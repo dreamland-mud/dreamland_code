@@ -11,6 +11,8 @@ all:
 	@aclocal
 	@echo "*** Scaning for include statements"
 	@autoheader
+	@libtoolize -f
+	@automake --add-missing
 	@echo "*** Building Makefile templates( step one )"
 	@automake
 	@echo "*** Scaning for moc files in src"
