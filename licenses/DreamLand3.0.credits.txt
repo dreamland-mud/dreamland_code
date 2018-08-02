@@ -1,0 +1,23 @@
+DreamLand 3.0 (c) 2003-2012 by Ruffina
+
+     Code contributions by 
+	Sturm, Unicorn, and from realms of Forgotten Dungeon,
+	Shades of Gray, Anatolia 3.0, DalekenMUD, Labyrinth
+
+     Fenia coding by
+        Ancifer, Filths, Kind, Miyamoto, Ruqun
+
+     Quest scenarios by
+        Cotton, Miyamoto, Ragnar, Tleylax
+
+     Area translations by
+        Bastian, Brillar, Cradya, Irlana, Karmina, Nimoa, Pradd, 
+	SinLair, Shavatar, Thoren, Tsamada, Vrem
+        and from realms of Forgotten Dungeon, Shadow Realms
+
+     Area creation by
+        Aileen, Ancifer, Cotton, Cradya, Dalt, Emmanuil, Hellen, 
+	Irlana, McLaud, Myrriti, Thoren
+   
+     Great thanks to all who gave ideas and inspiration.
+

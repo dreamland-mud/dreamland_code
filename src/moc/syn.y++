@@ -1,0 +1,180 @@
+%pure_parser
+
+%{
+
+//#define YYDEBUG 1
+
+/* $Id: syn.y++,v 1.3.4.5.8.3 2014-09-19 11:42:19 rufina Exp $
+ *
+ * ruffina, 2004
+ */
+/***************************************************************************
+                          moc.y  -  Parser and code generator for moc
+                             -------------------
+    begin                : Tue Nov 21 2000
+    copyright            : (C) 2000 by Igor S. Petrenko
+    email                : nofate@europe.com
+ ***************************************************************************/
+
+#include "system.h"
+#include <iostream>
+#include <string>
+#include <list>
+
+using namespace std;
+
+int yylex( System::MocType* value );
+extern int yylineno;
+#define	YYSTYPE	System::MocType
+
+void error( const string& text );
+
+int yyerror( char* message ) {
+  error(message);
+  return -1;
+}
+
+string 
+getFQCN(string ln) {
+    string fqcn;
+    System::ListStringType::iterator i;
+    
+    for(i = System::getNamespaceStack().begin();
+	    i != System::getNamespaceStack().end(); i++)
+	fqcn += *i + "::";
+
+    return fqcn + ln;
+}
+
+%}
+
+%token		CLASS
+%token		VIRTUAL
+%token		PRIVATE
+%token		PROTECTED
+%token		PUBLIC
+%token 		NAME
+%token 		NAME_TEMPLATE
+%token		TYPE
+%token		NAMESPACE
+
+
+%type<getString( )>    NAME
+%type<getString( )>	TYPE
+%type<getString( )>	NAME_TEMPLATE
+
+
+%%
+
+start:
+		statement_list
+;
+
+statement_list:
+		statement
+	|	statement_list statement
+;
+
+statement:
+		class
+	|	variable
+	|	NAMESPACE NAME '{' '}'
+	|	NAMESPACE NAME '{'
+	{
+		System::namespaceOpen( );
+		System::getNamespaceStack().push_back($2);
+	}
+		statement_list
+	{
+		System::getNamespaceStack().pop_back();
+		System::namespaceClose( );
+	}
+		'}'
+;
+
+
+class:
+		CLASS NAME ';'	{
+			System::setST_INITIAL( );
+		}
+	|	CLASS NAME {
+			System::getCurrentClass( ).setName( getFQCN($2) );
+			System::getCurrentClass( ).setFile( System::getCurrentFile( ) );
+		} ancestors '{'
+;
+ancestors:
+	|	':' ancestors_list
+;
+ancestors_list:
+		modifier virtual NAME {
+		    System::getCurrentClass( ).addAncestor( $3 );
+		}
+	|	virtual NAME { 
+		    System::getCurrentClass( ).addAncestor( $2 ); 
+		}
+	|	modifier virtual NAME ',' ancestors_list  { 
+		    System::getCurrentClass( ).addAncestor( $3 ); 
+		}
+	|	modifier virtual NAME_TEMPLATE { 
+		    string t = $3;
+		    t = t.erase( t.find('<'), t.size() );
+		    System::getCurrentClass( ).addAncestor( t );
+		}
+	|	virtual NAME_TEMPLATE { 
+		    string t = $2;
+		    t = t.erase( t.find('<'), t.size() );
+		    System::getCurrentClass( ).addAncestor( t );
+		}
+	|	modifier virtual NAME_TEMPLATE ',' ancestors_list { 
+		    string t = $3;
+		    t = t.erase( t.find('<'), t.size() );
+		    System::getCurrentClass( ).addAncestor( t );
+		}
+;
+
+virtual:
+	|	VIRTUAL
+;
+
+modifier:
+		PRIVATE
+	|	PROTECTED
+	|	PUBLIC
+;
+
+variable:
+		TYPE {
+			System::getCurrentVariable( ).setType( $1 );
+			if( ( $1 ).find( '*' ) != string::npos )
+			{
+				System::getCurrentVariable( ).setPointer( );
+			}
+			else
+			{
+				System::getCurrentVariable( ).unsetPointer( );
+			}
+			System::getCurrentVariable( ).setStatic( System::isStaticVariable( ) );
+			System::unsetStaticVariable( );
+		} variable_name ';'
+;
+
+variable_name:
+		NAME {
+			System::getCurrentVariable( ).setName( $1 );
+			System::getCurrentVariable( ).setClassName( System::getCurrentClass( ).getName( ) );
+			System::getCurrentClass( ).addVariable( System::getCurrentVariable( ) );
+		}
+	|	NAME {
+			System::getCurrentVariable( ).setName( $1 );
+			System::getCurrentVariable( ).setClassName( System::getCurrentClass( ).getName( ) );
+			System::getCurrentClass( ).addVariable( System::getCurrentVariable( ) );
+		} ',' variable_name
+;
+%%
+
+void
+yydbg(int i) {
+#if YYDEBUG
+    yydebug = i;
+#endif
+}

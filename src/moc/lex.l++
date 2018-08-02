@@ -1,0 +1,522 @@
+/* $Id: lex.l++,v 1.7.2.5.8.1 2008/03/04 07:24:12 rufina Exp $
+ *
+ * ruffina, 2004
+ */
+/***************************************************************************
+                          moc.l  -  Lexical analyzer for moc
+                             -------------------                                         
+    begin                : Tue Nov 21 2000                                           
+    copyright            : (C) 2000 by Igor S. Petrenko                         
+    email                : nofate@europe.com                                     
+ ***************************************************************************/
+
+%option noyywrap
+%option yylineno
+
+%{
+
+#include <stdlib.h>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+
+#include "syn.h++"
+#include "system.h"
+
+using std::cerr;
+using std::endl;
+
+#define	YY_DECL		int yylex( System::MocType* value )
+
+string braces;
+int bracesCnt = 0;
+
+FILE* open_include( const string& file_name );
+bool check_header( const string& hfile, int token );
+void error( const string& text );
+
+int curl = 0;
+%}
+
+DEFINE      		#define
+WS           		[ \t\f\b]* 
+SPACE       		[ \t\f\b]+
+S_INCLUDE     		#[ \t]*include[ \t]+["<]
+E_INCLUDE     		[">]
+INCLUDE_NAME   		[a-zA-Z\-_][a-zA-Z0-9.\-_/]*
+NAME       		[a-zA-Z_][a-zA-Z0-9_]*
+NAME_NAMESPACE  	{NAME}::{NAME}
+NAME_TEMPLATE   	{NAME}<[a-zA-Z:0-9_,\* ]+>
+NAME_NAMESPACE_TEMPLATE {NAME}::{NAME_TEMPLATE}
+TYPEDEF_STRUCT  	typedef[ \n\r\t\f]+struct
+TYPE       		[a-zA-Z_][a-zA-Z0-9_<>:]+\**
+EXTERN      		extern
+
+
+%s	ST_INCLUDE_START ST_INCLUDE_END
+%s	ST_CLASS_INITIATE ST_IN_CLASS
+%s	ST_XML_VARIABLE ST_XML_VARIABLE_TYPE
+%s	ST_TEMPLATE
+%s	ST_TYPEDEF
+%s	ST_DEFINE
+%s	ST_IGN
+%s	ST_EXTERN
+%s	ST_NAMESPACE_INITIATE
+%x	ST_SKIP
+%x	ST_USING_NAMESPACE
+
+%%
+"//".*MOC_SKIP_BEGIN.*$	{
+	System::setST( YYSTATE );
+	System::pushST( );
+	System::setST( ST_SKIP );
+}
+<ST_SKIP>"//".*MOC_SKIP_END.*$ {
+	System::popST( );
+}
+
+"//".*$ ;
+
+"/*"	{
+	int c;
+	for( ; ; ) {
+	  while( ( c = yyinput( ) ) != '*' && c != EOF );
+	  if( c == '*' )
+	  {
+	    while( ( c = yyinput( ) ) == '*' );
+	    if( c == '/' ) break;
+	  }
+	  if( c == EOF )
+	  {
+	    cerr << "EOF in comment" << endl;
+	    break;
+	  }
+	}
+}
+
+<INITIAL>{EXTERN}	{
+	BEGIN( ST_EXTERN );
+}
+
+<ST_EXTERN>";"	{
+	BEGIN( INITIAL );
+}
+
+<ST_EXTERN>.	;
+
+<INITIAL>"using"{SPACE}"namespace" {
+    BEGIN(ST_USING_NAMESPACE);
+}
+
+<ST_USING_NAMESPACE>{NAME} {
+    System::getUsingNamespaceList().push_back(yytext);
+}
+<ST_USING_NAMESPACE>";" {
+    BEGIN(INITIAL);
+}
+
+<INITIAL>"namespace"	{
+    BEGIN( ST_NAMESPACE_INITIATE );
+    return NAMESPACE;
+}
+
+<ST_NAMESPACE_INITIATE>{NAME}		{ 
+    value->setString( yytext );
+    return NAME;
+}
+
+<ST_NAMESPACE_INITIATE>"{"		{ 
+    BEGIN( INITIAL );
+    return '{';
+}
+
+<INITIAL>"{"	{ 
+    curl++;
+}
+
+<INITIAL>"}"	{ 
+    if(!curl)
+	return '}'; 
+    else
+	curl--; 
+}
+
+<INITIAL>"template"[^A-Za-z0-9_]	{
+	System::setST( INITIAL );
+	System::pushST( );
+	System::setST( ST_TEMPLATE );
+}
+
+<ST_TEMPLATE>"<"	{
+	System::openTemplate( );
+}
+
+<ST_TEMPLATE>">"	{
+	System::closeTemplate( );
+	if( System::getTemplate( ) <= 0 ) {
+	  System::popST( );
+	}
+}
+
+<ST_TEMPLATE>"."	;
+
+<INITIAL>{TYPEDEF_STRUCT}	{
+	System::setST( INITIAL );
+	System::pushST( );
+	System::setST( ST_TYPEDEF );
+}
+
+<ST_TYPEDEF>"{"	{
+	System::openTypedef( );
+}
+
+<ST_TYPEDEF>"}"	{
+	System::closeTypedef( );
+	if( System::getTypedef( ) <= 0 )
+	{
+	  System::popST( );
+	}
+}
+
+<INITIAL>"class"[ \t\n]+|"struct"[ \t\n]+	{
+	System::setST( ST_CLASS_INITIATE );
+	return CLASS;
+}
+
+<ST_CLASS_INITIATE>"{"	{
+	System::inClass( );
+	System::setST( ST_IN_CLASS );
+	return '{';
+}
+
+<ST_CLASS_INITIATE>[:,;]	{
+	return yytext[0];
+}
+
+<ST_CLASS_INITIATE>"virtual"[^A-Za-z0-9_]	{
+	return VIRTUAL;
+}
+
+<ST_CLASS_INITIATE>"private"[^A-Za-z0-9_]	{
+	return PRIVATE;
+}
+
+<ST_CLASS_INITIATE>"public"[^A-Za-z0-9_]	{
+	return PUBLIC;
+}
+
+<ST_CLASS_INITIATE>"protected"[^A-Za-z0-9_]	{
+	return PROTECTED;
+}
+
+<ST_CLASS_INITIATE>{NAME}	{
+	value->setString( yytext );
+	return NAME;
+}
+
+<ST_CLASS_INITIATE>{NAME_NAMESPACE}	{
+	string ns = yytext;
+//	ns.erase( 0, ns.find( "::" ) + 2 );
+	value->setString( ns );
+	return NAME;
+}
+
+<ST_CLASS_INITIATE>{NAME_TEMPLATE}	{
+	value->setString( yytext );
+	return NAME_TEMPLATE;
+}
+
+<ST_CLASS_INITIATE>{NAME_NAMESPACE_TEMPLATE}	{
+	string ns = yytext;
+	ns.erase( 0, ns.find( "::" ) + 2 );
+	value->setString( ns );
+	return NAME_TEMPLATE;
+}
+
+<ST_IN_CLASS>"XML_OBJECT"[^A-Za-z0-9_] {
+	System::getCurrentClass( ).setXML_OBJECT( );
+}
+
+<ST_IN_CLASS>"static"[^A-Za-z0-9_]	{
+	System::setStaticVariable( );
+}
+
+<ST_IN_CLASS>";"	{
+	System::unsetStaticVariable( );
+}
+
+
+<ST_IN_CLASS>"XML_VARIABLE"[^A-Za-z0-9_]	{
+	if( System::getClassLevel( ) > 0 )
+	{
+		System::setST( ST_XML_VARIABLE_TYPE );
+	}
+}
+
+<ST_XML_VARIABLE_TYPE>{TYPE}	{
+
+	string hfile = yytext;
+
+	value->setString( yytext );
+
+	while( hfile[hfile.length( ) - 1] == '*' ) hfile.erase( hfile.length( ) - 1 );
+
+	hfile += ".h";
+
+	System::VectorStringType::iterator p = find( System::getIncludeFiles( ).begin( ), System::getIncludeFiles( ).end( ), hfile );
+	if( p == System::getIncludeFiles( ).end( ) )
+	{
+		System::getIncludeFiles( ).push_back( hfile );
+	}
+
+	System::setST( ST_XML_VARIABLE );
+	return TYPE;
+}
+
+<ST_IN_CLASS>"{"	{
+	System::unsetStaticVariable( );
+	System::inClass( );
+}
+
+<ST_IN_CLASS>"}"	{
+	System::unsetStaticVariable( );
+	System::outClass( );
+	if( System::getClassLevel( ) == 0 )
+	{
+		    
+		if( !System::getCurrentClass( ).getName( ).empty( ) )
+		{
+			    
+			if( System::getHeaderLevel( ) <= 0 )
+			{
+
+		    System::getMocClassList( ).push_back( System::getCurrentClass( ) );
+			}
+
+			System::getClassMap( )[System::getCurrentClass( ).getName( )] = System::getCurrentClass( );
+			System::getCurrentClass( ).destroy( );
+		}
+
+	  System::setST( INITIAL );
+	}
+}
+
+<INITIAL>{S_INCLUDE}	{
+	System::unsetStaticVariable( );
+	System::setST( ST_INCLUDE_START );
+}
+
+<ST_INCLUDE_START>{INCLUDE_NAME}	{
+	if( !check_header( yytext, ST_INCLUDE_END ) )
+	{
+	  System::setST( ST_INCLUDE_END );
+	}
+}
+
+<ST_INCLUDE_END>{E_INCLUDE}	{
+	System::setST( INITIAL );
+}
+
+<ST_XML_VARIABLE>{NAME}	{
+	value->setString( yytext );
+	return	NAME;
+}
+
+<ST_XML_VARIABLE>","	{
+	return ',';
+}
+
+<ST_XML_VARIABLE>";"	{
+	System::setST( ST_IN_CLASS );
+	return ';';
+}
+
+[ \t\r\f]		;
+
+{DEFINE}	{
+	System::pushST( );
+	System::setST( ST_DEFINE );
+}
+
+<ST_DEFINE>"\\"[ \t]*\n	;
+
+<ST_DEFINE>.	;
+
+<ST_DEFINE>\n	{
+	System::popST( );
+}
+
+"("	{
+	System::pushST( );
+	System::setST( ST_IGN );
+}
+
+<ST_IGN>")"	{
+	System::popST( );
+}
+
+<ST_IGN>.	;
+<ST_IGN>\n	;
+
+<INITIAL>.				System::unsetStaticVariable( );
+
+<ST_INCLUDE_END>.	;
+
+<ST_SKIP>.	;
+<ST_SKIP>\n	;
+
+<<EOF>>	{
+	if( !System::getIncludeFiles( ).empty( ) )
+	{
+		unput( EOF );
+		string hfile = System::getIncludeFiles( ).back( ); System::getIncludeFiles( ).pop_back( );
+		check_header( System::lower( hfile ), INITIAL );
+		System::setST( INITIAL );
+	}
+	else
+	{
+		System::outHeader( );
+		if( System::getHeaderLevel( ) < 0 )
+		{
+			System::clearHeader( );
+		}
+		
+		if( !System::getStackInclude( ).empty( ) )
+		{
+		  System::IncludeType inc = System::getStackInclude( ).top( );
+		  yylineno = inc.line;
+			System::getStackInclude( ).pop( );
+			yy_delete_buffer( YY_CURRENT_BUFFER );
+			System::setCurrentFile( inc.getFileName( ) );
+			System::setST( inc.getST( ) );
+			yy_switch_to_buffer( static_cast<YY_BUFFER_STATE>( inc.getBuffer( ) ) );
+			System::setCurrentClass( inc.getClassType( ) );
+			System::setST( ST_INCLUDE_END );
+		}
+		else
+		{
+			return EOF;
+		}
+	}
+}
+
+<ST_CLASS_INITIATE>.	{
+	std::basic_ostringstream<char> text;
+	text << "In class: " << System::getCurrentClass( ).getName( )
+	     << "unexpected character: " << yytext[0];
+	error(text.str( ));
+}
+
+.		System::unsetStaticVariable( );
+
+%%
+
+int System::statement = INITIAL;
+
+bool check_header( const string& hfile, int token )
+{
+	System::ListStringType::iterator pos = find(
+		System::getIncludeList( ).begin( ),
+		System::getIncludeList( ).end( ),
+		hfile
+	);
+	if( pos == System::getIncludeList( ).end( ) )
+	{
+		System::getIncludeList( ).push_back( hfile );
+		FILE* tmp_yyin;
+
+		if( !( tmp_yyin = open_include( hfile ) ) )
+		{
+			System::setST( token );
+			
+			return false;
+		}
+		else
+		{
+			System::getStackInclude( ).push( System::IncludeType( System::getCurrentClass( ), System::getCurrentFile( ), token, yylineno, YY_CURRENT_BUFFER ) );
+	
+			yyin = tmp_yyin;
+			yylineno = 1;
+			yy_switch_to_buffer( yy_create_buffer( tmp_yyin, YY_BUF_SIZE ) );
+			System::setST( INITIAL );
+			System::inHeader( );
+			System::setCurrentFile( hfile );
+			System::getCurrentClass( ).destroy( );
+
+			return true;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+FILE* open_include( const string& file_name )
+{
+
+  for( System::VectorStringType::iterator pos = System::getIncludePath( ).begin( );
+       pos != System::getIncludePath( ).end( );
+       pos++ )
+	{
+		string file = *pos + ( ( *pos ).empty( ) ? "" : "/" ) + file_name;
+		
+		FILE* tmp = fopen( file.c_str( ), "r" );
+		if( tmp != 0 )
+		{
+			return tmp;
+		}
+	}
+	return 0;
+}
+
+
+void System::setST( int statement )
+{
+	BEGIN( statement );
+	System::statement = statement;
+}
+
+int System::getST( )
+{
+	return statement;
+}
+
+void System::pushST( )
+{
+	statementStack.push( statement );
+}
+
+void System::popST( )
+{
+	if( statementStack.empty( ) )
+	{
+	  cerr << "stack is empty!!!" << endl;
+		exit( 1 );
+	}
+	else
+	{
+		statement = statementStack.top( );
+		statementStack.pop( );
+		BEGIN( statement );
+	}
+}
+
+void System::setST_INITIAL( )
+{
+	setST( INITIAL );
+}
+
+void error( const string& text)
+{
+    cerr << "In file: " << System::getCurrentFile( ) << ":" << yylineno << ": "
+	 << "state " << YY_START << ": " << text << endl;
+    
+    for(;!System::getStackInclude( ).empty();System::getStackInclude( ).pop()) {
+	const System::IncludeType & inc = System::getStackInclude( ).top();
+	cerr << "   included from " << inc.getFileName() << ":" << inc.line << endl;
+    }
+
+    exit(3);
+}

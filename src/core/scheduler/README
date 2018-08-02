@@ -1,0 +1,47 @@
+SCDP_BOOT    =  100
+    +5 XMLAreaLoadTask (on 0 tick)
+    +5 AreaLoadTask (on 0 tick)
+    +6 AreaFixTask (on 0 tick)
+   +10 PlayerLoadTask (on 0 tick)
+   +20 DropsLoadTask (on 0 tick)
+
+SCDP_INITIAL = 1000
+    +0 InitialUpdate (on 0 tick)
+    +0 BanManager
+  +100 GQuestSchutdownTask (if destroy occured before SCDP_IOREAD or after SCDP_AUTO)
+  +100 GangKeysResetTask (or any current prio +100)
+  
+SCDP_IOINIT  = 2000
+   +0  IOInitTask
+   
+SCDP_IOPOLL  = 3000
+   +0  IOPollTask
+   
+SCDP_IOREAD  = 4000
+   +0  IOReadTask
+
+SCDP_AUTO    = 5000
+    +0 AnatoliaUpdate
+    +1 CPlugin "Мир неуловимо изменился"
+  +100 GQuestShutdownTask (if destroy occured btw SCDP_IOREAD and SCDP_AUTO)
+  
+SCDP_ROUND   = 6500
+   +10 SchedulerTaskRoundPCMemory
+   +15 WorldKnowledge
+   +20 SchedulerTaskRoundPCharacter
+   +30 SchedulerTaskRoundCharacter
+   +40 SchedulerTaskRoundObject
+   +50 SchedulerTaskRoundRoom
+   +90 CardStartersRefresh
+  +100 GlobalQuestManager
+  +101 GlobalQuest
+  +400 fight PlayerDeleteTask
+
+SCDP_IOWRITE = 7000
+   +0  IOWriteTask
+
+SCDP_FINAL   = 10000
+   +0 IOFinalyTask
+   +0 feniaroot SyncTask
+   +0 QuestDestroyTask
+

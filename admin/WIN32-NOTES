@@ -1,0 +1,9 @@
+ - ::rename fails if dest exist
+ - fix libtool (remove -lstdc++)
+ - strip does not work for PE exec! -- it just removes .stub 
+   and .stubstr sections without taking care of .reloc choping,
+   thus -Wl,-S should be added to LDFLAGS to strip dll early
+ - renaming .rdata (with fixing flags) does not work on XP.
+   custom ldscript (i386pei.x-no-rdata) should be used to produce
+   dlls.
+

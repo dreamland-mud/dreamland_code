@@ -1,0 +1,149 @@
+
+%option c++
+%option prefix="fenia"
+%option yylineno
+%option noyywrap
+
+%{
+/* $Id: scan.l++,v 1.4.2.6 2005/09/11 22:50:54 rufina Exp $
+ *
+ * ruffina, 2004
+ */
+/* $Id: scan.l++,v 1.4.2.6 2005/09/11 22:50:54 rufina Exp $
+ * 
+ * unicorn, Forgotten Dungeon, 2004
+ */
+#include <dlstring.h>
+
+#include "parse.h++"
+
+#include "feniaparser.h"
+
+using namespace Scripting;
+
+#define YY_DECL         int FeniaParser::lex( SValue * value)
+%}
+
+RL	    [ÊÃÕËÅÎÇÛİÚÈßÆÙ×ÁĞÒÏÌÄÖÜÑŞÓÍÉÔØÂÀ£êãõëåîçûıúèÿæù÷áğòïìäöüñşóíéôøâà³]
+L	    ([A-Za-z]|{RL})
+NUM	    [0-9]+
+WS	    [[:space:]]+
+ID	    {L}({L}|[0-9_])*
+
+
+%x QUOTE
+%x DQUOTE
+%x COMMENT
+
+%%
+	    int c_level = 0;
+	    DLString buf;
+
+\n	    ;
+
+[[:space:]]*
+
+"//".*
+
+"/*"	    { BEGIN(COMMENT); }
+<COMMENT>{
+"/*"	    { c_level++; }
+"*/"	    { if(--c_level) BEGIN(INITIAL); }
+"\n"	    ;
+.
+}
+
+\'	    { BEGIN(QUOTE); buf.clear(); }
+<QUOTE>{
+\'	    { BEGIN(INITIAL); value->str = buf; return T_STR; }
+\\n	    { buf += '\n';      }
+\\r	    { buf += '\r';      }
+\\t	    { buf += '\t';      }
+\\.	    { buf += yytext[1]; }
+.	    { buf += yytext[0]; }
+\n          { buf += yytext[0]; }
+}
+
+\"	    { BEGIN(DQUOTE); buf.clear(); }
+<DQUOTE>{
+\"	    { BEGIN(INITIAL); value->str = buf; return T_STR; }
+\\n	    { buf += '\n';      }
+\\r	    { buf += '\r';      }
+\\t	    { buf += '\t';      }
+\\.	    { buf += yytext[1]; }
+.	    { buf += yytext[0]; }
+\n          { buf += yytext[0]; }
+}
+
+"<"	    { return *yytext; }
+">"	    { return *yytext; }
+"-"	    { return *yytext; }
+"+"	    { return *yytext; }
+"="	    { return *yytext; }
+"*"	    { return *yytext; }
+"/"	    { return *yytext; }
+"("	    { return *yytext; }
+")"	    { return *yytext; }
+"!"	    { return *yytext; }
+"~"	    { return *yytext; }
+"%"	    { return *yytext; }
+"|"	    { return *yytext; }
+"^"	    { return *yytext; }
+","	    { return *yytext; }
+"."	    { return *yytext; }
+"}"	    { return *yytext; }
+"{"	    { return *yytext; }
+"["	    { return *yytext; }
+"]"	    { return *yytext; }
+";"	    { return *yytext; }
+[|&]	    { return *yytext; }
+
+
+"!="	    { return T_NEQ; }
+"=="	    { return T_EQ; }
+"->"        { return T_ARROW; }
+
+"null"	    { return T_NULL; }
+"if"	    { return T_IF; }
+"else"	    { return T_ELSE; }
+"for"	    { return T_FOR; }
+"break"	    { return T_BREAK; }
+"continue"  { return T_CONTINUE; }
+"return"    { return T_RETURN; }
+"function"  { return T_FUNCTION; }
+"var"	    { return T_VAR; }
+"try"	    { return T_TRY; }
+"catch"	    { return T_CATCH; }
+"throw"	    { return T_THROW; }
+
+{NUM}	    { value->num = atoi( yytext ); return T_NUM; }
+"true"	    { value->num = 1; return T_NUM; }
+"false"	    { value->num = 0; return T_NUM; }
+
+"this"	    {
+		value->id = ID_THIS;
+		return T_ID;
+	    }
+    
+{ID}	    { 
+		value->id = Lex::getThis()->resolve(yytext);
+		return T_ID; 
+	    }
+
+.           { error((DLString("unexpected char: ") + yytext[0]).c_str()); }
+
+%%
+
+/*
+"switch"    { return T_SWITCH; }
+"case"	    { return T_CASE; }
+"default"   { return T_DEFAULT; }
+ */
+
+int 
+feniaFlexLexer::yylex( )
+{
+    return 0;
+}
+
+

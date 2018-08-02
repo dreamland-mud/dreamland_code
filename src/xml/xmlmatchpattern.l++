@@ -1,0 +1,248 @@
+/***************************************************************************
+                          xmlmatchpattern.l++  -  description                              
+                             -------------------                                         
+    begin                : Tue Oct 16 2001                                           
+    copyright            : (C) 2001 by Igor S. Petrenko                         
+    email                : nofate@europe.com                                     
+ ***************************************************************************/
+
+%option c++
+%option prefix="xmlmatchpattern"
+%option noyywrap
+
+%{
+
+#include "xmlmatchpattern.h"
+
+#define YY_DECL int XMLMatchPattern::yylex( ) throw( ExceptionXSL )
+
+%}
+
+NAME			[[:alpha:]][[:alnum:]:]*
+VARIABLE	("@"{NAME})|("'"[[:graph:]]*"'")
+
+%s	READ_FIRST_VARIABLE
+%s	READ_OPERATOR
+%s	READ_SECOND_VARIABLE
+%s	END_READ_OPERATION
+
+%%
+
+<INITIAL>"/["	{
+	listDown( );
+	if( list->empty( ) ) return 1;
+	position += 2;
+	BEGIN( READ_FIRST_VARIABLE );
+}
+
+<INITIAL>"["	{
+	position++;
+	BEGIN( READ_FIRST_VARIABLE );
+}
+
+<INITIAL>"//"	{
+	throw ExceptionXSL( "don't support", "//", position );
+}
+
+<INITIAL>"/"	{
+	listDown( );
+	if( list->empty( ) ) return 1;
+	position++;
+}
+
+<INITIAL>{NAME}	{ // Ищем по имени
+	DLString name = YYText( );
+	position += name.length( );
+	list = lookupName( name, list );
+}
+
+<READ_FIRST_VARIABLE>{VARIABLE}	{
+	firstVariable = YYText( );
+	position += firstVariable.length( );
+	BEGIN( READ_OPERATOR );
+}
+
+<READ_OPERATOR>"=="	{
+	 operation = EQUAL;
+	 position += 2;
+	 BEGIN( READ_SECOND_VARIABLE );
+}
+
+<READ_OPERATOR>"!="	{
+	 operation = NOT_EQUAL;
+	 position += 2;
+	 BEGIN( READ_SECOND_VARIABLE );
+}
+
+<READ_OPERATOR>"<"	{
+	 operation = LESS;
+	 position += 2;
+	 BEGIN( READ_SECOND_VARIABLE );
+}
+
+<READ_OPERATOR>">"	{
+	 operation = MORE;
+	 position += 2;
+	 BEGIN( READ_SECOND_VARIABLE );
+}
+
+<READ_OPERATOR>"<="	{
+	 operation = LESS_OR_EQUAL;
+	 position += 2;
+	 BEGIN( READ_SECOND_VARIABLE );
+}
+
+<READ_OPERATOR>">="	{
+	 operation = MORE_OR_EQUAL;
+	 position += 2;
+	 BEGIN( READ_SECOND_VARIABLE );
+}
+
+<READ_SECOND_VARIABLE>{VARIABLE}	{
+	secondVariable = YYText( );
+	position += secondVariable.length( );
+	BEGIN( END_READ_OPERATION );
+}
+
+<END_READ_OPERATION>"]"	{
+	list = lookupArgument( list );
+	position++;
+	BEGIN( INITIAL );
+}
+
+<READ_FIRST_VARIABLE,READ_OPERATOR,READ_SECOND_VARIABLE,END_READ_OPERATION>[ \t]*	{
+	position += strlen( YYText( ) );
+}
+
+<*>.	{
+	throw ExceptionXSL( YYText( )[0], position );
+}
+
+%%
+
+XMLMatchPattern::XMLMatchPattern ( const XMLNode::Pointer root, const DLString& pattern )
+		: yyFlexLexer( ), root( root ), pattern( pattern ),
+			list( NEW ), position( 0 )
+{
+	DLString newPattern = pattern;
+	if( pattern.length( ) > 0 && pattern[0] != '/' )
+	{
+		newPattern.insert( 0, "/" );
+	}
+	istr.str( newPattern );
+	list->push_back( root );
+	switch_streams( &istr, &ostr );
+}
+
+XMLMatchPattern::~XMLMatchPattern( )
+{
+}
+
+int yyFlexLexer::yylex( )
+{
+	return 0;
+}
+
+inline XMLMatchPattern::NodeList::Pointer XMLMatchPattern::lookupArgument
+(
+	const XMLNode::NodeList::Pointer list
+)
+{
+	bool isFirstArgument = false;
+	bool isSecondArgument = false;
+	
+	if( firstVariable[0] == '@' )
+	{
+		isFirstArgument = true;
+		firstVariable.erase( 0, 1 );
+	}
+	else
+	{
+		firstVariable.erase( 0, 1 );
+		firstVariable.erase( firstVariable.length( ) - 1, 1 );
+	}
+	
+	if( secondVariable[0] == '@' )
+	{
+		isSecondArgument = true;
+		secondVariable.erase( 0, 1 );
+	}
+	else
+	{
+		secondVariable.erase( 0, 1 );
+		secondVariable.erase( secondVariable.length( ) - 1, 1 );
+	}
+	
+	NodeList::Pointer newList( NEW );
+	for( XMLNode::NodeList::const_iterator ipos = list->begin( );
+		ipos != list->end( );
+		ipos++ )
+	{
+		const DLString& one = isFirstArgument ? ( *ipos )->getAttribute( firstVariable ) : firstVariable;
+		const DLString& two = isSecondArgument ? ( *ipos )->getAttribute( secondVariable ) : secondVariable;
+		bool result = false;
+
+		switch( operation )
+		{
+			case EQUAL:
+				result = one == two;
+				break;
+			case NOT_EQUAL:
+				result = one != two;
+				break;
+			case LESS:
+				result = one < two;
+				break;
+			case LESS_OR_EQUAL:
+				result = one <= two;
+				break;
+			case MORE:
+				result = one > two;
+				break;
+			case MORE_OR_EQUAL:
+				result = one >= two;
+				break;
+		}
+		if( result )
+		{
+			newList->push_back( *ipos );
+		}
+	}
+	return newList;
+}
+
+inline XMLMatchPattern::NodeList::Pointer XMLMatchPattern::lookupName
+(
+	const DLString& name, const NodeList::Pointer inList
+)
+{
+	NodeList::Pointer newList( NEW );
+	for( XMLNode::NodeList::const_iterator ipos = inList->begin( );
+		ipos != inList->end( );
+		ipos++ )
+	{
+		if( ( *ipos )->getName( ) == name )
+		{
+			newList->push_back( *ipos );
+		}
+	}
+	return newList;
+}
+
+inline void XMLMatchPattern::listDown( )
+{
+	NodeList::Pointer newList( NEW );
+	for( XMLNode::NodeList::const_iterator ipos = list->begin( );
+		ipos != list->end( );
+		ipos++ )
+	{
+		const NodeList& inList = ( *ipos )->getNodeList( );
+		for( XMLNode::NodeList::const_iterator ipos = inList.begin( );
+			ipos != inList.end( );
+			ipos++ )
+		{
+			newList->push_back( *ipos );
+		}
+	}
+	list = newList;
+}

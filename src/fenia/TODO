@@ -1,0 +1,6 @@
+
+- убрать лишние исключения, поправить формат нужных
+- id( name ) syntax: Register::IDENTIFIER register.
+- redo codesource storage, sync on finalization
+- decide what to do with incrementing syncing
+- split Manager template it two parts: container <-> storage

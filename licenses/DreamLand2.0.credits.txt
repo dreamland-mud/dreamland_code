@@ -1,0 +1,23 @@
+DreamLand 2.0 (c) 1998-2003 by 
+	Igor Antonenko         (Leo)
+	Olga Ridvanuk          (Varda)
+	Igor Petrenko          (NoFate, Demogorgon)
+	Sergey Tereschenko     (Sturm)
+	Denis Lukinykh         (Dwarkin, Corvin)
+	Vladimir Gulyaev       (Tirna, Teelak)
+	Roman Cherednichenko   (Glorund)
+	Aleksandr Zadvinsky    (Kiddy)
+	Vladimir Kirichenko    (Razer)
+	Nazar Koval            (Nazar, Redrum)
+	Vladimir Doropey       (Reorx)  
+	Denis Kulgeiko         (Burzum)
+	Aleksandr Andreyanov   (Manwe)
+     
+     Russian localization, area translations by
+	Bastian, Cradya, Corvin, Derini, Dred, Garret, Grom, Fantik,
+	Finraag, Hauzer, Hinore, Joker, Krauss, Fiorinne, Lexx, Miyamoto, 
+	Resky, Sherhan, Teelak, Varda, Xok, Zav, Бесенок, Холод
+
+     Area creation by
+        Branwen, Cradya, Galen, Miyamoto, Tananda, Teelak, Shur
+

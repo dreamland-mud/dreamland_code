@@ -1,0 +1,147 @@
+/***************************************************************************
+                          parsedate.l++  -  разбор строки времени
+                             -------------------                                         
+    begin                : Thu Sep 27 2001                                           
+    copyright            : (C) 2001 by nofate                         
+    email                : nofate@europe.com
+ ***************************************************************************/
+
+%option c++
+%option prefix="date"
+%option yylineno
+%option noyywrap
+
+%{
+
+#include <sstream>
+#include <string.h>
+
+using namespace std;
+
+#include "dateparser.h"
+
+#define YY_DECL int DateParser::dateLex( ) throw( ExceptionBadDateString )
+
+
+
+static const char MONTH					= 1;
+static const char WEEK					= 2;
+static const char DAY						= 3;
+static const char HOUR					= 4;
+static const char MINUTE				= 5;
+static const char SECOND				= 6;
+
+static const char* IS_NOT_IN_ORDER = "isn't in order";
+
+%}
+
+MONTH				"mon"|"мес"|"month"|"месяц"
+WEEK				"w"|"н"|"week"|"неделя"
+DAY					"d"|"д"|"day"|"день"
+HOUR				"h"|"ч"|"hour"|"час"
+MINUTE			"min"|"мин"|"minute"|"митута"
+SECOND			"s"|"с"|"second"|"секунда"
+
+
+%%
+
+[0-9]+	{
+	tokenStatus++;
+	if( tokenStatus > SECOND )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	DLString number = YYText( );
+	position += number.length( );
+	number.stripLeftWhiteSpace( );
+	lastNumber = number.toLongInt( );
+}
+
+{MONTH}	{
+	if( tokenStatus > MONTH )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	position += strlen( YYText( ) );
+	second += ( lastNumber * 60 * 60 * 24 * 30 );
+	lastNumber = 0;
+	tokenStatus++;
+}
+
+{WEEK}	{
+	if( tokenStatus > WEEK )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	position += strlen( YYText( ) );
+	second += ( lastNumber * 60 * 60 * 24 * 7 );
+	lastNumber = 0;
+	tokenStatus++;
+}
+
+{DAY}	{
+	if( tokenStatus > DAY )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	position += strlen( YYText( ) );
+	second += ( lastNumber * 60 * 60 * 24 );
+	lastNumber = 0;
+	tokenStatus++;
+}
+
+{HOUR}	{
+	if( tokenStatus > HOUR )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	position += strlen( YYText( ) );
+	second += ( lastNumber * 60 * 60 );
+	lastNumber = 0;
+	tokenStatus++;
+}
+
+{MINUTE}	{
+	if( tokenStatus > MINUTE )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	position += strlen( YYText( ) );
+	second += ( lastNumber * 60 );
+	lastNumber = 0;
+	tokenStatus++;
+}
+
+{SECOND}	{
+	if( tokenStatus > SECOND )
+	{
+		throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+	}
+	position += strlen( YYText( ) );
+	second += lastNumber;
+	lastNumber = 0;
+	tokenStatus++;
+}
+
+[ ]+	{
+	position += strlen( YYText( ) );
+}
+
+.	{
+	throw ExceptionBadDateString( date, IS_NOT_IN_ORDER, position );
+}
+
+%%
+
+
+DateParser::DateParser( const DLString& date )
+	: yyFlexLexer( &istr, &cout ), tokenStatus( MONTH ), date( date ),
+		second( 0 ), modifier( 1 ), position( 1 ),
+		lastNumber( 0 ), istr( date.c_str( ) )
+{
+}
+
+int dateFlexLexer::yylex( )
+{
+	return 0;
+}

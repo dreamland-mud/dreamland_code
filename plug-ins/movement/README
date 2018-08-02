@@ -1,0 +1,38 @@
+Movement
+  |
+  +------> Walkment
+  |           |
+  |           +-----> PortalMovement
+  |	      |
+  |	      +-----> ExitsMovement
+  |                      |
+  |                      +--> RunMovement [comm]
+  |                      |
+  |                      +--> PushMovement [groups]
+  |                      |
+  |                      +--> FleeMovement
+  |                              |
+  |                              +--> EscapeMovement [groups]
+  |
+  +-----> JumpMovement
+              |
+	      +-----> TransferMovement 
+              |
+	      +-----> GateMovement [skills_impl]
+	      |          |
+              |          +--> SolarFlight [groups]
+	      |
+	      +-----> SummonMovement [skills_impl]
+	      |
+	      +-----> RecallMovement
+	                 |
+			 +--> TempleRecallMovement [groups]
+			 |
+			 +--> ClanRecallMovement [clan]
+			 |
+			 +--> HomeRecallMovement [mansion]
+			 |
+			 +--> WordOfRecallMovement [groups]
+			 
+	      
+	      

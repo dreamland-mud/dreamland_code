@@ -1,0 +1,360 @@
+
+dnl AC_CHECK_BDB
+
+AC_DEFUN([AC_CHECK_BDB],
+[
+    AC_CACHE_CHECK([for DbEnv::DbEnv], [ac_cv_bdb],
+    [
+	ac_cv_bdb_safelibs=$LIBS
+	LIBS="-ldb_cxx $LIBS"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <db_cxx.h>]],
+				        [[DbEnv db( 0 );]])],
+		[ac_cv_bdb=yes],
+		[ac_cv_bdb=no])
+	LIBS=$ac_cv_bdb_safelibs
+    ])
+
+    if test $ac_cv_bdb = yes; then
+	BDB_LIBS=" -ldb_cxx"
+	AC_SUBST(BDB_LIBS)
+	AC_DEFINE(HAS_BDB, 1, [use berkley db])
+    fi
+])
+
+dnl Check for the type of the third argument of getsockname
+
+AC_DEFUN([AC_CHECK_DLSIZE_T],
+[
+    AC_MSG_CHECKING(for the third argument of getsockname)  
+    AC_LANG_CPLUSPLUS
+    AC_CACHE_VAL(ac_cv_DLsize_t,
+    [
+	AC_TRY_COMPILE(
+	[
+	    #include <sys/types.h>
+	    #include <sys/socket.h>
+	],
+	[
+	    socklen_t a=0; 
+	    getsockname(0,(struct sockaddr*)0, &a);
+	],
+	ac_cv_DLsize_t=socklen_t,
+	ac_cv_DLsize_t=)
+
+    if test -z "$ac_cv_DLsize_t"; then
+	ac_safe_cxxflags="$CXXFLAGS"
+	
+	if test "$GCC" = "yes"; then
+	    CXXFLAGS="-Werror $CXXFLAGS"
+	fi
+	AC_TRY_COMPILE(
+	[
+	    #include <sys/types.h>
+	    #include <sys/socket.h>
+	],
+	[
+	    int a=0; 
+	    getsockname(0,(struct sockaddr*)0, &a);
+	],
+	ac_cv_DLsize_t=int,
+	ac_cv_DLsize_t=size_t)
+	CXXFLAGS="$ac_safe_cxxflags"
+    fi
+])
+
+if test -z "$ac_cv_DLsize_t"; then
+  ac_cv_DLsize_t=int
+fi
+
+AC_MSG_RESULT($ac_cv_DLsize_t)
+AC_DEFINE_UNQUOTED(DLsize_t, $ac_cv_DLsize_t, [DL size_t])
+
+])
+
+AC_DEFUN([AC_COPY_DIR],
+[
+  if test ![ -d "$prefix/$1" ]; then
+    AC_MSG_CHECKING([copying directory $1])
+    cp -r "$srcdir/$1" "$prefix/$1"
+    AC_MSG_RESULT(done)
+  fi
+])
+
+AC_DEFUN([AC_CREATE_DIR],
+[
+  if test ![ -d "$prefix/$1" ]; then
+    AC_MSG_CHECKING([creating directory $1])
+    mkdir -p "$prefix/$1"
+    AC_MSG_RESULT(done)
+  fi
+])
+
+AC_DEFUN([AC_CREATE_DIR_16],
+[
+    AC_CREATE_DIR("$1/0")
+    AC_CREATE_DIR("$1/1")
+    AC_CREATE_DIR("$1/2")
+    AC_CREATE_DIR("$1/3")
+    AC_CREATE_DIR("$1/4")
+    AC_CREATE_DIR("$1/5")
+    AC_CREATE_DIR("$1/6")
+    AC_CREATE_DIR("$1/7")
+    AC_CREATE_DIR("$1/8")
+    AC_CREATE_DIR("$1/9")
+    AC_CREATE_DIR("$1/10")
+    AC_CREATE_DIR("$1/11")
+    AC_CREATE_DIR("$1/12")
+    AC_CREATE_DIR("$1/13")
+    AC_CREATE_DIR("$1/14")
+    AC_CREATE_DIR("$1/15")
+])
+
+AC_DEFUN([AC_COPY_FILE],
+[
+  if test ![ -f "$prefix/$1" ]; then
+    AC_MSG_CHECKING([copying file $1])
+    cp "$srcdir/$1" "$prefix/$1"
+    AC_MSG_RESULT(done)
+  fi
+])
+
+AC_DEFUN([AC_CREATE_FILE],
+[
+  if test ![ -f "$prefix/$1" ]; then
+    AC_MSG_CHECKING([creating file $1])
+    cp "$srcdir/$1.template" "$prefix/$1"
+    AC_MSG_RESULT(done)
+  fi
+])
+
+AC_DEFUN([AC_CHECK_OPTIMIZATION],
+[
+  AC_ARG_ENABLE(optimization,[  --enable-optimization   create optimized code( for stable release ) [default=no]],
+  [
+   if test $enableval = "no"; dnl
+     then ac_use_optimization_code="no"
+     else ac_use_optimization_code="yes"
+   fi
+  ], [ac_use_optimization_code="no"])
+  if test "$ac_use_optimization_code" = "yes"; then
+    AC_MSG_CHECKING([whether $CXX accepts -mpentium])
+    cat > conftest.$ac_ext <<EOF
+int main( ) {return 0;}
+EOF
+    ac_compile='$CXX -c  $CXXFLAGS -O99 -mpentium conftest.$ac_ext'
+    if AC_TRY_EVAL(ac_compile); then
+      AC_MSG_RESULT(yes)
+      CXXFLAGS="$CXXFLAGS -O99 -mpentium"
+    else
+      AC_MSG_RESULT(no)
+      CXXFLAGS="$CXXFLAGS -O99 -m486"
+    fi
+    rm -fr conftest*
+  fi
+])
+
+
+AC_DEFUN([AC_CHECK_TIME_T],
+[
+  AC_MSG_CHECKING([time_t for printf])
+  cat > conftest.$ac_ext <<EOF
+#include <ctime>
+#include <cstdio>
+int main( )
+{
+  time_t t;
+  ctime( &t );
+  printf( "%d", t );
+  return 0;
+}
+EOF
+  ac_compile='$CXX -c  $CXXFLAGS -Wall -Werror conftest.$ac_ext'
+  if AC_TRY_EVAL(ac_compile); then
+    AC_MSG_RESULT(%d)
+    time_t="%d"
+  else
+    AC_MSG_RESULT(%ld)
+    time_t="%ld"
+  fi
+  rm -fr conftest*
+  AC_DEFINE_UNQUOTED(TIME_T_PRINTF, "$time_t", [time_t])
+])
+
+
+AC_DEFUN([AC_CHECK_THREADS],
+[
+  AC_CHECK_LIB(c_r,
+    pthread_create,
+    [look_for_pthread=yes]
+    LIBS="-lc_r $LIBS")
+  if test x$look_for_pthread = xyes; then
+    CXXFLAGS="$CXXFLAGS -pthread -D_THREAD_SAFE"
+    LDFLAGS="$LDFLAGS -pthread"
+  else
+    AC_CHECK_LIB(pthread,
+      pthread_create,
+      [look_for_pthread=yes]
+      LIBS="-lpthread $LIBS")
+    if test x$look_for_pthread = xyes; then
+      CXXFLAGS="$CXXFLAGS -D_REENTRANT"
+    else
+      AC_TRY_LINK(
+	  [#include <windows.h>],
+	  [CreateThread(NULL, 0, NULL, NULL, CREATE_SUSPENDED, 0);],
+	  [look_for_pthread=yes]
+      )
+dnl
+dnl      - we do not need reentrant exception handling since we run only one
+dnl        thread at a time that could throw an exception
+dnl
+dnl      if test x$look_for_pthread = xyes; then
+dnl         CXXFLAGS="$CXXFLAGS -mthreads
+dnl      fi
+dnl
+    fi
+  fi
+  if test x$look_for_pthread != xyes; then
+    AC_MSG_ERROR(thread support is needed.)
+  fi
+])
+
+AC_DEFUN([AC_CHECK_MCCP],
+[
+    AC_MSG_CHECKING(whether to enable MCCP support)
+
+    WITH_MCCP="yes"
+    MCCP_LIBS=""
+
+    AC_ARG_ENABLE(
+	mccp,
+	[   --disable-mccp	disable MCCP support],
+	WITH_MCCP="$enableval", WITH_MCCP="yes")
+    
+    if test "$WITH_MCCP" = "no"; then
+	AC_MSG_RESULT(no)
+    else
+	AC_MSG_RESULT(yes)
+	WITH_MCCP="no"
+
+	AC_CHECK_LIB(z, deflate, MCCP_LIBS="-lz")
+	if test -n "$MCCP_LIBS"; then
+	    AC_CHECK_HEADER(zlib.h, 
+		[WITH_MCCP="yes"
+		 AC_DEFINE(MCCP, 1, [use mccp])	    
+		])
+	fi
+    fi
+
+    AC_SUBST(MCCP_LIBS)
+	
+])
+
+AC_DEFUN([AC_CHECK_GC],
+[
+    AC_MSG_CHECKING(whether to enable GC support (memory leakage detecting))
+
+    WITH_GC="yes"
+    GC_LIBS=""
+
+    AC_ARG_ENABLE(
+	gc,
+	[   --enable-gc	enable GC support],
+	WITH_GC="$enableval", WITH_GC="no")
+    
+    if test "$WITH_GC" = "no"; then
+	AC_MSG_RESULT(no)
+    else
+	AC_MSG_RESULT(yes)
+	WITH_GC="no"
+
+	AC_CHECK_LIB(gcj, GC_debug_malloc, GC_LIBS="-lgcj")
+	if test -n "$GC_LIBS"; then
+	    AC_CHECK_HEADER(gc.h, 
+		[WITH_GC="yes"
+		 AC_DEFINE(WITH_GC, 1, [use gc])	    
+		])
+	fi
+    fi
+
+    AC_SUBST(GC_LIBS)
+	
+])
+
+
+AC_DEFUN([AC_FAKE_CLOSEDIR_VOID],
+[
+    AH_BOTTOM(
+    [
+#ifndef CLOSEDIR_VOID
+// Fake a return value
+#define CLOSEDIR( d ) ( closedir( d ), 0 )
+#else
+#define CLOSEDIR( d ) closedir( d )
+#endif
+    ])
+])
+    
+AC_DEFUN([AC_CHECK_MINGW],
+[
+    AC_MSG_CHECKING([for mingw32])
+    AC_CACHE_VAL(ac_cv_mingw32,
+      AC_EGREP_CPP(yes,[
+#ifdef __MINGW32__
+yes
+#endif
+      ], ac_cv_mingw32=yes, ac_cv_mingw32=no))
+    
+    AC_MSG_RESULT($ac_cv_mingw32)
+    AM_CONDITIONAL(WITH_MINGW, test $ac_cv_mingw32 = yes)
+])
+
+AC_DEFUN([AC_CHECK_FIGHT_STUB],
+[
+    AC_MSG_CHECKING(whether to use stub functions for fight plugin)
+
+    WITH_FIGHT_STUB="no"
+
+    AC_ARG_ENABLE(
+	fight_stub,
+	[   --enable-fight-stub enable stub for fight plugin],
+	WITH_FIGHT_STUB="$enableval", WITH_FIGHT_STUB="no")
+    
+    if test "$WITH_FIGHT_STUB" = "no"; then
+	AC_MSG_RESULT(no)
+    else
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(FIGHT_STUB, 1, [use fight_stub])
+    fi
+])
+
+AC_DEFUN([AC_CHECK_AI_STUB],
+[
+    AC_MSG_CHECKING(whether to use stub behaviors in ai plugin)
+
+    WITH_AI_STUB="no"
+
+    AC_ARG_ENABLE(
+	ai_stub,
+	[   --enable-ai-stub enable stub for ai plugin],
+	WITH_AI_STUB="$enableval", WITH_AI_STUB="no")
+    
+    if test "$WITH_AI_STUB" = "no"; then
+	AC_MSG_RESULT(no)
+    else
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(AI_STUB, 1, [use ai_stub])
+    fi
+])
+
+AC_DEFUN([AC_CHECK_BITNESS],
+[
+    case $host_cpu in
+    *64)
+        CXXFLAGS="$CXXFLAGS -m32 -Wl,-melf_i386"
+        CFLAGS="$CFLAGS -m32 -Wl,-melf_i386"
+        LDFLAGS="$LDFLAGS -Wl,-melf_i386"
+        ;;
+    esac
+])
+
+

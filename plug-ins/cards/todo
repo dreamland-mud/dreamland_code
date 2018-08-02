@@ -1,0 +1,45 @@
+0  1  2  3   4     5     6     7    8
+6, 7, 8, 9, 10, jack, queen, king, ace (9)
+trump
+
+
+X убивает карту Y:
+    if (X < Y || isTrump(Y))
+	X = min(ace, X+1)
+	Y--;
+	
+	if (Y < 6)
+	    delete Y;
+
+
+CardPackBehavior
+    examine pack
+	* show card list
+    use pack <player name>  
+	* create card
+
+CardBehavior
+    examine <card name>
+	* show room name
+    use <card name>
+	* goto player
+	* extract card
+
+CardStarterBehavior
+    death
+	* if (killer.level < level) killer.setAttr
+
+
+skills: CardSkill
+6 :   'fetch card'  :  use pack <player name>. запомнить качество карты
+6 :   'peek card'   :  examine <card name>, шанс увидеть не то
+8 :   'enter card'  :  use <card name>, шанс попасть на северный полюс
+10:   ace in sleeves:  group healing, obj with fight_prog 
+J :   frame         :  from FD
+Q :   sconce        :  удар канделябром (усыплялка)
+K :   joker         :  instant kill
+
+trump has all skills
+
+
+

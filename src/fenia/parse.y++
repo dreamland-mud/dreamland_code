@@ -1,0 +1,491 @@
+%pure-parser
+%{
+
+/* $Id: parse.y++,v 1.4.2.8.6.2 2010-09-01 21:20:47 rufina Exp $
+ *
+ * ruffina, 2004
+ */
+/* $Id: parse.y++,v 1.4.2.8.6.2 2010-09-01 21:20:47 rufina Exp $
+ * 
+ * unicorn, Forgotten Dungeon, 2004
+ */
+#include <iostream>
+
+#undef yyFlexLexer
+#define yyFlexLexer feniaFlexLexer
+#include <FlexLexer.h>
+
+#include "feniaparser.h"
+#include "register-impl.h"
+#include "exceptions.h"
+
+using namespace std;
+using namespace Scripting;
+
+
+#define OP(op, x...) OpExp::Pointer(NEW, #op, x);
+
+#define YYSTYPE SValue
+
+void
+FeniaParser::error( const char* message ) 
+{
+   errors << source.name << "[" << source.getId() << "]: " << yylineno << ": " << message << endl;
+}
+
+FeniaParser * parser = NULL;
+
+FeniaParser::FeniaParser(istream &src, CodeSource &s)
+		: yyFlexLexer( &src, &cout ), source(s)
+{
+        parser = this;
+}
+
+void
+FeniaParser::compile()
+{
+    if (parse() || !errors.str( ).empty( ))
+	throw ParseError( errors.str( ) );
+}
+
+Register
+FeniaParser::eval(Register &thiz)
+{
+    CppScopeClobberRoot scope;
+    
+    scope.addVar(ID_THIS);
+    scope.addVar(ID_ORIGIN);
+    scope.setVar(ID_THIS, thiz);
+    scope.setVar(ID_ORIGIN, thiz);
+
+    if(!input)
+	compile();
+
+    return input->eval( );
+}
+
+#define YYPARSE_PARAM dummy, FeniaParser *parser
+#define yylex parser->lex
+#define yyerror parser->error
+#define yylineno parser->yylineno
+
+CodeSourceRef 
+csrc()
+{
+    CodeSourceRef ref;
+
+    ref.source = &parser->source;
+    ref.line = yylineno;
+
+    return ref;
+}
+
+%}
+
+%token '!'
+%token '~'
+%token T_PLUS 
+%token T_MINUS
+
+%token '+' '-' '/' '*' '%'
+%token '(' ')' '{' '}'
+%token '.' ';'
+
+%token <id> T_ID
+%token <num> T_NUM
+%token <str> T_STR
+
+%token T_FUNCTION T_NULL
+%token T_EQ T_NEQ
+%token T_FOR T_BREAK T_CONTINUE
+%token T_IF T_ELSE
+%token T_RETURN
+%token T_ASSIGN T_LOGIC
+%token T_UNARY
+%token T_VAR
+%token T_TRY T_CATCH T_THROW
+%token T_ARROW
+
+%nonassoc T_IF
+%nonassoc T_ELSE
+%nonassoc T_REF
+
+%right T_ARROW
+%right T_ASSIGN '='
+%left T_LOGIC
+%left '|'
+%left '^'
+%left '&'
+%left T_EQ T_NEQ
+%left '<' '>'
+%left '+' '-'
+%left '*' '/' '%'
+%right T_UNARY
+%left '.' '(' '['
+
+%type <reg> constant
+%type <stmts> stmts lambda_rh
+%type <exps> nonnull_explist explist
+%type <stmt> stmt stmt_aux
+%type <exp> exp binary_exp unary_exp primary lambda
+%type <ref> reference 
+%type <id> id
+%type <args> arguments nonnull_arguments
+%type <str> string
+
+%%
+
+input:
+	    exp
+	{
+	    parser->input = $1;
+	}
+	;
+
+stmts:
+	    /*empty*/
+	{
+	    $$ = StmtNodeList::Pointer(NEW);
+	}
+	|   stmts stmt
+	{
+	    $$ = $1;
+	    $$->push_back($2);
+	}
+	|   stmts error
+	{
+	    yyerror("statement expected");
+	    $$ = $1;
+	}
+	;
+
+
+stmt:
+	    stmt_aux
+	{
+	    $$ = $1;
+	    $$->source = csrc();
+	}
+	;
+
+
+stmt_aux:
+	    ';'
+	{
+	    $$ = EmptyStmt::Pointer(NEW);
+	}
+	|   '{' stmts '}'
+	{
+	    $$ = CompoundStmt::Pointer(NEW, $2);
+	}
+	|   T_IF '(' exp ')' stmt    %prec T_IF
+	{
+	    $$ = IfStmt::Pointer(NEW, $3, $5);
+	}
+	|   T_IF '(' exp ')' stmt T_ELSE stmt
+	{
+	    $$ = IfStmt::Pointer(NEW, $3, $5, $7);
+	}
+	|   T_FOR '(' explist ';' exp ';' explist ')' stmt
+	{
+	    $$ = ForStmt::Pointer(NEW, $3, $5, $7, $9);
+	}
+	|   T_FOR '(' explist ';' ';' explist ')' stmt
+	{
+	    $$ = ForStmt::Pointer(NEW, $3, ExpNode::Pointer( ), $6, $8);
+	}
+	|   T_BREAK ';'
+	{
+	    $$ = BreakStmt::Pointer(NEW);
+	}
+	|   T_CONTINUE ';'
+	{
+	    $$ = ContinueStmt::Pointer(NEW);
+	}
+	|   exp ';'
+	{
+	    $$ = ExpStmt::Pointer(NEW, $1);
+	}
+	|   T_RETURN ';'
+	{
+	    $$ = ReturnStmt::Pointer(NEW);
+	}
+	|   T_RETURN exp ';'
+	{
+	    $$ = ReturnStmt::Pointer(NEW, $2);
+	}
+	|   T_THROW exp ';'
+	{
+	    $$ = ThrowStmt::Pointer(NEW, $2);
+	}
+	|   T_VAR arguments ';'
+	{
+	    $$ = VarStmt::Pointer(NEW, $2);
+	}
+	|   T_TRY stmt T_CATCH '(' id ')' stmt
+	{
+	    $$ = TryCatchStmt::Pointer(NEW, $2, $5, $7);
+	}
+	;
+
+nonnull_explist: 
+	    exp
+	{
+	    $$ = ExpNodeList::Pointer(NEW);
+	    $$->push_back($1);
+	}
+	|   nonnull_explist ',' exp
+	{
+	    $$ = $1;
+	    $$->push_back($3);
+	}
+	;
+
+explist:
+	    /* null */
+	{
+	    $$ = ExpNodeList::Pointer(NEW);
+	}
+	|   nonnull_explist
+	{
+	    $$ = $1;
+	}
+	;
+
+exp:
+	    binary_exp
+	{
+	    $$ = $1;
+	}
+	|   exp '&' '&' exp	%prec T_LOGIC
+	{
+	    $$ = AndExp::Pointer(NEW, $1, $4);
+	    $$->source = csrc();
+	}
+	|   exp '|' '|' exp	%prec T_LOGIC
+	{
+	    $$ = OrExp::Pointer(NEW, $1, $4);
+	    $$->source = csrc();
+	}
+	|   reference '=' exp
+	{
+	    $$ = AssignExp::Pointer(NEW, $1, $3);
+	    $$->source = csrc();
+	}
+        |   lambda
+        {
+            $$ = $1;
+        }
+        ;
+
+lambda_rh:
+            T_ARROW exp
+        {
+	    ReturnStmt::Pointer ret = ReturnStmt::Pointer(NEW, $2);
+            $$ = StmtNodeList::Pointer(NEW);
+            $$->push_back(ret);
+        }
+        |   T_ARROW '{' stmts '}'
+        {
+            $$ = $3;
+        }
+        ;
+
+lambda:     id lambda_rh                                 %prec T_ARROW
+        {
+	    ArgNames::Pointer args(NEW);
+            args->push_back($1);
+	    Function &f = parser->source.functions.allocate();
+	    f.source = csrc();
+            f.argNames = args;
+            f.stmts = $2;
+            $$ = LambdaExp::Pointer(NEW, &f);
+	    $$->source = csrc();
+        }
+        |   '(' ')' lambda_rh                            %prec T_ARROW
+        {
+	    ArgNames::Pointer args(NEW);
+	    Function &f = parser->source.functions.allocate();
+	    f.source = csrc();
+            f.argNames = args;
+            f.stmts = $3;
+            $$ = LambdaExp::Pointer(NEW, &f);
+	    $$->source = csrc();
+        }
+        |   '(' nonnull_arguments ',' id ')' lambda_rh   %prec T_ARROW
+        {
+            $2->push_back($4);
+	    Function &f = parser->source.functions.allocate();
+	    f.source = csrc();
+            f.argNames = $2;
+            f.stmts = $6;
+            $$ = LambdaExp::Pointer(NEW, &f);
+	    $$->source = csrc();
+        }
+	;
+
+binary_exp:
+	    unary_exp
+	{
+	    $$ = $1;
+	}
+	|   exp '+' exp		      { $$ = OP(+,  $1, $3); $$->source = csrc(); }
+	|   exp '*' exp		      { $$ = OP(*,  $1, $3); $$->source = csrc(); }
+	|   exp '-' exp		      { $$ = OP(-,  $1, $3); $$->source = csrc(); }
+	|   exp '/' exp	              { $$ = OP(/,  $1, $3); $$->source = csrc(); }
+	|   exp '&' exp		      { $$ = OP(&,  $1, $3); $$->source = csrc(); }
+	|   exp '|' exp	              { $$ = OP(|,  $1, $3); $$->source = csrc(); }
+	|   exp '%' exp	              { $$ = OP(%,  $1, $3); $$->source = csrc(); }
+	|   exp '^' exp	              { $$ = OP(^,  $1, $3); $$->source = csrc(); }
+	|   exp T_EQ exp	      { $$ = OP(==, $1, $3); $$->source = csrc(); }
+	|   exp T_NEQ exp             { $$ = OP(!=, $1, $3); $$->source = csrc(); }
+	|   exp '>' exp	              { $$ = OP(>,  $1, $3); $$->source = csrc(); }
+	|   exp '>' '=' exp %prec '>' { $$ = OP(>=, $1, $4); $$->source = csrc(); }
+	|   exp '<' exp	              { $$ = OP(<,  $1, $3); $$->source = csrc(); }
+	|   exp '<' '=' exp %prec '<' { $$ = OP(<=, $1, $4); $$->source = csrc(); }
+	;
+
+unary_exp:
+	    primary                     { $$ = $1; }
+	|   '!' unary_exp               { $$ = OP(!, $2); $$->source = csrc(); }
+	|   '~' unary_exp               { $$ = OP(~, $2); $$->source = csrc(); }
+	|   '-' unary_exp               { $$ = OP(-, $2); $$->source = csrc(); }
+	;
+	
+id:
+	    T_ID
+	;
+
+reference:
+	    id
+	{
+	    $$ = DefaultRef::Pointer(NEW, $1);
+	    $$->source = csrc();
+	}
+	|   '.' id
+	{
+	    $$ = RootRef::Pointer(NEW, $2);
+	    $$->source = csrc();
+	}
+	|   primary '.' id
+	{
+	    $$ = MemberRef::Pointer(NEW, $1, $3);
+	    $$->source = csrc();
+	}
+	|   primary '[' exp ']' 
+	{
+	    $$ = HashRef::Pointer(NEW, $1, $3);
+	    $$->source = csrc();
+	}
+	;
+
+primary:
+	    reference %prec T_REF
+	{
+	    $$ = DerefExp::Pointer(NEW, $1);
+	    $$->source = $1->source;
+	}
+	|   reference '(' explist ')'
+	{
+	    $$ = CallExp::Pointer(NEW, $1, $3);
+	    $$->source = csrc();
+	}
+	|   '[' nonnull_explist ']'
+	{
+	    $$ = ListExp::Pointer(NEW, $2);
+	    $$->source = csrc();
+	}
+        |   '(' exp ')'
+        {
+            $$ = $2;
+        }
+	|   constant
+	{
+	    $$ = ConstantExp::Pointer(NEW, $1);
+	    $$->source = csrc();
+	}
+        |   T_FUNCTION '(' arguments ')' '{' stmts '}'
+	{
+	    Function &f = parser->source.functions.allocate();
+	    f.source = csrc();
+	    f.argNames = $3;
+	    f.stmts = $6;
+            $$ = ClosureExp::Pointer(NEW, &f);
+	    $$->source = csrc();
+	}
+        |   T_FUNCTION T_NUM '(' arguments ')' '{' stmts '}'
+        {
+            Function &f = parser->source.functions.at($2);
+            f.source = csrc();
+            f.argNames = $4;
+            f.stmts = $7;
+            $$ = ClosureExp::Pointer(NEW, &f);
+	    $$->source = csrc();
+        }
+        |   T_FUNCTION T_NUM
+        {
+            Function &f = parser->source.functions.at($2);
+            $$ = ClosureExp::Pointer(NEW, &f);
+	    $$->source = csrc();
+        }
+        ;
+
+constant:
+	    T_NULL
+	{
+	    $$ = Register();
+	}
+	|   T_NUM
+	{
+	    $$ = Register($1);
+	}
+	|   string
+	{
+	    $$ = Register($1);
+	}
+	;
+
+arguments:
+	    /*null*/
+	{
+	    $$ = ArgNames::Pointer(NEW);
+	}
+	|   nonnull_arguments
+	{
+	    $$ = $1;
+	}
+	;
+
+nonnull_arguments:
+	    id
+	{
+	    $$ = ArgNames::Pointer(NEW);
+	    $$->push_back($1);
+	}
+	|   nonnull_arguments ',' id
+	{
+	    $$ = $1;
+	    $$->push_back($3);
+	}
+	;
+
+string:
+	    T_STR
+	{
+	    $$ = $1;
+	}
+	|   string T_STR
+	{
+	    $$ = $1 + $2;
+	}
+	;
+
+%%
+
+int 
+FeniaParser::parse( ) 
+{
+//    return yyparse(NULL, this);
+        return yyparse();
+}
+

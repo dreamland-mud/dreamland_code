@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DreamLand>
+  <areaDir>share/DL/areas</areaDir>
+  <areaListFile>area.lst</areaListFile>
+  <basePath>.</basePath>
+  <bootVersion>1000</bootVersion>
+  <dbPath>var/db</dbPath>
+  <feniaDbDir>var/db/fenia</feniaDbDir>
+  <feniaScriptDir>share/DL/fenia</feniaScriptDir>
+  <immLogFile>var/log/immortals.log</immLogFile>
+  <libexecPath>libexec</libexecPath>
+  <logPattern>var/log/%Y%m%d-%H%M%S.log</logPattern>
+  <merchantBank>10000</merchantBank>
+  <miscPath>var/misc</miscPath>
+  <options>pk save_objs save_mobs log_comm</options>
+  <playerBackupDir>var/db/oldstyle/backup</playerBackupDir>
+  <playerDeleteDir>var/db/oldstyle/delete</playerDeleteDir>
+  <playerDir>var/db/oldstyle/player</playerDir>
+  <playerRemortDir>var/db/oldstyle/remorts</playerRemortDir>
+  <pulseMobile>16</pulseMobile>
+  <pulsePerSecond>4</pulsePerSecond>
+  <pulseTick>240</pulseTick>
+  <pulseViolence>12</pulseViolence>
+  <savedDir>var/db/saved</savedDir>
+  <shutdownFile>var/run/shutdown.txt</shutdownFile>
+  <tablePath>share/DL</tablePath>
+  <tempFile>var/db/oldstyle/player/romtmp</tempFile>
+  <worldTime>9376538</worldTime>
+</DreamLand>

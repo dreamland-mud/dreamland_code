@@ -1,0 +1,299 @@
+/***************************************************************************
+                          xmlparser.lxx  -  description                              
+                             -------------------                                         
+    begin                : Fri May 4 2001                                           
+    copyright            : (C) 2001 by Igor S. Petrenko                         
+    email                : nofate@europe.com                                     
+ ***************************************************************************/
+
+%option c++
+%option prefix="xml"
+%option yylineno
+%option noyywrap
+
+%{
+
+#define YY_DECL int XMLParser::yylex( )
+
+#include "xmlparser.h"
+#include "dlstring.h"
+#include "xmldocument.h"
+#include "iconvmap.h"
+
+IconvMap utf2koi("utf-8", "koi8-r");
+
+using namespace std;
+
+
+%}
+
+NODE_NAME				[A-Za-z_][A-Za-z0-9_\-:]*
+ATTRIBUTE_NAME	{NODE_NAME}
+VERSION					version[\t ]*=[\t ]*\"
+ENCODING				encoding[\t ]*=[\t ]*\"
+CDATA						"![CDATA["
+
+
+%s	NS_VE NS_VE_E NS_VE_VERSION NS_VE_ENCODING
+%s	NS_XMLDocument
+%s	NS_XMLNode NS_XMLNodeEnd NS_XMLNodeEnd_Begin
+%s	NS_XMLAttributes NS_XMLAttributeEqual NS_XMLAttributeBegin NS_XMLAttributeValue
+%s	NS_XMLCDATA
+
+
+%%
+
+\r	;
+
+<NS_XMLDocument>"<"	{
+	if( !value.empty( ) )
+	{
+		XMLNode::Pointer cdata( NEW, decode(value + space));
+		cdata->setType( XMLNode::XML_TEXT );
+		value.erase( );
+		currentNode->appendChild( cdata );
+	}
+	space.erase( );
+	BEGIN( NS_XMLNode );
+}
+
+
+<NS_XMLDocument>[\n\t ]	{
+	space += YYText( )[0];
+}
+
+
+<NS_XMLDocument>"&amp;"	{
+	if( !space.empty( ) && !value.empty( ) )
+	{
+		value += space;
+	}
+	value += '&';
+	space.erase( );
+}
+
+<NS_XMLDocument>"&apos;"	{
+	if( !space.empty( ) && !value.empty( ) )
+	{
+		value += space;
+	}
+	value += '\'';
+	space.erase( );
+}
+
+<NS_XMLDocument>"&gt;"	{
+	if( !space.empty( ) && !value.empty( ) )
+	{
+		value += space;
+	}
+	value += '>';
+	space.erase( );
+}
+
+<NS_XMLDocument>"&lt;"	{
+	if( !space.empty( ) && !value.empty( ) )
+	{
+		value += space;
+	}
+	value += '<';
+	space.erase( );
+}
+
+<NS_XMLDocument>"&quot;"	{
+	if( !space.empty( ) && !value.empty( ) )
+	{
+		value += space;
+	}
+	value += '"';
+	space.erase( );
+}
+
+<NS_XMLDocument>.	{
+	if( !space.empty( ) && !value.empty( ) )
+	{
+		value += space;
+	}
+	value += YYText( )[0];
+	space.erase( );
+}
+
+<NS_XMLNode>{CDATA}	{
+	BEGIN( NS_XMLCDATA );
+}
+
+<NS_XMLCDATA>"]]>"	{
+	XMLNode::Pointer node( NEW, decode(value));
+	node->setType( XMLNode::XML_CDATA );
+	value.erase( );
+	currentNode->appendChild( node );
+	BEGIN( NS_XMLDocument );
+}
+
+<NS_XMLCDATA>.	{
+	value += YYText( )[0];
+}
+
+
+<NS_XMLNode>{NODE_NAME}	{
+	XMLNode::Pointer node( NEW, YYText( ) );
+	currentNode->appendChild( node );
+	st.push( currentNode );
+	currentNode = node;
+	BEGIN( NS_XMLAttributes );
+}
+
+<NS_XMLNode>"/"	{
+	if( currentNode == rootNode )
+	{
+		throw ExceptionXMLError( "close", '/', lineno( ) );
+	}
+	else
+	{
+		BEGIN( NS_XMLNodeEnd_Begin );
+	}
+}
+
+<NS_XMLNodeEnd_Begin>{NODE_NAME}	{
+	if( currentNode->getName( ) != YYText( ) )
+	{
+		throw ExceptionXMLError( "open tag != close tag " + currentNode->getName( ) + "!=" +YYText( ), ' ', lineno( ) );
+	}
+	BEGIN( NS_XMLNodeEnd );
+}
+
+<NS_XMLAttributes>[\t ]+	;
+
+<NS_XMLAttributes>{ATTRIBUTE_NAME}	{
+	attributeName = YYText( );
+	BEGIN( NS_XMLAttributeEqual );
+}
+
+<NS_XMLAttributes>"/"	{
+	currentNode->setType( XMLNode::XML_LEAF );
+	BEGIN( NS_XMLNodeEnd );
+}
+
+<NS_XMLAttributes>">"	{
+	BEGIN( NS_XMLDocument );
+}
+
+<NS_XMLAttributeEqual>[\t ]+	;
+
+<NS_XMLAttributeEqual>"="	{
+	BEGIN( NS_XMLAttributeBegin );
+}
+
+<NS_XMLAttributeBegin>[\t ]+	;
+
+<NS_XMLAttributeBegin>"\""	{
+	BEGIN( NS_XMLAttributeValue );
+}
+
+<NS_XMLAttributeValue>"\""	{
+	currentNode->insertAttribute( attributeName, decode(attributeValue));
+	attributeValue.erase( );
+	BEGIN( NS_XMLAttributes );
+}
+
+<NS_XMLAttributeValue>\\. {
+	attributeValue += YYText( )[1];
+}
+
+<NS_XMLAttributeValue>.	{
+	attributeValue += YYText( )[0];
+}
+
+<NS_XMLNode>"?xml"	{
+	BEGIN( NS_VE );
+}
+
+<NS_VE>[\t ]+	;
+
+<NS_VE>{VERSION}	{
+	BEGIN( NS_VE_VERSION );
+}
+
+<NS_VE_VERSION>[0-9.]+	{
+	rootNode->setVersion( YYText( ) );
+	BEGIN( NS_VE_E );
+}
+
+<NS_VE>{ENCODING}	{
+	BEGIN( NS_VE_ENCODING );
+}
+
+<NS_VE_ENCODING>[a-zA-Z\-0-9]+	{
+	rootNode->setEncoding( YYText( ) );
+	BEGIN( NS_VE_E );
+}
+
+<NS_VE_E>"\""	{
+	BEGIN( NS_VE );
+}
+
+<NS_VE>[ \t]	;
+
+<NS_VE>"?>"	{
+	BEGIN( NS_XMLDocument );
+}
+
+<NS_XMLNodeEnd>">"	{
+	currentNode = st.top( );
+	st.pop( );
+	BEGIN( NS_XMLDocument );
+}
+
+
+<NS_XMLAttributes>.	{
+	throw ExceptionXMLError( "attribute", YYText( )[0], lineno( ) );
+}
+
+<NS_XMLAttributeBegin>.	{
+	throw ExceptionXMLError( "attribute begin", YYText( )[0], lineno( ) );
+}
+
+<NS_XMLAttributeEqual>.	{
+	throw ExceptionXMLError( "attribute =", YYText( )[0], lineno( ) );
+}
+
+<NS_XMLNodeEnd_Begin>.	{
+	throw ExceptionXMLError( "</???", YYText( )[0], lineno( ) );
+}
+
+<NS_VE_VERSION>.	{
+	throw ExceptionXMLError( "version", YYText( )[0], lineno( ) );
+}
+
+<NS_VE_ENCODING>.	{
+	throw ExceptionXMLError( "encoding", YYText( )[0], lineno( ) );
+}
+
+<NS_XMLNode>.	{
+	throw ExceptionXMLError( "node name", YYText( )[0], lineno( ) );
+}
+
+%%
+
+XMLParser::XMLParser( XMLDocument::Pointer& root, istream* istr )
+	: yyFlexLexer( &*istr, &cout ), root( root ), rootNode( root ), currentNode( root )
+{
+	BEGIN( NS_XMLDocument );
+}
+
+XMLParser::~XMLParser( )
+{
+}
+
+int yyFlexLexer::yylex( )
+{
+	return 0;
+}
+
+DLString XMLParser::decode(const DLString &str) const
+{
+    if(rootNode->getEncoding() == "UTF-8") {
+        return DLString(utf2koi(str));
+    } else {
+        return str;
+    }
+}

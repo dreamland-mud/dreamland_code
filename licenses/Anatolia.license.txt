@@ -1,0 +1,43 @@
+    In compiling this code, you have agreed to the following restrictions
+on any operating version of ANATOLIA MUD code:
+
+1) following all guidelines in the diku license (contained in the file 
+   license.doc)
+2) following all guidelines in the Merc license (contained in the file
+   license.txt)
+2) following all guidelines in the ROM license (contained in the file
+   rom.license)
+3) The login message to your mud must contain a notice that it is based
+   on ANATOLIA 2.1, copyright 1997 by Serdar BULUT and Ibrahim CANPUNAR.
+   The help files must include a ANATOLIA entry, readable by all players,
+   and unaltered from the file included with the source code, except as
+   authorized by the ANATOLIA authors.
+4) Before opening a ANATOLIA based mud, you must send email to the author
+   (bulut@rorqual.cc.metu.edu.tr and canpunar@anatolia.cc.metu.edu.tr), so
+   that I can keep track of sites for future code releases.
+5) Any use of the term Realms of Anatolia or Anatolia MUD remains the
+   exclusive copyright of Serdar BULUT and Ibrahim CANPUNAR, this includes
+   the sole right to release future versions of ANATOLIA source code, and
+   the title Realms of Anatolia and Anatolia MUD as pertains to a mud.
+   Permission to use the name Realms of Anatolia and Anatolia MUD has been
+   granted to Silverleaf (Donovan K Cozzens <donocoz@juno.com), his mud
+   will remain the only one with that privilige, unless otherwise is
+   declared by Serdar BULUT and Ibrahim CANPUNAR.
+6) As a coder, you have full rights to release your own derivatives of the
+   ANATOLIA code, provided they follow the restrictions of this license, 
+   contain all appropriate README and credits files, and are properly
+   labelled as being derivatives of the ANATOLIA 2.1 code (just as ANATOLIA
+   is itself a derivative of Gamma 0.0, Merc 2.1 and ROM 2.4 code).  
+7) Anyone not wishing to follow terms of the ANATOLIA license shall be 
+   obligated to delete all copies of this code in their possession.  This
+   includes, but is not limited to, failure to display full credits for
+   ANATOLIA, ROM, Merc, and Diku.
+8) Collaboration with known Diku, Merc, ROM or ANATOLIA license violators
+   on any ANATOLIA code project is strictly forbidden without written
+   permission from the ANATOLIA consortium (Serdar BULUT, Ibrahim CANPUNAR,
+   Murat BICER, and Devrim Baris ACAR).
+
+If you have any questions about this license, please send email to
+bulut@rorqual.cc.metu.edu.tr
+canpunar@rorqual.cc.metu.edu.tr
+

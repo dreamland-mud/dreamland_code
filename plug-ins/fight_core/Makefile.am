@@ -1,0 +1,47 @@
+lib_LTLIBRARIES = libfight_core.la
+
+include $(top_srcdir)/src/Makefile.inc
+INCLUDES = \
+$(INCLUDES_SRC) \
+-I$(top_srcdir)/plug-ins/descriptor \
+-I$(top_srcdir)/plug-ins/output \
+-I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/iomanager \
+-I$(top_srcdir)/plug-ins/loadsave \
+-I$(top_srcdir)/plug-ins/occupations \
+-I$(top_srcdir)/plug-ins/follow/core \
+-I$(top_srcdir)/plug-ins/interpret
+
+libfight_core_la_SOURCES = \
+damageflags.cpp \
+impl.cpp \
+fight_position.cpp \
+fight_exception.cpp \
+damage.cpp \
+damage_impl.cpp \
+character.cpp \
+stats_apply.cpp \
+weapons.cpp \
+material.cpp \
+fight_safe.cpp \
+immunity.cpp \
+deathmanager.cpp
+
+libfight_core_la_LIBADD = \
+../output/liboutput.la \
+../descriptor/libdescriptor.la \
+../iomanager/libiomanager.la \
+../loadsave/libloadsave.la \
+../follow/core/libfollow_core.la \
+../system/libsystem.la \
+../occupations/liboccupations.la \
+../system/libscheduler_task_round.la \
+../interpret/libinterpret.la
+
+damageflags.cpp: damageflags.conf damageflags.h
+damageflags.h: damageflags.conf
+damageflags.cpp: damageflags.h
+
+CLEANFILES = damageflags.cpp $(top_builddir)/src/damageflags.h 
+
+include $(top_srcdir)/plug-ins/Makefile.inc

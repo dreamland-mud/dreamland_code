@@ -1,0 +1,390 @@
+%pure_parser
+%{
+
+/* $Id: edparse.y++,v 1.1.2.2 2006/01/03 09:50:53 rufina Exp $
+ *
+ * ruffina, 2004
+ */
+/* $Id: edparse.y++,v 1.1.2.2 2006/01/03 09:50:53 rufina Exp $
+ * 
+ * unicorn, Forgotten Dungeon, 2004
+ */
+#include <iostream>
+
+#include "edscan.c++"
+
+#define YYSTYPE Editor::SVal
+
+/* ugly... UGLY! crap... */
+/*
+#define YYPARSE_PARAM ) { return 0; } int Editor::parse(
+#define yyparse ___dummy
+*/
+#define yylex lex
+#define YY_parse_PARSE Editor::parse
+#define YY_parse_PARSE_PARAM
+#define yyparse YY_parse_PARSE
+%}
+
+%token <number> NUMBER
+%token <character> CHARACTER
+%token <str> STRING ARG
+%token LINES
+
+%type <ipos> address address_or_null address_checked address_checked_or_null put_start
+%type <ipair> subst_start addrpair_checked yank_start del_start change_start explicitpair_checked
+%type <sflags> substflag substflags
+
+%%
+
+all:		cmd ;
+
+address_or_null:
+		/*empty*/
+	    {
+		$$ = currentline;
+	    }
+	    |	address
+	    ;
+	    
+address:	'.'
+	    {
+		$$ = currentline;
+	    }
+	    |	NUMBER
+	    {
+		$$ = lines.begin();
+		safeadvance($$, $1 - 1);
+	    }
+	    |	'\'' { BEGIN(S_CHARACTER); } CHARACTER 
+	    {
+		marks_t::iterator i = marks.find($3);
+		
+		if(i == marks.end()) {
+		    yyerror("mark is not defined");
+		    YYERROR;
+		}
+		
+		ipos_t m = i->second;
+		
+		for($$ = lines.begin(); $$ != lines.end(); $$++)
+		    if($$ == m)
+			break;
+			
+		if($$ == lines.end()) {
+		    yyerror("mark is not in buffer");
+		    YYERROR;
+		}
+	    }
+	    |	'/' { BEGIN(S_STRING); str_end = '/'; } STRING
+	    {
+		if(!$3.empty())
+		    lastpat = $3;
+		    
+		$$ = lookup(lastpat, true);
+		
+		if($$ == lines.end()) {
+		    yyerror("pattern not found");
+		    YYERROR;
+		}
+	    }
+	    |	'?' { BEGIN(S_STRING); str_end = '?'; } STRING
+	    {
+		if(!$3.empty())
+		    lastpat = $3;
+		    
+		$$ = lookup(lastpat, false);
+		
+		if($$ == lines.end()) {
+		    yyerror("pattern not found");
+		    YYERROR;
+		}
+	    }
+	    |	'$'
+	    {
+		$$ = lines.end();
+		$$--;
+	    }
+	    |	address_or_null '+' NUMBER
+	    {
+		$$ = $1;
+		safeadvance($$, $3);
+	    }
+	    |	address_or_null '-' NUMBER
+	    {
+		$$ = $1;
+		safeadvance($$, -$3);
+	    }
+	    ;
+
+address_checked:    address
+	    {
+		$$ = $1;
+		if($$ == lines.end()) {
+		    yyerror("index out of range");
+		    YYERROR;
+		}
+	    }
+	    ;
+
+address_checked_or_null:
+		address_checked
+	    |	/*empty*/
+	    {
+		$$ = currentline;
+		if($$ == lines.end()) {
+		    yyerror("index out of range");
+		    YYERROR;
+		}
+	    }
+	    ;
+
+explicitpair_checked:
+		'%'
+	    {
+		if(lines.empty()) {
+		    yyerror("buffer empty");
+		    YYERROR;
+		}
+		$$.first = lines.begin();
+		$$.second = lines.end();
+		$$.second--;
+	    }
+	    |	address_checked ',' address_checked
+	    {
+		$$.first = $1;
+		$$.second = $3;
+	    }
+	    ;
+
+addrpair_checked:
+		explicitpair_checked
+	    |	/*empty*/
+	    {
+		if(currentline == lines.end()) {
+		    yyerror("index out of range");
+		    YYERROR;
+		}
+		$$.first = currentline;
+		$$.second = currentline;
+	    }
+	    |	address_checked
+	    {
+		$$.first = $1;
+		$$.second = $1;
+	    }
+	    ;
+
+quit:		'q' 
+	    {  
+		done();
+	    }
+	    ;
+
+nop:		/*empty*/
+	    {
+		currentline++;
+		if(currentline == lines.end()) {
+		    currentline--;
+		    yyerror("index out of range");
+		    YYERROR;
+		}
+		print(currentline->str);
+	    }
+	    |	address_checked
+	    {
+		print($1->str);
+		currentline = $1;
+	    }
+	    ;
+	
+print:		addrpair_checked 'p'
+	    {
+		if(do_print($1.first, $1.second))
+		    YYERROR;
+	    }
+	    ;
+	    
+number:		addrpair_checked 'n'
+	    {
+		if(do_number($1.first, $1.second))
+		    YYERROR;
+	    }
+	    ;
+
+substflag:	'g' { $$ = SF_GLOBAL; }
+	    |	'p' { $$ = SF_PRINT; }
+	    ;
+
+substflags:	/*empty*/ { $$ = SF_NONE; }
+	    |	substflags substflag
+	    {
+		$$ = $1 | $2;
+	    }
+	    ;
+
+subst_start:	addrpair_checked 's' 
+	    {
+		$$ = $1;
+		BEGIN(S_ARGS_BEGIN);
+	    } 
+	    ;
+
+subst:		subst_start ARG ARG { BEGIN(INITIAL);} substflags
+	    {
+		lastsubst.pat = $2;
+		lastsubst.rep = $3;
+		
+		if(do_subst($1.first, $1.second, $5))
+		    YYERROR;
+		
+	    }
+	    |	subst_start substflags 
+	    {
+		BEGIN(INITIAL);
+		
+		if(do_subst($1.first, $1.second, $2))
+		    YYERROR;
+	    }
+	    ;
+
+del_start:	addrpair_checked 'd' { BEGIN(S_CHARACTER); } ;
+	    
+del:		del_start CHARACTER
+	    {
+		if(do_del($1.first, $1.second, $2))
+		    YYERROR;
+	    }
+	    |	del_start
+	    {
+		if(do_del($1.first, $1.second, 0))
+		    YYERROR;
+	    }
+	    ;
+
+append:		address_or_null 'a'
+	    {
+		append_at = $1;
+	    }
+	    ;
+
+insert:		address_checked_or_null 'i'
+	    {
+		$1--;
+		append_at = $1;
+	    }
+	    ;
+
+change_start:	addrpair_checked 'c' { BEGIN(S_CHARACTER); } ;
+
+change:		change_start CHARACTER
+	    {
+		ipos_t i = $1.first;
+		
+		i--;
+		
+		if(do_del($1.first, $1.second, $2))
+		    YYERROR;
+
+		append_at = i;
+	    }
+	    |	change_start
+	    {
+		ipos_t i = $1.first;
+		
+		i--;
+		
+		if(do_del($1.first, $1.second, 0))
+		    YYERROR;
+
+		append_at = i;
+	    }
+	    ;
+
+shell:	    addrpair_checked '!' { BEGIN(S_STRING); str_end = 0; } STRING
+	    {
+		if(do_shell($1.first, $1.second, $4))
+		    YYERROR;
+	    }
+	    ;
+
+markcmds:	'm' | 'k' ;
+
+mark:		address_checked_or_null markcmds { BEGIN(S_CHARACTER); } CHARACTER
+	    {
+		marks[$4] = $1;
+	    }
+	    ;
+	    
+yank_start:	addrpair_checked 'Y' { BEGIN(S_CHARACTER); } ;
+
+yank:		yank_start CHARACTER
+	    {
+		if(do_yank($1.first, $1.second, $2))
+		    YYERROR;
+	    }
+	    |	yank_start
+	    {
+		if(do_yank($1.first, $1.second, 0))
+		    YYERROR;
+	    }
+	    ;
+
+put_start:	address_or_null 'P' { BEGIN(S_CHARACTER); } ;
+
+put:		put_start CHARACTER
+	    {
+		if(do_put($1, $2))
+		    YYERROR;
+	    }
+	    |	put_start
+	    {
+		if(do_put($1, 0))
+		    YYERROR;
+	    }
+	    ;
+
+join:		address_checked_or_null 'j'
+	    {
+		ipos_t start = $1;
+		$1++;
+		if($1 == lines.end()) {
+		    yyerror("index out of range");
+		    YYERROR;
+		}
+		if(do_join(start, $1))
+		    YYERROR;
+	    }
+	    |	explicitpair_checked 'j'
+	    {
+		if(do_join($1.first, $1.second))
+		    YYERROR;
+	    }
+	    ;
+
+undo:		'u'
+	    {
+		if(do_undo() < 0)
+		    YYERROR;
+	    }
+	    ;
+	    
+cmd:		print
+	    |	nop
+	    |	number
+	    |	subst
+	    |	del
+	    |	append
+	    |	insert
+	    |	change
+	    |	mark
+	    |	yank
+	    |	join
+	    |	put
+	    |	quit
+	    |	undo
+	    |	shell
+	    ;
+
+%%
+

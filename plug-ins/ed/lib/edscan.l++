@@ -1,0 +1,111 @@
+
+%option c++
+%option prefix="ed"
+%option yylineno
+%option noyywrap
+%option always-interactive
+
+%{
+/* $Id: edscan.l++,v 1.1.2.1.6.2 2014-09-19 11:50:41 rufina Exp $
+ *
+ * ruffina, 2004
+ */
+/* $Id: edscan.l++,v 1.1.2.1.6.2 2014-09-19 11:50:41 rufina Exp $
+ * 
+ * unicorn, Forgotten Dungeon, 2004
+ */
+#include "ed.h"
+#undef YY_parse_h_included
+#include "edparse.h++"
+
+    
+static char str_end = 0;
+string buf;
+
+#define YY_DECL         int Editor::lex( Editor::SVal * value)
+
+%}
+
+NUM	    [0-9]+
+
+%x S_STRING S_ARGS S_CHARACTER
+%s S_ARGS_BEGIN 
+
+%%
+
+[ \t]*
+
+<S_CHARACTER>{
+[ \t]*
+<<EOF>>	    {
+		BEGIN(INITIAL);
+		return *yytext;
+	    }
+.	    {
+		BEGIN(INITIAL); 
+		value->character = *yytext; 
+		return CHARACTER; 
+	    }
+}
+
+<S_STRING>{
+"\\".       { buf += yytext; }
+.	    { 
+		if(*yytext == str_end) {
+		    value->str = buf;
+		    buf = "";
+		    BEGIN(INITIAL);
+		    return STRING; 
+		}
+
+		buf += *yytext;
+	    }
+<<EOF>> {
+		value->str = buf;
+		unput(*yytext);
+		buf = "";
+		BEGIN(INITIAL);
+		return STRING; 
+	    }
+
+}
+
+<S_ARGS_BEGIN>[`~!@#$%^&*()_+-={};'\:"|<>?,./]	{
+		str_end = *yytext; 
+		BEGIN(S_ARGS); 
+	    }
+
+<S_ARGS>{
+"\\".       { buf += yytext; }
+.	    { 
+		if(*yytext == str_end) {
+		    value->str = buf;
+		    buf = "";
+		    return ARG; 
+		}
+
+		buf += *yytext;
+	    }
+<<EOF>> {
+		value->str = buf;
+		unput(*yytext);
+		buf = "";
+
+		BEGIN(INITIAL);
+		return STRING; 
+	    }
+
+}
+
+{NUM}	    { value->number = atoi( yytext ); return NUMBER; }
+
+.	    return *yytext;
+
+%%
+
+int 
+edFlexLexer::yylex( )
+{
+    return 0;
+}
+

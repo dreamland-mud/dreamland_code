@@ -1,0 +1,34 @@
+lib_LTLIBRARIES = \
+librace.la 
+
+include $(top_srcdir)/src/Makefile.inc
+INCLUDES = \
+$(INCLUDES_SRC) \
+-I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/alignment \
+-I$(top_srcdir)/plug-ins/help
+
+librace_la_LIBADD = ../system/libsystem.la \
+../help/libhelp.la \
+../alignment/libalignment.la
+
+librace_la_SOURCES = \
+raceflags.cpp \
+defaultrace.cpp \
+defaultpcrace.cpp \
+defaultracelanguage.cpp \
+impl.cpp
+
+librace_la_MOC = \
+defaultrace.h \
+defaultpcrace.h \
+defaultracelanguage.h 
+
+
+include $(top_srcdir)/plug-ins/Makefile.inc
+
+raceflags.cpp: raceflags.conf raceflags.h
+raceflags.h: raceflags.conf
+librace_la_moc_xml.cpp: raceflags.h
+
+CLEANFILES = raceflags.cpp $(top_builddir)/src/raceflags.h 

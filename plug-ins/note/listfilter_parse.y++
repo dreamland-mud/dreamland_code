@@ -1,0 +1,85 @@
+%pure_parser
+%define api.prefix listfilter_yy
+
+%{
+/* $Id: listfilter_parse.y++,v 1.1.2.3.18.4 2010-09-01 21:20:45 rufina Exp $
+ *
+ * ruffina, 2005
+ */
+
+#include "dl_match.h"    
+
+#include "listfilter_val.h"    
+
+#include "pcharacter.h"
+#include "note.h"
+
+void listfilter_yyerror( const char *txt )
+{
+    throw Exception(txt);
+}
+
+ListFilterParam lfParam;
+
+bool match( const DLString &str, const DLString &pattern )
+{
+    return dl_match( pattern.colourStrip( ).c_str( ), 
+		    str.colourStrip( ).c_str( ), true);
+}
+
+%}
+
+%token <str> T_STRING
+%token <num> T_INTEGER
+%token T_OR T_AND 
+%token T_ID T_LAST T_FROM T_TO T_SUBJ T_TEXT T_UNREAD
+%token T_LEQ T_GEQ T_NEQ 
+
+%type <result> cond
+%type <str> str_expr
+%type <num> num_expr
+
+%left T_OR
+%left T_AND
+%left '+' '-'
+
+%%
+
+filter: 
+	/*empty*/		    { lfParam.result = true;	}
+    |	cond			    { lfParam.result = $1;	}
+    ;
+
+cond:	cond T_OR cond		    { $$ = $1 || $3;	    }   
+    |	cond T_AND cond		    { $$ = $1 && $3;	    }
+    |	'(' cond ')'		    { $$ = (  $2  );	    }
+    |   num_expr '=' num_expr	    { $$ = $1 == $3;	    }
+    |   str_expr '=' str_expr	    { $$ = match($1, $3);   }
+    |   num_expr T_NEQ num_expr	    { $$ = $1 != $3;	    }
+    |   str_expr T_NEQ str_expr	    { $$ = !match($1, $3);  }
+    |	num_expr T_LEQ num_expr	    { $$ = $1 <= $3;	    }
+    |	num_expr T_GEQ num_expr	    { $$ = $1 >= $3;	    }
+    |	num_expr '<' num_expr	    { $$ = $1 <  $3;	    }
+    |	num_expr '>' num_expr	    { $$ = $1 >  $3;	    }
+    |	T_UNREAD		    { $$ = !lfParam.hidden; }
+    |	'-' T_INTEGER		    { $$ = lfParam.cnt > lfParam.last - $2; }
+    ;
+
+num_expr:   
+	T_INTEGER
+    |	T_ID			    { $$ = lfParam.cnt;		}
+    |	T_LAST			    { $$ = lfParam.last;	}
+    |	num_expr '+' num_expr	    { $$ = $1 + $3;		}
+    |	num_expr '-' num_expr	    { $$ = $1 - $3;		}
+    ;
+    
+str_expr: 
+	T_STRING
+    |	T_FROM			    { $$ = lfParam.note->getFrom( );	}
+    |	T_TO			    { $$ = lfParam.note->getRecipient( );}
+    |	T_SUBJ			    { $$ = lfParam.note->getSubject( );	}
+    |	T_TEXT			    { $$ = lfParam.note->getText( );	}
+    ;
+
+%%
+

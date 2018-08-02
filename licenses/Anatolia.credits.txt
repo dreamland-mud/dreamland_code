@@ -1,0 +1,32 @@
+      ANATOLIA started in early September 1996, using Rom2.4 code. In
+June of 1997, ANATOLIA II was started, eventually replacing the original
+ANATOLIA.
+
+The following people contributed to the ANATOLIA flavor of the ROM base
+code:
+
+Addition of New Areas --
+	Ibrahim Canpunar, Serdar Bulut and Murat Bicer
+
+Revision of New Areas --
+	Ibrahim Canpunar
+
+Revision and Addition of New Helps --
+	Ibrahim Canpunar and Serdar Bulut
+
+Additional Maps --
+	Ibrahim Canpunar
+
+Ideas and playtesting --
+    So many dedicated mudders around the world. Especially Amac Ural,
+Mustafa Ongel, Ibrahim Uzel, Rasit Gumus, David Heide.
+
+Complete C Code --
+	chiefly by Serdar Bulut,
+        with major contributions by Murat Bicer,
+        and also Ibrahim Canpunar and Devrim Baris Acar. 
+
+Used snippets (Available on internet) --
+	Quest Code (c) 1996 Ryan Addams (moongate@moongate.ams.com)
+	Some snippets by Erwin S. Andreasen. 
+		erwin@pip.dknet.dk, http://pip.dknet.dk/~pip1773/

@@ -1,0 +1,29 @@
+default: all
+
+all:
+	@echo "This Makefile is only for the CVS repository"
+	@echo ""
+	@rm -f config.cache
+	@echo "*** Concatenating configure tests into acinclude.m4"
+	@rm -f acinclude.m4
+	@$(MAKE) -f Makefile.am top_srcdir=. acinclude.m4
+	@echo "*** Retrieving configure tests needed by configure.in"
+	@aclocal
+	@echo "*** Scaning for include statements"
+	@autoheader
+	@echo "*** Building Makefile templates( step one )"
+	@automake
+	@echo "*** Scaning for moc files in src"
+	@cd src && /usr/bin/perl ../admin/moc_edit.pl --root ..
+	@echo "*** Scaning for moc files in plugins"
+	@cd plug-ins && /usr/bin/perl ../admin/moc_edit.pl --root ..
+	@echo "*** Building Makefile templates( step two )"
+	@autoconf
+	@echo "*** building configuration system for MOC"
+	@cd src/moc && sh autogen.sh 
+	@echo "*** Creating date/time stamp"
+	@touch stamp-h.in
+	@echo "*** Finished"
+	@echo "    Don't forget to run ./configure"
+	@echo "    If you haven't done so in a while, run ./configure -- help"
+

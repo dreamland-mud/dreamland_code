@@ -1,0 +1,92 @@
+
+%option yylineno
+%option noyywrap
+%option caseless
+
+%{
+/* $Id: listfilter_scan.l++,v 1.1.2.2.18.3 2010-09-01 21:20:45 rufina Exp $
+ *
+ * ruffina, 2005
+ */
+#include "listfilter_val.h"    
+#include "listfilter_parse.h++"
+#include "pcharacter.h"
+
+void listfilter_yyerror( const char *txt );
+%}
+
+RL	    [йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ]
+L	    ([A-Za-z]|{RL})
+
+%x QUOTE
+
+%%
+	    DLString buf;
+
+\"	    { BEGIN(QUOTE); buf.clear( ); }
+<QUOTE>{
+\"	    { BEGIN(INITIAL); value->str = buf; return T_STRING; }
+\\n	    { buf += '\n';      }
+\\r	    { buf += '\r';      }
+\\t	    { buf += '\t';      }
+\\.	    { buf += yytext[1]; }
+.	    { buf += yytext[0]; }
+}
+
+[0-9]+	    { value->num = atoi( yytext ); return T_INTEGER; }
+
+"OR"	    return T_OR;
+"AND"       return T_AND;
+"ID"        return T_ID;
+"LAST"      return T_LAST;
+"FROM"      return T_FROM;
+"TO"        return T_TO;
+"SUBJ"      return T_SUBJ;
+"TEXT"      return T_TEXT;
+"UNREAD"    return T_UNREAD;
+
+"или"	    return T_OR;
+"и"         return T_AND;
+"номер"     return T_ID;
+"последние" return T_LAST;
+"от"        return T_FROM;
+"к"         return T_TO;
+"тема"      return T_SUBJ;
+"текст"     return T_TEXT;
+"непрочитано" return T_UNREAD;
+
+"<="	    return T_LEQ;
+">="	    return T_GEQ;
+"!="	    return T_NEQ;
+[()<>=+\-]    return *yytext;
+
+{L}+	    { value->str = yytext; return T_STRING; }
+
+[ \t]	    ;
+
+.	    listfilter_yyerror("Unparsed symbol");
+
+%%
+
+
+bool listfilter_parse( PCharacter *ch, int cnt, int last, const Note *note,
+		       bool hidden, const char *args )
+{
+    YY_BUFFER_STATE yybuf;
+    
+    yybuf = yy_scan_string( args );
+
+    lfParam.ch = ch;
+    lfParam.cnt = cnt;
+    lfParam.last = last;
+    lfParam.note = note;
+    lfParam.hidden = hidden;
+
+    if (listfilter_yyparse( ) != 0) {
+	yy_delete_buffer( yybuf );
+	throw Exception( "Syntax error." );
+    }
+
+    yy_delete_buffer( yybuf );
+    return lfParam.result;
+}	

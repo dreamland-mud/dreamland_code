@@ -1,0 +1,31 @@
+startup:
+    gc = false
+    init context (root == 0)  -- FeniaWorld ctor
+    load world		      -- FeniaWorld fromXML
+    load root		      --     --//--
+    register classes	      -- feniaroot initialization
+    recover		      --     --//--
+    ...
+    boot db		      -- ...normal bootup
+    ...
+    gc = true                 -- feniaroot scheduler task
+    validate world            --   --//--
+    (if root == 0, create new one) --//--
+
+destruction:
+    gc = false
+    backup (and clear)
+    unregister classes
+
+initialization:
+    register classes
+    recover
+    gc = true
+    validate world (if root == 0, create new one)
+
+shutdown:
+    gc = false
+    backup (and clear)
+    unregister classes
+    save
+

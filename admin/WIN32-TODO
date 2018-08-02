@@ -1,0 +1,6 @@
+ - XMLPolymorphPointer::toXML: reverse order of getPointer( )->toXML(parent) and parent->insertAttribute(...)
+ - are -> xml
+ - fix plugin initialization order!!
+ - fix ed parser hack
+ - remove --image-base
+ - test on win98 and xp w/o mingw/cygwin
