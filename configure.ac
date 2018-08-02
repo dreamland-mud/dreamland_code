@@ -73,6 +73,7 @@ AC_CREATE_DIR(bin)
 AC_CREATE_DIR(lib)
 AC_CREATE_DIR(libexec)
 AC_CREATE_DIR(etc)
+AC_CREATE_DIR(share)
 
 AC_CREATE_DIR(var/run)
 AC_CREATE_DIR(var/log)
