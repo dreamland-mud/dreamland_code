@@ -16,7 +16,6 @@ aclocal.m4
 /src/moc/configure
 /bin
 /lib
-/libexec
 /share
 /var
 /core.2*
