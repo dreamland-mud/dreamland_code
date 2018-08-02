@@ -37,7 +37,6 @@ olc \
 liquid \
 clan \
 feniaroot \
-web \
 selfrate \
 gquest \
 languages \
@@ -53,5 +52,6 @@ misc_behaviors \
 race_aptitude \
 cards \
 religion \
+web \
 riding
 
