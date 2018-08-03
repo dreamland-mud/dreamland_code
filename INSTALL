@@ -2,7 +2,7 @@ Build:
 -----
 Initial setup:
   automake --add-missing
-  cd admin && ln -s `locate ltmain.sh` .
+  libtoolize -f
  
 After repository clone or update:
   make -f Makefile.git
