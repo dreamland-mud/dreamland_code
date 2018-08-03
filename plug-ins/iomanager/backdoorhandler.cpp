@@ -83,7 +83,11 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
 	PCharacterManager::update( pch );
 	
 	char_to_list( pch, &char_list );
-	char_to_room( pch, get_room_index( pch->start_room ) );
+
+        Room *start_room = get_room_index( pch->start_room  );
+        if (!start_room)
+            start_room = get_room_index( ROOM_VNUM_TEMPLE );
+	char_to_room( pch, start_room );
 
 	if (pch->pet) {
             // If room was already set in fread_pet, simply place the beast there.
