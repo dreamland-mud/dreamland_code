@@ -19,6 +19,7 @@
 #include "interp.h"
 #include "wiznet.h"
 #include "mercdb.h"
+#include "vnum.h"
 #include "def.h"
 
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
