@@ -22,3 +22,5 @@ aclocal.m4
 /*.f++
 /db_*.csv
 /db_*.txt
+libexec/plugin.xml
+libexec/plugins
