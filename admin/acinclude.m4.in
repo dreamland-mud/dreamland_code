@@ -127,6 +127,16 @@ AC_DEFUN([AC_CREATE_FILE],
   fi
 ])
 
+AC_DEFUN([AC_PLAYER_COPY],
+[
+  if test ![ -f "$prefix/var/db/player/$1.xml" ]; then
+    AC_MSG_CHECKING([copying player profiles for $1])
+    cp "$srcdir/admin/player/$1.xml"    "$prefix/var/db/player/$1.xml"
+    cp "$srcdir/admin/player/$1.player" "$prefix/var/db/oldstyle/player/$1.player"
+    AC_MSG_RESULT(done)
+  fi
+])
+
 AC_DEFUN([AC_CHECK_OPTIMIZATION],
 [
   AC_ARG_ENABLE(optimization,[  --enable-optimization   create optimized code( for stable release ) [default=no]],
