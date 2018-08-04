@@ -535,16 +535,14 @@ bool password_check( PCMemoryInterface *target, const DLString &input )
     // Split out salt prefix from saved password.
     DLString::size_type pos = hashAndSalt.find( '$' );
     if (pos == DLString::npos || pos >= hashAndSalt.size( ) - 1) {
-          warn("Invalid salt separator position for hashed password %s.", hashAndSalt.c_str( ));
+          warn("Invalid salt separator position for hashed password for %s.", pci->getName( ).c_str( ));
           return false;
     }
   
     DLString hexSalt = hashAndSalt.substr(0, pos);
-    notice("Retrieved salt %s from source hash %s.", hexSalt.c_str( ), hashAndSalt.c_str( ));
     
     // Encode user's input with stored salt, to receive hash&salt combination.
     DLString generated = digestWithHexSalt( input, hexSalt );
-    notice("Generated hash %s, source hash %s.", generated.c_str( ), hashAndSalt.c_str( ) );
     // Check stored hash&salt combination against generated one.
     return generated == hashAndSalt;
 }
@@ -553,7 +551,6 @@ void password_set( PCMemoryInterface *pci, const DLString &password )
 {
     // Generate hash&salt combination from provided plain text and unique random salt.
     DLString hashAndSalt = digestWithRandomSalt( password );
-    notice("password_set for %s generated digest %s.", pci->getName( ).c_str( ), hashAndSalt.c_str( ) );
     // Store generated combo as user's password.
     pci->setPassword( hashAndSalt );
     // Save user's profile to disk.

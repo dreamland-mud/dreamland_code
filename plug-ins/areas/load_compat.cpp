@@ -425,6 +425,20 @@ void load_resets( FILE *fp ) {
     }
 }
 
+void bad_reset( const char *fmt, ... )
+{
+    va_list ap;
+    
+    va_start( ap, fmt );
+
+    if (dreamland->hasOption(DL_BUILDPLOT)) 
+        logerror( fmt, ap );
+    else
+        throw FileFormatException( fmt, ap );
+
+    va_end( ap );
+}
+
 void fix_resets()
 {
     char letter = '\0';
@@ -458,40 +472,48 @@ void fix_resets()
 		iLastRoom = pReset->arg3;
 	    }
 	    else
-		throw FileFormatException( "Load_resets: 'M': bad room: %d.", pReset->arg3 );
+		bad_reset( "Load_resets: 'M': bad room: %d.", pReset->arg3 );
 	    break;
 	case 'O':
-	    if (!( temp_index = get_obj_index( pReset->arg1 ) ))
-		throw FileFormatException( "Load_resets: 'O': bad obj: %d.", pReset->arg1 );
+	    if (!( temp_index = get_obj_index( pReset->arg1 ) )) {
+		bad_reset( "Load_resets: 'O': bad obj: %d.", pReset->arg1 );
+                break;
+            }
 	    if( (pRoomIndex = get_room_index ( pReset->arg3 ))) {
 		new_reset(pRoomIndex, pReset);
 		iLastObj = pReset->arg3;
 	    }
 	    else
-		throw FileFormatException( "Load_resets: 'O': bad room: %d.", pReset->arg3 );
+		bad_reset( "Load_resets: 'O': bad room: %d.", pReset->arg3 );
 	    break;
 	case 'P':
-	    if (!( temp_index = get_obj_index( pReset->arg1 ) ))
-		throw FileFormatException( "Load_resets: 'P': bad obj: %d.", pReset->arg1 );
-	    if (!( temp_index = get_obj_index( pReset->arg3 ) ))
-		throw FileFormatException( "Load_resets: 'P': bad obj: %d.", pReset->arg3 );
+	    if (!( temp_index = get_obj_index( pReset->arg1 ) )) {
+		bad_reset( "Load_resets: 'P': bad obj: %d.", pReset->arg1 );
+                break;
+            }
+	    if (!( temp_index = get_obj_index( pReset->arg3 ) )) {
+		bad_reset( "Load_resets: 'P': bad obj: %d.", pReset->arg3 );
+                break;
+            }
 	    if( (pRoomIndex = get_room_index ( iLastObj ))) {
 		new_reset(pRoomIndex, pReset);
 	    }
 	    else
-		throw FileFormatException( "Load_resets: 'O': bad room: %d.", pReset->arg3 );
+		bad_reset( "Load_resets: 'O': bad room: %d.", pReset->arg3 );
 	    break;
 
 	case 'G':
 	case 'E':
-	    if (!( temp_index = get_obj_index( pReset->arg1 ) ))
-		throw FileFormatException( "Load_resets: 'G''E': bad obj: %d.", pReset->arg1 );
+	    if (!( temp_index = get_obj_index( pReset->arg1 ) )) {
+		bad_reset( "Load_resets: 'G''E': bad obj: %d.", pReset->arg1 );
+                break;
+            }
 	    if( (pRoomIndex = get_room_index ( iLastRoom ))) {
 		new_reset(pRoomIndex, pReset);
 		iLastObj = iLastRoom;
 	    }
 	    else
-		throw FileFormatException( "Load_resets: 'G''E': bad room: %d.", pReset->arg3 );
+		bad_reset( "Load_resets: 'G''E': bad room: %d.", pReset->arg3 );
 	    break;
 
 	case 'D':
@@ -499,20 +521,22 @@ void fix_resets()
 
 	    if ( pReset->arg2 == DIR_SOMEWHERE ) {
 		if ( pRoomIndex->extra_exit == 0 ) {
-		    throw FileFormatException( "Load_resets: 'D': room %d does not contain extra exits", pReset->arg1 );
+		    bad_reset( "Load_resets: 'D': room %d does not contain extra exits", pReset->arg1 );
+                    break;
 		}
 	    } else {
 		if ( pReset->arg2 < 0
 			|| pReset->arg2 > 5
 			|| ( pexit = pRoomIndex->exit[pReset->arg2] ) == 0
 			|| !IS_SET( pexit->exit_info, EX_ISDOOR ) ) {
-		    throw FileFormatException( "Load_resets: 'D': exit %d from room %d not door", pReset->arg2, pRoomIndex->vnum );
-
+		    bad_reset( "Load_resets: 'D': exit %d from room %d not door", pReset->arg2, pRoomIndex->vnum );
+                    break;
 		}
 
 		switch(pReset->arg3) {
 		    default:
-			throw FileFormatException( "Load_resets: 'D': bad 'locks': %d.", pReset->arg3 );
+			bad_reset( "Load_resets: 'D': bad 'locks': %d.", pReset->arg3 );
+                        break;
 		    
 		    case 0:
 			break;
@@ -532,11 +556,15 @@ void fix_resets()
 	    break;
 
 	case 'R':
-	    if (!( pRoomIndex= get_room_index( pReset->arg1 ) ))
-		throw FileFormatException( "Load_resets: 'R': bad room: %d.", pReset->arg1 );
+	    if (!( pRoomIndex= get_room_index( pReset->arg1 ) )) {
+		bad_reset( "Load_resets: 'R': bad room: %d.", pReset->arg1 );
+                break;
+            }
 
-	    if ( pReset->arg2 < 0 || pReset->arg2 > 6 )
-		throw FileFormatException( "Load_resets: 'R': bad exit %d.", pReset->arg2 );
+	    if ( pReset->arg2 < 0 || pReset->arg2 > 6 ) {
+		bad_reset( "Load_resets: 'R': bad exit %d.", pReset->arg2 );
+                break;
+            }
 	    
 	    new_reset(pRoomIndex, pReset);
 	    break;
@@ -548,8 +576,10 @@ void fix_resets()
 	    switch (pReset->command) {
 	    case 'G': case 'O':
 	    case 'E': case 'P':
-		if (!( get_obj_index( pReset->arg1 ) ))
-		    throw FileFormatException( "Load_resets: %c: bad obj: %d.", pReset->command, pReset->arg1 );
+		if (!( get_obj_index( pReset->arg1 ) )) {
+		    bad_reset( "Load_resets: %c: bad obj: %d.", pReset->command, pReset->arg1 );
+                    break;
+                }
 		get_obj_index( pReset->arg1 )->reset_num++;
 		break;
 	    }

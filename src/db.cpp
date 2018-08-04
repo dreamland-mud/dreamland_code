@@ -231,7 +231,7 @@ MOB_INDEX_DATA *get_mob_index( int vnum )
 	    return pMobIndex;
     }
 
-    if (DLScheduler::getThis( )->getCurrentTick( ) == 0) 
+    if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
 	throw FileFormatException( "get_mob_index: vnum %d not found on world startup", vnum );
 
     return 0;
@@ -255,7 +255,7 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
 	    return pObjIndex;
     }
 
-    if (DLScheduler::getThis( )->getCurrentTick( ) == 0) 
+    if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
 	throw FileFormatException( "get_obj_index: vnum %d not found on world startup", vnum );
 
     return 0;
@@ -279,7 +279,7 @@ Room *get_room_index( int vnum )
 	    return pRoomIndex;
     }
 
-    if (DLScheduler::getThis( )->getCurrentTick( ) == 0) 
+    if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
 	throw FileFormatException( "get_room_index: vnum %d not found on world startup", vnum );
 
     return 0;
