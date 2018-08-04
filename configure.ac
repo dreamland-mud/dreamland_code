@@ -114,6 +114,7 @@ AC_CREATE_DIR_16(var/db/saved/mobiles)
 AC_CREATE_FILE(etc/dreamland.xml)
 AC_CREATE_FILE(libexec/plugin.xml)
 AC_PLAYER_COPY(kadm)
+cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
 
 AC_CONFIG_COMMANDS([src/moc/moc], [
     AC_MSG_NOTICE([Configuring meta object compiller...])
