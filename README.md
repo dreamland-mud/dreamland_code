@@ -5,7 +5,7 @@ Tested on clean Ubuntu 16.04, Ubuntu 14.04.
 ## Install build and dev tools
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim
 ```
 
 ## Install dependency libraries
@@ -16,6 +16,7 @@ sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev lib
 ## Download and build server code
 ```bash
 git clone https://github.com/dreamland-mud/dreamland_code.git
+cd dreamland_code
 make -f Makefile.git
 mkdir ../objs && cd ../objs
 ../dreamland_code/configure --path=/path/to/runtime
