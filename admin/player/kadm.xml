@@ -5,7 +5,7 @@
   <add_affected_by></add_affected_by>
   <add_comm>autostore nocancel autolook</add_comm>
   <affected_by></affected_by>
-  <age>1991</age>
+  <age>11991</age>
   <alignment>0</alignment>
   <armor>
     <pierce>100</pierce>
@@ -33,36 +33,6 @@
         <node name="story">1528106002</node>
       </stamps>
     </node>
-    <node name="webprompt" type="WebPromptAttribute">
-      <prompt>
-        <node name="date">{&quot;d&quot;:18,&quot;m&quot;:&quot;Абсолютной Темноты&quot;,&quot;y&quot;:656}
-</node>
-        <node name="det"></node>
-        <node name="enh"></node>
-        <node name="exits">{&quot;e&quot;:&quot;e&quot;,&quot;h&quot;:&quot;&quot;,&quot;l&quot;:&quot;r&quot;}
-</node>
-        <node name="group">{&quot;leader&quot;:{&quot;health&quot;:100,&quot;hit&quot;:1398,&quot;hit_clr&quot;:&quot;6&quot;,&quot;level&quot;:107,&quot;max_hit&quot;:1398,&quot;sees&quot;:&quot;Кадм&quot;,&quot;tnl&quot;:1000},&quot;ln&quot;:&quot;Кадма&quot;}
-</node>
-        <node name="mal"></node>
-        <node name="p1">{&quot;cs&quot;:[&quot;16&quot;,&quot;17&quot;,&quot;17&quot;,&quot;17&quot;,&quot;17&quot;,&quot;17&quot;],&quot;ps&quot;:[&quot;16&quot;,&quot;17&quot;,&quot;17&quot;,&quot;17&quot;,&quot;17&quot;,&quot;17&quot;]}
-</node>
-        <node name="p2">{&quot;a&quot;:&quot;80&quot;,&quot;d&quot;:&quot;0&quot;,&quot;h&quot;:&quot;0&quot;,&quot;s&quot;:&quot;0&quot;}
-</node>
-        <node name="pro"></node>
-        <node name="q"></node>
-        <node name="room">&quot;Гавань&quot;
-</node>
-        <node name="time">{&quot;h&quot;:6,&quot;l&quot;:&quot;темно&quot;,&quot;tod&quot;:&quot;утра&quot;}
-</node>
-        <node name="trv"></node>
-        <node name="w">{&quot;i&quot;:&quot;night-alt-showers&quot;,&quot;m&quot;:&quot;дождь, холодный ветер&quot;}
-</node>
-        <node name="who">{&quot;p&quot;:[{&quot;cc&quot;:&quot;dx&quot;,&quot;cn&quot;:&quot;n&quot;,&quot;n&quot;:&quot;Кадм&quot;,&quot;r&quot;:&quot;hu&quot;,&quot;s&quot;:&quot;m&quot;},{&quot;cc&quot;:&quot;dg&quot;,&quot;cn&quot;:&quot;l&quot;,&quot;n&quot;:&quot;Руфина&quot;,&quot;r&quot;:&quot;sa&quot;,&quot;s&quot;:&quot;f&quot;}],&quot;t&quot;:&quot;2&quot;,&quot;v&quot;:&quot;2&quot;}
-</node>
-        <node name="zone">&quot;Фрегат&quot;
-</node>
-      </prompt>
-    </node>
   </attributes>
   <batle_prompt>&lt;%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:&lt;%o&gt;&gt; </batle_prompt>
   <bless>0</bless>
@@ -84,7 +54,7 @@
   <ethos>lawful</ethos>
   <exp>107000</exp>
   <hit>1398</hit>
-  <hometown>frigate</hometown>
+  <hometown>midgaard_neutral</hometown>
   <imm_flags></imm_flags>
   <lastAccessHost></lastAccessHost>
   <lastAccessTime>1533291993</lastAccessTime>
@@ -1705,7 +1675,8 @@
       <timer>0</timer>
     </node>
   </skills>
-  <start_room>40100</start_room>
+  <start_room>3001</start_room>
+  <security>999</security>
   <title>творящий хаос из хаоса</title>
   <train>24</train>
   <vuln_flags></vuln_flags>
