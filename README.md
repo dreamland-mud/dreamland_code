@@ -1,4 +1,4 @@
-# DreamLand MUD server build instructions
+# DreamLand MUD developer instructions
 
 Tested on clean Ubuntu 16.04, Ubuntu 14.04. You can either follow these instructions and create a local build environment,
 or build a ready-to-use Docker container, as described in [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker) README file.
