@@ -30,14 +30,14 @@ git clone https://github.com/dreamland-mud/dreamland_world.git
 ln -s /path/to/dreamland_world /path/to/runtime/share/DL
 ```
 
-## Running
+## Start the game
 ```bash
 cd /path/to/runtime
 ./bin/dreamland etc/dreamland.xml &
 ```
 
-## Logs
-Are available under /path/to/runtime/var/log.
+## View logs
+Logs are available under /path/to/runtime/var/log.
 
 ## Accessing the game
 ```bash
