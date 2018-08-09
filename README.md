@@ -1,4 +1,4 @@
-# DreamLand MUD server build instructions
+# DreamLand MUD developer instructions
 
 Tested on clean Ubuntu 16.04, Ubuntu 14.04. You can either follow these instructions and create a local build environment,
 or build a ready-to-use Docker container, as described in [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker) README file.
@@ -30,14 +30,14 @@ git clone https://github.com/dreamland-mud/dreamland_world.git
 ln -s /path/to/dreamland_world /path/to/runtime/share/DL
 ```
 
-## Running
+## Start the game
 ```bash
 cd /path/to/runtime
 ./bin/dreamland etc/dreamland.xml &
 ```
 
-## Logs
-Are available under /path/to/runtime/var/log.
+## View logs
+Logs are available under /path/to/runtime/var/log.
 
 ## Accessing the game
 ```bash
