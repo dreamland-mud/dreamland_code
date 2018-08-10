@@ -8,7 +8,7 @@
 ---
 
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
-[![License](https://img.shields.io/badge/License-GPL-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 **Содержание**
 * [Запуск локальной версии](#local)
@@ -17,6 +17,7 @@
    * [Установка dreamland_world](#areas)
    * [Запуск сервера](#run)
    * [Просмотр логов](#logs)
+   * [Вход в мир](#telnet)
 * [Работа с репозиторием](#git)
    * [Fork репозитория](#fork)
    * [Внесение изменений](#push)
@@ -27,7 +28,16 @@
 
 ## <a name="local">Запуск локальной версии</a>
 
-Эта инструкция по сборке была проверена на Ubuntu 16.04 и Ubuntu 14.04. Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. Вы можете либо воспользоваться инструкцией и создать локальное окружение с нуля, либо собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
+Эта инструкция по сборке была проверена на Ubuntu 16.04 и Ubuntu 14.04. Дримленд гарантированно собирается и работает под версиями компилятора:
+* gcc 5.4
+* gcc 4.8
+
+Гарантированно не собирается под 
+* gcc 6.3
+
+Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
+
+Вы можете либо воспользоваться инструкцией и создать локальное окружение с нуля, либо собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
 
 ### <a name="env">Подготовка окружения</a>
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
@@ -72,12 +82,21 @@ ln -s /path/to/dreamland_world /path/to/runtime/share/DL
 cd /path/to/runtime
 ./bin/dreamland etc/dreamland.xml &
 ```
+### <a name="logs">Просмотр логов</a>
 
-Logs are available under /path/to/runtime/var/log.
+Логи попадают в подкаталог var/log в каталоге runtime. Формат файла логов задается в etc/dreamland.xml, по умолчанию имя файла - это дата и время запуска. 
+```xml
+<logPattern>var/log/%Y%m%d-%H%M%S.log</logPattern>
+```
+Удалив эту строку из dreamland.xml, можно добиться вывода логов в stdout.
 
+### <a name="telnet">Вход в мир</a>
+
+Мир доступен локально на порту 9127, например:
 ```bash
 telnet localhost 9127
 ```
-user: Kadm
-password: KadmKadm
+Там есть только один персонаж, наделенный всеми полномочиями: Kadm, пароль KadmKadm. 
+При входе через порт 9127 укажите кодировку, логин и пароль, например: 0 Kadm KadmKadm
+
 
