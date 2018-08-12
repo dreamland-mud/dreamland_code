@@ -42,6 +42,14 @@ const DLString & DefaultSkillCommand::getRussianName( ) const
     return DefaultCommand::getRussianName( );
 }
 
+bool DefaultSkillCommand::visible( Character *ch ) const
+{
+    if (!DefaultCommand::visible( ch ))
+        return false;
+
+    return getSkill( )->visible( ch );
+}
+
 void DefaultSkillCommand::run( Character *ch, const DLString &args )
 {
     DefaultCommand::run( ch, args );
