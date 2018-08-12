@@ -150,7 +150,7 @@ void ConfigGroup::printHeader( PCharacter *ch ) const
 {
     ch->printf( "\r\n{%s%s{x\r\n", 
 		    CLR_HEADER(ch),
-		    ch->getConfig( )->rucommands ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ) );
+		    name.getValue( ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------

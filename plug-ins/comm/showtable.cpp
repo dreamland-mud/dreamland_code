@@ -50,10 +50,10 @@ static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 
 static void show_matched_commands( Character *ch, const DLString &arg )
 {
     ostringstream buf;
-    CommandList::const_iterator c;
+    list<Command::Pointer>::const_iterator c;
     const CommandList &commands = commandManager->getCommands( );
 
-    for (c = commands.begin( ); c != commands.end( ); c++) {
+    for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	ostringstream aliases;
 	Command::Pointer cmd = *c;
 
@@ -79,18 +79,18 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 static void show_commands( Character *ch, int flags )
 {
     ostringstream buf;
-    CommandList::const_iterator c;
+    list<Command::Pointer>::const_iterator c;
     const CommandList &commands = commandManager->getCommands( );
 
     if (IS_SET(flags, FCMD_ALIASES|FCMD_HINTS)) {
 	buf << fmt( 0, "%-12s | %-17s| %s", 
-		    "English name", "Russian name", 
-		    IS_SET(flags, FCMD_ALIASES) ? "Aliases" : "Help" ) 
+		    "По-английски", "По-русски", 
+		    IS_SET(flags, FCMD_ALIASES) ? "Синонимы" : "Справка" ) 
 	    << endl
 	    << "-------------+------------------+--------------------------------------------" 
 	    << endl;
 
-	for (c = commands.begin( ); c != commands.end( ); c++) {
+        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    ostringstream other;
 	    Command::Pointer cmd = *c;
 	    
@@ -118,7 +118,7 @@ static void show_commands( Character *ch, int flags )
 	const char *pattern = (fRus ? "%-17s" : "%-13s");
 	const int columns = (fRus ? 4 : 6);
 
-	for (c = commands.begin( ); c != commands.end( ); c++) {
+        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    Command::Pointer cmd = *c;
 
 	    if (!cmd->visible( ch ))
@@ -138,11 +138,11 @@ static void show_commands( Character *ch, int flags )
 	buf << endl;
     }
     else if (IS_SET(flags, FCMD_WIZARD)) {
-	buf << fmt( 0, "%-12s | %-45s | %s", "English name", "Help", "Aliases" )
+	buf << fmt( 0, "%-12s | %-45s | %s", "По-английски", "Справка", "Синонимы" )
 	    << endl
 	    << "-------------+-----------------------------------------------+---------------" 
 	    << endl;
-	for (c = commands.begin( ); c != commands.end( ); c++) {
+        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    ostringstream aliases;
 	    Command::Pointer cmd = *c;
 
