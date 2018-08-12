@@ -53,7 +53,6 @@ public:
     void printHeader( PCharacter * ) const;
 
     XML_VARIABLE XMLString name;
-    XML_VARIABLE XMLString rname;
 };
 
 class ConfigCommand : public CommandPlugin, public DefaultCommand {
