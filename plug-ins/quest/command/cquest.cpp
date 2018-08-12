@@ -10,6 +10,7 @@
 #include "npcharacter.h"
 #include "pcharactermanager.h"
 #include "room.h"
+#include "hometown.h"
 
 #include "feniamanager.h"
 #include "wrappermanagerbase.h"
@@ -35,6 +36,23 @@
 #include "xmlattributequestdata.h"
 #include "def.h"
 
+HOMETOWN(frigate);
+enum {
+    QCMD_NONE = 0,
+    QCMD_BUY,
+    QCMD_LIST,
+    QCMD_TROUBLE,
+    QCMD_REQUEST,
+    QCMD_CANCEL,
+    QCMD_COMPLETE,
+    QCMD_FIND
+};        
+
+static void see_also( PCharacter *pch )
+{
+    pch->println( "Смотри также {y{lRквест ?{lEquest ?{x для списка всех возможных действий." );
+}
+
 COMMAND(CQuest, "quest")
 {
     Questor::Pointer questman;
@@ -50,8 +68,10 @@ COMMAND(CQuest, "quest")
 	return;
     }
 
+    // Parse commands that can be done anywhere.
     if (cmd.empty( )) {
-	usage( pch );
+	doInfo( pch );
+        see_also( pch );
 	return;
     }
     else if (arg_is_info( cmd )) {
@@ -73,48 +93,104 @@ COMMAND(CQuest, "quest")
     else if (arg_oneof( cmd, "set", "установить" ) && pch->isCoder( )) {
 	doSet( pch, arguments );
 	return;
+    } else if (arg_is_help( cmd )) {
+        usage( pch );
+        return;
     }
+   
+    int qcmd = QCMD_NONE;
     
-    if (arg_is_list( cmd ) || arg_oneof( cmd, "buy", "купить" ) || arg_oneof( cmd, "trouble", "вернуть" )) { 
+    // Parse quest trading commands.
+    if (arg_is_list( cmd ))
+        qcmd = QCMD_LIST;
+    else if (arg_oneof( cmd, "buy", "купить" ))
+        qcmd = QCMD_BUY;
+    else if (arg_oneof( cmd, "trouble", "вернуть" ))
+        qcmd = QCMD_TROUBLE;
+
+    // Execute quest trading commands.
+    if (qcmd != QCMD_NONE) { 
 	QuestTrader::Pointer trader;
 
 	trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
 
 	if (!trader) {
 	    pch->send_to( "Здесь нет торговца квестовыми благами.\r\n" );
+            see_also( pch );
 	    return;
 	}
-	
-	if (arg_is_list( cmd ))
-	    trader->doList( pch );
-	else if (arg_oneof( cmd, "buy", "купить" ))
-	    trader->doBuy( pch, arguments );
-	else
-	    trader->doTrouble( pch, arguments );
+
+        switch(qcmd) {
+            case QCMD_LIST:
+                trader->doList( pch );
+                break;
+            case QCMD_BUY:
+                trader->doBuy( pch, arguments );
+                break;
+            case QCMD_TROUBLE:
+                trader->doTrouble( pch, arguments );
+                break;
+        }
 
 	return;
     }
-    
+   
+    // Parse questor commands.
+    if (arg_oneof( cmd, "request", "попросить", "получить" )) 
+        qcmd = QCMD_REQUEST;
+    else if (arg_oneof( cmd, "complete", "сдать", "завершить" )) 
+        qcmd = QCMD_COMPLETE;
+    else if (arg_oneof( cmd, "cancel", "отменить" )) 
+        qcmd = QCMD_CANCEL;
+    else if (arg_oneof( cmd, "find", "найти" )) 
+        qcmd = QCMD_FIND;
+
+    if (qcmd == QCMD_NONE) {
+	usage( pch ); 
+        return;
+    }
+
     questman = find_attracted_mob_behavior<Questor>( pch, OCC_QUEST_MASTER );
-
     if (!questman) {
-	pch->send_to("Ты не можешь сделать этого здесь.\n\r");
-	return;
+        if (pch->getHometown( ) != home_frigate) {
+            pch->println("Здесь нет квестора.");
+            see_also( pch );
+            return;
+        }
+
+        // Special handling for newbie quests. TODO: add Fenia triggers for each command.
+        switch(qcmd) {
+            case QCMD_CANCEL:
+                pch->println("Твое задание не нужно отменять, оно исчезнет как только ты сойдешь с корабля.");
+                break;
+            case QCMD_REQUEST:
+            case QCMD_FIND:
+            case QCMD_COMPLETE:
+                pch->println("Эта команда недоступна, пока ты на корабле.");
+                pch->println("Список текущих квестов показывает команда {y{lRквест инфо{lEquest info{x.");
+                break;
+        }
+        return;
     }
-    
+
     if (!questman->canGiveQuest( pch ))
 	return;
-    
-    if (arg_oneof( cmd, "request", "попросить", "получить" )) 
-	questman->doRequest( pch );
-    else if (arg_oneof( cmd, "complete", "сдать", "завершить" )) 
-	questman->doComplete( pch, arguments );
-    else if (arg_oneof( cmd, "cancel", "отменить" )) 
-	questman->doCancel( pch ); 
-    else if (arg_oneof( cmd, "find", "найти" )) 
-	questman->doFind( pch ); 
-    else 	
-	usage( pch ); 
+   
+    // Execute questor commands.
+    switch(qcmd) {
+        case QCMD_REQUEST:
+            questman->doRequest( pch );
+            break;
+        case QCMD_COMPLETE:
+	    questman->doComplete( pch, arguments );
+            break;
+        case QCMD_CANCEL:
+	    questman->doCancel( pch );
+            break;
+        case QCMD_FIND:
+	    questman->doFind( pch );
+            break;
+    }
 }
 
 bool CQuest::gprog_questinfo( PCharacter *ch )
