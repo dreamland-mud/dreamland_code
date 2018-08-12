@@ -76,10 +76,10 @@ int direction_lookup( const char *arg )
 		return door;
 	}
 
-	if (!str_cmp( arg, dirs[door].name ))
+	if (!str_prefix( arg, dirs[door].name ))
 	    return door;
 
-	if (!str_cmp( arg, dirs[door].rname ))
+	if (!str_prefix( arg, dirs[door].rname ))
 	    return door;
     }
     
