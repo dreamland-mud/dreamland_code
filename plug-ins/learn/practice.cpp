@@ -36,7 +36,7 @@ COMMAND(CPractice, "practice")
 	return;
 	
     if (argument.empty( ) || arg_is_all( argument ))
-	pracShow( ch->getPC( ), !argument.empty( ), false );
+	pracShow( ch->getPC( ), true, false );
     else if (arg_oneof_strict( argument, "now", "сейчас" ))
 	pracShow( ch->getPC( ), true, true );
     else
