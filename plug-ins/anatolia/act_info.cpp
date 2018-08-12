@@ -2321,6 +2321,9 @@ CMDRUNP( help )
 		strcat(argall," ");
 	    strcat(argall,argone);
 	}
+
+        buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
+
 	count=0;
 	for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
 	    if (!(*a)->visible( ch ))
@@ -2328,18 +2331,12 @@ CMDRUNP( help )
 
 	    if (is_name( argall, (*a)->getKeyword( ).c_str( ) ) ){
 		count++;
-		if (count == 2){
-		    buf << ("Найдены следующие разделы помощи:\n\r");
-		    buf << "\t1." << findHelp->getKeyword( ) << "\n\r";                  
-		    buf << "\t"<< count << "." << (*a)->getKeyword( ) << "\n\r";
-		}
+                buf << "    {C" << count << "." << origArgument << "{x : " << (*a)->getKeyword( ) << endl;
 		findHelp = *a;
-		if (count > 2){
-		    buf << "\t"<< count << "." << (*a)->getKeyword( ) << "\n\r";
-		}
             }
 	}
-        ch->send_to(buf.str().c_str());
+
+        buf << endl;
     }
     /*
      * Strip leading '.' to allow initial blanks.
@@ -2352,7 +2349,8 @@ CMDRUNP( help )
 	bugTracker->reportNohelp( ch, origArgument.c_str( ) );
     }
     else if (count > 1) {
-	ch->send_to("Используйте ""цифра.ключевое слово"" для выбора необходимого раздела.\n\rНапример: help 2.create\n\r");
+        buf << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." << endl;
+        ch->send_to(buf.str().c_str());
     }
 }                  
 
