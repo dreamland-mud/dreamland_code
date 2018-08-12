@@ -41,6 +41,11 @@ void QuestTrader::doTrouble( PCharacter *client, const DLString &constArguments 
     
     arguments = constArguments;
     arg = arguments.getOneArgument( );
+    if (arg.empty( )) {
+        tell_act( client, getKeeper( ), "Какую именно вещь ты хочешь вернуть?" );
+        return;
+    }
+
     article = findArticle( client, arg );
 
     if (!article) {

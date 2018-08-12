@@ -6,6 +6,7 @@
  *
  * sturm, 2003
  */
+#include "commandflags.h"
 #include "commandtemplate.h"
 #include "commandmanager.h"
 #include "pcharacter.h"
@@ -25,6 +26,7 @@ enum {
     FCMD_HINTS = (C),
     FCMD_WIZARD = (D),
     FCMD_SHOW_FIRST_RUS = (E),
+    FCMD_IMPORTANT = (F)
 };
 
 static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 0 )
@@ -50,10 +52,18 @@ static void show_aliases( Command::Pointer cmd, ostringstream &buf, int flags = 
 static void show_matched_commands( Character *ch, const DLString &arg )
 {
     ostringstream buf;
-    CommandList::const_iterator c;
+    list<Command::Pointer>::const_iterator c;
     const CommandList &commands = commandManager->getCommands( );
+    bool found = false;
 
-    for (c = commands.begin( ); c != commands.end( ); c++) {
+    if (arg.empty( )) {
+        ch->println("Использование: {y{lRкоманды показ{lEcommand show{lx{D название{x.");
+        return;
+    }
+
+    buf << "Найдены такие команды:" << endl;
+
+    for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	ostringstream aliases;
 	Command::Pointer cmd = *c;
 
@@ -62,7 +72,8 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 	
 	if (!cmd->matches( arg ))
 	    continue;
-
+        
+        found = true;
 	show_aliases( cmd, aliases );
 
 	buf << fmt( 0, "{c%-12s {x: {c%s %s{x\r\n%-12s   %s\r\n",
@@ -73,24 +84,27 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 		       cmd->getHint( ).c_str( ) );
     }
 
-    page_to_char( buf.str( ).c_str( ), ch );
+    if (found)
+        page_to_char( buf.str( ).c_str( ), ch );
+    else
+        ch->printf("Не найдено ни одной команды, начинающейся с '%s'.\r\n", arg.c_str( ));
 }
 
 static void show_commands( Character *ch, int flags )
 {
     ostringstream buf;
-    CommandList::const_iterator c;
+    list<Command::Pointer>::const_iterator c;
     const CommandList &commands = commandManager->getCommands( );
 
     if (IS_SET(flags, FCMD_ALIASES|FCMD_HINTS)) {
 	buf << fmt( 0, "%-12s | %-17s| %s", 
-		    "English name", "Russian name", 
-		    IS_SET(flags, FCMD_ALIASES) ? "Aliases" : "Help" ) 
+		    "По-английски", "По-русски", 
+		    IS_SET(flags, FCMD_ALIASES) ? "Синонимы" : "Справка" ) 
 	    << endl
 	    << "-------------+------------------+--------------------------------------------" 
 	    << endl;
 
-	for (c = commands.begin( ); c != commands.end( ); c++) {
+        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    ostringstream other;
 	    Command::Pointer cmd = *c;
 	    
@@ -111,14 +125,26 @@ static void show_commands( Character *ch, int flags )
 			   other.str( ).c_str( ) )
 		<< endl;
 	}
+
+        buf << endl;
+        if (IS_SET(flags, FCMD_ALIASES)) 
+            buf << "Также смотри {y{lRкоманды{lEcommand{x, {y{lRкоманды подсказ{lEcommand hints{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+        else
+            buf << "Также смотри {y{lRкоманды{lEcommad{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+
     }
-    else if (IS_SET(flags, FCMD_TABLE)) {
+    else if (IS_SET(flags, FCMD_TABLE|FCMD_IMPORTANT)) {
 	int i = 1;
 	bool fRus = ch->getConfig( )->rucommands;
 	const char *pattern = (fRus ? "%-17s" : "%-13s");
 	const int columns = (fRus ? 4 : 6);
+        
+        if (IS_SET(flags, FCMD_TABLE))
+            buf << "{cВсе команды{x:" << endl;
+        else
+            buf << "{cВажные команды{x:" << endl;
 
-	for (c = commands.begin( ); c != commands.end( ); c++) {
+        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    Command::Pointer cmd = *c;
 
 	    if (!cmd->visible( ch ))
@@ -126,6 +152,9 @@ static void show_commands( Character *ch, int flags )
 	    
 	    if (cmd->getLevel( ) >= LEVEL_HERO)
 		continue;
+
+            if (IS_SET(flags, FCMD_IMPORTANT) && !cmd->getExtra( ).isSet( CMD_IMPORTANT ))
+                continue;
 
 	    buf << fmt( 0, pattern, 
 	                   (fRus && !cmd->getRussianName( ).empty( ) ? 
@@ -136,13 +165,17 @@ static void show_commands( Character *ch, int flags )
 	}
 
 	buf << endl;
+        if (IS_SET(flags, FCMD_TABLE))
+            buf << "Также смотри {y{lRкоманды{lEcommand{x для краткого списка, {y{lRкоманды подсказ{lEcommand hints{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+        else
+            buf << "Для полного списка используй {y{lRкоманды таблица{lEcommand table{x, {y{lRкоманды подсказ{lEcommand hints{x." << endl;
     }
     else if (IS_SET(flags, FCMD_WIZARD)) {
-	buf << fmt( 0, "%-12s | %-45s | %s", "English name", "Help", "Aliases" )
+	buf << fmt( 0, "%-12s | %-45s | %s", "По-английски", "Справка", "Синонимы" )
 	    << endl
 	    << "-------------+-----------------------------------------------+---------------" 
 	    << endl;
-	for (c = commands.begin( ); c != commands.end( ); c++) {
+        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    ostringstream aliases;
 	    Command::Pointer cmd = *c;
 
@@ -177,9 +210,12 @@ CMDRUN( commands )
 	return;
     }
 
-    if (arg.empty( ) || arg_oneof( arg, "hints", "подсказки" ))
-	SET_BIT(flags, FCMD_HINTS);
+    if (arg.empty( ))
+	SET_BIT(flags, FCMD_IMPORTANT);
     
+    if (arg_oneof( arg, "hints", "подсказки" ))
+	SET_BIT(flags, FCMD_HINTS);
+
     if (arg_oneof( arg, "table", "таблица" ))
 	SET_BIT(flags, FCMD_TABLE);
 

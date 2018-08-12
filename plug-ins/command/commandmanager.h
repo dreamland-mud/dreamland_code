@@ -17,14 +17,30 @@
 
 class Character;
 
-class CommandList : public list<Command::Pointer> {
+class CommandList {
 public:
-	
-	const_iterator findExact( const DLString & ) const;
+        Command::Pointer findExact( const DLString & ) const;
 	Command::Pointer chooseCommand( Character *, const DLString & ) const;
 
-	void sort( ); 
+        void add( Command::Pointer & );
+        void remove( Command::Pointer & );
+        inline const list<Command::Pointer> &getCommands( ) const;
+        inline const list<Command::Pointer> &getCommandsRU( ) const;
+
+protected:        
+        list<Command::Pointer> commands;
+        list<Command::Pointer> commands_ru;
 };
+
+inline const list<Command::Pointer> &CommandList::getCommands( ) const
+{
+    return commands;
+}
+
+inline const list<Command::Pointer> &CommandList::getCommandsRU( ) const
+{
+    return commands_ru;
+}
 
 class CommandLoader : public virtual Plugin, public DLXMLLoader {
 public:    
@@ -60,9 +76,11 @@ public:
 	
 	Command::Pointer findExact( const DLString & ) const;
 	inline const Priorities & getPriorities( ) const;
+	inline const Priorities & getPrioritiesRU( ) const;
 	inline CommandList & getCommands( );
 	inline const CommandList & getCommands( ) const;
         CategoryMap getCategorizedCommands() const;
+	bool compare( const Command &, const Command &, bool fRussian ) const;
 
 	virtual bool process( InterpretArguments & );
 
@@ -75,11 +93,14 @@ protected:
 	
 private:
 	void loadPriorities( );
+        void savePrioritiesRU( );
 
 	static const DLString TABLE_NAME;
 	static const DLString PRIO_FILE;
+	static const DLString PRIO_FILE_RU;
 
 	Priorities priorities;
+	Priorities priorities_ru;
 	CommandList commands;
 };
 
@@ -96,6 +117,11 @@ inline const CommandList & CommandManager::getCommands( ) const
 inline const CommandManager::Priorities & CommandManager::getPriorities( ) const
 {
     return priorities;
+}
+
+inline const CommandManager::Priorities & CommandManager::getPrioritiesRU( ) const
+{
+    return priorities_ru;
 }
 
 extern CommandManager *commandManager;

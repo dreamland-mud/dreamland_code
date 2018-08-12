@@ -110,7 +110,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     }
 
     if (argStat.empty( )) {
-	tell_raw( client, ch, "У тебя {1{Y%d{2 тренировочн%s.", 
+	tell_raw( client, ch, "У тебя {Y%d{G тренировочн%s.", 
 	          client->train.getValue( ),
                   GET_COUNT(client->train,"ая сессия","ые сессии","ых сессий") );
     }
@@ -143,7 +143,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 		      (cnt > 2 ? "\r\n" : " " ),
 		      buf.str( ).c_str( ) );
 	    if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ))
-		tell_raw( client, ch, "Ты можешь повысить телосложение за {1{Y%d{2 квестовых единиц: train con qp.", costQP );
+		tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: train con qp.", costQP );
 	}	    
 	else
 	    /*

@@ -428,10 +428,11 @@ void char_update( )
         for (ch = char_list; ch != 0; ch = ch_next)
         {
             ch_next = ch->next;
-            if ( !ch->is_npc() )
+            if (!ch->is_npc())
                 ch->getPC( )->save();
             if( ( ch == ch_quit || ch->timer > 20 ) && !ch->isCoder( ) ) {
-                ch->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
+                if (ch->getPC( ))
+                    ch->getPC( )->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "auto" );
                 interpret_raw(ch, "quit", "");
             }
         }

@@ -38,7 +38,7 @@ public:
 	virtual const Enumeration & getPosition( ) const;
 	virtual const Flags & getOrder( ) const;
 
-	virtual bool matches( const DLString & ) const;
+	virtual bool matchesAlias( const DLString & ) const;
 	virtual bool matchesExactly( const DLString & ) const;
 
 	virtual void run( Character * ch, const DLString & );

@@ -44,13 +44,13 @@ CMDRUN( run )
     walk = constArguments;
     walk.stripWhiteSpace( );
 
-    if (!pch || walk.empty( )) {
-	ch->send_to( "Куда собрались?\r\n" );
+    if (pch->fighting) {
+	pch->println("Но ты же сражаешься! Используй команду {y{lRсбежать{lEflee{x для побега из боя.");
 	return;
     }
 
-    if (pch->fighting) {
-	pch->send_to("Закончи сражение, потом беги.\n\r");
+    if (!pch || walk.empty( )) {
+	ch->send_to( "По какому маршруту ты хочешь бежать?\r\n" );
 	return;
     }
 

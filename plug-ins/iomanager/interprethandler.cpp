@@ -243,7 +243,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		    out << "BAD!!";
 	    }
 	    else
-		out << "None!";
+		out << "нет";
 	    break;
 
 	case 'h' :
@@ -307,7 +307,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		    out << ch->in_room->name;
 		}
 		else
-		    out << "darkness";
+		    out << "темнота";
 	    else
 		out << " ";
 	    break;
