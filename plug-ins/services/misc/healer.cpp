@@ -9,6 +9,7 @@
 #include "attract.h"
 #include "occupations.h"
 #include "commandtemplate.h"
+#include "hometown.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -22,6 +23,7 @@
 #include "def.h"
 
 CLAN(battlerager);
+HOMETOWN(frigate);
 
 /*------------------------------------------------------------------------
  * Healer 
@@ -191,7 +193,13 @@ CMDRUN( heal )
     healer = find_attracted_mob_behavior<Healer>( ch, OCC_HEALER );
 
     if (!healer) {
-	ch->send_to( "Здесь некому тебя вылечить.\r\n" );
+	ch->send_to( "Здесь некому тебя вылечить за деньги.\r\n" );
+        if (ch->getModifyLevel() < 11) {
+            if (!ch->is_npc( ) && ch->getPC( )->getHometown( ) == home_frigate)
+                ch->println("Доктор в лазарете вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
+            else
+                ch->println("Лекарь в любом храме вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
+        }
 	return;
     }
 
