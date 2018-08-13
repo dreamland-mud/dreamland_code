@@ -70,7 +70,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
 	if (!cmd->visible( ch ))
 	    continue;
 	
-	if (!cmd->matches( arg ))
+	if (!cmd->matches( arg ) && !cmd->matchesAlias( arg ))
 	    continue;
         
         found = true;
