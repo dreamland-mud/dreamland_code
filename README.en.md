@@ -31,7 +31,7 @@ git clone https://github.com/dreamland-mud/dreamland_code.git
 cd dreamland_code
 make -f Makefile.git
 mkdir ../objs && cd ../objs
-../dreamland_code/configure --path=/path/to/runtime
+../dreamland_code/configure --prefix=/path/to/runtime
 make -j 8 && make install
 ```
 
