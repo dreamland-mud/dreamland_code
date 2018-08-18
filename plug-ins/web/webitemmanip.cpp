@@ -2,7 +2,7 @@
  *
  * ruffina, 2018
  */
-#include "webitemmanip.h"
+#include "webmanipcommandtemplate.h"
 
 #include <map>
 #include <list>
@@ -13,7 +13,6 @@
 #include "register-impl.h"
 #include "lex.h"
 
-#include "commandtemplate.h"
 #include "command.h"
 #include "commandmanager.h"
 #include "mobilebehavior.h"
@@ -379,8 +378,15 @@ static bool has_trigger_examine( Object *obj )
     return false;
 }
 
-bool WebItemManip::decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *ch, const DLString &pocket, int combined ) const
+WEBMANIP_RUN(decorateItem)
 {
+    const ItemManipArgs &myArgs = static_cast<const ItemManipArgs &>( args );
+    const DLString &descr = myArgs.descr;
+    Object *item = myArgs.item;
+    Character *ch = myArgs.target;
+    const DLString &pocket = myArgs.pocket;
+    int combined = myArgs.combined;
+
     ManipList manips( item, descr );
     bitstring_t wear = item->wear_flags;
     REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
@@ -591,8 +597,12 @@ bool WebItemManip::decorateItem( ostringstream &buf, const DLString &descr, Obje
 }
 
 
-bool WebItemManip::decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const
+WEBMANIP_RUN(decorateShopItem)
 {
+    const ShopItemManipArgs &myArgs = static_cast<const ShopItemManipArgs &>( args );
+    const DLString &descr = myArgs.descr;
+    Object *item = myArgs.item;
+
     ManipList manips( item, descr );
 
     manips.add( "buy" );
@@ -603,8 +613,12 @@ bool WebItemManip::decorateShopItem( ostringstream &buf, const DLString &descr, 
     return true;
 }
 
-bool WebItemManip::decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const
+WEBMANIP_RUN(decoratePocket)
 {
+    const PocketManipArgs &myArgs = static_cast<const PocketManipArgs &>( args );
+    const DLString &pocket= myArgs.pocket;
+    Object *container = myArgs.container;
+
     ManipList manips( container, pocket );
 
     manips.add( "look", "×", pocket );
