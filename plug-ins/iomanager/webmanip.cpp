@@ -2,37 +2,22 @@
  *
  * ruffina, 2018
  */
-#include <stdarg.h>
+#include <string.h>
 #include "webmanip.h"
 
 
-WebManip::~WebManip( )
+WebManipCommand::~WebManipCommand( )
 {
 }
 
-void WebManip::initialization( ) 
+void WebManipCommand::initialization( )
 {
     webManipManager->registrate( Pointer( this ) );
 }
 
-void WebManip::destruction( ) 
+void WebManipCommand::destruction( ) 
 {
     webManipManager->unregistrate( Pointer( this ) );
-}
-
-bool WebManip::decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *, const DLString &pocket, int combined ) const
-{
-    return false;
-}
-
-bool WebManip::decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const
-{
-    return false;
-}
-
-bool WebManip::decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const
-{
-    return false;
 }
 
 WebManipManager* webManipManager = NULL;
@@ -48,59 +33,64 @@ WebManipManager::~WebManipManager( )
     webManipManager = NULL;
 }
 
-void WebManipManager::registrate( WebManip::Pointer m )
+void WebManipManager::registrate( WebManipCommand::Pointer m )
 {
-    manips.push_back( m );
+    manips[m->getName( )] = m;
 }
 
-void WebManipManager::unregistrate( WebManip::Pointer m )
+void WebManipManager::unregistrate( WebManipCommand::Pointer m )
 {
-    manips.remove( m );
+    WebManipMap::iterator i = manips.find(m->getName( ));
+    if (i != manips.end( ))
+    	manips.erase(m->getName( ));
 }
 
 
 void WebManipManager::decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *ch, const DLString &pocket, int combined ) const
 {
-    bool needDefaultAction = true;
-
-    // Find a registered 'manipulator' to handle this item.
-    for (WebManipList::const_iterator m = manips.begin( ); m != manips.end( ); m++)
-        if ((*m)->decorateItem( buf, descr, item, ch, pocket, combined )) {
-            needDefaultAction = false;
-            break;
-        }
-
-    // No one was succesful, simply output the description as is without decorations.
-    if (needDefaultAction)
-        buf << descr;
+	static const DLString COMMAND_NAME = "decorateItem";
+	ItemManipArgs args( ch, item, descr, pocket, combined );
+	if (!run( buf, COMMAND_NAME, args ))
+		buf << descr;
 }
 
 void WebManipManager::decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character *ch ) const
 {
-    bool needDefaultAction = true;
-
-    for (WebManipList::const_iterator m = manips.begin( ); m != manips.end( ); m++)
-        if ((*m)->decorateShopItem( buf, descr, item, ch )) {
-            needDefaultAction = false;
-            break;
-        }
-
-    if (needDefaultAction)
-        buf << descr;
+	static const DLString COMMAND_NAME = "decorateShopItem";
+	ShopItemManipArgs args( ch, item, descr );
+	if (!run( buf, COMMAND_NAME, args ))
+		buf << descr;
 }
 
 void WebManipManager::decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const
 {
-    bool needDefaultAction = true;
+	static const DLString COMMAND_NAME = "decoratePocket";
+	PocketManipArgs args( ch, pocket, container );
+	if (!run( buf, COMMAND_NAME, args ))
+		buf << pocket;
+}
 
-    for (WebManipList::const_iterator m = manips.begin( ); m != manips.end( ); m++)
-        if ((*m)->decoratePocket( buf, pocket, container, ch )) {
-            needDefaultAction = false;
-            break;
-        }
+void WebManipManager::decorateExtraDescr( ostringstream &buf, const char *desc, extra_descr_data *ed, Character *ch ) const
+{
+    static const DLString COMMAND_NAME = "decorateExtraDescr";
+    ExtraDescrManipArgs args( ch, desc, ed );
+    if (!run( buf, COMMAND_NAME, args ))
+        buf << desc;
+}
 
-    if (needDefaultAction)
-        buf << pocket;
+bool WebManipManager::run( ostringstream &buf, const DLString &command, const ManipCommandArgs &args ) const
+{
+	bool success = false;
+
+	WebManipMap::const_iterator i = manips.find( command );
+	if (i != manips.end( )) {
+		WebManipCommand::Pointer cmd = i->second;
+		if (cmd->run( buf, args )) {
+			success = true;
+		}
+	}
+
+	return success;
 }
 
 void WebManipManager::initialization( )

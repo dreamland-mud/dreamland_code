@@ -6,7 +6,8 @@ include $(top_srcdir)/src/Makefile.inc
 libweb_la_SOURCES = \
 impl.cpp \
 webpromptattribute.cpp \
-webitemmanip.cpp
+webitemmanip.cpp \
+webtextmanip.cpp
 
 libweb_la_MOC = webpromptattribute.h
 

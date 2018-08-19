@@ -4,7 +4,6 @@
  */
 #include "webprompt.h"
 #include "webpromptattribute.h"
-#include "webitemmanip.h"
 #include "logstream.h"
 #include "xmlattributeticker.h"
 #include "xmlattributeplugin.h"
@@ -959,7 +958,7 @@ extern "C"
     SO::PluginList initialize_web( )
     {
 	SO::PluginList ppl;
-	Plugin::registerPlugin<WebItemManip>( ppl );
+//	Plugin::registerPlugin<WebItemManip>( ppl );
 	Plugin::registerPlugin<WhoWebPromptListener>( ppl );
 	Plugin::registerPlugin<GroupWebPromptListener>( ppl );
 	Plugin::registerPlugin<CalendarWebPromptListener>( ppl );

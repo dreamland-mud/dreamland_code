@@ -19,6 +19,8 @@
 #include "exception.h"
 #include "dreamland.h"
 
+static const DLString DEFAULT_CONFIG_PATH = "etc/dreamland.xml";
+
 int main( int argc, char* argv[] )
 {
     try
@@ -27,6 +29,8 @@ int main( int argc, char* argv[] )
 
 	if (argc > 1)
 	    dl.setConfigFilePath( argv[1] );
+	else
+		dl.setConfigFilePath(DEFAULT_CONFIG_PATH);
 	
 	dl.load( );
 
