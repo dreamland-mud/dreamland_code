@@ -63,7 +63,7 @@ make -f Makefile.git
 Инсталяция дримленд также будет в отдельном каталоге runtime, где на этапе конфигурации будет создано дерево каталогов и скопированы нужные файлы. 
 ```bash
 mkdir ../objs && cd ../objs
-../dreamland_code/configure --path=/path/to/runtime
+../dreamland_code/configure --prefix=/path/to/runtime
 make -j 8 && make install
 ```
 ### <a name="areas">Установка dreamland_world</a>
