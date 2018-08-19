@@ -2,7 +2,9 @@
  *
  * ruffina, 2018
  */
+#include <string.h>
 #include "webmanip.h"
+
 
 WebManipCommand::~WebManipCommand( )
 {
@@ -66,6 +68,14 @@ void WebManipManager::decoratePocket( ostringstream &buf, const DLString &pocket
 	PocketManipArgs args( ch, pocket, container );
 	if (!run( buf, COMMAND_NAME, args ))
 		buf << pocket;
+}
+
+void WebManipManager::decorateExtraDescr( ostringstream &buf, const char *desc, extra_descr_data *ed, Character *ch ) const
+{
+    static const DLString COMMAND_NAME = "decorateExtraDescr";
+    ExtraDescrManipArgs args( ch, desc, ed );
+    if (!run( buf, COMMAND_NAME, args ))
+        buf << desc;
 }
 
 bool WebManipManager::run( ostringstream &buf, const DLString &command, const ManipCommandArgs &args ) const

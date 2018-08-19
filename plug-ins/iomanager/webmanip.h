@@ -14,6 +14,7 @@
 class Object;
 class Character;
 struct ManipCommandArgs;
+struct extra_descr_data;
 
 class WebManipCommand : public virtual Plugin {
 public:    
@@ -42,7 +43,7 @@ public:
         void decorateItem( ostringstream &buf, const DLString &descr, Object *item, Character *, const DLString &pocket, int combined ) const;
         void decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const;
         void decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const;
-//        void decorateExtraDescr( ostringstream &buf, EXTRA_DESCR_DATA *ed, Character *ch ) const;
+        void decorateExtraDescr( ostringstream &buf, const char *desc, extra_descr_data *ed, Character *ch ) const;
 
 protected:        
         virtual void initialization( );
@@ -98,6 +99,18 @@ struct PocketManipArgs : public ManipCommandArgs {
 
 	DLString pocket;
 	Object *container;
+};
+
+struct ExtraDescrManipArgs : public ManipCommandArgs {
+    ExtraDescrManipArgs(Character *target, const char *desc, extra_descr_data *ed)
+            : ManipCommandArgs(target)
+    {
+        this->desc = desc;
+        this->ed = ed;
+    }
+
+    const char *desc;
+    extra_descr_data *ed;
 };
 
 
