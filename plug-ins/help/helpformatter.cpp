@@ -88,7 +88,7 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 	    if (!t_ref) {
 		t_ref = true;
 		t_bracket = false;
-		out << "{W";
+		out << "{hh{W";
 	    } else
 		out << *p;
 	    break;
@@ -97,7 +97,7 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 	    if (t_ref) {
 		t_ref = false;
 		t_bracket = false;
-		out << "{w";
+		out << "{x";
 	    } else
 		out << *p;
 	    break;
