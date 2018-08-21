@@ -155,7 +155,7 @@ CMDRUNP( prompt )
 
     if (arg_is_all( argument )) {
 	old = ch->prompt;
-	ch->prompt = "<%n: %h/%Hhp %m/%Mm %v/%Vmv %Xexp> ";
+	ch->prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x>%c";
     }
     else if (arg_is_show( argument )) {
 	ch->println( "Текущая строка состояния:" );
@@ -189,7 +189,7 @@ CMDRUNP( battleprompt )
 
     if (arg_is_all( argument )) {
 	old = ch->batle_prompt;
-	ch->batle_prompt = "<%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:<%o>> ";
+	ch->batle_prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг %Xоп Вых:{g%d{x> [{r%y{x:{Y%o{x]%c";
     }
     else if (arg_is_show( argument )) {
 	ch->println( "Текущая строка состояния в бою:" );
