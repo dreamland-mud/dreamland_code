@@ -49,8 +49,9 @@ sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev lib
 
 ### <a name="build">Сборка из исходников</a>
 Склонируйте к себе либо главный репозиторий, либо свою собственную копию (fork) - о создании fork читайте ниже.
-
+Предположим, что исходники будут лежать в `/home/dreamland/dreamland_code`, тогда:
 ```bash
+mkdir /home/dreamland && cd /home/dreamland
 git clone https://github.com/dreamland-mud/dreamland_code.git
 ```
 В каталоге с исходниками проинициализируйте конфигурационный скрипт и сборочные файлы, запустив
@@ -61,17 +62,20 @@ make -f Makefile.git
 В дальнейшем эту команду запускать не нужно, разве что если изменится configure.ac.
 Приступаем к конфигурации и сборке. Для удобства все объектники будут в отдельном каталоге, чтобы не засорять исходники лишними файлами.
 Инсталяция дримленд также будет в отдельном каталоге runtime, где на этапе конфигурации будет создано дерево каталогов и скопированы нужные файлы. 
+В этом руководстве предполагается, что объектники лежат в `/home/dreamland/objs`, а инсталляция - в `/home/dreamland/runtime`. Измените пути в примерах согласно своей конфигурации.
+
 ```bash
-mkdir ../objs && cd ../objs
-../dreamland_code/configure --prefix=/path/to/runtime
+mkdir /home/dreamland/objs && cd /home/dreamland/objs
+/home/dreamland/dreamland_code/configure --prefix=/home/dreamland/runtime
 make -j 8 && make install
 ```
 ### <a name="areas">Установка dreamland_world</a>
 Склонируйте репозиторий dreamland_world, который содержит все конфигурационные файлы и некоторые зоны. 
 Создайте на него ссылку из каталога runtime.
 ```bash
+cd /home/dreamland
 git clone https://github.com/dreamland-mud/dreamland_world.git
-ln -s /path/to/dreamland_world /path/to/runtime/share/DL
+ln -s /home/dreamland/dreamland_world /home/dreamland/runtime/share/DL
 ```
 
 Вот и всё, мир готов к запуску.
@@ -79,12 +83,12 @@ ln -s /path/to/dreamland_world /path/to/runtime/share/DL
 ### <a name="run">Запуск сервера</a>
 
 ```bash
-cd /path/to/runtime
+cd  /home/dreamland/runtime
 ./bin/dreamland etc/dreamland.xml &
 ```
 ### <a name="logs">Просмотр логов</a>
 
-Логи попадают в подкаталог var/log в каталоге runtime. Формат файла логов задается в etc/dreamland.xml, по умолчанию имя файла - это дата и время запуска. 
+Логи попадают в подкаталог `var/log` в каталоге runtime. Формат файла логов задается в `etc/dreamland.xml`, по умолчанию имя файла - это дата и время запуска. 
 ```xml
 <logPattern>var/log/%Y%m%d-%H%M%S.log</logPattern>
 ```
@@ -135,7 +139,7 @@ git add .
 ```
 Добавить файлы выборочно:
 ```bash
-git add /path/to/file
+git add path/to/file
 ```
 3. Создать commit и описать изменение. Описания рекомендуется делать понятные для тех, кто будет читать их через полгода.
 ```bash
@@ -168,12 +172,12 @@ git push
 Если вы внесли изменения в каталог src:
 * если поменялась только реализация (файлы с расширением .cpp), достаточно пересобрать только каталог src:
 ```bash
-cd /path/to/objs/src
+cd /home/dreamland/objs/src
 make -j 4 && make install
 ```
 * если ваше изменение также повлияет и на плагины (например, поменялся заголовочный файл) - то нужно пересобрать вообще всё.  
 ```bash
-cd /path/to/objs
+cd /home/dreamland/objs
 make -j 4 && make install
 ```
 Затем надо перезапустить dreamland (см. выше про запуск).
@@ -181,7 +185,7 @@ make -j 4 && make install
 ### <a name="plugin">Пересборка плагинов</a>
 Пересоберите все измененные плагины:
 ```bash
-cd /path/to/objs/plug-ins/yourplugin
+cd /home/dreamland/objs/plug-ins/yourplugin
 make -j 4 && make install
 ```
 Перегрузите все измененные плагины изнутри мира, набрав:
