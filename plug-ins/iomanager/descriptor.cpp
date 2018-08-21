@@ -427,7 +427,7 @@ sendVersion(Descriptor *d)
 {
     Json::Value val;
     val["command"] = "version";
-    val["args"][0] = "DreamLand Web Client/1.6";
+    val["args"][0] = "DreamLand Web Client/1.7";
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);
 }
