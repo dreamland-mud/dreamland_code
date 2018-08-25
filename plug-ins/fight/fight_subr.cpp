@@ -17,6 +17,7 @@
 #include "affect.h"
 #include "room.h"
 #include "pcharacter.h"
+#include "dreamland.h"
 #include "npcharacter.h"
 #include "object.h"
 #include "race.h"
@@ -127,6 +128,8 @@ void check_bloodthirst( Character *ch )
 {
     Character *vch, *vch_next;
 
+    if (dreamland->hasOption( DL_BUILDPLOT ))
+        return;
     if (!IS_AFFECTED(ch, AFF_BLOODTHIRST))
 	return;
     if (!IS_AWAKE(ch))

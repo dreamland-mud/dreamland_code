@@ -71,7 +71,10 @@ bool BasicMobileBehavior::canAggress( Character *victim )
 {
     if (victim->is_npc( ))
 	return false;
-	
+
+    if (dreamland->hasOption( DL_BUILDPLOT ))
+        return false;
+
     if (victim->is_immortal( ))
 	return false;
 	
