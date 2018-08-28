@@ -4,6 +4,7 @@
  */
 #include <string.h>
 #include "webmanip.h"
+#include "character.h"
 
 
 WebManipCommand::~WebManipCommand( )
@@ -76,6 +77,24 @@ void WebManipManager::decorateExtraDescr( ostringstream &buf, const char *desc, 
     ExtraDescrManipArgs args( ch, desc, ed );
     if (!run( buf, COMMAND_NAME, args ))
         buf << desc;
+}
+
+void WebManipManager::decorateCharacter( ostringstream &buf, const DLString &descr, Character *victim, Character *ch ) const
+{
+    static const DLString COMMAND_PC = "decoratePlayer";
+    static const DLString COMMAND_NPC = "decorateMobile";
+    bool result;
+
+    if (victim->is_npc( )) {
+        // not implemented
+        result = false;
+    } else {
+        PlayerManipArgs args( ch, victim->getPC( ), descr );
+        result = run( buf, COMMAND_PC, args );
+    }
+
+    if (!result)
+        buf << descr;
 }
 
 bool WebManipManager::run( ostringstream &buf, const DLString &command, const ManipCommandArgs &args ) const

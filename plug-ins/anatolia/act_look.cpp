@@ -600,8 +600,11 @@ void show_char_to_char_0( Character *victim, Character *ch )
 	if (ch->getConfig( )->holy && origVict != victim)
 	    buf << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ) << "{x "
 		<< "(под личиной " << ch->sees( victim, '2' ) << ") ";
-	else
-	    buf << "{" << CLR_PLAYER(ch) << ch->sees( victim, '1' ) << "{x";
+	else {
+	    buf << "{" << CLR_PLAYER(ch);
+            webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ), victim, ch );
+            buf << "{x";
+        }
 
 	if (!IS_SET(ch->comm, COMM_BRIEF) 
 	    && victim->position == POS_STANDING 

@@ -3,6 +3,7 @@
  * ruffina, 2018
  */
 #include "webmanipcommandtemplate.h"
+#include "maniplist.h"
 
 #include <map>
 #include <list>
@@ -41,48 +42,18 @@ NPCharacter * find_mob_with_act( Room *room, bitstring_t act );
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
 
 /*
- * Decorates each object in a list with manipulations markup,
- * adding tags like <m c='wear,drop,look,lore'>a short sword</m>
- * around each name.
+ * Hold the list of all commands and their arguments that are applicable
+ * to the item in given context.
  */
-
-struct Manip {
-    DLString cmdName;
-    Command::Pointer cmd;
-    DLString args;
-
-    Manip( const DLString &cmdName, const DLString &args ) {
-        this->cmdName = cmdName;
-        cmd = commandManager->findExact( cmdName );
-        if (cmd.isEmpty( ))
-            throw Exception( cmdName + ": manip command not found" );
-        this->args = args;
-    }
-
-    DLString toString( ) const {
-        return cmd->getRussianName( ) + " " + args;
-    }
-};
-
-static const DLString TAG = "m";
-static const DLString ATTR_CMD = "c";
-static const DLString ATTR_LOCAL = "l";
-static const DLString THIS = "$";
-
-struct ManipList {
-    // Main commands.
-    list<Manip> manips;
-    // Commands only available in this room (local).
-    list<Manip> locals;
+struct ItemManipList : public ManipList {
     Object *target;
-    DLString descr;
 
-    ManipList( Object *target, const DLString &descr ) {
+    ItemManipList( Object *target, const DLString &descr ) {
         this->target = target;
         this->descr = descr;
     }
 
-    // Add commands to the list that it's going to be shown
+    // Add commands to the list that is going to be shown
     // below the divider and passed in the 'l' attribute.
     void addLocal( const DLString &cmdName ) {
         locals.push_back( Manip( cmdName, THIS ) );
@@ -150,37 +121,8 @@ struct ManipList {
         manips.push_back( Manip( cmdName, args ) );
     }
 
-    DLString toString( ) const {
-        ostringstream buf;
-
-        buf << "{Iw<" << TAG << " ";
-        
-        if (manips.size( ) > 0) {
-            buf << ATTR_CMD << "=\"";
-            for (list<Manip>::const_iterator m = manips.begin( );
-                 m != manips.end( );
-                 m++)
-            {
-                buf << m->toString( ) << ",";
-            }
-
-            buf << "\" ";
-        }
-       
-        if (locals.size( ) > 0) {
-            buf << ATTR_LOCAL << "=\"";
-            for (list<Manip>::const_iterator m = locals.begin( );
-                 m != locals.end( );
-                 m++)
-            {
-                buf << m->toString( ) << ",";
-            }
-            buf << "\" ";
-        }
-
-        buf << "i=\"" << target->getID( ) << "\">{Ix"
-            << descr << "{Iw</" << TAG << ">{Ix";
-        return buf.str( );
+    virtual DLString getID( ) const {
+        return DLString( target->getID( ) );
     }
 };
 
@@ -378,6 +320,11 @@ static bool has_trigger_examine( Object *obj )
     return false;
 }
 
+/*
+ * Decorates each object in a list with manipulations markup,
+ * adding tags like <m c='wear,drop,look,lore'>a short sword</m>
+ * around each name.
+ */
 WEBMANIP_RUN(decorateItem)
 {
     const ItemManipArgs &myArgs = static_cast<const ItemManipArgs &>( args );
@@ -387,7 +334,7 @@ WEBMANIP_RUN(decorateItem)
     const DLString &pocket = myArgs.pocket;
     int combined = myArgs.combined;
 
-    ManipList manips( item, descr );
+    ItemManipList manips( item, descr );
     bitstring_t wear = item->wear_flags;
     REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
     
@@ -603,7 +550,7 @@ WEBMANIP_RUN(decorateShopItem)
     const DLString &descr = myArgs.descr;
     Object *item = myArgs.item;
 
-    ManipList manips( item, descr );
+    ItemManipList manips( item, descr );
 
     manips.add( "buy" );
     if (IS_OBJ_STAT( item, ITEM_INVENTORY )) 
@@ -619,7 +566,7 @@ WEBMANIP_RUN(decoratePocket)
     const DLString &pocket= myArgs.pocket;
     Object *container = myArgs.container;
 
-    ManipList manips( container, pocket );
+    ItemManipList manips( container, pocket );
 
     manips.add( "look", "в", pocket );
     manips.add( "get", "все", pocket );

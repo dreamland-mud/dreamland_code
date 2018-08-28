@@ -12,6 +12,7 @@
 #include "object.h"
 #include "pcrace.h"
 
+#include "webmanip.h"
 #include "clanreference.h"
 #include "fight.h"
 #include "act.h"
@@ -228,10 +229,12 @@ DLString Who::formatChar( Character *ch, PCharacter *victim ) {
 	buf << "{C";
     else
 	buf << "{W";
-    
-    player_fmt( "%N{x %p", victim, buf, ch );
-    result = buf.str( ) + "{x\r\n";
-    return result;
+   
+    DLString descr = ch->seeName( victim );
+    webManipManager->decorateCharacter( buf, descr, victim, ch );
+
+    buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
+    return buf.str( );
 }
 
 DLString Who::leftColumn( Character *ch, PCharacter *victim ) {

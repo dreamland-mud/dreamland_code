@@ -13,6 +13,7 @@
 
 class Object;
 class Character;
+class PCharacter;
 struct ManipCommandArgs;
 struct extra_descr_data;
 
@@ -44,6 +45,7 @@ public:
         void decorateShopItem( ostringstream &buf, const DLString &descr, Object *item, Character * ) const;
         void decoratePocket( ostringstream &buf, const DLString &pocket, Object *container, Character *ch ) const;
         void decorateExtraDescr( ostringstream &buf, const char *desc, extra_descr_data *ed, Character *ch ) const;
+        void decorateCharacter( ostringstream &buf, const DLString &descr, Character *victim, Character *ch ) const;
 
 protected:        
         virtual void initialization( );
@@ -111,6 +113,18 @@ struct ExtraDescrManipArgs : public ManipCommandArgs {
 
     const char *desc;
     extra_descr_data *ed;
+};
+
+struct PlayerManipArgs : public ManipCommandArgs {
+	PlayerManipArgs(Character *target, PCharacter *victim, const DLString &descr)
+		: ManipCommandArgs(target)
+	{
+		this->victim = victim;
+		this->descr = descr;
+	}
+
+    PCharacter *victim;
+	DLString descr;
 };
 
 

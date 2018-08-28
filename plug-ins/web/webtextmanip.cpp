@@ -4,35 +4,11 @@
  */
 #include "webmanipcommandtemplate.h"
 
-#include <map>
-#include <list>
 #include <sstream>
 
 #include "logstream.h"
-#include "wrapperbase.h"
-#include "register-impl.h"
-#include "lex.h"
-
-#include "command.h"
-#include "commandmanager.h"
-#include "mobilebehavior.h"
-#include "behavior_utils.h"
-
-#include "object.h"
 #include "pcharacter.h"
-#include "npcharacter.h"
-#include "room.h"
-
 #include "descriptor.h"
-#include "comm.h"
-#include "gsn_plugin.h"
-#include "attract.h"
-#include "occupations.h"
-#include "shoptrader.h"
-#include "move_utils.h"
-#include "act_lock.h"
-#include "handler.h"
-#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
