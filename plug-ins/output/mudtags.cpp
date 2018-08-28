@@ -492,7 +492,8 @@ void VisibilityTags::run( ostringstream &out )
             
 // {h
 // close hyper link: x
-// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>)
+// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>),
+// g (<hg>skill group names</hg>)
 void VisibilityTags::hyper_tag_start( ostringstream &out )
 {
     switch (*++p) {
@@ -506,6 +507,10 @@ void VisibilityTags::hyper_tag_start( ostringstream &out )
 
     case 'h': 
         my_hyper_tag = "hh";
+        break;
+
+    case 'g': 
+        my_hyper_tag = "hg";
         break;
 
     default:

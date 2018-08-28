@@ -67,7 +67,7 @@ public:
     XML_VARIABLE XMLInteger maximum;
     XML_VARIABLE XMLInteger rating;
     XML_VARIABLE XMLIntegerNoEmpty clanLevel;
-    XML_VARIABLE XMLBooleanNoFalse needItem;
+    XML_VARIABLE XMLBoolean needItem;
     XML_VARIABLE XMLBooleanNoFalse needPractice;
     XML_VARIABLE XMLInteger maxLevel;
 };

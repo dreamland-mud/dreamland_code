@@ -122,7 +122,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     }
     
     buf << endl
-	<< "Входит в группу '{W" << getGroup( )->getName( ) << "{x'";
+	<< "Входит в группу '{hg{W" << getGroup( )->getName( ) << "{x'";
 	
     if (!visible( ch )) {
 	buf << endl;

@@ -15,7 +15,7 @@ void XMLTableLoaderPlugin::initialization( )
 
 void XMLTableLoaderPlugin::destruction( )
 {
-//    saveAll( );
+    saveAll( );
     unloadAll( );
 }
 

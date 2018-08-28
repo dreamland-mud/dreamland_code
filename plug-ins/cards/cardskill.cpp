@@ -92,7 +92,7 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf )
 
     buf << (spell ? "Заклинание" : "Умение") 
 	<< " Колоды '{W" << getName( ) << "{x' или '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{W"  
+        << "входит в группу '{hg{W"  
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
         << "{x'" << endl;
     

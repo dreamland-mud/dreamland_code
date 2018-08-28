@@ -26,7 +26,7 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    in << ", входит в группу '{c" 
+    in << ", входит в группу '{hg{c" 
        << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
        << endl << endl
        << *this;
@@ -131,5 +131,10 @@ void SkillHelp::unsetSkill( )
     helpManager->unregistrate( Pointer( this ) );
     skill.clear( );
     fullKeyword = "";
+}
+
+bool SkillHelp::toXML( XMLNode::Pointer &parent ) const
+{
+    return XMLHelpArticle::toXML( parent ); 
 }
 

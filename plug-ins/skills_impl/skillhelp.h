@@ -18,6 +18,7 @@ class SkillHelp : public virtual XMLHelpArticle,
 public:
     typedef ::Pointer<SkillHelp> Pointer;
 
+    virtual bool toXML( XMLNode::Pointer& ) const;
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );
     inline virtual SkillPointer getSkill( ) const;

@@ -61,10 +61,11 @@ bool XMLHelpArticle::toXML( XMLNode::Pointer &parent ) const
     XMLStringNoEmpty xmlString( *this );
 
     if (!xmlString.toXML( parent ))
-        return false;
+        if (keyword.empty( ) && ref.empty( ) && refby.empty( ))
+            return false;
     
-    if (!getKeyword( ).empty( ))
-	parent->insertAttribute( ATTRIBUTE_KEYWORD, getKeyword( ) );
+    if (!keyword.empty( ))
+	parent->insertAttribute( ATTRIBUTE_KEYWORD, keyword );
 
     if (level >= -1)
 	parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
@@ -86,7 +87,7 @@ void XMLHelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionB
     assign( xmlString );
 
     keyword = parent->getAttribute( ATTRIBUTE_KEYWORD );
-    fullKeyword = keyword;
+    addKeyword( keyword );
 
     if (parent->hasAttribute( ATTRIBUTE_LEVEL ))
 	level = parent->getAttribute( ATTRIBUTE_LEVEL ).toInt( );

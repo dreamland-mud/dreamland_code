@@ -95,7 +95,7 @@ void QuestManager::load( QuestRegistratorBase* reg ) {
 }
 
 void QuestManager::unLoad( QuestRegistratorBase* reg ) {
-//    saveXML( reg );
+    saveXML( reg, reg->getName( ) );
     
     for (QuestRegistry::iterator i = quests.begin( ); i != quests.end( ); i++)
 	if (**i == reg) {

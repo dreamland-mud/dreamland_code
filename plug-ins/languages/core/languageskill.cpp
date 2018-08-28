@@ -146,7 +146,7 @@ void Language::show( PCharacter *ch, std::ostream & buf )
 
     buf << "Язык '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{W" 
+	<< "входит в группу '{hg{W" 
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
 	<< "{x'"
 	<< endl;
