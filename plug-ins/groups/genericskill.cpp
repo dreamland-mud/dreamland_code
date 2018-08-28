@@ -499,17 +499,19 @@ bool GenericSkill::practiceAux( PCharacter *ch, std::ostream & buf ) const
     return true;
 }
 
-bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch ) 
+bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
     if (!mob) {
-	ch->println( "Тебе не с кем практиковаться здесь." );
+	if (verbose)
+	    ch->println( "Тебе не с кем практиковаться здесь." );
 	return false;
     }
     
     if (mob->pIndexData->practicer.isSet( (int)getGroup( ) ))
 	return true;
 
-    ch->pecho( "%^C1 не может научить тебя искусству '%s'.\n"
+    if (verbose)
+	ch->pecho( "%^C1 не может научить тебя искусству '%s'.\n"
 	       "Для большей информации используй glist, slook.",
 	       mob, getNameFor( ch ).c_str( ) );
     return false;

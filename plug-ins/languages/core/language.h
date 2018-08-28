@@ -75,7 +75,7 @@ public:
     virtual int getAdept( PCharacter * ) const;
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
-    virtual bool canTeach( NPCharacter *, PCharacter * );
+    virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void practice( PCharacter * ) const;
     virtual void show( PCharacter *, std::ostream & ); 
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;

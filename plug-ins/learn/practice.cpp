@@ -39,6 +39,8 @@ COMMAND(CPractice, "practice")
 	pracShow( ch->getPC( ), true, false );
     else if (arg_oneof_strict( argument, "now", "сейчас" ))
 	pracShow( ch->getPC( ), true, true );
+    else if (arg_oneof_strict( argument, "here", "здесь" ))
+        pracHere( ch->getPC( ) );
     else
 	pracLearn( ch->getPC( ), argument );
 }
@@ -173,6 +175,46 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
+void CPractice::pracHere( PCharacter *ch )
+{
+    std::basic_ostringstream<char> buf;
+    Character *teacher;
+    bool found = false;
+
+    if (!( teacher = findTeacher( ch ) ))
+	if (!( teacher = findPracticer( ch ) )) {
+            ch->println("Тебе не с кем практиковаться здесь.");
+	    return;
+        }
+
+    buf << fmt( ch, "%1$^C1 может научить тебя таким навыкам:", teacher ) << endl;
+    for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
+        ostringstream errbuf;
+	Skill *skill = SkillManager::getThis( )->find( sn );
+
+	if (!skill->available( ch ) || !skill->canPractice( ch, errbuf ))
+	    continue;
+
+        if (ch->getSkillData( sn ).learned >= skill->getAdept( ch ))
+            continue;
+
+        if (teacher->is_npc( ) && !skill->canTeach( teacher->getNPC( ), ch, false ))
+            continue;
+
+        if (!teacher->is_npc( ) && skill->getEffective( teacher ) < 100)
+            continue;
+
+        DLString sname = skill->getNameFor( ch ).c_str( );
+        buf << "     " << sname << endl;
+        found = true;
+    }
+    
+    if (found) 
+        page_to_char( buf.str( ).c_str( ), ch );
+    else
+        ch->pecho("Тебе нечему научиться у %C2.", teacher );
+}
+
 void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 {
     int sn, adept;
@@ -251,7 +293,7 @@ PCharacter * CPractice::findTeacher( PCharacter *ch, Skill *skill )
 	if (!teacher->getAttributes( ).isAvailable( "teacher" ))
 	    continue;
 	
-	if (skill->getEffective( teacher ) < 100)
+	if (skill && skill->getEffective( teacher ) < 100)
 	    continue;
 
 	return teacher;
@@ -266,7 +308,7 @@ NPCharacter * CPractice::findPracticer( PCharacter *ch, Skill *skill )
 
     mob = find_attracted_mob( ch, OCC_PRACTICER );
 
-    if (skill->canTeach( mob, ch )) 
+    if (!skill || skill->canTeach( mob, ch )) 
 	return mob;
     else
 	return NULL;

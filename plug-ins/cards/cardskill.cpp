@@ -73,15 +73,17 @@ bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
-bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch ) 
+bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<CardSellerBehavior>( ))
 	return true;
-    
-    if (mob)
-	ch->pecho( "%^C1 не разбирается в картах.", mob );
-    else
-	ch->println( "Поищи кого-то, кто разбирается в картах." );
+
+    if (verbose) {    
+        if (mob)
+            ch->pecho( "%^C1 не разбирается в картах.", mob );
+        else
+            ch->println( "Поищи кого-то, кто разбирается в картах." );
+    }
 
     return false;
 }
