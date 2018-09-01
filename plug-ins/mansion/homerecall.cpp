@@ -16,6 +16,7 @@
 #include "recallmovement.h"
 #include "act.h"
 #include "merc.h"
+#include "arg_utils.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -34,36 +35,44 @@ COMMAND(HomeRecall, "homerecall")
     }
     
     if (arguments.empty( )) {
-	doRecall( pch );
-	return;
-    }
-    
-    if (!pch->is_immortal( )) {
-	pch->println( "Эта команда не требует аргументов." );
+	doRecall( pch, DLString::emptyString );
 	return;
     }
     
     cmd = arguments.getOneArgument( );
+
+    if (!pch->is_immortal( )) {
+	if (arg_is_list( cmd )) 
+	    doListMortal( pch );
+	else if (arg_is_help( cmd )) 
+	    doUsage( pch ); 
+        else
+	    doRecall( pch, cmd );
+	return;
+    }
    
-    if (cmd.strPrefix( "list" ))
+    if (arg_is_list( cmd ))
 	doList( pch );
     else if (arguments.empty( ))
 	doUsage( pch );
     else if (cmd.strPrefix( "set" ))
 	doSet( pch, arguments );
-    else if (cmd.strPrefix( "show" ))
+    else if (arg_is_show( cmd ))
 	doShow( pch, arguments );
     else if (cmd.strPrefix( "remove" ))
 	doRemove( pch, arguments );
-    else
+    else if (arg_is_help( cmd )) 
 	doUsage( pch ); 
+    else 
+	doRecall( pch, cmd );
 }
 
 class HomeRecallMovement : public RecallMovement {
 public:
-    HomeRecallMovement( Character *ch )
+    HomeRecallMovement( Character *ch, const DLString &label )
                : RecallMovement( ch )
     {
+	this->label = label;
     }
     HomeRecallMovement( Character *ch, Character *actor, Room *to_room )
                : RecallMovement( ch )
@@ -73,6 +82,8 @@ public:
     }
     
 protected:
+    DLString label;
+
     virtual bool findTargetRoom( )
     {
 	XMLAttributeHomeRecall::Pointer attr;
@@ -90,8 +101,14 @@ protected:
 	    msgSelf( ch, "У тебя нет своего дома." );
 	    return false;
 	}
-	
-	if (!( to_room = get_room_index( attr->getPoint( ) ) )) {
+
+	int vnum = attr->getLabeledPoint( label );
+	if (vnum <= 0 && !label.empty( )) {
+	    msgSelf( ch, "У тебя нету дома, помеченного такой меткой." );
+            return false;
+	}
+
+	if (!( to_room = get_room_index( vnum ) )) {
 	    msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
 	    return false;
 	}
@@ -139,9 +156,9 @@ protected:
     }
 };
 
-void HomeRecall::doRecall( PCharacter * ch )
+void HomeRecall::doRecall( PCharacter * ch, const DLString& label )
 {
-    HomeRecallMovement( ch ).move( );
+    HomeRecallMovement( ch, label ).move( );
 }
 
 void HomeRecall::doSet( PCharacter * ch, DLString &arg )
@@ -149,10 +166,11 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
     int vnum;
     PCMemoryInterface *pci;
     DLString name = arg.getOneArgument( );
-    
-    arg = arg.getOneArgument( );
+    DLString vnumArg = arg.getOneArgument( );
+    DLString label = arg; 
+
     try {
-	vnum = arg.toInt( );
+	vnum = vnumArg.toInt( );
     } catch (const ExceptionBadType& e) {
 	ch->println( "<room vnum> должно быть числом." );
 	return;
@@ -163,24 +181,39 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
 	ch->println( "Жертва не найдена." );
 	return;
     }
-    
-    if (get_room_index( vnum ) == 0) {
+   
+    Room *target =  get_room_index( vnum );
+    if (!target) {
 	ch->println( "Комнаты с таким номером не существует." );
 	return;
     }
 
-    pci->getAttributes( ).getAttr<XMLAttributeHomeRecall>( "homerecall" )->setPoint( vnum );
+    pci->getAttributes( ).getAttr<XMLAttributeHomeRecall>( "homerecall" )->setPoint( vnum, label );
     PCharacterManager::saveMemory( pci );
 
-    ch->println( "Done." );
+    if (label.empty( ))
+	ch->printf( "Персонажу %s установлен основной дом в комнате [%d] %s.\r\n", 
+		pci->getName( ).c_str( ), vnum, target->name  );
+    else
+	ch->printf( "Персонажу %s установлен дом с меткой %s в комнате [%d] %s.\r\n", 
+		pci->getName( ).c_str( ), label.c_str( ), vnum, target->name  );
+}
+
+static void print_room( int vnum, ostringstream &buf )
+{
+    Room *room = get_room_index( vnum );
+    if (!room) {
+	buf << "[" << vnum << "] не существует!" << endl;
+        return;
+    }
+
+    buf << "[" << vnum << "] " << room->name << " (" << room->area->name << ")" << endl;
 }
 
 void HomeRecall::doShow( PCharacter * ch, DLString &arg )
 {
     XMLAttributeHomeRecall::Pointer attr;
     PCMemoryInterface *pci;
-    int point;
-    Room *room;
     DLString name = arg.getOneArgument( );
     
     pci = PCharacterManager::find( name );
@@ -195,17 +228,15 @@ void HomeRecall::doShow( PCharacter * ch, DLString &arg )
 	return;
     }
     
-    point = attr->getPoint( );
-    room = get_room_index( point );
+    ostringstream buf;
+    buf << "Основной дом: ";
+    print_room( attr->getPoint( ), buf );
 
-    if (!room) {
-	ch->printf( "%s имеет homerecall в несуществующую комнату #%d!", 
-		    pci->getName( ).c_str( ), point );
-	return;
+    for (XMLAttributeHomeRecall::LabeledPoints::const_iterator l = attr->getLabeled( ).begin( ); l != attr->getLabeled( ).end( ); l++) {
+	buf << "Дом с меткой '" << l->first << "': ";
+        print_room( l->second, buf );
     }
-    
-    ch->printf( "Homerecall для %s расположен в [%d] %s (%s).\r\n",
-		pci->getName( ).c_str( ), room->vnum, room->name, room->area->name );
+    ch->send_to( buf );
 }
 
 void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
@@ -261,17 +292,54 @@ void HomeRecall::doList( PCharacter *ch )
     }
 }
 
+static void print_room_mortal( int vnum, ostringstream &buf )
+{
+    Room *room = get_room_index( vnum );
+    if (!room) {
+	buf << "не существует!" << endl;
+        return;
+    }
+
+    buf << room->name << " (" << room->area->name << ")" << endl;
+}
+
+void HomeRecall::doListMortal( PCharacter * ch )
+{
+    XMLAttributeHomeRecall::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
+    if (!attr) {
+	ch->println( "У тебя нет своего дома." );
+	return;
+    }
+    
+    ostringstream buf;
+    buf << "Основной дом: ";
+    print_room_mortal( attr->getPoint( ), buf );
+
+    for (XMLAttributeHomeRecall::LabeledPoints::const_iterator l = attr->getLabeled( ).begin( ); l != attr->getLabeled( ).end( ); l++) {
+	buf << "Дом с меткой '" << l->first << "': ";
+        print_room_mortal( l->second, buf );
+    }
+    ch->send_to( buf );
+}
+
 void HomeRecall::doUsage( PCharacter * ch )
 {
     std::basic_ostringstream<char> buf;
 
     buf << "Синтаксис: " << endl
-        << "{Whomerecall{x                          - переносит в родной дом" << endl
-	<< "{Whomerecall set{x <name> <room vnum>   - установить игроку комнату для homerecall" << endl
-	<< "в идеале это комната снаружи дома, от которого он может купить ключ" << endl
-	<< "{Whomerecall show{x <name>              - посмотреть чей-то homerecall" << endl
-	<< "{Whomerecall remove{x <name>            - отобрать возможность рекаллиться домой" << endl
-	<< "{Whomerecall list{x                     - список всех игроков, имеющих homerecall" << endl;
+	<< "{W{lEhomerecall{lRдомой     {x             - переносит в дом" << endl
+	<< "{W{lEhomerecall метка{lRдомой метка     {x       - переносит в дом с указанной меткой" << endl;
+    if (ch->is_immortal( ))
+        buf << "{Whomerecall set{x <name> <room vnum>   - установить игроку комнату для homerecall" << endl
+	    << "в идеале это комната снаружи дома, от которого он может купить ключ" << endl
+	    << "{Whomerecall set{x <name> <room vnum> <label>  " << endl
+	    << "                                    - установить homerecall с указанной меткой" << endl
+	    << "{Whomerecall show{x <name>              - посмотреть чей-то homerecall" << endl
+	    << "{Whomerecall remove{x <name>            - отобрать возможность рекаллиться домой" << endl
+	    << "{Whomerecall list{x                     - список всех игроков, имеющих homerecall" << endl;
+    else 
+	buf << "{W{lEhomerecall list{lRдомой список   {x        - показать список твоих домов и меток" << endl;
+
     
     ch->send_to( buf );
 }
@@ -289,12 +357,33 @@ XMLAttributeHomeRecall::~XMLAttributeHomeRecall( )
 
 int XMLAttributeHomeRecall::getPoint( ) const
 {
-    return point.getValue( );
+    return point;
 }
 
-void XMLAttributeHomeRecall::setPoint( int point ) 
+int XMLAttributeHomeRecall::getLabeledPoint( const DLString &label ) const
 {
-    this->point = point;
+    if (label.empty( ))
+	return point.getValue( );
+    else {
+	LabeledPoints::const_iterator l = labeled.find( label );
+	if (l == labeled.end( ))
+            return 0;
+        else
+            return l->second;
+    }
+	
+}
+
+void XMLAttributeHomeRecall::setPoint( int point, const DLString &label ) 
+{
+    if (label.empty( ))
+	this->point = point;
+    else
+        labeled[label] = point;
 }
     
+const XMLAttributeHomeRecall::LabeledPoints & XMLAttributeHomeRecall::getLabeled( ) const
+{
+    return labeled;
+}
 
