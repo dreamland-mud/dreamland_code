@@ -194,7 +194,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 	
 	case 'd':
 	case 'e':
-	    ruexits = (*str == 'd');
+	    ruexits = ch->getPC( ) && ch->getPC( )->getConfig( )->ruexits;
 
 	    for (int door = 0; door < DIR_SOMEWHERE; door++) {
 		EXIT_DATA *pexit = ch->in_room->exit[door];
