@@ -39,6 +39,7 @@
 
 #define	IAC_REPL		223
 
+#define GMCP    201             /* Generic MUD Communication Protocol */
 #define	IAC	255		/* interpret as command: */
 #define	DONT	254		/* you are not to use option */
 #define	DO	253		/* please, you use option */

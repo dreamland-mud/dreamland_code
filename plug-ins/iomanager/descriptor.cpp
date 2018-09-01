@@ -32,6 +32,7 @@
 #include "pagerhandler.h"
 #include "codepage.h"
 #include "comm.h"
+#include "gmcp.h"
 
 #include "char.h"
 #include "dreamland.h"
@@ -232,33 +233,42 @@ int Descriptor::inputTelnet( unsigned char i )
 	    break;
 	    
 	case DO:
-	case DONT:
-	case WILL:
-	case WONT:
+            switch (i) {
 #ifdef MCCP
-	    if(i == TELOPT_COMPRESS || i == TELOPT_COMPRESS2) {
-		switch( telnet.state ) {
-		    case DO:
-			startMccp(i);
-			break;
-		    case DONT:
-			stopMccp();
-			break;
-			
-		    case WILL:
-		    case WONT:
-			break;
-		}
-	    }
+                case TELOPT_COMPRESS:
+                case TELOPT_COMPRESS2:
+                    startMccp(i);
+                    break;
 #endif
-            if (i == TELOPT_TTYPE && telnet.state == WILL) {
-                static const unsigned char ttype_qry_str[] = { 
-	            IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE };
-                writeFd(ttype_qry_str, sizeof(ttype_qry_str));
+                case GMCP:
+                    GMCPHandler::sendVersion(this); 
+                    break;
             }
-
 	    telnet.state = TNS_NORMAL;
-	    break;
+            break;
+
+	case WILL:
+            switch (i) {
+                case TELOPT_TTYPE:
+                    static const unsigned char ttype_qry_str[] = { 
+                        IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE };
+                    writeFd(ttype_qry_str, sizeof(ttype_qry_str));
+                    break;
+            }
+	    telnet.state = TNS_NORMAL;
+            break;
+
+	case DONT:
+            switch (i) {
+#ifdef MCCP
+                case TELOPT_COMPRESS:
+                case TELOPT_COMPRESS2:
+		    stopMccp();
+                    break;
+#endif
+            }
+	    telnet.state = TNS_NORMAL;
+            break;
 
 	default:
 	    LogStream::sendError() << "telnet: unknown state" << endl;
