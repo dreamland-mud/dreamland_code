@@ -159,7 +159,7 @@ void LanguageManager::unload( LanguagePointer lang )
     DLString name = lang->getName( );
     Languages::iterator ipos = langs.find( name );
     
-    saveXML( *lang, name );
+//    saveXML( *lang, name );
     langs.erase( ipos );
 }
 
