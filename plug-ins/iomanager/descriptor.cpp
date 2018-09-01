@@ -62,6 +62,31 @@ static IconvMap utf2koi("utf-8", "koi8-r");
 static const char *MSG_FLUSH_BUF = "Buffer flushed.\r\n";
 const char *lid = "\n\r*** PUT A LID ON IT!!! ***\n\r";
 
+/*
+ * Negotiated client terminal type.
+ */
+enum {
+    TTYPE_NONE = 0,
+    TTYPE_MUDLET,
+    TTYPE_MAX
+};
+const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet" };
+int ttype_lookup( const char *received )
+{
+    for (int i = 0; i < TTYPE_MAX; i++) {
+	const char *ttype = TTYPE_NAMES[i]; 
+	if (strncmp(received, ttype, strlen(ttype)) == 0) {
+	    LogStream::sendNotice() << "telnet: received " << ttype << " terminal type" << endl;
+	    return i;
+	}
+    }
+    return TTYPE_NONE;
+}
+const char *ttype_name( int ttype )
+{
+    return TTYPE_NAMES[URANGE(TTYPE_NONE, ttype, TTYPE_MAX-1)];
+}
+
 bool Descriptor::checkStopSymbol( )
 {
     if (!character)
@@ -193,6 +218,14 @@ int Descriptor::inputTelnet( unsigned char i )
 			if (banManager->checkVerbose( this, BAN_ALL )) 
 			    return -1;
 		    }
+
+		    if (telnet.sn_ptr >= 3 
+                            && telnet.subneg[0] == TELOPT_TTYPE
+                            && telnet.subneg[1] == TELQUAL_IS)
+                    {
+			telnet.subneg[telnet.sn_ptr] = 0;
+                        telnet.ttype = ttype_lookup((const char *)telnet.subneg + 2);
+                    }
 		    telnet.state = TNS_NORMAL;
 		    break;
 	    }
@@ -218,6 +251,12 @@ int Descriptor::inputTelnet( unsigned char i )
 		}
 	    }
 #endif
+            if (i == TELOPT_TTYPE && telnet.state == WILL) {
+                static const unsigned char ttype_qry_str[] = { 
+	            IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE };
+                writeFd(ttype_qry_str, sizeof(ttype_qry_str));
+            }
+
 	    telnet.state = TNS_NORMAL;
 	    break;
 

@@ -54,7 +54,7 @@ const unsigned char compress_on_str[] = { IAC, WILL, TELOPT_COMPRESS };
 const unsigned char compress2_on_str[] = { IAC, WILL, TELOPT_COMPRESS2 };
 #endif
 const unsigned char via_qry_str[]  = { IAC, WILL, TELOPT_VIA };
-
+const unsigned char ttype_do_str[] = { IAC, DO, TELOPT_TTYPE };
 
 /*
  * Strip out last octet of an ip address and return
@@ -161,6 +161,7 @@ void init_descriptor( int control )
     dnew->inptr = 0;
     dnew->telnet.sn_ptr = 0;
     dnew->telnet.state = TNS_NORMAL;
+    dnew->telnet.ttype = 0;
 
     dnew->realip	= realip( inet_ntoa( sock.sin_addr ) );
     dnew->host          = realip( inet_ntoa( sock.sin_addr ) );
@@ -195,6 +196,7 @@ void init_descriptor( int control )
         dnew->writeFd(compress_on_str, sizeof(compress_on_str));
 #endif
         dnew->writeFd(via_qry_str, sizeof(via_qry_str));
+        dnew->writeFd(ttype_do_str, sizeof(ttype_do_str));
     }
 }
 

@@ -53,8 +53,6 @@ COMMAND(HomeRecall, "homerecall")
    
     if (arg_is_list( cmd ))
 	doList( pch );
-    else if (arguments.empty( ))
-	doUsage( pch );
     else if (cmd.strPrefix( "set" ))
 	doSet( pch, arguments );
     else if (arg_is_show( cmd ))

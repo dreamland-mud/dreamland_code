@@ -65,6 +65,7 @@ DESIRE(full);
 DESIRE(drunk);
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
+const char *ttype_name( int ttype );
 
 using namespace std;
 using namespace Scripting;
@@ -240,6 +241,14 @@ NMI_SET( CharacterWrapper, logon, "" )
     checkTarget( );
     CHK_NPC
     target->getPC( )->age.setLogon( arg.toNumber( ) );
+}
+NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-клиента" )
+{
+    checkTarget( );
+    CHK_NPC
+    if (!target->desc)
+	return "";
+    return ttype_name( target->desc->telnet.ttype );
 }
 
 NMI_SET( CharacterWrapper, damage_number, "" )
