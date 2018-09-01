@@ -100,7 +100,7 @@ protected:
     bool checkPostAffect( )
     {
 	if (ch->isAffected( gsn_clanrecall )) {
-	    msgSelf( ch, "You can't pray now." );
+	    msgSelf( ch, "Слишком мало времени прошло с последней молитвы." );
 	    return false;
 	}
 
@@ -108,7 +108,7 @@ protected:
     }
     bool applyPostAffect( )
     {
-	postaffect_to_char( ch, gsn_clanrecall, ch->getModifyLevel( ) / 6 + 15 );
+	postaffect_to_char( ch, gsn_clanrecall, ch->getModifyLevel( ) / 6 + 1 );
 	return true;
     }
 };
