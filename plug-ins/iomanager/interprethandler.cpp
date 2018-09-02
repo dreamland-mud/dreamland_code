@@ -34,6 +34,11 @@
 GSN(perception);
 const	char 	go_ahead_str	[] = { IAC, GA, '\0' };
 
+const char *dir_name[] = {"N","E","S","W","U","D"};
+const char *dir_name_small[] = {"n","e","s","w","u","d"};
+const char *ru_dir_name[] = {"ó","÷","à","ú","ð","ï"};
+const char *ru_dir_name_small[] = {"Ó","×","À","Ú","Ð","Ï"};
+
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
     FENIA_CALL(room, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
@@ -147,10 +152,6 @@ void InterpretHandler::normalPrompt( Character *ch )
     while( *str ) {
 	ostringstream doors;
 	Character *victim;
-	static const char *dir_name[] = {"N","E","S","W","U","D"};
-	static const char *dir_name_small[] = {"n","e","s","w","u","d"};
-	static const char *ru_dir_name[] = {"ó","÷","à","ú","ð","ï"};
-	static const char *ru_dir_name_small[] = {"Ó","×","À","Ú","Ð","Ï"};
 	bool ruexits = false;
 	bool handled = false;
 

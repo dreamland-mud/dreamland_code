@@ -9,6 +9,7 @@ class Descriptor;
 class GMCPHandler {
 public:
         static void sendVersion(Descriptor *d);
+        static void sendRoom(Descriptor *d);
 
 private:
         static void send(Descriptor *d, const string &package, const string &message, const string &data);

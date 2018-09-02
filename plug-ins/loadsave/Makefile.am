@@ -4,6 +4,7 @@ include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 INCLUDES = \
 $(INCLUDES_SRC) \
+-I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system 
@@ -33,6 +34,7 @@ mobilebehaviormanager.cpp \
 objectbehaviormanager.cpp \
 areabehaviormanager.cpp \
 roombehaviormanager.cpp \
+gmcp.cpp \
 fread_utils.cpp
 
 libloadsave_la_MOC = \
@@ -43,7 +45,8 @@ libloadsave_la_LIBADD = \
 ../descriptor/libdescriptor.la \
 ../system/libsystem.la \
 ../system/libscheduler_task_round.la \
-../output/liboutput.la 
+../output/liboutput.la \
+-ljsoncpp
 
 affectflags.cpp: affectflags.conf affectflags.h
 affectflags.h: affectflags.conf

@@ -163,6 +163,7 @@ void init_descriptor( int control )
     dnew->telnet.sn_ptr = 0;
     dnew->telnet.state = TNS_NORMAL;
     dnew->telnet.ttype = 0;
+    dnew->oob_proto = 0;
 
     dnew->realip	= realip( inet_ntoa( sock.sin_addr ) );
     dnew->host          = realip( inet_ntoa( sock.sin_addr ) );

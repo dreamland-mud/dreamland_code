@@ -241,6 +241,7 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
 #endif
                 case GMCP:
+                    SET_BIT(oob_proto, OOB_GMCP);
                     GMCPHandler::sendVersion(this); 
                     break;
             }

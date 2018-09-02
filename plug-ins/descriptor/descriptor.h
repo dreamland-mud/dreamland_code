@@ -72,6 +72,10 @@ typedef std::vector<ViaRecord> ViaVector;
 #define WS_NEGOTIATING  1
 #define WS_ESTABLISHED  2
 
+/*
+ * Out-of-band protocols support
+ */
+#define OOB_GMCP (A)
 
 struct WebSockState {
     int state;
@@ -143,6 +147,7 @@ public:
     char *		outbuf;
     int			outsize;
     int			outtop;
+    int                 oob_proto;
 
 #ifdef MCCP
     unsigned char       compressing;
