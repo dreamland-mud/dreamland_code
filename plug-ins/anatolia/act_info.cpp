@@ -2331,7 +2331,7 @@ CMDRUNP( help )
 
 	    if (is_name( argall, (*a)->getKeyword( ).c_str( ) ) ){
 		count++;
-                buf << "    {C" << count << "." << origArgument << "{x : " << (*a)->getKeyword( ) << endl;
+                buf << "    {C{hh" << count << "." << origArgument << "{x : " << (*a)->getKeyword( ) << endl;
 		findHelp = *a;
             }
 	}
