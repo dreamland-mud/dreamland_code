@@ -48,6 +48,17 @@ PROF(ninja);
 
 static void arrow_damage( Object *arrow, Character *ch, Character *victim, int damroll, int door );
 
+static bool check_rock_catching( Character *victim, Object *obj )
+{
+    if (obj->item_type != ITEM_WEAPON)
+	return false;
+    if (obj->value[0] != WEAPON_STONE)
+        return false;
+    if (victim->size < SIZE_HUGE) 
+        return false;
+    return true;
+}
+
 bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
 {
     int chance;
@@ -71,29 +82,34 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
     }
 
     chance -= (bonus - 90);
-    if ( !victim->is_npc() && victim->getClan( ) != clan_battlerager)
+
+    bool canCatchMissile = (!victim->is_npc() && victim->getClan( ) == clan_battlerager);
+    bool canCatchRock = check_rock_catching(victim, obj);
+
+    if (!canCatchMissile && !canCatchRock)
 	chance /= 2;
 	
-    if ( number_percent( ) >= chance )
-//	&& (victim->is_npc() || victim->getClan( ) != clan_battlerager))
+    if (number_percent( ) >= chance)
 	return false;
 
-    if (!victim->is_npc()
-	&& victim->getClan( ) == clan_battlerager 
-	&& victim->getClan( )->isRecruiter( victim->getPC( ) ))
-    {
+    if (canCatchRock) {
 	act_p("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
 	act_p("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
 	act_p("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
 	obj_to_char(obj,victim);
-	return true;
     }
-
-    act_p("Ты уклоняешься от $o2.",ch,obj,victim,TO_VICT,POS_RESTING);
-    act_p("$C1 уклоняется от $o2.",ch,obj,victim,TO_CHAR,POS_RESTING);
-    act_p("$c1 уклоняется от $o2.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
-    obj_to_room(obj,victim->in_room);
-    gsn_dodge->improve( victim, true, ch );
+    else if (canCatchMissile) {
+	act_p("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
+	act_p("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
+	act_p("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+	obj_to_char(obj,victim);
+    } else {
+        act_p("Ты уклоняешься от $o2.",ch,obj,victim,TO_VICT,POS_RESTING);
+        act_p("$C1 уклоняется от $o2.",ch,obj,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 уклоняется от $o2.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+        obj_to_room(obj,victim->in_room);
+        gsn_dodge->improve( victim, true, ch );
+    }
 
     return true;
 }
