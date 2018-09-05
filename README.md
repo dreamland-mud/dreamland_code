@@ -67,8 +67,16 @@ make -f Makefile.git
 ```bash
 mkdir /home/dreamland/objs && cd /home/dreamland/objs
 /home/dreamland/dreamland_code/configure --prefix=/home/dreamland/runtime
-make -j 8 && make install
 ```
+Для сборки и установки запустите команду:
+```bash
+make && make install
+```
+Если у вас несколько процессоров, будет выгодно распараллелить сборку, указав количество параллельных потоков, например:
+```bash
+make -j 4 && make install
+```
+
 ### <a name="areas">Установка dreamland_world</a>
 Склонируйте репозиторий dreamland_world, который содержит все конфигурационные файлы и некоторые зоны. 
 Создайте на него ссылку из каталога runtime.
