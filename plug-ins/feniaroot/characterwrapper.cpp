@@ -38,6 +38,7 @@
 #include "alignment.h"
 #include "wiznet.h"
 #include "xmlattributecoder.h"
+#include "xmlattributerestring.h"
 #include "pet.h"
 
 #include "objectwrapper.h"
@@ -2004,7 +2005,40 @@ NMI_INVOKE( CharacterWrapper, drink, "(item, amount) заполнить желудок так, будт
     return Register( );
 }
 
+NMI_INVOKE(CharacterWrapper, restring, "(skill, key, names, short, long) установить аттрибут для рестринга результатов заклинаний")
+{
+    checkTarget( );
+    CHK_NPC
+    if (args.size( ) != 5)
+	throw Scripting::NotEnoughArgumentsException( );
 
+    RegisterList::const_iterator i = args.begin( );
+    DLString skillName = (i++)->toString();
+    DLString key = (i++)->toString();
+    DLString objName = (i++)->toString();
+    DLString objShort = (i++)->toString();
+    DLString objLong = (i)->toString();
+
+    Skill *skill = skillManager->findExisting( skillName );
+    if (!skill)
+	throw Scripting::Exception( "Skill name not found" );
+
+    XMLAttributeRestring::Pointer attr = target->getPC( )->getAttributes( ).getAttr<XMLAttributeRestring>( skillName );
+    XMLAttributeRestring::iterator r = attr->find( key );
+    if (r != attr->end( )) {
+	r->second.name = objName;
+        r->second.shortDescr = objShort;
+	r->second.longDescr = objLong;
+    } else {
+	(**attr)[key].name = objName;
+	(**attr)[key].shortDescr = objShort;
+	(**attr)[key].longDescr = objLong;
+    }
+
+    target->getPC( )->save( );
+    return Register( );
+}
+ 
 NMI_INVOKE( CharacterWrapper, api, "печатает этот API" )
 {
     ostringstream buf;
