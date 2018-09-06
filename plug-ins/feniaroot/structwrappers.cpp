@@ -25,6 +25,7 @@
 
 #include "handler.h"
 #include "gsn_plugin.h"
+#include "profflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -319,9 +320,10 @@ NMI_INVOKE( ProfessionWrapper, goodSex, "проверить ограничения по полу на профес
     
     if (args.empty( ))
 	throw Scripting::NotEnoughArgumentsException( );
-    
+   
+    Profession *prof =  professionManager->find( name );
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
-    return professionManager->find( name )->getSex( ).isSetBitNumber( ch->getTarget( )->getSex( ) );
+    return prof->getSex( ).isSetBitNumber( ch->getTarget( )->getSex( ) );
 }
 
 NMI_INVOKE( ProfessionWrapper, goodRace, "проверить ограничения по расе на профессию для персонажа" )
@@ -331,8 +333,12 @@ NMI_INVOKE( ProfessionWrapper, goodRace, "проверить ограничения по расе на профе
     if (args.empty( ))
 	throw Scripting::NotEnoughArgumentsException( );
     
+    Profession *prof =  professionManager->find( name );
+    if (prof->getFlags( ).isSet( PROF_NEWLOCK ))
+	return false;
+
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
-    return ch->getTarget( )->getRace( )->getPC( )->getClasses( )[professionManager->find( name )->getIndex( )] > 0;
+    return ch->getTarget( )->getRace( )->getPC( )->getClasses( )[prof->getIndex( )] > 0;
 }
 
 NMI_INVOKE( ProfessionWrapper, goodPersonality, "проверить ограничение на характер и этос на профессию для персонажа" )
