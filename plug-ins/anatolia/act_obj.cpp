@@ -1754,7 +1754,7 @@ CMDRUNP( make )
     DLString args = argument, arg = args.getOneArgument( );
 
     if (!arg.empty( )) {
-	if (arg.strPrefix( "arrow" ) || arg.strPrefix( "стрелы" )) {
+	if (arg.strPrefix( "arrow" ) || arg.strPrefix( "стрелы" ) || arg.strPrefix( "стрелу")) {
 	    interpret_cmd( ch, "makearrow", args.c_str( ) );
 	    return;
 	}
