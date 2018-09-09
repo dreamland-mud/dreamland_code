@@ -69,6 +69,7 @@ void SkillHelpFormatter::setup( Character *ch )
 /*
  * CMD      ->  {lEeng_name{lRрусское_имя{lx
  * SKILL    ->  {lEeng_name{lRрусское_имя{lx
+ * SPELL    ->  {lEc 'spell name'{lRк 'название заклинания'{lx
  */
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
@@ -84,6 +85,13 @@ bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 
     if (kw == "SKILL") {
 	out << (fRusSkill ? skill->getRussianName( ).quote( )
+	                  : skill->getName( ).quote( ));
+	return true;
+    }
+
+    if (kw == "SPELL") {
+	out << (fRusCmd ? "к" : "c") << " "
+	    << (fRusSkill ? skill->getRussianName( ).quote( )
 	                  : skill->getName( ).quote( ));
 	return true;
     }

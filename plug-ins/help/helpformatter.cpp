@@ -75,7 +75,7 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 	case '_':
 	    t_underline = !t_underline;
 	    t_bracket = false;
-	    out << (t_underline ? "{D<{w" : "{D>{w");
+	    out << (t_underline ? "{D" : "{w");
 	    break;
 
 	case '=':
