@@ -53,5 +53,6 @@ race_aptitude \
 cards \
 religion \
 web \
-riding
+riding \
+craft
 
