@@ -44,6 +44,7 @@ idelete.cpp \
 nochannel.cpp \
 nopost.cpp \
 socket.cpp \
+reward.cpp \
 confirm.cpp 
 
 libplugin_command_la_LIBADD = \
@@ -61,6 +62,7 @@ deny.h \
 cban.h \
 nochannel.h \
 nopost.h \
+reward.h \
 confirm.h 
 
 libplugin_command_la_MOC = cplugin.h

@@ -17,6 +17,7 @@
 #include "confirm.h"
 #include "deny.h"
 #include "cban.h"
+#include "reward.h"
 #include "so.h"
 
 extern "C"
@@ -37,6 +38,10 @@ extern "C"
 		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeDeny> >( ppl );
 		
 		Plugin::registerPlugin<CBan>( ppl );
+		
+		
+		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGodReward> >( ppl );
+		Plugin::registerPlugin<XMLAttributeGodRewardListenerPlugin>( ppl );
 		
 		return ppl;
 	}
