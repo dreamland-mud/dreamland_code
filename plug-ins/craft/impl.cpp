@@ -10,22 +10,22 @@
 #include "craftattribute.h"
 #include "craftskill.h"
 
-TABLE_LOADER(SubProfessionLoader, "subprofessions", "SubProfession");
+TABLE_LOADER(CraftProfessionLoader, "craft-professions", "CraftProfession");
 TABLE_LOADER(CraftSkillLoader, "craft-skills", "skill");
 
 
-class SubProfessionRegistrator : public Plugin {
+class CraftProfessionRegistrator : public Plugin {
 public:
     virtual void initialization( )
     {
-	Class::regXMLVar<SubProfessionHelp>( );
-	Class::regMoc<SubProfession>( );
+	Class::regXMLVar<CraftProfessionHelp>( );
+	Class::regMoc<CraftProfession>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregXMLVar<SubProfessionHelp>( );
-	Class::unregMoc<SubProfession>( );
+	Class::unregXMLVar<CraftProfessionHelp>( );
+	Class::unregMoc<CraftProfession>( );
     }
 };
 
@@ -35,8 +35,9 @@ extern "C"
     SO::PluginList initialize_craft( ) {
 	SO::PluginList ppl;
 	
-	Plugin::registerPlugin<SubProfessionRegistrator>( ppl );
-	Plugin::registerPlugin<SubProfessionLoader>( ppl );
+	Plugin::registerPlugin<CraftProfessionManager>( ppl );
+	Plugin::registerPlugin<CraftProfessionRegistrator>( ppl );
+	Plugin::registerPlugin<CraftProfessionLoader>( ppl );
 	Plugin::registerPlugin<MocRegistrator<CraftSkill> >( ppl );
 	Plugin::registerPlugin<CraftSkillLoader>( ppl );
 	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCraft> >( ppl );

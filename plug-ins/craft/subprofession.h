@@ -6,19 +6,22 @@
 #include "xmlboolean.h"
 #include "xmlstring.h"
 #include "xmltableelement.h"
+#include "plugin.h"
+#include "oneallocate.h"
+#include "grammar_entities.h"
 
 #include "helpmanager.h"
 #include "markuphelparticle.h"
 
 
-class SubProfession;
+class CraftProfession;
 
-class SubProfessionHelp : public virtual XMLHelpArticle,
+class CraftProfessionHelp : public virtual XMLHelpArticle,
                        public virtual MarkupHelpArticle {
 public:
-    typedef ::Pointer<SubProfessionHelp> Pointer;
+    typedef ::Pointer<CraftProfessionHelp> Pointer;
 
-    virtual void setProfession( ::Pointer<SubProfession> );
+    virtual void setProfession( ::Pointer<CraftProfession> );
     virtual void unsetProfession( );
 
     virtual void getRawText( Character *, ostringstream & ) const;
@@ -26,29 +29,30 @@ public:
     static const DLString TYPE;
 
 protected:
-    ::Pointer<SubProfession> prof;
+    ::Pointer<CraftProfession> prof;
 };
 
-inline const DLString & SubProfessionHelp::getType( ) const
+inline const DLString & CraftProfessionHelp::getType( ) const
 {
     return TYPE;
 }
 
-class SubProfession : public XMLTableElement,
+class CraftProfession : public XMLTableElement,
 	              public XMLVariableContainer
 {
 XML_OBJECT
 public:
-    typedef ::Pointer<SubProfession> Pointer;
+    typedef ::Pointer<CraftProfession> Pointer;
     
-    SubProfession( );
-    virtual ~SubProfession( );
+    CraftProfession( );
+    virtual ~CraftProfession( );
     
     inline virtual const DLString & getName( ) const;
     inline virtual void setName( const DLString & );
     virtual void loaded( );
     virtual void unloaded( );
     
+    virtual DLString getNameFor( Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
     inline virtual const DLString &getRusName( ) const;
     inline virtual const DLString &getMltName( ) const;
     inline virtual int getBaseExp( ) const;
@@ -56,33 +60,54 @@ public:
 protected:
     XML_VARIABLE XMLString  name, rusName, mltName;
     XML_VARIABLE XMLInteger baseExp;
-    XML_VARIABLE XMLPointerNoEmpty<SubProfessionHelp> help;
+    XML_VARIABLE XMLPointerNoEmpty<CraftProfessionHelp> help;
 };
 
 
-inline const DLString & SubProfession::getName( ) const
+inline const DLString & CraftProfession::getName( ) const
 {
     return name;
 }
 
-inline void SubProfession::setName( const DLString &name ) 
+inline void CraftProfession::setName( const DLString &name ) 
 {
     this->name = name;
 }
 
-inline const DLString & SubProfession::getRusName( ) const
+inline const DLString & CraftProfession::getRusName( ) const
 {
     return rusName;
 }
 
-inline const DLString &SubProfession::getMltName( ) const
+inline const DLString &CraftProfession::getMltName( ) const
 {
     return mltName;
 }
 
-inline int SubProfession::getBaseExp( ) const
+inline int CraftProfession::getBaseExp( ) const
 {
     return baseExp;
 }
+
+class CraftProfessionManager : public OneAllocate, public virtual Plugin {
+public:
+    typedef ::Pointer<CraftProfessionManager> Pointer;
+    typedef std::map<DLString, CraftProfession::Pointer> Professions;
+
+    CraftProfessionManager( );
+    virtual ~CraftProfessionManager( );
+    
+    virtual void initialization( );
+    virtual void destruction( );
+    void load( CraftProfession::Pointer );
+    void unload( CraftProfession::Pointer );
+    CraftProfession::Pointer get( const DLString & ) const;
+    CraftProfession::Pointer lookup( const DLString & ) const;
+
+protected:
+    Professions profs;
+};
+
+extern CraftProfessionManager * craftProfessionManager;
 
 #endif

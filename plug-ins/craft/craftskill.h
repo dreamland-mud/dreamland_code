@@ -7,14 +7,14 @@
 #include "xmlmap.h"
 #include "xmlflags.h"
 
-class SubProfessionInfo;
+class CraftProfessionInfo;
 
 class CraftSkill : public BasicSkill {
 XML_OBJECT
 friend class CraftSkillLoader;
 public:
     typedef ::Pointer<CraftSkill> Pointer;
-    typedef XMLMapBase<SubProfessionInfo> SubProfessions;
+    typedef XMLMapBase<CraftProfessionInfo> CraftProfessions;
     
     CraftSkill( );
 
@@ -45,14 +45,14 @@ protected:
 
     XML_VARIABLE XMLInteger weight;    
     XML_VARIABLE XMLSkillGroupReference group;
-    XML_VARIABLE SubProfessions subprofessions;
+    XML_VARIABLE CraftProfessions subprofessions;
 };
 
 
-class SubProfessionInfo : public XMLVariableContainer {
+class CraftProfessionInfo : public XMLVariableContainer {
 XML_OBJECT
 public:
-    typedef ::Pointer<SubProfessionInfo> Pointer;
+    typedef ::Pointer<CraftProfessionInfo> Pointer;
 
     XML_VARIABLE XMLInteger level;
 };

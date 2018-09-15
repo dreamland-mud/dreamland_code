@@ -10,7 +10,7 @@ XMLAttributeCraft::~XMLAttributeCraft( )
 }
 
 
-int XMLAttributeCraft::proficiencyLevel(const SubProfession &prof) const
+int XMLAttributeCraft::proficiencyLevel(const CraftProfession &prof) const
 {
     return proficiencyLevel(prof.getName());
 }

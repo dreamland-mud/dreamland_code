@@ -1,5 +1,7 @@
 #include "craftskill.h"
+#include "subprofession.h"
 
+#include "grammar_entities_impl.h"
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
 #include "behavior_utils.h"
@@ -33,7 +35,7 @@ XMLAttributeCraft::Pointer CraftSkill::getProfAttr(Character *ch) const
 
 bool CraftSkill::visible( Character *ch ) const
 {
-    SubProfessions::const_iterator sp;
+    CraftProfessions::const_iterator sp;
     XMLAttributeCraft::Pointer attr = getProfAttr(ch);
 
     if (!attr) 
@@ -50,7 +52,7 @@ bool CraftSkill::visible( Character *ch ) const
 
 bool CraftSkill::available( Character *ch ) const
 {
-    SubProfessions::const_iterator sp;
+    CraftProfessions::const_iterator sp;
     XMLAttributeCraft::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeCraft>("craft");
 
     if (!attr)  
@@ -132,15 +134,19 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf )
 
 
     DLString pbuf;
-    SubProfessions::const_iterator sp;
+    CraftProfessions::const_iterator sp;
+    bool found = false;
     for (sp = subprofessions.begin(); sp != subprofessions.end(); sp++) {
-        // TODO runame lookup
-        if (sp != subprofessions.begin())
-            pbuf << ", ";        
-        pbuf << sp->first;
+	CraftProfession::Pointer prof = craftProfessionManager->get(sp->first);
+        if (prof) {
+            if (found)
+		pbuf << ", ";        
+	    pbuf << prof->getNameFor(ch);
+            found = true;
+       }
     }
 
     if (!pbuf.empty())
-        buf << "Доступно профессиям " << pbuf << endl;
+        buf << "Доступно профессии " << pbuf << endl;
 } 
 

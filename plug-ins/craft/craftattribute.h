@@ -9,7 +9,7 @@
 #include "xmlattribute.h"
 #include "xmlattributeplugin.h"
 
-class SubProfession;
+class CraftProfession;
 
 /*
  Example attribute value:
@@ -44,7 +44,7 @@ public:
 	XMLAttributeCraft( );
 	virtual ~XMLAttributeCraft( );
 	
-	int proficiencyLevel(const SubProfession &prof) const;
+	int proficiencyLevel(const CraftProfession &prof) const;
 	int proficiencyLevel(const DLString &profName) const;
 	bool learned(const DLString &profName) const;
 protected:
