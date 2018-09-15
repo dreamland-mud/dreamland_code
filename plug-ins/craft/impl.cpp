@@ -9,9 +9,11 @@
 #include "subprofession.h"
 #include "craftattribute.h"
 #include "craftskill.h"
+#include "craftwearloc.h"
 
 TABLE_LOADER(CraftProfessionLoader, "craft-professions", "CraftProfession");
 TABLE_LOADER(CraftSkillLoader, "craft-skills", "skill");
+TABLE_LOADER(CraftWearlocLoader, "craft-wearlocs", "Wearlocation");
 
 
 class CraftProfessionRegistrator : public Plugin {
@@ -40,6 +42,8 @@ extern "C"
 	Plugin::registerPlugin<CraftProfessionLoader>( ppl );
 	Plugin::registerPlugin<MocRegistrator<CraftSkill> >( ppl );
 	Plugin::registerPlugin<CraftSkillLoader>( ppl );
+	Plugin::registerPlugin<MocRegistrator<CraftTattooWearloc> >( ppl );
+	Plugin::registerPlugin<CraftWearlocLoader>( ppl );
 	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCraft> >( ppl );
 	
 	return ppl;
