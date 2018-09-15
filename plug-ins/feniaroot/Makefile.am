@@ -52,6 +52,7 @@ INCLUDES = \
 -I$(top_srcdir)/plug-ins/updates \
 -I$(top_srcdir)/plug-ins/traverse \
 -I$(top_srcdir)/plug-ins/ai \
+-I$(top_srcdir)/plug-ins/craft \
 -I$(top_srcdir)/plug-ins/skills_impl  \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/services/core \
@@ -66,6 +67,7 @@ $(LIBADD_AI) \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \
 ../updates/libupdates.la \
+../craft/libcraft.la \
 ../clan/core/libclan_core.la \
 ../skills_impl/libskills_impl.la \
 ../services/core/libservices_core.la \

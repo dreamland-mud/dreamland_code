@@ -24,6 +24,7 @@
 #include "object.h"
 #include "room.h"
 
+#include "craftattribute.h"
 #include "occupations.h"
 #include "interp.h"
 #include "comm.h"
@@ -50,6 +51,7 @@
 #include "affectwrapper.h"
 #include "xmleditorinputhandler.h"
 #include "reglist.h"
+#include "regcontainer.h"
 #include "nativeext.h"
 
 #include "wrap_utils.h"
@@ -405,6 +407,25 @@ NMI_GET( CharacterWrapper, altar, "vnum комнаты-алтаря в хометауне чара" )
     checkTarget( );
     CHK_NPC
     return Register( (int)target->getPC( )->getHometown( )->getAltar( ) );
+}
+
+
+NMI_GET( CharacterWrapper, craftProfessions, "map из названия->уровень мастерства для крафтовых профессий" )
+{
+    ::Pointer<RegContainer> rc(NEW);
+    checkTarget( );
+    CHK_NPC
+    XMLAttributeCraft::Pointer attr = target->getPC( )->getAttributes( ).findAttr<XMLAttributeCraft>("craft");
+    XMLAttributeCraft::Proficiency::const_iterator p;
+    
+    if (attr) 
+        for (p = attr->getProficiency().begin(); p != attr->getProficiency().end(); p++)
+            (*rc)->map[p->first] = Register(p->second.level);
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(rc);
+
+    return Register( obj );
 }
 
 #define CONDITION(type, api) \

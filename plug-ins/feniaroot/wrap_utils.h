@@ -13,6 +13,7 @@ using Scripting::Register;
 using Scripting::RegisterList;
 class Object;
 class Character;
+class PCharacter;
 class Room;
 class Wearlocation;
 struct obj_index_data;
@@ -34,6 +35,9 @@ Wearlocation * arg2wearloc( const Register & );
 Object * arg2item( const Register & );
 Room * arg2room( const Register & );
 Character * arg2character( const Register & );
+PCharacter * arg2player( const Register & );
+Character * args2character( const RegisterList & );
+PCharacter * args2player( const RegisterList & );
 
 #endif
 

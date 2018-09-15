@@ -63,6 +63,19 @@ DLString args2string( const RegisterList &args )
     return get_unique_arg( args ).toString( );
 }
 
+Character * args2character( const RegisterList &args )
+{
+    return wrapper_cast<CharacterWrapper>( get_unique_arg(args) )->getTarget( );
+}
+
+PCharacter * args2player( const RegisterList &args )
+{
+    Character *ch = args2character(args); 
+    if (ch->is_npc())
+        throw Scripting::CustomException("Mobile found when PC expected.");
+    return ch->getPC();
+}
+
 Wearlocation * arg2wearloc( const Register &reg )
 {
     DLString locName = reg.toString( );
@@ -87,6 +100,14 @@ Room * arg2room( const Register &reg )
 Character * arg2character( const Register &reg )
 {
     return wrapper_cast<CharacterWrapper>( reg )->getTarget( );
+}
+
+PCharacter * arg2player( const Register &reg )
+{
+    Character *ch = arg2character(reg);
+    if (ch->is_npc())
+        throw Scripting::CustomException("Mobile found when PC expected.");
+    return ch->getPC();
 }
 
 void args2buf(const RegisterList &args, char *buf, size_t bufsize)

@@ -79,3 +79,7 @@ bool XMLAttributeCraft::learned(const DLString &profName) const
     return p != proficiency.end();
 }
 
+void XMLAttributeCraft::setProficiencyLevel(const DLString &profName, int level)
+{
+    proficiency[profName].level = level;
+}

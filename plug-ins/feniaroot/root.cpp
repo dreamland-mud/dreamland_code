@@ -762,6 +762,18 @@ NMI_INVOKE( Root, Profession, "конструктор для профессии по имени" )
     return ProfessionWrapper::wrap( name );
 }
 
+NMI_INVOKE( Root, CraftProfession, "конструктор для крафтовой профессии по имени" )
+{
+    DLString name;
+
+    if (args.empty( ))
+	name = "none";
+    else
+	name = args.front( ).toString( );
+	
+    return CraftProfessionWrapper::wrap( name );
+}
+
 NMI_GET( Root, races, "список всех рас") 
 {
     RegList::Pointer list(NEW);

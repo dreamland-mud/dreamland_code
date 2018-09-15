@@ -7,6 +7,8 @@
 #include "hometown.h"
 #include "skill.h"
 #include "profession.h"
+#include "subprofession.h"
+#include "craftattribute.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "pcrace.h"
@@ -630,3 +632,64 @@ NMI_INVOKE( ClanWrapper, diplomacy, "" )
 	      ];
 }
 
+/*----------------------------------------------------------------------
+ * CraftProfession
+ *----------------------------------------------------------------------*/
+NMI_INIT(CraftProfessionWrapper, "craftprofession");
+
+CraftProfessionWrapper::CraftProfessionWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register CraftProfessionWrapper::wrap( const DLString &name )
+{
+    CraftProfessionWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+NMI_INVOKE( CraftProfessionWrapper, api, "печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<CraftProfessionWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( CraftProfessionWrapper, name, "название профессии" ) 
+{
+    return craftProfessionManager->get( name )->getName( );
+}
+
+NMI_GET( CraftProfessionWrapper, nameRus, "название по-русски с падежами" ) 
+{
+    return craftProfessionManager->get( name )->getRusName( );
+}
+
+NMI_GET( CraftProfessionWrapper, nameMlt, "название во множественном числе" ) 
+{
+    return craftProfessionManager->get( name )->getMltName( );
+}
+
+NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить персонажу уровень мастерства в этой профессии" )
+{
+    if (args.size( ) != 2)
+	throw Scripting::NotEnoughArgumentsException( );
+    
+    PCharacter *ch = arg2player(args.front());
+    int level = args.back().toNumber();
+    XMLAttributeCraft::Pointer attr = ch->getAttributes().getAttr<XMLAttributeCraft>("craft");
+    attr->setProficiencyLevel(name, level);     
+    return Scripting::Register();
+}
+
+NMI_INVOKE( CraftProfessionWrapper, getLevel, "(ch) получить уровень мастерства персонажа в этой профессии" )
+{
+    PCharacter *ch = args2player(args);
+    XMLAttributeCraft::Pointer attr = ch->getAttributes().getAttr<XMLAttributeCraft>("craft");
+    return Scripting::Register(attr->proficiencyLevel(name));
+}

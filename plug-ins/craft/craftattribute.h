@@ -53,8 +53,15 @@ public:
 	int proficiencyLevel(const CraftProfession &prof) const;
 	int proficiencyLevel(const DLString &profName) const;
 	bool learned(const DLString &profName) const;
+        inline const Proficiency &getProficiency() const;
+        void setProficiencyLevel(const DLString &profName, int level);
 protected:
 	XML_VARIABLE Proficiency proficiency;
 };
+
+inline const XMLAttributeCraft::Proficiency &XMLAttributeCraft::getProficiency() const
+{
+        return proficiency;
+}
 
 #endif

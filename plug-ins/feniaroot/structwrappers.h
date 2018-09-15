@@ -91,6 +91,30 @@ public:
 };
 
 /*----------------------------------------------------------------------
+ * CraftProfession
+ *----------------------------------------------------------------------*/
+class CraftProfession;
+
+class CraftProfessionWrapper : public PluginNativeImpl<CraftProfessionWrapper>, 
+                          public NativeHandler,
+                          public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<CraftProfessionWrapper> Pointer;
+
+    CraftProfessionWrapper() { }
+    CraftProfessionWrapper(const DLString &);
+	    
+    virtual void setSelf(Scripting::Object *) { }
+    
+    static Scripting::Register wrap( const DLString & );
+
+    XML_VARIABLE XMLString name;
+};
+
+/*----------------------------------------------------------------------
  * Race
  *----------------------------------------------------------------------*/
 class Race;
