@@ -8,6 +8,7 @@
 #include "xmlmap.h"
 #include "xmlattribute.h"
 #include "xmlattributeplugin.h"
+#include "playerattributes.h"
 
 class CraftProfession;
 
@@ -34,7 +35,9 @@ public:
 	XML_VARIABLE XMLInteger level;
 };
 
-class XMLAttributeCraft: public XMLVariableContainer, public XMLAttribute
+class XMLAttributeCraft: public XMLVariableContainer, 
+                         public virtual EventHandler<ScoreArguments>,
+                         public virtual EventHandler<WhoisArguments>
 {
 XML_OBJECT
 public:
@@ -44,6 +47,9 @@ public:
 	XMLAttributeCraft( );
 	virtual ~XMLAttributeCraft( );
 	
+	virtual bool handle( const ScoreArguments &args ); 
+	virtual bool handle( const WhoisArguments &args ); 
+
 	int proficiencyLevel(const CraftProfession &prof) const;
 	int proficiencyLevel(const DLString &profName) const;
 	bool learned(const DLString &profName) const;

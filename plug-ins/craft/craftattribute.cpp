@@ -1,5 +1,7 @@
+#include "grammar_entities_impl.h"
 #include "craftattribute.h"
 #include "subprofession.h"
+#include "pcharacter.h"
 
 XMLAttributeCraft::XMLAttributeCraft( )
 {
@@ -9,6 +11,58 @@ XMLAttributeCraft::~XMLAttributeCraft( )
 {
 }
 
+
+bool XMLAttributeCraft::handle( const WhoisArguments &args )
+{
+    ostringstream buf;
+
+    if (proficiency.empty())
+        return false;
+
+    buf << "владеет профессиями: ";
+    
+    Proficiency::const_iterator p;
+    bool found = false;
+
+    for (p = proficiency.begin(); p != proficiency.end(); p++) {
+        CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
+        if (prof) {
+            if (found)
+                buf << ", ";
+            buf << prof->getNameFor(args.looker);
+            found = true;
+        }
+    }
+    
+    if (found)
+        args.lines.push_back( buf.str() );
+
+    return found;
+}
+
+bool XMLAttributeCraft::handle( const ScoreArguments &args )
+{
+    if (proficiency.empty())
+        return false;
+
+    args.buf << "Ты владеешь профессиями: ";
+    
+    Proficiency::const_iterator p;
+    bool found = false;
+
+    for (p = proficiency.begin(); p != proficiency.end(); p++) {
+        CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
+        if (prof) {
+            if (found)
+                args.buf << ", ";
+            args.buf << prof->getNameFor(args.pch) << " уровня " << p->second.level;
+            found = true;
+        }
+    }
+    
+    args.buf << endl; 
+    return found;
+}
 
 int XMLAttributeCraft::proficiencyLevel(const CraftProfession &prof) const
 {
