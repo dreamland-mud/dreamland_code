@@ -51,17 +51,13 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
         if (prof) {
             ostringstream buf;
-            buf << "Дополнительная профессия: " << prof->getNameFor(args.pch) << " уровня " << p->second.level;
+            buf << "Профессия: " << prof->getNameFor(args.pch) << " уровня " << p->second.level
+                << ", опыт " << prof->getExpToLevel(args.pch) << "/" << prof->getExpThisLevel(args.pch);
             args.lines.push_back( buf.str() );
         }
     }
 
     return !args.lines.empty();
-}
-
-int XMLAttributeCraft::proficiencyLevel(const CraftProfession &prof) const
-{
-    return proficiencyLevel(prof.getName());
 }
 
 int XMLAttributeCraft::proficiencyLevel(const DLString &profName) const
@@ -83,3 +79,13 @@ void XMLAttributeCraft::setProficiencyLevel(const DLString &profName, int level)
 {
     proficiency[profName].level = level;
 }
+
+int XMLAttributeCraft::exp(const DLString &profName) const
+{
+    Proficiency::const_iterator p = proficiency.find(profName);
+    if (p == proficiency.end())
+        return 0;
+        
+    return p->second.exp;
+}
+

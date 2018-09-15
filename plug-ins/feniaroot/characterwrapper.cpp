@@ -24,7 +24,7 @@
 #include "object.h"
 #include "room.h"
 
-#include "craftattribute.h"
+#include "subprofession.h"
 #include "occupations.h"
 #include "interp.h"
 #include "comm.h"
@@ -415,12 +415,11 @@ NMI_GET( CharacterWrapper, craftProfessions, "map из названия->уровень мастерств
     ::Pointer<RegContainer> rc(NEW);
     checkTarget( );
     CHK_NPC
-    XMLAttributeCraft::Pointer attr = target->getPC( )->getAttributes( ).findAttr<XMLAttributeCraft>("craft");
-    XMLAttributeCraft::Proficiency::const_iterator p;
-    
-    if (attr) 
-        for (p = attr->getProficiency().begin(); p != attr->getProficiency().end(); p++)
-            (*rc)->map[p->first] = Register(p->second.level);
+    list<CraftProfession::Pointer>::const_iterator p;
+    list<CraftProfession::Pointer> profs = craftProfessionManager->getProfessions();
+     
+    for (p = profs.begin(); p != profs.end(); p++)
+        (*rc)->map[(*p)->getName()] = Register((*p)->getLevel(target->getPC()));
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);

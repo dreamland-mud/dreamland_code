@@ -1,4 +1,5 @@
 #include "subprofession.h"
+#include "craftattribute.h"
 
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
@@ -82,6 +83,47 @@ DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) co
 	return getName( );
 }
 
+XMLAttributeCraft::Pointer CraftProfession::getAttr(PCharacter *ch) const
+{
+    return ch->getAttributes( ).getAttr<XMLAttributeCraft>("craft");
+}
+
+int CraftProfession::getLevel( PCharacter *ch ) const
+{
+    return getAttr(ch)->proficiencyLevel(getName());
+}
+
+void CraftProfession::setLevel( PCharacter *ch, int level ) const
+{
+    getAttr(ch)->setProficiencyLevel(getName(), level);
+}
+
+int CraftProfession::getExpToLevel( PCharacter *ch, int level ) const
+{ 
+    if (level < 0)
+        level = getLevel(ch);
+    return getExpPerLevel(ch,  level + 1) - getTotalExp(ch);
+}
+
+int CraftProfession::getExpThisLevel( PCharacter *ch ) const
+{
+    int level = getLevel(ch);
+    return getExpPerLevel(ch, level + 1) - getExpPerLevel(ch, level);
+}
+
+int CraftProfession::getExpPerLevel( PCharacter *ch, int level ) const
+{
+    if (level < 0)
+        level = getLevel(ch);
+
+    return baseExp * level;
+}
+
+int CraftProfession::getTotalExp( PCharacter *ch ) const
+{
+    return getAttr(ch)->exp(getName());
+}
+
 /*-------------------------------------------------------------------
  * CraftProfessionManager
  *------------------------------------------------------------------*/
@@ -125,6 +167,15 @@ CraftProfession::Pointer CraftProfessionManager::lookup( const DLString &arg ) c
         if (is_name(arg.c_str(), p->first.c_str()))
             return p->second;
     return CraftProfession::Pointer();
+}
+
+list<CraftProfession::Pointer> CraftProfessionManager::getProfessions() const
+{
+    list<CraftProfession::Pointer> result;
+    Professions::const_iterator p;
+    for (p = profs.begin(); p != profs.end(); p++)
+        result.push_back(p->second);
+    return result;
 }
 
 void CraftProfessionManager::initialization( ) 

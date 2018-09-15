@@ -9,11 +9,12 @@
 #include "plugin.h"
 #include "oneallocate.h"
 #include "grammar_entities.h"
+#include "craftattribute.h"
 
 #include "helpmanager.h"
 #include "markuphelparticle.h"
 
-
+class PCharacter;
 class CraftProfession;
 
 class CraftProfessionHelp : public virtual XMLHelpArticle,
@@ -55,9 +56,17 @@ public:
     virtual DLString getNameFor( Character *, const Grammar::Case & = Grammar::Case::NONE ) const;
     inline virtual const DLString &getRusName( ) const;
     inline virtual const DLString &getMltName( ) const;
-    inline virtual int getBaseExp( ) const;
+    virtual void setLevel( PCharacter *, int level = -1 ) const;
+    virtual int getLevel( PCharacter * ) const;
+
+    virtual int getExpToLevel( PCharacter *, int level = -1 ) const;
+    virtual int getExpThisLevel( PCharacter * ) const;
+    virtual int getExpPerLevel( PCharacter *, int level = -1  ) const;
+    virtual int getTotalExp( PCharacter * ) const;
     
 protected:
+    XMLAttributeCraft::Pointer getAttr(PCharacter *ch) const;
+
     XML_VARIABLE XMLString  name, rusName, mltName;
     XML_VARIABLE XMLInteger baseExp;
     XML_VARIABLE XMLPointerNoEmpty<CraftProfessionHelp> help;
@@ -84,11 +93,6 @@ inline const DLString &CraftProfession::getMltName( ) const
     return mltName;
 }
 
-inline int CraftProfession::getBaseExp( ) const
-{
-    return baseExp;
-}
-
 class CraftProfessionManager : public OneAllocate, public virtual Plugin {
 public:
     typedef ::Pointer<CraftProfessionManager> Pointer;
@@ -103,6 +107,7 @@ public:
     void unload( CraftProfession::Pointer );
     CraftProfession::Pointer get( const DLString & ) const;
     CraftProfession::Pointer lookup( const DLString & ) const;
+    list<CraftProfession::Pointer> getProfessions() const;
 
 protected:
     Professions profs;

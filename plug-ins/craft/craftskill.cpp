@@ -24,7 +24,7 @@ SkillGroupReference &CraftSkill::getGroup( )
     return group;
 }
 
-XMLAttributeCraft::Pointer CraftSkill::getProfAttr(Character *ch) const
+XMLAttributeCraft::Pointer CraftSkill::getAttr(Character *ch) const
 {
     XMLAttributeCraft::Pointer attr;
     if (!ch->is_npc())
@@ -36,7 +36,7 @@ XMLAttributeCraft::Pointer CraftSkill::getProfAttr(Character *ch) const
 bool CraftSkill::visible( Character *ch ) const
 {
     CraftProfessions::const_iterator sp;
-    XMLAttributeCraft::Pointer attr = getProfAttr(ch);
+    XMLAttributeCraft::Pointer attr = getAttr(ch);
 
     if (!attr) 
         return false;

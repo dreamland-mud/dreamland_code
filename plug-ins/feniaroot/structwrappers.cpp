@@ -8,7 +8,6 @@
 #include "skill.h"
 #include "profession.h"
 #include "subprofession.h"
-#include "craftattribute.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "pcrace.h"
@@ -682,14 +681,25 @@ NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить персонажу 
     
     PCharacter *ch = arg2player(args.front());
     int level = args.back().toNumber();
-    XMLAttributeCraft::Pointer attr = ch->getAttributes().getAttr<XMLAttributeCraft>("craft");
-    attr->setProficiencyLevel(name, level);     
+    craftProfessionManager->get(name)->setLevel(ch, level);
     return Scripting::Register();
 }
 
 NMI_INVOKE( CraftProfessionWrapper, getLevel, "(ch) получить уровень мастерства персонажа в этой профессии" )
 {
     PCharacter *ch = args2player(args);
-    XMLAttributeCraft::Pointer attr = ch->getAttributes().getAttr<XMLAttributeCraft>("craft");
-    return Scripting::Register(attr->proficiencyLevel(name));
+    return craftProfessionManager->get( name )->getLevel(ch);
 }
+
+NMI_INVOKE( CraftProfessionWrapper, getTotalExp, "(ch) суммарный опыт персонажа в этой профессии" )
+{
+    PCharacter *ch = args2player(args);
+    return craftProfessionManager->get( name )->getTotalExp(ch);
+}
+
+NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) кол-во опыта до следующего уровня мастерства в этой профессии" )
+{
+    PCharacter *ch = args2player(args);
+    return craftProfessionManager->get( name )->getExpToLevel(ch);
+}
+

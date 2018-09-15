@@ -39,7 +39,7 @@ public:
     }
 
 protected:
-    XMLAttributeCraft::Pointer getProfAttr(Character *ch) const;
+    XMLAttributeCraft::Pointer getAttr(Character *ch) const;
 
     static const DLString CATEGORY;
 

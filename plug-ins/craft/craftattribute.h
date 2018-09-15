@@ -19,9 +19,11 @@ class CraftProfession;
 	<proficiency>
 		<node name="tattooist">
 			<level>3</level>
+			<exp>3300</exp>
 		</node>
 		<node name="hairdresser">
 			<level>1</level>
+			<exp>200</exp>
 		</node>
 	</proficiency>
 	...
@@ -33,6 +35,7 @@ XML_OBJECT
 public:
 	typedef ::Pointer<CraftProficiency> Pointer;
 	XML_VARIABLE XMLInteger level;
+	XML_VARIABLE XMLInteger exp;
 };
 
 class XMLAttributeCraft: public XMLVariableContainer, 
@@ -50,8 +53,8 @@ public:
 	virtual bool handle( const ScoreArguments &args ); 
 	virtual bool handle( const WhoisArguments &args ); 
 
-	int proficiencyLevel(const CraftProfession &prof) const;
 	int proficiencyLevel(const DLString &profName) const;
+	int exp(const DLString &profName) const;
 	bool learned(const DLString &profName) const;
         inline const Proficiency &getProficiency() const;
         void setProficiencyLevel(const DLString &profName, int level);
