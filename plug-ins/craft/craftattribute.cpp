@@ -10,17 +10,23 @@ XMLAttributeCraft::~XMLAttributeCraft( )
 }
 
 
-int XMLAttributeCraft::getProficiencyLevel(const SubProfession &prof) const
+int XMLAttributeCraft::proficiencyLevel(const SubProfession &prof) const
 {
-    return getProficiencyLevel(prof.getName());
+    return proficiencyLevel(prof.getName());
 }
 
-int XMLAttributeCraft::getProficiencyLevel(const DLString &profName) const
+int XMLAttributeCraft::proficiencyLevel(const DLString &profName) const
 {
     Proficiency::const_iterator p = proficiency.find(profName);
     if (p == proficiency.end())
         return 0;
         
     return p->second.level;
+}
+
+bool XMLAttributeCraft::learned(const DLString &profName) const
+{
+    Proficiency::const_iterator p = proficiency.find(profName);
+    return p != proficiency.end();
 }
 

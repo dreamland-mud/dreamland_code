@@ -34,7 +34,7 @@ public:
 	XML_VARIABLE XMLInteger level;
 };
 
-class XMLAttributeCraft: public XMLVariableContainer
+class XMLAttributeCraft: public XMLVariableContainer, public XMLAttribute
 {
 XML_OBJECT
 public:
@@ -44,8 +44,9 @@ public:
 	XMLAttributeCraft( );
 	virtual ~XMLAttributeCraft( );
 	
-	int getProficiencyLevel(const SubProfession &prof) const;
-	int getProficiencyLevel(const DLString &profName) const;
+	int proficiencyLevel(const SubProfession &prof) const;
+	int proficiencyLevel(const DLString &profName) const;
+	bool learned(const DLString &profName) const;
 protected:
 	XML_VARIABLE Proficiency proficiency;
 };

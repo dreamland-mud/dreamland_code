@@ -1,5 +1,4 @@
 #include "craftskill.h"
-#include "craftattribue.h"
 
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
@@ -12,27 +11,37 @@
 #include "act.h"
 #include "def.h"
 
+const DLString CraftSkill::CATEGORY = "Умения крафтинга";
+
+CraftSkill::CraftSkill( )
+{
+}
+
 SkillGroupReference &CraftSkill::getGroup( )
 {
     return group;
 }
 
+XMLAttributeCraft::Pointer CraftSkill::getProfAttr(Character *ch) const
+{
+    XMLAttributeCraft::Pointer attr;
+    if (!ch->is_npc())
+        attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCraft>("craft");
+    return attr;
+}
+
+
 bool CraftSkill::visible( Character *ch ) const
 {
-    if (ch->is_npc())
-        return false;
-
-    
-    XMLAttributeCraft::Pointer attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCraft>("craft");
-    if (!attr)
-        return false;
-
     SubProfessions::const_iterator sp;
+    XMLAttributeCraft::Pointer attr = getProfAttr(ch);
+
+    if (!attr) 
+        return false;
+
     for (sp = subprofessions.begin(); sp != subprofessions.end(); sp++) {
         const DLString &profName = sp->first;
-        const Integer &minLevel = sp->second.level;
-
-        if (attr->getProficiencyLevel(profName) >= minLevel)
+        if (attr->learned(profName))
             return true;
     }
 
@@ -41,18 +50,39 @@ bool CraftSkill::visible( Character *ch ) const
 
 bool CraftSkill::available( Character *ch ) const
 {
+    SubProfessions::const_iterator sp;
+    XMLAttributeCraft::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeCraft>("craft");
+
+    if (!attr)  
+        return false;
+
+    for (sp = subprofessions.begin(); sp != subprofessions.end(); sp++) {
+        const DLString &profName = sp->first;
+        const int minLevel = sp->second.level;
+      
+        if (attr->proficiencyLevel(profName) >= minLevel) 
+            return true;
+    }
+
+    return false;
 }
 
 bool CraftSkill::usable( Character *ch, bool verbose ) const
 {
+    return available(ch);
 } 
 
 int CraftSkill::getLevel( Character *ch ) const
 {
+    return 1;
 }
 
 int CraftSkill::getLearned( Character *ch ) const
 {
+    if (!usable( ch, false ))
+	return 0;
+
+    return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
 
 int CraftSkill::getWeight( Character *ch ) const
@@ -67,13 +97,50 @@ bool CraftSkill::canForget( PCharacter *ch ) const
 
 bool CraftSkill::canPractice( PCharacter *ch, std::ostream &buf ) const
 {
+    return available(ch);
 }
 
-bool CraftSkill::canTeach( NPCharacter *ch, PCharacter *, bool verbose )
+bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
+    if (!mob) {
+	if (verbose)
+	    ch->println( "Тебе не с кем практиковаться здесь." );
+	return false;
+    }
+    
+    if (mob->pIndexData->practicer.isSet( (int)getGroup( ) ))
+	return true;
+
+    if (verbose)
+	ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
+	       "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
+	       mob, getNameFor( ch ).c_str( ) );
+    return false;
 }
 
 void CraftSkill::show( PCharacter *ch, std::ostream &buf )
 {
+    bool rus = ch->getConfig( )->ruskills;
+
+    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
+        << " '{W" << getName( ) << "{x'"
+	<< " '{W" << getRussianName( ) << "{x', "
+	<< "входит в группу '{hg{W" 
+	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+	<< "{x'"
+	<< endl;
+
+
+    DLString pbuf;
+    SubProfessions::const_iterator sp;
+    for (sp = subprofessions.begin(); sp != subprofessions.end(); sp++) {
+        // TODO runame lookup
+        if (sp != subprofessions.begin())
+            pbuf << ", ";        
+        pbuf << sp->first;
+    }
+
+    if (!pbuf.empty())
+        buf << "Доступно профессиям " << pbuf << endl;
 } 
 

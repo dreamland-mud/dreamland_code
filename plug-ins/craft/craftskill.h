@@ -2,7 +2,8 @@
 #define CRAFTSKILL_H
 
 #include "basicskill.h"
-
+#include "craftattribute.h"
+#include "skillgroup.h"
 #include "xmlmap.h"
 #include "xmlflags.h"
 
@@ -38,6 +39,8 @@ public:
     }
 
 protected:
+    XMLAttributeCraft::Pointer getProfAttr(Character *ch) const;
+
     static const DLString CATEGORY;
 
     XML_VARIABLE XMLInteger weight;    
