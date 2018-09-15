@@ -69,6 +69,7 @@
 #include "xmlattributeticker.h"
 #include "commonattributes.h"
 #include "commandtemplate.h"
+#include "playerattributes.h"
 
 #include "affect.h"
 #include "object.h"
@@ -589,7 +590,14 @@ CMDRUNP( oscore )
 		   ch->getPC( )->invis_level.getValue( ),
 		   ch->getPC( )->incog_level.getValue( ) )
 	    << endl;
-    
+
+    // Collect information from various attributes, such as craft professions.    
+    list<DLString> attrLines;
+    if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) ))
+	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
+	    buf << *l << endl;
+	}
+
     ch->send_to( buf );
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
@@ -1712,6 +1720,16 @@ CMDRUNP( score )
               pch->invis_level.getValue( ),
 	      pch->incog_level.getValue( ),
 	      CLR_FRAME);
+    }
+
+    list<DLString> attrLines;
+    if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) )) {
+        ekle = 1;
+	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
+	    ch->printf("     | {w%-64s%s|\r\n", 
+			l->c_str(),
+			CLR_FRAME);
+	}
     }
 
     if (ekle) {

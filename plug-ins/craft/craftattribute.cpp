@@ -45,23 +45,18 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
     if (proficiency.empty())
         return false;
 
-    args.buf << "Ты владеешь профессиями: ";
-    
     Proficiency::const_iterator p;
-    bool found = false;
 
     for (p = proficiency.begin(); p != proficiency.end(); p++) {
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
         if (prof) {
-            if (found)
-                args.buf << ", ";
-            args.buf << prof->getNameFor(args.pch) << " уровня " << p->second.level;
-            found = true;
+            ostringstream buf;
+            buf << "Дополнительная профессия: " << prof->getNameFor(args.pch) << " уровня " << p->second.level;
+            args.lines.push_back( buf.str() );
         }
     }
-    
-    args.buf << endl; 
-    return found;
+
+    return !args.lines.empty();
 }
 
 int XMLAttributeCraft::proficiencyLevel(const CraftProfession &prof) const

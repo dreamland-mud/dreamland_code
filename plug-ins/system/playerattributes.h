@@ -17,14 +17,14 @@ class Character;
 class PCharacter;
 
 struct ScoreArguments {
-    ScoreArguments(PCharacter *ch, ostringstream &b)
-            : pch(ch), buf(b)
+    ScoreArguments(PCharacter *ch, list<DLString> &l)
+            : pch(ch), lines(l)
     {
     }
 
 	
     PCharacter *pch;
-    ostringstream &buf;
+    list<DLString> &lines;
 };
 
 struct DeathArguments {
