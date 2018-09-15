@@ -232,7 +232,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     skill = skillManager->find( sn );
 
     if (!skill) {
-	ch->send_to( "Ты не можешь практиковать это.\n\r");
+        ch->printf("Умение %s не существует или еще тебе не доступно.\r\n", arg.c_str());
 	return;
     }
 
@@ -282,7 +282,7 @@ PCharacter * CPractice::findTeacher( PCharacter *ch, Skill *skill )
     PCharacter *teacher;
     
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
-	if (rch->is_npc( ))
+	if (rch->is_npc( ) || rch == ch)
 	    continue;
 	
 	teacher = rch->getPC( );
