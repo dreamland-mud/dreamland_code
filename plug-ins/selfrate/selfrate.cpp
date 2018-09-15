@@ -77,26 +77,36 @@ CMDRUN( selfrate )
     }
 }
 
+static const char *rate_alias [] = { "newbie", "expert", "guru" };
+static const char *rate_alias_ru [] = { "ньюби", "эксперт", "гуру" };
 
 XMLAttributeSelfRate::XMLAttributeSelfRate( ) 
 {
 }
 
-DLString XMLAttributeSelfRate::getRateAlias( ) const
+DLString XMLAttributeSelfRate::getRateAlias( PCharacter *looker ) const
 {
-    switch (rate.getValue( )) {
-    case 0: return "newbie";
-    case 1: return "expert";
-    case 2: return "guru";
-    default: return "unknown!";
+    short r = rate.getValue();
+
+    if (r > 2 || r < 0)
+        return "unknown!";
+    
+    ostringstream buf;
+
+    if (looker) {
+     	buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
+    } else {
+	buf << "{lE" << rate_alias[r] << "{lR" << rate_alias_ru[r] << "{lx";
     }
+
+    return buf.str();
 }
 
 bool XMLAttributeSelfRate::handle( const WhoisArguments &args )
 {
     DLString l;
     
-    l << "считает себя {W" << getRateAlias( ) << "{x";
+    l << "самоуверенность уровня {W" << getRateAlias(args.looker) << "{x";
     args.lines.push_back( l );
     return true;
 }

@@ -13,6 +13,7 @@
 #include "xmlvariablecontainer.h"
 
 class PCMemoryInterface;
+class PCharacter;
 
 bool rated_as_newbie( PCMemoryInterface* );
 bool rated_as_expert( PCMemoryInterface* );
@@ -28,7 +29,7 @@ public:
 	
 	virtual bool handle( const WhoisArguments & );
 
-	DLString getRateAlias( ) const;
+	DLString getRateAlias( PCharacter *looker = NULL ) const;
 	XML_VARIABLE XMLShort rate;
 };
 
