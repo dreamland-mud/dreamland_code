@@ -81,6 +81,8 @@ WrappersPlugin::initialization( )
     Class::regMoc<ProfessionWrapper>( );
     Class::regMoc<CraftProfessionWrapper>( );
     Class::regMoc<RaceWrapper>( );
+    Class::regMoc<LiquidWrapper>( );
+    Class::regMoc<SkillWrapper>( );
     
     FeniaManager::getThis( )->recover( );
     
@@ -95,6 +97,8 @@ void WrappersPlugin::destruction( ) {
     Scripting::gc = false;
     FeniaManager::getThis( )->backup( );
 
+    Class::unregMoc<LiquidWrapper>( );
+    Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );
     Class::unregMoc<AreaWrapper>( );
     Class::unregMoc<CraftProfessionWrapper>( );

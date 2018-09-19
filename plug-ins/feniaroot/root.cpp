@@ -86,22 +86,6 @@ NMI_INVOKE( Root, Affect, "конструктор для аффекта" )
     }
 }
 
-NMI_INVOKE( Root, Skill, "регистрирует скил-пустышку с заданным именем, скил просуществует до ребута" )
-{
-    DLString skillName;
-
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-
-    skillName = args.front( ).toString( );
-
-    if (skillManager->findExisting( skillName ))
-	throw Scripting::CustomException( "Skill already exists" );
-
-    skillManager->lookup( skillName );
-    return Register( );
-}
-
 DLString regfmt(Character *to, const RegisterList &argv);
 
 NMI_INVOKE( Root, fmt, "отформатировать строку") 
@@ -847,6 +831,14 @@ NMI_INVOKE( Root, Liquid, "конструктор для жидкости по имени" )
     }
     
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
+}
+
+NMI_INVOKE( Root, Skill, "конструктор для умения по имени" )
+{
+    DLString name = args2string(args);
+    if (!skillManager->findExisting(name))
+	return Register( );
+    return SkillWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
 NMI_INVOKE( Root, Clan, "конструктор для клана по имени" )

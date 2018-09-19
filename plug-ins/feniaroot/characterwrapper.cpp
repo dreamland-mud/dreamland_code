@@ -69,6 +69,7 @@ DESIRE(drunk);
 
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 const char *ttype_name( int ttype );
+DLString regfmt(Character *to, const RegisterList &argv);
 
 using namespace std;
 using namespace Scripting;
@@ -684,11 +685,18 @@ NMI_SET( CharacterWrapper, x, help) \
 }
 INT_FIELD(off_flags, "")
 
-NMI_SET( CharacterWrapper, wearloc, "")
+NMI_SET( CharacterWrapper, wearloc, "установить список слотов экипировки из строки")
 {
     checkTarget( );
     CHK_NPC
     target->getPC( )->wearloc.fromString( arg.toString( ) );
+}
+
+NMI_GET( CharacterWrapper, wearloc, "строка со всеми названиями слотов экипировки (wearlocations)")
+{
+    checkTarget( );
+    CHK_NPC
+    return target->getPC( )->wearloc.toString();
 }
 
 NMI_GET( CharacterWrapper, expToLevel, "")
@@ -901,6 +909,15 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "выполняет команду с аргументами от
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, say, "(формат, аргументы...) произносит вслух реплику, отформатированную как в методе act" )
+{
+    checkTarget( );
+	
+    DLString msg = regfmt(target, args).c_str();
+    ::interpret_cmd(target, "say", msg.c_str());
+    return Register();
+}
+
 NMI_INVOKE( CharacterWrapper, get_char_world, "параметры: строка с именем чара. вернет видимого для нас чара с таким именем" )
 {
     checkTarget( );
@@ -911,6 +928,12 @@ NMI_INVOKE( CharacterWrapper, get_obj_here, "параметры: строка с именем объекта.
 {
     checkTarget( );
     return wrap( ::get_obj_here( target, args2string( args ) ) );
+}
+
+NMI_INVOKE( CharacterWrapper, get_obj_carry_type, "(.tables.item_table.*) вернет видимый нам объект в инвентаре или equipment с этим типом" )
+{
+    checkTarget( );
+    return wrap( ::get_obj_carry_type( target, args2number( args ) ) );
 }
 
 NMI_INVOKE( CharacterWrapper, get_obj_room, "параметры: строка с именем объекта. вернет видимый нам объект в комнате" )
@@ -1075,8 +1098,6 @@ NMI_INVOKE( CharacterWrapper, can_see_exit, "" )
     return target->can_see( pExit );
 }
 
-DLString regfmt(Character *to, const RegisterList &argv);
-
 NMI_INVOKE( CharacterWrapper, print, "параметры: строка-формат, аргументы. возвращает отформатированную строку (аналог sprintf)" )
 {
     checkTarget();
@@ -1097,6 +1118,18 @@ NMI_INVOKE( CharacterWrapper, recho, "параметры: cтрока-формат, аргументы. вывод
 {
     checkTarget( );
     target->recho( regfmt( target, args ).c_str( ) );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...) выводит отформатированную строку всем в комнате, кроме нас и vict" )
+{
+    checkTarget( );
+    RegisterList myArgs(args);
+    
+    Character *vict = args2character(args);
+    myArgs.pop_front();
+
+    target->recho( vict, regfmt( target, myArgs ).c_str( ) );
     return Register( );
 }
 
@@ -1776,7 +1809,7 @@ NMI_INVOKE( CharacterWrapper, get_eq_char, "" )
     return wrap( arg2wearloc( get_unique_arg( args ) )->find( target ) );
 }
 
-NMI_INVOKE( CharacterWrapper, hasWearloc, "")
+NMI_INVOKE( CharacterWrapper, hasWearloc, "(wearloc name) обладает ли персонаж данным слотом в экипировке")
 {
     checkTarget( );
     CHK_NPC

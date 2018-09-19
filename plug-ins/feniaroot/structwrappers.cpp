@@ -703,3 +703,47 @@ NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) кол-во опыта до следующ
     return craftProfessionManager->get( name )->getExpToLevel(ch);
 }
 
+/*----------------------------------------------------------------------
+ * Skill
+ *----------------------------------------------------------------------*/
+NMI_INIT(SkillWrapper, "skill");
+
+SkillWrapper::SkillWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register SkillWrapper::wrap( const DLString &name )
+{
+    SkillWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+NMI_INVOKE( SkillWrapper, api, "печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<SkillWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+
+NMI_GET( SkillWrapper, name, "название умения" ) 
+{
+    return skillManager->find( name )->getName( );
+}
+
+NMI_INVOKE( SkillWrapper, usable, "(ch) доступно ли умение для использования прямо сейчас" )
+{
+    Character *ch = args2character(args);
+    return skillManager->find( name )->usable( ch, false );
+}
+
+NMI_GET( SkillWrapper, nameRus, "название умения по-русски" ) 
+{
+    return skillManager->find( name )->getRussianName( );
+}

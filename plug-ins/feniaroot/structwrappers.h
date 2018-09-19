@@ -186,4 +186,28 @@ public:
     XML_VARIABLE XMLString name;
 };
 
+/*----------------------------------------------------------------------
+ * Skill
+ *----------------------------------------------------------------------*/
+class Skill;
+
+class SkillWrapper : public PluginNativeImpl<SkillWrapper>, 
+                      public NativeHandler,
+                      public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<SkillWrapper> Pointer;
+
+    SkillWrapper() { }
+    SkillWrapper(const DLString &);
+	    
+    virtual void setSelf(Scripting::Object *) { }
+    
+    static Scripting::Register wrap( const DLString & );
+
+    XML_VARIABLE XMLString name;
+};
+
 #endif
