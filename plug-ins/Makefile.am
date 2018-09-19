@@ -36,7 +36,6 @@ skills_impl \
 olc \
 liquid \
 clan \
-feniaroot \
 selfrate \
 gquest \
 languages \
@@ -54,5 +53,6 @@ cards \
 religion \
 web \
 riding \
-craft
+craft \
+feniaroot 
 
