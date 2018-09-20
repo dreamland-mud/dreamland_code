@@ -53,6 +53,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
     criteria = &SkillInfo::cmp_by_level;
     fUsableOnly = false;
     fShowHint = false;
+    fCurrentProfAll = false;
 
     if (arg1.empty( )) {
         arg1 = "now";
@@ -72,12 +73,12 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 
         if (ch->getProfession( ) == prof_universal) 
             buf 
-            << "        {y{lR" << rcmd << " текущ{lE" << cmd << " curr{lx{w: все доступные на этом уровне " << what << endl;
+            << "        {y{lR" << rcmd << " текущ{lE" << cmd << " curr{lx{w: доступные на всех уровнях у выбранной профессии" << endl;
 
         buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <уровень>{w: " << what << ", которые появятся на этом уровне" << endl;
         buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <уровень1> <уровень2>{w: " << what << ", которые появятся на этом диапазоне уровней" << endl;
         buf << "        {y{lR" << rcmd << " сорт имя|уровень|изучено{lE" << cmd << " sort name|level|learned{lx{w: сортировать " << what << endl;
-        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <названия группы>{w: все " << what << " из этой группы" << endl
+        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <название группы>{w: все " << what << " из этой группы" << endl
             << "" << endl
             << "См. также {W{lR? умения{lE? skills{lx{w, {W{lR? группаумений{lE? glist{lx{w." << endl;
 
@@ -90,8 +91,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 	fUsableOnly = true;
     }
     else if (arg_oneof( arg1, "current", "текущие" )) {
-	levLow = 1;
-	levHigh = ch->getRealLevel( );
+	fCurrentProfAll = true;
     }
     else if (arg1.isNumber( )) {
 	try {
@@ -130,13 +130,9 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 	    return false;
 	}
     }
-    else {
-	group = skillGroupManager->findUnstrict( arg1 );
-
-	if (!group) {
-	    buf << "Такой группы не существует." << endl;
-	    return false;
-	}
+    else if (!(group = skillGroupManager->findUnstrict( arg1 ))) {
+	buf << "Такой группы не существует." << endl;
+	return false;
     }
     
     fRussian = ch->getConfig( )->ruskills;
@@ -146,6 +142,10 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 void AllSkillsList::make( Character *ch )
 {
     SkillInfo info;
+    int savedLevel = ch->getLevel();
+
+    if (fCurrentProfAll)
+	ch->setLevel(MAX_LEVEL);
 
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
 	Skill *skill = SkillManager::getThis( )->find( sn );
@@ -155,6 +155,9 @@ void AllSkillsList::make( Character *ch )
 	    continue;
 
 	if (fUsableOnly && !skill->usable( ch, false ))
+	    continue;
+
+	if (fCurrentProfAll && !skill->usable( ch, false ))
 	    continue;
     
 	if (fSpells != (spell && spell->isCasted( )))
@@ -167,7 +170,7 @@ void AllSkillsList::make( Character *ch )
 
 	if (info.level > levHigh || info.level < levLow)
 	    continue;
-	
+
 	info.name = skill->getNameFor( ch );
 	info.real = skill->getEffective( ch );
 	info.spell = fSpells;
@@ -193,6 +196,9 @@ void AllSkillsList::make( Character *ch )
 	
 	push_back( info );
     }
+
+    if (fCurrentProfAll)
+	ch->setLevel(savedLevel);
 
     sort( criteria );
 }
