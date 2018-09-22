@@ -89,3 +89,18 @@ int XMLAttributeCraft::exp(const DLString &profName) const
     return p->second.exp;
 }
 
+int XMLAttributeCraft::gainExp(const DLString &profName, int xp)
+{
+    Proficiency::iterator p = proficiency.find(profName);
+    if (p == proficiency.end()) {
+        CraftProficiency craftProf;
+        craftProf.level = 1;
+        craftProf.exp = xp;
+        proficiency[profName] = craftProf;
+        return xp;
+    }
+
+    p->second.exp += xp;
+    return p->second.exp;
+}
+

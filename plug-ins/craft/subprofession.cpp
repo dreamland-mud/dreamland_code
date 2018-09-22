@@ -1,9 +1,12 @@
 #include "subprofession.h"
+#include "craft_utils.h"
 #include "craftattribute.h"
 
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
 #include "alignment.h"
+#include "infonet.h"
+#include "wiznet.h"
 #include "room.h"
 #include "race.h"
 #include "merc.h"
@@ -83,26 +86,21 @@ DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) co
 	return getName( );
 }
 
-XMLAttributeCraft::Pointer CraftProfession::getAttr(PCharacter *ch) const
-{
-    return ch->getAttributes( ).getAttr<XMLAttributeCraft>("craft");
-}
-
 int CraftProfession::getLevel( PCharacter *ch ) const
 {
-    return getAttr(ch)->proficiencyLevel(getName());
+    return craft_attr(ch)->proficiencyLevel(getName());
 }
 
 void CraftProfession::setLevel( PCharacter *ch, int level ) const
 {
-    getAttr(ch)->setProficiencyLevel(getName(), level);
+    craft_attr(ch)->setProficiencyLevel(getName(), level);
 }
 
 int CraftProfession::getExpToLevel( PCharacter *ch, int level ) const
 { 
     if (level < 0)
         level = getLevel(ch);
-    return getExpPerLevel(ch,  level + 1) - getTotalExp(ch);
+    return max(0, getExpPerLevel(ch,  level + 1) - getTotalExp(ch));
 }
 
 int CraftProfession::getExpThisLevel( PCharacter *ch ) const
@@ -116,12 +114,40 @@ int CraftProfession::getExpPerLevel( PCharacter *ch, int level ) const
     if (level < 0)
         level = getLevel(ch);
 
-    return baseExp * level;
+    // Summ[x=1..lvl] (base + maxLevel * x)
+    // TNL: base + maxLevel * maxLevel * (level + 1)
+   return baseExp * level + maxLevel * maxLevel * level * (level + 1) / 2;
 }
 
 int CraftProfession::getTotalExp( PCharacter *ch ) const
 {
-    return getAttr(ch)->exp(getName());
+    return craft_attr(ch)->exp(getName());
+}
+
+int CraftProfession::gainExp( PCharacter *ch, int xp ) const
+{
+    XMLAttributeCraft::Pointer attr = craft_attr(ch);
+    int level = attr->proficiencyLevel(getName());
+    int total_xp = attr->gainExp(getName(), xp);
+
+    ch->pecho("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2.", xp, getRusName().c_str());
+
+    if (level >= maxLevel)
+    	return total_xp;
+    
+    while (getExpToLevel(ch) <= 0) {
+        level++;
+        attr->setProficiencyLevel(getName(), level);
+        ch->pecho("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!",
+                   level, getRusName().c_str());
+
+        infonet("{CРадостный голос из $o2: {W$C1 дости$Gгло|г|гла новой ступени профессионального мастерства.{x", 
+                 ch, 0);
+
+        wiznet(WIZ_LEVELS, 0, 0, 
+	          "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
+                  ch, level, getRusName().c_str());
+    }
 }
 
 /*-------------------------------------------------------------------

@@ -63,12 +63,12 @@ public:
     virtual int getExpThisLevel( PCharacter * ) const;
     virtual int getExpPerLevel( PCharacter *, int level = -1  ) const;
     virtual int getTotalExp( PCharacter * ) const;
+    virtual int gainExp( PCharacter *ch, int xp ) const;
     
 protected:
-    XMLAttributeCraft::Pointer getAttr(PCharacter *ch) const;
-
     XML_VARIABLE XMLString  name, rusName, mltName;
     XML_VARIABLE XMLInteger baseExp;
+    XML_VARIABLE XMLInteger maxLevel;
     XML_VARIABLE XMLPointerNoEmpty<CraftProfessionHelp> help;
 };
 

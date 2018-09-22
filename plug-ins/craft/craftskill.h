@@ -30,6 +30,7 @@ public:
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
+    virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
 
     virtual void show( PCharacter *, std::ostream & ); 
 
@@ -39,8 +40,6 @@ public:
     }
 
 protected:
-    XMLAttributeCraft::Pointer getAttr(Character *ch) const;
-
     static const DLString CATEGORY;
 
     XML_VARIABLE XMLInteger weight;    

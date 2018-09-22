@@ -55,6 +55,7 @@ public:
 
 	int proficiencyLevel(const DLString &profName) const;
 	int exp(const DLString &profName) const;
+	int gainExp(const DLString &profName, int xp);
 	bool learned(const DLString &profName) const;
         inline const Proficiency &getProficiency() const;
         void setProficiencyLevel(const DLString &profName, int level);
