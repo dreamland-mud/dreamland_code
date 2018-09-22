@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include <list>
 #include "loadsave.h"
 #include "save.h"
 
@@ -18,7 +19,6 @@
 
 WEARLOC(none);
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
-
 
 // Parse string argument as if it contains entity ID.
 long long get_arg_id( const DLString &cArgument )
@@ -499,11 +499,10 @@ int count_char_room( Character *ch, char *argument )
 {
 	char arg[MAX_INPUT_LENGTH];
 	Character *rch;
-	int number;
 	int count;
 	int ugly;
 
-	number = number_argument( argument, arg );
+	int number = number_argument( argument, arg );
 	count  = 0;
 	ugly   = 0;
 
@@ -654,6 +653,19 @@ Object * get_obj_list_type( Character *ch, int type, Object *list )
 	    return obj;
 
     return NULL;
+}
+
+std::list<Object *> get_objs_list_type( Character *ch, int type, Object *list )
+{
+    Object *obj;
+    std::list<Object *> result;    
+
+    for (obj = list; obj; obj = obj->next_content)
+	if (obj->item_type == type
+	    && (ch->can_see( obj ) || ch->can_hear( obj )))
+	    result.push_back(obj);
+
+    return result;
 }
 
 Object * get_obj_room_type( Character *ch, int type )
