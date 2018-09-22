@@ -83,20 +83,23 @@ CMDADM( codesource )
     }
 
     if(cmd.strPrefix("list")) {
+	ostringstream buf;
+	char header[MAX_STRING_LENGTH];
 	CodeSource::Manager::iterator i;
 
-	page_to_char( "CodeSources in use:\r\n", ch );
-	
+	buf << "{YСценарии{x (всего " << CodeSource::manager->size() << "):" << endl;
+	sprintf(header, "{W[%5s] %8s  %-36s %s{x\r\n", "Номер", "Автор:", "Название", "Используется функций");
+        buf << header;
+
 	for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
-	    char buf[MAX_STRING_LENGTH];
-	    
-	    sprintf( buf, "[%lu] %s: %s {D(%d functions active){x\r\n", 
+	    sprintf( header, "[%5u] {g%8s{x: %-36s {D(%lu функц.){x\r\n", 
 		    i->getId( ), 
 		    i->author.c_str( ), 
 		    i->name.c_str( ),
 		    i->functions.size( ));
-	    page_to_char(buf, ch);
+            buf << header;
 	}
+	page_to_char(buf.str().c_str(), ch);
 	return;
     }
     
@@ -136,7 +139,7 @@ CMDADM( codesource )
 	}
 	
 	char buf[MAX_STRING_LENGTH];
-	sprintf( buf, "[%lu] %s: %s\r\n", 
+	sprintf( buf, "[%u] {g%s{x: %s\r\n", 
 		    i->getId(), 
 		    i->author.c_str( ),
 		    i->name.c_str( ));
