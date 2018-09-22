@@ -39,5 +39,8 @@ PCharacter * arg2player( const Register & );
 Character * args2character( const RegisterList & );
 PCharacter * args2player( const RegisterList & );
 
+Character *argnum2character(const RegisterList &args, int num);
+PCharacter *argnum2player(const RegisterList &args, int num);
+int argnum2number(const RegisterList &args, int num);
 #endif
 

@@ -41,6 +41,7 @@
 #include "xmlattributecoder.h"
 #include "xmlattributerestring.h"
 #include "pet.h"
+#include "recipeflags.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -70,6 +71,7 @@ DESIRE(drunk);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 const char *ttype_name( int ttype );
 DLString regfmt(Character *to, const RegisterList &argv);
+list< ::Object *> get_objs_list_type( Character *ch, int type, ::Object *list );
 
 using namespace std;
 using namespace Scripting;
@@ -936,6 +938,35 @@ NMI_INVOKE( CharacterWrapper, get_obj_carry_type, "(.tables.item_table.*) вернет
     return wrap( ::get_obj_carry_type( target, args2number( args ) ) );
 }
 
+NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(имя жидкости) вернет емкость в инвентаре с заданной жидкостью" )
+{
+    checkTarget( );
+
+    DLString liqName = args2string(args);
+    Liquid *liquid = liquidManager->find(liqName);
+    if (!liquid)
+	throw Scripting::CustomException( "Invalid liquid name");
+
+    list< ::Object *> drinks = ::get_objs_list_type(target, ITEM_DRINK_CON, target->carrying);
+    for (list< ::Object *>::iterator o = drinks.begin(); o != drinks.end(); o++)
+	if (liquidManager->find((*o)->value[2]) == liquid)
+	    return wrap(*o);
+
+    return Register();
+}
+
+NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(.tables.recipe_flags.*) вернет рецепт в инвентаре с заданным флагом" )
+{
+    checkTarget( );
+
+    bitstring_t flag = args2number(args);
+    list< ::Object *> recipes = ::get_objs_list_type(target, ITEM_RECIPE, target->carrying);
+    for (list< ::Object *>::iterator o = recipes.begin(); o != recipes.end(); o++)
+	if (IS_SET((*o)->value[0], flag))
+	    return wrap(*o);
+
+    return Register();
+}
 NMI_INVOKE( CharacterWrapper, get_obj_room, "параметры: строка с именем объекта. вернет видимый нам объект в комнате" )
 {
     checkTarget( );
@@ -1394,77 +1425,6 @@ NMI_INVOKE( CharacterWrapper, damage, "параметры: victim, размер повреждений, на
     return Register( );
 }
 
-
-NMI_INVOKE( CharacterWrapper, setSkillLearned, "" )
-{
-    Skill *skill;
-    int value;
-    
-    checkTarget( );
-    CHK_NPC
-
-    if (args.size( ) < 2)
-	throw Scripting::NotEnoughArgumentsException( );
-    
-    DLString d = args.front().toString();
-    skill = SkillManager::getThis( )->findExisting( d.c_str( ) );
-    value = args.back( ).toNumber( );
-    
-    if (!skill || value < 0)
-	throw Scripting::IllegalArgumentException( );
-    
-    target->getPC( )->getSkillData( skill->getIndex( ) ).learned = value;
-    return Register( );
-}
-
-NMI_INVOKE( CharacterWrapper, getSkill, "узнать процент раскачки скила с данным именем" )
-{
-    Skill *skill;
-    
-    checkTarget( );
-
-    if (args.size() < 1)
-	throw Scripting::NotEnoughArgumentsException( );
-	
-    DLString d = args.front().toString();
-    skill = SkillManager::getThis( )->findExisting( d.c_str( ) );
-
-    if (!skill)
-	throw Scripting::IllegalArgumentException( );
-
-    return Register( skill->getEffective( target ) );
-}
-
-NMI_INVOKE( CharacterWrapper, improveSkill, "попытаться улучшить знание указанного скила, на успехе/неудаче (true/false). необязательный параметр - жертва" )
-{
-    RegisterList::const_iterator i;
-    Skill *skill;
-    Character *victim = NULL;
-    int success, weight;
-    
-    checkTarget( );
-
-    if (args.size() < 3)
-	throw Scripting::NotEnoughArgumentsException( );
-    
-    i = args.begin( );
-    DLString d = i->toString();
-    skill = SkillManager::getThis( )->findExisting( d.c_str( ) );
-    i++;
-    success = i->toNumber( );
-    i++;
-    weight = i->toNumber( );
-    i++;
-
-    if (i != args.end( ))
-	victim = arg2character( *i );
-
-    if (!skill || weight <= 0)
-	throw Scripting::IllegalArgumentException( );
-    
-    skill->improve( target, success, victim );
-    return Register( );
-}
 
 NMI_INVOKE( CharacterWrapper, spell, "скастовать заклинание ( название, уровень, жертва, спелбанить? )")
 {

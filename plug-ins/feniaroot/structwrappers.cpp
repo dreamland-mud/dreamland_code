@@ -703,6 +703,17 @@ NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) кол-во опыта до следующ
     return craftProfessionManager->get( name )->getExpToLevel(ch);
 }
 
+NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp) заработать очков опыта в этой профессии" )
+{
+    if (args.size( ) != 2)
+	throw Scripting::NotEnoughArgumentsException( );
+    
+    PCharacter *ch = arg2player(args.front());
+    int exp = args.back().toNumber();
+    craftProfessionManager->get(name)->gainExp(ch, exp);
+    return Scripting::Register();
+}
+
 /*----------------------------------------------------------------------
  * Skill
  *----------------------------------------------------------------------*/
@@ -737,13 +748,48 @@ NMI_GET( SkillWrapper, name, "название умения" )
     return skillManager->find( name )->getName( );
 }
 
+NMI_GET( SkillWrapper, nameRus, "название умения по-русски" ) 
+{
+    return skillManager->find( name )->getRussianName( );
+}
+
 NMI_INVOKE( SkillWrapper, usable, "(ch) доступно ли умение для использования прямо сейчас" )
 {
     Character *ch = args2character(args);
     return skillManager->find( name )->usable( ch, false );
 }
 
-NMI_GET( SkillWrapper, nameRus, "название умения по-русски" ) 
+NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]) вернуть разученность или установить ее в percent" )
 {
-    return skillManager->find( name )->getRussianName( );
+    PCharacter *ch = args2player(args); 
+    int sn = skillManager->find(name)->getIndex();
+
+    if (args.size() > 1) {
+        int value = args.back( ).toNumber( );
+        
+        if (value < 0)
+            throw Scripting::IllegalArgumentException( );
+        
+        ch->getSkillData(sn).learned = value;
+        return Register( );
+    }
+
+    return Register(ch->getSkillData(sn).learned);
 }
+
+NMI_INVOKE( SkillWrapper, effective, "(ch) узнать процент раскачки у персонажа" )
+{
+    PCharacter *ch = args2player(args); 
+    return Register( skillManager->find(name)->getEffective(ch) );
+}
+
+NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]) попытаться улучшить знание умения на успехе/неудаче (true/false), применен на жертву" )
+{
+    PCharacter *ch = argnum2player(args, 1);
+    int success = argnum2number(args, 2);
+    Character *victim = args.size() > 2 ? argnum2character(args, 3) : NULL;
+     
+    skillManager->find( name )->improve( ch, success, victim );
+    return Register( );
+}
+

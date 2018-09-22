@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "wrap_utils.h"
+#include "logstream.h"
 
 #include "affect.h"
 #include "pcharacter.h"
@@ -114,5 +115,37 @@ void args2buf(const RegisterList &args, char *buf, size_t bufsize)
 {
     strncpy(buf, args2string(args).c_str(), bufsize);
     buf[bufsize - 1] = 0;
+}
+
+static const Register & argnum(const RegisterList &args, int num)
+{
+    if (args.size() < (unsigned int)num)
+        throw Scripting::NotEnoughArgumentsException();
+    
+    RegisterList::const_iterator a;
+    int i;
+    for (a = args.begin(), i = 1; i <= num - 1 && a != args.end(); i++, a++) 
+        ; 
+    return *a;
+}
+
+
+Character *argnum2character(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return wrapper_cast<CharacterWrapper>(reg)->getTarget();
+}
+
+PCharacter *argnum2player(const RegisterList &args, int num)
+{
+    Character *ch = argnum2character(args, num);
+    if (ch->is_npc())
+        throw Scripting::CustomException("Mobile found when PC expected.");
+    return ch->getPC();
+}
+
+int argnum2number(const RegisterList &args, int num)
+{
+    return argnum(args, num).toNumber();
 }
 
