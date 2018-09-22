@@ -511,8 +511,8 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 	return true;
 
     if (verbose)
-	ch->pecho( "%^C1 не может научить тебя искусству '%s'.\n"
-	       "Для большей информации используй glist, slook.",
+	ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
+	       "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
 	       mob, getNameFor( ch ).c_str( ) );
     return false;
 }

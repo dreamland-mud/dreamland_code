@@ -7,6 +7,7 @@
 #include "hometown.h"
 #include "skill.h"
 #include "profession.h"
+#include "subprofession.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "pcrace.h"
@@ -628,5 +629,167 @@ NMI_INVOKE( ClanWrapper, diplomacy, "" )
 	      [ diplomacy_number( clanManager->find( name ),
 	                          clanManager->findExisting( otherName ) )
 	      ];
+}
+
+/*----------------------------------------------------------------------
+ * CraftProfession
+ *----------------------------------------------------------------------*/
+NMI_INIT(CraftProfessionWrapper, "craftprofession");
+
+CraftProfessionWrapper::CraftProfessionWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register CraftProfessionWrapper::wrap( const DLString &name )
+{
+    CraftProfessionWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+NMI_INVOKE( CraftProfessionWrapper, api, "печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<CraftProfessionWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( CraftProfessionWrapper, name, "название профессии" ) 
+{
+    return craftProfessionManager->get( name )->getName( );
+}
+
+NMI_GET( CraftProfessionWrapper, nameRus, "название по-русски с падежами" ) 
+{
+    return craftProfessionManager->get( name )->getRusName( );
+}
+
+NMI_GET( CraftProfessionWrapper, nameMlt, "название во множественном числе" ) 
+{
+    return craftProfessionManager->get( name )->getMltName( );
+}
+
+NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить персонажу уровень мастерства в этой профессии" )
+{
+    if (args.size( ) != 2)
+	throw Scripting::NotEnoughArgumentsException( );
+    
+    PCharacter *ch = arg2player(args.front());
+    int level = args.back().toNumber();
+    craftProfessionManager->get(name)->setLevel(ch, level);
+    return Scripting::Register();
+}
+
+NMI_INVOKE( CraftProfessionWrapper, getLevel, "(ch) получить уровень мастерства персонажа в этой профессии" )
+{
+    PCharacter *ch = args2player(args);
+    return craftProfessionManager->get( name )->getLevel(ch);
+}
+
+NMI_INVOKE( CraftProfessionWrapper, getTotalExp, "(ch) суммарный опыт персонажа в этой профессии" )
+{
+    PCharacter *ch = args2player(args);
+    return craftProfessionManager->get( name )->getTotalExp(ch);
+}
+
+NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) кол-во опыта до следующего уровня мастерства в этой профессии" )
+{
+    PCharacter *ch = args2player(args);
+    return craftProfessionManager->get( name )->getExpToLevel(ch);
+}
+
+NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp) заработать очков опыта в этой профессии" )
+{
+    if (args.size( ) != 2)
+	throw Scripting::NotEnoughArgumentsException( );
+    
+    PCharacter *ch = arg2player(args.front());
+    int exp = args.back().toNumber();
+    craftProfessionManager->get(name)->gainExp(ch, exp);
+    return Scripting::Register();
+}
+
+/*----------------------------------------------------------------------
+ * Skill
+ *----------------------------------------------------------------------*/
+NMI_INIT(SkillWrapper, "skill");
+
+SkillWrapper::SkillWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register SkillWrapper::wrap( const DLString &name )
+{
+    SkillWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+NMI_INVOKE( SkillWrapper, api, "печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<SkillWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+
+NMI_GET( SkillWrapper, name, "название умения" ) 
+{
+    return skillManager->find( name )->getName( );
+}
+
+NMI_GET( SkillWrapper, nameRus, "название умения по-русски" ) 
+{
+    return skillManager->find( name )->getRussianName( );
+}
+
+NMI_INVOKE( SkillWrapper, usable, "(ch) доступно ли умение для использования прямо сейчас" )
+{
+    Character *ch = args2character(args);
+    return skillManager->find( name )->usable( ch, false );
+}
+
+NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]) вернуть разученность или установить ее в percent" )
+{
+    PCharacter *ch = args2player(args); 
+    int sn = skillManager->find(name)->getIndex();
+
+    if (args.size() > 1) {
+        int value = args.back( ).toNumber( );
+        
+        if (value < 0)
+            throw Scripting::IllegalArgumentException( );
+        
+        ch->getSkillData(sn).learned = value;
+        return Register( );
+    }
+
+    return Register(ch->getSkillData(sn).learned);
+}
+
+NMI_INVOKE( SkillWrapper, effective, "(ch) узнать процент раскачки у персонажа" )
+{
+    PCharacter *ch = args2player(args); 
+    return Register( skillManager->find(name)->getEffective(ch) );
+}
+
+NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]) попытаться улучшить знание умения на успехе/неудаче (true/false), применен на жертву" )
+{
+    PCharacter *ch = argnum2player(args, 1);
+    int success = argnum2number(args, 2);
+    Character *victim = args.size() > 2 ? argnum2character(args, 3) : NULL;
+     
+    skillManager->find( name )->improve( ch, success, victim );
+    return Register( );
 }
 
