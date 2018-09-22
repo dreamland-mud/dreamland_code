@@ -382,7 +382,7 @@ NMI_INVOKE( ObjectWrapper, obj_to_char , "")
     
     obj_from_anywhere( target );
     ::obj_to_char( target, chWrap->getTarget( ) );
-    return Register( );
+    return wrap(target);
 }
 
 NMI_INVOKE( ObjectWrapper, obj_from_room , "deprecated")
@@ -402,7 +402,7 @@ NMI_INVOKE( ObjectWrapper, obj_to_room , "")
     
     obj_from_anywhere( target );
     ::obj_to_room( target, roomWrap->getTarget( ) );
-    return Register( );
+    return wrap(target);
 }
 
 NMI_INVOKE( ObjectWrapper, obj_from_obj , "deprecated")
@@ -422,7 +422,7 @@ NMI_INVOKE( ObjectWrapper, obj_to_obj , "")
     
     obj_from_anywhere( target );
     ::obj_to_obj( target, objWrap->getTarget( ) );
-    return Register( );
+    return wrap(target);
 }
 
 NMI_INVOKE( ObjectWrapper, extract , "")

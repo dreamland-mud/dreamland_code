@@ -14,6 +14,7 @@
 #include "reglist.h"
 #include "register-impl.h"
 #include "nativeext.h"
+#include "wrap_utils.h"
 
 #include "def.h"
 
@@ -167,6 +168,17 @@ NMI_GET( ObjIndexWrapper, instances, "список всех предметов с этим pIndexData" )
     obj->setHandler(rc);
 
     return Register( obj );
+}
+
+NMI_INVOKE( ObjIndexWrapper, property, "(имя) свойство прототипа с данным именем или null" )
+{
+    checkTarget();
+    DLString name = args2string(args);
+    Properties::const_iterator p = target->properties.find(name);
+    if (p == target->properties.end())
+        return Register();
+    else
+        return Register(p->second);
 }
 
 NMI_INVOKE( ObjIndexWrapper, api, "печатает этот API" )
