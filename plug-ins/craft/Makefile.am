@@ -5,10 +5,12 @@ include $(top_srcdir)/src/Makefile.inc
 
 libcraft_la_SOURCES = \
 impl.cpp \
+recipeflags.cpp \
 subprofession.cpp \
 craftskill.cpp \
 craftattribute.cpp \
-craftwearloc.cpp
+craftwearloc.cpp \
+craft_utils.cpp
 
 libcraft_la_MOC = \
 subprofession.h \
@@ -48,3 +50,8 @@ $(LIBADD_AI) \
 ../services/shop/libservices_shop.la \
 ../services/petshop/libservices_petshop.la 
 
+recipeflags.cpp: recipeflags.conf recipeflags.h
+recipeflags.h: recipeflags.conf
+recipeflags.cpp: recipeflags.h
+
+CLEANFILES = recipeflags.cpp $(top_builddir)/src/recipeflags.h 
