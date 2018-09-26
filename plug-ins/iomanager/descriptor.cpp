@@ -129,6 +129,7 @@ int Descriptor::inputChar( unsigned char i )
     return -1;
 }
 
+
 int Descriptor::inputTelnet( unsigned char i )
 {
     switch(telnet.state) {
@@ -253,7 +254,7 @@ int Descriptor::inputTelnet( unsigned char i )
                 case TELOPT_TTYPE:
                     static const unsigned char ttype_qry_str[] = { 
                         IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE };
-                    writeFd(ttype_qry_str, sizeof(ttype_qry_str));
+                    writeRaw(ttype_qry_str, sizeof(ttype_qry_str));
                     break;
             }
 	    telnet.state = TNS_NORMAL;
@@ -264,7 +265,8 @@ int Descriptor::inputTelnet( unsigned char i )
 #ifdef MCCP
                 case TELOPT_COMPRESS:
                 case TELOPT_COMPRESS2:
-		    stopMccp();
+		    if (compressing == i)
+			stopMccp();
                     break;
 #endif
             }
@@ -272,12 +274,13 @@ int Descriptor::inputTelnet( unsigned char i )
             break;
 
 	default:
-	    LogStream::sendError() << "telnet: unknown state" << endl;
+	    LogStream::sendError() << "telnet: unknown state " << i << endl;
 	    telnet.state = TNS_NORMAL;
     }
 
     return i;
 }
+
 
 #ifdef __MINGW32__
 static int

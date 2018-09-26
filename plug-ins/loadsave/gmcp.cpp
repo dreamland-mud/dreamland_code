@@ -76,7 +76,7 @@ void GMCPHandler::send(Descriptor *d, const string &package, const string &messa
         << C_IAC << C_SE;
 
     string str = buf.str();
-//    LogStream::sendDebug() << "Sending GMCP data " << data << endl;
-    d->writeFd(str.c_str());
+    LogStream::sendNotice() << "Sending GMCP data " << data << endl;
+    d->writeRaw((const unsigned char *)str.c_str(), str.size());
 }
 
