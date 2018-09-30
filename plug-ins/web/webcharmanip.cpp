@@ -18,7 +18,6 @@
 #include "commandmanager.h"
 #include "mobilebehavior.h"
 #include "behavior_utils.h"
-
 #include "object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -30,6 +29,7 @@
 #include "attract.h"
 #include "occupations.h"
 #include "shoptrader.h"
+#include "lover.h"
 #include "move_utils.h"
 #include "act_lock.h"
 #include "handler.h"
@@ -77,6 +77,27 @@ static bool has_trigger_group( Character *ch, Character *victim )
     return true;
 }
 
+static bool has_trigger_nuke( Character *ch, Character *victim )
+{
+    return ch != victim && is_same_group(victim, ch);
+}
+
+static bool has_trigger_mount( Character *victim )
+{
+    if (!victim->is_npc())
+	return IS_SET(victim->form, FORM_CENTAUR);
+    else
+	return IS_SET(victim->act, ACT_RIDEABLE);
+}
+
+static bool has_trigger_murder(Character *ch, Character *victim)
+{
+    return !ch->is_npc() 
+		&& !victim->is_npc() 
+		&& ch != victim
+		&& !is_safe_nomessage(ch, victim);
+}
+
 /*
  * Decorate a PC character with drop-down menu of applicable commands.
  */
@@ -94,6 +115,20 @@ WEBMANIP_RUN(decoratePlayer)
 
 	if (has_trigger_group( ch, victim ))
 	    manips.add( "group" );
+
+	if (has_trigger_nuke( ch, victim ))
+	    manips.add( "nuke" );
+
+	if (has_trigger_mount( victim ))
+	    manips.add( "mount" );
+
+        manips.add( "smell" );
+
+        if (mlove_accepts(ch, victim))
+	    manips.add("mlove");
+         
+        if (has_trigger_murder(ch, victim))
+	    manips.add("murder");
     }
 
     manips.add( "grats" );

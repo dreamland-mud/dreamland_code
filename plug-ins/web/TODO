@@ -86,14 +86,14 @@ Bugs:
 
 PC рядом в комнате:
 * look
-- smell if set
-- mount if centaur
-- mlove if lover
-- murder, consider if pk
-- follow if doesn't follow
-- group if follows and can group
-- nuke if same group
-- all global commands
+* smell 
+* mount if centaur
+* mlove if lover
+* murder, consider if pk
+* follow if doesn't follow
+* group if follows and can group
+* nuke if same group
+* all global commands
 ? social and mysocial in submenu https://www.codeply.com/go/1Iz3DxS60l
 
 PC глобально (who, webclient who, scan, where):

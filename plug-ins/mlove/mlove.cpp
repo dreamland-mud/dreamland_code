@@ -7,6 +7,7 @@
 #include "commandtemplate.h"
 
 #include "xmllovers.h"
+#include "lover.h"
 #include "xmlattributelovers.h"
 
 #include "wrapperbase.h"
@@ -102,32 +103,21 @@ CMDRUN( mlove )
 	    ch->send_to("Тебе нельзя.\n\r");
 	    return;
 	}
-	
-	if (!victim->is_npc()) {
-	    XMLAttributeLovers::Pointer pointer;
-	    
-	    XMLAttributes* attributes = &victim->getPC( )->getAttributes( );
-	    XMLAttributes::iterator ipos = attributes->find( "lovers" );	
-	
-	    if (ipos != attributes->end( ) &&
-		!(pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( ))
-	    {
-		if (pointer->lovers.isPresent( ch->getName() ) ) {
-		    ch->mana -= ch->mana / 4;
-		    victim->mana -= victim->mana / 4;
-		    ch->move -= ch->move / 4;
-		    victim->move -= victim->move / 4;
- 
-		    act_p("Ты срываешь с $C2 одежду и страстно занимаешься с $Y любовью.", ch, 0, victim, TO_CHAR, POS_RESTING);
-		    act_p("$c1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, 0, victim, TO_VICT, POS_RESTING);
-		    act_p("$c1 срывает с $C2 одежду и страстно занимается с $Y любовью.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-		    
-		    MLOVE_DAZE(victim);
-		    MLOVE_DAZE(ch);
-		    
-		    return;
-		}
-	    }
+
+        if (mlove_accepts(ch, victim)) {	
+            ch->mana -= ch->mana / 4;
+            victim->mana -= victim->mana / 4;
+            ch->move -= ch->move / 4;
+            victim->move -= victim->move / 4;
+
+            act_p("Ты срываешь с $C2 одежду и страстно занимаешься с $Y любовью.", ch, 0, victim, TO_CHAR, POS_RESTING);
+            act_p("$c1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, 0, victim, TO_VICT, POS_RESTING);
+            act_p("$c1 срывает с $C2 одежду и страстно занимается с $Y любовью.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            
+            MLOVE_DAZE(victim);
+            MLOVE_DAZE(ch);
+            
+            return;
 	}
 	
 	act_p("О$Gно|н|на тебя не хочет.", ch, 0, victim, TO_CHAR, POS_RESTING);
