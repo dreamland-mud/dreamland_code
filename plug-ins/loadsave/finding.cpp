@@ -19,6 +19,7 @@
 
 WEARLOC(none);
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
+bool char_has_name(Character *target, const char *arg);
 
 // Parse string argument as if it contains entity ID.
 long long get_arg_id( const DLString &cArgument )
@@ -120,14 +121,14 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
 	    {
                 if (id && tch->getID( ) == id)
                     return rch;
-		if (id || !is_name( argument, tch->getNameP( ) ))
+		if (id || !char_has_name(tch, argument))
 		    continue;
 	    }
 	    else
 	    {
                 if (id && tch->getID( ) == id)
                     return rch;
-		if (id || !is_name( argument, tch->getNameP( '7' ).c_str() ))
+		if (id || !char_has_name(tch, argument))
 		    continue;
 	    }
 
@@ -167,7 +168,7 @@ Character *get_char_area( Character *ch, char *argument )
 			|| ach->in_room->area != ch->in_room->area
 			|| !ch->can_see( ach )
                         || (id && ach->getID( ) != id)
-			|| (!id && !is_name( arg, ach->getNameP( '7' ).c_str() )) )
+			|| (!id && !char_has_name(ach, arg)) )
 		{
 			continue;
 		}
@@ -211,7 +212,7 @@ Character *get_char_world( Character *ch, const char *cArgument )
 		    continue;
 		if (!ch->can_see( wch ))
 		    continue;
-		if (!is_name( arg, wch->getNameP( '7' ).c_str() ))
+		if (!char_has_name(wch, arg))
 		    continue;
 
 		if ( ++count >= number )
@@ -528,16 +529,8 @@ int count_char_room( Character *ch, char *argument )
 		
 		tch = rch->getDoppel( ch );
 
-		if ( tch->is_npc( ) )
-		{
-			if ( !is_name( argument, tch->getNameP( ) ) )
-				continue;
-		}
-		else
-		{
-			if ( !is_name( argument, tch->getNameP( '7' ).c_str() ) )
-				continue;
-		}
+		if (!char_has_name(tch, argument))
+			continue;
 
 		count++;
 	}
@@ -747,7 +740,7 @@ Character *get_char_world_doppel( Character *ch, const char *cArgument )
 	    continue;
 	if (!ch->can_see( dch ))
 	    continue;
-	if (!is_name( arg, dch->getNameP( '7' ).c_str() ))
+	if (!char_has_name( dch, arg ))
 	    continue;
 
 	if ( ++count >= number )
@@ -780,7 +773,7 @@ PCharacter * get_player_world( PCharacter *ch, const char *arg )
 	if (!ch->can_see( victim ))
 	    continue;
 
-	if (!is_name( arg, victim->getNameP( '7' ).c_str( ) ))
+	if (!char_has_name( victim, arg ))
 	    continue;
 	
 	return victim;
@@ -925,6 +918,13 @@ bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
 
     // For items inside PC corpses and the like: match only by names.
     return is_name( arg.c_str( ), obj->getName( ) );
+}
+
+// Return true if arg matches one of the character names or short descriptions.
+// Doppel is already applied.
+bool char_has_name(Character *target, const char *arg)
+{
+    return is_name(arg, target->getNameP('7').c_str());
 }
 
 bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id )
