@@ -62,9 +62,9 @@ private:
     XML_VARIABLE XMLString  msgCharNotFound;
     XML_VARIABLE XMLString  msgCharAuto;
     XML_VARIABLE XMLString  msgOthersAuto;
-    XML_VARIABLE XMLString  msgCharFound2;
-    XML_VARIABLE XMLString  msgOthersFound2;
-    XML_VARIABLE XMLString  msgVictimFound2;
+    XML_VARIABLE XMLStringNoEmpty  msgCharFound2;
+    XML_VARIABLE XMLStringNoEmpty  msgOthersFound2;
+    XML_VARIABLE XMLStringNoEmpty  msgVictimFound2;
     XML_VARIABLE XMLStringList aliases;
 
     XML_VARIABLE XMLEnumeration position;
