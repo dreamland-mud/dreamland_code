@@ -50,10 +50,28 @@ struct PlayerManipList : public ManipList {
         this->descr = descr;
     }
 
+    // Add commands to the main list, with various arguments.
+    void add( const DLString &cmdName ) {
+        manips.push_back( Manip( cmdName, THIS ) );
+    }
+
+    virtual DLString getID( ) const {
+        return victim->getName( );
+    }
+};
+
+struct MobileManipList : public ManipList {
+    NPCharacter *victim;
+
+    MobileManipList( NPCharacter *victim, const DLString &descr ) {
+        this->victim = victim;
+        this->descr = descr;
+    }
+
     // Add commands to the list that is going to be shown
     // below the divider and passed in the 'l' attribute.
-    void addLocal( const DLString &cmdName ) {
-        locals.push_back( Manip( cmdName, THIS ) );
+    void addLocal( const DLString &cmdName, const DLString &args ) {
+        locals.push_back( Manip( cmdName, args ) );
     }
 
     // Add commands to the main list, with various arguments.
@@ -62,7 +80,7 @@ struct PlayerManipList : public ManipList {
     }
 
     virtual DLString getID( ) const {
-        return victim->getName( );
+        return DLString( victim->getID( ) );
     }
 };
 
@@ -96,6 +114,12 @@ static bool has_trigger_murder(Character *ch, Character *victim)
 		&& !victim->is_npc() 
 		&& ch != victim
 		&& !is_safe_nomessage(ch, victim);
+}
+
+static bool has_trigger_kill(Character *ch, Character *victim)
+{
+    return victim->master != ch
+           && !is_safe_nomessage(ch, victim);
 }
 
 /*
@@ -138,6 +162,69 @@ WEBMANIP_RUN(decoratePlayer)
     return true;
 }
 
+/*
+ * Decorate a NPC character with drop-down menu of applicable commands.
+ */
+WEBMANIP_RUN(decorateMobile)
+{
+    const MobManipArgs &myArgs = static_cast<const MobManipArgs &>( args );
+    Character *ch = myArgs.target;
+    NPCharacter *victim = myArgs.victim;
+
+    MobileManipList manips( victim, myArgs.descr );
+
+    if (ch->in_room == victim->in_room) {
+        manips.add( "look" );
+
+	if (mob_has_occupation(victim, OCC_TRAINER) && ch->getPC()) {
+	    for (int i = 0; i < stat_table.size; i++)
+		if (ch->perm_stat[stat_table.fields[i].value] < ch->getPC()->getMaxTrain( stat_table.fields[i].value))
+		    manips.addLocal("train", russian_case(stat_table.fields[i].message, '4'));
+
+	    if (ch->perm_stat[STAT_CON] < ch->getPC()->getMaxTrain( STAT_CON ))
+		manips.addLocal("train", "сложение кп");
+
+	    manips.addLocal("gain", "продать");
+	    manips.addLocal("gain", "купить");
+        }
+
+	if (mob_has_occupation(victim, OCC_PRACTICER)) 
+	    manips.addLocal("practice", "здесь");
+
+	if (mob_has_occupation(victim, OCC_HEALER)) 
+	    manips.addLocal("heal", "");
+
+	if (mob_has_occupation(victim, OCC_SMITHMAN)) 
+	    manips.addLocal("smith", "");
+
+	if (mob_has_occupation(victim, OCC_SHOPPER)) 
+	    manips.addLocal("list", "");
+
+	if (mob_has_occupation(victim, OCC_QUEST_MASTER)) {
+	    manips.addLocal("quest", "попросить");
+	    manips.addLocal("quest", "сдать");
+	    manips.addLocal("quest", "отменить");
+        }
+
+	if (mob_has_occupation(victim, OCC_QUEST_TRADER)) {
+	    manips.addLocal("quest", "список");
+        }
+
+	if (has_trigger_mount( victim ))
+	    manips.add( "mount" );
+
+        manips.add( "consider" );
+        if (has_trigger_kill(ch, victim))
+	    manips.add("kill");
+
+        manips.add( "smell" );
+        manips.add( "follow" );
+	if (has_trigger_nuke( ch, victim ))
+	    manips.add( "nuke" );
+    }
+
+    buf << manips.toString( );
+    return true;
+}
 
 
-    

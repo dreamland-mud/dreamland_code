@@ -587,14 +587,17 @@ void show_char_to_char_0( Character *victim, Character *ch )
 	    && nVict->getLongDescr( ) 
 	    && nVict->getLongDescr( )[0])
 	{
-	    buf << "{" << CLR_MOB(ch) << nVict->getLongDescr( ) << "{x";
+	    buf << "{" << CLR_MOB(ch);
+	    webManipManager->decorateCharacter(buf, nVict->getLongDescr( ), victim, ch);
+            buf << "{x";
 	    show_char_blindness( ch, victim, buf );
 	    ch->send_to( buf);
 	    return;
 	}
     
     if (nVict) {
-	buf << "{" << CLR_MOB(ch) << ch->sees( victim, '1' );
+	buf << "{" << CLR_MOB(ch);
+        webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ), victim, ch);
     }
     else {
 	if (ch->getConfig( )->holy && origVict != victim)

@@ -14,6 +14,7 @@
 class Object;
 class Character;
 class PCharacter;
+class NPCharacter;
 struct ManipCommandArgs;
 struct extra_descr_data;
 
@@ -116,15 +117,28 @@ struct ExtraDescrManipArgs : public ManipCommandArgs {
 };
 
 struct PlayerManipArgs : public ManipCommandArgs {
-	PlayerManipArgs(Character *target, PCharacter *victim, const DLString &descr)
-		: ManipCommandArgs(target)
-	{
-		this->victim = victim;
-		this->descr = descr;
-	}
+    PlayerManipArgs(Character *target, PCharacter *victim, const DLString &descr)
+	    : ManipCommandArgs(target)
+    {
+	this->victim = victim;
+	this->descr = descr;
+    }
 
     PCharacter *victim;
-	DLString descr;
+    DLString descr;
+};
+
+
+struct MobManipArgs : public ManipCommandArgs {
+    MobManipArgs(Character *target, NPCharacter *victim, const DLString &descr)
+	    : ManipCommandArgs(target)
+    {
+	this->victim = victim;
+	this->descr = descr;
+    }
+
+    NPCharacter *victim;
+    DLString descr;
 };
 
 

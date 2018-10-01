@@ -86,8 +86,8 @@ void WebManipManager::decorateCharacter( ostringstream &buf, const DLString &des
     bool result;
 
     if (victim->is_npc( )) {
-        // not implemented
-        result = false;
+        MobManipArgs args( ch, victim->getNPC( ), descr );
+        result = run( buf, COMMAND_NPC, args );
     } else {
         PlayerManipArgs args( ch, victim->getPC( ), descr );
         result = run( buf, COMMAND_PC, args );

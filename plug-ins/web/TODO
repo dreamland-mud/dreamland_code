@@ -103,20 +103,22 @@ PC глобально (who, webclient who, scan, where):
 ? page if both have orbs
 ? twit add|remove
 
-зеркала и доппель: look like original pc
-pc просто по имени
+* зеркала и доппель: look like original pc
+* pc просто по имени
 
 =================================================
 Моб, команды контекстного меню:
 
-look, consider, kill (not on pets), tell if prog, listen if prog, smell if set
-occupations: list, train, prac here, smith, mount if horse
-SET AS TARGET 
-groups: follow, nuke, group
-copy name to buffer - ?
+* look, consider, kill (not on pets), smell
+- tell if prog, listen if prog
+* list, train, prac here, smith
+* mount if horse
+- SET AS TARGET 
+* follow, nuke
+? copy name to buffer 
 
-не делать меню на глобалквестовых мобов (гангстеров)
-ранги на мобов видных по скану?
+- не делать меню на глобалквестовых мобов (гангстеров)
+? ранги на мобов видных по скану
 
 =================================================
 Меню которое возникает если просто кликнуть на окно?
