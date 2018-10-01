@@ -37,54 +37,29 @@
 SPELL_DECL(Aid);
 VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    
-    Affect af;
-
-    if ( ch->isAffected(sn ) )
-      {
+    if (ch->isAffected(sn)) {
 	ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
 	return;
-      }
-
-    af.where	 = TO_AFFECTS;
-    af.type      = sn;
-    af.level     = level;
-    af.duration  = level / 50;
-    af.location  = 0;
-    af.modifier  = 0;
-    af.bitvector = 0;
-    affect_to_char( ch, &af );
+    }
 
     victim->hit += level * 5;
     update_pos( victim );
     victim->send_to("Волна тепла согревает твое тело.\n\r");
     act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
     if (ch != victim) ch->send_to("Ok.\n\r");
-    return;
 
+    postaffect_to_char(ch, sn, level / 50);
 }
 
 
 SPELL_DECL(Assist);
 VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	
-	Affect af;
-
 	if ( ch->isAffected(sn ) )
 	{
 		ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
 		return;
 	}
-
-	af.where	 = TO_AFFECTS;
-	af.type      = sn;
-	af.level     = level;
-	af.duration  = level / 50;
-	af.location  = 0;
-	af.modifier  = 0;
-	af.bitvector = 0;
-	affect_to_char( ch, &af );
 
 	victim->hit += 100 + level * 5;
 	update_pos( victim );
@@ -92,8 +67,8 @@ VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level )
 	act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
 	if ( ch != victim )
 		ch->send_to("Ok.\n\r");
-	return;
 
+        postaffect_to_char(ch, sn, level / 50);
 }
 
 SPELL_DECL(Refresh);

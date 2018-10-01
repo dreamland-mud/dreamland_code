@@ -117,7 +117,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     else {
 	for (int i = 0; i < stat_table.size; i++)
 	    if (argStat.strPrefix( stat_table.fields[i].name )
-		|| argStat.strPrefix( stat_table.fields[i].message ))
+		|| argStat.strPrefix( russian_case(stat_table.fields[i].message, '1') )
+		|| argStat.strPrefix( russian_case(stat_table.fields[i].message, '4') ))
 	    {
 		stat = i;
 		break;
