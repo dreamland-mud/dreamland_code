@@ -21,7 +21,7 @@ void GMCPHandler::sendVersion(Descriptor *d)
 {
     if (IS_SET(d->oob_proto, OOB_GMCP)) {
         LogStream::sendNotice() << "telnet: sending GMCP version" << endl;
-        send(d, "Client", "GUI", "0.3\nhttps://dreamland.rocks/img/dl.zip");
+        send(d, "Client", "GUI", "3\nhttps://dreamland.rocks/img/dl.zip");
     }
 }
 
