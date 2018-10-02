@@ -163,6 +163,7 @@ void PCharacter::load( )
     vuln_flags  = getRace( )->getVuln( );
     form        = getRace( )->getForm() ;
     parts       = getRace( )->getParts( );
+    wearloc.set(getRace()->getWearloc());
 
     /* now start adding back the effects */
     for (Object *obj = carrying; obj != 0; obj = obj->next_content) 

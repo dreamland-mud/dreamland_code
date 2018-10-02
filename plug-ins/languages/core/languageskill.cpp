@@ -107,15 +107,17 @@ bool Language::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
-bool Language::canTeach( NPCharacter *mob, PCharacter *ch )
+bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<Poliglot>( ))
 	return true;
-    
-    if (mob)
-	ch->pecho( "%^C1 отнюдь не полиглот.", mob );
-    else
-	ch->println( "Поищи бродячего монаха." );
+   
+    if (verbose) { 
+        if (mob)
+            ch->pecho( "%^C1 отнюдь не полиглот.", mob );
+        else
+            ch->println( "Поищи бродячего монаха." );
+    }
 
     return false;
 }
@@ -146,7 +148,7 @@ void Language::show( PCharacter *ch, std::ostream & buf )
 
     buf << "Язык '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{W" 
+	<< "входит в группу '{hg{W" 
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
 	<< "{x'"
 	<< endl;

@@ -9,6 +9,7 @@
 
 #include "socialbase.h"
 
+#include "russianstring.h"
 #include "skillreference.h"
 #include "character.h"
 #include "room.h"
@@ -85,9 +86,18 @@ bool SocialBase::dispatch( const InterpretArguments &iargs )
     return true;
 }
 
+static const void *victimOrSelf(Character *ch, Character *victim)
+{
+    static RussianString self("с||ебя||ебя||ебе||ебя||обой||ебе");
+    if (ch == victim)
+        return &self;
+    else
+        return victim;
+}
+
 void SocialBase::run( Character *ch, const DLString &constArguments )
 {
-    Character *victim;
+    Character *victim, *victim2;
     int pos;
     DLString argument = constArguments;
 
@@ -95,57 +105,56 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
     DLString secondArgument = argument.getOneArgument( );
     pos = getPosition( );
     victim = 0;
+    victim2 = 0;
 
-    if (firstArgument.empty( ))
+    if (firstArgument.empty( )) // вызов без аргументов
     {
-	act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-	act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR,pos );
+        act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+        act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR,pos );
     }
-    else if (( victim = get_char_room( ch, firstArgument ) ) == 0)
-    {
-/*	
-	if (!getErrorMsg( ).empty( ))
-	    act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, pos );
-	else
-	    ch->send_to("Нет этого здесь.\n\r");
-*/	    
-    }
-    else if (victim == ch)
-    {
-	act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-	act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-    }
-    else
-    {
-        Character *victim2 = victim;
-
+    else if (( victim = get_char_room( ch, firstArgument ) ) != 0) // найден персонаж по первому аргументу
+    { 
+        victim2 = victim;
         // See if 2-victim syntax is supported by this social. Find second victim.
         if (!getArgMe2( ).empty( ) && !secondArgument.empty( )) {
             victim2 = get_char_room( ch, secondArgument );
-            if (!victim2) {
-                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %2s?", victim, secondArgument.c_str( ));
-                return;
-            }
         }
-        
-        if (victim2 == victim) {
-            act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
-            act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-            act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
+
+        if ( !victim2 ) { // не найден персонаж по второму аргументу
+            if ( victim == ch )
+                ch->pecho( "Ты видишь только себя здесь, кто такой %s?", secondArgument.c_str( ));
+            else
+                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %s?", victim, secondArgument.c_str( ));
+            return;
+        }
+
+        if (victim == ch && victim2 == ch) { // применение социала на себя
+            act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+            act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+        }
+        else if (victim2 == victim) { // применение социала на жертву, в т.ч. если оба аргумента - одна и та же жертва
+	    act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
+	    act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+	    act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
         } else {
-            // Output to actor and both victims.
-            ch->pecho( getArgMe2( ).c_str( ), ch, victim, victim2 );
-            victim->pecho( getArgVictim2( ).c_str( ), ch, victim, victim2 );
-            victim2->pecho( getArgVictim2( ).c_str( ), ch, victim2, victim );
+            // Output to actor and both victims. Substitute actor name with "self" if it matches victim.
+	    const void *arg1 = victimOrSelf(ch, victim);
+	    const void *arg2 = victimOrSelf(ch, victim2);
+
+            ch->pecho( getArgMe2( ).c_str( ), ch, arg1, arg2 );
+            if (victim != ch ) victim->pecho( getArgVictim2( ).c_str( ), ch, arg1, arg2 );
+            if (victim2 != ch ) victim2->pecho( getArgVictim2( ).c_str( ), ch, arg2, arg1 );
 
             // Output to everyone else in the room.
             for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
                 if (rch != ch && rch != victim && rch != victim2)
-                    rch->pecho( getArgOther2( ).c_str( ), ch, victim, victim2 );
+                    rch->pecho( getArgOther2( ).c_str( ), ch, arg1, arg2 );
         }
     }
-    
+
     reaction( ch, victim, firstArgument );
+    if (victim2 && victim2 != victim)
+        reaction( ch, victim2, secondArgument );
 }
 
 bool SocialBase::checkPosition( Character *ch )

@@ -15,6 +15,7 @@ public:
     typedef ::Pointer<Command> CommandPointer;
 
     virtual bool visible( Character * ) const;
+    virtual bool toXML( XMLNode::Pointer& ) const;
 
     virtual void setCommand( CommandPointer );
     virtual void unsetCommand( );

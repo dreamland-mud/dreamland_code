@@ -15,6 +15,11 @@ LANG(common);   LANG(human);   LANG(dwarvish);
 LANG(elvish);   LANG(gnomish); LANG(giant);
 LANG(trollish); LANG(cat);
 
+static bool is_websock( Character *ch )
+{
+    return ch && ch->desc && ch->desc->websock.state == WS_ESTABLISHED;
+}
+
 /*------------------------------------------------------------------------------------
  * ColorTags
  *------------------------------------------------------------------------------------*/
@@ -53,7 +58,7 @@ ColorTags::ColorTags( const char *text, Character *ch )
     // Is colour enabled for this player?
     my_color = ch ? cfg->color : true;
     // Are we using ANSI escape sequences or HTML tags?
-    my_ansi = (!ch) || (!ch->desc) || (ch->desc->websock.state != WS_ESTABLISHED);
+    my_ansi = !is_websock(ch);
     raw = false;
 
     reset( );
@@ -260,7 +265,6 @@ const char * ColorTags::color_tag_ansi( )
     }
 }
 
-
 /*------------------------------------------------------------------------------------
  * VisibilityTags
  *------------------------------------------------------------------------------------*/
@@ -321,6 +325,10 @@ protected:
     bool invis_tag_work( );
     long long st_invis, my_invis;
 
+    void hyper_tag_start( ostringstream & );
+    void hyper_tag_end( ostringstream & );
+    const char *my_hyper_tag;
+
     void html_escape( ostringstream &buf );
     bool need_escape( );
     
@@ -359,10 +367,10 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
 	    SET_BIT(my_invis, INVIS_RECRUITER);
 	if (!ch->is_npc( ) && ch->getClan( )->isLeader( ch->getPC( ) ))
 	    SET_BIT(my_invis, INVIS_LEADER);
-        if (ch->desc && ch->desc->websock.state == WS_ESTABLISHED) 
+        if (is_websock(ch))
 	    SET_BIT(my_invis, INVIS_WEB);
     }
-    
+   
     reset( );
 }
 
@@ -377,13 +385,14 @@ void VisibilityTags::reset( )
     st_align = N_ALIGN_NULL;
     invert_align = false;
     st_invis = INVIS_NONE;
+    my_hyper_tag = 0;
 }
 
 // See if some characters need to be replaced with HTML entities.
 bool VisibilityTags::need_escape( )
 {
     // Don't escape for telnet clients.
-    if (!ch || !ch->desc || ch->desc->websock.state != WS_ESTABLISHED) {
+    if (!is_websock(ch)) {
         return false;
     }
     // Don't escape strings inside "{Iw" tags.
@@ -461,11 +470,15 @@ void VisibilityTags::run( ostringstream &out )
 	case 'I':
 	    invis_tag_parse( out );
 	    break;
+        case 'h':
+            hyper_tag_start( out );
+            break;
 
 	// Total reset, but leave {x there for color parser to pick up.
         // Ideally each tag should reset individually, but historically many
         // texts rely on this 'total reset' sequence.
 	case 'x':
+            hyper_tag_end( out );
 	    reset( );
 	    out << "{" << *p;
 	    break;
@@ -476,7 +489,50 @@ void VisibilityTags::run( ostringstream &out )
 	}
     }
 }
+            
+// {h
+// close hyper link: x
+// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>),
+// g (<hg>skill group names</hg>)
+void VisibilityTags::hyper_tag_start( ostringstream &out )
+{
+    switch (*++p) {
+    case 'c': 
+        my_hyper_tag = "hc";
+        break;
 
+    case 'l': 
+        my_hyper_tag = "hl";
+        break;
+
+    case 'h': 
+        my_hyper_tag = "hh";
+        break;
+
+    case 'g': 
+        my_hyper_tag = "hg";
+        break;
+
+    default:
+    case 'x':
+    case 'X': 
+        hyper_tag_end( out );
+        return;
+    }
+
+    if (IS_SET(my_invis, INVIS_WEB)) 
+        out << "\036" << "<" << my_hyper_tag << ">" << "\037";
+}    
+
+void VisibilityTags::hyper_tag_end( ostringstream &out )
+{
+    if (my_hyper_tag) {
+        if (IS_SET(my_invis, INVIS_WEB)) 
+            out << "\036" << "</" << my_hyper_tag << ">" << "\037";
+        
+        my_hyper_tag = 0;
+    }
+}
 
 // {L 
 // close race lang: x
@@ -672,18 +728,20 @@ void VisibilityTags::invis_tag_parse( ostringstream &out )
  *------------------------------------------------------------------------------------*/
 void mudtags_convert( const char *text, ostringstream &out, Character *ch )
 {
-      ostringstream buf;
-      VisibilityTags( text, ch ).run( buf );
-      ColorTags( buf.str( ).c_str( ), ch ).run( out );
+     ostringstream vbuf;
+     VisibilityTags( text, ch ).run( vbuf );
+
+     DLString vbufStr = vbuf.str( );
+     ColorTags( vbufStr.c_str( ), ch ).run( out );
 }
 
 void mudtags_convert_nocolor( const char *text, ostringstream &out, Character *ch )
 {
-     ostringstream buf;
-     VisibilityTags( text, ch ).run( buf );
+     ostringstream vbuf;
+     VisibilityTags( text, ch ).run( vbuf );
 
-     DLString bufStr = buf.str( );
-     ColorTags ct( bufStr.c_str( ), ch );
+     DLString vbufStr = vbuf.str( );
+     ColorTags ct( vbufStr.c_str( ), ch );
      ct.setColor( false );
      ct.run( out );
 }

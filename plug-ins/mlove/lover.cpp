@@ -145,3 +145,15 @@ void Lover::usage( Character* ch )
     ch->send_to( str );
 }
 
+bool mlove_accepts(Character *ch, Character *victim)
+{
+    if (victim->is_npc() || ch->is_npc())
+        return false;
+
+
+    XMLAttributeLovers::Pointer attr =
+        victim->getPC()->getAttributes().findAttr<XMLAttributeLovers>("lovers");
+    
+    return attr && attr->lovers.isPresent(ch->getName()); 
+}
+

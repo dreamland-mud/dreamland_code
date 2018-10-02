@@ -28,6 +28,8 @@ public:
     virtual bool run( Character *, int );
     virtual void run( Character *, Character *, Character *& );
     virtual void run( Character *, Character *, int & );
+    virtual bool visible( Character * ) const;
+
 protected:
     SkillPointer skill;
     XML_VARIABLE XMLBooleanNoTrue interp; 

@@ -62,6 +62,7 @@ struct telnet {
     int state;
     unsigned char subneg[2048];
     unsigned int sn_ptr;
+    int ttype;
 };
 
 typedef std::pair<in_addr, std::string> ViaRecord;
@@ -71,6 +72,10 @@ typedef std::vector<ViaRecord> ViaVector;
 #define WS_NEGOTIATING  1
 #define WS_ESTABLISHED  2
 
+/*
+ * Out-of-band protocols support
+ */
+#define OOB_GMCP (A)
 
 struct WebSockState {
     int state;
@@ -142,6 +147,7 @@ public:
     char *		outbuf;
     int			outsize;
     int			outtop;
+    int                 oob_proto;
 
 #ifdef MCCP
     unsigned char       compressing;

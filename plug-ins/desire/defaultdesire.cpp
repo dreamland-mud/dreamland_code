@@ -85,10 +85,18 @@ void DefaultDesire::update( PCharacter *ch )
 	gain( ch, getUpdateAmount( ch ) );
 }
 
+// Helper function to show non-empty messages to the character.
+static void ptc( PCharacter *ch, const DLString &msg )
+{
+    if (!msg.empty( ))
+        ch->println( msg );
+}
+
 void DefaultDesire::gain( PCharacter *ch, int value )
 {
     int oldDesire, desire;
     bool wasActive;
+    bool isNewbie = ch->getRealLevel( ) <= PK_MIN_LEVEL;
     
     if (!applicable( ch ) || ch->is_immortal( )) {
 	reset( ch );
@@ -101,18 +109,18 @@ void DefaultDesire::gain( PCharacter *ch, int value )
     if (IS_GHOST( ch ))
 	return;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY) || ch->getRealLevel( ) <= PK_MIN_LEVEL) {
-	desire = maxValue;
-        ch->desires[getIndex( )] = desire;
-	return;
-    }
-    
     wasActive = isActive( ch );
     oldDesire = ch->desires[getIndex( )];
     desire = URANGE( (int)minValue, oldDesire + value, (int)maxValue );
+
+    // Newbies don't become too hungry.
+    if (isNewbie)
+        desire = std::max( 10, desire );
+
     ch->desires[getIndex( )] = desire;
-    
-    if (desire == damageLimit && ch->getRealLevel( ) >= PK_MIN_LEVEL) {
+
+    // Too hungry or thirsty, inflict some damage.
+    if (desire == damageLimit && !isNewbie) {
 	if (!msgDamageSelf.empty( ))
 	    ch->pecho( msgDamageSelf.c_str( ) );
 	if (!msgDamageRoom.empty( ))
@@ -121,19 +129,22 @@ void DefaultDesire::gain( PCharacter *ch, int value )
 	return;
     }
 
+    // Was hungry but now satisfied, print stop message.
+    if (wasActive != isActive( ch ) && wasActive) {
+        ptc( ch, msgStop );
+        return;
+    }
+    
+    // Feel hunger for the first time, print start message.
     if (wasActive != isActive( ch )) {
-	if (wasActive) {
-	    if (!msgStop.empty( ))
-		ch->println( msgStop );
-	} else if (!msgStart.empty( ))
-	    ch->println( msgStart );
-	return;
+        ptc( ch, msgStart );
+        return;
     }
 
+    // Still feeling hungry, report about it.
     if (isActive( ch )) {
-	if (!msgActive.empty( ))
-	    ch->println( msgActive );
-	return;
+        ptc( ch, msgActive );
+        return;
     }
 }
 

@@ -32,6 +32,7 @@
 #include "pagerhandler.h"
 #include "codepage.h"
 #include "comm.h"
+#include "gmcp.h"
 
 #include "char.h"
 #include "dreamland.h"
@@ -61,6 +62,31 @@ static IconvMap utf2koi("utf-8", "koi8-r");
 
 static const char *MSG_FLUSH_BUF = "Buffer flushed.\r\n";
 const char *lid = "\n\r*** PUT A LID ON IT!!! ***\n\r";
+
+/*
+ * Negotiated client terminal type.
+ */
+enum {
+    TTYPE_NONE = 0,
+    TTYPE_MUDLET,
+    TTYPE_MAX
+};
+const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet" };
+int ttype_lookup( const char *received )
+{
+    for (int i = 0; i < TTYPE_MAX; i++) {
+	const char *ttype = TTYPE_NAMES[i]; 
+	if (strncmp(received, ttype, strlen(ttype)) == 0) {
+	    LogStream::sendNotice() << "telnet: received " << ttype << " terminal type" << endl;
+	    return i;
+	}
+    }
+    return TTYPE_NONE;
+}
+const char *ttype_name( int ttype )
+{
+    return TTYPE_NAMES[URANGE(TTYPE_NONE, ttype, TTYPE_MAX-1)];
+}
 
 bool Descriptor::checkStopSymbol( )
 {
@@ -102,6 +128,7 @@ int Descriptor::inputChar( unsigned char i )
     writeRaw((const unsigned char*)lid, strlen(lid));
     return -1;
 }
+
 
 int Descriptor::inputTelnet( unsigned char i )
 {
@@ -193,41 +220,67 @@ int Descriptor::inputTelnet( unsigned char i )
 			if (banManager->checkVerbose( this, BAN_ALL )) 
 			    return -1;
 		    }
+
+		    if (telnet.sn_ptr >= 3 
+                            && telnet.subneg[0] == TELOPT_TTYPE
+                            && telnet.subneg[1] == TELQUAL_IS)
+                    {
+			telnet.subneg[telnet.sn_ptr] = 0;
+                        telnet.ttype = ttype_lookup((const char *)telnet.subneg + 2);
+                    }
 		    telnet.state = TNS_NORMAL;
 		    break;
 	    }
 	    break;
 	    
 	case DO:
-	case DONT:
-	case WILL:
-	case WONT:
+            switch (i) {
 #ifdef MCCP
-	    if(i == TELOPT_COMPRESS || i == TELOPT_COMPRESS2) {
-		switch( telnet.state ) {
-		    case DO:
-			startMccp(i);
-			break;
-		    case DONT:
-			stopMccp();
-			break;
-			
-		    case WILL:
-		    case WONT:
-			break;
-		}
-	    }
+                case TELOPT_COMPRESS:
+                case TELOPT_COMPRESS2:
+                    startMccp(i);
+                    break;
 #endif
+                case GMCP:
+                    SET_BIT(oob_proto, OOB_GMCP);
+                    GMCPHandler::sendVersion(this); 
+                    break;
+            }
 	    telnet.state = TNS_NORMAL;
-	    break;
+            break;
+
+	case WILL:
+            switch (i) {
+                case TELOPT_TTYPE:
+                    static const unsigned char ttype_qry_str[] = { 
+                        IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE };
+                    writeRaw(ttype_qry_str, sizeof(ttype_qry_str));
+                    break;
+            }
+	    telnet.state = TNS_NORMAL;
+            break;
+
+	case DONT:
+            switch (i) {
+#ifdef MCCP
+                case TELOPT_COMPRESS:
+                case TELOPT_COMPRESS2:
+		    if (compressing == i)
+			stopMccp();
+                    break;
+#endif
+            }
+	    telnet.state = TNS_NORMAL;
+            break;
 
 	default:
-	    LogStream::sendError() << "telnet: unknown state" << endl;
+	    LogStream::sendError() << "telnet: unknown state " << i << endl;
 	    telnet.state = TNS_NORMAL;
     }
 
     return i;
 }
+
 
 #ifdef __MINGW32__
 static int
@@ -427,7 +480,7 @@ sendVersion(Descriptor *d)
 {
     Json::Value val;
     val["command"] = "version";
-    val["args"][0] = "DreamLand Web Client/1.5";
+    val["args"][0] = "DreamLand Web Client/1.7";
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);
 }

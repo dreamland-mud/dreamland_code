@@ -30,6 +30,7 @@ private:
 };
 
 
+bool mlove_accepts(Character *ch, Character *victim);
 
 
 #endif

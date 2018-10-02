@@ -110,14 +110,15 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     }
 
     if (argStat.empty( )) {
-	tell_raw( client, ch, "У тебя {1{Y%d{2 тренировочн%s.", 
+	tell_raw( client, ch, "У тебя {Y%d{G тренировочн%s.", 
 	          client->train.getValue( ),
                   GET_COUNT(client->train,"ая сессия","ые сессии","ых сессий") );
     }
     else {
 	for (int i = 0; i < stat_table.size; i++)
 	    if (argStat.strPrefix( stat_table.fields[i].name )
-		|| argStat.strPrefix( stat_table.fields[i].message ))
+		|| argStat.strPrefix( russian_case(stat_table.fields[i].message, '1') )
+		|| argStat.strPrefix( russian_case(stat_table.fields[i].message, '4') ))
 	    {
 		stat = i;
 		break;
@@ -143,7 +144,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 		      (cnt > 2 ? "\r\n" : " " ),
 		      buf.str( ).c_str( ) );
 	    if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ))
-		tell_raw( client, ch, "Ты можешь повысить телосложение за {1{Y%d{2 квестовых единиц: train con qp.", costQP );
+		tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: train con qp.", costQP );
 	}	    
 	else
 	    /*

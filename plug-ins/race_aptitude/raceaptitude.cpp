@@ -79,17 +79,19 @@ bool RaceAptitude::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
-bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch )
+bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
-	ch->println( "Тебе не с кем практиковаться здесь." );
+        if (verbose)
+            ch->println( "Тебе не с кем практиковаться здесь." );
 	return false;
     }
     
     if (mob->pIndexData->practicer.isSet(  (int)getGroup( ) ))
 	return true;
 
-    ch->println( "Ты не можешь практиковать это здесь." );
+    if (verbose)
+        ch->println( "Ты не можешь практиковать это здесь." );
     return false;
 }
 
@@ -122,7 +124,7 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     }
     
     buf << endl
-	<< "Входит в группу '{W" << getGroup( )->getName( ) << "{x'";
+	<< "Входит в группу '{hg{W" << getGroup( )->getName( ) << "{x'";
 	
     if (!visible( ch )) {
 	buf << endl;

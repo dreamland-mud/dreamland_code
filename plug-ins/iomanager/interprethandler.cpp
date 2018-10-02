@@ -34,6 +34,11 @@
 GSN(perception);
 const	char 	go_ahead_str	[] = { IAC, GA, '\0' };
 
+const char *dir_name[] = {"N","E","S","W","U","D"};
+const char *dir_name_small[] = {"n","e","s","w","u","d"};
+const char *ru_dir_name[] = {"С","В","Ю","З","П","О"};
+const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
+
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
     FENIA_CALL(room, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
@@ -147,10 +152,6 @@ void InterpretHandler::normalPrompt( Character *ch )
     while( *str ) {
 	ostringstream doors;
 	Character *victim;
-	static const char *dir_name[] = {"N","E","S","W","U","D"};
-	static const char *dir_name_small[] = {"n","e","s","w","u","d"};
-	static const char *ru_dir_name[] = {"С","В","Ю","З","П","О"};
-	static const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
 	bool ruexits = false;
 	bool handled = false;
 
@@ -194,7 +195,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 	
 	case 'd':
 	case 'e':
-	    ruexits = (*str == 'd');
+	    ruexits = ch->getPC( ) && ch->getPC( )->getConfig( )->ruexits;
 
 	    for (int door = 0; door < DIR_SOMEWHERE; door++) {
 		EXIT_DATA *pexit = ch->in_room->exit[door];
@@ -243,7 +244,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		    out << "BAD!!";
 	    }
 	    else
-		out << "None!";
+		out << "нет";
 	    break;
 
 	case 'h' :
@@ -307,7 +308,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		    out << ch->in_room->name;
 		}
 		else
-		    out << "darkness";
+		    out << "темнота";
 	    else
 		out << " ";
 	    break;

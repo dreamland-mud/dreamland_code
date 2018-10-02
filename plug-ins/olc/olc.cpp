@@ -60,6 +60,7 @@ GSN(none);
 
 using namespace std;
 
+
 enum {
     NDX_ROOM,
     NDX_OBJ,
@@ -640,6 +641,14 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
+static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
+{
+    DLString line = str;
+    line.erase(line.find_last_not_of(chars) + 1);
+    line.erase(0, line.find_first_not_of(chars));
+    return line;
+}
+
 CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
 {
     if (!ch->isCoder( ))
@@ -911,140 +920,6 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
 	return;
     }
 
-    if (arg == "db_armor") {
-	buf << "DROP TABLE IF EXISTS `armor`;" << endl
-	    << "CREATE TABLE `armor` (" << endl
-	    << "`id` int(11) NOT NULL auto_increment," << endl
-	    << "`vnum` int(11) default NULL," << endl
-	    << "`itype` varchar(255) default NULL," << endl
-	    << "`name` varchar(255) default NULL," << endl
-	    << "`lev` int(11) default NULL," << endl
-	    << "`num` int(11) default NULL," << endl
-	    << "`lim` tinyint(4) default NULL," << endl
-	    << "`wear` varchar(255) default NULL," << endl
-	    << "`extra` varchar(255) default NULL," << endl
-	    << "`material` varchar(255) default NULL," << endl
-	    << "`cost` tinyint(4) default NULL," << endl
-	    << "`weight` tinyint(4) default NULL," << endl
-	    << "`hr` int(11) default NULL," << endl
-	    << "`dr` int(11) default NULL," << endl
-	    << "`hp` int(11) default NULL," << endl
-	    << "`svs` int(11) default NULL," << endl
-	    << "`mana` int(11) default NULL," << endl
-	    << "`move` int(11) default NULL," << endl
-	    << "`ac` int(11) default NULL," << endl
-	    << "`str` int(11) default NULL," << endl
-	    << "`inta` int(11) default NULL," << endl
-	    << "`wis` int(11) default NULL," << endl
-	    << "`dex` int(11) default NULL," << endl
-	    << "`con` int(11) default NULL," << endl
-	    << "`cha` int(11) default NULL," << endl
-	    << "`size` int(11) default NULL," << endl
-	    << "`aff` varchar(255) default NULL," << endl
-	    << "`det` varchar(255) default NULL," << endl
-	    << "`imm` varchar(255) default NULL," << endl
-	    << "`res` varchar(255) default NULL," << endl
-	    << "`vuln` varchar(255) default NULL," << endl
-	    << "PRIMARY KEY  (`id`)" << endl
-	    << ");" << endl;
-
-	for (int i = 0; i < MAX_KEY_HASH; i++)
-	for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
-	    bitstring_t wear = pObj->wear_flags;
-	    REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
-	    if (wear == 0 && pObj->item_type != ITEM_LIGHT)
-		continue;
-	
-	    buf << "insert into armor "
-		<< "(vnum,itype,name,lev,num,lim,wear,extra,"
-		<< "material,cost,weight,"
-		<< "hr,dr,hp,svs,mana,move,ac,str,inta,wis,dex,con,cha,size,"
-		<< "aff,det,imm,res,vuln) "
-		<< "values (";
-
-	    DLString name = russian_case(pObj->short_descr, '1');
-	    name.colourstrip( );
-	    name.replaces( "\"", "\\\"");
-	    name.replaces( "\'", "\\\'");
-
-	    buf << pObj->vnum << ","
-		<< "\"" << item_table.name(pObj->item_type) << "\","
-		<< "\"" << name << "\","
-		<< pObj->level << ","
-		<< pObj->reset_num << ","
-		<< pObj->limit << ","
-		<< "\"" << wear_flags.messages(wear) << "\","
-		<< "\"" << extra_flags.names(pObj->extra_flags) << "\",";
-
-	    buf << "\"" << pObj->material << "\","
-		<< pObj->cost << ","
-		<< pObj->weight << ",";
-
-	    int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
-	    int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
-	    DLString aff,det,imm,res,vuln;
-
-	    for (Affect *paf = pObj->affected; paf; paf = paf->next) {
-		int m = paf->modifier;
-
-		switch (paf->location) {
-		case APPLY_STR: str+=m; break;
-		case APPLY_INT: inta+=m; break;
-		case APPLY_WIS: wis+=m; break;
-		case APPLY_DEX: dex+=m; break;
-		case APPLY_CON: con+=m; break;
-		case APPLY_CHA: cha+=m; break;
-		case APPLY_HIT: hp+=m; break;
-		case APPLY_MANA: mana+=m; break;
-		case APPLY_MOVE: move+=m; break;
-		case APPLY_AC: ac+=m; break;
-		case APPLY_HITROLL: hr+=m; break;
-		case APPLY_DAMROLL: dr+=m; break;
-		case APPLY_SIZE: size+=m; break;
-		case APPLY_SAVES:         
-		case APPLY_SAVING_ROD:    
-		case APPLY_SAVING_PETRI:  
-		case APPLY_SAVING_BREATH: 
-		case APPLY_SAVING_SPELL:  svs+=m; break;
-		}
-		
-		if (paf->bitvector) {
-		    bitstring_t b = paf->bitvector;
-
-		    switch(paf->where) {
-		    case TO_DETECTS: det << detect_flags.names(b) << " "; break;
-		    case TO_AFFECTS: aff << affect_flags.names(b) << " "; break;
-		    case TO_IMMUNE:  imm << imm_flags.names(b) << " "; break;
-		    case TO_RESIST:  res << res_flags.names(b) << " "; break;
-		    case TO_VULN:    vuln << vuln_flags.names(b) << " "; break;
-		    }
-		}
-	    }
-
-	    buf << hr << "," << dr << "," << hp << "," << svs << ","
-	        << mana << "," << move << "," << ac << ","
-	        << str << "," << inta << "," << wis << ","
-	        << dex << "," << con << "," << cha << ","
-	        << size << "," 
-		<< "\"" << aff << "\","
-		<< "\"" << det << "\","
-		<< "\"" << imm << "\","
-		<< "\"" << res << "\","
-		<< "\"" << vuln << "\""
-		<< ");" << endl;
-	}
-
-	try {
-	    DLFileStream( "db_armor.txt" ).fromString( buf.str( ) );
-	} catch (const ExceptionDBIO &ex) {
-	    ch->println( ex.what( ) );
-	    return;
-	}
-	
-	ch->println("Armor db dumped.");
-	return;
-    }
-    
     if (arg == "searcherMagic" || arg == "sm") {
         buf << "vnum,name,level,itemtype,spellLevel,charges,spells,area,where,limit" << endl;
         // Collect distinct list of spells.
@@ -1264,100 +1139,6 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
 	ch->println("Weapon CSV file dumped.");
 	return;
     }
-    if (arg == "db_weapons") {
-	for (int i = 0; i < MAX_KEY_HASH; i++)
-	for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
-	    if (pObj->item_type != ITEM_WEAPON)
-		continue;
-
-	    buf << "insert into weapons "
-		   "(vnum,name,lev,num,lim,wclass,v1,v2,ave,wflags,wtype,extra,"
-		   "hr,dr,hp,svs,mana,move,ac,str,inta,wis,dex,con,cha,size,other) "
-		   "values (";
-	    
-	    DLString name = russian_case(pObj->short_descr, '1');
-	    name.colourstrip( );
-	    name.replaces( "\"", "\\\"");
-	    name.replaces( "\'", "\\\'");
-
-	    buf << pObj->vnum << ","
-		<< "\"" << name << "\","
-		<< pObj->level << ","
-		<< pObj->reset_num << ","
-		<< pObj->limit << ","
-		<< "\"" << weapon_class.name(pObj->value[0]) << "\","
-		<< pObj->value[1] << ","
-		<< pObj->value[2] << ","
-		<< (1 + pObj->value[2]) * pObj->value[1] / 2 << ","
-		<< "\"" << weapon_type2.names(pObj->value[4]) << "\","
-		<< "\"" << weapon_flags.name(pObj->value[3]) << "\","
-		<< "\"" << extra_flags.names(pObj->extra_flags) << "\",";
-	    
-	    int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
-	    int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
-	    DLString other;
-
-	    for (Affect *paf = pObj->affected; paf; paf = paf->next) {
-		int m = paf->modifier;
-
-		switch (paf->location) {
-		case APPLY_STR: str+=m; break;
-		case APPLY_INT: inta+=m; break;
-		case APPLY_WIS: wis+=m; break;
-		case APPLY_DEX: dex+=m; break;
-		case APPLY_CON: con+=m; break;
-		case APPLY_CHA: cha+=m; break;
-		case APPLY_HIT: hp+=m; break;
-		case APPLY_MANA: mana+=m; break;
-		case APPLY_MOVE: move+=m; break;
-		case APPLY_AC: ac+=m; break;
-		case APPLY_HITROLL: hr+=m; break;
-		case APPLY_DAMROLL: dr+=m; break;
-		case APPLY_SIZE: size+=m; break;
-		case APPLY_SAVES:         
-		case APPLY_SAVING_ROD:    
-		case APPLY_SAVING_PETRI:  
-		case APPLY_SAVING_BREATH: 
-		case APPLY_SAVING_SPELL:  svs+=m; break;
-		}
-		
-		if (paf->bitvector) {
-		    bitstring_t b = paf->bitvector;
-		    other << affwhere_flags.name(paf->where) << "(";
-
-		    switch(paf->where) {
-		    case TO_DETECTS: other << detect_flags.names(b); break;
-		    case TO_AFFECTS: other << affect_flags.names(b); break;
-		    case TO_IMMUNE:  other << imm_flags.names(b); break;
-		    case TO_RESIST:  other << res_flags.names(b); break;
-		    case TO_VULN:    other << vuln_flags.names(b); break;
-		    case TO_OBJECT:  other << extra_flags.names(b); break;
-		    default:         other << "???"; break;
-		    }
-
-		    other << ") ";
-		}
-	    }
-
-	    buf << hr << "," << dr << "," << hp << "," << svs << ","
-	        << mana << "," << move << "," << ac << ","
-	        << str << "," << inta << "," << wis << ","
-	        << dex << "," << con << "," << cha << ","
-	        << size << "," 
-		<< "\"" << other << "\""
-		<< ");" << endl;
-	}
-	
-	try {
-	    DLFileStream( "db_weapons.txt" ).fromString( buf.str( ) );
-	} catch (const ExceptionDBIO &ex) {
-	    ch->println( ex.what( ) );
-	    return;
-	}
-	
-	ch->println("Weapons db dumped.");
-	return;
-    }
 
     if (arg == "linkwrapper") {
 	DLString vnumStr = args.getOneArgument();
@@ -1523,5 +1304,57 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
                             obj->in_room->vnum, obj->in_room->area->name);
         }
         ch->println("Done marking limits.");
+        return;
     }
+
+    if (arg == "mobname") {
+        int cnt = 0, hcnt = 0, rcnt = 0;
+        ostringstream buf, hbuf, rbuf;
+
+	for (int i = 0; i < MAX_KEY_HASH; i++)
+	for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            DLString names = DLString(pMob->player_name).toLower();
+            DLString longd = trim(pMob->long_descr).toLower();
+            longd.colourstrip( );
+
+            static RegExp pattern_rus("[а-я]");
+            static RegExp pattern_longd("^.*\\(([-a-z ]+)\\).*$");
+            
+            if (!pattern_rus.match( longd )) 
+                continue;
+
+            if (IS_SET(pMob->area->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+                continue;
+            
+            {
+                RussianString rshortd(pMob->short_descr, MultiGender(pMob->sex, pMob->gram_number));
+                DLString shortd = rshortd.decline( '7' ).colourStrip( ).toLower();
+                if (!arg_contains_someof( shortd, pMob->player_name )) {
+                    rcnt ++;
+                    rbuf << pMob->vnum << ": [" << rshortd.decline( '1' ) << "] [" << pMob->player_name << "]" <<  endl;
+                }
+            }
+
+	    RegExp::MatchVector matches = pattern_longd.subexpr( longd.c_str( ) );
+	    if (matches.size( ) < 1) {
+		buf << pMob->vnum << ": [" << longd << "] [" << pMob->short_descr << "]" <<  endl;
+		cnt++;
+	    } else {
+		
+		DLString hint = matches.front( );
+		if (!is_name(hint.c_str(), names.c_str())) {
+		    hbuf << dlprintf( "%6d : [%35s] hint [{G%10s{x] [{W%s{x]\r\n",
+			    pMob->vnum, longd.c_str( ), hint.c_str( ), pMob->player_name );
+		    hcnt++;
+		}
+	    }
+        }
+
+        ch->printf("\r\n{RНайдено %d несоответствий подсказок в длинном имени моба.{x\r\n", hcnt);
+	page_to_char( hbuf.str( ).c_str( ), ch );
+        return;
+    }
+
 }
+
+

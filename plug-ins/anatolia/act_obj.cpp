@@ -347,7 +347,7 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
 	
     case ITEM_CONTAINER:
 	if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
-	    act("Тебе не удалось нашарить ни одного кармана у $o2.",ch,obj,0,TO_CHAR);
+	    act("Тебе не удалось нашарить ни одного кармана у $o2.",ch,container,0,TO_CHAR);
 	    return false;
 	}
 	
@@ -1754,7 +1754,7 @@ CMDRUNP( make )
     DLString args = argument, arg = args.getOneArgument( );
 
     if (!arg.empty( )) {
-	if (arg.strPrefix( "arrow" ) || arg.strPrefix( "стрелы" )) {
+	if (arg.strPrefix( "arrow" ) || arg.strPrefix( "стрелы" ) || arg.strPrefix( "стрелу")) {
 	    interpret_cmd( ch, "makearrow", args.c_str( ) );
 	    return;
 	}

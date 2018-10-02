@@ -127,16 +127,19 @@ bool ClanSkill::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
-bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch ) 
+bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose ) 
 {
     if (mob && ch->getClan( ) == mob->getClan( ))
 	return true;
-    
-    if (mob)
-	ch->pecho( "%^C1 не служит твоему клану.", mob );
-    else
-	ch->println( "Клановые умения практикуют у служителей клана, "
-		     "например, у лекаря или охранника." );
+   
+    if (verbose) { 
+        if (mob)
+            ch->pecho( "%^C1 не служит твоему клану.", mob );
+        else
+            ch->println( "Клановые умения практикуют у служителей клана, "
+                         "например, у лекаря или охранника." );
+    }
+
     return false;
 }
 

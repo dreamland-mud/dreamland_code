@@ -3,6 +3,7 @@
  * ruffina, 2004
  * based on CommandManager by NoFate
  */
+#include <algorithm>
 
 #include "commandmanager.h"
 #include "commandinterpreter.h"
@@ -10,32 +11,61 @@
 
 #include "logstream.h"
 #include "xmlvector.h"
+#include "dbio.h"
 
 #include "character.h"
 
 /*-----------------------------------------------------------------------
  * CommandList
  *-----------------------------------------------------------------------*/
-CommandList::const_iterator CommandList::findExact( const DLString& name ) const
+Command::Pointer CommandList::findExact( const DLString& name ) const
 {
-    const_iterator ipos;
+    list<Command::Pointer>::const_iterator ipos;
 
-    for (ipos = begin( ); ipos != end( ); ipos++)
-	if ((*ipos)->getName( ) == name) 
-	    return ipos;
+    if (name.isRussian( )) {
+        for (ipos = commands_ru.begin( ); ipos != commands_ru.end( ); ipos++) {
+            if ((*ipos)->getRussianName( ) == name) 
+                return *ipos;
 
-    return end( );
+            const XMLStringList &aliases = (*ipos)->getRussianAliases( );
+            if (find(aliases.begin( ), aliases.end( ), name) != aliases.end( ))
+                return *ipos;
+        }
+
+        return Command::Pointer( );
+    }
+
+    for (ipos = commands.begin( ); ipos != commands.end( ); ipos++) {
+        if ((*ipos)->getName( ) == name) 
+            return *ipos;
+
+        const XMLStringList &aliases = (*ipos)->getAliases( );
+        if (find(aliases.begin( ), aliases.end( ), name) != aliases.end( ))
+            return *ipos;
+    }
+
+    return Command::Pointer( );
 }
 
 Command::Pointer CommandList::chooseCommand( Character *ch, const DLString &name ) const
 {
-    const_iterator i;
+    list<Command::Pointer>::const_iterator i;
+    const list<Command::Pointer> &mylist = name.isRussian( ) ? commands_ru : commands;
 
-    for (i = begin( ); i != end( ); i++) {
+    for (i = mylist.begin( ); i != mylist.end( ); i++) {
 	Command::Pointer pCommand = *i;
 
-	if (pCommand->available( ch ) && pCommand->matches( name )) 
+	if (pCommand->available( ch ) && pCommand->matches( name ))  {
 	    return pCommand;
+        }
+    }
+
+    for (i = mylist.begin( ); i != mylist.end( ); i++) {
+	Command::Pointer pCommand = *i;
+
+	if (pCommand->available( ch ) && pCommand->matchesAlias( name ))  {
+	    return pCommand;
+        }
     }
 
     return Command::Pointer( );
@@ -43,12 +73,29 @@ Command::Pointer CommandList::chooseCommand( Character *ch, const DLString &name
 
 static bool compare( Command::Pointer a, Command::Pointer b )
 {
-    return a->compare( **b );
+    return commandManager->compare( **a, **b, false );
 }
 
-void CommandList::sort( )
+static bool compare_ru( Command::Pointer a, Command::Pointer b )
 {
-    std::list<Command::Pointer>::sort( compare );
+    return commandManager->compare( **a, **b, true );
+}
+
+void CommandList::add( Command::Pointer &cmd )
+{
+    commands.push_back( cmd ); 
+    commands.sort( compare );
+    
+    if (!cmd->getRussianName( ).empty( )) {
+        commands_ru.push_back( cmd );
+        commands_ru.sort( compare_ru );
+    }
+}
+
+void CommandList::remove( Command::Pointer &cmd )
+{
+    commands.remove( cmd );
+    commands_ru.remove( cmd );
 }
 
 /*-----------------------------------------------------------------------
@@ -56,6 +103,7 @@ void CommandList::sort( )
  *-----------------------------------------------------------------------*/
 const DLString CommandManager::TABLE_NAME = "commands";
 const DLString CommandManager::PRIO_FILE = "cmdpriority";
+const DLString CommandManager::PRIO_FILE_RU = "cmdpriority_ru";
 CommandManager* commandManager = NULL;
 
 CommandManager::CommandManager( ) 
@@ -75,6 +123,37 @@ void CommandManager::initialization( )
     InterpretLayer::initialization( );
 }
 
+// Do a one-off save of Russian command priorities, if the file doesn't yet exist.
+void CommandManager::savePrioritiesRU( )
+{
+    // Do nothing if the file is already there.
+    DBIO dbio( getTablePath( ), getTableName( ) );
+    dbio.open( );
+    if (dbio.getEntryAsFile( PRIO_FILE_RU ).exist( )) {
+        return;
+    }
+
+    // Collect all Russian aliases in the order they exist now.
+    XMLVectorBase<XMLString> prio;                                                 
+    list<Command::Pointer>::const_iterator cmd;
+    for (cmd = commands.getCommandsRU( ).begin( ); cmd != commands.getCommandsRU( ).end( ); cmd++) {
+        const DLString &rname = (*cmd)->getRussianName( );
+        if (!rname.empty( ))
+            prio.push_back( rname );
+
+        for (XMLStringList::const_iterator a = (*cmd)->getRussianAliases( ).begin( ); 
+                a != (*cmd)->getRussianAliases( ).end( ); 
+                a++)
+            if (*a != rname)
+                prio.push_back( *a );
+    }
+
+
+    LogStream::sendNotice( ) << "Saving " << prio.size( ) << " Russian aliases in priority order." << endl;
+    // Save the file to disc.
+    saveXML( &prio, PRIO_FILE_RU, true );
+}
+
 void CommandManager::destruction( )
 {
     InterpretLayer::destruction( );
@@ -87,7 +166,6 @@ void CommandManager::load( XMLCommand::Pointer command )
         LogStream::sendError( ) << "No loader for command " << command->getName( ) << endl;
         return;
     }
-    LogStream::sendNotice( ) << "Loader for command " << command->getName( ) << ": " << loader->getTableName( ) << endl;
     command->getLoader( )->loadCommand( command );
 }
 
@@ -98,8 +176,7 @@ void CommandManager::save( XMLCommand::Pointer command )
 
 void CommandManager::registrate( Command::Pointer command )
 {
-    commands.push_back( command );
-    commands.sort( );
+    commands.add( command );
 
     if (command->getHelp( ))
 	command->getHelp( )->setCommand( command );
@@ -115,15 +192,20 @@ void CommandManager::unregistrate( Command::Pointer command )
 
 void CommandManager::loadPriorities( )
 {
-    XMLVectorBase<XMLString> v;                                                 
+    XMLVectorBase<XMLString> v, rv;                                                 
 
     if (!loadXML( &v, PRIO_FILE )) {
 	LogStream::sendError( ) << "Command priorities file not found!" << endl;
 	return;
     }
-    
+
+    loadXML( &rv, PRIO_FILE_RU );
+
     for (unsigned int i = 0; i < v.size( ); i++)
         priorities[v[i].getValue( )] = i;
+
+    for (unsigned int i = 0; i < rv.size( ); i++)
+        priorities_ru[rv[i].getValue( )] = i;
 
     LogStream::sendNotice( ) 
 	<< "Loaded " << priorities.size( ) << " command priorities" << endl;
@@ -152,20 +234,15 @@ bool CommandManager::process( InterpretArguments &iargs )
 
 Command::Pointer CommandManager::findExact( const DLString &cmdName ) const
 {
-    CommandList::const_iterator c = commands.findExact( cmdName ); 
-
-    if (c != commands.end( )) 
-	return *c;
-    else
-	return Command::Pointer( );
+    return commands.findExact( cmdName );
 }
 
 CommandManager::CategoryMap CommandManager::getCategorizedCommands( ) const
 {
     CategoryMap cats;
 
-    CommandList::const_iterator cmd;
-    for (cmd = commands.begin( ); cmd != commands.end( ); cmd++) {
+    list<Command::Pointer>::const_iterator cmd;
+    for (cmd = commands.getCommands( ).begin( ); cmd != commands.getCommands( ).end( ); cmd++) {
         CategoryMap::iterator c = cats.find( (*cmd)->getCommandCategory( ) );
 
         if (c == cats.end( )) {
@@ -180,6 +257,21 @@ CommandManager::CategoryMap CommandManager::getCategorizedCommands( ) const
     return cats;
 }
 
+bool CommandManager::compare( const Command &a, const Command &b, bool fRussian ) const
+{       
+    Priorities::const_iterator i_a, i_b, i_end;
+    const Priorities &prio = fRussian ? priorities_ru : priorities;
+
+    i_a = prio.find( fRussian ? a.getRussianName( ) : a.getName( ) );
+    i_b = prio.find( fRussian ? b.getRussianName( ) : b.getName( ) );
+    i_end = prio.end( );
+
+    if (i_a != i_end && i_b != i_end)
+        return (i_a->second < i_b->second);
+
+    return (i_a != i_end);  
+}
+
 /*-----------------------------------------------------------------------
  * CommandLoader
  *-----------------------------------------------------------------------*/
@@ -192,7 +284,7 @@ void CommandLoader::loadCommand( XMLCommand::Pointer command )
 
 void CommandLoader::saveCommand( XMLCommand::Pointer command )
 {
-    saveXML( *command, command->getName( ) );
+//    saveXML( *command, command->getName( ) );
 }
 
 DLString CommandLoader::getNodeName( ) const

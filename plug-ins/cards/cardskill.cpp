@@ -73,15 +73,17 @@ bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
-bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch ) 
+bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<CardSellerBehavior>( ))
 	return true;
-    
-    if (mob)
-	ch->pecho( "%^C1 не разбирается в картах.", mob );
-    else
-	ch->println( "Поищи кого-то, кто разбирается в картах." );
+
+    if (verbose) {    
+        if (mob)
+            ch->pecho( "%^C1 не разбирается в картах.", mob );
+        else
+            ch->println( "Поищи кого-то, кто разбирается в картах." );
+    }
 
     return false;
 }
@@ -92,7 +94,7 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf )
 
     buf << (spell ? "Заклинание" : "Умение") 
 	<< " Колоды '{W" << getName( ) << "{x' или '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{W"  
+        << "входит в группу '{hg{W"  
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
         << "{x'" << endl;
     

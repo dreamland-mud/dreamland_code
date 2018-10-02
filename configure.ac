@@ -69,6 +69,7 @@ AC_CHECK_FIGHT_STUB
 AC_CHECK_AI_STUB
 
 dnl Creating installation tree
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
 AC_CREATE_DIR(bin)
 AC_CREATE_DIR(lib)
 AC_CREATE_DIR(libexec)
@@ -238,6 +239,7 @@ plug-ins/follow/command/Makefile \
 plug-ins/debug/Makefile \
 plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
+plug-ins/craft/Makefile \
 )
 
 echo ""

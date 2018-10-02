@@ -20,12 +20,44 @@ void QuestWeapon::wear( Character *ch )
     ch->send_to("{CТвое оружие ярко вспыхивает.{x\r\n");
 }
 
+struct weapon_param {
+    short level;
+    short value1;
+    short value2;
+};
+
+static const struct weapon_param weapon_params [] = {
+//  lvl, v1 v2      ave
+    { 5, 5, 4 }, // 12.5
+    { 9, 5, 5 }, // 15
+    { 19, 5, 6 },// 17.5
+    { 29, 6, 6 },// 21
+    { 39, 7, 7 },// 28
+    { 49, 8, 8 },// 36
+    { 59, 9, 9 },// 45
+    { 69, 9, 10 },// 49.5
+    { 79, 9, 11 },// 54
+    { 85, 10, 11 },// 60 
+    { 89, 10, 12 },// 65
+    { 99, 10, 13 },// 70
+    { 1000, 10, 14 },// 75
+    { 0 }
+};
+
 void QuestWeapon::equip( Character *ch ) 
 {
-  short level = ch->getModifyLevel();
-  Affect *paf;
-  Affect af;
-
+    short level = ch->getModifyLevel();
+    Affect *paf;
+    Affect af;
+    for (int i = 0; weapon_params[i].level; i++) {
+        if (level <= weapon_params[i].level) {
+            obj->value[1] = weapon_params[i].value1;
+            obj->value[2] = weapon_params[i].value2;
+            break;
+        }
+   }
+        
+/*
     if ( level > 17 && level <= 30)	   obj->value[2] = 4;
     else if ( level > 30 && level <= 40)   obj->value[2] = 5;
     else if ( level > 40 && level <= 50)   obj->value[2] = 6;
@@ -33,7 +65,7 @@ void QuestWeapon::equip( Character *ch )
     else if ( level > 60 && level <= 70)   obj->value[2] = 10;
     else if ( level > 70 && level <= 80)   obj->value[2] = 11;
     else obj->value[2] = 12;
-    
+*/    
     obj->level = ch->getRealLevel( );
 
     if( obj->affected )

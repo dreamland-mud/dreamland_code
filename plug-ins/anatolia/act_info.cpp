@@ -69,6 +69,7 @@
 #include "xmlattributeticker.h"
 #include "commonattributes.h"
 #include "commandtemplate.h"
+#include "playerattributes.h"
 
 #include "affect.h"
 #include "object.h"
@@ -155,7 +156,7 @@ CMDRUNP( prompt )
 
     if (arg_is_all( argument )) {
 	old = ch->prompt;
-	ch->prompt = "<%n: %h/%Hhp %m/%Mm %v/%Vmv %Xexp> ";
+	ch->prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x>%c";
     }
     else if (arg_is_show( argument )) {
 	ch->println( "Текущая строка состояния:" );
@@ -189,7 +190,7 @@ CMDRUNP( battleprompt )
 
     if (arg_is_all( argument )) {
 	old = ch->batle_prompt;
-	ch->batle_prompt = "<%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:<%o>> ";
+	ch->batle_prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг %Xоп Вых:{g%d{x> [{r%y{x:{Y%o{x]%c";
     }
     else if (arg_is_show( argument )) {
 	ch->println( "Текущая строка состояния в бою:" );
@@ -589,7 +590,14 @@ CMDRUNP( oscore )
 		   ch->getPC( )->invis_level.getValue( ),
 		   ch->getPC( )->incog_level.getValue( ) )
 	    << endl;
-    
+
+    // Collect information from various attributes, such as craft professions.    
+    list<DLString> attrLines;
+    if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) ))
+	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
+	    buf << *l << endl;
+	}
+
     ch->send_to( buf );
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
@@ -1714,6 +1722,16 @@ CMDRUNP( score )
 	      CLR_FRAME);
     }
 
+    list<DLString> attrLines;
+    if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) )) {
+        ekle = 1;
+	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
+	    ch->printf("     | {w%-64s%s|\r\n", 
+			l->c_str(),
+			CLR_FRAME);
+	}
+    }
+
     if (ekle) {
 	ch->printf( 
 "     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
@@ -2321,6 +2339,9 @@ CMDRUNP( help )
 		strcat(argall," ");
 	    strcat(argall,argone);
 	}
+
+        buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
+
 	count=0;
 	for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
 	    if (!(*a)->visible( ch ))
@@ -2328,18 +2349,12 @@ CMDRUNP( help )
 
 	    if (is_name( argall, (*a)->getKeyword( ).c_str( ) ) ){
 		count++;
-		if (count == 2){
-		    buf << ("Найдены следующие разделы помощи:\n\r");
-		    buf << "\t1." << findHelp->getKeyword( ) << "\n\r";                  
-		    buf << "\t"<< count << "." << (*a)->getKeyword( ) << "\n\r";
-		}
+                buf << "    {C{hh" << count << "." << origArgument << "{x : " << (*a)->getKeyword( ) << endl;
 		findHelp = *a;
-		if (count > 2){
-		    buf << "\t"<< count << "." << (*a)->getKeyword( ) << "\n\r";
-		}
             }
 	}
-        ch->send_to(buf.str().c_str());
+
+        buf << endl;
     }
     /*
      * Strip leading '.' to allow initial blanks.
@@ -2352,7 +2367,8 @@ CMDRUNP( help )
 	bugTracker->reportNohelp( ch, origArgument.c_str( ) );
     }
     else if (count > 1) {
-	ch->send_to("Используйте ""цифра.ключевое слово"" для выбора необходимого раздела.\n\rНапример: help 2.create\n\r");
+        buf << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." << endl;
+        ch->send_to(buf.str().c_str());
     }
 }                  
 

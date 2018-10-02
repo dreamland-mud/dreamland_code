@@ -122,7 +122,7 @@ bool Skill::canPractice( PCharacter *, std::ostream & ) const
 {
     return false;
 }
-bool Skill::canTeach( NPCharacter *, PCharacter * ) 
+bool Skill::canTeach( NPCharacter *, PCharacter *, bool ) 
 {
     return false;
 }

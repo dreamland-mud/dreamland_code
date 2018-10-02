@@ -150,7 +150,7 @@ void ConfigGroup::printHeader( PCharacter *ch ) const
 {
     ch->printf( "\r\n{%s%s{x\r\n", 
 		    CLR_HEADER(ch),
-		    ch->getConfig( )->rucommands ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ) );
+		    name.getValue( ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -248,7 +248,9 @@ COMMAND(ConfigCommand, "config")
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
 	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ) && (*c)->matches( arg1 )) {
+	    if ((*c)->available( pch ) 
+                    && ((*c)->matches( arg1 ) || (*c)->matchesAlias( arg1 ))) 
+            {
 		if (!(*c)->handleArgument( pch, arg2 ))
 		    pch->println("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
 

@@ -181,10 +181,8 @@ void WieldWearloc::reportWeaponSkill( Character *ch, Object *obj )
 	msg = "Ты довольно посредственно владеешь $o5.";
     else if (skill > 25)
 	msg = "Ты чувствуешь себя неуклюже, вооружившись $o5.";
-    else if (skill > 1)
-	msg = "Ты неумело крутишь в руках $o4, боясь уронить.";
     else
-	msg = "Ты не знаешь, как вооружиться $o5.";
+	msg = "Ты неумело крутишь в руках $o4, боясь уронить.";
     
     act( msg, ch, obj, 0, TO_CHAR );
 }

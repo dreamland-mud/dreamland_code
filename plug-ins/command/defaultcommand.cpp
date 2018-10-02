@@ -35,16 +35,22 @@ bool DefaultCommand::matchesExactly( const DLString &cmdName ) const
     if (Command::matchesExactly( cmdName ))
 	return true;
 
-    for (XMLStringList::const_iterator i = aliases.begin( ); i != aliases.end( ); i++) 
-	if (*i == cmdName) 
-	    return true;
+    if (dl_isrusalpha( cmdName.at( 0 ) )) {
+        for (XMLStringList::const_iterator i = russian.begin( ); i != russian.end( ); i++) 
+            if (*i == cmdName) 
+                return true;
+    } else {
+        for (XMLStringList::const_iterator i = aliases.begin( ); i != aliases.end( ); i++) 
+            if (*i == cmdName) 
+                return true;
+    }
 
     return false;
 }
 
-bool DefaultCommand::matches( const DLString& command ) const
+bool DefaultCommand::matchesAlias( const DLString& command ) const
 {
-    if (Command::matches( command ))
+    if (Command::matchesAlias( command ))
 	return true;
 
     if (command.empty( ))

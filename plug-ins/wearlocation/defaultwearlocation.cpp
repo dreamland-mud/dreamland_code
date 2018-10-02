@@ -194,19 +194,14 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-	if (IS_OBJ_STAT(obj, ITEM_NODROP)) {
-	    act( "You are zapped by $o1.", ch, obj, 0, TO_CHAR );
-	    act( "$c1 is zapped by $o1.", ch, obj, 0, TO_ROOM );
-	} else {
-	    act( "You are zapped by $o1 and drop it.", ch, obj, 0, TO_CHAR );
-	    act( "$c1 is zapped by $o1 and drops it.", ch, obj, 0, TO_ROOM );
-	    obj_from_char( obj );
-	    obj_to_room( obj, ch->in_room );
-	}
+	act( "Твой характер не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
+	act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
+	act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
 	return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
+	act("Твой характер все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
 	act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
 	act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
 	return false;

@@ -121,6 +121,11 @@ bool Command::matches( const DLString& command ) const
     return false;
 }
 
+bool Command::matchesAlias( const DLString& command ) const
+{
+    return false;
+}
+
 bool Command::properOrder( Character *ch )
 {
     if (!ch->is_npc( )) 
@@ -262,21 +267,6 @@ bool Command::checkPosition( Character *ch )
     }
     
     return false;
-}
-
-bool Command::compare( const Command &b ) const
-{
-    CommandManager::Priorities::const_iterator i_a, i_b, i_end;
-    const CommandManager::Priorities &prio = commandManager->getPriorities( );
-
-    i_a = prio.find( getName( ) );
-    i_b = prio.find( b.getName( ) );
-    i_end = prio.end( );
-
-    if (i_a != i_end && i_b != i_end)
-	return (i_a->second < i_b->second);
-
-    return (i_a != i_end);
 }
 
 static const XMLStringList emptyList;

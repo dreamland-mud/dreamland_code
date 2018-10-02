@@ -53,4 +53,5 @@
 	<node>riding</node>
 	<node>follow_command</node>
 	<node>web</node>
+	<node>craft</node>
 </PluginManager>

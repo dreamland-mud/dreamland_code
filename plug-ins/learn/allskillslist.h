@@ -57,6 +57,7 @@ struct AllSkillsList : public std::list<SkillInfo> {
     bool fUsableOnly;
     bool fRussian;
     bool fShowHint;
+    bool fCurrentProfAll;
 };
 
 #endif

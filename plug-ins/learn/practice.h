@@ -26,8 +26,9 @@ private:
 		
 	void pracShow( PCharacter *, bool, bool );
 	void pracLearn( PCharacter *, DLString & );
-	PCharacter * findTeacher( PCharacter *, Skill * );
-	NPCharacter * findPracticer( PCharacter *, Skill * );
+	void pracHere( PCharacter * );
+	PCharacter * findTeacher( PCharacter *, Skill * = NULL );
+	NPCharacter * findPracticer( PCharacter *, Skill * = NULL );
 };
 
 #endif

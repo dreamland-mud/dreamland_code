@@ -499,18 +499,20 @@ bool GenericSkill::practiceAux( PCharacter *ch, std::ostream & buf ) const
     return true;
 }
 
-bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch ) 
+bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
     if (!mob) {
-	ch->println( "Тебе не с кем практиковаться здесь." );
+	if (verbose)
+	    ch->println( "Тебе не с кем практиковаться здесь." );
 	return false;
     }
     
     if (mob->pIndexData->practicer.isSet( (int)getGroup( ) ))
 	return true;
 
-    ch->pecho( "%^C1 не может научить тебя искусству '%s'.\n"
-	       "Для большей информации используй glist, slook.",
+    if (verbose)
+	ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
+	       "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
 	       mob, getNameFor( ch ).c_str( ) );
     return false;
 }
@@ -528,7 +530,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
         << " '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{W" 
+	<< "входит в группу '{hg{W" 
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
 	<< "{x'"
 	<< endl;

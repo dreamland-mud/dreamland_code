@@ -26,7 +26,7 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    in << ", входит в группу '{c" 
+    in << ", входит в группу '{hg{c" 
        << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
        << endl << endl
        << *this;
@@ -69,6 +69,7 @@ void SkillHelpFormatter::setup( Character *ch )
 /*
  * CMD      ->  {lEeng_name{lRрусское_имя{lx
  * SKILL    ->  {lEeng_name{lRрусское_имя{lx
+ * SPELL    ->  {lEc 'spell name'{lRк 'название заклинания'{lx
  */
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
@@ -84,6 +85,13 @@ bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 
     if (kw == "SKILL") {
 	out << (fRusSkill ? skill->getRussianName( ).quote( )
+	                  : skill->getName( ).quote( ));
+	return true;
+    }
+
+    if (kw == "SPELL") {
+	out << (fRusCmd ? "к" : "c") << " "
+	    << (fRusSkill ? skill->getRussianName( ).quote( )
 	                  : skill->getName( ).quote( ));
 	return true;
     }
@@ -131,5 +139,10 @@ void SkillHelp::unsetSkill( )
     helpManager->unregistrate( Pointer( this ) );
     skill.clear( );
     fullKeyword = "";
+}
+
+bool SkillHelp::toXML( XMLNode::Pointer &parent ) const
+{
+    return XMLHelpArticle::toXML( parent ); 
 }
 

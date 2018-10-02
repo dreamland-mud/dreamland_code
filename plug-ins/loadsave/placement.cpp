@@ -6,6 +6,7 @@
 #include "save.h"
 
 #include "affect.h"
+#include "gmcp.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -154,6 +155,7 @@ void char_to_room( Character *ch, Room *pRoomIndex )
 		save_mobs( pRoomIndex );
 	}
 
+	GMCPHandler::sendRoom(ch->desc);
 	return;
 }
 

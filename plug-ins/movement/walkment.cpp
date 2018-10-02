@@ -528,8 +528,12 @@ bool Walkment::applyWeb( Character *wch )
 	return true;
 
     wch->setWaitViolence( 1 );
-    
-    if (number_percent( ) < get_str_app(wch).web) {
+
+    int chance = get_str_app(wch).web;
+    if (IS_SET(wch->form, FORM_MIST))
+        chance *= 2;
+
+    if (number_percent( ) < chance) {
 	affect_strip(wch, gsn_web);
 	msgSelfRoom( wch,
 		     "Ты разрываешь сети, которые мешали тебе покинуть это место.",

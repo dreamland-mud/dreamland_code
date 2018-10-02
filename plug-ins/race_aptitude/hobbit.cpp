@@ -6,12 +6,14 @@
 #include "skillreference.h"
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"
+#include "logstream.h"
 
 #include "affect.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "npcharacter.h"
 #include "object.h"
+#include "race.h"
 
 #include "dreamland.h"
 #include "act_move.h"
@@ -27,6 +29,8 @@
 
 GSN(search_stones);
 GSN(throw_stone);
+GSN(flaming_stone);
+GSN(freezing_stone);
 
 #define OBJ_VNUM_THROWING_STONE 118 
 
@@ -205,7 +209,28 @@ SKILL_RUNP( throwstone )
     chance += ch->hitroll - ch->getRealLevel( );
     dam = dice(stone->value[1], stone->value[2]);
     dam += ch->damroll + get_str_app(ch).missile;
-    dam /= 2;
+
+    if (ch->size < SIZE_HUGE)
+	dam /= 2;
+
+    if (number_percent( ) <= gsn_flaming_stone->getEffective( ch )) {
+	Affect saf;
+	saf.where	       = TO_WEAPON;
+	saf.type               = gsn_flaming_stone;
+	saf.level              = level;
+	saf.duration           = -1;
+        saf.bitvector	= WEAPON_FLAMING;
+	affect_to_obj( stone, &saf);
+
+    } else if (number_percent( ) <= gsn_freezing_stone->getEffective( ch )) {
+	Affect saf;
+	saf.where	       = TO_WEAPON;
+	saf.type               = gsn_freezing_stone;
+	saf.level              = level;
+	saf.duration           = -1;
+	saf.bitvector	= WEAPON_FROST;
+	affect_to_obj( stone, &saf);
+    }
 
     try {
 	obj_from_char( stone );
