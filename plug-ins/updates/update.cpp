@@ -472,6 +472,9 @@ void water_float_update( )
 	
         if (!IS_WATER( obj->in_room ))
 	    continue;
+
+        if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))
+	    continue;
         
 	ch = obj->in_room->people;
 	
