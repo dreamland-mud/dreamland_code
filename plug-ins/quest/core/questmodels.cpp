@@ -126,6 +126,7 @@ bool ItemQuestModel::checkItem( PCharacter *pch, Object *obj )
 {
     if (obj->item_type == ITEM_KEY 
 	|| obj->item_type == ITEM_MAP
+	|| obj->item_type == ITEM_POTION
 	|| obj->item_type == ITEM_MONEY)
 	return false;
 

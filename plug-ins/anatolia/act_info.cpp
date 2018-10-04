@@ -592,11 +592,13 @@ CMDRUNP( oscore )
 	    << endl;
 
     // Collect information from various attributes, such as craft professions.    
-    list<DLString> attrLines;
-    if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) ))
-	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
-	    buf << *l << endl;
-	}
+    if (pch) {
+        list<DLString> attrLines;
+        if (pch->getAttributes( ).handleEvent( ScoreArguments( pch, attrLines ) ))
+        	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
+				buf << *l << endl;
+			}
+    }
 
     ch->send_to( buf );
 

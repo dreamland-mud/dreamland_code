@@ -436,6 +436,9 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
     if (material_is_flagged( worn, MAT_INDESTR ))
 	return;
 
+    if (IS_SET( worn->extra_flags, ITEM_NOPURGE ))
+	return;
+
     worn->condition -= damage;
 
     act( "$o1 наносит повреждения $O3.", ch, wield, worn, TO_ROOM );

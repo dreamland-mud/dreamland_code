@@ -764,13 +764,13 @@ SKILL_RUNP( makearrow )
 	arrowSkill = &*gsn_make_arrow;
     }
     else { 
-        if (arg_oneof("green", "зеленая", "зеленые"))
+        if (arg_oneof(arg, "green", "зеленая", "зеленые"))
 	    arrowSkill = &*gsn_green_arrow;
-        else if (arg_oneof("red", "красная", "красные"))
+        else if (arg_oneof(arg, "red", "красная", "красные"))
 	    arrowSkill = &*gsn_red_arrow;
-        else if (arg_oneof("white", "белая", "белые"))
+        else if (arg_oneof(arg, "white", "белая", "белые"))
 	    arrowSkill = &*gsn_white_arrow;
-        else if (arg_oneof("blue", "голубая", "голубые"))
+        else if (arg_oneof(arg, "blue", "голубая", "голубые"))
 	    arrowSkill = &*gsn_blue_arrow;
 	else {
 	    ch->send_to("Можно изготовить только зеленые, красные, белые или голубые стрелы.\n\r");
