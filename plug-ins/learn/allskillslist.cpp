@@ -217,7 +217,7 @@ void AllSkillsList::display( std::ostream & buf )
     int tmp_len;
     for (iterator i = begin( ); i != end( ); i++) {
         SkillInfo info = *i;
-        tmp_len = strlen(info.name.c_str( ));
+        tmp_len = info.name.size();
         if ( tmp_len > tmp_max ) tmp_max = tmp_len;
     }
     int bool_long_name = 0;
