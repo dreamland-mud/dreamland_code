@@ -15,10 +15,13 @@
 #include "dreamland.h"
 #include "recallmovement.h"
 #include "act.h"
+#include "hometown.h"
 #include "merc.h"
 #include "arg_utils.h"
 #include "mercdb.h"
 #include "def.h"
+
+HOMETOWN(frigate);
 
 /*----------------------------------------------------------------------------
  * 'homerecall' command 
@@ -91,6 +94,11 @@ protected:
 
 	if (ch->is_npc( )) {
 	    msgSelf( ch, "В лес!" );
+	    return false;
+	}
+
+	if (ch->getPC( )->getHometown( ) == home_frigate) {
+	    msgSelf( ch, "Сначала спустись с фрегата." );
 	    return false;
 	}
 

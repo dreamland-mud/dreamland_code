@@ -15,11 +15,13 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "descriptor.h"
+#include "hometown.h"
 #include "vnum.h"
 #include "merc.h"
 #include "def.h"
 
 GSN(jail);
+HOMETOWN(frigate);
 
 /*---------------------------------------------------------------------------
  * GlobalQuestInfo
@@ -105,6 +107,9 @@ bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
     if (ch->getAttributes( ).isAvailable( "nogq" ))
 	return false;
     
+    if (ch->getPC( )->getHometown( ) == home_frigate)
+	return false;
+
     if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY))
 	return false;
 
