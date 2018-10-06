@@ -453,7 +453,7 @@ bool DLString::isRussian( ) const
 	return false;
 
     for (size_type i = 0; i < length( ); i++) 
-	if (!dl_isrusalpha( at( i ) ))
+	if (!dl_isrusalpha(at(i)) && !dl_isspace(at(i)))
 	    return false;
 
     return true;

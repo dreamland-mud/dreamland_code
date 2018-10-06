@@ -327,7 +327,7 @@ NMI_INVOKE(FeniaString, isRussian, "возвращает true если строка не пуста и содер
 	return false;
 
     for (iterator i = begin(); i != end(); i++) 
-	if (!dl_isrusalpha( *i ))
+	if (!dl_isrusalpha( *i ) && !dl_isspace( *i ))
 	    return false;
 
     return true;
