@@ -74,10 +74,10 @@ static bool oprog_open_msg(Object *obj, Character *ch)
 
 void open_door_extra ( Character *ch, int door, void *pexit )
 {
-    Room *to_room;
     EXIT_DATA *pexit_rev = 0;
     int exit_info;
     bool eexit = door == DIR_SOMEWHERE;
+    Room *room = ch->in_room;
 
     if ( !pexit )
 	    return;
@@ -107,22 +107,17 @@ void open_door_extra ( Character *ch, int door, void *pexit )
 	act( "Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
     }
     else {
-	act( "$c1 открывает $d.", ch, 0, ((EXIT_DATA *) pexit)->keyword, TO_ROOM );
-	act( "Ты открываешь $d.", ch, 0, ((EXIT_DATA *) pexit)->keyword, TO_CHAR );
+        const char *doorname = direction_doorname((EXIT_DATA *) pexit);
+	act( "$c1 открывает $N4.", ch, 0, doorname, TO_ROOM );
+	act( "Ты открываешь $N4.", ch, 0, doorname, TO_CHAR );
     }
 
 
     /* open the other side */
-    if ( !eexit
-	    && ( to_room   = ((EXIT_DATA *) pexit)->u1.to_room) != 0
-	    && ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-	    && pexit_rev->u1.to_room == ch->in_room )
+    if (!eexit && (pexit_rev = direction_reverse(room, door)))
     {
-	    Character *rch;
-
 	    REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
-	    for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-		    act_p( "$d открывается.", rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING );
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 открывается.", direction_doorname(pexit_rev));
     }
 }
 
@@ -313,9 +308,9 @@ static bool oprog_close( Object *obj, Character *ch )
 static void close_door( Character *ch, int door )
 {
     // 'close door'
-    Room *to_room;
     EXIT_DATA *pexit;
     EXIT_DATA *pexit_rev = 0;
+    Room *room = ch->in_room;
 
     pexit	= ch->in_room->exit[door];
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
@@ -325,19 +320,16 @@ static void close_door( Character *ch, int door )
     }
 
     SET_BIT(pexit->exit_info, EX_CLOSED);
-    act_p( "$c1 закрывает $d.", ch, 0, pexit->keyword, TO_ROOM,POS_RESTING );
-    ch->println( "Ok." );
+    
+    const char *doorname = direction_doorname(pexit);
+    act( "$c1 закрывает $N4.", ch, 0, doorname, TO_ROOM );
+    act( "Ты закрываешь $N4.", ch, 0, doorname, TO_CHAR );
 
     // close the other side
-    if ( ( to_room   = pexit->u1.to_room            ) != 0
-	    && ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-	    && pexit_rev->u1.to_room == ch->in_room )
+    if ((pexit_rev = direction_reverse(room, door)))
     {
-	    Character *rch;
-
 	    SET_BIT( pexit_rev->exit_info, EX_CLOSED );
-	    for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-		    act_p( "$d закрывается.", rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING );
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 закрывается.", direction_doorname(pexit_rev));
     }
 }
 
@@ -468,8 +460,8 @@ CMDRUNP( close )
 	}
 
 	SET_BIT(peexit->exit_info, EX_CLOSED);
-	act_p( "$c1 закрывает $N4.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
-	ch->println( "Ok." );
+	act( "$c1 закрывает $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
+	act( "Ты закрываешь $N4.", ch, 0, peexit->short_desc_from, TO_CHAR);
 
 	return;
     }	
@@ -484,10 +476,9 @@ CMDRUNP( close )
 static void lock_door( Character *ch, int door )
 {
     // 'lock door'
-    Room *to_room;
     EXIT_DATA *pexit;
     EXIT_DATA *pexit_rev = 0;
-    Character *rch;
+    Room *room = ch->in_room;
 
     pexit	= ch->in_room->exit[door];
     if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
@@ -522,16 +513,13 @@ static void lock_door( Character *ch, int door )
 
     SET_BIT(pexit->exit_info, EX_LOCKED);
     ch->println( "*Щелк*" );
-    act_p( "$c1 запирает $d на ключ.", ch, 0, pexit->keyword, TO_ROOM,POS_RESTING );
+    act( "$c1 запирает $N4 на ключ.", ch, 0, direction_doorname(pexit), TO_ROOM);
 
     /* lock the other side */
-    if ( ( to_room   = pexit->u1.to_room ) != 0
-	    && ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-	    && pexit_rev->u1.to_room == ch->in_room )
+    if ((pexit_rev = direction_reverse(room, door)))
     {
 	    SET_BIT( pexit_rev->exit_info, EX_LOCKED );
-	    for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-		    act_p( "$d защелкивается.", rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING );
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 защелкивается.", direction_doorname(pexit_rev));
     }
 }
 
@@ -721,10 +709,9 @@ CMDRUNP( lock )
 static void unlock_door( Character *ch, int door )
 {
     // 'unlock door'
-    Room *to_room;
     EXIT_DATA *pexit;
     EXIT_DATA *pexit_rev = 0;
-    Character *rch;
+    Room *room = ch->in_room;
 
     pexit = ch->in_room->exit[door];
     if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
@@ -753,16 +740,13 @@ static void unlock_door( Character *ch, int door )
 
     REMOVE_BIT(pexit->exit_info, EX_LOCKED);
     ch->println( "*Щелк*" );
-    act_p( "$c1 открывает ключом $d.", ch, 0, pexit->keyword, TO_ROOM,POS_RESTING );
+    act( "$c1 открывает ключом $N4.", ch, 0, direction_doorname(pexit), TO_ROOM);
 
     // unlock the other side
-    if ( ( to_room = pexit->u1.to_room  ) != 0
-	    && ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-	    && pexit_rev->u1.to_room == ch->in_room )
+    if ((pexit_rev = direction_reverse(room, door)))
     {
 	    REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-	    for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-		    act_p( "$d щелкает.", rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING );
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 щелкает.", direction_doorname(pexit_rev));
     }
 }
 

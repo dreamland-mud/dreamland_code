@@ -106,6 +106,14 @@ int find_exit( Character *ch, const char *arg, int flags )
 
 	    if (pexit->keyword && is_name( arg, pexit->keyword ))
 		return d;
+            
+            if (pexit->short_descr 
+                  && (is_name(arg, russian_case(pexit->short_descr, '1').c_str())
+                      || is_name(arg, russian_case(pexit->short_descr, '4').c_str())))
+                return d;
+
+            if (!str_prefix(arg, "дверь") || !str_prefix(arg, "door"))
+                return d;
 	}
 
 	if (IS_SET(flags, FEX_VERBOSE))
@@ -151,3 +159,34 @@ EXTRA_EXIT_DATA * get_extra_exit ( const char * name,EXTRA_EXIT_DATA * list )
 	return 0;
 }
 
+const char * direction_doorname(EXIT_DATA *pexit)
+{
+    if (!pexit->short_descr || !pexit->short_descr[0])
+        return "дверь";
+    return pexit->short_descr;
+}
+
+exit_data *direction_reverse(Room *room, int door)
+{
+    Room *to_room;       
+    EXIT_DATA *pexit = room->exit[door], *pexit_rev;
+
+    if (!pexit)
+	return 0;
+
+    if (!(to_room = pexit->u1.to_room))
+	return 0;
+
+    if (!(pexit_rev = to_room->exit[dirs[door].rev]))
+	return 0;
+
+    if (pexit_rev->u1.to_room != room)
+	return 0;
+
+    return pexit_rev;
+}
+
+Room * direction_target(Room *room, int door)
+{
+    return room->exit[door]->u1.to_room;
+}

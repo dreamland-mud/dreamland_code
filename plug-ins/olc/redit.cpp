@@ -367,6 +367,11 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
 	    if (pexit->keyword && pexit->keyword[0] != '\0') {
 		ptc(ch, "        Kwds: [{W%s{x]\n\r", pexit->keyword);
 	    }
+
+	    if (pexit->short_descr && pexit->short_descr[0] != '\0') {
+		ptc(ch, "  Short desc: [{W%s{x]\n\r", pexit->short_descr);
+            }
+
 	    if (pexit->description && pexit->description[0] != '\0') {
 		stc(pexit->description, ch);
 	    }
@@ -622,6 +627,24 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 	pRoom->exit[door]->keyword = str_dup(arg);
 
 	stc("Exit name set.\n\r", ch);
+	return true;
+    }
+
+    if (!str_cmp(command, "short")) {
+	if (arg[0] == '\0') {
+	    stc("Syntax:  [direction] short [string]\n\r", ch);
+	    return false;
+	}
+
+	if (!pRoom->exit[door]) {
+	    stc("REdit:  Door doesn't exist.\n\r", ch);
+	    return false;
+	}
+
+	free_string(pRoom->exit[door]->short_descr);
+	pRoom->exit[door]->short_descr = str_dup(arg);
+
+	stc("Exit short description set.\n\r", ch);
 	return true;
     }
 

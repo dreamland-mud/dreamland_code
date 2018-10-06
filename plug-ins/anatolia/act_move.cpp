@@ -188,7 +188,7 @@ static Room * scan_room( Room *start_room, Character *ch, int depth, int door,
 	    buf << "Дальность " << depth;
 	
 	buf << ":{x" << endl
-	    << "    {" << CLR_SCAN_DOOR(ch) << "Закрытая дверь.{x" << endl;
+	    << "    {" << CLR_SCAN_DOOR(ch) << russian_case(direction_doorname(pExit), '1') << " (закрыто).{x" << endl;
 
 	return NULL;
     }

@@ -420,6 +420,7 @@ struct	exit_data
 	int		key;
 	char *		keyword;
 	char *		description;
+        char *          short_descr;
 	EXIT_DATA *	next;
 	int		orig_door;
 	int		level;

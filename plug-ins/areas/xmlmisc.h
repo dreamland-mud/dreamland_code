@@ -111,6 +111,7 @@ public:
     exit_data *compat( );
 
     XML_VARIABLE XMLStringNoEmpty keyword;
+    XML_VARIABLE XMLStringNoEmpty short_descr;
 };
 
 struct extra_exit_data;

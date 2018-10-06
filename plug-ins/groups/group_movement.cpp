@@ -60,6 +60,8 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 	char arg[MAX_INPUT_LENGTH];
 	int chance=0;
 	int door;
+        Room *room = ch->in_room;
+	EXTRA_EXIT_DATA *peexit = 0;
 
 	target_name = one_argument( target_name, arg );
 
@@ -75,76 +77,80 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 		return;
 	}
 	
-	if (( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY) ) >= 0) 
+        if ( ((peexit = get_extra_exit( arg, room->extra_exit )) && ch->can_see(peexit)) ||
+	     (door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY)) >= 0) 
 	{
-		Room *to_room;
 		EXIT_DATA *pexit;
 		EXIT_DATA *pexit_rev = 0;
+                int exit_info;
 
-		pexit = ch->in_room->exit[door];
-		if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
+                if ( peexit != 0 )
+                {
+                        door = DIR_SOMEWHERE;
+                        exit_info = peexit->exit_info;
+                }
+                else
+                {
+                        pexit = room->exit[door];
+                        exit_info = pexit->exit_info;
+                }
+
+		if ( !IS_SET(exit_info, EX_CLOSED) )
 		{
 			ch->send_to("Здесь уже открыто.\n\r");
 			return;
 		}
-		if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
+		if ( !IS_SET(exit_info, EX_LOCKED) )
 		{
 			ch->send_to("Попробуй просто открыть...\n\r");
 			return;
 		}
-		if ( IS_SET(pexit->exit_info, EX_NOPASS) )
+		if ( IS_SET(exit_info, EX_NOPASS) )
 		{
 			ch->send_to("Таинственная сила блокирует проход.\n\r");
 			return;
 		}
 		chance = ch->getModifyLevel() / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
 
-		act_p("Ударом Магической Силы ты пытаешься открыть $d!",
-			ch,0,pexit->keyword,TO_CHAR,POS_RESTING);
+                const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
+		act("Ударом Магической Силы ты пытаешься открыть $N4!", ch, 0, doorname, TO_CHAR);
+		act("Ударом Магической Силы $c1 пытается открыть $N4!", ch, 0, doorname,TO_ROOM);
 
-		act_p("Ударом Магической Силы $c1 пытается открыть $d!",
-			ch,0,pexit->keyword,TO_ROOM,POS_RESTING);
-
-		if (ch->in_room->isDark())
+		if (room->isDark())
 			chance /= 2;
 
 		// now the attack
 		if (number_percent() < chance )
 		{
+                    if ( peexit != 0 )
+                    {
+                        REMOVE_BIT(peexit->exit_info, EX_LOCKED);
+                        REMOVE_BIT(peexit->exit_info, EX_CLOSED);
+			act( "$N1 с грохотом распахивается.", ch, 0, doorname, TO_ALL);
+
+                    } else {
 			REMOVE_BIT(pexit->exit_info, EX_LOCKED);
 			REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-			act_p( "$c1 с грохотом распахивает $d!",
-				ch, 0,pexit->keyword, TO_ROOM,POS_RESTING);
-			act_p( "$d с грохотом распахивается.",
-				ch, 0, pexit->keyword, TO_CHAR,POS_RESTING);
+			act( "$N1 с грохотом распахивается.", ch, 0, doorname, TO_ALL);
 
 			// open the other side
-			if ( ( to_room   = pexit->u1.to_room            ) != 0
-				&& ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-				&& pexit_rev->u1.to_room == ch->in_room )
+                        if ((pexit_rev = direction_reverse(room, door)))
 			{
-				Character *rch;
-
 				REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
 				REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-				for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-					act_p( "Внезапно с грохотом распахивается $d.",
-						rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING);
+                                direction_target(room, door)->echo(POS_RESTING, "Внезапно с грохотом распахивается %N1.", doorname);
 			}
+                    }
 		}
 		else
 		{
-			act_p("Твой удар сотрясает все вокруг, но $d остается закрытой.",
-				ch,0,pexit->keyword,TO_CHAR,POS_RESTING);
-			act_p("Удар $c2 сотрясает все вокруг, но $d остается закрытой.",
-				ch,0,pexit->keyword,TO_ROOM,POS_RESTING);
+			act("Твой удар сотрясает все вокруг, но $N1 не поддается.", ch,0, doorname,TO_CHAR);
+			act("Удар $c2 сотрясает все вокруг, но $N1 не поддается.", ch,0, doorname,TO_ROOM);
 		}
 		return;
 	}
 
 	ch->send_to("Тут нет такой двери.\n\r");
-	return;
-
 }
 
 

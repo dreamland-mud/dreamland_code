@@ -183,7 +183,7 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
 	rc = RC_MOVE_PASS_NEVER;
 	msgSelfRoom( wch,
 		     "Через %4$N4 невозможно пройти насквозь.",
-		     "%2$C1 стукается лбом о %4$N4." );
+		     "%2$^C1 стукается лбом о %4$N4." );
     }
     else {
 	if (IS_SET(exit_info, EX_LOCKED))
@@ -192,8 +192,8 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
 	    rc = RC_MOVE_CLOSED;
 	    
 	msgSelfParty( wch,
-		      "%4$N1: закрыто.",
-		      "%4$N1: закрыто." );
+		      "%4$^N1: тут закрыто.",
+		      "%4$^N1: тут закрыто." );
     }
     
     return false;
@@ -488,7 +488,7 @@ void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg 
 	               (RIDDEN(wch) ? wch->mount : wch),
 	               (MOUNTED(wch) ? wch->mount : wch),
 		       wch, 
-		       peexit ? peexit->short_desc_from : pexit ? pexit->keyword : "",
+		       peexit ? peexit->short_desc_from : direction_doorname(pexit),
 		       boat );
 }
 

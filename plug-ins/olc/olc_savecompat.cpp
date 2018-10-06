@@ -480,6 +480,7 @@ void save_room(FILE *fp, Room *pRoomIndex)
 
 		fprintf(fp, "D%d\n", pExit->orig_door);
 		fprintf(fp, "%s~\n", fix_string(pExit->description));
+                // Door short description is not saved here.
 		fprintf(fp, "%s~\n", pExit->keyword);
 		fprintf(fp, "%d ", locks);
 		if(locks == 6)

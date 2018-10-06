@@ -124,6 +124,7 @@ EXIT_DATA *new_exit(void)
     pExit->exit_info = 0;
     pExit->key = 0;
     pExit->keyword = &str_empty[0];
+    pExit->short_descr = &str_empty[0];
     pExit->description = &str_empty[0];
     pExit->exit_info_default = 0;
     pExit->level = 0;
@@ -133,6 +134,7 @@ EXIT_DATA *new_exit(void)
 void free_exit(EXIT_DATA * pExit)
 {
     free_string(pExit->keyword);
+    free_string(pExit->short_descr);
     free_string(pExit->description);
 
     pExit->next = exit_free;
@@ -220,7 +222,7 @@ void free_room_index(Room * pRoom)
 	    free_exit(pRoom->exit[door]);
     }
 
-    for (pExtra = pRoom->extra_descr; pExtra; pExtra = pExtra->next) {
+    for (pExtra = pRoom->extra_descr; pExtra; pExtra = pExtra_next) {
 	pExtra_next = pExtra->next;
 	free_extra_descr(pExtra);
     }

@@ -61,6 +61,7 @@ SKILL_RUNP( bashdoor )
 	int chance=0;
 	EXTRA_EXIT_DATA *peexit = 0;
 	int damage_bash,door=0;
+        Room *room = ch->in_room;
 
 	one_argument( argument, arg );
 
@@ -93,8 +94,7 @@ SKILL_RUNP( bashdoor )
 		ch->send_to("Сначала закончи сражение.\n\r");
 		return;
 	}
-        if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) == 0
-	                                    || !ch->can_see( peexit ) )
+        if ( ( ( peexit = get_extra_exit( arg, room->extra_exit ) ) == 0 || !ch->can_see( peexit ) )
 	     && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
 	{
 		ch->send_to("Но тут нечего выбивать!\n\r");
@@ -102,18 +102,16 @@ SKILL_RUNP( bashdoor )
 	}
 
 	/* look for guards */
-	for ( gch = ch->in_room->people; gch; gch = gch->next_in_room )
+	for ( gch = room->people; gch; gch = gch->next_in_room )
 	{
 		if ( gch->is_npc() && IS_AWAKE(gch) && ch->getModifyLevel() + 5 < gch->getModifyLevel() )
 		{
-			act_p( "$C1 стоит слишком близко к двери.",
-				ch, 0, gch, TO_CHAR,POS_RESTING);
+			act_p( "$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR,POS_RESTING);
 			return;
 		}
 	}
 
 	// 'bash door'
-	Room *to_room;
 	EXIT_DATA *pexit = 0;
 	EXIT_DATA *pexit_rev = 0;
 	int	exit_info;
@@ -125,7 +123,7 @@ SKILL_RUNP( bashdoor )
 	}
 	else
 	{
-		pexit = ch->in_room->exit[door];
+		pexit = room->exit[door];
 		exit_info = pexit->exit_info;
 	}
 
@@ -165,23 +163,11 @@ SKILL_RUNP( bashdoor )
 	*/
 
 	chance += ( gsn_bash_door->getEffective( ch ) - 90 );
+        const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
+        act("Ты бьешь в $N4, пытаясь выбить!", ch,0, doorname,TO_CHAR);
+        act("$c1 бьет в $N4, пытаясь выбить!", ch,0, doorname,TO_ROOM);
 
-	if ( peexit != 0 )
-	{
-		act_p("Ты бьешь в $N4, и пытаешься выбить ее!",
-			ch,0,peexit->short_desc_from,TO_CHAR,POS_RESTING);
-		act_p("$c1 бьет в $N4, и пытается выбить ее!",
-			ch,0,peexit->short_desc_from,TO_ROOM,POS_RESTING);
-	}
-	else
-	{
-		act_p("Ты бьешь в $d, и пытаешься выбить ее!",
-			ch,0,pexit->keyword,TO_CHAR,POS_RESTING);
-		act_p("$c1 бьет в $d, и пытается выбить ее!",
-			ch,0,pexit->keyword,TO_ROOM,POS_RESTING);
-	}
-
-	if (ch->in_room->isDark( ))
+	if (room->isDark( ))
 		chance /= 2;
 
 	/* now the attack */
@@ -193,30 +179,22 @@ SKILL_RUNP( bashdoor )
 		{
 			REMOVE_BIT(peexit->exit_info, EX_LOCKED);
 			REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-			act_p( "$c1 бьет в $N4 и выбивает ее.", ch, 0,
-				peexit->short_desc_from, TO_ROOM,POS_RESTING);
-			act_p( "Ты бьешь в $N4 и выбиваешь ее.", ch, 0,
-				peexit->short_desc_from, TO_CHAR,POS_RESTING);
+                        act("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
+                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
 		}
 		else
 		{
 			REMOVE_BIT(pexit->exit_info, EX_LOCKED);
 			REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-			act_p( "$c1 бьет в $d и выбивает ее.", ch, 0,
-				pexit->keyword, TO_ROOM,POS_RESTING);
-			ch->send_to("Ты выбиваешь дверь!\n\r");
+                        act("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
+                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
 
 			/* open the other side */
-			if ( ( to_room   = pexit->u1.to_room ) != 0
-				&& ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-				&& pexit_rev->u1.to_room == ch->in_room )
+                        if ((pexit_rev = direction_reverse(room, door)))
 			{
-				Character *rch;
-
 				REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
 				REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-				for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-					act_p( "$d с грохотом вылетает.", rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING);
+                                direction_target(room, door)->echo(POS_RESTING, "%^N1 с грохотом вылетает.", doorname);
 			}
 		}
 
@@ -225,10 +203,8 @@ SKILL_RUNP( bashdoor )
 	}
 	else
 	{
-		act_p("Обессилев, ты падаешь лицом вниз!",
-			ch,0,0,TO_CHAR,POS_RESTING);
-		act_p("Обессилев, $c1 упа$gло|л|ла лицом вниз.",
-			ch,0,0,TO_ROOM,POS_RESTING);
+		act("Обессилев, ты падаешь лицом вниз!", ch,0,0,TO_CHAR);
+		act("Обессилев, $c1 упа$gло|л|ла лицом вниз.", ch,0,0,TO_ROOM);
 		gsn_bash_door->improve( ch, false );
 		ch->position = POS_RESTING;
 		ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );

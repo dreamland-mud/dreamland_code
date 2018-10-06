@@ -1256,19 +1256,10 @@ static bool do_look_direction( Character *ch, const char *arg1 )
     else
 	    ch->println( "Здесь нет ничего особенного." );
 
-    if ( pexit->keyword    != 0
-	    && pexit->keyword[0] != '\0'
-	    && pexit->keyword[0] != ' ' )
-    {
-	    if ( IS_SET(pexit->exit_info, EX_CLOSED) )
-	    {
-		    act_p( "$d: тут закрыто.", ch, 0, pexit->keyword, TO_CHAR,POS_RESTING );
-	    }
-	    else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
-	    {
-		    act_p( "$d: тут открыто.",   ch, 0, pexit->keyword, TO_CHAR,POS_RESTING );
-	    }
-    }
+    if ( IS_SET(pexit->exit_info, EX_CLOSED) )
+	act("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+    else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
+	act("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
     
     DoorKeyhole( ch, ch->in_room, door ).doExamine( );
     return true;
@@ -1770,7 +1761,7 @@ CMDRUNP( exits )
 		found = true;
 
 		buf << fmt( ch, "%-6^s", ename ) 
-		    << " * (" << pexit->keyword << ")";
+		    << " * (" << direction_doorname(pexit) << ")";
 
 		if (ch->is_immortal())
 		    buf << " (room " << room->vnum << ")";

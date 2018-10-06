@@ -314,6 +314,8 @@ void
 XMLExitDir::init(const exit_data *ex)
 {
     keyword.setValue(ex->keyword);
+    if (ex->short_descr)
+        short_descr.setValue(ex->short_descr);
     description.setValue(ex->description);
     flags.setValue(ex->exit_info_default);
     //if(ex->key > 0)
@@ -327,6 +329,7 @@ XMLExitDir::compat( )
     EXIT_DATA *pexit = (EXIT_DATA*)alloc_perm(sizeof(EXIT_DATA));
     
     pexit->keyword = str_dup(keyword.getValue( ).c_str( ));
+    pexit->short_descr = str_dup(short_descr.c_str());
     pexit->description = str_dup(description.getValue( ).c_str( ));
     pexit->exit_info_default = pexit->exit_info = flags.getValue( );
     pexit->key = key.getValue( );

@@ -649,6 +649,126 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
+static void door_rename(EXIT_DATA *pexit, const char *keyword, const char *short_descr, const char *extra_keyword = NULL)
+{
+    DLString newKeyword = keyword;
+    if (extra_keyword && extra_keyword[0] && !is_name(extra_keyword, keyword))
+    	newKeyword << " " << extra_keyword;
+
+    LogStream::sendNotice() << "door [" << pexit->keyword << "] -> [" << newKeyword << "], [" << short_descr << endl;
+    free_string(pexit->keyword);
+    pexit->keyword = str_dup(newKeyword.c_str());
+    free_string(pexit->short_descr);
+    pexit->short_descr = str_dup(short_descr);
+}
+
+struct door_rename_info {
+    const char *orig_keyword;
+    const char *keyword;
+    const char *short_descr;
+};
+static const struct door_rename_info renames [] = {
+    { "doors", "двери", "двер|и|ей|ям|и|ьми|ях" },
+    { "door", "дверь", "двер|ь|и|и|ь|ью|и" },
+    { "celldoor", "door дверь", "двер|ь|и|и|ь|ью|и" },
+    { "marble square", "мраморная клетка", "мраморн|ая|ой|ой|ую|ой|ой клетк|а|и|е|у|ой|е" },
+    { "steel", "steel door дверь", "двер|ь|и|и|ь|ью|и" },
+    { "дверь", "door", "двер|ь|и|и|ь|ью|и" },
+    { "ldthm", "door дверь", "двер|ь|и|и|ь|ью|и" },
+    { "двустворчатая", "door дверь", "двустворчат|ая|ой|ой|ую|ой|ой двер|ь|и|и|ь|ью|и" },
+    { "opening", "отверстие", "отверсти|е|я|ю|е|ем|и" },
+    { "калитка", "wicket", "калитк|а|у|е|у|ой|е" },
+    { "cell", "door дверь", "двер|ь|и|и|ь|ью|и" },
+    { "дверь домика", "door house дверь домика", "двер|ь|и|и|ь|ью|и домика" },
+    { "дверь клетки", "door cage дверь клетки", "двер|ь|и|и|ь|ью|и клетки" },
+    { "door cage дверь клетки", "door cage дверь клетки", "двер|ь|и|и|ь|ью|и клетки" },
+    { "могильный камень tomb stone", "могильный камень tomb stone", "могильн|ый|ого|ому|ый|ым|ом кам|ень|ня|ню|ень|нем|не" },
+    { "hatch", "люк", "люк||а|у||ом|е" },
+    { "gates", "ворота", "ворот|а||ам|а|ами|ах" },
+    { "stones", "камни", "камн|и|ей|ям|и|ями|ях" },
+    { "воротца", "gates", "ворот|ца|ец|цам|ца|цами|цах" },
+    { "gate", "ворота", "ворот|а||ам|а|ами|ах" },
+    { "gateway", "ворота", "ворот|а||ам|а|ами|ах" },
+    { "trapdoor", "люк", "люк||а|у||ом|е" },
+    { "тайник", "secret", "тайник||а|у||ом|е" },
+    { "люк", "trapdoor", "люк||а|у||ом|е" },
+    { "tapestry", "гобелен", "гобелен||а|у||ом|е" },
+    { "manhole", "проход", "проход||а|у||ом|е" },
+    { "wall", "стена", "стен|а|у|е|у|ой|е" },
+    { "floorboard", "половица", "половиц|а|у|е|у|ей|е" },
+    { "floorboards", "половица", "половиц|а|у|е|у|ей|е" },
+    { "curtain", "штора", "штор|а|у|е|у|ой|е" },
+    { "cage", "клетка", "клетк|а|у|е|у|ой|е" },
+    { "hole", "дыра", "дыр|а|у|е|у|ой|е" },
+    { "tree", "дерево", "дерев|о|а|у|о|ом|е" },
+    { "bookcase", "шкаф книжный", "шкаф||а|у||ом|е" },
+    { "skeleton", "скелет", "скелет||а|у||ом|е" },
+    { "painting", "картина", "картин|а|у|е|у|ой|е" },
+    { "panel", "панель", "панел|ь|и||ь|ью|и" },
+    { "statue", "статуя", "стату|я|ю|е|ю|ей|е" },
+    { "stone", "камень", "кам|ень|ня|ню|ень|нем|не" },
+    { "grate", "решетка", "решетк|а|и|е|у|ой|е" },
+    { "bookshelf", "полка", "полк|а|и|е|у|ой|е" },
+    { "tomb", "могила", "могил|а|ы|е|у|ой|е" },
+    { "crack", "трещина", "трещин|а|ы|е|у|ой|е" },
+    { "sculpture", "скульптура", "скульптур|а|ы|е|у|ой|е" },
+    { "throne", "трон", "трон||а|у||ом|е" },
+    { "bars", "решетка", "решетк|а|и|е|у|ой|е" },
+    { "bushes", "кусты", "куст|ы|ов|ам|ы|ами|ах" },
+    { "thicket", "заросли", "заросл|и|ей|ям|и|ями|ях" },
+    { "drapes", "портьеры", "портьер|ы||ам|ы|ами|ах" },
+    { "underbrush", "подлесок", "подлес|ок|ка|ку|ок|ком|ке" },
+    { "forcefield", "поле силовое", "силов|ое|ого|ому|ое|ым|ом пол|е|я|ю|е|ем|е" },
+    { "enterance", "entrance вход", "вход||а|у||ом|е" },
+    { "lid", "крышка", "крышк|а|и|е|у|ой|е" },
+    { "floor", "пол", "пол||а|у||ом|е" },
+    { "boulder", "валун", "валун||а|у||ом|е" },
+    { "sesame", "сезам", "сезам||а|у||ом|е" },
+    { "exit", "выход", "выход||а|у||ом|е" },
+    { "ranks", "ряды", "ряд|ы|ом|ам|ы|ами|ах" },
+    { "tank", "аквариум", "аквариум||а|у||ом|е" },
+    { "ceiling", "потолок", "потол|ок|ка|ку|ок|ком|ке" },
+    { "hope", "надежда", "надежд|а|у|е|у|ой|е" },
+    { "secret", "секретная потайная дверь", "потайн|ая|ой|ой|ую|ой|ой двер|ь|и|и|ь|ью|и" },
+    { 0 },
+};
+
+static bool door_match_and_rename_exact(EXIT_DATA *pexit) 
+{
+    const char *k = pexit->keyword;
+    for (int r = 0; renames[r].orig_keyword; r++) {
+	if (!str_cmp(renames[r].orig_keyword, k)) {
+	    door_rename(pexit, k, renames[r].short_descr, renames[r].keyword);
+	    return true;
+	}
+    }
+    return false;
+}
+    
+static bool door_match_and_rename_substring(EXIT_DATA *pexit) 
+{
+    const char *k = pexit->keyword;
+    DLString kStr(k);
+
+    for (int r = 0; renames[r].orig_keyword; r++) {
+	if (kStr.isName(renames[r].orig_keyword)) {
+	    door_rename(pexit, k, renames[r].short_descr, renames[r].keyword);
+	    return true;
+	}
+    }
+    return false;
+}
+
+static bool door_rename_as_russian(EXIT_DATA *pexit)
+{
+    const char *k = pexit->keyword;
+    if (DLString(k).isRussian()) {
+	door_rename(pexit, k, k, "door дверь");
+	return true;
+    }
+    return false;
+}
+
 CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
 {
     if (!ch->isCoder( ))
@@ -1353,6 +1473,43 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         ch->printf("\r\n{RНайдено %d несоответствий подсказок в длинном имени моба.{x\r\n", hcnt);
 	page_to_char( hbuf.str( ).c_str( ), ch );
         return;
+    }
+
+    if (arg == "doors") {
+        ostringstream buf;
+        int cnt = 0, total = 0, unprocessed = 0;
+
+	for (Room *room = room_list; room; room = room->rnext) {
+	    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+		EXIT_DATA *pexit;
+
+		if (!(pexit = room->exit[door]))
+                    continue;
+                if (!IS_SET(pexit->exit_info_default, EX_ISDOOR))
+                    continue;
+                if (!pexit->keyword || !pexit->keyword[0]) 
+                    continue;
+
+                total++;
+
+                unprocessed++;
+
+                if (door_match_and_rename_exact(pexit)
+                    || door_match_and_rename_substring(pexit)
+                    || door_rename_as_russian(pexit))
+		    continue;
+
+		cnt++;
+		buf << dlprintf("[{G%5d{x] %30s %20s: {g%s{x\r\n",
+			room->vnum, room->name, room->area->name,
+			pexit->keyword && pexit->keyword[0] ? pexit->keyword : "");
+                door_rename(pexit, pexit->keyword, "двер|ь|и|и|ь|ью|и");
+            }
+	}
+
+        buf << "Всего " << cnt << "/" << unprocessed << "/" << total << "." << endl;           
+	page_to_char( buf.str( ).c_str( ), ch );
+	return;
     }
 
 }

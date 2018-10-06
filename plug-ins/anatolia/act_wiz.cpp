@@ -964,7 +964,7 @@ CMDWIZP( stat )
 	if ( ( pexit = location->exit[door] ) != 0 )
 	{
 	    sprintf( buf,
-		"Door: %d.  To: %d.  Key: %d. Level: %d.  Exit flags: %s.\n\rKeyword: '%s'.  Description: %s",
+		"Door: %d.  To: %d.  Key: %d. Level: %d.  Exit flags: %s.\n\rKeyword: '%s'.  Short: '%s'. Description: %s",
 
 		door,
 		( pexit->u1.to_room == 0 ? -1 : pexit->u1.to_room->vnum),
@@ -972,6 +972,7 @@ CMDWIZP( stat )
 		pexit->level,
 	    	exit_flags.names(pexit->exit_info).c_str(),
 	    	pexit->keyword,
+                direction_doorname(pexit),
 	    	pexit->description[0] != '\0'
 		    ? pexit->description : "(none).\n\r" );
 	    ch->send_to(buf);
