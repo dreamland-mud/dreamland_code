@@ -33,10 +33,10 @@ void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king )
 void KidnapScenario::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *king )
 {
     tell_raw( hero, questman, 
-	      "õ {W%s{G ÓÌÕÞÉÌÏÓØ ÎÅÓÞÁÓÔØÅ. óÒÏÞÎÏ ÔÒÅÂÕÅÔÓÑ Ô×ÏÑ ÐÏÍÏÝØ.",
+	      "Ð£ {W%s{G ÑÐ»ÑƒÑ‡Ð¸Ð»Ð¾ÑÑŒ Ð½ÐµÑÑ‡Ð°ÑÑ‚ÑŒÐµ. Ð¡Ñ€Ð¾Ñ‡Ð½Ð¾ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ñ‚Ð²Ð¾Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.",
                    king->getNameP( '2' ).c_str() );
     tell_raw( hero, questman, 
-	     "éÝÉ %s × ÍÅÓÔÎÏÓÔÉ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ {W%s{G ({W%s{G).",
-                   GET_SEX(king, "ÅÇÏ", "ÅÇÏ", "ÅÅ"), king->in_room->name, king->in_room->area->name );
+	     "Ð˜Ñ‰Ð¸ %s Ð² Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ {W%s{G ({W%s{G).",
+                   GET_SEX(king, "ÐµÐ³Ð¾", "ÐµÐ³Ð¾", "ÐµÐµ"), king->in_room->name, king->in_room->area->name );
 }
 

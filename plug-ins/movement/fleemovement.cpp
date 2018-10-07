@@ -84,7 +84,7 @@ bool FleeMovement::findTargetRoom( )
 
     switch (targetDoor) {
     case -1:
-	msgSelf( ch, "{RПАНИКА!{x Ты не находишь выхода!" );
+	msgSelf( ch, "{Rп÷п░п²п≤п п░!{x п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ п╡я▀я┘п╬п╢п╟!" );
 	return false;
 
     case DIR_SOMEWHERE:
@@ -113,7 +113,7 @@ bool FleeMovement::canMove( Character * )
 bool FleeMovement::checkPositionHorse( )
 {
     if (horse->position <= POS_RESTING) {
-	msgSelf( ch, "%2$^C1 долж%2$Gно|ен|на сначала встать." );
+	msgSelf( ch, "%2$^C1 п╢п╬п╩п╤%2$Gп╫п╬|п╣п╫|п╫п╟ я│п╫п╟я┤п╟п╩п╟ п╡я│я┌п╟я┌я▄." );
 	return false;
     }
 
@@ -142,19 +142,19 @@ void FleeMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (fLeaving) {
 	if (wch == rider)
-	    msgSelf( wch, "%2$^C1 выносит тебя с поля битвы!" );
+	    msgSelf( wch, "%2$^C1 п╡я▀п╫п╬я│п╦я┌ я┌п╣п╠я▐ я│ п©п╬п╩я▐ п╠п╦я┌п╡я▀!" );
 	else if (wch == horse) 
-	    msgSelf( wch, "%1$^C1 покидает поле битвы верхом на тебе!" );
+	    msgSelf( wch, "%1$^C1 п©п╬п╨п╦п╢п╟п╣я┌ п©п╬п╩п╣ п╠п╦я┌п╡я▀ п╡п╣я─я┘п╬п╪ п╫п╟ я┌п╣п╠п╣!" );
 	else
-	    msgSelf( wch, "Ты убегаешь с поля битвы!" );
+	    msgSelf( wch, "п╒я▀ я┐п╠п╣пЁп╟п╣я┬я▄ я│ п©п╬п╩я▐ п╠п╦я┌п╡я▀!" );
     }
     
     ExitsMovement::msgOnMove( wch, fLeaving );
 
     if (fLeaving) 
 	msgRoomNoParty( wch, 
-			"%1$^C1 убегает!",
-			"%1$^C1 и %2$C1 убегают!" );
+			"%1$^C1 я┐п╠п╣пЁп╟п╣я┌!",
+			"%1$^C1 п╦ %2$C1 я┐п╠п╣пЁп╟я▌я┌!" );
 }
 
 bool FleeMovement::applySkill( SkillReference &skill ) 
@@ -162,7 +162,7 @@ bool FleeMovement::applySkill( SkillReference &skill )
     bool fSuccess = true;;
     
     if (number_percent() > skill->getEffective( ch )) {
-	msgSelf( ch, "У тебя не получается сбежать." );
+	msgSelf( ch, "пё я┌п╣п╠я▐ п╫п╣ п©п╬п╩я┐я┤п╟п╣я┌я│я▐ я│п╠п╣п╤п╟я┌я▄." );
 	fSuccess = false;
     }
 

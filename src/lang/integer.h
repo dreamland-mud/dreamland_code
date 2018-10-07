@@ -25,7 +25,7 @@ public:
 	static const DLString TYPE;
 
 public:	
-	/** По умолчанию значение 0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
 	inline Integer( ) : value( 0 )
 	{
 	}
@@ -67,7 +67,7 @@ private:
 
 
 
-/** Вывод в ostream типа Integer */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Integer */
 inline std::ostream& operator << ( std::ostream& ostr, const Integer& integer )
 {
 	ostr << integer.getValue( );

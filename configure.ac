@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([dreamland], [0.1])
+AC_CONVERT_CHARSET
 AC_CONFIG_SRCDIR(Makefile.am)
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_SYSTEM

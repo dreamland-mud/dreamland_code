@@ -64,7 +64,7 @@ const unsigned char gmcp_on_str[] = { IAC, WILL, GMCP };
 char * realip( char *ip )
 {
     if (!ip)
-        return str_dup( "неизвестно" );
+        return str_dup( "п╫п╣п╦п╥п╡п╣я│я┌п╫п╬" );
 
     DLString ipStr = DLString( ip );
 

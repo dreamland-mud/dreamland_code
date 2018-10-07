@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
  *    Koval Nazar	    {Nazar, Redrum}                 		   *
  *    Doropey Vladimir	    {Reorx}		                           *
  *    Kulgeyko Denis	    {Burzum}		                           *
  *    Andreyanov Aleksandr  {Manwe}		                           *
- *    и все остальные, кто советовал и играл в этот MUD	                   *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD	                   *
  ***************************************************************************/
 
 
@@ -144,30 +144,30 @@ Object *create_money( int gold, int silver )
 DLString describe_money( int gold, int silver, const Grammar::Case &gcase )
 {
     static const char *cases_gold [] = {
-	"золот%1$Iая|ые|ых",
-	"золот%1$Iой|ых|ых",
-	"золот%1$Iой|ым|ым",
-	"золот%1$Iую|ые|ых",
-	"золот%1$Iой|ыми|ыми",
-	"золот%1$Iой|ых|ых",
+	"п╥п╬п╩п╬я┌%1$Iп╟я▐|я▀п╣|я▀я┘",
+	"п╥п╬п╩п╬я┌%1$Iп╬п╧|я▀я┘|я▀я┘",
+	"п╥п╬п╩п╬я┌%1$Iп╬п╧|я▀п╪|я▀п╪",
+	"п╥п╬п╩п╬я┌%1$Iя┐я▌|я▀п╣|я▀я┘",
+	"п╥п╬п╩п╬я┌%1$Iп╬п╧|я▀п╪п╦|я▀п╪п╦",
+	"п╥п╬п╩п╬я┌%1$Iп╬п╧|я▀я┘|я▀я┘",
     };
     static const char *cases_silver [] = {
-	"серебрян%1$Iая|ые|ых",
-	"серебрян%1$Iая|ые|ых",
-	"серебрян%1$Iой|ых|ых",
-	"серебрян%1$Iой|ым|ым",
-	"серебрян%1$Iую|ые|ых",
-	"серебрян%1$Iой|ыми|ыми",
-	"серебрян%1$Iой|ых|ых",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iп╟я▐|я▀п╣|я▀я┘",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iп╟я▐|я▀п╣|я▀я┘",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iп╬п╧|я▀я┘|я▀я┘",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iп╬п╧|я▀п╪|я▀п╪",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iя┐я▌|я▀п╣|я▀я┘",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iп╬п╧|я▀п╪п╦|я▀п╪п╦",
+	"я│п╣я─п╣п╠я─я▐п╫%1$Iп╬п╧|я▀я┘|я▀я┘",
     };
     static const char *cases_coin [] = {
-	"моне%1$Iта|ты|т",
-	"моне%1$Iта|ты|т",
-	"моне%1$Iты|т|т",
-	"моне%1$Iте|там|там",
-	"моне%1$Iту|ты|т",
-	"моне%1$Iтой|тами|тами",
-	"моне%1$Iте|тах|тах",
+	"п╪п╬п╫п╣%1$Iя┌п╟|я┌я▀|я┌",
+	"п╪п╬п╫п╣%1$Iя┌п╟|я┌я▀|я┌",
+	"п╪п╬п╫п╣%1$Iя┌я▀|я┌|я┌",
+	"п╪п╬п╫п╣%1$Iя┌п╣|я┌п╟п╪|я┌п╟п╪",
+	"п╪п╬п╫п╣%1$Iя┌я┐|я┌я▀|я┌",
+	"п╪п╬п╫п╣%1$Iя┌п╬п╧|я┌п╟п╪п╦|я┌п╟п╪п╦",
+	"п╪п╬п╫п╣%1$Iя┌п╣|я┌п╟я┘|я┌п╟я┘",
     };
 
     DLString msg;
@@ -177,7 +177,7 @@ DLString describe_money( int gold, int silver, const Grammar::Case &gcase )
 
     if (silver > 0) {
 	if (gold > 0)
-	    msg << " и ";
+	    msg << " п╦ ";
 
 	msg << silver << " " << fmt( 0, cases_silver[gcase], silver);
     }
@@ -226,7 +226,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
 	bug("In find_char wrong door: %d",door);
 
 	if (message)
-	    ch->send_to("Ты не видишь этого здесь.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄.\n\r");
 
 	return 0;
     }
@@ -249,7 +249,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
 	    || bExit->u1.to_room != back_room)
 	{
 	    if (message)
-		ch->send_to("По выбранному направлению что-то препятствует тебе.\n\r");
+		ch->send_to("п÷п╬ п╡я▀п╠я─п╟п╫п╫п╬п╪я┐ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▌ я┤я┌п╬-я┌п╬ п©я─п╣п©я▐я┌я│я┌п╡я┐п╣я┌ я┌п╣п╠п╣.\n\r");
 
 	    return 0;
 	}
@@ -259,7 +259,7 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
     }
     
     if (message)
-	ch->send_to("Ты не видишь этого здесь.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄.\n\r");
 
     return 0;
 }
@@ -297,18 +297,18 @@ void eyes_blinded_msg( Character *ch )
     for (paf = ch->affected; paf; paf = paf->next) 
 	if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_BLIND)) {
 	    if (paf->type == gsn_fire_breath)
-		ch->println( "Твои глаза слезятся из-за дыма, и ты ничего не видишь." );
+		ch->println( "п╒п╡п╬п╦ пЁп╩п╟п╥п╟ я│п╩п╣п╥я▐я┌я│я▐ п╦п╥-п╥п╟ п╢я▀п╪п╟, п╦ я┌я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄." );
 	    else if (paf->type == gsn_sand_storm)
-		ch->println( "Песок в глазах мешает тебе что-либо разглядеть." );
+		ch->println( "п÷п╣я│п╬п╨ п╡ пЁп╩п╟п╥п╟я┘ п╪п╣я┬п╟п╣я┌ я┌п╣п╠п╣ я┤я┌п╬-п╩п╦п╠п╬ я─п╟п╥пЁп╩я▐п╢п╣я┌я▄." );
 	    else if (paf->type == gsn_dirt_kicking)
-		ch->println( "Ты ничего не видишь из-за пыли, попавшей в глаза." );
+		ch->println( "п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄ п╦п╥-п╥п╟ п©я▀п╩п╦, п©п╬п©п╟п╡я┬п╣п╧ п╡ пЁп╩п╟п╥п╟." );
 	    else
 		continue;
 
 	    return;
 	}
 
-    ch->println( "Твои глаза слепы, ты ничего не видишь!" );
+    ch->println( "п╒п╡п╬п╦ пЁп╩п╟п╥п╟ я│п╩п╣п©я▀, я┌я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄!" );
 }
 
 /*--------------------------------------------------------------
@@ -343,9 +343,9 @@ void nuke_pets( PCharacter *ch, int flags )
     pet->stop_follower( );
    
     if (pet->in_room == ch->in_room)
-        act( "$C1 медленно исчезает.", ch, NULL, pet, TO_NOTVICT );
+        act( "$C1 п╪п╣п╢п╩п╣п╫п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌.", ch, NULL, pet, TO_NOTVICT );
     else
-        act( "$c1 медленно исчезает.", pet, NULL, NULL, TO_ROOM );
+        act( "$c1 п╪п╣п╢п╩п╣п╫п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌.", pet, NULL, NULL, TO_ROOM );
         
     
     if (IS_SET(flags, FEXTRACT_TOTAL))
@@ -357,7 +357,7 @@ void nuke_pets( PCharacter *ch, int flags )
 }
 
 /*
- * Оповестить о extract-е всех, кто на нас ссылался
+ * п·п©п╬п╡п╣я│я┌п╦я┌я▄ п╬ extract-п╣ п╡я│п╣я┘, п╨я┌п╬ п╫п╟ п╫п╟я│ я│я│я▀п╩п╟п╩я│я▐
  */
 void notify_referers( Character *ch, int flags )
 {
@@ -368,7 +368,7 @@ void notify_referers( Character *ch, int flags )
 	    wch->reply = 0;
 
 	if (wch->doppel == ch && wch->isAffected(gsn_doppelganger)) {
-	    wch->println("Ты принимаешь свое истинное обличье.");
+	    wch->println("п╒я▀ п©я─п╦п╫п╦п╪п╟п╣я┬я▄ я│п╡п╬п╣ п╦я│я┌п╦п╫п╫п╬п╣ п╬п╠п╩п╦я┤я▄п╣.");
 	    
 	    if (gsn_doppelganger->getAffect( ))
 		gsn_doppelganger->getAffect( )->remove( wch );
@@ -388,7 +388,7 @@ void notify_referers( Character *ch, int flags )
 }
 
 /*
- * Extract мертвого игрока
+ * Extract п╪п╣я─я┌п╡п╬пЁп╬ п╦пЁя─п╬п╨п╟
  */
 void extract_dead_player( PCharacter *ch, int flags )
 {
@@ -488,12 +488,12 @@ DLString quality_percent( int c )
 {
     DLString str;
 
-    if (c >  99) return "{Cотличн|ое{x|ого{x|ому{x|ое{x|ым{x|ом{x";
-    if (c >= 80) return "{cхорош|ее{x|его{x|ему{x|ее{x|им{x|ем{x";
-    if (c >= 60) return "{Yнормальн|ое{x|ого{x|ому{x|ое{x|ым{x|ом{x";
-    if (c >= 40) return "{yсредн|ее{x|его{x|ему{x|ее{x|им{x|ем{x";
-    if (c >= 20) return "{Rплох|ое{x|ого{x|ому{x|ое{x|им{x|ом{x";
-                 return "{rужасн|ое{x|ого{x|ому{x|ое{x|ым{x|ом{x";
+    if (c >  99) return "{Cп╬я┌п╩п╦я┤п╫|п╬п╣{x|п╬пЁп╬{x|п╬п╪я┐{x|п╬п╣{x|я▀п╪{x|п╬п╪{x";
+    if (c >= 80) return "{cя┘п╬я─п╬я┬|п╣п╣{x|п╣пЁп╬{x|п╣п╪я┐{x|п╣п╣{x|п╦п╪{x|п╣п╪{x";
+    if (c >= 60) return "{Yп╫п╬я─п╪п╟п╩я▄п╫|п╬п╣{x|п╬пЁп╬{x|п╬п╪я┐{x|п╬п╣{x|я▀п╪{x|п╬п╪{x";
+    if (c >= 40) return "{yя│я─п╣п╢п╫|п╣п╣{x|п╣пЁп╬{x|п╣п╪я┐{x|п╣п╣{x|п╦п╪{x|п╣п╪{x";
+    if (c >= 20) return "{Rп©п╩п╬я┘|п╬п╣{x|п╬пЁп╬{x|п╬п╪я┐{x|п╬п╣{x|п╦п╪{x|п╬п╪{x";
+                 return "{rя┐п╤п╟я│п╫|п╬п╣{x|п╬пЁп╬{x|п╬п╪я┐{x|п╬п╣{x|я▀п╪{x|п╬п╪{x";
 }
 
 

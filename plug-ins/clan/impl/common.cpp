@@ -44,17 +44,17 @@ protected:
 	    return true;
 
 	if (( point = ch->getClan( )->getRecallVnum( ) ) <= 0) {
-	    msgSelf( ch, "Но у тебя нет кланового дома." );
+	    msgSelf( ch, "п²п╬ я┐ я┌п╣п╠я▐ п╫п╣я┌ п╨п╩п╟п╫п╬п╡п╬пЁп╬ п╢п╬п╪п╟." );
 	    return false;
 	}
 	
 	if (!gsn_clanrecall->available( ch )) {
-	    msgSelf( ch, "Богам нет дела до твоих просьб." );
+	    msgSelf( ch, "п▒п╬пЁп╟п╪ п╫п╣я┌ п╢п╣п╩п╟ п╢п╬ я┌п╡п╬п╦я┘ п©я─п╬я│я▄п╠." );
 	    return false;
 	}
 	
 	if (!( to_room = get_room_index( point ) )) {
-	    msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
+	    msgSelf( ch, "п╒я▀ п╥п╟п╠п╩я┐п╢п╦п╩%1Gп╬я│я▄|я│я▐|п╟я│я▄." );
 	    return false;
 	}
 
@@ -86,12 +86,12 @@ protected:
     {
 	if (fLeaving)
 	    msgRoomNoParty( wch,
-		            "%1$^C1 исчезает.",
-			    "%1$^C1 и %2$C1 исчезают." );
+		            "%1$^C1 п╦я│я┤п╣п╥п╟п╣я┌.",
+			    "%1$^C1 п╦ %2$C1 п╦я│я┤п╣п╥п╟я▌я┌." );
 	else
 	    msgRoomNoParty( wch, 
-	                    "%1$^C1 появляется в комнате.",
-			    "%1$^C1 и %2$C1 появляются в комнате." );
+	                    "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╡ п╨п╬п╪п╫п╟я┌п╣.",
+			    "%1$^C1 п╦ %2$C1 п©п╬я▐п╡п╩я▐я▌я┌я│я▐ п╡ п╨п╬п╪п╫п╟я┌п╣." );
     }
     virtual void movePet( NPCharacter *pet )
     {
@@ -100,7 +100,7 @@ protected:
     bool checkPostAffect( )
     {
 	if (ch->isAffected( gsn_clanrecall )) {
-	    msgSelf( ch, "Слишком мало времени прошло с последней молитвы." );
+	    msgSelf( ch, "п║п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╬ п╡я─п╣п╪п╣п╫п╦ п©я─п╬я┬п╩п╬ я│ п©п╬я│п╩п╣п╢п╫п╣п╧ п╪п╬п╩п╦я┌п╡я▀." );
 	    return false;
 	}
 

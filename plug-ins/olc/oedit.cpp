@@ -390,7 +390,7 @@ OEDIT(show)
 
 OEDIT(where)
 {
-    ptc(ch, "%s находится:\r\n", DLString( obj.short_descr ).ruscase('1').c_str( ));
+    ptc(ch, "%s п╫п╟я┘п╬п╢п╦я┌я│я▐:\r\n", DLString( obj.short_descr ).ruscase('1').c_str( ));
     
     for (Object *o = object_list; o; o = o->next) {
 	Character *wch;
@@ -403,18 +403,18 @@ OEDIT(where)
 	wch = o->getCarrier( );
 
 	if (wch)
-	    ptc(ch, "[%5d]   у %s в %s (%s)\r\n", 
+	    ptc(ch, "[%5d]   я┐ %s п╡ %s (%s)\r\n", 
 		    room->vnum,
 		    wch->getNameP('2').c_str( ), 
 		    room->name, 
 		    room->area->name);
 	else if (o->in_room)
-	    ptc(ch, "[%5d]   на полу в %s (%s)\r\n", 
+	    ptc(ch, "[%5d]   п╫п╟ п©п╬п╩я┐ п╡ %s (%s)\r\n", 
 		    room->vnum,
 		    room->name, 
 		    room->area->name);
 	else if (o->in_obj)
-	    ptc(ch, "[%5d]   внутри %s в %s (%s)\r\n", 
+	    ptc(ch, "[%5d]   п╡п╫я┐я┌я─п╦ %s п╡ %s (%s)\r\n", 
 		    room->vnum,
 		    o->in_obj->getShortDescr('2').c_str( ),
 		    room->name,
@@ -958,7 +958,7 @@ OEDIT(material)
 
     free_string(pObj->material);
     pObj->material = str_dup(argument);
-#warning нет material_lookup
+#warning п╫п╣я┌ material_lookup
 
     stc("Material set.\n\r", ch);
     return true;
@@ -1204,7 +1204,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 
 	if (!OLCState::can_edit(ch, pObj->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п©я─п╣п╢п╪п╣я┌п╬п╡.\n\r", ch);
 	    return;
 	}
 
@@ -1230,7 +1230,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 
 	if (!OLCState::can_edit(ch, value)) {
-	    stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п©я─п╣п╢п╪п╣я┌п╬п╡.\n\r", ch);
 	    return;
 	}
 
@@ -1259,7 +1259,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 
 	if (!OLCState::can_edit(ch, value)) {
-	    stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п©я─п╣п╢п╪п╣я┌п╬п╡.\n\r", ch);
 	    return;
 	}
 
@@ -1280,12 +1280,12 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 	pObj = get_obj_index(atoi(argument));
 	if(!pObj) {
-	    stc("Нет такого объекта.\n\r", ch);
+	    stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟.\n\r", ch);
 	    return;
 	}
 	
 	if (!OLCState::can_edit(ch, pObj->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования объектов.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╬п╠я┼п╣п╨я┌п╬п╡.\n\r", ch);
 	    return;
 	}
 
@@ -1298,12 +1298,12 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 	pObj = get_obj_index(atoi(argument));
 	if(!pObj) {
-	    stc("Нет такого объекта.\n\r", ch);
+	    stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟.\n\r", ch);
 	    return;
 	}
 	
 	if (!OLCState::can_edit(ch, pObj->vnum)) {
-	    stc("У тебя недостаточно прав для создания этого предмета.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я│п╬п╥п╢п╟п╫п╦я▐ я█я┌п╬пЁп╬ п©я─п╣п╢п╪п╣я┌п╟.\n\r", ch);
 	    return;
 	}
 	
@@ -1314,8 +1314,8 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	else
 	    obj_to_room( obj, ch->in_room );
 
-	act_p( "$c1 создает $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
-	act_p( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
+	act_p( "$c1 я│п╬п╥п╢п╟п╣я┌ $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
+	act_p( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
 	return;
     }
     stc("OEdit:  There is no default object to edit.\n\r", ch);

@@ -29,10 +29,10 @@ bool dl_isspace( char ch )
 
 bool dl_isrusalpha( char c )
 {
-    return (c >= 'à' && c < 'ÿ') 
-	   || (c >= 'À' && c <= 'ß') 
-	   || c == '£' 
-	   || c == '³';
+    return (c >= 'Ð®' && c < 'Ðª') 
+	   || (c >= 'ÑŽ' && c <= 'ÑŠ') 
+	   || c == 'Ñ‘' 
+	   || c == 'Ð';
 }
 
 bool dl_isalpha( char c )
@@ -43,15 +43,15 @@ bool dl_isalpha( char c )
 bool dl_isupper( char c )
 {
     return isupper( c ) 
-	    || (c >= 'à' && c < 'ÿ') 
-	    || c == '³';
+	    || (c >= 'Ð®' && c < 'Ðª') 
+	    || c == 'Ð';
 }
 
 bool dl_islower( char c )
 {
     return islower( c )
-	   || (c >= 'À' && c <= 'ß') 
-	   || c == '£';
+	   || (c >= 'ÑŽ' && c <= 'ÑŠ') 
+	   || c == 'Ñ‘';
 }
 
 bool dl_isalnum( char c )

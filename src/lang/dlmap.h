@@ -13,9 +13,9 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Расширенный класс map
- * Добавлены методы для удаления элементов, для которых нужно
- * вызвать delete
+ * @short п═п╟я│я┬п╦я─п╣п╫п╫я▀п╧ п╨п╩п╟я│я│ map
+ * п■п╬п╠п╟п╡п╩п╣п╫я▀ п╪п╣я┌п╬п╢я▀ п╢п╩я▐ я┐п╢п╟п╩п╣п╫п╦я▐ я█п╩п╣п╪п╣п╫я┌п╬п╡, п╢п╩я▐ п╨п╬я┌п╬я─я▀я┘ п╫я┐п╤п╫п╬
+ * п╡я▀п╥п╡п╟я┌я▄ delete
  */
 template<typename Key, class Value, class Compare=std::less<Key> >
 class DLMap : public std::map<Key, Value*, Compare>

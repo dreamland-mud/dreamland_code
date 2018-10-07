@@ -68,11 +68,11 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_range( 5, 10 ); 
     setTime( pch, time );
 
-    tell_fmt( "{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи.",  
+    tell_fmt( "{W%3$#^C1{G я┘п╬я┤п╣я┌ п╬я┌я▀я│п╨п╟я┌я▄ п╫п╣п╨п╬я┌п╬я─я▀п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╟я┴п╦п╣ %3$P3 п╡п╣я┴п╦.",  
               pch, questman, customer );
-    tell_fmt( "%3$#^P1 ждет тебя в районе {W%4$s{G ({W%5$s{G).", 
+    tell_fmt( "%3$#^P1 п╤п╢п╣я┌ я┌п╣п╠я▐ п╡ я─п╟п╧п╬п╫п╣ {W%4$s{G ({W%5$s{G).", 
 	       pch, questman, customer, customer->in_room->name, customer->in_room->area->name );
-    tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.",  
+    tell_fmt( "пё я┌п╣п╠я▐ п╣я│я┌я▄ {Y%3$d{G п╪п╦п╫я┐%3$Iя┌п╟|я┌я▀|я┌, я┤я┌п╬п╠я▀ п╢п╬п╠я─п╟я┌я▄я│я▐ я┌я┐п╢п╟ п╦ я┐п╥п╫п╟я┌я▄ п©п╬п╢я─п╬п╠п╫п╬я│я┌п╦.",  
                pch, questman, time );
     
     wiznet( scenName.getValue( ).c_str( ), 
@@ -92,23 +92,23 @@ void LocateQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << customerName.ruscase( '1' ) <<  " хочет отыскать кое-какие свои вещи." << endl
-	    << "Тебя с нетерпением ждут в районе " << customerRoom << "." << endl
-	    << "Это находится в местности под названием " << customerArea << "." << endl;
+	buf << customerName.ruscase( '1' ) <<  " я┘п╬я┤п╣я┌ п╬я┌я▀я│п╨п╟я┌я▄ п╨п╬п╣-п╨п╟п╨п╦п╣ я│п╡п╬п╦ п╡п╣я┴п╦." << endl
+	    << "п╒п╣п╠я▐ я│ п╫п╣я┌п╣я─п©п╣п╫п╦п╣п╪ п╤п╢я┐я┌ п╡ я─п╟п╧п╬п╫п╣ " << customerRoom << "." << endl
+	    << "п╜я┌п╬ п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ п╪п╣я│я┌п╫п╬я│я┌п╦ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ " << customerArea << "." << endl;
 	break;
     case QSTAT_SEARCH:
 	getScenario( ).getLegend( ch, this, buf );
 
 	if (delivered > 0)
-	    buf << "Тобой уже доставлено {Y" << delivered << "{x из них." << endl;
+	    buf << "п╒п╬п╠п╬п╧ я┐п╤п╣ п╢п╬я│я┌п╟п╡п╩п╣п╫п╬ {Y" << delivered << "{x п╦п╥ п╫п╦я┘." << endl;
 	
-	buf << "Заказчик ждет тебя в районе " << customerRoom << "." << endl
-	    << "Это находится в местности под названием " << customerArea << "." << endl;
+	buf << "п≈п╟п╨п╟п╥я┤п╦п╨ п╤п╢п╣я┌ я┌п╣п╠я▐ п╡ я─п╟п╧п╬п╫п╣ " << customerRoom << "." << endl
+	    << "п╜я┌п╬ п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ п╪п╣я│я┌п╫п╬я│я┌п╦ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ " << customerArea << "." << endl;
 
 	break;
     case QSTAT_FINISHED:
-	buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-	    << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+	buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ {Yп▓п╚п÷п·п⌡п²п∙п²п·{x!" << endl
+	    << "п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪, п╢п╬ я┌п╬пЁп╬ п╨п╟п╨ п╡я▀п╧п╢п╣я┌ п╡я─п╣п╪я▐!" << endl;
 	break;
     default:
 	break;
@@ -119,17 +119,17 @@ void LocateQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Помочь " << customerName.ruscase( '3' ) << " из " << customerRoom
-            << " (" << customerArea << ") отыскать свои вещи.";
+        buf << "п÷п╬п╪п╬я┤я▄ " << customerName.ruscase( '3' ) << " п╦п╥ " << customerRoom
+            << " (" << customerArea << ") п╬я┌я▀я│п╨п╟я┌я▄ я│п╡п╬п╦ п╡п╣я┴п╦.";
 	break;
     case QSTAT_SEARCH:
-        buf << "Найти " << total << " штук" << GET_COUNT(total, "у", "и", "") << " "
-            << russian_case( itemMltName.getValue( ), '2' ) << " для "
-            << russian_case( customerName.getValue( ), '2' ) << " из " << customerRoom 
+        buf << "п²п╟п╧я┌п╦ " << total << " я┬я┌я┐п╨" << GET_COUNT(total, "я┐", "п╦", "") << " "
+            << russian_case( itemMltName.getValue( ), '2' ) << " п╢п╩я▐ "
+            << russian_case( customerName.getValue( ), '2' ) << " п╦п╥ " << customerRoom 
             << " (" << customerArea << ").";
 	break;
     case QSTAT_FINISHED:
-	buf << "Вернуться к квестору за наградой.";
+	buf << "п▓п╣я─п╫я┐я┌я▄я│я▐ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ п╫п╟пЁя─п╟п╢п╬п╧.";
 	break;
     default:
 	break;

@@ -70,7 +70,7 @@ bool limit_check_on_load( Object *obj )
             << ", " << (fCount ? "count":"nocount") << endl;
     } else {
         if (obj->getRoom( ))
-            obj->getRoom( )->echo( POS_RESTING, "%1$^O1 “¡””Ÿ–¡≈‘”— ‘“’»œ !", obj );
+            obj->getRoom( )->echo( POS_RESTING, "%1$^O1 —Ä–∞—Å—Å—ã–ø–∞–µ—Ç—Å—è —Ç—Ä—É—Ö–æ–π!", obj );
         LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
             << " (" << obj->getID( ) << ") extracted in " << (obj->getRoom( ) ? obj->getRoom( )->vnum : -1)
             << ", " << (fCount ? "count":"nocount") << endl;
@@ -105,7 +105,7 @@ bool limit_check_on_save( Object *obj )
         return false;
 
     if (obj->getRoom( ))
-        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 “¡””Ÿ–¡≈‘”— ‘“’»œ !", obj );
+        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 —Ä–∞—Å—Å—ã–ø–∞–µ—Ç—Å—è —Ç—Ä—É—Ö–æ–π!", obj );
 
     // If item was already expired during boot time,
     // its counter hasn't been increased, thus we shouldn't decrease.

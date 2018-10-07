@@ -55,33 +55,33 @@ void XMLAttributeReward::reward( PCharacter *ch )
 	c = r->gold;
 	if (c > 0) {
 	    ch->gold += c;
-	    sprintf( buf + strlen(buf), "%s%s%4d %sзолот%s\r\n",
+	    sprintf( buf + strlen(buf), "%s%s%4d %sп╥п╬п╩п╬я┌%s\r\n",
 		     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		     GET_COUNT(c, "ую монету", "ые монеты", "ых монет") );
+		     GET_COUNT(c, "я┐я▌ п╪п╬п╫п╣я┌я┐", "я▀п╣ п╪п╬п╫п╣я┌я▀", "я▀я┘ п╪п╬п╫п╣я┌") );
 	}
 
 	c = r->qpoints;
 	if (c > 0) {
 	    ch->questpoints += c;
-	    sprintf( buf + strlen(buf), "%s%s%4d %sквестов%s\r\n",
+	    sprintf( buf + strlen(buf), "%s%s%4d %sп╨п╡п╣я│я┌п╬п╡%s\r\n",
 		     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		     GET_COUNT(c, "ую единицу", "ые единицы", "ых единиц") );
+		     GET_COUNT(c, "я┐я▌ п╣п╢п╦п╫п╦я├я┐", "я▀п╣ п╣п╢п╦п╫п╦я├я▀", "я▀я┘ п╣п╢п╦п╫п╦я├") );
 	}
 
 	c = r->practice;
 	if (c > 0) {
 	    ch->practice += c;
-	    sprintf( buf + strlen(buf), "%s%s%4d %sпрактик%s\r\n",
+	    sprintf( buf + strlen(buf), "%s%s%4d %sп©я─п╟п╨я┌п╦п╨%s\r\n",
 		      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		      GET_COUNT(c, "у", "и", "") );
+		      GET_COUNT(c, "я┐", "п╦", "") );
 	}
 	
 	c = r->experience;
 	if (c > 0) {
 	    ch->gainExp( c );
-	    sprintf( buf + strlen(buf), "%s%s%4d %sочк%s опыта\r\n",
+	    sprintf( buf + strlen(buf), "%s%s%4d %sп╬я┤п╨%s п╬п©я▀я┌п╟\r\n",
 		     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		     GET_COUNT(c, "о", "а", "ов"));
+		     GET_COUNT(c, "п╬", "п╟", "п╬п╡"));
 	}
 	
 	GQChannel::pecho( ch, buf );

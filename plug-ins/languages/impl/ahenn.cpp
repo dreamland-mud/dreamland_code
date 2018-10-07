@@ -20,7 +20,7 @@
 static bool is_vowel( char c )
 {
     static const char vowels [] = 
-	{ '¡', '—', '≈', '‹', '…', 'Ÿ', 'œ', '’', '¿', 0 };
+	{ '–∞', '—è', '–µ', '—ç', '–∏', '—ã', '–æ', '—É', '—é', 0 };
 
     for (int i = 0; vowels[i]; i++)
 	if (vowels[i] == c)
@@ -31,12 +31,12 @@ static bool is_vowel( char c )
 
 static bool to_vowel( char c )
 {
-    return c == ' ';
+    return c == '–π';
 }
 
 static bool to_consonant( char c )
 {
-    return c == 'ÿ' || c == 'ﬂ';
+    return c == '—å' || c == '—ä';
 }
 
 static bool is_consonant( char c )
@@ -172,7 +172,7 @@ DLString AhennLanguage::createDictum( ) const
      * pretend this is a verb and add verb-endings
      */
     if (!verb_ends.empty( )
-	&& dictum.at( dsize - 1 ) == 'œ' 
+	&& dictum.at( dsize - 1 ) == '–æ' 
 	&& chance( 80 )) 
     {
 	dictum.erase( dsize - 1, dsize );
@@ -207,15 +207,15 @@ DLString AhennLanguage::createDictum( ) const
 	    if (v_0 - i > 2) 
 		dictum.erase( i, v_0 - i - 1 );
 	}
-	// eliminate   , $ 
-	else if (i != dictum.size( ) && dictum[i + 1] == ' ') { 
-	    for (v_0 = i + 1; v_0 < dictum.size( ) && dictum[v_0] == ' '; v_0++)
+	// eliminate –π–π, $–π
+	else if (i != dictum.size( ) && dictum[i + 1] == '–π') { 
+	    for (v_0 = i + 1; v_0 < dictum.size( ) && dictum[v_0] == '–π'; v_0++)
 		;
 
 	    dictum.erase( i + 1, v_0 - i - 1 );
 	}
     }
-    // ÃÿÃ, ÃÃÃ
+    // –ª—å–ª, –ª–ª–ª
 
     return dictum;
 }
@@ -351,7 +351,7 @@ DLString AhennLanguage::mixSyllabes( vector<vector<DLString> > &syllabes ) const
 
 void AhennLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "È⁄ ⁄◊’Àœ◊ Õ≈Ãœƒ……, ƒ“≈◊Œ≈ , À¡À ”¡Õ Õ…“, “œ÷ƒ¡≈‘”— ”Ãœ◊œ {c%s{x.\r\n",
+    ch->printf( "–ò–∑ –∑–≤—É–∫–æ–≤ –º–µ–ª–æ–¥–∏–∏, –¥—Ä–µ–≤–Ω–µ–π, –∫–∞–∫ —Å–∞–º –º–∏—Ä, —Ä–æ–∂–¥–∞–µ—Ç—Å—è —Å–ª–æ–≤–æ {c%s{x.\r\n",
                 word.toStr( ) );
 }
 

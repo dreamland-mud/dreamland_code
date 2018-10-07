@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "summoncreaturespell.h"
@@ -71,13 +71,13 @@ void ClanGuardRulerPre::actGreet( PCharacter *wch )
 
 void ClanGuardRulerPre::actInvited( PCharacter *wch, Object *obj )
 {
-    do_say( ch, "Я вижу - тебя пригласили?" );
+    do_say( ch, "п╞ п╡п╦п╤я┐ - я┌п╣п╠я▐ п©я─п╦пЁп╩п╟я│п╦п╩п╦?" );
 }
 
 void ClanGuardRulerPre::actPush( PCharacter *wch )
 {
-    act( "$C1 взмахивает перед тобой кандалами... слегка задевает...\n\r... и ты летишь...", wch, 0, ch, TO_CHAR );
-    act( "$C1 задевает кандалами $c4 и $c1 с воплем улетает...", wch, 0, ch, TO_ROOM );
+    act( "$C1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ п©п╣я─п╣п╢ я┌п╬п╠п╬п╧ п╨п╟п╫п╢п╟п╩п╟п╪п╦... я│п╩п╣пЁп╨п╟ п╥п╟п╢п╣п╡п╟п╣я┌...\n\r... п╦ я┌я▀ п╩п╣я┌п╦я┬я▄...", wch, 0, ch, TO_CHAR );
+    act( "$C1 п╥п╟п╢п╣п╡п╟п╣я┌ п╨п╟п╫п╢п╟п╩п╟п╪п╦ $c4 п╦ $c1 я│ п╡п╬п©п╩п╣п╪ я┐п╩п╣я┌п╟п╣я┌...", wch, 0, ch, TO_ROOM );
 }
 
 void ClanGuardRulerPre::greet( Character *wch )
@@ -110,8 +110,8 @@ void ClanGuardRulerPre::greet( Character *wch )
     if (checkGhost( pch ))
 	return;
 
-    do_say( ch, "Не смей идти дальше!!! Покинь это место!" );
-    do_say( ch, "Это место для тебя сейчас недоступно!" );
+    do_say( ch, "п²п╣ я│п╪п╣п╧ п╦п╢я┌п╦ п╢п╟п╩я▄я┬п╣!!! п÷п╬п╨п╦п╫я▄ я█я┌п╬ п╪п╣я│я┌п╬!" );
+    do_say( ch, "п╜я┌п╬ п╪п╣я│я┌п╬ п╢п╩я▐ я┌п╣п╠я▐ я│п╣п╧я┤п╟я│ п╫п╣п╢п╬я│я┌я┐п©п╫п╬!" );
 }
 
 void ClanGuardRulerPre::speech( Character *, const char * )
@@ -195,13 +195,13 @@ int ClanGuardRuler::getCast( Character *victim )
  *------------------------------------------------------------------------*/
 void ClanGuardRulerJailer::actPush( PCharacter *wch )
 {
-    act( "$C1 бросает на тебя мимолетный взгляд.\n\rИ тут же ты чувствуешь, как некая магическая сила вышвыривает тебя вон.", wch, 0, ch, TO_CHAR );
-    act( "$C1 бросает на $c4 мимолетный взгляд и $c1 мгновенно исчезает.", wch, 0, ch, TO_ROOM );
+    act( "$C1 п╠я─п╬я│п╟п╣я┌ п╫п╟ я┌п╣п╠я▐ п╪п╦п╪п╬п╩п╣я┌п╫я▀п╧ п╡п╥пЁп╩я▐п╢.\n\rп≤ я┌я┐я┌ п╤п╣ я┌я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ п╫п╣п╨п╟я▐ п╪п╟пЁп╦я┤п╣я│п╨п╟я▐ я│п╦п╩п╟ п╡я▀я┬п╡я▀я─п╦п╡п╟п╣я┌ я┌п╣п╠я▐ п╡п╬п╫.", wch, 0, ch, TO_CHAR );
+    act( "$C1 п╠я─п╬я│п╟п╣я┌ п╫п╟ $c4 п╪п╦п╪п╬п╩п╣я┌п╫я▀п╧ п╡п╥пЁп╩я▐п╢ п╦ $c1 п╪пЁп╫п╬п╡п╣п╫п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌.", wch, 0, ch, TO_ROOM );
 }
 
 void ClanGuardRulerJailer::actIntruder( PCharacter *wch )
 {
-    interpret_raw( ch, "cb", "Посторонние в Тюрьме... Посторонним вход запрещен!" );
+    interpret_raw( ch, "cb", "п÷п╬я│я┌п╬я─п╬п╫п╫п╦п╣ п╡ п╒я▌я─я▄п╪п╣... п÷п╬я│я┌п╬я─п╬п╫п╫п╦п╪ п╡я┘п╬п╢ п╥п╟п©я─п╣я┴п╣п╫!" );
 } 
 
 void ClanGuardRulerJailer::greet( Character *wch )
@@ -269,7 +269,7 @@ bool ClanGuardRulerJailer::specFight( )
     if ( victim != 0 )
     {
 	    ch->setClan( clan_ruler );
-	    interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
+	    interpret_raw(ch, "cb", "п▓п²п≤п°п░п²п≤п∙!!! %s п╫п╟я┘п╬п╢п╦я┌я│я▐ %s п╡ я─п╟п╧п╬п╫п╣ %s",
 			    victim->getNameP(), 
 			    ch->in_room->name,
 		            ch->in_room->area->name);
@@ -278,14 +278,14 @@ bool ClanGuardRulerJailer::specFight( )
 	    if ( ( ch->getModifyLevel() + 8 > victim->getModifyLevel() )
 		    && !is_safe_nomessage ( ch, victim ) )
 	    {
-		    sprintf( buf, "%s %s! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+		    sprintf( buf, "%s %s! п≈п░п╘п≤п╘п░п≥ п²п∙п▓п≤п²п²п╚п╔!! п║п°п∙п═п╒п╛ п÷п═п∙п║п╒пёп÷п²п≤п п░п°!!",
 			    victim->getNameP( ), crime );
 		    do_yell( ch, buf );
 		    multi_hit( ch, victim );
 	    }
 	    else
 	    {
-		    sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
+		    sprintf( buf, "$c1 п╨я─п╦я┤п╦я┌ '%s! п╒п╚ п∙п╘п∙ п·п╒п▓п∙п╒п≤п╗п╛ п≈п░ п║п▓п·п≤ п÷п═п∙п║п╒пёп÷п⌡п∙п²п≤п╞!'",
 			    victim->getNameP( ));
 		    act_p( buf, ch, 0, 0, TO_ROOM,POS_RESTING );
 	    }
@@ -294,7 +294,7 @@ bool ClanGuardRulerJailer::specFight( )
 
     if ( ech != 0 )
     {
-	    act_p( "$c1 кричит ' ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+	    act_p( "$c1 п╨я─п╦я┤п╦я┌ ' п≈п░п╘п≤п╘п░п≥ п²п∙п▓п≤п²п²п╚п╔!! п║п°п∙п═п╒п╛ п÷п═п∙п║п╒пёп÷п²п≤п п░п°!!",
 		    ch, 0, 0, TO_ROOM,POS_RESTING );
 	    multi_hit( ch, ech );
 	    return true;
@@ -323,7 +323,7 @@ SKILL_RUNP( judge )
 
 	if ( !gsn_judge->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -332,7 +332,7 @@ SKILL_RUNP( judge )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -340,26 +340,26 @@ SKILL_RUNP( judge )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "Кого будем осуждать?\n\r");
+		ch->send_to( "п п╬пЁп╬ п╠я┐п╢п╣п╪ п╬я│я┐п╤п╢п╟я┌я▄?\n\r");
 		return;
 	}
 
 	/* judge thru world */
 	if ( ( victim = get_char_world( ch, arg ) ) == 0 )
 	{
-		ch->send_to( "Нет этого тут.\n\r");
+		ch->send_to( "п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r");
 		return;
 	}
 
 	if (victim->is_npc())
 	{
-		ch->send_to("Тебе незачем судить это подневольное создание.\n\r");
+		ch->send_to("п╒п╣п╠п╣ п╫п╣п╥п╟я┤п╣п╪ я│я┐п╢п╦я┌я▄ я█я┌п╬ п©п╬п╢п╫п╣п╡п╬п╩я▄п╫п╬п╣ я│п╬п╥п╢п╟п╫п╦п╣.\n\r");
 		return;
 	}
 
 	if (victim->is_immortal() && !ch->is_immortal())
 	{
-		ch->send_to( "Ты не в силах применить обычные законы к Бессмертным.\n\r");
+		ch->send_to( "п╒я▀ п╫п╣ п╡ я│п╦п╩п╟я┘ п©я─п╦п╪п╣п╫п╦я┌я▄ п╬п╠я▀я┤п╫я▀п╣ п╥п╟п╨п╬п╫я▀ п╨ п▒п╣я│я│п╪п╣я─я┌п╫я▀п╪.\n\r");
 		return;
 	}
 
@@ -367,8 +367,8 @@ SKILL_RUNP( judge )
 	argument =  one_argument( argument, arg );
 	if ( arg[0] == '\0' )
 	{
-		ch->pecho("У %1$#C2 %2$s этос и %3$s характер.\n\r"
-		          "%1$#^P2 заслуги перед законом: %4$d.",
+		ch->pecho("пё %1$#C2 %2$s я█я┌п╬я│ п╦ %3$s я┘п╟я─п╟п╨я┌п╣я─.\n\r"
+		          "%1$#^P2 п╥п╟я│п╩я┐пЁп╦ п©п╣я─п╣п╢ п╥п╟п╨п╬п╫п╬п╪: %4$d.",
 			  victim, 
 			  ethos_table.message( victim->ethos ).c_str( ),
 			  align_name( victim ).ruscase( '1' ).c_str( ),
@@ -380,7 +380,7 @@ SKILL_RUNP( judge )
 	{
 		if ( victim->getClan() == clan_chaos )
 		{
-			ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+			ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 			return;
 		}
 
@@ -388,7 +388,7 @@ SKILL_RUNP( judge )
 			value = atoi( arg );
 		else
 		{
-			ch->send_to("Неправильное число.\n\r");
+			ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬.\n\r");
 			return;
 		}
 
@@ -400,7 +400,7 @@ SKILL_RUNP( judge )
 
 		victim->getPC( )->loyalty=value;
 
-		sprintf(buf,"Установлено в %d.\n\r",value);
+		sprintf(buf,"пёя│я┌п╟п╫п╬п╡п╩п╣п╫п╬ п╡ %d.\n\r",value);
 		ch->send_to(buf);
 
 		return;
@@ -418,7 +418,7 @@ SKILL_RUNP( manacles )
 
 	if ( !gsn_manacles->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -426,7 +426,7 @@ SKILL_RUNP( manacles )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -434,50 +434,50 @@ SKILL_RUNP( manacles )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "И кого мы хотим заковать в кандалы?\n\r");
+		ch->send_to( "п≤ п╨п╬пЁп╬ п╪я▀ я┘п╬я┌п╦п╪ п╥п╟п╨п╬п╡п╟я┌я▄ п╡ п╨п╟п╫п╢п╟п╩я▀?\n\r");
 		return;
 	}
 
 	/* manacles works only in current room */
 	if ( ( victim = get_char_room( ch, arg ) ) == 0 )
 	{
-		ch->send_to( "Нет этого тут.\n\r" );
+		ch->send_to( "п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r" );
 		return;
 	}
 
 	if ( victim == ch )
 	{
-		ch->send_to( "Идея неплоха, но не стоит этого делать.\n\r" );
+		ch->send_to( "п≤п╢п╣я▐ п╫п╣п©п╩п╬я┘п╟, п╫п╬ п╫п╣ я│я┌п╬п╦я┌ я█я┌п╬пЁп╬ п╢п╣п╩п╟я┌я▄.\n\r" );
 		return;
 	}
 
 	if (victim->is_npc())
 	{
-		ch->send_to("ОНО не властно над собой, не делай глупостей.\n\r" );
+		ch->send_to("п·п²п· п╫п╣ п╡п╩п╟я│я┌п╫п╬ п╫п╟п╢ я│п╬п╠п╬п╧, п╫п╣ п╢п╣п╩п╟п╧ пЁп╩я┐п©п╬я│я┌п╣п╧.\n\r" );
 		return;
 	}
 
 	if (victim->is_immortal() && !ch->is_immortal())
 	{
-		ch->send_to( "Ты не можешь заковывать в кандалы Бессмертных.\n\r" );
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п╨п╬п╡я▀п╡п╟я┌я▄ п╡ п╨п╟п╫п╢п╟п╩я▀ п▒п╣я│я│п╪п╣я─я┌п╫я▀я┘.\n\r" );
 		return;
 	}
 
 	if ( victim->getClan() == clan_chaos )
 	{
-		ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+		ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 		return;
 	}
 
 	// Well let's look for action
 	argument =  one_argument( argument, arg );
 
-	if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "проверка" ))
+	if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "п©я─п╬п╡п╣я─п╨п╟" ))
 	{
 
-		act_p("$c1 бросает быстрый взгляд на твои руки.",
+		act_p("$c1 п╠я─п╬я│п╟п╣я┌ п╠я▀я│я┌я─я▀п╧ п╡п╥пЁп╩я▐п╢ п╫п╟ я┌п╡п╬п╦ я─я┐п╨п╦.",
 					ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 бросает быстрый взгляд на руки $C4.",
+		act_p("$c1 п╠я─п╬я│п╟п╣я┌ п╠я▀я│я┌я─я▀п╧ п╡п╥пЁп╩я▐п╢ п╫п╟ я─я┐п╨п╦ $C4.",
 					ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 		if ( victim->isAffected(gsn_manacles) )
@@ -487,51 +487,51 @@ SKILL_RUNP( manacles )
 
 			if ( paf->duration >= 0 )
 			{
-				sprintf (buf,"$C1 закован на %d час%s."
+				sprintf (buf,"$C1 п╥п╟п╨п╬п╡п╟п╫ п╫п╟ %d я┤п╟я│%s."
 					,paf->duration
-					,GET_COUNT(paf->duration, "","а","ов"));
+					,GET_COUNT(paf->duration, "","п╟","п╬п╡"));
 			}
 			else
 			{
-				sprintf (buf,"$C1 закован навсегда.");
+				sprintf (buf,"$C1 п╥п╟п╨п╬п╡п╟п╫ п╫п╟п╡я│п╣пЁп╢п╟.");
 			}
 
-			act_p("Руки $C4 закованы в кандалы!",
+			act_p("п═я┐п╨п╦ $C4 п╥п╟п╨п╬п╡п╟п╫я▀ п╡ п╨п╟п╫п╢п╟п╩я▀!",
 						ch,0,victim,TO_CHAR,POS_RESTING);
 
 			act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
 		}
 		else
 		{
-			act_p("$C1 свободен от оков.",
+			act_p("$C1 я│п╡п╬п╠п╬п╢п╣п╫ п╬я┌ п╬п╨п╬п╡.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
 		}
 	
 	} else
-	if (arg_oneof_strict( arg, "remove", "снять" ))
+	if (arg_oneof_strict( arg, "remove", "я│п╫я▐я┌я▄" ))
 	{
 		if ( victim->isAffected(gsn_manacles) )
 		{
 			affect_strip ( victim, gsn_manacles );
 
-			act_p("Ты освобождаешь руки $C4 от оков.",
+			act_p("п╒я▀ п╬я│п╡п╬п╠п╬п╤п╢п╟п╣я┬я▄ я─я┐п╨п╦ $C4 п╬я┌ п╬п╨п╬п╡.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 снимает кандалы с твоих рук.",
+			act_p("$c1 я│п╫п╦п╪п╟п╣я┌ п╨п╟п╫п╢п╟п╩я▀ я│ я┌п╡п╬п╦я┘ я─я┐п╨.",
 						ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("$c1 снимает кандалы с рук $C4.",
+			act_p("$c1 я│п╫п╦п╪п╟п╣я┌ п╨п╟п╫п╢п╟п╩я▀ я│ я─я┐п╨ $C4.",
 						ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}
 		else
 		{
-			act_p("Ты пытаешься освободить руки $C4 от оков, но находишь их СВОБОДЫМИ.",
+			act_p("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╬я│п╡п╬п╠п╬п╢п╦я┌я▄ я─я┐п╨п╦ $C4 п╬я┌ п╬п╨п╬п╡, п╫п╬ п╫п╟я┘п╬п╢п╦я┬я▄ п╦я┘ п║п▓п·п▒п·п■п╚п°п≤.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 делает вид, что снимает кандалы с твоих рук. К чему бы это...",
+			act_p("$c1 п╢п╣п╩п╟п╣я┌ п╡п╦п╢, я┤я┌п╬ я│п╫п╦п╪п╟п╣я┌ п╨п╟п╫п╢п╟п╩я▀ я│ я┌п╡п╬п╦я┘ я─я┐п╨. п  я┤п╣п╪я┐ п╠я▀ я█я┌п╬...",
 						ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("$c1 возится вокруг рук $C4... Наверное, хочет чего-то..",
+			act_p("$c1 п╡п╬п╥п╦я┌я│я▐ п╡п╬п╨я─я┐пЁ я─я┐п╨ $C4... п²п╟п╡п╣я─п╫п╬п╣, я┘п╬я┤п╣я┌ я┤п╣пЁп╬-я┌п╬..",
 						ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}
 	}
-	else if (arg_oneof_strict( arg, "place", "заковать" ))
+	else if (arg_oneof_strict( arg, "place", "п╥п╟п╨п╬п╡п╟я┌я▄" ))
 	{
 		int success = 0;
 		int duration;
@@ -547,13 +547,13 @@ SKILL_RUNP( manacles )
 			duration = atoi( arg );
 		else
 		{
-			ch->send_to("Неправильное число.\n\r");
+			ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬.\n\r");
 			return;
 		}
 
 		if ( duration == 0 || duration <= -2 )
 		{
-			ch->send_to ("Ты точно этого хочешь ?\n\r");
+			ch->send_to ("п╒я▀ я┌п╬я┤п╫п╬ я█я┌п╬пЁп╬ я┘п╬я┤п╣я┬я▄ ?\n\r");
 			return;
 		}
 
@@ -569,7 +569,7 @@ SKILL_RUNP( manacles )
 		}
 		else if ( victim->position <= POS_DEAD )
 		{
-			ch->send_to( "Сковывать кандалами мертвых - какая низость.\n\r" );
+			ch->send_to( "п║п╨п╬п╡я▀п╡п╟я┌я▄ п╨п╟п╫п╢п╟п╩п╟п╪п╦ п╪п╣я─я┌п╡я▀я┘ - п╨п╟п╨п╟я▐ п╫п╦п╥п╬я│я┌я▄.\n\r" );
 		}
 		else if ( victim->position >= POS_FIGHTING )
 		{
@@ -578,11 +578,11 @@ SKILL_RUNP( manacles )
 
 			if (!success)
 			{
-				act_p("Ты пытаешься заковать $C4 в кандалы, но что-то идет не так...",
+				act_p("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╥п╟п╨п╬п╡п╟я┌я▄ $C4 п╡ п╨п╟п╫п╢п╟п╩я▀, п╫п╬ я┤я┌п╬-я┌п╬ п╦п╢п╣я┌ п╫п╣ я┌п╟п╨...",
 							ch,0,victim,TO_CHAR,POS_RESTING);
-				act_p("$c1 пытается сковать твои руки! ОН НЕ ПРАВ!",
+				act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╨п╬п╡п╟я┌я▄ я┌п╡п╬п╦ я─я┐п╨п╦! п·п² п²п∙ п÷п═п░п▓!",
 							ch,0,victim,TO_VICT,POS_RESTING);
-				act_p("$c1 пытается заковать $C4 в кандалы, но терпит неудачу.",
+				act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟п╨п╬п╡п╟я┌я▄ $C4 п╡ п╨п╟п╫п╢п╟п╩я▀, п╫п╬ я┌п╣я─п©п╦я┌ п╫п╣я┐п╢п╟я┤я┐.",
 							ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 			}
@@ -602,17 +602,17 @@ SKILL_RUNP( manacles )
 			af.location		= APPLY_NONE;
 			affect_to_char ( victim, &af);
 
-			act_p("Ты успешно заковываешь $C4 в кандалы!",
+			act_p("п╒я▀ я┐я│п©п╣я┬п╫п╬ п╥п╟п╨п╬п╡я▀п╡п╟п╣я┬я▄ $C4 п╡ п╨п╟п╫п╢п╟п╩я▀!",
 						ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 заковывает тебя в кандалы!",
+			act_p("$c1 п╥п╟п╨п╬п╡я▀п╡п╟п╣я┌ я┌п╣п╠я▐ п╡ п╨п╟п╫п╢п╟п╩я▀!",
 						ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("$c1 заковывает $C4 в кандалы!",
+			act_p("$c1 п╥п╟п╨п╬п╡я▀п╡п╟п╣я┌ $C4 п╡ п╨п╟п╫п╢п╟п╩я▀!",
 						ch,0,victim,TO_NOTVICT,POS_RESTING);
 		};
 	
 	} else
 	{
-		ch->send_to( "Ты не можешь этого сделать.\n\r" );
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄.\n\r" );
 	};
 
 	return;
@@ -630,7 +630,7 @@ SKILL_RUNP( wanted )
 
 	if ( !gsn_wanted->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -639,7 +639,7 @@ SKILL_RUNP( wanted )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -648,7 +648,7 @@ SKILL_RUNP( wanted )
 
 	if ( arg1[0] == '\0' || arg2[0] == '\0' )
 	{
-		ch->send_to("Используй: wanted <player> <Y|N>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧: wanted <player> <Y|N>\n\r");
 		return;
 	}
 
@@ -656,27 +656,27 @@ SKILL_RUNP( wanted )
 
 	if ( (victim == 0) ||	!(ch->can_see(victim)) )
 	{
-		ch->send_to("Здесь нет таких.\n\r");
+		ch->send_to("п≈п╢п╣я│я▄ п╫п╣я┌ я┌п╟п╨п╦я┘.\n\r");
 		return;
 	}
 
 	if ( victim->getRealLevel( ) >= LEVEL_IMMORTAL
 		&& (ch->getRealLevel( ) < victim->getRealLevel( )) )
 	{
-		act_p( "У тебя не хватает сил объявить $C4 в розыск.",
+		act_p( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩ п╬п╠я┼я▐п╡п╦я┌я▄ $C4 п╡ я─п╬п╥я▀я│п╨.",
 				ch, 0, victim, TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if (victim == ch)
 	{
-		ch->send_to("Нельзя играть с такой вещью!\n\r");
+		ch->send_to("п²п╣п╩я▄п╥я▐ п╦пЁя─п╟я┌я▄ я│ я┌п╟п╨п╬п╧ п╡п╣я┴я▄я▌!\n\r");
 		return;
 	}
 
 	if ( victim->getClan() == clan_chaos )
 	{
-		ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+		ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 		return;
 	}
 
@@ -684,23 +684,23 @@ SKILL_RUNP( wanted )
 	{
 		case 'Y':
 		case 'y':
-		case 'д':
-		case 'Д':
+		case 'п╢':
+		case 'п■':
 			if ( victim->isAffected(gsn_suspect ) )
 			{
 				affect_strip ( victim, gsn_suspect );
-				victim->send_to ("Твоя повестка в Суд горит синим пламенем!\n\r");
+				victim->send_to ("п╒п╡п╬я▐ п©п╬п╡п╣я│я┌п╨п╟ п╡ п║я┐п╢ пЁп╬я─п╦я┌ я│п╦п╫п╦п╪ п©п╩п╟п╪п╣п╫п╣п╪!\n\r");
 			}
 
 			if ( IS_SET(victim->act ,PLR_WANTED) )
 			{
-				act_p( "$C1 уже разыскивается.", ch, 0, victim, TO_CHAR,POS_RESTING);
+				act_p( "$C1 я┐п╤п╣ я─п╟п╥я▀я│п╨п╦п╡п╟п╣я┌я│я▐.", ch, 0, victim, TO_CHAR,POS_RESTING);
 			}
 			else
 			{
 				SET_BIT(victim->act, PLR_WANTED);
-				act_p( "$c1 теперь в РОЗЫСКЕ!!!",victim, 0, ch, TO_NOTVICT,POS_RESTING);
-				victim->send_to("Ты теперь в РОЗЫСКЕ!!!\n\r");
+				act_p( "$c1 я┌п╣п©п╣я─я▄ п╡ п═п·п≈п╚п║п п∙!!!",victim, 0, ch, TO_NOTVICT,POS_RESTING);
+				victim->send_to("п╒я▀ я┌п╣п©п╣я─я▄ п╡ п═п·п≈п╚п║п п∙!!!\n\r");
 				if ( !victim->is_npc() )
 					victim->getPC( )->loyalty = max ( victim->getPC( )->loyalty - 50, -1000);
 				ch->send_to("Ok.\n\r");
@@ -708,20 +708,20 @@ SKILL_RUNP( wanted )
 			break;
 		case 'N':
 		case 'n':
-		case 'Н':
-		case 'н':
+		case 'п²':
+		case 'п╫':
 			if ( !IS_SET(victim->act,PLR_WANTED) )
-				act_p( "$C1 не разыскивается.", ch, 0, victim, TO_CHAR,POS_RESTING);
+				act_p( "$C1 п╫п╣ я─п╟п╥я▀я│п╨п╦п╡п╟п╣я┌я│я▐.", ch, 0, victim, TO_CHAR,POS_RESTING);
 			else
 			{
 				REMOVE_BIT(victim->act, PLR_WANTED);
-				act_p( "$c1 больше не разыскивается.",victim, 0, ch, TO_NOTVICT,POS_RESTING);
-				victim->send_to("Тебя больше не разыскивают.\n\r");
+				act_p( "$c1 п╠п╬п╩я▄я┬п╣ п╫п╣ я─п╟п╥я▀я│п╨п╦п╡п╟п╣я┌я│я▐.",victim, 0, ch, TO_NOTVICT,POS_RESTING);
+				victim->send_to("п╒п╣п╠я▐ п╠п╬п╩я▄я┬п╣ п╫п╣ я─п╟п╥я▀я│п╨п╦п╡п╟я▌я┌.\n\r");
 				ch->send_to("Ok.\n\r");
 			}
 			break;
 		default:
-			ch->send_to("Используй: wanted <player> <Y|N>\n\r");
+			ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧: wanted <player> <Y|N>\n\r");
 			break;
 	}
 }
@@ -741,7 +741,7 @@ SKILL_RUNP( fine )
 
 	if ( !gsn_fine->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -750,7 +750,7 @@ SKILL_RUNP( fine )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -758,7 +758,7 @@ SKILL_RUNP( fine )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "Синтаксис: fine <наказуемый> <сумма> [<получатель>]\n\r");
+		ch->send_to( "п║п╦п╫я┌п╟п╨я│п╦я│: fine <п╫п╟п╨п╟п╥я┐п╣п╪я▀п╧> <я│я┐п╪п╪п╟> [<п©п╬п╩я┐я┤п╟я┌п╣п╩я▄>]\n\r");
 		return;
 	}
 
@@ -768,13 +768,13 @@ SKILL_RUNP( fine )
 
 		if ( (victim == 0) ||	!(ch->can_see(victim)) )
 		{
-			ch->send_to("У тебя не получается найти преступника с таким именем.\n\r");
+			ch->send_to("пё я┌п╣п╠я▐ п╫п╣ п©п╬п╩я┐я┤п╟п╣я┌я│я▐ п╫п╟п╧я┌п╦ п©я─п╣я│я┌я┐п©п╫п╦п╨п╟ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪.\n\r");
 			return;
 		}
 
 		if ( victim->getClan() == clan_chaos )
 		{
-			ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+			ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 			return;
 		}
 
@@ -786,13 +786,13 @@ SKILL_RUNP( fine )
 		value = atoi( arg );
 	else
 	{
-		ch->send_to("Неправильное число\n\r");
+		ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬\n\r");
 		return;
 	}
 
 	if ( value <= 0 )
 	{
-		ch->send_to ("Странные какие то у тебя штрафы.");
+		ch->send_to ("п║я┌я─п╟п╫п╫я▀п╣ п╨п╟п╨п╦п╣ я┌п╬ я┐ я┌п╣п╠я▐ я┬я┌я─п╟я└я▀.");
 		return;
 	}
 
@@ -804,7 +804,7 @@ SKILL_RUNP( fine )
 
 		if ( recepient == 0 || !(ch->can_see(recepient)) )
 		{
-			ch->send_to("Ты не находишь того, кому собирался отдать собранный штаф.\n\r");
+			ch->send_to("п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ я┌п╬пЁп╬, п╨п╬п╪я┐ я│п╬п╠п╦я─п╟п╩я│я▐ п╬я┌п╢п╟я┌я▄ я│п╬п╠я─п╟п╫п╫я▀п╧ я┬я┌п╟я└.\n\r");
 			return;
 		}
 	}
@@ -813,13 +813,13 @@ SKILL_RUNP( fine )
 		|| ( ( recepient != 0 ) && recepient->is_npc() ) 
 		|| victim == ch )
 	{
-		ch->send_to ("Тебе не кажется, что ты занимаешь мышиной возней?\n\r");
+		ch->send_to ("п╒п╣п╠п╣ п╫п╣ п╨п╟п╤п╣я┌я│я▐, я┤я┌п╬ я┌я▀ п╥п╟п╫п╦п╪п╟п╣я┬я▄ п╪я▀я┬п╦п╫п╬п╧ п╡п╬п╥п╫п╣п╧?\n\r");
 		return;
 	}
 
 	if ( ( ( (inroom && victim->isAffected(gsn_manacles) ) ? (int)victim->gold : 0 ) + victim->getPC()->bank_g ) < value )
 	{
-		act_p ("Ты не можешь забрать столько золотых монет у $C4."
+		act_p ("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п╠я─п╟я┌я▄ я│я┌п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ я┐ $C4."
 			, ch, 0, victim, TO_CHAR, POS_RESTING );
 		return;
 	}
@@ -835,11 +835,11 @@ SKILL_RUNP( fine )
 		victim->gold -= amount;
 		value -= amount;
 
-		act_p ("Ты забираешь у $C4 несколько золотых монет в качестве штрафа."
+		act_p ("п╒я▀ п╥п╟п╠п╦я─п╟п╣я┬я▄ я┐ $C4 п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ п╡ п╨п╟я┤п╣я│я┌п╡п╣ я┬я┌я─п╟я└п╟."
 			, ch, 0, victim, TO_CHAR, POS_RESTING );
-		act_p ("$c1 забирает у тебя несколько золотых монет в качестве штрафа."
+		act_p ("$c1 п╥п╟п╠п╦я─п╟п╣я┌ я┐ я┌п╣п╠я▐ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ п╡ п╨п╟я┤п╣я│я┌п╡п╣ я┬я┌я─п╟я└п╟."
 			, ch, 0, victim, TO_VICT, POS_RESTING );
-		act_p ("$c1 забирает у $C4 несколько золотых монет в качестве штрафа."
+		act_p ("$c1 п╥п╟п╠п╦я─п╟п╣я┌ я┐ $C4 п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ п╡ п╨п╟я┤п╣я│я┌п╡п╣ я┬я┌я─п╟я└п╟."
 			, ch, 0, victim, TO_NOTVICT, POS_RESTING );
 	}
 
@@ -847,18 +847,18 @@ SKILL_RUNP( fine )
 	{
 		victim->getPC()->bank_g -= value;
 
-		act_p ("Ты снимаешь у $C4 со счета несколько золотых монет в качестве штрафа."
+		act_p ("п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ я┐ $C4 я│п╬ я│я┤п╣я┌п╟ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ п╡ п╨п╟я┤п╣я│я┌п╡п╣ я┬я┌я─п╟я└п╟."
 			, ch, 0, victim, TO_CHAR, POS_RESTING );
-		act_p ("$c1 снимает у $C4 со счета несколько золотых монет в качестве штрафа."
+		act_p ("$c1 я│п╫п╦п╪п╟п╣я┌ я┐ $C4 я│п╬ я│я┤п╣я┌п╟ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ п╡ п╨п╟я┤п╣я│я┌п╡п╣ я┬я┌я─п╟я└п╟."
 			, ch, 0, victim, TO_NOTVICT, POS_RESTING );
 		if ( inroom )
 		{
-			act_p ("$c1 забирает у тебя со счета несколько золотых монет в качестве штрафа."
+			act_p ("$c1 п╥п╟п╠п╦я─п╟п╣я┌ я┐ я┌п╣п╠я▐ я│п╬ я│я┤п╣я┌п╟ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌ п╡ п╨п╟я┤п╣я│я┌п╡п╣ я┬я┌я─п╟я└п╟."
 				, ch, 0, victim, TO_VICT, POS_RESTING );
 		}
 		else
 		{
-			victim->send_to ("Похоже, что твои золотые запасы в банке уменьшились.\n\r");
+			victim->send_to ("п÷п╬я┘п╬п╤п╣, я┤я┌п╬ я┌п╡п╬п╦ п╥п╬п╩п╬я┌я▀п╣ п╥п╟п©п╟я│я▀ п╡ п╠п╟п╫п╨п╣ я┐п╪п╣п╫я▄я┬п╦п╩п╦я│я▄.\n\r");
 		}
 	}
 
@@ -866,20 +866,20 @@ SKILL_RUNP( fine )
 	{
 		ch->getPC()->bank_g += value2;
 
-		act_p ("Ты переводишь на свой счет несколько золотых монет."
+		act_p ("п╒я▀ п©п╣я─п╣п╡п╬п╢п╦я┬я▄ п╫п╟ я│п╡п╬п╧ я│я┤п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌."
 			, ch, 0, 0, TO_CHAR, POS_RESTING );
-		act_p ("$c1 переводит на свой счет несколько золотых монет."
+		act_p ("$c1 п©п╣я─п╣п╡п╬п╢п╦я┌ п╫п╟ я│п╡п╬п╧ я│я┤п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌."
 			, ch, 0, 0, TO_ROOM, POS_RESTING );
 	}
 	else
 	{
 		recepient->getPC()->bank_g += value2;
 		
-		act_p ("Ты переводишь на счет $C4 несколько золотых монет."
+		act_p ("п╒я▀ п©п╣я─п╣п╡п╬п╢п╦я┬я▄ п╫п╟ я│я┤п╣я┌ $C4 п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌."
 			, ch, 0, recepient, TO_CHAR, POS_RESTING );
-		act_p ("$c1 переводит на твой счет несколько золотых монет."
+		act_p ("$c1 п©п╣я─п╣п╡п╬п╢п╦я┌ п╫п╟ я┌п╡п╬п╧ я│я┤п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌."
 			, ch, 0, recepient, TO_VICT, POS_RESTING );
-		act_p ("$c1 переводит на счет $C4 несколько золотых монет."
+		act_p ("$c1 п©п╣я─п╣п╡п╬п╢п╦я┌ п╫п╟ я│я┤п╣я┌ $C4 п╫п╣я│п╨п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌."
 			, ch, 0, recepient, TO_NOTVICT, POS_RESTING );
 	}
 }
@@ -897,7 +897,7 @@ SKILL_RUNP( confiscate )
 
 	if ( !gsn_confiscate->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -906,7 +906,7 @@ SKILL_RUNP( confiscate )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -914,7 +914,7 @@ SKILL_RUNP( confiscate )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "Синтаксис: confiscate <наказуемый> <% от кол-ва вещей>\n\r");
+		ch->send_to( "п║п╦п╫я┌п╟п╨я│п╦я│: confiscate <п╫п╟п╨п╟п╥я┐п╣п╪я▀п╧> <% п╬я┌ п╨п╬п╩-п╡п╟ п╡п╣я┴п╣п╧>\n\r");
 		return;
 	}
 
@@ -922,27 +922,27 @@ SKILL_RUNP( confiscate )
 
 	if ( (victim == 0) ||	!(ch->can_see(victim)) )
 	{
-		ch->send_to("У тебя не получается найти преступника с таким именем.\n\r");
+		ch->send_to("пё я┌п╣п╠я▐ п╫п╣ п©п╬п╩я┐я┤п╟п╣я┌я│я▐ п╫п╟п╧я┌п╦ п©я─п╣я│я┌я┐п©п╫п╦п╨п╟ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪.\n\r");
 		return;
 	}
 
 	if ( victim->is_npc()
 		|| victim == ch )
 	{
-		ch->send_to ("Тебе не кажется, что ты занимаешь мышиной возней?\n\r");
+		ch->send_to ("п╒п╣п╠п╣ п╫п╣ п╨п╟п╤п╣я┌я│я▐, я┤я┌п╬ я┌я▀ п╥п╟п╫п╦п╪п╟п╣я┬я▄ п╪я▀я┬п╦п╫п╬п╧ п╡п╬п╥п╫п╣п╧?\n\r");
 		return;
 	}
 
 	if ( !victim->isAffected(gsn_manacles) )
 	{
-		act_p ("И ты думаешь, что $C1 так просто отдаст тебе свои вещи?",
+		act_p ("п≤ я┌я▀ п╢я┐п╪п╟п╣я┬я▄, я┤я┌п╬ $C1 я┌п╟п╨ п©я─п╬я│я┌п╬ п╬я┌п╢п╟я│я┌ я┌п╣п╠п╣ я│п╡п╬п╦ п╡п╣я┴п╦?",
 			ch, 0, victim, TO_CHAR, POS_RESTING);
 		return;
 	}
 
 	if ( victim->getClan() == clan_chaos )
 	{
-		ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+		ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 		return;
 	}
 
@@ -952,13 +952,13 @@ SKILL_RUNP( confiscate )
 		percent = atoi( arg );
 	else
 	{
-		ch->send_to("Неправильный процент.\n\r");
+		ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п©я─п╬я├п╣п╫я┌.\n\r");
 		return;
 	}
 
 	if ( ( percent <= 0 ) || ( percent > 100 ) )
 	{
-		ch->send_to ("Недопустимое значение процента.\n\r");
+		ch->send_to ("п²п╣п╢п╬п©я┐я│я┌п╦п╪п╬п╣ п╥п╫п╟я┤п╣п╫п╦п╣ п©я─п╬я├п╣п╫я┌п╟.\n\r");
 		return;
 	}
 
@@ -994,13 +994,13 @@ SKILL_RUNP( confiscate )
 			obj_from_char( obj );
 			obj->wear_loc = wear_none ;
 
-			act_p( "Ты конфискуешь $o4 у $C4.", ch, obj, victim, TO_CHAR,POS_RESTING);
-			act_p( "$c1 конфискует у тебя $o4.", ch, obj, victim, TO_VICT,POS_RESTING);
-			act_p( "$c1 конфискует $o4 у $C4.", ch, obj, victim, TO_NOTVICT,POS_RESTING);
+			act_p( "п╒я▀ п╨п╬п╫я└п╦я│п╨я┐п╣я┬я▄ $o4 я┐ $C4.", ch, obj, victim, TO_CHAR,POS_RESTING);
+			act_p( "$c1 п╨п╬п╫я└п╦я│п╨я┐п╣я┌ я┐ я┌п╣п╠я▐ $o4.", ch, obj, victim, TO_VICT,POS_RESTING);
+			act_p( "$c1 п╨п╬п╫я└п╦я│п╨я┐п╣я┌ $o4 я┐ $C4.", ch, obj, victim, TO_NOTVICT,POS_RESTING);
 
 			obj_to_room( obj, ch->in_room );
-			act_p( "Ты аккуратно кладешь $o4 на пол.", ch, obj, 0, TO_CHAR,POS_RESTING);
-			act_p( "$c1 аккуратно кладет $o4 на пол.", ch, obj, 0, TO_ROOM,POS_RESTING);
+			act_p( "п╒я▀ п╟п╨п╨я┐я─п╟я┌п╫п╬ п╨п╩п╟п╢п╣я┬я▄ $o4 п╫п╟ п©п╬п╩.", ch, obj, 0, TO_CHAR,POS_RESTING);
+			act_p( "$c1 п╟п╨п╨я┐я─п╟я┌п╫п╬ п╨п╩п╟п╢п╣я┌ $o4 п╫п╟ п©п╬п╩.", ch, obj, 0, TO_ROOM,POS_RESTING);
 
 		}
 	}  
@@ -1025,7 +1025,7 @@ SKILL_RUNP( suspect )
 
 	if ( !gsn_suspect->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -1033,7 +1033,7 @@ SKILL_RUNP( suspect )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -1041,37 +1041,37 @@ SKILL_RUNP( suspect )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "Кому выдаем повестку в Суд?\n\r");
+		ch->send_to( "п п╬п╪я┐ п╡я▀п╢п╟п╣п╪ п©п╬п╡п╣я│я┌п╨я┐ п╡ п║я┐п╢?\n\r");
 		return;
 	}
 
 	if ( ( victim = get_char_world( ch, arg ) ) == 0 )
 	{
-		ch->send_to( "Нет этого тут.\n\r");
+		ch->send_to( "п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r");
 		return;
 	}
 
 	if (victim->is_npc())
 	{
-		ch->send_to("Это подневольное создание - им повестки не выдаются.\n\r");
+		ch->send_to("п╜я┌п╬ п©п╬п╢п╫п╣п╡п╬п╩я▄п╫п╬п╣ я│п╬п╥п╢п╟п╫п╦п╣ - п╦п╪ п©п╬п╡п╣я│я┌п╨п╦ п╫п╣ п╡я▀п╢п╟я▌я┌я│я▐.\n\r");
 		return;
 	}
 
 	if ( ch == victim )
 	{
-		ch->send_to ("А тебе не кажется, можно сделать это и добровольно?\n\r");
+		ch->send_to ("п░ я┌п╣п╠п╣ п╫п╣ п╨п╟п╤п╣я┌я│я▐, п╪п╬п╤п╫п╬ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬ п╦ п╢п╬п╠я─п╬п╡п╬п╩я▄п╫п╬?\n\r");
 		return;
 	}
 
 	if (victim->is_immortal() && !ch->is_immortal())
 	{
-		ch->send_to( "Смешно требовать чего-то от Бессмертных.\n\r" );
+		ch->send_to( "п║п╪п╣я┬п╫п╬ я┌я─п╣п╠п╬п╡п╟я┌я▄ я┤п╣пЁп╬-я┌п╬ п╬я┌ п▒п╣я│я│п╪п╣я─я┌п╫я▀я┘.\n\r" );
 		return;
 	}
 
 	if ( victim->getClan() == clan_chaos )
 	{
-		ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+		ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 		return;
 	}
 
@@ -1083,35 +1083,35 @@ SKILL_RUNP( suspect )
 
 		if ( paf != 0 )   
 		{
-			sprintf (buf,"Повестка $C2 действительна в течении %d час%s."
+			sprintf (buf,"п÷п╬п╡п╣я│я┌п╨п╟ $C2 п╢п╣п╧я│я┌п╡п╦я┌п╣п╩я▄п╫п╟ п╡ я┌п╣я┤п╣п╫п╦п╦ %d я┤п╟я│%s."
 				,paf->duration
-				,GET_COUNT(paf->duration, "а","ов","ов"));
+				,GET_COUNT(paf->duration, "п╟","п╬п╡","п╬п╡"));
 
-			victim->send_to ("Ты чувствуешь - тебя ждут в Суде.\n\r");
+			victim->send_to ("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ - я┌п╣п╠я▐ п╤п╢я┐я┌ п╡ п║я┐п╢п╣.\n\r");
 		}
 		else
-			sprintf (buf,"$C1 не выдавалась повестка в Суд.");
+			sprintf (buf,"$C1 п╫п╣ п╡я▀п╢п╟п╡п╟п╩п╟я│я▄ п©п╬п╡п╣я│я┌п╨п╟ п╡ п║я┐п╢.");
 
 		act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
 
 		return;
 	}
-	else if (arg_oneof_strict( arg, "off", "отменить" ))
+	else if (arg_oneof_strict( arg, "off", "п╬я┌п╪п╣п╫п╦я┌я▄" ))
 	{
 		if ( !victim->isAffected(gsn_suspect) )
 		{
-			act_p ("Но ведь $C3 не выдавалась повестка в Суд!", ch, 0, victim,
+			act_p ("п²п╬ п╡п╣п╢я▄ $C3 п╫п╣ п╡я▀п╢п╟п╡п╟п╩п╟я│я▄ п©п╬п╡п╣я│я┌п╨п╟ п╡ п║я┐п╢!", ch, 0, victim,
 				TO_CHAR, POS_RESTING );
 		}
 		else
 		{
-			act_p ("Ты аннулируешь повестку $C4.", ch, 0, victim,
+			act_p ("п╒я▀ п╟п╫п╫я┐п╩п╦я─я┐п╣я┬я▄ п©п╬п╡п╣я│я┌п╨я┐ $C4.", ch, 0, victim,
 				TO_CHAR, POS_RESTING );
-			act_p ("$c1 аннулирует твою повестку в Суд.", ch, 0, victim,
+			act_p ("$c1 п╟п╫п╫я┐п╩п╦я─я┐п╣я┌ я┌п╡п╬я▌ п©п╬п╡п╣я│я┌п╨я┐ п╡ п║я┐п╢.", ch, 0, victim,
 				TO_VICT, POS_RESTING );
-			act_p ("$c1 аннулирует повестку $C3 в Суд.", ch, 0, victim,
+			act_p ("$c1 п╟п╫п╫я┐п╩п╦я─я┐п╣я┌ п©п╬п╡п╣я│я┌п╨я┐ $C3 п╡ п║я┐п╢.", ch, 0, victim,
 				TO_NOTVICT, POS_RESTING );
-			act_p ("$C1 аннулирует повестку $c3 в Суд.", victim, 0, ch,
+			act_p ("$C1 п╟п╫п╫я┐п╩п╦я─я┐п╣я┌ п©п╬п╡п╣я│я┌п╨я┐ $c3 п╡ п║я┐п╢.", victim, 0, ch,
 				TO_NOTVICT, POS_RESTING );
 
 			affect_strip ( victim, gsn_suspect );
@@ -1123,13 +1123,13 @@ SKILL_RUNP( suspect )
 		value = atoi( arg );
 	else
 	{
-		ch->send_to("Неправильное число.\n\r");
+		ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬.\n\r");
 		return;
 	}
 
 	if ( value <= 0 )
 	{
-		ch->send_to("ЗАПОМНИ: Нельзя выдавать повестки задним числом.\n\r");
+		ch->send_to("п≈п░п÷п·п°п²п≤: п²п╣п╩я▄п╥я▐ п╡я▀п╢п╟п╡п╟я┌я▄ п©п╬п╡п╣я│я┌п╨п╦ п╥п╟п╢п╫п╦п╪ я┤п╦я│п╩п╬п╪.\n\r");
 		return;
 	}
 
@@ -1147,18 +1147,18 @@ SKILL_RUNP( suspect )
 
 		affect_to_char ( victim, &af);
 
-		act_p ("Ты посылаешь повестку $C4.", ch, 0, victim,
+		act_p ("п╒я▀ п©п╬я│я▀п╩п╟п╣я┬я▄ п©п╬п╡п╣я│я┌п╨я┐ $C4.", ch, 0, victim,
 			TO_CHAR, POS_RESTING );
-		act_p ("$c1 посылает тебе повестку в Суд.", ch, 0, victim,
+		act_p ("$c1 п©п╬я│я▀п╩п╟п╣я┌ я┌п╣п╠п╣ п©п╬п╡п╣я│я┌п╨я┐ п╡ п║я┐п╢.", ch, 0, victim,
 			TO_VICT, POS_RESTING );
-		act_p ("$c1 посылает $C3 повестку в Суд.", ch, 0, victim,
+		act_p ("$c1 п©п╬я│я▀п╩п╟п╣я┌ $C3 п©п╬п╡п╣я│я┌п╨я┐ п╡ п║я┐п╢.", ch, 0, victim,
 			TO_NOTVICT, POS_RESTING );
-		act_p ("$C1 посылает $c3 повестку в Суд.", victim, 0, ch,
+		act_p ("$C1 п©п╬я│я▀п╩п╟п╣я┌ $c3 п©п╬п╡п╣я│я┌п╨я┐ п╡ п║я┐п╢.", victim, 0, ch,
 			TO_NOTVICT, POS_RESTING );
 	}
 	else
 	{
-		ch->send_to ("Сначала необходимо отменить предыдущую повестку.");
+		ch->send_to ("п║п╫п╟я┤п╟п╩п╟ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╬я┌п╪п╣п╫п╦я┌я▄ п©я─п╣п╢я▀п╢я┐я┴я┐я▌ п©п╬п╡п╣я│я┌п╨я┐.");
 	}
 
 	return;
@@ -1176,7 +1176,7 @@ SKILL_RUNP( jail )
 
 	if ( !gsn_jail->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -1184,7 +1184,7 @@ SKILL_RUNP( jail )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -1192,50 +1192,50 @@ SKILL_RUNP( jail )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "И кого мы хотим посадить в кутузку?\n\r");
+		ch->send_to( "п≤ п╨п╬пЁп╬ п╪я▀ я┘п╬я┌п╦п╪ п©п╬я│п╟п╢п╦я┌я▄ п╡ п╨я┐я┌я┐п╥п╨я┐?\n\r");
 		return;
 	}
 
 	/* Jail works only in current room */
 	if ( ( victim = get_char_room( ch, arg ) ) == 0 )
 	{
-		ch->send_to( "Нет этого тут.\n\r" );
+		ch->send_to( "п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r" );
 		return;
 	}
 
 	if ( victim == ch )
 	{
-		ch->send_to( "Идея неплоха, но не стоит этого делать.\n\r" );
+		ch->send_to( "п≤п╢п╣я▐ п╫п╣п©п╩п╬я┘п╟, п╫п╬ п╫п╣ я│я┌п╬п╦я┌ я█я┌п╬пЁп╬ п╢п╣п╩п╟я┌я▄.\n\r" );
 		return;
 	}
 
 	if (victim->is_npc())
 	{
-		ch->send_to("ОНО не властно над собой, не делай глупостей.\n\r" );
+		ch->send_to("п·п²п· п╫п╣ п╡п╩п╟я│я┌п╫п╬ п╫п╟п╢ я│п╬п╠п╬п╧, п╫п╣ п╢п╣п╩п╟п╧ пЁп╩я┐п©п╬я│я┌п╣п╧.\n\r" );
 		return;
 	}
 
 	if (victim->is_immortal() && !ch->is_immortal())
 	{
-		ch->send_to( "Ты не можешь упечь за решетку Бессмертных.\n\r" );
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐п©п╣я┤я▄ п╥п╟ я─п╣я┬п╣я┌п╨я┐ п▒п╣я│я│п╪п╣я─я┌п╫я▀я┘.\n\r" );
 		return;
 	}
 
 	if ( victim->getClan() == clan_chaos )
 	{
-		ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+		ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 		return;
 	}
 
 	// Well let's look for action
 	argument =  one_argument( argument, arg );
 
-	if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "проверка" ))
+	if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "п©я─п╬п╡п╣я─п╨п╟" ))
 	{
 
-		act_p("$c1 пристально смотрит на ТЕБЯ.",
+		act_p("$c1 п©я─п╦я│я┌п╟п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ п╒п∙п▒п╞.",
 					ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 пристально смотрит на $C4.",
+		act_p("$c1 п©я─п╦я│я┌п╟п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $C4.",
 					ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 		if ( victim->isAffected(gsn_jail) )
@@ -1245,51 +1245,51 @@ SKILL_RUNP( jail )
 
 			if ( paf->duration >= 0 )
 			{
-				sprintf (buf,"$C1 в тюряге на %d час%s."
+				sprintf (buf,"$C1 п╡ я┌я▌я─я▐пЁп╣ п╫п╟ %d я┤п╟я│%s."
 					,paf->duration
-					,GET_COUNT(paf->duration, "","а","ов"));
+					,GET_COUNT(paf->duration, "","п╟","п╬п╡"));
 			}
 			else
 			{
-				sprintf (buf,"$C1 в тюряге ПОЖИЗНЕННО.");
+				sprintf (buf,"$C1 п╡ я┌я▌я─я▐пЁп╣ п÷п·п√п≤п≈п²п∙п²п²п·.");
 			}
 
 			if ( victim->isAffected(gsn_manacles) )
-				act_p("Руки $C4 закованы в кандалы!",ch,0,victim,TO_CHAR,POS_RESTING);
+				act_p("п═я┐п╨п╦ $C4 п╥п╟п╨п╬п╡п╟п╫я▀ п╡ п╨п╟п╫п╢п╟п╩я▀!",ch,0,victim,TO_CHAR,POS_RESTING);
 
 			act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
 		}
 		else
 		{
-			act_p("$C1 не отбывает наказания.",
+			act_p("$C1 п╫п╣ п╬я┌п╠я▀п╡п╟п╣я┌ п╫п╟п╨п╟п╥п╟п╫п╦я▐.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
 		}
 	
 	} 
-	else if (arg_oneof_strict( arg, "remove", "освободить" ))
+	else if (arg_oneof_strict( arg, "remove", "п╬я│п╡п╬п╠п╬п╢п╦я┌я▄" ))
 	{
 		if ( victim->isAffected(gsn_jail) )
 		{
 			affect_strip ( victim, gsn_jail );
 
-			act_p("Ты освобождаешь $C4 из каталажки.",
+			act_p("п╒я▀ п╬я│п╡п╬п╠п╬п╤п╢п╟п╣я┬я▄ $C4 п╦п╥ п╨п╟я┌п╟п╩п╟п╤п╨п╦.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 освобождает тебя из каталажки.",
+			act_p("$c1 п╬я│п╡п╬п╠п╬п╤п╢п╟п╣я┌ я┌п╣п╠я▐ п╦п╥ п╨п╟я┌п╟п╩п╟п╤п╨п╦.",
 						ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("$c1 освобождает $C4 из каталажки.",
+			act_p("$c1 п╬я│п╡п╬п╠п╬п╤п╢п╟п╣я┌ $C4 п╦п╥ п╨п╟я┌п╟п╩п╟п╤п╨п╦.",
 						ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}
 		else
 		{
-			act_p("Ты пытаешься освободить $C4 из тюрьмы, но ведь о$gно|н|на НЕ СИДИТ.",
+			act_p("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╬я│п╡п╬п╠п╬п╢п╦я┌я▄ $C4 п╦п╥ я┌я▌я─я▄п╪я▀, п╫п╬ п╡п╣п╢я▄ п╬$gп╫п╬|п╫|п╫п╟ п²п∙ п║п≤п■п≤п╒.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 пытается тебя освободить из тюрьмы. К чему бы это...",
+			act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ я┌п╣п╠я▐ п╬я│п╡п╬п╠п╬п╢п╦я┌я▄ п╦п╥ я┌я▌я─я▄п╪я▀. п  я┤п╣п╪я┐ п╠я▀ я█я┌п╬...",
 						ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("$c1 напыщенно что то говорит $C4... $C1 хихикает...",
+			act_p("$c1 п╫п╟п©я▀я┴п╣п╫п╫п╬ я┤я┌п╬ я┌п╬ пЁп╬п╡п╬я─п╦я┌ $C4... $C1 я┘п╦я┘п╦п╨п╟п╣я┌...",
 						ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}
 	}
-	else if (arg_oneof_strict( arg, "place", "приговорить" ))
+	else if (arg_oneof_strict( arg, "place", "п©я─п╦пЁп╬п╡п╬я─п╦я┌я▄" ))
 	{
 		int duration;
 
@@ -1304,13 +1304,13 @@ SKILL_RUNP( jail )
 			duration = atoi( arg );
 		else
 		{
-			ch->send_to("Неправильное число.\n\r");
+			ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬.\n\r");
 			return;
 		}
 
 		if ( duration == 0 || duration <= -2 )
 		{
-			ch->send_to ("Ты точно этого хочешь ?\n\r");
+			ch->send_to ("п╒я▀ я┌п╬я┤п╫п╬ я█я┌п╬пЁп╬ я┘п╬я┤п╣я┬я▄ ?\n\r");
 			return;
 		}
 
@@ -1330,15 +1330,15 @@ SKILL_RUNP( jail )
 		af.location		= APPLY_NONE;
 		affect_to_char ( victim, &af);
 
-		act_p("Ты приговариваешь $C4 к тюремному заключению!",
+		act_p("п╒я▀ п©я─п╦пЁп╬п╡п╟я─п╦п╡п╟п╣я┬я▄ $C4 п╨ я┌я▌я─п╣п╪п╫п╬п╪я┐ п╥п╟п╨п╩я▌я┤п╣п╫п╦я▌!",
 					ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 приговаривает тебя к тюремному заключению.",
+		act_p("$c1 п©я─п╦пЁп╬п╡п╟я─п╦п╡п╟п╣я┌ я┌п╣п╠я▐ п╨ я┌я▌я─п╣п╪п╫п╬п╪я┐ п╥п╟п╨п╩я▌я┤п╣п╫п╦я▌.",
 					ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 приговаривает $C4 к тюремному заключению.",
+		act_p("$c1 п©я─п╦пЁп╬п╡п╟я─п╦п╡п╟п╣я┌ $C4 п╨ я┌я▌я─п╣п╪п╫п╬п╪я┐ п╥п╟п╨п╩я▌я┤п╣п╫п╦я▌.",
 					ch,0,victim,TO_NOTVICT,POS_RESTING);
 	} else
 	{
-		ch->send_to( "Ты не можешь этого сделать.\n\r" );
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄.\n\r" );
 	};
 
 	return;
@@ -1356,7 +1356,7 @@ SKILL_RUNP( dismiss )
 
 	if ( !gsn_dismiss->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
@@ -1364,7 +1364,7 @@ SKILL_RUNP( dismiss )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
@@ -1372,55 +1372,55 @@ SKILL_RUNP( dismiss )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to( "И кого мы хотим лишить прав?\n\r");
+		ch->send_to( "п≤ п╨п╬пЁп╬ п╪я▀ я┘п╬я┌п╦п╪ п╩п╦я┬п╦я┌я▄ п©я─п╟п╡?\n\r");
 		return;
 	}
 
 	/* Dismiss works in whole room */
 	if ( ( victim = get_char_world( ch, arg ) ) == 0 )
 	{
-		ch->send_to( "Нет этого тут.\n\r" );
+		ch->send_to( "п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r" );
 		return;
 	}
 
 	if ( victim == ch )
 	{
-		ch->send_to( "Идея неплоха, но не стоит этого делать.\n\r" );
+		ch->send_to( "п≤п╢п╣я▐ п╫п╣п©п╩п╬я┘п╟, п╫п╬ п╫п╣ я│я┌п╬п╦я┌ я█я┌п╬пЁп╬ п╢п╣п╩п╟я┌я▄.\n\r" );
 		return;
 	}
 
 	if (victim->is_npc())
 	{
-		ch->send_to("ОНО не властно над собой, не делай глупостей.\n\r" );
+		ch->send_to("п·п²п· п╫п╣ п╡п╩п╟я│я┌п╫п╬ п╫п╟п╢ я│п╬п╠п╬п╧, п╫п╣ п╢п╣п╩п╟п╧ пЁп╩я┐п©п╬я│я┌п╣п╧.\n\r" );
 		return;
 	}
 
 	if (victim->is_immortal() && !ch->is_immortal())
 	{
-		ch->send_to( "Ты не можешь лишать Бессмертных их прав.\n\r" );
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╩п╦я┬п╟я┌я▄ п▒п╣я│я│п╪п╣я─я┌п╫я▀я┘ п╦я┘ п©я─п╟п╡.\n\r" );
 		return;
 	}
 
 	if ( victim->getPC()->getClan() != clan_ruler )
 	{
-		ch->send_to( "Да ведь это даже не Рулер - чего его лишать то?\n\r" );
+		ch->send_to( "п■п╟ п╡п╣п╢я▄ я█я┌п╬ п╢п╟п╤п╣ п╫п╣ п═я┐п╩п╣я─ - я┤п╣пЁп╬ п╣пЁп╬ п╩п╦я┬п╟я┌я▄ я┌п╬?\n\r" );
 		return;
 	}
 
 	if ( victim->getPC()->getClanLevel() >= ch->getPC()->getClanLevel() )
 	{
-		ch->send_to( "Нет... Твоих полномочий тут явно недостаточно!\n\r" );
+		ch->send_to( "п²п╣я┌... п╒п╡п╬п╦я┘ п©п╬п╩п╫п╬п╪п╬я┤п╦п╧ я┌я┐я┌ я▐п╡п╫п╬ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬!\n\r" );
 		return;
 	}
 
 	argument =  one_argument( argument, arg );
 
-	if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "проверка" ))
+	if ( arg[0] == '\0' || arg_oneof_strict( arg, "check", "п©я─п╬п╡п╣я─п╨п╟" ))
 	{
 
-		act_p("$c1 роется в твоем личном деле.",
+		act_p("$c1 я─п╬п╣я┌я│я▐ п╡ я┌п╡п╬п╣п╪ п╩п╦я┤п╫п╬п╪ п╢п╣п╩п╣.",
 					ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 роется в личном деле $C4.",
+		act_p("$c1 я─п╬п╣я┌я│я▐ п╡ п╩п╦я┤п╫п╬п╪ п╢п╣п╩п╣ $C4.",
 					ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 		if ( victim->isAffected(gsn_dismiss) )
@@ -1430,43 +1430,43 @@ SKILL_RUNP( dismiss )
 
 			if ( paf->duration >= 0 )
 			{
-				sprintf (buf,"$C1 лише$Gно|н|на своих Рулерских прав на %d час%s."
+				sprintf (buf,"$C1 п╩п╦я┬п╣$Gп╫п╬|п╫|п╫п╟ я│п╡п╬п╦я┘ п═я┐п╩п╣я─я│п╨п╦я┘ п©я─п╟п╡ п╫п╟ %d я┤п╟я│%s."
 					,paf->duration
-					,GET_COUNT(paf->duration, "","а","ов"));
+					,GET_COUNT(paf->duration, "","п╟","п╬п╡"));
 			}
 			else
 			{
-				sprintf (buf,"$C1 лише$Gно|н|на своих Рулерских прав НАВСЕГДА.");
+				sprintf (buf,"$C1 п╩п╦я┬п╣$Gп╫п╬|п╫|п╫п╟ я│п╡п╬п╦я┘ п═я┐п╩п╣я─я│п╨п╦я┘ п©я─п╟п╡ п²п░п▓п║п∙п⌠п■п░.");
 			}
 
 			act_p (buf, ch, 0, victim, TO_CHAR, POS_RESTING);
 		}
 		else
 		{
-			act_p("$C1 настоящий Рулер.",
+			act_p("$C1 п╫п╟я│я┌п╬я▐я┴п╦п╧ п═я┐п╩п╣я─.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
 		}
 	
 	} 
-	else if (arg_oneof_strict( arg, "remove", "вернуть" ))
+	else if (arg_oneof_strict( arg, "remove", "п╡п╣я─п╫я┐я┌я▄" ))
 	{
 		if ( victim->isAffected(gsn_dismiss) )
 		{
 			affect_strip ( victim, gsn_dismiss );
 
-			act_p("Ты возвращаешь $C3 право вершить суд.",
+			act_p("п╒я▀ п╡п╬п╥п╡я─п╟я┴п╟п╣я┬я▄ $C3 п©я─п╟п╡п╬ п╡п╣я─я┬п╦я┌я▄ я│я┐п╢.",
 						ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 возвращает тебе право вершить суд.",
+			act_p("$c1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣ п©я─п╟п╡п╬ п╡п╣я─я┬п╦я┌я▄ я│я┐п╢.",
 						ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("$c1 возвращает $C3 право вершить суд.",
+			act_p("$c1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $C3 п©я─п╟п╡п╬ п╡п╣я─я┬п╦я┌я▄ я│я┐п╢.",
 						ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}
 		else
 		{
-			ch->send_to( "Расслабься. Все на своих местах и пашут как кони!\n\r" );
+			ch->send_to( "п═п╟я│я│п╩п╟п╠я▄я│я▐. п▓я│п╣ п╫п╟ я│п╡п╬п╦я┘ п╪п╣я│я┌п╟я┘ п╦ п©п╟я┬я┐я┌ п╨п╟п╨ п╨п╬п╫п╦!\n\r" );
 		}
 	}
-	else if (arg_oneof_strict( arg, "place", "лишить" ))
+	else if (arg_oneof_strict( arg, "place", "п╩п╦я┬п╦я┌я▄" ))
 	{
 		int duration;
 
@@ -1481,13 +1481,13 @@ SKILL_RUNP( dismiss )
 			duration = atoi( arg );
 		else
 		{
-			ch->send_to("Неправильное число.\n\r");
+			ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬.\n\r");
 			return;
 		}
 
 		if ( duration == 0 || duration <= -2 )
 		{
-			ch->send_to ("Ты точно этого хочешь ?\n\r");
+			ch->send_to ("п╒я▀ я┌п╬я┤п╫п╬ я█я┌п╬пЁп╬ я┘п╬я┤п╣я┬я▄ ?\n\r");
 			return;
 		}
 
@@ -1507,15 +1507,15 @@ SKILL_RUNP( dismiss )
 		af.location		= APPLY_NONE;
 		affect_to_char ( victim, &af);
 
-		act_p("Ты лишаешь $C4 права вершить суд!",
+		act_p("п╒я▀ п╩п╦я┬п╟п╣я┬я▄ $C4 п©я─п╟п╡п╟ п╡п╣я─я┬п╦я┌я▄ я│я┐п╢!",
 					ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 лишает тебя права вершить суд.",
+		act_p("$c1 п╩п╦я┬п╟п╣я┌ я┌п╣п╠я▐ п©я─п╟п╡п╟ п╡п╣я─я┬п╦я┌я▄ я│я┐п╢.",
 					ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 лишает $C4 права вершить суд.",
+		act_p("$c1 п╩п╦я┬п╟п╣я┌ $C4 п©я─п╟п╡п╟ п╡п╣я─я┬п╦я┌я▄ я│я┐п╢.",
 					ch,0,victim,TO_NOTVICT,POS_RESTING);
 	} else
 	{
-		ch->send_to( "Ты не можешь этого сделать.\n\r" );
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄.\n\r" );
 	};
 
 	return;
@@ -1535,7 +1535,7 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 	target = victim;
     
     if (target->in_room != victim->in_room) {
-	ch->send_to( "Среди зеркал нет оригинала.\r\n" );
+	ch->send_to( "п║я─п╣п╢п╦ п╥п╣я─п╨п╟п╩ п╫п╣я┌ п╬я─п╦пЁп╦п╫п╟п╩п╟.\r\n" );
 	return;
     }
 
@@ -1550,11 +1550,11 @@ VOID_SPELL(OpticResonance)::run( Character *ch, Character *victim, int sn, int l
 
     for (rch = victim->in_room->people; rch; rch = rch->next_in_room) {
 	if (rch->is_mirror() && rch->doppel == target) {
-	    act( "Луч света, посланный $c5, отразившись от зеркала, поражает ТЕБЯ!",
+	    act( "п⌡я┐я┤ я│п╡п╣я┌п╟, п©п╬я│п╩п╟п╫п╫я▀п╧ $c5, п╬я┌я─п╟п╥п╦п╡я┬п╦я│я▄ п╬я┌ п╥п╣я─п╨п╟п╩п╟, п©п╬я─п╟п╤п╟п╣я┌ п╒п∙п▒п╞!",
 	         ch, 0, target, TO_VICT );
-	    act( "Луч света, посланный $c5, отразившись от зеркала, поражает $C4!",
+	    act( "п⌡я┐я┤ я│п╡п╣я┌п╟, п©п╬я│п╩п╟п╫п╫я▀п╧ $c5, п╬я┌я─п╟п╥п╦п╡я┬п╦я│я▄ п╬я┌ п╥п╣я─п╨п╟п╩п╟, п©п╬я─п╟п╤п╟п╣я┌ $C4!",
 	         ch, 0, target, TO_NOTVICT );
-	    act( "Луч света, посланный тобой, отразившись от зеркала, поражает $C4!",
+	    act( "п⌡я┐я┤ я│п╡п╣я┌п╟, п©п╬я│п╩п╟п╫п╫я▀п╧ я┌п╬п╠п╬п╧, п╬я┌я─п╟п╥п╦п╡я┬п╦я│я▄ п╬я┌ п╥п╣я─п╨п╟п╩п╟, п©п╬я─п╟п╤п╟п╣я┌ $C4!",
 	         ch, 0, target, TO_CHAR );
 
 	    dam = dice( level, 5 );
@@ -1592,7 +1592,7 @@ bool RulerSpecialGuard::specFight( )
 	return false;
 
     ch->setClan( clan_ruler );
-    interpret_raw(ch, "cb", "ВНИМАНИЕ!!! %s находится %s в районе %s",
+    interpret_raw(ch, "cb", "п▓п²п≤п°п░п²п≤п∙!!! %s п╫п╟я┘п╬п╢п╦я┌я│я▐ %s п╡ я─п╟п╧п╬п╫п╣ %s",
 		    victim->getNameP(), 
 		    ch->in_room->name, 
 		    ch->in_room->area->name);
@@ -1600,14 +1600,14 @@ bool RulerSpecialGuard::specFight( )
     if ( ( ch->getModifyLevel() + 20 > victim->getModifyLevel() )
 	    && !is_safe_nomessage ( ch, victim ) )
     {
-	sprintf( buf, "%s CRIMINAL! ЗАЩИЩАЙ НЕВИННЫХ!! СМЕРТЬ ПРЕСТУПНИКАМ!!",
+	sprintf( buf, "%s CRIMINAL! п≈п░п╘п≤п╘п░п≥ п²п∙п▓п≤п²п²п╚п╔!! п║п°п∙п═п╒п╛ п÷п═п∙п║п╒пёп÷п²п≤п п░п°!!",
 		victim->getNameP( ) );
 	do_yell( ch, buf );
 	multi_hit( ch, victim );
     }
     else
     {
-	sprintf( buf, "$c1 кричит '%s! ТЫ ЕЩЕ ОТВЕТИШЬ ЗА СВОИ ПРЕСТУПЛЕНИЯ!'",
+	sprintf( buf, "$c1 п╨я─п╦я┤п╦я┌ '%s! п╒п╚ п∙п╘п∙ п·п╒п▓п∙п╒п≤п╗п╛ п≈п░ п║п▓п·п≤ п÷п═п∙п║п╒пёп÷п⌡п∙п²п≤п╞!'",
 		 victim->getNameP( ));
 	act_p( buf, ch, 0, 0, TO_ROOM,POS_RESTING );
     }
@@ -1628,7 +1628,7 @@ TYPE_SPELL(NPCharacter *, GuardCall)::createMobile( Character *ch, int level ) c
 VOID_SPELL(GuardCall)::run( Character *ch, char *target_name, int sn, int level ) 
 { 
     if ( ch->isAffected(gsn_dismiss ) ) {
-	ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+	ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 	return;
     }
     
@@ -1642,7 +1642,7 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
 
     if ( ch->isAffected(gsn_dismiss ) )
     {
-	ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+	ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 	return;
     }
 
@@ -1659,12 +1659,12 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
 			repops.push_back( room );
 	    
 	    if (repops.size( ) == 1) {
-		ch->printf( "%s обитает в местности под названием %s (%s).\r\n",
+		ch->printf( "%s п╬п╠п╦я┌п╟п╣я┌ п╡ п╪п╣я│я┌п╫п╬я│я┌п╦ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ %s (%s).\r\n",
 			    mob->getNameP( '1' ).c_str( ), 
 			    repops.front( )->name, repops.front( )->area->name );
 	    }
 	    else if (repops.size( ) > 0) {
-		act( "$C1 может обитать в одном из следующих мест:", ch, 0, mob, TO_CHAR );
+		act( "$C1 п╪п╬п╤п╣я┌ п╬п╠п╦я┌п╟я┌я▄ п╡ п╬п╢п╫п╬п╪ п╦п╥ я│п╩п╣п╢я┐я▌я┴п╦я┘ п╪п╣я│я┌:", ch, 0, mob, TO_CHAR );
 
 		for (list<Room *>::iterator r = repops.begin( ); r != repops.end( ); r++)
 		    ch->printf( "    %s  (%s)\r\n", (*r)->name, (*r)->area->name );
@@ -1673,17 +1673,17 @@ VOID_SPELL(KnowPersone)::run( Character *ch, Character *victim, int sn, int leve
     }
 
     if (!victim->isAffected(gsn_doppelganger)) {
-	act("Ты не замечаешь во внешности $C2 ничего необычного.", ch, 0, victim, TO_CHAR);
+	act("п╒я▀ п╫п╣ п╥п╟п╪п╣я┤п╟п╣я┬я▄ п╡п╬ п╡п╫п╣я┬п╫п╬я│я┌п╦ $C2 п╫п╦я┤п╣пЁп╬ п╫п╣п╬п╠я▀я┤п╫п╬пЁп╬.", ch, 0, victim, TO_CHAR);
     }
     else if (saves_spell( level, victim, DAM_MENTAL, ch, DAMF_SPELL)) {
-	act("Тебе не удалось заглянуть под личину $C2.", ch, 0, victim, TO_CHAR);
+	act("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╥п╟пЁп╩я▐п╫я┐я┌я▄ п©п╬п╢ п╩п╦я┤п╦п╫я┐ $C2.", ch, 0, victim, TO_CHAR);
     }
     else {
 	if (victim->is_mirror( )) 
-	    ch->pecho( "%^C1 - это всего лишь зеркало, созданное %#^C5!",
+	    ch->pecho( "%^C1 - я█я┌п╬ п╡я│п╣пЁп╬ п╩п╦я┬я▄ п╥п╣я─п╨п╟п╩п╬, я│п╬п╥п╢п╟п╫п╫п╬п╣ %#^C5!",
 	               victim, victim->doppel );
 	else 
-	    ch->pecho( "Ты замечаешь, что под обликом %1$^C2 скрывается %1$#^C1!",
+	    ch->pecho( "п╒я▀ п╥п╟п╪п╣я┤п╟п╣я┬я▄, я┤я┌п╬ п©п╬п╢ п╬п╠п╩п╦п╨п╬п╪ %1$^C2 я│п╨я─я▀п╡п╟п╣я┌я│я▐ %1$#^C1!",
 	               victim );
     }
 }
@@ -1703,8 +1703,8 @@ VOID_SPELL(RemoveBadge)::run( Character *ch, Character *victim, int sn, int leve
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
 	{
-	  act_p("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR,POS_RESTING);
-	  act_p("У $c2 исчезает $o1.", ch, badge, 0, TO_ROOM,POS_RESTING);
+	  act_p("п╒п╡п╬п╧ $o1 п╦я│я┤п╣п╥п╟п╣я┌.",ch, badge, 0, TO_CHAR,POS_RESTING);
+	  act_p("пё $c2 п╦я│я┤п╣п╥п╟п╣я┌ $o1.", ch, badge, 0, TO_ROOM,POS_RESTING);
 	
 	  obj_from_char(badge);
 	  extract_obj(badge);
@@ -1725,7 +1725,7 @@ VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level )
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("Теперь ты чувствуешь себя более информированным, правя Миром.\n\r");
+      ch->send_to("п╒п╣п©п╣я─я▄ я┌я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╠п╬п╩п╣п╣ п╦п╫я└п╬я─п╪п╦я─п╬п╡п╟п╫п╫я▀п╪, п©я─п╟п╡я▐ п°п╦я─п╬п╪.\n\r");
 
       af.where = TO_IMMUNE;
       af.type = sn;
@@ -1751,7 +1751,7 @@ VOID_SPELL(RulerAura)::run( Character *ch, Character *, int sn, int level )
 
     }
   else
-      ch->send_to("Ты и так уже знаешь многое в этом мире, неподвластное другим.\n\r");
+      ch->send_to("п╒я▀ п╦ я┌п╟п╨ я┐п╤п╣ п╥п╫п╟п╣я┬я▄ п╪п╫п╬пЁп╬п╣ п╡ я█я┌п╬п╪ п╪п╦я─п╣, п╫п╣п©п╬п╢п╡п╩п╟я│я┌п╫п╬п╣ п╢я─я┐пЁп╦п╪.\n\r");
  return;
 
 }
@@ -1769,7 +1769,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
   if ( (get_eq_char(ch, wear_neck_1)  != 0 ) &&
 	(get_eq_char(ch, wear_neck_2)  != 0 ) )
   {
-    ch->send_to("Но у тебя уже что-то одето!\n\r");
+    ch->send_to("п²п╬ я┐ я┌п╣п╠я▐ я┐п╤п╣ я┤я┌п╬-я┌п╬ п╬п╢п╣я┌п╬!\n\r");
     return;
   }
 
@@ -1779,7 +1779,7 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
       obj_next = badge->next_content;
       if (badge->pIndexData->vnum == OBJ_VNUM_DEPUTY_BADGE)
 	{
-	  act_p("Твой $o1 исчезает.",ch, badge, 0, TO_CHAR,POS_RESTING);
+	  act_p("п╒п╡п╬п╧ $o1 п╦я│я┤п╣п╥п╟п╣я┌.",ch, badge, 0, TO_CHAR,POS_RESTING);
 	  obj_from_char(badge);
 	  extract_obj(badge);
 	  continue;
@@ -1813,8 +1813,8 @@ VOID_SPELL(RulerBadge)::run( Character *ch, Character *, int sn, int level )
 
 
   badge->timer = 200;
-  act_p("Ты одеваешь символ Хранителя Закона!",ch, 0, 0, TO_CHAR,POS_RESTING);
-  act_p("$c1 одевает символ Хранителя Закона!", ch, 0, 0, TO_ROOM,POS_RESTING);
+  act_p("п╒я▀ п╬п╢п╣п╡п╟п╣я┬я▄ я│п╦п╪п╡п╬п╩ п╔я─п╟п╫п╦я┌п╣п╩я▐ п≈п╟п╨п╬п╫п╟!",ch, 0, 0, TO_CHAR,POS_RESTING);
+  act_p("$c1 п╬п╢п╣п╡п╟п╣я┌ я│п╦п╪п╡п╬п╩ п╔я─п╟п╫п╦я┌п╣п╩я▐ п≈п╟п╨п╬п╫п╟!", ch, 0, 0, TO_ROOM,POS_RESTING);
 
   obj_to_char(badge,ch);
   wear_obj( ch, badge, 0 );
@@ -1875,9 +1875,9 @@ VOID_SPELL(ShieldOfRuler)::run( Character *ch, char *target_name, int sn, int le
   af.location     = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  act_p("Ты взмахиваешь руками и создаешь $o4!",
+  act_p("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ $o4!",
          ch,shield,0,TO_CHAR,POS_RESTING);
-  act_p("$c1 взмахивает руками и создает $o4!",
+  act_p("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ $o4!",
          ch,shield,0,TO_ROOM,POS_RESTING);
 
 }
@@ -1894,37 +1894,37 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
 
 	if ( ch->isAffected(gsn_dismiss ) )
 	{
-		ch->send_to( "У тебя отобрали привилегии Рулера!\n\r" );
+		ch->send_to( "пё я┌п╣п╠я▐ п╬я┌п╬п╠я─п╟п╩п╦ п©я─п╦п╡п╦п╩п╣пЁп╦п╦ п═я┐п╩п╣я─п╟!\n\r" );
 		return;
 	}
 
   if (victim == ch || victim->in_room == 0
       || victim->is_npc() || !IS_SET(victim->act, PLR_WANTED))
     {
-      ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+      ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
       return;
     }
 
   if (ch->isAffected(sn))
     {
-      ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+      ch->send_to("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╬я│я▄ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.\n\r");
       return;
     }
 
   if( !is_safe_nomessage(ch,victim) )
     {
-      ch->send_to("Тебе лучше использовать охранников для этой цели.\n\r");
+      ch->send_to("п╒п╣п╠п╣ п╩я┐я┤я┬п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╬я┘я─п╟п╫п╫п╦п╨п╬п╡ п╢п╩я▐ я█я┌п╬п╧ я├п╣п╩п╦.\n\r");
       return;
     }
 
 	if ( victim->getClan() == clan_chaos )
 	{
-		ch->send_to("{xНет, с {MХаосом {xтебе придется бороться другими средствами!\n\r");
+		ch->send_to("{xп²п╣я┌, я│ {Mп╔п╟п╬я│п╬п╪ {xя┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╠п╬я─п╬я┌я▄я│я▐ п╢я─я┐пЁп╦п╪п╦ я│я─п╣п╢я│я┌п╡п╟п╪п╦!\n\r");
 		return;
 	}
 
-  ch->send_to("Ты пытаешься призвать себе в помощь охотника за головами.\n\r");
-  act_p("$c1 пытается призвать себе на помощь охотника за головами.",ch,0,0,TO_ROOM,POS_RESTING);
+  ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п©я─п╦п╥п╡п╟я┌я▄ я│п╣п╠п╣ п╡ п©п╬п╪п╬я┴я▄ п╬я┘п╬я┌п╫п╦п╨п╟ п╥п╟ пЁп╬п╩п╬п╡п╟п╪п╦.\n\r");
+  act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п©я─п╦п╥п╡п╟я┌я▄ я│п╣п╠п╣ п╫п╟ п©п╬п╪п╬я┴я▄ п╬я┘п╬я┌п╫п╦п╨п╟ п╥п╟ пЁп╬п╩п╬п╡п╟п╪п╦.",ch,0,0,TO_ROOM,POS_RESTING);
 
   stalker = create_mobile( get_mob_index(MOB_VNUM_STALKER) );
 
@@ -1974,12 +1974,12 @@ VOID_SPELL(Stalker)::run( Character *ch, Character *victim, int sn, int level )
 	if ( victim->isAffected(gsn_suspect ) )
 	{
 		affect_strip ( victim, gsn_suspect );
-		victim->send_to ("Твоя повестка в Суд горит синим пламенем!\n\r");
+		victim->send_to ("п╒п╡п╬я▐ п©п╬п╡п╣я│я┌п╨п╟ п╡ п║я┐п╢ пЁп╬я─п╦я┌ я│п╦п╫п╦п╪ п©п╩п╟п╪п╣п╫п╣п╪!\n\r");
 	}
-  victim->send_to("Охотник за головами послан за тобой!\n\r");
-  act_p("Охотник за головами прибывает, чтобы искать $c4!",
+  victim->send_to("п·я┘п╬я┌п╫п╦п╨ п╥п╟ пЁп╬п╩п╬п╡п╟п╪п╦ п©п╬я│п╩п╟п╫ п╥п╟ я┌п╬п╠п╬п╧!\n\r");
+  act_p("п·я┘п╬я┌п╫п╦п╨ п╥п╟ пЁп╬п╩п╬п╡п╟п╪п╦ п©я─п╦п╠я▀п╡п╟п╣я┌, я┤я┌п╬п╠я▀ п╦я│п╨п╟я┌я▄ $c4!",
          victim,0,0,TO_ROOM,POS_RESTING);
-  ch->send_to("Охотник за головами послан по заданию.\n\r");
+  ch->send_to("п·я┘п╬я┌п╫п╦п╨ п╥п╟ пЁп╬п╩п╬п╡п╟п╪п╦ п©п╬я│п╩п╟п╫ п©п╬ п╥п╟п╢п╟п╫п╦я▌.\n\r");
 }
 
 AFFECT_DECL(Jail);
@@ -1989,13 +1989,13 @@ VOID_AFFECT(Jail)::remove( Character *victim )
 
     DefaultAffectHandler::remove( victim );
 
-    clantalk( *clan_ruler, "С этого момента %s снова на свободе!", victim->getNameP( '1' ).c_str() );
+    clantalk( *clan_ruler, "п║ я█я┌п╬пЁп╬ п╪п╬п╪п╣п╫я┌п╟ %s я│п╫п╬п╡п╟ п╫п╟ я│п╡п╬п╠п╬п╢п╣!", victim->getNameP( '1' ).c_str() );
 
     if (victim->isAffected(gsn_manacles ))
 	affect_strip( victim, gsn_manacles );
 
-    act_p("$c1 искупи$gло|л|ла свою провинность и освобождается из под стражи.", victim, 0, 0, TO_ROOM, POS_RESTING);
-    act_p("ТЫ СНОВА НА СВОБОДЕ!", victim, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("$c1 п╦я│п╨я┐п©п╦$gп╩п╬|п╩|п╩п╟ я│п╡п╬я▌ п©я─п╬п╡п╦п╫п╫п╬я│я┌я▄ п╦ п╬я│п╡п╬п╠п╬п╤п╢п╟п╣я┌я│я▐ п╦п╥ п©п╬п╢ я│я┌я─п╟п╤п╦.", victim, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("п╒п╚ п║п²п·п▓п░ п²п░ п║п▓п·п▒п·п■п∙!", victim, 0, 0, TO_CHAR, POS_RESTING);
 
     if (victim->in_room
 	&& victim->in_room->vnum >= 4343
@@ -2003,12 +2003,12 @@ VOID_AFFECT(Jail)::remove( Character *victim )
     {
 	if ( ( location = get_room_index( 4283 ) ) == 0 )
 	{
-	    victim->send_to("Мда... Освобождать-то тебя - некуда.\n\r");
+	    victim->send_to("п°п╢п╟... п·я│п╡п╬п╠п╬п╤п╢п╟я┌я▄-я┌п╬ я┌п╣п╠я▐ - п╫п╣п╨я┐п╢п╟.\n\r");
 	    return;
 	}
 	
 	transfer_char( victim, 0, location,
-		    NULL, NULL, "%1$^C1 появляется, вдыхая воздух свободы." );
+		    NULL, NULL, "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐, п╡п╢я▀я┘п╟я▐ п╡п╬п╥п╢я┐я┘ я│п╡п╬п╠п╬п╢я▀." );
     }
 }
 
@@ -2017,10 +2017,10 @@ VOID_AFFECT(Jail)::update( Character *ch, Affect *paf )
     DefaultAffectHandler::update( ch, paf );
 
     if ( paf->duration < 3) {
-	clantalk(*clan_ruler, "%s выйдет на свободу через %d час%s",
+	clantalk(*clan_ruler, "%s п╡я▀п╧п╢п╣я┌ п╫п╟ я│п╡п╬п╠п╬п╢я┐ я┤п╣я─п╣п╥ %d я┤п╟я│%s",
 		ch->getNameP( '1' ).c_str(),
 		paf->duration,
-		GET_COUNT(paf->duration, "","а","ов"));
+		GET_COUNT(paf->duration, "","п╟","п╬п╡"));
     }
 }
 
@@ -2029,7 +2029,7 @@ VOID_AFFECT(Manacles)::remove( Character *ch )
 {
     DefaultAffectHandler::remove( ch );
 
-    clantalk(*clan_ruler, "С %s спали кандалы!", ch->getNameP( '2' ).c_str() );
+    clantalk(*clan_ruler, "п║ %s я│п©п╟п╩п╦ п╨п╟п╫п╢п╟п╩я▀!", ch->getNameP( '2' ).c_str() );
 }
 
 VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf ) 
@@ -2037,10 +2037,10 @@ VOID_AFFECT(Manacles)::update( Character *ch, Affect *paf )
     DefaultAffectHandler::update( ch, paf );
 
     if ( paf->duration < 3) {
-	clantalk(*clan_ruler, "С %s спадут кандалы через %d час%s",
+	clantalk(*clan_ruler, "п║ %s я│п©п╟п╢я┐я┌ п╨п╟п╫п╢п╟п╩я▀ я┤п╣я─п╣п╥ %d я┤п╟я│%s",
 		ch->getNameP( '2' ).c_str(),
 		paf->duration,
-		GET_COUNT(paf->duration, "","а","ов"));
+		GET_COUNT(paf->duration, "","п╟","п╬п╡"));
     }
 }
 
@@ -2049,7 +2049,7 @@ AFFECT_DECL(Suspect);
 VOID_AFFECT(Suspect)::remove( Character *ch ) 
 { 
     DefaultAffectHandler::remove( ch );
-    clantalk(*clan_ruler, "Повестка в суд для %s истекла!", ch->getNameP( '2' ).c_str() );
+    clantalk(*clan_ruler, "п÷п╬п╡п╣я│я┌п╨п╟ п╡ я│я┐п╢ п╢п╩я▐ %s п╦я│я┌п╣п╨п╩п╟!", ch->getNameP( '2' ).c_str() );
 }
 
 VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf ) 
@@ -2057,10 +2057,10 @@ VOID_AFFECT(Suspect)::update( Character *ch, Affect *paf )
     DefaultAffectHandler::update( ch, paf );
 
     if ( paf->duration < 3) {
-	clantalk(*clan_ruler, "Повестка в суд для %s истекает через %d час%s",
+	clantalk(*clan_ruler, "п÷п╬п╡п╣я│я┌п╨п╟ п╡ я│я┐п╢ п╢п╩я▐ %s п╦я│я┌п╣п╨п╟п╣я┌ я┤п╣я─п╣п╥ %d я┤п╟я│%s",
 		ch->getNameP( '2' ).c_str(),
 		paf->duration,
-		GET_COUNT(paf->duration, "","а","ов"));
+		GET_COUNT(paf->duration, "","п╟","п╬п╡"));
     }
 }
 
@@ -2171,7 +2171,7 @@ bool Stalker::specIdle( )
 
 bool Stalker::death( Character *killer ) 
 {
-    clantalk( "Я тщетно пытался убить %s! Мои силы на исходе." );
+    clantalk( "п╞ я┌я┴п╣я┌п╫п╬ п©я▀я┌п╟п╩я│я▐ я┐п╠п╦я┌я▄ %s! п°п╬п╦ я│п╦п╩я▀ п╫п╟ п╦я│я┘п╬п╢п╣." );
     return false;
 }
 

@@ -3,15 +3,15 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    Zadvinsky Aleksandr  {Kiddy}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
@@ -99,7 +99,7 @@ void delete_player( PCharacter *victim )
     Object *obj_next;
     DLString name = victim->getName( );
 
-    // удаляем из мира вещички энтого гуся
+    // я┐п╢п╟п╩я▐п╣п╪ п╦п╥ п╪п╦я─п╟ п╡п╣я┴п╦я┤п╨п╦ я█п╫я┌п╬пЁп╬ пЁя┐я│я▐
     for ( obj = object_list; obj != 0; obj = obj_next ) {
 	obj_next = obj->next;
 
@@ -130,25 +130,25 @@ CMDRUNP( delete )
     {
         if (!password_check( pch, argument ))
 	{
-	    pch->send_to("Состояние самоуничтожения отменено (неверный пароль).\n\r");
+	    pch->send_to("п║п╬я│я┌п╬я▐п╫п╦п╣ я│п╟п╪п╬я┐п╫п╦я┤я┌п╬п╤п╣п╫п╦я▐ п╬я┌п╪п╣п╫п╣п╫п╬ (п╫п╣п╡п╣я─п╫я▀п╧ п©п╟я─п╬п╩я▄).\n\r");
 	    pch->confirm_delete = false;
 	    return;
 	}
 	else
 	{
 	    wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
-	           "%1$^C1 превращает себя в помехи в проводах.", pch );
+	           "%1$^C1 п©я─п╣п╡я─п╟я┴п╟п╣я┌ я│п╣п╠я▐ п╡ п©п╬п╪п╣я┘п╦ п╡ п©я─п╬п╡п╬п╢п╟я┘.", pch );
 	    delete_player( pch );
 	    return;
 	}
     }
 
-    pch->send_to("Введи {Wdelete <твой пароль>{x для подтверждения команды.\n\r");
-    pch->send_to("{RВНИМАНИЕ{x: это необратимая команда.\n\r");
-    pch->send_to("Введение команды {Wdelete{x без пароля отменяет попытку самоликвидации.\n\r");
+    pch->send_to("п▓п╡п╣п╢п╦ {Wdelete <я┌п╡п╬п╧ п©п╟я─п╬п╩я▄>{x п╢п╩я▐ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦я▐ п╨п╬п╪п╟п╫п╢я▀.\n\r");
+    pch->send_to("{Rп▓п²п≤п°п░п²п≤п∙{x: я█я┌п╬ п╫п╣п╬п╠я─п╟я┌п╦п╪п╟я▐ п╨п╬п╪п╟п╫п╢п╟.\n\r");
+    pch->send_to("п▓п╡п╣п╢п╣п╫п╦п╣ п╨п╬п╪п╟п╫п╢я▀ {Wdelete{x п╠п╣п╥ п©п╟я─п╬п╩я▐ п╬я┌п╪п╣п╫я▐п╣я┌ п©п╬п©я▀я┌п╨я┐ я│п╟п╪п╬п╩п╦п╨п╡п╦п╢п╟я├п╦п╦.\n\r");
     pch->getPC( )->confirm_delete = true;
     wiznet( WIZ_SECURE, 0, pch->get_trust( ), 
-            "%^C1 собирается удалить свой персонаж.", pch );
+            "%^C1 я│п╬п╠п╦я─п╟п╣я┌я│я▐ я┐п╢п╟п╩п╦я┌я▄ я│п╡п╬п╧ п©п╣я─я│п╬п╫п╟п╤.", pch );
 }
 
 /* COMPAT */void do_quit( Character *ch, const char *argument )
@@ -170,7 +170,7 @@ CMDRUNP( delete )
 
 CMDRUNP( rent )
 {
-    ch->send_to( "Здесь нет ренты. Просто покинь мир.\n\r");
+    ch->send_to( "п≈п╢п╣я│я▄ п╫п╣я┌ я─п╣п╫я┌я▀. п÷я─п╬я│я┌п╬ п©п╬п╨п╦п╫я▄ п╪п╦я─.\n\r");
     return;
 }
 
@@ -234,7 +234,7 @@ CMDRUNP( quit )
     
     if (pch->position == POS_FIGHTING || pch->fighting) {
 	if (!fForced) {
-	    pch->println( "Не сейчас! Тебе необходимо закончить сражение!");
+	    pch->println( "п²п╣ я│п╣п╧я┤п╟я│! п╒п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╥п╟п╨п╬п╫я┤п╦я┌я▄ я│я─п╟п╤п╣п╫п╦п╣!");
 	    return;
 	}
 
@@ -243,7 +243,7 @@ CMDRUNP( quit )
 
     if (pch->position  < POS_STUNNED) {
 	if (!fForced) {
-	    pch->pecho("Ты еще не УМЕ%GРЛО|Р|РЛА.", pch);
+	    pch->pecho("п╒я▀ п╣я┴п╣ п╫п╣ пёп°п∙%Gп═п⌡п·|п═|п═п⌡п░.", pch);
 	    return;
 	}
 
@@ -253,22 +253,22 @@ CMDRUNP( quit )
     
     if (!pch->is_immortal( ) && !fAuto && !fForced) {
 	if (IS_VIOLENT(pch)) {
-	    pch->println("У тебя слишком много адреналина в крови.");
+	    pch->println("пё я┌п╣п╠я▐ я│п╩п╦я┬п╨п╬п╪ п╪п╫п╬пЁп╬ п╟п╢я─п╣п╫п╟п╩п╦п╫п╟ п╡ п╨я─п╬п╡п╦.");
 	    return;
 	}
 	if (IS_SLAIN(pch)) {
-	    pch->println("Правда о твоем поражении еще не забыта.");
+	    pch->println("п÷я─п╟п╡п╢п╟ п╬ я┌п╡п╬п╣п╪ п©п╬я─п╟п╤п╣п╫п╦п╦ п╣я┴п╣ п╫п╣ п╥п╟п╠я▀я┌п╟.");
 	    return;
 	}
 	if (IS_KILLER(pch)) {
-	    pch->println("Боги еще помнят убийство, совершенное тобой.");
+	    pch->println("п▒п╬пЁп╦ п╣я┴п╣ п©п╬п╪п╫я▐я┌ я┐п╠п╦п╧я│я┌п╡п╬, я│п╬п╡п╣я─я┬п╣п╫п╫п╬п╣ я┌п╬п╠п╬п╧.");
 	    return;
 	}
     }
 
     if (IS_AFFECTED( pch, AFF_CHARM )) {
 	if (!fForced) {
-	    pch->send_to( "Ты не можешь покинуть своего хозяина.\n\r");
+	    pch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╨п╦п╫я┐я┌я▄ я│п╡п╬п╣пЁп╬ я┘п╬п╥я▐п╦п╫п╟.\n\r");
 	    return;
 	}
 
@@ -279,13 +279,13 @@ CMDRUNP( quit )
 	&& !pch->is_immortal( )
 	&& IS_SET( pch->act, PLR_NO_EXP ))
     {
-	pch->send_to( "Ты не можешь покинуть этот мир! Твой дух во власти противника.\n\r");
+	pch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╨п╦п╫я┐я┌я▄ я█я┌п╬я┌ п╪п╦я─! п╒п╡п╬п╧ п╢я┐я┘ п╡п╬ п╡п╩п╟я│я┌п╦ п©я─п╬я┌п╦п╡п╫п╦п╨п╟.\n\r");
 	return;
     }
 
     if (auction->item != 0 && ((pch == auction->buyer) || (pch == auction->seller))) {
 	if (!fForced) {
-	    pch->send_to("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.\n\r");
+	    pch->send_to("п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ п╡п╣я┴я▄, п╡я▀я│я┌п╟п╡п╩п╣п╫п╫п╟я▐ п╫п╟ п╟я┐п╨я├п╦п╬п╫, п╠я┐п╢п╣я┌ п©я─п╬п╢п╟п╫п╟ п╦п╩п╦ п╡п╬п╥п╡я─п╟я┴п╣п╫п╟.\n\r");
 	    return;
 	}
 	
@@ -297,7 +297,7 @@ CMDRUNP( quit )
 	&& !pch->is_immortal()
 	&& IS_RAFFECTED( pch->in_room, AFF_ROOM_ESPIRIT ))
     {
-	pch->send_to( "Злые духи в этой зоне не отпускают тебя.\n\r");
+	pch->send_to( "п≈п╩я▀п╣ п╢я┐я┘п╦ п╡ я█я┌п╬п╧ п╥п╬п╫п╣ п╫п╣ п╬я┌п©я┐я│п╨п╟я▌я┌ я┌п╣п╠я▐.\n\r");
 	return;
     }
 
@@ -306,7 +306,7 @@ CMDRUNP( quit )
 	    && pch->getClan( ) != clan_invader 
 	    && pch->isAffected( gsn_evil_spirit ))
     {
-	pch->send_to( "Злые духи, овладевшие тобой, не позволяют тебе покинуть этот мир.\n\r");
+	pch->send_to( "п≈п╩я▀п╣ п╢я┐я┘п╦, п╬п╡п╩п╟п╢п╣п╡я┬п╦п╣ я┌п╬п╠п╬п╧, п╫п╣ п©п╬п╥п╡п╬п╩я▐я▌я┌ я┌п╣п╠п╣ п©п╬п╨п╦п╫я┐я┌я▄ я█я┌п╬я┌ п╪п╦я─.\n\r");
 	return;
     }
 
@@ -314,7 +314,7 @@ CMDRUNP( quit )
 	&& !pch->is_immortal()  
 	&& pch->isAffected(gsn_suspect))
     {
-	pch->send_to ("Ты не можешь этого сделать - тебя ждет Суд!\n\r");
+	pch->send_to ("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄ - я┌п╣п╠я▐ п╤п╢п╣я┌ п║я┐п╢!\n\r");
 	return;
     }
 
@@ -323,7 +323,7 @@ CMDRUNP( quit )
 	    && pch->death_ground_delay > 0
 	    && pch->trap.isSet( TF_NO_MOVE ))
     {
-	pch->send_to( "Сначала выберись отсюда, а потом можно и покинуть этот Мир.\n\r" );
+	pch->send_to( "п║п╫п╟я┤п╟п╩п╟ п╡я▀п╠п╣я─п╦я│я▄ п╬я┌я│я▌п╢п╟, п╟ п©п╬я┌п╬п╪ п╪п╬п╤п╫п╬ п╦ п©п╬п╨п╦п╫я┐я┌я▄ я█я┌п╬я┌ п°п╦я─.\n\r" );
 	return;
     }
 
@@ -332,7 +332,7 @@ CMDRUNP( quit )
 	    && pch->getClan() != pch->in_room->clan)
     {
 	if (!fAuto && !fForced) {
-	    pch->send_to("Ты не можешь этого сделать - здесь не твоя территория!\n\r");
+	    pch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄ - п╥п╢п╣я│я▄ п╫п╣ я┌п╡п╬я▐ я┌п╣я─я─п╦я┌п╬я─п╦я▐!\n\r");
 	    return;
 	}
 	
@@ -348,14 +348,14 @@ CMDRUNP( quit )
     
     PCharacterManager::quit( pch );
 
-    pch->send_to("Жаль, но все хорошее когда-нибудь заканчивается.\n\r");
+    pch->send_to("п√п╟п╩я▄, п╫п╬ п╡я│п╣ я┘п╬я─п╬я┬п╣п╣ п╨п╬пЁп╢п╟-п╫п╦п╠я┐п╢я▄ п╥п╟п╨п╟п╫я┤п╦п╡п╟п╣я┌я│я▐.\n\r");
     
     if (pch->desc && !fQuiet)
 	DescriptorStateManager::getThis( )->handle( CON_PLAYING, CON_QUIT, pch->desc );
 
-    act_p( "$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
-    wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
-    infonet("{CТихий голос из $o2: {W$C1 покину$Gло|л|ла Dream Land.{x", pch, 0);
+    act_p( "$c1 п©п╬п╨п╦п╫я┐$gп╩п╬|п╩|п╩п╟ я█я┌п╬я┌ п╪п╦я─.", pch, 0, 0, TO_ROOM ,POS_DEAD);
+    wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 п©п╬п╨п╦п╫я┐%1$Gп╩п╬|п╩|п╩п╟ я█я┌п╬я┌ п╪п╦я─.", pch );
+    infonet("{Cп╒п╦я┘п╦п╧ пЁп╬п╩п╬я│ п╦п╥ $o2: {W$C1 п©п╬п╨п╦п╫я┐$Gп╩п╬|п╩|п╩п╟ Dream Land.{x", pch, 0);
 
     dreamland->removeOption( DL_SAVE_OBJS );
 
@@ -391,7 +391,7 @@ CMDRUNP( save )
 	return;
 
     ch->getPC( )->save();
-    ch->send_to( "Жрецы {CDream Land{x заносят сведения о тебе в свои манускрипты.\n\r");
+    ch->send_to( "п√я─п╣я├я▀ {CDream Land{x п╥п╟п╫п╬я│я▐я┌ я│п╡п╣п╢п╣п╫п╦я▐ п╬ я┌п╣п╠п╣ п╡ я│п╡п╬п╦ п╪п╟п╫я┐я│п╨я─п╦п©я┌я▀.\n\r");
     ch->setWaitViolence( 1 );
 }
 

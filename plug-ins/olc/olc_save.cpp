@@ -122,7 +122,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
 	    save_xmlarea(afile);
 	}
-	stc("Все арии сохранены\n\r", ch);
+	stc("п▓я│п╣ п╟я─п╦п╦ я│п╬я┘я─п╟п╫п╣п╫я▀\n\r", ch);
 	return;
     }
 
@@ -171,7 +171,7 @@ CMD(asave, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	    return;
 	}
 	if (!pArea || !OLCState::can_edit(ch, pArea)) {
-	    stc("У вас нет прав изменять эту арию.\n\r", ch);
+	    stc("пё п╡п╟я│ п╫п╣я┌ п©я─п╟п╡ п╦п╥п╪п╣п╫я▐я┌я▄ я█я┌я┐ п╟я─п╦я▌.\n\r", ch);
 	    return;
 	}
 

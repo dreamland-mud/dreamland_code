@@ -29,7 +29,7 @@ CMDADM( finger )
 
 	if ( !ch->is_immortal() )
 	{
-		str << "Что?" << std::endl;
+		str << "п╖я┌п╬?" << std::endl;
 	}
 	else if( PCMemoryInterface* pci = PCharacterManager::find( constArguments ) )
 	{

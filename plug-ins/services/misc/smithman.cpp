@@ -39,7 +39,7 @@ bool Smithman::specIdle( )
     if (chance(90))
 	return false;
 
-    interpret_raw(ch, "say", "Эх, скучно мне!!!");
+    interpret_raw(ch, "say", "п╜я┘, я│п╨я┐я┤п╫п╬ п╪п╫п╣!!!");
     return true;
 }
 
@@ -49,17 +49,17 @@ bool Smithman::canServeClient( Character *client )
 	return false;
 
     if (getKeeper( )->fighting) {
-	say_act( client, getKeeper( ), "Обожди, $c1, мне сейчас не до тебя." );
+	say_act( client, getKeeper( ), "п·п╠п╬п╤п╢п╦, $c1, п╪п╫п╣ я│п╣п╧я┤п╟я│ п╫п╣ п╢п╬ я┌п╣п╠я▐." );
 	return false;
     }
     
     if (IS_GHOST( client )) {
-	say_act( client, getKeeper( ), "Э, $c1, так не пойдет.. Нет тела - нет клиента." );
+	say_act( client, getKeeper( ), "п╜, $c1, я┌п╟п╨ п╫п╣ п©п╬п╧п╢п╣я┌.. п²п╣я┌ я┌п╣п╩п╟ - п╫п╣я┌ п╨п╩п╦п╣п╫я┌п╟." );
 	return false;
     }
 
     if (IS_AFFECTED( client, AFF_CHARM )) {
-	say_act( client, getKeeper( ), "Не буду я тебя обслуживать, $c1, слишком уж странно ты себя ведешь." );
+	say_act( client, getKeeper( ), "п²п╣ п╠я┐п╢я┐ я▐ я┌п╣п╠я▐ п╬п╠я│п╩я┐п╤п╦п╡п╟я┌я▄, $c1, я│п╩п╦я┬п╨п╬п╪ я┐п╤ я│я┌я─п╟п╫п╫п╬ я┌я▀ я│п╣п╠я▐ п╡п╣п╢п╣я┬я▄." );
 	return false;
     }
 
@@ -68,23 +68,23 @@ bool Smithman::canServeClient( Character *client )
 
 void Smithman::msgListRequest( Character *client ) 
 {
-    act( "Ты просишь у $C4 список услуг.", client, 0, getKeeper( ), TO_CHAR );
-    act( "$c1 просит $C4 рассказать, что $E умеет делать.", client, 0, getKeeper( ), TO_ROOM );
+    act( "п╒я▀ п©я─п╬я│п╦я┬я▄ я┐ $C4 я│п©п╦я│п╬п╨ я┐я│п╩я┐пЁ.", client, 0, getKeeper( ), TO_CHAR );
+    act( "$c1 п©я─п╬я│п╦я┌ $C4 я─п╟я│я│п╨п╟п╥п╟я┌я▄, я┤я┌п╬ $E я┐п╪п╣п╣я┌ п╢п╣п╩п╟я┌я▄.", client, 0, getKeeper( ), TO_ROOM );
 }
 
 void Smithman::msgListBefore( Character *client ) 
 {
-    tell_dim( client, getKeeper( ), "Вот список того, что я умею: " );
+    tell_dim( client, getKeeper( ), "п▓п╬я┌ я│п©п╦я│п╬п╨ я┌п╬пЁп╬, я┤я┌п╬ я▐ я┐п╪п╣я▌: " );
 }
 
 void Smithman::msgListAfter( Character *client )
 {
-    tell_dim( client, getKeeper( ), "Пока, пожалуй, все." );
+    tell_dim( client, getKeeper( ), "п÷п╬п╨п╟, п©п╬п╤п╟п╩я┐п╧, п╡я│п╣." );
 }
 
 void Smithman::msgListEmpty( Character *client )
 {
-    say_act( client, getKeeper( ), "Извини, $c1, но для тебя у меня сегодня выходной." );
+    say_act( client, getKeeper( ), "п≤п╥п╡п╦п╫п╦, $c1, п╫п╬ п╢п╩я▐ я┌п╣п╠я▐ я┐ п╪п╣п╫я▐ я│п╣пЁп╬п╢п╫я▐ п╡я▀я┘п╬п╢п╫п╬п╧." );
 }
 
 void Smithman::msgArticleNotFound( Character *client ) 
@@ -94,13 +94,13 @@ void Smithman::msgArticleNotFound( Character *client )
 
 void Smithman::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    say_act( client, getKeeper( ), "Не жадничай." );
+    say_act( client, getKeeper( ), "п²п╣ п╤п╟п╢п╫п╦я┤п╟п╧." );
 }
 
 void Smithman::msgBuyRequest( Character *client ) 
 {
-    act( "Ты просишь $C4 обслужить тебя.", client, 0, getKeeper( ), TO_CHAR );
-    act( "$c1 просит $C4 обслужить $s.", client, 0, getKeeper( ), TO_ROOM );
+    act( "п╒я▀ п©я─п╬я│п╦я┬я▄ $C4 п╬п╠я│п╩я┐п╤п╦я┌я▄ я┌п╣п╠я▐.", client, 0, getKeeper( ), TO_CHAR );
+    act( "$c1 п©я─п╬я│п╦я┌ $C4 п╬п╠я│п╩я┐п╤п╦я┌я▄ $s.", client, 0, getKeeper( ), TO_ROOM );
 }
 
 
@@ -151,7 +151,7 @@ bool HorseshoeSmithService::available( Character *client, NPCharacter *smithman 
     if (visible( client )) 
 	return true;
 
-    say_act( client, smithman, "Ну, $c1, и куда же тебе подковки приделать?" );
+    say_act( client, smithman, "п²я┐, $c1, п╦ п╨я┐п╢п╟ п╤п╣ я┌п╣п╠п╣ п©п╬п╢п╨п╬п╡п╨п╦ п©я─п╦п╢п╣п╩п╟я┌я▄?" );
     return false;
 }
 
@@ -162,7 +162,7 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     int level, hr, dr;
 
     if (!price->canAfford( client )) {
-	say_act( client, smithman, "У тебя не хватает $n2, чтобы оплатить мою работу.", price->toCurrency( ).c_str( ) );
+	say_act( client, smithman, "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ $n2, я┤я┌п╬п╠я▀ п╬п©п╩п╟я┌п╦я┌я▄ п╪п╬я▌ я─п╟п╠п╬я┌я┐.", price->toCurrency( ).c_str( ) );
 	return;
     }
 
@@ -201,24 +201,24 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     affect_to_obj( shoe, &af );
     
     price->deduct( client );
-    act( "$C1 забирает у тебя $n4.", client, price->toString( client ).c_str( ), smithman, TO_CHAR );
+    act( "$C1 п╥п╟п╠п╦я─п╟п╣я┌ я┐ я┌п╣п╠я▐ $n4.", client, price->toString( client ).c_str( ), smithman, TO_CHAR );
     
-//    act( "$c1 изготавливает две пары подков.", smithman, 0, 0, TO_ROOM );
+//    act( "$c1 п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┌ п╢п╡п╣ п©п╟я─я▀ п©п╬п╢п╨п╬п╡.", smithman, 0, 0, TO_ROOM );
 
     if ((old_shoe = get_eq_char( client, wear_hooves ))) {
 	unequip_char( client, old_shoe );
-	act( "$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
-	act( "$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
+	act( "$c1 я│п╫п╦п╪п╟п╣я┌ я│ я┌п╣п╠я▐ я│я┌п╟я─я▀п╣ п©п╬п╢п╨п╬п╡я▀.", smithman, 0, client, TO_VICT );
+	act( "$c1 я│п╫п╦п╪п╟п╣я┌ я│ $C2 я│я┌п╟я─я▀п╣ п©п╬п╢п╨п╬п╡я▀.", smithman, 0, client, TO_NOTVICT );
     }
 
     obj_to_char( shoe, client );
     equip_char( client, shoe, wear_hooves);
-    act( "$c1 прилаживает новые подковы на твои копыта.", smithman, 0, client, TO_VICT );
-    act( "$c1 прилаживает новые подковы на копыта $C2.", smithman, 0, client, TO_NOTVICT );
+    act( "$c1 п©я─п╦п╩п╟п╤п╦п╡п╟п╣я┌ п╫п╬п╡я▀п╣ п©п╬п╢п╨п╬п╡я▀ п╫п╟ я┌п╡п╬п╦ п╨п╬п©я▀я┌п╟.", smithman, 0, client, TO_VICT );
+    act( "$c1 п©я─п╦п╩п╟п╤п╦п╡п╟п╣я┌ п╫п╬п╡я▀п╣ п©п╬п╢п╨п╬п╡я▀ п╫п╟ п╨п╬п©я▀я┌п╟ $C2.", smithman, 0, client, TO_NOTVICT );
 
     if (client->getSex( ) == SEX_FEMALE && chance( 50 )) {
-	act( "$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
-	act( "$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
+	act( "$c1 я┘п╩п╬п©п╟п╣я┌ я┌п╣п╠я▐ п©п╬ п╨я─я┐п©я┐, п©я─п╦пЁп╬п╡п╟я─п╦п╡п╟я▐ '{gп╔п╬я─п╬я┬п╟, пЁп╬п╩я┐п╠я┐я┬п╨п╟!{x'", smithman, 0, client, TO_VICT );
+	act( "$c1 я┘п╩п╬п©п╟п╣я┌ $C4 п©п╬ п╨я─я┐п©я┐, п©я─п╦пЁп╬п╡п╟я─п╦п╡п╟я▐ '{gп╔п╬я─п╬я┬п╟, пЁп╬п╩я┐п╠я┐я┬п╨п╟!{x'", smithman, 0, client, TO_NOTVICT );
     }
 }
 
@@ -245,22 +245,22 @@ void ItemSmithService::purchase( Character *client, NPCharacter *smithman, const
     arg = argument.getOneArgument( );
 
     if (arg.empty( )) {
-	say_act( client, smithman, "Не томи, скажи что $t будем?", verb.getValue( ).c_str( ) );
+	say_act( client, smithman, "п²п╣ я┌п╬п╪п╦, я│п╨п╟п╤п╦ я┤я┌п╬ $t п╠я┐п╢п╣п╪?", verb.getValue( ).c_str( ) );
 	return;
     }
 
     obj = get_obj_carry( client, arg.c_str( ) );
 
     if (!obj) {
-	say_act( client, smithman, "Издеваешься? У тебя нет этого." );
+	say_act( client, smithman, "п≤п╥п╢п╣п╡п╟п╣я┬я▄я│я▐? пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬." );
 	return;
     }
 
-    act( "Ты протягиваешь $C3 $o4.", client, obj, smithman, TO_CHAR );
-    act( "$c1 протягивает $C3 $o4.", client, obj, smithman, TO_NOTVICT );
+    act( "п╒я▀ п©я─п╬я┌я▐пЁп╦п╡п╟п╣я┬я▄ $C3 $o4.", client, obj, smithman, TO_CHAR );
+    act( "$c1 п©я─п╬я┌я▐пЁп╦п╡п╟п╣я┌ $C3 $o4.", client, obj, smithman, TO_NOTVICT );
 
     if (obj->pIndexData->limit != -1) {
-	say_act( client, smithman, "Эта вещь - уникальна. Я ничего не могу тут поделать." );
+	say_act( client, smithman, "п╜я┌п╟ п╡п╣я┴я▄ - я┐п╫п╦п╨п╟п╩я▄п╫п╟. п╞ п╫п╦я┤п╣пЁп╬ п╫п╣ п╪п╬пЁя┐ я┌я┐я┌ п©п╬п╢п╣п╩п╟я┌я▄." );
 	return;
     }
     
@@ -286,12 +286,12 @@ bool ItemSmithService::checkPrice( Character *client, NPCharacter *smithman, Pri
 void BurnproofSmithService::smith( Character *client, NPCharacter *smithman, Object *obj )
 {
     if (obj->item_type != ITEM_CONTAINER && obj->item_type != ITEM_DRINK_CON) {
-	say_act( client, smithman, "Это не контейнер, с этим я не умею." );
+	say_act( client, smithman, "п╜я┌п╬ п╫п╣ п╨п╬п╫я┌п╣п╧п╫п╣я─, я│ я█я┌п╦п╪ я▐ п╫п╣ я┐п╪п╣я▌." );
 	return;
     }
        
     if (IS_OBJ_STAT(obj, ITEM_BURN_PROOF)) {
-	say_act( client, smithman, "Жаль. Но мою работу сделал кто-то другой." );
+	say_act( client, smithman, "п√п╟п╩я▄. п²п╬ п╪п╬я▌ я─п╟п╠п╬я┌я┐ я│п╢п╣п╩п╟п╩ п╨я┌п╬-я┌п╬ п╢я─я┐пЁп╬п╧." );
 	return;
     }
     
@@ -300,8 +300,8 @@ void BurnproofSmithService::smith( Character *client, NPCharacter *smithman, Obj
 
     SET_BIT(obj->extra_flags, ITEM_BURN_PROOF);
 
-    act( "$c1 обрабатывает чем-то $o4 и возвращает тебе.", smithman, obj, client, TO_VICT );
-    act( "$c1 обрабатывает чем-то $o4 и возвращает $C3.", smithman, obj, client, TO_NOTVICT ); 
+    act( "$c1 п╬п╠я─п╟п╠п╟я┌я▀п╡п╟п╣я┌ я┤п╣п╪-я┌п╬ $o4 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣.", smithman, obj, client, TO_VICT );
+    act( "$c1 п╬п╠я─п╟п╠п╟я┌я▀п╡п╟п╣я┌ я┤п╣п╪-я┌п╬ $o4 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $C3.", smithman, obj, client, TO_NOTVICT ); 
 }
 
 /*-------------------------------------------------------------------------
@@ -312,12 +312,12 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
     int boff, bon;
 
     if (!obj->isAntiAligned( client )) {
-	say_act( client, smithman, "Оно и так для тебя подходит, $c1." );
+	say_act( client, smithman, "п·п╫п╬ п╦ я┌п╟п╨ п╢п╩я▐ я┌п╣п╠я▐ п©п╬п╢я┘п╬п╢п╦я┌, $c1." );
 	return;
     }
     
     if (!obj->getRealShortDescr( )) {
-	say_act( client, smithman, "$c1, тебе придется сперва потратить рестринг купон и изменить внешний вид вещи." );
+	say_act( client, smithman, "$c1, я┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ я│п©п╣я─п╡п╟ п©п╬я┌я─п╟я┌п╦я┌я▄ я─п╣я│я┌я─п╦п╫пЁ п╨я┐п©п╬п╫ п╦ п╦п╥п╪п╣п╫п╦я┌я▄ п╡п╫п╣я┬п╫п╦п╧ п╡п╦п╢ п╡п╣я┴п╦." );
 	return;
     }
     
@@ -340,8 +340,8 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
     REMOVE_BIT( obj->extra_flags, boff );
     SET_BIT( obj->extra_flags, bon );
 
-    act( "$C1 что-то делает с $o5 и возвращает тебе.", client, obj, smithman, TO_CHAR );
-    act( "$C1 что-то делает с $o5 и возвращает $c3.", client, obj, smithman, TO_ROOM );
+    act( "$C1 я┤я┌п╬-я┌п╬ п╢п╣п╩п╟п╣я┌ я│ $o5 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣.", client, obj, smithman, TO_CHAR );
+    act( "$C1 я┤я┌п╬-я┌п╬ п╢п╣п╩п╟п╣я┌ я│ $o5 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $c3.", client, obj, smithman, TO_ROOM );
 }
 
 /*-------------------------------------------------------------------------
@@ -358,17 +358,17 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
     Price::Pointer myprice;
 
     if (obj->item_type != ITEM_WEAPON) {
-	say_act( client, smithman, "И с какой стороны? $o1 не оружие.", obj );
+	say_act( client, smithman, "п≤ я│ п╨п╟п╨п╬п╧ я│я┌п╬я─п╬п╫я▀? $o1 п╫п╣ п╬я─я┐п╤п╦п╣.", obj );
 	return;
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_SHARP|WEAPON_VORPAL)) {
-	say_act( client, smithman, "$o1 и без того острое оружие.", obj );
+	say_act( client, smithman, "$o1 п╦ п╠п╣п╥ я┌п╬пЁп╬ п╬я│я┌я─п╬п╣ п╬я─я┐п╤п╦п╣.", obj );
 	return;
     }
 
     if (IS_WEAPON_STAT( obj, WEAPON_HOLY )) {
-	say_act( client, smithman, "$o1 наполнено священной силой, острота ему ни к чему.", obj );
+	say_act( client, smithman, "$o1 п╫п╟п©п╬п╩п╫п╣п╫п╬ я│п╡я▐я┴п╣п╫п╫п╬п╧ я│п╦п╩п╬п╧, п╬я│я┌я─п╬я┌п╟ п╣п╪я┐ п╫п╦ п╨ я┤п╣п╪я┐.", obj );
 	return;
     }
 
@@ -376,7 +376,7 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
    			     WEAPON_VAMPIRIC | WEAPON_SHOCKING | WEAPON_POISON ))
     {
 	myprice = extraPrice;
-	say_act( client, smithman, "У $o2 и без того очень хорошо, сложно будет, потому и дороже.", obj );
+	say_act( client, smithman, "пё $o2 п╦ п╠п╣п╥ я┌п╬пЁп╬ п╬я┤п╣п╫я▄ я┘п╬я─п╬я┬п╬, я│п╩п╬п╤п╫п╬ п╠я┐п╢п╣я┌, п©п╬я┌п╬п╪я┐ п╦ п╢п╬я─п╬п╤п╣.", obj );
     }
     else
 	myprice = price;
@@ -389,8 +389,8 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
 
     SET_BIT( obj->value[4], WEAPON_SHARP );
 
-    act( "$C1 точит $o4 и возвращает тебе.", client, obj, smithman, TO_CHAR );
-    act( "$C1 точит $o4 и возвращает $c3.", client, obj, smithman, TO_ROOM );
+    act( "$C1 я┌п╬я┤п╦я┌ $o4 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣.", client, obj, smithman, TO_CHAR );
+    act( "$C1 я┌п╬я┤п╦я┌ $o4 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $c3.", client, obj, smithman, TO_ROOM );
 }
 
 
@@ -405,12 +405,12 @@ CMDRUN( smith )
     smithman = find_attracted_mob_behavior<Smithman>( ch, OCC_SMITHMAN );
 
     if (!smithman) {
-	ch->send_to( "Здесь нет кузнеца.\r\n" );
+	ch->send_to( "п≈п╢п╣я│я▄ п╫п╣я┌ п╨я┐п╥п╫п╣я├п╟.\r\n" );
 	return;
     }
 
     if (ch->is_npc( )) {
-	ch->send_to( "Тебя обслуживать не будут, извини.\r\n" );
+	ch->send_to( "п╒п╣п╠я▐ п╬п╠я│п╩я┐п╤п╦п╡п╟я┌я▄ п╫п╣ п╠я┐п╢я┐я┌, п╦п╥п╡п╦п╫п╦.\r\n" );
 	return;
     }
     

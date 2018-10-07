@@ -36,7 +36,7 @@ COMMAND(CWrite, "write")
     else if (( target = get_obj_room( ch, targetName.c_str( ) ) ))
 	writeOnWall( ch, target, arguments );
     else
-	ch->send_to( "У тебя нет этого.\r\n" );
+	ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\r\n" );
 }
 
 void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
@@ -46,22 +46,22 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
     Object *nail;
 
     if (wall->item_type != ITEM_PARCHMENT) {
-	act("Тебе не удастся ничего нацарапать на $o6.", ch, wall, 0, TO_CHAR);
+	act("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟я│я┌я│я▐ п╫п╦я┤п╣пЁп╬ п╫п╟я├п╟я─п╟п©п╟я┌я▄ п╫п╟ $o6.", ch, wall, 0, TO_CHAR);
 	return;
     }
 
     if (wall->can_wear(ITEM_TAKE)) {
-	act("Подними $o4 с земли, а потом пиши.", ch, wall, 0, TO_CHAR);
+	act("п÷п╬п╢п╫п╦п╪п╦ $o4 я│ п╥п╣п╪п╩п╦, п╟ п©п╬я┌п╬п╪ п©п╦я┬п╦.", ch, wall, 0, TO_CHAR);
 	return;
     }
     
     if (!( nail = findNail( ch ) )) {
-	ch->send_to( "Ты не держишь в руках ничего колющего или царапающего.\r\n" );
+	ch->send_to( "п╒я▀ п╫п╣ п╢п╣я─п╤п╦я┬я▄ п╡ я─я┐п╨п╟я┘ п╫п╦я┤п╣пЁп╬ п╨п╬п╩я▌я┴п╣пЁп╬ п╦п╩п╦ я├п╟я─п╟п©п╟я▌я┴п╣пЁп╬.\r\n" );
 	return;
     }
 
     if (arguments.empty( )) {
-	act("Что именно ты хочешь выцарапать на $o6?", ch, wall, 0, TO_CHAR);
+	act("п╖я┌п╬ п╦п╪п╣п╫п╫п╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п╡я▀я├п╟я─п╟п©п╟я┌я▄ п╫п╟ $o6?", ch, wall, 0, TO_CHAR);
 	return;
     }
 
@@ -75,21 +75,21 @@ void CWrite::writeOnWall( Character *ch, Object *wall, DLString &arguments )
 	    ed = descAdd( wall, wall->getName( ) );
 	    
 	lineAdd( ed, arguments );
-	act( "Ты выцарапываешь $O5 надпись на $o6.", ch, wall, nail, TO_CHAR );
-	act( "$c1 выцарапывает $O5 надпись на $o6.", ch, wall, nail, TO_ROOM );
+	act( "п╒я▀ п╡я▀я├п╟я─п╟п©я▀п╡п╟п╣я┬я▄ $O5 п╫п╟п╢п©п╦я│я▄ п╫п╟ $o6.", ch, wall, nail, TO_CHAR );
+	act( "$c1 п╡я▀я├п╟я─п╟п©я▀п╡п╟п╣я┌ $O5 п╫п╟п╢п©п╦я│я▄ п╫п╟ $o6.", ch, wall, nail, TO_ROOM );
     }
     else if (cmd == "-" && ch->is_immortal( )) {
 	if (ed && lineDel( ed )) {
-	    act( "Ты отшкрябываешь последнюю строчку с $o2.", ch, wall, 0, TO_CHAR );
-	    act( "$c1 скребет $o4.", ch, wall, 0, TO_ROOM );
+	    act( "п╒я▀ п╬я┌я┬п╨я─я▐п╠я▀п╡п╟п╣я┬я▄ п©п╬я│п╩п╣п╢п╫я▌я▌ я│я┌я─п╬я┤п╨я┐ я│ $o2.", ch, wall, 0, TO_CHAR );
+	    act( "$c1 я│п╨я─п╣п╠п╣я┌ $o4.", ch, wall, 0, TO_ROOM );
 	}
 	else
-	    act( "$o1 девственно чист(а) - удалять нечего.", ch, wall, 0, TO_CHAR );
+	    act( "$o1 п╢п╣п╡я│я┌п╡п╣п╫п╫п╬ я┤п╦я│я┌(п╟) - я┐п╢п╟п╩я▐я┌я▄ п╫п╣я┤п╣пЁп╬.", ch, wall, 0, TO_CHAR );
     }
     else if (cmd == "clear" && ch->is_immortal( )) {
 	descFree( wall, wall->getName( ) );
-	act( "Ты тщательно отшкрябываешь все надписи с $o2.", ch, wall, 0, TO_CHAR );
-	act( "$c1 тщательно отшкрябывает все надписи с $o2.", ch, wall, 0, TO_ROOM );
+	act( "п╒я▀ я┌я┴п╟я┌п╣п╩я▄п╫п╬ п╬я┌я┬п╨я─я▐п╠я▀п╡п╟п╣я┬я▄ п╡я│п╣ п╫п╟п╢п©п╦я│п╦ я│ $o2.", ch, wall, 0, TO_CHAR );
+	act( "$c1 я┌я┴п╟я┌п╣п╩я▄п╫п╬ п╬я┌я┬п╨я─я▐п╠я▀п╡п╟п╣я┌ п╡я│п╣ п╫п╟п╢п©п╦я│п╦ я│ $o2.", ch, wall, 0, TO_ROOM );
     }		
     else
 	usage( ch );
@@ -101,12 +101,12 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
     DLString cmd, keyword;
 
     if (paper->item_type != ITEM_PARCHMENT) {
-	ch->send_to( "Это не пергамент.\r\n" );
+	ch->send_to( "п╜я┌п╬ п╫п╣ п©п╣я─пЁп╟п╪п╣п╫я┌.\r\n" );
 	return;
     }
 
     if (arguments.empty( )) {
-	act("Что именно ты хочешь записать на $o4?", ch, paper, 0, TO_CHAR);
+	act("п╖я┌п╬ п╦п╪п╣п╫п╫п╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п╥п╟п©п╦я│п╟я┌я▄ п╫п╟ $o4?", ch, paper, 0, TO_CHAR);
 	return;
     }
     
@@ -128,9 +128,9 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
 	descFree( paper, keyword );
 	
 	if (keyword == paper->getName( ))
-	    act( "Ты стираешь все надписи с лицевой стороны $o2.", ch, paper, 0, TO_CHAR );
+	    act( "п╒я▀ я│я┌п╦я─п╟п╣я┬я▄ п╡я│п╣ п╫п╟п╢п©п╦я│п╦ я│ п╩п╦я├п╣п╡п╬п╧ я│я┌п╬я─п╬п╫я▀ $o2.", ch, paper, 0, TO_CHAR );
 	else
-	    act( "Ты стираешь с $o2 все, что касается '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
+	    act( "п╒я▀ я│я┌п╦я─п╟п╣я┬я▄ я│ $o2 п╡я│п╣, я┤я┌п╬ п╨п╟я│п╟п╣я┌я│я▐ '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
 
 	return;
     }
@@ -144,18 +144,18 @@ void CWrite::writeOnPaper( Character *ch, Object *paper, DLString &arguments )
 	lineAdd( ed, arguments );
 	
 	if (keyword == paper->getName( ))
-	    act( "Ты делаешь запись на $o6.", ch, paper, 0, TO_CHAR );
+	    act( "п╒я▀ п╢п╣п╩п╟п╣я┬я▄ п╥п╟п©п╦я│я▄ п╫п╟ $o6.", ch, paper, 0, TO_CHAR );
 	else
-	    act( "Ты делаешь запись на $o6 в раздел '$T'", ch, paper, keyword.c_str( ), TO_CHAR );
+	    act( "п╒я▀ п╢п╣п╩п╟п╣я┬я▄ п╥п╟п©п╦я│я▄ п╫п╟ $o6 п╡ я─п╟п╥п╢п╣п╩ '$T'", ch, paper, keyword.c_str( ), TO_CHAR );
     }
     else if (cmd == "-") {
 	if (ed && lineDel( ed ))
 	    if (keyword == paper->getName( ))
-		act( "Ты удаляешь последнюю строку с $o2.", ch, paper, 0, TO_CHAR );
+		act( "п╒я▀ я┐п╢п╟п╩я▐п╣я┬я▄ п©п╬я│п╩п╣п╢п╫я▌я▌ я│я┌я─п╬п╨я┐ я│ $o2.", ch, paper, 0, TO_CHAR );
 	    else
-		act( "Ты удаляешь последнюю строку с $o2 в разделе '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
+		act( "п╒я▀ я┐п╢п╟п╩я▐п╣я┬я▄ п©п╬я│п╩п╣п╢п╫я▌я▌ я│я┌я─п╬п╨я┐ я│ $o2 п╡ я─п╟п╥п╢п╣п╩п╣ '$T'.", ch, paper, keyword.c_str( ), TO_CHAR );
 	else
-	    act( "Удалять с $o2 больше нечего.", ch, paper, 0, TO_CHAR );
+	    act( "пёп╢п╟п╩я▐я┌я▄ я│ $o2 п╠п╬п╩я▄я┬п╣ п╫п╣я┤п╣пЁп╬.", ch, paper, 0, TO_CHAR );
     }
 }
 
@@ -267,7 +267,7 @@ Object * CWrite::findNail( Character *ch )
     if (!nail)
 	return NULL;
 
-    if (is_name( "гвоздь", nail->getName( ) ) || is_name( "nail", nail->getName( ) ))
+    if (is_name( "пЁп╡п╬п╥п╢я▄", nail->getName( ) ) || is_name( "nail", nail->getName( ) ))
 	return nail;
 	
     if (nail->item_type == ITEM_WEAPON)
@@ -282,7 +282,7 @@ Object * CWrite::findNail( Character *ch )
 
 void CWrite::usage( Character *ch )
 {
-    ch->send_to( "Подробнее см. 'help write'.\r\n" );
+    ch->send_to( "п÷п╬п╢я─п╬п╠п╫п╣п╣ я│п╪. 'help write'.\r\n" );
 }
 
 

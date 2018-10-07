@@ -64,13 +64,13 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 
 	if (!IS_SET(ch->comm, off)) {
 	    if (msgOn.empty( ))
-		ch->printf( "Канал %s теперь включен.\r\n", getName( ).c_str( ) );
+		ch->printf( "п п╟п╫п╟п╩ %s я┌п╣п©п╣я─я▄ п╡п╨п╩я▌я┤п╣п╫.\r\n", getName( ).c_str( ) );
 	    else
 		ch->println( msgOn );
 	}
 	else {
 	    if (msgOff.empty( ))
-		ch->printf( "Канал %s теперь выключен.\r\n", getName( ).c_str( ) );
+		ch->printf( "п п╟п╫п╟п╩ %s я┌п╣п©п╣я─я▄ п╡я▀п╨п╩я▌я┤п╣п╫.\r\n", getName( ).c_str( ) );
 	    else
 		ch->println( msgOff );
 	}
@@ -118,17 +118,17 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 bool GlobalChannel::canTalkGlobally( Character *ch ) const
 {
     if (nomob && ch->is_npc( )) {
-	ch->println( "Этот канал не для тебя, прости." );
+	ch->println( "п╜я┌п╬я┌ п╨п╟п╫п╟п╩ п╫п╣ п╢п╩я▐ я┌п╣п╠я▐, п©я─п╬я│я┌п╦." );
 	return false;
     }
     
     if (ch->get_trust( ) < trustSpeak) {
-	ch->println( "В этом канале ты можешь только слушать, прости." );
+	ch->println( "п▓ я█я┌п╬п╪ п╨п╟п╫п╟п╩п╣ я┌я▀ п╪п╬п╤п╣я┬я▄ я┌п╬п╩я▄п╨п╬ я│п╩я┐я┬п╟я┌я▄, п©я─п╬я│я┌п╦." );
 	return false;
     }
     
     if (quiet && IS_SET(ch->comm, COMM_QUIET)) {
-	ch->println( "Сначала необходимо повынимать вату из ушей.");
+	ch->println( "п║п╫п╟я┤п╟п╩п╟ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п©п╬п╡я▀п╫п╦п╪п╟я┌я▄ п╡п╟я┌я┐ п╦п╥ я┐я┬п╣п╧.");
 	return false;
     }
 
@@ -145,7 +145,7 @@ bool GlobalChannel::canTalkGlobally( Character *ch ) const
 	int cost = ch->max_mana * manaPercent / 100;
 
 	if (ch->mana < cost) {
-	    ch->println( "У тебя недостаточно сил, чтобы орать на весь мир." );
+	    ch->println( "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я│п╦п╩, я┤я┌п╬п╠я▀ п╬я─п╟я┌я▄ п╫п╟ п╡п╣я│я▄ п╪п╦я─." );
 	    return false;
 	}
 
@@ -197,7 +197,7 @@ bool GlobalChannel::checkConfirmed( Character *ch ) const
 
     if (!ch->is_npc( ) && !IS_SET(ch->act, PLR_CONFIRMED))
     {
-        ch->println("Только подтвержденные богами персонажи могут общаться в этом канале." );
+        ch->println("п╒п╬п╩я▄п╨п╬ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╫я▀п╣ п╠п╬пЁп╟п╪п╦ п©п╣я─я│п╬п╫п╟п╤п╦ п╪п╬пЁя┐я┌ п╬п╠я┴п╟я┌я▄я│я▐ п╡ я█я┌п╬п╪ п╨п╟п╫п╟п╩п╣." );
         return true;
     }
 
@@ -213,13 +213,13 @@ bool GlobalChannel::checkNoChannel( Character *ch ) const
 	if (!msgNochan.empty( ))
 	    ch->println( msgNochan );
 	else
-	    ch->println( "Боги лишили тебя возможности общаться." );
+	    ch->println( "п▒п╬пЁп╦ п╩п╦я┬п╦п╩п╦ я┌п╣п╠я▐ п╡п╬п╥п╪п╬п╤п╫п╬я│я┌п╦ п╬п╠я┴п╟я┌я▄я│я▐." );
 	
 	return true;
     }
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master && has_nochannel( ch->master )) {
-	act("$c1 сдавленно хрипит, не в силах вымолвить ни слова.", ch, 0, 0, TO_ROOM);	
+	act("$c1 я│п╢п╟п╡п╩п╣п╫п╫п╬ я┘я─п╦п©п╦я┌, п╫п╣ п╡ я│п╦п╩п╟я┘ п╡я▀п╪п╬п╩п╡п╦я┌я▄ п╫п╦ я│п╩п╬п╡п╟.", ch, 0, 0, TO_ROOM);	
 	return true;
     }
 
@@ -242,8 +242,8 @@ bool GlobalChannel::checkSoap( Character *ch ) const
     if (!ch->getPC( )->getAttributes( ).isAvailable( attrName )) 
 	return false;
     
-    act("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    act("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    act("$c1 п©я┐я│п╨п╟п╣я┌ п╦п╥п╬ я─я┌п╟ {Rя─{Yп╟{Gп╥{Cп╫{Mп╬{Rя├{Gп╡{Yп╣{Cя┌{Mп╫{Yя▀{Cп╣{x п╪я▀п╩я▄п╫я▀п╣ п©я┐п╥я▀я─п╦.", ch, 0, 0, TO_ROOM);
+    act("п╒я▀ п©я┐я│п╨п╟п╣я┬я▄ п╦п╥п╬ я─я┌п╟ {Rя─{Yп╟{Gп╥{Cп╫{Mп╬{Rя├{Gп╡{Yп╣{Cя┌{Mп╫{Yя▀{Cп╣{x п╪я▀п╩я▄п╫я▀п╣ п©я┐п╥я▀я─п╦.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -278,7 +278,7 @@ bool GlobalChannel::needOutputSelf( Character *ch ) const
 bool GlobalChannel::needOutputOther( Character *ch ) const
 {
     if (dig && DIGGED(ch)) {
-	ch->println( "Стены могилы поглощают звуки." );
+	ch->println( "п║я┌п╣п╫я▀ п╪п╬пЁп╦п╩я▀ п©п╬пЁп╩п╬я┴п╟я▌я┌ п╥п╡я┐п╨п╦." );
 	return false;
     }
     

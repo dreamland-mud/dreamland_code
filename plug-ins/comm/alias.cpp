@@ -117,11 +117,11 @@ public:
 	    ostringstream buf;
 	    
 	    if (aliases->empty( )) {
-		pch->send_to( "Не определен ни один синоним.\n\r" );
+		pch->send_to( "п²п╣ п╬п©я─п╣п╢п╣п╩п╣п╫ п╫п╦ п╬п╢п╦п╫ я│п╦п╫п╬п╫п╦п╪.\n\r" );
 		return;
 	    }
 
-	    buf << "Определенные синонимы:" << endl;
+	    buf << "п·п©я─п╣п╢п╣п╩п╣п╫п╫я▀п╣ я│п╦п╫п╬п╫п╦п╪я▀:" << endl;
 	    
 	    for (i = aliases->begin( ); i != aliases->end( ); i++)
 		buf << "    " << i->first << ":  " << i->second << "{x" << endl;
@@ -130,9 +130,9 @@ public:
 	    return;
 	}
 	
-	if (arg == "flush" || arg == "очистить") {
+	if (arg == "flush" || arg == "п╬я┤п╦я│я┌п╦я┌я▄") {
 	    aliases->clear( );
-	    pch->send_to( "Все синонимы удалены.\r\n" );
+	    pch->send_to( "п▓я│п╣ я│п╦п╫п╬п╫п╦п╪я▀ я┐п╢п╟п╩п╣п╫я▀.\r\n" );
 	    return;
 	}
 	
@@ -140,9 +140,9 @@ public:
 	    i = aliases->find( arg );
 	    
 	    if (i != aliases->end( ))
-		pch->printf( "%s означает '%s{x'.\r\n", arg.c_str( ), i->second.getValue( ).c_str( ) );
+		pch->printf( "%s п╬п╥п╫п╟я┤п╟п╣я┌ '%s{x'.\r\n", arg.c_str( ), i->second.getValue( ).c_str( ) );
 	    else
-		pch->send_to( "Этот синоним не задан.\n\r" );
+		pch->send_to( "п╜я┌п╬я┌ я│п╦п╫п╬п╫п╦п╪ п╫п╣ п╥п╟п╢п╟п╫.\n\r" );
 
 	    return;
 	}
@@ -151,7 +151,7 @@ public:
 		|| argument == "prefix"
 		|| argument == "alias")
 	{
-	    pch->send_to( "Этим командам нельзя присвоить синоним!\n\r" );
+	    pch->send_to( "п╜я┌п╦п╪ п╨п╬п╪п╟п╫п╢п╟п╪ п╫п╣п╩я▄п╥я▐ п©я─п╦я│п╡п╬п╦я┌я▄ я│п╦п╫п╬п╫п╦п╪!\n\r" );
 	    return;
 	}
 	
@@ -160,20 +160,20 @@ public:
 	if (i != aliases->end( )) // redefine an alias
 	{
 	    i->second.setValue( argument );
-	    pch->printf( "%s меняет свое значение на '%s{x'.\r\n", arg.c_str( ), argument.c_str( ) );
+	    pch->printf( "%s п╪п╣п╫я▐п╣я┌ я│п╡п╬п╣ п╥п╫п╟я┤п╣п╫п╦п╣ п╫п╟ '%s{x'.\r\n", arg.c_str( ), argument.c_str( ) );
 	    return;
 	}
 
 	if (aliases->size( ) >= MAX_ALIASES)
 	{
-	    pch->printf( "Извините, Вы превысили лимит синонимов (%d).\n\r", MAX_ALIASES );
+	    pch->printf( "п≤п╥п╡п╦п╫п╦я┌п╣, п▓я▀ п©я─п╣п╡я▀я│п╦п╩п╦ п╩п╦п╪п╦я┌ я│п╦п╫п╬п╫п╦п╪п╬п╡ (%d).\n\r", MAX_ALIASES );
 	    return;
 	}
 
 	// make a new alias
 	(**aliases) [arg] = argument;
 
-	pch->printf( "%s теперь будет означать '%s{x'.\r\n", arg.c_str( ), argument.c_str( ) );
+	pch->printf( "%s я┌п╣п©п╣я─я▄ п╠я┐п╢п╣я┌ п╬п╥п╫п╟я┤п╟я┌я▄ '%s{x'.\r\n", arg.c_str( ), argument.c_str( ) );
     }
 
 protected:
@@ -219,7 +219,7 @@ public:
 	aliases = pch->getAttributes( ).getAttr<XMLAttributeAliases>( "aliases" );
 	
 	if (arg.empty( )) {
-	    pch->send_to("Какой синоним удалить?\n\r");
+	    pch->send_to("п п╟п╨п╬п╧ я│п╦п╫п╬п╫п╦п╪ я┐п╢п╟п╩п╦я┌я▄?\n\r");
 	    return;
 	}
 	
@@ -227,12 +227,12 @@ public:
 	
 	if (i != aliases->end( ))
 	{
-	    pch->send_to( "Синоним удален.\n\r" );
+	    pch->send_to( "п║п╦п╫п╬п╫п╦п╪ я┐п╢п╟п╩п╣п╫.\n\r" );
 	    aliases->erase( i );
 	}
 	else
 	{
-	    pch->send_to( "Синоним с таким именем не задан.\n\r" );
+	    pch->send_to( "п║п╦п╫п╬п╫п╦п╪ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╥п╟п╢п╟п╫.\n\r" );
 	}
     }
 
@@ -294,7 +294,7 @@ public:
 	iargs.line = get_multi_command( d, buffer );
 
 	if (iargs.line.size( ) >  MAX_INPUT_LENGTH) {
-	    iargs.ch->send_to( "Подстановка синонимов слишком удлинила строку, строка будет обрезана.\r\n" );
+	    iargs.ch->send_to( "п÷п╬п╢я│я┌п╟п╫п╬п╡п╨п╟ я│п╦п╫п╬п╫п╦п╪п╬п╡ я│п╩п╦я┬п╨п╬п╪ я┐п╢п╩п╦п╫п╦п╩п╟ я│я┌я─п╬п╨я┐, я│я┌я─п╬п╨п╟ п╠я┐п╢п╣я┌ п╬п╠я─п╣п╥п╟п╫п╟.\r\n" );
 	    iargs.line.erase( MAX_INPUT_LENGTH - 1, iargs.line.size( ) );
 	}
 

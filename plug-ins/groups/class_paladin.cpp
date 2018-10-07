@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "skill.h"
@@ -54,17 +54,17 @@ SKILL_RUNP( layhands )
 
     if ( ch->is_npc() || !gsn_lay_hands->usable( ch ) )
     {
-	ch->println("Тебе недостает мастерства лечить других наложением рук.");
+	ch->println("п╒п╣п╠п╣ п╫п╣п╢п╬я│я┌п╟п╣я┌ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п╩п╣я┤п╦я┌я▄ п╢я─я┐пЁп╦я┘ п╫п╟п╩п╬п╤п╣п╫п╦п╣п╪ я─я┐п╨.");
 	return;
     }
 
     if ( (victim = get_char_room(ch,argument)) == 0) {
-	ch->send_to("Ты не видишь здесь такого персонажа.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я┌п╟п╨п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╤п╟.\n\r");
 	return;
     }
 
     if ( ch->isAffected(gsn_lay_hands)) {
-	ch->send_to("Ты пока не можешь сосредоточиться.\n\r");
+	ch->send_to("п╒я▀ п©п╬п╨п╟ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╬я│я─п╣п╢п╬я┌п╬я┤п╦я┌я▄я│я▐.\n\r");
 	return;
     }
 
@@ -83,12 +83,12 @@ SKILL_RUNP( layhands )
     update_pos( victim );
     
     if (ch != victim) {
-	act( "Ты возлагаешь руки на $C4, и $M становится гораздо лучше.", ch, 0, victim, TO_CHAR);
-	act( "$c1 возлагает на тебя руки. Тепло наполняет твое тело.", ch, 0, victim, TO_VICT);
-	act( "$c1 возлагает руки на $C4. $C1 выглядит намного лучше.", ch, 0, victim, TO_NOTVICT);
+	act( "п╒я▀ п╡п╬п╥п╩п╟пЁп╟п╣я┬я▄ я─я┐п╨п╦ п╫п╟ $C4, п╦ $M я│я┌п╟п╫п╬п╡п╦я┌я│я▐ пЁп╬я─п╟п╥п╢п╬ п╩я┐я┤я┬п╣.", ch, 0, victim, TO_CHAR);
+	act( "$c1 п╡п╬п╥п╩п╟пЁп╟п╣я┌ п╫п╟ я┌п╣п╠я▐ я─я┐п╨п╦. п╒п╣п©п╩п╬ п╫п╟п©п╬п╩п╫я▐п╣я┌ я┌п╡п╬п╣ я┌п╣п╩п╬.", ch, 0, victim, TO_VICT);
+	act( "$c1 п╡п╬п╥п╩п╟пЁп╟п╣я┌ я─я┐п╨п╦ п╫п╟ $C4. $C1 п╡я▀пЁп╩я▐п╢п╦я┌ п╫п╟п╪п╫п╬пЁп╬ п╩я┐я┤я┬п╣.", ch, 0, victim, TO_NOTVICT);
     } else {
-	act( "Ты возлагаешь на себя руки: тебе становится гораздо лучше.", ch, 0, 0, TO_CHAR);
-	act( "$c1 возлагает на себя руки. $c1 выглядит намного лучше.", ch, 0, 0, TO_ROOM);
+	act( "п╒я▀ п╡п╬п╥п╩п╟пЁп╟п╣я┬я▄ п╫п╟ я│п╣п╠я▐ я─я┐п╨п╦: я┌п╣п╠п╣ я│я┌п╟п╫п╬п╡п╦я┌я│я▐ пЁп╬я─п╟п╥п╢п╬ п╩я┐я┤я┬п╣.", ch, 0, 0, TO_CHAR);
+	act( "$c1 п╡п╬п╥п╩п╟пЁп╟п╣я┌ п╫п╟ я│п╣п╠я▐ я─я┐п╨п╦. $c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╫п╟п╪п╫п╬пЁп╬ п╩я┐я┤я┬п╣.", ch, 0, 0, TO_ROOM);
     }
     
     gsn_lay_hands->improve( ch, true, victim );
@@ -104,16 +104,16 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
 	   && victim->getRace( ) != race_demon
 	   && victim->getRace( ) != race_golem))
     {
-	act_p("$C1 - вовсе не нечисть и не демон.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p("$C1 - п╡п╬п╡я│п╣ п╫п╣ п╫п╣я┤п╦я│я┌я▄ п╦ п╫п╣ п╢п╣п╪п╬п╫.", ch, 0, victim, TO_CHAR, POS_RESTING);
 	return;
     }
 
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_SPELL)) {
-	act_p("С $C5, кажется, ничего не происходит.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p("п║ $C5, п╨п╟п╤п╣я┌я│я▐, п╫п╦я┤п╣пЁп╬ п╫п╣ п©я─п╬п╦я│я┘п╬п╢п╦я┌.", ch, 0, victim, TO_CHAR, POS_RESTING);
 	return;
     }
     
-    act_p("Возникает ослепительная вспышка, она поглощает $c4 и $e исчезает.",
+    act_p("п▓п╬п╥п╫п╦п╨п╟п╣я┌ п╬я│п╩п╣п©п╦я┌п╣п╩я▄п╫п╟я▐ п╡я│п©я▀я┬п╨п╟, п╬п╫п╟ п©п╬пЁп╩п╬я┴п╟п╣я┌ $c4 п╦ $e п╦я│я┤п╣п╥п╟п╣я┌.",
 	    victim, 0, 0, TO_ROOM, POS_RESTING);
 	
     raw_kill( victim, -1, ch, FKILL_MOB_EXTRACT );
@@ -129,7 +129,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     level = number_range(102, 110);
 
     if (ch->hit < ch->getRealLevel( ) || ch->mana < ch->getRealLevel( ) || ch->move < ch->getRealLevel( )) {
-	act_p("Ты слишком истоще$gно|н|на для молитвы.", ch, 0, 0, TO_CHAR, POS_RESTING);
+	act_p("п╒я▀ я│п╩п╦я┬п╨п╬п╪ п╦я│я┌п╬я┴п╣$gп╫п╬|п╫|п╫п╟ п╢п╩я▐ п╪п╬п╩п╦я┌п╡я▀.", ch, 0, 0, TO_CHAR, POS_RESTING);
 	return;
     }
 
@@ -143,7 +143,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 	|| (number_percent() < number_fuzzy(1) + 50 - ch->getSkill( sn ) / 2))
     {
 	// bad 
-	act_p("Ты разгнева$gло|л|ла Богов своими молитвами!", ch, 0, 0, TO_CHAR, POS_RESTING);
+	act_p("п╒я▀ я─п╟п╥пЁп╫п╣п╡п╟$gп╩п╬|п╩|п╩п╟ п▒п╬пЁп╬п╡ я│п╡п╬п╦п╪п╦ п╪п╬п╩п╦я┌п╡п╟п╪п╦!", ch, 0, 0, TO_CHAR, POS_RESTING);
 
 	if (!ch->isAffected(gsn_weaken)) {
 	    af.where = TO_AFFECTS;
@@ -154,8 +154,8 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 	    af.modifier = -1 * (lvl / 4);
 	    af.bitvector = 0;
 	    affect_to_char(ch, &af);
-	    ch->send_to("Ты чувствуешь, как сила уходит из тебя.\n\r");
-	    act_p("$c1 выглядит слабым и уставшим.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+	    ch->send_to("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ я│п╦п╩п╟ я┐я┘п╬п╢п╦я┌ п╦п╥ я┌п╣п╠я▐.\n\r");
+	    act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ я│п╩п╟п╠я▀п╪ п╦ я┐я│я┌п╟п╡я┬п╦п╪.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 	}
 	else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
 	    af.where = TO_AFFECTS;
@@ -169,11 +169,11 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 	    af.location = APPLY_SAVING_SPELL;
 	    af.modifier = lvl / 7;
 	    affect_to_char(ch, &af);
-	    act_p("Ты чувствуешь себя проклят$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_RESTING);
+	    act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п©я─п╬п╨п╩я▐я┌$gя▀п╪|я▀п╪|п╬п╧.", ch, 0, 0, TO_CHAR, POS_RESTING);
 	}
 	else {
 	    if (ch->position == POS_FIGHTING) {
-		ch->send_to("Твои мускулы перестают тебе повиноваться...\n\r");
+		ch->send_to("п╒п╡п╬п╦ п╪я┐я│п╨я┐п╩я▀ п©п╣я─п╣я│я┌п╟я▌я┌ я┌п╣п╠п╣ п©п╬п╡п╦п╫п╬п╡п╟я┌я▄я│я▐...\n\r");
 		ch->setDazeViolence( 3 );
 		ch->setWaitViolence( 1 );
 	    }
@@ -188,8 +188,8 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 		affect_join(ch, &af);
 
 		if (IS_AWAKE(ch)) {
-		    ch->send_to("Ты засыпаешь....\n\r");
-		    act_p("$c1 засыпает.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+		    ch->send_to("п╒я▀ п╥п╟я│я▀п©п╟п╣я┬я▄....\n\r");
+		    act_p("$c1 п╥п╟я│я▀п©п╟п╣я┌.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 		    ch->position = POS_SLEEPING;
 		}
 	    }
@@ -199,13 +199,13 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
 
     if (number_percent() > ch->getRealLevel( ) * 3 * ch->getSkill( sn ) / 100) {
 	// nothing 
-	ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
+	ch->send_to("п▒п╬пЁп╦ я│п╩п╦я┬п╨п╬п╪ п╥п╟п╫я▐я┌я▀, я┤я┌п╬п╠я▀ я│п╫п╦п╥п╬п╧я┌п╦ п╢п╬ я┌п╡п╬п╦я┘ п╪п╬п╩п╦я┌п╡...\n\r");
 	return;
     }
 
     // you did it! 
 
-    ch->send_to("Благословение Богов снизошло на тебя!\n\r");
+    ch->send_to("п▒п╩п╟пЁп╬я│п╩п╬п╡п╣п╫п╦п╣ п▒п╬пЁп╬п╡ я│п╫п╦п╥п╬я┬п╩п╬ п╫п╟ я┌п╣п╠я▐!\n\r");
 
     af.where = TO_AFFECTS;
     af.type = sn;
@@ -292,8 +292,8 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
     Character *vch, *vch_next;
     int dam;
 
-    act_p( "$c1 чертит в воздухе священный символ.", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p( "Ты чертишь в воздухе священный символ.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p( "$c1 я┤п╣я─я┌п╦я┌ п╡ п╡п╬п╥п╢я┐я┘п╣ я│п╡я▐я┴п╣п╫п╫я▀п╧ я│п╦п╪п╡п╬п╩.", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p( "п╒я▀ я┤п╣я─я┌п╦я┬я▄ п╡ п╡п╬п╥п╢я┐я┘п╣ я│п╡я▐я┴п╣п╫п╫я▀п╧ я│п╦п╪п╡п╬п╩.", ch, 0, 0, TO_CHAR, POS_RESTING);
 
     for (vch = room->people; vch != NULL; vch = vch_next) {
 	vch_next = vch->next_in_room;
@@ -309,13 +309,13 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
 	
 	try {
 	    if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_SPELL )) {
-		act("$C1 игнорирует твою слабую попытку изгнания и бросается в атаку!", ch, 0, vch, TO_CHAR);
-		act_p("Ты игнорируешь слабую попытку изгнания.", ch, 0, vch, TO_VICT, POS_RESTING);
+		act("$C1 п╦пЁп╫п╬я─п╦я─я┐п╣я┌ я┌п╡п╬я▌ я│п╩п╟п╠я┐я▌ п©п╬п©я▀я┌п╨я┐ п╦п╥пЁп╫п╟п╫п╦я▐ п╦ п╠я─п╬я│п╟п╣я┌я│я▐ п╡ п╟я┌п╟п╨я┐!", ch, 0, vch, TO_CHAR);
+		act_p("п╒я▀ п╦пЁп╫п╬я─п╦я─я┐п╣я┬я▄ я│п╩п╟п╠я┐я▌ п©п╬п©я▀я┌п╨я┐ п╦п╥пЁп╫п╟п╫п╦я▐.", ch, 0, vch, TO_VICT, POS_RESTING);
 		damage( ch, vch, 0, sn, DAM_HOLY, true, DAMF_SPELL );
 	    }
 	    else {
-		act_p( "$c5 овладевают священные силы, заставляя в ужасе обратиться в бегство.", vch, 0, ch, TO_ROOM, POS_RESTING);
-		act_p( "Священные силы овладевают тобой, заставляя в ужасе обратиться в бегство.", ch, 0, vch, TO_VICT, POS_RESTING);
+		act_p( "$c5 п╬п╡п╩п╟п╢п╣п╡п╟я▌я┌ я│п╡я▐я┴п╣п╫п╫я▀п╣ я│п╦п╩я▀, п╥п╟я│я┌п╟п╡п╩я▐я▐ п╡ я┐п╤п╟я│п╣ п╬п╠я─п╟я┌п╦я┌я▄я│я▐ п╡ п╠п╣пЁя│я┌п╡п╬.", vch, 0, ch, TO_ROOM, POS_RESTING);
+		act_p( "п║п╡я▐я┴п╣п╫п╫я▀п╣ я│п╦п╩я▀ п╬п╡п╩п╟п╢п╣п╡п╟я▌я┌ я┌п╬п╠п╬п╧, п╥п╟я│я┌п╟п╡п╩я▐я▐ п╡ я┐п╤п╟я│п╣ п╬п╠я─п╟я┌п╦я┌я▄я│я▐ п╡ п╠п╣пЁя│я┌п╡п╬.", ch, 0, vch, TO_VICT, POS_RESTING);
 
 		dam = dice( level, 12 ); 
 		damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_SPELL );
@@ -336,7 +336,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-	ch->send_to("Это заклинание использовалось совсем недавно.");
+	ch->send_to("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╬я│я▄ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.");
 	return;
     }
     af.where	 = TO_AFFECTS;
@@ -362,19 +362,19 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
 	if (IS_EVIL(ch) ) {
 	    victim = ch;
-	    ch->send_to("Энергия взрывается внутри тебя!\n\r");
+	    ch->send_to("п╜п╫п╣я─пЁп╦я▐ п╡п╥я─я▀п╡п╟п╣я┌я│я▐ п╡п╫я┐я┌я─п╦ я┌п╣п╠я▐!\n\r");
 	}
 
 	if (victim != ch) {
-	    act_p("$c1 высоко вздымает руки, посылая ослепительный луч света!",
+	    act_p("$c1 п╡я▀я│п╬п╨п╬ п╡п╥п╢я▀п╪п╟п╣я┌ я─я┐п╨п╦, п©п╬я│я▀п╩п╟я▐ п╬я│п╩п╣п©п╦я┌п╣п╩я▄п╫я▀п╧ п╩я┐я┤ я│п╡п╣я┌п╟!",
 		   ch,0,0,TO_ROOM,POS_RESTING);
-	    ch->send_to("Ты высоко вздымаешь руки, посылая ослепительный луч света!\n\r");
+	    ch->send_to("п╒я▀ п╡я▀я│п╬п╨п╬ п╡п╥п╢я▀п╪п╟п╣я┬я▄ я─я┐п╨п╦, п©п╬я│я▀п╩п╟я▐ п╬я│п╩п╣п©п╦я┌п╣п╩я▄п╫я▀п╧ п╩я┐я┤ я│п╡п╣я┌п╟!\n\r");
 	}
 
 	if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
-	    act_p("Свет не может причинить вреда $c3.",
+	    act_p("п║п╡п╣я┌ п╫п╣ п╪п╬п╤п╣я┌ п©я─п╦я┤п╦п╫п╦я┌я▄ п╡я─п╣п╢п╟ $c3.",
 		   victim,0,victim,TO_ROOM,POS_RESTING);
-	    victim->send_to("Свет не может причинить тебе вреда.\n\r");
+	    victim->send_to("п║п╡п╣я┌ п╫п╣ п╪п╬п╤п╣я┌ п©я─п╦я┤п╦п╫п╦я┌я▄ я┌п╣п╠п╣ п╡я─п╣п╢п╟.\n\r");
 	    continue;
 	}
 	
@@ -382,7 +382,7 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 	    && victim->getNPC( )->behavior
 	    && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
 	{
-	    act_p("$c1 не может покинуть свой пост.", victim, 0, 0, TO_ROOM, POS_RESTING);
+	    act_p("$c1 п╫п╣ п╪п╬п╤п╣я┌ п©п╬п╨п╦п╫я┐я┌я▄ я│п╡п╬п╧ п©п╬я│я┌.", victim, 0, 0, TO_ROOM, POS_RESTING);
 	    continue;
 	}
 			     

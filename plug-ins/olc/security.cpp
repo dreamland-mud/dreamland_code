@@ -95,7 +95,7 @@ CMD(security, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     Character *victim;
     
     if(ch->getPC()->getSecurity() < 100) {
-	ch->send_to("Это не для тебя.\n\r");
+	ch->send_to("п╜я┌п╬ п╫п╣ п╢п╩я▐ я┌п╣п╠я▐.\n\r");
 	return;
     }
     argument = one_argument(argument, buf);
@@ -131,7 +131,7 @@ CMD(olcvnum, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     DLString arguments = argument;
     
     if(ch->getPC( )->getSecurity() < 100) {
-	ch->send_to( "Это не для тебя.\n\r" );
+	ch->send_to( "п╜я┌п╬ п╫п╣ п╢п╩я▐ я┌п╣п╠я▐.\n\r" );
 	return;
     }
     

@@ -15,7 +15,7 @@
 void listfilter_yyerror( const char *txt );
 %}
 
-RL	    [йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ]
+RL	    [п╧я├я┐п╨п╣п╫пЁя┬я┴п╥я┘я┼я└я▀п╡п╟п©я─п╬п╩п╢п╤я█я▐я┤я│п╪п╦я┌я▄п╠я▌я▒п≥п╕пёп п∙п²п⌠п╗п╘п≈п╔п╙п╓п╚п▓п░п÷п═п·п⌡п■п√п╜п╞п╖п║п°п≤п╒п╛п▒п╝п│]
 L	    ([A-Za-z]|{RL})
 
 %x QUOTE
@@ -45,15 +45,15 @@ L	    ([A-Za-z]|{RL})
 "TEXT"      return T_TEXT;
 "UNREAD"    return T_UNREAD;
 
-"или"	    return T_OR;
-"и"         return T_AND;
-"номер"     return T_ID;
-"последние" return T_LAST;
-"от"        return T_FROM;
-"к"         return T_TO;
-"тема"      return T_SUBJ;
-"текст"     return T_TEXT;
-"непрочитано" return T_UNREAD;
+"п╦п╩п╦"	    return T_OR;
+"п╦"         return T_AND;
+"п╫п╬п╪п╣я─"     return T_ID;
+"п©п╬я│п╩п╣п╢п╫п╦п╣" return T_LAST;
+"п╬я┌"        return T_FROM;
+"п╨"         return T_TO;
+"я┌п╣п╪п╟"      return T_SUBJ;
+"я┌п╣п╨я│я┌"     return T_TEXT;
+"п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╬" return T_UNREAD;
 
 "<="	    return T_LEQ;
 ">="	    return T_GEQ;

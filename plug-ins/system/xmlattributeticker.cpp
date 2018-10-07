@@ -55,10 +55,10 @@ DLString XMLAttributeTicker::getTimeString( bool russian ) const
 {
     DLString str;
     
-    str = (russian ? "на" : "for");
+    str = (russian ? "п╫п╟" : "for");
     
     if (time.getValue( ) == -1)
-	str += (russian ? "всегда" : "ever" );
+	str += (russian ? "п╡я│п╣пЁп╢п╟" : "ever" );
     else
 	str += " " + Date::getStringFromSecond( time.getValue( ) );
     
@@ -70,9 +70,9 @@ DLString XMLAttributeTicker::getUntilString( bool russian ) const
     DLString str;
     
     if (time.getValue( ) == -1)
-	str += (russian ? "навсегда" : "forever" );
+	str += (russian ? "п╫п╟п╡я│п╣пЁп╢п╟" : "forever" );
     else {
-	str += (russian ? "до" : "until" );
+	str += (russian ? "п╢п╬" : "until" );
 	str += " " + Date::getTimeAsString( getTime( ) );
     }
     

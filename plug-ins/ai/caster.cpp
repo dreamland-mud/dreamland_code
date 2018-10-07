@@ -169,7 +169,7 @@ bool BasicMobileBehavior::aggressCaster( )
 	target->castFar = true;
 	target->range = victRange;
 
-	act("$c1 пристально смотрит $T.", ch, 0, dirs[victDoor].leave, TO_ROOM);
+	act("$c1 п©я─п╦я│я┌п╟п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ $T.", ch, 0, dirs[victDoor].leave, TO_ROOM);
 	return ::spell( castSn, ch->getModifyLevel( ), ch, target, 
 			FSPELL_VERBOSE | FSPELL_BANE | FSPELL_WAIT | FSPELL_OBSTACLES | FSPELL_MANA );
     }

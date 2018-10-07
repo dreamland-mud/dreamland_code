@@ -30,7 +30,7 @@ COMMAND(CCard, "card")
 	return;
     
     if (!pch->is_immortal( )) {
-	pch->send_to( "Это не для тебя.\r\n" );
+	pch->send_to( "п╜я┌п╬ п╫п╣ п╢п╩я▐ я┌п╣п╠я▐.\r\n" );
 	return;
     }
     
@@ -52,7 +52,7 @@ void CCard::doMob( PCharacter *ch, DLString& arguments )
     DLString mobName = arguments.getOneArgument( );
     
     if (mobName.empty( )) {
-	ch->send_to( "Кого ты хочешь сделать шестеркой?\r\n" );
+	ch->send_to( "п п╬пЁп╬ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я┬п╣я│я┌п╣я─п╨п╬п╧?\r\n" );
 	return;
     }
     
@@ -68,7 +68,7 @@ void CCard::doMob( PCharacter *ch, DLString& arguments )
     mob->getNPC( )->behavior.setPointer( *bhv );
     save_mobs( mob->in_room );
 
-    ch->printf( "%s из комнаты [%d] стал(о) шестеркой.\r\n",
+    ch->printf( "%s п╦п╥ п╨п╬п╪п╫п╟я┌я▀ [%d] я│я┌п╟п╩(п╬) я┬п╣я│я┌п╣я─п╨п╬п╧.\r\n",
 		mob->getNameP( '1' ).c_str( ), mob->in_room->vnum );
 }
 
@@ -84,7 +84,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-	ch->send_to( "Жертва не найдена.\r\n" );
+	ch->send_to( "п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟.\r\n" );
 	return;
     }
 
@@ -92,9 +92,9 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     card = attributes->findAttr<XMLAttributeCards>( "cards" );
     
     if (!card)
-	ch->printf( "%s не состоит в Колоде.\r\n", pci->getName( ).c_str( ) );
+	ch->printf( "%s п╫п╣ я│п╬я│я┌п╬п╦я┌ п╡ п п╬п╩п╬п╢п╣.\r\n", pci->getName( ).c_str( ) );
     else
-	ch->printf( "%s - это %s из Колоды.\r\n", 
+	ch->printf( "%s - я█я┌п╬ %s п╦п╥ п п╬п╩п╬п╢я▀.\r\n", 
 		    pci->getName( ).c_str( ), card->getFace( '1' ).c_str( ) );
 
 
@@ -106,7 +106,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
     if (arg == "clear" || arg == "off") {
 	attributes->eraseAttribute( "cards" );
 	PCharacterManager::saveMemory( pci );
-	ch->println( "Он(а) выбывает из Колоды." );	
+	ch->println( "п·п╫(п╟) п╡я▀п╠я▀п╡п╟п╣я┌ п╦п╥ п п╬п╩п╬п╢я▀." );	
 	return;
     }
 
@@ -115,7 +115,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
 	if (level < 0 || level > 8)
 	    throw Exception( );
     } catch (const Exception& ) {
-	ch->send_to( "<card level> должен быть числом от 0 до 8.\r\n" );
+	ch->send_to( "<card level> п╢п╬п╩п╤п╣п╫ п╠я▀я┌я▄ я┤п╦я│п╩п╬п╪ п╬я┌ 0 п╢п╬ 8.\r\n" );
 	return;
     }
     
@@ -128,7 +128,7 @@ void CCard::doChar( PCharacter *ch, DLString& arguments )
 	card->setSuit( card->getRandomSuit( ) );
 
     PCharacterManager::saveMemory( pci );
-    ch->printf( "%s становится %s.\r\n", 
+    ch->printf( "%s я│я┌п╟п╫п╬п╡п╦я┌я│я▐ %s.\r\n", 
 		pci->getName( ).c_str( ), card->getFace( '5' ).c_str( ) );
      
 }
@@ -140,7 +140,7 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
    
-    ch->send_to( "Список всех карт из Колоды: \r\nИгроки: \r\n");
+    ch->send_to( "п║п©п╦я│п╬п╨ п╡я│п╣я┘ п╨п╟я─я┌ п╦п╥ п п╬п╩п╬п╢я▀: \r\nп≤пЁя─п╬п╨п╦: \r\n");
     cnt = 0;
      
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
@@ -159,9 +159,9 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     }
     
     if (cnt > 0)
-	ch->printf( "Итого: %d тел\r\n", cnt );
+	ch->printf( "п≤я┌п╬пЁп╬: %d я┌п╣п╩\r\n", cnt );
 
-    ch->printf( "\r\nМобы-шестерки:\r\n", cnt );
+    ch->printf( "\r\nп°п╬п╠я▀-я┬п╣я│я┌п╣я─п╨п╦:\r\n", cnt );
     cnt = 0;
 	
     for (wch = char_list; wch; wch = wch->next) {
@@ -187,21 +187,21 @@ void CCard::doList( PCharacter *ch, DLString& arguments )
     }
     
     if (cnt > 0)
-	ch->printf( "Итого: %d тел\r\n", cnt );
+	ch->printf( "п≤я┌п╬пЁп╬: %d я┌п╣п╩\r\n", cnt );
 }
 
 void CCard::usage( PCharacter *ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "Синтаксис: " << endl
-	<< "{Wcard list{x  - посмотреть всю колоду" << endl
-	<< "{Wcard mob {x<name>   -  сделать моба карточной шестеркой" << endl
-	<< "{Wcard char {x<name>  - показать место в колоде для этого игрока" << endl;
+    buf << "п║п╦п╫я┌п╟п╨я│п╦я│: " << endl
+	<< "{Wcard list{x  - п©п╬я│п╪п╬я┌я─п╣я┌я▄ п╡я│я▌ п╨п╬п╩п╬п╢я┐" << endl
+	<< "{Wcard mob {x<name>   -  я│п╢п╣п╩п╟я┌я▄ п╪п╬п╠п╟ п╨п╟я─я┌п╬я┤п╫п╬п╧ я┬п╣я│я┌п╣я─п╨п╬п╧" << endl
+	<< "{Wcard char {x<name>  - п©п╬п╨п╟п╥п╟я┌я▄ п╪п╣я│я┌п╬ п╡ п╨п╬п╩п╬п╢п╣ п╢п╩я▐ я█я┌п╬пЁп╬ п╦пЁя─п╬п╨п╟" << endl;
     
     if (ch->isCoder( )) {
-	buf << "{Wcard char {x<name> <level> - установить игроку уровень в колоде (0..8)" << endl
-	    << "{Wcard char {x<name> {Wclear{x - выгнать игрока из колоды" << endl;
+	buf << "{Wcard char {x<name> <level> - я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╦пЁя─п╬п╨я┐ я┐я─п╬п╡п╣п╫я▄ п╡ п╨п╬п╩п╬п╢п╣ (0..8)" << endl
+	    << "{Wcard char {x<name> {Wclear{x - п╡я▀пЁп╫п╟я┌я▄ п╦пЁя─п╬п╨п╟ п╦п╥ п╨п╬п╩п╬п╢я▀" << endl;
     }
 
     ch->send_to( buf );

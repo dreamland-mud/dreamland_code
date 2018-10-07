@@ -11,7 +11,7 @@
 
 namespace Scripting {
 
-NMI_INIT(FeniaString, "строка")
+NMI_INIT(FeniaString, "я│я┌я─п╬п╨п╟")
 
 }
 

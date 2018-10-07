@@ -63,9 +63,9 @@ void ClanTitlesByClass::toStream( ostringstream &buf ) const
 
     for (i = begin( ); i != end( ); i++) {
 	if (i->first == "all")
-	    buf << "{WäÌÑ ×ÓÅÈ ÐÒÏÆÅÓÓÉÊ:{x" << endl;
+	    buf << "{WÐ”Ð»Ñ Ð²ÑÐµÑ… Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¹:{x" << endl;
 	else
-	    buf << "{WäÌÑ ÐÒÏÆÅÓÓÉÉ " << i->first << ":{x" << endl;
+	    buf << "{WÐ”Ð»Ñ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸ " << i->first << ":{x" << endl;
 	
 	for (int j = 0; j < (int) i->second.size( ); j++) {
 	    buf << dlprintf( "%-3d", j );

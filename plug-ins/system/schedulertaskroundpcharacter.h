@@ -21,7 +21,7 @@ class PCharacter;
 class PCMemoryInterface;
 
 /**
- * @short Задача для планировщика, которой на вход подаются PC online
+ * @short п≈п╟п╢п╟я┤п╟ п╢п╩я▐ п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨п╟, п╨п╬я┌п╬я─п╬п╧ п╫п╟ п╡я┘п╬п╢ п©п╬п╢п╟я▌я┌я│я▐ PC online
  * @author Igor S. Petrenko
  * @see Scheduler
  * @see SchedulerTask
@@ -31,13 +31,13 @@ struct SchedulerTaskRoundPCharacter : public virtual SchedulerTask
 	typedef ::Pointer<SchedulerTaskRoundPCharacter> Pointer;
 	
 	virtual void run( );
-	/** Обработать игрока */
+	/** п·п╠я─п╟п╠п╬я┌п╟я┌я▄ п╦пЁя─п╬п╨п╟ */
 	virtual void run( PCharacter* pc ) = 0;
 	virtual int getPriority( ) const;
 };
 
 /**
- * @short Задача для планировщика, которой на вход подаются PC online/offline
+ * @short п≈п╟п╢п╟я┤п╟ п╢п╩я▐ п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨п╟, п╨п╬я┌п╬я─п╬п╧ п╫п╟ п╡я┘п╬п╢ п©п╬п╢п╟я▌я┌я│я▐ PC online/offline
  * @author Igor S. Petrenko
  * @see Scheduler
  * @see SchedulerTask
@@ -48,7 +48,7 @@ struct SchedulerTaskRoundPCMemory : public virtual SchedulerTask
 	
 	virtual void run( );
 	/**
-	 * Обработать игрока через PCMemoryInterface
+	 * п·п╠я─п╟п╠п╬я┌п╟я┌я▄ п╦пЁя─п╬п╨п╟ я┤п╣я─п╣п╥ PCMemoryInterface
 	 * @see PCMemoryInterface
 	 */
 	virtual void run( PCMemoryInterface* pcm ) = 0;

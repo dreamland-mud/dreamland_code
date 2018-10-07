@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "wrapperbase.h"
@@ -218,7 +218,7 @@ SKILL_RUNP( settraps )
 {
 	if (!gsn_settraps->usable(ch))
 	{
-		ch->send_to("Ты абсолютно не в курсе, как это делается.\n\r");
+		ch->send_to("п╒я▀ п╟п╠я│п╬п╩я▌я┌п╫п╬ п╫п╣ п╡ п╨я┐я─я│п╣, п╨п╟п╨ я█я┌п╬ п╢п╣п╩п╟п╣я┌я│я▐.\n\r");
 		return;
 	}
 
@@ -227,7 +227,7 @@ SKILL_RUNP( settraps )
 
 	if ( IS_SET(ch->in_room->room_flags, ROOM_LAW) )
 	{
-		ch->send_to("Мистическая сила защищает комнату.\n\r");
+		ch->send_to("п°п╦я│я┌п╦я┤п╣я│п╨п╟я▐ я│п╦п╩п╟ п╥п╟я┴п╦я┴п╟п╣я┌ п╨п╬п╪п╫п╟я┌я┐.\n\r");
 		return;
 	}
 
@@ -242,13 +242,13 @@ SKILL_RUNP( settraps )
 
 		if (  ch->in_room->isAffected(gsn_settraps ))
 		{
-			ch->send_to("В этой комнате уже есть ловушка.\n\r");
+			ch->send_to("п▓ я█я┌п╬п╧ п╨п╬п╪п╫п╟я┌п╣ я┐п╤п╣ п╣я│я┌я▄ п╩п╬п╡я┐я┬п╨п╟.\n\r");
 			return;
 		}
 
 		if ( ch->isAffected(gsn_settraps))
 		{
-			ch->send_to("Ты слишком сильно заботишься еще о старой ловушке.\n\r");
+			ch->send_to("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я│п╦п╩я▄п╫п╬ п╥п╟п╠п╬я┌п╦я┬я▄я│я▐ п╣я┴п╣ п╬ я│я┌п╟я─п╬п╧ п╩п╬п╡я┐я┬п╨п╣.\n\r");
 			return;
 		}
 
@@ -275,13 +275,13 @@ SKILL_RUNP( settraps )
 		af2.bitvector = 0;
 		affect_to_char( ch, &af2 );
 
-		ch->send_to( "Ты устраиваешь ловушку в комнате.\n\r");
+		ch->send_to( "п╒я▀ я┐я│я┌я─п╟п╦п╡п╟п╣я┬я▄ п╩п╬п╡я┐я┬п╨я┐ п╡ п╨п╬п╪п╫п╟я┌п╣.\n\r");
 
-		act_p("$c1 устраивает ловушку в комнате.",ch,0,0,TO_ROOM,POS_RESTING);
+		act_p("$c1 я┐я│я┌я─п╟п╦п╡п╟п╣я┌ п╩п╬п╡я┐я┬п╨я┐ п╡ п╨п╬п╪п╫п╟я┌п╣.",ch,0,0,TO_ROOM,POS_RESTING);
 		return;
 	}
 	else {
-		ch->println( "Твоя попытка устроить ловушку провалилась." );
+		ch->println( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ я┐я│я┌я─п╬п╦я┌я▄ п╩п╬п╡я┐я┬п╨я┐ п©я─п╬п╡п╟п╩п╦п╩п╟я│я▄." );
 		gsn_settraps->improve( ch, false );
 	}
 
@@ -293,8 +293,8 @@ struct SettrapsDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-	msgRoom( "Ловушка \6%C4.", ch );
-	msgChar( "Ловушка \6тебя!", ch );
+	msgRoom( "п⌡п╬п╡я┐я┬п╨п╟ \6%C4.", ch );
+	msgChar( "п⌡п╬п╡я┐я┬п╨п╟ \6я┌п╣п╠я▐!", ch );
     }
 };
 
@@ -302,7 +302,7 @@ AFFECT_DECL(Settraps);
 VOID_AFFECT(Settraps)::entry( Room *room, Character *ch, Affect *paf )
 {
     if (!is_safe_rspell(paf->level,ch)) {
-	ch->send_to("Установленная кем-то ловушка препятствует тебе.\n\r");
+	ch->send_to("пёя│я┌п╟п╫п╬п╡п╩п╣п╫п╫п╟я▐ п╨п╣п╪-я┌п╬ п╩п╬п╡я┐я┬п╨п╟ п©я─п╣п©я▐я┌я│я┌п╡я┐п╣я┌ я┌п╣п╠п╣.\n\r");
 	
 	try {
 	    SettrapsDamage( ch, dice(paf->level,5)+12 ).hit( true ); 
@@ -316,7 +316,7 @@ VOID_AFFECT(Settraps)::entry( Room *room, Character *ch, Affect *paf )
 
 VOID_AFFECT(Settraps)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Здесь на {W%1$d{x ча%1$Iс|са|сов установлена воровская ловушка.",
+    buf << fmt( 0, "п≈п╢п╣я│я▄ п╫п╟ {W%1$d{x я┤п╟%1$Iя│|я│п╟|я│п╬п╡ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╟ п╡п╬я─п╬п╡я│п╨п╟я▐ п╩п╬п╡я┐я┬п╨п╟.",
 		   paf->duration )
 	<< endl;
 }
@@ -335,7 +335,7 @@ SKILL_RUNP( envenom )
     /* find out what */
     if (argument == '\0')
     {
-	ch->send_to("Отравить ядом что?\n\r");
+	ch->send_to("п·я┌я─п╟п╡п╦я┌я▄ я▐п╢п╬п╪ я┤я┌п╬?\n\r");
 	return;
     }
 
@@ -343,13 +343,13 @@ SKILL_RUNP( envenom )
 
     if (obj== 0)
     {
-	ch->send_to("У тебя нет этого.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
     if ((skill = gsn_envenom->getEffective( ch )) < 1)
     {
-	ch->send_to("О чем ты думаешь? Отравить себя!..\n\r");
+	ch->send_to("п· я┤п╣п╪ я┌я▀ п╢я┐п╪п╟п╣я┬я▄? п·я┌я─п╟п╡п╦я┌я▄ я│п╣п╠я▐!..\n\r");
 	return;
     }
 
@@ -360,15 +360,15 @@ SKILL_RUNP( envenom )
 
 	if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
 	{
-	    act_p("Твоя попытка отравить $o4 закончилась неудачей.",
+	    act_p("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╬я┌я─п╟п╡п╦я┌я▄ $o4 п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.",
             ch,obj,0,TO_CHAR,POS_RESTING);
 	    return;
 	}
 
 	if (number_percent() < skill)  /* success! */
 	{
-	    act_p("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM,POS_RESTING);
-	    act_p("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR,POS_RESTING);
+	    act_p("$c1 п╬я┌я─п╟п╡п╩я▐п╣я┌ $o4 я│п╪п╣я─я┌п╣п╩я▄п╫я▀п╪ я▐п╢п╬п╪.",ch,obj,0,TO_ROOM,POS_RESTING);
+	    act_p("п╒я▀ п╬я┌я─п╟п╡п╩я▐п╣я┬я▄ $o4 я│п╪п╣я─я┌п╣п╩я▄п╫я▀п╪ я▐п╢п╬п╪.",ch,obj,0,TO_CHAR,POS_RESTING);
 	    if (!IS_SET(obj->value[3], DRINK_POISONED))
 	    {
 		SET_BIT(obj->value[3], DRINK_POISONED);
@@ -378,7 +378,7 @@ SKILL_RUNP( envenom )
 	    return;
 	}
 
-	act_p("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR,POS_RESTING);
+	act_p("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╬я┌я─п╟п╡п╦я┌я▄ $o4 п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.",ch,obj,0,TO_CHAR,POS_RESTING);
 	if (!IS_SET(obj->value[3], DRINK_POISONED))
 	    gsn_envenom->improve( ch, false );
 	ch->setWait( gsn_envenom->getBeats( ) );
@@ -396,20 +396,20 @@ SKILL_RUNP( envenom )
         ||  IS_WEAPON_STAT(obj,WEAPON_HOLY)
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
         {
-            act_p("Ты не можешь отравить ядом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+            act_p("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╬я┌я─п╟п╡п╦я┌я▄ я▐п╢п╬п╪ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
             return;
         }
 
 	if (obj->value[3] < 0
 	||  attack_table[obj->value[3]].damage == DAM_BASH)
 	{
-	    ch->send_to("Ты можешь отравить только оружие, имеющее острое лезвие.\n\r");
+	    ch->send_to("п╒я▀ п╪п╬п╤п╣я┬я▄ п╬я┌я─п╟п╡п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╬я─я┐п╤п╦п╣, п╦п╪п╣я▌я┴п╣п╣ п╬я│я┌я─п╬п╣ п╩п╣п╥п╡п╦п╣.\n\r");
 	    return;
 	}
 
         if (IS_WEAPON_STAT(obj,WEAPON_POISON))
         {
-	    ch->pecho( "%1$^O1 уже отравле%1$Gно|н|на ядом.", obj );
+	    ch->pecho( "%1$^O1 я┐п╤п╣ п╬я┌я─п╟п╡п╩п╣%1$Gп╫п╬|п╫|п╫п╟ я▐п╢п╬п╪.", obj );
             return;
         }
 
@@ -427,22 +427,22 @@ SKILL_RUNP( envenom )
             affect_to_obj( obj, &af);
 
 	    if ( !IS_AFFECTED( ch, AFF_SNEAK ) )
-              act_p("$c1 покрывает $o4 смертельным ядом.",ch,obj,0,TO_ROOM,POS_RESTING);
-	    act_p("Ты покрываешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR,POS_RESTING);
+              act_p("$c1 п©п╬п╨я─я▀п╡п╟п╣я┌ $o4 я│п╪п╣я─я┌п╣п╩я▄п╫я▀п╪ я▐п╢п╬п╪.",ch,obj,0,TO_ROOM,POS_RESTING);
+	    act_p("п╒я▀ п©п╬п╨я─я▀п╡п╟п╣я┬я▄ $o4 я│п╪п╣я─я┌п╣п╩я▄п╫я▀п╪ я▐п╢п╬п╪.",ch,obj,0,TO_CHAR,POS_RESTING);
 	    gsn_envenom->improve( ch, true );
 	    ch->setWait( gsn_envenom->getBeats( ) );
             return;
         }
 	else
 	{
-	    act_p("Твоя попытка отравить ядом $o4 закончилась неудачей.",ch,obj,0,TO_CHAR,POS_RESTING);
+	    act_p("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╬я┌я─п╟п╡п╦я┌я▄ я▐п╢п╬п╪ $o4 п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.",ch,obj,0,TO_CHAR,POS_RESTING);
 	    gsn_envenom->improve( ch, false );
 	    ch->setWait( gsn_envenom->getBeats( ) );
 	    return;
 	}
     }
 
-    act_p("Ты не можешь отравить $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+    act_p("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╬я┌я─п╟п╡п╦я┌я▄ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
     return;
 }
 
@@ -467,49 +467,49 @@ SKILL_RUNP( steal )
 
 	if ( ch->is_npc() || skill <= 1)
 	{
-		ch->send_to("Кажется, ты не умеешь красть?\n\r");
+		ch->send_to("п п╟п╤п╣я┌я│я▐, я┌я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╨я─п╟я│я┌я▄?\n\r");
 		return;
 	}
 
 	if ( arg1[0] == '\0' || arg2[0] == '\0' )
 	{
-		ch->send_to("Украсть что и у кого?\n\r");
+		ch->send_to("пёп╨я─п╟я│я┌я▄ я┤я┌п╬ п╦ я┐ п╨п╬пЁп╬?\n\r");
 		return;
 	}
 
 	if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
 	{
-		ch->send_to("Нет этого тут.\n\r");
+		ch->send_to("п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r");
 		return;
 	}
 
 	if( !victim->is_npc() && IS_GHOST( victim ) )
 	{
-		ch->send_to("Эта загадочная субстанция не имеет ничего.");
+		ch->send_to("п╜я┌п╟ п╥п╟пЁп╟п╢п╬я┤п╫п╟я▐ я│я┐п╠я│я┌п╟п╫я├п╦я▐ п╫п╣ п╦п╪п╣п╣я┌ п╫п╦я┤п╣пЁп╬.");
 		return;
 	}
 
 	if( !ch->is_npc() && IS_DEATH_TIME( ch ) )
 	{
-		ch->send_to("Боги снимают с тебя свою защиту.\n\r");
+		ch->send_to("п▒п╬пЁп╦ я│п╫п╦п╪п╟я▌я┌ я│ я┌п╣п╠я▐ я│п╡п╬я▌ п╥п╟я┴п╦я┌я┐.\n\r");
 		UNSET_DEATH_TIME(ch);
 	}
 
 	if (!victim->is_npc() && victim->desc == 0)
 	{
-		ch->send_to("Ты не можешь сделать этого.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬.\n\r");
 		return;
 	}
 
 	if ( victim == ch || victim->is_immortal() )
 	{
-		ch->send_to("Это не разумно.\n\r");
+		ch->send_to("п╜я┌п╬ п╫п╣ я─п╟п╥я┐п╪п╫п╬.\n\r");
 		return;
 	}
 
 	if ( victim->is_immortal() )
 	{
-		ch->send_to("Подумай, стоит ли это делать.\n\r");
+		ch->send_to("п÷п╬п╢я┐п╪п╟п╧, я│я┌п╬п╦я┌ п╩п╦ я█я┌п╬ п╢п╣п╩п╟я┌я▄.\n\r");
 		return;
 	}
 
@@ -518,7 +518,7 @@ SKILL_RUNP( steal )
 
 	if ( victim->position == POS_FIGHTING )
 	{
-		ch->send_to("Не стоит - еще ударят больно в пылу битвы.\n\r");
+		ch->send_to("п²п╣ я│я┌п╬п╦я┌ - п╣я┴п╣ я┐п╢п╟я─я▐я┌ п╠п╬п╩я▄п╫п╬ п╡ п©я▀п╩я┐ п╠п╦я┌п╡я▀.\n\r");
 		return;
 	}
     
@@ -541,14 +541,14 @@ SKILL_RUNP( steal )
 	 * Failure.
 	 */
 
-		ch->send_to("Упс..\n\r");
+		ch->send_to("пёп©я│..\n\r");
 		if ( !IS_AFFECTED( victim, AFF_SLEEP ) )
 		{
 			victim->position= victim->position==POS_SLEEPING? POS_STANDING:
 			victim->position;
-			act_p( "$c1 пытается обокрасть тебя.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
+			act_p( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬п╠п╬п╨я─п╟я│я┌я▄ я┌п╣п╠я▐.\n\r", ch, 0, victim,TO_VICT,POS_DEAD);
 		}
-		act_p( "$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT,POS_RESTING);
+		act_p( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬п╠п╬п╨я─п╟я│я┌я▄ $C4.\n\r",  ch, 0, victim,TO_NOTVICT,POS_RESTING);
 
 		if( !victim->is_npc() )
 			set_thief( ch );
@@ -559,17 +559,17 @@ SKILL_RUNP( steal )
 		switch(number_range(0,3))
 		{
 		case 0 :
-			sprintf( buf, "%s - подлый воришка!", tmp_ch->getNameP( ) );
+			sprintf( buf, "%s - п©п╬п╢п╩я▀п╧ п╡п╬я─п╦я┬п╨п╟!", tmp_ch->getNameP( ) );
 			break;
 		case 1 :
-			sprintf( buf, "Да %s и конфетку у ребенка украсть не сможет, неумеха!",
+			sprintf( buf, "п■п╟ %s п╦ п╨п╬п╫я└п╣я┌п╨я┐ я┐ я─п╣п╠п╣п╫п╨п╟ я┐п╨я─п╟я│я┌я▄ п╫п╣ я│п╪п╬п╤п╣я┌, п╫п╣я┐п╪п╣я┘п╟!",
 				 tmp_ch->getNameP( ));
 			break;
 		case 2 :
-			sprintf( buf,"%s пытается обокрасть меня!",tmp_ch->getNameP( ) );
+			sprintf( buf,"%s п©я▀я┌п╟п╣я┌я│я▐ п╬п╠п╬п╨я─п╟я│я┌я▄ п╪п╣п╫я▐!",tmp_ch->getNameP( ) );
 			break;
 		case 3 :
-			sprintf(buf,"Держи свои руки подальше, %s!",tmp_ch->getNameP( ));
+			sprintf(buf,"п■п╣я─п╤п╦ я│п╡п╬п╦ я─я┐п╨п╦ п©п╬п╢п╟п╩я▄я┬п╣, %s!",tmp_ch->getNameP( ));
 			break;
 		}
 		if ( IS_AWAKE( victim ) )
@@ -597,7 +597,7 @@ SKILL_RUNP( steal )
 
 		if ( amount_s <= 0 && amount_g <= 0 )
 		{
-			ch->send_to("Тебе не удалось нащупать ни одной монетки.\n\r");
+			ch->send_to("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╫п╟я┴я┐п©п╟я┌я▄ п╫п╦ п╬п╢п╫п╬п╧ п╪п╬п╫п╣я┌п╨п╦.\n\r");
 			return;
 		}
 
@@ -605,7 +605,7 @@ SKILL_RUNP( steal )
 		victim->gold -= amount_g;
 		ch->silver     += amount_s;
 		victim->silver -= amount_s;
-		ch->pecho("Bingo! Тебе удалось стащить %s.",
+		ch->pecho("Bingo! п╒п╣п╠п╣ я┐п╢п╟п╩п╬я│я▄ я│я┌п╟я┴п╦я┌я▄ %s.",
 		          describe_money( amount_g, amount_s, 4 ).c_str( ));
 		gsn_steal->improve( ch, true, victim );
 
@@ -617,7 +617,7 @@ SKILL_RUNP( steal )
 
 	if ( ( obj = see_obj_carry( ch, victim, arg1 ) ) == 0 )
 	{
-		ch->send_to("Ты не находишь этого.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ я█я┌п╬пЁп╬.\n\r");
 		return;
 	}
 
@@ -625,32 +625,32 @@ SKILL_RUNP( steal )
    /* ||   IS_SET(obj->extra_flags, ITEM_INVENTORY)*/
    /* ||  obj->level > ch->getModifyLevel() */ )
 	{
-		ch->send_to("Это тебе не удастся стянуть.\n\r");
+		ch->send_to("п╜я┌п╬ я┌п╣п╠п╣ п╫п╣ я┐п╢п╟я│я┌я│я▐ я│я┌я▐п╫я┐я┌я▄.\n\r");
 		return;
 	}
 
 	if (obj->behavior && !obj->behavior->canSteal( ch ))
 	{
-		ch->send_to("Это бесполезно для тебя.\n\r");
+		ch->send_to("п╜я┌п╬ п╠п╣я│п©п╬п╩п╣п╥п╫п╬ п╢п╩я▐ я┌п╣п╠я▐.\n\r");
 		return;
 	}
 
 	if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
 	{
-		ch->send_to("Твои руки полны.\n\r");
+		ch->send_to("п╒п╡п╬п╦ я─я┐п╨п╦ п©п╬п╩п╫я▀.\n\r");
 		return;
 	}
 
 	if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
 	{
-		ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╣я│я┌п╦ я┌п╟п╨я┐я▌ я┌я▐п╤п╣я│я┌я▄.\n\r");
 		return;
 	}
 	if ( !IS_SET( obj->extra_flags, ITEM_INVENTORY ) )
 	{
 		obj_from_char( obj );
 		obj_to_char( obj, ch );
-		ch->send_to("Есть!\n\r");
+		ch->send_to("п∙я│я┌я▄!\n\r");
 		oprog_get( obj, ch );
 		gsn_steal->improve( ch, true, victim );
 	}
@@ -661,7 +661,7 @@ SKILL_RUNP( steal )
 		clone_object( obj, obj_inve );
 		REMOVE_BIT( obj_inve->extra_flags, ITEM_INVENTORY );
 		obj_to_char( obj_inve, ch );
-		ch->pecho("Ты укра%Gло|л|ла одну штуку!", ch);
+		ch->pecho("п╒я▀ я┐п╨я─п╟%Gп╩п╬|п╩|п╩п╟ п╬п╢п╫я┐ я┬я┌я┐п╨я┐!", ch);
 		oprog_get( obj, ch );
 		gsn_steal->improve( ch, true, victim );
 	}
@@ -682,12 +682,12 @@ SKILL_RUNP( pick )
     Keyhole::Pointer keyhole;
 
     if (!gsn_pick_lock->usable( ch )) {
-	ch->println( "Ты пытаешься засунуть отмычку в скважину, но промахиваешься!" );
+	ch->println( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╥п╟я│я┐п╫я┐я┌я▄ п╬я┌п╪я▀я┤п╨я┐ п╡ я│п╨п╡п╟п╤п╦п╫я┐, п╫п╬ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐!" );
 	return;
     }
     
     if (MOUNTED(ch)) {
-	ch->println( "Ты не можешь взломать что-либо, пока ты в седле." );
+	ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╥п╩п╬п╪п╟я┌я▄ я┤я┌п╬-п╩п╦п╠п╬, п©п╬п╨п╟ я┌я▀ п╡ я│п╣п╢п╩п╣." );
 	return;
     }
 
@@ -695,17 +695,17 @@ SKILL_RUNP( pick )
     arg2 = args.getOneArgument( );
 
     if (arg1.empty( )) {
-	ch->println( "Взломать что?" );
+	ch->println( "п▓п╥п╩п╬п╪п╟я┌я▄ я┤я┌п╬?" );
 	return;
     }
 
     if (arg2.empty( )) {
-	ch->println( "Взломать чем?" );
+	ch->println( "п▓п╥п╩п╬п╪п╟я┌я▄ я┤п╣п╪?" );
 	return;
     }
     
     if (!( keyhole = Keyhole::create( ch, arg1 ) )) {
-	ch->println( "Ты не видишь здесь такого замка." );
+	ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я┌п╟п╨п╬пЁп╬ п╥п╟п╪п╨п╟." );
 	return;
     }
 
@@ -733,7 +733,7 @@ protected:
 	door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
 	
 	if (door < 0) {
-	    actor->pecho( "Ты не видишь выхода в этом направлении." );
+	    actor->pecho( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╡я▀я┘п╬п╢п╟ п╡ я█я┌п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦." );
 	    return false;
 	}
 
@@ -744,7 +744,7 @@ protected:
 
 	if (IS_SET(pexit->exit_info, EX_ISDOOR)) {
 	    if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-		actor->pecho( "Там закрыто." );
+		actor->pecho( "п╒п╟п╪ п╥п╟п╨я─я▀я┌п╬." );
 		return false;
 	    }
 	}
@@ -763,7 +763,7 @@ protected:
 	    return false;
 	    
 	if (!ExitsMovement::canMove( wch )) {
-	    actor->pecho( "Ты не сможешь протолкнуть %1$C4 в этом направлении.", ch );
+	    actor->pecho( "п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п©я─п╬я┌п╬п╩п╨п╫я┐я┌я▄ %1$C4 п╡ я█я┌п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦.", ch );
 	    return false;
 	}
 
@@ -776,7 +776,7 @@ protected:
 	    return true;
 
 	if (!ExitsMovement::tryMove( wch )) {
-	    actor->pecho( "Ты не сможешь протолкнуть %1$C4 в этом направлении.", ch );
+	    actor->pecho( "п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п©я─п╬я┌п╬п╩п╨п╫я┐я┌я▄ %1$C4 п╡ я█я┌п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦.", ch );
 	    return false;
 	}
 
@@ -797,18 +797,18 @@ protected:
 	
 	if (percent > gsn_push->getEffective( actor )) {
 	    fSuccess = false;
-	    actor->pecho( "Упс.." );
+	    actor->pecho( "пёп©я│.." );
 
 	    if (!IS_AFFECTED( ch, AFF_SLEEP )) {
 		ch->position = ch->position == POS_SLEEPING ? POS_STANDING: ch->position;
-		ch->pecho( "%1$^C1 пытается вытолкнуть тебя.", actor );
+		ch->pecho( "%1$^C1 п©я▀я┌п╟п╣я┌я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ я┌п╣п╠я▐.", actor );
 	    }
 
-	    actor->recho( ch, "%1$^C1 пытается вытолкнуть %2$C4.", actor, ch );
+	    actor->recho( ch, "%1$^C1 п©я▀я┌п╟п╣я┌я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ %2$C4.", actor, ch );
 
 	    if (IS_AWAKE( ch )) {
 		interpret_raw( ch, "yell",
-			       fmt( ch, "Держи свои руки подальше, %^C1!", actor ).c_str( ) );
+			       fmt( ch, "п■п╣я─п╤п╦ я│п╡п╬п╦ я─я┐п╨п╦ п©п╬п╢п╟п╩я▄я┬п╣, %^C1!", actor ).c_str( ) );
 
 		if (ch->is_npc( ))
 		    multi_hit( ch, actor );
@@ -829,9 +829,9 @@ protected:
     virtual void msgOnMove( Character *wch, bool fLeaving )
     {
 	if (fLeaving && wch == ch) {
-	    actor->pecho( "{YТы выталкиваешь %2$C4 %3$s.{x", actor, ch, dirs[door].leave );
-	    ch->pecho( "{Y%1$^C1 выталкивает тебя %3$s.{x", actor,  ch, dirs[door].leave );
-	    actor->recho( ch, "{Y%1$^C1 выталкивает %2$C4 %3$s.{x", actor, ch, dirs[door].leave );
+	    actor->pecho( "{Yп╒я▀ п╡я▀я┌п╟п╩п╨п╦п╡п╟п╣я┬я▄ %2$C4 %3$s.{x", actor, ch, dirs[door].leave );
+	    ch->pecho( "{Y%1$^C1 п╡я▀я┌п╟п╩п╨п╦п╡п╟п╣я┌ я┌п╣п╠я▐ %3$s.{x", actor,  ch, dirs[door].leave );
+	    actor->recho( ch, "{Y%1$^C1 п╡я▀я┌п╟п╩п╨п╦п╡п╟п╣я┌ %2$C4 %3$s.{x", actor, ch, dirs[door].leave );
 	}
 
 	ExitsMovement::msgOnMove( wch, fLeaving );
@@ -840,16 +840,16 @@ protected:
     bool checkWeb( )
     {
 	if (CAN_DETECT(actor, ADET_WEB)) {
-	    actor->pecho( "Ты в паутине!" );
-	    actor->recho( ch, "Путаясь в паутине, %1$^C1 глупо пытается вытолкнуть %2$C4.", actor, ch );
-	    ch->pecho( "Путаясь в паутине, %1$^C1 глупо пытается вытолкнуть тебя.", actor );
+	    actor->pecho( "п╒я▀ п╡ п©п╟я┐я┌п╦п╫п╣!" );
+	    actor->recho( ch, "п÷я┐я┌п╟я▐я│я▄ п╡ п©п╟я┐я┌п╦п╫п╣, %1$^C1 пЁп╩я┐п©п╬ п©я▀я┌п╟п╣я┌я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ %2$C4.", actor, ch );
+	    ch->pecho( "п÷я┐я┌п╟я▐я│я▄ п╡ п©п╟я┐я┌п╦п╫п╣, %1$^C1 пЁп╩я┐п©п╬ п©я▀я┌п╟п╣я┌я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ я┌п╣п╠я▐.", actor );
 	    return false;
 	}
 
 	if (CAN_DETECT(ch, ADET_WEB)) {
-	    actor->pecho( "Ты пытаешься вытолкнуть %2$C4, но паутина удерживает %2$P2 на месте.", actor, ch );
-	    actor->recho( ch, "%1$^C1 пытается вытолкнуть %2$C4, но паутина удерживает %2$P2 на месте.", actor, ch );
-	    ch->pecho( "%1$^C1 пытается вытолкнуть тебя, но паутина удерживает тебя на месте.", actor, ch );
+	    actor->pecho( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ %2$C4, п╫п╬ п©п╟я┐я┌п╦п╫п╟ я┐п╢п╣я─п╤п╦п╡п╟п╣я┌ %2$P2 п╫п╟ п╪п╣я│я┌п╣.", actor, ch );
+	    actor->recho( ch, "%1$^C1 п©я▀я┌п╟п╣я┌я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ %2$C4, п╫п╬ п©п╟я┐я┌п╦п╫п╟ я┐п╢п╣я─п╤п╦п╡п╟п╣я┌ %2$P2 п╫п╟ п╪п╣я│я┌п╣.", actor, ch );
+	    ch->pecho( "%1$^C1 п©я▀я┌п╟п╣я┌я│я▐ п╡я▀я┌п╬п╩п╨п╫я┐я┌я▄ я┌п╣п╠я▐, п╫п╬ п©п╟я┐я┌п╦п╫п╟ я┐п╢п╣я─п╤п╦п╡п╟п╣я┌ я┌п╣п╠я▐ п╫п╟ п╪п╣я│я┌п╣.", actor, ch );
 	    return false;
 	}
 
@@ -859,12 +859,12 @@ protected:
     bool checkActor( )
     {
 	if (MOUNTED(actor)) {
-	    actor->pecho( "Ты не можешь толкнуть кого-то, сидя в седле." );
+	    actor->pecho( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┌п╬п╩п╨п╫я┐я┌я▄ п╨п╬пЁп╬-я┌п╬, я│п╦п╢я▐ п╡ я│п╣п╢п╩п╣." );
 	    return false;
 	}
 	
 	if (RIDDEN(actor)) {
-	    actor->pecho( "Ты не можешь толкнуть кого-то, пока ты оседла%1$Gно|н|на.", actor );
+	    actor->pecho( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┌п╬п╩п╨п╫я┐я┌я▄ п╨п╬пЁп╬-я┌п╬, п©п╬п╨п╟ я┌я▀ п╬я│п╣п╢п╩п╟%1$Gп╫п╬|п╫|п╫п╟.", actor );
 	    return false;
 	}
 
@@ -874,12 +874,12 @@ protected:
     bool checkVictim( )
     {
 	if (!ch->is_npc( ) && ch->desc == 0) {
-	    actor->pecho( "Ты не можешь сделать этого." );
+	    actor->pecho( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬." );
 	    return false;
 	}
 
 	if (actor == ch) {
-	    actor->pecho( "Это бесполезно." );
+	    actor->pecho( "п╜я┌п╬ п╠п╣я│п©п╬п╩п╣п╥п╫п╬." );
 	    return false;
 	}
 	
@@ -887,7 +887,7 @@ protected:
 	    return false;
 
 	if (ch->position == POS_FIGHTING) {
-	    actor->pecho( "Подожди, пока закончится сражение." );
+	    actor->pecho( "п÷п╬п╢п╬п╤п╢п╦, п©п╬п╨п╟ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐ я│я─п╟п╤п╣п╫п╦п╣." );
 	    return false;
 	}
 
@@ -911,17 +911,17 @@ SKILL_RUNP( push )
     argument = one_argument( argument, arg2 );
 
     if (ch->is_npc() || !gsn_push->usable( ch )) {
-	ch->send_to("Кажется, ты не умеешь толкать?\n\r");
+	ch->send_to("п п╟п╤п╣я┌я│я▐, я┌я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ я┌п╬п╩п╨п╟я┌я▄?\n\r");
 	return;
     }
 
     if (arg1[0] == '\0' || arg2[0] == '\0') {
-	ch->send_to("Вытолкнуть кого и куда?\n\r");
+	ch->send_to("п▓я▀я┌п╬п╩п╨п╫я┐я┌я▄ п╨п╬пЁп╬ п╦ п╨я┐п╢п╟?\n\r");
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg1 ) ) == 0 ) {
-	ch->send_to("Здесь таких нет.\n\r");
+	ch->send_to("п≈п╢п╣я│я▄ я┌п╟п╨п╦я┘ п╫п╣я┌.\n\r");
 	return;
     }
 
@@ -944,32 +944,32 @@ SKILL_RUNP( backstab )
 
     if ( MOUNTED(ch) )
     {
-	    ch->send_to("Ты не можешь ударить сзади, если ты верхом!\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐п╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦, п╣я│п╩п╦ я┌я▀ п╡п╣я─я┘п╬п╪!\n\r");
 	    return;
     }
 
     if (gsn_backstab->getEffective( ch ) <= 1)
     {
-	    ch->send_to("Ты не знаешь, КАК ударить сзади.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╥п╫п╟п╣я┬я▄, п п░п  я┐п╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦.\n\r");
 	    return;
     }
 
     if ( arg[0] == '\0' )
     {
-	    ch->send_to("Ударить сзади? Кого?\n\r");
+	    ch->send_to("пёп╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦? п п╬пЁп╬?\n\r");
 	    return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-	    ch->send_to("Этого нет здесь.\n\r");
+	    ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	    return;
     }
 
     
     if ( victim == ch )
     {
-	    ch->send_to("Как ты можешь ударить сзади себя?\n\r");
+	    ch->send_to("п п╟п╨ я┌я▀ п╪п╬п╤п╣я┬я▄ я┐п╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦ я│п╣п╠я▐?\n\r");
 	    return;
     }
 
@@ -980,26 +980,26 @@ SKILL_RUNP( backstab )
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0 )
     {
-	    act_p("Ты долж$gно|ен|на быть вооруже$gно|н|на, чтоб ударить сзади.",
+	    act_p("п╒я▀ п╢п╬п╩п╤$gп╫п╬|п╣п╫|п╫п╟ п╠я▀я┌я▄ п╡п╬п╬я─я┐п╤п╣$gп╫п╬|п╫|п╫п╟, я┤я┌п╬п╠ я┐п╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦.",
 		    ch,0,0,TO_CHAR,POS_RESTING);
 	    return;
     }
 
     if ( attack_table[obj->value[3]].damage != DAM_PIERCE )
     {
-	    ch->send_to("Чтоб ударить сзади, нужно вооружится колющим оружием.\n\r");
+	    ch->send_to("п╖я┌п╬п╠ я┐п╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦, п╫я┐п╤п╫п╬ п╡п╬п╬я─я┐п╤п╦я┌я│я▐ п╨п╬п╩я▌я┴п╦п╪ п╬я─я┐п╤п╦п╣п╪.\n\r");
 	    return;
     }
 
     if ( victim->fighting != 0 )
     {
-	    ch->send_to("Ты не можешь ударить сзади того, кто уже сражается.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐п╢п╟я─п╦я┌я▄ я│п╥п╟п╢п╦ я┌п╬пЁп╬, п╨я┌п╬ я┐п╤п╣ я│я─п╟п╤п╟п╣я┌я│я▐.\n\r");
 	    return;
     }
 
     if ( ch->fighting != 0 )
     {
-	    ch->send_to("Тебе некогда подкрадываться к противнику - ты сражаешься!\n\r");
+	    ch->send_to("п╒п╣п╠п╣ п╫п╣п╨п╬пЁп╢п╟ п©п╬п╢п╨я─п╟п╢я▀п╡п╟я┌я▄я│я▐ п╨ п©я─п╬я┌п╦п╡п╫п╦п╨я┐ - я┌я▀ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
 	    return;
     }
 
@@ -1008,14 +1008,14 @@ SKILL_RUNP( backstab )
     if ( victim->hit < (0.7 * victim->max_hit)
 	    && (IS_AWAKE(victim) ) )
     {
-	    act_p( "$C1 бол$Gьно|ен|ьна и подозрител$Gьно|ен|ьна ... ты не можешь незаметно подкрасться к не$Gму|му|й.",
+	    act_p( "$C1 п╠п╬п╩$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п╦ п©п╬п╢п╬п╥я─п╦я┌п╣п╩$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ ... я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╣п╥п╟п╪п╣я┌п╫п╬ п©п╬п╢п╨я─п╟я│я┌я▄я│я▐ п╨ п╫п╣$Gп╪я┐|п╪я┐|п╧.",
 		    ch, 0, victim, TO_CHAR,POS_RESTING);
 	    return;
     }
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-	    act_p( "$C1 беспокойно озирается по сторонам... ты не сможешь незаметно подкрасться.",
+	    act_p( "$C1 п╠п╣я│п©п╬п╨п╬п╧п╫п╬ п╬п╥п╦я─п╟п╣я┌я│я▐ п©п╬ я│я┌п╬я─п╬п╫п╟п╪... я┌я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╫п╣п╥п╟п╪п╣я┌п╫п╬ п©п╬п╢п╨я─п╟я│я┌я▄я│я▐.",
 		    ch, 0, victim, TO_CHAR,POS_RESTING);
 	    return;
     }
@@ -1059,8 +1059,8 @@ SKILL_RUNP( backstab )
 	}
 	
 	yell_panic( ch, victim,
-	            "Помогите! Кто-то ударил меня сзади!",
-		    "Помогите! %1$^C1 удари%1$Gло|л|ла меня в спину!" );
+	            "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ я┐п╢п╟я─п╦п╩ п╪п╣п╫я▐ я│п╥п╟п╢п╦!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я┐п╢п╟я─п╦%1$Gп╩п╬|п╩|п╩п╟ п╪п╣п╫я▐ п╡ я│п©п╦п╫я┐!" );
     }
     catch (const VictimDeathException& e) {
     }
@@ -1078,26 +1078,26 @@ SKILL_RUNP( circle )
 
     if ( MOUNTED(ch) )
     {
-	    ch->send_to("Только не верхом!\n\r");
+	    ch->send_to("п╒п╬п╩я▄п╨п╬ п╫п╣ п╡п╣я─я┘п╬п╪!\n\r");
 	    return;
     }
 
     if ( ch->is_npc() || !gsn_circle->usable( ch ) )
     {
-	    ch->send_to("Ты не владеешь круговым ударом.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╡п╩п╟п╢п╣п╣я┬я▄ п╨я─я┐пЁп╬п╡я▀п╪ я┐п╢п╟я─п╬п╪.\n\r");
 	    return;
     }
 
     if ( ( victim = ch->fighting ) == 0 )
     {
-	    ch->send_to("Сейчас ты не сражаешься.\n\r");
+	    ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐.\n\r");
 	    return;
     }
 
     if ( get_eq_char(ch,wear_wield) == 0
 	    || attack_table[get_eq_char(ch,wear_wield)->value[3]].damage != DAM_PIERCE)
     {
-	    ch->send_to("Вооружись для этого колющим оружием.\n\r");
+	    ch->send_to("п▓п╬п╬я─я┐п╤п╦я│я▄ п╢п╩я▐ я█я┌п╬пЁп╬ п╨п╬п╩я▌я┴п╦п╪ п╬я─я┐п╤п╦п╣п╪.\n\r");
 	    return;
     }
 
@@ -1110,7 +1110,7 @@ SKILL_RUNP( circle )
     {
 	    if (person->fighting == ch)
 	    {
-		    ch->send_to("Ты не можешь сделать это, защищаясь от ударов.\n\r");
+		    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬, п╥п╟я┴п╦я┴п╟я▐я│я▄ п╬я┌ я┐п╢п╟я─п╬п╡.\n\r");
 		    return;
 	    }
     }
@@ -1145,43 +1145,43 @@ SKILL_RUNP( blackjack )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Только не верхом!\n\r");
+		ch->send_to("п╒п╬п╩я▄п╨п╬ п╫п╣ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	}
 
 	if (!gsn_blackjack->usable( ch ) )
 	{
-		ch->send_to("У тебя нет мешочка.\n\r");
+		ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ п╪п╣я┬п╬я┤п╨п╟.\n\r");
 		return;
 	}
 
 	if ( (victim = get_char_room(ch,argument)) == 0 )
 	{
-		ch->send_to("Здесь таких нет.\n\r");
+		ch->send_to("п≈п╢п╣я│я▄ я┌п╟п╨п╦я┘ п╫п╣я┌.\n\r");
 		return;
 	}
 
 	if ( ch == victim )
 	{
-		ch->send_to("Не надо.. можешь потерять сознание.\n\r");
+		ch->send_to("п²п╣ п╫п╟п╢п╬.. п╪п╬п╤п╣я┬я▄ п©п╬я┌п╣я─я▐я┌я▄ я│п╬п╥п╫п╟п╫п╦п╣.\n\r");
 		return;
 	}
 
 	if ( victim->fighting )
 	{
-		ch->send_to("Подожди пока закончится сражение.\n\r");
+		ch->send_to("п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐ я│я─п╟п╤п╣п╫п╦п╣.\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED( ch, AFF_CHARM ) )
 	{
-		ch->send_to( "Ты же не хочешь ударить по голове своего любимого хозяина?\n\r");
+		ch->send_to( "п╒я▀ п╤п╣ п╫п╣ я┘п╬я┤п╣я┬я▄ я┐п╢п╟я─п╦я┌я▄ п©п╬ пЁп╬п╩п╬п╡п╣ я│п╡п╬п╣пЁп╬ п╩я▌п╠п╦п╪п╬пЁп╬ я┘п╬п╥я▐п╦п╫п╟?\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED(victim,AFF_SLEEP) )
 	{
-		act_p("$E уже спит.",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("$E я┐п╤п╣ я│п©п╦я┌.",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
@@ -1218,11 +1218,11 @@ SKILL_RUNP( blackjack )
 
 	if (number_percent() < chance * k / 100)
 	{
-		act_p("Ты бьешь $C4 по голове мешочком со свинцом.",
+		act_p("п╒я▀ п╠я▄п╣я┬я▄ $C4 п©п╬ пЁп╬п╩п╬п╡п╣ п╪п╣я┬п╬я┤п╨п╬п╪ я│п╬ я│п╡п╦п╫я├п╬п╪.",
 			ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("Ты чувствуешь внезапную боль в черепе!",
+		act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╡п╫п╣п╥п╟п©п╫я┐я▌ п╠п╬п╩я▄ п╡ я┤п╣я─п╣п©п╣!",
 	       ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*",
+		act_p("$c1 п╠я▄п╣я┌ $C4 я│п╥п╟п╢п╦ п©п╬ пЁп╬п╩п╬п╡п╣ я┌я▐п╤п╣п╩я▀п╪ п╪п╣я┬п╬я┤п╨п╬п╪! *OUCH*",
 	       ch,0,victim,TO_NOTVICT,POS_RESTING);
 		gsn_blackjack->improve( ch, true, victim );
 	
@@ -1246,8 +1246,8 @@ SKILL_RUNP( blackjack )
 		gsn_blackjack->improve( ch, false, victim );
 
 		yell_panic( ch, victim,
-			    "Помогите! Меня кто-то ударил по голове!",
-			    "Помогите! %1$^C1 удари%1$Gло|л|ла меня по голове!" );
+			    "п÷п╬п╪п╬пЁп╦я┌п╣! п°п╣п╫я▐ п╨я┌п╬-я┌п╬ я┐п╢п╟я─п╦п╩ п©п╬ пЁп╬п╩п╬п╡п╣!",
+			    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я┐п╢п╟я─п╦%1$Gп╩п╬|п╩|п╩п╟ п╪п╣п╫я▐ п©п╬ пЁп╬п╩п╬п╡п╣!" );
 	}
 }
 
@@ -1263,39 +1263,39 @@ SKILL_RUNP( knife )
     int chance;
     
     if (!gsn_knife->usable( ch )) {
-	ch->send_to("Аккуратней, смотри не порежься.\r\n");
+	ch->send_to("п░п╨п╨я┐я─п╟я┌п╫п╣п╧, я│п╪п╬я┌я─п╦ п╫п╣ п©п╬я─п╣п╤я▄я│я▐.\r\n");
 	return;
     }
 
     one_argument(argument, arg);
 
     if (arg[0] == '\0') {
-	ch->send_to("Пырнуть ножом кого?\r\n");
+	ch->send_to("п÷я▀я─п╫я┐я┌я▄ п╫п╬п╤п╬п╪ п╨п╬пЁп╬?\r\n");
 	return;
     }
 
     if ((knife = get_eq_char(ch, wear_wield)) == NULL) {
-	ch->send_to("Вооружись для начала.\r\n");
+	ch->send_to("п▓п╬п╬я─я┐п╤п╦я│я▄ п╢п╩я▐ п╫п╟я┤п╟п╩п╟.\r\n");
 	return;
     }
 
     if (knife->value[0] != WEAPON_DAGGER) {
-	ch->send_to("Для этого тебе нужен кинжал.\r\n");
+	ch->send_to("п■п╩я▐ я█я┌п╬пЁп╬ я┌п╣п╠п╣ п╫я┐п╤п╣п╫ п╨п╦п╫п╤п╟п╩.\r\n");
 	return;
     }
 
     if ((victim = get_char_room(ch, arg)) == NULL) {
-	ch->send_to("Нет таких здесь.\r\n");
+	ch->send_to("п²п╣я┌ я┌п╟п╨п╦я┘ п╥п╢п╣я│я▄.\r\n");
 	return;
     }
 
     if (ch == victim) {
-	ch->send_to("У тебя боязнь себя?\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╠п╬я▐п╥п╫я▄ я│п╣п╠я▐?\n\r");
 	return;
     }
 
     if (victim->fighting != NULL) {
-	ch->send_to("Подожди, пока закончится сражение.\r\n");
+	ch->send_to("п÷п╬п╢п╬п╤п╢п╦, п©п╬п╨п╟ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐ я│я─п╟п╤п╣п╫п╦п╣.\r\n");
 	return;
     }
 
@@ -1318,8 +1318,8 @@ SKILL_RUNP( knife )
 	}
 
 	yell_panic( ch, victim,
-	            "Помогите! Кто-то пырнул меня ножом!",
-		    "Помогите! %1$^C1 пырну%1$Gло|л|ла меня ножом!" );
+	            "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ п©я▀я─п╫я┐п╩ п╪п╣п╫я▐ п╫п╬п╤п╬п╪!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 п©я▀я─п╫я┐%1$Gп╩п╬|п╩|п╩п╟ п╪п╣п╫я▐ п╫п╬п╤п╬п╪!" );
     }
     catch (const VictimDeathException &e) {
     }
@@ -1336,12 +1336,12 @@ SKILL_RUNP( forge )
     Object *key, *blank;
     
     if (!gsn_key_forgery->usable( ch )) {
-	ch->println( "Эти трюки не для тебя." );
+	ch->println( "п╜я┌п╦ я┌я─я▌п╨п╦ п╫п╣ п╢п╩я▐ я┌п╣п╠я▐." );
 	return;
     }
 
     if (( arg = args.getOneArgument( ) ).empty( )) {
-	ch->println( "Подделать что?" );
+	ch->println( "п÷п╬п╢п╢п╣п╩п╟я┌я▄ я┤я┌п╬?" );
 	return;
     }
     
@@ -1351,12 +1351,12 @@ SKILL_RUNP( forge )
 	;
     
     if (!blank) {
-	ch->println( "Тебе понадобится заготовка, чтобы создать дубликат или отмычку." );
+	ch->println( "п╒п╣п╠п╣ п©п╬п╫п╟п╢п╬п╠п╦я┌я│я▐ п╥п╟пЁп╬я┌п╬п╡п╨п╟, я┤я┌п╬п╠я▀ я│п╬п╥п╢п╟я┌я▄ п╢я┐п╠п╩п╦п╨п╟я┌ п╦п╩п╦ п╬я┌п╪я▀я┤п╨я┐." );
 	return;
     }
 
     if (ch->mana < gsn_key_forgery->getMana( )) {
-	ch->println( "У тебя не хватает сил для такой тонкой работы." );
+	ch->println( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩ п╢п╩я▐ я┌п╟п╨п╬п╧ я┌п╬п╫п╨п╬п╧ я─п╟п╠п╬я┌я▀." );
 	return;
     }
 
@@ -1365,22 +1365,22 @@ SKILL_RUNP( forge )
      */
     if (( key = get_obj_list_type( ch, arg, ITEM_KEY, ch->carrying ))) {
 	Object *dup;
-	static const char * DUP_NAMES = "дубликат duplicate %s";
-	static const char * DUP_SHORT = "дубликат||а|у||ом|е %s";
-	static const char * DUP_LONG  = "Дубликат %s лежит тут.";
+	static const char * DUP_NAMES = "п╢я┐п╠п╩п╦п╨п╟я┌ duplicate %s";
+	static const char * DUP_SHORT = "п╢я┐п╠п╩п╦п╨п╟я┌||п╟|я┐||п╬п╪|п╣ %s";
+	static const char * DUP_LONG  = "п■я┐п╠п╩п╦п╨п╟я┌ %s п╩п╣п╤п╦я┌ я┌я┐я┌.";
 
 	if (!( keyhole = Keyhole::locate( ch, key ) )) {
-	    ch->println( "Непонятно, что же открывает этот ключ." );
+	    ch->println( "п²п╣п©п╬п╫я▐я┌п╫п╬, я┤я┌п╬ п╤п╣ п╬я┌п╨я─я▀п╡п╟п╣я┌ я█я┌п╬я┌ п╨п╩я▌я┤." );
 	    return;
 	}
 	
 	if (!keyhole->isLockable( )) {
-	    ch->println( "Это ключ от сломанного замка." );
+	    ch->println( "п╜я┌п╬ п╨п╩я▌я┤ п╬я┌ я│п╩п╬п╪п╟п╫п╫п╬пЁп╬ п╥п╟п╪п╨п╟." );
 	    return;
 	}
 	
 	if (keyhole->isPickProof( )) {
-	    ch->println( "Это ключ от замка, который невозможно взломать. Увы.." );
+	    ch->println( "п╜я┌п╬ п╨п╩я▌я┤ п╬я┌ п╥п╟п╪п╨п╟, п╨п╬я┌п╬я─я▀п╧ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╡п╥п╩п╬п╪п╟я┌я▄. пёп╡я▀.." );
 	    return;
 	}
 	
@@ -1388,7 +1388,7 @@ SKILL_RUNP( forge )
 	ch->mana -= gsn_key_forgery->getMana( );
 
 	if (number_percent( ) >= gsn_key_forgery->getEffective( ch )) {
-	    act( "Тебе не удалось точно передать рисунок бороздок $o2.", ch, key, 0, TO_CHAR );
+	    act( "п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ я┌п╬я┤п╫п╬ п©п╣я─п╣п╢п╟я┌я▄ я─п╦я│я┐п╫п╬п╨ п╠п╬я─п╬п╥п╢п╬п╨ $o2.", ch, key, 0, TO_CHAR );
 	    gsn_key_forgery->improve( ch, false );
 	    return;
 	}
@@ -1406,8 +1406,8 @@ SKILL_RUNP( forge )
 	dup->value[1] = 1;
 	obj_to_char( dup, ch );
 	
-	act( "Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
-	act( "$c1 изготавливает $o4.", ch, key, 0, TO_ROOM );
+	act( "п╒я▀ п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┬я▄ $o4 п╦п╥ $O2.", ch, dup, blank, TO_CHAR );
+	act( "$c1 п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┌ $o4.", ch, key, 0, TO_ROOM );
 
 	gsn_key_forgery->improve( ch, true );
 	extract_obj( blank );
@@ -1418,18 +1418,18 @@ SKILL_RUNP( forge )
      * create lockpick for a keyhole
      */
     if (( keyhole = Keyhole::create( ch, arg ) )) {
-	static const char * LOCK_NAMES = "отмычка lockpick";
-	static const char * LOCK_SHORT = "фирменн|ая|ой|ой|ую|ой|ой отмычк|а|и|е|у|ой|е %1$#^C2";
-	static const char * LOCK_LONG  = "Фирменная отмычка (lockpick) %1$#^C2 оставлена тут хозя%1$#Gином|ином|йкой.";
-	static const char * LOCK_EXTRA = "Эта отмычка из 'Фирменного набора %1$#^C2' подходит для замка\n";
+	static const char * LOCK_NAMES = "п╬я┌п╪я▀я┤п╨п╟ lockpick";
+	static const char * LOCK_SHORT = "я└п╦я─п╪п╣п╫п╫|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧ п╬я┌п╪я▀я┤п╨|п╟|п╦|п╣|я┐|п╬п╧|п╣ %1$#^C2";
+	static const char * LOCK_LONG  = "п╓п╦я─п╪п╣п╫п╫п╟я▐ п╬я┌п╪я▀я┤п╨п╟ (lockpick) %1$#^C2 п╬я│я┌п╟п╡п╩п╣п╫п╟ я┌я┐я┌ я┘п╬п╥я▐%1$#Gп╦п╫п╬п╪|п╦п╫п╬п╪|п╧п╨п╬п╧.";
+	static const char * LOCK_EXTRA = "п╜я┌п╟ п╬я┌п╪я▀я┤п╨п╟ п╦п╥ 'п╓п╦я─п╪п╣п╫п╫п╬пЁп╬ п╫п╟п╠п╬я─п╟ %1$#^C2' п©п╬п╢я┘п╬п╢п╦я┌ п╢п╩я▐ п╥п╟п╪п╨п╟\n";
 
 	if (!keyhole->isLockable( )) {
-	    ch->println( "Здесь нет замочной скважины." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 	    return;
 	}
 
 	if (keyhole->isPickProof( )) {
-	    ch->println( "Этот замок защищен от взлома." );
+	    ch->println( "п╜я┌п╬я┌ п╥п╟п╪п╬п╨ п╥п╟я┴п╦я┴п╣п╫ п╬я┌ п╡п╥п╩п╬п╪п╟." );
 	    return;
 	}
 	
@@ -1437,13 +1437,13 @@ SKILL_RUNP( forge )
 	ch->mana -= gsn_key_forgery->getMana( );
 
 	if (number_percent( ) >= gsn_key_forgery->getEffective( ch )) {
-	    act( "Твои попытки превратить $o4 в отмычку к этому замку ни к чему не привели.", ch, blank, 0, TO_CHAR );
+	    act( "п╒п╡п╬п╦ п©п╬п©я▀я┌п╨п╦ п©я─п╣п╡я─п╟я┌п╦я┌я▄ $o4 п╡ п╬я┌п╪я▀я┤п╨я┐ п╨ я█я┌п╬п╪я┐ п╥п╟п╪п╨я┐ п╫п╦ п╨ я┤п╣п╪я┐ п╫п╣ п©я─п╦п╡п╣п╩п╦.", ch, blank, 0, TO_CHAR );
 	    gsn_key_forgery->improve( ch, false );
 	    return;
 	}
 	
-	act( "$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
-	act( "$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
+	act( "$o1 п╡ я┌п╡п╬п╦я┘ я┐п╪п╣п╩я▀я┘ я─я┐п╨п╟я┘ п©п╬я│я┌п╣п©п╣п╫п╫п╬ п©я─п╣п╡я─п╟я┴п╟п╣я┌я│я▐ п╡ п╬я┌п╪я▀я┤п╨я┐ п╢п╩я▐ $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
+	act( "$c1 п©я─п╬п╢п╣п╩я▀п╡п╟п╣я┌ п╪п╟п╫п╦п©я┐п╩я▐я├п╦п╦ я│ $o5.", ch, blank, 0, TO_ROOM );
 	
 	blank->setOwner( ch->getName( ).c_str( ) );
 	blank->setName( LOCK_NAMES );
@@ -1459,6 +1459,6 @@ SKILL_RUNP( forge )
 	return;
     }
 
-    ch->println( "У тебя нет такого ключа, и здесь нет такой замочной скважины." );
+    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╟п╨п╬пЁп╬ п╨п╩я▌я┤п╟, п╦ п╥п╢п╣я│я▄ п╫п╣я┌ я┌п╟п╨п╬п╧ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 }
 

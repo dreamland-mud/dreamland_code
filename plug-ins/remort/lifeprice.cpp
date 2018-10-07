@@ -8,8 +8,8 @@
 /*----------------------------------------------------------------------
  * LifePrice 
  *---------------------------------------------------------------------*/
-const DLString LifePrice::LIFE_ONE = "прожит|ая|ой|ой|ую|ой|ой жизн|ь|и|и|ь|ью|и";
-const DLString LifePrice::LIFE_MANY = "прожит|ые|ых|ым|ые|ыми|ых жизн|и|ей|ям|и|ями|ях";
+const DLString LifePrice::LIFE_ONE = "п©я─п╬п╤п╦я┌|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧ п╤п╦п╥п╫|я▄|п╦|п╦|я▄|я▄я▌|п╦";
+const DLString LifePrice::LIFE_MANY = "п©я─п╬п╤п╦я┌|я▀п╣|я▀я┘|я▀п╪|я▀п╣|я▀п╪п╦|я▀я┘ п╤п╦п╥п╫|п╦|п╣п╧|я▐п╪|п╦|я▐п╪п╦|я▐я┘";
 
 DLString LifePrice::toCurrency( ) const
 {
@@ -21,7 +21,7 @@ DLString LifePrice::toString( Character * ) const
     DLString str;
     int p = points.getValue( ) / Remorts::POINT_PER_LIFE;
     
-    str << (p == 0 ? "пол" : p == 1 ? "одну" : DLString( p ))
+    str << (p == 0 ? "п©п╬п╩" : p == 1 ? "п╬п╢п╫я┐" : DLString( p ))
         << " "
 	<< (p == 0 ? LIFE_ONE.ruscase( '2' ) : p == 1 ? LIFE_ONE : LIFE_MANY);
 

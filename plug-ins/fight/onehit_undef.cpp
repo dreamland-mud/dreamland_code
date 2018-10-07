@@ -65,7 +65,7 @@ bool UndefinedOneHit::canDamage( )
 
     if (ch != victim) {
 	if (victim->is_mirror( )) {
-	    act_p("$c1 разбивается на мелкие осколки.",victim,0,0,TO_ROOM,POS_RESTING);
+	    act_p("$c1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.",victim,0,0,TO_ROOM,POS_RESTING);
 	    extract_char(victim);
 	    return false;
 	}
@@ -172,19 +172,19 @@ void UndefinedOneHit::message( )
 
     if (immune) {
 	if (ch == victim) {
-	    msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна против %2$P4 сам%2$Gого|ого|ой|их", &noun, ch);
-	    msgChar("Тебе повезло, у тебя иммунитет к этому");
+	    msgRoom("%1$^O1 %2$C2 п╠п╣я│я│п╦п╩%1$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п©я─п╬я┌п╦п╡ %2$P4 я│п╟п╪%2$Gп╬пЁп╬|п╬пЁп╬|п╬п╧|п╦я┘", &noun, ch);
+	    msgChar("п╒п╣п╠п╣ п©п╬п╡п╣п╥п╩п╬, я┐ я┌п╣п╠я▐ п╦п╪п╪я┐п╫п╦я┌п╣я┌ п╨ я█я┌п╬п╪я┐");
 	}
 	else {
-	    msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна против %3$C2", &noun, ch, victim);
-	    msgChar("%1$^T1 %1$O1 бессил%1$Gьно|ен|ьна против %2$C2", &noun, victim);
-	    msgVict("Против тебя %2$O1 %1$C2 бессил%2$Gьно|ен|ьна", ch, &noun);
+	    msgRoom("%1$^O1 %2$C2 п╠п╣я│я│п╦п╩%1$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п©я─п╬я┌п╦п╡ %3$C2", &noun, ch, victim);
+	    msgChar("%1$^T1 %1$O1 п╠п╣я│я│п╦п╩%1$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п©я─п╬я┌п╦п╡ %2$C2", &noun, victim);
+	    msgVict("п÷я─п╬я┌п╦п╡ я┌п╣п╠я▐ %2$O1 %1$C2 п╠п╣я│я│п╦п╩%2$Gя▄п╫п╬|п╣п╫|я▄п╫п╟", ch, &noun);
 	}
     }
     else {
 	if (ch == victim) {
-	    msgRoom( "%1$^O1 %2$C2\6себя", &noun, ch );
-	    msgChar( "%1$^T1 %1$O1\6тебя", &noun );
+	    msgRoom( "%1$^O1 %2$C2\6я│п╣п╠я▐", &noun, ch );
+	    msgChar( "%1$^T1 %1$O1\6я┌п╣п╠я▐", &noun );
 	}
 	else {
 	    if ( dam == 0 )
@@ -196,7 +196,7 @@ void UndefinedOneHit::message( )
 		msgRoom( "%1$^O1 %2$C2\6%3$C4", &noun, ch, victim );
 		msgChar( "%1$^T1 %1$O1\6%2$C4", &noun, victim );
 	    }
-	    msgVict( "%1$^O1 %2$C2\6тебя", &noun, ch );
+	    msgVict( "%1$^O1 %2$C2\6я┌п╣п╠я▐", &noun, ch );
 	}
     }
 }
@@ -219,15 +219,15 @@ bool UndefinedOneHit::defenseBatSworm( )
 	return false;
 
     if (SHADOW(victim)) {
-	msgFightVict( "Стая летучих мышей вокруг тебя сбита с толку твоей тенью." );
-	msgFightChar( "Стая летучих мышей вокруг %2$C2 сбита с толку тенью." );
-	msgFightRoom( "Стая летучих мышей вокруг %2$C2 сбита с толку тенью." );
+	msgFightVict( "п║я┌п╟я▐ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п╡п╬п╨я─я┐пЁ я┌п╣п╠я▐ я│п╠п╦я┌п╟ я│ я┌п╬п╩п╨я┐ я┌п╡п╬п╣п╧ я┌п╣п╫я▄я▌." );
+	msgFightChar( "п║я┌п╟я▐ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п╡п╬п╨я─я┐пЁ %2$C2 я│п╠п╦я┌п╟ я│ я┌п╬п╩п╨я┐ я┌п╣п╫я▄я▌." );
+	msgFightRoom( "п║я┌п╟я▐ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п╡п╬п╨я─я┐пЁ %2$C2 я│п╠п╦я┌п╟ я│ я┌п╬п╩п╨я┐ я┌п╣п╫я▄я▌." );
 	return false;
     }
     
-    msgFightChar( "Ты не смо%1$Gгло|г|гла пробиться сквозь стаю летучих мышей, кружащихся вокруг %2$C2.");
-    msgFightVict( "Стая летучих мышей не позволяет %1$C3 повредить тебе." );
-    msgFightRoom( "%1$^C1 пытается разогнать стаю летучих мышей вокруг %2$C2." );
+    msgFightChar( "п╒я▀ п╫п╣ я│п╪п╬%1$GпЁп╩п╬|пЁ|пЁп╩п╟ п©я─п╬п╠п╦я┌я▄я│я▐ я│п╨п╡п╬п╥я▄ я│я┌п╟я▌ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧, п╨я─я┐п╤п╟я┴п╦я┘я│я▐ п╡п╬п╨я─я┐пЁ %2$C2.");
+    msgFightVict( "п║я┌п╟я▐ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п╫п╣ п©п╬п╥п╡п╬п╩я▐п╣я┌ %1$C3 п©п╬п╡я─п╣п╢п╦я┌я▄ я┌п╣п╠п╣." );
+    msgFightRoom( "%1$^C1 п©я▀я┌п╟п╣я┌я│я▐ я─п╟п╥п╬пЁп╫п╟я┌я▄ я│я┌п╟я▌ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п╡п╬п╨я─я┐пЁ %2$C2." );
 
     return true;
 }
@@ -288,9 +288,9 @@ bool UndefinedOneHit::defenseParry( )
 
     if(SHADOW(victim))
     {
-	msgFightVict( "Ты пытаешься парировать атаку, но путаешься в своей тени." );
-	msgFightChar( "%2$^C1 постоянно путается в своей тени." );
-	msgFightRoom( "%2$^C1 постоянно путается в своей тени." );
+	msgFightVict( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п©п╟я─п╦я─п╬п╡п╟я┌я▄ п╟я┌п╟п╨я┐, п╫п╬ п©я┐я┌п╟п╣я┬я▄я│я▐ п╡ я│п╡п╬п╣п╧ я┌п╣п╫п╦." );
+	msgFightChar( "%2$^C1 п©п╬я│я┌п╬я▐п╫п╫п╬ п©я┐я┌п╟п╣я┌я│я▐ п╡ я│п╡п╬п╣п╧ я┌п╣п╫п╦." );
+	msgFightRoom( "%2$^C1 п©п╬я│я┌п╬я▐п╫п╫п╬ п©я┐я┌п╟п╣я┌я│я▐ п╡ я│п╡п╬п╣п╧ я┌п╣п╫п╦." );
 	return false;
     }
     
@@ -302,20 +302,20 @@ bool UndefinedOneHit::defenseParry( )
 	msgFightVict( "%3$^O1 passes straight through your attempt to parry!" );
 	
 	if (defending_weapon) {
-	    msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
-	    msgFightRoom( "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!" );
+	    msgFightChar( "%3$^O1 п©я─п╬я┘п╬п╢п╦я┌ я│п╨п╡п╬п╥я▄ п╬я─я┐п╤п╦п╣ %2$C2!" );
+	    msgFightRoom( "%3$^O1 %1$C2 п©я─п╬я┘п╬п╢п╦я┌ я│п╨п╡п╬п╥я▄ п╬я─я┐п╤п╦п╣ %2$C2!" );
 	}
 	else {
-	    msgFightChar( "%3$^O1 проходит сквозь руки %2$C2!" );
-	    msgFightRoom( "%3$^O1 %1$C2 проходит сквозь руки %2$C2!" );
+	    msgFightChar( "%3$^O1 п©я─п╬я┘п╬п╢п╦я┌ я│п╨п╡п╬п╥я▄ я─я┐п╨п╦ %2$C2!" );
+	    msgFightRoom( "%3$^O1 %1$C2 п©я─п╬я┘п╬п╢п╦я┌ я│п╨п╡п╬п╥я▄ я─я┐п╨п╦ %2$C2!" );
 	}
 
         return false;
     }
 
-    msgFightVict( "Ты парируешь атаку %1$C2." );
-    msgFightChar( "%2$^C1 парирует твою атаку." );
-    msgFightRoom( "%2$^C1 парирует атаку %1$C2." );
+    msgFightVict( "п╒я▀ п©п╟я─п╦я─я┐п╣я┬я▄ п╟я┌п╟п╨я┐ %1$C2." );
+    msgFightChar( "%2$^C1 п©п╟я─п╦я─я┐п╣я┌ я┌п╡п╬я▌ п╟я┌п╟п╨я┐." );
+    msgFightRoom( "%2$^C1 п©п╟я─п╦я─я┐п╣я┌ п╟я┌п╟п╨я┐ %1$C2." );
 
     destroyWeapon( );
 
@@ -350,10 +350,10 @@ bool UndefinedOneHit::defenseParry( )
 	/* now the attack */
 	if (number_percent() < ( chance / 20  ))
 	{
-	    act("Ты не можешь устоять на ногах!",ch,0,victim,TO_VICT);
-	    act("Ты падаешь вниз!",ch,0,victim,TO_VICT);
-	    act("$C1 не может устоять на ногах и падает вниз!", ch,0,victim,TO_CHAR);
-	    act("$C1 пытается парировать мощный удар $c1, но не может устоять на ногах.", ch,0,victim,TO_NOTVICT);
+	    act("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐я│я┌п╬я▐я┌я▄ п╫п╟ п╫п╬пЁп╟я┘!",ch,0,victim,TO_VICT);
+	    act("п╒я▀ п©п╟п╢п╟п╣я┬я▄ п╡п╫п╦п╥!",ch,0,victim,TO_VICT);
+	    act("$C1 п╫п╣ п╪п╬п╤п╣я┌ я┐я│я┌п╬я▐я┌я▄ п╫п╟ п╫п╬пЁп╟я┘ п╦ п©п╟п╢п╟п╣я┌ п╡п╫п╦п╥!", ch,0,victim,TO_CHAR);
+	    act("$C1 п©я▀я┌п╟п╣я┌я│я▐ п©п╟я─п╦я─п╬п╡п╟я┌я▄ п╪п╬я┴п╫я▀п╧ я┐п╢п╟я─ $c1, п╫п╬ п╫п╣ п╪п╬п╤п╣я┌ я┐я│я┌п╬я▐я┌я▄ п╫п╟ п╫п╬пЁп╟я┘.", ch,0,victim,TO_NOTVICT);
 
 	    victim->setWait(gsn_bash->getBeats( ));
 	    victim->position = POS_RESTING;
@@ -384,15 +384,15 @@ bool UndefinedOneHit::defenseBlink( )
 
     if(SHADOW(victim))
     {
-	msgFightVict("Ты мерцаешь и попадаешь под удар.");
-	msgFightChar("%2$^C1 мерцает... но тень выдает %2$P4.");
-	msgFightRoom("%2$^C1 мерцает... но тень выдает %2$P4.");
+	msgFightVict("п╒я▀ п╪п╣я─я├п╟п╣я┬я▄ п╦ п©п╬п©п╟п╢п╟п╣я┬я▄ п©п╬п╢ я┐п╢п╟я─.");
+	msgFightChar("%2$^C1 п╪п╣я─я├п╟п╣я┌... п╫п╬ я┌п╣п╫я▄ п╡я▀п╢п╟п╣я┌ %2$P4.");
+	msgFightRoom("%2$^C1 п╪п╣я─я├п╟п╣я┌... п╫п╬ я┌п╣п╫я▄ п╡я▀п╢п╟п╣я┌ %2$P4.");
 	return false;
     }
 
-    msgFightVict( "Ты мерцаешь и уклоняешься от атаки %1$C2.");
-    msgFightChar( "%2$^C1 мерцает и уклоняется от твоей атаки.");
-    msgFightRoom( "%2$^C1 мерцает и уклоняется от атаки %1$C2.");
+    msgFightVict( "п╒я▀ п╪п╣я─я├п╟п╣я┬я▄ п╦ я┐п╨п╩п╬п╫я▐п╣я┬я▄я│я▐ п╬я┌ п╟я┌п╟п╨п╦ %1$C2.");
+    msgFightChar( "%2$^C1 п╪п╣я─я├п╟п╣я┌ п╦ я┐п╨п╩п╬п╫я▐п╣я┌я│я▐ п╬я┌ я┌п╡п╬п╣п╧ п╟я┌п╟п╨п╦.");
+    msgFightRoom( "%2$^C1 п╪п╣я─я├п╟п╣я┌ п╦ я┐п╨п╩п╬п╫я▐п╣я┌я│я▐ п╬я┌ п╟я┌п╟п╨п╦ %1$C2.");
 
     gsn_blink->improve( victim, true, ch );
     return true;
@@ -460,15 +460,15 @@ bool UndefinedOneHit::defenseShieldBlock( )
 
     if (SHADOW(victim))
     {
-	msgFightVict( "Ты впустую машешь щитом перед твоей тенью." );
-	msgFightChar( "%2$^C1 впустую размахивает щитом перед своей тенью.");
-	msgFightRoom( "%2$^C1 впустую размахивает щитом перед своей тенью.");
+	msgFightVict( "п╒я▀ п╡п©я┐я│я┌я┐я▌ п╪п╟я┬п╣я┬я▄ я┴п╦я┌п╬п╪ п©п╣я─п╣п╢ я┌п╡п╬п╣п╧ я┌п╣п╫я▄я▌." );
+	msgFightChar( "%2$^C1 п╡п©я┐я│я┌я┐я▌ я─п╟п╥п╪п╟я┘п╦п╡п╟п╣я┌ я┴п╦я┌п╬п╪ п©п╣я─п╣п╢ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.");
+	msgFightRoom( "%2$^C1 п╡п©я┐я│я┌я┐я▌ я─п╟п╥п╪п╟я┘п╦п╡п╟п╣я┌ я┴п╦я┌п╬п╪ п©п╣я─п╣п╢ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.");
 	return false;
     }
 
-    msgFightVict( "Ты отражаешь щитом атаку %1$C2." );
-    msgFightChar( "%2$^C1 отражает твою атаку %2$P2 щитом." );
-    msgFightRoom( "%2$^C1 отражает атаку %1$C2 своим щитом." );
+    msgFightVict( "п╒я▀ п╬я┌я─п╟п╤п╟п╣я┬я▄ я┴п╦я┌п╬п╪ п╟я┌п╟п╨я┐ %1$C2." );
+    msgFightChar( "%2$^C1 п╬я┌я─п╟п╤п╟п╣я┌ я┌п╡п╬я▌ п╟я┌п╟п╨я┐ %2$P2 я┴п╦я┌п╬п╪." );
+    msgFightRoom( "%2$^C1 п╬я┌я─п╟п╤п╟п╣я┌ п╟я┌п╟п╨я┐ %1$C2 я│п╡п╬п╦п╪ я┴п╦я┌п╬п╪." );
 
     destroyShield( );
     gsn_shield_block->improve( victim, true, ch );
@@ -535,15 +535,15 @@ bool UndefinedOneHit::defenseDodge( )
 
     if (SHADOW(victim))
     {
-	msgFightVict( "Ты скачешь вокруг своей тени, пытаясь от нее увернуться." );
-	msgFightChar( "%2$^C1 забавно прыгает вокруг своей тени." );
-	msgFightRoom( "%2$^C1 забавно прыгает вокруг своей тени." );
+	msgFightVict( "п╒я▀ я│п╨п╟я┤п╣я┬я▄ п╡п╬п╨я─я┐пЁ я│п╡п╬п╣п╧ я┌п╣п╫п╦, п©я▀я┌п╟я▐я│я▄ п╬я┌ п╫п╣п╣ я┐п╡п╣я─п╫я┐я┌я▄я│я▐." );
+	msgFightChar( "%2$^C1 п╥п╟п╠п╟п╡п╫п╬ п©я─я▀пЁп╟п╣я┌ п╡п╬п╨я─я┐пЁ я│п╡п╬п╣п╧ я┌п╣п╫п╦." );
+	msgFightRoom( "%2$^C1 п╥п╟п╠п╟п╡п╫п╬ п©я─я▀пЁп╟п╣я┌ п╡п╬п╨я─я┐пЁ я│п╡п╬п╣п╧ я┌п╣п╫п╦." );
 	return false;
     }
 
-    msgFightVict( "Ты уворачиваешься от атаки %1$C2." );
-    msgFightChar( "%2$^C1 уворачивается от твоей атаки." );
-    msgFightRoom( "%2$^C1 уворачивается от атаки %1$C2." );
+    msgFightVict( "п╒я▀ я┐п╡п╬я─п╟я┤п╦п╡п╟п╣я┬я▄я│я▐ п╬я┌ п╟я┌п╟п╨п╦ %1$C2." );
+    msgFightChar( "%2$^C1 я┐п╡п╬я─п╟я┤п╦п╡п╟п╣я┌я│я▐ п╬я┌ я┌п╡п╬п╣п╧ п╟я┌п╟п╨п╦." );
+    msgFightRoom( "%2$^C1 я┐п╡п╬я─п╟я┤п╦п╡п╟п╣я┌я│я▐ п╬я┌ п╟я┌п╟п╨п╦ %1$C2." );
 
     if ( number_percent() < (gsn_dodge->getEffective( victim ) / 20 )
 	&& !(is_flying( ch ) || ch->position < POS_FIGHTING) )
@@ -572,9 +572,9 @@ bool UndefinedOneHit::defenseDodge( )
 	/* now the attack */
 	if ( number_percent() < (chance / 20) )
 	{
-	    act("$c1 теряет равновесие и падает вниз!", ch,0,victim,TO_VICT);
-	    act("$C1 уворачивается от твоей атаки, ты теряешь равновесие, и падаешь вниз!", ch,0,victim,TO_CHAR);
-	    act("$C1 уворачивается от атаки $c2, $c1 теряет равновесие и падает вниз.", ch,0,victim,TO_NOTVICT);
+	    act("$c1 я┌п╣я─я▐п╣я┌ я─п╟п╡п╫п╬п╡п╣я│п╦п╣ п╦ п©п╟п╢п╟п╣я┌ п╡п╫п╦п╥!", ch,0,victim,TO_VICT);
+	    act("$C1 я┐п╡п╬я─п╟я┤п╦п╡п╟п╣я┌я│я▐ п╬я┌ я┌п╡п╬п╣п╧ п╟я┌п╟п╨п╦, я┌я▀ я┌п╣я─я▐п╣я┬я▄ я─п╟п╡п╫п╬п╡п╣я│п╦п╣, п╦ п©п╟п╢п╟п╣я┬я▄ п╡п╫п╦п╥!", ch,0,victim,TO_CHAR);
+	    act("$C1 я┐п╡п╬я─п╟я┤п╦п╡п╟п╣я┌я│я▐ п╬я┌ п╟я┌п╟п╨п╦ $c2, $c1 я┌п╣я─я▐п╣я┌ я─п╟п╡п╫п╬п╡п╣я│п╦п╣ п╦ п©п╟п╢п╟п╣я┌ п╡п╫п╦п╥.", ch,0,victim,TO_NOTVICT);
 
 	    ch->setWait(gsn_trip->getBeats( ));
 	    ch->position = POS_RESTING;
@@ -646,9 +646,9 @@ bool UndefinedOneHit::defenseCrossBlock( )
 
     if (SHADOW(victim))
     {
-	msgFightVict( "Тень запутывает тебя." );
-	msgFightChar( "Тень %2$C2 лезет со своими советам." );
-	msgFightRoom( "Тень %2$C2 лезет со своими советам." );
+	msgFightVict( "п╒п╣п╫я▄ п╥п╟п©я┐я┌я▀п╡п╟п╣я┌ я┌п╣п╠я▐." );
+	msgFightChar( "п╒п╣п╫я▄ %2$C2 п╩п╣п╥п╣я┌ я│п╬ я│п╡п╬п╦п╪п╦ я│п╬п╡п╣я┌п╟п╪." );
+	msgFightRoom( "п╒п╣п╫я▄ %2$C2 п╩п╣п╥п╣я┌ я│п╬ я│п╡п╬п╦п╪п╦ я│п╬п╡п╣я┌п╟п╪." );
 	return false;
     }
 
@@ -658,15 +658,15 @@ bool UndefinedOneHit::defenseCrossBlock( )
 	&& !IS_WEAPON_STAT(def2, WEAPON_HOLY)) 
     {
 	msgFightVict( "%3$^O1 passes straight through your attempt to cross block!" );
-	msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
-	msgFightRoom( "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!" );
+	msgFightChar( "%3$^O1 п©я─п╬я┘п╬п╢п╦я┌ я│п╨п╡п╬п╥я▄ п╬я─я┐п╤п╦п╣ %2$C2!" );
+	msgFightRoom( "%3$^O1 %1$C2 п©я─п╬я┘п╬п╢п╦я┌ я│п╨п╡п╬п╥я▄ п╬я─я┐п╤п╦п╣ %2$C2!" );
 
         return false;
     }
     
-    msgFightVict( "Ты кросс-блокируешь атаку %1$C2." );
-    msgFightChar( "%2$^C1 кросс-блокирует твою атаку." );
-    msgFightRoom( "%2$^C1 кросс-блокирует атаку %1$C2." );
+    msgFightVict( "п╒я▀ п╨я─п╬я│я│-п╠п╩п╬п╨п╦я─я┐п╣я┬я▄ п╟я┌п╟п╨я┐ %1$C2." );
+    msgFightChar( "%2$^C1 п╨я─п╬я│я│-п╠п╩п╬п╨п╦я─я┐п╣я┌ я┌п╡п╬я▌ п╟я┌п╟п╨я┐." );
+    msgFightRoom( "%2$^C1 п╨я─п╬я│я│-п╠п╩п╬п╨п╦я─я┐п╣я┌ п╟я┌п╟п╨я┐ %1$C2." );
 
     destroyWeapon( );
 
@@ -701,9 +701,9 @@ bool UndefinedOneHit::defenseCrossBlock( )
 	/* now the attack */
 	if (number_percent() < ( chance / 20  ))
 	{
-	    act("Тебе не удается удержать равновесие!\nТы падаешь!", ch, 0, victim, TO_VICT);
-	    act("$C1 не может сдержать твою атаку и падает!", ch, 0, victim, TO_CHAR);
-	    act("$C1 не может сдержать ошеломляющую атаку $c2 и падает.", ch, 0, victim, TO_NOTVICT);
+	    act("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╣я┌я│я▐ я┐п╢п╣я─п╤п╟я┌я▄ я─п╟п╡п╫п╬п╡п╣я│п╦п╣!\nп╒я▀ п©п╟п╢п╟п╣я┬я▄!", ch, 0, victim, TO_VICT);
+	    act("$C1 п╫п╣ п╪п╬п╤п╣я┌ я│п╢п╣я─п╤п╟я┌я▄ я┌п╡п╬я▌ п╟я┌п╟п╨я┐ п╦ п©п╟п╢п╟п╣я┌!", ch, 0, victim, TO_CHAR);
+	    act("$C1 п╫п╣ п╪п╬п╤п╣я┌ я│п╢п╣я─п╤п╟я┌я▄ п╬я┬п╣п╩п╬п╪п╩я▐я▌я┴я┐я▌ п╟я┌п╟п╨я┐ $c2 п╦ п©п╟п╢п╟п╣я┌.", ch, 0, victim, TO_NOTVICT);
 
 	    victim->setWait(gsn_bash->getBeats( ));
 	    victim->position = POS_RESTING;
@@ -765,15 +765,15 @@ bool UndefinedOneHit::defenseHandBlock( )
 
     if(SHADOW(victim))
     {
-	msgFightVict( "Тень пинает тебя." );
-	msgFightChar( "Тень и %2$C1 играют в кунг-фу." );
-	msgFightRoom( "Тень и %2$C1 играют в кунг-фу." );
+	msgFightVict( "п╒п╣п╫я▄ п©п╦п╫п╟п╣я┌ я┌п╣п╠я▐." );
+	msgFightChar( "п╒п╣п╫я▄ п╦ %2$C1 п╦пЁя─п╟я▌я┌ п╡ п╨я┐п╫пЁ-я└я┐." );
+	msgFightRoom( "п╒п╣п╫я▄ п╦ %2$C1 п╦пЁя─п╟я▌я┌ п╡ п╨я┐п╫пЁ-я└я┐." );
 	return false;
     }
 
-    msgFightVict( "Ты отражаешь руками атаку %1$C2." );
-    msgFightChar( "%2$^C1 отражает руками твою атаку." );
-    msgFightRoom( "%2$^C1 отражает руками атаку %1$C2." );
+    msgFightVict( "п╒я▀ п╬я┌я─п╟п╤п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╟я┌п╟п╨я┐ %1$C2." );
+    msgFightChar( "%2$^C1 п╬я┌я─п╟п╤п╟п╣я┌ я─я┐п╨п╟п╪п╦ я┌п╡п╬я▌ п╟я┌п╟п╨я┐." );
+    msgFightRoom( "%2$^C1 п╬я┌я─п╟п╤п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╟я┌п╟п╨я┐ %1$C2." );
 
     gsn_hand_block->improve( victim, true, ch );
     return true;
@@ -829,15 +829,15 @@ void UndefinedOneHit::damEffectGroundStrike( )
     gsn_ground_strike->improve( ch, true, victim );
   
     if( diceroll < 75 ) {  
-	act_p( "{RЗемля трясется под твоими ногами!{x", ch, 0, victim, TO_VICT,POS_RESTING );
-	act_p( "{RЗемля под ногами $C2 начинает трястись, повинуясь твоему приказу!{x", ch, NULL, victim, TO_CHAR,POS_RESTING );
+	act_p( "{Rп≈п╣п╪п╩я▐ я┌я─я▐я│п╣я┌я│я▐ п©п╬п╢ я┌п╡п╬п╦п╪п╦ п╫п╬пЁп╟п╪п╦!{x", ch, 0, victim, TO_VICT,POS_RESTING );
+	act_p( "{Rп≈п╣п╪п╩я▐ п©п╬п╢ п╫п╬пЁп╟п╪п╦ $C2 п╫п╟я┤п╦п╫п╟п╣я┌ я┌я─я▐я│я┌п╦я│я▄, п©п╬п╡п╦п╫я┐я▐я│я▄ я┌п╡п╬п╣п╪я┐ п©я─п╦п╨п╟п╥я┐!{x", ch, NULL, victim, TO_CHAR,POS_RESTING );
 	
 	victim->setWaitViolence( 2 );
 	dam += (dam * number_range( 2, 5 )) / 5;			
     } 
     else if (diceroll < 95) {   
-	act_p( "{yТы ослепле$Gно|н|на атакой $c2!{x", ch, NULL, victim, TO_VICT, POS_RESTING );
-	act_p( "{yТы ослепляешь $C4 своей атакой!{x", ch, NULL, victim, TO_CHAR, POS_RESTING );
+	act_p( "{yп╒я▀ п╬я│п╩п╣п©п╩п╣$Gп╫п╬|п╫|п╫п╟ п╟я┌п╟п╨п╬п╧ $c2!{x", ch, NULL, victim, TO_VICT, POS_RESTING );
+	act_p( "{yп╒я▀ п╬я│п╩п╣п©п╩я▐п╣я┬я▄ $C4 я│п╡п╬п╣п╧ п╟я┌п╟п╨п╬п╧!{x", ch, NULL, victim, TO_CHAR, POS_RESTING );
 
 	if (!IS_AFFECTED(victim,AFF_BLIND)) {
 	      baf.where    = TO_AFFECTS;
@@ -853,8 +853,8 @@ void UndefinedOneHit::damEffectGroundStrike( )
 	dam += dam * number_range( 1, 2 );			
     } 
     else {
-	act_p( "{R$c1 вырывает твое сердце! OUCH!!{x", ch, NULL, victim, TO_VICT ,POS_RESTING ); 
-	act_p( "{RТы вырываешь сердце $C2!{x", ch, NULL, victim, TO_CHAR ,POS_RESTING );
+	act_p( "{R$c1 п╡я▀я─я▀п╡п╟п╣я┌ я┌п╡п╬п╣ я│п╣я─п╢я├п╣! OUCH!!{x", ch, NULL, victim, TO_VICT ,POS_RESTING ); 
+	act_p( "{Rп╒я▀ п╡я▀я─я▀п╡п╟п╣я┬я▄ я│п╣я─п╢я├п╣ $C2!{x", ch, NULL, victim, TO_CHAR ,POS_RESTING );
 
 	dam += dam * number_range( 2, 5 );			
     }
@@ -903,15 +903,15 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     gsn_critical_strike->improve( ch, true, victim );
 
     if (diceroll < 75) {
-	act_p( "{R$c1 бросает тебя умелым движением!{x", ch, 0, victim, TO_VICT,POS_RESTING);
-	act_p( "{RТы бросаешь $C4 умелым движением!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
+	act_p( "{R$c1 п╠я─п╬я│п╟п╣я┌ я┌п╣п╠я▐ я┐п╪п╣п╩я▀п╪ п╢п╡п╦п╤п╣п╫п╦п╣п╪!{x", ch, 0, victim, TO_VICT,POS_RESTING);
+	act_p( "{Rп╒я▀ п╠я─п╬я│п╟п╣я┬я▄ $C4 я┐п╪п╣п╩я▀п╪ п╢п╡п╦п╤п╣п╫п╦п╣п╪!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
 
 	victim->setWaitViolence( 2 );
 	dam += (dam * number_range( 2, 5 )) / 5;	    
     }
     else if (diceroll < 95) {
-	act_p( "{y$c1 ослепляет тебя своей атакой!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
-	act_p( "{yТы ослепляешь $C4 своей атакой!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
+	act_p( "{y$c1 п╬я│п╩п╣п©п╩я▐п╣я┌ я┌п╣п╠я▐ я│п╡п╬п╣п╧ п╟я┌п╟п╨п╬п╧!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
+	act_p( "{yп╒я▀ п╬я│п╩п╣п©п╩я▐п╣я┬я▄ $C4 я│п╡п╬п╣п╧ п╟я┌п╟п╨п╬п╧!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
 
 	if ( !IS_AFFECTED(victim,AFF_BLIND) )
 	{
@@ -927,8 +927,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
 	dam += dam * number_range( 1, 2 );	    
     }
     else {
-	act_p( "{r$c1 подрезает тебя больно! ОЙ!!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
-	act_p( "{rТы подрезаешь $C4 больно!  Это действительно больно!{x", ch, 0, victim, TO_CHAR ,POS_RESTING);
+	act_p( "{r$c1 п©п╬п╢я─п╣п╥п╟п╣я┌ я┌п╣п╠я▐ п╠п╬п╩я▄п╫п╬! п·п≥!!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
+	act_p( "{rп╒я▀ п©п╬п╢я─п╣п╥п╟п╣я┬я▄ $C4 п╠п╬п╩я▄п╫п╬!  п╜я┌п╬ п╢п╣п╧я│я┌п╡п╦я┌п╣п╩я▄п╫п╬ п╠п╬п╩я▄п╫п╬!{x", ch, 0, victim, TO_CHAR ,POS_RESTING);
 	dam += dam * number_range( 2, 5 );	    
     }
 }
@@ -995,9 +995,9 @@ void UndefinedOneHit::damEffectMasterSword( )
 	ch->damroll += paf->modifier - old_mod;
     }
     
-    act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana,0, TO_ROOM);
-    act("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
-	    ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
+    act("$o1 $c2 п╥п╟пЁп╬я─п╟п╣я┌я│я▐ {CпЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪{x.", ch, katana,0, TO_ROOM);
+    act("$o1 п╡ я┌п╡п╬п╣п╧ $T я─я┐п╨п╣ п╥п╟пЁп╬я─п╟п╣я┌я│я▐ {CпЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪{x.", 
+	    ch, katana, (secondary ? "п╩п╣п╡п╬п╧" : "п©я─п╟п╡п╬п╧"), TO_CHAR);
 }
 
 void UndefinedOneHit::damApplyDeathblow( ) 
@@ -1027,8 +1027,8 @@ void UndefinedOneHit::damApplyDeathblow( )
 	dam = number_range( min_dam, max_dam );
 	dam = ch->applyCurse( dam );
 
-	act("Твои руки наполняются смертоносной силой!",ch,0,0,TO_CHAR);
-	act("Руки $c2 наполняются смертоносной силой!",ch,0,0,TO_ROOM);
+	act("п╒п╡п╬п╦ я─я┐п╨п╦ п╫п╟п©п╬п╩п╫я▐я▌я┌я│я▐ я│п╪п╣я─я┌п╬п╫п╬я│п╫п╬п╧ я│п╦п╩п╬п╧!",ch,0,0,TO_CHAR);
+	act("п═я┐п╨п╦ $c2 п╫п╟п©п╬п╩п╫я▐я▌я┌я│я▐ я│п╪п╣я─я┌п╬п╫п╬я│п╫п╬п╧ я│п╦п╩п╬п╧!",ch,0,0,TO_ROOM);
 	gsn_deathblow->improve( ch, true, victim );
     }
     else
@@ -1049,12 +1049,12 @@ void UndefinedOneHit::damEffectMasterHand( )
     SET_BIT(victim->affected_by,AFF_WEAK_STUN);
     
     if (ch != victim) {
-	act("{rТы оглушаешь $C4 своим ударом!{x", ch,0,victim,TO_CHAR);
-	act("{r$c1 оглушает тебя своим ударом!{x", ch,0,victim,TO_VICT);
-	act("{r$c1 оглушает $C4 своим ударом!{x", ch,0,victim,TO_NOTVICT);
+	act("{rп╒я▀ п╬пЁп╩я┐я┬п╟п╣я┬я▄ $C4 я│п╡п╬п╦п╪ я┐п╢п╟я─п╬п╪!{x", ch,0,victim,TO_CHAR);
+	act("{r$c1 п╬пЁп╩я┐я┬п╟п╣я┌ я┌п╣п╠я▐ я│п╡п╬п╦п╪ я┐п╢п╟я─п╬п╪!{x", ch,0,victim,TO_VICT);
+	act("{r$c1 п╬пЁп╩я┐я┬п╟п╣я┌ $C4 я│п╡п╬п╦п╪ я┐п╢п╟я─п╬п╪!{x", ch,0,victim,TO_NOTVICT);
     } else {
-	act("{rТы оглушаешь себя!{x", ch,0,victim,TO_CHAR);
-	act("{r$c1 оглушает себя!{x", ch,0,victim,TO_NOTVICT);
+	act("{rп╒я▀ п╬пЁп╩я┐я┬п╟п╣я┬я▄ я│п╣п╠я▐!{x", ch,0,victim,TO_CHAR);
+	act("{r$c1 п╬пЁп╩я┐я┬п╟п╣я┌ я│п╣п╠я▐!{x", ch,0,victim,TO_NOTVICT);
     }
 
     gsn_mastering_pound->improve( ch, true, victim );
@@ -1098,12 +1098,12 @@ void UndefinedOneHit::damEffectSlice( )
     if (number_bits(1)) {
 	sliced_loc = wear_wrist_l;
 	left = true;
-	sideName = "левую";
+	sideName = "п╩п╣п╡я┐я▌";
     }
     else {
 	sliced_loc = wear_wrist_r;
 	left = false;
-	sideName = "правую";
+	sideName = "п©я─п╟п╡я┐я▌";
     }
 
     if (!victim->getWearloc( ).isSet( sliced_loc ))
@@ -1126,9 +1126,9 @@ void UndefinedOneHit::damEffectSlice( )
 	chance -= chance / 10;
     
     if (number_percent( ) > chance) {
-	act_p("Твое оружие скользит по запястью $C2.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	act_p("$o1 $c2 скользит по твоему запястью.", ch, axe, victim, TO_VICT, POS_RESTING);
-	act_p("$o1 $c2 скользит по запястью $C2.", ch, axe, victim, TO_NOTVICT, POS_RESTING);
+	act_p("п╒п╡п╬п╣ п╬я─я┐п╤п╦п╣ я│п╨п╬п╩я▄п╥п╦я┌ п©п╬ п╥п╟п©я▐я│я┌я▄я▌ $C2.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p("$o1 $c2 я│п╨п╬п╩я▄п╥п╦я┌ п©п╬ я┌п╡п╬п╣п╪я┐ п╥п╟п©я▐я│я┌я▄я▌.", ch, axe, victim, TO_VICT, POS_RESTING);
+	act_p("$o1 $c2 я│п╨п╬п╩я▄п╥п╦я┌ п©п╬ п╥п╟п©я▐я│я┌я▄я▌ $C2.", ch, axe, victim, TO_NOTVICT, POS_RESTING);
 	gsn_slice->improve( ch, false, victim );
 	return;
     }
@@ -1158,12 +1158,12 @@ void UndefinedOneHit::damEffectSlice( )
     }
 
     obj_to_room( arm, victim->in_room );
-    act( "{R$c1 отруби$gло|л|ла тебе $t руку!{x", ch, sideName.c_str( ), victim, TO_VICT );
-    act( "$c1 отруби$gло|л|ла $C3 $t руку!", ch, sideName.c_str( ), victim, TO_NOTVICT );
-    act( "{RТы отрубаешь $t руку $C3!{x", ch, sideName.c_str( ), victim, TO_CHAR );
+    act( "{R$c1 п╬я┌я─я┐п╠п╦$gп╩п╬|п╩|п╩п╟ я┌п╣п╠п╣ $t я─я┐п╨я┐!{x", ch, sideName.c_str( ), victim, TO_VICT );
+    act( "$c1 п╬я┌я─я┐п╠п╦$gп╩п╬|п╩|п╩п╟ $C3 $t я─я┐п╨я┐!", ch, sideName.c_str( ), victim, TO_NOTVICT );
+    act( "{Rп╒я▀ п╬я┌я─я┐п╠п╟п╣я┬я▄ $t я─я┐п╨я┐ $C3!{x", ch, sideName.c_str( ), victim, TO_CHAR );
     gsn_slice->improve( ch, true, victim );
-    act( "Отрубленная рука $c2 падает на землю.", victim, 0, 0, TO_ROOM );
-    act( "Твоя отрубленная рука падает на землю.", victim, 0, 0, TO_CHAR );
+    act( "п·я┌я─я┐п╠п╩п╣п╫п╫п╟я▐ я─я┐п╨п╟ $c2 п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌.", victim, 0, 0, TO_ROOM );
+    act( "п╒п╡п╬я▐ п╬я┌я─я┐п╠п╩п╣п╫п╫п╟я▐ я─я┐п╨п╟ п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌.", victim, 0, 0, TO_CHAR );
 
     /* affect */
     af.where = TO_LOCATIONS;
@@ -1200,7 +1200,7 @@ void UndefinedOneHit::damEffectSlice( )
 	    if (!IS_SET( obj->extra_flags, ITEM_NODROP )) {
 		obj_from_char( obj );
 		obj_to_room( obj, victim->in_room );
-		act_p( "$o1 падает на землю.", victim, obj, 0, TO_ALL, POS_RESTING );
+		act_p( "$o1 п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌.", victim, obj, 0, TO_ALL, POS_RESTING );
 	    }
 	}
 	

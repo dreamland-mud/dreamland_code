@@ -168,10 +168,10 @@ void Gangsters::cleanup( bool performance )
 	    
 	if (performance) {
 	    if (ch->position >= POS_RESTING) 
-		act_p("$c1 ÐÒÏÉÚÎÏÓÉÔ '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
+		act_p("$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    
 	    if (ch->position >= POS_MORTAL)	
-		act_p("$c1 ÉÓÞÅÚÁÅÔ × ËÌÕÂÅ ÄÙÍÁ.", ch, 0, 0, TO_ROOM, POS_RESTING);
+		act_p("$c1 Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚ Ð² ÐºÐ»ÑƒÐ±Ðµ Ð´Ñ‹Ð¼Ð°.", ch, 0, 0, TO_ROOM, POS_RESTING);
 	}
 	
 	extract_char( ch );
@@ -275,10 +275,10 @@ void Gangsters::report( std::ostringstream &buf, PCharacter *ch ) const
 	attr = ch->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
 	
 	if (attr && attr->getKilled( ) > 0)
-	    buf << "þÉÓÌÏ ÕÂÉÔÙÈ ÔÏÂÏÊ ÐÒÅÓÔÕÐÎÉËÏ×: " 
+	    buf << "Ð§Ð¸ÑÐ»Ð¾ ÑƒÐ±Ð¸Ñ‚Ñ‹Ñ… Ñ‚Ð¾Ð±Ð¾Ð¹ Ð¿Ñ€ÐµÑÑ‚ÑƒÐ¿Ð½Ð¸ÐºÐ¾Ð²: " 
 		<< GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
 	
-	buf << "äÏ ËÏÎÃÁ ÏÈÏÔÙ ÏÓÔÁÅÔÓÑ ";
+	buf << "Ð”Ð¾ ÐºÐ¾Ð½Ñ†Ð° Ð¾Ñ…Ð¾Ñ‚Ñ‹ Ð¾ÑÑ‚Ð°ÐµÑ‚ÑÑ ";
 	printRemainedTime( buf );
 	buf << "." << endl;
     }
@@ -312,10 +312,10 @@ void Gangsters::getQuestDescription( std::ostringstream &buf ) const
 
 void Gangsters::getQuestStartMessage( std::ostringstream &buf ) const
 {
-    buf << "ûÁÊËÁ ÐÒÅÓÔÕÐÎÉËÏ× ÁÔÁËÏ×ÁÌÁ ÍÉÒÎÙÈ ÖÉÔÅÌÅÊ. "
-	<< "éÝÕÔÓÑ ÈÒÁÂÒÅÃÙ " 
+    buf << "Ð¨Ð°Ð¹ÐºÐ° Ð¿Ñ€ÐµÑÑ‚ÑƒÐ¿Ð½Ð¸ÐºÐ¾Ð² Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð»Ð° Ð¼Ð¸Ñ€Ð½Ñ‹Ñ… Ð¶Ð¸Ñ‚ÐµÐ»ÐµÐ¹. "
+	<< "Ð˜Ñ‰ÑƒÑ‚ÑÑ Ñ…Ñ€Ð°Ð±Ñ€ÐµÑ†Ñ‹ " 
 	<< GQChannel::BOLD << minLevel << "-" << maxLevel << GQChannel::NORMAL
-	<< " ÕÒÏ×ÎÅÊ ÄÌÑ ÕÎÉÞÔÏÖÅÎÉÑ ÂÁÎÄÉÔÏ× É ÉÈ ÇÌÁ×ÁÒÑ.";
+	<< " ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹ Ð´Ð»Ñ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð¸Ñ Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ð¸ Ð¸Ñ… Ð³Ð»Ð°Ð²Ð°Ñ€Ñ.";
 }
 
 /*****************************************************************************/
@@ -349,11 +349,11 @@ void Gangsters::rewardLeader( )
 	    leaders.push_back( i->second );
     }
     
-    buf << "çÌÁ×ÁÒÑ ÛÁÊËÉ ÔÁË ÎÉËÔÏ É ÎÅ ÕÂÉÌ.";
+    buf << "Ð“Ð»Ð°Ð²Ð°Ñ€Ñ ÑˆÐ°Ð¹ÐºÐ¸ Ñ‚Ð°Ðº Ð½Ð¸ÐºÑ‚Ð¾ Ð¸ Ð½Ðµ ÑƒÐ±Ð¸Ð».";
     GQChannel::gecho( this, buf );
 
     if (leaders.empty( )) {
-	buf << "âÏÌÅÅ ÔÏÇÏ, ÎÉ ÏÄÉÎ ÂÁÎÄÉÔ ÎÅ ÐÏÓÔÒÁÄÁÌ."  << endl;
+	buf << "Ð‘Ð¾Ð»ÐµÐµ Ñ‚Ð¾Ð³Ð¾, Ð½Ð¸ Ð¾Ð´Ð¸Ð½ Ð±Ð°Ð½Ð´Ð¸Ñ‚ Ð½Ðµ Ð¿Ð¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð»."  << endl;
     }
     else { 
 	XMLReward reward;
@@ -361,13 +361,13 @@ void Gangsters::rewardLeader( )
 	reward.qpoints = max * number_range( 10, 15 ) + number_fuzzy( 10 );
 	reward.gold = max * number_range( 10, 15 );
 	reward.experience = max * number_fuzzy( 50 );
-	reward.reason = DLString( "úÁ ÕÂÉÊÓÔ×Ï ÓÁÍÏÇÏ ÂÏÌØÛÏÇÏ ËÏÌÉÞÅÓÔ×Á ÂÁÎÄÉÔÏ× ÔÙ ÐÏÌÕÞÁÅÛØ: " );
+	reward.reason = DLString( "Ð—Ð° ÑƒÐ±Ð¸Ð¹ÑÑ‚Ð²Ð¾ ÑÐ°Ð¼Ð¾Ð³Ð¾ Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð³Ð¾ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð° Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ñ‚Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ: " );
 	reward.id = getQuestID( );
 	
 	if (leaders.size( ) == 1)
-	    buf << "óÁÍÙÊ ÌÕÞÛÉÊ ÏÈÏÔÎÉË ÚÁ ÂÁÎÄÉÔÁÍÉ:" << GQChannel::BOLD;
+	    buf << "Ð¡Ð°Ð¼Ñ‹Ð¹ Ð»ÑƒÑ‡ÑˆÐ¸Ð¹ Ð¾Ñ…Ð¾Ñ‚Ð½Ð¸Ðº Ð·Ð° Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð°Ð¼Ð¸:" << GQChannel::BOLD;
 	else
-	    buf << "óÁÍÙÅ ÕÓÐÅÛÎÙÅ ÏÈÏÔÎÉËÉ ÚÁ ÂÁÎÄÉÔÁÍÉ:" << GQChannel::BOLD;
+	    buf << "Ð¡Ð°Ð¼Ñ‹Ðµ ÑƒÑÐ¿ÐµÑˆÐ½Ñ‹Ðµ Ð¾Ñ…Ð¾Ñ‚Ð½Ð¸ÐºÐ¸ Ð·Ð° Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð°Ð¼Ð¸:" << GQChannel::BOLD;
 	
 	while (!leaders.empty( )) {
 	    PCMemoryInterface * pci;
@@ -397,13 +397,13 @@ void Gangsters::rewardChefKiller( )
     r.qpoints = number_range( 200, 250 );
     r.experience = number_range( 300, 500 );
     r.practice = number_range( -6, 3 );
-    r.reason = DLString( "ðÏÚÄÒÁ×ÌÑÅÍ! ûÅÆ ÕÂÉÔ É ×ÓÅ ÂÁÎÄÉÔÙ ÒÁÚÂÅÖÁÌÉÓØ. ÷ ÎÁÇÒÁÄÕ ÔÙ ÐÏÌÕÞÁÅÛØ: " );
+    r.reason = DLString( "ÐŸÐ¾Ð·Ð´Ñ€Ð°Ð²Ð»ÑÐµÐ¼! Ð¨ÐµÑ„ ÑƒÐ±Ð¸Ñ‚ Ð¸ Ð²ÑÐµ Ð±Ð°Ð½Ð´Ð¸Ñ‚Ñ‹ Ñ€Ð°Ð·Ð±ÐµÐ¶Ð°Ð»Ð¸ÑÑŒ. Ð’ Ð½Ð°Ð³Ñ€Ð°Ð´Ñƒ Ñ‚Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ: " );
     r.id = getQuestID( );
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
 
     buf << GQChannel::BOLD << pci->getName( ) << GQChannel::NORMAL 
-	<< " ÕÎÉÞÔÏÖÉÌ" << GET_SEX(pci, "", "Ï", "Á") <<" ÇÌÁ×ÁÒÑ ÛÁÊËÉ!";
+	<< " ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð¸Ð»" << GET_SEX(pci, "", "Ð¾", "Ð°") <<" Ð³Ð»Ð°Ð²Ð°Ñ€Ñ ÑˆÐ°Ð¹ÐºÐ¸!";
 
     GQChannel::gecho( this, buf );
     
@@ -413,7 +413,7 @@ void Gangsters::rewardChefKiller( )
 
 void Gangsters::rewardNobody( ) 
 {
-    GQChannel::gecho( this, "ûÅÆÁ ÂÁÎÄÙ ÕÂÉÌÁ ÐÒÏÔÉ×ÏÂÏÒÓÔ×ÕÀÝÁÑ ÇÒÕÐÐÉÒÏ×ËÁ.");
+    GQChannel::gecho( this, "Ð¨ÐµÑ„Ð° Ð±Ð°Ð½Ð´Ñ‹ ÑƒÐ±Ð¸Ð»Ð° Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð¾Ð±Ð¾Ñ€ÑÑ‚Ð²ÑƒÑŽÑ‰Ð°Ñ Ð³Ñ€ÑƒÐ¿Ð¿Ð¸Ñ€Ð¾Ð²ÐºÐ°.");
 }
 
 void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
@@ -424,7 +424,7 @@ void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
     r.experience = number_range( 10, 30 );
     r.qpoints = number_range( diff, 8 );
     r.gold = number_range( diff, 8 );
-    r.reason = "ô×ÏÑ ÎÁÇÒÁÄÁ ÚÁ ÕÎÉÞÔÏÖÅÎÉÅ ÐÒÅÓÔÕÐÎÉËÁ ÓÏÓÔÁ×ÌÑÅÔ: ";
+    r.reason = "Ð¢Ð²Ð¾Ñ Ð½Ð°Ð³Ñ€Ð°Ð´Ð° Ð·Ð° ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¿Ñ€ÐµÑÑ‚ÑƒÐ¿Ð½Ð¸ÐºÐ° ÑÐ¾ÑÑ‚Ð°Ð²Ð»ÑÐµÑ‚: ";
     r.id = getQuestID( );
     GlobalQuestManager::getThis( )->rewardChar( killer, r );	
 
@@ -455,15 +455,15 @@ void Gangsters::createFirstHint( MobileList &people )
     informerName = name;
     informerRoom = informer->in_room->name;
 
-    buf << name	<< " ÓÏÏÂÝÉÌ" << GET_SEX( informer, "", "Ï", "Á" );
+    buf << name	<< " ÑÐ¾Ð¾Ð±Ñ‰Ð¸Ð»" << GET_SEX( informer, "", "Ð¾", "Ð°" );
     
     switch (number_range(1, 4)) {
-    case 1: case 2: buf << " èÁÓÓÁÎÕ"; break;
-    case 3: case 4: buf << " ÷ÁÌØËÉÒÉÉ"; break;
+    case 1: case 2: buf << " Ð¥Ð°ÑÑÐ°Ð½Ñƒ"; break;
+    case 3: case 4: buf << " Ð’Ð°Ð»ÑŒÐºÐ¸Ñ€Ð¸Ð¸"; break;
     }
     
-    buf << ", ÞÔÏ ×ÉÄÅÌ" << GET_SEX( informer, "", "Ï", "Á" )
-	<< " ÂÁÎÄÉÔÏ× ×ÏÚÌÅ ÍÅÓÔÎÏÓÔÉ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << informer->in_room->name << ". ";
+    buf << ", Ñ‡Ñ‚Ð¾ Ð²Ð¸Ð´ÐµÐ»" << GET_SEX( informer, "", "Ð¾", "Ð°" )
+	<< " Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ð²Ð¾Ð·Ð»Ðµ Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << informer->in_room->name << ". ";
     setHint( buf.str( ) );
 }	    
 
@@ -496,8 +496,8 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
 	    /* from the same area but not informer */
 	    
 	    name.upperFirstCharacter( );
-	    buf	<< name << " ÓÔÏÌËÎÕÌ" << GET_SEX( ch, "ÓÑ", "ÏÓØ", "ÁÓØ" )
-		<< " Ó ÇÁÎÇÓÔÅÒÁÍÉ ×ÏÚÌÅ " << room->name << ".";
+	    buf	<< name << " ÑÑ‚Ð¾Ð»ÐºÐ½ÑƒÐ»" << GET_SEX( ch, "ÑÑ", "Ð¾ÑÑŒ", "Ð°ÑÑŒ" )
+		<< " Ñ Ð³Ð°Ð½Ð³ÑÑ‚ÐµÑ€Ð°Ð¼Ð¸ Ð²Ð¾Ð·Ð»Ðµ " << room->name << ".";
 
 	    return room;
 	}
@@ -505,7 +505,7 @@ Room * Gangsters::findHintRoom( std::ostringstream &buf )
     
     /* cannot find mob, give hint only about a room they're in */
     if (room) 
-	buf << "çÁÎÇÓÔÅÒÙ ÂÙÌÉ ÔÁËÖÅ ÚÁÍÅÞÅÎÙ ÎÅÐÏÄÁÌÅËÕ ÏÔ " 
+	buf << "Ð“Ð°Ð½Ð³ÑÑ‚ÐµÑ€Ñ‹ Ð±Ñ‹Ð»Ð¸ Ñ‚Ð°ÐºÐ¶Ðµ Ð·Ð°Ð¼ÐµÑ‡ÐµÐ½Ñ‹ Ð½ÐµÐ¿Ð¾Ð´Ð°Ð»ÐµÐºÑƒ Ð¾Ñ‚ " 
 	    << room->name << ".";
     
     return room;
@@ -530,7 +530,7 @@ void Gangsters::createThirdHint( )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "âÏÌØÛÅ ×ÓÅÇÏ ÏÔ ÒÕËÉ ÂÁÎÄÉÔÏ× ÐÏÓÔÒÁÄÁÌÁ ÍÅÓÔÎÏÓÔØ " << areaName << ".";
+    buf << "Ð‘Ð¾Ð»ÑŒÑˆÐµ Ð²ÑÐµÐ³Ð¾ Ð¾Ñ‚ Ñ€ÑƒÐºÐ¸ Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ð¿Ð¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð»Ð° Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚ÑŒ " << areaName << ".";
     setHint( buf.str( ) );
     GQChannel::gecho( this, buf );
 
@@ -815,9 +815,9 @@ bool Gangsters::isPoliceman( Character *ch )
 
     if (is_name("guard", name) || is_name("guardian", name) ||
 	is_name("shiriff", name) || is_name("bodyguard", name) ||
-	is_name("cityguard", name) || is_name("ÓÔÒÁÖÎÉË", name)  ||
-	is_name("ÛÅÒÉÆ", name)  || is_name("ÏÈÒÁÎÎÉË", name)  ||
-	is_name("ÔÅÌÏÈÒÁÎÉÔÅÌØ", name))
+	is_name("cityguard", name) || is_name("ÑÑ‚Ñ€Ð°Ð¶Ð½Ð¸Ðº", name)  ||
+	is_name("ÑˆÐµÑ€Ð¸Ñ„", name)  || is_name("Ð¾Ñ…Ñ€Ð°Ð½Ð½Ð¸Ðº", name)  ||
+	is_name("Ñ‚ÐµÐ»Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÐµÐ»ÑŒ", name))
 	return true;
 
     return false;

@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "class_warlock.h"
 
@@ -59,20 +59,20 @@ SKILL_RUNP( blink )
 
     if (!ch->is_npc() && !gsn_blink->usable( ch ))
     {
-	ch->send_to("Что?\n\r");
+	ch->send_to("п╖я┌п╬?\n\r");
 	return;
     }
 
     if (arg[0] == '\0' )
     {
-	ch->printf("Во время боя ты {W%sмерцаешь{x.\n\r",
-		    IS_SET(ch->act, PLR_BLINK_ON) ? "" : "не ");
+	ch->printf("п▓п╬ п╡я─п╣п╪я▐ п╠п╬я▐ я┌я▀ {W%sп╪п╣я─я├п╟п╣я┬я▄{x.\n\r",
+		    IS_SET(ch->act, PLR_BLINK_ON) ? "" : "п╫п╣ ");
 	return;
     }
 
     if (arg_is_switch_on( arg ))
 	{
-	    ch->println("Ты будешь мерцать, уклоняясь от атак.");
+	    ch->println("п╒я▀ п╠я┐п╢п╣я┬я▄ п╪п╣я─я├п╟я┌я▄, я┐п╨п╩п╬п╫я▐я▐я│я▄ п╬я┌ п╟я┌п╟п╨.");
 	    SET_BIT(ch->act,PLR_BLINK_ON);
 	     return;
 	}
@@ -80,11 +80,11 @@ SKILL_RUNP( blink )
     if (arg_is_switch_off( arg ))
 	{
 	 REMOVE_BIT(ch->act,PLR_BLINK_ON);
-	 ch->println("Ты больше не будешь мерцать, уклоняясь от атак.");
+	 ch->println("п╒я▀ п╠п╬п╩я▄я┬п╣ п╫п╣ п╠я┐п╢п╣я┬я▄ п╪п╣я─я├п╟я┌я▄, я┐п╨п╩п╬п╫я▐я▐я│я▄ п╬я┌ п╟я┌п╟п╨.");
 	 return;
 	}
     
-    ch->println("Укажи {lRвкл или выкл{lEon или off{lx в качестве аргумента."); 
+    ch->println("пёп╨п╟п╤п╦ {lRп╡п╨п╩ п╦п╩п╦ п╡я▀п╨п╩{lEon п╦п╩п╦ off{lx п╡ п╨п╟я┤п╣я│я┌п╡п╣ п╟я─пЁя┐п╪п╣п╫я┌п╟."); 
 }
 
 SPELL_DECL(Disintegrate);
@@ -94,7 +94,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
 
 	if ( victim->fighting )
 	{
-		ch->send_to("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╬я│я─п╣п╢п╬я┌п╬я┤п╦я┌я▄я│я▐.. п√п╣я─я┌п╡п╟ я│п╩п╦я┬п╨п╬п╪ п╠я▀я│я┌я─п╬ п╢п╡п╦п╤п╣я┌я│я▐.\n\r");
 		return;
 	}
 
@@ -117,18 +117,18 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
 		return;
 	}
 
-	act_p("$C1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x тебя!",
+	act_p("$C1 я─п╟п╥я─я┐я┬п╟я▌я┴п╦п╪ я│п╡п╣я┌п╬п╡я▀п╪ п╩я┐я┤п╬п╪ {R###п÷п·п⌡п²п·п║п╒п╛п╝ пёп²п≤п╖п╒п·п√п░п∙п╒###{x я┌п╣п╠я▐!",
 		victim, 0, ch, TO_CHAR, POS_RESTING);
-	act_p("$c1 разрушающим световым лучом {R###ПОЛНОСТЬЮ УНИЧТОЖАЕТ###{x $C4!",
+	act_p("$c1 я─п╟п╥я─я┐я┬п╟я▌я┴п╦п╪ я│п╡п╣я┌п╬п╡я▀п╪ п╩я┐я┤п╬п╪ {R###п÷п·п⌡п²п·п║п╒п╛п╝ пёп²п≤п╖п╒п·п√п░п∙п╒###{x $C4!",
 		ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	act_p("Разрушающим световым лучом ты {R###ПОЛНОСТЬЮ УНИЧТОЖАЕШЬ###{x $C4!",
+	act_p("п═п╟п╥я─я┐я┬п╟я▌я┴п╦п╪ я│п╡п╣я┌п╬п╡я▀п╪ п╩я┐я┤п╬п╪ я┌я▀ {R###п÷п·п⌡п²п·п║п╒п╛п╝ пёп²п≤п╖п╒п·п√п░п∙п╗п╛###{x $C4!",
 		ch, 0, victim, TO_CHAR, POS_RESTING);
-	victim->send_to("Тебя {RУБИЛИ{x!\n\r");
+	victim->send_to("п╒п╣п╠я▐ {Rпёп▒п≤п⌡п≤{x!\n\r");
 
-	act_p("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR,POS_RESTING);
-	act_p("$c1 больше не существует!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
+	act_p("п╒п╣п╠я▐ п╠п╬п╩я▄я┬п╣ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌!\n\r", victim, 0, 0, TO_CHAR,POS_RESTING);
+	act_p("$c1 п╠п╬п╩я▄я┬п╣ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
 
-	victim->send_to("{YБожественные Силы возвращают тебя к жизни!{x\n\r");
+	victim->send_to("{Yп▒п╬п╤п╣я│я┌п╡п╣п╫п╫я▀п╣ п║п╦п╩я▀ п╡п╬п╥п╡я─п╟я┴п╟я▌я┌ я┌п╣п╠я▐ п╨ п╤п╦п╥п╫п╦!{x\n\r");
 	
 	group_gain( ch, victim );
 	raw_kill( victim, -1, ch, FKILL_REABILITATE | FKILL_PURGE | FKILL_MOB_EXTRACT );
@@ -148,14 +148,14 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
 
         if ( ch->isAffected(sn ) )
 	{
-	    ch->send_to("Ты пытаешься крикнуть, но только хрип вырывается из твоего горла.");
-	    act_p("$c1 хрипит!",ch,0,0,TO_ROOM,POS_RESTING);
+	    ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╨я─п╦п╨п╫я┐я┌я▄, п╫п╬ я┌п╬п╩я▄п╨п╬ я┘я─п╦п© п╡я▀я─я▀п╡п╟п╣я┌я│я▐ п╦п╥ я┌п╡п╬п╣пЁп╬ пЁп╬я─п╩п╟.");
+	    act_p("$c1 я┘я─п╦п©п╦я┌!",ch,0,0,TO_ROOM,POS_RESTING);
 	    return;
 	}
 
-	act_p("$c1 пронзительно кричит, сотрясая все вокруг!",
+	act_p("$c1 п©я─п╬п╫п╥п╦я┌п╣п╩я▄п╫п╬ п╨я─п╦я┤п╦я┌, я│п╬я┌я─я▐я│п╟я▐ п╡я│п╣ п╡п╬п╨я─я┐пЁ!",
 		ch,0,0,TO_ROOM,POS_RESTING);
-	act_p("Ты пронзительно кричишь, сотрясая все вокруг.",
+	act_p("п╒я▀ п©я─п╬п╫п╥п╦я┌п╣п╩я▄п╫п╬ п╨я─п╦я┤п╦я┬я▄, я│п╬я┌я─я▐я│п╟я▐ п╡я│п╣ п╡п╬п╨я─я┐пЁ.",
 		ch,0,0,TO_CHAR,POS_RESTING);
 
 	hpch = max( 10, (int)ch->hit );
@@ -195,9 +195,9 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (saves_spell( level, victim, DAM_OTHER,ch, DAMF_SPELL)) {
-	act_p("Легкая дрожь пронизывает $C4, но это быстро проходит.",
+	act_p("п⌡п╣пЁп╨п╟я▐ п╢я─п╬п╤я▄ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ $C4, п╫п╬ я█я┌п╬ п╠я▀я│я┌я─п╬ п©я─п╬я┘п╬п╢п╦я┌.",
                ch, 0, victim, TO_CHAR,POS_RESTING );
-	victim->send_to("Легкая дрожь пронизывает тебя, но это быстро проходит.\n\r");
+	victim->send_to("п⌡п╣пЁп╨п╟я▐ п╢я─п╬п╤я▄ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ я┌п╣п╠я▐, п╫п╬ я█я┌п╬ п╠я▀я│я┌я─п╬ п©я─п╬я┘п╬п╢п╦я┌.\n\r");
 	return;
     }
 
@@ -210,8 +210,8 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 	af.bitvector = 0;
 	affect_to_char(victim, &af );
 	if (ch != victim)
-	    act_p("Ты создаешь экран Магической Силы вокруг $C2.", ch, 0, victim, TO_CHAR,POS_RESTING);
-	victim->send_to("Магическая Сила создает экран вокруг тебя.\n\r");
+	    act_p("п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ я█п╨я─п╟п╫ п°п╟пЁп╦я┤п╣я│п╨п╬п╧ п║п╦п╩я▀ п╡п╬п╨я─я┐пЁ $C2.", ch, 0, victim, TO_CHAR,POS_RESTING);
+	victim->send_to("п°п╟пЁп╦я┤п╣я│п╨п╟я▐ п║п╦п╩п╟ я│п╬п╥п╢п╟п╣я┌ я█п╨я─п╟п╫ п╡п╬п╨я─я┐пЁ я┌п╣п╠я▐.\n\r");
     }
     else {
 	af.type	= sn;
@@ -222,9 +222,9 @@ VOID_SPELL(Shielding)::run( Character *ch, Character *victim, int sn, int level 
 	af.bitvector = 0;
 	affect_join( victim, &af );
 
-	victim->send_to("Магическая Сила полностью изолирует тебя от внешнего мира.\n\r");
+	victim->send_to("п°п╟пЁп╦я┤п╣я│п╨п╟я▐ п║п╦п╩п╟ п©п╬п╩п╫п╬я│я┌я▄я▌ п╦п╥п╬п╩п╦я─я┐п╣я┌ я┌п╣п╠я▐ п╬я┌ п╡п╫п╣я┬п╫п╣пЁп╬ п╪п╦я─п╟.\n\r");
 	if (ch != victim)
-	    act_p("Магическая Сила полностью изолирует $C4 от внешнего мира.", ch, 0, victim, TO_CHAR,POS_RESTING);
+	    act_p("п°п╟пЁп╦я┤п╣я│п╨п╟я▐ п║п╦п╩п╟ п©п╬п╩п╫п╬я│я┌я▄я▌ п╦п╥п╬п╩п╦я─я┐п╣я┌ $C4 п╬я┌ п╡п╫п╣я┬п╫п╣пЁп╬ п╪п╦я─п╟.", ch, 0, victim, TO_CHAR,POS_RESTING);
     }
 }
 
@@ -235,13 +235,13 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-	ch->send_to("Комната уже наполнена силовыми волнами.\n\r");
+	ch->send_to("п п╬п╪п╫п╟я┌п╟ я┐п╤п╣ п╫п╟п©п╬п╩п╫п╣п╫п╟ я│п╦п╩п╬п╡я▀п╪п╦ п╡п╬п╩п╫п╟п╪п╦.\n\r");
 	return;
     }
 
     if ( ch->isAffected(sn))
     {
-	ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+	ch->send_to("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╬я│я▄ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.\n\r");
 	return;
     }
 
@@ -256,8 +256,8 @@ VOID_SPELL(ShockingTrap)::run( Character *ch, Room *room, int sn, int level )
 
     postaffect_to_char( ch, sn, level / 10 );
 
-    ch->send_to("Комната наполняется силовыми волнами, заставляя вибрировать воздух.\n\r");
-    act_p("$c1 заставляет вибрировать воздух, наполняя комнату силовыми волнами.",
+    ch->send_to("п п╬п╪п╫п╟я┌п╟ п╫п╟п©п╬п╩п╫я▐п╣я┌я│я▐ я│п╦п╩п╬п╡я▀п╪п╦ п╡п╬п╩п╫п╟п╪п╦, п╥п╟я│я┌п╟п╡п╩я▐я▐ п╡п╦п╠я─п╦я─п╬п╡п╟я┌я▄ п╡п╬п╥п╢я┐я┘.\n\r");
+    act_p("$c1 п╥п╟я│я┌п╟п╡п╩я▐п╣я┌ п╡п╦п╠я─п╦я─п╬п╡п╟я┌я▄ п╡п╬п╥п╢я┐я┘, п╫п╟п©п╬п╩п╫я▐я▐ п╨п╬п╪п╫п╟я┌я┐ я│п╦п╩п╬п╡я▀п╪п╦ п╡п╬п╩п╫п╟п╪п╦.",
            ch,0,0,TO_ROOM,POS_RESTING);
 }
 
@@ -266,8 +266,8 @@ struct ShockingTrapDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-	msgRoom( "Силовые волны, наполняющие местность,\6%C4", ch );
-	msgChar( "Силовые волны, наполняющие местность,\6тебя", ch );
+	msgRoom( "п║п╦п╩п╬п╡я▀п╣ п╡п╬п╩п╫я▀, п╫п╟п©п╬п╩п╫я▐я▌я┴п╦п╣ п╪п╣я│я┌п╫п╬я│я┌я▄,\6%C4", ch );
+	msgChar( "п║п╦п╩п╬п╡я▀п╣ п╡п╬п╩п╫я▀, п╫п╟п©п╬п╩п╫я▐я▌я┴п╦п╣ п╪п╣я│я┌п╫п╬я│я┌я▄,\6я┌п╣п╠я▐", ch );
     }
 };
 	
@@ -286,7 +286,7 @@ VOID_AFFECT(ShockingTrap)::entry( Room *room, Character *ch, Affect *paf )
 
 VOID_AFFECT(ShockingTrap)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Воздух вибрирует от переизбытка энергии, это продлится еще {W%1$d{x ча%1$Iс|са|сов.",
+    buf << fmt( 0, "п▓п╬п╥п╢я┐я┘ п╡п╦п╠я─п╦я─я┐п╣я┌ п╬я┌ п©п╣я─п╣п╦п╥п╠я▀я┌п╨п╟ я█п╫п╣я─пЁп╦п╦, я█я┌п╬ п©я─п╬п╢п╩п╦я┌я│я▐ п╣я┴п╣ {W%1$d{x я┤п╟%1$Iя│|я│п╟|я│п╬п╡.",
 		   paf->duration )
 	<< endl;
 }
@@ -297,7 +297,7 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
 
     if (victim->isAffected(gsn_witch_curse)) {
-	ch->println("Твой противник уже проклят ведьмами.");
+	ch->println("п╒п╡п╬п╧ п©я─п╬я┌п╦п╡п╫п╦п╨ я┐п╤п╣ п©я─п╬п╨п╩я▐я┌ п╡п╣п╢я▄п╪п╟п╪п╦.");
 	return;
     }
 
@@ -312,9 +312,9 @@ VOID_SPELL(WitchCurse)::run( Character *ch, Character *victim, int sn, int level
     af.bitvector        = 0;
     affect_to_char(victim,&af);
 
-    act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_CHAR);
-    act("$C1 вступи$Gло|л|ла на путь смерти.", ch, 0, victim, TO_NOTVICT);
-    act("Ты вступи$Gло|л|ла на путь смерти.",  ch, 0, victim, TO_VICT);
+    act("$C1 п╡я│я┌я┐п©п╦$Gп╩п╬|п╩|п╩п╟ п╫п╟ п©я┐я┌я▄ я│п╪п╣я─я┌п╦.", ch, 0, victim, TO_CHAR);
+    act("$C1 п╡я│я┌я┐п©п╦$Gп╩п╬|п╩|п╩п╟ п╫п╟ п©я┐я┌я▄ я│п╪п╣я─я┌п╦.", ch, 0, victim, TO_NOTVICT);
+    act("п╒я▀ п╡я│я┌я┐п©п╦$Gп╩п╬|п╩|п╩п╟ п╫п╟ п©я┐я┌я▄ я│п╪п╣я─я┌п╦.",  ch, 0, victim, TO_VICT);
 }
 
 AFFECT_DECL(WitchCurse);
@@ -324,9 +324,9 @@ VOID_AFFECT(WitchCurse)::update( Character *ch, Affect *paf )
     
     DefaultAffectHandler::update( ch, paf );
 
-    act_p("Проклятие ведьм безжалостно отбирает жизнь у $c2.",
+    act_p("п÷я─п╬п╨п╩я▐я┌п╦п╣ п╡п╣п╢я▄п╪ п╠п╣п╥п╤п╟п╩п╬я│я┌п╫п╬ п╬я┌п╠п╦я─п╟п╣я┌ п╤п╦п╥п╫я▄ я┐ $c2.",
 	  ch,0,0,TO_ROOM,POS_RESTING);
-    ch->send_to("Проклятие ведьм безжалостно отбирает у тебя жизнь.\n\r");
+    ch->send_to("п÷я─п╬п╨п╩я▐я┌п╦п╣ п╡п╣п╢я▄п╪ п╠п╣п╥п╤п╟п╩п╬я│я┌п╫п╬ п╬я┌п╠п╦я─п╟п╣я┌ я┐ я┌п╣п╠я▐ п╤п╦п╥п╫я▄.\n\r");
 
     if (paf->level <= 1)
 	return;
@@ -357,13 +357,13 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-	ch->send_to("Эта комната уже защищена щитом.\n\r");
+	ch->send_to("п╜я┌п╟ п╨п╬п╪п╫п╟я┌п╟ я┐п╤п╣ п╥п╟я┴п╦я┴п╣п╫п╟ я┴п╦я┌п╬п╪.\n\r");
 	return;
     }
 
     if ( ch->isAffected(sn))
     {
-	ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+	ch->send_to("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╬я│я▄ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.\n\r");
 	return;
     }
 
@@ -379,8 +379,8 @@ VOID_SPELL(LightningShield)::run( Character *ch, Room *room, int sn, int level )
     postaffect_to_char( ch, sn, level / 10 );
 
     ch->in_room->owner = str_dup( ch->getNameP( ) );
-    ch->send_to("Комната наполняется молниями.\n\r");
-    act_p("$c1 окружает себя молниями.",ch,0,0,TO_ROOM,POS_RESTING);
+    ch->send_to("п п╬п╪п╫п╟я┌п╟ п╫п╟п©п╬п╩п╫я▐п╣я┌я│я▐ п╪п╬п╩п╫п╦я▐п╪п╦.\n\r");
+    act_p("$c1 п╬п╨я─я┐п╤п╟п╣я┌ я│п╣п╠я▐ п╪п╬п╩п╫п╦я▐п╪п╦.",ch,0,0,TO_ROOM,POS_RESTING);
     return;
 
 }
@@ -401,8 +401,8 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
 	room->affectStrip(paf->type);
     }
     else if (!ch->is_immortal( )) {
-	ch->send_to("Защитный щит комнаты блокирует тебя.\n\r");
-	act_p("$C1 заходит в комнату.",vch,0,ch,TO_CHAR,POS_RESTING);
+	ch->send_to("п≈п╟я┴п╦я┌п╫я▀п╧ я┴п╦я┌ п╨п╬п╪п╫п╟я┌я▀ п╠п╩п╬п╨п╦я─я┐п╣я┌ я┌п╣п╠я▐.\n\r");
+	act_p("$C1 п╥п╟я┘п╬п╢п╦я┌ п╡ п╨п╬п╪п╫п╟я┌я┐.",vch,0,ch,TO_CHAR,POS_RESTING);
 	interpret_raw( vch, "wake" );
 
 	if (!is_safe_rspell(paf->level,ch)) {
@@ -416,7 +416,7 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
 
 VOID_AFFECT(LightningShield)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Здесь установлен волшебный щит, который просуществует еще {W%1$d{x ча%1$Iс|са|сов.",
+    buf << fmt( 0, "п≈п╢п╣я│я▄ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ п╡п╬п╩я┬п╣п╠п╫я▀п╧ я┴п╦я┌, п╨п╬я┌п╬я─я▀п╧ п©я─п╬я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п╣я┴п╣ {W%1$d{x я┤п╟%1$Iя│|я│п╟|я│п╬п╡.",
 		   paf->duration )
 	<< endl;
 }
@@ -449,9 +449,9 @@ void EnergyShield::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_make_shield)) {
 	if (isColdShield( ))
-	    ch->send_to("Твоя сопротивляемость холоду повышается.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ я│п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ я┘п╬п╩п╬п╢я┐ п©п╬п╡я▀я┬п╟п╣я┌я│я▐.\n\r");
 	else if (isFireShield( )) 
-	    ch->send_to("Твоя сопротивляемость огню повышается.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ я│п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ п╬пЁп╫я▌ п©п╬п╡я▀я┬п╟п╣я┌я│я▐.\n\r");
     }
 }
 
@@ -485,9 +485,9 @@ void EnergyShield::remove( Character *ch )
     affect_strip(ch, gsn_make_shield);
 
     if (isColdShield( ))
-	ch->send_to("Твоя сопротивляемость холоду становится хуже.\n\r");
+	ch->send_to("п╒п╡п╬я▐ я│п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ я┘п╬п╩п╬п╢я┐ я│я┌п╟п╫п╬п╡п╦я┌я│я▐ я┘я┐п╤п╣.\n\r");
     else  if (isFireShield( ))
-	ch->send_to("Твоя сопротивляемость огню становится хуже.\n\r");
+	ch->send_to("п╒п╡п╬я▐ я│п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ п╬пЁп╫я▌ я│я┌п╟п╫п╬п╡п╦я┌я│я▐ я┘я┐п╤п╣.\n\r");
 }
 
 /*
@@ -503,7 +503,7 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     target_name = one_argument( target_name, arg );
 
     if (!(!str_cmp(arg,"cold") || !str_cmp(arg,"fire"))) {
-	ch->send_to("Выбери: от огня или холода он будет тебя защищать.\n\r");
+	ch->send_to("п▓я▀п╠п╣я─п╦: п╬я┌ п╬пЁп╫я▐ п╦п╩п╦ я┘п╬п╩п╬п╢п╟ п╬п╫ п╠я┐п╢п╣я┌ я┌п╣п╠я▐ п╥п╟я┴п╦я┴п╟я┌я▄.\n\r");
 	return;
     }
 	
@@ -533,6 +533,6 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
 	 SET_BIT(fire->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_GOOD));	
 	 
     obj_to_char( fire, ch);
-    ch->send_to("Ты создаешь энергетический щит.\n\r");
+    ch->send_to("п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ я█п╫п╣я─пЁп╣я┌п╦я┤п╣я│п╨п╦п╧ я┴п╦я┌.\n\r");
 }
 

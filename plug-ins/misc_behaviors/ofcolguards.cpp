@@ -30,7 +30,7 @@ void OfcolMarshal::fight( Character *victim )
     if (number_percent() < 25) 
 	return;
    
-    do_yell( ch, "ïÈÒÁÎÁ! îÁ ÐÏÍÏÝØ!" );
+    do_yell( ch, "ÐžÑ…Ñ€Ð°Ð½Ð°! ÐÐ° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ!" );
 
     if (ch->isAffected( gsn_garble ))
 	return;
@@ -65,8 +65,8 @@ void OfcolMarshal::fight( Character *victim )
 	{
 	    int i;
 
-	    act_p("$c1 ÐÒÉÚÙ×ÁÅÔ âÏÇÏ× ÎÁ ÐÏÍÏÝØ.", ch,0,0,TO_ROOM,POS_SLEEPING);
-	    act_p("âÏÇÉ ÐÒÉÚÙ×ÁÀÔ $c4 ÎÁ ÐÏÍÏÝØ äÉÁÎÅ.", mob,0,0,TO_ROOM,POS_SLEEPING);
+	    act_p("$c1 Ð¿Ñ€Ð¸Ð·Ñ‹Ð²Ð°ÐµÑ‚ Ð‘Ð¾Ð³Ð¾Ð² Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.", ch,0,0,TO_ROOM,POS_SLEEPING);
+	    act_p("Ð‘Ð¾Ð³Ð¸ Ð¿Ñ€Ð¸Ð·Ñ‹Ð²Ð°ÑŽÑ‚ $c4 Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð”Ð¸Ð°Ð½Ðµ.", mob,0,0,TO_ROOM,POS_SLEEPING);
 
 	    mob->max_hit = 6000;
 	    mob->hit = 6000;
@@ -78,7 +78,7 @@ void OfcolMarshal::fight( Character *victim )
 	    for(i=0;i<stat_table.size;i++)
 		mob->perm_stat[i] = 23;
 
-	    do_say(mob, "äÉÁÎÁ, Ñ ÉÄÕ ÎÁ ÐÏÍÏÝØ...");
+	    do_say(mob, "Ð”Ð¸Ð°Ð½Ð°, Ñ Ð¸Ð´Ñƒ Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ...");
 	    multi_hit( mob, victim );
 	}
 	else {
@@ -86,9 +86,9 @@ void OfcolMarshal::fight( Character *victim )
 
 	    if (!guard->path.empty( )) {
 		if (number_percent() < 25)
-		    do_yell(mob, "äÅÒÖÉÓØ äÉÁÎÁ! ñ ÉÄÕ ÎÁ ÐÏÍÏÝØ!");
+		    do_yell(mob, "Ð”ÐµÑ€Ð¶Ð¸ÑÑŒ Ð”Ð¸Ð°Ð½Ð°! Ð¯ Ð¸Ð´Ñƒ Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ!");
 		else
-		    do_say(mob, "äÉÁÎÅ ÎÅÏÂÈÏÄÉÍÁ ÍÏÑ ÐÏÍÏÝØ.");
+		    do_say(mob, "Ð”Ð¸Ð°Ð½Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð° Ð¼Ð¾Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.");
 
 		guard->makeOneStep( );
 	    }
@@ -108,7 +108,7 @@ void OfcolGuard::fight( Character *victim )
     if (number_percent( ) < 25) 
 	return;
 
-    interpret_raw( ch, "yell", "óÔÒÁÖÁ ÎÁ ÐÏÍÏÝØ! %s ÕÂÉ×ÁÅÔ ÍÅÎÑ.", 
+    interpret_raw( ch, "yell", "Ð¡Ñ‚Ñ€Ð°Ð¶Ð° Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ! %s ÑƒÐ±Ð¸Ð²Ð°ÐµÑ‚ Ð¼ÐµÐ½Ñ.", 
                   victim->getNameP( '1' ).c_str( ) );
    
     for (ach = char_list; ach != 0; ach = ach_next)
@@ -138,7 +138,7 @@ void OfcolGuard::fight( Character *victim )
 	    continue;
 
 	if (ch->in_room == mob->in_room) {
-	    interpret_raw( mob, "say", "ôÅÐÅÒØ, %s, ÔÙ ÐÏÐÌÁÔÉÛØÓÑ ÚÁ ÎÁÐÁÄÅÎÉÅ ÎÁ ÓÔÒÁÖÎÉËÁ.",
+	    interpret_raw( mob, "say", "Ð¢ÐµÐ¿ÐµÑ€ÑŒ, %s, Ñ‚Ñ‹ Ð¿Ð¾Ð¿Ð»Ð°Ñ‚Ð¸ÑˆÑŒÑÑ Ð·Ð° Ð½Ð°Ð¿Ð°Ð´ÐµÐ½Ð¸Ðµ Ð½Ð° ÑÑ‚Ñ€Ð°Ð¶Ð½Ð¸ÐºÐ°.",
 	                   victim->getNameP( '1' ).c_str( ) );
 	    multi_hit( mob, victim );
 	}
@@ -147,9 +147,9 @@ void OfcolGuard::fight( Character *victim )
 
 	    if (!guard->path.empty( )) {
 		if (number_percent() < 25)
-		    do_yell(mob, "äÅÒÖÉÓØ ÓÔÒÁÖÎÉË! ñ ÉÄÕ ÎÁ ÐÏÍÏÝØ.");
+		    do_yell(mob, "Ð”ÐµÑ€Ð¶Ð¸ÑÑŒ ÑÑ‚Ñ€Ð°Ð¶Ð½Ð¸Ðº! Ð¯ Ð¸Ð´Ñƒ Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.");
 		else
-		    do_say(mob, "óÔÒÁÖÅ ÎÅÏÂÈÏÄÉÍÁ ÍÏÑ ÐÏÍÏÝØ.");
+		    do_say(mob, "Ð¡Ñ‚Ñ€Ð°Ð¶Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð° Ð¼Ð¾Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.");
 
 		guard->makeOneStep( );
 	    }

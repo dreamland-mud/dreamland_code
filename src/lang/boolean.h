@@ -25,7 +25,7 @@ public:
 	static const DLString VAL_FALSE;
 
 public:	
-	/** По умолчанию значение true */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ true */
 	inline Boolean( ) : value( true )
 	{
 	}
@@ -66,7 +66,7 @@ private:
 
 
 
-/** Вывод в ostream типа Boolean */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Boolean */
 inline std::ostream& operator << ( std::ostream& ostr, const Boolean& boolean )
 {
 	ostr << boolean.getValue( );

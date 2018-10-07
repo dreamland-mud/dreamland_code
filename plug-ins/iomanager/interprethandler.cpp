@@ -36,8 +36,8 @@ const	char 	go_ahead_str	[] = { IAC, GA, '\0' };
 
 const char *dir_name[] = {"N","E","S","W","U","D"};
 const char *dir_name_small[] = {"n","e","s","w","u","d"};
-const char *ru_dir_name[] = {"ó","÷","à","ú","ð","ï"};
-const char *ru_dir_name_small[] = {"Ó","×","À","Ú","Ð","Ï"};
+const char *ru_dir_name[] = {"Ð¡","Ð’","Ð®","Ð—","ÐŸ","Ðž"};
+const char *ru_dir_name_small[] = {"Ñ","Ð²","ÑŽ","Ð·","Ð¿","Ð¾"};
 
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
@@ -102,7 +102,7 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     
     if (!iargs.pCommand) {
 	if (!iargs.cmdName.empty( ))
-	    iargs.ch->send_to( "þÔÏ?\r\n" );
+	    iargs.ch->send_to( "Ð§Ñ‚Ð¾?\r\n" );
 
 	return 0;
     }
@@ -211,7 +211,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		}
 	    }
 	    if (doors.str( ).empty( ))
-		out << (ruexits ? "ÎÅÔ" : "none");
+		out << (ruexits ? "Ð½ÐµÑ‚" : "none");
 	    else
 		out << doors.str( );
 	    break;
@@ -244,7 +244,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		    out << "BAD!!";
 	    }
 	    else
-		out << "ÎÅÔ";
+		out << "Ð½ÐµÑ‚";
 	    break;
 
 	case 'h' :
@@ -308,7 +308,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 		    out << ch->in_room->name;
 		}
 		else
-		    out << "ÔÅÍÎÏÔÁ";
+		    out << "Ñ‚ÐµÐ¼Ð½Ð¾Ñ‚Ð°";
 	    else
 		out << " ";
 	    break;
@@ -414,21 +414,21 @@ void InterpretHandler::battlePrompt( Character *ch )
     buf << "%1$^C1 ";
     
     if( percent >= 100 )
-	buf << "{C× ÐÒÅËÒÁÓÎÏÍ ÓÏÓÔÏÑÎÉÉ.{x";
+	buf << "{CÐ² Ð¿Ñ€ÐµÐºÑ€Ð°ÑÐ½Ð¾Ð¼ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ð¸.{x";
     else if( percent >= 90 )
-	buf << "{BÉÍÅÅÔ ÎÅÓËÏÌØËÏ ÃÁÒÁÐÉÎ.{x";
+	buf << "{BÐ¸Ð¼ÐµÐµÑ‚ Ð½ÐµÑÐºÐ¾Ð»ÑŒÐºÐ¾ Ñ†Ð°Ñ€Ð°Ð¿Ð¸Ð½.{x";
     else if( percent >= 75 )
-	buf << "{BÉÍÅÅÔ ÎÅÓËÏÌØËÏ ÎÅÂÏÌØÛÉÈ ÓÉÎÑËÏ× É ÃÁÒÁÐÉÎ.{x";
+	buf << "{BÐ¸Ð¼ÐµÐµÑ‚ Ð½ÐµÑÐºÐ¾Ð»ÑŒÐºÐ¾ Ð½ÐµÐ±Ð¾Ð»ÑŒÑˆÐ¸Ñ… ÑÐ¸Ð½ÑÐºÐ¾Ð² Ð¸ Ñ†Ð°Ñ€Ð°Ð¿Ð¸Ð½.{x";
     else if( percent >= 50 )
-	buf << "{GÉÍÅÅÔ ÄÏ×ÏÌØÎÏ ÍÎÏÇÏ ÒÁÎ.{x";
+	buf << "{GÐ¸Ð¼ÐµÐµÑ‚ Ð´Ð¾Ð²Ð¾Ð»ÑŒÐ½Ð¾ Ð¼Ð½Ð¾Ð³Ð¾ Ñ€Ð°Ð½.{x";
     else if( percent >= 30 )
-	buf << "{YÉÍÅÅÔ ÎÅÓËÏÌØËÏ ÂÏÌØÛÉÈ, ÏÐÁÓÎÙÈ ÒÁÎ É ÃÁÒÁÐÉÎ.{x";
+	buf << "{YÐ¸Ð¼ÐµÐµÑ‚ Ð½ÐµÑÐºÐ¾Ð»ÑŒÐºÐ¾ Ð±Ð¾Ð»ÑŒÑˆÐ¸Ñ…, Ð¾Ð¿Ð°ÑÐ½Ñ‹Ñ… Ñ€Ð°Ð½ Ð¸ Ñ†Ð°Ñ€Ð°Ð¿Ð¸Ð½.{x";
     else if( percent >= 15 )
-	buf << "{M×ÙÇÌÑÄÉÔ ÓÉÌØÎÏ ÐÏ×ÒÅÖÄÅÎÎ%1$GÙÍ|ÙÍ|ÏÊ.{x";
+	buf << "{MÐ²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ ÑÐ¸Ð»ÑŒÐ½Ð¾ Ð¿Ð¾Ð²Ñ€ÐµÐ¶Ð´ÐµÐ½Ð½%1$GÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.{x";
     else if( percent >= 0 )
-	buf << "{R× ÕÖÁÓÎÏÍ ÓÏÓÔÏÑÎÉÉ.{x";
+	buf << "{RÐ² ÑƒÐ¶Ð°ÑÐ½Ð¾Ð¼ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ð¸.{x";
     else
-	buf << "{RÉÓÔÅËÁÅÔ ËÒÏ×ØÀ.{x";
+	buf << "{RÐ¸ÑÑ‚ÐµÐºÐ°ÐµÑ‚ ÐºÑ€Ð¾Ð²ÑŒÑŽ.{x";
     
     ch->pecho( buf.str( ).c_str( ), victim ); 
 }
@@ -440,7 +440,7 @@ void InterpretHandler::close( Descriptor *d )
     if (!ch)
 	return;
 	
-    act( "$c1 ÐÏÔÅÒÑ$gÌÏ|Ì|ÌÁ Ó×ÑÚØ Ó ÜÔÉÍ ÍÉÒÏÍ.", ch, 0, 0, TO_ROOM );
+    act( "$c1 Ð¿Ð¾Ñ‚ÐµÑ€Ñ$gÐ»Ð¾|Ð»|Ð»Ð° ÑÐ²ÑÐ·ÑŒ Ñ ÑÑ‚Ð¸Ð¼ Ð¼Ð¸Ñ€Ð¾Ð¼.", ch, 0, 0, TO_ROOM );
     wiznet( WIZ_LINKS, 0, ch->get_trust( ), "Net death has claimed %C1.", ch );
     ch->desc = 0;
 }

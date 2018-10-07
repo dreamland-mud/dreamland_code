@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "skill.h"
@@ -50,38 +50,38 @@ SKILL_RUNP( rescue )
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to("óÐÁÓÔÉ ËÏÇÏ?\n\r");
+		ch->send_to("Ð¡Ð¿Ð°ÑÑ‚Ð¸ ÐºÐ¾Ð³Ð¾?\n\r");
 		return;
 	}
 
 	if ( ( victim = get_char_room( ch, arg ) ) == 0 )
 	{
-		ch->send_to("üÔÏÇÏ ÎÅÔ ÚÄÅÓØ.\n\r");
+		ch->send_to("Ð­Ñ‚Ð¾Ð³Ð¾ Ð½ÐµÑ‚ Ð·Ð´ÐµÑÑŒ.\n\r");
 		return;
 	}
 
 	if ( victim == ch )
 	{
-		ch->send_to("óÅÂÑ?\n\r");
+		ch->send_to("Ð¡ÐµÐ±Ñ?\n\r");
 		return;
 	}
 
 	if ( !ch->is_npc() && victim->is_npc() )
 	{
-		ch->send_to("ô×ÏÑ ÐÏÍÏÝØ ÎÅ ÎÕÖÎÁ!\n\r");
+		ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð½Ðµ Ð½ÑƒÐ¶Ð½Ð°!\n\r");
 		return;
 	}
 
 	if ( ch->fighting == victim )
 	{
-		ch->send_to("óÌÉÛËÏÍ ÐÏÚÄÎÏ...\n\r");
+		ch->send_to("Ð¡Ð»Ð¸ÑˆÐºÐ¾Ð¼ Ð¿Ð¾Ð·Ð´Ð½Ð¾...\n\r");
 		return;
 	}
 
 	if ( ( ( fch = victim->fighting ) == 0 )
 		&& ( victim->death_ground_delay == 0 ) )
 	{
-		ch->send_to("îÏ ÎÉËÔÏ ÎÅ ÎÕÖÄÁÅÔÓÑ × ÐÏÍÏÝÉ..\n\r");
+		ch->send_to("ÐÐ¾ Ð½Ð¸ÐºÑ‚Ð¾ Ð½Ðµ Ð½ÑƒÐ¶Ð´Ð°ÐµÑ‚ÑÑ Ð² Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸..\n\r");
 		return;
 	}
 
@@ -101,14 +101,14 @@ SKILL_RUNP( rescue )
 		|| ( victim->getModifyLevel() > ( ch->getModifyLevel() + 30) )
 		|| ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
 	{
-		ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÓÐÁÓÔÉ ÎÅ ÕÄÁÌÁÓØ.\n\r");
+		ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° ÑÐ¿Ð°ÑÑ‚Ð¸ Ð½Ðµ ÑƒÐ´Ð°Ð»Ð°ÑÑŒ.\n\r");
 		gsn_rescue->improve( ch, false, victim );
 		return;
 	}
 
-	act_p( "ôÙ ÓÐÁÓÁÅÛØ $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING);
-	act_p( "$c1 ÓÐÁÓÁÅÔ ÔÅÂÑ!", ch, 0, victim, TO_VICT,POS_RESTING);
-	act_p( "$c1 ÓÐÁÓÁÅÔ $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+	act_p( "Ð¢Ñ‹ ÑÐ¿Ð°ÑÐ°ÐµÑˆÑŒ $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING);
+	act_p( "$c1 ÑÐ¿Ð°ÑÐ°ÐµÑ‚ Ñ‚ÐµÐ±Ñ!", ch, 0, victim, TO_VICT,POS_RESTING);
+	act_p( "$c1 ÑÐ¿Ð°ÑÐ°ÐµÑ‚ $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
 	gsn_rescue->improve( ch, true, victim );
 
 	if ( fch )

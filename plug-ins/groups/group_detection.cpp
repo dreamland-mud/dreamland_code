@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -53,9 +53,9 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, ACUTE_VISION) )
     {
         if (victim == ch)
-          ch->send_to("Ù◊œ≈ ⁄“≈Œ…≈ ’÷≈ œ¬œ”‘“≈Œœ ƒœ –“≈ƒ≈Ã¡. \n\r");
+          ch->send_to("–¢–≤–æ–µ –∑—Ä–µ–Ω–∏–µ —É–∂–µ –æ–±–æ—Å—Ç—Ä–µ–Ω–æ –¥–æ –ø—Ä–µ–¥–µ–ª–∞. \n\r");
         else
-          act_p("˙“≈Œ…≈ $C2 ’÷≈ œ¬œ”‘“≈Œœ ƒœ –“≈ƒ≈Ã¡.",
+          act_p("–ó—Ä–µ–Ω–∏–µ $C2 —É–∂–µ –æ–±–æ—Å—Ç—Ä–µ–Ω–æ –¥–æ –ø—Ä–µ–¥–µ–ª–∞.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
         return;
     }
@@ -67,7 +67,7 @@ VOID_SPELL(AcuteVision)::run( Character *ch, Character *victim, int sn, int leve
     af.modifier  = 0;
     af.bitvector = ACUTE_VISION;
     affect_to_char( victim, &af );
-    victim->send_to("Ù◊œ≈ ⁄“≈Œ…≈ œ¬œ”‘“—≈‘”—.\n\r");
+    victim->send_to("–¢–≤–æ–µ –∑—Ä–µ–Ω–∏–µ –æ–±–æ—Å—Ç—Ä—è–µ—Ç—Å—è.\n\r");
     if ( ch != victim )
         ch->send_to("Ok.\n\r");
     return;
@@ -84,9 +84,9 @@ VOID_SPELL(DetectEvil)::run( Character *ch, Character *victim, int sn, int level
     if ( CAN_DETECT(victim, DETECT_EVIL) )
     {
 	if (victim == ch)
-	  ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ ƒÿ—◊œÃÿ”À…» ”…Ã.\n\r");
+	  ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –¥—å—è–≤–æ–ª—å—Å–∫–∏—Ö —Å–∏–ª.\n\r");
 	else
-	  act_p("$C1 ’÷≈ ﬁ’◊”‘◊’≈‘ –“…”’‘”‘◊…≈ ƒÿ—◊œÃÿ”À…» ”…Ã.",
+	  act_p("$C1 —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—Ç –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –¥—å—è–≤–æ–ª—å—Å–∫–∏—Ö —Å–∏–ª.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -98,7 +98,7 @@ VOID_SPELL(DetectEvil)::run( Character *ch, Character *victim, int sn, int level
     af.location  = APPLY_NONE;
     af.bitvector = DETECT_EVIL;
     affect_to_char( victim, &af );
-    victim->send_to("Ù≈–≈“ÿ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ {D⁄Ãœ{x.\n\r");
+    victim->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å {D–∑–ª–æ{x.\n\r");
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
     return;
@@ -116,9 +116,9 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
     if ( CAN_DETECT(victim, DETECT_GOOD) )
     {
 	if (victim == ch)
-	  ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ ƒœ¬“Ÿ» ”…Ã.\n\r");
+	  ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –¥–æ–±—Ä—ã—Ö —Å–∏–ª.\n\r");
 	else
-	  act_p("$C1 ’÷≈ ﬁ’◊”‘◊’≈‘ –“…”’‘”‘◊…≈ ƒœ¬“Ÿ» ”…Ã.",
+	  act_p("$C1 —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—Ç –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –¥–æ–±—Ä—ã—Ö —Å–∏–ª.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -130,7 +130,7 @@ VOID_SPELL(DetectGood)::run( Character *ch, Character *victim, int sn, int level
     af.location  = APPLY_NONE;
     af.bitvector = DETECT_GOOD;
     affect_to_char( victim, &af );
-    victim->send_to("Ù≈–≈“ÿ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ {Wƒœ¬“¡{x.\n\r");
+    victim->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ {W–¥–æ–±—Ä–∞{x.\n\r");
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
     return;
@@ -147,9 +147,9 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
     if ( CAN_DETECT(victim, DETECT_HIDDEN) )
     {
 	if (victim == ch)
-	  ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ ”À“Ÿ‘Ÿ» ”…Ã. \n\r");
+	  ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ —Å–∫—Ä—ã—Ç—ã—Ö —Å–∏–ª. \n\r");
 	else
-	  act_p("$C1 ’÷≈ ﬁ’◊”‘◊’≈‘ –“…”’‘”‘◊…≈ ”À“Ÿ‘Ÿ» ”…Ã.",
+	  act_p("$C1 —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—Ç –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ —Å–∫—Ä—ã—Ç—ã—Ö —Å–∏–ª.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -161,7 +161,7 @@ VOID_SPELL(DetectHidden)::run( Character *ch, Character *victim, int sn, int lev
     af.modifier  = 0;
     af.bitvector = DETECT_HIDDEN;
     affect_to_char( victim, &af );
-    victim->send_to("Ù≈–≈“ÿ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ ”À“Ÿ‘Ÿ» ”…Ã.\n\r");
+    victim->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ —Å–∫—Ä—ã—Ç—ã—Ö —Å–∏–ª.\n\r");
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
     return;
@@ -178,9 +178,9 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, DETECT_INVIS) )
     {
 	if (victim == ch)
-	  ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ Œ≈◊…ƒ…ÕŸ» ”…Ã.\n\r");
+	  ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –Ω–µ–≤–∏–¥–∏–º—ã—Ö —Å–∏–ª.\n\r");
 	else
-	  act_p("$C1 ’÷≈ ﬁ’◊”‘◊’≈‘ –“…”’‘”‘◊…≈ Œ≈◊…ƒ…ÕŸ» ”…Ã.",
+	  act_p("$C1 —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—Ç –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –Ω–µ–≤–∏–¥–∏–º—ã—Ö —Å–∏–ª.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -193,7 +193,7 @@ VOID_SPELL(DetectInvis)::run( Character *ch, Character *victim, int sn, int leve
     af.location  = APPLY_NONE;
     af.bitvector = DETECT_INVIS;
     affect_to_char( victim, &af );
-    victim->send_to("Ù≈–≈“ÿ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ Œ≈◊…ƒ…ÕŸ» ”…Ã.\n\r");
+    victim->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –Ω–µ–≤–∏–¥–∏–º—ã—Ö —Å–∏–ª.\n\r");
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
     return;
@@ -210,9 +210,9 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
     if ( CAN_DETECT(victim, DETECT_MAGIC) )
     {
 	if (victim == ch)
-	  ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ Õ¡«…ﬁ≈”À…» ”…Ã.\n\r");
+	  ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –º–∞–≥–∏—á–µ—Å–∫–∏—Ö —Å–∏–ª.\n\r");
 	else
-	  act_p("$C1 ’÷≈ ﬁ’◊”‘◊’≈‘ –“…”’‘”‘◊…≈ Õ¡«…ﬁ≈”À…» ”…Ã.",
+	  act_p("$C1 —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—Ç –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –º–∞–≥–∏—á–µ—Å–∫–∏—Ö —Å–∏–ª.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -225,7 +225,7 @@ VOID_SPELL(DetectMagic)::run( Character *ch, Character *victim, int sn, int leve
     af.location  = APPLY_NONE;
     af.bitvector = DETECT_MAGIC;
     affect_to_char( victim, &af );
-    victim->send_to("Ù◊œ… «Ã¡⁄¡ ⁄¡«œ“¡¿‘”—.\n\r");
+    victim->send_to("–¢–≤–æ–∏ –≥–ª–∞–∑–∞ –∑–∞–≥–æ—Ä–∞—é—Ç—Å—è.\n\r");
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
     return;
@@ -239,13 +239,13 @@ VOID_SPELL(DetectPoison)::run( Character *ch, Object *obj, int sn, int level )
     if ( obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOOD )
     {
 	if (IS_SET(obj->value[3], DRINK_POISONED))
-	    ch->send_to("ÙŸ ﬁ’◊”‘◊’≈€ÿ ⁄¡–¡» —ƒ¡.\n\r");
+	    ch->send_to("–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –∑–∞–ø–∞—Ö —è–¥–∞.\n\r");
 	else
-	    ch->send_to("¸‘œ ◊Ÿ«Ã—ƒ…‘ ◊–œÃŒ≈ Œœ“Õ¡ÃÿŒœ.\n\r");
+	    ch->send_to("–≠—Ç–æ –≤—ã–≥–ª—è–¥–∏—Ç –≤–ø–æ–ª–Ω–µ –Ω–æ—Ä–º–∞–ª—å–Ω–æ.\n\r");
     }
     else
     {
-	ch->send_to("¸‘œ ◊Ÿ«Ã—ƒ…‘ Œ≈ œ‘“¡◊Ã≈ŒŒŸÕ.\n\r");
+	ch->send_to("–≠—Ç–æ –≤—ã–≥–ª—è–¥–∏—Ç –Ω–µ –æ—Ç—Ä–∞–≤–ª–µ–Ω–Ω—ã–º.\n\r");
     }
 
     return;
@@ -261,7 +261,7 @@ VOID_SPELL(DetectUndead)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( CAN_DETECT(ch, DETECT_UNDEAD) )
     {
-		ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ Œ≈÷…‘ÿ.\n\r");
+		ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –Ω–µ–∂–∏—Ç—å.\n\r");
 
 		return;
     }
@@ -274,7 +274,7 @@ VOID_SPELL(DetectUndead)::run( Character *ch, Character *victim, int sn, int lev
     af.location  = APPLY_NONE;
     af.bitvector = DETECT_UNDEAD;
     affect_to_char( victim, &af );
-    ch->send_to("Ù≈–≈“ÿ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ Œ≈÷…‘ÿ.\n\r");
+    ch->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –Ω–µ–∂–∏—Ç—å.\n\r");
 
     return;
 
@@ -323,7 +323,7 @@ VOID_SPELL(Farsight)::run( Character *ch, char *target_name, int sn, int level )
 
     if ( (room = check_place(ch,target_name)) == 0)
       {
-	ch->send_to("Ù¡À ƒ¡Ã≈Àœ ‘≈¬≈ Œ≈ ◊…ƒŒœ.\n\r");
+	ch->send_to("–¢–∞–∫ –¥–∞–ª–µ–∫–æ —Ç–µ–±–µ –Ω–µ –≤–∏–¥–Ω–æ.\n\r");
 	return;
       }
     
@@ -340,9 +340,9 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
     if ( CAN_DETECT(victim, DETECT_IMP_INVIS) )
     {
 	if (victim == ch)
-	  ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ œﬁ≈Œÿ Œ≈◊…ƒ…ÕŸ» ”…Ã.\n\r");
+	  ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –æ—á–µ–Ω—å –Ω–µ–≤–∏–¥–∏–º—ã—Ö —Å–∏–ª.\n\r");
 	else
-	  act_p("$C1 ’÷≈ ﬁ’◊”‘◊’≈‘ –“…”’‘”‘◊…≈ œﬁ≈Œÿ Œ≈◊…ƒ…ÕŸ» ”…Ã.",
+	  act_p("$C1 —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—Ç –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –æ—á–µ–Ω—å –Ω–µ–≤–∏–¥–∏–º—ã—Ö —Å–∏–ª.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -355,7 +355,7 @@ VOID_SPELL(ImprovedDetect)::run( Character *ch, Character *victim, int sn, int l
     af.location  = APPLY_NONE;
     af.bitvector = DETECT_IMP_INVIS;
     affect_to_char( victim, &af );
-    victim->send_to("Ù≈–≈“ÿ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ œﬁ≈Œÿ Œ≈◊…ƒ…ÕŸ» ”…Ã.\n\r");
+    victim->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ –æ—á–µ–Ω—å –Ω–µ–≤–∏–¥–∏–º—ã—Ö —Å–∏–ª.\n\r");
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
     return;
@@ -369,11 +369,11 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
 	const char *msg;
 
 	if ( IS_GOOD(victim) )
-		msg = "$C1 …Õ≈≈‘ ”◊≈‘Ã’¿ … ﬁ…”‘’¿ ¡’“’.";
+		msg = "$C1 –∏–º–µ–µ—Ç —Å–≤–µ—Ç–ª—É—é –∏ —á–∏—Å—Ç—É—é –∞—É—Ä—É.";
 	else if ( IS_NEUTRAL(victim) )
-		msg = "$C1 …Õ≈≈‘ ”≈“’¿ ¡’“’.";
+		msg = "$C1 –∏–º–µ–µ—Ç —Å–µ—Ä—É—é –∞—É—Ä—É.";
 	else
-		msg = "$C1 - ◊œ–Ãœ›≈Œ…≈ {D⁄Ã¡{x!.";
+		msg = "$C1 - –≤–æ–ø–ª–æ—â–µ–Ω–∏–µ {D–∑–ª–∞{x!.";
 
 	act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING);
 
@@ -381,16 +381,16 @@ VOID_SPELL(KnowAlignment)::run( Character *ch, Character *victim, int sn, int le
 	{
 		switch (victim->ethos.getValue( )) {
 		case ETHOS_LAWFUL:
-			msg = "$C1 ﬁ‘…‘ ⁄¡ÀœŒ.";
+			msg = "$C1 —á—Ç–∏—Ç –∑–∞–∫–æ–Ω.";
 			break;
 		case ETHOS_NEUTRAL:
-			msg = "$C1 œ‘Œœ”…‘”— À ⁄¡ÀœŒ’ Œ≈ ‘“¡ÃÿŒœ.";
+			msg = "$C1 –æ—Ç–Ω–æ—Å–∏—Ç—Å—è –∫ –∑–∞–∫–æ–Ω—É –Ω–µ–π—Ç—Ä–∞–ª—å–Ω–æ.";
 			break;
 		case ETHOS_CHAOTIC:
-			msg = "$C1 …Õ≈≈‘ »¡œ‘…ﬁ≈”À…  »¡“¡À‘≈“.";
+			msg = "$C1 –∏–º–µ–µ—Ç —Ö–∞–æ—Ç–∏—á–µ—Å–∫–∏–π —Ö–∞—Ä–∞–∫—Ç–µ—Ä.";
 			break;
 		default:
-			msg = "$C1 –œŒ—‘…— Œ≈ …Õ≈≈‘, À¡À œ‘Œœ”…‘ÿ”— À ⁄¡ÀœŒ¡Õ.";
+			msg = "$C1 –ø–æ–Ω—è—Ç–∏—è –Ω–µ –∏–º–µ–µ—Ç, –∫–∞–∫ –æ—Ç–Ω–æ—Å–∏—Ç—å—Å—è –∫ –∑–∞–∫–æ–Ω–∞–º.";
 			break;
 		}
 		act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING);
@@ -429,16 +429,16 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
 
 	if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by))
 	{
-	    sprintf( buf, "ÈÕ≈≈‘”— ’ %s\n\r",
+	    sprintf( buf, "–ò–º–µ–µ—Ç—Å—è —É %s\n\r",
 		ch->sees(in_obj->carried_by, '2').c_str() );
 	}
 	else
 	{
 	    if (ch->is_immortal() && in_obj->in_room != 0)
-		sprintf( buf, "Œ¡»œƒ…‘”— ◊ %s [ÎœÕŒ¡‘¡ %d]\n\r",
+		sprintf( buf, "–Ω–∞—Ö–æ–¥–∏—Ç—Å—è –≤ %s [–ö–æ–º–Ω–∞—Ç–∞ %d]\n\r",
 		    in_obj->in_room->name, in_obj->in_room->vnum);
 	    else
-		sprintf( buf, "Œ¡»œƒ…‘”— ◊ %s\n\r",
+		sprintf( buf, "–Ω–∞—Ö–æ–¥–∏—Ç—Å—è –≤ %s\n\r",
 		    in_obj->in_room == 0
 			? "somewhere" : in_obj->in_room->name );
 	}
@@ -451,7 +451,7 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
     }
 
     if ( !found )
-	ch->send_to("˜ Dream Land Œ≈‘ Œ…ﬁ≈«œ –œ»œ÷≈«œ Œ¡ ‹‘œ.\n\r");
+	ch->send_to("–í Dream Land –Ω–µ—Ç –Ω–∏—á–µ–≥–æ –ø–æ—Ö–æ–∂–µ–≥–æ –Ω–∞ —ç—Ç–æ.\n\r");
     else
 	page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -463,7 +463,7 @@ VOID_SPELL(Observation)::run( Character *ch, Character *victim, int sn, int leve
   Affect	af;
 
   if( CAN_DETECT( victim, DETECT_OBSERVATION ) ) {
-    ch->send_to("ÙŸ ’÷≈ ⁄¡Õ≈ﬁ¡≈€ÿ ”œ”‘œ—Œ…≈ ƒ“’«…».\n\r");
+    ch->send_to("–¢—ã —É–∂–µ –∑–∞–º–µ—á–∞–µ—à—å —Å–æ—Å—Ç–æ—è–Ω–∏–µ –¥—Ä—É–≥–∏—Ö.\n\r");
     return;
   }
 
@@ -475,7 +475,7 @@ VOID_SPELL(Observation)::run( Character *ch, Character *victim, int sn, int leve
   af.modifier	= 0;
   af.bitvector	= DETECT_OBSERVATION;
   affect_to_char( victim, &af );
-  ch->send_to("Ù≈–≈“ÿ ‘Ÿ ⁄¡Õ≈ﬁ¡≈€ÿ ”œ”‘œ—Œ…≈ ƒ“’«…».\n\r");
+  ch->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã –∑–∞–º–µ—á–∞–µ—à—å —Å–æ—Å—Ç–æ—è–Ω–∏–µ –¥—Ä—É–≥–∏—Ö.\n\r");
   return;
 
 }
@@ -491,13 +491,13 @@ SKILL_RUNP( detect )
 
 	if (!gsn_detect_hide->usable( ch ))
 	{
-		ch->send_to( "˛≈«œ?\n\r");
+		ch->send_to( "–ß–µ–≥–æ?\n\r");
 		return;
 	}
 
 	if ( CAN_DETECT(ch, DETECT_HIDDEN) )
 	{
-		ch->send_to("ÙŸ ’÷≈ ﬁ’◊”‘◊’≈€ÿ –“…”’‘”‘◊…≈ ”À“Ÿ‘Ÿ» ”…Ã. \n\r");
+		ch->send_to("–¢—ã —É–∂–µ —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏—Å—É—Ç—Å—Ç–≤–∏–µ —Å–∫—Ä—ã—Ç—ã—Ö —Å–∏–ª. \n\r");
 		return;
 	}
 
@@ -505,7 +505,7 @@ SKILL_RUNP( detect )
 	
 	if ( number_percent( ) > gsn_detect_hide->getEffective( ch ) )
 	{
-		ch->send_to("ÙŸ –Ÿ‘¡≈€ÿ”— ’◊…ƒ≈‘ÿ ”À“Ÿ‘œ≈ ◊ ‘≈Œ…, Œœ ’ ‘≈¬— Œ…ﬁ≈«œ Œ≈ ◊Ÿ»œƒ…‘.\n\r");
+		ch->send_to("–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è —É–≤–∏–¥–µ—Ç—å —Å–∫—Ä—ã—Ç–æ–µ –≤ —Ç–µ–Ω–∏, –Ω–æ —É —Ç–µ–±—è –Ω–∏—á–µ–≥–æ –Ω–µ –≤—ã—Ö–æ–¥–∏—Ç.\n\r");
 		gsn_detect_hide->improve( ch, false );
 		return;
 	}
@@ -518,7 +518,7 @@ SKILL_RUNP( detect )
 	af.modifier  = 0;
 	af.bitvector = DETECT_HIDDEN;
 	affect_to_char( ch, &af );
-	ch->send_to( "Ù◊œ— …Œ∆œ“Õ…“œ◊¡ŒŒœ”‘ÿ –œ◊Ÿ€¡≈‘”—.\n\r");
+	ch->send_to( "–¢–≤–æ—è –∏–Ω—Ñ–æ—Ä–º–∏—Ä–æ–≤–∞–Ω–Ω–æ—Å—Ç—å –ø–æ–≤—ã—à–∞–µ—Ç—Å—è.\n\r");
 	gsn_detect_hide->improve( ch, true );
 	return;
 }
@@ -545,38 +545,38 @@ void lore_fmt_obj( Object *obj, ostringstream &buf,
 {
     DLString itype;
 
-    buf << "œ»œ÷≈, ﬁ‘œ ‹‘¡ ◊≈›ÿ œ‘ÀÃ…À¡≈‘”— Œ¡ …Õ≈Œ¡ {W" << obj->getName( ) << "{x." << endl;
+    buf << "–ü–æ—Ö–æ–∂–µ, —á—Ç–æ —ç—Ç–∞ –≤–µ—â—å –æ—Ç–∫–ª–∏–∫–∞–µ—Ç—Å—è –Ω–∞ –∏–º–µ–Ω–∞ {W" << obj->getName( ) << "{x." << endl;
 
     if (weight != -1) {
 	weight /= 10;
 
 	if (weight == 0)
-	    buf << "œ»œ÷≈, ”œ◊”≈Õ Œ…ﬁ≈«œ Œ≈ ◊≈”…‘." << endl;
+	    buf << "–ü–æ—Ö–æ–∂–µ, —Å–æ–≤—Å–µ–º –Ω–∏—á–µ–≥–æ –Ω–µ –≤–µ—Å–∏—Ç." << endl;
 	else
-	    buf << "Ó¡ ◊≈” œŒ¡ œÀœÃœ {W" << weight << "{x ∆’Œ‘" << GET_COUNT(weight, "¡", "œ◊", "œ◊") << "." << endl;
+	    buf << "–ù–∞ –≤–µ—Å –æ–Ω–∞ –æ–∫–æ–ª–æ {W" << weight << "{x —Ñ—É–Ω—Ç" << GET_COUNT(weight, "–∞", "–æ–≤", "–æ–≤") << "." << endl;
     }
 
     if (cost != -1)
 	if (cost == 0)
-	    buf << "Î¡÷≈‘”—, ‹‘¡ ◊≈›ÿ Œ…ﬁ≈«œ Œ≈ ”‘œ…‘." << endl;
+	    buf << "–ö–∞–∂–µ—Ç—Å—è, —ç—Ç–∞ –≤–µ—â—å –Ω–∏—á–µ–≥–æ –Ω–µ —Å—Ç–æ–∏—Ç." << endl;
 	else
-	    buf << "“…Õ≈“Œ¡— ”‘œ…Õœ”‘ÿ - {W" << cost << "{x ”≈“≈¬“¡." << endl;
+	    buf << "–ü—Ä–∏–º–µ—Ä–Ω–∞—è —Å—Ç–æ–∏–º–æ—Å—Ç—å - {W" << cost << "{x —Å–µ—Ä–µ–±—Ä–∞." << endl;
 
     if (material && strcmp( material, "none" ) && strcmp( material, "oldstyle" ))
-	buf << "Ì¡‘≈“…¡Ã Œ¡–œÕ…Œ¡≈‘ {W" << material << "{x." << endl;
+	buf << "–ú–∞—Ç–µ—Ä–∏–∞–ª –Ω–∞–ø–æ–º–∏–Ω–∞–µ—Ç {W" << material << "{x." << endl;
 
     if (level != -1)
-	buf << "“…¬Ã…⁄…‘≈ÃÿŒŸ  ’“œ◊≈Œÿ - {W" << level << "{x." << endl;
+	buf << "–ü—Ä–∏–±–ª–∏–∑–∏—Ç–µ–ª—å–Ω—ã–π —É—Ä–æ–≤–µ–Ω—å - {W" << level << "{x." << endl;
     
     itype = item_table.message(type );
     if (!itype.empty( ))
-	buf << "œ Œ≈Àœ‘œ“ŸÕ –“…⁄Œ¡À¡Õ ‘Ÿ ’⁄Œ¡≈€ÿ, ﬁ‘œ ‹‘œ {W" << itype << "{x." << endl;
+	buf << "–ü–æ –Ω–µ–∫–æ—Ç–æ—Ä—ã–º –ø—Ä–∏–∑–Ω–∞–∫–∞–º —Ç—ã —É–∑–Ω–∞–µ—à—å, —á—Ç–æ —ç—Ç–æ {W" << itype << "{x." << endl;
 
     if (extra > 0)
-	buf << "Ó¡Õ≈‘¡ŒŒŸ  ◊⁄«Ã—ƒ –œƒÕ≈ﬁ¡≈‘ œ”œ¬≈ŒŒŸ≈ ”◊œ ”‘◊¡: {W" << extra_flags.messages(extra, true ) << "{x." << endl;
+	buf << "–ù–∞–º–µ—Ç–∞–Ω–Ω—ã–π –≤–∑–≥–ª—è–¥ –ø–æ–¥–º–µ—á–∞–µ—Ç –æ—Å–æ–±–µ–Ω–Ω—ã–µ —Å–≤–æ–π—Å—Ç–≤–∞: {W" << extra_flags.messages(extra, true ) << "{x." << endl;
 
     if (limit != -1 && limit < 100)
-	buf << "Ëœƒ—‘ ”Ã’»…, ﬁ‘œ ‹‘œ œﬁ≈Œÿ “≈ƒÀ¡— ◊≈›ÿ - ÀœÃ…ﬁ≈”‘◊œ ≈  –œƒœ¬ŒŸ» ◊ Õ…“≈ Œ≈ –“≈◊Ÿ€¡≈‘ {W" << limit << "{x!" << endl;
+	buf << "–•–æ–¥—è—Ç —Å–ª—É—Ö–∏, —á—Ç–æ —ç—Ç–æ –æ—á–µ–Ω—å —Ä–µ–¥–∫–∞—è –≤–µ—â—å - –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ –µ–π –ø–æ–¥–æ–±–Ω—ã—Ö –≤ –º–∏—Ä–µ –Ω–µ –ø—Ä–µ–≤—ã—à–∞–µ—Ç {W" << limit << "{x!" << endl;
 }
 
 int lore_rnd_value( int x, int learned )
@@ -600,7 +600,7 @@ SKILL_RUNP( lore )
     int value[5], i;
     
     if (( obj = get_obj_carry( ch, argument ) ) == 0) {
-	ch->send_to("ı ‘≈¬— Œ≈‘ ‹‘œ«œ.\n\r");
+	ch->send_to("–£ —Ç–µ–±—è –Ω–µ—Ç —ç—Ç–æ–≥–æ.\n\r");
 	return;
     }
 
@@ -612,8 +612,8 @@ SKILL_RUNP( lore )
 	value[i] = -1;
 
     if (learned < 10) {
-	act("ÙŸ Œ≈ƒœ”‘¡‘œﬁŒœ ◊Œ…Õ¡‘≈ÃÿŒœ ”Ã’€¡$gÃ|Ãœ|Ã¡ ¬¡¬’€À…ŒŸ ”À¡⁄À…, "
-	    "… ◊“—ƒÃ… ”Õœ÷≈€ÿ ﬁ‘œ-‘œ ’⁄Œ¡‘ÿ œ $o6.", ch, obj, 0, TO_CHAR);
+	act("–¢—ã –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ –≤–Ω–∏–º–∞—Ç–µ–ª—å–Ω–æ —Å–ª—É—à–∞$g–ª|–ª–æ|–ª–∞ –±–∞–±—É—à–∫–∏–Ω—ã —Å–∫–∞–∑–∫–∏, "
+	    "–∏ –≤—Ä—è–¥–ª–∏ —Å–º–æ–∂–µ—à—å —á—Ç–æ-—Ç–æ —É–∑–Ω–∞—Ç—å –æ $o6.", ch, obj, 0, TO_CHAR);
 	return;
     }
 
@@ -649,8 +649,8 @@ SKILL_RUNP( lore )
 	level    = obj->level;
     }
     
-    act( "ÙŸ ◊Œ…Õ¡‘≈ÃÿŒœ “¡””Õ¡‘“…◊¡≈€ÿ $o4, –“…–œÕ…Œ¡— ◊”≈, ﬁ‘œ Àœ«ƒ¡-Ã…¬œ "
-         "”ÃŸ€¡$gÃœ|Ã|Ã¡ œ –œƒœ¬ŒŸ» ◊≈›¡».", ch, obj, 0, TO_CHAR );
+    act( "–¢—ã –≤–Ω–∏–º–∞—Ç–µ–ª—å–Ω–æ —Ä–∞—Å—Å–º–∞—Ç—Ä–∏–≤–∞–µ—à—å $o4, –ø—Ä–∏–ø–æ–º–∏–Ω–∞—è –≤—Å–µ, —á—Ç–æ –∫–æ–≥–¥–∞-–ª–∏–±–æ "
+         "—Å–ª—ã—à–∞$g–ª–æ|–ª|–ª–∞ –æ –ø–æ–¥–æ–±–Ω—ã—Ö –≤–µ—â–∞—Ö.", ch, obj, 0, TO_CHAR );
 
     lore_fmt_obj( obj, buf, weight, cost, material, level, type, extra, limit );
     lore_fmt_wear( type, wear, buf );
@@ -678,7 +678,7 @@ SKILL_RUNP( lore )
 
   if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-      ch->send_to("ı ‘≈¬— Œ≈‘ ‹‘œ«œ.\n\r");
+      ch->send_to("–£ —Ç–µ–±—è –Ω–µ—Ç —ç—Ç–æ–≥–æ.\n\r");
       return;
     }
 
@@ -687,25 +687,25 @@ SKILL_RUNP( lore )
     
   if (ch->mana < mana)
     {
-      ch->send_to("ı ‘≈¬— Œ≈ƒœ”‘¡‘œﬁŒœ ‹Œ≈“«…… ƒÃ— ‹‘œ«œ.\n\r");
+      ch->send_to("–£ —Ç–µ–±—è –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ —ç–Ω–µ—Ä–≥–∏–∏ –¥–ª—è —ç—Ç–æ–≥–æ.\n\r");
       return;
     }
 
   if (!gsn_lore->usable( ch ) || learned < 10)
     {
-      ch->send_to("ÙŸ Œ≈ƒœ”‘¡‘œﬁŒœ »œ“œ€œ ⁄Œ¡≈€ÿ Ã≈«≈ŒƒŸ.\n\r");
+      ch->send_to("–¢—ã –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ —Ö–æ—Ä–æ—à–æ –∑–Ω–∞–µ—à—å –ª–µ–≥–µ–Ω–¥—ã.\n\r");
       return;
     }
 
 	if ( IS_SET(obj->extra_flags, ITEM_NOIDENT) )
 	{
-		sprintf( buf,"Ô¬ÿ≈À‘ '{G%s{x', ‘…– %s\n\r, ˜≈” %d, ’“œ◊≈Œÿ %d.\n\r",
+		sprintf( buf,"–û–±—å–µ–∫—Ç '{G%s{x', —Ç–∏–ø %s\n\r, –í–µ—Å %d, —É—Ä–æ–≤–µ–Ω—å %d.\n\r",
 			obj->getName( ),
 			item_table.message(obj->item_type).c_str( ),
 			obj->weight / 10,
 			obj->level);
 		ch->send_to(buf);
-		ch->send_to("\n\r‚œÃ≈≈ –“œ ‹‘’ ◊≈›ÿ Œ≈◊œ⁄Õœ÷Œœ Œ…ﬁ≈«œ ”À¡⁄¡‘ÿ.\n\r");
+		ch->send_to("\n\r–ë–æ–ª–µ–µ –ø—Ä–æ —ç—Ç—É –≤–µ—â—å –Ω–µ–≤–æ–∑–º–æ–∂–Ω–æ –Ω–∏—á–µ–≥–æ —Å–∫–∞–∑–∞—Ç—å.\n\r");
 		return;
 	}
 
@@ -717,7 +717,7 @@ SKILL_RUNP( lore )
 
   if (learned < 20)
     {
-      sprintf( buf, "Ô¬ﬂ≈À‘: '%s'.\n\r", obj->getName( ));
+      sprintf( buf, "–û–±—ä–µ–∫—Ç: '%s'.\n\r", obj->getName( ));
       ch->send_to(buf);
       ch->mana -= mana;
       gsn_lore->improve( ch, true );
@@ -727,14 +727,14 @@ SKILL_RUNP( lore )
   else if (learned < 40)
     {
       sprintf( buf,
-	  "Ô¬ﬂ≈À‘: '%s'.  ˜≈”: %d.  Û‘œ…Õœ”‘ÿ: %d.\n\r",
+	  "–û–±—ä–µ–∫—Ç: '%s'.  –í–µ—Å: %d.  –°—Ç–æ–∏–º–æ—Å—Ç—å: %d.\n\r",
 	      obj->getName( ),
 	      chance < 60 ? obj->weight : number_range(1, 2 * obj->weight),
 	      chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost
 	      );
       ch->send_to(buf);
       if ( str_cmp( obj->getMaterial( ), "oldstyle" ) )  {
-        sprintf( buf, "Ì¡‘≈“…¡Ã: %s.\n\r", obj->getMaterial( ));
+        sprintf( buf, "–ú–∞—Ç–µ—Ä–∏–∞–ª: %s.\n\r", obj->getMaterial( ));
         ch->send_to(buf);
       }
       ch->mana -= mana;
@@ -745,7 +745,7 @@ SKILL_RUNP( lore )
   else if (learned < 60)
     {
       sprintf( buf,
-	      "Ô¬ﬂ≈À‘: '%s'.  ˜≈”: %d.\n\rÛ‘œ…Õœ”‘ÿ: %d.  ı“œ◊≈Œÿ: %d.\n\rÌ¡‘≈“…¡Ã: %s.\n\r",
+	      "–û–±—ä–µ–∫—Ç: '%s'.  –í–µ—Å: %d.\n\r–°—Ç–æ–∏–º–æ—Å—Ç—å: %d.  –£—Ä–æ–≤–µ–Ω—å: %d.\n\r–ú–∞—Ç–µ—Ä–∏–∞–ª: %s.\n\r",
 	      obj->getName( ),
 	      obj->weight,
 	      chance < 60 ? number_range(1, 2 * obj->cost) : obj->cost,
@@ -761,7 +761,7 @@ SKILL_RUNP( lore )
   else if (learned < 80)
     {
       sprintf( buf,
-	      "Ô¬ﬂ≈À‘: '%s'.  Ù…–: %s.\n\rÔ”œ¬≈ŒŒœ”‘…: %s.\n\r˜≈”: %d.  Û‘œ…Õœ”‘ÿ: %d.  ı“œ◊≈Œÿ: %d.\n\rÌ¡‘≈“…¡Ã: %s.\n\r",
+	      "–û–±—ä–µ–∫—Ç: '%s'.  –¢–∏–ø: %s.\n\r–û—Å–æ–±–µ–Ω–Ω–æ—Å—Ç–∏: %s.\n\r–í–µ—Å: %d.  –°—Ç–æ–∏–º–æ—Å—Ç—å: %d.  –£—Ä–æ–≤–µ–Ω—å: %d.\n\r–ú–∞—Ç–µ—Ä–∏–∞–ª: %s.\n\r",
 	      obj->getName( ),
 	      item_table.message(obj->item_type).c_str( ),
 	      extra_flags.messages( extra, true ).c_str( ),
@@ -779,7 +779,7 @@ SKILL_RUNP( lore )
   else if (learned < 85)
     {
       sprintf( buf,
-	      "Ô¬ﬂ≈À‘: '%s'.  Ù…–: %s.\r\nÔ”œ¬≈ŒŒœ”‘…: %s.\n\r˜≈”: %d.  Û‘œ…Õœ”‘ÿ: %d.  ı“œ◊≈Œÿ: %d.\n\rÌ¡‘≈“…¡Ã: %s.\n\r",
+	      "–û–±—ä–µ–∫—Ç: '%s'.  –¢–∏–ø: %s.\r\n–û—Å–æ–±–µ–Ω–Ω–æ—Å—Ç–∏: %s.\n\r–í–µ—Å: %d.  –°—Ç–æ–∏–º–æ—Å—Ç—å: %d.  –£—Ä–æ–≤–µ–Ω—å: %d.\n\r–ú–∞—Ç–µ—Ä–∏–∞–ª: %s.\n\r",
 	      obj->getName( ),
 	      item_table.message(obj->item_type).c_str( ),
 	      extra_flags.messages( extra, true ).c_str( ),
@@ -793,7 +793,7 @@ SKILL_RUNP( lore )
   else
     {
       sprintf( buf,
-	      "Ô¬ﬂ≈À‘: '%s'.  Ù…–: %s.\r\nÔ”œ¬≈ŒŒœ”‘…: %s.\n\r˜≈”: %d.  Û‘œ…Õœ”‘ÿ: %d.  ı“œ◊≈Œÿ: %d.\n\rÌ¡‘≈“…¡Ã: %s.\n\r",
+	      "–û–±—ä–µ–∫—Ç: '%s'.  –¢–∏–ø: %s.\r\n–û—Å–æ–±–µ–Ω–Ω–æ—Å—Ç–∏: %s.\n\r–í–µ—Å: %d.  –°—Ç–æ–∏–º–æ—Å—Ç—å: %d.  –£—Ä–æ–≤–µ–Ω—å: %d.\n\r–ú–∞—Ç–µ—Ä–∏–∞–ª: %s.\n\r",
 	      obj->getName( ),
 	      item_table.message(obj->item_type).c_str( ),
 	      extra_flags.messages( extra, true ).c_str( ),
@@ -828,7 +828,7 @@ SKILL_RUNP( lore )
 	else 
 	    value0 = obj->value[0];
 	
-	ch->pecho( "Ìœ÷Œœ Œ¡Œ…⁄¡‘ÿ %1$d ÀÃ¿%1$Iﬁ|ﬁ¡|ﬁ≈ .", value0 );
+	ch->pecho( "–ú–æ–∂–Ω–æ –Ω–∞–Ω–∏–∑–∞—Ç—å %1$d –∫–ª—é%1$I—á|—á–∞|—á–µ–π.", value0 );
 	break;
     case ITEM_LOCKPICK:
 	if (learned < 85) {
@@ -841,15 +841,15 @@ SKILL_RUNP( lore )
 	}
 	
 	if (value0 == Keyhole::LOCK_VALUE_BLANK) {
-	    ch->println( "¸‘œ ⁄¡«œ‘œ◊À¡ ƒÃ— ÀÃ¿ﬁ¡ …Ã… œ‘ÕŸﬁÀ…." );
+	    ch->println( "–≠—Ç–æ –∑–∞–≥–æ—Ç–æ–≤–∫–∞ –¥–ª—è –∫–ª—é—á–∞ –∏–ª–∏ –æ—Ç–º—ã—á–∫–∏." );
 	}
 	else {
 	    if (value0 == Keyhole::LOCK_VALUE_MULTI)
-		ch->send_to( "Ô‘À“Ÿ◊¡≈‘ Ã¿¬œ  ⁄¡ÕœÀ. " );
+		ch->send_to( "–û—Ç–∫—Ä—ã–≤–∞–µ—Ç –ª—é–±–æ–π –∑–∞–º–æ–∫. " );
 	    else
-		ch->send_to( "Ô‘À“Ÿ◊¡≈‘ œƒ…Œ …⁄ ◊…ƒœ◊ ⁄¡ÕÀœ◊. " );
+		ch->send_to( "–û—Ç–∫—Ä—ã–≤–∞–µ—Ç –æ–¥–∏–Ω –∏–∑ –≤–∏–¥–æ–≤ –∑–∞–º–∫–æ–≤. " );
 	    
-	    ch->printf( "Ô‘ÕŸﬁÀ¡ %s À¡ﬁ≈”‘◊¡.\r\n", 
+	    ch->printf( "–û—Ç–º—ã—á–∫–∞ %s –∫–∞—á–µ—Å—Ç–≤–∞.\r\n", 
 			quality_percent( value1 ).colourStrip( ).ruscase( '2' ).c_str( ) );
 	}
 	break;
@@ -866,7 +866,7 @@ SKILL_RUNP( lore )
 	    value2 = number_fuzzy( obj->value[2] );
 	}
 	
-	ch->printf( "Û‘“¡Œ…√: %d …⁄ %d. Ì¡À”…Õ¡ÃÿŒœ≈ À¡ﬁ≈”‘◊œ ∆œ“Õ’Ã %d%%.\r\n",
+	ch->printf( "–°—Ç—Ä–∞–Ω–∏—Ü: %d –∏–∑ %d. –ú–∞–∫—Å–∏–º–∞–ª—å–Ω–æ–µ –∫–∞—á–µ—Å—Ç–≤–æ —Ñ–æ—Ä–º—É–ª %d%%.\r\n",
 	             value1, value0, value2 ); 
 	break;
 
@@ -881,7 +881,7 @@ SKILL_RUNP( lore )
 	    value1 = obj->value[1];
 	    value2 = number_fuzzy( obj->value[2] );
 	}
-	ch->printf( "Û‘“¡Œ…√: %d …⁄ %d. Ì¡À”…Õ¡ÃÿŒœ≈ À¡ﬁ≈”‘◊œ ⁄¡–…”≈  %d%%.\r\n",
+	ch->printf( "–°—Ç—Ä–∞–Ω–∏—Ü: %d –∏–∑ %d. –ú–∞–∫—Å–∏–º–∞–ª—å–Ω–æ–µ –∫–∞—á–µ—Å—Ç–≤–æ –∑–∞–ø–∏—Å–µ–π %d%%.\r\n",
 	             value1, value0, value2 ); 
         break;
 
@@ -912,7 +912,7 @@ SKILL_RUNP( lore )
 	  }
 	}
 
-      sprintf( buf, "ı“œ◊≈Œÿ %d ⁄¡ÀÃ…Œ¡Œ…—:", obj->value[0] );
+      sprintf( buf, "–£—Ä–æ–≤–µ–Ω—å %d –∑–∞–∫–ª–∏–Ω–∞–Ω–∏—è:", obj->value[0] );
       ch->send_to(buf);
 
       if (value1 >= 0 && value1 < SkillManager::getThis( )->size() && value1 != gsn_none)
@@ -965,7 +965,7 @@ SKILL_RUNP( lore )
 	  }
 	}
 
-      sprintf( buf, " %d(%d) ⁄¡ÀÃ…Œ¡Œ…  %d-«œ ’“œ◊Œ—",
+      sprintf( buf, " %d(%d) –∑–∞–∫–ª–∏–Ω–∞–Ω–∏–π %d-–≥–æ —É—Ä–æ–≤–Ω—è",
 	      value1, value2, value0 );
       ch->send_to(buf);
 
@@ -980,7 +980,7 @@ SKILL_RUNP( lore )
       break;
 
     case ITEM_WEAPON:
-      ch->send_to("Ù…– œ“’÷…—: ");
+      ch->send_to("–¢–∏–ø –æ—Ä—É–∂–∏—è: ");
       if (learned < 85)
 	{
 	  value0 = number_range(0, 8);
@@ -1004,14 +1004,14 @@ SKILL_RUNP( lore )
 		   weapon_class.name( value0 ).c_str( )
 		  );
 
-	sprintf(buf,"œ◊“≈÷ƒ≈Œ…— %dd%d (”“≈ƒŒ≈≈ %d).\n\r",
+	sprintf(buf,"–ü–æ–≤—Ä–µ–∂–¥–µ–Ω–∏—è %dd%d (—Å—Ä–µ–¥–Ω–µ–µ %d).\n\r",
 		value1,value2,
 		(1 + value2) * value1 / 2);
       ch->send_to(buf);
       if (learned > 85)
         if (obj->value[4])  /* weapon flags */
         {
-          sprintf(buf,"ÊÃ¡«… œ“’÷…—:%s.\n\r",weapon_type2.messages(obj->value[4]).c_str( ));
+          sprintf(buf,"–§–ª–∞–≥–∏ –æ—Ä—É–∂–∏—è:%s.\n\r",weapon_type2.messages(obj->value[4]).c_str( ));
           ch->send_to(buf);
         }
 
@@ -1048,7 +1048,7 @@ SKILL_RUNP( lore )
 	}
 
       sprintf( buf,
-	      "ÎÃ¡”” ⁄¡›…‘Ÿ: %d ’ÀœÃ  %d ’ƒ¡“  %d “¡⁄“≈⁄¡Œ…≈  %d vs. Õ¡«…—.\n\r",
+	      "–ö–ª–∞—Å—Å –∑–∞—â–∏—Ç—ã: %d —É–∫–æ–ª  %d —É–¥–∞—Ä  %d —Ä–∞–∑—Ä–µ–∑–∞–Ω–∏–µ  %d vs. –º–∞–≥–∏—è.\n\r",
 	      value0, value1, value2, value3 );
       ch->send_to(buf);
       break;
@@ -1071,7 +1071,7 @@ SKILL_RUNP( lore )
       {
 	if ( paf->location != APPLY_NONE && paf->modifier != 0 )
 	  {
-	    sprintf( buf, "È⁄Õ≈Œ—≈‘: %s Œ¡ %d.\n\r",
+	    sprintf( buf, "–ò–∑–º–µ–Ω—è–µ—Ç: %s –Ω–∞ %d.\n\r",
 		    apply_flags.message( paf->location ).c_str( ), paf->modifier );
 	    ch->send_to(buf);
 	  }
@@ -1081,11 +1081,11 @@ SKILL_RUNP( lore )
     {
       if ( paf->location != APPLY_NONE && paf->modifier != 0 )
 	{
-	  sprintf( buf, "È⁄Õ≈Œ—≈‘: %s Œ¡ %d",
+	  sprintf( buf, "–ò–∑–º–µ–Ω—è–µ—Ç: %s –Ω–∞ %d",
 		  apply_flags.message( paf->location ).c_str( ), paf->modifier );
 	  ch->send_to(buf);
           if ( paf->duration > -1)
-              sprintf(buf,", ◊ ‘≈ﬁ≈Œ…… %d ﬁ¡”œ◊.\n\r",paf->duration);
+              sprintf(buf,", –≤ —Ç–µ—á–µ–Ω–∏–∏ %d —á–∞—Å–æ–≤.\n\r",paf->duration);
           else
               sprintf(buf,".\n\r");
           ch->send_to(buf);
@@ -1095,7 +1095,7 @@ SKILL_RUNP( lore )
     if ( obj->pIndexData->limit != -1 )
     {
         sprintf(buf,
-        "{RÔ¬ÿ≈À‘œ◊ ◊ Õ…“≈ Œ≈ ¬œÃ≈≈: %d.\n\r{x",
+        "{R–û–±—å–µ–∫—Ç–æ–≤ –≤ –º–∏—Ä–µ –Ω–µ –±–æ–ª–µ–µ: %d.\n\r{x",
          obj->pIndexData->limit);
          ch->send_to(buf);
     }

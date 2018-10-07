@@ -33,7 +33,7 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
     Character *victim = get_char_world( ch, arg.c_str( ) );
 
     if (!victim)
-	ch->println( "Ты не находишь этого персонажа." );
+	ch->println( "п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ я█я┌п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╤п╟." );
     
     return victim;
 }
@@ -54,7 +54,7 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
 bool PersonalChannel::checkIgnore( Character *ch, Character *victim ) const
 {
     if (CommunicationChannel::checkIgnore( ch, victim )) {
-	act_p( "$E не желает тебя слышать.", ch, 0, victim, TO_CHAR, position );
+	act_p( "$E п╫п╣ п╤п╣п╩п╟п╣я┌ я┌п╣п╠я▐ я│п╩я▀я┬п╟я┌я▄.", ch, 0, victim, TO_CHAR, position );
 	return true;
     }
 
@@ -67,17 +67,17 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
 	return false;
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
-	act_p( "$C1 отсутствует и не может сейчас получить твое сообщение.", 
+	act_p( "$C1 п╬я┌я│я┐я┌я│я┌п╡я┐п╣я┌ п╦ п╫п╣ п╪п╬п╤п╣я┌ я│п╣п╧я┤п╟я│ п©п╬п╩я┐я┤п╦я┌я▄ я┌п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣.", 
 		ch, 0, victim, TO_CHAR, position );
     else
-	act_p("$C1 не может сейчас получить твое сообщение, т.к. $E отсутствует: {c$t{x.", 
+	act_p("$C1 п╫п╣ п╪п╬п╤п╣я┌ я│п╣п╧я┤п╟я│ п©п╬п╩я┐я┤п╦я┌я▄ я┌п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣, я┌.п╨. $E п╬я┌я│я┐я┌я│я┌п╡я┐п╣я┌: {c$t{x.", 
 		ch, 
 		victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
 				    "afk" )->getValue( ).c_str( ), 
 		victim, TO_CHAR, position );
 
     if (storeAFK) {
-	act_p( "Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
+	act_p( "п║п╬п╬п╠я┴п╣п╫п╦п╣ п╠я┐п╢п╣я┌ п©я─п╬я┤п╦я┌п╟п╫п╬, п╨п╬пЁп╢п╟ $E п╡п╣я─п╫п╣я┌я│я▐.", ch, 0, victim, TO_CHAR, position );
 	tellToBuffer( ch, victim, msg );
     }
 
@@ -90,14 +90,14 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
 	return false;
 
     if (victim->is_npc( )) {
-	act_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
+	act_p("$E я│п╣п╧я┤п╟я│ я│я─п╟п╤п╟п╣я┌я│я▐ п╦ п╫п╣ п╪п╬п╤п╣я┌ п©п╬п╩я┐я┤п╦я┌я▄ я┌п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣.",ch,0,victim,TO_CHAR,position);
 	return true;
     }
     
     if (!IS_SET( victim->add_comm, COMM_STORE ) || !storeFight)
 	return false;
 
-    act_p("$E сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
+    act_p("$E я│п╣п╧я┤п╟я│ я│я─п╟п╤п╟п╣я┌я│я▐, п╫п╬ я┌п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣ п╠я┐п╢п╣я┌ п©я─п╬я┤п╦я┌п╟п╫п╬, п╨п╬пЁп╢п╟ $E п╥п╟п╨п╬п╫я┤п╦я┌ п╠п╬п╧.",
 	    ch,0,victim,TO_CHAR,position);
     tellToBuffer( ch, victim, msg );
 
@@ -112,7 +112,7 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
     if (victim->desc)
 	return false;
 
-    act_p("У $C2 нет связи с этим миром... попробуй позже.",
+    act_p("пё $C2 п╫п╣я┌ я│п╡я▐п╥п╦ я│ я█я┌п╦п╪ п╪п╦я─п╬п╪... п©п╬п©я─п╬п╠я┐п╧ п©п╬п╥п╤п╣.",
 	    ch,0,victim,TO_CHAR,position);
     
     if (storeDisco)
@@ -129,7 +129,7 @@ bool PersonalChannel::checkPosition( Character *ch, Character *victim ) const
     if (positionOther <= victim->position)
 	return false;
     
-    act_p( "$E не слышит тебя.", ch, 0, victim, TO_CHAR, position );
+    act_p( "$E п╫п╣ я│п╩я▀я┬п╦я┌ я┌п╣п╠я▐.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -140,7 +140,7 @@ bool PersonalChannel::checkVictimDeaf( Character *ch, Character *victim ) const
 
     if (IS_SET(victim->comm, COMM_QUIET) || IS_SET(victim->comm, COMM_DEAF))
     {
-	act_p( "Твое сообщение не дошло $M.", ch, 0, victim, TO_CHAR, position );
+	act_p( "п╒п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣ п╫п╣ п╢п╬я┬п╩п╬ $M.", ch, 0, victim, TO_CHAR, position );
 	return true;
     }
 
@@ -190,17 +190,17 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
 bool PersonalChannel::canTalkPersonally( Character *ch ) const
 {
     if (IS_SET(ch->comm, COMM_NOTELL)) {
-	ch->println( "Боги лишили тебя возможности личного общения." );
+	ch->println( "п▒п╬пЁп╦ п╩п╦я┬п╦п╩п╦ я┌п╣п╠я▐ п╡п╬п╥п╪п╬п╤п╫п╬я│я┌п╦ п╩п╦я┤п╫п╬пЁп╬ п╬п╠я┴п╣п╫п╦я▐." );
 	return false;
     }
 
     if (IS_SET(ch->comm, COMM_QUIET)) {
-	ch->println( "Сперва выйди из режима тишины (quiet)." );
+	ch->println( "п║п©п╣я─п╡п╟ п╡я▀п╧п╢п╦ п╦п╥ я─п╣п╤п╦п╪п╟ я┌п╦я┬п╦п╫я▀ (quiet)." );
 	return false;
     }
 
     if (IS_SET(ch->comm, COMM_DEAF)) {
-	ch->println("Сперва выйди из режима глухоты (deaf).");
+	ch->println("п║п©п╣я─п╡п╟ п╡я▀п╧п╢п╦ п╦п╥ я─п╣п╤п╦п╪п╟ пЁп╩я┐я┘п╬я┌я▀ (deaf).");
 	return false;
     }
 

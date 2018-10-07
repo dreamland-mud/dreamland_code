@@ -34,44 +34,44 @@ CMDRUN( attract )
     int occupation;
     
     if (targetName.empty( )) {
-	ch->println( "þØÅ ×ÎÉÍÁÎÉÅ ÔÙ ÈÏÞÅÛØ ÐÒÉ×ÌÅÞØ?" );
+	ch->println( "Ð§ÑŒÐµ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð¿Ñ€Ð¸Ð²Ð»ÐµÑ‡ÑŒ?" );
 	return;
     }
     
     vch = get_char_room( ch, targetName );
     
     if (vch== NULL) {
-	ch->println( "úÄÅÓØ ÔÁËÉÈ ÎÅÔ." );
+	ch->println( "Ð—Ð´ÐµÑÑŒ Ñ‚Ð°ÐºÐ¸Ñ… Ð½ÐµÑ‚." );
 	return;
     }
 
     if (!IS_AWAKE(vch)) {
-	ch->pecho("ðÏÄÏÖÄÉ, ÐÏËÁ %P1 ÐÒÏÓÎÅÔÓÑ.", vch);
+	ch->pecho("ÐŸÐ¾Ð´Ð¾Ð¶Ð´Ð¸, Ð¿Ð¾ÐºÐ° %P1 Ð¿Ñ€Ð¾ÑÐ½ÐµÑ‚ÑÑ.", vch);
 	return;
     }
 
     if (!vch->is_npc( ) || ch->is_npc( )) {
-	act("$c1 ÍÁÛÅÔ ÒÕËÁÍÉ, ÐÙÔÁÑÓØ ÐÒÉ×ÌÅÞØ Ô×ÏÅ ×ÎÉÍÁÎÉÅ.", ch, 0, vch, TO_VICT);
-	act("ôÙ ÍÁÛÅÛØ ÒÕËÁÍÉ, ÐÙÔÁÑÓØ ÐÒÉ×ÌÅÞØ ×ÎÉÍÁÎÉÅ $C2.", ch, 0, vch, TO_CHAR);
-	act("$c1 ÍÁÛÅÔ ÒÕËÁÍÉ, ÐÙÔÁÑÓØ ÐÒÉ×ÌÅÞØ ×ÎÉÍÁÎÉÅ $C2.", ch, 0, vch, TO_NOTVICT);
+	act("$c1 Ð¼Ð°ÑˆÐµÑ‚ Ñ€ÑƒÐºÐ°Ð¼Ð¸, Ð¿Ñ‹Ñ‚Ð°ÑÑÑŒ Ð¿Ñ€Ð¸Ð²Ð»ÐµÑ‡ÑŒ Ñ‚Ð²Ð¾Ðµ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ.", ch, 0, vch, TO_VICT);
+	act("Ð¢Ñ‹ Ð¼Ð°ÑˆÐµÑˆÑŒ Ñ€ÑƒÐºÐ°Ð¼Ð¸, Ð¿Ñ‹Ñ‚Ð°ÑÑÑŒ Ð¿Ñ€Ð¸Ð²Ð»ÐµÑ‡ÑŒ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ $C2.", ch, 0, vch, TO_CHAR);
+	act("$c1 Ð¼Ð°ÑˆÐµÑ‚ Ñ€ÑƒÐºÐ°Ð¼Ð¸, Ð¿Ñ‹Ñ‚Ð°ÑÑÑŒ Ð¿Ñ€Ð¸Ð²Ð»ÐµÑ‡ÑŒ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ $C2.", ch, 0, vch, TO_NOTVICT);
 	return;
     }
     
     target = vch->getNPC( );
     occupation = (target->behavior ? target->behavior->getOccupation( ) : OCC_NONE);
 
-    act("ôÙ ÐÒÏÓÉÛØ $C4 ÏÂÒÁÔÉÔØ ÎÁ ÔÅÂÑ ×ÎÉÍÁÎÉÅ.", ch, 0, target, TO_CHAR);
-    act("$c1 ÐÒÏÓÉÔ $C4 ÏÂÒÁÔÉÔØ ÎÁ $x ×ÎÉÍÁÎÉÅ.", ch, 0, target, TO_NOTVICT);
-    act("$c1 ÐÒÏÓÉÔ ÔÅÂÑ ÏÂÒÁÔÉÔØ ÎÁ $x ×ÎÉÍÁÎÉÅ.", ch, 0, target, TO_VICT);
+    act("Ð¢Ñ‹ Ð¿Ñ€Ð¾ÑÐ¸ÑˆÑŒ $C4 Ð¾Ð±Ñ€Ð°Ñ‚Ð¸Ñ‚ÑŒ Ð½Ð° Ñ‚ÐµÐ±Ñ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ.", ch, 0, target, TO_CHAR);
+    act("$c1 Ð¿Ñ€Ð¾ÑÐ¸Ñ‚ $C4 Ð¾Ð±Ñ€Ð°Ñ‚Ð¸Ñ‚ÑŒ Ð½Ð° $x Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ.", ch, 0, target, TO_NOTVICT);
+    act("$c1 Ð¿Ñ€Ð¾ÑÐ¸Ñ‚ Ñ‚ÐµÐ±Ñ Ð¾Ð±Ñ€Ð°Ñ‚Ð¸Ñ‚ÑŒ Ð½Ð° $x Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ.", ch, 0, target, TO_VICT);
 
     if (occupation == OCC_NONE) {
-	say_act( ch, target, "ñ ÎÉÞÅÍ ÎÅ ÓÍÏÇÕ ÂÙÔØ ÔÅÂÅ ÐÏÌÅÚ$GÎÏ|ÎÙÍ|ÎÏÊ." );
+	say_act( ch, target, "Ð¯ Ð½Ð¸Ñ‡ÐµÐ¼ Ð½Ðµ ÑÐ¼Ð¾Ð³Ñƒ Ð±Ñ‹Ñ‚ÑŒ Ñ‚ÐµÐ±Ðµ Ð¿Ð¾Ð»ÐµÐ·$GÐ½Ð¾|Ð½Ñ‹Ð¼|Ð½Ð¾Ð¹." );
 	return;
     }
     
-    act("$C1 ÐÏ×ÏÒÁÞÉ×ÁÅÔÓÑ × Ô×ÏÀ ÓÔÏÒÏÎÕ.", ch, 0, target, TO_CHAR);
-    act("$C1 ÐÏ×ÏÒÁÞÉ×ÁÅÔÓÑ Ë $c3.", ch, 0, target, TO_NOTVICT);
-    act("ôÙ ÐÏ×ÏÒÁÞÉ×ÁÅÛØÓÑ Ë $c3.", ch, 0, target, TO_VICT);
+    act("$C1 Ð¿Ð¾Ð²Ð¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð² Ñ‚Ð²Ð¾ÑŽ ÑÑ‚Ð¾Ñ€Ð¾Ð½Ñƒ.", ch, 0, target, TO_CHAR);
+    act("$C1 Ð¿Ð¾Ð²Ð¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ðº $c3.", ch, 0, target, TO_NOTVICT);
+    act("Ð¢Ñ‹ Ð¿Ð¾Ð²Ð¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÑˆÑŒÑÑ Ðº $c3.", ch, 0, target, TO_VICT);
 
     attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeAttract>( "attract" );
     attr->addTarget( target, occupation );

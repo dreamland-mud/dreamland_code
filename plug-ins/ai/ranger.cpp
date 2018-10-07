@@ -56,7 +56,7 @@ bool BasicMobileBehavior::aggressRanger( )
     if (!victim) 
 	return false;
     
-    act("$c1 пристально смотрит $T и натягивает тетиву $o2.",
+    act("$c1 п©я─п╦я│я┌п╟п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ $T п╦ п╫п╟я┌я▐пЁп╦п╡п╟п╣я┌ я┌п╣я┌п╦п╡я┐ $o2.",
 	 ch, get_eq_char( ch, wear_wield ), dirs[victDoor].leave, TO_ROOM);
 
     interpret_raw( ch, "shoot", "%s %s", 

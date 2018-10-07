@@ -14,7 +14,7 @@
 #include "mercdb.h"
 #include "def.h"
 
-const DLString ClanSkill::CATEGORY = "Клановые умения";
+const DLString ClanSkill::CATEGORY = "п п╩п╟п╫п╬п╡я▀п╣ я┐п╪п╣п╫п╦я▐";
 GROUP(clan);
 
 ClanSkill::ClanSkill( )
@@ -70,7 +70,7 @@ bool ClanSkill::usable( Character * ch, bool message = true ) const
 	return true;
 
     if (message)
-	ch->println( "Клан не может сейчас придать тебе сил." );
+	ch->println( "п п╩п╟п╫ п╫п╣ п╪п╬п╤п╣я┌ я│п╣п╧я┤п╟я│ п©я─п╦п╢п╟я┌я▄ я┌п╣п╠п╣ я│п╦п╩." );
 
     return false;
 }
@@ -134,10 +134,10 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
    
     if (verbose) { 
         if (mob)
-            ch->pecho( "%^C1 не служит твоему клану.", mob );
+            ch->pecho( "%^C1 п╫п╣ я│п╩я┐п╤п╦я┌ я┌п╡п╬п╣п╪я┐ п╨п╩п╟п╫я┐.", mob );
         else
-            ch->println( "Клановые умения практикуют у служителей клана, "
-                         "например, у лекаря или охранника." );
+            ch->println( "п п╩п╟п╫п╬п╡я▀п╣ я┐п╪п╣п╫п╦я▐ п©я─п╟п╨я┌п╦п╨я┐я▌я┌ я┐ я│п╩я┐п╤п╦я┌п╣п╩п╣п╧ п╨п╩п╟п╫п╟, "
+                         "п╫п╟п©я─п╦п╪п╣я─, я┐ п╩п╣п╨п╟я─я▐ п╦п╩п╦ п╬я┘я─п╟п╫п╫п╦п╨п╟." );
     }
 
     return false;
@@ -151,7 +151,7 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
     
     buf << "'{W" << getName( ) << "{x' " 
 	<< "'{W" << getRussianName( ) << "{x', "
-        << (spell && spell->isCasted( ) ? "заклинание" : "умение") << " ";
+        << (spell && spell->isCasted( ) ? "п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "я┐п╪п╣п╫п╦п╣") << " ";
 
     for (i = clans.begin( ); i != clans.end( ); i++) {
 	Clan *clan = ClanManager::getThis( )->find( i->first );
@@ -166,13 +166,13 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
 
     switch (clanNames.size( )) {
     case 0: 
-	buf << "неизвестного клана ";
+	buf << "п╫п╣п╦п╥п╡п╣я│я┌п╫п╬пЁп╬ п╨п╩п╟п╫п╟ ";
 	break;
     case 1:
-	buf << "клана " << clanNames.front( );
+	buf << "п╨п╩п╟п╫п╟ " << clanNames.front( );
 	break;
     default:
-	buf << "кланов ";
+	buf << "п╨п╩п╟п╫п╬п╡ ";
     
 	for (list<DLString>::iterator i = clanNames.begin( ); i != clanNames.end( ); )	{
 	    buf << *i;
@@ -189,10 +189,10 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
 	return;
     }
 	
-    buf << ", уровень {W" << getLevel( ch ) << "{x";
+    buf << ", я┐я─п╬п╡п╣п╫я▄ {W" << getLevel( ch ) << "{x";
 
     if (available( ch ))
-	buf << ", изучено на {W" << data.learned << "%{x";
+	buf << ", п╦п╥я┐я┤п╣п╫п╬ п╫п╟ {W" << data.learned << "%{x";
     
     buf << endl;
 }

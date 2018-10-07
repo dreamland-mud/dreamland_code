@@ -18,7 +18,7 @@ void XMLAttributeLanguage::wordUsed( const Word &word, PCharacter *ch )
     if (--w->second.count > 0)
 	return;
 
-    ch->pecho( "{wóÌÏ×Ï {w%s{w ÕÓËÏÌØÚÁÅÔ ÏÔ ÔÅÂÑ.{x", 
+    ch->pecho( "{wÐ¡Ð»Ð¾Ð²Ð¾ {w%s{w ÑƒÑÐºÐ¾Ð»ÑŒÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ.{x", 
                w->second.dictum.getValue( ).c_str( ) );
     
     words.erase( w );

@@ -173,12 +173,12 @@ const char *Object::get_cond_alias( void )
 {
  const char *stat;
 
- if      ( condition >  99 ) stat = "{CÏÔÌ.{x";
- else if ( condition >= 80 ) stat = "{cÈÏÒ.{x";
- else if ( condition >= 60 ) stat = "{YÎÏÒÍ.{x";
- else if ( condition >= 40 ) stat = "{yÓÒ.{x";
- else if ( condition >= 20 ) stat = "{RĞÌ.{x";
- else                        stat = "{rÕÖ.{x";
+ if      ( condition >  99 ) stat = "{CĞ¾Ñ‚Ğ».{x";
+ else if ( condition >= 80 ) stat = "{cÑ…Ğ¾Ñ€.{x";
+ else if ( condition >= 60 ) stat = "{YĞ½Ğ¾Ñ€Ğ¼.{x";
+ else if ( condition >= 40 ) stat = "{yÑÑ€.{x";
+ else if ( condition >= 20 ) stat = "{RĞ¿Ğ».{x";
+ else                        stat = "{rÑƒĞ¶.{x";
 
  return stat;
 }

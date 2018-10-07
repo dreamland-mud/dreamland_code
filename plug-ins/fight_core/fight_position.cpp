@@ -55,7 +55,7 @@ void stop_fighting( Character *ch, bool fBoth )
 			= fch->getPC( )->getAttributes( ).findAttr<XMLStringListAttribute>( aname );
 		
 		if (tells && tells->size( ) > 0) {
-                    fch->pecho( "ôÅÂÅ ÂÙÌÏ ÐÏÓÌÁÎÏ {R%1$d{x ÓÏÏÂÝÅÎ%1$IÉÅ|ÉÑ|ÉÊ. éÓÐÏÌØÚÕÊ ËÏÍÁÎÄÕ {y{lEreplay{lRÐÒÏÓÌÕÛÁÔØ{lx ÄÌÑ ÐÒÏÓÍÏÔÒÁ.",
+                    fch->pecho( "Ð¢ÐµÐ±Ðµ Ð±Ñ‹Ð»Ð¾ Ð¿Ð¾ÑÐ»Ð°Ð½Ð¾ {R%1$d{x ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½%1$IÐ¸Ðµ|Ð¸Ñ|Ð¸Ð¹. Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ {y{lEreplay{lRÐ¿Ñ€Ð¾ÑÐ»ÑƒÑˆÐ°Ñ‚ÑŒ{lx Ð´Ð»Ñ Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€Ð°.",
                                  tells->size( ) );
 		}
 	    }
@@ -169,10 +169,10 @@ void set_violent( Character *ch, Character *victim, bool fAlways )
     
     if (!IS_VIOLENT(ch))
 	wiznet( WIZ_FLAGS, 0, 0, 
-		"%^C1 %s ÁÔÁËÕÅÔ %s %^C4 × %s [%d].",
+		"%^C1 %s Ð°Ñ‚Ð°ÐºÑƒÐµÑ‚ %s %^C4 Ð² %s [%d].",
 		ch,
-		(IS_VIOLENT(victim) ? "ÐÏ×ÔÏÒÎÏ" : ""),
-		(victim->is_mirror( ) ? "ÚÅÒËÁÌÏ" : ""),
+		(IS_VIOLENT(victim) ? "Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€Ð½Ð¾" : ""),
+		(victim->is_mirror( ) ? "Ð·ÐµÑ€ÐºÐ°Ð»Ð¾" : ""),
 		victim,
 		ch->in_room->name,
 		ch->in_room->vnum );
@@ -251,42 +251,42 @@ void do_visible( Character *ch )
 {
     if (IS_SET(ch->affected_by, AFF_HIDE))
       {
-	ch->println( "ôÙ ×ÙÈÏÄÉÛØ ÉÚ ÔÅÎÉ." );
+	ch->println( "Ð¢Ñ‹ Ð²Ñ‹Ñ…Ð¾Ð´Ð¸ÑˆÑŒ Ð¸Ð· Ñ‚ÐµÐ½Ð¸." );
 	REMOVE_BIT(ch->affected_by, AFF_HIDE);
-	act_p("$c1 ×ÙÈÏÄÉÔ ÉÚ ÔÅÎÉ.", ch, 0, 0, TO_ROOM,POS_RESTING);
+	act_p("$c1 Ð²Ñ‹Ñ…Ð¾Ð´Ð¸Ñ‚ Ð¸Ð· Ñ‚ÐµÐ½Ð¸.", ch, 0, 0, TO_ROOM,POS_RESTING);
       }
     if (IS_SET(ch->affected_by, AFF_FADE))
       {
-	ch->println( "ôÙ ×ÙÈÏÄÉÛØ ÉÚ ÔÅÎÉ." );
+	ch->println( "Ð¢Ñ‹ Ð²Ñ‹Ñ…Ð¾Ð´Ð¸ÑˆÑŒ Ð¸Ð· Ñ‚ÐµÐ½Ð¸." );
 	REMOVE_BIT(ch->affected_by, AFF_FADE);
-	act_p("$c1 ×ÙÈÏÄÉÔ ÉÚ ÔÅÎÉ.", ch, 0, 0, TO_ROOM,POS_RESTING);
+	act_p("$c1 Ð²Ñ‹Ñ…Ð¾Ð´Ð¸Ñ‚ Ð¸Ð· Ñ‚ÐµÐ½Ð¸.", ch, 0, 0, TO_ROOM,POS_RESTING);
       }
     if ( IS_AFFECTED( ch, AFF_CAMOUFLAGE ) )
     {
 	    REMOVE_BIT(ch->affected_by, AFF_CAMOUFLAGE);
 	    ch->ambushing = &str_empty[0];
-	    ch->send_to("ôÙ ×ÙÈÏÄÉÛØ ÉÚ Ó×ÏÅÇÏ ÕËÒÙÔÉÑ.\n\r");
-	    act_p("$c1 ×ÙÈÏÄÉÔ ÉÚ $s ÕËÒÙÔÉÑ.", ch, 0, 0,TO_ROOM,POS_RESTING);
+	    ch->send_to("Ð¢Ñ‹ Ð²Ñ‹Ñ…Ð¾Ð´Ð¸ÑˆÑŒ Ð¸Ð· ÑÐ²Ð¾ÐµÐ³Ð¾ ÑƒÐºÑ€Ñ‹Ñ‚Ð¸Ñ.\n\r");
+	    act_p("$c1 Ð²Ñ‹Ñ…Ð¾Ð´Ð¸Ñ‚ Ð¸Ð· $s ÑƒÐºÑ€Ñ‹Ñ‚Ð¸Ñ.", ch, 0, 0,TO_ROOM,POS_RESTING);
     }
     if (IS_SET(ch->affected_by, AFF_INVISIBLE))
       {
-	ch->println( "ôÙ ÐÏÑ×ÌÑÅÛØÓÑ ÉÚ ÎÉÏÔËÕÄÁ." );
+	ch->println( "Ð¢Ñ‹ Ð¿Ð¾ÑÐ²Ð»ÑÐµÑˆÑŒÑÑ Ð¸Ð· Ð½Ð¸Ð¾Ñ‚ÐºÑƒÐ´Ð°." );
 	affect_strip(ch, gsn_invisibility);
 	affect_strip(ch, gsn_mass_invis);
 	REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
-	act_p("$c1 ÐÏÑ×ÌÑÅÔÓÑ ÉÚ ÎÉÏÔËÕÄÁ.", ch, 0, 0, TO_ROOM,POS_RESTING);
+	act_p("$c1 Ð¿Ð¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ð¸Ð· Ð½Ð¸Ð¾Ñ‚ÐºÑƒÐ´Ð°.", ch, 0, 0, TO_ROOM,POS_RESTING);
       }
     if (IS_SET(ch->affected_by, AFF_IMP_INVIS))
       {
-	ch->println( "ôÙ ÐÏÑ×ÌÑÅÛØÓÑ ÉÚ ÎÉÏÔËÕÄÁ." );
+	ch->println( "Ð¢Ñ‹ Ð¿Ð¾ÑÐ²Ð»ÑÐµÑˆÑŒÑÑ Ð¸Ð· Ð½Ð¸Ð¾Ñ‚ÐºÑƒÐ´Ð°." );
 	affect_strip(ch, gsn_improved_invis);
 	REMOVE_BIT(ch->affected_by, AFF_IMP_INVIS);
-	act_p("$c1 ÐÏÑ×ÌÑÅÔÓÑ ÉÚ ÎÉÏÔËÕÄÁ.", ch, 0, 0, TO_ROOM,POS_RESTING);
+	act_p("$c1 Ð¿Ð¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ð¸Ð· Ð½Ð¸Ð¾Ñ‚ÐºÑƒÐ´Ð°.", ch, 0, 0, TO_ROOM,POS_RESTING);
       }
     if (IS_SET(ch->affected_by, AFF_SNEAK)
 	&& !ch->is_npc() && !IS_SET(ch->getRace()->getAff(),AFF_SNEAK) )
       {
-	ch->println( "ô×ÏÉ Ä×ÉÖÅÎÉÑ ÓÔÁÎÏ×ÑÔÓÑ ÚÁÍÅÔÎÙÍÉ ÄÌÑ ÏËÒÕÖÁÀÝÉÈ." );
+	ch->println( "Ð¢Ð²Ð¾Ð¸ Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ð½Ð¾Ð²ÑÑ‚ÑÑ Ð·Ð°Ð¼ÐµÑ‚Ð½Ñ‹Ð¼Ð¸ Ð´Ð»Ñ Ð¾ÐºÑ€ÑƒÐ¶Ð°ÑŽÑ‰Ð¸Ñ…." );
 	affect_strip(ch, gsn_sneak);
 	REMOVE_BIT(ch->affected_by, AFF_SNEAK);
       }

@@ -40,25 +40,25 @@ CMDRUN( mlove )
 	Character *victim;
 
 	if (IS_AFFECTED(ch,AFF_CHARM)) {
-	    act_p("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR, POS_RESTING);  
-	    act_p("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT, POS_RESTING);
+	    act_p("... п╫п╬ я│п╣я─п╢я├я┐ п╫п╣ п©я─п╦п╨п╟п╤п╣я┬я▄.", ch, 0, 0, TO_CHAR, POS_RESTING);  
+	    act_p("$c1 я┐я┘п╪я▀п╩я▐п╣я┌я│я▐ - я│п╣я─п╢я├я┐ п╫п╣ п©я─п╦п╨п╟п╤п╣я┬я▄.", ch, 0, ch->master, TO_VICT, POS_RESTING);
 	    return;
 	}
 
 	if (arguments.empty( )) {
 	    if (ch->getSex( ) == SEX_MALE)
-		act_p("Ты никак не можешь определиться: куда совать жетон?", ch, 0, 0, TO_CHAR, POS_RESTING);
+		act_p("п╒я▀ п╫п╦п╨п╟п╨ п╫п╣ п╪п╬п╤п╣я┬я▄ п╬п©я─п╣п╢п╣п╩п╦я┌я▄я│я▐: п╨я┐п╢п╟ я│п╬п╡п╟я┌я▄ п╤п╣я┌п╬п╫?", ch, 0, 0, TO_CHAR, POS_RESTING);
 	    else 
-		act_p("Куда пойти, куда податься.. кого найти, кому отдаться?", ch, 0, 0, TO_CHAR, POS_RESTING);
+		act_p("п я┐п╢п╟ п©п╬п╧я┌п╦, п╨я┐п╢п╟ п©п╬п╢п╟я┌я▄я│я▐.. п╨п╬пЁп╬ п╫п╟п╧я┌п╦, п╨п╬п╪я┐ п╬я┌п╢п╟я┌я▄я│я▐?", ch, 0, 0, TO_CHAR, POS_RESTING);
 
-	    act_p("$c1 гоняется с похотливым видом за всеми в комнате..берегись!", ch, 0, 0, TO_ROOM, POS_RESTING);
+	    act_p("$c1 пЁп╬п╫я▐п╣я┌я│я▐ я│ п©п╬я┘п╬я┌п╩п╦п╡я▀п╪ п╡п╦п╢п╬п╪ п╥п╟ п╡я│п╣п╪п╦ п╡ п╨п╬п╪п╫п╟я┌п╣..п╠п╣я─п╣пЁп╦я│я▄!", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    return;
 	}
 	
 	arg = arguments.getOneArgument( );
 
 	if ( (victim = get_char_room(ch, arg.c_str())) == 0 ) {
-	    ch->send_to("Объект твоей страсти куда-то подевался.\n\r");
+	    ch->send_to("п·п╠я┼п╣п╨я┌ я┌п╡п╬п╣п╧ я│я┌я─п╟я│я┌п╦ п╨я┐п╢п╟-я┌п╬ п©п╬п╢п╣п╡п╟п╩я│я▐.\n\r");
 	    return;
 	}
 
@@ -66,33 +66,33 @@ CMDRUN( mlove )
 	    ch->move -= ch->move / 4;
 	    ch->mana -= ch->mana / 4;
 
-	    ch->send_to("Да! Ты любишь себя! Еще, еще..!\n\r");
-	    act_p("Страсть $c1 к само$gму|му|й себе пользуется полной взаимностью.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	    ch->send_to("п■п╟! п╒я▀ п╩я▌п╠п╦я┬я▄ я│п╣п╠я▐! п∙я┴п╣, п╣я┴п╣..!\n\r");
+	    act_p("п║я┌я─п╟я│я┌я▄ $c1 п╨ я│п╟п╪п╬$gп╪я┐|п╪я┐|п╧ я│п╣п╠п╣ п©п╬п╩я▄п╥я┐п╣я┌я│я▐ п©п╬п╩п╫п╬п╧ п╡п╥п╟п╦п╪п╫п╬я│я┌я▄я▌.", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    MLOVE_DAZE(ch);
 	    return;
 	}
 
 	if (ch->position == POS_FIGHTING) {
 	    if (ch->getSex( ) == SEX_MALE)
-		act_p("Быстро спрячь, пока не отрезали!", ch, 0, 0, TO_CHAR, POS_RESTING);
+		act_p("п▒я▀я│я┌я─п╬ я│п©я─я▐я┤я▄, п©п╬п╨п╟ п╫п╣ п╬я┌я─п╣п╥п╟п╩п╦!", ch, 0, 0, TO_CHAR, POS_RESTING);
 	    else 
-		act_p("Эй, не отвлекайся!", ch, 0, 0, TO_CHAR, POS_RESTING);
+		act_p("п╜п╧, п╫п╣ п╬я┌п╡п╩п╣п╨п╟п╧я│я▐!", ch, 0, 0, TO_CHAR, POS_RESTING);
 	    
-	    act_p("$c1 торжественно произносит: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
+	    act_p("$c1 я┌п╬я─п╤п╣я│я┌п╡п╣п╫п╫п╬ п©я─п╬п╦п╥п╫п╬я│п╦я┌: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    return;
 	}
 
 	if (victim->position <= POS_STUNNED) {
-	    act_p("$M сейчас 'как-то так'.. извини.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	    act_p("$M я│п╣п╧я┤п╟я│ 'п╨п╟п╨-я┌п╬ я┌п╟п╨'.. п╦п╥п╡п╦п╫п╦.", ch, 0, victim, TO_CHAR, POS_RESTING);
 	    return;
 	}
 	else if (victim->position == POS_SLEEPING) {
-	    act_p("Может, стоит $S для начала разбудить?", ch, 0, victim, TO_CHAR, POS_RESTING);
-	    act_p("$c1 вертится вокруг $C2 и так, и эдак, но что-то $s смущает. Наверное, $S храп?", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+	    act_p("п°п╬п╤п╣я┌, я│я┌п╬п╦я┌ $S п╢п╩я▐ п╫п╟я┤п╟п╩п╟ я─п╟п╥п╠я┐п╢п╦я┌я▄?", ch, 0, victim, TO_CHAR, POS_RESTING);
+	    act_p("$c1 п╡п╣я─я┌п╦я┌я│я▐ п╡п╬п╨я─я┐пЁ $C2 п╦ я┌п╟п╨, п╦ я█п╢п╟п╨, п╫п╬ я┤я┌п╬-я┌п╬ $s я│п╪я┐я┴п╟п╣я┌. п²п╟п╡п╣я─п╫п╬п╣, $S я┘я─п╟п©?", ch, 0, victim, TO_NOTVICT, POS_RESTING);
 	    return;
 	}
 	else if (victim->position == POS_FIGHTING) {
-	    act_p("$M сейчас совсем не до тебя.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	    act_p("$M я│п╣п╧я┤п╟я│ я│п╬п╡я│п╣п╪ п╫п╣ п╢п╬ я┌п╣п╠я▐.", ch, 0, victim, TO_CHAR, POS_RESTING);
 	    return;
 	}
 	
@@ -100,7 +100,7 @@ CMDRUN( mlove )
 	    return;
 
 	if (ch->is_npc()) {
-	    ch->send_to("Тебе нельзя.\n\r");
+	    ch->send_to("п╒п╣п╠п╣ п╫п╣п╩я▄п╥я▐.\n\r");
 	    return;
 	}
 
@@ -110,9 +110,9 @@ CMDRUN( mlove )
             ch->move -= ch->move / 4;
             victim->move -= victim->move / 4;
 
-            act_p("Ты срываешь с $C2 одежду и страстно занимаешься с $Y любовью.", ch, 0, victim, TO_CHAR, POS_RESTING);
-            act_p("$c1 срывает с тебя одежду и страстно занимается с тобой любовью. Ах, да! Еще, еще!", ch, 0, victim, TO_VICT, POS_RESTING);
-            act_p("$c1 срывает с $C2 одежду и страстно занимается с $Y любовью.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            act_p("п╒я▀ я│я─я▀п╡п╟п╣я┬я▄ я│ $C2 п╬п╢п╣п╤п╢я┐ п╦ я│я┌я─п╟я│я┌п╫п╬ п╥п╟п╫п╦п╪п╟п╣я┬я▄я│я▐ я│ $Y п╩я▌п╠п╬п╡я▄я▌.", ch, 0, victim, TO_CHAR, POS_RESTING);
+            act_p("$c1 я│я─я▀п╡п╟п╣я┌ я│ я┌п╣п╠я▐ п╬п╢п╣п╤п╢я┐ п╦ я│я┌я─п╟я│я┌п╫п╬ п╥п╟п╫п╦п╪п╟п╣я┌я│я▐ я│ я┌п╬п╠п╬п╧ п╩я▌п╠п╬п╡я▄я▌. п░я┘, п╢п╟! п∙я┴п╣, п╣я┴п╣!", ch, 0, victim, TO_VICT, POS_RESTING);
+            act_p("$c1 я│я─я▀п╡п╟п╣я┌ я│ $C2 п╬п╢п╣п╤п╢я┐ п╦ я│я┌я─п╟я│я┌п╫п╬ п╥п╟п╫п╦п╪п╟п╣я┌я│я▐ я│ $Y п╩я▌п╠п╬п╡я▄я▌.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
             
             MLOVE_DAZE(victim);
             MLOVE_DAZE(ch);
@@ -120,9 +120,9 @@ CMDRUN( mlove )
             return;
 	}
 	
-	act_p("О$Gно|н|на тебя не хочет.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	act_p("$c1 пытается добиться от тебя взаимности, но ты отвергаешь $s.", ch, 0, victim, TO_VICT, POS_RESTING);
-	act_p("$c1 пытается добиться от $C2 взаимности, но $C1 отвергает $s.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+	act_p("п·$Gп╫п╬|п╫|п╫п╟ я┌п╣п╠я▐ п╫п╣ я┘п╬я┤п╣я┌.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╢п╬п╠п╦я┌я▄я│я▐ п╬я┌ я┌п╣п╠я▐ п╡п╥п╟п╦п╪п╫п╬я│я┌п╦, п╫п╬ я┌я▀ п╬я┌п╡п╣я─пЁп╟п╣я┬я▄ $s.", ch, 0, victim, TO_VICT, POS_RESTING);
+	act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╢п╬п╠п╦я┌я▄я│я▐ п╬я┌ $C2 п╡п╥п╟п╦п╪п╫п╬я│я┌п╦, п╫п╬ $C1 п╬я┌п╡п╣я─пЁп╟п╣я┌ $s.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
 }
 
 

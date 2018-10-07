@@ -53,7 +53,7 @@ COMMAND(CEat, "eat")
 
     if (arg.empty( ))
     {
-	    ch->send_to("óßÅÓÔØ ÞÔÏ?\n\r");
+	    ch->send_to("Ð¡ÑŠÐµÑÑ‚ÑŒ Ñ‡Ñ‚Ð¾?\n\r");
 	    return;
     }
     
@@ -66,7 +66,7 @@ COMMAND(CEat, "eat")
 	    return;
 	}
 	
-	ch->send_to("õ ÔÅÂÑ ÎÅÔ ÜÔÏÇÏ.\n\r");
+	ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
 	return;
     }
 
@@ -74,14 +74,14 @@ COMMAND(CEat, "eat")
     {
 	    if ( obj->item_type != ITEM_FOOD && obj->item_type != ITEM_PILL )
 	    {
-		    ch->send_to("üÔÏ ÎÅÓßÅÄÏÂÎÏ.\n\r");
+		    ch->send_to("Ð­Ñ‚Ð¾ Ð½ÐµÑÑŠÐµÐ´Ð¾Ð±Ð½Ð¾.\n\r");
 		    return;
 	    }
 
 	    if ( ch->isAffected(gsn_manacles)
 		    && obj->item_type == ITEM_PILL )
 	    {
-		    ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÐÒÉÎÉÍÁÔØ ÓÎÁÄÏÂØÑ × ËÁÎÄÁÌÁÈ.\n\r");
+		    ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ñ€Ð¸Ð½Ð¸Ð¼Ð°Ñ‚ÑŒ ÑÐ½Ð°Ð´Ð¾Ð±ÑŒÑ Ð² ÐºÐ°Ð½Ð´Ð°Ð»Ð°Ñ….\n\r");
 		    return;
 	    }
 
@@ -90,7 +90,7 @@ COMMAND(CEat, "eat")
 		&& !ch->is_immortal( )
 		&& obj->item_type == ITEM_PILL)
 	    {
-		ch->send_to("ôÙ ÖÅ BattleRager, Á ÎÅ ÐÒÅÚÒÅÎÎÙÊ íáç!\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð¶Ðµ BattleRager, Ð° Ð½Ðµ Ð¿Ñ€ÐµÐ·Ñ€ÐµÐ½Ð½Ñ‹Ð¹ ÐœÐÐ“!\n\r");
 		return;
 	    }
 
@@ -103,12 +103,12 @@ COMMAND(CEat, "eat")
 
     if (obj->level > ch->getModifyLevel() && !ch->is_immortal() )
     {
-	    ch->send_to("ôÅÂÅ ÎÁÄÏ ÐÏÄÒÁÓÔÉ, ÞÔÏÂÙ ÚÁÇÌÏÔÉÔØ ÜÔÏ.\n\r");
+	    ch->send_to("Ð¢ÐµÐ±Ðµ Ð½Ð°Ð´Ð¾ Ð¿Ð¾Ð´Ñ€Ð°ÑÑ‚Ð¸, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð·Ð°Ð³Ð»Ð¾Ñ‚Ð¸Ñ‚ÑŒ ÑÑ‚Ð¾.\n\r");
 	    return;
     }
 
-    act_p( "$c1 ÅÓÔ $o4.",  ch, obj, 0, TO_ROOM,POS_RESTING);
-    act_p( "ôÙ ÅÛØ $o4.", ch, obj, 0, TO_CHAR,POS_RESTING);
+    act_p( "$c1 ÐµÑÑ‚ $o4.",  ch, obj, 0, TO_ROOM,POS_RESTING);
+    act_p( "Ð¢Ñ‹ ÐµÑˆÑŒ $o4.", ch, obj, 0, TO_CHAR,POS_RESTING);
     if ( ch->fighting != 0 )
 	     ch->setWaitViolence( 3 );
 
@@ -149,8 +149,8 @@ void CEat::eatFood( Character *ch, int cFull, int cHunger, int cPoison )
 	    /* The food was poisoned! */
 	    Affect af;
 
-	    act_p( "$c1 È×ÁÔÁÅÔÓÑ ÚÁ ÇÏÒÌÏ É ÚÁÄÙÈÁÅÔÓÑ.", ch, 0, 0, TO_ROOM,POS_RESTING);
-	    ch->send_to("ôÙ È×ÁÔÁÅÛØÓÑ ÚÁ ÇÏÒÌÏ É ÚÁÄÙÈÁÅÛØÓÑ.\n\r");
+	    act_p( "$c1 Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ÑÑ Ð·Ð° Ð³Ð¾Ñ€Ð»Ð¾ Ð¸ Ð·Ð°Ð´Ñ‹Ñ…Ð°ÐµÑ‚ÑÑ.", ch, 0, 0, TO_ROOM,POS_RESTING);
+	    ch->send_to("Ð¢Ñ‹ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑˆÑŒÑÑ Ð·Ð° Ð³Ð¾Ñ€Ð»Ð¾ Ð¸ Ð·Ð°Ð´Ñ‹Ñ…Ð°ÐµÑˆÑŒÑÑ.\n\r");
 
 	    af.where	 = TO_AFFECTS;
 	    af.type      = gsn_poison;
@@ -170,7 +170,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     int diff, dam, gain;
     
     if (ch->fighting) {
-	ch->send_to( "óÅÊÞÁÓ ÔÙ ÓÒÁÖÁÅÛØÓÑ - ÔÅÂÅ ÎÅ ÄÏ ÏÈÏÔÙ!\r\n" );
+	ch->send_to( "Ð¡ÐµÐ¹Ñ‡Ð°Ñ Ñ‚Ñ‹ ÑÑ€Ð°Ð¶Ð°ÐµÑˆÑŒÑÑ - Ñ‚ÐµÐ±Ðµ Ð½Ðµ Ð´Ð¾ Ð¾Ñ…Ð¾Ñ‚Ñ‹!\r\n" );
 	return;
     }
     
@@ -180,38 +180,38 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
     
     if (!isFelar) {
 	if (!isMouse && !isFish) {
-	    ch->println("üÔÏ ÖÉ×ÏÔÎÏÅ ÎÅ ÓÄÅÌÁÌÏ ÔÅÂÅ ÎÉÞÅÇÏ ÐÌÏÈÏÇÏ!");
+	    ch->println("Ð­Ñ‚Ð¾ Ð¶Ð¸Ð²Ð¾Ñ‚Ð½Ð¾Ðµ Ð½Ðµ ÑÐ´ÐµÐ»Ð°Ð»Ð¾ Ñ‚ÐµÐ±Ðµ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð¿Ð»Ð¾Ñ…Ð¾Ð³Ð¾!");
 	}
 	else {
-	    act("÷ÏÏÂÒÁÚÉ× ÓÅÂÑ ËÏÔÏÍ, $c1 ÐÙÔÁÅÔÓÑ ÉÚÌÏ×ÉÔØ É ÓÏÖÒÁÔØ $C4, ÎÏ ÏÐÙÔÁ Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, mob, TO_ROOM);
-	    act("îÁ ÍÉÇ ×ÏÏÂÒÁÚÉ× ÓÅÂÑ ËÏÔÏÍ, ÔÙ ÐÙÔÁÅÛØÓÑ ÉÚÌÏ×ÉÔØ É ÓÏÖÒÁÔØ $C4.. ÎÏ ÏÐÙÔÁ Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, mob, TO_CHAR);
+	    act("Ð’Ð¾Ð¾Ð±Ñ€Ð°Ð·Ð¸Ð² ÑÐµÐ±Ñ ÐºÐ¾Ñ‚Ð¾Ð¼, $c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¸Ð·Ð»Ð¾Ð²Ð¸Ñ‚ÑŒ Ð¸ ÑÐ¾Ð¶Ñ€Ð°Ñ‚ÑŒ $C4, Ð½Ð¾ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, mob, TO_ROOM);
+	    act("ÐÐ° Ð¼Ð¸Ð³ Ð²Ð¾Ð¾Ð±Ñ€Ð°Ð·Ð¸Ð² ÑÐµÐ±Ñ ÐºÐ¾Ñ‚Ð¾Ð¼, Ñ‚Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ð¸Ð·Ð»Ð¾Ð²Ð¸Ñ‚ÑŒ Ð¸ ÑÐ¾Ð¶Ñ€Ð°Ñ‚ÑŒ $C4.. Ð½Ð¾ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, mob, TO_CHAR);
 	}
 
 	return;
     }
     else {
 	if (!isMouse && !isFish) {
-	    act("$c1, ÐÏÈÏÖÅ, ÐÒÉÎÑ$gÌÏ|Ì|ÌÁ $C4 ÚÁ ÍÁÁÁÌÅÎØËÕÀ ÍÙÛËÕ.", ch, 0, mob, TO_ROOM);
-	    act("üÔÏ ÎÅ ÍÙÛËÁ! äÁÖÅ É ÎÅ ÄÕÍÁÊ ÚÁ $Y ÇÏÎÑÔØÓÑ.", ch, 0, mob, TO_CHAR);
+	    act("$c1, Ð¿Ð¾Ñ…Ð¾Ð¶Ðµ, Ð¿Ñ€Ð¸Ð½Ñ$gÐ»Ð¾|Ð»|Ð»Ð° $C4 Ð·Ð° Ð¼Ð°Ð°Ð°Ð»ÐµÐ½ÑŒÐºÑƒÑŽ Ð¼Ñ‹ÑˆÐºÑƒ.", ch, 0, mob, TO_ROOM);
+	    act("Ð­Ñ‚Ð¾ Ð½Ðµ Ð¼Ñ‹ÑˆÐºÐ°! Ð”Ð°Ð¶Ðµ Ð¸ Ð½Ðµ Ð´ÑƒÐ¼Ð°Ð¹ Ð·Ð° $Y Ð³Ð¾Ð½ÑÑ‚ÑŒÑÑ.", ch, 0, mob, TO_CHAR);
 	    return;
 	}
     }
     
 
     if (mob->master) {
-	act("$c1 Ó ÁÐÐÅÔÉÔÏÍ ËÌÁÃÁÅÔ ÚÕÂÁÍÉ ÐÒÉ ×ÉÄÅ $C2.", ch, 0, mob, TO_ROOM);
-	act("ôÙ Ó ÁÐÐÅÔÉÔÏÍ ËÌÁÃÁÅÛØ ÚÕÂÁÍÉ ÐÒÉ ×ÉÄÅ $C2.", ch, 0, mob, TO_CHAR);
+	act("$c1 Ñ Ð°Ð¿Ð¿ÐµÑ‚Ð¸Ñ‚Ð¾Ð¼ ÐºÐ»Ð°Ñ†Ð°ÐµÑ‚ Ð·ÑƒÐ±Ð°Ð¼Ð¸ Ð¿Ñ€Ð¸ Ð²Ð¸Ð´Ðµ $C2.", ch, 0, mob, TO_ROOM);
+	act("Ð¢Ñ‹ Ñ Ð°Ð¿Ð¿ÐµÑ‚Ð¸Ñ‚Ð¾Ð¼ ÐºÐ»Ð°Ñ†Ð°ÐµÑˆÑŒ Ð·ÑƒÐ±Ð°Ð¼Ð¸ Ð¿Ñ€Ð¸ Ð²Ð¸Ð´Ðµ $C2.", ch, 0, mob, TO_CHAR);
 	
 	if (mob->master == ch) {
-	    act("$C1 Ó ÕÖÁÓÏÍ ÓÍÏÔÒÉÔ ÎÁ $c4.", ch, 0, mob, TO_ROOM);
-	    act("$C1 Ó ÕÖÁÓÏÍ ÓÍÏÔÒÉÔ ÎÁ ÔÅÂÑ.", ch, 0, mob, TO_CHAR);
+	    act("$C1 Ñ ÑƒÐ¶Ð°ÑÐ¾Ð¼ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð½Ð° $c4.", ch, 0, mob, TO_ROOM);
+	    act("$C1 Ñ ÑƒÐ¶Ð°ÑÐ¾Ð¼ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð½Ð° Ñ‚ÐµÐ±Ñ.", ch, 0, mob, TO_CHAR);
 	}
 	else if (mob->master->in_room == mob->in_room) {
-	    act("$C1 ÛÕÓÔÒÏ ÐÒÑÞÅÔÓÑ ÚÁ ÓÐÉÎÕ ÈÏÚÑÉÎÁ!", mob->master, 0, mob, TO_ROOM);
-	    act("$C1 ÛÕÓÔÒÏ ÐÒÑÞÅÔÓÑ ÚÁ Ô×ÏÀ ÓÐÉÎÕ!", mob->master, 0, mob, TO_CHAR);  
+	    act("$C1 ÑˆÑƒÑÑ‚Ñ€Ð¾ Ð¿Ñ€ÑÑ‡ÐµÑ‚ÑÑ Ð·Ð° ÑÐ¿Ð¸Ð½Ñƒ Ñ…Ð¾Ð·ÑÐ¸Ð½Ð°!", mob->master, 0, mob, TO_ROOM);
+	    act("$C1 ÑˆÑƒÑÑ‚Ñ€Ð¾ Ð¿Ñ€ÑÑ‡ÐµÑ‚ÑÑ Ð·Ð° Ñ‚Ð²Ð¾ÑŽ ÑÐ¿Ð¸Ð½Ñƒ!", mob->master, 0, mob, TO_CHAR);  
 	}
 	else
-	    act("$C1 ×ÖÉÍÁÅÔÓÑ × ÐÏÌ, ÚÁËÒÙ× ÇÌÁÚÁ ÌÁÐÁÍÉ.", ch, 0, mob, TO_ALL);
+	    act("$C1 Ð²Ð¶Ð¸Ð¼Ð°ÐµÑ‚ÑÑ Ð² Ð¿Ð¾Ð», Ð·Ð°ÐºÑ€Ñ‹Ð² Ð³Ð»Ð°Ð·Ð° Ð»Ð°Ð¿Ð°Ð¼Ð¸.", ch, 0, mob, TO_ALL);
 	
 	return;
     }
@@ -221,8 +221,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 	    if (!desireManager->find( i )->canEat( ch->getPC( ) ))
  		return;
    
-    act("$c1 Ó ÇÒÏÍËÉÍ ÍÑÕËÁÎØÅÍ ×ÃÅÐÌÑÅÔÓÑ ÚÕÂÁÍÉ É ËÏÇÔÑÍÉ × $C4!", ch, 0, mob, TO_ROOM);
-    act("ôÙ Ó ÇÒÏÍËÉÍ ÍÑÕËÁÎØÅÍ ×ÃÅÐÌÑÅÛØÓÑ ÚÕÂÁÍÉ É ËÏÇÔÑÍÉ × $C4!", ch, 0, mob, TO_CHAR);
+    act("$c1 Ñ Ð³Ñ€Ð¾Ð¼ÐºÐ¸Ð¼ Ð¼ÑÑƒÐºÐ°Ð½ÑŒÐµÐ¼ Ð²Ñ†ÐµÐ¿Ð»ÑÐµÑ‚ÑÑ Ð·ÑƒÐ±Ð°Ð¼Ð¸ Ð¸ ÐºÐ¾Ð³Ñ‚ÑÐ¼Ð¸ Ð² $C4!", ch, 0, mob, TO_ROOM);
+    act("Ð¢Ñ‹ Ñ Ð³Ñ€Ð¾Ð¼ÐºÐ¸Ð¼ Ð¼ÑÑƒÐºÐ°Ð½ÑŒÐµÐ¼ Ð²Ñ†ÐµÐ¿Ð»ÑÐµÑˆÑŒÑÑ Ð·ÑƒÐ±Ð°Ð¼Ð¸ Ð¸ ÐºÐ¾Ð³Ñ‚ÑÐ¼Ð¸ Ð² $C4!", ch, 0, mob, TO_CHAR);
 
     diff = max( 1, ch->getRealLevel( ) - mob->getRealLevel( ) );
     dam = diff * 10;
@@ -233,8 +233,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
 	Object *obj, *obj_next;
 	
 	death_cry( mob, 99 );
-	act("ôÙ ÅÛØ $C4.", ch, 0, mob, TO_CHAR);
-	act("$c1 ÅÓÔ $C4.", ch, 0, mob, TO_ROOM);
+	act("Ð¢Ñ‹ ÐµÑˆÑŒ $C4.", ch, 0, mob, TO_CHAR);
+	act("$c1 ÐµÑÑ‚ $C4.", ch, 0, mob, TO_ROOM);
 
 	for (obj = mob->carrying; obj; obj = obj_next) {
 	    obj_next = obj->next_content;

@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 #include "skill.h"
 #include "skillcommandtemplate.h"
@@ -51,25 +51,25 @@ SKILL_RUNP( vanish )
 
     if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
     {
-	    ch->send_to("þÔÏ?\n\r");
+	    ch->send_to("Ð§Ñ‚Ð¾?\n\r");
 	    return;
     }
     
     if (ch->mana < gsn_vanish->getMana( ))
     {
-	    ch->send_to("õ ÔÅÂÑ ÎÅÄÏÓÔÁÔÏÞÎÏ ÜÎÅÒÇÉÉ ÄÌÑ ÜÔÏÇÏ.\n\r" );
+	    ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.\n\r" );
 	    return;
     }
 
     if ( ch->death_ground_delay > 0
 	    && ch->trap.isSet( TF_NO_MOVE ) )
     {
-	    ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÐÏËÉÎÕÔØ ÜÔÏ ÍÅÓÔÏ - ÂÅÚ ÐÏÓÔÏÒÏÎÎÅÊ ÐÏÍÏÝÉ!\n\r");
+	    ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÑ‚Ð¾ Ð¼ÐµÑÑ‚Ð¾ - Ð±ÐµÐ· Ð¿Ð¾ÑÑ‚Ð¾Ñ€Ð¾Ð½Ð½ÐµÐ¹ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸!\n\r");
 	    return;
     }
 
     if (ch->mount) {
-	ch->pecho( "ôÙ ÎÅ ÍÏÖÅÛØ ÉÓÞÅÚÎÕÔØ, ÐÏËÁ ÔÙ ×ÅÒÈÏÍ ÉÌÉ ÏÓÅÄÌÁ%GÎÏ|Î|ÎÁ!", ch );
+	ch->pecho( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¸ÑÑ‡ÐµÐ·Ð½ÑƒÑ‚ÑŒ, Ð¿Ð¾ÐºÐ° Ñ‚Ñ‹ Ð²ÐµÑ€Ñ…Ð¾Ð¼ Ð¸Ð»Ð¸ Ð¾ÑÐµÐ´Ð»Ð°%GÐ½Ð¾|Ð½|Ð½Ð°!", ch );
 	return;
     }
 
@@ -77,45 +77,45 @@ SKILL_RUNP( vanish )
     ch->setWait( gsn_vanish->getBeats( )  );
     
     if (ch->isAffected(gsn_vanish)) {
-	ch->send_to("ôÅÂÅ ÐÏËÁ ÎÅÞÅÇÏ ÂÒÏÓÉÔØ.\r\n");
+	ch->send_to("Ð¢ÐµÐ±Ðµ Ð¿Ð¾ÐºÐ° Ð½ÐµÑ‡ÐµÐ³Ð¾ Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ.\r\n");
 	return;
     }
     
     if (number_percent() > gsn_vanish->getEffective( ch ) )
     {
-	    ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÚÁËÏÎÞÉÌÁÓØ ÎÅÕÄÁÞÅÊ!\n\r");
+	    ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡ÐµÐ¹!\n\r");
 	    gsn_vanish->improve( ch, false );
 	    return;
     }
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
     {
-	ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÚÁËÏÎÞÉÌÁÓØ ÎÅÕÄÁÞÅÊ!\n\r");
+	ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡ÐµÐ¹!\n\r");
 	return;
     }
 
     pRoomIndex = get_random_room_vanish( ch );
     
     if (!pRoomIndex) {
-	ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÚÁËÏÎÞÉÌÁÓØ ÎÅÕÄÁÞÅÊ!\n\r");
+	ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡ÐµÐ¹!\n\r");
 	return;
     }
     
-  act_p( "$c1 ÂÒÏÓÁÅÔ ÎÁ ÚÅÍÌÀ ÎÅÂÏÌØÛÏÊ ÛÁÒ.", ch, 0, 0, TO_ROOM,POS_RESTING);
-  ch->send_to("ôÙ ÂÒÏÓÁÅÛØ ÎÁ ÚÅÍÌÀ ÎÅÂÏÌØÛÏÊ ÛÁÒ.\r\n");
+  act_p( "$c1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ Ð½Ð° Ð·ÐµÐ¼Ð»ÑŽ Ð½ÐµÐ±Ð¾Ð»ÑŒÑˆÐ¾Ð¹ ÑˆÐ°Ñ€.", ch, 0, 0, TO_ROOM,POS_RESTING);
+  ch->send_to("Ð¢Ñ‹ Ð±Ñ€Ð¾ÑÐ°ÐµÑˆÑŒ Ð½Ð° Ð·ÐµÐ¼Ð»ÑŽ Ð½ÐµÐ±Ð¾Ð»ÑŒÑˆÐ¾Ð¹ ÑˆÐ°Ñ€.\r\n");
 
   gsn_vanish->improve( ch, true );
 
   if (!ch->is_npc() && ch->fighting != 0 && number_bits(1) == 1)
   {
-    ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÚÁËÏÎÞÉÌÁÓØ ÎÅÕÄÁÞÅÊ!\n\r");
+    ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡ÐµÐ¹!\n\r");
     return;
   }
     
     transfer_char( ch, ch, pRoomIndex,
-	    "%1^C1 ÉÓÞÅÚÁÅÔ!",
-	    "ôÙ ÉÓÞÅÚÁÅÛØ!",
-	    "%1^C1 ÐÏÑ×ÌÑÅÔÓÑ ÉÚ ÎÉÞÅÇÏ." );
+	    "%1^C1 Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚!",
+	    "Ð¢Ñ‹ Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑˆÑŒ!",
+	    "%1^C1 Ð¿Ð¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ð¸Ð· Ð½Ð¸Ñ‡ÐµÐ³Ð¾." );
 }
 
 /*
@@ -129,7 +129,7 @@ SKILL_RUNP( nerve )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("ôÏÌØËÏ ÎÅ ×ÅÒÈÏÍ!\n\r");
+		ch->send_to("Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð½Ðµ Ð²ÐµÑ€Ñ…Ð¾Ð¼!\n\r");
 		return;
 	}
 
@@ -137,13 +137,13 @@ SKILL_RUNP( nerve )
 
 	if (!gsn_nerve->usable( ch ) )
 	{
-		ch->send_to("ôÙ ÎÅ ×ÌÁÄÅÅÛØ ÜÔÏÊ ÔÅÈÎÉËÏÊ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð²Ð»Ð°Ð´ÐµÐµÑˆÑŒ ÑÑ‚Ð¾Ð¹ Ñ‚ÐµÑ…Ð½Ð¸ÐºÐ¾Ð¹.\n\r");
 		return;
 	}
 
 	if (ch->fighting == 0)
 	{
-		ch->send_to("óÅÊÞÁÓ ÔÙ ÎÅ ÓÒÁÖÁÅÛØÓÑ.\n\r");
+		ch->send_to("Ð¡ÐµÐ¹Ñ‡Ð°Ñ Ñ‚Ñ‹ Ð½Ðµ ÑÑ€Ð°Ð¶Ð°ÐµÑˆÑŒÑÑ.\n\r");
 		return;
 	}
 
@@ -154,7 +154,7 @@ SKILL_RUNP( nerve )
 
 	if ( ch->isAffected(gsn_nerve) )
 	{
-		ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓÄÅÌÁÔØ ÅÇÏ ÅÝÅ ÓÌÁÂÅÅ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ ÐµÐ³Ð¾ ÐµÑ‰Ðµ ÑÐ»Ð°Ð±ÐµÐµ.\n\r");
 		return;
 	}
 
@@ -174,25 +174,25 @@ SKILL_RUNP( nerve )
 		af.bitvector = 0;
 
 		affect_to_char(victim,&af);
-		act_p("ôÙ ÏÓÌÁÂÌÑÅÛØ $C4, ÐÅÒÅÖÉÍÁÑ ÎÅÒ×ÎÙÅ ÔÏÞËÉ.",ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 ÏÓÌÁÂÌÑÅÔ ÔÅÂÑ, ÐÅÒÅÖÉÍÁÑ Ô×ÏÉ ÎÅÒ×ÎÙÅ ÔÏÞËÉ.",ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 ÏÓÌÁÂÌÑÅÔ $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
+		act_p("Ð¢Ñ‹ Ð¾ÑÐ»Ð°Ð±Ð»ÑÐµÑˆÑŒ $C4, Ð¿ÐµÑ€ÐµÐ¶Ð¸Ð¼Ð°Ñ Ð½ÐµÑ€Ð²Ð½Ñ‹Ðµ Ñ‚Ð¾Ñ‡ÐºÐ¸.",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("$c1 Ð¾ÑÐ»Ð°Ð±Ð»ÑÐµÑ‚ Ñ‚ÐµÐ±Ñ, Ð¿ÐµÑ€ÐµÐ¶Ð¸Ð¼Ð°Ñ Ñ‚Ð²Ð¾Ð¸ Ð½ÐµÑ€Ð²Ð½Ñ‹Ðµ Ñ‚Ð¾Ñ‡ÐºÐ¸.",ch,0,victim,TO_VICT,POS_RESTING);
+		act_p("$c1 Ð¾ÑÐ»Ð°Ð±Ð»ÑÐµÑ‚ $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
 		gsn_nerve->improve( ch, true, victim );
 	}
   else
 	{
-		ch->send_to("ôÙ ÎÁÖÉÍÁÅÛØ ÎÅ ÔÕÄÁ, ËÕÄÁ ÎÁÄÏ.\n\r");
-		act_p("$c1 ÎÁÖÉÍÁÅÔ ÐÁÌØÃÁÍÉ ÎÁ Ô×ÏÅ ÔÅÌÏ, ÎÏ ÎÉÞÅÇÏ ÎÅ ÐÒÏÉÓÈÏÄÉÔ.",
+		ch->send_to("Ð¢Ñ‹ Ð½Ð°Ð¶Ð¸Ð¼Ð°ÐµÑˆÑŒ Ð½Ðµ Ñ‚ÑƒÐ´Ð°, ÐºÑƒÐ´Ð° Ð½Ð°Ð´Ð¾.\n\r");
+		act_p("$c1 Ð½Ð°Ð¶Ð¸Ð¼Ð°ÐµÑ‚ Ð¿Ð°Ð»ÑŒÑ†Ð°Ð¼Ð¸ Ð½Ð° Ñ‚Ð²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾, Ð½Ð¾ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð¿Ñ€Ð¾Ð¸ÑÑ…Ð¾Ð´Ð¸Ñ‚.",
 			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 ÎÁÖÉÍÁÅÔ ÐÁÌØÃÁÍÉ ÎÁ ÔÅÌÏ $C2, ÎÏ ÎÉÞÅÇÏ ÎÅ ÐÒÏÉÓÈÏÄÉÔ.",
+		act_p("$c1 Ð½Ð°Ð¶Ð¸Ð¼Ð°ÐµÑ‚ Ð¿Ð°Ð»ÑŒÑ†Ð°Ð¼Ð¸ Ð½Ð° Ñ‚ÐµÐ»Ð¾ $C2, Ð½Ð¾ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð¿Ñ€Ð¾Ð¸ÑÑ…Ð¾Ð´Ð¸Ñ‚.",
 			ch,0,victim,TO_NOTVICT,POS_RESTING);
 		gsn_nerve->improve( ch, false, victim );
 	}
 
 	if (!victim->fighting) {
 	    yell_panic( ch, victim,
-			"ðÏÍÏÇÉÔÅ! íÅÎÑ ËÔÏ-ÔÏ ÔÒÏÇÁÅÔ!",
-			"õÂÅÒÉ Ó×ÏÉ ÒÕËÉ, %1$C1!" );
+			"ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐœÐµÐ½Ñ ÐºÑ‚Ð¾-Ñ‚Ð¾ Ñ‚Ñ€Ð¾Ð³Ð°ÐµÑ‚!",
+			"Ð£Ð±ÐµÑ€Ð¸ ÑÐ²Ð¾Ð¸ Ñ€ÑƒÐºÐ¸, %1$C1!" );
 	
 	    multi_hit(victim,ch);
 	}
@@ -208,19 +208,19 @@ SKILL_RUNP( endure )
 
   if (ch->is_npc())
     {
-      ch->send_to("÷ÙÎÏÓÌÉ×ÏÓÔØ - ÎÅ Ô×ÏÊ ÕÄÅÌ.\n\r");
+      ch->send_to("Ð’Ñ‹Ð½Ð¾ÑÐ»Ð¸Ð²Ð¾ÑÑ‚ÑŒ - Ð½Ðµ Ñ‚Ð²Ð¾Ð¹ ÑƒÐ´ÐµÐ».\n\r");
       return;
     }
 
   if ( gsn_endure->getEffective( ch ) <= 1 )
   {
-      ch->send_to("ðÏÈÏÖÅ ÔÙ ÎÅ ÔÁË ×ÙÎÏÓÌÉ×, ËÁË Ï ÓÅÂÅ ÄÕÍÁÅÛØ.\n\r");
+      ch->send_to("ÐŸÐ¾Ñ…Ð¾Ð¶Ðµ Ñ‚Ñ‹ Ð½Ðµ Ñ‚Ð°Ðº Ð²Ñ‹Ð½Ð¾ÑÐ»Ð¸Ð², ÐºÐ°Ðº Ð¾ ÑÐµÐ±Ðµ Ð´ÑƒÐ¼Ð°ÐµÑˆÑŒ.\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_endure))
     {
-      ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓÔÁÔØ ÅÝÅ ×ÙÎÏÓÌÉ×ÅÅ.\n\r");
+      ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÑ‚Ð°Ñ‚ÑŒ ÐµÑ‰Ðµ Ð²Ñ‹Ð½Ð¾ÑÐ»Ð¸Ð²ÐµÐµ.\n\r");
       return;
     }
 
@@ -237,8 +237,8 @@ SKILL_RUNP( endure )
 
   affect_to_char(ch,&af);
 
-  act("ôÙ ÇÏÔÏ×ÉÛØÓÑ Ë ÓÔÏÌËÎÏ×ÅÎÉÀ Ó ÍÁÇÉÅÊ.", ch, 0, 0, TO_CHAR);
-  act("$c1 ÍÇÎÏ×ÅÎÎÏ ËÏÎÃÅÎÔÒÉÒÕÅÔÓÑ.", ch,0,0,TO_ROOM);
+  act("Ð¢Ñ‹ Ð³Ð¾Ñ‚Ð¾Ð²Ð¸ÑˆÑŒÑÑ Ðº ÑÑ‚Ð¾Ð»ÐºÐ½Ð¾Ð²ÐµÐ½Ð¸ÑŽ Ñ Ð¼Ð°Ð³Ð¸ÐµÐ¹.", ch, 0, 0, TO_CHAR);
+  act("$c1 Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð½Ð¾ ÐºÐ¾Ð½Ñ†ÐµÐ½Ñ‚Ñ€Ð¸Ñ€ÑƒÐµÑ‚ÑÑ.", ch,0,0,TO_ROOM);
   gsn_endure->improve( ch, true );
 }
 
@@ -275,9 +275,9 @@ void AssassinateOneHit::calcDamage( )
     }
 
     if (number_percent( ) <= chance) {
-	act_p("ôÙ {R+++ASSASSINATE+++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
+	act_p("Ð¢Ñ‹ {R+++ASSASSINATE+++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
 	act_p("$c1 {R+++ASSASSINATES+++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-	act_p("$c1 {R+++ASSASSINATES+++{x ÔÅÂÑ!",ch,0,victim,TO_VICT,POS_DEAD);
+	act_p("$c1 {R+++ASSASSINATES+++{x Ñ‚ÐµÐ±Ñ!",ch,0,victim,TO_VICT,POS_DEAD);
 
 	gsn_assassinate->improve( ch, true, victim );
 
@@ -305,7 +305,7 @@ SKILL_RUNP( assassinate )
 
     if ( MOUNTED(ch) )
     {
-	    ch->send_to("ôÏÌØËÏ ÎÅ ×ÅÒÈÏÍ!\n\r");
+	    ch->send_to("Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð½Ðµ Ð²ÐµÑ€Ñ…Ð¾Ð¼!\n\r");
 	    return;
     }
     one_argument( argument, arg );
@@ -315,31 +315,31 @@ SKILL_RUNP( assassinate )
 
     if ( !ch->is_npc() && !gsn_assassinate->usable( ch ) )
     {
-	    ch->send_to("ôÙ ÎÅ ÉÍÅÅÛØ ÐÏÎÑÔÉÑ, ËÁË ÜÔÏ ÄÅÌÁÅÔÓÑ.\n\r");
+	    ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¸Ð¼ÐµÐµÑˆÑŒ Ð¿Ð¾Ð½ÑÑ‚Ð¸Ñ, ÐºÐ°Ðº ÑÑ‚Ð¾ Ð´ÐµÐ»Ð°ÐµÑ‚ÑÑ.\n\r");
 	    return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )
     {
-	    ch->send_to( "ôÙ ÖÅ ÎÅ ÈÏÞÅÛØ ÕÂÉÔØ Ó×ÏÅÇÏ ÌÀÂÉÍÏÇÏ ÈÏÚÑÉÎÁ.\n\r");
+	    ch->send_to( "Ð¢Ñ‹ Ð¶Ðµ Ð½Ðµ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ ÑƒÐ±Ð¸Ñ‚ÑŒ ÑÐ²Ð¾ÐµÐ³Ð¾ Ð»ÑŽÐ±Ð¸Ð¼Ð¾Ð³Ð¾ Ñ…Ð¾Ð·ÑÐ¸Ð½Ð°.\n\r");
 	    return;
     }
 
     if ( arg[0] == '\0' )
     {
-	    ch->send_to("ëÏÇÏ ÕÂÉ×ÁÅÍ óåçïäîñ?\n\r");
+	    ch->send_to("ÐšÐ¾Ð³Ð¾ ÑƒÐ±Ð¸Ð²Ð°ÐµÐ¼ Ð¡Ð•Ð“ÐžÐ”ÐÐ¯?\n\r");
 	    return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-	    ch->send_to("üÔÏÇÏ ÎÅÔ ÚÄÅÓØ.\n\r");
+	    ch->send_to("Ð­Ñ‚Ð¾Ð³Ð¾ Ð½ÐµÑ‚ Ð·Ð´ÐµÑÑŒ.\n\r");
 	    return;
     }
 
     if ( victim == ch )
     {
-	    ch->send_to("ô×ÏÊ ÐÕÔØ ÎÅ ×ËÌÀÞÁÅÔ × ÓÅÂÑ ÓÕÉÃÉÄ.\n\r");
+	    ch->send_to("Ð¢Ð²Ð¾Ð¹ Ð¿ÑƒÑ‚ÑŒ Ð½Ðµ Ð²ÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ Ð² ÑÐµÐ±Ñ ÑÑƒÐ¸Ñ†Ð¸Ð´.\n\r");
 	    return;
     }
 
@@ -348,13 +348,13 @@ SKILL_RUNP( assassinate )
 
     if ( victim->is_immortal() && !victim->is_npc() )
     {
-	    ch->send_to("ïÏÐÓ.. ÒÕËÉ ÎÅ ÎÁÈÏÄÑÔ ÎÕÖÎÏÇÏ ÉÍ.\n\r");
+	    ch->send_to("ÐžÐ¾Ð¿Ñ.. Ñ€ÑƒÐºÐ¸ Ð½Ðµ Ð½Ð°Ñ…Ð¾Ð´ÑÑ‚ Ð½ÑƒÐ¶Ð½Ð¾Ð³Ð¾ Ð¸Ð¼.\n\r");
 	    return;
     }
 
     if ( victim->fighting != 0 )
     {
-	    ch->send_to("ðÏÄÏÖÄÉ, ÐÏËÁ ÚÁËÏÎÞÉÔÓÑ ÓÒÁÖÅÎÉÅ.\n\r");
+	    ch->send_to("ÐŸÐ¾Ð´Ð¾Ð¶Ð´Ð¸, Ð¿Ð¾ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ñ‚ÑÑ ÑÑ€Ð°Ð¶ÐµÐ½Ð¸Ðµ.\n\r");
 	    return;
     }
     
@@ -364,13 +364,13 @@ SKILL_RUNP( assassinate )
 	|| !loc.isSet( wear_wrist_l )
 	|| !loc.isSet( wear_wrist_r ))
     {
-	ch->send_to("õ ÔÅÂÑ ÎÅÔ ÒÕË.\r\n");
+	ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ñ€ÑƒÐº.\r\n");
 	return;
     }
 
     if (!check_bare_hands(ch))	
     {
-	    ch->send_to("ïÓ×ÏÂÏÄÉ ÏÂÅ ÒÕËÉ ÄÌÑ ÜÔÏÇÏ.\n\r");
+	    ch->send_to("ÐžÑÐ²Ð¾Ð±Ð¾Ð´Ð¸ Ð¾Ð±Ðµ Ñ€ÑƒÐºÐ¸ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
 	    return;
     }
 
@@ -378,14 +378,14 @@ SKILL_RUNP( assassinate )
 	    && victim->can_see(ch)
 	    && IS_AWAKE(victim) )
     {
-	    act_p( "$C1 ÒÁÎ$GÅÎÏ|ÅÎ|ÅÎÁ É ÎÁÓÔÏÒÏÖÅÎÎÏ ÏÇÌÑÄÙ×ÁÅÔÓÑ.. ÔÙ ÎÅ ÍÏÖÅÛØ ÐÏÄËÒÁÓÔØÓÑ.",
+	    act_p( "$C1 Ñ€Ð°Ð½$GÐµÐ½Ð¾|ÐµÐ½|ÐµÐ½Ð° Ð¸ Ð½Ð°ÑÑ‚Ð¾Ñ€Ð¾Ð¶ÐµÐ½Ð½Ð¾ Ð¾Ð³Ð»ÑÐ´Ñ‹Ð²Ð°ÐµÑ‚ÑÑ.. Ñ‚Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾Ð´ÐºÑ€Ð°ÑÑ‚ÑŒÑÑ.",
 		    ch, 0, victim, TO_CHAR,POS_RESTING);
 	    return;
     }
 
     if (IS_SET(victim->imm_flags, IMM_WEAPON))
     {
-	    act_p("$C1 ÉÍÅÅÔ ÓÌÉÛËÏÍ ËÒÅÐËÕÀ ÛÅÀ, ÞÔÏÂÙ ÅÅ ÍÏÖÎÏ ÂÙÌÏ ÓÌÏÍÁÔØ.", ch, 0,
+	    act_p("$C1 Ð¸Ð¼ÐµÐµÑ‚ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ ÐºÑ€ÐµÐ¿ÐºÑƒÑŽ ÑˆÐµÑŽ, Ñ‡Ñ‚Ð¾Ð±Ñ‹ ÐµÐµ Ð¼Ð¾Ð¶Ð½Ð¾ Ð±Ñ‹Ð»Ð¾ ÑÐ»Ð¾Ð¼Ð°Ñ‚ÑŒ.", ch, 0,
 		    victim, TO_CHAR,POS_RESTING);
 	    return;
     }
@@ -409,8 +409,8 @@ SKILL_RUNP( assassinate )
 	}
 	
 	yell_panic( ch, victim,
-	            "ðÏÍÏÇÉÔÅ! ëÔÏ-ÔÏ ÐÙÔÁÅÔÓÑ õâéôø ÍÅÎÑ!",
-		    "ðÏÍÏÇÉÔÅ! %1$^C1 ÐÙÔÁÅÔÓÑ õâéôø ÍÅÎÑ!" );
+	            "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐšÑ‚Ð¾-Ñ‚Ð¾ Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð£Ð‘Ð˜Ð¢Ð¬ Ð¼ÐµÐ½Ñ!",
+		    "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! %1$^C1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð£Ð‘Ð˜Ð¢Ð¬ Ð¼ÐµÐ½Ñ!" );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -426,22 +426,22 @@ SKILL_RUNP( caltraps )
 
   if (ch->is_npc() || !gsn_caltraps->usable( ch ))
     {
-      ch->send_to("ûÉÐÁÍÉ ËÉÄÁÔØÓÑ? îÅ ×ÙÒÏÓÌÉ ÅÝÅ.\n\r");
+      ch->send_to("Ð¨Ð¸Ð¿Ð°Ð¼Ð¸ ÐºÐ¸Ð´Ð°Ñ‚ÑŒÑÑ? ÐÐµ Ð²Ñ‹Ñ€Ð¾ÑÐ»Ð¸ ÐµÑ‰Ðµ.\n\r");
       return;
     }
 
   if (victim == 0)
     {
-      ch->pecho("äÌÑ ÜÔÏÇÏ ÔÙ ÄÏÌÖ%GÎÏ|ÅÎ|ÎÁ Ó ËÅÍ-ÔÏ ÓÒÁÖÁÔØÓÑ.", ch);
+      ch->pecho("Ð”Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾ Ñ‚Ñ‹ Ð´Ð¾Ð»Ð¶%GÐ½Ð¾|ÐµÐ½|Ð½Ð° Ñ ÐºÐµÐ¼-Ñ‚Ð¾ ÑÑ€Ð°Ð¶Ð°Ñ‚ÑŒÑÑ.", ch);
       return;
     }
 
   if (is_safe(ch,victim))
     return;
 
-  act_p("ôÙ ËÉÄÁÅÛØ ÐÒÉÇÏÒÏÛÎÀ ÏÓÔÒÙÈ ÛÉÐÏ× ÐÏÄ ÎÏÇÉ $C3.",
+  act_p("Ð¢Ñ‹ ÐºÐ¸Ð´Ð°ÐµÑˆÑŒ Ð¿Ñ€Ð¸Ð³Ð¾Ñ€Ð¾ÑˆÐ½ÑŽ Ð¾ÑÑ‚Ñ€Ñ‹Ñ… ÑˆÐ¸Ð¿Ð¾Ð² Ð¿Ð¾Ð´ Ð½Ð¾Ð³Ð¸ $C3.",
          ch,0,victim,TO_CHAR,POS_RESTING);
-  act_p("$c1 ËÉÄÁÅÔ ÐÒÉÇÏÒÏÛÎÀ ÏÓÔÒÙÈ ÛÉÐÏ× ÔÅÂÅ ÐÏÄ ÎÏÇÉ!",
+  act_p("$c1 ÐºÐ¸Ð´Ð°ÐµÑ‚ Ð¿Ñ€Ð¸Ð³Ð¾Ñ€Ð¾ÑˆÐ½ÑŽ Ð¾ÑÑ‚Ñ€Ñ‹Ñ… ÑˆÐ¸Ð¿Ð¾Ð² Ñ‚ÐµÐ±Ðµ Ð¿Ð¾Ð´ Ð½Ð¾Ð³Ð¸!",
          ch,0,victim,TO_VICT,POS_RESTING);
 
   ch->setWait( gsn_caltraps->getBeats( ) );
@@ -486,8 +486,8 @@ SKILL_RUNP( caltraps )
 	  todex.bitvector = 0;
 	  affect_to_char( victim, &todex);
 
-	  act_p("$C1 ÎÁÞÉÎÁÅÔ ÈÒÏÍÁÔØ.",ch,0,victim,TO_CHAR,POS_RESTING);
-	  act_p("ôÙ ÎÁÞÉÎÁÅÛØ ÈÒÏÍÁÔØ.",ch,0,victim,TO_VICT,POS_RESTING);
+	  act_p("$C1 Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÑ‚ Ñ…Ñ€Ð¾Ð¼Ð°Ñ‚ÑŒ.",ch,0,victim,TO_CHAR,POS_RESTING);
+	  act_p("Ð¢Ñ‹ Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÑˆÑŒ Ñ…Ñ€Ð¾Ð¼Ð°Ñ‚ÑŒ.",ch,0,victim,TO_VICT,POS_RESTING);
 	  gsn_caltraps->improve( ch, true, victim );
 	}
     } catch (const VictimDeathException &) {
@@ -507,7 +507,7 @@ SKILL_RUNP( throwdown )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("îÅÌØÚÑ ÎÉËÏÇÏ ÂÒÏÓÉÔØ, ÓÉÄÑ × ÓÅÄÌÅ!\n\r");
+		ch->send_to("ÐÐµÐ»ÑŒÐ·Ñ Ð½Ð¸ÐºÐ¾Ð³Ð¾ Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ, ÑÐ¸Ð´Ñ Ð² ÑÐµÐ´Ð»Ðµ!\n\r");
 		return;
 	}
 
@@ -515,25 +515,25 @@ SKILL_RUNP( throwdown )
 
 	if ( ch->is_npc() || !gsn_throw->usable( ch ) )
 	{
-		ch->send_to("ôÙ ÎÅ ÕÍÅÅÛØ ÂÒÏÓÁÔØ ÞÅÒÅÚ ÐÌÅÞÏ!\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ ÑƒÐ¼ÐµÐµÑˆÑŒ Ð±Ñ€Ð¾ÑÐ°Ñ‚ÑŒ Ñ‡ÐµÑ€ÐµÐ· Ð¿Ð»ÐµÑ‡Ð¾!\n\r");
 		return;
 	}
 
 	if (is_flying( ch ))
 	{
-		ch->send_to("ô×ÏÉ ÎÏÇÉ ÄÏÌÖÎÙ ÓÔÏÑÔØ ÎÁ ÚÅÍÌÅ ÄÌÑ ÕÐÏÒÁ.\n\r");
+		ch->send_to("Ð¢Ð²Ð¾Ð¸ Ð½Ð¾Ð³Ð¸ Ð´Ð¾Ð»Ð¶Ð½Ñ‹ ÑÑ‚Ð¾ÑÑ‚ÑŒ Ð½Ð° Ð·ÐµÐ¼Ð»Ðµ Ð´Ð»Ñ ÑƒÐ¿Ð¾Ñ€Ð°.\n\r");
 		return;
 	}
 
 	if ( ( victim = ch->fighting ) == 0 )
 	{
-		ch->send_to("óÅÊÞÁÓ ÔÙ ÎÅ ÓÒÁÖÁÅÛØÓÑ.\n\r");
+		ch->send_to("Ð¡ÐµÐ¹Ñ‡Ð°Ñ Ñ‚Ñ‹ Ð½Ðµ ÑÑ€Ð°Ð¶Ð°ÐµÑˆÑŒÑÑ.\n\r");
 		return;
 	}
 
 	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
 	{
-		act_p("îÏ $C1 Ô×ÏÊ ÄÒÕÇ!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("ÐÐ¾ $C1 Ñ‚Ð²Ð¾Ð¹ Ð´Ñ€ÑƒÐ³!",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
@@ -542,7 +542,7 @@ SKILL_RUNP( throwdown )
 
 	if( !ch->is_npc() && !ch->move )
 	{
-		ch->pecho("ôÙ ÓÌÉÛËÏÍ ÕÓÔÁ%GÌÏ|Ì|ÌÁ ÄÌÑ ÜÔÏÇÏ.", ch);
+		ch->pecho("Ð¢Ñ‹ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ ÑƒÑÑ‚Ð°%GÐ»Ð¾|Ð»|Ð»Ð° Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.", ch);
 		return;
 	}
 	else
@@ -552,11 +552,11 @@ SKILL_RUNP( throwdown )
 
 	if (victim->isAffected(gsn_protective_shield))
 	{
-		act_p("{Yõ ÔÅÂÑ ÎÅ ÐÏÌÕÞÉÌÏÓØ ÄÏÂÒÁÔØÓÑ ÄÏ $X.{x",
+		act_p("{YÐ£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ð»Ð¾ÑÑŒ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ð´Ð¾ $X.{x",
 					ch,0,victim, TO_CHAR,POS_FIGHTING);
-		act_p("{Y$c1 ÎÅ ÓÍÏ$gÇÌÏ|Ç|ÇÌÁ ÂÒÏÓÉÔØ ÔÅÂÑ, ÎÁÔÏÌËÎÕ×ÛÉÓØ ÎÁ ÚÁÝÉÔÎÙÊ ÝÉÔ.{x",
+		act_p("{Y$c1 Ð½Ðµ ÑÐ¼Ð¾$gÐ³Ð»Ð¾|Ð³|Ð³Ð»Ð° Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ Ñ‚ÐµÐ±Ñ, Ð½Ð°Ñ‚Ð¾Ð»ÐºÐ½ÑƒÐ²ÑˆÐ¸ÑÑŒ Ð½Ð° Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ñ‹Ð¹ Ñ‰Ð¸Ñ‚.{x",
 					ch, 0, victim, TO_VICT,POS_FIGHTING);
-		act_p("{Y$c1 ÒÁÓÐÌÁÓÔÙ×ÁÅÔÓÑ ÐÏ ÚÁÝÉÔÎÏÍÕ ÝÉÔÕ $C2 × ÐÏÐÙÔËÅ ÂÒÏÓËÁ.{x",
+		act_p("{Y$c1 Ñ€Ð°ÑÐ¿Ð»Ð°ÑÑ‚Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ð¿Ð¾ Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ð¾Ð¼Ñƒ Ñ‰Ð¸Ñ‚Ñƒ $C2 Ð² Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐµ Ð±Ñ€Ð¾ÑÐºÐ°.{x",
 					ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 		return;
 	}
@@ -587,20 +587,20 @@ SKILL_RUNP( throwdown )
 	if ( ch->is_npc() || number_percent() < chance )
 	{
 	    if ( number_percent() < 70 ) {
-		act_p("ôÙ ÂÒÏÓÁÅÛØ $C4 Ó ÏÛÅÌÏÍÌÑÀÝÅÊ ÓÉÌÏÊ.",
+		act_p("Ð¢Ñ‹ Ð±Ñ€Ð¾ÑÐ°ÐµÑˆÑŒ $C4 Ñ Ð¾ÑˆÐµÐ»Ð¾Ð¼Ð»ÑÑŽÑ‰ÐµÐ¹ ÑÐ¸Ð»Ð¾Ð¹.",
 			ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 ÂÒÏÓÁÅÔ ÔÅÂÑ Ó ÏÛÅÌÏÍÌÑÀÝÅÊ ÓÉÌÏÊ.",
+		act_p("$c1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ñ Ð¾ÑˆÐµÐ»Ð¾Ð¼Ð»ÑÑŽÑ‰ÐµÐ¹ ÑÐ¸Ð»Ð¾Ð¹.",
 			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 ÂÒÏÓÁÅÔ $C4 Ó ÏÛÅÌÏÍÌÑÀÝÅÊ ÓÉÌÏÊ.",
+		act_p("$c1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ $C4 Ñ Ð¾ÑˆÐµÐ»Ð¾Ð¼Ð»ÑÑŽÑ‰ÐµÐ¹ ÑÐ¸Ð»Ð¾Ð¹.",
 			ch,0,victim,TO_NOTVICT,POS_RESTING);
 		victim->setWaitViolence( 2 );
 
 		victim->position = POS_RESTING;
 	    }
 	    else {
-		act("ôÙ ÂÒÏÓÁÅÛØ $C4 ÞÅÒÅÚ ÐÌÅÞÏ.", ch,0,victim,TO_CHAR);
-		act("$c1 ÂÒÏÓÁÅÔ ÔÅÂÑ ÞÅÒÅÚ ÐÌÅÞÏ.", ch,0,victim,TO_VICT);
-		act("$c1 ÂÒÏÓÁÅÔ $C4 ÞÅÒÅÚ ÐÌÅÞÏ.", ch,0,victim,TO_NOTVICT);
+		act("Ð¢Ñ‹ Ð±Ñ€Ð¾ÑÐ°ÐµÑˆÑŒ $C4 Ñ‡ÐµÑ€ÐµÐ· Ð¿Ð»ÐµÑ‡Ð¾.", ch,0,victim,TO_CHAR);
+		act("$c1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ñ‡ÐµÑ€ÐµÐ· Ð¿Ð»ÐµÑ‡Ð¾.", ch,0,victim,TO_VICT);
+		act("$c1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ $C4 Ñ‡ÐµÑ€ÐµÐ· Ð¿Ð»ÐµÑ‡Ð¾.", ch,0,victim,TO_NOTVICT);
 	    }	
 
 	    dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
@@ -611,9 +611,9 @@ SKILL_RUNP( throwdown )
 	}
 	else
 	{
-	    act( "ô×ÏÊ ÂÒÏÓÏË ÎÅ ÕÄÁÌÓÑ.", ch, 0, 0, TO_CHAR);
-	    act( "$C1 ÐÙÔÁÅÔÓÑ ÂÒÏÓÉÔØ ÔÅÂÑ, ÎÏ ÔÅÒÐÉÔ ÎÅÕÄÁÞÕ.", victim, 0, ch,TO_CHAR);
-	    act( "$c1 ÐÙÔÁÅÔÓÑ ÕÈ×ÁÔÉÔØÓÑ ÚÁ $C4 ÐÏÕÄÏÂÎÅÅ. îÏ ÂÅÚÕÓÐÅÛÎÏ.", ch, 0, victim, TO_NOTVICT);
+	    act( "Ð¢Ð²Ð¾Ð¹ Ð±Ñ€Ð¾ÑÐ¾Ðº Ð½Ðµ ÑƒÐ´Ð°Ð»ÑÑ.", ch, 0, 0, TO_CHAR);
+	    act( "$C1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ Ñ‚ÐµÐ±Ñ, Ð½Ð¾ Ñ‚ÐµÑ€Ð¿Ð¸Ñ‚ Ð½ÐµÑƒÐ´Ð°Ñ‡Ñƒ.", victim, 0, ch,TO_CHAR);
+	    act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ ÑƒÑ…Ð²Ð°Ñ‚Ð¸Ñ‚ÑŒÑÑ Ð·Ð° $C4 Ð¿Ð¾ÑƒÐ´Ð¾Ð±Ð½ÐµÐµ. ÐÐ¾ Ð±ÐµÐ·ÑƒÑÐ¿ÐµÑˆÐ½Ð¾.", ch, 0, victim, TO_NOTVICT);
 	    gsn_throw->improve( ch, false, victim );
 	}
 }
@@ -630,13 +630,13 @@ SKILL_RUNP( strangle )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("ôÏÌØËÏ ÎÅ ×ÅÒÈÏÍ!\n\r");
+		ch->send_to("Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð½Ðµ Ð²ÐµÑ€Ñ…Ð¾Ð¼!\n\r");
 		return;
 	}
 
 	if ( ch->is_npc() || !gsn_strangle->usable( ch ) )
 	{
-		ch->send_to("ôÙ ÎÅ ÕÍÅÅÛØ ÄÕÛÉÔØ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ ÑƒÐ¼ÐµÐµÑˆÑŒ Ð´ÑƒÑˆÐ¸Ñ‚ÑŒ.\n\r");
 		return;
 	}
 
@@ -646,31 +646,31 @@ SKILL_RUNP( strangle )
 	    || !loc.isSet( wear_wrist_l )
 	    || !loc.isSet( wear_wrist_r ))
 	{
-	    ch->send_to("õ ÔÅÂÑ ÎÅÔ ÒÕË.\r\n");
+	    ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ñ€ÑƒÐº.\r\n");
 	    return;
 	}
 
 	if (!check_bare_hands(ch))	
 	{
-		ch->send_to("ïÓ×ÏÂÏÄÉ ÏÂÅ ÒÕËÉ ÄÌÑ ÜÔÏÇÏ.\n\r");
+		ch->send_to("ÐžÑÐ²Ð¾Ð±Ð¾Ð´Ð¸ Ð¾Ð±Ðµ Ñ€ÑƒÐºÐ¸ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED( ch, AFF_CHARM ) )
 	{
-		ch->send_to("ôÙ ÖÅ ÎÅ ÈÏÞÅÛØ ÐÒÉÄÕÛÉÔØ Ó×ÏÅÇÏ ÈÏÚÑÉÎÁ?\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð¶Ðµ Ð½Ðµ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð¿Ñ€Ð¸Ð´ÑƒÑˆÐ¸Ñ‚ÑŒ ÑÐ²Ð¾ÐµÐ³Ð¾ Ñ…Ð¾Ð·ÑÐ¸Ð½Ð°?\n\r");
 		return;
 	}
 
 	if ( (victim = get_char_room(ch,argument)) == 0 )
 	{
-		ch->send_to("úÄÅÓØ ÔÁËÉÈ ÎÅÔ.\n\r");
+		ch->send_to("Ð—Ð´ÐµÑÑŒ Ñ‚Ð°ÐºÐ¸Ñ… Ð½ÐµÑ‚.\n\r");
 		return;
 	}
 
 	if ( ch == victim )
 	{
-		ch->send_to("õ ÔÅÂÑ ÂÏÑÚÎØ ÓÅÂÑ?\n\r");
+		ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð±Ð¾ÑÐ·Ð½ÑŒ ÑÐµÐ±Ñ?\n\r");
 		return;
 	}
 
@@ -679,7 +679,7 @@ SKILL_RUNP( strangle )
 
 	if ( is_safe(ch,victim) )
 	{
-		ch->send_to("âÏÇÉ ÚÁÝÉÝÁÀÔ Ô×ÏÀ ÖÅÒÔ×Õ.\n\r");
+		ch->send_to("Ð‘Ð¾Ð³Ð¸ Ð·Ð°Ñ‰Ð¸Ñ‰Ð°ÑŽÑ‚ Ñ‚Ð²Ð¾ÑŽ Ð¶ÐµÑ€Ñ‚Ð²Ñƒ.\n\r");
 		return;
 	}
 	
@@ -708,11 +708,11 @@ SKILL_RUNP( strangle )
 	
 	if ( ch->is_npc() || number_percent() < chance * k / 100 )
 	{
-		act_p("ôÙ ÓÍÙËÁÅÛØ ÒÕËÉ ÎÁ ÛÅÅ $C2 É $E ÐÏÇÒÕÖÁÅÔÓÑ × ÓÏÎ.",
+		act_p("Ð¢Ñ‹ ÑÐ¼Ñ‹ÐºÐ°ÐµÑˆÑŒ Ñ€ÑƒÐºÐ¸ Ð½Ð° ÑˆÐµÐµ $C2 Ð¸ $E Ð¿Ð¾Ð³Ñ€ÑƒÐ¶Ð°ÐµÑ‚ÑÑ Ð² ÑÐ¾Ð½.",
 			ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 ÓÍÙËÁÅÔ ÒÕËÉ ÎÁ Ô×ÏÅÊ ÛÅÅ É ÔÙ ÐÏÇÒÕÖÁÅÛØÓÑ × ÓÏÎ.",
+		act_p("$c1 ÑÐ¼Ñ‹ÐºÐ°ÐµÑ‚ Ñ€ÑƒÐºÐ¸ Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¹ ÑˆÐµÐµ Ð¸ Ñ‚Ñ‹ Ð¿Ð¾Ð³Ñ€ÑƒÐ¶Ð°ÐµÑˆÑŒÑÑ Ð² ÑÐ¾Ð½.",
 			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 ÓÍÙËÁÅÔ ÒÕËÉ ÎÁ ÛÅÅ $C2 É $E ÐÏÇÒÕÖÁÅÔÓÑ × ÓÏÎ.",
+		act_p("$c1 ÑÐ¼Ñ‹ÐºÐ°ÐµÑ‚ Ñ€ÑƒÐºÐ¸ Ð½Ð° ÑˆÐµÐµ $C2 Ð¸ $E Ð¿Ð¾Ð³Ñ€ÑƒÐ¶Ð°ÐµÑ‚ÑÑ Ð² ÑÐ¾Ð½.",
 			ch,0,victim,TO_NOTVICT,POS_RESTING);
 		gsn_strangle->improve( ch, true, victim );
 	
@@ -737,8 +737,8 @@ SKILL_RUNP( strangle )
 		gsn_strangle->improve( ch, false, victim );
 		
 		yell_panic( ch, victim,
-		            "ðÏÍÏÇÉÔÅ! íÅÎÑ ËÔÏ-ÔÏ ÄÕÛÉÔ!",
-			    "ðÏÍÏÇÉÔÅ! íÅÎÑ ÄÕÛÉÔ %1$C1!" );
+		            "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐœÐµÐ½Ñ ÐºÑ‚Ð¾-Ñ‚Ð¾ Ð´ÑƒÑˆÐ¸Ñ‚!",
+			    "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐœÐµÐ½Ñ Ð´ÑƒÑˆÐ¸Ñ‚ %1$C1!" );
 	}
 }
 
@@ -756,13 +756,13 @@ SKILL_RUNP( poison )
 
 	if (!gsn_poison_smoke->usable( ch ))
 	{
-	    ch->send_to("áÓØ?\n\r");
+	    ch->send_to("ÐÑÑŒ?\n\r");
 	    return;
 	}
 
 	if ( ch->mana < gsn_poison_smoke->getMana( ) )
 	{
-		ch->send_to("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÜÎÅÒÇÉÉ ÄÌÑ ÜÔÏÇÏ.\n\r");
+		ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
 		return;
 	}
 
@@ -772,19 +772,19 @@ SKILL_RUNP( poison )
 
 	if ( number_percent() > gsn_poison_smoke->getEffective( ch ) )
 	{
-		ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÚÁËÏÎÞÉÌÁÓØ ÎÅÕÄÁÞÅÊ.\n\r");
+		ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡ÐµÐ¹.\n\r");
 		gsn_poison_smoke->improve( ch, false );
 		return;
 	}
 
 	if (SHADOW(ch))
 	{
-		ch->send_to("ïÂÌÁËÏ ÐÏÇÌÏÝÁÅÔÓÑ Ô×ÏÅÊ ÔÅÎØÀ.\n\r");
+		ch->send_to("ÐžÐ±Ð»Ð°ÐºÐ¾ Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÐµÑ‚ÑÑ Ñ‚Ð²Ð¾ÐµÐ¹ Ñ‚ÐµÐ½ÑŒÑŽ.\n\r");
 		return;
 	}
 
-	ch->send_to("ïÂÌÁËÏ ÏÔÒÁ×ÌÅÎÎÏÇÏ ÄÙÍÁ ÎÁÐÏÌÎÉÌÏ ËÏÍÎÁÔÕ.\n\r");
-	act_p("ïÂÌÁËÏ ÏÔÒÁ×ÌÅÎÎÏÇÏ ÄÙÍÁ ÎÁÐÏÌÎÉÌÏ ËÏÍÎÁÔÕ.",ch,0,0,TO_ROOM,POS_RESTING);
+	ch->send_to("ÐžÐ±Ð»Ð°ÐºÐ¾ Ð¾Ñ‚Ñ€Ð°Ð²Ð»ÐµÐ½Ð½Ð¾Ð³Ð¾ Ð´Ñ‹Ð¼Ð° Ð½Ð°Ð¿Ð¾Ð»Ð½Ð¸Ð»Ð¾ ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñƒ.\n\r");
+	act_p("ÐžÐ±Ð»Ð°ÐºÐ¾ Ð¾Ñ‚Ñ€Ð°Ð²Ð»ÐµÐ½Ð½Ð¾Ð³Ð¾ Ð´Ñ‹Ð¼Ð° Ð½Ð°Ð¿Ð¾Ð»Ð½Ð¸Ð»Ð¾ ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñƒ.",ch,0,0,TO_ROOM,POS_RESTING);
 
 	gsn_poison_smoke->improve( ch, true );
 
@@ -794,8 +794,8 @@ SKILL_RUNP( poison )
 		{
 			if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
 			    yell_panic( ch, tmp_vict,
-					"ðÏÍÏÇÉÔÅ! íÅÎÑ ÐÙÔÁÀÔÓÑ ÏÔÒÁ×ÉÔØ!",
-					"ðÏÍÏÇÉÔÅ! %1$^C1 ÔÒÁ×ÉÔ ÍÅÎÑ ÄÙÍÏÍ!",
+					"ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐœÐµÐ½Ñ Ð¿Ñ‹Ñ‚Ð°ÑŽÑ‚ÑÑ Ð¾Ñ‚Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ!",
+					"ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! %1$^C1 Ñ‚Ñ€Ð°Ð²Ð¸Ñ‚ Ð¼ÐµÐ½Ñ Ð´Ñ‹Ð¼Ð¾Ð¼!",
 					FYP_SLEEP );
 
 			spell( gsn_poison, ch->getModifyLevel( ), ch, tmp_vict );
@@ -820,13 +820,13 @@ SKILL_RUNP( blindness )
 	
 	if (!gsn_blindness_dust->usable(ch))
 	{
-	    ch->send_to("áÓØ?\n\r");
+	    ch->send_to("ÐÑÑŒ?\n\r");
 	    return;
 	}
 
 	if (ch->mana < gsn_blindness_dust->getMana( ))
 	{
-		ch->send_to("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÜÎÅÒÇÉÉ ÄÌÑ ÜÔÏÇÏ.\n\r");
+		ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
 		return;
 	}
 
@@ -836,19 +836,19 @@ SKILL_RUNP( blindness )
 
 	if (number_percent() > gsn_blindness_dust->getEffective( ch ) )
 	{
-		ch->send_to("ô×ÏÑ ÐÏÐÙÔËÁ ÚÁËÏÎÞÉÌÁÓØ ÎÅÕÄÁÞÅÊ.\n\r");
+		ch->send_to("Ð¢Ð²Ð¾Ñ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡ÐµÐ¹.\n\r");
 		gsn_blindness_dust->improve( ch, false );
 		return;
 	}
 
 	if(SHADOW(ch))
 	{
-		ch->send_to("ïÂÌÁËÏ ÐÏÇÌÏÝÁÅÔÓÑ Ô×ÏÅÊ ÔÅÎØÀ.\n\r");
+		ch->send_to("ÐžÐ±Ð»Ð°ÐºÐ¾ Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÐµÑ‚ÑÑ Ñ‚Ð²Ð¾ÐµÐ¹ Ñ‚ÐµÐ½ÑŒÑŽ.\n\r");
 		return;
 	}
 
-	ch->send_to("ïÂÌÁËÏ ÐÙÌÉ ÎÁÐÏÌÎÉÌÏ ËÏÍÎÁÔÕ.\n\r");
-	act_p("ïÂÌÁËÏ ÐÙÌÉ ÎÁÐÏÌÎÉÌÏ ËÏÍÎÁÔÕ.",ch,0,0,TO_ROOM,POS_RESTING);
+	ch->send_to("ÐžÐ±Ð»Ð°ÐºÐ¾ Ð¿Ñ‹Ð»Ð¸ Ð½Ð°Ð¿Ð¾Ð»Ð½Ð¸Ð»Ð¾ ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñƒ.\n\r");
+	act_p("ÐžÐ±Ð»Ð°ÐºÐ¾ Ð¿Ñ‹Ð»Ð¸ Ð½Ð°Ð¿Ð¾Ð»Ð½Ð¸Ð»Ð¾ ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñƒ.",ch,0,0,TO_ROOM,POS_RESTING);
 
 	gsn_blindness_dust->improve( ch, true );
 
@@ -858,8 +858,8 @@ SKILL_RUNP( blindness )
 	    {
 		if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
 		    yell_panic( ch, tmp_vict,
-				"ðÏÍÏÇÉÔÅ! ëÔÏ-ÔÏ ÓÌÅÐÉÔ ÍÅÎÑ ÐÙÌØÀ!",
-				"ðÏÍÏÇÉÔÅ! %1$^C1 ÓÌÅÐÉÔ ÍÅÎÑ ÐÙÌØÀ!",
+				"ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐšÑ‚Ð¾-Ñ‚Ð¾ ÑÐ»ÐµÐ¿Ð¸Ñ‚ Ð¼ÐµÐ½Ñ Ð¿Ñ‹Ð»ÑŒÑŽ!",
+				"ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! %1$^C1 ÑÐ»ÐµÐ¿Ð¸Ñ‚ Ð¼ÐµÐ½Ñ Ð¿Ñ‹Ð»ÑŒÑŽ!",
 				FYP_SLEEP );
 		
 		spell( gsn_blindness, ch->getModifyLevel( ), ch, tmp_vict );

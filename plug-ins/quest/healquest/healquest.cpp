@@ -85,15 +85,15 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
 
     setTime( pch, time );
 
-    tell_raw( pch, questman, "õ ÍÅÎÑ ÅÓÔØ ÄÌÑ ÔÅÂÑ ÓÒÏÞÎÏÅ ÐÏÒÕÞÅÎÉÅ!" );   
-    tell_fmt( "{W%3$#^C1{G ÞÅÍ-ÔÏ ÓÅÒØÅÚÎÏ ÂÏÌ%3$GØÎÏ|ÅÎ|ØÎÁ É ÎÕÖÄÁÅÔÓÑ × ÐÏÍÏÝÉ ÌÅËÁÒÑ.",
+    tell_raw( pch, questman, "Ð£ Ð¼ÐµÐ½Ñ ÐµÑÑ‚ÑŒ Ð´Ð»Ñ Ñ‚ÐµÐ±Ñ ÑÑ€Ð¾Ñ‡Ð½Ð¾Ðµ Ð¿Ð¾Ñ€ÑƒÑ‡ÐµÐ½Ð¸Ðµ!" );   
+    tell_fmt( "{W%3$#^C1{G Ñ‡ÐµÐ¼-Ñ‚Ð¾ ÑÐµÑ€ÑŒÐµÐ·Ð½Ð¾ Ð±Ð¾Ð»%3$GÑŒÐ½Ð¾|ÐµÐ½|ÑŒÐ½Ð° Ð¸ Ð½ÑƒÐ¶Ð´Ð°ÐµÑ‚ÑÑ Ð² Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸ Ð»ÐµÐºÐ°Ñ€Ñ.",
 	       pch, questman, patient );
-    tell_fmt( "íÅÓÔÏ, ÇÄÅ %3$P2 ×ÉÄÅÌÉ × ÐÏÓÌÅÄÎÉÊ ÒÁÚ - {W%4$s{x.",
+    tell_fmt( "ÐœÐµÑÑ‚Ð¾, Ð³Ð´Ðµ %3$P2 Ð²Ð¸Ð´ÐµÐ»Ð¸ Ð² Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€Ð°Ð· - {W%4$s{x.",
 	      pch, questman, patient, patient->in_room->name );
-    tell_fmt( "üÔÏ ÎÁÈÏÄÉÔÓÑ × ÒÁÊÏÎÅ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ {W%3$s{x.", 
+    tell_fmt( "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ {W%3$s{x.", 
 	      pch, questman, patient->in_room->area->name );
-    tell_fmt( "ðÏÔÏÒÏÐÉÓØ, ÐÏËÁ ÂÏÌÅÚÎØ ÎÅ ÄÏËÏÎÁÌÁ %3$P2!", pch, questman, patient );
-    tell_fmt( "õ ÔÅÂÑ ÅÓÔØ {Y%3$d{G ÍÉÎÕ%3$IÔÁ|ÔÙ|Ô ÎÁ ×ÙÐÏÌÎÅÎÉÅ ÚÁÄÁÎÉÑ.", pch, questman, time );
+    tell_fmt( "ÐŸÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¿Ð¸ÑÑŒ, Ð¿Ð¾ÐºÐ° Ð±Ð¾Ð»ÐµÐ·Ð½ÑŒ Ð½Ðµ Ð´Ð¾ÐºÐ¾Ð½Ð°Ð»Ð° %3$P2!", pch, questman, patient );
+    tell_fmt( "Ð£ Ñ‚ÐµÐ±Ñ ÐµÑÑ‚ÑŒ {Y%3$d{G Ð¼Ð¸Ð½Ñƒ%3$IÑ‚Ð°|Ñ‚Ñ‹|Ñ‚ Ð½Ð° Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ñ.", pch, questman, time );
 
     wiznet( "", "cure %s [%d] from %d maladies, mode %d",
 		patient->getNameP('1').c_str( ), patient->in_room->vnum,
@@ -172,20 +172,20 @@ Quest::Reward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman 
 void HealQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "ô×ÏÅ ÚÁÄÁÎÉÅ {Y÷ùðïìîåîï{x!" << endl
-	    << "÷ÅÒÎÉÓØ ÚÁ ×ÏÚÎÁÇÒÁÖÄÅÎÉÅÍ, ÄÏ ÔÏÇÏ ËÁË ×ÙÊÄÅÔ ×ÒÅÍÑ!" << endl;
+	buf << "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ {YÐ’Ð«ÐŸÐžÐ›ÐÐ•ÐÐž{x!" << endl
+	    << "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ð·Ð° Ð²Ð¾Ð·Ð½Ð°Ð³Ñ€Ð°Ð¶Ð´ÐµÐ½Ð¸ÐµÐ¼, Ð´Ð¾ Ñ‚Ð¾Ð³Ð¾ ÐºÐ°Ðº Ð²Ñ‹Ð¹Ð´ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ!" << endl;
     else 
-	buf << "õ ÔÅÂÑ ÚÁÄÁÎÉÅ - ×ÙÌÅÞÉÔØ " << russian_case( mobName, '4' ) << "!" << endl
-	    << "íÅÓÔÏ, ÇÄÅ ÐÁÃÉÅÎÔÁ ×ÉÄÅÌÉ × ÐÏÓÌÅÄÎÉÊ ÒÁÚ - " << roomName << endl
-	    << "üÔÏ ÎÁÈÏÄÉÔÓÑ × ÒÁÊÏÎÅ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << areaName << "." << endl;
+	buf << "Ð£ Ñ‚ÐµÐ±Ñ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ - Ð²Ñ‹Ð»ÐµÑ‡Ð¸Ñ‚ÑŒ " << russian_case( mobName, '4' ) << "!" << endl
+	    << "ÐœÐµÑÑ‚Ð¾, Ð³Ð´Ðµ Ð¿Ð°Ñ†Ð¸ÐµÐ½Ñ‚Ð° Ð²Ð¸Ð´ÐµÐ»Ð¸ Ð² Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€Ð°Ð· - " << roomName << endl
+	    << "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << areaName << "." << endl;
 }
 
 void HealQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "÷ÅÒÎÕÔØÓÑ Ë Ë×ÅÓÔÏÒÕ ÚÁ ÎÁÇÒÁÄÏÊ.";
+	buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒÑÑ Ðº ÐºÐ²ÐµÑÑ‚Ð¾Ñ€Ñƒ Ð·Ð° Ð½Ð°Ð³Ñ€Ð°Ð´Ð¾Ð¹.";
     else 
-        buf << "÷ÙÌÅÞÉÔØ " << russian_case( mobName, '4' ) << " ÉÚ "
+        buf << "Ð’Ñ‹Ð»ÐµÑ‡Ð¸Ñ‚ÑŒ " << russian_case( mobName, '4' ) << " Ð¸Ð· "
             << roomName << " (" << areaName << ").";
 }
 

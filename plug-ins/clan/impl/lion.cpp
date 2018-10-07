@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "lion.h"
@@ -53,12 +53,12 @@ GSN(dispel_affects);
  *-------------------------------------------------------------------------*/
 void ClanGuardLion::actGreet( PCharacter *wch )
 {
-    do_say(ch, "‰œ¬“œ –œ÷¡Ãœ◊¡‘ÿ, ”‘“¡ŒŒ…À.");
+    do_say(ch, "–î–æ–±—Ä–æ –ø–æ–∂–∞–ª–æ–≤–∞—Ç—å, —Å—Ç—Ä–∞–Ω–Ω–∏–∫.");
 }
 void ClanGuardLion::actPush( PCharacter *wch )
 {
-    act( "$C1 ◊Ÿ–’”À¡≈‘ Àœ«‘….\n\rÈ ‘Ÿ ¬Ÿ”‘“≈ŒÿÀœ ’¬…“¡≈€ÿ”— …⁄ ‹‘œ  Õ≈”‘Œœ”‘….", wch, 0, ch, TO_CHAR );
-    act( "$C1 «Ã—ƒ— Œ¡ $c4 ◊Ÿ–’”À¡≈‘ Àœ«‘… … $c1 ”Õ¡‘Ÿ◊¡≈‘ ’ƒœﬁÀ….", wch, 0, ch, TO_ROOM );
+    act( "$C1 –≤—ã–ø—É—Å–∫–∞–µ—Ç –∫–æ–≥—Ç–∏.\n\r–ò —Ç—ã –±—ã—Å—Ç—Ä–µ–Ω—å–∫–æ —É–±–∏—Ä–∞–µ—à—å—Å—è –∏–∑ —ç—Ç–æ–π –º–µ—Å—Ç–Ω–æ—Å—Ç–∏.", wch, 0, ch, TO_CHAR );
+    act( "$C1 –≥–ª—è–¥—è –Ω–∞ $c4 –≤—ã–ø—É—Å–∫–∞–µ—Ç –∫–æ–≥—Ç–∏ –∏ $c1 —Å–º–∞—Ç—ã–≤–∞–µ—Ç —É–¥–æ—á–∫–∏.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardLion::getCast( Character *victim )
 {
@@ -125,7 +125,7 @@ SKILL_RUNP( claw )
 
 	if (!gsn_claw->available( ch ) )
 	{
-	    ch->send_to("·”ÿ?\n\r");
+	    ch->send_to("–ê—Å—å?\n\r");
 	    return;
 	}
 
@@ -134,13 +134,13 @@ SKILL_RUNP( claw )
 
 	if ( ( victim = ch->fighting ) == 0 )
 	{
-		ch->send_to("Û≈ ﬁ¡” ‘Ÿ Œ≈ ”“¡÷¡≈€ÿ”—.\n\r");
+		ch->send_to("–°–µ–π—á–∞—Å —Ç—ã –Ω–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è.\n\r");
 		return;
 	}
 	 
 	if ( victim == ch )
 	{
-		ch->send_to("ÙŸ ÷≈ Œ≈ »œﬁ≈€ÿ … ◊ ”¡ÕœÕ ƒ≈Ã≈ œ‘»◊¡‘…‘ÿ ”≈¬≈ «œÃœ◊’?\n\r");
+		ch->send_to("–¢—ã –∂–µ –Ω–µ —Ö–æ—á–µ—à—å –∏ –≤ —Å–∞–º–æ–º –¥–µ–ª–µ –æ—Ç—Ö–≤–∞—Ç–∏—Ç—å —Å–µ–±–µ –≥–æ–ª–æ–≤—É?\n\r");
 		return;
 	}
 
@@ -149,7 +149,7 @@ SKILL_RUNP( claw )
 
 	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
 	{
-		act_p("Óœ ◊≈ƒÿ $C1 ‘◊œ  ƒ“’«!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("–ù–æ –≤–µ–¥—å $C1 —Ç–≤–æ–π –¥—Ä—É–≥!",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
    
@@ -181,7 +181,7 @@ SKILL_RUNP( claw )
 
 	if ( ch->mana < gsn_claw->getMana( ) )
 	{
-		ch->send_to("Ù◊œ…» ”…Ã Œ≈ƒœ”‘¡‘œﬁŒœ ƒÃ— ‹‘œ«œ.\n\r");
+		ch->send_to("–¢–≤–æ–∏—Ö —Å–∏–ª –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ –¥–ª—è —ç—Ç–æ–≥–æ.\n\r");
 		return;
 	}
     
@@ -218,7 +218,7 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   if ( ch->isAffected(sn )
 		|| ch->hit > ch->max_hit )
 	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ¬Ÿ‘ÿ ¬œÃ≈≈ Ïÿ◊œÕ, ﬁ≈Õ ”≈ ﬁ¡”.\n\r");
+		ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –±—ã—Ç—å –±–æ–ª–µ–µ –õ—å–≤–æ–º, —á–µ–º —Å–µ–π—á–∞—Å.\n\r");
 		return;
 	}
 
@@ -251,9 +251,9 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
   af.bitvector = AFF_BERSERK;
   affect_to_char( ch, &af );
 
-  act_p("ÙŸ ﬁ’◊”‘◊’≈€ÿ ”≈¬— Œ≈ÕŒœ«œ Œ≈–œ◊œ“œ‘Ã…◊$gŸÕ|ŸÕ|œ , Œœ ⁄¡‘œ Œ¡ÕŒœ«œ ¬œÃ≈≈ ”…ÃÿŒ$gŸÕ|ŸÕ|œ .",
+  act_p("–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å —Å–µ–±—è –Ω–µ–º–Ω–æ–≥–æ –Ω–µ–ø–æ–≤–æ—Ä–æ—Ç–ª–∏–≤$g—ã–º|—ã–º|–æ–π, –Ω–æ –∑–∞—Ç–æ –Ω–∞–º–Ω–æ–≥–æ –±–æ–ª–µ–µ —Å–∏–ª—å–Ω$g—ã–º|—ã–º|–æ–π.",
 		ch,0,0,TO_CHAR,POS_RESTING);
-  act_p( "Îœ÷¡ $c2 ”‘¡Œœ◊…‘”— ”≈“œ !",ch,0,0,TO_ROOM,POS_RESTING);
+  act_p( "–ö–æ–∂–∞ $c2 —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è —Å–µ—Ä–æ–π!",ch,0,0,TO_ROOM,POS_RESTING);
 
 }
 
@@ -262,8 +262,8 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
  */
 void LionEyedSword::wear( Character *ch )
 {
-    act_p("ÁÃ¡⁄¡ $o2 œ‘À“Ÿ◊¡¿‘”—.",ch,obj,0,TO_CHAR,POS_RESTING);
-    act_p("ÁÃ¡⁄¡ $o2 œ‘À“Ÿ◊¡¿‘”—.",ch,obj,0,TO_ROOM,POS_RESTING);
+    act_p("–ì–ª–∞–∑–∞ $o2 –æ—Ç–∫—Ä—ã–≤–∞—é—Ç—Å—è.",ch,obj,0,TO_CHAR,POS_RESTING);
+    act_p("–ì–ª–∞–∑–∞ $o2 –æ—Ç–∫—Ä—ã–≤–∞—é—Ç—Å—è.",ch,obj,0,TO_ROOM,POS_RESTING);
 
 }
 void LionEyedSword::equip( Character *ch )
@@ -312,8 +312,8 @@ VOID_SPELL(EyedSword)::run( Character *ch, char *target_name, int sn, int level 
   	eyed->level = ch->getRealLevel( );
 	eyed->cost = 0;
 	obj_to_char( eyed, ch);
-	ch->send_to("ÙŸ ”œ⁄ƒ¡≈€ÿ Õ≈ﬁ ” Ù˜ÔÈÌ …Õ≈Œ≈Õ.\n\r");
-	ch->send_to("Ó≈ ⁄¡¬’ƒÿ, ﬁ‘œ ‘Ÿ ¬œÃÿ€≈ Œ≈ ”Õœ÷≈€ÿ ”œ⁄ƒ¡‘ÿ ‹‘œ œ“’÷…≈.\n\r");
+	ch->send_to("–¢—ã —Å–æ–∑–¥–∞–µ—à—å –º–µ—á —Å –¢–í–û–ò–ú –∏–º–µ–Ω–µ–º.\n\r");
+	ch->send_to("–ù–µ –∑–∞–±—É–¥—å, —á—Ç–æ —Ç—ã –±–æ–ª—å—à–µ –Ω–µ —Å–º–æ–∂–µ—à—å —Å–æ–∑–¥–∞—Ç—å —ç—Ç–æ –æ—Ä—É–∂–∏–µ.\n\r");
 }
 
 SPELL_DECL(EyesOfTiger);
@@ -321,19 +321,19 @@ VOID_SPELL(EyesOfTiger)::run( Character *ch, Character *victim, int sn, int leve
 { 
 	if (DIGGED(victim))
 	{
-		ch->send_to("Ù◊œ  Ãÿ◊…ŒŸ  «Ã¡⁄ Œ≈ Õœ÷≈‘ Œ¡ ‘… ‘¡Àœ«œ.\n\r");
+		ch->send_to("–¢–≤–æ–π –ª—å–≤–∏–Ω—ã–π –≥–ª–∞–∑ –Ω–µ –º–æ–∂–µ—Ç –Ω–∞–π—Ç–∏ —Ç–∞–∫–æ–≥–æ.\n\r");
 		return;
 	}
 
 	if (victim->is_npc() || victim->getPC()->getClan() != clan_hunter)
 	{
-		ch->send_to("ÙŸ Õœ÷≈€ÿ ”Ã≈ƒ…‘ÿ ‘œÃÿÀœ ⁄¡ Ô»œ‘Œ…À¡Õ…!\n\r");
+		ch->send_to("–¢—ã –º–æ–∂–µ—à—å —Å–ª–µ–¥–∏—Ç—å —Ç–æ–ª—å–∫–æ –∑–∞ –û—Ö–æ—Ç–Ω–∏–∫–∞–º–∏!\n\r");
 		return;
 	}
 	
 	if (is_safe_nomessage(ch,victim)) 
 	{
-		ch->send_to("Ù◊œ  Ãÿ◊…ŒŸ  «Ã¡⁄ Œ≈ ”Õœ« Œ¡ ‘… ‘¡Àœ«œ.\n\r");
+		ch->send_to("–¢–≤–æ–π –ª—å–≤–∏–Ω—ã–π –≥–ª–∞–∑ –Ω–µ —Å–º–æ–≥ –Ω–∞–π—Ç–∏ —Ç–∞–∫–æ–≥–æ.\n\r");
 		return;
 	}
 	
@@ -383,8 +383,8 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   af.location     = APPLY_CHA;
   affect_to_obj( shield, &af);
 
-  act_p( "ÙŸ ”œ⁄ƒ¡≈€ÿ $o4!",ch,shield,0,TO_CHAR,POS_RESTING );
-  act_p( "$c1 ”œ⁄ƒ¡≈‘ $o4!",ch,shield,0,TO_ROOM,POS_RESTING );
+  act_p( "–¢—ã —Å–æ–∑–¥–∞–µ—à—å $o4!",ch,shield,0,TO_CHAR,POS_RESTING );
+  act_p( "$c1 —Å–æ–∑–¥–∞–µ—Ç $o4!",ch,shield,0,TO_ROOM,POS_RESTING );
 
 }
 
@@ -407,7 +407,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (ch->isAffected( sn )) {
-	act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ œ‘ Ãœ◊’€≈À Ô»œ‘Œ…Àœ◊.", ch, 0, 0, TO_CHAR);
+	act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –æ—Ç –ª–æ–≤—É—à–µ–∫ –û—Ö–æ—Ç–Ω–∏–∫–æ–≤.", ch, 0, 0, TO_CHAR);
 	return;
     }
 
@@ -420,7 +420,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Character *victim, int sn, int level )
     af.location           = APPLY_NONE;
     affect_to_char(ch, &af);  
 
-    ch->println( "ÙŸ ⁄¡›…›¡≈€ÿ ”≈¬— œ‘ Ãœ◊’€≈À Ô»œ‘Œ…Àœ◊." );
+    ch->println( "–¢—ã –∑–∞—â–∏—â–∞–µ—à—å —Å–µ–±—è –æ—Ç –ª–æ–≤—É—à–µ–∫ –û—Ö–æ—Ç–Ω–∏–∫–æ–≤." );
 }
 
 VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level ) 
@@ -429,7 +429,7 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
 
 	if ( room->isAffected( sn ))
 	{
-		ch->send_to("¸‘œ Õ≈”‘œ ’÷≈ ⁄¡›…›≈Œœ œ‘ Õ≈”‘… … Ãœ◊’€≈À Ô»œ‘Œ…Àœ◊.\n\r");
+		ch->send_to("–≠—Ç–æ –º–µ—Å—Ç–æ —É–∂–µ –∑–∞—â–∏—â–µ–Ω–æ –æ—Ç –º–µ—Å—Ç–∏ –∏ –ª–æ–≤—É—à–µ–∫ –û—Ö–æ—Ç–Ω–∏–∫–æ–≤.\n\r");
 		return;
 	}
 
@@ -442,14 +442,14 @@ VOID_SPELL(Prevent)::run( Character *ch, Room *room, int sn, int level )
 	af.bitvector = AFF_ROOM_PREVENT;
 	room->affectTo( &af );
 
-	ch->send_to( "ÙŸ ⁄¡›…›¡≈€ÿ Õ≈”‘Œœ”‘ÿ œ‘ Ãœ◊’€≈À Ô»œ‘Œ…Àœ◊ … œ‘ …» Õ≈”‘….\n\r");
-	act_p( "$c1 ⁄¡›…›¡≈‘ Õ≈”‘Œœ”‘ÿ œ‘ Ãœ◊’€≈À Ô»œ‘Œ…Àœ◊ … œ‘ …» Õ≈”‘….",ch,0,0,TO_ROOM,POS_RESTING);
+	ch->send_to( "–¢—ã –∑–∞—â–∏—â–∞–µ—à—å –º–µ—Å—Ç–Ω–æ—Å—Ç—å –æ—Ç –ª–æ–≤—É—à–µ–∫ –û—Ö–æ—Ç–Ω–∏–∫–æ–≤ –∏ –æ—Ç –∏—Ö –º–µ—Å—Ç–∏.\n\r");
+	act_p( "$c1 –∑–∞—â–∏—â–∞–µ—Ç –º–µ—Å—Ç–Ω–æ—Å—Ç—å –æ—Ç –ª–æ–≤—É—à–µ–∫ –û—Ö–æ—Ç–Ω–∏–∫–æ–≤ –∏ –æ—Ç –∏—Ö –º–µ—Å—Ç–∏.",ch,0,0,TO_ROOM,POS_RESTING);
 }
 
 AFFECT_DECL(Prevent);
 VOID_AFFECT(Prevent)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Ì≈”‘Œœ”‘ÿ Œ¡ {W%1$d{x ﬁ¡%1$I”|”¡|”œ◊ ⁄¡›…›≈Œ¡ œ‘ Ãœ◊’€≈À … Õ≈”‘… Ô»œ‘Œ…Àœ◊.", paf->duration )
+    buf << fmt( 0, "–ú–µ—Å—Ç–Ω–æ—Å—Ç—å –Ω–∞ {W%1$d{x —á–∞%1$I—Å|—Å–∞|—Å–æ–≤ –∑–∞—â–∏—â–µ–Ω–∞ –æ—Ç –ª–æ–≤—É—à–µ–∫ –∏ –º–µ—Å—Ç–∏ –û—Ö–æ—Ç–Ω–∏–∫–æ–≤.", paf->duration )
 	<< endl;
 }
 

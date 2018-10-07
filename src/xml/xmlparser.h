@@ -22,7 +22,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Загрузка XML с помощью flex
+ * @short п≈п╟пЁя─я┐п╥п╨п╟ XML я│ п©п╬п╪п╬я┴я▄я▌ flex
  */
 class XMLParser : public yyFlexLexer, public virtual DLObject
 {

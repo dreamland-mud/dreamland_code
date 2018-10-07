@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
@@ -135,24 +135,24 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 		case ITEM_CONTAINER:
 		case ITEM_CORPSE_PC:
 		case ITEM_CORPSE_NPC:
-			msg = "$o1 дымится и медлено растворяется.";
+			msg = "$o1 п╢я▀п╪п╦я┌я│я▐ п╦ п╪п╣п╢п╩п╣п╫п╬ я─п╟я│я┌п╡п╬я─я▐п╣я┌я│я▐.";
 			break;
 		case ITEM_ARMOR:
-			msg = "$o1 {gпокрывается {yокалиной.{x";
+			msg = "$o1 {gп©п╬п╨я─я▀п╡п╟п╣я┌я│я▐ {yп╬п╨п╟п╩п╦п╫п╬п╧.{x";
 			break;
 		case ITEM_CLOTHING:
-			msg = "$o1 рассыпается на клочки.";
+			msg = "$o1 я─п╟я│я│я▀п©п╟п╣я┌я│я▐ п╫п╟ п╨п╩п╬я┤п╨п╦.";
 			break;
 		case ITEM_STAFF:
 		case ITEM_WAND:
 			chance -= 10;
-			msg = "$o1 переламывается пополам.";
+			msg = "$o1 п©п╣я─п╣п╩п╟п╪я▀п╡п╟п╣я┌я│я▐ п©п╬п©п╬п╩п╟п╪.";
 			break;
 		case ITEM_SCROLL:
 		case ITEM_SPELLBOOK:
 		case ITEM_TEXTBOOK:
 			chance += 10;
-			msg = "$o1 обращается в пепел.";
+			msg = "$o1 п╬п╠я─п╟я┴п╟п╣я┌я│я▐ п╡ п©п╣п©п╣п╩.";
 			break;
 		}
 
@@ -250,9 +250,9 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 	{
 	    Affect af;
 
-            act_p("Волна холода пронизывает $c4.",
+            act_p("п▓п╬п╩п╫п╟ я┘п╬п╩п╬п╢п╟ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ $c4.",
                    victim,0,0,TO_ROOM,POS_RESTING);
-	    act_p("Холод окутывает тебя и проникает до самых костей.",
+	    act_p("п╔п╬п╩п╬п╢ п╬п╨я┐я┌я▀п╡п╟п╣я┌ я┌п╣п╠я▐ п╦ п©я─п╬п╫п╦п╨п╟п╣я┌ п╢п╬ я│п╟п╪я▀я┘ п╨п╬я│я┌п╣п╧.",
                    victim,0,0,TO_CHAR,POS_RESTING);
             af.where     = TO_AFFECTS;
             af.type      = gsn_chill_touch;
@@ -305,11 +305,11 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 	    default:
 		return;
 	    case ITEM_POTION:
-		msg = "$o1 покрывается инеем и взрывается!";
+		msg = "$o1 п©п╬п╨я─я▀п╡п╟п╣я┌я│я▐ п╦п╫п╣п╣п╪ п╦ п╡п╥я─я▀п╡п╟п╣я┌я│я▐!";
 		chance += 25;
 		break;
 	    case ITEM_DRINK_CON:
-		msg = "$o1 покрывается инеем и взрывается!";
+		msg = "$o1 п©п╬п╨я─я▀п╡п╟п╣я┌я│я▐ п╦п╫п╣п╣п╪ п╦ п╡п╥я─я▀п╡п╟п╣я┌я│я▐!";
 		chance += 5;
 		break;
 	}
@@ -355,9 +355,9 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 	&&  !saves_spell(level / 4 + dam / 20, victim,DAM_FIRE, 0, dam_flag))
 	{
             Affect af;
-            act_p("$c1 ничего не видит из-за дыма, попавшего в глаза!",
+            act_p("$c1 п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┌ п╦п╥-п╥п╟ п╢я▀п╪п╟, п©п╬п©п╟п╡я┬п╣пЁп╬ п╡ пЁп╩п╟п╥п╟!",
                    victim,0,0,TO_ROOM,POS_RESTING);
-            act_p("Твои глаза слезятся от попавшего в них дыма... и ты ничего не видишь!",
+            act_p("п╒п╡п╬п╦ пЁп╩п╟п╥п╟ я│п╩п╣п╥я▐я┌я│я▐ п╬я┌ п©п╬п©п╟п╡я┬п╣пЁп╬ п╡ п╫п╦я┘ п╢я▀п╪п╟... п╦ я┌я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄!",
 		   victim,0,0,TO_CHAR,POS_RESTING);
 	
             af.where        = TO_AFFECTS;
@@ -410,7 +410,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 
         if  (material_is_flagged( obj, MAT_MELTING ))  {
           chance += 30;
-          msg = "$o1 тает и испаряется!";
+          msg = "$o1 я┌п╟п╣я┌ п╦ п╦я│п©п╟я─я▐п╣я┌я│я▐!";
         }
         else
         switch ( obj->item_type )
@@ -418,31 +418,31 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         default:
 	    return;
         case ITEM_CONTAINER:
-            msg = "$o1 вспыхивает ярким пламенем и сгорает!";
+            msg = "$o1 п╡я│п©я▀я┘п╦п╡п╟п╣я┌ я▐я─п╨п╦п╪ п©п╩п╟п╪п╣п╫п╣п╪ п╦ я│пЁп╬я─п╟п╣я┌!";
             break;
         case ITEM_POTION:
             chance += 25;
-            msg = "$o1 закипает и взрывается!";
+            msg = "$o1 п╥п╟п╨п╦п©п╟п╣я┌ п╦ п╡п╥я─я▀п╡п╟п╣я┌я│я▐!";
             break;
         case ITEM_SCROLL:
         case ITEM_PARCHMENT:
 	case ITEM_SPELLBOOK:
 	case ITEM_TEXTBOOK:
             chance += 50;
-            msg = "$o1 трескается и сгорает!";
+            msg = "$o1 я┌я─п╣я│п╨п╟п╣я┌я│я▐ п╦ я│пЁп╬я─п╟п╣я┌!";
             break;
         case ITEM_STAFF:
             chance += 10;
-            msg = "$o1 дымится и обугливается!";
+            msg = "$o1 п╢я▀п╪п╦я┌я│я▐ п╦ п╬п╠я┐пЁп╩п╦п╡п╟п╣я┌я│я▐!";
             break;
         case ITEM_WAND:
-            msg = "$o1 искрится и шипит!";
+            msg = "$o1 п╦я│п╨я─п╦я┌я│я▐ п╦ я┬п╦п©п╦я┌!";
             break;
         case ITEM_FOOD:
-            msg = "$o1 зажаривается и чернеет!";
+            msg = "$o1 п╥п╟п╤п╟я─п╦п╡п╟п╣я┌я│я▐ п╦ я┤п╣я─п╫п╣п╣я┌!";
             break;
         case ITEM_PILL:
-            msg = "$o1 тает!";
+            msg = "$o1 я┌п╟п╣я┌!";
             break;
         }
 
@@ -519,8 +519,8 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         {
 	    Affect af;
 
-            victim->send_to("Ты чувствуешь, как яд растекается по твоим венам.\n\r");
-            act_p("$c1 выглядит очень болезненно.",victim,0,0,TO_ROOM,POS_RESTING);
+            victim->send_to("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ я▐п╢ я─п╟я│я┌п╣п╨п╟п╣я┌я│я▐ п©п╬ я┌п╡п╬п╦п╪ п╡п╣п╫п╟п╪.\n\r");
+            act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╬я┤п╣п╫я▄ п╠п╬п╩п╣п╥п╫п╣п╫п╫п╬.",victim,0,0,TO_ROOM,POS_RESTING);
 
             af.where     = TO_AFFECTS;
             af.type      = gsn_poison;
@@ -606,7 +606,7 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
 	/* daze and confused? */
 	if (!saves_spell(level/4 + dam/20,victim,DAM_LIGHTNING, 0, dam_flag))
 	{
-	    victim->send_to("Твое тело парализовано.\n\r");
+	    victim->send_to("п╒п╡п╬п╣ я┌п╣п╩п╬ п©п╟я─п╟п╩п╦п╥п╬п╡п╟п╫п╬.\n\r");
 	    victim->setDaze( max(12,level/4 + dam/20) );
 	}
 
@@ -649,11 +649,11 @@ void shock_effect(void *vo,short level, int dam, int target, bitstring_t dam_fla
 	   case ITEM_WAND:
 	   case ITEM_STAFF:
 		chance += 10;
-		msg = "$o1 с треском взрывается!";
+		msg = "$o1 я│ я┌я─п╣я│п╨п╬п╪ п╡п╥я─я▀п╡п╟п╣я┌я│я▐!";
 		break;
 	   case ITEM_JEWELRY:
 		chance -= 10;
-		msg = "$o1 плавится.";
+		msg = "$o1 п©п╩п╟п╡п╦я┌я│я▐.";
 	}
 	
 	chance = URANGE(5,chance,95);
@@ -695,9 +695,9 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 			&& !saves_spell(level / 4 + dam / 20, victim,DAM_COLD, 0, dam_flag) )
 		{
 			Affect af;
-			act_p("$c1 ничего не видит из-за песка, попавшего в глаза!",
+			act_p("$c1 п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┌ п╦п╥-п╥п╟ п©п╣я│п╨п╟, п©п╬п©п╟п╡я┬п╣пЁп╬ п╡ пЁп╩п╟п╥п╟!",
 				victim,0,0,TO_ROOM,POS_RESTING);
-			act_p("Твои глаза слезятся от попавшего в них песка... ты ничего не видишь!",
+			act_p("п╒п╡п╬п╦ пЁп╩п╟п╥п╟ я│п╩п╣п╥я▐я┌я│я▐ п╬я┌ п©п╬п©п╟п╡я┬п╣пЁп╬ п╡ п╫п╦я┘ п©п╣я│п╨п╟... я┌я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄!",
 				victim,0,0,TO_CHAR,POS_RESTING);
 	
 			af.where        = TO_AFFECTS;
@@ -752,28 +752,28 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
 		case ITEM_CORPSE_PC:
 		case ITEM_CORPSE_NPC:
 			chance += 50;
-			msg = "$o1 наполняется песком и исчезает.";
+			msg = "$o1 п╫п╟п©п╬п╩п╫я▐п╣я┌я│я▐ п©п╣я│п╨п╬п╪ п╦ п╦я│я┤п╣п╥п╟п╣я┌.";
 			break;
 		case ITEM_ARMOR:
 			chance -=10;
-			msg = "$o1 царапается песком.";
+			msg = "$o1 я├п╟я─п╟п©п╟п╣я┌я│я▐ п©п╣я│п╨п╬п╪.";
 			break;
 		case ITEM_CLOTHING:
-			msg = "$o1 разрывается песком.";
+			msg = "$o1 я─п╟п╥я─я▀п╡п╟п╣я┌я│я▐ п©п╣я│п╨п╬п╪.";
 			break;
 		case ITEM_WAND:
 			chance = 50;
-			msg = "$o1 рассыпается в пыль.";
+			msg = "$o1 я─п╟я│я│я▀п©п╟п╣я┌я│я▐ п╡ п©я▀п╩я▄.";
 			break;
 		case ITEM_SCROLL:
 		case ITEM_SPELLBOOK:
 	        case ITEM_TEXTBOOK:
 			chance += 20;
-			msg = "$o1 покрывается слоем песка.";
+			msg = "$o1 п©п╬п╨я─я▀п╡п╟п╣я┌я│я▐ я│п╩п╬п╣п╪ п©п╣я│п╨п╟.";
 			break;
 		case ITEM_POTION:
 			chance +=10;
-			msg = "$o1 разбивается на кусочки под ударом песка.";
+			msg = "$o1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╨я┐я│п╬я┤п╨п╦ п©п╬п╢ я┐п╢п╟я─п╬п╪ п©п╣я│п╨п╟.";
 			break;
 		}
 
@@ -871,8 +871,8 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
 		if  (!saves_spell(level / 4 + dam / 20, victim,DAM_SOUND, 0, dam_flag))
 		{
 			Affect af;
-			act_p("$c1 теперь ничего не слышит!",victim,0,0,TO_ROOM,POS_RESTING);
-			act_p("Ты ничего не слышишь!",victim,0,0,TO_CHAR,POS_RESTING);
+			act_p("$c1 я┌п╣п©п╣я─я▄ п╫п╦я┤п╣пЁп╬ п╫п╣ я│п╩я▀я┬п╦я┌!",victim,0,0,TO_ROOM,POS_RESTING);
+			act_p("п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ я│п╩я▀я┬п╦я┬я▄!",victim,0,0,TO_CHAR,POS_RESTING);
 	
 			af.where        = TO_AFFECTS;
 			af.type         = gsn_scream;
@@ -888,7 +888,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
 		/* daze and confused? */
 		if (!saves_spell(level/4 + dam/20,victim,DAM_SOUND, 0, dam_flag))
 		{
-			victim->send_to("Ты ничего не слышишь!\n\r");
+			victim->send_to("п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ я│п╩я▀я┬п╦я┬я▄!\n\r");
 			victim->setDaze( max(12,level/4 + dam/20) );
 		}
 
@@ -933,13 +933,13 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
 		if  (material_is_flagged( obj, MAT_MELTING ))  
 		{
 			chance += 30;
-			msg = "$o1 разбивается и испаряется!";
+			msg = "$o1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╦ п╦я│п©п╟я─я▐п╣я┌я│я▐!";
 		}
 		else
 		if  (material_is_flagged( obj, MAT_FRAGILE ))  
 		{
 			chance += 30;
-			msg = "$o1 разлетается на множество мелких осколков";
+			msg = "$o1 я─п╟п╥п╩п╣я┌п╟п╣я┌я│я▐ п╫п╟ п╪п╫п╬п╤п╣я│я┌п╡п╬ п╪п╣п╩п╨п╦я┘ п╬я│п╨п╬п╩п╨п╬п╡";
 		}
 		else
 		switch ( obj->item_type )
@@ -948,20 +948,20 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
 				return;
 			case ITEM_POTION:
 				chance += 25;
-				msg = "$o1 разбивается и содержимое выливается на землю!";
+				msg = "$o1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╦ я│п╬п╢п╣я─п╤п╦п╪п╬п╣ п╡я▀п╩п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╥п╣п╪п╩я▌!";
 				break;
 			case ITEM_SCROLL:
 			case ITEM_SPELLBOOK:
 	                case ITEM_TEXTBOOK:
 				chance += 50;
-				msg = "$o1 разрывается на клочки!";
+				msg = "$o1 я─п╟п╥я─я▀п╡п╟п╣я┌я│я▐ п╫п╟ п╨п╩п╬я┤п╨п╦!";
 				break;
 			case ITEM_DRINK_CON:
-				msg = "$o1 разбивается и содержимое выливается на землю!";
+				msg = "$o1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╦ я│п╬п╢п╣я─п╤п╦п╪п╬п╣ п╡я▀п╩п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╥п╣п╪п╩я▌!";
 				chance += 5;
 				break;
 			case ITEM_PILL:
-				msg = "$o1 разлетается на мелкие кусочки!";
+				msg = "$o1 я─п╟п╥п╩п╣я┌п╟п╣я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╨я┐я│п╬я┤п╨п╦!";
 				break;
 		}
 

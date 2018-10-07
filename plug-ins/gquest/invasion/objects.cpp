@@ -38,8 +38,8 @@ InvasionInstrument::InvasionInstrument( ) : charges( 5 )
 
 void InvasionInstrument::wear( Character *ch ) 
 { 
-    act("Ты покрепче сжимаешь $o4, готовясь к грядущим подвигам.", ch, obj, 0, TO_CHAR);
-    act("$c1 с серьезным видом сжимает $o4.", ch, obj, 0, TO_ROOM);
+    act("п╒я▀ п©п╬п╨я─п╣п©я┤п╣ я│п╤п╦п╪п╟п╣я┬я▄ $o4, пЁп╬я┌п╬п╡я▐я│я▄ п╨ пЁя─я▐п╢я┐я┴п╦п╪ п©п╬п╢п╡п╦пЁп╟п╪.", ch, obj, 0, TO_CHAR);
+    act("$c1 я│ я│п╣я─я▄п╣п╥п╫я▀п╪ п╡п╦п╢п╬п╪ я│п╤п╦п╪п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM);
 }
 
 bool InvasionInstrument::use( Character *ch, const char *args ) 
@@ -51,18 +51,18 @@ bool InvasionInstrument::use( Character *ch, const char *args )
 	return false;
     
     if (obj->wear_loc != wear_hold) {
-	act("Покрепче зажми $o4 в руках - глядишь, поможет..", ch, obj, 0, TO_CHAR);
+	act("п÷п╬п╨я─п╣п©я┤п╣ п╥п╟п╤п╪п╦ $o4 п╡ я─я┐п╨п╟я┘ - пЁп╩я▐п╢п╦я┬я▄, п©п╬п╪п╬п╤п╣я┌..", ch, obj, 0, TO_CHAR);
 	return true;
     }
     
     if (!( trgt = get_obj_room( ch, args ) )) {
-	ch->send_to("Цель не найдена.\r\n");
-	act("$c1 угрожающе размахивает $o5 - берегись!", ch, obj, 0, TO_ROOM);
+	ch->send_to("п╕п╣п╩я▄ п╫п╣ п╫п╟п╧п╢п╣п╫п╟.\r\n");
+	act("$c1 я┐пЁя─п╬п╤п╟я▌я┴п╣ я─п╟п╥п╪п╟я┘п╦п╡п╟п╣я┌ $o5 - п╠п╣я─п╣пЁп╦я│я▄!", ch, obj, 0, TO_ROOM);
 	return true;
     }
     
     if (!trgt->behavior || !trgt->behavior.getDynamicPointer<InvasionObj>( )) {
-	ch->send_to("То, на что ты замахиваешься, не сделало тебе ничего плохого.\r\n");
+	ch->send_to("п╒п╬, п╫п╟ я┤я┌п╬ я┌я▀ п╥п╟п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐, п╫п╣ я│п╢п╣п╩п╟п╩п╬ я┌п╣п╠п╣ п╫п╦я┤п╣пЁп╬ п©п╩п╬я┘п╬пЁп╬.\r\n");
 	return true;
     }
 

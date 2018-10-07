@@ -20,7 +20,7 @@
 
 using namespace std;
 
-NMI_INIT(CommandWrapper, "команда");
+NMI_INIT(CommandWrapper, "п╨п╬п╪п╟п╫п╢п╟");
 
 void 
 CommandWrapper::setSelf(Scripting::Object *obj)

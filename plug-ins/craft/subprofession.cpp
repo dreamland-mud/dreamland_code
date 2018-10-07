@@ -45,7 +45,7 @@ void CraftProfessionHelp::unsetProfession( )
 
 void CraftProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "Дополнительная профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
+    in << "п■п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫п╟я▐ п©я─п╬я└п╣я│я│п╦я▐ {C" << prof->getRusName( ).ruscase( '1' ) << "{x п╦п╩п╦ {C"
        << prof->getName( ) << "{x" << endl << endl;
         
     in << *this << endl;
@@ -130,7 +130,7 @@ int CraftProfession::gainExp( PCharacter *ch, int xp ) const
     int level = attr->proficiencyLevel(getName());
     int total_xp = attr->gainExp(getName(), xp);
 
-    ch->pecho("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2.", xp, getRusName().c_str());
+    ch->pecho("п╒я▀ п©п╬п╩я┐я┤п╟п╣я┬я▄ %1$d п╬я┤п╨%1$Iп╬|п╟|п╬п╡ п╬п©я▀я┌п╟ п╡ п©я─п╬я└п╣я│я│п╦п╦ %2$N2.", xp, getRusName().c_str());
 
     if (level >= maxLevel)
     	return total_xp;
@@ -138,14 +138,14 @@ int CraftProfession::gainExp( PCharacter *ch, int xp ) const
     while (getExpToLevel(ch) <= 0) {
         level++;
         attr->setProficiencyLevel(getName(), level);
-        ch->pecho("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!",
+        ch->pecho("{Cп╒я▀ п╢п╬я│я┌п╦пЁп╟п╣я┬я▄ {Y%1$dпЁп╬{C я┐я─п╬п╡п╫я▐ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п╡ п©я─п╬я└п╣я│я│п╦п╦ {Y%2$N2{C!",
                    level, getRusName().c_str());
 
-        infonet("{CРадостный голос из $o2: {W$C1 дости$Gгло|г|гла новой ступени профессионального мастерства.{x", 
+        infonet("{Cп═п╟п╢п╬я│я┌п╫я▀п╧ пЁп╬п╩п╬я│ п╦п╥ $o2: {W$C1 п╢п╬я│я┌п╦$GпЁп╩п╬|пЁ|пЁп╩п╟ п╫п╬п╡п╬п╧ я│я┌я┐п©п╣п╫п╦ п©я─п╬я└п╣я│я│п╦п╬п╫п╟п╩я▄п╫п╬пЁп╬ п╪п╟я│я┌п╣я─я│я┌п╡п╟.{x", 
                  ch, 0);
 
         wiznet(WIZ_LEVELS, 0, 0, 
-	          "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
+	          "%1$^C1 п╢п╬я│я┌п╦%1$GпЁп╩п╬|пЁ|пЁп╩п╟ %2$d я┐я─п╬п╡п╫я▐ п╡ п©я─п╬я└п╣я│я│п╦п╦ %3$N2!", 
                   ch, level, getRusName().c_str());
     }
 }

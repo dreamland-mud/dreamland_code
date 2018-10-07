@@ -145,8 +145,8 @@ bool BeerElementalBehavior::specFight( )
     dam = max( dam      + dice( level, 12 ) / 10, 
 	       dam / 10 + dice( level, 12 ) );
     
-    act( "$c1 дышит на тебя перегаром!", ch, 0, victim, TO_VICT);
-    act( "$c1 дышит перегаром на $C4!", ch, 0, victim, TO_NOTVICT);
+    act( "$c1 п╢я▀я┬п╦я┌ п╫п╟ я┌п╣п╠я▐ п©п╣я─п╣пЁп╟я─п╬п╪!", ch, 0, victim, TO_VICT);
+    act( "$c1 п╢я▀я┬п╦я┌ п©п╣я─п╣пЁп╟я─п╬п╪ п╫п╟ $C4!", ch, 0, victim, TO_NOTVICT);
     
     try {
 	damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true);
@@ -162,7 +162,7 @@ bool BeerElementalBehavior::area( )
     ch->max_hit -= ch->max_hit / 10;
 
     if (ch->max_hit < ch->getModifyLevel( )) {
-	act( "$c1 окончательно усыхает и исчезает.", ch, 0, 0, TO_ROOM );
+	act( "$c1 п╬п╨п╬п╫я┤п╟я┌п╣п╩я▄п╫п╬ я┐я│я▀я┘п╟п╣я┌ п╦ п╦я│я┤п╣п╥п╟п╣я┌.", ch, 0, 0, TO_ROOM );
 	extract_char( ch, true );
 	return true;
     }

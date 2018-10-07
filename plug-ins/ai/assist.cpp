@@ -67,7 +67,7 @@ bool BasicMobileBehavior::assistOffense( Character *fch, Character *victim )
     if (!( target = findAssistVictim( victim ) ))
 	return false;
 
-    act("$c1 вскрикивает и атакует!", ch, 0, 0, TO_ROOM);
+    act("$c1 п╡я│п╨я─п╦п╨п╦п╡п╟п╣я┌ п╦ п╟я┌п╟п╨я┐п╣я┌!", ch, 0, 0, TO_ROOM);
     memoryAttacked.remember( target );
     attack( target );
     return true;
@@ -185,7 +185,7 @@ bool BasicMobileBehavior::assistGroup( Character *fch, Character *victim )
     if (assistGroupDistance( fch, victim )) 
 	return true;
 
-    act("$c1 вступи$gло|л|ла в битву на стороне $C2.", ch, 0, fch, TO_NOTVICT);
+    act("$c1 п╡я│я┌я┐п©п╦$gп╩п╬|п╩|п╩п╟ п╡ п╠п╦я┌п╡я┐ п╫п╟ я│я┌п╬я─п╬п╫п╣ $C2.", ch, 0, fch, TO_NOTVICT);
     memoryAttacked.remember( victim );
     attack( victim );
     return true;
@@ -219,8 +219,8 @@ bool BasicMobileBehavior::assistGroupDistance( Character *fch, Character *victim
 	return false;
 
     if (!memoryFought.memorized( victim )) {
-	act("$c1 пристально смотрит на $C4.", ch, 0, victim, TO_NOTVICT);
-	act("$c1 пристально смотрит на тебя.", ch, 0, victim, TO_VICT);
+	act("$c1 п©я─п╦я│я┌п╟п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $C4.", ch, 0, victim, TO_NOTVICT);
+	act("$c1 п©я─п╦я│я┌п╟п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ я┌п╣п╠я▐.", ch, 0, victim, TO_VICT);
 	memoryFought.remember( victim );
     }
     
@@ -409,7 +409,7 @@ bool BasicMobileBehavior::doCallHelp( )
     if (fighters < helpers) 
 	return false;
    
-    interpret_raw( ch, "yell", "На помощь!" );
+    interpret_raw( ch, "yell", "п²п╟ п©п╬п╪п╬я┴я▄!" );
     
     if (ch->isAffected( gsn_garble ))
 	return true;

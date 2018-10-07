@@ -153,7 +153,7 @@ REDIT(rlist)
     pArea = ch->in_room->area;
 
     if (pArea->rooms.empty( )) {
-	stc("Комната(комнаты) в этой арии не обнаружены.\n\r", ch);
+	stc("п п╬п╪п╫п╟я┌п╟(п╨п╬п╪п╫п╟я┌я▀) п╡ я█я┌п╬п╧ п╟я─п╦п╦ п╫п╣ п╬п╠п╫п╟я─я┐п╤п╣п╫я▀.\n\r", ch);
 	return false;
     }
 
@@ -186,7 +186,7 @@ REDIT(mlist)
     int col = 0;
 
     if(!*argument) {
-	stc("Синтаксис:  mlist <all/имя>\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:  mlist <all/п╦п╪я▐>\n\r", ch);
 	return false;
     }
 
@@ -208,7 +208,7 @@ REDIT(mlist)
     }
 
     if (!found) {
-	stc("Монстр(ы) в этой арии не найдены.\n\r", ch);
+	stc("п°п╬п╫я│я┌я─(я▀) п╡ я█я┌п╬п╧ п╟я─п╦п╦ п╫п╣ п╫п╟п╧п╢п╣п╫я▀.\n\r", ch);
 	return false;
     }
 
@@ -230,7 +230,7 @@ REDIT(olist)
     int col = 0;
 
     if(!*argument) {
-	stc("Синтаксис:  olist <all/имя/тип_предмета>\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:  olist <all/п╦п╪я▐/я┌п╦п©_п©я─п╣п╢п╪п╣я┌п╟>\n\r", ch);
 	return false;
     }
 
@@ -255,7 +255,7 @@ REDIT(olist)
     }
 
     if (!found) {
-	stc("Предмет(предметы) в этой арии не найдены.\n\r", ch);
+	stc("п÷я─п╣п╢п╪п╣я┌(п©я─п╣п╢п╪п╣я┌я▀) п╡ я█я┌п╬п╧ п╟я─п╦п╦ п╫п╣ п╫п╟п╧п╢п╣п╫я▀.\n\r", ch);
 	return false;
     }
 
@@ -417,7 +417,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 	//int rev;
 
 	if (!pRoom->exit[door]) {
-	    stc("Здесь нет двери.\n\r", ch);
+	    stc("п≈п╢п╣я│я▄ п╫п╣я┌ п╢п╡п╣я─п╦.\n\r", ch);
 	    return false;
 	}
 
@@ -967,7 +967,7 @@ REDIT(desc)
     if (is_name(command, "copy")) {
         DLString str = pRoom->description;
         ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(str);
-        ptc(ch, "Описание скопировано в буфер.\r\n");
+        ptc(ch, "п·п©п╦я│п╟п╫п╦п╣ я│п╨п╬п©п╦я─п╬п╡п╟п╫п╬ п╡ п╠я┐я└п╣я─.\r\n");
         return true;
     }
 
@@ -975,14 +975,14 @@ REDIT(desc)
         DLString str = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
         free_string(pRoom->description);
         pRoom->description = str_dup(str.c_str( ));
-        ptc(ch, "Описание вставлено из буфера.\r\n");
+        ptc(ch, "п·п©п╦я│п╟п╫п╦п╣ п╡я│я┌п╟п╡п╩п╣п╫п╬ п╦п╥ п╠я┐я└п╣я─п╟.\r\n");
         return true;
     }
 
     stc("Syntax:\n\r", ch);
-    stc("    desc      : войти в редактор описаний\n\r", ch);
-    stc("    desc copy : скопировать описание в буфер\n\r", ch);
-    stc("    desc paste: заменить описание на то, что в буфере\n\r", ch);
+    stc("    desc      : п╡п╬п╧я┌п╦ п╡ я─п╣п╢п╟п╨я┌п╬я─ п╬п©п╦я│п╟п╫п╦п╧\n\r", ch);
+    stc("    desc copy : я│п╨п╬п©п╦я─п╬п╡п╟я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╡ п╠я┐я└п╣я─\n\r", ch);
+    stc("    desc paste: п╥п╟п╪п╣п╫п╦я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╫п╟ я┌п╬, я┤я┌п╬ п╡ п╠я┐я└п╣я─п╣\n\r", ch);
     return false;
 }
 
@@ -1034,12 +1034,12 @@ REDIT(property)
 static bool redit_purge_obj(PCharacter *ch, Object *obj) 
 {
     if (!OLCState::can_edit(ch, obj->pIndexData->vnum)) {
-	ptc(ch, "У тебя недостаточно прав для редактирования %s.\n\r", obj->getShortDescr('2').c_str());
+	ptc(ch, "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ %s.\n\r", obj->getShortDescr('2').c_str());
 	return false;
     }
     
-    act("Ты уничтожаешь $o4.", ch, obj, 0, TO_CHAR);
-    act("$c1 уничтожает $o4.", ch, obj, 0, TO_ROOM);
+    act("п╒я▀ я┐п╫п╦я┤я┌п╬п╤п╟п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR);
+    act("$c1 я┐п╫п╦я┤я┌п╬п╤п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM);
     extract_obj(obj);
     return true;
 }
@@ -1053,12 +1053,12 @@ static bool redit_purge_mob(PCharacter *ch, Character *vch)
     
     mob = vch->getNPC();
     if (!OLCState::can_edit(ch, mob->pIndexData->vnum)) {
-	ptc(ch, "У тебя недостаточно прав для редактирования %s.\n\r", mob->getNameP('2').c_str());
+	ptc(ch, "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ %s.\n\r", mob->getNameP('2').c_str());
 	return false;
     }
 
-    act("Ты уничтожаешь $C4.", ch, 0, mob, TO_CHAR);
-    act("$c1 уничтожает $C4.", ch, 0, mob, TO_ROOM);
+    act("п╒я▀ я┐п╫п╦я┤я┌п╬п╤п╟п╣я┬я▄ $C4.", ch, 0, mob, TO_CHAR);
+    act("$c1 я┐п╫п╦я┤я┌п╬п╤п╟п╣я┌ $C4.", ch, 0, mob, TO_ROOM);
     extract_char(mob);
     return true;
 }
@@ -1095,7 +1095,7 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
 	if (( vch = get_char_room(ch, arg) )) 
 	    return redit_purge_mob(ch, vch);
 
-	stc("Жертва не найдена. Используй \"purge all|mobs|objs|<name>\"\n\r", ch);
+	stc("п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟. п≤я│п©п╬п╩я▄п╥я┐п╧ \"purge all|mobs|objs|<name>\"\n\r", ch);
 	return false;
     }
     
@@ -1205,11 +1205,11 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	    pRoom2 = pRoom;
 
 	if(!pRoom2) {
-	    stc("Нет такой комнаты.\n\r", ch);
+	    stc("п²п╣я┌ я┌п╟п╨п╬п╧ п╨п╬п╪п╫п╟я┌я▀.\n\r", ch);
 	    return;
 	}
 	if (!OLCState::can_edit(ch, pRoom2->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╨п╬п╪п╫п╟я┌.\n\r", ch);
 	    return;
 	}
 	
@@ -1218,7 +1218,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	
     } else if (!str_cmp(arg1, "reset")) {
 	if (!OLCState::can_edit(ch, pRoom->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╨п╬п╪п╫п╟я┌.\n\r", ch);
 	    return;
 	}
 	reset_room(pRoom);
@@ -1234,23 +1234,23 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
 	Room *r = get_room_index(atoi(argument));
 	if (!r) {
-	    stc("Комната с таким номером не найдена.\n\r", ch);
+	    stc("п п╬п╪п╫п╟я┌п╟ я│ я┌п╟п╨п╦п╪ п╫п╬п╪п╣я─п╬п╪ п╫п╣ п╫п╟п╧п╢п╣п╫п╟.\n\r", ch);
 	    return;
 	}
 
 	if (!OLCState::can_edit(ch, r->vnum)) {
-	    stc("У тебя недостаточно прав, чтобы попасть в эту комнату.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡, я┤я┌п╬п╠я▀ п©п╬п©п╟я│я┌я▄ п╡ я█я┌я┐ п╨п╬п╪п╫п╟я┌я┐.\n\r", ch);
 	    return;
 	}
 
 	transfer_char( ch, ch, r, 
-		       "%1$^C1 взмахивает лопатой и исчезает.", NULL,
-		       "%1$^C1 внезапно вырастает из-под земли." );
+		       "%1$^C1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ п╩п╬п©п╟я┌п╬п╧ п╦ п╦я│я┤п╣п╥п╟п╣я┌.", NULL,
+		       "%1$^C1 п╡п╫п╣п╥п╟п©п╫п╬ п╡я▀я─п╟я│я┌п╟п╣я┌ п╦п╥-п©п╬п╢ п╥п╣п╪п╩п╦." );
 	return;
 	
     } else if (!str_cmp(arg1, "purge")) {
 	if (!OLCState::can_edit(ch, pRoom->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования этой комнаты.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ я█я┌п╬п╧ п╨п╬п╪п╫п╟я┌я▀.\n\r", ch);
 	    return;
 	}
 	
@@ -1273,7 +1273,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	pRoom = get_room_index(atoi(arg1));
 
 	if(!pRoom) {
-	    stc("Нет такой комнаты.\r\n", ch);
+	    stc("п²п╣я┌ я┌п╟п╨п╬п╧ п╨п╬п╪п╫п╟я┌я▀.\r\n", ch);
 	    return;
 	}
     } else if(!*arg1) {
@@ -1289,7 +1289,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
     
     if (!OLCState::can_edit(ch, pRoom->vnum)) {
-	stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
+	stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╨п╬п╪п╫п╟я┌.\n\r", ch);
 	return;
     }
     

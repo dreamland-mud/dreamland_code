@@ -101,7 +101,7 @@ void CommandHelpFormatter::setup( Character *ch )
 }
 
 /*
- * CMD    ->  {lEeng_name{lR“’””Àœ≈_…Õ—{lx
+ * CMD    ->  {lEeng_name{lR—Ä—É—Å—Å–∫–æ–µ_–∏–º—è{lx
  */
 bool CommandHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {

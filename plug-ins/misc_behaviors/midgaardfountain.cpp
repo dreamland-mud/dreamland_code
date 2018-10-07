@@ -38,7 +38,7 @@ bool MidgaardFountain::area( ) {
 	    obj->value[2] = obj->pIndexData->value[2];
 
 	    if (wch)
-		act_p("Кровь в $o6 снова превращается в воду..", wch, obj, 0, TO_ALL, POS_RESTING);
+		act_p("п я─п╬п╡я▄ п╡ $o6 я│п╫п╬п╡п╟ п©я─п╣п╡я─п╟я┴п╟п╣я┌я│я▐ п╡ п╡п╬п╢я┐..", wch, obj, 0, TO_ALL, POS_RESTING);
 	}   
 	return false;
     }
@@ -47,7 +47,7 @@ bool MidgaardFountain::area( ) {
 	obj->value[2] = liq_blood;
 	
 	if (wch) 
-	    act_p("Вода в $o6 медленно окрашивается {rкрасным{x.", wch, obj, 0, TO_ALL, POS_RESTING);
+	    act_p("п▓п╬п╢п╟ п╡ $o6 п╪п╣п╢п╩п╣п╫п╫п╬ п╬п╨я─п╟я┬п╦п╡п╟п╣я┌я│я▐ {rп╨я─п╟я│п╫я▀п╪{x.", wch, obj, 0, TO_ALL, POS_RESTING);
     }
 
     return false;

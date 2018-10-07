@@ -12,7 +12,7 @@ template class Scripting::NativeImpl<RegList>;
 
 const DLString RegList::TYPE = "RegList";
 
-NMI_INIT(RegList, "список")
+NMI_INIT(RegList, "я│п©п╦я│п╬п╨")
 
 void
 RegList::setSelf(Scripting::Object *s) 

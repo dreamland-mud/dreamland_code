@@ -14,12 +14,12 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная bool
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ bool
  */
 class XMLBoolean : public Boolean
 {
 public:
-	/** По умолчанию значение true */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ true */
 	inline XMLBoolean( ) : Boolean( )
 	{
 	}
@@ -33,9 +33,9 @@ public:
 	{
 	}
 
-	/** Возвращает xml представление переменной */
+	/** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
 	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
+	/** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
 	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
@@ -89,7 +89,7 @@ public:
 };
 
 
-/** Вывод в ostream типа XMLBoolean */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLBoolean */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLBoolean& xmlBoolean )
 {
 	ostr << xmlBoolean.getValue( );

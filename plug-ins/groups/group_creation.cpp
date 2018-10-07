@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -57,7 +57,7 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
 	&& ( light = get_obj_carry(ch, target_name) ))
     {
 	if (light->is_obj_stat(ITEM_GLOW)) {
-	    ch->pecho( "%1$^O1 уже свет%1$nится|ятся.", light );
+	    ch->pecho( "%1$^O1 я┐п╤п╣ я│п╡п╣я┌%1$nп╦я┌я│я▐|я▐я┌я│я▐.", light );
 	    return;
 	}
 
@@ -65,7 +65,7 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
 	if (!ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
 	    SET_BIT(light->extra_flags, ITEM_MAGIC);
 	
-	light->getRoom( )->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют белым светом.", light );
+	light->getRoom( )->echo( POS_RESTING, "%1$^O1 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ п╠п╣п╩я▀п╪ я│п╡п╣я┌п╬п╪.", light );
 	return;
     }
 
@@ -76,8 +76,8 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
     dress_created_item( sn, light, ch, target_name );
     obj_to_char( light, ch );
 
-    act("$c1 взмахивает руками и создает $o4.",ch,light,0,TO_ROOM);
-    act("Ты взмахиваешь руками и создаешь $o4.",ch,light,0,TO_CHAR);
+    act("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ $o4.",ch,light,0,TO_ROOM);
+    act("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ $o4.",ch,light,0,TO_CHAR);
 }
 
 
@@ -99,12 +99,12 @@ VOID_SPELL(CreateFood)::run( Character *ch, char *target_name, int sn, int level
     obj_to_char( mushroom, ch );
 
     if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-	act( "$c1 взмахивает руками, и с неба падает $o1.", ch, mushroom, 0, TO_ROOM );
-	act( "Ты взмахиваешь руками, и с неба падает $o1.", ch, mushroom, 0, TO_CHAR );
+	act( "$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦, п╦ я│ п╫п╣п╠п╟ п©п╟п╢п╟п╣я┌ $o1.", ch, mushroom, 0, TO_ROOM );
+	act( "п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦, п╦ я│ п╫п╣п╠п╟ п©п╟п╢п╟п╣я┌ $o1.", ch, mushroom, 0, TO_CHAR );
     }
     else {
-	act( "$c1 взмахивает руками и создает $o4.", ch, mushroom, 0, TO_ROOM);
-	act( "Ты взмахиваешь руками и создаешь $o4.", ch, mushroom, 0, TO_CHAR);
+	act( "$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ $o4.", ch, mushroom, 0, TO_ROOM);
+	act( "п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ $o4.", ch, mushroom, 0, TO_CHAR);
     }
 }
 
@@ -119,12 +119,12 @@ VOID_SPELL(CreateRose)::run( Character *ch, char *target_name, int sn, int level
     obj_to_char(rose, ch);
     
     if (!rose->getRealShortDescr( )) {
-	act("$c1 взмахивает руками и создает прекрасную $o4.", ch, rose, 0, TO_ROOM);
-	act("Ты взмахиваешь руками и создаешь прекрасную $o4.", ch, rose, 0, TO_CHAR);
+	act("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ п©я─п╣п╨я─п╟я│п╫я┐я▌ $o4.", ch, rose, 0, TO_ROOM);
+	act("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ п©я─п╣п╨я─п╟я│п╫я┐я▌ $o4.", ch, rose, 0, TO_CHAR);
     }
     else {
-	act("$c1 взмахивает руками и создает $o4.", ch, rose, 0, TO_ROOM);
-	act("Ты взмахиваешь руками и создаешь $o4.", ch, rose, 0, TO_CHAR);
+	act("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ $o4.", ch, rose, 0, TO_ROOM);
+	act("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ $o4.", ch, rose, 0, TO_CHAR);
     }
 }
 
@@ -143,7 +143,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
 	     && ch->in_room->sector_type != SECT_HILLS
 	     && ch->in_room->sector_type != SECT_MOUNTAIN)
 	{
-	    ch->println("Ты не сможешь создать родник в этой местности.");
+	    ch->println("п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ я│п╬п╥п╢п╟я┌я▄ я─п╬п╢п╫п╦п╨ п╡ я█я┌п╬п╧ п╪п╣я│я┌п╫п╬я│я┌п╦.");
 	    return;
 	}
 	
@@ -156,7 +156,7 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     spring->timer = level;
     obj_to_room( spring, ch->in_room );
     dress_created_item( sn, spring, ch, target_name );
-    act( "$o1 пробивается сквозь землю.", ch, spring, 0, TO_ALL );
+    act( "$o1 п©я─п╬п╠п╦п╡п╟п╣я┌я│я▐ я│п╨п╡п╬п╥я▄ п╥п╣п╪п╩я▌.", ch, spring, 0, TO_ALL );
 }
 
 SPELL_DECL(CreateWater);
@@ -166,7 +166,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
     if ( obj->item_type != ITEM_DRINK_CON )
     {
-	ch->send_to("Здесь не может содержаться вода.\n\r");
+	ch->send_to("п≈п╢п╣я│я▄ п╫п╣ п╪п╬п╤п╣я┌ я│п╬п╢п╣я─п╤п╟я┌я▄я│я▐ п╡п╬п╢п╟.\n\r");
 	return;
     }
 
@@ -175,7 +175,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->value[2] != liq_water && obj->value[1] != 0 )
     {
-	ch->send_to("Контейнер содержит другую жидкость.\n\r");
+	ch->send_to("п п╬п╫я┌п╣п╧п╫п╣я─ я│п╬п╢п╣я─п╤п╦я┌ п╢я─я┐пЁя┐я▌ п╤п╦п╢п╨п╬я│я┌я▄.\n\r");
 	return;
     }
 
@@ -191,7 +191,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 	if ( !is_name( "water", obj->getName( )) )
 	    obj->fmtName( "%s water", obj->getName( ) );
 
-	ch->pecho( "%1$^O1 наполне%1$Gно|н|на|ны.", obj );
+	ch->pecho( "%1$^O1 п╫п╟п©п╬п╩п╫п╣%1$Gп╫п╬|п╫|п╫п╟|п╫я▀.", obj );
     }
 
 
@@ -206,7 +206,7 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     floating = get_eq_char(ch,wear_float);
     if (floating != 0 && IS_OBJ_STAT(floating,ITEM_NOREMOVE))
     {
-	act_p("Ты не можешь снять $o4.",ch,floating,0,TO_CHAR,POS_RESTING);
+	act_p("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╫я▐я┌я▄ $o4.",ch,floating,0,TO_CHAR,POS_RESTING);
 	return;
     }
 
@@ -222,12 +222,12 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     obj_to_char(disc,ch);
     
     if (!disc->getRealShortDescr( )) {
-	act("$c1 взмахивает руками и создает черный вращающийся диск.", ch,0,0,TO_ROOM);
-	act("Ты взмахиваешь руками и создаешь вращающийся диск.", ch, 0, 0, TO_CHAR);
+	act("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ я┤п╣я─п╫я▀п╧ п╡я─п╟я┴п╟я▌я┴п╦п╧я│я▐ п╢п╦я│п╨.", ch,0,0,TO_ROOM);
+	act("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ п╡я─п╟я┴п╟я▌я┴п╦п╧я│я▐ п╢п╦я│п╨.", ch, 0, 0, TO_CHAR);
     }
     else {
-	act("$c1 взмахивает руками и создает $o4.", ch, disc, 0, TO_ROOM);
-	act("Ты взмахиваешь руками и создаешь $o4.", ch, disc, 0, TO_CHAR);
+	act("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ $o4.", ch, disc, 0, TO_ROOM);
+	act("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ $o4.", ch, disc, 0, TO_CHAR);
     }
 
     wear_obj(ch,disc,F_WEAR_REPLACE|F_WEAR_VERBOSE);

@@ -29,9 +29,9 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
 
     if (!victim->getRace( )->getVuln( ).isSet( VULN_IRON )) {
 	if (victim == ch)
-	    act("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
+	    act("п╒я▀ п╫п╣ я│я┌я─п╟п╢п╟п╣я┬я▄ п╡я─п╬п╤п╢п╣п╫п╫п╬п╧ я┐я▐п╥п╡п╦п╪п╬я│я┌я▄я▌ п╨ п╤п╣п╩п╣п╥я┐.", ch, 0, 0, TO_CHAR);
 	else
-	    act("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
+	    act("$C1 п╫п╣ я│я┌я─п╟п╢п╟п╣я┌ п╡я─п╬п╤п╢п╣п╫п╫п╬п╧ я┐я▐п╥п╡п╦п╪п╬я│я┌я▄я▌ п╨ п╤п╣п╩п╣п╥я┐.", ch, 0, victim, TO_CHAR);
 	
 	return false;
     }
@@ -44,8 +44,8 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
    
-    act("{CСекретное знание Сидхов теперь защищает $c4.{x", victim, 0, 0, TO_ROOM);
-    act("{CСекретное знание Сидхов теперь защищает тебя.{x", victim, 0, 0, TO_CHAR);
+    act("{Cп║п╣п╨я─п╣я┌п╫п╬п╣ п╥п╫п╟п╫п╦п╣ п║п╦п╢я┘п╬п╡ я┌п╣п©п╣я─я▄ п╥п╟я┴п╦я┴п╟п╣я┌ $c4.{x", victim, 0, 0, TO_ROOM);
+    act("{Cп║п╣п╨я─п╣я┌п╫п╬п╣ п╥п╫п╟п╫п╦п╣ п║п╦п╢я┘п╬п╡ я┌п╣п©п╣я─я▄ п╥п╟я┴п╦я┴п╟п╣я┌ я┌п╣п╠я▐.{x", victim, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -74,8 +74,8 @@ bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
 	ch->saving_throw += af.modifier;
     }
 
-    act( "{CОбмундирование на $c6 на мгновение загорается священным огнем.{x", victim, 0, 0, TO_ROOM );
-    act( "{CТвое обмундирование на мгновение загорается священным огнем.{x", victim, 0, 0, TO_CHAR );
+    act( "{Cп·п╠п╪я┐п╫п╢п╦я─п╬п╡п╟п╫п╦п╣ п╫п╟ $c6 п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╥п╟пЁп╬я─п╟п╣я┌я│я▐ я│п╡я▐я┴п╣п╫п╫я▀п╪ п╬пЁп╫п╣п╪.{x", victim, 0, 0, TO_ROOM );
+    act( "{Cп╒п╡п╬п╣ п╬п╠п╪я┐п╫п╢п╦я─п╬п╡п╟п╫п╦п╣ п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╥п╟пЁп╬я─п╟п╣я┌я│я▐ я│п╡я▐я┴п╣п╫п╫я▀п╪ п╬пЁп╫п╣п╪.{x", victim, 0, 0, TO_CHAR );
     return true;
 }
 
@@ -87,9 +87,9 @@ bool RestoringWE::run( PCharacter *ch, Character *victim ) const
     update_pos( victim );
 
     if (ch != victim)
-	act( "{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
+	act( "{Cп╒п╟п╦п╫я│я┌п╡п╣п╫п╫п╬п╣ п╪п╣п╩п╬п╢п╦я┤п╫п╬п╣ я│п╩п╬п╡п╬ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ $C4 я┌п╣п©п╩п╬п╪.{x", ch, 0, victim, TO_CHAR );
 
-    victim->println( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
+    victim->println( "{Cп╒п╟п╦п╫я│я┌п╡п╣п╫п╫п╬п╣ п╪п╣п╩п╬п╢п╦я┤п╫п╬п╣ я│п╩п╬п╡п╬ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ я┌п╣п╠я▐ я┌п╣п©п╩п╬п╪.{x" );
     return true;
 }
 

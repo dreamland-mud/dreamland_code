@@ -30,7 +30,7 @@
 using namespace std;
 using namespace Scripting;
 
-NMI_INIT(ObjectWrapper, "предмет")
+NMI_INIT(ObjectWrapper, "п©я─п╣п╢п╪п╣я┌")
 
 
 ObjectWrapper::ObjectWrapper( ) : target( NULL )
@@ -295,13 +295,13 @@ NMI_GET( ObjectWrapper, wear_loc, "")
     return Register( target->wear_loc->getName( ) );
 }
 
-NMI_GET( ObjectWrapper, weightTotal, "вес предмета с учетом содержимого")
+NMI_GET( ObjectWrapper, weightTotal, "п╡п╣я│ п©я─п╣п╢п╪п╣я┌п╟ я│ я┐я┤п╣я┌п╬п╪ я│п╬п╢п╣я─п╤п╦п╪п╬пЁп╬")
 {
     checkTarget( );
     return Register( target->getWeight( ) );
 }
 
-NMI_GET( ObjectWrapper, weight, "вес предмета")
+NMI_GET( ObjectWrapper, weight, "п╡п╣я│ п©я─п╣п╢п╪п╣я┌п╟")
 {
     checkTarget( );
     return Register( target->weight );
@@ -499,7 +499,7 @@ NMI_INVOKE( ObjectWrapper, set_extra_descr , "")
 }
 
 
-NMI_INVOKE( ObjectWrapper, equip, "оденется в указанное место тому кто нас несет" )
+NMI_INVOKE( ObjectWrapper, equip, "п╬п╢п╣п╫п╣я┌я│я▐ п╡ я┐п╨п╟п╥п╟п╫п╫п╬п╣ п╪п╣я│я┌п╬ я┌п╬п╪я┐ п╨я┌п╬ п╫п╟я│ п╫п╣я│п╣я┌" )
 {
     Wearlocation *loc;
     
@@ -518,7 +518,7 @@ NMI_INVOKE( ObjectWrapper, equip, "оденется в указанное место тому кто нас несет
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, unequip, "снимает шмотку и кладет в инвентарь" )
+NMI_INVOKE( ObjectWrapper, unequip, "я│п╫п╦п╪п╟п╣я┌ я┬п╪п╬я┌п╨я┐ п╦ п╨п╩п╟п╢п╣я┌ п╡ п╦п╫п╡п╣п╫я┌п╟я─я▄" )
 {
     checkTarget( );
     
@@ -605,7 +605,7 @@ NMI_INVOKE( ObjectWrapper, affectStripAll, "" )
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, random_obj_list, "случайный объект из списка, начинающегося с этого объекта. может брать в параметры item type")
+NMI_INVOKE( ObjectWrapper, random_obj_list, "я│п╩я┐я┤п╟п╧п╫я▀п╧ п╬п╠я┼п╣п╨я┌ п╦п╥ я│п©п╦я│п╨п╟, п╫п╟я┤п╦п╫п╟я▌я┴п╣пЁп╬я│я▐ я│ я█я┌п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟. п╪п╬п╤п╣я┌ п╠я─п╟я┌я▄ п╡ п©п╟я─п╟п╪п╣я┌я─я▀ item type")
 {
     int itype = -1;
     ::Object *result = NULL;
@@ -625,25 +625,25 @@ NMI_INVOKE( ObjectWrapper, random_obj_list, "случайный объект из списка, начинаю
     return wrap( result );
 }
 
-NMI_INVOKE( ObjectWrapper, madeOfWood, "предмет сделан из дерева" )
+NMI_INVOKE( ObjectWrapper, madeOfWood, "п©я─п╣п╢п╪п╣я┌ я│п╢п╣п╩п╟п╫ п╦п╥ п╢п╣я─п╣п╡п╟" )
 {
     checkTarget( );
     return Register( material_is_typed( target, MAT_WOOD ) );
 }
 
-NMI_INVOKE( ObjectWrapper, madeOfMetal, "предмет сделан из металла" )
+NMI_INVOKE( ObjectWrapper, madeOfMetal, "п©я─п╣п╢п╪п╣я┌ я│п╢п╣п╩п╟п╫ п╦п╥ п╪п╣я┌п╟п╩п╩п╟" )
 {
     checkTarget( );
     return Register( material_is_typed( target, MAT_METAL ) );
 }
 
-NMI_INVOKE( ObjectWrapper, materialBurns, "сколько тиков горит (-1 если тушит огонь)" )
+NMI_INVOKE( ObjectWrapper, materialBurns, "я│п╨п╬п╩я▄п╨п╬ я┌п╦п╨п╬п╡ пЁп╬я─п╦я┌ (-1 п╣я│п╩п╦ я┌я┐я┬п╦я┌ п╬пЁп╬п╫я▄)" )
 {
     checkTarget( );
     return Register( material_burns( target ) );
 }
 
-NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "поиск объекта внутри этого по внуму" )
+NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "п©п╬п╦я│п╨ п╬п╠я┼п╣п╨я┌п╟ п╡п╫я┐я┌я─п╦ я█я┌п╬пЁп╬ п©п╬ п╡п╫я┐п╪я┐" )
 {
     checkTarget( );
 
@@ -656,7 +656,7 @@ NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "поиск объекта внутри этого по 
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "поиск списка объектов внутри этого по внуму" )
+NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "п©п╬п╦я│п╨ я│п©п╦я│п╨п╟ п╬п╠я┼п╣п╨я┌п╬п╡ п╡п╫я┐я┌я─п╦ я█я┌п╬пЁп╬ п©п╬ п╡п╫я┐п╪я┐" )
 {
     checkTarget( );
     RegList::Pointer rc(NEW);
@@ -673,7 +673,7 @@ NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "поиск списка объектов внутри 
     return Register( sobj );
 }
 
-NMI_GET( ObjectWrapper, items, "список (List) всех предметов внутри этого" )
+NMI_GET( ObjectWrapper, items, "я│п©п╦я│п╬п╨ (List) п╡я│п╣я┘ п©я─п╣п╢п╪п╣я┌п╬п╡ п╡п╫я┐я┌я─п╦ я█я┌п╬пЁп╬" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
@@ -687,21 +687,21 @@ NMI_GET( ObjectWrapper, items, "список (List) всех предметов внутри этого" )
     return Register( sobj );
 }
 
-NMI_INVOKE( ObjectWrapper, api, "печатает этот API" )
+NMI_INVOKE( ObjectWrapper, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<ObjectWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjectWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( ObjectWrapper, rtapi, "п©п╣я┤п╟я┌п╟п╣я┌ п╡я│п╣ п©п╬п╩я▐ п╦ п╪п╣я┌п╬п╢я▀, я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╣ п╡ runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjectWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( ObjectWrapper, clear, "п╬я┤п╦я│я┌п╨п╟ п╡я│п╣я┘ runtime п©п╬п╩п╣п╧" )
 {
     guts.clear( );
     self->changed();

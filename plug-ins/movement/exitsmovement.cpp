@@ -84,7 +84,7 @@ bool ExitsMovement::findTargetRoom( )
 	return false;
 
     if (!pexit && !peexit) {
-	ch->println( "Извини, но ты не можешь туда идти." );
+	ch->println( "п≤п╥п╡п╦п╫п╦, п╫п╬ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┌я┐п╢п╟ п╦п╢я┌п╦." );
 	return false;
     }
     
@@ -105,7 +105,7 @@ bool ExitsMovement::findTargetRoom( )
     }
 
     if (!to_room) { /* sanity check, will be re-checked in checkVisibility */
-	ch->println( "Жаль, но ты не можешь туда идти." );
+	ch->println( "п√п╟п╩я▄, п╫п╬ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┌я┐п╢п╟ п╦п╢я┌п╦." );
 	return false;
     }
 
@@ -182,8 +182,8 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
     if (IS_AFFECTED(wch, AFF_PASS_DOOR) && IS_SET( exit_info, EX_NOPASS)) {
 	rc = RC_MOVE_PASS_NEVER;
 	msgSelfRoom( wch,
-		     "Через %4$N4 невозможно пройти насквозь.",
-		     "%2$^C1 стукается лбом о %4$N4." );
+		     "п╖п╣я─п╣п╥ %4$N4 п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п©я─п╬п╧я┌п╦ п╫п╟я│п╨п╡п╬п╥я▄.",
+		     "%2$^C1 я│я┌я┐п╨п╟п╣я┌я│я▐ п╩п╠п╬п╪ п╬ %4$N4." );
     }
     else {
 	if (IS_SET(exit_info, EX_LOCKED))
@@ -192,8 +192,8 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
 	    rc = RC_MOVE_CLOSED;
 	    
 	msgSelfParty( wch,
-		      "%4$^N1: тут закрыто.",
-		      "%4$^N1: тут закрыто." );
+		      "%4$^N1: я┌я┐я┌ п╥п╟п╨я─я▀я┌п╬.",
+		      "%4$^N1: я┌я┐я┌ п╥п╟п╨я─я▀я┌п╬." );
     }
     
     return false;
@@ -205,8 +205,8 @@ bool ExitsMovement::checkVisibility( Character *wch )
 	|| (peexit && !wch->can_see( peexit )))
     {
 	msgSelfParty( wch, 
-		      "Жаль, но ты не можешь туда идти.",
-		      "Жаль, но %2$C1 не может туда идти.");
+		      "п√п╟п╩я▄, п╫п╬ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┌я┐п╢п╟ п╦п╢я┌п╦.",
+		      "п√п╟п╩я▄, п╫п╬ %2$C1 п╫п╣ п╪п╬п╤п╣я┌ я┌я┐п╢п╟ п╦п╢я┌п╦.");
 	return false;
     }
 
@@ -239,29 +239,29 @@ bool ExitsMovement::checkExtraExit( Character *wch )
     
     if (total_size > peexit->max_size_pass) {
 	msgSelfParty( wch, 
-		      "Чтобы это сделать, надо быть чуууточку поменьше размером.",
-		      "Вам с %2$C5 стоит быть чуточку поменьше размером." );
+		      "п╖я┌п╬п╠я▀ я█я┌п╬ я│п╢п╣п╩п╟я┌я▄, п╫п╟п╢п╬ п╠я▀я┌я▄ я┤я┐я┐я┐я┌п╬я┤п╨я┐ п©п╬п╪п╣п╫я▄я┬п╣ я─п╟п╥п╪п╣я─п╬п╪.",
+		      "п▓п╟п╪ я│ %2$C5 я│я┌п╬п╦я┌ п╠я▀я┌я▄ я┤я┐я┌п╬я┤п╨я┐ п©п╬п╪п╣п╫я▄я┬п╣ я─п╟п╥п╪п╣я─п╬п╪." );
 	return false;
     }
     
     if (IS_SET(peexit->exit_info, EX_NOFLY) && is_flying( wch )) {
 	msgSelfParty( wch, 
-		      "Ты не сможешь здесь пролететь.",
-		      "%2$^C1 не может здесь пролететь." );
+		      "п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╥п╢п╣я│я▄ п©я─п╬п╩п╣я┌п╣я┌я▄.",
+		      "%2$^C1 п╫п╣ п╪п╬п╤п╣я┌ п╥п╢п╣я│я▄ п©я─п╬п╩п╣я┌п╣я┌я▄." );
 	return false;
     }
 
     if (IS_SET(peexit->exit_info, EX_NOWALK) && !is_flying( wch )) {
 	msgSelfParty( wch, 
-		      "Ты не сможешь здесь пройти.",
-		      "%2$^C1 не сможет здесь пройти." );
+		      "п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╥п╢п╣я│я▄ п©я─п╬п╧я┌п╦.",
+		      "%2$^C1 п╫п╣ я│п╪п╬п╤п╣я┌ п╥п╢п╣я│я▄ п©я─п╬п╧я┌п╦." );
 	return false;
     }
 
     if (IS_SET(peexit->exit_info, EX_SWIM_ONLY) && boat_type == BOAT_NONE) {
 	msgSelfParty( wch, 
-		      "Здесь ты можешь только проплыть.",
-		      "%2$^C1 сможет здесь только проплыть." );
+		      "п≈п╢п╣я│я▄ я┌я▀ п╪п╬п╤п╣я┬я▄ я┌п╬п╩я▄п╨п╬ п©я─п╬п©п╩я▀я┌я▄.",
+		      "%2$^C1 я│п╪п╬п╤п╣я┌ п╥п╢п╣я│я▄ я┌п╬п╩я▄п╨п╬ п©я─п╬п©п╩я▀я┌я▄." );
 	return false;
     }
 
@@ -296,7 +296,7 @@ bool ExitsMovement::applyPassDoor( Character *wch )
 		     95 );
 
     if (number_percent( ) < chance) {
-	msgSelf( wch, "Ты просачиваешься сквозь %4$N4." );
+	msgSelf( wch, "п╒я▀ п©я─п╬я│п╟я┤п╦п╡п╟п╣я┬я▄я│я▐ я│п╨п╡п╬п╥я▄ %4$N4." );
 	wch->setWait( 2 );
 	return true;	
     }
@@ -304,8 +304,8 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     rc = RC_MOVE_PASS_FAILED;
     wch->setWait( 4 );
     msgSelfRoom( wch,
-		 "Твоя попытка просочиться сквозь %4$N4 закончилась неудачей.", 
-		 "%2$C1 стукается лбом о %4$N4." );
+		 "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п©я─п╬я│п╬я┤п╦я┌я▄я│я▐ я│п╨п╡п╬п╥я▄ %4$N4 п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.", 
+		 "%2$C1 я│я┌я┐п╨п╟п╣я┌я│я▐ п╩п╠п╬п╪ п╬ %4$N4." );
     return false;
 }
 
@@ -384,7 +384,7 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
 		<< russian_case( peexit->short_desc_from,
 				 extra_move_rtum[peexit->moving_mode_from] );
 	else
-	    buf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " сюда " 
+	    buf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " я│я▌п╢п╟ " 
 		<< extra_move_rt[peexit->moving_mode_to] << " "
 		<< russian_case( peexit->short_desc_to,
 				 extra_move_rtpm[peexit->moving_mode_to] );
@@ -405,16 +405,16 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
 	    DLString part, prep;
 		    
 	    switch (boat->value[1]) {
-	    case POS_RESTING:  part = "лежа"; break;
-	    case POS_SITTING:  part = "сидя"; break;
-	    case POS_STANDING: part = "стоя"; break;
+	    case POS_RESTING:  part = "п╩п╣п╤п╟"; break;
+	    case POS_SITTING:  part = "я│п╦п╢я▐"; break;
+	    case POS_STANDING: part = "я│я┌п╬я▐"; break;
 	    }
 	    
 	    switch (boat->value[2]) {
-	    case PUT_IN:     prep = "в";      ncase = 6; break;
-	    case PUT_ON:     prep = "на";     ncase = 6; break;
-	    case PUT_AT:     prep = "у";      ncase = 2; break;
-	    case PUT_INSIDE: prep = "внутри"; ncase = 2; break;
+	    case PUT_IN:     prep = "п╡";      ncase = 6; break;
+	    case PUT_ON:     prep = "п╫п╟";     ncase = 6; break;
+	    case PUT_AT:     prep = "я┐";      ncase = 2; break;
+	    case PUT_INSIDE: prep = "п╡п╫я┐я┌я─п╦"; ncase = 2; break;
 	    }
 
 	    if (!prep.empty( )) {
@@ -427,7 +427,7 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
     }
     
     if (RIDDEN(wch))
-	buf << ", верхом на %2$C6";
+	buf << ", п╡п╣я─я┘п╬п╪ п╫п╟ %2$C6";
 
     buf << "."; 
 
@@ -467,7 +467,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
 
 void ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    act( "Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
+    act( "п╒я▀ я│п╩п╣п╢я┐п╣я┬я▄ п╥п╟ $C5.", fch, 0, wch, TO_CHAR );
 
     if (peexit)
 	ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 

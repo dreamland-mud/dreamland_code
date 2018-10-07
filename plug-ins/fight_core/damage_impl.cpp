@@ -40,21 +40,21 @@ RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam )
 void RawDamage::message( )
 {
     if( ch == victim ) {
-	msgRoom( "%^C1\6себя", ch );
-	msgChar( "Ты\5себя" );
+	msgRoom( "%^C1\6я│п╣п╠я▐", ch );
+	msgChar( "п╒я▀\5я│п╣п╠я▐" );
 	return;
     } 
 
     if ( dam == 0 ) {
        msgRoom( "%^C1\6%C2", ch, victim);
-       msgChar( "Ты\5%C2", victim);
+       msgChar( "п╒я▀\5%C2", victim);
     }
     else {
        msgRoom( "%^C1\6%C4", ch, victim );
-       msgChar( "Ты\5%C4", victim );
+       msgChar( "п╒я▀\5%C4", victim );
     }
 
-    msgVict( "%^C1\6тебя", ch );
+    msgVict( "%^C1\6я┌п╣п╠я▐", ch );
 }
 
 bool RawDamage::canDamage( )
@@ -83,19 +83,19 @@ void SkillDamage::message( )
 
     if (immune) {
 	if (ch == victim) {
-	    msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна против %2$P4 сам%2$Gого|ого|ой|их", &attack, ch);
-	    msgChar("Тебе повезло, у тебя иммунитет к этому");
+	    msgRoom("%1$^O1 %2$C2 п╠п╣я│я│п╦п╩%1$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п©я─п╬я┌п╦п╡ %2$P4 я│п╟п╪%2$Gп╬пЁп╬|п╬пЁп╬|п╬п╧|п╦я┘", &attack, ch);
+	    msgChar("п╒п╣п╠п╣ п©п╬п╡п╣п╥п╩п╬, я┐ я┌п╣п╠я▐ п╦п╪п╪я┐п╫п╦я┌п╣я┌ п╨ я█я┌п╬п╪я┐");
 	}
 	else {
-	    msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна против %3$C2", &attack, ch, victim);
-	    msgChar("%1$^T1 %1$O1 бессил%1$Gьно|ен|ьна против %2$C2", &attack, victim);
-	    msgVict("Против тебя %2$O1 %1$C2 бессил%2$Gьно|ен|ьна", ch, &attack);
+	    msgRoom("%1$^O1 %2$C2 п╠п╣я│я│п╦п╩%1$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п©я─п╬я┌п╦п╡ %3$C2", &attack, ch, victim);
+	    msgChar("%1$^T1 %1$O1 п╠п╣я│я│п╦п╩%1$Gя▄п╫п╬|п╣п╫|я▄п╫п╟ п©я─п╬я┌п╦п╡ %2$C2", &attack, victim);
+	    msgVict("п÷я─п╬я┌п╦п╡ я┌п╣п╠я▐ %2$O1 %1$C2 п╠п╣я│я│п╦п╩%2$Gя▄п╫п╬|п╣п╫|я▄п╫п╟", ch, &attack);
 	}
     }
     else {
 	if (ch == victim) {
-	    msgRoom( "%1$^O1 %2$C2\6себя", &attack, ch );
-	    msgChar( "%1$^T1 %1$O1\6тебя", &attack );
+	    msgRoom( "%1$^O1 %2$C2\6я│п╣п╠я▐", &attack, ch );
+	    msgChar( "%1$^T1 %1$O1\6я┌п╣п╠я▐", &attack );
 	}
 	else {
 	    if ( dam == 0 )
@@ -107,7 +107,7 @@ void SkillDamage::message( )
 		msgRoom( "%1$^O1 %2$C2\6%3$C4", &attack, ch, victim );
 		msgChar( "%1$^T1 %1$O1\6%2$C4", &attack, victim );
 	    }
-	    msgVict( "%1$^O1 %2$C2\6тебя", &attack, ch );
+	    msgVict( "%1$^O1 %2$C2\6я┌п╣п╠я▐", &attack, ch );
 	}
     }
 }

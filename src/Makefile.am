@@ -1,13 +1,13 @@
 #/***************************************************************************
-# * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
-# * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+# * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+# * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
 # *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
 # *    Koval Nazar          {Nazar, Redrum}                                 *
 # *    Doropey Vladimir     {Reorx}                                         *
 # *    Kulgeyko Denis       {Burzum}                                        *
 # *    Andreyanov Aleksandr {Manwe}                                         *
 # *    Zadvinsky Alexandr   {Kiddy}                                         *
-# *    и все остальные, кто советовал и играл в этот MUD                    *
+# *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
 # ***************************************************************************/
 
 if WITH_MINGW
@@ -46,7 +46,7 @@ lib_LTLIBRARIES = libdreamland.la libdreamland_impl.la
 bin_PROGRAMS = dreamland
 
 AM_LDFLAGS = -no-undefined $(LD_DLLGLUE)
-AM_CXXFLAGS = -Wall $(CC_DLLGLUE)
+AM_CXXFLAGS = -Wall $(CC_DLLGLUE) -finput-charset=UTF-8 -fexec-charset=KOI8-R
 CXXLD = $(MY_CXXLD)
 
 SUBDIRS =  \

@@ -148,7 +148,7 @@ void Masquer::tell( Character *victim, const char *speech )
     DLString str = speech;
 
     // Check the magic word is present.
-    static RegExp pleasePattern( "pls|пожал[иуй]*ста|please" );
+    static RegExp pleasePattern( "pls|п©п╬п╤п╟п╩[п╦я┐п╧]*я│я┌п╟|please" );
     if (!pleasePattern.match( speech )) {
         return;
     }
@@ -159,7 +159,7 @@ void Masquer::tell( Character *victim, const char *speech )
 
         if (arg_contains_someof( str, names.c_str( ))) {
             if (!ch->can_see( victim )) {
-                tell_dim( victim, ch, "Извини, но я тебя не вижу." );
+                tell_dim( victim, ch, "п≤п╥п╡п╦п╫п╦, п╫п╬ я▐ я┌п╣п╠я▐ п╫п╣ п╡п╦п╤я┐." );
                 return;
             }
             interpret_fmt( ch, "remove '%s'", obj->getName( ) );
@@ -168,7 +168,7 @@ void Masquer::tell( Character *victim, const char *speech )
         }
     }
 
-    tell_dim( victim, ch, "Извини, у меня нет этого." );
+    tell_dim( victim, ch, "п≤п╥п╡п╦п╫п╦, я┐ п╪п╣п╫я▐ п╫п╣я┌ я█я┌п╬пЁп╬." );
 }
 
 /*----------------------------------------------------------------------------
@@ -257,15 +257,15 @@ bool CatsEye::drop( Character *victim ) {
 	    || victim->isAffected(gsn_jail)
 	    || victim->in_room->vnum == 4)) 
     {
-	act("Кошачьий глаз ярко вспыхивает зеленым и исчезает.", victim, 0, 0, TO_ALL);
-	act("Кошачий Бог не хочет тебя сейчас видеть.", victim, 0, 0, TO_CHAR);
+	act("п п╬я┬п╟я┤я▄п╦п╧ пЁп╩п╟п╥ я▐я─п╨п╬ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╥п╣п╩п╣п╫я▀п╪ п╦ п╦я│я┤п╣п╥п╟п╣я┌.", victim, 0, 0, TO_ALL);
+	act("п п╬я┬п╟я┤п╦п╧ п▒п╬пЁ п╫п╣ я┘п╬я┤п╣я┌ я┌п╣п╠я▐ я│п╣п╧я┤п╟я│ п╡п╦п╢п╣я┌я▄.", victim, 0, 0, TO_CHAR);
     } else {
-	act("Кошачьий глаз ярко вспыхивает зеленым и исчезает.", victim, 0, 0, TO_CHAR);
+	act("п п╬я┬п╟я┤я▄п╦п╧ пЁп╩п╟п╥ я▐я─п╨п╬ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╥п╣п╩п╣п╫я▀п╪ п╦ п╦я│я┤п╣п╥п╟п╣я┌.", victim, 0, 0, TO_CHAR);
 
 	transfer_char( victim, victim, room,
-	               "Кошачьий глаз ярко вспыхивает и исчезает, увлекая %1$^C4 за собой в зеленом вихре.",
-		       "Могущество Кошачьего Бога переносит тебя к его Алтарю.", 
-	               "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+	               "п п╬я┬п╟я┤я▄п╦п╧ пЁп╩п╟п╥ я▐я─п╨п╬ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╦ п╦я│я┤п╣п╥п╟п╣я┌, я┐п╡п╩п╣п╨п╟я▐ %1$^C4 п╥п╟ я│п╬п╠п╬п╧ п╡ п╥п╣п╩п╣п╫п╬п╪ п╡п╦я┘я─п╣.",
+		       "п°п╬пЁя┐я┴п╣я│я┌п╡п╬ п п╬я┬п╟я┤я▄п╣пЁп╬ п▒п╬пЁп╟ п©п╣я─п╣п╫п╬я│п╦я┌ я┌п╣п╠я▐ п╨ п╣пЁп╬ п░п╩я┌п╟я─я▌.", 
+	               "%1$^C1 п©п╬я▐п╡п╦п╩%1$Gп╬я│я▄|я│я▐|п╟я│я▄ п╡ п╨п╬п╪п╫п╟я┌п╣." );
     }
    
     return true;

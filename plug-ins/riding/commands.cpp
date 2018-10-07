@@ -33,72 +33,72 @@ CMDRUN( mount )
 	ostringstream buf;
 	
 	if (ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM)) {
-	    ch->println( "Да ты и так на коне." );
+	    ch->println( "п■п╟ я┌я▀ п╦ я┌п╟п╨ п╫п╟ п╨п╬п╫п╣." );
 	    return;
 	}
 	
 	trust = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeTrust>( "mount" );
 
 	if (trust->parse( constArguments, buf )) 
-	    ch->send_to( "Ездить на тебе верхом " );
+	    ch->send_to( "п∙п╥п╢п╦я┌я▄ п╫п╟ я┌п╣п╠п╣ п╡п╣я─я┘п╬п╪ " );
 	    
 	ch->println( buf.str( ) );
 	return;
     }
     
     if (MOUNTED(ch)) {
-	ch->println( "Ты уже верхом." );
+	ch->println( "п╒я▀ я┐п╤п╣ п╡п╣я─я┘п╬п╪." );
 	return;
     }
 
     if (RIDDEN(ch)) {
-	ch->pecho( "Но тебя сам%Gо|ого|у оседали!", ch );
+	ch->pecho( "п²п╬ я┌п╣п╠я▐ я│п╟п╪%Gп╬|п╬пЁп╬|я┐ п╬я│п╣п╢п╟п╩п╦!", ch );
 	return;
     }
 
     arg = args.getOneArgument( );
 
     if (( horse = get_char_room( ch, arg.c_str( ) ) ) == NULL) {
-	ch->println( "Кого ты хочешь оседлать?" );
+	ch->println( "п п╬пЁп╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п╬я│п╣п╢п╩п╟я┌я▄?" );
 	return;
     }
     
     if (MOUNTED(horse) || horse == ch) {
-	ch->pecho( "Мы не в цирке!" );
+	ch->pecho( "п°я▀ п╫п╣ п╡ я├п╦я─п╨п╣!" );
 	return;
     }
     
     if (RIDDEN(horse)) {
-	ch->pecho( "%1$^C1 уже оседла%1$Gно|н|на.", horse );
+	ch->pecho( "%1$^C1 я┐п╤п╣ п╬я│п╣п╢п╩п╟%1$Gп╫п╬|п╫|п╫п╟.", horse );
 	return;
     }
     
     if (!horse->is_npc( )) { /* pc-mounts like centaurs */
         if (!IS_SET(horse->form, FORM_CENTAUR)) {
-            act("$c1 пытается запрыгнуть верхом на $C4.", ch, 0, horse, TO_NOTVICT);
-            act("$c1 пытается запрыгнуть верхом на тебя.", ch, 0, horse, TO_VICT);
-            act("Ты пытаешься оседлать $C4, но никак не поймешь, где же у $X стремена..", ch, 0, horse, TO_CHAR);
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟п©я─я▀пЁп╫я┐я┌я▄ п╡п╣я─я┘п╬п╪ п╫п╟ $C4.", ch, 0, horse, TO_NOTVICT);
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟п©я─я▀пЁп╫я┐я┌я▄ п╡п╣я─я┘п╬п╪ п╫п╟ я┌п╣п╠я▐.", ch, 0, horse, TO_VICT);
+            act("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ $C4, п╫п╬ п╫п╦п╨п╟п╨ п╫п╣ п©п╬п╧п╪п╣я┬я▄, пЁп╢п╣ п╤п╣ я┐ $X я│я┌я─п╣п╪п╣п╫п╟..", ch, 0, horse, TO_CHAR);
             return;
         }
 	
 	trust = horse->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( "mount" );
 	if (!trust || !trust->check( ch )) {
-            act("$c1 пытается оседлать $C4. $C1 строго смотрит на $c4.", ch, 0, horse, TO_NOTVICT);
-            act("$c1 пытается оседлать тебя, но заметив твой строгий взгляд, останавливается.", ch, 0, horse, TO_VICT);
-            act("$C1 не желает, чтобы на $Z катались.", ch, 0, horse, TO_CHAR);
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ $C4. $C1 я│я┌я─п╬пЁп╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $c4.", ch, 0, horse, TO_NOTVICT);
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ я┌п╣п╠я▐, п╫п╬ п╥п╟п╪п╣я┌п╦п╡ я┌п╡п╬п╧ я│я┌я─п╬пЁп╦п╧ п╡п╥пЁп╩я▐п╢, п╬я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌я│я▐.", ch, 0, horse, TO_VICT);
+            act("$C1 п╫п╣ п╤п╣п╩п╟п╣я┌, я┤я┌п╬п╠я▀ п╫п╟ $Z п╨п╟я┌п╟п╩п╦я│я▄.", ch, 0, horse, TO_CHAR);
             return;
         }
     }
     else if (!ch->isCoder( )) { /* other rideable beasts */
 	if (!IS_SET(horse->act, ACT_RIDEABLE)) {
-            act("$c1 пытается запрыгнуть верхом на $C4, но соскальзывает.", ch, 0, horse, TO_NOTVICT);
-	    ch->println("Этот вид живых существ не предназначен для верховой езды.");
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟п©я─я▀пЁп╫я┐я┌я▄ п╡п╣я─я┘п╬п╪ п╫п╟ $C4, п╫п╬ я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌.", ch, 0, horse, TO_NOTVICT);
+	    ch->println("п╜я┌п╬я┌ п╡п╦п╢ п╤п╦п╡я▀я┘ я│я┐я┴п╣я│я┌п╡ п╫п╣ п©я─п╣п╢п╫п╟п╥п╫п╟я┤п╣п╫ п╢п╩я▐ п╡п╣я─я┘п╬п╡п╬п╧ п╣п╥п╢я▀.");
 	    return;
 	}
 	
 	if (horse->getModifyLevel( ) - ch->getModifyLevel( ) > 5) {
-            act("$c1 пытается оседлать $C4, но опыта явно не хватает.", ch, 0, horse, TO_NOTVICT);
-	    ch->println("Тебе не хватит опыта справиться с этим скакуном.");
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ $C4, п╫п╬ п╬п©я▀я┌п╟ я▐п╡п╫п╬ п╫п╣ я┘п╡п╟я┌п╟п╣я┌.", ch, 0, horse, TO_NOTVICT);
+	    ch->println("п╒п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╦я┌ п╬п©я▀я┌п╟ я│п©я─п╟п╡п╦я┌я▄я│я▐ я│ я█я┌п╦п╪ я│п╨п╟п╨я┐п╫п╬п╪.");
 	    return;
 	}
     }
@@ -107,17 +107,17 @@ CMDRUN( mount )
 	&& horse->master 
 	&& horse->master != ch) 
     {
-	ch->pecho("У %C2 уже есть хозяин, и это явно - не ты!", horse );
+	ch->pecho("пё %C2 я┐п╤п╣ п╣я│я┌я▄ я┘п╬п╥я▐п╦п╫, п╦ я█я┌п╬ я▐п╡п╫п╬ - п╫п╣ я┌я▀!", horse );
 	return;
     }
     
     if (horse->position < POS_STANDING) {
-	ch->pecho("%1$^C1 долж%1$Gно|ен|на для начала встать на ноги.", horse );
+	ch->pecho("%1$^C1 п╢п╬п╩п╤%1$Gп╫п╬|п╣п╫|п╫п╟ п╢п╩я▐ п╫п╟я┤п╟п╩п╟ п╡я│я┌п╟я┌я▄ п╫п╟ п╫п╬пЁп╦.", horse );
 	return;
     }
 
     if (ch->move < moveCost) {
-	ch->println("У тебя не хватает сил даже задрать ногу.");
+	ch->println("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩ п╢п╟п╤п╣ п╥п╟п╢я─п╟я┌я▄ п╫п╬пЁя┐.");
 	return;
     }
     
@@ -133,9 +133,9 @@ CMDRUN( mount )
 	     && number_percent( ) > gsn_riding->getEffective( ch ) 
 	     && !ch->isCoder( )) 
     {
-	act( "Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
-	act( "$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
-	act( "$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
+	act( "п╒п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╦п╩п╬ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п╬я│п╣п╢п╩п╟я┌я▄ $C4.", ch, 0, horse, TO_CHAR );
+	act( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ я┌п╣п╠я▐, п╫п╬ п╪п╟я│я┌п╣я─я│я┌п╡п╟ я▐п╡п╫п╬ п╫п╣ я┘п╡п╟я┌п╟п╣я┌.", ch, 0, horse, TO_VICT );
+	act( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ $C4, п╫п╬ п╪п╟я│я┌п╣я─я│я┌п╡п╟ я▐п╡п╫п╬ п╫п╣ я┘п╡п╟я┌п╟п╣я┌.", ch, 0, horse, TO_NOTVICT );
 	
 	ch->setWait( gsn_riding->getBeats( ) );
 	gsn_riding->improve( ch, false );
@@ -147,9 +147,9 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    act( "Ты запрыгиваешь на $C4.", ch, 0, horse, TO_CHAR );
-    act( "$c1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
-    act( "$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
+    act( "п╒я▀ п╥п╟п©я─я▀пЁп╦п╡п╟п╣я┬я▄ п╫п╟ $C4.", ch, 0, horse, TO_CHAR );
+    act( "$c1 п╥п╟п©я─я▀пЁп╦п╡п╟п╣я┌ я┌п╣п╠п╣ п╫п╟ я│п©п╦п╫я┐.", ch, 0, horse, TO_VICT );
+    act( "$c1 п╥п╟п©я─я▀пЁп╦п╡п╟п╣я┌ п╫п╟ я│п©п╦п╫я┐ $C2.", ch, 0, horse, TO_NOTVICT );
     
     gsn_riding->improve( ch, true);
 
@@ -159,7 +159,7 @@ CMDRUN( mount )
     HorseBridle::Pointer bridle;
     Skill *ridingSkill = &*gsn_horseback_riding;
     if (!horse->is_npc( ) && horse->getRace( ) != race_centaur) {
-	ch->println("Попробуй mlove.");
+	ch->println("п÷п╬п©я─п╬п╠я┐п╧ mlove.");
 	return;
     }
 
@@ -170,7 +170,7 @@ CMDRUN( mount )
 	    rideable = horse->getNPC( )->behavior.getDynamicPointer<Rideable>( );
 
 	if (!rideable) {
-	    ch->println("Этот вид живых существ не предназначен для верховой езды.");
+	    ch->println("п╜я┌п╬я┌ п╡п╦п╢ п╤п╦п╡я▀я┘ я│я┐я┴п╣я│я┌п╡ п╫п╣ п©я─п╣п╢п╫п╟п╥п╫п╟я┤п╣п╫ п╢п╩я▐ п╡п╣я─я┘п╬п╡п╬п╧ п╣п╥п╢я▀.");
 	    return;
 	}
 	
@@ -178,14 +178,14 @@ CMDRUN( mount )
     }
 
     if (abs( ch->size - horse->size ) > 1) {
-	ch->println("Подыщи кого-то более подходящего размера.");
+	ch->println("п÷п╬п╢я▀я┴п╦ п╨п╬пЁп╬-я┌п╬ п╠п╬п╩п╣п╣ п©п╬п╢я┘п╬п╢я▐я┴п╣пЁп╬ я─п╟п╥п╪п╣я─п╟.");
 	return;
     }
 
     if (horse->is_npc( ) 
 	&& horse->getModifyLevel( ) - ch->getModifyLevel( ) > ch->getModifyLevel / 10)
     {
-	ch->println("Тебе не хватит опыта справиться с этим скакуном.");
+	ch->println("п╒п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╦я┌ п╬п©я▀я┌п╟ я│п©я─п╟п╡п╦я┌я▄я│я▐ я│ я█я┌п╦п╪ я│п╨п╟п╨я┐п╫п╬п╪.");
 	return;
     }
 
@@ -193,7 +193,7 @@ CMDRUN( mount )
 	|| !obj->behavior
 	|| !( sadle = obj->behavior.getDynamicPointer<HorseSaddle>( ) ))
     {
-	ch->pecho("Как ты собираешься кататься? На %C6 нет седла.", horse);
+	ch->pecho("п п╟п╨ я┌я▀ я│п╬п╠п╦я─п╟п╣я┬я▄я│я▐ п╨п╟я┌п╟я┌я▄я│я▐? п²п╟ %C6 п╫п╣я┌ я│п╣п╢п╩п╟.", horse);
 	return;
     }
 
@@ -202,12 +202,12 @@ CMDRUN( mount )
 	&& ( bridle = obj->behavior.getDynamicPointer<HorseBridle>( ) ))
     {
 	if (bridle->isTethered( )) {
-	    ch->pecho("Тебе стоит для начала отвязать %C4.", horse );
+	    ch->pecho("п╒п╣п╠п╣ я│я┌п╬п╦я┌ п╢п╩я▐ п╫п╟я┤п╟п╩п╟ п╬я┌п╡я▐п╥п╟я┌я▄ %C4.", horse );
 	    return;
 	}
     }
     else if (horse->is_npc( )) {
-	ch->pecho("Как ты собираешься кататься? На %C6 нет уздечки.", horse );
+	ch->pecho("п п╟п╨ я┌я▀ я│п╬п╠п╦я─п╟п╣я┬я▄я│я▐ п╨п╟я┌п╟я┌я▄я│я▐? п²п╟ %C6 п╫п╣я┌ я┐п╥п╢п╣я┤п╨п╦.", horse );
 	return;
     }
 
@@ -215,17 +215,17 @@ CMDRUN( mount )
 	&& horse->master 
 	&& horse->master != ch) 
     {
-	ch->pecho("У %C2 уже есть хозяин, и это явно - не ты!", horse );
+	ch->pecho("пё %C2 я┐п╤п╣ п╣я│я┌я▄ я┘п╬п╥я▐п╦п╫, п╦ я█я┌п╬ я▐п╡п╫п╬ - п╫п╣ я┌я▀!", horse );
 	return;
     }
     
     if (horse->position < POS_STANDING) {
-	ch->pecho("%1$^C1 долж%1$Gно|ен|на для начала встать на ноги.", horse );
+	ch->pecho("%1$^C1 п╢п╬п╩п╤%1$Gп╫п╬|п╣п╫|п╫п╟ п╢п╩я▐ п╫п╟я┤п╟п╩п╟ п╡я│я┌п╟я┌я▄ п╫п╟ п╫п╬пЁп╦.", horse );
 	return;
     }
 
     if (ch->move < moveCost) {
-	ch->println("У тебя не хватает сил даже задрать ногу.");
+	ch->println("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩ п╢п╟п╤п╣ п╥п╟п╢я─п╟я┌я▄ п╫п╬пЁя┐.");
 	return;
     }
 
@@ -233,9 +233,9 @@ CMDRUN( mount )
     ch->setWait( ridingSkill->getBeats( ) );
     
     if (number_percent( ) > gsn_carry_rider->getEffective( horse )) {
-	act( "$C1 брыкается, и ты падаешь.", ch, 0, horse, TO_CHAR );
-	act( "$c1 пытается вскочить тебе на спину, но ты брыкаешься, и $e падает.", ch, 0, horse, TO_VICT );
-	act( "$c1 пытается вскочить на спину $C3, но $e брыкается и $c1 падает.", ch, 0, horse, TO_NOTVICT );
+	act( "$C1 п╠я─я▀п╨п╟п╣я┌я│я▐, п╦ я┌я▀ п©п╟п╢п╟п╣я┬я▄.", ch, 0, horse, TO_CHAR );
+	act( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╡я│п╨п╬я┤п╦я┌я▄ я┌п╣п╠п╣ п╫п╟ я│п©п╦п╫я┐, п╫п╬ я┌я▀ п╠я─я▀п╨п╟п╣я┬я▄я│я▐, п╦ $e п©п╟п╢п╟п╣я┌.", ch, 0, horse, TO_VICT );
+	act( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╡я│п╨п╬я┤п╦я┌я▄ п╫п╟ я│п©п╦п╫я┐ $C3, п╫п╬ $e п╠я─я▀п╨п╟п╣я┌я│я▐ п╦ $c1 п©п╟п╢п╟п╣я┌.", ch, 0, horse, TO_NOTVICT );
 
 	gsn_carry_rider->improve( horse, false );
 	ch->position = POS_SITTING;
@@ -243,9 +243,9 @@ CMDRUN( mount )
     }
 
     if (number_percent( ) > ridingSkill->getEffective( ch )) {
-	act( "Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
-	act( "$c1 пытается оседлать тебя, но опыта явно не хватает.", ch, 0, horse, TO_VICT );
-	act( "$c1 пытается оседлать $C4, но опыта явно не хватает.", ch, 0, horse, TO_NOTVICT );
+	act( "п╒п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╦п╩п╬ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п╬я│п╣п╢п╩п╟я┌я▄ $C4.", ch, 0, horse, TO_CHAR );
+	act( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ я┌п╣п╠я▐, п╫п╬ п╬п©я▀я┌п╟ я▐п╡п╫п╬ п╫п╣ я┘п╡п╟я┌п╟п╣я┌.", ch, 0, horse, TO_VICT );
+	act( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╬я│п╣п╢п╩п╟я┌я▄ $C4, п╫п╬ п╬п©я▀я┌п╟ я▐п╡п╫п╬ п╫п╣ я┘п╡п╟я┌п╟п╣я┌.", ch, 0, horse, TO_NOTVICT );
 
 	ridingSkill->improve( ch, false );
 	return;
@@ -256,9 +256,9 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    act( "Ты запрыгиваешь на $C4.", ch, 0, horse, TO_CHAR );
-    act( "$c1 запрыгивает тебе на спину.", ch, 0, horse, TO_VICT );
-    act( "$c1 запрыгивает на спину $C2.", ch, 0, horse, TO_NOTVICT );
+    act( "п╒я▀ п╥п╟п©я─я▀пЁп╦п╡п╟п╣я┬я▄ п╫п╟ $C4.", ch, 0, horse, TO_CHAR );
+    act( "$c1 п╥п╟п©я─я▀пЁп╦п╡п╟п╣я┌ я┌п╣п╠п╣ п╫п╟ я│п©п╦п╫я┐.", ch, 0, horse, TO_VICT );
+    act( "$c1 п╥п╟п©я─я▀пЁп╦п╡п╟п╣я┌ п╫п╟ я│п©п╦п╫я┐ $C2.", ch, 0, horse, TO_NOTVICT );
 
     ridingSkill->improve( ch, true );
 #endif    
@@ -273,19 +273,19 @@ CMDRUN( dismount )
      * jump off the horse 
      */
     if (!ch->mount) {
-	ch->println( "Ни над тобой, ни под тобой никого нет!" );
+	ch->println( "п²п╦ п╫п╟п╢ я┌п╬п╠п╬п╧, п╫п╦ п©п╬п╢ я┌п╬п╠п╬п╧ п╫п╦п╨п╬пЁп╬ п╫п╣я┌!" );
 	return;
     }
     
     if (MOUNTED(ch)) {
-	act( "Ты соскакиваешь со спины $C2.", ch, 0, ch->mount, TO_CHAR );
-	act( "$c1 соскакивает с твоей спины.", ch, 0, ch->mount, TO_VICT );
-	act( "$c1 спрыгивает с $C2.", ch, 0, ch->mount, TO_NOTVICT );
+	act( "п╒я▀ я│п╬я│п╨п╟п╨п╦п╡п╟п╣я┬я▄ я│п╬ я│п©п╦п╫я▀ $C2.", ch, 0, ch->mount, TO_CHAR );
+	act( "$c1 я│п╬я│п╨п╟п╨п╦п╡п╟п╣я┌ я│ я┌п╡п╬п╣п╧ я│п©п╦п╫я▀.", ch, 0, ch->mount, TO_VICT );
+	act( "$c1 я│п©я─я▀пЁп╦п╡п╟п╣я┌ я│ $C2.", ch, 0, ch->mount, TO_NOTVICT );
     }
     else {
-	act( "Ты сбрасываешь $C4 со спины.", ch, 0, ch->mount, TO_CHAR );
-	act( "$c1 сбрасывает тебя со спины.", ch, 0, ch->mount, TO_VICT );
-	act( "$c1 сбрасывает $C4 со спины.", ch, 0, ch->mount, TO_NOTVICT );
+	act( "п╒я▀ я│п╠я─п╟я│я▀п╡п╟п╣я┬я▄ $C4 я│п╬ я│п©п╦п╫я▀.", ch, 0, ch->mount, TO_CHAR );
+	act( "$c1 я│п╠я─п╟я│я▀п╡п╟п╣я┌ я┌п╣п╠я▐ я│п╬ я│п©п╦п╫я▀.", ch, 0, ch->mount, TO_VICT );
+	act( "$c1 я│п╠я─п╟я│я▀п╡п╟п╣я┌ $C4 я│п╬ я│п©п╦п╫я▀.", ch, 0, ch->mount, TO_NOTVICT );
     }
     
     ch->dismount( );
@@ -300,24 +300,24 @@ CMDRUN( dismount )
      * dismount victim 
      */
     if (( learned = gsn_dismount->getEffective( ch ) ) <= 1) {
-	ch->println("Ты не владеешь искусством стаскивать противника с лошади.");
+	ch->println("п╒я▀ п╫п╣ п╡п╩п╟п╢п╣п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬п╪ я│я┌п╟я│п╨п╦п╡п╟я┌я▄ п©я─п╬я┌п╦п╡п╫п╦п╨п╟ я│ п╩п╬я┬п╟п╢п╦.");
 	return;
     }
     
     arg = args.getOneArgument( );
 
     if (( victim = get_char_room( ch, arg.c_str( ) ) ) == NULL) {
-	ch->println( "Кого ты хочешь стащить с лошади?" );
+	ch->println( "п п╬пЁп╬ я┌я▀ я┘п╬я┤п╣я┬я▄ я│я┌п╟я┴п╦я┌я▄ я│ п╩п╬я┬п╟п╢п╦?" );
 	return;
     }
     
     if (!MOUNTED(victim)) {
-	ch->pecho("Но %C1 не в седле.", victim);
+	ch->pecho("п²п╬ %C1 п╫п╣ п╡ я│п╣п╢п╩п╣.", victim);
 	return;
     }
 
     if (victim == ch) {
-	ch->println("Стащить себя? Может, проще спрыгнуть?");
+	ch->println("п║я┌п╟я┴п╦я┌я▄ я│п╣п╠я▐? п°п╬п╤п╣я┌, п©я─п╬я┴п╣ я│п©я─я▀пЁп╫я┐я┌я▄?");
 	return;
     }
     
@@ -325,7 +325,7 @@ CMDRUN( dismount )
 	return;
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
-	ch->pecho("Но ведь %C1 - твой любимый хозяин!", victim);
+	ch->pecho("п²п╬ п╡п╣п╢я▄ %C1 - я┌п╡п╬п╧ п╩я▌п╠п╦п╪я▀п╧ я┘п╬п╥я▐п╦п╫!", victim);
 	return;
     }
     

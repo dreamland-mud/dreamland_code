@@ -45,21 +45,21 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
 	if (!gq->isLevelOK( ch ))
 	    continue;
 	    
-	buf << "         ë×ÅÓÔ " 
+	buf << "         ÐšÐ²ÐµÑÑ‚ " 
 	    << GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
-	    << GQChannel::NORMAL << " (ÄÌÑ ";
+	    << GQChannel::NORMAL << " (Ð´Ð»Ñ ";
 	    
 	if (gq->hasLevels( ))
 	    buf << GQChannel::BOLD << gq->getMinLevel( ) 
 		<< "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
 	else
-	    buf << "×ÓÅÈ";
+	    buf << "Ð²ÑÐµÑ…";
 	
-	buf << " ÕÒÏ×ÎÅÊ)" << endl;
+	buf << " ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹)" << endl;
     }
 
     if (!buf.str( ).empty( )) {
-	GQChannel::pecho( ch, "\r\nçÌÏÂÁÌØÎÙÅ Ë×ÅÓÔÙ, × ËÏÔÏÒÙÈ ÔÙ ÍÏÖÅÛØ ÐÒÉÎÑÔØ ÕÞÁÓÔÉÅ: ");
+	GQChannel::pecho( ch, "\r\nÐ“Ð»Ð¾Ð±Ð°Ð»ÑŒÐ½Ñ‹Ðµ ÐºÐ²ÐµÑÑ‚Ñ‹, Ð² ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ñ… Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ñ€Ð¸Ð½ÑÑ‚ÑŒ ÑƒÑ‡Ð°ÑÑ‚Ð¸Ðµ: ");
 	GQChannel::pecho( ch, buf );
     }
 }

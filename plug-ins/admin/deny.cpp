@@ -89,7 +89,7 @@ void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argu
     int time;
     
     if (ch->get_trust( ) < pcm->get_trust( )) {
-	ch->send_to( "Фигушки.\r\n" );
+	ch->send_to( "п╓п╦пЁя┐я┬п╨п╦.\r\n" );
 	return;
     }
     
@@ -109,10 +109,10 @@ void Deny::doPlace( Character *ch, PCMemoryInterface *pcm, const DLString & argu
 void Deny::doUsage( Character *ch )
 {
     ch->send_to( 
-	"Использование: \r\n"
-        "deny <name>         - показать, кто и на какой срок поденаил чара\r\n"
-	"deny <name> off     - снять deny\r\n"
-	"deny <name> <time>  - запретить доступ на время <time>\r\n" );
+	"п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: \r\n"
+        "deny <name>         - п©п╬п╨п╟п╥п╟я┌я▄, п╨я┌п╬ п╦ п╫п╟ п╨п╟п╨п╬п╧ я│я─п╬п╨ п©п╬п╢п╣п╫п╟п╦п╩ я┤п╟я─п╟\r\n"
+	"deny <name> off     - я│п╫я▐я┌я▄ deny\r\n"
+	"deny <name> <time>  - п╥п╟п©я─п╣я┌п╦я┌я▄ п╢п╬я│я┌я┐п© п╫п╟ п╡я─п╣п╪я▐ <time>\r\n" );
 }
 
 /*----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void XMLAttributeDeny::start( PCMemoryInterface *pcm ) const
 	ostringstream buf;
 	PCharacter *ch = pcm->getPlayer( );
 
-	buf << "Доступ к этому миру тебе запрещен " << getTimeString( true ) << "." << endl;
+	buf << "п■п╬я│я┌я┐п© п╨ я█я┌п╬п╪я┐ п╪п╦я─я┐ я┌п╣п╠п╣ п╥п╟п©я─п╣я┴п╣п╫ " << getTimeString( true ) << "." << endl;
 	ch->send_to( buf );
         ch->getAttributes( ).getAttr<XMLStringAttribute>( "quit_flags" )->setValue( "quiet forced" );
 	interpret_raw( ch, "quit", "" );
@@ -147,7 +147,7 @@ void XMLAttributeDeny::end( PCMemoryInterface *pcm ) const
 {
     std::basic_ostringstream<char> buf;
     
-    buf << "Время deny для " << pcm->getName( ) << " истекло. *shiver*" << endl; 
+    buf << "п▓я─п╣п╪я▐ deny п╢п╩я▐ " << pcm->getName( ) << " п╦я│я┌п╣п╨п╩п╬. *shiver*" << endl; 
     wiznet( WIZ_PENALTIES, 0, 0 , buf.str( ).c_str( ) );
 }
 

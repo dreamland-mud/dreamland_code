@@ -11,7 +11,7 @@ using namespace Scripting;
 
 const DLString RegContainer::TYPE = "RegContainer";
     
-NMI_INIT(RegContainer, "массив")
+NMI_INIT(RegContainer, "п╪п╟я│я│п╦п╡")
 
 Register 
 RegContainer::getField(const Register &key)

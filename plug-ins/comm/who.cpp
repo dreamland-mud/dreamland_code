@@ -53,9 +53,9 @@ COMMAND(Who, "who")
 	    continue;
 	}
 
-	if (arg == "tattoo" || arg == "татуировка") {
+	if (arg == "tattoo" || arg == "я┌п╟я┌я┐п╦я─п╬п╡п╨п╟") {
 	    if (!get_eq_char( ch, wear_tattoo )) {
-		ch->send_to( "У тебя нет татуировки!\n\r");
+		ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╟я┌я┐п╦я─п╬п╡п╨п╦!\n\r");
 		return;
 	    } else {
 		tattoo = get_eq_char( ch, wear_tattoo )->pIndexData->vnum;
@@ -65,14 +65,14 @@ COMMAND(Who, "who")
 
 	if (is_number( arg.c_str( ) )) {
 	    if (!ch->is_immortal( )) {
-		ch->send_to( "Синтаксис 'who <minlevel> <maxlevel>' доступен только богам.\r\n" );
+		ch->send_to( "п║п╦п╫я┌п╟п╨я│п╦я│ 'who <minlevel> <maxlevel>' п╢п╬я│я┌я┐п©п╣п╫ я┌п╬п╩я▄п╨п╬ п╠п╬пЁп╟п╪.\r\n" );
 		return;
 	    }
 	    
 	    switch (++nNumber) {
 	    case 1:	minLevel = atoi( arg.c_str( ) ); break;
 	    case 2:	maxLevel = atoi( arg.c_str( ) ); break;
-	    default:	ch->send_to( "Слишком много аргументов.\n\r"); return;
+	    default:	ch->send_to( "п║п╩п╦я┬п╨п╬п╪ п╪п╫п╬пЁп╬ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡.\n\r"); return;
 	    }
 
 	    continue;  
@@ -94,7 +94,7 @@ COMMAND(Who, "who")
 	    Race * race = raceManager->findUnstrict( arg );
 	    
 	    if (!race) {
-		ch->send_to( "Неправильная раса.\n\r");
+		ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╟я▐ я─п╟я│п╟.\n\r");
 		return;
 	    }
 	    
@@ -102,7 +102,7 @@ COMMAND(Who, "who")
 
 	} else { 
 	    if (!ch->is_immortal( )) {
-		ch->send_to( "Синтаксис 'who <имя класса>' доступен только богам.\r\n" );
+		ch->send_to( "п║п╦п╫я┌п╟п╨я│п╦я│ 'who <п╦п╪я▐ п╨п╩п╟я│я│п╟>' п╢п╬я│я┌я┐п©п╣п╫ я┌п╬п╩я▄п╨п╬ п╠п╬пЁп╟п╪.\r\n" );
 		return;
 	    }
 	    
@@ -169,11 +169,11 @@ COMMAND(Who, "who")
 	    count++;
     
     buf << endl 
-	<< "Всего игроков: " << victims.size( ) << ". "
-	<< "Максимум на сегодня был: " << Descriptor::getMaxOnline( ) << "." << endl;
+	<< "п▓я│п╣пЁп╬ п╦пЁя─п╬п╨п╬п╡: " << victims.size( ) << ". "
+	<< "п°п╟п╨я│п╦п╪я┐п╪ п╫п╟ я│п╣пЁп╬п╢п╫я▐ п╠я▀п╩: " << Descriptor::getMaxOnline( ) << "." << endl;
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && ch->getPC( )->getRemorts( ).size( ) == 0) 
-        buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl
-            << "Подробнее читай {W? подтверждение{x." << endl;
+        buf << "п▒я┐п╨п╡п╟ (U) я─я▐п╢п╬п╪ я│ я┌п╡п╬п╦п╪ п╦п╪п╣п╫п╣п╪ п╬п╥п╫п╟я┤п╟п╣я┌, я┤я┌п╬ я┌п╡п╬п╣ п╬п©п╦я│п╟п╫п╦п╣ п╣я┴п╣ п╫п╣ п╬п╢п╬п╠я─п╣п╫п╬ п╠п╬пЁп╟п╪п╦." << endl
+            << "п÷п╬п╢я─п╬п╠п╫п╣п╣ я┤п╦я┌п╟п╧ {W? п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣{x." << endl;
     ch->send_to( buf );
 }
 

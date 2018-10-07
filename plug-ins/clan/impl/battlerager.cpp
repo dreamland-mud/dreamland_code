@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "battlerager.h"
@@ -80,7 +80,7 @@ PersonalBattleragerPoncho::~PersonalBattleragerPoncho( )
 
 /*
  * 'chop' skill command
- * 'chop leg|arm|head|рука|нога|голова <corpse>'
+ * 'chop leg|arm|head|я─я┐п╨п╟|п╫п╬пЁп╟|пЁп╬п╩п╬п╡п╟ <corpse>'
  */
 CMDRUNP( chop )
 {
@@ -90,7 +90,7 @@ CMDRUNP( chop )
     int vnum;
 
     if (!gsn_trophy->available( ch )) {
-	ch->println( "Ась?" );
+	ch->println( "п░я│я▄?" );
 	return;
     }
 
@@ -101,55 +101,55 @@ CMDRUNP( chop )
     argBody = args.getOneArgument( );
 
     if (argPart.empty( )) {
-	ch->println( "Какую часть тела ты хочешь отрубить - ногу, голову или руку?" );
+	ch->println( "п п╟п╨я┐я▌ я┤п╟я│я┌я▄ я┌п╣п╩п╟ я┌я▀ я┘п╬я┤п╣я┬я▄ п╬я┌я─я┐п╠п╦я┌я▄ - п╫п╬пЁя┐, пЁп╬п╩п╬п╡я┐ п╦п╩п╦ я─я┐п╨я┐?" );
 	return;
     }
 
-    if (arg_oneof( argPart, "leg", "нога", "ногу" )) {
+    if (arg_oneof( argPart, "leg", "п╫п╬пЁп╟", "п╫п╬пЁя┐" )) {
 	part = PART_LEGS;
 	vnum = OBJ_VNUM_SLICED_LEG;
     }
-    else if (arg_oneof( argPart, "arm", "рука", "руку" )) {
+    else if (arg_oneof( argPart, "arm", "я─я┐п╨п╟", "я─я┐п╨я┐" )) {
 	part = PART_ARMS;
 	vnum = OBJ_VNUM_SLICED_ARM;
     }
-    else if (arg_oneof( argPart, "head", "голова", "голову" )) {
+    else if (arg_oneof( argPart, "head", "пЁп╬п╩п╬п╡п╟", "пЁп╬п╩п╬п╡я┐" )) {
 	part = PART_HEAD;
 	vnum = OBJ_VNUM_SEVERED_HEAD;
     }
     else {
-	ch->println( "Ты можешь отрубить только ногу, голову или руку." );
+	ch->println( "п╒я▀ п╪п╬п╤п╣я┬я▄ п╬я┌я─я┐п╠п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╫п╬пЁя┐, пЁп╬п╩п╬п╡я┐ п╦п╩п╦ я─я┐п╨я┐." );
 	return;
     }
 
     if (argBody.empty( )) {
-	ch->println( "От какого трупа ты хочешь отрубить кусок?" );
+	ch->println( "п·я┌ п╨п╟п╨п╬пЁп╬ я┌я─я┐п©п╟ я┌я▀ я┘п╬я┤п╣я┬я▄ п╬я┌я─я┐п╠п╦я┌я▄ п╨я┐я│п╬п╨?" );
 	return;
     }
 
     if (!( corpse = get_obj_here( ch, argBody.c_str( ) ) )) {
-	ch->println( "Здесь нет такого трупа." );
+	ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ я┌п╟п╨п╬пЁп╬ я┌я─я┐п©п╟." );
 	return;
     }
 
     if (corpse->item_type != ITEM_CORPSE_PC && corpse->item_type != ITEM_CORPSE_NPC) {
-	ch->println( "Это не труп." );
+	ch->println( "п╜я┌п╬ п╫п╣ я┌я─я┐п©." );
 	return;
     }
 
     if (!IS_SET(corpse->value[2], part)) {
-	ch->pecho( "У этого трупа нету %s.", 
+	ch->pecho( "пё я█я┌п╬пЁп╬ я┌я─я┐п©п╟ п╫п╣я┌я┐ %s.", 
 		   part_flags.messages( part, '2' ).c_str( ) );
 	return;
     }
     
     if (!( axe = get_wield( ch, false ) )) {
-	ch->println( "Чем рубить будешь?" );
+	ch->println( "п╖п╣п╪ я─я┐п╠п╦я┌я▄ п╠я┐п╢п╣я┬я▄?" );
 	return;
     }
 
     if (axe->value[3] != DAMW_SLASH && axe->value[3] != DAMW_CHOP && axe->value[3] != DAMW_SLICE) {
-	ch->println( "Твоим оружием неудобно это делать." );
+	ch->println( "п╒п╡п╬п╦п╪ п╬я─я┐п╤п╦п╣п╪ п╫п╣я┐п╢п╬п╠п╫п╬ я█я┌п╬ п╢п╣п╩п╟я┌я▄." );
 	return;
     }
 
@@ -159,15 +159,15 @@ CMDRUNP( chop )
     DLString what = part_flags.messages( part, '4' );
 
     if (number_percent( ) > 2 * gsn_trophy->getEffective( ch ) / 3) {
-	ch->pecho( "Ты лупишь оружием плашмя, превращая %s трупа в кровавое месиво.",
+	ch->pecho( "п╒я▀ п╩я┐п©п╦я┬я▄ п╬я─я┐п╤п╦п╣п╪ п©п╩п╟я┬п╪я▐, п©я─п╣п╡я─п╟я┴п╟я▐ %s я┌я─я┐п©п╟ п╡ п╨я─п╬п╡п╟п╡п╬п╣ п╪п╣я│п╦п╡п╬.",
 		   what.c_str( ) );
-	ch->recho( "%^C1 плашмя лупит оружием по %O3.", ch, corpse ); 
+	ch->recho( "%^C1 п©п╩п╟я┬п╪я▐ п╩я┐п©п╦я┌ п╬я─я┐п╤п╦п╣п╪ п©п╬ %O3.", ch, corpse ); 
 	gsn_trophy->improve( ch, false );
 	return;
     }
 
-    ch->pecho( "Ты отсекаешь %s от %O2.", what.c_str( ), corpse );
-    ch->recho( "%^C1 отсекает %s от %O2.", ch, what.c_str( ), corpse );
+    ch->pecho( "п╒я▀ п╬я┌я│п╣п╨п╟п╣я┬я▄ %s п╬я┌ %O2.", what.c_str( ), corpse );
+    ch->recho( "%^C1 п╬я┌я│п╣п╨п╟п╣я┌ %s п╬я┌ %O2.", ch, what.c_str( ), corpse );
     bodypart_create( vnum, 0, corpse );
     gsn_trophy->improve( ch, true );
 }
@@ -188,7 +188,7 @@ SKILL_RUNP( trophy )
     argument = one_argument( argument, arg );
 
     if (!gsn_trophy->available( ch )) {
-	ch->println( "Ась?" );
+	ch->println( "п░я│я▄?" );
 	return;
     }
 
@@ -197,25 +197,25 @@ SKILL_RUNP( trophy )
 
     if (ch->isAffected(gsn_trophy))
     {
-	ch->println( "Но у тебя уже есть один трофей!" );
+	ch->println( "п²п╬ я┐ я┌п╣п╠я▐ я┐п╤п╣ п╣я│я┌я▄ п╬п╢п╦п╫ я┌я─п╬я└п╣п╧!" );
 	return;
     }
 
     if (ch->mana < mana)
     {
-	ch->println( "Ты слишком слаб, чтоб сконцентрироваться." );
+	ch->println( "п╒я▀ я│п╩п╦я┬п╨п╬п╪ я│п╩п╟п╠, я┤я┌п╬п╠ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐." );
 	return;
     }
 
     if (arg[0] == '\0')
     {
-	ch->println( "Что именно ты хочешь превратить в трофей?" );
+	ch->println( "п╖я┌п╬ п╦п╪п╣п╫п╫п╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п©я─п╣п╡я─п╟я┌п╦я┌я▄ п╡ я┌я─п╬я└п╣п╧?" );
 	return;
     }
 
     if ( ( part = get_obj_carry( ch, arg ) ) == 0 )
     {
-	ch->println( "У тебя нету такой части тела." );
+	ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌я┐ я┌п╟п╨п╬п╧ я┤п╟я│я┌п╦ я┌п╣п╩п╟." );
 	return;
     }
 
@@ -229,27 +229,27 @@ SKILL_RUNP( trophy )
 	trophy_vnum = OBJ_VNUM_BATTLE_PONCHO;
     break;
     case OBJ_VNUM_BRAINS:
-	ch->println( "А почему бы тебе просто не съесть их?" );
+	ch->println( "п░ п©п╬я┤п╣п╪я┐ п╠я▀ я┌п╣п╠п╣ п©я─п╬я│я┌п╬ п╫п╣ я│я┼п╣я│я┌я▄ п╦я┘?" );
 	return;
     default:
-	ch->println( "Ты не можешь превратить это в трофей!" );
+	ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©я─п╣п╡я─п╟я┌п╦я┌я▄ я█я┌п╬ п╡ я┌я─п╬я└п╣п╧!" );
 	return;
     }
 
     if (part->from[0] == '\0')
     {
-	ch->println( "Это какая-то неправильная часть тела." );
+	ch->println( "п╜я┌п╬ п╨п╟п╨п╟я▐-я┌п╬ п╫п╣п©я─п╟п╡п╦п╩я▄п╫п╟я▐ я┤п╟я│я┌я▄ я┌п╣п╩п╟." );
 	return;
     }
 
     if (part->level < ch->getModifyLevel( ) - 20) {
-	ch->println( "Эта часть тела слишком мала для трофея." );
+	ch->println( "п╜я┌п╟ я┤п╟я│я┌я▄ я┌п╣п╩п╟ я│п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╟ п╢п╩я▐ я┌я─п╬я└п╣я▐." );
 	return;
     }
 
     if (number_percent( ) > (gsn_trophy->getEffective( ch )/3)*2)
     {
-	ch->println( "Твоя попытка не удалась, и ты разрушаешь это." );
+	ch->println( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╫п╣ я┐п╢п╟п╩п╟я│я▄, п╦ я┌я▀ я─п╟п╥я─я┐я┬п╟п╣я┬я▄ я█я┌п╬." );
 	extract_obj(part);
 	return;
     }
@@ -312,8 +312,8 @@ SKILL_RUNP( trophy )
 	    obj_to_char(trophy, ch);
 	    gsn_trophy->improve( ch, true );
 
-	    act_p("Ты изготавливаешь пончо из $o2!",ch,part,0,TO_CHAR,POS_RESTING);
-	    act_p("$c1 изготавливает пончо из $o2!",ch,part,0,TO_ROOM,POS_RESTING);
+	    act_p("п╒я▀ п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┬я▄ п©п╬п╫я┤п╬ п╦п╥ $o2!",ch,part,0,TO_CHAR,POS_RESTING);
+	    act_p("$c1 п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┌ п©п╬п╫я┤п╬ п╦п╥ $o2!",ch,part,0,TO_ROOM,POS_RESTING);
 
 	    extract_obj(part);
 	    return;
@@ -321,7 +321,7 @@ SKILL_RUNP( trophy )
     }
     else
     {
-	ch->println( "Ты разрушаешь это." );
+	ch->println( "п╒я▀ я─п╟п╥я─я┐я┬п╟п╣я┬я▄ я█я┌п╬." );
 	extract_obj(part);
 	ch->mana -= mana / 2;
 	gsn_trophy->improve( ch, false );
@@ -347,11 +347,11 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
 	if ( number_percent( ) < chance )
 	{
 	    int dam;
-	    act_p("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x",
+	    act_p("{Rп╒п╡п╬п╧ п╪п╬п╩п╫п╦п╣п╫п╬я│п╫я▀п╧ я┐п╢п╟я─ п╡ п╬п╢п╫п╬ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╩п╦я┬п╟п╣я┌ $C4 п╤п╦п╥п╫п╦!{x",
 		ch,0,victim,TO_CHAR,POS_RESTING);
-	    act_p("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x",
+	    act_p("{Rп°п╬п╩п╫п╦п╣п╫п╬я│п╫я▀п╧ я┐п╢п╟я─ $c2 п╡ п╬п╢п╫п╬ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╩п╦я┬п╟п╣я┌ $C4 п╤п╦п╥п╫п╦!{x",
 		ch,0,victim,TO_NOTVICT,POS_RESTING);
-	    act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x",
+	    act_p("{Rп°п╬п╩п╫п╦п╣п╫п╬я│п╫я▀п╧ я┐п╢п╟я─ $c2 п╡ п╬п╢п╫п╬ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╩п╦я┬п╟п╣я┌ я┌п╣п╠я▐ п╤п╦п╥п╫п╦!{x",
 		ch,0,victim,TO_VICT,POS_DEAD);
 	    dam = ( victim->hit + 1 ) * ch->getPC( )->curse / 100;
 	    damage(ch,victim,(victim->hit + 1),gsn_mortal_strike,DAM_NONE, true);
@@ -375,7 +375,7 @@ SKILL_RUNP( bloodthirst )
 
     if (!gsn_bloodthirst->available( ch ))
     {
-	ch->println( "Ты не знаешь что такое жажда." );
+	ch->println( "п╒я▀ п╫п╣ п╥п╫п╟п╣я┬я▄ я┤я┌п╬ я┌п╟п╨п╬п╣ п╤п╟п╤п╢п╟." );
 	return;
     }
 
@@ -386,19 +386,19 @@ SKILL_RUNP( bloodthirst )
 
     if (IS_AFFECTED(ch,AFF_BLOODTHIRST) || ch->isAffected(gsn_bloodthirst) )
     {
-	ch->println( "Ты уже давно жаждешь крови." );
+	ch->println( "п╒я▀ я┐п╤п╣ п╢п╟п╡п╫п╬ п╤п╟п╤п╢п╣я┬я▄ п╨я─п╬п╡п╦." );
 	return;
     }
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-	ch->println( "Ты слишком миролюбив, чтоб жаждать крови." );
+	ch->println( "п╒я▀ я│п╩п╦я┬п╨п╬п╪ п╪п╦я─п╬п╩я▌п╠п╦п╡, я┤я┌п╬п╠ п╤п╟п╤п╢п╟я┌я▄ п╨я─п╬п╡п╦." );
 	return;
     }
 
     if (ch->fighting == 0)
       {
-	ch->println( "Для этого ты должен сражаться." );
+	ch->println( "п■п╩я▐ я█я┌п╬пЁп╬ я┌я▀ п╢п╬п╩п╤п╣п╫ я│я─п╟п╤п╟я┌я▄я│я▐." );
 	return;
       }
 
@@ -414,8 +414,8 @@ SKILL_RUNP( bloodthirst )
 	ch->setWaitViolence( 1 );
 
 
-	ch->println( "Ты жаждешь {rкрови!{x" );
-	act_p("Глаза $c2 загораются кровожадным огнем.",
+	ch->println( "п╒я▀ п╤п╟п╤п╢п╣я┬я▄ {rп╨я─п╬п╡п╦!{x" );
+	act_p("п⌠п╩п╟п╥п╟ $c2 п╥п╟пЁп╬я─п╟я▌я┌я│я▐ п╨я─п╬п╡п╬п╤п╟п╢п╫я▀п╪ п╬пЁп╫п╣п╪.",
                ch,0,0,TO_ROOM,POS_RESTING);
 	gsn_bloodthirst->improve( ch, true );
 
@@ -441,7 +441,7 @@ SKILL_RUNP( bloodthirst )
     {
 	ch->setWaitViolence( 3 );
 
-	ch->println( "На миг ты чувствуешь себя кровожадно, но это быстро проходит." );
+	ch->println( "п²п╟ п╪п╦пЁ я┌я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╨я─п╬п╡п╬п╤п╟п╢п╫п╬, п╫п╬ я█я┌п╬ п╠я▀я│я┌я─п╬ п©я─п╬я┘п╬п╢п╦я┌." );
 	gsn_bloodthirst->improve( ch, false );
     }
 }
@@ -460,7 +460,7 @@ SKILL_RUNP( spellbane )
 
 	if (ch->isAffected(gsn_spellbane))
 	{
-		ch->println( "Ты уже отражаешь заклинания." );
+		ch->println( "п╒я▀ я┐п╤п╣ п╬я┌я─п╟п╤п╟п╣я┬я▄ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐." );
 		return;
 	}
 
@@ -476,8 +476,8 @@ SKILL_RUNP( spellbane )
 
 	affect_to_char(ch,&af);
 
-	act_p("Ненависть к магии окружает тебя.",ch,0,0,TO_CHAR,POS_RESTING);
-	act_p("$c1 распространяет вокруг себя ненависть к магии.", ch,0,0,TO_ROOM,POS_RESTING);
+	act_p("п²п╣п╫п╟п╡п╦я│я┌я▄ п╨ п╪п╟пЁп╦п╦ п╬п╨я─я┐п╤п╟п╣я┌ я┌п╣п╠я▐.",ch,0,0,TO_CHAR,POS_RESTING);
+	act_p("$c1 я─п╟я│п©я─п╬я│я┌я─п╟п╫я▐п╣я┌ п╡п╬п╨я─я┐пЁ я│п╣п╠я▐ п╫п╣п╫п╟п╡п╦я│я┌я▄ п╨ п╪п╟пЁп╦п╦.", ch,0,0,TO_ROOM,POS_RESTING);
 }
 
 /*
@@ -496,13 +496,13 @@ SKILL_RUNP( resistance )
 
 	if (ch->isAffected(gsn_resistance))
 	{
-		ch->println( "Ты уже защищен. Больше уже некуда." );
+		ch->println( "п╒я▀ я┐п╤п╣ п╥п╟я┴п╦я┴п╣п╫. п▒п╬п╩я▄я┬п╣ я┐п╤п╣ п╫п╣п╨я┐п╢п╟." );
 		return;
 	}
 
 	if ( ch->mana < mana )
 	{
-		ch->println( "У тебя недостаточно энергии для этого." );
+		ch->println( "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬." );
 		return;
 	}
 
@@ -524,16 +524,16 @@ SKILL_RUNP( resistance )
       affect_to_char(ch,&af);
       ch->mana -= mana;
 
-      act_p("Ты чувствуешь себя крепче!",ch,0,0,TO_CHAR,POS_RESTING);
-      act_p("$c1 выглядит покрепче.",ch,0,0,TO_ROOM,POS_RESTING);
+      act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╨я─п╣п©я┤п╣!",ch,0,0,TO_CHAR,POS_RESTING);
+      act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п©п╬п╨я─п╣п©я┤п╣.",ch,0,0,TO_ROOM,POS_RESTING);
       gsn_resistance->improve( ch, true );
     }
   else
     {
       ch->mana -= mana / 2;
 
-     ch->println( "Ты напрягаешь свои мускулы, но это все впустую." );
-      act_p("$c1 играет мускулами, пытаясь выглядеть крепче.",
+     ch->println( "п╒я▀ п╫п╟п©я─я▐пЁп╟п╣я┬я▄ я│п╡п╬п╦ п╪я┐я│п╨я┐п╩я▀, п╫п╬ я█я┌п╬ п╡я│п╣ п╡п©я┐я│я┌я┐я▌." );
+      act_p("$c1 п╦пЁя─п╟п╣я┌ п╪я┐я│п╨я┐п╩п╟п╪п╦, п©я▀я┌п╟я▐я│я▄ п╡я▀пЁп╩я▐п╢п╣я┌я▄ п╨я─п╣п©я┤п╣.",
 	     ch,0,0,TO_ROOM,POS_RESTING);
       gsn_resistance->improve( ch, false );
     }
@@ -551,7 +551,7 @@ SKILL_RUNP( truesight )
 
   if (!gsn_truesight->available( ch ))
   {
-    ch->println( "Ась?" );
+    ch->println( "п░я│я▄?" );
     return;
   }
 
@@ -560,13 +560,13 @@ SKILL_RUNP( truesight )
 
   if (ch->isAffected(gsn_truesight))
     {
-      ch->println( "Твои глаза настолько зорки, насколько это возможно." );
+      ch->println( "п╒п╡п╬п╦ пЁп╩п╟п╥п╟ п╫п╟я│я┌п╬п╩я▄п╨п╬ п╥п╬я─п╨п╦, п╫п╟я│п╨п╬п╩я▄п╨п╬ я█я┌п╬ п╡п╬п╥п╪п╬п╤п╫п╬." );
       return;
     }
 
   if (ch->mana < mana)
     {
-      ch->println( "У тебя не хватает энергии для этого." );
+      ch->println( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬." );
       return;
     }
 
@@ -591,7 +591,7 @@ SKILL_RUNP( truesight )
       af.bitvector = DETECT_IMP_INVIS;
       affect_to_char(ch,&af);
 
-// Нечего ! Корвин.
+// п²п╣я┤п╣пЁп╬ ! п п╬я─п╡п╦п╫.
 //      af.bitvector = ACUTE_VISION;
 //      affect_to_char(ch,&af);
 
@@ -600,16 +600,16 @@ SKILL_RUNP( truesight )
 
       ch->mana -= mana; 
 
-      act_p("Ты зорко смотришь вокруг!",ch,0,0,TO_CHAR,POS_RESTING);
-      act_p("$c1 смотрит более зорко.",ch,0,0,TO_ROOM,POS_RESTING);
+      act_p("п╒я▀ п╥п╬я─п╨п╬ я│п╪п╬я┌я─п╦я┬я▄ п╡п╬п╨я─я┐пЁ!",ch,0,0,TO_CHAR,POS_RESTING);
+      act_p("$c1 я│п╪п╬я┌я─п╦я┌ п╠п╬п╩п╣п╣ п╥п╬я─п╨п╬.",ch,0,0,TO_ROOM,POS_RESTING);
       gsn_truesight->improve( ch, true );
     }
   else
     {
       ch->mana -= mana / 2;
 
-     ch->println( "Ты зорко смотришь вокруг, но не видишь ничего нового." );
-      act_p("$c1 зорко смотрит вокруг, но ничего нового не замечает.",
+     ch->println( "п╒я▀ п╥п╬я─п╨п╬ я│п╪п╬я┌я─п╦я┬я▄ п╡п╬п╨я─я┐пЁ, п╫п╬ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п╫п╬п╡п╬пЁп╬." );
+      act_p("$c1 п╥п╬я─п╨п╬ я│п╪п╬я┌я─п╦я┌ п╡п╬п╨я─я┐пЁ, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╬п╡п╬пЁп╬ п╫п╣ п╥п╟п╪п╣я┤п╟п╣я┌.",
 	     ch,0,0,TO_ROOM,POS_RESTING);
       gsn_truesight->improve( ch, false );
     }
@@ -630,20 +630,20 @@ SKILL_RUNP( bandage )
 
 	if ( gsn_bandage->getEffective( ch ) == 0)
 	{
-		ch->println( "Что?" );
+		ch->println( "п╖я┌п╬?" );
 		return;
 	}
 
 	if ( IS_AFFECTED(ch,AFF_REGENERATION) || ch->isAffected(gsn_bandage) )
 	{
-		act_p("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR,POS_RESTING);
+		act_p("п╒я▀ я┐п╤п╣ п©п╣я─п╣п╡я▐п╥п╟$gп╩п╬|п╩|п╩п╟ я│п╡п╬п╦ я─п╟п╫я▀!",ch,0,0,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if (SHADOW(ch))
 	{
-		ch->println( "Как это наверное интересно смотрится со стороны - бинтовать собственную тень." );
-		act_p("$c1 пытается забинтовать свою собственную тень\n\r...похоже кому-то нужен доктор.",
+		ch->println( "п п╟п╨ я█я┌п╬ п╫п╟п╡п╣я─п╫п╬п╣ п╦п╫я┌п╣я─п╣я│п╫п╬ я│п╪п╬я┌я─п╦я┌я│я▐ я│п╬ я│я┌п╬я─п╬п╫я▀ - п╠п╦п╫я┌п╬п╡п╟я┌я▄ я│п╬п╠я│я┌п╡п╣п╫п╫я┐я▌ я┌п╣п╫я▄." );
+		act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟п╠п╦п╫я┌п╬п╡п╟я┌я▄ я│п╡п╬я▌ я│п╬п╠я│я┌п╡п╣п╫п╫я┐я▌ я┌п╣п╫я▄\n\r...п©п╬я┘п╬п╤п╣ п╨п╬п╪я┐-я┌п╬ п╫я┐п╤п╣п╫ п╢п╬п╨я┌п╬я─.",
 			ch, 0, 0, TO_ROOM,POS_RESTING);
 		return;
 	}
@@ -655,14 +655,14 @@ SKILL_RUNP( bandage )
 
 		ch->setWaitViolence( 1 );
 
-		ch->println( "Ты накладываешь повязку на свою рану!" );
-		act_p("$c1 перевязывает свои раны.",ch,0,0,TO_ROOM,POS_RESTING);
+		ch->println( "п╒я▀ п╫п╟п╨п╩п╟п╢я▀п╡п╟п╣я┬я▄ п©п╬п╡я▐п╥п╨я┐ п╫п╟ я│п╡п╬я▌ я─п╟п╫я┐!" );
+		act_p("$c1 п©п╣я─п╣п╡я▐п╥я▀п╡п╟п╣я┌ я│п╡п╬п╦ я─п╟п╫я▀.",ch,0,0,TO_ROOM,POS_RESTING);
 		gsn_bandage->improve( ch, true );
 
 		heal = ch->applyCurse( dice(4, 8 ) + ch->getModifyLevel() / 2 );
 		ch->hit = min( ch->hit + heal, (int)ch->max_hit );
 		update_pos( ch );
-		ch->println( "Тебе становится лучше!" );
+		ch->println( "п╒п╣п╠п╣ я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╩я┐я┤я┬п╣!" );
 
 		af.where	= TO_AFFECTS;
 		af.type		= gsn_bandage;
@@ -677,7 +677,7 @@ SKILL_RUNP( bandage )
 	{
 		ch->setWaitViolence( 1 );
 
-		ch->println( "Ты пытаешься перевязать свои раны, но пальцы не слушаются тебя." );
+		ch->println( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п©п╣я─п╣п╡я▐п╥п╟я┌я▄ я│п╡п╬п╦ я─п╟п╫я▀, п╫п╬ п©п╟п╩я▄я├я▀ п╫п╣ я│п╩я┐я┬п╟я▌я┌я│я▐ я┌п╣п╠я▐." );
 		gsn_bandage->improve( ch, false );
 	}
 }
@@ -700,24 +700,24 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
 			    || !healPets))
 	|| (!wch->is_npc( ) && wch->getClan( ) != clan)) 
     {
-	do_say(ch, "Я не хочу помогать тебе.");
+	do_say(ch, "п╞ п╫п╣ я┘п╬я┤я┐ п©п╬п╪п╬пЁп╟я┌я▄ я┌п╣п╠п╣.");
 	return;
     }
 
     if (!IS_AFFECTED(wch,AFF_BLIND) && !IS_AFFECTED(wch,AFF_PLAGUE)
 	 && !IS_AFFECTED(wch,AFF_POISON) && !IS_AFFECTED(wch,AFF_CURSE) )
     {
-	do_say(ch, "Ты не нуждаешься в моей помощи.");
+	do_say(ch, "п╒я▀ п╫п╣ п╫я┐п╤п╢п╟п╣я┬я▄я│я▐ п╡ п╪п╬п╣п╧ п©п╬п╪п╬я┴п╦.");
 	return;
     }
 
-    act_p("$c1 дает тебе лечебное зелье, предлагая сьесть его.",
+    act_p("$c1 п╢п╟п╣я┌ я┌п╣п╠п╣ п╩п╣я┤п╣п╠п╫п╬п╣ п╥п╣п╩я▄п╣, п©я─п╣п╢п╩п╟пЁп╟я▐ я│я▄п╣я│я┌я▄ п╣пЁп╬.",
            ch,0,wch,TO_VICT,POS_RESTING);
-    act_p("Ты съедаешь лечебное зелье.",ch,0,wch,TO_VICT,POS_RESTING);
-    act_p("Ты передаешь лечебное зелье $C3.",ch,0,wch,TO_CHAR,POS_RESTING);
-    act_p("$C1 съедает лечебное зелье, данное тобой.",ch,0,wch,TO_CHAR,POS_RESTING);
-    act_p("$c1 дает лечебное зелье $C3.",ch,0,wch,TO_NOTVICT,POS_RESTING);
-    act_p("$C1 съедает лечебное зелье, которое $m да$gло|л|ла $c1.",ch,0,wch,TO_NOTVICT,POS_RESTING);
+    act_p("п╒я▀ я│я┼п╣п╢п╟п╣я┬я▄ п╩п╣я┤п╣п╠п╫п╬п╣ п╥п╣п╩я▄п╣.",ch,0,wch,TO_VICT,POS_RESTING);
+    act_p("п╒я▀ п©п╣я─п╣п╢п╟п╣я┬я▄ п╩п╣я┤п╣п╠п╫п╬п╣ п╥п╣п╩я▄п╣ $C3.",ch,0,wch,TO_CHAR,POS_RESTING);
+    act_p("$C1 я│я┼п╣п╢п╟п╣я┌ п╩п╣я┤п╣п╠п╫п╬п╣ п╥п╣п╩я▄п╣, п╢п╟п╫п╫п╬п╣ я┌п╬п╠п╬п╧.",ch,0,wch,TO_CHAR,POS_RESTING);
+    act_p("$c1 п╢п╟п╣я┌ п╩п╣я┤п╣п╠п╫п╬п╣ п╥п╣п╩я▄п╣ $C3.",ch,0,wch,TO_NOTVICT,POS_RESTING);
+    act_p("$C1 я│я┼п╣п╢п╟п╣я┌ п╩п╣я┤п╣п╠п╫п╬п╣ п╥п╣п╩я▄п╣, п╨п╬я┌п╬я─п╬п╣ $m п╢п╟$gп╩п╬|п╩|п╩п╟ $c1.",ch,0,wch,TO_NOTVICT,POS_RESTING);
 
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
 
@@ -749,8 +749,8 @@ bool ClanGuardBattlerager::specFight( )
 
     if ( number_percent() < 33 )
     {
-	    act("Ты наносишь тройной удар смертоносной силы!",ch,0,0,TO_CHAR);
-	    act("$c1 наносит тройной удар смертоносной силы!",ch,0,0,TO_ROOM);
+	    act("п╒я▀ п╫п╟п╫п╬я│п╦я┬я▄ я┌я─п╬п╧п╫п╬п╧ я┐п╢п╟я─ я│п╪п╣я─я┌п╬п╫п╬я│п╫п╬п╧ я│п╦п╩я▀!",ch,0,0,TO_CHAR);
+	    act("$c1 п╫п╟п╫п╬я│п╦я┌ я┌я─п╬п╧п╫п╬п╧ я┐п╢п╟я─ я│п╪п╣я─я┌п╬п╫п╬я│п╫п╬п╧ я│п╦п╩я▀!",ch,0,0,TO_ROOM);
 	    one_hit( ch, victim );
 	    one_hit( ch, victim );
 	    one_hit( ch, victim );
@@ -767,13 +767,13 @@ bool ClanGuardBattlerager::specFight( )
 
 void ClanGuardBattlerager::actGreet( PCharacter *wch )
 {
-    do_say(ch, "Добро пожаловать, великий Воин.");
+    do_say(ch, "п■п╬п╠я─п╬ п©п╬п╤п╟п╩п╬п╡п╟я┌я▄, п╡п╣п╩п╦п╨п╦п╧ п▓п╬п╦п╫.");
 }
 
 void ClanGuardBattlerager::actPush( PCharacter *wch )
 {
-    act( "$C1 отвешивает тебе нехилый подзатыльник...", wch, 0, ch, TO_CHAR );
-    act( "$C1 отвешивает $c3 подзатыльник...\n\r$c1 - как ветром сдуло.", wch, 0, ch, TO_ROOM );
+    act( "$C1 п╬я┌п╡п╣я┬п╦п╡п╟п╣я┌ я┌п╣п╠п╣ п╫п╣я┘п╦п╩я▀п╧ п©п╬п╢п╥п╟я┌я▀п╩я▄п╫п╦п╨...", wch, 0, ch, TO_CHAR );
+    act( "$C1 п╬я┌п╡п╣я┬п╦п╡п╟п╣я┌ $c3 п©п╬п╢п╥п╟я┌я▀п╩я▄п╫п╦п╨...\n\r$c1 - п╨п╟п╨ п╡п╣я┌я─п╬п╪ я│п╢я┐п╩п╬.", wch, 0, ch, TO_ROOM );
 }
 
 

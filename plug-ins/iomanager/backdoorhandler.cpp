@@ -104,7 +104,7 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     InterpretHandler::init( d );
 
     DescriptorStateManager::getThis( )->handle( oldState, CON_PLAYING, d );
-    wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%C1 ×ÈÏÄÉÔ × DreamLand ÞÅÒÅÚ ÚÁÄÎÀÀ Ä×ÅÒØ.", pch );
+    wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%C1 Ð²Ñ…Ð¾Ð´Ð¸Ñ‚ Ð² DreamLand Ñ‡ÐµÑ€ÐµÐ· Ð·Ð°Ð´Ð½ÑŽÑŽ Ð´Ð²ÐµÑ€ÑŒ.", pch );
     return 1;
 }
 

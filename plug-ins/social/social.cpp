@@ -99,7 +99,7 @@ void Social::reaction( Character *ch, Character *victim, const DLString &arg )
 	if (!getErrorMsg( ).empty( ))
 	    act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
 	else
-	    ch->println("îÅÔ ÜÔÏÇÏ ÚÄÅÓØ.");
+	    ch->println("ÐÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð´ÐµÑÑŒ.");
     }
 
     if (!victim || victim == ch)
@@ -121,9 +121,9 @@ void Social::reaction( Character *ch, Character *victim, const DLString &arg )
 	break;
 
     case 9: case 10: case 11: case 12:
-	act( "$c1 ÛÌÅÐÁÅÔ $C4.",  victim, 0, ch, TO_NOTVICT );
-	act_p( "ôÙ ÛÌÅÐÁÅÛØ $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
-	act( "$c1 ÛÌÅÐÁÅÔ ÔÅÂÑ.", victim, 0, ch, TO_VICT );
+	act( "$c1 ÑˆÐ»ÐµÐ¿Ð°ÐµÑ‚ $C4.",  victim, 0, ch, TO_NOTVICT );
+	act_p( "Ð¢Ñ‹ ÑˆÐ»ÐµÐ¿Ð°ÐµÑˆÑŒ $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
+	act( "$c1 ÑˆÐ»ÐµÐ¿Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.", victim, 0, ch, TO_VICT );
 	break;
     case 13: 
 	interpret_fmt( victim, "sigh %s", ch->getNameP( ) );

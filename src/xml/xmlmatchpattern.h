@@ -19,7 +19,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Поиск по xml документу
+ * @short п÷п╬п╦я│п╨ п©п╬ xml п╢п╬п╨я┐п╪п╣п╫я┌я┐
  */
 class XMLMatchPattern : public yyFlexLexer
 {

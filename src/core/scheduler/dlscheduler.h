@@ -29,9 +29,9 @@ public:
 	DLScheduler( );
 	virtual ~DLScheduler( );
 	
-	/** Выполнить задачу через секунду */
+	/** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ я┤п╣я─п╣п╥ я│п╣п╨я┐п╫п╢я┐ */
 	void putTaskInSecond( SchedulerTaskPointer task );
-	/** Выполнить задачу через time секунд */
+	/** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ я┤п╣я─п╣п╥ time я│п╣п╨я┐п╫п╢ */
 	void putTaskInSecond( long time, SchedulerTaskPointer task );
 	
 	static inline DLScheduler* getThis( ) 

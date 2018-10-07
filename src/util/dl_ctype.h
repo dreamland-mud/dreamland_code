@@ -21,20 +21,20 @@ inline char dl_toupper( char c )
 {
     return (c >= 'a' && c <= 'z') 
            ? c + 'A' - 'a' 
-           : (c >= 'À' && c <= 'ß') 
-                ? c + 'à' - 'À' 
-                : c == '£'
-                    ? '³'
+           : (c >= 'ÑŽ' && c <= 'ÑŠ') 
+                ? c + 'Ð®' - 'ÑŽ' 
+                : c == 'Ñ‘'
+                    ? 'Ð'
                     : c;
 }
 inline char dl_tolower( char c )
 {
     return (c >= 'A' && c <= 'Z') 
            ? c + 'a' - 'A' 
-           : (c >= 'à' && c < 'ÿ') 
-                ? c + 'À' - 'à' 
-                : c == '³'
-                    ? '£'
+           : (c >= 'Ð®' && c < 'Ðª') 
+                ? c + 'ÑŽ' - 'Ð®' 
+                : c == 'Ð'
+                    ? 'Ñ‘'
                     : c;
 }
 #ifdef __cplusplus

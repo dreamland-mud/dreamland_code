@@ -57,11 +57,11 @@ static void show_matched_commands( Character *ch, const DLString &arg )
     bool found = false;
 
     if (arg.empty( )) {
-        ch->println("Использование: {y{lRкоманды показ{lEcommand show{lx{D название{x.");
+        ch->println("п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╨п╟п╥{lEcommand show{lx{D п╫п╟п╥п╡п╟п╫п╦п╣{x.");
         return;
     }
 
-    buf << "Найдены такие команды:" << endl;
+    buf << "п²п╟п╧п╢п╣п╫я▀ я┌п╟п╨п╦п╣ п╨п╬п╪п╟п╫п╢я▀:" << endl;
 
     for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	ostringstream aliases;
@@ -87,7 +87,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
     if (found)
         page_to_char( buf.str( ).c_str( ), ch );
     else
-        ch->printf("Не найдено ни одной команды, начинающейся с '%s'.\r\n", arg.c_str( ));
+        ch->printf("п²п╣ п╫п╟п╧п╢п╣п╫п╬ п╫п╦ п╬п╢п╫п╬п╧ п╨п╬п╪п╟п╫п╢я▀, п╫п╟я┤п╦п╫п╟я▌я┴п╣п╧я│я▐ я│ '%s'.\r\n", arg.c_str( ));
 }
 
 static void show_commands( Character *ch, int flags )
@@ -98,8 +98,8 @@ static void show_commands( Character *ch, int flags )
 
     if (IS_SET(flags, FCMD_ALIASES|FCMD_HINTS)) {
 	buf << fmt( 0, "%-12s | %-17s| %s", 
-		    "По-английски", "По-русски", 
-		    IS_SET(flags, FCMD_ALIASES) ? "Синонимы" : "Справка" ) 
+		    "п÷п╬-п╟п╫пЁп╩п╦п╧я│п╨п╦", "п÷п╬-я─я┐я│я│п╨п╦", 
+		    IS_SET(flags, FCMD_ALIASES) ? "п║п╦п╫п╬п╫п╦п╪я▀" : "п║п©я─п╟п╡п╨п╟" ) 
 	    << endl
 	    << "-------------+------------------+--------------------------------------------" 
 	    << endl;
@@ -128,9 +128,9 @@ static void show_commands( Character *ch, int flags )
 
         buf << endl;
         if (IS_SET(flags, FCMD_ALIASES)) 
-            buf << "Также смотри {y{lRкоманды{lEcommand{x, {y{lRкоманды подсказ{lEcommand hints{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+            buf << "п╒п╟п╨п╤п╣ я│п╪п╬я┌я─п╦ {y{lRп╨п╬п╪п╟п╫п╢я▀{lEcommand{x, {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╢я│п╨п╟п╥{lEcommand hints{x п╦ {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╨п╟п╥{lEcommand show{x." << endl;
         else
-            buf << "Также смотри {y{lRкоманды{lEcommad{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+            buf << "п╒п╟п╨п╤п╣ я│п╪п╬я┌я─п╦ {y{lRп╨п╬п╪п╟п╫п╢я▀{lEcommad{x, {y{lRп╨п╬п╪п╟п╫п╢я▀ я│п╦п╫п╬п╫п╦п╪{lEcommand alias{x п╦ {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╨п╟п╥{lEcommand show{x." << endl;
 
     }
     else if (IS_SET(flags, FCMD_TABLE|FCMD_IMPORTANT)) {
@@ -140,9 +140,9 @@ static void show_commands( Character *ch, int flags )
 	const int columns = (fRus ? 4 : 6);
         
         if (IS_SET(flags, FCMD_TABLE))
-            buf << "{cВсе команды{x:" << endl;
+            buf << "{cп▓я│п╣ п╨п╬п╪п╟п╫п╢я▀{x:" << endl;
         else
-            buf << "{cВажные команды{x:" << endl;
+            buf << "{cп▓п╟п╤п╫я▀п╣ п╨п╬п╪п╟п╫п╢я▀{x:" << endl;
 
         for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
 	    Command::Pointer cmd = *c;
@@ -166,12 +166,12 @@ static void show_commands( Character *ch, int flags )
 
 	buf << endl;
         if (IS_SET(flags, FCMD_TABLE))
-            buf << "Также смотри {y{lRкоманды{lEcommand{x для краткого списка, {y{lRкоманды подсказ{lEcommand hints{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+            buf << "п╒п╟п╨п╤п╣ я│п╪п╬я┌я─п╦ {y{lRп╨п╬п╪п╟п╫п╢я▀{lEcommand{x п╢п╩я▐ п╨я─п╟я┌п╨п╬пЁп╬ я│п©п╦я│п╨п╟, {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╢я│п╨п╟п╥{lEcommand hints{x п╦ {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╨п╟п╥{lEcommand show{x." << endl;
         else
-            buf << "Для полного списка используй {y{lRкоманды таблица{lEcommand table{x, {y{lRкоманды подсказ{lEcommand hints{x." << endl;
+            buf << "п■п╩я▐ п©п╬п╩п╫п╬пЁп╬ я│п©п╦я│п╨п╟ п╦я│п©п╬п╩я▄п╥я┐п╧ {y{lRп╨п╬п╪п╟п╫п╢я▀ я┌п╟п╠п╩п╦я├п╟{lEcommand table{x, {y{lRп╨п╬п╪п╟п╫п╢я▀ п©п╬п╢я│п╨п╟п╥{lEcommand hints{x." << endl;
     }
     else if (IS_SET(flags, FCMD_WIZARD)) {
-	buf << fmt( 0, "%-12s | %-45s | %s", "По-английски", "Справка", "Синонимы" )
+	buf << fmt( 0, "%-12s | %-45s | %s", "п÷п╬-п╟п╫пЁп╩п╦п╧я│п╨п╦", "п║п©я─п╟п╡п╨п╟", "п║п╦п╫п╬п╫п╦п╪я▀" )
 	    << endl
 	    << "-------------+-----------------------------------------------+---------------" 
 	    << endl;
@@ -205,7 +205,7 @@ CMDRUN( commands )
     
     arg = args.getOneArgument( );
     
-    if (arg_oneof( arg, "show", "показать" )) {
+    if (arg_oneof( arg, "show", "п©п╬п╨п╟п╥п╟я┌я▄" )) {
 	show_matched_commands( ch, args );
 	return;
     }
@@ -213,18 +213,18 @@ CMDRUN( commands )
     if (arg.empty( ))
 	SET_BIT(flags, FCMD_IMPORTANT);
     
-    if (arg_oneof( arg, "hints", "подсказки" ))
+    if (arg_oneof( arg, "hints", "п©п╬п╢я│п╨п╟п╥п╨п╦" ))
 	SET_BIT(flags, FCMD_HINTS);
 
-    if (arg_oneof( arg, "table", "таблица" ))
+    if (arg_oneof( arg, "table", "я┌п╟п╠п╩п╦я├п╟" ))
 	SET_BIT(flags, FCMD_TABLE);
 
-    if (arg_oneof( arg, "aliases", "синонимы" ))
+    if (arg_oneof( arg, "aliases", "я│п╦п╫п╬п╫п╦п╪я▀" ))
 	SET_BIT(flags, FCMD_ALIASES);
     
     if (!flags) {
-	ch->println( "Ты можешь задать один из видов таблицы команд: aliases, hints, table,\r\n"
-	             "либо отобразить только несколько команд: commands show <имя команды>." );
+	ch->println( "п╒я▀ п╪п╬п╤п╣я┬я▄ п╥п╟п╢п╟я┌я▄ п╬п╢п╦п╫ п╦п╥ п╡п╦п╢п╬п╡ я┌п╟п╠п╩п╦я├я▀ п╨п╬п╪п╟п╫п╢: aliases, hints, table,\r\n"
+	             "п╩п╦п╠п╬ п╬я┌п╬п╠я─п╟п╥п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╨п╬п╪п╟п╫п╢: commands show <п╦п╪я▐ п╨п╬п╪п╟п╫п╢я▀>." );
 	return;
     }
     

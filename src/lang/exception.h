@@ -15,7 +15,7 @@ using namespace std;
 
 /**
  * @author Igor S. Petrenko
- * @short От этого класса порождаются все исключения
+ * @short п·я┌ я█я┌п╬пЁп╬ п╨п╩п╟я│я│п╟ п©п╬я─п╬п╤п╢п╟я▌я┌я│я▐ п╡я│п╣ п╦я│п╨п╩я▌я┤п╣п╫п╦я▐
  */
 class Exception : public std::exception
 {

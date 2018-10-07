@@ -389,40 +389,40 @@ Json::Value CalendarWebPromptListener::jsonWeather( Descriptor *d, Character *ch
     if (!canSeeWeather( ch ))
         return Json::Value( );
 
-    // Небо (ясное|облачное|дождливое|во вспышках молний)
-    // ->     ясно   облачно  дождь    гроза
-    // и дует (теплый южный | холодный северный) ветер
-    // ->      теплый        холодный          ветер
+    // п²п╣п╠п╬ (я▐я│п╫п╬п╣|п╬п╠п╩п╟я┤п╫п╬п╣|п╢п╬п╤п╢п╩п╦п╡п╬п╣|п╡п╬ п╡я│п©я▀я┬п╨п╟я┘ п╪п╬п╩п╫п╦п╧)
+    // ->     я▐я│п╫п╬   п╬п╠п╩п╟я┤п╫п╬  п╢п╬п╤п╢я▄    пЁя─п╬п╥п╟
+    // п╦ п╢я┐п╣я┌ (я┌п╣п©п╩я▀п╧ я▌п╤п╫я▀п╧ | я┘п╬п╩п╬п╢п╫я▀п╧ я│п╣п╡п╣я─п╫я▀п╧) п╡п╣я┌п╣я─
+    // ->      я┌п╣п©п╩я▀п╧        я┘п╬п╩п╬п╢п╫я▀п╧          п╡п╣я┌п╣я─
     switch (weather_info.sky) {
         case SKY_CLOUDY:    
-            msg = "облачно";
+            msg = "п╬п╠п╩п╟я┤п╫п╬";
             icon_day = "day-cloudy";
             icon_night = "night-alt-cloudy";
             break;
         case SKY_CLOUDLESS:
-            msg = "ясно";
+            msg = "я▐я│п╫п╬";
             icon_day = "day-sunny";
             icon_night = "night-clear";
             break;
         case SKY_RAINING:
-            msg = "дождь";
+            msg = "п╢п╬п╤п╢я▄";
             icon_day = "day-showers";
             icon_night = "night-alt-showers";
             break;
         case SKY_LIGHTNING:
-            msg = "гроза";
+            msg = "пЁя─п╬п╥п╟";
             icon_day = "day-lightning";
             icon_night = "night-alt-lightning";
             break;
     }
     
     if (weather_info.change >= 0)
-        msg += ", теплый ветер";
+        msg += ", я┌п╣п©п╩я▀п╧ п╡п╣я┌п╣я─";
     else
-        msg += ", холодный ветер";
+        msg += ", я┘п╬п╩п╬п╢п╫я▀п╧ п╡п╣я┌п╣я─";
 
     DLString sl = sunlight( );
-    if (sl == "светло" || sl == "светает") 
+    if (sl == "я│п╡п╣я┌п╩п╬" || sl == "я│п╡п╣я┌п╟п╣я┌") 
         icon = icon_day;
     else 
         icon = icon_night;

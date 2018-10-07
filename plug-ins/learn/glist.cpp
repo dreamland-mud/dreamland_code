@@ -26,7 +26,7 @@ CMDRUN( glist )
 	return;
 
     if (argument.empty( )) {
-	buf << "˜”≈ «“’––Ÿ:" << endl << endl;;
+	buf << "–í—Å–µ –≥—Ä—É–ø–ø—ã:" << endl << endl;;
 	
 	for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
 	    group = skillGroupManager->find( gn );
@@ -37,14 +37,14 @@ CMDRUN( glist )
 	}
 
 	buf << endl
-	    << "‰Ã— –“œ”Õœ‘“¡ Œ¡◊ŸÀœ◊ À¡÷ƒœ  «“’––Ÿ …”–œÃÿ⁄’  '{y{lR«“’––¡’Õ≈Œ… {lEglist{lx {D<{w«“’––¡{D>{w'."
+	    << "–î–ª—è –ø—Ä–æ—Å–º–æ—Ç—Ä–∞ –Ω–∞–≤—ã–∫–æ–≤ –∫–∞–∂–¥–æ–π –≥—Ä—É–ø–ø—ã –∏—Å–ø–æ–ª—å–∑—É–π '{y{lR–≥—Ä—É–ø–ø–∞—É–º–µ–Ω–∏–π{lEglist{lx {D<{w–≥—Ä—É–ø–ø–∞{D>{w'."
 	    << endl;
     }
     else {
 	group = skillGroupManager->findUnstrict( argument );
 	
 	if (!group) {
-	    ch->println("Ó≈–“¡◊…ÃÿŒœ ’À¡⁄¡Œ¡ «“’––¡.");
+	    ch->println("–ù–µ–ø—Ä–∞–≤–∏–ª—å–Ω–æ —É–∫–∞–∑–∞–Ω–∞ –≥—Ä—É–ø–ø–∞.");
 	    return;
 	}
 	

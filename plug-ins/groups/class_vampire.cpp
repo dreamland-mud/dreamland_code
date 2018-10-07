@@ -118,7 +118,7 @@ void VampiricBiteOneHit::postDamageEffects( )
     ch->hit += hit_ga;
     ch->hit  = min( ch->hit , ch->max_hit);
     update_pos( ch );
-    ch->send_to("Твое самочувствие улучшается, когда ты высасываешь кровь из противника.\n\r");
+    ch->send_to("п╒п╡п╬п╣ я│п╟п╪п╬я┤я┐п╡я│я┌п╡п╦п╣ я┐п╩я┐я┤я┬п╟п╣я┌я│я▐, п╨п╬пЁп╢п╟ я┌я▀ п╡я▀я│п╟я│я▀п╡п╟п╣я┬я▄ п╨я─п╬п╡я▄ п╦п╥ п©я─п╬я┌п╦п╡п╫п╦п╨п╟.\n\r");
 }
 
 /*
@@ -135,30 +135,30 @@ SKILL_RUNP( control )
 
   if (ch->is_npc() || !gsn_control_animal->usable( ch ) )
     {
-      ch->send_to( "Чего?\n\r");
+      ch->send_to( "п╖п╣пЁп╬?\n\r");
       return;
     }
 
   if ( arg[0] == '\0' )
     {
-      ch->send_to( "Кого очаровать?\n\r");
+      ch->send_to( "п п╬пЁп╬ п╬я┤п╟я─п╬п╡п╟я┌я▄?\n\r");
       return;
     }
 
   if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-      ch->send_to( "Нет этого тут.\n\r");
+      ch->send_to( "п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r");
       return;
     }
 
   if (victim->getRace( )->isPC( ))
     {
-      ch->send_to("Стоит попробовать на животных?\n\r");
+      ch->send_to("п║я┌п╬п╦я┌ п©п╬п©я─п╬п╠п╬п╡п╟я┌я▄ п╫п╟ п╤п╦п╡п╬я┌п╫я▀я┘?\n\r");
       return;
     }
 
   if (IS_SET( victim->form, FORM_NONADOPTABLE )) {
-    ch->send_to("Эта форма жизни не поддается контролю.\n\r");
+    ch->send_to("п╜я┌п╟ я└п╬я─п╪п╟ п╤п╦п╥п╫п╦ п╫п╣ п©п╬п╢п╢п╟п╣я┌я│я▐ п╨п╬п╫я┌я─п╬п╩я▌.\n\r");
     return;	
   }
     
@@ -186,7 +186,7 @@ SKILL_RUNP( control )
 	    && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))))
 	{
 	 gsn_control_animal->improve( ch, false, victim );
-	 do_say(victim,"Я не собираюсь следовать за тобой!");
+	 do_say(victim,"п╞ п╫п╣ я│п╬п╠п╦я─п╟я▌я│я▄ я│п╩п╣п╢п╬п╡п╟я┌я▄ п╥п╟ я┌п╬п╠п╬п╧!");
 	 interpret_raw(victim, "murder", ch->getNameP( ));
 	 return;
 	}
@@ -205,9 +205,9 @@ SKILL_RUNP( control )
 		
   victim->master = victim->leader = ch;
 
-  act_p( "Ну разве $c1 не прелесть?", ch, 0, victim, TO_VICT,POS_RESTING );
+  act_p( "п²я┐ я─п╟п╥п╡п╣ $c1 п╫п╣ п©я─п╣п╩п╣я│я┌я▄?", ch, 0, victim, TO_VICT,POS_RESTING );
   if ( ch != victim )
-	act_p("$C1 смотрит на тебя влюбленными глазами.",ch,0,victim,TO_CHAR,POS_RESTING);
+	act_p("$C1 я│п╪п╬я┌я─п╦я┌ п╫п╟ я┌п╣п╠я▐ п╡п╩я▌п╠п╩п╣п╫п╫я▀п╪п╦ пЁп╩п╟п╥п╟п╪п╦.",ch,0,victim,TO_CHAR,POS_RESTING);
 
   return;
 }
@@ -237,43 +237,43 @@ SKILL_RUNP( dig )
     chance = gsn_digging->getEffective( ch );
 
     if (chance < 2) {
-	ch->send_to("Ты не умеешь копать!\r\n");
+	ch->send_to("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╨п╬п©п╟я┌я▄!\r\n");
 	return;
     }
 
     if (IS_WATER( room )) {
-	ch->send_to("Ты же не хочешь промокнуть?\r\n");
+	ch->send_to("п╒я▀ п╤п╣ п╫п╣ я┘п╬я┤п╣я┬я▄ п©я─п╬п╪п╬п╨п╫я┐я┌я▄?\r\n");
 	return;
     }
 
     if (room->sector_type == SECT_AIR) {
-	ch->send_to("Копать в воздухе? И как ты себе это представляешь?\r\n");
+	ch->send_to("п п╬п©п╟я┌я▄ п╡ п╡п╬п╥п╢я┐я┘п╣? п≤ п╨п╟п╨ я┌я▀ я│п╣п╠п╣ я█я┌п╬ п©я─п╣п╢я│я┌п╟п╡п╩я▐п╣я┬я▄?\r\n");
 	return;
     }
 
     if (room->sector_type == SECT_CITY || room->sector_type == SECT_INSIDE) {
-	ch->send_to("Здесь слишком твердая почва..\r\n");
+	ch->send_to("п≈п╢п╣я│я▄ я│п╩п╦я┬п╨п╬п╪ я┌п╡п╣я─п╢п╟я▐ п©п╬я┤п╡п╟..\r\n");
 	return;
     }
     
     if (IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
     {
-	ch->send_to("Здесь неподходящее место для копания могилы.\r\n");
+	ch->send_to("п≈п╢п╣я│я▄ п╫п╣п©п╬п╢я┘п╬п╢я▐я┴п╣п╣ п╪п╣я│я┌п╬ п╢п╩я▐ п╨п╬п©п╟п╫п╦я▐ п╪п╬пЁп╦п╩я▀.\r\n");
 	return;
     }
     
     if (get_obj_room_vnum( room, OBJ_VNUM_GRAVE )) {
-	ch->send_to("Опс.. похоже, этот участок уже занял твой коллега.\r\n");
+	ch->send_to("п·п©я│.. п©п╬я┘п╬п╤п╣, я█я┌п╬я┌ я┐я┤п╟я│я┌п╬п╨ я┐п╤п╣ п╥п╟п╫я▐п╩ я┌п╡п╬п╧ п╨п╬п╩п╩п╣пЁп╟.\r\n");
 	return;
     }
 
     if (IS_VIOLENT( ch )) {
-	act_p("Ты слишком возбужде$gно|н|на, чтобы копать.", ch, 0, 0, TO_CHAR, POS_STANDING);
+	act_p("п╒я▀ я│п╩п╦я┬п╨п╬п╪ п╡п╬п╥п╠я┐п╤п╢п╣$gп╫п╬|п╫|п╫п╟, я┤я┌п╬п╠я▀ п╨п╬п©п╟я┌я▄.", ch, 0, 0, TO_CHAR, POS_STANDING);
 	return;
     }
 
     if (ch->move < 100) {
-	act_p("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR, POS_STANDING);
+	act_p("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟$gп╩п╬|п╩|п╩п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch, 0, 0, TO_CHAR, POS_STANDING);
 	return;
     }
 
@@ -282,18 +282,18 @@ SKILL_RUNP( dig )
     ch->setWait( gsn_digging->getBeats( )  );
 
     if (number_percent( ) > chance) {
-	act_p("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	act_p("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR, POS_RESTING);
+	act_p("$c1 п©я─п╣п╢п©я─п╦п╫п╦п╪п╟п╣я┌ п©п╬п©я▀я┌п╨я┐ п╥п╟п╨п╬п©п╟я┌я▄ я│п╣п╠я▐.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	act_p("п╒я▀ я│я┌п╟я─п╟я┌п╣п╩я▄п╫п╬ п╨п╬п╡я▀я─я▐п╣я┬я▄я│я▐ п╡ п╥п╣п╪п╩п╣, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я┘п╬п╢п╦я┌.", ch, 0, 0, TO_CHAR, POS_RESTING);
 	gsn_digging->improve( ch, false );
 	return;
     }
 
-    act_p("$c1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p("Ты выкапываешь себе могилку и устраиваешься в ней со всеми удобствами.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("$c1 п╡я▀п╨п╟п©я▀п╡п╟п╣я┌ я│п╣п╠п╣ п╪п╬пЁп╦п╩п╨я┐ п╦ я┐я│я┌я─п╟п╦п╡п╟п╣я┌я│я▐ п╡ п╫п╣п╧ я│п╬ п╡я│п╣п╪п╦ я┐п╢п╬п╠я│я┌п╡п╟п╪п╦.", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("п╒я▀ п╡я▀п╨п╟п©я▀п╡п╟п╣я┬я▄ я│п╣п╠п╣ п╪п╬пЁп╦п╩п╨я┐ п╦ я┐я│я┌я─п╟п╦п╡п╟п╣я┬я▄я│я▐ п╡ п╫п╣п╧ я│п╬ п╡я│п╣п╪п╦ я┐п╢п╬п╠я│я┌п╡п╟п╪п╦.", ch, 0, 0, TO_CHAR, POS_RESTING);
     gsn_digging->improve( ch, true );
 
     if (number_percent( ) < 2) 
-	act_p("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL, POS_RESTING);
+	act_p("п·я┌п╨я┐п╢п╟-я┌п╬ я│п╡п╣я─я┘я┐ я─п╟п╥п╢п╟п╣я┌я│я▐ пЁя─п╬п╪п╬п╡п╬п╧ пЁп╬п╩п╬я│: \"п⌡п·п÷п░п╒пё п▓п∙п═п²п≤!\"", ch, 0, 0, TO_ALL, POS_RESTING);
     
     ch->dismount( );
     char_from_room( ch );
@@ -320,26 +320,26 @@ SKILL_RUNP( vampire )
 
 	if ( ch->isAffected(gsn_vampire ) )
 	{
-		ch->send_to("Ты не можешь стать еще более вампиром!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│я┌п╟я┌я▄ п╣я┴п╣ п╠п╬п╩п╣п╣ п╡п╟п╪п©п╦я─п╬п╪!\n\r");
 		return;
 	}
 
 	if ( !ch->is_npc() && !gsn_vampire->usable( ch ) )
 	{
-		ch->send_to("Ты пытаешься выглядеть более уродливо.\n\r");
+		ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╡я▀пЁп╩я▐п╢п╣я┌я▄ п╠п╬п╩п╣п╣ я┐я─п╬п╢п╩п╦п╡п╬.\n\r");
 		return;
 	}
 
         if (gsn_vampire->getLearned( ch ) < 100)
 	{
-		ch->send_to("Попроси гильдмастера помочь тебе.\n\r");
+		ch->send_to("п÷п╬п©я─п╬я│п╦ пЁп╦п╩я▄п╢п╪п╟я│я┌п╣я─п╟ п©п╬п╪п╬я┤я▄ я┌п╣п╠п╣.\n\r");
 		return;
 	}
 
 	if ( weather_info.sunlight == SUN_LIGHT
 		|| weather_info.sunlight == SUN_RISE )
 	{
-		ch->send_to("Тебе нужно дождаться вечера, чтобы превратиться в вампира.\n\r");
+		ch->send_to("п╒п╣п╠п╣ п╫я┐п╤п╫п╬ п╢п╬п╤п╢п╟я┌я▄я│я▐ п╡п╣я┤п╣я─п╟, я┤я┌п╬п╠я▀ п©я─п╣п╡я─п╟я┌п╦я┌я▄я│я▐ п╡ п╡п╟п╪п©п╦я─п╟.\n\r");
 	}
 
 	level = ch->getModifyLevel();
@@ -398,8 +398,8 @@ SKILL_RUNP( vampire )
 	af.bitvector = PLR_VAMPIRE;
 	affect_to_char( ch, &af );
 
-	ch->send_to("Превращаясь в кровожадного вампира, ты чувствуешь прилив силы.\r\n");
-	act_p("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM,POS_RESTING);
+	ch->send_to("п÷я─п╣п╡я─п╟я┴п╟я▐я│я▄ п╡ п╨я─п╬п╡п╬п╤п╟п╢п╫п╬пЁп╬ п╡п╟п╪п©п╦я─п╟, я┌я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п©я─п╦п╩п╦п╡ я│п╦п╩я▀.\r\n");
+	act_p("$c1 п╫п╣я┐п╩п╬п╡п╦п╪п╬ п╪п╣п╫я▐п╣я┌я│я▐, п©я─п╣п╡я─п╟я┴п╟я▐я│я▄ п╡ п╫п╣я┤я┌п╬ я┐п╤п╟я│п╫п╬п╣!",ch,0,0,TO_ROOM,POS_RESTING);
 }
 
 void sucking( Character *ch, Character *victim ) 
@@ -407,7 +407,7 @@ void sucking( Character *ch, Character *victim )
     int cond, hp_gain;
 
     if (victim == ch) {
-	ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ пЁп╦п╠п╨п╦п╧ п©п╬п╥п╡п╬п╫п╬я┤п╫п╦п╨.\n\r");
 	return;
     }
 
@@ -415,21 +415,21 @@ void sucking( Character *ch, Character *victim )
 	return;
 
     if (IS_AWAKE( victim )) {
-	ch->send_to("Сначала жертва должна уснуть.\r\n");
+	ch->send_to("п║п╫п╟я┤п╟п╩п╟ п╤п╣я─я┌п╡п╟ п╢п╬п╩п╤п╫п╟ я┐я│п╫я┐я┌я▄.\r\n");
 	return;
     }
     
     if (!victim->isAffected(gsn_vampiric_bite )) {
-	ch->send_to("В жертве нет необходимой дырочки.\n\r");
+	ch->send_to("п▓ п╤п╣я─я┌п╡п╣ п╫п╣я┌ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬п╧ п╢я▀я─п╬я┤п╨п╦.\n\r");
 	return;
     }
     
     UNSET_DEATH_TIME(ch);
     ch->setWait( gsn_vampiric_bite->getBeats( )  );
                      
-    act_p("Сквозь кошмарный сон ты чувствуешь, как $c1 высасывает твою {rкровь{x.", ch, 0, victim, TO_VICT, POS_DEAD);
-    act_p("Ты высасываешь {rкровь{x из шеи $C2.", ch, 0, victim, TO_CHAR, POS_RESTING);
-    act_p("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+    act_p("п║п╨п╡п╬п╥я▄ п╨п╬я┬п╪п╟я─п╫я▀п╧ я│п╬п╫ я┌я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ $c1 п╡я▀я│п╟я│я▀п╡п╟п╣я┌ я┌п╡п╬я▌ {rп╨я─п╬п╡я▄{x.", ch, 0, victim, TO_VICT, POS_DEAD);
+    act_p("п╒я▀ п╡я▀я│п╟я│я▀п╡п╟п╣я┬я▄ {rп╨я─п╬п╡я▄{x п╦п╥ я┬п╣п╦ $C2.", ch, 0, victim, TO_CHAR, POS_RESTING);
+    act_p("$c1 п╡я▀я│п╟я│я▀п╡п╟п╣я┌ {rп╨я─п╬п╡я▄{x п╦п╥ я┬п╣п╦ $C2.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
     
     if (!ch->is_npc( )) {
 	desire_bloodlust->gain( ch->getPC( ), 20 );
@@ -452,8 +452,8 @@ void sucking( Character *ch, Character *victim )
 			       
 	if (number_percent( ) < cond) {
 	    set_fighting( victim, ch );
-	    act_p("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM, POS_RESTING);
-	    act_p("Твой кошмар проходит - ты просыпаешься.", victim, 0, ch, TO_CHAR, POS_DEAD);
+	    act_p("$c1 п╬я┤п╫я┐п╩$gп╬я│я▄|я│я▐|п╟я│я▄ п╬я┌ я┌п╣я─п╥п╟п╡я┬п╣пЁп╬ $s п╨п╬я┬п╪п╟я─п╟.", victim, 0, ch, TO_ROOM, POS_RESTING);
+	    act_p("п╒п╡п╬п╧ п╨п╬я┬п╪п╟я─ п©я─п╬я┘п╬п╢п╦я┌ - я┌я▀ п©я─п╬я│я▀п©п╟п╣я┬я▄я│я▐.", victim, 0, ch, TO_CHAR, POS_DEAD);
 	    multi_hit( victim, ch );
 	}
     } 
@@ -474,22 +474,22 @@ SKILL_RUNP( suck )
 
     if (!gsn_vampiric_bite->usable( ch )) 
     {
-	ch->send_to("Хрум, хрум!\n\r");
+	ch->send_to("п╔я─я┐п╪, я┘я─я┐п╪!\n\r");
 	return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	 ch->send_to("Высасывать кровь можно, только превратившись в вампира.\n\r");
+	 ch->send_to("п▓я▀я│п╟я│я▀п╡п╟я┌я▄ п╨я─п╬п╡я▄ п╪п╬п╤п╫п╬, я┌п╬п╩я▄п╨п╬ п©я─п╣п╡я─п╟я┌п╦п╡я┬п╦я│я▄ п╡ п╡п╟п╪п©п╦я─п╟.\n\r");
 	 return;
     }
 
     if (arg[0] == '\0') {
-	ch->send_to("Пить кровь из кого?\n\r");
+	ch->send_to("п÷п╦я┌я▄ п╨я─п╬п╡я▄ п╦п╥ п╨п╬пЁп╬?\n\r");
 	return;
     }
 
     if ((victim = get_char_room( ch, arg )) == 0) {
-	ch->send_to("Этого нет здесь.\n\r");
+	ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	return;
     }
 
@@ -510,41 +510,41 @@ SKILL_RUNP( bite )
     one_argument( argument, arg );
 
     if (!gsn_vampiric_bite->usable( ch )) {
-	ch->send_to("Ты не умеешь кусаться.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╨я┐я│п╟я┌я▄я│я▐.\n\r");
 	return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	ch->send_to("Чтоб укусить ты должен сначала превратиться в вампира.\n\r");
+	ch->send_to("п╖я┌п╬п╠ я┐п╨я┐я│п╦я┌я▄ я┌я▀ п╢п╬п╩п╤п╣п╫ я│п╫п╟я┤п╟п╩п╟ п©я─п╣п╡я─п╟я┌п╦я┌я▄я│я▐ п╡ п╡п╟п╪п©п╦я─п╟.\n\r");
 	return;
     }
 
     if ( arg[0] == '\0' )
     {
-	ch->send_to("Укусить кого?\n\r");
+	ch->send_to("пёп╨я┐я│п╦я┌я▄ п╨п╬пЁп╬?\n\r");
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-	ch->send_to("Этого нет здесь.\n\r");
+	ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	return;
     }
 
     if ( victim == ch )
     {
-	ch->send_to("Поцелуй себя в локоть.\n\r");
+	ch->send_to("п÷п╬я├п╣п╩я┐п╧ я│п╣п╠я▐ п╡ п╩п╬п╨п╬я┌я▄.\n\r");
 	return;
     }
 
     if ( victim->position != POS_SLEEPING )
     {
-	ch->send_to("Сначала он должен уснуть.\n\r");
+	ch->send_to("п║п╫п╟я┤п╟п╩п╟ п╬п╫ п╢п╬п╩п╤п╣п╫ я┐я│п╫я┐я┌я▄.\n\r");
 	return;
     }
 
     if (victim->isAffected(gsn_vampiric_bite )) {
-	ch->send_to("Отсюда уже можно пить.\r\n");
+	ch->send_to("п·я┌я│я▌п╢п╟ я┐п╤п╣ п╪п╬п╤п╫п╬ п©п╦я┌я▄.\r\n");
 	return;
     }
     
@@ -553,7 +553,7 @@ SKILL_RUNP( bite )
 
     if ( victim->fighting != 0 )
     {
-	ch->send_to("Ты не можешь укусить того, кто сражается.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐п╨я┐я│п╦я┌я▄ я┌п╬пЁп╬, п╨я┌п╬ я│я─п╟п╤п╟п╣я┌я│я▐.\n\r");
 	return;
     }
 
@@ -563,13 +563,13 @@ SKILL_RUNP( bite )
     if ( victim->hit < (0.8 * victim->max_hit) &&
 	 (IS_AWAKE(victim) ) )
     {
-	act_p( "$C1 ран%Gно|ен|на и подозрител%Gьно|ен|ьна... не стоит даже пытаться.", ch, 0, victim, TO_CHAR,POS_RESTING);
+	act_p( "$C1 я─п╟п╫%Gп╫п╬|п╣п╫|п╫п╟ п╦ п©п╬п╢п╬п╥я─п╦я┌п╣п╩%Gя▄п╫п╬|п╣п╫|я▄п╫п╟... п╫п╣ я│я┌п╬п╦я┌ п╢п╟п╤п╣ п©я▀я┌п╟я┌я▄я│я▐.", ch, 0, victim, TO_CHAR,POS_RESTING);
 	return;
     }
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-	act_p( "$C1 настороже, не стоит даже пробовать.",ch, 0, victim, TO_CHAR,POS_RESTING);
+	act_p( "$C1 п╫п╟я│я┌п╬я─п╬п╤п╣, п╫п╣ я│я┌п╬п╦я┌ п╢п╟п╤п╣ п©я─п╬п╠п╬п╡п╟я┌я▄.",ch, 0, victim, TO_CHAR,POS_RESTING);
 	return;
     }
     
@@ -614,8 +614,8 @@ SKILL_RUNP( bite )
 	}
 	
 	yell_panic( ch, victim,
-		    "Помогите, {Dсоздание ночи{Y кусает меня!",
-		    "Помогите, {Dсоздание ночи{Y кусает меня!" );
+		    "п÷п╬п╪п╬пЁп╦я┌п╣, {Dя│п╬п╥п╢п╟п╫п╦п╣ п╫п╬я┤п╦{Y п╨я┐я│п╟п╣я┌ п╪п╣п╫я▐!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣, {Dя│п╬п╥п╢п╟п╫п╦п╣ п╫п╬я┤п╦{Y п╨я┐я│п╟п╣я┌ п╪п╣п╫я▐!" );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -634,43 +634,43 @@ SKILL_RUNP( touch )
 
     if (!gsn_vampiric_touch->usable( ch ))
     {
-	ch->send_to("Ты не владеешь этим!\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╡п╩п╟п╢п╣п╣я┬я▄ я█я┌п╦п╪!\n\r");
 	return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
     {
-	ch->send_to("Ок, ок.\n\r");
+	ch->send_to("п·п╨, п╬п╨.\n\r");
 	return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )
     {
-	ch->send_to("Ты же не хочешь высосать своего хозяина?\n\r");
+	ch->send_to("п╒я▀ п╤п╣ п╫п╣ я┘п╬я┤п╣я┬я▄ п╡я▀я│п╬я│п╟я┌я▄ я│п╡п╬п╣пЁп╬ я┘п╬п╥я▐п╦п╫п╟?\n\r");
 	return;
     }
 
     if ( (victim = get_char_room(ch,argument)) == 0 )
     {
-	ch->send_to("Здесь таких нет.\n\r");
+	ch->send_to("п≈п╢п╣я│я▄ я┌п╟п╨п╦я┘ п╫п╣я┌.\n\r");
 	return;
     }
 
     if ( ch == victim )
     {
-	ch->send_to("Что-что ты хочешь сотворить с собой?\n\r");
+	ch->send_to("п╖я┌п╬-я┤я┌п╬ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╬я┌п╡п╬я─п╦я┌я▄ я│ я│п╬п╠п╬п╧?\n\r");
 	return;
     }
 
     if ( victim->isAffected(gsn_vampiric_touch) )
     {
-	ch->send_to("Твоя жертва еще не отошла от прикосновения.\n\r");
+	ch->send_to("п╒п╡п╬я▐ п╤п╣я─я┌п╡п╟ п╣я┴п╣ п╫п╣ п╬я┌п╬я┬п╩п╟ п╬я┌ п©я─п╦п╨п╬я│п╫п╬п╡п╣п╫п╦я▐.\n\r");
 	return;
     }
 
     if ( is_safe(ch,victim) )
     {
-	ch->send_to("Боги защищают твою жертву.\n\r");
+	ch->send_to("п▒п╬пЁп╦ п╥п╟я┴п╦я┴п╟я▌я┌ я┌п╡п╬я▌ п╤п╣я─я┌п╡я┐.\n\r");
 	return;
     }
 
@@ -698,11 +698,11 @@ SKILL_RUNP( touch )
 
     if (number_percent() < chance)
     {
-	act_p("Ты прикасаешься к шее $C2 и $E забывается в ужасном кошмаре.",
+	act_p("п╒я▀ п©я─п╦п╨п╟я│п╟п╣я┬я▄я│я▐ п╨ я┬п╣п╣ $C2 п╦ $E п╥п╟п╠я▀п╡п╟п╣я┌я│я▐ п╡ я┐п╤п╟я│п╫п╬п╪ п╨п╬я┬п╪п╟я─п╣.",
 				ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.",
+	act_p("$c1 п©я─п╦п╨п╟я│п╟п╣я┌я│я▐ п╨ я┌п╡п╬п╣п╧ я┬п╣п╣ п╦ я┌я▀ п╥п╟п╠я▀п╡п╟п╣я┬я▄я│я▐ п╡ я┐п╤п╟я│п╫п╬п╪ п╨п╬я┬п╪п╟я─п╣.",
 				ch,0,victim,TO_VICT,POS_RESTING);
-	act_p("$c1 прикасается к шее $C2 и $E забывается в ужасном кошмаре.",
+	act_p("$c1 п©я─п╦п╨п╟я│п╟п╣я┌я│я▐ п╨ я┬п╣п╣ $C2 п╦ $E п╥п╟п╠я▀п╡п╟п╣я┌я│я▐ п╡ я┐п╤п╟я│п╫п╬п╪ п╨п╬я┬п╪п╟я─п╣.",
 				ch,0,victim,TO_NOTVICT,POS_RESTING);
 	gsn_vampiric_touch->improve( ch, true, victim );
 
@@ -728,7 +728,7 @@ SKILL_RUNP( touch )
 	gsn_vampiric_touch->improve( ch, false, victim );
 	if ( !victim->is_npc() )
 	{
-		do_yell(victim, "Помогите! Вампиры!");
+		do_yell(victim, "п÷п╬п╪п╬пЁп╦я┌п╣! п▓п╟п╪п©п╦я─я▀!");
 	}
     }
 }
@@ -741,19 +741,19 @@ SKILL_RUNP( human )
 {
     if (ch->getProfession( ) != prof_vampire)
     {
-     ch->send_to("Что?\n\r");
+     ch->send_to("п╖я┌п╬?\n\r");
      return;
     }
 
     if ( !IS_VAMPIRE(ch) )
     {
-     ch->send_to("Ты и есть человек.\n\r");
+     ch->send_to("п╒я▀ п╦ п╣я│я┌я▄ я┤п╣п╩п╬п╡п╣п╨.\n\r");
      return;
     }
 
    affect_strip(ch, gsn_vampire);
    REMOVE_BIT(ch->act,PLR_VAMPIRE);
-   ch->send_to("Ты принимаешь человеческий облик.\n\r");
+   ch->send_to("п╒я▀ п©я─п╦п╫п╦п╪п╟п╣я┬я▄ я┤п╣п╩п╬п╡п╣я┤п╣я│п╨п╦п╧ п╬п╠п╩п╦п╨.\n\r");
 }
 
 /*
@@ -767,17 +767,17 @@ SKILL_RUNP( bloodlet )
     int chance = gsn_bloodlet->getEffective( ch );
     
     if ( chance < 2 ) {
-	ch->send_to("Ты не владеешь этим!\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╡п╩п╟п╢п╣п╣я┬я▄ я█я┌п╦п╪!\n\r");
 	return;
     }
 
     if (ch->isAffected(gsn_bloodlet )) {
-	ch->send_to("У тебя еще не зажили старые раны.\r\n");
+	ch->send_to("пё я┌п╣п╠я▐ п╣я┴п╣ п╫п╣ п╥п╟п╤п╦п╩п╦ я│я┌п╟я─я▀п╣ я─п╟п╫я▀.\r\n");
 	return;
     }
     
     if (IS_VAMPIRE( ch )) {
-	ch->send_to("Тебя возбудит только вид человеческой крови.\r\n");
+	ch->send_to("п╒п╣п╠я▐ п╡п╬п╥п╠я┐п╢п╦я┌ я┌п╬п╩я▄п╨п╬ п╡п╦п╢ я┤п╣п╩п╬п╡п╣я┤п╣я│п╨п╬п╧ п╨я─п╬п╡п╦.\r\n");
 	return;
     }
 
@@ -785,14 +785,14 @@ SKILL_RUNP( bloodlet )
     dam = ch->getModifyLevel( );
     
     if (number_percent( ) < chance) {
-	act_p("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR, POS_RESTING);
-	act_p("$c1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	act_p("п╒я▀ п©п╣я─п╣я─п╣п╥п╟п╣я┬я▄ я│п╣п╠п╣ п╡п╣п╫я▀.\r\nп▓п╦п╢ я│п╬п╠я│я┌п╡п╣п╫п╫п╬п╧ {Rп╨я─п╬п╡п╦{x п╡п╬п╥п╠я┐п╤п╢п╟п╣я┌ я┌п╣п╠я▐!", ch, 0, 0, TO_CHAR, POS_RESTING);
+	act_p("$c1 я─п╟п╥я─п╣п╥п╟п╣я┌ я│п╡п╬я▌ я─я┐п╨я┐ п╦ п╤п╟п╢п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ п╨п╟п©п╟я▌я┴я┐я▌ п╨я─п╬п╡я▄.", ch, 0, 0, TO_ROOM, POS_RESTING);
 	ch->getPC( )->desires[desire_bloodlust] = 0;
 	gsn_bloodlet->improve( ch, true );
 
     } else {
-	act_p("Упс! Кажется, ты потеря$gло|л|ла СЛИШКОМ много крови!", ch, 0, 0, TO_CHAR, POS_RESTING);
-	act_p("$c1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	act_p("пёп©я│! п п╟п╤п╣я┌я│я▐, я┌я▀ п©п╬я┌п╣я─я▐$gп╩п╬|п╩|п╩п╟ п║п⌡п≤п╗п п·п° п╪п╫п╬пЁп╬ п╨я─п╬п╡п╦!", ch, 0, 0, TO_CHAR, POS_RESTING);
+	act_p("$c1 я│п╩п╦я┬п╨п╬п╪ я│п╦п╩я▄п╫п╬ я─п╟п╫п╦я┌ я│п╡п╬я▌ я─я┐п╨я┐ п╦ п╫п╣ п╪п╬п╤п╣я┌ п╬я│я┌п╟п╫п╬п╡п╦я┌я▄ п╨я─п╬п╡я▄.", ch, 0, 0, TO_ROOM, POS_RESTING);
 	ch->getPC( )->desires[desire_bloodlust] = -6;
 	dam *= 2;
 	gsn_bloodlet->improve( ch, false );
@@ -848,12 +848,12 @@ SKILL_RUNP( bonedagger )
     int chance = gsn_bonedagger->getEffective( ch );
 
     if (chance < 2) {
-	ch->send_to("Что?\r\n");
+	ch->send_to("п╖я┌п╬?\r\n");
 	return;
     }
 
     if (!DIGGED(ch)) {
-	ch->send_to("Нападать можно только из-под земли.\r\n");
+	ch->send_to("п²п╟п©п╟п╢п╟я┌я▄ п╪п╬п╤п╫п╬ я┌п╬п╩я▄п╨п╬ п╦п╥-п©п╬п╢ п╥п╣п╪п╩п╦.\r\n");
 	return;
     }
     
@@ -861,11 +861,11 @@ SKILL_RUNP( bonedagger )
     
     if (arg[0] == '\0') {
 	if (ch->ambushing[0] == '\0') {
-	    ch->send_to("Чью тень ты хочешь подкараулить?\n\r");
+	    ch->send_to("п╖я▄я▌ я┌п╣п╫я▄ я┌я▀ я┘п╬я┤п╣я┬я▄ п©п╬п╢п╨п╟я─п╟я┐п╩п╦я┌я▄?\n\r");
 	    return;
 	}
 	else  {
-	    ch->printf("Ты ждешь, пока некто '%s' отбросит тень на твою могилу.\n\r", ch->ambushing);
+	    ch->printf("п╒я▀ п╤п╢п╣я┬я▄, п©п╬п╨п╟ п╫п╣п╨я┌п╬ '%s' п╬я┌п╠я─п╬я│п╦я┌ я┌п╣п╫я▄ п╫п╟ я┌п╡п╬я▌ п╪п╬пЁп╦п╩я┐.\n\r", ch->ambushing);
 	    return;
 	}
     }
@@ -908,8 +908,8 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
     if (!victim)
 	return false;
     
-    act_p("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR, POS_RESTING);
-    act_p("Тень $c2 падает на могилу...", victim, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("п╒п╡п╬я▐ я┌п╣п╫я▄ п©п╟п╢п╟п╣я┌ п╫п╟ п╪п╬пЁп╦п╩я┐...", victim, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("п╒п╣п╫я▄ $c2 п©п╟п╢п╟п╣я┌ п╫п╟ п╪п╬пЁп╦п╩я┐...", victim, 0, 0, TO_ROOM, POS_RESTING);
     
     undig( ch );
     ch->position = POS_STANDING;
@@ -918,9 +918,9 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
 	BonedaggerOneHit bd( ch, victim );
 	
 	if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
-	    act_p("$c1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT, POS_RESTING);
-	    act_p("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	    act_p("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, victim, TO_CHAR, POS_RESTING);
+	    act_p("$c1 п╨п╬я│я┌я▐п╫я▀п╪ п╫п╬п╤п╬п╪ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╪п╦п╪п╬ я┌п╡п╬п╣п╧ я┌п╣п╫п╦!", ch, 0, victim, TO_VICT, POS_RESTING);
+	    act_p("$c1 п╨п╬я│я┌я▐п╫я▀п╪ п╫п╬п╤п╬п╪ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╪п╦п╪п╬ я┌п╣п╫п╦ $C2!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+	    act_p("п╒я▀ п╨п╬я│я┌я▐п╫я▀п╪ п╫п╬п╤п╬п╪ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐ п╪п╦п╪п╬ я┌п╣п╫п╦ $C2!", ch, 0, victim, TO_CHAR, POS_RESTING);
 	    
 	    gsn_bonedagger->improve( ch, false, victim );
 	    bd.miss( );
@@ -929,9 +929,9 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
 	
 	gsn_bonedagger->improve( ch, true, victim );
 	
-	act_p("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT, POS_RESTING);
-	act_p("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	act_p("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p("$c1 п©я─п╦п╨п╬п╡я▀п╡п╟п╣я┌ я┌п╡п╬я▌ я┌п╣п╫я▄ п╨п╬я│я┌я▐п╫я▀п╪ п╫п╬п╤п╬п╪ п╨ п╥п╣п╪п╩п╣!\r\nп╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╡п╦п╫я┐я┌я▄я│я▐ я│ п╪п╣я│я┌п╟!", ch, 0, victim, TO_VICT, POS_RESTING);
+	act_p("$c1 п©я─п╦п╨п╬п╡я▀п╡п╟п╣я┌ я┌п╣п╫я▄ $C2 п╨п╬я│я┌я▐п╫я▀п╪ п╫п╬п╤п╬п╪ п╨ п╥п╣п╪п╩п╣!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+	act_p("п╒я▀ п©я─п╦п╨п╬п╡я▀п╡п╟п╣я┬я▄ я┌п╣п╫я▄ $C2 п╨п╬я│я┌я▐п╫я▀п╪ п╫п╬п╤п╬п╪ п╨ п╥п╣п╪п╩п╣!", ch, 0, victim, TO_CHAR, POS_RESTING);
 
 	af.type = gsn_bonedagger;
 	af.level = ch->getModifyLevel( );
@@ -960,13 +960,13 @@ SKILL_RUNP( sense )
     
   if (ch->is_npc() || !gsn_sense_life->usable( ch ) )
     {
-      ch->send_to("Что?\n\r");
+      ch->send_to("п╖я┌п╬?\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_sense_life))
     {
-      ch->send_to("Ты уже можешь чувствовать присутствие живых организмов.\n\r");
+      ch->send_to("п╒я▀ я┐п╤п╣ п╪п╬п╤п╣я┬я▄ я┤я┐п╡я│я┌п╡п╬п╡п╟я┌я▄ п©я─п╦я│я┐я┌я│я┌п╡п╦п╣ п╤п╦п╡я▀я┘ п╬я─пЁп╟п╫п╦п╥п╪п╬п╡.\n\r");
       return;
     }
 
@@ -974,14 +974,14 @@ SKILL_RUNP( sense )
     
   if (ch->mana < mana)
     {
-      ch->send_to("У тебя не хватает энергии для этого.\n\r");
+      ch->send_to("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬.\n\r");
       return;
     }
 
   ch->setWait( gsn_sense_life->getBeats( )  );
 
     if(SHADOW(ch)) {
-      ch->send_to("Кроме своей тени тебе не удается ничего почувствовать.\n\r");
+      ch->send_to("п я─п╬п╪п╣ я│п╡п╬п╣п╧ я┌п╣п╫п╦ я┌п╣п╠п╣ п╫п╣ я┐п╢п╟п╣я┌я│я▐ п╫п╦я┤п╣пЁп╬ п©п╬я┤я┐п╡я│я┌п╡п╬п╡п╟я┌я▄.\n\r");
       return;
     }
 
@@ -1000,9 +1000,9 @@ SKILL_RUNP( sense )
 
       ch->mana -= mana;
 
-      act_p("Ты начинаешь чувствовать присутствие живых организмов в комнате!",
+      act_p("п╒я▀ п╫п╟я┤п╦п╫п╟п╣я┬я▄ я┤я┐п╡я│я┌п╡п╬п╡п╟я┌я▄ п©я─п╦я│я┐я┌я│я┌п╡п╦п╣ п╤п╦п╡я▀я┘ п╬я─пЁп╟п╫п╦п╥п╪п╬п╡ п╡ п╨п╬п╪п╫п╟я┌п╣!",
              ch,0,0,TO_CHAR,POS_RESTING);
-      act_p("$c1 выглядит более чувствительным к присутствию живых организмов.",
+      act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╠п╬п╩п╣п╣ я┤я┐п╡я│я┌п╡п╦я┌п╣п╩я▄п╫я▀п╪ п╨ п©я─п╦я│я┐я┌я│я┌п╡п╦я▌ п╤п╦п╡я▀я┘ п╬я─пЁп╟п╫п╦п╥п╪п╬п╡.",
              ch,0,0,TO_ROOM,POS_RESTING);
       gsn_sense_life->improve( ch, true );
     }
@@ -1010,7 +1010,7 @@ SKILL_RUNP( sense )
     {
       ch->mana -= mana / 2;
 
-     ch->send_to("Твоя попытка закончилась неудачей.\n\r" );
+     ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r" );
       gsn_sense_life->improve( ch, false );
     }
 
@@ -1022,23 +1022,23 @@ VOID_SPELL(BatSworm)::run( Character *ch, Character *, int sn, int level )
     Affect af;
 
     if (!ch->fighting) {
-	ch->send_to("Сейчас ты не сражаешься!\r\n");
+	ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\r\n");
 	return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	ch->send_to("Для этого тебе необходимо превратиться в вампира.\r\n");
+	ch->send_to("п■п╩я▐ я█я┌п╬пЁп╬ я┌п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п©я─п╣п╡я─п╟я┌п╦я┌я▄я│я▐ п╡ п╡п╟п╪п©п╦я─п╟.\r\n");
 	return;
     }
 
     if (ch->isAffected(sn)) {
-	ch->send_to("Две стаи летучих мышей - это слишком.\r\n");
+	ch->send_to("п■п╡п╣ я│я┌п╟п╦ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ - я█я┌п╬ я│п╩п╦я┬п╨п╬п╪.\r\n");
 	return;
     }
 
-    act_p("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL, POS_RESTING);
-    act_p("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("п▓ п╡п╬п╥п╢я┐я┘п╣ п╡п╫п╣п╥п╟п©п╫п╬ я─п╟п╥п╢п╟п╣я┌я│я▐ я┬п╣п╩п╣я│я┌ п╨я─я▀п╩я▄п╣п╡ п╦ п╣п╢п╡п╟ я─п╟п╥п╩п╦я┤п╦п╪я▀п╧ п©п╦я│п╨.", ch, 0, 0, TO_ALL, POS_RESTING);
+    act_p("п²п╟ п╥п╬п╡ $c2 я│п╩п╣я┌п╟п╣я┌я│я▐ я│я┌п╟я▐ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п╦ п╬п╨я─я┐п╤п╟п╣я┌ $s п╤п╦п╡я▀п╪ п╬п╠п╩п╟п╨п╬п╪.", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("п║я┌п╟я▐ п╩п╣я┌я┐я┤п╦я┘ п╪я▀я┬п╣п╧ п©я─п╦п╠я▀п╡п╟п╣я┌ п©п╬ я┌п╡п╬п╣п╪я┐ п╥п╬п╡я┐ п╦ п╬п╨я─я┐п╤п╟п╣я┌ я┌п╣п╠я▐ п╤п╦п╡я▀п╪ п╬п╠п╩п╟п╨п╬п╪.", ch, 0, 0, TO_CHAR, POS_RESTING);
 
     af.where	    = TO_AFFECTS;
     af.type	    = sn;
@@ -1064,8 +1064,8 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
 	return false;
 
     if (actor->is_npc( ) || actor->getProfession( ) != prof_vampire) {
-	act( "$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
-	act( "$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
+	act( "$c1 п╬п╢п╟я─п╦п╡п╟п╣я┌ $C4 я─п╟п╡п╫п╬п╢я┐я┬п╫я▀п╪ я┘п╬п╩п╬п╢п╫я▀п╪ п╡п╥пЁп╩я▐п╢п╬п╪.", ch, 0, actor, TO_NOTVICT );
+	act( "$c1 п╬п╢п╟я─п╦п╡п╟п╣я┌ я┌п╣п╠я▐ я─п╟п╡п╫п╬п╢я┐я┬п╫я▀п╪ я┘п╬п╩п╬п╢п╫я▀п╪ п╡п╥пЁп╩я▐п╢п╬п╪.", ch, 0, actor, TO_VICT );
 	return true;
     }
     
@@ -1073,21 +1073,21 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     PCSkillData &data = pActor->getSkillData( gsn_vampire );
 
     if (data.learned == 100) {
-	say_act( actor, ch, "Ты уже ста$gло|л|ла одн$gим|им|ой из нас, $c1." );
+	say_act( actor, ch, "п╒я▀ я┐п╤п╣ я│я┌п╟$gп╩п╬|п╩|п╩п╟ п╬п╢п╫$gп╦п╪|п╦п╪|п╬п╧ п╦п╥ п╫п╟я│, $c1." );
 	return true;
     }
     
     if (pActor->questpoints < 50) {
-	say_act( actor, ch, "Я потребую с тебя 50 qp, но я вижу, что ты не можешь заплатить такую цену." );
+	say_act( actor, ch, "п╞ п©п╬я┌я─п╣п╠я┐я▌ я│ я┌п╣п╠я▐ 50 qp, п╫п╬ я▐ п╡п╦п╤я┐, я┤я┌п╬ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п©п╩п╟я┌п╦я┌я▄ я┌п╟п╨я┐я▌ я├п╣п╫я┐." );
 	return true;
     }
 
     pActor->questpoints -= 50;
     data.learned = 100;
 
-    act( "$C1 делится секретом бессмертия с $c5.", actor, 0, ch, TO_ROOM );
-    act( "$C1 делится с тобой секретом бессмертия.", actor, 0, ch, TO_CHAR );
-    act_p( "{BМолнии сверкают на небе.{x", actor, 0, ch, TO_ALL, POS_SLEEPING );
+    act( "$C1 п╢п╣п╩п╦я┌я│я▐ я│п╣п╨я─п╣я┌п╬п╪ п╠п╣я│я│п╪п╣я─я┌п╦я▐ я│ $c5.", actor, 0, ch, TO_ROOM );
+    act( "$C1 п╢п╣п╩п╦я┌я│я▐ я│ я┌п╬п╠п╬п╧ я│п╣п╨я─п╣я┌п╬п╪ п╠п╣я│я│п╪п╣я─я┌п╦я▐.", actor, 0, ch, TO_CHAR );
+    act_p( "{Bп°п╬п╩п╫п╦п╦ я│п╡п╣я─п╨п╟я▌я┌ п╫п╟ п╫п╣п╠п╣.{x", actor, 0, ch, TO_ALL, POS_SLEEPING );
     return true;
 }
 

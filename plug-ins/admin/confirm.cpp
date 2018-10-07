@@ -37,7 +37,7 @@ COMMAND(Confirm, "confirm")
     cmd = arguments.getOneArgument( );
     
     if (ch->is_npc( )) {
-        ch->send_to( "Тебе нельзя.\n\r" );
+        ch->send_to( "п╒п╣п╠п╣ п╫п╣п╩я▄п╥я▐.\n\r" );
         return;
     }
     
@@ -45,23 +45,23 @@ COMMAND(Confirm, "confirm")
 	usage( ch );
     }
     else if (cmd.strPrefix( "request" ) 
-	     || cmd.strPrefix( "попросить" )) 
+	     || cmd.strPrefix( "п©п╬п©я─п╬я│п╦я┌я▄" )) 
     {
         doRequest( ch );
     }
     else if ((cmd.strPrefix( "accept" ) 
-	      || cmd.strPrefix( "принять" )) && ch->is_immortal( ))
+	      || cmd.strPrefix( "п©я─п╦п╫я▐я┌я▄" )) && ch->is_immortal( ))
     {
         doAccept( ch, arguments );
     }
     else if ((cmd.strPrefix( "remove" ) 
 	     || cmd.strPrefix( "reject" ) 
-	     || cmd.strPrefix( "отклонить" )) && ch->is_immortal( ))
+	     || cmd.strPrefix( "п╬я┌п╨п╩п╬п╫п╦я┌я▄" )) && ch->is_immortal( ))
     {
         doReject( ch, arguments );
     }
     else if ((cmd.strPrefix( "delete" ) 
-	      || cmd.strPrefix( "удалить" )) && ch->is_immortal( ))
+	      || cmd.strPrefix( "я┐п╢п╟п╩п╦я┌я▄" )) && ch->is_immortal( ))
     {
         doDelete( ch, arguments );
     }
@@ -74,7 +74,7 @@ COMMAND(Confirm, "confirm")
         doShow( ch, arguments );
     }
     else if ((cmd.strPrefix( "unread" ) 
-	      || cmd.strPrefix( "непрочитано" )) && ch->is_immortal( ))
+	      || cmd.strPrefix( "п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╬" )) && ch->is_immortal( ))
     {
         doUnread( ch );
     }
@@ -90,7 +90,7 @@ void Confirm::doRequest( Character *ch )
     DLString descr;    
 
     if (IS_SET( ch->act, PLR_CONFIRMED )) {
-	ch->send_to( "Твой персонаж уже подтвержден.\n\r" );
+	ch->send_to( "п╒п╡п╬п╧ п©п╣я─я│п╬п╫п╟п╤ я┐п╤п╣ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫.\n\r" );
 	return;
     }
     
@@ -103,15 +103,15 @@ void Confirm::doRequest( Character *ch )
     }
     
     if (descr.empty( )) {
-	ch->send_to( "Прочитай внимательно '{lRсправка подтверждение{lEhelp confirm{lx' и '{lRсправка описание{lEhelp description{lx'.\r\n" );
+	ch->send_to( "п÷я─п╬я┤п╦я┌п╟п╧ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ '{lRя│п©я─п╟п╡п╨п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣{lEhelp confirm{lx' п╦ '{lRя│п©я─п╟п╡п╨п╟ п╬п©п╦я│п╟п╫п╦п╣{lEhelp description{lx'.\r\n" );
 	return;
     }
 
     attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeConfirm>( "confirm" );
     
-    ch->println( "Твое описание отправлено Бессмертным на рассмотрение." );
+    ch->println( "п╒п╡п╬п╣ п╬п©п╦я│п╟п╫п╦п╣ п╬я┌п©я─п╟п╡п╩п╣п╫п╬ п▒п╣я│я│п╪п╣я─я┌п╫я▀п╪ п╫п╟ я─п╟я│я│п╪п╬я┌я─п╣п╫п╦п╣." );
     wiznet( WIZ_CONFIRM, 0, 0,
-            "%^C1 просит подтверждения своему персонажу.", ch );
+            "%^C1 п©я─п╬я│п╦я┌ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦я▐ я│п╡п╬п╣п╪я┐ п©п╣я─я│п╬п╫п╟п╤я┐.", ch );
     
     attr->update( ch ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
@@ -125,7 +125,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-	ch->send_to( "Подтвердить кого?\r\n" );
+	ch->send_to( "п÷п╬п╢я┌п╡п╣я─п╢п╦я┌я▄ п╨п╬пЁп╬?\r\n" );
 	return;
     }
 
@@ -139,7 +139,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
     victim = pci->getPlayer( );
 
     if (victim && IS_SET(victim->act, PLR_CONFIRMED)) {
-	ch->send_to( "Этот персонаж уже подтвержден.\r\n" );
+	ch->send_to( "п╜я┌п╬я┌ п©п╣я─я│п╬п╫п╟п╤ я┐п╤п╣ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫.\r\n" );
 	return;
     }
 	    
@@ -147,12 +147,12 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
 
     if (!attr) { 
 	if (!victim) {
-	    ch->send_to( "Может, хотя бы взглянешь на него?\r\n" );
+	    ch->send_to( "п°п╬п╤п╣я┌, я┘п╬я┌я▐ п╠я▀ п╡п╥пЁп╩я▐п╫п╣я┬я▄ п╫п╟ п╫п╣пЁп╬?\r\n" );
 	    return;
 	} 
 	
 	if (!ch->isCoder( )) {
-	    ch->printf( "От %s не было заявки на подтверждение персонажа.\n\r", pci->getName( ).c_str( ) );
+	    ch->printf( "п·я┌ %s п╫п╣ п╠я▀п╩п╬ п╥п╟я▐п╡п╨п╦ п╫п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣ п©п╣я─я│п╬п╫п╟п╤п╟.\n\r", pci->getName( ).c_str( ) );
 	    return;
 	}
 
@@ -169,7 +169,7 @@ void Confirm::doAccept( Character *ch, DLString& arguments )
     ch->send_to( "Ok.\r\n" );
 
     wiznet( WIZ_CONFIRM, 0, 0,
-	    "Персонаж %^N1 подтвержден %C5.", pci->getName( ).c_str( ), ch );
+	    "п÷п╣я─я│п╬п╫п╟п╤ %^N1 п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫ %C5.", pci->getName( ).c_str( ), ch );
 
     if (victim) 
 	attr->run( victim );
@@ -188,7 +188,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     }
 
     if (arguments.empty( )) {
-	ch->send_to( "Нужно указать причину отказа.\r\n" );
+	ch->send_to( "п²я┐п╤п╫п╬ я┐п╨п╟п╥п╟я┌я▄ п©я─п╦я┤п╦п╫я┐ п╬я┌п╨п╟п╥п╟.\r\n" );
 	return;
     }
 
@@ -204,7 +204,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
 
     } catch (Exception e) {
 	LogStream::sendError( ) << e.what( ) << endl;
-	ch->send_to( "Невозможно по техническим причинам.\r\n" );
+	ch->send_to( "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п©п╬ я┌п╣я┘п╫п╦я┤п╣я│п╨п╦п╪ п©я─п╦я┤п╦п╫п╟п╪.\r\n" );
 	return;
     }
 
@@ -212,7 +212,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     
     if (!attr) { 
 	if (!victim) { 
-	    ch->send_to( "Может, хотя бы взглянешь на него?\r\n" );
+	    ch->send_to( "п°п╬п╤п╣я┌, я┘п╬я┌я▐ п╠я▀ п╡п╥пЁп╩я▐п╫п╣я┬я▄ п╫п╟ п╫п╣пЁп╬?\r\n" );
 	    return;
 	} else { 
 	    attr = pci->getAttributes( ).getAttr<XMLAttributeConfirm>( "confirm" );
@@ -229,7 +229,7 @@ void Confirm::doReject( Character *ch, DLString& arguments )
     ch->send_to( "Ok.\r\n" );
 
     wiznet( WIZ_CONFIRM, 0, 0,
-	    "%^C1 отказывает в подтверждении персонажу %^N1.", ch, pci->getName( ).c_str( ) );
+	    "%^C1 п╬я┌п╨п╟п╥я▀п╡п╟п╣я┌ п╡ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╦ п©п╣я─я│п╬п╫п╟п╤я┐ %^N1.", ch, pci->getName( ).c_str( ) );
 
     if (victim) 
 	attr->run( victim );
@@ -242,7 +242,7 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
     DLString name = arguments.getOneArgument( );
 
     if (name.empty( )) {
-	ch->send_to( "Чью заявку удалить?\r\n" );
+	ch->send_to( "п╖я▄я▌ п╥п╟я▐п╡п╨я┐ я┐п╢п╟п╩п╦я┌я▄?\r\n" );
 	return;
     }
 
@@ -256,7 +256,7 @@ void Confirm::doDelete( Character *ch, DLString& arguments )
     attr = pci->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
     
     if (!attr) {
-	ch->send_to( "Этот игрок не посылал заявки на подтверждение.\r\n" );
+	ch->send_to( "п╜я┌п╬я┌ п╦пЁя─п╬п╨ п╫п╣ п©п╬я│я▀п╩п╟п╩ п╥п╟я▐п╡п╨п╦ п╫п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣.\r\n" );
 	return;
     }
     
@@ -311,7 +311,7 @@ void Confirm::doShow( Character *ch, DLString& argument )
     attr = pci->getAttributes( ).findAttr<XMLAttributeConfirm>( "confirm" );
     
     if (!attr) {
-	ch->send_to( "Этот игрок не посылал заявки на подтверждение.\r\n" );
+	ch->send_to( "п╜я┌п╬я┌ п╦пЁя─п╬п╨ п╫п╣ п©п╬я│я▀п╩п╟п╩ п╥п╟я▐п╡п╨п╦ п╫п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣.\r\n" );
 	return;
     }
 
@@ -363,9 +363,9 @@ void Confirm::doUnread( Character *ch )
     }
     
     if (total) {
-	buf << "Тебя ожидает " << total-processed 
-	    << " заяв" << GET_COUNT( total-processed, "ка", "ки", "ок" )
-	    << " на подтверждение персонажа. Всего заявок: " << total << "." << endl;
+	buf << "п╒п╣п╠я▐ п╬п╤п╦п╢п╟п╣я┌ " << total-processed 
+	    << " п╥п╟я▐п╡" << GET_COUNT( total-processed, "п╨п╟", "п╨п╦", "п╬п╨" )
+	    << " п╫п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣ п©п╣я─я│п╬п╫п╟п╤п╟. п▓я│п╣пЁп╬ п╥п╟я▐п╡п╬п╨: " << total << "." << endl;
 	ch->send_to( buf );
     }
 }
@@ -374,21 +374,21 @@ void Confirm::usage( Character *ch )
 {
     std::basic_ostringstream<char> buf;
    
-    buf << "Формат:" << endl
-        << "{lEconfirm{lRподтверждение{lx {lErequest{lRпопросить{x  - послать заявку на подтверждение персонажа" << endl;
+    buf << "п╓п╬я─п╪п╟я┌:" << endl
+        << "{lEconfirm{lRп©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣{lx {lErequest{lRп©п╬п©я─п╬я│п╦я┌я▄{x  - п©п╬я│п╩п╟я┌я▄ п╥п╟я▐п╡п╨я┐ п╫п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣ п©п╣я─я│п╬п╫п╟п╤п╟" << endl;
 
     if (!ch->is_immortal( )) {
 	ch->send_to( buf );
 	return;
     }
 
-    buf << endl << "Для бессмертных:" << endl
-        << "confirm list     - показать список заявок" << endl
-	<< "confirm unread   - статистика поданых заявок" << endl
-	<< "confirm accept <player> [<reason>] - подтвердить персонаж" << endl
-	<< "confirm reject <player> <reason>   - отказать в подтверждении" << endl
-	<< "confirm delete <player>            - удалить заявку из списка" << endl
-	<< "confirm show   <player>            - показать детали заявки" << endl;
+    buf << endl << "п■п╩я▐ п╠п╣я│я│п╪п╣я─я┌п╫я▀я┘:" << endl
+        << "confirm list     - п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ п╥п╟я▐п╡п╬п╨" << endl
+	<< "confirm unread   - я│я┌п╟я┌п╦я│я┌п╦п╨п╟ п©п╬п╢п╟п╫я▀я┘ п╥п╟я▐п╡п╬п╨" << endl
+	<< "confirm accept <player> [<reason>] - п©п╬п╢я┌п╡п╣я─п╢п╦я┌я▄ п©п╣я─я│п╬п╫п╟п╤" << endl
+	<< "confirm reject <player> <reason>   - п╬я┌п╨п╟п╥п╟я┌я▄ п╡ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╦" << endl
+	<< "confirm delete <player>            - я┐п╢п╟п╩п╦я┌я▄ п╥п╟я▐п╡п╨я┐ п╦п╥ я│п©п╦я│п╨п╟" << endl
+	<< "confirm show   <player>            - п©п╬п╨п╟п╥п╟я┌я▄ п╢п╣я┌п╟п╩п╦ п╥п╟я▐п╡п╨п╦" << endl;
 
     ch->send_to( buf );
 }
@@ -405,11 +405,11 @@ void XMLAttributeConfirm::run( Character *ch )
 	return;
     
     if (accepted.getValue( )) {
-	buf << "{WТвой персонаж подтвержден Богами.{x" << endl;
+	buf << "{Wп╒п╡п╬п╧ п©п╣я─я│п╬п╫п╟п╤ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫ п▒п╬пЁп╟п╪п╦.{x" << endl;
 	SET_BIT( ch->act, PLR_CONFIRMED );
     }
     else {
-	buf << "{RТвоему персонажу отказано в подтверждении.{x" << endl;
+	buf << "{Rп╒п╡п╬п╣п╪я┐ п©п╣я─я│п╬п╫п╟п╤я┐ п╬я┌п╨п╟п╥п╟п╫п╬ п╡ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╦.{x" << endl;
 	REMOVE_BIT( ch->act, PLR_CONFIRMED );
     }
     

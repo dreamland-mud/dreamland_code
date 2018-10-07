@@ -312,12 +312,12 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
 	d->outbuf[d->outtop] = c;
 	if( to == koi8_tran ) {
 	    switch( *txt ) {
-	    case 'Ñ': case 'ñ': d->outbuf[++d->outtop] = 'a'; break;
-	    case 'À': case 'à': d->outbuf[++d->outtop] = 'u'; break;
-	    case 'Þ': case 'þ': d->outbuf[++d->outtop] = 'h'; break;
-	    case 'Ö': case 'ö': d->outbuf[++d->outtop] = 'h'; break;
-	    case 'Û': case 'û': d->outbuf[++d->outtop] = 'h'; break;
-	    case 'Ý': case 'ý': d->outbuf[++d->outtop] = 'c';
+	    case 'Ñ': case 'Ð¯': d->outbuf[++d->outtop] = 'a'; break;
+	    case 'ÑŽ': case 'Ð®': d->outbuf[++d->outtop] = 'u'; break;
+	    case 'Ñ‡': case 'Ð§': d->outbuf[++d->outtop] = 'h'; break;
+	    case 'Ð¶': case 'Ð–': d->outbuf[++d->outtop] = 'h'; break;
+	    case 'Ñˆ': case 'Ð¨': d->outbuf[++d->outtop] = 'h'; break;
+	    case 'Ñ‰': case 'Ð©': d->outbuf[++d->outtop] = 'c';
 				d->outbuf[++d->outtop] = 'h';
 				break;
 	    }

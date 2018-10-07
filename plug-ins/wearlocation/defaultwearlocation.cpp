@@ -194,25 +194,25 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-	act( "Твой характер не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
-	act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-	act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+	act( "п╒п╡п╬п╧ я┘п╟я─п╟п╨я┌п╣я─ п╫п╣ п©п╬п╥п╡п╬п╩я▐п╣я┌ я┌п╣п╠п╣ п╫п╬я│п╦я┌я▄ $o4.", ch, obj, 0, TO_CHAR);
+	act( "$o1 я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ я│ $c2.", ch, obj, 0, TO_ROOM );
+	act( "$o1 я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ я│ я┌п╣п╠я▐.", ch, obj, 0, TO_CHAR );
 	return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
-	act("Твой характер все еще не позволяет тебе носить $o4.", ch, obj, 0, TO_CHAR);
-	act( "$o1 соскальзывает с $c2.", ch, obj, 0, TO_ROOM );
-	act( "$o1 соскальзывает с тебя.", ch, obj, 0, TO_CHAR );
+	act("п╒п╡п╬п╧ я┘п╟я─п╟п╨я┌п╣я─ п╡я│п╣ п╣я┴п╣ п╫п╣ п©п╬п╥п╡п╬п╩я▐п╣я┌ я┌п╣п╠п╣ п╫п╬я│п╦я┌я▄ $o4.", ch, obj, 0, TO_CHAR);
+	act( "$o1 я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ я│ $c2.", ch, obj, 0, TO_ROOM );
+	act( "$o1 я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ я│ я┌п╣п╠я▐.", ch, obj, 0, TO_CHAR );
 	return false;
     }
 
     if (IS_SET( obj->extra_flags, ITEM_MAGIC ) && ch->isAffected( gsn_spellbane )) {
 	int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
-	act("Магия $o2 аннигилирует с твоим spellbane!", ch, obj, 0, TO_CHAR);
-	act("Магия $o2 аннигилирует со spellbane $c2!", ch, obj, 0, TO_ROOM);
+	act("п°п╟пЁп╦я▐ $o2 п╟п╫п╫п╦пЁп╦п╩п╦я─я┐п╣я┌ я│ я┌п╡п╬п╦п╪ spellbane!", ch, obj, 0, TO_CHAR);
+	act("п°п╟пЁп╦я▐ $o2 п╟п╫п╫п╦пЁп╦п╩п╦я─я┐п╣я┌ я│п╬ spellbane $c2!", ch, obj, 0, TO_ROOM);
 	SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_SPELL ).hit( false );
-	interpret_raw( ch, "cb", "Меня ударило магической вещью!" );
+	interpret_raw( ch, "cb", "п°п╣п╫я▐ я┐п╢п╟я─п╦п╩п╬ п╪п╟пЁп╦я┤п╣я│п╨п╬п╧ п╡п╣я┴я▄я▌!" );
 	return false;
     }
 
@@ -296,8 +296,8 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
  *------------------------------------------------------------------*/
 bool DefaultWearlocation::remove( Object *obj, int flags )
 {
-    static const char *MSG_SELF = "Ты снимаешь %2$O4.";
-    static const char *MSG_ROOM = "%1$^C1 снимает %2$O4.";
+    static const char *MSG_SELF = "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ %2$O4.";
+    static const char *MSG_ROOM = "%1$^C1 я│п╫п╦п╪п╟п╣я┌ %2$O4.";
     Character *ch = obj->carried_by;
     
     if (!canRemove( ch, obj, flags ))
@@ -337,7 +337,7 @@ bool DefaultWearlocation::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(obj->extra_flags, ITEM_NOREMOVE)) {
 	if (IS_SET(flags, F_WEAR_VERBOSE)) 
-	    act( "Ты не можешь снять $o4.", ch, obj, 0, TO_CHAR);
+	    act( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╫я▐я┌я▄ $o4.", ch, obj, 0, TO_CHAR);
 	return false;
     }
     
@@ -406,8 +406,8 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (wear_level > ch->getRealLevel( )) {
 	if (IS_SET(flags, F_WEAR_VERBOSE)) {
-	    ch->pecho( "Чтобы использовать это, тебе необходимо достичь %d уровня.", wear_level );
-	    ch->recho( "%1$^C3 не хватает опыта, чтобы использовать %2$O4.", ch, obj );
+	    ch->pecho( "п╖я┌п╬п╠я▀ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я█я┌п╬, я┌п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╢п╬я│я┌п╦я┤я▄ %d я┐я─п╬п╡п╫я▐.", wear_level );
+	    ch->recho( "%1$^C3 п╫п╣ я┘п╡п╟я┌п╟п╣я┌ п╬п©я▀я┌п╟, я┤я┌п╬п╠я▀ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ %2$O4.", ch, obj );
 	}
 	return RC_WEAR_YOUNG;
     }

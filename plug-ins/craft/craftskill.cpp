@@ -22,7 +22,7 @@
 
 GSN(learning);
 
-const DLString CraftSkill::CATEGORY = "Умения дополнительных профессий";
+const DLString CraftSkill::CATEGORY = "пёп╪п╣п╫п╦я▐ п╢п╬п©п╬п╩п╫п╦я┌п╣п╩я▄п╫я▀я┘ п©я─п╬я└п╣я│я│п╦п╧";
 
 CraftSkill::CraftSkill( )
 {
@@ -106,7 +106,7 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
 	if (verbose)
-	    ch->println( "Тебе не с кем практиковаться здесь." );
+	    ch->println( "п╒п╣п╠п╣ п╫п╣ я│ п╨п╣п╪ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄я│я▐ п╥п╢п╣я│я▄." );
 	return false;
     }
     
@@ -114,8 +114,8 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 	return true;
 
     if (verbose)
-	ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-	       "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
+	ch->pecho( "%1$^C1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╟я┐я┤п╦я┌я▄ я┌п╣п╠я▐ п╦я│п╨я┐я│я│я┌п╡я┐ '%2$s'.\n"
+	       "п■п╩я▐ п╠п╬п╩я▄я┬п╣п╧ п╦п╫я└п╬я─п╪п╟я├п╦п╦ п╦я│п©п╬п╩я▄п╥я┐п╧: {y{hc{lRя┐п╪п╣п╫п╦п╣ %2$s{lEslook %2$s{x, {y{lRпЁя─я┐п©п©п╟я┐п╪п╣п╫ {DпЁя─я┐п©п©п╟{y{lEglist {DпЁя─я┐п©п©п╟{x.",
 	       mob, getNameFor( ch ).c_str( ) );
     return false;
 }
@@ -124,10 +124,10 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf )
 {
     bool rus = ch->getConfig( )->ruskills;
 
-    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
+    buf << (spell && spell->isCasted( ) ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣")
         << " '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{hg{W" 
+	<< "п╡я┘п╬п╢п╦я┌ п╡ пЁя─я┐п©п©я┐ '{hg{W" 
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
 	<< "{x'"
 	<< endl;
@@ -147,7 +147,7 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf )
     }
 
     if (!pbuf.empty())
-        buf << "Доступно профессии " << pbuf << endl;
+        buf << "п■п╬я│я┌я┐п©п╫п╬ п©я─п╬я└п╣я│я│п╦п╦ " << pbuf << endl;
 } 
 
 static void mprog_skill( Character *ch, Character *actor, const char *skill, bool success, Character *victim )
@@ -204,7 +204,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
 	if (number_percent( ) >= chance)
 	    return;
 	    
-	act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
+	act_p("{Gп╒п╣п©п╣я─я▄ я┌я▀ пЁп╬я─п╟п╥п╢п╬ п╩я┐я┤я┬п╣ п╡п╩п╟п╢п╣п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬п╪ '$t'!{x",
 		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
 	    
 	data.learned++;
@@ -220,7 +220,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
 	if (number_percent( ) >= chance)
 	    return;
 
-	act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
+	act_p("{Gп╒я▀ я┐я┤п╦я┬я▄я│я▐ п╫п╟ я│п╡п╬п╦я┘ п╬я┬п╦п╠п╨п╟я┘, п╦ я┌п╡п╬п╣ я┐п╪п╣п╫п╦п╣ '$t' я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡я┐п╣я┌я│я▐.{x",
 		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
 	
 	data.learned += number_range( 1, wis_mod );
@@ -234,7 +234,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
 	xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-	act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
+	act_p("{Wп╒п╣п©п╣я─я▄ я┌я▀ {Cп╪п╟я│я┌п╣я─я│п╨п╦{W п╡п╩п╟п╢п╣п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬п╪ {C$t{W!{x",
 	      pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
 	
 	xp += 98 * getRating( pch );

@@ -31,7 +31,7 @@ bool RemortBonus::available( Character *client, NPCharacter *keeper ) const
 	return false;
 
     if (bonusMaximum( client->getPC( ) ) <= 0) {
-	tell_raw( client, keeper, "Это тебе ни к чему." );
+	tell_raw( client, keeper, "п╜я┌п╬ я┌п╣п╠п╣ п╫п╦ п╨ я┤п╣п╪я┐." );
 	return false;
     }
 
@@ -44,16 +44,16 @@ void RemortBonus::purchase( Character *client, NPCharacter *keeper, const DLStri
 	return;
 
     if (!price->canAfford( client )) { /* xxx quantity */
-	tell_raw( client, keeper, "Это тебе не по карману." );
+	tell_raw( client, keeper, "п╜я┌п╬ я┌п╣п╠п╣ п╫п╣ п©п╬ п╨п╟я─п╪п╟п╫я┐." );
 	return;
     }
     
     bonusBuy( client->getPC( ) );
     price->deduct( client );
     
-    client->pecho( "%^C1 вручает тебе %N4 в обмен на %N4.",
+    client->pecho( "%^C1 п╡я─я┐я┤п╟п╣я┌ я┌п╣п╠п╣ %N4 п╡ п╬п╠п╪п╣п╫ п╫п╟ %N4.",
                    keeper, getShortDescr( ).c_str( ), price->toString( client ).c_str( ) );
-    client->recho( "%^C1 выменивает что-то у %C2.", client, keeper );
+    client->recho( "%^C1 п╡я▀п╪п╣п╫п╦п╡п╟п╣я┌ я┤я┌п╬-я┌п╬ я┐ %C2.", client, keeper );
 }
 
 bool RemortBonus::sellable( Character *client )
@@ -69,15 +69,15 @@ void RemortBonus::sell( Character *client, NPCharacter *keeper )
     bonusSell( client->getPC( ) );
     price->induct( client );
 
-    client->pecho( "Ты возвращаешь %C3 %N4.", keeper, getShortDescr( ).c_str( ) );
-    client->recho( "%^C1 возвращает %C3 %N4.", client, keeper, getShortDescr( ).c_str( ) );
+    client->pecho( "п╒я▀ п╡п╬п╥п╡я─п╟я┴п╟п╣я┬я▄ %C3 %N4.", keeper, getShortDescr( ).c_str( ) );
+    client->recho( "%^C1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ %C3 %N4.", client, keeper, getShortDescr( ).c_str( ) );
 }
 
 const DLString & RemortBonus::getGender( ) const
 {
-    static const DLString yourNeutral = "тво|е|его|ему|е|им|ем";
-    static const DLString yourFemale  = "тво|я|ей|ей|ю|ей|ей";
-    static const DLString yourMale    = "тво|й|его|ему|й|им|ем";
+    static const DLString yourNeutral = "я┌п╡п╬|п╣|п╣пЁп╬|п╣п╪я┐|п╣|п╦п╪|п╣п╪";
+    static const DLString yourFemale  = "я┌п╡п╬|я▐|п╣п╧|п╣п╧|я▌|п╣п╧|п╣п╧";
+    static const DLString yourMale    = "я┌п╡п╬|п╧|п╣пЁп╬|п╣п╪я┐|п╧|п╦п╪|п╣п╪";
 
     switch (gender.getValue( )) {
     case SEX_NEUTRAL: return yourNeutral;
@@ -96,7 +96,7 @@ void RemortBonus::toStream( Character *client, ostringstream &buf ) const
 	n << " ";
     n << getShortDescr( );
 
-    buf << dlprintf( "     %-27s     {D(%d за ", 
+    buf << dlprintf( "     %-27s     {D(%d п╥п╟ ", 
                      n.ruscase( '1' ).c_str( ), getQuantity( ) );
     price->toStream( client, buf );
     buf << "){x" << endl;

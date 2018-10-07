@@ -23,14 +23,14 @@ bool XMLAttributeMarriage::handle( const WhoisArguments &args )
 
 	if (spousePCM) {
 	    if (wife)
-		buf << "ÚÁÍÕÖÅÍ ÚÁ ";
+		buf << "Ð·Ð°Ð¼ÑƒÐ¶ÐµÐ¼ Ð·Ð° ";
 	    else 
-		buf << "ÖÅÎÁÔ" << GET_SEX( args.pch, "", "Ï", "Á" ) << " ÎÁ ";
+		buf << "Ð¶ÐµÐ½Ð°Ñ‚" << GET_SEX( args.pch, "", "Ð¾", "Ð°" ) << " Ð½Ð° ";
 	} else {
 	    if (wife)
-		buf << "×ÄÏ×Á ";
+		buf << "Ð²Ð´Ð¾Ð²Ð° ";
 	    else
-		buf << "×ÄÏ×ÅÃ ";
+		buf << "Ð²Ð´Ð¾Ð²ÐµÑ† ";
 	}
 
 	buf << "{W" << spouse << "{w";
@@ -40,9 +40,9 @@ bool XMLAttributeMarriage::handle( const WhoisArguments &args )
 	if (!spouse.empty( ))
 	    buf << ", ";
 
-	buf << "ÂÙÌ" << GET_SEX( args.pch, " ÖÅÎÁÔ(ÚÁÍÕÖÅÍ)", "Ï", "Á ÚÁÍÕÖÅÍ(ÖÅÎÁÔÁ)" ) 
+	buf << "Ð±Ñ‹Ð»" << GET_SEX( args.pch, " Ð¶ÐµÐ½Ð°Ñ‚(Ð·Ð°Ð¼ÑƒÐ¶ÐµÐ¼)", "Ð¾", "Ð° Ð·Ð°Ð¼ÑƒÐ¶ÐµÐ¼(Ð¶ÐµÐ½Ð°Ñ‚Ð°)" ) 
 	    << " {W" << history.size( ) 
-	    << "{w ÒÁÚ" << GET_COUNT( history.size( ), "", "Á", "" );
+	    << "{w Ñ€Ð°Ð·" << GET_COUNT( history.size( ), "", "Ð°", "" );
     }
 
     if (!buf.empty( )) {

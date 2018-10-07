@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 #include "class_samurai.h"
 
@@ -57,13 +57,13 @@ SKILL_RUNP( enchant )
 
     if ( !ch->is_npc() &&   !gsn_enchant_sword->usable( ch ) )
     {
-	ch->send_to("þÅÇÏ?\n\r");
+	ch->send_to("Ð§ÐµÐ³Ð¾?\n\r");
 	return;
     }
 
     if (argument[0] == '\0') /* empty */
     {
-        ch->send_to("ëÁËÏÅ ÏÒÕÖÉÅ ÔÙ ÈÏÞÅÛØ ÕÌÕÞÛÉÔØ?\n\r");
+        ch->send_to("ÐšÐ°ÐºÐ¾Ðµ Ð¾Ñ€ÑƒÐ¶Ð¸Ðµ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ ÑƒÐ»ÑƒÑ‡ÑˆÐ¸Ñ‚ÑŒ?\n\r");
         return;
     }
 
@@ -71,7 +71,7 @@ SKILL_RUNP( enchant )
 
     if (obj == 0)
     {
-        ch->send_to("õ ÔÅÂÑ ÎÅÔ ÜÔÏÇÏ.\n\r");
+        ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
         return;
     }
 
@@ -79,8 +79,8 @@ SKILL_RUNP( enchant )
 
     if (wear_level > ch->getRealLevel( ))
     {
-	ch->pecho("ôÙ ÄÏÌÖ%GÎÏ|ÅÎ|ÎÁ ÄÏÓÔÉÞØ %d ÕÒÏ×ÎÑ, ÞÔÏÂÙ ÕÌÕÞÛÉÔØ ÜÔÏ.", ch, wear_level );
-        act( "$c1 ÐÙÔÁÅÔÓÑ ÕÌÕÞÛÉÔØ $o1, ÎÏ ÜÔÏ ÓÌÉÛËÏÍ ÓÌÏÖÎÏ.", ch, obj, 0, TO_ROOM);
+	ch->pecho("Ð¢Ñ‹ Ð´Ð¾Ð»Ð¶%GÐ½Ð¾|ÐµÐ½|Ð½Ð° Ð´Ð¾ÑÑ‚Ð¸Ñ‡ÑŒ %d ÑƒÑ€Ð¾Ð²Ð½Ñ, Ñ‡Ñ‚Ð¾Ð±Ñ‹ ÑƒÐ»ÑƒÑ‡ÑˆÐ¸Ñ‚ÑŒ ÑÑ‚Ð¾.", ch, wear_level );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ ÑƒÐ»ÑƒÑ‡ÑˆÐ¸Ñ‚ÑŒ $o1, Ð½Ð¾ ÑÑ‚Ð¾ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ ÑÐ»Ð¾Ð¶Ð½Ð¾.", ch, obj, 0, TO_ROOM);
         return;
     }
     
@@ -88,14 +88,14 @@ SKILL_RUNP( enchant )
     
    if (ch->mana < mana )
 	{
-	 ch->send_to("õ ÔÅÂÑ ÎÅÄÏÓÔÁÔÏÞÎÏ ÜÎÅÒÇÉÉ ÄÌÑ ÜÔÏÇÏ.\n\r");
+	 ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾.\n\r");
 	 return;
 	}
 
    if ( number_percent() > gsn_enchant_sword->getEffective( ch ) )
 	{
-	 ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓËÏÎÃÅÎÔÒÉÒÏ×ÁÔØÓÑ.\n\r");
-        act_p( "$c1 ÐÙÔÁÌÓÑ ÕÌÕÞÛÉÔØ $o1, ÎÏ ÎÁ ÍÇÎÏ×ÅÎÉÅ ÚÁÂÙÌ ËÁË ÜÔÏ ÄÅÌÁÅÔÓÑ.",
+	 ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐºÐ¾Ð½Ñ†ÐµÐ½Ñ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒÑÑ.\n\r");
+        act_p( "$c1 Ð¿Ñ‹Ñ‚Ð°Ð»ÑÑ ÑƒÐ»ÑƒÑ‡ÑˆÐ¸Ñ‚ÑŒ $o1, Ð½Ð¾ Ð½Ð° Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð¸Ðµ Ð·Ð°Ð±Ñ‹Ð» ÐºÐ°Ðº ÑÑ‚Ð¾ Ð´ÐµÐ»Ð°ÐµÑ‚ÑÑ.",
             ch, obj, 0, TO_ROOM,POS_RESTING );
 	ch->setWait( gsn_enchant_sword->getBeats( ) );
 	gsn_enchant_sword->improve( ch, false );
@@ -117,8 +117,8 @@ SKILL_RUNP( enchant )
 static void yell_explode( Character *ch, Character *victim )
 {
     yell_panic( ch, victim,
-                "ðÏÍÏÇÉÔÅ! ëÔÏ-ÔÏ ÐÙÔÁÅÔÓÑ ÐÏÄÏÒ×ÁÔØ ÍÅÎÑ!",
-		"ðÏÍÏÇÉÔÅ! %1$^C1 ÐÙÔÁÅÔÓÑ ÐÏÄÏÒ×ÁÔØ ÍÅÎÑ!" );
+                "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐšÑ‚Ð¾-Ñ‚Ð¾ Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¿Ð¾Ð´Ð¾Ñ€Ð²Ð°Ñ‚ÑŒ Ð¼ÐµÐ½Ñ!",
+		"ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! %1$^C1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¿Ð¾Ð´Ð¾Ñ€Ð²Ð°Ñ‚ÑŒ Ð¼ÐµÐ½Ñ!" );
 }
 
 
@@ -134,7 +134,7 @@ SKILL_RUNP( explode )
     level = ch->getModifyLevel( );
 
     if (ch->is_npc() || !gsn_explode->usable( ch ) ) {
-	ch->send_to("ïÇÏÎØ? þÔÏ ÜÔÏ?\n\r");
+	ch->send_to("ÐžÐ³Ð¾Ð½ÑŒ? Ð§Ñ‚Ð¾ ÑÑ‚Ð¾?\n\r");
 	return;
     }
 
@@ -142,12 +142,12 @@ SKILL_RUNP( explode )
 	one_argument(argument, arg);
 
 	if ( arg == 0 ) {
-	    ch->send_to("ôÙ ÉÇÒÁÅÛØ ÓÏ ×ÚÒÙ×ÞÁÔÙÍÉ ×ÅÝÅÓÔ×ÁÍÉ.\n\r");
+	    ch->send_to("Ð¢Ñ‹ Ð¸Ð³Ñ€Ð°ÐµÑˆÑŒ ÑÐ¾ Ð²Ð·Ñ€Ñ‹Ð²Ñ‡Ð°Ñ‚Ñ‹Ð¼Ð¸ Ð²ÐµÑ‰ÐµÑÑ‚Ð²Ð°Ð¼Ð¸.\n\r");
 	    return;
 	}
 
 	if ((victim = get_char_room(ch,arg)) == 0) {
-	    ch->send_to("üÔÏÇÏ ÎÅÔ ÚÄÅÓØ.\n\r");
+	    ch->send_to("Ð­Ñ‚Ð¾Ð³Ð¾ Ð½ÐµÑ‚ Ð·Ð´ÐµÑÑŒ.\n\r");
 	    return;
 	}
     }
@@ -155,15 +155,15 @@ SKILL_RUNP( explode )
     mana= gsn_explode->getMana( );
 
     if (ch->mana < mana ) {
-	ch->send_to("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÜÎÅÒÇÉÉ ÄÌÑ ÏÇÎÑ.\n\r");
+	ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð´Ð»Ñ Ð¾Ð³Ð½Ñ.\n\r");
 	return;
     }
 
     ch->mana -= mana;
 
-    act("$c1 ÐÏÄÖÉÇÁÅÔ ÞÔÏ-ÔÏ.",ch,0,victim,TO_NOTVICT);
-    act("$c1 ÐÏÄÖÉÇÁÅÔ ÞÔÏ-ÔÏ ×ÚÒÙ×ÞÁÔÏÅ ÐÏÄ ÔÏÂÏÊ!", ch,0,victim,TO_VICT);
-    act("ðÕÓÔØ ×ÓÅ ÓÇÏÒÉÔ!",ch,0,0,TO_CHAR);
+    act("$c1 Ð¿Ð¾Ð´Ð¶Ð¸Ð³Ð°ÐµÑ‚ Ñ‡Ñ‚Ð¾-Ñ‚Ð¾.",ch,0,victim,TO_NOTVICT);
+    act("$c1 Ð¿Ð¾Ð´Ð¶Ð¸Ð³Ð°ÐµÑ‚ Ñ‡Ñ‚Ð¾-Ñ‚Ð¾ Ð²Ð·Ñ€Ñ‹Ð²Ñ‡Ð°Ñ‚Ð¾Ðµ Ð¿Ð¾Ð´ Ñ‚Ð¾Ð±Ð¾Ð¹!", ch,0,victim,TO_VICT);
+    act("ÐŸÑƒÑÑ‚ÑŒ Ð²ÑÐµ ÑÐ³Ð¾Ñ€Ð¸Ñ‚!",ch,0,0,TO_CHAR);
 
     ch->setWait( gsn_explode->getBeats( ) );
 
@@ -230,25 +230,25 @@ SKILL_RUNP( target )
 
     if ( !ch->is_npc() &&   !gsn_target->usable( ch ) )
     {
-	ch->send_to("ôÙ ÎÅ ÚÎÁÅÛØ, ËÁË ÍÏÖÎÏ ÐÏÍÅÎÑÔØ ÃÅÌØ, ÓÒÁÖÁÑÓØ × ÇÒÕÐÐÅ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð·Ð½Ð°ÐµÑˆÑŒ, ÐºÐ°Ðº Ð¼Ð¾Ð¶Ð½Ð¾ Ð¿Ð¾Ð¼ÐµÐ½ÑÑ‚ÑŒ Ñ†ÐµÐ»ÑŒ, ÑÑ€Ð°Ð¶Ð°ÑÑÑŒ Ð² Ð³Ñ€ÑƒÐ¿Ð¿Ðµ.\n\r");
 	return;
     }
 
     if (ch->fighting == 0)
     {
-        ch->send_to("óÅÊÞÁÓ ÔÙ ÎÅ ÓÒÁÖÁÅÛØÓÑ.\n\r");
+        ch->send_to("Ð¡ÐµÐ¹Ñ‡Ð°Ñ Ñ‚Ñ‹ Ð½Ðµ ÑÑ€Ð°Ð¶Ð°ÐµÑˆÑŒÑÑ.\n\r");
         return;
     }
 
     if (argument[0] == '\0')
     {
-        ch->send_to("éÚÍÅÎÉÔØ ÃÅÌØ? îÁ ÞÔÏ?\n\r");
+        ch->send_to("Ð˜Ð·Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ñ†ÐµÐ»ÑŒ? ÐÐ° Ñ‡Ñ‚Ð¾?\n\r");
         return;
     }
 
     if (( victim = get_char_room (ch, argument)) == 0 )
     {
-        ch->send_to("ôÙ ÎÅ ×ÉÄÉÛØ ÜÔÏÇÏ ÚÄÅÓØ.\n\r");
+        ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð²Ð¸Ð´Ð¸ÑˆÑŒ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð´ÐµÑÑŒ.\n\r");
         return;
     }
 
@@ -257,7 +257,7 @@ SKILL_RUNP( target )
 
     if ( victim->fighting != ch)
     {
-	act("îÏ $E ÎÅ ÓÒÁÖÁÅÔÓÑ Ó ÔÏÂÏÊ.", ch, 0, victim, TO_CHAR);
+	act("ÐÐ¾ $E Ð½Ðµ ÑÑ€Ð°Ð¶Ð°ÐµÑ‚ÑÑ Ñ Ñ‚Ð¾Ð±Ð¾Ð¹.", ch, 0, victim, TO_CHAR);
         return;
     }
 
@@ -265,7 +265,7 @@ SKILL_RUNP( target )
   ch->setWait( gsn_target->getBeats( ) );
 
     if (victim == ch->fighting) {
-	act("ôÙ É ÔÁË Ó $Y ÓÒÁÖÁÅÛØÓÑ.", ch, 0, victim, TO_CHAR);
+	act("Ð¢Ñ‹ Ð¸ Ñ‚Ð°Ðº Ñ $Y ÑÑ€Ð°Ð¶Ð°ÐµÑˆÑŒÑÑ.", ch, 0, victim, TO_CHAR);
 	return;
     }
 
@@ -276,13 +276,13 @@ SKILL_RUNP( target )
 
     ch->fighting = victim;
 
-    act_p("$c1 ÍÅÎÑÅÔ $s ÃÅÌØ ÎÁ $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-    act_p("ôÙ ÍÅÎÑÅÛØ Ó×ÏÀ ÃÅÌØ ÎÁ $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-    act_p("$c1 ÍÅÎÑÅÔ Ó×ÏÀ ÃÅÌØ ÎÁ ÔÅÂÑ!",ch,0,victim,TO_VICT,POS_RESTING);
+    act_p("$c1 Ð¼ÐµÐ½ÑÐµÑ‚ $s Ñ†ÐµÐ»ÑŒ Ð½Ð° $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("Ð¢Ñ‹ Ð¼ÐµÐ½ÑÐµÑˆÑŒ ÑÐ²Ð¾ÑŽ Ñ†ÐµÐ»ÑŒ Ð½Ð° $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("$c1 Ð¼ÐµÐ½ÑÐµÑ‚ ÑÐ²Ð¾ÑŽ Ñ†ÐµÐ»ÑŒ Ð½Ð° Ñ‚ÐµÐ±Ñ!",ch,0,victim,TO_VICT,POS_RESTING);
       return;
     }
 
-ch->send_to("ôÙ ÐÙÔÁÅÛØÓÑ, ÎÏ ÎÅ ÍÏÖÅÛØ. ðÏÐÒÏÂÕÊ ÅÝÅ ÒÁÚ!.\n\r");
+ch->send_to("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ, Ð½Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ. ÐŸÐ¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ ÐµÑ‰Ðµ Ñ€Ð°Ð·!.\n\r");
       gsn_target->improve( ch, false, victim );
 
     return;
@@ -300,32 +300,32 @@ SKILL_RUNP( harakiri )
 
     if ( MOUNTED(ch) )
     {
-        ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓÄÅÌÁÔØ ÈÁÒÁËÉÒÉ, ÅÓÌÉ ÔÙ ×ÅÒÈÏÍ!\n\r");
+        ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ Ñ…Ð°Ñ€Ð°ÐºÐ¸Ñ€Ð¸, ÐµÑÐ»Ð¸ Ñ‚Ñ‹ Ð²ÐµÑ€Ñ…Ð¾Ð¼!\n\r");
         return;
     }
 
     if ( (chance = gsn_hara_kiri->getEffective( ch )) == 0)
     {
-	ch->send_to("ôÙ ÐÙÔÁÅÛØÓÑ ÕÂÉÔØ ÓÅÂÑ, ÎÏ ÎÅ ÍÏÖÅÛØ ×ÙÎÅÓÔÉ ÔÁËÕÀ ÂÏÌØ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ ÑƒÐ±Ð¸Ñ‚ÑŒ ÑÐµÐ±Ñ, Ð½Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð²Ñ‹Ð½ÐµÑÑ‚Ð¸ Ñ‚Ð°ÐºÑƒÑŽ Ð±Ð¾Ð»ÑŒ.\n\r");
 	return;
     }
 
     if (ch->isAffected(gsn_hara_kiri))
     {
-	act("åÓÌÉ ÕÖ ÒÅÛÉ$gÌÏ|Ì|ÌÁ ÐÏËÏÎÞÉÔØ Ó ÓÏÂÏÊ - ÐÏÐÒÏÂÕÊ ÕÂÉÔØ ôÉÓÁÈÎÁ.", ch, 0, 0, TO_CHAR);
+	act("Ð•ÑÐ»Ð¸ ÑƒÐ¶ Ñ€ÐµÑˆÐ¸$gÐ»Ð¾|Ð»|Ð»Ð° Ð¿Ð¾ÐºÐ¾Ð½Ñ‡Ð¸Ñ‚ÑŒ Ñ ÑÐ¾Ð±Ð¾Ð¹ - Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ ÑƒÐ±Ð¸Ñ‚ÑŒ Ð¢Ð¸ÑÐ°Ñ…Ð½Ð°.", ch, 0, 0, TO_CHAR);
 	return;
     }
 
     /* fighting */
     if (ch->position == POS_FIGHTING || ch->fighting)
     {
-	ch->send_to("éÓÐÏÌØÚÕÊ Ó×ÏÊ ÛÁÎÓ ÓÒÁÚÉÔØÓÑ ÄÏ ËÏÎÃÁ.\n\r");
+	ch->send_to("Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹ ÑÐ²Ð¾Ð¹ ÑˆÐ°Ð½Ñ ÑÑ€Ð°Ð·Ð¸Ñ‚ÑŒÑÑ Ð´Ð¾ ÐºÐ¾Ð½Ñ†Ð°.\n\r");
 	return;
     }
 
     if(SHADOW(ch)) {
-      ch->send_to("ôÙ ÂÅÚÕÓÐÅÛÎÏ ÒÅÖÅÛØ Ó×ÏÀ ÔÅÎØ.\n\r");
-      act_p("$c1 ÎÅ ÍÏÖÅÔ ÄÁÖÅ ÓÄÅÌÁÔØ ÓÅÂÅ ÈÁÒÁËÉÒÉ.\n...ÐÏÒÁ ÎÁ ÐÅÎÓÉÀ.",
+      ch->send_to("Ð¢Ñ‹ Ð±ÐµÐ·ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ñ€ÐµÐ¶ÐµÑˆÑŒ ÑÐ²Ð¾ÑŽ Ñ‚ÐµÐ½ÑŒ.\n\r");
+      act_p("$c1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð´Ð°Ð¶Ðµ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ ÑÐµÐ±Ðµ Ñ…Ð°Ñ€Ð°ÐºÐ¸Ñ€Ð¸.\n...Ð¿Ð¾Ñ€Ð° Ð½Ð° Ð¿ÐµÐ½ÑÐ¸ÑŽ.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -343,8 +343,8 @@ SKILL_RUNP( harakiri )
 	desire_hunger->reset( ch->getPC( ) );
 	desire_thirst->reset( ch->getPC( ) );
 
-	ch->send_to("ôÙ ÏÔÒÅÚÁÅÛØ ÓÅÂÅ ÐÁÌÅÃ É ÖÄÅÛØ, ËÏÇÄÁ ×ÙÔÅÞÅÔ ×ÓÑ ËÒÏ×Ø.\n\r");
-	act_p("$c1 ÒÁÚÒÅÚÁÅÔ Ó×ÏÅ ÔÅÌÏ É ÖÄÅÔ ÓÍÅÒÔÉ.", ch,0,0,TO_ROOM,POS_FIGHTING);
+	ch->send_to("Ð¢Ñ‹ Ð¾Ñ‚Ñ€ÐµÐ·Ð°ÐµÑˆÑŒ ÑÐµÐ±Ðµ Ð¿Ð°Ð»ÐµÑ† Ð¸ Ð¶Ð´ÐµÑˆÑŒ, ÐºÐ¾Ð³Ð´Ð° Ð²Ñ‹Ñ‚ÐµÑ‡ÐµÑ‚ Ð²ÑÑ ÐºÑ€Ð¾Ð²ÑŒ.\n\r");
+	act_p("$c1 Ñ€Ð°Ð·Ñ€ÐµÐ·Ð°ÐµÑ‚ ÑÐ²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾ Ð¸ Ð¶Ð´ÐµÑ‚ ÑÐ¼ÐµÑ€Ñ‚Ð¸.", ch,0,0,TO_ROOM,POS_FIGHTING);
 	gsn_hara_kiri->improve( ch, true );
 	interpret_raw( ch, "sleep" );
 	SET_BIT(ch->act,PLR_HARA_KIRI);
@@ -372,7 +372,7 @@ SKILL_RUNP( harakiri )
                af.bitvector = 0;
                affect_to_char( ch, &af );
 
-	ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÏÔÒÅÚÁÔØ ÓÅÂÅ ÐÁÌÅÃ. ÷ÅÄØ ÜÔÏ ÎÅ ÔÁË ÌÅÇËÏ!.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¾Ñ‚Ñ€ÐµÐ·Ð°Ñ‚ÑŒ ÑÐµÐ±Ðµ Ð¿Ð°Ð»ÐµÑ†. Ð’ÐµÐ´ÑŒ ÑÑ‚Ð¾ Ð½Ðµ Ñ‚Ð°Ðº Ð»ÐµÐ³ÐºÐ¾!.\n\r");
 	gsn_hara_kiri->improve( ch, false );
     }
 }
@@ -395,13 +395,13 @@ SKILL_RUNP( katana )
 
 	if ( ch->is_npc() || !gsn_katana->usable( ch ) )
 	{
-		ch->send_to("þÔÏ?\n\r");
+		ch->send_to("Ð§Ñ‚Ð¾?\n\r");
 		return;
 	}
 
 	if ( ch->isAffected(gsn_katana) )
 	{
-		ch->send_to("îÏ Õ ÔÅÂÑ ÕÖÅ ÅÓÔØ ËÁÔÁÎÁ!\n\r");
+		ch->send_to("ÐÐ¾ Ñƒ Ñ‚ÐµÐ±Ñ ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ ÐºÐ°Ñ‚Ð°Ð½Ð°!\n\r");
 		return;
 	}
 	
@@ -409,39 +409,39 @@ SKILL_RUNP( katana )
 
 	if ( ch->mana < mana )
 	{
-		ch->send_to("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÜÎÅÒÇÉÉ ÄÌÑ ËÁÔÁÎÙ.\n\r");
+		ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð´Ð»Ñ ÐºÐ°Ñ‚Ð°Ð½Ñ‹.\n\r");
 		return;
 	}
 
 	if ( arg[0] == '\0' )
 	{
-		ch->send_to("óÄÅÌÁÔØ ËÁÔÁÎÕ? éÚ ÞÅÇÏ?\n\r");
+		ch->send_to("Ð¡Ð´ÐµÐ»Ð°Ñ‚ÑŒ ÐºÐ°Ñ‚Ð°Ð½Ñƒ? Ð˜Ð· Ñ‡ÐµÐ³Ð¾?\n\r");
 		return;
 	}
 
 	if ( ( part = get_obj_carry( ch, arg ) ) == 0 )
 	{
-		ch->send_to("õ ÔÅÂÑ ÎÅÔÕ ÎÉ ËÕÓËÁ ÖÅÌÅÚÁ.\n\r");
+		ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚Ñƒ Ð½Ð¸ ÐºÑƒÑÐºÐ° Ð¶ÐµÐ»ÐµÐ·Ð°.\n\r");
 		return;
 	}
 
 	if ( part->pIndexData->vnum != OBJ_VNUM_CHUNK_IRON )
 	{
-		ch->send_to("õ ÔÅÂÑ ÎÅÔ ÎÕÖÎÏÇÏ ÍÁÔÅÒÉÁÌÁ.\n\r");
+		ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ð½ÑƒÐ¶Ð½Ð¾Ð³Ð¾ Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ð°Ð»Ð°.\n\r");
 		return;
 	}
 
 	if (SHADOW(ch))
 	{
-		ch->send_to("ô×ÏÑ ÔÅÎØ ×ÓÅ ×ÒÅÍÑ ÍÅÌØËÁÅÔ ÐÅÒÅÄ ÇÌÁÚÁÍÉ.\n\rôÑÖÅÌÏ×ÁÔÏ ÓÄÅÌÁÔØ ËÁÔÁÎÕ × ÔÁËÉÈ ÕÓÌÏ×ÉÑÈ.\n\r");
-		act_p("$c1 ×ÍÅÓÔÅ ÓÏ Ó×ÏÅÊ ÔÅÎØÀ ÐÙÔÁÀÔÓÑ ÓÄÅÌÁÔØ ËÁÔÁÎÕ.\n\r...ÇÌÕÐÏÅ ÚÁÎÑÔÉÅ.",
+		ch->send_to("Ð¢Ð²Ð¾Ñ Ñ‚ÐµÐ½ÑŒ Ð²ÑÐµ Ð²Ñ€ÐµÐ¼Ñ Ð¼ÐµÐ»ÑŒÐºÐ°ÐµÑ‚ Ð¿ÐµÑ€ÐµÐ´ Ð³Ð»Ð°Ð·Ð°Ð¼Ð¸.\n\rÐ¢ÑÐ¶ÐµÐ»Ð¾Ð²Ð°Ñ‚Ð¾ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ ÐºÐ°Ñ‚Ð°Ð½Ñƒ Ð² Ñ‚Ð°ÐºÐ¸Ñ… ÑƒÑÐ»Ð¾Ð²Ð¸ÑÑ….\n\r");
+		act_p("$c1 Ð²Ð¼ÐµÑÑ‚Ðµ ÑÐ¾ ÑÐ²Ð¾ÐµÐ¹ Ñ‚ÐµÐ½ÑŒÑŽ Ð¿Ñ‹Ñ‚Ð°ÑŽÑ‚ÑÑ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ ÐºÐ°Ñ‚Ð°Ð½Ñƒ.\n\r...Ð³Ð»ÑƒÐ¿Ð¾Ðµ Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ.",
 			ch, 0, 0, TO_ROOM,POS_RESTING);
 		return;
 	}
 
 	if ( number_percent( ) > ( gsn_katana->getEffective( ch ) / 3 ) * 2 )
 	{
-		ch->send_to("ðÏÐÙÔËÁ ÎÅ ÕÄÁÌÁÓØ, É ÔÙ ÒÁÚÒÕÛÁÅÛØ ÜÔÏ.\n\r");
+		ch->send_to("ÐŸÐ¾Ð¿Ñ‹Ñ‚ÐºÐ° Ð½Ðµ ÑƒÐ´Ð°Ð»Ð°ÑÑŒ, Ð¸ Ñ‚Ñ‹ Ñ€Ð°Ð·Ñ€ÑƒÑˆÐ°ÐµÑˆÑŒ ÑÑ‚Ð¾.\n\r");
 		extract_obj(part);
 		return;
 	}
@@ -491,15 +491,15 @@ SKILL_RUNP( katana )
 		obj_to_char(katana, ch);
 		gsn_katana->improve( ch, true );
 	
-		act_p("ôÙ ÄÅÌÁÅÛØ ËÁÔÁÎÕ ÉÚ $o2!",ch,part,0,TO_CHAR,POS_RESTING);
-		act_p("$c1 ÄÅÌÁÅÔ ËÁÔÁÎÕ ÉÚ $o2!",ch,part,0,TO_ROOM,POS_RESTING);
+		act_p("Ð¢Ñ‹ Ð´ÐµÐ»Ð°ÐµÑˆÑŒ ÐºÐ°Ñ‚Ð°Ð½Ñƒ Ð¸Ð· $o2!",ch,part,0,TO_CHAR,POS_RESTING);
+		act_p("$c1 Ð´ÐµÐ»Ð°ÐµÑ‚ ÐºÐ°Ñ‚Ð°Ð½Ñƒ Ð¸Ð· $o2!",ch,part,0,TO_ROOM,POS_RESTING);
 	
 		extract_obj(part);
 		return;
 	}
 	else
 	{
-		ch->send_to("ôÙ ÒÁÚÒÕÛÁÅÛØ ÜÔÏ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ñ€Ð°Ð·Ñ€ÑƒÑˆÐ°ÐµÑˆÑŒ ÑÑ‚Ð¾.\n\r");
 		extract_obj(part);
 		ch->mana -= mana / 2;
 		gsn_katana->improve( ch, false );
@@ -514,13 +514,13 @@ SKILL_RUNP( katana )
 void SamuraiGuildmaster::give( Character *victim, Object *obj ) 
 {
     if (obj->pIndexData->vnum != OBJ_VNUM_KATANA_SWORD) {
-	say_act( victim, ch, "ñ ÎÅ ÐÒÉÎÉÍÁÀ ÐÏÄÁÒËÏ×, $c1." );
+	say_act( victim, ch, "Ð¯ Ð½Ðµ Ð¿Ñ€Ð¸Ð½Ð¸Ð¼Ð°ÑŽ Ð¿Ð¾Ð´Ð°Ñ€ÐºÐ¾Ð², $c1." );
 	giveBack( victim, obj );
 	return;
     }
     
     if (victim->getTrueProfession( ) != prof_samurai) {
-	say_act( victim, ch, "ôÙ ÎÅ ÐÒÉÎÁÄÌÅÖÉÛØ Ë ËÌÁÓÓÕ ÓÁÍÕÒÁÅ×, ÔÙ ÎÅÄÏÓÔÏ$gÊÎÏ|ÉÎ|ÊÎÁ ÄÁÖÅ ÎÁÈÏÄÉÔØÓÑ ÚÄÅÓØ!" );
+	say_act( victim, ch, "Ð¢Ñ‹ Ð½Ðµ Ð¿Ñ€Ð¸Ð½Ð°Ð´Ð»ÐµÐ¶Ð¸ÑˆÑŒ Ðº ÐºÐ»Ð°ÑÑÑƒ ÑÐ°Ð¼ÑƒÑ€Ð°ÐµÐ², Ñ‚Ñ‹ Ð½ÐµÐ´Ð¾ÑÑ‚Ð¾$gÐ¹Ð½Ð¾|Ð¸Ð½|Ð¹Ð½Ð° Ð´Ð°Ð¶Ðµ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑŒÑÑ Ð·Ð´ÐµÑÑŒ!" );
 	giveBack( victim, obj );
 	return;
     }
@@ -529,7 +529,7 @@ void SamuraiGuildmaster::give( Character *victim, Object *obj )
 	|| !obj->extra_descr->description
 	|| !strstr(obj->extra_descr->description, victim->getNameP( )))
     {
-	say_act( victim, ch, "îÁÄÐÉÓÉ ÎÁ ÜÔÏÍ ÏÒÕÖÉÉ ÇÏ×ÏÒÑÔ Ï ÔÏÍ, ÞÔÏ ÏÎÏ ÂÙÌÏ ÉÚÇÏÔÏ×ÌÅÎÏ ËÅÍ-ÔÏ ÄÒÕÇÉÍ, Á ÎÅ ÔÏÂÏÊ, $c1." );
+	say_act( victim, ch, "ÐÐ°Ð´Ð¿Ð¸ÑÐ¸ Ð½Ð° ÑÑ‚Ð¾Ð¼ Ð¾Ñ€ÑƒÐ¶Ð¸Ð¸ Ð³Ð¾Ð²Ð¾Ñ€ÑÑ‚ Ð¾ Ñ‚Ð¾Ð¼, Ñ‡Ñ‚Ð¾ Ð¾Ð½Ð¾ Ð±Ñ‹Ð»Ð¾ Ð¸Ð·Ð³Ð¾Ñ‚Ð¾Ð²Ð»ÐµÐ½Ð¾ ÐºÐµÐ¼-Ñ‚Ð¾ Ð´Ñ€ÑƒÐ³Ð¸Ð¼, Ð° Ð½Ðµ Ñ‚Ð¾Ð±Ð¾Ð¹, $c1." );
 	giveBack( victim, obj );
 	return;
     }
@@ -561,11 +561,11 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
     if (victim->getProfession( ) != prof_samurai)
 	return;
 
-    if (!is_name( "death", speech ) && !is_name( "ÓÍÅÒÔØ", speech ))
+    if (!is_name( "death", speech ) && !is_name( "ÑÐ¼ÐµÑ€Ñ‚ÑŒ", speech ))
 	return;
     
     if (victim->getPC( )->death < 1) {
-	say_act( victim, ch, "óÍÅÒÔØ ÅÝÅ ÎÉ ÒÁÚÕ ÎÅ ËÏÓÎÕÌÁÓØ ÔÅÂÑ, $c1." );
+	say_act( victim, ch, "Ð¡Ð¼ÐµÑ€Ñ‚ÑŒ ÐµÑ‰Ðµ Ð½Ð¸ Ñ€Ð°Ð·Ñƒ Ð½Ðµ ÐºÐ¾ÑÐ½ÑƒÐ»Ð°ÑÑŒ Ñ‚ÐµÐ±Ñ, $c1." );
 	return;
     }
 
@@ -574,15 +574,15 @@ void SamuraiGuildmaster::tell( Character *victim, const char *speech )
 
     victim->getPC( )->death -= 1;
 
-    act( "$C1 ÚÁÂÉÒÁÅÔ ÓÍÅÒÔØ Õ $c5.", victim, 0, ch, TO_ROOM );
-    act( "$C1 ÚÁÂÉÒÁÅÔ Õ ÔÅÂÑ ÓÍÅÒÔØ.", victim, 0, ch, TO_CHAR );
-    act_p( "{BíÏÌÎÉÉ Ó×ÅÒËÁÀÔ ÎÁ ÎÅÂÅ.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
+    act( "$C1 Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÑ‚ ÑÐ¼ÐµÑ€Ñ‚ÑŒ Ñƒ $c5.", victim, 0, ch, TO_ROOM );
+    act( "$C1 Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÑ‚ Ñƒ Ñ‚ÐµÐ±Ñ ÑÐ¼ÐµÑ€Ñ‚ÑŒ.", victim, 0, ch, TO_CHAR );
+    act_p( "{BÐœÐ¾Ð»Ð½Ð¸Ð¸ ÑÐ²ÐµÑ€ÐºÐ°ÑŽÑ‚ Ð½Ð° Ð½ÐµÐ±Ðµ.{x", victim, 0, ch, TO_ALL, POS_SLEEPING );
 }
 
 void SamuraiGuildmaster::giveBack( Character *victim, Object *obj )
 {
-    act( "$c1 ×ÏÚ×ÒÁÝÁÅÔ $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    act( "$c1 ×ÏÚ×ÒÁÝÁÅÔ ÔÅÂÅ $o4.", ch, obj, victim, TO_VICT );
+    act( "$c1 Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ $o4 $C3.", ch, obj, victim, TO_NOTVICT );
+    act( "$c1 Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ $o4.", ch, obj, victim, TO_VICT );
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
@@ -594,7 +594,7 @@ bool SamuraiGuildmaster::checkPrice( Character *victim, int qp )
 	return false;
     
     if (victim->getPC( )->questpoints < qp) {
-	say_act( victim, ch, "õ ÔÅÂÑ ÅÝÅ ÎÅÄÏÓÔÁÔÏÞÎÏ ÓÌÁ×Ù ÄÌÑ ÜÔÏÇÏ." );
+	say_act( victim, ch, "Ð£ Ñ‚ÐµÐ±Ñ ÐµÑ‰Ðµ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ ÑÐ»Ð°Ð²Ñ‹ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾." );
 	return false;
     }
 
@@ -615,7 +615,7 @@ void SamuraiGuildmaster::doFirstEnchant( Character *victim, Object *katana )
     af.location	= APPLY_NONE;
     affect_to_obj( katana, &af );
     
-    say_act( victim, ch, "ëÁË ÔÏÌØËÏ ÔÙ ×ÏÏÒÕÖÉÛØÓÑ ÜÔÉÍ, ÔÙ ÐÏÞÕ×ÓÔ×ÕÅÛØ, ÞÔÏ ÓÉÌÁ ÅÅ ÐÏÓÔÏÑÎÎÏ Õ×ÅÌÉÞÉ×ÁÅÔÓÑ." );
+    say_act( victim, ch, "ÐšÐ°Ðº Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ñ‚Ñ‹ Ð²Ð¾Ð¾Ñ€ÑƒÐ¶Ð¸ÑˆÑŒÑÑ ÑÑ‚Ð¸Ð¼, Ñ‚Ñ‹ Ð¿Ð¾Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ, Ñ‡Ñ‚Ð¾ ÑÐ¸Ð»Ð° ÐµÐµ Ð¿Ð¾ÑÑ‚Ð¾ÑÐ½Ð½Ð¾ ÑƒÐ²ÐµÐ»Ð¸Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ." );
 }
 
 void SamuraiGuildmaster::doOwner( Character *victim, Object *katana )
@@ -629,8 +629,8 @@ void SamuraiGuildmaster::doOwner( Character *victim, Object *katana )
     SET_BIT(katana->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
     SET_BIT(katana->wear_flags, ITEM_NO_SAC);
 
-    say_act( victim, ch, "ëÁÔÁÎÁ ÓÔÁÌÁ Ô×ÏÅÊ ÌÉÞÎÏÊ ÓÏÂÓÔ×ÅÎÎÏÓÔØÀ. " 
-                         "ïÔÎÙÎÅ ÎÉËÔÏ ÎÅ ÐÏÓÍÅÅÔ ÐÒÉËÏÓÎÕÔØÓÑ Ë ÎÅÊ." );
+    say_act( victim, ch, "ÐšÐ°Ñ‚Ð°Ð½Ð° ÑÑ‚Ð°Ð»Ð° Ñ‚Ð²Ð¾ÐµÐ¹ Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ ÑÐ¾Ð±ÑÑ‚Ð²ÐµÐ½Ð½Ð¾ÑÑ‚ÑŒÑŽ. " 
+                         "ÐžÑ‚Ð½Ñ‹Ð½Ðµ Ð½Ð¸ÐºÑ‚Ð¾ Ð½Ðµ Ð¿Ð¾ÑÐ¼ÐµÐµÑ‚ Ð¿Ñ€Ð¸ÐºÐ¾ÑÐ½ÑƒÑ‚ÑŒÑÑ Ðº Ð½ÐµÐ¹." );
 }
 
 /*
@@ -643,7 +643,7 @@ void Katana::wear( Character *ch )
 	&& obj->extra_descr->description
 	&& strstr( obj->extra_descr->description, ch->getNameP( ) ) != 0)
   {
-   ch->send_to("ôÙ ÏÝÕÝÁÅÛØ ó÷ïà ËÁÔÁÎÕ, ËÁË ÞÁÓÔØ ÓÅÂÑ!\n\r");
+   ch->send_to("Ð¢Ñ‹ Ð¾Ñ‰ÑƒÑ‰Ð°ÐµÑˆÑŒ Ð¡Ð’ÐžÐ® ÐºÐ°Ñ‚Ð°Ð½Ñƒ, ÐºÐ°Ðº Ñ‡Ð°ÑÑ‚ÑŒ ÑÐµÐ±Ñ!\n\r");
   }
 }
 
@@ -662,12 +662,12 @@ void OwnedKatana::get( Character *ch )
     
   if (obj->hasOwner( ch ))
   {
-    act_p("{BíÅÒÃÁÀÝÁÑ ÁÕÒÁ ÏËÒÕÖÁÅÔ ÌÅÚ×ÉÅ $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    act_p("{BÐœÐµÑ€Ñ†Ð°ÑŽÑ‰Ð°Ñ Ð°ÑƒÑ€Ð° Ð¾ÐºÑ€ÑƒÐ¶Ð°ÐµÑ‚ Ð»ÐµÐ·Ð²Ð¸Ðµ $o2.{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
     return;
   }
 
-  act( "$o1 ×ÙÐÁÄÁÅÔ ÉÚ Ô×ÏÉÈ ÒÕË.", ch, obj, 0, TO_CHAR );
-  act( "$o1 ×ÙÐÁÄÁÅÔ ÉÚ ÒÕË $c2.", ch, obj, 0, TO_ROOM );
+  act( "$o1 Ð²Ñ‹Ð¿Ð°Ð´Ð°ÐµÑ‚ Ð¸Ð· Ñ‚Ð²Ð¾Ð¸Ñ… Ñ€ÑƒÐº.", ch, obj, 0, TO_CHAR );
+  act( "$o1 Ð²Ñ‹Ð¿Ð°Ð´Ð°ÐµÑ‚ Ð¸Ð· Ñ€ÑƒÐº $c2.", ch, obj, 0, TO_ROOM );
 
   obj_from_char( obj );
   obj_to_room( obj, ch->in_room );

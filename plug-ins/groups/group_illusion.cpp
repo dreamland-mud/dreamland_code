@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -44,20 +44,20 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if ((victim->getProfession( ) == prof_samurai) && ( victim->getModifyLevel() >=10) ) {
-	 act("üÔÏ ÚÁËÌÉÎÁÎÉÅ ÎÅ ÍÏÖÅÔ ÐÒÉÞÉÎÉÔØ ×ÒÅÄÁ Ô×ÏÅÍÕ ÐÒÏÔÉ×ÎÉËÕ.", ch, 0, 0, TO_CHAR);
+	 act("Ð­Ñ‚Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ð¸Ñ‚ÑŒ Ð²Ñ€ÐµÐ´Ð° Ñ‚Ð²Ð¾ÐµÐ¼Ñƒ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð½Ð¸ÐºÑƒ.", ch, 0, 0, TO_CHAR);
 	 return;
     }
 
     if (victim->isAffected(gsn_fear)) {
 	if (ch == victim)
-	    act("ôÙ É ÔÁË ÄÒÏÖÉÛØ ÏÔ ÓÔÒÁÈÁ.", ch, 0, 0, TO_CHAR);
+	    act("Ð¢Ñ‹ Ð¸ Ñ‚Ð°Ðº Ð´Ñ€Ð¾Ð¶Ð¸ÑˆÑŒ Ð¾Ñ‚ ÑÑ‚Ñ€Ð°Ñ…Ð°.", ch, 0, 0, TO_CHAR);
 	else
-	    act("$C1 ÕÖÅ ÄÒÏÖÉÔ ÏÔ ÓÔÒÁÈÁ.", ch, 0, victim, TO_CHAR);
+	    act("$C1 ÑƒÐ¶Ðµ Ð´Ñ€Ð¾Ð¶Ð¸Ñ‚ Ð¾Ñ‚ ÑÑ‚Ñ€Ð°Ñ…Ð°.", ch, 0, victim, TO_CHAR);
 	return;
     }
 
     if (saves_spell( level, victim,DAM_OTHER, ch, DAMF_SPELL)) {
-	act("ôÅÂÅ ÎÅ ÕÄÁÌÏÓØ ÚÁÐÕÇÁÔØ $C4...", ch, 0, victim, TO_CHAR); 
+	act("Ð¢ÐµÐ±Ðµ Ð½Ðµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð·Ð°Ð¿ÑƒÐ³Ð°Ñ‚ÑŒ $C4...", ch, 0, victim, TO_CHAR); 
 	return;
     }
 
@@ -69,8 +69,8 @@ VOID_SPELL(Fear)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = 0;
     af.bitvector = ADET_FEAR;
     affect_to_char( victim, &af );
-    act("ôÙ ÄÒÏÖÉÛØ ÏÔ ÓÔÒÁÈÁ.", victim, 0, 0, TO_CHAR);
-    act("$c1 ÄÒÏÖÉÔ ÏÔ ÓÔÒÁÈÁ.", victim, 0, 0, TO_ROOM);
+    act("Ð¢Ñ‹ Ð´Ñ€Ð¾Ð¶Ð¸ÑˆÑŒ Ð¾Ñ‚ ÑÑ‚Ñ€Ð°Ñ…Ð°.", victim, 0, 0, TO_CHAR);
+    act("$c1 Ð´Ñ€Ð¾Ð¶Ð¸Ñ‚ Ð¾Ñ‚ ÑÑ‚Ñ€Ð°Ñ…Ð°.", victim, 0, 0, TO_ROOM);
 }
 
 SPELL_DECL(ImprovedInvis);
@@ -79,16 +79,16 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     Affect af;
 
     if ( IS_AFFECTED(ch, AFF_IMP_INVIS) ) {
-	ch->send_to("ôÅÂÑ ÕÖÅ É ÔÁË ÓÏ×ÓÅÍ ÎÅ ×ÉÄÎÏ.\r\n");
+	ch->send_to("Ð¢ÐµÐ±Ñ ÑƒÐ¶Ðµ Ð¸ Ñ‚Ð°Ðº ÑÐ¾Ð²ÑÐµÐ¼ Ð½Ðµ Ð²Ð¸Ð´Ð½Ð¾.\r\n");
 	return;
     }
 
     if (IS_AFFECTED(ch, AFF_FAERIE_FIRE)) {
-	ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓÔÁÔØ ÓÏ×ÓÅÍ ÎÅ×ÉÄÉÍÙÍ, ËÏÇÄÁ Ó×ÅÔÉÛØÓÑ.\r\n");
+	ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÑ‚Ð°Ñ‚ÑŒ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼Ñ‹Ð¼, ÐºÐ¾Ð³Ð´Ð° ÑÐ²ÐµÑ‚Ð¸ÑˆÑŒÑÑ.\r\n");
 	return;
     }
 
-    act_p("$c1 ÓÔÁÎÏ×ÉÔÓÑ ÓÏ×ÓÅÍ ÎÅ×ÉÄÉÍ$gÙÍ|ÙÍ|ÏÊ.",
+    act_p("$c1 ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.",
            ch, 0, 0, TO_ROOM,POS_RESTING);
 
     af.where     = TO_AFFECTS;
@@ -100,7 +100,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     af.bitvector = AFF_IMP_INVIS;
     affect_to_char( ch, &af );
 
-    act("ôÙ ÓÔÁÎÏ×ÉÛØÓÑ ÓÏ×ÓÅÍ ÎÅ×ÉÄÉÍ$gÙÍ|ÙÍ|ÏÊ.", ch, 0, 0, TO_CHAR);
+    act("Ð¢Ñ‹ ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸ÑˆÑŒÑÑ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.", ch, 0, 0, TO_CHAR);
 }
 
 
@@ -111,11 +111,11 @@ VOID_SPELL(Invisibility)::run( Character *ch, Object *obj, int sn, int level )
 
     if (IS_OBJ_STAT(obj,ITEM_INVIS))
     {
-	ch->pecho( "%1$^O1 ÕÖÅ ÎÅ×ÉÄÉ%1$GÍÏ|Í|ÍÁ|ÍÙ.", obj );
+	ch->pecho( "%1$^O1 ÑƒÐ¶Ðµ Ð½ÐµÐ²Ð¸Ð´Ð¸%1$GÐ¼Ð¾|Ð¼|Ð¼Ð°|Ð¼Ñ‹.", obj );
 	return;
     }
 
-    ch->in_room->echo( POS_RESTING, "%1$^O1 ÓÔÁÎÏ×%1$nÉÔÓÑ|ÑÔÓÑ ÎÅ×ÉÄÉÍ%1$GÙÍ|ÙÍ|ÏÊ|ÙÍÉ.", obj );
+    ch->in_room->echo( POS_RESTING, "%1$^O1 ÑÑ‚Ð°Ð½Ð¾Ð²%1$nÐ¸Ñ‚ÑÑ|ÑÑ‚ÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼%1$GÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹|Ñ‹Ð¼Ð¸.", obj );
 
     af.where	= TO_OBJECT;
     af.type		= sn;
@@ -133,13 +133,13 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( IS_AFFECTED(victim, AFF_INVISIBLE) ) {
 	if (victim == ch)
-	    ch->send_to("ôÅÂÑ ÕÖÅ É ÔÁË ÎÅ ×ÉÄÎÏ.\r\n");
+	    ch->send_to("Ð¢ÐµÐ±Ñ ÑƒÐ¶Ðµ Ð¸ Ñ‚Ð°Ðº Ð½Ðµ Ð²Ð¸Ð´Ð½Ð¾.\r\n");
 	else
-	    act("$C1 ÕÖÅ É ÔÁË ÎÅ×ÉÄÉ$GÍÏ|Í|ÍÁ.", ch, 0, victim, TO_CHAR);
+	    act("$C1 ÑƒÐ¶Ðµ Ð¸ Ñ‚Ð°Ðº Ð½ÐµÐ²Ð¸Ð´Ð¸$GÐ¼Ð¾|Ð¼|Ð¼Ð°.", ch, 0, victim, TO_CHAR);
 	return;
     }
 
-    act_p("$c1 ÓÔÁÎÏ×ÉÔÓÑ ÎÅ×ÉÄÉÍ$gÙÍ|ÙÍ|ÏÊ.",
+    act_p("$c1 ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.",
            victim, 0, 0, TO_ROOM,POS_RESTING);
 
     af.where     = TO_AFFECTS;
@@ -151,7 +151,7 @@ VOID_SPELL(Invisibility)::run( Character *ch, Character *victim, int sn, int lev
     af.bitvector = AFF_INVISIBLE;
     affect_to_char( victim, &af );
 
-    act("ôÙ ÓÔÁÎÏ×ÉÛØÓÑ ÎÅ×ÉÄÉÍ$gÙÍ|ÙÍ|ÏÊ.", victim, 0, 0, TO_CHAR);
+    act("Ð¢Ñ‹ ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸ÑˆÑŒÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.", victim, 0, 0, TO_CHAR);
 }
 
 
@@ -169,8 +169,8 @@ VOID_SPELL(MassInvis)::run( Character *ch, Room *room, int sn, int level )
 	if (spellbane( ch, gch ))
 	    continue;
 
-        act("$c1 ÓÔÁÎÏ×ÉÔÓÑ ÎÅ×ÉÄÉÍ$gÙÍ|ÙÍ|ÏÊ.", gch, 0, 0, TO_ROOM);
-	act("ôÙ ÓÔÁÎÏ×ÉÛØÓÑ ÎÅ×ÉÄÉÍ$gÙÍ|ÙÍ|ÏÊ.", gch, 0, 0, TO_CHAR);
+        act("$c1 ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.", gch, 0, 0, TO_ROOM);
+	act("Ð¢Ñ‹ ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸ÑˆÑŒÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.", gch, 0, 0, TO_CHAR);
 
 	af.where     = TO_AFFECTS;
 	af.type      = sn;
@@ -195,8 +195,8 @@ VOID_SPELL(Ventriloquate)::run( Character *ch, char *target_name, int sn, int le
 
     target_name = one_argument( target_name, speaker );
 
-    sprintf( buf1, "%s ÐÒÏÉÚÎÏÓÉÔ '{g%s{x'.\n\r", speaker, target_name );
-    sprintf( buf2, "ëÔÏ-ÔÏ ÚÁÓÔÁ×ÌÑÅÔ %s ÐÒÏÉÚÎÅÓÔÉ '{g%s{x'.\n\r", speaker, target_name );
+    sprintf( buf1, "%s Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{g%s{x'.\n\r", speaker, target_name );
+    sprintf( buf2, "ÐšÑ‚Ð¾-Ñ‚Ð¾ Ð·Ð°ÑÑ‚Ð°Ð²Ð»ÑÐµÑ‚ %s Ð¿Ñ€Ð¾Ð¸Ð·Ð½ÐµÑÑ‚Ð¸ '{g%s{x'.\n\r", speaker, target_name );
     buf1[0] = Char::upper(buf1[0]);
 
     for ( vch = ch->in_room->people; vch != 0; vch = vch->next_in_room )

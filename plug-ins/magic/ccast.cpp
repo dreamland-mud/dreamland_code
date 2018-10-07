@@ -93,35 +93,35 @@ CMDRUN( cast )
 
     if (ch->is_npc( ) && ch->master != 0) {
 	if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
-	    act_p( "$C1 ÇÏ×ÏÒÉÔ ÔÅÂÅ '{Gñ ÎÅ ÐÏÎÉÍÁÀ, ÞÅÇÏ ÔÙ ÈÏÞÅÛØ, ÈÏÚÑ$gÉÎ|ÉÎ|ÊËÁ.{x'", ch->master, 0, ch, TO_CHAR, POS_RESTING );
+	    act_p( "$C1 Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ '{GÐ¯ Ð½Ðµ Ð¿Ð¾Ð½Ð¸Ð¼Ð°ÑŽ, Ñ‡ÐµÐ³Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ, Ñ…Ð¾Ð·Ñ$gÐ¸Ð½|Ð¸Ð½|Ð¹ÐºÐ°.{x'", ch->master, 0, ch, TO_CHAR, POS_RESTING );
 	    return;
 	}
     }
     
     if (!ch->is_npc( ) && !ch->move) {
-	ch->send_to("õ ÔÅÂÑ ÎÅÔ ÓÉÌ ÄÁÖÅ ÐÏÛÅ×ÅÌÉÔØ ÑÚÙËÏÍ.\n\r");
+	ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ ÑÐ¸Ð» Ð´Ð°Ð¶Ðµ Ð¿Ð¾ÑˆÐµÐ²ÐµÐ»Ð¸Ñ‚ÑŒ ÑÐ·Ñ‹ÐºÐ¾Ð¼.\n\r");
 	return;
     }
 
     if (ch->isAffected(gsn_shielding ) && number_percent( ) > 50) {
-	ch->send_to("ôÙ ÐÙÔÁÅÛØÓÑ ÓÏÓÒÅÄÏÔÏÞÉÔØÓÑ ÎÁ ÚÁËÌÉÎÁÎÉÉ, ÎÏ ÞÔÏ-ÔÏ ÏÓÔÁÎÁ×ÌÉ×ÁÅÔ ÔÅÂÑ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ ÑÐ¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡Ð¸Ñ‚ÑŒÑÑ Ð½Ð° Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¸, Ð½Ð¾ Ñ‡Ñ‚Ð¾-Ñ‚Ð¾ Ð¾ÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.\n\r");
 	return;
     }
 
     if ((ch->isAffected(gsn_garble ) || ch->isAffected(gsn_deafen )) && number_percent( ) > 50) {
-	ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÎÁÓÔÒÏÉÔØÓÑ ÎÁ ÐÒÁ×ÉÌØÎÕÀ ÉÎÔÏÎÁÃÉÀ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½Ð°ÑÑ‚Ñ€Ð¾Ð¸Ñ‚ÑŒÑÑ Ð½Ð° Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½ÑƒÑŽ Ð¸Ð½Ñ‚Ð¾Ð½Ð°Ñ†Ð¸ÑŽ.\n\r");
 	return;
     }
 
     if (HALF_SHADOW(ch)) {
-	ch->send_to("ô×ÏÑ ÔÅÎØ ÐÏÇÌÏÝÁÅÔ ×ÓÑËÕÀ ÐÏÐÙÔËÕ ÓÏÔ×ÏÒÉÔØ ÚÁËÌÉÎÁÎÉÅ.\n\r");
-	act_p("$c1 ÐÙÔÁÅÔÓÑ ÓÏÔ×ÏÒÉÔØ ÚÁËÌÉÎÁÎÉÅ, ÎÏ ÔÅÎØ ÎÅ ÄÁÅÔ $m ÓÏÓÒÅÄÏÔÏÞÉÔÓÑ.",
+	ch->send_to("Ð¢Ð²Ð¾Ñ Ñ‚ÐµÐ½ÑŒ Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÐµÑ‚ Ð²ÑÑÐºÑƒÑŽ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÑƒ ÑÐ¾Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚ÑŒ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ.\n\r");
+	act_p("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ ÑÐ¾Ñ‚Ð²Ð¾Ñ€Ð¸Ñ‚ÑŒ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ, Ð½Ð¾ Ñ‚ÐµÐ½ÑŒ Ð½Ðµ Ð´Ð°ÐµÑ‚ $m ÑÐ¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡Ð¸Ñ‚ÑÑ.",
 		ch, 0, 0, TO_ROOM,POS_RESTING);
 	return;
     }
 
     if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
-	ch->send_to("ôÅÂÑ ÚÁÎÉÍÁÅÔ ÂÏÌÅÅ ×ÁÖÎÏÅ ÚÁÎÑÔÉÅ - ÓÐÁÓÅÎÉÅ Ó×ÏÅÊ ÖÉÚÎÉ.\n\r");
+	ch->send_to("Ð¢ÐµÐ±Ñ Ð·Ð°Ð½Ð¸Ð¼Ð°ÐµÑ‚ Ð±Ð¾Ð»ÐµÐµ Ð²Ð°Ð¶Ð½Ð¾Ðµ Ð·Ð°Ð½ÑÑ‚Ð¸Ðµ - ÑÐ¿Ð°ÑÐµÐ½Ð¸Ðµ ÑÐ²Ð¾ÐµÐ¹ Ð¶Ð¸Ð·Ð½Ð¸.\n\r");
 	return;
     }
 
@@ -130,17 +130,17 @@ CMDRUN( cast )
     spellName = arguments.getOneArgument( );
     
     if (spellName.empty( )) {
-	ch->send_to("ëÏÌÄÏ×ÁÔØ ÞÔÏ É ÎÁ ËÏÇÏ?\n\r");
+	ch->send_to("ÐšÐ¾Ð»Ð´Ð¾Ð²Ð°Ñ‚ÑŒ Ñ‡Ñ‚Ð¾ Ð¸ Ð½Ð° ÐºÐ¾Ð³Ð¾?\n\r");
 	return;
     }
 
     if (ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-	ch->send_to("ôÙ {RBattleRager{x, Á ÎÅ ÐÒÅÚÒÅÎÎÙÊ ÍÁÇ!\n\r");
+	ch->send_to("Ð¢Ñ‹ {RBattleRager{x, Ð° Ð½Ðµ Ð¿Ñ€ÐµÐ·Ñ€ÐµÐ½Ð½Ñ‹Ð¹ Ð¼Ð°Ð³!\n\r");
 	return;
     }
 
     if (ch->is_npc( ) && ch->master && ch->master->getClan( ) == clan_battlerager) {
-	do_say(ch,"èÏÚÑÉÎ, Ñ Õ×ÁÖÁÀ Ô×ÏÉ ÕÂÅÖÄÅÎÉÑ.");
+	do_say(ch,"Ð¥Ð¾Ð·ÑÐ¸Ð½, Ñ ÑƒÐ²Ð°Ð¶Ð°ÑŽ Ñ‚Ð²Ð¾Ð¸ ÑƒÐ±ÐµÐ¶Ð´ÐµÐ½Ð¸Ñ.");
 	return;
     }
     
@@ -148,9 +148,9 @@ CMDRUN( cast )
 
     if (!spell) {
 	if (ch->is_npc( ) && ch->master) 
-	    do_say(ch, "äÁ ÎÅ ÕÍÅÀ Ñ");
+	    do_say(ch, "Ð”Ð° Ð½Ðµ ÑƒÐ¼ÐµÑŽ Ñ");
 	else
-	    ch->send_to("ôÙ ÎÅ ÚÎÁÅÛØ ÔÁËÏÇÏ ÚÁËÌÉÎÁÎÉÑ.\n\r");
+	    ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð·Ð½Ð°ÐµÑˆÑŒ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ.\n\r");
 
 	return;
     }
@@ -165,8 +165,8 @@ CMDRUN( cast )
 	return;
 	
     if (IS_SET(ch->in_room->room_flags,ROOM_NO_CAST)) {
-	ch->send_to("óÔÅÎÙ ÜÔÏÊ ËÏÍÎÁÔÙ ÐÏÇÌÏÔÉÌÉ Ô×ÏÅ ÚÁËÌÉÎÁÎÉÅ.\n\r");
-	act_p("$c1 ÐÒÏÉÚÎÅ$gÓÌÏ|Ó|ÓÌÁ ÚÁËÌÉÎÁÎÉÅ, ÎÏ ÓÔÅÎÙ ËÏÍÎÁÔÙ ÐÏÇÌÏÔÉÌÉ ÅÇÏ.",
+	ch->send_to("Ð¡Ñ‚ÐµÐ½Ñ‹ ÑÑ‚Ð¾Ð¹ ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñ‹ Ð¿Ð¾Ð³Ð»Ð¾Ñ‚Ð¸Ð»Ð¸ Ñ‚Ð²Ð¾Ðµ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ.\n\r");
+	act_p("$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ðµ$gÑÐ»Ð¾|Ñ|ÑÐ»Ð° Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ, Ð½Ð¾ ÑÑ‚ÐµÐ½Ñ‹ ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñ‹ Ð¿Ð¾Ð³Ð»Ð¾Ñ‚Ð¸Ð»Ð¸ ÐµÐ³Ð¾.",
 		ch, 0, 0, TO_ROOM,POS_RESTING);
 	return;
     }
@@ -175,9 +175,9 @@ CMDRUN( cast )
 
     if (ch->mana < mana) {
 	if (ch->is_npc( ) && ch->master != 0) 
-	    do_say(ch,"èÏÚÑÉÎ. õ ÍÅÎÑ ÍÁÎÎÁ ËÏÎÞÉÌÁÓØ!");
+	    do_say(ch,"Ð¥Ð¾Ð·ÑÐ¸Ð½. Ð£ Ð¼ÐµÐ½Ñ Ð¼Ð°Ð½Ð½Ð° ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ!");
 	else 
-	    ch->send_to("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÜÎÅÒÇÉÉ (mana).\n\r");
+	    ch->send_to("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ (mana).\n\r");
 
 	return;
     }
@@ -192,9 +192,9 @@ CMDRUN( cast )
 
     if (offensive && ch->is_npc( ) && ch->master && ch->master != victim) {
 	if (victim && !victim->is_npc( ))
-	    do_say(ch, "ñ ÅÇÏ ÂÏÀÓØ, ÈÏÚÑÉÎ!");
+	    do_say(ch, "Ð¯ ÐµÐ³Ð¾ Ð±Ð¾ÑŽÑÑŒ, Ñ…Ð¾Ð·ÑÐ¸Ð½!");
 	else
-	    do_say(ch, "ñ ÎÅ ÂÕÄÕ ÄÅÌÁÔØ ÜÔÏÇÏ.");
+	    do_say(ch, "Ð¯ Ð½Ðµ Ð±ÑƒÐ´Ñƒ Ð´ÐµÐ»Ð°Ñ‚ÑŒ ÑÑ‚Ð¾Ð³Ð¾.");
 
 	return;
     }
@@ -218,7 +218,7 @@ CMDRUN( cast )
 	return;
 	
     if (number_percent( ) > skill->getEffective( ch )) {
-	ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓËÏÎÃÅÎÔÒÉÒÏ×ÁÔØÓÑ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐºÐ¾Ð½Ñ†ÐµÐ½Ñ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒÑÑ.\n\r");
 	skill->improve( ch, false, victim );
 	ch->mana -= mana / 2;
 	target->castFar = false;

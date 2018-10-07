@@ -18,7 +18,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Класс для работы с каталогами
+ * @short п п╩п╟я│я│ п╢п╩я▐ я─п╟п╠п╬я┌я▀ я│ п╨п╟я┌п╟п╩п╬пЁп╟п╪п╦
  */
 class DBIO : public virtual DLObject
 {

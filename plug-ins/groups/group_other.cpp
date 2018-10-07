@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "group_other.h"
 #include "spelltemplate.h"
@@ -95,7 +95,7 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
 
   if ( ch->isAffected(sn ) )
     {
-      ch->send_to("Кассандра использовалась совсем недавно.\n\r" );
+      ch->send_to("п п╟я│я│п╟п╫п╢я─п╟ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╟я│я▄ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.\n\r" );
       return;
     }
   af.where		= TO_AFFECTS;
@@ -106,8 +106,8 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
   af.modifier  = -30;
   af.bitvector = 0;
   affect_to_char( ch, &af );
-  act_p( "Таинственный щит окружает $c4.",ch, 0,0,TO_ROOM,POS_RESTING);
-  ch->send_to("Таинственный щит окружает тебя.\n\r");
+  act_p( "п╒п╟п╦п╫я│я┌п╡п╣п╫п╫я▀п╧ я┴п╦я┌ п╬п╨я─я┐п╤п╟п╣я┌ $c4.",ch, 0,0,TO_ROOM,POS_RESTING);
+  ch->send_to("п╒п╟п╦п╫я│я┌п╡п╣п╫п╫я▀п╧ я┴п╦я┌ п╬п╨я─я┐п╤п╟п╣я┌ я┌п╣п╠я▐.\n\r");
   return;
 
 }
@@ -120,7 +120,7 @@ VOID_SPELL(Matandra)::run( Character *ch, Character *victim, int sn, int level )
 
   if ( ch->isAffected(sn ) )
     {
-      ch->send_to("Кассандра использовалась для этой же цели совсем недавно.\n\r" );
+      ch->send_to("п п╟я│я│п╟п╫п╢я─п╟ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╟я│я▄ п╢п╩я▐ я█я┌п╬п╧ п╤п╣ я├п╣п╩п╦ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.\n\r" );
       return;
     }
 
@@ -135,7 +135,7 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
 { 
     if ( ch->isAffected(sn ) )
       {
-	ch->send_to("Ты совсем недавно пользовался этим заклинанием.\n\r");
+	ch->send_to("п╒я▀ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬ п©п╬п╩я▄п╥п╬п╡п╟п╩я│я▐ я█я┌п╦п╪ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣п╪.\n\r");
 	return;
       }
 
@@ -144,8 +144,8 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
     ch->hit = min( ch->hit + 150, (int)ch->max_hit );
     update_pos( ch );
 
-    ch->send_to("Волна тепла согревает твое тело.\n\r");
-    act_p("$c1 выглядит лучше.", ch, 0, 0, TO_ROOM,POS_RESTING);
+    ch->send_to("п▓п╬п╩п╫п╟ я┌п╣п©п╩п╟ я│п╬пЁя─п╣п╡п╟п╣я┌ я┌п╡п╬п╣ я┌п╣п╩п╬.\n\r");
+    act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╩я┐я┤я┬п╣.", ch, 0, 0, TO_ROOM,POS_RESTING);
 }
 
 SPELL_DECL(DragonStrength);
@@ -155,7 +155,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
 
   if (ch->isAffected(sn))
     {
-      ch->send_to("Сила Дракона уже переполняет тебя.\n\r");
+      ch->send_to("п║п╦п╩п╟ п■я─п╟п╨п╬п╫п╟ я┐п╤п╣ п©п╣я─п╣п©п╬п╩п╫я▐п╣я┌ я┌п╣п╠я▐.\n\r");
       return;
     }
 
@@ -185,8 +185,8 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
   af.location = APPLY_DEX;
   affect_to_char(ch, &af);
 
-  ch->send_to("Сила Дракона пронизывает тебя.\n\r");
-  act_p("$c1 становится сильнее.", ch, 0, 0, TO_ROOM,POS_RESTING);
+  ch->send_to("п║п╦п╩п╟ п■я─п╟п╨п╬п╫п╟ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ я┌п╣п╠я▐.\n\r");
+  act_p("$c1 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ я│п╦п╩я▄п╫п╣п╣.", ch, 0, 0, TO_ROOM,POS_RESTING);
 
 }
 

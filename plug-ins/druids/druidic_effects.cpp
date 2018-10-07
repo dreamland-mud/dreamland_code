@@ -38,7 +38,7 @@ bool AnimalSpiritWE::run( PCharacter *ch, Object *obj ) const
     if (!obj->behavior
 	|| !(comp = obj->behavior.getDynamicPointer<AnimalSpiritComponent>( )))
     {
-	ch->println("Это слово нужно произносить на специальный компонент.");
+	ch->println("п╜я┌п╬ я│п╩п╬п╡п╬ п╫я┐п╤п╫п╬ п©я─п╬п╦п╥п╫п╬я│п╦я┌я▄ п╫п╟ я│п©п╣я├п╦п╟п╩я▄п╫я▀п╧ п╨п╬п╪п©п╬п╫п╣п╫я┌.");
 	return false;
     }
     

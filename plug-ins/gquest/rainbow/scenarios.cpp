@@ -116,23 +116,23 @@ bool RainbowDefaultScenario::checkRoom( Room *room ) const
 
 void RainbowDefaultScenario::printCount( int cnt, ostringstream& buf ) const
 {
-    buf << "У тебя уже есть " << GQChannel::BOLD << cnt << GQChannel::NORMAL
-	<< " разноцветн" << GET_COUNT(cnt, "ый", "ых", "ых")
-	<< " кусоч" << GET_COUNT(cnt, "ек", "ка", "ков") << ". ";
+    buf << "пё я┌п╣п╠я▐ я┐п╤п╣ п╣я│я┌я▄ " << GQChannel::BOLD << cnt << GQChannel::NORMAL
+	<< " я─п╟п╥п╫п╬я├п╡п╣я┌п╫" << GET_COUNT(cnt, "я▀п╧", "я▀я┘", "я▀я┘")
+	<< " п╨я┐я│п╬я┤" << GET_COUNT(cnt, "п╣п╨", "п╨п╟", "п╨п╬п╡") << ". ";
 }
 
 void RainbowDefaultScenario::printTime( ostringstream& buf ) const
 {
-    buf << "Остается ";
+    buf << "п·я│я┌п╟п╣я┌я│я▐ ";
     RainbowGQuest::getThis( )->printRemainedTime( buf );
-    buf << ", чтобы собрать всю радугу." << endl;
+    buf << ", я┤я┌п╬п╠я▀ я│п╬п╠я─п╟я┌я▄ п╡я│я▌ я─п╟п╢я┐пЁя┐." << endl;
 }
 
 void RainbowDefaultScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
     buf << GQChannel::BOLD << name << GQChannel::NORMAL
-	<< " зажигает {Yр{Rа{Mд{Gу{Bг{Cу{x " << GQChannel::NORMAL 
-	<< "над Миром!";
+	<< " п╥п╟п╤п╦пЁп╟п╣я┌ {Yя─{Rп╟{Mп╢{Gя┐{BпЁ{Cя┐{x " << GQChannel::NORMAL 
+	<< "п╫п╟п╢ п°п╦я─п╬п╪!";
 }
 
 bool RainbowDefaultScenario::canHearInitMsg( PCharacter *ch ) const
@@ -156,16 +156,16 @@ void RainbowDefaultScenario::onQuestFinish( PCharacter *ch ) const
     af.modifier = 0;
     affect_join(ch, &af);
     
-    act("Ты поднимаешь к небу ладони, полные разноцветных осколков.", ch, 0, 0, TO_CHAR);
-    act("$c1 поднимает ладони к небу.", ch, 0, 0, TO_ROOM);
-    act("\r\n{YР{Rа{Mд{Gу{Bж{Cн{Rы{Mй{W столп света ударяет в {Cнебо!{x", ch, 0, 0, TO_ALL);
-    act("\r\nТебя окружают {Yр{Rа{Mз{Gн{Bо{Cц{Rв{Mе{Gт{Cн{Yы{Rе{x вихри!", ch, 0, 0, TO_CHAR);
-    act("\r\n{YР{Rа{Mз{Gн{Bо{Cц{Rв{Mе{Gт{Cн{Yы{Rе{x вихри окружают $c4!", ch, 0, 0, TO_ROOM);
+    act("п╒я▀ п©п╬п╢п╫п╦п╪п╟п╣я┬я▄ п╨ п╫п╣п╠я┐ п╩п╟п╢п╬п╫п╦, п©п╬п╩п╫я▀п╣ я─п╟п╥п╫п╬я├п╡п╣я┌п╫я▀я┘ п╬я│п╨п╬п╩п╨п╬п╡.", ch, 0, 0, TO_CHAR);
+    act("$c1 п©п╬п╢п╫п╦п╪п╟п╣я┌ п╩п╟п╢п╬п╫п╦ п╨ п╫п╣п╠я┐.", ch, 0, 0, TO_ROOM);
+    act("\r\n{Yп═{Rп╟{Mп╢{Gя┐{Bп╤{Cп╫{Rя▀{Mп╧{W я│я┌п╬п╩п© я│п╡п╣я┌п╟ я┐п╢п╟я─я▐п╣я┌ п╡ {Cп╫п╣п╠п╬!{x", ch, 0, 0, TO_ALL);
+    act("\r\nп╒п╣п╠я▐ п╬п╨я─я┐п╤п╟я▌я┌ {Yя─{Rп╟{Mп╥{Gп╫{Bп╬{Cя├{Rп╡{Mп╣{Gя┌{Cп╫{Yя▀{Rп╣{x п╡п╦я┘я─п╦!", ch, 0, 0, TO_CHAR);
+    act("\r\n{Yп═{Rп╟{Mп╥{Gп╫{Bп╬{Cя├{Rп╡{Mп╣{Gя┌{Cп╫{Yя▀{Rп╣{x п╡п╦я┘я─п╦ п╬п╨я─я┐п╤п╟я▌я┌ $c4!", ch, 0, 0, TO_ROOM);
 }  
 
 void RainbowDefaultScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) const
 {
-    act("$c1 достает откуда-то цветной булыжник и отламывает от него кусочек.", mob, 0, hero, TO_ROOM);
+    act("$c1 п╢п╬я│я┌п╟п╣я┌ п╬я┌п╨я┐п╢п╟-я┌п╬ я├п╡п╣я┌п╫п╬п╧ п╠я┐п╩я▀п╤п╫п╦п╨ п╦ п╬я┌п╩п╟п╪я▀п╡п╟п╣я┌ п╬я┌ п╫п╣пЁп╬ п╨я┐я│п╬я┤п╣п╨.", mob, 0, hero, TO_ROOM);
 }
 
 void RainbowDefaultScenario::dressItem( Object *obj, int number ) const
@@ -197,14 +197,14 @@ void RainbowSinsScenario::canStart( ) const throw ( GQCannotStartException )
 
 void RainbowSinsScenario::printCount( int cnt, ostringstream& buf ) const
 {
-    buf << "Тебе удалось собрать " << GQChannel::BOLD << cnt << GQChannel::NORMAL
-	<< " смертн" << GET_COUNT(cnt, "ый", "ых", "ых")
-	<< " грех" << GET_COUNT(cnt, "", "а", "ов") << ". ";
+    buf << "п╒п╣п╠п╣ я┐п╢п╟п╩п╬я│я▄ я│п╬п╠я─п╟я┌я▄ " << GQChannel::BOLD << cnt << GQChannel::NORMAL
+	<< " я│п╪п╣я─я┌п╫" << GET_COUNT(cnt, "я▀п╧", "я▀я┘", "я▀я┘")
+	<< " пЁя─п╣я┘" << GET_COUNT(cnt, "", "п╟", "п╬п╡") << ". ";
 }
 
 void RainbowSinsScenario::printTime( ostringstream& buf ) const
 {
-    buf << "Вакансия закроется через ";
+    buf << "п▓п╟п╨п╟п╫я│п╦я▐ п╥п╟п╨я─п╬п╣я┌я│я▐ я┤п╣я─п╣п╥ ";
     RainbowGQuest::getThis( )->printRemainedTime( buf );
     buf << "." << endl;
 }
@@ -212,7 +212,7 @@ void RainbowSinsScenario::printTime( ostringstream& buf ) const
 void RainbowSinsScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
     buf << GQChannel::BOLD << name << GQChannel::NORMAL
-	<< "  приняли на адскую должность!";
+	<< "  п©я─п╦п╫я▐п╩п╦ п╫п╟ п╟п╢я│п╨я┐я▌ п╢п╬п╩п╤п╫п╬я│я┌я▄!";
 }
 
 bool RainbowSinsScenario::canHearInitMsg( PCharacter *ch ) const
@@ -236,17 +236,17 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
     af.modifier = 0;
     affect_join(ch, &af);
    
-    ch->pecho("\r\nИз дымки появляется cекретарша Ада и произносит '{rТы приня%Gто|т|та!{x'.", ch);
-    act("\r\nИз дымки появляется секретарша Ада и что-то говорит $c3.", ch, 0, 0, TO_ROOM );
+    ch->pecho("\r\nп≤п╥ п╢я▀п╪п╨п╦ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ cп╣п╨я─п╣я┌п╟я─я┬п╟ п░п╢п╟ п╦ п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{rп╒я▀ п©я─п╦п╫я▐%Gя┌п╬|я┌|я┌п╟!{x'.", ch);
+    act("\r\nп≤п╥ п╢я▀п╪п╨п╦ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я│п╣п╨я─п╣я┌п╟я─я┬п╟ п░п╢п╟ п╦ я┤я┌п╬-я┌п╬ пЁп╬п╡п╬я─п╦я┌ $c3.", ch, 0, 0, TO_ROOM );
 
-    act("\r\nТебя окутывает демоническая мантия!", ch, 0, 0, TO_CHAR);
-    act("\r\nДемоническая мантия окутывает $c4!", ch, 0, 0, TO_ROOM);
+    act("\r\nп╒п╣п╠я▐ п╬п╨я┐я┌я▀п╡п╟п╣я┌ п╢п╣п╪п╬п╫п╦я┤п╣я│п╨п╟я▐ п╪п╟п╫я┌п╦я▐!", ch, 0, 0, TO_CHAR);
+    act("\r\nп■п╣п╪п╬п╫п╦я┤п╣я│п╨п╟я▐ п╪п╟п╫я┌п╦я▐ п╬п╨я┐я┌я▀п╡п╟п╣я┌ $c4!", ch, 0, 0, TO_ROOM);
 }  
 
 void RainbowSinsScenario::onGivePiece( PCharacter *hero, NPCharacter *mob ) const
 {
-    act("$c1 понимающе ухмыляется, узнав в $C6 достойного преемника.", mob, 0, hero, TO_NOTVICT);
-    act("$c1 понимающе ухмыляется, узнав в тебе достойного преемника.", mob, 0, hero, TO_VICT);
+    act("$c1 п©п╬п╫п╦п╪п╟я▌я┴п╣ я┐я┘п╪я▀п╩я▐п╣я┌я│я▐, я┐п╥п╫п╟п╡ п╡ $C6 п╢п╬я│я┌п╬п╧п╫п╬пЁп╬ п©я─п╣п╣п╪п╫п╦п╨п╟.", mob, 0, hero, TO_NOTVICT);
+    act("$c1 п©п╬п╫п╦п╪п╟я▌я┴п╣ я┐я┘п╪я▀п╩я▐п╣я┌я│я▐, я┐п╥п╫п╟п╡ п╡ я┌п╣п╠п╣ п╢п╬я│я┌п╬п╧п╫п╬пЁп╬ п©я─п╣п╣п╪п╫п╦п╨п╟.", mob, 0, hero, TO_VICT);
 }
 
 bool RainbowSinsScenario::checkMobile( NPCharacter *ch ) const

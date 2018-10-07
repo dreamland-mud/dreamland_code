@@ -79,10 +79,10 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg, Character 
 	    *dst= 'a' + number_range( 0, 25 );
 	else if( c >= 'A' && c <= 'Z' )
 	    *dst = 'A' + number_range( 0, 25 );
-	else if( c >= 'à' && c <= 'þ' )
-	    *dst = 'à' + number_range( 0, 'þ' - 'à' );
-	else if( c >= 'À' && c <= 'ß' )
-	    *dst = 'À' + number_range( 0, 'ß' - 'À' );
+	else if( c >= 'Ð®' && c <= 'Ð§' )
+	    *dst = 'Ð®' + number_range( 0, 'Ð§' - 'Ð®' );
+	else if( c >= 'ÑŽ' && c <= 'ÑŠ' )
+	    *dst = 'ÑŽ' + number_range( 0, 'ÑŠ' - 'ÑŽ' );
 	else
 	    *dst = c;
     }

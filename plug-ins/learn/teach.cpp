@@ -18,7 +18,7 @@ CMDRUN( teach )
     XMLAttributes * attributes;
     
     if (ch->is_npc( ) || ch->getRealLevel( ) < LEVEL_HERO - 1) {
-	ch->send_to("Тебе необходимо достичь уровня Героя.\n\r");       
+	ch->send_to("п╒п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╢п╬я│я┌п╦я┤я▄ я┐я─п╬п╡п╫я▐ п⌠п╣я─п╬я▐.\n\r");       
 	return;
     }
     
@@ -26,17 +26,17 @@ CMDRUN( teach )
     
     if (attributes->isAvailable( "teacher" )) {
 	attributes->eraseAttribute( "teacher" );
-	act_p("Ты передума$gло|л|ла обучать других.", ch, 0, 0, TO_CHAR, POS_DEAD);
+	act_p("п╒я▀ п©п╣я─п╣п╢я┐п╪п╟$gп╩п╬|п╩|п╩п╟ п╬п╠я┐я┤п╟я┌я▄ п╢я─я┐пЁп╦я┘.", ch, 0, 0, TO_CHAR, POS_DEAD);
     }
     else {
 	attributes->getAttr<XMLAttributeTeacher>( "teacher" );
-	ch->send_to("Теперь ты можешь обучать других тому, что ты знаешь в совершенстве.\r\n" );
+	ch->send_to("п╒п╣п©п╣я─я▄ я┌я▀ п╪п╬п╤п╣я┬я▄ п╬п╠я┐я┤п╟я┌я▄ п╢я─я┐пЁп╦я┘ я┌п╬п╪я┐, я┤я┌п╬ я┌я▀ п╥п╫п╟п╣я┬я▄ п╡ я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡п╣.\r\n" );
     }
 }
 
 CMDRUN( learn )
 {
-    ch->println( "Используй 'prac <skill>', стоя рядом с героем-учителем." );
+    ch->println( "п≤я│п©п╬п╩я▄п╥я┐п╧ 'prac <skill>', я│я┌п╬я▐ я─я▐п╢п╬п╪ я│ пЁп╣я─п╬п╣п╪-я┐я┤п╦я┌п╣п╩п╣п╪." );
 }
 
 XMLAttributeTeacher::XMLAttributeTeacher( ) 

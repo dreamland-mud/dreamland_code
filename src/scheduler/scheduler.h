@@ -14,7 +14,7 @@ class SchedulerTask;
 class SchedulerPriorityMap;
 
 /**
- * @short Планировщик задач
+ * @short п÷п╩п╟п╫п╦я─п╬п╡я┴п╦п╨ п╥п╟п╢п╟я┤
  */
 class Scheduler : public virtual DLObject { 
 public:	
@@ -26,20 +26,20 @@ public:
 	virtual ~Scheduler( );
 	
 	void putTask( long time, SchedulerTaskPointer task );
-	/** Выполнить задачу немедленно */
+	/** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ п╫п╣п╪п╣п╢п╩п╣п╫п╫п╬ */
 	void putTaskNOW( SchedulerTaskPointer task );
-	/** Выполнить задачу при инициализации */
+	/** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ п©я─п╦ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦п╦ */
 	void putTaskInitiate( SchedulerTaskPointer task );
 	
-	/** Насильно убить все задачи заданного типа */
+	/** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ п╥п╟п╢п╟п╫п╫п╬пЁп╬ я┌п╦п©п╟ */
 	void slay( SchedulerTaskPointer task );
-	/** Насильно убить все задачи с этим указателем */
+	/** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ я│ я█я┌п╦п╪ я┐п╨п╟п╥п╟я┌п╣п╩п╣п╪ */
 	void slayInstance( SchedulerTaskPointer task );
 	
-	/** Системный тик */
+	/** п║п╦я│я┌п╣п╪п╫я▀п╧ я┌п╦п╨ */
 	void tick( );
 
-	/** Текущий приоритет в обрабатываемом мэпе */
+	/** п╒п╣п╨я┐я┴п╦п╧ п©я─п╦п╬я─п╦я┌п╣я┌ п╡ п╬п╠я─п╟п╠п╟я┌я▀п╡п╟п╣п╪п╬п╪ п╪я█п©п╣ */
 	int getPriority( ) const;
 	long getCurrentTick( ) const;
 	

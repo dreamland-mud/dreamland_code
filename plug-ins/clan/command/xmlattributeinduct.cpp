@@ -61,7 +61,7 @@ XMLAttributeInductListenerPlugin::run( int oldState, int newState, Descriptor *d
 		cnt++;
 	
 	if (cnt > 0)
-	    ch->pecho( "%1$d петиц%1$Iия|ии|ии ожида%1$Iет|ют|ют твоего рассмотрения.\n", cnt );
+	    ch->pecho( "%1$d п©п╣я┌п╦я├%1$Iп╦я▐|п╦п╦|п╦п╦ п╬п╤п╦п╢п╟%1$Iп╣я┌|я▌я┌|я▌я┌ я┌п╡п╬п╣пЁп╬ я─п╟я│я│п╪п╬я┌я─п╣п╫п╦я▐.\n", cnt );
     }
 }
 

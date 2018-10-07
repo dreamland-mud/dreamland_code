@@ -151,28 +151,28 @@ bool Command::dispatchOrder( const InterpretArguments &iargs )
 	&& IS_SET(ch->act, PLR_FREEZE)
 	&& !getExtra( ).isSet( CMD_FREEZE ))
     {
-	ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
+	ch->pecho("п╒я▀ п©п╬п╩п╫п╬я│я┌я▄я▌ п╥п╟п╪п╬я─п╬п╤п╣%Gп╫п╬|п╫|п╫п╟!", ch);
 	return false;
     }
 
     if (IS_SET( ch->comm, COMM_AFK ) && !getExtra( ).isSet( CMD_AFK )) {
-	ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
+	ch->send_to( "п▓я▀п╧п╢п╦ я│п╫п╟я┤п╟п╩п╟ п╦п╥ {WAFK{x\n\r" );
 	return false;
     }
 
     if (getExtra( ).isSet( CMD_SPELLOUT ) && !matchesExactly( iargs.cmdName.toLower( ) )) {
-	ch->printf("Команду '%s' необходимо ввести полностью.\n\r", getName( ).c_str( ) );
+	ch->printf("п п╬п╪п╟п╫п╢я┐ '%s' п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╡п╡п╣я│я┌п╦ п©п╬п╩п╫п╬я│я┌я▄я▌.\n\r", getName( ).c_str( ) );
 	return false;
     }
 		    
     if (IS_AFFECTED( ch, AFF_STUN ) && !getExtra( ).isSet( CMD_KEEP_HIDE )) {
-	ch->send_to( "Ты не в состоянии сделать это.\n\r" );
+	ch->send_to( "п╒я▀ п╫п╣ п╡ я│п╬я│я┌п╬я▐п╫п╦п╦ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.\n\r" );
 	return false;
     }
 
     // prevent ghosts from doing a bunch of commands
     if (IS_GHOST( ch ) && !getExtra( ).isSet( CMD_GHOST )) {
-	ch->send_to( "У тебя нет тела... А твой немощный дух не в состоянии тебе помочь.\n\r" );
+	ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╣п╩п╟... п░ я┌п╡п╬п╧ п╫п╣п╪п╬я┴п╫я▀п╧ п╢я┐я┘ п╫п╣ п╡ я│п╬я│я┌п╬я▐п╫п╦п╦ я┌п╣п╠п╣ п©п╬п╪п╬я┤я▄.\n\r" );
 	return false;
     }
 
@@ -193,12 +193,12 @@ bool Command::dispatch( const InterpretArguments &iargs )
     if (IS_AFFECTED(ch, AFF_CHARM) 
 	&& !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
     {
-	ch->send_to( "Сперва спроси разрешения у любимого хозяина!\n\r" );
+	ch->send_to( "п║п©п╣я─п╡п╟ я│п©я─п╬я│п╦ я─п╟п╥я─п╣я┬п╣п╫п╦я▐ я┐ п╩я▌п╠п╦п╪п╬пЁп╬ я┘п╬п╥я▐п╦п╫п╟!\n\r" );
 	return false;
     }
 
     if (ch->isAffected(gsn_manacles ) && !getExtra( ).isSet( CMD_MANACLES )) {
-	ch->send_to( "Ты не можешь этого сделать - мешают кандалы!\n\r" );
+	ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄ - п╪п╣я┬п╟я▌я┌ п╨п╟п╫п╢п╟п╩я▀!\n\r" );
 	return false;
     }
 
@@ -213,16 +213,16 @@ void Command::visualize( Character *ch )
     if (IS_AFFECTED( ch, AFF_HIDE | AFF_FADE ) && !getExtra( ).isSet( CMD_KEEP_HIDE ))
     {
 	REMOVE_BIT( ch->affected_by, AFF_HIDE | AFF_FADE );
-	ch->send_to( "Ты выходишь из тени.\n\r" );
-	act_p( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM, POS_RESTING );
+	ch->send_to( "п╒я▀ п╡я▀я┘п╬п╢п╦я┬я▄ п╦п╥ я┌п╣п╫п╦.\n\r" );
+	act_p( "$c1 п╡я▀я┘п╬п╢п╦я┌ п╦п╥ я┌п╣п╫п╦.", ch, 0, 0, TO_ROOM, POS_RESTING );
     }
 
     if (IS_AFFECTED( ch, AFF_IMP_INVIS ) && getPosition( ).getValue( ) == POS_FIGHTING)
     {
 	affect_strip( ch, gsn_improved_invis );
 	REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-	act_p( "Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR, POS_RESTING );
-	act_p( "$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM, POS_RESTING );
+	act_p( "п╒я▀ я│я┌п╟п╫п╬п╡п╦я┬я▄я│я▐ п╡п╦п╢п╦п╪$gп╬|я▀п╪|п╬п╧ п╢п╩я▐ п╬п╨я─я┐п╤п╟я▌я┴п╦я┘.", ch, 0, 0, TO_CHAR, POS_RESTING );
+	act_p( "$c1 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╡п╦п╢п╦п╪$gп╬|я▀п╪|п╬п╧ п╢п╩я▐ п╬п╨я─я┐п╤п╟я▌я┴п╦я┘.", ch, 0, 0, TO_ROOM, POS_RESTING );
     }
 
     if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))
@@ -237,32 +237,32 @@ bool Command::checkPosition( Character *ch )
 
     switch (ch->position.getValue( )) {
 	case POS_DEAD:
-	    ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
+	    ch->send_to("п⌡п╣п╤п╦ я│п╪п╦я─п╫п╬! п╒я▀ {Rп╒п═пёп÷{x.\n\r");
 	    break;
 
 	case POS_MORTAL:
 	case POS_INCAP:
-	    ch->send_to( "Даже не думай об этом! Ты в ужасном состоянии.\n\r" );
+	    ch->send_to( "п■п╟п╤п╣ п╫п╣ п╢я┐п╪п╟п╧ п╬п╠ я█я┌п╬п╪! п╒я▀ п╡ я┐п╤п╟я│п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦.\n\r" );
 	    break;
 
 	case POS_STUNNED:
-	    ch->send_to( "Ты не в состоянии сделать это.\n\r" );
+	    ch->send_to( "п╒я▀ п╫п╣ п╡ я│п╬я│я┌п╬я▐п╫п╦п╦ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.\n\r" );
 	    break;
 
 	case POS_SLEEPING:
-	    ch->send_to( "Во сне? Или может сначала проснешься...\n\r" );
+	    ch->send_to( "п▓п╬ я│п╫п╣? п≤п╩п╦ п╪п╬п╤п╣я┌ я│п╫п╟я┤п╟п╩п╟ п©я─п╬я│п╫п╣я┬я▄я│я▐...\n\r" );
 	    break;
 
 	case POS_RESTING:
-	    ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
+	    ch->send_to( "пёя└я└... п²п╬ п╡п╣п╢я▄ я┌я▀ п╬я┌п╢я▀я┘п╟п╣я┬я▄...\n\r" );
 	    break;
 
 	case POS_SITTING:
-	    ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
+	    ch->send_to( "п║п╦п╢я▐? п≤п╩п╦ п╪п╬п╤п╣я┌ я│п╫п╟я┤п╟п╩п╟ п╡я│я┌п╟п╫п╣я┬я▄...\n\r" );
 	    break;
 
 	case POS_FIGHTING:
-	    act_p( "Куда! Ты долж$gно|ен|на сражаться.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+	    act_p( "п я┐п╢п╟! п╒я▀ п╢п╬п╩п╤$gп╫п╬|п╣п╫|п╫п╟ я│я─п╟п╤п╟я┌я▄я│я▐.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
 	    break;
     }
     

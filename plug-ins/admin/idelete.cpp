@@ -15,22 +15,22 @@ CMDADM( idelete )
     DLString name = constArguments;
 
     if (name.empty( )) {
-	ch->println( "Удалить чей профайл?" );
+	ch->println( "пёп╢п╟п╩п╦я┌я▄ я┤п╣п╧ п©я─п╬я└п╟п╧п╩?" );
 	return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-	ch->println( "Персонаж с таким именем не найден." );
+	ch->println( "п÷п╣я─я│п╬п╫п╟п╤ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫." );
 	return;
     }
 
     if (pci->isOnline( )) {
-	ch->println( "Персонаж присутствует в мире, удаление невозможно." );
+	ch->println( "п÷п╣я─я│п╬п╫п╟п╤ п©я─п╦я│я┐я┌я│я┌п╡я┐п╣я┌ п╡ п╪п╦я─п╣, я┐п╢п╟п╩п╣п╫п╦п╣ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬." );
 	return;
     }
     
     if (!PCharacterManager::pfDelete( constArguments ))
-	ch->println( "Ошибка при удалении профайла!" );
+	ch->println( "п·я┬п╦п╠п╨п╟ п©я─п╦ я┐п╢п╟п╩п╣п╫п╦п╦ п©я─п╬я└п╟п╧п╩п╟!" );
     else
 	ch->println( "Ok." );
 }
@@ -44,7 +44,7 @@ CMDADM( ipassword )
     DLString passwd = arguments.getOneArgument( );
 
     if (name.empty( )) {
-	ch->println( "Установить пароль кому?" );
+	ch->println( "пёя│я┌п╟п╫п╬п╡п╦я┌я▄ п©п╟я─п╬п╩я▄ п╨п╬п╪я┐?" );
 	return;
     }
 
@@ -64,22 +64,22 @@ CMDADM( ipassword )
             }
         }
 
-        ch->printf( "Захешированы пароли %d персонажей из %d.\r\n", cnt, pcm.size( ) );
+        ch->printf( "п≈п╟я┘п╣я┬п╦я─п╬п╡п╟п╫я▀ п©п╟я─п╬п╩п╦ %d п©п╣я─я│п╬п╫п╟п╤п╣п╧ п╦п╥ %d.\r\n", cnt, pcm.size( ) );
         return;
     }
 
     if (passwd.empty( )) {
-        ch->println("Использование: ipassword <player name> <new password>.");
+        ch->println("п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: ipassword <player name> <new password>.");
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-	ch->println( "Персонаж с таким именем не найден." );
+	ch->println( "п÷п╣я─я│п╬п╫п╟п╤ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫." );
 	return;
     }
     
     password_set( pci, passwd );
-    ch->println( "Новый пароль установлен и сохранен." );
+    ch->println( "п²п╬п╡я▀п╧ п©п╟я─п╬п╩я▄ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ п╦ я│п╬я┘я─п╟п╫п╣п╫." );
 }
 
 

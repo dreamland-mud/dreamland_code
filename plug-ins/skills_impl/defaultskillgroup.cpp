@@ -72,7 +72,7 @@ bool DefaultSkillGroup::available( Character *ch ) const
 
 void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 {
-    buf << "çÒÕÐÐÁ "
+    buf << "Ð“Ñ€ÑƒÐ¿Ð¿Ð° "
         << "{Y" << getName( ) << "{w, "
 	<< "{Y" << getRussianName( ) << "{w" << endl;
 
@@ -90,10 +90,10 @@ void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) const
 {
     if (group_clan == this) {
-	buf << "ðÒÁËÔÉËÕÅÔÓÑ Õ {gËÌÁÎÏ×ÏÇÏ ÏÈÒÁÎÎÉËÁ{x.";
+	buf << "ÐŸÑ€Ð°ÐºÑ‚Ð¸ÐºÑƒÐµÑ‚ÑÑ Ñƒ {gÐºÐ»Ð°Ð½Ð¾Ð²Ð¾Ð³Ð¾ Ð¾Ñ…Ñ€Ð°Ð½Ð½Ð¸ÐºÐ°{x.";
     }
     else if (practicer == 0) {
-	buf << "ðÒÁËÔÉËÕÅÔÓÑ × {gÇÉÌØÄÉÉ{x.";
+	buf << "ÐŸÑ€Ð°ÐºÑ‚Ð¸ÐºÑƒÐµÑ‚ÑÑ Ð² {gÐ³Ð¸Ð»ÑŒÐ´Ð¸Ð¸{x.";
     }
     else {
 	MOB_INDEX_DATA *pMob = get_mob_index( practicer );
@@ -104,9 +104,9 @@ void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) con
 	}
 
 	if (pMob->sex == SEX_FEMALE)
-	    buf << "õÞÉÔÅÌØÎÉÃÁ";
+	    buf << "Ð£Ñ‡Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¸Ñ†Ð°";
 	else
-	    buf << "õÞÉÔÅÌØ";
+	    buf << "Ð£Ñ‡Ð¸Ñ‚ÐµÐ»ÑŒ";
 
 	buf << " - {g" 
 	    << russian_case( pMob->short_descr, '1' ) << "{x "
@@ -123,7 +123,7 @@ void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
     int columns = 3;
     const char *pattern = fRus ? "{%c%-26s{x" : "{%c%-20s{x";
     
-    buf << endl << "îÁ×ÙËÉ ÜÔÏÊ ÇÒÕÐÐÙ:" << endl;
+    buf << endl << "ÐÐ°Ð²Ñ‹ÐºÐ¸ ÑÑ‚Ð¾Ð¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹:" << endl;
 
     for (int col = 0, sn = 0; sn < skillManager->size( ); sn++) {
 	Skill *skill = skillManager->find( sn );

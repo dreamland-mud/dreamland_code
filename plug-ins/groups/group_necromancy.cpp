@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "group_necromancy.h"
@@ -82,9 +82,9 @@ void AdamantiteGolem::fight( Character *victim )
 
     ch->setWait( gsn_rescue->getBeats( )  );
     
-    act( "Ты спасаешь $C4!",  ch, 0, master, TO_CHAR );
-    act( "$c1 спасает тебя!", ch, 0, master, TO_VICT );
-    act( "$c1 спасает $C4!",  ch, 0, master, TO_NOTVICT );
+    act( "п╒я▀ я│п©п╟я│п╟п╣я┬я▄ $C4!",  ch, 0, master, TO_CHAR );
+    act( "$c1 я│п©п╟я│п╟п╣я┌ я┌п╣п╠я▐!", ch, 0, master, TO_VICT );
+    act( "$c1 я│п©п╟я│п╟п╣я┌ $C4!",  ch, 0, master, TO_NOTVICT );
 
     stop_fighting( master->fighting, false );
     set_fighting( ch, master->fighting);
@@ -187,19 +187,19 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 	if ( !(obj->item_type == ITEM_CORPSE_NPC
 			|| obj->item_type == ITEM_CORPSE_PC))
 	{
-		ch->send_to("Ты можешь воскресить только труп!!!\n\r");
+		ch->send_to("п╒я▀ п╪п╬п╤п╣я┬я▄ п╡п╬я│п╨я─п╣я│п╦я┌я▄ я┌п╬п╩я▄п╨п╬ я┌я─я┐п©!!!\n\r");
 		return;
 	}
 
 	if ( !ch->is_immortal() && obj->item_type == ITEM_CORPSE_PC )
 	{
-		ch->send_to("Запрещено богами!\n\r");
+		ch->send_to("п≈п╟п©я─п╣я┴п╣п╫п╬ п╠п╬пЁп╟п╪п╦!\n\r");
 		return;
 	}
 
 	if ( ch->isAffected(sn ) )
 	{
-		ch->send_to("Нужно восстановить энергию после предыдущего воскрешения.\n\r");
+		ch->send_to("п²я┐п╤п╫п╬ п╡п╬я│я│я┌п╟п╫п╬п╡п╦я┌я▄ я█п╫п╣я─пЁп╦я▌ п©п╬я│п╩п╣ п©я─п╣п╢я▀п╢я┐я┴п╣пЁп╬ п╡п╬я│п╨я─п╣я┬п╣п╫п╦я▐.\n\r");
 		return;
 	}
 
@@ -208,7 +208,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
 	if ( ch->in_room && IS_SET( ch->in_room->room_flags, ROOM_NO_MOB ) )
 	{
-		ch->send_to("Здесь невозможно оживить труп.\n\r");
+		ch->send_to("п≈п╢п╣я│я▄ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬п╤п╦п╡п╦я┌я▄ я┌я─я┐п©.\n\r");
 		return;
 	}
 
@@ -216,7 +216,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 		|| IS_SET(ch->in_room->room_flags, ROOM_PRIVATE )
 		|| IS_SET(ch->in_room->room_flags, ROOM_SOLITARY ) )
 	{
-		ch->send_to("Святость этого места не позволяет тебе сделать этого.\n\r");
+		ch->send_to("п║п╡я▐я┌п╬я│я┌я▄ я█я┌п╬пЁп╬ п╪п╣я│я┌п╟ п╫п╣ п©п╬п╥п╡п╬п╩я▐п╣я┌ я┌п╣п╠п╣ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬.\n\r");
 		return;
 	}
 	undead = create_mobile( get_mob_index(MOB_VNUM_UNDEAD) );
@@ -262,9 +262,9 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 	while (argument[0] != '\0' )
 	{
 		argument = one_argument(argument, arg);
-		if (!( !str_cmp(arg,"Оживленный")
+		if (!( !str_cmp(arg,"п·п╤п╦п╡п╩п╣п╫п╫я▀п╧")
 				|| !str_cmp(arg,"(corpse)")
-				|| !str_cmp(arg,"труп") ))
+				|| !str_cmp(arg,"я┌я─я┐п©") ))
 		{
 			if (buf3[0] == '\0')
 				strcat(buf3,arg);
@@ -292,21 +292,21 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
 	postaffect_to_char( ch, sn, ch->getModifyLevel() / 10 );
 
-	ch->send_to("Используя Мистическую Силу ты воскрешаешь труп!\n\r");
+	ch->send_to("п≤я│п©п╬п╩я▄п╥я┐я▐ п°п╦я│я┌п╦я┤п╣я│п╨я┐я▌ п║п╦п╩я┐ я┌я▀ п╡п╬я│п╨я─п╣я┬п╟п╣я┬я▄ я┌я─я┐п©!\n\r");
 
-	sprintf(buf,"Используя Мистическую Силу $c1 воскрешает %s!",obj->getShortDescr( '4' ).c_str( ));
+	sprintf(buf,"п≤я│п©п╬п╩я▄п╥я┐я▐ п°п╦я│я┌п╦я┤п╣я│п╨я┐я▌ п║п╦п╩я┐ $c1 п╡п╬я│п╨я─п╣я┬п╟п╣я┌ %s!",obj->getShortDescr( '4' ).c_str( ));
 	act_p(buf,ch,0,0,TO_ROOM,POS_RESTING);
 
-	act_p("$C1 смотрит на тебя бессмысленным взглядом,\n\rповинуясь твоим приказам!",ch,0,undead,TO_CHAR,POS_RESTING);
+	act_p("$C1 я│п╪п╬я┌я─п╦я┌ п╫п╟ я┌п╣п╠я▐ п╠п╣я│я│п╪я▀я│п╩п╣п╫п╫я▀п╪ п╡п╥пЁп╩я▐п╢п╬п╪,\n\rп©п╬п╡п╦п╫я┐я▐я│я▄ я┌п╡п╬п╦п╪ п©я─п╦п╨п╟п╥п╟п╪!",ch,0,undead,TO_CHAR,POS_RESTING);
 	extract_obj (obj);
 }
 
 VOID_SPELL(AnimateDead)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
 	if ( victim == ch )
-	    ch->send_to("Жизнь прекрасна и ты не собираешься расставаться со своим телом!\n\r");
+	    ch->send_to("п√п╦п╥п╫я▄ п©я─п╣п╨я─п╟я│п╫п╟ п╦ я┌я▀ п╫п╣ я│п╬п╠п╦я─п╟п╣я┬я▄я│я▐ я─п╟я│я│я┌п╟п╡п╟я┌я▄я│я▐ я│п╬ я│п╡п╬п╦п╪ я┌п╣п╩п╬п╪!\n\r");
 	else 
-	    act_p("Жизнь прекрасна и $C1 не собирается расставаться со своим телом!",ch,0,victim,TO_CHAR,POS_RESTING);
+	    act_p("п√п╦п╥п╫я▄ п©я─п╣п╨я─п╟я│п╫п╟ п╦ $C1 п╫п╣ я│п╬п╠п╦я─п╟п╣я┌я│я▐ я─п╟я│я│я┌п╟п╡п╟я┌я▄я│я▐ я│п╬ я│п╡п╬п╦п╪ я┌п╣п╩п╬п╪!",ch,0,victim,TO_CHAR,POS_RESTING);
 
 }
 
@@ -377,14 +377,14 @@ VOID_SPELL(CallCorpseRenameMePlease)::run( Character *ch, char *, int sn, int le
     int countTotal = 0, countMoved = 0;
 
     if (ch->isAffected( sn )) {
-	ch->println( "Ты слишком сконцентрирован на предыдущей попытке призыва." );
+	ch->println( "п╒я▀ я│п╩п╦я┬п╨п╬п╪ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟п╫ п╫п╟ п©я─п╣п╢я▀п╢я┐я┴п╣п╧ п©п╬п©я▀я┌п╨п╣ п©я─п╦п╥я▀п╡п╟." );
 	return;
     }
     
     if (IS_SET(ch->in_room->room_flag, ROOM_SOLITARY|ROOM_PRIVATE|ROOM_NO_MOB)
 	|| ch->in_room->clan != clan_none)
     {
-	ch->println("Твоя нежить не сможет собраться здесь.");
+	ch->println("п╒п╡п╬я▐ п╫п╣п╤п╦я┌я▄ п╫п╣ я│п╪п╬п╤п╣я┌ я│п╬п╠я─п╟я┌я▄я│я▐ п╥п╢п╣я│я▄.");
 	return;
     }
     
@@ -406,16 +406,16 @@ VOID_SPELL(CallCorpseRenameMePlease)::run( Character *ch, char *, int sn, int le
 	}
 
     if (countTotal == 0) {
-	ch->println("В мире нет нежити, подвластной тебе.");
+	ch->println("п▓ п╪п╦я─п╣ п╫п╣я┌ п╫п╣п╤п╦я┌п╦, п©п╬п╢п╡п╩п╟я│я┌п╫п╬п╧ я┌п╣п╠п╣.");
 	return;
     }
 
     if (countMoved == 0) {
-	ch->println("Ни один из твоих големов или зомби не сможет добраться до тебя.");
+	ch->println("п²п╦ п╬п╢п╦п╫ п╦п╥ я┌п╡п╬п╦я┘ пЁп╬п╩п╣п╪п╬п╡ п╦п╩п╦ п╥п╬п╪п╠п╦ п╫п╣ я│п╪п╬п╤п╣я┌ п╢п╬п╠я─п╟я┌я▄я│я▐ п╢п╬ я┌п╣п╠я▐.");
 	return;
     }
     
-    ch->println("Ты мысленно приказываешь всей подвластной тебе нежити собраться в этом месте.");
+    ch->println("п╒я▀ п╪я▀я│п╩п╣п╫п╫п╬ п©я─п╦п╨п╟п╥я▀п╡п╟п╣я┬я▄ п╡я│п╣п╧ п©п╬п╢п╡п╩п╟я│я┌п╫п╬п╧ я┌п╣п╠п╣ п╫п╣п╤п╦я┌п╦ я│п╬п╠я─п╟я┌я▄я│я▐ п╡ я█я┌п╬п╪ п╪п╣я│я┌п╣.");
 
     postaffect_to_char( ch, sn, level / 10 );
 }

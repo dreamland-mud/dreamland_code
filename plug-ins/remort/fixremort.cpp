@@ -84,13 +84,13 @@ void FixRemortListener::fixOldRemort( PCharacter *ch )
     ch->getAttributes( ).eraseAttribute( "fixremort1" );
     ch->getRemorts( ).resetBonuses( );
     
-    ch->send_to( "\r\n{R÷ÎÉÍÁÎÉÅ!{x\r\n"
-                 "ëÏÎÃÅÐÃÉÑ ÒÅÍÏÒÔÏ× ÉÚÍÅÎÅÎÁ. "
-		 "þÉÔÁÊÔÅ changes, help remort, help oldremort.\r\n" );
+    ch->send_to( "\r\n{RÐ’Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ!{x\r\n"
+                 "ÐšÐ¾Ð½Ñ†ÐµÐ¿Ñ†Ð¸Ñ Ñ€ÐµÐ¼Ð¾Ñ€Ñ‚Ð¾Ð² Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð°. "
+		 "Ð§Ð¸Ñ‚Ð°Ð¹Ñ‚Ðµ changes, help remort, help oldremort.\r\n" );
 		
     if (corpse)
-	ch->send_to( "ïÂÒÁÔÉÔÅ ×ÎÉÍÁÎÉÅ ÎÁ ÍÅÛÏË, ËÏÔÏÒÙÊ ÌÅÖÉÔ Õ ×ÁÓ ÐÏÄ ÎÏÇÁÍÉ.\r\n"
-	             "ðÏÄÒÏÂÎÅÅ Ï ÎÅÍ ÔÏÖÅ ÓÍ. help oldremort.\r\n" );
+	ch->send_to( "ÐžÐ±Ñ€Ð°Ñ‚Ð¸Ñ‚Ðµ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ Ð½Ð° Ð¼ÐµÑˆÐ¾Ðº, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ Ð»ÐµÐ¶Ð¸Ñ‚ Ñƒ Ð²Ð°Ñ Ð¿Ð¾Ð´ Ð½Ð¾Ð³Ð°Ð¼Ð¸.\r\n"
+	             "ÐŸÐ¾Ð´Ñ€Ð¾Ð±Ð½ÐµÐµ Ð¾ Ð½ÐµÐ¼ Ñ‚Ð¾Ð¶Ðµ ÑÐ¼. help oldremort.\r\n" );
 	
     ch->save( );
 }
@@ -106,9 +106,9 @@ Object * FixRemortListener::makeCorpse( PCharacter *ch )
     corpse->value[3] = ch->getHometown( )->getPit( );
     corpse->timer = 24 * 60;
 
-    corpse->setName( "ÍÅÛÏË sack" );
-    corpse->fmtShortDescr( "ÍÅÛ|ÏË|ËÁ|ËÕ|ÏË|ËÏÍ|ËÅ Ó ×ÅÝÁÍÉ %s", ch->getNameP( '2' ).c_str( ) );
-    corpse->fmtDescription( "íÅÛÏË (sack) Ó ×ÅÝÁÍÉ %s ÌÅÖÉÔ ÚÄÅÓØ.", ch->getNameP( '2' ).c_str( ) );
+    corpse->setName( "Ð¼ÐµÑˆÐ¾Ðº sack" );
+    corpse->fmtShortDescr( "Ð¼ÐµÑˆ|Ð¾Ðº|ÐºÐ°|ÐºÑƒ|Ð¾Ðº|ÐºÐ¾Ð¼|ÐºÐµ Ñ Ð²ÐµÑ‰Ð°Ð¼Ð¸ %s", ch->getNameP( '2' ).c_str( ) );
+    corpse->fmtDescription( "ÐœÐµÑˆÐ¾Ðº (sack) Ñ Ð²ÐµÑ‰Ð°Ð¼Ð¸ %s Ð»ÐµÐ¶Ð¸Ñ‚ Ð·Ð´ÐµÑÑŒ.", ch->getNameP( '2' ).c_str( ) );
 		   
     obj_to_room( corpse, ch->in_room );
     return corpse;

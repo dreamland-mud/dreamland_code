@@ -23,7 +23,7 @@ public:
 	static const DLString TYPE;
 
 public:	
-	/** По умолчанию значение 0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
 	inline Long( ) : value( 0 )
 	{
 	}
@@ -61,7 +61,7 @@ private:
 
 
 
-/** Вывод в ostream типа Long */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Long */
 inline std::ostream& operator << ( std::ostream& ostr, const Long& longValue )
 {
 	ostr << longValue.getValue( );

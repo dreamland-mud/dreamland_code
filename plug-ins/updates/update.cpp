@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT		           *	
@@ -287,7 +287,7 @@ void char_update( )
 	    continue;
 
 	if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
-	    act_p("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM,POS_RESTING);
+	    act_p("$c1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.",ch,0,0,TO_ROOM,POS_RESTING);
 	    extract_char( ch );
 	    continue;
 	}
@@ -327,7 +327,7 @@ void char_update( )
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && IS_VAMPIRE(ch) && !MOUNTED(ch))
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╢п╡п╦пЁп╟я┌я▄я│я▐ п╫п╣п╥п╟п╪п╣я┌п╫п╬.\n\r");
             SET_BIT(ch->affected_by ,AFF_SNEAK);
 	    room_to_save( ch );
         }
@@ -335,14 +335,14 @@ void char_update( )
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╢п╡п╦пЁп╟я┌я▄я│я▐ п╫п╣п╥п╟п╪п╣я┌п╫п╬.\n\r");
 	    room_to_save( ch );
         }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты прячешься обратно в тень.\n\r");
+            ch->send_to("п╒я▀ п©я─я▐я┤п╣я┬я▄я│я▐ п╬п╠я─п╟я┌п╫п╬ п╡ я┌п╣п╫я▄.\n\r");
 	    room_to_save( ch );
         }
 
@@ -384,9 +384,9 @@ void char_update( )
 	if (ch->is_npc( ) && ch->timer > 0) {
 	    if (--ch->timer == 0) {
 		if (IS_SET(ch->act, ACT_UNDEAD))
-		    act("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
+		    act("$c1 я─п╟п╥п╡п╟п╩п╦п╩$gп╬я│я▄|я│я▐|п╟я│я▄ п╫п╟ п╨я┐я│п╨п╦.", ch, 0, 0, TO_ROOM);
 		else
-		    act("$c1 уме$gрло|р|рла.", ch, 0, 0, TO_ROOM);
+		    act("$c1 я┐п╪п╣$gя─п╩п╬|я─|я─п╩п╟.", ch, 0, 0, TO_ROOM);
 		extract_char( ch );
 		continue;
 	    }
@@ -486,7 +486,7 @@ void water_float_update( )
 	}
 	
 	if (obj->item_type == ITEM_DRINK_CON && !IS_SET(obj->value[4], DRINK_CLOSED)) {
-	    obj->in_room->echo( POS_RESTING, "%1$^O1 дела%1$nет|ют пузыри на поверхности %2$N2.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+	    obj->in_room->echo( POS_RESTING, "%1$^O1 п╢п╣п╩п╟%1$nп╣я┌|я▌я┌ п©я┐п╥я▀я─п╦ п╫п╟ п©п╬п╡п╣я─я┘п╫п╬я│я┌п╦ %2$N2.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
 
 	    obj->value[1] = URANGE( 1, obj->value[1] + 8, obj->value[0] );
 	    obj->water_float = obj->value[0] - obj->value[1];
@@ -502,10 +502,10 @@ void water_float_update( )
 		    || obj->item_type == ITEM_CORPSE_PC
 		    || obj->item_type == ITEM_CONTAINER)
 	    {
-		obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6, оставляя лишь несколько пузырьков.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+		obj->in_room->echo( POS_RESTING, "%1$^O1 я┌п╬п╫%1$nп╣я┌|я┐я┌ п╡ %2$N6, п╬я│я┌п╟п╡п╩я▐я▐ п╩п╦я┬я▄ п╫п╣я│п╨п╬п╩я▄п╨п╬ п©я┐п╥я▀я─я▄п╨п╬п╡.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
 	    }
 	    else
-		obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+		obj->in_room->echo( POS_RESTING, "%1$^O1 я┌п╬п╫%1$nп╣я┌|я┐я┌ п╡ %2$N6.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
 
 	    extract_obj( obj );
 	}
@@ -687,7 +687,7 @@ void obj_update( void )
 	    && obj->pIndexData->limit != -1) 
 	{
 
-	    room->echo( POS_RESTING, "Внезапно появляется злобная домоуправительница и подметает %1$O4 на совок!", obj );
+	    room->echo( POS_RESTING, "п▓п╫п╣п╥п╟п©п╫п╬ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╥п╩п╬п╠п╫п╟я▐ п╢п╬п╪п╬я┐п©я─п╟п╡п╦я┌п╣п╩я▄п╫п╦я├п╟ п╦ п©п╬п╢п╪п╣я┌п╟п╣я┌ %1$O4 п╫п╟ я│п╬п╡п╬п╨!", obj );
 	    extract_obj( obj );
 	    continue;
 	}
@@ -733,14 +733,14 @@ void obj_update( void )
 	{
 	    if (carrier) {
 		if (chance( 40 )) {
-		    carrier->pecho( "%1$^O1 та%1$nет|ют от жара.", obj );
+		    carrier->pecho( "%1$^O1 я┌п╟%1$nп╣я┌|я▌я┌ п╬я┌ п╤п╟я─п╟.", obj );
 		    extract_obj( obj );
 		    continue;
 		}
 	    }
 	    else {
 		if (chance( 50 )) {
-		    room->echo( POS_RESTING, "%1$^O1 та%1$nет|ют от жара.", obj );
+		    room->echo( POS_RESTING, "%1$^O1 я┌п╟%1$nп╣я┌|я▌я┌ п╬я┌ п╤п╟я─п╟.", obj );
 		    extract_obj( obj );
 		    continue;
 		}
@@ -754,14 +754,14 @@ void obj_update( void )
         {
 	    if (carrier) {
 		if (!carrier->is_npc( ) && chance( 20 )) {
-		    carrier->pecho( "%1$^O1 разбива%1$nется|ются.", obj );
+		    carrier->pecho( "%1$^O1 я─п╟п╥п╠п╦п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐.", obj );
 		    extract_obj( obj );
 		    continue;
 		}
             }
             else {
 		if (chance( 30 )) {
-		    room->echo( POS_RESTING, "%1$^O1 разбива%1$nется|ются на мелкие осколки.", obj );
+		    room->echo( POS_RESTING, "%1$^O1 я─п╟п╥п╠п╦п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.", obj );
 		    extract_obj( obj );
 		    continue;
 		}
@@ -782,37 +782,37 @@ void obj_update( void )
         switch ( obj->item_type )
         {
         default:
-            message = "%1$^O1 превраща%1$nется|ются в пыль.";
+            message = "%1$^O1 п©я─п╣п╡я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я▀п╩я▄.";
             break;
         case ITEM_FOUNTAIN:
-            message = "%1$^O1 высыха%1$nет|ют.";
+            message = "%1$^O1 п╡я▀я│я▀я┘п╟%1$nп╣я┌|я▌я┌.";
             break;
         case ITEM_CORPSE_NPC:
-            message = "%1$^O1 обраща%1$nется|ются в прах.";
+            message = "%1$^O1 п╬п╠я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я─п╟я┘.";
             break;
         case ITEM_CORPSE_PC:
-            message = "%1$^O1 обраща%1$nется|ются в прах.";
+            message = "%1$^O1 п╬п╠я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я─п╟я┘.";
             break;
         case ITEM_FOOD:
-            message = "%1$^O1 разлага%1$nется|ются.";
+            message = "%1$^O1 я─п╟п╥п╩п╟пЁп╟%1$nп╣я┌я│я▐|я▌я┌я│я▐.";
             break;
         case ITEM_POTION:
-            message = "%1$^O1 испаря%1$nется|ются.";
+            message = "%1$^O1 п╦я│п©п╟я─я▐%1$nп╣я┌я│я▐|я▌я┌я│я▐.";
             break;
         case ITEM_PORTAL:
-            message = "%1$^O1 исчеза%1$nет|ют в дымке.";
+            message = "%1$^O1 п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌ п╡ п╢я▀п╪п╨п╣.";
             break;
         case ITEM_FURNITURE:
-            message = "%1$^O1 исчеза%1$nет|ют.";
+            message = "%1$^O1 п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌.";
             break;
         case ITEM_CONTAINER:
             if (obj->can_wear(ITEM_WEAR_FLOAT))
                 if (obj->contains)
-                    message = "%1$^O1 вспыхива%1$nет|ют и исчеза%1$nет|ют, рассыпая все содержимое по земле.";
+                    message = "%1$^O1 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ п╦ п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌, я─п╟я│я│я▀п©п╟я▐ п╡я│п╣ я│п╬п╢п╣я─п╤п╦п╪п╬п╣ п©п╬ п╥п╣п╪п╩п╣.";
                 else
-                    message = "%1$^O1 вспыхива%1$nет|ют и исчеза%1$nет|ют.";
+                    message = "%1$^O1 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ п╦ п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌.";
             else
-                message = "%1$^O1 обраща%1$nется|ются в прах.";
+                message = "%1$^O1 п╬п╠я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я─п╟я┘.";
             break;
         }
 
@@ -1114,20 +1114,20 @@ struct LightVampireDamage : public Damage {
 	DLString msg;
 	
 	if (weather_info.sunlight == SUN_LIGHT) 
-	    msg = "Солнечный свет тревожит тебя.";
+	    msg = "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌ я┌я─п╣п╡п╬п╤п╦я┌ я┌п╣п╠я▐.";
 	else if (weather_info.sunlight == SUN_RISE) 
-	    msg = "Лучи восходящего солнца тревожат тебя." ;
+	    msg = "п⌡я┐я┤п╦ п╡п╬я│я┘п╬п╢я▐я┴п╣пЁп╬ я│п╬п╩п╫я├п╟ я┌я─п╣п╡п╬п╤п╟я┌ я┌п╣п╠я▐." ;
 	else if (weather_info.sunlight == SUN_SET) 
-	    msg = "Закатные лучи тревожат тебя." ;
+	    msg = "п≈п╟п╨п╟я┌п╫я▀п╣ п╩я┐я┤п╦ я┌я─п╣п╡п╬п╤п╟я┌ я┌п╣п╠я▐." ;
     
 	act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
 	if (dam == 0)
-	    msgRoom( "Солнечный свет\6%C2", ch);
+	    msgRoom( "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌\6%C2", ch);
 	else
-	    msgRoom( "Солнечный свет\6%C4", ch);
+	    msgRoom( "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌\6%C4", ch);
 	    
-	msgChar( "Солнечный свет\6тебя" );
+	msgChar( "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌\6я┌п╣п╠я▐" );
     }
 };
 
@@ -1242,8 +1242,8 @@ void check_reboot( void )
     case 5:
     case 10:
     case 15:
-	msg = fmt( NULL, "%1$^s громко кричит '{RВнимание! Перезагрузка через %2$d мину%2$Iту|ты|т!{x'",
-	           (chance( 50 ) ? "Хассан" : "Валькирия"), 
+	msg = fmt( NULL, "%1$^s пЁя─п╬п╪п╨п╬ п╨я─п╦я┤п╦я┌ '{Rп▓п╫п╦п╪п╟п╫п╦п╣! п÷п╣я─п╣п╥п╟пЁя─я┐п╥п╨п╟ я┤п╣я─п╣п╥ %2$d п╪п╦п╫я┐%2$Iя┌я┐|я┌я▀|я┌!{x'",
+	           (chance( 50 ) ? "п╔п╟я│я│п╟п╫" : "п▓п╟п╩я▄п╨п╦я─п╦я▐"), 
 		   dreamland->getRebootCounter( ) );
         for (d = descriptor_list; d != 0; d = d->next)
 	    if (d->connected == CON_PLAYING && d->character)
@@ -1268,16 +1268,16 @@ void player_update( )
 
         if (HAS_SHADOW(ch)) 
             if (--ch->shadow < 0)
-                act("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
+                act("п╒п╡п╬я▐ п╡я┌п╬я─п╟я▐ я┌п╣п╫я▄ п╦я│я┤п╣п╥п╟п╣я┌.",ch,0,0,TO_CHAR);
 	
         if (ch->move <= 0 && ch->position != POS_SLEEPING)
-            ch->send_to("Тебе нужно отдохнуть!\n\r") ;
+            ch->send_to("п╒п╣п╠п╣ п╫я┐п╤п╫п╬ п╬я┌п╢п╬я┘п╫я┐я┌я▄!\n\r") ;
 
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
-                act_p("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR, POS_RESTING);
-                act_p("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT, POS_RESTING);
+                act_p("п╒я▀ п©п╬п╩п╫п╬я│я┌я▄я▌ п╡п╬п╥п╡я─п╟я┴п╟п╣я┬я▄я│я▐ п╡ п╪п╦я─ п╤п╦п╡я▀я┘.", ch, 0, 0, TO_CHAR, POS_RESTING);
+                act_p("$c1 п©п╬п╩п╫п╬я│я┌я▄я▌ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌я│я▐ п╡ п╪п╦я─ п╤п╦п╡я▀я┘.", ch, 0, 0, TO_NOTVICT, POS_RESTING);
 		UNSET_DEATH_TIME(ch);
             }
         }
@@ -1286,9 +1286,9 @@ void player_update( )
             ch->PK_time_v--;
         else if( !ch->PK_time_v && IS_VIOLENT( ch ) )
         {
-            act_p( "Лихорадочный блеск в глазах $c2 пропадает.",
+            act_p( "п⌡п╦я┘п╬я─п╟п╢п╬я┤п╫я▀п╧ п╠п╩п╣я│п╨ п╡ пЁп╩п╟п╥п╟я┘ $c2 п©я─п╬п©п╟п╢п╟п╣я┌.",
                    ch, 0, 0, TO_ROOM,POS_RESTING );
-            act_p( "Ты успокаиваешься.",
+            act_p( "п╒я▀ я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┬я▄я│я▐.",
                    ch, 0, 0, TO_CHAR,POS_RESTING );
             REMOVE_VIOLENT( ch );
         }
@@ -1297,9 +1297,9 @@ void player_update( )
             ch->ghost_time--;
         else if( !ch->ghost_time && IS_GHOST( ch ) )
         {
-            act_p( "В комнате начинает сгущаться божественная энергия и $c1 обретает плоть.\n\rНо похоже $c1 еще в мире мертвых.",
+            act_p( "п▓ п╨п╬п╪п╫п╟я┌п╣ п╫п╟я┤п╦п╫п╟п╣я┌ я│пЁя┐я┴п╟я┌я▄я│я▐ п╠п╬п╤п╣я│я┌п╡п╣п╫п╫п╟я▐ я█п╫п╣я─пЁп╦я▐ п╦ $c1 п╬п╠я─п╣я┌п╟п╣я┌ п©п╩п╬я┌я▄.\n\rп²п╬ п©п╬я┘п╬п╤п╣ $c1 п╣я┴п╣ п╡ п╪п╦я─п╣ п╪п╣я─я┌п╡я▀я┘.",
                    ch, 0, 0, TO_ROOM,POS_RESTING);
-            act_p( "Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми.",
+            act_p( "п╒я▀ я│п╩я▀я┬п╦я┬я▄ п╢п╟п╩п╣п╨п╦п╧ п╨п╬п╩п╬п╨п╬п╩я▄п╫я▀п╧ п╥п╡п╬п╫.\n\rп²п╟ я┌п╣п╠я▐ п╫п╟п╨п╟я┌я▀п╡п╟п╣я┌я│я▐ п╡п╬п╩п╫п╟ я┐п╤п╟я│п╫п╬п╧ п╠п╬п╩п╦...\n\rп╒я▀ я─п╬п╤п╢п╟п╣я┬я▄я│я▐ п╥п╟п╫п╬п╡п╬, п╬п╠я─п╣я┌п╟я▐ п©п╩п╬я┌я▄.\n\rп²п╬ я┌я▀ п©п╬п╨п╟ п╣я┴п╣ п╪п╣п╤п╢я┐ п╤п╦п╡я▀п╪п╦ п╦ п╪п╣я─я┌п╡я▀п╪п╦.",
                    ch, 0, 0, TO_CHAR,POS_RESTING);
             REMOVE_GHOST( ch );
         }
@@ -1310,17 +1310,17 @@ void player_update( )
         {
             if( IS_KILLER( ch ) )
             {
-                act_p("Аура проклятия вокруг $c2 исчезает.",
+                act_p("п░я┐я─п╟ п©я─п╬п╨п╩я▐я┌п╦я▐ п╡п╬п╨я─я┐пЁ $c2 п╦я│я┤п╣п╥п╟п╣я┌.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-                act_p("Боги забывают убийство, совершенное тобой.",
+                act_p("п▒п╬пЁп╦ п╥п╟п╠я▀п╡п╟я▌я┌ я┐п╠п╦п╧я│я┌п╡п╬, я│п╬п╡п╣я─я┬п╣п╫п╫п╬п╣ я┌п╬п╠п╬п╧.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
                 REMOVE_KILLER( ch );
             }
             else if( IS_SLAIN( ch ) )
             {
-                act_p("Все забывается... и даже записи жрецов Страны Грез превращаются в прах.",
+                act_p("п▓я│п╣ п╥п╟п╠я▀п╡п╟п╣я┌я│я▐... п╦ п╢п╟п╤п╣ п╥п╟п©п╦я│п╦ п╤я─п╣я├п╬п╡ п║я┌я─п╟п╫я▀ п⌠я─п╣п╥ п©я─п╣п╡я─п╟я┴п╟я▌я┌я│я▐ п╡ п©я─п╟я┘.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-                act_p("Правда о твоем поражении забывается.",
+                act_p("п÷я─п╟п╡п╢п╟ п╬ я┌п╡п╬п╣п╪ п©п╬я─п╟п╤п╣п╫п╦п╦ п╥п╟п╠я▀п╡п╟п╣я┌я│я▐.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
                 REMOVE_SLAIN( ch );
             }
@@ -1332,7 +1332,7 @@ void player_update( )
         {
             if( IS_THIEF( ch ) )
             {
-                act_p("Ты вздыхаешь с облегчением, ведь все забывают о твоей неспособности\n\rхоть что-то украсть.",
+                act_p("п╒я▀ п╡п╥п╢я▀я┘п╟п╣я┬я▄ я│ п╬п╠п╩п╣пЁя┤п╣п╫п╦п╣п╪, п╡п╣п╢я▄ п╡я│п╣ п╥п╟п╠я▀п╡п╟я▌я┌ п╬ я┌п╡п╬п╣п╧ п╫п╣я│п©п╬я│п╬п╠п╫п╬я│я┌п╦\n\rя┘п╬я┌я▄ я┤я┌п╬-я┌п╬ я┐п╨я─п╟я│я┌я▄.",
                       ch, 0, 0, TO_CHAR,POS_RESTING );
                 REMOVE_THIEF( ch );
             }
@@ -1353,12 +1353,12 @@ void lantern_update( Character *ch )
 	if ( --obj->value[2] == 0 && ch->in_room != 0 )
 	{
 //  (decreased in unequip)    --ch->in_room->light; 
-	    ch->pecho("%1$^O1 мигну%1$Gло|л|ла|ли и поту%1$Gхло|х|хла|хли.", obj );
-	    ch->recho("%1$^O1 поту%1$Gхло|х|хла|хли.", obj );
+	    ch->pecho("%1$^O1 п╪п╦пЁп╫я┐%1$Gп╩п╬|п╩|п╩п╟|п╩п╦ п╦ п©п╬я┌я┐%1$Gя┘п╩п╬|я┘|я┘п╩п╟|я┘п╩п╦.", obj );
+	    ch->recho("%1$^O1 п©п╬я┌я┐%1$Gя┘п╩п╬|я┘|я┘п╩п╟|я┘п╩п╦.", obj );
 	    extract_obj( obj );
 	}
 	else if ( obj->value[2] <= 5 && ch->in_room != 0)
-	    ch->pecho("%1$^O1 мига%1$nет|ют.", obj );
+	    ch->pecho("%1$^O1 п╪п╦пЁп╟%1$nп╣я┌|я▌я┌.", obj );
     }
 }
 
@@ -1366,14 +1366,14 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-	act( "Лихорадочный блеск в глазах $c2, пропадает.", ch, 0, 0, TO_ROOM );
-	act( "Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
+	act( "п⌡п╦я┘п╬я─п╟п╢п╬я┤п╫я▀п╧ п╠п╩п╣я│п╨ п╡ пЁп╩п╟п╥п╟я┘ $c2, п©я─п╬п©п╟п╢п╟п╣я┌.", ch, 0, 0, TO_ROOM );
+	act( "п╒я▀ я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┬я▄я│я▐.", ch, 0, 0, TO_CHAR );
 	REMOVE_VIOLENT( ch );
 	ch->PK_time_v = 0;
     }
 
-    act( "$c1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
-    act( "Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
+    act( "$c1 я─п╟я│я┌п╡п╬я─я▐п╣я┌я│я▐ п╡ п╡п╬п╥п╢я┐я┘п╣.",ch, 0, 0, TO_ROOM );
+    act( "п╒я▀ я─п╟я│я┌п╡п╬я─я▐п╣я┬я▄я│я▐ п╡ п╡п╬п╥п╢я┐я┘п╣.", ch, 0, 0, TO_CHAR );
 
     if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
 	interpret_raw( ch, "afk" );
@@ -1459,8 +1459,8 @@ void wield_update( Character *ch )
 	    && second->getWeight( ) > (get_str_app(ch).wield * 5)
 	    && !check_native_weapon( ch, second ))
     {
-	act("Ты не в силах удержать $o4 в левой руке.", ch, second, 0, TO_CHAR);
-	act("$c1 не в силах удержать $o4.", ch, second, 0, TO_ROOM);
+	act("п╒я▀ п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4 п╡ п╩п╣п╡п╬п╧ я─я┐п╨п╣.", ch, second, 0, TO_CHAR);
+	act("$c1 п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4.", ch, second, 0, TO_ROOM);
 	unequip_char( ch, second );
     }
     
@@ -1471,8 +1471,8 @@ void wield_update( Character *ch )
 	    && wield->getWeight( ) > (get_str_app(ch).wield * 10)
 	    && !check_native_weapon( ch, wield ))
     {
-	act("Ты не в силах удержать $o4 в правой руке.", ch, wield, 0, TO_CHAR);
-	act("$c1 не в силах удержать $o4.", ch, wield, 0, TO_ROOM);
+	act("п╒я▀ п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4 п╡ п©я─п╟п╡п╬п╧ я─я┐п╨п╣.", ch, wield, 0, TO_CHAR);
+	act("$c1 п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4.", ch, wield, 0, TO_ROOM);
 	unequip_char( ch, wield );
     }
     
@@ -1480,8 +1480,8 @@ void wield_update( Character *ch )
 	    && (second && second->wear_loc == wear_second_wield) 
 	    && (!wield || wield->wear_loc == wear_none)) 
     {
-	act("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
-	act("$c1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
+	act("п╒я▀ п╡п╬п╬я─я┐п╤п╟п╣я┬я▄я│я▐ п╡я┌п╬я─п╦я┤п╫я▀п╪ п╬я─я┐п╤п╦п╣п╪, п╨п╟п╨ п╬я│п╫п╬п╡п╫я▀п╪!", ch, 0,0,TO_CHAR);
+	act("$c1 п╡п╬п╬я─я┐п╤п╟п╣я┌я│я▐ п╡я┌п╬я─п╦я┤п╫я▀п╪ п╬я─я┐п╤п╦п╣п╪, п╨п╟п╨ п╬я│п╫п╬п╡п╫я▀п╪!", ch, 0,0,TO_ROOM);
 	unequip_char( ch, second );
 	equip_char( ch, second, wear_wield );
     }

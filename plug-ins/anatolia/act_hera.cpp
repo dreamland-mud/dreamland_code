@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
@@ -265,22 +265,22 @@ void auction_update (void)
             case 2 : /* going twice */
             if (auction->bet > 0)
             {
-		talk_auction(fmt(0, "%1$O1{Y: буд%1$nет|ут прода%1$Gно|н|на|ны за %2$d золот%3$s - %4$s{x.", 
+		talk_auction(fmt(0, "%1$O1{Y: п╠я┐п╢%1$nп╣я┌|я┐я┌ п©я─п╬п╢п╟%1$Gп╫п╬|п╫|п╫п╟|п╫я▀ п╥п╟ %2$d п╥п╬п╩п╬я┌%3$s - %4$s{x.", 
 		        auction->item,
                         auction->bet,
-			GET_COUNT(auction->bet,"ую монету","ые монеты","ых монет"),
-                        ((auction->going == 1) ? "раз" : "два")).c_str( ));
+			GET_COUNT(auction->bet,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"),
+                        ((auction->going == 1) ? "я─п╟п╥" : "п╢п╡п╟")).c_str( ));
                 break;
             }
             else
             {
-                sprintf (buf, "%s{Y: ставок не получено - %s{x.", auction->item->getShortDescr( '1' ).c_str( ),
-                     ((auction->going == 1) ? "раз" : "два"));
+                sprintf (buf, "%s{Y: я│я┌п╟п╡п╬п╨ п╫п╣ п©п╬п╩я┐я┤п╣п╫п╬ - %s{x.", auction->item->getShortDescr( '1' ).c_str( ),
+                     ((auction->going == 1) ? "я─п╟п╥" : "п╢п╡п╟"));
                 talk_auction (buf);
                 if (auction->startbet != 0)
                 {
-                  sprintf(buf, "Начальная цена: %d золот%s{x.", auction->startbet,
-                                GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет"));
+                  sprintf(buf, "п²п╟я┤п╟п╩я▄п╫п╟я▐ я├п╣п╫п╟: %d п╥п╬п╩п╬я┌%s{x.", auction->startbet,
+                                GET_COUNT(auction->startbet,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
                   talk_auction(buf);
                 }
                 break;
@@ -289,21 +289,21 @@ void auction_update (void)
 
             if (auction->bet > 0)
             {
-                sprintf (buf, "%s получает %s{Y за %d золот%s{x.",
+                sprintf (buf, "%s п©п╬п╩я┐я┤п╟п╣я┌ %s{Y п╥п╟ %d п╥п╬п╩п╬я┌%s{x.",
                     auction->buyer->getNameP( '1' ).c_str( ),
                     auction->item->getShortDescr( '4' ).c_str( ), auction->bet,
-                    GET_COUNT(auction->bet,"ую монету","ые монеты","ых монет"));
+                    GET_COUNT(auction->bet,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
                 talk_auction(buf);
                 obj_to_char (auction->item,auction->buyer);
-                act_p("Из дымки появляется аукционер и передает тебе $o4.",
+                act_p("п≤п╥ п╢я▀п╪п╨п╦ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╟я┐п╨я├п╦п╬п╫п╣я─ п╦ п©п╣я─п╣п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.",
                      auction->buyer,auction->item,0,TO_CHAR,POS_DEAD);
-                act_p("$c1 получает от прибывшего аукционера $o4.",
+                act_p("$c1 п©п╬п╩я┐я┤п╟п╣я┌ п╬я┌ п©я─п╦п╠я▀п╡я┬п╣пЁп╬ п╟я┐п╨я├п╦п╬п╫п╣я─п╟ $o4.",
                      auction->buyer,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->seller->gold += auction->bet; /* give him the money */
-                act_p("Из дымки появляется аукционер и передает тебе вырученные деньги.",
+                act_p("п≤п╥ п╢я▀п╪п╨п╦ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╟я┐п╨я├п╦п╬п╫п╣я─ п╦ п©п╣я─п╣п╢п╟п╣я┌ я┌п╣п╠п╣ п╡я▀я─я┐я┤п╣п╫п╫я▀п╣ п╢п╣п╫я▄пЁп╦.",
                      auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                act_p("$c1 получает вырученные деньги от прибывшего аукционера.",
+                act_p("$c1 п©п╬п╩я┐я┤п╟п╣я┌ п╡я▀я─я┐я┤п╣п╫п╫я▀п╣ п╢п╣п╫я▄пЁп╦ п╬я┌ п©я─п╦п╠я▀п╡я┬п╣пЁп╬ п╟я┐п╨я├п╦п╬п╫п╣я─п╟.",
                      auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
 
                 auction->item = 0; /* reset item */
@@ -312,12 +312,12 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                sprintf (buf, "Ставок не получено - %s{Y снят с аукциона{x.",auction->item->getShortDescr( '1' ).c_str( ));
+                sprintf (buf, "п║я┌п╟п╡п╬п╨ п╫п╣ п©п╬п╩я┐я┤п╣п╫п╬ - %s{Y я│п╫я▐я┌ я│ п╟я┐п╨я├п╦п╬п╫п╟{x.",auction->item->getShortDescr( '1' ).c_str( ));
                 talk_auction(buf);
 
-                act_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
+                act_p("п≤п╥ п╢я▀п╪п╨п╦ п©п╣я─п╣п╢ я┌п╬п╠п╬п╧ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╟я┐п╨я├п╦п╬п╫п╣я─ п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣ {W$o4{w.",
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
-                act_p("Аукционер появляется перед $c5 и возвращает $m {W$o4{w.",
+                act_p("п░я┐п╨я├п╦п╬п╫п╣я─ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п©п╣я─п╣п╢ $c5 п╦ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $m {W$o4{w.",
                       auction->seller,auction->item,0,TO_ROOM,POS_RESTING);
                 obj_to_char (auction->item,auction->seller);
                 auction->item = 0; /* clear auction */
@@ -344,14 +344,14 @@ CMDRUNP( auction )
 	{
 		if (arg_is_switch_on( arg1 ))
 		{
-			ch->send_to("Канал Аукциона (Auction) теперь {Rвключен{x.\n\r");
+			ch->send_to("п п╟п╫п╟п╩ п░я┐п╨я├п╦п╬п╫п╟ (Auction) я┌п╣п©п╣я─я▄ {Rп╡п╨п╩я▌я┤п╣п╫{x.\n\r");
 			REMOVE_BIT(ch->comm,COMM_NOAUCTION);
 			return;
 		}
 		else
 		{
-			ch->send_to("Канал Аукциона (Auction) теперь {Rвыключен{x.\n\r");
-			ch->send_to("Для получения информации по этому каналу включите его.\n\r");
+			ch->send_to("п п╟п╫п╟п╩ п░я┐п╨я├п╦п╬п╫п╟ (Auction) я┌п╣п©п╣я─я▄ {Rп╡я▀п╨п╩я▌я┤п╣п╫{x.\n\r");
+			ch->send_to("п■п╩я▐ п©п╬п╩я┐я┤п╣п╫п╦я▐ п╦п╫я└п╬я─п╪п╟я├п╦п╦ п©п╬ я█я┌п╬п╪я┐ п╨п╟п╫п╟п╩я┐ п╡п╨п╩я▌я┤п╦я┌п╣ п╣пЁп╬.\n\r");
 			return;
 		}
 	}
@@ -362,27 +362,27 @@ CMDRUNP( auction )
 		{
 			if ( ch->is_immortal() )
 			{
-				sprintf(buf,"Продавец: %s Текущая ставка: %s\n\r",
+				sprintf(buf,"п÷я─п╬п╢п╟п╡п╣я├: %s п╒п╣п╨я┐я┴п╟я▐ я│я┌п╟п╡п╨п╟: %s\n\r",
 					auction->seller->getNameP(),
-					auction->buyer ? auction->buyer->getNameP() : "Нет");
+					auction->buyer ? auction->buyer->getNameP() : "п²п╣я┌");
 				ch->send_to(buf);
 			}
 			/* show item data here */
 			if (auction->bet > 0)
 			{
-				sprintf (buf, "Текущая ставка на выставленный лот - %d золот%s{x.\n\r",
+				sprintf (buf, "п╒п╣п╨я┐я┴п╟я▐ я│я┌п╟п╡п╨п╟ п╫п╟ п╡я▀я│я┌п╟п╡п╩п╣п╫п╫я▀п╧ п╩п╬я┌ - %d п╥п╬п╩п╬я┌%s{x.\n\r",
 					auction->bet,
-					GET_COUNT(auction->bet,"ая монета","ые монеты","ых монет"));
+					GET_COUNT(auction->bet,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 				ch->send_to( buf);
 			}
 			else
 			{
-				sprintf (buf, "Ставок на выставленный лот не получено{x.\n\r");
+				sprintf (buf, "п║я┌п╟п╡п╬п╨ п╫п╟ п╡я▀я│я┌п╟п╡п╩п╣п╫п╫я▀п╧ п╩п╬я┌ п╫п╣ п©п╬п╩я┐я┤п╣п╫п╬{x.\n\r");
 				ch->send_to( buf);
 				if (auction->startbet != 0)
 				{
-					sprintf(buf, "Начальная цена: %d золот%s{x.\n\r", auction->startbet,
-						GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет"));
+					sprintf(buf, "п²п╟я┤п╟п╩я▄п╫п╟я▐ я├п╣п╫п╟: %d п╥п╬п╩п╬я┌%s{x.\n\r", auction->startbet,
+						GET_COUNT(auction->startbet,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 					ch->send_to( buf);
 				}
 			}
@@ -395,7 +395,7 @@ CMDRUNP( auction )
 			    return;
 			}
 			sprintf( buf,
-				"Лот: '%s{x'. Тип: %s. Экстра флаги: %s.\n\rВес: %d. Стоимость: %d. Уровень: %d.\n\r",
+				"п⌡п╬я┌: '%s{x'. п╒п╦п©: %s. п╜п╨я│я┌я─п╟ я└п╩п╟пЁп╦: %s.\n\rп▓п╣я│: %d. п║я┌п╬п╦п╪п╬я│я┌я▄: %d. пёя─п╬п╡п╣п╫я▄: %d.\n\r",
 				obj->getShortDescr( '1' ).c_str( ),
 				item_table.message(obj->item_type).c_str( ), 
 				extra_flags.messages( obj->extra_flags).c_str( ),
@@ -416,7 +416,7 @@ CMDRUNP( auction )
 			}
 
 			if  (obj->item_type == ITEM_WEAPON) {
-				ch->printf("Тип оружия: %s (%s)\r\n",
+				ch->printf("п╒п╦п© п╬я─я┐п╤п╦я▐: %s (%s)\r\n",
 					   weapon_class.message(obj->value[0] ).c_str( ),
 					   weapon_class.name( obj->value[0] ).c_str( )
 					  );
@@ -426,26 +426,26 @@ CMDRUNP( auction )
 		}
 		else
 		{
-			ch->send_to( "{RВыставить на Аукцион ЧТО{x?\n\r");
+			ch->send_to( "{Rп▓я▀я│я┌п╟п╡п╦я┌я▄ п╫п╟ п░я┐п╨я├п╦п╬п╫ п╖п╒п·{x?\n\r");
 			return;
 		}
 	}
 
 	if (arg_is_switch_off( arg1 ))
 	{
-		ch->send_to("Канал Аукциона (Auction) теперь {Rвыключен{x.\n\r");
+		ch->send_to("п п╟п╫п╟п╩ п░я┐п╨я├п╦п╬п╫п╟ (Auction) я┌п╣п©п╣я─я▄ {Rп╡я▀п╨п╩я▌я┤п╣п╫{x.\n\r");
 		SET_BIT(ch->comm,COMM_NOAUCTION);
 		return;
 	}
 	
-	if (arg_oneof_strict( arg1, "talk", "реклама", "говорить" ))
+	if (arg_oneof_strict( arg1, "talk", "я─п╣п╨п╩п╟п╪п╟", "пЁп╬п╡п╬я─п╦я┌я▄" ))
 	{
 	    if ( ch != auction->seller ) {
-		ch->send_to("Ты ничего не выставлял на аукцион - рекламировать тебе нечего.\r\n");
+		ch->send_to("п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я│я┌п╟п╡п╩я▐п╩ п╫п╟ п╟я┐п╨я├п╦п╬п╫ - я─п╣п╨п╩п╟п╪п╦я─п╬п╡п╟я┌я▄ я┌п╣п╠п╣ п╫п╣я┤п╣пЁп╬.\r\n");
 		return;
 	    }
 	    if (argument[0] == '\0') {
-		ch->send_to("Как ты хочешь разрекламировать товар?\r\n");
+		ch->send_to("п п╟п╨ я┌я▀ я┘п╬я┤п╣я┬я▄ я─п╟п╥я─п╣п╨п╩п╟п╪п╦я─п╬п╡п╟я┌я▄ я┌п╬п╡п╟я─?\r\n");
 		return;
 	    }
 	    
@@ -454,16 +454,16 @@ CMDRUNP( auction )
 	    return;
 	}
 	
-	if (ch->is_immortal() && arg_oneof_strict( arg1, "stop", "стоп" ))
+	if (ch->is_immortal() && arg_oneof_strict( arg1, "stop", "я│я┌п╬п©" ))
 	{
 		if (auction->item == 0)
 		{
-			ch->send_to("На аукцион ничего не выставлено. Будь внимательней!\n\r");
+			ch->send_to("п²п╟ п╟я┐п╨я├п╦п╬п╫ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я│я┌п╟п╡п╩п╣п╫п╬. п▒я┐п╢я▄ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╣п╧!\n\r");
 			return;
 		}
 		else /* stop the auction */
 		{
-			sprintf(buf,"Продажа остановлена Богами. Лот '%s{Y' конфискован{x.",
+			sprintf(buf,"п÷я─п╬п╢п╟п╤п╟ п╬я│я┌п╟п╫п╬п╡п╩п╣п╫п╟ п▒п╬пЁп╟п╪п╦. п⌡п╬я┌ '%s{Y' п╨п╬п╫я└п╦я│п╨п╬п╡п╟п╫{x.",
 				auction->item->getShortDescr( '1' ).c_str( ));
 			talk_auction(buf);
 			obj_to_char(auction->item, auction->seller);
@@ -472,13 +472,13 @@ CMDRUNP( auction )
 			if (auction->buyer != 0) /* return money to the buyer */
 			{
 				auction->buyer->gold += auction->bet;
-				auction->buyer->send_to("Твои деньги возвращены.\n\r");
+				auction->buyer->send_to("п╒п╡п╬п╦ п╢п╣п╫я▄пЁп╦ п╡п╬п╥п╡я─п╟я┴п╣п╫я▀.\n\r");
 			}
 			return;
 		}
 	}
 
-	if (arg_oneof_strict( arg1, "bet", "ставка" ))
+	if (arg_oneof_strict( arg1, "bet", "я│я┌п╟п╡п╨п╟" ))
 	{
 		if (auction->item != 0)
 		{
@@ -486,34 +486,34 @@ CMDRUNP( auction )
 
 			if ( ch == auction->seller )
 			{
-				ch->send_to("Ты не можешь купить свой же лот..:)\n\r");
+				ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╨я┐п©п╦я┌я▄ я│п╡п╬п╧ п╤п╣ п╩п╬я┌..:)\n\r");
 				return;
 			}
 			/* make - perhaps - a bet now */
 			if (argument[0] == '\0')
 			{
-				ch->send_to("Ставка (Bet) сколько?\n\r");
+				ch->send_to("п║я┌п╟п╡п╨п╟ (Bet) я│п╨п╬п╩я▄п╨п╬?\n\r");
 				return;
 			}
 
 			newbet = parsebet (auction->bet, argument);
-			sprintf (betbuf,"Ставка: %d\n\r",newbet);
+			sprintf (betbuf,"п║я┌п╟п╡п╨п╟: %d\n\r",newbet);
 
 			if ((auction->startbet != 0) && (newbet < (auction->startbet + 1)))
 			{
-				ch->send_to("Тебе необходимо повысить ставку хотя бы на 1 золотой выше начальной цены.\n\r");
+				ch->send_to("п╒п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п©п╬п╡я▀я│п╦я┌я▄ я│я┌п╟п╡п╨я┐ я┘п╬я┌я▐ п╠я▀ п╫п╟ 1 п╥п╬п╩п╬я┌п╬п╧ п╡я▀я┬п╣ п╫п╟я┤п╟п╩я▄п╫п╬п╧ я├п╣п╫я▀.\n\r");
 				return;
 			}
 
 			if (newbet < (auction->bet + 1))
 			{
-				ch->send_to("Тебе необходимо повысить ставку хотя бы на 1 золотой выше текущей ставки.\n\r");
+				ch->send_to("п╒п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п©п╬п╡я▀я│п╦я┌я▄ я│я┌п╟п╡п╨я┐ я┘п╬я┌я▐ п╠я▀ п╫п╟ 1 п╥п╬п╩п╬я┌п╬п╧ п╡я▀я┬п╣ я┌п╣п╨я┐я┴п╣п╧ я│я┌п╟п╡п╨п╦.\n\r");
 				return;
 			}
 
 			if (newbet > ch->gold)
 			{
-				ch->send_to("У тебя нет необходимой суммы!\n\r");
+				ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬п╧ я│я┐п╪п╪я▀!\n\r");
 				return;
 			}
 
@@ -529,16 +529,16 @@ CMDRUNP( auction )
 			auction->going = 0;
 			auction->pulse = PULSE_AUCTION; /* start the auction over again */
 
-			sprintf( buf, "На %s{Y получена новая ставка: %d золот%s{x.\n\r",
+			sprintf( buf, "п²п╟ %s{Y п©п╬п╩я┐я┤п╣п╫п╟ п╫п╬п╡п╟я▐ я│я┌п╟п╡п╨п╟: %d п╥п╬п╩п╬я┌%s{x.\n\r",
 				auction->item->getShortDescr( '4' ).c_str( ),newbet,
-				GET_COUNT(newbet,"ая монета","ые монеты","ых монет"));
+				GET_COUNT(newbet,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 			talk_auction( buf );
 			return;
 
 		}
 		else
 		{
-			ch->send_to("В данный момент на аукцион ничего не выставлено.\n\r");
+			ch->send_to("п▓ п╢п╟п╫п╫я▀п╧ п╪п╬п╪п╣п╫я┌ п╫п╟ п╟я┐п╨я├п╦п╬п╫ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я│я┌п╟п╡п╩п╣п╫п╬.\n\r");
 			return;
 		}
 	}
@@ -549,25 +549,25 @@ CMDRUNP( auction )
 
 	if (obj == 0)
 	{
-		ch->send_to("У тебя нет этого.\n\r");
+		ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
 		return;
 	}
 
 	if (obj->timer != 0)
 	{
-		sprintf( buf, "Этот предмет не может быть выставлен на аукцион, т.к. исчезнет через %d часов.\n\r", obj->timer );
+		sprintf( buf, "п╜я┌п╬я┌ п©я─п╣п╢п╪п╣я┌ п╫п╣ п╪п╬п╤п╣я┌ п╠я▀я┌я▄ п╡я▀я│я┌п╟п╡п╩п╣п╫ п╫п╟ п╟я┐п╨я├п╦п╬п╫, я┌.п╨. п╦я│я┤п╣п╥п╫п╣я┌ я┤п╣я─п╣п╥ %d я┤п╟я│п╬п╡.\n\r", obj->timer );
 		ch->send_to( buf);
 		return;
 	}
 
 	if (IS_OBJ_STAT(obj, ITEM_NOSELL)) {
-	    ch->send_to("Этот предмет не подлежит продаже.\r\n");
+	    ch->send_to("п╜я┌п╬я┌ п©я─п╣п╢п╪п╣я┌ п╫п╣ п©п╬п╢п╩п╣п╤п╦я┌ п©я─п╬п╢п╟п╤п╣.\r\n");
 	    return;
 	}
 
 	if (auction->item == 0) {
 		if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) {
-		    ch->println( "Ты не можешь ничего выставлять на аукцион." );
+		    ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╦я┤п╣пЁп╬ п╡я▀я│я┌п╟п╡п╩я▐я┌я▄ п╫п╟ п╟я┐п╨я├п╦п╬п╫." );
 		    return;
 		}
 
@@ -577,7 +577,7 @@ CMDRUNP( auction )
 		case ITEM_CORPSE_PC:
 		case ITEM_CORPSE_NPC:
 		case ITEM_TATTOO:
-			act_p("Ты не можешь выставить на аукцион $T.",
+			act_p("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡я▀я│я┌п╟п╡п╦я┌я▄ п╫п╟ п╟я┐п╨я├п╦п╬п╫ $T.",
 				ch, 0, item_table.message(obj->item_type).c_str( ),TO_CHAR,POS_SLEEPING);
 			return;
 		default:
@@ -590,28 +590,28 @@ CMDRUNP( auction )
 			auction->pulse = PULSE_AUCTION;
 			auction->going = 0;
 
-			sprintf(buf, "На аукцион выставлен новый лот: %s{x.",
+			sprintf(buf, "п²п╟ п╟я┐п╨я├п╦п╬п╫ п╡я▀я│я┌п╟п╡п╩п╣п╫ п╫п╬п╡я▀п╧ п╩п╬я┌: %s{x.",
 				obj->getShortDescr( '1' ).c_str( ));
 			talk_auction( buf );
 			if (auction->startbet == 0)
 			{
-				sprintf(buf, "Начальная цена владельцем не установлена{x.");
+				sprintf(buf, "п²п╟я┤п╟п╩я▄п╫п╟я▐ я├п╣п╫п╟ п╡п╩п╟п╢п╣п╩я▄я├п╣п╪ п╫п╣ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╟{x.");
 				talk_auction( buf );
 			}
 			else
 			{
-				sprintf(buf, "Начальная цена: %d золот%s{x.", auction->startbet,
-					GET_COUNT(auction->startbet,"ая монета","ые монеты","ых монет"));
+				sprintf(buf, "п²п╟я┤п╟п╩я▄п╫п╟я▐ я├п╣п╫п╟: %d п╥п╬п╩п╬я┌%s{x.", auction->startbet,
+					GET_COUNT(auction->startbet,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 				talk_auction( buf );
 			}
-			wiznet( 0, 0, 0, "Продавец - %C1", ch );
+			wiznet( 0, 0, 0, "п÷я─п╬п╢п╟п╡п╣я├ - %C1", ch );
 			return;
 
 		} /* switch */
 	}
 	else
 	{
-		act_p("Попробуй позже! Кто-то другой уже выставил на аукцион $o4!",
+		act_p("п÷п╬п©я─п╬п╠я┐п╧ п©п╬п╥п╤п╣! п я┌п╬-я┌п╬ п╢я─я┐пЁп╬п╧ я┐п╤п╣ п╡я▀я│я┌п╟п╡п╦п╩ п╫п╟ п╟я┐п╨я├п╦п╬п╫ $o4!",
 			ch,auction->item,0,TO_CHAR,POS_RESTING);
 		return;
 	}

@@ -115,23 +115,23 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_fuzzy( 10 );
     setTime( pch, time );
     
-    tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
+    tell_raw( pch, questman, "пё п╪п╣п╫я▐ п╣я│я┌я▄ п╢п╩я▐ я┌п╣п╠я▐ я│я─п╬я┤п╫п╬п╣ п©п╬я─я┐я┤п╣п╫п╦п╣!" );
     
     switch (number_range( 1, 3 )) {
-    case 1:  tell_fmt( "{W%3$#^C4{G обворовали, %3$P1 просит помочь в поимке негодяев.", 
+    case 1:  tell_fmt( "{W%3$#^C4{G п╬п╠п╡п╬я─п╬п╡п╟п╩п╦, %3$P1 п©я─п╬я│п╦я┌ п©п╬п╪п╬я┤я▄ п╡ п©п╬п╦п╪п╨п╣ п╫п╣пЁп╬п╢я▐п╣п╡.", 
                         pch, questman, victim );
 	     break;
-    case 2:  tell_fmt( "{W%3$#^C1{G ста%3$Gло|л|ла жертвой грабителей и просит вернуть украденную вещь.", 
+    case 2:  tell_fmt( "{W%3$#^C1{G я│я┌п╟%3$Gп╩п╬|п╩|п╩п╟ п╤п╣я─я┌п╡п╬п╧ пЁя─п╟п╠п╦я┌п╣п╩п╣п╧ п╦ п©я─п╬я│п╦я┌ п╡п╣я─п╫я┐я┌я▄ я┐п╨я─п╟п╢п╣п╫п╫я┐я▌ п╡п╣я┴я▄.", 
                         pch, questman, victim );
 	     break;
-    case 3:  tell_fmt( "Воры ограбили {W%3$#C4{G, и теперь %3$P1 нуждается в твоей помощи.", 
+    case 3:  tell_fmt( "п▓п╬я─я▀ п╬пЁя─п╟п╠п╦п╩п╦ {W%3$#C4{G, п╦ я┌п╣п©п╣я─я▄ %3$P1 п╫я┐п╤п╢п╟п╣я┌я│я▐ п╡ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦.", 
                         pch, questman, victim );
 	     break;
     }
 
-    tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W%s{G).", 
+    tell_raw( pch, questman, "п÷п╬я│я┌я─п╟п╢п╟п╡я┬п╣пЁп╬ п╦я┴п╦ п╡ я─п╟п╧п╬п╫п╣ {W%s{G ({W%s{G).", 
                   victim->in_room->name, victim->in_room->area->name );
-    tell_fmt("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.", 
+    tell_fmt("пё я┌п╣п╠я▐ п╣я│я┌я▄ {Y%3$d{G п╪п╦п╫я┐%3$Iя┌п╟|я┌я▀|я┌, я┤я┌п╬п╠я▀ п╢п╬п╠я─п╟я┌я▄я│я▐ я┌я┐п╢п╟ п╦ я┐п╥п╫п╟я┌я▄ п©п╬п╢я─п╬п╠п╫п╬я│я┌п╦.", 
               pch, questman, time );
     
     wiznet( "", "thief [%s] [%d], obj [%s], victim [%s] [%d], chest [%d], mode %d",
@@ -209,29 +209,29 @@ void StealQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << "У " << russian_case( victimName, '2' ) << " какие-то неприятности." << endl
-	    << "Пострадавший ждет тебя в районе '" 
+	buf << "пё " << russian_case( victimName, '2' ) << " п╨п╟п╨п╦п╣-я┌п╬ п╫п╣п©я─п╦я▐я┌п╫п╬я│я┌п╦." << endl
+	    << "п÷п╬я│я┌я─п╟п╢п╟п╡я┬п╦п╧ п╤п╢п╣я┌ я┌п╣п╠я▐ п╡ я─п╟п╧п╬п╫п╣ '" 
 	    << victimRoom << "' (" << victimArea << ")." << endl;
 	break;
 
     case QSTAT_HUNT_ROBBER:
-	buf << "Тебе стало известно, что у " << russian_case( victimName, '2' ) 
-	    << " украли " << russian_case( itemName, '4' ) << ". " << endl
-	    << "Вор - " << russian_case( thiefName, '1' ) 
-	    << ", скорее всего скрывается в районе '" << thiefRoom << "' (" << thiefArea << ")." << endl;
+	buf << "п╒п╣п╠п╣ я│я┌п╟п╩п╬ п╦п╥п╡п╣я│я┌п╫п╬, я┤я┌п╬ я┐ " << russian_case( victimName, '2' ) 
+	    << " я┐п╨я─п╟п╩п╦ " << russian_case( itemName, '4' ) << ". " << endl
+	    << "п▓п╬я─ - " << russian_case( thiefName, '1' ) 
+	    << ", я│п╨п╬я─п╣п╣ п╡я│п╣пЁп╬ я│п╨я─я▀п╡п╟п╣я┌я│я▐ п╡ я─п╟п╧п╬п╫п╣ '" << thiefRoom << "' (" << thiefArea << ")." << endl;
 
 	    if (!chestRoom.getValue( ).empty( ))
-		buf << "По слухам, награбленное добро спрятано где-то около '" << chestRoom << "'" 
-		    << ", ключ от нычки ищи у вора." << endl;
+		buf << "п÷п╬ я│п╩я┐я┘п╟п╪, п╫п╟пЁя─п╟п╠п╩п╣п╫п╫п╬п╣ п╢п╬п╠я─п╬ я│п©я─я▐я┌п╟п╫п╬ пЁп╢п╣-я┌п╬ п╬п╨п╬п╩п╬ '" << chestRoom << "'" 
+		    << ", п╨п╩я▌я┤ п╬я┌ п╫я▀я┤п╨п╦ п╦я┴п╦ я┐ п╡п╬я─п╟." << endl;
 
-	    buf << "Пострадавший ждет тебя около '" 
+	    buf << "п÷п╬я│я┌я─п╟п╢п╟п╡я┬п╦п╧ п╤п╢п╣я┌ я┌п╣п╠я▐ п╬п╨п╬п╩п╬ '" 
 	        << victimRoom << "' (" << victimArea << ")." << endl;
 
 	break;
 
     case QSTAT_FINISHED:
-	buf << "Твое задание выполнено!" << endl
-	    << "Вернись за вознаграждением до того, как выйдет время." << endl;
+	buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ п╡я▀п©п╬п╩п╫п╣п╫п╬!" << endl
+	    << "п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪ п╢п╬ я┌п╬пЁп╬, п╨п╟п╨ п╡я▀п╧п╢п╣я┌ п╡я─п╣п╪я▐." << endl;
 	break;
     }
 }
@@ -240,23 +240,23 @@ void StealQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Узнать, что случилось у " << russian_case( victimName, '2') << " в "
+        buf << "пёп╥п╫п╟я┌я▄, я┤я┌п╬ я│п╩я┐я┤п╦п╩п╬я│я▄ я┐ " << russian_case( victimName, '2') << " п╡ "
             << victimRoom << " (" << victimArea << ").";
 	break;
 
     case QSTAT_HUNT_ROBBER:
-        buf << "Вернуть " << russian_case( itemName, '4' ) << " " << russian_case( victimName, '3' ) << ". "
-            << "Вор, " << russian_case( thiefName, '1' ) << ", скрывается в " 
+        buf << "п▓п╣я─п╫я┐я┌я▄ " << russian_case( itemName, '4' ) << " " << russian_case( victimName, '3' ) << ". "
+            << "п▓п╬я─, " << russian_case( thiefName, '1' ) << ", я│п╨я─я▀п╡п╟п╣я┌я│я▐ п╡ " 
             << thiefRoom << " (" << thiefArea << ")";
 
 	    if (!chestRoom.getValue( ).empty( ))
-                buf << ", награбленное прячет около " << chestRoom << ".";
+                buf << ", п╫п╟пЁя─п╟п╠п╩п╣п╫п╫п╬п╣ п©я─я▐я┤п╣я┌ п╬п╨п╬п╩п╬ " << chestRoom << ".";
             else 
                 buf << ".";
 	break;
 
     case QSTAT_FINISHED:
-	buf << "Вернуться к квестору за наградой.";
+	buf << "п▓п╣я─п╫я┐я┌я▄я│я▐ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ п╫п╟пЁя─п╟п╢п╬п╧.";
 	break;
     }
 }
@@ -270,13 +270,13 @@ void StealQuest::helpMessage( ostringstream &buf )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << "До " << russian_case( victimName, '2' )
-	    << " ты можешь добраться, следуя по такому пути: ";
+	buf << "п■п╬ " << russian_case( victimName, '2' )
+	    << " я┌я▀ п╪п╬п╤п╣я┬я▄ п╢п╬п╠я─п╟я┌я▄я│я▐, я│п╩п╣п╢я┐я▐ п©п╬ я┌п╟п╨п╬п╪я┐ п©я┐я┌п╦: ";
 	break;
 
     case QSTAT_HUNT_ROBBER:
-	buf << "Ты можешь отыскать " << russian_case( thiefName, '4' )
-	    << ", следуя по такому пути: ";
+	buf << "п╒я▀ п╪п╬п╤п╣я┬я▄ п╬я┌я▀я│п╨п╟я┌я▄ " << russian_case( thiefName, '4' )
+	    << ", я│п╩п╣п╢я┐я▐ п©п╬ я┌п╟п╨п╬п╪я┐ п©я┐я┌п╦: ";
 	break;
     }
 }
@@ -374,7 +374,7 @@ void StealQuest::fillChest( PCharacter *pch, Object *chest )
     Object *obj;
     VnumList objects;
     
-    /* барахло */
+    /* п╠п╟я─п╟я┘п╩п╬ */
     for (obj = object_list; obj; obj = obj->next) {
 	if (IS_SET( obj->pIndexData->area->area_flag, AREA_NOQUEST ))
 	    continue;
@@ -400,7 +400,7 @@ void StealQuest::fillChest( PCharacter *pch, Object *chest )
 		obj_to_obj( obj, chest );
     }
     
-    /* ништяки */
+    /* п╫п╦я┬я┌я▐п╨п╦ */
     if (chance( 1 )) 
 	if (( obj = StealQuestRegistrator::getThis( )->bonuses.randomItem( ) ))
 	    obj_to_obj( obj, chest );

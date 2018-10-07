@@ -134,7 +134,7 @@ void System::generateClass( ostream& output, const ClassType& mc, VectorStringTy
 
     string cname = mc.getName( );
    
-    /* ĞÒÏÇÒÁÍÍÁ ÄÏÌÖÎÁ ÉÍÅÔØ ÆÏÒÍÕ ËÉÒĞÉŞÁ: >8) */
+    /* Ğ¿Ñ€Ğ¾Ğ³Ñ€Ğ°Ğ¼Ğ¼Ğ° Ğ´Ğ¾Ğ»Ğ¶Ğ½Ğ° Ğ¸Ğ¼ĞµÑ‚ÑŒ Ñ„Ğ¾Ñ€Ğ¼Ñƒ ĞºĞ¸Ñ€Ğ¿Ğ¸Ñ‡Ğ°: >8) */
     output 
 	<< "//------------------- " << cname << " ------------------" << endl << endl
 	<< "class " << cname << "::__MetaInfo__  {            " << endl

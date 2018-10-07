@@ -95,11 +95,11 @@ void ClanOrgs::doMembers( PCharacter *pch ) const
     ClanOrder::Pointer ord = findOrder( pch );
 
     if (!ord) {
-	pch->pecho( "Ты не состоишь в %O6.", &name );
+	pch->pecho( "п╒я▀ п╫п╣ я│п╬я│я┌п╬п╦я┬я▄ п╡ %O6.", &name );
 	return;
     }
     
-    buf << "\n\r{WИмя         раса        класс         уровень   звание{x\n\r";
+    buf << "\n\r{Wп≤п╪я▐         я─п╟я│п╟        п╨п╩п╟я│я│         я┐я─п╬п╡п╣п╫я▄   п╥п╡п╟п╫п╦п╣{x\n\r";
     
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
     for (PCharacterMemoryList::const_iterator pos = list.begin( ); pos != list.end( ); pos++) {
@@ -122,17 +122,17 @@ void ClanOrgs::doSelfInduct( PCharacter *pch, DLString &arg ) const
     ClanOrder::Pointer ord;
 
     if (!pch->getClan( )->isLeader( pch )) {
-	pch->pecho( "Принять себя в %O4 может только Лидер.", &name );
+	pch->pecho( "п÷я─п╦п╫я▐я┌я▄ я│п╣п╠я▐ п╡ %O4 п╪п╬п╤п╣я┌ я┌п╬п╩я▄п╨п╬ п⌡п╦п╢п╣я─.", &name );
 	return;
     }
     
     if (!( ord = findOrder( arg ) )) {
-	pch->pecho( "%1$^O1 указа%1$Gно|н|на неверно.", &name );
+	pch->pecho( "%1$^O1 я┐п╨п╟п╥п╟%1$Gп╫п╬|п╫|п╫п╟ п╫п╣п╡п╣я─п╫п╬.", &name );
 	return;
     }
     
     setAttr( pch, ord->name );
-    pch->pecho( "Ты вступаешь в %s.", ord->shortDescr.c_str( ) );
+    pch->pecho( "п╒я▀ п╡я│я┌я┐п©п╟п╣я┬я▄ п╡ %s.", ord->shortDescr.c_str( ) );
 }
 
 void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
@@ -140,31 +140,31 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
     PCMemoryInterface *victim;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-	pch->println( "Твоих полномочий недостаточно." );
+	pch->println( "п╒п╡п╬п╦я┘ п©п╬п╩п╫п╬п╪п╬я┤п╦п╧ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬." );
 	return;
     }
 
     if (!hasAttr( pch )) {
-	pch->pecho( "Ты не являешься главой %O2.", &name );
+	pch->pecho( "п╒я▀ п╫п╣ я▐п╡п╩я▐п╣я┬я▄я│я▐ пЁп╩п╟п╡п╬п╧ %O2.", &name );
 	return;
     }
     
     if (!( victim = PCharacterManager::find( arg ) )) {
-	pch->println( "Никого нет с таким именем. Укажи имя полностью." );
+	pch->println( "п²п╦п╨п╬пЁп╬ п╫п╣я┌ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪. пёп╨п╟п╤п╦ п╦п╪я▐ п©п╬п╩п╫п╬я│я┌я▄я▌." );
 	return;
     }
 
     if (victim->getClan( ) != pch->getClan( )) {
-	pch->pecho( "Но %s не принадлежит к твоему клану!", victim->getName( ).c_str( ) );
+	pch->pecho( "п²п╬ %s п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ п╨ я┌п╡п╬п╣п╪я┐ п╨п╩п╟п╫я┐!", victim->getName( ).c_str( ) );
 	return;
     }
     
     if (hasAttr( victim )) {
 	if (getAttr( victim ) != getAttr( pch )) 
-	    pch->pecho( "%1$s уже состоит в друг%2$Gом|ом|ой %2$O6.", 
+	    pch->pecho( "%1$s я┐п╤п╣ я│п╬я│я┌п╬п╦я┌ п╡ п╢я─я┐пЁ%2$Gп╬п╪|п╬п╪|п╬п╧ %2$O6.", 
 	                 victim->getName( ).c_str( ), &name );
 	else
-	    pch->pecho( "%1$s и так состоит в тво%2$Gем|ем|ей %2$O6.", 
+	    pch->pecho( "%1$s п╦ я┌п╟п╨ я│п╬я│я┌п╬п╦я┌ п╡ я┌п╡п╬%2$Gп╣п╪|п╣п╪|п╣п╧ %2$O6.", 
 	                 victim->getName( ).c_str( ), &name );
 	
 	return;
@@ -173,22 +173,22 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
     ClanOrder::Pointer ord = findOrder( pch );
 
     if (!ord) {
-	pch->pecho( "%1$^O1, к котор%1$Gому|ому|ой ты принадлежишь, не существует!", &name );
+	pch->pecho( "%1$^O1, п╨ п╨п╬я┌п╬я─%1$Gп╬п╪я┐|п╬п╪я┐|п╬п╧ я┌я▀ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┬я▄, п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌!", &name );
 	return;
     }
 
     if (!ord->canInduct( victim )) {
-	pch->pecho( "%s не может вступить в %s.", 
+	pch->pecho( "%s п╫п╣ п╪п╬п╤п╣я┌ п╡я│я┌я┐п©п╦я┌я▄ п╡ %s.", 
 		    victim->getName( ).c_str( ), ord->shortDescr.c_str( ) );
 	return;
     }
     
     setAttr( victim, ord->name );
-    pch->pecho( "Ты принимаешь %s в %s!", 
+    pch->pecho( "п╒я▀ п©я─п╦п╫п╦п╪п╟п╣я┬я▄ %s п╡ %s!", 
                  victim->getName( ).c_str( ), ord->shortDescr.c_str( ) );
     
     if (victim->isOnline( ))
-	victim->getPlayer( )->pecho( "%s принимает тебя в %s!",
+	victim->getPlayer( )->pecho( "%s п©я─п╦п╫п╦п╪п╟п╣я┌ я┌п╣п╠я▐ п╡ %s!",
 				     pch->getName( ).c_str( ),
 				     ord->shortDescr.c_str( ) );
     else
@@ -198,10 +198,10 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
 void ClanOrgs::doSelfRemove( PCharacter *pch ) const
 {
     if (!hasAttr( pch ))
-	pch->println( "Ты и так нигде не состоишь." );
+	pch->println( "п╒я▀ п╦ я┌п╟п╨ п╫п╦пЁп╢п╣ п╫п╣ я│п╬я│я┌п╬п╦я┬я▄." );
     else {
 	delAttr( pch );
-	pch->pecho( "Ты покидаешь сво%1$Gй|й|ю %1$^O4.", &name );
+	pch->pecho( "п╒я▀ п©п╬п╨п╦п╢п╟п╣я┬я▄ я│п╡п╬%1$Gп╧|п╧|я▌ %1$^O4.", &name );
     }
 }
 
@@ -210,37 +210,37 @@ void ClanOrgs::doRemove( PCharacter *pch, DLString &arg ) const
     PCMemoryInterface *victim;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-	pch->println( "Твоих полномочий недостаточно." );
+	pch->println( "п╒п╡п╬п╦я┘ п©п╬п╩п╫п╬п╪п╬я┤п╦п╧ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬." );
 	return;
     }
     
     if (!hasAttr( pch )) {
-	pch->pecho( "Ты не являешься главой %1$O2.", &name );
+	pch->pecho( "п╒я▀ п╫п╣ я▐п╡п╩я▐п╣я┬я▄я│я▐ пЁп╩п╟п╡п╬п╧ %1$O2.", &name );
 	return;
     }
     
     if (!( victim = PCharacterManager::find( arg ) )) {
-	pch->println( "Никого нет с таким именем. Укажи имя полностью." );
+	pch->println( "п²п╦п╨п╬пЁп╬ п╫п╣я┌ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪. пёп╨п╟п╤п╦ п╦п╪я▐ п©п╬п╩п╫п╬я│я┌я▄я▌." );
 	return;
     }
 
     if (victim->getClan( ) != pch->getClan( )) {
-	pch->pecho( "Но %s не принадлежит к твоем клану!", victim->getName( ).c_str( ) );
+	pch->pecho( "п²п╬ %s п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ п╨ я┌п╡п╬п╣п╪ п╨п╩п╟п╫я┐!", victim->getName( ).c_str( ) );
 	return;
     }
 
     if (getAttr( victim ) != getAttr( pch )) {
-	pch->pecho( "%1$s не состоит в тво%2$Gем|ем|ей %2$O6!", 
+	pch->pecho( "%1$s п╫п╣ я│п╬я│я┌п╬п╦я┌ п╡ я┌п╡п╬%2$Gп╣п╪|п╣п╪|п╣п╧ %2$O6!", 
 	            victim->getName( ).c_str( ), &name );
 	return;
     }
     
     delAttr( victim );
-    pch->pecho( "%1$s покидает тво%2$Gй|й|ю %2$O4.", 
+    pch->pecho( "%1$s п©п╬п╨п╦п╢п╟п╣я┌ я┌п╡п╬%2$Gп╧|п╧|я▌ %2$O4.", 
                  victim->getName( ).c_str( ), &name );
 
     if (victim->isOnline( ))
-	victim->getPlayer( )->pecho( "%s исключает тебя из %^O2!",
+	victim->getPlayer( )->pecho( "%s п╦я│п╨п╩я▌я┤п╟п╣я┌ я┌п╣п╠я▐ п╦п╥ %^O2!",
 				     pch->getName( ).c_str( ), &name );
     else
 	PCharacterManager::saveMemory( victim );

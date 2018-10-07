@@ -138,7 +138,7 @@ bool ClanHealer::canServeClient( Character *client )
 		                  || client->master->is_npc( )
 				  || client->master->getClan( ) != clan)))
     {
-	say_act( client, ch, "Я не буду помогать тебе." );
+	say_act( client, ch, "п╞ п╫п╣ п╠я┐п╢я┐ п©п╬п╪п╬пЁп╟я┌я▄ я┌п╣п╠п╣." );
 	return false;
     }
     
@@ -253,10 +253,10 @@ bool ClanGuard::checkPush( PCharacter* wch )
 	actPush( wch );
 
 	if (!( location = get_room_index( wch->getHometown( )->getRecall( ) ) )) 
-	    location = get_room_index( 1 ); // В limbo потвор
+	    location = get_room_index( 1 ); // п▓ limbo п©п╬я┌п╡п╬я─
 	
 	transfer_char( wch, ch, location,
-		       NULL, NULL, "%1$^C1 внезапно появляется." );
+		       NULL, NULL, "%1$^C1 п╡п╫п╣п╥п╟п©п╫п╬ п©п╬я▐п╡п╩я▐п╣я┌я│я▐." );
 	return true;
     }
 
@@ -279,12 +279,12 @@ bool ClanGuard::checkGhost( PCharacter *wch )
 
 void ClanGuard::actGhost( PCharacter *wch )
 {
-    do_say( ch, "Призраки не имеют права входить сюда." );
+    do_say( ch, "п÷я─п╦п╥я─п╟п╨п╦ п╫п╣ п╦п╪п╣я▌я┌ п©я─п╟п╡п╟ п╡я┘п╬п╢п╦я┌я▄ я│я▌п╢п╟." );
 }
 
 void ClanGuard::actIntruder( PCharacter *wch )
 {
-    interpret_raw( ch, "cb", "Посторонние... Посторонним вход запрещен!" );
+    interpret_raw( ch, "cb", "п÷п╬я│я┌п╬я─п╬п╫п╫п╦п╣... п÷п╬я│я┌п╬я─п╬п╫п╫п╦п╪ п╡я┘п╬п╢ п╥п╟п©я─п╣я┴п╣п╫!" );
 }
 
 void ClanGuard::doPetitionOutsider( PCharacter *wch )
@@ -311,9 +311,9 @@ void ClanGuard::doAttack( PCharacter *wch )
 
 void ClanGuard::actInvited( PCharacter *wch, Object *obj )
 {
-    do_say( ch, "Тебя пригласили - только это оправдывает твое присутствие здесь!" );
-//    act( "$C1 забирает $o4 у $c2.", wch, obj, ch, TO_ROOM );
-//    act( "$C1 забирает у тебя $o4.", wch, obj, ch, TO_CHAR );
+    do_say( ch, "п╒п╣п╠я▐ п©я─п╦пЁп╩п╟я│п╦п╩п╦ - я┌п╬п╩я▄п╨п╬ я█я┌п╬ п╬п©я─п╟п╡п╢я▀п╡п╟п╣я┌ я┌п╡п╬п╣ п©я─п╦я│я┐я┌я│я┌п╡п╦п╣ п╥п╢п╣я│я▄!" );
+//    act( "$C1 п╥п╟п╠п╦я─п╟п╣я┌ $o4 я┐ $c2.", wch, obj, ch, TO_ROOM );
+//    act( "$C1 п╥п╟п╠п╦я─п╟п╣я┌ я┐ я┌п╣п╠я▐ $o4.", wch, obj, ch, TO_CHAR );
 }
 
 void ClanGuard::actPush( PCharacter *wch )
@@ -343,20 +343,20 @@ void ClanGuard::speech( Character *wch, const char *speech )
     if (!str_cmp( speech, "I need key" )) {
 	if (clanArea->keyVnum > 0) {
 	    if (wch->getClan( ) != ch->getClan( )) {
-		do_say(ch, "ЭТОГО ты не получишь!");
+		do_say(ch, "п╜п╒п·п⌠п· я┌я▀ п╫п╣ п©п╬п╩я┐я┤п╦я┬я▄!");
 		return;
 	    }
 
 	    obj = create_object(get_obj_index(clanArea->keyVnum), 0);
 	    obj->timer = 120;
-	    act( "$c1 снимает с шеи $o4.", ch, obj, 0, TO_ROOM );
-	    act( "Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
+	    act( "$c1 я│п╫п╦п╪п╟п╣я┌ я│ я┬п╣п╦ $o4.", ch, obj, 0, TO_ROOM );
+	    act( "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ я│ я┬п╣п╦ $o4.", ch, obj, 0, TO_CHAR );
 	}
     }
     else if (!str_cmp( speech, "I need invitation" )) {
 	if (clanArea->invitationVnum > 0) {
 	    if (wch->getClan( ) != ch->getClan( )) {
-		do_say(ch, "Я не обязан приглашать тебя в свой клан!");
+		do_say(ch, "п╞ п╫п╣ п╬п╠я▐п╥п╟п╫ п©я─п╦пЁп╩п╟я┬п╟я┌я▄ я┌п╣п╠я▐ п╡ я│п╡п╬п╧ п╨п╩п╟п╫!");
 		return;
 	    }
 
@@ -368,12 +368,12 @@ void ClanGuard::speech( Character *wch, const char *speech )
     else if (!str_cmp( speech, "I need book" )) {
 	if (clanArea->bookVnum > 0) {
 	    if (wch->getClan( ) != ch->getClan( )) {
-		do_say(ch, "Эта книга не для твоих глаз!");
+		do_say(ch, "п╜я┌п╟ п╨п╫п╦пЁп╟ п╫п╣ п╢п╩я▐ я┌п╡п╬п╦я┘ пЁп╩п╟п╥!");
 		return;
 	    }
 	    
 	    if (!wch->getClan( )->isRecruiter( wch->getPC( ) )) {
-                do_say(ch, "Эту книгу я отдам только руководителям клана!");
+                do_say(ch, "п╜я┌я┐ п╨п╫п╦пЁя┐ я▐ п╬я┌п╢п╟п╪ я┌п╬п╩я▄п╨п╬ я─я┐п╨п╬п╡п╬п╢п╦я┌п╣п╩я▐п╪ п╨п╩п╟п╫п╟!");
                 return;
             }
 
@@ -382,16 +382,16 @@ void ClanGuard::speech( Character *wch, const char *speech )
     }
 
     if (obj) {
-	act( "$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
-	act( "$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
+	act( "$C1 п╢п╟п╣я┌ $o4 $c3.", wch, obj, ch, TO_ROOM );
+	act( "$C1 п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.", wch, obj, ch, TO_CHAR );
 	obj_to_char(obj, wch);
     }
 }
 
 void ClanGuard::actGiveInvitation( PCharacter *wch, Object *obj )
 {
-    act( "$c1 пишет на $o6.", ch, obj, 0, TO_ROOM );
-    act( "Ты пишешь на $o6.", ch, obj, 0, TO_CHAR );
+    act( "$c1 п©п╦я┬п╣я┌ п╫п╟ $o6.", ch, obj, 0, TO_ROOM );
+    act( "п╒я▀ п©п╦я┬п╣я┬я▄ п╫п╟ $o6.", ch, obj, 0, TO_CHAR );
 }
 
 /*--------------------------------------------------------------------------

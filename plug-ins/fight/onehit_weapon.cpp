@@ -122,9 +122,9 @@ void WeaponOneHit::damApplyHoly( )
 
     if (wield && IS_WEAPON_STAT(wield,WEAPON_HOLY) && number_percent( ) < 30) 
     {
-	msgWeaponVict( "{YСвященная аура %3$O2 поражает тебя.{x" );
-	msgWeaponRoom( "{YСвященная аура %3$O2 поражает %2$C2.{x" );
-	msgWeaponChar( "{YСвященная аура %3$O2 поражает %2$C2.{x" );
+	msgWeaponVict( "{Yп║п╡я▐я┴п╣п╫п╫п╟я▐ п╟я┐я─п╟ %3$O2 п©п╬я─п╟п╤п╟п╣я┌ я┌п╣п╠я▐.{x" );
+	msgWeaponRoom( "{Yп║п╡я▐я┴п╣п╫п╫п╟я▐ п╟я┐я─п╟ %3$O2 п©п╬я─п╟п╤п╟п╣я┌ %2$C2.{x" );
+	msgWeaponChar( "{Yп║п╡я▐я┴п╣п╫п╫п╟я▐ п╟я┐я─п╟ %3$O2 п©п╬я─п╟п╤п╟п╣я┌ %2$C2.{x" );
 	dam += dam * 120 / 100;
 	return;
     }
@@ -133,14 +133,14 @@ void WeaponOneHit::damApplyHoly( )
 	return;
     
     if (wield) {
-	msgWeaponChar( "%3$^O4 в твоих руках на мгновение окутывает священная аура." );
-	msgWeaponRoom( "%3$^O4 %1$C2 на мгновение окутывает священная аура." );
-	msgWeaponVict( "%3$^O4 %1$C2 на мгновение окутывает священная аура." );
+	msgWeaponChar( "%3$^O4 п╡ я┌п╡п╬п╦я┘ я─я┐п╨п╟я┘ п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╬п╨я┐я┌я▀п╡п╟п╣я┌ я│п╡я▐я┴п╣п╫п╫п╟я▐ п╟я┐я─п╟." );
+	msgWeaponRoom( "%3$^O4 %1$C2 п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╬п╨я┐я┌я▀п╡п╟п╣я┌ я│п╡я▐я┴п╣п╫п╫п╟я▐ п╟я┐я─п╟." );
+	msgWeaponVict( "%3$^O4 %1$C2 п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п╬п╨я┐я┌я▀п╡п╟п╣я┌ я│п╡я▐я┴п╣п╫п╫п╟я▐ п╟я┐я─п╟." );
     }
     else {
-	msgWeaponChar( "Твои руки наполняются священной силой." );
-	msgWeaponRoom( "Руки %1$C2 наполняются священной силой." );
-	msgWeaponVict( "Руки %1$C2 наполняются священной силой." );
+	msgWeaponChar( "п╒п╡п╬п╦ я─я┐п╨п╦ п╫п╟п©п╬п╩п╫я▐я▌я┌я│я▐ я│п╡я▐я┴п╣п╫п╫п╬п╧ я│п╦п╩п╬п╧." );
+	msgWeaponRoom( "п═я┐п╨п╦ %1$C2 п╫п╟п©п╬п╩п╫я▐я▌я┌я│я▐ я│п╡я▐я┴п╣п╫п╫п╬п╧ я│п╦п╩п╬п╧." );
+	msgWeaponVict( "п═я┐п╨п╦ %1$C2 п╫п╟п©п╬п╩п╫я▐я▌я┌я│я▐ я│п╡я▐я┴п╣п╫п╫п╬п╧ я│п╦п╩п╬п╧." );
     }
 	
     gsn_holy_attack->improve( ch, true );
@@ -178,9 +178,9 @@ void WeaponOneHit::damApplyCounter( )
     if (chance <= gsn_counter->getEffective( victim ))
     {
 	gsn_counter->improve( victim, true, ch );
-	act_p("$C1 направляет твой удар против тебя самого!",ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT,POS_RESTING);
-	act_p("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+	act_p("$C1 п╫п╟п©я─п╟п╡п╩я▐п╣я┌ я┌п╡п╬п╧ я┐п╢п╟я─ п©я─п╬я┌п╦п╡ я┌п╣п╠я▐ я│п╟п╪п╬пЁп╬!",ch,0,victim,TO_CHAR,POS_RESTING);
+	act_p("п╒я▀ п╫п╟п©я─п╟п╡п╩я▐п╣я┬я▄ я┐п╢п╟я─ $c2 п©я─п╬я┌п╦п╡ $x!",ch,0,victim,TO_VICT,POS_RESTING);
+	act_p("$C1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┐п╢п╟я─ $c2 п╬п╠я─п╟я┌п╫п╬!",ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 	// set fighting state
 	if (ch->fighting == NULL)
@@ -230,9 +230,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 	    level = poison->level;
 	if ( !saves_spell(level / 2,victim,DAM_POISON) )
 	{
-	    msgWeaponVict("Ты чувствуешь, как яд распространяется по твоим венам.");
-	    msgWeaponRoom("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2 %1$C2.");
-	    msgWeaponChar("%2$^C1 отравле%2$Gно|н|на ядом от %3$O2.");
+	    msgWeaponVict("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ я▐п╢ я─п╟я│п©я─п╬я│я┌я─п╟п╫я▐п╣я┌я│я▐ п©п╬ я┌п╡п╬п╦п╪ п╡п╣п╫п╟п╪.");
+	    msgWeaponRoom("%2$^C1 п╬я┌я─п╟п╡п╩п╣%2$Gп╫п╬|п╫|п╫п╟ я▐п╢п╬п╪ п╬я┌ %3$O2 %1$C2.");
+	    msgWeaponChar("%2$^C1 п╬я┌я─п╟п╡п╩п╣%2$Gп╫п╬|п╫|п╫п╟ я▐п╢п╬п╪ п╬я┌ %3$O2.");
 
 	    af.where     = TO_AFFECTS;
 	    af.type      = gsn_poison;
@@ -250,15 +250,15 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 	    poison->level = max(0,poison->level - 2);
 	    poison->duration = max(0,poison->duration - 1);
 	    if ( poison->level == 0 || poison->duration == 0 )
-		act_p("Яд с $o2 проходит.",ch,wield,0,TO_CHAR,POS_RESTING);
+		act_p("п╞п╢ я│ $o2 п©я─п╬я┘п╬п╢п╦я┌.",ch,wield,0,TO_CHAR,POS_RESTING);
 	}
     }
 
     if (IS_WEAPON_STAT(wield,WEAPON_VAMPIRIC))
     {
-	msgWeaponVict("Ты чувствуешь как %3$O1 вытягивает из тебя жизнь.");
-	msgWeaponRoom("%3$^O1 %1$C2 вытягивает жизнь из %2$C2.");
-	msgWeaponChar("%3$^O1 вытягивает жизнь из %2$C2.");
+	msgWeaponVict("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╨п╟п╨ %3$O1 п╡я▀я┌я▐пЁп╦п╡п╟п╣я┌ п╦п╥ я┌п╣п╠я▐ п╤п╦п╥п╫я▄.");
+	msgWeaponRoom("%3$^O1 %1$C2 п╡я▀я┌я▐пЁп╦п╡п╟п╣я┌ п╤п╦п╥п╫я▄ п╦п╥ %2$C2.");
+	msgWeaponChar("%3$^O1 п╡я▀я┌я▐пЁп╦п╡п╟п╣я┌ п╤п╦п╥п╫я▄ п╦п╥ %2$C2.");
 
 	dam = number_range(1, wield->level / 5 + 1);
 	damage_nocatch(ch,victim,dam,0,DAM_NEGATIVE,false);
@@ -266,9 +266,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
     {
-	msgWeaponVict("%3$^O1 обжигает тебя.");
-	msgWeaponRoom("%3$^O1 %1$C2 обжигает %2$C4.");
-	msgWeaponChar("%3$^O1 обжигает %2$C4.");
+	msgWeaponVict("%3$^O1 п╬п╠п╤п╦пЁп╟п╣я┌ я┌п╣п╠я▐.");
+	msgWeaponRoom("%3$^O1 %1$C2 п╬п╠п╤п╦пЁп╟п╣я┌ %2$C4.");
+	msgWeaponChar("%3$^O1 п╬п╠п╤п╦пЁп╟п╣я┌ %2$C4.");
 
 	dam = number_range(1,wield->level / 4 + 1);
 	fire_effect( (void *) victim,wield->level/2,dam,TARGET_CHAR);
@@ -276,9 +276,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FROST) )
     {
-	msgWeaponVict("Ледяное прикосновение %3$O2 обмораживает тебя, покрывая льдом.");
-	msgWeaponRoom("%3$^O1 %1$C2 обмораживает %2$C4.");
-	msgWeaponChar("%3$^O1 обмораживает %2$C4.");
+	msgWeaponVict("п⌡п╣п╢я▐п╫п╬п╣ п©я─п╦п╨п╬я│п╫п╬п╡п╣п╫п╦п╣ %3$O2 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ я┌п╣п╠я▐, п©п╬п╨я─я▀п╡п╟я▐ п╩я▄п╢п╬п╪.");
+	msgWeaponRoom("%3$^O1 %1$C2 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ %2$C4.");
+	msgWeaponChar("%3$^O1 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ %2$C4.");
 
 	dam = number_range(1,wield->level / 6 + 2);
 	cold_effect(victim,wield->level/2,dam,TARGET_CHAR);
@@ -286,9 +286,9 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     }
     if (IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
     {
-	msgWeaponVict("Ты пораже%2$Gно|н|на разрядом %3$O2.");
-	msgWeaponRoom("%2$^C1 пораже%2$Gно|н|на разрядом %3$O2 %1$C2.");
-	msgWeaponChar("%2$^C1 пораже%2$Gно|н|на разрядом %3$O2.");
+	msgWeaponVict("п╒я▀ п©п╬я─п╟п╤п╣%2$Gп╫п╬|п╫|п╫п╟ я─п╟п╥я─я▐п╢п╬п╪ %3$O2.");
+	msgWeaponRoom("%2$^C1 п©п╬я─п╟п╤п╣%2$Gп╫п╬|п╫|п╫п╟ я─п╟п╥я─я▐п╢п╬п╪ %3$O2 %1$C2.");
+	msgWeaponChar("%2$^C1 п©п╬я─п╟п╤п╣%2$Gп╫п╬|п╫|п╫п╟ я─п╟п╥я─я▐п╢п╬п╪ %3$O2.");
 
 	dam = number_range(1,wield->level/5 + 2);
 	shock_effect(victim,wield->level/2,dam,TARGET_CHAR);
@@ -304,7 +304,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 		&& waf->where == TO_WEAPON
 		&& number_range( 1, waf->modifier ) == 1) 
 	    {
-		act_p("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL, POS_RESTING);
+		act_p("$o1 я▐я─п╨п╬ п╡я│п©я▀я┘п╦п╡п╟п╣я┌!", ch, wield, 0, TO_ALL, POS_RESTING);
 		lvl = std::min(ch->getModifyLevel(), waf->level);
 		spell( waf->type, lvl, ch, victim );
 	    }
@@ -326,11 +326,11 @@ void WeaponOneHit::damEffectFeeble( )
 	return;
    
     SET_BIT( ch->affected_by, AFF_WEAK_STUN );
-    act("{DЧерная немощь{x поражает твою руку!", ch, 0, 0, TO_CHAR);
-    act("{DЧерная немощь{x поражает руку $c2!", ch, 0, 0, TO_ROOM);
+    act("{Dп╖п╣я─п╫п╟я▐ п╫п╣п╪п╬я┴я▄{x п©п╬я─п╟п╤п╟п╣я┌ я┌п╡п╬я▌ я─я┐п╨я┐!", ch, 0, 0, TO_CHAR);
+    act("{Dп╖п╣я─п╫п╟я▐ п╫п╣п╪п╬я┴я▄{x п©п╬я─п╟п╤п╟п╣я┌ я─я┐п╨я┐ $c2!", ch, 0, 0, TO_ROOM);
 
     if (wield && !IS_OBJ_STAT(wield, ITEM_NOREMOVE)) {
-	act("Ты парализова$gно|н|на и роняешь оружие!", ch, 0, 0, TO_CHAR);
+	act("п╒я▀ п©п╟я─п╟п╩п╦п╥п╬п╡п╟$gп╫п╬|п╫|п╫п╟ п╦ я─п╬п╫я▐п╣я┬я▄ п╬я─я┐п╤п╦п╣!", ch, 0, 0, TO_CHAR);
 	
 	obj_from_char( wield );
 

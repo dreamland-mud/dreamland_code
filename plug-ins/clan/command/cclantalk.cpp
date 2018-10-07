@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 
@@ -46,10 +46,10 @@ static void garble( const char *src, char *dst )
 		    *dst= 'a' + number_range( 0, 25 );
 	    else if( ch >= 'A' && ch <= 'Z' )
 		    *dst = 'A' + number_range( 0, 25 );
-	    else if( ch >= 'Ю' && ch <= 'Ч' )
-		    *dst = 'Ю' + number_range( 0, 'Ч' - 'Ю' );
-	    else if( ch >= 'ю' && ch <= 'ъ' )
-		    *dst = 'ю' + number_range( 0, 'ъ' - 'ю' );
+	    else if( ch >= 'п╝' && ch <= 'п╖' )
+		    *dst = 'п╝' + number_range( 0, 'п╖' - 'п╝' );
+	    else if( ch >= 'я▌' && ch <= 'я┼' )
+		    *dst = 'я▌' + number_range( 0, 'я┼' - 'я▌' );
 	    else
 		    *dst = ch;
     }
@@ -71,8 +71,8 @@ static bool check_soap( Character *ch )
     if (!ch->getPC( )->getAttributes( ).isAvailable( soap )) 
 	return false;
     
-    act("$c1 пускает изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_ROOM);
-    act("Ты пускаешь изо рта {Rр{Yа{Gз{Cн{Mо{Rц{Gв{Yе{Cт{Mн{Yы{Cе{x мыльные пузыри.", ch, 0, 0, TO_CHAR);
+    act("$c1 п©я┐я│п╨п╟п╣я┌ п╦п╥п╬ я─я┌п╟ {Rя─{Yп╟{Gп╥{Cп╫{Mп╬{Rя├{Gп╡{Yп╣{Cя┌{Mп╫{Yя▀{Cп╣{x п╪я▀п╩я▄п╫я▀п╣ п©я┐п╥я▀я─п╦.", ch, 0, 0, TO_ROOM);
+    act("п╒я▀ п©я┐я│п╨п╟п╣я┬я▄ п╦п╥п╬ я─я┌п╟ {Rя─{Yп╟{Gп╥{Cп╫{Mп╬{Rя├{Gп╡{Yп╣{Cя┌{Mп╫{Yя▀{Cп╣{x п╪я▀п╩я▄п╫я▀п╣ п©я┐п╥я▀я─п╦.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -85,12 +85,12 @@ CMDRUN( cb )
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
-	ch->send_to("Ты не принадлежишь ни к одному Клану.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┬я▄ п╫п╦ п╨ п╬п╢п╫п╬п╪я┐ п п╩п╟п╫я┐.\n\r");
 	return;
     }
 
     if (!ch->getClan( )->hasChannel( )) {
-	ch->send_to("До тебя никому нет дела.\n\r");
+	ch->send_to("п■п╬ я┌п╣п╠я▐ п╫п╦п╨п╬п╪я┐ п╫п╣я┌ п╢п╣п╩п╟.\n\r");
 	return;
     }
     
@@ -98,9 +98,9 @@ CMDRUN( cb )
 	TOGGLE_BIT(ch->comm, COMM_NOCB);
 
 	if (IS_SET(ch->comm, COMM_NOCB))
-	    ch->println("С этого момента ты не слышишь клановые разговоры.");
+	    ch->println("п║ я█я┌п╬пЁп╬ п╪п╬п╪п╣п╫я┌п╟ я┌я▀ п╫п╣ я│п╩я▀я┬п╦я┬я▄ п╨п╩п╟п╫п╬п╡я▀п╣ я─п╟п╥пЁп╬п╡п╬я─я▀.");
 	else
-	    ch->println("Ты снова слышишь клановые разговоры.");
+	    ch->println("п╒я▀ я│п╫п╬п╡п╟ я│п╩я▀я┬п╦я┬я▄ п╨п╩п╟п╫п╬п╡я▀п╣ я─п╟п╥пЁп╬п╡п╬я─я▀.");
 	return;
     }
     

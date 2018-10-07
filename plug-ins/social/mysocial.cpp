@@ -41,13 +41,13 @@ COMMAND(MySocial, "mysocial")
     else if (arg_is_help( cmd ))
 	usage( ch );
     else if (name.empty( )) 
-	ch->println( "ıÀ¡÷… …Õ— ”œ√…¡Ã¡." );
-    else if (arg_oneof( cmd, "del", "’ƒ¡Ã…‘ÿ" ))
+	ch->println( "–£–∫–∞–∂–∏ –∏–º—è —Å–æ—Ü–∏–∞–ª–∞." );
+    else if (arg_oneof( cmd, "del", "—É–¥–∞–ª–∏—Ç—å" ))
 	doDelete( ch, attr, name );
     else if (arg_is_show( cmd ))
 	doShow( ch, attr, name );
     else if (arg.empty( )) 
-	ch->println( "ıÀ¡÷…, À¡Àœ  ◊…ƒ ”œœ¬›≈Œ…— …⁄Õ≈Œ…‘ÿ … À¡À. ÛÕœ‘“… '{lRÕœ ”œ√ ?{lEmysoc help{lx'." );
+	ch->println( "–£–∫–∞–∂–∏, –∫–∞–∫–æ–π –≤–∏–¥ —Å–æ–æ–±—â–µ–Ω–∏—è –∏–∑–º–µ–Ω–∏—Ç—å –∏ –∫–∞–∫. –°–º–æ—Ç—Ä–∏ '{lR–º–æ–π—Å–æ—Ü ?{lEmysoc help{lx'." );
     else {
 	CustomSocial::Pointer social;
 	XMLAttributeCustomSocials::iterator i = attr->find( name );
@@ -61,53 +61,53 @@ COMMAND(MySocial, "mysocial")
 
 	social->setName( name );
 	
-	if (arg_oneof( cmd, "rus", "“’”" ))
+	if (arg_oneof( cmd, "rus", "—Ä—É—Å" ))
 	{
 	    social->setRussianName( arg );
 	}
-	else if (arg_oneof( cmd, "noarg_other", "¬≈⁄√≈Ã…_ƒ“’«…≈" ))
+	else if (arg_oneof( cmd, "noarg_other", "–±–µ–∑—Ü–µ–ª–∏_–¥—Ä—É–≥–∏–µ" ))
 	{
 	    if (hasMeOnly( ch, arg )) 
 		social->setNoargOther( arg );
 	    else
 		return;
 	}
-	else if (arg_oneof( cmd, "noarg_me", "¬≈⁄√≈Ã…_—" ))
+	else if (arg_oneof( cmd, "noarg_me", "–±–µ–∑—Ü–µ–ª–∏_—è" ))
 	{
 	    if (hasNoVariables( ch, arg ))
 		social->setNoargMe( arg );
 	    else
 		return;
 	}
-	else if (arg_oneof( cmd, "auto_me", "Œ¡”≈¬—_—" ))
+	else if (arg_oneof( cmd, "auto_me", "–Ω–∞—Å–µ–±—è_—è" ))
 	{
 	    if (hasNoVariables( ch, arg ))
 		social->setAutoMe( arg );
 	    else
 		return;
 	}
-	else if (arg_oneof( cmd, "auto_other", "Œ¡”≈¬—_ƒ“’«…≈" ))
+	else if (arg_oneof( cmd, "auto_other", "–Ω–∞—Å–µ–±—è_–¥—Ä—É–≥–∏–µ" ))
 	{
 	    if (hasMeOnly( ch, arg ))
 		social->setAutoOther( arg );
 	    else
 		return;
 	}
-	else if (arg_oneof( cmd, "arg_victim", "Œ¡√≈Ãÿ_÷≈“‘◊¡" ))
+	else if (arg_oneof( cmd, "arg_victim", "–Ω–∞—Ü–µ–ª—å_–∂–µ—Ä—Ç–≤–∞" ))
 	{
 	    if (hasMeOnly( ch, arg ))
 		social->setArgVictim( arg );
 	    else
 		return;
 	}
-	else if (arg_oneof( cmd, "arg_me", "Œ¡√≈Ãÿ_—" ))
+	else if (arg_oneof( cmd, "arg_me", "–Ω–∞—Ü–µ–ª—å_—è" ))
 	{
 	    if (hasVictOnly( ch, arg ))
 		social->setArgMe( arg );
 	    else
 		return;
 	}
-	else if (arg_oneof( cmd, "arg_other", "Œ¡√≈Ãÿ_ƒ“’«…≈" ))
+	else if (arg_oneof( cmd, "arg_other", "–Ω–∞—Ü–µ–ª—å_–¥—Ä—É–≥–∏–µ" ))
 	{
 	    if (hasBoth( ch, arg ))
 		social->setArgOther( arg );
@@ -115,7 +115,7 @@ COMMAND(MySocial, "mysocial")
 		return;
 	}
 	else {
-	    ch->println("Ó≈‘ ‘¡Àœ«œ ◊…ƒ¡ ”œœ¬›≈Œ… . ÛÕœ‘“… '{lRÕœ ”œ√ ?{lEmysoc help{lx'.");
+	    ch->println("–ù–µ—Ç —Ç–∞–∫–æ–≥–æ –≤–∏–¥–∞ —Å–æ–æ–±—â–µ–Ω–∏–π. –°–º–æ—Ç—Ä–∏ '{lR–º–æ–π—Å–æ—Ü ?{lEmysoc help{lx'.");
 	    return;
 	}
 
@@ -128,7 +128,7 @@ bool MySocial::hasMeOnly( Character *ch,  const DLString &arg )
     static RegExp pat( "^\\$c[1-6] [^\\$]*$", true );
     
     if (!pat.match( arg )) {
-	ch->send_to( "Ûœœ¬›≈Œ…≈ ƒœÃ÷Œœ Œ¡ﬁ…Œ¡‘ÿ”— ” ‘◊œ≈«œ …Õ≈Œ… (◊ Œ’÷ŒœÕ –¡ƒ≈÷≈) … Œ≈ ”œƒ≈“÷¡‘ÿ ƒ“’«…» –≈“≈Õ≈ŒŒŸ». È”–œÃÿ⁄’  $c1, $c2...$c6.\r\n" );
+	ch->send_to( "–°–æ–æ–±—â–µ–Ω–∏–µ –¥–æ–ª–∂–Ω–æ –Ω–∞—á–∏–Ω–∞—Ç—å—Å—è —Å —Ç–≤–æ–µ–≥–æ –∏–º–µ–Ω–∏ (–≤ –Ω—É–∂–Ω–æ–º –ø–∞–¥–µ–∂–µ) –∏ –Ω–µ —Å–æ–¥–µ—Ä–∂–∞—Ç—å –¥—Ä—É–≥–∏—Ö –ø–µ—Ä–µ–º–µ–Ω–Ω—ã—Ö. –ò—Å–ø–æ–ª—å–∑—É–π $c1, $c2...$c6.\r\n" );
 	return false;
     }
     else 
@@ -140,7 +140,7 @@ bool MySocial::hasNoVariables( Character *ch, const DLString &arg )
     static RegExp pat( "^[^\\$]*$" );
 
     if (!pat.match( arg )) {
-	ch->send_to( "ÛÃ…€ÀœÕ ÕŒœ«œ ƒœÃÃ¡“œ◊! ˜ ‹‘œÕ ”œœ¬›≈Œ…… Œ≈Ãÿ⁄— …”–œÃÿ⁄œ◊¡‘ÿ –≈“≈Õ≈ŒŒŸ≈.\r\n" );
+	ch->send_to( "–°–ª–∏—à–∫–æ–º –º–Ω–æ–≥–æ –¥–æ–ª–ª–∞—Ä–æ–≤! –í —ç—Ç–æ–º —Å–æ–æ–±—â–µ–Ω–∏–∏ –Ω–µ–ª—å–∑—è –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å –ø–µ—Ä–µ–º–µ–Ω–Ω—ã–µ.\r\n" );
 	return false;
     }
 
@@ -153,7 +153,7 @@ bool MySocial::hasVictOnly( Character *ch, const DLString &arg )
                        "^[^\\$]*$", true );
     
     if (!pat.match( arg )) {
-	ch->send_to( "˜ ‹‘œÕ ”œœ¬›≈Œ…… Õœ÷≈‘ ◊”‘“≈ﬁ¡‘ÿ”— ‘œÃÿÀœ …Õ— ÷≈“‘◊Ÿ ◊ Œ’÷ƒœÕ –¡ƒ≈÷≈ ($C1, .. $C6).\r\n" );
+	ch->send_to( "–í —ç—Ç–æ–º —Å–æ–æ–±—â–µ–Ω–∏–∏ –º–æ–∂–µ—Ç –≤—Å—Ç—Ä–µ—á–∞—Ç—å—Å—è —Ç–æ–ª—å–∫–æ –∏–º—è –∂–µ—Ä—Ç–≤—ã –≤ –Ω—É–∂–¥–æ–º –ø–∞–¥–µ–∂–µ ($C1, .. $C6).\r\n" );
 	return false;
     }
 
@@ -167,8 +167,8 @@ bool MySocial::hasBoth( Character *ch, const DLString &arg )
 		       "^\\$c1[1-6] .*\\$C[1-6][^\\$]*$", true );
     
     if (!pat.match( arg )) {
-	ch->println( "Ûœœ¬›≈Œ…≈ ƒœÃ÷Œœ Œ¡ﬁ…Œ¡‘ÿ”— ” ‘◊œ≈«œ …Õ≈Œ… ◊ Œ’÷ŒœÕ –¡ƒ≈÷≈ ($c1, .. $c6) \r\n"
-	             "… À“œÕ≈ Œ≈«œ Õœ÷≈‘ ”œƒ≈“÷¡‘ÿ ≈›≈ ‘œÃÿÀœ …Õ— ÷≈“‘◊Ÿ ($C1, ... $C6)." ); 
+	ch->println( "–°–æ–æ–±—â–µ–Ω–∏–µ –¥–æ–ª–∂–Ω–æ –Ω–∞—á–∏–Ω–∞—Ç—å—Å—è —Å —Ç–≤–æ–µ–≥–æ –∏–º–µ–Ω–∏ –≤ –Ω—É–∂–Ω–æ–º –ø–∞–¥–µ–∂–µ ($c1, .. $c6) \r\n"
+	             "–∏ –∫—Ä–æ–º–µ –Ω–µ–≥–æ –º–æ–∂–µ—Ç —Å–æ–¥–µ—Ä–∂–∞—Ç—å –µ—â–µ —Ç–æ–ª—å–∫–æ –∏–º—è –∂–µ—Ä—Ç–≤—ã ($C1, ... $C6)." ); 
 	return false;
     }
     else 
@@ -182,7 +182,7 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
     ostringstream buf;
     
     if (attr->empty( )) {
-	act_p("ÙŸ –œÀ¡ Œ≈ –“…ƒ’Õ¡$gÃœ|Ã|Ã¡ Œ… œƒŒœ«œ ”œ¬”‘◊≈ŒŒœ«œ ”œ√…¡Ã¡.", ch, 0, 0, TO_CHAR, POS_DEAD);
+	act_p("–¢—ã –ø–æ–∫–∞ –Ω–µ –ø—Ä–∏–¥—É–º–∞$g–ª–æ|–ª|–ª–∞ –Ω–∏ –æ–¥–Ω–æ–≥–æ —Å–æ–±—Å—Ç–≤–µ–Ω–Ω–æ–≥–æ —Å–æ—Ü–∏–∞–ª–∞.", ch, 0, 0, TO_CHAR, POS_DEAD);
 	return;
     }
     
@@ -198,25 +198,25 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
 			  c->getRussianName( ).c_str( ) ) << endl;
 
 	if (!c->getNoargMe( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "¬≈⁄√≈Ã…_—" : "noarg_me" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–±–µ–∑—Ü–µ–ª–∏_—è" : "noarg_me" )
 		<< c->getNoargMe( ) << endl;
 	if (!c->getNoargOther( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "¬≈⁄√≈Ã…_ƒ“’«…≈" : "noarg_other" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–±–µ–∑—Ü–µ–ª–∏_–¥—Ä—É–≥–∏–µ" : "noarg_other" )
 		<< c->getNoargOther( ) << endl;
 	if (!c->getArgOther( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "Œ¡√≈Ãÿ_ƒ“’«…≈" : "arg_other" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–Ω–∞—Ü–µ–ª—å_–¥—Ä—É–≥–∏–µ" : "arg_other" )
 		<< c->getArgOther( ) << endl;
 	if (!c->getArgMe( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "Œ¡√≈Ãÿ_—" : "arg_me" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–Ω–∞—Ü–µ–ª—å_—è" : "arg_me" )
 		<< c->getArgMe( ) << endl;
 	if (!c->getArgVictim( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "Œ¡√≈Ãÿ_÷≈“‘◊¡" : "arg_victim" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–Ω–∞—Ü–µ–ª—å_–∂–µ—Ä—Ç–≤–∞" : "arg_victim" )
 		<< c->getArgVictim( ) << endl;
 	if (!c->getAutoMe( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "Œ¡”≈¬—_—" : "auto_me" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–Ω–∞—Å–µ–±—è_—è" : "auto_me" )
 		<< c->getAutoMe( ) << endl;
 	if (!c->getAutoOther( ).empty( ))
-	    buf << dlprintf( "%-14s | ", fRus ? "Œ¡”≈¬—_ƒ“’«…≈" : "auto_other" )
+	    buf << dlprintf( "%-14s | ", fRus ? "–Ω–∞—Å–µ–±—è_–¥—Ä—É–≥–∏–µ" : "auto_other" )
 		<< c->getAutoOther( ) << endl;
 
 	buf << "{W----------------+--------------------------------------------------------------{x" << endl;
@@ -232,7 +232,7 @@ void MySocial::doDelete( Character *ch, XMLAttributeCustomSocials::Pointer attr,
     i = attr->find( name );
 
     if (attr->end( ) == i)
-	ch->send_to( "Ûœ√…¡Ã ” ‘¡À…Õ …Õ≈Œ≈Õ Œ≈ Œ¡ ƒ≈Œ.\r\n" );
+	ch->send_to( "–°–æ—Ü–∏–∞–ª —Å —Ç–∞–∫–∏–º –∏–º–µ–Ω–µ–º –Ω–µ –Ω–∞–π–¥–µ–Ω.\r\n" );
     else {
 	attr->erase( i );
 	ch->send_to( "Ok.\r\n" );
@@ -246,7 +246,7 @@ void MySocial::doShow( Character *ch, XMLAttributeCustomSocials::Pointer attr, c
     XMLAttributeCustomSocials::iterator i = attr->find( name );
     
     if (i == attr->end( )) {
-	ch->send_to( "Ûœ√…¡Ã ” ‘¡À…Õ …Õ≈Œ≈Õ Œ≈ Œ¡ ƒ≈Œ.\r\n" );
+	ch->send_to( "–°–æ—Ü–∏–∞–ª —Å —Ç–∞–∫–∏–º –∏–º–µ–Ω–µ–º –Ω–µ –Ω–∞–π–¥–µ–Ω.\r\n" );
 	return;
     }
 
@@ -259,18 +259,18 @@ void MySocial::doShow( Character *ch, XMLAttributeCustomSocials::Pointer attr, c
 
     buf << endl;
 
-    buf << "{c“… …”–œÃÿ⁄œ◊¡Œ…… ¬≈⁄ ¡“«’Õ≈Œ‘¡{x: " << endl
-	<< "ÙŸ ’◊…ƒ…€ÿ ({lR¬≈⁄√≈Ã…_—{lEnoarg_me{lx):  " << c->getNoargMe( ) << endl  
-	<< "ÔÀ“’÷¡¿›…≈ ’◊…ƒ—‘ ({lR¬≈⁄√≈Ã…_ƒ“’«…≈{lEnoarg_other{lx):  " << c->getNoargOther( ) << endl 
+    buf << "{c–ü—Ä–∏ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–∏ –±–µ–∑ –∞—Ä–≥—É–º–µ–Ω—Ç–∞{x: " << endl
+	<< "–¢—ã —É–≤–∏–¥–∏—à—å ({lR–±–µ–∑—Ü–µ–ª–∏_—è{lEnoarg_me{lx):  " << c->getNoargMe( ) << endl  
+	<< "–û–∫—Ä—É–∂–∞—é—â–∏–µ —É–≤–∏–¥—è—Ç ({lR–±–µ–∑—Ü–µ–ª–∏_–¥—Ä—É–≥–∏–µ{lEnoarg_other{lx):  " << c->getNoargOther( ) << endl 
 	<< endl
-	<< "{c“… …”–œÃÿ⁄œ◊¡Œ…… Œ¡ Àœ«œ-‘œ{x: " << endl
-	<< "ÙŸ ’◊…ƒ…€ÿ ({lRŒ¡√≈Ãÿ_—{lEarg_me{lx):  " << c->getArgMe( ) << endl
-	<< "ˆ≈“‘◊¡ ’◊…ƒ…‘ ({lRŒ¡√≈Ãÿ_÷≈“‘◊¡{lEarg_victim{lx):  " << c->getArgVictim( ) << endl 
-	<< "˜”≈ œ”‘¡ÃÿŒŸ≈ ’◊…ƒ—‘ ({lRŒ¡√≈Ãÿ_ƒ“’«…≈{lEarg_other{lx):  " << c->getArgOther( ) << endl 
+	<< "{c–ü—Ä–∏ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–∏ –Ω–∞ –∫–æ–≥–æ-—Ç–æ{x: " << endl
+	<< "–¢—ã —É–≤–∏–¥–∏—à—å ({lR–Ω–∞—Ü–µ–ª—å_—è{lEarg_me{lx):  " << c->getArgMe( ) << endl
+	<< "–ñ–µ—Ä—Ç–≤–∞ —É–≤–∏–¥–∏—Ç ({lR–Ω–∞—Ü–µ–ª—å_–∂–µ—Ä—Ç–≤–∞{lEarg_victim{lx):  " << c->getArgVictim( ) << endl 
+	<< "–í—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ —É–≤–∏–¥—è—Ç ({lR–Ω–∞—Ü–µ–ª—å_–¥—Ä—É–≥–∏–µ{lEarg_other{lx):  " << c->getArgOther( ) << endl 
 	<< endl
-	<< "{c“… …”–œÃÿ⁄œ◊¡Œ…… Œ¡ ”¡Õœ«œ ”≈¬—{x: " << endl
-	<< "ÙŸ ’◊…ƒ…€ÿ ({lRŒ¡”≈¬—_—{lEauto_me{lx):  " << c->getAutoMe( ) << endl 
-	<< "ÔÀ“’÷¡¿›…≈ ’◊…ƒ—‘ ({lRŒ¡”≈¬—_ƒ“’«…≈{lEauto_other{lx):  " << c->getAutoOther( ) << endl;
+	<< "{c–ü—Ä–∏ –∏—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–∏ –Ω–∞ —Å–∞–º–æ–≥–æ —Å–µ–±—è{x: " << endl
+	<< "–¢—ã —É–≤–∏–¥–∏—à—å ({lR–Ω–∞—Å–µ–±—è_—è{lEauto_me{lx):  " << c->getAutoMe( ) << endl 
+	<< "–û–∫—Ä—É–∂–∞—é—â–∏–µ —É–≤–∏–¥—è—Ç ({lR–Ω–∞—Å–µ–±—è_–¥—Ä—É–≥–∏–µ{lEauto_other{lx):  " << c->getAutoOther( ) << endl;
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -280,22 +280,22 @@ void MySocial::usage( Character *ch )
 {
     ostringstream buf;
     
-    buf << "{W{lRÕœ ”œ√…¡Ã ”–…”œÀ{lEmysocial list{lx{w" << endl
-	<< "      - –œÀ¡⁄¡‘ÿ ”–…”œÀ ”œ√…¡Ãœ◊" << endl
-	<< "{W{lRÕœ ”œ√…¡Ã –œÀ¡⁄¡‘ÿ{lEmysocial show{lx{w <Œ¡⁄◊¡Œ…≈>" << endl
-	<< "      - –œÀ¡⁄¡‘ÿ –œƒ“œ¬Œœ”‘… ”œ√…¡Ã¡" << endl
-	<< "{W{lRÕœ ”œ√…¡Ã ’ƒ¡Ã…‘ÿ{lEmysocial del{lx{w <Œ¡⁄◊¡Œ…≈>" << endl
-	<< "      - ’ƒ¡Ã…‘ÿ ”œ√…¡Ã" << endl
-	<< "{W{lRÕœ ”œ√…¡Ã “’”{lEmysocial rus{lx{w <Œ¡⁄◊¡Œ…≈> <”…ŒœŒ…Õ>" << endl
-	<< "      - –“…”◊œ…‘ÿ “’””À…  ”…ŒœŒ…Õ" << endl
-	<< "{W{lRÕœ ”œ√…¡Ã ¬≈⁄√≈Ã…_ƒ“’«…≈|¬≈⁄√≈Ã…_—{lEmysocial noarg_other|noarg_me{lx{w <Œ¡⁄◊¡Œ…≈> <”‘“œÀ¡>" << endl
-	<< "      - ⁄¡ƒ¡‘ÿ ”œ√…¡Ã, Àœ‘œ“Ÿ  …”–œÃÿ⁄’≈‘”— ¬≈⁄ ’À¡⁄¡Œ…— √≈Ã…" << endl
-	<< "{W{lRÕœ ”œ√…¡Ã Œ¡”≈¬—_ƒ“’«…≈|Œ¡”≈¬—_—{lEmysocial auto_other|auto_me{lx{w <Œ¡⁄◊¡Œ…≈> <”‘“œÀ¡>" << endl
-	<< "      - ⁄¡ƒ¡‘ÿ ”œ√…¡Ã, Àœ‘œ“Ÿ  …”–œÃÿ⁄’≈‘”— Œ¡ ”¡Õœ«œ ”≈¬—" << endl
-	<< "{W{lRÕœ ”œ√…¡Ã Œ¡√≈Ãÿ_ƒ“’«…≈|Œ¡√≈Ãÿ_—|Œ¡√≈Ãÿ_÷≈“‘◊¡{lEmysocial arg_other|arg_me|arg_victim{lx{w <Œ¡⁄◊¡Œ…≈> <”‘“œÀ¡>" << endl
-	<< "      - ⁄¡ƒ¡‘ÿ ”œ√…¡Ã, Àœ‘œ“Ÿ  …”–œÃÿ⁄’≈‘”— Œ¡ Àœ«œ-‘œ ƒ“’«œ«œ" << endl
+    buf << "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª —Å–ø–∏—Å–æ–∫{lEmysocial list{lx{w" << endl
+	<< "      - –ø–æ–∫–∞–∑–∞—Ç—å —Å–ø–∏—Å–æ–∫ —Å–æ—Ü–∏–∞–ª–æ–≤" << endl
+	<< "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª –ø–æ–∫–∞–∑–∞—Ç—å{lEmysocial show{lx{w <–Ω–∞–∑–≤–∞–Ω–∏–µ>" << endl
+	<< "      - –ø–æ–∫–∞–∑–∞—Ç—å –ø–æ–¥—Ä–æ–±–Ω–æ—Å—Ç–∏ —Å–æ—Ü–∏–∞–ª–∞" << endl
+	<< "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª —É–¥–∞–ª–∏—Ç—å{lEmysocial del{lx{w <–Ω–∞–∑–≤–∞–Ω–∏–µ>" << endl
+	<< "      - —É–¥–∞–ª–∏—Ç—å —Å–æ—Ü–∏–∞–ª" << endl
+	<< "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª —Ä—É—Å{lEmysocial rus{lx{w <–Ω–∞–∑–≤–∞–Ω–∏–µ> <—Å–∏–Ω–æ–Ω–∏–º>" << endl
+	<< "      - –ø—Ä–∏—Å–≤–æ–∏—Ç—å —Ä—É—Å—Å–∫–∏–π —Å–∏–Ω–æ–Ω–∏–º" << endl
+	<< "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª –±–µ–∑—Ü–µ–ª–∏_–¥—Ä—É–≥–∏–µ|–±–µ–∑—Ü–µ–ª–∏_—è{lEmysocial noarg_other|noarg_me{lx{w <–Ω–∞–∑–≤–∞–Ω–∏–µ> <—Å—Ç—Ä–æ–∫–∞>" << endl
+	<< "      - –∑–∞–¥–∞—Ç—å —Å–æ—Ü–∏–∞–ª, –∫–æ—Ç–æ—Ä—ã–π –∏—Å–ø–æ–ª—å–∑—É–µ—Ç—Å—è –±–µ–∑ —É–∫–∞–∑–∞–Ω–∏—è —Ü–µ–ª–∏" << endl
+	<< "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª –Ω–∞—Å–µ–±—è_–¥—Ä—É–≥–∏–µ|–Ω–∞—Å–µ–±—è_—è{lEmysocial auto_other|auto_me{lx{w <–Ω–∞–∑–≤–∞–Ω–∏–µ> <—Å—Ç—Ä–æ–∫–∞>" << endl
+	<< "      - –∑–∞–¥–∞—Ç—å —Å–æ—Ü–∏–∞–ª, –∫–æ—Ç–æ—Ä—ã–π –∏—Å–ø–æ–ª—å–∑—É–µ—Ç—Å—è –Ω–∞ —Å–∞–º–æ–≥–æ —Å–µ–±—è" << endl
+	<< "{W{lR–º–æ–π—Å–æ—Ü–∏–∞–ª –Ω–∞—Ü–µ–ª—å_–¥—Ä—É–≥–∏–µ|–Ω–∞—Ü–µ–ª—å_—è|–Ω–∞—Ü–µ–ª—å_–∂–µ—Ä—Ç–≤–∞{lEmysocial arg_other|arg_me|arg_victim{lx{w <–Ω–∞–∑–≤–∞–Ω–∏–µ> <—Å—Ç—Ä–æ–∫–∞>" << endl
+	<< "      - –∑–∞–¥–∞—Ç—å —Å–æ—Ü–∏–∞–ª, –∫–æ—Ç–æ—Ä—ã–π –∏—Å–ø–æ–ª—å–∑—É–µ—Ç—Å—è –Ω–∞ –∫–æ–≥–æ-—Ç–æ –¥—Ä—É–≥–æ–≥–æ" << endl
 	<< endl
-	<< "œƒ“œ¬Œœ”‘… ”Õœ‘“… ◊ '{lR? Õœ ”œ√…¡Ã{lEhelp mysocial{lx'." << endl;
+	<< "–ü–æ–¥—Ä–æ–±–Ω–æ—Å—Ç–∏ —Å–º–æ—Ç—Ä–∏ –≤ '{lR? –º–æ–π—Å–æ—Ü–∏–∞–ª{lEhelp mysocial{lx'." << endl;
 
     ch->send_to( buf );
 }

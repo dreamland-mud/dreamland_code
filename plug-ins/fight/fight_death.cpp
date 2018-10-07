@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
  *    Koval Nazar	    {Nazar, Redrum}                 		   *
  *    Doropey Vladimir	    {Reorx}		                           *
  *    Kulgeyko Denis	    {Burzum}		                           *
  *    Andreyanov Aleksandr  {Manwe}		                           *
- *    и все остальные, кто советовал и играл в этот MUD	                   *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD	                   *
  ***************************************************************************/
 
 #include "so.h"
@@ -314,7 +314,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
 	body_vnum = ch->is_npc( ) ? ch->getNPC( )->pIndexData->vnum : 0;
     }
     else if (corpse) {
-	body_name = corpse->getShortDescr( '1' ).replaces( "труп (corpse) ", "" );
+	body_name = corpse->getShortDescr( '1' ).replaces( "я┌я─я┐п© (corpse) ", "" );
 	if (body_name.size( ) == corpse->getShortDescr( '1' ).size( ))
 	    body_name = "";
 	
@@ -366,25 +366,25 @@ void death_cry( Character *ch, int part )
 	return;
 
     vnum = 0;
-    msg = "Ты слышишь предсмертный крик $c2.";
+    msg = "п╒я▀ я│п╩я▀я┬п╦я┬я▄ п©я─п╣п╢я│п╪п╣я─я┌п╫я▀п╧ п╨я─п╦п╨ $c2.";
 
     if (part == -1)
       part = number_bits(4);
 
     switch (part)
     {
-    case  0: msg  = "$c1 падает на землю ... и {RУМИРАЕТ{x.";	    
+    case  0: msg  = "$c1 п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌ ... п╦ {Rпёп°п≤п═п░п∙п╒{x.";	    
 	     break;
     case  1:
 	if (ch->material == 0)
 	{
-	    msg  = "Кровь $c2 покрывает твои доспехи.";	
+	    msg  = "п я─п╬п╡я▄ $c2 п©п╬п╨я─я▀п╡п╟п╣я┌ я┌п╡п╬п╦ п╢п╬я│п©п╣я┘п╦.";	
 	    break;
 	}
     case  2:			     
 	if (bodyparts.isSet(PART_GUTS))
 	{
-	    msg = "Внутренности $c2 вываливаются на пол.";
+	    msg = "п▓п╫я┐я┌я─п╣п╫п╫п╬я│я┌п╦ $c2 п╡я▀п╡п╟п╩п╦п╡п╟я▌я┌я│я▐ п╫п╟ п©п╬п╩.";
 	    vnum = OBJ_VNUM_GUTS;
 	    bodyparts.removeBit(PART_GUTS);
 	}
@@ -392,7 +392,7 @@ void death_cry( Character *ch, int part )
     case  3:
 	if (bodyparts.isSet(PART_HEAD))
 	{
-	    msg  = "Отрубленная голова $c2 падает на землю.";
+	    msg  = "п·я┌я─я┐п╠п╩п╣п╫п╫п╟я▐ пЁп╬п╩п╬п╡п╟ $c2 п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌.";
 	    vnum = OBJ_VNUM_SEVERED_HEAD;		
 	    bodyparts.removeBit(PART_HEAD);
 	}
@@ -400,7 +400,7 @@ void death_cry( Character *ch, int part )
     case  4:
 	if (bodyparts.isSet(PART_HEART))
 	{
-	    msg  = "Сердце $c2 выпадает из $s разрубленной груди.";
+	    msg  = "п║п╣я─п╢я├п╣ $c2 п╡я▀п©п╟п╢п╟п╣я┌ п╦п╥ $s я─п╟п╥я─я┐п╠п╩п╣п╫п╫п╬п╧ пЁя─я┐п╢п╦.";
 	    vnum = OBJ_VNUM_TORN_HEART;		
 	    bodyparts.removeBit(PART_HEART);
 	}
@@ -408,7 +408,7 @@ void death_cry( Character *ch, int part )
     case  5:
 	if (bodyparts.isSet(PART_ARMS))
 	{
-	    msg  = "Рука $c2 отваливается от $s мертвого тела.";
+	    msg  = "п═я┐п╨п╟ $c2 п╬я┌п╡п╟п╩п╦п╡п╟п╣я┌я│я▐ п╬я┌ $s п╪п╣я─я┌п╡п╬пЁп╬ я┌п╣п╩п╟.";
 	    vnum = OBJ_VNUM_SLICED_ARM;		
 	    bodyparts.removeBit(PART_ARMS);
 	}
@@ -416,7 +416,7 @@ void death_cry( Character *ch, int part )
     case  6:
 	if (bodyparts.isSet(PART_LEGS))
 	{
-	    msg  = "Нога $c2 отваливается от $s мертвого тела.";
+	    msg  = "п²п╬пЁп╟ $c2 п╬я┌п╡п╟п╩п╦п╡п╟п╣я┌я│я▐ п╬я┌ $s п╪п╣я─я┌п╡п╬пЁп╬ я┌п╣п╩п╟.";
 	    vnum = OBJ_VNUM_SLICED_LEG;		
 	    bodyparts.removeBit(PART_LEGS);
 	}
@@ -424,7 +424,7 @@ void death_cry( Character *ch, int part )
     case 7:
 	if (bodyparts.isSet(PART_BRAINS))
 	{
-	    msg = "Голова $c2 разбивается вдребезги, забрызгивая все вокруг.";
+	    msg = "п⌠п╬п╩п╬п╡п╟ $c2 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╡п╢я─п╣п╠п╣п╥пЁп╦, п╥п╟п╠я─я▀п╥пЁп╦п╡п╟я▐ п╡я│п╣ п╡п╬п╨я─я┐пЁ.";
 	    vnum = OBJ_VNUM_BRAINS;
 	    bodyparts.removeBit(PART_BRAINS);
 	}
@@ -435,7 +435,7 @@ void death_cry( Character *ch, int part )
     if (vnum != 0)
 	bodypart_create( vnum, ch, NULL ); 
 
-    msg = "Ты слышишь чей-то предсмертный крик.";
+    msg = "п╒я▀ я│п╩я▀я┬п╦я┬я▄ я┤п╣п╧-я┌п╬ п©я─п╣п╢я│п╪п╣я─я┌п╫я▀п╧ п╨я─п╦п╨.";
     ch->in_room->echoAround( POS_RESTING, msg );
     ch->parts = bodyparts;
 }
@@ -472,7 +472,7 @@ void ghost_gain( Character *victim )
 	SET_DEATH_TIME(victim);
 
 	if (victim->getModifyLevel( ) >= PK_MIN_LEVEL) {
-	    victim->println("Ты лишаешься тела на несколько минут.");
+	    victim->println("п╒я▀ п╩п╦я┬п╟п╣я┬я▄я│я▐ я┌п╣п╩п╟ п╫п╟ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╪п╦п╫я┐я┌.");
 	    set_ghost( victim );
 	}
     }
@@ -556,10 +556,10 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
     wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
     if (ch)
 	wiznet( wizflag, 0, victim->get_trust( ),
-	        "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch );
+	        "%1$C1 п©п╟%1$Gп╩п╬|п╩|п╩п╟ п╬я┌ я─я┐п╨п╦ %2$C2.", victim, ch );
     else
 	wiznet( wizflag, 0, victim->get_trust( ),
-	        "%1$C1 па%1$Gло|л|ла от неизвестной (божественной) руки.", victim );
+	        "%1$C1 п©п╟%1$Gп╩п╬|п╩|п╩п╟ п╬я┌ п╫п╣п╦п╥п╡п╣я│я┌п╫п╬п╧ (п╠п╬п╤п╣я│я┌п╡п╣п╫п╫п╬п╧) я─я┐п╨п╦.", victim );
 
     if (ch && mprog_kill( ch, victim ))
 	ch = NULL;
@@ -707,8 +707,8 @@ protected:
     void autoBlood( )
     {
 	if (desire_bloodlust->applicable( killer->getPC( ) )) {
-	    act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-	    act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+	    act( "{R$c1 п╡я▀п©п╦п╡п╟п╣я┌ п©п╬я│п╩п╣п╢п╫п╦п╣ п╨п╟п©п╩п╦ п╤п╦п╥п╫п╦ п╦п╥ $C2!{x", killer, 0,ch,TO_ROOM);
+	    act( "{Rп╒я▀ п╡я▀п©п╦п╡п╟п╣я┬я▄ п©п╬я│п╩п╣п╢п╫п╦п╣ п╨п╟п©п╩п╦ п╤п╦п╥п╫п╦ п╦п╥ $C2!{x", killer, 0,ch,TO_CHAR);
 	    desire_bloodlust->gain( killer->getPC( ), 3 );
 	}
     }
@@ -764,8 +764,8 @@ public:
     }
     virtual void run( )
     {
-	pvict->println("Ты превращаешься в привидение и покидаешь этот мир.");
-	act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
+	pvict->println("п╒я▀ п©я─п╣п╡я─п╟я┴п╟п╣я┬я▄я│я▐ п╡ п©я─п╦п╡п╦п╢п╣п╫п╦п╣ п╦ п©п╬п╨п╦п╢п╟п╣я┬я▄ я█я┌п╬я┌ п╪п╦я─.");
+	act( "$c1 пёп°п∙$gп═п⌡п·|п═|п═п⌡п░, п╦ п╫п╟п╡я│п╣пЁп╢п╟ п©п╬п╨п╦п╫я┐$gп╩п╬|п╩|п╩п╟ я█я┌п╬я┌ п╪п╦я─.\n\r", pvict,0,0,TO_ROOM);
 	wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
 	
 	delete_player( pvict );
@@ -827,7 +827,7 @@ protected:
 	pch->perm_stat[STAT_CON]--;
 
 	if (pch->perm_stat[STAT_CON] >= 3) {
-	    pch->println("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
+	    pch->println("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ я┌п╡п╬я▐ п╤п╦п╥п╫п╣п╫п╫п╟я▐ я│п╦п╩п╟ я┐п╪п╣п╫я▄я┬п╦п╩п╟я│я▄ п©п╬я│п╩п╣ я█я┌п╬п╧ я│п╪п╣я─я┌п╦.");
 	    return false;
 	}
 	
@@ -835,7 +835,7 @@ protected:
 
 	DLScheduler::getThis( )->putTaskNOW(
 	    PlayerDeleteTask::Pointer( NEW, pch, killer, 
-		"%C1 : %C1 удаляется из-за слабого телосложения." ) );
+		"%C1 : %C1 я┐п╢п╟п╩я▐п╣я┌я│я▐ п╦п╥-п╥п╟ я│п╩п╟п╠п╬пЁп╬ я┌п╣п╩п╬я│п╩п╬п╤п╣п╫п╦я▐." ) );
 	return true;
     }
 
@@ -861,7 +861,7 @@ protected:
 
 	DLScheduler::getThis( )->putTaskNOW(
 	    PlayerDeleteTask::Pointer( NEW, pch, killer, 
-		"%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
+		"%C1 : %C1 я┐п╢п╟п╩я▐п╣я┌я│я▐, п╢п╬я│я┌п╦пЁп╫я┐п╡ п©я─п╣п╢п╣п╩п╟ 10 я│п╪п╣я─я┌п╣п╧ я│п╟п╪я┐я─п╟я▐." ) );
 	return true;
     }
 

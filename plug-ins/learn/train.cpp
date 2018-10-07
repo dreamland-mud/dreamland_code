@@ -39,41 +39,41 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
     arg = argument.getOneArgument( );
     
     if (arg.empty( )) {
-	tell_act( client, ch, "Ты можешь обменять {Y10{G практик на {Y1{G тренировочную сессию." );
-	tell_act( client, ch, "Ты можешь обменять {Y1{G тренировочную сессию на {Y10{G практик." );
-	tell_act( client, ch, "Используй для этого '{lRтренировки купить{lEgain convert{lx' или '{lRтренировки продать{lEgain revert{lx'." );
+	tell_act( client, ch, "п╒я▀ п╪п╬п╤п╣я┬я▄ п╬п╠п╪п╣п╫я▐я┌я▄ {Y10{G п©я─п╟п╨я┌п╦п╨ п╫п╟ {Y1{G я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я┐я▌ я│п╣я│я│п╦я▌." );
+	tell_act( client, ch, "п╒я▀ п╪п╬п╤п╣я┬я▄ п╬п╠п╪п╣п╫я▐я┌я▄ {Y1{G я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я┐я▌ я│п╣я│я│п╦я▌ п╫п╟ {Y10{G п©я─п╟п╨я┌п╦п╨." );
+	tell_act( client, ch, "п≤я│п©п╬п╩я▄п╥я┐п╧ п╢п╩я▐ я█я┌п╬пЁп╬ '{lRя┌я─п╣п╫п╦я─п╬п╡п╨п╦ п╨я┐п©п╦я┌я▄{lEgain convert{lx' п╦п╩п╦ '{lRя┌я─п╣п╫п╦я─п╬п╡п╨п╦ п©я─п╬п╢п╟я┌я▄{lEgain revert{lx'." );
 	return;
     }
     
-    if (arg.strPrefix( "revert" ) || arg.strPrefix("продать")) {
+    if (arg.strPrefix( "revert" ) || arg.strPrefix("п©я─п╬п╢п╟я┌я▄")) {
 	if (client->train < 1) {
-	    tell_act( client, ch, "У тебя нет тренировочных сессий." );
+	    tell_act( client, ch, "пё я┌п╣п╠я▐ п╫п╣я┌ я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я▀я┘ я│п╣я│я│п╦п╧." );
 	    return;
 	}
 
-	act( "$C1 дает тебе {Y10{x практик в обмен на {Y1{x тренировочную сессию.", client, 0, ch, TO_CHAR);
-	act( "$C1 обменивает для $c2 тренировочные сессии на сессии практики.", client, 0, ch, TO_NOTVICT );
+	act( "$C1 п╢п╟п╣я┌ я┌п╣п╠п╣ {Y10{x п©я─п╟п╨я┌п╦п╨ п╡ п╬п╠п╪п╣п╫ п╫п╟ {Y1{x я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я┐я▌ я│п╣я│я│п╦я▌.", client, 0, ch, TO_CHAR);
+	act( "$C1 п╬п╠п╪п╣п╫п╦п╡п╟п╣я┌ п╢п╩я▐ $c2 я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я▀п╣ я│п╣я│я│п╦п╦ п╫п╟ я│п╣я│я│п╦п╦ п©я─п╟п╨я┌п╦п╨п╦.", client, 0, ch, TO_NOTVICT );
 
 	client->practice += 10;
 	client->train -=1 ;
 	return;
     }
 
-    if (arg.strPrefix( "convert" ) || arg.strPrefix("купить")) {
+    if (arg.strPrefix( "convert" ) || arg.strPrefix("п╨я┐п©п╦я┌я▄")) {
 	if (client->practice < 10) {
-	    tell_act( client, ch, "У тебя нет необходимого количества практик." );
+	    tell_act( client, ch, "пё я┌п╣п╠я▐ п╫п╣я┌ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬пЁп╬ п╨п╬п╩п╦я┤п╣я│я┌п╡п╟ п©я─п╟п╨я┌п╦п╨." );
 	    return;
 	}
 
-	act( "$C1 дает тебе {Y1{x тренировочную сессию в обмен на {Y10{x практик.", client, 0, ch, TO_CHAR );
-	act( "$C1 обменивает для $c2 сессии практики на тренировочные сессии.", client, 0, ch, TO_NOTVICT );
+	act( "$C1 п╢п╟п╣я┌ я┌п╣п╠п╣ {Y1{x я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я┐я▌ я│п╣я│я│п╦я▌ п╡ п╬п╠п╪п╣п╫ п╫п╟ {Y10{x п©я─п╟п╨я┌п╦п╨.", client, 0, ch, TO_CHAR );
+	act( "$C1 п╬п╠п╪п╣п╫п╦п╡п╟п╣я┌ п╢п╩я▐ $c2 я│п╣я│я│п╦п╦ п©я─п╟п╨я┌п╦п╨п╦ п╫п╟ я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я▀п╣ я│п╣я│я│п╦п╦.", client, 0, ch, TO_NOTVICT );
 
 	client->practice -= 10;
 	client->train +=1 ;
 	return;
     }
 
-    tell_act( client, ch, "Я тебя не могу понять..." );
+    tell_act( client, ch, "п╞ я┌п╣п╠я▐ п╫п╣ п╪п╬пЁя┐ п©п╬п╫я▐я┌я▄..." );
 }
 
 static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
@@ -101,8 +101,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 	return;
 
     if (!argQP.empty( )) {
-	if (argQP != "qp" && argQP != "кп") {
-	    tell_raw( client, ch, "Если хочешь тренироваться за квестовые единицы, используй '{lRтренировать <параметр> кп{lEtrain <stat> qp{lx'." );
+	if (argQP != "qp" && argQP != "п╨п©") {
+	    tell_raw( client, ch, "п∙я│п╩п╦ я┘п╬я┤п╣я┬я▄ я┌я─п╣п╫п╦я─п╬п╡п╟я┌я▄я│я▐ п╥п╟ п╨п╡п╣я│я┌п╬п╡я▀п╣ п╣п╢п╦п╫п╦я├я▀, п╦я│п©п╬п╩я▄п╥я┐п╧ '{lRя┌я─п╣п╫п╦я─п╬п╡п╟я┌я▄ <п©п╟я─п╟п╪п╣я┌я─> п╨п©{lEtrain <stat> qp{lx'." );
 	    return;
 	}
 	else
@@ -110,9 +110,9 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     }
 
     if (argStat.empty( )) {
-	tell_raw( client, ch, "У тебя {Y%d{G тренировочн%s.", 
+	tell_raw( client, ch, "пё я┌п╣п╠я▐ {Y%d{G я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫%s.", 
 	          client->train.getValue( ),
-                  GET_COUNT(client->train,"ая сессия","ые сессии","ых сессий") );
+                  GET_COUNT(client->train,"п╟я▐ я│п╣я│я│п╦я▐","я▀п╣ я│п╣я│я│п╦п╦","я▀я┘ я│п╣я│я│п╦п╧") );
     }
     else {
 	for (int i = 0; i < stat_table.size; i++)
@@ -140,18 +140,18 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 	
 	if (cnt > 0) {
 	    tell_raw( client, ch, 
-	              "Ты можешь тренировать:%s%s", 
+	              "п╒я▀ п╪п╬п╤п╣я┬я▄ я┌я─п╣п╫п╦я─п╬п╡п╟я┌я▄:%s%s", 
 		      (cnt > 2 ? "\r\n" : " " ),
 		      buf.str( ).c_str( ) );
 	    if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ))
-		tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: train con qp.", costQP );
+		tell_raw( client, ch, "п╒я▀ п╪п╬п╤п╣я┬я▄ п©п╬п╡я▀я│п╦я┌я▄ я┌п╣п╩п╬я│п╩п╬п╤п╣п╫п╦п╣ п╥п╟ {Y%d{G п╨п╡п╣я│я┌п╬п╡я▀я┘ п╣п╢п╦п╫п╦я├: train con qp.", costQP );
 	}	    
 	else
 	    /*
 	     * This message dedicated to Jordan ... you big stud!
 	     */
-	    tell_raw( client, ch, "Тебе больше нечего тренировать, %s!",
-		      GET_SEX(client, "жеребчик", "дикое животное", "красотка") );
+	    tell_raw( client, ch, "п╒п╣п╠п╣ п╠п╬п╩я▄я┬п╣ п╫п╣я┤п╣пЁп╬ я┌я─п╣п╫п╦я─п╬п╡п╟я┌я▄, %s!",
+		      GET_SEX(client, "п╤п╣я─п╣п╠я┤п╦п╨", "п╢п╦п╨п╬п╣ п╤п╦п╡п╬я┌п╫п╬п╣", "п╨я─п╟я│п╬я┌п╨п╟") );
 
 	return;
     }
@@ -159,7 +159,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     if (client->perm_stat[stat_table.fields[stat].value] 
 	>= client->getMaxTrain( stat_table.fields[stat].value )) 
     {
-	tell_raw( client, ch, "Твой параметр %s (%s) уже на максимуме.", 
+	tell_raw( client, ch, "п╒п╡п╬п╧ п©п╟я─п╟п╪п╣я┌я─ %s (%s) я┐п╤п╣ п╫п╟ п╪п╟п╨я│п╦п╪я┐п╪п╣.", 
 	          russian_case( stat_table.fields[stat].message, '1' ).c_str( ), 
 		  stat_table.fields[stat].name );
 	return;
@@ -167,16 +167,16 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     
     if (fQP) {
 	if (stat != STAT_CON) {
-	    tell_raw( client, ch, "Ты можешь тренировать за qp только телосложение." );
+	    tell_raw( client, ch, "п╒я▀ п╪п╬п╤п╣я┬я▄ я┌я─п╣п╫п╦я─п╬п╡п╟я┌я▄ п╥п╟ qp я┌п╬п╩я▄п╨п╬ я┌п╣п╩п╬я│п╩п╬п╤п╣п╫п╦п╣." );
 	    return;
 	}
 
 	if (costQP > client->questpoints) {
-	    tell_raw( client, ch, "У тебя недостаточно квестовых единиц." );
+	    tell_raw( client, ch, "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╨п╡п╣я│я┌п╬п╡я▀я┘ п╣п╢п╦п╫п╦я├." );
 	    return;
 	}
     } else if (cost > client->train) {
-	tell_raw( client, ch, "У тебя нет достаточного количества тренировочных сессий." );
+	tell_raw( client, ch, "пё я┌п╣п╠я▐ п╫п╣я┌ п╢п╬я│я┌п╟я┌п╬я┤п╫п╬пЁп╬ п╨п╬п╩п╦я┤п╣я│я┌п╡п╟ я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫я▀я┘ я│п╣я│я│п╦п╧." );
 	return;
     }
     
@@ -187,8 +187,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     client->perm_stat[stat_table.fields[stat].value] += 1;
 
-    act( "Ты повышаешь $N4!", client, 0, stat_table.fields[stat].message, TO_CHAR );
-    act( "$c1 повышает $N4!", client, 0, stat_table.fields[stat].message, TO_ROOM );
+    act( "п╒я▀ п©п╬п╡я▀я┬п╟п╣я┬я▄ $N4!", client, 0, stat_table.fields[stat].message, TO_CHAR );
+    act( "$c1 п©п╬п╡я▀я┬п╟п╣я┌ $N4!", client, 0, stat_table.fields[stat].message, TO_ROOM );
 }
 
 
@@ -198,14 +198,14 @@ CMDRUN( gain )
     DLString argument = constArguments;
 
     if (ch->is_npc( )) {
-	ch->println( "Это бесполезно для тебя." );
+	ch->println( "п╜я┌п╬ п╠п╣я│п©п╬п╩п╣п╥п╫п╬ п╢п╩я▐ я┌п╣п╠я▐." );
 	return;
     }
     
     trainer = find_people_behavior<Trainer>( ch->in_room );
 
     if (!trainer) {
-	ch->println( "Здесь никто не меняет тренировки на практики." );
+	ch->println( "п≈п╢п╣я│я▄ п╫п╦п╨я┌п╬ п╫п╣ п╪п╣п╫я▐п╣я┌ я┌я─п╣п╫п╦я─п╬п╡п╨п╦ п╫п╟ п©я─п╟п╨я┌п╦п╨п╦." );
 	return;
     }
     
@@ -219,14 +219,14 @@ CMDRUN( train )
     DLString argument = constArguments;
 
     if (ch->is_npc( )) {
-	ch->println( "Это бесполезно для тебя." );
+	ch->println( "п╜я┌п╬ п╠п╣я│п©п╬п╩п╣п╥п╫п╬ п╢п╩я▐ я┌п╣п╠я▐." );
 	return;
     }
     
     trainer = find_attracted_mob_behavior<Trainer>( ch, OCC_TRAINER );
 
     if (!trainer) {
-	ch->println( "Здесь некому тренировать тебя." );
+	ch->println( "п≈п╢п╣я│я▄ п╫п╣п╨п╬п╪я┐ я┌я─п╣п╫п╦я─п╬п╡п╟я┌я▄ я┌п╣п╠я▐." );
 	return;
     }
     

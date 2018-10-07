@@ -58,7 +58,7 @@ bool KidnapBandit::spec_hunt_prince( )
 	    return false;
     }
    
-    debug( "Буду охотиться на принца." );
+    debug( "п▒я┐п╢я┐ п╬я┘п╬я┌п╦я┌я▄я│я▐ п╫п╟ п©я─п╦п╫я├п╟." );
     princeHunt( );
 
     return true;
@@ -158,7 +158,7 @@ bool KidnapBandit::spec( )
  */
 void KidnapBandit::fight( Character *victim ) 
 {
-    debug( "Я сражаюсь." );
+    debug( "п╞ я│я─п╟п╤п╟я▌я│я▄." );
 
     if (state == BSTAT_KIDNAP)
 	princeDetach( );
@@ -289,11 +289,11 @@ bool KidnapBandit::heroAttack( PCharacter *hero )
 	    return false;
     }
     
-    debug( "Я вижу неспящего героя - ща как дам в дыню!" );
+    debug( "п╞ п╡п╦п╤я┐ п╫п╣я│п©я▐я┴п╣пЁп╬ пЁп╣я─п╬я▐ - я┴п╟ п╨п╟п╨ п╢п╟п╪ п╡ п╢я▀п╫я▌!" );
     multi_hit( ch, hero );
     
     if (!ch->fighting) {
-	debug( "Все это очень хорошо, но сражение не началось!" );
+	debug( "п▓я│п╣ я█я┌п╬ п╬я┤п╣п╫я▄ я┘п╬я─п╬я┬п╬, п╫п╬ я│я─п╟п╤п╣п╫п╦п╣ п╫п╣ п╫п╟я┤п╟п╩п╬я│я▄!" );
 	return false;
     }
     

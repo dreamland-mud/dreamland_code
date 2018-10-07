@@ -55,12 +55,12 @@ CMDADM( eval )
 	return;
     
     if (!has_fenia_security( pch )) {
-	ch->println("Ты не ботаешь по фене.");
+	ch->println("п╒я▀ п╫п╣ п╠п╬я┌п╟п╣я┬я▄ п©п╬ я└п╣п╫п╣.");
 	return;
     }
 
     if (constArguments.empty( )) {
-	ch->println("Синтаксис: {Weval {x<expression>");
+	ch->println("п║п╦п╫я┌п╟п╨я│п╦я│: {Weval {x<expression>");
 	return;
     }
 
@@ -100,7 +100,7 @@ RPCRUN(cs_eval)
                 << "----------------------------" << endl;
 
         if (!has_fenia_security( pch )) {
-            ch->println("Ты не ботаешь по фене.");
+            ch->println("п╒я▀ п╫п╣ п╠п╬я┌п╟п╣я┬я▄ п©п╬ я└п╣п╫п╣.");
             return;
         }
 

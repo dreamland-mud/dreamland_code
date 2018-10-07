@@ -207,7 +207,7 @@ bool BasicMobileBehavior::backHome( bool fAlways )
 
     if (homeVnum == 0) {
 	if (fAlways) {
-	    act( "$c1 ÉÝÅÔ Ó×ÏÊ ÄÏÍ.", ch, 0, 0, TO_ROOM );
+	    act( "$c1 Ð¸Ñ‰ÐµÑ‚ ÑÐ²Ð¾Ð¹ Ð´Ð¾Ð¼.", ch, 0, 0, TO_ROOM );
 	    extract_char( ch );
 	    return true;
 	}
@@ -226,9 +226,9 @@ bool BasicMobileBehavior::backHome( bool fAlways )
 	return false;
     
     transfer_char( ch, 0, home,
-                   "%1$^C1 ÍÏÌÉÔ âÏÇÏ× Ï ×ÏÚ×ÒÁÝÅÎÉÉ.", 
+                   "%1$^C1 Ð¼Ð¾Ð»Ð¸Ñ‚ Ð‘Ð¾Ð³Ð¾Ð² Ð¾ Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ð¸.", 
 		   NULL,
-                   "%1$^C1 ÐÏÑ×ÌÑÅÔÓÑ ÉÚ ÄÙÍËÉ." );
+                   "%1$^C1 Ð¿Ð¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ð¸Ð· Ð´Ñ‹Ð¼ÐºÐ¸." );
 
     ch->position = ch->default_pos;
     homeVnum = 0;

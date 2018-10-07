@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "invader.h"
@@ -50,12 +50,12 @@ CLAN(invader);
  *-------------------------------------------------------------------------*/
 void ClanGuardInvader::actGreet( PCharacter *wch )
 {
-    do_say(ch, "Приветствую тебя, идущий темным путем.");
+    do_say(ch, "п÷я─п╦п╡п╣я┌я│я┌п╡я┐я▌ я┌п╣п╠я▐, п╦п╢я┐я┴п╦п╧ я┌п╣п╪п╫я▀п╪ п©я┐я┌п╣п╪.");
 }
 void ClanGuardInvader::actPush( PCharacter *wch )
 {
-    act( "$C1 зверски ухмыляется тебе...\n\rТы теряешь рассудок от страха и куда-то несешься.", wch, 0, ch, TO_CHAR );
-    act( "$C1 сверлит глазами $c4 и $c1 с испугу куда-то уносится.", wch, 0, ch, TO_ROOM );
+    act( "$C1 п╥п╡п╣я─я│п╨п╦ я┐я┘п╪я▀п╩я▐п╣я┌я│я▐ я┌п╣п╠п╣...\n\rп╒я▀ я┌п╣я─я▐п╣я┬я▄ я─п╟я│я│я┐п╢п╬п╨ п╬я┌ я│я┌я─п╟я┘п╟ п╦ п╨я┐п╢п╟-я┌п╬ п╫п╣я│п╣я┬я▄я│я▐.", wch, 0, ch, TO_CHAR );
+    act( "$C1 я│п╡п╣я─п╩п╦я┌ пЁп╩п╟п╥п╟п╪п╦ $c4 п╦ $c1 я│ п╦я│п©я┐пЁя┐ п╨я┐п╢п╟-я┌п╬ я┐п╫п╬я│п╦я┌я│я▐.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardInvader::getCast( Character *victim )
 {
@@ -115,32 +115,32 @@ SKILL_RUNP( fade )
 {
 	if ( !gsn_fade->available( ch ))
 	{
-	    ch->send_to("Ась?\n\r");
+	    ch->send_to("п░я│я▄?\n\r");
 	    return;
 	}
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Ты не можешь исчезнуть, когда в седле.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│я┤п╣п╥п╫я┐я┌я▄, п╨п╬пЁп╢п╟ п╡ я│п╣п╢п╩п╣.\n\r");
 		return;
 	}
 
 	if ( RIDDEN(ch) )
 	{
-		ch->send_to("Ты не можешь исчезнуть, когда ты оседлан.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│я┤п╣п╥п╫я┐я┌я▄, п╨п╬пЁп╢п╟ я┌я▀ п╬я│п╣п╢п╩п╟п╫.\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE) )
 	{
-		ch->send_to("Ты не можешь скрыться, когда светишься.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╨я─я▀я┌я▄я│я▐, п╨п╬пЁп╢п╟ я│п╡п╣я┌п╦я┬я▄я│я▐.\n\r");
 		return;
 	}
 
 	if ( !gsn_fade->usable( ch ) )
 		return;
 
-	ch->send_to("Ты пытаешься исчезнуть.\n\r");
+	ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╦я│я┤п╣п╥п╫я┐я┌я▄.\n\r");
 
 	int k = ch->getLastFightDelay( );
 
@@ -171,20 +171,20 @@ VOID_SPELL(EvilSpirit)::run( Character *ch, Room *room, int sn, int level )
  if (IS_RAFFECTED(room, AFF_ROOM_ESPIRIT)
 	|| room->isAffected( sn) )
   {
-   ch->send_to("Эта зона полностью под контролем злых духов.\n\r");
+   ch->send_to("п╜я┌п╟ п╥п╬п╫п╟ п©п╬п╩п╫п╬я│я┌я▄я▌ п©п╬п╢ п╨п╬п╫я┌я─п╬п╩п╣п╪ п╥п╩я▀я┘ п╢я┐я┘п╬п╡.\n\r");
    return;
   }
 
  if ( ch->isAffected(sn ) )
     {
-      ch->send_to("У тебя недостаточно энергии.\n\r");
+      ch->send_to("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦.\n\r");
       return;
     }
 
   if (IS_SET(room->room_flags, ROOM_LAW)
 	|| IS_SET(room->area->area_flag,AREA_HOMETOWN) )
     {
-      ch->send_to("Святая аура в этой комнате не дает творить зло.\n\r");
+      ch->send_to("п║п╡я▐я┌п╟я▐ п╟я┐я─п╟ п╡ я█я┌п╬п╧ п╨п╬п╪п╫п╟я┌п╣ п╫п╣ п╢п╟п╣я┌ я┌п╡п╬я─п╦я┌я▄ п╥п╩п╬.\n\r");
       return;
     }
 
@@ -209,7 +209,7 @@ VOID_SPELL(EvilSpirit)::run( Character *ch, Room *room, int sn, int level )
     {
 	room = i->second;
 	room->affectTo( &af );
-	act("Частица первородного зла проникает в этот мир.", room->people,0,0,TO_ALL);
+	act("п╖п╟я│я┌п╦я├п╟ п©п╣я─п╡п╬я─п╬п╢п╫п╬пЁп╬ п╥п╩п╟ п©я─п╬п╫п╦п╨п╟п╣я┌ п╡ я█я┌п╬я┌ п╪п╦я─.", room->people,0,0,TO_ALL);
     }
 }
 
@@ -220,14 +220,14 @@ VOID_SPELL(EyesOfIntrigue)::run( Character *ch, char *target_name, int sn, int l
 
 	if (( victim = get_char_world_doppel( ch, target_name ) ) == 0 || DIGGED(victim))
 	{
-		ch->send_to("Тьма не может обнаружить такого персонажа.\n\r");
+		ch->send_to("п╒я▄п╪п╟ п╫п╣ п╪п╬п╤п╣я┌ п╬п╠п╫п╟я─я┐п╤п╦я┌я▄ я┌п╟п╨п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╤п╟.\n\r");
 		return;
 	}
 
 	if(is_safe_nomessage(ch,victim) 
 	    || (victim->is_npc( ) && IS_SET(victim->act, ACT_NOEYE)))
 	{
-		ch->send_to("Извини, тьма тут бессильна.\n\r");
+		ch->send_to("п≤п╥п╡п╦п╫п╦, я┌я▄п╪п╟ я┌я┐я┌ п╠п╣я│я│п╦п╩я▄п╫п╟.\n\r");
 		return;
 	}
 
@@ -235,12 +235,12 @@ VOID_SPELL(EyesOfIntrigue)::run( Character *ch, char *target_name, int sn, int l
 	{
 		if(saves_spell(level, victim, DAM_OTHER, ch, DAMF_SPELL))
 		{
-			ch->send_to("У тебя не хватает силы приказать темноте.\n\r");
+			ch->send_to("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩я▀ п©я─п╦п╨п╟п╥п╟я┌я▄ я┌п╣п╪п╫п╬я┌п╣.\n\r");
 			return;
 		}
 
-		victim->pecho( "На миг тебя окружает темнота, из которой на тебя смотрит огромный глаз.\n\r"
-			       "...И тихий звон {Wауры{x рождает имя - {D%#^C1{x.", ch );
+		victim->pecho( "п²п╟ п╪п╦пЁ я┌п╣п╠я▐ п╬п╨я─я┐п╤п╟п╣я┌ я┌п╣п╪п╫п╬я┌п╟, п╦п╥ п╨п╬я┌п╬я─п╬п╧ п╫п╟ я┌п╣п╠я▐ я│п╪п╬я┌я─п╦я┌ п╬пЁя─п╬п╪п╫я▀п╧ пЁп╩п╟п╥.\n\r"
+			       "...п≤ я┌п╦я┘п╦п╧ п╥п╡п╬п╫ {Wп╟я┐я─я▀{x я─п╬п╤п╢п╟п╣я┌ п╦п╪я▐ - {D%#^C1{x.", ch );
 	}
 	
 	do_look_auto( ch, victim->in_room );
@@ -257,13 +257,13 @@ VOID_SPELL(Nightfall)::run( Character *ch, Room *room, int sn, int level )
   Affect af;
 
   if( ch->isAffected(sn ) ) {
-    ch->send_to("У тебя не достаточно энергии для контроля над светом.\n\r");
+    ch->send_to("пё я┌п╣п╠я▐ п╫п╣ п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ п╨п╬п╫я┌я─п╬п╩я▐ п╫п╟п╢ я│п╡п╣я┌п╬п╪.\n\r");
     return;
   }
 
 	if (IS_SET(room->room_flags,ROOM_SAFE))
 	{
-		ch->send_to("Тут нельзя даже такую мелочь, как эта.\n\r");
+		ch->send_to("п╒я┐я┌ п╫п╣п╩я▄п╥я▐ п╢п╟п╤п╣ я┌п╟п╨я┐я▌ п╪п╣п╩п╬я┤я▄, п╨п╟п╨ я█я┌п╟.\n\r");
 		return;
 	}
 
@@ -308,7 +308,7 @@ VOID_SPELL(ShadowCloak)::run( Character *ch, Character *victim, int sn, int leve
     DLString msgChar, msgVict, orgCh, orgVict;
     
     if (ch->is_npc( ) || victim->is_npc( ) || ch->getClan( ) != victim->getClan( )) {
-	ch->println("Это заклинание ты можешь произнести только на члена твоего клана.");
+	ch->println("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ я┌я▀ п╪п╬п╤п╣я┬я▄ п©я─п╬п╦п╥п╫п╣я│я┌п╦ я┌п╬п╩я▄п╨п╬ п╫п╟ я┤п╩п╣п╫п╟ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟.");
 	return;
     }
     
@@ -316,37 +316,37 @@ VOID_SPELL(ShadowCloak)::run( Character *ch, Character *victim, int sn, int leve
     orgVict = ClanOrgs::getAttr( victim->getPC( ) );
 
     if (orgCh != orgVict) {
-	ch->println("Это заклинание ты можешь произнести только на члена твоей организации.");
+	ch->println("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ я┌я▀ п╪п╬п╤п╣я┬я▄ п©я─п╬п╦п╥п╫п╣я│я┌п╦ я┌п╬п╩я▄п╨п╬ п╫п╟ я┤п╩п╣п╫п╟ я┌п╡п╬п╣п╧ п╬я─пЁп╟п╫п╦п╥п╟я├п╦п╦.");
 	return;
     }
 
     if (victim->isAffected( gsn_soul_lust )) {
 	ch->pecho( ch == victim ? 
-			  "Жажда душ уже горит в тебе." :
-			  "Жажда душ уже горит в %C6.", victim );
+			  "п√п╟п╤п╢п╟ п╢я┐я┬ я┐п╤п╣ пЁп╬я─п╦я┌ п╡ я┌п╣п╠п╣." :
+			  "п√п╟п╤п╢п╟ п╢я┐я┬ я┐п╤п╣ пЁп╬я─п╦я┌ п╡ %C6.", victim );
 	return;
     }
 
     if (victim->isAffected( sn ) || victim->isAffected( gsn_shadow_shroud )) {
 	ch->pecho( ch == victim ? 
-			  "Призрачная мантия уже защищает тебя." : 
-			  "Призрачная мантия уже защищает %C4.", victim );
+			  "п÷я─п╦п╥я─п╟я┤п╫п╟я▐ п╪п╟п╫я┌п╦я▐ я┐п╤п╣ п╥п╟я┴п╦я┴п╟п╣я┌ я┌п╣п╠я▐." : 
+			  "п÷я─п╦п╥я─п╟я┤п╫п╟я▐ п╪п╟п╫я┌п╦я▐ я┐п╤п╣ п╥п╟я┴п╦я┴п╟п╣я┌ %C4.", victim );
 	return;
     }
 
     if (orgCh == "killers") {
-	msgVict = "Призрачная мантия окутывает тебя. Ты погружаешься во тьму.";
-	msgChar = "%2$C1 окутывается тьмой.";
+	msgVict = "п÷я─п╦п╥я─п╟я┤п╫п╟я▐ п╪п╟п╫я┌п╦я▐ п╬п╨я┐я┌я▀п╡п╟п╣я┌ я┌п╣п╠я▐. п╒я▀ п©п╬пЁя─я┐п╤п╟п╣я┬я▄я│я▐ п╡п╬ я┌я▄п╪я┐.";
+	msgChar = "%2$C1 п╬п╨я┐я┌я▀п╡п╟п╣я┌я│я▐ я┌я▄п╪п╬п╧.";
 	sn = gsn_shadow_shroud;
     }
     else if (orgVict == "adepts") {
-	msgVict = "В тебе загорается огонь, жаждущий душ ангелов.";
-	msgChar = "В %2$C6 загорается огонь, жаждущий душ ангелов.";
+	msgVict = "п▓ я┌п╣п╠п╣ п╥п╟пЁп╬я─п╟п╣я┌я│я▐ п╬пЁп╬п╫я▄, п╤п╟п╤п╢я┐я┴п╦п╧ п╢я┐я┬ п╟п╫пЁп╣п╩п╬п╡.";
+	msgChar = "п▓ %2$C6 п╥п╟пЁп╬я─п╟п╣я┌я│я▐ п╬пЁп╬п╫я▄, п╤п╟п╤п╢я┐я┴п╦п╧ п╢я┐я┬ п╟п╫пЁп╣п╩п╬п╡.";
 	sn = gsn_soul_lust;
     }
     else {
-	msgVict = "Призрачная мантия окутывает тебя.";
-	msgChar = "Призрачная мантия окутывает %2$C4.";
+	msgVict = "п÷я─п╦п╥я─п╟я┤п╫п╟я▐ п╪п╟п╫я┌п╦я▐ п╬п╨я┐я┌я▀п╡п╟п╣я┌ я┌п╣п╠я▐.";
+	msgChar = "п÷я─п╦п╥я─п╟я┤п╫п╟я▐ п╪п╟п╫я┌п╦я▐ п╬п╨я┐я┌я▀п╡п╟п╣я┌ %2$C4.";
     }
 
     af.type      = sn;
@@ -380,27 +380,27 @@ VOID_SPELL(Shadowlife)::run( Character *ch, Character *victim, int sn, int level
 
 	if (victim->is_npc())
 	{
-		ch->send_to("Бесполезная трата сил и энергии...\n\r");
+		ch->send_to("п▒п╣я│п©п╬п╩п╣п╥п╫п╟я▐ я┌я─п╟я┌п╟ я│п╦п╩ п╦ я█п╫п╣я─пЁп╦п╦...\n\r");
 		return;
 	}
 
 	if (ch->isAffected(sn))
 	{
-		ch->send_to("У тебя недостаточно энергии, чтобы создать тень.\n\r");
+		ch->send_to("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦, я┤я┌п╬п╠я▀ я│п╬п╥п╢п╟я┌я▄ я┌п╣п╫я▄.\n\r");
 		return;
 	}
 
 	if ( victim->isAffected(gsn_golden_aura )
 		&& saves_spell(level, victim, DAM_OTHER, ch, DAMF_SPELL) )
 	{
-		ch->send_to("Тьма пытается сделать это для тебя, но не может.\n\r");
-		victim->send_to("Около тебя появляется твоя тень, но тут же исчезает.\n\r");
+		ch->send_to("п╒я▄п╪п╟ п©я▀я┌п╟п╣я┌я│я▐ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬ п╢п╩я▐ я┌п╣п╠я▐, п╫п╬ п╫п╣ п╪п╬п╤п╣я┌.\n\r");
+		victim->send_to("п·п╨п╬п╩п╬ я┌п╣п╠я▐ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я┌п╡п╬я▐ я┌п╣п╫я▄, п╫п╬ я┌я┐я┌ п╤п╣ п╦я│я┤п╣п╥п╟п╣я┌.\n\r");
 		return;
 	}
 
-  act_p("Ты даешь жизнь тени $C2!",ch, 0, victim, TO_CHAR,POS_RESTING);
-  act_p("$c1 дает жизнь тени $C2!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-  act_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT,POS_RESTING);
+  act_p("п╒я▀ п╢п╟п╣я┬я▄ п╤п╦п╥п╫я▄ я┌п╣п╫п╦ $C2!",ch, 0, victim, TO_CHAR,POS_RESTING);
+  act_p("$c1 п╢п╟п╣я┌ п╤п╦п╥п╫я▄ я┌п╣п╫п╦ $C2!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+  act_p("$c1 п╢п╟п╣я┌ п╤п╦п╥п╫я▄ я┌п╡п╬п╣п╧ я┌п╣п╫п╦!", ch, 0, victim, TO_VICT,POS_RESTING);
 
   victim->getPC()->shadow	= ch->getModifyLevel() / 10;
 
@@ -442,8 +442,8 @@ VOID_AFFECT(EvilSpirit)::update( Room *room, Affect *paf )
 		&& !is_safe_rspell(vch->getModifyLevel() + 2, vch)
 		&& !vch->isAffected(gsn_evil_spirit) && number_bits(3) == 0 )
 	{
-	    vch->send_to("Злые духи овладевают тобой.\n\r");
-	    act_p("Злые духи овладевают $c1.",vch,0,0,TO_ROOM,POS_RESTING);
+	    vch->send_to("п≈п╩я▀п╣ п╢я┐я┘п╦ п╬п╡п╩п╟п╢п╣п╡п╟я▌я┌ я┌п╬п╠п╬п╧.\n\r");
+	    act_p("п≈п╩я▀п╣ п╢я┐я┘п╦ п╬п╡п╩п╟п╢п╣п╡п╟я▌я┌ $c1.",vch,0,0,TO_ROOM,POS_RESTING);
 	    affect_join(vch,&af);
 	}
     }
@@ -451,7 +451,7 @@ VOID_AFFECT(EvilSpirit)::update( Room *room, Affect *paf )
 
 VOID_AFFECT(EvilSpirit)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Злые духи воцарились здесь на {W%1$d{x ча%1$Iс|са|сов.", paf->duration )
+    buf << fmt( 0, "п≈п╩я▀п╣ п╢я┐я┘п╦ п╡п╬я├п╟я─п╦п╩п╦я│я▄ п╥п╢п╣я│я▄ п╫п╟ {W%1$d{x я┤п╟%1$Iя│|я│п╟|я│п╬п╡.", paf->duration )
 	<< endl;
 }
 
@@ -472,17 +472,17 @@ COMMAND(CDarkLeague, "darkleague")
     pch = ch->getPC( );
     
     if (pch->getClan( ) != clan_invader) {
-	pch->println( "Ты не принадлежишь к клану Захватчиков." );
+	pch->println( "п╒я▀ п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┬я▄ п╨ п╨п╩п╟п╫я┐ п≈п╟я┘п╡п╟я┌я┤п╦п╨п╬п╡." );
 	return;
     }
     
     if (!( orgs = clan_invader->getOrgs( ) )) {
-	pch->println( "Попробуй позже." );
+	pch->println( "п÷п╬п©я─п╬п╠я┐п╧ п©п╬п╥п╤п╣." );
 	return;
     }
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-	pch->println( "Твоих полномочий недостаточно." );
+	pch->println( "п╒п╡п╬п╦я┘ п©п╬п╩п╫п╬п╪п╬я┤п╦п╧ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬." );
 	return;
     }
 
@@ -496,19 +496,19 @@ COMMAND(CDarkLeague, "darkleague")
     else if (arg_is_list( cmd )) {
 	orgs->doList( pch );
     }
-    else if (arg_oneof( cmd, "induct", "принять" )) {
+    else if (arg_oneof( cmd, "induct", "п©я─п╦п╫я▐я┌я▄" )) {
 	if (arg_is_self( arg ))
 	    orgs->doSelfInduct( pch, arguments );
 	else
 	    orgs->doInduct( pch, arg );
     }
-    else if (arg_oneof( cmd, "remove", "выгнать", "уйти" )) {
+    else if (arg_oneof( cmd, "remove", "п╡я▀пЁп╫п╟я┌я▄", "я┐п╧я┌п╦" )) {
 	if (arg_is_self( arg ))
 	    orgs->doSelfRemove( pch );
 	else
 	    orgs->doRemove( pch, arg );
     }
-    else if (arg_oneof( cmd, "members", "члены" )) {
+    else if (arg_oneof( cmd, "members", "я┤п╩п╣п╫я▀" )) {
 	orgs->doMembers( pch );
     }
     else {
@@ -520,15 +520,15 @@ void CDarkLeague::doUsage( PCharacter *pch )
 {
     ostringstream buf;
 
-    buf << "Для руководства: " << endl
-        << "{wdarkleague list{x            - посмотреть список групп" << endl
-	<< "{wdarkleague members{x         - посмотреть список членов группы" << endl
-	<< "{wdarkleague remove self{x     - выйти из группы" << endl
-	<< "{wdarkleague induct <{Dname{w>{x - принять кого-то в группу" << endl
-	<< "{wdarkleague remove <{Dname{w>{x - выгнать кого-то из группы" << endl
+    buf << "п■п╩я▐ я─я┐п╨п╬п╡п╬п╢я│я┌п╡п╟: " << endl
+        << "{wdarkleague list{x            - п©п╬я│п╪п╬я┌я─п╣я┌я▄ я│п©п╦я│п╬п╨ пЁя─я┐п©п©" << endl
+	<< "{wdarkleague members{x         - п©п╬я│п╪п╬я┌я─п╣я┌я▄ я│п©п╦я│п╬п╨ я┤п╩п╣п╫п╬п╡ пЁя─я┐п©п©я▀" << endl
+	<< "{wdarkleague remove self{x     - п╡я▀п╧я┌п╦ п╦п╥ пЁя─я┐п©п©я▀" << endl
+	<< "{wdarkleague induct <{Dname{w>{x - п©я─п╦п╫я▐я┌я▄ п╨п╬пЁп╬-я┌п╬ п╡ пЁя─я┐п©п©я┐" << endl
+	<< "{wdarkleague remove <{Dname{w>{x - п╡я▀пЁп╫п╟я┌я▄ п╨п╬пЁп╬-я┌п╬ п╦п╥ пЁя─я┐п©п©я▀" << endl
 	<< endl
-	<< "Для лидера: " << endl
-	<< "{wdarkleague induct self <{Dname{w>{x - принять себя в группу" << endl;
+	<< "п■п╩я▐ п╩п╦п╢п╣я─п╟: " << endl
+	<< "{wdarkleague induct self <{Dname{w>{x - п©я─п╦п╫я▐я┌я▄ я│п╣п╠я▐ п╡ пЁя─я┐п©п©я┐" << endl;
 
     pch->send_to( buf );
 }

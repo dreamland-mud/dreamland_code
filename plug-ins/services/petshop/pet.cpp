@@ -39,17 +39,17 @@ void Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     NPCharacter *pet;
     
     if (client->is_npc( ) || client->getPC( )->pet) {
-	client->println( "У тебя уже есть одно домашнее животное." );
+	client->println( "пё я┌п╣п╠я▐ я┐п╤п╣ п╣я│я┌я▄ п╬п╢п╫п╬ п╢п╬п╪п╟я┬п╫п╣п╣ п╤п╦п╡п╬я┌п╫п╬п╣." );
 	return;
     }
 
     if (!canAfford( client )) {
-	client->pecho( "У тебя не хватает %N2, чтобы заплатить за это.", toCurrency( ).c_str( ) );
+	client->pecho( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ %N2, я┤я┌п╬п╠я▀ п╥п╟п©п╩п╟я┌п╦я┌я▄ п╥п╟ я█я┌п╬.", toCurrency( ).c_str( ) );
 	return;
     }
 
     if (getLevel( client ) > client->getModifyLevel( )) {
-	client->println( "У тебя недостаточно опыта, чтобы справиться с этим животным." );
+	client->println( "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╬п©я▀я┌п╟, я┤я┌п╬п╠я▀ я│п©я─п╟п╡п╦я┌я▄я│я▐ я│ я█я┌п╦п╪ п╤п╦п╡п╬я┌п╫я▀п╪." );
 	return;
     }
 
@@ -57,8 +57,8 @@ void Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     pet = create( client->getPC( ) ); 
     client->setWaitViolence( 1 );
     
-    act( "В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
-    act( "$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
+    act( "п▓ я┌я─я┐п╢п╫я┐я▌ п╪п╦п╫я┐я┌я┐ $E п©п╬п╪п╬п╤п╣я┌ я┌п╣п╠п╣!", client, 0, pet, TO_CHAR );
+    act( "$c1 п©я─п╦п╬п╠я─п╣я┌п╟п╣я┌ $C4.", client, 0, pet, TO_ROOM );
 }
 
 bool Pet::available( Character *client, NPCharacter *keeper ) const
@@ -90,7 +90,7 @@ int Pet::haggle( Character *client ) const
 
     if (roll < gsn_haggle->getEffective( client )) {
 	cost -= cost / 2 * roll / 100;
-	client->printf( "Ты торгуешься и цена снижается до %d монет.\r\n", cost );
+	client->printf( "п╒я▀ я┌п╬я─пЁя┐п╣я┬я▄я│я▐ п╦ я├п╣п╫п╟ я│п╫п╦п╤п╟п╣я┌я│я▐ п╢п╬ %d п╪п╬п╫п╣я┌.\r\n", cost );
 	gsn_haggle->improve( client, true );
     }
     
@@ -112,7 +112,7 @@ void Pet::config( PCharacter *client, NPCharacter *pet ) const
 	pet->alignment = client->alignment;
     
     pet->setDescription( dlprintf( 
-	     "%s\r\nТабличка на ошейнике %s гласит {C'Я принадлежу %s'{x.\n\r", 
+	     "%s\r\nп╒п╟п╠п╩п╦я┤п╨п╟ п╫п╟ п╬я┬п╣п╧п╫п╦п╨п╣ %s пЁп╩п╟я│п╦я┌ {C'п╞ п©я─п╦п╫п╟п╢п╩п╣п╤я┐ %s'{x.\n\r", 
 	     pet->getDescription( ), 
 	     pet->getNameP( '2' ).c_str( ), client->getNameP( '3' ).c_str( ) ) );
 }
@@ -229,17 +229,17 @@ void RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
 	return;
 
     if (MOUNTED(client)) {
-	client->println( "У тебя уже есть скакун." );
+	client->println( "пё я┌п╣п╠я▐ я┐п╤п╣ п╣я│я┌я▄ я│п╨п╟п╨я┐п╫." );
 	return;
     }
 
     if (!canAfford( client )) {
-	client->pecho( "У тебя не хватает %N2, чтобы заплатить за это.", toCurrency( ).c_str( ) );
+	client->pecho( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ %N2, я┤я┌п╬п╠я▀ п╥п╟п©п╩п╟я┌п╦я┌я▄ п╥п╟ я█я┌п╬.", toCurrency( ).c_str( ) );
 	return;
     }
 
     if (getLevel( client ) - 5 > client->getModifyLevel( )) {
-	ch->println("Тебе не хватит опыта справиться с этим скакуном.");
+	ch->println("п╒п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╦я┌ п╬п©я▀я┌п╟ я│п©я─п╟п╡п╦я┌я▄я│я▐ я│ я█я┌п╦п╪ я│п╨п╟п╨я┐п╫п╬п╪.");
 	return;
     }
 
@@ -249,7 +249,7 @@ void RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     
     interpret_fmt( client, "mount %s", horse->getNameP( ) );
 
-    client->println("Наслаждайся своей лошадью.");
-    act( "$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
+    client->println("п²п╟я│п╩п╟п╤п╢п╟п╧я│я▐ я│п╡п╬п╣п╧ п╩п╬я┬п╟п╢я▄я▌.");
+    act( "$c1 п©я─п╦п╬п╠я─п╣я┌п╟п╣я┌ п╢п╩я▐ п╡п╣я─я┘п╬п╡п╬п╧ п╣п╥п╢я▀ $C4.", client, 0, horse, TO_ROOM );
 }
 

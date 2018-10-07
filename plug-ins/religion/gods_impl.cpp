@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 #include "gods_impl.h"
 
@@ -37,14 +37,14 @@ void AtumRaGod::tattooFight( Object *obj, Character *ch ) const
     switch(number_bits(6)) {
     case 0:
     case 1:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ×ÓÐÙÈÉ×ÁÅÔ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð²ÑÐ¿Ñ‹Ñ…Ð¸Ð²Ð°ÐµÑ‚ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       break;
     case 2:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ×ÓÐÙÈÉ×ÁÅÔ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð²ÑÐ¿Ñ‹Ñ…Ð¸Ð²Ð°ÐµÑ‚ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
-      do_yell( ch, "ðÏÔÁÎÃÕÊ ÓÏ {Wó×ÅÔÏÍ!{x");
+      do_yell( ch, "ÐŸÐ¾Ñ‚Ð°Ð½Ñ†ÑƒÐ¹ ÑÐ¾ {WÐ¡Ð²ÐµÑ‚Ð¾Ð¼!{x");
       spell( gsn_wrath, ch->getModifyLevel( ), ch, ch->fighting );
       break;
     }
@@ -57,12 +57,12 @@ void ZeusGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
     case 1:
     case 2:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch );
       break;
     case 3:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       if (IS_AFFECTED(ch,AFF_PLAGUE))	
 	spell( gsn_cure_disease, 100, ch, ch );
@@ -76,12 +76,12 @@ void SiebeleGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(6)) {
     case 0:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch,ch );
       break;
     case 1:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
 	spell( gsn_bluefire, ch->getModifyLevel( ), ch, ch->fighting );
       break;
@@ -92,17 +92,17 @@ void AhuramazdaGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(6)) {
     case 0:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_light, ch->getModifyLevel(), ch, ch );
       break;
     case 1:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       break;
     case 2:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell( gsn_dispel_evil, ch->getModifyLevel( ), ch, ch->fighting );
       break;
@@ -114,12 +114,12 @@ void ShamashGod::tattooFight( Object *obj, Character *ch ) const
     switch(number_bits(6)) {
     case 0:
     case 1:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       break;
     case 2:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       do_yell(ch,"And justice for all!....");
       spell( gsn_scream, ch->getModifyLevel( ), ch, ch->in_room );
@@ -131,12 +131,12 @@ void EhrumenGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(6)) {
     case 0:
-      act_p("{BôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{BÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       break;
     case 1:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_demonfire, ch->getModifyLevel(), ch, ch->fighting );
       break;
@@ -149,17 +149,17 @@ void VenusGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
     case 1:
     case 2:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_light, ch->getModifyLevel(), ch, ch );
       break;
     case 3:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_plague, ch->getModifyLevel(), ch, ch->fighting );
       break;
     case 4:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_bless, ch->getModifyLevel(), ch, ch );
       break;
@@ -170,12 +170,12 @@ void SethGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(5)) {
     case 0:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_dragon_strength, ch->getModifyLevel(), ch, ch );
       break;
     case 1:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell( gsn_dragon_breath, ch->getModifyLevel( ), ch, ch->fighting );
       break;
@@ -187,12 +187,12 @@ void OdinGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(5)) {
     case 0:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch );
       break;
     case 1:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_faerie_fire, ch->getModifyLevel(), ch, ch->fighting );
       break;
@@ -203,12 +203,12 @@ void PhobosGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(6)) {
     case 0:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       break;
     case 1:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_colour_spray, ch->getModifyLevel(), ch, ch->fighting );
       break;
@@ -220,19 +220,19 @@ void TeshubGod::tattooFight( Object *obj, Character *ch ) const
     switch(number_bits(5)) {
     case 0:
       spell(gsn_blindness, ch->getModifyLevel(), ch, ch->fighting );
-      ch->send_to("{rôÙ ÎÁÓÙÌÁÅÛØ ÚÁ×ÅÓÕ ÚÁÍÅÛÁÔÅÌØÓÔ×Á.{x\n\r");
+      ch->send_to("{rÐ¢Ñ‹ Ð½Ð°ÑÑ‹Ð»Ð°ÐµÑˆÑŒ Ð·Ð°Ð²ÐµÑÑƒ Ð·Ð°Ð¼ÐµÑˆÐ°Ñ‚ÐµÐ»ÑŒÑÑ‚Ð²Ð°.{x\n\r");
       break;
     case 1:
       spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting );
-      ch->send_to("{gîÅÍÎÏÇÏ Ô×ÏÅÇÏ ÂÅÚÕÍÉÑ ÐÅÒÅÈÏÄÉÔ ÎÁ Ô×ÏÅÇÏ ÐÒÏÔÉ×ÎÉËÁ.{x\n\r");
+      ch->send_to("{gÐÐµÐ¼Ð½Ð¾Ð³Ð¾ Ñ‚Ð²Ð¾ÐµÐ³Ð¾ Ð±ÐµÐ·ÑƒÐ¼Ð¸Ñ Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´Ð¸Ñ‚ Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ³Ð¾ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð½Ð¸ÐºÐ°.{x\n\r");
       break;
     case 2:
       spell(gsn_haste, ch->getModifyLevel(), ch, ch );
-      ch->send_to("{WôÙ ×ÎÅÚÁÐÎÏ ÏÝÕÝÁÅÛØ ÐÏ×ÙÛÅÎÎÕÀ ÁËÔÉ×ÎÏÓÔØ!{x\n\r");
+      ch->send_to("{WÐ¢Ñ‹ Ð²Ð½ÐµÐ·Ð°Ð¿Ð½Ð¾ Ð¾Ñ‰ÑƒÑ‰Ð°ÐµÑˆÑŒ Ð¿Ð¾Ð²Ñ‹ÑˆÐµÐ½Ð½ÑƒÑŽ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ!{x\n\r");
       break;
     case 3:
       spell(gsn_shield, ch->getModifyLevel(), ch, ch );
-      ch->send_to("{WôÙ ÞÕ×ÓÔ×ÕÅÛØ ÓÅÂÑ ÅÝÅ ÂÏÌØÛÉÍ ÐÁÒÁÎÏÉËÏÍ!{x\n\r");
+      ch->send_to("{WÐ¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÑÐµÐ±Ñ ÐµÑ‰Ðµ Ð±Ð¾Ð»ÑŒÑˆÐ¸Ð¼ Ð¿Ð°Ñ€Ð°Ð½Ð¾Ð¸ÐºÐ¾Ð¼!{x\n\r");
       break;
     }
 }
@@ -248,7 +248,7 @@ void AresGod::tattooFight( Object *obj, Character *ch ) const
 	  if (IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk)
 	      ||  ch->isAffected(gsn_frenzy))
 	    {
-		act("ôÙ ÓÔÁÎÏ×ÉÛØÓÑ ÎÅÍÎÏÇÏ ÄÉË$gÉÍ|ÉÍ|ÏÊ.", ch, 0, 0, TO_CHAR);
+		act("Ð¢Ñ‹ ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸ÑˆÑŒÑÑ Ð½ÐµÐ¼Ð½Ð¾Ð³Ð¾ Ð´Ð¸Ðº$gÐ¸Ð¼|Ð¸Ð¼|Ð¾Ð¹.", ch, 0, 0, TO_CHAR);
 	      return;
 	    }
 
@@ -272,8 +272,8 @@ void AresGod::tattooFight( Object *obj, Character *ch ) const
 	  ch->hit += ch->getModifyLevel() * 4;
 	  ch->hit = std::min( ch->hit, ch->max_hit );
 	
-	  ch->send_to("ô×ÏÊ ÐÕÌØÓ ÕÞÁÝÁÅÔÓÑ, ËÏÇÄÁ ÑÒÏÓÔØ ÏÈ×ÁÔÙ×ÁÅÔ ÔÅÂÑ!\n\r");
-	  act_p("÷ÚÇÌÑÄ $c2 ÓÔÁÎÏ×ÉÔÓÑ ÄÉËÉÍ.", ch,0,0,TO_ROOM,POS_RESTING);
+	  ch->send_to("Ð¢Ð²Ð¾Ð¹ Ð¿ÑƒÐ»ÑŒÑ ÑƒÑ‡Ð°Ñ‰Ð°ÐµÑ‚ÑÑ, ÐºÐ¾Ð³Ð´Ð° ÑÑ€Ð¾ÑÑ‚ÑŒ Ð¾Ñ…Ð²Ð°Ñ‚Ñ‹Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ!\n\r");
+	  act_p("Ð’Ð·Ð³Ð»ÑÐ´ $c2 ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ Ð´Ð¸ÐºÐ¸Ð¼.", ch,0,0,TO_ROOM,POS_RESTING);
 
 	  break;
 	}
@@ -305,22 +305,22 @@ void HeraGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(5)) {
     case 0:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_plague, ch->getModifyLevel(), ch, ch->fighting );
       break;
     case 1:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting );
       break;
     case 2:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting );
       break;
     case 3:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_slow, ch->getModifyLevel(), ch, ch->fighting );
       break;
@@ -333,12 +333,12 @@ void DeimosGod::tattooFight( Object *obj, Character *ch ) const
     switch(number_bits(6)) {
     case 0:
     case 1:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       break;
     case 2:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell( gsn_web, ch->getModifyLevel( ), ch, ch->fighting );
       break;
@@ -353,13 +353,13 @@ void ErosGod::tattooFight( Object *obj, Character *ch ) const
     case 1:
       if ( number_percent() < URANGE(10, ch->getModifyLevel()-5, 90) )
       {
-        act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÏÓÌÅÐÉÔÅÌØÎÙÍ Ó×ÅÔÏÍ.{x",
+        act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð¾ÑÐ»ÐµÐ¿Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
         spell( gsn_heal, ch->getModifyLevel(), ch, ch );
       }	
       else
       {
-        act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+        act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
         spell( gsn_cure_serious, ch->getModifyLevel(), ch, ch );
       }	
@@ -368,13 +368,13 @@ void ErosGod::tattooFight( Object *obj, Character *ch ) const
     case 3:
       if ( number_percent() < URANGE(10, ch->getModifyLevel()-5, 90) )
       {
-        act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÏÓÌÅÐÉÔÅÌØÎÙÍ Ó×ÅÔÏÍ.{x",
+        act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð¾ÑÐ»ÐµÐ¿Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
         spell( gsn_heal, ch->getModifyLevel(), ch, ch );
       }	
       else
       {
-        act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+        act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
         spell( gsn_cure_critical, ch->getModifyLevel(), ch, ch );
       }	
@@ -387,13 +387,13 @@ void EnkiGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(5)) {
     case 0:
-      act_p("{CôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÇÏÌÕÂÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{CÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð³Ð¾Ð»ÑƒÐ±Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch );
       break;
     case 1:
     case 2:
-      act_p("{rôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ËÒÁÓÎÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{rÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ ÐºÑ€Ð°ÑÐ½Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       
       if (IS_EVIL(ch->fighting) && !IS_EVIL(ch))
@@ -413,7 +413,7 @@ void GoktengriGod::tattooFight( Object *obj, Character *ch ) const
     switch(number_bits(4)) {
     case 0:
     case 1:
-      act_p("{WôÁÔÕÉÒÏ×ËÁ ÎÁ Ô×ÏÅÍ ÐÌÅÞÅ ÚÁÇÏÒÁÅÔÓÑ ÂÅÌÙÍ Ó×ÅÔÏÍ.{x",
+      act_p("{WÐ¢Ð°Ñ‚ÑƒÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð½Ð° Ñ‚Ð²Ð¾ÐµÐ¼ Ð¿Ð»ÐµÑ‡Ðµ Ð·Ð°Ð³Ð¾Ñ€Ð°ÐµÑ‚ÑÑ Ð±ÐµÐ»Ñ‹Ð¼ ÑÐ²ÐµÑ‚Ð¾Ð¼.{x",
 		   ch,0,0,TO_CHAR,POS_DEAD);
       do_say(ch,"My honour is my life.");
       one_hit(ch, ch->fighting);

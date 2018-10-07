@@ -57,27 +57,27 @@ NMI_INVOKE(FeniaString, ruscase, "")
     return Register( ruscase( cse + '0' ) );
 }
 
-NMI_INVOKE(FeniaString, getOneArgument, "возвращает первое слово или первую фразу в кавычках")
+NMI_INVOKE(FeniaString, getOneArgument, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©п╣я─п╡п╬п╣ я│п╩п╬п╡п╬ п╦п╩п╦ п©п╣я─п╡я┐я▌ я└я─п╟п╥я┐ п╡ п╨п╟п╡я▀я┤п╨п╟я┘")
 {
     DLString str = *this;
     return str.getOneArgument( );
 }
 
-NMI_INVOKE(FeniaString, cutOneArgument, "возвращает строку без первого слова (или без первой фразы в кавычках)")
+NMI_INVOKE(FeniaString, cutOneArgument, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я│я┌я─п╬п╨я┐ п╠п╣п╥ п©п╣я─п╡п╬пЁп╬ я│п╩п╬п╡п╟ (п╦п╩п╦ п╠п╣п╥ п©п╣я─п╡п╬п╧ я└я─п╟п╥я▀ п╡ п╨п╟п╡я▀я┤п╨п╟я┘)")
 {
     DLString str = *this;
     str.getOneArgument( );
     return str;
 }
 
-NMI_INVOKE(FeniaString, upperFirstChar, "Возвращает ту же  строку, но с большой буквы")
+NMI_INVOKE(FeniaString, upperFirstChar, "п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌я┐ п╤п╣  я│я┌я─п╬п╨я┐, п╫п╬ я│ п╠п╬п╩я▄я┬п╬п╧ п╠я┐п╨п╡я▀")
 {
     DLString str = *this;
     str.upperFirstCharacter();
     return Register( str );
 }
 
-NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) заменяет в данной строке все вхождения $1..$9 на соответствующие совпадения") 
+NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) п╥п╟п╪п╣п╫я▐п╣я┌ п╡ п╢п╟п╫п╫п╬п╧ я│я┌я─п╬п╨п╣ п╡я│п╣ п╡я┘п╬п╤п╢п╣п╫п╦я▐ $1..$9 п╫п╟ я│п╬п╬я┌п╡п╣я┌я│я┌п╡я┐я▌я┴п╦п╣ я│п╬п╡п©п╟п╢п╣п╫п╦я▐") 
 {
     if (args.size() != 2)
 	throw NotEnoughArgumentsException();
@@ -107,7 +107,7 @@ NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) заменяет в данной строк
     return result;
 }
 
-NMI_INVOKE(FeniaString, matchGroups, "(pattern) возвращает все группы шаблона") 
+NMI_INVOKE(FeniaString, matchGroups, "(pattern) п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п╡я│п╣ пЁя─я┐п©п©я▀ я┬п╟п╠п╩п╬п╫п╟") 
 {
     if (args.size() != 1)
 	throw NotEnoughArgumentsException();
@@ -187,7 +187,7 @@ NMI_INVOKE(FeniaString, is_name, "")
     return is_name( l, r );
 }
 
-NMI_INVOKE(FeniaString, substr, "возвращает подстроку, первый аргумент - смещение относительно начала, второй - длина подстроки, по умолчанию - до конца")
+NMI_INVOKE(FeniaString, substr, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©п╬п╢я│я┌я─п╬п╨я┐, п©п╣я─п╡я▀п╧ п╟я─пЁя┐п╪п╣п╫я┌ - я│п╪п╣я┴п╣п╫п╦п╣ п╬я┌п╫п╬я│п╦я┌п╣п╩я▄п╫п╬ п╫п╟я┤п╟п╩п╟, п╡я┌п╬я─п╬п╧ - п╢п╩п╦п╫п╟ п©п╬п╢я│я┌я─п╬п╨п╦, п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ - п╢п╬ п╨п╬п╫я├п╟")
 {
     if (args.empty())
 	throw NotEnoughArgumentsException();
@@ -248,7 +248,7 @@ NMI_INVOKE(FeniaString, contains, "")
     return false;
 }
 
-NMI_INVOKE(FeniaString, split, "параметр - разделитель. возвращает List из подстрок")
+NMI_INVOKE(FeniaString, split, "п©п╟я─п╟п╪п╣я┌я─ - я─п╟п╥п╢п╣п╩п╦я┌п╣п╩я▄. п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ List п╦п╥ п©п╬п╢я│я┌я─п╬п╨")
 {
     char delim;
     size_type pos1, pos2;
@@ -287,7 +287,7 @@ NMI_INVOKE(FeniaString, api, "")
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(FeniaString, format, "превращает строку в абзац заданной ширины")
+NMI_INVOKE(FeniaString, format, "п©я─п╣п╡я─п╟я┴п╟п╣я┌ я│я┌я─п╬п╨я┐ п╡ п╟п╠п╥п╟я├ п╥п╟п╢п╟п╫п╫п╬п╧ я┬п╦я─п╦п╫я▀")
 {
     int width;
     ostringstream os;
@@ -304,7 +304,7 @@ NMI_INVOKE(FeniaString, format, "превращает строку в абзац заданной ширины")
 }
 
 
-NMI_INVOKE(FeniaString, replace, "заменяет все вхождения первой подстроки на вторую")
+NMI_INVOKE(FeniaString, replace, "п╥п╟п╪п╣п╫я▐п╣я┌ п╡я│п╣ п╡я┘п╬п╤п╢п╣п╫п╦я▐ п©п╣я─п╡п╬п╧ п©п╬п╢я│я┌я─п╬п╨п╦ п╫п╟ п╡я┌п╬я─я┐я▌")
 {
     DLString aStr, bStr;
     RegisterList::const_iterator iter;
@@ -321,7 +321,7 @@ NMI_INVOKE(FeniaString, replace, "заменяет все вхождения первой подстроки на вто
     return r;
 }
 
-NMI_INVOKE(FeniaString, isRussian, "возвращает true если строка не пуста и содержит только русские буквы")
+NMI_INVOKE(FeniaString, isRussian, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ true п╣я│п╩п╦ я│я┌я─п╬п╨п╟ п╫п╣ п©я┐я│я┌п╟ п╦ я│п╬п╢п╣я─п╤п╦я┌ я┌п╬п╩я▄п╨п╬ я─я┐я│я│п╨п╦п╣ п╠я┐п╨п╡я▀")
 {
     if (empty( ))
 	return false;

@@ -37,7 +37,7 @@ bool Quest::help( PCharacter *ch, NPCharacter *questman )
 
 void Quest::helpMessage( ostringstream &buf )
 {
-    buf << "ôÅÂÅ ÎÅÏÂÈÏÄÉÍÏ ÓÌÅÄÏ×ÁÔØ ÐÏ ÓÌÅÄÕÀÝÅÍÕ ÐÕÔÉ: ";
+    buf << "Ð¢ÐµÐ±Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð¿Ð¾ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ¼Ñƒ Ð¿ÑƒÑ‚Ð¸: ";
 }
 
 Room * Quest::helpLocation( )

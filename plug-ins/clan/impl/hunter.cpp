@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "hunter.h"
@@ -93,51 +93,51 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
 	return;
    
     if (wch->getClan( ) != clanArea->getClan( )) {
-	do_say(ch, "Тебе придется сильно постараться!");
+	do_say(ch, "п╒п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ я│п╦п╩я▄п╫п╬ п©п╬я│я┌п╟я─п╟я┌я▄я│я▐!");
 	return;
     }
 
     if (!wch->getAttributes( ).isAvailable( "hunterarmor" )) {
-	do_say(ch, "Что ты имеешь в виду?");
+	do_say(ch, "п╖я┌п╬ я┌я▀ п╦п╪п╣п╣я┬я▄ п╡ п╡п╦п╢я┐?");
 	return;
     }
     
     obj = get_obj_world_unique( vnum, wch );
     
     if (!obj) {
-	do_say( ch, "Ты уже не сможешь найти свое оружие!" );
+	do_say( ch, "п╒я▀ я┐п╤п╣ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╫п╟п╧я┌п╦ я│п╡п╬п╣ п╬я─я┐п╤п╦п╣!" );
     
 	if (vnum == clanArea->armorVnum) 
 	    obj = clanArea->createArmor( wch );
 	else
 	    obj = clanArea->createWeapon( wch, vnum );
 	
-	interpret_fmt( ch, "emote создает %s.", obj->getShortDescr( '4' ).c_str( ) );
-	interpret_fmt( ch, "say Я дам тебе другой %s.", obj->getShortDescr( '4' ).c_str( ) );
-	act( "$C1 дает $o4 $c3.", wch, obj, ch, TO_ROOM );
-	act( "$C1 дает тебе $o4.", wch, obj, ch, TO_CHAR );
+	interpret_fmt( ch, "emote я│п╬п╥п╢п╟п╣я┌ %s.", obj->getShortDescr( '4' ).c_str( ) );
+	interpret_fmt( ch, "say п╞ п╢п╟п╪ я┌п╣п╠п╣ п╢я─я┐пЁп╬п╧ %s.", obj->getShortDescr( '4' ).c_str( ) );
+	act( "$C1 п╢п╟п╣я┌ $o4 $c3.", wch, obj, ch, TO_ROOM );
+	act( "$C1 п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.", wch, obj, ch, TO_CHAR );
 	obj_to_char( obj, wch );
-	do_say( ch, "Будь внимательней! Не потеряй снова!" );
+	do_say( ch, "п▒я┐п╢я▄ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╣п╧! п²п╣ п©п╬я┌п╣я─я▐п╧ я│п╫п╬п╡п╟!" );
 	return;
     }
 
     if (( carrier = obj->getCarrier( ) )) {
 	if (carrier == wch) {
-	    do_say( ch, "Это шутка такая? Давай посмеемся вместе!" );
+	    do_say( ch, "п╜я┌п╬ я┬я┐я┌п╨п╟ я┌п╟п╨п╟я▐? п■п╟п╡п╟п╧ п©п╬я│п╪п╣п╣п╪я│я▐ п╡п╪п╣я│я┌п╣!" );
 	    interpret_raw( ch, "smite", wch->getNameP( ));
 	}
 	else {
-	    interpret_raw( ch, "say", "%s находится у %s!",
+	    interpret_raw( ch, "say", "%s п╫п╟я┘п╬п╢п╦я┌я│я▐ я┐ %s!",
 			    obj->getShortDescr( '1' ).c_str( ),
 			    wch->sees( carrier, '4' ).c_str( ) );
-	    interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
+	    interpret_raw( ch, "say", "%s п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ п╥п╬п╫п╣ %s п╬п╨п╬п╩п╬ %s!",
 			    wch->sees( carrier, '1' ).c_str( ),
 			    carrier->in_room->area->name,
 			    carrier->in_room->name );
 	}
     }
     else {
-	interpret_raw( ch, "say", "%s находится в зоне %s около %s!",
+	interpret_raw( ch, "say", "%s п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ п╥п╬п╫п╣ %s п╬п╨п╬п╩п╬ %s!",
 			obj->getShortDescr( '1' ).c_str( ),
 			obj->getRoom( )->area->name, 
 			obj->getRoom( )->name );
@@ -149,13 +149,13 @@ void ClanHealerHunter::speech( Character *ach, const char *speech )
  *-------------------------------------------------------------------------*/
 void ClanGuardHunter::actPush( PCharacter *wch )
 {
-    act( "$C1 вытягивает такой страшненький ножичек и слегка щекочет тебя.\n\r...Ты с диким воплем подпрыгиваешь и уносишься не видя ничего перед собой.", wch, 0, ch, TO_CHAR );
-    act( "$C1 вытягивает такой страшненький ножичек и слегка щекочет $c4\n\r... $c1 с диким воплем уносится не видя ничего перед собой.", wch, 0, ch, TO_ROOM );
+    act( "$C1 п╡я▀я┌я▐пЁп╦п╡п╟п╣я┌ я┌п╟п╨п╬п╧ я│я┌я─п╟я┬п╫п╣п╫я▄п╨п╦п╧ п╫п╬п╤п╦я┤п╣п╨ п╦ я│п╩п╣пЁп╨п╟ я┴п╣п╨п╬я┤п╣я┌ я┌п╣п╠я▐.\n\r...п╒я▀ я│ п╢п╦п╨п╦п╪ п╡п╬п©п╩п╣п╪ п©п╬п╢п©я─я▀пЁп╦п╡п╟п╣я┬я▄ п╦ я┐п╫п╬я│п╦я┬я▄я│я▐ п╫п╣ п╡п╦п╢я▐ п╫п╦я┤п╣пЁп╬ п©п╣я─п╣п╢ я│п╬п╠п╬п╧.", wch, 0, ch, TO_CHAR );
+    act( "$C1 п╡я▀я┌я▐пЁп╦п╡п╟п╣я┌ я┌п╟п╨п╬п╧ я│я┌я─п╟я┬п╫п╣п╫я▄п╨п╦п╧ п╫п╬п╤п╦я┤п╣п╨ п╦ я│п╩п╣пЁп╨п╟ я┴п╣п╨п╬я┤п╣я┌ $c4\n\r... $c1 я│ п╢п╦п╨п╦п╪ п╡п╬п©п╩п╣п╪ я┐п╫п╬я│п╦я┌я│я▐ п╫п╣ п╡п╦п╢я▐ п╫п╦я┤п╣пЁп╬ п©п╣я─п╣п╢ я│п╬п╠п╬п╧.", wch, 0, ch, TO_ROOM );
 }
 
 void ClanGuardHunter::actGreet( PCharacter *wch )
 {
-    do_say( ch, "Добро пожаловать, доблестный охотник." );
+    do_say( ch, "п■п╬п╠я─п╬ п©п╬п╤п╟п╩п╬п╡п╟я┌я▄, п╢п╬п╠п╩п╣я│я┌п╫я▀п╧ п╬я┘п╬я┌п╫п╦п╨." );
     createEquipment( wch );
 }
 
@@ -207,16 +207,16 @@ void ClanGuardHunter::createEquipment( PCharacter *wch )
     wch->getAttributes( ).getAttr<XMLEmptyAttribute>( "hunterarmor" );
     armor = clanArea->createEquipment( wch ); 
     
-    do_say( ch, "Я дарю тебе именное оружие охотника." );
-    interpret( ch, "emote создает комплект оружия Охотников." );
+    do_say( ch, "п╞ п╢п╟я─я▌ я┌п╣п╠п╣ п╦п╪п╣п╫п╫п╬п╣ п╬я─я┐п╤п╦п╣ п╬я┘п╬я┌п╫п╦п╨п╟." );
+    interpret( ch, "emote я│п╬п╥п╢п╟п╣я┌ п╨п╬п╪п©п╩п╣п╨я┌ п╬я─я┐п╤п╦я▐ п·я┘п╬я┌п╫п╦п╨п╬п╡." );
 
-    act("Ты передаешь $o4 $C3.", ch, armor, wch, TO_CHAR);
-    act("$c1 передает тебе $o4.", ch, armor, wch, TO_VICT);
-    act("$c1 передает $o4 $C3.", ch, armor, wch, TO_NOTVICT);
+    act("п╒я▀ п©п╣я─п╣п╢п╟п╣я┬я▄ $o4 $C3.", ch, armor, wch, TO_CHAR);
+    act("$c1 п©п╣я─п╣п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, armor, wch, TO_VICT);
+    act("$c1 п©п╣я─п╣п╢п╟п╣я┌ $o4 $C3.", ch, armor, wch, TO_NOTVICT);
     obj_to_char( armor, wch );
 
-    do_say( ch, "Помни! Если оружие будет утеряно, то найти его поможет клановый лекарь!" );
-    do_say( ch, "Просто скажи ему 'trouble' и имя вещи... Например, 'troublearmor'." );
+    do_say( ch, "п÷п╬п╪п╫п╦! п∙я│п╩п╦ п╬я─я┐п╤п╦п╣ п╠я┐п╢п╣я┌ я┐я┌п╣я─я▐п╫п╬, я┌п╬ п╫п╟п╧я┌п╦ п╣пЁп╬ п©п╬п╪п╬п╤п╣я┌ п╨п╩п╟п╫п╬п╡я▀п╧ п╩п╣п╨п╟я─я▄!" );
+    do_say( ch, "п÷я─п╬я│я┌п╬ я│п╨п╟п╤п╦ п╣п╪я┐ 'trouble' п╦ п╦п╪я▐ п╡п╣я┴п╦... п²п╟п©я─п╦п╪п╣я─, 'troublearmor'." );
 }
 
 /*--------------------------------------------------------------------------
@@ -255,11 +255,11 @@ bool HunterEquip::canEquip( Character *ch )
     
     if (obj->hasOwner( ch ) && ch->getClan( ) == clan)
     {
-	ch->pecho( "{C%1$^O1 начина%1$nет|ют светиться.{x", obj );
+	ch->pecho( "{C%1$^O1 п╫п╟я┤п╦п╫п╟%1$nп╣я┌|я▌я┌ я│п╡п╣я┌п╦я┌я▄я│я▐.{x", obj );
 	return true;
     }
     else {
-	ch->pecho( "Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj );
+	ch->pecho( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╩п╟п╢п╣я┌я▄ %1$O5 п╦ п╠я─п╬я│п╟п╣я┬я▄ %1$P2.", obj );
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
 	return false;
@@ -459,9 +459,9 @@ void HunterWeapon::fight_axe( Character *ch )
 
     if (number_percent() < chance){
     	ch->setWait( gsn_shield_cleave->getBeats( )  );
-	act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
-	act_p("$o1 раскалывает пополам твой щит.",ch,obj,victim,TO_VICT,POS_DEAD);
-	act_p("$o1 раскалывает пополам щит $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
+	act_p("$o1 я─п╟я│п╨п╟п╩я▀п╡п╟п╣я┌ п©п╬п©п╬п╩п╟п╪ я┴п╦я┌ $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
+	act_p("$o1 я─п╟я│п╨п╟п╩я▀п╡п╟п╣я┌ п©п╬п©п╬п╩п╟п╪ я┌п╡п╬п╧ я┴п╦я┌.",ch,obj,victim,TO_VICT,POS_DEAD);
+	act_p("$o1 я─п╟я│п╨п╟п╩я▀п╡п╟п╣я┌ п©п╬п©п╬п╩п╟п╪ я┴п╦я┌ $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
 	extract_obj( get_eq_char(victim,wear_shield) );
     }else
     	ch->setWait( gsn_shield_cleave->getBeats( )  );
@@ -479,9 +479,9 @@ void HunterWeapon::fight_mace( Character *ch )
     chance=25;
 
     if (number_percent() < chance){
-	act_p("$o1 оглушает $C4.",ch,obj,victim,TO_CHAR,POS_DEAD);
-	act_p("$o1 оглушает тебя.",ch,obj,victim,TO_VICT,POS_DEAD);
-	act_p("$o1 оглушает $C4.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
+	act_p("$o1 п╬пЁп╩я┐я┬п╟п╣я┌ $C4.",ch,obj,victim,TO_CHAR,POS_DEAD);
+	act_p("$o1 п╬пЁп╩я┐я┬п╟п╣я┌ я┌п╣п╠я▐.",ch,obj,victim,TO_VICT,POS_DEAD);
+	act_p("$o1 п╬пЁп╩я┐я┬п╟п╣я┌ $C4.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
 	SET_BIT(victim->affected_by,AFF_WEAK_STUN);
 	ch->setWaitViolence( 2 );
     }
@@ -524,14 +524,14 @@ void HunterWeapon::fight_sword( Character *ch )
 
     if (number_percent() < chance){
     	ch->setWait( gsn_weapon_cleave->getBeats( )  );
-	act_p("$o1 уничтожает оружие $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
-	act_p("$o1 уничтожает твое оружие.",ch,obj,victim,TO_VICT,POS_DEAD);
-	act_p("$o1 уничтожает  оружие $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
+	act_p("$o1 я┐п╫п╦я┤я┌п╬п╤п╟п╣я┌ п╬я─я┐п╤п╦п╣ $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
+	act_p("$o1 я┐п╫п╦я┤я┌п╬п╤п╟п╣я┌ я┌п╡п╬п╣ п╬я─я┐п╤п╦п╣.",ch,obj,victim,TO_VICT,POS_DEAD);
+	act_p("$o1 я┐п╫п╦я┤я┌п╬п╤п╟п╣я┌  п╬я─я┐п╤п╦п╣ $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
 	extract_obj( get_eq_char(victim,wear_wield) );
     }else{
-	act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
-	act_p("$o1 со звоном отскакивает от твоего оружия.",ch,obj,victim,TO_VICT,POS_DEAD);
-        act_p("$o1 со звоном отскакивает от оружия $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
+	act_p("$o1 я│п╬ п╥п╡п╬п╫п╬п╪ п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ п╬я─я┐п╤п╦я▐ $C2.",ch,obj,victim,TO_CHAR,POS_DEAD);
+	act_p("$o1 я│п╬ п╥п╡п╬п╫п╬п╪ п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ я┌п╡п╬п╣пЁп╬ п╬я─я┐п╤п╦я▐.",ch,obj,victim,TO_VICT,POS_DEAD);
+        act_p("$o1 я│п╬ п╥п╡п╬п╫п╬п╪ п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ п╬я─я┐п╤п╦я▐ $C2.",ch,obj,victim,TO_NOTVICT,POS_DEAD);
     	ch->setWait( gsn_weapon_cleave->getBeats( )  );
     }
 }
@@ -596,7 +596,7 @@ SKILL_RUNP( hunt )
     bool fArea;
     
     if (!gsn_hunt->available( ch )) {
-	ch->send_to("Ты не умеешь охотиться.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╬я┘п╬я┌п╦я┌я▄я│я▐.\n\r");
 	return;
     }
     if (!gsn_hunt->usable( ch ))
@@ -605,7 +605,7 @@ SKILL_RUNP( hunt )
     one_argument( argument, arg );
 
     if( arg[0] == '\0' ) {
-	ch->send_to( "Кого выслеживаем?\n\r");
+	ch->send_to( "п п╬пЁп╬ п╡я▀я│п╩п╣п╤п╦п╡п╟п╣п╪?\n\r");
 	return;
     }
 
@@ -618,7 +618,7 @@ SKILL_RUNP( hunt )
 	}
 	else {
 	    gsn_world_find->improve( ch, false );
-	    ch->send_to ("Твоих знаний недостаточно, чтобы искать по всему миру!\n\r");
+	    ch->send_to ("п╒п╡п╬п╦я┘ п╥п╫п╟п╫п╦п╧ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬, я┤я┌п╬п╠я▀ п╦я│п╨п╟я┌я▄ п©п╬ п╡я│п╣п╪я┐ п╪п╦я─я┐!\n\r");
 	}
     }
 
@@ -628,17 +628,17 @@ SKILL_RUNP( hunt )
 	victim = get_char_world( ch, arg);
 
     if (victim == 0) {
-	ch->send_to("Нет никого здесь с таким именем.\n\r");
+	ch->send_to("п²п╣я┌ п╫п╦п╨п╬пЁп╬ п╥п╢п╣я│я▄ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪.\n\r");
 	return;
     }
 
     if (victim->in_room == 0) {
-	ch->send_to("Ты не можешь точно определить, где находится цель.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┌п╬я┤п╫п╬ п╬п©я─п╣п╢п╣п╩п╦я┌я▄, пЁп╢п╣ п╫п╟я┘п╬п╢п╦я┌я│я▐ я├п╣п╩я▄.\n\r");
 	return;
     }
 
     if( ch->in_room == victim->in_room ) {
-	act_p( "$C1 прямо здесь!", ch, 0, victim, TO_CHAR,POS_RESTING );
+	act_p( "$C1 п©я─я▐п╪п╬ п╥п╢п╣я│я▄!", ch, 0, victim, TO_CHAR,POS_RESTING );
 	return;
     }
 
@@ -649,12 +649,12 @@ SKILL_RUNP( hunt )
 	if (ch->endur > 2)
 	    ch->endur -= 3;
 	else {
-	    ch->send_to( "Твои силы истощились и ты не можешь охотиться!\n\r");
+	    ch->send_to( "п╒п╡п╬п╦ я│п╦п╩я▀ п╦я│я┌п╬я┴п╦п╩п╦я│я▄ п╦ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╬я┘п╬я┌п╦я┌я▄я│я▐!\n\r");
 	    return;
 	}
     }
 
-    act( "$c1 сосредоточенно осматривает местность и следы на земле.", ch, 0, 0, TO_ROOM );
+    act( "$c1 я│п╬я│я─п╣п╢п╬я┌п╬я┤п╣п╫п╫п╬ п╬я│п╪п╟я┌я─п╦п╡п╟п╣я┌ п╪п╣я│я┌п╫п╬я│я┌я▄ п╦ я│п╩п╣п╢я▀ п╫п╟ п╥п╣п╪п╩п╣.", ch, 0, 0, TO_ROOM );
 
     ch->setWait( gsn_hunt->getBeats( )  );
     
@@ -665,9 +665,9 @@ SKILL_RUNP( hunt )
 		    true, false, false );
     
     if (road.type == Road::DOOR)
-	act( "$C1 на $t отсюда.", ch, dirs[road.value.door].name, victim, TO_CHAR );
+	act( "$C1 п╫п╟ $t п╬я┌я│я▌п╢п╟.", ch, dirs[road.value.door].name, victim, TO_CHAR );
     else
-	act( "Тебе не удается понять, как пройти к $C3.", ch, 0, victim, TO_CHAR );
+	act( "п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╣я┌я│я▐ п©п╬п╫я▐я┌я▄, п╨п╟п╨ п©я─п╬п╧я┌п╦ п╨ $C3.", ch, 0, victim, TO_CHAR );
 }
 
 SPELL_DECL(FindObject);
@@ -700,16 +700,16 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
 
 	if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by))
 	{
-	    sprintf( buf, "имеется у %s\n\r",
+	    sprintf( buf, "п╦п╪п╣п╣я┌я│я▐ я┐ %s\n\r",
 		ch->sees(in_obj->carried_by,'2').c_str() );
 	}
 	else
 	{
 	    if (ch->is_immortal() && in_obj->in_room != 0)
-		sprintf( buf, "находится в %s [Комната %d]\n\r",
+		sprintf( buf, "п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ %s [п п╬п╪п╫п╟я┌п╟ %d]\n\r",
 		    in_obj->in_room->name, in_obj->in_room->vnum);
 	    else
-		sprintf( buf, "находится в %s\n\r",
+		sprintf( buf, "п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ %s\n\r",
 		    in_obj->in_room == 0
 			? "somewhere" : in_obj->in_room->name );
 	}
@@ -722,7 +722,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
     }
 
     if ( !found )
-	ch->send_to("В Dream Land нет ничего похожего на это.\n\r");
+	ch->send_to("п▓ Dream Land п╫п╣я┌ п╫п╦я┤п╣пЁп╬ п©п╬я┘п╬п╤п╣пЁп╬ п╫п╟ я█я┌п╬.\n\r");
     else
 	page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -738,7 +738,7 @@ VOID_SPELL(TakeRevenge)::run( Character *ch, char *target_name, int sn, int leve
 
     if (!IS_DEATH_TIME( ch ))
     {
-	ch->send_to("Слишком поздно мстить в твоем положении.\n\r");
+	ch->send_to("п║п╩п╦я┬п╨п╬п╪ п©п╬п╥п╢п╫п╬ п╪я│я┌п╦я┌я▄ п╡ я┌п╡п╬п╣п╪ п©п╬п╩п╬п╤п╣п╫п╦п╦.\n\r");
 	return;
     }
     
@@ -746,9 +746,9 @@ VOID_SPELL(TakeRevenge)::run( Character *ch, char *target_name, int sn, int leve
     room = (obj ? obj->getRoom( ) : 0);
 
     if (room == 0)
-	ch->send_to("Увы, похоже твой труп разделали на мясо.\n\r");
+	ch->send_to("пёп╡я▀, п©п╬я┘п╬п╤п╣ я┌п╡п╬п╧ я┌я─я┐п© я─п╟п╥п╢п╣п╩п╟п╩п╦ п╫п╟ п╪я▐я│п╬.\n\r");
     else if ( IS_SET(room->affected_by,AFF_ROOM_PREVENT) )
-	ch->send_to ("Извини, но тебе не удается добраться туда.\n\r");
+	ch->send_to ("п≤п╥п╡п╦п╫п╦, п╫п╬ я┌п╣п╠п╣ п╫п╣ я┐п╢п╟п╣я┌я│я▐ п╢п╬п╠я─п╟я┌я▄я│я▐ я┌я┐п╢п╟.\n\r");
     else
 	transfer_char( ch, ch, room );
 }
@@ -792,8 +792,8 @@ bool HunterTrapObject::checkPrevent( Character *victim )
     if (!saves_spell( ownerLevel, victim, DAM_NONE ))
 	return false;
 
-    act("Сила твоего клана защищает тебя от ловушек Охотников.", victim, 0, 0, TO_CHAR);
-    act("Сила клана защищает $c4 от ловушек Охотников.", victim, 0, 0, TO_ROOM);
+    act("п║п╦п╩п╟ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟ п╥п╟я┴п╦я┴п╟п╣я┌ я┌п╣п╠я▐ п╬я┌ п╩п╬п╡я┐я┬п╣п╨ п·я┘п╬я┌п╫п╦п╨п╬п╡.", victim, 0, 0, TO_CHAR);
+    act("п║п╦п╩п╟ п╨п╩п╟п╫п╟ п╥п╟я┴п╦я┴п╟п╣я┌ $c4 п╬я┌ п╩п╬п╡я┐я┬п╣п╨ п·я┘п╬я┌п╫п╦п╨п╬п╡.", victim, 0, 0, TO_ROOM);
     return true;
 }
 
@@ -811,7 +811,7 @@ bool HunterTrapObject::checkRoom( Room *r )
 bool HunterTrapObject::checkTrapConditions( Character *ch, Skill &skill )
 {
     if (obj->carried_by != ch) {
-	ch->println( "Подними это с земли." );
+	ch->println( "п÷п╬п╢п╫п╦п╪п╦ я█я┌п╬ я│ п╥п╣п╪п╩п╦." );
 	return false;
     }
     
@@ -819,22 +819,22 @@ bool HunterTrapObject::checkTrapConditions( Character *ch, Skill &skill )
 	return false;
 
     if (skill.getLearned( ch ) <= 1) {
-	ch->println( "Попрактикуйся сначала." );
+	ch->println( "п÷п╬п©я─п╟п╨я┌п╦п╨я┐п╧я│я▐ я│п╫п╟я┤п╟п╩п╟." );
 	return false;
     }
     
     if (ch->mana < skill.getMana( )) {
-	ch->println( "У тебя недостаточно энергии для этого." );
+	ch->println( "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬." );
 	return false;
     }
 
     if (ch->position != POS_STANDING) {
-	ch->println( "Это гораздо удобней делать стоя." );
+	ch->println( "п╜я┌п╬ пЁп╬я─п╟п╥п╢п╬ я┐п╢п╬п╠п╫п╣п╧ п╢п╣п╩п╟я┌я▄ я│я┌п╬я▐." );
 	return false;
     }
     
     if (IS_SET(ch->in_room->affected_by, AFF_ROOM_PREVENT)) {
-	ch->println( "Львы защитили эту местность от ловушек Охотников." );
+	ch->println( "п⌡я▄п╡я▀ п╥п╟я┴п╦я┌п╦п╩п╦ я█я┌я┐ п╪п╣я│я┌п╫п╬я│я┌я▄ п╬я┌ п╩п╬п╡я┐я┬п╣п╨ п·я┘п╬я┌п╫п╦п╨п╬п╡." );
 	return false;
     }
 
@@ -864,7 +864,7 @@ bool HunterTrapObject::visible( const Character *ch )
 void HunterTrapObject::log( Character *ch, const char *verb )
 {
     wiznet( WIZ_FLAGS, 0, 110, 
-	    "Охотничьи ловушки: %^C1 %s %O4 в [%d] '%s'",
+	    "п·я┘п╬я┌п╫п╦я┤я▄п╦ п╩п╬п╡я┐я┬п╨п╦: %^C1 %s %O4 п╡ [%d] '%s'",
 	    ch, verb, obj, ch->in_room->vnum, ch->in_room->name );
 }
 
@@ -888,50 +888,50 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
 	return true;
     
     if (!checkRoom( ch->in_room )) {
-	ch->println( "Здесь нельзя устанавливать маяки." );	
+	ch->println( "п≈п╢п╣я│я▄ п╫п╣п╩я▄п╥я▐ я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟я┌я▄ п╪п╟я▐п╨п╦." );	
 	return true;
     }
     
     if (ch->isAffected( gsn_hunter_beacon )) {
-	ch->println( "С момента установки предыдущего маяка прошло слишком мало времени." );
+	ch->println( "п║ п╪п╬п╪п╣п╫я┌п╟ я┐я│я┌п╟п╫п╬п╡п╨п╦ п©я─п╣п╢я▀п╢я┐я┴п╣пЁп╬ п╪п╟я▐п╨п╟ п©я─п╬я┬п╩п╬ я│п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╬ п╡я─п╣п╪п╣п╫п╦." );
 	return true;
     }
     
     args.colourstrip( );
     args.stripWhiteSpace( );
     if (args.empty( )) {
-	ch->println( "На кого именно должен реагировать маяк?" );
+	ch->println( "п²п╟ п╨п╬пЁп╬ п╦п╪п╣п╫п╫п╬ п╢п╬п╩п╤п╣п╫ я─п╣п╟пЁп╦я─п╬п╡п╟я┌я▄ п╪п╟я▐п╨?" );
 	return true;
     }
 
     victim = get_player_world( ch->getPC( ), args.c_str( ) );
     if (victim == NULL) {
-	ch->println( "Жертва с таким именем не найдена." );
+	ch->println( "п√п╣я─я┌п╡п╟ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫п╟." );
 	return true;
     }
 
     if (is_safe_nomessage( ch, victim )) {
-	ch->println( "Жертва не находится в твоем ПК." );
+	ch->println( "п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ я┌п╡п╬п╣п╪ п÷п ." );
 	return true;
     }
     
     if (!chance( gsn_hunter_beacon->getEffective( ch ) )) {
-	act( "Твоя попытка установить $o4 окончилась неудачей.", ch, obj, 0, TO_CHAR );
+	act( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ $o4 п╬п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.", ch, obj, 0, TO_CHAR );
 	ch->mana -= gsn_hunter_beacon->getMana( ) / 2;
 	ch->setWait( gsn_hunter_beacon->getBeats( ) / 2 );
 	gsn_hunter_beacon->improve( ch, false );
 
 	if (!chance( ch->getPC( )->getClanLevel( ) * 10 )) {
-	    act( "Из-за неумелого обращения ты уничтожаешь $o4.", ch, obj, 0, TO_CHAR );
-	    act( "$c1 своим неумелым обращением уничтожает $o4.", ch, obj, 0, TO_ROOM );
+	    act( "п≤п╥-п╥п╟ п╫п╣я┐п╪п╣п╩п╬пЁп╬ п╬п╠я─п╟я┴п╣п╫п╦я▐ я┌я▀ я┐п╫п╦я┤я┌п╬п╤п╟п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR );
+	    act( "$c1 я│п╡п╬п╦п╪ п╫п╣я┐п╪п╣п╩я▀п╪ п╬п╠я─п╟я┴п╣п╫п╦п╣п╪ я┐п╫п╦я┤я┌п╬п╤п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
 	    extract_obj( obj );
 	}
 	
 	return true;
     } 
     
-    act( "Ты устанавливаешь $o4 и настраиваешь реакцию на появление $C2.", ch, obj, victim, TO_CHAR );
-    act( "$c1 устанавливает и настраивает $o4.", ch, obj, 0, TO_ROOM );
+    act( "п╒я▀ я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┬я▄ $o4 п╦ п╫п╟я│я┌я─п╟п╦п╡п╟п╣я┬я▄ я─п╣п╟п╨я├п╦я▌ п╫п╟ п©п╬я▐п╡п╩п╣п╫п╦п╣ $C2.", ch, obj, victim, TO_CHAR );
+    act( "$c1 я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌ п╦ п╫п╟я│я┌я─п╟п╦п╡п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
     
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
@@ -951,7 +951,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
     ch->mana -= gsn_hunter_beacon->getMana( );
     gsn_hunter_beacon->improve( ch, true );
     
-    log( ch, "устанавливает" );
+    log( ch, "я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌" );
     return true; 
 }
 
@@ -972,13 +972,13 @@ void HunterBeaconTrap::greet( Character *victim )
     if (!chance( quality + 10 ))
 	return;
 
-//    act( "Рядом с тобой раздается щелчок.", victim, 0, 0, TO_ALL );
+//    act( "п═я▐п╢п╬п╪ я│ я┌п╬п╠п╬п╧ я─п╟п╥п╢п╟п╣я┌я│я▐ я┴п╣п╩я┤п╬п╨.", victim, 0, 0, TO_ALL );
 
     clantalk( *clan_hunter, 
-	      "Внимание! Сработал маяк, установленный в '%s' и настроенный на появление %s.",
+	      "п▓п╫п╦п╪п╟п╫п╦п╣! п║я─п╟п╠п╬я┌п╟п╩ п╪п╟я▐п╨, я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╧ п╡ '%s' п╦ п╫п╟я│я┌я─п╬п╣п╫п╫я▀п╧ п╫п╟ п©п╬я▐п╡п╩п╣п╫п╦п╣ %s.",
 	      obj->in_room->name, victim->getNameP( '2' ).c_str( ) );
     
-    log( victim, "активизирует" );
+    log( victim, "п╟п╨я┌п╦п╡п╦п╥п╦я─я┐п╣я┌" );
 
     if (( charges = charges - 1 ) <= 0)
 	extract_obj( obj );
@@ -1001,12 +1001,12 @@ struct HunterSnareDamage : public Damage {
 	
     virtual void message( ) {
 	if (fMovement) {
-	    msgChar( "%^O1\6твою ногу при ходьбе", snare->getObj( ) );
-	    msgRoom( "%^C1 морщится от боли, наступив на зажатую в %O4 ногу", ch, snare->getObj( ) );
+	    msgChar( "%^O1\6я┌п╡п╬я▌ п╫п╬пЁя┐ п©я─п╦ я┘п╬п╢я▄п╠п╣", snare->getObj( ) );
+	    msgRoom( "%^C1 п╪п╬я─я┴п╦я┌я│я▐ п╬я┌ п╠п╬п╩п╦, п╫п╟я│я┌я┐п©п╦п╡ п╫п╟ п╥п╟п╤п╟я┌я┐я▌ п╡ %O4 п╫п╬пЁя┐", ch, snare->getObj( ) );
 	}
 	else {
 	    msgRoom( "%^O1\6%C4", snare->getObj( ), ch );
-	    msgChar( "%^O1\6тебя", snare->getObj( ) );
+	    msgChar( "%^O1\6я┌п╣п╠я▐", snare->getObj( ) );
 	}
     }
 
@@ -1053,34 +1053,34 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
 	return true;
 
     if (!checkRoom( ch->in_room )) {
-	ch->println( "Здесь невозможно установить и замаскировать капкан." );	
+	ch->println( "п≈п╢п╣я│я▄ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╦ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄ п╨п╟п©п╨п╟п╫." );	
 	return true;
     }
     
     if (ch->isAffected( gsn_hunter_snare )) {
-	ch->println( "Предыдущий капкан был установлен тобой совсем недавно." );
+	ch->println( "п÷я─п╣п╢я▀п╢я┐я┴п╦п╧ п╨п╟п©п╨п╟п╫ п╠я▀п╩ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ я┌п╬п╠п╬п╧ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬." );
 	return true;
     }
 
     if (obj->level > ch->getModifyLevel( )) {
-	ch->println( "Устройство этого капкана слишком сложно для твоего понимания." );
+	ch->println( "пёя│я┌я─п╬п╧я│я┌п╡п╬ я█я┌п╬пЁп╬ п╨п╟п©п╨п╟п╫п╟ я│п╩п╦я┬п╨п╬п╪ я│п╩п╬п╤п╫п╬ п╢п╩я▐ я┌п╡п╬п╣пЁп╬ п©п╬п╫п╦п╪п╟п╫п╦я▐." );
 	return true;
     }
 
     if (!ownerName.getValue( ).empty( )) {
-	ch->println( "В этом капкане уже кто-то побывал." );
+	ch->println( "п▓ я█я┌п╬п╪ п╨п╟п©п╨п╟п╫п╣ я┐п╤п╣ п╨я┌п╬-я┌п╬ п©п╬п╠я▀п╡п╟п╩." );
 	return true;
     }
     
     if (!chance( gsn_hunter_snare->getEffective( ch ))) {
 	if (!chance( ch->getPC( )->getClanLevel( ) * 10 )) {
-	    ch->pecho( "Ты пытаешься зарядить %1$O4, но зажимаешь в %1$P4 собственную руку. Это больно!", obj );
-	    ch->recho( "%2$^C1 пытается зарядить %1$O4, но зажимает в %1$P4 собственную руку.", obj, ch );
+	    ch->pecho( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╥п╟я─я▐п╢п╦я┌я▄ %1$O4, п╫п╬ п╥п╟п╤п╦п╪п╟п╣я┬я▄ п╡ %1$P4 я│п╬п╠я│я┌п╡п╣п╫п╫я┐я▌ я─я┐п╨я┐. п╜я┌п╬ п╠п╬п╩я▄п╫п╬!", obj );
+	    ch->recho( "%2$^C1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟я─я▐п╢п╦я┌я▄ %1$O4, п╫п╬ п╥п╟п╤п╦п╪п╟п╣я┌ п╡ %1$P4 я│п╬п╠я│я┌п╡п╣п╫п╫я┐я▌ я─я┐п╨я┐.", obj, ch );
 	    rawdamage( ch, ch, DAM_PIERCE, ch->hit / 10, true );
 	}
 	else {
-	    ch->pecho( "Ты пытаешься установить %1$O4, но только ломаешь %1$P2.", obj );
-	    ch->recho( "%2$^C1 пытается установить %1$O4, но только ломает %1$P2.", obj, ch );
+	    ch->pecho( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ %1$O4, п╫п╬ я┌п╬п╩я▄п╨п╬ п╩п╬п╪п╟п╣я┬я▄ %1$P2.", obj );
+	    ch->recho( "%2$^C1 п©я▀я┌п╟п╣я┌я│я▐ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ %1$O4, п╫п╬ я┌п╬п╩я▄п╨п╬ п╩п╬п╪п╟п╣я┌ %1$P2.", obj, ch );
 	}
 
 	ch->setWait( gsn_hunter_snare->getBeats( ) / 2 );
@@ -1089,8 +1089,8 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
 	return true;
     }
     
-    act( "Ты устанавливаешь и маскируешь $o4.", ch, obj, 0, TO_CHAR );
-    act( "$c1 устанавливает и маскирует $o4.", ch, obj, 0, TO_ROOM );
+    act( "п╒я▀ я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┬я▄ п╦ п╪п╟я│п╨п╦я─я┐п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR );
+    act( "$c1 я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌ п╦ п╪п╟я│п╨п╦я─я┐п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
 
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
@@ -1108,7 +1108,7 @@ bool HunterSnareTrap::use( Character *ch, const char *cArgs )
     ch->mana -= gsn_hunter_snare->getMana( );
     gsn_hunter_snare->improve( ch, true );
 
-    log( ch, "маскирует" );
+    log( ch, "п╪п╟я│п╨п╦я─я┐п╣я┌" );
     return true;
 }
 
@@ -1136,12 +1136,12 @@ void HunterSnareTrap::greet( Character *victim )
     obj_to_char( obj, victim );
     equip_char( victim, obj, wear_hold_leg );
     SET_BIT(obj->wear_flags, ITEM_TAKE);
-    obj->fmtDescription( "Разломанный %s лежит тут.", obj->getShortDescr( '1' ).c_str( ) );
+    obj->fmtDescription( "п═п╟п╥п╩п╬п╪п╟п╫п╫я▀п╧ %s п╩п╣п╤п╦я┌ я┌я┐я┌.", obj->getShortDescr( '1' ).c_str( ) );
     obj->timer = 24;
     activated = false;
     
-    act( "Твоя нога попала в $o4!", victim, obj, 0, TO_CHAR );
-    act( "$c1 угоди$gло|л|ла в $o4!", victim, obj, 0, TO_ROOM );
+    act( "п╒п╡п╬я▐ п╫п╬пЁп╟ п©п╬п©п╟п╩п╟ п╡ $o4!", victim, obj, 0, TO_CHAR );
+    act( "$c1 я┐пЁп╬п╢п╦$gп╩п╬|п╩|п╩п╟ п╡ $o4!", victim, obj, 0, TO_ROOM );
 
     try {
 	HunterSnareDamage( victim, this, false ).hit( true );
@@ -1149,7 +1149,7 @@ void HunterSnareTrap::greet( Character *victim )
     } catch (const VictimDeathException &) {
     }
 
-    log( victim, "попадает в" );
+    log( victim, "п©п╬п©п╟п╢п╟п╣я┌ п╡" );
 }
 
 
@@ -1216,7 +1216,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
 	return false;
     
     if (obj->wear_loc == wear_none) {
-	act( "Ты не держишь $o4 в руках.", ch, obj, 0, TO_CHAR );
+	act( "п╒я▀ п╫п╣ п╢п╣я─п╤п╦я┬я▄ $o4 п╡ я─я┐п╨п╟я┘.", ch, obj, 0, TO_CHAR );
 	return true;
     }
     
@@ -1224,19 +1224,19 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
 	return true;
 
     if (!checkRoom( ch->in_room )) {
-	ch->println( "Здешняя почва непригодна для копания ямы." );	
+	ch->println( "п≈п╢п╣я┬п╫я▐я▐ п©п╬я┤п╡п╟ п╫п╣п©я─п╦пЁп╬п╢п╫п╟ п╢п╩я▐ п╨п╬п©п╟п╫п╦я▐ я▐п╪я▀." );	
 	return true;
     }
     
     moveCost = ch->max_move / 4;
 
     if (ch->move < moveCost) {
-	act( "Ты слишком уста$gло|л|ла.", ch, 0, 0, TO_CHAR );
+	act( "п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟$gп╩п╬|п╩|п╩п╟.", ch, 0, 0, TO_CHAR );
 	return true;
     }
     
     if (obj->condition < 10) {
-	ch->pecho( "%1$^O1 слишком затупил%1$Gось|ся|ась|ись.", obj );
+	ch->pecho( "%1$^O1 я│п╩п╦я┬п╨п╬п╪ п╥п╟я┌я┐п©п╦п╩%1$Gп╬я│я▄|я│я▐|п╟я│я▄|п╦я│я▄.", obj );
 	return true;
     }
     
@@ -1248,17 +1248,17 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
     }
     
     if (!pit->behavior || !(bhv = pit->behavior.getDynamicPointer<HunterPitTrap>( ))) {
-	ch->println( "Что-то не так.." );
+	ch->println( "п╖я┌п╬-я┌п╬ п╫п╣ я┌п╟п╨.." );
 	return true;
     }
     
     if (!bhv->isFresh( ) && !bhv->isOwner( ch )) {
-	ch->println( "Другой Охотник уже начал копать здесь яму, не стоит ему мешать." );
+	ch->println( "п■я─я┐пЁп╬п╧ п·я┘п╬я┌п╫п╦п╨ я┐п╤п╣ п╫п╟я┤п╟п╩ п╨п╬п©п╟я┌я▄ п╥п╢п╣я│я▄ я▐п╪я┐, п╫п╣ я│я┌п╬п╦я┌ п╣п╪я┐ п╪п╣я┬п╟я┌я▄." );
 	return true;
     }
     
     if (bhv->getSteaks( )) {
-	ch->println( "Эта яма уже замаскирована и ждет гостей." );
+	ch->println( "п╜я┌п╟ я▐п╪п╟ я┐п╤п╣ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟п╫п╟ п╦ п╤п╢п╣я┌ пЁп╬я│я┌п╣п╧." );
 	return true;
     }
 
@@ -1266,20 +1266,20 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
     chance = gsn_hunter_pit->getEffective( ch );
 
     if (bhv->getDepth( ) == 0) {
-	act( "Ты начинаешь копать $o4.", ch, pit, 0, TO_CHAR );
-	act( "$c1 начинает копать $o4.", ch, pit, 0, TO_ROOM );
+	act( "п╒я▀ п╫п╟я┤п╦п╫п╟п╣я┬я▄ п╨п╬п©п╟я┌я▄ $o4.", ch, pit, 0, TO_CHAR );
+	act( "$c1 п╫п╟я┤п╦п╫п╟п╣я┌ п╨п╬п©п╟я┌я▄ $o4.", ch, pit, 0, TO_ROOM );
 	bhv->setDepth( 1 );
     }
     else {
 	if (number_percent( ) < number_fuzzy( chance )) {
-	    act( "Ты орудуешь $O5, еще больше углубляя $o4.", ch, pit, obj, TO_CHAR );
-	    act( "$c1 орудует $O5, углубляя $o4.", ch, pit, obj, TO_ROOM );
+	    act( "п╒я▀ п╬я─я┐п╢я┐п╣я┬я▄ $O5, п╣я┴п╣ п╠п╬п╩я▄я┬п╣ я┐пЁп╩я┐п╠п╩я▐я▐ $o4.", ch, pit, obj, TO_CHAR );
+	    act( "$c1 п╬я─я┐п╢я┐п╣я┌ $O5, я┐пЁп╩я┐п╠п╩я▐я▐ $o4.", ch, pit, obj, TO_ROOM );
 	    bhv->setDepth( bhv->getDepth( ) + 1 );
 	    gsn_hunter_pit->improve( ch, true );
 	}
 	else {
-	    act( "Ты втыкаешь $o4 в почву, но натыкаешься на камень.", ch, obj, 0, TO_CHAR );
-	    act( "$c1 втыкает $o4 в почву, но натыкается на камень.", ch, obj, 0, TO_ROOM );
+	    act( "п╒я▀ п╡я┌я▀п╨п╟п╣я┬я▄ $o4 п╡ п©п╬я┤п╡я┐, п╫п╬ п╫п╟я┌я▀п╨п╟п╣я┬я▄я│я▐ п╫п╟ п╨п╟п╪п╣п╫я▄.", ch, obj, 0, TO_CHAR );
+	    act( "$c1 п╡я┌я▀п╨п╟п╣я┌ $o4 п╡ п©п╬я┤п╡я┐, п╫п╬ п╫п╟я┌я▀п╨п╟п╣я┌я│я▐ п╫п╟ п╨п╟п╪п╣п╫я▄.", ch, obj, 0, TO_ROOM );
 	    gsn_hunter_pit->improve( ch, false );
 	}
     }
@@ -1287,7 +1287,7 @@ bool HunterShovel::use( Character *ch, const char *cArgs )
     bhv->setDescription( );
 
     if (number_percent( ) < 10) {
-	ch->pecho( "%1$^O1 слегка туп%1$nится|ятся.", obj );
+	ch->pecho( "%1$^O1 я│п╩п╣пЁп╨п╟ я┌я┐п©%1$nп╦я┌я│я▐|я▐я┌я│я▐.", obj );
 	obj->condition = max( 1, obj->condition - 10 );
     }
     
@@ -1335,40 +1335,40 @@ bool HunterPitSteaks::use( Character *ch, const char * cArgs )
 	return true;
 
     if (obj->level > ch->getModifyLevel( )) {
-	act( "Ты недостаточно опыт$gно|ен|на, чтобы использовать $o4.", ch, obj, 0, TO_CHAR );
+	act( "п╒я▀ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╬п©я▀я┌$gп╫п╬|п╣п╫|п╫п╟, я┤я┌п╬п╠я▀ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ $o4.", ch, obj, 0, TO_CHAR );
 	return true;
     }
 
     pit = get_obj_room_vnum( ch->in_room, OBJ_VNUM_HUNTER_PIT );
     if (!pit) {
-	act( "Здесь некуда засунуть $o4.", ch, obj, 0, TO_CHAR );
-	act( "$c1 тычет повсюду $o5, ища, куда бы это засунуть.", ch, obj, 0, TO_ROOM );
+	act( "п≈п╢п╣я│я▄ п╫п╣п╨я┐п╢п╟ п╥п╟я│я┐п╫я┐я┌я▄ $o4.", ch, obj, 0, TO_CHAR );
+	act( "$c1 я┌я▀я┤п╣я┌ п©п╬п╡я│я▌п╢я┐ $o5, п╦я┴п╟, п╨я┐п╢п╟ п╠я▀ я█я┌п╬ п╥п╟я│я┐п╫я┐я┌я▄.", ch, obj, 0, TO_ROOM );
 	return true;
     }
 
     if (!pit->behavior || !(bhv = pit->behavior.getDynamicPointer<HunterPitTrap>( ))) {
-	ch->println( "С этой ямой что-то не так.." );
+	ch->println( "п║ я█я┌п╬п╧ я▐п╪п╬п╧ я┤я┌п╬-я┌п╬ п╫п╣ я┌п╟п╨.." );
 	return true;
     }
     
     if (bhv->getSteaks( )) {
-	ch->println( "Эта яма уже замаскирована и ждет гостей." );
+	ch->println( "п╜я┌п╟ я▐п╪п╟ я┐п╤п╣ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟п╫п╟ п╦ п╤п╢п╣я┌ пЁп╬я│я┌п╣п╧." );
 	return true;
     }
 
     if (!bhv->isOwner( ch )) {
-	ch->println( "Эту яму выкопал другой Охотник." );
+	ch->println( "п╜я┌я┐ я▐п╪я┐ п╡я▀п╨п╬п©п╟п╩ п╢я─я┐пЁп╬п╧ п·я┘п╬я┌п╫п╦п╨." );
 	return true;
     }
     
-    act("Ты устанавливаешь на дне $O2 $o4 и тщательно маскируешь яму.", ch, obj, pit, TO_CHAR); 
-    act("$c1 устанавливает на дне $O2 $o4 и тщательно маскирует яму.", ch, obj, pit, TO_ROOM); 
+    act("п╒я▀ я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┬я▄ п╫п╟ п╢п╫п╣ $O2 $o4 п╦ я┌я┴п╟я┌п╣п╩я▄п╫п╬ п╪п╟я│п╨п╦я─я┐п╣я┬я▄ я▐п╪я┐.", ch, obj, pit, TO_CHAR); 
+    act("$c1 я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌ п╫п╟ п╢п╫п╣ $O2 $o4 п╦ я┌я┴п╟я┌п╣п╩я▄п╫п╬ п╪п╟я│п╨п╦я─я┐п╣я┌ я▐п╪я┐.", ch, obj, pit, TO_ROOM); 
     bhv->setReady( ch );
     obj_from_char( obj );
     obj_to_obj( obj, pit );
     ch->setWait( gsn_hunter_pit->getBeats( ) );
 
-    log( ch, "устанавливает" );
+    log( ch, "я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌" );
     return true;
 }
 
@@ -1387,8 +1387,8 @@ struct HunterPitDamage : public Damage {
     }
     
     virtual void message( ) {
-	msgRoom( "%^O1 в %O6\6 %C4", pit->getSteaks( ), pit->getObj( ), ch );
-	msgChar( "%^O1 в %O6\6 тебя", pit->getSteaks( ), pit->getObj( ) );
+	msgRoom( "%^O1 п╡ %O6\6 %C4", pit->getSteaks( ), pit->getObj( ), ch );
+	msgChar( "%^O1 п╡ %O6\6 я┌п╣п╠я▐", pit->getSteaks( ), pit->getObj( ) );
     }
     
     virtual void calcDamage( ) {
@@ -1416,8 +1416,8 @@ struct HunterPitDamage : public Damage {
 	    if (!saves_spell( obj->level, ch, DAM_POISON )) {   
 		Affect af;
 
-		act("Ты чувствуешь, как яд распространяется по твоим венам.", ch, 0, 0, TO_CHAR);
-		act("$c1 отравле$gно|н|на ядом от $o2.", ch, obj, 0, TO_ROOM);
+		act("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, п╨п╟п╨ я▐п╢ я─п╟я│п©я─п╬я│я┌я─п╟п╫я▐п╣я┌я│я▐ п©п╬ я┌п╡п╬п╦п╪ п╡п╣п╫п╟п╪.", ch, 0, 0, TO_CHAR);
+		act("$c1 п╬я┌я─п╟п╡п╩п╣$gп╫п╬|п╫|п╫п╟ я▐п╢п╬п╪ п╬я┌ $o2.", ch, obj, 0, TO_ROOM);
 
 		af.where     = TO_AFFECTS;
 		af.type      = gsn_poison;
@@ -1460,20 +1460,20 @@ void HunterPitTrap::greet( Character *victim )
 	return;
 
     activated = false;
-    act("Ты проваливаешься в $o4 и падаешь прямо на $O4!", victim, obj, getSteaks( ), TO_CHAR);
-    act("$c1 проваливается в $o4 и падает прямо на $O4!", victim, obj, getSteaks( ), TO_ROOM);
+    act("п╒я▀ п©я─п╬п╡п╟п╩п╦п╡п╟п╣я┬я▄я│я▐ п╡ $o4 п╦ п©п╟п╢п╟п╣я┬я▄ п©я─я▐п╪п╬ п╫п╟ $O4!", victim, obj, getSteaks( ), TO_CHAR);
+    act("$c1 п©я─п╬п╡п╟п╩п╦п╡п╟п╣я┌я│я▐ п╡ $o4 п╦ п©п╟п╢п╟п╣я┌ п©я─я▐п╪п╬ п╫п╟ $O4!", victim, obj, getSteaks( ), TO_ROOM);
     
     try { 
 	HunterPitDamage( victim, this ).hit( true );
 
-	act("Ты теряешь сознание.", victim, 0, 0, TO_CHAR);
-	act("$c1 теряет сознание.", victim, 0, 0, TO_ROOM);
+	act("п╒я▀ я┌п╣я─я▐п╣я┬я▄ я│п╬п╥п╫п╟п╫п╦п╣.", victim, 0, 0, TO_CHAR);
+	act("$c1 я┌п╣я─я▐п╣я┌ я│п╬п╥п╫п╟п╫п╦п╣.", victim, 0, 0, TO_ROOM);
 	victim->position = POS_STUNNED;
 	victim->setWait( gsn_hunter_pit->getBeats( ) );
     } catch (const VictimDeathException &) {
     }
 
-    log( victim, "падает в" );
+    log( victim, "п©п╟п╢п╟п╣я┌ п╡" );
     
     extract_obj( getSteaks( ) );
     unsetReady( );
@@ -1558,7 +1558,7 @@ bool HunterPitTrap::isFresh( ) const
 void HunterPitTrap::setDescription( )
 {
     obj->fmtDescription( 
-	    "В земле вырыта яма %s размера.", 
+	    "п▓ п╥п╣п╪п╩п╣ п╡я▀я─я▀я┌п╟ я▐п╪п╟ %s я─п╟п╥п╪п╣я─п╟.", 
 	    size_table.message(URANGE( SIZE_TINY, getSize( ), SIZE_GARGANTUAN ), '2' ).c_str( ) );
 }
 
@@ -1571,7 +1571,7 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
     Affect af;
 
     if (ch->isAffected(sn)) {
-	ch->println( "Ты и так в состоянии отличить бревно от капкана.");
+	ch->println( "п╒я▀ п╦ я┌п╟п╨ п╡ я│п╬я│я┌п╬я▐п╫п╦п╦ п╬я┌п╩п╦я┤п╦я┌я▄ п╠я─п╣п╡п╫п╬ п╬я┌ п╨п╟п©п╨п╟п╫п╟.");
 	return;
     }
 
@@ -1581,7 +1581,7 @@ VOID_SPELL(DetectTrap)::run( Character *ch, Character *, int sn, int level )
     af.duration         = max( 6, ch->getPC( )->getClanLevel( ) * 2 );
     affect_to_char(ch,&af);
 
-    act("Теперь ты будешь замечать чужие ловушки.", ch, 0, 0, TO_CHAR);
-    act("Взгляд $c2 становится более внимательным.", ch, 0, 0, TO_ROOM);
+    act("п╒п╣п©п╣я─я▄ я┌я▀ п╠я┐п╢п╣я┬я▄ п╥п╟п╪п╣я┤п╟я┌я▄ я┤я┐п╤п╦п╣ п╩п╬п╡я┐я┬п╨п╦.", ch, 0, 0, TO_CHAR);
+    act("п▓п╥пЁп╩я▐п╢ $c2 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╠п╬п╩п╣п╣ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫я▀п╪.", ch, 0, 0, TO_ROOM);
 }
 

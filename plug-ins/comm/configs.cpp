@@ -59,11 +59,11 @@ bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
     
     Flags &field = getField( ch );
 
-    if (arg == "yes" || arg == "ƒ¡")
+    if (arg == "yes" || arg == "–¥–∞")
 	field.setBit( bit.getValue( ) );
-    else if (arg == "no" || arg == "Œ≈‘")
+    else if (arg == "no" || arg == "–Ω–µ—Ç")
 	field.removeBit( bit.getValue( ) );
-    else if (arg.strPrefix( "toggle" ) || arg.strPrefix( "–≈“≈ÀÃ¿ﬁ…‘ÿ" ))
+    else if (arg.strPrefix( "toggle" ) || arg.strPrefix( "–ø–µ—Ä–µ–∫–ª—é—á–∏—Ç—å" ))
 	field.toggleBit( bit.getValue( ) );
     else 
 	return false;
@@ -100,7 +100,7 @@ void ConfigElement::printRow( PCharacter *ch ) const
 		      CLR_NAME(ch), 
 		      rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
 		      yes ? CLR_YES(ch) : CLR_NO(ch),
-		      yes ? "˜ÎÏ." : "˜˘ÎÏ." );
+		      yes ? "–í–ö–õ." : "–í–´–ö–õ." );
 }
 
 void ConfigElement::printLine( PCharacter *ch ) const
@@ -112,7 +112,7 @@ void ConfigElement::printLine( PCharacter *ch ) const
 			CLR_NAME(ch),
 			rname.getValue( ).c_str( ),
 			yes ? CLR_YES(ch) : CLR_NO(ch),
-			yes ? "‰·" : "ÓÂÙ",
+			yes ? "–î–ê" : "–ù–ï–¢",
 			hint.c_str( ) );
     else
 	ch->printf( "  {%s%-12s {%s%5s {x%s\n",
@@ -252,13 +252,13 @@ COMMAND(ConfigCommand, "config")
                     && ((*c)->matches( arg1 ) || (*c)->matchesAlias( arg1 ))) 
             {
 		if (!(*c)->handleArgument( pch, arg2 ))
-		    pch->println("Ó≈–“¡◊…ÃÿŒŸ  –≈“≈ÀÃ¿ﬁ¡‘≈Ãÿ. ÛÕ. {W? {lR“≈÷…Õ{lEconfig{x.");
+		    pch->println("–ù–µ–ø—Ä–∞–≤–∏–ª—å–Ω—ã–π –ø–µ—Ä–µ–∫–ª—é—á–∞—Ç–µ–ª—å. –°–º. {W? {lR—Ä–µ–∂–∏–º{lEconfig{x.");
 
 		return;
 	    }
 
     
-    pch->println("Ô–√…— Œ≈ Œ¡ ƒ≈Œ¡. È”–œÃÿ⁄’ ‘≈ '{y{lR“≈÷…Õ{lEconfig{lx{w' ƒÃ— ”–…”À¡.");
+    pch->println("–û–ø—Ü–∏—è –Ω–µ –Ω–∞–π–¥–µ–Ω–∞. –ò—Å–ø–æ–ª—å–∑—É–π—Ç–µ '{y{lR—Ä–µ–∂–∏–º{lEconfig{lx{w' –¥–ª—è —Å–ø–∏—Å–∫–∞.");
 }
 
 /*-------------------------------------------------------------------------
@@ -276,7 +276,7 @@ CMDRUN( autolist )
     pch = ch->getPC( );
     
     pch->send_to( line );
-    pch->printf( "|  {%sÓ¡…Õ≈Œœ◊¡Œ…≈   Ûœ”‘œ—Œ…≈{x |\r\n", CLR_HEADER(ch) );
+    pch->printf( "|  {%s–ù–∞–∏–º–µ–Ω–æ–≤–∞–Ω–∏–µ   –°–æ—Å—Ç–æ—è–Ω–∏–µ{x |\r\n", CLR_HEADER(ch) );
     pch->send_to( line );
 
     ConfigCommand::getThis( )->printAllRows( pch );
@@ -284,9 +284,9 @@ CMDRUN( autolist )
 
     if (pch->lines != PAGELEN) {
 	if (pch->lines)
-	    pch->printf( "Ù≈¬≈ ◊Ÿ◊œƒ…‘”— Œ≈–“≈“Ÿ◊Œœ %d Ã…Œ…  ‘≈À”‘¡.\r\n", pch->lines.getValue( ) + 2 );
+	    pch->printf( "–¢–µ–±–µ –≤—ã–≤–æ–¥–∏—Ç—Å—è –Ω–µ–ø—Ä–µ—Ä—ã–≤–Ω–æ %d –ª–∏–Ω–∏–π —Ç–µ–∫—Å—Ç–∞.\r\n", pch->lines.getValue( ) + 2 );
 	else
-	    pch->send_to( "‚’∆≈“ –“œÀ“’‘À… ◊ŸÀÃ¿ﬁ≈Œ.\r\n" );
+	    pch->send_to( "–ë—É—Ñ–µ—Ä –ø—Ä–æ–∫—Ä—É—Ç–∫–∏ –≤—ã–∫–ª—é—á–µ–Ω.\r\n" );
     }
 
     ConfigCommand::getThis( )->printAllTexts( pch );
@@ -308,16 +308,16 @@ CMDRUN( scroll )
     if (arg.empty( ))
     {
 	if (ch->lines == 0)
-	    ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ –œÃ’ﬁ¡‘ÿ ƒÃ…ŒŒŸ≈ ”œœ¬›≈Œ…—.\n\r");
+	    ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –ø–æ–ª—É—á–∞—Ç—å –¥–ª–∏–Ω–Ω—ã–µ —Å–æ–æ–±—â–µ–Ω–∏—è.\n\r");
 	else
-	    ch->printf( "Ù≈¬≈ Œ≈–“≈“Ÿ◊Œœ ◊Ÿ◊œƒ…‘”— %d Ã…Œ%s ‘≈À”‘¡.\n\r",
-		        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "…—","……","… ") );
+	    ch->printf( "–¢–µ–±–µ –Ω–µ–ø—Ä–µ—Ä—ã–≤–Ω–æ –≤—ã–≤–æ–¥–∏—Ç—Å—è %d –ª–∏–Ω%s —Ç–µ–∫—Å—Ç–∞.\n\r",
+		        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "–∏—è","–∏–∏","–∏–π") );
 
 	return;
     }
 
     if (!arg.isNumber( )) {
-	ch->send_to("ÙŸ ƒœÃ÷≈Œ ◊◊≈”‘… ÀœÃ…ﬁ≈”‘◊œ Ã…Œ… .\n\r");
+	ch->send_to("–¢—ã –¥–æ–ª–∂–µ–Ω –≤–≤–µ—Å—Ç–∏ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ –ª–∏–Ω–∏–π.\n\r");
 	return;
     }
 
@@ -325,24 +325,24 @@ CMDRUN( scroll )
         lines = arg.toInt( );
     }
     catch (const ExceptionBadType& ) {
-        ch->send_to("Ó≈–“¡◊…ÃÿŒœ≈ ﬁ…”Ãœ.\r\n");
+        ch->send_to("–ù–µ–ø—Ä–∞–≤–∏–ª—å–Ω–æ–µ —á–∏—Å–ª–æ.\r\n");
         return;
     }
 
     if (lines == 0)
     {
-        ch->send_to("˜Ÿ◊œƒ œ‘ÀÃ¿ﬁ≈Œ.\n\r");
+        ch->send_to("–í—ã–≤–æ–¥ –æ—Ç–∫–ª—é—á–µ–Ω.\n\r");
         ch->lines = 0;
         return;
     }
 
     if (lines < 10 || lines > 100)
     {
-	ch->send_to("ÙŸ ƒœÃ÷≈Œ ◊◊≈”‘… ƒœ–’”‘…Õœ≈ ÀœÃ…ﬁ≈”‘◊œ Ã…Œ… .\n\r");
+	ch->send_to("–¢—ã –¥–æ–ª–∂–µ–Ω –≤–≤–µ—Å—Ç–∏ –¥–æ–ø—É—Å—Ç–∏–º–æ–µ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ –ª–∏–Ω–∏–π.\n\r");
 	return;
     }
 
     ch->lines = lines - 2;
-    ch->printf( "˜Ÿ◊œƒ ’”‘¡Œœ◊Ã≈Œ Œ¡ %d Ã…Œ%s.\n\r", lines,
-		GET_COUNT(lines, "…¿","……","… ") );
+    ch->printf( "–í—ã–≤–æ–¥ —É—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω –Ω–∞ %d –ª–∏–Ω%s.\n\r", lines,
+		GET_COUNT(lines, "–∏—é","–∏–∏","–∏–π") );
 }

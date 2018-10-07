@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -43,9 +43,9 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
 
     if (IS_AWAKE( victim )) {
 	if (victim != ch)
-	    act_p("$E уже не спит.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	    act_p("$E я┐п╤п╣ п╫п╣ я│п©п╦я┌.", ch, 0, victim, TO_CHAR, POS_RESTING);
 	else
-	    ch->send_to("Что, не спится?\r\n");
+	    ch->send_to("п╖я┌п╬, п╫п╣ я│п©п╦я┌я│я▐?\r\n");
 
 	return;
     }
@@ -65,7 +65,7 @@ VOID_SPELL(Awakening)::run( Character *ch, Character *victim, int sn, int level 
     }
 
     if (IS_AFFECTED( victim, AFF_SLEEP )) {
-	act_p("Тебе не удалось разбудить $C4.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ я─п╟п╥п╠я┐п╢п╦я┌я▄ $C4.", ch, 0, victim, TO_CHAR, POS_RESTING);
 	return;
     }
 
@@ -82,14 +82,14 @@ VOID_SPELL(CureBlindness)::run( Character *ch, Character *victim, int sn, int le
     if ( !victim->isAffected(gsn_blindness ) )
     {
 	if (victim == ch)
-	  ch->send_to("Твое зрение в порядке.\n\r");
+	  ch->send_to("п╒п╡п╬п╣ п╥я─п╣п╫п╦п╣ п╡ п©п╬я─я▐п╢п╨п╣.\n\r");
 	else
-	  act_p("Зрение $C2 в порядке.",ch,0,victim,TO_CHAR,POS_RESTING);
+	  act_p("п≈я─п╣п╫п╦п╣ $C2 п╡ п©п╬я─я▐п╢п╨п╣.",ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
 
     if (!checkDispel(level,victim,gsn_blindness))
-	ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+	ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 
 }
 
@@ -101,15 +101,15 @@ VOID_SPELL(CureDisease)::run( Character *ch, Character *victim, int sn, int leve
 	if ( !victim->isAffected(gsn_plague ) )
 	{
 		if (victim == ch)
-			act("Ты не бол$gьно|ен|ьна.",ch, 0, 0, TO_CHAR);
+			act("п╒я▀ п╫п╣ п╠п╬п╩$gя▄п╫п╬|п╣п╫|я▄п╫п╟.",ch, 0, 0, TO_CHAR);
 		else
-			act( "$C1 совершенно здоро$Gво|в|ва.", ch,0,victim,TO_CHAR);
+			act( "$C1 я│п╬п╡п╣я─я┬п╣п╫п╫п╬ п╥п╢п╬я─п╬$Gп╡п╬|п╡|п╡п╟.", ch,0,victim,TO_CHAR);
 
 		return;
 	}
 
 	if (!checkDispel(level,victim,gsn_plague))
-	    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 
 }
 
@@ -119,15 +119,15 @@ VOID_SPELL(CurePoison)::run( Character *ch, Character *victim, int sn, int level
 	if ( !victim->isAffected(gsn_poison ) )
 	{
 		if (victim == ch)
-			act("Ты не отравле$gно|н|на.", ch, 0, 0, TO_CHAR);
+			act("п╒я▀ п╫п╣ п╬я┌я─п╟п╡п╩п╣$gп╫п╬|п╫|п╫п╟.", ch, 0, 0, TO_CHAR);
 		else
-			act("$C1 не отравле$Gно|н|на.", ch,0,victim,TO_CHAR);
+			act("$C1 п╫п╣ п╬я┌я─п╟п╡п╩п╣$Gп╫п╬|п╫|п╫п╟.", ch,0,victim,TO_CHAR);
 
 		return;
 	}
 
 	if (!checkDispel(level,victim,gsn_poison))
-	    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 
 }
 
@@ -141,15 +141,15 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Object *obj, int sn, int level )
 	{
 	    REMOVE_BIT(obj->extra_flags,ITEM_NODROP);
 	    REMOVE_BIT(obj->extra_flags,ITEM_NOREMOVE);
-	    act("$o1 загорается голубым светом.", ch,obj,0,TO_ALL);
+	    act("$o1 п╥п╟пЁп╬я─п╟п╣я┌я│я▐ пЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪.", ch,obj,0,TO_ALL);
 	    return;
 	}
 
-	act("Проклятие $o2 пока неподвластно твоим молитвам.", ch,obj,0,TO_CHAR);
+	act("п÷я─п╬п╨п╩я▐я┌п╦п╣ $o2 п©п╬п╨п╟ п╫п╣п©п╬п╢п╡п╩п╟я│я┌п╫п╬ я┌п╡п╬п╦п╪ п╪п╬п╩п╦я┌п╡п╟п╪.", ch,obj,0,TO_CHAR);
 	return;
     }
     else  {
-      ch->send_to("Ничего не произошло...\n\r");
+      ch->send_to("п²п╦я┤п╣пЁп╬ п╫п╣ п©я─п╬п╦п╥п╬я┬п╩п╬...\n\r");
       return;
     }
 }
@@ -160,7 +160,7 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Character *victim, int sn, int leve
     bool found = false;
 
     if (!checkDispel(level,victim,gsn_curse))
-	    ch->send_to("Не получилось.\n\r");
+	    ch->send_to("п²п╣ п©п╬п╩я┐я┤п╦п╩п╬я│я▄.\n\r");
 
    for (obj = victim->carrying; (obj != 0 && !found); obj = obj->next_content)
    {
@@ -171,9 +171,9 @@ VOID_SPELL(RemoveCurse)::run( Character *ch, Character *victim, int sn, int leve
 	    {
 		REMOVE_BIT(obj->extra_flags,ITEM_NODROP);
 		REMOVE_BIT(obj->extra_flags,ITEM_NOREMOVE);
-		act_p("$o1 вспыхивает голубым светом.",
+		act_p("$o1 п╡я│п©я▀я┘п╦п╡п╟п╣я┌ пЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪.",
                        victim,obj,0,TO_CHAR,POS_RESTING);
-		act_p("$o1 $c2 вспыхивает голубым светом.",
+		act_p("$o1 $c2 п╡я│п©я▀я┘п╦п╡п╟п╣я┌ пЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪.",
                        victim,obj,0,TO_ROOM,POS_RESTING);
 		found = true;
 	    }
@@ -186,6 +186,6 @@ SPELL_DECL(RemoveFear);
 VOID_SPELL(RemoveFear)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     if (!checkDispel(level,victim,gsn_fear))
-	ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+	ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 }
 

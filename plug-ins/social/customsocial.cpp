@@ -89,7 +89,7 @@ void CustomSocial::reaction( Character *ch, Character *victim, const DLString &a
 	if (!getErrorMsg( ).empty( ))
 	    act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
 	else
-	    ch->println("Нет этого здесь.");
+	    ch->println("п²п╣я┌ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄.");
     }
 }
 

@@ -24,7 +24,7 @@ PROF(none);
 PROF(vampire);
 PROF(universal);
 
-const DLString GenericSkill::CATEGORY = "Профессиональные умения";
+const DLString GenericSkill::CATEGORY = "п÷я─п╬я└п╣я│я│п╦п╬п╫п╟п╩я▄п╫я▀п╣ я┐п╪п╣п╫п╦я▐";
 
 GenericSkill::GenericSkill( ) 
                 : raceAffect( 0, &affect_flags ),
@@ -45,8 +45,8 @@ SkillGroupReference & GenericSkill::getGroup( )
 }
 
 /*
- * заполняет массивы с детьми, на основании массива с предками.
- * Вызывается из GenericSkillLoader после загрузки всех generic-skills.
+ * п╥п╟п©п╬п╩п╫я▐п╣я┌ п╪п╟я│я│п╦п╡я▀ я│ п╢п╣я┌я▄п╪п╦, п╫п╟ п╬я│п╫п╬п╡п╟п╫п╦п╦ п╪п╟я│я│п╦п╡п╟ я│ п©я─п╣п╢п╨п╟п╪п╦.
+ * п▓я▀п╥я▀п╡п╟п╣я┌я│я▐ п╦п╥ GenericSkillLoader п©п╬я│п╩п╣ п╥п╟пЁя─я┐п╥п╨п╦ п╡я│п╣я┘ generic-skills.
  */
 void GenericSkill::resolve( ) 
 {
@@ -71,7 +71,7 @@ void GenericSkill::unresolve( )
 }
 
 /*
- * виден ли скилл этому чару в принципе, независимо от уровня.
+ * п╡п╦п╢п╣п╫ п╩п╦ я│п╨п╦п╩п╩ я█я┌п╬п╪я┐ я┤п╟я─я┐ п╡ п©я─п╦п╫я├п╦п©п╣, п╫п╣п╥п╟п╡п╦я│п╦п╪п╬ п╬я┌ я┐я─п╬п╡п╫я▐.
  */
 bool GenericSkill::visible( Character *ch ) const
 {
@@ -104,7 +104,7 @@ bool GenericSkill::visible( Character *ch ) const
 }
 
 /*
- * доступен ли на этом уровне
+ * п╢п╬я│я┌я┐п©п╣п╫ п╩п╦ п╫п╟ я█я┌п╬п╪ я┐я─п╬п╡п╫п╣
  */
 bool GenericSkill::available( Character *ch ) const
 {
@@ -112,7 +112,7 @@ bool GenericSkill::available( Character *ch ) const
 }
 
 /*
- * может ли чар _сейчас_ использовать этот (уже доступный) скилл
+ * п╪п╬п╤п╣я┌ п╩п╦ я┤п╟я─ _я│п╣п╧я┤п╟я│_ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я█я┌п╬я┌ (я┐п╤п╣ п╢п╬я│я┌я┐п©п╫я▀п╧) я│п╨п╦п╩п╩
  */
 bool GenericSkill::usable( Character *ch, bool message = false ) const
 {
@@ -132,7 +132,7 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
     if (ch->getProfession( ) == prof_vampire) {
 	if (spell && !IS_VAMPIRE( ch )) {
 	    if (message)
-		ch->send_to("Для этого необходимо превратиться в вампира!\n\r");
+		ch->send_to("п■п╩я▐ я█я┌п╬пЁп╬ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п©я─п╣п╡я─п╟я┌п╦я┌я▄я│я▐ п╡ п╡п╟п╪п©п╦я─п╟!\n\r");
 
 	    return false;
 	}
@@ -158,7 +158,7 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
 	    fUsable = false;
 	
 	if (!fUsable && message && spell && spell->isCasted( ))
-	    ch->send_to( "Это заклинание в данный момент недоступно тебе.\r\n" );
+	    ch->send_to( "п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╡ п╢п╟п╫п╫я▀п╧ п╪п╬п╪п╣п╫я┌ п╫п╣п╢п╬я│я┌я┐п©п╫п╬ я┌п╣п╠п╣.\r\n" );
 
 	return fUsable;
     }
@@ -182,9 +182,9 @@ bool GenericSkill::availableForAll( ) const
 }
 
 /*
- * с какого уровня скилл станет доступен этому чару
- * Для мобов: скилы, соответствующие их off_flags, доступны с 1 уровня
- * (например: OFF_DIRT, OFF_KICK)
+ * я│ п╨п╟п╨п╬пЁп╬ я┐я─п╬п╡п╫я▐ я│п╨п╦п╩п╩ я│я┌п╟п╫п╣я┌ п╢п╬я│я┌я┐п©п╣п╫ я█я┌п╬п╪я┐ я┤п╟я─я┐
+ * п■п╩я▐ п╪п╬п╠п╬п╡: я│п╨п╦п╩я▀, я│п╬п╬я┌п╡п╣я┌я│я┌п╡я┐я▌я┴п╦п╣ п╦я┘ off_flags, п╢п╬я│я┌я┐п©п╫я▀ я│ 1 я┐я─п╬п╡п╫я▐
+ * (п╫п╟п©я─п╦п╪п╣я─: OFF_DIRT, OFF_KICK)
  */
 int GenericSkill::getLevel( Character *ch ) const
 {
@@ -206,8 +206,8 @@ int GenericSkill::getLevel( Character *ch ) const
 }
 
 /*
- * Для чаров возвращает процент разученности скила, с учетом всех скилов-предков.
- * Для мобов возвращает dice * level + bonus
+ * п■п╩я▐ я┤п╟я─п╬п╡ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©я─п╬я├п╣п╫я┌ я─п╟п╥я┐я┤п╣п╫п╫п╬я│я┌п╦ я│п╨п╦п╩п╟, я│ я┐я┤п╣я┌п╬п╪ п╡я│п╣я┘ я│п╨п╦п╩п╬п╡-п©я─п╣п╢п╨п╬п╡.
+ * п■п╩я▐ п╪п╬п╠п╬п╡ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ dice * level + bonus
  */
 int GenericSkill::getLearned( Character *ch ) const
 {
@@ -232,9 +232,9 @@ int GenericSkill::getLearned( Character *ch ) const
 }
 
 /*
- * вспомогательная процедура для getLearned
- * находит минимально разученный скил среди всех предков
- * (без учета скилов, разученных > 75 или совпадающих с расовыми аффектами)
+ * п╡я│п©п╬п╪п╬пЁп╟я┌п╣п╩я▄п╫п╟я▐ п©я─п╬я├п╣п╢я┐я─п╟ п╢п╩я▐ getLearned
+ * п╫п╟я┘п╬п╢п╦я┌ п╪п╦п╫п╦п╪п╟п╩я▄п╫п╬ я─п╟п╥я┐я┤п╣п╫п╫я▀п╧ я│п╨п╦п╩ я│я─п╣п╢п╦ п╡я│п╣я┘ п©я─п╣п╢п╨п╬п╡
+ * (п╠п╣п╥ я┐я┤п╣я┌п╟ я│п╨п╦п╩п╬п╡, я─п╟п╥я┐я┤п╣п╫п╫я▀я┘ > 75 п╦п╩п╦ я│п╬п╡п©п╟п╢п╟я▌я┴п╦я┘ я│ я─п╟я│п╬п╡я▀п╪п╦ п╟я└я└п╣п╨я┌п╟п╪п╦)
  */
 int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
 {
@@ -307,8 +307,8 @@ int GenericSkill::getMaximum( Character *ch ) const
 }
 
 /*
- * Суммарная цена скила в skill points-ах, с учетом стоимости
- * всех разученных предков.
+ * п║я┐п╪п╪п╟я─п╫п╟я▐ я├п╣п╫п╟ я│п╨п╦п╩п╟ п╡ skill points-п╟я┘, я│ я┐я┤п╣я┌п╬п╪ я│я┌п╬п╦п╪п╬я│я┌п╦
+ * п╡я│п╣я┘ я─п╟п╥я┐я┤п╣п╫п╫я▀я┘ п©я─п╣п╢п╨п╬п╡.
  */
 int GenericSkill::getTotalWeight( PCharacter *ch ) 
 {
@@ -343,8 +343,8 @@ int GenericSkill::totalWeightAux( PCharacter *ch )
 }
 
 /*
- * Сколько будет стоит знание этого скила на 100%
- * (скилы-предки должны быть разучены минимум на 75%)
+ * п║п╨п╬п╩я▄п╨п╬ п╠я┐п╢п╣я┌ я│я┌п╬п╦я┌ п╥п╫п╟п╫п╦п╣ я█я┌п╬пЁп╬ я│п╨п╦п╩п╟ п╫п╟ 100%
+ * (я│п╨п╦п╩я▀-п©я─п╣п╢п╨п╦ п╢п╬п╩п╤п╫я▀ п╠я▀я┌я▄ я─п╟п╥я┐я┤п╣п╫я▀ п╪п╦п╫п╦п╪я┐п╪ п╫п╟ 75%)
  */
 int GenericSkill::getMaxWeight( PCharacter *ch ) 
 {
@@ -403,9 +403,9 @@ int GenericSkill::getRating( PCharacter *ch ) const
 }
 
 /*
- * может ли чар забыть скилл (автоматически либо с пом. команды 'forget')
- * Нельзя забывать расовые бонусы и те скилы, у которых есть разученные
- * потомки. Если потомок - расовый бонус, то он не учитывается.
+ * п╪п╬п╤п╣я┌ п╩п╦ я┤п╟я─ п╥п╟п╠я▀я┌я▄ я│п╨п╦п╩п╩ (п╟п╡я┌п╬п╪п╟я┌п╦я┤п╣я│п╨п╦ п╩п╦п╠п╬ я│ п©п╬п╪. п╨п╬п╪п╟п╫п╢я▀ 'forget')
+ * п²п╣п╩я▄п╥я▐ п╥п╟п╠я▀п╡п╟я┌я▄ я─п╟я│п╬п╡я▀п╣ п╠п╬п╫я┐я│я▀ п╦ я┌п╣ я│п╨п╦п╩я▀, я┐ п╨п╬я┌п╬я─я▀я┘ п╣я│я┌я▄ я─п╟п╥я┐я┤п╣п╫п╫я▀п╣
+ * п©п╬я┌п╬п╪п╨п╦. п∙я│п╩п╦ п©п╬я┌п╬п╪п╬п╨ - я─п╟я│п╬п╡я▀п╧ п╠п╬п╫я┐я│, я┌п╬ п╬п╫ п╫п╣ я┐я┤п╦я┌я▀п╡п╟п╣я┌я│я▐.
  */
 bool GenericSkill::canForget( PCharacter *ch ) const
 {
@@ -443,7 +443,7 @@ bool GenericSkill::forgetAux( PCharacter *ch ) const
 }
 
 /*
- * может ли чар практиковать этот скилл
+ * п╪п╬п╤п╣я┌ п╩п╦ я┤п╟я─ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄ я█я┌п╬я┌ я│п╨п╦п╩п╩
  */
 bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
 {
@@ -451,12 +451,12 @@ bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
 	return false;
     
     if (ch->getProfession( ) == prof_universal && !usable( ch )) {
-	buf << "Умение '" << getNameFor( ch ) << "' сейчас недоступно тебе." << endl;
+	buf << "пёп╪п╣п╫п╦п╣ '" << getNameFor( ch ) << "' я│п╣п╧я┤п╟я│ п╫п╣п╢п╬я│я┌я┐п©п╫п╬ я┌п╣п╠п╣." << endl;
 	return false;
     }
 
     if (ch->skill_points( ) > ch->max_skill_points) {
-	buf << "Тебе уже есть, что {RЗАБЫВАТЬ{x!" << endl;
+	buf << "п╒п╣п╠п╣ я┐п╤п╣ п╣я│я┌я▄, я┤я┌п╬ {Rп≈п░п▒п╚п▓п░п╒п╛{x!" << endl;
 	return false;
     }
     
@@ -482,13 +482,13 @@ bool GenericSkill::practiceAux( PCharacter *ch, std::ostream & buf ) const
 	const char *sname = (*i)->getNameFor( ch ).c_str( );
 
 	if (data.forgetting) {
-	    buf << "Ты не можешь изучить это умение, ведь ты сейчас "
-	        << "пытаешься забыть исскуство '" << sname << "'." << endl;
+	    buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥я┐я┤п╦я┌я▄ я█я┌п╬ я┐п╪п╣п╫п╦п╣, п╡п╣п╢я▄ я┌я▀ я│п╣п╧я┤п╟я│ "
+	        << "п©я▀я┌п╟п╣я┬я▄я│я▐ п╥п╟п╠я▀я┌я▄ п╦я│я│п╨я┐я│я┌п╡п╬ '" << sname << "'." << endl;
 	    return false;
 	}
 	
 	if (!isRaceAffect( ch ) && data.learned.getValue( ) < adept) {
-	    buf << "Ты недостаточно владеешь искусством '" << sname << "'." << endl;
+	    buf << "п╒я▀ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╡п╩п╟п╢п╣п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬п╪ '" << sname << "'." << endl;
 	    return false;
 	}
 
@@ -503,7 +503,7 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
 	if (verbose)
-	    ch->println( "Тебе не с кем практиковаться здесь." );
+	    ch->println( "п╒п╣п╠п╣ п╫п╣ я│ п╨п╣п╪ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄я│я▐ п╥п╢п╣я│я▄." );
 	return false;
     }
     
@@ -511,15 +511,15 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 	return true;
 
     if (verbose)
-	ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-	       "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
+	ch->pecho( "%1$^C1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╟я┐я┤п╦я┌я▄ я┌п╣п╠я▐ п╦я│п╨я┐я│я│я┌п╡я┐ '%2$s'.\n"
+	       "п■п╩я▐ п╠п╬п╩я▄я┬п╣п╧ п╦п╫я└п╬я─п╪п╟я├п╦п╦ п╦я│п©п╬п╩я▄п╥я┐п╧: {y{hc{lRя┐п╪п╣п╫п╦п╣ %2$s{lEslook %2$s{x, {y{lRпЁя─я┐п©п©п╟я┐п╪п╣п╫ {DпЁя─я┐п©п©п╟{y{lEglist {DпЁя─я┐п©п©п╟{x.",
 	       mob, getNameFor( ch ).c_str( ) );
     return false;
 }
 
 /*
- * Печатает разную инфу: группу, цену в s.p., дерево предков, список потомков etc
- * Используется в showskill.
+ * п÷п╣я┤п╟я┌п╟п╣я┌ я─п╟п╥п╫я┐я▌ п╦п╫я└я┐: пЁя─я┐п©п©я┐, я├п╣п╫я┐ п╡ s.p., п╢п╣я─п╣п╡п╬ п©я─п╣п╢п╨п╬п╡, я│п©п╦я│п╬п╨ п©п╬я┌п╬п╪п╨п╬п╡ etc
+ * п≤я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ п╡ showskill.
  */
 void GenericSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
@@ -527,10 +527,10 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     int total, max;
     bool rus = ch->getConfig( )->ruskills;
 
-    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
+    buf << (spell && spell->isCasted( ) ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣")
         << " '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{hg{W" 
+	<< "п╡я┘п╬п╢п╦я┌ п╡ пЁя─я┐п©п©я┐ '{hg{W" 
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
 	<< "{x'"
 	<< endl;
@@ -544,7 +544,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
 	if (csize > 1) {
 	    DLString cl;
 
-	    buf << "Доступно професси" << (csize == 2 ? "и" : "ям") << " ";
+	    buf << "п■п╬я│я┌я┐п©п╫п╬ п©я─п╬я└п╣я│я│п╦" << (csize == 2 ? "п╦" : "я▐п╪") << " ";
 	    
 	    for (Classes::iterator i = classes.begin( ); i != classes.end( ); i++) 
 		if (i->first != prof_universal->getName( )) {
@@ -562,9 +562,9 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     max = getMaxWeight( ch );
 #if 0    
     if (sp || total || max) 
-	buf << "Цена {W" << sp << "{x sp, "
-	    << "на всю ветку потрачено {W" << total << "{x sp, "
-	    << "мастерское владение стоит {W" << max << "{x sp" 
+	buf << "п╕п╣п╫п╟ {W" << sp << "{x sp, "
+	    << "п╫п╟ п╡я│я▌ п╡п╣я┌п╨я┐ п©п╬я┌я─п╟я┤п╣п╫п╬ {W" << total << "{x sp, "
+	    << "п╪п╟я│я┌п╣я─я│п╨п╬п╣ п╡п╩п╟п╢п╣п╫п╦п╣ я│я┌п╬п╦я┌ {W" << max << "{x sp" 
 	    << endl;
 #endif    
     SkillClassInfo *ci = getClassInfo( ch );
@@ -574,7 +574,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
 	const GenericSkillVector &v = ci->children.getConstVector( ch );
 	
 	if (!v.empty( )) {
-	    buf << "Позволяет выучить: ";
+	    buf << "п÷п╬п╥п╡п╬п╩я▐п╣я┌ п╡я▀я┐я┤п╦я┌я▄: ";
 	    
 	    for (i = v.begin( ); i != v.end( ); ) {
 		buf << "{W" << (*i)->getNameFor( ch ) << "{x";
@@ -595,7 +595,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
 }
 
 /* 
- * Печатает дерево предков для скила
+ * п÷п╣я┤п╟я┌п╟п╣я┌ п╢п╣я─п╣п╡п╬ п©я─п╣п╢п╨п╬п╡ п╢п╩я▐ я│п╨п╦п╩п╟
  */
 void 
 GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad ) 
@@ -637,7 +637,7 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
     if (sp > 0)
 	buf << "*" << sp;
 #endif	
-    buf << ", уровень {W" << getLevel( ch ) << "{x)" << endl;
+    buf << ", я┐я─п╬п╡п╣п╫я▄ {W" << getLevel( ch ) << "{x)" << endl;
     
     ci->mark( );
 
@@ -656,9 +656,9 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
 }
 
 /*
- * Возвращает структуру SkillClassInfo для класса этого чара.
- * Для мобов ищет тот класс, в котором скил доступен на самом низком левеле.
- * Мобы могут быть "многоклассовыми", в соотв-и со своими act-flags.
+ * п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ я│я┌я─я┐п╨я┌я┐я─я┐ SkillClassInfo п╢п╩я▐ п╨п╩п╟я│я│п╟ я█я┌п╬пЁп╬ я┤п╟я─п╟.
+ * п■п╩я▐ п╪п╬п╠п╬п╡ п╦я┴п╣я┌ я┌п╬я┌ п╨п╩п╟я│я│, п╡ п╨п╬я┌п╬я─п╬п╪ я│п╨п╦п╩ п╢п╬я│я┌я┐п©п╣п╫ п╫п╟ я│п╟п╪п╬п╪ п╫п╦п╥п╨п╬п╪ п╩п╣п╡п╣п╩п╣.
+ * п°п╬п╠я▀ п╪п╬пЁя┐я┌ п╠я▀я┌я▄ "п╪п╫п╬пЁп╬п╨п╩п╟я│я│п╬п╡я▀п╪п╦", п╡ я│п╬п╬я┌п╡-п╦ я│п╬ я│п╡п╬п╦п╪п╦ act-flags.
  */
 const SkillClassInfo *
 GenericSkill::getClassInfo( Character *ch ) const
@@ -706,7 +706,7 @@ GenericSkill::getClassInfo( const DLString &className )
 }
 
 /*
- * возвращает инфо о расовом бонусе для чара (if any)
+ * п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п╦п╫я└п╬ п╬ я─п╟я│п╬п╡п╬п╪ п╠п╬п╫я┐я│п╣ п╢п╩я▐ я┤п╟я─п╟ (if any)
  */
 const SkillRaceBonus *
 GenericSkill::getRaceBonus( Character *ch ) const
@@ -717,8 +717,8 @@ GenericSkill::getRaceBonus( Character *ch ) const
 }
 
 /*
- * соответствует ли этот скил какому-либо расовому аффекту для чара?
- * (пример: sneak - AFF_SNEAK)
+ * я│п╬п╬я┌п╡п╣я┌я│я┌п╡я┐п╣я┌ п╩п╦ я█я┌п╬я┌ я│п╨п╦п╩ п╨п╟п╨п╬п╪я┐-п╩п╦п╠п╬ я─п╟я│п╬п╡п╬п╪я┐ п╟я└я└п╣п╨я┌я┐ п╢п╩я▐ я┤п╟я─п╟?
+ * (п©я─п╦п╪п╣я─: sneak - AFF_SNEAK)
  */
 bool GenericSkill::isRaceAffect( Character *ch ) const
 {
@@ -726,8 +726,8 @@ bool GenericSkill::isRaceAffect( Character *ch ) const
 }
 
 /*
- * установка/снятие/проверка меток на дереве предков
- * (используется при обходе в глубину)
+ * я┐я│я┌п╟п╫п╬п╡п╨п╟/я│п╫я▐я┌п╦п╣/п©я─п╬п╡п╣я─п╨п╟ п╪п╣я┌п╬п╨ п╫п╟ п╢п╣я─п╣п╡п╣ п©я─п╣п╢п╨п╬п╡
+ * (п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ п©я─п╦ п╬п╠я┘п╬п╢п╣ п╡ пЁп╩я┐п╠п╦п╫я┐)
  */
 void GenericSkill::unmark( PCharacter *ch )
 {
@@ -763,8 +763,8 @@ SkillClassInfo::SkillClassInfo( )
 }
 
 /*
- * возвращает инфо о клановых запретах на использования скила 
- * для данной профессии
+ * п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п╦п╫я└п╬ п╬ п╨п╩п╟п╫п╬п╡я▀я┘ п╥п╟п©я─п╣я┌п╟я┘ п╫п╟ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦я▐ я│п╨п╦п╩п╟ 
+ * п╢п╩я▐ п╢п╟п╫п╫п╬п╧ п©я─п╬я└п╣я│я│п╦п╦
  */
 const SkillClanAntiBonus *
 SkillClassInfo::getClanAntiBonus( Character *ch ) const
