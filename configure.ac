@@ -1,7 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([dreamland], [0.1])
-AC_CONVERT_CHARSET
 AC_CONFIG_SRCDIR(Makefile.am)
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_SYSTEM
@@ -11,7 +10,6 @@ AM_INIT_AUTOMAKE
 
 dnl Check for additional compiler/linker options
 AC_CHECK_OPTIMIZATION
-
    
 AM_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
@@ -63,6 +61,7 @@ AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_THREADS
 AC_CHECK_MCCP
 AC_CHECK_GC
+AC_CONVERT_CHARSET
 #AM_ICONV_LINK
 
 dnl Additional options

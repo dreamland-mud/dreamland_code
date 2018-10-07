@@ -46,7 +46,7 @@ lib_LTLIBRARIES = libdreamland.la libdreamland_impl.la
 bin_PROGRAMS = dreamland
 
 AM_LDFLAGS = -no-undefined $(LD_DLLGLUE)
-AM_CXXFLAGS = -Wall $(CC_DLLGLUE) -finput-charset=UTF-8 -fexec-charset=KOI8-R
+AM_CXXFLAGS = -Wall $(CC_DLLGLUE) 
 CXXLD = $(MY_CXXLD)
 
 SUBDIRS =  \
