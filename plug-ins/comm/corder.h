@@ -14,18 +14,18 @@ class InterpretArguments;
 class COrder : public CommandPlugin, public DefaultCommand {
 XML_OBJECT
 public:
-	typedef ::Pointer<COrder> Pointer;
+        typedef ::Pointer<COrder> Pointer;
     
-	COrder( );
+        COrder( );
 
-	virtual void run( Character *, const DLString & );
-	
+        virtual void run( Character *, const DLString & );
+        
 private:
-	bool canOrder( Character *, Character * );
-	Character *findVictim( Character *, DLString & );
-	void interpretOrder( Character *, InterpretArguments &, const DLString & );
+        bool canOrder( Character *, Character * );
+        Character *findVictim( Character *, DLString & );
+        void interpretOrder( Character *, InterpretArguments &, const DLString & );
 
-	static const DLString COMMAND_NAME;
+        static const DLString COMMAND_NAME;
 };
 
 #endif

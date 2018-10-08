@@ -16,28 +16,28 @@
 #include "exception.h"
 
 /**
- * @short Для генерации ощибок при разборе patterns
+ * @short п■п╩я▐ пЁп╣п╫п╣я─п╟я├п╦п╦ п╬я┴п╦п╠п╬п╨ п©я─п╦ я─п╟п╥п╠п╬я─п╣ patterns
  * @author Igor S. Petrenko
  */
 class ExceptionXSL : public Exception
 {
 public: 
     /**
-     * @arg type - сообщение о ошибке
-     * @arg position - в какой позиции
+     * @arg type - я│п╬п╬п╠я┴п╣п╫п╦п╣ п╬ п╬я┬п╦п╠п╨п╣
+     * @arg position - п╡ п╨п╟п╨п╬п╧ п©п╬п╥п╦я├п╦п╦
      */
     ExceptionXSL( const string type, int position  );
     
     /**
-     * @arg type - сообщение о ошибке
-     * @arg symbol - неизвестная строка
-     * @arg position - в какой позиции
+     * @arg type - я│п╬п╬п╠я┴п╣п╫п╦п╣ п╬ п╬я┬п╦п╠п╨п╣
+     * @arg symbol - п╫п╣п╦п╥п╡п╣я│я┌п╫п╟я▐ я│я┌я─п╬п╨п╟
+     * @arg position - п╡ п╨п╟п╨п╬п╧ п©п╬п╥п╦я├п╦п╦
      */
     ExceptionXSL( const string type, const string  symbol, int position  );
     
     /**
-     * @arg symbol - неизвестный символ
-     * @arg position - в какой позиции
+     * @arg symbol - п╫п╣п╦п╥п╡п╣я│я┌п╫я▀п╧ я│п╦п╪п╡п╬п╩
+     * @arg position - п╡ п╨п╟п╨п╬п╧ п©п╬п╥п╦я├п╦п╦
      */
     ExceptionXSL( char symbol, int position  );
 

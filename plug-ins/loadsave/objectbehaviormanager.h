@@ -11,12 +11,12 @@ class Object;
 struct obj_index_data;
 
 class ObjectBehaviorManager {
-public:	
-	static void assign( Object * );
-	static void parse( obj_index_data *, FILE * );
-	static void parse( Object *, FILE * );
-	static void save( const obj_index_data *, FILE * );
-	static void save( const Object *, FILE * );
+public:        
+        static void assign( Object * );
+        static void parse( obj_index_data *, FILE * );
+        static void parse( Object *, FILE * );
+        static void save( const obj_index_data *, FILE * );
+        static void save( const Object *, FILE * );
 };
 
 #endif

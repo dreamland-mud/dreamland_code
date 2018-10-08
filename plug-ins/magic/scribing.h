@@ -14,17 +14,17 @@
 class SpellBook : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<SpellBook> Pointer;
-	typedef XMLMapBase<XMLInteger> SpellList;
+        typedef ::Pointer<SpellBook> Pointer;
+        typedef XMLMapBase<XMLInteger> SpellList;
     
-	SpellBook( );
-	
-	virtual bool examine( Character * );
-	virtual DLString extraDescription( Character *ch, const DLString & );
+        SpellBook( );
+        
+        virtual bool examine( Character * );
+        virtual DLString extraDescription( Character *ch, const DLString & );
         virtual bool hasTrigger( const DLString &  );
         void toString( ostringstream & buf );
 
-	XML_VARIABLE SpellList spells;
+        XML_VARIABLE SpellList spells;
 };
 
 

@@ -19,32 +19,32 @@ public:
         typedef ::Pointer<XMLGodReward> Pointer;
         
         XMLGodReward( );
-	virtual ~XMLGodReward( );
+        virtual ~XMLGodReward( );
 
-	XML_VARIABLE XMLInteger qp;
-	XML_VARIABLE XMLString  reason;
+        XML_VARIABLE XMLInteger qp;
+        XML_VARIABLE XMLString  reason;
 };
 
 class XMLAttributeGodReward : public XMLAttribute, public XMLVariableContainer {
 XML_OBJECT;
 public:
-	typedef ::Pointer<XMLAttributeGodReward> Pointer;
+        typedef ::Pointer<XMLAttributeGodReward> Pointer;
 
-	void addReward( int qp, const DLString &reason );
+        void addReward( int qp, const DLString &reason );
         void listRewards(ostringstream &buf) const;
-	void reward( PCharacter * );
+        void reward( PCharacter * );
         bool isEmpty() const;
 
-private:	
-	XML_VARIABLE XMLVectorBase<XMLGodReward> rewards;
+private:        
+        XML_VARIABLE XMLVectorBase<XMLGodReward> rewards;
 };
 
 
 class XMLAttributeGodRewardListenerPlugin : public DescriptorStateListener {
 public:
-	typedef ::Pointer<XMLAttributeGodRewardListenerPlugin> Pointer;
+        typedef ::Pointer<XMLAttributeGodRewardListenerPlugin> Pointer;
 
-	virtual void run( int, int, Descriptor * );	
+        virtual void run( int, int, Descriptor * );        
 };
 
 #endif

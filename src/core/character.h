@@ -79,8 +79,8 @@ struct PlayerConfig : public virtual DLObject {
 class Character : public Grammar::NounHolder,
                   public virtual CharacterMemoryInterface, 
                   public XMLVariableContainer,
-		  public WrapperTarget
-{		
+                  public WrapperTarget
+{                
 XML_OBJECT
 public:
     typedef ::Pointer<Character> Pointer;
@@ -231,72 +231,72 @@ protected:
     XML_VARIABLE XMLShort sex;
     XML_VARIABLE XMLRaceReference race;
     XML_VARIABLE XMLReligionReference religion;
-    time_t			last_fight_time;
+    time_t                        last_fight_time;
 
 public:
     bool extracted;
-    Character* 			reply;
-    Character* 			next;
-    Character* 			prev;
-    Character *			next_in_room;
-    Character *			master;
-    Character *			leader;
-    Character *			doppel;
-    Character *			fighting;
-    Character *			last_fought;
-    Descriptor *		desc;
-    Affect *			affected;
-    Object *			carrying;
-    Object *			on;
-    Room *			in_room;
-    Room *			was_in_room;
-    XML_VARIABLE		XMLEnumeration ethos;
+    Character*                         reply;
+    Character*                         next;
+    Character*                         prev;
+    Character *                        next_in_room;
+    Character *                        master;
+    Character *                        leader;
+    Character *                        doppel;
+    Character *                        fighting;
+    Character *                        last_fought;
+    Descriptor *                desc;
+    Affect *                        affected;
+    Object *                        carrying;
+    Object *                        on;
+    Room *                        in_room;
+    Room *                        was_in_room;
+    XML_VARIABLE                XMLEnumeration ethos;
     
-    int				timer;
-    int				wait;
-    int				daze;
+    int                                timer;
+    int                                wait;
+    int                                daze;
     
-    XML_VARIABLE XMLInteger		hit;
-    XML_VARIABLE XMLInteger		max_hit;
-    XML_VARIABLE XMLInteger		mana;
-    XML_VARIABLE XMLInteger		max_mana;
-    XML_VARIABLE XMLInteger		move;
-    XML_VARIABLE XMLInteger		max_move;
-    XML_VARIABLE XMLIntegerNoEmpty	gold;
-    XML_VARIABLE XMLIntegerNoEmpty	silver;
-    XML_VARIABLE XMLInteger		exp;
+    XML_VARIABLE XMLInteger                hit;
+    XML_VARIABLE XMLInteger                max_hit;
+    XML_VARIABLE XMLInteger                mana;
+    XML_VARIABLE XMLInteger                max_mana;
+    XML_VARIABLE XMLInteger                move;
+    XML_VARIABLE XMLInteger                max_move;
+    XML_VARIABLE XMLIntegerNoEmpty        gold;
+    XML_VARIABLE XMLIntegerNoEmpty        silver;
+    XML_VARIABLE XMLInteger                exp;
     
     // wizard stuff
-    XML_VARIABLE XMLIntegerNoEmpty	invis_level;
-    XML_VARIABLE XMLIntegerNoEmpty	incog_level;
+    XML_VARIABLE XMLIntegerNoEmpty        invis_level;
+    XML_VARIABLE XMLIntegerNoEmpty        incog_level;
     
     // text output
-    XML_VARIABLE XMLString		prompt;
-    XML_VARIABLE XMLString		batle_prompt;
-    char *		prefix;
-    XML_VARIABLE XMLInteger		lines;  // for the pager
+    XML_VARIABLE XMLString                prompt;
+    XML_VARIABLE XMLString                batle_prompt;
+    char *                prefix;
+    XML_VARIABLE XMLInteger                lines;  // for the pager
 
-    XML_VARIABLE XMLFlags		act;
-    XML_VARIABLE XMLFlags		comm;   
-    XML_VARIABLE XMLFlags		add_comm;
-    XML_VARIABLE XMLFlags		imm_flags;
-    XML_VARIABLE XMLFlags		res_flags;
-    XML_VARIABLE XMLFlags		vuln_flags;
-    XML_VARIABLE XMLFlags		affected_by;
-    XML_VARIABLE XMLFlags		add_affected_by;
-    XML_VARIABLE XMLFlags		detection;
-    XML_VARIABLE XMLEnumeration	position;
+    XML_VARIABLE XMLFlags                act;
+    XML_VARIABLE XMLFlags                comm;   
+    XML_VARIABLE XMLFlags                add_comm;
+    XML_VARIABLE XMLFlags                imm_flags;
+    XML_VARIABLE XMLFlags                res_flags;
+    XML_VARIABLE XMLFlags                vuln_flags;
+    XML_VARIABLE XMLFlags                affected_by;
+    XML_VARIABLE XMLFlags                add_affected_by;
+    XML_VARIABLE XMLFlags                detection;
+    XML_VARIABLE XMLEnumeration        position;
     XML_VARIABLE XMLFlags posFlags;
 
-    int			carry_weight;
-    int			carry_number;
-    XML_VARIABLE XMLIntegerNoEmpty	saving_throw;
-    XML_VARIABLE XMLInteger		alignment;
-    XML_VARIABLE XMLIntegerNoEmpty	hitroll;
-    XML_VARIABLE XMLIntegerNoEmpty	damroll;
+    int                        carry_weight;
+    int                        carry_number;
+    XML_VARIABLE XMLIntegerNoEmpty        saving_throw;
+    XML_VARIABLE XMLInteger                alignment;
+    XML_VARIABLE XMLIntegerNoEmpty        hitroll;
+    XML_VARIABLE XMLIntegerNoEmpty        damroll;
     XML_VARIABLE XMLEnumerationArray    armor;
     XML_VARIABLE XMLIntegerNoEmpty   wimpy;
-    int			dam_type;
+    int                        dam_type;
     int heal_gain;
     int mana_gain;
 
@@ -305,23 +305,23 @@ public:
     XML_VARIABLE XMLEnumerationArray mod_stat;
 
     // parts stuff 
-    long	form;
-    long	parts;
-    int	size;
-    char*	material;
+    long        form;
+    long        parts;
+    int        size;
+    char*        material;
     
     // hunt data 
-    int 	endur;
+    int         endur;
     
     // mount data 
-    bool	riding;	
-    Character *	mount;
+    bool        riding;        
+    Character *        mount;
 
     RaceLanguageReference language;
-    char	*ambushing;
+    char        *ambushing;
     
     // traps
-    int	death_ground_delay;
+    int        death_ground_delay;
     Flags trap;
 };
 

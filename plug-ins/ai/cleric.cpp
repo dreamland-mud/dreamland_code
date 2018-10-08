@@ -68,7 +68,7 @@ BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnPanicAttack [] = {
     { gsn_cause_serious,  100 },
     { gsn_cause_light,     -1 }
 };
-	
+        
 BasicMobileBehavior::SpellChance BasicMobileBehavior::clericSnPassiveDefence [] = {
     { gsn_dispel_affects,  90 },
     { gsn_faerie_fire,   50 },
@@ -107,18 +107,18 @@ bool BasicMobileBehavior::specFightCleric( )
     SpellChance * spellTable;
     
     if (!( victim = findCastVictim( ) ))
-	return false;
+        return false;
     
     if (HEALTH(victim) < 25 || HEALTH(ch) < 25) 
-	spellTable = clericSnPanicAttack;
+        spellTable = clericSnPanicAttack;
     else if (HEALTH(ch) <= 80 && HEALTH(ch) > 45) 
-	spellTable = clericSnAttack;
+        spellTable = clericSnAttack;
     else if (HEALTH(ch) <= 45) {
-	spellTable = clericSnHealing;
-	victim = ch;
+        spellTable = clericSnHealing;
+        victim = ch;
     }
     else 
-	spellTable = clericSnPassiveDefence;
+        spellTable = clericSnPassiveDefence;
     
     return SpellChanceTable( spellTable, ch, victim ).castSpell( );
 }
@@ -128,9 +128,9 @@ bool BasicMobileBehavior::healCleric( Character *patient )
     SpellChance * spellTable;
     
     if (!chance( HEALTH(patient) ))
-	spellTable = clericSnHealing;
+        spellTable = clericSnHealing;
     else
-	spellTable = clericSnCurative;
+        spellTable = clericSnCurative;
     
     return SpellChanceTable( spellTable, ch, patient ).castSpell( ~FSPELL_OBSTACLES);
 }
@@ -138,8 +138,8 @@ bool BasicMobileBehavior::healCleric( Character *patient )
 
 /*
     if (gsn_flamestrike->usable( ch ))
-	if (check_immune( victim, DAM_FIRE ) == IS_VULNERABLE)
-	    return gsn_flamestrike;
+        if (check_immune( victim, DAM_FIRE ) == IS_VULNERABLE)
+            return gsn_flamestrike;
 */
 
 #endif

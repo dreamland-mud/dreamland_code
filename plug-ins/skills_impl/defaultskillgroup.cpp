@@ -31,13 +31,13 @@ void DefaultSkillGroup::loaded( )
     skillGroupManager->registrate( Pointer( this ) );
 
     if (help) 
-	help->setSkillGroup( Pointer( this ) );
+        help->setSkillGroup( Pointer( this ) );
 }
 
 void DefaultSkillGroup::unloaded( )
 {
     if (help) 
-	help->unsetSkillGroup( );
+        help->unsetSkillGroup( );
 
     skillGroupManager->unregistrate( Pointer( this ) );
 }
@@ -65,19 +65,19 @@ bool DefaultSkillGroup::visible( Character *ch ) const
 bool DefaultSkillGroup::available( Character *ch ) const
 {
     if (ch->is_npc( ) && IS_AFFECTED(ch, AFF_CHARM))
-	return !nopet;
+        return !nopet;
 
     return true;
 }
 
 void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 {
-    buf << "çÒÕÐÐÁ "
+    buf << "Ð“Ñ€ÑƒÐ¿Ð¿Ð° "
         << "{Y" << getName( ) << "{w, "
-	<< "{Y" << getRussianName( ) << "{w" << endl;
+        << "{Y" << getRussianName( ) << "{w" << endl;
 
     if (help)
-	buf << help->c_str( );
+        buf << help->c_str( );
 
     if (autoHelp) {
         buf << endl;
@@ -90,27 +90,27 @@ void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) const
 {
     if (group_clan == this) {
-	buf << "ðÒÁËÔÉËÕÅÔÓÑ Õ {gËÌÁÎÏ×ÏÇÏ ÏÈÒÁÎÎÉËÁ{x.";
+        buf << "ÐŸÑ€Ð°ÐºÑ‚Ð¸ÐºÑƒÐµÑ‚ÑÑ Ñƒ {gÐºÐ»Ð°Ð½Ð¾Ð²Ð¾Ð³Ð¾ Ð¾Ñ…Ñ€Ð°Ð½Ð½Ð¸ÐºÐ°{x.";
     }
     else if (practicer == 0) {
-	buf << "ðÒÁËÔÉËÕÅÔÓÑ × {gÇÉÌØÄÉÉ{x.";
+        buf << "ÐŸÑ€Ð°ÐºÑ‚Ð¸ÐºÑƒÐµÑ‚ÑÑ Ð² {gÐ³Ð¸Ð»ÑŒÐ´Ð¸Ð¸{x.";
     }
     else {
-	MOB_INDEX_DATA *pMob = get_mob_index( practicer );
+        MOB_INDEX_DATA *pMob = get_mob_index( practicer );
 
-	if (!pMob) {
-	    LogStream::sendError( ) << "Group " << getName( ) << " has invalid practicer " << practicer << endl;
-	    return;
-	}
+        if (!pMob) {
+            LogStream::sendError( ) << "Group " << getName( ) << " has invalid practicer " << practicer << endl;
+            return;
+        }
 
-	if (pMob->sex == SEX_FEMALE)
-	    buf << "õÞÉÔÅÌØÎÉÃÁ";
-	else
-	    buf << "õÞÉÔÅÌØ";
+        if (pMob->sex == SEX_FEMALE)
+            buf << "Ð£Ñ‡Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¸Ñ†Ð°";
+        else
+            buf << "Ð£Ñ‡Ð¸Ñ‚ÐµÐ»ÑŒ";
 
-	buf << " - {g" 
-	    << russian_case( pMob->short_descr, '1' ) << "{x "
-	    << "({g" << pMob->area->name << "{x).";
+        buf << " - {g" 
+            << russian_case( pMob->short_descr, '1' ) << "{x "
+            << "({g" << pMob->area->name << "{x).";
     }
 
     buf << endl;
@@ -123,28 +123,28 @@ void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
     int columns = 3;
     const char *pattern = fRus ? "{%c%-26s{x" : "{%c%-20s{x";
     
-    buf << endl << "îÁ×ÙËÉ ÜÔÏÊ ÇÒÕÐÐÙ:" << endl;
+    buf << endl << "ÐÐ°Ð²Ñ‹ÐºÐ¸ ÑÑ‚Ð¾Ð¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹:" << endl;
 
     for (int col = 0, sn = 0; sn < skillManager->size( ); sn++) {
-	Skill *skill = skillManager->find( sn );
+        Skill *skill = skillManager->find( sn );
 
-	if (skill->getGroup( ) != this)
-	    continue;
+        if (skill->getGroup( ) != this)
+            continue;
 
-	const DLString &skillName = fRus ? skill->getRussianName( ) : skill->getName( );
-	buf << fmt( 0, pattern, 
-	               getSkillColor( skill, ch ),
-		       skillName.c_str( ) );
-	
-	if (++col % columns == 0)
-	    buf << endl;
+        const DLString &skillName = fRus ? skill->getRussianName( ) : skill->getName( );
+        buf << fmt( 0, pattern, 
+                       getSkillColor( skill, ch ),
+                       skillName.c_str( ) );
+        
+        if (++col % columns == 0)
+            buf << endl;
     }
 }
 
 char DefaultSkillGroup::getSkillColor( Skill *skill, PCharacter *ch ) const
 {
     if (skill->usable( ch, false ))
-	return 'g';
+        return 'g';
 
     return 'w';
 }
@@ -152,16 +152,16 @@ char DefaultSkillGroup::getSkillColor( Skill *skill, PCharacter *ch ) const
 bool DefaultSkillGroup::matchesUnstrict( const DLString &str ) const
 {
     if (!name.empty( ) 
-	&& str.strPrefix( name ))    
+        && str.strPrefix( name ))    
     {
-	return true;
+        return true;
     }
 
     if (!nameRus.getFullForm( ).empty( ) 
-	&& is_name( str.c_str( ),
-	            nameRus.decline( '7' ).c_str( ) ))
+        && is_name( str.c_str( ),
+                    nameRus.decline( '7' ).c_str( ) ))
     {
-	return true;
+        return true;
     }
 
     return false;

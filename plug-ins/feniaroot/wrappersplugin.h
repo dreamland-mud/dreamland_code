@@ -11,13 +11,13 @@
 
 class WrappersPlugin : public Plugin, public XMLVariableContainer {
 XML_OBJECT
-public:	
-	typedef ::Pointer<WrappersPlugin> Pointer;
-	
-	virtual void initialization( );
-	virtual void destruction( );
-	
-	static void linkTargets();
+public:        
+        typedef ::Pointer<WrappersPlugin> Pointer;
+        
+        virtual void initialization( );
+        virtual void destruction( );
+        
+        static void linkTargets();
 };
 
 #endif

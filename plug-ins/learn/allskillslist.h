@@ -28,15 +28,15 @@ struct SkillInfo
 
     static bool cmp_by_name( SkillInfo a, SkillInfo b )
     {
-	return a.name < b.name;
+        return a.name < b.name;
     }
     static bool cmp_by_level( SkillInfo a, SkillInfo b )
     {
-	return a.level < b.level;
+        return a.level < b.level;
     }
     static bool cmp_by_learned( SkillInfo a, SkillInfo b )
     {
-	return a.learned < b.learned;
+        return a.learned < b.learned;
     }
 
     const char * colorLearned( );

@@ -51,7 +51,7 @@ FeniaManager::~FeniaManager()
     Class::unregMoc<RegListCall>( );
 
     if(current == this)
-	current = NULL;
+        current = NULL;
 
     thisClass = 0;
 }

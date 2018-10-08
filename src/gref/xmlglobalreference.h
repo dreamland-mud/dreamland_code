@@ -20,12 +20,12 @@ public:
 
 #define XMLGLOBALREF_DECL(Type) \
     struct XML##Type##Reference : public Type##Reference, public XMLGlobalReference { \
-	XML##Type##Reference( ); \
-	virtual ~XML##Type##Reference( ); \
-	inline XML##Type##Reference & operator = ( int index ) { \
-	    assign( index ); \
-	    return *this; \
-	} \
+        XML##Type##Reference( ); \
+        virtual ~XML##Type##Reference( ); \
+        inline XML##Type##Reference & operator = ( int index ) { \
+            assign( index ); \
+            return *this; \
+        } \
     };
 
 #define XMLGLOBALREF_IMPL(Type) \

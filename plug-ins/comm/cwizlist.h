@@ -3,15 +3,15 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    Zadvinsky Alexandr   {Kiddy}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #ifndef CWIZLIST_H
@@ -34,29 +34,29 @@ public:
     
 private:
     static const DLString COMMAND_NAME;
-		
-    /* Элемент массива с именами уровней */
+                
+    /* п╜п╩п╣п╪п╣п╫я┌ п╪п╟я│я│п╦п╡п╟ я│ п╦п╪п╣п╫п╟п╪п╦ я┐я─п╬п╡п╫п╣п╧ */
     struct GodLevelName {
-	DLString name;
-	int level;
-	const char * color;
+        DLString name;
+        int level;
+        const char * color;
     };
 
-    /* Уровни богов */
+    /* пёя─п╬п╡п╫п╦ п╠п╬пЁп╬п╡ */
     static GodLevelName names[];
     
-    /* Кусочки мечей, рисуемых по бокам списка */
+    /* п я┐я│п╬я┤п╨п╦ п╪п╣я┤п╣п╧, я─п╦я│я┐п╣п╪я▀я┘ п©п╬ п╠п╬п╨п╟п╪ я│п©п╦я│п╨п╟ */
     struct SwordLine {
-	DLString name;
-	int count;
+        DLString name;
+        int count;
     };
 
-    /* Кусочки меча */
+    /* п я┐я│п╬я┤п╨п╦ п╪п╣я┤п╟ */
     static SwordLine swordLines[];
     
     int cSwordLine;
     int lineCounter;
-    static const int textLine; /* Ширина текста между мечами */
+    static const int textLine; /* п╗п╦я─п╦п╫п╟ я┌п╣п╨я│я┌п╟ п╪п╣п╤п╢я┐ п╪п╣я┤п╟п╪п╦ */
     
     void initSwords( );
     void writeSwordLine( std::ostream &, char *, char * );
@@ -64,13 +64,13 @@ private:
 
     struct CompareGods : public std::binary_function<PCMemoryInterface *, PCMemoryInterface *, bool>
     {
-	bool operator () ( PCMemoryInterface *a, PCMemoryInterface *b )
-	{
-	    if (a->getLevel( ) == b->getLevel( ))
-		return a->getName( ) < b->getName( );
-	    else
-		return a->getLevel( ) > b->getLevel( );
-	}
+        bool operator () ( PCMemoryInterface *a, PCMemoryInterface *b )
+        {
+            if (a->getLevel( ) == b->getLevel( ))
+                return a->getName( ) < b->getName( );
+            else
+                return a->getLevel( ) > b->getLevel( );
+        }
     };
 
     typedef std::list<PCMemoryInterface *> GodList;

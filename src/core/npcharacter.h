@@ -77,8 +77,8 @@ public:
     virtual PlayerConfig::Pointer getConfig( ) const;
 
 public:
-    MOB_INDEX_DATA *	pIndexData;
-    AREA_DATA *		zone;
+    MOB_INDEX_DATA *        pIndexData;
+    AREA_DATA *                zone;
     
 protected:    
     char *  description;
@@ -87,18 +87,18 @@ protected:
     RussianString::Pointer cachedNoun;
     
 public:    
-    int		group;
-    long	off_flags;
-    int		damage[3];
-    int		start_pos;
-    int		default_pos;
+    int                group;
+    long        off_flags;
+    int                damage[3];
+    int                start_pos;
+    int                default_pos;
     
     // behavior
     ProgWrapper<SPEC_FUN> spec_fun;
     XMLPersistentStreamable<MobileBehavior> behavior;
 
     // switch
-    PCharacter		*switchedFrom;
+    PCharacter                *switchedFrom;
 };
 
 inline const char * NPCharacter::getNameP( ) const 

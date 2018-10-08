@@ -27,13 +27,13 @@ ClanArea::ClanArea( )
 void ClanArea::update( ) 
 {
     if (roomVnum <= 0 || altarVnum <= 0 || itemVnum <= 0)
-	return;
+        return;
 
     if (get_obj_index( itemVnum )->count > 0)
-	return;
+        return;
 
     if (get_obj_index( altarVnum )->count > 0)
-	return;
+        return;
 
     createAltar( );
 }
@@ -52,7 +52,7 @@ void ClanArea::createAltar( )
     container->behavior.getDynamicPointer<ClanAltar>( )->actAppear( );
 
     if (clan->getData( ))
-	clan->getData( )->setItem( item );
+        clan->getData( )->setItem( item );
 }
 
 ClanReference & ClanArea::getClan( )
@@ -65,11 +65,11 @@ Object * ClanArea::findInvitation( PCharacter *wch )
     Object *obj;
 
     if (invitationVnum <= 0)
-	return 0;
+        return 0;
 
     for (obj = wch->carrying; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == invitationVnum)
-	    break;
+        if (obj->pIndexData->vnum == invitationVnum)
+            break;
 
     return obj;
 }

@@ -10,9 +10,9 @@
 class MoneyChanger : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<MoneyChanger> Pointer;
+        typedef ::Pointer<MoneyChanger> Pointer;
     
-	virtual void bribe( Character *, int, int );
+        virtual void bribe( Character *, int, int );
 };
 
 #endif

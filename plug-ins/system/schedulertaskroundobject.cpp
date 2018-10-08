@@ -2,7 +2,7 @@
  *
  * ruffina, 2003
  *
- * переписано заново, добавлены приоритеты
+ * п©п╣я─п╣п©п╦я│п╟п╫п╬ п╥п╟п╫п╬п╡п╬, п╢п╬п╠п╟п╡п╩п╣п╫я▀ п©я─п╦п╬я─п╦я┌п╣я┌я▀
  */
 /***************************************************************************
                           schedulertask.cpp  -  description
@@ -27,6 +27,6 @@ int SchedulerTaskRoundObject::getPriority( ) const
 void SchedulerTaskRoundObject::run( )
 {
     for( Object* obj = object_list; obj != 0; obj = obj->next )
-	run( obj );
+        run( obj );
 }
 

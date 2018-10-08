@@ -24,7 +24,7 @@
 void string_show(Character * ch, char *strch);
 
 
-#define MAX_MOB 1		/* Default maximum number for resetting mobs */
+#define MAX_MOB 1                /* Default maximum number for resetting mobs */
 
 AREA_DATA *get_area_data(int vnum);
 void add_reset(Room * room, RESET_DATA * pReset, int index);

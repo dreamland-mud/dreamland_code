@@ -84,7 +84,7 @@ class DedicatedMobile : public virtual MobQuestBehavior {
 protected:
     inline bool getQuest( )
     {
-	return quest || (quest = getMyQuest<Q>( ));
+        return quest || (quest = getMyQuest<Q>( ));
     }
 
     ::Pointer<Q> quest;

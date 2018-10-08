@@ -36,7 +36,7 @@ void RaceHelp::setRace( Race::Pointer race )
     this->race = race;
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
 
     kwd.insert( race->getName( ) );
     kwd.insert( race->getMaleName( ).ruscase( '1' ) );
@@ -76,37 +76,37 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     DLString nameF = race->getFemaleName( ).ruscase( '1' ); 
     DLString nameM = race->getMaleName( ).ruscase( '1' ); 
 
-    in << "òÁÓÁ {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
+    in << "Ð Ð°ÑÐ° {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " ÉÌÉ {C" << race->getName( ) << "{x" << endl << endl;
+    in << " Ð¸Ð»Ð¸ {C" << race->getName( ) << "{x" << endl << endl;
 
     in << *this << endl;
 
     const PCRace *r = (const_cast<Race *>(race.getPointer( )))->getPC( );
     if (r) {
         
-        in << "{cèÁÒÁËÔÅÒ{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
+        in << "{cÐ¥Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
         if (!r->getStats( ).empty( )) {
             bool found = false;
 
-            in << "{cðÁÒÁÍÅÔÒÙ{x : ";
+            in << "{cÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹{x : ";
             for (int i = 0; i < stat_table.size; i++) {
                 int stat = r->getStats( )[i];
                 if (stat != 0) {
                     if (found) 
                         in << ", ";
-                    in << (stat > 0 ? "+" : "") << stat << " Ë " << stat_table.message( i, '3' );
+                    in << (stat > 0 ? "+" : "") << stat << " Ðº " << stat_table.message( i, '3' );
                     found = true;
                 }
             }
             if (!found)
-                in << "ÂÅÚ ÉÚÍÅÎÅÎÉÊ";
+                in << "Ð±ÐµÐ· Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹";
             in << endl;
         }
-        in << "{còÁÚÍÅÒ{x    : " << size_table.message( r->getSize( ) ) << endl; 
+        in << "{cÐ Ð°Ð·Ð¼ÐµÑ€{x    : " << size_table.message( r->getSize( ) ) << endl; 
         
-        in << "{cðÒÏÆÅÓÓÉÉ{x : ";
+        in << "{cÐŸÑ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸{x : ";
         bool found = false;
         for (int i = 0; i < professionManager->size( ); i++) {
             Profession *prof = professionManager->find( i );
@@ -120,21 +120,21 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         in << endl;
 
         if (r->getPoints( ) > 0) {
-            in << "{cäÏÐ. ÏÐÙÔ{x : " << r->getPoints( ) << endl;
+            in << "{cÐ”Ð¾Ð¿. Ð¾Ð¿Ñ‹Ñ‚{x : " << r->getPoints( ) << endl;
         }
 
         DLString res = imm_flags.messages( r->getRes( ), true, '1' );
         if (!res.empty( )) {
-            in << "{cõÓÔÏÊÞÉ×Ù{x : Ë " << res << endl;
+            in << "{cÐ£ÑÑ‚Ð¾Ð¹Ñ‡Ð¸Ð²Ñ‹{x : Ðº " << res << endl;
         }
         DLString vuln = imm_flags.messages( r->getVuln( ), true, '1' );
         if (!vuln.empty( )) {
-            in << "{cõÑÚ×ÉÍÙ{x   : Ë " << vuln << endl;
+            in << "{cÐ£ÑÐ·Ð²Ð¸Ð¼Ñ‹{x   : Ðº " << vuln << endl;
         }
 
         DLString aff = r->getAff( ).messages( true, '1' );
         if (!aff.empty( )) {
-            in << "{cáÆÆÅËÔÙ{x   : " << aff << endl;
+            in << "{cÐÑ„Ñ„ÐµÐºÑ‚Ñ‹{x   : " << aff << endl;
         }
     }
 
@@ -154,7 +154,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
         // Collect skills available even for profession 'none',
         // such as race aptitudes or non-professional bonuses.
-	if (skill->visible( &dummy )) {
+        if (skill->visible( &dummy )) {
             if (skill->getLearned( &dummy ) >= 100)
                 noprof100.insert( sname );
             else if (skill->getGroup( ) != group_ancient_languages)
@@ -167,26 +167,26 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
             Profession *prof = professionManager->find( i );
             if (!prof->isPlayed( ))
                 continue;
-	    dummy.setProfession( prof->getName( ) );
+            dummy.setProfession( prof->getName( ) );
             if (skill->visible( &dummy )) {
-		if (skill->getLearned( &dummy ) >= 100)
+                if (skill->getLearned( &dummy ) >= 100)
                     if (raceApt.count( sname ) == 0 && noprof100.count( sname ) == 0)
                         prof100.insert( sname );
             }
-	}
+        }
     }
     
     if (!raceApt.empty( )) {
-        in << "{WòÁÓÏ×ÙÅ cÐÏÓÏÂÎÏÓÔÉ{x: " << raceApt << endl;
+        in << "{WÐ Ð°ÑÐ¾Ð²Ñ‹Ðµ cÐ¿Ð¾ÑÐ¾Ð±Ð½Ð¾ÑÑ‚Ð¸{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
-        in << "{WâÏÎÕÓÙ ÎÁ ÐÒÏÆÅÓÓÉÏÎÁÌØÎÙÅ ÕÍÅÎÉÑ{x: " << prof100 << endl;
+        in << "{WÐ‘Ð¾Ð½ÑƒÑÑ‹ Ð½Ð° Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ðµ ÑƒÐ¼ÐµÐ½Ð¸Ñ{x: " << prof100 << endl;
     }
     if (!noprof100.empty( )) {
-        in << "{WâÏÎÕÓÙ ÎÅÚÁ×ÉÓÉÍÏ ÏÔ ÐÒÏÆÅÓÓÉÉ{x: " << noprof100 << endl;
+        in << "{WÐ‘Ð¾Ð½ÑƒÑÑ‹ Ð½ÐµÐ·Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ Ð¾Ñ‚ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸{x: " << noprof100 << endl;
     }
 
-    in << endl << "ðÏÄÒÏÂÎÅÅ ÏÂÏ ×ÓÅÈ ÐÁÒÁÍÅÔÒÁÈ ÞÉÔÁÊ × %H% [(race stats,ÒÁÓÁ ÈÁÒÁËÔÅÒÉÓÔÉËÉ)]" << endl;
+    in << endl << "ÐŸÐ¾Ð´Ñ€Ð¾Ð±Ð½ÐµÐµ Ð¾Ð±Ð¾ Ð²ÑÐµÑ… Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°Ñ… Ñ‡Ð¸Ñ‚Ð°Ð¹ Ð² %H% [(race stats,Ñ€Ð°ÑÐ° Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸)]" << endl;
 }
 
 /* ------------------------------------------------------------------
@@ -194,18 +194,18 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
  *------------------------------------------------------------------*/
 DefaultRace::DefaultRace( ) : 
                 det( 0, &detect_flags ),
-		act( 0, &act_flags ),
-		aff( 0, &affect_flags ),
-		off( 0, &off_flags ),
-		imm( 0, &imm_flags ),
-		res( 0, &res_flags ),
-		vuln( 0, &vuln_flags ),
-		form( 0, &form_flags ),
-		parts( 0, &part_flags ),
-		size( SIZE_MEDIUM, &size_table ),
-		wearloc( wearlocationManager ),
-		hunts( raceManager ),
-		donates( raceManager )
+                act( 0, &act_flags ),
+                aff( 0, &affect_flags ),
+                off( 0, &off_flags ),
+                imm( 0, &imm_flags ),
+                res( 0, &res_flags ),
+                vuln( 0, &vuln_flags ),
+                form( 0, &form_flags ),
+                parts( 0, &part_flags ),
+                size( SIZE_MEDIUM, &size_table ),
+                wearloc( wearlocationManager ),
+                hunts( raceManager ),
+                donates( raceManager )
 {
 }
 
@@ -240,13 +240,13 @@ void DefaultRace::loaded( )
     raceManager->registrate( Pointer( this ) );
 
     if (help)
-	help->setRace( Pointer( this ) );
+        help->setRace( Pointer( this ) );
 }
 
 void DefaultRace::unloaded( )
 {
     if (help)
-	help->unsetRace( );
+        help->unsetRace( );
 
     raceManager->unregistrate( Pointer( this ) );
 }
@@ -316,12 +316,12 @@ const DLString & DefaultRace::getMltName( ) const
 DLString DefaultRace::getNameFor( Character *looker, Character *me, const Grammar::Case &c ) const
 {
     if (looker && me && looker->getConfig( )->rucommands) {
-	if (me->getSex( ) == SEX_MALE)
-	    return getMaleName( ).ruscase( c );
-	if (me->getSex( ) == SEX_FEMALE)
-	    return getFemaleName( ).ruscase( c );
-	if (me->getSex( ) == SEX_NEUTRAL)
-	    return getNeuterName( ).ruscase( c );
+        if (me->getSex( ) == SEX_MALE)
+            return getMaleName( ).ruscase( c );
+        if (me->getSex( ) == SEX_FEMALE)
+            return getFemaleName( ).ruscase( c );
+        if (me->getSex( ) == SEX_NEUTRAL)
+            return getNeuterName( ).ruscase( c );
     }
     
     return getName( );
@@ -332,10 +332,10 @@ Flags DefaultRace::getAttitude( const Race &race ) const
     Flags att( 0, &race_flags );
 
     if (getForm( ).isSet( FORM_CANINE ) && race.getForm( ).isSet( FORM_FELINE ))
-	att.setBit( RACE_HATES );
+        att.setBit( RACE_HATES );
 
     if (getForm( ).isSet( FORM_FELINE ) && race.getForm( ).isSet( FORM_CANINE ))
-	att.setBit( RACE_HATES );
+        att.setBit( RACE_HATES );
 
     return att;
 }

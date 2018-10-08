@@ -50,8 +50,8 @@ GateMovement::~GateMovement( )
 bool GateMovement::moveAtomic( )
 {
     if (!JumpMovement::moveAtomic( )) {
-	ch->pecho( "Твоя попытка закончилась неудачей." );
-	return false;
+        ch->pecho( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧." );
+        return false;
     }
 
     return true;
@@ -60,35 +60,35 @@ bool GateMovement::moveAtomic( )
 bool GateMovement::canMove( Character *wch )
 {
     if (ch != actor)
-	return true;
+        return true;
     else if (wch == ch->mount)
-	return checkCaster( wch );
+        return checkCaster( wch );
     else
-	return checkLevel( )
-	       && checkCaster( wch )
-	       && checkCasterRoom( )
-	       && checkVictimRoom( )
-	       && checkVictim( );
+        return checkLevel( )
+               && checkCaster( wch )
+               && checkCasterRoom( )
+               && checkVictimRoom( )
+               && checkVictim( );
 }
 
 bool GateMovement::tryMove( Character *wch )
 {
     if (ch != actor)
-	return true;
+        return true;
     else if (wch == ch->mount)
-	return applyViolent( wch );
+        return applyViolent( wch );
     else
-	return applyViolent( wch )
-	       && applySavesSpell( );
+        return applyViolent( wch )
+               && applySavesSpell( );
 }
 
 bool GateMovement::checkLevel( )
 {
     if (level < 0 || !spell)
-	return true;
-	
+        return true;
+        
     if (victim->getModifyLevel( ) < level + spell->levelDiff)
-	return true;
+        return true;
 
     return false;
 }
@@ -96,16 +96,16 @@ bool GateMovement::checkLevel( )
 bool GateMovement::checkCaster( Character *wch )
 {
     if (wch->fighting)
-	return false;
-	
+        return false;
+        
     if (IS_AFFECTED(wch, AFF_CURSE))
-	return false;
+        return false;
     
     if (spell && !spell->gateShadow && HAS_SHADOW( wch ))
-	return false;
+        return false;
 
     if (wch->is_npc( ) && wch == actor && wch->mount)
-	return false;
+        return false;
 
     return true;
 }
@@ -113,10 +113,10 @@ bool GateMovement::checkCaster( Character *wch )
 bool GateMovement::checkCasterRoom( )
 {
     if (IS_SET(from_room->room_flags, ROOM_SAFE|ROOM_NO_RECALL|ROOM_NOSUMMON))
-	return false;
+        return false;
 
     if (IS_RAFFECTED(from_room, AFF_ROOM_CURSE))
-	return false;
+        return false;
 
     return true;
 }
@@ -124,38 +124,38 @@ bool GateMovement::checkCasterRoom( )
 bool GateMovement::checkVictim( )
 {
     if (victim == ch || victim == ch->mount)
-	return false;
+        return false;
 
     if (victim->is_immortal( ) && !ch->is_immortal( )) 
-	return false;
+        return false;
 
     if (DIGGED(victim))
-	return false;
+        return false;
 
     if (victim->is_npc( )) {
-	if (IS_SET(victim->getNPC( )->pIndexData->area->area_flag, AREA_NOGATE))
-	    return false;
+        if (IS_SET(victim->getNPC( )->pIndexData->area->area_flag, AREA_NOGATE))
+            return false;
 
         if (IS_SET(victim->imm_flags, IMM_SUMMON))
-	    return false;
-	    
-	if (IS_AFFECTED(victim, AFF_CHARM))
-	    return false;
+            return false;
+            
+        if (IS_AFFECTED(victim, AFF_CHARM))
+            return false;
     } 
     else {
         if (!ch->is_npc( ) 
-	    && !ch->getClan( )->isDispersed( ) 
-	    && ch->getClan( ) == victim->getClan( ))
-	    return true; 
-	
+            && !ch->getClan( )->isDispersed( ) 
+            && ch->getClan( ) == victim->getClan( ))
+            return true; 
+        
         if (!is_safe_nomessage(ch, victim) 
-	    && IS_SET(victim->act, PLR_NOSUMMON) 
-	    && spell 
-	    && from_room->area != to_room->area)
-	    return false;
-	
-	if (is_safe_nomessage(ch, victim) && IS_SET(victim->act, PLR_NOSUMMON))
-	    return false;
+            && IS_SET(victim->act, PLR_NOSUMMON) 
+            && spell 
+            && from_room->area != to_room->area)
+            return false;
+        
+        if (is_safe_nomessage(ch, victim) && IS_SET(victim->act, PLR_NOSUMMON))
+            return false;
     }
     
     return true;
@@ -164,11 +164,11 @@ bool GateMovement::checkVictim( )
 bool GateMovement::checkVictimRoom( )
 {
     if (!ch->can_see( to_room ))
-	return false;
+        return false;
 
     if (IS_SET(to_room->room_flags, 
-	       ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY|ROOM_NOSUMMON))
-	return false;
+               ROOM_SAFE|ROOM_PRIVATE|ROOM_SOLITARY|ROOM_NOSUMMON))
+        return false;
 
     return true;
 }
@@ -181,14 +181,14 @@ bool GateMovement::applySavesSpell( )
 bool GateMovement::applyViolent( Character *wch )
 {
     if (IS_BLOODY( wch )) {
-	int chance = 0;
+        int chance = 0;
 
-	if (spell && spell->gateViolent) {
-	    chance = PK_TIME_VIOLENT - wch->getPC( )->PK_time_v;
-	    chance = 100 * chance / PK_TIME_VIOLENT;
-	}
+        if (spell && spell->gateViolent) {
+            chance = PK_TIME_VIOLENT - wch->getPC( )->PK_time_v;
+            chance = 100 * chance / PK_TIME_VIOLENT;
+        }
 
-	return number_percent( ) < chance;
+        return number_percent( ) < chance;
     }
 
     return true;
@@ -197,57 +197,57 @@ bool GateMovement::applyViolent( Character *wch )
 void GateMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (!spell)
-	return;
+        return;
 
     if (fLeaving) {
-	if (ch != actor && !spell->msgGroupLeave.empty( ))
-	    msgSelf( wch, spell->msgGroupLeave.c_str( ) );
-	else {
-	    msgSelf( wch, spell->msgSelfLeave.c_str( ) );
-	    msgRoomNoParty( wch, spell->msgRoomLeave.c_str( ) );     
-	}
+        if (ch != actor && !spell->msgGroupLeave.empty( ))
+            msgSelf( wch, spell->msgGroupLeave.c_str( ) );
+        else {
+            msgSelf( wch, spell->msgSelfLeave.c_str( ) );
+            msgRoomNoParty( wch, spell->msgRoomLeave.c_str( ) );     
+        }
     }
     else {
-	if (ch != actor && !spell->msgGroupEnter.empty( ))
-	    msgSelf( wch, spell->msgGroupEnter.c_str( ) );
-	else {
-	    msgSelf( wch, spell->msgSelfEnter.c_str( ) );
-	    msgRoomNoParty( wch, spell->msgRoomEnter.c_str( ) );
-	}
+        if (ch != actor && !spell->msgGroupEnter.empty( ))
+            msgSelf( wch, spell->msgGroupEnter.c_str( ) );
+        else {
+            msgSelf( wch, spell->msgSelfEnter.c_str( ) );
+            msgRoomNoParty( wch, spell->msgRoomEnter.c_str( ) );
+        }
     }
 }
 
 void GateMovement::moveFollowers( Character *wch )
 {
     if (!wch)
-	return;
+        return;
 
     if (!spell)
-	return;
+        return;
     
     if (from_room == to_room)
-	return;
+        return;
 
     if (spell->takePet) {
-	NPCharacter *pet;
+        NPCharacter *pet;
 
-	if (!wch->is_npc( ) && ( pet = wch->getPC( )->pet ))
-	    GateMovement( pet, victim, spell, actor, level ).moveRecursive( );
+        if (!wch->is_npc( ) && ( pet = wch->getPC( )->pet ))
+            GateMovement( pet, victim, spell, actor, level ).moveRecursive( );
     }
-	
+        
     if (spell->takeGroup) {
-	GroupMembers group = group_members_room( ch, from_room );
+        GroupMembers group = group_members_room( ch, from_room );
 
-	for (GroupMembers::iterator g = group.begin( ); g != group.end( ); g++)
-	    if ((*g)->in_room == from_room)
-		GateMovement( *g, victim, spell, actor, level ).moveRecursive( );
+        for (GroupMembers::iterator g = group.begin( ); g != group.end( ); g++)
+            if ((*g)->in_room == from_room)
+                GateMovement( *g, victim, spell, actor, level ).moveRecursive( );
     }
 }
 
 void GateMovement::msgEcho( Character *listener, Character *wch, const char *msg )
 {
     if (IS_AWAKE(listener))
-	listener->pecho( msg, wch, victim, actor );
+        listener->pecho( msg, wch, victim, actor );
 }
 
 /*------------------------------------------------------------------------
@@ -278,8 +278,8 @@ SummonMovement::~SummonMovement( )
 bool SummonMovement::moveAtomic( )
 {
     if (!JumpMovement::moveAtomic( )) {
-	caster->pecho( "Твоя попытка закончилась неудачей." );
-	return false;
+        caster->pecho( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧." );
+        return false;
     }
 
     return true;
@@ -288,8 +288,8 @@ bool SummonMovement::moveAtomic( )
 bool SummonMovement::canMove( Character *wch )
 {
     if (wch == ch->mount)
-	return true;
-	
+        return true;
+        
     return checkCaster( ) 
            && checkVictim( );
 }
@@ -297,18 +297,18 @@ bool SummonMovement::canMove( Character *wch )
 bool SummonMovement::tryMove( Character *wch )
 {
     if (wch == ch->mount)
-	return true;
+        return true;
 
     return applySavesSpell( ) 
            && applySpellbane( )
-	   && applyLazy( );
+           && applyLazy( );
 }
 
 bool SummonMovement::applyLazy( )
 {
     if (caster->in_room->area == ch->in_room->area) {
-	caster->pecho( "Может, пора пройтись пешком?" );
-	return false;
+        caster->pecho( "п°п╬п╤п╣я┌, п©п╬я─п╟ п©я─п╬п╧я┌п╦я│я▄ п©п╣я┬п╨п╬п╪?" );
+        return false;
     }
 
     return true;
@@ -317,16 +317,16 @@ bool SummonMovement::applyLazy( )
 bool SummonMovement::checkCaster( )
 {
     if (caster->is_npc( ) && IS_AFFECTED(caster, AFF_CHARM))
-	return false;
+        return false;
 
     if (IS_VIOLENT( caster ))
-	return false;
+        return false;
 
     if (IS_SET(caster->in_room->room_flags, ROOM_SAFE|ROOM_NOSUMMON))
-	return false;
+        return false;
     
     if (caster->in_room->getCapacity( ) == 0)
-	return false;
+        return false;
 
     return true;
 }    
@@ -334,51 +334,51 @@ bool SummonMovement::checkCaster( )
 bool SummonMovement::checkVictim( )
 {
     if (ch == caster)
-	return false;
+        return false;
     
     if (ch->is_immortal( ) && !caster->is_immortal( ))
-	return false;
+        return false;
 
     if (IS_SET(ch->in_room->room_flags, ROOM_SAFE|ROOM_NOSUMMON))
-	return false;
+        return false;
 
     if (ch->fighting != 0)
-	return false;
+        return false;
 
     if (ch->isAffected( gsn_mental_block ))
-	return false;
+        return false;
 
     if (ch->isAffected( gsn_spellbane ))
-	return false;
+        return false;
 
     if (ch->is_npc( )) {
-	if (IS_SET(ch->act,ACT_AGGRESSIVE))
-	    return false;
-	    
-	if (IS_SET(ch->imm_flags,IMM_SUMMON))
-	    return false;
-	
-	if (ch->getNPC( )->behavior
-	    && IS_SET(ch->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
-	    return false;
+        if (IS_SET(ch->act,ACT_AGGRESSIVE))
+            return false;
+            
+        if (IS_SET(ch->imm_flags,IMM_SUMMON))
+            return false;
+        
+        if (ch->getNPC( )->behavior
+            && IS_SET(ch->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
+            return false;
 
-	if (is_safe_nomessage( caster, ch ))
-	    return false;
+        if (is_safe_nomessage( caster, ch ))
+            return false;
     }
     else {
-	if (!IS_SET(ch->act,PLR_NOSUMMON))
-	    return true;
-	
-	if (!is_safe_nomessage( caster, ch ))
-	    return true;
-	
-	if (!caster->is_npc( )) {
-	    if (ch->getClan( )->isDispersed( ))
-		return false;
+        if (!IS_SET(ch->act,PLR_NOSUMMON))
+            return true;
+        
+        if (!is_safe_nomessage( caster, ch ))
+            return true;
+        
+        if (!caster->is_npc( )) {
+            if (ch->getClan( )->isDispersed( ))
+                return false;
 
-	    if (caster->getClan( ) != ch->getClan( ))
-		return false;
-	}
+            if (caster->getClan( ) != ch->getClan( ))
+                return false;
+        }
     }
 
     return true;
@@ -397,22 +397,22 @@ bool SummonMovement::applySpellbane( )
 void SummonMovement::msgEcho( Character *listener, Character *wch, const char *msg )
 {
     if (IS_AWAKE(listener))
-	listener->pecho( msg, 
-			   (RIDDEN(wch) ? wch->mount : wch),
-			   (MOUNTED(wch) ? wch->mount : wch),
-			   caster );
+        listener->pecho( msg, 
+                           (RIDDEN(wch) ? wch->mount : wch),
+                           (MOUNTED(wch) ? wch->mount : wch),
+                           caster );
 }
 
 void SummonMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (fLeaving) {
-	msgRoomNoParty( wch, "%1$^C1 внезапно исчезает." );     
-	msgSelfParty( wch, 
-	              "%3$^C1 призывает тебя!",
-		      "%3$^C1 призывает %2$^C4!" );
+        msgRoomNoParty( wch, "%1$^C1 п╡п╫п╣п╥п╟п©п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌." );     
+        msgSelfParty( wch, 
+                      "%3$^C1 п©я─п╦п╥я▀п╡п╟п╣я┌ я┌п╣п╠я▐!",
+                      "%3$^C1 п©я─п╦п╥я▀п╡п╟п╣я┌ %2$^C4!" );
     }
     else {
-	msgRoomNoParty( wch, "%1$^C1 появляется рядом с тобой." );
+        msgRoomNoParty( wch, "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ я┌п╬п╠п╬п╧." );
     }
 }
 

@@ -16,13 +16,13 @@ void DefaultSkillCommand::setSkill( SkillPointer skill )
     this->skill = skill;
 
     if (interp)
-	commandManager->registrate( Pointer( this ) );
+        commandManager->registrate( Pointer( this ) );
 }
 
 void DefaultSkillCommand::unsetSkill( )
 {
     if (interp)
-	commandManager->unregistrate( Pointer( this ) );
+        commandManager->unregistrate( Pointer( this ) );
 
     skill.clear( );
 }

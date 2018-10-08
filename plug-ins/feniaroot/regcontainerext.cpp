@@ -12,14 +12,14 @@
 
 using namespace Scripting;
 
-NMI_GET(RegContainer, keys, "список ключей") 
+NMI_GET(RegContainer, keys, "я│п©п╦я│п╬п╨ п╨п╩я▌я┤п╣п╧") 
 {
     RegList::Pointer rc(NEW);
 
     Map::const_iterator i;
     
     for(i = map.begin(); i != map.end(); i++)
-	rc->push_back( i->first );
+        rc->push_back( i->first );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -27,14 +27,14 @@ NMI_GET(RegContainer, keys, "список ключей")
     return Register( obj );
 }
 
-NMI_GET(RegContainer, values, "список значений") 
+NMI_GET(RegContainer, values, "я│п©п╦я│п╬п╨ п╥п╫п╟я┤п╣п╫п╦п╧") 
 {
     RegList::Pointer rc(NEW);
 
     Map::const_iterator i;
     
     for(i = map.begin(); i != map.end(); i++)
-	rc->push_back( i->second );
+        rc->push_back( i->second );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -54,7 +54,7 @@ NMI_INVOKE( RegContainer, clone , "")
     Map::const_iterator i;
     
     for(i = map.begin(); i != map.end(); i++)
-	(*rc)->map[i->first] = i->second;
+        (*rc)->map[i->first] = i->second;
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -62,7 +62,7 @@ NMI_INVOKE( RegContainer, clone , "")
     return Register( obj );
 }
 
-NMI_INVOKE( RegContainer, api, "печатает этот API" )
+NMI_INVOKE( RegContainer, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<RegContainer>( buf );
@@ -70,7 +70,7 @@ NMI_INVOKE( RegContainer, api, "печатает этот API" )
 }
 
 
-NMI_INVOKE( RegContainer, clear, "очистка всех runtime полей" )
+NMI_INVOKE( RegContainer, clear, "п╬я┤п╦я│я┌п╨п╟ п╡я│п╣я┘ runtime п©п╬п╩п╣п╧" )
 {
     map.clear( );
     self->changed();

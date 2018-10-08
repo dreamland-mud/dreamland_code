@@ -17,25 +17,25 @@
 extern "C"
 {
     SO::PluginList initialize_remort( ) {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<CMlt>( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<CMlt>( ppl );
 
-	Plugin::registerPlugin<RemortNanny>( ppl );
-	Plugin::registerPlugin<MocRegistrator<LifePrice> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<StatRemortBonus> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<LevelRemortBonus> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<PretitleRemortBonus> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<HealthRemortBonus> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ManaRemortBonus> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<SkillPointRemortBonus> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<RemortWitch> >( ppl );
+        Plugin::registerPlugin<RemortNanny>( ppl );
+        Plugin::registerPlugin<MocRegistrator<LifePrice> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<StatRemortBonus> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<LevelRemortBonus> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<PretitleRemortBonus> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<HealthRemortBonus> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ManaRemortBonus> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<SkillPointRemortBonus> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<RemortWitch> >( ppl );
 
-	Plugin::registerPlugin<MocRegistrator<VictoryPrice> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Koschey> >( ppl );
-	
-	Plugin::registerPlugin<FixRemortListener>( ppl );
+        Plugin::registerPlugin<MocRegistrator<VictoryPrice> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Koschey> >( ppl );
+        
+        Plugin::registerPlugin<FixRemortListener>( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

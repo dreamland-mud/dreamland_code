@@ -16,7 +16,7 @@ DreamLand 2.0 (c) 1998-2003 by
      Russian localization, area translations by
 	Bastian, Cradya, Corvin, Derini, Dred, Garret, Grom, Fantik,
 	Finraag, Hauzer, Hinore, Joker, Krauss, Fiorinne, Lexx, Miyamoto, 
-	Resky, Sherhan, Teelak, Varda, Xok, Zav, Бесенок, Холод
+	Resky, Sherhan, Teelak, Varda, Xok, Zav, п▒п╣я│п╣п╫п╬п╨, п╔п╬п╩п╬п╢
 
      Area creation by
         Branwen, Cradya, Galen, Miyamoto, Tananda, Teelak, Shur

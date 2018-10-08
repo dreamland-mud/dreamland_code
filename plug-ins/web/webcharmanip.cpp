@@ -103,17 +103,17 @@ static bool has_trigger_nuke( Character *ch, Character *victim )
 static bool has_trigger_mount( Character *victim )
 {
     if (!victim->is_npc())
-	return IS_SET(victim->form, FORM_CENTAUR);
+        return IS_SET(victim->form, FORM_CENTAUR);
     else
-	return IS_SET(victim->act, ACT_RIDEABLE);
+        return IS_SET(victim->act, ACT_RIDEABLE);
 }
 
 static bool has_trigger_murder(Character *ch, Character *victim)
 {
     return !ch->is_npc() 
-		&& !victim->is_npc() 
-		&& ch != victim
-		&& !is_safe_nomessage(ch, victim);
+                && !victim->is_npc() 
+                && ch != victim
+                && !is_safe_nomessage(ch, victim);
 }
 
 static bool has_trigger_kill(Character *ch, Character *victim)
@@ -137,22 +137,22 @@ WEBMANIP_RUN(decoratePlayer)
         manips.add( "look" );
         manips.add( "follow" );
 
-	if (has_trigger_group( ch, victim ))
-	    manips.add( "group" );
+        if (has_trigger_group( ch, victim ))
+            manips.add( "group" );
 
-	if (has_trigger_nuke( ch, victim ))
-	    manips.add( "nuke" );
+        if (has_trigger_nuke( ch, victim ))
+            manips.add( "nuke" );
 
-	if (has_trigger_mount( victim ))
-	    manips.add( "mount" );
+        if (has_trigger_mount( victim ))
+            manips.add( "mount" );
 
         manips.add( "smell" );
 
         if (mlove_accepts(ch, victim))
-	    manips.add("mlove");
+            manips.add("mlove");
          
         if (has_trigger_murder(ch, victim))
-	    manips.add("murder");
+            manips.add("murder");
     }
 
     manips.add( "grats" );
@@ -176,51 +176,51 @@ WEBMANIP_RUN(decorateMobile)
     if (ch->in_room == victim->in_room) {
         manips.add( "look" );
 
-	if (mob_has_occupation(victim, OCC_TRAINER) && ch->getPC()) {
-	    for (int i = 0; i < stat_table.size; i++)
-		if (ch->perm_stat[stat_table.fields[i].value] < ch->getPC()->getMaxTrain( stat_table.fields[i].value))
-		    manips.addLocal("train", russian_case(stat_table.fields[i].message, '4'));
+        if (mob_has_occupation(victim, OCC_TRAINER) && ch->getPC()) {
+            for (int i = 0; i < stat_table.size; i++)
+                if (ch->perm_stat[stat_table.fields[i].value] < ch->getPC()->getMaxTrain( stat_table.fields[i].value))
+                    manips.addLocal("train", russian_case(stat_table.fields[i].message, '4'));
 
-	    if (ch->perm_stat[STAT_CON] < ch->getPC()->getMaxTrain( STAT_CON ))
-		manips.addLocal("train", "сложение кп");
+            if (ch->perm_stat[STAT_CON] < ch->getPC()->getMaxTrain( STAT_CON ))
+                manips.addLocal("train", "я│п╩п╬п╤п╣п╫п╦п╣ п╨п©");
 
-	    manips.addLocal("gain", "продать");
-	    manips.addLocal("gain", "купить");
+            manips.addLocal("gain", "п©я─п╬п╢п╟я┌я▄");
+            manips.addLocal("gain", "п╨я┐п©п╦я┌я▄");
         }
 
-	if (mob_has_occupation(victim, OCC_PRACTICER)) 
-	    manips.addLocal("practice", "здесь");
+        if (mob_has_occupation(victim, OCC_PRACTICER)) 
+            manips.addLocal("practice", "п╥п╢п╣я│я▄");
 
-	if (mob_has_occupation(victim, OCC_HEALER)) 
-	    manips.addLocal("heal", "");
+        if (mob_has_occupation(victim, OCC_HEALER)) 
+            manips.addLocal("heal", "");
 
-	if (mob_has_occupation(victim, OCC_SMITHMAN)) 
-	    manips.addLocal("smith", "");
+        if (mob_has_occupation(victim, OCC_SMITHMAN)) 
+            manips.addLocal("smith", "");
 
-	if (mob_has_occupation(victim, OCC_SHOPPER)) 
-	    manips.addLocal("list", "");
+        if (mob_has_occupation(victim, OCC_SHOPPER)) 
+            manips.addLocal("list", "");
 
-	if (mob_has_occupation(victim, OCC_QUEST_MASTER)) {
-	    manips.addLocal("quest", "попросить");
-	    manips.addLocal("quest", "сдать");
-	    manips.addLocal("quest", "отменить");
+        if (mob_has_occupation(victim, OCC_QUEST_MASTER)) {
+            manips.addLocal("quest", "п©п╬п©я─п╬я│п╦я┌я▄");
+            manips.addLocal("quest", "я│п╢п╟я┌я▄");
+            manips.addLocal("quest", "п╬я┌п╪п╣п╫п╦я┌я▄");
         }
 
-	if (mob_has_occupation(victim, OCC_QUEST_TRADER)) {
-	    manips.addLocal("quest", "список");
+        if (mob_has_occupation(victim, OCC_QUEST_TRADER)) {
+            manips.addLocal("quest", "я│п©п╦я│п╬п╨");
         }
 
-	if (has_trigger_mount( victim ))
-	    manips.add( "mount" );
+        if (has_trigger_mount( victim ))
+            manips.add( "mount" );
 
         manips.add( "consider" );
         if (has_trigger_kill(ch, victim))
-	    manips.add("kill");
+            manips.add("kill");
 
         manips.add( "smell" );
         manips.add( "follow" );
-	if (has_trigger_nuke( ch, victim ))
-	    manips.add( "nuke" );
+        if (has_trigger_nuke( ch, victim ))
+            manips.add( "nuke" );
     }
 
     buf << manips.toString( );

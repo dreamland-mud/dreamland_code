@@ -14,65 +14,65 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная bool
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ bool
  */
 class XMLBoolean : public Boolean
 {
 public:
-	/** По умолчанию значение true */
-	inline XMLBoolean( ) : Boolean( )
-	{
-	}
-	
-	inline XMLBoolean( bool value ) : Boolean( value )
-	{
-	}
-	
-	inline XMLBoolean( const DLString& value ) throw( ExceptionBadType )
-		: Boolean( value )
-	{
-	}
+        /** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ true */
+        inline XMLBoolean( ) : Boolean( )
+        {
+        }
+        
+        inline XMLBoolean( bool value ) : Boolean( value )
+        {
+        }
+        
+        inline XMLBoolean( const DLString& value ) throw( ExceptionBadType )
+                : Boolean( value )
+        {
+        }
 
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 class XMLBooleanNoFalse : public XMLBoolean {
 public:
-	inline XMLBooleanNoFalse( ) : XMLBoolean( )
-	{
-	}
-	
-	inline XMLBooleanNoFalse( bool value ) : XMLBoolean( value )
-	{
-	}
-	
-	inline XMLBooleanNoFalse( const DLString& value ) throw( ExceptionBadType )
-		: XMLBoolean( value )
-	{
-	}
+        inline XMLBooleanNoFalse( ) : XMLBoolean( )
+        {
+        }
+        
+        inline XMLBooleanNoFalse( bool value ) : XMLBoolean( value )
+        {
+        }
+        
+        inline XMLBooleanNoFalse( const DLString& value ) throw( ExceptionBadType )
+                : XMLBoolean( value )
+        {
+        }
 
-	bool toXML( XMLNode::Pointer& node ) const;
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 class XMLBooleanNoTrue : public XMLBoolean {
 public:
-	inline XMLBooleanNoTrue( ) : XMLBoolean( )
-	{
-	}
-	
-	inline XMLBooleanNoTrue( bool value ) : XMLBoolean( value )
-	{
-	}
-	
-	inline XMLBooleanNoTrue( const DLString& value ) throw( ExceptionBadType )
-		: XMLBoolean( value )
-	{
-	}
+        inline XMLBooleanNoTrue( ) : XMLBoolean( )
+        {
+        }
+        
+        inline XMLBooleanNoTrue( bool value ) : XMLBoolean( value )
+        {
+        }
+        
+        inline XMLBooleanNoTrue( const DLString& value ) throw( ExceptionBadType )
+                : XMLBoolean( value )
+        {
+        }
 
-	bool toXML( XMLNode::Pointer& node ) const;
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 template <bool def>
@@ -89,11 +89,11 @@ public:
 };
 
 
-/** Вывод в ostream типа XMLBoolean */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLBoolean */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLBoolean& xmlBoolean )
 {
-	ostr << xmlBoolean.getValue( );
-	return ostr;
+        ostr << xmlBoolean.getValue( );
+        return ostr;
 }
 
 #endif

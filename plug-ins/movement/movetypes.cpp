@@ -14,25 +14,25 @@ const char * movedanger_names [] = {
 };
 
 const struct movetype_t movetypes [] = {
- { MOVETYPE_SWIMMING,   MOVETYPE_NORMAL,    1, false, "swimming",  "ÐÒÉÐÌÙ%1$GÌÏ|Ì|ÌÁ",        "ÕÐÌÙ%1$GÌÏ|Ì|ÌÁ",
+ { MOVETYPE_SWIMMING,   MOVETYPE_NORMAL,    1, false, "swimming",  "Ð¿Ñ€Ð¸Ð¿Ð»Ñ‹%1$GÐ»Ð¾|Ð»|Ð»Ð°",        "ÑƒÐ¿Ð»Ñ‹%1$GÐ»Ð¾|Ð»|Ð»Ð°",
  },
- { MOVETYPE_WATER_WALK, MOVETYPE_NORMAL,    1, false, "waterwalk", "ÐÒÉÛ%1$GÌÏ|ÅÌ|ÌÁ ÐÏ ×ÏÄÅ", "ÕÛ%1$GÌÏ|ÅÌ|ÌÁ ÐÏ ×ÏÄÅ",
+ { MOVETYPE_WATER_WALK, MOVETYPE_NORMAL,    1, false, "waterwalk", "Ð¿Ñ€Ð¸Ñˆ%1$GÐ»Ð¾|ÐµÐ»|Ð»Ð° Ð¿Ð¾ Ð²Ð¾Ð´Ðµ", "ÑƒÑˆ%1$GÐ»Ð¾|ÐµÐ»|Ð»Ð° Ð¿Ð¾ Ð²Ð¾Ð´Ðµ",
  },
- { MOVETYPE_SLINK,      MOVETYPE_MORESAFE,  3, true,  "slink",     "ÐÒÉÐÏÌ%1$GÚÌÏ|Ú|ÚÌÁ",      "ÕÐÏÌ%1$GÚÌÏ|Ú|ÚÌÁ",
+ { MOVETYPE_SLINK,      MOVETYPE_MORESAFE,  3, true,  "slink",     "Ð¿Ñ€Ð¸Ð¿Ð¾Ð»%1$GÐ·Ð»Ð¾|Ð·|Ð·Ð»Ð°",      "ÑƒÐ¿Ð¾Ð»%1$GÐ·Ð»Ð¾|Ð·|Ð·Ð»Ð°",
  },
- { MOVETYPE_CRAWL,      MOVETYPE_SAFE,      2, true,  "crawl",     "ÐÒÏËÒÁÌ%1$GÏÓØ|ÓÑ|ÁÓØ",    "ÐÒÏËÒÁÌ%1$GÏÓØ|ÓÑ|ÁÓØ",
+ { MOVETYPE_CRAWL,      MOVETYPE_SAFE,      2, true,  "crawl",     "Ð¿Ñ€Ð¾ÐºÑ€Ð°Ð»%1$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ",    "Ð¿Ñ€Ð¾ÐºÑ€Ð°Ð»%1$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ",
  },
- { MOVETYPE_WALK,       MOVETYPE_NORMAL,    1, true,  "normal",    "ÐÒÉÛ%1$GÌÏ|ÅÌ|ÌÁ",         "ÕÛ%1$GÌÏ|ÅÌ|ÌÁ",
+ { MOVETYPE_WALK,       MOVETYPE_NORMAL,    1, true,  "normal",    "Ð¿Ñ€Ð¸Ñˆ%1$GÐ»Ð¾|ÐµÐ»|Ð»Ð°",         "ÑƒÑˆ%1$GÐ»Ð¾|ÐµÐ»|Ð»Ð°",
  },
- { MOVETYPE_QUICKLY,    MOVETYPE_DANGEROUS, 1, true,  "quickly",   "ÅÝÅ ÎÅÔÕ",                 "ÅÝÅ ÎÅÔÕ",
+ { MOVETYPE_QUICKLY,    MOVETYPE_DANGEROUS, 1, true,  "quickly",   "ÐµÑ‰Ðµ Ð½ÐµÑ‚Ñƒ",                 "ÐµÑ‰Ðµ Ð½ÐµÑ‚Ñƒ",
  },
- { MOVETYPE_RUNNING,    MOVETYPE_DEATH,     1, true,  "running",   "ÐÒÉÂÅÖÁ%1$GÌÏ|Ì|ÌÁ",       "ÕÂÅÖÁ%1$GÌÏ|Ì|ÌÁ",
+ { MOVETYPE_RUNNING,    MOVETYPE_DEATH,     1, true,  "running",   "Ð¿Ñ€Ð¸Ð±ÐµÐ¶Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð°",       "ÑƒÐ±ÐµÐ¶Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð°",
  },
- { MOVETYPE_FLEE,       MOVETYPE_DEATH,     1, true,  "flee",      "ÐÒÉÂÅÖÁ%1$GÌÏ|Ì|ÌÁ",       "ÓÂÅÖÁ%1$GÌÏ|Ì|ÌÁ",
+ { MOVETYPE_FLEE,       MOVETYPE_DEATH,     1, true,  "flee",      "Ð¿Ñ€Ð¸Ð±ÐµÐ¶Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð°",       "ÑÐ±ÐµÐ¶Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð°",
  },
- { MOVETYPE_RIDING,     MOVETYPE_DANGEROUS, 1, true,  "riding",    "ÐÒÉÓËÁËÁ%1$GÌÏ|Ì|ÌÁ",      "ÕÓËÁËÁ%1$GÌÏ|Ì|ÌÁ",
+ { MOVETYPE_RIDING,     MOVETYPE_DANGEROUS, 1, true,  "riding",    "Ð¿Ñ€Ð¸ÑÐºÐ°ÐºÐ°%1$GÐ»Ð¾|Ð»|Ð»Ð°",      "ÑƒÑÐºÐ°ÐºÐ°%1$GÐ»Ð¾|Ð»|Ð»Ð°",
  },
- { MOVETYPE_FLYING,     MOVETYPE_NORMAL,    1, true,  "flying",    "ÐÒÉÌÅÔÅ%1$GÌÏ|Ì|ÌÁ",       "ÕÌÅÔÅ%1$GÌÏ|Ì|ÌÁ",
+ { MOVETYPE_FLYING,     MOVETYPE_NORMAL,    1, true,  "flying",    "Ð¿Ñ€Ð¸Ð»ÐµÑ‚Ðµ%1$GÐ»Ð¾|Ð»|Ð»Ð°",       "ÑƒÐ»ÐµÑ‚Ðµ%1$GÐ»Ð¾|Ð»|Ð»Ð°",
  },
  { 0, 0, 0, 0 },
 };
@@ -41,9 +41,9 @@ const struct movetype_t movetypes [] = {
 int movetype_lookup( const char *argument )
 {
     if (argument && argument[0])
-	for (int i = 0; movetypes[i].name; i++)
-	    if (!str_cmp( argument, movetypes[i].name ))
-		return i;
+        for (int i = 0; movetypes[i].name; i++)
+            if (!str_cmp( argument, movetypes[i].name ))
+                return i;
     
     return MOVETYPE_WALK;
 }
@@ -54,11 +54,11 @@ int movetype_resolve( Character *ch, const char *argument )
     int movetype;
     
     if (argument == NULL || argument[0] == 0)
-	movetype = MOVETYPE_WALK;
+        movetype = MOVETYPE_WALK;
     else if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
-	movetype = MOVETYPE_RUNNING;
+        movetype = MOVETYPE_RUNNING;
     else
-	movetype = movetype_lookup( argument );
+        movetype = movetype_lookup( argument );
     
     return movetype;
 }

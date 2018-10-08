@@ -17,7 +17,7 @@
 
 void QuestRing::wear( Character *ch ) 
 {
-    ch->send_to( "{Cô×ÏÅ ËÏÌØÃÏ ÑÒËÏ ×ÓÐÙÈÉ×ÁÅÔ.{x\r\n" );
+    ch->send_to( "{CÐ¢Ð²Ð¾Ðµ ÐºÐ¾Ð»ÑŒÑ†Ð¾ ÑÑ€ÐºÐ¾ Ð²ÑÐ¿Ñ‹Ñ…Ð¸Ð²Ð°ÐµÑ‚.{x\r\n" );
 }
 
 void QuestRing::equip( Character *ch ) {
@@ -27,46 +27,46 @@ void QuestRing::equip( Character *ch ) {
     obj->level = ch->getRealLevel( );
     
     if( obj->affected ) {
-	for( paf = obj->affected; paf; paf = paf->next )
-	    addAffect( ch, paf );
+        for( paf = obj->affected; paf; paf = paf->next )
+            addAffect( ch, paf );
     }
     else {
-	af.where = TO_OBJECT;
-	af.type  = -1;
-	af.duration = -1;
-	af.bitvector = 0;
+        af.where = TO_OBJECT;
+        af.type  = -1;
+        af.duration = -1;
+        af.bitvector = 0;
 
-	af.location = APPLY_INT;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_INT;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_WIS;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_WIS;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_AC;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_AC;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_HIT;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_HIT;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_MANA;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_MANA;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_MOVE;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_MOVE;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_HITROLL;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_HITROLL;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_DAMROLL;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_DAMROLL;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
     }
 }
 

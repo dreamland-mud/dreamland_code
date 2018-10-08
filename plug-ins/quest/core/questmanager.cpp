@@ -53,37 +53,37 @@ void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) {
     QuestList qlist;
     
     for (summ = 0, i = 0; i < quests.size( ); i++) {
-	if (quests[i]->applicable( pch )) {
-	    summ += quests[i]->getPriority( );
-	    qlist.push_back( quests[i] );
-	}
+        if (quests[i]->applicable( pch )) {
+            summ += quests[i]->getPriority( );
+            qlist.push_back( quests[i] );
+        }
     }
 
     while (!qlist.empty( )) {
-	QuestList::iterator ipos;
+        QuestList::iterator ipos;
 
-	dice = number_range( 0, summ - 1 );
-	for (i = 0, ipos = qlist.begin( ); ipos != qlist.end( ); ipos++) {
-	    i += (*ipos)->getPriority( );
+        dice = number_range( 0, summ - 1 );
+        for (i = 0, ipos = qlist.begin( ); ipos != qlist.end( ); ipos++) {
+            i += (*ipos)->getPriority( );
 
-	    if (i > dice) 
-		break;
-	}
-	
-	try {
-	    pch->getAttributes( ).addAttribute( 
-	                 (*ipos)->createQuest( pch, questor ), "quest" );
-	    return; 
-	} 
-	catch (const QuestCannotStartException &e) {
-	    summ -= (*ipos)->getPriority( );
-	    qlist.erase( ipos );
+            if (i > dice) 
+                break;
+        }
+        
+        try {
+            pch->getAttributes( ).addAttribute( 
+                         (*ipos)->createQuest( pch, questor ), "quest" );
+            return; 
+        } 
+        catch (const QuestCannotStartException &e) {
+            summ -= (*ipos)->getPriority( );
+            qlist.erase( ipos );
 
-	} 
-	catch (const Exception &e1) {
-	    LogStream::sendError( ) << e1.what( ) << endl;
-	    throw QuestCannotStartException( );
-	}
+        } 
+        catch (const Exception &e1) {
+            LogStream::sendError( ) << e1.what( ) << endl;
+            throw QuestCannotStartException( );
+        }
     }
     
     throw QuestCannotStartException( );
@@ -91,17 +91,17 @@ void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) {
 
 void QuestManager::load( QuestRegistratorBase* reg ) {
     if (loadXML( reg, reg->getName( ) )) 
-	quests.push_back( reg );
+        quests.push_back( reg );
 }
 
 void QuestManager::unLoad( QuestRegistratorBase* reg ) {
 //    saveXML( reg, reg->getName( ) );
     
     for (QuestRegistry::iterator i = quests.begin( ); i != quests.end( ); i++)
-	if (**i == reg) {
-	    quests.erase( i );
-	    break;
-	}
+        if (**i == reg) {
+            quests.erase( i );
+            break;
+        }
 }
 
 QuestRegistratorBase::Pointer
@@ -114,11 +114,11 @@ QuestManager::findQuestRegistrator( const DLString& carg )
     arg.toLower( );
     
     for (i = 0; i < quests.size( ); i++) {
-	name = quests[i]->getName( );
-	name.toLower( );
+        name = quests[i]->getName( );
+        name.toLower( );
 
-	if (name == arg)
-	    return quests[i];
+        if (name == arg)
+            return quests[i];
     }
     
     return QuestRegistratorBase::Pointer( );

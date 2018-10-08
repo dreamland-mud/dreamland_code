@@ -42,44 +42,44 @@ Walkment::Walkment( Character *ch )
 bool Walkment::moveAtomic( )
 {
     if (horse) {
-	if (!canControlHorse( ))
-	    return false;
+        if (!canControlHorse( ))
+            return false;
 
-	visualize( horse );
-	visualize( ch );
+        visualize( horse );
+        visualize( ch );
 
-	if (!canMove( horse ) || !canMove( ch ))
-	    return false;
-	
-	if (!tryMove( horse ) || !tryMove( ch ))
-	    return false;
+        if (!canMove( horse ) || !canMove( ch ))
+            return false;
+        
+        if (!tryMove( horse ) || !tryMove( ch ))
+            return false;
 
-	place( horse );
-	place( ch );
+        place( horse );
+        place( ch );
     }
     else if (rider) {
-	visualize( rider );
-	visualize( ch );
+        visualize( rider );
+        visualize( ch );
 
-	if (!canMove( ch ) || !canMove( rider ))
-	    return false;
+        if (!canMove( ch ) || !canMove( rider ))
+            return false;
 
-	if (!tryMove( ch ) || !tryMove( rider ))
-	    return false;
+        if (!tryMove( ch ) || !tryMove( rider ))
+            return false;
 
-	place( ch );
-	place( rider );
+        place( ch );
+        place( rider );
     }
     else {
-	visualize( ch );
+        visualize( ch );
 
-	if (!canMove( ch ))
-	    return false;
+        if (!canMove( ch ))
+            return false;
 
-	if (!tryMove( ch ))
-	    return false;
-	
-	place( ch );
+        if (!tryMove( ch ))
+            return false;
+        
+        place( ch );
     }
     
     setWaitstate( );
@@ -89,20 +89,20 @@ bool Walkment::moveAtomic( )
 bool Walkment::canLeaveMaster( Character *wch )
 {
     if (!IS_AFFECTED(wch, AFF_CHARM))
-	return true;
+        return true;
     
     if (wch->master == 0)
-	return true;
+        return true;
     
     if (from_room != wch->master->in_room)
-	return true;
+        return true;
     
     if (wch->master == wch->mount)
-	return true;
+        return true;
     
     msgSelfParty( wch, 
-	          "þÔÏ? é ÐÏËÉÎÕÔØ Ó×ÏÅÇÏ ÈÏÚÑÉÎÁ?",
-		  "%^C1 ÎÅ ÍÏÖÅÔ ÐÏËÉÎÕÔØ Ó×ÏÅÇÏ ÈÏÚÑÉÎÁ." );
+                  "Ð§Ñ‚Ð¾? Ð˜ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÐ²Ð¾ÐµÐ³Ð¾ Ñ…Ð¾Ð·ÑÐ¸Ð½Ð°?",
+                  "%^C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÐ²Ð¾ÐµÐ³Ð¾ Ñ…Ð¾Ð·ÑÐ¸Ð½Ð°." );
     return false;
 }
 
@@ -126,10 +126,10 @@ static bool mprog_cant_move( Character *ch, Room *to_room, const char *movetype 
 static bool mprog_cant_leave( Character *ch )
 {
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
-	if (rch != ch) {
-	    FENIA_CALL( rch, "CantLeave", "C", ch );
-	    FENIA_NDX_CALL( rch->getNPC( ), "CantLeave", "CC", rch, ch );
-	}
+        if (rch != ch) {
+            FENIA_CALL( rch, "CantLeave", "C", ch );
+            FENIA_NDX_CALL( rch->getNPC( ), "CantLeave", "CC", rch, ch );
+        }
     
     return false;
 }
@@ -139,18 +139,18 @@ bool Walkment::autoDismount( Character *wch )
     bool rc;
     
     if (wch == ch)
-	return false;
+        return false;
     if (!MOUNTED(wch))
-	return false;
+        return false;
     if (wch->mount == wch->master)
-	return false;
+        return false;
 
     silence = true;
     rc = canLeaveMaster( wch );
     silence = false;
 
     if (rc)
-	return false;
+        return false;
 
     interpret_raw( wch, "dismount" );
     horse = MOUNTED(ch);
@@ -161,41 +161,41 @@ bool Walkment::autoDismount( Character *wch )
 bool Walkment::canLeave( Character *wch )
 {
     if (autoDismount( wch ))
-	return true;
+        return true;
 
     return canLeaveMaster( wch )
-	    && checkPosition( wch )
-	    && !mprog_cant_leave( wch )
-	    && checkTrap( wch );
+            && checkPosition( wch )
+            && !mprog_cant_leave( wch )
+            && checkTrap( wch );
 }
 
 bool Walkment::canMove( Character *wch )
 {
     return checkVisibility( wch )
-	    && checkCyclicRooms( wch )
-	    && !mprog_cant_move( wch, to_room, movetypes[movetype].name )
-	    && !rprog_cant_move( wch, to_room, movetypes[movetype].name )
+            && checkCyclicRooms( wch )
+            && !mprog_cant_move( wch, to_room, movetypes[movetype].name )
+            && !rprog_cant_move( wch, to_room, movetypes[movetype].name )
             && checkLawzone( wch )
-	    && checkClosedDoor( wch )
-	    && checkRoomCapacity( wch )
-	    && checkGuild( wch )
-	    && checkSafe( wch )
-	    && checkAir( wch )
-	    && checkWater( wch );
+            && checkClosedDoor( wch )
+            && checkRoomCapacity( wch )
+            && checkGuild( wch )
+            && checkSafe( wch )
+            && checkAir( wch )
+            && checkWater( wch );
 }
 
 bool Walkment::checkPosition( Character *wch )
 {
     if (horse) {
-	if (wch == horse)
-	    return checkPositionHorse( );
+        if (wch == horse)
+            return checkPositionHorse( );
     }
     else if (rider) {
-	if (wch == rider)
-	    return checkPositionRider( );
+        if (wch == rider)
+            return checkPositionRider( );
     }
     else {
-	return checkPositionWalkman( );
+        return checkPositionWalkman( );
     }
 
     return true;
@@ -205,15 +205,15 @@ bool Walkment::checkPosition( Character *wch )
 bool Walkment::checkPositionHorse( )
 {
     if (horse->fighting) {
-	msgSelf( ch, "ôÙ ÄÏÌÖ%1$GÎÏ|ÅÎ|ÎÁ cÐÅÒ×Á ÓÐÅÛÉÔØÓÑ." ); 
-	return false;
+        msgSelf( ch, "Ð¢Ñ‹ Ð´Ð¾Ð»Ð¶%1$GÐ½Ð¾|ÐµÐ½|Ð½Ð° cÐ¿ÐµÑ€Ð²Ð° ÑÐ¿ÐµÑˆÐ¸Ñ‚ÑŒÑÑ." ); 
+        return false;
     }
 
     if (horse->position <= POS_RESTING) {
-	msgSelfParty( horse,
-		      "éÓÈÏÄÎÏÅ ÐÏÌÏÖÅÎÉÅ ÄÌÑ ÈÏÄØÂÙ - ÓÔÏÑ!",
-		      "%2$^C1 ÄÏÌÖ%2$GÎÏ|ÅÎ|ÎÁ ÓÎÁÞÁÌÁ ×ÓÔÁÔØ." );
-	return false;
+        msgSelfParty( horse,
+                      "Ð˜ÑÑ…Ð¾Ð´Ð½Ð¾Ðµ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð´Ð»Ñ Ñ…Ð¾Ð´ÑŒÐ±Ñ‹ - ÑÑ‚Ð¾Ñ!",
+                      "%2$^C1 Ð´Ð¾Ð»Ð¶%2$GÐ½Ð¾|ÐµÐ½|Ð½Ð° ÑÐ½Ð°Ñ‡Ð°Ð»Ð° Ð²ÑÑ‚Ð°Ñ‚ÑŒ." );
+        return false;
     }
 
     return true;
@@ -222,10 +222,10 @@ bool Walkment::checkPositionHorse( )
 bool Walkment::checkPositionRider( )
 {
     if (rider->fighting) {
-	msgSelfMaster( ch, 
-		       "ô×ÏÊ ÓÅÄÏË ÓÒÁÖÁÅÔÓÑ! óÂÒÏÓØ ÅÇÏ ÄÌÑ ÎÁÞÁÌÁ.",
-		       "óÅÄÏË %1$C2 ÓÒÁÖÁÅÔÓÑ, ÐÒÉËÁÖÉ ÅÇÏ ÓÂÒÏÓÉÔØ!" );
-	return false;
+        msgSelfMaster( ch, 
+                       "Ð¢Ð²Ð¾Ð¹ ÑÐµÐ´Ð¾Ðº ÑÑ€Ð°Ð¶Ð°ÐµÑ‚ÑÑ! Ð¡Ð±Ñ€Ð¾ÑÑŒ ÐµÐ³Ð¾ Ð´Ð»Ñ Ð½Ð°Ñ‡Ð°Ð»Ð°.",
+                       "Ð¡ÐµÐ´Ð¾Ðº %1$C2 ÑÑ€Ð°Ð¶Ð°ÐµÑ‚ÑÑ, Ð¿Ñ€Ð¸ÐºÐ°Ð¶Ð¸ ÐµÐ³Ð¾ ÑÐ±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ!" );
+        return false;
     }
 
     return true;
@@ -234,15 +234,15 @@ bool Walkment::checkPositionRider( )
 bool Walkment::checkPositionWalkman( )
 {
     if (ch->fighting) {
-	rc = RC_MOVE_FIGHTING;
-	msgSelf( ch, "ëÕÄÁ? ôÙ ÖÅ ÓÒÁÖÁÅÛØÓÑ!" );
-	return false;
+        rc = RC_MOVE_FIGHTING;
+        msgSelf( ch, "ÐšÑƒÐ´Ð°? Ð¢Ñ‹ Ð¶Ðµ ÑÑ€Ð°Ð¶Ð°ÐµÑˆÑŒÑÑ!" );
+        return false;
     }
     
     if (ch->position < POS_STANDING) {
-	rc = RC_MOVE_RESTING;
-	msgSelf( ch, "éÓÈÏÄÎÏÅ ÐÏÌÏÖÅÎÉÅ ÄÌÑ ÈÏÄØÂÙ - ÓÔÏÑ!" );
-	return false;
+        rc = RC_MOVE_RESTING;
+        msgSelf( ch, "Ð˜ÑÑ…Ð¾Ð´Ð½Ð¾Ðµ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð´Ð»Ñ Ñ…Ð¾Ð´ÑŒÐ±Ñ‹ - ÑÑ‚Ð¾Ñ!" );
+        return false;
     }
 
     return true;
@@ -251,41 +251,41 @@ bool Walkment::checkPositionWalkman( )
 void Walkment::visualize( Character *wch )
 {
     if (IS_AFFECTED( wch, AFF_HIDE|AFF_FADE ) && !IS_AFFECTED(wch, AFF_SNEAK)) {
-	REMOVE_BIT(wch->affected_by, AFF_HIDE|AFF_FADE);
-	wch->println( "ôÙ ×ÙÈÏÄÉÛØ ÉÚ ÔÅÎÉ." );
-	act( "$c1 ×ÙÈÏÄÉÔ ÉÚ ÔÅÎÉ.", wch, 0, 0, TO_ROOM );
+        REMOVE_BIT(wch->affected_by, AFF_HIDE|AFF_FADE);
+        wch->println( "Ð¢Ñ‹ Ð²Ñ‹Ñ…Ð¾Ð´Ð¸ÑˆÑŒ Ð¸Ð· Ñ‚ÐµÐ½Ð¸." );
+        act( "$c1 Ð²Ñ‹Ñ…Ð¾Ð´Ð¸Ñ‚ Ð¸Ð· Ñ‚ÐµÐ½Ð¸.", wch, 0, 0, TO_ROOM );
     }
 
     if (IS_AFFECTED( wch, AFF_CAMOUFLAGE )) {
-	if (number_percent( ) < gsn_camouflage_move->getEffective( wch )) {
-	    gsn_camouflage_move->improve( wch, true );
-	}
-	else {
-	    strip_camouflage( wch );
-	    gsn_camouflage_move->improve( wch, false );
-	}
+        if (number_percent( ) < gsn_camouflage_move->getEffective( wch )) {
+            gsn_camouflage_move->improve( wch, true );
+        }
+        else {
+            strip_camouflage( wch );
+            gsn_camouflage_move->improve( wch, false );
+        }
     }
 }
 
 bool Walkment::canControlHorse( )
 {
     if (!canOrderHorse( )) {
-	act( "ôÙ ÎÅ ÍÏÖÅÛØ ÕÐÒÁ×ÌÑÔØ $C5.", ch, 0, horse, TO_CHAR );
-	return false;
+        act( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑƒÐ¿Ñ€Ð°Ð²Ð»ÑÑ‚ÑŒ $C5.", ch, 0, horse, TO_CHAR );
+        return false;
     }
     
     /* horrible XXX until riding skills are available for all */
     if (horse->is_npc( ) 
-	    && (   (horse->getNPC( )->pIndexData->vnum >= 50000
-	           && horse->getNPC( )->pIndexData->vnum <= 51000)
-		|| (horse->getNPC( )->pIndexData->vnum >= 550
-		   && horse->getNPC( )->pIndexData->vnum <= 560)))
-	return true;
+            && (   (horse->getNPC( )->pIndexData->vnum >= 50000
+                   && horse->getNPC( )->pIndexData->vnum <= 51000)
+                || (horse->getNPC( )->pIndexData->vnum >= 550
+                   && horse->getNPC( )->pIndexData->vnum <= 560)))
+        return true;
 
     if (number_percent( ) > gsn_riding->getEffective( ch ) && !ch->isCoder( )) {
-	act( "ôÅÂÅ ÎÅ È×ÁÔÁÅÔ ÍÁÓÔÅÒÓÔ×Á ÕÐÒÁ×ÌÑÔØ $C5.", ch, 0, horse, TO_CHAR );
-	gsn_riding->improve( ch, false );
-	return false; 
+        act( "Ð¢ÐµÐ±Ðµ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð° ÑƒÐ¿Ñ€Ð°Ð²Ð»ÑÑ‚ÑŒ $C5.", ch, 0, horse, TO_CHAR );
+        gsn_riding->improve( ch, false );
+        return false; 
     }
 
     /* XXX more checks */
@@ -296,10 +296,10 @@ bool Walkment::canControlHorse( )
 bool Walkment::checkCyclicRooms( Character *wch )
 {
     if (from_room == to_room) {
-	msgSelfParty( wch, 
-		      "ó ÎÅÐÏÎÑÔÎÙÍÉ ÎÁÍÅÒÅÎÉÑÍÉ ÔÙ ÔÏÐÞÅÛØÓÑ ÎÁ ÍÅÓÔÅ... É ÞÔÏ ÄÁÌØÛÅ?",
-	              "%2$^C1 Ó ÎÅÐÏÎÑÔÎÙÍÉ ÎÁÍÅÒÅÎÉÑÍÉ ÔÏÐÞÅÔÓÑ ÎÁ ÏÄÎÏÍ ÍÅÓÔÅ." );
-	return false;
+        msgSelfParty( wch, 
+                      "Ð¡ Ð½ÐµÐ¿Ð¾Ð½ÑÑ‚Ð½Ñ‹Ð¼Ð¸ Ð½Ð°Ð¼ÐµÑ€ÐµÐ½Ð¸ÑÐ¼Ð¸ Ñ‚Ñ‹ Ñ‚Ð¾Ð¿Ñ‡ÐµÑˆÑŒÑÑ Ð½Ð° Ð¼ÐµÑÑ‚Ðµ... Ð¸ Ñ‡Ñ‚Ð¾ Ð´Ð°Ð»ÑŒÑˆÐµ?",
+                      "%2$^C1 Ñ Ð½ÐµÐ¿Ð¾Ð½ÑÑ‚Ð½Ñ‹Ð¼Ð¸ Ð½Ð°Ð¼ÐµÑ€ÐµÐ½Ð¸ÑÐ¼Ð¸ Ñ‚Ð¾Ð¿Ñ‡ÐµÑ‚ÑÑ Ð½Ð° Ð¾Ð´Ð½Ð¾Ð¼ Ð¼ÐµÑÑ‚Ðµ." );
+        return false;
     }
 
     return true;
@@ -308,10 +308,10 @@ bool Walkment::checkCyclicRooms( Character *wch )
 bool Walkment::checkTrap( Character *wch )
 {
     if (wch->death_ground_delay > 0 && wch->trap.isSet( TF_NO_MOVE )) {
-	msgSelfParty( wch, 
-		     "ôÙ ÎÅ ÍÏÖÅÛØ ÐÏËÉÎÕÔØ ÜÔÏ ÍÅÓÔÏ - ÂÅÚ ÐÏÓÔÏÒÏÎÎÅÊ ÐÏÍÏÝÉ!",
-	             "%2$^C1 ÎÅ ÍÏÖÅÔ ÐÏËÉÎÕÔØ ÜÔÏ ÍÅÓÔÏ ÂÅÚ ÐÏÓÔÏÒÏÎÎÅÊ ÐÏÍÏÝÉ!" );
-	return false;
+        msgSelfParty( wch, 
+                     "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÑ‚Ð¾ Ð¼ÐµÑÑ‚Ð¾ - Ð±ÐµÐ· Ð¿Ð¾ÑÑ‚Ð¾Ñ€Ð¾Ð½Ð½ÐµÐ¹ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸!",
+                     "%2$^C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÑ‚Ð¾ Ð¼ÐµÑÑ‚Ð¾ Ð±ÐµÐ· Ð¿Ð¾ÑÑ‚Ð¾Ñ€Ð¾Ð½Ð½ÐµÐ¹ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸!" );
+        return false;
     }
 
     return true;
@@ -321,10 +321,10 @@ bool Walkment::checkTrap( Character *wch )
 bool Walkment::checkVisibility( Character *wch )
 {
     if (!wch->can_see( to_room )) {
-	msgSelfParty( wch,
-		      "öÁÌØ, ÎÏ ÔÙ ÎÅ ÍÏÖÅÛØ ÔÕÄÁ ÉÄÔÉ.",
-	              "öÁÌØ, ÎÏ %2$C1 ÎÅ ÍÏÖÅÔ ÔÕÄÁ ÉÄÔÉ." );
-	return false;
+        msgSelfParty( wch,
+                      "Ð–Ð°Ð»ÑŒ, Ð½Ð¾ Ñ‚Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ñ‚ÑƒÐ´Ð° Ð¸Ð´Ñ‚Ð¸.",
+                      "Ð–Ð°Ð»ÑŒ, Ð½Ð¾ %2$C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ñ‚ÑƒÐ´Ð° Ð¸Ð´Ñ‚Ð¸." );
+        return false;
     }
 
     return true;
@@ -333,13 +333,13 @@ bool Walkment::checkVisibility( Character *wch )
 bool Walkment::checkSafe( Character *wch )
 {
     if (!IS_SET( to_room->room_flags, ROOM_SAFE ))
-	return true;
-	
+        return true;
+        
     if (IS_BLOODY(wch)) {
-	msgSelfRoom( wch, 
-		     "âÏÖÅÓÔ×ÅÎÎÙÅ ÓÉÌÙ ÎÅ ÐÏÚ×ÏÌÑÀÔ ÔÅÂÅ ×ÏÊÔÉ ÔÕÄÁ × ÔÁËÏÍ ÓÏÓÔÏÑÎÉÉ.",
-		     "%2$^C1 ÐÒÅÄÐÒÉÎÉÍÁÅÔ ÇÅÒÏÉÞÅÓËÕÀ... É ÂÅÓÐÏÌÅÚÎÕÀ ÐÏÐÙÔËÕ ×ÏÊÔÉ × ËÏÍÎÁÔÕ." );
-	return false;
+        msgSelfRoom( wch, 
+                     "Ð‘Ð¾Ð¶ÐµÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ðµ ÑÐ¸Ð»Ñ‹ Ð½Ðµ Ð¿Ð¾Ð·Ð²Ð¾Ð»ÑÑŽÑ‚ Ñ‚ÐµÐ±Ðµ Ð²Ð¾Ð¹Ñ‚Ð¸ Ñ‚ÑƒÐ´Ð° Ð² Ñ‚Ð°ÐºÐ¾Ð¼ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ð¸.",
+                     "%2$^C1 Ð¿Ñ€ÐµÐ´Ð¿Ñ€Ð¸Ð½Ð¸Ð¼Ð°ÐµÑ‚ Ð³ÐµÑ€Ð¾Ð¸Ñ‡ÐµÑÐºÑƒÑŽ... Ð¸ Ð±ÐµÑÐ¿Ð¾Ð»ÐµÐ·Ð½ÑƒÑŽ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÑƒ Ð²Ð¾Ð¹Ñ‚Ð¸ Ð² ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ñƒ." );
+        return false;
     }
 
     return true;
@@ -348,26 +348,26 @@ bool Walkment::checkSafe( Character *wch )
 bool Walkment::checkGuild( Character *wch )
 {
     if (wch->is_immortal( )) 
-	return true;
+        return true;
     
     if (wch->is_npc( ))
-	return true;
+        return true;
     
     if (to_room->guilds.empty( ))
-	return true;
+        return true;
 
     if (!to_room->guilds.isSet( wch->getProfession( ) )) {
-	msgSelfParty( wch, 
-		      "ôÙ ÎÅ ÍÏÖÅÛØ ×ÏÊÔÉ × ÞÕÖÕÀ ÇÉÌØÄÉÀ.", 
-		      "%2$^C1 ÎÅ ÍÏÖÅÔ ×ÏÊÔÉ × ÞÕÖÕÀ ÇÉÌØÄÉÀ." );
-	return false;
+        msgSelfParty( wch, 
+                      "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð²Ð¾Ð¹Ñ‚Ð¸ Ð² Ñ‡ÑƒÐ¶ÑƒÑŽ Ð³Ð¸Ð»ÑŒÐ´Ð¸ÑŽ.", 
+                      "%2$^C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð²Ð¾Ð¹Ñ‚Ð¸ Ð² Ñ‡ÑƒÐ¶ÑƒÑŽ Ð³Ð¸Ð»ÑŒÐ´Ð¸ÑŽ." );
+        return false;
     }
 
     if (IS_BLOODY(wch)) {
-	msgSelfParty( wch, 
-		      "ô×ÏÑ ÇÉÌØÄÉÑ ÎÅ ÍÏÖÅÔ ÓÅÊÞÁÓ ÓÌÕÖÉÔØ ÔÅÂÅ ÕËÒÙÔÉÅÍ.",
-		      "çÉÌØÄÉÑ ÎÅ ÍÏÖÅÔ ÓÅÊÞÁÓ ÓÌÕÖÉÔØ ÕËÒÙÔÉÅÍ ÄÌÑ %2$C2." );
-	return false;
+        msgSelfParty( wch, 
+                      "Ð¢Ð²Ð¾Ñ Ð³Ð¸Ð»ÑŒÐ´Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ ÑÐµÐ¹Ñ‡Ð°Ñ ÑÐ»ÑƒÐ¶Ð¸Ñ‚ÑŒ Ñ‚ÐµÐ±Ðµ ÑƒÐºÑ€Ñ‹Ñ‚Ð¸ÐµÐ¼.",
+                      "Ð“Ð¸Ð»ÑŒÐ´Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ ÑÐµÐ¹Ñ‡Ð°Ñ ÑÐ»ÑƒÐ¶Ð¸Ñ‚ÑŒ ÑƒÐºÑ€Ñ‹Ñ‚Ð¸ÐµÐ¼ Ð´Ð»Ñ %2$C2." );
+        return false;
     }
     
     return true;
@@ -376,43 +376,43 @@ bool Walkment::checkGuild( Character *wch )
 bool Walkment::checkAir( Character *wch )
 {
     if (from_room->sector_type != SECT_AIR && to_room->sector_type != SECT_AIR)
-	return true;
+        return true;
 
     if (MOUNTED(wch))
-	return true;
+        return true;
 
     if (is_flying( wch ))
-	return true;
+        return true;
 
     if (wch->is_immortal( ) || wch->is_mirror( ))
-	return true;
+        return true;
 
     if (IS_GHOST(wch))
-	return true;
+        return true;
     
     rc = RC_MOVE_AIR;
     msgSelfParty( wch, 
-	          "ôÙ ÎÅ ÕÍÅÅÛØ ÌÅÔÁÔØ.", 
-	          "%2$^C1 ÎÅ ÕÍÅÅÔ ÌÅÔÁÔØ." );
+                  "Ð¢Ñ‹ Ð½Ðµ ÑƒÐ¼ÐµÐµÑˆÑŒ Ð»ÐµÑ‚Ð°Ñ‚ÑŒ.", 
+                  "%2$^C1 Ð½Ðµ ÑƒÐ¼ÐµÐµÑ‚ Ð»ÐµÑ‚Ð°Ñ‚ÑŒ." );
     return false;
 }
 
 bool Walkment::checkWater( Character *wch )
 {
     if (from_room->sector_type != SECT_WATER_NOSWIM
-	 && to_room->sector_type != SECT_WATER_NOSWIM)
-	return true;
+         && to_room->sector_type != SECT_WATER_NOSWIM)
+        return true;
     
     if (MOUNTED(wch))
-	return true;
+        return true;
 
     if (boat_type != BOAT_NONE) 
-	return true;
+        return true;
     
     rc = RC_MOVE_WATER;
     msgSelfParty( wch, 
-	          "þÔÏÂ ÉÄÔÉ ÄÁÌØÛÅ ÔÅÂÅ ÎÕÖÎÁ ÌÏÄËÁ.",
-	          "%2$^C1 ÎÅ ÕÍÅÅÔ ÈÏÄÉÔØ ÐÏ ×ÏÄÅ." );
+                  "Ð§Ñ‚Ð¾Ð± Ð¸Ð´Ñ‚Ð¸ Ð´Ð°Ð»ÑŒÑˆÐµ Ñ‚ÐµÐ±Ðµ Ð½ÑƒÐ¶Ð½Ð° Ð»Ð¾Ð´ÐºÐ°.",
+                  "%2$^C1 Ð½Ðµ ÑƒÐ¼ÐµÐµÑ‚ Ñ…Ð¾Ð´Ð¸Ñ‚ÑŒ Ð¿Ð¾ Ð²Ð¾Ð´Ðµ." );
     return false;
 }
 
@@ -421,21 +421,21 @@ bool Walkment::checkRoomCapacity( Character *wch )
     int capacity;
     
     if (wch->is_immortal( ))
-	return true;
+        return true;
     
     if (MOUNTED(wch))
-	return true;
+        return true;
     
     capacity = to_room->getCapacity( );
     
     if (capacity < 0)
-	return true;
+        return true;
 
     if (capacity < (RIDDEN(wch) ? 2 : 1)) {
-	msgSelfParty( wch, 
-		      "äÌÑ ÔÅÂÑ ÎÅÔ ÔÁÍ ÓÅÊÞÁÓ ÍÅÓÔÁ.",
-		      "äÌÑ ×ÁÓ Ó %2$^C5 ÎÅÔ ÔÁÍ ÓÅÊÞÁÓ ÍÅÓÔÁ." );
-	return false;
+        msgSelfParty( wch, 
+                      "Ð”Ð»Ñ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ñ‚Ð°Ð¼ ÑÐµÐ¹Ñ‡Ð°Ñ Ð¼ÐµÑÑ‚Ð°.",
+                      "Ð”Ð»Ñ Ð²Ð°Ñ Ñ %2$^C5 Ð½ÐµÑ‚ Ñ‚Ð°Ð¼ ÑÐµÐ¹Ñ‡Ð°Ñ Ð¼ÐµÑÑ‚Ð°." );
+        return false;
     }
 
     return true;
@@ -444,26 +444,26 @@ bool Walkment::checkRoomCapacity( Character *wch )
 bool Walkment::checkLawzone( Character *wch )    
 {
     if (!IS_SET(to_room->room_flags, ROOM_LAW))
-	return true;
+        return true;
     
     if (!wch->is_npc( ) || !IS_SET(wch->act, ACT_AGGRESSIVE))
-	return true;
+        return true;
     
     if (!(wch->master && IS_AFFECTED( wch, AFF_CHARM )))
-	return true;
+        return true;
     
     rc = RC_MOVE_LAWZONE;
     msgSelfMaster( wch, 
-	           "ôÙ ÎÅ ÍÏÖÅÛØ ÏÔÐÒÁ×ÉÔØÓÑ × ÇÏÒÏÄ.", 
-                   "ôÙ ÎÅ ÍÏÖÅÛØ ×ÚÑÔØ Ó ÓÏÂÏÊ %1$C4 × ÇÏÒÏÄ." );
+                   "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒÑÑ Ð² Ð³Ð¾Ñ€Ð¾Ð´.", 
+                   "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð²Ð·ÑÑ‚ÑŒ Ñ ÑÐ¾Ð±Ð¾Ð¹ %1$C4 Ð² Ð³Ð¾Ñ€Ð¾Ð´." );
     return false; 
 }
 
 bool Walkment::tryMove( Character *wch )
 {
     return applyMovepoints( wch )
-	   && applyWeb( wch )
-	   && applyCamouflage( wch );
+           && applyWeb( wch )
+           && applyCamouflage( wch );
 }
 
 bool Walkment::applyMovepoints( Character *wch )
@@ -471,22 +471,22 @@ bool Walkment::applyMovepoints( Character *wch )
     int move;
     
     if (MOUNTED( wch ))
-	return true;
+        return true;
 
     if (IS_GHOST( wch ))
-	return true;
+        return true;
 
     if (wch->is_npc( ))
-	return true;
+        return true;
     
     if (( move = getMoveCost( wch ) ) == 0)
-	return true;
+        return true;
 
     if (wch->move < move) {
-	msgSelfParty( wch,
-		      "ôÙ ÓÌÉÛËÏÍ ÕÓÔÁ%1$GÌÏ|Ì|ÌÁ.",
-		      "%2$^C1 ÓÌÉÛËÏÍ ÕÓÔÁ%2$GÌÏ|Ì|ÌÁ." );
-	return false;
+        msgSelfParty( wch,
+                      "Ð¢Ñ‹ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ ÑƒÑÑ‚Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð°.",
+                      "%2$^C1 ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ ÑƒÑÑ‚Ð°%2$GÐ»Ð¾|Ð»|Ð»Ð°." );
+        return false;
     }
 
     ch->move -= move;
@@ -496,10 +496,10 @@ bool Walkment::applyMovepoints( Character *wch )
 bool Walkment::checkMovepoints( Character *wch )
 {
     if (wch->move < getMoveCost( wch )) {
-	msgSelfParty( wch,
-	              "õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÓÉÌ ÛÅ×ÅÌÉÔØ ÎÏÇÁÍÉ.",
-		      "õ %2$C2 ÎÅ È×ÁÔÁÅÔ ÓÉÌ ÛÅ×ÅÌÉÔØ ÎÏÇÁÍÉ." );
-	return false;
+        msgSelfParty( wch,
+                      "Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ¸Ð» ÑˆÐµÐ²ÐµÐ»Ð¸Ñ‚ÑŒ Ð½Ð¾Ð³Ð°Ð¼Ð¸.",
+                      "Ð£ %2$C2 Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ¸Ð» ÑˆÐµÐ²ÐµÐ»Ð¸Ñ‚ÑŒ Ð½Ð¾Ð³Ð°Ð¼Ð¸." );
+        return false;
     }
     return true;
 }
@@ -508,13 +508,13 @@ bool Walkment::checkMovepoints( Character *wch )
 bool Walkment::applyCamouflage( Character *wch )
 {
     if (IS_AFFECTED(wch, AFF_CAMOUFLAGE)
-	    && to_room->sector_type != SECT_FIELD
-	    && to_room->sector_type != SECT_FOREST
-	    && to_room->sector_type != SECT_MOUNTAIN
-	    && to_room->sector_type != SECT_HILLS)
+            && to_room->sector_type != SECT_FIELD
+            && to_room->sector_type != SECT_FOREST
+            && to_room->sector_type != SECT_MOUNTAIN
+            && to_room->sector_type != SECT_HILLS)
     {
-	strip_camouflage( wch );
-    }	
+        strip_camouflage( wch );
+    }        
 
     return true;
 }
@@ -522,10 +522,10 @@ bool Walkment::applyCamouflage( Character *wch )
 bool Walkment::applyWeb( Character *wch )
 {
     if (MOUNTED(wch))
-	return true;
+        return true;
 
     if (!CAN_DETECT(wch, ADET_WEB))
-	return true;
+        return true;
 
     wch->setWaitViolence( 1 );
 
@@ -534,18 +534,18 @@ bool Walkment::applyWeb( Character *wch )
         chance *= 2;
 
     if (number_percent( ) < chance) {
-	affect_strip(wch, gsn_web);
-	msgSelfRoom( wch,
-		     "ôÙ ÒÁÚÒÙ×ÁÅÛØ ÓÅÔÉ, ËÏÔÏÒÙÅ ÍÅÛÁÌÉ ÔÅÂÅ ÐÏËÉÎÕÔØ ÜÔÏ ÍÅÓÔÏ.",
-	             "%2$^C1 ÒÁÚÒÙ×ÁÅÔ ÓÅÔÉ, ËÏÔÏÒÙÅ ÍÅÛÁÌÉ %2$P3 ÐÏËÉÎÕÔØ ÜÔÏ ÍÅÓÔÏ." );
-	return true;
+        affect_strip(wch, gsn_web);
+        msgSelfRoom( wch,
+                     "Ð¢Ñ‹ Ñ€Ð°Ð·Ñ€Ñ‹Ð²Ð°ÐµÑˆÑŒ ÑÐµÑ‚Ð¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð¼ÐµÑˆÐ°Ð»Ð¸ Ñ‚ÐµÐ±Ðµ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÑ‚Ð¾ Ð¼ÐµÑÑ‚Ð¾.",
+                     "%2$^C1 Ñ€Ð°Ð·Ñ€Ñ‹Ð²Ð°ÐµÑ‚ ÑÐµÑ‚Ð¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð¼ÐµÑˆÐ°Ð»Ð¸ %2$P3 Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÑ‚Ð¾ Ð¼ÐµÑÑ‚Ð¾." );
+        return true;
     }
     else {
-	rc = RC_MOVE_WEB;
-	msgSelfRoom( wch,
-		     "ôÙ ÐÙÔÁÅÛØÓÑ ÒÁÚÏÒ×ÁÔØ ÓÅÔÉ, ËÏÔÏÒÙÅ ÍÅÛÁÀÔ ÐÒÏÊÔÉ, ÎÏ ÔÅÒÐÉÛØ ÎÅÕÄÁÞÕ.",
-	             "%2$^C1 ÐÙÔÁÅÔÓÑ ÒÁÚÏÒ×ÁÔØ ÓÅÔÉ, ÐÒÅÇÒÁÖÄÁÀÝÉÅ %2$P3 ÄÏÒÏÇÕ, ÎÏ ÔÅÒÐÉÔ ÎÅÕÄÁÞÕ." );
-	return false;
+        rc = RC_MOVE_WEB;
+        msgSelfRoom( wch,
+                     "Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ñ€Ð°Ð·Ð¾Ñ€Ð²Ð°Ñ‚ÑŒ ÑÐµÑ‚Ð¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð¼ÐµÑˆÐ°ÑŽÑ‚ Ð¿Ñ€Ð¾Ð¹Ñ‚Ð¸, Ð½Ð¾ Ñ‚ÐµÑ€Ð¿Ð¸ÑˆÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡Ñƒ.",
+                     "%2$^C1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ñ€Ð°Ð·Ð¾Ñ€Ð²Ð°Ñ‚ÑŒ ÑÐµÑ‚Ð¸, Ð¿Ñ€ÐµÐ³Ñ€Ð°Ð¶Ð´Ð°ÑŽÑ‰Ð¸Ðµ %2$P3 Ð´Ð¾Ñ€Ð¾Ð³Ñƒ, Ð½Ð¾ Ñ‚ÐµÑ€Ð¿Ð¸Ñ‚ Ð½ÐµÑƒÐ´Ð°Ñ‡Ñƒ." );
+        return false;
     }
 }
 
@@ -556,15 +556,15 @@ void Walkment::moveFollowers( Character *wch )
     Character *fch;
 
     if (!wch)
-	return;
+        return;
 
     for (fch = from_room->people; fch != 0; fch = fch->next_in_room) 
-	if (fch->master == wch && fch->position == POS_STANDING)
-	    followers.push_back( fch );
+        if (fch->master == wch && fch->position == POS_STANDING)
+            followers.push_back( fch );
 
     for (f = followers.begin( ); f != followers.end( ); f++) 
-	if ((*f)->in_room == from_room)
-	    moveOneFollower( wch, *f );
+        if ((*f)->in_room == from_room)
+            moveOneFollower( wch, *f );
 }
 
 bool Walkment::canHear( Character *victim, Character *wch )

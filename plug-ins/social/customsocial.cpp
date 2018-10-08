@@ -37,31 +37,31 @@ bool CustomSocialManager::process( InterpretArguments &iargs )
     XMLAttributeCustomSocials::Pointer mysocials;
 
     if (iargs.ch->is_npc( )) {
-	if (IS_AFFECTED(iargs.ch, AFF_CHARM) && iargs.ch->master) {
-	    Character *orig = iargs.ch;
+        if (IS_AFFECTED(iargs.ch, AFF_CHARM) && iargs.ch->master) {
+            Character *orig = iargs.ch;
 
-	    iargs.ch = iargs.ch->master;
-	    process( iargs );
-	    iargs.ch = orig;
-	}
+            iargs.ch = iargs.ch->master;
+            process( iargs );
+            iargs.ch = orig;
+        }
 
-	return true;
+        return true;
     }
 
     mysocials = iargs.ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCustomSocials>( "socials" );
 
     if (mysocials) {
-	DLString cmd = iargs.cmdName;
-	
-	if (!cmd.empty( ) && cmd.at( 0 ) == '*') 
-	    cmd.erase( 0, 1 );
-	
-	iargs.pCommand = mysocials->chooseSocial( cmd );
+        DLString cmd = iargs.cmdName;
+        
+        if (!cmd.empty( ) && cmd.at( 0 ) == '*') 
+            cmd.erase( 0, 1 );
+        
+        iargs.pCommand = mysocials->chooseSocial( cmd );
 
-	if (iargs.pCommand) {
-	    iargs.cmdName = cmd;
-	    iargs.advance( );
-	}
+        if (iargs.pCommand) {
+            iargs.cmdName = cmd;
+            iargs.advance( );
+        }
     }
 
     return true;
@@ -86,10 +86,10 @@ int CustomSocial::getPosition( ) const
 void CustomSocial::reaction( Character *ch, Character *victim, const DLString &arg )
 {
     if (!victim && !arg.empty( )) {
-	if (!getErrorMsg( ).empty( ))
-	    act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
-	else
-	    ch->println("îÅÔ ÜÔÏÇÏ ÚÄÅÓØ.");
+        if (!getErrorMsg( ).empty( ))
+            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
+        else
+            ch->println("ÐÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð´ÐµÑÑŒ.");
     }
 }
 
@@ -150,8 +150,8 @@ CustomSocial::Pointer XMLAttributeCustomSocials::chooseSocial( const DLString &c
     iterator i;
     
     for (i = begin( ); i != end( ); i++) 
-	if (i->second->matches( cmd )) 
-	    return i->second;
+        if (i->second->matches( cmd )) 
+            return i->second;
     
     return CustomSocial::Pointer( );
 }
@@ -161,12 +161,12 @@ CustomSocial::Pointer XMLAttributeCustomSocials::getSocial( const DLString &name
     iterator i = find( name );
 
     if (i == end( )) {
-	CustomSocial::Pointer social( NEW );
+        CustomSocial::Pointer social( NEW );
 
-	social->setName( name );
-	insert( make_pair( name, XMLCustomSocial( social ) ) );
-	return social;
+        social->setName( name );
+        insert( make_pair( name, XMLCustomSocial( social ) ) );
+        return social;
     }
     else
-	return i->second;
+        return i->second;
 }

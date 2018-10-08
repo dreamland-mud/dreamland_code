@@ -26,7 +26,7 @@ class Character;
  * Race
  */
 class Race : public GlobalRegistryElement {
-public:	
+public:        
     typedef ::Pointer<Race> Pointer;
     
     Race( );

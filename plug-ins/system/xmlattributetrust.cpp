@@ -10,7 +10,7 @@
 
 XMLAttributeTrust::XMLAttributeTrust( )
                     : all( false ), 
-		      clansAllow( clanManager ), clansDeny( clanManager )
+                      clansAllow( clanManager ), clansDeny( clanManager )
 {
 }
 
@@ -21,25 +21,25 @@ XMLAttributeTrust::~XMLAttributeTrust( )
 bool XMLAttributeTrust::check( Character *ch ) const
 {
     if (ch->is_npc( )) {
-	if (ch->master)
-	    return check( ch->master );
-	else 
-	    return all.getValue( );
+        if (ch->master)
+            return check( ch->master );
+        else 
+            return all.getValue( );
     }
 
     if (all.getValue( )) 
-	return !checkDeny( ch->getPC( ) );
+        return !checkDeny( ch->getPC( ) );
     else 
-	return checkAllow( ch->getPC( ) );
+        return checkAllow( ch->getPC( ) );
 }
 
 bool XMLAttributeTrust::checkDeny( PCharacter *ch ) const
 {
     if (playersDeny.hasElement( ch->getName( ) ))
-	return true;
+        return true;
 
     if (clansDeny.isSet( *(ch->getClan( )) ))
-	return true;
+        return true;
 
     return false;
 }
@@ -47,10 +47,10 @@ bool XMLAttributeTrust::checkDeny( PCharacter *ch ) const
 bool XMLAttributeTrust::checkAllow( PCharacter *ch ) const
 {
     if (playersAllow.hasElement( ch->getName( ) ))
-	return true;
+        return true;
 
     if (clansAllow.isSet( *(ch->getClan( )) ))
-	return true;
+        return true;
 
     return false;
 }
@@ -64,98 +64,98 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
     Clan *clan;
     
     if (cmd.empty( )) {
-	buf << "õËÁÖÉ ÏÄÎÏ ÉÚ ÄÅÊÓÔ×ÉÊ: {lRÓÐÉÓÏË, ÒÁÚÒÅÛÉÔØ ÉÌÉ ÚÁÐÒÅÔÉÔØ{lElist, allow ÉÌÉ deny{lx.";
-	return false;
+        buf << "Ð£ÐºÐ°Ð¶Ð¸ Ð¾Ð´Ð½Ð¾ Ð¸Ð· Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹: {lRÑÐ¿Ð¸ÑÐ¾Ðº, Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ Ð¸Ð»Ð¸ Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ{lElist, allow Ð¸Ð»Ð¸ deny{lx.";
+        return false;
     }
     
-    if (cmd.strPrefix( "list" ) || cmd.strPrefix( "ÓÐÉÓÏË" )) {
-	if (all) {
-	    buf << "ÒÁÚÒÅÛÅÎÏ ×ÓÅÍ";
-	    
-	    if (!clansDeny.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÞÌÅÎÏ× ËÌÁÎÁ " << clansDeny.toString( );
+    if (cmd.strPrefix( "list" ) || cmd.strPrefix( "ÑÐ¿Ð¸ÑÐ¾Ðº" )) {
+        if (all) {
+            buf << "Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ð²ÑÐµÐ¼";
+            
+            if (!clansDeny.empty( ))
+                buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ñ‡Ð»ÐµÐ½Ð¾Ð² ÐºÐ»Ð°Ð½Ð° " << clansDeny.toString( );
 
-	    if (!playersDeny.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÐÅÒÓÏÎÁÖÁ " << playersDeny.toString( );
-	}
-	else { 
-	    buf << "ÚÁÐÒÅÝÅÎÏ ×ÓÅÍ";
+            if (!playersDeny.empty( ))
+                buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð° " << playersDeny.toString( );
+        }
+        else { 
+            buf << "Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ð²ÑÐµÐ¼";
 
-	    if (!clansAllow.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÞÌÅÎÏ× ËÌÁÎÁ " << clansAllow.toString( );
+            if (!clansAllow.empty( ))
+                buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ñ‡Ð»ÐµÐ½Ð¾Ð² ÐºÐ»Ð°Ð½Ð° " << clansAllow.toString( );
 
-	    if (!playersAllow.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÐÅÒÓÏÎÁÖÁ " << playersAllow.toString( );
-	}
+            if (!playersAllow.empty( ))
+                buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð° " << playersAllow.toString( );
+        }
 
-	return true;
+        return true;
     }
 
-    if (cmd.strPrefix( "allow" ) || cmd.strPrefix( "ÒÁÚÒÅÛÉÔØ" ))
-	fAllow = true;
-    else if (cmd.strPrefix( "deny" ) || cmd.strPrefix( "ÚÁÐÒÅÔÉÔØ" ))
-	fAllow = false;
+    if (cmd.strPrefix( "allow" ) || cmd.strPrefix( "Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ" ))
+        fAllow = true;
+    else if (cmd.strPrefix( "deny" ) || cmd.strPrefix( "Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ" ))
+        fAllow = false;
     else {
-	buf << "õËÁÖÉ ÏÄÎÏ ÉÚ ÄÅÊÓÔ×ÉÊ: {lRÓÐÉÓÏË, ÒÁÚÒÅÛÉÔØ ÉÌÉ ÚÁÐÒÅÔÉÔØ{lElist, allow ÉÌÉ deny{lx.";
-	return false;
+        buf << "Ð£ÐºÐ°Ð¶Ð¸ Ð¾Ð´Ð½Ð¾ Ð¸Ð· Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹: {lRÑÐ¿Ð¸ÑÐ¾Ðº, Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ Ð¸Ð»Ð¸ Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ{lElist, allow Ð¸Ð»Ð¸ deny{lx.";
+        return false;
     }
 
     if (args.empty( )) {
-	buf << "ëÏÍÕ ÉÍÅÎÎÏ ÔÙ ÈÏÞÅÛØ " 
-	    << (fAllow ? "ÒÁÚÒÅÛÉÔØ" : "ÚÁÐÒÅÔÉÔØ") << " ÜÔÏ ÄÅÌÁÔØ?";
-	return false;
+        buf << "ÐšÐ¾Ð¼Ñƒ Ð¸Ð¼ÐµÐ½Ð½Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ " 
+            << (fAllow ? "Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ" : "Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ") << " ÑÑ‚Ð¾ Ð´ÐµÐ»Ð°Ñ‚ÑŒ?";
+        return false;
     }
     
-    if (args == "all" || args == "×ÓÅ" || args == "×ÓÅÍ") {
-	if (fAllow)
-	    buf << "ÏÔÎÙÎÅ ÒÁÚÒÅÛÅÎÏ ×ÓÅÍ (ËÒÏÍÅ ÔÅÈ, ËÏÍÕ ÚÁÐÒÅÝÅÎÏ Ñ×ÎÏ).";
-	else
-	    buf << "ÏÔÎÙÎÅ ÚÁÐÒÅÝÅÎÏ ×ÓÅÍ (ËÒÏÍÅ ÔÅÈ, ËÏÍÕ ÒÁÚÒÅÛÅÎÏ Ñ×ÎÏ).";
+    if (args == "all" || args == "Ð²ÑÐµ" || args == "Ð²ÑÐµÐ¼") {
+        if (fAllow)
+            buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ð²ÑÐµÐ¼ (ÐºÑ€Ð¾Ð¼Ðµ Ñ‚ÐµÑ…, ÐºÐ¾Ð¼Ñƒ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ ÑÐ²Ð½Ð¾).";
+        else
+            buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ð²ÑÐµÐ¼ (ÐºÑ€Ð¾Ð¼Ðµ Ñ‚ÐµÑ…, ÐºÐ¾Ð¼Ñƒ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ ÑÐ²Ð½Ð¾).";
 
-	all = fAllow;
-	return true;
+        all = fAllow;
+        return true;
     }
 
     pci = PCharacterManager::find( args );
     clan = clanManager->findExisting( args );
 
     if (pci) {
-	if (fAllow) {
-	    if (all)
-		playersDeny.remove( pci->getName( ) );
-	    else
-		playersAllow.add( pci->getName( ) );
-	    buf << "ÏÔÎÙÎÅ ÒÁÚÒÅÛÅÎÏ ÐÅÒÓÏÎÁÖÕ " << pci->getName( ) << ".";
-	}
-	else {
-	    if (all)
-		playersDeny.add( pci->getName( ) );
-	    else
-		playersAllow.remove( pci->getName( ) );
-	    buf << "ÏÔÎÙÎÅ ÚÁÐÒÅÝÅÎÏ ÐÅÒÓÏÎÁÖÕ " << pci->getName( ) << ".";
-	}
-	return true;
+        if (fAllow) {
+            if (all)
+                playersDeny.remove( pci->getName( ) );
+            else
+                playersAllow.add( pci->getName( ) );
+            buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ñƒ " << pci->getName( ) << ".";
+        }
+        else {
+            if (all)
+                playersDeny.add( pci->getName( ) );
+            else
+                playersAllow.remove( pci->getName( ) );
+            buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ñƒ " << pci->getName( ) << ".";
+        }
+        return true;
     }
 
     if (clan) {
-	if (fAllow) {
-	    if (all)
-		clansDeny.remove( *clan );
-	    else
-		clansAllow.set( *clan );
-	    buf << "ÏÔÎÙÎÅ ÒÁÚÒÅÛÅÎÏ ÞÌÅÎÁÍ ËÌÁÎÁ " << clan->getShortName( ) << ".";
-	}
-	else {
-	    if (all)
-		clansDeny.set( *clan );
-	    else
-		clansAllow.remove( *clan );
-	    buf << "ÏÔÎÙÎÅ ÚÁÐÒÅÝÅÎÏ ÞÌÅÎÁÍ ËÌÁÎÁ " << clan->getShortName( ) << ".";
-	}
-	return true; 
+        if (fAllow) {
+            if (all)
+                clansDeny.remove( *clan );
+            else
+                clansAllow.set( *clan );
+            buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ñ‡Ð»ÐµÐ½Ð°Ð¼ ÐºÐ»Ð°Ð½Ð° " << clan->getShortName( ) << ".";
+        }
+        else {
+            if (all)
+                clansDeny.set( *clan );
+            else
+                clansAllow.remove( *clan );
+            buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ñ‡Ð»ÐµÐ½Ð°Ð¼ ÐºÐ»Ð°Ð½Ð° " << clan->getShortName( ) << ".";
+        }
+        return true; 
     }
 
-    buf << "ëÌÁÎ ÉÌÉ ÐÅÒÓÏÎÁÖ Ó ÔÁËÉÍ ÉÍÅÎÅÍ ÎÅ ÎÁÊÄÅÎÙ.";
+    buf << "ÐšÐ»Ð°Ð½ Ð¸Ð»Ð¸ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶ Ñ Ñ‚Ð°ÐºÐ¸Ð¼ Ð¸Ð¼ÐµÐ½ÐµÐ¼ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ñ‹.";
     return false;
 }
 

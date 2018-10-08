@@ -49,7 +49,7 @@ void DLFile::makePath( const DLString &dirname, const DLString &filename, const 
     path = dirname;
 
     if (!filename.empty( )) {
-	path << PATH_SEP << filename << fileext;
+        path << PATH_SEP << filename << fileext;
     }
 }
 
@@ -70,11 +70,11 @@ DLString DLFile::getAbsolutePath( ) const
     char buf[PATH_MAX];
     
     if (realpath( path.c_str( ), buf )) {
-	return DLString( buf );
+        return DLString( buf );
     }
     else {
-	LogStream::sendSystem( ) << METHOD << " " << buf << endl;
-	return DLString::emptyString;
+        LogStream::sendSystem( ) << METHOD << " " << buf << endl;
+        return DLString::emptyString;
     }
 }
 
@@ -94,12 +94,12 @@ bool DLFile::isDirectory( ) const
     struct stat statBuf;
     
     if (stat( path.c_str( ), &statBuf ) == 0) {
-	if (S_ISDIR( statBuf.st_mode )) {
-	    return true;
-	}
+        if (S_ISDIR( statBuf.st_mode )) {
+            return true;
+        }
     }
     else {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
     }
 
     return false;
@@ -126,17 +126,17 @@ DLString DLFile::getFileName( ) const
     DLString::size_type epos = path.rfind( EXT_SEP );
     
     if (epos == DLString::npos) {
-	epos = path.length( );	
+        epos = path.length( );        
     }
 
     if (npos == path.length( ) - 1) {
-	return DLString::emptyString;
+        return DLString::emptyString;
     }
     else if (npos == DLString::npos) {
-	npos = 0;
+        npos = 0;
     }
     else {
-	npos = npos + 1;
+        npos = npos + 1;
     }
 
     return path.substr( npos, epos - npos );
@@ -148,10 +148,10 @@ DLString DLFile::getFileExt( ) const
     DLString::size_type epos = path.rfind( EXT_SEP );
     
     if (epos == DLString::npos) {
-	return DLString::emptyString;
+        return DLString::emptyString;
     }
     if (npos != DLString::npos && epos < npos) {
-	return DLString::emptyString;
+        return DLString::emptyString;
     }
     
     return path.substr( epos );
@@ -177,8 +177,8 @@ bool DLFile::remove( ) const
     static const char * METHOD = "DLFile::remove";
 
     if (::remove( path.c_str( ) ) < 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        return false;
     }
 
     return true;
@@ -198,8 +198,8 @@ bool DLFile::rename( const DLString &newPath ) const
 #endif
 
     if (::rename( path.c_str( ), newPath.c_str( ) ) < 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << " " << newPath << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << " " << newPath << endl;
+        return false;
     }
 
     return true;
@@ -215,12 +215,12 @@ bool DLFile::copy( const DLString &newPath ) const
     std::ifstream ifs( getPath( ).c_str( ) );
 
     if (!ifs)
-	return false;
+        return false;
 
     std::ofstream ofs( newPath.c_str( ) );
 
     if (!ofs)
-	return false;
+        return false;
     
     ofs << ifs.rdbuf( );
 
@@ -235,7 +235,7 @@ time_t DLFile::getModifyTime( ) const
     if (stat( path.c_str( ), &statBuf ) == 0) 
         return statBuf.st_mtime;
     else {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
         return 0;
     }
 }
@@ -248,7 +248,7 @@ int DLFile::getSize( ) const
     if (stat( path.c_str( ), &statBuf ) == 0) 
         return statBuf.st_size;
     else {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
         return 0;
     }
 }

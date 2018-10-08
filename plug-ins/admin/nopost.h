@@ -24,12 +24,12 @@
 class XMLAttributeNoPost : public XMLAttributeOnlineTicker, public RemortAttribute {
 XML_OBJECT;
 public:
-	typedef ::Pointer<XMLAttributeNoPost> Pointer;
+        typedef ::Pointer<XMLAttributeNoPost> Pointer;
 
-	XMLAttributeNoPost( );
+        XMLAttributeNoPost( );
 
-	virtual void start( PCMemoryInterface * ) const;
-	virtual void end( PCMemoryInterface * ) const;
+        virtual void start( PCMemoryInterface * ) const;
+        virtual void end( PCMemoryInterface * ) const;
 };
 
 

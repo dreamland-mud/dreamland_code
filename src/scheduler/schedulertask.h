@@ -19,7 +19,7 @@
 class SchedulerPriorityMap;
 
 /**
- * @short Задача для планировщика
+ * @short п≈п╟п╢п╟я┤п╟ п╢п╩я▐ п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨п╟
  * @author Igor S. Petrenko
  * @see Scheduler
  */
@@ -28,13 +28,13 @@ struct SchedulerTask : public virtual DLObject
     typedef ::Pointer<SchedulerTask> Pointer;
     typedef ::Pointer<SchedulerPriorityMap> SchedulerPriorityMapPointer;
 
-    /** Вызывается перед прохождением списка */
+    /** п▓я▀п╥я▀п╡п╟п╣я┌я│я▐ п©п╣я─п╣п╢ п©я─п╬я┘п╬п╤п╢п╣п╫п╦п╣п╪ я│п©п╦я│п╨п╟ */
     virtual void before( );
-    /** Выполнить задачу */ 
+    /** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ */ 
     virtual void run( );
-    /** Вызывается после прохождением списка */
+    /** п▓я▀п╥я▀п╡п╟п╣я┌я│я▐ п©п╬я│п╩п╣ п©я─п╬я┘п╬п╤п╢п╣п╫п╦п╣п╪ я│п©п╦я│п╨п╟ */
     virtual void after( );
-    /** Положить себя в list */
+    /** п÷п╬п╩п╬п╤п╦я┌я▄ я│п╣п╠я▐ п╡ list */
     virtual void putInto( SchedulerPriorityMapPointer& list );
     virtual int getPriority( ) const = 0;
 };

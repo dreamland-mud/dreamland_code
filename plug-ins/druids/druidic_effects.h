@@ -45,7 +45,7 @@ protected:
     bool applyPositiveAffect( PCharacter *, Affect * ) const;
     bool applyNegativeAffect( PCharacter *, Affect * ) const;
     DruidSpiritAffectHandler::Pointer getAffectHandler( Affect * ) const;
-			      
+                              
     XML_VARIABLE XMLBoolean good;
 };
 

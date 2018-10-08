@@ -24,18 +24,18 @@ public:
 
     inline int getIndex( ) const
     {
-	return index;
+        return index;
     }
     
     virtual bool isValid( ) const 
     {
-	return true;
+        return true;
     }
 
 protected:
     inline void setIndex( int i )
     {
-	index = i;
+        index = i;
     }
 
 private:

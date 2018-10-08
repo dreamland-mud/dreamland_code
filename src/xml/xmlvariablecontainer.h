@@ -32,13 +32,13 @@ private:
 };
 
 #define XML_OBJECT \
-	class __MetaInfo__; \
+        class __MetaInfo__; \
     public: \
-	static const DLString MOC_TYPE; \
+        static const DLString MOC_TYPE; \
     private: \
-	virtual const DLString & mocGetType( ) const; \
-	virtual bool mocNodeFromXML( const XMLNode::Pointer & ); \
-	virtual bool mocToXML( XMLNode::Pointer & ) const; 
+        virtual const DLString & mocGetType( ) const; \
+        virtual bool mocNodeFromXML( const XMLNode::Pointer & ); \
+        virtual bool mocToXML( XMLNode::Pointer & ) const; 
 
 #define XML_VARIABLE
     

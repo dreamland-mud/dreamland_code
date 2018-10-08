@@ -10,7 +10,7 @@ extern "C"
 {
     SO::PluginList initialize_ed( )
     {
-	SO::PluginList ppl;
-	return ppl;
+        SO::PluginList ppl;
+        return ppl;
     }
 }

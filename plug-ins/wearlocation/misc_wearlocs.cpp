@@ -65,8 +65,8 @@ void HairWearloc::affectsOnEquip( Character *ch, Object *obj ) {
 void HairWearloc::affectsOnUnequip( Character *ch, Object *obj ) { }
 int HairWearloc::canWear( Character *ch, Object *obj, int flags ) {
     if (find( ch ) != NULL) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("В твоих волосах уже запуталось что-то другое.");
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println("п▓ я┌п╡п╬п╦я┘ п╡п╬п╩п╬я│п╟я┘ я┐п╤п╣ п╥п╟п©я┐я┌п╟п╩п╬я│я▄ я┤я┌п╬-я┌п╬ п╢я─я┐пЁп╬п╣.");
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );
@@ -81,17 +81,17 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
     int rc;
     
     if (( rc = DefaultWearlocation::canWear( ch, obj, flags ) ) != RC_WEAR_OK)
-	return rc;
+        return rc;
 
     weapon = wear_wield->find( ch );
     
     if (weapon 
-	&& ch->size < SIZE_LARGE 
-	&& IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
+        && ch->size < SIZE_LARGE 
+        && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
     {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println("Твои руки заняты оружием!");
-	return RC_WEAR_CONFLICT;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println("п╒п╡п╬п╦ я─я┐п╨п╦ п╥п╟п╫я▐я┌я▀ п╬я─я┐п╤п╦п╣п╪!");
+        return RC_WEAR_CONFLICT;
     }
 
     return RC_WEAR_OK;
@@ -106,13 +106,13 @@ bool WieldWearloc::remove( Object *obj, int flags )
     Object *dual;
 
     if (!DefaultWearlocation::remove( obj, flags ))
-	return false;
+        return false;
 
     if (IS_SET(flags, F_WEAR_REPLACE))
-	return true;
+        return true;
 
     if (( dual = wear_second_wield->find( obj->carried_by ) )) 
-	dual->wear_loc.assign( this );
+        dual->wear_loc.assign( this );
     
     return true;
 }
@@ -122,22 +122,22 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
     int rc;
     
     if (( rc = DefaultWearlocation::canWear( ch, obj, flags ) ) != RC_WEAR_OK)
-	return rc;
-	
+        return rc;
+        
     if (!ch->is_npc( ) && obj->getWeight( ) > (get_str_app(ch).wield * 10)) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println("Ты не можешь этим вооружиться. Оно слишком тяжело для тебя.");
-	return RC_WEAR_HEAVY;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╦п╪ п╡п╬п╬я─я┐п╤п╦я┌я▄я│я▐. п·п╫п╬ я│п╩п╦я┬п╨п╬п╪ я┌я▐п╤п╣п╩п╬ п╢п╩я▐ я┌п╣п╠я▐.");
+        return RC_WEAR_HEAVY;
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS)
-	&& !ch->is_npc( )
-	&& ((ch->size < SIZE_LARGE && wear_shield->find( ch ))
-	    || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
+        && !ch->is_npc( )
+        && ((ch->size < SIZE_LARGE && wear_shield->find( ch ))
+            || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
     {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println("Чтобы вооружиться этим, у тебя должно быть две свободные руки.");
-	return RC_WEAR_LARGE;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println("п╖я┌п╬п╠я▀ п╡п╬п╬я─я┐п╤п╦я┌я▄я│я▐ я█я┌п╦п╪, я┐ я┌п╣п╠я▐ п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ п╢п╡п╣ я│п╡п╬п╠п╬п╢п╫я▀п╣ я─я┐п╨п╦.");
+        return RC_WEAR_LARGE;
     }
 
     return RC_WEAR_OK;
@@ -148,13 +148,13 @@ int WieldWearloc::wear(  Object *obj, int flags )
     int rc;
     
     if (( rc = DefaultWearlocation::wear( obj, flags ) ) != RC_WEAR_OK)
-	return rc;
+        return rc;
 
     if (obj->wear_loc != this)
-	return rc;
+        return rc;
     
     if (IS_SET(flags, F_WEAR_VERBOSE))
-	reportWeaponSkill( obj->carried_by, obj );
+        reportWeaponSkill( obj->carried_by, obj );
 
     return RC_WEAR_OK;
 }
@@ -167,22 +167,22 @@ void WieldWearloc::reportWeaponSkill( Character *ch, Object *obj )
     sn = get_weapon_sn( obj );
 
     if (sn == gsn_hand_to_hand)
-	return;
+        return;
 
     skill = ch->getSkill( sn );
 
     if (skill >= 100)
-	msg = "$o1 становится частью тебя!";
+        msg = "$o1 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ я┤п╟я│я┌я▄я▌ я┌п╣п╠я▐!";
     else if (skill > 85)
-	msg = "Ты чувствуешь себя с $o5 абсолютно уверенно.";
+        msg = "п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ я│ $o5 п╟п╠я│п╬п╩я▌я┌п╫п╬ я┐п╡п╣я─п╣п╫п╫п╬.";
     else if (skill > 70)
-	msg = "Ты хорошо владеешь $o5.";
+        msg = "п╒я▀ я┘п╬я─п╬я┬п╬ п╡п╩п╟п╢п╣п╣я┬я▄ $o5.";
     else if (skill > 50)
-	msg = "Ты довольно посредственно владеешь $o5.";
+        msg = "п╒я▀ п╢п╬п╡п╬п╩я▄п╫п╬ п©п╬я│я─п╣п╢я│я┌п╡п╣п╫п╫п╬ п╡п╩п╟п╢п╣п╣я┬я▄ $o5.";
     else if (skill > 25)
-	msg = "Ты чувствуешь себя неуклюже, вооружившись $o5.";
+        msg = "п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╫п╣я┐п╨п╩я▌п╤п╣, п╡п╬п╬я─я┐п╤п╦п╡я┬п╦я│я▄ $o5.";
     else
-	msg = "Ты неумело крутишь в руках $o4, боясь уронить.";
+        msg = "п╒я▀ п╫п╣я┐п╪п╣п╩п╬ п╨я─я┐я┌п╦я┬я▄ п╡ я─я┐п╨п╟я┘ $o4, п╠п╬я▐я│я▄ я┐я─п╬п╫п╦я┌я▄.";
     
     act( msg, ch, obj, 0, TO_CHAR );
 }
@@ -198,10 +198,10 @@ bool SecondWieldWearloc::remove( Object *obj, int flags )
 bool SecondWieldWearloc::matches( Character *ch )
 {
     if (!DefaultWearlocation::matches( ch ))
-	return false;
+        return false;
 
     if (!gsn_second_weapon->usable( ch )) 
-	return false;
+        return false;
 
     return true;
 }
@@ -212,36 +212,36 @@ int SecondWieldWearloc::canWear( Character *ch, Object *obj, int flags )
     Object *wield;
     
     if (( rc = DefaultWearlocation::canWear( ch, obj, flags ) ) != RC_WEAR_OK)
-	return rc;
+        return rc;
     
     if (wear_shield->find( ch ) || wear_hold->find( ch )) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println( "Твои руки уже заняты щитом или чем-либо другим." );
-	return RC_WEAR_CONFLICT;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println( "п╒п╡п╬п╦ я─я┐п╨п╦ я┐п╤п╣ п╥п╟п╫я▐я┌я▀ я┴п╦я┌п╬п╪ п╦п╩п╦ я┤п╣п╪-п╩п╦п╠п╬ п╢я─я┐пЁп╦п╪." );
+        return RC_WEAR_CONFLICT;
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_TWO_HANDS) && ch->getRace( )->getSize( ) < SIZE_HUGE) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println( "Только не двуручным оружием!" );
-	return RC_WEAR_LARGE;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println( "п╒п╬п╩я▄п╨п╬ п╫п╣ п╢п╡я┐я─я┐я┤п╫я▀п╪ п╬я─я┐п╤п╦п╣п╪!" );
+        return RC_WEAR_LARGE;
     }
 
     if (!( wield = wear_wield->find( ch ) )) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println( "У тебя нет даже первичного оружия!" );
-	return RC_WEAR_CONFLICT;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╢п╟п╤п╣ п©п╣я─п╡п╦я┤п╫п╬пЁп╬ п╬я─я┐п╤п╦я▐!" );
+        return RC_WEAR_CONFLICT;
     }
 
     if (IS_WEAPON_STAT(wield, WEAPON_TWO_HANDS) && ch->getRace( )->getSize( ) < SIZE_HUGE) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println( "Обе руки заняты двуручным оружием!" );
-	return RC_WEAR_LARGE;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println( "п·п╠п╣ я─я┐п╨п╦ п╥п╟п╫я▐я┌я▀ п╢п╡я┐я─я┐я┤п╫я▀п╪ п╬я─я┐п╤п╦п╣п╪!" );
+        return RC_WEAR_LARGE;
     }
 
     if (obj->getWeight( ) > (get_str_app(ch).wield * 5)) {
-	if (IS_SET(flags, F_WEAR_VERBOSE))
-	    ch->println( "Это оружие слишком тяжело для тебя, чтоб использовать его как вторичное." );
-	return RC_WEAR_HEAVY;
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println( "п╜я┌п╬ п╬я─я┐п╤п╦п╣ я│п╩п╦я┬п╨п╬п╪ я┌я▐п╤п╣п╩п╬ п╢п╩я▐ я┌п╣п╠я▐, я┤я┌п╬п╠ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╣пЁп╬ п╨п╟п╨ п╡я┌п╬я─п╦я┤п╫п╬п╣." );
+        return RC_WEAR_HEAVY;
     }
 
     return RC_WEAR_OK;
@@ -253,15 +253,15 @@ int SecondWieldWearloc::canWear( Character *ch, Object *obj, int flags )
 int TattooWearloc::canWear( Character *ch, Object *obj, int flags )
 {
     if (!ch->is_immortal( )) 
-	return RC_WEAR_NOMATCH;
+        return RC_WEAR_NOMATCH;
     else
-	return DefaultWearlocation::canWear( ch, obj, flags );
+        return DefaultWearlocation::canWear( ch, obj, flags );
 }
 
 bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(flags, F_WEAR_VERBOSE))
-	act("Лишь Божественные Силы могут избавить тебя от $o2.", ch, obj, 0, TO_CHAR);
+        act("п⌡п╦я┬я▄ п▒п╬п╤п╣я│я┌п╡п╣п╫п╫я▀п╣ п║п╦п╩я▀ п╪п╬пЁя┐я┌ п╦п╥п╠п╟п╡п╦я┌я▄ я┌п╣п╠я▐ п╬я┌ $o2.", ch, obj, 0, TO_CHAR);
 
     return false;
 }

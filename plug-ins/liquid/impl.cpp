@@ -20,15 +20,15 @@ extern "C"
 {
     SO::PluginList initialize_liquid( ) 
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<DrinkContainer> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<DefaultLiquid> >( ppl );
-	Plugin::registerPlugin<LiquidLoader>( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<DrinkContainer> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<DefaultLiquid> >( ppl );
+        Plugin::registerPlugin<LiquidLoader>( ppl );
 
-	Plugin::registerPlugin<CPour>( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<CPour>( ppl );
+        
+        return ppl;
     }
 }
 

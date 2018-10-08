@@ -37,7 +37,7 @@ public:
     inline Register(Object *o);
     inline Register(const Register &r);
     template <typename T> 
-	static inline Register handler();
+        static inline Register handler();
     inline ~Register();
 
     inline const Register &operator = (int r);
@@ -83,32 +83,32 @@ public:
     inline DLString repr() const;
 
     enum /*Type*/ {
-	NONE,
-	NUMBER,
-	IDENTIFIER,
-	STRING,
-	OBJECT,
-	FUNCTION,
+        NONE,
+        NUMBER,
+        IDENTIFIER,
+        STRING,
+        OBJECT,
+        FUNCTION,
     } type;
 
     inline const char *getTypeName() const {
-	switch(type) {
-	    case NONE:		return "NONE";		break;
-            case NUMBER:	return "NUMBER";	break;
-            case IDENTIFIER:	return "IDENTIFIER";	break;
-            case STRING:	return "STRING";	break;
-            case OBJECT:	return "OBJECT";	break;
-            case FUNCTION:	return "FUNCTION";	break;
-	    default:		return "<unknown>";	break;
-	}
+        switch(type) {
+            case NONE:                return "NONE";                break;
+            case NUMBER:        return "NUMBER";        break;
+            case IDENTIFIER:        return "IDENTIFIER";        break;
+            case STRING:        return "STRING";        break;
+            case OBJECT:        return "OBJECT";        break;
+            case FUNCTION:        return "FUNCTION";        break;
+            default:                return "<unknown>";        break;
+        }
     }
     
     union {
-	int number;
-	Lex::id_t identifier;
-	Closure *function;
-	Object *object;
-	char aux[sizeof(DLString)];   /*XXX: actualy, FeniaString*/
+        int number;
+        Lex::id_t identifier;
+        Closure *function;
+        Object *object;
+        char aux[sizeof(DLString)];   /*XXX: actualy, FeniaString*/
     } value;
 
 

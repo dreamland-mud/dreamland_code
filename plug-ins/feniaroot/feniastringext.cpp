@@ -43,7 +43,7 @@ NMI_INVOKE(FeniaString, strPrefix, "")
        throw Scripting::NotEnoughArgumentsException( );
     
     if (empty( ))
-	return false;
+        return false;
     return strPrefix( args.front( ).toString( ) );
 }
 
@@ -52,81 +52,81 @@ NMI_INVOKE(FeniaString, ruscase, "")
     int cse = 1;
     
     if (!args.empty())
-	cse = args.front().toNumber( );
+        cse = args.front().toNumber( );
 
     return Register( ruscase( cse + '0' ) );
 }
 
-NMI_INVOKE(FeniaString, getOneArgument, "возвращает первое слово или первую фразу в кавычках")
+NMI_INVOKE(FeniaString, getOneArgument, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©п╣я─п╡п╬п╣ я│п╩п╬п╡п╬ п╦п╩п╦ п©п╣я─п╡я┐я▌ я└я─п╟п╥я┐ п╡ п╨п╟п╡я▀я┤п╨п╟я┘")
 {
     DLString str = *this;
     return str.getOneArgument( );
 }
 
-NMI_INVOKE(FeniaString, cutOneArgument, "возвращает строку без первого слова (или без первой фразы в кавычках)")
+NMI_INVOKE(FeniaString, cutOneArgument, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я│я┌я─п╬п╨я┐ п╠п╣п╥ п©п╣я─п╡п╬пЁп╬ я│п╩п╬п╡п╟ (п╦п╩п╦ п╠п╣п╥ п©п╣я─п╡п╬п╧ я└я─п╟п╥я▀ п╡ п╨п╟п╡я▀я┤п╨п╟я┘)")
 {
     DLString str = *this;
     str.getOneArgument( );
     return str;
 }
 
-NMI_INVOKE(FeniaString, upperFirstChar, "Возвращает ту же  строку, но с большой буквы")
+NMI_INVOKE(FeniaString, upperFirstChar, "п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌я┐ п╤п╣  я│я┌я─п╬п╨я┐, п╫п╬ я│ п╠п╬п╩я▄я┬п╬п╧ п╠я┐п╨п╡я▀")
 {
     DLString str = *this;
     str.upperFirstCharacter();
     return Register( str );
 }
 
-NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) заменяет в данной строке все вхождения $1..$9 на соответствующие совпадения") 
+NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) п╥п╟п╪п╣п╫я▐п╣я┌ п╡ п╢п╟п╫п╫п╬п╧ я│я┌я─п╬п╨п╣ п╡я│п╣ п╡я┘п╬п╤п╢п╣п╫п╦я▐ $1..$9 п╫п╟ я│п╬п╬я┌п╡п╣я┌я│я┌п╡я┐я▌я┴п╦п╣ я│п╬п╡п©п╟п╢п╣п╫п╦я▐") 
 {
     if (args.size() != 2)
-	throw NotEnoughArgumentsException();
+        throw NotEnoughArgumentsException();
 
     DLString pattern = args.front().toString();
     DLString str = args.back().toString();
     DLString result = *this;
     
     try {
-	RegExp re( pattern.c_str() );
-	RegExp::MatchVector mv;
-	
-	mv = re.subexpr( str.c_str() );
-	if (mv.size() == 0)
-	    return result;
+        RegExp re( pattern.c_str() );
+        RegExp::MatchVector mv;
+        
+        mv = re.subexpr( str.c_str() );
+        if (mv.size() == 0)
+            return result;
 
-	for (int i = mv.size() - 1; i >= 0; i--) {
-	    DLString num;
-	    num << "$" << i + 1;
-	    result.replaces(num, mv[i]);	    
-	}
-	
+        for (int i = mv.size() - 1; i >= 0; i--) {
+            DLString num;
+            num << "$" << i + 1;
+            result.replaces(num, mv[i]);            
+        }
+        
     } catch( const std::exception &e ) {
-	throw CustomException(e.what());
+        throw CustomException(e.what());
     }
 
     return result;
 }
 
-NMI_INVOKE(FeniaString, matchGroups, "(pattern) возвращает все группы шаблона") 
+NMI_INVOKE(FeniaString, matchGroups, "(pattern) п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п╡я│п╣ пЁя─я┐п©п©я▀ я┬п╟п╠п╩п╬п╫п╟") 
 {
     if (args.size() != 1)
-	throw NotEnoughArgumentsException();
+        throw NotEnoughArgumentsException();
 
     DLString pattern = args.front().toString();
     RegList::Pointer groups(NEW);
     
     try {
-	RegExp re( pattern.c_str() );
-	RegExp::MatchVector mv;
-	
-	mv = re.subexpr( this->c_str() );
+        RegExp re( pattern.c_str() );
+        RegExp::MatchVector mv;
+        
+        mv = re.subexpr( this->c_str() );
 
-	for (int i = mv.size() - 1; i >= 0; i--) {
+        for (int i = mv.size() - 1; i >= 0; i--) {
             groups->push_back( Register( mv[i] ) );
-	}
-	
+        }
+        
     } catch( const std::exception &e ) {
-	throw CustomException(e.what());
+        throw CustomException(e.what());
     }
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
@@ -137,44 +137,44 @@ NMI_INVOKE(FeniaString, matchGroups, "(pattern) возвращает все группы шаблона")
 NMI_INVOKE(FeniaString, match, "")
 {
     if (args.empty())
-	throw NotEnoughArgumentsException();
+        throw NotEnoughArgumentsException();
     
     try {
-	RegExp re( args.front().toString().c_str() );
+        RegExp re( args.front().toString().c_str() );
 
-	return re.match( c_str() );
+        return re.match( c_str() );
     } catch( const std::exception &e ) {
-	throw CustomException(e.what());
+        throw CustomException(e.what());
     }
 }
 
 NMI_INVOKE(FeniaString, matchCase, "")
 {
     if (args.empty())
-	throw NotEnoughArgumentsException();
-	
+        throw NotEnoughArgumentsException();
+        
     try {
-	RegExp re( args.front().toString().c_str(), true );
+        RegExp re( args.front().toString().c_str(), true );
 
-	return re.match( c_str() );
+        return re.match( c_str() );
     } catch( const std::exception &e ) {
-	throw IllegalArgumentException();
+        throw IllegalArgumentException();
     }
 }
 
 NMI_INVOKE(FeniaString, isName, "")
 {
     if (args.empty())
-	throw NotEnoughArgumentsException();
-	
+        throw NotEnoughArgumentsException();
+        
     return isName( args.front().toString().c_str() );
 }
 
 NMI_INVOKE(FeniaString, is_name, "")
 {
     if (args.empty())
-	throw NotEnoughArgumentsException();
-	
+        throw NotEnoughArgumentsException();
+        
     const DLString &a = args.front().toString();
     char l[size()+1], r[a.size()+1];
 
@@ -187,24 +187,24 @@ NMI_INVOKE(FeniaString, is_name, "")
     return is_name( l, r );
 }
 
-NMI_INVOKE(FeniaString, substr, "возвращает подстроку, первый аргумент - смещение относительно начала, второй - длина подстроки, по умолчанию - до конца")
+NMI_INVOKE(FeniaString, substr, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©п╬п╢я│я┌я─п╬п╨я┐, п©п╣я─п╡я▀п╧ п╟я─пЁя┐п╪п╣п╫я┌ - я│п╪п╣я┴п╣п╫п╦п╣ п╬я┌п╫п╬я│п╦я┌п╣п╩я▄п╫п╬ п╫п╟я┤п╟п╩п╟, п╡я┌п╬я─п╬п╧ - п╢п╩п╦п╫п╟ п©п╬п╢я│я┌я─п╬п╨п╦, п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ - п╢п╬ п╨п╬п╫я├п╟")
 {
     if (args.empty())
-	throw NotEnoughArgumentsException();
-	
+        throw NotEnoughArgumentsException();
+        
     try {
-	RegisterList::const_iterator iter;
-	int i1, i2 = std::string::npos;
+        RegisterList::const_iterator iter;
+        int i1, i2 = std::string::npos;
 
-	iter = args.begin();
-	i1 = iter->toNumber();
+        iter = args.begin();
+        i1 = iter->toNumber();
 
-	if (++iter != args.end())
-	    i2 = iter->toNumber();
-	
-	return substr( i1, i2 );
+        if (++iter != args.end())
+            i2 = iter->toNumber();
+        
+        return substr( i1, i2 );
     } catch( const std::exception &e ) {
-	throw IllegalArgumentException();
+        throw IllegalArgumentException();
     }
 }
 
@@ -213,13 +213,13 @@ NMI_INVOKE(FeniaString, stripColour, "")
     DLString rc;
     
     for(iterator i = begin(); i != end();) {
-	char c = *i++;
-	
-	if(c == '{') {
-	    if(*i++ == '{')
-		rc += '{';
-	} else
-	    rc += c;
+        char c = *i++;
+        
+        if(c == '{') {
+            if(*i++ == '{')
+                rc += '{';
+        } else
+            rc += c;
     }
     
     return rc;
@@ -233,43 +233,43 @@ NMI_INVOKE(FeniaString, contains, "")
     char *s_tok;
     
     if (args.empty())
-	throw NotEnoughArgumentsException();
-	
+        throw NotEnoughArgumentsException();
+        
     const char *arg = args.front( ).toString( ).c_str( );
     strcpy(strbuf, c_str( ));
 
     while (( s_tok = strtok( p_strbuf, " " ) ) != NULL) {
-	p_strbuf = NULL;
+        p_strbuf = NULL;
 
-	if (::is_name( s_tok, arg ))
-	    return true;
+        if (::is_name( s_tok, arg ))
+            return true;
     }
     
     return false;
 }
 
-NMI_INVOKE(FeniaString, split, "параметр - разделитель. возвращает List из подстрок")
+NMI_INVOKE(FeniaString, split, "п©п╟я─п╟п╪п╣я┌я─ - я─п╟п╥п╢п╣п╩п╦я┌п╣п╩я▄. п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ List п╦п╥ п©п╬п╢я│я┌я─п╬п╨")
 {
     char delim;
     size_type pos1, pos2;
     RegList::Pointer list(NEW);
     
     if (args.empty() || args.front().toString().empty())
-	delim = '\n';
+        delim = '\n';
     else
-	delim = args.front().toString().at(0);
-	
-	
+        delim = args.front().toString().at(0);
+        
+        
     pos1 = pos2 = 0;
 
     do {
-	pos2 = find(delim, pos1);
-	
-	if (pos2 == DLString::npos) 
-	    pos2 = size();
-	
-	list->push_back(Register(substr(pos1, pos2 - pos1)));
-	pos1 = pos2 + 1;
+        pos2 = find(delim, pos1);
+        
+        if (pos2 == DLString::npos) 
+            pos2 = size();
+        
+        list->push_back(Register(substr(pos1, pos2 - pos1)));
+        pos1 = pos2 + 1;
     }
     while (pos1 < size());
 
@@ -287,14 +287,14 @@ NMI_INVOKE(FeniaString, api, "")
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(FeniaString, format, "превращает строку в абзац заданной ширины")
+NMI_INVOKE(FeniaString, format, "п©я─п╣п╡я─п╟я┴п╟п╣я┌ я│я┌я─п╬п╨я┐ п╡ п╟п╠п╥п╟я├ п╥п╟п╢п╟п╫п╫п╬п╧ я┬п╦я─п╦п╫я▀")
 {
     int width;
     ostringstream os;
     istringstream is(c_str( ));
     
     if (args.empty())
-	throw NotEnoughArgumentsException();
+        throw NotEnoughArgumentsException();
 
     width = args.front().toNumber();
 
@@ -304,13 +304,13 @@ NMI_INVOKE(FeniaString, format, "превращает строку в абзац заданной ширины")
 }
 
 
-NMI_INVOKE(FeniaString, replace, "заменяет все вхождения первой подстроки на вторую")
+NMI_INVOKE(FeniaString, replace, "п╥п╟п╪п╣п╫я▐п╣я┌ п╡я│п╣ п╡я┘п╬п╤п╢п╣п╫п╦я▐ п©п╣я─п╡п╬п╧ п©п╬п╢я│я┌я─п╬п╨п╦ п╫п╟ п╡я┌п╬я─я┐я▌")
 {
     DLString aStr, bStr;
     RegisterList::const_iterator iter;
     
     if (args.size() < 2)
-	throw NotEnoughArgumentsException();
+        throw NotEnoughArgumentsException();
 
     iter = args.begin();
     aStr = iter->toString();
@@ -321,14 +321,14 @@ NMI_INVOKE(FeniaString, replace, "заменяет все вхождения первой подстроки на вто
     return r;
 }
 
-NMI_INVOKE(FeniaString, isRussian, "возвращает true если строка не пуста и содержит только русские буквы")
+NMI_INVOKE(FeniaString, isRussian, "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ true п╣я│п╩п╦ я│я┌я─п╬п╨п╟ п╫п╣ п©я┐я│я┌п╟ п╦ я│п╬п╢п╣я─п╤п╦я┌ я┌п╬п╩я▄п╨п╬ я─я┐я│я│п╨п╦п╣ п╠я┐п╨п╡я▀")
 {
     if (empty( ))
-	return false;
+        return false;
 
     for (iterator i = begin(); i != end(); i++) 
-	if (!dl_isrusalpha( *i ))
-	    return false;
+        if (!dl_isrusalpha( *i ) && !dl_isspace( *i ))
+            return false;
 
     return true;
 }
@@ -337,8 +337,8 @@ NMI_INVOKE(FeniaString, toLower, "")
     DLString s = *this;
     for( DLString::size_type pos = 0; pos < s.length( ); pos++ )
     {
-	    char& ch = s.at( pos );
-	    ch = Char::lower( ch );
+            char& ch = s.at( pos );
+            ch = Char::lower( ch );
     }
     return s;
 }

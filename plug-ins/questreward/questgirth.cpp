@@ -17,7 +17,7 @@
 
 void QuestGirth::wear( Character *ch ) 
 {
-    ch->send_to( "{Cô×ÏÊ ÐÏÑÓ ÑÒËÏ ×ÓÐÙÈÉ×ÁÅÔ.{x\r\n" );
+    ch->send_to( "{CÐ¢Ð²Ð¾Ð¹ Ð¿Ð¾ÑÑ ÑÑ€ÐºÐ¾ Ð²ÑÐ¿Ñ‹Ñ…Ð¸Ð²Ð°ÐµÑ‚.{x\r\n" );
 }
 
 void QuestGirth::equip( Character *ch ) 
@@ -28,42 +28,42 @@ void QuestGirth::equip( Character *ch )
     obj->level = ch->getRealLevel( );
     
     if( obj->affected ) {
-	for( paf = obj->affected; paf; paf = paf->next )
-	    addAffect( ch, paf );
+        for( paf = obj->affected; paf; paf = paf->next )
+            addAffect( ch, paf );
     }
     else {
-	af.where = TO_OBJECT;
-	af.type  = -1;
-	af.duration = -1;
-	af.bitvector = 0;
+        af.where = TO_OBJECT;
+        af.type  = -1;
+        af.duration = -1;
+        af.bitvector = 0;
 
-	af.location = APPLY_CON;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_CON;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_AC;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_AC;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_HIT;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_HIT;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_MANA;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_MANA;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_MOVE;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_MOVE;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_HITROLL;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_HITROLL;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_DAMROLL;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_DAMROLL;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
     }
 }
 

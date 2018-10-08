@@ -12,14 +12,14 @@
 
 extern "C"
 {
-	SO::PluginList initialize_quest_staff( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<StaffBehavior> >( ppl );
-		Plugin::registerPlugin<MocRegistrator<StaffScenario> >( ppl );
-		Plugin::registerPlugin<StaffQuestRegistrator>( ppl );
-		
-		return ppl;
-	}
+        SO::PluginList initialize_quest_staff( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<StaffBehavior> >( ppl );
+                Plugin::registerPlugin<MocRegistrator<StaffScenario> >( ppl );
+                Plugin::registerPlugin<StaffQuestRegistrator>( ppl );
+                
+                return ppl;
+        }
 }

@@ -40,24 +40,24 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     state = QSTAT_INIT;
 
     try {
-	scenName = getReg( )->getRandomScenario( pch );
+        scenName = getReg( )->getRandomScenario( pch );
 
-	king = createKing( pch );
-	kingVnum = king->pIndexData->vnum;
-	kingRoom = king->in_room->name;
-	kingArea = king->in_room->area->name;
-	kingName = king->getShortDescr( );
+        king = createKing( pch );
+        kingVnum = king->pIndexData->vnum;
+        kingRoom = king->in_room->name;
+        kingArea = king->in_room->area->name;
+        kingName = king->getShortDescr( );
 
-	room = findRefuge( pch, king );
-	princeArea = room->area->name;
-	princeRoom = room->name;
+        room = findRefuge( pch, king );
+        princeArea = room->area->name;
+        princeRoom = room->name;
 
-	prince = createPrince( king, room );
-	princeName = prince->getShortDescr( );
+        prince = createPrince( king, room );
+        princeName = prince->getShortDescr( );
 
     } catch (const QuestCannotStartException &e) {
-	destroy( );
-	throw e;
+        destroy( );
+        throw e;
     }
     
     time = std::max( 6, range / 10 );
@@ -66,16 +66,16 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman, king );
-    tell_raw( pch, questman, "õ ÔÅÂÑ ÅÓÔØ {Y%d{G ÍÉÎÕÔ%s, ÞÔÏÂÙ ÄÏÂÒÁÔØÓÑ ÔÕÄÁ É ÕÚÎÁÔØ, × ÞÅÍ ÄÅÌÏ.",
-                  time, GET_COUNT(time,"Á","Ù","") ); 
+    tell_raw( pch, questman, "Ð£ Ñ‚ÐµÐ±Ñ ÐµÑÑ‚ÑŒ {Y%d{G Ð¼Ð¸Ð½ÑƒÑ‚%s, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ñ‚ÑƒÐ´Ð° Ð¸ ÑƒÐ·Ð½Ð°Ñ‚ÑŒ, Ð² Ñ‡ÐµÐ¼ Ð´ÐµÐ»Ð¾.",
+                  time, GET_COUNT(time,"Ð°","Ñ‹","") ); 
 
     wiznet( scenName.c_str( ), "%s in [%d], kid in [%d]",
-		 king->getNameP('1').c_str( ),
-		 king->in_room->vnum,
-		 prince->in_room->vnum );
+                 king->getNameP('1').c_str( ),
+                 king->in_room->vnum,
+                 prince->in_room->vnum );
 
     if (pch->isCoder( ))
-	debug = true;
+        debug = true;
 }
 
 void KidnapQuest::destroy( ) 
@@ -100,11 +100,11 @@ Quest::Reward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questma
     r->scrollChance = number_range( 5, 5 * ambushes );
 
     if (chance( 5 * ambushes ))
-	r->prac = number_range( 1, 3 );
+        r->prac = number_range( 1, 3 );
     
     if (!ch->getClan( )->isDispersed( )) {
-	r->points /= 2;
-	r->clanpoints = r->points;
+        r->points /= 2;
+        r->clanpoints = r->points;
     }
 
     r->exp = (r->points + r->clanpoints) * 10;
@@ -115,31 +115,31 @@ void KidnapQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << "ôÅÂÅ ÎÕÖÎÏ ÐÏÐÁÓÔØ × " << kingRoom << " (" << kingArea << "), "
-	    << "ÎÁÊÔÉ ÔÁÍ " << russian_case( kingName, '4' ) 
-	    << " É ÕÚÎÁÔØ, ËÁËÁÑ ÐÏÍÏÝØ ÏÔ ÔÅÂÑ ÔÒÅÂÕÅÔÓÑ." << endl;
-	break;
+        buf << "Ð¢ÐµÐ±Ðµ Ð½ÑƒÐ¶Ð½Ð¾ Ð¿Ð¾Ð¿Ð°ÑÑ‚ÑŒ Ð² " << kingRoom << " (" << kingArea << "), "
+            << "Ð½Ð°Ð¹Ñ‚Ð¸ Ñ‚Ð°Ð¼ " << russian_case( kingName, '4' ) 
+            << " Ð¸ ÑƒÐ·Ð½Ð°Ñ‚ÑŒ, ÐºÐ°ÐºÐ°Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ." << endl;
+        break;
 
     case QSTAT_MARK_RCVD:
-	buf << "ôÅÂÅ ÎÕÖÎÏ ÏÔÙÓËÁÔØ " << russian_case( princeName, '4' ) 
-	    << " × ÍÅÓÔÎÏÓÔÉ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << princeArea << "." << endl;
-	break;
+        buf << "Ð¢ÐµÐ±Ðµ Ð½ÑƒÐ¶Ð½Ð¾ Ð¾Ñ‚Ñ‹ÑÐºÐ°Ñ‚ÑŒ " << russian_case( princeName, '4' ) 
+            << " Ð² Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << princeArea << "." << endl;
+        break;
     
     case QSTAT_KID_FOUND:
-	buf << "ôÅÂÅ ÎÅÏÂÈÏÄÉÍÏ ÏÔ×ÅÓÔÉ " << russian_case( princeName, '4' )
-	    << " Ë " << russian_case( kingName, '3' ) << "." << endl
-	    << "üÔÏ ÎÁÈÏÄÉÔÓÑ × " << kingRoom << " (" << kingArea << ")." << endl;
-	break;
-	
+        buf << "Ð¢ÐµÐ±Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð¾Ñ‚Ð²ÐµÑÑ‚Ð¸ " << russian_case( princeName, '4' )
+            << " Ðº " << russian_case( kingName, '3' ) << "." << endl
+            << "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² " << kingRoom << " (" << kingArea << ")." << endl;
+        break;
+        
     case QSTAT_KING_ACK_WAITING:
-	buf << "ô×ÏÅ ÚÁÄÁÎÉÅ ÐÏÞÔÉ ×ÙÐÏÌÎÅÎÏ!" << endl
-	    << "÷ÅÒÎÉÓØ Ë " << russian_case( kingName, '3' ) << " ÚÁ ÂÌÁÇÏÄÁÒÎÏÓÔØÀ." << endl;
-	break;
+        buf << "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ñ‡Ñ‚Ð¸ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¾!" << endl
+            << "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ðº " << russian_case( kingName, '3' ) << " Ð·Ð° Ð±Ð»Ð°Ð³Ð¾Ð´Ð°Ñ€Ð½Ð¾ÑÑ‚ÑŒÑŽ." << endl;
+        break;
 
     case QSTAT_FINISHED:
-	buf << "ô×ÏÅ ÚÁÄÁÎÉÅ ×ÙÐÏÌÎÅÎÏ!" << endl
-	    << "÷ÅÒÎÉÓØ Ë ÔÏÍÕ, ËÔÏ ÔÅÂÅ ÅÇÏ ÄÁÌ, ÄÏ ÔÏÇÏ, ËÁË ×ÙÊÄÅÔ ×ÒÅÍÑ!" << endl;
-	break;
+        buf << "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¾!" << endl
+            << "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ðº Ñ‚Ð¾Ð¼Ñƒ, ÐºÑ‚Ð¾ Ñ‚ÐµÐ±Ðµ ÐµÐ³Ð¾ Ð´Ð°Ð», Ð´Ð¾ Ñ‚Ð¾Ð³Ð¾, ÐºÐ°Ðº Ð²Ñ‹Ð¹Ð´ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ!" << endl;
+        break;
     }
 }
 
@@ -147,27 +147,27 @@ void KidnapQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "õÚÎÁÔØ, ÞÔÏ ÓÌÕÞÉÌÏÓØ Õ " << russian_case( kingName, '2') << " × "
+        buf << "Ð£Ð·Ð½Ð°Ñ‚ÑŒ, Ñ‡Ñ‚Ð¾ ÑÐ»ÑƒÑ‡Ð¸Ð»Ð¾ÑÑŒ Ñƒ " << russian_case( kingName, '2') << " Ð² "
             << kingRoom << " (" << kingArea << ").";
-	break;
+        break;
 
     case QSTAT_MARK_RCVD:
-        buf << "îÁÊÔÉ " << russian_case( princeName, '4' ) << " × "
+        buf << "ÐÐ°Ð¹Ñ‚Ð¸ " << russian_case( princeName, '4' ) << " Ð² "
             << princeArea << ".";
-	break;
+        break;
     
     case QSTAT_KID_FOUND:
-        buf << "ïÔ×ÅÓÔÉ " << russian_case( princeName, '4' ) 
-            << " Ë " << russian_case( kingName, '3' ) << " × " << kingRoom << " (" << kingArea << ").";
-	break;
-	
+        buf << "ÐžÑ‚Ð²ÐµÑÑ‚Ð¸ " << russian_case( princeName, '4' ) 
+            << " Ðº " << russian_case( kingName, '3' ) << " Ð² " << kingRoom << " (" << kingArea << ").";
+        break;
+        
     case QSTAT_KING_ACK_WAITING:
-        buf << "÷ÅÒÎÕÔØÓÑ Ë " << russian_case( kingName, '3' ) << " ÚÁ ÂÌÁÇÏÄÁÒÎÏÓÔØÀ.";
-	break;
+        buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒÑÑ Ðº " << russian_case( kingName, '3' ) << " Ð·Ð° Ð±Ð»Ð°Ð³Ð¾Ð´Ð°Ñ€Ð½Ð¾ÑÑ‚ÑŒÑŽ.";
+        break;
 
     case QSTAT_FINISHED:
-	buf << "÷ÅÒÎÕÔØÓÑ Ë Ë×ÅÓÔÏÒÕ ÚÁ ÎÁÇÒÁÄÏÊ.";
-	break;
+        buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒÑÑ Ðº ÐºÐ²ÐµÑÑ‚Ð¾Ñ€Ñƒ Ð·Ð° Ð½Ð°Ð³Ñ€Ð°Ð´Ð¾Ð¹.";
+        break;
     }
 }
 
@@ -186,33 +186,33 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
     Room *room = helpLocation( );
 
     if (state == QSTAT_INIT || !room) {
-	tell_fmt( "éÚ×ÉÎÉ, ÎÏ ÔÅÂÅ ÐÒÉÄÅÔÓÑ ÉÓËÁÔØ ÐÕÔØ ÓÁÍÏ%1$GÍÕ|ÍÕ|ÏÊ.", ch, questman );
-	wiznet( "find", "failure" );
-	return true;
+        tell_fmt( "Ð˜Ð·Ð²Ð¸Ð½Ð¸, Ð½Ð¾ Ñ‚ÐµÐ±Ðµ Ð¿Ñ€Ð¸Ð´ÐµÑ‚ÑÑ Ð¸ÑÐºÐ°Ñ‚ÑŒ Ð¿ÑƒÑ‚ÑŒ ÑÐ°Ð¼Ð¾%1$GÐ¼Ñƒ|Ð¼Ñƒ|Ð¾Ð¹.", ch, questman );
+        wiznet( "find", "failure" );
+        return true;
     }
 
     if (hint.getValue( ) > 5) {
-	if (number_percent( ) < 30)
-	    tell_fmt( "%1$^C1, ÔÅÂÅ ÎÅÏÂÈÏÄÉÍÏ ÓÌÅÄÏ×ÁÔØ ÐÏ ÔÁËÏÍÕ ÐÕÔÉ: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
-	else
-	    tell_fmt( "ï, %1$^C1, ËÁË ÖÅ ÔÙ ÍÅÎÑ ÕÔÏÍÉ%1$GÌÏ|Ì|ÌÁ.. óÔÕÐÁÊ... éÝÉ ÓÁ%1$GÍÏ|Í|ÍÁ.", ch, questman );
-	
-	wiznet( "find", "failure" );
-	return true;
+        if (number_percent( ) < 30)
+            tell_fmt( "%1$^C1, Ñ‚ÐµÐ±Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð¿Ð¾ Ñ‚Ð°ÐºÐ¾Ð¼Ñƒ Ð¿ÑƒÑ‚Ð¸: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
+        else
+            tell_fmt( "Ðž, %1$^C1, ÐºÐ°Ðº Ð¶Ðµ Ñ‚Ñ‹ Ð¼ÐµÐ½Ñ ÑƒÑ‚Ð¾Ð¼Ð¸%1$GÐ»Ð¾|Ð»|Ð»Ð°.. Ð¡Ñ‚ÑƒÐ¿Ð°Ð¹... Ð˜Ñ‰Ð¸ ÑÐ°%1$GÐ¼Ð¾|Ð¼|Ð¼Ð°.", ch, questman );
+        
+        wiznet( "find", "failure" );
+        return true;
     }
 
-    tell_raw( ch, questman,  "ñ ÐÏÍÏÇÕ ÔÅÂÅ, ÎÏ ÎÁÇÒÁÄÁ ÂÕÄÅÔ ÎÅ ÔÁË ×ÅÌÉËÁ.");
+    tell_raw( ch, questman,  "Ð¯ Ð¿Ð¾Ð¼Ð¾Ð³Ñƒ Ñ‚ÐµÐ±Ðµ, Ð½Ð¾ Ð½Ð°Ð³Ñ€Ð°Ð´Ð° Ð±ÑƒÐ´ÐµÑ‚ Ð½Ðµ Ñ‚Ð°Ðº Ð²ÐµÐ»Ð¸ÐºÐ°.");
 
     if (rated_as_guru( ch ))
-	tell_raw( ch, questman, 
-	     "ðÏÓÌÅÄÎÉÊ ÒÁÚ {W%s{G ×ÉÄÅÌÉ ÎÅÐÏÄÁÌÅËÕ ÏÔ {W%s{G.", 
-	     russian_case( princeName, '4' ).c_str( ),
-	     room->name );
+        tell_raw( ch, questman, 
+             "ÐŸÐ¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€Ð°Ð· {W%s{G Ð²Ð¸Ð´ÐµÐ»Ð¸ Ð½ÐµÐ¿Ð¾Ð´Ð°Ð»ÐµÐºÑƒ Ð¾Ñ‚ {W%s{G.", 
+             russian_case( princeName, '4' ).c_str( ),
+             room->name );
     else
-	tell_raw( ch, questman, 
-	     "ðÏÓÌÅÄÎÉÊ ÒÁÚ {W%s{G ×ÉÄÅÌÉ × ÍÅÓÔÎÏÓÔÉ {W%s{G.", 
-	     russian_case( princeName, '4' ).c_str( ),
-	     room->area->name );
+        tell_raw( ch, questman, 
+             "ÐŸÐ¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€Ð°Ð· {W%s{G Ð²Ð¸Ð´ÐµÐ»Ð¸ Ð² Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ {W%s{G.", 
+             russian_case( princeName, '4' ).c_str( ),
+             room->area->name );
      
     hint++;
     wiznet( "find", "success, attempt #%d", hint.getValue( ) );
@@ -240,9 +240,9 @@ Room * KidnapQuest::findRefuge( PCharacter *hero, NPCharacter *king )
     KidnapScenario &scenario = getScenario( );
     
     if (!scenario.refuges.empty( )) 
-	findClientRooms( hero, rooms, scenario.refuges );
+        findClientRooms( hero, rooms, scenario.refuges );
     else 
-	findClientRooms( hero, rooms );
+        findClientRooms( hero, rooms );
     
     return getDistantRoom( hero, rooms, king->in_room, 30, 3 );
 }
@@ -299,13 +299,13 @@ bool KidnapQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 bool KidnapQuest::checkRoomClient( PCharacter *pch, Room * room ) 
 {
     if (!ClientQuestModel::checkRoomClient( pch, room ))
-	return false;
-	
+        return false;
+        
     if (IS_WATER(room) || room->sector_type == SECT_AIR)
-	return false;
+        return false;
     
     if (!kingArea.empty( ) && kingArea == room->area->name)
-	return false;
+        return false;
 
     return true;
 }

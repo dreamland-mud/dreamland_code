@@ -32,4 +32,4 @@ protected:
     DIR * dirp;
 };
 
-#endif	
+#endif        

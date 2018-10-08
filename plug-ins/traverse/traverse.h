@@ -24,75 +24,75 @@ struct BroadTraverse {
     typedef ::NodesEntry<TraverseTraits> NodesEntry;
 
     struct AddHook {
-	inline AddHook( BroadTraverse *bt ) : traverse( bt )
-	{
-	}
-	
-	inline void operator () ( HookType &hook ) const
-	{
-	    traverse->addHook( hook );
-	}
+        inline AddHook( BroadTraverse *bt ) : traverse( bt )
+        {
+        }
+        
+        inline void operator () ( HookType &hook ) const
+        {
+            traverse->addHook( hook );
+        }
 
-	BroadTraverse *traverse;
+        BroadTraverse *traverse;
     };
 
     HooksIterator foreach_hook;
     TraverseComplete complete;
 
     BroadTraverse(  HooksIterator fh = HooksIterator(), 
-		    TraverseComplete c = TraverseComplete())
-	: foreach_hook(fh), complete(c)
+                    TraverseComplete c = TraverseComplete())
+        : foreach_hook(fh), complete(c)
     {
     }
     
     inline void operator () ( NodeType *start, int top)
     {
-	NodesEntry *nodes = new NodesEntry[top];
-	
-	nodes[0].node = start;
-	nodes[0].prev = 0;
-	nodes[0].generation = 0;
+        NodesEntry *nodes = new NodesEntry[top];
+        
+        nodes[0].node = start;
+        nodes[0].prev = 0;
+        nodes[0].generation = 0;
 
-	begin = nodes;
-	end = nodes + top;
-	tail = begin + 1;
-	
-	AddHook ah( this );
+        begin = nodes;
+        end = nodes + top;
+        tail = begin + 1;
+        
+        AddHook ah( this );
 
-	for (head = begin; head != tail; head++) {
+        for (head = begin; head != tail; head++) {
 
-	    if (complete( head, false ))
-		break;
-	     
-	    foreach_hook( head->node, ah );
-	}
+            if (complete( head, false ))
+                break;
+             
+            foreach_hook( head->node, ah );
+        }
     
-	if (head == tail)
-	    complete( head - 1, true );
+        if (head == tail)
+            complete( head - 1, true );
 
-	register NodesEntry *i;
-	for (i = begin; i != tail; i++) 
-	    TraverseTraits::unmark( i->node );
+        register NodesEntry *i;
+        for (i = begin; i != tail; i++) 
+            TraverseTraits::unmark( i->node );
 
-	delete nodes;
+        delete nodes;
     }
    
     inline void addHook( HookType &hook ) {
-	if (tail == end)
-	    return;
+        if (tail == end)
+            return;
 
-	register NodeType * node = hook.target( head->node );
+        register NodeType * node = hook.target( head->node );
 
-	if (TraverseTraits::marked( node ))
-	    return;
-	
-	TraverseTraits::mark( node );
+        if (TraverseTraits::marked( node ))
+            return;
+        
+        TraverseTraits::mark( node );
 
-	tail->node = node;
-	tail->prev = head;
-	tail->hook = hook;
-	tail->generation = head->generation + 1;
-	tail++;
+        tail->node = node;
+        tail->prev = head;
+        tail->hook = hook;
+        tail->generation = head->generation + 1;
+        tail++;
     }
 
     NodesEntry *head, *tail, *begin, *end;

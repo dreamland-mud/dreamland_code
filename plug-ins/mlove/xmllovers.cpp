@@ -16,14 +16,14 @@ XMLLovers::~XMLLovers( )
 
 void XMLLovers::put( const DLString name )
 {
-	(*this)[name] = XMLString( );
+        (*this)[name] = XMLString( );
 }
 
       
 
 void XMLLovers::erase( const DLString name)
 {
-	XMLMapBase<XMLString>::erase( find( name ) );
+        XMLMapBase<XMLString>::erase( find( name ) );
 }
 
 bool XMLLovers::isPresent( const DLString name) 
@@ -31,4 +31,4 @@ bool XMLLovers::isPresent( const DLString name)
         return find( name ) != end( );
 }
 
-			
+                        

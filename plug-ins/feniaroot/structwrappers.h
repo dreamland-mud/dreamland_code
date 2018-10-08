@@ -34,7 +34,7 @@ public:
 
     AreaWrapper() { }
     AreaWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -58,7 +58,7 @@ public:
 
     HometownWrapper() { }
     HometownWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -82,7 +82,7 @@ public:
 
     ProfessionWrapper() { }
     ProfessionWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -106,7 +106,7 @@ public:
 
     CraftProfessionWrapper() { }
     CraftProfessionWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -130,7 +130,7 @@ public:
 
     RaceWrapper() { }
     RaceWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -154,7 +154,7 @@ public:
 
     LiquidWrapper() { }
     LiquidWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -178,7 +178,7 @@ public:
 
     ClanWrapper() { }
     ClanWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -202,7 +202,7 @@ public:
 
     SkillWrapper() { }
     SkillWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );

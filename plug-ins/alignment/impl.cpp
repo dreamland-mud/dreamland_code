@@ -9,7 +9,7 @@ extern "C"
 {
     SO::PluginList initialize_alignment( )
     {
-	SO::PluginList ppl;
-	return ppl;
+        SO::PluginList ppl;
+        return ppl;
     }
 }

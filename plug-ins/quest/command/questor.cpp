@@ -58,68 +58,68 @@ void Questor::doRequest( PCharacter *client )
     DLString descr;
     int cha;
     
-    act("$c1 просит $C4 дать $m задание.",client,0,ch,TO_ROOM);
-    act("Ты просишь $C4 дать тебе задание.",client,0,ch,TO_CHAR);
+    act("$c1 п©я─п╬я│п╦я┌ $C4 п╢п╟я┌я▄ $m п╥п╟п╢п╟п╫п╦п╣.",client,0,ch,TO_ROOM);
+    act("п╒я▀ п©я─п╬я│п╦я┬я▄ $C4 п╢п╟я┌я▄ я┌п╣п╠п╣ п╥п╟п╢п╟п╫п╦п╣.",client,0,ch,TO_CHAR);
 
     if (client->getAttributes( ).isAvailable( "quest" )) {
-	tell_raw( client,ch,"Но у тебя уже есть задание!" );
-	return;
+        tell_raw( client,ch,"п²п╬ я┐ я┌п╣п╠я▐ я┐п╤п╣ п╣я│я┌я▄ п╥п╟п╢п╟п╫п╦п╣!" );
+        return;
     }
 
     attr = client->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" );
     
     if (attr->getTime( ) > 0) {
-	tell_fmt( "Ты очень отваж%1$Gно|ен|на, %1$C1, но дай шанс кому-нибудь еще.", client, ch );
-	tell_raw( client, ch, "Приходи позже." );
-	return;
+        tell_fmt( "п╒я▀ п╬я┤п╣п╫я▄ п╬я┌п╡п╟п╤%1$Gп╫п╬|п╣п╫|п╫п╟, %1$C1, п╫п╬ п╢п╟п╧ я┬п╟п╫я│ п╨п╬п╪я┐-п╫п╦п╠я┐п╢я▄ п╣я┴п╣.", client, ch );
+        tell_raw( client, ch, "п÷я─п╦я┘п╬п╢п╦ п©п╬п╥п╤п╣." );
+        return;
     }
     
     if (client->getDescription( )) {
-	descr = client->getDescription( );
-	descr.stripWhiteSpace( );
+        descr = client->getDescription( );
+        descr.stripWhiteSpace( );
     }
 
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
-	tell_raw( client, ch, "Сначала попроси у Богов подтверждения своему персонажу.");
-	tell_raw( client, ch, "Если не знаешь, как это делается, прочитай help confirm." );
-	return;
+        tell_raw( client, ch, "п║п╫п╟я┤п╟п╩п╟ п©п╬п©я─п╬я│п╦ я┐ п▒п╬пЁп╬п╡ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦я▐ я│п╡п╬п╣п╪я┐ п©п╣я─я│п╬п╫п╟п╤я┐.");
+        tell_raw( client, ch, "п∙я│п╩п╦ п╫п╣ п╥п╫п╟п╣я┬я▄, п╨п╟п╨ я█я┌п╬ п╢п╣п╩п╟п╣я┌я│я▐, п©я─п╬я┤п╦я┌п╟п╧ help confirm." );
+        return;
     } else if (descr.empty( )) {
-	tell_raw( client, ch, "Я не хочу давать задание такой непримечательной личности, как ты!");
-	wiznet( WIZ_CONFIRM, 0, 0, "%C1 is confirmed but has no description!", client );
-	return;
+        tell_raw( client, ch, "п╞ п╫п╣ я┘п╬я┤я┐ п╢п╟п╡п╟я┌я▄ п╥п╟п╢п╟п╫п╦п╣ я┌п╟п╨п╬п╧ п╫п╣п©я─п╦п╪п╣я┤п╟я┌п╣п╩я▄п╫п╬п╧ п╩п╦я┤п╫п╬я│я┌п╦, п╨п╟п╨ я┌я▀!");
+        wiznet( WIZ_CONFIRM, 0, 0, "%C1 is confirmed but has no description!", client );
+        return;
     } 
     
     cha = client->getCurrStat( STAT_CHA );
     
     if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
-	tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
-	tell_raw( client, ch, "Приходи позже.");
-	
-	if (rated_as_guru( client ))
-	    attr->setTime( 1 );
-	else
-	    attr->setTime( number_range(3, 6) );
+        tell_raw( client, ch, "п≈п╫п╟п╣я┬я▄, я┤я┌п╬-я┌п╬ п╢я┐я┬п╟ п╫п╣ п╩п╣п╤п╦я┌ п╢п╟п╡п╟я┌я▄ я┌п╣п╠п╣ п╥п╟п╢п╟п╫п╦п╣." );
+        tell_raw( client, ch, "п÷я─п╦я┘п╬п╢п╦ п©п╬п╥п╤п╣.");
+        
+        if (rated_as_guru( client ))
+            attr->setTime( 1 );
+        else
+            attr->setTime( number_range(3, 6) );
 
-	return;
+        return;
     }
     
-    tell_fmt( "Спасибо тебе, %1$C1!", client, ch );
+    tell_fmt( "п║п©п╟я│п╦п╠п╬ я┌п╣п╠п╣, %1$C1!", client, ch );
 
     try {
-	QuestManager::getThis( )->generate( client, ch );
-	
-	PCharacterManager::save( client );
-	
-	tell_raw( client, ch,  "Пусть удача сопутствует тебе!");
+        QuestManager::getThis( )->generate( client, ch );
+        
+        PCharacterManager::save( client );
+        
+        tell_raw( client, ch,  "п÷я┐я│я┌я▄ я┐п╢п╟я┤п╟ я│п╬п©я┐я┌я│я┌п╡я┐п╣я┌ я┌п╣п╠п╣!");
 
     } catch (const QuestCannotStartException &e) {
-	tell_raw( client, ch, "Извини, но у меня сейчас нет для тебя задания.");
-	tell_raw( client, ch, "Приходи позже.");
-	
-	if (rated_as_guru( client ))
-	    attr->setTime( 1 );
-	else
-	    attr->setTime( number_range(3, 6) );
+        tell_raw( client, ch, "п≤п╥п╡п╦п╫п╦, п╫п╬ я┐ п╪п╣п╫я▐ я│п╣п╧я┤п╟я│ п╫п╣я┌ п╢п╩я▐ я┌п╣п╠я▐ п╥п╟п╢п╟п╫п╦я▐.");
+        tell_raw( client, ch, "п÷я─п╦я┘п╬п╢п╦ п©п╬п╥п╤п╣.");
+        
+        if (rated_as_guru( client ))
+            attr->setTime( 1 );
+        else
+            attr->setTime( number_range(3, 6) );
     }
 }
 
@@ -134,85 +134,85 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     bool fExpReward, fScrollGiven;
     DLString arg = args.getOneArgument( );
 
-    act("$c1 информирует $C4 о выполнении задания.",client,0,ch,TO_ROOM);
-    act("Ты информируешь $C4 о выполнении задания.",client,0,ch,TO_CHAR);
+    act("$c1 п╦п╫я└п╬я─п╪п╦я─я┐п╣я┌ $C4 п╬ п╡я▀п©п╬п╩п╫п╣п╫п╦п╦ п╥п╟п╢п╟п╫п╦я▐.",client,0,ch,TO_ROOM);
+    act("п╒я▀ п╦п╫я└п╬я─п╪п╦я─я┐п╣я┬я▄ $C4 п╬ п╡я▀п©п╬п╩п╫п╣п╫п╦п╦ п╥п╟п╢п╟п╫п╦я▐.",client,0,ch,TO_CHAR);
 
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
 
     if (!quest) {
-	if (client->getAttributes( ).isAvailable( "quest" )) 
-	    tell_raw( client, ch, "Твое задание невозможно выполнить." );
-	else
-	    tell_fmt( "Тебе нужно сначала получить (request) задание, %1$C1.", client, ch );
-	    
-	return;
+        if (client->getAttributes( ).isAvailable( "quest" )) 
+            tell_raw( client, ch, "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╡я▀п©п╬п╩п╫п╦я┌я▄." );
+        else
+            tell_fmt( "п╒п╣п╠п╣ п╫я┐п╤п╫п╬ я│п╫п╟я┤п╟п╩п╟ п©п╬п╩я┐я┤п╦я┌я▄ (request) п╥п╟п╢п╟п╫п╦п╣, %1$C1.", client, ch );
+            
+        return;
     }
    
     if (!quest->isComplete( )) {
-	tell_raw( client, ch,  "Задание не выполнено! Но у тебя еще осталось немного времени!");
-	return;
+        tell_raw( client, ch,  "п≈п╟п╢п╟п╫п╦п╣ п╫п╣ п╡я▀п©п╬п╩п╫п╣п╫п╬! п²п╬ я┐ я┌п╣п╠я▐ п╣я┴п╣ п╬я│я┌п╟п╩п╬я│я▄ п╫п╣п╪п╫п╬пЁп╬ п╡я─п╣п╪п╣п╫п╦!");
+        return;
     }
 
-    tell_raw( client, ch,  "Поздравляю с выполнением задания!" );
+    tell_raw( client, ch,  "п÷п╬п╥п╢я─п╟п╡п╩я▐я▌ я│ п╡я▀п©п╬п╩п╫п╣п╫п╦п╣п╪ п╥п╟п╢п╟п╫п╦я▐!" );
 
     if (quest->hint.getValue( ) > 0) {
-	tell_raw( client, ch,  "Я припоминаю, что мне пришлось подсказать тебе путь.");
-	msg << "Но за настойчивость я даю тебе";
+        tell_raw( client, ch,  "п╞ п©я─п╦п©п╬п╪п╦п╫п╟я▌, я┤я┌п╬ п╪п╫п╣ п©я─п╦я┬п╩п╬я│я▄ п©п╬п╢я│п╨п╟п╥п╟я┌я▄ я┌п╣п╠п╣ п©я┐я┌я▄.");
+        msg << "п²п╬ п╥п╟ п╫п╟я│я┌п╬п╧я┤п╦п╡п╬я│я┌я▄ я▐ п╢п╟я▌ я┌п╣п╠п╣";
     }
     else {
-	msg << "В награду я даю тебе";
+        msg << "п▓ п╫п╟пЁя─п╟п╢я┐ я▐ п╢п╟я▌ я┌п╣п╠п╣";
     }
     
-    fExpReward = (!arg.empty( ) && (arg.strPrefix( "experience" ) || arg.strPrefix("опыт")));
+    fExpReward = (!arg.empty( ) && (arg.strPrefix( "experience" ) || arg.strPrefix("п╬п©я▀я┌")));
     msg << " {Y%3$d{G "
-	<< (fExpReward ? "очк%3$Iо|а|ов опыта" : "квестов%3$Iую|ые|ых едини%3$Iцу|цы|ц")
-	<< " и {Y%4$d{G золот%4$Iую|ые|ых моне%4$Iту|ты|т.";
+        << (fExpReward ? "п╬я┤п╨%3$Iп╬|п╟|п╬п╡ п╬п©я▀я┌п╟" : "п╨п╡п╣я│я┌п╬п╡%3$Iя┐я▌|я▀п╣|я▀я┘ п╣п╢п╦п╫п╦%3$Iя├я┐|я├я▀|я├")
+        << " п╦ {Y%4$d{G п╥п╬п╩п╬я┌%4$Iя┐я▌|я▀п╣|я▀я┘ п╪п╬п╫п╣%4$Iя┌я┐|я┌я▀|я┌.";
     
     r = quest->reward( client, ch );
     tell_fmt( msg.str( ).c_str( ), client, ch, 
               fExpReward ? r->exp : r->points,
-	      r->gold );
+              r->gold );
 
     client->gold += r->gold;
 
     if (fExpReward) {
-	client->gainExp( r->exp );
+        client->gainExp( r->exp );
     }
     else {
-	client->questpoints += r->points;
+        client->questpoints += r->points;
 
-	if (r->clanpoints > 0) {
-	    ClanData *cd = client->getClan( )->getData( );
-	    
-	    if (cd && cd->getBank( )) {
-		tell_fmt( "Еще {Y%3$d{G квестов%3$Iая|ые|ых едини%3$Iца|цы|ц уходит на счет твоего клана.",
-			  client, ch, r->clanpoints );
-		
-		cd->getBank( )->questpoints += r->clanpoints;
-		cd->save( );
-	    }
-	}
+        if (r->clanpoints > 0) {
+            ClanData *cd = client->getClan( )->getData( );
+            
+            if (cd && cd->getBank( )) {
+                tell_fmt( "п∙я┴п╣ {Y%3$d{G п╨п╡п╣я│я┌п╬п╡%3$Iп╟я▐|я▀п╣|я▀я┘ п╣п╢п╦п╫п╦%3$Iя├п╟|я├я▀|я├ я┐я┘п╬п╢п╦я┌ п╫п╟ я│я┤п╣я┌ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟.",
+                          client, ch, r->clanpoints );
+                
+                cd->getBank( )->questpoints += r->clanpoints;
+                cd->save( );
+            }
+        }
     }
 
     if (r->prac > 0) {
-	tell_fmt( "Тебе повезло! Ты получаешь {Y%3$d{G сесси%3$Iю|и|й практики!",
-		  client, ch, r->prac );
-	client->practice += r->prac;
+        tell_fmt( "п╒п╣п╠п╣ п©п╬п╡п╣п╥п╩п╬! п╒я▀ п©п╬п╩я┐я┤п╟п╣я┬я▄ {Y%3$d{G я│п╣я│я│п╦%3$Iя▌|п╦|п╧ п©я─п╟п╨я┌п╦п╨п╦!",
+                  client, ch, r->prac );
+        client->practice += r->prac;
     }
     
     if (chance( r->wordChance ))
-	rewardWord( client );
+        rewardWord( client );
    
     if (client->getProfession( ) == prof_universal) 
         r->scrollChance *= 2;
     fScrollGiven = chance( r->scrollChance );
     if (fScrollGiven)
-	rewardScroll( client );
+        rewardScroll( client );
 
     quest->wiznet( "complete", "%s = %d Gold = %d Prac = %d WordChance = %d ScrollChance = %d %s",
-	           (fExpReward ? "Exp" : "Qp"), (fExpReward ? r->exp : r->points), 
-		   r->gold, r->prac, r->wordChance, r->scrollChance, (fScrollGiven ? "" : "*") );
+                   (fExpReward ? "Exp" : "Qp"), (fExpReward ? r->exp : r->points), 
+                   r->gold, r->prac, r->wordChance, r->scrollChance, (fScrollGiven ? "" : "*") );
     
     time = quest->getNextTime( client );
     qdata = attributes->getAttr<XMLAttributeQuestData>( "questdata" );
@@ -230,29 +230,29 @@ void Questor::doCancel( PCharacter *client )
     XMLAttributes *attributes;
     Quest::Pointer quest;
     
-    act_p("$c1 просит $C4 отменить $S задание.",client,0,ch,TO_ROOM,POS_RESTING);
-    act_p("Ты просишь $C4 отменить $S задание.",client,0,ch,TO_CHAR,POS_RESTING);
+    act_p("$c1 п©я─п╬я│п╦я┌ $C4 п╬я┌п╪п╣п╫п╦я┌я▄ $S п╥п╟п╢п╟п╫п╦п╣.",client,0,ch,TO_ROOM,POS_RESTING);
+    act_p("п╒я▀ п©я─п╬я│п╦я┬я▄ $C4 п╬я┌п╪п╣п╫п╦я┌я▄ $S п╥п╟п╢п╟п╫п╦п╣.",client,0,ch,TO_CHAR,POS_RESTING);
     
     attributes = &client->getAttributes( );
     quest = attributes->findAttr<Quest>( "quest" );
     
     if (!quest) {
-	if (attributes->isAvailable( "quest" ))
-	    tell_raw( client, ch, "Твое задание невозможно отменить." );
-	else
-	    tell_raw( client, ch,  "Но у тебя нет задания!");
+        if (attributes->isAvailable( "quest" ))
+            tell_raw( client, ch, "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬я┌п╪п╣п╫п╦я┌я▄." );
+        else
+            tell_raw( client, ch,  "п²п╬ я┐ я┌п╣п╠я▐ п╫п╣я┌ п╥п╟п╢п╟п╫п╦я▐!");
 
-	return;
+        return;
     }
     
     if (rated_as_guru( client )) {
-	tell_raw( client, ch, "Извини, %s, но это было бы слишком простым выходом для тебя.", client->getNameP( ) );
-	return;
+        tell_raw( client, ch, "п≤п╥п╡п╦п╫п╦, %s, п╫п╬ я█я┌п╬ п╠я▀п╩п╬ п╠я▀ я│п╩п╦я┬п╨п╬п╪ п©я─п╬я│я┌я▀п╪ п╡я▀я┘п╬п╢п╬п╪ п╢п╩я▐ я┌п╣п╠я▐.", client->getNameP( ) );
+        return;
     }
     
     if ( client->questpoints < 3 )  {
-	tell_raw( client, ch,  "У тебя недостаточно квестовых единиц для отмены задания.");
-	return;
+        tell_raw( client, ch,  "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╨п╡п╣я│я┌п╬п╡я▀я┘ п╣п╢п╦п╫п╦я├ п╢п╩я▐ п╬я┌п╪п╣п╫я▀ п╥п╟п╢п╟п╫п╦я▐.");
+        return;
     }
     
     quest->wiznet( "cancel" );
@@ -263,52 +263,52 @@ void Questor::doCancel( PCharacter *client )
     client->questpoints -= 3;
     PCharacterManager::save( client );
 
-    tell_raw( client, ch,  "Ты теряешь {Y3{G квестовые единицы.");
-    tell_fmt( "Через {Y%3$d{G мину%3$Iту|ты|т ты сможешь получить новое задание.",
+    tell_raw( client, ch,  "п╒я▀ я┌п╣я─я▐п╣я┬я▄ {Y3{G п╨п╡п╣я│я┌п╬п╡я▀п╣ п╣п╢п╦п╫п╦я├я▀.");
+    tell_fmt( "п╖п╣я─п╣п╥ {Y%3$d{G п╪п╦п╫я┐%3$Iя┌я┐|я┌я▀|я┌ я┌я▀ я│п╪п╬п╤п╣я┬я▄ п©п╬п╩я┐я┤п╦я┌я▄ п╫п╬п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣.",
               client, ch, time );
 }
-	    
+            
 void Questor::doFind( PCharacter *client ) 
 {
     ostringstream buf;
     Quest::Pointer quest;
     
-    act_p("$c1 просит помощи у $C2.",client,0,ch,TO_ROOM,POS_RESTING);
-    act_p("Ты просишь помощи у $C2.",client,0,ch,TO_CHAR,POS_RESTING);
+    act_p("$c1 п©я─п╬я│п╦я┌ п©п╬п╪п╬я┴п╦ я┐ $C2.",client,0,ch,TO_ROOM,POS_RESTING);
+    act_p("п╒я▀ п©я─п╬я│п╦я┬я▄ п©п╬п╪п╬я┴п╦ я┐ $C2.",client,0,ch,TO_CHAR,POS_RESTING);
 
     quest = client->getAttributes( ).findAttr<Quest>( "quest" );
 
     if (!quest) {
-	if (client->getAttributes( ).isAvailable( "quest" ))
-	    tell_raw( client, ch, "Для невыполнимых заданий помощь не нужна." );
-	else
-	    tell_raw( client, ch,  "Но у тебя нет задания.");
+        if (client->getAttributes( ).isAvailable( "quest" ))
+            tell_raw( client, ch, "п■п╩я▐ п╫п╣п╡я▀п©п╬п╩п╫п╦п╪я▀я┘ п╥п╟п╢п╟п╫п╦п╧ п©п╬п╪п╬я┴я▄ п╫п╣ п╫я┐п╤п╫п╟." );
+        else
+            tell_raw( client, ch,  "п²п╬ я┐ я┌п╣п╠я▐ п╫п╣я┌ п╥п╟п╢п╟п╫п╦я▐.");
 
-	return;
+        return;
     }
      
     if (quest->help( client, ch )) 
-	return;
+        return;
 
     if (rated_as_guru( client )) {
-	tell_fmt( "Извини, но тебе придется искать путь само%1$Gму|му|й.", client, ch);
-	quest->wiznet( "find", "failure, guru mode" );
-	return;
+        tell_fmt( "п≤п╥п╡п╦п╫п╦, п╫п╬ я┌п╣п╠п╣ п©я─п╦п╢п╣я┌я│я▐ п╦я│п╨п╟я┌я▄ п©я┐я┌я▄ я│п╟п╪п╬%1$Gп╪я┐|п╪я┐|п╧.", client, ch);
+        quest->wiznet( "find", "failure, guru mode" );
+        return;
     }
     
     quest->helpMessage( buf );
     
     if (!makeSpeedwalk( ch->in_room, quest->helpLocation( ), buf )) 
     {
-	tell_fmt( "Извини, %1$C1, но я ничем не могу тебе помочь.", client, ch );
-	quest->wiznet( "find", "failure, broken path" );
-	return;
+        tell_fmt( "п≤п╥п╡п╦п╫п╦, %1$C1, п╫п╬ я▐ п╫п╦я┤п╣п╪ п╫п╣ п╪п╬пЁя┐ я┌п╣п╠п╣ п©п╬п╪п╬я┤я▄.", client, ch );
+        quest->wiznet( "find", "failure, broken path" );
+        return;
     }
 
-    tell_raw( client, ch, "Я помогу тебе, но награда будет не так велика.");
+    tell_raw( client, ch, "п╞ п©п╬п╪п╬пЁя┐ я┌п╣п╠п╣, п╫п╬ п╫п╟пЁя─п╟п╢п╟ п╠я┐п╢п╣я┌ п╫п╣ я┌п╟п╨ п╡п╣п╩п╦п╨п╟.");
     tell_raw( client, ch, buf.str( ).c_str( ) );
-    tell_raw( client, ch,  "Но помни! Все дороги в этом мире изменчивы и опасны.");
-    tell_raw( client, ch,  "И не забывай открывать двери на своем пути.");
+    tell_raw( client, ch,  "п²п╬ п©п╬п╪п╫п╦! п▓я│п╣ п╢п╬я─п╬пЁп╦ п╡ я█я┌п╬п╪ п╪п╦я─п╣ п╦п╥п╪п╣п╫я┤п╦п╡я▀ п╦ п╬п©п╟я│п╫я▀.");
+    tell_raw( client, ch,  "п≤ п╫п╣ п╥п╟п╠я▀п╡п╟п╧ п╬я┌п╨я─я▀п╡п╟я┌я▄ п╢п╡п╣я─п╦ п╫п╟ я│п╡п╬п╣п╪ п©я┐я┌п╦.");
     
     quest->hint++;
     quest->wiznet( "find", "success, attempt #%d", quest->hint.getValue( ) );
@@ -336,11 +336,11 @@ void Questor::rewardWord( PCharacter *client )
     languageManager->getRandomWord( word, client );
 
     if (!word.empty( )) {
-	tell_raw( client, ch, 
-		  "В награду я делюсь с тобой частицей древней мудрости "
-		  "и сообщаю тебе слово {1{Y%s{2.", word.toStr( ) );
-	::wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 узнает слово '%s' (%s).", client, word.toStr( ), word.effect.getValue( ).c_str( ) );
-    }	
+        tell_raw( client, ch, 
+                  "п▓ п╫п╟пЁя─п╟п╢я┐ я▐ п╢п╣п╩я▌я│я▄ я│ я┌п╬п╠п╬п╧ я┤п╟я│я┌п╦я├п╣п╧ п╢я─п╣п╡п╫п╣п╧ п╪я┐п╢я─п╬я│я┌п╦ "
+                  "п╦ я│п╬п╬п╠я┴п╟я▌ я┌п╣п╠п╣ я│п╩п╬п╡п╬ {1{Y%s{2.", word.toStr( ) );
+        ::wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 я┐п╥п╫п╟п╣я┌ я│п╩п╬п╡п╬ '%s' (%s).", client, word.toStr( ), word.effect.getValue( ).c_str( ) );
+    }        
 }
 
 void Questor::rewardScroll( PCharacter *client )
@@ -352,33 +352,33 @@ void Questor::rewardScroll( PCharacter *client )
     QuestScrollBehavior::Pointer bhv;
 
     for (sn = 0; sn < skillManager->size( ); sn++) {
-	Skill *skill = skillManager->find( sn );
+        Skill *skill = skillManager->find( sn );
 
-	if (!skill->usable( client, false ))
-	    continue;
-	
-	learned = skill->getLearned( client );
-	maximum = skill->getMaximum( client );
-	
-	if (learned >= maximum)
-	    continue;
-	
-	if (number_percent( ) > learned * 100 / maximum) 
-	    continue;
+        if (!skill->usable( client, false ))
+            continue;
+        
+        learned = skill->getLearned( client );
+        maximum = skill->getMaximum( client );
+        
+        if (learned >= maximum)
+            continue;
+        
+        if (number_percent( ) > learned * 100 / maximum) 
+            continue;
 
-	skills.push_back( sn );
+        skills.push_back( sn );
     }
     
     if (skills.empty( ))
-	return;
+        return;
 
     bhv.construct( );
     count = number_range( 1, 2 );
 
     for (sn = 0; sn < count && !skills.empty( ); sn++) {
-	sn = number_range( 0, skills.size( ) - 1 );
-	bhv->addSkill( skills[sn], number_range( 1, 3 ) );	
-	skills.erase( skills.begin( ) + sn );
+        sn = number_range( 0, skills.size( ) - 1 );
+        bhv->addSkill( skills[sn], number_range( 1, 3 ) );        
+        skills.erase( skills.begin( ) + sn );
     }
     
     scroll = create_object( get_obj_index( OBJ_VNUM_QUEST_SCROLL ), 0 );
@@ -388,10 +388,10 @@ void Questor::rewardScroll( PCharacter *client )
     bhv->createDescription( client );
 
     obj_to_char( scroll, client );
-    tell_raw( client, ch, "Кроме того, я вручаю тебе свиток, внимательно изучив который, "
-	                  "ты сможешь усовершенствовать свои умения." );
-    act( "$C1 дает тебе $o4.", client, scroll, ch, TO_CHAR );
-    act( "$C1 дает $c3 $o4.", client, scroll, ch, TO_ROOM );
+    tell_raw( client, ch, "п я─п╬п╪п╣ я┌п╬пЁп╬, я▐ п╡я─я┐я┤п╟я▌ я┌п╣п╠п╣ я│п╡п╦я┌п╬п╨, п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ п╦п╥я┐я┤п╦п╡ п╨п╬я┌п╬я─я▀п╧, "
+                          "я┌я▀ я│п╪п╬п╤п╣я┬я▄ я┐я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡п╬п╡п╟я┌я▄ я│п╡п╬п╦ я┐п╪п╣п╫п╦я▐." );
+    act( "$C1 п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.", client, scroll, ch, TO_CHAR );
+    act( "$C1 п╢п╟п╣я┌ $c3 $o4.", client, scroll, ch, TO_ROOM );
 }
 
 /*--------------------------------------------------------------------------
@@ -402,34 +402,34 @@ void QuestScrollBehavior::createDescription( PCharacter *ch )
     ostringstream bufInfo, bufEmpty, bufSkill;
     XMLMapBase<XMLInteger>::iterator s;
     
-    bufEmpty << "Ты держишь в руках свиток из желтого пергамента, все надписи на котором размыты так, " << endl
-	     << "что невозможно что-либо разобрать." << endl;
+    bufEmpty << "п╒я▀ п╢п╣я─п╤п╦я┬я▄ п╡ я─я┐п╨п╟я┘ я│п╡п╦я┌п╬п╨ п╦п╥ п╤п╣п╩я┌п╬пЁп╬ п©п╣я─пЁп╟п╪п╣п╫я┌п╟, п╡я│п╣ п╫п╟п╢п©п╦я│п╦ п╫п╟ п╨п╬я┌п╬я─п╬п╪ я─п╟п╥п╪я▀я┌я▀ я┌п╟п╨, " << endl
+             << "я┤я┌п╬ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я┤я┌п╬-п╩п╦п╠п╬ я─п╟п╥п╬п╠я─п╟я┌я▄." << endl;
 
-    bufInfo << "Ты держишь в руках свиток из желтого пергамента, испрещенный загадочными значками." << endl
-	    << "Значки выведены аккуратным почерком, и, по-видимому, для их написания использовались особые чернила." << endl
-	    << "Из пометок рядом со значками ты понимаешь, что они содержат ";
-	    
+    bufInfo << "п╒я▀ п╢п╣я─п╤п╦я┬я▄ п╡ я─я┐п╨п╟я┘ я│п╡п╦я┌п╬п╨ п╦п╥ п╤п╣п╩я┌п╬пЁп╬ п©п╣я─пЁп╟п╪п╣п╫я┌п╟, п╦я│п©я─п╣я┴п╣п╫п╫я▀п╧ п╥п╟пЁп╟п╢п╬я┤п╫я▀п╪п╦ п╥п╫п╟я┤п╨п╟п╪п╦." << endl
+            << "п≈п╫п╟я┤п╨п╦ п╡я▀п╡п╣п╢п╣п╫я▀ п╟п╨п╨я┐я─п╟я┌п╫я▀п╪ п©п╬я┤п╣я─п╨п╬п╪, п╦, п©п╬-п╡п╦п╢п╦п╪п╬п╪я┐, п╢п╩я▐ п╦я┘ п╫п╟п©п╦я│п╟п╫п╦я▐ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╦я│я▄ п╬я│п╬п╠я▀п╣ я┤п╣я─п╫п╦п╩п╟." << endl
+            << "п≤п╥ п©п╬п╪п╣я┌п╬п╨ я─я▐п╢п╬п╪ я│п╬ п╥п╫п╟я┤п╨п╟п╪п╦ я┌я▀ п©п╬п╫п╦п╪п╟п╣я┬я▄, я┤я┌п╬ п╬п╫п╦ я│п╬п╢п╣я─п╤п╟я┌ ";
+            
     for (s = skills.begin( ); s != skills.end( ); s++) {
-	Skill * skill = skillManager->findExisting( s->first );
+        Skill * skill = skillManager->findExisting( s->first );
 
-	if (!skill) 
-	    continue;
+        if (!skill) 
+            continue;
 
-	if (!bufSkill.str( ).empty( ))
-	    bufSkill << " и ";
-	
-	switch (number_range( 1, 3 )) {
-	case 1: bufSkill << "секрет мастерства '" << skill->getNameFor( ch ) << "'"; break;
-	case 2: bufSkill << "неизвестный тебе ранее трюк в искусстве '" << skill->getNameFor( ch ) << "'"; break;
-	case 3: bufSkill << "кое-что новое о '" << skill->getNameFor( ch ) << "'"; break;
-	}
+        if (!bufSkill.str( ).empty( ))
+            bufSkill << " п╦ ";
+        
+        switch (number_range( 1, 3 )) {
+        case 1: bufSkill << "я│п╣п╨я─п╣я┌ п╪п╟я│я┌п╣я─я│я┌п╡п╟ '" << skill->getNameFor( ch ) << "'"; break;
+        case 2: bufSkill << "п╫п╣п╦п╥п╡п╣я│я┌п╫я▀п╧ я┌п╣п╠п╣ я─п╟п╫п╣п╣ я┌я─я▌п╨ п╡ п╦я│п╨я┐я│я│я┌п╡п╣ '" << skill->getNameFor( ch ) << "'"; break;
+        case 3: bufSkill << "п╨п╬п╣-я┤я┌п╬ п╫п╬п╡п╬п╣ п╬ '" << skill->getNameFor( ch ) << "'"; break;
+        }
     }
 
     if (bufSkill.str( ).empty( ))
-	obj->addExtraDescr( obj->getName( ), bufEmpty.str( ) );
+        obj->addExtraDescr( obj->getName( ), bufEmpty.str( ) );
     else {
-	bufInfo << bufSkill.str( ) << "." << endl;
-	obj->addExtraDescr( obj->getName( ), bufInfo.str( ) );
+        bufInfo << bufSkill.str( ) << "." << endl;
+        obj->addExtraDescr( obj->getName( ), bufInfo.str( ) );
     }
 }
 
@@ -447,8 +447,8 @@ void QuestScrollBehavior::setOwner( PCharacter *pch )
 bool QuestScrollBehavior::isOwner( Character *ch ) const
 {
     return !(ownerName.getValue( ) != ch->getName( ) 
-	    || ownerID.getValue( ) != ch->getID( )
-	    || ch->is_npc( ));
+            || ownerID.getValue( ) != ch->getID( )
+            || ch->is_npc( ));
 }
 
 bool QuestScrollBehavior::hasTrigger( const DLString &t )
@@ -463,42 +463,42 @@ bool QuestScrollBehavior::examine( Character *ch )
     XMLMapBase<XMLInteger>::iterator s;
     
     if (!isOwner( ch )) {
-	act("Знания, заключенные в $o6, недоступны тебе.", ch, obj, 0, TO_CHAR);
-	return true;
+        act("п≈п╫п╟п╫п╦я▐, п╥п╟п╨п╩я▌я┤п╣п╫п╫я▀п╣ п╡ $o6, п╫п╣п╢п╬я│я┌я┐п©п╫я▀ я┌п╣п╠п╣.", ch, obj, 0, TO_CHAR);
+        return true;
     }
     
-    act("Ты внимательно изучаешь знаки на $o6.", ch, obj, 0, TO_CHAR);
+    act("п╒я▀ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ п╦п╥я┐я┤п╟п╣я┬я▄ п╥п╫п╟п╨п╦ п╫п╟ $o6.", ch, obj, 0, TO_CHAR);
     
     for (s = skills.begin( ); s != skills.end( ); s++) {
-	if (s->second <= 0)
-	    continue;
+        if (s->second <= 0)
+            continue;
 
-	skill = skillManager->findExisting( s->first );
+        skill = skillManager->findExisting( s->first );
 
-	if (!skill) 
-	    continue;
+        if (!skill) 
+            continue;
 
-	if (!skill->canPractice( ch->getPC( ), tmpbuf )) {
-	    buf << "Ты не можешь сейчас улучшить свои познания в '" << skill->getNameFor( ch ) << "'." << endl;
-	    continue;
-	}
+        if (!skill->canPractice( ch->getPC( ), tmpbuf )) {
+            buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╣п╧я┤п╟я│ я┐п╩я┐я┤я┬п╦я┌я▄ я│п╡п╬п╦ п©п╬п╥п╫п╟п╫п╦я▐ п╡ '" << skill->getNameFor( ch ) << "'." << endl;
+            continue;
+        }
 
-	PCSkillData &data = ch->getPC( )->getSkillData( skill->getIndex( ) );
-	
-	if (data.learned >= skill->getMaximum( ch )) {
-	    buf << "Искусство '" << skill->getNameFor( ch ) << "' уже изучено тобой в совершенстве." << endl;
-	}
-	else {
-	    buf << "Ты узнаешь кое-что новое об искусстве '" << skill->getNameFor( ch ) << "'!" << endl;
-	    data.learned = URANGE( data.learned.getValue( ), 
-		                   data.learned + s->second,
-		                   skill->getMaximum( ch ));
-	    s->second = 0;
-	}
+        PCSkillData &data = ch->getPC( )->getSkillData( skill->getIndex( ) );
+        
+        if (data.learned >= skill->getMaximum( ch )) {
+            buf << "п≤я│п╨я┐я│я│я┌п╡п╬ '" << skill->getNameFor( ch ) << "' я┐п╤п╣ п╦п╥я┐я┤п╣п╫п╬ я┌п╬п╠п╬п╧ п╡ я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡п╣." << endl;
+        }
+        else {
+            buf << "п╒я▀ я┐п╥п╫п╟п╣я┬я▄ п╨п╬п╣-я┤я┌п╬ п╫п╬п╡п╬п╣ п╬п╠ п╦я│п╨я┐я│я│я┌п╡п╣ '" << skill->getNameFor( ch ) << "'!" << endl;
+            data.learned = URANGE( data.learned.getValue( ), 
+                                   data.learned + s->second,
+                                   skill->getMaximum( ch ));
+            s->second = 0;
+        }
     }
     
     if (buf.str( ).empty( ))
-	buf << "Похоже, знаки на этом свитке потеряли силу." << endl;
+        buf << "п÷п╬я┘п╬п╤п╣, п╥п╫п╟п╨п╦ п╫п╟ я█я┌п╬п╪ я│п╡п╦я┌п╨п╣ п©п╬я┌п╣я─я▐п╩п╦ я│п╦п╩я┐." << endl;
 
     ch->send_to( buf );
     return true;

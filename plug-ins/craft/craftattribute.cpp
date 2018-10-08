@@ -19,7 +19,7 @@ bool XMLAttributeCraft::handle( const WhoisArguments &args )
     if (proficiency.empty())
         return false;
 
-    buf << "×ÌÁÄÅÅÔ ÐÒÏÆÅÓÓÉÑÍÉ: ";
+    buf << "Ð²Ð»Ð°Ð´ÐµÐµÑ‚ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸ÑÐ¼Ð¸: ";
     
     Proficiency::const_iterator p;
     bool found = false;
@@ -51,8 +51,8 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
         if (prof) {
             ostringstream buf;
-            buf << "ðÒÏÆÅÓÓÉÑ: " << prof->getNameFor(args.pch) << " ÕÒÏ×ÎÑ " << p->second.level
-                << ", ÏÐÙÔ " << prof->getExpToLevel(args.pch) << "/" << prof->getExpThisLevel(args.pch);
+            buf << "ÐŸÑ€Ð¾Ñ„ÐµÑÑÐ¸Ñ: " << prof->getNameFor(args.pch) << " ÑƒÑ€Ð¾Ð²Ð½Ñ " << p->second.level
+                << ", Ð¾Ð¿Ñ‹Ñ‚ " << prof->getExpToLevel(args.pch) << "/" << prof->getExpThisLevel(args.pch);
             args.lines.push_back( buf.str() );
         }
     }

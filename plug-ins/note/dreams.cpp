@@ -33,14 +33,14 @@ DreamThread::~DreamThread( )
 
 void DreamThread::getUnreadMessage( int count, ostringstream &buf ) const
 {
-    // Example: Смертным приснили {W10{x новых снов ('{y{lRсон{lEdream{x').
-    buf << fmt( 0, "Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{y{lRсон{lEdream{x').", count ) << endl;
+    // Example: п║п╪п╣я─я┌п╫я▀п╪ п©я─п╦я│п╫п╦п╩п╦ {W10{x п╫п╬п╡я▀я┘ я│п╫п╬п╡ ('{y{lRя│п╬п╫{lEdream{x').
+    buf << fmt( 0, "п║п╪п╣я─я┌п╫я▀п╪ п©я─п╦я│п╫п╦п╩п╦ {W%1$d{x п╫п╬п╡%1$Iя▀п╧|я▀я┘|я▀я┘ я│%1$Iп╬п╫|п╫п╟|п╫п╬п╡ ('{y{lRя│п╬п╫{lEdream{x').", count ) << endl;
 }
 
 bool DreamThread::canWrite( const PCharacter *ch ) const
 {
     if (!NoteThread::canWrite( ch ))
-	return false;
+        return false;
 
     return !ch->getAttributes( ).isAvailable( "nochannel" );
 }
@@ -61,16 +61,16 @@ void XMLAttributeDream::setLines( const DLString &text )
     DLString::size_type i1 = 0, i2 = 0;
 
     while (true) {
-	i2 = text.find_first_of( "\n", i1 );
+        i2 = text.find_first_of( "\n", i1 );
 
-	if (i2 == DLString::npos) 
-	    i2 = text.length( );
-	
-	lines.push_back( XMLString( text.substr( i1, i2 - i1 ) + "{x" ) );
-	i1 = i2 + 1;
+        if (i2 == DLString::npos) 
+            i2 = text.length( );
+        
+        lines.push_back( XMLString( text.substr( i1, i2 - i1 ) + "{x" ) );
+        i1 = i2 + 1;
 
-	if (i1 >= text.length( ))
-	    break;
+        if (i1 >= text.length( ))
+            break;
     }
 }
 
@@ -81,14 +81,14 @@ void XMLAttributeDream::run( PCharacter *ch )
      * if woke up/fall asleep again too quickly, same dream will continue
      */
     if (ch->position != POS_SLEEPING) {
-	if (currentDreamID) {
-	    lastDreamID = currentDreamID;
-	    currentDreamID = 0;
-	}
+        if (currentDreamID) {
+            lastDreamID = currentDreamID;
+            currentDreamID = 0;
+        }
 
-	sleepTime = 0;
-	lines.clear( );
-	return;
+        sleepTime = 0;
+        lines.clear( );
+        return;
     }
     
     /*
@@ -97,42 +97,42 @@ void XMLAttributeDream::run( PCharacter *ch )
     time_t now = dreamland->getCurrentTime( );
 
     if (sleepTime == 0) {
-	sleepTime = now;
-	return;
+        sleepTime = now;
+        return;
     }
     
     /*
      * second sleep tick, get some random delay and find a dream
      */
     if (currentDreamID == 0) {
-	if (now - sleepTime < number_range( 1, 5 ))
-	    return;
+        if (now - sleepTime < number_range( 1, 5 ))
+            return;
     
-	const Note *note = dreamThread->findNextNote( ch, lastDreamID );
+        const Note *note = dreamThread->findNextNote( ch, lastDreamID );
 
-	if (!note)
-	    return;
+        if (!note)
+            return;
 
-	setLines( note->getText( ) );
-	currentDreamID = note->getID( );
-	LogStream::sendNotice( ) 
-	    << ch->getName( ) << " sees a dream from " << note->getAuthor( ) 
-	    << " to " << note->getRecipient( )
-	    << ", id " << note->getID( ) << endl;
+        setLines( note->getText( ) );
+        currentDreamID = note->getID( );
+        LogStream::sendNotice( ) 
+            << ch->getName( ) << " sees a dream from " << note->getAuthor( ) 
+            << " to " << note->getRecipient( )
+            << ", id " << note->getID( ) << endl;
     }
     /*
      * already dreaming, but dream got invalidated
      */
     else if (!dreamThread->findNote( ch, currentDreamID )) {
-	lines.clear( );
-	return;
+        lines.clear( );
+        return;
     }
     
     /*
      * dream is over
      */
     if (lines.empty( )) 
-	return;
+        return;
 
     /*
      * show next dream line
@@ -141,8 +141,8 @@ void XMLAttributeDream::run( PCharacter *ch )
     lines.pop_front( );
 
     if (lines.empty( ))
-	LogStream::sendNotice( ) << ch->getName( ) 
-	    << " finishes to dream, id " << currentDreamID << endl;
+        LogStream::sendNotice( ) << ch->getName( ) 
+            << " finishes to dream, id " << currentDreamID << endl;
 }
 
 /*-----------------------------------------------------------------------
@@ -165,7 +165,7 @@ void DreamManager::run( PCharacter *ch )
     XMLAttributeDream::Pointer attr = ch->getAttributes( ).getAttr<XMLAttributeDream>( "dream" );
 
     if (attr)
-	attr->run( ch );
+        attr->run( ch );
 }
 
 void DreamManager::after( )

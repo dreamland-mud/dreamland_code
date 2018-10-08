@@ -31,24 +31,24 @@ GSN(frenzy);
 bool GoodSpellWE::run( PCharacter *ch, Character *victim ) const
 {
     static const int spells [] = {
-	gsn_sanctuary,
-	gsn_haste,
-	gsn_giant_strength,
-	gsn_shield,
-	gsn_bless,
-	gsn_stone_skin,
-	gsn_frenzy,
+        gsn_sanctuary,
+        gsn_haste,
+        gsn_giant_strength,
+        gsn_shield,
+        gsn_bless,
+        gsn_stone_skin,
+        gsn_frenzy,
     };
     static const int spells_size = sizeof( spells ) / sizeof( *spells );
 
     int i;
 
-    act( "{CСила древнего благословления проникает в мир.{x", ch, 0, 0, TO_ALL );
+    act( "{Cп║п╦п╩п╟ п╢я─п╣п╡п╫п╣пЁп╬ п╠п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫п╦я▐ п©я─п╬п╫п╦п╨п╟п╣я┌ п╡ п╪п╦я─.{x", ch, 0, 0, TO_ALL );
 
     for (i = 0; i < spells_size; i++)
-	spell( spells[i], 
-	       number_range( ch->getModifyLevel( ) + 5, 120 ),
-	       ch, victim, FSPELL_BANE );
+        spell( spells[i], 
+               number_range( ch->getModifyLevel( ) + 5, 120 ),
+               ch, victim, FSPELL_BANE );
 
     return true;
 }
@@ -65,8 +65,8 @@ bool AccuracyWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
 
-    act( "{CТеперь твой взгляд способен различить каждое перышко жаворонка в небе.{x", victim, 0, 0, TO_CHAR );
-    act( "{CВ глазах $c2 стальным блеском вспыхивает наконечник стрелы.{x", victim, 0, 0, TO_ROOM );
+    act( "{Cп╒п╣п©п╣я─я▄ я┌п╡п╬п╧ п╡п╥пЁп╩я▐п╢ я│п©п╬я│п╬п╠п╣п╫ я─п╟п╥п╩п╦я┤п╦я┌я▄ п╨п╟п╤п╢п╬п╣ п©п╣я─я▀я┬п╨п╬ п╤п╟п╡п╬я─п╬п╫п╨п╟ п╡ п╫п╣п╠п╣.{x", victim, 0, 0, TO_CHAR );
+    act( "{Cп▓ пЁп╩п╟п╥п╟я┘ $c2 я│я┌п╟п╩я▄п╫я▀п╪ п╠п╩п╣я│п╨п╬п╪ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╫п╟п╨п╬п╫п╣я┤п╫п╦п╨ я│я┌я─п╣п╩я▀.{x", victim, 0, 0, TO_ROOM );
     return true;
 }
 

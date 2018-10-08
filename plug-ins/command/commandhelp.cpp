@@ -12,10 +12,10 @@ const DLString CommandHelp::TYPE = "CommandHelp";
 bool CommandHelp::visible( Character *ch ) const
 {
     if (!HelpArticle::visible( ch ))
-	return false;
+        return false;
     
     if (getLevel( ) <= 0)
-	return true;
+        return true;
 
     return command->available( ch );
 }
@@ -33,32 +33,32 @@ void CommandHelp::setCommand( Command::Pointer command )
     command->getRussianAliases( ).toSet( kwd );
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
 
     for (r = ref.begin( ); r != ref.end( ); r++) {
-	Command::Pointer cmd = commandManager->findExact( *r );
+        Command::Pointer cmd = commandManager->findExact( *r );
 
-	if (cmd) 
-	    kwd.fromString( cmd->getHelp( )->getKeyword( ) );
+        if (cmd) 
+            kwd.fromString( cmd->getHelp( )->getKeyword( ) );
     }
     
     fullKeyword = kwd.toString( ).toUpper( );
 
     for (r = refby.begin( ); r != refby.end( ); r++) {
-	Command::Pointer cmd = commandManager->findExact( *r );
+        Command::Pointer cmd = commandManager->findExact( *r );
 
-	if (cmd && cmd->getHelp( ))
-	    cmd->getHelp( )->addKeyword( fullKeyword );
+        if (cmd && cmd->getHelp( ))
+            cmd->getHelp( )->addKeyword( fullKeyword );
     }
     
     if (!empty( ))
-	helpManager->registrate( Pointer( this ) );
+        helpManager->registrate( Pointer( this ) );
 }
 
 void CommandHelp::unsetCommand( )
 {
     if (!empty( ))
-	helpManager->unregistrate( Pointer( this ) );
+        helpManager->unregistrate( Pointer( this ) );
     
     /* XXX remove refby keyword */
 
@@ -71,7 +71,7 @@ void CommandHelp::applyFormatter( Character *ch, ostringstream &in, ostringstrea
 {
     CommandHelpFormatter( in.str( ).c_str( ), 
                           command 
-			).run( ch, out );
+                        ).run( ch, out );
 }
 
 CommandHelpFormatter::CommandHelpFormatter( const char *text, Command::Pointer cmd )
@@ -94,25 +94,25 @@ void CommandHelpFormatter::reset( )
 void CommandHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-	fRusCmd = ch->getConfig( )->rucommands;
+        fRusCmd = ch->getConfig( )->rucommands;
     }
     
     HelpFormatter::setup( ch );
 }
 
 /*
- * CMD    ->  {lEeng_name{lR“’””Àœ≈_…Õ—{lx
+ * CMD    ->  {lEeng_name{lR—Ä—É—Å—Å–∫–æ–µ_–∏–º—è{lx
  */
 bool CommandHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (HelpFormatter::handleKeyword( kw, out ))
-	return true;
+        return true;
     
     if (kw == "CMD" && cmd) {
-	out << (fRusCmd && !cmd->getRussianName( ).empty( )
-	                ? cmd->getRussianName( )
-	                : cmd->getName( ));
-	return true;
+        out << (fRusCmd && !cmd->getRussianName( ).empty( )
+                        ? cmd->getRussianName( )
+                        : cmd->getName( ));
+        return true;
     }
     
     return false;

@@ -20,10 +20,10 @@ bool HiddenChest::canLock( Character *ch )
     StealQuest::Pointer quest;
 
     if (!ourHero( ch ))
-	return false;
+        return false;
     
     if (!( quest = getMyQuest<StealQuest>( ch->getPC( ) ) ))
-	return false;
+        return false;
 
     quest->wiznet( "", "%s tries to unlock the chest", ch->getNameP( '1' ).c_str( ) );
     return quest->getItemList<LockPick>( ch->carrying );
@@ -37,13 +37,13 @@ bool HiddenChest::canLock( Character *ch )
 void LockPick::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets key", ch->getNameP( '1' ).c_str( ) );
-    act( "$o1 ‘’”ÀÃœ –œ¬Ã≈”À…◊¡≈‘.", ch, obj, 0, TO_CHAR );
+    act( "$o1 —Ç—É—Å–∫–ª–æ –ø–æ–±–ª–µ—Å–∫–∏–≤–∞–µ—Ç.", ch, obj, 0, TO_CHAR );
 }
 
 void LockPick::getByOther( Character *ch ) 
 { 
-    act( "ÙŸ “œŒ—≈€ÿ $o4.", ch, obj, 0, TO_CHAR );
-    act( "$c1 “œŒ—≈‘ $o4.", ch, obj, 0, TO_ROOM );
+    act( "–¢—ã —Ä–æ–Ω—è–µ—à—å $o4.", ch, obj, 0, TO_CHAR );
+    act( "$c1 —Ä–æ–Ω—è–µ—Ç $o4.", ch, obj, 0, TO_ROOM );
 }
 
 bool LockPick::ourMobile( NPCharacter *mob ) 
@@ -55,16 +55,16 @@ bool LockPick::ourMobile( NPCharacter *mob )
 
 /* 
  * RobbedItem 
- */	
+ */        
 void RobbedItem::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets item", ch->getNameP( '1' ).c_str( ) );
-    ch->pecho( "%1$^O1 ÷¡÷ƒ%1$n≈‘|—‘ ◊≈“Œ’‘ÿ”— À »œ⁄—…Œ’.", obj );
+    ch->pecho( "%1$^O1 –∂–∞–∂–¥%1$n–µ—Ç|—è—Ç –≤–µ—Ä–Ω—É—Ç—å—Å—è –∫ —Ö–æ–∑—è–∏–Ω—É.", obj );
 }
 
 void RobbedItem::getByOther( Character *ch ) 
 {
-    ch->pecho( "%1$^O1 ◊Ÿ–¡ƒ¡%1$n≈‘|¿‘ ’ ‘≈¬— …⁄ “’À.", obj );
-    act( "$c1 “œŒ—≈‘ $o4.", ch, obj, 0, TO_ROOM );
+    ch->pecho( "%1$^O1 –≤—ã–ø–∞–¥–∞%1$n–µ—Ç|—é—Ç —É —Ç–µ–±—è –∏–∑ —Ä—É–∫.", obj );
+    act( "$c1 —Ä–æ–Ω—è–µ—Ç $o4.", ch, obj, 0, TO_ROOM );
 }
 

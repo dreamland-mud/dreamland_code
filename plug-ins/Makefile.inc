@@ -10,7 +10,7 @@ LD_DLLGLUE =
 CC_DLLGLUE =
 endif
 
-AM_CPPFLAGS =  -Wall $(CC_DLLGLUE)
+AM_CPPFLAGS =  -Wall $(CC_DLLGLUE) 
 AM_LDFLAGS = -Wl,--no-undefined $(LD_DLLGLUE)
 
 CXXLD = $(MY_CXXLD)

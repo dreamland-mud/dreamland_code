@@ -15,25 +15,25 @@ class PCharacter;
 class ClanArea : public AreaBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanArea> Pointer;
+        typedef ::Pointer<ClanArea> Pointer;
     
-	ClanArea( );
+        ClanArea( );
 
-	virtual void update( );
+        virtual void update( );
 
-	void createAltar( );
-	ClanReference &getClan( );
-	Object * findInvitation( PCharacter * );
-	
-	XML_VARIABLE XMLInteger itemVnum;
-	XML_VARIABLE XMLInteger altarVnum;
-	XML_VARIABLE XMLInteger roomVnum;
-	XML_VARIABLE XMLInteger invitationVnum;
-	XML_VARIABLE XMLInteger keyVnum;
-	XML_VARIABLE XMLInteger bookVnum;
+        void createAltar( );
+        ClanReference &getClan( );
+        Object * findInvitation( PCharacter * );
+        
+        XML_VARIABLE XMLInteger itemVnum;
+        XML_VARIABLE XMLInteger altarVnum;
+        XML_VARIABLE XMLInteger roomVnum;
+        XML_VARIABLE XMLInteger invitationVnum;
+        XML_VARIABLE XMLInteger keyVnum;
+        XML_VARIABLE XMLInteger bookVnum;
 
 protected:
-	XML_VARIABLE XMLClanReference clan;
+        XML_VARIABLE XMLClanReference clan;
 };
 
 #endif

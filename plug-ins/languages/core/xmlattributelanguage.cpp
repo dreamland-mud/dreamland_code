@@ -16,9 +16,9 @@ void XMLAttributeLanguage::wordUsed( const Word &word, PCharacter *ch )
     Words::iterator w = words.find( word.dictum );
     
     if (--w->second.count > 0)
-	return;
+        return;
 
-    ch->pecho( "{wóÌÏ×Ï {w%s{w ÕÓËÏÌØÚÁÅÔ ÏÔ ÔÅÂÑ.{x", 
+    ch->pecho( "{wÐ¡Ð»Ð¾Ð²Ð¾ {w%s{w ÑƒÑÐºÐ¾Ð»ÑŒÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ.{x", 
                w->second.dictum.getValue( ).c_str( ) );
     
     words.erase( w );
@@ -35,7 +35,7 @@ XMLAttributeLanguageHints::~XMLAttributeLanguageHints( )
 void XMLAttributeLanguageHints::addWord( const Word &word, bool hint )
 {
     if (word.empty( ))
-	return;
+        return;
 
     hints[word.dictum] = hint;
 }    

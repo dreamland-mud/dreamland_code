@@ -13,9 +13,9 @@ void XMLAttributes::eraseAttribute( const DLString &name )
     iterator ipos = find( name );
     
     if (ipos != end( )) {
-	XPAttribute attr = ipos->second;
-	erase( ipos );
-	attr->destroy( );
+        XPAttribute attr = ipos->second;
+        erase( ipos );
+        attr->destroy( );
     }
 }
    
@@ -35,13 +35,13 @@ bool XMLAttributes::nodeFromXML( const XMLNode::Pointer & child )
 {
 #warning XXX    
     try {
-	if (!XMLMapBase<XPAttribute>::nodeFromXML( child ))
-	    if (!XMLVariableContainer::nodeFromXML( child ))
-		LogStream::sendWarning( ) 
-		    << "Unparsed node <" <<  child->getName( ) << ">" << endl;
+        if (!XMLMapBase<XPAttribute>::nodeFromXML( child ))
+            if (!XMLVariableContainer::nodeFromXML( child ))
+                LogStream::sendWarning( ) 
+                    << "Unparsed node <" <<  child->getName( ) << ">" << endl;
     } 
     catch (const ExceptionBadType& e) {
-	LogStream::sendWarning( ) << e.what( ) << endl;
+        LogStream::sendWarning( ) << e.what( ) << endl;
     }
     
     return true;

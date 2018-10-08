@@ -3,49 +3,49 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
- *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
- *    Koval Nazar	    {Nazar, Redrum}                 		   *
- *    Doropey Vladimir	    {Reorx}		                           *
- *    Kulgeyko Denis	    {Burzum}		                           *
- *    Andreyanov Aleksandr  {Manwe}		                           *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD	                   *
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
+ *    Igor S. Petrenko            {NoFate, Demogorgon}                           *
+ *    Koval Nazar            {Nazar, Redrum}                                    *
+ *    Doropey Vladimir            {Reorx}                                           *
+ *    Kulgeyko Denis            {Burzum}                                           *
+ *    Andreyanov Aleksandr  {Manwe}                                           *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                           *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
  *     ANATOLIA has been brought to you by ANATOLIA consortium             *
- *     Serdar BULUT {Chronos}	bulut@rorqual.cc.metu.edu.tr               *
+ *     Serdar BULUT {Chronos}        bulut@rorqual.cc.metu.edu.tr               *
  *     Ibrahim Canpunar  {Asena}    canpunar@rorqual.cc.metu.edu.tr        *    
- *     Murat BICER  {KIO}	mbicer@rorqual.cc.metu.edu.tr              *    
+ *     Murat BICER  {KIO}        mbicer@rorqual.cc.metu.edu.tr              *    
  *     D.Baris ACAR {Powerman}    dbacar@rorqual.cc.metu.edu.tr            *    
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence	           *    
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence                   *    
  ***************************************************************************/
 /***************************************************************************
  *  Original Diku Mud copyright (C) 1990, 1991 by Sebastian Hammer,        *
  *  Michael Seifert, Hans Henrik St{rfeldt, Tom Madsen, and Katja Nyboe.   *
- *				                                           *
+ *                                                                           *
  *  Merc Diku Mud improvments copyright (C) 1992, 1993 by Michael          *
- *  Chastain, Michael Quan, and Mitchell Tse.		                   *
- *				                                           *
+ *  Chastain, Michael Quan, and Mitchell Tse.                                   *
+ *                                                                           *
  *  In order to use any part of this Merc Diku Mud, you must comply with   *
  *  both the original Diku license in 'license.doc' as well the Merc       *
  *  license in 'license.txt'.  In particular, you may not remove either of *
- *  these copyright notices.			                           *
- *				                                           *
+ *  these copyright notices.                                                   *
+ *                                                                           *
  *  Much time and thought has gone into this software and you are          *
  *  benefitting.  We hope that you share your changes too.  What goes      *
- *  around, comes around.			                           *
+ *  around, comes around.                                                   *
  ***************************************************************************/
 /***************************************************************************
-*    ROM 2.4 is copyright 1993-1995 Russ Taylor	                           *
-*    ROM has been brought to you by the ROM consortium	                   *
-*	Russ Taylor (rtaylor@pacinfo.com)		                   *
-*	Gabrielle Taylor (gtaylor@pacinfo.com)	                           *
-*	Brian Moore (rom@rom.efn.org)		                           *
+*    ROM 2.4 is copyright 1993-1995 Russ Taylor                                   *
+*    ROM has been brought to you by the ROM consortium                           *
+*        Russ Taylor (rtaylor@pacinfo.com)                                   *
+*        Gabrielle Taylor (gtaylor@pacinfo.com)                                   *
+*        Brian Moore (rom@rom.efn.org)                                           *
 *    By using this code, you have agreed to follow the terms of the        *
-*    ROM license, in the file Rom24/doc/rom.license	                   *
+*    ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
 
@@ -139,46 +139,46 @@ void violence_update( )
 
     for ( ch = char_list; ch != 0; ch = ch->next )
     {
-	if ( ( victim = ch->fighting ) == 0 || ch->in_room == 0 )
-	    continue;
+        if ( ( victim = ch->fighting ) == 0 || ch->in_room == 0 )
+            continue;
 
-	if ( IS_AWAKE(ch) && ch->in_room == victim->in_room )
-	{
-	    FENIA_VOID_CALL( ch->in_room, "Dive", "Ci", ch,  MOVETYPE_DANGEROUS );
+        if ( IS_AWAKE(ch) && ch->in_room == victim->in_room )
+        {
+            FENIA_VOID_CALL( ch->in_room, "Dive", "Ci", ch,  MOVETYPE_DANGEROUS );
 
-	    if ( ch->fighting != 0 )
-		multi_hit( ch, victim );
-	    else
-		stop_fighting( ch, false );
-	}
-	else
-	{
-	    stop_fighting( ch, false );
-	}
+            if ( ch->fighting != 0 )
+                multi_hit( ch, victim );
+            else
+                stop_fighting( ch, false );
+        }
+        else
+        {
+            stop_fighting( ch, false );
+        }
 
-	if( ( victim = ch->fighting ) == 0 )
-	{
-	    continue;
-	}
+        if( ( victim = ch->fighting ) == 0 )
+        {
+            continue;
+        }
 
-//	if ( !victim->is_npc() )
-	  ch->last_fought = victim;
+//        if ( !victim->is_npc() )
+          ch->last_fought = victim;
 
-	ch->setLastFightTime( );
-	UNSET_DEATH_TIME(ch);
+        ch->setLastFightTime( );
+        UNSET_DEATH_TIME(ch);
 
-	for( obj = ch->carrying; obj; obj = obj_next )
-	{
-	    obj_next = obj->next_content;
+        for( obj = ch->carrying; obj; obj = obj_next )
+        {
+            obj_next = obj->next_content;
 
-	    if( ch->fighting )
-		oprog_fight( obj, ch );
-	}
+            if( ch->fighting )
+                oprog_fight( obj, ch );
+        }
 
-	/*
-	 * Fun for the whole family!
-	 */
-	check_assist(ch,victim);
+        /*
+         * Fun for the whole family!
+         */
+        check_assist(ch,victim);
     }
 }
 
@@ -206,26 +206,26 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
 
     weapon = get_eq_char(ch, wear_wield);
     if (weapon != 0 
-	&& IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS)
-	&& ch->getRace( )->getSize( ) < SIZE_HUGE)
-	return;
+        && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS)
+        && ch->getRace( )->getSize( ) < SIZE_HUGE)
+        return;
 
     if (get_eq_char(ch, wear_shield) || get_eq_char(ch, wear_hold))
-	return;
+        return;
     
     weapon = get_eq_char(ch, wear_second_wield);
     if (weapon && weapon->item_type == ITEM_WEAPON)
-	index = weapon->value[0] + 1;
+        index = weapon->value[0] + 1;
    
     for (int i = 0; second_weapon_table[i].prof != prof_none; i++)
-	if (ch->getTrueProfession( ) == second_weapon_table[i].prof) {
-	    chance = chance * second_weapon_table[i].percents[index] / 100;
-	    break;
-	}
+        if (ch->getTrueProfession( ) == second_weapon_table[i].prof) {
+            chance = chance * second_weapon_table[i].percents[index] / 100;
+            break;
+        }
 
     if (number_percent( ) < gsn_second_weapon->getEffective( ch ) * chance / 100) {
-	one_hit_nocatch( ch, victim, true );
-	gsn_second_weapon->improve( ch, true, victim );
+        one_hit_nocatch( ch, victim, true );
+        gsn_second_weapon->improve( ch, true, victim );
     }
 }
 
@@ -234,16 +234,16 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
     int chance = skill.getEffective( ch ) / coef;
     
     if (number_percent( ) < chance) {
-	one_hit_nocatch( ch, victim );
-	skill.improve( ch, true, victim );
-	
-	if (ch->fighting != victim)
-	    return false;
-	    
-	second_weapon_hit( ch, victim, chance );
-	
-	if (ch->fighting != victim)
-	    return false;
+        one_hit_nocatch( ch, victim );
+        skill.improve( ch, true, victim );
+        
+        if (ch->fighting != victim)
+            return false;
+            
+        second_weapon_hit( ch, victim, chance );
+        
+        if (ch->fighting != victim)
+            return false;
     }
 
     return true;
@@ -252,22 +252,22 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
 bool forest_attack( Character *ch, Character *victim )
 {
     if (gsn_forest_fighting->getCommand( )->run(ch, FOREST_ATTACK)) {
-	int chance = gsn_forest_fighting->getEffective( ch );
-	
-	while (number_percent() < chance) {
-	    one_hit_nocatch( ch, victim );
-	    gsn_forest_fighting->improve( ch, true, victim );
-	    
-	    if (ch->fighting != victim)
-		return false;
-		
-	    second_weapon_hit( ch, victim, chance );
-	    
-	    if (ch->fighting != victim)
-		return false;
-		
-	    chance /= 3;
-	}
+        int chance = gsn_forest_fighting->getEffective( ch );
+        
+        while (number_percent() < chance) {
+            one_hit_nocatch( ch, victim );
+            gsn_forest_fighting->improve( ch, true, victim );
+            
+            if (ch->fighting != victim)
+                return false;
+                
+            second_weapon_hit( ch, victim, chance );
+            
+            if (ch->fighting != victim)
+                return false;
+                
+            chance /= 3;
+        }
     }
 
     return true;
@@ -279,7 +279,7 @@ bool forest_attack( Character *ch, Character *victim )
 void multi_hit( Character *ch, Character *victim )
 {
     try {
-	multi_hit_nocatch( ch, victim );
+        multi_hit_nocatch( ch, victim );
     }
     catch (const VictimDeathException &) {
     }
@@ -289,42 +289,42 @@ void multi_hit_nocatch( Character *ch, Character *victim )
 {
     /* no attacks for stunnies -- just a check */
     if ( ch->position < POS_RESTING )
-	return;
+        return;
 
     /* no attacks on ghosts or attacks by ghosts */
     if ( ( !victim->is_npc() && IS_GHOST( victim ) )
-	|| ( !ch->is_npc() && IS_GHOST( ch ) ) )
-	return;
+        || ( !ch->is_npc() && IS_GHOST( ch ) ) )
+        return;
 
     if (check_stun( ch, victim ))
-	return;
+        return;
     
     mprog_fight( ch, victim );
 
     if (ch->is_npc( ))
-	return;
+        return;
    
     one_hit_nocatch( ch, victim );
 
     if (ch->fighting != victim)
-	return;
+        return;
     
     gsn_area_attack->getCommand( )->run( ch, victim );
 
     if (IS_AFFECTED(ch,AFF_HASTE))
-	one_hit_nocatch( ch, victim );
+        one_hit_nocatch( ch, victim );
 
     if (ch->fighting != victim )
-	return;
+        return;
     
     second_weapon_hit(ch,victim,100);
 
     ch->fighting == victim 
-	&& next_attack( ch, victim, *gsn_second_attack, 2 )
-	&& next_attack( ch, victim, *gsn_third_attack, 3 )
-	&& next_attack( ch, victim, *gsn_fourth_attack, 3 )
-	&& next_attack( ch, victim, *gsn_fifth_attack, 3 )
-	&& forest_attack( ch, victim );
+        && next_attack( ch, victim, *gsn_second_attack, 2 )
+        && next_attack( ch, victim, *gsn_third_attack, 3 )
+        && next_attack( ch, victim, *gsn_fourth_attack, 3 )
+        && next_attack( ch, victim, *gsn_fifth_attack, 3 )
+        && forest_attack( ch, victim );
 }
 
 void one_hit_nocatch( Character *ch, Character *victim, bool secondary )
@@ -335,7 +335,7 @@ void one_hit_nocatch( Character *ch, Character *victim, bool secondary )
 void one_hit( Character *ch, Character *victim, bool secondary )
 {
     try {
-	one_hit_nocatch( ch, victim, secondary );
+        one_hit_nocatch( ch, victim, secondary );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -349,10 +349,10 @@ damage_nocatch( Character *ch, Character *victim,
 }
 
 bool damage( Character *ch, Character *victim, 
-	     int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) 
+             int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) 
 {
     try {
-	return damage_nocatch( ch, victim, dam, sn, dam_type, show, dam_flag );
+        return damage_nocatch( ch, victim, dam, sn, dam_type, show, dam_flag );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -368,7 +368,7 @@ void rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam,
 void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show )
 {
     try {
-	rawdamage_nocatch( ch, victim, dam_type, dam, show );
+        rawdamage_nocatch( ch, victim, dam_type, dam, show );
     } catch (const VictimDeathException &) {
     }
 }
@@ -394,11 +394,11 @@ static inline bool must_not_yell( Character *ch, Character *victim, int flags )
 {
     /* sanity checks */
     if (!ch || !victim || ch == victim)
-	return true;
+        return true;
     
     /* sleeping victims yell only with FYP_SLEEP flag */
     if (!IS_AWAKE(victim) && !IS_SET(flags, FYP_SLEEP))
-	return true;
+        return true;
     
     /* players yell always */
     if (!victim->is_npc( ))
@@ -414,14 +414,14 @@ static inline bool must_not_yell( Character *ch, Character *victim, int flags )
 
 void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags )
 {
-    static const char *defaultMsgBlind = "ðÏÍÏÇÉÔÅ! ëÔÏ-ÔÏ ÎÁÐÁÌ ÎÁ ÍÅÎÑ!";
-    static const char *defaultMsg = "ðÏÍÏÇÉÔÅ! %1$^C1 ÎÁÐÁ%1$GÌÏ|Ì|ÌÁ ÎÁ ÍÅÎÑ!";
+    static const char *defaultMsgBlind = "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐšÑ‚Ð¾-Ñ‚Ð¾ Ð½Ð°Ð¿Ð°Ð» Ð½Ð° Ð¼ÐµÐ½Ñ!";
+    static const char *defaultMsg = "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! %1$^C1 Ð½Ð°Ð¿Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð° Ð½Ð° Ð¼ÐµÐ½Ñ!";
 
     if (must_not_yell( ch, victim, flags ))
         return;
 
     if (!victim->can_see( ch )) 
-	interpret_raw( victim, "yell", 
+        interpret_raw( victim, "yell", 
                         msgBlind ? msgBlind : defaultMsgBlind );
     else
         interpret_raw( victim, "yell", 
@@ -431,45 +431,45 @@ void yell_panic( Character *ch, Character *victim, const char *msgBlind, const c
 void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage ) 
 {
     if (damage == 0)
-	return;
+        return;
 
     if (material_is_flagged( worn, MAT_INDESTR ))
-	return;
+        return;
 
     if (IS_SET( worn->extra_flags, ITEM_NOPURGE ))
-	return;
+        return;
 
     worn->condition -= damage;
 
-    act( "$o1 ÎÁÎÏÓÉÔ ÐÏ×ÒÅÖÄÅÎÉÑ $O3.", ch, wield, worn, TO_ROOM );
+    act( "$o1 Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ Ð¿Ð¾Ð²Ñ€ÐµÐ¶Ð´ÐµÐ½Ð¸Ñ $O3.", ch, wield, worn, TO_ROOM );
 
     if (worn->condition < 1) {
-	act("$O1 ÒÁÚÌÅÔÁÅÔÓÑ ÎÁ ÍÅÌËÉÅ ÞÁÓÔÉ.", ch, wield, worn, TO_ROOM);
-	extract_obj( worn );
-	return;
+        act("$O1 Ñ€Ð°Ð·Ð»ÐµÑ‚Ð°ÐµÑ‚ÑÑ Ð½Ð° Ð¼ÐµÐ»ÐºÐ¸Ðµ Ñ‡Ð°ÑÑ‚Ð¸.", ch, wield, worn, TO_ROOM);
+        extract_obj( worn );
+        return;
     }
 }
 
 int move_dec( Character *ch ) 
 {
     if (ch->is_npc( ))
-	return 0;
+        return 0;
 
     return min( max( ch->getModifyLevel( ) / 20, 1 ), (int)ch->move );
 }
 
 #else
-void	violence_update( ) { }
-void	multi_hit( Character *ch, Character *victim ) { }
-void	multi_hit_nocatch( Character *ch, Character *victim ) { }
-void	one_hit( Character *ch, Character* victim, bool secondary ) { }
-void	one_hit_nocatch( Character *ch, Character* victim, bool secondary ) { }
-bool	damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
-bool	damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
-void	rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
-void	rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
-void	damage_to_obj(Character *ch,Object *wield, Object *worn, int damage) { }
-int	move_dec( Character *ch ) { return 0; }
-void	set_backguard( Character * ) { }
-void	yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags ) { }
+void        violence_update( ) { }
+void        multi_hit( Character *ch, Character *victim ) { }
+void        multi_hit_nocatch( Character *ch, Character *victim ) { }
+void        one_hit( Character *ch, Character* victim, bool secondary ) { }
+void        one_hit_nocatch( Character *ch, Character* victim, bool secondary ) { }
+bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
+bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
+void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
+void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
+void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage) { }
+int        move_dec( Character *ch ) { return 0; }
+void        set_backguard( Character * ) { }
+void        yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags ) { }
 #endif

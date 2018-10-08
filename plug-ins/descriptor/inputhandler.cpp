@@ -40,9 +40,9 @@ void InputHandlerPlugin::initialization( )
     handle_input_t::iterator i;
     
     for(d = descriptor_list; d; d = d->next) 
-	for(i = d->handle_input.begin(); i != d->handle_input.end(); i++)
-	    if(*i && (*i)->getType() == type)
-		i->recover();
+        for(i = d->handle_input.begin(); i != d->handle_input.end(); i++)
+            if(*i && (*i)->getType() == type)
+                i->recover();
 }
 
 void InputHandlerPlugin::destruction( )
@@ -52,8 +52,8 @@ void InputHandlerPlugin::destruction( )
     handle_input_t::iterator i;
     
     for(d = descriptor_list; d; d = d->next) 
-	for(i = d->handle_input.begin(); i != d->handle_input.end(); i++)
-	    if(*i && (*i)->getType() == type)
-		i->backup();
+        for(i = d->handle_input.begin(); i != d->handle_input.end(); i++)
+            if(*i && (*i)->getType() == type)
+                i->backup();
 }
 

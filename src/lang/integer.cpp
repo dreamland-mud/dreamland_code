@@ -19,23 +19,23 @@ const DLString Integer::TYPE = "Integer";
 
 void Integer::fromString( const DLString & value ) throw( ExceptionBadType )
 {
-	std::basic_istringstream<char> s( value.c_str( ) );
-	int i;
-  		
-	s >> i;
+        std::basic_istringstream<char> s( value.c_str( ) );
+        int i;
+                  
+        s >> i;
 
-	if( s )
-	{
-		this->value = i;
-		return;
-	}
-	throw ExceptionBadType( TYPE, value );
+        if( s )
+        {
+                this->value = i;
+                return;
+        }
+        throw ExceptionBadType( TYPE, value );
 }
 
 DLString Integer::toString( ) const throw( )
 {
-	std::basic_ostringstream<char>  buf;
+        std::basic_ostringstream<char>  buf;
 
-	buf << value;
-	return buf.str( );
+        buf << value;
+        return buf.str( );
 }

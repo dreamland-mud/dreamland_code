@@ -36,9 +36,9 @@ int ClanData::getDiplomacy( Clan *clan ) const
     i = diplomacy.find( clan->getName( ) );
 
     if (i == diplomacy.end( ))
-	return 0;
+        return 0;
     else
-	return i->second.getValue( );
+        return i->second.getValue( );
 }
 
 int ClanData::getProposition( Clan *clan ) const
@@ -48,9 +48,9 @@ int ClanData::getProposition( Clan *clan ) const
     i = proposition.find( clan->getName( ) );
 
     if (i == proposition.end( ))
-	return 0;
+        return 0;
     else
-	return i->second.getValue( );
+        return i->second.getValue( );
 }
 
 void ClanData::setDiplomacy( Clan *clan, int dip )
@@ -92,8 +92,8 @@ void ClanData::setItem( Object *obj )
 void ClanData::unsetItem( Object *obj )
 {
     if (obj->getID( ) == itemID) {
-	itemID = 0;
-	save( );
+        itemID = 0;
+        save( );
     }
 }
 
@@ -103,9 +103,9 @@ void ClanData::unsetItem( Object *obj )
  * ClanMembership 
  *----------------------------------------------------------------*/
 ClanMembership::ClanMembership( )
-		: mode( 0, &petition_table ),
-		  minLevel( 999 ),
-		  removable( false )
+                : mode( 0, &petition_table ),
+                  minLevel( 999 ),
+                  removable( false )
 {
 }
 

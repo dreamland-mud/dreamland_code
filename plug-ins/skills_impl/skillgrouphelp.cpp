@@ -27,7 +27,7 @@ void SkillGroupHelp::setSkillGroup( SkillGroup::Pointer group )
     kwd.insert( group->getRussianName( ) );    
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
     
     fullKeyword = kwd.toString( );
     fullKeyword.toUpper( );

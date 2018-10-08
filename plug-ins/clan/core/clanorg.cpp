@@ -33,11 +33,11 @@ ClanOrder::Pointer ClanOrgs::findOrder( const DLString &oname ) const
     ClanOrder::Pointer null;
 
     if (oname.size( ) == 0)
-	return null;
+        return null;
 
     const_iterator i = find( oname );
     if (i == end( ))
-	return null;
+        return null;
 
     return i->second;
 }
@@ -69,9 +69,9 @@ const DLString & ClanOrgs::getAttr( PCMemoryInterface *pci )
     ord = pci->getAttributes( ).findAttr<XMLStringAttribute>( ATTR_NAME );
 
     if (ord)
-	return ord->getValue( );
+        return ord->getValue( );
     else
-	return DLString::emptyString;
+        return DLString::emptyString;
 }
 
 /*
@@ -82,9 +82,9 @@ void ClanOrgs::doList( PCharacter *pch ) const
     ostringstream buf;
 
     for (const_iterator i = begin( ); i != end( ); i++)
-	buf << dlprintf("   %-15s (%s)\n\r",
-	                i->second->shortDescr.c_str( ),
-	                i->first.c_str( ) );
+        buf << dlprintf("   %-15s (%s)\n\r",
+                        i->second->shortDescr.c_str( ),
+                        i->first.c_str( ) );
 
     pch->send_to( buf );
 }
@@ -95,22 +95,22 @@ void ClanOrgs::doMembers( PCharacter *pch ) const
     ClanOrder::Pointer ord = findOrder( pch );
 
     if (!ord) {
-	pch->pecho( "ÙŸ Œ≈ ”œ”‘œ…€ÿ ◊ %O6.", &name );
-	return;
+        pch->pecho( "–¢—ã –Ω–µ —Å–æ—Å—Ç–æ–∏—à—å –≤ %O6.", &name );
+        return;
     }
     
-    buf << "\n\r{WÈÕ—         “¡”¡        ÀÃ¡””         ’“œ◊≈Œÿ   ⁄◊¡Œ…≈{x\n\r";
+    buf << "\n\r{W–ò–º—è         —Ä–∞—Å–∞        –∫–ª–∞—Å—Å         —É—Ä–æ–≤–µ–Ω—å   –∑–≤–∞–Ω–∏–µ{x\n\r";
     
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
     for (PCharacterMemoryList::const_iterator pos = list.begin( ); pos != list.end( ); pos++) {
-	PCMemoryInterface *pcm = pos->second;
+        PCMemoryInterface *pcm = pos->second;
 
-	if (pcm->getClan( ) != pch->getClan( )
-	    || pcm->getLevel( ) >= LEVEL_IMMORTAL
-	    || getAttr( pcm ) != ord->name)
-	    continue;
+        if (pcm->getClan( ) != pch->getClan( )
+            || pcm->getLevel( ) >= LEVEL_IMMORTAL
+            || getAttr( pcm ) != ord->name)
+            continue;
 
-	player_fmt( "%-10n %-10R %-12P %b %-3l   %-15t\r\n", pcm, buf );
+        player_fmt( "%-10n %-10R %-12P %b %-3l   %-15t\r\n", pcm, buf );
     }
 
     pch->send_to( buf );
@@ -122,17 +122,17 @@ void ClanOrgs::doSelfInduct( PCharacter *pch, DLString &arg ) const
     ClanOrder::Pointer ord;
 
     if (!pch->getClan( )->isLeader( pch )) {
-	pch->pecho( "“…Œ—‘ÿ ”≈¬— ◊ %O4 Õœ÷≈‘ ‘œÃÿÀœ Ï…ƒ≈“.", &name );
-	return;
+        pch->pecho( "–ü—Ä–∏–Ω—è—Ç—å —Å–µ–±—è –≤ %O4 –º–æ–∂–µ—Ç —Ç–æ–ª—å–∫–æ –õ–∏–¥–µ—Ä.", &name );
+        return;
     }
     
     if (!( ord = findOrder( arg ) )) {
-	pch->pecho( "%1$^O1 ’À¡⁄¡%1$GŒœ|Œ|Œ¡ Œ≈◊≈“Œœ.", &name );
-	return;
+        pch->pecho( "%1$^O1 —É–∫–∞–∑–∞%1$G–Ω–æ|–Ω|–Ω–∞ –Ω–µ–≤–µ—Ä–Ω–æ.", &name );
+        return;
     }
     
     setAttr( pch, ord->name );
-    pch->pecho( "ÙŸ ◊”‘’–¡≈€ÿ ◊ %s.", ord->shortDescr.c_str( ) );
+    pch->pecho( "–¢—ã –≤—Å—Ç—É–ø–∞–µ—à—å –≤ %s.", ord->shortDescr.c_str( ) );
 }
 
 void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
@@ -140,68 +140,68 @@ void ClanOrgs::doInduct( PCharacter *pch, DLString &arg ) const
     PCMemoryInterface *victim;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-	pch->println( "Ù◊œ…» –œÃŒœÕœﬁ…  Œ≈ƒœ”‘¡‘œﬁŒœ." );
-	return;
+        pch->println( "–¢–≤–æ–∏—Ö –ø–æ–ª–Ω–æ–º–æ—á–∏–π –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ." );
+        return;
     }
 
     if (!hasAttr( pch )) {
-	pch->pecho( "ÙŸ Œ≈ —◊Ã—≈€ÿ”— «Ã¡◊œ  %O2.", &name );
-	return;
+        pch->pecho( "–¢—ã –Ω–µ —è–≤–ª—è–µ—à—å—Å—è –≥–ª–∞–≤–æ–π %O2.", &name );
+        return;
     }
     
     if (!( victim = PCharacterManager::find( arg ) )) {
-	pch->println( "Ó…Àœ«œ Œ≈‘ ” ‘¡À…Õ …Õ≈Œ≈Õ. ıÀ¡÷… …Õ— –œÃŒœ”‘ÿ¿." );
-	return;
+        pch->println( "–ù–∏–∫–æ–≥–æ –Ω–µ—Ç —Å —Ç–∞–∫–∏–º –∏–º–µ–Ω–µ–º. –£–∫–∞–∂–∏ –∏–º—è –ø–æ–ª–Ω–æ—Å—Ç—å—é." );
+        return;
     }
 
     if (victim->getClan( ) != pch->getClan( )) {
-	pch->pecho( "Óœ %s Œ≈ –“…Œ¡ƒÃ≈÷…‘ À ‘◊œ≈Õ’ ÀÃ¡Œ’!", victim->getName( ).c_str( ) );
-	return;
+        pch->pecho( "–ù–æ %s –Ω–µ –ø—Ä–∏–Ω–∞–¥–ª–µ–∂–∏—Ç –∫ —Ç–≤–æ–µ–º—É –∫–ª–∞–Ω—É!", victim->getName( ).c_str( ) );
+        return;
     }
     
     if (hasAttr( victim )) {
-	if (getAttr( victim ) != getAttr( pch )) 
-	    pch->pecho( "%1$s ’÷≈ ”œ”‘œ…‘ ◊ ƒ“’«%2$GœÕ|œÕ|œ  %2$O6.", 
-	                 victim->getName( ).c_str( ), &name );
-	else
-	    pch->pecho( "%1$s … ‘¡À ”œ”‘œ…‘ ◊ ‘◊œ%2$G≈Õ|≈Õ|≈  %2$O6.", 
-	                 victim->getName( ).c_str( ), &name );
-	
-	return;
+        if (getAttr( victim ) != getAttr( pch )) 
+            pch->pecho( "%1$s —É–∂–µ —Å–æ—Å—Ç–æ–∏—Ç –≤ –¥—Ä—É–≥%2$G–æ–º|–æ–º|–æ–π %2$O6.", 
+                         victim->getName( ).c_str( ), &name );
+        else
+            pch->pecho( "%1$s –∏ —Ç–∞–∫ —Å–æ—Å—Ç–æ–∏—Ç –≤ —Ç–≤–æ%2$G–µ–º|–µ–º|–µ–π %2$O6.", 
+                         victim->getName( ).c_str( ), &name );
+        
+        return;
     }
     
     ClanOrder::Pointer ord = findOrder( pch );
 
     if (!ord) {
-	pch->pecho( "%1$^O1, À Àœ‘œ“%1$GœÕ’|œÕ’|œ  ‘Ÿ –“…Œ¡ƒÃ≈÷…€ÿ, Œ≈ ”’›≈”‘◊’≈‘!", &name );
-	return;
+        pch->pecho( "%1$^O1, –∫ –∫–æ—Ç–æ—Ä%1$G–æ–º—É|–æ–º—É|–æ–π —Ç—ã –ø—Ä–∏–Ω–∞–¥–ª–µ–∂–∏—à—å, –Ω–µ —Å—É—â–µ—Å—Ç–≤—É–µ—Ç!", &name );
+        return;
     }
 
     if (!ord->canInduct( victim )) {
-	pch->pecho( "%s Œ≈ Õœ÷≈‘ ◊”‘’–…‘ÿ ◊ %s.", 
-		    victim->getName( ).c_str( ), ord->shortDescr.c_str( ) );
-	return;
+        pch->pecho( "%s –Ω–µ –º–æ–∂–µ—Ç –≤—Å—Ç—É–ø–∏—Ç—å –≤ %s.", 
+                    victim->getName( ).c_str( ), ord->shortDescr.c_str( ) );
+        return;
     }
     
     setAttr( victim, ord->name );
-    pch->pecho( "ÙŸ –“…Œ…Õ¡≈€ÿ %s ◊ %s!", 
+    pch->pecho( "–¢—ã –ø—Ä–∏–Ω–∏–º–∞–µ—à—å %s –≤ %s!", 
                  victim->getName( ).c_str( ), ord->shortDescr.c_str( ) );
     
     if (victim->isOnline( ))
-	victim->getPlayer( )->pecho( "%s –“…Œ…Õ¡≈‘ ‘≈¬— ◊ %s!",
-				     pch->getName( ).c_str( ),
-				     ord->shortDescr.c_str( ) );
+        victim->getPlayer( )->pecho( "%s –ø—Ä–∏–Ω–∏–º–∞–µ—Ç —Ç–µ–±—è –≤ %s!",
+                                     pch->getName( ).c_str( ),
+                                     ord->shortDescr.c_str( ) );
     else
-	PCharacterManager::saveMemory( victim );
+        PCharacterManager::saveMemory( victim );
 }
 
 void ClanOrgs::doSelfRemove( PCharacter *pch ) const
 {
     if (!hasAttr( pch ))
-	pch->println( "ÙŸ … ‘¡À Œ…«ƒ≈ Œ≈ ”œ”‘œ…€ÿ." );
+        pch->println( "–¢—ã –∏ —Ç–∞–∫ –Ω–∏–≥–¥–µ –Ω–µ —Å–æ—Å—Ç–æ–∏—à—å." );
     else {
-	delAttr( pch );
-	pch->pecho( "ÙŸ –œÀ…ƒ¡≈€ÿ ”◊œ%1$G | |¿ %1$^O4.", &name );
+        delAttr( pch );
+        pch->pecho( "–¢—ã –ø–æ–∫–∏–¥–∞–µ—à—å —Å–≤–æ%1$G–π|–π|—é %1$^O4.", &name );
     }
 }
 
@@ -210,39 +210,39 @@ void ClanOrgs::doRemove( PCharacter *pch, DLString &arg ) const
     PCMemoryInterface *victim;
 
     if (!pch->getClan( )->isRecruiter( pch )) {
-	pch->println( "Ù◊œ…» –œÃŒœÕœﬁ…  Œ≈ƒœ”‘¡‘œﬁŒœ." );
-	return;
+        pch->println( "–¢–≤–æ–∏—Ö –ø–æ–ª–Ω–æ–º–æ—á–∏–π –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ." );
+        return;
     }
     
     if (!hasAttr( pch )) {
-	pch->pecho( "ÙŸ Œ≈ —◊Ã—≈€ÿ”— «Ã¡◊œ  %1$O2.", &name );
-	return;
+        pch->pecho( "–¢—ã –Ω–µ —è–≤–ª—è–µ—à—å—Å—è –≥–ª–∞–≤–æ–π %1$O2.", &name );
+        return;
     }
     
     if (!( victim = PCharacterManager::find( arg ) )) {
-	pch->println( "Ó…Àœ«œ Œ≈‘ ” ‘¡À…Õ …Õ≈Œ≈Õ. ıÀ¡÷… …Õ— –œÃŒœ”‘ÿ¿." );
-	return;
+        pch->println( "–ù–∏–∫–æ–≥–æ –Ω–µ—Ç —Å —Ç–∞–∫–∏–º –∏–º–µ–Ω–µ–º. –£–∫–∞–∂–∏ –∏–º—è –ø–æ–ª–Ω–æ—Å—Ç—å—é." );
+        return;
     }
 
     if (victim->getClan( ) != pch->getClan( )) {
-	pch->pecho( "Óœ %s Œ≈ –“…Œ¡ƒÃ≈÷…‘ À ‘◊œ≈Õ ÀÃ¡Œ’!", victim->getName( ).c_str( ) );
-	return;
+        pch->pecho( "–ù–æ %s –Ω–µ –ø—Ä–∏–Ω–∞–¥–ª–µ–∂–∏—Ç –∫ —Ç–≤–æ–µ–º –∫–ª–∞–Ω—É!", victim->getName( ).c_str( ) );
+        return;
     }
 
     if (getAttr( victim ) != getAttr( pch )) {
-	pch->pecho( "%1$s Œ≈ ”œ”‘œ…‘ ◊ ‘◊œ%2$G≈Õ|≈Õ|≈  %2$O6!", 
-	            victim->getName( ).c_str( ), &name );
-	return;
+        pch->pecho( "%1$s –Ω–µ —Å–æ—Å—Ç–æ–∏—Ç –≤ —Ç–≤–æ%2$G–µ–º|–µ–º|–µ–π %2$O6!", 
+                    victim->getName( ).c_str( ), &name );
+        return;
     }
     
     delAttr( victim );
-    pch->pecho( "%1$s –œÀ…ƒ¡≈‘ ‘◊œ%2$G | |¿ %2$O4.", 
+    pch->pecho( "%1$s –ø–æ–∫–∏–¥–∞–µ—Ç —Ç–≤–æ%2$G–π|–π|—é %2$O4.", 
                  victim->getName( ).c_str( ), &name );
 
     if (victim->isOnline( ))
-	victim->getPlayer( )->pecho( "%s …”ÀÃ¿ﬁ¡≈‘ ‘≈¬— …⁄ %^O2!",
-				     pch->getName( ).c_str( ), &name );
+        victim->getPlayer( )->pecho( "%s –∏—Å–∫–ª—é—á–∞–µ—Ç —Ç–µ–±—è –∏–∑ %^O2!",
+                                     pch->getName( ).c_str( ), &name );
     else
-	PCharacterManager::saveMemory( victim );
+        PCharacterManager::saveMemory( victim );
 }
 

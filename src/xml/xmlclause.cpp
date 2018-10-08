@@ -17,8 +17,8 @@ XMLClause::XMLClause( )
 bool XMLClause::match( DLObject * arg ) const
 {
     for (const_iterator i = begin( ); i != end( ); i++)
-	if (!(*i)->eval( arg )) 
-	    return false;
+        if (!(*i)->eval( arg )) 
+            return false;
     
     return true;
 }
@@ -32,10 +32,10 @@ void XMLClause::fromXML( const XMLNode::Pointer& parent ) throw (ExceptionBadTyp
 bool XMLClause::toXML( XMLNode::Pointer& parent ) const 
 {
     if (XMLPredicatesList::toXML( parent )) {
-	parent->insertAttribute( 
-		ATTRIBUTE_ALLOW, Boolean( allow ).toString( ) );
-	return true;
+        parent->insertAttribute( 
+                ATTRIBUTE_ALLOW, Boolean( allow ).toString( ) );
+        return true;
     }
     else
-	return false;
+        return false;
 }

@@ -24,7 +24,7 @@ GSN(deafen);
  * PersonalChannel
  *-----------------------------------------------------------------------*/
 PersonalChannel::PersonalChannel( )
-		    : storeAFK( false ), storeFight( false ), storeDisco( false )
+                    : storeAFK( false ), storeFight( false ), storeDisco( false )
 {
 }
 
@@ -33,7 +33,7 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
     Character *victim = get_char_world( ch, arg.c_str( ) );
 
     if (!victim)
-	ch->println( "ôÙ ÎÅ ÎÁÈÏÄÉÛØ ÜÔÏÇÏ ÐÅÒÓÏÎÁÖÁ." );
+        ch->println( "Ð¢Ñ‹ Ð½Ðµ Ð½Ð°Ñ…Ð¾Ð´Ð¸ÑˆÑŒ ÑÑ‚Ð¾Ð³Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð°." );
     
     return victim;
 }
@@ -43,8 +43,8 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
     if (!victim->is_npc( )) {
         DLString message = fmt( victim, msgVict.c_str( ), ch, msg.c_str( ), victim );
 
-	victim->getPC( )->getAttributes( ).getAttr<XMLStringListAttribute>( 
-				    "tells" )->push_back( message );
+        victim->getPC( )->getAttributes( ).getAttr<XMLStringListAttribute>( 
+                                    "tells" )->push_back( message );
         remember_history_private( victim->getPC( ), message );
     }
     
@@ -54,8 +54,8 @@ void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLSt
 bool PersonalChannel::checkIgnore( Character *ch, Character *victim ) const
 {
     if (CommunicationChannel::checkIgnore( ch, victim )) {
-	act_p( "$E ÎÅ ÖÅÌÁÅÔ ÔÅÂÑ ÓÌÙÛÁÔØ.", ch, 0, victim, TO_CHAR, position );
-	return true;
+        act_p( "$E Ð½Ðµ Ð¶ÐµÐ»Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ ÑÐ»Ñ‹ÑˆÐ°Ñ‚ÑŒ.", ch, 0, victim, TO_CHAR, position );
+        return true;
     }
 
     return false;
@@ -64,21 +64,21 @@ bool PersonalChannel::checkIgnore( Character *ch, Character *victim ) const
 bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (!IS_SET(victim->comm, COMM_AFK))
-	return false;
+        return false;
    
     if (victim->is_npc( ) || !victim->getPC( )->getAttributes( ).isAvailable( "afk" ))
-	act_p( "$C1 ÏÔÓÕÔÓÔ×ÕÅÔ É ÎÅ ÍÏÖÅÔ ÓÅÊÞÁÓ ÐÏÌÕÞÉÔØ Ô×ÏÅ ÓÏÏÂÝÅÎÉÅ.", 
-		ch, 0, victim, TO_CHAR, position );
+        act_p( "$C1 Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ ÑÐµÐ¹Ñ‡Ð°Ñ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ñ‚Ð²Ð¾Ðµ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ.", 
+                ch, 0, victim, TO_CHAR, position );
     else
-	act_p("$C1 ÎÅ ÍÏÖÅÔ ÓÅÊÞÁÓ ÐÏÌÕÞÉÔØ Ô×ÏÅ ÓÏÏÂÝÅÎÉÅ, Ô.Ë. $E ÏÔÓÕÔÓÔ×ÕÅÔ: {c$t{x.", 
-		ch, 
-		victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
-				    "afk" )->getValue( ).c_str( ), 
-		victim, TO_CHAR, position );
+        act_p("$C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ ÑÐµÐ¹Ñ‡Ð°Ñ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ñ‚Ð²Ð¾Ðµ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ, Ñ‚.Ðº. $E Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚: {c$t{x.", 
+                ch, 
+                victim->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( 
+                                    "afk" )->getValue( ).c_str( ), 
+                victim, TO_CHAR, position );
 
     if (storeAFK) {
-	act_p( "óÏÏÂÝÅÎÉÅ ÂÕÄÅÔ ÐÒÏÞÉÔÁÎÏ, ËÏÇÄÁ $E ×ÅÒÎÅÔÓÑ.", ch, 0, victim, TO_CHAR, position );
-	tellToBuffer( ch, victim, msg );
+        act_p( "Ð¡Ð¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ Ð±ÑƒÐ´ÐµÑ‚ Ð¿Ñ€Ð¾Ñ‡Ð¸Ñ‚Ð°Ð½Ð¾, ÐºÐ¾Ð³Ð´Ð° $E Ð²ÐµÑ€Ð½ÐµÑ‚ÑÑ.", ch, 0, victim, TO_CHAR, position );
+        tellToBuffer( ch, victim, msg );
     }
 
     return true;
@@ -87,18 +87,18 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
 bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (!victim->fighting)
-	return false;
+        return false;
 
     if (victim->is_npc( )) {
-	act_p("$E ÓÅÊÞÁÓ ÓÒÁÖÁÅÔÓÑ É ÎÅ ÍÏÖÅÔ ÐÏÌÕÞÉÔØ Ô×ÏÅ ÓÏÏÂÝÅÎÉÅ.",ch,0,victim,TO_CHAR,position);
-	return true;
+        act_p("$E ÑÐµÐ¹Ñ‡Ð°Ñ ÑÑ€Ð°Ð¶Ð°ÐµÑ‚ÑÑ Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ñ‚Ð²Ð¾Ðµ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ.",ch,0,victim,TO_CHAR,position);
+        return true;
     }
     
     if (!IS_SET( victim->add_comm, COMM_STORE ) || !storeFight)
-	return false;
+        return false;
 
-    act_p("$E ÓÅÊÞÁÓ ÓÒÁÖÁÅÔÓÑ, ÎÏ Ô×ÏÅ ÓÏÏÂÝÅÎÉÅ ÂÕÄÅÔ ÐÒÏÞÉÔÁÎÏ, ËÏÇÄÁ $E ÚÁËÏÎÞÉÔ ÂÏÊ.",
-	    ch,0,victim,TO_CHAR,position);
+    act_p("$E ÑÐµÐ¹Ñ‡Ð°Ñ ÑÑ€Ð°Ð¶Ð°ÐµÑ‚ÑÑ, Ð½Ð¾ Ñ‚Ð²Ð¾Ðµ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ Ð±ÑƒÐ´ÐµÑ‚ Ð¿Ñ€Ð¾Ñ‡Ð¸Ñ‚Ð°Ð½Ð¾, ÐºÐ¾Ð³Ð´Ð° $E Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ñ‚ Ð±Ð¾Ð¹.",
+            ch,0,victim,TO_CHAR,position);
     tellToBuffer( ch, victim, msg );
 
     return true;
@@ -107,16 +107,16 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
 bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (victim->is_npc( ))
-	return false;
+        return false;
 
     if (victim->desc)
-	return false;
+        return false;
 
-    act_p("õ $C2 ÎÅÔ Ó×ÑÚÉ Ó ÜÔÉÍ ÍÉÒÏÍ... ÐÏÐÒÏÂÕÊ ÐÏÚÖÅ.",
-	    ch,0,victim,TO_CHAR,position);
+    act_p("Ð£ $C2 Ð½ÐµÑ‚ ÑÐ²ÑÐ·Ð¸ Ñ ÑÑ‚Ð¸Ð¼ Ð¼Ð¸Ñ€Ð¾Ð¼... Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ Ð¿Ð¾Ð·Ð¶Ðµ.",
+            ch,0,victim,TO_CHAR,position);
     
     if (storeDisco)
-	tellToBuffer( ch, victim, msg );
+        tellToBuffer( ch, victim, msg );
 
     return true;
 }
@@ -124,24 +124,24 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
 bool PersonalChannel::checkPosition( Character *ch, Character *victim ) const
 {
     if (ch->is_immortal( ))
-	return false;
+        return false;
     
     if (positionOther <= victim->position)
-	return false;
+        return false;
     
-    act_p( "$E ÎÅ ÓÌÙÛÉÔ ÔÅÂÑ.", ch, 0, victim, TO_CHAR, position );
+    act_p( "$E Ð½Ðµ ÑÐ»Ñ‹ÑˆÐ¸Ñ‚ Ñ‚ÐµÐ±Ñ.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
 bool PersonalChannel::checkVictimDeaf( Character *ch, Character *victim ) const
 {
     if (ch->is_immortal( ))
-	return false;
+        return false;
 
     if (IS_SET(victim->comm, COMM_QUIET) || IS_SET(victim->comm, COMM_DEAF))
     {
-	act_p( "ô×ÏÅ ÓÏÏÂÝÅÎÉÅ ÎÅ ÄÏÛÌÏ $M.", ch, 0, victim, TO_CHAR, position );
-	return true;
+        act_p( "Ð¢Ð²Ð¾Ðµ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ Ð½Ðµ Ð´Ð¾ÑˆÐ»Ð¾ $M.", ch, 0, victim, TO_CHAR, position );
+        return true;
     }
 
     return false;
@@ -154,34 +154,34 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     DLString name, msg;
     
     if (!canTalkPersonally( ch ))
-	return;
+        return;
     
     if (!parseArguments( ch, constArguments, msg, name ))
-	return;
+        return;
     
     if (!( victim = findListener( ch, name ) ))
-	return;
+        return;
     
     if (!isPersonalListener( ch, victim, msg ))
-	return;
+        return;
     
     if (needOutputChar( ch )) {
-	bool fAuto = (ch == victim && !msgAuto.empty( ));
-	const DLString &fmtChar = fAuto ? msgAuto : msgChar;
-	
-	DLString outChar = msg;
-	applyGarble( ch, outChar, ch );
-	
-	outputChar( ch, victim, fmtChar, outChar );
+        bool fAuto = (ch == victim && !msgAuto.empty( ));
+        const DLString &fmtChar = fAuto ? msgAuto : msgChar;
+        
+        DLString outChar = msg;
+        applyGarble( ch, outChar, ch );
+        
+        outputChar( ch, victim, fmtChar, outChar );
     }
 
     if (needOutputVict( ch, victim )) {
-	const DLString &fmtVict = msgVict;
+        const DLString &fmtVict = msgVict;
 
-	DLString outVict = msg;
-	applyGarble( ch, outVict, victim );
+        DLString outVict = msg;
+        applyGarble( ch, outVict, victim );
 
-	outputVict( ch, victim, fmtVict, outVict );
+        outputVict( ch, victim, fmtVict, outVict );
     }
 
     triggers( ch, victim, msg );
@@ -190,18 +190,18 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
 bool PersonalChannel::canTalkPersonally( Character *ch ) const
 {
     if (IS_SET(ch->comm, COMM_NOTELL)) {
-	ch->println( "âÏÇÉ ÌÉÛÉÌÉ ÔÅÂÑ ×ÏÚÍÏÖÎÏÓÔÉ ÌÉÞÎÏÇÏ ÏÂÝÅÎÉÑ." );
-	return false;
+        ch->println( "Ð‘Ð¾Ð³Ð¸ Ð»Ð¸ÑˆÐ¸Ð»Ð¸ Ñ‚ÐµÐ±Ñ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸ Ð»Ð¸Ñ‡Ð½Ð¾Ð³Ð¾ Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ñ." );
+        return false;
     }
 
     if (IS_SET(ch->comm, COMM_QUIET)) {
-	ch->println( "óÐÅÒ×Á ×ÙÊÄÉ ÉÚ ÒÅÖÉÍÁ ÔÉÛÉÎÙ (quiet)." );
-	return false;
+        ch->println( "Ð¡Ð¿ÐµÑ€Ð²Ð° Ð²Ñ‹Ð¹Ð´Ð¸ Ð¸Ð· Ñ€ÐµÐ¶Ð¸Ð¼Ð° Ñ‚Ð¸ÑˆÐ¸Ð½Ñ‹ (quiet)." );
+        return false;
     }
 
     if (IS_SET(ch->comm, COMM_DEAF)) {
-	ch->println("óÐÅÒ×Á ×ÙÊÄÉ ÉÚ ÒÅÖÉÍÁ ÇÌÕÈÏÔÙ (deaf).");
-	return false;
+        ch->println("Ð¡Ð¿ÐµÑ€Ð²Ð° Ð²Ñ‹Ð¹Ð´Ð¸ Ð¸Ð· Ñ€ÐµÐ¶Ð¸Ð¼Ð° Ð³Ð»ÑƒÑ…Ð¾Ñ‚Ñ‹ (deaf).");
+        return false;
     }
 
     return true;
@@ -210,22 +210,22 @@ bool PersonalChannel::canTalkPersonally( Character *ch ) const
 bool PersonalChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (checkIgnore( ch, victim )) 
-	return false;
+        return false;
 
     if (checkAFK( ch, victim, msg ))
-	return false;
+        return false;
     
     if (checkAutoStore( ch, victim, msg ))
-	return false;
+        return false;
     
     if (checkDisconnect( ch, victim, msg ))
-	return false;
+        return false;
     
     if (checkPosition( ch, victim ))
-	return false;
+        return false;
     
     if (checkVictimDeaf( ch, victim ))
-	return false;
+        return false;
 
     return true;
 }
@@ -237,13 +237,13 @@ bool PersonalChannel::parseArguments( Character *ch, const DLString &constArgume
     name = msg.getOneArgument( );
 
     if (name.empty( )) {
-	ch->println( msgNoName );
-	return false; 
+        ch->println( msgNoName );
+        return false; 
     }
 
     if (msg.empty( )) {
-	ch->println( msgNoArg );
-	return false;
+        ch->println( msgNoArg );
+        return false;
     }
 
     return true;
@@ -256,7 +256,7 @@ void PersonalChannel::triggers( Character *ch, Character *victim, const DLString
 bool PersonalChannel::needOutputChar( Character *ch ) const
 {
     if (deafen && ch->isAffected( gsn_deafen )) 
-	return false;
+        return false;
 
     return true;
 }

@@ -35,13 +35,13 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
     Affect todam;
 
     staff = create_object( get_obj_index(OBJ_VNUM_DRUID_STAFF),level);
-    ch->println("ôÙ ÓÏÚÄÁÅÛØ ĞÏÓÏÈ ÄÒÕÉÄÁ!");
-    act("$c1 ÓÏÚÄÁÅÔ ĞÏÓÏÈ ÄÒÕÉÄÁ!",ch,0,0,TO_ROOM);
+    ch->println("Ğ¢Ñ‹ ÑĞ¾Ğ·Ğ´Ğ°ĞµÑˆÑŒ Ğ¿Ğ¾ÑĞ¾Ñ… Ğ´Ñ€ÑƒĞ¸Ğ´Ğ°!");
+    act("$c1 ÑĞ¾Ğ·Ğ´Ğ°ĞµÑ‚ Ğ¿Ğ¾ÑĞ¾Ñ… Ğ´Ñ€ÑƒĞ¸Ğ´Ğ°!",ch,0,0,TO_ROOM);
 
     staff->value[1] = 4 + level / 15;
     staff->value[2] = 4 + level / 15;
 
-    tohit.where		   = TO_OBJECT;
+    tohit.where                   = TO_OBJECT;
     tohit.type               = sn;
     tohit.level              = ch->getModifyLevel();
     tohit.duration           = -1;
@@ -50,7 +50,7 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
     tohit.bitvector          = 0;
     affect_to_obj( staff, &tohit);
 
-    todam.where		   = TO_OBJECT;
+    todam.where                   = TO_OBJECT;
     todam.type               = sn;
     todam.level              = ch->getModifyLevel();
     todam.duration           = -1;
@@ -71,21 +71,21 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
 void DruidStaff::fight( Character *ch )
 {
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
-	return;
+        return;
 
     if (chance( 90 ))
-	return;
+        return;
 
-    act_p( "{BóÉÎÅ×ÁÔÏÅ Ó×ÅŞÅÎÉÅ ÏËÕÔÙ×ÁÅÔ Ô×ÏÊ ĞÏÓÏÈ ÄÒÕÉÄÁ.{x", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "{BóÉÎÅ×ÁÔÏÅ Ó×ÅŞÅÎÉÅ ÏËÕÔÙ×ÁÅÔ ĞÏÓÏÈ ÄÒÕÉÄÁ $c2.{x", ch, 0, 0, TO_ROOM );
+    act_p( "{BĞ¡Ğ¸Ğ½ĞµĞ²Ğ°Ñ‚Ğ¾Ğµ ÑĞ²ĞµÑ‡ĞµĞ½Ğ¸Ğµ Ğ¾ĞºÑƒÑ‚Ñ‹Ğ²Ğ°ĞµÑ‚ Ñ‚Ğ²Ğ¾Ğ¹ Ğ¿Ğ¾ÑĞ¾Ñ… Ğ´Ñ€ÑƒĞ¸Ğ´Ğ°.{x", ch, 0, 0, TO_CHAR, POS_DEAD );
+    act( "{BĞ¡Ğ¸Ğ½ĞµĞ²Ğ°Ñ‚Ğ¾Ğµ ÑĞ²ĞµÑ‡ĞµĞ½Ğ¸Ğµ Ğ¾ĞºÑƒÑ‚Ñ‹Ğ²Ğ°ĞµÑ‚ Ğ¿Ğ¾ÑĞ¾Ñ… Ğ´Ñ€ÑƒĞ¸Ğ´Ğ° $c2.{x", ch, 0, 0, TO_ROOM );
 
     spell( gsn_cure_critical, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
 }
 
 bool DruidStaff::death( Character *ch )
 {
-    act_p( "ô×ÏÊ ĞÏÓÏÈ ÄÒÕÉÄÁ ÉÓŞÅÚÁÅÔ.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "ğÏÓÏÈ ÄÒÕÉÄÁ $c2 ÉÓŞÅÚÁÅÔ.", ch, 0, 0, TO_ROOM );
+    act_p( "Ğ¢Ğ²Ğ¾Ğ¹ Ğ¿Ğ¾ÑĞ¾Ñ… Ğ´Ñ€ÑƒĞ¸Ğ´Ğ° Ğ¸ÑÑ‡ĞµĞ·Ğ°ĞµÑ‚.", ch, 0, 0, TO_CHAR, POS_DEAD );
+    act( "ĞŸĞ¾ÑĞ¾Ñ… Ğ´Ñ€ÑƒĞ¸Ğ´Ğ° $c2 Ğ¸ÑÑ‡ĞµĞ·Ğ°ĞµÑ‚.", ch, 0, 0, TO_ROOM );
     extract_obj( obj );
     return false;
 }
@@ -93,12 +93,12 @@ bool DruidStaff::death( Character *ch )
 bool DruidStaff::canEquip( Character *ch )
 {
   if (ch->getTrueProfession( ) != prof_druid) {
-	ch->println("ôÙ ÎÅ ÚÎÁÅÛØ ËÁË ÉÓĞÏÌØÚÏ×ÁÔØ ÜÔÕ ×ÅİØ.");
-	act( "$o1 ×ÙÓËÁÌØÚÙ×ÁÅÔ ÉÚ Ô×ÏÉÈ ÒÕË.", ch, obj, 0, TO_CHAR );
-	act( "$o1 ×ÙÓËÁÌØÚÙ×ÁÅÔ ÉÚ ÒÕË $c2.", ch, obj, 0, TO_ROOM );
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	return false;
+        ch->println("Ğ¢Ñ‹ Ğ½Ğµ Ğ·Ğ½Ğ°ĞµÑˆÑŒ ĞºĞ°Ğº Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ ÑÑ‚Ñƒ Ğ²ĞµÑ‰ÑŒ.");
+        act( "$o1 Ğ²Ñ‹ÑĞºĞ°Ğ»ÑŒĞ·Ñ‹Ğ²Ğ°ĞµÑ‚ Ğ¸Ğ· Ñ‚Ğ²Ğ¾Ğ¸Ñ… Ñ€ÑƒĞº.", ch, obj, 0, TO_CHAR );
+        act( "$o1 Ğ²Ñ‹ÑĞºĞ°Ğ»ÑŒĞ·Ñ‹Ğ²Ğ°ĞµÑ‚ Ğ¸Ğ· Ñ€ÑƒĞº $c2.", ch, obj, 0, TO_ROOM );
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        return false;
     }
 
     return true;

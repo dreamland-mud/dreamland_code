@@ -44,8 +44,8 @@ void XMLAttributeTicker::setTime( int time )
 bool XMLAttributeTicker::tick( PCMemoryInterface *pcm )
 {
     if (time != -1 && getTime( ) - dreamland->getCurrentTime( ) <= 0) {
-	end( pcm );
-	return true;
+        end( pcm );
+        return true;
     }
 
     return false;
@@ -55,12 +55,12 @@ DLString XMLAttributeTicker::getTimeString( bool russian ) const
 {
     DLString str;
     
-    str = (russian ? "ÎÁ" : "for");
+    str = (russian ? "Ğ½Ğ°" : "for");
     
     if (time.getValue( ) == -1)
-	str += (russian ? "×ÓÅÇÄÁ" : "ever" );
+        str += (russian ? "Ğ²ÑĞµĞ³Ğ´Ğ°" : "ever" );
     else
-	str += " " + Date::getStringFromSecond( time.getValue( ) );
+        str += " " + Date::getStringFromSecond( time.getValue( ) );
     
     return str;
 }
@@ -70,10 +70,10 @@ DLString XMLAttributeTicker::getUntilString( bool russian ) const
     DLString str;
     
     if (time.getValue( ) == -1)
-	str += (russian ? "ÎÁ×ÓÅÇÄÁ" : "forever" );
+        str += (russian ? "Ğ½Ğ°Ğ²ÑĞµĞ³Ğ´Ğ°" : "forever" );
     else {
-	str += (russian ? "ÄÏ" : "until" );
-	str += " " + Date::getTimeAsString( getTime( ) );
+        str += (russian ? "Ğ´Ğ¾" : "until" );
+        str += " " + Date::getTimeAsString( getTime( ) );
     }
     
     return str;

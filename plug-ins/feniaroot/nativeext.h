@@ -20,8 +20,8 @@ void traitsAPIAux( ostringstream &buf )
     typename TT::List *list = TT::List::begin();
     
     for ( ; list; list = list->getNext())
-	buf << "{g" << list->getKey().name 
-	    << "{x: " << list->getVal().help << endl;
+        buf << "{g" << list->getKey().name 
+            << "{x: " << list->getVal().help << endl;
 }
 
 template <typename T>
@@ -30,13 +30,13 @@ void traitsAPI( ostringstream &buf )
     typedef NativeTraits<T> Traits;
     
     buf << "{Y" << Traits::NAME << "{x" << endl
-	<< Traits::HELP << endl;
+        << Traits::HELP << endl;
     
-    buf << endl << "{WðÏÌÑ, ÄÏÓÔÕÐÎÙÅ ÄÌÑ ÚÁÐÉÓÉ: {x" << endl;
+    buf << endl << "{WÐŸÐ¾Ð»Ñ, Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð·Ð°Ð¿Ð¸ÑÐ¸: {x" << endl;
     traitsAPIAux<typename Traits::Set>( buf );
-    buf << endl << "{WðÏÌÑ, ÄÏÓÔÕÐÎÙÅ ÄÌÑ ÞÔÅÎÉÑ: {x" << endl;
+    buf << endl << "{WÐŸÐ¾Ð»Ñ, Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð´Ð»Ñ Ñ‡Ñ‚ÐµÐ½Ð¸Ñ: {x" << endl;
     traitsAPIAux<typename Traits::Get>( buf );
-    buf << endl << "{WíÅÔÏÄÙ: {x" << endl;
+    buf << endl << "{WÐœÐµÑ‚Ð¾Ð´Ñ‹: {x" << endl;
     traitsAPIAux<typename Traits::Invoke>( buf );
 }
 

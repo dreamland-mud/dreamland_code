@@ -15,11 +15,11 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regMoc<C>( );
+        Class::regMoc<C>( );
     }
     virtual void destruction( ) 
     {
-	Class::unregMoc<C>( );
+        Class::unregMoc<C>( );
     }
 };
 

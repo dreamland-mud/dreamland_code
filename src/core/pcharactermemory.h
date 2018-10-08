@@ -36,7 +36,7 @@ class PCharacterMemory : public XMLVariableContainer,
                          public PCMemoryInterface
 {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<PCharacterMemory> Pointer;
     
     PCharacterMemory( );

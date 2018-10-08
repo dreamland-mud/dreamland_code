@@ -27,7 +27,7 @@ friend class RainbowMob;
 friend class RainbowPiece;
 
 public:
-    typedef ::Pointer<RainbowGQuest>	Pointer;
+    typedef ::Pointer<RainbowGQuest>        Pointer;
     
     RainbowGQuest( );
     RainbowGQuest( const DLString& );
@@ -57,10 +57,10 @@ protected:
     RainbowScenario * getScenario( ) const;
 
     enum {
-	ST_INIT,
-	ST_RUNNING,
-	ST_ENDING,
-	ST_FINISHED
+        ST_INIT,
+        ST_RUNNING,
+        ST_ENDING,
+        ST_FINISHED
     };
     XML_VARIABLE XMLInteger state;
     XML_VARIABLE XMLString winnerName;

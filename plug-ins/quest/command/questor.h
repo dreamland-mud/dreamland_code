@@ -12,25 +12,25 @@
 class Questor : public Wanderer {
 XML_OBJECT
 public:
-	typedef ::Pointer<Questor> Pointer;
+        typedef ::Pointer<Questor> Pointer;
 
-	Questor( );
-	
-	virtual int getOccupation( );
-	
-	virtual bool canGiveQuest( Character * );
-	void doRequest( PCharacter * );
-	void doComplete( PCharacter *, DLString & );
-	void doCancel( PCharacter * );
-	void doFind( PCharacter * );
-	
-	virtual bool canWander( Room *const, EXIT_DATA * );
-	virtual bool canWander( Room *const, EXTRA_EXIT_DATA * );
-	virtual bool canWander( Room *const, Object * );
+        Questor( );
+        
+        virtual int getOccupation( );
+        
+        virtual bool canGiveQuest( Character * );
+        void doRequest( PCharacter * );
+        void doComplete( PCharacter *, DLString & );
+        void doCancel( PCharacter * );
+        void doFind( PCharacter * );
+        
+        virtual bool canWander( Room *const, EXIT_DATA * );
+        virtual bool canWander( Room *const, EXTRA_EXIT_DATA * );
+        virtual bool canWander( Room *const, Object * );
 
 private:
-	void rewardScroll( PCharacter * );
-	void rewardWord( PCharacter * );
+        void rewardScroll( PCharacter * );
+        void rewardWord( PCharacter * );
 };
 
 class QuestScrollBehavior : public ObjectBehavior {

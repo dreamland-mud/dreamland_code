@@ -15,19 +15,19 @@
 
 extern "C"
 {
-	SO::PluginList initialize_questreward( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestReward> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<PersonalQuestReward> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestGirth> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestRing> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestWeapon> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestBag> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<ValentinePrise> >( ppl );
-		Plugin::registerPlugin<ObjectBehaviorRegistrator<OwnerCoupon> >( ppl );
-		
-		return ppl;
-	}
+        SO::PluginList initialize_questreward( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestReward> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<PersonalQuestReward> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestGirth> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestRing> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestWeapon> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestBag> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<ValentinePrise> >( ppl );
+                Plugin::registerPlugin<ObjectBehaviorRegistrator<OwnerCoupon> >( ppl );
+                
+                return ppl;
+        }
 }

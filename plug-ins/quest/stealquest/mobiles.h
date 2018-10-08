@@ -12,9 +12,9 @@ class StealQuest;
 
 class RobbedVictim : public TalkativeClient, 
                      public MandatoryMobile,
-		     public ProtectedClient,
-		     public GreedyClient,
-		     public DedicatedMobile<StealQuest>
+                     public ProtectedClient,
+                     public GreedyClient,
+                     public DedicatedMobile<StealQuest>
 {
 XML_OBJECT
 public:

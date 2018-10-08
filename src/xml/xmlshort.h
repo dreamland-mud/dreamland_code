@@ -18,51 +18,51 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная short
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ short
  */
 class XMLShort : public Short
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLShort( ) : Short( )
-	{
-	}
-	
-	inline XMLShort( short value ) : Short( value )
-	{
-	}
-	
-	inline XMLShort( const DLString& value ) throw( ExceptionBadType )
-		: Short( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ \0 */
+        inline XMLShort( ) : Short( )
+        {
+        }
+        
+        inline XMLShort( short value ) : Short( value )
+        {
+        }
+        
+        inline XMLShort( const DLString& value ) throw( ExceptionBadType )
+                : Short( value )
+        {
+        }
+        
+        /** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
 
-/** Вывод в ostream типа XMLShort */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLShort */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLShort& xmlShort )
 {
-	ostr << xmlShort.getValue( );
-	return ostr;
+        ostr << xmlShort.getValue( );
+        return ostr;
 }
 
 class XMLShortNoEmpty : public XMLShort {
 public:
-	inline XMLShortNoEmpty( )
-	{
-	}
-	
-	inline XMLShortNoEmpty( int value ) : XMLShort( value )
-	{
-	}
+        inline XMLShortNoEmpty( )
+        {
+        }
+        
+        inline XMLShortNoEmpty( int value ) : XMLShort( value )
+        {
+        }
 
-	bool toXML( XMLNode::Pointer& node ) const;
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 #endif

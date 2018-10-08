@@ -21,8 +21,8 @@ void RoomChannel::findListeners( Character *ch, Listeners &listeners ) const
     Character *rch;
     
     for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room)
-	if (isGlobalListener( ch, rch ))
-	    listeners.push_back( rch );
+        if (isGlobalListener( ch, rch ))
+            listeners.push_back( rch );
 }
 
 void RoomChannel::postOutput( Character *outputTo, const DLString &message ) const

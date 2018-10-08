@@ -49,24 +49,24 @@ bool PortalMovement::findTargetRoom( )
     int targetVnum = (rc.empty( ) || !rc.isNumber( ) ? 0 : rc.toInt( ));
 
     if (targetVnum != 0) {
-	to_room = get_room_index( targetVnum );
+        to_room = get_room_index( targetVnum );
     }
     else if (IS_SET(portal->value[2],GATE_RANDOM) || portal->value[3] == -1) {
-	to_room = get_random_room( ch );
-	portal->value[3] = to_room->vnum; /* keeps record */
+        to_room = get_random_room( ch );
+        portal->value[3] = to_room->vnum; /* keeps record */
     }
     else if (IS_SET(portal->value[2], GATE_BUGGY) && (number_percent( ) < 5)) {
-	to_room = get_random_room( ch );
+        to_room = get_random_room( ch );
     }
     else {
-	to_room = get_room_index( portal->value[3] );
+        to_room = get_room_index( portal->value[3] );
     }
 
     if (to_room == 0) {
-	 msgSelfParty( ch,
-		       "%4$^O1 не может находиться тут.", 
-		       "%4$^O1 не может находиться тут." );
-	 return false;
+         msgSelfParty( ch,
+                       "%4$^O1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╟я┘п╬п╢п╦я┌я▄я│я▐ я┌я┐я┌.", 
+                       "%4$^O1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╟я┘п╬п╢п╦я┌я▄я│я▐ я┌я┐я┌." );
+         return false;
     }
 
     return true;
@@ -85,14 +85,14 @@ bool PortalMovement::canLeaveMaster( Character *wch )
 bool PortalMovement::canMove( Character *wch )
 {
     return checkCharges( )
-	    && Walkment::canMove( wch )
-	    && checkCurse( wch );
+            && Walkment::canMove( wch )
+            && checkCurse( wch );
 }
 
 bool PortalMovement::tryMove( Character *wch )
 {
     return Walkment::tryMove( wch )
-	    && applySpellbane( wch );
+            && applySpellbane( wch );
 }
 
 bool PortalMovement::checkCharges( )
@@ -103,18 +103,18 @@ bool PortalMovement::checkCharges( )
 int PortalMovement::move( )
 {
     if (!moveRecursive( )) 
-	return RC_MOVE_FAIL;
+        return RC_MOVE_FAIL;
 
     if (IS_SET(portal->value[2], GATE_GOWITH)) { 
-	obj_from_room( portal );
-	obj_to_room( portal, to_room );
+        obj_from_room( portal );
+        obj_to_room( portal, to_room );
     }
 
     if (portal->value[0] == -1) {
-	portal->getRoom( )->echo( POS_RESTING, 
-		                  "%^O1 медленно исчезает в дымке.", 
-				  portal );
-	extract_obj( portal );
+        portal->getRoom( )->echo( POS_RESTING, 
+                                  "%^O1 п╪п╣п╢п╩п╣п╫п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌ п╡ п╢я▀п╪п╨п╣.", 
+                                  portal );
+        extract_obj( portal );
     }
 
     return RC_MOVE_OK;
@@ -122,18 +122,18 @@ int PortalMovement::move( )
 
 void PortalMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    act( "Ты следуешь за $C5.", fch, 0, wch, TO_CHAR );
+    act( "п╒я▀ я│п╩п╣п╢я┐п╣я┬я▄ п╥п╟ $C5.", fch, 0, wch, TO_CHAR );
     PortalMovement( fch, portal ).moveRecursive( );
 }
 
 bool PortalMovement::moveAtomic( )
 {
     if (!Walkment::moveAtomic( ))
-	return false;
+        return false;
 
     if (portal->value[0] > 0) 
-	if (--portal->value[0] == 0)
-	    portal->value[0] = -1;
+        if (--portal->value[0] == 0)
+            portal->value[0] = -1;
 
     return true;
 }
@@ -141,18 +141,18 @@ bool PortalMovement::moveAtomic( )
 bool PortalMovement::checkClosedDoor( Character *wch )
 {
     if (!IS_SET(portal->value[1], EX_CLOSED))
-	return true;
-	
+        return true;
+        
     if (wch->get_trust( ) >= ANGEL)
-	return true;
+        return true;
 
     if (IS_GHOST( wch ))
-	return true;
+        return true;
     
     rc = RC_MOVE_CLOSED;
     msgSelfParty( wch, 
-	          "%4$^O1: тут закрыто.",
-	          "%4$^O1: тут закрыто." );
+                  "%4$^O1: я┌я┐я┌ п╥п╟п╨я─я▀я┌п╬.",
+                  "%4$^O1: я┌я┐я┌ п╥п╟п╨я─я▀я┌п╬." );
     return false;
 }
 
@@ -174,25 +174,25 @@ bool PortalMovement::checkWater( Character *wch )
 bool PortalMovement::checkCurse( Character *wch )
 {
     if (wch->get_trust( ) >= ANGEL)
-	return true;
+        return true;
     
     if (IS_SET(portal->value[2], GATE_NOCURSE))
-	return true;
+        return true;
     
     if (IS_AFFECTED(wch, AFF_CURSE)) {
-	msgSelfParty( wch, 
-		      "Твое проклятье мешает тебе войти в %4$O4.",
-		      "Проклятье %2$C2 мешает %2$P3 войти в %4$O4." );
-	return false;
+        msgSelfParty( wch, 
+                      "п╒п╡п╬п╣ п©я─п╬п╨п╩я▐я┌я▄п╣ п╪п╣я┬п╟п╣я┌ я┌п╣п╠п╣ п╡п╬п╧я┌п╦ п╡ %4$O4.",
+                      "п÷я─п╬п╨п╩я▐я┌я▄п╣ %2$C2 п╪п╣я┬п╟п╣я┌ %2$P3 п╡п╬п╧я┌п╦ п╡ %4$O4." );
+        return false;
     }
     
     if (IS_SET(from_room->room_flags, ROOM_NO_RECALL)
-	 || IS_RAFFECTED(from_room, AFF_ROOM_CURSE))
+         || IS_RAFFECTED(from_room, AFF_ROOM_CURSE))
     {
-	msgSelfParty( wch,
-		      "Проклятье этого места мешает тебе его покинуть.",
-		      "Проклятье этого места мешает %2$C3 его покинуть." );
-	return false;
+        msgSelfParty( wch,
+                      "п÷я─п╬п╨п╩я▐я┌я▄п╣ я█я┌п╬пЁп╬ п╪п╣я│я┌п╟ п╪п╣я┬п╟п╣я┌ я┌п╣п╠п╣ п╣пЁп╬ п©п╬п╨п╦п╫я┐я┌я▄.",
+                      "п÷я─п╬п╨п╩я▐я┌я▄п╣ я█я┌п╬пЁп╬ п╪п╣я│я┌п╟ п╪п╣я┬п╟п╣я┌ %2$C3 п╣пЁп╬ п©п╬п╨п╦п╫я┐я┌я▄." );
+        return false;
     }
     
     return true;
@@ -206,26 +206,26 @@ bool PortalMovement::applyWeb( Character *wch )
 bool PortalMovement::applySpellbane( Character *wch )
 {
     if (wch->is_npc( ))
-	return true;
+        return true;
     
     if (!IS_SET(portal->extra_flags, ITEM_MAGIC))
-	return true;
-		
+        return true;
+                
     if (wch->getClan( ) != clan_battlerager)
-	return true;
+        return true;
     
     if (!wch->isAffected( gsn_spellbane ))
-	return true;
+        return true;
     
     try {
-	act_p("Магия $o2 аннигилирует с твоим spellbane!", wch,portal,0,TO_CHAR,POS_RESTING);
-	act_p("Магия $o2 аннигилирует со spellbane $c2!", wch,portal,0,TO_ROOM,POS_RESTING);
-	SkillDamage( wch, wch, gsn_spellbane, DAM_NEGATIVE, wch->max_hit / 3, DAMF_SPELL ).hit( true );
-	interpret_raw( wch, "cb", "Меня ударило магическим порталом!" );
+        act_p("п°п╟пЁп╦я▐ $o2 п╟п╫п╫п╦пЁп╦п╩п╦я─я┐п╣я┌ я│ я┌п╡п╬п╦п╪ spellbane!", wch,portal,0,TO_CHAR,POS_RESTING);
+        act_p("п°п╟пЁп╦я▐ $o2 п╟п╫п╫п╦пЁп╦п╩п╦я─я┐п╣я┌ я│п╬ spellbane $c2!", wch,portal,0,TO_ROOM,POS_RESTING);
+        SkillDamage( wch, wch, gsn_spellbane, DAM_NEGATIVE, wch->max_hit / 3, DAMF_SPELL ).hit( true );
+        interpret_raw( wch, "cb", "п°п╣п╫я▐ я┐п╢п╟я─п╦п╩п╬ п╪п╟пЁп╦я┤п╣я│п╨п╦п╪ п©п╬я─я┌п╟п╩п╬п╪!" );
     }
     catch (const VictimDeathException &) {
-	interpret_raw( wch, "cb", "Меня УБИЛО магическим порталом!" );
-	return false;
+        interpret_raw( wch, "cb", "п°п╣п╫я▐ пёп▒п≤п⌡п· п╪п╟пЁп╦я┤п╣я│п╨п╦п╪ п©п╬я─я┌п╟п╩п╬п╪!" );
+        return false;
     }
     
     return true;
@@ -246,52 +246,52 @@ void PortalMovement::msgOnMove( Character *wch, bool fLeaving )
     DLString msg;
     
     if (MOUNTED(wch))
-	return;
+        return;
 
     if (wch->is_mirror( ))
-	return;
+        return;
 
     if (ch->invis_level >= LEVEL_HERO || wch->invis_level >= LEVEL_HERO)
-	return;
+        return;
     
     if (fLeaving) {
-	if (RIDDEN(wch))
-	    msgRoomNoParty( wch,
-			    "%1^C1 входит в %4$O4 верхом на %2$C6." );
-	else	
-	    msgRoomNoParty( wch,
-			    "%1^C1 входит в %4$O4." );
-	
-	if (isNormalExit( )) 
-	    msg = "Ты входишь в %4$O4.";
-	else
-	    msg = "Ты входишь в %4$O4 и переносишься в другое место...";
-	
-	msgSelf( wch, msg.c_str( ) );
-	if (RIDDEN(wch))
-	    msgSelf( RIDDEN(wch), msg.c_str( ) );
+        if (RIDDEN(wch))
+            msgRoomNoParty( wch,
+                            "%1^C1 п╡я┘п╬п╢п╦я┌ п╡ %4$O4 п╡п╣я─я┘п╬п╪ п╫п╟ %2$C6." );
+        else        
+            msgRoomNoParty( wch,
+                            "%1^C1 п╡я┘п╬п╢п╦я┌ п╡ %4$O4." );
+        
+        if (isNormalExit( )) 
+            msg = "п╒я▀ п╡я┘п╬п╢п╦я┬я▄ п╡ %4$O4.";
+        else
+            msg = "п╒я▀ п╡я┘п╬п╢п╦я┬я▄ п╡ %4$O4 п╦ п©п╣я─п╣п╫п╬я│п╦я┬я▄я│я▐ п╡ п╢я─я┐пЁп╬п╣ п╪п╣я│я┌п╬...";
+        
+        msgSelf( wch, msg.c_str( ) );
+        if (RIDDEN(wch))
+            msgSelf( RIDDEN(wch), msg.c_str( ) );
     }
     else {
-	if (isNormalExit( )) 
-	    msg = "%1$^C1 появляется";
-	else
-	    msg = "%1$^C1 появляется из %4$O2";
+        if (isNormalExit( )) 
+            msg = "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐";
+        else
+            msg = "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╦п╥ %4$O2";
 
-	if (RIDDEN(wch))
-	    msg << " верхом на %2$C6";
+        if (RIDDEN(wch))
+            msg << " п╡п╣я─я┘п╬п╪ п╫п╟ %2$C6";
 
-	msg << ".";
-	msgRoomNoParty( wch, msg.c_str( ) );
+        msg << ".";
+        msgRoomNoParty( wch, msg.c_str( ) );
     }
 }
 
 void PortalMovement::msgEcho( Character *victim, Character *wch, const char *msg )
 {
     if (canHear( victim, wch ))
-	victim->pecho( msg, 
-	               (RIDDEN(wch) ? wch->mount : wch),
-	               (MOUNTED(wch) ? wch->mount : wch),
-		       wch, 
-		       portal );
+        victim->pecho( msg, 
+                       (RIDDEN(wch) ? wch->mount : wch),
+                       (MOUNTED(wch) ? wch->mount : wch),
+                       wch, 
+                       portal );
 }
 

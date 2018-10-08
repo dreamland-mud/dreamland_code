@@ -32,16 +32,16 @@ public:
     }
 
     void open( ) {
-	Object::Manager::open( );
-	CodeSource::Manager::open( );
+        Object::Manager::open( );
+        CodeSource::Manager::open( );
     }
     void close( ) {
-	Object::Manager::close( );
-	CodeSource::Manager::close( );
+        Object::Manager::close( );
+        CodeSource::Manager::close( );
     }
     void load( ) {
-	Object::Manager::load( );
-	CodeSource::Manager::load( );
+        Object::Manager::load( );
+        CodeSource::Manager::load( );
     }
 
     virtual DbEnvContext *getDbEnv( ) const;
@@ -61,7 +61,7 @@ public:
     void save();
 
     virtual void setSelf(Object *s) { 
-	self = s;
+        self = s;
     }
 
     Object *self;

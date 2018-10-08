@@ -41,7 +41,7 @@
 HOMETOWN(frigate);
 
 using namespace Scripting;
-NMI_INIT(NannyHandler, "няня");
+NMI_INIT(NannyHandler, "п╫я▐п╫я▐");
 Register NannyHandler::tmpNanny;
 bool password_check( PCMemoryInterface *pci, const DLString &input );
 
@@ -52,27 +52,27 @@ void NannyHandler::close( Descriptor *d )
     Character *ch = d->character;
 
     if (ch) {
-	::Object *obj, *obj_next;
-	
-	if (ch->in_room)
-	    char_from_room( ch );
+        ::Object *obj, *obj_next;
+        
+        if (ch->in_room)
+            char_from_room( ch );
 
-	char_from_list( ch, &newbie_list );
-	
-	for (obj = ch->carrying; obj != 0; obj = obj_next) {
-	    obj_next = obj->next_content;
-	    extract_obj_1( obj, true );
-	}
+        char_from_list( ch, &newbie_list );
+        
+        for (obj = ch->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
+            extract_obj_1( obj, true );
+        }
 
-	for (Character *wch = char_list; wch != 0; wch = wch->next) {
-	    if (wch->reply == ch)
-		wch->reply = 0;
-	}
-	
-	PCharacterManager::quit( ch->getPC( ) );
-	LogStream::sendWarning( ) << "Closing nanny link to " << ch->getName( ) << '.' << endl;
-	mprog_extract( ch, true );
-	ddeallocate( ch );
+        for (Character *wch = char_list; wch != 0; wch = wch->next) {
+            if (wch->reply == ch)
+                wch->reply = 0;
+        }
+        
+        PCharacterManager::quit( ch->getPC( ) );
+        LogStream::sendWarning( ) << "Closing nanny link to " << ch->getName( ) << '.' << endl;
+        mprog_extract( ch, true );
+        ddeallocate( ch );
         d->character = NULL;
     }
 }
@@ -106,12 +106,12 @@ void NannyHandler::doGreeting( Descriptor *d )
     d->send( ANSI_CLEARSCR ANSI_HOME ANSI_COLOR_RESET "\n\r" );
     
     if ((now->tm_mon == 11 && now->tm_mday >= 24)
-	|| (now->tm_mon == 0 && now->tm_mday <= 8))
+        || (now->tm_mon == 0 && now->tm_mday <= 8))
     {
-	do_help( d, "newyear", true );
+        do_help( d, "newyear", true );
     }
     else
-	do_help( d, "greeting", false );
+        do_help( d, "greeting", false );
 }
 
 void NannyHandler::doCodepage( Descriptor *d, char *arg )
@@ -119,17 +119,17 @@ void NannyHandler::doCodepage( Descriptor *d, char *arg )
     int num;
 
     if (!arg[0] 
-	|| (num = arg[0] - '1') < 0
-	|| num >= NCODEPAGES)
+        || (num = arg[0] - '1') < 0
+        || num >= NCODEPAGES)
     {
-	ostringstream buf;
+        ostringstream buf;
 
-	for (int i = 0; i < NCODEPAGES; i++)
-	    buf << "  " << i + 1 << ") " << russian_codepages[i].name << endl;
-	
-	buf << endl << "Select your codepage: ";
-	d->send( buf.str( ).c_str( ) );
-	return;
+        for (int i = 0; i < NCODEPAGES; i++)
+            buf << "  " << i + 1 << ") " << russian_codepages[i].name << endl;
+        
+        buf << endl << "Select your codepage: ";
+        d->send( buf.str( ).c_str( ) );
+        return;
     }
 
     d->buffer_handler = new DefaultBufferHandler( num );
@@ -143,14 +143,14 @@ void NannyHandler::doPlace( Descriptor *d )
     d->send( "\r\n" ANSI_HOME ANSI_CLEARSCR );
 
     if (d->character == NULL)
-	d->associate( PCharacterManager::getPCharacter( ) );
+        d->associate( PCharacterManager::getPCharacter( ) );
     
     d->connected = CON_NANNY;
     char_to_list( d->character, &newbie_list );
     
     if (!invoke( ID_CONNECT, d->character, Scripting::RegisterList( ) )) {
-	d->send("Front door is closed, please use backdoor.\n");
-	d->close( );
+        d->send("Front door is closed, please use backdoor.\n");
+        d->close( );
     }
 }
 
@@ -169,16 +169,16 @@ int NannyHandler::handle(Descriptor *d, char *arg)
 {
     switch (d->connected) {
     case CON_CODEPAGE:
-	doCodepage( d, arg );
-	break;
+        doCodepage( d, arg );
+        break;
     
     case CON_NANNY:
-	doInterpret( d, arg );
-	break;
+        doInterpret( d, arg );
+        break;
 
     default:
-	LogStream::sendError( ) << "nanny: unknown descriptor state " << d->connected << endl;
-	break;
+        LogStream::sendError( ) << "nanny: unknown descriptor state " << d->connected << endl;
+        break;
     }
 
     return 0;
@@ -187,8 +187,8 @@ int NannyHandler::handle(Descriptor *d, char *arg)
 void NannyHandler::prompt( Descriptor *d )
 {
     if (d->character 
-	&& !d->character->getName( ).empty( )
-	&& d->echo)
+        && !d->character->getName( ).empty( )
+        && d->echo)
     {
         d->character->send_to( "{R>{x ");
     }
@@ -204,11 +204,11 @@ bool NannyHandler::resolve( )
     static Scripting::IdRef ID_TMP( "tmp" ), ID_NANNY( "nanny" );
 
     try {
-	tmpNanny = *(*Scripting::Context::root[ID_TMP])[ID_NANNY];
+        tmpNanny = *(*Scripting::Context::root[ID_TMP])[ID_NANNY];
     }
     catch (const Scripting::Exception &e) {
-	LogStream::sendWarning( ) << "nanny: " << e.what( ) << endl;
-	return false;
+        LogStream::sendWarning( ) << "nanny: " << e.what( ) << endl;
+        return false;
     }
 
     return true;
@@ -217,18 +217,18 @@ bool NannyHandler::resolve( )
 bool NannyHandler::invoke( Scripting::IdRef &id, Character *ch, Scripting::RegisterList regList )
 {
     if (!FeniaManager::wrapperManager)
-	return false;
-	
+        return false;
+        
     if (!resolve( ))
-	return false;
+        return false;
 
     try {
-	regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
-	tmpNanny[id]( regList );
+        regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
+        tmpNanny[id]( regList );
     }
     catch (const Scripting::Exception &e) {
-	LogStream::sendWarning( ) << "nanny: " << e.what( ) << endl;
-	return false;
+        LogStream::sendWarning( ) << "nanny: " << e.what( ) << endl;
+        return false;
     }
     
     return true;
@@ -242,7 +242,7 @@ Character * NannyHandler::getCharacter( const RegisterList &args )
     Character *ch;
 
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     FeniaManager::wrapperManager->getTarget( args.front( ), ch );
     return ch;
@@ -251,7 +251,7 @@ Character * NannyHandler::getCharacter( const RegisterList &args )
 PCharacter * NannyHandler::getPlayer( const RegisterList &args ) 
 {
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     return getPlayer( args.front( ) );
 }
@@ -263,7 +263,7 @@ PCharacter * NannyHandler::getPlayer( const Register &arg )
     FeniaManager::wrapperManager->getTarget( arg, ch );
 
     if (ch->is_npc( ))
-	throw Scripting::Exception("nanny invoked on npc");
+        throw Scripting::Exception("nanny invoked on npc");
 
     return ch->getPC( );
 }
@@ -317,26 +317,26 @@ NMI_INVOKE( NannyHandler, notifyCreated, "" )
 {
     DescriptorStateManager::getThis( )->handle( 
              CON_CREATE_DONE, 
-	     CON_READ_MOTD,
-	     getCharacter( args )->desc );
+             CON_READ_MOTD,
+             getCharacter( args )->desc );
     return Register( );
 }
 
 NMI_INVOKE( NannyHandler, notifyPlaying, "" )
 {
     DescriptorStateManager::getThis( )->handle( 
-	     CON_READ_MOTD,
-	     CON_PLAYING,
-	     getCharacter( args )->desc );
+             CON_READ_MOTD,
+             CON_PLAYING,
+             getCharacter( args )->desc );
     return Register( );
 }
 
 NMI_INVOKE( NannyHandler, notifyReconnect, "" )
 {
     DescriptorStateManager::getThis( )->handle( 
-	     CON_BREAK_CONNECT,
-	     CON_PLAYING,
-	     getCharacter( args )->desc );
+             CON_BREAK_CONNECT,
+             CON_PLAYING,
+             getCharacter( args )->desc );
     return Register( );
 }
 
@@ -346,7 +346,7 @@ NMI_INVOKE( NannyHandler, reconnect, "" )
     Descriptor *d;
 
     if (args.size( ) != 2)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     FeniaManager::wrapperManager->getTarget( args.front( ), ch );
     FeniaManager::wrapperManager->getTarget( args.back( ), twin );
@@ -364,26 +364,26 @@ NMI_INVOKE( NannyHandler, reanimate, "" )
     Descriptor *d;
 
     if (args.size( ) != 2)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     try {
-	FeniaManager::wrapperManager->getTarget( args.front( ), ch );
-	FeniaManager::wrapperManager->getTarget( args.back( ), twin );
-	
-	while (( d = descriptor_find_named( ch->desc, ch->getName( ) ) ))
-	    d->close( );
+        FeniaManager::wrapperManager->getTarget( args.front( ), ch );
+        FeniaManager::wrapperManager->getTarget( args.back( ), twin );
+        
+        while (( d = descriptor_find_named( ch->desc, ch->getName( ) ) ))
+            d->close( );
 
-	if (!PCharacterManager::findPlayer( ch->getName( ) ))
-	    return false;
-	
-	d = ch->desc;
-	d->handle_input.front( )->close( d );
-	d->associate( twin );
-	InterpretHandler::init( d );
-	return true;
+        if (!PCharacterManager::findPlayer( ch->getName( ) ))
+            return false;
+        
+        d = ch->desc;
+        d->handle_input.front( )->close( d );
+        d->associate( twin );
+        InterpretHandler::init( d );
+        return true;
     }
     catch (const Scripting::Exception &) {
-	return false;
+        return false;
     }
 }
 
@@ -397,26 +397,26 @@ NMI_INVOKE( NannyHandler, checkBan, "" )
     d = ch->desc;
     
     if (banManager->check( d, BAN_ALL ))
-	return "banall";
+        return "banall";
 
     if (( pci = PCharacterManager::find( ch->getName( ) ) )) {
-	if (pci->getAttributes( ).isAvailable( "deny" ))
-	    return "deny";
+        if (pci->getAttributes( ).isAvailable( "deny" ))
+            return "deny";
 
-	if (pci->get_trust( ) < LEVEL_IMMORTAL && banManager->check( d, BAN_PLAYER ))
-	    return "banplayer";
+        if (pci->get_trust( ) < LEVEL_IMMORTAL && banManager->check( d, BAN_PLAYER ))
+            return "banplayer";
     }
     else {
-	if (dreamland->hasOption( DL_NEWLOCK ))
-	    return "newlock";
+        if (dreamland->hasOption( DL_NEWLOCK ))
+            return "newlock";
 
-	if (banManager->check( d, BAN_NEWBIES ))
-	    return "bannewbie";
+        if (banManager->check( d, BAN_NEWBIES ))
+            return "bannewbie";
     }
 
     if (dreamland->hasOption( DL_WIZLOCK )) 
-	if (!pci || (!pci->isOnline( ) && pci->get_trust( ) < LEVEL_HERO))
-	    return "wizlock";
+        if (!pci || (!pci->isOnline( ) && pci->get_trust( ) < LEVEL_HERO))
+            return "wizlock";
     
     return Register( );
 }
@@ -433,10 +433,10 @@ NMI_INVOKE( NannyHandler, checkName, "" )
     
     name = args.front( ).toString( );
     if (!badNames->checkName( name )) 
-	return false;
+        return false;
 
     if (descriptor_find_named( NULL, name ))
-	return false;
+        return false;
 
     return true;
 }
@@ -456,11 +456,11 @@ NMI_INVOKE( NannyHandler, setupStats, "initial, non-random stat setup" )
     target = getPlayer( args );
     
     if (target->getHometown( ) != home_frigate && !target->isCoder( ))
-	throw Scripting::Exception( "setupStats requested on non-newbie" );
+        throw Scripting::Exception( "setupStats requested on non-newbie" );
 
     for (int i = 0; i < stat_table.size; i++) {
         int max_train = target->getMaxTrain( i );
-	target->perm_stat[i] = max_train + STAT_DELTAS[i];
+        target->perm_stat[i] = max_train + STAT_DELTAS[i];
     }
 
     return Register( );
@@ -487,43 +487,43 @@ NMI_INVOKE( NannyHandler, randomizeStats, "randomize player stats during rolling
     target = getPlayer( args );
     
     if (target->getHometown( ) != home_frigate && !target->isCoder( ))
-	throw Scripting::Exception( "randomizeStats requested on non-newbie" );
+        throw Scripting::Exception( "randomizeStats requested on non-newbie" );
 
     for (i = 0, sum = 0; i < stat_table.size; i++) {
         int max_train = get_max_train( target, i );
-	target->perm_stat[i] = max( MIN_THROW, 
-	                        max_train - number_range( 0, 5 ) );
-	sum += max_train - target->perm_stat[i];
+        target->perm_stat[i] = max( MIN_THROW, 
+                                max_train - number_range( 0, 5 ) );
+        sum += max_train - target->perm_stat[i];
     }
     
     marks.resize( stat_table.size, 0 );
 
     while (sum != MIN_SUM) {
-	int j, m, d;
-	
-	for (j = 0, m = 0; j < stat_table.size; j++)
-	    m += marks[j];
+        int j, m, d;
+        
+        for (j = 0, m = 0; j < stat_table.size; j++)
+            m += marks[j];
 
-	m /= stat_table.size;
-	
-	for ( ; ; ) {
-	    j = number_range( 0, stat_table.size - 1 );
+        m /= stat_table.size;
+        
+        for ( ; ; ) {
+            j = number_range( 0, stat_table.size - 1 );
 
-	    if (marks[j] == m) {
-		marks[j] = m + 1;
-		break;
-	    }
-	}
-	
-	if (sum > MIN_SUM)
-	    d = min( get_max_train( target, j ) - target->perm_stat[j], 
-	             number_range( 0, sum - MIN_SUM ) );
-	else
-	    d = max( MIN_THROW - target->perm_stat[j], 
-	             number_range( sum - MIN_SUM, 0 ) );
-	
-	target->perm_stat[j] += d;
-	sum -= d;
+            if (marks[j] == m) {
+                marks[j] = m + 1;
+                break;
+            }
+        }
+        
+        if (sum > MIN_SUM)
+            d = min( get_max_train( target, j ) - target->perm_stat[j], 
+                     number_range( 0, sum - MIN_SUM ) );
+        else
+            d = max( MIN_THROW - target->perm_stat[j], 
+                     number_range( sum - MIN_SUM, 0 ) );
+        
+        target->perm_stat[j] += d;
+        sum -= d;
     }
 
     return Register( );
@@ -550,17 +550,17 @@ NMI_INVOKE( NannyHandler, alignChoose, "" )
     a = args.back( ).toString( );
     
     if (a.isNumber( )) 
-	try {
-	    n = align_choose_allowed( target, a.toInt( ) );  
-	} catch (const ExceptionBadType &) {
-	    return false;
-	}
+        try {
+            n = align_choose_allowed( target, a.toInt( ) );  
+        } catch (const ExceptionBadType &) {
+            return false;
+        }
     else
-	n = align_choose_allowed( target, a.c_str( ) );
+        n = align_choose_allowed( target, a.c_str( ) );
 
     
     if (n == ALIGN_ERROR)
-	return false;
+        return false;
 
     target->alignment = n;
     return true;

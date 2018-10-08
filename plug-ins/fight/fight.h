@@ -23,20 +23,20 @@ class Object;
 class Skill;
 
 /* fight.cpp */
-void	violence_update( );
-void	multi_hit( Character *ch, Character *victim );
-void	multi_hit_nocatch( Character *ch, Character *victim );
-bool	next_attack( Character *ch, Character *victim, Skill &skill, int coef );
-void	one_hit( Character *ch, Character* victim, bool secondary = false);
-void	one_hit_nocatch( Character *ch, Character* victim, bool secondary = false);
-bool	damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
-bool	damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
-void	rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show );
-void	rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show );
-void	damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
-int	move_dec( Character *ch );
+void        violence_update( );
+void        multi_hit( Character *ch, Character *victim );
+void        multi_hit_nocatch( Character *ch, Character *victim );
+bool        next_attack( Character *ch, Character *victim, Skill &skill, int coef );
+void        one_hit( Character *ch, Character* victim, bool secondary = false);
+void        one_hit_nocatch( Character *ch, Character* victim, bool secondary = false);
+bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
+bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag = 0 );
+void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show );
+void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show );
+void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
+int        move_dec( Character *ch );
 
-void	set_backguard( Character * );
+void        set_backguard( Character * );
 
 
 #define FYP_SLEEP    (A)
@@ -45,7 +45,7 @@ void yell_panic( Character *ch, Character *victim, const char *msgBlind = NULL, 
 
 
 /* gaining experience (fight_exp.cpp) */
-void	group_gain( Character *ch, Character *victim );
+void        group_gain( Character *ch, Character *victim );
 
 /* death handling routines (fight_death.cpp) */
 #define    FKILL_CRY          (A)
@@ -54,17 +54,17 @@ void	group_gain( Character *ch, Character *victim );
 #define    FKILL_PURGE        (D)
 #define    FKILL_MOB_EXTRACT  (E)
 #define    FKILL_REABILITATE  (F)
-void	raw_kill( Character* victim, int part, Character* ch, int flags );
-void	death_cry( Character *ch, int part = -1 );
-void	pk_gain( Character *ch, Character *victim );
+void        raw_kill( Character* victim, int part, Character* ch, int flags );
+void        death_cry( Character *ch, int part = -1 );
+void        pk_gain( Character *ch, Character *victim );
 
 /* subroutines (fight_subr.cpp) */
 #define FOREST_ATTACK  1
 #define FOREST_DEFENCE 2
-void	check_assist(Character *ch,Character *victim);
-bool	check_stun( Character *ch, Character *victim ); 
-bool	check_bare_hands( Character *ch );
-void	check_bloodthirst( Character *ch );
+void        check_assist(Character *ch,Character *victim);
+bool        check_stun( Character *ch, Character *victim ); 
+bool        check_bare_hands( Character *ch );
+void        check_bloodthirst( Character *ch );
 
 
 #define IS_QUICK(ch) (((ch)->is_npc() && IS_SET((ch)->getNPC()->off_flags,OFF_FAST)) \

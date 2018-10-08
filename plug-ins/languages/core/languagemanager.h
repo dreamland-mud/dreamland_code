@@ -20,9 +20,9 @@ typedef ::Pointer<Language> LanguagePointer;
 
 class LanguageManager : public WordContainer, 
                         public SchedulerTaskRoundPlugin, 
-			public virtual SchedulerTaskRoundPCharacter, 
+                        public virtual SchedulerTaskRoundPCharacter, 
                         public OneAllocate, 
-			public DLXMLLoader 
+                        public DLXMLLoader 
 {
 public:
     typedef ::Pointer<LanguageManager> Pointer;

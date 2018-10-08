@@ -14,47 +14,47 @@
 class ClanObject: public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanObject> Pointer;
+        typedef ::Pointer<ClanObject> Pointer;
     
-	ClanObject( );
-	virtual ~ClanObject( );
-	
+        ClanObject( );
+        virtual ~ClanObject( );
+        
 protected:
-	ClanArea::Pointer getClanArea( );
+        ClanArea::Pointer getClanArea( );
 
-	XML_VARIABLE XMLClanReference clan;
+        XML_VARIABLE XMLClanReference clan;
 };
 
 class ClanItem : public ClanObject {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanItem> Pointer;
+        typedef ::Pointer<ClanItem> Pointer;
     
-	ClanItem( );
+        ClanItem( );
 
-	virtual void get( Character *victim );
-	virtual bool sac( Character *victim );
-	virtual void give( Character *from, Character *to );
-	virtual bool area( );
-	virtual bool extract( bool );
+        virtual void get( Character *victim );
+        virtual bool sac( Character *victim );
+        virtual void give( Character *from, Character *to );
+        virtual bool area( );
+        virtual bool extract( bool );
 
-	virtual void actDisappear( );
+        virtual void actDisappear( );
 
 private:
-	bool isHolded( ) const;
+        bool isHolded( ) const;
 };
 
 class ClanAltar : public ClanObject {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanAltar> Pointer;
+        typedef ::Pointer<ClanAltar> Pointer;
     
-	ClanAltar( );
+        ClanAltar( );
 
-	virtual bool fetch( Character *ch, Object *item );
-	virtual void actAppear( );
-	virtual void actDisappear( );
-	virtual void actNotify( Character * );
+        virtual bool fetch( Character *ch, Object *item );
+        virtual void actAppear( );
+        virtual void actDisappear( );
+        virtual void actNotify( Character * );
 };
 
 #endif

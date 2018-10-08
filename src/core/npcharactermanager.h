@@ -24,25 +24,25 @@ class NPCharacter;
  */
 class NPCharacterManager : public OneAllocate
 {
-public:	
-	typedef ::Pointer<NPCharacterManager> Pointer;
-	typedef DLList<NPCharacter>	ExtractList;
+public:        
+        typedef ::Pointer<NPCharacterManager> Pointer;
+        typedef DLList<NPCharacter>        ExtractList;
 
 public:
-	NPCharacterManager( );
-	virtual ~NPCharacterManager( );
-	
-	static void extract( NPCharacter* ch );
-	static NPCharacter* getNPCharacter( );
-	
-	static inline NPCharacterManager* getThis( )
-	{
-		return thisClass;
-	}
+        NPCharacterManager( );
+        virtual ~NPCharacterManager( );
+        
+        static void extract( NPCharacter* ch );
+        static NPCharacter* getNPCharacter( );
+        
+        static inline NPCharacterManager* getThis( )
+        {
+                return thisClass;
+        }
 
 private:
-	static NPCharacterManager* thisClass;
-	static ExtractList extractList;
+        static NPCharacterManager* thisClass;
+        static ExtractList extractList;
 };
 
 #endif

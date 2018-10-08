@@ -35,7 +35,7 @@ public:
 
     virtual const DLString & getCategory( ) const
     {
-	return CATEGORY;
+        return CATEGORY;
     }
 
 protected:

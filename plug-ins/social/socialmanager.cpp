@@ -61,7 +61,7 @@ void SocialManager::destruction( )
 
 void SocialManager::putInto( )
 {
-    interp->put( this, CMDP_FIND, 20 );	
+    interp->put( this, CMDP_FIND, 20 );        
 }
 
 bool SocialManager::process( InterpretArguments &iargs )
@@ -70,17 +70,17 @@ bool SocialManager::process( InterpretArguments &iargs )
     DLString cmd = iargs.cmdName;
     
     if (!cmd.empty( ) && cmd.at( 0 ) == '*')
-	cmd.erase( 0, 1 );
-	
+        cmd.erase( 0, 1 );
+        
     for (e = elements.begin( ); e != elements.end( ); e++) {
-	Social *social = e->getStaticPointer<Social>( );
+        Social *social = e->getStaticPointer<Social>( );
 
-	if (social->matches( cmd )) {
-	    iargs.pCommand.setPointer( social );
-	    iargs.cmdName = cmd;
-	    iargs.advance( );
-	    break;
-	}
+        if (social->matches( cmd )) {
+            iargs.pCommand.setPointer( social );
+            iargs.cmdName = cmd;
+            iargs.advance( );
+            break;
+        }
     }
 
     return true;

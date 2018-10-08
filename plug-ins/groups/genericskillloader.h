@@ -17,11 +17,11 @@ public:
     
     virtual DLString getTableName( ) const
     {
-	return TABLE_NAME;
+        return TABLE_NAME;
     }
     virtual DLString getNodeName( ) const
     {
-	return NODE_NAME;
+        return NODE_NAME;
     }
     
 

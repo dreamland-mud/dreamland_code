@@ -19,7 +19,7 @@ void XMLDate::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType 
     XMLNode::Pointer node = parent->getFirstNode( );
 
     if (!node.isEmpty( )) 
-	setTime( Long( node->getCData( ) ) );
+        setTime( Long( node->getCData( ) ) );
 }
 
 bool XMLDate::toXML( XMLNode::Pointer& parent ) const
@@ -32,8 +32,8 @@ bool XMLDate::toXML( XMLNode::Pointer& parent ) const
 bool XMLDateNoEmpty::toXML( XMLNode::Pointer& parent ) const
 {
     if (getTime( ) <= 0)
-	return false;
+        return false;
     else
-	return XMLDate::toXML( parent );
+        return XMLDate::toXML( parent );
 }
 

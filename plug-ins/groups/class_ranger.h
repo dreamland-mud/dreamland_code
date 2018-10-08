@@ -21,7 +21,7 @@ public:
 };
 
 class RangerCreature : public SummonedCreature, 
-		       public SavedCreature,
+                       public SavedCreature,
                        public BasicMobileDestiny {
 XML_OBJECT
 public:

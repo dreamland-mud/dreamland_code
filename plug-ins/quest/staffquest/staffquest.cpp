@@ -30,12 +30,12 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     charName = pch->getName( );
 
     try {
-	scenName = StaffQuestRegistrator::getThis( )->getRandomScenario( pch );
-	eyed = createStaff( getRandomRoomClient( pch ) );
+        scenName = StaffQuestRegistrator::getThis( )->getRandomScenario( pch );
+        eyed = createStaff( getRandomRoomClient( pch ) );
     } 
     catch (const QuestCannotStartException &e) {
-	destroy( );
-	throw e;
+        destroy( );
+        throw e;
     }
 
     areaName = eyed->in_room->area->name;
@@ -46,12 +46,12 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman );
-    tell_raw( pch, questman, "Придворные волшебники определили, где спрятано украденное сокровище." );
-    tell_raw( pch, questman, "Тебе поручается доставить его мне!" );	
-    tell_raw( pch, questman, "Место, где оно спрятано, называется {W%s{G", roomName.c_str( ) );
-    tell_raw( pch, questman, "И находится это место в районе под названием - {W%s{G", areaName.c_str( ) );
-    tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s на выполнение задания.",
-		  time, GET_COUNT(time,"а","ы","") ); 
+    tell_raw( pch, questman, "п÷я─п╦п╢п╡п╬я─п╫я▀п╣ п╡п╬п╩я┬п╣п╠п╫п╦п╨п╦ п╬п©я─п╣п╢п╣п╩п╦п╩п╦, пЁп╢п╣ я│п©я─я▐я┌п╟п╫п╬ я┐п╨я─п╟п╢п╣п╫п╫п╬п╣ я│п╬п╨я─п╬п╡п╦я┴п╣." );
+    tell_raw( pch, questman, "п╒п╣п╠п╣ п©п╬я─я┐я┤п╟п╣я┌я│я▐ п╢п╬я│я┌п╟п╡п╦я┌я▄ п╣пЁп╬ п╪п╫п╣!" );        
+    tell_raw( pch, questman, "п°п╣я│я┌п╬, пЁп╢п╣ п╬п╫п╬ я│п©я─я▐я┌п╟п╫п╬, п╫п╟п╥я▀п╡п╟п╣я┌я│я▐ {W%s{G", roomName.c_str( ) );
+    tell_raw( pch, questman, "п≤ п╫п╟я┘п╬п╢п╦я┌я│я▐ я█я┌п╬ п╪п╣я│я┌п╬ п╡ я─п╟п╧п╬п╫п╣ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ - {W%s{G", areaName.c_str( ) );
+    tell_raw( pch, questman, "пё я┌п╣п╠я▐ п╣я│я┌я▄ {Y%d{G п╪п╦п╫я┐я┌%s п╫п╟ п╡я▀п©п╬п╩п╫п╣п╫п╦п╣ п╥п╟п╢п╟п╫п╦я▐.",
+                  time, GET_COUNT(time,"п╟","я▀","") ); 
     
     wiznet( scenName.c_str( ), "in room \"%s\" area \"%s\"", 
                                roomName.c_str( ), areaName.c_str( ) );
@@ -62,7 +62,7 @@ bool StaffQuest::isComplete( )
     PCharacter *ch = getHeroWorld( );
     
     if (!ch)
-	return false;
+        return false;
 
     return getItemList<StaffBehavior>( ch->carrying ) != NULL;
 }
@@ -77,21 +77,21 @@ Room * StaffQuest::helpLocation( )
 void StaffQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-	    << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+        buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ {Yп▓п╚п÷п·п⌡п²п∙п²п·{x!" << endl
+            << "п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪, п╢п╬ я┌п╬пЁп╬ п╨п╟п╨ п╡я▀п╧п╢п╣я┌ п╡я─п╣п╪я▐!" << endl;
     else 
-	buf << "У тебя задание - вернуть " << russian_case( objName.getValue( ), '4' ) << "." << endl
-	    << "Место, где он спрятан, называется " << roomName << "." << endl
-	    << "И находится это место в районе под названием " << areaName << endl;
+        buf << "пё я┌п╣п╠я▐ п╥п╟п╢п╟п╫п╦п╣ - п╡п╣я─п╫я┐я┌я▄ " << russian_case( objName.getValue( ), '4' ) << "." << endl
+            << "п°п╣я│я┌п╬, пЁп╢п╣ п╬п╫ я│п©я─я▐я┌п╟п╫, п╫п╟п╥я▀п╡п╟п╣я┌я│я▐ " << roomName << "." << endl
+            << "п≤ п╫п╟я┘п╬п╢п╦я┌я│я▐ я█я┌п╬ п╪п╣я│я┌п╬ п╡ я─п╟п╧п╬п╫п╣ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ " << areaName << endl;
 }
 
 void StaffQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "Вернуться к квестору за наградой.";
+        buf << "п▓п╣я─п╫я┐я┌я▄я│я▐ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ п╫п╟пЁя─п╟п╢п╬п╧.";
     else 
-        buf << "Доставить квестору " << russian_case( objName.getValue( ), '4' ) << " из "
-	    << roomName << " (" << areaName << ").";
+        buf << "п■п╬я│я┌п╟п╡п╦я┌я▄ п╨п╡п╣я│я┌п╬я─я┐ " << russian_case( objName.getValue( ), '4' ) << " п╦п╥ "
+            << roomName << " (" << areaName << ").";
 }
 
 Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman ) 
@@ -99,23 +99,23 @@ Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman
     Reward::Pointer r( NEW );
 
     if (hint.getValue( )) {
-	r->gold = number_range( 1, 2 );
-	r->points = number_range( 1, 4 );
+        r->gold = number_range( 1, 2 );
+        r->points = number_range( 1, 4 );
     }
     else {
-	r->gold = number_range( 5, 10 );
-	r->points = number_range( 5, 10 );
-	r->wordChance = 2 * r->points;
-	r->scrollChance = number_range( 3, 7 );
+        r->gold = number_range( 5, 10 );
+        r->points = number_range( 5, 10 );
+        r->wordChance = 2 * r->points;
+        r->scrollChance = number_range( 3, 7 );
 
-	if (chance( 10 ))
-	    r->prac = 1;
+        if (chance( 10 ))
+            r->prac = 1;
     }
     
     r->exp = (r->points + r->clanpoints) * 10;
 
-    act_p("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR, POS_RESTING);
-    act_p("$c1 передает $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM, POS_RESTING);
+    act_p("п╒я▀ п©п╣я─п╣п╢п╟п╣я┬я▄ $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR, POS_RESTING);
+    act_p("$c1 п©п╣я─п╣п╢п╟п╣я┌ $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM, POS_RESTING);
 
     return Reward::Pointer( r );
 }
@@ -128,13 +128,13 @@ void StaffQuest::destroy( )
 bool StaffQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
     if (room->area->high_range + 20 < pch->getModifyLevel( ))
-	return false;
+        return false;
 
     if (IS_WATER(room) || room->sector_type == SECT_AIR)
-	return false;
+        return false;
 
     if (!ItemQuestModel::checkRoomClient( pch, room ))
-	return false;
+        return false;
 
     return true;
 }
@@ -165,10 +165,10 @@ bool StaffScenario::applicable( PCharacter *pch )
 void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman )
 {
     if (msg.empty( ))
-	tell_raw( pch, questman, "Из королевской сокровищницы похитили {W%s{G!", 
-	          shortDesc.ruscase( '4' ).c_str( ) );
+        tell_raw( pch, questman, "п≤п╥ п╨п╬я─п╬п╩п╣п╡я│п╨п╬п╧ я│п╬п╨я─п╬п╡п╦я┴п╫п╦я├я▀ п©п╬я┘п╦я┌п╦п╩п╦ {W%s{G!", 
+                  shortDesc.ruscase( '4' ).c_str( ) );
     else
-	tell_raw( pch, questman, msg.c_str( ) );
+        tell_raw( pch, questman, msg.c_str( ) );
 }
 
 /*

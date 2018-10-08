@@ -46,32 +46,32 @@ DLString Flexer::flexAux(const DLString &str, int part_num, bool fNeedRoot, bool
     iPhase = PHASE_COPYTOBUF;
 
     for (size_t cnt = 0; cnt < str.size(); cnt++) {
-	tempchar = str.at(cnt); 
-	
-	if (isWordDelimiter(tempchar))
-	    iPhase=PHASE_COPYTOBUF; /* reset */
+        tempchar = str.at(cnt); 
+        
+        if (isWordDelimiter(tempchar))
+            iPhase=PHASE_COPYTOBUF; /* reset */
 
-	if (iPhase != PHASE_FINDNEED)
-	    case_counter = part_num;
+        if (iPhase != PHASE_FINDNEED)
+            case_counter = part_num;
 
-	if (isFlexDelimiter(tempchar)) {
-	    if (iPhase == PHASE_COPYEND)
-		iPhase=PHASE_FINDNEXT;
+        if (isFlexDelimiter(tempchar)) {
+            if (iPhase == PHASE_COPYEND)
+                iPhase=PHASE_FINDNEXT;
 
-	    if (iPhase == PHASE_COPYTOBUF)
-		iPhase=PHASE_FINDNEED;
+            if (iPhase == PHASE_COPYTOBUF)
+                iPhase=PHASE_FINDNEED;
 
-	    if (iPhase == PHASE_FINDNEED) {
-		case_counter--;
-		if (case_counter <= 0)
-		    iPhase = PHASE_COPYEND;
-	    }
-	}
-	else if ((iPhase == PHASE_COPYEND && fNeedEnding)
-	         || (iPhase == PHASE_COPYTOBUF && fNeedRoot)) 
-	{
-	    buf << tempchar;
-	}
+            if (iPhase == PHASE_FINDNEED) {
+                case_counter--;
+                if (case_counter <= 0)
+                    iPhase = PHASE_COPYEND;
+            }
+        }
+        else if ((iPhase == PHASE_COPYEND && fNeedEnding)
+                 || (iPhase == PHASE_COPYTOBUF && fNeedRoot)) 
+        {
+            buf << tempchar;
+        }
     }
 
     return buf.str();

@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "ghost.h"
@@ -33,12 +33,12 @@ GSN(dispel_affects);
  *-------------------------------------------------------------------------*/
 void ClanGuardGhost::actGreet( PCharacter *wch )
 {
-    do_say(ch, "ðÒÉ×ÅÔÓÔ×ÕÀ ÔÅÂÑ, ÐÏÌÁÇÁÀÝÉÊÓÑ ÎÁ úÎÁÎÉÑ.");
+    do_say(ch, "ÐŸÑ€Ð¸Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÑŽ Ñ‚ÐµÐ±Ñ, Ð¿Ð¾Ð»Ð°Ð³Ð°ÑŽÑ‰Ð¸Ð¹ÑÑ Ð½Ð° Ð—Ð½Ð°Ð½Ð¸Ñ.");
 }
 void ClanGuardGhost::actPush( PCharacter *wch )
 {
-    act( "$C1 ÂÒÏÓÁÅÔ ÎÁ ÔÅÂÑ ÍÉÍÏÌÅÔÎÙÊ ×ÚÇÌÑÄ.\n\ré ÔÕÔ ÖÅ ÔÙ ÞÕ×ÓÔ×ÕÅÛØ, ËÁË ÎÅËÁÑ ÍÁÇÉÞÅÓËÁÑ ÓÉÌÁ ×ÙÛ×ÙÒÉ×ÁÅÔ ÔÅÂÑ ×ÏÎ.", wch, 0, ch, TO_CHAR );
-    act( "$C1 ÂÒÏÓÁÅÔ ÎÁ $c4 ÍÉÍÏÌÅÔÎÙÊ ×ÚÇÌÑÄ É $c1 ÍÇÎÏ×ÅÎÎÏ ÉÓÞÅÚÁÅÔ.", wch, 0, ch, TO_ROOM );
+    act( "$C1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ Ð½Ð° Ñ‚ÐµÐ±Ñ Ð¼Ð¸Ð¼Ð¾Ð»ÐµÑ‚Ð½Ñ‹Ð¹ Ð²Ð·Ð³Ð»ÑÐ´.\n\rÐ˜ Ñ‚ÑƒÑ‚ Ð¶Ðµ Ñ‚Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ, ÐºÐ°Ðº Ð½ÐµÐºÐ°Ñ Ð¼Ð°Ð³Ð¸Ñ‡ÐµÑÐºÐ°Ñ ÑÐ¸Ð»Ð° Ð²Ñ‹ÑˆÐ²Ñ‹Ñ€Ð¸Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð²Ð¾Ð½.", wch, 0, ch, TO_CHAR );
+    act( "$C1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ Ð½Ð° $c4 Ð¼Ð¸Ð¼Ð¾Ð»ÐµÑ‚Ð½Ñ‹Ð¹ Ð²Ð·Ð³Ð»ÑÐ´ Ð¸ $c1 Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð½Ð¾ Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardGhost::getCast( Character *victim )
 {
@@ -46,9 +46,9 @@ int ClanGuardGhost::getCast( Character *victim )
     
     switch ( dice(1,20) ) {
     case  0: 
-	if (!victim->isAffected( gsn_spellbane ))
-	    sn = gsn_dispel_affects;
-	break;
+        if (!victim->isAffected( gsn_spellbane ))
+            sn = gsn_dispel_affects;
+        break;
     case  1: sn = gsn_blindness;      break;
     case  2: sn = gsn_weaken;         break;
     case  3: sn = gsn_blindness;      break;
@@ -58,12 +58,12 @@ int ClanGuardGhost::getCast( Character *victim )
     case  7:
     case  8:
     case  9: sn = gsn_acid_blast;       break;
-    case 10: sn = gsn_plague;	   break;
+    case 10: sn = gsn_plague;           break;
     case 11: sn = gsn_acid_blast;         break;
     case 12:
     case 13: sn = gsn_lightning_breath;  break;
     case 14:
-    case 15: sn = gsn_acid_blast;	break;
+    case 15: sn = gsn_acid_blast;        break;
     default: sn = -1;     break;
     }
     
@@ -73,10 +73,10 @@ int ClanGuardGhost::getCast( Character *victim )
 bool ClanGuardGhost::spec_cast( Character *victim )
 {
     return ::spell( getCast( victim ), 
-	            ch->getRealLevel( ), 
-		    ch, 
-		    victim, 
-		    FSPELL_VERBOSE | FSPELL_BANE );
+                    ch->getRealLevel( ), 
+                    ch, 
+                    victim, 
+                    FSPELL_VERBOSE | FSPELL_BANE );
 }
 
 

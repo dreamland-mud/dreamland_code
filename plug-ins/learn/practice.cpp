@@ -33,16 +33,16 @@ COMMAND(CPractice, "practice")
     DLString argument = constArguments;
 
     if (ch->is_npc( ))
-	return;
-	
+        return;
+        
     if (argument.empty( ) || arg_is_all( argument ))
-	pracShow( ch->getPC( ), true, false );
-    else if (arg_oneof_strict( argument, "now", "сейчас" ))
-	pracShow( ch->getPC( ), true, true );
-    else if (arg_oneof_strict( argument, "here", "здесь" ))
+        pracShow( ch->getPC( ), true, false );
+    else if (arg_oneof_strict( argument, "now", "я│п╣п╧я┤п╟я│" ))
+        pracShow( ch->getPC( ), true, true );
+    else if (arg_oneof_strict( argument, "here", "п╥п╢п╣я│я▄" ))
         pracHere( ch->getPC( ) );
     else
-	pracLearn( ch->getPC( ), argument );
+        pracLearn( ch->getPC( ), argument );
 }
 
 struct PracInfo {
@@ -56,23 +56,23 @@ struct PracInfo {
 
     inline const char * getNameColor( ) const
     {
-	if (forgetting)
-	    return "{r";
-	else
-	    return "{x";
+        if (forgetting)
+            return "{r";
+        else
+            return "{x";
     }
     inline const char * getPercentColor( ) const
     {
-	if (percent == 1)
-	    return "{R";
-	else if (percent >= maximum)
-	    return "{C";
-	else if (percent >= adept + parentAdept)
-	    return "{c";
-	else if (percent > adept)
-	    return "{m";
-	else
-	    return "{x";
+        if (percent == 1)
+            return "{R";
+        else if (percent >= maximum)
+            return "{C";
+        else if (percent >= adept + parentAdept)
+            return "{c";
+        else if (percent > adept)
+            return "{m";
+        else
+            return "{x";
     }
 };
 
@@ -91,85 +91,85 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
     bool fRussian = ch->getConfig( )->ruskills;
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	category = skill->getCategory( );
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        category = skill->getCategory( );
 
-	if (!skill->available( ch ))
-	    continue;
-	
-	if (!skill->usable( ch, false ) && fUsableOnly)
-	    continue;
+        if (!skill->available( ch ))
+            continue;
+        
+        if (!skill->usable( ch, false ) && fUsableOnly)
+            continue;
 
-	if (skill->getSpell( ) 
-		&& skill->getSpell( )->isCasted( ) 
-		&& ch->getClan( ) == clan_battlerager)
-	    continue;
+        if (skill->getSpell( ) 
+                && skill->getSpell( )->isCasted( ) 
+                && ch->getClan( ) == clan_battlerager)
+            continue;
 
-	PCSkillData &data = ch->getSkillData( sn );
-	
-	if (data.learned <= 1 && !fAll)
-	    continue;
-	
-	info.percent = data.learned;
-	info.weight = skill->getWeight( ch );
-	info.forgetting = data.forgetting;
-	info.name = skill->getNameFor( ch );
-	info.adept = skill->getAdept( ch );
-	info.parentAdept = ch->getProfession( )->getParentAdept( );
-	info.maximum = skill->getMaximum( ch );
+        PCSkillData &data = ch->getSkillData( sn );
+        
+        if (data.learned <= 1 && !fAll)
+            continue;
+        
+        info.percent = data.learned;
+        info.weight = skill->getWeight( ch );
+        info.forgetting = data.forgetting;
+        info.name = skill->getNameFor( ch );
+        info.adept = skill->getAdept( ch );
+        info.parentAdept = ch->getProfession( )->getParentAdept( );
+        info.maximum = skill->getMaximum( ch );
 
-	cm_iter = cmap.find( category );
+        cm_iter = cmap.find( category );
 
-	if (cm_iter == cmap.end( )) {
-	    PracInfoList list;
+        if (cm_iter == cmap.end( )) {
+            PracInfoList list;
 
-	    list.push_back( info );
-	    cmap[category] = list;
-	    
-	} else
-	    cm_iter->second.push_back( info );
+            list.push_back( info );
+            cmap[category] = list;
+            
+        } else
+            cm_iter->second.push_back( info );
     }
 
     const char *pattern = (fRussian ? "%s%-27s %s%3d%%{x" : "%s%-16s%s%3d%%{x");
     const int columns = (fRussian ? 2 : 3);
 
     for (cm_iter = cmap.begin( ); cm_iter != cmap.end( ); cm_iter++) {
-	unsigned int i;
-	
-	category = cm_iter->first;
-	category.upperFirstCharacter( );
-	buf << category << ":" << endl;
-	
-	for (i = 0; i < cm_iter->second.size( ); i++) {
-	    info = cm_iter->second[i];
-	     
-	    buf << dlprintf( pattern,
-	                      info.getNameColor( ), 
-	                      info.name.c_str( ),
-			      info.getPercentColor( ),
-			      info.percent );    	        	    
-#if 0	    
-	    if (info.weight > 0)
-		buf << "*{c" << info.weight / 10 << "." << info.weight % 10 << "{x ";
-	    else
+        unsigned int i;
+        
+        category = cm_iter->first;
+        category.upperFirstCharacter( );
+        buf << category << ":" << endl;
+        
+        for (i = 0; i < cm_iter->second.size( ); i++) {
+            info = cm_iter->second[i];
+             
+            buf << dlprintf( pattern,
+                              info.getNameColor( ), 
+                              info.name.c_str( ),
+                              info.getPercentColor( ),
+                              info.percent );                                
+#if 0            
+            if (info.weight > 0)
+                buf << "*{c" << info.weight / 10 << "." << info.weight % 10 << "{x ";
+            else
 #endif                
-		buf << "     ";
-	    
-	    if ((i + 1) % columns == 0)
-		buf << endl;
-	}
+                buf << "     ";
+            
+            if ((i + 1) % columns == 0)
+                buf << endl;
+        }
 
-	if (i % columns)
-	    buf << endl;
-	    
-	buf << endl;
+        if (i % columns)
+            buf << endl;
+            
+        buf << endl;
     }
     
-    buf << dlprintf( "У тебя %d сесси%s практики (practice).\n\r",
-                 ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
+    buf << dlprintf( "пё я┌п╣п╠я▐ %d я│п╣я│я│п╦%s п©я─п╟п╨я┌п╦п╨п╦ (practice).\n\r",
+                 ch->practice.getValue( ), GET_COUNT(ch->practice, "я▐","п╦","п╧") );
 #if 0    
     if ((sp = ch->skill_points( )) > 0)
-	buf << "{cУ тебя " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
+        buf << "{cпё я┌п╣п╠я▐ " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
 #endif
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -182,18 +182,18 @@ void CPractice::pracHere( PCharacter *ch )
     bool found = false;
 
     if (!( teacher = findTeacher( ch ) ))
-	if (!( teacher = findPracticer( ch ) )) {
-            ch->println("Тебе не с кем практиковаться здесь.");
-	    return;
+        if (!( teacher = findPracticer( ch ) )) {
+            ch->println("п╒п╣п╠п╣ п╫п╣ я│ п╨п╣п╪ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄я│я▐ п╥п╢п╣я│я▄.");
+            return;
         }
 
-    buf << fmt( ch, "%1$^C1 может научить тебя таким навыкам:", teacher ) << endl;
+    buf << fmt( ch, "%1$^C1 п╪п╬п╤п╣я┌ п╫п╟я┐я┤п╦я┌я▄ я┌п╣п╠я▐ я┌п╟п╨п╦п╪ п╫п╟п╡я▀п╨п╟п╪:", teacher ) << endl;
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         ostringstream errbuf;
-	Skill *skill = SkillManager::getThis( )->find( sn );
+        Skill *skill = SkillManager::getThis( )->find( sn );
 
-	if (!skill->available( ch ) || !skill->canPractice( ch, errbuf ))
-	    continue;
+        if (!skill->available( ch ) || !skill->canPractice( ch, errbuf ))
+            continue;
 
         if (ch->getSkillData( sn ).learned >= skill->getAdept( ch ))
             continue;
@@ -212,7 +212,7 @@ void CPractice::pracHere( PCharacter *ch )
     if (found) 
         page_to_char( buf.str( ).c_str( ), ch );
     else
-        ch->pecho("Тебе нечему научиться у %C2.", teacher );
+        ch->pecho("п╒п╣п╠п╣ п╫п╣я┤п╣п╪я┐ п╫п╟я┐я┤п╦я┌я▄я│я▐ я┐ %C2.", teacher );
 }
 
 void CPractice::pracLearn( PCharacter *ch, DLString &arg )
@@ -224,30 +224,30 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     ostringstream buf;
 
     if (!IS_AWAKE( ch )) {
-	ch->send_to( "Во сне или как?\n\r");
-	return;
+        ch->send_to( "п▓п╬ я│п╫п╣ п╦п╩п╦ п╨п╟п╨?\n\r");
+        return;
     }
 
     sn = skillManager->unstrictLookup( arg, ch );
     skill = skillManager->find( sn );
 
     if (!skill) {
-        ch->printf("Умение %s не существует или еще тебе не доступно.\r\n", arg.c_str());
-	return;
+        ch->printf("пёп╪п╣п╫п╦п╣ %s п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п╦п╩п╦ п╣я┴п╣ я┌п╣п╠п╣ п╫п╣ п╢п╬я│я┌я┐п©п╫п╬.\r\n", arg.c_str());
+        return;
     }
 
     if (!skill->canPractice( ch, buf )) {
-	ch->send_to( buf );
-	return;
+        ch->send_to( buf );
+        return;
     }
     
     if (!( teacher = findTeacher( ch, skill ) ))
-	if (!( teacher = findPracticer( ch, skill ) ))
-	    return;
+        if (!( teacher = findPracticer( ch, skill ) ))
+            return;
 
     if (ch->practice <= 0) {
-	ch->send_to( "У тебя нет сессий практики (practice).\n\r");
-	return;
+        ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я│п╣я│я│п╦п╧ п©я─п╟п╨я┌п╦п╨п╦ (practice).\n\r");
+        return;
     }
 
     int &learned = ch->getSkillData( skill->getIndex( ) ).learned;
@@ -256,23 +256,23 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     sname = skill->getNameFor( ch ).c_str( );
 
     if (learned >= adept) {
-	ch->printf( "Ты уже знаешь искусство '%s'.\r\n", sname );
-	return;
+        ch->printf( "п╒я▀ я┐п╤п╣ п╥п╫п╟п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬ '%s'.\r\n", sname );
+        return;
     }
 
     ch->practice--;
     
     skill->practice( ch );
 
-    act("$c1 обучает тебя искусству '$t'.", teacher, sname, ch, TO_VICT);
-    act("Ты обучаешь $C4 искусству '$t'.", teacher, sname, ch, TO_CHAR);
-    act("$c1 обучает $C4 искусству '$t'.", teacher, sname, ch, TO_NOTVICT);
+    act("$c1 п╬п╠я┐я┤п╟п╣я┌ я┌п╣п╠я▐ п╦я│п╨я┐я│я│я┌п╡я┐ '$t'.", teacher, sname, ch, TO_VICT);
+    act("п╒я▀ п╬п╠я┐я┤п╟п╣я┬я▄ $C4 п╦я│п╨я┐я│я│я┌п╡я┐ '$t'.", teacher, sname, ch, TO_CHAR);
+    act("$c1 п╬п╠я┐я┤п╟п╣я┌ $C4 п╦я│п╨я┐я│я│я┌п╡я┐ '$t'.", teacher, sname, ch, TO_NOTVICT);
     
     if (learned < adept)
-	ch->printf( "Ты теперь знаешь '%s' на %d процентов.\n\r", sname, learned );
+        ch->printf( "п╒я▀ я┌п╣п©п╣я─я▄ п╥п╫п╟п╣я┬я▄ '%s' п╫п╟ %d п©я─п╬я├п╣п╫я┌п╬п╡.\n\r", sname, learned );
     else {
-	act_p("Ты теперь знаешь '$t'.",ch, sname, 0, TO_CHAR, POS_RESTING);
-	act_p("$c1 теперь знает '$t'.",ch, sname, 0, TO_ROOM, POS_RESTING);
+        act_p("п╒я▀ я┌п╣п©п╣я─я▄ п╥п╫п╟п╣я┬я▄ '$t'.",ch, sname, 0, TO_CHAR, POS_RESTING);
+        act_p("$c1 я┌п╣п©п╣я─я▄ п╥п╫п╟п╣я┌ '$t'.",ch, sname, 0, TO_ROOM, POS_RESTING);
     }
 }
 
@@ -282,21 +282,21 @@ PCharacter * CPractice::findTeacher( PCharacter *ch, Skill *skill )
     PCharacter *teacher;
     
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
-	if (rch->is_npc( ) || rch == ch)
-	    continue;
-	
-	teacher = rch->getPC( );
-	
-	if (teacher->getRealLevel( ) < HERO - 1)
-	    continue;
+        if (rch->is_npc( ) || rch == ch)
+            continue;
+        
+        teacher = rch->getPC( );
+        
+        if (teacher->getRealLevel( ) < HERO - 1)
+            continue;
 
-	if (!teacher->getAttributes( ).isAvailable( "teacher" ))
-	    continue;
-	
-	if (skill && skill->getEffective( teacher ) < 100)
-	    continue;
+        if (!teacher->getAttributes( ).isAvailable( "teacher" ))
+            continue;
+        
+        if (skill && skill->getEffective( teacher ) < 100)
+            continue;
 
-	return teacher;
+        return teacher;
     }
     
     return NULL;
@@ -309,8 +309,8 @@ NPCharacter * CPractice::findPracticer( PCharacter *ch, Skill *skill )
     mob = find_attracted_mob( ch, OCC_PRACTICER );
 
     if (!skill || skill->canTeach( mob, ch )) 
-	return mob;
+        return mob;
     else
-	return NULL;
+        return NULL;
 }
 

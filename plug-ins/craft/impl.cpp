@@ -20,14 +20,14 @@ class CraftProfessionRegistrator : public Plugin {
 public:
     virtual void initialization( )
     {
-	Class::regXMLVar<CraftProfessionHelp>( );
-	Class::regMoc<CraftProfession>( );
+        Class::regXMLVar<CraftProfessionHelp>( );
+        Class::regMoc<CraftProfession>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregXMLVar<CraftProfessionHelp>( );
-	Class::unregMoc<CraftProfession>( );
+        Class::unregXMLVar<CraftProfessionHelp>( );
+        Class::unregMoc<CraftProfession>( );
     }
 };
 
@@ -35,18 +35,18 @@ public:
 extern "C"
 {
     SO::PluginList initialize_craft( ) {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<CraftProfessionManager>( ppl );
-	Plugin::registerPlugin<CraftProfessionRegistrator>( ppl );
-	Plugin::registerPlugin<CraftProfessionLoader>( ppl );
-	Plugin::registerPlugin<MocRegistrator<CraftSkill> >( ppl );
-	Plugin::registerPlugin<CraftSkillLoader>( ppl );
-	Plugin::registerPlugin<MocRegistrator<CraftTattooWearloc> >( ppl );
-	Plugin::registerPlugin<CraftWearlocLoader>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCraft> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<CraftProfessionManager>( ppl );
+        Plugin::registerPlugin<CraftProfessionRegistrator>( ppl );
+        Plugin::registerPlugin<CraftProfessionLoader>( ppl );
+        Plugin::registerPlugin<MocRegistrator<CraftSkill> >( ppl );
+        Plugin::registerPlugin<CraftSkillLoader>( ppl );
+        Plugin::registerPlugin<MocRegistrator<CraftTattooWearloc> >( ppl );
+        Plugin::registerPlugin<CraftWearlocLoader>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCraft> >( ppl );
+        
+        return ppl;
     }
 }
 

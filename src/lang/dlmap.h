@@ -6,16 +6,16 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef	DLMAP_H
+#ifndef        DLMAP_H
 #define DLMAP_H
 
 #include <map>
 
 /**
  * @author Igor S. Petrenko
- * @short Расширенный класс map
- * Добавлены методы для удаления элементов, для которых нужно
- * вызвать delete
+ * @short п═п╟я│я┬п╦я─п╣п╫п╫я▀п╧ п╨п╩п╟я│я│ map
+ * п■п╬п╠п╟п╡п╩п╣п╫я▀ п╪п╣я┌п╬п╢я▀ п╢п╩я▐ я┐п╢п╟п╩п╣п╫п╦я▐ я█п╩п╣п╪п╣п╫я┌п╬п╡, п╢п╩я▐ п╨п╬я┌п╬я─я▀я┘ п╫я┐п╤п╫п╬
+ * п╡я▀п╥п╡п╟я┌я▄ delete
  */
 template<typename Key, class Value, class Compare=std::less<Key> >
 class DLMap : public std::map<Key, Value*, Compare>
@@ -37,24 +37,24 @@ public:
 template<typename Key, typename Value, typename Compare>
 void DLMap<Key, Value, Compare>::erase_delete( iterator begin, iterator end )
 {
-	for( iterator pos = begin; pos != end; pos++ )
-	{
-		delete( pos->second );
-	}
-	erase( begin, end );
+        for( iterator pos = begin; pos != end; pos++ )
+        {
+                delete( pos->second );
+        }
+        erase( begin, end );
 }
 
 template<typename Key, typename Value, typename Compare>
 void DLMap<Key, Value, Compare>::erase_delete( iterator position )
 {
-	delete( position->second );
-	erase( position );
+        delete( position->second );
+        erase( position );
 }
 
 template<typename Key, typename Value, typename Compare>
 void DLMap<Key, Value, Compare>::clear_delete( )
 {
-	erase_delete( begin( ), end( ) );
+        erase_delete( begin( ), end( ) );
 }
 
 #endif

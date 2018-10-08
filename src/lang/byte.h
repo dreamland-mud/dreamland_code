@@ -22,48 +22,48 @@
 class Byte
 {
 public:
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-public:	
-	/** По умолчанию значение 0 */
-	inline Byte( ) : value( 0 )
-	{
-	}
+public:        
+        /** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
+        inline Byte( ) : value( 0 )
+        {
+        }
 
-	inline Byte( unsigned char value ) : value( value )
-	{
-	}
+        inline Byte( unsigned char value ) : value( value )
+        {
+        }
 
-	inline Byte( const DLString& value ) throw( ExceptionBadType )
-	{
-		fromString( value );
-	}
-	
-	DLString toString( ) const throw( );
-	void fromString( const DLString& value ) throw( ExceptionBadType );
-	
-	inline unsigned char getValue( ) const
-	{
-		return value;
-	}
+        inline Byte( const DLString& value ) throw( ExceptionBadType )
+        {
+                fromString( value );
+        }
+        
+        DLString toString( ) const throw( );
+        void fromString( const DLString& value ) throw( ExceptionBadType );
+        
+        inline unsigned char getValue( ) const
+        {
+                return value;
+        }
 
-	inline void setValue( unsigned char value )
-	{
-		this->value = value;
-	}
+        inline void setValue( unsigned char value )
+        {
+                this->value = value;
+        }
 
 private:
-	unsigned char value;
+        unsigned char value;
 };
 
 
 
 
-/** Вывод в ostream типа Byte */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Byte */
 inline std::ostream& operator << ( std::ostream& ostr, const Byte& byte )
 {
-	ostr << byte.getValue( );
-	return ostr;
+        ostr << byte.getValue( );
+        return ostr;
 }
 
 #endif

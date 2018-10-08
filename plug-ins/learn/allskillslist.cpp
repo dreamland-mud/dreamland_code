@@ -60,37 +60,37 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         fShowHint = true;
     }
 
-    if (arg_oneof( arg1, "help", "?", "помощь", "справка" )) {
-        DLString what = fSpells ? "заклинания" : "умения";
+    if (arg_oneof( arg1, "help", "?", "п©п╬п╪п╬я┴я▄", "я│п©я─п╟п╡п╨п╟" )) {
+        DLString what = fSpells ? "п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐" : "я┐п╪п╣п╫п╦я▐";
         if (ch->getProfession( ) == prof_universal) 
             buf 
-            << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: все доступные сейчас у выбранной профессии "  << what << endl;
+            << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: п╡я│п╣ п╢п╬я│я┌я┐п©п╫я▀п╣ я│п╣п╧я┤п╟я│ я┐ п╡я▀п╠я─п╟п╫п╫п╬п╧ п©я─п╬я└п╣я│я│п╦п╦ "  << what << endl;
         else            
             buf 
-            << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: все доступные на этом уровне "  << what << endl;
+            << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: п╡я│п╣ п╢п╬я│я┌я┐п©п╫я▀п╣ п╫п╟ я█я┌п╬п╪ я┐я─п╬п╡п╫п╣ "  << what << endl;
 
-        buf << "        {y{lR" << rcmd << " все{lE" << cmd << " all{lx{w: доступные на всех уровнях "  << what << endl;
+        buf << "        {y{lR" << rcmd << " п╡я│п╣{lE" << cmd << " all{lx{w: п╢п╬я│я┌я┐п©п╫я▀п╣ п╫п╟ п╡я│п╣я┘ я┐я─п╬п╡п╫я▐я┘ "  << what << endl;
 
         if (ch->getProfession( ) == prof_universal) 
             buf 
-            << "        {y{lR" << rcmd << " текущ{lE" << cmd << " curr{lx{w: доступные на всех уровнях у выбранной профессии" << endl;
+            << "        {y{lR" << rcmd << " я┌п╣п╨я┐я┴{lE" << cmd << " curr{lx{w: п╢п╬я│я┌я┐п©п╫я▀п╣ п╫п╟ п╡я│п╣я┘ я┐я─п╬п╡п╫я▐я┘ я┐ п╡я▀п╠я─п╟п╫п╫п╬п╧ п©я─п╬я└п╣я│я│п╦п╦" << endl;
 
-        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <уровень>{w: " << what << ", которые появятся на этом уровне" << endl;
-        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <уровень1> <уровень2>{w: " << what << ", которые появятся на этом диапазоне уровней" << endl;
-        buf << "        {y{lR" << rcmd << " сорт имя|уровень|изучено{lE" << cmd << " sort name|level|learned{lx{w: сортировать " << what << endl;
-        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <название группы>{w: все " << what << " из этой группы" << endl
+        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <я┐я─п╬п╡п╣п╫я▄>{w: " << what << ", п╨п╬я┌п╬я─я▀п╣ п©п╬я▐п╡я▐я┌я│я▐ п╫п╟ я█я┌п╬п╪ я┐я─п╬п╡п╫п╣" << endl;
+        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <я┐я─п╬п╡п╣п╫я▄1> <я┐я─п╬п╡п╣п╫я▄2>{w: " << what << ", п╨п╬я┌п╬я─я▀п╣ п©п╬я▐п╡я▐я┌я│я▐ п╫п╟ я█я┌п╬п╪ п╢п╦п╟п©п╟п╥п╬п╫п╣ я┐я─п╬п╡п╫п╣п╧" << endl;
+        buf << "        {y{lR" << rcmd << " я│п╬я─я┌ п╦п╪я▐|я┐я─п╬п╡п╣п╫я▄|п╦п╥я┐я┤п╣п╫п╬{lE" << cmd << " sort name|level|learned{lx{w: я│п╬я─я┌п╦я─п╬п╡п╟я┌я▄ " << what << endl;
+        buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <п╫п╟п╥п╡п╟п╫п╦п╣ пЁя─я┐п©п©я▀>{w: п╡я│п╣ " << what << " п╦п╥ я█я┌п╬п╧ пЁя─я┐п©п©я▀" << endl
             << "" << endl
-            << "См. также {W{lR? умения{lE? skills{lx{w, {W{lR? группаумений{lE? glist{lx{w." << endl;
+            << "п║п╪. я┌п╟п╨п╤п╣ {W{lR? я┐п╪п╣п╫п╦я▐{lE? skills{lx{w, {W{lR? пЁя─я┐п©п©п╟я┐п╪п╣п╫п╦п╧{lE? glist{lx{w." << endl;
 
         return false;
     }
 
     if (arg_is_all( arg1 )) {
     }
-    else if (arg_oneof_strict( arg1, "now", "сейчас" )) {
+    else if (arg_oneof_strict( arg1, "now", "я│п╣п╧я┤п╟я│" )) {
         fUsableOnly = true;
     }
-    else if (arg_oneof( arg1, "current", "текущие" )) {
+    else if (arg_oneof( arg1, "current", "я┌п╣п╨я┐я┴п╦п╣" )) {
         fCurrentProfAll = true;
     }
     else if (arg1.isNumber( )) {
@@ -99,7 +99,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
             
             if (!arg2.empty( )) {
                 if (!arg2.isNumber( )) {
-                    buf << "Неправильный диапазон уровней." << endl;
+                    buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╢п╦п╟п©п╟п╥п╬п╫ я┐я─п╬п╡п╫п╣п╧." << endl;
                     return false;
                 }
 
@@ -109,29 +109,29 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
                 levHigh = levLow;
         }
         catch (const ExceptionBadType &e) {
-            buf << "Неправильный диапазон уровней." << endl;
+            buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╢п╦п╟п©п╟п╥п╬п╫ я┐я─п╬п╡п╫п╣п╧." << endl;
             return false;
         }
     }
-    else if (arg_oneof( arg1, "sortby", "сортировать" )) {
+    else if (arg_oneof( arg1, "sortby", "я│п╬я─я┌п╦я─п╬п╡п╟я┌я▄" )) {
         if (arg2.empty( )) {
-            buf << "Укажите критерий сортировки ('{lEname{lRимя{lx', '{lElevel{lRуровень{lx' или '{lElearned{lRизучено{lx')." << endl;
+            buf << "пёп╨п╟п╤п╦я┌п╣ п╨я─п╦я┌п╣я─п╦п╧ я│п╬я─я┌п╦я─п╬п╡п╨п╦ ('{lEname{lRп╦п╪я▐{lx', '{lElevel{lRя┐я─п╬п╡п╣п╫я▄{lx' п╦п╩п╦ '{lElearned{lRп╦п╥я┐я┤п╣п╫п╬{lx')." << endl;
             return false;
         }
         
-        if (arg_oneof( arg2, "name", "имя" ))
+        if (arg_oneof( arg2, "name", "п╦п╪я▐" ))
             criteria = SkillInfo::cmp_by_name;
-        else if (arg_oneof( arg2, "level", "уровень" ))
+        else if (arg_oneof( arg2, "level", "я┐я─п╬п╡п╣п╫я▄" ))
             criteria = SkillInfo::cmp_by_level;
-        else if (arg_oneof( arg2, "learned", "изучено" ))
+        else if (arg_oneof( arg2, "learned", "п╦п╥я┐я┤п╣п╫п╬" ))
             criteria = SkillInfo::cmp_by_learned;
         else {
-            buf << "Неправильный критерий сортировки." << endl;
+            buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╨я─п╦я┌п╣я─п╦п╧ я│п╬я─я┌п╦я─п╬п╡п╨п╦." << endl;
             return false;
         }
     }
     else if (!(group = skillGroupManager->findUnstrict( arg1 ))) {
-        buf << "Такой группы не существует." << endl;
+        buf << "п╒п╟п╨п╬п╧ пЁя─я┐п©п©я▀ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌." << endl;
         return false;
     }
 
@@ -209,7 +209,7 @@ void AllSkillsList::display( std::ostream & buf )
     int prevLevel = 0, firstColumn = true;
 
     if (empty( )) {
-        buf << "Не найдено ни одного " << (fSpells ? "заклинания" : "умения") << "." << endl;
+        buf << "п²п╣ п╫п╟п╧п╢п╣п╫п╬ п╫п╦ п╬п╢п╫п╬пЁп╬ " << (fSpells ? "п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐" : "я┐п╪п╣п╫п╦я▐") << "." << endl;
         return;
     }
 
@@ -217,7 +217,7 @@ void AllSkillsList::display( std::ostream & buf )
     int tmp_len;
     for (iterator i = begin( ); i != end( ); i++) {
         SkillInfo info = *i;
-        tmp_len = strlen(info.name.c_str( ));
+        tmp_len = info.name.size();
         if ( tmp_len > tmp_max ) tmp_max = tmp_len;
     }
     int bool_long_name = 0;
@@ -229,10 +229,10 @@ void AllSkillsList::display( std::ostream & buf )
         << dlprintf( (bool_long_name ? 
                        "%7s| %-30s| %-7s |%4s{W|{x " :
                        "%7s| %-18s| %-7s |%4s{W|{x "),
-                      "Уровень", (fSpells ? "Заклинание" : "Умение"), "Изучено", "Мана" )
+                      "пёя─п╬п╡п╣п╫я▄", (fSpells ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣"), "п≤п╥я┐я┤п╣п╫п╬", "п°п╟п╫п╟" )
         << dlprintf( (bool_long_name ? 
                        "" : "%-18s| %-7s |%4s"),
-                     (fSpells ? "Заклинание" : "Умение"), "Изучено", "Мана")
+                     (fSpells ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣"), "п≤п╥я┐я┤п╣п╫п╬", "п°п╟п╫п╟")
         << endl
         << (bool_long_name ?
             "{W-------+----------------------------------+---------+----+{x" : 
@@ -287,5 +287,5 @@ void AllSkillsList::display( std::ostream & buf )
         buf << "                    |         |" << endl;
 
     if (fShowHint)
-        buf << endl << "См. также {W{lR" << rcmd << "{lE" << cmd << "{lx ?{w." << endl;
+        buf << endl << "п║п╪. я┌п╟п╨п╤п╣ {W{lR" << rcmd << "{lE" << cmd << "{lx ?{w." << endl;
 }

@@ -24,15 +24,15 @@ Profession * find_prof_unstrict( const DLString &className);
 
 /*
  * paladin [7900]  the grand knight of paladins [7900]
- * samurai [9800]  ”¡Õ’“¡ -Õ¡”‘≈“ œ“’÷…— [9594]
+ * samurai [9800]  —Å–∞–º—É—Ä–∞–π-–º–∞—Å—Ç–µ—Ä –æ—Ä—É–∂–∏—è [9594]
  * warrior [1221]  heimdall [1200]
- * cleric  [9604]  –≈“◊œ”◊—›≈ŒŒ…À [9581]
- * witch   [9623]  ¸Ãÿ◊…“¡ [9579]
- * warlock [18103] ˜œÃ€≈¬Œ…À (Ì¡«¡⁄…Œ Ì¡«…ﬁ≈”À…» Ùœ◊¡“œ◊) [18206]
+ * cleric  [9604]  –ø–µ—Ä–≤–æ—Å–≤—è—â–µ–Ω–Ω–∏–∫ [9581]
+ * witch   [9623]  –≠–ª—å–≤–∏—Ä–∞ [9579]
+ * warlock [18103] –í–æ–ª—à–µ–±–Ω–∏–∫ (–ú–∞–≥–∞–∑–∏–Ω –ú–∞–≥–∏—á–µ—Å–∫–∏—Ö –¢–æ–≤–∞—Ä–æ–≤) [18206]
  * ninja   [16412] The guildmaster (Assassin's Meeting Chamber) [16099]
  * thief   [16385] The head thief [16088]
- * ranger  [234]   Ïœ“ƒ-Ú≈ Œƒ÷≈“ [213]
- * anti-paladin [18116] ·Œ‘…-–¡Ã¡ƒ…Œ [18036]
+ * ranger  [234]   –õ–æ—Ä–¥-–†–µ–π–Ω–¥–∂–µ—Ä [213]
+ * anti-paladin [18116] –ê–Ω—Ç–∏-–ø–∞–ª–∞–¥–∏–Ω [18036]
  * necromancer [16135] The necromancer [16010]
  */
 UniclassAdept::UniclassAdept( ) 
@@ -44,16 +44,16 @@ bool UniclassAdept::parseSpeech( Character *vict, const char *speech, DLString &
     PCharacter *victim;
 
     RegExp::MatchVector matches;
-    static RegExp pattern1( "I (wish|want) .*become a?|— »œﬁ’ ”‘¡‘ÿ"); 
-    static RegExp pattern2( "([A-Za-z‡-ˇ¿-ﬂ-]+)[.!]*$"); 
+    static RegExp pattern1( "I (wish|want) .*become a?|—è —Ö–æ—á—É —Å—Ç–∞—Ç—å"); 
+    static RegExp pattern2( "([A-Za-z–Æ-–™—é-—ä-]+)[.!]*$"); 
     
     if (vict->is_npc( ))
-	return false;
+        return false;
     
     victim = vict->getPC( );
 
     if (victim->getProfession( ) != prof_universal)
-	return false;
+        return false;
 
     if (!pattern1.match( speech ))
         return false;
@@ -61,7 +61,7 @@ bool UniclassAdept::parseSpeech( Character *vict, const char *speech, DLString &
     matches = pattern2.subexpr( speech );
 
     if (matches.size( ) < 1) {
-	return true;
+        return true;
     }
     
     className = matches.front( );
@@ -89,86 +89,86 @@ void UniclassAdept::speech( Character *vict, const char * speech )
 
     victim = vict->getPC( );
     if (className.empty( )) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÎ≈Õ ÷≈ ‘Ÿ »œﬁ≈€ÿ ”‘¡‘ÿ, $C1?{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–ö–µ–º –∂–µ —Ç—ã —Ö–æ—á–µ—à—å —Å—Ç–∞—Ç—å, $C1?{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     prof = find_prof_unstrict( className );
 
     if (!prof) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÓ…Àœ«ƒ¡ Œ≈ ”ÃŸ€¡$gÃœ|Ã|Ã¡ œ ‘¡Àœ  ”‘“¡ŒŒœ  –“œ∆≈””…… - '$t', $C1.{x'", ch, className.c_str( ), victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–ù–∏–∫–æ–≥–¥–∞ –Ω–µ —Å–ª—ã—à–∞$g–ª–æ|–ª|–ª–∞ –æ —Ç–∞–∫–æ–π —Å—Ç—Ä–∞–Ω–Ω–æ–π –ø—Ä–æ—Ñ–µ—Å—Å–∏–∏ - '$t', $C1.{x'", ch, className.c_str( ), victim, TO_ALL );
+        return;
     }
     
     if (prof_universal == prof) {
-	interpret_fmt( ch, "bonk %s", victim->getNameP( ) );
-	return;
+        interpret_fmt( ch, "bonk %s", victim->getNameP( ) );
+        return;
     }
     
     className = prof->getName( );
     DLString rusName = prof->getRusName( );
     
     if (myclass.getValue( ) != className) {
-	switch (number_range( 1, 3 )) {
-	case 1: act( "$c1 –“œ…⁄Œœ”…‘ '{gÒ Œ≈ Õœ«’ ”ƒ≈Ã¡‘ÿ ” ‘œ¬œ  ‘œ, ﬁ≈«œ ‘Ÿ –“œ”…€ÿ, $C1.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
-	case 2: act( "$c1 –“œ…⁄Œœ”…‘ '{gÙŸ œ€…¬$GÃœ”ÿ|”—|Ã¡”ÿ ¡ƒ“≈”œÕ. ı ƒ…, Œ≈ ‘“≈◊œ÷ÿ Õœ  –œÀœ .{x'", ch, className.c_str( ), victim, TO_ALL ); break;
-	case 3: act( "$c1 –“œ…⁄Œœ”…‘ '{g$C1! · Œ’-À¡ Õ¡“€ ◊ «…Ãÿƒ…¿ … ◊Œ…Õ¡‘≈ÃÿŒœ ﬁ…‘¡ , ﬁ‘œ Œ¡ ”‘≈Œ¡» –…€’‘!{x'", ch, 0, victim, TO_ALL ); break;
-	}
-	return;
+        switch (number_range( 1, 3 )) {
+        case 1: act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–Ø –Ω–µ –º–æ–≥—É —Å–¥–µ–ª–∞—Ç—å —Å —Ç–æ–±–æ–π —Ç–æ, —á–µ–≥–æ —Ç—ã –ø—Ä–æ—Å–∏—à—å, $C1.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
+        case 2: act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–¢—ã –æ—à–∏–±$G–ª–æ—Å—å|—Å—è|–ª–∞—Å—å –∞–¥—Ä–µ—Å–æ–º. –£–π–¥–∏, –Ω–µ —Ç—Ä–µ–≤–æ–∂—å –º–æ–π –ø–æ–∫–æ–π.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
+        case 3: act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g$C1! –ê –Ω—É-–∫–∞ –º–∞—Ä—à –≤ –≥–∏–ª—å–¥–∏—é –∏ –≤–Ω–∏–º–∞—Ç–µ–ª—å–Ω–æ —á–∏—Ç–∞–π, —á—Ç–æ –Ω–∞ —Å—Ç–µ–Ω–∞—Ö –ø–∏—à—É—Ç!{x'", ch, 0, victim, TO_ALL ); break;
+        }
+        return;
     }
     
     if (!prof->getSex( ).isSetBitNumber( victim->getSex( ) )) {
-	if (victim->getSex( ) == SEX_MALE) {
-	    act( "$c1 –“œ…⁄Œœ”…‘ '{g‰Ã— ‹‘œ«œ –“…ƒ≈‘”— ’ ‘≈¬— Àœ≈-ﬁ‘œ œ‘“≈⁄¡‘ÿ, $C1.{x'", ch, 0, victim, TO_ALL );
-	    interpret_fmt( ch, "giggle %s", victim->getNameP( ) );
-	}
-	else {
-	    act( "$c1 –“œ…⁄Œœ”…‘ '{g‰Ã— ‹‘œ«œ ‘≈¬≈ Œ≈ »◊¡‘¡≈‘ œƒŒœ  Õ¡Ã≈ŒÿÀœ  €‘’ﬁÀ…, $C1.{x'", ch, 0, victim, TO_ALL );
-	    interpret_fmt( ch, "smirk" );
-	}
-	
-	return;
+        if (victim->getSex( ) == SEX_MALE) {
+            act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–î–ª—è —ç—Ç–æ–≥–æ –ø—Ä–∏–¥–µ—Ç—Å—è —É —Ç–µ–±—è –∫–æ–µ-—á—Ç–æ –æ—Ç—Ä–µ–∑–∞—Ç—å, $C1.{x'", ch, 0, victim, TO_ALL );
+            interpret_fmt( ch, "giggle %s", victim->getNameP( ) );
+        }
+        else {
+            act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–î–ª—è —ç—Ç–æ–≥–æ —Ç–µ–±–µ –Ω–µ —Ö–≤–∞—Ç–∞–µ—Ç –æ–¥–Ω–æ–π –º–∞–ª–µ–Ω—å–∫–æ–π —à—Ç—É—á–∫–∏, $C1.{x'", ch, 0, victim, TO_ALL );
+            interpret_fmt( ch, "smirk" );
+        }
+        
+        return;
     }
     
     if (!prof->getAlign( ).isSetBitNumber( ALIGNMENT(victim) )) {
-	if (IS_EVIL( victim ))
-	    act( "$c1 –“œ…⁄Œœ”…‘ '{gı ‘≈¬— Œ≈ﬁ…”‘¡— ƒ’€¡, $C1. Ù≈¬≈ Œ≈ Õ≈”‘œ ”“≈ƒ… Œ¡”.{x'", ch, className.c_str( ), victim, TO_ALL );
-	else if (IS_GOOD( victim )) {
-	    act( "$c1 –“≈⁄“…‘≈ÃÿŒœ À“…◊…‘”—.", ch, 0, 0, TO_ALL );
-	    act( "$c1 –“œ…⁄Œœ”…‘ '{gı÷ ¬œÃÿŒœ ‘Ÿ »œ“œ€$Gœ≈|… |¡—, $C1. Û‘’–¡ -À¡ œ‘”¿ƒ¡ –œƒœ¬“’-–œ⁄ƒœ“œ◊’.{x'", ch, 0, victim, TO_ALL );
-	}
-	else
-	    act( "$c1 –“œ…⁄Œœ”…‘ '{gÙŸ ”Ã’÷…€ÿ ”…Ã¡Õ “¡◊Œœ◊≈”…—. Ù≈¬≈ Œ≈ Õ≈”‘œ ”“≈ƒ… Œ¡”, $C1.{x'", ch, 0, victim, TO_ALL );
-	
-	return;
+        if (IS_EVIL( victim ))
+            act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–£ —Ç–µ–±—è –Ω–µ—á–∏—Å—Ç–∞—è –¥—É—à–∞, $C1. –¢–µ–±–µ –Ω–µ –º–µ—Å—Ç–æ —Å—Ä–µ–¥–∏ –Ω–∞—Å.{x'", ch, className.c_str( ), victim, TO_ALL );
+        else if (IS_GOOD( victim )) {
+            act( "$c1 –ø—Ä–µ–∑—Ä–∏—Ç–µ–ª—å–Ω–æ –∫—Ä–∏–≤–∏—Ç—Å—è.", ch, 0, 0, TO_ALL );
+            act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–£–∂ –±–æ–ª—å–Ω–æ —Ç—ã —Ö–æ—Ä–æ—à$G–æ–µ|–∏–π|–∞—è, $C1. –°—Ç—É–ø–∞–π-–∫–∞ –æ—Ç—Å—é–¥–∞ –ø–æ–¥–æ–±—Ä—É-–ø–æ–∑–¥–æ—Ä–æ–≤—É.{x'", ch, 0, victim, TO_ALL );
+        }
+        else
+            act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–¢—ã —Å–ª—É–∂–∏—à—å —Å–∏–ª–∞–º —Ä–∞–≤–Ω–æ–≤–µ—Å–∏—è. –¢–µ–±–µ –Ω–µ –º–µ—Å—Ç–æ —Å—Ä–µ–¥–∏ –Ω–∞—Å, $C1.{x'", ch, 0, victim, TO_ALL );
+        
+        return;
     }
     
     if (!prof->getEthos( ).isSetBitNumber( victim->ethos )) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÙ◊œ  ‹‘œ” Œ≈ –œ⁄◊œÃ—≈‘ ”‘¡‘ÿ œƒŒ$G…Õ|…Õ|œ  …⁄ Œ¡”, $C1.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–¢–≤–æ–π —ç—Ç–æ—Å –Ω–µ –ø–æ–∑–≤–æ–ª—è–µ—Ç —Å—Ç–∞—Ç—å –æ–¥–Ω$G–∏–º|–∏–º|–æ–π –∏–∑ –Ω–∞—Å, $C1.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     if (victim->getSubProfession( ) == prof) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÓœ ‘Ÿ … ‘¡À –Ÿ‘¡≈€ÿ”— …⁄œ¬“¡÷¡‘ÿ …⁄ ”≈¬— $n4, $C1!{x'", ch, rusName.c_str( ), victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–ù–æ —Ç—ã –∏ —Ç–∞–∫ –ø—ã—Ç–∞–µ—à—å—Å—è –∏–∑–æ–±—Ä–∞–∂–∞—Ç—å –∏–∑ —Å–µ–±—è $n4, $C1!{x'", ch, rusName.c_str( ), victim, TO_ALL );
+        return;
     }
     
     if (victim->getSubProfession( ) == prof_none)
-	cost = 0;
+        cost = 0;
 
     if (victim->questpoints < cost) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÈ⁄◊…Œ…, $C1, Œœ ’ ‘≈¬— Œ≈ »◊¡‘¡≈‘ À◊≈”‘œ◊Ÿ» ≈ƒ…Œ…√.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–ò–∑–≤–∏–Ω–∏, $C1, –Ω–æ —É —Ç–µ–±—è –Ω–µ —Ö–≤–∞—Ç–∞–µ—Ç –∫–≤–µ—Å—Ç–æ–≤—ã—Ö –µ–¥–∏–Ω–∏—Ü.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     attr = victim->getAttributes( ).getAttr<XMLAttributeUniclass>( "uniclass" );
 
     if (dreamland->getCurrentTime( ) - attr->lastTime < timeout) {
-	switch (number_range( 1, 2 )) {
-	case 1: act( "$c1 –“œ…⁄Œœ”…‘ '{g$C1, ¬’ƒ≈€ÿ ‘¡À ﬁ¡”‘œ ”À¡À¡‘ÿ Õ≈÷ƒ’ –“œ∆≈””…—Õ…, «œÃœ◊¡ ⁄¡À“’÷…‘”—.{x'", ch, 0, victim, TO_ALL ); break;
-	case 2: act( "$c1 –“œ…⁄Œœ”…‘ '{g$C1, ‘◊œ≈ ◊“≈Õ— ≈›≈ Œ≈ –“…€Ãœ. œƒœ÷ƒ… Œ≈ÕŒœ«œ.{x'", ch, 0, victim, TO_ALL ); break;
-	}
-	return;	
+        switch (number_range( 1, 2 )) {
+        case 1: act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g$C1, –±—É–¥–µ—à—å —Ç–∞–∫ —á–∞—Å—Ç–æ —Å–∫–∞–∫–∞—Ç—å –º–µ–∂–¥—É –ø—Ä–æ—Ñ–µ—Å—Å–∏—è–º–∏, –≥–æ–ª–æ–≤–∞ –∑–∞–∫—Ä—É–∂–∏—Ç—Å—è.{x'", ch, 0, victim, TO_ALL ); break;
+        case 2: act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g$C1, —Ç–≤–æ–µ –≤—Ä–µ–º—è –µ—â–µ –Ω–µ –ø—Ä–∏—à–ª–æ. –ü–æ–¥–æ–∂–¥–∏ –Ω–µ–º–Ω–æ–≥–æ.{x'", ch, 0, victim, TO_ALL ); break;
+        }
+        return;        
     }
     
     wiznet( WIZ_LEVELS, 0, 0 , "%^C1 changes uniclass to %s", victim, className.c_str( ) );
@@ -180,9 +180,9 @@ void UniclassAdept::speech( Character *vict, const char * speech )
     victim->updateSkills( );
     victim->save( );
     
-    act( "$c1 –“œ…⁄Œœ”…‘ '{gÙŸ »œﬁ≈€ÿ ”‘¡‘ÿ $n5 … — ¬Ã¡«œ”Ãœ◊Ã—¿ ‘≈¬— Œ¡ ‹‘œ‘ –’‘ÿ, $C1.{x'", ch, rusName.c_str( ), victim, TO_ALL ); 
-    act( "$c1 –“œ…⁄Œœ”…‘ '{gÔ‘ŒŸŒ≈ ‘Ÿ ”Õœ÷≈€ÿ œ◊Ã¡ƒ≈◊¡‘ÿ ⁄Œ¡Œ…—Õ… Œ¡€≈  –“œ∆≈””…….{x'", ch, 0, victim, TO_ALL ); 
-    act( "$c1 –“œ…⁄Œœ”…‘ '{gÓœ –œÕŒ…, ﬁ‘œ …”‘…ŒŒœ«œ Õ¡”‘≈“”‘◊¡ ‘≈¬≈ ¬’ƒ≈‘ ƒœ”‘…ﬁÿ œﬁ≈Œÿ ‘“’ƒŒœ.{x'", ch, 0, victim, TO_ALL ); 
+    act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–¢—ã —Ö–æ—á–µ—à—å —Å—Ç–∞—Ç—å $n5 –∏ —è –±–ª–∞–≥–æ—Å–ª–æ–≤–ª—è—é —Ç–µ–±—è –Ω–∞ —ç—Ç–æ—Ç –ø—É—Ç—å, $C1.{x'", ch, rusName.c_str( ), victim, TO_ALL ); 
+    act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–û—Ç–Ω—ã–Ω–µ —Ç—ã —Å–º–æ–∂–µ—à—å –æ–≤–ª–∞–¥–µ–≤–∞—Ç—å –∑–Ω–∞–Ω–∏—è–º–∏ –Ω–∞—à–µ–π –ø—Ä–æ—Ñ–µ—Å—Å–∏–∏.{x'", ch, 0, victim, TO_ALL ); 
+    act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–ù–æ –ø–æ–º–Ω–∏, —á—Ç–æ –∏—Å—Ç–∏–Ω–Ω–æ–≥–æ –º–∞—Å—Ç–µ—Ä—Å—Ç–≤–∞ —Ç–µ–±–µ –±—É–¥–µ—Ç –¥–æ—Å—Ç–∏—á—å –æ—á–µ–Ω—å —Ç—Ä—É–¥–Ω–æ.{x'", ch, 0, victim, TO_ALL ); 
 }
 
 /*
@@ -235,26 +235,26 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     PCharacter *pch;
     int cost, age;
     XMLAttributeEnlight::Pointer attr;
-    static RegExp pattern( "^Ò »œﬁ’ ¬Ÿ”‘“≈.* ’ﬁ…‘ÿ*”—|^I wish to learn quicker"); 
+    static RegExp pattern( "^–Ø —Ö–æ—á—É –±—ã—Å—Ç—Ä–µ.* —É—á–∏—Ç—å*—Å—è|^I wish to learn quicker"); 
 
     if (victim->is_npc( ) || victim->getProfession( ) != prof_universal)
-	return;
-	
+        return;
+        
     if (!pattern.match( speech ))
-	return;
+        return;
     
     pch = victim->getPC( );
     cost = 1000;
     age = pch->age.getTrueYears( ) + 3;
 
     if (pch->getAttributes( ).isAvailable( "enlight" )) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÙŸ ’÷≈ Œ≈–Ãœ»œ ’ﬁ…€ÿ”—, $C1.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–¢—ã —É–∂–µ –Ω–µ–ø–ª–æ—Ö–æ —É—á–∏—à—å—Å—è, $C1.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
 
     if (pch->questpoints < cost) {
-	act( "$c1 –“œ…⁄Œœ”…‘ '{gÈ⁄◊…Œ…, $C1, Œœ ’ ‘≈¬— Œ≈ »◊¡‘¡≈‘ À◊≈”‘œ◊Ÿ» ≈ƒ…Œ…√.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç '{g–ò–∑–≤–∏–Ω–∏, $C1, –Ω–æ —É —Ç–µ–±—è –Ω–µ —Ö–≤–∞—Ç–∞–µ—Ç –∫–≤–µ—Å—Ç–æ–≤—ã—Ö –µ–¥–∏–Ω–∏—Ü.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     attr = pch->getAttributes( ).getAttr<XMLAttributeEnlight>( "enlight" );
@@ -262,10 +262,10 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     pch->questpoints -= cost;
     pch->save( );
 
-    act( "$c1 ƒœ‘“¡«…◊¡≈‘”— ƒœ ‘◊œ≈«œ Ã¬¡.", ch, 0, victim, TO_VICT );
-    act( "$c1 –“…À¡”¡≈‘”— À «œÃœ◊≈ $C2.", ch, 0, victim, TO_NOTVICT );
-    interpret_raw( ch, "say", "Ò ƒ¡¿ ‘≈¬≈ ”–œ”œ¬Œœ”‘ÿ À ¬Ÿ”‘“œÕ’ œ¬’ﬁ≈Œ…¿. Óœ œŒ¡ …”ﬁ≈⁄Œ≈‘, Àœ«ƒ¡ ‘≈¬≈ …”–œÃŒ…‘”— {G%d{g %s.",
-		       age, GET_COUNT(age, "«œƒ", "«œƒ¡", "Ã≈‘") );
+    act( "$c1 –¥–æ—Ç—Ä–∞–≥–∏–≤–∞–µ—Ç—Å—è –¥–æ —Ç–≤–æ–µ–≥–æ –ª–±–∞.", ch, 0, victim, TO_VICT );
+    act( "$c1 –ø—Ä–∏–∫–∞—Å–∞–µ—Ç—Å—è –∫ –≥–æ–ª–æ–≤–µ $C2.", ch, 0, victim, TO_NOTVICT );
+    interpret_raw( ch, "say", "–Ø –¥–∞—é —Ç–µ–±–µ —Å–ø–æ—Å–æ–±–Ω–æ—Å—Ç—å –∫ –±—ã—Å—Ç—Ä–æ–º—É –æ–±—É—á–µ–Ω–∏—é. –ù–æ –æ–Ω–∞ –∏—Å—á–µ–∑–Ω–µ—Ç, –∫–æ–≥–¥–∞ —Ç–µ–±–µ –∏—Å–ø–æ–ª–Ω–∏—Ç—Å—è {G%d{g %s.",
+                       age, GET_COUNT(age, "–≥–æ–¥", "–≥–æ–¥–∞", "–ª–µ—Ç") );
 }
 
 /* 
@@ -279,8 +279,8 @@ XMLAttributeEnlight::XMLAttributeEnlight( )
 bool XMLAttributeEnlight::pull( PCharacter *pch ) 
 {
     if (pch->age.getTrueYears( ) >= age) { 
-	pch->send_to( "{GÙŸ ﬁ’◊”‘◊’≈€ÿ, ﬁ‘œ ”–œ”œ¬Œœ”‘ÿ À ¬Ÿ”‘“œÕ’ œ¬’ﬁ≈Œ…¿ –œÀ…ƒ¡≈‘ ‘≈¬—.{x\r\n" );
-	return true;		
+        pch->send_to( "{G–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å, —á—Ç–æ —Å–ø–æ—Å–æ–±–Ω–æ—Å—Ç—å –∫ –±—ã—Å—Ç—Ä–æ–º—É –æ–±—É—á–µ–Ω–∏—é –ø–æ–∫–∏–¥–∞–µ—Ç —Ç–µ–±—è.{x\r\n" );
+        return true;                
     }
 
     return false;

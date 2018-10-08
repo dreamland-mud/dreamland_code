@@ -19,7 +19,7 @@ Price::~Price( )
 /*----------------------------------------------------------------------
  * MoneyPrice
  *---------------------------------------------------------------------*/
-const DLString MoneyPrice::CURRENCY_NAME = "ÄÅÎ|ØÇÉ|ÅÇ|ØÇÁÍ|ÅÇ|ØÇÁÍÉ|ØÇÁÈ";
+const DLString MoneyPrice::CURRENCY_NAME = "Ð´ÐµÐ½|ÑŒÐ³Ð¸|ÐµÐ³|ÑŒÐ³Ð°Ð¼|ÐµÐ³|ÑŒÐ³Ð°Ð¼Ð¸|ÑŒÐ³Ð°Ñ…";
 
 DLString MoneyPrice::toCurrency( ) const
 {
@@ -36,13 +36,13 @@ DLString MoneyPrice::toString( Character *ch ) const
     silver = silver % 100;
 
     if (gold > 0) 
-	buf << gold << " ÚÏÌÏÔ" << GET_COUNT(gold, "ÁÑ ÍÏÎÅÔÁ", "ÙÅ ÍÏÎÅÔÙ", "ÙÈ ÍÏÎÅÔ");
+        buf << gold << " Ð·Ð¾Ð»Ð¾Ñ‚" << GET_COUNT(gold, "Ð°Ñ Ð¼Ð¾Ð½ÐµÑ‚Ð°", "Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹", "Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚");
     
     if (silver > 0) {
-	if (gold > 0)
-	    buf << " É ";
+        if (gold > 0)
+            buf << " Ð¸ ";
 
-	buf << silver << " ÓÅÒÅÂÒÑÎ" << GET_COUNT(silver, "ÁÑ ÍÏÎÅÔÁ", "ÙÅ ÍÏÎÅÔÙ", "ÙÈ ÍÏÎÅÔ");
+        buf << silver << " ÑÐµÑ€ÐµÐ±Ñ€ÑÐ½" << GET_COUNT(silver, "Ð°Ñ Ð¼Ð¾Ð½ÐµÑ‚Ð°", "Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹", "Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚");
     }
     
     return buf.str( );
@@ -74,8 +74,8 @@ void MoneyPrice::deduct( Character *ch ) const
     silver = min( (int)ch->silver, cost );
     
     if (silver < cost) {
-	gold = (cost - silver + 99) / 100;
-	silver = cost - 100 * gold;
+        gold = (cost - silver + 99) / 100;
+        silver = cost - 100 * gold;
     }
 
     ch->gold -= gold;
@@ -98,11 +98,11 @@ void MoneyPrice::toStream( Character *ch, ostringstream &buf ) const
     silver = cost % 100;
 
     if (silver == 0) {
-	if (gold != 0)
-	    buf << gold << " gold";
+        if (gold != 0)
+            buf << gold << " gold";
     }
     else
-	buf << cost;
+        buf << cost;
 }
 
 /*----------------------------------------------------------------------
@@ -131,7 +131,7 @@ int LevelPrice::toSilver( Character *ch ) const
     int pow = power.getValue( );
     
     while (--pow > 0)
-	level *= level;
+        level *= level;
     
     return level * coef.getValue( ) + bonus.getValue( );
 }
@@ -140,7 +140,7 @@ int LevelPrice::toSilver( Character *ch ) const
  * QuestPointPrice 
  *---------------------------------------------------------------------*/
 const DLString QuestPointPrice::CURRENCY_NAME 
-               = "Ë×ÅÓÔÏ×|ÙÅ|ÙÈ|ÙÍ|ÙÅ|ÙÍÉ|ÙÈ ÅÄÉÎÉÃ|Ù||ÁÍ|Ù|ÁÍÉ|ÁÈ";
+               = "ÐºÐ²ÐµÑÑ‚Ð¾Ð²|Ñ‹Ðµ|Ñ‹Ñ…|Ñ‹Ð¼|Ñ‹Ðµ|Ñ‹Ð¼Ð¸|Ñ‹Ñ… ÐµÐ´Ð¸Ð½Ð¸Ñ†|Ñ‹||Ð°Ð¼|Ñ‹|Ð°Ð¼Ð¸|Ð°Ñ…";
 
 DLString QuestPointPrice::toCurrency( ) const
 {
@@ -155,21 +155,21 @@ DLString QuestPointPrice::toString( Character * ) const
 bool QuestPointPrice::canAfford( Character *ch ) const
 {
     if (ch->is_npc( ))
-	return false;
+        return false;
     else
-	return ch->getPC( )->questpoints >= questpoint.getValue( );
+        return ch->getPC( )->questpoints >= questpoint.getValue( );
 }
 
 void QuestPointPrice::induct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-	ch->getPC( )->questpoints += questpoint.getValue( );
+        ch->getPC( )->questpoints += questpoint.getValue( );
 }
 
 void QuestPointPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-	ch->getPC( )->questpoints -= questpoint.getValue( );
+        ch->getPC( )->questpoints -= questpoint.getValue( );
 }
 
 void QuestPointPrice::toStream( Character *ch, ostringstream &buf ) const

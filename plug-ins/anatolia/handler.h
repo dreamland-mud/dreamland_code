@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 #ifndef HANDLER_H
 #define HANDLER_H
@@ -27,7 +27,7 @@ class Object;
 class NPCharacter;
 struct mob_index_data;
 
-int	    count_users(Object *obj);
+int            count_users(Object *obj);
 void        get_money_here( Object *list, int &gold, int &silver );
 Object *    create_money( int gold, int silver );
 DLString    describe_money( int gold, int silver, const Grammar::Case &gcase );
@@ -54,19 +54,19 @@ void do_yell( Character *, const char * );
 #define    FEXTRACT_TOTAL  (A)
 #define    FEXTRACT_COUNT  (B)
 #define    FEXTRACT_LASTFOUGHT  (C)
-void	extract_dead_player( PCharacter *, int flags );
-void	extract_char( Character *, bool fCount = true );
+void        extract_dead_player( PCharacter *, int flags );
+void        extract_char( Character *, bool fCount = true );
 
-#define IS_OUTSIDE(ch)		(!IS_SET(				    \
-				    (ch)->in_room->room_flags,		    \
-				    ROOM_INDOORS))
+#define IS_OUTSIDE(ch)                (!IS_SET(                                    \
+                                    (ch)->in_room->room_flags,                    \
+                                    ROOM_INDOORS))
 
-#define IS_TRUSTED(ch,level)	(( ch->get_trust() ) >= (level))
+#define IS_TRUSTED(ch,level)        (( ch->get_trust() ) >= (level))
 
-#define	SHADOW_ACTIVE		50	
-#define SHADOW(ch)	    (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE)
-#define HALF_SHADOW(ch)	    (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE/2)
-#define HAS_SHADOW(ch)	    (!(ch)->is_npc() && (ch)->getPC()->shadow >= 0)
+#define        SHADOW_ACTIVE                50        
+#define SHADOW(ch)            (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE)
+#define HALF_SHADOW(ch)            (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE/2)
+#define HAS_SHADOW(ch)            (!(ch)->is_npc() && (ch)->getPC()->shadow >= 0)
 
 
 #endif

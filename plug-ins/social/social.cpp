@@ -38,14 +38,14 @@ Social::~Social( )
 bool Social::matches( const DLString& argument ) const
 {
     if (argument.empty( )) 
-	return false;
+        return false;
     
     if (SocialBase::matches( argument ))
-	return true;
+        return true;
     
     for (XMLStringList::const_iterator a = aliases.begin( ); a != aliases.end( ); a++)
-	if (argument.strPrefix( *a ))
-	    return true;
+        if (argument.strPrefix( *a ))
+            return true;
     
     return false;
 }
@@ -70,12 +70,12 @@ bool Social::mprog( Character *ch, Character *victim )
     bool rc = false;
 
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
-	if (mprog_social( rch, ch, victim, getName( ).c_str( ) ))
-	    rc = true;
+        if (mprog_social( rch, ch, victim, getName( ).c_str( ) ))
+            rc = true;
 
-	for (Object *obj = rch->carrying; obj; obj = obj->next_content)
-	    if (oprog_social( obj, ch, victim, getName( ).c_str( ) ))
-		rc = true;
+        for (Object *obj = rch->carrying; obj; obj = obj->next_content)
+            if (oprog_social( obj, ch, victim, getName( ).c_str( ) ))
+                rc = true;
     }
 
     return rc;
@@ -90,50 +90,50 @@ static bool rprog_social( Room *room, Character *actor, Character *victim, const
 void Social::reaction( Character *ch, Character *victim, const DLString &arg )
 {
     if (rprog_social( ch->in_room, ch, victim, getName( ).c_str( ), arg.c_str( ) ))
-	return;
+        return;
 
     if (mprog( ch, victim ))
-	return;
+        return;
     
     if (!victim && !arg.empty( )) {
-	if (!getErrorMsg( ).empty( ))
-	    act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
-	else
-	    ch->println("îÅÔ ÜÔÏÇÏ ÚÄÅÓØ.");
+        if (!getErrorMsg( ).empty( ))
+            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
+        else
+            ch->println("ÐÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð´ÐµÑÑŒ.");
     }
 
     if (!victim || victim == ch)
-	return;
+        return;
 
     if (ch->is_npc( ) || !victim->is_npc( ) || victim->desc)
-	return;
-	
+        return;
+        
     if (IS_AFFECTED(victim, AFF_CHARM) || !IS_AWAKE(victim))
-	return;
+        return;
     
     switch (number_bits( 4 )) {
     case 0:
     case 1: case 2: case 3: case 4:
     case 5: case 6: case 7: case 8:
-	act( getArgOther( ).c_str( ), victim, 0, ch, TO_NOTVICT );
-	act_p( getArgMe( ).c_str( ), victim, 0, ch, TO_CHAR, getPosition( ) );
-	act( getArgVictim( ).c_str( ), victim, 0, ch, TO_VICT );
-	break;
+        act( getArgOther( ).c_str( ), victim, 0, ch, TO_NOTVICT );
+        act_p( getArgMe( ).c_str( ), victim, 0, ch, TO_CHAR, getPosition( ) );
+        act( getArgVictim( ).c_str( ), victim, 0, ch, TO_VICT );
+        break;
 
     case 9: case 10: case 11: case 12:
-	act( "$c1 ÛÌÅÐÁÅÔ $C4.",  victim, 0, ch, TO_NOTVICT );
-	act_p( "ôÙ ÛÌÅÐÁÅÛØ $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
-	act( "$c1 ÛÌÅÐÁÅÔ ÔÅÂÑ.", victim, 0, ch, TO_VICT );
-	break;
+        act( "$c1 ÑˆÐ»ÐµÐ¿Ð°ÐµÑ‚ $C4.",  victim, 0, ch, TO_NOTVICT );
+        act_p( "Ð¢Ñ‹ ÑˆÐ»ÐµÐ¿Ð°ÐµÑˆÑŒ $C4.",  victim, 0, ch, TO_CHAR, getPosition( ) );
+        act( "$c1 ÑˆÐ»ÐµÐ¿Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.", victim, 0, ch, TO_VICT );
+        break;
     case 13: 
-	interpret_fmt( victim, "sigh %s", ch->getNameP( ) );
-	break;
+        interpret_fmt( victim, "sigh %s", ch->getNameP( ) );
+        break;
     case 14:
-	interpret_fmt( victim, "shrug %s", ch->getNameP( ) );
-	break;
+        interpret_fmt( victim, "shrug %s", ch->getNameP( ) );
+        break;
     case 15: 
-	interpret_fmt( victim, "eyebrow %s", ch->getNameP( ) );
-	break;
+        interpret_fmt( victim, "eyebrow %s", ch->getNameP( ) );
+        break;
     }
 }
 

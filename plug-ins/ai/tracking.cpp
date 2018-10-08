@@ -34,21 +34,21 @@ bool BasicMobileBehavior::track( )
     Character *wch;
     
     if (!hasLastFought( ))
-	return false;
+        return false;
 
     if (!canTrack( )) 
-	return false;
+        return false;
     
     wch = getLastFoughtWorld( );
 
     if (!canTrackLastFought( wch ))
-	return false;
+        return false;
 
     if (trackCaster( wch ))
-	return true;
+        return true;
 
     if (trackLastFought( wch ))
-	return true;
+        return true;
 
     return false;
 }
@@ -56,22 +56,22 @@ bool BasicMobileBehavior::track( )
 bool BasicMobileBehavior::canTrack( )
 {
     if (!IS_AWAKE(ch))
-	return false;
+        return false;
     
     if (ch->fighting)
-	return false;
+        return false;
 
     if (IS_SET(ch->act, ACT_NOTRACK))
-	return false;
+        return false;
 
     if (IS_AFFECTED(ch, AFF_CALM|AFF_CHARM|AFF_SCREAM))
-	return false;
+        return false;
     
     if (RIDDEN(ch))
-	return false;
+        return false;
     
     if (ch->is_mirror( ))
-	return false;
+        return false;
 
     return true;
 }
@@ -79,10 +79,10 @@ bool BasicMobileBehavior::canTrack( )
 bool BasicMobileBehavior::canTrackLastFought( Character *wch )
 {
     if (!wch)
-	return false;
+        return false;
 
     if (ch->in_room == wch->in_room)
-	return false;
+        return false;
 
     return true;
 }
@@ -94,21 +94,21 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
     int d;
 
     ch->setWait( gsn_track->getBeats( ) );
-    act("$c1 ×ÓÍÁÔÒÉ×ÁÅÔÓÑ × ÚÅÍÌÀ × ÐÏÉÓËÁÈ ÓÌÅÄÏ×.",ch,0,0,TO_ROOM);
+    act("$c1 Ð²ÑÐ¼Ð°Ñ‚Ñ€Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð² Ð·ÐµÐ¼Ð»ÑŽ Ð² Ð¿Ð¾Ð¸ÑÐºÐ°Ñ… ÑÐ»ÐµÐ´Ð¾Ð².",ch,0,0,TO_ROOM);
 
     d = room->history.went( wch );
     pexit = (d == -1 ? NULL : room->exit[d]);
 
     if (!pexit) {
-	act("ôÙ ÎÅ ×ÉÄÉÛØ ÚÄÅÓØ ÓÌÅÄÏ× $C2.", ch, 0, wch, TO_CHAR);
-	lostTrack = true;
-	return true;
+        act("Ð¢Ñ‹ Ð½Ðµ Ð²Ð¸Ð´Ð¸ÑˆÑŒ Ð·Ð´ÐµÑÑŒ ÑÐ»ÐµÐ´Ð¾Ð² $C2.", ch, 0, wch, TO_CHAR);
+        lostTrack = true;
+        return true;
     }
     
-    act("óÌÅÄÙ $C2 ×ÅÄÕÔ $t.", ch, dirs[d].leave, wch, TO_CHAR);
+    act("Ð¡Ð»ÐµÐ´Ñ‹ $C2 Ð²ÐµÐ´ÑƒÑ‚ $t.", ch, dirs[d].leave, wch, TO_CHAR);
     
     if (!move( d, pexit, wch )) 
-	lostTrack = true;
+        lostTrack = true;
 
     return true;
 }
@@ -122,32 +122,32 @@ bool BasicMobileBehavior::move( int d, EXIT_DATA *pexit, Character *whosHunted )
     switch (rc) {
     case RC_MOVE_OK:
     case RC_MOVE_PASS_FAILED:
-	return true;
+        return true;
 
     case RC_MOVE_WEB:
-	assistSpell( ch, gsn_giant_strength, whosHunted );
-	return true;
+        assistSpell( ch, gsn_giant_strength, whosHunted );
+        return true;
 
     case RC_MOVE_PASS_NEVER:
-	return false;
+        return false;
 
     case RC_MOVE_PASS_NEEDED:
-	return assistSpell( ch, gsn_pass_door, whosHunted );
+        return assistSpell( ch, gsn_pass_door, whosHunted );
 
     case RC_MOVE_AIR:
     case RC_MOVE_WATER:
-	return assistSpell( ch, gsn_fly, whosHunted );
+        return assistSpell( ch, gsn_fly, whosHunted );
     
     case RC_MOVE_CLOSED:
-	open_door_extra( ch, d, pexit );
-	return true;
+        open_door_extra( ch, d, pexit );
+        return true;
 
     case RC_MOVE_RESTING:
-	interpret_cmd( ch, "wake", "" );
-	return true;
+        interpret_cmd( ch, "wake", "" );
+        return true;
 
     default:
-	return false;
+        return false;
     }
 }
 
@@ -165,71 +165,71 @@ void BasicMobileBehavior::shooted( Character *attacker, int door )
     int range = 0;
 
     if (ch->position == POS_DEAD)
-	return;
+        return;
     
     setLastFought( attacker );
 
     if (door < 0 || door >= DIR_SOMEWHERE) {
-	bug("In path_to_track wrong door: %d",door);
-	return;
+        bug("In path_to_track wrong door: %d",door);
+        return;
     }
     
     opdoor = dirs[door].rev;
     temp = attacker->in_room;
 
     while (1) {
-	range++;
-	
-	if ( ch->in_room == temp ) 
-	    break;
-	    
-	if ((pExit = temp->exit[ door ]) == 0
-	    || (temp = pExit->u1.to_room ) == 0)
-	{
-	    bug("In path_to_track: couldn't calculate range %d",range);
-	    return;
-	}
+        range++;
+        
+        if ( ch->in_room == temp ) 
+            break;
+            
+        if ((pExit = temp->exit[ door ]) == 0
+            || (temp = pExit->u1.to_room ) == 0)
+        {
+            bug("In path_to_track: couldn't calculate range %d",range);
+            return;
+        }
 
-	if (range > 100) {
-	    bug("In path_to_track: range exceeded 100",0);
-	    return;
-	}
+        if (range > 100) {
+            bug("In path_to_track: range exceeded 100",0);
+            return;
+        }
     }
 
     temp = ch->in_room;
 
     while (--range > 0) {
-	temp->history.record( attacker, opdoor );
+        temp->history.record( attacker, opdoor );
 
-	if ((pExit = temp->exit[opdoor]) == 0
-	    || (temp = pExit->u1.to_room ) == 0 )
-	{
-	    break;
-	}
+        if ((pExit = temp->exit[opdoor]) == 0
+            || (temp = pExit->u1.to_room ) == 0 )
+        {
+            break;
+        }
     }
 }
 
 #if 0
 {
     if (ch->in_room->history.traverse( ch->in_room, victim )) {
-	int d;
-	EXIT_DATA *pexit;
+        int d;
+        EXIT_DATA *pexit;
     
-	act("$c1 ×ÓÍÁÔÒÉ×ÁÅÔÓÑ × ÚÅÍÌÀ × ÐÏÉÓËÁÈ ÓÌÅÄÏ×.",ch,0,0,TO_ROOM);
-	d = ch->in_room->history.went( victim );
-	pexit = ch->in_room->exit[d];
+        act("$c1 Ð²ÑÐ¼Ð°Ñ‚Ñ€Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð² Ð·ÐµÐ¼Ð»ÑŽ Ð² Ð¿Ð¾Ð¸ÑÐºÐ°Ñ… ÑÐ»ÐµÐ´Ð¾Ð².",ch,0,0,TO_ROOM);
+        d = ch->in_room->history.went( victim );
+        pexit = ch->in_room->exit[d];
 
-	if (IS_SET(pexit->exit_info, EX_CLOSED)) 
-	    open_door_extra( ch, d, pexit );
+        if (IS_SET(pexit->exit_info, EX_CLOSED)) 
+            open_door_extra( ch, d, pexit );
 
-	return move_char(ch, d, false, "normal");
+        return move_char(ch, d, false, "normal");
     }
     
     if (ch->in_room->area != ch->zone) 
-	return chance( 10 ) && backHome( false );
+        return chance( 10 ) && backHome( false );
 
     if (ch->in_room->area == victim->in_room->area) 
-	return chance( 10 ) && trackTraverseSameZone( victim->in_room );
+        return chance( 10 ) && trackTraverseSameZone( victim->in_room );
 
     return trackCaster( victim );
 }

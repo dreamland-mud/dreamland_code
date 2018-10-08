@@ -128,15 +128,15 @@ IOManager::ioInit()
     ServerSocketContainer::FD_SETBeforeSelect( &in_set );
 
     for ( d = descriptor_list; d; d = d->next ) {
-	/* always process pending output */
-	FD_SET( d->descriptor, &out_set );
-	
-	/* ignore closed descriptors */
-	if (d->connected == CON_CLOSED)
-	    continue;
+        /* always process pending output */
+        FD_SET( d->descriptor, &out_set );
+        
+        /* ignore closed descriptors */
+        if (d->connected == CON_CLOSED)
+            continue;
 
-	FD_SET( d->descriptor, &in_set  );
-	FD_SET( d->descriptor, &exc_set );
+        FD_SET( d->descriptor, &in_set  );
+        FD_SET( d->descriptor, &exc_set );
     }
 }
 
@@ -146,7 +146,7 @@ IOManager::ioPoll()
     static struct timeval null_time = { 0, 0 };
 
     if ( select( FD_SETSIZE, &in_set, &out_set, &exc_set, &null_time ) < 0 )
-	throw Exception(DLString("Game_loop: select: poll::") + strerror( errno ));
+        throw Exception(DLString("Game_loop: select: poll::") + strerror( errno ));
 }
 
 void
@@ -170,61 +170,61 @@ IOManager::ioRead()
 
     // Kick out the freaky folks.
     for ( d = descriptor_list; d != 0; d = d->next )
-	if ( FD_ISSET( d->descriptor, &exc_set ) )
-	    kick(d);
+        if ( FD_ISSET( d->descriptor, &exc_set ) )
+            kick(d);
 
     /*
      * Process input.
      */
     for( d = descriptor_list; d; d = d->next ) {
-	if (d->connected == CON_CLOSED)
-	    continue;
+        if (d->connected == CON_CLOSED)
+            continue;
 
-	d->fcommand = false;
-	Character *ch = d->character;
+        d->fcommand = false;
+        Character *ch = d->character;
 
-	if (FD_ISSET( d->descriptor, &in_set )) {
-	    LastLogStream::send( ) <<  "Input data"  << endl;
+        if (FD_ISSET( d->descriptor, &in_set )) {
+            LastLogStream::send( ) <<  "Input data"  << endl;
 
-	    if (ch)
-		ch->timer = 0;
+            if (ch)
+                ch->timer = 0;
 
-	    if (!d->readInput()) {
-		kick(d);
-		continue;
-	    }
-	}
-	
-	if (ch) {
-	    if (ch->daze > 0)
-		--ch->daze;
+            if (!d->readInput()) {
+                kick(d);
+                continue;
+            }
+        }
+        
+        if (ch) {
+            if (ch->daze > 0)
+                --ch->daze;
 
-	    if (ch->wait > 0) {
-		--d->character->wait;
-		/* waitstate - no command parsing! */
-		continue;
-	    }
+            if (ch->wait > 0) {
+                --d->character->wait;
+                /* waitstate - no command parsing! */
+                continue;
+            }
 
-	    if (!ch->is_npc( )
-		&& ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
-		continue;
-	}
+            if (!ch->is_npc( )
+                && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
+                continue;
+        }
 
-	if (!d->buffer_handler)
-	    continue;
+        if (!d->buffer_handler)
+            continue;
 
-	if (!d->buffer_handler->read(d)) 
-	    continue;
-	
-	if (*d->incomm) {
-	    char *command2;
+        if (!d->buffer_handler->read(d)) 
+            continue;
+        
+        if (*d->incomm) {
+            char *command2;
 
-	    d->fcommand	= true;
-	    command2 = get_multi_command( d, d->incomm );
+            d->fcommand        = true;
+            command2 = get_multi_command( d, d->incomm );
 
-	    if (!d->handle_input.empty( ) && d->handle_input.front( ))
-		d->handle_input.front( )->handle( d, command2 );
-	}
+            if (!d->handle_input.empty( ) && d->handle_input.front( ))
+                d->handle_input.front( )->handle( d, command2 );
+        }
     }
 }
 
@@ -234,12 +234,12 @@ IOManager::ioWrite()
     Descriptor *d;
 
     for ( d = descriptor_list; d != 0; d = d->next ) {
-	if (!FD_ISSET(d->descriptor, &out_set))
-	    continue;
+        if (!FD_ISSET(d->descriptor, &out_set))
+            continue;
 
-	if (d->fcommand || d->outtop > 0)
-	    if (!process_output( d, true ))
-		kick(d);
+        if (d->fcommand || d->outtop > 0)
+            if (!process_output( d, true ))
+                kick(d);
     }
 }
 
@@ -249,12 +249,12 @@ IOManager::ioFinaly()
     Descriptor *d, *d_next;
 
     for ( d = descriptor_list; d != 0; d = d_next ) {
-	d_next = d->next;
+        d_next = d->next;
 
-	if (d->connected != CON_CLOSED)
-	    continue;
+        if (d->connected != CON_CLOSED)
+            continue;
 
-	d->slay( );
+        d->slay( );
     }
 }
 

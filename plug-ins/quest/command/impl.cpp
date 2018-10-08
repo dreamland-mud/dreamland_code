@@ -19,26 +19,26 @@ extern "C"
 {
     SO::PluginList initialize_quest_command( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<CQuest>( ppl );
-	Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeQuestReward> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ObjectQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ConQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<GoldQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<PocketsQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<KeyringQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<PersonalQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<OwnerQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<PiercingQuestArticle> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<TattooQuestArticle> >( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<CQuest>( ppl );
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeQuestReward> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ObjectQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ConQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<GoldQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<PocketsQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<KeyringQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<PersonalQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<OwnerQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<PiercingQuestArticle> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<TattooQuestArticle> >( ppl );
 
-	Plugin::registerPlugin<MobileBehaviorRegistrator<QuestTrader> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Questor> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestScrollBehavior> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<QuestMaster> >( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<MobileBehaviorRegistrator<QuestTrader> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Questor> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestScrollBehavior> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<QuestMaster> >( ppl );
+        
+        return ppl;
     }
 }
 

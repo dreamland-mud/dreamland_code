@@ -39,7 +39,7 @@ inline const DLString & CraftProfessionHelp::getType( ) const
 }
 
 class CraftProfession : public XMLTableElement,
-	              public XMLVariableContainer
+                      public XMLVariableContainer
 {
 XML_OBJECT
 public:

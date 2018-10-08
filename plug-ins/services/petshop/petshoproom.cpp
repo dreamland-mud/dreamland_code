@@ -25,15 +25,15 @@ PetShopStorage::Pointer PetShopRoom::getStorage( )
     PetShopStorage::Pointer storage;
 
     if (( storageRoom = get_room_index( storageVnum ) ) == NULL) {
-	LogStream::sendError( ) << getType( ) << ": zero room for storage " << storageVnum << endl;
-	return storage;
+        LogStream::sendError( ) << getType( ) << ": zero room for storage " << storageVnum << endl;
+        return storage;
     }
 
     if (!storageRoom->behavior 
-	|| !( storage = storageRoom->behavior.getDynamicPointer<PetShopStorage>( ) )) 
+        || !( storage = storageRoom->behavior.getDynamicPointer<PetShopStorage>( ) )) 
     {
-	LogStream::sendError( ) << getType( ) << ": zero behavior for storage " << storageVnum << endl;
-	return storage;
+        LogStream::sendError( ) << getType( ) << ": zero behavior for storage " << storageVnum << endl;
+        return storage;
     }
 
     return storage;
@@ -44,19 +44,19 @@ bool PetShopRoom::command( Character *ch, const DLString &cmdName, const DLStrin
     PetShopStorage::Pointer storage = getStorage( );
 
     if (!storage)
-	return false;
+        return false;
 
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     if (cmdName == "list") {
-	storage->doList( ch->getPC( ) );
-	return true;
+        storage->doList( ch->getPC( ) );
+        return true;
     }
 
     if (cmdName == "buy" ) {
-	storage->doBuy( ch->getPC( ), cmdArgs );
-	return true;
+        storage->doBuy( ch->getPC( ), cmdArgs );
+        return true;
     }
 
     return false;

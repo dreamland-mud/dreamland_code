@@ -20,7 +20,7 @@
 
 using Scripting::NativeTraits;
 
-NMI_INIT(ObjIndexWrapper, "прототип для предметов (obj index data)")
+NMI_INIT(ObjIndexWrapper, "п©я─п╬я┌п╬я┌п╦п© п╢п╩я▐ п©я─п╣п╢п╪п╣я┌п╬п╡ (obj index data)")
 
 ObjIndexWrapper::ObjIndexWrapper( ) : target( NULL )
 {
@@ -60,10 +60,10 @@ void
 ObjIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );
+        throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );
 
     if (!target)
-	throw Scripting::Exception( "OBJ_INDEX_DATA is offline?!");
+        throw Scripting::Exception( "OBJ_INDEX_DATA is offline?!");
 }
 
 OBJ_INDEX_DATA *
@@ -129,10 +129,10 @@ NMI_GET( ObjIndexWrapper, cost , "")
 
 #define GETVALUE(x) \
     NMI_GET( ObjIndexWrapper, value##x, "") { \
-	checkTarget( ); \
-	return Register( target->value[x]); \
+        checkTarget( ); \
+        return Register( target->value[x]); \
     } 
-	
+        
 GETVALUE(0)
 GETVALUE(1)
 GETVALUE(2)
@@ -155,14 +155,14 @@ NMI_GET( ObjIndexWrapper, item_type, "")
     return Register( target->item_type);
 }
 
-NMI_GET( ObjIndexWrapper, instances, "список всех предметов с этим pIndexData" )
+NMI_GET( ObjIndexWrapper, instances, "я│п©п╦я│п╬п╨ п╡я│п╣я┘ п©я─п╣п╢п╪п╣я┌п╬п╡ я│ я█я┌п╦п╪ pIndexData" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
 
     for (Object *o = object_list; o; o = o->next)
-	if (o->pIndexData == target)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
+        if (o->pIndexData == target)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -170,7 +170,7 @@ NMI_GET( ObjIndexWrapper, instances, "список всех предметов с этим pIndexData" )
     return Register( obj );
 }
 
-NMI_INVOKE( ObjIndexWrapper, property, "(имя) свойство прототипа с данным именем или null" )
+NMI_INVOKE( ObjIndexWrapper, property, "(п╦п╪я▐) я│п╡п╬п╧я│я┌п╡п╬ п©я─п╬я┌п╬я┌п╦п©п╟ я│ п╢п╟п╫п╫я▀п╪ п╦п╪п╣п╫п╣п╪ п╦п╩п╦ null" )
 {
     checkTarget();
     DLString name = args2string(args);
@@ -181,21 +181,21 @@ NMI_INVOKE( ObjIndexWrapper, property, "(имя) свойство прототипа с данным именем
         return Register(p->second);
 }
 
-NMI_INVOKE( ObjIndexWrapper, api, "печатает этот API" )
+NMI_INVOKE( ObjIndexWrapper, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<ObjIndexWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjIndexWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( ObjIndexWrapper, rtapi, "п©п╣я┤п╟я┌п╟п╣я┌ п╡я│п╣ п©п╬п╩я▐ п╦ п╪п╣я┌п╬п╢я▀, я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╣ п╡ runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjIndexWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( ObjIndexWrapper, clear, "п╬я┤п╦я│я┌п╨п╟ п╡я│п╣я┘ runtime п©п╬п╩п╣п╧" )
 {
     guts.clear( );
     self->changed();

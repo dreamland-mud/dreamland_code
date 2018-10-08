@@ -62,12 +62,12 @@ inline ::Pointer<T> QuestEntity::getMyQuest( PCMemoryInterface *pci )
     ::Pointer<T> myQuest, null;
 
     if (pci
-	&& ( quest = getQuest( pci ) )
-	&& ( myQuest = dynamic_cast<T *>( quest.getPointer( ) ) )
-	&& quest->charName == heroName)
-	return myQuest;
+        && ( quest = getQuest( pci ) )
+        && ( myQuest = dynamic_cast<T *>( quest.getPointer( ) ) )
+        && quest->charName == heroName)
+        return myQuest;
     else
-	return null;
+        return null;
 }
 
 #endif

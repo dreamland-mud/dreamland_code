@@ -55,11 +55,11 @@ inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, vector< ::
     Scenarios::iterator i;
     
     for (i = scenarios.begin( ); i != scenarios.end( ); i++)
-	if (i->second->applicable( pch ))
-	    list.push_back( static_cast<S*>( i->second.getPointer( ) ) );
+        if (i->second->applicable( pch ))
+            list.push_back( static_cast<S*>( i->second.getPointer( ) ) );
 
     if (list.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }
 
 template<typename S> 
@@ -68,11 +68,11 @@ inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, NPCharacte
     Scenarios::iterator i;
     
     for (i = scenarios.begin( ); i != scenarios.end( ); i++)
-	if (i->second->applicable( pch ) && i->second->applicable( pch, victim ))
-	    list.push_back( static_cast<S*>( i->second.getPointer( ) ) );
+        if (i->second->applicable( pch ) && i->second->applicable( pch, victim ))
+            list.push_back( static_cast<S*>( i->second.getPointer( ) ) );
 
     if (list.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }
 
 class QuestItemAppearence : public XMLVariableContainer {

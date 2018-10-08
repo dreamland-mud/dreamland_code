@@ -19,17 +19,17 @@ extern "C"
 {
     SO::PluginList initialize_languages_impl( ) 
     {
-	SO::PluginList ppl;
-		
-	Plugin::registerPlugin<ElvishEffectsPlugin>( ppl );
-	Plugin::registerPlugin<QueniaLanguage>( ppl );
-	Plugin::registerPlugin<AhennLanguage>( ppl );
-	Plugin::registerPlugin<KhuzdulLanguage>( ppl );
-	Plugin::registerPlugin<ArcadianLanguage>( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<ArcadianDrinkBehavior> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<BeerElementalBehavior> >( ppl );
+        SO::PluginList ppl;
+                
+        Plugin::registerPlugin<ElvishEffectsPlugin>( ppl );
+        Plugin::registerPlugin<QueniaLanguage>( ppl );
+        Plugin::registerPlugin<AhennLanguage>( ppl );
+        Plugin::registerPlugin<KhuzdulLanguage>( ppl );
+        Plugin::registerPlugin<ArcadianLanguage>( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ArcadianDrinkBehavior> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<BeerElementalBehavior> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }
 

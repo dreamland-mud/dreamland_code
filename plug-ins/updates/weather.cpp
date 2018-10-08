@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 #include "weather.h"
 
@@ -32,10 +32,10 @@
 PROF(vampire);
 
 const char * sunlight_ru [4] = {
-    "‘≈ÕŒœ",
-    "”◊≈‘¡≈‘",
-    "”◊≈‘Ãœ",
-    "”’Õ≈“À…"
+    "—Ç–µ–º–Ω–æ",
+    "—Å–≤–µ—Ç–∞–µ—Ç",
+    "—Å–≤–µ—Ç–ª–æ",
+    "—Å—É–º–µ—Ä–∫–∏"
 };    
 const char * sunlight_en [4] = {
     "dark",
@@ -52,23 +52,23 @@ struct month_info {
 };
 
 const struct month_info month_table [17] = {
-  { "˙…ÕŸ",		   -12,    7, 17 },
-  { "˙…ÕŒ≈«œ ˜œÃÀ¡",	   -14,    7, 18 },
-  { "ËœÃœƒŒœ«œ Á…«¡Œ‘¡",   -14,    7, 18 },
-  { "‰“≈◊Œ…» ˜œ…Œ”‘◊",	   -12,    7, 19 },   /* ◊≈”Œ¡ */
-  { "˜≈Ã…À…» ‚…‘◊",	   -8,     6, 19 },
-  { "˜≈”ŒŸ",		   -4,     5, 19 }, 
-  { "“…“œƒŸ",		   0,      5, 21 },
-  { "Ù›≈‘Œœ”‘…",	   4,      5, 22 },   /* Ã≈‘œ */
-  { "‰“¡ÀœŒ¡",		   8,      4, 22 },
-  { "ÛœÃŒ√¡",		   12,     4, 22 },
-  { "ˆ¡“Ÿ",		   16,     5, 21 },    
-  { "‚…‘◊Ÿ",		   12,     5, 20 },   /* œ”≈Œÿ */
-  { "Ù≈ÕŒœ‘Ÿ",		   8,      6, 20 },
-  { "Ù≈Œ…",		   4,      6, 19 },
-  { "‰Ã…ŒŒŸ» Ù≈Œ≈ ",	   0,      7, 18 },         
-  { "·¬”œÃ¿‘Œœ  Ù≈ÕŒœ‘Ÿ",  -4,     8, 17 },   /* ⁄…Õ¡ */
-  { "˜≈Ã…Àœ«œ ˙Ã¡",	   -8,     8, 17 },
+  { "–ó–∏–º—ã",                   -12,    7, 17 },
+  { "–ó–∏–º–Ω–µ–≥–æ –í–æ–ª–∫–∞",           -14,    7, 18 },
+  { "–•–æ–ª–æ–¥–Ω–æ–≥–æ –ì–∏–≥–∞–Ω—Ç–∞",   -14,    7, 18 },
+  { "–î—Ä–µ–≤–Ω–∏—Ö –í–æ–∏–Ω—Å—Ç–≤",           -12,    7, 19 },   /* –≤–µ—Å–Ω–∞ */
+  { "–í–µ–ª–∏–∫–∏—Ö –ë–∏—Ç–≤",           -8,     6, 19 },
+  { "–í–µ—Å–Ω—ã",                   -4,     5, 19 }, 
+  { "–ü—Ä–∏—Ä–æ–¥—ã",                   0,      5, 21 },
+  { "–¢—â–µ—Ç–Ω–æ—Å—Ç–∏",           4,      5, 22 },   /* –ª–µ—Ç–æ */
+  { "–î—Ä–∞–∫–æ–Ω–∞",                   8,      4, 22 },
+  { "–°–æ–ª–Ω—Ü–∞",                   12,     4, 22 },
+  { "–ñ–∞—Ä—ã",                   16,     5, 21 },    
+  { "–ë–∏—Ç–≤—ã",                   12,     5, 20 },   /* –æ—Å–µ–Ω—å */
+  { "–¢–µ–º–Ω–æ—Ç—ã",                   8,      6, 20 },
+  { "–¢–µ–Ω–∏",                   4,      6, 19 },
+  { "–î–ª–∏–Ω–Ω—ã—Ö –¢–µ–Ω–µ–π",           0,      7, 18 },         
+  { "–ê–±—Å–æ–ª—é—Ç–Ω–æ–π –¢–µ–º–Ω–æ—Ç—ã",  -4,     8, 17 },   /* –∑–∏–º–∞ */
+  { "–í–µ–ª–∏–∫–æ–≥–æ –ó–ª–∞",           -8,     8, 17 },
 };
 
 void mmhg_update()
@@ -76,8 +76,8 @@ void mmhg_update()
     int diff, d;
     
     if (number_range( 0, 10 * 24 ) == 0) {
-	weather_info.avg_mmhg = 1000 + month_table[time_info.month].pressure;
-	weather_info.avg_mmhg += dice(1, 5) - dice(1, 5);
+        weather_info.avg_mmhg = 1000 + month_table[time_info.month].pressure;
+        weather_info.avg_mmhg += dice(1, 5) - dice(1, 5);
     }
     
     diff = weather_info.mmhg > weather_info.avg_mmhg ? -2 : 2;
@@ -86,11 +86,11 @@ void mmhg_update()
     weather_info.change = URANGE( -12, weather_info.change, 12 );
 
     if(weather_info.change > 0) {
-	if(weather_info.change >= number_range(0, 12*2))
-	    weather_info.mmhg++;
+        if(weather_info.change >= number_range(0, 12*2))
+            weather_info.mmhg++;
     } else {
-	if(weather_info.change <= -number_range(0, 12*2))
-	    weather_info.mmhg--;
+        if(weather_info.change <= -number_range(0, 12*2))
+            weather_info.mmhg--;
     }
 
     d = dice(10, 5) - dice(10, 5);
@@ -116,19 +116,19 @@ void sunlight_update( )
 
     if (time_info.hour == month_table[time_info.month].sunrise) {
         weather_info.sunlight = SUN_RISE;
-	buf << "≈“◊Ÿ≈ Ã’ﬁ… ”œÃŒ√¡ –“œ¬…◊¡¿‘”— ” ◊œ”‘œÀ¡." << endl;
+        buf << "–ü–µ—Ä–≤—ã–µ –ª—É—á–∏ —Å–æ–ª–Ω—Ü–∞ –ø—Ä–æ–±–∏–≤–∞—é—Ç—Å—è —Å –≤–æ—Å—Ç–æ–∫–∞." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunrise + 1) {
         weather_info.sunlight = SUN_LIGHT;
-        buf << "Ó¡ﬁ¡Ã”— Œœ◊Ÿ  ƒ≈Œÿ." << endl;
+        buf << "–ù–∞—á–∞–ª—Å—è –Ω–æ–≤—ã–π –¥–µ–Ω—å." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset) {
         weather_info.sunlight = SUN_SET;
-	buf << "ÛœÃŒ√≈ Õ≈ƒÃ≈ŒŒœ –“—ﬁ≈‘”— ⁄¡ «œ“…⁄œŒ‘œÕ." << endl;
+        buf << "–°–æ–ª–Ω—Ü–µ –º–µ–¥–ª–µ–Ω–Ω–æ –ø—Ä—è—á–µ—Ç—Å—è –∑–∞ –≥–æ—Ä–∏–∑–æ–Ω—Ç–æ–º." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset + 1) {
         weather_info.sunlight = SUN_DARK;
-	buf << "Ó¡ﬁ…Œ¡≈‘”— Œœﬁÿ." << endl;
+        buf << "–ù–∞—á–∏–Ω–∞–µ—Ç—Å—è –Ω–æ—á—å." << endl;
     }
     
     if (time_info.hour == 24) {
@@ -147,22 +147,22 @@ void sunlight_update( )
     }
 
     if (!buf.str( ).empty( )) {
-	Descriptor *d;
-	Character *ch;
-	
+        Descriptor *d;
+        Character *ch;
+        
         for (d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
-		continue;
+                continue;
 
-	    ch = d->character;
+            ch = d->character;
 
-	    if (ch
-		&& IS_OUTSIDE(ch) 
-		&& IS_AWAKE(ch) 
-		&& !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
-	    {
-		ch->send_to( buf );
-	    }
+            if (ch
+                && IS_OUTSIDE(ch) 
+                && IS_AWAKE(ch) 
+                && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
+            {
+                ch->send_to( buf );
+            }
         }
     }
 
@@ -173,9 +173,9 @@ void sunlight_update( )
     }
 
     for(int i=0;i<MAX_KEY_HASH;i++)
-	for(Room *r = room_index_hash[i]; r; r = r->next) {
-	    FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
-	}
+        for(Room *r = room_index_hash[i]; r; r = r->next) {
+            FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
+        }
 }
 
 DLString sunlight( )
@@ -206,7 +206,7 @@ void weather_update( )
         if ( weather_info.mmhg <  990
                 || ( weather_info.mmhg < 1010 && number_bits( 2 ) == 0 ) )
         {
-	    buf << "Ó≈¬œ ⁄¡‘—«…◊¡≈‘”— ‘’ﬁ¡Õ…." << endl;
+            buf << "–ù–µ–±–æ –∑–∞—Ç—è–≥–∏–≤–∞–µ—Ç—Å—è —Ç—É—á–∞–º–∏." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -215,13 +215,13 @@ void weather_update( )
         if ( weather_info.mmhg <  970
                 || ( weather_info.mmhg <  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Ó¡ﬁ…Œ¡≈‘”— ƒœ÷ƒÿ." << endl;
+            buf << "–ù–∞—á–∏–Ω–∞–µ—Ç—Å—è –¥–æ–∂–¥—å." << endl;
             weather_info.sky = SKY_RAINING;
         }
 
         if ( weather_info.mmhg > 1030 && number_bits( 2 ) == 0 )
         {
-            buf << "Ù’ﬁ… “¡””≈…◊¡¿‘”—." << endl;
+            buf << "–¢—É—á–∏ —Ä–∞—Å—Å–µ–∏–≤–∞—é—Ç—Å—è." << endl;
             weather_info.sky = SKY_CLOUDLESS;
         }
         break;
@@ -229,14 +229,14 @@ void weather_update( )
     case SKY_RAINING:
         if ( weather_info.mmhg <  970 && number_bits( 2 ) == 0 )
         {
-            buf << "ÌœÃŒ…… ”◊≈“À¡¿‘ Œ¡ Œ≈¬≈." << endl;
+            buf << "–ú–æ–ª–Ω–∏–∏ —Å–≤–µ—Ä–∫–∞—é—Ç –Ω–∞ –Ω–µ–±–µ." << endl;
             weather_info.sky = SKY_LIGHTNING;
         }
 
         if ( weather_info.mmhg > 1030
                 || ( weather_info.mmhg > 1010 && number_bits( 2 ) == 0 ) )
         {
-            buf << "‰œ÷ƒÿ –“≈À“¡›¡≈‘”—." << endl;
+            buf << "–î–æ–∂–¥—å –ø—Ä–µ–∫—Ä–∞—â–∞–µ—Ç—Å—è." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -245,7 +245,7 @@ void weather_update( )
         if ( weather_info.mmhg > 1010
                 || ( weather_info.mmhg >  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "ÌœÃŒ…  ¬œÃÿ€≈ Œ≈‘." << endl;
+            buf << "–ú–æ–ª–Ω–∏–π –±–æ–ª—å—à–µ –Ω–µ—Ç." << endl;
             weather_info.sky = SKY_RAINING;
             break;
         }
@@ -253,61 +253,61 @@ void weather_update( )
     }
 
     if (!buf.str( ).empty( )) {
-	Descriptor *d;
-	Character *ch;
-	
+        Descriptor *d;
+        Character *ch;
+        
         for (d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
-		continue;
+                continue;
 
-	    ch = d->character;
+            ch = d->character;
 
-	    if (ch
-		&& IS_OUTSIDE(ch) 
-		&& IS_AWAKE(ch) 
-		&& !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
-	    {
-		ch->send_to( buf );
-	    }
+            if (ch
+                && IS_OUTSIDE(ch) 
+                && IS_AWAKE(ch) 
+                && !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
+            {
+                ch->send_to( buf );
+            }
         }
     }
 }
 
 
-const char *	const	day_name	[] =
+const char *        const        day_name        [] =
 {
-    "Ï’ŒŸ", "‚ŸÀ¡", "Ï÷…", "Á“œÕ¡", "Û◊œ¬œƒŸ",
-    "˜≈Ã…À…» ‚œ«œ◊", "ÛœÃŒ√¡"
+    "–õ—É–Ω—ã", "–ë—ã–∫–∞", "–õ–∂–∏", "–ì—Ä–æ–º–∞", "–°–≤–æ–±–æ–¥—ã",
+    "–í–µ–ª–∏–∫–∏—Ö –ë–æ–≥–æ–≤", "–°–æ–ª–Ω—Ü–∞"
 };
 
 static const char * adjective_ext(int d) 
 {
-    static const char * EXT_ONE = "Ÿ ";
-    static const char * EXT_TWO = "œ ";
-    static const char * EXT_THREE = "… ";
+    static const char * EXT_ONE = "—ã–π";
+    static const char * EXT_TWO = "–æ–π";
+    static const char * EXT_THREE = "–∏–π";
     
     switch (d % 10) {
     case 0: 
-	return d == 0 ? EXT_TWO : EXT_ONE;
+        return d == 0 ? EXT_TWO : EXT_ONE;
     case 1: case 4: case 5: case 9:
-	return EXT_ONE;
+        return EXT_ONE;
     case 3:
-	return EXT_THREE;
+        return EXT_THREE;
     default:
-	return EXT_TWO;
+        return EXT_TWO;
     }
 }
 
 DLString time_of_day( )
 {
     if ((time_info.hour > 16) && (time_info.hour < 24)) 
-        return "◊≈ﬁ≈“¡";
+        return "–≤–µ—á–µ—Ä–∞";
     if (time_info.hour < 4) 
-        return "Œœﬁ…";
+        return "–Ω–æ—á–∏";
     if ((time_info.hour > 3) && (time_info.hour < 12)) 
-        return "’‘“¡";
+        return "—É—Ç—Ä–∞";
     if ((time_info.hour > 11) && (time_info.hour < 17)) 
-        return "ƒŒ—";
+        return "–¥–Ω—è";
     return DLString::emptyString;
 }
 
@@ -327,9 +327,9 @@ void make_date( ostringstream &buf )
     const char * suf = adjective_ext( day );
     
     buf << hour_of_day( ) << " " << time_of_day( ) << ", " 
-	<< "‰≈Œÿ: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
-	<< "Ì≈”—√ " << calendar_month( ) << ", "
-	<< "Áœƒ " << time_info.year << "." << endl;
+        << "–î–µ–Ω—å: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
+        << "–ú–µ—Å—è—Ü " << calendar_month( ) << ", "
+        << "–ì–æ–¥ " << time_info.year << "." << endl;
 }
 
 CMDRUN( time )
@@ -337,53 +337,53 @@ CMDRUN( time )
     ostringstream buf;
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
-	ch->println( "œ»œ÷≈, ◊ ‹‘œÕ Õ≈”‘≈ ◊“≈Õ— œ”‘¡Œœ◊…Ãœ ”◊œ  »œƒ." );
-	return;
+        ch->println( "–ü–æ—Ö–æ–∂–µ, –≤ —ç—Ç–æ–º –º–µ—Å—Ç–µ –≤—Ä–µ–º—è –æ—Å—Ç–∞–Ω–æ–≤–∏–ª–æ —Å–≤–æ–π —Ö–æ–¥." );
+        return;
     }
 
-    buf << "Û≈ ﬁ¡”: ";
+    buf << "–°–µ–π—á–∞—Å: ";
     make_date( buf );
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
     {
-	buf <<  "˜“≈Õ— {r’¬…◊¡‘ÿ{x, {D”œ⁄ƒ¡Œ…≈ Œœﬁ…{x!" << endl;
+        buf <<  "–í—Ä–µ–º—è {r—É–±–∏–≤–∞—Ç—å{x, {D—Å–æ–∑–¥–∞–Ω–∏–µ –Ω–æ—á–∏{x!" << endl;
     }
 
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-	ch->printf( "Dream Land ⁄¡«“’÷≈Œ %s\r\nÛ…”‘≈ÕŒœ≈ ◊“≈Õ—: %s\r\n",
-	            Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
-	            Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
+        ch->printf( "Dream Land –∑–∞–≥—Ä—É–∂–µ–Ω %s\r\n–°–∏—Å—Ç–µ–º–Ω–æ–µ –≤—Ä–µ–º—è: %s\r\n",
+                    Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
+                    Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
 
 CMDRUN( weather )
 {
     static const char * const sky_look[4] =
     {
-	"—”Œœ≈",
-	"œ¬Ã¡ﬁŒœ≈",
-	"ƒœ÷ƒÃ…◊œ≈",
-	"◊œ ◊”–Ÿ€À¡» ÕœÃŒ… "
+        "—è—Å–Ω–æ–µ",
+        "–æ–±–ª–∞—á–Ω–æ–µ",
+        "–¥–æ–∂–¥–ª–∏–≤–æ–µ",
+        "–≤–æ –≤—Å–ø—ã—à–∫–∞—Ö –º–æ–ª–Ω–∏–π"
     };
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
-	ch->println( "œ»œ÷≈, ◊ ‹‘œÕ Õ≈”‘≈ –œ«œƒ¡ ◊”≈«ƒ¡ œƒ…Œ¡Àœ◊¡—." );
-	return;
+        ch->println( "–ü–æ—Ö–æ–∂–µ, –≤ —ç—Ç–æ–º –º–µ—Å—Ç–µ –ø–æ–≥–æ–¥–∞ –≤—Å–µ–≥–¥–∞ –æ–¥–∏–Ω–∞–∫–æ–≤–∞—è." );
+        return;
     }
     
     if ( !IS_OUTSIDE(ch) )
     {
-	ch->send_to( "ÙŸ Œ≈ Õœ÷≈€ÿ ◊…ƒ≈‘ÿ –œ«œƒ’ ◊ –œÕ≈›≈Œ…….\n\r");
-	return;
+        ch->send_to( "–¢—ã –Ω–µ –º–æ–∂–µ—à—å –≤–∏–¥–µ—Ç—å –ø–æ–≥–æ–¥—É –≤ –ø–æ–º–µ—â–µ–Ω–∏–∏.\n\r");
+        return;
     }
 
-    ch->printf( "Ó≈¬œ %s … %s.\n\r",
-	sky_look[weather_info.sky],
-	weather_info.change >= 0
-	? "ƒ’≈‘ ‘≈–ÃŸ  ¿÷ŒŸ  ◊≈‘≈“"
-	: "ƒ’≈‘ »œÃœƒŒŸ  ”≈◊≈“ŒŸ  ◊≈‘≈“"
-	);
+    ch->printf( "–ù–µ–±–æ %s –∏ %s.\n\r",
+        sky_look[weather_info.sky],
+        weather_info.change >= 0
+        ? "–¥—É–µ—Ç —Ç–µ–ø–ª—ã–π —é–∂–Ω—ã–π –≤–µ—Ç–µ—Ä"
+        : "–¥—É–µ—Ç —Ö–æ–ª–æ–¥–Ω—ã–π —Å–µ–≤–µ—Ä–Ω—ã–π –≤–µ—Ç–µ—Ä"
+        );
 }
 
 
@@ -394,25 +394,25 @@ void weather_init( )
 {
     long lhour, lday, lmonth;
 
-    lhour		= dreamland->getWorldTime( );
+    lhour                = dreamland->getWorldTime( );
 
     if ( lhour == 0 )
     {
-	    lhour = ( dreamland->getCurrentTime( ) - 650336715)
-		    / (PULSE_TICK / dreamland->getPulsePerSecond( ));
+            lhour = ( dreamland->getCurrentTime( ) - 650336715)
+                    / (PULSE_TICK / dreamland->getPulsePerSecond( ));
 
-	    dreamland->setWorldTime( lhour );
+            dreamland->setWorldTime( lhour );
     }
 
-    time_info.hour	= lhour  % 24;
+    time_info.hour        = lhour  % 24;
 
-    lday		= lhour  / 24;
-    time_info.day	= lday   % 35;
+    lday                = lhour  / 24;
+    time_info.day        = lday   % 35;
 
-    lmonth		= lday   / 35;
-    time_info.month	= lmonth % 17;
+    lmonth                = lday   / 35;
+    time_info.month        = lmonth % 17;
 
-    time_info.year	= lmonth / 17;
+    time_info.year        = lmonth / 17;
 
     if (time_info.hour < month_table[time_info.month].sunrise) 
         weather_info.sunlight = SUN_DARK;
@@ -425,17 +425,17 @@ void weather_init( )
     else
         weather_info.sunlight = SUN_DARK;
 
-    weather_info.change	  = 0;
+    weather_info.change          = 0;
     weather_info.change_  = 0;
-    weather_info.mmhg	  = 960;
+    weather_info.mmhg          = 960;
     weather_info.avg_mmhg = 1000;
 
     if ( time_info.month >= 7 && time_info.month <=12 )
-	weather_info.mmhg += number_range( 1, 50 );
+        weather_info.mmhg += number_range( 1, 50 );
     else
-	weather_info.mmhg += number_range( 1, 80 );
+        weather_info.mmhg += number_range( 1, 80 );
 
-	 if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
+         if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
     else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;

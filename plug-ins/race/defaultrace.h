@@ -51,7 +51,7 @@ class DefaultRace : public virtual Race,
                     public XMLVariableContainer 
 {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<DefaultRace> Pointer;
 
     DefaultRace( );

@@ -37,7 +37,7 @@ bool GangstersInfo::canAutoStart( const PlayerList &players, Config &config ) co
     int psize = players.size( );
     
     if (psize == 0)
-	return false;
+        return false;
 
     i = number_range( 0, psize - 1 );
     level = players[i]->getModifyLevel( );
@@ -52,10 +52,10 @@ bool GangstersInfo::canAutoStart( const PlayerList &players, Config &config ) co
 bool GangstersInfo::canParticipate( PCharacter *ch ) const
 {
     if (!GlobalQuestInfo::canParticipate( ch ))
-	return false;
+        return false;
 
     if (ch->getAttributes( ).isAvailable( "nogangsters" ))
-	return false;
+        return false;
 
     return true;
 }

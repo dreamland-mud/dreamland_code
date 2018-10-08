@@ -24,6 +24,6 @@ WrapperBase * WrapperTarget::getWrapper( )
 void WrapperTarget::extractWrapper(bool forever)
 {
     if (wrapper)
-	getWrapper()->extract(forever);
+        getWrapper()->extract(forever);
 }
 

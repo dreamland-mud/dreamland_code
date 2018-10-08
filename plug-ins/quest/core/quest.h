@@ -36,7 +36,7 @@ enum {
 /*
  * Quest
  */
-class Quest :	public XMLAttribute, public XMLVariableContainer 
+class Quest :        public XMLAttribute, public XMLVariableContainer 
 {
 XML_OBJECT
 public:
@@ -71,7 +71,7 @@ public:
     int getTime( PCMemoryInterface * );
 
     XML_VARIABLE XMLInteger     hint;
-    XML_VARIABLE XMLString	charName;
+    XML_VARIABLE XMLString        charName;
     XML_VARIABLE XMLInteger     state;
 
 protected:
@@ -89,7 +89,7 @@ struct Quest::Reward : public virtual DLObject {
     typedef ::Pointer<Reward> Pointer;
     
     Reward( ) : points( 0 ), exp( 0 ), gold( 0 ), prac( 0 ), clanpoints( 0 ),
-		wordChance( 0 ), scrollChance( 0 )
+                wordChance( 0 ), scrollChance( 0 )
     {
     }
 

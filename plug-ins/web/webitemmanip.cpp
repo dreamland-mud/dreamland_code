@@ -90,9 +90,9 @@ struct ItemManipList : public ManipList {
     }
 
     // addAll methods will create commands in the format: 
-    // get все.'item names'[ <container>[:<pocket>]]
+    // get п╡я│п╣.'item names'[ <container>[:<pocket>]]
     void addAll( const DLString &cmdName, Object *obj1, Object *obj2 = NULL ) {
-        DLString args = "все.'" + DLString(obj1->getName( )) + "'";
+        DLString args = "п╡я│п╣.'" + DLString(obj1->getName( )) + "'";
         if (obj2) {
             args += " " + DLString( obj2->getID( ) ); 
         }
@@ -100,7 +100,7 @@ struct ItemManipList : public ManipList {
     }
 
     void addAll( const DLString &cmdName, Object *obj1, Object *obj2, const DLString &pocket ) {
-        DLString args = "все.'" + DLString(obj1->getName( )) + "'";
+        DLString args = "п╡я│п╣.'" + DLString(obj1->getName( )) + "'";
         args += " ";
         args += (obj2 == target ? THIS : DLString( obj2->getID( ) ));
         args += ":" + pocket;
@@ -372,11 +372,11 @@ WEBMANIP_RUN(decorateItem)
                 break;
             case ITEM_CONTAINER:
                 if (!IS_PIT(item))
-                    manips.add( "get", "все" );
+                    manips.add( "get", "п╡я│п╣" );
                 break;
             case ITEM_CORPSE_NPC:
             case ITEM_CORPSE_PC:
-                manips.add( "get", "все" );
+                manips.add( "get", "п╡я│п╣" );
                 break;
             case ITEM_WAND:
                 if (item->wear_loc == wear_hold) 
@@ -483,12 +483,12 @@ WEBMANIP_RUN(decorateItem)
 
             case ITEM_CONTAINER:
                 if (!IS_PIT(item))
-                    manips.add( "get", "все" );
+                    manips.add( "get", "п╡я│п╣" );
                 break;
 
             case ITEM_CORPSE_NPC:
             case ITEM_CORPSE_PC:
-                manips.add( "get", "все" );
+                manips.add( "get", "п╡я│п╣" );
                 break;
 
             case ITEM_FURNITURE:
@@ -568,8 +568,8 @@ WEBMANIP_RUN(decoratePocket)
 
     ItemManipList manips( container, pocket );
 
-    manips.add( "look", "в", pocket );
-    manips.add( "get", "все", pocket );
+    manips.add( "look", "п╡", pocket );
+    manips.add( "get", "п╡я│п╣", pocket );
     buf << manips.toString( );
     return true;
 }

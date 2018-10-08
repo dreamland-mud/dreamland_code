@@ -16,7 +16,7 @@
 
 #include "poliglot.h"
 
-const DLString Language::CATEGORY = "‰“≈◊Œ…≈ —⁄ŸÀ…";
+const DLString Language::CATEGORY = "–î—Ä–µ–≤–Ω–∏–µ —è–∑—ã–∫–∏";
 const int Language::SKILL_ADEPT  = 50;
 const int Language::SKILL_SENSE  = 75;
 const int Language::SKILL_NATIVE = 100;
@@ -31,13 +31,13 @@ SkillGroupReference & Language::getGroup( )
 bool Language::visible( Character * ch ) const
 {
     if (!Command::available( ch ))
-	return false;
+        return false;
 
     if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return true;
+        return true;
     
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     const RaceLangInfo *race = getRaceInfo( ch->getPC( ) );
     const ClassLangInfo *prof = getClassInfo( ch->getPC( ) );
@@ -54,10 +54,10 @@ bool Language::available( Character * ch ) const
 bool Language::usable( Character * ch, bool message = false ) const 
 {
     if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return true;
+        return true;
 
     if (!available( ch ))
-	return false;
+        return false;
 
     return true;
 }
@@ -65,10 +65,10 @@ bool Language::usable( Character * ch, bool message = false ) const
 int Language::getLevel( Character *ch ) const
 {
     if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return 1;
+        return 1;
 
     if (!visible( ch ))
-	return 999;
+        return 999;
 
     const RaceLangInfo *race = getRaceInfo( ch->getPC( ) );
     const ClassLangInfo *prof = getClassInfo( ch->getPC( ) );
@@ -81,10 +81,10 @@ int Language::getLearned( Character *ch ) const
     int learned, maximum;
     
     if (ch->is_immortal( ) && ch->getRealLevel( ) > LEVEL_IMMORTAL)
-	return SKILL_NATIVE;
-	
+        return SKILL_NATIVE;
+        
     if (!usable( ch ))
-	return 0;
+        return 0;
 
     learned = ch->getPC( )->getSkillData( getIndex( ) ).learned.getValue( );
     maximum = getMaximum( ch );
@@ -110,13 +110,13 @@ bool Language::canPractice( PCharacter * ch, std::ostream & ) const
 bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<Poliglot>( ))
-	return true;
+        return true;
    
     if (verbose) { 
         if (mob)
-            ch->pecho( "%^C1 œ‘Œ¿ƒÿ Œ≈ –œÃ…«Ãœ‘.", mob );
+            ch->pecho( "%^C1 –æ—Ç–Ω—é–¥—å –Ω–µ –ø–æ–ª–∏–≥–ª–æ—Ç.", mob );
         else
-            ch->println( "œ…›… ¬“œƒ—ﬁ≈«œ ÕœŒ¡»¡." );
+            ch->println( "–ü–æ–∏—â–∏ –±—Ä–æ–¥—è—á–µ–≥–æ –º–æ–Ω–∞—Ö–∞." );
     }
 
     return false;
@@ -125,9 +125,9 @@ bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 int Language::getAdept( PCharacter *ch ) const
 {
     if (!visible( ch ))
-	return 0;
+        return 0;
     else
-	return SKILL_ADEPT;
+        return SKILL_ADEPT;
 }
 
 void Language::practice( PCharacter *ch ) const
@@ -146,74 +146,74 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     DLString userName;
     bool rus = ch->getConfig( )->ruskills;
 
-    buf << "Ò⁄ŸÀ '{W" << getName( ) << "{x'"
-	<< " '{W" << getRussianName( ) << "{x', "
-	<< "◊»œƒ…‘ ◊ «“’––’ '{hg{W" 
-	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-	<< "{x'"
-	<< endl;
+    buf << "–Ø–∑—ã–∫ '{W" << getName( ) << "{x'"
+        << " '{W" << getRussianName( ) << "{x', "
+        << "–≤—Ö–æ–¥–∏—Ç –≤ –≥—Ä—É–ø–ø—É '{hg{W" 
+        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << "{x'"
+        << endl;
     
     for (r = races.begin( ); r != races.end( ); r++) {
-	Race *race = raceManager->findExisting( r->first );
+        Race *race = raceManager->findExisting( r->first );
     
-	if (!race || !race->isPC( ))
-	    continue;
-	    
-	if (r->second.maximum == SKILL_NATIVE) 
-	    perfect.push_back( russian_case( race->getPC( )->getMltName( ), '1' ) );
-	else 
-	    unperfect.push_back( russian_case( race->getPC( )->getMltName( ), '3' ) );
+        if (!race || !race->isPC( ))
+            continue;
+            
+        if (r->second.maximum == SKILL_NATIVE) 
+            perfect.push_back( russian_case( race->getPC( )->getMltName( ), '1' ) );
+        else 
+            unperfect.push_back( russian_case( race->getPC( )->getMltName( ), '3' ) );
     }
 
     for (c = classes.begin( ); c != classes.end( ); c++) {
-	Profession *prof = professionManager->findExisting( c->first );
-	if (!prof)
-	    continue;
+        Profession *prof = professionManager->findExisting( c->first );
+        if (!prof)
+            continue;
 
-	if (r->second.maximum == SKILL_NATIVE)
-	    perfect.push_back( prof->getMltName( ).ruscase('1') );
-	else 
-	    unperfect.push_back( prof->getMltName( ).ruscase('3') );
+        if (r->second.maximum == SKILL_NATIVE)
+            perfect.push_back( prof->getMltName( ).ruscase('1') );
+        else 
+            unperfect.push_back( prof->getMltName( ).ruscase('3') );
     }
     
     if (!perfect.empty( )) {
-	for (n = perfect.begin( ); n != perfect.end( ); ) {
-	    userName = *n;
+        for (n = perfect.begin( ); n != perfect.end( ); ) {
+            userName = *n;
 
-	    if (n == perfect.begin( ))
-		userName.upperFirstCharacter( );
+            if (n == perfect.begin( ))
+                userName.upperFirstCharacter( );
 
-	    buf << "{w" << userName  << "{x";
+            buf << "{w" << userName  << "{x";
 
-	    if (++n != perfect.end( ))
-		buf << ", ";
-	}
-	     
-        buf << " Õœ«’‘ œ◊Ã¡ƒ≈‘ÿ ‹‘…Õ —⁄ŸÀœÕ ◊ ”œ◊≈“€≈Œ”‘◊≈." << endl;
+            if (++n != perfect.end( ))
+                buf << ", ";
+        }
+             
+        buf << " –º–æ–≥—É—Ç –æ–≤–ª–∞–¥–µ—Ç—å —ç—Ç–∏–º —è–∑—ã–∫–æ–º –≤ —Å–æ–≤–µ—Ä—à–µ–Ω—Å—Ç–≤–µ." << endl;
     }
 
     if (!unperfect.empty( )) {
-	buf << "Ó≈–œÃŒŸ≈ ⁄Œ¡Œ…— ƒœ”‘’–ŒŸ ";
-	
-	for (n = unperfect.begin( ); n != unperfect.end( ); ) {
-	    buf << "{w" << *n << "{x";
+        buf << "–ù–µ–ø–æ–ª–Ω—ã–µ –∑–Ω–∞–Ω–∏—è –¥–æ—Å—Ç—É–ø–Ω—ã ";
+        
+        for (n = unperfect.begin( ); n != unperfect.end( ); ) {
+            buf << "{w" << *n << "{x";
 
-	    if (++n != unperfect.end( ))
-		buf << ", ";
-	}
-	
-	buf << "." << endl;
+            if (++n != unperfect.end( ))
+                buf << ", ";
+        }
+        
+        buf << "." << endl;
     }
 
     if (visible( ch )) {
-	int learned = getLearned( ch );
-	
-	buf << "Ù≈¬≈ —⁄ŸÀ ƒœ”‘’–≈Œ ” ’“œ◊Œ— {W" << getLevel( ch ) << "{x";
+        int learned = getLearned( ch );
+        
+        buf << "–¢–µ–±–µ —è–∑—ã–∫ –¥–æ—Å—Ç—É–ø–µ–Ω —Å —É—Ä–æ–≤–Ω—è {W" << getLevel( ch ) << "{x";
 
-	if (learned > 0)
-	    buf << ", …⁄’ﬁ≈Œ Œ¡ {W" << learned << "%{x";
-	
-	buf << "." << endl;
+        if (learned > 0)
+            buf << ", –∏–∑—É—á–µ–Ω –Ω–∞ {W" << learned << "%{x";
+        
+        buf << "." << endl;
     }
 }
 
@@ -234,21 +234,21 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCharacter *pch = ch->getPC( );
 
     if (learned < SKILL_ADEPT || learned >= maximum)
-	return;
+        return;
 
     if (maximum <= SKILL_ADEPT) 
-	return;
+        return;
 
     if (!chance( maximum / 2 ))
-	return;
+        return;
     
     if (number_percent( ) >= 4 * ch->getCurrStat( STAT_INT )) 
-	return;
-	
+        return;
+        
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;
-    ch->pecho( "ÙŸ ”œ◊≈“€≈Œ”‘◊’≈€ÿ ”◊œ… –œ⁄Œ¡Œ…— ◊ %^N6.", nameRus.getValue( ).c_str( ) );
+    ch->pecho( "–¢—ã —Å–æ–≤–µ—Ä—à–µ–Ω—Å—Ç–≤—É–µ—à—å —Å–≤–æ–∏ –ø–æ–∑–Ω–∞–Ω–∏—è –≤ %^N6.", nameRus.getValue( ).c_str( ) );
 }
 
 const DLString & Language::getName( ) const

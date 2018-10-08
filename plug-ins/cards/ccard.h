@@ -13,19 +13,19 @@ class PCharacter;
 class CCard : public AdminCommand {
 XML_OBJECT
 public:
-	typedef ::Pointer<CCard> Pointer;
+        typedef ::Pointer<CCard> Pointer;
     
-	CCard( );
+        CCard( );
 
-	virtual void run( Character *, const DLString & );
-	
+        virtual void run( Character *, const DLString & );
+        
 private:
-	void doMob( PCharacter *, DLString& );
-	void doChar( PCharacter *, DLString& );
-	void doList( PCharacter *, DLString& );
-	void usage( PCharacter * );
+        void doMob( PCharacter *, DLString& );
+        void doChar( PCharacter *, DLString& );
+        void doList( PCharacter *, DLString& );
+        void usage( PCharacter * );
 
-	static const DLString COMMAND_NAME;
+        static const DLString COMMAND_NAME;
 };
 
 #endif

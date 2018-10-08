@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
- *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
- *    Koval Nazar	    {Nazar, Redrum}                 		   *
- *    Doropey Vladimir	    {Reorx}		                           *
- *    Kulgeyko Denis	    {Burzum}		                           *
- *    Andreyanov Aleksandr  {Manwe}		                           *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD	                   *
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
+ *    Igor S. Petrenko            {NoFate, Demogorgon}                           *
+ *    Koval Nazar            {Nazar, Redrum}                                    *
+ *    Doropey Vladimir            {Reorx}                                           *
+ *    Kulgeyko Denis            {Burzum}                                           *
+ *    Andreyanov Aleksandr  {Manwe}                                           *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                           *
  ***************************************************************************/
 
 
@@ -43,11 +43,11 @@
 #include "handler.h"
 #include "def.h"
 
-#define OBJ_VNUM_SILVER_ONE	      1
-#define OBJ_VNUM_GOLD_ONE	      2
-#define OBJ_VNUM_GOLD_SOME	      3
-#define OBJ_VNUM_SILVER_SOME	      4
-#define OBJ_VNUM_COINS		      5
+#define OBJ_VNUM_SILVER_ONE              1
+#define OBJ_VNUM_GOLD_ONE              2
+#define OBJ_VNUM_GOLD_SOME              3
+#define OBJ_VNUM_SILVER_SOME              4
+#define OBJ_VNUM_COINS                      5
 
 void get_money_here( Object *list, int &gold, int &silver )
 {
@@ -55,35 +55,35 @@ void get_money_here( Object *list, int &gold, int &silver )
 
     for ( obj = list; obj != 0; obj = obj_next )
     {
-	obj_next = obj->next_content;
+        obj_next = obj->next_content;
 
-	switch ( obj->pIndexData->vnum ) {
-	case OBJ_VNUM_SILVER_ONE:
-	    silver += 1;
-	    extract_obj(obj);
-	    break;
+        switch ( obj->pIndexData->vnum ) {
+        case OBJ_VNUM_SILVER_ONE:
+            silver += 1;
+            extract_obj(obj);
+            break;
 
-	case OBJ_VNUM_GOLD_ONE:
-	    gold += 1;
-	    extract_obj( obj );
-	    break;
+        case OBJ_VNUM_GOLD_ONE:
+            gold += 1;
+            extract_obj( obj );
+            break;
 
-	case OBJ_VNUM_SILVER_SOME:
-	    silver += obj->value[0];
-	    extract_obj(obj);
-	    break;
+        case OBJ_VNUM_SILVER_SOME:
+            silver += obj->value[0];
+            extract_obj(obj);
+            break;
 
-	case OBJ_VNUM_GOLD_SOME:
-	    gold += obj->value[1];
-	    extract_obj( obj );
-	    break;
+        case OBJ_VNUM_GOLD_SOME:
+            gold += obj->value[1];
+            extract_obj( obj );
+            break;
 
-	case OBJ_VNUM_COINS:
-	    silver += obj->value[0];
-	    gold += obj->value[1];
-	    extract_obj(obj);
-	    break;
-	}
+        case OBJ_VNUM_COINS:
+            silver += obj->value[0];
+            gold += obj->value[1];
+            extract_obj(obj);
+            break;
+        }
     }
 }
 
@@ -98,44 +98,44 @@ Object *create_money( int gold, int silver )
 
     if ( gold < 0 || silver < 0 || (gold == 0 && silver == 0) )
     {
-	bug( "Create_money: zero or negative money.",min(gold,silver));
-	gold = max(1,gold);
-	silver = max(1,silver);
+        bug( "Create_money: zero or negative money.",min(gold,silver));
+        gold = max(1,gold);
+        silver = max(1,silver);
     }
 
     if (gold == 0 && silver == 1)
     {
-	obj = create_object( get_obj_index( OBJ_VNUM_SILVER_ONE ), 0 );
+        obj = create_object( get_obj_index( OBJ_VNUM_SILVER_ONE ), 0 );
     }
     else if (gold == 1 && silver == 0)
     {
-	obj = create_object( get_obj_index( OBJ_VNUM_GOLD_ONE), 0 );
+        obj = create_object( get_obj_index( OBJ_VNUM_GOLD_ONE), 0 );
     }
     else if (silver == 0)
     {
         obj = create_object( get_obj_index( OBJ_VNUM_GOLD_SOME ), 0 );
-	obj->fmtShortDescr( obj->getShortDescr( ), gold );
+        obj->fmtShortDescr( obj->getShortDescr( ), gold );
         obj->value[1]           = gold;
         obj->cost               = gold;
-	obj->weight		= gold/5;
+        obj->weight                = gold/5;
     }
     else if (gold == 0)
     {
         obj = create_object( get_obj_index( OBJ_VNUM_SILVER_SOME ), 0 );
-	obj->fmtShortDescr( obj->getShortDescr( ), silver );
+        obj->fmtShortDescr( obj->getShortDescr( ), silver );
         obj->value[0]           = silver;
         obj->cost               = silver;
-	obj->weight		= silver/20;
+        obj->weight                = silver/20;
     }
 
     else
     {
-	obj = create_object( get_obj_index( OBJ_VNUM_COINS ), 0 );
-	obj->fmtShortDescr( obj->getShortDescr( ), silver, gold );
-	obj->value[0]		= silver;
-	obj->value[1]		= gold;
-	obj->cost		= 100 * gold + silver;
-	obj->weight		= gold / 5 + silver / 20;
+        obj = create_object( get_obj_index( OBJ_VNUM_COINS ), 0 );
+        obj->fmtShortDescr( obj->getShortDescr( ), silver, gold );
+        obj->value[0]                = silver;
+        obj->value[1]                = gold;
+        obj->cost                = 100 * gold + silver;
+        obj->weight                = gold / 5 + silver / 20;
     }
 
     return obj;
@@ -144,42 +144,42 @@ Object *create_money( int gold, int silver )
 DLString describe_money( int gold, int silver, const Grammar::Case &gcase )
 {
     static const char *cases_gold [] = {
-	"⁄œÃœ‘%1$I¡—|Ÿ≈|Ÿ»",
-	"⁄œÃœ‘%1$Iœ |Ÿ»|Ÿ»",
-	"⁄œÃœ‘%1$Iœ |ŸÕ|ŸÕ",
-	"⁄œÃœ‘%1$I’¿|Ÿ≈|Ÿ»",
-	"⁄œÃœ‘%1$Iœ |ŸÕ…|ŸÕ…",
-	"⁄œÃœ‘%1$Iœ |Ÿ»|Ÿ»",
+        "–∑–æ–ª–æ—Ç%1$I–∞—è|—ã–µ|—ã—Ö",
+        "–∑–æ–ª–æ—Ç%1$I–æ–π|—ã—Ö|—ã—Ö",
+        "–∑–æ–ª–æ—Ç%1$I–æ–π|—ã–º|—ã–º",
+        "–∑–æ–ª–æ—Ç%1$I—É—é|—ã–µ|—ã—Ö",
+        "–∑–æ–ª–æ—Ç%1$I–æ–π|—ã–º–∏|—ã–º–∏",
+        "–∑–æ–ª–æ—Ç%1$I–æ–π|—ã—Ö|—ã—Ö",
     };
     static const char *cases_silver [] = {
-	"”≈“≈¬“—Œ%1$I¡—|Ÿ≈|Ÿ»",
-	"”≈“≈¬“—Œ%1$I¡—|Ÿ≈|Ÿ»",
-	"”≈“≈¬“—Œ%1$Iœ |Ÿ»|Ÿ»",
-	"”≈“≈¬“—Œ%1$Iœ |ŸÕ|ŸÕ",
-	"”≈“≈¬“—Œ%1$I’¿|Ÿ≈|Ÿ»",
-	"”≈“≈¬“—Œ%1$Iœ |ŸÕ…|ŸÕ…",
-	"”≈“≈¬“—Œ%1$Iœ |Ÿ»|Ÿ»",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I–∞—è|—ã–µ|—ã—Ö",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I–∞—è|—ã–µ|—ã—Ö",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I–æ–π|—ã—Ö|—ã—Ö",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I–æ–π|—ã–º|—ã–º",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I—É—é|—ã–µ|—ã—Ö",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I–æ–π|—ã–º–∏|—ã–º–∏",
+        "—Å–µ—Ä–µ–±—Ä—è–Ω%1$I–æ–π|—ã—Ö|—ã—Ö",
     };
     static const char *cases_coin [] = {
-	"ÕœŒ≈%1$I‘¡|‘Ÿ|‘",
-	"ÕœŒ≈%1$I‘¡|‘Ÿ|‘",
-	"ÕœŒ≈%1$I‘Ÿ|‘|‘",
-	"ÕœŒ≈%1$I‘≈|‘¡Õ|‘¡Õ",
-	"ÕœŒ≈%1$I‘’|‘Ÿ|‘",
-	"ÕœŒ≈%1$I‘œ |‘¡Õ…|‘¡Õ…",
-	"ÕœŒ≈%1$I‘≈|‘¡»|‘¡»",
+        "–º–æ–Ω–µ%1$I—Ç–∞|—Ç—ã|—Ç",
+        "–º–æ–Ω–µ%1$I—Ç–∞|—Ç—ã|—Ç",
+        "–º–æ–Ω–µ%1$I—Ç—ã|—Ç|—Ç",
+        "–º–æ–Ω–µ%1$I—Ç–µ|—Ç–∞–º|—Ç–∞–º",
+        "–º–æ–Ω–µ%1$I—Ç—É|—Ç—ã|—Ç",
+        "–º–æ–Ω–µ%1$I—Ç–æ–π|—Ç–∞–º–∏|—Ç–∞–º–∏",
+        "–º–æ–Ω–µ%1$I—Ç–µ|—Ç–∞—Ö|—Ç–∞—Ö",
     };
 
     DLString msg;
     
     if (gold > 0)
-	msg << gold << " " << fmt( 0, cases_gold[gcase], gold );
+        msg << gold << " " << fmt( 0, cases_gold[gcase], gold );
 
     if (silver > 0) {
-	if (gold > 0)
-	    msg << " … ";
+        if (gold > 0)
+            msg << " –∏ ";
 
-	msg << silver << " " << fmt( 0, cases_silver[gcase], silver);
+        msg << silver << " " << fmt( 0, cases_silver[gcase], silver);
     }
     
     msg << " " << fmt( 0, cases_coin[gcase], silver > 0 ? silver : gold );
@@ -195,11 +195,11 @@ int count_users(Object *obj)
     int count = 0;
 
     if (obj->in_room == 0)
-	return 0;
+        return 0;
 
     for (fch = obj->in_room->people; fch != 0; fch = fch->next_in_room)
-	if (fch->on == obj)
-	    count++;
+        if (fch->on == obj)
+            count++;
 
     return count;
 }
@@ -219,71 +219,71 @@ Character * find_char( Character *ch, const char *cArgument, int door, int *rang
     dest_room = ch->in_room;
 
     if ( (target = get_char_room(ch,dest_room,arg,&number)) != 0)
-	return target;
+        return target;
 
     if (door < 0 || door >= DIR_SOMEWHERE)
     {
-	bug("In find_char wrong door: %d",door);
+        bug("In find_char wrong door: %d",door);
 
-	if (message)
-	    ch->send_to("ÙŸ Œ≈ ◊…ƒ…€ÿ ‹‘œ«œ ⁄ƒ≈”ÿ.\n\r");
+        if (message)
+            ch->send_to("–¢—ã –Ω–µ –≤–∏–¥–∏—à—å —ç—Ç–æ–≥–æ –∑–¥–µ—Å—å.\n\r");
 
-	return 0;
+        return 0;
     }
     
     opdoor = dirs[door].rev;
 
     while (*range > 0)
     {
-	*range = *range - 1;
-	/* find target room */
-	back_room = dest_room;
+        *range = *range - 1;
+        /* find target room */
+        back_room = dest_room;
 
-	if ( (pExit = dest_room->exit[door]) == 0
-	    || !ch->can_see( pExit )
-	    || (dest_room = pExit->u1.to_room ) == 0
-	    || IS_SET(pExit->exit_info,EX_CLOSED) )
-	    break;
+        if ( (pExit = dest_room->exit[door]) == 0
+            || !ch->can_see( pExit )
+            || (dest_room = pExit->u1.to_room ) == 0
+            || IS_SET(pExit->exit_info,EX_CLOSED) )
+            break;
 
-	if ( (bExit = dest_room->exit[opdoor]) == 0
-	    || bExit->u1.to_room != back_room)
-	{
-	    if (message)
-		ch->send_to("œ ◊Ÿ¬“¡ŒŒœÕ’ Œ¡–“¡◊Ã≈Œ…¿ ﬁ‘œ-‘œ –“≈–—‘”‘◊’≈‘ ‘≈¬≈.\n\r");
+        if ( (bExit = dest_room->exit[opdoor]) == 0
+            || bExit->u1.to_room != back_room)
+        {
+            if (message)
+                ch->send_to("–ü–æ –≤—ã–±—Ä–∞–Ω–Ω–æ–º—É –Ω–∞–ø—Ä–∞–≤–ª–µ–Ω–∏—é —á—Ç–æ-—Ç–æ –ø—Ä–µ–ø—è—Ç—Å—Ç–≤—É–µ—Ç —Ç–µ–±–µ.\n\r");
 
-	    return 0;
-	}
+            return 0;
+        }
 
-	if ((target = get_char_room(ch,dest_room,arg,&number)) != 0 )
-	    return target;
+        if ((target = get_char_room(ch,dest_room,arg,&number)) != 0 )
+            return target;
     }
     
     if (message)
-	ch->send_to("ÙŸ Œ≈ ◊…ƒ…€ÿ ‹‘œ«œ ⁄ƒ≈”ÿ.\n\r");
+        ch->send_to("–¢—ã –Ω–µ –≤–∏–¥–∏—à—å —ç—Ç–æ–≥–æ –∑–¥–µ—Å—å.\n\r");
 
     return 0;
 }
-	
+        
 
 void reboot_anatolia( void )
 {
-	Descriptor *d,*d_next;
-	
-	LogStream::sendNotice( ) << "Rebooting DREAM LAND." << endl;
+        Descriptor *d,*d_next;
+        
+        LogStream::sendNotice( ) << "Rebooting DREAM LAND." << endl;
 
-	for ( d = descriptor_list; d != 0; d = d_next )
-	{
-		d_next = d->next;
-		d->send("Dream Land is going down for rebooting NOW!\n");
+        for ( d = descriptor_list; d != 0; d = d_next )
+        {
+                d_next = d->next;
+                d->send("Dream Land is going down for rebooting NOW!\n");
 
-		if (d->character && d->connected == CON_PLAYING)
-			d->character->getPC( )->save();
+                if (d->character && d->connected == CON_PLAYING)
+                        d->character->getPC( )->save();
 
-		d->close();
-	}
-	dreamland->shutdown( );
+                d->close();
+        }
+        dreamland->shutdown( );
 
-	return;
+        return;
 }
 
 
@@ -292,23 +292,23 @@ void eyes_blinded_msg( Character *ch )
     Affect *paf;
 
     if (!IS_AFFECTED(ch, AFF_BLIND))
-	return;
+        return;
 
     for (paf = ch->affected; paf; paf = paf->next) 
-	if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_BLIND)) {
-	    if (paf->type == gsn_fire_breath)
-		ch->println( "Ù◊œ… «Ã¡⁄¡ ”Ã≈⁄—‘”— …⁄-⁄¡ ƒŸÕ¡, … ‘Ÿ Œ…ﬁ≈«œ Œ≈ ◊…ƒ…€ÿ." );
-	    else if (paf->type == gsn_sand_storm)
-		ch->println( "≈”œÀ ◊ «Ã¡⁄¡» Õ≈€¡≈‘ ‘≈¬≈ ﬁ‘œ-Ã…¬œ “¡⁄«Ã—ƒ≈‘ÿ." );
-	    else if (paf->type == gsn_dirt_kicking)
-		ch->println( "ÙŸ Œ…ﬁ≈«œ Œ≈ ◊…ƒ…€ÿ …⁄-⁄¡ –ŸÃ…, –œ–¡◊€≈  ◊ «Ã¡⁄¡." );
-	    else
-		continue;
+        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_BLIND)) {
+            if (paf->type == gsn_fire_breath)
+                ch->println( "–¢–≤–æ–∏ –≥–ª–∞–∑–∞ —Å–ª–µ–∑—è—Ç—Å—è –∏–∑-–∑–∞ –¥—ã–º–∞, –∏ —Ç—ã –Ω–∏—á–µ–≥–æ –Ω–µ –≤–∏–¥–∏—à—å." );
+            else if (paf->type == gsn_sand_storm)
+                ch->println( "–ü–µ—Å–æ–∫ –≤ –≥–ª–∞–∑–∞—Ö –º–µ—à–∞–µ—Ç —Ç–µ–±–µ —á—Ç–æ-–ª–∏–±–æ —Ä–∞–∑–≥–ª—è–¥–µ—Ç—å." );
+            else if (paf->type == gsn_dirt_kicking)
+                ch->println( "–¢—ã –Ω–∏—á–µ–≥–æ –Ω–µ –≤–∏–¥–∏—à—å –∏–∑-–∑–∞ –ø—ã–ª–∏, –ø–æ–ø–∞–≤—à–µ–π –≤ –≥–ª–∞–∑–∞." );
+            else
+                continue;
 
-	    return;
-	}
+            return;
+        }
 
-    ch->println( "Ù◊œ… «Ã¡⁄¡ ”Ã≈–Ÿ, ‘Ÿ Œ…ﬁ≈«œ Œ≈ ◊…ƒ…€ÿ!" );
+    ch->println( "–¢–≤–æ–∏ –≥–ª–∞–∑–∞ —Å–ª–µ–ø—ã, —Ç—ã –Ω–∏—á–µ–≥–æ –Ω–µ –≤–∏–¥–∏—à—å!" );
 }
 
 /*--------------------------------------------------------------
@@ -319,13 +319,13 @@ static bool char_is_nodrop( Character *ch )
     NPCharacter *npc = ch->getNPC();
 
     if (!npc)
-	return false;
+        return false;
     
     if (IS_SET(npc->pIndexData->area->area_flag, AREA_NOSAVEDROP))
-	return true;
+        return true;
     
     if (IS_SET(ch->act, ACT_NOSAVEDROP))
-	return true;
+        return true;
 
     return false;
 }
@@ -338,57 +338,57 @@ void nuke_pets( PCharacter *ch, int flags )
     NPCharacter *pet = ch->pet;
     
     if (!pet)
-	return;
+        return;
 
     pet->stop_follower( );
    
     if (pet->in_room == ch->in_room)
-        act( "$C1 Õ≈ƒÃ≈ŒŒœ …”ﬁ≈⁄¡≈‘.", ch, NULL, pet, TO_NOTVICT );
+        act( "$C1 –º–µ–¥–ª–µ–Ω–Ω–æ –∏—Å—á–µ–∑–∞–µ—Ç.", ch, NULL, pet, TO_NOTVICT );
     else
-        act( "$c1 Õ≈ƒÃ≈ŒŒœ …”ﬁ≈⁄¡≈‘.", pet, NULL, NULL, TO_ROOM );
+        act( "$c1 –º–µ–¥–ª–µ–Ω–Ω–æ –∏—Å—á–µ–∑–∞–µ—Ç.", pet, NULL, NULL, TO_ROOM );
         
     
     if (IS_SET(flags, FEXTRACT_TOTAL))
-	extract_char( pet, IS_SET(flags, FEXTRACT_COUNT));
+        extract_char( pet, IS_SET(flags, FEXTRACT_COUNT));
     else
-	pet->setDead( );
+        pet->setDead( );
 
     ch->pet = NULL;
 }
 
 /*
- * Ô–œ◊≈”‘…‘ÿ œ extract-≈ ◊”≈», À‘œ Œ¡ Œ¡” ””ŸÃ¡Ã”—
+ * –û–ø–æ–≤–µ—Å—Ç–∏—Ç—å –æ extract-–µ –≤—Å–µ—Ö, –∫—Ç–æ –Ω–∞ –Ω–∞—Å —Å—Å—ã–ª–∞–ª—Å—è
  */
 void notify_referers( Character *ch, int flags )
 {
     Character *wch;
 
     for (wch = char_list; wch != 0; wch = wch->next) {
-	if (IS_SET(flags, FEXTRACT_TOTAL) && wch->reply == ch)
-	    wch->reply = 0;
+        if (IS_SET(flags, FEXTRACT_TOTAL) && wch->reply == ch)
+            wch->reply = 0;
 
-	if (wch->doppel == ch && wch->isAffected(gsn_doppelganger)) {
-	    wch->println("ÙŸ –“…Œ…Õ¡≈€ÿ ”◊œ≈ …”‘…ŒŒœ≈ œ¬Ã…ﬁÿ≈.");
-	    
-	    if (gsn_doppelganger->getAffect( ))
-		gsn_doppelganger->getAffect( )->remove( wch );
+        if (wch->doppel == ch && wch->isAffected(gsn_doppelganger)) {
+            wch->println("–¢—ã –ø—Ä–∏–Ω–∏–º–∞–µ—à—å —Å–≤–æ–µ –∏—Å—Ç–∏–Ω–Ω–æ–µ –æ–±–ª–∏—á—å–µ.");
+            
+            if (gsn_doppelganger->getAffect( ))
+                gsn_doppelganger->getAffect( )->remove( wch );
 
-	    affect_strip(wch,gsn_doppelganger);
-	}
+            affect_strip(wch,gsn_doppelganger);
+        }
 
-	if (wch->is_npc( ) && wch->getNPC( )->behavior) 
-	    wch->getNPC( )->behavior->extractNotify( ch, IS_SET(flags, FEXTRACT_TOTAL), IS_SET(flags, FEXTRACT_COUNT) );
+        if (wch->is_npc( ) && wch->getNPC( )->behavior) 
+            wch->getNPC( )->behavior->extractNotify( ch, IS_SET(flags, FEXTRACT_TOTAL), IS_SET(flags, FEXTRACT_COUNT) );
 
-	
-	if (IS_SET(flags, FEXTRACT_TOTAL|FEXTRACT_LASTFOUGHT) && wch->last_fought == ch)
-	    wch->last_fought = 0;
+        
+        if (IS_SET(flags, FEXTRACT_TOTAL|FEXTRACT_LASTFOUGHT) && wch->last_fought == ch)
+            wch->last_fought = 0;
     }
     
     guarding_clear( ch );
 }
 
 /*
- * Extract Õ≈“‘◊œ«œ …«“œÀ¡
+ * Extract –º–µ—Ä—Ç–≤–æ–≥–æ –∏–≥—Ä–æ–∫–∞
  */
 void extract_dead_player( PCharacter *ch, int flags )
 {
@@ -403,8 +403,8 @@ void extract_dead_player( PCharacter *ch, int flags )
     ch->dismount( );
     
     if (( altar = get_room_index( ch->getHometown( )->getAltar( ) ) )) {
-	char_from_room( ch );
-	char_to_room( ch, altar );
+        char_from_room( ch );
+        char_to_room( ch, altar );
     }
 
     notify_referers( ch, flags );
@@ -420,30 +420,30 @@ void extract_char( Character *ch, bool count )
     int flags;
 
     if (ch->extracted)  {
-	LogStream::sendError( ) << "Warning! Extraction of " << ch->getNameP( ) << endl;
-	return; 
+        LogStream::sendError( ) << "Warning! Extraction of " << ch->getNameP( ) << endl;
+        return; 
     }
     else
-	ch->extracted = true;  
+        ch->extracted = true;  
 
     NPCharacter *npc = ch->getNPC( );
     PCharacter *pc = ch->getPC( );
     
     if (char_is_nodrop( ch ))
-	count = true;
+        count = true;
 
     flags = FEXTRACT_TOTAL | (count ? FEXTRACT_COUNT : 0);
 
     if (!npc)
-	nuke_pets( pc, flags );
-	
+        nuke_pets( pc, flags );
+        
     ch->die_follower( );
 
     stop_fighting( ch, true );
 
     for (obj = ch->carrying; obj != 0; obj = obj_next) {
-	obj_next = obj->next_content;
-	extract_obj_1( obj, count );
+        obj_next = obj->next_content;
+        extract_obj_1( obj, count );
     }
     
     undig( ch );
@@ -452,48 +452,48 @@ void extract_char( Character *ch, bool count )
     notify_referers( ch, flags );
 
     if (npc && npc->switchedFrom)
-	interpret_raw( ch, "return" );
+        interpret_raw( ch, "return" );
 
     char_from_room( ch );
 
     if (npc) {
-	if (count)
-	    --npc->pIndexData->count;
+        if (count)
+            --npc->pIndexData->count;
     }
 
     /*paranoid*/
     if (!npc && pc->switchedTo && pc->switchedTo->desc) {
-	pc->switchedTo->desc->close( );
-	pc->switchedTo->switchedFrom = 0;
-	pc->switchedTo = 0;
-	LogStream::sendError() 
-	    << "attempt to extract original PCwhile in switch: " 
-	    << pc->getNameP( ) << endl;
+        pc->switchedTo->desc->close( );
+        pc->switchedTo->switchedFrom = 0;
+        pc->switchedTo = 0;
+        LogStream::sendError() 
+            << "attempt to extract original PCwhile in switch: " 
+            << pc->getNameP( ) << endl;
     }
 
     char_from_list( ch, &char_list );
     
     if (ch->desc)
-	ch->desc->character = 0;
-	
+        ch->desc->character = 0;
+        
     mprog_extract( ch, count );
     
     if (!npc)
-	PCharacterManager::extract( pc );
+        PCharacterManager::extract( pc );
     else
-	NPCharacterManager::extract( npc );
+        NPCharacterManager::extract( npc );
 }
 
 DLString quality_percent( int c )
 {
     DLString str;
 
-    if (c >  99) return "{Cœ‘Ã…ﬁŒ|œ≈{x|œ«œ{x|œÕ’{x|œ≈{x|ŸÕ{x|œÕ{x";
-    if (c >= 80) return "{c»œ“œ€|≈≈{x|≈«œ{x|≈Õ’{x|≈≈{x|…Õ{x|≈Õ{x";
-    if (c >= 60) return "{YŒœ“Õ¡ÃÿŒ|œ≈{x|œ«œ{x|œÕ’{x|œ≈{x|ŸÕ{x|œÕ{x";
-    if (c >= 40) return "{y”“≈ƒŒ|≈≈{x|≈«œ{x|≈Õ’{x|≈≈{x|…Õ{x|≈Õ{x";
-    if (c >= 20) return "{R–Ãœ»|œ≈{x|œ«œ{x|œÕ’{x|œ≈{x|…Õ{x|œÕ{x";
-                 return "{r’÷¡”Œ|œ≈{x|œ«œ{x|œÕ’{x|œ≈{x|ŸÕ{x|œÕ{x";
+    if (c >  99) return "{C–æ—Ç–ª–∏—á–Ω|–æ–µ{x|–æ–≥–æ{x|–æ–º—É{x|–æ–µ{x|—ã–º{x|–æ–º{x";
+    if (c >= 80) return "{c—Ö–æ—Ä–æ—à|–µ–µ{x|–µ–≥–æ{x|–µ–º—É{x|–µ–µ{x|–∏–º{x|–µ–º{x";
+    if (c >= 60) return "{Y–Ω–æ—Ä–º–∞–ª—å–Ω|–æ–µ{x|–æ–≥–æ{x|–æ–º—É{x|–æ–µ{x|—ã–º{x|–æ–º{x";
+    if (c >= 40) return "{y—Å—Ä–µ–¥–Ω|–µ–µ{x|–µ–≥–æ{x|–µ–º—É{x|–µ–µ{x|–∏–º{x|–µ–º{x";
+    if (c >= 20) return "{R–ø–ª–æ—Ö|–æ–µ{x|–æ–≥–æ{x|–æ–º—É{x|–æ–µ{x|–∏–º{x|–æ–º{x";
+                 return "{r—É–∂–∞—Å–Ω|–æ–µ{x|–æ–≥–æ{x|–æ–º—É{x|–æ–µ{x|—ã–º{x|–æ–º{x";
 }
 
 

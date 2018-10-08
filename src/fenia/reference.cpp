@@ -18,28 +18,28 @@ const Register
 Reference::operator () (const RegisterList &args) const
 {
     if(id)
-	return Context::current->scope->callVar(id, args);
+        return Context::current->scope->callVar(id, args);
 
     switch(container.type) {
-	case Register::NONE:
-	    throw NullPointerException();
+        case Register::NONE:
+            throw NullPointerException();
 
-	case Register::OBJECT:
-	    return container.toHandler()->callMethod(key, args);
-	    
-	case Register::STRING:
-	{
-	    FeniaString::Traits::Invoke::Entry *e = FeniaString::Traits::Invoke::List::lookup(key);
-	    
-	    if(!e || e->method == 0)
-		throw Exception("Invoke method not found: " + key.toString( ));
+        case Register::OBJECT:
+            return container.toHandler()->callMethod(key, args);
+            
+        case Register::STRING:
+        {
+            FeniaString::Traits::Invoke::Entry *e = FeniaString::Traits::Invoke::List::lookup(key);
+            
+            if(!e || e->method == 0)
+                throw Exception("Invoke method not found: " + key.toString( ));
 
-	    /*XXX: get rid of const_cast?*/
-	    return (const_cast<FeniaString *>(container.strPtr( ))->*(e->method))(args);
-	}
-	case Register::NUMBER:
-	default:
-	    throw NotImplementedException();
+            /*XXX: get rid of const_cast?*/
+            return (const_cast<FeniaString *>(container.strPtr( ))->*(e->method))(args);
+        }
+        case Register::NUMBER:
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -48,17 +48,17 @@ const Register &
 Reference::operator = (const Register &r) const
 {
     if(id) {
-	Context::current->scope->setVar(id, r);
-	return r;
+        Context::current->scope->setVar(id, r);
+        return r;
     }
 
     switch(container.type) {
-	case Register::OBJECT:
-	    container.toHandler()->setField(key, r);
-	    return r;
+        case Register::OBJECT:
+            container.toHandler()->setField(key, r);
+            return r;
 
-	default:
-	    throw NotImplementedException();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -66,25 +66,25 @@ const Register
 Reference::operator * () const
 {
     if(id)
-	return Context::current->scope->getVar(id);
+        return Context::current->scope->getVar(id);
 
     switch(container.type) {
-	case Register::OBJECT:
-	    return container.toHandler()->getField(key);
+        case Register::OBJECT:
+            return container.toHandler()->getField(key);
 
-	case Register::STRING:
-	    try {
-		DLString result;
+        case Register::STRING:
+            try {
+                DLString result;
 
-		result.assign( container.toString().at( key.toNumber() ) );
-		return result;
-	    
-	    } catch (const std::exception& e) {
-		throw IndexOutOfBoundsException();
-	    }
-	    
-	default:
-	    throw NotImplementedException();
+                result.assign( container.toString().at( key.toNumber() ) );
+                return result;
+            
+            } catch (const std::exception& e) {
+                throw IndexOutOfBoundsException();
+            }
+            
+        default:
+            throw NotImplementedException();
     }
 }
 

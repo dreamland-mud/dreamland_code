@@ -13,18 +13,18 @@ class PCharacter;
 
 class Divorce : public CommandPlugin, public DefaultCommand {
 public:
-	typedef ::Pointer<Divorce> Pointer;
+        typedef ::Pointer<Divorce> Pointer;
     
-	Divorce( );
+        Divorce( );
 
-	virtual void run( Character*, const DLString& constArguments );
-	
+        virtual void run( Character*, const DLString& constArguments );
+        
 private:
-	void divorce( PCharacter *, DLString );
-	void divorceWidow( PCharacter * );
-	PCharacter * checkBride( Character *, DLString );
-	
-	static const DLString COMMAND_NAME;
+        void divorce( PCharacter *, DLString );
+        void divorceWidow( PCharacter * );
+        PCharacter * checkBride( Character *, DLString );
+        
+        static const DLString COMMAND_NAME;
 };
 
 #endif

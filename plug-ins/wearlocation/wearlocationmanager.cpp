@@ -19,8 +19,8 @@ int WearlocationManager::wear( Object *obj, int flags )
     sortIndexes( order, compareForWear );
 
     for (o = order.begin( ); o != order.end( ); o++)
-	if (find( *o )->matches( obj ))
-	    return find( *o )->wear( obj, flags );
+        if (find( *o )->matches( obj ))
+            return find( *o )->wear( obj, flags );
 
     return RC_WEAR_NOMATCH;
 }
@@ -39,6 +39,6 @@ void WearlocationManager::display( Character *ch, Wearlocation::DisplayList &eq 
     sortIndexes( order, compareForDisplay );
     
     for (o = order.begin( ); o != order.end( ); o++)
-	find( *o )->display( ch, eq );
+        find( *o )->display( ch, eq );
 }
 

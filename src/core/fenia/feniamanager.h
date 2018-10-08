@@ -13,8 +13,8 @@
 
 class FeniaManager : public Scripting::CodeSource::Manager, // order is important: 
                      public Scripting::Object::Manager,     // the object manager must be destroyed before the codesource manager
-		     public Scripting::Context,
-		     public OneAllocate
+                     public Scripting::Context,
+                     public OneAllocate
 {
 public:
     typedef ::Pointer<FeniaManager> Pointer;
@@ -23,16 +23,16 @@ public:
     virtual ~FeniaManager( );
 
     void open( ) {
-	Scripting::Object::Manager::open( );
-	Scripting::CodeSource::Manager::open( );
+        Scripting::Object::Manager::open( );
+        Scripting::CodeSource::Manager::open( );
     }
     void close( ) {
-	Scripting::Object::Manager::close( );
-	Scripting::CodeSource::Manager::close( );
+        Scripting::Object::Manager::close( );
+        Scripting::CodeSource::Manager::close( );
     }
     void load( ) {
-	Scripting::Object::Manager::load( );
-	Scripting::CodeSource::Manager::load( );
+        Scripting::Object::Manager::load( );
+        Scripting::CodeSource::Manager::load( );
     }
 
     virtual DbEnvContext *getDbEnv( ) const;
@@ -40,7 +40,7 @@ public:
     static WrapperManagerBase::Pointer wrapperManager;
 
     inline static FeniaManager * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 private:
     static FeniaManager *thisClass;

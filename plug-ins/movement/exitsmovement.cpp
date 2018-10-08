@@ -54,10 +54,10 @@ ExitsMovement::ExitsMovement( Character *ch, int door, int movetype )
     this->movetype = movetype;
     
     if (door < DIR_SOMEWHERE) {
-	pexit = ch->in_room->exit[door];
+        pexit = ch->in_room->exit[door];
 
-	if (pexit)
-	    exit_info = pexit->exit_info;
+        if (pexit)
+            exit_info = pexit->exit_info;
     }
 }
 
@@ -81,19 +81,19 @@ static DLString rprog_exit_location(Room *room, Character *wch, Room *to_room, i
 bool ExitsMovement::findTargetRoom( )
 {
     if (door < 0 || door > DIR_SOMEWHERE)
-	return false;
+        return false;
 
     if (!pexit && !peexit) {
-	ch->println( "È⁄◊…Œ…, Œœ ‘Ÿ Œ≈ Õœ÷≈€ÿ ‘’ƒ¡ …ƒ‘…." );
-	return false;
+        ch->println( "–ò–∑–≤–∏–Ω–∏, –Ω–æ —Ç—ã –Ω–µ –º–æ–∂–µ—à—å —Ç—É–¥–∞ –∏–¥—Ç–∏." );
+        return false;
     }
     
     randomizeExits( ); 
 
     if (pexit)
-	to_room = pexit->u1.to_room;
+        to_room = pexit->u1.to_room;
     else
-	to_room = peexit->u1.to_room;
+        to_room = peexit->u1.to_room;
     
     if(to_room) {
         DLString rc = rprog_exit_location(from_room, ch, to_room, door);
@@ -105,8 +105,8 @@ bool ExitsMovement::findTargetRoom( )
     }
 
     if (!to_room) { /* sanity check, will be re-checked in checkVisibility */
-	ch->println( "ˆ¡Ãÿ, Œœ ‘Ÿ Œ≈ Õœ÷≈€ÿ ‘’ƒ¡ …ƒ‘…." );
-	return false;
+        ch->println( "–ñ–∞–ª—å, –Ω–æ —Ç—ã –Ω–µ –º–æ–∂–µ—à—å —Ç—É–¥–∞ –∏–¥—Ç–∏." );
+        return false;
     }
 
     return true;
@@ -118,82 +118,82 @@ void ExitsMovement::randomizeExits( )
     int count = 0;
 
     if (!IS_ROOM_AFFECTED(from_room, AFF_ROOM_RANDOMIZER)
-	&& !ch->isAffected( gsn_confuse ))
-	return;
+        && !ch->isAffected( gsn_confuse ))
+        return;
     
     for (int d = 0; d < DIR_SOMEWHERE; d++) {
-	EXIT_DATA *pe;
+        EXIT_DATA *pe;
 
-	if (!( pe = from_room->exit[d] ))
-	    continue;
+        if (!( pe = from_room->exit[d] ))
+            continue;
 
-	if (!ch->can_see( pe ))
-	    continue;
-	
-	if (number_range( 0, count++ ) == 0) {
-	    pexit = pe;
-	    door = d;
-	}
+        if (!ch->can_see( pe ))
+            continue;
+        
+        if (number_range( 0, count++ ) == 0) {
+            pexit = pe;
+            door = d;
+        }
     }
     
     for (EXTRA_EXIT_DATA *pee = from_room->extra_exit; pee; pee = pee->next) {
-	if (!ch->can_see( pee ))
-	    continue;
+        if (!ch->can_see( pee ))
+            continue;
 
-	if (number_range( 0, count++ ) == 0) {
-	    peexit = pee;
-	    door = DIR_SOMEWHERE;
-	}
+        if (number_range( 0, count++ ) == 0) {
+            peexit = pee;
+            door = DIR_SOMEWHERE;
+        }
     }
 
     if (door == DIR_SOMEWHERE)
-	pexit = NULL;
+        pexit = NULL;
     else
-	peexit = NULL;
+        peexit = NULL;
 }
 
 
 bool ExitsMovement::canMove( Character *wch )
 {
     return Walkment::canMove( wch )
-	   && checkExtraExit( wch );
+           && checkExtraExit( wch );
 }
 
     
 bool ExitsMovement::checkClosedDoor( Character *wch )
 {
     if (!IS_SET(exit_info, EX_CLOSED))
-	return true;
-	
+        return true;
+        
     if (wch->get_trust( ) >= ANGEL)
-	return true;
+        return true;
 
     if (IS_AFFECTED(wch, AFF_PASS_DOOR) && !IS_SET(exit_info, EX_NOPASS))
-	return true;
+        return true;
 
     if (wch->is_mirror( ))
-	return true;
-	    
+        return true;
+            
     if (IS_GHOST( wch )) 
-	if (!IS_SET(to_room->room_flags, ROOM_MANSION) 
-	    || IS_SET(from_room->room_flags, ROOM_MANSION))
-	    return true;
+        if (!IS_SET(to_room->room_flags, ROOM_MANSION) 
+            || IS_SET(from_room->room_flags, ROOM_MANSION))
+            return true;
 
     if (IS_AFFECTED(wch, AFF_PASS_DOOR) && IS_SET( exit_info, EX_NOPASS)) {
-	rc = RC_MOVE_PASS_NEVER;
-	msgSelfRoom( wch,
-		     "˛≈“≈⁄ %4$N4 Œ≈◊œ⁄Õœ÷Œœ –“œ ‘… Œ¡”À◊œ⁄ÿ.",
-		     "%2$C1 ”‘’À¡≈‘”— Ã¬œÕ œ %4$N4." );
+        rc = RC_MOVE_PASS_NEVER;
+        msgSelfRoom( wch,
+                     "–ß–µ—Ä–µ–∑ %4$N4 –Ω–µ–≤–æ–∑–º–æ–∂–Ω–æ –ø—Ä–æ–π—Ç–∏ –Ω–∞—Å–∫–≤–æ–∑—å.",
+                     "%2$^C1 —Å—Ç—É–∫–∞–µ—Ç—Å—è –ª–±–æ–º –æ %4$N4." );
     }
     else {
-	if (IS_SET(exit_info, EX_LOCKED))
-	    rc = RC_MOVE_PASS_NEEDED;
-	else
-	    rc = RC_MOVE_CLOSED;
-	    
-	msgSelfParty( wch,
-		      "%4$N1: ⁄¡À“Ÿ‘œ.",
-		      "%4$N1: ⁄¡À“Ÿ‘œ." );
+        if (IS_SET(exit_info, EX_LOCKED))
+            rc = RC_MOVE_PASS_NEEDED;
+        else
+            rc = RC_MOVE_CLOSED;
+            
+        msgSelfParty( wch,
+                      "%4$^N1: —Ç—É—Ç –∑–∞–∫—Ä—ã—Ç–æ.",
+                      "%4$^N1: —Ç—É—Ç –∑–∞–∫—Ä—ã—Ç–æ." );
     }
     
     return false;
@@ -202,12 +202,12 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
 bool ExitsMovement::checkVisibility( Character *wch )
 {
     if ((pexit && !wch->can_see( pexit ))
-	|| (peexit && !wch->can_see( peexit )))
+        || (peexit && !wch->can_see( peexit )))
     {
-	msgSelfParty( wch, 
-		      "ˆ¡Ãÿ, Œœ ‘Ÿ Œ≈ Õœ÷≈€ÿ ‘’ƒ¡ …ƒ‘….",
-		      "ˆ¡Ãÿ, Œœ %2$C1 Œ≈ Õœ÷≈‘ ‘’ƒ¡ …ƒ‘….");
-	return false;
+        msgSelfParty( wch, 
+                      "–ñ–∞–ª—å, –Ω–æ —Ç—ã –Ω–µ –º–æ–∂–µ—à—å —Ç—É–¥–∞ –∏–¥—Ç–∏.",
+                      "–ñ–∞–ª—å, –Ω–æ %2$C1 –Ω–µ –º–æ–∂–µ—Ç —Ç—É–¥–∞ –∏–¥—Ç–∏.");
+        return false;
     }
 
     return Walkment::checkVisibility( wch );
@@ -224,45 +224,45 @@ bool ExitsMovement::checkExtraExit( Character *wch )
     int total_size;
     
     if (!peexit)
-	return true;
+        return true;
     
     if (rprog_cant_walk( from_room, wch, peexit->keyword ))
-	return false;
+        return false;
 
     if (MOUNTED(wch))
-	return true;
+        return true;
     
     total_size = wch->size;
     
     if (rider) 
-	total_size += rider->size / 2;
+        total_size += rider->size / 2;
     
     if (total_size > peexit->max_size_pass) {
-	msgSelfParty( wch, 
-		      "˛‘œ¬Ÿ ‹‘œ ”ƒ≈Ã¡‘ÿ, Œ¡ƒœ ¬Ÿ‘ÿ ﬁ’’’‘œﬁÀ’ –œÕ≈Œÿ€≈ “¡⁄Õ≈“œÕ.",
-		      "˜¡Õ ” %2$C5 ”‘œ…‘ ¬Ÿ‘ÿ ﬁ’‘œﬁÀ’ –œÕ≈Œÿ€≈ “¡⁄Õ≈“œÕ." );
-	return false;
+        msgSelfParty( wch, 
+                      "–ß—Ç–æ–±—ã —ç—Ç–æ —Å–¥–µ–ª–∞—Ç—å, –Ω–∞–¥–æ –±—ã—Ç—å —á—É—É—É—Ç–æ—á–∫—É –ø–æ–º–µ–Ω—å—à–µ —Ä–∞–∑–º–µ—Ä–æ–º.",
+                      "–í–∞–º —Å %2$C5 —Å—Ç–æ–∏—Ç –±—ã—Ç—å —á—É—Ç–æ—á–∫—É –ø–æ–º–µ–Ω—å—à–µ —Ä–∞–∑–º–µ—Ä–æ–º." );
+        return false;
     }
     
     if (IS_SET(peexit->exit_info, EX_NOFLY) && is_flying( wch )) {
-	msgSelfParty( wch, 
-		      "ÙŸ Œ≈ ”Õœ÷≈€ÿ ⁄ƒ≈”ÿ –“œÃ≈‘≈‘ÿ.",
-		      "%2$^C1 Œ≈ Õœ÷≈‘ ⁄ƒ≈”ÿ –“œÃ≈‘≈‘ÿ." );
-	return false;
+        msgSelfParty( wch, 
+                      "–¢—ã –Ω–µ —Å–º–æ–∂–µ—à—å –∑–¥–µ—Å—å –ø—Ä–æ–ª–µ—Ç–µ—Ç—å.",
+                      "%2$^C1 –Ω–µ –º–æ–∂–µ—Ç –∑–¥–µ—Å—å –ø—Ä–æ–ª–µ—Ç–µ—Ç—å." );
+        return false;
     }
 
     if (IS_SET(peexit->exit_info, EX_NOWALK) && !is_flying( wch )) {
-	msgSelfParty( wch, 
-		      "ÙŸ Œ≈ ”Õœ÷≈€ÿ ⁄ƒ≈”ÿ –“œ ‘….",
-		      "%2$^C1 Œ≈ ”Õœ÷≈‘ ⁄ƒ≈”ÿ –“œ ‘…." );
-	return false;
+        msgSelfParty( wch, 
+                      "–¢—ã –Ω–µ —Å–º–æ–∂–µ—à—å –∑–¥–µ—Å—å –ø—Ä–æ–π—Ç–∏.",
+                      "%2$^C1 –Ω–µ —Å–º–æ–∂–µ—Ç –∑–¥–µ—Å—å –ø—Ä–æ–π—Ç–∏." );
+        return false;
     }
 
     if (IS_SET(peexit->exit_info, EX_SWIM_ONLY) && boat_type == BOAT_NONE) {
-	msgSelfParty( wch, 
-		      "˙ƒ≈”ÿ ‘Ÿ Õœ÷≈€ÿ ‘œÃÿÀœ –“œ–ÃŸ‘ÿ.",
-		      "%2$^C1 ”Õœ÷≈‘ ⁄ƒ≈”ÿ ‘œÃÿÀœ –“œ–ÃŸ‘ÿ." );
-	return false;
+        msgSelfParty( wch, 
+                      "–ó–¥–µ—Å—å —Ç—ã –º–æ–∂–µ—à—å —Ç–æ–ª—å–∫–æ –ø—Ä–æ–ø–ª—ã—Ç—å.",
+                      "%2$^C1 —Å–º–æ–∂–µ—Ç –∑–¥–µ—Å—å —Ç–æ–ª—å–∫–æ –ø—Ä–æ–ø–ª—ã—Ç—å." );
+        return false;
     }
 
     return true;
@@ -280,10 +280,10 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     int delta, minRange, maxRange;
     
     if (!IS_AFFECTED(wch, AFF_PASS_DOOR))
-	return true;
+        return true;
 
     if (!IS_SET(exit_info, EX_CLOSED))
-	return true;
+        return true;
 
     doorLevel = (peexit ? peexit->level : pexit->level);
 
@@ -293,19 +293,19 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     chance = (getPassDoorLevel( wch ) - minRange) * 100 / (maxRange - minRange);
     chance = URANGE( 25 / max( 1, ch->getModifyLevel( ) / 20), 
                      chance, 
-		     95 );
+                     95 );
 
     if (number_percent( ) < chance) {
-	msgSelf( wch, "ÙŸ –“œ”¡ﬁ…◊¡≈€ÿ”— ”À◊œ⁄ÿ %4$N4." );
-	wch->setWait( 2 );
-	return true;	
+        msgSelf( wch, "–¢—ã –ø—Ä–æ—Å–∞—á–∏–≤–∞–µ—à—å—Å—è —Å–∫–≤–æ–∑—å %4$N4." );
+        wch->setWait( 2 );
+        return true;        
     }
     
     rc = RC_MOVE_PASS_FAILED;
     wch->setWait( 4 );
     msgSelfRoom( wch,
-		 "Ù◊œ— –œ–Ÿ‘À¡ –“œ”œﬁ…‘ÿ”— ”À◊œ⁄ÿ %4$N4 ⁄¡ÀœŒﬁ…Ã¡”ÿ Œ≈’ƒ¡ﬁ≈ .", 
-		 "%2$C1 ”‘’À¡≈‘”— Ã¬œÕ œ %4$N4." );
+                 "–¢–≤–æ—è –ø–æ–ø—ã—Ç–∫–∞ –ø—Ä–æ—Å–æ—á–∏—Ç—å—Å—è —Å–∫–≤–æ–∑—å %4$N4 –∑–∞–∫–æ–Ω—á–∏–ª–∞—Å—å –Ω–µ—É–¥–∞—á–µ–π.", 
+                 "%2$C1 —Å—Ç—É–∫–∞–µ—Ç—Å—è –ª–±–æ–º –æ %4$N4." );
     return false;
 }
 
@@ -314,23 +314,23 @@ int ExitsMovement::getPassDoorLevel( Character *wch )
     int eqLevel = -1, castLevel = -1;
 
     if (wch->getRace( )->getAff( ).isSet( AFF_PASS_DOOR ))
-	return wch->getModifyLevel( ) * 11 / 10; 
+        return wch->getModifyLevel( ) * 11 / 10; 
 
     for (Affect *paf = wch->affected; paf; paf = paf->next)
-	if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
-	    castLevel = max( castLevel, (int)paf->level );
+        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
+            castLevel = max( castLevel, (int)paf->level );
 
     for (Object *obj = wch->carrying; obj; obj = obj->next_content)
-	if (obj->wear_loc != wear_none) {
-	    for (Affect *paf = obj->affected; paf; paf = paf->next)
-		if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
-		    eqLevel = max( eqLevel, obj->level );
+        if (obj->wear_loc != wear_none) {
+            for (Affect *paf = obj->affected; paf; paf = paf->next)
+                if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
+                    eqLevel = max( eqLevel, obj->level );
 
-	    if (!obj->enchanted)
-		for (Affect *paf = obj->pIndexData->affected; paf; paf = paf->next)
-		    if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
-			eqLevel = max( eqLevel, obj->level );
-	}
+            if (!obj->enchanted)
+                for (Affect *paf = obj->pIndexData->affected; paf; paf = paf->next)
+                    if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_PASS_DOOR))
+                        eqLevel = max( eqLevel, obj->level );
+        }
 
     return max( 0, max( eqLevel, castLevel ) );
 }
@@ -340,16 +340,16 @@ int ExitsMovement::getMoveCost( Character *wch )
     int move;
     
     move = terrains[from_room->sector_type].move
-	    + terrains[to_room->sector_type].move;
+            + terrains[to_room->sector_type].move;
 
     move /= 2;  /* i.e. the average */
 
     /* conditional effects */
     if (is_flying( wch ) || IS_AFFECTED(wch, AFF_HASTE))
-	move /= 2;
+        move /= 2;
 
     if (IS_AFFECTED(wch, AFF_SLOW))
-	move *= 2;
+        move *= 2;
     
     return move;
 }
@@ -369,97 +369,97 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
     ostringstream buf;
     
     if (MOUNTED(wch))
-	return;
+        return;
 
     if (wch->is_mirror( ))
-	return;
+        return;
 
     if (ch->invis_level >= LEVEL_HERO || wch->invis_level >= LEVEL_HERO)
-	return;
+        return;
     
     if (peexit) {
-	if (fLeaving)
-	    buf << "%1$^C1 " << extra_move_ru[peexit->moving_from] << " "
-		<< extra_move_rt[peexit->moving_mode_from] << " "
-		<< russian_case( peexit->short_desc_from,
-				 extra_move_rtum[peexit->moving_mode_from] );
-	else
-	    buf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " ”¿ƒ¡ " 
-		<< extra_move_rt[peexit->moving_mode_to] << " "
-		<< russian_case( peexit->short_desc_to,
-				 extra_move_rtpm[peexit->moving_mode_to] );
+        if (fLeaving)
+            buf << "%1$^C1 " << extra_move_ru[peexit->moving_from] << " "
+                << extra_move_rt[peexit->moving_mode_from] << " "
+                << russian_case( peexit->short_desc_from,
+                                 extra_move_rtum[peexit->moving_mode_from] );
+        else
+            buf << "%1$^C1 " << extra_move_rp[peexit->moving_to] << " —Å—é–¥–∞ " 
+                << extra_move_rt[peexit->moving_mode_to] << " "
+                << russian_case( peexit->short_desc_to,
+                                 extra_move_rtpm[peexit->moving_mode_to] );
     }
     else {
-	int mt = adjustMovetype( wch );
+        int mt = adjustMovetype( wch );
 
-	if (IS_AFFECTED(wch, AFF_SNEAK | AFF_CAMOUFLAGE) && movetypes[mt].sneak)
-	    return;
+        if (IS_AFFECTED(wch, AFF_SNEAK | AFF_CAMOUFLAGE) && movetypes[mt].sneak)
+            return;
 
-	buf << "%1$^C1 "
-	    << (fLeaving ? movetypes[mt].leave : movetypes[mt].enter)
-	    << " " 
-	    << (fLeaving ? dirs[door].leave : dirs[dirs[door].rev].enter);
+        buf << "%1$^C1 "
+            << (fLeaving ? movetypes[mt].leave : movetypes[mt].enter)
+            << " " 
+            << (fLeaving ? dirs[door].leave : dirs[dirs[door].rev].enter);
 
-	if ((mt == MOVETYPE_SWIMMING || mt == MOVETYPE_WATER_WALK) && boat) {
-	    int ncase = 0;
-	    DLString part, prep;
-		    
-	    switch (boat->value[1]) {
-	    case POS_RESTING:  part = "Ã≈÷¡"; break;
-	    case POS_SITTING:  part = "”…ƒ—"; break;
-	    case POS_STANDING: part = "”‘œ—"; break;
-	    }
-	    
-	    switch (boat->value[2]) {
-	    case PUT_IN:     prep = "◊";      ncase = 6; break;
-	    case PUT_ON:     prep = "Œ¡";     ncase = 6; break;
-	    case PUT_AT:     prep = "’";      ncase = 2; break;
-	    case PUT_INSIDE: prep = "◊Œ’‘“…"; ncase = 2; break;
-	    }
+        if ((mt == MOVETYPE_SWIMMING || mt == MOVETYPE_WATER_WALK) && boat) {
+            int ncase = 0;
+            DLString part, prep;
+                    
+            switch (boat->value[1]) {
+            case POS_RESTING:  part = "–ª–µ–∂–∞"; break;
+            case POS_SITTING:  part = "—Å–∏–¥—è"; break;
+            case POS_STANDING: part = "—Å—Ç–æ—è"; break;
+            }
+            
+            switch (boat->value[2]) {
+            case PUT_IN:     prep = "–≤";      ncase = 6; break;
+            case PUT_ON:     prep = "–Ω–∞";     ncase = 6; break;
+            case PUT_AT:     prep = "—É";      ncase = 2; break;
+            case PUT_INSIDE: prep = "–≤–Ω—É—Ç—Ä–∏"; ncase = 2; break;
+            }
 
-	    if (!prep.empty( )) {
-		if (!part.empty( ))
-		    buf << ", " << part;
+            if (!prep.empty( )) {
+                if (!part.empty( ))
+                    buf << ", " << part;
 
-		buf << " " << prep << " %5$O" << ncase;
-	    }
-	}
+                buf << " " << prep << " %5$O" << ncase;
+            }
+        }
     }
     
     if (RIDDEN(wch))
-	buf << ", ◊≈“»œÕ Œ¡ %2$C6";
+        buf << ", –≤–µ—Ä—Ö–æ–º –Ω–∞ %2$C6";
 
     buf << "."; 
 
     msgRoomNoParty( wch, buf.str( ).c_str( ) );
-}	    
+}            
 
 int ExitsMovement::adjustMovetype( Character *wch )
 {
     if (IS_GHOST( wch ))
-	return MOVETYPE_FLYING;
+        return MOVETYPE_FLYING;
 
     if (from_room->sector_type == SECT_WATER_NOSWIM || to_room->sector_type == SECT_WATER_NOSWIM)
-	switch (boat_type) {
-	case BOAT_INV:
-	case BOAT_EQ:
-	    return boat->value[0];
+        switch (boat_type) {
+        case BOAT_INV:
+        case BOAT_EQ:
+            return boat->value[0];
 
-	case BOAT_FLY:
-	    return MOVETYPE_FLYING;
-	}
+        case BOAT_FLY:
+            return MOVETYPE_FLYING;
+        }
     
     switch (movetype) {
     case MOVETYPE_WALK:
     case MOVETYPE_RUNNING:
     case MOVETYPE_FLEE:
-	if (is_flying( wch ))
-	    return MOVETYPE_FLYING;
-	else if (IS_SET(wch->parts, PART_FOUR_HOOVES | PART_TWO_HOOVES))
-	    return MOVETYPE_RIDING;
-	else if (IS_SET(wch->form, FORM_SNAKE))
-	    return MOVETYPE_SLINK;
-	break;
+        if (is_flying( wch ))
+            return MOVETYPE_FLYING;
+        else if (IS_SET(wch->parts, PART_FOUR_HOOVES | PART_TWO_HOOVES))
+            return MOVETYPE_RIDING;
+        else if (IS_SET(wch->form, FORM_SNAKE))
+            return MOVETYPE_SLINK;
+        break;
     }
 
     return movetype;
@@ -467,12 +467,12 @@ int ExitsMovement::adjustMovetype( Character *wch )
 
 void ExitsMovement::moveOneFollower( Character *wch, Character *fch )
 {
-    act( "ÙŸ ”Ã≈ƒ’≈€ÿ ⁄¡ $C5.", fch, 0, wch, TO_CHAR );
+    act( "–¢—ã —Å–ª–µ–¥—É–µ—à—å –∑–∞ $C5.", fch, 0, wch, TO_CHAR );
 
     if (peexit)
-	ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 
+        ExitsMovement( fch, peexit, movetype ).moveRecursive( ); 
     else
-	ExitsMovement( fch, door, movetype ).moveRecursive( ); 
+        ExitsMovement( fch, door, movetype ).moveRecursive( ); 
 }
 
 void ExitsMovement::place( Character *wch )
@@ -484,11 +484,11 @@ void ExitsMovement::place( Character *wch )
 void ExitsMovement::msgEcho( Character *victim, Character *wch, const char *msg )
 {
     if (canHear( victim, wch ))
-	victim->pecho( msg, 
-	               (RIDDEN(wch) ? wch->mount : wch),
-	               (MOUNTED(wch) ? wch->mount : wch),
-		       wch, 
-		       peexit ? peexit->short_desc_from : pexit ? pexit->keyword : "",
-		       boat );
+        victim->pecho( msg, 
+                       (RIDDEN(wch) ? wch->mount : wch),
+                       (MOUNTED(wch) ? wch->mount : wch),
+                       wch, 
+                       peexit ? peexit->short_desc_from : direction_doorname(pexit),
+                       boat );
 }
 

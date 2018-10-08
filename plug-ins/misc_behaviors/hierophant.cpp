@@ -53,101 +53,101 @@ void Hierophant::tell( Character *victim, const char *speech )
     bool fHello = false, fWhat = false;
     
     if (victim->is_npc( ))
-	return;
+        return;
     
     pet = victim->getPC( )->pet;
 
-    if (arg_has_oneof( speech, "hello", "hi", "приветствую", "здравствуй" )) 
-	fHello = true;
-    else if ((arg_has_oneof( speech, "pet", "пет", "животное", "любимец" )
-		|| (pet && arg_contains_someof( speech, pet->getName( ).c_str( ) )))
-	     && arg_has_oneof( speech, "заклинаниями", "владеет", "колдовать", "умениями" )) 
-	fWhat = true;
+    if (arg_has_oneof( speech, "hello", "hi", "п©я─п╦п╡п╣я┌я│я┌п╡я┐я▌", "п╥п╢я─п╟п╡я│я┌п╡я┐п╧" )) 
+        fHello = true;
+    else if ((arg_has_oneof( speech, "pet", "п©п╣я┌", "п╤п╦п╡п╬я┌п╫п╬п╣", "п╩я▌п╠п╦п╪п╣я├" )
+                || (pet && arg_contains_someof( speech, pet->getName( ).c_str( ) )))
+             && arg_has_oneof( speech, "п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐п╪п╦", "п╡п╩п╟п╢п╣п╣я┌", "п╨п╬п╩п╢п╬п╡п╟я┌я▄", "я┐п╪п╣п╫п╦я▐п╪п╦" )) 
+        fWhat = true;
     else 
-	return;
+        return;
 
     if (fHello) {
-	if (!pet || pet->in_room != victim->in_room)
-	    return;
+        if (!pet || pet->in_room != victim->in_room)
+            return;
 
-	say_act( victim, ch, "Здравствуй, $c1." );
-	say_act( victim, ch, "Ты приш$gло|ел|ла спросить меня, какими заклинаниями владеет твое домашнее животное?" );
-	say_act( victim, ch, "Так не стесняйся, спрашивай." );
-	interpret_fmt( ch, "smile %s", victim->getNameP( ) );
-	return;
+        say_act( victim, ch, "п≈п╢я─п╟п╡я│я┌п╡я┐п╧, $c1." );
+        say_act( victim, ch, "п╒я▀ п©я─п╦я┬$gп╩п╬|п╣п╩|п╩п╟ я│п©я─п╬я│п╦я┌я▄ п╪п╣п╫я▐, п╨п╟п╨п╦п╪п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐п╪п╦ п╡п╩п╟п╢п╣п╣я┌ я┌п╡п╬п╣ п╢п╬п╪п╟я┬п╫п╣п╣ п╤п╦п╡п╬я┌п╫п╬п╣?" );
+        say_act( victim, ch, "п╒п╟п╨ п╫п╣ я│я┌п╣я│п╫я▐п╧я│я▐, я│п©я─п╟я┬п╦п╡п╟п╧." );
+        interpret_fmt( ch, "smile %s", victim->getNameP( ) );
+        return;
     }
     
     if (!fWhat)
-	return;
+        return;
 
     if (!pet) {
-	say_act( victim, ch, "$c1, у тебя нет домашнего животного." );
-	return;
+        say_act( victim, ch, "$c1, я┐ я┌п╣п╠я▐ п╫п╣я┌ п╢п╬п╪п╟я┬п╫п╣пЁп╬ п╤п╦п╡п╬я┌п╫п╬пЁп╬." );
+        return;
     }
 
     if (pet->in_room != victim->in_room) {
-	say_act( victim, ch, "$c1, приводи его сюда - тогда и поговорим." );
-	return;
+        say_act( victim, ch, "$c1, п©я─п╦п╡п╬п╢п╦ п╣пЁп╬ я│я▌п╢п╟ - я┌п╬пЁп╢п╟ п╦ п©п╬пЁп╬п╡п╬я─п╦п╪." );
+        return;
     }
     
     if (!pet->getProfession( )->getFlags( pet ).isSet(PROF_CASTER)) {
-	act("$C1 внимательно смотрит на $c4 и качает головой.", pet, 0, ch, TO_ALL);
-	say_act( pet, ch, "Похоже, $c1 совершенно не способ$gно|ен|на к магии.." );
-	return;
+        act("$C1 п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $c4 п╦ п╨п╟я┤п╟п╣я┌ пЁп╬п╩п╬п╡п╬п╧.", pet, 0, ch, TO_ALL);
+        say_act( pet, ch, "п÷п╬я┘п╬п╤п╣, $c1 я│п╬п╡п╣я─я┬п╣п╫п╫п╬ п╫п╣ я│п©п╬я│п╬п╠$gп╫п╬|п╣п╫|п╫п╟ п╨ п╪п╟пЁп╦п╦.." );
+        return;
     }
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill::Pointer skill = SkillManager::getThis( )->find( sn );
-	Spell::Pointer spell = skill->getSpell( );
+        Skill::Pointer skill = SkillManager::getThis( )->find( sn );
+        Spell::Pointer spell = skill->getSpell( );
 
-	if (spell 
-	    && spell->isCasted( ) 
-	    && skill->usable( pet, false )
-	    && spell->getSpellType( ) != SPELL_OFFENSIVE
-	    && skill->getGroup( )->available( pet ))
-	{
-	    groups[skill->getGroup( )].push_back( skill->getNameFor( victim ) );
-	}
+        if (spell 
+            && spell->isCasted( ) 
+            && skill->usable( pet, false )
+            && spell->getSpellType( ) != SPELL_OFFENSIVE
+            && skill->getGroup( )->available( pet ))
+        {
+            groups[skill->getGroup( )].push_back( skill->getNameFor( victim ) );
+        }
     }
     
     if (groups.empty( )) {
-	act("$C1 внимательно смотрит на $c4 и вздыхает.", pet, 0, ch, TO_ALL);
-	say_act( pet, ch, "Похоже, что в голове у $x пусто.." );
-	return;
+        act("$C1 п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $c4 п╦ п╡п╥п╢я▀я┘п╟п╣я┌.", pet, 0, ch, TO_ALL);
+        say_act( pet, ch, "п÷п╬я┘п╬п╤п╣, я┤я┌п╬ п╡ пЁп╬п╩п╬п╡п╣ я┐ $x п©я┐я│я┌п╬.." );
+        return;
     }
     
-    act("$C1 тихо беседует с $c5 на странном языке.", pet, 0, ch, TO_ALL);
+    act("$C1 я┌п╦я┘п╬ п╠п╣я│п╣п╢я┐п╣я┌ я│ $c5 п╫п╟ я│я┌я─п╟п╫п╫п╬п╪ я▐п╥я▀п╨п╣.", pet, 0, ch, TO_ALL);
     buf << endl << "{G" << pet->getNameP( '1' ) << "{g "
-	<< "обладает познаниями в таких науках: " << endl << endl;
+        << "п╬п╠п╩п╟п╢п╟п╣я┌ п©п╬п╥п╫п╟п╫п╦я▐п╪п╦ п╡ я┌п╟п╨п╦я┘ п╫п╟я┐п╨п╟я┘: " << endl << endl;
     
     for (GroupsMap::iterator i = groups.begin( ); i != groups.end( ); i++) {
-	SkillGroup *group = skillGroupManager->find( i->first );
-	DLString g = group->getShortDescr( );
+        SkillGroup *group = skillGroupManager->find( i->first );
+        DLString g = group->getShortDescr( );
 
-	buf << "{G" << g.at( 0 ) << "{g" << g.substr( 1 ) << "{g:{x" << endl;
+        buf << "{G" << g.at( 0 ) << "{g" << g.substr( 1 ) << "{g:{x" << endl;
 
-	for (vector<DLString>::iterator j = i->second.begin( ); j != i->second.end( ); ) {
-	    buf << *j;
+        for (vector<DLString>::iterator j = i->second.begin( ); j != i->second.end( ); ) {
+            buf << *j;
 
-	    if (++j != i->second.end( ))
-		buf << ", ";
-	}
+            if (++j != i->second.end( ))
+                buf << ", ";
+        }
 
-	buf << "{x" << endl << "\r\n";
+        buf << "{x" << endl << "\r\n";
     }
     
     pObjIndex = get_obj_index( 9606 );
     if (!pObjIndex) {
-	say_act( victim, ch, "Извини, $c1, но у меня кончилась бумага." );
-	interpret_fmt( ch, "snick" );
-	return;
+        say_act( victim, ch, "п≤п╥п╡п╦п╫п╦, $c1, п╫п╬ я┐ п╪п╣п╫я▐ п╨п╬п╫я┤п╦п╩п╟я│я▄ п╠я┐п╪п╟пЁп╟." );
+        interpret_fmt( ch, "snick" );
+        return;
     }
 
     obj = create_object( pObjIndex, 0 );
     obj->addExtraDescr( obj->getName( ), buf.str( ) );
     obj_to_char( obj, victim );
 
-    act( "$c1 делает запись на свитке пергамента и дает его $C3.", ch, 0, victim, TO_NOTVICT );
-    act( "$c1 делает запись на свитке пергамента и дает его тебе.", ch, 0, victim, TO_VICT );
+    act( "$c1 п╢п╣п╩п╟п╣я┌ п╥п╟п©п╦я│я▄ п╫п╟ я│п╡п╦я┌п╨п╣ п©п╣я─пЁп╟п╪п╣п╫я┌п╟ п╦ п╢п╟п╣я┌ п╣пЁп╬ $C3.", ch, 0, victim, TO_NOTVICT );
+    act( "$c1 п╢п╣п╩п╟п╣я┌ п╥п╟п©п╦я│я▄ п╫п╟ я│п╡п╦я┌п╨п╣ п©п╣я─пЁп╟п╪п╣п╫я┌п╟ п╦ п╢п╟п╣я┌ п╣пЁп╬ я┌п╣п╠п╣.", ch, 0, victim, TO_VICT );
 }
 

@@ -16,40 +16,40 @@
 class Rat : public LevelAdaptivePet {
 XML_OBJECT
 public:
-	typedef ::Pointer<Rat> Pointer;
+        typedef ::Pointer<Rat> Pointer;
     
-	Rat( );
+        Rat( );
 
-	virtual bool death( Character *killer );
-	virtual void stopfol( Character *master );
-	virtual bool area( );
+        virtual bool death( Character *killer );
+        virtual void stopfol( Character *master );
+        virtual bool area( );
 
 protected:
 
-	XML_VARIABLE XMLInteger timer;
+        XML_VARIABLE XMLInteger timer;
 };
 
 class RatGod : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<RatGod> Pointer;
+        typedef ::Pointer<RatGod> Pointer;
     
-	virtual void greet( Character *victim );
-	
+        virtual void greet( Character *victim );
+        
 protected:
-	Character * getActor( Character * );
-	void exorcism( Character *, const char * );
+        Character * getActor( Character * );
+        void exorcism( Character *, const char * );
 };
 
 class XMLAttributeRats : public XMLAttribute, public XMLVariableContainer {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeRats> Pointer;
+        typedef ::Pointer<XMLAttributeRats> Pointer;
 
-	XMLAttributeRats( );
+        XMLAttributeRats( );
 
-	XML_VARIABLE XMLBoolean nongrata;
-	XML_VARIABLE XMLBoolean desecrator;
+        XML_VARIABLE XMLBoolean nongrata;
+        XML_VARIABLE XMLBoolean desecrator;
 };
 
 #endif

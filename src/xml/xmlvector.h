@@ -29,48 +29,48 @@ public:
     XMLVectorBase( bool flag = false, int size = 0 ) 
                      : saveEmpty( flag ), defaultSize( size )
     {
-	if (defaultSize != 0)
-	    resize( defaultSize );
+        if (defaultSize != 0)
+            resize( defaultSize );
     }
 
     virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
     {
-	clear( );
-	
-	if (defaultSize != 0)
-	    resize( defaultSize );
+        clear( );
+        
+        if (defaultSize != 0)
+            resize( defaultSize );
 
-	XMLContainer::fromXML( node );
+        XMLContainer::fromXML( node );
     }
     
     virtual bool nodeFromXML( const XMLNode::Pointer& child ) 
     {
-	if (child->getName( ) == XMLNode::ATTRIBUTE_NODE) {
-	    insert( end( ), T( ) );		
-	    back( ).fromXML( child );
-	    return true;
-	}
+        if (child->getName( ) == XMLNode::ATTRIBUTE_NODE) {
+            insert( end( ), T( ) );                
+            back( ).fromXML( child );
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     virtual bool toXML( XMLNode::Pointer& parent ) const
     {
-	if (empty( ) && !saveEmpty)
-	    return false;
+        if (empty( ) && !saveEmpty)
+            return false;
 
         for (typename XMLVectorBase::const_iterator ipos = begin( ); ipos != end( ); ipos++) {
-	    try {
-		XMLNode::Pointer child( NEW );
-		
-		if (nodeToXML( *ipos, child ))
-		    parent->appendChild( child );
-	    }
-	    catch (const ExceptionSkipVariable &) {
-	    }
+            try {
+                XMLNode::Pointer child( NEW );
+                
+                if (nodeToXML( *ipos, child ))
+                    parent->appendChild( child );
+            }
+            catch (const ExceptionSkipVariable &) {
+            }
         }
 
-	return true;
+        return true;
     }
 
     virtual bool nodeToXML( const T &element, XMLNode::Pointer &child ) const
@@ -79,7 +79,7 @@ public:
             child->setName( XMLNode::ATTRIBUTE_NODE );
             return true;
         }
-	return false;
+        return false;
     }
 
 protected:
@@ -94,16 +94,16 @@ class XMLVectorContainer : public XMLVectorBase<T>,
 public:
     virtual bool nodeFromXML( const XMLNode::Pointer& child )
     {
-	return XMLVectorBase<T>::nodeFromXML( child )
-		|| XMLVariableContainer::nodeFromXML( child );
+        return XMLVectorBase<T>::nodeFromXML( child )
+                || XMLVariableContainer::nodeFromXML( child );
     }
     virtual bool toXML( XMLNode::Pointer& parent ) const
     {
-	bool ret1, ret2;
+        bool ret1, ret2;
 
-	ret1 = XMLVectorBase<T>::toXML( parent );
-	ret2 = XMLVariableContainer::toXML( parent );
-	return ret1 || ret2;
+        ret1 = XMLVectorBase<T>::toXML( parent );
+        ret2 = XMLVariableContainer::toXML( parent );
+        return ret1 || ret2;
     }
 };
 

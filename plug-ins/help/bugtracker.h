@@ -14,7 +14,7 @@ class Character;
 
 class BugTracker : public OneAllocate, 
                    public XMLConfigurablePlugin, 
-		   public virtual XMLVariableContainer 
+                   public virtual XMLVariableContainer 
 {
 XML_OBJECT    
 public:

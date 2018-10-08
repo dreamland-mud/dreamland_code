@@ -14,39 +14,39 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная unsigned char
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ unsigned char
  */
 class XMLByte : public Byte
 {
 public:
-	/** По умолчанию значение 0 */
-	inline XMLByte( ) : Byte( )
-	{
-	}
-	
-	inline XMLByte( unsigned char value ) : Byte( value )
-	{
-	}
-	
-	inline XMLByte( const DLString& value ) throw( ExceptionBadType )
-		: Byte( value )
-	{
-	}
+        /** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
+        inline XMLByte( ) : Byte( )
+        {
+        }
+        
+        inline XMLByte( unsigned char value ) : Byte( value )
+        {
+        }
+        
+        inline XMLByte( const DLString& value ) throw( ExceptionBadType )
+                : Byte( value )
+        {
+        }
 
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
 
 
-/** Вывод в ostream типа XMLByte */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLByte */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLByte& xmlByte )
 {
-	ostr << xmlByte.getValue( );
-	return ostr;
+        ostr << xmlByte.getValue( );
+        return ostr;
 }
 
 #endif

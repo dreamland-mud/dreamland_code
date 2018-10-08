@@ -6,7 +6,9 @@
 #define __DIRECTIONS_H__
 
 class Character;
+class Room;
 struct extra_exit_data;
+struct exit_data;
 
 struct direction_t {
     int door;
@@ -29,6 +31,13 @@ extern char const extra_move_rtpm [];
 
 int direction_lookup( char c );
 int direction_lookup( const char *arg );
+
+/** Return short description of the exit, or generic "door" if not set. */
+const char * direction_doorname(exit_data *);
+/** Return corresponding exit from the opposite side, but only if it leads back here. */
+exit_data *direction_reverse(Room *room, int door);
+/** Return room this door leads to. */
+Room * direction_target(Room *room, int door);
 
 #define FEX_NONE     (0)
 #define FEX_NO_INVIS (A)

@@ -52,25 +52,25 @@ inline void EnumerationArray::clear( )
 inline void EnumerationArray::fill( int value )
 {
     for (iterator i = begin( ); i != end( ); i++)
-	*i = value;
+        *i = value;
 }
 
 inline int & EnumerationArray::operator [] (size_type ndx)
 {
     static int zeroValue;
     if (!table)
-	return zeroValue;
+        return zeroValue;
     else
-	return vector<int>::operator [](ndx);
+        return vector<int>::operator [](ndx);
 }
 
 inline const int & EnumerationArray::operator [] (size_type ndx) const
 {
     static int zeroValue;
     if (!table)
-	return zeroValue;
+        return zeroValue;
     else
-	return vector<int>::operator [](ndx);
+        return vector<int>::operator [](ndx);
 }
 
 #endif

@@ -95,55 +95,55 @@ public:
     typedef StaticList<DLString, Method> Chain;
 
     class Command : public OLCCommand {
-    public:	
-	typedef ::Pointer<Command> Pointer;
+    public:        
+        typedef ::Pointer<Command> Pointer;
     
-	Command( ::Pointer<T> s, const DLString &n, Method m )
-	        : OLCCommand( n ), state( s ), method( m )
-	{
-	}
+        Command( ::Pointer<T> s, const DLString &n, Method m )
+                : OLCCommand( n ), state( s ), method( m )
+        {
+        }
 
     private:
-    	virtual void run( PCharacter *pch, char *args )
-	{
-	    state->lastCmd.setValue( getName( ) );
-	    state->lastArgs.setValue( args );
+            virtual void run( PCharacter *pch, char *args )
+        {
+            state->lastCmd.setValue( getName( ) );
+            state->lastArgs.setValue( args );
 
-	    if (((*state)->*method)( pch, args ))
-		state->changed( pch );
-	}
-	
-	::Pointer<T> state;
-	Method method;
+            if (((*state)->*method)( pch, args ))
+                state->changed( pch );
+        }
+        
+        ::Pointer<T> state;
+        Method method;
     };
     
     void do_commands(PCharacter *ch) {
-	Chain *cmd;
-	ostringstream os;
-	int i;
+        Chain *cmd;
+        ostringstream os;
+        int i;
 
-	for (cmd = Chain::begin( ), i = 0; cmd; cmd = cmd->getNext( ), i++) {
-	    if(i && i % 4 == 0)
-		os << endl;
-	    os << std::setw(19) << std::setiosflags(ios::left) << cmd->getKey( );
-	}
-	os << endl;
+        for (cmd = Chain::begin( ), i = 0; cmd; cmd = cmd->getNext( ), i++) {
+            if(i && i % 4 == 0)
+                os << endl;
+            os << std::setw(19) << std::setiosflags(ios::left) << cmd->getKey( );
+        }
+        os << endl;
 
-	ch->send_to( os.str() );
+        ch->send_to( os.str() );
     }
     
     virtual CommandBase::Pointer findCommand( PCharacter *pch, const DLString &name )
     {
-	Chain *cmd;
+        Chain *cmd;
 
-	for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
-	    if (name.strPrefix( cmd->getKey( ) ))
-		return typename Command::Pointer( NEW, 
-			                 (T *)this, 
-					 cmd->getKey( ), 
-					 cmd->getVal( ) );
-	
-	return CommandBase::Pointer( );
+        for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( ))
+            if (name.strPrefix( cmd->getKey( ) ))
+                return typename Command::Pointer( NEW, 
+                                         (T *)this, 
+                                         cmd->getKey( ), 
+                                         cmd->getVal( ) );
+        
+        return CommandBase::Pointer( );
     }
 };    
 

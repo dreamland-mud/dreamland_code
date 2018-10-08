@@ -17,7 +17,7 @@
 
 class Healer : public ServiceTrader, 
                public TraderBehavior, 
-	       public BasicMobileDestiny 
+               public BasicMobileDestiny 
 {
 XML_OBJECT
 public:

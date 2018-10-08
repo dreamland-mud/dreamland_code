@@ -14,10 +14,10 @@
 bool PersonalQuestReward::canEquip( Character *ch )
 {
     if (!obj->hasOwner( ch )) {
-	ch->pecho( "ôÙ ÎÅ ÍÏÖÅÛØ ×ÌÁÄÅÔØ %1$O5 É ÂÒÏÓÁÅÛØ %1$P2.", obj );
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	return false;
+        ch->pecho( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð²Ð»Ð°Ð´ÐµÑ‚ÑŒ %1$O5 Ð¸ Ð±Ñ€Ð¾ÑÐ°ÐµÑˆÑŒ %1$P2.", obj );
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        return false;
     }
 
     return true;
@@ -26,12 +26,12 @@ bool PersonalQuestReward::canEquip( Character *ch )
 void PersonalQuestReward::get( Character *ch ) 
 { 
     if (ch->is_immortal())
-	return;
+        return;
     
     if (!canEquip( ch ))
-	return;
+        return;
 
-    act_p("{BíÅÒÃÁÀÝÁÑ ÁÕÒÁ ÏËÒÕÖÁÅÔ $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    act_p("{BÐœÐµÑ€Ñ†Ð°ÑŽÑ‰Ð°Ñ Ð°ÑƒÑ€Ð° Ð¾ÐºÑ€ÑƒÐ¶Ð°ÐµÑ‚ $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
 }
 
 
@@ -39,19 +39,19 @@ bool PersonalQuestReward::save( ) {
     Character *ch = obj->getCarrier( );
 
     if (!ch || ch->is_immortal( ))
-	return false;
+        return false;
     
     if (obj->hasOwner( ch )) 
-	return false;
+        return false;
     
-    act_p("$o1 ÉÓÞÅÚÁÅÔ!", ch, obj, 0, TO_CHAR, POS_RESTING);
+    act_p("$o1 Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚!", ch, obj, 0, TO_CHAR, POS_RESTING);
     extract_obj(obj);
     return true;
 }
 
 void PersonalQuestReward::delete_( Character *ch ) {
     if (obj->hasOwner( ch )) 
-	extract_obj( obj );
+        extract_obj( obj );
 }
 
 bool PersonalQuestReward::isLevelAdaptive( ) {

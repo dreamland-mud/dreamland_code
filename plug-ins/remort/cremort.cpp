@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "commandtemplate.h"
@@ -37,7 +37,7 @@
 CLAN(flowers);
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
-const	short	CONVERT_PRACTICE_QP = 3;
+const        short        CONVERT_PRACTICE_QP = 3;
 
 CMDRUN( remort )
 {
@@ -51,43 +51,43 @@ CMDRUN( remort )
     pch = ch->getPC( );
 
     if (!pch || !( d = pch->desc )) 
-	return;
+        return;
     
     /*
      * can remort?
      */
     if (pch->age.getTrueYears( ) < 25) {
-	pch->pecho("Ты слишком моло%1$Gдо|д|да, чтобы умирать.", pch);
-	return;
+        pch->pecho("п╒я▀ я│п╩п╦я┬п╨п╬п╪ п╪п╬п╩п╬%1$Gп╢п╬|п╢|п╢п╟, я┤я┌п╬п╠я▀ я┐п╪п╦я─п╟я┌я▄.", pch);
+        return;
     }
     
     if (IS_SET(pch->comm, COMM_NOTELL|COMM_NOEMOTE) 
-	|| pch->in_room->vnum == ROOM_VNUM_JAIL 
-	|| pch->in_room->vnum == 10 
-	|| pch->curse < 100)
+        || pch->in_room->vnum == ROOM_VNUM_JAIL 
+        || pch->in_room->vnum == 10 
+        || pch->curse < 100)
     {
-	pch->pecho("Ты еще не искупи%1$Gло|л|ла провинности ЭТОЙ жизни.", pch);
-	return;
+        pch->pecho("п╒я▀ п╣я┴п╣ п╫п╣ п╦я│п╨я┐п©п╦%1$Gп╩п╬|п╩|п╩п╟ п©я─п╬п╡п╦п╫п╫п╬я│я┌п╦ п╜п╒п·п≥ п╤п╦п╥п╫п╦.", pch);
+        return;
     }
     
     if (argument.empty( )) {
-	pch->println("Если хочешь начать новую жизнь, набери remort <password>");
-	return;
+        pch->println("п∙я│п╩п╦ я┘п╬я┤п╣я┬я▄ п╫п╟я┤п╟я┌я▄ п╫п╬п╡я┐я▌ п╤п╦п╥п╫я▄, п╫п╟п╠п╣я─п╦ remort <password>");
+        return;
     }
     
     if (!password_check( pch, argument )) {
-	pch->println("Неверный пароль.");
-	return;
+        pch->println("п²п╣п╡п╣я─п╫я▀п╧ п©п╟я─п╬п╩я▄.");
+        return;
     }
 
     if (auction->item && ((pch == auction->buyer) || (pch == auction->seller))) {
-	pch->println("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
-	return;
+        pch->println("п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ п╡п╣я┴я▄, п╡я▀я│я┌п╟п╡п╩п╣п╫п╫п╟я▐ п╫п╟ п╟я┐п╨я├п╦п╬п╫, п╠я┐п╢п╣я┌ п©я─п╬п╢п╟п╫п╟ п╦п╩п╦ п╡п╬п╥п╡я─п╟я┴п╣п╫п╟.");
+        return;
     }
 
     if (!PCharacterManager::pfRemort(pch)) {
-	pch->println("Не удалось сохранить твой профайл: сообщи Богам!");
-	return;
+        pch->println("п²п╣ я┐п╢п╟п╩п╬я│я▄ я│п╬я┘я─п╟п╫п╦я┌я▄ я┌п╡п╬п╧ п©я─п╬я└п╟п╧п╩: я│п╬п╬п╠я┴п╦ п▒п╬пЁп╟п╪!");
+        return;
     }
     
     new_ch = PCharacterManager::getPCharacter( );
@@ -103,11 +103,11 @@ CMDRUN( remort )
     new_ch->act = PLR_COLOR;
 
     if (pch->getClan( ) != clan_flowers) {
-	new_ch->questpoints = pch->questpoints +
-		              pch->practice * CONVERT_PRACTICE_QP +
-		              pch->train * CONVERT_PRACTICE_QP * 10;
-	new_ch->bank_s = pch->bank_s;
-	new_ch->bank_g = pch->bank_g;
+        new_ch->questpoints = pch->questpoints +
+                              pch->practice * CONVERT_PRACTICE_QP +
+                              pch->train * CONVERT_PRACTICE_QP * 10;
+        new_ch->bank_s = pch->bank_s;
+        new_ch->bank_g = pch->bank_g;
     }
     
     /* remember this life and reset remort bonuses */

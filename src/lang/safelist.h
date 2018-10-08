@@ -8,47 +8,47 @@
 struct SafeListElement {
     SafeListElement( )
     {
-	next = prev = this;
+        next = prev = this;
     }
 
     ~SafeListElement( )
     {
-	fromList( );
+        fromList( );
     }
 
     void linkup( )
     {
-	next->prev = this;
-	prev->next = this;
+        next->prev = this;
+        prev->next = this;
     }
     
     void insertBefore(SafeListElement *e) 
     {
-	next = e;
-	prev = e->prev;
-	linkup( );
+        next = e;
+        prev = e->prev;
+        linkup( );
     }
     void insertAfter(SafeListElement *e) 
     {
-	next = e->next;
-	prev = e;
-	linkup( );
+        next = e->next;
+        prev = e;
+        linkup( );
     }
     
     void fromList( ) 
     {
-	next->prev = prev;
-	prev->next = next;
-	next = prev = this;
+        next->prev = prev;
+        prev->next = next;
+        next = prev = this;
     }
 
     SafeListElement *next;
     SafeListElement *prev;
 
     enum {
-	SLE_ENTRY,
-	SLE_ITERATOR,
-	SLE_HEAD
+        SLE_ENTRY,
+        SLE_ITERATOR,
+        SLE_HEAD
     } type;
 };
 
@@ -56,7 +56,7 @@ template <typename>
 struct SafeListEntry : public SafeListElement {
     SafeListEntry( ) 
     {
-	type = SLE_ENTRY;
+        type = SLE_ENTRY;
     }
 };
 
@@ -68,57 +68,57 @@ public:
     template <typename Type>
     struct iterator_base : public SafeListElement {
     friend class SafeList;
-	iterator_base( ) 
-	{
-	    type = SLE_ITERATOR;
-	}
-	
-	iterator_base(const iterator_base &it) 
-	{
-	    type = SLE_ITERATOR;
-	    insertAfter(it.getPrev( ));
-	}
-	
-	iterator_base( Type *e );
+        iterator_base( ) 
+        {
+            type = SLE_ITERATOR;
+        }
+        
+        iterator_base(const iterator_base &it) 
+        {
+            type = SLE_ITERATOR;
+            insertAfter(it.getPrev( ));
+        }
+        
+        iterator_base( Type *e );
 
-	const iterator_base &operator =( const iterator_base &r ) 
-	{
-	    fromList( );
-	    insertAfter( r.getPrev( ) );
-	    return *this;
-	}
-	    
-	iterator_base & operator ++( ) 
-	{
-	    EntryType *e = getNext( );
-	    fromList( );
-	    insertAfter(e);
-	    return *this;
-	}
-	
-	iterator_base & operator --( );
-	Type & operator *( );
-	Type * operator -> ( );
+        const iterator_base &operator =( const iterator_base &r ) 
+        {
+            fromList( );
+            insertAfter( r.getPrev( ) );
+            return *this;
+        }
+            
+        iterator_base & operator ++( ) 
+        {
+            EntryType *e = getNext( );
+            fromList( );
+            insertAfter(e);
+            return *this;
+        }
+        
+        iterator_base & operator --( );
+        Type & operator *( );
+        Type * operator -> ( );
     
-	bool operator == ( const iterator_base &it ) const
-	{
-	    return getPrev( ) == it.getPrev( );
-	}
+        bool operator == ( const iterator_base &it ) const
+        {
+            return getPrev( ) == it.getPrev( );
+        }
     
-	bool operator != ( const iterator_base &it ) const
-	{
-	    return getPrev( ) != it.getPrev( );
-	}
+        bool operator != ( const iterator_base &it ) const
+        {
+            return getPrev( ) != it.getPrev( );
+        }
 
     protected:
-	iterator_base( SafeListElement *e ) 
-	{
-	    type = SLE_ITERATOR;
-	    insertAfter( e );
-	}
+        iterator_base( SafeListElement *e ) 
+        {
+            type = SLE_ITERATOR;
+            insertAfter( e );
+        }
 
-	EntryType *getNext( ) const;
-	EntryType *getPrev( ) const;
+        EntryType *getNext( ) const;
+        EntryType *getPrev( ) const;
     };
     
     typedef iterator_base<ElementType> iterator;
@@ -126,70 +126,70 @@ public:
 
     SafeList( )
     {
-	head.type = SafeListElement::SLE_HEAD;
+        head.type = SafeListElement::SLE_HEAD;
     }
     
     SafeList( const SafeList &list )
     {
-	head.type = SafeListElement::SLE_HEAD;
+        head.type = SafeListElement::SLE_HEAD;
     }
     
     const SafeList & operator = (SafeList &list)
     {
-	clear( );
-	return *this;
+        clear( );
+        return *this;
     }
     
     void clear( )
     {
-	while (!empty( ))
-	    erase( &front( ) );
+        while (!empty( ))
+            erase( &front( ) );
     }
 
     iterator begin( )
     {
-	return ++end( );
+        return ++end( );
     }
     
     const_iterator begin( ) const
     {
-	return ++end( );
+        return ++end( );
     }
     
     iterator end( )
     {
-	return iterator( &head );
+        return iterator( &head );
     }
     
     const_iterator end( ) const
     {
-	return const_iterator( const_cast<SafeListElement *>( &head ) );
+        return const_iterator( const_cast<SafeListElement *>( &head ) );
     }
     
     ElementType & front( ) 
     {
-	return *begin( );
+        return *begin( );
     }
 
     const ElementType & front( ) const
     {
-	return *begin( );
+        return *begin( );
     }
 
     bool empty( ) const
     {
-	return begin( ) == end( );
+        return begin( ) == end( );
     }
     
     int size( ) const
     {
-	int cnt;
-	const_iterator i;
-	
-	for (i = begin( ), cnt = 0; i != end( ); ++i, ++cnt)
-	    ;
+        int cnt;
+        const_iterator i;
+        
+        for (i = begin( ), cnt = 0; i != end( ); ++i, ++cnt)
+            ;
 
-	return cnt;
+        return cnt;
     }
     
     void push_back( ElementType *elem );
@@ -198,7 +198,7 @@ public:
 
     void erase( const iterator &it )
     {
-	it.getPrev( )->fromList( );
+        it.getPrev( )->fromList( );
     }
 
     SafeListElement head;

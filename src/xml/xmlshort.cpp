@@ -26,14 +26,14 @@ bool XMLShort::toXML( XMLNode::Pointer& parent ) const
         node->setType( XMLNode::XML_TEXT );
         node->setCData( toString( ) );
         parent->appendChild( node );
-	return true;
+        return true;
 }
 
 bool XMLShortNoEmpty::toXML( XMLNode::Pointer& parent ) const
 {
     if (getValue( ) == 0)
-	return false;
+        return false;
     else 
-	return XMLShort::toXML( parent );
+        return XMLShort::toXML( parent );
 }
 

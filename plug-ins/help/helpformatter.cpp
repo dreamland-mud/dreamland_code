@@ -26,7 +26,7 @@ void HelpFormatter::setup( Character * )
 // *...*     ->  {y...{w                      (bold text)
 // _..._     ->  {D<{w...{D>{w                (italic with <>)
 // =...=     ->  {c...{w                      (header text)
-// (eng,ÒÕÓ) ->  {lEeng{lRÒÕÓ{lx              (language choice)
+// (eng,Ñ€ÑƒÑ) ->  {lEeng{lRÑ€ÑƒÑ{lx              (language choice)
 // [...]     ->  {W...{w                      (reference)
 // %KEYWORD%
 void HelpFormatter::run( Character *ch, ostringstream &out )
@@ -40,226 +40,226 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
     reset( );
 
     if (!text)
-	return;
+        return;
 
     setup( ch );
 
     for (const char *p = text; *p; ++p) {
-	if (*p == '%') {
-	    DLString kw;
+        if (*p == '%') {
+            DLString kw;
 
-	    while (*++p && *p >= 'A' && *p <= 'Z')
-		kw << *p;
-	    
-	    if (*p == '%') {
-		if (handleKeyword( kw, out ))
-		    continue;
-	    }
+            while (*++p && *p >= 'A' && *p <= 'Z')
+                kw << *p;
+            
+            if (*p == '%') {
+                if (handleKeyword( kw, out ))
+                    continue;
+            }
 
-	    out << "%" << kw << (*p ? *p : '\0');
-	    continue;
-	}
+            out << "%" << kw << (*p ? *p : '\0');
+            continue;
+        }
 
-	if (!fParse) {
-	    out << *p;
-	    continue;
-	}
-	
-	switch (*p) {    
-	case '*':
-	    t_asterix = !t_asterix;
-	    t_bracket = false;
-	    out << (t_asterix ? "{y" : "{w");
-	    break;
+        if (!fParse) {
+            out << *p;
+            continue;
+        }
+        
+        switch (*p) {    
+        case '*':
+            t_asterix = !t_asterix;
+            t_bracket = false;
+            out << (t_asterix ? "{y" : "{w");
+            break;
 
-	case '_':
-	    t_underline = !t_underline;
-	    t_bracket = false;
-	    out << (t_underline ? "{D" : "{w");
-	    break;
+        case '_':
+            t_underline = !t_underline;
+            t_bracket = false;
+            out << (t_underline ? "{D" : "{w");
+            break;
 
-	case '=':
-	    t_equals = !t_equals;
-	    t_bracket = false;
-	    out << (t_equals ? "{c" : "{w");
-	    break;
+        case '=':
+            t_equals = !t_equals;
+            t_bracket = false;
+            out << (t_equals ? "{c" : "{w");
+            break;
 
-	case '[':
-	    if (!t_ref) {
-		t_ref = true;
-		t_bracket = false;
-		out << "{hh{W";
-	    } else
-		out << *p;
-	    break;
-	    
-	case ']':
-	    if (t_ref) {
-		t_ref = false;
-		t_bracket = false;
-		out << "{x";
-	    } else
-		out << *p;
-	    break;
-	
-	case '(':
-	    if (t_ref || t_equals || t_underline || t_asterix) {
-		out << "{lE";
-		t_bracket = true;
-	    } else
-		out << *p;
-	    break;
+        case '[':
+            if (!t_ref) {
+                t_ref = true;
+                t_bracket = false;
+                out << "{hh{W";
+            } else
+                out << *p;
+            break;
+            
+        case ']':
+            if (t_ref) {
+                t_ref = false;
+                t_bracket = false;
+                out << "{x";
+            } else
+                out << *p;
+            break;
+        
+        case '(':
+            if (t_ref || t_equals || t_underline || t_asterix) {
+                out << "{lE";
+                t_bracket = true;
+            } else
+                out << *p;
+            break;
 
-	case ',':
-	    if (t_bracket) 
-		out << "{lR";
-	    else
-		out << *p;
-	    break;
+        case ',':
+            if (t_bracket) 
+                out << "{lR";
+            else
+                out << *p;
+            break;
 
-	case ')':
-	    if (t_bracket) {
-		t_bracket = false;
-		out << "{lx";
-	    } else
-		out << *p;
-	    break;
-	
-	default:
-	    out << *p;
-	    break;
-	}
+        case ')':
+            if (t_bracket) {
+                t_bracket = false;
+                out << "{lx";
+            } else
+                out << *p;
+            break;
+        
+        default:
+            out << *p;
+            break;
+        }
     }
     
 }
 
 // %KEYWORD%:
-// H, HELP     ->  {W{lEhelp{lRÓÐÒÁ×ËÁ{lx{w
-// SA, SEEALSO ->  óÍ. ÔÁËÖÅ
-// U, USAGE    ->  éÓÐÏÌØÚÏ×ÁÎÉÅ
-// FMT         ->  {wæÏÒÍÁÔ:{w
+// H, HELP     ->  {W{lEhelp{lRÑÐ¿Ñ€Ð°Ð²ÐºÐ°{lx{w
+// SA, SEEALSO ->  Ð¡Ð¼. Ñ‚Ð°ÐºÐ¶Ðµ
+// U, USAGE    ->  Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ
+// FMT         ->  {wÐ¤Ð¾Ñ€Ð¼Ð°Ñ‚:{w
 // FFF         ->  {w       {w
 // PAUSE       ->  stops help tag parsing
 // RESUME      ->  resumes help tag parsing
 // A           ->  * 
-// CAST        ->  {lEcast{lRËÏÌÄÏ×ÁÔØ{lx
-// OBJ         ->  ÐÒÅÄÍÅÔ
-// CHAR        ->  ÐÅÒÓÏÎÁÖ
-// PLR         ->  ÉÇÒÏË
-// MOB         ->  ÍÏÎÓÔÒ
-// VICT        ->  ÖÅÒÔ×Á
-// DIR         ->  ÎÁÐÒÁ×ÌÅÎÉÅ
-// YES, NO     ->  {lRÄÁ{lEyes{lx, {lRÎÅÔ{lEno{lx
-// ALL         ->  {lR×ÓÅ{lEall{lx
-// SHOW        ->  {lRÐÏËÁÚ{lEshow{lx
-// ON          ->  {lR×ËÌ{lEon{lx
-// OFF         ->  {lR×ÙËÌ{lEoff{lx
+// CAST        ->  {lEcast{lRÐºÐ¾Ð»Ð´Ð¾Ð²Ð°Ñ‚ÑŒ{lx
+// OBJ         ->  Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚
+// CHAR        ->  Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶
+// PLR         ->  Ð¸Ð³Ñ€Ð¾Ðº
+// MOB         ->  Ð¼Ð¾Ð½ÑÑ‚Ñ€
+// VICT        ->  Ð¶ÐµÑ€Ñ‚Ð²Ð°
+// DIR         ->  Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ
+// YES, NO     ->  {lRÐ´Ð°{lEyes{lx, {lRÐ½ÐµÑ‚{lEno{lx
+// ALL         ->  {lRÐ²ÑÐµ{lEall{lx
+// SHOW        ->  {lRÐ¿Ð¾ÐºÐ°Ð·{lEshow{lx
+// ON          ->  {lRÐ²ÐºÐ»{lEon{lx
+// OFF         ->  {lRÐ²Ñ‹ÐºÐ»{lEoff{lx
 bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (kw == "H" || kw == "HELP") {
-	out << "{W{lEhelp{lR?{lx{w";
-	return true;
+        out << "{W{lEhelp{lR?{lx{w";
+        return true;
     }
 
     if (kw == "A") {
-	out << "*";
-	return true;
+        out << "*";
+        return true;
     }
 
     if (kw == "FMT") {
-	out << "{wæÏÒÍÁÔ:{w";
-	return true;
+        out << "{wÐ¤Ð¾Ñ€Ð¼Ð°Ñ‚:{w";
+        return true;
     }
 
     if (kw == "FFF") {
-	out << "{w       {w";
-	return true;
+        out << "{w       {w";
+        return true;
     }
 
     if (kw == "U" || kw == "USAGE") {
-	out << "éÓÐÏÌØÚÏ×ÁÎÉÅ";
-	return true;
+        out << "Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ";
+        return true;
     }
 
     if (kw == "SA" || kw == "SEEALSO") {
-	out << "óÍ. ÔÁËÖÅ";
-	return true;
+        out << "Ð¡Ð¼. Ñ‚Ð°ÐºÐ¶Ðµ";
+        return true;
     }
 
     if (kw == "CAST") {
-	out << "{lEcast{lRËÏÌÄÏ×ÁÔØ{lx";
-	return true;
+        out << "{lEcast{lRÐºÐ¾Ð»Ð´Ð¾Ð²Ð°Ñ‚ÑŒ{lx";
+        return true;
     }
 
     if (kw == "OBJ") {
-	out << "ÐÒÅÄÍÅÔ";
-	return true;
+        out << "Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚";
+        return true;
     }
 
     if (kw == "CHAR") {
-	out << "ÐÅÒÓÏÎÁÖ";
-	return true;
+        out << "Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶";
+        return true;
     }
 
     if (kw == "PLR") {
-	out << "ÉÇÒÏË";
-	return true;
+        out << "Ð¸Ð³Ñ€Ð¾Ðº";
+        return true;
     }
 
     if (kw == "MOB") {
-	out << "ÍÏÎÓÔÒ";
-	return true;
+        out << "Ð¼Ð¾Ð½ÑÑ‚Ñ€";
+        return true;
     }
 
 
     if (kw == "VICT") {
-	out << "ÖÅÒÔ×Á";
-	return true;
+        out << "Ð¶ÐµÑ€Ñ‚Ð²Ð°";
+        return true;
     }
 
     if (kw == "DIR") {
-	out << "ÎÁÐÒÁ×ÌÅÎÉÅ";
-	return true;
+        out << "Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ";
+        return true;
     }
 
     if (kw == "YES") {
-	out << "{lRÄÁ{lEyes{lx";
-	return true;
+        out << "{lRÐ´Ð°{lEyes{lx";
+        return true;
     }
 
     if (kw == "NO") {
-	out << "{lRÎÅÔ{lEno{lx";
-	return true;
+        out << "{lRÐ½ÐµÑ‚{lEno{lx";
+        return true;
     }
 
     if (kw == "ALL") {
-	out << "{lR×ÓÅ{lEall{lx";
-	return true;
+        out << "{lRÐ²ÑÐµ{lEall{lx";
+        return true;
     }
 
     if (kw == "SHOW") {
-	out << "{lRÐÏËÁÚ{lEshow{lx";
-	return true;
+        out << "{lRÐ¿Ð¾ÐºÐ°Ð·{lEshow{lx";
+        return true;
     }
 
     if (kw == "ON") {
-	out << "{lR×ËÌ{lEon{lx";
-	return true;
+        out << "{lRÐ²ÐºÐ»{lEon{lx";
+        return true;
     }
 
     if (kw == "OFF") {
-	out << "{lR×ÙËÌ{lEoff{lx";
-	return true;
+        out << "{lRÐ²Ñ‹ÐºÐ»{lEoff{lx";
+        return true;
     }
 
     if (kw == "PAUSE") {
-	fParse = false;
-	return true;
+        fParse = false;
+        return true;
     }
     
     if (kw == "RESUME") {
-	fParse = true;
-	return true;
+        fParse = true;
+        return true;
     }
 
     return false;

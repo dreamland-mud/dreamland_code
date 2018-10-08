@@ -16,15 +16,15 @@ class Affect;
 class ValentinePrise : public PersonalQuestReward {
 XML_OBJECT
 public:
-	typedef ::Pointer<ValentinePrise> Pointer;
+        typedef ::Pointer<ValentinePrise> Pointer;
     
-	virtual void wear( Character *victim );                           
-	virtual void equip( Character * );                           
+        virtual void wear( Character *victim );                           
+        virtual void equip( Character * );                           
 
 private:
-	void addAffect( Affect *af, int level );
-	XML_VARIABLE XMLString msgChar;
-	XML_VARIABLE XMLString msgRoom;
+        void addAffect( Affect *af, int level );
+        XML_VARIABLE XMLString msgChar;
+        XML_VARIABLE XMLString msgRoom;
 };
 
 #endif

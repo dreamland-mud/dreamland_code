@@ -14,28 +14,28 @@ class SchedulerList;
 class SchedulerTask;
 
 /**
- * @short мэп очередей событий, отсортированный по приоритету
+ * @short п╪я█п© п╬я┤п╣я─п╣п╢п╣п╧ я│п╬п╠я▀я┌п╦п╧, п╬я┌я│п╬я─я┌п╦я─п╬п╡п╟п╫п╫я▀п╧ п©п╬ п©я─п╦п╬я─п╦я┌п╣я┌я┐
  * @see Scheduler
  * @see SchedulerQueue
  */
 class SchedulerPriorityMap : public std::map<int, SchedulerList>, public virtual DLObject {
 public:
-	typedef ::Pointer<SchedulerPriorityMap> Pointer;
-	typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
+        typedef ::Pointer<SchedulerPriorityMap> Pointer;
+        typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
 
 public:
-	SchedulerPriorityMap();
+        SchedulerPriorityMap();
 
-	void tick( );
-	/** Насильно убить все задачи заданного типа */
-	void slay( SchedulerTaskPointer& task );
-	/** Насильно убить все задачи с этим указателем */
-	void slayInstance( SchedulerTaskPointer& task );
-	/** Вернуть текущий приоритет */
-	int getPriority( ) const;
+        void tick( );
+        /** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ п╥п╟п╢п╟п╫п╫п╬пЁп╬ я┌п╦п©п╟ */
+        void slay( SchedulerTaskPointer& task );
+        /** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ я│ я█я┌п╦п╪ я┐п╨п╟п╥п╟я┌п╣п╩п╣п╪ */
+        void slayInstance( SchedulerTaskPointer& task );
+        /** п▓п╣я─п╫я┐я┌я▄ я┌п╣п╨я┐я┴п╦п╧ п©я─п╦п╬я─п╦я┌п╣я┌ */
+        int getPriority( ) const;
 
 private:
-	int priority;
+        int priority;
 };
 
 #endif

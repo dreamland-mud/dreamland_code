@@ -61,7 +61,7 @@ public:
     virtual bool applicable( PCharacter * );
 
     static inline StaffQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
     XML_VARIABLE XMLInteger objVnum;

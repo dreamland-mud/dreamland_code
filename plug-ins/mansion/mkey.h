@@ -92,7 +92,7 @@ inline void MansionKeyArticle::setPrice( Price::Pointer price )
 
 
 class XMLAttributeMansionKey : public RemortAttribute, 
-			       public XMLVariableContainer 
+                               public XMLVariableContainer 
 {
 XML_OBJECT
 public:

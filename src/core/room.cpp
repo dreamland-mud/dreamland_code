@@ -21,29 +21,29 @@ CLAN(none);
 PROF(none);
 
 Room::Room( ) : 
-		next( 0 ), rnext( 0 ),
-		aff_next( 0 ), reset_first( 0 ), reset_last( 0 ),
-		people( 0 ), contents( 0 ), extra_descr( 0 ),
-		area( 0 ), extra_exit( 0 ),
-		name( 0 ), description( 0 ), owner( 0 ),
-		vnum( 0 ), room_flags( 0 ), room_flags_default( 0 ),
-		light( 0 ), sector_type( 0 ),
-		heal_rate( 0 ), heal_rate_default( 0 ),
-		mana_rate( 0 ), mana_rate_default( 0 ),
-		clan( clan_none ),  
-		guilds( professionManager ),
-		affected( 0 ), affected_by( 0 ),
-		liquid( "none" ),
-		behavior( RoomBehavior::NODE_NAME )
+                next( 0 ), rnext( 0 ),
+                aff_next( 0 ), reset_first( 0 ), reset_last( 0 ),
+                people( 0 ), contents( 0 ), extra_descr( 0 ),
+                area( 0 ), extra_exit( 0 ),
+                name( 0 ), description( 0 ), owner( 0 ),
+                vnum( 0 ), room_flags( 0 ), room_flags_default( 0 ),
+                light( 0 ), sector_type( 0 ),
+                heal_rate( 0 ), heal_rate_default( 0 ),
+                mana_rate( 0 ), mana_rate_default( 0 ),
+                clan( clan_none ),  
+                guilds( professionManager ),
+                affected( 0 ), affected_by( 0 ),
+                liquid( "none" ),
+                behavior( RoomBehavior::NODE_NAME )
 {
     for (int i = 0; i < DIR_SOMEWHERE; i++) 
-	exit[i] = old_exit[i] = 0;
+        exit[i] = old_exit[i] = 0;
 }
 
 bool Room::isOwner( Character *ch ) const
 {
     if (owner == 0 || owner[0] == '\0')
-	return false;
+        return false;
 
     return is_name( ch->getNameP( ), owner );
 }
@@ -59,17 +59,17 @@ int Room::getCapacity( ) const
     int count;
 
     if (IS_SET( room_flags, ROOM_IMP_ONLY ))
-	return 0;
+        return 0;
 
     count = 0;
     for (rch = people; rch != 0; rch = rch->next_in_room)
-	count++;
+        count++;
 
     if (IS_SET(room_flags, ROOM_PRIVATE))
-	return max( 0, 2 - count );
+        return max( 0, 2 - count );
 
     if (IS_SET(room_flags, ROOM_SOLITARY))
-	return max( 0, 1 - count );
+        return max( 0, 1 - count );
 
     return -1;
 }
@@ -78,22 +78,22 @@ int Room::getCapacity( ) const
 bool Room::isCommon( ) 
 {
     if (IS_SET(room_flags, ROOM_IMP_ONLY | ROOM_GODS_ONLY | ROOM_HEROES_ONLY ))
-	return false;
+        return false;
 
     if (IS_SET(room_flags,ROOM_NEWBIES_ONLY))
-	return false;
+        return false;
 
     if (IS_SET(area->area_flag, AREA_WIZLOCK))
-	return false;
+        return false;
 
     if (clan != clan_none)
-	return false;
+        return false;
     
     if (!guilds.empty( ))
-	return false;
+        return false;
     
     if (behavior && !behavior->isCommon( ))
-	return false;
+        return false;
 
     return true;
 }
@@ -106,16 +106,16 @@ bool Room::isCommon( )
 bool Room::isDark( ) const
 {
     if (light > 0)
-	return false;
+        return false;
 
     if (IS_SET(room_flags, ROOM_DARK))
-	return true;
+        return true;
     
     if (sector_type == SECT_INSIDE || sector_type == SECT_CITY)
-	return false;
+        return false;
 
     if (weather_info.sunlight == SUN_LIGHT || weather_info.sunlight == SUN_RISE)
-	return false;
+        return false;
 
     return true;
 }

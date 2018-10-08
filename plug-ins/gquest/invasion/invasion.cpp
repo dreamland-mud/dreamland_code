@@ -80,67 +80,67 @@ void InvasionGQuest::create( const GlobalQuest::Config &config ) throw ( GQCanno
     log("trying " << scenName << " scenario for " << playerCnt << " players");
     
     if (!scen->canStart( ))
-	throw GQCannotStartException( "scenario doesnt want to start" );
+        throw GQCannotStartException( "scenario doesnt want to start" );
     
     if (scen->vnumMobs.empty( ))
-	objCnt = max( 40, number_range( playerCnt * 5, playerCnt * 7 ) );
+        objCnt = max( 40, number_range( playerCnt * 5, playerCnt * 7 ) );
     else if (scen->vnumObjs.empty( ))
-	mobCnt = max( 40, number_range( playerCnt * 5, playerCnt * 7 ) );
+        mobCnt = max( 40, number_range( playerCnt * 5, playerCnt * 7 ) );
     else {
-	mobCnt = max( 40, number_range( playerCnt * 2, playerCnt * 4 ) );
-	objCnt = max( 40, number_range( playerCnt * 2, playerCnt * 4 ) );
+        mobCnt = max( 40, number_range( playerCnt * 2, playerCnt * 4 ) );
+        objCnt = max( 40, number_range( playerCnt * 2, playerCnt * 4 ) );
     }
         
     if (!scen->vnumHelpers.empty( ))
-	helpCnt = max( 20, number_range( playerCnt * 2, playerCnt * 3 ) );
+        helpCnt = max( 20, number_range( playerCnt * 2, playerCnt * 3 ) );
     
     scen->collectRooms( rooms, mobCnt + objCnt + helpCnt);
     
     if ((int)rooms.size( ) < mobCnt + objCnt + helpCnt)
-	throw GQCannotStartException("not enough rooms");
-	
+        throw GQCannotStartException("not enough rooms");
+        
     log("mobiles " << mobCnt << ", objects " << objCnt << ", helpers " << helpCnt << ", rooms " << rooms.size( ));
     
     try {
-	int i;
-	NPCharacter *mob;
+        int i;
+        NPCharacter *mob;
 
-	while (!rooms.empty( ) && mobCnt > 0) {
-	    mob = createMob( );
-	    i = number_range( 0, rooms.size( ) - 1 );
-	    char_to_room( mob, rooms[i] );
+        while (!rooms.empty( ) && mobCnt > 0) {
+            mob = createMob( );
+            i = number_range( 0, rooms.size( ) - 1 );
+            char_to_room( mob, rooms[i] );
 
-	    if (mob->canEnter( rooms[i] )) 
-		mobCnt--;
-	    else 
-		extract_char( mob );
-	    
-	    rooms.erase( rooms.begin( ) + i );
-	}
+            if (mob->canEnter( rooms[i] )) 
+                mobCnt--;
+            else 
+                extract_char( mob );
+            
+            rooms.erase( rooms.begin( ) + i );
+        }
 
-	while (!rooms.empty( ) && objCnt > 0) {
-	    i = number_range( 0, rooms.size( ) - 1 );
-	    obj_to_room( createObj( ), rooms[i] );
-	    objCnt--;
-	    rooms.erase( rooms.begin( ) + i );
-	}
+        while (!rooms.empty( ) && objCnt > 0) {
+            i = number_range( 0, rooms.size( ) - 1 );
+            obj_to_room( createObj( ), rooms[i] );
+            objCnt--;
+            rooms.erase( rooms.begin( ) + i );
+        }
 
-	while (!rooms.empty( ) && helpCnt > 0) {
-	    mob = createHelper( );
-	    i = number_range( 0, rooms.size( ) - 1 );
-	    char_to_room( mob, rooms[i] );
+        while (!rooms.empty( ) && helpCnt > 0) {
+            mob = createHelper( );
+            i = number_range( 0, rooms.size( ) - 1 );
+            char_to_room( mob, rooms[i] );
 
-	    if (mob->canEnter( rooms[i] )) 
-		helpCnt--;
-	    else 
-		extract_char( mob );
-	    
-	    rooms.erase( rooms.begin( ) + i );
-	}
+            if (mob->canEnter( rooms[i] )) 
+                helpCnt--;
+            else 
+                extract_char( mob );
+            
+            rooms.erase( rooms.begin( ) + i );
+        }
     }
     catch (const Exception& e) {
-	cleanup( false );
-	throw e;
+        cleanup( false );
+        throw e;
     }
 }
 
@@ -150,36 +150,36 @@ void InvasionGQuest::cleanup( bool performance )
     Object *obj, *obj_next;
     
     for (ch = char_list; ch; ch = ch_next) {
-	ch_next = ch->next;
-	
-	if (ch->is_npc( )) {
-	    NPCharacter *mob = ch->getNPC( );
-	    
-	    if (mob->behavior) {
-		if (mob->behavior.getDynamicPointer<InvasionMob>( )) {
-		    if (performance) 
-			act("$c1 ÌÏÐÁÅÔÓÑ.", ch, 0, 0, TO_ROOM);
-		    
-		    extract_char( mob );
-		}
-		else if (mob->behavior.getDynamicPointer<InvasionHelper>( )) 
-		    extract_char( mob );
+        ch_next = ch->next;
+        
+        if (ch->is_npc( )) {
+            NPCharacter *mob = ch->getNPC( );
+            
+            if (mob->behavior) {
+                if (mob->behavior.getDynamicPointer<InvasionMob>( )) {
+                    if (performance) 
+                        act("$c1 Ð»Ð¾Ð¿Ð°ÐµÑ‚ÑÑ.", ch, 0, 0, TO_ROOM);
+                    
+                    extract_char( mob );
+                }
+                else if (mob->behavior.getDynamicPointer<InvasionHelper>( )) 
+                    extract_char( mob );
             }
-	}
+        }
     }
 
     for (obj = object_list; obj; obj = obj_next) {
-	obj_next = obj->next;
+        obj_next = obj->next;
 
-	if (obj->behavior) {
-	    if (obj->behavior.getDynamicPointer<InvasionObj>( )) {
-		if (performance && obj->in_room)
-		    act("$o1 ÉÓÞÅÚÁÅÔ.", obj->in_room->people, obj, 0, TO_ROOM);
+        if (obj->behavior) {
+            if (obj->behavior.getDynamicPointer<InvasionObj>( )) {
+                if (performance && obj->in_room)
+                    act("$o1 Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚.", obj->in_room->people, obj, 0, TO_ROOM);
 
-		extract_obj( obj );
-	    }
-	    else if (obj->behavior.getDynamicPointer<InvasionInstrument>( )) 
-		extract_obj( obj );
+                extract_obj( obj );
+            }
+            else if (obj->behavior.getDynamicPointer<InvasionInstrument>( )) 
+                extract_obj( obj );
         }
     }
 }
@@ -197,10 +197,10 @@ void InvasionGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     attr = ch->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
     
     if (attr && attr->getKilled( ) > 0)
-	buf << "þÉÓÌÏ ÕÎÉÞÔÏÖÅÎÎÙÈ ÔÏÂÏÊ ÂÅÚÏÂÒÁÚÉÊ: " 
-	    << GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
+        buf << "Ð§Ð¸ÑÐ»Ð¾ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð½Ñ‹Ñ… Ñ‚Ð¾Ð±Ð¾Ð¹ Ð±ÐµÐ·Ð¾Ð±Ñ€Ð°Ð·Ð¸Ð¹: " 
+            << GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
     
-    buf << "äÏ ËÏÎÃÁ ÏÈÏÔÙ ÏÓÔÁÅÔÓÑ ";
+    buf << "Ð”Ð¾ ÐºÐ¾Ð½Ñ†Ð° Ð¾Ñ…Ð¾Ñ‚Ñ‹ Ð¾ÑÑ‚Ð°ÐµÑ‚ÑÑ ";
     printRemainedTime( buf );
     buf << "." << endl;
 }
@@ -212,18 +212,18 @@ void InvasionGQuest::progress( std::ostringstream &ostr ) const
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
 
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	XMLAttributeInvasion::Pointer attr; 
-	
-	attr = i->second->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
-	
-	if (!attr || attr->getKilled( ) <= 0)
-	    continue;
+        XMLAttributeInvasion::Pointer attr; 
+        
+        attr = i->second->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
+        
+        if (!attr || attr->getKilled( ) <= 0)
+            continue;
 
-	sprintf(buf, "%s%-15s %s%-4d%s",
-		     GQChannel::NORMAL, i->second->getName( ).c_str( ), 	
-		     GQChannel::BOLD, attr->getKilled( ), GQChannel::NORMAL);
+        sprintf(buf, "%s%-15s %s%-4d%s",
+                     GQChannel::NORMAL, i->second->getName( ).c_str( ),         
+                     GQChannel::BOLD, attr->getKilled( ), GQChannel::NORMAL);
 
-	ostr << buf << endl;
+        ostr << buf << endl;
     }
 }
 
@@ -253,58 +253,58 @@ void InvasionGQuest::rewardLeader( )
     InvasionScenario *scen = getScenario( );
 
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	XMLAttributeInvasion::Pointer attr;
-	
-	attr = i->second->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
-	
-	if (!attr) 
-	    continue;
+        XMLAttributeInvasion::Pointer attr;
+        
+        attr = i->second->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
+        
+        if (!attr) 
+            continue;
 
-	killed = attr->getKilled( );
-	if (killed && killed > max) {
-	    max = killed;
-	    leaders.clear( );
-	    leaders.push_back( i->second );
-	} else if (killed && killed == max)
-	    leaders.push_back( i->second );
+        killed = attr->getKilled( );
+        if (killed && killed > max) {
+            max = killed;
+            leaders.clear( );
+            leaders.push_back( i->second );
+        } else if (killed && killed == max)
+            leaders.push_back( i->second );
     }
     
     if (leaders.empty( )) {
-	buf << scen->getNoWinnerMsg( ) << endl;
-//	"öÉÔÅÌÉ íÉÒÁ ÐÒÏÑ×ÉÌÉ ÎÅ×ÅÒÏÑÔÎÏÅ ÍÉÌÏÓÅÒÄÉÅ: ÎÉ ÏÄÎÁ ÂÕËÁÛËÁ ÎÅ ÐÏÓÔÒÁÄÁÌÁ."  << endl;
+        buf << scen->getNoWinnerMsg( ) << endl;
+//        "Ð–Ð¸Ñ‚ÐµÐ»Ð¸ ÐœÐ¸Ñ€Ð° Ð¿Ñ€Ð¾ÑÐ²Ð¸Ð»Ð¸ Ð½ÐµÐ²ÐµÑ€Ð¾ÑÑ‚Ð½Ð¾Ðµ Ð¼Ð¸Ð»Ð¾ÑÐµÑ€Ð´Ð¸Ðµ: Ð½Ð¸ Ð¾Ð´Ð½Ð° Ð±ÑƒÐºÐ°ÑˆÐºÐ° Ð½Ðµ Ð¿Ð¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð»Ð°."  << endl;
     }
     else { 
-	XMLReward reward;
+        XMLReward reward;
 
-	reward.qpoints = 200;
-	reward.gold = number_range( 150, 250 );
-	reward.experience = number_range( 100, 400 );
-	reward.practice = number_range( -6, 3 );
-	reward.reason = scen->getWinnerMsg( );
-	reward.id = getQuestID( );
-	
-	if (leaders.size( ) > 1 && !scen->getWinnerMsgOtherMlt( ).empty( ))
-	    buf << scen->getWinnerMsgOtherMlt( );
-	else
-	    buf << scen->getWinnerMsgOther( );
+        reward.qpoints = 200;
+        reward.gold = number_range( 150, 250 );
+        reward.experience = number_range( 100, 400 );
+        reward.practice = number_range( -6, 3 );
+        reward.reason = scen->getWinnerMsg( );
+        reward.id = getQuestID( );
+        
+        if (leaders.size( ) > 1 && !scen->getWinnerMsgOtherMlt( ).empty( ))
+            buf << scen->getWinnerMsgOtherMlt( );
+        else
+            buf << scen->getWinnerMsgOther( );
 
-	buf << GQChannel::BOLD;
-	
-	while (!leaders.empty( )) {
-	    PCMemoryInterface * pci;
+        buf << GQChannel::BOLD;
+        
+        while (!leaders.empty( )) {
+            PCMemoryInterface * pci;
 
-	    pci = leaders.back( );
-	    leaders.pop_back( );
+            pci = leaders.back( );
+            leaders.pop_back( );
 
-	    buf << " " << pci->getName( );
-	    if (!leaders.empty( ))
-		buf << ",";
+            buf << " " << pci->getName( );
+            if (!leaders.empty( ))
+                buf << ",";
 
-	    log("InvasionGQuest: reward leader " << pci->getName( ));
-	    GlobalQuestManager::getThis( )->rewardChar( pci, reward );
-	    pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
-			    ->rememberVictory( getQuestID( ) );
-	}
+            log("InvasionGQuest: reward leader " << pci->getName( ));
+            GlobalQuestManager::getThis( )->rewardChar( pci, reward );
+            pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
+                            ->rememberVictory( getQuestID( ) );
+        }
     }
 
     GQChannel::gecho( this, buf );
@@ -316,19 +316,19 @@ void InvasionGQuest::rewardKiller( PCharacter *killer )
     XMLAttributeInvasion::Pointer attr;
     
     if (!killer)
-	return;
+        return;
 
     attr = killer->getAttributes( ).getAttr<XMLAttributeInvasion>( getQuestID( ) );
     
     if (attr->isPunished( ))
-	return;
+        return;
 
     attr->setKilled( attr->getKilled( ) + 1 );
 
     r.qpoints = 1;
     r.reason = getScenario( )->getRewardMsg( );
     r.id = getQuestID( );
-    GlobalQuestManager::getThis( )->rewardChar( killer, r );	
+    GlobalQuestManager::getThis( )->rewardChar( killer, r );        
 }
 
 
@@ -345,13 +345,13 @@ NPCharacter * InvasionGQuest::createMob( )
     vnum = mobs[number_range( 0, mobs.size( ) - 1 )];
 
     if (!( pMobIndex = get_mob_index( vnum ) ))
-	throw MobileNotFoundException( vnum );
-	
+        throw MobileNotFoundException( vnum );
+        
     ch = create_mobile( pMobIndex );
     
     if (!ch->behavior || !ch->behavior.getDynamicPointer<InvasionMob>( ))
-	throw BadMobileBehaviorException( vnum );
-	
+        throw BadMobileBehaviorException( vnum );
+        
     return ch;
 }
 
@@ -365,13 +365,13 @@ NPCharacter * InvasionGQuest::createHelper( )
     vnum = mobs[number_range( 0, mobs.size( ) - 1 )];
 
     if (!( pMobIndex = get_mob_index( vnum ) ))
-	throw MobileNotFoundException( vnum );
-	
+        throw MobileNotFoundException( vnum );
+        
     ch = create_mobile( pMobIndex );
     
     if (!ch->behavior || !ch->behavior.getDynamicPointer<InvasionHelper>( ))
-	throw BadMobileBehaviorException( vnum );
-	
+        throw BadMobileBehaviorException( vnum );
+        
     return ch;
 }
 
@@ -385,12 +385,12 @@ Object * InvasionGQuest::createObj( )
     vnum = objs[number_range( 0, objs.size( ) - 1 )];
 
     if (!( pObjIndex = get_obj_index( vnum ) ))
-	throw ObjectNotFoundException( vnum );
+        throw ObjectNotFoundException( vnum );
 
     obj = create_object( pObjIndex, 0 );
-	
+        
     if (!obj->behavior || !obj->behavior.getDynamicPointer<InvasionObj>( ))
-	throw BadObjectBehaviorException( vnum );
+        throw BadObjectBehaviorException( vnum );
 
     return obj;
 }
@@ -405,12 +405,12 @@ Object * InvasionGQuest::createInstrument( )
     vnum = objs[number_range( 0, objs.size( ) - 1 )];
 
     if (!( pObjIndex = get_obj_index( vnum ) ))
-	throw ObjectNotFoundException( vnum );
+        throw ObjectNotFoundException( vnum );
 
     obj = create_object( pObjIndex, 0 );
-	
+        
     if (!obj->behavior || !obj->behavior.getDynamicPointer<InvasionInstrument>( ))
-	throw BadObjectBehaviorException( vnum );
+        throw BadObjectBehaviorException( vnum );
 
     return obj;
 }
@@ -423,16 +423,16 @@ int InvasionGQuest::countInstruments( PCharacter *ch )
     InvasionScenario::VnumList::iterator i;
     
     for (obj = object_list; obj; obj = obj->next) 
-	if (obj->behavior
-	    && obj->behavior.getDynamicPointer<InvasionInstrument>( )
-	    && obj->hasOwner( ch ))
-	{
-	    for (i = objs.begin( ); i != objs.end( ); i++)
-		if (*i == obj->pIndexData->vnum) {
-		    cnt++;
-		    break;
-		}
-	}
+        if (obj->behavior
+            && obj->behavior.getDynamicPointer<InvasionInstrument>( )
+            && obj->hasOwner( ch ))
+        {
+            for (i = objs.begin( ); i != objs.end( ); i++)
+                if (*i == obj->pIndexData->vnum) {
+                    cnt++;
+                    break;
+                }
+        }
 
     return cnt;
 }

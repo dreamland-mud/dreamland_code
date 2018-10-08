@@ -11,66 +11,66 @@ void ShopArticle::purchase( PCharacter *client, NPCharacter *keeper, const DLStr
     ShopBuyPrice::Pointer price( NEW, this, quantity );
 
     if (!price->canAfford( client )) {
-	if (quantity > 1)
-	    tell_dim( client, keeper, "ôÙ ÎÅ ÓÍÏÖÅÛØ ÚÁÐÌÁÔÉÔØ ÚÁ ÓÔÏÌØËÏ." );
-	else
-	    tell_dim( client, keeper, "õ ÔÅÂÑ ÎÅÔ ÎÕÖÎÏÊ ÓÕÍÍÙ, ÞÔÏÂ ËÕÐÉÔØ $o4.", obj );
-	
-	return;
+        if (quantity > 1)
+            tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð·Ð°Ð¿Ð»Ð°Ñ‚Ð¸Ñ‚ÑŒ Ð·Ð° ÑÑ‚Ð¾Ð»ÑŒÐºÐ¾." );
+        else
+            tell_dim( client, keeper, "Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ð½ÑƒÐ¶Ð½Ð¾Ð¹ ÑÑƒÐ¼Ð¼Ñ‹, Ñ‡Ñ‚Ð¾Ð± ÐºÑƒÐ¿Ð¸Ñ‚ÑŒ $o4.", obj );
+        
+        return;
     }
 
     if (client->carry_number + number * obj->getNumber( ) > client->canCarryNumber( )) {
-	tell_dim( client, keeper, "ôÙ ÎÅ ÍÏÖÅÛØ ÎÅÓÔÉ ÔÁË ÍÎÏÇÏ ×ÅÝÅÊ." );
-	return;
+        tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½ÐµÑÑ‚Ð¸ Ñ‚Ð°Ðº Ð¼Ð½Ð¾Ð³Ð¾ Ð²ÐµÑ‰ÐµÐ¹." );
+        return;
     }
 
     if (client->carry_weight + number * obj->getWeight( ) > client->canCarryWeight( )) {
-	tell_dim( client, keeper, "ôÙ ÎÅ ÍÏÖÅÛØ ÎÅÓÔÉ ÔÁËÕÀ ÔÑÖÅÓÔØ." );
-	return;
+        tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½ÐµÑÑ‚Ð¸ Ñ‚Ð°ÐºÑƒÑŽ Ñ‚ÑÐ¶ÐµÑÑ‚ÑŒ." );
+        return;
     }
     
     if (quantity > 1) {
-	ch->recho( "%^C1 ÐÏËÕÐÁÅÔ %O4 [%d].", ch, obj, quantity );
-	ch->pecho( "ôÙ ÐÏËÕÐÁÅÛØ %O4[%d] ÚÁ %N4.", 
-	            obj, quantity, price->toString( client ).c_str( ) );
+        ch->recho( "%^C1 Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑ‚ %O4 [%d].", ch, obj, quantity );
+        ch->pecho( "Ð¢Ñ‹ Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑˆÑŒ %O4[%d] Ð·Ð° %N4.", 
+                    obj, quantity, price->toString( client ).c_str( ) );
     }
     else {
-	ch->recho( "%^C1 ÐÏËÕÐÁÅÔ %O4.", ch, obj );
-	ch->pecho( "ôÙ ÐÏËÕÐÁÅÛØ %O4 ÚÁ %N4.", 
-	            obj, price->toString( client ).c_str( ) );
+        ch->recho( "%^C1 Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑ‚ %O4.", ch, obj );
+        ch->pecho( "Ð¢Ñ‹ Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑˆÑŒ %O4 Ð·Ð° %N4.", 
+                    obj, price->toString( client ).c_str( ) );
     }
 
     price->deduct( client );
     mprog_sell( keeper, client, obj, price->getSingleCost( ), quantity );
 
     for (int count = 0; count < quantity; count++) {
-	if (IS_SET( obj->extra_flags, ITEM_INVENTORY) 
-		&& (obj->pIndexData->limit < 0 || obj->pIndexData->limit > obj->pIndexData->count))
-	{
-	    t_obj = create_object( obj->pIndexData, obj->level );
-	}
-	else {
-	    t_obj = obj;
-	    obj = obj->next_content;
-	    obj_from_char( t_obj );
-	}
+        if (IS_SET( obj->extra_flags, ITEM_INVENTORY) 
+                && (obj->pIndexData->limit < 0 || obj->pIndexData->limit > obj->pIndexData->count))
+        {
+            t_obj = create_object( obj->pIndexData, obj->level );
+        }
+        else {
+            t_obj = obj;
+            obj = obj->next_content;
+            obj_from_char( t_obj );
+        }
 
-	if (t_obj->timer > 0 && !IS_OBJ_STAT( t_obj, ITEM_HAD_TIMER ))
-	    t_obj->timer = 0;
-	
-	REMOVE_BIT( t_obj->extra_flags, ITEM_HAD_TIMER );
-	obj_to_char( t_obj, client );
+        if (t_obj->timer > 0 && !IS_OBJ_STAT( t_obj, ITEM_HAD_TIMER ))
+            t_obj->timer = 0;
+        
+        REMOVE_BIT( t_obj->extra_flags, ITEM_HAD_TIMER );
+        obj_to_char( t_obj, client );
 
-	if (price->getSingleCost( ) < t_obj->cost)
-	    t_obj->cost = price->getSingleCost( );
+        if (price->getSingleCost( ) < t_obj->cost)
+            t_obj->cost = price->getSingleCost( );
     }
 }
 
 bool ShopArticle::available( PCharacter *client, NPCharacter *keeper ) const
 {
     if (client->getRealLevel( ) < get_wear_level( client, obj )) {
-	tell_dim( client, keeper, "ôÙ ÎÅ ÓÍÏÖÅÛØ ÉÓÐÏÌØÚÏ×ÁÔØ $o4.", obj );
-	return false;
+        tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ $o4.", obj );
+        return false;
     }
 
     return true;
@@ -79,13 +79,13 @@ bool ShopArticle::available( PCharacter *client, NPCharacter *keeper ) const
 bool ShopArticle::visible( PCharacter *client, NPCharacter *keeper ) const
 {
     if (obj->wear_loc != wear_none)
-	return false;
-	
+        return false;
+        
     if (!keeper->can_see( obj ) || !client->can_see( obj ))
-	return false;
+        return false;
 
     if (getBuyPrice( )->toSilver( ) <= 0)
-	return false;
+        return false;
 
     return true;
 }
@@ -96,18 +96,18 @@ int ShopArticle::getQuantity( ) const
     int count = 1;
     
     if (!IS_OBJ_STAT( obj, ITEM_INVENTORY ))
-	for (t_obj = obj->next_content; t_obj; t_obj = t_obj->next_content) 
-	    if (t_obj->pIndexData == obj->pIndexData
-		&& !str_cmp( t_obj->getShortDescr( ), obj->getShortDescr( ) ))
-	    {
-		count++;
-	    }
-	    else
-		break;
+        for (t_obj = obj->next_content; t_obj; t_obj = t_obj->next_content) 
+            if (t_obj->pIndexData == obj->pIndexData
+                && !str_cmp( t_obj->getShortDescr( ), obj->getShortDescr( ) ))
+            {
+                count++;
+            }
+            else
+                break;
 
     if (obj->pIndexData->limit > 0)
-	return URANGE( 0, count, obj->pIndexData->limit - obj->pIndexData->count );
+        return URANGE( 0, count, obj->pIndexData->limit - obj->pIndexData->count );
     else
-	return count;
+        return count;
 }
 

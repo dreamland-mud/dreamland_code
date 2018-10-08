@@ -27,50 +27,50 @@ using namespace std;
 class XMLDocument : public XMLNode
 {
 public:
-	typedef ::Pointer<XMLDocument> Pointer;
+        typedef ::Pointer<XMLDocument> Pointer;
 
 public:
-	static const char* const DEFAULT_ENCODING ;
-	static const char* const DEFAULT_VERSION ;
-	
+        static const char* const DEFAULT_ENCODING ;
+        static const char* const DEFAULT_VERSION ;
+        
 public:
-	XMLDocument( );
+        XMLDocument( );
 
-	inline void setVersion( DLString version )
-	{
-		this->version = version;
-	}
-	
-	inline const DLString& getVersion( ) const
-	{
-		return version;
-	}
-	
-	inline void setEncoding( DLString encoding )
-	{
-		this->encoding = encoding;
-	}
-	
-	inline const DLString& getEncoding( ) const
-	{
-		return encoding;
-	}
-	
-	inline XMLNode::Pointer getDocumentElement( )
-	{
-		if( nodes.empty( ) ) return XMLNode::Pointer( );
-		else return *nodes.begin( );
-	}
-	
-	void save( ostream& ) const throw( ExceptionXMLError );
-	void load( istream& ) throw( ExceptionXMLError );
+        inline void setVersion( DLString version )
+        {
+                this->version = version;
+        }
+        
+        inline const DLString& getVersion( ) const
+        {
+                return version;
+        }
+        
+        inline void setEncoding( DLString encoding )
+        {
+                this->encoding = encoding;
+        }
+        
+        inline const DLString& getEncoding( ) const
+        {
+                return encoding;
+        }
+        
+        inline XMLNode::Pointer getDocumentElement( )
+        {
+                if( nodes.empty( ) ) return XMLNode::Pointer( );
+                else return *nodes.begin( );
+        }
+        
+        void save( ostream& ) const throw( ExceptionXMLError );
+        void load( istream& ) throw( ExceptionXMLError );
 private:
         DLString encode(const DLString &) const;
-	void emit( const XMLNode &, ostream&, int, bool& ) const;
-	
+        void emit( const XMLNode &, ostream&, int, bool& ) const;
+        
 private:
-	DLString encoding;
-	DLString version;
+        DLString encoding;
+        DLString version;
 };
 
 #endif

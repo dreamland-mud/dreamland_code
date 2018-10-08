@@ -21,21 +21,21 @@ bool BankAction::handleCommand( Character *ch, const DLString &cmdName, const DL
     DLString args = cmdArgs;
     
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     if (cmdName == "balance") {
-	doBalance( ch->getPC( ) );
-	return true;
+        doBalance( ch->getPC( ) );
+        return true;
     }
     
     if (cmdName == "deposit") {
-	doDeposit( ch->getPC( ), args );
-	return true;
+        doDeposit( ch->getPC( ), args );
+        return true;
     }
 
     if (cmdName == "withdraw") {
-	doWithdraw( ch->getPC( ), args );
-	return true;
+        doWithdraw( ch->getPC( ), args );
+        return true;
     }
 
     return false;
@@ -49,25 +49,25 @@ void BankAction::doBalance( PCharacter *ch )
     long bank_g, bank_s;
 
     if ( ch->bank_s + ch->bank_g == 0 )  {
-	ch->send_to("У тебя нет никаких денег в банке.\n\r");
-	return;
+        ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ п╫п╦п╨п╟п╨п╦я┘ п╢п╣п╫п╣пЁ п╡ п╠п╟п╫п╨п╣.\n\r");
+        return;
     }
 
     bank_g = ch->getPC( )->bank_g;
     bank_s = ch->getPC( )->bank_s;
 
     if  (bank_g!=0 && bank_s!=0)
-	ch->printf( "У тебя %ld золот%s и %ld серебрян%s в банке.\n\r",
-	 bank_g,GET_COUNT(bank_g,"ая","ые","ых"),
-	 bank_s,GET_COUNT(bank_s,"ая монета","ые монеты","ых монет"));
+        ch->printf( "пё я┌п╣п╠я▐ %ld п╥п╬п╩п╬я┌%s п╦ %ld я│п╣я─п╣п╠я─я▐п╫%s п╡ п╠п╟п╫п╨п╣.\n\r",
+         bank_g,GET_COUNT(bank_g,"п╟я▐","я▀п╣","я▀я┘"),
+         bank_s,GET_COUNT(bank_s,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 
     if  (bank_g!=0 && bank_s == 0)
-	ch->printf( "У тебя %ld золот%s в банке.\n\r",
-	 bank_g,GET_COUNT(bank_g,"ая монета","ые монеты","ых монет"));
+        ch->printf( "пё я┌п╣п╠я▐ %ld п╥п╬п╩п╬я┌%s п╡ п╠п╟п╫п╨п╣.\n\r",
+         bank_g,GET_COUNT(bank_g,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 
     if  (bank_g == 0 && bank_s!= 0)
-	ch->printf( "У тебя %ld серебрян%s в банке.\n\r",
-	 bank_s,GET_COUNT(bank_s,"ая монета","ые монеты","ых монет"));
+        ch->printf( "пё я┌п╣п╠я▐ %ld я│п╣я─п╣п╠я─я▐п╫%s п╡ п╠п╟п╫п╨п╣.\n\r",
+         bank_s,GET_COUNT(bank_s,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
 }
 
 /*
@@ -84,83 +84,83 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
     amount_s = amount_g = amount = 0;
     
     if (argOne.empty( ) 
-	|| argTwo.empty( )
-	|| !argOne.isNumber( ) 
-	|| (!arg_is_gold( argTwo) && !arg_is_silver( argTwo )))
+        || argTwo.empty( )
+        || !argOne.isNumber( ) 
+        || (!arg_is_gold( argTwo) && !arg_is_silver( argTwo )))
     {
-	ch->println( "Укажи сумму и денежную единицу. Например: '{lRсосчета 77 золота{lEwithdraw 77 gold{x' или '{lRсосчета 9000 серебра{lEwithdraw 9000 silver{lx'.");
-	return;
+        ch->println( "пёп╨п╟п╤п╦ я│я┐п╪п╪я┐ п╦ п╢п╣п╫п╣п╤п╫я┐я▌ п╣п╢п╦п╫п╦я├я┐. п²п╟п©я─п╦п╪п╣я─: '{lRя│п╬я│я┤п╣я┌п╟ 77 п╥п╬п╩п╬я┌п╟{lEwithdraw 77 gold{x' п╦п╩п╦ '{lRя│п╬я│я┤п╣я┌п╟ 9000 я│п╣я─п╣п╠я─п╟{lEwithdraw 9000 silver{lx'.");
+        return;
     }
     
     try {
-	amount = argOne.toInt( );
+        amount = argOne.toInt( );
     } catch (const ExceptionBadType &) {
-	ch->println( "Сумма указана неверно." );
-	return;
+        ch->println( "п║я┐п╪п╪п╟ я┐п╨п╟п╥п╟п╫п╟ п╫п╣п╡п╣я─п╫п╬." );
+        return;
     }
 
     if (amount <= 0) {
-	ch->println( "Очень щедро." );
-	return;
+        ch->println( "п·я┤п╣п╫я▄ я┴п╣п╢я─п╬." );
+        return;
     }
 
     if (arg_is_silver( argTwo ))
-	amount_s = amount;
+        amount_s = amount;
     else
-	amount_g = amount;
+        amount_g = amount;
     
     if (amount_g > ch->bank_g || amount_s > ch->bank_s) {
-	ch->send_to("Извини, мы не даем взаймы.\n\r");
-	return;
+        ch->send_to("п≤п╥п╡п╦п╫п╦, п╪я▀ п╫п╣ п╢п╟п╣п╪ п╡п╥п╟п╧п╪я▀.\n\r");
+        return;
     }
 
     if (amount_s > 0 )
     {
-	if (amount_s < 10)
-	{
-	    if (amount_s == 1)
-		buf << "Одну";
-	    else
-		buf << amount_s;
+        if (amount_s < 10)
+        {
+            if (amount_s == 1)
+                buf << "п·п╢п╫я┐";
+            else
+                buf << amount_s;
 
-	    buf << " моне" << GET_COUNT(amount_s, "ту", "ты", "т")
-		<< "?! Не мало?!" << endl;
-	}
-	else
-	{
-	    int fee = max( 1, amount_s / 10 );
-	    ch->bank_s -= amount_s;
-	    ch->silver += amount_s - fee;
+            buf << " п╪п╬п╫п╣" << GET_COUNT(amount_s, "я┌я┐", "я┌я▀", "я┌")
+                << "?! п²п╣ п╪п╟п╩п╬?!" << endl;
+        }
+        else
+        {
+            int fee = max( 1, amount_s / 10 );
+            ch->bank_s -= amount_s;
+            ch->silver += amount_s - fee;
 
-	    buf << "Ты снимаешь со счета " << amount_s 
-	        << " серебрян" << GET_COUNT(amount_s,"ую монету","ые монеты","ых монет")
-		<< "." << endl << "Услуги банка составили " << fee 
-		<< " серебрян" << GET_COUNT(fee,"ую монету","ые монеты","ых монет") << endl;
-	}
+            buf << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ я│п╬ я│я┤п╣я┌п╟ " << amount_s 
+                << " я│п╣я─п╣п╠я─я▐п╫" << GET_COUNT(amount_s,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌")
+                << "." << endl << "пёя│п╩я┐пЁп╦ п╠п╟п╫п╨п╟ я│п╬я│я┌п╟п╡п╦п╩п╦ " << fee 
+                << " я│п╣я─п╣п╠я─я▐п╫" << GET_COUNT(fee,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌") << endl;
+        }
     }
 
     if (amount_g > 0)
     {
-	if (amount_g == 1)
-	{
-	    buf << "Одну золотую моне" << GET_COUNT(amount_g, "ту", "ты", "т")
-		<< "?! Не мало?!" << endl;
-	}
-	else
-	{
-	    int fee = max( 1, amount_g / 50 );
-	    ch->bank_g -= amount_g;
-	    ch->gold += amount_g - fee;
+        if (amount_g == 1)
+        {
+            buf << "п·п╢п╫я┐ п╥п╬п╩п╬я┌я┐я▌ п╪п╬п╫п╣" << GET_COUNT(amount_g, "я┌я┐", "я┌я▀", "я┌")
+                << "?! п²п╣ п╪п╟п╩п╬?!" << endl;
+        }
+        else
+        {
+            int fee = max( 1, amount_g / 50 );
+            ch->bank_g -= amount_g;
+            ch->gold += amount_g - fee;
 
-	    buf << "Ты снимаешь со счета " << amount_g 
-	        << " золот" << GET_COUNT(amount_g,"ую монету","ые монеты","ых монет")
-		<< "." << endl << "Услуги банка составили " << fee 
-		<< " золот" << GET_COUNT(fee,"ую монету","ые монеты","ых монет") << endl;
-	}
+            buf << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ я│п╬ я│я┤п╣я┌п╟ " << amount_g 
+                << " п╥п╬п╩п╬я┌" << GET_COUNT(amount_g,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌")
+                << "." << endl << "пёя│п╩я┐пЁп╦ п╠п╟п╫п╨п╟ я│п╬я│я┌п╟п╡п╦п╩п╦ " << fee 
+                << " п╥п╬п╩п╬я┌" << GET_COUNT(fee,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌") << endl;
+        }
     }
 
     ch->send_to(buf);
-    act("$c1 производит банковские операции.",ch,0,0,TO_ROOM);
+    act("$c1 п©я─п╬п╦п╥п╡п╬п╢п╦я┌ п╠п╟п╫п╨п╬п╡я│п╨п╦п╣ п╬п©п╣я─п╟я├п╦п╦.",ch,0,0,TO_ROOM);
 }
 
 /*
@@ -174,67 +174,67 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     DLString arg;
 
     if (arguments.empty( )) {
-	ch->send_to("Положить на счет сколько?\n\r");
-	return;
+        ch->send_to("п÷п╬п╩п╬п╤п╦я┌я▄ п╫п╟ я│я┤п╣я┌ я│п╨п╬п╩я▄п╨п╬?\n\r");
+        return;
     }
     
     amount_s = amount_g = 0;
     victim = ch->getPC( );
 
     while (!( arg = arguments.getOneArgument( ) ).empty( )) {
-	if (arg.isNumber( )) {
-	    try {
-		if (( amount = arg.toInt( ) ) <= 0)
-		    throw Exception( );
-	    }
-	    catch (const Exception &) {
-		ch->send_to( "Сумма указана неверно.\r\n" );
-		return;
-	    }
+        if (arg.isNumber( )) {
+            try {
+                if (( amount = arg.toInt( ) ) <= 0)
+                    throw Exception( );
+            }
+            catch (const Exception &) {
+                ch->send_to( "п║я┐п╪п╪п╟ я┐п╨п╟п╥п╟п╫п╟ п╫п╣п╡п╣я─п╫п╬.\r\n" );
+                return;
+            }
 
-	    if (( arg = arguments.getOneArgument( ) ).empty( )) {
-		ch->send_to( "Укажи денежную единицу: {lRзолото или серебро{lEgold или silver{lx.\r\n" );
-		return;
-	    }
+            if (( arg = arguments.getOneArgument( ) ).empty( )) {
+                ch->send_to( "пёп╨п╟п╤п╦ п╢п╣п╫п╣п╤п╫я┐я▌ п╣п╢п╦п╫п╦я├я┐: {lRп╥п╬п╩п╬я┌п╬ п╦п╩п╦ я│п╣я─п╣п╠я─п╬{lEgold п╦п╩п╦ silver{lx.\r\n" );
+                return;
+            }
 
-	    if (arg_is_silver( arg ) && amount_s == 0)
-		amount_s = amount;
-	    else if (arg_is_gold( arg ) && amount_g == 0)
-		amount_g = amount;
-	    else {
-		ch->send_to("Ты можешь положить на счет только золотые или серебряные монеты.\r\n"
-		            "Пример: {lEdeposit 3 silver 18 gold{lRнасчет 3 серебра 18 золота{lx\r\n" );
-		return;
-	    }
-	}
-	else if (victim != ch) {
-	    ch->send_to( "Двоим сразу давать деньги не стоит. Подерутся еще..\r\n" );
-	    return;
-	}
-	else {
-	    PCMemoryInterface *pci = PCharacterManager::find( arg );
+            if (arg_is_silver( arg ) && amount_s == 0)
+                amount_s = amount;
+            else if (arg_is_gold( arg ) && amount_g == 0)
+                amount_g = amount;
+            else {
+                ch->send_to("п╒я▀ п╪п╬п╤п╣я┬я▄ п©п╬п╩п╬п╤п╦я┌я▄ п╫п╟ я│я┤п╣я┌ я┌п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌я▀п╣ п╦п╩п╦ я│п╣я─п╣п╠я─я▐п╫я▀п╣ п╪п╬п╫п╣я┌я▀.\r\n"
+                            "п÷я─п╦п╪п╣я─: {lEdeposit 3 silver 18 gold{lRп╫п╟я│я┤п╣я┌ 3 я│п╣я─п╣п╠я─п╟ 18 п╥п╬п╩п╬я┌п╟{lx\r\n" );
+                return;
+            }
+        }
+        else if (victim != ch) {
+            ch->send_to( "п■п╡п╬п╦п╪ я│я─п╟п╥я┐ п╢п╟п╡п╟я┌я▄ п╢п╣п╫я▄пЁп╦ п╫п╣ я│я┌п╬п╦я┌. п÷п╬п╢п╣я─я┐я┌я│я▐ п╣я┴п╣..\r\n" );
+            return;
+        }
+        else {
+            PCMemoryInterface *pci = PCharacterManager::find( arg );
 
-	    if (!pci) {
-		ch->send_to( "Адресат перевода не найден. Укажи имя правильно и полностью.\r\n" );
-		return;
-	    }
+            if (!pci) {
+                ch->send_to( "п░п╢я─п╣я│п╟я┌ п©п╣я─п╣п╡п╬п╢п╟ п╫п╣ п╫п╟п╧п╢п╣п╫. пёп╨п╟п╤п╦ п╦п╪я▐ п©я─п╟п╡п╦п╩я▄п╫п╬ п╦ п©п╬п╩п╫п╬я│я┌я▄я▌.\r\n" );
+                return;
+            }
 
-	    if (!( victim = dynamic_cast<PCharacter *>( pci ) ) || !ch->can_see( victim )) {
-		ch->send_to( "Невидимый или отсутствующий в мире адресат не оценит твоей щедрости.\r\n" );
-		return;
-	    }
-	}
+            if (!( victim = dynamic_cast<PCharacter *>( pci ) ) || !ch->can_see( victim )) {
+                ch->send_to( "п²п╣п╡п╦п╢п╦п╪я▀п╧ п╦п╩п╦ п╬я┌я│я┐я┌я│я┌п╡я┐я▌я┴п╦п╧ п╡ п╪п╦я─п╣ п╟п╢я─п╣я│п╟я┌ п╫п╣ п╬я├п╣п╫п╦я┌ я┌п╡п╬п╣п╧ я┴п╣п╢я─п╬я│я┌п╦.\r\n" );
+                return;
+            }
+        }
     }
 
 
     if (amount_g > ch->gold || amount_s > ch->silver) {
-	ch->send_to("Это больше, чем есть у тебя в кошельке.\n\r");
-	return;
+        ch->send_to("п╜я┌п╬ п╠п╬п╩я▄я┬п╣, я┤п╣п╪ п╣я│я┌я▄ я┐ я┌п╣п╠я▐ п╡ п╨п╬я┬п╣п╩я▄п╨п╣.\n\r");
+        return;
     }
 
     if ( (amount_g + victim->getPC( )->bank_g) > 100000 ) {
-	ch->send_to("Размер банковского счета не может превышать 100.000 золотых.\n\r");
-	return;
+        ch->send_to("п═п╟п╥п╪п╣я─ п╠п╟п╫п╨п╬п╡я│п╨п╬пЁп╬ я│я┤п╣я┌п╟ п╫п╣ п╪п╬п╤п╣я┌ п©я─п╣п╡я▀я┬п╟я┌я▄ 100.000 п╥п╬п╩п╬я┌я▀я┘.\n\r");
+        return;
     }
 
     victim->getPC( )->bank_s += amount_s;
@@ -243,22 +243,22 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     ch->silver -= amount_s;
     
     if (victim == ch)
-	cbuf << "На твой банковский счет ";
+        cbuf << "п²п╟ я┌п╡п╬п╧ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ ";
     else {
-	cbuf << "На банковский счет {W" << victim->getName( ) << "{x ";
-	vbuf << "{W" << ch->getName( ) << "{x переводит на твой банковский счет ";
+        cbuf << "п²п╟ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ {W" << victim->getName( ) << "{x ";
+        vbuf << "{W" << ch->getName( ) << "{x п©п╣я─п╣п╡п╬п╢п╦я┌ п╫п╟ я┌п╡п╬п╧ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ ";
     }
     
-    cbuf << "переведено: ";
+    cbuf << "п©п╣я─п╣п╡п╣п╢п╣п╫п╬: ";
     
     if (amount_g > 0) 
-	mbuf << "{Y" << amount_g << "{x золот" << GET_COUNT(amount_g,"ая монета","ые монеты","ых монет");
+        mbuf << "{Y" << amount_g << "{x п╥п╬п╩п╬я┌" << GET_COUNT(amount_g,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌");
     
     if (amount_s > 0) {
-	if (amount_g > 0)
-	    mbuf << " и ";
+        if (amount_g > 0)
+            mbuf << " п╦ ";
 
-	mbuf << "{W" << amount_s << "{x серебрян" << GET_COUNT(amount_s,"ая монета","ые монеты","ых монет");
+        mbuf << "{W" << amount_s << "{x я│п╣я─п╣п╠я─я▐п╫" << GET_COUNT(amount_s,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌");
     }
     
     cbuf << mbuf.str( ) << "." << endl;
@@ -266,9 +266,9 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     ch->send_to( cbuf );
     
     if (victim != ch) 
-	victim->send_to( vbuf );
+        victim->send_to( vbuf );
 
-    act( "$c1 производит банковские операции.", ch, 0, 0, TO_ROOM );
+    act( "$c1 п©я─п╬п╦п╥п╡п╬п╢п╦я┌ п╠п╟п╫п╨п╬п╡я│п╨п╦п╣ п╬п©п╣я─п╟я├п╦п╦.", ch, 0, 0, TO_ROOM );
 }
 
 /*------------------------------------------------------------------------
@@ -300,35 +300,35 @@ void TaxesListener::run( int oldState, int newState, Descriptor *d )
     PCharacter *ch;
 
     if (!d->character || !( ch = d->character->getPC( ) ))
-	return;
+        return;
 
     if (oldState != CON_READ_MOTD || newState != CON_PLAYING) 
-	return;
+        return;
 
     if (ch->is_immortal( ))
-	return;
+        return;
     
     if (ch->gold > 6000) {
-	ch->printf("С тебя взыскали %d золотых налога на оплату адвокатов мэрии.\n\r",
-	           (ch->gold - 6000) / 2);
-	ch->gold -= (ch->gold - 6000) / 2;
+        ch->printf("п║ я┌п╣п╠я▐ п╡п╥я▀я│п╨п╟п╩п╦ %d п╥п╬п╩п╬я┌я▀я┘ п╫п╟п╩п╬пЁп╟ п╫п╟ п╬п©п╩п╟я┌я┐ п╟п╢п╡п╬п╨п╟я┌п╬п╡ п╪я█я─п╦п╦.\n\r",
+                   (ch->gold - 6000) / 2);
+        ch->gold -= (ch->gold - 6000) / 2;
     }
     
 
     if (ch->bank_g + ch->bank_s / 100 > 80000) {
-	long silver;
-	
-	silver = ch->bank_g + ch->bank_s / 100 - 20000;
-	
-	ch->printf( "С тебя взыскали %ld золотых налога на оплату военных расходов Султана.\n\r", silver );
+        long silver;
+        
+        silver = ch->bank_g + ch->bank_s / 100 - 20000;
+        
+        ch->printf( "п║ я┌п╣п╠я▐ п╡п╥я▀я│п╨п╟п╩п╦ %ld п╥п╬п╩п╬я┌я▀я┘ п╫п╟п╩п╬пЁп╟ п╫п╟ п╬п©п╩п╟я┌я┐ п╡п╬п╣п╫п╫я▀я┘ я─п╟я│я┘п╬п╢п╬п╡ п║я┐п╩я┌п╟п╫п╟.\n\r", silver );
     
-	if( silver < ch->bank_s / 100 ) {
-	    ch->bank_s -= ( silver * 100 );
-	} else {
-	    silver -= ( ch->bank_s / 100 );
-	    ch->bank_s %= 100;
-	    ch->bank_g -= silver;
-	}
+        if( silver < ch->bank_s / 100 ) {
+            ch->bank_s -= ( silver * 100 );
+        } else {
+            silver -= ( ch->bank_s / 100 );
+            ch->bank_s %= 100;
+            ch->bank_g -= silver;
+        }
     }
 }
 

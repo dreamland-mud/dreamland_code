@@ -37,13 +37,13 @@ short SocialBase::getLog( ) const
 bool SocialBase::matches( const DLString& argument ) const
 {
     if (argument.empty( )) 
-	return false;
+        return false;
 
     if (argument.strPrefix( getName( ) )) 
-	return true;
+        return true;
     
     if (argument.strPrefix( getRussianName( ) )) 
-	return true;
+        return true;
 
     return false;
 }
@@ -63,24 +63,24 @@ bool SocialBase::dispatch( const InterpretArguments &iargs )
     Character *ch = iargs.ch;
 
     if (!ch->is_npc( )) {
-	if (IS_SET(ch->act, PLR_FREEZE)) {
-	    ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
-	    return false;
-	}
+        if (IS_SET(ch->act, PLR_FREEZE)) {
+            ch->pecho("п╒я▀ п©п╬п╩п╫п╬я│я┌я▄я▌ п╥п╟п╪п╬я─п╬п╤п╣%Gп╫п╬|п╫|п╫п╟!", ch);
+            return false;
+        }
 
-	if (IS_SET( ch->comm, COMM_NOEMOTE )) {
-	    ch->pecho("Ты анти-социал%Gьно|ен|ьна!", ch);
-	    return false;
-	}
+        if (IS_SET( ch->comm, COMM_NOEMOTE )) {
+            ch->pecho("п╒я▀ п╟п╫я┌п╦-я│п╬я├п╦п╟п╩%Gя▄п╫п╬|п╣п╫|я▄п╫п╟!", ch);
+            return false;
+        }
 
-	if (IS_SET( ch->comm, COMM_AFK )) {
-	    ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
-	    return false;
-	}
+        if (IS_SET( ch->comm, COMM_AFK )) {
+            ch->send_to( "п▓я▀п╧п╢п╦ я│п╫п╟я┤п╟п╩п╟ п╦п╥ {WAFK{x\n\r" );
+            return false;
+        }
     }
     
     if (!checkPosition( ch )) 
-	return false;
+        return false;
     
     visualize( ch );
     return true;
@@ -88,7 +88,7 @@ bool SocialBase::dispatch( const InterpretArguments &iargs )
 
 static const void *victimOrSelf(Character *ch, Character *victim)
 {
-    static RussianString self("с||ебя||ебя||ебе||ебя||обой||ебе");
+    static RussianString self("я│||п╣п╠я▐||п╣п╠я▐||п╣п╠п╣||п╣п╠я▐||п╬п╠п╬п╧||п╣п╠п╣");
     if (ch == victim)
         return &self;
     else
@@ -107,12 +107,12 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
     victim = 0;
     victim2 = 0;
 
-    if (firstArgument.empty( )) // вызов без аргументов
+    if (firstArgument.empty( )) // п╡я▀п╥п╬п╡ п╠п╣п╥ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡
     {
         act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
         act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR,pos );
     }
-    else if (( victim = get_char_room( ch, firstArgument ) ) != 0) // найден персонаж по первому аргументу
+    else if (( victim = get_char_room( ch, firstArgument ) ) != 0) // п╫п╟п╧п╢п╣п╫ п©п╣я─я│п╬п╫п╟п╤ п©п╬ п©п╣я─п╡п╬п╪я┐ п╟я─пЁя┐п╪п╣п╫я┌я┐
     { 
         victim2 = victim;
         // See if 2-victim syntax is supported by this social. Find second victim.
@@ -120,26 +120,26 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
             victim2 = get_char_room( ch, secondArgument );
         }
 
-        if ( !victim2 ) { // не найден персонаж по второму аргументу
+        if ( !victim2 ) { // п╫п╣ п╫п╟п╧п╢п╣п╫ п©п╣я─я│п╬п╫п╟п╤ п©п╬ п╡я┌п╬я─п╬п╪я┐ п╟я─пЁя┐п╪п╣п╫я┌я┐
             if ( victim == ch )
-                ch->pecho( "Ты видишь только себя здесь, кто такой %s?", secondArgument.c_str( ));
+                ch->pecho( "п╒я▀ п╡п╦п╢п╦я┬я▄ я┌п╬п╩я▄п╨п╬ я│п╣п╠я▐ п╥п╢п╣я│я▄, п╨я┌п╬ я┌п╟п╨п╬п╧ %s?", secondArgument.c_str( ));
             else
-                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %s?", victim, secondArgument.c_str( ));
+                ch->pecho( "п╒я▀ п╡п╦п╢п╦я┬я▄ я┌п╬п╩я▄п╨п╬ %1$C4 п╥п╢п╣я│я▄, п╨я┌п╬ я┌п╟п╨п╬п╧ %s?", victim, secondArgument.c_str( ));
             return;
         }
 
-        if (victim == ch && victim2 == ch) { // применение социала на себя
+        if (victim == ch && victim2 == ch) { // п©я─п╦п╪п╣п╫п╣п╫п╦п╣ я│п╬я├п╦п╟п╩п╟ п╫п╟ я│п╣п╠я▐
             act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
             act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
         }
-        else if (victim2 == victim) { // применение социала на жертву, в т.ч. если оба аргумента - одна и та же жертва
-	    act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
-	    act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-	    act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
+        else if (victim2 == victim) { // п©я─п╦п╪п╣п╫п╣п╫п╦п╣ я│п╬я├п╦п╟п╩п╟ п╫п╟ п╤п╣я─я┌п╡я┐, п╡ я┌.я┤. п╣я│п╩п╦ п╬п╠п╟ п╟я─пЁя┐п╪п╣п╫я┌п╟ - п╬п╢п╫п╟ п╦ я┌п╟ п╤п╣ п╤п╣я─я┌п╡п╟
+            act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
+            act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
         } else {
             // Output to actor and both victims. Substitute actor name with "self" if it matches victim.
-	    const void *arg1 = victimOrSelf(ch, victim);
-	    const void *arg2 = victimOrSelf(ch, victim2);
+            const void *arg1 = victimOrSelf(ch, victim);
+            const void *arg2 = victimOrSelf(ch, victim2);
 
             ch->pecho( getArgMe2( ).c_str( ), ch, arg1, arg2 );
             if (victim != ch ) victim->pecho( getArgVictim2( ).c_str( ), ch, arg1, arg2 );
@@ -160,37 +160,37 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
 bool SocialBase::checkPosition( Character *ch )
 {
     if (ch->position >= getPosition( ))
-	return true;
+        return true;
 
     switch (ch->position.getValue( )) {
     case POS_DEAD:
-	ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
-	break;
+        ch->send_to("п⌡п╣п╤п╦ я│п╪п╦я─п╫п╬! п╒я▀ {Rп╒п═пёп÷{x.\n\r");
+        break;
 
     case POS_INCAP:
     case POS_MORTAL:
-	ch->send_to("Даже не думай об этом! Ты в ужасном состоянии.\n\r");
-	break;
+        ch->send_to("п■п╟п╤п╣ п╫п╣ п╢я┐п╪п╟п╧ п╬п╠ я█я┌п╬п╪! п╒я▀ п╡ я┐п╤п╟я│п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦.\n\r");
+        break;
 
     case POS_STUNNED:
-	ch->send_to("Ты не в состоянии сделать это.\n\r");
-	break;
+        ch->send_to("п╒я▀ п╫п╣ п╡ я│п╬я│я┌п╬я▐п╫п╦п╦ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.\n\r");
+        break;
 
     case POS_SLEEPING:
-	ch->send_to("Во сне? Или может сначала проснешься...\n\r");
-	break;
+        ch->send_to("п▓п╬ я│п╫п╣? п≤п╩п╦ п╪п╬п╤п╣я┌ я│п╫п╟я┤п╟п╩п╟ п©я─п╬я│п╫п╣я┬я▄я│я▐...\n\r");
+        break;
 
     case POS_RESTING:
-	ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
-	break;
+        ch->send_to( "пёя└я└... п²п╬ п╡п╣п╢я▄ я┌я▀ п╬я┌п╢я▀я┘п╟п╣я┬я▄...\n\r" );
+        break;
 
     case POS_SITTING:
-	ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
-	break;
+        ch->send_to( "п║п╦п╢я▐? п≤п╩п╦ п╪п╬п╤п╣я┌ я│п╫п╟я┤п╟п╩п╟ п╡я│я┌п╟п╫п╣я┬я▄...\n\r" );
+        break;
 
     case POS_FIGHTING:
-	act_p( "Тебе не до того, ты же сражаешься!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
-	break;
+        act_p( "п╒п╣п╠п╣ п╫п╣ п╢п╬ я┌п╬пЁп╬, я┌я▀ п╤п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+        break;
     }
 
     return false;
@@ -199,14 +199,14 @@ bool SocialBase::checkPosition( Character *ch )
 void SocialBase::visualize( Character *ch )                                        
 {
     if (IS_AFFECTED( ch, AFF_HIDE|AFF_FADE ))  {
-	REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
-	ch->send_to("Ты выходишь из тени.\n\r");
-	act_p( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM,POS_RESTING);
+        REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
+        ch->send_to("п╒я▀ п╡я▀я┘п╬п╢п╦я┬я▄ п╦п╥ я┌п╣п╫п╦.\n\r");
+        act_p( "$c1 п╡я▀я┘п╬п╢п╦я┌ п╦п╥ я┌п╣п╫п╦.", ch, 0, 0, TO_ROOM,POS_RESTING);
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-	affect_strip(ch,gsn_improved_invis);
-	act("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-	act("$c1 становится видим$gо|ым|ой для окружающих.\n\r", ch,0,0,TO_ROOM);
+        affect_strip(ch,gsn_improved_invis);
+        act("п╒я▀ я│я┌п╟п╫п╬п╡п╦я┬я▄я│я▐ п╡п╦п╢п╦п╪$gп╬|я▀п╪|п╬п╧ п╢п╩я▐ п╬п╨я─я┐п╤п╟я▌я┴п╦я┘.", ch, 0, 0, TO_CHAR);
+        act("$c1 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╡п╦п╢п╦п╪$gп╬|я▀п╪|п╬п╧ п╢п╩я▐ п╬п╨я─я┐п╤п╟я▌я┴п╦я┘.\n\r", ch,0,0,TO_ROOM);
     }
 }

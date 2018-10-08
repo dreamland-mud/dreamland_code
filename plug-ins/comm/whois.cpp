@@ -34,34 +34,34 @@ COMMAND(Whois, "whois")
     PCharacter *pch;
    
     if (ch->getPC( ) == 0)
-	return;
+        return;
 
     if (constArguments.empty( )) {
-	ch->send_to( "Имя, сестра, имя!\r\n" );
-	return;
+        ch->send_to( "п≤п╪я▐, я│п╣я│я┌я─п╟, п╦п╪я▐!\r\n" );
+        return;
     }
-	
+        
     for ( d = descriptor_list; d != 0; d = d->next ) {
-	if (d->connected != CON_PLAYING || !d->character)
-	    continue;
+        if (d->connected != CON_PLAYING || !d->character)
+            continue;
 
-	pch = d->character->getPC( );
+        pch = d->character->getPC( );
 
-	if (!ch->can_see( pch ))
-	    continue;
+        if (!ch->can_see( pch ))
+            continue;
 
-	if (IS_VAMPIRE( pch ) && !ch->is_immortal( ) && ch != pch)
-	    continue;
+        if (IS_VAMPIRE( pch ) && !ch->is_immortal( ) && ch != pch)
+            continue;
 
-	if (!is_name( constArguments.c_str( ), pch->getNameP( '7' ).c_str( ) ))
-	    continue;
-	
-	break;
+        if (!is_name( constArguments.c_str( ), pch->getNameP( '7' ).c_str( ) ))
+            continue;
+        
+        break;
     }
 
     if (!d) {
-	ch->send_to( "Никого нет с таким именем.\r\n" );
-	return;
+        ch->send_to( "п²п╦п╨п╬пЁп╬ п╫п╣я┌ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪.\r\n" );
+        return;
     }
     
     /* Pretitle Name Title */
@@ -72,103 +72,103 @@ COMMAND(Whois, "whois")
     buf << "{W";
     
     if (pch->getSex( ) == SEX_FEMALE)
-	buf << russian_case( pch->getRace( )->getPC( )->getFemaleName( ), '1' );
+        buf << russian_case( pch->getRace( )->getPC( )->getFemaleName( ), '1' );
     else
-	buf << russian_case( pch->getRace( )->getPC( )->getMaleName( ), '1' );
-	
+        buf << russian_case( pch->getRace( )->getPC( )->getMaleName( ), '1' );
+        
     buf << "{w";
     
     if (ch->getPC( )->canSeeProfession( pch )) {
-	buf << ", профессия {W" << pch->getProfession( )->getNameFor( ch ) << "{w";
-	
-	if (pch->getSubProfession( ) != prof_none)
-	    buf << " ({W" << pch->getSubProfession( )->getWhoNameFor( ch ) << "{w)";
+        buf << ", п©я─п╬я└п╣я│я│п╦я▐ {W" << pch->getProfession( )->getNameFor( ch ) << "{w";
+        
+        if (pch->getSubProfession( ) != prof_none)
+            buf << " ({W" << pch->getSubProfession( )->getWhoNameFor( ch ) << "{w)";
     }
     
     if (ch->getPC( )->canSeeLevel( pch ))
-	buf << ", уровень {W" << pch->getRealLevel( ) << "{w";
+        buf << ", я┐я─п╬п╡п╣п╫я▄ {W" << pch->getRealLevel( ) << "{w";
 
     lines.add( buf );
 
     /* Ethos-Align */
     if (ch->getClan( ) == pch->getClan( ) && !ch->getClan( )->isDispersed( ))
     {
-	buf << "характер {W"
-	    << ethos_table.name( pch->ethos ) << "-"
-	    << align_table.name( ALIGNMENT(pch) ) << "{w";
-	lines.add( buf );
+        buf << "я┘п╟я─п╟п╨я┌п╣я─ {W"
+            << ethos_table.name( pch->ethos ) << "-"
+            << align_table.name( ALIGNMENT(pch) ) << "{w";
+        lines.add( buf );
     }
 
     /* Remorts. PK */
     if (pch->getRemorts( ).size( )) 
-	buf << "количество перерождений: {W" << pch->getRemorts( ).size( ) << "{w    ";
+        buf << "п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п©п╣я─п╣я─п╬п╤п╢п╣п╫п╦п╧: {W" << pch->getRemorts( ).size( ) << "{w    ";
 
     if (pch->getRealLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, pch )) 
-	buf << "находится в твоем {R(PK){w";
+        buf << "п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ я┌п╡п╬п╣п╪ {R(PK){w";
 
     lines.add( buf );
 
     /* Clan name, clan level, (R) (L) */
     if (!pch->getClan( )->isHidden( )) {
-	const Clan &clan = *pch->getClan( );
-	
-	buf << "клан {" << clan.getColor( ) << clan.getShortName( ) << "{w, "
-	    << "клановое звание [{" << clan.getColor( ) << clan.getTitle( pch ) << "{w]";
-	
-	if (clan.isLeader( pch ))
-	    buf << ", лидер";
-	else if (clan.isRecruiter( pch ))
-	    buf << ", рекрутер";
+        const Clan &clan = *pch->getClan( );
+        
+        buf << "п╨п╩п╟п╫ {" << clan.getColor( ) << clan.getShortName( ) << "{w, "
+            << "п╨п╩п╟п╫п╬п╡п╬п╣ п╥п╡п╟п╫п╦п╣ [{" << clan.getColor( ) << clan.getTitle( pch ) << "{w]";
+        
+        if (clan.isLeader( pch ))
+            buf << ", п╩п╦п╢п╣я─";
+        else if (clan.isRecruiter( pch ))
+            buf << ", я─п╣п╨я─я┐я┌п╣я─";
 
-	lines.add( buf );
+        lines.add( buf );
     }
     
     /* gather info from attributes (selfrate, marriage etc) */
     list<DLString> attrLines;
     
     if (pch->getAttributes( ).handleEvent( WhoisArguments( pch, ch->getPC(), attrLines ) ))
-	for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
-	    buf << *l;
-	    lines.add( buf );
-	}
+        for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
+            buf << *l;
+            lines.add( buf );
+        }
 
     /* Flags */
     std::vector<const char *> flags;
     
     if (IS_SET( pch->comm, COMM_AFK ))  flags.push_back( " {CA{w(afk)" );
-    if (pch->incog_level >= LEVEL_HERO) flags.push_back( " {DI{w(инкогнито)" );
+    if (pch->incog_level >= LEVEL_HERO) flags.push_back( " {DI{w(п╦п╫п╨п╬пЁп╫п╦я┌п╬)" );
     if (pch->invis_level >= LEVEL_HERO) flags.push_back( " {DW{w(wizinv)" );
-    if (IS_KILLER( pch ))               flags.push_back( " {RK{w(убийца)" );
-    if (IS_THIEF( pch ))                flags.push_back( " {RT{w(вор)" );
-    if (IS_SLAIN( pch ))                flags.push_back( " {DS{w(убит)" );
-    if (IS_GHOST( pch ))                flags.push_back( " {DG{w(призрак)" );
-    if (IS_DEATH_TIME( pch ))           flags.push_back( " {DP{w(защита богов)" );
-    if (IS_VIOLENT( pch ))              flags.push_back( " {BV{w(адреналин в крови)" );
-    if (pch->curse != 100)              flags.push_back( " {DC{w(проклят богами)" );
-    if (pch->bless)                     flags.push_back( " {CB{w(благословлен богами)" );
-    if (IS_SET( pch->act, PLR_WANTED))  flags.push_back( " {RW{w(в розыске)" );
-    if (pch->isAffected(gsn_manacles)) flags.push_back( " {mM{w(в кандалах)" );
-    if (pch->isAffected(gsn_jail ))   flags.push_back( " {mJ{w(в тюрьме)" );
+    if (IS_KILLER( pch ))               flags.push_back( " {RK{w(я┐п╠п╦п╧я├п╟)" );
+    if (IS_THIEF( pch ))                flags.push_back( " {RT{w(п╡п╬я─)" );
+    if (IS_SLAIN( pch ))                flags.push_back( " {DS{w(я┐п╠п╦я┌)" );
+    if (IS_GHOST( pch ))                flags.push_back( " {DG{w(п©я─п╦п╥я─п╟п╨)" );
+    if (IS_DEATH_TIME( pch ))           flags.push_back( " {DP{w(п╥п╟я┴п╦я┌п╟ п╠п╬пЁп╬п╡)" );
+    if (IS_VIOLENT( pch ))              flags.push_back( " {BV{w(п╟п╢я─п╣п╫п╟п╩п╦п╫ п╡ п╨я─п╬п╡п╦)" );
+    if (pch->curse != 100)              flags.push_back( " {DC{w(п©я─п╬п╨п╩я▐я┌ п╠п╬пЁп╟п╪п╦)" );
+    if (pch->bless)                     flags.push_back( " {CB{w(п╠п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫ п╠п╬пЁп╟п╪п╦)" );
+    if (IS_SET( pch->act, PLR_WANTED))  flags.push_back( " {RW{w(п╡ я─п╬п╥я▀я│п╨п╣)" );
+    if (pch->isAffected(gsn_manacles)) flags.push_back( " {mM{w(п╡ п╨п╟п╫п╢п╟п╩п╟я┘)" );
+    if (pch->isAffected(gsn_jail ))   flags.push_back( " {mJ{w(п╡ я┌я▌я─я▄п╪п╣)" );
 
     if (pch->getAttributes( ).isAvailable( "nochannel" ))
-	flags.push_back( " {mN{w(nochannel)" );
+        flags.push_back( " {mN{w(nochannel)" );
 
     if (pch->getAttributes( ).isAvailable( "nopost" ))
-	flags.push_back( " {mP{w(nopost)" );
+        flags.push_back( " {mP{w(nopost)" );
 
     if (pch->getAttributes( ).isAvailable( "teacher" ))
-	flags.push_back( " {gT{w(может обучать других)" );
+        flags.push_back( " {gT{w(п╪п╬п╤п╣я┌ п╬п╠я┐я┤п╟я┌я▄ п╢я─я┐пЁп╦я┘)" );
     
     if (!flags.empty( ))
-	buf << "флаги:";
+        buf << "я└п╩п╟пЁп╦:";
 
     for (std::vector<const char *>::iterator i = flags.begin( ); i != flags.end( ); i++) {
-	if (DLString(buf.str()).colorLength() + DLString(*i).colorLength() > 70) {
-	    lines.add( buf );
-	    buf << "      ";
-	}
-	
-	buf << *i;
+        if (DLString(buf.str()).colorLength() + DLString(*i).colorLength() > 70) {
+            lines.add( buf );
+            buf << "      ";
+        }
+        
+        buf << *i;
     }
 
     lines.add( buf );
@@ -176,12 +176,12 @@ COMMAND(Whois, "whois")
     XMLStringAttribute::Pointer bio = pch->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( "bio" );
     if (bio && !bio->getValue( ).empty( )) {
             char buf[1024];
-	    istringstream is(bio->getValue( )); 
-	 
-	    while( is.getline(buf, sizeof(buf)) )  {
+            istringstream is(bio->getValue( )); 
+         
+            while( is.getline(buf, sizeof(buf)) )  {
                 ostringstream bufStr;
                 bufStr << buf;
-		lines.add( bufStr, true );
+                lines.add( bufStr, true );
             }
     }
 
@@ -190,7 +190,7 @@ COMMAND(Whois, "whois")
     ch->send_to( "/------------------------------------------------------------------------\\\r\n" );
     
     for (LinesList::iterator j = lines.begin( ); j != lines.end( ); j++)
-	ch->send_to( *j );
+        ch->send_to( *j );
     
     ch->send_to( "\\________________________________________________________________________/\r\n" );
 }
@@ -204,18 +204,18 @@ void Whois::LinesList::add( std::basic_ostringstream<char> &buf, bool fCR ) {
     std::basic_ostringstream<char> str;
 
     if (buf.str( ).empty( ))
-	return;
-	
+        return;
+        
     int length = DLString( buf.str( ) ).colorLength( );
 
     str << "{w| " << buf.str( );
 
     for (int i = 0; i < 70 - length; i++)
-	str << " ";
+        str << " ";
     
     str << " {d|";
     if (fCR)
-	str << endl;
+        str << endl;
 
     push_back( str.str( ) );
     buf.str( "" );

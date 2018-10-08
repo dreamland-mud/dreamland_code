@@ -24,18 +24,18 @@ void RainbowPiece::get( Character *ch )
     RainbowGQuest *gq = RainbowGQuest::getThis( );
 
     if (!gq || gq->isHidden( ) || gq->state == RainbowGQuest::ST_FINISHED)
-	return;
+        return;
     
     if (ch->is_npc( ))
-	return;
+        return;
     
     log("RainbowPiece: [" << number << "] by " << ch->getName( ));
 
     if (gq->countPieces( ch ) == gq->getScenario( )->getPiecesCount( )) {
-	gq->getScenario( )->onQuestFinish( ch->getPC( ) );
-	gq->winnerName = ch->getName( );
-	gq->state = RainbowGQuest::ST_FINISHED;
-	gq->scheduleDestroy( );
+        gq->getScenario( )->onQuestFinish( ch->getPC( ) );
+        gq->winnerName = ch->getName( );
+        gq->state = RainbowGQuest::ST_FINISHED;
+        gq->scheduleDestroy( );
     }
 }
 

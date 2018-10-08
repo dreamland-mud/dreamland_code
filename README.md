@@ -26,6 +26,7 @@
 * [Разработка](#dev)
    * [Пересборка 'ядра'](#core)
    * [Пересборка плагинов](#plugin)
+* [FAQ](https://github.com/dreamland-mud/dreamland_code/wiki/Testing-FAQ)
 
 ## <a name="local">Запуск локальной версии</a>
 

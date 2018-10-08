@@ -3,24 +3,24 @@
  * ruffina, 2004
  */
  /***************************************************************************
- * Все права на этот код 'Dream Land' принадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╦п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *	
- *	 Ibrahim Canpunar  {Asena}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *        
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *        
+ *         Ibrahim Canpunar  {Asena}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 
 /***************************************************************************
@@ -41,13 +41,13 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1995 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@pacinfo.com)				   *
-*	    Gabrielle Taylor (gtaylor@pacinfo.com)			   *
-*	    Brian Moore (rom@rom.efn.org)				   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*        ROM 2.4 is copyright 1993-1995 Russ Taylor                           *
+*        ROM has been brought to you by the ROM consortium                   *
+*            Russ Taylor (rtaylor@pacinfo.com)                                   *
+*            Gabrielle Taylor (gtaylor@pacinfo.com)                           *
+*            Brian Moore (rom@rom.efn.org)                                   *
+*        By using this code, you have agreed to follow the terms of the           *
+*        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -103,12 +103,12 @@ DLString get_pocket_argument( char *arg )
     DLString p;
     
     while (*arg++) {
-	if (*arg == ':') {
-	    p = arg + 1;
-	    *arg = '\0';
-	    p.colourstrip( );
-	    return p;
-	}
+        if (*arg == ':') {
+            p = arg + 1;
+            *arg = '\0';
+            p.colourstrip( );
+            return p;
+        }
     }
 
     return "";
@@ -130,50 +130,50 @@ DLString get_pocket_argument( DLString &arg )
 bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gold, int &silver )
 {
     if ((!arg_is_silver( arg ) && !arg_is_gold( arg ) )) {
-        if (!str_prefix( arg, "серебр" ) || !str_prefix( arg, "silver" )) {
-            ch->println( "Укажи название монеты полностью: серебро или silver." );
+        if (!str_prefix( arg, "я│п╣я─п╣п╠я─" ) || !str_prefix( arg, "silver" )) {
+            ch->println( "пёп╨п╟п╤п╦ п╫п╟п╥п╡п╟п╫п╦п╣ п╪п╬п╫п╣я┌я▀ п©п╬п╩п╫п╬я│я┌я▄я▌: я│п╣я─п╣п╠я─п╬ п╦п╩п╦ silver." );
             return false;
         }
-        if (!str_prefix( arg, "золот" ) || !str_prefix( arg, "gold" )) {
-            ch->println( "Укажи название монеты полностью: золото или gold." );
+        if (!str_prefix( arg, "п╥п╬п╩п╬я┌" ) || !str_prefix( arg, "gold" )) {
+            ch->println( "пёп╨п╟п╤п╦ п╫п╟п╥п╡п╟п╫п╦п╣ п╪п╬п╫п╣я┌я▀ п©п╬п╩п╫п╬я│я┌я▄я▌: п╥п╬п╩п╬я┌п╬ п╦п╩п╦ gold." );
             return false;
         }
-        ch->println( "Ты можешь указать количество денег в серебре (silver) или золоте (gold)." );
+        ch->println( "п╒я▀ п╪п╬п╤п╣я┬я▄ я┐п╨п╟п╥п╟я┌я▄ п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╢п╣п╫п╣пЁ п╡ я│п╣я─п╣п╠я─п╣ (silver) п╦п╩п╦ п╥п╬п╩п╬я┌п╣ (gold)." );
         return false;
     }
     if (amount < 0) {
-        ch->println( "Отрицательное количество денег?" );
+        ch->println( "п·я┌я─п╦я├п╟я┌п╣п╩я▄п╫п╬п╣ п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╢п╣п╫п╣пЁ?" );
         return false;
     }
     if (amount == 0) {
-        ch->println( "Ноль монет, это как?" );
+        ch->println( "п²п╬п╩я▄ п╪п╬п╫п╣я┌, я█я┌п╬ п╨п╟п╨?" );
         return false;
     }
 
 
     if (arg_is_silver( arg )) {
-	    if (ch->silver < amount)
-	    {
-		    ch->send_to("У тебя нет столько серебра.\n\r");
-		    return false;
-	    }
+            if (ch->silver < amount)
+            {
+                    ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я│я┌п╬п╩я▄п╨п╬ я│п╣я─п╣п╠я─п╟.\n\r");
+                    return false;
+            }
 
-	    silver = amount;
+            silver = amount;
     }
     else
     {
-	    if (ch->gold < amount)
-	    {
-		    ch->send_to("У тебя нет столько золота.\n\r");
-		    return false;
-	    }
+            if (ch->gold < amount)
+            {
+                    ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я│я┌п╬п╩я▄п╨п╬ п╥п╬п╩п╬я┌п╟.\n\r");
+                    return false;
+            }
 
-	    gold = amount;
+            gold = amount;
     }
 
     return true;
 }
-		
+                
 /*
  *   GET OBJECT [[FROM] CONTAINER[:POCKET]]
  *   GET MOBILE [BY] OBJECT
@@ -184,13 +184,13 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
     Object *obj;
 
     if (( obj = get_obj_wear_victim( victim, arg, ch ) ) == 0) {
-	act("У $C2 нет ничего похожего на $t.", ch, is_number(arg) ? "это" : arg, victim, TO_CHAR);
-	return;
+        act("пё $C2 п╫п╣я┌ п╫п╦я┤п╣пЁп╬ п©п╬я┘п╬п╤п╣пЁп╬ п╫п╟ $t.", ch, is_number(arg) ? "я█я┌п╬" : arg, victim, TO_CHAR);
+        return;
     }
     
-    act("Ты берешь $C4 за $o4.", ch, obj, victim, TO_CHAR);
-    act("$c1 берет тебя за $o4.", ch, obj, victim, TO_VICT);
-    act("$c1 берет $C4 за $o4.", ch, obj, victim, TO_NOTVICT);
+    act("п╒я▀ п╠п╣я─п╣я┬я▄ $C4 п╥п╟ $o4.", ch, obj, victim, TO_CHAR);
+    act("$c1 п╠п╣я─п╣я┌ я┌п╣п╠я▐ п╥п╟ $o4.", ch, obj, victim, TO_VICT);
+    act("$c1 п╠п╣я─п╣я┌ $C4 п╥п╟ $o4.", ch, obj, victim, TO_NOTVICT);
     
     FENIA_VOID_CALL( obj, "Seize", "CC", ch, victim );
     FENIA_VOID_CALL( ch, "Seize", "CCO", ch, victim, obj );
@@ -208,9 +208,9 @@ static bool oprog_get_money( Character *ch, Object *obj )
     ch->gold += obj->value[1];
 
     if (IS_SET(ch->act,PLR_AUTOSPLIT))
-	if (obj->value[0] > 1 || obj->value[1])
-	    if (party_members_room( ch ).size( ) > 1)
-		interpret_raw( ch, "split", "%d %d", obj->value[0], obj->value[1] );
+        if (obj->value[0] > 1 || obj->value[1])
+            if (party_members_room( ch ).size( ) > 1)
+                interpret_raw( ch, "split", "%d %d", obj->value[0], obj->value[1] );
     
     extract_obj( obj );
     return true;
@@ -224,7 +224,7 @@ bool oprog_get( Object *obj, Character *ch )
 
     switch (obj->item_type) {
     case ITEM_MONEY:
-	return oprog_get_money( ch, obj );
+        return oprog_get_money( ch, obj );
     }
 
     return false;
@@ -234,7 +234,7 @@ static bool oprog_fetch_corpse_pc( Character *ch, Object *obj, Object *container
 {
     if (!ch->is_immortal( ) && !container->hasOwner( ch ))
     {
-	container->count--;
+        container->count--;
     }
 
     return false;
@@ -249,7 +249,7 @@ static bool oprog_fetch( Character *ch, Object *obj, Object *container )
 
     switch (container->item_type) {
     case ITEM_CORPSE_PC:
-	return oprog_fetch_corpse_pc( ch, obj, container );
+        return oprog_fetch_corpse_pc( ch, obj, container );
     }
 
     return false;
@@ -259,8 +259,8 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 {
     if (!ch->is_immortal( ) && !obj->hasOwner( ch ))
     {
-	act("Похоже, $o4 от земли не оторвать.",ch,obj,0,TO_CHAR);
-	return false;
+        act("п÷п╬я┘п╬п╤п╣, $o4 п╬я┌ п╥п╣п╪п╩п╦ п╫п╣ п╬я┌п╬я─п╡п╟я┌я▄.",ch,obj,0,TO_CHAR);
+        return false;
     }
     
     return true;
@@ -269,8 +269,8 @@ static bool oprog_can_get_corpse_pc( Character *ch, Object *obj )
 static bool oprog_can_get_furniture( Character *ch, Object *obj )
 {
     if (count_users( obj ) > 0) {
-	act("Кто-то использует $o4.",ch,obj,0,TO_CHAR);
-	return false;
+        act("п я┌п╬-я┌п╬ п╦я│п©п╬п╩я▄п╥я┐п╣я┌ $o4.",ch,obj,0,TO_CHAR);
+        return false;
     }
 
     return true;
@@ -290,9 +290,9 @@ static bool oprog_can_get( Character *ch, Object *obj )
 
     switch (obj->item_type) {
     case ITEM_CORPSE_PC:
-	return oprog_can_get_corpse_pc( ch, obj );
+        return oprog_can_get_corpse_pc( ch, obj );
     case ITEM_FURNITURE:
-	return oprog_can_get_furniture( ch, obj );
+        return oprog_can_get_furniture( ch, obj );
     }
 
     return true;
@@ -301,29 +301,29 @@ static bool oprog_can_get( Character *ch, Object *obj )
 static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
 {
     if (ch->is_npc( )) {
-	ch->send_to( "Ты не умеешь обшаривать чужие трупы.\r\n" );
-	return false;
+        ch->send_to( "п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╬п╠я┬п╟я─п╦п╡п╟я┌я▄ я┤я┐п╤п╦п╣ я┌я─я┐п©я▀.\r\n" );
+        return false;
     }
     
     if (ch->is_immortal( ))
-	return true;
-	
+        return true;
+        
     if (container->hasOwner( ch ))
-	return true;
-	
+        return true;
+        
     if (!container->killer)
-	return true;
+        return true;
 
     if (str_cmp( ch->getNameP( ), container->killer ) 
-	&& str_cmp( "!anybody!", container->killer )) 
+        && str_cmp( "!anybody!", container->killer )) 
     {
-	ch->send_to( "Это не твоя добыча.\r\n" );
-	return false;
+        ch->send_to( "п╜я┌п╬ п╫п╣ я┌п╡п╬я▐ п╢п╬п╠я▀я┤п╟.\r\n" );
+        return false;
     }
     
     if (container->count == 0) {
-	ch->send_to("Более тебе ничего нельзя взять.\n\r");
-	return false;
+        ch->send_to("п▒п╬п╩п╣п╣ я┌п╣п╠п╣ п╫п╦я┤п╣пЁп╬ п╫п╣п╩я▄п╥я▐ п╡п╥я▐я┌я▄.\n\r");
+        return false;
     }
 
     return true;
@@ -339,68 +339,68 @@ static bool oprog_cant_fetch( Object *container, Character *ch, Object *obj, con
 static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, const DLString &pocket )
 {
     if (oprog_cant_fetch( container, ch, obj, pocket ))
-	return false;
+        return false;
 
     switch (container->item_type) {
     case ITEM_CORPSE_PC:
-	return oprog_can_fetch_corpse_pc( ch, container );
-	
+        return oprog_can_fetch_corpse_pc( ch, container );
+        
     case ITEM_CONTAINER:
-	if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
-	    act("Тебе не удалось нашарить ни одного кармана у $o2.",ch,container,0,TO_CHAR);
-	    return false;
-	}
-	
-	if (IS_SET( container->value[1], CONT_CLOSED )) {
-            ch->pecho("%1$^O4 нужно сперва открыть.", container );
-	    return false;
-	}
+        if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
+            act("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╫п╟я┬п╟я─п╦я┌я▄ п╫п╦ п╬п╢п╫п╬пЁп╬ п╨п╟я─п╪п╟п╫п╟ я┐ $o2.",ch,container,0,TO_CHAR);
+            return false;
+        }
+        
+        if (IS_SET( container->value[1], CONT_CLOSED )) {
+            ch->pecho("%1$^O4 п╫я┐п╤п╫п╬ я│п©п╣я─п╡п╟ п╬я┌п╨я─я▀я┌я▄.", container );
+            return false;
+        }
 
-	return true;
+        return true;
 
     case ITEM_KEYRING:
     case ITEM_CORPSE_NPC:
-	return true;
+        return true;
 
     default:
-        ch->pecho("%1$^O1 не контейнер, ты не можешь ничего оттуда взять.", container );
-	return false;
+        ch->pecho("%1$^O1 п╫п╣ п╨п╬п╫я┌п╣п╧п╫п╣я─, я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╦я┤п╣пЁп╬ п╬я┌я┌я┐п╢п╟ п╡п╥я▐я┌я▄.", container );
+        return false;
     }
 }
 
 static bool can_get_obj( Character *ch, Object *obj )
 {
     if (!oprog_can_get( ch, obj ))
-	return false;
+        return false;
 
     if (!obj->can_wear( ITEM_TAKE ))
     {
-        ch->pecho("Ты не можешь взять %1$O4.", obj );
-	return false;
+        ch->pecho("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╥я▐я┌я▄ %1$O4.", obj );
+        return false;
     }
 
     if (obj->pIndexData->limit != -1)
     {
-	if (obj->isAntiAligned( ch )) {
-	    ch->pecho("%2$^s не позволяют тебе владеть %1$O5, и ты роняешь %1$P2.",
-	              obj,
-		      IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
-	    
-	    ch->recho("%1$^C1 обжигается и роняет %2$O4.", ch, obj );
-	    return false;
-	}
+        if (obj->isAntiAligned( ch )) {
+            ch->pecho("%2$^s п╫п╣ п©п╬п╥п╡п╬п╩я▐я▌я┌ я┌п╣п╠п╣ п╡п╩п╟п╢п╣я┌я▄ %1$O5, п╦ я┌я▀ я─п╬п╫я▐п╣я┬я▄ %1$P2.",
+                      obj,
+                      IS_NEUTRAL(ch) ? "я│п╦п╩я▀ я─п╟п╡п╫п╬п╡п╣я│п╦я▐" : IS_GOOD(ch) ? "я│п╡я▐я┴п╣п╫п╫я▀п╣ я│п╦п╩я▀" : "я┌п╡п╬п╦ п╢п╣п╪п╬п╫я▀");
+            
+            ch->recho("%1$^C1 п╬п╠п╤п╦пЁп╟п╣я┌я│я▐ п╦ я─п╬п╫я▐п╣я┌ %2$O4.", ch, obj );
+            return false;
+        }
     }
 
     if (ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ))
     {
-	act_p( "$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR,POS_RESTING );
-	return false;
+        act_p( "$d: я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╣я│я┌п╦ п╠п╬п╩я▄я┬п╣ п╡п╣я┴п╣п╧.",ch,NULL,obj->getName( ),TO_CHAR,POS_RESTING );
+        return false;
     }
 
     if (ch->getCarryWeight( ) + obj->getWeight( ) > ch->canCarryWeight( ))
     {
-	act_p( "$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR ,POS_RESTING);
-	return false;
+        act_p( "$d: я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╢п╫я▐я┌я▄ я┌п╟п╨я┐я▌ я┌я▐п╤п╣я│я┌я▄.",ch,NULL,obj->getName( ),TO_CHAR ,POS_RESTING);
+        return false;
     }
 
     return true;
@@ -408,16 +408,16 @@ static bool can_get_obj( Character *ch, Object *obj )
 
 static bool get_obj( Character *ch, Object *obj )
 {
-    act_p( "Ты берешь $o4.", ch, obj, 0, TO_CHAR,POS_RESTING);
+    act_p( "п╒я▀ п╠п╣я─п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR,POS_RESTING);
 
     if (!IS_AFFECTED(ch,AFF_SNEAK))
-	act_p( "$c1 берет $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
-	    
+        act_p( "$c1 п╠п╣я─п╣я┌ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
+            
     obj_from_room( obj );
     obj_to_char( obj, ch );
 
     if (oprog_get( obj, ch ))
-	return true;
+        return true;
 
     return false;
 }
@@ -429,41 +429,41 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
     
     switch (container->item_type) {
     case ITEM_KEYRING:
-	toChar << "Ты снимаешь $o4 с $O2.";
-	toRoom << "$c1 снимает $o4 с $O2.";
-	break;
+        toChar << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ $o4 я│ $O2.";
+        toRoom << "$c1 я│п╫п╦п╪п╟п╣я┌ $o4 я│ $O2.";
+        break;
 
     case ITEM_CONTAINER:
-	if (IS_SET(container->value[1], CONT_PUT_ON)) 
-	    prep = "со";
-	else if (IS_SET(container->value[1], CONT_PUT_ON2)) 
-	    prep = "с";
-	else
-	    prep = "из";
-	
-	toChar << "Ты берешь $o4 " << prep << " $O2.";
-	toRoom << "$c1 берет $o4 " << prep << " $O2.";
-	break;
+        if (IS_SET(container->value[1], CONT_PUT_ON)) 
+            prep = "я│п╬";
+        else if (IS_SET(container->value[1], CONT_PUT_ON2)) 
+            prep = "я│";
+        else
+            prep = "п╦п╥";
+        
+        toChar << "п╒я▀ п╠п╣я─п╣я┬я▄ $o4 " << prep << " $O2.";
+        toRoom << "$c1 п╠п╣я─п╣я┌ $o4 " << prep << " $O2.";
+        break;
 
     default:
-	toChar << "Ты берешь $o4 из $O2.";
-	toRoom << "$c1 берет $o4 из $O2.";
-	break;
+        toChar << "п╒я▀ п╠п╣я─п╣я┬я▄ $o4 п╦п╥ $O2.";
+        toRoom << "$c1 п╠п╣я─п╣я┌ $o4 п╦п╥ $O2.";
+        break;
     }
 
     act( toChar.str( ).c_str( ), ch, obj, container, TO_CHAR );
 
     if (!IS_AFFECTED(ch, AFF_SNEAK))
-	act( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
+        act( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
 
     obj_from_obj( obj );
     obj_to_char( obj, ch );
 
     if (oprog_get( obj, ch ))
-	return true;
+        return true;
     
     if (oprog_fetch( ch, obj, container ))
-	return true;
+        return true;
     
     return false;
 }
@@ -471,7 +471,7 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
 void do_get_raw( Character *ch, Object *obj )
 {
     if (can_get_obj( ch, obj ))
-	get_obj( ch, obj );
+        get_obj( ch, obj );
 }
 
 bool do_get_raw( Character *ch, Object *obj, Object *container )
@@ -479,10 +479,10 @@ bool do_get_raw( Character *ch, Object *obj, Object *container )
     DLString pocket;
 
     if (!oprog_can_fetch( ch, container, obj, pocket ))
-	return true;
+        return true;
     
     if (can_get_obj( ch, obj ))
-	get_obj_container( ch, obj, container );
+        get_obj_container( ch, obj, container );
 
     return false;
 }
@@ -493,16 +493,16 @@ void do_get_all_raw( Character *ch, Object *container )
     DLString pocket;
 
     if (!oprog_can_fetch( ch, container, NULL, pocket ))
-	return;
+        return;
 
     for (obj = container->contains; obj; obj = obj_next) {
-	obj_next = obj->next_content;
+        obj_next = obj->next_content;
 
-	if (!ch->can_see( obj ))
-	    continue;
-	
-	if (do_get_raw( ch, obj, container ))
-	    return;
+        if (!ch->can_see( obj ))
+            continue;
+        
+        if (do_get_raw( ch, obj, container ))
+            return;
     }
 }
 
@@ -549,71 +549,71 @@ CMDRUNP( get )
     }
 
     argContainer = arguments.getOneArgument();
-    if (arg_is_from( argContainer ) || arg_oneof_strict( argContainer, "за", "by" ))
+    if (arg_is_from( argContainer ) || arg_oneof_strict( argContainer, "п╥п╟", "by" ))
         argContainer = arguments.getOneArgument( );
 
 
     if (argAllObj.empty( ))
     {
-	ch->send_to("Взять что?\n\r");
-	return;
+        ch->send_to("п▓п╥я▐я┌я▄ я┤я┌п╬?\n\r");
+        return;
     }
 
     if(argContainer.empty( ))
     {
-        DLString that = is_number(argTarget.c_str( )) ? "этого" : argTarget;
+        DLString that = is_number(argTarget.c_str( )) ? "я█я┌п╬пЁп╬" : argTarget;
 
-	if (!all && !allDot)
-	{
+        if (!all && !allDot)
+        {
             /*  get <name> */
-	    obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
-	    
-	    if (!obj)
-		act_p( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
-	    else
-		do_get_raw( ch, obj );
-	}
-	else
-	{
+            obj = get_obj_list( ch, argTarget.c_str( ), ch->in_room->contents );
+            
+            if (!obj)
+                act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
+            else
+                do_get_raw( ch, obj );
+        }
+        else
+        {
             /*
              *  get all
              *  get all.<name>
              *  get all.'<names list>'
              */
-	    found = false;
+            found = false;
 
-	    dreamland->removeOption( DL_SAVE_OBJS );
+            dreamland->removeOption( DL_SAVE_OBJS );
 
-	    for ( obj = ch->in_room->contents; obj; obj = obj_next )
-	    {
-		obj_next = obj->next_content;
-		if ( (all || obj_has_name( obj, argTarget, ch ))
-			&& ch->can_see( obj ) )
-		{
-		    found = true;
-		    do_get_raw( ch, obj );
-		}
-	    }
+            for ( obj = ch->in_room->contents; obj; obj = obj_next )
+            {
+                obj_next = obj->next_content;
+                if ( (all || obj_has_name( obj, argTarget, ch ))
+                        && ch->can_see( obj ) )
+                {
+                    found = true;
+                    do_get_raw( ch, obj );
+                }
+            }
 
-	    dreamland->resetOption( DL_SAVE_OBJS );
+            dreamland->resetOption( DL_SAVE_OBJS );
 
-	    if ( !found )
-	    {
-		if (all)
-		    ch->println("Ты ничего не видишь здесь.");
+            if ( !found )
+            {
+                if (all)
+                    ch->println("п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄.");
                 else if (allDot)
-		    ch->println("Ты не видишь ничего подобного здесь.");
-		else
-		    act_p( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
-	    }
-	    else
-		save_items( ch->in_room );
-	}
+                    ch->println("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п©п╬п╢п╬п╠п╫п╬пЁп╬ п╥п╢п╣я│я▄.");
+                else
+                    act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
+            }
+            else
+                save_items( ch->in_room );
+        }
     }
     else
     {
-	DLString pocket;
-        DLString that = is_number(argContainer.c_str( )) ? "этого" : argContainer;
+        DLString pocket;
+        DLString that = is_number(argContainer.c_str( )) ? "я█я┌п╬пЁп╬" : argContainer;
 
         /*
          *  get <name> [from] <container>[:<pocket>]
@@ -625,90 +625,90 @@ CMDRUNP( get )
          */
 
         // Disallow 'get <name> all.<container>' syntax.
-	if (arg_is_alldot( argContainer ))
-	{
-	    ch->send_to("Ты не можешь сделать этого.\n\r");
-	    return;
-	}
+        if (arg_is_alldot( argContainer ))
+        {
+            ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬.\n\r");
+            return;
+        }
 
         // Split out potential pocket argument from <container>:<pocket>.
-	pocket = get_pocket_argument( argContainer );
+        pocket = get_pocket_argument( argContainer );
 
         // Container not found, assume 'get <victim> by <name>' syntax.
-	if ( !( container = get_obj_here( ch, argContainer ) ) )
-	{
-	    Character *victim = get_char_room( ch, argTarget );
-	    
-	    if (victim)
-		get_obj_on_victim( ch, victim, argContainer.c_str( ) );
-	    else
-		act_p( "Ты не видишь здесь $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
-	    return;
-	}
+        if ( !( container = get_obj_here( ch, argContainer ) ) )
+        {
+            Character *victim = get_char_room( ch, argTarget );
+            
+            if (victim)
+                get_obj_on_victim( ch, victim, argContainer.c_str( ) );
+            else
+                act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ $T.", ch, 0, that.c_str( ), TO_CHAR,POS_RESTING);
+            return;
+        }
 
-	if (!oprog_can_fetch( ch, container, NULL, pocket ))
-	    return;
+        if (!oprog_can_fetch( ch, container, NULL, pocket ))
+            return;
 
-	if (!all && !allDot)
-	{
+        if (!all && !allDot)
+        {
             /*  get <name> [from] <container>[:<pocket>] */
-	    obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
+            obj = get_obj_list( ch, argTarget.c_str( ), container->contains, pocket );
 
-	    if(!obj) {
-		act_p( "Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
-		return;
-	    }
-	    
-	    if (can_get_obj( ch, obj ))
-		get_obj_container( ch, obj, container );
-	}
-	else {
+            if(!obj) {
+                act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п©п╬п╢п╬п╠п╫п╬пЁп╬ п╡ $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
+                return;
+            }
+            
+            if (can_get_obj( ch, obj ))
+                get_obj_container( ch, obj, container );
+        }
+        else {
             /*
              *  get all [from] <container>[:<pocket>]
              *  get all.<name> [from] <container>[:<pocket>]
              *  get all.'<names list>' [from] <container>[:<pocket>]
              */
 
-	    if (IS_PIT(container) && !ch->is_immortal() )
-	    {
-		ch->send_to("Не будь столь жаден!\n\r");
-		return;
-	    }
-		
-	    found = false;
+            if (IS_PIT(container) && !ch->is_immortal() )
+            {
+                ch->send_to("п²п╣ п╠я┐п╢я▄ я│я┌п╬п╩я▄ п╤п╟п╢п╣п╫!\n\r");
+                return;
+            }
+                
+            found = false;
 
-	    for ( obj = container->contains; obj; obj = obj_next )
-	    {
-		obj_next = obj->next_content;
+            for ( obj = container->contains; obj; obj = obj_next )
+            {
+                obj_next = obj->next_content;
 
-		if (!all && !obj_has_name( obj, argTarget, ch ))
-		    continue;
+                if (!all && !obj_has_name( obj, argTarget, ch ))
+                    continue;
 
-		if (!ch->can_see( obj ))
-		    continue;
+                if (!ch->can_see( obj ))
+                    continue;
 
-		if (!pocket.empty( ) && obj->pocket != pocket)
-		    continue;
+                if (!pocket.empty( ) && obj->pocket != pocket)
+                    continue;
 
-		if (pocket.empty( ) && !obj->pocket.empty( ))
-		    continue;
-		    
-		found = true;
+                if (pocket.empty( ) && !obj->pocket.empty( ))
+                    continue;
+                    
+                found = true;
 
-		if (!oprog_can_fetch( ch, container, obj, pocket ))
-		    return;
-		
-		if (can_get_obj( ch, obj ))
-		    get_obj_container( ch, obj, container );
-	    }
+                if (!oprog_can_fetch( ch, container, obj, pocket ))
+                    return;
+                
+                if (can_get_obj( ch, obj ))
+                    get_obj_container( ch, obj, container );
+            }
 
-	    if (!found) {
-		if (!all)
-		    act_p( "Ты не видишь ничего в $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
-		else
-		    act_p( "Ты не видишь ничего подобного в $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
-	    }
-	}
+            if (!found) {
+                if (!all)
+                    act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п╡ $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
+                else
+                    act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п©п╬п╢п╬п╠п╫п╬пЁп╬ п╡ $o6.", ch, container, 0, TO_CHAR,POS_RESTING);
+            }
+        }
     }
 }
 
@@ -717,12 +717,12 @@ CMDRUNP( get )
  *   PUT OBJECT [IN|ON] CONTAINER[:POCKET]
  */
 
-#define PUT_OBJ_STOP	-1
-#define PUT_OBJ_ERR	0
-#define PUT_OBJ_OK	1
+#define PUT_OBJ_STOP        -1
+#define PUT_OBJ_ERR        0
+#define PUT_OBJ_OK        1
 
 static bool oprog_cant_put( Character *ch, Object *obj, Object *container,
-	                    const char *pocket, bool verbose )
+                            const char *pocket, bool verbose )
 {
     FENIA_CALL( container, "CantPut", "COsi", ch, obj, pocket, verbose );
     FENIA_NDX_CALL( container, "CantPut", "OCOsi", container, ch, obj, pocket, verbose );
@@ -733,24 +733,24 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
 {
     switch (container->item_type) {
     case ITEM_CONTAINER:
-	if (IS_SET(container->value[1], CONT_CLOSED)) {
-	    ch->println( "Тут закрыто." );
-	    return false;
-	}
+        if (IS_SET(container->value[1], CONT_CLOSED)) {
+            ch->println( "п╒я┐я┌ п╥п╟п╨я─я▀я┌п╬." );
+            return false;
+        }
 
-	if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
-	    ch->println( "Тебе не удалось нашарить ни одного кармана." );
-	    return false;
-	}
+        if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
+            ch->println( "п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╫п╟я┬п╟я─п╦я┌я▄ п╫п╦ п╬п╢п╫п╬пЁп╬ п╨п╟я─п╪п╟п╫п╟." );
+            return false;
+        }
 
-	return true;
+        return true;
 
     case ITEM_KEYRING:
-	return true;
+        return true;
 
     default:
-	ch->println("Это не контейнер.");
-	return false;
+        ch->println("п╜я┌п╬ п╫п╣ п╨п╬п╫я┌п╣п╧п╫п╣я─.");
+        return false;
     }
 
 
@@ -761,75 +761,75 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     int pcount;
 
     if (obj == container) {
-	if (verbose)
-	    ch->send_to("Ты не можешь положить что-то в себя же.\n\r");
-	return PUT_OBJ_ERR;
+        if (verbose)
+            ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╩п╬п╤п╦я┌я▄ я┤я┌п╬-я┌п╬ п╡ я│п╣п╠я▐ п╤п╣.\n\r");
+        return PUT_OBJ_ERR;
     }
     
     if (oprog_cant_put( ch, obj, container, pocket.c_str( ), verbose )) 
-	return PUT_OBJ_ERR;
+        return PUT_OBJ_ERR;
 
     if (!can_drop_obj( ch, obj )) {
-	act( "Ты не можешь избавиться от $o2.", ch, obj, 0, TO_CHAR );
-	return PUT_OBJ_ERR;
+        act( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ $o2.", ch, obj, 0, TO_CHAR );
+        return PUT_OBJ_ERR;
     }
     
     pcount = count_obj_in_obj( container );
 
     if (container->item_type == ITEM_KEYRING) {
-	if (pcount >= container->value[0]) {
-	    act( "На $o6 не осталось свободного места.", ch, container, 0, TO_CHAR );
-	    return PUT_OBJ_STOP;
-	}
+        if (pcount >= container->value[0]) {
+            act( "п²п╟ $o6 п╫п╣ п╬я│я┌п╟п╩п╬я│я▄ я│п╡п╬п╠п╬п╢п╫п╬пЁп╬ п╪п╣я│я┌п╟.", ch, container, 0, TO_CHAR );
+            return PUT_OBJ_STOP;
+        }
 
-	if (obj->item_type != ITEM_KEY && obj->item_type != ITEM_LOCKPICK) {
-	    if (verbose)
-		act( "На $o4 ты можешь нанизать только ключи или отмычки.", ch, container, 0, TO_CHAR );
-	    return PUT_OBJ_ERR;
-	}
+        if (obj->item_type != ITEM_KEY && obj->item_type != ITEM_LOCKPICK) {
+            if (verbose)
+                act( "п²п╟ $o4 я┌я▀ п╪п╬п╤п╣я┬я▄ п╫п╟п╫п╦п╥п╟я┌я▄ я┌п╬п╩я▄п╨п╬ п╨п╩я▌я┤п╦ п╦п╩п╦ п╬я┌п╪я▀я┤п╨п╦.", ch, container, 0, TO_CHAR );
+            return PUT_OBJ_ERR;
+        }
 
-	return PUT_OBJ_OK;
+        return PUT_OBJ_OK;
     }
 
     if (pcount > container->value[0]) {
-	act_p("Опасно запихивать столько вещей в $o4!", ch,container,0, TO_CHAR,POS_RESTING);
-	return PUT_OBJ_STOP;
+        act_p("п·п©п╟я│п╫п╬ п╥п╟п©п╦я┘п╦п╡п╟я┌я▄ я│я┌п╬п╩я▄п╨п╬ п╡п╣я┴п╣п╧ п╡ $o4!", ch,container,0, TO_CHAR,POS_RESTING);
+        return PUT_OBJ_STOP;
     }
 
     if (obj->getWeightMultiplier() != 100 && !IS_SET(container->value[1], CONT_NESTED)) {
-	if (verbose)
-	    ch->send_to("Наверное это была плохая идея.\n\r");
-	return PUT_OBJ_ERR;
+        if (verbose)
+            ch->send_to("п²п╟п╡п╣я─п╫п╬п╣ я█я┌п╬ п╠я▀п╩п╟ п©п╩п╬я┘п╟я▐ п╦п╢п╣я▐.\n\r");
+        return PUT_OBJ_ERR;
     }
 
     if (obj->pIndexData->limit != -1) {
-	act( "$o4 нельзя хранить в такой дребедени.", ch,obj,0,TO_CHAR );
-	return PUT_OBJ_ERR;
+        act( "$o4 п╫п╣п╩я▄п╥я▐ я┘я─п╟п╫п╦я┌я▄ п╡ я┌п╟п╨п╬п╧ п╢я─п╣п╠п╣п╢п╣п╫п╦.", ch,obj,0,TO_CHAR );
+        return PUT_OBJ_ERR;
     }
 
     if (IS_SET(container->value[1],CONT_FOR_ARROW)
-	    && (obj->item_type != ITEM_WEAPON
-	    || obj->value[0]  != WEAPON_ARROW ))
+            && (obj->item_type != ITEM_WEAPON
+            || obj->value[0]  != WEAPON_ARROW ))
     {
-	if (verbose)
-	    act_p("Ты можешь положить только стрелы в $o4.",ch,container,0,TO_CHAR,POS_RESTING);
-	return PUT_OBJ_ERR;
+        if (verbose)
+            act_p("п╒я▀ п╪п╬п╤п╣я┬я▄ п©п╬п╩п╬п╤п╦я┌я▄ я┌п╬п╩я▄п╨п╬ я│я┌я─п╣п╩я▀ п╡ $o4.",ch,container,0,TO_CHAR,POS_RESTING);
+        return PUT_OBJ_ERR;
     }
 
     if (obj->getWeight( ) + container->getTrueWeight( ) > (container->value[0] * 10)
-	||  obj->getWeight( ) > (container->value[3] * 10))
+        ||  obj->getWeight( ) > (container->value[3] * 10))
     {
-	if (verbose)
-	    ch->send_to("Не входит.\n\r");
-	return PUT_OBJ_ERR;
+        if (verbose)
+            ch->send_to("п²п╣ п╡я┘п╬п╢п╦я┌.\n\r");
+        return PUT_OBJ_ERR;
     }
 
     if (obj->item_type == ITEM_POTION && IS_SET(container->wear_flags, ITEM_TAKE)) {
-	pcount = count_obj_in_obj( container, ITEM_POTION );
-		
+        pcount = count_obj_in_obj( container, ITEM_POTION );
+                
        if (pcount > 15) {
-	    act_p("Небезопасно далее складывать снадобья в $o4.",ch,container,0, TO_CHAR,POS_RESTING);
-	    return PUT_OBJ_ERR;
+            act_p("п²п╣п╠п╣п╥п╬п©п╟я│п╫п╬ п╢п╟п╩п╣п╣ я│п╨п╩п╟п╢я▀п╡п╟я┌я▄ я│п╫п╟п╢п╬п╠я▄я▐ п╡ $o4.",ch,container,0, TO_CHAR,POS_RESTING);
+            return PUT_OBJ_ERR;
        }
     }
 
@@ -872,41 +872,41 @@ static bool put_obj_container( Character *ch, Object *obj, Object *container,
     obj_to_obj( obj, container );
     
     if (container->item_type == ITEM_KEYRING) {
-	toRoom << "$c1 нанизывает $o4 на $O4.";
-	toChar << "Ты нанизываешь $o4 на $O4.";
+        toRoom << "$c1 п╫п╟п╫п╦п╥я▀п╡п╟п╣я┌ $o4 п╫п╟ $O4.";
+        toChar << "п╒я▀ п╫п╟п╫п╦п╥я▀п╡п╟п╣я┬я▄ $o4 п╫п╟ $O4.";
     }
     else {
 
-	if (!pocket.empty( )) 
-	    obj->pocket = pocket;
+        if (!pocket.empty( )) 
+            obj->pocket = pocket;
 
-	toRoom << "$c1 кладет $o4 "
-	       << (IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ?
-			     "на" : "в")
-	       << " $O4.";
-	
-	if (pocket.empty( ))
-	    toChar << "Ты кладешь $o4 "
-		   << (IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ?
-			     "на" : "в")
-		   << " $O4.";
-	else {
-	    toChar << "Ты кладешь $o4 ";
+        toRoom << "$c1 п╨п╩п╟п╢п╣я┌ $o4 "
+               << (IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ?
+                             "п╫п╟" : "п╡")
+               << " $O4.";
+        
+        if (pocket.empty( ))
+            toChar << "п╒я▀ п╨п╩п╟п╢п╣я┬я▄ $o4 "
+                   << (IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ?
+                             "п╫п╟" : "п╡")
+                   << " $O4.";
+        else {
+            toChar << "п╒я▀ п╨п╩п╟п╢п╣я┬я▄ $o4 ";
 
-	    if (IS_SET(container->value[1],CONT_PUT_ON|CONT_PUT_ON2)) {
-		toChar << "на $O4 в отделение '" << pocket << "'.";
-	    }
-	    else if (!container->can_wear(ITEM_TAKE)) {
-		toChar << "на полку $O2 с надписью '" << pocket << "'.";
-	    }
-	    else
-		toChar << "в карман $O2 с надписью '" << pocket << "'.";
-	}
+            if (IS_SET(container->value[1],CONT_PUT_ON|CONT_PUT_ON2)) {
+                toChar << "п╫п╟ $O4 п╡ п╬я┌п╢п╣п╩п╣п╫п╦п╣ '" << pocket << "'.";
+            }
+            else if (!container->can_wear(ITEM_TAKE)) {
+                toChar << "п╫п╟ п©п╬п╩п╨я┐ $O2 я│ п╫п╟п╢п©п╦я│я▄я▌ '" << pocket << "'.";
+            }
+            else
+                toChar << "п╡ п╨п╟я─п╪п╟п╫ $O2 я│ п╫п╟п╢п©п╦я│я▄я▌ '" << pocket << "'.";
+        }
     }
     
     if (!oprog_put_msg( obj, ch, container )) {
-	act( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
-	act( toChar.str( ).c_str( ), ch, obj, container, TO_CHAR );
+        act( toRoom.str( ).c_str( ), ch, obj, container, TO_ROOM );
+        act( toChar.str( ).c_str( ), ch, obj, container, TO_CHAR );
     }
 
     return oprog_put( obj, ch, container );
@@ -924,77 +924,77 @@ CMDRUNP( put )
     argument = one_argument( argument, arg2 );
 
     if (arg_is_in( arg2 ) || arg_is_on( arg2 ))
-	argument = one_argument(argument,arg2);
+        argument = one_argument(argument,arg2);
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-	ch->send_to("Положить что и куда?\n\r");
-	return;
+        ch->send_to("п÷п╬п╩п╬п╤п╦я┌я▄ я┤я┌п╬ п╦ п╨я┐п╢п╟?\n\r");
+        return;
     }
 
     if (arg_is_alldot( arg2 ))
     {
-	ch->send_to("Ты не можешь сделать этого.\n\r");
-	return;
+        ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬.\n\r");
+        return;
     }
     
     pocket = get_pocket_argument( arg2 );
 
     if ( ( container = get_obj_here( ch, arg2 ) ) == 0 ) {
-	act_p( "Ты не видишь здесь $T.", ch, 0, is_number(arg2) ? "этого" : arg2, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ $T.", ch, 0, is_number(arg2) ? "я█я┌п╬пЁп╬" : arg2, TO_CHAR,POS_RESTING);
+        return;
     }
     
     if (!can_put_into( ch, container, pocket ))
-	return;
+        return;
 
     if (!arg_is_alldot( arg1 ))
     {
-	/* 'put obj container' */
-	if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
-	{
-	    ch->send_to("У тебя нет этого.\n\r");
-	    return;
-	}
-	
-	if (can_put_obj_into( ch, obj, container, pocket, true ) == PUT_OBJ_OK) 
-	    put_obj_container( ch, obj, container, pocket );
+        /* 'put obj container' */
+        if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
+        {
+            ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
+            return;
+        }
+        
+        if (can_put_obj_into( ch, obj, container, pocket, true ) == PUT_OBJ_OK) 
+            put_obj_container( ch, obj, container, pocket );
     }
     else
     {
-	Object *obj_next;
-	bool found = false;
+        Object *obj_next;
+        bool found = false;
 
-	/* 'put all container' or 'put all.obj container' */
-	for (obj = ch->carrying; obj != 0; obj = obj_next) {
-	    obj_next = obj->next_content;
+        /* 'put all container' or 'put all.obj container' */
+        for (obj = ch->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
 
-	    if ((arg1[3] == '\0' || obj_has_name( obj, &arg1[4], ch ))
-		&&   ch->can_see( obj )
-		&&   obj->wear_loc == wear_none)
-	    {
+            if ((arg1[3] == '\0' || obj_has_name( obj, &arg1[4], ch ))
+                &&   ch->can_see( obj )
+                &&   obj->wear_loc == wear_none)
+            {
 
-		switch (can_put_obj_into( ch, obj, container, pocket, false )) {
-		case PUT_OBJ_STOP:
-		    return;
+                switch (can_put_obj_into( ch, obj, container, pocket, false )) {
+                case PUT_OBJ_STOP:
+                    return;
 
-		case PUT_OBJ_OK:
-		    if (put_obj_container( ch, obj, container, pocket ))
-			return;
-		    found = true;
-		    break;
+                case PUT_OBJ_OK:
+                    if (put_obj_container( ch, obj, container, pocket ))
+                        return;
+                    found = true;
+                    break;
 
-		case PUT_OBJ_ERR:
-		    break;
-		}
-	    }
-	}
-	
-	if (!found) {
-	    if (container->item_type == ITEM_KEYRING)
-		act( "Ты не наш$gло|ел|ла ничего, что можно нанизать на $o4.", ch, container, 0, TO_CHAR );
-	    else
-		act( "Ты не наш$gло|ел|ла ничего, что можно положить в $o4.", ch, container, 0, TO_CHAR );
+                case PUT_OBJ_ERR:
+                    break;
+                }
+            }
+        }
+        
+        if (!found) {
+            if (container->item_type == ITEM_KEYRING)
+                act( "п╒я▀ п╫п╣ п╫п╟я┬$gп╩п╬|п╣п╩|п╩п╟ п╫п╦я┤п╣пЁп╬, я┤я┌п╬ п╪п╬п╤п╫п╬ п╫п╟п╫п╦п╥п╟я┌я▄ п╫п╟ $o4.", ch, container, 0, TO_CHAR );
+            else
+                act( "п╒я▀ п╫п╣ п╫п╟я┬$gп╩п╬|п╣п╩|п╩п╟ п╫п╦я┤п╣пЁп╬, я┤я┌п╬ п╪п╬п╤п╫п╬ п©п╬п╩п╬п╤п╦я┌я▄ п╡ $o4.", ch, container, 0, TO_CHAR );
         }
     }
 }
@@ -1008,13 +1008,13 @@ CMDRUNP( put )
 bool can_drop_obj( Character *ch, Object *obj, bool verbose )
 {
     if (!IS_SET(obj->extra_flags, ITEM_NODROP))
-	return true;
+        return true;
 
     if (!ch->is_npc() && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return true;
+        return true;
 
     if (verbose)
-	ch->println("Ты не можешь избавиться от этого.");
+        ch->println("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ я█я┌п╬пЁп╬.");
 
     return false;
 }
@@ -1038,44 +1038,44 @@ static int drop_obj( Character *ch, Object *obj )
     obj_to_room( obj, ch->in_room );
 
     if (!IS_AFFECTED(ch, AFF_SNEAK))
-	act( "$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+        act( "$c1 п╠я─п╬я│п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
 
-    act( "Ты бросаешь $o4.", ch, obj, 0, TO_CHAR );
+    act( "п╒я▀ п╠я─п╬я│п╟п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR );
 
     if (oprog_drop( obj, ch ))
-	return DROP_OBJ_EXTRACT;
+        return DROP_OBJ_EXTRACT;
     
     if (IS_WATER( ch->in_room ) 
-	&& !obj->may_float( ) 
-	&& material_swims( obj ) == SWIM_NEVER)
+        && !obj->may_float( ) 
+        && material_swims( obj ) == SWIM_NEVER)
     {
-	if (!IS_AFFECTED(ch, AFF_SNEAK))
-	    ch->recho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->liquid->getShortDescr( ).c_str( ) );
+        if (!IS_AFFECTED(ch, AFF_SNEAK))
+            ch->recho( "%1$^O1 я┌п╬п╫%1$nп╣я┌|я┐я┌ п╡ %2$N6.", obj, ch->in_room->liquid->getShortDescr( ).c_str( ) );
 
-	ch->pecho( "%1$^O1 тон%1$nет|ут в %2$N6.", obj, ch->in_room->liquid->getShortDescr( ).c_str( ) );
+        ch->pecho( "%1$^O1 я┌п╬п╫%1$nп╣я┌|я┐я┌ п╡ %2$N6.", obj, ch->in_room->liquid->getShortDescr( ).c_str( ) );
     }
     else if (IS_OBJ_STAT(obj, ITEM_MELT_DROP))
     {
-	if (!IS_AFFECTED(ch, AFF_SNEAK))
-	    ch->recho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
+        if (!IS_AFFECTED(ch, AFF_SNEAK))
+            ch->recho( "%1$^O1 п©я─п╣п╡я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п╢я▀п╪.", obj );
 
-	ch->pecho( "%1$^O1 превраща%1$nется|ются в дым.", obj );
+        ch->pecho( "%1$^O1 п©я─п╣п╡я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п╢я▀п╪.", obj );
     }
     else if (!IS_WATER( ch->in_room ) 
-	     && ch->in_room->sector_type != SECT_AIR
-	     && ch->in_room->sector_type != SECT_FOREST
-	     && ch->in_room->sector_type != SECT_DESERT
-	     && obj->pIndexData->vnum == OBJ_VNUM_POTION_VIAL
-//	     && material_is_flagged( obj, MAT_FRAGILE )
-	     && chance( 40 ))
+             && ch->in_room->sector_type != SECT_AIR
+             && ch->in_room->sector_type != SECT_FOREST
+             && ch->in_room->sector_type != SECT_DESERT
+             && obj->pIndexData->vnum == OBJ_VNUM_POTION_VIAL
+//             && material_is_flagged( obj, MAT_FRAGILE )
+             && chance( 40 ))
     {
-	if (!IS_AFFECTED(ch, AFF_SNEAK))
-	    ch->recho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
-	
-	ch->pecho( "%1$^O1 падает и разбива%1$nется|ются на мелкие осколки.", obj );
+        if (!IS_AFFECTED(ch, AFF_SNEAK))
+            ch->recho( "%1$^O1 п©п╟п╢п╟п╣я┌ п╦ я─п╟п╥п╠п╦п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.", obj );
+        
+        ch->pecho( "%1$^O1 п©п╟п╢п╟п╣я┌ п╦ я─п╟п╥п╠п╦п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.", obj );
     }
     else
-	return DROP_OBJ_NORMAL;
+        return DROP_OBJ_NORMAL;
 
     extract_obj( obj );
     return DROP_OBJ_EXTRACT;
@@ -1091,97 +1091,97 @@ CMDRUNP( drop )
 
     if ( arg[0] == '\0' )
     {
-	ch->send_to("Бросить что?\n\r");
-	return;
+        ch->send_to("п▒я─п╬я│п╦я┌я▄ я┤я┌п╬?\n\r");
+        return;
     }
 
     if ( is_number( arg ) && get_arg_id( arg ) == 0)
     {
-	/* 'drop NNNN coins' */
-	int amount, gold = 0, silver = 0;
+        /* 'drop NNNN coins' */
+        int amount, gold = 0, silver = 0;
 
-	amount   = atoi(arg);
-	argument = one_argument( argument, arg );
+        amount   = atoi(arg);
+        argument = one_argument( argument, arg );
 
-	if (!parse_money_arguments( ch, arg, amount, gold, silver ))
-	    return;
+        if (!parse_money_arguments( ch, arg, amount, gold, silver ))
+            return;
 
-	ch->silver -= silver;
-	ch->gold -= gold;
-	get_money_here( ch->in_room->contents, gold, silver );
-	obj = create_money( gold, silver );
+        ch->silver -= silver;
+        ch->gold -= gold;
+        get_money_here( ch->in_room->contents, gold, silver );
+        obj = create_money( gold, silver );
 
-	if ( IS_WATER( ch->in_room ) )
-	{
-	    extract_obj( obj );
-	    if ( !IS_AFFECTED(ch, AFF_SNEAK) )
-		act("Монеты падают и тонут в $n6.", ch, ch->in_room->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
+        if ( IS_WATER( ch->in_room ) )
+        {
+            extract_obj( obj );
+            if ( !IS_AFFECTED(ch, AFF_SNEAK) )
+                act("п°п╬п╫п╣я┌я▀ п©п╟п╢п╟я▌я┌ п╦ я┌п╬п╫я┐я┌ п╡ $n6.", ch, ch->in_room->liquid->getShortDescr( ).c_str( ), 0, TO_ROOM);
 
-	    act("Монеты падают и тонут в $n6.", ch, ch->in_room->liquid->getShortDescr( ).c_str( ), 0, TO_CHAR);
-	}
-	else
-	{
-	    obj_to_room( obj, ch->in_room );
+            act("п°п╬п╫п╣я┌я▀ п©п╟п╢п╟я▌я┌ п╦ я┌п╬п╫я┐я┌ п╡ $n6.", ch, ch->in_room->liquid->getShortDescr( ).c_str( ), 0, TO_CHAR);
+        }
+        else
+        {
+            obj_to_room( obj, ch->in_room );
 
-	    if ( !IS_AFFECTED(ch, AFF_SNEAK) )
-		act_p( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM,POS_RESTING);
+            if ( !IS_AFFECTED(ch, AFF_SNEAK) )
+                act_p( "$c1 п╠я─п╬я│п╟п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╪п╬п╫п╣я┌.", ch, 0, 0, TO_ROOM,POS_RESTING);
 
-            ch->println( "Ты бросаешь несколько монет." );
-	}
+            ch->println( "п╒я▀ п╠я─п╬я│п╟п╣я┬я▄ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╪п╬п╫п╣я┌." );
+        }
 
-	return;
+        return;
     }
 
     if (!arg_is_alldot( arg ))
     {
-	/* 'drop obj' */
-	if ( ( obj = get_obj_carry( ch, arg ) ) == 0 )
-	{
-	    ch->send_to("У тебя нет этого.\n\r");
-	    return;
-	}
+        /* 'drop obj' */
+        if ( ( obj = get_obj_carry( ch, arg ) ) == 0 )
+        {
+            ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
+            return;
+        }
 
-	if (can_drop_obj( ch, obj, true )) 
-	    drop_obj( ch, obj );
+        if (can_drop_obj( ch, obj, true )) 
+            drop_obj( ch, obj );
     }
     else { /* 'drop all' or 'drop all.obj', drop all.'obj names' */
-	bool found = false;
-	Object *obj_next;
+        bool found = false;
+        Object *obj_next;
 
-	dreamland->removeOption( DL_SAVE_OBJS );
+        dreamland->removeOption( DL_SAVE_OBJS );
 
         bool fAll = arg[3] == '\0';
         DLString objnames; 
         if (!fAll)
             objnames = DLString(arguments.substr(4)).getOneArgument( );
         
-	for (obj = ch->carrying; obj != 0; obj = obj_next) {
-	    obj_next = obj->next_content;
+        for (obj = ch->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
 
             if (!fAll && !obj_has_name( obj, objnames, ch ))
-		continue;
-	    if (!ch->can_see( obj ))
-		continue;
-	    if (obj->wear_loc != wear_none)
-		continue;
-	    if (!can_drop_obj( ch, obj, true ))
-		continue;
+                continue;
+            if (!ch->can_see( obj ))
+                continue;
+            if (obj->wear_loc != wear_none)
+                continue;
+            if (!can_drop_obj( ch, obj, true ))
+                continue;
 
-	    found = true;
-	    drop_obj( ch, obj );
-	}
+            found = true;
+            drop_obj( ch, obj );
+        }
 
-	dreamland->resetOption( DL_SAVE_OBJS );
+        dreamland->resetOption( DL_SAVE_OBJS );
 
-	if (!found) {
-	    if (arg[3] == '\0')
-		act( "У тебя ничего нет.", ch, 0, arg, TO_CHAR );
-	    else
-		act( "У тебя нет $T.", ch, 0, is_number(&arg[4]) ? "этого":&arg[4], TO_CHAR );
-	}
-	else {
-	    save_items( ch->in_room );
-	}
+        if (!found) {
+            if (arg[3] == '\0')
+                act( "пё я┌п╣п╠я▐ п╫п╦я┤п╣пЁп╬ п╫п╣я┌.", ch, 0, arg, TO_CHAR );
+            else
+                act( "пё я┌п╣п╠я▐ п╫п╣я┌ $T.", ch, 0, is_number(&arg[4]) ? "я█я┌п╬пЁп╬":&arg[4], TO_CHAR );
+        }
+        else {
+            save_items( ch->in_room );
+        }
     }
 }
 
@@ -1199,15 +1199,15 @@ bool omprog_give( Object *obj, Character *ch, Character *victim )
     BEHAVIOR_VOID_CALL( obj, give, ch, victim )
 
     if (obj->carried_by != victim)
-	return true;
+        return true;
     
     FENIA_CALL( victim, "Give", "CO", ch, obj );
     FENIA_NDX_CALL( victim->getNPC( ), "Give", "CCO", victim, ch, obj );
     BEHAVIOR_VOID_CALL( victim->getNPC( ), give, ch, obj );
-	
+        
     if (obj->carried_by != victim)
-	return true;
-	
+        return true;
+        
     return oprog_get( obj, victim );
 }
 
@@ -1221,46 +1221,46 @@ static bool oprog_present( Object *obj, Character *ch, Character *victim )
 static void give_obj_char( Character *ch, Object *obj, Character *victim, int mode = GIVE_MODE_USUAL )
 {
     if (ch == victim) {
-	ch->printf("%s себе?\n\r", (mode ? "Подарить" : "Дать"));
-	return;
+        ch->printf("%s я│п╣п╠п╣?\n\r", (mode ? "п÷п╬п╢п╟я─п╦я┌я▄" : "п■п╟я┌я▄"));
+        return;
     }
 
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
-	ch->printf("Разве можно что-то %s призраку?\n\r", (mode ? "подарить" : "дать"));
-	return;
+        ch->printf("п═п╟п╥п╡п╣ п╪п╬п╤п╫п╬ я┤я┌п╬-я┌п╬ %s п©я─п╦п╥я─п╟п╨я┐?\n\r", (mode ? "п©п╬п╢п╟я─п╦я┌я▄" : "п╢п╟я┌я▄"));
+        return;
     }
 
     if ( !can_drop_obj( ch, obj ) )
     {
-	ch->send_to("Ты не можешь избавиться от этого.\n\r");
-	return;
+        ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ я█я┌п╬пЁп╬.\n\r");
+        return;
     }
 
     if ( victim->carry_number + obj->getNumber( ) > victim->canCarryNumber( ) )
     {
-	act_p( "$C1 не может нести столько вещей.", ch, 0, victim, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "$C1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╣я│я┌п╦ я│я┌п╬п╩я▄п╨п╬ п╡п╣я┴п╣п╧.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (victim->getCarryWeight( ) + obj->getWeight( ) > victim->canCarryWeight( ) )
     {
-	act_p( "$C1 не может нести такую тяжесть.", ch, 0, victim, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "$C1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╣я│я┌п╦ я┌п╟п╨я┐я▌ я┌я▐п╤п╣я│я┌я▄.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        return;
     }
 
     if ( !victim->can_see( obj ) )
     {
-	act_p( "$C1 не видит этого.", ch, 0, victim, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "$C1 п╫п╣ п╡п╦п╢п╦я┌ я█я┌п╬пЁп╬.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (obj->pIndexData->limit != -1)
     {
-	if (obj->isAntiAligned( victim )) {
-	    ch->pecho("%1$^C1 не сможет владеть этой вещью.", victim);
-	    return;
-	}
+        if (obj->isAntiAligned( victim )) {
+            ch->pecho("%1$^C1 п╫п╣ я│п╪п╬п╤п╣я┌ п╡п╩п╟п╢п╣я┌я▄ я█я┌п╬п╧ п╡п╣я┴я▄я▌.", victim);
+            return;
+        }
     }
 
     obj_from_char( obj );
@@ -1269,20 +1269,20 @@ static void give_obj_char( Character *ch, Object *obj, Character *victim, int mo
     switch (mode) {
     case GIVE_MODE_USUAL:
     default:
-	act( "$c1 дает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-	act( "$c1 дает тебе $o4.", ch, obj, victim, TO_VICT );
-	act( "Ты даешь $o4 $C3.", ch, obj, victim, TO_CHAR );
-	break;
+        act( "$c1 п╢п╟п╣я┌ $o4 $C3.", ch, obj, victim, TO_NOTVICT );
+        act( "$c1 п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, obj, victim, TO_VICT );
+        act( "п╒я▀ п╢п╟п╣я┬я▄ $o4 $C3.", ch, obj, victim, TO_CHAR );
+        break;
 
     case GIVE_MODE_PRESENT:
-	act( "$c1 дарит $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-	act( "$c1 дарит тебе $o4.", ch, obj, victim, TO_VICT );
-	act( "Ты даришь $o4 $C3.", ch, obj, victim, TO_CHAR );
+        act( "$c1 п╢п╟я─п╦я┌ $o4 $C3.", ch, obj, victim, TO_NOTVICT );
+        act( "$c1 п╢п╟я─п╦я┌ я┌п╣п╠п╣ $o4.", ch, obj, victim, TO_VICT );
+        act( "п╒я▀ п╢п╟я─п╦я┬я▄ $o4 $C3.", ch, obj, victim, TO_CHAR );
 
-	if (oprog_present( obj, ch, victim ))
-	    return;
+        if (oprog_present( obj, ch, victim ))
+            return;
 
-	break;
+        break;
     }
     
     omprog_give( obj, ch, victim );
@@ -1301,53 +1301,53 @@ static void give_money_char( Character *ch, int gold, int silver, Character *vic
 {
     if (ch == victim)
     {
-	    ch->send_to("Дать себе?\n\r");
-	    return;
+            ch->send_to("п■п╟я┌я▄ я│п╣п╠п╣?\n\r");
+            return;
     }
 
     if ( !victim->is_npc() && IS_GHOST( victim ) )
     {
-	    ch->send_to("Разве можно что-то дать призраку?\n\r");
-	    return;
+            ch->send_to("п═п╟п╥п╡п╣ п╪п╬п╤п╫п╬ я┤я┌п╬-я┌п╬ п╢п╟я┌я▄ п©я─п╦п╥я─п╟п╨я┐?\n\r");
+            return;
     }
 
     if( ( victim->getCarryWeight( ) + gold + silver / 10 ) > victim->canCarryWeight( ) )
     {
-	    act_p( "$c1 не может нести такой вес.", victim, 0, ch, TO_VICT,POS_RESTING);
-	    return;
+            act_p( "$c1 п╫п╣ п╪п╬п╤п╣я┌ п╫п╣я│я┌п╦ я┌п╟п╨п╬п╧ п╡п╣я│.", victim, 0, ch, TO_VICT,POS_RESTING);
+            return;
     }
 
-    ch->silver	-= silver;
-    ch->gold	-= gold;
-    victim->silver 	+= silver;
-    victim->gold	+= gold;
+    ch->silver        -= silver;
+    ch->gold        -= gold;
+    victim->silver         += silver;
+    victim->gold        += gold;
     
     if (silver > 0) {
-	DLString slv( silver );
-	if (mode == GIVE_MODE_PRESENT) {
-	    act( "$c1 дарит тебе $t серебра.", ch, slv.c_str( ), victim, TO_VICT);
-	    act("Ты даришь $C3 $t серебра.",ch, slv.c_str( ), victim, TO_CHAR);
-	} else {
-	    act( "$c1 дает тебе $t серебра.", ch, slv.c_str( ), victim, TO_VICT);
-	    act("Ты даешь $C3 $t серебра.",ch, slv.c_str( ), victim, TO_CHAR);
-	}
+        DLString slv( silver );
+        if (mode == GIVE_MODE_PRESENT) {
+            act( "$c1 п╢п╟я─п╦я┌ я┌п╣п╠п╣ $t я│п╣я─п╣п╠я─п╟.", ch, slv.c_str( ), victim, TO_VICT);
+            act("п╒я▀ п╢п╟я─п╦я┬я▄ $C3 $t я│п╣я─п╣п╠я─п╟.",ch, slv.c_str( ), victim, TO_CHAR);
+        } else {
+            act( "$c1 п╢п╟п╣я┌ я┌п╣п╠п╣ $t я│п╣я─п╣п╠я─п╟.", ch, slv.c_str( ), victim, TO_VICT);
+            act("п╒я▀ п╢п╟п╣я┬я▄ $C3 $t я│п╣я─п╣п╠я─п╟.",ch, slv.c_str( ), victim, TO_CHAR);
+        }
     }
     
     if (gold > 0) {
-	DLString gld( gold );
-	if (mode == GIVE_MODE_PRESENT) {
-	    act( "$c1 дарит тебе $t золота.", ch, gld.c_str( ), victim, TO_VICT);
-	    act("Ты даришь $C3 $t золота.",ch, gld.c_str( ), victim, TO_CHAR);
-	} else {
-	    act( "$c1 дает тебе $t золота.", ch, gld.c_str( ), victim, TO_VICT);
-	    act("Ты даешь $C3 $t золота.",ch, gld.c_str( ), victim, TO_CHAR);
-	}
+        DLString gld( gold );
+        if (mode == GIVE_MODE_PRESENT) {
+            act( "$c1 п╢п╟я─п╦я┌ я┌п╣п╠п╣ $t п╥п╬п╩п╬я┌п╟.", ch, gld.c_str( ), victim, TO_VICT);
+            act("п╒я▀ п╢п╟я─п╦я┬я▄ $C3 $t п╥п╬п╩п╬я┌п╟.",ch, gld.c_str( ), victim, TO_CHAR);
+        } else {
+            act( "$c1 п╢п╟п╣я┌ я┌п╣п╠п╣ $t п╥п╬п╩п╬я┌п╟.", ch, gld.c_str( ), victim, TO_VICT);
+            act("п╒я▀ п╢п╟п╣я┬я▄ $C3 $t п╥п╬п╩п╬я┌п╟.",ch, gld.c_str( ), victim, TO_CHAR);
+        }
     }
 
     if (mode == GIVE_MODE_PRESENT) {
-	act( "$c1 дарит $C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        act( "$c1 п╢п╟я─п╦я┌ $C3 п╫п╣я│п╨п╬п╩я▄п╨п╬ п╪п╬п╫п╣я┌.",  ch, 0, victim, TO_NOTVICT);
     } else {
-	act( "$c1 дает $C3 несколько монет.",  ch, 0, victim, TO_NOTVICT);
+        act( "$c1 п╢п╟п╣я┌ $C3 п╫п╣я│п╨п╬п╩я▄п╨п╬ п╪п╬п╫п╣я┌.",  ch, 0, victim, TO_NOTVICT);
     }
     
     mprog_bribe( victim, ch, gold, silver );
@@ -1361,19 +1361,19 @@ static void give_money( Character *ch, char *arg1, char *arg2, char *argument, i
 
     amount   = atoi(arg1);
     if (!parse_money_arguments( ch, arg2, amount, gold, silver ))
-	return;
+        return;
 
     argument = one_argument( argument, arg2 );
     if ( arg2[0] == '\0' )
     {
-	    ch->send_to("Дать что и кому?\n\r");
-	    return;
+            ch->send_to("п■п╟я┌я▄ я┤я┌п╬ п╦ п╨п╬п╪я┐?\n\r");
+            return;
     }
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-	    ch->send_to("Нет этого тут.\n\r");
-	    return;
+            ch->send_to("п²п╣я┌ я█я┌п╬пЁп╬ я┌я┐я┌.\n\r");
+            return;
     }
 
     give_money_char( ch, gold, silver, victim, mode );
@@ -1391,25 +1391,25 @@ CMDRUNP( give )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-	    ch->send_to("Дать что и кому?\n\r");
-	    return;
+            ch->send_to("п■п╟я┌я▄ я┤я┌п╬ п╦ п╨п╬п╪я┐?\n\r");
+            return;
     }
 
     if (is_number( arg1 ) && get_arg_id( arg1 ) == 0) {
-	give_money( ch, arg1, arg2, argument );
-	return;
+        give_money( ch, arg1, arg2, argument );
+        return;
     }
 
     if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-	ch->send_to("У тебя нет этого.\n\r");
-	return;
+        ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
+        return;
     }
 
     if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-	ch->send_to("Тому, кого нет здесь?.\n\r");
-	return;
+        ch->send_to("п╒п╬п╪я┐, п╨п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄?.\n\r");
+        return;
     }
     
     give_obj_char( ch, obj, victim );
@@ -1426,23 +1426,23 @@ CMDRUNP( present )
     argument = one_argument( argument, arg2 );
 
     if (arg1[0] == '\0' || arg2[0] == '\0') {
-	ch->println( "Что и кому ты хочешь подарить?" );
-	return;
+        ch->println( "п╖я┌п╬ п╦ п╨п╬п╪я┐ я┌я▀ я┘п╬я┤п╣я┬я▄ п©п╬п╢п╟я─п╦я┌я▄?" );
+        return;
     }
 
     if (is_number( arg1 ) && get_arg_id( arg1 ) == 0) {
-	give_money( ch, arg1, arg2, argument, GIVE_MODE_PRESENT );
-	return;
+        give_money( ch, arg1, arg2, argument, GIVE_MODE_PRESENT );
+        return;
     }
 
     if (( obj = get_obj_carry( ch, arg1 ) ) == 0) {
-	ch->println( "У тебя нет этого." );
-	return;
+        ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬." );
+        return;
     }
 
     if (( victim = get_char_room( ch, arg2 ) ) == 0) {
-	ch->println( "Они ушли, не дождавшись подарков." );
-	return;
+        ch->println( "п·п╫п╦ я┐я┬п╩п╦, п╫п╣ п╢п╬п╤п╢п╟п╡я┬п╦я│я▄ п©п╬п╢п╟я─п╨п╬п╡." );
+        return;
     }
     
     give_obj_char( ch, obj, victim, GIVE_MODE_PRESENT );
@@ -1453,31 +1453,31 @@ CMDRUNP( present )
  */
 static bool can_sacrifice( Character *ch, Object *obj, bool needSpam ) 
 {
-	if (!ch->can_see( obj ))
-	    return false;
+        if (!ch->can_see( obj ))
+            return false;
 
-	if (obj->item_type == ITEM_CORPSE_PC)
-	{
-		if (needSpam)
-			ch->send_to("Богам это не понравится.\n\r");
-		return false;
-	}
+        if (obj->item_type == ITEM_CORPSE_PC)
+        {
+                if (needSpam)
+                        ch->send_to("п▒п╬пЁп╟п╪ я█я┌п╬ п╫п╣ п©п╬п╫я─п╟п╡п╦я┌я│я▐.\n\r");
+                return false;
+        }
 
-	if ( !obj->can_wear(ITEM_TAKE) || obj->can_wear(ITEM_NO_SAC) 
-	     || IS_SET(obj->extra_flags, ITEM_NOSAC))
-	{
-		if (needSpam) 
-		    ch->pecho( "%1$^O1 не подлеж%1$nит|ат жертвоприношению.", obj );
-		return false;
-	}
+        if ( !obj->can_wear(ITEM_TAKE) || obj->can_wear(ITEM_NO_SAC) 
+             || IS_SET(obj->extra_flags, ITEM_NOSAC))
+        {
+                if (needSpam) 
+                    ch->pecho( "%1$^O1 п╫п╣ п©п╬п╢п╩п╣п╤%1$nп╦я┌|п╟я┌ п╤п╣я─я┌п╡п╬п©я─п╦п╫п╬я┬п╣п╫п╦я▌.", obj );
+                return false;
+        }
 
-	if ( IS_SET(obj->item_type,ITEM_FURNITURE)
-		&& ( count_users(obj) > 0 ) )
-	{
-		if (needSpam) 
-		    ch->pecho( "%1$^O1 использу%1$nется|ются.", obj );
-		return false;
-	}
+        if ( IS_SET(obj->item_type,ITEM_FURNITURE)
+                && ( count_users(obj) > 0 ) )
+        {
+                if (needSpam) 
+                    ch->pecho( "%1$^O1 п╦я│п©п╬п╩я▄п╥я┐%1$nп╣я┌я│я▐|я▌я┌я│я▐.", obj );
+                return false;
+        }
 
   return true;
 }
@@ -1490,16 +1490,16 @@ static int rescue_nosac_items ( Object *container, Room *room )
     int count = 0;
     
     for ( item = container->contains; item; item = obj_next ) {
-	obj_next = item->next_content;
-	
-	if (item->contains) 
-	    count += rescue_nosac_items(item, room);
+        obj_next = item->next_content;
+        
+        if (item->contains) 
+            count += rescue_nosac_items(item, room);
 
-	if (item->can_wear(ITEM_NO_SAC) || IS_SET(item->extra_flags, ITEM_NOSAC)) {
-	    obj_from_obj(item);
-	    obj_to_room(item, room);	
-	    count++;
-	}
+        if (item->can_wear(ITEM_NO_SAC) || IS_SET(item->extra_flags, ITEM_NOSAC)) {
+            obj_from_obj(item);
+            obj_to_room(item, room);        
+            count++;
+        }
     }
     
     return count;
@@ -1516,158 +1516,158 @@ static bool oprog_sac( Object *obj, Character *ch )
 
 int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
 {
-	int silver = -1;
+        int silver = -1;
 
-	if ( !can_sacrifice(ch, obj, needSpam) )
-		return -1;
+        if ( !can_sacrifice(ch, obj, needSpam) )
+                return -1;
 
         silver = number_range(number_fuzzy(obj->level), obj->cost / 10);
 
-	if (needSpam)
-	    act_p( "$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
+        if (needSpam)
+            act_p( "$c1 п©я─п╦п╫п╬я│п╦я┌ п╡ п╤п╣я─я┌п╡я┐ п╠п╬пЁп╟п╪ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
 
-	if (oprog_sac( obj, ch ))
-		return silver;
-	
-	if (needSpam)
-	    wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит во всесожжение %O4.", ch, obj );
+        if (oprog_sac( obj, ch ))
+                return silver;
+        
+        if (needSpam)
+            wiznet( WIZ_SACCING, 0, 0, "%^C1 п©я─п╦п╫п╬я│п╦я┌ п╡п╬ п╡я│п╣я│п╬п╤п╤п╣п╫п╦п╣ %O4.", ch, obj );
 
-	if (rescue_nosac_items(obj, ch->in_room)) 
-	    if (needSpam)
-		act( "Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", 
-		     ch, obj, terrains[ch->in_room->sector_type].fall, TO_ALL );
+        if (rescue_nosac_items(obj, ch->in_room)) 
+            if (needSpam)
+                act( "п²п╣п╨п╬я┌п╬я─я▀п╣ п╡п╣я┴п╦, п╩п╣п╤п╟я┴п╦п╣ п╡ $o6, п╫п╣ п╪п╬пЁя┐я┌ п╠я▀я┌я▄ п©я─п╦п╫п╣я│п╣п╫я▀ п╡ п╤п╣я─я┌п╡я┐ п╦ п©п╟п╢п╟я▌я┌ $T.", 
+                     ch, obj, terrains[ch->in_room->sector_type].fall, TO_ALL );
 
-	extract_obj( obj );
-	return silver;
+        extract_obj( obj );
+        return silver;
 }
 
 CMDRUNP( sacrifice )
 {
-	char arg[MAX_INPUT_LENGTH];
-	char buf[MAX_STRING_LENGTH];
-	Object *obj, *next_obj;
-	int silver, mana_gain;
+        char arg[MAX_INPUT_LENGTH];
+        char buf[MAX_STRING_LENGTH];
+        Object *obj, *next_obj;
+        int silver, mana_gain;
 
-	mana_gain=-1;
+        mana_gain=-1;
 
-	one_argument( argument, arg );
+        one_argument( argument, arg );
 
-	if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) )
-	{
-		act_p( "$c1 предлагает себя в жертву богам, но они вежливо отказываются.",
-			ch, 0, 0, TO_ROOM,POS_RESTING);
-		ch->send_to("Боги оценили твою жертву и возможно примут ее позже.\n\r");
-		return;
-	}
+        if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) )
+        {
+                act_p( "$c1 п©я─п╣п╢п╩п╟пЁп╟п╣я┌ я│п╣п╠я▐ п╡ п╤п╣я─я┌п╡я┐ п╠п╬пЁп╟п╪, п╫п╬ п╬п╫п╦ п╡п╣п╤п╩п╦п╡п╬ п╬я┌п╨п╟п╥я▀п╡п╟я▌я┌я│я▐.",
+                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                ch->send_to("п▒п╬пЁп╦ п╬я├п╣п╫п╦п╩п╦ я┌п╡п╬я▌ п╤п╣я─я┌п╡я┐ п╦ п╡п╬п╥п╪п╬п╤п╫п╬ п©я─п╦п╪я┐я┌ п╣п╣ п©п╬п╥п╤п╣.\n\r");
+                return;
+        }
 
-	if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-            ch->send_to("Бог не хочет принять твою жертву.\r\n");
-	    return;
-	}
+        if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
+            ch->send_to("п▒п╬пЁ п╫п╣ я┘п╬я┤п╣я┌ п©я─п╦п╫я▐я┌я▄ я┌п╡п╬я▌ п╤п╣я─я┌п╡я┐.\r\n");
+            return;
+        }
 
-	if (arg_is_all( arg ))
-	{
-		int count = 0;
-		obj = ch->in_room->contents;
+        if (arg_is_all( arg ))
+        {
+                int count = 0;
+                obj = ch->in_room->contents;
 
-		silver = 0;
-		dreamland->removeOption( DL_SAVE_OBJS );
+                silver = 0;
+                dreamland->removeOption( DL_SAVE_OBJS );
 
-		while( obj!=0 )
-		{
-			if (can_sacrifice( ch, obj, false))
-			{
-				next_obj = obj->next_content;
-				silver += sacrifice_obj( ch, obj, false);
-				count++;
-				obj = next_obj;
-			}
-			else
-				obj = obj->next_content;
-		}
+                while( obj!=0 )
+                {
+                        if (can_sacrifice( ch, obj, false))
+                        {
+                                next_obj = obj->next_content;
+                                silver += sacrifice_obj( ch, obj, false);
+                                count++;
+                                obj = next_obj;
+                        }
+                        else
+                                obj = obj->next_content;
+                }
 
-		dreamland->resetOption( DL_SAVE_OBJS );
+                dreamland->resetOption( DL_SAVE_OBJS );
 
-		save_items( ch->in_room );
-		
-		if (count == 0) {
-		    act("Ты не наш$gло|ел|ла ничего подходящего для жертвоприношения.", ch, 0, 0, TO_CHAR);
-		    return;
-		}
-		
-		act( "$c1 приносит в жертву богам все, что находится $T.", ch, 0, terrains[ch->in_room->sector_type].where, TO_ROOM );
-		wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->name );
+                save_items( ch->in_room );
+                
+                if (count == 0) {
+                    act("п╒я▀ п╫п╣ п╫п╟я┬$gп╩п╬|п╣п╩|п╩п╟ п╫п╦я┤п╣пЁп╬ п©п╬п╢я┘п╬п╢я▐я┴п╣пЁп╬ п╢п╩я▐ п╤п╣я─я┌п╡п╬п©я─п╦п╫п╬я┬п╣п╫п╦я▐.", ch, 0, 0, TO_CHAR);
+                    return;
+                }
+                
+                act( "$c1 п©я─п╦п╫п╬я│п╦я┌ п╡ п╤п╣я─я┌п╡я┐ п╠п╬пЁп╟п╪ п╡я│п╣, я┤я┌п╬ п╫п╟я┘п╬п╢п╦я┌я│я▐ $T.", ch, 0, terrains[ch->in_room->sector_type].where, TO_ROOM );
+                wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->name );
 
-		if (silver==0) {
-		    return;
-		}
-	}
-	else
-	{
-		obj = get_obj_list( ch, arg, ch->in_room->contents );
-		if ( obj == 0 )
-		{
-			ch->send_to("Ты не находишь это.\n\r");
-			return;
-		}
+                if (silver==0) {
+                    return;
+                }
+        }
+        else
+        {
+                obj = get_obj_list( ch, arg, ch->in_room->contents );
+                if ( obj == 0 )
+                {
+                        ch->send_to("п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ я█я┌п╬.\n\r");
+                        return;
+                }
 
-		if ( (  obj->item_type == ITEM_CORPSE_NPC  )
-			&& number_percent() < gsn_crusify->getEffective( ch ) )
-		{
-			mana_gain = ch->getModifyLevel();
-			gsn_crusify->improve( ch, true );
-		} 	
+                if ( (  obj->item_type == ITEM_CORPSE_NPC  )
+                        && number_percent() < gsn_crusify->getEffective( ch ) )
+                {
+                        mana_gain = ch->getModifyLevel();
+                        gsn_crusify->improve( ch, true );
+                }         
 
-		if ( ( silver=sacrifice_obj(ch, obj, true) )<0 )
-			return;
-	}
+                if ( ( silver=sacrifice_obj(ch, obj, true) )<0 )
+                        return;
+        }
 
-	if (mana_gain != -1 )
-	{
-		ch->mana += mana_gain;
-		sprintf(buf,"Боги дают тебе %d энергии за сожжение.\n\r", mana_gain);
-		ch->send_to(buf);
-	}
+        if (mana_gain != -1 )
+        {
+                ch->mana += mana_gain;
+                sprintf(buf,"п▒п╬пЁп╦ п╢п╟я▌я┌ я┌п╣п╠п╣ %d я█п╫п╣я─пЁп╦п╦ п╥п╟ я│п╬п╤п╤п╣п╫п╦п╣.\n\r", mana_gain);
+                ch->send_to(buf);
+        }
 
-	sprintf(buf,"Боги дают тебе %d серебрян%s за жертвоприношение.\n\r",
-		silver,GET_COUNT(silver,"ую монету","ые монеты","ых монет"));
-	ch->send_to(buf);
+        sprintf(buf,"п▒п╬пЁп╦ п╢п╟я▌я┌ я┌п╣п╠п╣ %d я│п╣я─п╣п╠я─я▐п╫%s п╥п╟ п╤п╣я─я┌п╡п╬п©я─п╦п╫п╬я┬п╣п╫п╦п╣.\n\r",
+                silver,GET_COUNT(silver,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
+        ch->send_to(buf);
 
-	ch->silver += silver;
+        ch->silver += silver;
 
-	if (IS_SET(ch->act,PLR_AUTOSPLIT))
-	    if (silver > 1)
-		if (party_members_room( ch ).size( ) > 1)
-		    interpret_raw( ch, "split", "%d", silver );
+        if (IS_SET(ch->act,PLR_AUTOSPLIT))
+            if (silver > 1)
+                if (party_members_room( ch ).size( ) > 1)
+                    interpret_raw( ch, "split", "%d", silver );
 }
 
-// код прочистки желудка "двухпальцевым методом" ,)
+// п╨п╬п╢ п©я─п╬я┤п╦я│я┌п╨п╦ п╤п╣п╩я┐п╢п╨п╟ "п╢п╡я┐я┘п©п╟п╩я▄я├п╣п╡я▀п╪ п╪п╣я┌п╬п╢п╬п╪" ,)
 static void mprog_vomit( Character *ch )
 {
     FENIA_VOID_CALL( ch, "Vomit", "C", ch );
     FENIA_NDX_VOID_CALL( ch->getNPC( ), "Vomit", "CC", ch, ch );
 
     for (Object *obj = ch->carrying; obj; obj = obj->next_content) {
-	FENIA_VOID_CALL( obj, "Vomit", "C", ch );
-	FENIA_NDX_VOID_CALL( obj, "Vomit", "OC", obj, ch );
+        FENIA_VOID_CALL( obj, "Vomit", "C", ch );
+        FENIA_NDX_VOID_CALL( obj, "Vomit", "OC", obj, ch );
     }
 }
 
 CMDRUNP( vomit )
 {
     if (!ch->is_npc( )) {
-	if (desire_bloodlust->applicable( ch->getPC( ) )) {
-	    ch->send_to("Ты ведь вампир, не так ли?\n\r");
-	    return;
-	}
-	
-	desire_full->vomit( ch->getPC( ) );
-	desire_hunger->vomit( ch->getPC( ) );
-	desire_thirst->vomit( ch->getPC( ) );
+        if (desire_bloodlust->applicable( ch->getPC( ) )) {
+            ch->send_to("п╒я▀ п╡п╣п╢я▄ п╡п╟п╪п©п╦я─, п╫п╣ я┌п╟п╨ п╩п╦?\n\r");
+            return;
+        }
+        
+        desire_full->vomit( ch->getPC( ) );
+        desire_hunger->vomit( ch->getPC( ) );
+        desire_thirst->vomit( ch->getPC( ) );
     }
 
-    act_p("$c1 засовывает два пальца в рот и начинает блевать.",ch,0,0,TO_ROOM,POS_RESTING);
-    ch->send_to("Ты прочищаешь свой желудок двухпальцевым методом.\n\r");
+    act_p("$c1 п╥п╟я│п╬п╡я▀п╡п╟п╣я┌ п╢п╡п╟ п©п╟п╩я▄я├п╟ п╡ я─п╬я┌ п╦ п╫п╟я┤п╦п╫п╟п╣я┌ п╠п╩п╣п╡п╟я┌я▄.",ch,0,0,TO_ROOM,POS_RESTING);
+    ch->send_to("п╒я▀ п©я─п╬я┤п╦я┴п╟п╣я┬я▄ я│п╡п╬п╧ п╤п╣п╩я┐п╢п╬п╨ п╢п╡я┐я┘п©п╟п╩я▄я├п╣п╡я▀п╪ п╪п╣я┌п╬п╢п╬п╪.\n\r");
 
     mprog_vomit( ch );
 }
@@ -1685,7 +1685,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
     switch(obj->item_type) {
         case ITEM_POTION:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
-                ch->pecho("%1$^O1 долж%1$Gно|ен|на находиться в твоем инвентаре.", obj);
+                ch->pecho("%1$^O1 п╢п╬п╩п╤%1$Gп╫п╬|п╣п╫|п╫п╟ п╫п╟я┘п╬п╢п╦я┌я▄я│я▐ п╡ я┌п╡п╬п╣п╪ п╦п╫п╡п╣п╫я┌п╟я─п╣.", obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
                 interpret_cmd( ch, "quaff", idArg.c_str( ) );
@@ -1693,7 +1693,7 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             return true;
         case ITEM_SCROLL:
             if (obj->carried_by != ch || obj->wear_loc != wear_none) 
-                ch->pecho("%1$^O1 долж%1$Gно|ен|на находиться в твоем инвентаре.", obj);
+                ch->pecho("%1$^O1 п╢п╬п╩п╤%1$Gп╫п╬|п╣п╫|п╫п╟ п╫п╟я┘п╬п╢п╦я┌я▄я│я▐ п╡ я┌п╡п╬п╣п╪ п╦п╫п╡п╣п╫я┌п╟я─п╣.", obj);
             else {
                 DLString idArg = DLString( obj->getID( ) ) + " " + argument;
                 interpret_cmd( ch, "recite", idArg.c_str( ) );
@@ -1701,13 +1701,13 @@ static bool oprog_use( Object *obj, Character *ch, const char *argument )
             return true;
         case ITEM_WAND:
             if (obj->wear_loc != wear_hold) 
-                ch->pecho("%1$^O4 сперва необходимо зажать в руках.", obj);
+                ch->pecho("%1$^O4 я│п©п╣я─п╡п╟ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╥п╟п╤п╟я┌я▄ п╡ я─я┐п╨п╟я┘.", obj);
             else
                 interpret_cmd( ch, "zap", argument );
             return true;
         case ITEM_STAFF:
             if (obj->wear_loc != wear_hold) 
-                ch->pecho("%1$^O4 сперва необходимо зажать в руках.", obj);
+                ch->pecho("%1$^O4 я│п©п╣я─п╡п╟ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ п╥п╟п╤п╟я┌я▄ п╡ я─я┐п╨п╟я┘.", obj);
             else
                 interpret_cmd( ch, "brandish", argument );
             return true;
@@ -1724,27 +1724,27 @@ CMDRUNP( use )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-	ch->send_to("Воспользоваться чем?\n\r");
-	return;
+        ch->send_to("п▓п╬я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄я│я▐ я┤п╣п╪?\n\r");
+        return;
     }
 
     if ( !( obj = get_obj_here( ch, arg ) ))
     {
-	act_p( "Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я█я┌п╬пЁп╬.", ch, 0, 0, TO_CHAR,POS_RESTING);
+        return;
     }
     
     if (oprog_use( obj, ch, argument ))
-	return;
+        return;
     
     if (obj->carried_by == ch) {
-	act("Ты вертишь в руках $o4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-	act("$c1 вертит в руках $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        act("п╒я▀ п╡п╣я─я┌п╦я┬я▄ п╡ я─я┐п╨п╟я┘ $o4, п╫п╣ п╥п╫п╟я▐, я┤я┌п╬ я│ я█я┌п╦п╪ п╢п╣п╩п╟я┌я▄.", ch, obj, 0, TO_CHAR);
+        act("$c1 п╡п╣я─я┌п╦я┌ п╡ я─я┐п╨п╟я┘ $o4, я▐п╡п╫п╬ п╫п╣ п╥п╫п╟я▐, я┤я┌п╬ я│ я█я┌п╦п╪ п╢п╣п╩п╟я┌я▄.", ch, obj, 0, TO_ROOM);
     } else {
-	act("Ты озадаченно ощупываешь $o4, не зная, что с этим делать.", ch, obj, 0, TO_CHAR);
-	act("$c1 озадаченно ощупывает $o4, явно не зная, что с этим делать.", ch, obj, 0, TO_ROOM);
+        act("п╒я▀ п╬п╥п╟п╢п╟я┤п╣п╫п╫п╬ п╬я┴я┐п©я▀п╡п╟п╣я┬я▄ $o4, п╫п╣ п╥п╫п╟я▐, я┤я┌п╬ я│ я█я┌п╦п╪ п╢п╣п╩п╟я┌я▄.", ch, obj, 0, TO_CHAR);
+        act("$c1 п╬п╥п╟п╢п╟я┤п╣п╫п╫п╬ п╬я┴я┐п©я▀п╡п╟п╣я┌ $o4, я▐п╡п╫п╬ п╫п╣ п╥п╫п╟я▐, я┤я┌п╬ я│ я█я┌п╦п╪ п╢п╣п╩п╟я┌я▄.", ch, obj, 0, TO_ROOM);
     }
-}	
+}        
 
 /*
  * commands with separate sub-cmds: make, throw, search
@@ -1754,18 +1754,18 @@ CMDRUNP( make )
     DLString args = argument, arg = args.getOneArgument( );
 
     if (!arg.empty( )) {
-	if (arg.strPrefix( "arrow" ) || arg.strPrefix( "стрелы" ) || arg.strPrefix( "стрелу")) {
-	    interpret_cmd( ch, "makearrow", args.c_str( ) );
-	    return;
-	}
-		
-	if (arg.strPrefix( "bow" ) || arg.strPrefix( "лук" )) {
-	    interpret_cmd( ch, "makebow", args.c_str( ) );
-	    return;
-	}
+        if (arg.strPrefix( "arrow" ) || arg.strPrefix( "я│я┌я─п╣п╩я▀" ) || arg.strPrefix( "я│я┌я─п╣п╩я┐")) {
+            interpret_cmd( ch, "makearrow", args.c_str( ) );
+            return;
+        }
+                
+        if (arg.strPrefix( "bow" ) || arg.strPrefix( "п╩я┐п╨" )) {
+            interpret_cmd( ch, "makebow", args.c_str( ) );
+            return;
+        }
     }
 
-    ch->println("Ты можешь изготовить только лук(bow) или стрелы(arrow).");
+    ch->println("п╒я▀ п╪п╬п╤п╣я┬я▄ п╦п╥пЁп╬я┌п╬п╡п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╩я┐п╨(bow) п╦п╩п╦ я│я┌я─п╣п╩я▀(arrow).");
 }
 
 CMDRUNP( search )
@@ -1773,13 +1773,13 @@ CMDRUNP( search )
     DLString args = argument, arg = args.getOneArgument( );
 
     if (!arg.empty( )) {
-	if (arg.strPrefix( "stones" ) || arg.strPrefix( "камни" )) {
-	    interpret_cmd( ch, "searchstones", args.c_str( ) );
-	    return;
-	}
+        if (arg.strPrefix( "stones" ) || arg.strPrefix( "п╨п╟п╪п╫п╦" )) {
+            interpret_cmd( ch, "searchstones", args.c_str( ) );
+            return;
+        }
     }
 
-    ch->println("Ты можешь искать только камни(stones).");
+    ch->println("п╒я▀ п╪п╬п╤п╣я┬я▄ п╦я│п╨п╟я┌я▄ я┌п╬п╩я▄п╨п╬ п╨п╟п╪п╫п╦(stones).");
 }
 
 CMDRUNP( throw )
@@ -1787,15 +1787,15 @@ CMDRUNP( throw )
     DLString args = argument, arg = args.getOneArgument( );
 
     if (!arg.empty( )) {
-	if (arg.strPrefix( "spear" ) || arg.strPrefix( "копье" )) {
-	    interpret_cmd( ch, "throwspear", args.c_str( ) );
-	    return;
-	}
+        if (arg.strPrefix( "spear" ) || arg.strPrefix( "п╨п╬п©я▄п╣" )) {
+            interpret_cmd( ch, "throwspear", args.c_str( ) );
+            return;
+        }
 
-	if (arg.strPrefix( "stone" ) || arg.strPrefix( "камень" )) {
-	    interpret_cmd( ch, "throwstone", args.c_str( ) );
-	    return;
-	}
+        if (arg.strPrefix( "stone" ) || arg.strPrefix( "п╨п╟п╪п╣п╫я▄" )) {
+            interpret_cmd( ch, "throwstone", args.c_str( ) );
+            return;
+        }
     }
 
     interpret_cmd( ch, "throwdown", argument );

@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "group_necromancy.h"
@@ -51,40 +51,40 @@ void AdamantiteGolem::fight( Character *victim )
     Character *master, *rch;
     int mirrors;
 
-    BasicMobileDestiny::fight( victim );	
+    BasicMobileDestiny::fight( victim );        
     
     master = ch->master;
 
     if (!master
-	|| !master->fighting
-	|| master->is_npc( )
-	|| master->getTrueProfession( ) != prof_necromancer)
-	return;
+        || !master->fighting
+        || master->is_npc( )
+        || master->getTrueProfession( ) != prof_necromancer)
+        return;
     
     if (master->fighting->fighting != master)
-	return;
+        return;
 
     if (ch->fighting == master)
-	return;
+        return;
     
     if (!ch->can_see( master ))
-	return;
+        return;
 
     if (is_safe( ch, master->fighting ) || is_safe( ch, master ))
-	return;
+        return;
 
     for (mirrors = 0, rch = ch->in_room->people; rch; rch = rch->next_in_room)
-	if (rch->is_mirror( ) && rch->doppel == master)
-	    mirrors++;
+        if (rch->is_mirror( ) && rch->doppel == master)
+            mirrors++;
     
     if (number_percent( ) > 100 - mirrors * 5)
-	return;
+        return;
 
     ch->setWait( gsn_rescue->getBeats( )  );
     
-    act( "ÙŸ ”–¡”¡≈€ÿ $C4!",  ch, 0, master, TO_CHAR );
-    act( "$c1 ”–¡”¡≈‘ ‘≈¬—!", ch, 0, master, TO_VICT );
-    act( "$c1 ”–¡”¡≈‘ $C4!",  ch, 0, master, TO_NOTVICT );
+    act( "–¢—ã —Å–ø–∞—Å–∞–µ—à—å $C4!",  ch, 0, master, TO_CHAR );
+    act( "$c1 —Å–ø–∞—Å–∞–µ—Ç —Ç–µ–±—è!", ch, 0, master, TO_VICT );
+    act( "$c1 —Å–ø–∞—Å–∞–µ—Ç $C4!",  ch, 0, master, TO_NOTVICT );
 
     stop_fighting( master->fighting, false );
     set_fighting( ch, master->fighting);
@@ -95,12 +95,12 @@ SPELL_DECL_T(AdamantiteGolem, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, AdamantiteGolem)::createMobile( Character *ch, int level ) const 
 {
     NPCharacter *mob = createMobileAux( ch, ch->getModifyLevel( ), 
-	                             10 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 4000,
-				     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-				     13, 9, ch->getModifyLevel( ) / 2 + 10 );
+                                     10 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 4000,
+                                     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
+                                     13, 9, ch->getModifyLevel( ) / 2 + 10 );
     
     for (int i = 0; i < stat_table.size; i ++)
-	mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
+        mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
 
     mob->perm_stat[STAT_STR] += 3;
     mob->perm_stat[STAT_INT] -= 1;
@@ -113,12 +113,12 @@ SPELL_DECL_T(IronGolem, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, IronGolem)::createMobile( Character *ch, int level ) const 
 {
     NPCharacter *mob = createMobileAux( ch, ch->getModifyLevel( ), 
-	                             10 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 1000,
-				     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-				     11, 5, ch->getModifyLevel( ) / 2 + 10 );
+                                     10 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 1000,
+                                     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
+                                     11, 5, ch->getModifyLevel( ) / 2 + 10 );
     
     for (int i = 0; i < stat_table.size; i ++)
-	mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
+        mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
 
     mob->perm_stat[STAT_STR] += 3;
     mob->perm_stat[STAT_INT] -= 1;
@@ -131,12 +131,12 @@ SPELL_DECL_T(LesserGolem, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, LesserGolem)::createMobile( Character *ch, int level ) const 
 {
     NPCharacter *mob = createMobileAux( ch, ch->getModifyLevel( ), 
-	                             2 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 400,
-				     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-				     3, 10, ch->getModifyLevel( ) / 2 );
+                                     2 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 400,
+                                     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
+                                     3, 10, ch->getModifyLevel( ) / 2 );
     
     for (int i = 0; i < stat_table.size; i ++)
-	mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
+        mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
 
     mob->perm_stat[STAT_STR] += 3;
     mob->perm_stat[STAT_INT] -= 1;
@@ -148,12 +148,12 @@ SPELL_DECL_T(StoneGolem, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, StoneGolem)::createMobile( Character *ch, int level ) const 
 {
     NPCharacter *mob = createMobileAux( ch, ch->getModifyLevel( ), 
-	                             5 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 2000,
-				     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
-				     8, 4, ch->getModifyLevel( ) / 2 );
+                                     5 * (ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit) + 2000,
+                                     (ch->is_npc( ) ? ch->max_mana : ch->getPC( )->perm_mana),
+                                     8, 4, ch->getModifyLevel( ) / 2 );
     
     for (int i = 0; i < stat_table.size; i ++)
-	mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
+        mob->perm_stat[i] = min( 25, 15 + ch->getModifyLevel( ) / 10 );
 
     mob->perm_stat[STAT_STR] += 3;
     mob->perm_stat[STAT_INT] -= 1;
@@ -166,147 +166,147 @@ SPELL_DECL_T(SummonShadow, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, SummonShadow)::createMobile( Character *ch, int level ) const 
 {
     return createMobileAux( ch, ch->getModifyLevel( ), 
-	                 ch->max_hit, ch->max_mana,
-			 number_range(level/15, level/10),
-			 number_range(level/3, level/2),
-			 number_range(level/8, level/6) );
+                         ch->max_hit, ch->max_mana,
+                         number_range(level/15, level/10),
+                         number_range(level/3, level/2),
+                         number_range(level/8, level/6) );
 }
 
 SPELL_DECL(AnimateDead);
 VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level ) 
 {
-	NPCharacter *undead;
-	Object *obj2,*next;
-	MOB_INDEX_DATA *pCorpseOwner = 0;
-	char buf[MAX_STRING_LENGTH];
-	char buf3[MAX_STRING_LENGTH];
-	char arg[MAX_STRING_LENGTH];
-	char *argument;
-	int i;
+        NPCharacter *undead;
+        Object *obj2,*next;
+        MOB_INDEX_DATA *pCorpseOwner = 0;
+        char buf[MAX_STRING_LENGTH];
+        char buf3[MAX_STRING_LENGTH];
+        char arg[MAX_STRING_LENGTH];
+        char *argument;
+        int i;
 
-	if ( !(obj->item_type == ITEM_CORPSE_NPC
-			|| obj->item_type == ITEM_CORPSE_PC))
-	{
-		ch->send_to("ÙŸ Õœ÷≈€ÿ ◊œ”À“≈”…‘ÿ ‘œÃÿÀœ ‘“’–!!!\n\r");
-		return;
-	}
+        if ( !(obj->item_type == ITEM_CORPSE_NPC
+                        || obj->item_type == ITEM_CORPSE_PC))
+        {
+                ch->send_to("–¢—ã –º–æ–∂–µ—à—å –≤–æ—Å–∫—Ä–µ—Å–∏—Ç—å —Ç–æ–ª—å–∫–æ —Ç—Ä—É–ø!!!\n\r");
+                return;
+        }
 
-	if ( !ch->is_immortal() && obj->item_type == ITEM_CORPSE_PC )
-	{
-		ch->send_to("˙¡–“≈›≈Œœ ¬œ«¡Õ…!\n\r");
-		return;
-	}
+        if ( !ch->is_immortal() && obj->item_type == ITEM_CORPSE_PC )
+        {
+                ch->send_to("–ó–∞–ø—Ä–µ—â–µ–Ω–æ –±–æ–≥–∞–º–∏!\n\r");
+                return;
+        }
 
-	if ( ch->isAffected(sn ) )
-	{
-		ch->send_to("Ó’÷Œœ ◊œ””‘¡Œœ◊…‘ÿ ‹Œ≈“«…¿ –œ”Ã≈ –“≈ƒŸƒ’›≈«œ ◊œ”À“≈€≈Œ…—.\n\r");
-		return;
-	}
+        if ( ch->isAffected(sn ) )
+        {
+                ch->send_to("–ù—É–∂–Ω–æ –≤–æ—Å—Å—Ç–∞–Ω–æ–≤–∏—Ç—å —ç–Ω–µ—Ä–≥–∏—é –ø–æ—Å–ª–µ –ø—Ä–µ–¥—ã–¥—É—â–µ–≥–æ –≤–æ—Å–∫—Ä–µ—à–µ–Ω–∏—è.\n\r");
+                return;
+        }
 
-	if ( overcharmed( ch ) )
-		return;
+        if ( overcharmed( ch ) )
+                return;
 
-	if ( ch->in_room && IS_SET( ch->in_room->room_flags, ROOM_NO_MOB ) )
-	{
-		ch->send_to("˙ƒ≈”ÿ Œ≈◊œ⁄Õœ÷Œœ œ÷…◊…‘ÿ ‘“’–.\n\r");
-		return;
-	}
+        if ( ch->in_room && IS_SET( ch->in_room->room_flags, ROOM_NO_MOB ) )
+        {
+                ch->send_to("–ó–¥–µ—Å—å –Ω–µ–≤–æ–∑–º–æ–∂–Ω–æ –æ–∂–∏–≤–∏—Ç—å —Ç—Ä—É–ø.\n\r");
+                return;
+        }
 
-	if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE )
-		|| IS_SET(ch->in_room->room_flags, ROOM_PRIVATE )
-		|| IS_SET(ch->in_room->room_flags, ROOM_SOLITARY ) )
-	{
-		ch->send_to("Û◊—‘œ”‘ÿ ‹‘œ«œ Õ≈”‘¡ Œ≈ –œ⁄◊œÃ—≈‘ ‘≈¬≈ ”ƒ≈Ã¡‘ÿ ‹‘œ«œ.\n\r");
-		return;
-	}
-	undead = create_mobile( get_mob_index(MOB_VNUM_UNDEAD) );
+        if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE )
+                || IS_SET(ch->in_room->room_flags, ROOM_PRIVATE )
+                || IS_SET(ch->in_room->room_flags, ROOM_SOLITARY ) )
+        {
+                ch->send_to("–°–≤—è—Ç–æ—Å—Ç—å —ç—Ç–æ–≥–æ –º–µ—Å—Ç–∞ –Ω–µ –ø–æ–∑–≤–æ–ª—è–µ—Ç —Ç–µ–±–µ —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ–≥–æ.\n\r");
+                return;
+        }
+        undead = create_mobile( get_mob_index(MOB_VNUM_UNDEAD) );
 
-	for ( i=0; i < stat_table.size; i++ )
-	{
-		undead->perm_stat[i] = min(25,2 * ch->perm_stat[i]);
-	}
+        for ( i=0; i < stat_table.size; i++ )
+        {
+                undead->perm_stat[i] = min(25,2 * ch->perm_stat[i]);
+        }
 
-	undead->max_hit = ch->is_npc() ? ch->max_hit : ch->getPC( )->perm_hit;
-	undead->hit = undead->max_hit;
-	undead->max_mana = ch->is_npc() ? ch->max_mana : ch->getPC( )->perm_mana;
-	undead->mana = undead->max_mana;
-	undead->alignment = ch->alignment;
-	undead->setLevel( min(100, ( ch->getModifyLevel() - 2 ) ) );
+        undead->max_hit = ch->is_npc() ? ch->max_hit : ch->getPC( )->perm_hit;
+        undead->hit = undead->max_hit;
+        undead->max_mana = ch->is_npc() ? ch->max_mana : ch->getPC( )->perm_mana;
+        undead->mana = undead->max_mana;
+        undead->alignment = ch->alignment;
+        undead->setLevel( min(100, ( ch->getModifyLevel() - 2 ) ) );
 
-	for ( i=0; i < 3; i++ )
-		undead->armor[i] = interpolate(undead->getRealLevel( ),100,-100);
-	undead->armor[3] = interpolate(undead->getRealLevel( ),50,-200);
-	undead->gold = 0;
+        for ( i=0; i < 3; i++ )
+                undead->armor[i] = interpolate(undead->getRealLevel( ),100,-100);
+        undead->armor[3] = interpolate(undead->getRealLevel( ),50,-200);
+        undead->gold = 0;
 
-	SET_BIT(undead->act, ACT_UNDEAD);
-	SET_BIT(undead->affected_by, AFF_CHARM);
-	SET_BIT(undead->form, FORM_INSTANT_DECAY);
-	undead->timer = (undead->getRealLevel( ) / 10 + 1) * 60 * 24; // 1 day per 10lev 
-	undead->master = ch;
-	undead->leader = ch;
-	
-	if (obj->value[3]) 
-	    pCorpseOwner = get_mob_index( obj->value[3] );
-	
-	if (pCorpseOwner && pCorpseOwner->sex != SEX_EITHER) 
-	    undead->setSex( pCorpseOwner->sex );
-	else
-	    undead->setSex( ch->getSex( ) );
+        SET_BIT(undead->act, ACT_UNDEAD);
+        SET_BIT(undead->affected_by, AFF_CHARM);
+        SET_BIT(undead->form, FORM_INSTANT_DECAY);
+        undead->timer = (undead->getRealLevel( ) / 10 + 1) * 60 * 24; // 1 day per 10lev 
+        undead->master = ch;
+        undead->leader = ch;
+        
+        if (obj->value[3]) 
+            pCorpseOwner = get_mob_index( obj->value[3] );
+        
+        if (pCorpseOwner && pCorpseOwner->sex != SEX_EITHER) 
+            undead->setSex( pCorpseOwner->sex );
+        else
+            undead->setSex( ch->getSex( ) );
 
-	sprintf(buf, undead->getName().c_str(), obj->getName( ));
-	undead->setName( buf );
-	
-	strcpy(buf, obj->getShortDescr( '1' ).c_str( ));
-	argument = buf;
-	buf3[0] = '\0';
-	while (argument[0] != '\0' )
-	{
-		argument = one_argument(argument, arg);
-		if (!( !str_cmp(arg,"Ô÷…◊Ã≈ŒŒŸ ")
-				|| !str_cmp(arg,"(corpse)")
-				|| !str_cmp(arg,"‘“’–") ))
-		{
-			if (buf3[0] == '\0')
-				strcat(buf3,arg);
-			else
-			{
-				strcat(buf3," ");
-				strcat(buf3,arg);
-			}
-		}
-	}
-	sprintf(buf, undead->getShortDescr( ), buf3);
-	undead->setShortDescr( buf );
-	sprintf(buf, undead->getLongDescr( ), buf3);
-	undead->setLongDescr( buf );
+        sprintf(buf, undead->getName().c_str(), obj->getName( ));
+        undead->setName( buf );
+        
+        strcpy(buf, obj->getShortDescr( '1' ).c_str( ));
+        argument = buf;
+        buf3[0] = '\0';
+        while (argument[0] != '\0' )
+        {
+                argument = one_argument(argument, arg);
+                if (!( !str_cmp(arg,"–û–∂–∏–≤–ª–µ–Ω–Ω—ã–π")
+                                || !str_cmp(arg,"(corpse)")
+                                || !str_cmp(arg,"—Ç—Ä—É–ø") ))
+                {
+                        if (buf3[0] == '\0')
+                                strcat(buf3,arg);
+                        else
+                        {
+                                strcat(buf3," ");
+                                strcat(buf3,arg);
+                        }
+                }
+        }
+        sprintf(buf, undead->getShortDescr( ), buf3);
+        undead->setShortDescr( buf );
+        sprintf(buf, undead->getLongDescr( ), buf3);
+        undead->setLongDescr( buf );
 
-	char_to_room(undead,ch->in_room);
+        char_to_room(undead,ch->in_room);
 
-	for ( obj2 = obj->contains;obj2;obj2=next )
-	{
-		next = obj2->next_content;
-		obj_from_obj(obj2);
-		obj_to_char(obj2, undead);
-	}
-	interpret_raw( undead,"wear", "all" );
+        for ( obj2 = obj->contains;obj2;obj2=next )
+        {
+                next = obj2->next_content;
+                obj_from_obj(obj2);
+                obj_to_char(obj2, undead);
+        }
+        interpret_raw( undead,"wear", "all" );
 
-	postaffect_to_char( ch, sn, ch->getModifyLevel() / 10 );
+        postaffect_to_char( ch, sn, ch->getModifyLevel() / 10 );
 
-	ch->send_to("È”–œÃÿ⁄’— Ì…”‘…ﬁ≈”À’¿ Û…Ã’ ‘Ÿ ◊œ”À“≈€¡≈€ÿ ‘“’–!\n\r");
+        ch->send_to("–ò—Å–ø–æ–ª—å–∑—É—è –ú–∏—Å—Ç–∏—á–µ—Å–∫—É—é –°–∏–ª—É —Ç—ã –≤–æ—Å–∫—Ä–µ—à–∞–µ—à—å —Ç—Ä—É–ø!\n\r");
 
-	sprintf(buf,"È”–œÃÿ⁄’— Ì…”‘…ﬁ≈”À’¿ Û…Ã’ $c1 ◊œ”À“≈€¡≈‘ %s!",obj->getShortDescr( '4' ).c_str( ));
-	act_p(buf,ch,0,0,TO_ROOM,POS_RESTING);
+        sprintf(buf,"–ò—Å–ø–æ–ª—å–∑—É—è –ú–∏—Å—Ç–∏—á–µ—Å–∫—É—é –°–∏–ª—É $c1 –≤–æ—Å–∫—Ä–µ—à–∞–µ—Ç %s!",obj->getShortDescr( '4' ).c_str( ));
+        act_p(buf,ch,0,0,TO_ROOM,POS_RESTING);
 
-	act_p("$C1 ”Õœ‘“…‘ Œ¡ ‘≈¬— ¬≈””ÕŸ”Ã≈ŒŒŸÕ ◊⁄«Ã—ƒœÕ,\n\r–œ◊…Œ’—”ÿ ‘◊œ…Õ –“…À¡⁄¡Õ!",ch,0,undead,TO_CHAR,POS_RESTING);
-	extract_obj (obj);
+        act_p("$C1 —Å–º–æ—Ç—Ä–∏—Ç –Ω–∞ —Ç–µ–±—è –±–µ—Å—Å–º—ã—Å–ª–µ–Ω–Ω—ã–º –≤–∑–≥–ª—è–¥–æ–º,\n\r–ø–æ–≤–∏–Ω—É—è—Å—å —Ç–≤–æ–∏–º –ø—Ä–∏–∫–∞–∑–∞–º!",ch,0,undead,TO_CHAR,POS_RESTING);
+        extract_obj (obj);
 }
 
 VOID_SPELL(AnimateDead)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	if ( victim == ch )
-	    ch->send_to("ˆ…⁄Œÿ –“≈À“¡”Œ¡ … ‘Ÿ Œ≈ ”œ¬…“¡≈€ÿ”— “¡””‘¡◊¡‘ÿ”— ”œ ”◊œ…Õ ‘≈ÃœÕ!\n\r");
-	else 
-	    act_p("ˆ…⁄Œÿ –“≈À“¡”Œ¡ … $C1 Œ≈ ”œ¬…“¡≈‘”— “¡””‘¡◊¡‘ÿ”— ”œ ”◊œ…Õ ‘≈ÃœÕ!",ch,0,victim,TO_CHAR,POS_RESTING);
+        if ( victim == ch )
+            ch->send_to("–ñ–∏–∑–Ω—å –ø—Ä–µ–∫—Ä–∞—Å–Ω–∞ –∏ —Ç—ã –Ω–µ —Å–æ–±–∏—Ä–∞–µ—à—å—Å—è —Ä–∞—Å—Å—Ç–∞–≤–∞—Ç—å—Å—è —Å–æ —Å–≤–æ–∏–º —Ç–µ–ª–æ–º!\n\r");
+        else 
+            act_p("–ñ–∏–∑–Ω—å –ø—Ä–µ–∫—Ä–∞—Å–Ω–∞ –∏ $C1 –Ω–µ —Å–æ–±–∏—Ä–∞–µ—Ç—Å—è —Ä–∞—Å—Å—Ç–∞–≤–∞—Ç—å—Å—è —Å–æ —Å–≤–æ–∏–º —Ç–µ–ª–æ–º!",ch,0,victim,TO_CHAR,POS_RESTING);
 
 }
 
@@ -314,13 +314,13 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Character *victim, int sn, int leve
 void NecroCreature::canEnter( Room *const room )
 {
     if (!Wanderer::canEnter( room ))
-	return false;
+        return false;
 
     if (IS_SET(room->room_flags, ROOM_NO_MOB))
-	return false;
+        return false;
     
     if (room->clan != clan_none)
-	return false;
+        return false;
 
     return true;
 }
@@ -328,26 +328,26 @@ void NecroCreature::canEnter( Room *const room )
 bool NecroCreature::startMoving( )
 {
     pathToTarget( ch->in_room, 
-	          get_room_index( masterRoomVnum ), 
-		  ch->master->getModifyLevel( ) * 100 );
+                  get_room_index( masterRoomVnum ), 
+                  ch->master->getModifyLevel( ) * 100 );
     
     makeOneStep( );
 
     if (ch->in_room == old_room) {
-	path.clear( );
-	masterRoomVnum = 0;
-	masterID = 0;
-	return false;
+        path.clear( );
+        masterRoomVnum = 0;
+        masterID = 0;
+        return false;
     }
     else 
-	return true;
+        return true;
 }
 
 void NecroCreature::entry( )
 {
     if (ch->in_room->vnum == masterRoomVnum) {
-	masterRoomVnum = 0;
-	masterID = 0;
+        masterRoomVnum = 0;
+        masterID = 0;
     }
 
     SummonedCreature::entry( );
@@ -356,16 +356,16 @@ void NecroCreature::entry( )
 bool NecroCreature::specIdle( ) 
 {
     if (SummonedCreature::specIdle( ))
-	return true;
+        return true;
     
     if (!IS_AFFECTED(ch, AFF_CHARM)
-	|| !ch->master
-	|| ch->master->getID( ) != masterID
-	|| !masterRoomVnum)
-	return false;
+        || !ch->master
+        || ch->master->getID( ) != masterID
+        || !masterRoomVnum)
+        return false;
 
     if (path.empty( ) && !startMoving( )) 
-	return false;
+        return false;
     
     makeOneStep( );
     return true;
@@ -377,45 +377,45 @@ VOID_SPELL(CallCorpseRenameMePlease)::run( Character *ch, char *, int sn, int le
     int countTotal = 0, countMoved = 0;
 
     if (ch->isAffected( sn )) {
-	ch->println( "ÙŸ ”Ã…€ÀœÕ ”ÀœŒ√≈Œ‘“…“œ◊¡Œ Œ¡ –“≈ƒŸƒ’›≈  –œ–Ÿ‘À≈ –“…⁄Ÿ◊¡." );
-	return;
+        ch->println( "–¢—ã —Å–ª–∏—à–∫–æ–º —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞–Ω –Ω–∞ –ø—Ä–µ–¥—ã–¥—É—â–µ–π –ø–æ–ø—ã—Ç–∫–µ –ø—Ä–∏–∑—ã–≤–∞." );
+        return;
     }
     
     if (IS_SET(ch->in_room->room_flag, ROOM_SOLITARY|ROOM_PRIVATE|ROOM_NO_MOB)
-	|| ch->in_room->clan != clan_none)
+        || ch->in_room->clan != clan_none)
     {
-	ch->println("Ù◊œ— Œ≈÷…‘ÿ Œ≈ ”Õœ÷≈‘ ”œ¬“¡‘ÿ”— ⁄ƒ≈”ÿ.");
-	return;
+        ch->println("–¢–≤–æ—è –Ω–µ–∂–∏—Ç—å –Ω–µ —Å–º–æ–∂–µ—Ç —Å–æ–±—Ä–∞—Ç—å—Å—è –∑–¥–µ—Å—å.");
+        return;
     }
     
     for (Character *wch = char_list; wch; wch = wch->next)
-	if (wch->is_npc( )
-	     && IS_AFFECTED(wch, AFF_CHARM)
-	     && wch->master == ch
-	     && wch->in_room != ch->in_room
-	     && wch->behavior)
-	{
-	    NecroCreature::Pointer bhv;
-	    
-	    if (( bhv = wch->behavior.getDynamicPointer<NecroCreature>( ) )) {
-		bhv->masterID = ch->getID( );
-		bhv->masterRoomVnum = ch->in_room->vnum;
-		countMoved += (bhv->startMoving( ));
-		countTotal++;
-	    }
-	}
+        if (wch->is_npc( )
+             && IS_AFFECTED(wch, AFF_CHARM)
+             && wch->master == ch
+             && wch->in_room != ch->in_room
+             && wch->behavior)
+        {
+            NecroCreature::Pointer bhv;
+            
+            if (( bhv = wch->behavior.getDynamicPointer<NecroCreature>( ) )) {
+                bhv->masterID = ch->getID( );
+                bhv->masterRoomVnum = ch->in_room->vnum;
+                countMoved += (bhv->startMoving( ));
+                countTotal++;
+            }
+        }
 
     if (countTotal == 0) {
-	ch->println("˜ Õ…“≈ Œ≈‘ Œ≈÷…‘…, –œƒ◊Ã¡”‘Œœ  ‘≈¬≈.");
-	return;
+        ch->println("–í –º–∏—Ä–µ –Ω–µ—Ç –Ω–µ–∂–∏—Ç–∏, –ø–æ–¥–≤–ª–∞—Å—Ç–Ω–æ–π —Ç–µ–±–µ.");
+        return;
     }
 
     if (countMoved == 0) {
-	ch->println("Ó… œƒ…Œ …⁄ ‘◊œ…» «œÃ≈Õœ◊ …Ã… ⁄œÕ¬… Œ≈ ”Õœ÷≈‘ ƒœ¬“¡‘ÿ”— ƒœ ‘≈¬—.");
-	return;
+        ch->println("–ù–∏ –æ–¥–∏–Ω –∏–∑ —Ç–≤–æ–∏—Ö –≥–æ–ª–µ–º–æ–≤ –∏–ª–∏ –∑–æ–º–±–∏ –Ω–µ —Å–º–æ–∂–µ—Ç –¥–æ–±—Ä–∞—Ç—å—Å—è –¥–æ —Ç–µ–±—è.");
+        return;
     }
     
-    ch->println("ÙŸ ÕŸ”Ã≈ŒŒœ –“…À¡⁄Ÿ◊¡≈€ÿ ◊”≈  –œƒ◊Ã¡”‘Œœ  ‘≈¬≈ Œ≈÷…‘… ”œ¬“¡‘ÿ”— ◊ ‹‘œÕ Õ≈”‘≈.");
+    ch->println("–¢—ã –º—ã—Å–ª–µ–Ω–Ω–æ –ø—Ä–∏–∫–∞–∑—ã–≤–∞–µ—à—å –≤—Å–µ–π –ø–æ–¥–≤–ª–∞—Å—Ç–Ω–æ–π —Ç–µ–±–µ –Ω–µ–∂–∏—Ç–∏ —Å–æ–±—Ä–∞—Ç—å—Å—è –≤ —ç—Ç–æ–º –º–µ—Å—Ç–µ.");
 
     postaffect_to_char( ch, sn, level / 10 );
 }

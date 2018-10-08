@@ -23,32 +23,32 @@ CMDRUN( glist )
     DLString argument = constArguments;
     
     if (!ch->getPC( ))
-	return;
+        return;
 
     if (argument.empty( )) {
-	buf << "÷ÓÅ ÇÒÕÐÐÙ:" << endl << endl;;
-	
-	for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
-	    group = skillGroupManager->find( gn );
-	    buf << fmt( 0, "    %-17s   %-25s",
-	                group->getName( ).c_str( ),
-			group->getRussianName( ).c_str( ) )
-	        << endl;
-	}
+        buf << "Ð’ÑÐµ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹:" << endl << endl;;
+        
+        for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
+            group = skillGroupManager->find( gn );
+            buf << fmt( 0, "    %-17s   %-25s",
+                        group->getName( ).c_str( ),
+                        group->getRussianName( ).c_str( ) )
+                << endl;
+        }
 
-	buf << endl
-	    << "äÌÑ ÐÒÏÓÍÏÔÒÁ ÎÁ×ÙËÏ× ËÁÖÄÏÊ ÇÒÕÐÐÙ ÉÓÐÏÌØÚÕÊ '{y{lRÇÒÕÐÐÁÕÍÅÎÉÊ{lEglist{lx {D<{wÇÒÕÐÐÁ{D>{w'."
-	    << endl;
+        buf << endl
+            << "Ð”Ð»Ñ Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€Ð° Ð½Ð°Ð²Ñ‹ÐºÐ¾Ð² ÐºÐ°Ð¶Ð´Ð¾Ð¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹ '{y{lRÐ³Ñ€ÑƒÐ¿Ð¿Ð°ÑƒÐ¼ÐµÐ½Ð¸Ð¹{lEglist{lx {D<{wÐ³Ñ€ÑƒÐ¿Ð¿Ð°{D>{w'."
+            << endl;
     }
     else {
-	group = skillGroupManager->findUnstrict( argument );
-	
-	if (!group) {
-	    ch->println("îÅÐÒÁ×ÉÌØÎÏ ÕËÁÚÁÎÁ ÇÒÕÐÐÁ.");
-	    return;
-	}
-	
-	group->show( ch->getPC( ), buf );
+        group = skillGroupManager->findUnstrict( argument );
+        
+        if (!group) {
+            ch->println("ÐÐµÐ¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ð¾ ÑƒÐºÐ°Ð·Ð°Ð½Ð° Ð³Ñ€ÑƒÐ¿Ð¿Ð°.");
+            return;
+        }
+        
+        group->show( ch->getPC( ), buf );
     }
     
     page_to_char( buf.str( ).c_str( ), ch );

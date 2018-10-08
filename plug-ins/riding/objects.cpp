@@ -22,13 +22,13 @@ Rideable::Pointer HorseHarness::findHorse( Character *ch, const DLString &arg )
     Character *rch;
 
     if (!( rch = get_char_room( ch, arg ) ))
-	return null;
+        return null;
 
     if (!rch->is_npc( ))
-	return null;
+        return null;
 
     if (!rch->getNPC( )->behavior)
-	return null;
+        return null;
 
     return rch->getNPC( )->behavior.getDynamicPointer<Rideable>( );
 }

@@ -20,20 +20,20 @@ public:
 
     virtual void initialization( )
     {
-	Class::regMoc<WorldChannel>( );
-	Class::regMoc<AreaChannel>( );
-	Class::regMoc<RaceChannel>( );
-	Class::regMoc<RoomChannel>( );
-	Class::regMoc<PersonalChannel>( );
+        Class::regMoc<WorldChannel>( );
+        Class::regMoc<AreaChannel>( );
+        Class::regMoc<RaceChannel>( );
+        Class::regMoc<RoomChannel>( );
+        Class::regMoc<PersonalChannel>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregMoc<WorldChannel>( );
-	Class::unregMoc<AreaChannel>( );
-	Class::unregMoc<RaceChannel>( );
-	Class::unregMoc<RoomChannel>( );
-	Class::unregMoc<PersonalChannel>( );
+        Class::unregMoc<WorldChannel>( );
+        Class::unregMoc<AreaChannel>( );
+        Class::unregMoc<RaceChannel>( );
+        Class::unregMoc<RoomChannel>( );
+        Class::unregMoc<PersonalChannel>( );
     }
 };
 
@@ -41,13 +41,13 @@ extern "C"
 {
     SO::PluginList initialize_communication( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
     
-	Plugin::registerPlugin<RegMocPlugin>( ppl );
-	Plugin::registerPlugin<CTwit>( ppl );
-	Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeTwitList> >( ppl );
+        Plugin::registerPlugin<RegMocPlugin>( ppl );
+        Plugin::registerPlugin<CTwit>( ppl );
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeTwitList> >( ppl );
         Plugin::registerPlugin<ChannelsCommand>( ppl );
-	
-	return ppl;
+        
+        return ppl;
     }
 }

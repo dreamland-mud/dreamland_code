@@ -25,20 +25,20 @@ CMDRUN( socials )
     ostringstream buf;
 
     buf << "{W==============================================================================={x" << endl
-	<<   " English    {W|{x Russian     {W|{x Description"  << endl
-	<< "{W------------+-------------+----------------------------------------------------{x" << endl;
+        <<   " English    {W|{x Russian     {W|{x Description"  << endl
+        << "{W------------+-------------+----------------------------------------------------{x" << endl;
     
     SocialManager::LoadedList::const_iterator i;
     const SocialManager::LoadedList &socials = SocialManager::getThis( )->getElements( );
 
     for (i = socials.begin( ); i != socials.end( ); i++) {
-	const Social *s = i->getConstPointer<Social>( );
+        const Social *s = i->getConstPointer<Social>( );
 
-	buf << dlprintf( "{c%-10s{x | %-11s| %-s", 
-	                 s->getName( ).c_str( ), 
-			 s->getRussianName( ).c_str( ), 
-			 s->getShortDesc( ).c_str( ) )
-	    << endl;
+        buf << dlprintf( "{c%-10s{x | %-11s| %-s", 
+                         s->getName( ).c_str( ), 
+                         s->getRussianName( ).c_str( ), 
+                         s->getShortDesc( ).c_str( ) )
+            << endl;
     }
 
     page_to_char( buf.str( ).c_str( ), ch );

@@ -8,12 +8,12 @@
 
 extern "C"
 {
-	SO::PluginList initialize_interpret( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<CommandInterpreter>( ppl );
-		
-		return ppl;
-	}
+        SO::PluginList initialize_interpret( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<CommandInterpreter>( ppl );
+                
+                return ppl;
+        }
 }

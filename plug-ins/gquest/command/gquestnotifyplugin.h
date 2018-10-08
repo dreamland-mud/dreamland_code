@@ -10,9 +10,9 @@
 class GQuestNotifyPlugin: public DescriptorStateListener {
 public:
         typedef ::Pointer<GQuestNotifyPlugin> Pointer;
-	
+        
         virtual void run( int, int, Descriptor * );
-	
+        
 };
 
 #endif

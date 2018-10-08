@@ -29,7 +29,7 @@ bool InvasionMob::death( Character *killer )
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
    
     if (!killer) 
-	return true;
+        return true;
 
     killer = gquest->getActor( killer );
 
@@ -56,22 +56,22 @@ bool InvasionHelper::death( Character *killer )
     InvasionGQuest *gq = InvasionGQuest::getThis( );
 
     if (killer) {
-	Character *wch;
+        Character *wch;
 
-	wch = gq->getActor( killer );
-	log("InvasionHelper killed by " << wch->getName( ));
-	
-	if (!wch->is_npc( )) {
-	    XMLAttributeInvasion::Pointer attr;
+        wch = gq->getActor( killer );
+        log("InvasionHelper killed by " << wch->getName( ));
+        
+        if (!wch->is_npc( )) {
+            XMLAttributeInvasion::Pointer attr;
 
-	    attr = wch->getPC( )->getAttributes( ).getAttr<XMLAttributeInvasion>( gq->getQuestID( ) );
-	    attr->punish( );
-	    wch->send_to("{YВ твоих услугах более никто не нуждается.{x\r\n");
-	}
+            attr = wch->getPC( )->getAttributes( ).getAttr<XMLAttributeInvasion>( gq->getQuestID( ) );
+            attr->punish( );
+            wch->send_to("{Yп▓ я┌п╡п╬п╦я┘ я┐я│п╩я┐пЁп╟я┘ п╠п╬п╩п╣п╣ п╫п╦п╨я┌п╬ п╫п╣ п╫я┐п╤п╢п╟п╣я┌я│я▐.{x\r\n");
+        }
     } 
 
     char_to_room( gq->createHelper( ), ch->in_room );
-    act("{YБожественные силы возвращают $c4 к жизни!{x", ch, 0, 0, TO_ROOM);
+    act("{Yп▒п╬п╤п╣я│я┌п╡п╣п╫п╫я▀п╣ я│п╦п╩я▀ п╡п╬п╥п╡я─п╟я┴п╟я▌я┌ $c4 п╨ п╤п╦п╥п╫п╦!{x", ch, 0, 0, TO_ROOM);
     return true;
 }
 
@@ -80,32 +80,32 @@ void InvasionHelper::tell( Character *victim, const char *speech )
     Object *obj;
     unsigned int size;
     PCharacter *pch;
-    static RegExp help( "помогу|помочь|помощь" );
+    static RegExp help( "п©п╬п╪п╬пЁя┐|п©п╬п╪п╬я┤я▄|п©п╬п╪п╬я┴я▄" );
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
     
     if (victim->is_npc( ))
-	return;
+        return;
 
     pch = victim->getPC( );
     
-    act("$C1 что-то говорит $c3.", ch, 0, victim, TO_NOTVICT);
+    act("$C1 я┤я┌п╬-я┌п╬ пЁп╬п╡п╬я─п╦я┌ $c3.", ch, 0, victim, TO_NOTVICT);
 
     if (!help.match( speech )) {
-	actWrongSpeech( pch );
-	return;
+        actWrongSpeech( pch );
+        return;
     }
 
     obj = gquest->createInstrument( );
     size = gquest->countInstruments( pch );
     
     if (size >= 3) {
-	actTooMuch( pch, obj );
-	extract_obj( obj );
+        actTooMuch( pch, obj );
+        extract_obj( obj );
     }
     else {
-	obj_to_char( obj, pch );
-	obj->setOwner( pch->getNameP( ) );
-	actGiveInstrument( pch, obj );
+        obj_to_char( obj, pch );
+        obj->setOwner( pch->getNameP( ) );
+        actGiveInstrument( pch, obj );
     }
 }
 
@@ -119,8 +119,8 @@ void InvasionHelper::actTooMuch( PCharacter *pch, Object *obj )
 
 void InvasionHelper::actGiveInstrument( PCharacter *pch, Object *obj )
 {
-    act("$c1 вручает тебе $o4.", ch, obj, pch, TO_VICT);
-    act("$c1 вручает $C3 $o4.", ch, obj, pch, TO_NOTVICT);
+    act("$c1 п╡я─я┐я┤п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, obj, pch, TO_VICT);
+    act("$c1 п╡я─я┐я┤п╟п╣я┌ $C3 $o4.", ch, obj, pch, TO_NOTVICT);
 }
 
 

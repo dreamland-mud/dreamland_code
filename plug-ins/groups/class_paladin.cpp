@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "skill.h"
@@ -54,18 +54,18 @@ SKILL_RUNP( layhands )
 
     if ( ch->is_npc() || !gsn_lay_hands->usable( ch ) )
     {
-	ch->println("ôÅÂÅ ÎÅÄÏÓÔÁÅÔ ÍÁÓÔÅÒÓÔ×Á ÌÅÞÉÔØ ÄÒÕÇÉÈ ÎÁÌÏÖÅÎÉÅÍ ÒÕË.");
-	return;
+        ch->println("Ð¢ÐµÐ±Ðµ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°ÐµÑ‚ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð° Ð»ÐµÑ‡Ð¸Ñ‚ÑŒ Ð´Ñ€ÑƒÐ³Ð¸Ñ… Ð½Ð°Ð»Ð¾Ð¶ÐµÐ½Ð¸ÐµÐ¼ Ñ€ÑƒÐº.");
+        return;
     }
 
     if ( (victim = get_char_room(ch,argument)) == 0) {
-	ch->send_to("ôÙ ÎÅ ×ÉÄÉÛØ ÚÄÅÓØ ÔÁËÏÇÏ ÐÅÒÓÏÎÁÖÁ.\n\r");
-	return;
+        ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð²Ð¸Ð´Ð¸ÑˆÑŒ Ð·Ð´ÐµÑÑŒ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð°.\n\r");
+        return;
     }
 
     if ( ch->isAffected(gsn_lay_hands)) {
-	ch->send_to("ôÙ ÐÏËÁ ÎÅ ÍÏÖÅÛØ ÓÏÓÒÅÄÏÔÏÞÉÔØÓÑ.\n\r");
-	return;
+        ch->send_to("Ð¢Ñ‹ Ð¿Ð¾ÐºÐ° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡Ð¸Ñ‚ÑŒÑÑ.\n\r");
+        return;
     }
 
     ch->setWait( gsn_lay_hands->getBeats( ) );
@@ -83,12 +83,12 @@ SKILL_RUNP( layhands )
     update_pos( victim );
     
     if (ch != victim) {
-	act( "ôÙ ×ÏÚÌÁÇÁÅÛØ ÒÕËÉ ÎÁ $C4, É $M ÓÔÁÎÏ×ÉÔÓÑ ÇÏÒÁÚÄÏ ÌÕÞÛÅ.", ch, 0, victim, TO_CHAR);
-	act( "$c1 ×ÏÚÌÁÇÁÅÔ ÎÁ ÔÅÂÑ ÒÕËÉ. ôÅÐÌÏ ÎÁÐÏÌÎÑÅÔ Ô×ÏÅ ÔÅÌÏ.", ch, 0, victim, TO_VICT);
-	act( "$c1 ×ÏÚÌÁÇÁÅÔ ÒÕËÉ ÎÁ $C4. $C1 ×ÙÇÌÑÄÉÔ ÎÁÍÎÏÇÏ ÌÕÞÛÅ.", ch, 0, victim, TO_NOTVICT);
+        act( "Ð¢Ñ‹ Ð²Ð¾Ð·Ð»Ð°Ð³Ð°ÐµÑˆÑŒ Ñ€ÑƒÐºÐ¸ Ð½Ð° $C4, Ð¸ $M ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ Ð³Ð¾Ñ€Ð°Ð·Ð´Ð¾ Ð»ÑƒÑ‡ÑˆÐµ.", ch, 0, victim, TO_CHAR);
+        act( "$c1 Ð²Ð¾Ð·Ð»Ð°Ð³Ð°ÐµÑ‚ Ð½Ð° Ñ‚ÐµÐ±Ñ Ñ€ÑƒÐºÐ¸. Ð¢ÐµÐ¿Ð»Ð¾ Ð½Ð°Ð¿Ð¾Ð»Ð½ÑÐµÑ‚ Ñ‚Ð²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.", ch, 0, victim, TO_VICT);
+        act( "$c1 Ð²Ð¾Ð·Ð»Ð°Ð³Ð°ÐµÑ‚ Ñ€ÑƒÐºÐ¸ Ð½Ð° $C4. $C1 Ð²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ Ð½Ð°Ð¼Ð½Ð¾Ð³Ð¾ Ð»ÑƒÑ‡ÑˆÐµ.", ch, 0, victim, TO_NOTVICT);
     } else {
-	act( "ôÙ ×ÏÚÌÁÇÁÅÛØ ÎÁ ÓÅÂÑ ÒÕËÉ: ÔÅÂÅ ÓÔÁÎÏ×ÉÔÓÑ ÇÏÒÁÚÄÏ ÌÕÞÛÅ.", ch, 0, 0, TO_CHAR);
-	act( "$c1 ×ÏÚÌÁÇÁÅÔ ÎÁ ÓÅÂÑ ÒÕËÉ. $c1 ×ÙÇÌÑÄÉÔ ÎÁÍÎÏÇÏ ÌÕÞÛÅ.", ch, 0, 0, TO_ROOM);
+        act( "Ð¢Ñ‹ Ð²Ð¾Ð·Ð»Ð°Ð³Ð°ÐµÑˆÑŒ Ð½Ð° ÑÐµÐ±Ñ Ñ€ÑƒÐºÐ¸: Ñ‚ÐµÐ±Ðµ ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ Ð³Ð¾Ñ€Ð°Ð·Ð´Ð¾ Ð»ÑƒÑ‡ÑˆÐµ.", ch, 0, 0, TO_CHAR);
+        act( "$c1 Ð²Ð¾Ð·Ð»Ð°Ð³Ð°ÐµÑ‚ Ð½Ð° ÑÐµÐ±Ñ Ñ€ÑƒÐºÐ¸. $c1 Ð²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ Ð½Ð°Ð¼Ð½Ð¾Ð³Ð¾ Ð»ÑƒÑ‡ÑˆÐµ.", ch, 0, 0, TO_ROOM);
     }
     
     gsn_lay_hands->improve( ch, true, victim );
@@ -99,23 +99,23 @@ VOID_SPELL(Banishment)::run( Character *ch, Character *victim, int sn, int level
 { 
     
     if (!victim->is_npc( ) 
-	|| (!IS_SET( victim->form, FORM_UNDEAD )
-	   && !IS_SET( victim->act, ACT_UNDEAD )
-	   && victim->getRace( ) != race_demon
-	   && victim->getRace( ) != race_golem))
+        || (!IS_SET( victim->form, FORM_UNDEAD )
+           && !IS_SET( victim->act, ACT_UNDEAD )
+           && victim->getRace( ) != race_demon
+           && victim->getRace( ) != race_golem))
     {
-	act_p("$C1 - ×Ï×ÓÅ ÎÅ ÎÅÞÉÓÔØ É ÎÅ ÄÅÍÏÎ.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	return;
+        act_p("$C1 - Ð²Ð¾Ð²ÑÐµ Ð½Ðµ Ð½ÐµÑ‡Ð¸ÑÑ‚ÑŒ Ð¸ Ð½Ðµ Ð´ÐµÐ¼Ð¾Ð½.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        return;
     }
 
     if (saves_spell(level, victim, DAM_HOLY, ch, DAMF_SPELL)) {
-	act_p("ó $C5, ËÁÖÅÔÓÑ, ÎÉÞÅÇÏ ÎÅ ÐÒÏÉÓÈÏÄÉÔ.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	return;
+        act_p("Ð¡ $C5, ÐºÐ°Ð¶ÐµÑ‚ÑÑ, Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð¿Ñ€Ð¾Ð¸ÑÑ…Ð¾Ð´Ð¸Ñ‚.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        return;
     }
     
-    act_p("÷ÏÚÎÉËÁÅÔ ÏÓÌÅÐÉÔÅÌØÎÁÑ ×ÓÐÙÛËÁ, ÏÎÁ ÐÏÇÌÏÝÁÅÔ $c4 É $e ÉÓÞÅÚÁÅÔ.",
-	    victim, 0, 0, TO_ROOM, POS_RESTING);
-	
+    act_p("Ð’Ð¾Ð·Ð½Ð¸ÐºÐ°ÐµÑ‚ Ð¾ÑÐ»ÐµÐ¿Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð°Ñ Ð²ÑÐ¿Ñ‹ÑˆÐºÐ°, Ð¾Ð½Ð° Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÐµÑ‚ $c4 Ð¸ $e Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚.",
+            victim, 0, 0, TO_ROOM, POS_RESTING);
+        
     raw_kill( victim, -1, ch, FKILL_MOB_EXTRACT );
 }
 
@@ -129,8 +129,8 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     level = number_range(102, 110);
 
     if (ch->hit < ch->getRealLevel( ) || ch->mana < ch->getRealLevel( ) || ch->move < ch->getRealLevel( )) {
-	act_p("ôÙ ÓÌÉÛËÏÍ ÉÓÔÏÝÅ$gÎÏ|Î|ÎÁ ÄÌÑ ÍÏÌÉÔ×Ù.", ch, 0, 0, TO_CHAR, POS_RESTING);
-	return;
+        act_p("Ð¢Ñ‹ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð¸ÑÑ‚Ð¾Ñ‰Ðµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð´Ð»Ñ Ð¼Ð¾Ð»Ð¸Ñ‚Ð²Ñ‹.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        return;
     }
 
     ch->mana -= ch->getModifyLevel( );
@@ -140,72 +140,72 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     ch->setWaitViolence( 1 );
 
     if (ch->isAffected(sn) 
-	|| (number_percent() < number_fuzzy(1) + 50 - ch->getSkill( sn ) / 2))
+        || (number_percent() < number_fuzzy(1) + 50 - ch->getSkill( sn ) / 2))
     {
-	// bad 
-	act_p("ôÙ ÒÁÚÇÎÅ×Á$gÌÏ|Ì|ÌÁ âÏÇÏ× Ó×ÏÉÍÉ ÍÏÌÉÔ×ÁÍÉ!", ch, 0, 0, TO_CHAR, POS_RESTING);
+        // bad 
+        act_p("Ð¢Ñ‹ Ñ€Ð°Ð·Ð³Ð½ÐµÐ²Ð°$gÐ»Ð¾|Ð»|Ð»Ð° Ð‘Ð¾Ð³Ð¾Ð² ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¼Ð¾Ð»Ð¸Ñ‚Ð²Ð°Ð¼Ð¸!", ch, 0, 0, TO_CHAR, POS_RESTING);
 
-	if (!ch->isAffected(gsn_weaken)) {
-	    af.where = TO_AFFECTS;
-	    af.type = gsn_weaken;
-	    af.level = lvl;
-	    af.duration = lvl / 15;
-	    af.location = APPLY_STR;
-	    af.modifier = -1 * (lvl / 4);
-	    af.bitvector = 0;
-	    affect_to_char(ch, &af);
-	    ch->send_to("ôÙ ÞÕ×ÓÔ×ÕÅÛØ, ËÁË ÓÉÌÁ ÕÈÏÄÉÔ ÉÚ ÔÅÂÑ.\n\r");
-	    act_p("$c1 ×ÙÇÌÑÄÉÔ ÓÌÁÂÙÍ É ÕÓÔÁ×ÛÉÍ.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
-	}
-	else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
-	    af.where = TO_AFFECTS;
-	    af.type = gsn_curse;
-	    af.level = lvl;
-	    af.duration = lvl / 10;
-	    af.location = APPLY_HITROLL;
-	    af.modifier = -1 * (lvl / 7);
-	    af.bitvector = AFF_CURSE;
-	    affect_to_char(ch, &af);
-	    af.location = APPLY_SAVING_SPELL;
-	    af.modifier = lvl / 7;
-	    affect_to_char(ch, &af);
-	    act_p("ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÓÅÂÑ ÐÒÏËÌÑÔ$gÙÍ|ÙÍ|ÏÊ.", ch, 0, 0, TO_CHAR, POS_RESTING);
-	}
-	else {
-	    if (ch->position == POS_FIGHTING) {
-		ch->send_to("ô×ÏÉ ÍÕÓËÕÌÙ ÐÅÒÅÓÔÁÀÔ ÔÅÂÅ ÐÏ×ÉÎÏ×ÁÔØÓÑ...\n\r");
-		ch->setDazeViolence( 3 );
-		ch->setWaitViolence( 1 );
-	    }
-	    else {
-		af.where = TO_AFFECTS;
-		af.type = gsn_sleep;
-		af.level = lvl;
-		af.duration = 3;
-		af.location = APPLY_NONE;
-		af.modifier = 0;
-		af.bitvector = AFF_SLEEP;
-		affect_join(ch, &af);
+        if (!ch->isAffected(gsn_weaken)) {
+            af.where = TO_AFFECTS;
+            af.type = gsn_weaken;
+            af.level = lvl;
+            af.duration = lvl / 15;
+            af.location = APPLY_STR;
+            af.modifier = -1 * (lvl / 4);
+            af.bitvector = 0;
+            affect_to_char(ch, &af);
+            ch->send_to("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ, ÐºÐ°Ðº ÑÐ¸Ð»Ð° ÑƒÑ…Ð¾Ð´Ð¸Ñ‚ Ð¸Ð· Ñ‚ÐµÐ±Ñ.\n\r");
+            act_p("$c1 Ð²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ ÑÐ»Ð°Ð±Ñ‹Ð¼ Ð¸ ÑƒÑÑ‚Ð°Ð²ÑˆÐ¸Ð¼.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+        }
+        else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
+            af.where = TO_AFFECTS;
+            af.type = gsn_curse;
+            af.level = lvl;
+            af.duration = lvl / 10;
+            af.location = APPLY_HITROLL;
+            af.modifier = -1 * (lvl / 7);
+            af.bitvector = AFF_CURSE;
+            affect_to_char(ch, &af);
+            af.location = APPLY_SAVING_SPELL;
+            af.modifier = lvl / 7;
+            affect_to_char(ch, &af);
+            act_p("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÑÐµÐ±Ñ Ð¿Ñ€Ð¾ÐºÐ»ÑÑ‚$gÑ‹Ð¼|Ñ‹Ð¼|Ð¾Ð¹.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        }
+        else {
+            if (ch->position == POS_FIGHTING) {
+                ch->send_to("Ð¢Ð²Ð¾Ð¸ Ð¼ÑƒÑÐºÑƒÐ»Ñ‹ Ð¿ÐµÑ€ÐµÑÑ‚Ð°ÑŽÑ‚ Ñ‚ÐµÐ±Ðµ Ð¿Ð¾Ð²Ð¸Ð½Ð¾Ð²Ð°Ñ‚ÑŒÑÑ...\n\r");
+                ch->setDazeViolence( 3 );
+                ch->setWaitViolence( 1 );
+            }
+            else {
+                af.where = TO_AFFECTS;
+                af.type = gsn_sleep;
+                af.level = lvl;
+                af.duration = 3;
+                af.location = APPLY_NONE;
+                af.modifier = 0;
+                af.bitvector = AFF_SLEEP;
+                affect_join(ch, &af);
 
-		if (IS_AWAKE(ch)) {
-		    ch->send_to("ôÙ ÚÁÓÙÐÁÅÛØ....\n\r");
-		    act_p("$c1 ÚÁÓÙÐÁÅÔ.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
-		    ch->position = POS_SLEEPING;
-		}
-	    }
-	}
-	return;
+                if (IS_AWAKE(ch)) {
+                    ch->send_to("Ð¢Ñ‹ Ð·Ð°ÑÑ‹Ð¿Ð°ÐµÑˆÑŒ....\n\r");
+                    act_p("$c1 Ð·Ð°ÑÑ‹Ð¿Ð°ÐµÑ‚.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+                    ch->position = POS_SLEEPING;
+                }
+            }
+        }
+        return;
     }
 
     if (number_percent() > ch->getRealLevel( ) * 3 * ch->getSkill( sn ) / 100) {
-	// nothing 
-	ch->send_to("âÏÇÉ ÓÌÉÛËÏÍ ÚÁÎÑÔÙ, ÞÔÏÂÙ ÓÎÉÚÏÊÔÉ ÄÏ Ô×ÏÉÈ ÍÏÌÉÔ×...\n\r");
-	return;
+        // nothing 
+        ch->send_to("Ð‘Ð¾Ð³Ð¸ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð·Ð°Ð½ÑÑ‚Ñ‹, Ñ‡Ñ‚Ð¾Ð±Ñ‹ ÑÐ½Ð¸Ð·Ð¾Ð¹Ñ‚Ð¸ Ð´Ð¾ Ñ‚Ð²Ð¾Ð¸Ñ… Ð¼Ð¾Ð»Ð¸Ñ‚Ð²...\n\r");
+        return;
     }
 
     // you did it! 
 
-    ch->send_to("âÌÁÇÏÓÌÏ×ÅÎÉÅ âÏÇÏ× ÓÎÉÚÏÛÌÏ ÎÁ ÔÅÂÑ!\n\r");
+    ch->send_to("Ð‘Ð»Ð°Ð³Ð¾ÑÐ»Ð¾Ð²ÐµÐ½Ð¸Ðµ Ð‘Ð¾Ð³Ð¾Ð² ÑÐ½Ð¸Ð·Ð¾ÑˆÐ»Ð¾ Ð½Ð° Ñ‚ÐµÐ±Ñ!\n\r");
 
     af.where = TO_AFFECTS;
     af.type = sn;
@@ -220,66 +220,66 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
     sn = -1;
 
     if (ch->position == POS_FIGHTING && ch->fighting != NULL) {
-	switch (number_range(0, 7)) {
-	case 0:
-	    if (IS_GOOD(ch) && IS_EVIL(ch->fighting))
-		sn = gsn_ray_of_truth;
-	    else if (IS_EVIL(ch) && IS_GOOD(ch->fighting))
-		sn = gsn_demonfire;
-	    else
-		sn = gsn_flamestrike;
-	    break;
-	case 2:
-	    sn = gsn_curse;
-	    break;
-	case 5:
-	    sn = gsn_blindness;
-	    break;
-	case 7:
-	    sn = gsn_cause_critical;
-	    break;
-	default:
-	    break;
-	}
+        switch (number_range(0, 7)) {
+        case 0:
+            if (IS_GOOD(ch) && IS_EVIL(ch->fighting))
+                sn = gsn_ray_of_truth;
+            else if (IS_EVIL(ch) && IS_GOOD(ch->fighting))
+                sn = gsn_demonfire;
+            else
+                sn = gsn_flamestrike;
+            break;
+        case 2:
+            sn = gsn_curse;
+            break;
+        case 5:
+            sn = gsn_blindness;
+            break;
+        case 7:
+            sn = gsn_cause_critical;
+            break;
+        default:
+            break;
+        }
 
-	if (sn != -1)
-	    spell( sn, level, ch, ch->fighting );
+        if (sn != -1)
+            spell( sn, level, ch, ch->fighting );
 
-	ch->setWaitViolence( 1 );
+        ch->setWaitViolence( 1 );
     }
     else {
-	switch (number_range(0, 31)) {
-	case 0:	    sn = gsn_sanctuary;		    break;
-	case 1:	    sn = gsn_bless;		    break;
-	case 2:
-	case 3:	    sn = gsn_heal;		    break;
-	case 4:	    sn = gsn_haste;		    break;
-	case 5:
-	case 6:	    sn = gsn_refresh;               break;
-	case 7:	    sn = gsn_benediction;	    break;
-	case 8:	    sn = gsn_shield;		    break;
-	case 9:		
-	case 10:    sn = gsn_stone_skin;            break;
-	case 11:
-	case 12:    sn = gsn_armor;		    break;
-	case 13:	
-	    if (IS_EVIL( ch ))
-		sn = gsn_protection_good;
-	    break;
-	case 14:
-	    if (IS_GOOD( ch ))
-		sn = gsn_protection_evil;
-	    break;
-	case 15:
-	case 16:    sn = gsn_giant_strength;	    break;
-	case 17:    sn = gsn_protective_shield;	    break;
-	case 18:    sn = gsn_frenzy;                break;
-	case 19:    sn = gsn_enhanced_armor;	    break;
-	default:
-	    break;
-	}
-	if (sn != -1)
-	    spell( sn, level, ch, ch );
+        switch (number_range(0, 31)) {
+        case 0:            sn = gsn_sanctuary;                    break;
+        case 1:            sn = gsn_bless;                    break;
+        case 2:
+        case 3:            sn = gsn_heal;                    break;
+        case 4:            sn = gsn_haste;                    break;
+        case 5:
+        case 6:            sn = gsn_refresh;               break;
+        case 7:            sn = gsn_benediction;            break;
+        case 8:            sn = gsn_shield;                    break;
+        case 9:                
+        case 10:    sn = gsn_stone_skin;            break;
+        case 11:
+        case 12:    sn = gsn_armor;                    break;
+        case 13:        
+            if (IS_EVIL( ch ))
+                sn = gsn_protection_good;
+            break;
+        case 14:
+            if (IS_GOOD( ch ))
+                sn = gsn_protection_evil;
+            break;
+        case 15:
+        case 16:    sn = gsn_giant_strength;            break;
+        case 17:    sn = gsn_protective_shield;            break;
+        case 18:    sn = gsn_frenzy;                break;
+        case 19:    sn = gsn_enhanced_armor;            break;
+        default:
+            break;
+        }
+        if (sn != -1)
+            spell( sn, level, ch, ch );
     }
     
 
@@ -292,37 +292,37 @@ VOID_SPELL(TurnUndead)::run( Character *ch, Room *room, int sn, int level )
     Character *vch, *vch_next;
     int dam;
 
-    act_p( "$c1 ÞÅÒÔÉÔ × ×ÏÚÄÕÈÅ Ó×ÑÝÅÎÎÙÊ ÓÉÍ×ÏÌ.", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p( "ôÙ ÞÅÒÔÉÛØ × ×ÏÚÄÕÈÅ Ó×ÑÝÅÎÎÙÊ ÓÉÍ×ÏÌ.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p( "$c1 Ñ‡ÐµÑ€Ñ‚Ð¸Ñ‚ Ð² Ð²Ð¾Ð·Ð´ÑƒÑ…Ðµ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ñ‹Ð¹ ÑÐ¸Ð¼Ð²Ð¾Ð».", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p( "Ð¢Ñ‹ Ñ‡ÐµÑ€Ñ‚Ð¸ÑˆÑŒ Ð² Ð²Ð¾Ð·Ð´ÑƒÑ…Ðµ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ñ‹Ð¹ ÑÐ¸Ð¼Ð²Ð¾Ð».", ch, 0, 0, TO_CHAR, POS_RESTING);
 
     for (vch = room->people; vch != NULL; vch = vch_next) {
-	vch_next = vch->next_in_room;
+        vch_next = vch->next_in_room;
 
-	if (is_safe_spell( ch, vch, true ))
-	    continue;
-	
-	if (!IS_SET( vch->form, FORM_UNDEAD ))
-	    continue;
-	
-	if (!IS_SET( vch->act, ACT_UNDEAD ))
-	    continue;
-	
-	try {
-	    if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_SPELL )) {
-		act("$C1 ÉÇÎÏÒÉÒÕÅÔ Ô×ÏÀ ÓÌÁÂÕÀ ÐÏÐÙÔËÕ ÉÚÇÎÁÎÉÑ É ÂÒÏÓÁÅÔÓÑ × ÁÔÁËÕ!", ch, 0, vch, TO_CHAR);
-		act_p("ôÙ ÉÇÎÏÒÉÒÕÅÛØ ÓÌÁÂÕÀ ÐÏÐÙÔËÕ ÉÚÇÎÁÎÉÑ.", ch, 0, vch, TO_VICT, POS_RESTING);
-		damage( ch, vch, 0, sn, DAM_HOLY, true, DAMF_SPELL );
-	    }
-	    else {
-		act_p( "$c5 Ï×ÌÁÄÅ×ÁÀÔ Ó×ÑÝÅÎÎÙÅ ÓÉÌÙ, ÚÁÓÔÁ×ÌÑÑ × ÕÖÁÓÅ ÏÂÒÁÔÉÔØÓÑ × ÂÅÇÓÔ×Ï.", vch, 0, ch, TO_ROOM, POS_RESTING);
-		act_p( "ó×ÑÝÅÎÎÙÅ ÓÉÌÙ Ï×ÌÁÄÅ×ÁÀÔ ÔÏÂÏÊ, ÚÁÓÔÁ×ÌÑÑ × ÕÖÁÓÅ ÏÂÒÁÔÉÔØÓÑ × ÂÅÇÓÔ×Ï.", ch, 0, vch, TO_VICT, POS_RESTING);
+        if (is_safe_spell( ch, vch, true ))
+            continue;
+        
+        if (!IS_SET( vch->form, FORM_UNDEAD ))
+            continue;
+        
+        if (!IS_SET( vch->act, ACT_UNDEAD ))
+            continue;
+        
+        try {
+            if (saves_spell( level, vch, DAM_HOLY, ch, DAMF_SPELL )) {
+                act("$C1 Ð¸Ð³Ð½Ð¾Ñ€Ð¸Ñ€ÑƒÐµÑ‚ Ñ‚Ð²Ð¾ÑŽ ÑÐ»Ð°Ð±ÑƒÑŽ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÑƒ Ð¸Ð·Ð³Ð½Ð°Ð½Ð¸Ñ Ð¸ Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ÑÑ Ð² Ð°Ñ‚Ð°ÐºÑƒ!", ch, 0, vch, TO_CHAR);
+                act_p("Ð¢Ñ‹ Ð¸Ð³Ð½Ð¾Ñ€Ð¸Ñ€ÑƒÐµÑˆÑŒ ÑÐ»Ð°Ð±ÑƒÑŽ Ð¿Ð¾Ð¿Ñ‹Ñ‚ÐºÑƒ Ð¸Ð·Ð³Ð½Ð°Ð½Ð¸Ñ.", ch, 0, vch, TO_VICT, POS_RESTING);
+                damage( ch, vch, 0, sn, DAM_HOLY, true, DAMF_SPELL );
+            }
+            else {
+                act_p( "$c5 Ð¾Ð²Ð»Ð°Ð´ÐµÐ²Ð°ÑŽÑ‚ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ñ‹Ðµ ÑÐ¸Ð»Ñ‹, Ð·Ð°ÑÑ‚Ð°Ð²Ð»ÑÑ Ð² ÑƒÐ¶Ð°ÑÐµ Ð¾Ð±Ñ€Ð°Ñ‚Ð¸Ñ‚ÑŒÑÑ Ð² Ð±ÐµÐ³ÑÑ‚Ð²Ð¾.", vch, 0, ch, TO_ROOM, POS_RESTING);
+                act_p( "Ð¡Ð²ÑÑ‰ÐµÐ½Ð½Ñ‹Ðµ ÑÐ¸Ð»Ñ‹ Ð¾Ð²Ð»Ð°Ð´ÐµÐ²Ð°ÑŽÑ‚ Ñ‚Ð¾Ð±Ð¾Ð¹, Ð·Ð°ÑÑ‚Ð°Ð²Ð»ÑÑ Ð² ÑƒÐ¶Ð°ÑÐµ Ð¾Ð±Ñ€Ð°Ñ‚Ð¸Ñ‚ÑŒÑÑ Ð² Ð±ÐµÐ³ÑÑ‚Ð²Ð¾.", ch, 0, vch, TO_VICT, POS_RESTING);
 
-		dam = dice( level, 12 ); 
-		damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_SPELL );
-		FleeMovement( vch ).move( );
-	    }
-	} catch (const VictimDeathException &) {
-	}
+                dam = dice( level, 12 ); 
+                damage_nocatch( ch, vch, dam, sn, DAM_HOLY, true, DAMF_SPELL );
+                FleeMovement( vch ).move( );
+            }
+        } catch (const VictimDeathException &) {
+        }
     }
 
 }
@@ -336,12 +336,12 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-	ch->send_to("üÔÏ ÚÁËÌÉÎÁÎÉÅ ÉÓÐÏÌØÚÏ×ÁÌÏÓØ ÓÏ×ÓÅÍ ÎÅÄÁ×ÎÏ.");
-	return;
+        ch->send_to("Ð­Ñ‚Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ´Ð°Ð²Ð½Ð¾.");
+        return;
     }
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 5;
     af.modifier  = 0;
     af.location  = 0;
@@ -350,60 +350,60 @@ VOID_SPELL(Turn)::run( Character *ch, Room *room, int sn, int level )
 
     for (victim = room->people; victim != 0; victim = victim_next)
     {
-	int dam, align, level;
+        int dam, align, level;
 
-	victim_next = victim->next_in_room;
-	level = ch->getModifyLevel( );
+        victim_next = victim->next_in_room;
+        level = ch->getModifyLevel( );
 
-	if (is_safe_spell(ch,victim,true))
-	    continue;
-	if (is_safe(ch, victim))
+        if (is_safe_spell(ch,victim,true))
+            continue;
+        if (is_safe(ch, victim))
           continue;
 
-	if (IS_EVIL(ch) ) {
-	    victim = ch;
-	    ch->send_to("üÎÅÒÇÉÑ ×ÚÒÙ×ÁÅÔÓÑ ×ÎÕÔÒÉ ÔÅÂÑ!\n\r");
-	}
+        if (IS_EVIL(ch) ) {
+            victim = ch;
+            ch->send_to("Ð­Ð½ÐµÑ€Ð³Ð¸Ñ Ð²Ð·Ñ€Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ð²Ð½ÑƒÑ‚Ñ€Ð¸ Ñ‚ÐµÐ±Ñ!\n\r");
+        }
 
-	if (victim != ch) {
-	    act_p("$c1 ×ÙÓÏËÏ ×ÚÄÙÍÁÅÔ ÒÕËÉ, ÐÏÓÙÌÁÑ ÏÓÌÅÐÉÔÅÌØÎÙÊ ÌÕÞ Ó×ÅÔÁ!",
-		   ch,0,0,TO_ROOM,POS_RESTING);
-	    ch->send_to("ôÙ ×ÙÓÏËÏ ×ÚÄÙÍÁÅÛØ ÒÕËÉ, ÐÏÓÙÌÁÑ ÏÓÌÅÐÉÔÅÌØÎÙÊ ÌÕÞ Ó×ÅÔÁ!\n\r");
-	}
+        if (victim != ch) {
+            act_p("$c1 Ð²Ñ‹ÑÐ¾ÐºÐ¾ Ð²Ð·Ð´Ñ‹Ð¼Ð°ÐµÑ‚ Ñ€ÑƒÐºÐ¸, Ð¿Ð¾ÑÑ‹Ð»Ð°Ñ Ð¾ÑÐ»ÐµÐ¿Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ Ð»ÑƒÑ‡ ÑÐ²ÐµÑ‚Ð°!",
+                   ch,0,0,TO_ROOM,POS_RESTING);
+            ch->send_to("Ð¢Ñ‹ Ð²Ñ‹ÑÐ¾ÐºÐ¾ Ð²Ð·Ð´Ñ‹Ð¼Ð°ÐµÑˆÑŒ Ñ€ÑƒÐºÐ¸, Ð¿Ð¾ÑÑ‹Ð»Ð°Ñ Ð¾ÑÐ»ÐµÐ¿Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ Ð»ÑƒÑ‡ ÑÐ²ÐµÑ‚Ð°!\n\r");
+        }
 
-	if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
-	    act_p("ó×ÅÔ ÎÅ ÍÏÖÅÔ ÐÒÉÞÉÎÉÔØ ×ÒÅÄÁ $c3.",
-		   victim,0,victim,TO_ROOM,POS_RESTING);
-	    victim->send_to("ó×ÅÔ ÎÅ ÍÏÖÅÔ ÐÒÉÞÉÎÉÔØ ÔÅÂÅ ×ÒÅÄÁ.\n\r");
-	    continue;
-	}
-	
-	if (victim->is_npc( )
-	    && victim->getNPC( )->behavior
-	    && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
-	{
-	    act_p("$c1 ÎÅ ÍÏÖÅÔ ÐÏËÉÎÕÔØ Ó×ÏÊ ÐÏÓÔ.", victim, 0, 0, TO_ROOM, POS_RESTING);
-	    continue;
-	}
-			     
-	dam = dice( level, 10 );
-	if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL ) )
-	    dam /= 2;
+        if (IS_GOOD(victim) || IS_NEUTRAL(victim)) {
+            act_p("Ð¡Ð²ÐµÑ‚ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ð¸Ñ‚ÑŒ Ð²Ñ€ÐµÐ´Ð° $c3.",
+                   victim,0,victim,TO_ROOM,POS_RESTING);
+            victim->send_to("Ð¡Ð²ÐµÑ‚ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ð¸Ñ‚ÑŒ Ñ‚ÐµÐ±Ðµ Ð²Ñ€ÐµÐ´Ð°.\n\r");
+            continue;
+        }
+        
+        if (victim->is_npc( )
+            && victim->getNPC( )->behavior
+            && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
+        {
+            act_p("$c1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÐ²Ð¾Ð¹ Ð¿Ð¾ÑÑ‚.", victim, 0, 0, TO_ROOM, POS_RESTING);
+            continue;
+        }
+                             
+        dam = dice( level, 10 );
+        if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL ) )
+            dam /= 2;
 
-	align = victim->alignment;
-	align -= 350;
+        align = victim->alignment;
+        align -= 350;
 
-	if (align < -1000)
-	    align = -1000 + (align + 1000) / 3;
+        if (align < -1000)
+            align = -1000 + (align + 1000) / 3;
 
-	dam = (dam * align * align) / 1000000;
+        dam = (dam * align * align) / 1000000;
 
-	damage( ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL);
+        damage( ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL);
 
-	if (victim->in_room == 0)
-	    continue;
-	
-	if (FleeMovement( victim ).move( ))
-	    break;
+        if (victim->in_room == 0)
+            continue;
+        
+        if (FleeMovement( victim ).move( ))
+            break;
     }
 }

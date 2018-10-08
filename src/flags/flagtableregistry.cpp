@@ -36,12 +36,12 @@ void FlagTableRegistry::removeTable( const FlagTable *table )
     TablesMap::iterator t = tables2names.find( table );
     
     if (t != tables2names.end( )) {
-	NamesMap::iterator n = names2tables.find( t->second );
+        NamesMap::iterator n = names2tables.find( t->second );
 
-	if (n != names2tables.end( )) 
-	    names2tables.erase( n );
+        if (n != names2tables.end( )) 
+            names2tables.erase( n );
 
-	tables2names.erase( t );
+        tables2names.erase( t );
     }
 }
 
@@ -50,24 +50,24 @@ void FlagTableRegistry::removeTable( const DLString &name )
     NamesMap::iterator n = names2tables.find( name );
     
     if (n != names2tables.end( )) {
-	TablesMap::iterator t = tables2names.find( n->second );
+        TablesMap::iterator t = tables2names.find( n->second );
 
-	if (t != tables2names.end( ))
-	    tables2names.erase( t );
+        if (t != tables2names.end( ))
+            tables2names.erase( t );
 
-	names2tables.erase( n );
+        names2tables.erase( n );
     }
 }
 
 const DLString & FlagTableRegistry::getName( const FlagTable * table ) 
 {
     if (table == 0)
-	return DLString::emptyString;
+        return DLString::emptyString;
 
     TablesMap::iterator t = tables2names.find( table );
 
     if (t == tables2names.end( ))
-	return DLString::emptyString;
+        return DLString::emptyString;
 
     return t->second;
 }
@@ -75,12 +75,12 @@ const DLString & FlagTableRegistry::getName( const FlagTable * table )
 const FlagTable * FlagTableRegistry::getTable( const DLString & arg ) 
 {
     if (arg.empty( ))
-	return NULL;
+        return NULL;
 
     NamesMap::iterator n = names2tables.find( arg );
 
     if (n == names2tables.end( ))
-	return NULL;
+        return NULL;
     
     return n->second;
 }

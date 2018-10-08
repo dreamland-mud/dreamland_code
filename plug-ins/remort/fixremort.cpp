@@ -28,22 +28,22 @@ void FixRemortListener::run( int oldState, int newState, Descriptor *d )
     PCharacter *ch;
     
     if (newState != CON_PLAYING)
-	return;
+        return;
     
     if (!d->character || !( ch = d->character->getPC( ) ))
-	return;
+        return;
     
     if (ch->getRemorts( ).size( ) == 0)
-	return;
+        return;
 
     if (ch->getAttributes( ).isAvailable( "fixremort1" )) {
-	fixOldRemort( ch );
-	return;
+        fixOldRemort( ch );
+        return;
     }
 
     if (ch->getAttributes( ).isAvailable( "fixremort2" )) {
-	fixNewRemort( ch );
-	return;
+        fixNewRemort( ch );
+        return;
     }
 }
 
@@ -58,8 +58,8 @@ void FixRemortListener::fixNewRemort( PCharacter *ch )
     adjustObjects( ch, ch->carrying, corpse );
 
     if (corpse->contains == 0) {
-	extract_obj( corpse );
-	corpse = 0;
+        extract_obj( corpse );
+        corpse = 0;
     }
     
     ch->getAttributes( ).eraseAttribute( "fixremort2" );
@@ -77,21 +77,21 @@ void FixRemortListener::fixOldRemort( PCharacter *ch )
     adjustObjects( ch, ch->carrying, corpse );
 
     if (corpse->contains == 0) {
-	extract_obj( corpse );
-	corpse = 0;
+        extract_obj( corpse );
+        corpse = 0;
     }
    
     ch->getAttributes( ).eraseAttribute( "fixremort1" );
     ch->getRemorts( ).resetBonuses( );
     
-    ch->send_to( "\r\n{R÷ÎÉÍÁÎÉÅ!{x\r\n"
-                 "ëÏÎÃÅÐÃÉÑ ÒÅÍÏÒÔÏ× ÉÚÍÅÎÅÎÁ. "
-		 "þÉÔÁÊÔÅ changes, help remort, help oldremort.\r\n" );
-		
+    ch->send_to( "\r\n{RÐ’Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ!{x\r\n"
+                 "ÐšÐ¾Ð½Ñ†ÐµÐ¿Ñ†Ð¸Ñ Ñ€ÐµÐ¼Ð¾Ñ€Ñ‚Ð¾Ð² Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð°. "
+                 "Ð§Ð¸Ñ‚Ð°Ð¹Ñ‚Ðµ changes, help remort, help oldremort.\r\n" );
+                
     if (corpse)
-	ch->send_to( "ïÂÒÁÔÉÔÅ ×ÎÉÍÁÎÉÅ ÎÁ ÍÅÛÏË, ËÏÔÏÒÙÊ ÌÅÖÉÔ Õ ×ÁÓ ÐÏÄ ÎÏÇÁÍÉ.\r\n"
-	             "ðÏÄÒÏÂÎÅÅ Ï ÎÅÍ ÔÏÖÅ ÓÍ. help oldremort.\r\n" );
-	
+        ch->send_to( "ÐžÐ±Ñ€Ð°Ñ‚Ð¸Ñ‚Ðµ Ð²Ð½Ð¸Ð¼Ð°Ð½Ð¸Ðµ Ð½Ð° Ð¼ÐµÑˆÐ¾Ðº, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ Ð»ÐµÐ¶Ð¸Ñ‚ Ñƒ Ð²Ð°Ñ Ð¿Ð¾Ð´ Ð½Ð¾Ð³Ð°Ð¼Ð¸.\r\n"
+                     "ÐŸÐ¾Ð´Ñ€Ð¾Ð±Ð½ÐµÐµ Ð¾ Ð½ÐµÐ¼ Ñ‚Ð¾Ð¶Ðµ ÑÐ¼. help oldremort.\r\n" );
+        
     ch->save( );
 }
 
@@ -106,10 +106,10 @@ Object * FixRemortListener::makeCorpse( PCharacter *ch )
     corpse->value[3] = ch->getHometown( )->getPit( );
     corpse->timer = 24 * 60;
 
-    corpse->setName( "ÍÅÛÏË sack" );
-    corpse->fmtShortDescr( "ÍÅÛ|ÏË|ËÁ|ËÕ|ÏË|ËÏÍ|ËÅ Ó ×ÅÝÁÍÉ %s", ch->getNameP( '2' ).c_str( ) );
-    corpse->fmtDescription( "íÅÛÏË (sack) Ó ×ÅÝÁÍÉ %s ÌÅÖÉÔ ÚÄÅÓØ.", ch->getNameP( '2' ).c_str( ) );
-		   
+    corpse->setName( "Ð¼ÐµÑˆÐ¾Ðº sack" );
+    corpse->fmtShortDescr( "Ð¼ÐµÑˆ|Ð¾Ðº|ÐºÐ°|ÐºÑƒ|Ð¾Ðº|ÐºÐ¾Ð¼|ÐºÐµ Ñ Ð²ÐµÑ‰Ð°Ð¼Ð¸ %s", ch->getNameP( '2' ).c_str( ) );
+    corpse->fmtDescription( "ÐœÐµÑˆÐ¾Ðº (sack) Ñ Ð²ÐµÑ‰Ð°Ð¼Ð¸ %s Ð»ÐµÐ¶Ð¸Ñ‚ Ð·Ð´ÐµÑÑŒ.", ch->getNameP( '2' ).c_str( ) );
+                   
     obj_to_room( corpse, ch->in_room );
     return corpse;
 }
@@ -119,27 +119,27 @@ void FixRemortListener::adjustObjects( PCharacter *ch, Object *list, Object *cor
     Object *obj, *obj_next;
 
     for (obj = list; obj; obj = obj_next) {
-	obj_next = obj->next_content;
-	
-	if (obj->contains)
-	    adjustObjects( ch, obj->contains, corpse );
+        obj_next = obj->next_content;
+        
+        if (obj->contains)
+            adjustObjects( ch, obj->contains, corpse );
 
-	if ((obj->getOwner( ) && is_name( obj->getOwner( ), ch->getNameP( '7' ).c_str( ) ))
-	    || (obj->extra_descr && obj->extra_descr->description 
-	        && strstr( obj->extra_descr->description, ch->getNameP( ) ) ))
-	{
-	    obj->level = std::min( (short)obj->level, ch->getModifyLevel( ) );
-	    log( "fix level: vnum " << obj->pIndexData->vnum << ", id " << obj->getID( ) );
-	}
-	else if (obj->mustDisappear( ch )) {
-	    if (obj->carried_by)
-		obj_from_char( obj );
-	    else
-		obj_from_obj( obj );
+        if ((obj->getOwner( ) && is_name( obj->getOwner( ), ch->getNameP( '7' ).c_str( ) ))
+            || (obj->extra_descr && obj->extra_descr->description 
+                && strstr( obj->extra_descr->description, ch->getNameP( ) ) ))
+        {
+            obj->level = std::min( (short)obj->level, ch->getModifyLevel( ) );
+            log( "fix level: vnum " << obj->pIndexData->vnum << ", id " << obj->getID( ) );
+        }
+        else if (obj->mustDisappear( ch )) {
+            if (obj->carried_by)
+                obj_from_char( obj );
+            else
+                obj_from_obj( obj );
 
-	    obj_to_obj( obj, corpse );
-	    log( "to corpse: vnum " << obj->pIndexData->vnum << ", id " << obj->getID( ) );
-	}
+            obj_to_obj( obj, corpse );
+            log( "to corpse: vnum " << obj->pIndexData->vnum << ", id " << obj->getID( ) );
+        }
     }
 }
 
@@ -156,14 +156,14 @@ void FixRemortListener::adjustExp( PCharacter *ch )
     oldExp = ch->exp;
 
     for (i = 0; i < remorts.size( ); i++) {
-	LifeData &life = remorts[i];
-	
-	ch->setRace( life.race.getValue( ) );
-	ch->setProfession( life.classCh.getValue( ) );
+        LifeData &life = remorts[i];
+        
+        ch->setRace( life.race.getValue( ) );
+        ch->setProfession( life.classCh.getValue( ) );
 
-	base = ch->getBaseExp( );
-	log( "#"<< i << " " << 100 * base << " ** " << ch->getExpPerLevel( 100, i ) );
-	oldExp += 100 * base;
+        base = ch->getBaseExp( );
+        log( "#"<< i << " " << 100 * base << " ** " << ch->getExpPerLevel( 100, i ) );
+        oldExp += 100 * base;
     }
     
     ch->setProfession( origProf );
@@ -171,28 +171,28 @@ void FixRemortListener::adjustExp( PCharacter *ch )
     newExp = ch->getExpPerLevel( );
 
     for (i = 0; i < remorts.size( ) && newExp <= oldExp; i++) {
-	LifeData &life = remorts[i];
-	
-	ch->setRace( life.race.getValue( ) );
-	ch->setProfession( life.classCh.getValue( ) );
+        LifeData &life = remorts[i];
+        
+        ch->setRace( life.race.getValue( ) );
+        ch->setProfession( life.classCh.getValue( ) );
 
-	newExp += ch->getExpPerLevel( 100, i );
+        newExp += ch->getExpPerLevel( 100, i );
     }
 
     ch->setProfession( origProf );
     ch->setRace( origRace );
 
     log( "Adjust exp for " 
-	<< ch->getName( ) << ": old exp " << oldExp << ", border exp " << newExp);
+        << ch->getName( ) << ": old exp " << oldExp << ", border exp " << newExp);
 
     if (i + 1 < remorts.size( )) {
-	log ( "erase lives from " << i+1 << " to " << remorts.size( ) - 1 );
-	remorts.erase( remorts.begin( ) + i + 1, remorts.end( ) );
+        log ( "erase lives from " << i+1 << " to " << remorts.size( ) - 1 );
+        remorts.erase( remorts.begin( ) + i + 1, remorts.end( ) );
     }
     
     ch->exp = URANGE( ch->getExpPerLevel( ),
-		      ch->exp.getValue( ),
-		      ch->getExpPerLevel( ch->getRealLevel( ) + 1 ) - 10 );
+                      ch->exp.getValue( ),
+                      ch->getExpPerLevel( ch->getRealLevel( ) + 1 ) - 10 );
 }
 
 void FixRemortListener::adjustBonuses( PCharacter *ch )
@@ -203,11 +203,11 @@ void FixRemortListener::adjustBonuses( PCharacter *ch )
     r.level = 0;
 
     for (int i = ch->getRealLevel( ); i > 1; i--) {
-	ch->max_hit -= r.getHitPerLevel( i );
-	ch->perm_hit -= r.getHitPerLevel( i );
-	ch->max_mana -= r.getManaPerLevel( i );
-	ch->perm_mana -= r.getManaPerLevel( i );
-	ch->max_skill_points -= r.getSkillPointsPerLevel( i );
+        ch->max_hit -= r.getHitPerLevel( i );
+        ch->perm_hit -= r.getHitPerLevel( i );
+        ch->max_mana -= r.getManaPerLevel( i );
+        ch->perm_mana -= r.getManaPerLevel( i );
+        ch->max_skill_points -= r.getSkillPointsPerLevel( i );
     }
 
     r.points     += 5 * r.hp / 50;
@@ -218,10 +218,10 @@ void FixRemortListener::adjustBonuses( PCharacter *ch )
     r.skillPoints = 0;
 
     for (int i = 0; i < stat_table.size; i++) {
-	if (i == STAT_CON)
-	    continue;
+        if (i == STAT_CON)
+            continue;
 
-	r.points += 10 * r.stats[i];
-	r.stats[i] = 0;
+        r.points += 10 * r.stats[i];
+        r.stats[i] = 0;
     }
 }

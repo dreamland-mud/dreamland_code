@@ -12,13 +12,13 @@
 
 extern "C"
 {
-	SO::PluginList initialize_quest_kill( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<MobileBehaviorRegistrator<VictimBehavior> >( ppl );
-		Plugin::registerPlugin<QuestRegistrator<KillQuest> >( ppl );
-		
-		return ppl;
-	}
+        SO::PluginList initialize_quest_kill( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<MobileBehaviorRegistrator<VictimBehavior> >( ppl );
+                Plugin::registerPlugin<QuestRegistrator<KillQuest> >( ppl );
+                
+                return ppl;
+        }
 }

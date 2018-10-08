@@ -19,7 +19,7 @@ public:
     virtual ~KidnapQuestRegistrator( );
     
     static inline KidnapQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
     XML_VARIABLE XMLInteger markVnum;

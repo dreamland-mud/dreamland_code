@@ -19,19 +19,19 @@
 class Room;
 
 /**
- * @short Задача для планировщика, которой на вход подаются комнаты
+ * @short п≈п╟п╢п╟я┤п╟ п╢п╩я▐ п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨п╟, п╨п╬я┌п╬я─п╬п╧ п╫п╟ п╡я┘п╬п╢ п©п╬п╢п╟я▌я┌я│я▐ п╨п╬п╪п╫п╟я┌я▀
  * @author Igor S. Petrenko
  * @see Scheduler
  * @see SchedulerTask
  */
 struct SchedulerTaskRoundRoom : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundRoom> Pointer;
-	
-	virtual void run( );
-	/** Обработать комнату */
-	virtual void run( Room* room ) = 0;
-	virtual int getPriority( ) const;
+        typedef ::Pointer<SchedulerTaskRoundRoom> Pointer;
+        
+        virtual void run( );
+        /** п·п╠я─п╟п╠п╬я┌п╟я┌я▄ п╨п╬п╪п╫п╟я┌я┐ */
+        virtual void run( Room* room ) = 0;
+        virtual int getPriority( ) const;
 };
 
 #endif

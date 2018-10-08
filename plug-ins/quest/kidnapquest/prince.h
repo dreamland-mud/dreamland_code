@@ -21,8 +21,8 @@ enum {
 
 class KidnapPrince : public KidnapMobile, 
                      public MandatoryMobile,
-		     public ProtectedClient,
-		     public ConfiguredMobile
+                     public ProtectedClient,
+                     public ConfiguredMobile
 {
 XML_OBJECT
 public:

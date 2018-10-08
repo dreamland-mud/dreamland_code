@@ -30,116 +30,116 @@ CMDRUN( mount )
     DLString arg, args = constArguments;
 
     if (IS_SET( ch->form, FORM_CENTAUR )) {
-	ostringstream buf;
-	
-	if (ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM)) {
-	    ch->println( "äÁ ÔÙ É ÔÁË ÎÁ ËÏÎÅ." );
-	    return;
-	}
-	
-	trust = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeTrust>( "mount" );
+        ostringstream buf;
+        
+        if (ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM)) {
+            ch->println( "Ð”Ð° Ñ‚Ñ‹ Ð¸ Ñ‚Ð°Ðº Ð½Ð° ÐºÐ¾Ð½Ðµ." );
+            return;
+        }
+        
+        trust = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeTrust>( "mount" );
 
-	if (trust->parse( constArguments, buf )) 
-	    ch->send_to( "åÚÄÉÔØ ÎÁ ÔÅÂÅ ×ÅÒÈÏÍ " );
-	    
-	ch->println( buf.str( ) );
-	return;
+        if (trust->parse( constArguments, buf )) 
+            ch->send_to( "Ð•Ð·Ð´Ð¸Ñ‚ÑŒ Ð½Ð° Ñ‚ÐµÐ±Ðµ Ð²ÐµÑ€Ñ…Ð¾Ð¼ " );
+            
+        ch->println( buf.str( ) );
+        return;
     }
     
     if (MOUNTED(ch)) {
-	ch->println( "ôÙ ÕÖÅ ×ÅÒÈÏÍ." );
-	return;
+        ch->println( "Ð¢Ñ‹ ÑƒÐ¶Ðµ Ð²ÐµÑ€Ñ…Ð¾Ð¼." );
+        return;
     }
 
     if (RIDDEN(ch)) {
-	ch->pecho( "îÏ ÔÅÂÑ ÓÁÍ%GÏ|ÏÇÏ|Õ ÏÓÅÄÁÌÉ!", ch );
-	return;
+        ch->pecho( "ÐÐ¾ Ñ‚ÐµÐ±Ñ ÑÐ°Ð¼%GÐ¾|Ð¾Ð³Ð¾|Ñƒ Ð¾ÑÐµÐ´Ð°Ð»Ð¸!", ch );
+        return;
     }
 
     arg = args.getOneArgument( );
 
     if (( horse = get_char_room( ch, arg.c_str( ) ) ) == NULL) {
-	ch->println( "ëÏÇÏ ÔÙ ÈÏÞÅÛØ ÏÓÅÄÌÁÔØ?" );
-	return;
+        ch->println( "ÐšÐ¾Ð³Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ?" );
+        return;
     }
     
     if (MOUNTED(horse) || horse == ch) {
-	ch->pecho( "íÙ ÎÅ × ÃÉÒËÅ!" );
-	return;
+        ch->pecho( "ÐœÑ‹ Ð½Ðµ Ð² Ñ†Ð¸Ñ€ÐºÐµ!" );
+        return;
     }
     
     if (RIDDEN(horse)) {
-	ch->pecho( "%1$^C1 ÕÖÅ ÏÓÅÄÌÁ%1$GÎÏ|Î|ÎÁ.", horse );
-	return;
+        ch->pecho( "%1$^C1 ÑƒÐ¶Ðµ Ð¾ÑÐµÐ´Ð»Ð°%1$GÐ½Ð¾|Ð½|Ð½Ð°.", horse );
+        return;
     }
     
     if (!horse->is_npc( )) { /* pc-mounts like centaurs */
         if (!IS_SET(horse->form, FORM_CENTAUR)) {
-            act("$c1 ÐÙÔÁÅÔÓÑ ÚÁÐÒÙÇÎÕÔØ ×ÅÒÈÏÍ ÎÁ $C4.", ch, 0, horse, TO_NOTVICT);
-            act("$c1 ÐÙÔÁÅÔÓÑ ÚÁÐÒÙÇÎÕÔØ ×ÅÒÈÏÍ ÎÁ ÔÅÂÑ.", ch, 0, horse, TO_VICT);
-            act("ôÙ ÐÙÔÁÅÛØÓÑ ÏÓÅÄÌÁÔØ $C4, ÎÏ ÎÉËÁË ÎÅ ÐÏÊÍÅÛØ, ÇÄÅ ÖÅ Õ $X ÓÔÒÅÍÅÎÁ..", ch, 0, horse, TO_CHAR);
+            act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð½ÑƒÑ‚ÑŒ Ð²ÐµÑ€Ñ…Ð¾Ð¼ Ð½Ð° $C4.", ch, 0, horse, TO_NOTVICT);
+            act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð½ÑƒÑ‚ÑŒ Ð²ÐµÑ€Ñ…Ð¾Ð¼ Ð½Ð° Ñ‚ÐµÐ±Ñ.", ch, 0, horse, TO_VICT);
+            act("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4, Ð½Ð¾ Ð½Ð¸ÐºÐ°Ðº Ð½Ðµ Ð¿Ð¾Ð¹Ð¼ÐµÑˆÑŒ, Ð³Ð´Ðµ Ð¶Ðµ Ñƒ $X ÑÑ‚Ñ€ÐµÐ¼ÐµÐ½Ð°..", ch, 0, horse, TO_CHAR);
             return;
         }
-	
-	trust = horse->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( "mount" );
-	if (!trust || !trust->check( ch )) {
-            act("$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ $C4. $C1 ÓÔÒÏÇÏ ÓÍÏÔÒÉÔ ÎÁ $c4.", ch, 0, horse, TO_NOTVICT);
-            act("$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ ÔÅÂÑ, ÎÏ ÚÁÍÅÔÉ× Ô×ÏÊ ÓÔÒÏÇÉÊ ×ÚÇÌÑÄ, ÏÓÔÁÎÁ×ÌÉ×ÁÅÔÓÑ.", ch, 0, horse, TO_VICT);
-            act("$C1 ÎÅ ÖÅÌÁÅÔ, ÞÔÏÂÙ ÎÁ $Z ËÁÔÁÌÉÓØ.", ch, 0, horse, TO_CHAR);
+        
+        trust = horse->getPC( )->getAttributes( ).findAttr<XMLAttributeTrust>( "mount" );
+        if (!trust || !trust->check( ch )) {
+            act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4. $C1 ÑÑ‚Ñ€Ð¾Ð³Ð¾ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð½Ð° $c4.", ch, 0, horse, TO_NOTVICT);
+            act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ Ñ‚ÐµÐ±Ñ, Ð½Ð¾ Ð·Ð°Ð¼ÐµÑ‚Ð¸Ð² Ñ‚Ð²Ð¾Ð¹ ÑÑ‚Ñ€Ð¾Ð³Ð¸Ð¹ Ð²Ð·Ð³Ð»ÑÐ´, Ð¾ÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ÑÑ.", ch, 0, horse, TO_VICT);
+            act("$C1 Ð½Ðµ Ð¶ÐµÐ»Ð°ÐµÑ‚, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð½Ð° $Z ÐºÐ°Ñ‚Ð°Ð»Ð¸ÑÑŒ.", ch, 0, horse, TO_CHAR);
             return;
         }
     }
     else if (!ch->isCoder( )) { /* other rideable beasts */
-	if (!IS_SET(horse->act, ACT_RIDEABLE)) {
-            act("$c1 ÐÙÔÁÅÔÓÑ ÚÁÐÒÙÇÎÕÔØ ×ÅÒÈÏÍ ÎÁ $C4, ÎÏ ÓÏÓËÁÌØÚÙ×ÁÅÔ.", ch, 0, horse, TO_NOTVICT);
-	    ch->println("üÔÏÔ ×ÉÄ ÖÉ×ÙÈ ÓÕÝÅÓÔ× ÎÅ ÐÒÅÄÎÁÚÎÁÞÅÎ ÄÌÑ ×ÅÒÈÏ×ÏÊ ÅÚÄÙ.");
-	    return;
-	}
-	
-	if (horse->getModifyLevel( ) - ch->getModifyLevel( ) > 5) {
-            act("$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ $C4, ÎÏ ÏÐÙÔÁ Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, horse, TO_NOTVICT);
-	    ch->println("ôÅÂÅ ÎÅ È×ÁÔÉÔ ÏÐÙÔÁ ÓÐÒÁ×ÉÔØÓÑ Ó ÜÔÉÍ ÓËÁËÕÎÏÍ.");
-	    return;
-	}
+        if (!IS_SET(horse->act, ACT_RIDEABLE)) {
+            act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð½ÑƒÑ‚ÑŒ Ð²ÐµÑ€Ñ…Ð¾Ð¼ Ð½Ð° $C4, Ð½Ð¾ ÑÐ¾ÑÐºÐ°Ð»ÑŒÐ·Ñ‹Ð²Ð°ÐµÑ‚.", ch, 0, horse, TO_NOTVICT);
+            ch->println("Ð­Ñ‚Ð¾Ñ‚ Ð²Ð¸Ð´ Ð¶Ð¸Ð²Ñ‹Ñ… ÑÑƒÑ‰ÐµÑÑ‚Ð² Ð½Ðµ Ð¿Ñ€ÐµÐ´Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½ Ð´Ð»Ñ Ð²ÐµÑ€Ñ…Ð¾Ð²Ð¾Ð¹ ÐµÐ·Ð´Ñ‹.");
+            return;
+        }
+        
+        if (horse->getModifyLevel( ) - ch->getModifyLevel( ) > 5) {
+            act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4, Ð½Ð¾ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, horse, TO_NOTVICT);
+            ch->println("Ð¢ÐµÐ±Ðµ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð¸Ñ‚ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒÑÑ Ñ ÑÑ‚Ð¸Ð¼ ÑÐºÐ°ÐºÑƒÐ½Ð¾Ð¼.");
+            return;
+        }
     }
     
     if ((horse->is_npc( ) || IS_AFFECTED(horse, AFF_CHARM))
-	&& horse->master 
-	&& horse->master != ch) 
+        && horse->master 
+        && horse->master != ch) 
     {
-	ch->pecho("õ %C2 ÕÖÅ ÅÓÔØ ÈÏÚÑÉÎ, É ÜÔÏ Ñ×ÎÏ - ÎÅ ÔÙ!", horse );
-	return;
+        ch->pecho("Ð£ %C2 ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ Ñ…Ð¾Ð·ÑÐ¸Ð½, Ð¸ ÑÑ‚Ð¾ ÑÐ²Ð½Ð¾ - Ð½Ðµ Ñ‚Ñ‹!", horse );
+        return;
     }
     
     if (horse->position < POS_STANDING) {
-	ch->pecho("%1$^C1 ÄÏÌÖ%1$GÎÏ|ÅÎ|ÎÁ ÄÌÑ ÎÁÞÁÌÁ ×ÓÔÁÔØ ÎÁ ÎÏÇÉ.", horse );
-	return;
+        ch->pecho("%1$^C1 Ð´Ð¾Ð»Ð¶%1$GÐ½Ð¾|ÐµÐ½|Ð½Ð° Ð´Ð»Ñ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð²ÑÑ‚Ð°Ñ‚ÑŒ Ð½Ð° Ð½Ð¾Ð³Ð¸.", horse );
+        return;
     }
 
     if (ch->move < moveCost) {
-	ch->println("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÓÉÌ ÄÁÖÅ ÚÁÄÒÁÔØ ÎÏÇÕ.");
-	return;
+        ch->println("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ¸Ð» Ð´Ð°Ð¶Ðµ Ð·Ð°Ð´Ñ€Ð°Ñ‚ÑŒ Ð½Ð¾Ð³Ñƒ.");
+        return;
     }
     
     /* horrible XXX unless riding skills are available for all */
     if (horse->is_npc( ) 
-	    && ((horse->getNPC( )->pIndexData->vnum >= 50000
-	           && horse->getNPC( )->pIndexData->vnum <= 51000)
-		|| (horse->getNPC( )->pIndexData->vnum >= 550
-		   && horse->getNPC( )->pIndexData->vnum <= 560)))
+            && ((horse->getNPC( )->pIndexData->vnum >= 50000
+                   && horse->getNPC( )->pIndexData->vnum <= 51000)
+                || (horse->getNPC( )->pIndexData->vnum >= 550
+                   && horse->getNPC( )->pIndexData->vnum <= 560)))
     {
     }
     else if (horse->is_npc( ) 
-	     && number_percent( ) > gsn_riding->getEffective( ch ) 
-	     && !ch->isCoder( )) 
+             && number_percent( ) > gsn_riding->getEffective( ch ) 
+             && !ch->isCoder( )) 
     {
-	act( "ôÅÂÅ ÎÅ È×ÁÔÉÌÏ ÍÁÓÔÅÒÓÔ×Á ÏÓÅÄÌÁÔØ $C4.", ch, 0, horse, TO_CHAR );
-	act( "$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ ÔÅÂÑ, ÎÏ ÍÁÓÔÅÒÓÔ×Á Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, horse, TO_VICT );
-	act( "$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ $C4, ÎÏ ÍÁÓÔÅÒÓÔ×Á Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, horse, TO_NOTVICT );
-	
-	ch->setWait( gsn_riding->getBeats( ) );
-	gsn_riding->improve( ch, false );
-	return;
+        act( "Ð¢ÐµÐ±Ðµ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð¸Ð»Ð¾ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð° Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4.", ch, 0, horse, TO_CHAR );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ Ñ‚ÐµÐ±Ñ, Ð½Ð¾ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, horse, TO_VICT );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4, Ð½Ð¾ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, horse, TO_NOTVICT );
+        
+        ch->setWait( gsn_riding->getBeats( ) );
+        gsn_riding->improve( ch, false );
+        return;
     }
 
     ch->mount = horse;
@@ -147,9 +147,9 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    act( "ôÙ ÚÁÐÒÙÇÉ×ÁÅÛØ ÎÁ $C4.", ch, 0, horse, TO_CHAR );
-    act( "$c1 ÚÁÐÒÙÇÉ×ÁÅÔ ÔÅÂÅ ÎÁ ÓÐÉÎÕ.", ch, 0, horse, TO_VICT );
-    act( "$c1 ÚÁÐÒÙÇÉ×ÁÅÔ ÎÁ ÓÐÉÎÕ $C2.", ch, 0, horse, TO_NOTVICT );
+    act( "Ð¢Ñ‹ Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑˆÑŒ Ð½Ð° $C4.", ch, 0, horse, TO_CHAR );
+    act( "$c1 Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ Ð½Ð° ÑÐ¿Ð¸Ð½Ñƒ.", ch, 0, horse, TO_VICT );
+    act( "$c1 Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑ‚ Ð½Ð° ÑÐ¿Ð¸Ð½Ñƒ $C2.", ch, 0, horse, TO_NOTVICT );
     
     gsn_riding->improve( ch, true);
 
@@ -159,96 +159,96 @@ CMDRUN( mount )
     HorseBridle::Pointer bridle;
     Skill *ridingSkill = &*gsn_horseback_riding;
     if (!horse->is_npc( ) && horse->getRace( ) != race_centaur) {
-	ch->println("ðÏÐÒÏÂÕÊ mlove.");
-	return;
+        ch->println("ÐŸÐ¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ mlove.");
+        return;
     }
 
     if (horse->is_npc( )) {
-	Rideable::Pointer rideable;
-	
-	if (horse->getNPC( )->behavior)
-	    rideable = horse->getNPC( )->behavior.getDynamicPointer<Rideable>( );
+        Rideable::Pointer rideable;
+        
+        if (horse->getNPC( )->behavior)
+            rideable = horse->getNPC( )->behavior.getDynamicPointer<Rideable>( );
 
-	if (!rideable) {
-	    ch->println("üÔÏÔ ×ÉÄ ÖÉ×ÙÈ ÓÕÝÅÓÔ× ÎÅ ÐÒÅÄÎÁÚÎÁÞÅÎ ÄÌÑ ×ÅÒÈÏ×ÏÊ ÅÚÄÙ.");
-	    return;
-	}
-	
-	ridingSkill = rideable->getRidingSkill( );
+        if (!rideable) {
+            ch->println("Ð­Ñ‚Ð¾Ñ‚ Ð²Ð¸Ð´ Ð¶Ð¸Ð²Ñ‹Ñ… ÑÑƒÑ‰ÐµÑÑ‚Ð² Ð½Ðµ Ð¿Ñ€ÐµÐ´Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½ Ð´Ð»Ñ Ð²ÐµÑ€Ñ…Ð¾Ð²Ð¾Ð¹ ÐµÐ·Ð´Ñ‹.");
+            return;
+        }
+        
+        ridingSkill = rideable->getRidingSkill( );
     }
 
     if (abs( ch->size - horse->size ) > 1) {
-	ch->println("ðÏÄÙÝÉ ËÏÇÏ-ÔÏ ÂÏÌÅÅ ÐÏÄÈÏÄÑÝÅÇÏ ÒÁÚÍÅÒÁ.");
-	return;
+        ch->println("ÐŸÐ¾Ð´Ñ‹Ñ‰Ð¸ ÐºÐ¾Ð³Ð¾-Ñ‚Ð¾ Ð±Ð¾Ð»ÐµÐµ Ð¿Ð¾Ð´Ñ…Ð¾Ð´ÑÑ‰ÐµÐ³Ð¾ Ñ€Ð°Ð·Ð¼ÐµÑ€Ð°.");
+        return;
     }
 
     if (horse->is_npc( ) 
-	&& horse->getModifyLevel( ) - ch->getModifyLevel( ) > ch->getModifyLevel / 10)
+        && horse->getModifyLevel( ) - ch->getModifyLevel( ) > ch->getModifyLevel / 10)
     {
-	ch->println("ôÅÂÅ ÎÅ È×ÁÔÉÔ ÏÐÙÔÁ ÓÐÒÁ×ÉÔØÓÑ Ó ÜÔÉÍ ÓËÁËÕÎÏÍ.");
-	return;
+        ch->println("Ð¢ÐµÐ±Ðµ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð¸Ñ‚ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒÑÑ Ñ ÑÑ‚Ð¸Ð¼ ÑÐºÐ°ÐºÑƒÐ½Ð¾Ð¼.");
+        return;
     }
 
     if (!( obj = wear_horse->find( horse ) ) 
-	|| !obj->behavior
-	|| !( sadle = obj->behavior.getDynamicPointer<HorseSaddle>( ) ))
+        || !obj->behavior
+        || !( sadle = obj->behavior.getDynamicPointer<HorseSaddle>( ) ))
     {
-	ch->pecho("ëÁË ÔÙ ÓÏÂÉÒÁÅÛØÓÑ ËÁÔÁÔØÓÑ? îÁ %C6 ÎÅÔ ÓÅÄÌÁ.", horse);
-	return;
+        ch->pecho("ÐšÐ°Ðº Ñ‚Ñ‹ ÑÐ¾Ð±Ð¸Ñ€Ð°ÐµÑˆÑŒÑÑ ÐºÐ°Ñ‚Ð°Ñ‚ÑŒÑÑ? ÐÐ° %C6 Ð½ÐµÑ‚ ÑÐµÐ´Ð»Ð°.", horse);
+        return;
     }
 
     if (( obj = wear_head->find( horse ) )
-	&& obj->behavior
-	&& ( bridle = obj->behavior.getDynamicPointer<HorseBridle>( ) ))
+        && obj->behavior
+        && ( bridle = obj->behavior.getDynamicPointer<HorseBridle>( ) ))
     {
-	if (bridle->isTethered( )) {
-	    ch->pecho("ôÅÂÅ ÓÔÏÉÔ ÄÌÑ ÎÁÞÁÌÁ ÏÔ×ÑÚÁÔØ %C4.", horse );
-	    return;
-	}
+        if (bridle->isTethered( )) {
+            ch->pecho("Ð¢ÐµÐ±Ðµ ÑÑ‚Ð¾Ð¸Ñ‚ Ð´Ð»Ñ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð¾Ñ‚Ð²ÑÐ·Ð°Ñ‚ÑŒ %C4.", horse );
+            return;
+        }
     }
     else if (horse->is_npc( )) {
-	ch->pecho("ëÁË ÔÙ ÓÏÂÉÒÁÅÛØÓÑ ËÁÔÁÔØÓÑ? îÁ %C6 ÎÅÔ ÕÚÄÅÞËÉ.", horse );
-	return;
+        ch->pecho("ÐšÐ°Ðº Ñ‚Ñ‹ ÑÐ¾Ð±Ð¸Ñ€Ð°ÐµÑˆÑŒÑÑ ÐºÐ°Ñ‚Ð°Ñ‚ÑŒÑÑ? ÐÐ° %C6 Ð½ÐµÑ‚ ÑƒÐ·Ð´ÐµÑ‡ÐºÐ¸.", horse );
+        return;
     }
 
     if ((horse->is_npc( ) || IS_AFFECTED(horse, AFF_CHARM))
-	&& horse->master 
-	&& horse->master != ch) 
+        && horse->master 
+        && horse->master != ch) 
     {
-	ch->pecho("õ %C2 ÕÖÅ ÅÓÔØ ÈÏÚÑÉÎ, É ÜÔÏ Ñ×ÎÏ - ÎÅ ÔÙ!", horse );
-	return;
+        ch->pecho("Ð£ %C2 ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ Ñ…Ð¾Ð·ÑÐ¸Ð½, Ð¸ ÑÑ‚Ð¾ ÑÐ²Ð½Ð¾ - Ð½Ðµ Ñ‚Ñ‹!", horse );
+        return;
     }
     
     if (horse->position < POS_STANDING) {
-	ch->pecho("%1$^C1 ÄÏÌÖ%1$GÎÏ|ÅÎ|ÎÁ ÄÌÑ ÎÁÞÁÌÁ ×ÓÔÁÔØ ÎÁ ÎÏÇÉ.", horse );
-	return;
+        ch->pecho("%1$^C1 Ð´Ð¾Ð»Ð¶%1$GÐ½Ð¾|ÐµÐ½|Ð½Ð° Ð´Ð»Ñ Ð½Ð°Ñ‡Ð°Ð»Ð° Ð²ÑÑ‚Ð°Ñ‚ÑŒ Ð½Ð° Ð½Ð¾Ð³Ð¸.", horse );
+        return;
     }
 
     if (ch->move < moveCost) {
-	ch->println("õ ÔÅÂÑ ÎÅ È×ÁÔÁÅÔ ÓÉÌ ÄÁÖÅ ÚÁÄÒÁÔØ ÎÏÇÕ.");
-	return;
+        ch->println("Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ ÑÐ¸Ð» Ð´Ð°Ð¶Ðµ Ð·Ð°Ð´Ñ€Ð°Ñ‚ÑŒ Ð½Ð¾Ð³Ñƒ.");
+        return;
     }
 
     ch->move -= moveCost;
     ch->setWait( ridingSkill->getBeats( ) );
     
     if (number_percent( ) > gsn_carry_rider->getEffective( horse )) {
-	act( "$C1 ÂÒÙËÁÅÔÓÑ, É ÔÙ ÐÁÄÁÅÛØ.", ch, 0, horse, TO_CHAR );
-	act( "$c1 ÐÙÔÁÅÔÓÑ ×ÓËÏÞÉÔØ ÔÅÂÅ ÎÁ ÓÐÉÎÕ, ÎÏ ÔÙ ÂÒÙËÁÅÛØÓÑ, É $e ÐÁÄÁÅÔ.", ch, 0, horse, TO_VICT );
-	act( "$c1 ÐÙÔÁÅÔÓÑ ×ÓËÏÞÉÔØ ÎÁ ÓÐÉÎÕ $C3, ÎÏ $e ÂÒÙËÁÅÔÓÑ É $c1 ÐÁÄÁÅÔ.", ch, 0, horse, TO_NOTVICT );
+        act( "$C1 Ð±Ñ€Ñ‹ÐºÐ°ÐµÑ‚ÑÑ, Ð¸ Ñ‚Ñ‹ Ð¿Ð°Ð´Ð°ÐµÑˆÑŒ.", ch, 0, horse, TO_CHAR );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð²ÑÐºÐ¾Ñ‡Ð¸Ñ‚ÑŒ Ñ‚ÐµÐ±Ðµ Ð½Ð° ÑÐ¿Ð¸Ð½Ñƒ, Ð½Ð¾ Ñ‚Ñ‹ Ð±Ñ€Ñ‹ÐºÐ°ÐµÑˆÑŒÑÑ, Ð¸ $e Ð¿Ð°Ð´Ð°ÐµÑ‚.", ch, 0, horse, TO_VICT );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð²ÑÐºÐ¾Ñ‡Ð¸Ñ‚ÑŒ Ð½Ð° ÑÐ¿Ð¸Ð½Ñƒ $C3, Ð½Ð¾ $e Ð±Ñ€Ñ‹ÐºÐ°ÐµÑ‚ÑÑ Ð¸ $c1 Ð¿Ð°Ð´Ð°ÐµÑ‚.", ch, 0, horse, TO_NOTVICT );
 
-	gsn_carry_rider->improve( horse, false );
-	ch->position = POS_SITTING;
-	return;
+        gsn_carry_rider->improve( horse, false );
+        ch->position = POS_SITTING;
+        return;
     }
 
     if (number_percent( ) > ridingSkill->getEffective( ch )) {
-	act( "ôÅÂÅ ÎÅ È×ÁÔÉÌÏ ÍÁÓÔÅÒÓÔ×Á ÏÓÅÄÌÁÔØ $C4.", ch, 0, horse, TO_CHAR );
-	act( "$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ ÔÅÂÑ, ÎÏ ÏÐÙÔÁ Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, horse, TO_VICT );
-	act( "$c1 ÐÙÔÁÅÔÓÑ ÏÓÅÄÌÁÔØ $C4, ÎÏ ÏÐÙÔÁ Ñ×ÎÏ ÎÅ È×ÁÔÁÅÔ.", ch, 0, horse, TO_NOTVICT );
+        act( "Ð¢ÐµÐ±Ðµ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð¸Ð»Ð¾ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð° Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4.", ch, 0, horse, TO_CHAR );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ Ñ‚ÐµÐ±Ñ, Ð½Ð¾ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, horse, TO_VICT );
+        act( "$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾ÑÐµÐ´Ð»Ð°Ñ‚ÑŒ $C4, Ð½Ð¾ Ð¾Ð¿Ñ‹Ñ‚Ð° ÑÐ²Ð½Ð¾ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚.", ch, 0, horse, TO_NOTVICT );
 
-	ridingSkill->improve( ch, false );
-	return;
+        ridingSkill->improve( ch, false );
+        return;
     }
     
     ch->mount = horse;
@@ -256,9 +256,9 @@ CMDRUN( mount )
     horse->mount = ch;
     horse->riding = false;
 
-    act( "ôÙ ÚÁÐÒÙÇÉ×ÁÅÛØ ÎÁ $C4.", ch, 0, horse, TO_CHAR );
-    act( "$c1 ÚÁÐÒÙÇÉ×ÁÅÔ ÔÅÂÅ ÎÁ ÓÐÉÎÕ.", ch, 0, horse, TO_VICT );
-    act( "$c1 ÚÁÐÒÙÇÉ×ÁÅÔ ÎÁ ÓÐÉÎÕ $C2.", ch, 0, horse, TO_NOTVICT );
+    act( "Ð¢Ñ‹ Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑˆÑŒ Ð½Ð° $C4.", ch, 0, horse, TO_CHAR );
+    act( "$c1 Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ Ð½Ð° ÑÐ¿Ð¸Ð½Ñƒ.", ch, 0, horse, TO_VICT );
+    act( "$c1 Ð·Ð°Ð¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑ‚ Ð½Ð° ÑÐ¿Ð¸Ð½Ñƒ $C2.", ch, 0, horse, TO_NOTVICT );
 
     ridingSkill->improve( ch, true );
 #endif    
@@ -273,19 +273,19 @@ CMDRUN( dismount )
      * jump off the horse 
      */
     if (!ch->mount) {
-	ch->println( "îÉ ÎÁÄ ÔÏÂÏÊ, ÎÉ ÐÏÄ ÔÏÂÏÊ ÎÉËÏÇÏ ÎÅÔ!" );
-	return;
+        ch->println( "ÐÐ¸ Ð½Ð°Ð´ Ñ‚Ð¾Ð±Ð¾Ð¹, Ð½Ð¸ Ð¿Ð¾Ð´ Ñ‚Ð¾Ð±Ð¾Ð¹ Ð½Ð¸ÐºÐ¾Ð³Ð¾ Ð½ÐµÑ‚!" );
+        return;
     }
     
     if (MOUNTED(ch)) {
-	act( "ôÙ ÓÏÓËÁËÉ×ÁÅÛØ ÓÏ ÓÐÉÎÙ $C2.", ch, 0, ch->mount, TO_CHAR );
-	act( "$c1 ÓÏÓËÁËÉ×ÁÅÔ Ó Ô×ÏÅÊ ÓÐÉÎÙ.", ch, 0, ch->mount, TO_VICT );
-	act( "$c1 ÓÐÒÙÇÉ×ÁÅÔ Ó $C2.", ch, 0, ch->mount, TO_NOTVICT );
+        act( "Ð¢Ñ‹ ÑÐ¾ÑÐºÐ°ÐºÐ¸Ð²Ð°ÐµÑˆÑŒ ÑÐ¾ ÑÐ¿Ð¸Ð½Ñ‹ $C2.", ch, 0, ch->mount, TO_CHAR );
+        act( "$c1 ÑÐ¾ÑÐºÐ°ÐºÐ¸Ð²Ð°ÐµÑ‚ Ñ Ñ‚Ð²Ð¾ÐµÐ¹ ÑÐ¿Ð¸Ð½Ñ‹.", ch, 0, ch->mount, TO_VICT );
+        act( "$c1 ÑÐ¿Ñ€Ñ‹Ð³Ð¸Ð²Ð°ÐµÑ‚ Ñ $C2.", ch, 0, ch->mount, TO_NOTVICT );
     }
     else {
-	act( "ôÙ ÓÂÒÁÓÙ×ÁÅÛØ $C4 ÓÏ ÓÐÉÎÙ.", ch, 0, ch->mount, TO_CHAR );
-	act( "$c1 ÓÂÒÁÓÙ×ÁÅÔ ÔÅÂÑ ÓÏ ÓÐÉÎÙ.", ch, 0, ch->mount, TO_VICT );
-	act( "$c1 ÓÂÒÁÓÙ×ÁÅÔ $C4 ÓÏ ÓÐÉÎÙ.", ch, 0, ch->mount, TO_NOTVICT );
+        act( "Ð¢Ñ‹ ÑÐ±Ñ€Ð°ÑÑ‹Ð²Ð°ÐµÑˆÑŒ $C4 ÑÐ¾ ÑÐ¿Ð¸Ð½Ñ‹.", ch, 0, ch->mount, TO_CHAR );
+        act( "$c1 ÑÐ±Ñ€Ð°ÑÑ‹Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ ÑÐ¾ ÑÐ¿Ð¸Ð½Ñ‹.", ch, 0, ch->mount, TO_VICT );
+        act( "$c1 ÑÐ±Ñ€Ð°ÑÑ‹Ð²Ð°ÐµÑ‚ $C4 ÑÐ¾ ÑÐ¿Ð¸Ð½Ñ‹.", ch, 0, ch->mount, TO_NOTVICT );
     }
     
     ch->dismount( );
@@ -300,33 +300,33 @@ CMDRUN( dismount )
      * dismount victim 
      */
     if (( learned = gsn_dismount->getEffective( ch ) ) <= 1) {
-	ch->println("ôÙ ÎÅ ×ÌÁÄÅÅÛØ ÉÓËÕÓÓÔ×ÏÍ ÓÔÁÓËÉ×ÁÔØ ÐÒÏÔÉ×ÎÉËÁ Ó ÌÏÛÁÄÉ.");
-	return;
+        ch->println("Ð¢Ñ‹ Ð½Ðµ Ð²Ð»Ð°Ð´ÐµÐµÑˆÑŒ Ð¸ÑÐºÑƒÑÑÑ‚Ð²Ð¾Ð¼ ÑÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð½Ð¸ÐºÐ° Ñ Ð»Ð¾ÑˆÐ°Ð´Ð¸.");
+        return;
     }
     
     arg = args.getOneArgument( );
 
     if (( victim = get_char_room( ch, arg.c_str( ) ) ) == NULL) {
-	ch->println( "ëÏÇÏ ÔÙ ÈÏÞÅÛØ ÓÔÁÝÉÔØ Ó ÌÏÛÁÄÉ?" );
-	return;
+        ch->println( "ÐšÐ¾Ð³Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ ÑÑ‚Ð°Ñ‰Ð¸Ñ‚ÑŒ Ñ Ð»Ð¾ÑˆÐ°Ð´Ð¸?" );
+        return;
     }
     
     if (!MOUNTED(victim)) {
-	ch->pecho("îÏ %C1 ÎÅ × ÓÅÄÌÅ.", victim);
-	return;
+        ch->pecho("ÐÐ¾ %C1 Ð½Ðµ Ð² ÑÐµÐ´Ð»Ðµ.", victim);
+        return;
     }
 
     if (victim == ch) {
-	ch->println("óÔÁÝÉÔØ ÓÅÂÑ? íÏÖÅÔ, ÐÒÏÝÅ ÓÐÒÙÇÎÕÔØ?");
-	return;
+        ch->println("Ð¡Ñ‚Ð°Ñ‰Ð¸Ñ‚ÑŒ ÑÐµÐ±Ñ? ÐœÐ¾Ð¶ÐµÑ‚, Ð¿Ñ€Ð¾Ñ‰Ðµ ÑÐ¿Ñ€Ñ‹Ð³Ð½ÑƒÑ‚ÑŒ?");
+        return;
     }
     
     if (is_safe( ch, victim ))
-	return;
+        return;
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
-	ch->pecho("îÏ ×ÅÄØ %C1 - Ô×ÏÊ ÌÀÂÉÍÙÊ ÈÏÚÑÉÎ!", victim);
-	return;
+        ch->pecho("ÐÐ¾ Ð²ÐµÐ´ÑŒ %C1 - Ñ‚Ð²Ð¾Ð¹ Ð»ÑŽÐ±Ð¸Ð¼Ñ‹Ð¹ Ñ…Ð¾Ð·ÑÐ¸Ð½!", victim);
+        return;
     }
     
     chance = 1;
@@ -334,30 +334,30 @@ CMDRUN( dismount )
     chance += (ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX)) * 2;
 
     if (( wield = wear_wield->find( ch ) ))
-	switch (wield->value[0]) {
-	case WEAPON_POLEARM: 
-	    chance += 20;
-	    break;
-	case WEAPON_DAGGER:
-	    chance -= 40;
-	    break;
-	case WEAPON_SPEAR:
-	    chance += 10;
-	    break;
-	}
+        switch (wield->value[0]) {
+        case WEAPON_POLEARM: 
+            chance += 20;
+            break;
+        case WEAPON_DAGGER:
+            chance -= 40;
+            break;
+        case WEAPON_SPEAR:
+            chance += 10;
+            break;
+        }
     else
-	chance -= 30;
+        chance -= 30;
     
     if (!victim->can_see( ch ))
-	chance += 20;
+        chance += 20;
     else if (victim->fighting && victim->fighting != ch)
-	chance += 10;
+        chance += 10;
     
     chance = chance * learned / 100;
     chance = URANGE( 1, chance, 100 );
     
     if (number_percent( ) < chance) {
-	gsn_dismount->improve( ch, true, victim );		
+        gsn_dismount->improve( ch, true, victim );                
     }
 #endif    
 }

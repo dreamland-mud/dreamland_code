@@ -31,17 +31,17 @@ short get_wear_level( Character *ch, Object *obj );
 bool BasicMobileBehavior::spec( )
 {
     if (ch->fighting) {
-	if (specFight( ))
-	    return true;
-	
-	if (specFightCaster( ))
-	    return true;
+        if (specFight( ))
+            return true;
+        
+        if (specFightCaster( ))
+            return true;
 
-	return false;
+        return false;
     }
 
     if (isAdrenalined( ))
-	return specAdrenaline( );
+        return specAdrenaline( );
 
     return specIdle( );
 }
@@ -49,25 +49,25 @@ bool BasicMobileBehavior::spec( )
 bool BasicMobileBehavior::specFight( )
 {
     if (doWimpy( ))
-	return true;
+        return true;
 
     if (isAfterCharm( ))
-	return true;
+        return true;
     
     if (ch->wait > 0)
-	return false;
+        return false;
 
     if (doCallHelp( ))
-	return true;
+        return true;
 
     if (doPickWeapon( ))
-	return true;
+        return true;
 
     if (doQuaff( ))
-	return true;
+        return true;
 
     if (doScavenge( ))
-	return true;
+        return true;
 
     return false;
 }
@@ -75,22 +75,22 @@ bool BasicMobileBehavior::specFight( )
 bool BasicMobileBehavior::specAdrenaline( )
 {
     if (!IS_AWAKE( ch ))
-	return false;
+        return false;
 
     if (isAfterCharm( ))
-	return false;
+        return false;
     
     if (ch->wait > 0)
-	return false;
-	    
+        return false;
+            
     if (doPickWeapon( ))
-	return true;
+        return true;
 
     if (doQuaff( ))
-	return true;
+        return true;
     
     if (doHeal( ))
-	return true;
+        return true;
     
     return false;
 }
@@ -98,13 +98,13 @@ bool BasicMobileBehavior::specAdrenaline( )
 bool BasicMobileBehavior::specIdle( )
 {
     if (!IS_AWAKE( ch ))
-	return false;
+        return false;
 
     if (doWander( ))
-	return true;
+        return true;
 
     if (doScavenge( ))
-	return true;
+        return true;
 
     return false;
 }
@@ -187,70 +187,70 @@ bool BasicMobileBehavior::doQuaff( )
     Object *obj;
     
     if (ch->position != POS_STANDING
-	    && ch->position != POS_RESTING
-	    && ch->position != POS_FIGHTING)
-	return false;
+            && ch->position != POS_RESTING
+            && ch->position != POS_FIGHTING)
+        return false;
 
     if (ch->getCurrStat(STAT_INT ) <= 15)
-	return false;
+        return false;
 
     if (ch->hit >= (ch->max_hit * 9) / 10
-	&& !IS_AFFECTED(ch, AFF_BLIND|AFF_POISON|AFF_PLAGUE)
-	&& !ch->fighting)
-	return false;
+        && !IS_AFFECTED(ch, AFF_BLIND|AFF_POISON|AFF_PLAGUE)
+        && !ch->fighting)
+        return false;
 
     for ( obj=ch->carrying;obj!=0;obj=obj->next_content ) {
-	if (obj->item_type != ITEM_POTION)
-	    continue;
-	if (!ch->can_see( obj ))
-	    continue;
-	if (ch->getRealLevel( ) < obj->level)
-	    continue;
+        if (obj->item_type != ITEM_POTION)
+            continue;
+        if (!ch->can_see( obj ))
+            continue;
+        if (ch->getRealLevel( ) < obj->level)
+            continue;
 
-	if ( ch->hit < ch->max_hit*0.9 ) 
-	{
-	    int cl;
-	    cl = potion_cure_level( obj );
-	    if ( cl > 0 )
-	    {
-		if ( ch->hit<ch->max_hit*0.5 && cl > 3 )
-		    break;
-		if ( ch->hit<ch->max_hit*0.7 )
-		    break;
-	    }
-	}
+        if ( ch->hit < ch->max_hit*0.9 ) 
+        {
+            int cl;
+            cl = potion_cure_level( obj );
+            if ( cl > 0 )
+            {
+                if ( ch->hit<ch->max_hit*0.5 && cl > 3 )
+                    break;
+                if ( ch->hit<ch->max_hit*0.7 )
+                    break;
+            }
+        }
 
-	if ( IS_AFFECTED(ch,AFF_POISON) && potion_cure_poison(obj) )
-	    break;
-	if ( IS_AFFECTED(ch,AFF_PLAGUE) && potion_cure_disease(obj) )
-	    break;
-	if ( IS_AFFECTED(ch,AFF_BLIND) && potion_cure_blind(obj) )
-	    break;
+        if ( IS_AFFECTED(ch,AFF_POISON) && potion_cure_poison(obj) )
+            break;
+        if ( IS_AFFECTED(ch,AFF_PLAGUE) && potion_cure_disease(obj) )
+            break;
+        if ( IS_AFFECTED(ch,AFF_BLIND) && potion_cure_blind(obj) )
+            break;
 
-	if ( ch->fighting != 0 )
-	{
-	    int al;
-	    al = potion_arm_level( obj );
-	    
-	    if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 7 && al>3)
-		break;
-	    if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 8 && al>2 )
-		break;
-	    if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 9 && al>1 )
-		break;
-	    if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 10 && al>0 )
-		break;
-	}
+        if ( ch->fighting != 0 )
+        {
+            int al;
+            al = potion_arm_level( obj );
+            
+            if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 7 && al>3)
+                break;
+            if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 8 && al>2 )
+                break;
+            if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 9 && al>1 )
+                break;
+            if ( ch->getModifyLevel() - ch->fighting->getModifyLevel() < 10 && al>0 )
+                break;
+        }
     }
 
     if (obj) {
-	act( "$c1 ÏÓÕÛÁÅÔ $o4.", ch, obj, 0, TO_ROOM );
-	act( "ôÙ ÏÓÕÛÁÅÛØ $o4.", ch, obj, 0 ,TO_CHAR );
-	
-	spell_by_item( ch, obj );
-	obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);
-	extract_obj( obj );
-	return true;
+        act( "$c1 Ð¾ÑÑƒÑˆÐ°ÐµÑ‚ $o4.", ch, obj, 0, TO_ROOM );
+        act( "Ð¢Ñ‹ Ð¾ÑÑƒÑˆÐ°ÐµÑˆÑŒ $o4.", ch, obj, 0 ,TO_CHAR );
+        
+        spell_by_item( ch, obj );
+        obj_to_char( create_object(get_obj_index(OBJ_VNUM_POTION_VIAL),0),ch);
+        extract_obj( obj );
+        return true;
     }
 
     return false;
@@ -262,43 +262,43 @@ bool BasicMobileBehavior::doQuaff( )
 static bool can_take_obj( Character *ch, Object *obj )
 {
     if (!obj->can_wear( ITEM_TAKE )) 
-	return false;
+        return false;
     if (obj->getOwner( ))
-	return false;
+        return false;
     if (obj->behavior)
-	return false;
+        return false;
     if (!ch->can_see( obj ))
-	return false;
+        return false;
     if (obj->isAntiAligned( ch ))
-	return false;
+        return false;
     return true;
 }
 
 static bool can_wield_obj( Character *ch, Object *obj )
 {
     if (!can_take_obj( ch, obj ))
-	return false;
+        return false;
     if (obj->item_type != ITEM_WEAPON)
-	return false;
+        return false;
     if (!obj->can_wear( ITEM_WIELD ))
-	return false;
+        return false;
     if (obj->getWeight( ) > get_str_app(ch).wield * 10)
-	return false;
+        return false;
     if (!get_weapon_skill( obj )->usable( ch ))
-	return false;
+        return false;
     if (get_wear_level( ch, obj ) > ch->getModifyLevel( ))
-	return false;
+        return false;
     return true;
 }
 
 static bool can_shield_obj( Character *ch, Object *obj )
 {
     if (!can_take_obj( ch, obj ))
-	return false;
+        return false;
     if (!obj->can_wear( ITEM_WEAR_SHIELD ))
-	return false;
+        return false;
     if (get_wear_level( ch, obj ) > ch->getRealLevel( ))
-	return false;
+        return false;
     return true;
 }
 
@@ -311,43 +311,43 @@ bool BasicMobileBehavior::doScavenge( )
     int count = 0;
     
     if (!IS_SET(ch->act, ACT_SCAVENGER))
-	return false;
+        return false;
     
     if (!IS_AWAKE(ch))
-	return false;
-	
+        return false;
+        
     if (ch->in_room->area->empty)
-	return false;
+        return false;
 
     if (ch->in_room->contents == 0)
-	return false;
+        return false;
 
     if (number_bits( 6 ))
-	return false;
+        return false;
     
     for (obj = ch->in_room->contents; obj; obj = obj->next_content) {
-	if (!can_take_obj( ch, obj ))
-	    continue;
-	if (count_obj_list( obj->pIndexData, ch->carrying ) >= 3)
-	    continue;
-	
-	if (number_range( 0, count++ ) == 0) 
-	    target = obj;
+        if (!can_take_obj( ch, obj ))
+            continue;
+        if (count_obj_list( obj->pIndexData, ch->carrying ) >= 3)
+            continue;
+        
+        if (number_range( 0, count++ ) == 0) 
+            target = obj;
     }
     
     if (!target)
-	return false;
+        return false;
 
     do_get_raw( ch, target );
 
     if (target->carried_by != ch)
-	return false;
-	
+        return false;
+        
     if ((can_wield_obj( ch, target ) && !get_eq_char( ch, wear_wield ))
-	|| (can_shield_obj( ch, target ) && !get_eq_char( ch, wear_shield )))
+        || (can_shield_obj( ch, target ) && !get_eq_char( ch, wear_shield )))
     {
-	act("$c1 ÏÃÅÎÉ×ÁÀÝÅ ÒÁÓÓÍÁÔÒÉ×ÁÅÔ $o4.", ch, target, 0, TO_ROOM);
-	wear_obj( ch, target, F_WEAR_VERBOSE );
+        act("$c1 Ð¾Ñ†ÐµÐ½Ð¸Ð²Ð°ÑŽÑ‰Ðµ Ñ€Ð°ÑÑÐ¼Ð°Ñ‚Ñ€Ð¸Ð²Ð°ÐµÑ‚ $o4.", ch, target, 0, TO_ROOM);
+        wear_obj( ch, target, F_WEAR_VERBOSE );
     }
 
     return true;
@@ -363,7 +363,7 @@ bool BasicMobileBehavior::doPickWeapon( )
     int count;
     
     if (number_bits( 1 ))
-	return false;
+        return false;
 
     wield = get_eq_char( ch, wear_wield );
     shield = get_eq_char( ch, wear_shield );
@@ -371,57 +371,57 @@ bool BasicMobileBehavior::doPickWeapon( )
     count = 0;
     
     for (obj = ch->carrying; obj; obj = obj->next_content) {
-	bool isGood = false;
+        bool isGood = false;
 
-	if (obj->wear_loc != wear_none)
-	    continue;
-	
-	if (!can_wield_obj( ch, obj ))
-	    continue;
-	
-	if (ch->fighting) { // wield some weapon for combat
-	    if (!wield) 
-		isGood = true;
-	}
-	else { // while tracking, wield dagger to stab or bow to shoot
-	    if (gsn_bow->usable( ch )
-		&& (!wield || wield->value[0] != WEAPON_BOW)
-		&& obj->value[0] == WEAPON_BOW)
-	    {
-		isGood = true;
-	    }
+        if (obj->wear_loc != wear_none)
+            continue;
+        
+        if (!can_wield_obj( ch, obj ))
+            continue;
+        
+        if (ch->fighting) { // wield some weapon for combat
+            if (!wield) 
+                isGood = true;
+        }
+        else { // while tracking, wield dagger to stab or bow to shoot
+            if (gsn_bow->usable( ch )
+                && (!wield || wield->value[0] != WEAPON_BOW)
+                && obj->value[0] == WEAPON_BOW)
+            {
+                isGood = true;
+            }
 
-	    if (gsn_backstab->usable( ch )
-		&& (!wield || attack_table[wield->value[3]].damage != DAM_PIERCE) 
-		&& attack_table[obj->value[3]].damage == DAM_PIERCE)
-	    {
-		isGood = true;
-	    }
-	}
+            if (gsn_backstab->usable( ch )
+                && (!wield || attack_table[wield->value[3]].damage != DAM_PIERCE) 
+                && attack_table[obj->value[3]].damage == DAM_PIERCE)
+            {
+                isGood = true;
+            }
+        }
 
-	if (isGood)
-	    if (number_range( 0, count++ ) == 0) 
-		choice = obj;
+        if (isGood)
+            if (number_range( 0, count++ ) == 0) 
+                choice = obj;
     }
 
     if (choice) {
-	if (wear_obj( ch, choice, F_WEAR_VERBOSE | F_WEAR_REPLACE ) == RC_WEAR_OK)
-	    return true;
+        if (wear_obj( ch, choice, F_WEAR_VERBOSE | F_WEAR_REPLACE ) == RC_WEAR_OK)
+            return true;
     }
     
     if (!shield && !IS_SET( ch->act, ACT_RANGER )) { // wear shield for non-archers
-	choice = 0;
-	count = 0;
+        choice = 0;
+        count = 0;
 
-	for (obj = ch->carrying; obj; obj = obj->next_content) 
-	    if (can_shield_obj( ch, obj )) 
-		if (number_range( 0, count++ ) == 0) 
-		    choice = obj;
+        for (obj = ch->carrying; obj; obj = obj->next_content) 
+            if (can_shield_obj( ch, obj )) 
+                if (number_range( 0, count++ ) == 0) 
+                    choice = obj;
     
-	if (choice) {
-	    if (wear_obj( ch, choice, F_WEAR_VERBOSE ) == RC_WEAR_OK)
-		return true;
-	}
+        if (choice) {
+            if (wear_obj( ch, choice, F_WEAR_VERBOSE ) == RC_WEAR_OK)
+                return true;
+        }
     }
     
     // pickup insteresting things from the ground
@@ -429,13 +429,13 @@ bool BasicMobileBehavior::doPickWeapon( )
     count = 0;
 
     for (obj = ch->in_room->contents; obj; obj = obj->next_content)
-	if (can_wield_obj( ch, obj ) || can_shield_obj( ch, obj ))
-	    if (number_range( 0, count++ ) == 0) 
-		choice = obj;
+        if (can_wield_obj( ch, obj ) || can_shield_obj( ch, obj ))
+            if (number_range( 0, count++ ) == 0) 
+                choice = obj;
     
     if (choice) {
-	do_get_raw( ch, choice );
-	return true;
+        do_get_raw( ch, choice );
+        return true;
     }
 
     return false;
@@ -452,13 +452,13 @@ bool BasicMobileBehavior::doWander( )
     EXIT_DATA *pexit;
     
     if (IS_SET(ch->act, ACT_SENTINEL))
-	return false;
+        return false;
     
     if (ch->position != POS_STANDING)
-	return false;
+        return false;
     
     if (ch->in_room->area->empty)
-	return false;
+        return false;
 
     if (IS_SET(ch->in_room->room_flags, ROOM_MANSION)) {
         if (number_range( 0, 50 ))
@@ -467,33 +467,33 @@ bool BasicMobileBehavior::doWander( )
         if (number_range( 0, 215 ))
             return false;
     }
-	
+        
     if (RIDDEN(ch))
-	return false;
+        return false;
     
     door = number_door( );
     pexit = ch->in_room->exit[door];
 
     if (!pexit || !ch->can_see( pexit ))
-	return false;
+        return false;
 
     room = pexit->u1.to_room;
 
     if (IS_SET(pexit->exit_info, EX_CLOSED) && !IS_AFFECTED( ch, AFF_PASS_DOOR ))
-	return false;
-	
+        return false;
+        
     if (IS_SET( room->room_flags, ROOM_NO_MOB ))
-	return false;
-	
+        return false;
+        
     if (IS_SET(ch->act, ACT_STAY_AREA) && room->area != ch->in_room->area)
-	return false;
+        return false;
 
     if (IS_SET(ch->act, ACT_OUTDOORS) && IS_SET( room->room_flags,ROOM_INDOORS|ROOM_MANSION))
-	return false;
+        return false;
 
     if (IS_SET(ch->act, ACT_INDOORS) && !IS_SET( room->room_flags,ROOM_INDOORS))
-	return false;
-	
+        return false;
+        
     return move_char( ch, door );
 }
 
@@ -504,22 +504,22 @@ bool BasicMobileBehavior::doWander( )
 bool BasicMobileBehavior::doHeal( )
 {
     if (ch->position != POS_STANDING)
-	return false;
+        return false;
 
     if (number_bits( 4 ))
-	return false;
+        return false;
 
     if (IS_SET(ch->act, ACT_RANGER))
-	if (healRanger( ch ))
-	    return true;
+        if (healRanger( ch ))
+            return true;
 
     if (IS_SET(ch->act, ACT_CLERIC))
-	if (healCleric( ch ))
-	    return true;
+        if (healCleric( ch ))
+            return true;
 
     if (IS_SET(ch->act, ACT_NECROMANCER|ACT_UNDEAD))
-	if (healNecro( ch ))
-	    return true;
+        if (healNecro( ch ))
+            return true;
 
     return false;
 }

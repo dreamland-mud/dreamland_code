@@ -21,7 +21,7 @@
 
 using Scripting::NativeTraits;
 
-NMI_INIT(MobIndexWrapper, "Прототип для мобов (mob index data)")
+NMI_INIT(MobIndexWrapper, "п÷я─п╬я┌п╬я┌п╦п© п╢п╩я▐ п╪п╬п╠п╬п╡ (mob index data)")
 
 MobIndexWrapper::MobIndexWrapper( ) : target( NULL )
 {
@@ -44,9 +44,9 @@ void MobIndexWrapper::setSelf( Scripting::Object *s )
 {
 #if 0
     if(s)
-	LogStream::sendNotice() << "set self" << endl;
+        LogStream::sendNotice() << "set self" << endl;
     else
-	LogStream::sendNotice() << "unset self" << endl;
+        LogStream::sendNotice() << "unset self" << endl;
 #endif
 
     WrapperBase::setSelf( s );
@@ -68,10 +68,10 @@ void
 MobIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "MOB_INDEX_DATA is dead" );
+        throw Scripting::Exception( "MOB_INDEX_DATA is dead" );
 
     if (!target)
-	throw Scripting::Exception( "MOB_INDEX_DATA is offline?!");
+        throw Scripting::Exception( "MOB_INDEX_DATA is offline?!");
 }
 
 MOB_INDEX_DATA *
@@ -131,9 +131,9 @@ NMI_GET( MobIndexWrapper, spec_fun, "")
 {
     checkTarget( ); 
     if (target->spec_fun.func)
-	return Register( spec_name(target->spec_fun.func) );
+        return Register( spec_name(target->spec_fun.func) );
     else
-	return Register( );
+        return Register( );
 }
 
 NMI_GET( MobIndexWrapper, practicer, "") 
@@ -142,7 +142,7 @@ NMI_GET( MobIndexWrapper, practicer, "")
     return target->practicer.toString( );
 }
 
-NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
+NMI_GET( MobIndexWrapper, repopPlaces, "я│п©п╦я│п╬п╨ п╡п╫я┐п╪п╬п╡ п╨п╬п╪п╫п╟я┌, п╡ п╨п╬я┌п╬я─я▀я┘ я─п╣я│п╣я┌п╦я┌я│я▐ п╪п╬п╠") 
 {
     Room *room;
     RESET_DATA *pReset;
@@ -151,9 +151,9 @@ NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетитс
     checkTarget( );
     
     for (room = room_list; room; room = room->rnext)
-	for (pReset = room->reset_first; pReset; pReset = pReset->next)
-	    if (pReset->command == 'M' && pReset->arg1 == target->vnum)
-		rc->push_back( Register( room->vnum ) );
+        for (pReset = room->reset_first; pReset; pReset = pReset->next)
+            if (pReset->command == 'M' && pReset->arg1 == target->vnum)
+                rc->push_back( Register( room->vnum ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate( );
     obj->setHandler( rc );
@@ -161,15 +161,15 @@ NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетитс
     return Register( obj );
 }    
 
-NMI_GET( MobIndexWrapper, instances, "список всех экземпляров мобов с этим pIndexData" )
+NMI_GET( MobIndexWrapper, instances, "я│п©п╦я│п╬п╨ п╡я│п╣я┘ я█п╨п╥п╣п╪п©п╩я▐я─п╬п╡ п╪п╬п╠п╬п╡ я│ я█я┌п╦п╪ pIndexData" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
     Character *ch;
 
     for (ch = char_list; ch; ch = ch->next)
-	if (ch->is_npc( ) && ch->getNPC( )->pIndexData == target)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( ch ) );
+        if (ch->is_npc( ) && ch->getNPC( )->pIndexData == target)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( ch ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -188,21 +188,21 @@ NMI_INVOKE(MobIndexWrapper, create, "")
 }
 
 
-NMI_INVOKE( MobIndexWrapper, api, "печатает этот API" )
+NMI_INVOKE( MobIndexWrapper, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<MobIndexWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( MobIndexWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( MobIndexWrapper, rtapi, "п©п╣я┤п╟я┌п╟п╣я┌ п╡я│п╣ п©п╬п╩я▐ п╦ п╪п╣я┌п╬п╢я▀, я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╣ п╡ runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( MobIndexWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( MobIndexWrapper, clear, "п╬я┤п╦я│я┌п╨п╟ п╡я│п╣я┘ runtime п©п╬п╩п╣п╧" )
 {
     guts.clear( );
     self->changed();

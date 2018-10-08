@@ -14,12 +14,12 @@ extern "C"
 {
     SO::PluginList initialize_clan_command( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<CClan>( ppl );
-	Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeInduct> >( ppl );
-	Plugin::registerPlugin<XMLAttributeInductListenerPlugin>( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<CClan>( ppl );
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeInduct> >( ppl );
+        Plugin::registerPlugin<XMLAttributeInductListenerPlugin>( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

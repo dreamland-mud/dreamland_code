@@ -107,7 +107,7 @@ ProcessManager::ProcessManager( )
 ProcessManager::~ProcessManager( )
 {
     if(running.next != &running)
-	LogStream::sendError( ) << "not all threads finished!" << endl;
+        LogStream::sendError( ) << "not all threads finished!" << endl;
 
     thisClass = 0;
     running.mux.unlock( );
@@ -117,6 +117,6 @@ void
 ProcessManager::yield() 
 {
     if(running.next != &running) 
-	running.yield( );
+        running.yield( );
 }
 

@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #ifndef _DESCRIPTOR_H_
@@ -54,9 +54,9 @@ enum {
 };
 
 
-#define TNS_NORMAL	0
-#define TNS_SUBNEG	1
-#define TNS_SUBNEG_IAC	2
+#define TNS_NORMAL        0
+#define TNS_SUBNEG        1
+#define TNS_SUBNEG_IAC        2
 
 struct telnet {
     int state;
@@ -96,7 +96,7 @@ public:
     
     void send(const char *); 
     void printf( const char *, ... );
-    void close( );	     
+    void close( );             
     void slay( );
     void associate( Character * );
 
@@ -128,25 +128,25 @@ private:
     bool checkStopSymbol();
      
 public:
-    Descriptor *	next;
-    Descriptor *	snoop_by;
-    Character *		character;
-    int			control;
+    Descriptor *        next;
+    Descriptor *        snoop_by;
+    Character *                character;
+    int                        control;
     bool                echo;
-    char *		host;
-    char *		realip;
-    int		descriptor;
-    int		connected;
-    bool		fcommand;
-    struct telnet	telnet;
-    unsigned int	inptr;
-    char		inbuf		[4 * MAX_INPUT_LENGTH];
-    char		incomm		[MAX_INPUT_LENGTH];
-    char		inlast		[MAX_INPUT_LENGTH];
-    int			repeat;
-    char *		outbuf;
-    int			outsize;
-    int			outtop;
+    char *                host;
+    char *                realip;
+    int                descriptor;
+    int                connected;
+    bool                fcommand;
+    struct telnet        telnet;
+    unsigned int        inptr;
+    char                inbuf                [4 * MAX_INPUT_LENGTH];
+    char                incomm                [MAX_INPUT_LENGTH];
+    char                inlast                [MAX_INPUT_LENGTH];
+    int                        repeat;
+    char *                outbuf;
+    int                        outsize;
+    int                        outtop;
     int                 oob_proto;
 
 #ifdef MCCP

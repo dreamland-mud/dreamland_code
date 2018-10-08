@@ -20,18 +20,18 @@ int SummonCreatureSpell::countMobiles( Character *ch ) const
     int count;
 
     for (wch = char_list, count = 0; wch; wch = wch->next)
-	if (wch->is_npc( )
-	      && IS_AFFECTED( wch, AFF_CHARM )
-	      && wch->master == ch
-	      && wch->getNPC( )->pIndexData->vnum == mobVnum.getValue( ))
-	    count++;
+        if (wch->is_npc( )
+              && IS_AFFECTED( wch, AFF_CHARM )
+              && wch->master == ch
+              && wch->getNPC( )->pIndexData->vnum == mobVnum.getValue( ))
+            count++;
 
     return count;
 }
 
 NPCharacter * SummonCreatureSpell::createMobileAux( 
-		Character *ch, int level, int hit, int mana,
-		int dice_number, int dice_type, int dice_bonus ) const
+                Character *ch, int level, int hit, int mana,
+                int dice_number, int dice_type, int dice_bonus ) const
 {
     int i;
     NPCharacter *mob = create_mobile( get_mob_index( mobVnum.getValue( ) ) );
@@ -39,23 +39,23 @@ NPCharacter * SummonCreatureSpell::createMobileAux(
     mob->setLevel( max( 1, ch->applyCurse( level ) ) );
 
     for (i = 0; i < stat_table.size; i++)
-	mob->perm_stat[i] = ch->applyCurse( ch->getCurrStat( i ) ); 
+        mob->perm_stat[i] = ch->applyCurse( ch->getCurrStat( i ) ); 
 
     mob->hit = mob->max_hit = URANGE( 
-	                           ch->applyCurse( ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit ), 
-				   ch->applyCurse( hit ), 
-				   30000 );
+                                   ch->applyCurse( ch->is_npc( ) ? ch->max_hit : ch->getPC( )->perm_hit ), 
+                                   ch->applyCurse( hit ), 
+                                   30000 );
     mob->mana = mob->max_mana = ch->applyCurse( mana );
     
     mob->armor[3] = interpolate( level, 100, 0 );
     for (i = 0; i < 3; i++)
-	mob->armor[i] = interpolate( level, 100, -100 );
+        mob->armor[i] = interpolate( level, 100, -100 );
     
     if (IS_SET( mob->act, ACT_NOALIGN ))
-	mob->alignment = ch->alignment;
+        mob->alignment = ch->alignment;
 
     if (mob->pIndexData->sex == SEX_EITHER)
-	mob->setSex( ch->getSex( ) );
+        mob->setSex( ch->getSex( ) );
 
     mob->gold = 0;
     mob->damage[DICE_NUMBER] = dice_number;
@@ -70,30 +70,30 @@ void SummonCreatureSpell::run( Character *ch, char *, int sn, int level )
     int cnt;
     
     if (ch->is_npc( ))
-	return;
+        return;
 
     if (ch->isAffected( sn )) {
-	ch->pecho( msgStillAffected.getValue( ).c_str( ) );
-	return;
+        ch->pecho( msgStillAffected.getValue( ).c_str( ) );
+        return;
     }
     
     if (!msgCreateAttemptArea.getValue( ).empty( ))
-	interpret_raw( ch, "yell", msgCreateAttemptArea.getValue( ).c_str( ) );
+        interpret_raw( ch, "yell", msgCreateAttemptArea.getValue( ).c_str( ) );
     else {
-	ch->pecho( msgCreateAttemptSelf.getValue( ).c_str( ) );
-	ch->recho( POS_RESTING, msgCreateAttemptRoom.getValue( ).c_str( ), ch );
+        ch->pecho( msgCreateAttemptSelf.getValue( ).c_str( ) );
+        ch->recho( POS_RESTING, msgCreateAttemptRoom.getValue( ).c_str( ), ch );
     }
     
     cnt = countMobiles( ch );
     cnt = min( castMobCount.getValue( ), maxMobCount.getValue( ) - cnt );
     
     if (cnt <= 0) {
-	ch->pecho( msgTooManyMobiles.getValue( ).c_str( ) );
-	return;
+        ch->pecho( msgTooManyMobiles.getValue( ).c_str( ) );
+        return;
     }
 
     if (!canSummonHere( ch )) 
-	return;
+        return;
 
     ch->pecho( msgCreateSelf.getValue( ).c_str( ) );
     ch->recho( POS_RESTING, msgCreateRoom.getValue( ).c_str( ), ch );
@@ -101,19 +101,19 @@ void SummonCreatureSpell::run( Character *ch, char *, int sn, int level )
     postaffect_to_char( ch, sn, postaffectDuration );
 
     for (int i = 0; i < cnt; i++) { 
-	SummonedCreature::Pointer bhv;
-	NPCharacter *mob = createMobile( ch, level );
+        SummonedCreature::Pointer bhv;
+        NPCharacter *mob = createMobile( ch, level );
 
-	SET_BIT( mob->affected_by, AFF_CHARM );
-	mob->master = mob->leader = ch;
-	
-	bhv = mob->behavior.getDynamicPointer<SummonedCreature>( );
-	bhv->creatorName = ch->getName( );
-	bhv->creatorID = ch->getID( );
+        SET_BIT( mob->affected_by, AFF_CHARM );
+        mob->master = mob->leader = ch;
+        
+        bhv = mob->behavior.getDynamicPointer<SummonedCreature>( );
+        bhv->creatorName = ch->getName( );
+        bhv->creatorID = ch->getID( );
 
-	char_to_room( mob, ch->in_room );
-	bhv->save( );
-	bhv->conjure( );
+        char_to_room( mob, ch->in_room );
+        bhv->save( );
+        bhv->conjure( );
     }
 }
 
@@ -123,39 +123,39 @@ void SummonCreatureSpell::run( Character *ch, Character *victim, int sn, int lev
     const char * shortDescr = get_mob_index( mobVnum )->short_descr;
     
     if (ch->is_npc( ))
-	return;
+        return;
 
     if (!victim->is_npc( )) {
-	ch->pecho( "%^C3 ×ÒÑÄ ÌÉ ÐÏÎÒÁ×ÉÔÓÑ ÂÙÔØ %N5.", victim, shortDescr);
-	return;
+        ch->pecho( "%^C3 Ð²Ñ€ÑÐ´ Ð»Ð¸ Ð¿Ð¾Ð½Ñ€Ð°Ð²Ð¸Ñ‚ÑÑ Ð±Ñ‹Ñ‚ÑŒ %N5.", victim, shortDescr);
+        return;
     }
     
     if (victim->getNPC( )->pIndexData->vnum != mobVnum) {
-	ch->pecho( "%1$^C1 ÒÁÚ×Å ÐÏÈÏ%1$GÖ|Ö|ÖÁ ÎÁ %2$N4?", victim, shortDescr);
-	return;
+        ch->pecho( "%1$^C1 Ñ€Ð°Ð·Ð²Ðµ Ð¿Ð¾Ñ…Ð¾%1$GÐ¶|Ð¶|Ð¶Ð° Ð½Ð° %2$N4?", victim, shortDescr);
+        return;
     }
     
     if (IS_AFFECTED( victim, AFF_CHARM )) {
-	ch->pecho( "õ %C2 ÕÖÅ ÅÓÔØ ÈÏÚÑÉÎ.", victim );
-	return;
+        ch->pecho( "Ð£ %C2 ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ Ñ…Ð¾Ð·ÑÐ¸Ð½.", victim );
+        return;
     }
  
     ch->pecho( msgReattachAttemptSelf.getValue( ).c_str( ), victim );
     ch->recho( POS_RESTING, msgReattachAttemptRoom.getValue( ).c_str( ), ch, victim );
 
     if (!victim->getNPC( )->behavior
-	    || !( bhv = victim->getNPC( )->behavior.getDynamicPointer<SummonedCreature>( ) )
-	    || bhv->creatorName.getValue( ) != ch->getName( )
-	    || bhv->creatorID.getValue( ) != ch->getID( ))
+            || !( bhv = victim->getNPC( )->behavior.getDynamicPointer<SummonedCreature>( ) )
+            || bhv->creatorName.getValue( ) != ch->getName( )
+            || bhv->creatorID.getValue( ) != ch->getID( ))
     {
-	ch->recho( POS_RESTING, msgNotRecognizeRoom.getValue( ).c_str( ), ch, victim );
-	ch->pecho( msgNotRecognizeSelf.getValue( ).c_str( ), ch, victim );
-	return;
+        ch->recho( POS_RESTING, msgNotRecognizeRoom.getValue( ).c_str( ), ch, victim );
+        ch->pecho( msgNotRecognizeSelf.getValue( ).c_str( ), ch, victim );
+        return;
     }
     
     if (countMobiles( ch ) >= maxMobCount) {
-	ch->pecho( msgTooManyMobiles.getValue( ).c_str( ) );
-	return;
+        ch->pecho( msgTooManyMobiles.getValue( ).c_str( ) );
+        return;
     }
     
     SET_BIT( victim->affected_by, AFF_CHARM );

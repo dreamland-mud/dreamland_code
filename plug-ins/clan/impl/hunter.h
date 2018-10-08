@@ -21,22 +21,22 @@ class Room;
 class ClanGuardHunter : public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardHunter> Pointer;
+        typedef ::Pointer<ClanGuardHunter> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual int getCast( Character * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual int getCast( Character * );
 
-	void createEquipment( PCharacter * );
+        void createEquipment( PCharacter * );
 };
 
 class ClanHealerHunter: public ClanHealer {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanHealerHunter> Pointer;
+        typedef ::Pointer<ClanHealerHunter> Pointer;
     
-	void speech( Character *wch, const char *speech );
+        void speech( Character *wch, const char *speech );
 };
 
 class ClanAreaHunter: public ClanArea {
@@ -44,61 +44,61 @@ XML_OBJECT
 friend class ClanHealerHunter;
 friend class ClanGuardHunter;
 public:
-	typedef ::Pointer<ClanAreaHunter> Pointer;
-	typedef XMLMapBase<XMLInteger> Weapons;
+        typedef ::Pointer<ClanAreaHunter> Pointer;
+        typedef XMLMapBase<XMLInteger> Weapons;
 
 protected:
-	XML_VARIABLE Weapons weapons;
-	XML_VARIABLE XMLInteger armorVnum;
+        XML_VARIABLE Weapons weapons;
+        XML_VARIABLE XMLInteger armorVnum;
 
-	Object * createEquipment( PCharacter * );
-	Object * createArmor( PCharacter * );
-	Object * createWeapon( PCharacter *, int );
-	int  vnumByString( const DLString& );
+        Object * createEquipment( PCharacter * );
+        Object * createArmor( PCharacter * );
+        Object * createWeapon( PCharacter *, int );
+        int  vnumByString( const DLString& );
 };
 
 class HunterEquip : public ClanObject {
 XML_OBJECT
 friend class ClanAreaHunter;
 public:
-	typedef ::Pointer<HunterEquip> Pointer;
-	
-	HunterEquip( );
+        typedef ::Pointer<HunterEquip> Pointer;
+        
+        HunterEquip( );
 
-	virtual void get( Character * );
-	virtual bool canEquip( Character * );
+        virtual void get( Character * );
+        virtual bool canEquip( Character * );
 
 protected:
-	void config( PCharacter * );
+        void config( PCharacter * );
 };
 
 class HunterWeapon : public HunterEquip {
 XML_OBJECT
 public:
-	typedef ::Pointer<HunterWeapon> Pointer;
-	
-	virtual void wear( Character * );
-	virtual void fight( Character * );
-	
+        typedef ::Pointer<HunterWeapon> Pointer;
+        
+        virtual void wear( Character * );
+        virtual void fight( Character * );
+        
 protected:
-	void fight_axe( Character * );
-	void fight_mace( Character * );
-	void fight_sword( Character * );
-	void addAffect( Character *, Affect * );
+        void fight_axe( Character * );
+        void fight_mace( Character * );
+        void fight_sword( Character * );
+        void addAffect( Character *, Affect * );
 };
 
 class HunterArmor : public HunterEquip {
 XML_OBJECT
 public:
-	typedef ::Pointer<HunterArmor> Pointer;
-	
-	virtual void wear( Character * );
-	virtual bool canLock( Character * );
-	virtual void delete_( Character * ); 
-	virtual bool mayFloat( ); 
+        typedef ::Pointer<HunterArmor> Pointer;
+        
+        virtual void wear( Character * );
+        virtual bool canLock( Character * );
+        virtual void delete_( Character * ); 
+        virtual bool mayFloat( ); 
 
 protected:
-	void addAffect( Character *, Affect * );
+        void addAffect( Character *, Affect * );
 };
 
 class HunterTrapObject : public ObjectBehavior {

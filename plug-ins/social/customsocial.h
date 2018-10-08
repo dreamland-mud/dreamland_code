@@ -20,15 +20,15 @@
 
 class CustomSocialManager : public InterpretLayer {
 public:
-	typedef ::Pointer<CustomSocialManager> Pointer;
+        typedef ::Pointer<CustomSocialManager> Pointer;
 
-	CustomSocialManager( );
-	virtual ~CustomSocialManager( );
+        CustomSocialManager( );
+        virtual ~CustomSocialManager( );
 
-	virtual bool process( InterpretArguments & );
+        virtual bool process( InterpretArguments & );
 
 protected:
-	virtual void putInto( );
+        virtual void putInto( );
 };
 
 class CustomSocial : public SocialBase, public XMLVariableContainer {
@@ -111,22 +111,22 @@ inline void CustomSocial::setAutoOther( const DLString &arg )
 typedef XMLPointer<CustomSocial> XMLCustomSocial;
 
 class XMLAttributeCustomSocials : public XMLMapBase<XMLCustomSocial>,
-				  public RemortAttribute
+                                  public RemortAttribute
 {
 public:
-	typedef ::Pointer<XMLAttributeCustomSocials> Pointer;
+        typedef ::Pointer<XMLAttributeCustomSocials> Pointer;
 
-	XMLAttributeCustomSocials( );
+        XMLAttributeCustomSocials( );
 
-	virtual const DLString & getType( ) const
-	{
-	    return TYPE;
-	}
+        virtual const DLString & getType( ) const
+        {
+            return TYPE;
+        }
 
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-	CustomSocial::Pointer chooseSocial( const DLString & );
-	CustomSocial::Pointer getSocial( const DLString & );
+        CustomSocial::Pointer chooseSocial( const DLString & );
+        CustomSocial::Pointer getSocial( const DLString & );
 };
 
 

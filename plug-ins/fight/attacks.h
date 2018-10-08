@@ -9,11 +9,11 @@
 
 struct attack_type
 {
-    const char *	name;			/* name */
-    const char *	noun;			/* message */
-    int   	damage;			/* damage class */
+    const char *        name;                        /* name */
+    const char *        noun;                        /* message */
+    int           damage;                        /* damage class */
     Grammar::MultiGender gender;        /* grammatical gender of russian noun */
 };
-extern struct attack_type	attack_table	[];
+extern struct attack_type        attack_table        [];
 
 #endif

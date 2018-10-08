@@ -17,7 +17,7 @@
 
 void QuestWeapon::wear( Character *ch ) 
 {
-    ch->send_to("{Cô×ÏÅ ÏÒÕÖÉÅ ÑÒËÏ ×ÓÐÙÈÉ×ÁÅÔ.{x\r\n");
+    ch->send_to("{CÐ¢Ð²Ð¾Ðµ Ð¾Ñ€ÑƒÐ¶Ð¸Ðµ ÑÑ€ÐºÐ¾ Ð²ÑÐ¿Ñ‹Ñ…Ð¸Ð²Ð°ÐµÑ‚.{x\r\n");
 }
 
 struct weapon_param {
@@ -58,7 +58,7 @@ void QuestWeapon::equip( Character *ch )
    }
         
 /*
-    if ( level > 17 && level <= 30)	   obj->value[2] = 4;
+    if ( level > 17 && level <= 30)           obj->value[2] = 4;
     else if ( level > 30 && level <= 40)   obj->value[2] = 5;
     else if ( level > 40 && level <= 50)   obj->value[2] = 6;
     else if ( level > 50 && level <= 60)   obj->value[2] = 8;
@@ -97,13 +97,13 @@ void QuestWeapon::equip( Character *ch )
       addAffect( ch, &af );
       affect_to_obj( obj, &af );
 
-	af.location = APPLY_HIT;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_HIT;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
 
-	af.location = APPLY_MANA;
-	addAffect( ch, &af );
-	affect_to_obj( obj, &af );
+        af.location = APPLY_MANA;
+        addAffect( ch, &af );
+        affect_to_obj( obj, &af );
     }
 }
 
@@ -111,7 +111,7 @@ void QuestWeapon::addAffect( Character *ch, Affect *paf ) {
   short level = ch->getModifyLevel();
 
   switch( paf->location )
-	{
+        {
     case APPLY_DAMROLL:
       paf->level = level;
       paf->modifier = IS_EVIL( ch ) ? ( level / 5 ) :
@@ -140,7 +140,7 @@ void QuestWeapon::addAffect( Character *ch, Affect *paf ) {
       paf->level = level;
       paf->modifier = level * 2;
       if (ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER)) 
-	  paf->modifier += paf->modifier*3/2;
+          paf->modifier += paf->modifier*3/2;
 
       return;
   }

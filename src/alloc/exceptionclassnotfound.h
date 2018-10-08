@@ -23,7 +23,7 @@ class ExceptionClassNotFound : public Exception
 {
 public: 
     inline ExceptionClassNotFound( string name )
-	    : Exception( string( "Class '" ) + name + "' not found" )
+            : Exception( string( "Class '" ) + name + "' not found" )
     {
     }
 

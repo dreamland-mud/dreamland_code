@@ -12,7 +12,7 @@
 #include "commandbase.h"
 
 class SocialBase : public CommandBase {
-public:	
+public:        
     typedef ::Pointer<SocialBase> Pointer;
 
     SocialBase( );

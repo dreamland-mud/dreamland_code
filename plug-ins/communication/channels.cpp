@@ -46,8 +46,8 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
     */
     if (!victim || (!victim->getPC( ) && victim->in_room != ch->in_room)) 
     {
-	ch->println( "Ты не находишь этого персонажа.");
-	return NULL;
+        ch->println( "п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ я█я┌п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╤п╟.");
+        return NULL;
     }
 
     return victim;
@@ -86,7 +86,7 @@ Character * ReplyChannel::findListener( Character *ch, const DLString &name ) co
     Character *victim = ch->reply;
    
     if (!victim)
-	ch->println( "Ты не находишь этого персонажа." );
+        ch->println( "п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ я█я┌п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╤п╟." );
 
     return victim;
 }
@@ -97,8 +97,8 @@ bool ReplyChannel::parseArguments( Character *ch, const DLString &constArguments
     msg = constArguments;
 
     if (msg.empty( )) {
-	ch->println( msgNoArg );
-	return false;
+        ch->println( msgNoArg );
+        return false;
     }
 
     return true;
@@ -119,8 +119,8 @@ Character * PageChannel::findListener( Character *ch, const DLString &name ) con
     victim = get_char_world( ch, name.c_str( ) );
 
     if (!victim || (victim->is_immortal( ) && !ch->is_immortal( ))) {
-	ch->println( "Информационное агенство не может найти данного абонента." );
-	return NULL;
+        ch->println( "п≤п╫я└п╬я─п╪п╟я├п╦п╬п╫п╫п╬п╣ п╟пЁп╣п╫я│я┌п╡п╬ п╫п╣ п╪п╬п╤п╣я┌ п╫п╟п╧я┌п╦ п╢п╟п╫п╫п╬пЁп╬ п╟п╠п╬п╫п╣п╫я┌п╟." );
+        return NULL;
     }
 
     return victim;
@@ -133,21 +133,21 @@ void PageChannel::run( Character *ch, const DLString &constArguments )
     arguments = constArguments;
 
     if (!get_pager( ch )) {
-	ch->println( "Тебе определенно нужен хрустальный шар и то, что внутри него." );
-	return;
+        ch->println( "п╒п╣п╠п╣ п╬п©я─п╣п╢п╣п╩п╣п╫п╫п╬ п╫я┐п╤п╣п╫ я┘я─я┐я│я┌п╟п╩я▄п╫я▀п╧ я┬п╟я─ п╦ я┌п╬, я┤я┌п╬ п╡п╫я┐я┌я─п╦ п╫п╣пЁп╬." );
+        return;
     }
 
     if (arguments.getOneArgument( ) == "all")
-	GlobalChannel::run( ch, arguments );
+        GlobalChannel::run( ch, arguments );
     else
-	PersonalChannel::run( ch, constArguments );
+        PersonalChannel::run( ch, constArguments );
 }
 
 bool PageChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (!get_pager( victim )) {
-	act_p("У $C2 нет хрустального шара.",ch,0,victim,TO_CHAR, position);
-	return false;
+        act_p("пё $C2 п╫п╣я┌ я┘я─я┐я│я┌п╟п╩я▄п╫п╬пЁп╬ я┬п╟я─п╟.",ch,0,victim,TO_CHAR, position);
+        return false;
     }
 
     return PersonalChannel::isPersonalListener( ch, victim, msg );
@@ -156,10 +156,10 @@ bool PageChannel::isPersonalListener( Character *ch, Character *victim, const DL
 bool PageChannel::isGlobalListener( Character *ch, Character *victim ) const
 {
     if (!GlobalChannel::isGlobalListener( ch, victim ))
-	return false;
+        return false;
 
     if (!get_pager( victim ))
-	return false;
+        return false;
 
     return true;
 }
@@ -213,21 +213,21 @@ void SpeechChannel::triggers( Character *ch, const DLString &msg ) const
     const char *cmsg = msg.c_str( );
     
     if (!ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
-	RoomChannel::triggers( ch, msg );
+        RoomChannel::triggers( ch, msg );
 
     for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room) {
-	if (rch != ch)
-	    mprog_speech( rch, ch, cmsg );
+        if (rch != ch)
+            mprog_speech( rch, ch, cmsg );
 
-	for (obj = rch->carrying; obj != 0; obj = obj_next) {
-	    obj_next = obj->next_content;
-	    oprog_speech( obj, ch, cmsg );
-	}
+        for (obj = rch->carrying; obj != 0; obj = obj_next) {
+            obj_next = obj->next_content;
+            oprog_speech( obj, ch, cmsg );
+        }
     }
 
     for (obj = ch->in_room->contents; obj != 0; obj = obj_next) {
-	obj_next = obj->next_content;
-	oprog_speech( obj, ch, cmsg );
+        obj_next = obj->next_content;
+        oprog_speech( obj, ch, cmsg );
     }
 
     rprog_speech( ch->in_room, ch, cmsg );
@@ -243,21 +243,21 @@ EmoteChannel::EmoteChannel( )
 void EmoteChannel::triggers( Character *ch, const DLString &txt ) const
 {
     if (!ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
-	RoomChannel::triggers( ch, txt );
+        RoomChannel::triggers( ch, txt );
 
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
-	FENIA_VOID_CALL( rch, "Emote", "Cs", ch, txt.c_str( ) );
-	FENIA_NDX_VOID_CALL( rch->getNPC( ), "Emote", "CCs", rch, ch, txt.c_str( ) );
+        FENIA_VOID_CALL( rch, "Emote", "Cs", ch, txt.c_str( ) );
+        FENIA_NDX_VOID_CALL( rch->getNPC( ), "Emote", "CCs", rch, ch, txt.c_str( ) );
     }
 }
 
 bool EmoteChannel::canTalkGlobally( Character *ch ) const
 {
     if (!RoomChannel::canTalkGlobally( ch ))
-	return false;
+        return false;
 
     if (IS_SET(ch->comm, COMM_NOEMOTE)) {
-        ch->println( "Боги запретили тебе волноваться." );
+        ch->println( "п▒п╬пЁп╦ п╥п╟п©я─п╣я┌п╦п╩п╦ я┌п╣п╠п╣ п╡п╬п╩п╫п╬п╡п╟я┌я▄я│я▐." );
         return false;
     }
 
@@ -279,7 +279,7 @@ void ChannelsCommand::initialization( )
     CommandPlugin::initialization( );
 
     for (c = channels.begin( ); c != channels.end( ); c++) 
-	commandManager->registrate( *c );
+        commandManager->registrate( *c );
 }
 
 void ChannelsCommand::destruction( )
@@ -287,7 +287,7 @@ void ChannelsCommand::destruction( )
     Channels::iterator c;
     
     for (c = channels.begin( ); c != channels.end( ); c++) 
-	commandManager->unregistrate( *c );
+        commandManager->unregistrate( *c );
 
     CommandPlugin::destruction( );
     Class::unregMoc<SpeechChannel>( );
@@ -303,47 +303,47 @@ COMMAND(ChannelsCommand, "channels")
     Channels::iterator c;
     bool rus = ch->getConfig( )->rucommands;
     
-    buf << "   канал     статус  " << endl
-	<< "---------------------" << endl;
+    buf << "   п╨п╟п╫п╟п╩     я│я┌п╟я┌я┐я│  " << endl
+        << "---------------------" << endl;
     
     for (c = channels.begin( ); c != channels.end( ); c++) 
-	if ((*c)->getOff( ) && (*c)->canHear( ch ))
-	    buf << dlprintf( "%-12s %s.", 
-			     rus ? (*c)->getRussianName( ).c_str( )
-			         : (*c)->getName( ).c_str( ),
-			     (IS_SET(ch->comm, (*c)->getOff( )) 
-			         ? "ВЫКЛ" 
-				 : "ВКЛ")
-			    )
-		<< endl;
+        if ((*c)->getOff( ) && (*c)->canHear( ch ))
+            buf << dlprintf( "%-12s %s.", 
+                             rus ? (*c)->getRussianName( ).c_str( )
+                                 : (*c)->getName( ).c_str( ),
+                             (IS_SET(ch->comm, (*c)->getOff( )) 
+                                 ? "п▓п╚п п⌡" 
+                                 : "п▓п п⌡")
+                            )
+                << endl;
     
     
     if (ch->getClan( )->hasChannel( )) 
-	buf << (rus ? "кланканал     " : "clantalk (cb) ")
-	    << (!IS_SET(ch->comm, COMM_NOCB) ? "ВКЛ." : "ВЫКЛ.")
-	    << endl;
+        buf << (rus ? "п╨п╩п╟п╫п╨п╟п╫п╟п╩     " : "clantalk (cb) ")
+            << (!IS_SET(ch->comm, COMM_NOCB) ? "п▓п п⌡." : "п▓п╚п п⌡.")
+            << endl;
 
-    buf <<     (rus ? "аукцион       " : "auction       ")
-	<<     (!IS_SET(ch->comm, COMM_NOAUCTION) ? "ВКЛ." : "ВЫКЛ.")
-	<<     endl
-	<<     (rus ? "глухота       " : "tells         ")
-	<<     (!IS_SET(ch->comm, COMM_DEAF) ? "ВКЛ." : "ВЫКЛ.")
-	<<     endl
-	<<     (rus ? "тишина        " : "quiet mode    ")
-	<<     (IS_SET(ch->comm, COMM_QUIET) ? "ВКЛ." : "ВЫКЛ.")
-	<<     endl;
+    buf <<     (rus ? "п╟я┐п╨я├п╦п╬п╫       " : "auction       ")
+        <<     (!IS_SET(ch->comm, COMM_NOAUCTION) ? "п▓п п⌡." : "п▓п╚п п⌡.")
+        <<     endl
+        <<     (rus ? "пЁп╩я┐я┘п╬я┌п╟       " : "tells         ")
+        <<     (!IS_SET(ch->comm, COMM_DEAF) ? "п▓п п⌡." : "п▓п╚п п⌡.")
+        <<     endl
+        <<     (rus ? "я┌п╦я┬п╦п╫п╟        " : "quiet mode    ")
+        <<     (IS_SET(ch->comm, COMM_QUIET) ? "п▓п п⌡." : "п▓п╚п п⌡.")
+        <<     endl;
 
     if (IS_SET(ch->comm, COMM_SNOOP_PROOF))
-	buf << "Ты защищен от подслушивания." << endl;
+        buf << "п╒я▀ п╥п╟я┴п╦я┴п╣п╫ п╬я┌ п©п╬п╢я│п╩я┐я┬п╦п╡п╟п╫п╦я▐." << endl;
 
     if (IS_SET(ch->comm, COMM_NOTELL))
-	buf << "Ты не можешь использовать {lRкоманду 'говорить'{Etell{lx." << endl;
+        buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ {lRп╨п╬п╪п╟п╫п╢я┐ 'пЁп╬п╡п╬я─п╦я┌я▄'{Etell{lx." << endl;
 
     if (has_nochannel( ch ))
-	buf << "Ты не можешь использовать каналы общения." << endl;
+        buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╨п╟п╫п╟п╩я▀ п╬п╠я┴п╣п╫п╦я▐." << endl;
 
     if (IS_SET(ch->comm, COMM_NOEMOTE))
-	buf << "Ты не можешь выражать эмоции." << endl;
+        buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡я▀я─п╟п╤п╟я┌я▄ я█п╪п╬я├п╦п╦." << endl;
 
     ch->send_to( buf );
 }

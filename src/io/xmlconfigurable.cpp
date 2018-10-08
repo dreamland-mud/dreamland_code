@@ -32,8 +32,8 @@ XMLFile XMLConfigurable::getConfigXMLFile( )
 DLFile XMLConfigurable::getConfigFile( ) const
 {
     return DLFile( getConfigDirPath( ),
-	           getType( ).toLower( ),
-		   ".xml" );
+                   getType( ).toLower( ),
+                   ".xml" );
 }
 
 DLString XMLConfigurable::getConfigDirPath( ) const
@@ -44,7 +44,7 @@ DLString XMLConfigurable::getConfigDirPath( ) const
 DLFile XMLConfigurableWithPath::getConfigFile( ) const
 {
     if (!configFilePath.empty( ))
-	return configFilePath;
+        return configFilePath;
 
     return XMLConfigurable::getConfigFile( );
 }

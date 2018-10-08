@@ -46,11 +46,11 @@ class SpellTemplate<tn, SummonCreatureSpell> :
 public:
     virtual void run( Character *ch, Character *victim, int sn, int level ) 
     {
-	SummonCreatureSpell::run( ch, victim, sn, level );
+        SummonCreatureSpell::run( ch, victim, sn, level );
     }
     virtual void run( Character *ch, char *arg, int sn, int level ) 
     {
-	SummonCreatureSpell::run( ch, arg, sn, level );
+        SummonCreatureSpell::run( ch, arg, sn, level );
     }
 
     virtual const DLString &getType( ) const {
@@ -59,11 +59,11 @@ public:
 protected:    
     virtual NPCharacter * createMobile( Character *, int ) const 
     { 
-	return 0; 
+        return 0; 
     }
     virtual bool canSummonHere( Character * ) const 
     {
-	return true;
+        return true;
     }
 };
 // MOC_SKIP_END

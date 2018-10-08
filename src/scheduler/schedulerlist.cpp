@@ -20,7 +20,7 @@ SchedulerList::~SchedulerList()
 
 void SchedulerList::put( SchedulerTaskPointer pointer )
 {
-	push_back( pointer );
+        push_back( pointer );
 }
 
 inline static bool __slay__( const SchedulerTask::Pointer task1, SchedulerTask::Pointer* task2 )
@@ -37,29 +37,29 @@ inline static bool __slay_instance__( const SchedulerTask::Pointer task1, Schedu
 void SchedulerList::tick( )
 {
     for (iterator i = begin( ); i != end( ); i++)
-	(*i)->before( );
+        (*i)->before( );
     
     for (iterator i = begin( ); i != end( ); i++)
-	(*i)->run( );
+        (*i)->run( );
 
     for (iterator i = begin( ); i != end( ); i++)
-	(*i)->after( );
+        (*i)->after( );
 }
 
 void SchedulerList::slay( SchedulerTaskPointer& task )
 {
     iterator pos = std::remove_if( 
-		  	    begin( ), 
-			    end( ), 
-			    std::bind2nd( std::ptr_fun( __slay__ ), &task ) );
+                              begin( ), 
+                            end( ), 
+                            std::bind2nd( std::ptr_fun( __slay__ ), &task ) );
     erase( pos, end( ) );
 }
 
 void SchedulerList::slayInstance( SchedulerTaskPointer& task )
 {
     iterator pos = std::remove_if( 
-		  	    begin( ), 
-			    end( ), 
-			    std::bind2nd( std::ptr_fun( __slay_instance__ ), &task ) );
+                              begin( ), 
+                            end( ), 
+                            std::bind2nd( std::ptr_fun( __slay_instance__ ), &task ) );
     erase( pos, end( ) );
 }

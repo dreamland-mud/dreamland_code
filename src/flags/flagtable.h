@@ -15,9 +15,9 @@ const int NO_FLAG   = -99;
  */
 struct FlagTable {
     struct Field {
-	bitnumber_t value;
-	const char *name;
-	const char *message;
+        bitnumber_t value;
+        const char *name;
+        const char *message;
     };
 
     const Field * fields;

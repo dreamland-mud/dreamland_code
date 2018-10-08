@@ -18,7 +18,7 @@ ShopPrice::ShopPrice( ShopArticle::Pointer article )
 int ShopPrice::calculate( )
 {
     if (IS_OBJ_STAT( article->obj, ITEM_NOSELL )) 
-	return 0;
+        return 0;
     
     return article->obj->cost;
 }
@@ -36,15 +36,15 @@ int ShopBuyPrice::calculate( )
     int cost = ShopPrice::calculate( );
 
     if (!cost)
-	return 0;
-	
+        return 0;
+        
     cost *= article->trader->profitBuy  / 100;
 
     if (obj->item_type == ITEM_STAFF || obj->item_type == ITEM_WAND) {
-	if( !obj->value[1] ) 
-	    cost /= 4;
-	else 
-	    cost = cost * obj->value[2] / obj->value[1];
+        if( !obj->value[1] ) 
+            cost /= 4;
+        else 
+            cost = cost * obj->value[2] / obj->value[1];
     }
 
     return cost;
@@ -66,10 +66,10 @@ int ShopBuyPrice::haggle( Character *client ) const
     int roll = number_percent( );
 
     if (!IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && roll < gsn_haggle->getEffective( client )) {
-	cost -= obj->cost / 2 * roll / 100;
+        cost -= obj->cost / 2 * roll / 100;
 
-	act( "ôÙ ÔÏÒÇÕÅÛØÓÑ Ó $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
-	gsn_haggle->improve( client, true );
+        act( "Ð¢Ñ‹ Ñ‚Ð¾Ñ€Ð³ÑƒÐµÑˆÑŒÑÑ Ñ $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
+        gsn_haggle->improve( client, true );
     }
 
     return cost;
@@ -80,9 +80,9 @@ int ShopBuyPrice::haggle( Character *client ) const
 void ShopBuyPrice::taxes( int cost ) const
 {
     cost += keeper->silver;
-    /* 'number' ÐÒÏÃÅÎÔÏ× ÏÔ ÃÅÎÙ É ËÁÓÓÙ - × ÂÁÎË */
+    /* 'number' Ð¿Ñ€Ð¾Ñ†ÐµÐ½Ñ‚Ð¾Ð² Ð¾Ñ‚ Ñ†ÐµÐ½Ñ‹ Ð¸ ÐºÐ°ÑÑÑ‹ - Ð² Ð±Ð°Ð½Ðº */
     dreamland->putToMerchantBank( cost * number / 100 );
-    /* ÐÏÌÏÖÉÔØ ÄÏÈÏÄ × ËÁÓÓÕ É ×ÙÞÅÓÔØ ÔÏ, ÞÔÏ ÕÛÌÏ × ÂÁÎË */
+    /* Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ñ‚ÑŒ Ð´Ð¾Ñ…Ð¾Ð´ Ð² ÐºÐ°ÑÑÑƒ Ð¸ Ð²Ñ‹Ñ‡ÐµÑÑ‚ÑŒ Ñ‚Ð¾, Ñ‡Ñ‚Ð¾ ÑƒÑˆÐ»Ð¾ Ð² Ð±Ð°Ð½Ðº */
     keeper->silver = cost * number - ( cost * number / 100 ) * 100;
 }
 
@@ -95,21 +95,21 @@ int ShopSellPrice::calculate( )
     Object *obj = article->obj;
 
     if (!cost)
-	return 0;
+        return 0;
 
     if (!article->trader->buys.isSet( obj->item_type ))
-	return 0;
+        return 0;
 
     cost *= article->trader->profitSell / 100;
     
     if (!IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ))
-	cost >>= article->trader->countSameObjects( obj );
+        cost >>= article->trader->countSameObjects( obj );
 
     if (obj->item_type == ITEM_STAFF || obj->item_type == ITEM_WAND) {
-	if (!obj->value[1]) 
-	    cost /= 4;
-	else 
-	    cost = cost * obj->value[2] / obj->value[1];
+        if (!obj->value[1]) 
+            cost /= 4;
+        else 
+            cost = cost * obj->value[2] / obj->value[1];
     }
 
     return cost;
@@ -122,12 +122,12 @@ int ShopSellPrice::haggle( Character *client ) const
     int roll = number_percent( );
 
     if (!IS_OBJ_STAT(obj, ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( client )) {
-	roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
-	cost += obj->cost / 2 * roll / 100;
-	cost = min(cost, 95 * ocost / 100);
+        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
+        cost += obj->cost / 2 * roll / 100;
+        cost = min(cost, 95 * ocost / 100);
 
-	act( "ôÙ ÔÏÒÇÕÅÛØÓÑ Ó $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
-	gsn_haggle->improve( ch, true );
+        act( "Ð¢Ñ‹ Ñ‚Ð¾Ñ€Ð³ÑƒÐµÑˆÑŒÑÑ Ñ $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
+        gsn_haggle->improve( ch, true );
     }
 
     return cost;
@@ -138,28 +138,28 @@ bool ShopSellPrice::canAfford( Character *ch ) const
     int cass = article->trader->getKeeper( )->silver;
     
     if (silver <= cass)
-	return true;
+        return true;
     else if ((silver - cass) / 100 + 1 <= dreamland->getBalanceMerchantBank( ))
-	return true;
+        return true;
     else
-	return false;
+        return false;
 }
 
 void ShopSellPrice::taxes( int cost ) const
 {
     if (cost <= keeper->silver)
-	keeper->silver -= cost;
+        keeper->silver -= cost;
     else {
-	cost -= keeper->silver;
-	
-	if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
-	{
-	    act_p("$c1 ÇÏ×ÏÒÉÔ ÔÅÂÅ '{Gõ ÍÅÎÑ ÎÅÔ ÄÅÎÅÇ.{x'",
-	    keeper,0,ch,TO_VICT,POS_RESTING);
-	    return;
-	}
+        cost -= keeper->silver;
+        
+        if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
+        {
+            act_p("$c1 Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ '{GÐ£ Ð¼ÐµÐ½Ñ Ð½ÐµÑ‚ Ð´ÐµÐ½ÐµÐ³.{x'",
+            keeper,0,ch,TO_VICT,POS_RESTING);
+            return;
+        }
 
-	keeper->silver = ( cost / 100 + 1 ) * 100 - cost;
+        keeper->silver = ( cost / 100 + 1 ) * 100 - cost;
     }
 }
 
@@ -170,8 +170,8 @@ void ShopSellPrice::deduct( Character *ch ) const
     silver = min( ch->silver, cost );
     
     if (silver < cost) {
-	gold = (cost - silver + 99) / 100;
-	silver = cost - 100 * gold;
+        gold = (cost - silver + 99) / 100;
+        silver = cost - 100 * gold;
     }
 
     ch->gold -= gold;

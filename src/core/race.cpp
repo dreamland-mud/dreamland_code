@@ -142,24 +142,24 @@ const PCRace * RaceManager::findUnstrictPC( const DLString &name )
     Race *race;
     
     if (name.empty( ))
-	return NULL;
-	
+        return NULL;
+        
     if (( race = findExisting( name ) )
-	&& race->isValid( ) 
-	&& race->isPC( ))
+        && race->isValid( ) 
+        && race->isPC( ))
     {
-	return race->getPC( );
+        return race->getPC( );
     }
     
     for (int i = 0; i < size( ); i++) {
-	race = find( i );
-	
-	if (race->isValid( ) 
-	    && race->isPC( )
-	    && name.strPrefix( race->getName( ) ))
-	{
-	    return race->getPC( );
-	}
+        race = find( i );
+        
+        if (race->isValid( ) 
+            && race->isPC( )
+            && name.strPrefix( race->getName( ) ))
+        {
+            return race->getPC( );
+        }
     }
 
     return NULL;

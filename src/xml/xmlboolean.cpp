@@ -15,7 +15,7 @@ void XMLBoolean::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadTy
     XMLNode::Pointer node = parent->getFirstNode( );
     
     if (!node.isEmpty( )) 
-	fromString( node->getCData( ) );
+        fromString( node->getCData( ) );
 }
 
 bool XMLBoolean::toXML( XMLNode::Pointer& parent ) const
@@ -31,16 +31,16 @@ bool XMLBoolean::toXML( XMLNode::Pointer& parent ) const
 bool XMLBooleanNoFalse::toXML( XMLNode::Pointer& parent ) const
 {
     if (getValue( ) == false)
-	return false;
+        return false;
     else
-	return XMLBoolean::toXML( parent );
+        return XMLBoolean::toXML( parent );
 }
 
 bool XMLBooleanNoTrue::toXML( XMLNode::Pointer& parent ) const
 {
     if (getValue( ) == true)
-	return false;
+        return false;
     else
-	return XMLBoolean::toXML( parent );
+        return XMLBoolean::toXML( parent );
 }
 

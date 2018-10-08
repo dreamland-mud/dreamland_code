@@ -2,7 +2,7 @@
  *
  * ruffina, 2003
  *
- * переписано заново, добавлены приоритеты
+ * п©п╣я─п╣п©п╦я│п╟п╫п╬ п╥п╟п╫п╬п╡п╬, п╢п╬п╠п╟п╡п╩п╣п╫я▀ п©я─п╦п╬я─п╦я┌п╣я┌я▀
  */
 /***************************************************************************
                           schedulertask.cpp  -  description
@@ -29,5 +29,5 @@ int SchedulerTaskRoundRoom::getPriority( ) const
 void SchedulerTaskRoundRoom::run( )
 {
     for( Room* room = room_list; room != 0; room = room->rnext )
-	run( room );
+        run( room );
 }

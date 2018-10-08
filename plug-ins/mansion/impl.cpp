@@ -14,14 +14,14 @@ extern "C"
 {
     SO::PluginList initialize_mansion( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MKey>( ppl );
-	Plugin::registerPlugin<HomeRecall>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeHomeRecall> >( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeMansionKey> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<MansionKeyMaker> >( ppl );
-	    
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MKey>( ppl );
+        Plugin::registerPlugin<HomeRecall>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeHomeRecall> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeMansionKey> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<MansionKeyMaker> >( ppl );
+            
+        return ppl;
     }
 }

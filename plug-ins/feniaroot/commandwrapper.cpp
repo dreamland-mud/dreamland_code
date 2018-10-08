@@ -20,7 +20,7 @@
 
 using namespace std;
 
-NMI_INIT(CommandWrapper, "команда");
+NMI_INIT(CommandWrapper, "п╨п╬п╪п╟п╫п╢п╟");
 
 void 
 CommandWrapper::setSelf(Scripting::Object *obj)
@@ -50,7 +50,7 @@ CommandWrapper::run( Character * ch, const DLString &arg )
     try {
         func.toFunction()->invoke(wrap(ch), args);
     } catch (::Exception e) {
-	ch->send_to( e.what( ) );
+        ch->send_to( e.what( ) );
     }
 }
 

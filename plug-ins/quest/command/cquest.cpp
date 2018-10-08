@@ -50,7 +50,7 @@ enum {
 
 static void see_also( PCharacter *pch )
 {
-    pch->println( "Смотри также {y{lRквест ?{lEquest ?{x для списка всех возможных действий." );
+    pch->println( "п║п╪п╬я┌я─п╦ я┌п╟п╨п╤п╣ {y{lRп╨п╡п╣я│я┌ ?{lEquest ?{x п╢п╩я▐ я│п©п╦я│п╨п╟ п╡я│п╣я┘ п╡п╬п╥п╪п╬п╤п╫я▀я┘ п╢п╣п╧я│я┌п╡п╦п╧." );
 }
 
 COMMAND(CQuest, "quest")
@@ -59,40 +59,40 @@ COMMAND(CQuest, "quest")
     DLString arguments = constArguments;
     DLString cmd = arguments.getOneArgument( );
     PCharacter *pch = ch->getPC( );
-	
+        
     if (!pch)
-	return;
+        return;
 
     if (IS_GHOST( pch )) {
-	pch->send_to("Наслажденье жизнью недоступно призракам.\r\n");
-	return;
+        pch->send_to("п²п╟я│п╩п╟п╤п╢п╣п╫я▄п╣ п╤п╦п╥п╫я▄я▌ п╫п╣п╢п╬я│я┌я┐п©п╫п╬ п©я─п╦п╥я─п╟п╨п╟п╪.\r\n");
+        return;
     }
 
     // Parse commands that can be done anywhere.
     if (cmd.empty( )) {
-	doInfo( pch );
+        doInfo( pch );
         see_also( pch );
-	return;
+        return;
     }
     else if (arg_is_info( cmd )) {
-	doInfo( pch );
-	return;
+        doInfo( pch );
+        return;
     }
-    else if (arg_oneof( cmd, "points", "очки" )) {
-	doPoints( pch );
-	return;
+    else if (arg_oneof( cmd, "points", "п╬я┤п╨п╦" )) {
+        doPoints( pch );
+        return;
     }
     else if (arg_is_time( cmd )) {
-	doTime( pch );
-	return;
+        doTime( pch );
+        return;
     }
-    else if (arg_oneof( cmd, "stat", "статистика" )) {
-	doStat( pch );
-	return;
+    else if (arg_oneof( cmd, "stat", "я│я┌п╟я┌п╦я│я┌п╦п╨п╟" )) {
+        doStat( pch );
+        return;
     }
-    else if (arg_oneof( cmd, "set", "установить" ) && pch->isCoder( )) {
-	doSet( pch, arguments );
-	return;
+    else if (arg_oneof( cmd, "set", "я┐я│я┌п╟п╫п╬п╡п╦я┌я▄" ) && pch->isCoder( )) {
+        doSet( pch, arguments );
+        return;
     } else if (arg_is_help( cmd )) {
         usage( pch );
         return;
@@ -103,22 +103,22 @@ COMMAND(CQuest, "quest")
     // Parse quest trading commands.
     if (arg_is_list( cmd ))
         qcmd = QCMD_LIST;
-    else if (arg_oneof( cmd, "buy", "купить" ))
+    else if (arg_oneof( cmd, "buy", "п╨я┐п©п╦я┌я▄" ))
         qcmd = QCMD_BUY;
-    else if (arg_oneof( cmd, "trouble", "вернуть" ))
+    else if (arg_oneof( cmd, "trouble", "п╡п╣я─п╫я┐я┌я▄" ))
         qcmd = QCMD_TROUBLE;
 
     // Execute quest trading commands.
     if (qcmd != QCMD_NONE) { 
-	QuestTrader::Pointer trader;
+        QuestTrader::Pointer trader;
 
-	trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
+        trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
 
-	if (!trader) {
-	    pch->send_to( "Здесь нет торговца квестовыми благами.\r\n" );
+        if (!trader) {
+            pch->send_to( "п≈п╢п╣я│я▄ п╫п╣я┌ я┌п╬я─пЁп╬п╡я├п╟ п╨п╡п╣я│я┌п╬п╡я▀п╪п╦ п╠п╩п╟пЁп╟п╪п╦.\r\n" );
             see_also( pch );
-	    return;
-	}
+            return;
+        }
 
         switch(qcmd) {
             case QCMD_LIST:
@@ -132,28 +132,28 @@ COMMAND(CQuest, "quest")
                 break;
         }
 
-	return;
+        return;
     }
    
     // Parse questor commands.
-    if (arg_oneof( cmd, "request", "попросить", "получить" )) 
+    if (arg_oneof( cmd, "request", "п©п╬п©я─п╬я│п╦я┌я▄", "п©п╬п╩я┐я┤п╦я┌я▄" )) 
         qcmd = QCMD_REQUEST;
-    else if (arg_oneof( cmd, "complete", "сдать", "завершить" )) 
+    else if (arg_oneof( cmd, "complete", "я│п╢п╟я┌я▄", "п╥п╟п╡п╣я─я┬п╦я┌я▄" )) 
         qcmd = QCMD_COMPLETE;
-    else if (arg_oneof( cmd, "cancel", "отменить" )) 
+    else if (arg_oneof( cmd, "cancel", "п╬я┌п╪п╣п╫п╦я┌я▄" )) 
         qcmd = QCMD_CANCEL;
-    else if (arg_oneof( cmd, "find", "найти" )) 
+    else if (arg_oneof( cmd, "find", "п╫п╟п╧я┌п╦" )) 
         qcmd = QCMD_FIND;
 
     if (qcmd == QCMD_NONE) {
-	usage( pch ); 
+        usage( pch ); 
         return;
     }
 
     questman = find_attracted_mob_behavior<Questor>( pch, OCC_QUEST_MASTER );
     if (!questman) {
         if (pch->getHometown( ) != home_frigate) {
-            pch->println("Здесь нет квестора.");
+            pch->println("п≈п╢п╣я│я▄ п╫п╣я┌ п╨п╡п╣я│я┌п╬я─п╟.");
             see_also( pch );
             return;
         }
@@ -161,20 +161,20 @@ COMMAND(CQuest, "quest")
         // Special handling for newbie quests. TODO: add Fenia triggers for each command.
         switch(qcmd) {
             case QCMD_CANCEL:
-                pch->println("Твое задание не нужно отменять, оно исчезнет как только ты сойдешь с корабля.");
+                pch->println("п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ п╫п╣ п╫я┐п╤п╫п╬ п╬я┌п╪п╣п╫я▐я┌я▄, п╬п╫п╬ п╦я│я┤п╣п╥п╫п╣я┌ п╨п╟п╨ я┌п╬п╩я▄п╨п╬ я┌я▀ я│п╬п╧п╢п╣я┬я▄ я│ п╨п╬я─п╟п╠п╩я▐.");
                 break;
             case QCMD_REQUEST:
             case QCMD_FIND:
             case QCMD_COMPLETE:
-                pch->println("Эта команда недоступна, пока ты на корабле.");
-                pch->println("Список текущих квестов показывает команда {y{lRквест инфо{lEquest info{x.");
+                pch->println("п╜я┌п╟ п╨п╬п╪п╟п╫п╢п╟ п╫п╣п╢п╬я│я┌я┐п©п╫п╟, п©п╬п╨п╟ я┌я▀ п╫п╟ п╨п╬я─п╟п╠п╩п╣.");
+                pch->println("п║п©п╦я│п╬п╨ я┌п╣п╨я┐я┴п╦я┘ п╨п╡п╣я│я┌п╬п╡ п©п╬п╨п╟п╥я▀п╡п╟п╣я┌ п╨п╬п╪п╟п╫п╢п╟ {y{lRп╨п╡п╣я│я┌ п╦п╫я└п╬{lEquest info{x.");
                 break;
         }
         return;
     }
 
     if (!questman->canGiveQuest( pch ))
-	return;
+        return;
    
     // Execute questor commands.
     switch(qcmd) {
@@ -182,13 +182,13 @@ COMMAND(CQuest, "quest")
             questman->doRequest( pch );
             break;
         case QCMD_COMPLETE:
-	    questman->doComplete( pch, arguments );
+            questman->doComplete( pch, arguments );
             break;
         case QCMD_CANCEL:
-	    questman->doCancel( pch );
+            questman->doCancel( pch );
             break;
         case QCMD_FIND:
-	    questman->doFind( pch );
+            questman->doFind( pch );
             break;
     }
 }
@@ -200,16 +200,16 @@ bool CQuest::gprog_questinfo( PCharacter *ch )
     Scripting::RegisterList regList;
 
     if (!FeniaManager::wrapperManager)
-	return false;
+        return false;
 
     try {
-	tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
-	regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
-	return tmpQuest[ID_INFO]( regList ).toBoolean( );
+        tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
+        regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
+        return tmpQuest[ID_INFO]( regList ).toBoolean( );
     }
     catch (const Scripting::Exception &e) {
-	LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
-	return false;
+        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
+        return false;
     }
 }
 
@@ -223,16 +223,16 @@ void CQuest::doInfo( PCharacter *ch )
     time = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getTime( );
 
     if (!quest) {
-	if (ch->getAttributes( ).isAvailable( "quest" )) 
-	    buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
+        if (ch->getAttributes( ).isAvailable( "quest" )) 
+            buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╫п╦ п╡я▀п©п╬п╩п╫п╦я┌я▄, п╫п╦ п╬я┌п╪п╣п╫п╦я┌я▄." << endl;
     } else {
-	quest->info( buf, ch );
-	buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-	    << " на выполнение задания." << endl;
+        quest->info( buf, ch );
+        buf << "пё я┌п╣п╠я▐ {Y" << time << "{x п╪п╦п╫я┐я┌" << GET_COUNT(time, "п╟", "я▀", "")
+            << " п╫п╟ п╡я▀п©п╬п╩п╫п╣п╫п╦п╣ п╥п╟п╢п╟п╫п╦я▐." << endl;
     }
     
     if (!gprog_questinfo( ch ) && buf.str( ).empty( ))
-	buf << "У тебя сейчас нет задания." << endl;
+        buf << "пё я┌п╣п╠я▐ я│п╣п╧я┤п╟я│ п╫п╣я┌ п╥п╟п╢п╟п╫п╦я▐." << endl;
 
     ch->send_to( buf );
 }
@@ -242,8 +242,8 @@ void CQuest::doPoints( PCharacter *ch )
     char buf [MAX_STRING_LENGTH];
     int points = ch->questpoints;
 
-    sprintf( buf, "У тебя {Y%d{x квестов%s единиц%s.\n\r", 
-	     points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));
+    sprintf( buf, "пё я┌п╣п╠я▐ {Y%d{x п╨п╡п╣я│я┌п╬п╡%s п╣п╢п╦п╫п╦я├%s.\n\r", 
+             points, GET_COUNT(points, "п╟я▐", "я▀я┘", "я▀я┘"), GET_COUNT(points, "п╟", "я▀", ""));
     ch->send_to(buf);
 }
 
@@ -257,23 +257,23 @@ void CQuest::doTime( PCharacter *ch )
     time = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getTime( );
     
     if (!quest) {
-	if (ch->getAttributes( ).isAvailable( "quest" )) 
-	    buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
-	else {
-	    buf << "У тебя сейчас нет задания." << endl;
-	    
-	    if (time > 1) 
-		buf << "До того, как ты снова сможешь получить задание, {Y"
-		    << time <<  "{x минут"
-		    << GET_COUNT(time, "а", "ы", "") << endl;
-	    else if (time == 1) 
-		buf <<"Осталось меньше минуты до того, как ты снова сможешь получить задание." << endl;
-	}
-	
+        if (ch->getAttributes( ).isAvailable( "quest" )) 
+            buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╫п╦ п╡я▀п©п╬п╩п╫п╦я┌я▄, п╫п╦ п╬я┌п╪п╣п╫п╦я┌я▄." << endl;
+        else {
+            buf << "пё я┌п╣п╠я▐ я│п╣п╧я┤п╟я│ п╫п╣я┌ п╥п╟п╢п╟п╫п╦я▐." << endl;
+            
+            if (time > 1) 
+                buf << "п■п╬ я┌п╬пЁп╬, п╨п╟п╨ я┌я▀ я│п╫п╬п╡п╟ я│п╪п╬п╤п╣я┬я▄ п©п╬п╩я┐я┤п╦я┌я▄ п╥п╟п╢п╟п╫п╦п╣, {Y"
+                    << time <<  "{x п╪п╦п╫я┐я┌"
+                    << GET_COUNT(time, "п╟", "я▀", "") << endl;
+            else if (time == 1) 
+                buf <<"п·я│я┌п╟п╩п╬я│я▄ п╪п╣п╫я▄я┬п╣ п╪п╦п╫я┐я┌я▀ п╢п╬ я┌п╬пЁп╬, п╨п╟п╨ я┌я▀ я│п╫п╬п╡п╟ я│п╪п╬п╤п╣я┬я▄ п©п╬п╩я┐я┤п╦я┌я▄ п╥п╟п╢п╟п╫п╦п╣." << endl;
+        }
+        
     }
     else {
-	 buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-	     << " на выполнение задания." << endl;
+         buf << "пё я┌п╣п╠я▐ {Y" << time << "{x п╪п╦п╫я┐я┌" << GET_COUNT(time, "п╟", "я▀", "")
+             << " п╫п╟ п╡я▀п©п╬п╩п╫п╣п╫п╦п╣ п╥п╟п╢п╟п╫п╦я▐." << endl;
     }
 
     ch->send_to( buf );
@@ -287,72 +287,72 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
     bool plus;
     XMLAttributeQuestData::Pointer attr;
     QuestRegistratorBase::Pointer qbase;
-	
+        
     name = arguments.getOneArgument( );
     questID = arguments.getOneArgument( ); 
     number = arguments.getOneArgument( ); 
     plus = false;
     
     if (name == "clear") {
-	PCharacterMemoryList::const_iterator i;
-	const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
-	
-	for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	    XMLAttributeQuestData::Pointer attr;
-	    PCMemoryInterface *pc;
+        PCharacterMemoryList::const_iterator i;
+        const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
+        
+        for (i = pcm.begin( ); i != pcm.end( ); i++) {
+            XMLAttributeQuestData::Pointer attr;
+            PCMemoryInterface *pc;
 
-	    pc = i->second;
-	    attr = pc->getAttributes( ).findAttr<XMLAttributeQuestData>( "questdata" );
+            pc = i->second;
+            attr = pc->getAttributes( ).findAttr<XMLAttributeQuestData>( "questdata" );
 
-	    if (attr) {
-		XMLAttributeStatistic::Victories::const_iterator j;
-		const XMLAttributeStatistic::Victories &v = attr->getVictories( );
+            if (attr) {
+                XMLAttributeStatistic::Victories::const_iterator j;
+                const XMLAttributeStatistic::Victories &v = attr->getVictories( );
 
-		for (j = v.begin( ); j != v.end( ); j++)
-		    attr->setVictories( j->first, 0 );
+                for (j = v.begin( ); j != v.end( ); j++)
+                    attr->setVictories( j->first, 0 );
 
-		PCharacterManager::saveMemory( pc );
-	    }
-	}
-	
-	return;
+                PCharacterManager::saveMemory( pc );
+            }
+        }
+        
+        return;
     }
     
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
-	ch->send_to("Использование: quest set <player> <quest id> [+]<num. of victories>\r\n");
-	return;
+        ch->send_to("п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: quest set <player> <quest id> [+]<num. of victories>\r\n");
+        return;
     }
 
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-	ch->printf("%s: имя не найдено.\r\n", name.c_str( ));
-	return;
+        ch->printf("%s: п╦п╪я▐ п╫п╣ п╫п╟п╧п╢п╣п╫п╬.\r\n", name.c_str( ));
+        return;
     }
     
     qbase = QuestManager::getThis( )->findQuestRegistrator( questID );
 
     if (!qbase) {
-	ch->send_to("Неправильный ID.\r\n");
-	return;
+        ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID.\r\n");
+        return;
     }
     
     try {
-	if (number.at( 0 ) == '+') {
-	    plus = true;
-	    number.erase( 0, 1 );
-	}
-	
-	count = number.toInt( );
+        if (number.at( 0 ) == '+') {
+            plus = true;
+            number.erase( 0, 1 );
+        }
+        
+        count = number.toInt( );
     } catch (const ExceptionBadType&) {
-	ch->send_to("Неверное количество побед.\r\n");
-	return;
+        ch->send_to("п²п╣п╡п╣я─п╫п╬п╣ п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п©п╬п╠п╣п╢.\r\n");
+        return;
     }
    
     attr = pci->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" );
     
     if (plus)
-	count += attr->getVictories( qbase->getName( ) );
+        count += attr->getVictories( qbase->getName( ) );
 
     attr->setVictories( qbase->getName( ), count );
     PCharacterManager::saveMemory( pci );
@@ -367,33 +367,33 @@ void CQuest::doStat( PCharacter *ch )
     
     stat = XMLAttributeStatistic::gatherAll( "questdata" );
 
-    buf << "{wЛучшие квестодеятели Мира Грез: {x" << endl;
+    buf << "{wп⌡я┐я┤я┬п╦п╣ п╨п╡п╣я│я┌п╬п╢п╣я▐я┌п╣п╩п╦ п°п╦я─п╟ п⌠я─п╣п╥: {x" << endl;
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
-	XMLAttributeStatistic::StatRecordList::iterator r;
-	QuestRegistratorBase::Pointer qb;
-	int last = 0, cnt = 0;
-	
-	qb = QuestManager::getThis( )->findQuestRegistrator( s->first );
+        XMLAttributeStatistic::StatRecordList::iterator r;
+        QuestRegistratorBase::Pointer qb;
+        int last = 0, cnt = 0;
+        
+        qb = QuestManager::getThis( )->findQuestRegistrator( s->first );
 
-	if (!qb)
-	    continue;
+        if (!qb)
+            continue;
 
-	XMLAttributeStatistic::StatRecordList &records = s->second;
-	
-	buf << "{W\"" << qb->getShortDescr( ) << "\"{x" << endl;
+        XMLAttributeStatistic::StatRecordList &records = s->second;
+        
+        buf << "{W\"" << qb->getShortDescr( ) << "\"{x" << endl;
 
-	for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
-	    last = r->second;
-	    buf << dlprintf( "          {W%4d{w ", last ); 
+        for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
+            last = r->second;
+            buf << dlprintf( "          {W%4d{w ", last ); 
 
-	    for ( ; r != records.end( ) && r->second == last; r++)
-		buf << r->first << " ";
+            for ( ; r != records.end( ) && r->second == last; r++)
+                buf << r->first << " ";
 
-	    buf << "{x" << endl;
-	}
-	
-	buf << endl;
+            buf << "{x" << endl;
+        }
+        
+        buf << endl;
     }
 
     ch->send_to( buf );
@@ -403,10 +403,10 @@ void CQuest::usage( PCharacter *ch )
 {
     ostringstream buf;
 
-    buf << "Укажи одну из квестовых команд:" << endl << "    "
-        << "{lRочки инфо время попросить сдать список купить вернуть найти отменить стат{lEpoints info time request complete list buy trouble find cancel stat{lx." 
+    buf << "пёп╨п╟п╤п╦ п╬п╢п╫я┐ п╦п╥ п╨п╡п╣я│я┌п╬п╡я▀я┘ п╨п╬п╪п╟п╫п╢:" << endl << "    "
+        << "{lRп╬я┤п╨п╦ п╦п╫я└п╬ п╡я─п╣п╪я▐ п©п╬п©я─п╬я│п╦я┌я▄ я│п╢п╟я┌я▄ я│п©п╦я│п╬п╨ п╨я┐п©п╦я┌я▄ п╡п╣я─п╫я┐я┌я▄ п╫п╟п╧я┌п╦ п╬я┌п╪п╣п╫п╦я┌я▄ я│я┌п╟я┌{lEpoints info time request complete list buy trouble find cancel stat{lx." 
         << endl
-        << "Также смотри {W{lR? квесты{lE? quests{x." << endl;
+        << "п╒п╟п╨п╤п╣ я│п╪п╬я┌я─п╦ {W{lR? п╨п╡п╣я│я┌я▀{lE? quests{x." << endl;
     ch->send_to( buf );
 }
 

@@ -24,7 +24,7 @@ bool ClanGuardFlowers::checkPush( PCharacter *wch )
 {
     actPush( wch );
     transfer_char( wch, ch, get_random_room( wch ),
-		   NULL, NULL, "%1$^C1 внезапно появляется." );
+                   NULL, NULL, "%1$^C1 п╡п╫п╣п╥п╟п©п╫п╬ п©п╬я▐п╡п╩я▐п╣я┌я│я▐." );
     return true;
 }
 

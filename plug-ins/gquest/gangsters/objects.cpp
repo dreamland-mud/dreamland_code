@@ -27,13 +27,13 @@ void GangKey::get( Character *ch )
     Gangsters *gq = Gangsters::getThis( );
 
     if (ch->is_immortal( ) || gq->isLevelOK( ch ))
-	return;
+        return;
 
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
-    act( "Почему-то тебе кажется, что Боги этого не одобрят.\r\n"
-         "Пораженн$gое|ый|ая этой мыслью, ты роняешь $o4.", ch, obj, 0, TO_CHAR);
-    act( "$c1 с озадаченным видом роняет $o4.", ch, obj, 0, TO_ROOM );
+    act( "п÷п╬я┤п╣п╪я┐-я┌п╬ я┌п╣п╠п╣ п╨п╟п╤п╣я┌я│я▐, я┤я┌п╬ п▒п╬пЁп╦ я█я┌п╬пЁп╬ п╫п╣ п╬п╢п╬п╠я─я▐я┌.\r\n"
+         "п÷п╬я─п╟п╤п╣п╫п╫$gп╬п╣|я▀п╧|п╟я▐ я█я┌п╬п╧ п╪я▀я│п╩я▄я▌, я┌я▀ я─п╬п╫я▐п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR);
+    act( "$c1 я│ п╬п╥п╟п╢п╟я┤п╣п╫п╫я▀п╪ п╡п╦п╢п╬п╪ я─п╬п╫я▐п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
 }
 
 bool GangKey::extract( bool count )
@@ -41,7 +41,7 @@ bool GangKey::extract( bool count )
     Gangsters *gq = Gangsters::getThis( );
     
     if (gq && needsReset) 
-	gq->resetKeys( );
+        gq->resetKeys( );
     
     ObjectBehavior::extract( count );
     return false;
@@ -52,7 +52,7 @@ bool GangKey::canSteal( Character *ch )
     Gangsters *gq = Gangsters::getThis( );
 
     if (ch->is_immortal( ) || gq->isLevelOK( ch ))
-	return true;
+        return true;
 
     return false;
 }
@@ -64,18 +64,18 @@ bool GangKey::canSteal( Character *ch )
 bool GangPortal::canDrop( Room *pRoomIndex ) 
 {
     if (!Gangsters::checkRoom( pRoomIndex ))
-	return false;
+        return false;
     
     if (pRoomIndex->exit[DIR_DOWN])
-	return false;
-	    
+        return false;
+            
     if (IS_SET(pRoomIndex->room_flags, ROOM_INDOORS)
-	|| pRoomIndex->sector_type == SECT_INSIDE)
-	return false;
+        || pRoomIndex->sector_type == SECT_INSIDE)
+        return false;
 
     if (!Gangsters::recursiveWalk( pRoomIndex, 0, 4 )) 
-	return false;
-	
+        return false;
+        
     return true;
 }
 

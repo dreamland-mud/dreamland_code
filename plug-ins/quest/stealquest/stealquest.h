@@ -25,7 +25,7 @@ enum {
 
 class StealQuest : public ItemQuestModel, 
                    public VictimQuestModel, 
-		   public ClientQuestModel 
+                   public ClientQuestModel 
 {
 friend class RobbedVictim;
 friend class HiddenChest;
@@ -79,7 +79,7 @@ public:
     virtual ~StealQuestRegistrator( );
 
     static inline StealQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
     
     XML_VARIABLE NameList thiefs;

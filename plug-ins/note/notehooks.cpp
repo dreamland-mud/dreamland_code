@@ -35,7 +35,7 @@ static string json_to_string( const Json::Value &value )
     return writer.write( value );
 }    
 
-static const DLString DISCORD_USERNAME = "Новости мира DreamLand";
+static const DLString DISCORD_USERNAME = "п²п╬п╡п╬я│я┌п╦ п╪п╦я─п╟ DreamLand";
 static const DLString DISCORD_FOLDER = "discord";
 static const DLString SEPARATOR = "\n--------------------------------------------------------------------------------\n";
 
@@ -49,7 +49,7 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
         return;
 
     ostringstream content;
-    content << "**Тема: " << note.getSubject( ).colourStrip( ) << "**" << endl 
+    content << "**п╒п╣п╪п╟: " << note.getSubject( ).colourStrip( ) << "**" << endl 
             << note.getText( ).colourStrip( ) << SEPARATOR;
 
     // Compose JSON message for Discord webhook.

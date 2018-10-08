@@ -80,62 +80,62 @@ void RainbowGQuest::create( const Config& config ) throw ( GQCannotStartExceptio
 
     LogStream::sendNotice( ) << "Trying to start rainbow, scenario " << scenName << endl;
     for (ch = char_list; ch; ch = ch->next) {
-	if (!ch->is_npc( ))
-	    continue;
-	
-	mob = ch->getNPC( );
-	
-	if (scenario->checkArea( mob->in_room->area )
-	    && scenario->checkRoom( mob->in_room )
-	    && scenario->checkMobile( mob ))
-	{
-	    mobiles.push_back( mob );
-	}
+        if (!ch->is_npc( ))
+            continue;
+        
+        mob = ch->getNPC( );
+        
+        if (scenario->checkArea( mob->in_room->area )
+            && scenario->checkRoom( mob->in_room )
+            && scenario->checkMobile( mob ))
+        {
+            mobiles.push_back( mob );
+        }
     }
     
     LogStream::sendNotice( ) << "Found " << mobiles.size( ) << " candidates." << endl;
     total = scenario->getPiecesCount( );
 
     try {
-	while (!mobiles.empty( ) && bringers.size( ) < total) {
-	    list<NPCharacter *>::iterator j;
-	    int i = number_range( 0, mobiles.size( ) - 1 );
+        while (!mobiles.empty( ) && bringers.size( ) < total) {
+            list<NPCharacter *>::iterator j;
+            int i = number_range( 0, mobiles.size( ) - 1 );
 
-	    mob = mobiles[i];
-	    mobiles.erase( mobiles.begin( ) + i );
-	    
-	    for (j = bringers.begin( ); j != bringers.end( ); j++)
-		if ((*j)->in_room->area == mob->in_room->area)
-		    break;
-	    
-	    if (j != bringers.end( )) 
-		continue;
-	    
-	    RainbowMob::Pointer behavior( NEW );
-	    behavior->setChar( mob );
-	    behavior->number = bringers.size( );
-	    mob->behavior.setPointer( *behavior );
+            mob = mobiles[i];
+            mobiles.erase( mobiles.begin( ) + i );
+            
+            for (j = bringers.begin( ); j != bringers.end( ); j++)
+                if ((*j)->in_room->area == mob->in_room->area)
+                    break;
+            
+            if (j != bringers.end( )) 
+                continue;
+            
+            RainbowMob::Pointer behavior( NEW );
+            behavior->setChar( mob );
+            behavior->number = bringers.size( );
+            mob->behavior.setPointer( *behavior );
 
-	    save_mobs( mob->in_room );
-	    bringers.push_back( mob );
+            save_mobs( mob->in_room );
+            bringers.push_back( mob );
 
-	    roomVnums.push_back( mob->in_room->vnum );
-	    SET_BIT(mob->in_room->area->area_flag, AREA_NOGATE);
-	}
+            roomVnums.push_back( mob->in_room->vnum );
+            SET_BIT(mob->in_room->area->area_flag, AREA_NOGATE);
+        }
 
-	if (bringers.size( ) < total) 
-	    throw GQCannotStartException( "not found enough mobiles" );
+        if (bringers.size( ) < total) 
+            throw GQCannotStartException( "not found enough mobiles" );
 
     }
     catch (const GQCannotStartException& e0) {
         LogStream::sendNotice( ) << "Caught exception: " << e0.what( ) << endl;
-	cleanup( );
-	throw e0;
+        cleanup( );
+        throw e0;
     }
     catch (const Exception& e) {
         LogStream::sendNotice( ) << "Caught exception: " << e.what( ) << endl;
-	cleanup( );
-	throw GQCannotStartException( e.what( ) );
+        cleanup( );
+        throw GQCannotStartException( e.what( ) );
     }
     
     LogStream::sendNotice( ) << "Configured for " << bringers.size( ) << " candidates." << endl;
@@ -153,27 +153,27 @@ void RainbowGQuest::cleanup( )
     LogStream::sendNotice( ) << "Rainbow cleanup." << endl;
 
     for (i = 0; i < roomVnums.size( ); i++)
-	REMOVE_BIT(get_room_index(roomVnums[i])->area->area_flag, AREA_NOGATE);
-	
+        REMOVE_BIT(get_room_index(roomVnums[i])->area->area_flag, AREA_NOGATE);
+        
     for (ch = char_list; ch; ch = ch_next) {
-	ch_next = ch->next;
-	
-	if (!ch->is_npc( ))
-	    continue;
+        ch_next = ch->next;
+        
+        if (!ch->is_npc( ))
+            continue;
 
-	mob = ch->getNPC( );
-	 
-	if (mob->behavior && mob->behavior.getDynamicPointer<RainbowMob>( )) {
-	    MobileBehaviorManager::assignBasic( mob );
-	    save_mobs( mob->in_room );
-	}
+        mob = ch->getNPC( );
+         
+        if (mob->behavior && mob->behavior.getDynamicPointer<RainbowMob>( )) {
+            MobileBehaviorManager::assignBasic( mob );
+            save_mobs( mob->in_room );
+        }
     }
 
     for (obj = object_list; obj; obj = obj_next) {
-	obj_next = obj->next;
+        obj_next = obj->next;
 
-	if (obj->behavior && obj->behavior.getDynamicPointer<RainbowPiece>( ))
-	    extract_obj( obj );
+        if (obj->behavior && obj->behavior.getDynamicPointer<RainbowPiece>( ))
+            extract_obj( obj );
     }
 }
 
@@ -183,11 +183,11 @@ void RainbowGQuest::destroy( )
 
     switch (state.getValue( )) {
     case ST_FINISHED:
-	rewardWinner( );
-	break;
+        rewardWinner( );
+        break;
     case ST_RUNNING:
-	rewardNobody( );
-	break;
+        rewardNobody( );
+        break;
     }
 }
 
@@ -197,19 +197,19 @@ int RainbowGQuest::getTaskTime( ) const
 
     switch (state.getValue( )) {
     case ST_INIT:
-	return itime;
+        return itime;
     case ST_RUNNING:
-	return getRemainedTime( ) - itime;
+        return getRemainedTime( ) - itime;
     default:
-	return 0;
+        return 0;
     }
 }
 
 void RainbowGQuest::after( )
 {
     if (state == ST_INIT) {
-	GQChannel::gecho( this, getScenario( )->getStartMsg( ) );
-	state = ST_RUNNING;
+        GQChannel::gecho( this, getScenario( )->getStartMsg( ) );
+        state = ST_RUNNING;
     }
     
     GlobalQuest::after( );
@@ -220,12 +220,12 @@ void RainbowGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     int cnt;
     
     if (isHidden( ))
-	return;
+        return;
 
     cnt = countPieces( ch );
 
     if (cnt > 0)
-	getScenario( )->printCount( cnt, buf );
+        getScenario( )->printCount( cnt, buf );
 
     getScenario( )->printTime( buf );
 }
@@ -237,21 +237,21 @@ void RainbowGQuest::progress( std::ostringstream &ostr ) const
     Character *ch;
 
     if (isHidden( ))
-	return;
+        return;
 
     for (Descriptor *d = descriptor_list; d; d = d->next) {
-	if (!d->character || d->character->is_npc( ) || d->connected != CON_PLAYING)
-	    continue;
-	
-	ch = d->character;
-	cnt = countPieces( ch );
-	
-	if (cnt > 0) {
-	    sprintf(buf, "%s%-15s %s%-4d%s",
-			 GQChannel::NORMAL, ch->getName( ).c_str( ), 	
-			 GQChannel::BOLD, cnt, GQChannel::NORMAL);
-	    ostr << buf << endl;
-	}
+        if (!d->character || d->character->is_npc( ) || d->connected != CON_PLAYING)
+            continue;
+        
+        ch = d->character;
+        cnt = countPieces( ch );
+        
+        if (cnt > 0) {
+            sprintf(buf, "%s%-15s %s%-4d%s",
+                         GQChannel::NORMAL, ch->getName( ).c_str( ),         
+                         GQChannel::BOLD, cnt, GQChannel::NORMAL);
+            ostr << buf << endl;
+        }
     }
 }
 
@@ -263,29 +263,29 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
     int t = getRemainedTime( );
     
     if (isHidden( ))
-	return;
+        return;
    
     str << getScenario( )->getInfoMsg( ) << endl << endl;
     
     for (ch = char_list; ch; ch = ch->next) {
-	if (!ch->is_npc( ))
-	    continue;
-	
-	mob = ch->getNPC( );
+        if (!ch->is_npc( ))
+            continue;
+        
+        mob = ch->getNPC( );
 
-	if (!mob->behavior || !mob->behavior.getDynamicPointer<RainbowMob>( ))
-	    continue;
-	
-	
-	sprintf(buf, "%s%-30s%s ÉÚ %s%s",
-		     GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
-		     GQChannel::NORMAL, ch->in_room->name, GQChannel::NORMAL);
-	str << buf;
-	
-	if (t <= 5)
-	    str << " (" << ch->in_room->area->name << ")" << GQChannel::NORMAL;
-	
-	str << endl;
+        if (!mob->behavior || !mob->behavior.getDynamicPointer<RainbowMob>( ))
+            continue;
+        
+        
+        sprintf(buf, "%s%-30s%s Ð¸Ð· %s%s",
+                     GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
+                     GQChannel::NORMAL, ch->in_room->name, GQChannel::NORMAL);
+        str << buf;
+        
+        if (t <= 5)
+            str << " (" << ch->in_room->area->name << ")" << GQChannel::NORMAL;
+        
+        str << endl;
     }
 
     str << endl;
@@ -325,7 +325,7 @@ void RainbowGQuest::rewardWinner( )
     GQChannel::gecho( this, buf.str( ), dynamic_cast<PCharacter *>( pci ) );
 
     pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
-		    ->rememberVictory( getQuestID( ) );
+                    ->rememberVictory( getQuestID( ) );
 }
 
 /*****************************************************************************/
@@ -337,12 +337,12 @@ int RainbowGQuest::countPieces( Character *ch )
     map<int, int> pieces;
 
     for (obj = ch->carrying; obj; obj = obj->next_content) 
-	if (obj->behavior) {
-	    bhv = obj->behavior.getDynamicPointer<RainbowPiece>( );
+        if (obj->behavior) {
+            bhv = obj->behavior.getDynamicPointer<RainbowPiece>( );
 
-	    if (bhv) 
-		pieces[bhv->number]++;
-	}
+            if (bhv) 
+                pieces[bhv->number]++;
+        }
 
     return pieces.size( );
 }
@@ -354,8 +354,8 @@ Object * RainbowGQuest::createPiece( int number )
     RainbowPiece::Pointer behavior( NEW );
     
     if (!(pObjIndex = get_obj_index( getScenario( )->getPieceVnum( ) )))
-	throw GQRuntimeException( "no obj index for rainbow piece" );
-	
+        throw GQRuntimeException( "no obj index for rainbow piece" );
+        
     piece = create_object( pObjIndex, 0 );
     behavior->setObj( piece );
     behavior->config( number );

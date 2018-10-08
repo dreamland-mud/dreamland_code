@@ -25,17 +25,17 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regMoc<C>( );
-	AreaBehaviorPlugin::initialization( );
+        Class::regMoc<C>( );
+        AreaBehaviorPlugin::initialization( );
     }
     virtual void destruction( ) 
     {
-	AreaBehaviorPlugin::destruction( );
-	Class::unregMoc<C>( );
+        AreaBehaviorPlugin::destruction( );
+        Class::unregMoc<C>( );
     }
     virtual const DLString& getName( ) const 
     {
-	return C::MOC_TYPE;
+        return C::MOC_TYPE;
     }
 };
 

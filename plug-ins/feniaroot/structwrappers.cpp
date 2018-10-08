@@ -76,12 +76,12 @@ NMI_INVOKE( AreaWrapper, api, "" )
     return Scripting::Register( buf.str( ) );
 }
 
-NMI_GET( AreaWrapper, filename, "название файла зоны" ) 
+NMI_GET( AreaWrapper, filename, "п╫п╟п╥п╡п╟п╫п╦п╣ я└п╟п╧п╩п╟ п╥п╬п╫я▀" ) 
 {
     return Scripting::Register( filename );
 }
 
-NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" ) 
+NMI_GET( AreaWrapper, name, "п╦п╪я▐ п╥п╬п╫я▀ (п╨п╟п╨ п╡п╦п╢п╫п╬ п©п╬ 'where')" ) 
 {
     return Scripting::Register( find_area( filename )->name );
 }
@@ -113,15 +113,15 @@ NMI_INVOKE( HometownWrapper, isAllowed, "" )
     CharacterWrapper *charWrap;
 
     if (!ht)
-	return Scripting::Register( false );
+        return Scripting::Register( false );
 
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     charWrap = wrapper_cast<CharacterWrapper>( args.front( ) );
     
     if (charWrap->getTarget( )->is_npc( ))
-	throw Scripting::Exception( "PC field requested on NPC" ); 
+        throw Scripting::Exception( "PC field requested on NPC" ); 
 
     return Scripting::Register( ht->isAllowed( charWrap->getTarget( )->getPC( ) ) );
 }
@@ -149,7 +149,7 @@ NMI_GET( HometownWrapper, landing, "" )
     return Scripting::Register( hometownManager->find( name )->getLanding( ) );
 }
 
-NMI_GET( HometownWrapper, recall, "vnum комнаты возврата (recall)" ) 
+NMI_GET( HometownWrapper, recall, "vnum п╨п╬п╪п╫п╟я┌я▀ п╡п╬п╥п╡я─п╟я┌п╟ (recall)" ) 
 {
     return Scripting::Register( hometownManager->find( name )->getRecall( ) );
 }
@@ -159,9 +159,9 @@ NMI_GET( HometownWrapper, areaname, "" )
     Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-	return Scripting::Register( room->area->name );
+        return Scripting::Register( room->area->name );
     else
-	return Scripting::Register( DLString::emptyString );
+        return Scripting::Register( DLString::emptyString );
 }
 
 NMI_GET( HometownWrapper, altname, "" ) 
@@ -169,19 +169,19 @@ NMI_GET( HometownWrapper, altname, "" )
     Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-	return Scripting::Register( room->area->altname );
+        return Scripting::Register( room->area->altname );
     else
-	return Scripting::Register( DLString::emptyString );
+        return Scripting::Register( DLString::emptyString );
 }
 
-NMI_GET( HometownWrapper, credits, "Оригинальное англ название зоны хометауна" ) 
+NMI_GET( HometownWrapper, credits, "п·я─п╦пЁп╦п╫п╟п╩я▄п╫п╬п╣ п╟п╫пЁп╩ п╫п╟п╥п╡п╟п╫п╦п╣ п╥п╬п╫я▀ я┘п╬п╪п╣я┌п╟я┐п╫п╟" ) 
 {
     Room *room = get_room_index( hometownManager->find( name )->getAltar( ) );
 
     if (room)
-	return Scripting::Register( room->area->credits );
+        return Scripting::Register( room->area->credits );
     else
-	return Scripting::Register( DLString::emptyString );
+        return Scripting::Register( DLString::emptyString );
 }
 
 /*----------------------------------------------------------------------
@@ -232,12 +232,12 @@ static int weapon_vnum( int wclass )
     return -1;
 }
 
-NMI_INVOKE( ProfessionWrapper, bestWeapon, "внум лучшего новичкового оружия для расы и класса этого персонажа" )
+NMI_INVOKE( ProfessionWrapper, bestWeapon, "п╡п╫я┐п╪ п╩я┐я┤я┬п╣пЁп╬ п╫п╬п╡п╦я┤п╨п╬п╡п╬пЁп╬ п╬я─я┐п╤п╦я▐ п╢п╩я▐ я─п╟я│я▀ п╦ п╨п╩п╟я│я│п╟ я█я┌п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╤п╟" )
 {
     CharacterWrapper *ch;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
     if (ch->getTarget( )->getSkill( gsn_axe ) == 100)
@@ -282,13 +282,13 @@ NMI_GET( ProfessionWrapper, alignName, "" )
     const Flags &a = professionManager->find( name )->getAlign( );
     
     if (a.equalsToBitNumber( N_ALIGN_EVIL ))
-	return "злой";
+        return "п╥п╩п╬п╧";
     if (a.equalsToBitNumber( N_ALIGN_GOOD ))
-	return "добрый";
+        return "п╢п╬п╠я─я▀п╧";
     if (a.equalsToBitNumber( N_ALIGN_NEUTRAL ))
-	return "нейтр.";
+        return "п╫п╣п╧я┌я─.";
 
-    return "любой";
+    return "п╩я▌п╠п╬п╧";
 }
 
 NMI_GET( ProfessionWrapper, statPlus, "" ) 
@@ -298,56 +298,56 @@ NMI_GET( ProfessionWrapper, statPlus, "" )
     ostringstream buf;
     
     for (int s = 0; s < stat_table.size; s++) {
-	if (s == STAT_CHA)
-	    continue;
+        if (s == STAT_CHA)
+            continue;
 
-	stat = prof->getStat( s );
-	
-	if (stat <= 0)
-	    continue;
-	
-	if (!buf.str( ).empty( ))
-	    buf << ",";
+        stat = prof->getStat( s );
+        
+        if (stat <= 0)
+            continue;
+        
+        if (!buf.str( ).empty( ))
+            buf << ",";
 
-	buf <<  stat_table.name( s );
+        buf <<  stat_table.name( s );
     }
 
     return buf.str( );
 }
 
-NMI_INVOKE( ProfessionWrapper, goodSex, "проверить ограничения по полу на профессию для персонажа" )
+NMI_INVOKE( ProfessionWrapper, goodSex, "п©я─п╬п╡п╣я─п╦я┌я▄ п╬пЁя─п╟п╫п╦я┤п╣п╫п╦я▐ п©п╬ п©п╬п╩я┐ п╫п╟ п©я─п╬я└п╣я│я│п╦я▌ п╢п╩я▐ п©п╣я─я│п╬п╫п╟п╤п╟" )
 {
     CharacterWrapper *ch;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
    
     Profession *prof =  professionManager->find( name );
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
     return prof->getSex( ).isSetBitNumber( ch->getTarget( )->getSex( ) );
 }
 
-NMI_INVOKE( ProfessionWrapper, goodRace, "проверить ограничения по расе на профессию для персонажа" )
+NMI_INVOKE( ProfessionWrapper, goodRace, "п©я─п╬п╡п╣я─п╦я┌я▄ п╬пЁя─п╟п╫п╦я┤п╣п╫п╦я▐ п©п╬ я─п╟я│п╣ п╫п╟ п©я─п╬я└п╣я│я│п╦я▌ п╢п╩я▐ п©п╣я─я│п╬п╫п╟п╤п╟" )
 {
     CharacterWrapper *ch;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     Profession *prof =  professionManager->find( name );
     if (prof->getFlags( ).isSet( PROF_NEWLOCK ))
-	return false;
+        return false;
 
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
     return ch->getTarget( )->getRace( )->getPC( )->getClasses( )[prof->getIndex( )] > 0;
 }
 
-NMI_INVOKE( ProfessionWrapper, goodPersonality, "проверить ограничение на характер и этос на профессию для персонажа" )
+NMI_INVOKE( ProfessionWrapper, goodPersonality, "п©я─п╬п╡п╣я─п╦я┌я▄ п╬пЁя─п╟п╫п╦я┤п╣п╫п╦п╣ п╫п╟ я┘п╟я─п╟п╨я┌п╣я─ п╦ я█я┌п╬я│ п╫п╟ п©я─п╬я└п╣я│я│п╦я▌ п╢п╩я▐ п©п╣я─я│п╬п╫п╟п╤п╟" )
 {
     CharacterWrapper *ch;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
     Profession *prof = professionManager->find( name );
@@ -411,14 +411,14 @@ NMI_INVOKE( RaceWrapper, nameRus, "" )
     CharacterWrapper *ch;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     ch = wrapper_cast<CharacterWrapper>(args.front( ));
 
     if (ch->getTarget( )->getSex( ) == SEX_FEMALE)
-	return raceManager->find( name )->getPC( )->getFemaleName( );
+        return raceManager->find( name )->getPC( )->getFemaleName( );
     else
-	return raceManager->find( name )->getPC( )->getMaleName( );
+        return raceManager->find( name )->getPC( )->getMaleName( );
 }
 
 NMI_GET( RaceWrapper, hpBonus, "" ) 
@@ -606,10 +606,10 @@ static const int diplomacy_count = sizeof(diplomacy_names) / sizeof(char *);
 static int diplomacy_number( Clan *clan, Clan *otherClan )
 {
     if (!otherClan || !clan)
-	throw Scripting::CustomException( "No such clan" );
+        throw Scripting::CustomException( "No such clan" );
     
     if (!clan->hasDiplomacy( ) || !otherClan->hasDiplomacy( ))
-	return diplomacy_count - 1;
+        return diplomacy_count - 1;
 
     int dnum = clan->getData( )->getDiplomacy( otherClan );
     return URANGE( 0, dnum, diplomacy_count - 1 );
@@ -621,14 +621,14 @@ NMI_INVOKE( ClanWrapper, diplomacy, "" )
     const Register &arg = get_unique_arg( args );
 
     if (arg.type == Register::STRING)
-	otherName = arg.toString( );
+        otherName = arg.toString( );
     else 
-	otherName = wrapper_cast<ClanWrapper>( arg )->name;
+        otherName = wrapper_cast<ClanWrapper>( arg )->name;
 
     return diplomacy_names
-	      [ diplomacy_number( clanManager->find( name ),
-	                          clanManager->findExisting( otherName ) )
-	      ];
+              [ diplomacy_number( clanManager->find( name ),
+                                  clanManager->findExisting( otherName ) )
+              ];
 }
 
 /*----------------------------------------------------------------------
@@ -651,7 +651,7 @@ Scripting::Register CraftProfessionWrapper::wrap( const DLString &name )
     return Scripting::Register( sobj );
 }
 
-NMI_INVOKE( CraftProfessionWrapper, api, "печатает этот api" )
+NMI_INVOKE( CraftProfessionWrapper, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ api" )
 {
     ostringstream buf;
     
@@ -659,25 +659,25 @@ NMI_INVOKE( CraftProfessionWrapper, api, "печатает этот api" )
     return Scripting::Register( buf.str( ) );
 }
 
-NMI_GET( CraftProfessionWrapper, name, "название профессии" ) 
+NMI_GET( CraftProfessionWrapper, name, "п╫п╟п╥п╡п╟п╫п╦п╣ п©я─п╬я└п╣я│я│п╦п╦" ) 
 {
     return craftProfessionManager->get( name )->getName( );
 }
 
-NMI_GET( CraftProfessionWrapper, nameRus, "название по-русски с падежами" ) 
+NMI_GET( CraftProfessionWrapper, nameRus, "п╫п╟п╥п╡п╟п╫п╦п╣ п©п╬-я─я┐я│я│п╨п╦ я│ п©п╟п╢п╣п╤п╟п╪п╦" ) 
 {
     return craftProfessionManager->get( name )->getRusName( );
 }
 
-NMI_GET( CraftProfessionWrapper, nameMlt, "название во множественном числе" ) 
+NMI_GET( CraftProfessionWrapper, nameMlt, "п╫п╟п╥п╡п╟п╫п╦п╣ п╡п╬ п╪п╫п╬п╤п╣я│я┌п╡п╣п╫п╫п╬п╪ я┤п╦я│п╩п╣" ) 
 {
     return craftProfessionManager->get( name )->getMltName( );
 }
 
-NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить персонажу уровень мастерства в этой профессии" )
+NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п©п╣я─я│п╬п╫п╟п╤я┐ я┐я─п╬п╡п╣п╫я▄ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п╡ я█я┌п╬п╧ п©я─п╬я└п╣я│я│п╦п╦" )
 {
     if (args.size( ) != 2)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     PCharacter *ch = arg2player(args.front());
     int level = args.back().toNumber();
@@ -685,28 +685,28 @@ NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить персонажу 
     return Scripting::Register();
 }
 
-NMI_INVOKE( CraftProfessionWrapper, getLevel, "(ch) получить уровень мастерства персонажа в этой профессии" )
+NMI_INVOKE( CraftProfessionWrapper, getLevel, "(ch) п©п╬п╩я┐я┤п╦я┌я▄ я┐я─п╬п╡п╣п╫я▄ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п©п╣я─я│п╬п╫п╟п╤п╟ п╡ я█я┌п╬п╧ п©я─п╬я└п╣я│я│п╦п╦" )
 {
     PCharacter *ch = args2player(args);
     return craftProfessionManager->get( name )->getLevel(ch);
 }
 
-NMI_INVOKE( CraftProfessionWrapper, getTotalExp, "(ch) суммарный опыт персонажа в этой профессии" )
+NMI_INVOKE( CraftProfessionWrapper, getTotalExp, "(ch) я│я┐п╪п╪п╟я─п╫я▀п╧ п╬п©я▀я┌ п©п╣я─я│п╬п╫п╟п╤п╟ п╡ я█я┌п╬п╧ п©я─п╬я└п╣я│я│п╦п╦" )
 {
     PCharacter *ch = args2player(args);
     return craftProfessionManager->get( name )->getTotalExp(ch);
 }
 
-NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) кол-во опыта до следующего уровня мастерства в этой профессии" )
+NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) п╨п╬п╩-п╡п╬ п╬п©я▀я┌п╟ п╢п╬ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я┐я─п╬п╡п╫я▐ п╪п╟я│я┌п╣я─я│я┌п╡п╟ п╡ я█я┌п╬п╧ п©я─п╬я└п╣я│я│п╦п╦" )
 {
     PCharacter *ch = args2player(args);
     return craftProfessionManager->get( name )->getExpToLevel(ch);
 }
 
-NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp) заработать очков опыта в этой профессии" )
+NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp) п╥п╟я─п╟п╠п╬я┌п╟я┌я▄ п╬я┤п╨п╬п╡ п╬п©я▀я┌п╟ п╡ я█я┌п╬п╧ п©я─п╬я└п╣я│я│п╦п╦" )
 {
     if (args.size( ) != 2)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     PCharacter *ch = arg2player(args.front());
     int exp = args.back().toNumber();
@@ -734,7 +734,7 @@ Scripting::Register SkillWrapper::wrap( const DLString &name )
     return Scripting::Register( sobj );
 }
 
-NMI_INVOKE( SkillWrapper, api, "печатает этот api" )
+NMI_INVOKE( SkillWrapper, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ api" )
 {
     ostringstream buf;
     
@@ -743,23 +743,23 @@ NMI_INVOKE( SkillWrapper, api, "печатает этот api" )
 }
 
 
-NMI_GET( SkillWrapper, name, "название умения" ) 
+NMI_GET( SkillWrapper, name, "п╫п╟п╥п╡п╟п╫п╦п╣ я┐п╪п╣п╫п╦я▐" ) 
 {
     return skillManager->find( name )->getName( );
 }
 
-NMI_GET( SkillWrapper, nameRus, "название умения по-русски" ) 
+NMI_GET( SkillWrapper, nameRus, "п╫п╟п╥п╡п╟п╫п╦п╣ я┐п╪п╣п╫п╦я▐ п©п╬-я─я┐я│я│п╨п╦" ) 
 {
     return skillManager->find( name )->getRussianName( );
 }
 
-NMI_INVOKE( SkillWrapper, usable, "(ch) доступно ли умение для использования прямо сейчас" )
+NMI_INVOKE( SkillWrapper, usable, "(ch) п╢п╬я│я┌я┐п©п╫п╬ п╩п╦ я┐п╪п╣п╫п╦п╣ п╢п╩я▐ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦я▐ п©я─я▐п╪п╬ я│п╣п╧я┤п╟я│" )
 {
     Character *ch = args2character(args);
     return skillManager->find( name )->usable( ch, false );
 }
 
-NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]) вернуть разученность или установить ее в percent" )
+NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]) п╡п╣я─п╫я┐я┌я▄ я─п╟п╥я┐я┤п╣п╫п╫п╬я│я┌я▄ п╦п╩п╦ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╣п╣ п╡ percent" )
 {
     PCharacter *ch = args2player(args); 
     int sn = skillManager->find(name)->getIndex();
@@ -777,13 +777,13 @@ NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]) вернуть разученность или уста
     return Register(ch->getSkillData(sn).learned);
 }
 
-NMI_INVOKE( SkillWrapper, effective, "(ch) узнать процент раскачки у персонажа" )
+NMI_INVOKE( SkillWrapper, effective, "(ch) я┐п╥п╫п╟я┌я▄ п©я─п╬я├п╣п╫я┌ я─п╟я│п╨п╟я┤п╨п╦ я┐ п©п╣я─я│п╬п╫п╟п╤п╟" )
 {
     PCharacter *ch = args2player(args); 
     return Register( skillManager->find(name)->getEffective(ch) );
 }
 
-NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]) попытаться улучшить знание умения на успехе/неудаче (true/false), применен на жертву" )
+NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]) п©п╬п©я▀я┌п╟я┌я▄я│я▐ я┐п╩я┐я┤я┬п╦я┌я▄ п╥п╫п╟п╫п╦п╣ я┐п╪п╣п╫п╦я▐ п╫п╟ я┐я│п©п╣я┘п╣/п╫п╣я┐п╢п╟я┤п╣ (true/false), п©я─п╦п╪п╣п╫п╣п╫ п╫п╟ п╤п╣я─я┌п╡я┐" )
 {
     PCharacter *ch = argnum2player(args, 1);
     int success = argnum2number(args, 2);

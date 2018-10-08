@@ -12,14 +12,14 @@
 #include "playerattributes.h"
 
 class XMLAttributeCoder : public RemortAttribute, 
-			  public XMLVariableContainer
+                          public XMLVariableContainer
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeCoder> Pointer;
+        typedef ::Pointer<XMLAttributeCoder> Pointer;
 
-	XMLAttributeCoder( );
-	virtual ~XMLAttributeCoder( );
+        XMLAttributeCoder( );
+        virtual ~XMLAttributeCoder( );
 };
 
 #endif

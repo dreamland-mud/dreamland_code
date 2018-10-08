@@ -17,7 +17,7 @@
 bool str_not_equal( const char *astr, const char *bstr )
 {
     if (!astr || !bstr)
-	return true;
+        return true;
 
     for ( ; *astr || *bstr; astr++, bstr++ )
     {
@@ -39,7 +39,7 @@ int str_cmp( const char *astr, const char *bstr )
     int chk;
 
     if (!astr || !bstr)
-	return 0;
+        return 0;
 
     for ( ; *astr || *bstr; astr++, bstr++ )
     {
@@ -78,7 +78,7 @@ int strn_cmp(const char *arg1, const char *arg2, int n) {
 bool str_prefix( const char *astr, const char *bstr )
 {
     if (!astr || !bstr)
-	return true;
+        return true;
 
     for ( ; *astr; astr++, bstr++ )
     {
@@ -129,24 +129,24 @@ bool is_positive_number( const char *arg )
  */
 int number_argument( char *argument, char *arg )
 {
-	char *pdot;
-	int number;
+        char *pdot;
+        int number;
 
-	for ( pdot = argument; *pdot != '\0'; pdot++ )
-	{
-		if ( *pdot == '.' )
-		{
-			*pdot = '\0';
-			number = atoi( argument );
-			*pdot = '.';
-			strcpy( arg, pdot+1 );
-			return number;
-		}
-	}
+        for ( pdot = argument; *pdot != '\0'; pdot++ )
+        {
+                if ( *pdot == '.' )
+                {
+                        *pdot = '\0';
+                        number = atoi( argument );
+                        *pdot = '.';
+                        strcpy( arg, pdot+1 );
+                        return number;
+                }
+        }
 
-	strcpy( arg, argument );
+        strcpy( arg, argument );
 
-	return 1;
+        return 1;
 }
 
 /*
@@ -181,35 +181,35 @@ int mult_argument(char *argument, char *arg)
  */
 char *one_argument( char *argument, char *arg_first )
 {
-	char cEnd;
+        char cEnd;
 
-	while ( dl_isspace(*argument) )
-		argument++;
+        while ( dl_isspace(*argument) )
+                argument++;
 
-	cEnd = ' ';
+        cEnd = ' ';
 
-	if ( *argument == '\'' || *argument == '"' )
-		cEnd = *argument++;
+        if ( *argument == '\'' || *argument == '"' )
+                cEnd = *argument++;
 
-	while ( *argument != '\0' )
-	{
-		if ( *argument == cEnd )
-		{
-			argument++;
-			break;
-		}
+        while ( *argument != '\0' )
+        {
+                if ( *argument == cEnd )
+                {
+                        argument++;
+                        break;
+                }
 
-		*arg_first = dl_tolower(*argument);
-		arg_first++;
-		argument++;
-	}
+                *arg_first = dl_tolower(*argument);
+                arg_first++;
+                argument++;
+        }
 
-	*arg_first = '\0';
+        *arg_first = '\0';
 
-	while ( dl_isspace(*argument) )
-		argument++;
+        while ( dl_isspace(*argument) )
+                argument++;
 
-	return argument;
+        return argument;
 }
 
      
@@ -217,54 +217,54 @@ char *one_argument( char *argument, char *arg_first )
  * See if a string is one of the names of an object.
  */
 bool is_name( const char *arg1, const char *arg2 )
-{	
-	char *list;
-	char *string;
-	
-	if (!arg1 || !arg2)
-	    return false;
+{        
+        char *list;
+        char *string;
+        
+        if (!arg1 || !arg2)
+            return false;
 
-	int len1 = strlen(arg1) + 1, len2 = strlen(arg2) + 1;
-	char name[len2], part[len1];
-	char buf_str[len1], buf_namelist[len2];
-	char *str = buf_str, *namelist = buf_namelist;
+        int len1 = strlen(arg1) + 1, len2 = strlen(arg2) + 1;
+        char name[len2], part[len1];
+        char buf_str[len1], buf_namelist[len2];
+        char *str = buf_str, *namelist = buf_namelist;
 
-	strcpy( buf_str, arg1 );
-	strcpy( buf_namelist, arg2 );
+        strcpy( buf_str, arg1 );
+        strcpy( buf_namelist, arg2 );
 
-	if ( namelist == 0 || namelist[0] == '\0' )
-		return false;
+        if ( namelist == 0 || namelist[0] == '\0' )
+                return false;
 
-	if ( str[0] == '\0'
-		|| ( str[0] == '\''
-			&& ( str[1] == '\''
-				|| str[1] == '\0' ) ) )
-		return false;
-		
-	string = str;
-	/* we need ALL parts of string to match part of namelist */
-	for ( ; ; )  /* start parsing string */
-	{
-		str = one_argument(str,part);
+        if ( str[0] == '\0'
+                || ( str[0] == '\''
+                        && ( str[1] == '\''
+                                || str[1] == '\0' ) ) )
+                return false;
+                
+        string = str;
+        /* we need ALL parts of string to match part of namelist */
+        for ( ; ; )  /* start parsing string */
+        {
+                str = one_argument(str,part);
 
-		if ( part[0] == '\0' )
-			return true;
+                if ( part[0] == '\0' )
+                        return true;
 
-		/* check to see if this is part of namelist */
-		list = namelist;
-		for ( ; ; )  /* start parsing namelist */
-		{
-			list = one_argument(list,name);
-			if ( name[0] == '\0' )  /* this name was not found */
-				return false;
+                /* check to see if this is part of namelist */
+                list = namelist;
+                for ( ; ; )  /* start parsing namelist */
+                {
+                        list = one_argument(list,name);
+                        if ( name[0] == '\0' )  /* this name was not found */
+                                return false;
 
-			if ( !str_prefix(string,name) )
-				return true; /* full pattern match */
+                        if ( !str_prefix(string,name) )
+                                return true; /* full pattern match */
 
-			if ( !str_prefix(part,name) )
-				break;
-		}
-	}
+                        if ( !str_prefix(part,name) )
+                                break;
+                }
+        }
 }
 
 /*--------------------------------------------------------------------------

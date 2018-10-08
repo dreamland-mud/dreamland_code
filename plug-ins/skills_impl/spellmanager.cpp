@@ -49,10 +49,10 @@ void SpellManager::loadPriorities( )
     try {
         std::ifstream ifstr( pf.getPath( ).c_str( ) );
         XMLDocument::Pointer root( NEW );
-	
+        
         root->load( ifstr );
         XMLNode::Pointer node = root->getFirstNode( );
-	
+        
         if (!node.isEmpty( ))
             priorities.fromXML( node );
 
@@ -72,8 +72,8 @@ bool SpellManager::compare( Spell::Pointer a, Spell::Pointer b )
     i_b = priorities.getIndexOf( b->getSkill( )->getName( ) );
 
     if (i_a != -1 && i_b != -1)
-	return i_a < i_b;
-	
+        return i_a < i_b;
+        
     return (i_a != -1);
 }
 
@@ -86,22 +86,22 @@ void SpellManager::registrate( Spell::Pointer spell )
 void SpellManager::unregistrate( Spell::Pointer spell )
 {
     for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++)
-	if (**i == spell.getPointer( )) {
-	    spells.erase( i );
-	    break;
-	}
+        if (**i == spell.getPointer( )) {
+            spells.erase( i );
+            break;
+        }
 }
 
 Spell::Pointer SpellManager::lookup( const DLString &name, Character *ch )
 {
     for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++) {
-	Skill::Pointer skill = (*i)->getSkill( );
-	
-	if ((*i)->isCasted( )
-	    && (name.strPrefix( skill->getName( ) ) 
-	        || name.strPrefix( skill->getRussianName( ) ))  
-	    && skill->available( ch ))
-	    return *i;
+        Skill::Pointer skill = (*i)->getSkill( );
+        
+        if ((*i)->isCasted( )
+            && (name.strPrefix( skill->getName( ) ) 
+                || name.strPrefix( skill->getRussianName( ) ))  
+            && skill->available( ch ))
+            return *i;
     }
 
     return Spell::Pointer( );

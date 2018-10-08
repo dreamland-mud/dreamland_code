@@ -12,7 +12,7 @@
 #include "notethread.h"
 
 class NoteHooks : public Plugin, public OneAllocate {
-public:	
+public:        
     typedef ::Pointer<NoteHooks> Pointer;
     
     NoteHooks( );

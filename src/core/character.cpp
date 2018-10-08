@@ -73,26 +73,26 @@ PlayerConfig::PlayerConfig( const PCharacter *ch )
 }
 
 Character::Character( )
-	:       ethos( ETHOS_NULL, &ethos_table ),
-	        prefix( &str_empty[0] ),
-		act( 0, &plr_flags ),
-		comm( 0, &comm_flags ),   
-		add_comm( 0, &add_comm_flags ),
-		imm_flags( 0, &::imm_flags ),
-		res_flags( 0, &::res_flags ),
-		vuln_flags( 0, &::vuln_flags ),
-		affected_by( 0, &affect_flags ),
-		add_affected_by( 0, &affect_flags ),
-		detection( 0, &detect_flags ),
-		position( POS_STANDING, &position_table ),
-		posFlags( 0, &position_flags ),
-		armor( &ac_type ),
-	        perm_stat( &stat_table ), 
-		mod_stat( &stat_table ),
-		material( &str_empty[0] ),
-		language( lang_common ),
-		ambushing( &str_empty[0] ),
-		trap( 0, &trap_flags )
+        :       ethos( ETHOS_NULL, &ethos_table ),
+                prefix( &str_empty[0] ),
+                act( 0, &plr_flags ),
+                comm( 0, &comm_flags ),   
+                add_comm( 0, &add_comm_flags ),
+                imm_flags( 0, &::imm_flags ),
+                res_flags( 0, &::res_flags ),
+                vuln_flags( 0, &::vuln_flags ),
+                affected_by( 0, &affect_flags ),
+                add_affected_by( 0, &affect_flags ),
+                detection( 0, &detect_flags ),
+                position( POS_STANDING, &position_table ),
+                posFlags( 0, &position_flags ),
+                armor( &ac_type ),
+                perm_stat( &stat_table ), 
+                mod_stat( &stat_table ),
+                material( &str_empty[0] ),
+                language( lang_common ),
+                ambushing( &str_empty[0] ),
+                trap( 0, &trap_flags )
 {
     mobile_count++;
 }
@@ -100,10 +100,10 @@ Character::Character( )
 Character::~Character(void)
 {
     if (carrying)
-	throw Exception( "~Character: inventory not empty" );
+        throw Exception( "~Character: inventory not empty" );
 
     if (affected)
-	throw Exception( "~Character: affected not empty" );
+        throw Exception( "~Character: affected not empty" );
 
     free_string(prefix);
     free_string(material);
@@ -220,12 +220,12 @@ void Character::extract( )
     Affect *paf;
     
     if (carrying)
-	throw Exception( getName( ) + " extract: inventory not empty" );
+        throw Exception( getName( ) + " extract: inventory not empty" );
     
     while (affected) {
-	paf = affected->next;
-	ddeallocate( affected );
-	affected = paf;
+        paf = affected->next;
+        ddeallocate( affected );
+        affected = paf;
     }
 
     init( );
@@ -355,64 +355,64 @@ bool Character::can_see( const Character *victim ) const
 {
     // RT changed so that WIZ_INVIS has levels
     if ( this == victim )
-	return true;
+        return true;
     
     if (!can_sense( victim ))
-	return false;
+        return false;
     
     if (mprog_invisible( const_cast<Character *>( victim ), this ))
-	return false;
+        return false;
 
     if (!victim->is_npc( )) {
-	if ( get_trust() < victim->getPC( )->invis_level )
-	    return false;
+        if ( get_trust() < victim->getPC( )->invis_level )
+            return false;
 
-	if (IS_GHOST( victim ))
-	{
-	    if ( is_immortal()
-		    || ( CAN_DETECT( this, DETECT_INVIS )
-			    && !IS_AFFECTED(this, AFF_BLIND) ) )
-		    return true;
-	    return false;
-	}
+        if (IS_GHOST( victim ))
+        {
+            if ( is_immortal()
+                    || ( CAN_DETECT( this, DETECT_INVIS )
+                            && !IS_AFFECTED(this, AFF_BLIND) ) )
+                    return true;
+            return false;
+        }
 
-	if ( get_trust() < victim->getPC( )->incog_level && in_room != victim->in_room )
-	    return false;
+        if ( get_trust() < victim->getPC( )->incog_level && in_room != victim->in_room )
+            return false;
     } 
 
     if ( !is_npc() && ( IS_GHOST( this ) || IS_DEATH_TIME( this ) ) )
-	return true;
+        return true;
 
     if ( (!is_npc() && IS_SET(act, PLR_HOLYLIGHT)) || (is_npc() && is_immortal()))
-	return true;
+        return true;
 
     if ( IS_AFFECTED(this, AFF_BLIND) )
-	return false;
+        return false;
 
     if ( !in_room )
-	return false;
+        return false;
 
     if (in_room->isDark( ) && !IS_AFFECTED(this, AFF_INFRARED) )
-	return false;
+        return false;
 
     if ( IS_AFFECTED(victim, AFF_INVISIBLE) && !CAN_DETECT(this, DETECT_INVIS) )
-	return false;
+        return false;
 
     if ( IS_AFFECTED(victim, AFF_IMP_INVIS) && !CAN_DETECT(this, DETECT_IMP_INVIS) )
-	return false;
+        return false;
 
     if ( IS_AFFECTED(victim,AFF_CAMOUFLAGE) && !CAN_DETECT(this,ACUTE_VISION))
-	return false;
+        return false;
 
     if ( IS_AFFECTED(victim, AFF_HIDE) 
-	&& !CAN_DETECT(this, DETECT_HIDDEN)
-	&& victim->fighting == NULL)
-	return false;
+        && !CAN_DETECT(this, DETECT_HIDDEN)
+        && victim->fighting == NULL)
+        return false;
 
     if ( IS_AFFECTED(victim, AFF_FADE)
-	&& !CAN_DETECT(this, DETECT_FADE)
-	&& victim->fighting == NULL)
-	return false;
+        && !CAN_DETECT(this, DETECT_FADE)
+        && victim->fighting == NULL)
+        return false;
 
     return true;
 }
@@ -424,7 +424,7 @@ static bool oprog_invisible( Object *obj, const Character *ch )
     FENIA_NDX_CALL( obj, "Invisible", "OC", obj, ch )
 
     if (obj->behavior)
-	return !obj->behavior->visible( ch );
+        return !obj->behavior->visible( ch );
 
     return false;
 }
@@ -436,8 +436,8 @@ static bool oprog_invisible( Object *obj, const Character *ch )
 bool Character::can_see( const Object *obj ) const
 {
     if (oprog_invisible( const_cast<Object *>( obj ), this ))
-	return false;
-	
+        return false;
+        
   if( !is_npc() && IS_GHOST( this ) ) {
     return true;
   }
@@ -445,29 +445,29 @@ bool Character::can_see( const Object *obj ) const
     if ( !is_npc() && ( IS_SET(act, PLR_HOLYLIGHT) ||
                           IS_GHOST( this ) ||
                           IS_DEATH_TIME( this ) ) )
-	return true;
+        return true;
 
     if ( IS_SET(obj->extra_flags,ITEM_VIS_DEATH))
-	return false;
+        return false;
 
     if ( IS_AFFECTED( this, AFF_BLIND ) && obj->item_type != ITEM_POTION)
-	return false;
+        return false;
 
     if ( obj->item_type == ITEM_LIGHT && obj->value[2] != 0 )
-	return true;
+        return true;
 
     if ( IS_SET(obj->extra_flags, ITEM_INVIS)
     &&   !CAN_DETECT(this, DETECT_INVIS) )
         return false;
 
     if ( IS_OBJ_STAT(obj,ITEM_GLOW))
-	return true;
+        return true;
 
     if (in_room->isDark( ) && !IS_AFFECTED(this, AFF_INFRARED) )
-	return false;
+        return false;
 
     if ( obj->item_type == ITEM_TATTOO )
-	return true;
+        return true;
 
     return true;
 }
@@ -478,12 +478,12 @@ bool Character::can_see( const Object *obj ) const
 bool Character::can_hear( const Object *obj ) const
 {
     if (oprog_invisible( const_cast<Object *>( obj ), this ))
-	return false;
-	
+        return false;
+        
     if ( !IS_SET(obj->extra_flags, ITEM_HUM)
-	    || isAffected(gsn_deafen) )
+            || isAffected(gsn_deafen) )
     {
-	    return false;
+            return false;
     }
 
     return true;
@@ -492,16 +492,16 @@ bool Character::can_hear( const Object *obj ) const
 bool Character::can_sense( const Character *victim ) const
 {
     if (victim == this)
-	return true;
+        return true;
 
     if (IS_SET(in_room->room_flags, ROOM_DUMB)
-	&& !is_npc( )
-	&& !victim->is_npc( )
-	&& !(victim->is_immortal( ) || is_immortal( )))
-	return false;
+        && !is_npc( )
+        && !victim->is_npc( )
+        && !(victim->is_immortal( ) || is_immortal( )))
+        return false;
     
     if (DIGGED(this) && DIGGED(victim))
-	return false;
+        return false;
 
     return true;
 }
@@ -515,7 +515,7 @@ short Character::getWearLevel( Object *obj )
     int wear_mod;
     
     wear_mod = getProfession( )->getWearModifier( obj->item_type );
-	    
+            
     return std::max( 1, obj->level - wear_mod - (getModifyLevel( ) - getRealLevel( )));
 }
 
@@ -536,21 +536,21 @@ int Character::getSkill( int sn )
 const Character * Character::getDoppel( const Character *looker ) const
 {
     if (looker && looker->getConfig( )->holy)
-	return this;
+        return this;
     else if (doppel && isAffected(gsn_doppelganger))
-	return doppel->getDoppel( looker );
+        return doppel->getDoppel( looker );
     else
-	return this;
+        return this;
 }
 
 Character * Character::getDoppel( const Character *looker )
 {
     if (looker && looker->getConfig( )->holy)
-	return this;
+        return this;
     else if (doppel && isAffected(gsn_doppelganger))
-	return doppel->getDoppel( looker );
+        return doppel->getDoppel( looker );
     else
-	return this;
+        return this;
 }
 
 bool Character::isAffected( int sn ) const
@@ -558,8 +558,8 @@ bool Character::isAffected( int sn ) const
     Affect *paf;
 
     for (paf = affected; paf != 0; paf = paf->next)
-	if (paf->type == sn)
-	    return true;
+        if (paf->type == sn)
+            return true;
 
     return false;
 }
@@ -567,8 +567,8 @@ bool Character::isAffected( int sn ) const
 void Character::dismount( )
 {
     if (mount) {
-	mount->mount = NULL;
-	mount = NULL;
+        mount->mount = NULL;
+        mount = NULL;
     }
 }
 

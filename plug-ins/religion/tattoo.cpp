@@ -21,6 +21,6 @@
 void ReligionTattoo::fight( Character *ch )
 {
     if (obj->wear_loc == wear_tattoo)
-	ch->getReligion( )->tattooFight( obj, ch );
+        ch->getReligion( )->tattooFight( obj, ch );
 }
 
