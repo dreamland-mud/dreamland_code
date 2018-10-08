@@ -49,7 +49,7 @@ void NoteManager::unLoad( const NoteThread *thread )
     DLString name = thread->getName( );
     Threads::iterator ipos = threads.find( name );
     
-    saveXML( thread, name );
+//    saveXML( thread, name );
     threads.erase( ipos );
 }
 

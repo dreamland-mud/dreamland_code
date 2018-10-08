@@ -161,7 +161,7 @@ EXTRA_EXIT_DATA * get_extra_exit ( const char * name,EXTRA_EXIT_DATA * list )
 
 const char * direction_doorname(EXIT_DATA *pexit)
 {
-    if (!pexit->short_descr || !pexit->short_descr[0])
+    if (!pexit || !pexit->short_descr || !pexit->short_descr[0])
         return "дверь";
     return pexit->short_descr;
 }
