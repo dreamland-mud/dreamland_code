@@ -126,17 +126,17 @@ void SummonCreatureSpell::run( Character *ch, Character *victim, int sn, int lev
 	return;
 
     if (!victim->is_npc( )) {
-	ch->pecho( "%^C3 вряд ли понравится быть %N5.", victim, shortDescr);
+	ch->pecho( "%^C3 п╡я─я▐п╢ п╩п╦ п©п╬п╫я─п╟п╡п╦я┌я│я▐ п╠я▀я┌я▄ %N5.", victim, shortDescr);
 	return;
     }
     
     if (victim->getNPC( )->pIndexData->vnum != mobVnum) {
-	ch->pecho( "%1$^C1 разве похо%1$Gж|ж|жа на %2$N4?", victim, shortDescr);
+	ch->pecho( "%1$^C1 я─п╟п╥п╡п╣ п©п╬я┘п╬%1$Gп╤|п╤|п╤п╟ п╫п╟ %2$N4?", victim, shortDescr);
 	return;
     }
     
     if (IS_AFFECTED( victim, AFF_CHARM )) {
-	ch->pecho( "У %C2 уже есть хозяин.", victim );
+	ch->pecho( "пё %C2 я┐п╤п╣ п╣я│я┌я▄ я┘п╬п╥я▐п╦п╫.", victim );
 	return;
     }
  

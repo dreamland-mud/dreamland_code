@@ -25,7 +25,7 @@ public:
 	static const DLString TYPE;
 
 public:	
-	/** По умолчанию значение 0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
 	inline Byte( ) : value( 0 )
 	{
 	}
@@ -59,7 +59,7 @@ private:
 
 
 
-/** Вывод в ostream типа Byte */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Byte */
 inline std::ostream& operator << ( std::ostream& ostr, const Byte& byte )
 {
 	ostr << byte.getValue( );

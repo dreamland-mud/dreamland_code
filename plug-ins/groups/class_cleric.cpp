@@ -30,7 +30,7 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
 
     if ( room->isAffected( sn ))
     {
-	ch->send_to("¸‘¡ ÀœÕŒ¡‘¡ ’÷≈ –œÃŒ¡ ‹Œ≈“«≈‘…ﬁ≈”Àœ  ”…ÃŸ.\n\r");
+	ch->send_to("–≠—Ç–∞ –∫–æ–º–Ω–∞—Ç–∞ —É–∂–µ –ø–æ–ª–Ω–∞ —ç–Ω–µ—Ä–≥–µ—Ç–∏—á–µ—Å–∫–æ–π —Å–∏–ª—ã.\n\r");
 	return;
     }
 
@@ -51,8 +51,8 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
     af2.location  = APPLY_NONE;
     af2.bitvector = 0;
     affect_to_char( ch, &af2 );
-    ch->send_to("ÙŸ Œ¡–œÃŒ—≈€ÿ ◊œ⁄ƒ’» ‹Œ≈“«≈‘…ﬁ≈”Àœ  ”…Ãœ , ⁄¡”‘¡◊Ã—— ≈«œ Õ≈“√¡‘ÿ.\n\r");
-    act_p("$c1 Œ¡–œÃŒ—≈‘ ◊œ⁄ƒ’» ‹Œ≈“«≈‘…ﬁ≈”Àœ  ”…Ãœ , ⁄¡”‘¡◊Ã—— ≈«œ Õ≈“√¡‘ÿ.",
+    ch->send_to("–¢—ã –Ω–∞–ø–æ–ª–Ω—è–µ—à—å –≤–æ–∑–¥—É—Ö —ç–Ω–µ—Ä–≥–µ—Ç–∏—á–µ—Å–∫–æ–π —Å–∏–ª–æ–π, –∑–∞—Å—Ç–∞–≤–ª—è—è –µ–≥–æ –º–µ—Ä—Ü–∞—Ç—å.\n\r");
+    act_p("$c1 –Ω–∞–ø–æ–ª–Ω—è–µ—Ç –≤–æ–∑–¥—É—Ö —ç–Ω–µ—Ä–≥–µ—Ç–∏—á–µ—Å–∫–æ–π —Å–∏–ª–æ–π, –∑–∞—Å—Ç–∞–≤–ª—è—è –µ–≥–æ –º–µ—Ä—Ü–∞—Ç—å.",
            ch,0,0,TO_ROOM,POS_RESTING);
     return;
 
@@ -61,9 +61,9 @@ VOID_SPELL(MindLight)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(MindLight);
 VOID_AFFECT(MindLight)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "˜œ⁄ƒ’» Õ≈“√¡≈‘ œ‘ …⁄¬Ÿ‘À¡ ‹Œ≈“«≈‘…ﬁ≈”Àœ  ”…ÃŸ - "
-                   "‹‘œ Œ¡ ¬Ã…÷¡ €…≈ {W%1$d{x ﬁ¡%1$I”|”¡|”œ◊ ’Ã’ﬁ€…‘ "
-		   "◊œ””‘¡Œœ◊Ã≈Œ…≈ Õ¡ŒŸ Œ¡ {W%2$d{x.",
+    buf << fmt( 0, "–í–æ–∑–¥—É—Ö –º–µ—Ä—Ü–∞–µ—Ç –æ—Ç –∏–∑–±—ã—Ç–∫–∞ —ç–Ω–µ—Ä–≥–µ—Ç–∏—á–µ—Å–∫–æ–π —Å–∏–ª—ã - "
+                   "—ç—Ç–æ –Ω–∞ –±–ª–∏–∂–∞–π—à–∏–µ {W%1$d{x —á–∞%1$I—Å|—Å–∞|—Å–æ–≤ —É–ª—É—á—à–∏—Ç "
+		   "–≤–æ—Å—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω–∏–µ –º–∞–Ω—ã –Ω–∞ {W%2$d{x.",
 		   paf->duration, paf->modifier )
 	<< endl;
 }

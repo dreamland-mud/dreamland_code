@@ -33,8 +33,8 @@ DreamThread::~DreamThread( )
 
 void DreamThread::getUnreadMessage( int count, ostringstream &buf ) const
 {
-    // Example: Смертным приснили {W10{x новых снов ('{y{lRсон{lEdream{x').
-    buf << fmt( 0, "Смертным приснили {W%1$d{x нов%1$Iый|ых|ых с%1$Iон|на|нов ('{y{lRсон{lEdream{x').", count ) << endl;
+    // Example: п║п╪п╣я─я┌п╫я▀п╪ п©я─п╦я│п╫п╦п╩п╦ {W10{x п╫п╬п╡я▀я┘ я│п╫п╬п╡ ('{y{lRя│п╬п╫{lEdream{x').
+    buf << fmt( 0, "п║п╪п╣я─я┌п╫я▀п╪ п©я─п╦я│п╫п╦п╩п╦ {W%1$d{x п╫п╬п╡%1$Iя▀п╧|я▀я┘|я▀я┘ я│%1$Iп╬п╫|п╫п╟|п╫п╬п╡ ('{y{lRя│п╬п╫{lEdream{x').", count ) << endl;
 }
 
 bool DreamThread::canWrite( const PCharacter *ch ) const

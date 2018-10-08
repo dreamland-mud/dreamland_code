@@ -175,10 +175,10 @@ COMMAND(CBan, "ban")
 void CBan::doUsage( Character *ch )
 {
     ch->send_to( 
-	"Использование: \r\n"
-	"ban list                      - список банов\r\n"       
-	"ban {<pattern>|<index>}       - подробности про бан\r\n"
-	"ban {<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - добавить/изменить/удалить бан\r\n ");
+	"п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: \r\n"
+	"ban list                      - я│п©п╦я│п╬п╨ п╠п╟п╫п╬п╡\r\n"       
+	"ban {<pattern>|<index>}       - п©п╬п╢я─п╬п╠п╫п╬я│я┌п╦ п©я─п╬ п╠п╟п╫\r\n"
+	"ban {<pattern>|<index>} [off|none|all|player|newbie|confirm|communicate] [expire <timespec>] [comment <reason>] - п╢п╬п╠п╟п╡п╦я┌я▄/п╦п╥п╪п╣п╫п╦я┌я▄/я┐п╢п╟п╩п╦я┌я▄ п╠п╟п╫\r\n ");
 }
 
 void CBan::doKick( Character *ch )

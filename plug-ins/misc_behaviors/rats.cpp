@@ -74,7 +74,7 @@ bool Rat::area( )
 	XMLAttributeRats::Pointer attr = master->getPC( )->getAttributes( ).findAttr<XMLAttributeRats>( "rats" );
 	
 	if (attr && attr->nongrata == true) {
-	    act_p( "$c1 говорит тебе '{GЯ не желаю служить тебе..{x'", ch, 0, master, TO_VICT, POS_DEAD );
+	    act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп╞ п╫п╣ п╤п╣п╩п╟я▌ я│п╩я┐п╤п╦я┌я▄ я┌п╣п╠п╣..{x'", ch, 0, master, TO_VICT, POS_DEAD );
 	    extract_char( ch );
 	    return true;
 	}
@@ -90,7 +90,7 @@ bool Rat::area( )
 	return false;
     }
 
-    act_p("$c1 отправляется в крысиный рай.", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("$c1 п╬я┌п©я─п╟п╡п╩я▐п╣я┌я│я▐ п╡ п╨я─я▀я│п╦п╫я▀п╧ я─п╟п╧.", ch, 0, 0, TO_ROOM, POS_RESTING);
     extract_char( ch );
     return true;
 }
@@ -114,7 +114,7 @@ void RatGod::greet( Character *mob ) {
     race = mob->getRace( )->getName( );
     
     if (race == "felar" || race == "lion" || race == "cat") {
-	exorcism( mob, "{DС котами нельзя!{x" );
+	exorcism( mob, "{Dп║ п╨п╬я┌п╟п╪п╦ п╫п╣п╩я▄п╥я▐!{x" );
 	return;
     }
     
@@ -126,11 +126,11 @@ void RatGod::greet( Character *mob ) {
 
     if (attr) {
 	if (attr->nongrata.getValue( ) == true) {
-	    exorcism( mob, "{rКрысоубийце{D не место здесь.{x" );
+	    exorcism( mob, "{rп я─я▀я│п╬я┐п╠п╦п╧я├п╣{D п╫п╣ п╪п╣я│я┌п╬ п╥п╢п╣я│я▄.{x" );
 	    return;
 	}
 	if (attr->desecrator) {
-	    exorcism( mob, "Тебя здесь не желают видеть." );
+	    exorcism( mob, "п╒п╣п╠я▐ п╥п╢п╣я│я▄ п╫п╣ п╤п╣п╩п╟я▌я┌ п╡п╦п╢п╣я┌я▄." );
 	    return;
 	}
     }
@@ -148,9 +148,9 @@ void RatGod::exorcism( Character *victim, const char *msg ) {
 	to_room = get_room_index( ROOM_VNUM_TEMPLE );
     
     transfer_char( victim, ch, to_room,
-                   "%1$^C1 улетучивается.",
+                   "%1$^C1 я┐п╩п╣я┌я┐я┤п╦п╡п╟п╣я┌я│я▐.",
 		   msg,
-                   "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+                   "%1$^C1 п©п╬я▐п╡п╦п╩%1$Gп╬я│я▄|я│я▐|п╟я│я▄ п╡ п╨п╬п╪п╫п╟я┌п╣." );
 }
 
 

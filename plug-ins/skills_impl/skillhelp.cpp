@@ -19,14 +19,14 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     bool rus = ch->getConfig( )->ruskills;
 
-    in << (skill->getSpell( ) && skill->getSpell( )->isCasted( ) ? "Заклинание" : "Умение");
+    in << (skill->getSpell( ) && skill->getSpell( )->isCasted( ) ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣");
     if (rus)
-        in << " '{c" << skill->getRussianName( ) << "{x' или" << " '{c" << skill->getName( ) << "{x'";
+        in << " '{c" << skill->getRussianName( ) << "{x' п╦п╩п╦" << " '{c" << skill->getName( ) << "{x'";
     else
-        in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
+        in << " '{c" << skill->getName( ) << "{x' п╦п╩п╦" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    in << ", входит в группу '{hg{c" 
+    in << ", п╡я┘п╬п╢п╦я┌ п╡ пЁя─я┐п©п©я┐ '{hg{c" 
        << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
        << endl << endl
        << *this;
@@ -67,9 +67,9 @@ void SkillHelpFormatter::setup( Character *ch )
 
 
 /*
- * CMD      ->  {lEeng_name{lRрусское_имя{lx
- * SKILL    ->  {lEeng_name{lRрусское_имя{lx
- * SPELL    ->  {lEc 'spell name'{lRк 'название заклинания'{lx
+ * CMD      ->  {lEeng_name{lRя─я┐я│я│п╨п╬п╣_п╦п╪я▐{lx
+ * SKILL    ->  {lEeng_name{lRя─я┐я│я│п╨п╬п╣_п╦п╪я▐{lx
+ * SPELL    ->  {lEc 'spell name'{lRп╨ 'п╫п╟п╥п╡п╟п╫п╦п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐'{lx
  */
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
@@ -90,7 +90,7 @@ bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "SPELL") {
-	out << (fRusCmd ? "к" : "c") << " "
+	out << (fRusCmd ? "п╨" : "c") << " "
 	    << (fRusSkill ? skill->getRussianName( ).quote( )
 	                  : skill->getName( ).quote( ));
 	return true;

@@ -33,7 +33,7 @@ void XMLAttributeGodReward::listRewards(ostringstream &buf) const
     XMLVectorBase<XMLGodReward>::const_iterator r;
 
     for (r = rewards.begin( ); r!= rewards.end( ); r++) {
-        buf << "      " << fmt(0, "{Y%1$d{x À◊≈”‘œ◊%1$I’¿|Ÿ≈|Ÿ» ≈ƒ…Œ…√%1$I’|Ÿ|", r->qp)
+        buf << "      " << fmt(0, "{Y%1$d{x –∫–≤–µ—Å—Ç–æ–≤%1$I—É—é|—ã–µ|—ã—Ö –µ–¥–∏–Ω–∏—Ü%1$I—É|—ã|", r->qp)
             << "  " << r->reason << endl;
     }
 }
@@ -43,7 +43,7 @@ void XMLAttributeGodReward::reward( PCharacter *ch )
     XMLVectorBase<XMLGodReward>::const_iterator r;
     ostringstream buf;
 
-    buf << "{C˜ ¬Ã¡«œƒ¡“Œœ”‘ÿ œ‘ ¬œ«œ◊ ‘Ÿ –œÃ’ﬁ¡≈€ÿ:{x" << endl;
+    buf << "{C–í –±–ª–∞–≥–æ–¥–∞—Ä–Ω–æ—Å—Ç—å –æ—Ç –±–æ–≥–æ–≤ —Ç—ã –ø–æ–ª—É—á–∞–µ—à—å:{x" << endl;
     listRewards(buf);
     ch->send_to(buf);
 
@@ -91,24 +91,24 @@ CMDADM( ireward )
     DLString reason = arguments;
 
     if (name.empty( )) {
-	ch->println( "˜œ⁄Œ¡«“¡ƒ…‘ÿ Àœ«œ?" );
+	ch->println( "–í–æ–∑–Ω–∞–≥—Ä–∞–¥–∏—Ç—å –∫–æ–≥–æ?" );
 	return;
     }
 
     if (qpStr.empty( )) {
-        ch->println("È”–œÃÿ⁄œ◊¡Œ…≈: \r\n    ireward –≈“”œŒ¡÷ À– –“…ﬁ…Œ¡\r\n    ireward –≈“”œŒ¡÷ show\r\n    ireward –≈“”œŒ¡÷ delete");
+        ch->println("–ò—Å–ø–æ–ª—å–∑–æ–≤–∞–Ω–∏–µ: \r\n    ireward –ø–µ—Ä—Å–æ–Ω–∞–∂ –∫–ø –ø—Ä–∏—á–∏–Ω–∞\r\n    ireward –ø–µ—Ä—Å–æ–Ω–∞–∂ show\r\n    ireward –ø–µ—Ä—Å–æ–Ω–∞–∂ delete");
         return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-	ch->println( "≈“”œŒ¡÷ ” ‘¡À…Õ …Õ≈Œ≈Õ Œ≈ Œ¡ ƒ≈Œ." );
+	ch->println( "–ü–µ—Ä—Å–æ–Ω–∞–∂ —Å —Ç–∞–∫–∏–º –∏–º–µ–Ω–µ–º –Ω–µ –Ω–∞–π–¥–µ–Ω." );
 	return;
     }
 
-    if (arg_oneof(qpStr, "’ƒ¡Ã…‘ÿ", "delete")) {
+    if (arg_oneof(qpStr, "—É–¥–∞–ª–∏—Ç—å", "delete")) {
         pci->getAttributes().eraseAttribute(ATTRNAME);
         PCharacterManager::saveMemory(pci);
-        ch->println("ıƒ¡Ã≈ŒŸ ◊”≈ Œ¡«“¡ƒŸ.");
+        ch->println("–£–¥–∞–ª–µ–Ω—ã –≤—Å–µ –Ω–∞–≥—Ä–∞–¥—ã.");
         return;
     } 
 
@@ -116,12 +116,12 @@ CMDADM( ireward )
 
     if (arg_is_show(qpStr)) {
         if (attr->isEmpty()) {
-            ch->println("Ó¡«“¡ƒ Œ≈ Œ¡ ƒ≈Œœ.");
+            ch->println("–ù–∞–≥—Ä–∞–¥ –Ω–µ –Ω–∞–π–¥–µ–Ω–æ.");
             return;
         }
 
         ostringstream buf;
-        buf << "Ó¡«“¡ƒŸ ƒÃ— –≈“”œŒ¡÷¡ " << pci->getName() << ":" << endl;
+        buf << "–ù–∞–≥—Ä–∞–¥—ã –¥–ª—è –ø–µ—Ä—Å–æ–Ω–∞–∂–∞ " << pci->getName() << ":" << endl;
         attr->listRewards(buf);
         ch->send_to(buf);
         return;
@@ -132,12 +132,12 @@ CMDADM( ireward )
     try {
         qp = qpStr.toInt( );
     } catch (const ExceptionBadType& e) {
-        ch->println("ıÀ¡÷…‘≈ ÀœÃ-◊œ À◊≈”‘œ◊Ÿ» ≈ƒ…Œ…√.\r\n");
+        ch->println("–£–∫–∞–∂–∏—Ç–µ –∫–æ–ª-–≤–æ –∫–≤–µ—Å—Ç–æ–≤—ã—Ö –µ–¥–∏–Ω–∏—Ü.\r\n");
         return;
     }
 
     attr->addReward(qp, arguments);
-    ch->printf("ı”‘¡Œœ◊Ã≈Œ¡ Œ¡«“¡ƒ¡ ◊ %d qp, –“…ﬁ…Œ¡: %s.\r\n", qp, arguments.c_str());
+    ch->printf("–£—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω–∞ –Ω–∞–≥—Ä–∞–¥–∞ –≤ %d qp, –ø—Ä–∏—á–∏–Ω–∞: %s.\r\n", qp, arguments.c_str());
 
     if (pci->isOnline()) {      
         PCharacter *vict = pci->getPlayer();

@@ -30,7 +30,7 @@ public:
 
 	for (d = descriptor_list; d; d = d->next) 
 	    if (d->connected == CON_PLAYING && d->character) 
-		d->character->send_to( "Мир неуловимо изменился..\r\n" );
+		d->character->send_to( "п°п╦я─ п╫п╣я┐п╩п╬п╡п╦п╪п╬ п╦п╥п╪п╣п╫п╦п╩я│я▐..\r\n" );
     }
 
     virtual int getPriority( ) const
@@ -80,10 +80,10 @@ COMMAND(CPlugin, "plugin")
 void CPlugin::usage( Character *ch )
 {
     ch->send_to( 
-	"Использование: \r\n"
-	"plugin list - список всех загруженных модулей.\r\n"
+	"п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: \r\n"
+	"plugin list - я│п©п╦я│п╬п╨ п╡я│п╣я┘ п╥п╟пЁя─я┐п╤п╣п╫п╫я▀я┘ п╪п╬п╢я┐п╩п╣п╧.\r\n"
 	"plugin reload [all|changed|<name>] \r\n"
-	"            - перегрузка модулей (всех, измененных или по имени)\r\n" );
+	"            - п©п╣я─п╣пЁя─я┐п╥п╨п╟ п╪п╬п╢я┐п╩п╣п╧ (п╡я│п╣я┘, п╦п╥п╪п╣п╫п╣п╫п╫я▀я┘ п╦п╩п╦ п©п╬ п╦п╪п╣п╫п╦)\r\n" );
 }
 
 void CPlugin::doList( Character *ch )

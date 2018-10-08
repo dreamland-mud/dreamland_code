@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
  *    Koval Nazar	    {Nazar, Redrum}                 		   *
  *    Doropey Vladimir	    {Reorx}		                           *
  *    Kulgeyko Denis	    {Burzum}		                           *
  *    Andreyanov Aleksandr  {Manwe}		                           *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD	                   *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD	                   *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
@@ -414,8 +414,8 @@ static inline bool must_not_yell( Character *ch, Character *victim, int flags )
 
 void yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags )
 {
-    static const char *defaultMsgBlind = "ðÏÍÏÇÉÔÅ! ëÔÏ-ÔÏ ÎÁÐÁÌ ÎÁ ÍÅÎÑ!";
-    static const char *defaultMsg = "ðÏÍÏÇÉÔÅ! %1$^C1 ÎÁÐÁ%1$GÌÏ|Ì|ÌÁ ÎÁ ÍÅÎÑ!";
+    static const char *defaultMsgBlind = "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! ÐšÑ‚Ð¾-Ñ‚Ð¾ Ð½Ð°Ð¿Ð°Ð» Ð½Ð° Ð¼ÐµÐ½Ñ!";
+    static const char *defaultMsg = "ÐŸÐ¾Ð¼Ð¾Ð³Ð¸Ñ‚Ðµ! %1$^C1 Ð½Ð°Ð¿Ð°%1$GÐ»Ð¾|Ð»|Ð»Ð° Ð½Ð° Ð¼ÐµÐ½Ñ!";
 
     if (must_not_yell( ch, victim, flags ))
         return;
@@ -441,10 +441,10 @@ void damage_to_obj( Character *ch, Object *wield, Object *worn, int damage )
 
     worn->condition -= damage;
 
-    act( "$o1 ÎÁÎÏÓÉÔ ÐÏ×ÒÅÖÄÅÎÉÑ $O3.", ch, wield, worn, TO_ROOM );
+    act( "$o1 Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ Ð¿Ð¾Ð²Ñ€ÐµÐ¶Ð´ÐµÐ½Ð¸Ñ $O3.", ch, wield, worn, TO_ROOM );
 
     if (worn->condition < 1) {
-	act("$O1 ÒÁÚÌÅÔÁÅÔÓÑ ÎÁ ÍÅÌËÉÅ ÞÁÓÔÉ.", ch, wield, worn, TO_ROOM);
+	act("$O1 Ñ€Ð°Ð·Ð»ÐµÑ‚Ð°ÐµÑ‚ÑÑ Ð½Ð° Ð¼ÐµÐ»ÐºÐ¸Ðµ Ñ‡Ð°ÑÑ‚Ð¸.", ch, wield, worn, TO_ROOM);
 	extract_obj( worn );
 	return;
     }

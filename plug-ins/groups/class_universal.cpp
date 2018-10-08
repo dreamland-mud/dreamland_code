@@ -24,15 +24,15 @@ Profession * find_prof_unstrict( const DLString &className);
 
 /*
  * paladin [7900]  the grand knight of paladins [7900]
- * samurai [9800]  самурай-мастер оружия [9594]
+ * samurai [9800]  я│п╟п╪я┐я─п╟п╧-п╪п╟я│я┌п╣я─ п╬я─я┐п╤п╦я▐ [9594]
  * warrior [1221]  heimdall [1200]
- * cleric  [9604]  первосвященник [9581]
- * witch   [9623]  Эльвира [9579]
- * warlock [18103] Волшебник (Магазин Магических Товаров) [18206]
+ * cleric  [9604]  п©п╣я─п╡п╬я│п╡я▐я┴п╣п╫п╫п╦п╨ [9581]
+ * witch   [9623]  п╜п╩я▄п╡п╦я─п╟ [9579]
+ * warlock [18103] п▓п╬п╩я┬п╣п╠п╫п╦п╨ (п°п╟пЁп╟п╥п╦п╫ п°п╟пЁп╦я┤п╣я│п╨п╦я┘ п╒п╬п╡п╟я─п╬п╡) [18206]
  * ninja   [16412] The guildmaster (Assassin's Meeting Chamber) [16099]
  * thief   [16385] The head thief [16088]
- * ranger  [234]   Лорд-Рейнджер [213]
- * anti-paladin [18116] Анти-паладин [18036]
+ * ranger  [234]   п⌡п╬я─п╢-п═п╣п╧п╫п╢п╤п╣я─ [213]
+ * anti-paladin [18116] п░п╫я┌п╦-п©п╟п╩п╟п╢п╦п╫ [18036]
  * necromancer [16135] The necromancer [16010]
  */
 UniclassAdept::UniclassAdept( ) 
@@ -44,8 +44,8 @@ bool UniclassAdept::parseSpeech( Character *vict, const char *speech, DLString &
     PCharacter *victim;
 
     RegExp::MatchVector matches;
-    static RegExp pattern1( "I (wish|want) .*become a?|я хочу стать"); 
-    static RegExp pattern2( "([A-Za-zЮ-Ъю-ъ-]+)[.!]*$"); 
+    static RegExp pattern1( "I (wish|want) .*become a?|я▐ я┘п╬я┤я┐ я│я┌п╟я┌я▄"); 
+    static RegExp pattern2( "([A-Za-zп╝-п╙я▌-я┼-]+)[.!]*$"); 
     
     if (vict->is_npc( ))
 	return false;
@@ -89,14 +89,14 @@ void UniclassAdept::speech( Character *vict, const char * speech )
 
     victim = vict->getPC( );
     if (className.empty( )) {
-	act( "$c1 произносит '{gКем же ты хочешь стать, $C1?{x'", ch, 0, victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп п╣п╪ п╤п╣ я┌я▀ я┘п╬я┤п╣я┬я▄ я│я┌п╟я┌я▄, $C1?{x'", ch, 0, victim, TO_ALL );
 	return;
     }
     
     prof = find_prof_unstrict( className );
 
     if (!prof) {
-	act( "$c1 произносит '{gНикогда не слыша$gло|л|ла о такой странной профессии - '$t', $C1.{x'", ch, className.c_str( ), victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп²п╦п╨п╬пЁп╢п╟ п╫п╣ я│п╩я▀я┬п╟$gп╩п╬|п╩|п╩п╟ п╬ я┌п╟п╨п╬п╧ я│я┌я─п╟п╫п╫п╬п╧ п©я─п╬я└п╣я│я│п╦п╦ - '$t', $C1.{x'", ch, className.c_str( ), victim, TO_ALL );
 	return;
     }
     
@@ -110,20 +110,20 @@ void UniclassAdept::speech( Character *vict, const char * speech )
     
     if (myclass.getValue( ) != className) {
 	switch (number_range( 1, 3 )) {
-	case 1: act( "$c1 произносит '{gЯ не могу сделать с тобой то, чего ты просишь, $C1.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
-	case 2: act( "$c1 произносит '{gТы ошиб$Gлось|ся|лась адресом. Уйди, не тревожь мой покой.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
-	case 3: act( "$c1 произносит '{g$C1! А ну-ка марш в гильдию и внимательно читай, что на стенах пишут!{x'", ch, 0, victim, TO_ALL ); break;
+	case 1: act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╞ п╫п╣ п╪п╬пЁя┐ я│п╢п╣п╩п╟я┌я▄ я│ я┌п╬п╠п╬п╧ я┌п╬, я┤п╣пЁп╬ я┌я▀ п©я─п╬я│п╦я┬я▄, $C1.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
+	case 2: act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╒я▀ п╬я┬п╦п╠$Gп╩п╬я│я▄|я│я▐|п╩п╟я│я▄ п╟п╢я─п╣я│п╬п╪. пёп╧п╢п╦, п╫п╣ я┌я─п╣п╡п╬п╤я▄ п╪п╬п╧ п©п╬п╨п╬п╧.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
+	case 3: act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g$C1! п░ п╫я┐-п╨п╟ п╪п╟я─я┬ п╡ пЁп╦п╩я▄п╢п╦я▌ п╦ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ я┤п╦я┌п╟п╧, я┤я┌п╬ п╫п╟ я│я┌п╣п╫п╟я┘ п©п╦я┬я┐я┌!{x'", ch, 0, victim, TO_ALL ); break;
 	}
 	return;
     }
     
     if (!prof->getSex( ).isSetBitNumber( victim->getSex( ) )) {
 	if (victim->getSex( ) == SEX_MALE) {
-	    act( "$c1 произносит '{gДля этого придется у тебя кое-что отрезать, $C1.{x'", ch, 0, victim, TO_ALL );
+	    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп■п╩я▐ я█я┌п╬пЁп╬ п©я─п╦п╢п╣я┌я│я▐ я┐ я┌п╣п╠я▐ п╨п╬п╣-я┤я┌п╬ п╬я┌я─п╣п╥п╟я┌я▄, $C1.{x'", ch, 0, victim, TO_ALL );
 	    interpret_fmt( ch, "giggle %s", victim->getNameP( ) );
 	}
 	else {
-	    act( "$c1 произносит '{gДля этого тебе не хватает одной маленькой штучки, $C1.{x'", ch, 0, victim, TO_ALL );
+	    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп■п╩я▐ я█я┌п╬пЁп╬ я┌п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ п╬п╢п╫п╬п╧ п╪п╟п╩п╣п╫я▄п╨п╬п╧ я┬я┌я┐я┤п╨п╦, $C1.{x'", ch, 0, victim, TO_ALL );
 	    interpret_fmt( ch, "smirk" );
 	}
 	
@@ -132,24 +132,24 @@ void UniclassAdept::speech( Character *vict, const char * speech )
     
     if (!prof->getAlign( ).isSetBitNumber( ALIGNMENT(victim) )) {
 	if (IS_EVIL( victim ))
-	    act( "$c1 произносит '{gУ тебя нечистая душа, $C1. Тебе не место среди нас.{x'", ch, className.c_str( ), victim, TO_ALL );
+	    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gпё я┌п╣п╠я▐ п╫п╣я┤п╦я│я┌п╟я▐ п╢я┐я┬п╟, $C1. п╒п╣п╠п╣ п╫п╣ п╪п╣я│я┌п╬ я│я─п╣п╢п╦ п╫п╟я│.{x'", ch, className.c_str( ), victim, TO_ALL );
 	else if (IS_GOOD( victim )) {
-	    act( "$c1 презрительно кривится.", ch, 0, 0, TO_ALL );
-	    act( "$c1 произносит '{gУж больно ты хорош$Gое|ий|ая, $C1. Ступай-ка отсюда подобру-поздорову.{x'", ch, 0, victim, TO_ALL );
+	    act( "$c1 п©я─п╣п╥я─п╦я┌п╣п╩я▄п╫п╬ п╨я─п╦п╡п╦я┌я│я▐.", ch, 0, 0, TO_ALL );
+	    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gпёп╤ п╠п╬п╩я▄п╫п╬ я┌я▀ я┘п╬я─п╬я┬$Gп╬п╣|п╦п╧|п╟я▐, $C1. п║я┌я┐п©п╟п╧-п╨п╟ п╬я┌я│я▌п╢п╟ п©п╬п╢п╬п╠я─я┐-п©п╬п╥п╢п╬я─п╬п╡я┐.{x'", ch, 0, victim, TO_ALL );
 	}
 	else
-	    act( "$c1 произносит '{gТы служишь силам равновесия. Тебе не место среди нас, $C1.{x'", ch, 0, victim, TO_ALL );
+	    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╒я▀ я│п╩я┐п╤п╦я┬я▄ я│п╦п╩п╟п╪ я─п╟п╡п╫п╬п╡п╣я│п╦я▐. п╒п╣п╠п╣ п╫п╣ п╪п╣я│я┌п╬ я│я─п╣п╢п╦ п╫п╟я│, $C1.{x'", ch, 0, victim, TO_ALL );
 	
 	return;
     }
     
     if (!prof->getEthos( ).isSetBitNumber( victim->ethos )) {
-	act( "$c1 произносит '{gТвой этос не позволяет стать одн$Gим|им|ой из нас, $C1.{x'", ch, 0, victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╒п╡п╬п╧ я█я┌п╬я│ п╫п╣ п©п╬п╥п╡п╬п╩я▐п╣я┌ я│я┌п╟я┌я▄ п╬п╢п╫$Gп╦п╪|п╦п╪|п╬п╧ п╦п╥ п╫п╟я│, $C1.{x'", ch, 0, victim, TO_ALL );
 	return;
     }
     
     if (victim->getSubProfession( ) == prof) {
-	act( "$c1 произносит '{gНо ты и так пытаешься изображать из себя $n4, $C1!{x'", ch, rusName.c_str( ), victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп²п╬ я┌я▀ п╦ я┌п╟п╨ п©я▀я┌п╟п╣я┬я▄я│я▐ п╦п╥п╬п╠я─п╟п╤п╟я┌я▄ п╦п╥ я│п╣п╠я▐ $n4, $C1!{x'", ch, rusName.c_str( ), victim, TO_ALL );
 	return;
     }
     
@@ -157,7 +157,7 @@ void UniclassAdept::speech( Character *vict, const char * speech )
 	cost = 0;
 
     if (victim->questpoints < cost) {
-	act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп≤п╥п╡п╦п╫п╦, $C1, п╫п╬ я┐ я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ п╨п╡п╣я│я┌п╬п╡я▀я┘ п╣п╢п╦п╫п╦я├.{x'", ch, 0, victim, TO_ALL );
 	return;
     }
     
@@ -165,8 +165,8 @@ void UniclassAdept::speech( Character *vict, const char * speech )
 
     if (dreamland->getCurrentTime( ) - attr->lastTime < timeout) {
 	switch (number_range( 1, 2 )) {
-	case 1: act( "$c1 произносит '{g$C1, будешь так часто скакать между профессиями, голова закружится.{x'", ch, 0, victim, TO_ALL ); break;
-	case 2: act( "$c1 произносит '{g$C1, твое время еще не пришло. Подожди немного.{x'", ch, 0, victim, TO_ALL ); break;
+	case 1: act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g$C1, п╠я┐п╢п╣я┬я▄ я┌п╟п╨ я┤п╟я│я┌п╬ я│п╨п╟п╨п╟я┌я▄ п╪п╣п╤п╢я┐ п©я─п╬я└п╣я│я│п╦я▐п╪п╦, пЁп╬п╩п╬п╡п╟ п╥п╟п╨я─я┐п╤п╦я┌я│я▐.{x'", ch, 0, victim, TO_ALL ); break;
+	case 2: act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g$C1, я┌п╡п╬п╣ п╡я─п╣п╪я▐ п╣я┴п╣ п╫п╣ п©я─п╦я┬п╩п╬. п÷п╬п╢п╬п╤п╢п╦ п╫п╣п╪п╫п╬пЁп╬.{x'", ch, 0, victim, TO_ALL ); break;
 	}
 	return;	
     }
@@ -180,9 +180,9 @@ void UniclassAdept::speech( Character *vict, const char * speech )
     victim->updateSkills( );
     victim->save( );
     
-    act( "$c1 произносит '{gТы хочешь стать $n5 и я благословляю тебя на этот путь, $C1.{x'", ch, rusName.c_str( ), victim, TO_ALL ); 
-    act( "$c1 произносит '{gОтныне ты сможешь овладевать знаниями нашей профессии.{x'", ch, 0, victim, TO_ALL ); 
-    act( "$c1 произносит '{gНо помни, что истинного мастерства тебе будет достичь очень трудно.{x'", ch, 0, victim, TO_ALL ); 
+    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╒я▀ я┘п╬я┤п╣я┬я▄ я│я┌п╟я┌я▄ $n5 п╦ я▐ п╠п╩п╟пЁп╬я│п╩п╬п╡п╩я▐я▌ я┌п╣п╠я▐ п╫п╟ я█я┌п╬я┌ п©я┐я┌я▄, $C1.{x'", ch, rusName.c_str( ), victim, TO_ALL ); 
+    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп·я┌п╫я▀п╫п╣ я┌я▀ я│п╪п╬п╤п╣я┬я▄ п╬п╡п╩п╟п╢п╣п╡п╟я┌я▄ п╥п╫п╟п╫п╦я▐п╪п╦ п╫п╟я┬п╣п╧ п©я─п╬я└п╣я│я│п╦п╦.{x'", ch, 0, victim, TO_ALL ); 
+    act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп²п╬ п©п╬п╪п╫п╦, я┤я┌п╬ п╦я│я┌п╦п╫п╫п╬пЁп╬ п╪п╟я│я┌п╣я─я│я┌п╡п╟ я┌п╣п╠п╣ п╠я┐п╢п╣я┌ п╢п╬я│я┌п╦я┤я▄ п╬я┤п╣п╫я▄ я┌я─я┐п╢п╫п╬.{x'", ch, 0, victim, TO_ALL ); 
 }
 
 /*
@@ -235,7 +235,7 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     PCharacter *pch;
     int cost, age;
     XMLAttributeEnlight::Pointer attr;
-    static RegExp pattern( "^Я хочу быстре.* учить*ся|^I wish to learn quicker"); 
+    static RegExp pattern( "^п╞ я┘п╬я┤я┐ п╠я▀я│я┌я─п╣.* я┐я┤п╦я┌я▄*я│я▐|^I wish to learn quicker"); 
 
     if (victim->is_npc( ) || victim->getProfession( ) != prof_universal)
 	return;
@@ -248,12 +248,12 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     age = pch->age.getTrueYears( ) + 3;
 
     if (pch->getAttributes( ).isAvailable( "enlight" )) {
-	act( "$c1 произносит '{gТы уже неплохо учишься, $C1.{x'", ch, 0, victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╒я▀ я┐п╤п╣ п╫п╣п©п╩п╬я┘п╬ я┐я┤п╦я┬я▄я│я▐, $C1.{x'", ch, 0, victim, TO_ALL );
 	return;
     }
 
     if (pch->questpoints < cost) {
-	act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
+	act( "$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп≤п╥п╡п╦п╫п╦, $C1, п╫п╬ я┐ я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ п╨п╡п╣я│я┌п╬п╡я▀я┘ п╣п╢п╦п╫п╦я├.{x'", ch, 0, victim, TO_ALL );
 	return;
     }
     
@@ -262,10 +262,10 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     pch->questpoints -= cost;
     pch->save( );
 
-    act( "$c1 дотрагивается до твоего лба.", ch, 0, victim, TO_VICT );
-    act( "$c1 прикасается к голове $C2.", ch, 0, victim, TO_NOTVICT );
-    interpret_raw( ch, "say", "Я даю тебе способность к быстрому обучению. Но она исчезнет, когда тебе исполнится {G%d{g %s.",
-		       age, GET_COUNT(age, "год", "года", "лет") );
+    act( "$c1 п╢п╬я┌я─п╟пЁп╦п╡п╟п╣я┌я│я▐ п╢п╬ я┌п╡п╬п╣пЁп╬ п╩п╠п╟.", ch, 0, victim, TO_VICT );
+    act( "$c1 п©я─п╦п╨п╟я│п╟п╣я┌я│я▐ п╨ пЁп╬п╩п╬п╡п╣ $C2.", ch, 0, victim, TO_NOTVICT );
+    interpret_raw( ch, "say", "п╞ п╢п╟я▌ я┌п╣п╠п╣ я│п©п╬я│п╬п╠п╫п╬я│я┌я▄ п╨ п╠я▀я│я┌я─п╬п╪я┐ п╬п╠я┐я┤п╣п╫п╦я▌. п²п╬ п╬п╫п╟ п╦я│я┤п╣п╥п╫п╣я┌, п╨п╬пЁп╢п╟ я┌п╣п╠п╣ п╦я│п©п╬п╩п╫п╦я┌я│я▐ {G%d{g %s.",
+		       age, GET_COUNT(age, "пЁп╬п╢", "пЁп╬п╢п╟", "п╩п╣я┌") );
 }
 
 /* 
@@ -279,7 +279,7 @@ XMLAttributeEnlight::XMLAttributeEnlight( )
 bool XMLAttributeEnlight::pull( PCharacter *pch ) 
 {
     if (pch->age.getTrueYears( ) >= age) { 
-	pch->send_to( "{GТы чувствуешь, что способность к быстрому обучению покидает тебя.{x\r\n" );
+	pch->send_to( "{Gп╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, я┤я┌п╬ я│п©п╬я│п╬п╠п╫п╬я│я┌я▄ п╨ п╠я▀я│я┌я─п╬п╪я┐ п╬п╠я┐я┤п╣п╫п╦я▌ п©п╬п╨п╦п╢п╟п╣я┌ я┌п╣п╠я▐.{x\r\n" );
 	return true;		
     }
 

@@ -29,46 +29,46 @@ void RobbedVictim::givenGood( PCharacter *hero, Object *obj )
 {
     quest->state = QSTAT_FINISHED;
 
-    act( "$c1 восклицает '{gСпасибо тебе, $C1!{x'", ch, 0, hero, TO_ROOM );
-    say_act( hero, ch, "Вернись за вознаграждением к тому, кто рассказал тебе о моем несчастье." );
+    act( "$c1 п╡п╬я│п╨п╩п╦я├п╟п╣я┌ '{gп║п©п╟я│п╦п╠п╬ я┌п╣п╠п╣, $C1!{x'", ch, 0, hero, TO_ROOM );
+    say_act( hero, ch, "п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪ п╨ я┌п╬п╪я┐, п╨я┌п╬ я─п╟я│я│п╨п╟п╥п╟п╩ я┌п╣п╠п╣ п╬ п╪п╬п╣п╪ п╫п╣я│я┤п╟я│я┌я▄п╣." );
     
     if (quest->itemWear != wear_none) {
 	quest->itemWear->wear( obj, F_WEAR_VERBOSE );
 	if (obj->wear_loc != wear_none)
 	    interpret( ch, "smile" );
 	else /* not enough experience to use the item */
-	    interpret( ch, "emote смущенно улыбается." );
+	    interpret( ch, "emote я│п╪я┐я┴п╣п╫п╫п╬ я┐п╩я▀п╠п╟п╣я┌я│я▐." );
     }
 }
 
 void RobbedVictim::givenBad( PCharacter *hero, Object *obj )
 {
-    say_act( hero, ch, "Ну и зачем мне это?" );
-    act( "$c1 с равнодушным видом протягивает тебе $o4.", ch, obj, hero, TO_VICT );
-    act( "$c1 с равнодушным видом протягивает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
+    say_act( hero, ch, "п²я┐ п╦ п╥п╟я┤п╣п╪ п╪п╫п╣ я█я┌п╬?" );
+    act( "$c1 я│ я─п╟п╡п╫п╬п╢я┐я┬п╫я▀п╪ п╡п╦п╢п╬п╪ п©я─п╬я┌я▐пЁп╦п╡п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, obj, hero, TO_VICT );
+    act( "$c1 я│ я─п╟п╡п╫п╬п╢я┐я┬п╫я▀п╪ п╡п╦п╢п╬п╪ п©я─п╬я┌я▐пЁп╦п╡п╟п╣я┌ $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
 void RobbedVictim::deadFromIdiot( PCMemoryInterface *pcm )
 {
-    act("{YИдио$gт|т|тка! Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", pcm->getPlayer( ), 0, 0, TO_CHAR);
+    act("{Yп≤п╢п╦п╬$gя┌|я┌|я┌п╨п╟! п╒я▀ я┐п╠п╦$gп╩п╬|п╩|п╩п╟ я┌п╬пЁп╬, п╨я┌п╬ п╫я┐п╤п╢п╟п╩я│я▐ п╡ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦.{x", pcm->getPlayer( ), 0, 0, TO_CHAR);
 }
 
 void RobbedVictim::deadFromSuicide( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) 
-	act_p("{Y$c1 внезапно скончал$gось|ся|ась. Задание отменяется.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+	act_p("{Y$c1 п╡п╫п╣п╥п╟п©п╫п╬ я│п╨п╬п╫я┤п╟п╩$gп╬я│я▄|я│я▐|п╟я│я▄. п≈п╟п╢п╟п╫п╦п╣ п╬я┌п╪п╣п╫я▐п╣я┌я│я▐.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void RobbedVictim::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-	act_p("{Y$c1 подло уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+	act_p("{Y$c1 п©п╬п╢п╩п╬ я┐п╠п╦$gп╩п╬|п╩|п╩п╟ я┌п╬пЁп╬, п╨я┌п╬ п╫я┐п╤п╢п╟п╩я│я▐ п╡ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void RobbedVictim::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ) && getQuest( ) && !quest->isComplete( ))
-	buf << "{x({YХныкает{x) ";
+	buf << "{x({Yп╔п╫я▀п╨п╟п╣я┌{x) ";
 }
 
 void RobbedVictim::talkToHero( PCharacter *hero )
@@ -85,31 +85,31 @@ void RobbedVictim::talkToHero( PCharacter *hero )
 	    quest->setTime( hero, number_range( 20, 30 ) );
 	    quest->wiznet( "", "%s tells story", ch->getNameP( '1' ).c_str( ) );
 	    
-	    tell_fmt( "{1{W%3$N1{2, подл%4$gое|ый|ая вор%4$gье|юга|овка, "
-		      "укра%4$gло|л|ла у меня {1{W%5$N4{2.",
+	    tell_fmt( "{1{W%3$N1{2, п©п╬п╢п╩%4$gп╬п╣|я▀п╧|п╟я▐ п╡п╬я─%4$gя▄п╣|я▌пЁп╟|п╬п╡п╨п╟, "
+		      "я┐п╨я─п╟%4$gп╩п╬|п╩|п╩п╟ я┐ п╪п╣п╫я▐ {1{W%5$N4{2.",
 		      hero, ch,
 		      quest->thiefName.c_str( ),
 		      quest->thiefSex.getValue( ),
 		      quest->itemName.c_str( ) );
-	    tell_fmt( "Но мне удалось кое-что выяснить о грабител%3$gе|е|ьнице.",
+	    tell_fmt( "п²п╬ п╪п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╨п╬п╣-я┤я┌п╬ п╡я▀я▐я│п╫п╦я┌я▄ п╬ пЁя─п╟п╠п╦я┌п╣п╩%3$gп╣|п╣|я▄п╫п╦я├п╣.",
 		      hero, ch,
 		      quest->thiefSex.getValue( ) );
-	    tell_fmt( "%3$^p1 родом из {1{W%4$s{2, и чаще всего ошивается в районе {1{W%5$s{2.",
+	    tell_fmt( "%3$^p1 я─п╬п╢п╬п╪ п╦п╥ {1{W%4$s{2, п╦ я┤п╟я┴п╣ п╡я│п╣пЁп╬ п╬я┬п╦п╡п╟п╣я┌я│я▐ п╡ я─п╟п╧п╬п╫п╣ {1{W%5$s{2.",
 		      hero, ch,
 		      quest->thiefSex.getValue( ),
 		      quest->thiefArea.c_str( ), 
 		      quest->thiefRoom.c_str( ) );
 
 	    if (!quest->chestRoom.empty( )) {
-		tell_fmt( "А награбленное добро, по слухам, прячет около {1{W%3$s{2, точнее сказать не могу..",
+		tell_fmt( "п░ п╫п╟пЁя─п╟п╠п╩п╣п╫п╫п╬п╣ п╢п╬п╠я─п╬, п©п╬ я│п╩я┐я┘п╟п╪, п©я─я▐я┤п╣я┌ п╬п╨п╬п╩п╬ {1{W%3$s{2, я┌п╬я┤п╫п╣п╣ я│п╨п╟п╥п╟я┌я▄ п╫п╣ п╪п╬пЁя┐..",
 		          hero, ch,
 			  quest->chestRoom.c_str( ) );
-		tell_fmt( "Скорее всего, именно туда %3$p1 припрята%3$gло|л|ла мои вещички, и теперь не расстается с ключом.",
+		tell_fmt( "п║п╨п╬я─п╣п╣ п╡я│п╣пЁп╬, п╦п╪п╣п╫п╫п╬ я┌я┐п╢п╟ %3$p1 п©я─п╦п©я─я▐я┌п╟%3$gп╩п╬|п╩|п╩п╟ п╪п╬п╦ п╡п╣я┴п╦я┤п╨п╦, п╦ я┌п╣п©п╣я─я▄ п╫п╣ я─п╟я│я│я┌п╟п╣я┌я│я▐ я│ п╨п╩я▌я┤п╬п╪.",
 		          hero, ch,
 			  quest->thiefSex.getValue( ) );
 	    }
 
-	    tell_raw( hero, ch, "Верни мне украденное! Жду с нетерпением." );
+	    tell_raw( hero, ch, "п▓п╣я─п╫п╦ п╪п╫п╣ я┐п╨я─п╟п╢п╣п╫п╫п╬п╣! п√п╢я┐ я│ п╫п╣я┌п╣я─п©п╣п╫п╦п╣п╪." );
 
 	break;
     }
@@ -122,6 +122,6 @@ void RobbedVictim::talkToHero( PCharacter *hero )
 void Robber::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim )) 
-	buf << "{R[ВОР] {x";
+	buf << "{R[п▓п·п═] {x";
 }
 

@@ -176,8 +176,8 @@ bool BasicMobileBehavior::aggressLastFought( )
 	return false;
 
     interpret_raw( ch, "yell", 
-		   fmt( ch, "%^C1! ôÅÐÅÒØ ÔÙ%s ÕÍÒÅÛØ!", victim, 
-		            (chance(50) ? " ÍÏÖÅÔ ÂÙÔØ" : "" ) ).c_str( ) );
+		   fmt( ch, "%^C1! Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹%s ÑƒÐ¼Ñ€ÐµÑˆÑŒ!", victim, 
+		            (chance(50) ? " Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ" : "" ) ).c_str( ) );
     
     attack( victim );
     return true;
@@ -210,7 +210,7 @@ bool BasicMobileBehavior::aggressMemorized( )
     }
 
     if (victim) {
-	interpret_raw( ch, "yell", "÷ÏÔ ÍÙ É ×ÓÔÒÅÔÉÌÉÓØ! %s!",
+	interpret_raw( ch, "yell", "Ð’Ð¾Ñ‚ Ð¼Ñ‹ Ð¸ Ð²ÑÑ‚Ñ€ÐµÑ‚Ð¸Ð»Ð¸ÑÑŒ! %s!",
 	                   victim->getNameP( '1' ).c_str( ) );
 	
 	attack( victim );

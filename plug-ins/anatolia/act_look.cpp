@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include <map>
 #include <list>
@@ -168,27 +168,27 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
     FMT( true, buf, ch, "", "{x", "[" );
     
     FMT( IS_OBJ_STAT(obj, ITEM_INVIS), buf, ch,
-	 "({DНевидимо{x) ", "{D", "Н" );
+	 "({Dп²п╣п╡п╦п╢п╦п╪п╬{x) ", "{D", "п²" );
 	
     FMT( CAN_DETECT(ch, DETECT_EVIL) && IS_OBJ_STAT(obj, ITEM_EVIL), buf, ch,
-	 "({RКрасная Аура{x) ", "{R", "З" );
+	 "({Rп я─п╟я│п╫п╟я▐ п░я┐я─п╟{x) ", "{R", "п≈" );
 	
     FMT( CAN_DETECT(ch, DETECT_GOOD) && IS_OBJ_STAT(obj,ITEM_BLESS), buf, ch,
-	"({CГолубая Аура{x) ", "{C", "Б" );
+	"({Cп⌠п╬п╩я┐п╠п╟я▐ п░я┐я─п╟{x) ", "{C", "п▒" );
     	
     if (obj->item_type == ITEM_PORTAL) {
 	FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch, 
-	    "(Магическое) ", "{w", "М" );
+	    "(п°п╟пЁп╦я┤п╣я│п╨п╬п╣) ", "{w", "п°" );
     } else {
 	FMT( CAN_DETECT(ch, DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC), buf, ch,
-	    "(Заколдовано) ", "{w", "М" );
+	    "(п≈п╟п╨п╬п╩п╢п╬п╡п╟п╫п╬) ", "{w", "п°" );
     }
 
     FMT( IS_OBJ_STAT(obj, ITEM_GLOW), buf, ch,
-	"({MПылает{x) ", "{M", "П" ); 
+	"({Mп÷я▀п╩п╟п╣я┌{x) ", "{M", "п÷" ); 
 
     FMT( IS_OBJ_STAT(obj, ITEM_HUM), buf, ch,   
-	"({cВибрирует{x) ", "{c", "В" );
+	"({cп▓п╦п╠я─п╦я─я┐п╣я┌{x) ", "{c", "п▓" );
    
     FMT( true, buf, ch, "", "{x", "] " );
 #undef FMT
@@ -219,9 +219,9 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
 	    msg << "%1$^O1 ";
 
 	    switch(dice(1,3)) {
-	    case 1: msg << "тихо круж%1$nится|атся на %2$N6.";break;
-	    case 2: msg << "плыв%1$nет|ут по %2$N3.";break;
-	    case 3: msg << "намока%1$nет|ют от %2$N2.";break;
+	    case 1: msg << "я┌п╦я┘п╬ п╨я─я┐п╤%1$nп╦я┌я│я▐|п╟я┌я│я▐ п╫п╟ %2$N6.";break;
+	    case 2: msg << "п©п╩я▀п╡%1$nп╣я┌|я┐я┌ п©п╬ %2$N3.";break;
+	    case 3: msg << "п╫п╟п╪п╬п╨п╟%1$nп╣я┌|я▌я┌ п╬я┌ %2$N2.";break;
 	    }
 
 	    buf << fmt( ch, msg.c_str( ), obj, liq.c_str( ) );
@@ -248,11 +248,11 @@ void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf 
 	return;
 
     if (IS_SET(container->value[1], CONT_PUT_ON|CONT_PUT_ON2))
-	buf << "Отделения: " << endl;
+	buf << "п·я┌п╢п╣п╩п╣п╫п╦я▐: " << endl;
     else if (!container->can_wear( ITEM_TAKE ))
-	buf << "Полки: " << endl;
+	buf << "п÷п╬п╩п╨п╦: " << endl;
     else
-	buf << "Карманы: " << endl;
+	buf << "п п╟я─п╪п╟п╫я▀: " << endl;
     
     for (obj = container->contains; obj; obj = obj->next_content) {
 	if (obj->pocket.empty( ))
@@ -262,7 +262,7 @@ void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf 
     }
 
     if (pockets.empty( )) {
-        buf << "      (пустые)" << endl;
+        buf << "      (п©я┐я│я┌я▀п╣)" << endl;
     } 
     else {
        for (std::map<DLString, int>::iterator i = pockets.begin( ); i != pockets.end( ); i++) {
@@ -273,7 +273,7 @@ void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf 
     }
 
     buf << endl
-        << "Основное отделение:" << endl;
+        << "п·я│п╫п╬п╡п╫п╬п╣ п╬я┌п╢п╣п╩п╣п╫п╦п╣:" << endl;
 }
 
 
@@ -358,7 +358,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
     if (shortDescriptions.empty( ))
     {
 	if (fShowNothing)
-	    output << "     Ничего." << endl;
+	    output << "     п²п╦я┤п╣пЁп╬." << endl;
     }
     else {
 	std::list<DLString>::iterator sd;
@@ -370,7 +370,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
              sd++, item++, iShow++) {
 	    if (iShow >= 100) {
 		output << "{" << CLR_OBJ(ch)
-			<< "     ... И много чего еще ...{x" << endl;
+			<< "     ... п≤ п╪п╫п╬пЁп╬ я┤п╣пЁп╬ п╣я┴п╣ ...{x" << endl;
 		break;
 	    }
 
@@ -420,7 +420,7 @@ void show_char_blindness( Character *ch, Character *victim, ostringstream &buf )
 {
     if (IS_AFFECTED(victim, AFF_BLIND))
 	buf << fmt( ch, 
-	            " ... %1$P1 выглядит слеп%1$Gым|ым|ой, ощупывая все вокруг.{x",
+	            " ... %1$P1 п╡я▀пЁп╩я▐п╢п╦я┌ я│п╩п╣п©%1$Gя▀п╪|я▀п╪|п╬п╧, п╬я┴я┐п©я▀п╡п╟я▐ п╡я│п╣ п╡п╬п╨я─я┐пЁ.{x",
 		    victim )
 	    << endl;
 }
@@ -448,22 +448,22 @@ void show_char_position( Character *ch, Character *victim,
 	    if (!rc.empty( ))
 		buf << rc;
 	    else if (IS_SET(victim->on->value[2], atFlag))
-		buf << "возле " << victim->on->getShortDescr( '2' );
+		buf << "п╡п╬п╥п╩п╣ " << victim->on->getShortDescr( '2' );
 	    else if (IS_SET(victim->on->value[2], onFlag))
-		buf << "на " << victim->on->getShortDescr( '6' );
+		buf << "п╫п╟ " << victim->on->getShortDescr( '6' );
 	    else
-		buf << "в " << victim->on->getShortDescr( '6' );
+		buf << "п╡ " << victim->on->getShortDescr( '6' );
 	}
 	else
-	    buf << "здесь";
+	    buf << "п╥п╢п╣я│я▄";
 
 	if (victim->position == POS_SLEEPING && !IS_AFFECTED(victim, AFF_SLEEP)) 
 	    if (gsn_curl->getEffective( victim ) > 1)
-		buf << ", свернувшись клубочком";
+		buf << ", я│п╡п╣я─п╫я┐п╡я┬п╦я│я▄ п╨п╩я┐п╠п╬я┤п╨п╬п╪";
     }
     else
-	buf << "сидит здесь верхом на " 
-	    << (ch == victim->mount ? "тебе" : ch->sees( MOUNTED(victim), '6' ));
+	buf << "я│п╦п╢п╦я┌ п╥п╢п╣я│я▄ п╡п╣я─я┘п╬п╪ п╫п╟ " 
+	    << (ch == victim->mount ? "я┌п╣п╠п╣" : ch->sees( MOUNTED(victim), '6' ));
 
     buf << "." << endl;
     show_char_blindness( ch, victim, buf );
@@ -511,76 +511,76 @@ void show_char_to_char_0( Character *victim, Character *ch )
 	show_char_pk_flags( pVict, buf );
 
 	if (pVict->desc == 0 )
-	    buf << "[{DБез связи{x]";
+	    buf << "[{Dп▒п╣п╥ я│п╡я▐п╥п╦{x]";
 
 	if (IS_SET(pVict->comm, COMM_AFK ))
 	    buf << "[{CAFK{x]";
 
 	if (IS_SET(pVict->act, PLR_WANTED))
-	    buf << "({RРАЗЫСКИВАЕТСЯ{x)";
+	    buf << "({Rп═п░п≈п╚п║п п≤п▓п░п∙п╒п║п╞{x)";
 
 	if (pVict->isAffected(gsn_manacles ))
-	    buf << "({DКАНДАЛЫ{x)";
+	    buf << "({Dп п░п²п■п░п⌡п╚{x)";
 
 	if (victim->isAffected(gsn_jail ))
-	    buf << "({DТЮРЬМА{x)";
+	    buf << "({Dп╒п╝п═п╛п°п░{x)";
 	
 	if (pVict->invis_level >= LEVEL_HERO)
 	    buf << "(Wizi)";
     }
 
     if (RIDDEN( victim ))
-	buf << "(Оседлано)";
+	buf << "(п·я│п╣п╢п╩п╟п╫п╬)";
 
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
-	buf << "({DНевидимо{x)";
+	buf << "({Dп²п╣п╡п╦п╢п╦п╪п╬{x)";
 
     if (IS_AFFECTED(victim, AFF_IMP_INVIS))
 	buf << "(Improved)";
 
     if (IS_AFFECTED(victim, AFF_HIDE))
-	buf << "({DУкрыто{x)";
+	buf << "({Dпёп╨я─я▀я┌п╬{x)";
 
     if (IS_AFFECTED(victim, AFF_FADE))
-	buf << "({DСпрятано{x)";
+	buf << "({Dп║п©я─я▐я┌п╟п╫п╬{x)";
 
     if (IS_AFFECTED(victim, AFF_CAMOUFLAGE))
-	buf << "({DЗамаскировано{x)";
+	buf << "({Dп≈п╟п╪п╟я│п╨п╦я─п╬п╡п╟п╫п╬{x)";
 
     if (IS_AFFECTED(victim, AFF_CHARM))
-	buf << "(Очаровано)";
+	buf << "(п·я┤п╟я─п╬п╡п╟п╫п╬)";
 
     if (victim->is_npc()
 	    && IS_SET(victim->act,ACT_UNDEAD)
 	    && CAN_DETECT(ch, DETECT_UNDEAD))
-	buf << "(Нежить)";
+	buf << "(п²п╣п╤п╦я┌я▄)";
 
     if (IS_AFFECTED(victim, AFF_PASS_DOOR))
-	buf << "(Прозрачно)";
+	buf << "(п÷я─п╬п╥я─п╟я┤п╫п╬)";
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
-	buf << "({MРозовая Аура{x)";
+	buf << "({Mп═п╬п╥п╬п╡п╟я▐ п░я┐я─п╟{x)";
 
     if (IS_EVIL(victim) && CAN_DETECT(ch, DETECT_EVIL))
-	buf << "({RКрасная Аура{x)";
+	buf << "({Rп я─п╟я│п╫п╟я▐ п░я┐я─п╟{x)";
 
     if (IS_GOOD(victim) && CAN_DETECT(ch, DETECT_GOOD))
-	buf << "({YЗолотая Аура{x)";
+	buf << "({Yп≈п╬п╩п╬я┌п╟я▐ п░я┐я─п╟{x)";
 
     if (IS_AFFECTED(victim, AFF_SANCTUARY))
-	buf << "({WБелая Аура{x)";
+	buf << "({Wп▒п╣п╩п╟я▐ п░я┐я─п╟{x)";
 
     if (victim->isAffected(gsn_rainbow_shield))
-        buf << "({RР{Yа{Gд{Cу{Bг{Mа{x)";
+        buf << "({Rп═{Yп╟{Gп╢{Cя┐{BпЁ{Mп╟{x)";
 
     if (victim->isAffected(gsn_demonic_mantle))
-        buf << "({RМ{Dантия{x)";
+        buf << "({Rп°{Dп╟п╫я┌п╦я▐{x)";
 
     if (victim->isAffected(gsn_dark_shroud))
-	buf << "({DАура Тьмы{x)";
+	buf << "({Dп░я┐я─п╟ п╒я▄п╪я▀{x)";
 
     if (victim->isAffected(gsn_stardust))
-	buf << "({WЗ{wве{Wзд{wная {WП{wыль{x)";
+	buf << "({Wп≈{wп╡п╣{Wп╥п╢{wп╫п╟я▐ {Wп÷{wя▀п╩я▄{x)";
 
     if (nVict) 
 	if (nVict->position == nVict->start_pos 
@@ -602,7 +602,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
     else {
 	if (ch->getConfig( )->holy && origVict != victim)
 	    buf << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ) << "{x "
-		<< "(под личиной " << ch->sees( victim, '2' ) << ") ";
+		<< "(п©п╬п╢ п╩п╦я┤п╦п╫п╬п╧ " << ch->sees( victim, '2' ) << ") ";
 	else {
 	    buf << "{" << CLR_PLAYER(ch);
             webManipManager->decorateCharacter( buf, ch->sees( victim, '1' ), victim, ch );
@@ -621,48 +621,48 @@ void show_char_to_char_0( Character *victim, Character *ch )
 
     switch (victim->position.getValue( )) {
     case POS_DEAD:     
-	buf << "уже {RТРУП!!!{x" << endl;
+	buf << "я┐п╤п╣ {Rп╒п═пёп÷!!!{x" << endl;
 	break;
 	
     case POS_MORTAL:   
-	buf << "присмерти." << endl;   
+	buf << "п©я─п╦я│п╪п╣я─я┌п╦." << endl;   
 	break;
 	
     case POS_INCAP:    
-	buf << "в беспомощном состоянии." << endl;      
+	buf << "п╡ п╠п╣я│п©п╬п╪п╬я┴п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦." << endl;      
 	break;
 	
     case POS_STUNNED:  
-	buf << "лежит без сознания." << endl; 
+	buf << "п╩п╣п╤п╦я┌ п╠п╣п╥ я│п╬п╥п╫п╟п╫п╦я▐." << endl; 
 	break;
 	
     case POS_SLEEPING:
-	show_char_position( ch, victim, "спит", SLEEP_AT, SLEEP_ON, buf );
+	show_char_position( ch, victim, "я│п©п╦я┌", SLEEP_AT, SLEEP_ON, buf );
 	break;
 
     case POS_RESTING:
-	show_char_position( ch, victim, "отдыхает", REST_AT, REST_ON, buf );
+	show_char_position( ch, victim, "п╬я┌п╢я▀я┘п╟п╣я┌", REST_AT, REST_ON, buf );
 	break;
 
     case POS_SITTING:
-	show_char_position( ch, victim, "сидит", SIT_AT, SIT_ON, buf );
+	show_char_position( ch, victim, "я│п╦п╢п╦я┌", SIT_AT, SIT_ON, buf );
 	break;
 	    
     case POS_STANDING:
-	show_char_position( ch, victim, "стоит", STAND_AT, STAND_ON, buf );
+	show_char_position( ch, victim, "я│я┌п╬п╦я┌", STAND_AT, STAND_ON, buf );
 	break;
 
     case POS_FIGHTING:
-	buf << "здесь, сражается ";
+	buf << "п╥п╢п╣я│я▄, я│я─п╟п╤п╟п╣я┌я│я▐ ";
 
 	if (victim->fighting == 0)
-	    buf << "неизвестно с кем...";
+	    buf << "п╫п╣п╦п╥п╡п╣я│я┌п╫п╬ я│ п╨п╣п╪...";
 	else if (victim->fighting == ch)
-	    buf << "с {RТОБОЙ!!!{x";
+	    buf << "я│ {Rп╒п·п▒п·п≥!!!{x";
 	else if (victim->in_room == victim->fighting->in_room)
-	    buf << "с " << ch->sees( victim->fighting, '5') << ".";
+	    buf << "я│ " << ch->sees( victim->fighting, '5') << ".";
 	else
-	    buf << "кем-то кто ушел...";
+	    buf << "п╨п╣п╪-я┌п╬ п╨я┌п╬ я┐я┬п╣п╩...";
 
 	buf << endl;
 	show_char_blindness( ch, victim, buf );
@@ -670,7 +670,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
     }
 
     if (HAS_SHADOW(victim))
-	buf << " ... отбрасывает странную тень." << endl;
+	buf << " ... п╬я┌п╠я─п╟я│я▀п╡п╟п╣я┌ я│я┌я─п╟п╫п╫я┐я▌ я┌п╣п╫я▄." << endl;
     
     if (victim->death_ground_delay > 0) {
 	DLString rc = rprog_show_end( victim->in_room, victim, ch );
@@ -700,30 +700,30 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
 	return;
 
     if (IS_AFFECTED( victim, AFF_BLIND ))
-	str << "Похоже ничего не видит." << endl;
+	str << "п÷п╬я┘п╬п╤п╣ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┌." << endl;
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
-	str << "Покрыт чумными язвочками." << endl;
+	str << "п÷п╬п╨я─я▀я┌ я┤я┐п╪п╫я▀п╪п╦ я▐п╥п╡п╬я┤п╨п╟п╪п╦." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
-	str << "Отравлен." << endl;
+	str << "п·я┌я─п╟п╡п╩п╣п╫." << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
-	str << "Передвигается М Е Д Л Е Н  Н   О." << endl;
+	str << "п÷п╣я─п╣п╢п╡п╦пЁп╟п╣я┌я│я▐ п° п∙ п■ п⌡ п∙ п²  п²   п·." << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
-	str << "Передвигается очень быстро." << endl;
+	str << "п÷п╣я─п╣п╢п╡п╦пЁп╟п╣я┌я│я▐ п╬я┤п╣п╫я▄ п╠я▀я│я┌я─п╬." << endl;
     if (IS_AFFECTED( victim, AFF_WEAKEN ))
-	str << "Выглядит беспомощно и слабо." << endl;
+	str << "п▓я▀пЁп╩я▐п╢п╦я┌ п╠п╣я│п©п╬п╪п╬я┴п╫п╬ п╦ я│п╩п╟п╠п╬." << endl;
     if (IS_AFFECTED( victim, AFF_CORRUPTION ))
-	str << "Гниет заживо." << endl;
+	str << "п⌠п╫п╦п╣я┌ п╥п╟п╤п╦п╡п╬." << endl;
     if (CAN_DETECT( victim, ADET_FEAR ))
-	str << "Дрожит от страха." << endl;
+	str << "п■я─п╬п╤п╦я┌ п╬я┌ я│я┌я─п╟я┘п╟." << endl;
     if (IS_AFFECTED( victim, AFF_CURSE ))
-	str << "Проклят." << endl;
+	str << "п÷я─п╬п╨п╩я▐я┌." << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_EVIL ))
-	str << "Защищен от зла" << endl;
+	str << "п≈п╟я┴п╦я┴п╣п╫ п╬я┌ п╥п╩п╟" << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_GOOD ))
-	str << "Защищен от добра." << endl;
+	str << "п≈п╟я┴п╦я┴п╣п╫ п╬я┌ п╢п╬п╠я─п╟." << endl;
 
     if (!str.str( ).empty( )) 
-	buf << endl << "Ты замечаешь важные детали:" << endl
+	buf << endl << "п╒я▀ п╥п╟п╪п╣я┤п╟п╣я┬я▄ п╡п╟п╤п╫я▀п╣ п╢п╣я┌п╟п╩п╦:" << endl
 	    << str.str( ) << endl;
 }
 
@@ -740,21 +740,21 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
 	percent = -1;
 
     if (percent >= 100)
-	buf << "{C в прекрасном состоянии";
+	buf << "{C п╡ п©я─п╣п╨я─п╟я│п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦";
     else if (percent >= 90)
-	buf << "{B имеет несколько царапин";
+	buf << "{B п╦п╪п╣п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ я├п╟я─п╟п©п╦п╫";
     else if (percent >= 75)
-	buf << "{B имеет несколько маленьких ран и синяков";
+	buf << "{B п╦п╪п╣п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╪п╟п╩п╣п╫я▄п╨п╦я┘ я─п╟п╫ п╦ я│п╦п╫я▐п╨п╬п╡";
     else if (percent >= 50)
-	buf << "{G имеет довольно много ран";
+	buf << "{G п╦п╪п╣п╣я┌ п╢п╬п╡п╬п╩я▄п╫п╬ п╪п╫п╬пЁп╬ я─п╟п╫";
     else if (percent >=  30)
-	buf << "{Y имеет несколько больших, опасных ран и царапин";
+	buf << "{Y п╦п╪п╣п╣я┌ п╫п╣я│п╨п╬п╩я▄п╨п╬ п╠п╬п╩я▄я┬п╦я┘, п╬п©п╟я│п╫я▀я┘ я─п╟п╫ п╦ я├п╟я─п╟п©п╦п╫";
     else if (percent >= 15)
-	buf << "{M выглядит сильно поврежденным";
+	buf << "{M п╡я▀пЁп╩я▐п╢п╦я┌ я│п╦п╩я▄п╫п╬ п©п╬п╡я─п╣п╤п╢п╣п╫п╫я▀п╪";
     else if (percent >= 0 )
-	buf << "{R в ужасном состоянии";
+	buf << "{R п╡ я┐п╤п╟я│п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦";
     else
-	buf << "{R истекает кровью";
+	buf << "{R п╦я│я┌п╣п╨п╟п╣я┌ п╨я─п╬п╡я▄я▌";
 
     buf << ".{x" << endl;
 
@@ -779,14 +779,14 @@ static void show_char_description( Character *ch, Character *vict )
 				    pcRace->getMaleName( ).c_str( ),
 				    pcRace->getFemaleName( ).c_str( ));
 	if (ch == vict)
-	    act( "Ты выглядишь как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+	    act( "п╒я▀ п╡я▀пЁп╩я▐п╢п╦я┬я▄ п╨п╟п╨ п╬п╠я▀я┤п╫$Gп╬п╣|я▀п╧|п╟я▐ $n1.", ch, rname, vict, TO_CHAR );
 	else
-	    act( "$E выглядит как обычн$Gое|ый|ая $n1.", ch, rname, vict, TO_CHAR );
+	    act( "$E п╡я▀пЁп╩я▐п╢п╦я┌ п╨п╟п╨ п╬п╠я▀я┤п╫$Gп╬п╣|я▀п╧|п╟я▐ $n1.", ch, rname, vict, TO_CHAR );
 
 	return;
     }
     
-    act( "Ты не видишь ничего особенного в $Z.", ch, 0, vict, TO_CHAR );
+    act( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п╬я│п╬п╠п╣п╫п╫п╬пЁп╬ п╡ $Z.", ch, 0, vict, TO_CHAR );
 }
 
 static void show_char_sexrace( Character *ch, Character *vict, ostringstream &buf )
@@ -818,17 +818,17 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
 	show_char_description( ch, vict );
 
     if (MOUNTED(vict))
-	buf << ch->sees( vict, '1' ) << " верхом на " 
-	    << (ch == vict->mount ? "тебе" : ch->sees( MOUNTED( vict ), '6' ))
+	buf << ch->sees( vict, '1' ) << " п╡п╣я─я┘п╬п╪ п╫п╟ " 
+	    << (ch == vict->mount ? "я┌п╣п╠п╣" : ch->sees( MOUNTED( vict ), '6' ))
 	    << endl;
 
     if (RIDDEN(vict)) {
 	buf << ch->sees( vict, '1' );
 
 	if (ch == vict->mount)
-	    buf << " под твоим седлом";
+	    buf << " п©п╬п╢ я┌п╡п╬п╦п╪ я│п╣п╢п╩п╬п╪";
 	else
-	    buf << " под седлом, в котором сидит " 
+	    buf << " п©п╬п╢ я│п╣п╢п╩п╬п╪, п╡ п╨п╬я┌п╬я─п╬п╪ я│п╦п╢п╦я┌ " 
 		<< ch->sees( RIDDEN( vict ), '1' );
 	buf << "." << endl;
     }
@@ -846,7 +846,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     naked = show_char_equip( ch, victim, buf, false );
 
     if (!naked) {
-	act( "\r\n$C1 использует: ", ch, 0, victim, TO_CHAR );
+	act( "\r\n$C1 п╦я│п©п╬п╩я▄п╥я┐п╣я┌: ", ch, 0, victim, TO_CHAR );
 	ch->send_to( buf );
     }
 	    
@@ -860,7 +860,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
 		|| ch->is_immortal()))
 
     {
-	ch->println( "\n\rТы заглядываешь в инвентарь: " );
+	ch->println( "\n\rп╒я▀ п╥п╟пЁп╩я▐п╢я▀п╡п╟п╣я┬я▄ п╡ п╦п╫п╡п╣п╫я┌п╟я─я▄: " );
 	gsn_peek->improve( ch, true );
 	show_list_to_char( victim->is_mirror() ?
 		vict->carrying : victim->carrying, ch, true, true );
@@ -885,13 +885,13 @@ bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool
 
 	if (!obj) {
 	    if (fShowEmpty)
-		objName << "{" << CLR_NOEQ(ch) << "ничего.{x";
+		objName << "{" << CLR_NOEQ(ch) << "п╫п╦я┤п╣пЁп╬.{x";
 	    else
 		continue;
 	}
 	else if (!ch->can_see( obj )) {
 	    if (fShowEmpty)
-		objName = "нечто.";
+		objName = "п╫п╣я┤я┌п╬.";
 	    else
 		continue;
 	}
@@ -937,17 +937,17 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount )
 	    show_char_to_char_0( rch, ch );
 	else if (!rch->is_immortal( )) {
 	    if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED ))
-		ch->println( "{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x" );
+		ch->println( "{Wп╒я▀ п╡п╦п╢п╦я┬я▄ п╡п╥пЁп╩я▐п╢ {Rп©я▀п╩п╟я▌я┴п╦я┘ п╨я─п╟я│п╫я▀я┘ пЁп╩п╟п╥{W, я│п╩п╣п╢я▐я┴п╦я┘ п╥п╟ п╒п·п▒п·п≥!{x" );
 		
 	    life_count++;
 	}
     }
 
     if (life_count && CAN_DETECT(ch, DETECT_LIFE))
-	ch->printf( "Ты чувствуешь присутствие %d жизненн%s форм%s в комнате.\n\r",
+	ch->printf( "п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п©я─п╦я│я┐я┌я│я┌п╡п╦п╣ %d п╤п╦п╥п╫п╣п╫п╫%s я└п╬я─п╪%s п╡ п╨п╬п╪п╫п╟я┌п╣.\n\r",
 		    life_count,
-		    GET_COUNT(life_count, "ой", "ых", "ых"),
-		    GET_COUNT(life_count, "ы", "", ""));
+		    GET_COUNT(life_count, "п╬п╧", "я▀я┘", "я▀я┘"),
+		    GET_COUNT(life_count, "я▀", "", ""));
 }
 
 /*---------------------------------------------------------------------------
@@ -955,7 +955,7 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount )
  *--------------------------------------------------------------------------*/
 CMDRUNP( inventory )
 {
-    ch->println( "Ты несешь:" );
+    ch->println( "п╒я▀ п╫п╣я│п╣я┬я▄:" );
     show_list_to_char( ch->carrying, ch, true, true );
 }
 
@@ -969,11 +969,11 @@ CMDRUNP( equipment )
     
     naked = show_char_equip( ch, ch, buf, true );
 
-    ch->println( "Ты используешь:" );
+    ch->println( "п╒я▀ п╦я│п©п╬п╩я▄п╥я┐п╣я┬я▄:" );
     ch->send_to( buf );
 
     if (naked)
-	ch->println( "Да уж... Не мешало бы одеться!" );
+	ch->println( "п■п╟ я┐п╤... п²п╣ п╪п╣я┬п╟п╩п╬ п╠я▀ п╬п╢п╣я┌я▄я│я▐!" );
 }
 
 /*---------------------------------------------------------------------------
@@ -1054,7 +1054,7 @@ struct ExtraDescList : public list<EDInfo> {
 	    if (obj->in_room)
 		defaultDescr = obj->getDescription( );
 	    else
-		defaultDescr = "Ты не видишь здесь ничего особенного.";
+		defaultDescr = "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ п╫п╦я┤п╣пЁп╬ п╬я│п╬п╠п╣п╫п╫п╬пЁп╬.";
 		
 	    push_back( EDInfo( obj->getName( ), defaultDescr, obj, 0 ) );
 	}
@@ -1123,7 +1123,7 @@ rprog_descr( Room *room, Character *ch, const DLString &descr )
     ostringstream buf;
 
     if (eyes_darkened( ch )) {
-	ch->println( "Здесь слишком темно ... " );
+	ch->println( "п≈п╢п╣я│я▄ я│п╩п╦я┬п╨п╬п╪ я┌п╣п╪п╫п╬ ... " );
 	show_people_to_char( room->people, ch, fShowMount );
 	return;
     }
@@ -1174,7 +1174,7 @@ static void do_look_move( Character *ch, bool fBrief )
 {
     if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" )) {
 	if (eyes_darkened( ch ))
-	    ch->println( "Здесь слишком темно ... " );
+	    ch->println( "п≈п╢п╣я│я▄ я│п╩п╦я┬п╨п╬п╪ я┌п╣п╪п╫п╬ ... " );
 	else
 	    ch->printf( "{W%s{x", ch->in_room->name );
 	return;
@@ -1190,7 +1190,7 @@ static void do_look_into( Character *ch, char *arg2 )
     
     if (arg2[0] == '\0')
     {
-	ch->println( "Посмотреть на что?" );
+	ch->println( "п÷п╬я│п╪п╬я┌я─п╣я┌я▄ п╫п╟ я┤я┌п╬?" );
 	return;
     }
     
@@ -1198,7 +1198,7 @@ static void do_look_into( Character *ch, char *arg2 )
     obj = get_obj_here( ch, arg2 );
 
     if (!obj) {
-	ch->println( "Ты не видишь этого тут." );
+	ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ я┌я┐я┌." );
 	return;
     }
     
@@ -1221,11 +1221,11 @@ static void do_look_character( Character *ch, Character *victim )
 {
     if (victim->can_see( ch )) {
 	if (ch == victim)
-	    act_p( "$c1 смотрит на себя.",ch,0,0,TO_ROOM,POS_RESTING);
+	    act_p( "$c1 я│п╪п╬я┌я─п╦я┌ п╫п╟ я│п╣п╠я▐.",ch,0,0,TO_ROOM,POS_RESTING);
 	else
 	{
-	    act_p( "$c1 смотрит на тебя.", ch, 0, victim, TO_VICT,POS_RESTING);
-	    act_p( "$c1 смотрит на $C4.",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+	    act_p( "$c1 я│п╪п╬я┌я─п╦я┌ п╫п╟ я┌п╣п╠я▐.", ch, 0, victim, TO_VICT,POS_RESTING);
+	    act_p( "$c1 я│п╪п╬я┌я─п╦я┌ п╫п╟ $C4.",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
 	}
     }
 
@@ -1245,7 +1245,7 @@ static bool do_look_direction( Character *ch, const char *arg1 )
 
     if ( ( pexit = ch->in_room->exit[door] ) == 0 )
     {
-	    ch->println( "Ничего особенного тут." );
+	    ch->println( "п²п╦я┤п╣пЁп╬ п╬я│п╬п╠п╣п╫п╫п╬пЁп╬ я┌я┐я┌." );
 	    return true;
     }
 
@@ -1254,12 +1254,12 @@ static bool do_look_direction( Character *ch, const char *arg1 )
             ch->send_to( "\r\n" );
     }
     else
-	    ch->println( "Здесь нет ничего особенного." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╫п╦я┤п╣пЁп╬ п╬я│п╬п╠п╣п╫п╫п╬пЁп╬." );
 
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
-	act("$N1: тут закрыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+	act("$N1: я┌я┐я┌ п╥п╟п╨я─я▀я┌п╬.", ch, 0, direction_doorname(pexit), TO_CHAR);
     else if ( IS_SET(pexit->exit_info, EX_ISDOOR) )
-	act("$N1: тут открыто.", ch, 0, direction_doorname(pexit), TO_CHAR);
+	act("$N1: я┌я┐я┌ п╬я┌п╨я─я▀я┌п╬.", ch, 0, direction_doorname(pexit), TO_CHAR);
     
     DoorKeyhole( ch, ch->in_room, door ).doExamine( );
     return true;
@@ -1270,8 +1270,8 @@ static void do_look_object( Character *ch, Object *obj )
 {
         ostringstream buf;
             
-        buf << "Ты смотришь на {c" << obj->getShortDescr( '4' ) << "{x."
-            << " Это {W" << item_table.message(obj->item_type) << "{x";
+        buf << "п╒я▀ я│п╪п╬я┌я─п╦я┬я▄ п╫п╟ {c" << obj->getShortDescr( '4' ) << "{x."
+            << " п╜я┌п╬ {W" << item_table.message(obj->item_type) << "{x";
 
 
         for (int i = 0; i < wearlocationManager->size( ); i++) {
@@ -1306,7 +1306,7 @@ static void do_look_object( Character *ch, Object *obj )
 	    if (obj->in_room)
 		desc = obj->getDescription( );
 	    else
-		desc = "Ты не видишь здесь ничего особенного.";
+		desc = "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ п╫п╦я┤п╣пЁп╬ п╬я│п╬п╠п╣п╫п╫п╬пЁп╬.";
         }            
 
         ostringstream descBuf;
@@ -1328,7 +1328,7 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
 	    && ch->can_see( peexit ) )
 	    ch->send_to( peexit->description);
     else
-	    ch->println( "Здесь нет ничего особенного." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╫п╦я┤п╣пЁп╬ п╬я│п╬п╠п╣п╫п╫п╬пЁп╬." );
     
     if (peexit->short_desc_from != 0
 	&& peexit->short_desc_from[0] != '\0'
@@ -1336,11 +1336,11 @@ static bool do_look_extraexit( Character *ch, const char *arg3 )
     {
 	    if ( IS_SET(peexit->exit_info, EX_CLOSED) )
 	    {
-		ch->pecho( "%1$N1: тут закрыто.", peexit->short_desc_from );
+		ch->pecho( "%1$N1: я┌я┐я┌ п╥п╟п╨я─я▀я┌п╬.", peexit->short_desc_from );
 	    }
 	    else if ( IS_SET(peexit->exit_info, EX_ISDOOR) )
 	    {
-		ch->pecho( "%1$N1: тут открыто.", peexit->short_desc_from );
+		ch->pecho( "%1$N1: я┌я┐я┌ п╬я┌п╨я─я▀я┌п╬.", peexit->short_desc_from );
 	    }
     }
     
@@ -1364,12 +1364,12 @@ CMDRUNP( look )
 	return;
 
     if (ch->position < POS_SLEEPING) {
-	ch->println( "Ты не видишь ничего, кроме звезд!" );
+	ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬, п╨я─п╬п╪п╣ п╥п╡п╣п╥п╢!" );
 	return;
     }
 
     if (ch->position == POS_SLEEPING) {
-	ch->println( "Ты ничего не видишь, ты спишь!" );
+	ch->println( "п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄, я┌я▀ я│п©п╦я┬я▄!" );
 	return;
     }
     
@@ -1382,7 +1382,7 @@ CMDRUNP( look )
 
     if (eyes_blinded( ch )) {
 	if (fAuto || fMove)
-	    ch->println( "Ты не можешь видеть вещи!" );
+	    ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╦п╢п╣я┌я▄ п╡п╣я┴п╦!" );
 	else
 	    eyes_blinded_msg( ch );
 
@@ -1405,7 +1405,7 @@ CMDRUNP( look )
     }
 
     if (eyes_darkened( ch )) {
-	ch->println( "Тебе не удается ничего разглядеть в кромешной темноте." );
+	ch->println( "п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╣я┌я│я▐ п╫п╦я┤п╣пЁп╬ я─п╟п╥пЁп╩я▐п╢п╣я┌я▄ п╡ п╨я─п╬п╪п╣я┬п╫п╬п╧ я┌п╣п╪п╫п╬я┌п╣." );
 	return;
     }
     
@@ -1434,7 +1434,7 @@ CMDRUNP( look )
     if (do_look_direction( ch, arg1 ))
 	return;
 
-    ch->println( "Ты не видишь этого тут." );
+    ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ я┌я┐я┌." );
 }
 
 /*-------------------------------------------------------------------------
@@ -1455,7 +1455,7 @@ CMDRUNP( read )
     number = number_argument( arg1, arg2 );
 
     if (!do_look_extradescr( ch, arg2, number ))
-	ch->println( "Ты не видишь этого тут." );
+	ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ я┌я┐я┌." );
 }
 
 /*-------------------------------------------------------------------------
@@ -1475,7 +1475,7 @@ CMDRUNP( examine )
     argument = one_argument( argument, arg );
 
     if (arg[0] == '\0') {
-	ch->println( "Изучить что?" );
+	ch->println( "п≤п╥я┐я┤п╦я┌я▄ я┤я┌п╬?" );
 	return;
     }
 
@@ -1484,11 +1484,11 @@ CMDRUNP( examine )
 	if ( victim->can_see( ch ) )
 	{
 	    if (ch == victim)
-		act_p( "$c1 осматривает себя.",ch,0,0,TO_ROOM,POS_RESTING);
+		act_p( "$c1 п╬я│п╪п╟я┌я─п╦п╡п╟п╣я┌ я│п╣п╠я▐.",ch,0,0,TO_ROOM,POS_RESTING);
 	    else
 	    {
-		act_p( "$c1 бросает взгляд на тебя.", ch, 0, victim, TO_VICT,POS_RESTING);
-		act_p( "$c1 бросает взгляд на $C4.",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+		act_p( "$c1 п╠я─п╬я│п╟п╣я┌ п╡п╥пЁп╩я▐п╢ п╫п╟ я┌п╣п╠я▐.", ch, 0, victim, TO_VICT,POS_RESTING);
+		act_p( "$c1 п╠я─п╬я│п╟п╣я┌ п╡п╥пЁп╩я▐п╢ п╫п╟ $C4.",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
 	    }
 	}
 
@@ -1501,7 +1501,7 @@ CMDRUNP( examine )
 	return;
     }
 
-    ch->println( "Ты не видишь этого тут." );
+    ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ я┌я┐я┌." );
 }
 
 
@@ -1514,46 +1514,46 @@ static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
     if (obj->value[0] == 0)
     {
 	if (obj->value[1] == 0)
-		ch->printf("Жаль... но здесь нет золота.\n\r");
+		ch->printf("п√п╟п╩я▄... п╫п╬ п╥п╢п╣я│я▄ п╫п╣я┌ п╥п╬п╩п╬я┌п╟.\n\r");
 	else if (obj->value[1] == 1)
-		ch->printf("Ух-ты. Одна золотая монетка!\n\r");
+		ch->printf("пёя┘-я┌я▀. п·п╢п╫п╟ п╥п╬п╩п╬я┌п╟я▐ п╪п╬п╫п╣я┌п╨п╟!\n\r");
 	else
-		ch->printf("Здесь %d золот%s.\n\r",
-			obj->value[1],GET_COUNT(obj->value[1], "ая монета","ые монеты","ых монет"));
+		ch->printf("п≈п╢п╣я│я▄ %d п╥п╬п╩п╬я┌%s.\n\r",
+			obj->value[1],GET_COUNT(obj->value[1], "п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
     }
     else if (obj->value[1] == 0)
     {
 	if (obj->value[0] == 1)
-		ch->printf("Ух-ты. Одна серебряная монетка.\n\r");
+		ch->printf("пёя┘-я┌я▀. п·п╢п╫п╟ я│п╣я─п╣п╠я─я▐п╫п╟я▐ п╪п╬п╫п╣я┌п╨п╟.\n\r");
 	else
-		ch->printf("Здесь %d серебрян%s.\n\r",
-			obj->value[0],GET_COUNT(obj->value[0], "ая монета","ые монеты","ых монет"));
+		ch->printf("п≈п╢п╣я│я▄ %d я│п╣я─п╣п╠я─я▐п╫%s.\n\r",
+			obj->value[0],GET_COUNT(obj->value[0], "п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
     }
     else
-	ch->printf("Здесь %d золот%s и %d серебрян%s.\n\r",
-		obj->value[1],GET_COUNT(obj->value[1], "ая","ые","ых"),
-		obj->value[0],GET_COUNT(obj->value[0], "ая монета","ые монеты","ых монет"));
+	ch->printf("п≈п╢п╣я│я▄ %d п╥п╬п╩п╬я┌%s п╦ %d я│п╣я─п╣п╠я─я▐п╫%s.\n\r",
+		obj->value[1],GET_COUNT(obj->value[1], "п╟я▐","я▀п╣","я▀я┘"),
+		obj->value[0],GET_COUNT(obj->value[0], "п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌"));
     return true;
 }
 
 static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLString& )
 {
     if (IS_SET(obj->value[3], DRINK_CLOSED)) {
-	ch->println("Эта емкость закрыта.");
+	ch->println("п╜я┌п╟ п╣п╪п╨п╬я│я┌я▄ п╥п╟п╨я─я▀я┌п╟.");
 	return true;
     }
 
     if (obj->value[1] <= 0) {
-	ch->println( "Тут пусто." );
+	ch->println( "п╒я┐я┌ п©я┐я│я┌п╬." );
 	return true;
     }
 
-    ch->printf( "%s наполнен жидкостью %s цвета.\n\r",
+    ch->printf( "%s п╫п╟п©п╬п╩п╫п╣п╫ п╤п╦п╢п╨п╬я│я┌я▄я▌ %s я├п╡п╣я┌п╟.\n\r",
 		obj->value[1] < obj->value[0] / 4 ? 
-		    "Меньше, чем до половины" :
+		    "п°п╣п╫я▄я┬п╣, я┤п╣п╪ п╢п╬ п©п╬п╩п╬п╡п╦п╫я▀" :
 		    obj->value[1] < 3 * obj->value[0] / 4 ? 
-			"До половины"  : 
-			"Больше, чем до половины",
+			"п■п╬ п©п╬п╩п╬п╡п╦п╫я▀"  : 
+			"п▒п╬п╩я▄я┬п╣, я┤п╣п╪ п╢п╬ п©п╬п╩п╬п╡п╦п╫я▀",
 		liquidManager->find( obj->value[2] )->getColor( ).ruscase( '2' ).c_str( )
 	      );
     return true;
@@ -1569,13 +1569,13 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     ContainerKeyhole( ch, obj ).doExamine( );
 
     if (IS_SET(obj->value[1], CONT_CLOSED)) {
-	ch->println( "Тут закрыто." );
+	ch->println( "п╒я┐я┌ п╥п╟п╨я─я▀я┌п╬." );
 	return true;
     }
     
     if (!pocket.empty( )) {
 	if (!IS_SET(obj->value[1], CONT_WITH_POCKETS)) {
-	    ch->println( "Ты не видишь здесь ни одного кармана." );
+	    ch->println( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ п╫п╦ п╬п╢п╫п╬пЁп╬ п╨п╟я─п╪п╟п╫п╟." );
 	    return true;
 	}
     }
@@ -1584,19 +1584,19 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
     if (IS_SET(obj->value[1],CONT_PUT_ON|CONT_PUT_ON2)) {
 	if (!pocket.empty( ))
-	    ch->pecho( "Отделение '%2$s' %1$O2 содержит:", obj, p );
+	    ch->pecho( "п·я┌п╢п╣п╩п╣п╫п╦п╣ '%2$s' %1$O2 я│п╬п╢п╣я─п╤п╦я┌:", obj, p );
 	else
-	    ch->pecho( "На %1$O6 ты видишь:", obj );
+	    ch->pecho( "п²п╟ %1$O6 я┌я▀ п╡п╦п╢п╦я┬я▄:", obj );
     }
     else {
 	if (!pocket.empty( )) {
 	    if (!obj->can_wear( ITEM_TAKE ))
-		ch->pecho( "На полке %1$O2 с надписью '%2$s' ты видишь:", obj, p );
+		ch->pecho( "п²п╟ п©п╬п╩п╨п╣ %1$O2 я│ п╫п╟п╢п©п╦я│я▄я▌ '%2$s' я┌я▀ п╡п╦п╢п╦я┬я▄:", obj, p );
 	    else
-		ch->pecho( "В кармане %1$O2 с надписью '%2$s' ты видишь:", obj, p );
+		ch->pecho( "п▓ п╨п╟я─п╪п╟п╫п╣ %1$O2 я│ п╫п╟п╢п©п╦я│я▄я▌ '%2$s' я┌я▀ п╡п╦п╢п╦я┬я▄:", obj, p );
 	}
 	else {
-	    ch->pecho( "%1$^O1 содерж%1$nит|ат:", obj );
+	    ch->pecho( "%1$^O1 я│п╬п╢п╣я─п╤%1$nп╦я┌|п╟я┌:", obj );
 	}
     }
 
@@ -1606,14 +1606,14 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    act( "$o1 содержит:", ch, obj, 0, TO_CHAR );
+    act( "$o1 я│п╬п╢п╣я─п╤п╦я┌:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }	
 
 static bool oprog_examine_keyring( Object *obj, Character *ch, const DLString & )
 {
-    act( "На $o4 нанизано:", ch, obj, 0, TO_CHAR );
+    act( "п²п╟ $o4 п╫п╟п╫п╦п╥п╟п╫п╬:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }	
@@ -1653,7 +1653,7 @@ bool oprog_examine( Object *obj, Character *ch, const DLString &arg )
     }
 
     if (!rc)
-        ch->pecho( "Внутрь %O2 невозможно заглянуть.", obj );
+        ch->pecho( "п▓п╫я┐я┌я─я▄ %O2 п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╥п╟пЁп╩я▐п╫я┐я┌я▄.", obj );
 
     return rc;
 }
@@ -1673,7 +1673,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
     if (eyes_blinded( ch )) 
 	return;
 
-    buf << "{" << CLR_AEXIT(ch) << "[Выходы:";
+    buf << "{" << CLR_AEXIT(ch) << "[п▓я▀я┘п╬п╢я▀:";
     found = false;
     cfg = ch->getConfig( );
 
@@ -1699,7 +1699,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
     }
     
     if (!found)
-	buf << (cfg->ruexits ? " нет" : " none");
+	buf << (cfg->ruexits ? " п╫п╣я┌" : " none");
 	    
     buf << "]{x" << endl;
     ch->send_to( buf );
@@ -1716,14 +1716,14 @@ CMDRUNP( exits )
     int door;
 
     if (eyes_blinded( ch )) {
-	act( "Ты ослепле$gно|н|на и не видишь ничего вокруг себя!", ch, 0, 0, TO_CHAR );
+	act( "п╒я▀ п╬я│п╩п╣п©п╩п╣$gп╫п╬|п╫|п╫п╟ п╦ п╫п╣ п╡п╦п╢п╦я┬я▄ п╫п╦я┤п╣пЁп╬ п╡п╬п╨я─я┐пЁ я│п╣п╠я▐!", ch, 0, 0, TO_CHAR );
 	return;
     }
 
     if (ch->is_immortal())
-	buf << "Видимые выходы из комнаты " << ch->in_room->vnum << ":" << endl;
+	buf << "п▓п╦п╢п╦п╪я▀п╣ п╡я▀я┘п╬п╢я▀ п╦п╥ п╨п╬п╪п╫п╟я┌я▀ " << ch->in_room->vnum << ":" << endl;
     else
-	buf << "Видимые выходы:" << endl;
+	buf << "п▓п╦п╢п╦п╪я▀п╣ п╡я▀я┘п╬п╢я▀:" << endl;
 
     found = false;
     cfg = ch->getConfig( );
@@ -1746,7 +1746,7 @@ CMDRUNP( exits )
 	    buf << fmt( ch, "%-6^s", ename ) << " - ";
 
 	    if (room->isDark( ) && !cfg->holy)
-		buf << "Дорога ведет в темноту и неизвестность...";
+		buf << "п■п╬я─п╬пЁп╟ п╡п╣п╢п╣я┌ п╡ я┌п╣п╪п╫п╬я┌я┐ п╦ п╫п╣п╦п╥п╡п╣я│я┌п╫п╬я│я┌я▄...";
 	    else
 		buf << room->name;
 
@@ -1772,7 +1772,7 @@ CMDRUNP( exits )
     }
     
     if (!found)
-	buf << (cfg->ruexits ? "Нет." : "None.") << endl;
+	buf << (cfg->ruexits ? "п²п╣я┌." : "None.") << endl;
 	    
     ch->send_to( buf );
 }

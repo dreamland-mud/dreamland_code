@@ -50,11 +50,11 @@ void GroupChannel::triggers( Character *ch, const DLString &msg ) const
     GlobalChannel::triggers( ch, msg );
 
     if (!ch->is_npc( ) && (!str_prefix( msg.c_str( ), "where are you?" )
-                || !str_prefix( msg.c_str( ), "где ты?" ))) {
+                || !str_prefix( msg.c_str( ), "пЁп╢п╣ я┌я▀?" ))) {
     	NPCharacter *pet = ch->getPC( )->pet;
     
 	if (pet)
-	    tell_raw( ch, pet, "Хозяин, я нахожусь в %s - %s",
+	    tell_raw( ch, pet, "п╔п╬п╥я▐п╦п╫, я▐ п╫п╟я┘п╬п╤я┐я│я▄ п╡ %s - %s",
 			pet->in_room->area->name, pet->in_room->name );
     }
 }
@@ -65,7 +65,7 @@ bool GroupChannel::canTalkGlobally( Character *ch ) const
 	return false;
 
     if (IS_SET( ch->comm, COMM_NOTELL )) {
-	ch->println( "Твое сообщение не получено!" );
+	ch->println( "п╒п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣ п╫п╣ п©п╬п╩я┐я┤п╣п╫п╬!" );
 	return false;
     }
 

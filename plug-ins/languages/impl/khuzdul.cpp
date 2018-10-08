@@ -91,6 +91,6 @@ DLString KhuzdulLanguage::radicalToDictum( ) const
 
 void KhuzdulLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "Отзвуком древних битв приходит в твои сны слово {c%s{x.\r\n", word.toStr( ) ); 
+    ch->printf( "п·я┌п╥п╡я┐п╨п╬п╪ п╢я─п╣п╡п╫п╦я┘ п╠п╦я┌п╡ п©я─п╦я┘п╬п╢п╦я┌ п╡ я┌п╡п╬п╦ я│п╫я▀ я│п╩п╬п╡п╬ {c%s{x.\r\n", word.toStr( ) ); 
 }
 

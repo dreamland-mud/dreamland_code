@@ -37,13 +37,13 @@ bool HiddenChest::canLock( Character *ch )
 void LockPick::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets key", ch->getNameP( '1' ).c_str( ) );
-    act( "$o1 тускло поблескивает.", ch, obj, 0, TO_CHAR );
+    act( "$o1 я┌я┐я│п╨п╩п╬ п©п╬п╠п╩п╣я│п╨п╦п╡п╟п╣я┌.", ch, obj, 0, TO_CHAR );
 }
 
 void LockPick::getByOther( Character *ch ) 
 { 
-    act( "Ты роняешь $o4.", ch, obj, 0, TO_CHAR );
-    act( "$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    act( "п╒я▀ я─п╬п╫я▐п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR );
+    act( "$c1 я─п╬п╫я▐п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
 }
 
 bool LockPick::ourMobile( NPCharacter *mob ) 
@@ -59,12 +59,12 @@ bool LockPick::ourMobile( NPCharacter *mob )
 void RobbedItem::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets item", ch->getNameP( '1' ).c_str( ) );
-    ch->pecho( "%1$^O1 жажд%1$nет|ят вернуться к хозяину.", obj );
+    ch->pecho( "%1$^O1 п╤п╟п╤п╢%1$nп╣я┌|я▐я┌ п╡п╣я─п╫я┐я┌я▄я│я▐ п╨ я┘п╬п╥я▐п╦п╫я┐.", obj );
 }
 
 void RobbedItem::getByOther( Character *ch ) 
 {
-    ch->pecho( "%1$^O1 выпада%1$nет|ют у тебя из рук.", obj );
-    act( "$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    ch->pecho( "%1$^O1 п╡я▀п©п╟п╢п╟%1$nп╣я┌|я▌я┌ я┐ я┌п╣п╠я▐ п╦п╥ я─я┐п╨.", obj );
+    act( "$c1 я─п╬п╫я▐п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
 }
 

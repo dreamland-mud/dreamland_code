@@ -30,18 +30,18 @@ void PCharacter::gainExp( int gain )
         return;
 
     if (level > 19  && !IS_SET( act, PLR_CONFIRMED )) {
-        send_to("Ты больше не можешь получать опыт, пока тебя не подтвердили Боги.\n\r"
-	        "Прочитай '{lRсправка подтверждение{lEhelp confirm{lx'.\n\r");
+        send_to("п╒я▀ п╠п╬п╩я▄я┬п╣ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌, п©п╬п╨п╟ я┌п╣п╠я▐ п╫п╣ п©п╬п╢я┌п╡п╣я─п╢п╦п╩п╦ п▒п╬пЁп╦.\n\r"
+	        "п÷я─п╬я┤п╦я┌п╟п╧ '{lRя│п©я─п╟п╡п╨п╟ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫п╦п╣{lEhelp confirm{lx'.\n\r");
         return;
     }
 
     if (level >= PK_MIN_LEVEL && IS_SET(in_room->room_flags, ROOM_NEWBIES_ONLY)) {
-	println("Ты не можешь больше получать опыт в этой арии.");
+	println("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╠п╬п╩я▄я┬п╣ п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌ п╡ я█я┌п╬п╧ п╟я─п╦п╦.");
 	return;
     }
 
     if (IS_SET(act,PLR_NO_EXP)) {
-        send_to("Ты не можешь получать опыт, пока твой дух во власти противника.\n\r");
+        send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌, п©п╬п╨п╟ я┌п╡п╬п╧ п╢я┐я┘ п╡п╬ п╡п╩п╟я│я┌п╦ п©я─п╬я┌п╦п╡п╫п╦п╨п╟.\n\r");
         return;
     }
     
@@ -52,17 +52,17 @@ void PCharacter::gainExp( int gain )
 
     while (level < LEVEL_HERO - 1 && getExpToLevel( ) <= 0) {
 	
-	act_p("{CТы дости$gгло|г|гла следующего уровня!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
+	act_p("{Cп╒я▀ п╢п╬я│я┌п╦$gпЁп╩п╬|пЁ|пЁп╩п╟ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я┐я─п╬п╡п╫я▐!!!{x", this, 0, 0, TO_CHAR, POS_DEAD);
         setLevel( level + 1 );
 
         /* added for samurais by chronos */
         if (getProfession( ) == prof_samurai && level == 10)
             wimpy = 0;
 
-        infonet("{CРадостный голос из $o2: {W$C1 дости$Gгло|г|гла следующей ступени мастерства.{x", this, 0);
+        infonet("{Cп═п╟п╢п╬я│я┌п╫я▀п╧ пЁп╬п╩п╬я│ п╦п╥ $o2: {W$C1 п╢п╬я│я┌п╦$GпЁп╩п╬|пЁ|пЁп╩п╟ я│п╩п╣п╢я┐я▌я┴п╣п╧ я│я┌я┐п©п╣п╫п╦ п╪п╟я│я┌п╣я─я│я┌п╡п╟.{x", this, 0);
 
         ::wiznet( WIZ_LEVELS, 0, 0, 
-	          "%1$^C1 дости%1$Gгло|г|гла %2$d уровня!", this, getRealLevel( ) );
+	          "%1$^C1 п╢п╬я│я┌п╦%1$GпЁп╩п╬|пЁ|пЁп╩п╟ %2$d я┐я─п╬п╡п╫я▐!", this, getRealLevel( ) );
 
         advanceLevel( );
 	save( );
@@ -118,15 +118,15 @@ void PCharacter::advanceLevel( )
     perm_mana	+= add_mana;
     perm_move	+= add_move;
     
-    buf << "{CТы получаешь: "
-        << "{Y" << add_hp << "{C/" << max_hit << " {lRздоровья{lEhp{lx, "
-	<< "{Y" << add_mana << "{C/" << max_mana << " {lRманы{lEmana{lx, "
-	<< "{Y" << add_move << "{C/" << max_move << " {lRдвижения{lEmove{lx, "
+    buf << "{Cп╒я▀ п©п╬п╩я┐я┤п╟п╣я┬я▄: "
+        << "{Y" << add_hp << "{C/" << max_hit << " {lRп╥п╢п╬я─п╬п╡я▄я▐{lEhp{lx, "
+	<< "{Y" << add_mana << "{C/" << max_mana << " {lRп╪п╟п╫я▀{lEmana{lx, "
+	<< "{Y" << add_move << "{C/" << max_move << " {lRп╢п╡п╦п╤п╣п╫п╦я▐{lEmove{lx, "
         <<  endl <<  "              " 
-	<< "{Y" << add_prac << "{C/" << practice << " {lRпрактики{lEprac{lx";
+	<< "{Y" << add_prac << "{C/" << practice << " {lRп©я─п╟п╨я┌п╦п╨п╦{lEprac{lx";
 
     if (add_train > 0)
-        buf << ", {Y" << add_train << "{C/" << train << " {lRтренировку{lEtrain{lx";
+        buf << ", {Y" << add_train << "{C/" << train << " {lRя┌я─п╣п╫п╦я─п╬п╡п╨я┐{lEtrain{lx";
 
     if (getProfession( ) == prof_universal) {
 	int sp_gain;
@@ -135,7 +135,7 @@ void PCharacter::advanceLevel( )
 	max_skill_points += sp_gain; 	
 #if 0        
 	buf << "," << endl << "              "
-	    << "{Y" << sp_gain << "{C/" << max_skill_points << " {lRочков умений{lEskill points{lx"; 
+	    << "{Y" << sp_gain << "{C/" << max_skill_points << " {lRп╬я┤п╨п╬п╡ я┐п╪п╣п╫п╦п╧{lEskill points{lx"; 
 #endif        
     }
     

@@ -23,7 +23,7 @@ public:
 	static const DLString TYPE;
 
 public:	
-	/** По умолчанию значение 0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
 	inline Short( ) : value( 0 )
 	{
 	}
@@ -63,7 +63,7 @@ private:
 
 
 
-/** Вывод в ostream типа Short */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Short */
 inline std::ostream& operator << ( std::ostream& ostr, const Short& shortValue )
 {
 	ostr << shortValue.getValue( );

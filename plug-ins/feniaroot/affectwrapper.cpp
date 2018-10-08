@@ -22,7 +22,7 @@
 #include "def.h"
 
 using namespace std;
-NMI_INIT(AffectWrapper, "аффект");
+NMI_INIT(AffectWrapper, "п╟я└я└п╣п╨я┌");
 
 AffectWrapper::AffectWrapper( const RegisterList &args )
 {
@@ -90,7 +90,7 @@ void AffectWrapper::fromAffect( const Affect & af )
     }
 }
 
-NMI_GET( AffectWrapper, type, "название скила, которым этот аффект вешается, или none" ) 
+NMI_GET( AffectWrapper, type, "п╫п╟п╥п╡п╟п╫п╦п╣ я│п╨п╦п╩п╟, п╨п╬я┌п╬я─я▀п╪ я█я┌п╬я┌ п╟я└я└п╣п╨я┌ п╡п╣я┬п╟п╣я┌я│я▐, п╦п╩п╦ none" ) 
 { 
     int sn = type;
 
@@ -100,7 +100,7 @@ NMI_GET( AffectWrapper, type, "название скила, которым этот аффект вешается, или
 	return Register( type->getName( ) ); 
 } 
 
-NMI_SET( AffectWrapper, type, "название скила, которым этот аффект вешается, или none" ) 
+NMI_SET( AffectWrapper, type, "п╫п╟п╥п╡п╟п╫п╦п╣ я│п╨п╦п╩п╟, п╨п╬я┌п╬я─я▀п╪ я█я┌п╬я┌ п╟я└я└п╣п╨я┌ п╡п╣я┬п╟п╣я┌я│я▐, п╦п╩п╦ none" ) 
 { 
     const DLString & name = arg.toString( );
 
@@ -127,12 +127,12 @@ NMI_SET( AffectWrapper, x, api ) \
     x.setValue( arg.toNumber( ) ); \
 }
 
-GS(where, "поле, у которого аффект изменяет биты (таблица .tables.affwhere_flags.)")
-GS(bitvector, "какие биты добавятся полю, указанному в where")
-GS(location, "поле, на которое аффект воздействует численно (таблица .tables.apply_flags)")
-GS(modifier, "на сколько изменится поле, указанное в location")
-GS(duration, "длительность, -1 для вечных аффектов")
-GS(level, "уровень аффекта")
+GS(where, "п©п╬п╩п╣, я┐ п╨п╬я┌п╬я─п╬пЁп╬ п╟я└я└п╣п╨я┌ п╦п╥п╪п╣п╫я▐п╣я┌ п╠п╦я┌я▀ (я┌п╟п╠п╩п╦я├п╟ .tables.affwhere_flags.)")
+GS(bitvector, "п╨п╟п╨п╦п╣ п╠п╦я┌я▀ п╢п╬п╠п╟п╡я▐я┌я│я▐ п©п╬п╩я▌, я┐п╨п╟п╥п╟п╫п╫п╬п╪я┐ п╡ where")
+GS(location, "п©п╬п╩п╣, п╫п╟ п╨п╬я┌п╬я─п╬п╣ п╟я└я└п╣п╨я┌ п╡п╬п╥п╢п╣п╧я│я┌п╡я┐п╣я┌ я┤п╦я│п╩п╣п╫п╫п╬ (я┌п╟п╠п╩п╦я├п╟ .tables.apply_flags)")
+GS(modifier, "п╫п╟ я│п╨п╬п╩я▄п╨п╬ п╦п╥п╪п╣п╫п╦я┌я│я▐ п©п╬п╩п╣, я┐п╨п╟п╥п╟п╫п╫п╬п╣ п╡ location")
+GS(duration, "п╢п╩п╦я┌п╣п╩я▄п╫п╬я│я┌я▄, -1 п╢п╩я▐ п╡п╣я┤п╫я▀я┘ п╟я└я└п╣п╨я┌п╬п╡")
+GS(level, "я┐я─п╬п╡п╣п╫я▄ п╟я└я└п╣п╨я┌п╟")
 
 NMI_SET( AffectWrapper, global, "" ) 
 {

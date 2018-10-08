@@ -182,14 +182,14 @@ WEBMANIP_RUN(decorateMobile)
 		    manips.addLocal("train", russian_case(stat_table.fields[i].message, '4'));
 
 	    if (ch->perm_stat[STAT_CON] < ch->getPC()->getMaxTrain( STAT_CON ))
-		manips.addLocal("train", "сложение кп");
+		manips.addLocal("train", "я│п╩п╬п╤п╣п╫п╦п╣ п╨п©");
 
-	    manips.addLocal("gain", "продать");
-	    manips.addLocal("gain", "купить");
+	    manips.addLocal("gain", "п©я─п╬п╢п╟я┌я▄");
+	    manips.addLocal("gain", "п╨я┐п©п╦я┌я▄");
         }
 
 	if (mob_has_occupation(victim, OCC_PRACTICER)) 
-	    manips.addLocal("practice", "здесь");
+	    manips.addLocal("practice", "п╥п╢п╣я│я▄");
 
 	if (mob_has_occupation(victim, OCC_HEALER)) 
 	    manips.addLocal("heal", "");
@@ -201,13 +201,13 @@ WEBMANIP_RUN(decorateMobile)
 	    manips.addLocal("list", "");
 
 	if (mob_has_occupation(victim, OCC_QUEST_MASTER)) {
-	    manips.addLocal("quest", "попросить");
-	    manips.addLocal("quest", "сдать");
-	    manips.addLocal("quest", "отменить");
+	    manips.addLocal("quest", "п©п╬п©я─п╬я│п╦я┌я▄");
+	    manips.addLocal("quest", "я│п╢п╟я┌я▄");
+	    manips.addLocal("quest", "п╬я┌п╪п╣п╫п╦я┌я▄");
         }
 
 	if (mob_has_occupation(victim, OCC_QUEST_TRADER)) {
-	    manips.addLocal("quest", "список");
+	    manips.addLocal("quest", "я│п©п╦я│п╬п╨");
         }
 
 	if (has_trigger_mount( victim ))

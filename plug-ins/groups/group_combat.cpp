@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -45,7 +45,7 @@ VOID_SPELL(AcetumPrimus)::run( Character *ch, Character *victim, int sn, int lev
     if (saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ))
 	dam /= 2;
     
-    act("ðÌÁÝ ÐÅÒ×ÏÂÙÔÎÏÊ ËÉÓÌÏÔÙ ÏÂ×ÏÌÁËÉ×ÁÅÔ $C4 É, ÉÓËÒÑÓØ, ÐÏÇÌÏÝÁÅÔ ×ÓÅ, Ë ÞÅÍÕ ÐÒÉËÁÓÁÅÔÓÑ.", ch, 0, victim, TO_NOTVICT);
+    act("ÐŸÐ»Ð°Ñ‰ Ð¿ÐµÑ€Ð²Ð¾Ð±Ñ‹Ñ‚Ð½Ð¾Ð¹ ÐºÐ¸ÑÐ»Ð¾Ñ‚Ñ‹ Ð¾Ð±Ð²Ð¾Ð»Ð°ÐºÐ¸Ð²Ð°ÐµÑ‚ $C4 Ð¸, Ð¸ÑÐºÑ€ÑÑÑŒ, Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÐµÑ‚ Ð²ÑÐµ, Ðº Ñ‡ÐµÐ¼Ñƒ Ð¿Ñ€Ð¸ÐºÐ°ÑÐ°ÐµÑ‚ÑÑ.", ch, 0, victim, TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
 }
 
@@ -105,8 +105,8 @@ VOID_SPELL(CausticFont)::run( Character *ch, Character *victim, int sn, int leve
     if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
 	dam /= 2;
 	
-    act("æÏÎÔÁÎ ÅÄËÏÊ ÖÉÄËÏÓÔÉ ÏÂÒÁÚÕÅÔÓÑ Õ ÎÏÇ $C2.\n\r"
-        "úÁÐÁÈ $S ÒÁÚÌÁÇÁÀÝÉÈÓÑ ÔËÁÎÅÊ ÐÒÏÓÔÏ ÏÔ×ÒÁÔÉÔÅÌÅÎ!",
+    act("Ð¤Ð¾Ð½Ñ‚Ð°Ð½ ÐµÐ´ÐºÐ¾Ð¹ Ð¶Ð¸Ð´ÐºÐ¾ÑÑ‚Ð¸ Ð¾Ð±Ñ€Ð°Ð·ÑƒÐµÑ‚ÑÑ Ñƒ Ð½Ð¾Ð³ $C2.\n\r"
+        "Ð—Ð°Ð¿Ð°Ñ… $S Ñ€Ð°Ð·Ð»Ð°Ð³Ð°ÑŽÑ‰Ð¸Ñ…ÑÑ Ñ‚ÐºÐ°Ð½ÐµÐ¹ Ð¿Ñ€Ð¾ÑÑ‚Ð¾ Ð¾Ñ‚Ð²Ñ€Ð°Ñ‚Ð¸Ñ‚ÐµÐ»ÐµÐ½!",
         ch, 0, victim, TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
 }
@@ -122,11 +122,11 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 
     /* first strike */
 
-    act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ, ÓÏÚÄÁÎÎÙÊ $c5, ÐÏÒÁÖÁÅÔ $C4.",
+    act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸, ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ñ‹Ð¹ $c5, Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ $C4.",
 	   ch,0,victim,TO_NOTVICT,POS_RESTING);
-    act_p("óÏÚÄÁÎÎÙÊ ÔÏÂÏÊ ÒÁÚÒÑÄ ÍÏÌÎÉÉ ÐÏÒÁÖÁÅÔ $C4.",
+    act_p("Ð¡Ð¾Ð·Ð´Ð°Ð½Ð½Ñ‹Ð¹ Ñ‚Ð¾Ð±Ð¾Ð¹ Ñ€Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ $C4.",
 	   ch,0,victim,TO_CHAR,POS_RESTING);
-    act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ, ÓÏÚÄÁÎÎÙÊ $c5, ÐÏÒÁÖÁÅÔ ÔÅÂÑ!",
+    act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸, ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ñ‹Ð¹ $c5, Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ!",
 	   ch,0,victim,TO_VICT,POS_RESTING);
 
     dam = dice(level,6);
@@ -155,15 +155,15 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 	    found = true;
 	    last_vict = tmp_vict;
 	    if (is_safe(ch, tmp_vict) )  {
-	      act_p( "òÁÚÒÑÄ ÍÏÌÎÉÉ ÚÁÔÕÈÁÅÔ, ÎÅ ÄÏÓÔÉÇÎÕ× $c2.",
+	      act_p( "Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð·Ð°Ñ‚ÑƒÑ…Ð°ÐµÑ‚, Ð½Ðµ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÐ² $c2.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-	      act_p( "òÁÚÒÑÄ ÍÏÌÎÉÉ ÚÁÔÕÈÁÅÔ, ÎÅ ÄÏÓÔÉÇÎÕ× ÔÅÂÑ.",
+	      act_p( "Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð·Ð°Ñ‚ÑƒÑ…Ð°ÐµÑ‚, Ð½Ðµ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÐ² Ñ‚ÐµÐ±Ñ.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
 	    }
 	    else  {
-	      act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ ÐÏÒÁÖÁÅÔ $c4!",
+	      act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ $c4!",
                      tmp_vict,0,0,TO_ROOM,POS_RESTING);
-	      act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ ÐÏÒÁÖÁÅÔ ÔÅÂÑ!",
+	      act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ!",
                      tmp_vict,0,0,TO_CHAR,POS_RESTING);
 	      dam = dice(level,6);
 		
@@ -185,15 +185,15 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 
 	  if (last_vict == ch) /* no double hits */
 	  {
-	    act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ ÉÓÞÅÚÁÅÔ.",ch,0,0,TO_ROOM,POS_RESTING);
-	    act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ ÉÓÞÅÚÁÅÔ, ÎÅ ÄÏÓÔÉÇÎÕ× ÔÅÂÑ.",
+	    act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚.",ch,0,0,TO_ROOM,POS_RESTING);
+	    act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚, Ð½Ðµ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÐ² Ñ‚ÐµÐ±Ñ.",
 		   ch,0,0,TO_CHAR,POS_RESTING);
 	    return;
 	  }
 
 	  last_vict = ch;
-	  act_p("òÁÚÒÑÄ ÍÏÌÎÉÉ ÐÏÒÁÖÁÅÔ $c4..!",ch,0,0,TO_ROOM,POS_RESTING);
-	  ch->send_to("óÏÚÄÁÎÎÁÑ ÔÏÂÏÊ ÍÏÌÎÉÑ ÐÏÒÁÖÁÅÔ ÔÅÂÑ ÖÅ!\n\r");
+	  act_p("Ð Ð°Ð·Ñ€ÑÐ´ Ð¼Ð¾Ð»Ð½Ð¸Ð¸ Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ $c4..!",ch,0,0,TO_ROOM,POS_RESTING);
+	  ch->send_to("Ð¡Ð¾Ð·Ð´Ð°Ð½Ð½Ð°Ñ Ñ‚Ð¾Ð±Ð¾Ð¹ Ð¼Ð¾Ð»Ð½Ð¸Ñ Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð¶Ðµ!\n\r");
 	  dam = dice(level,6);
 	  if (saves_spell(level,ch,DAM_LIGHTNING,ch, DAMF_SPELL))
 	   dam /= 3;
@@ -223,7 +223,7 @@ VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level
     dam = number_range(1,level);
     if ( !saves_spell( level, victim,DAM_COLD,ch, DAMF_SPELL ) )
     {
-	act_p("$c1 ÚÁÍÅÒÚÁÅÔ ÏÔ ÌÅÄÑÎÏÇÏ ÐÒÉËÏÓÎÏ×ÅÎÉÑ.",
+	act_p("$c1 Ð·Ð°Ð¼ÐµÑ€Ð·Ð°ÐµÑ‚ Ð¾Ñ‚ Ð»ÐµÐ´ÑÐ½Ð¾Ð³Ð¾ Ð¿Ñ€Ð¸ÐºÐ¾ÑÐ½Ð¾Ð²ÐµÐ½Ð¸Ñ.",
                victim,0,0,TO_ROOM,POS_RESTING);
 	af.where     = TO_AFFECTS;
 	af.type      = sn;
@@ -273,13 +273,13 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
 		&& (ch->in_room->sector_type != SECT_MOUNTAIN)
 		&& (ch->in_room->sector_type != SECT_DESERT) )
 	{
-		ch->println("úÄÅÓØ ÎÅÄÏÓÔÁÔÏÞÎÏ ÐÅÓËÁ, ÞÔÏÂÙ ÓÆÏÒÍÉÒÏ×ÁÔØ ËÕÌÁË.");
+		ch->println("Ð—Ð´ÐµÑÑŒ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð¿ÐµÑÐºÐ°, Ñ‡Ñ‚Ð¾Ð±Ñ‹ ÑÑ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÐºÑƒÐ»Ð°Ðº.");
 		ch->wait = 0;
 		return;
 	}
 	
-	act("÷ÉÈÒØ ÐÅÓËÁ ÐÏÄÎÉÍÁÅÔÓÑ Ó ÚÅÍÌÉ, ÏÂÒÁÚÕÑ ÏÇÒÏÍÎÙÊ ËÕÌÁË, É ÕÄÁÒÑÅÔ $c4.", victim, 0, 0, TO_ROOM);
-	act("÷ÉÈÒØ ÐÅÓËÁ ÐÏÄÎÉÍÁÅÔÓÑ Ó ÚÅÍÌÉ, ÏÂÒÁÚÕÑ ÏÇÒÏÍÎÙÊ ËÕÌÁË, É ÕÄÁÒÑÅÔ ÔÅÂÑ.", victim, 0, 0, TO_CHAR);
+	act("Ð’Ð¸Ñ…Ñ€ÑŒ Ð¿ÐµÑÐºÐ° Ð¿Ð¾Ð´Ð½Ð¸Ð¼Ð°ÐµÑ‚ÑÑ Ñ Ð·ÐµÐ¼Ð»Ð¸, Ð¾Ð±Ñ€Ð°Ð·ÑƒÑ Ð¾Ð³Ñ€Ð¾Ð¼Ð½Ñ‹Ð¹ ÐºÑƒÐ»Ð°Ðº, Ð¸ ÑƒÐ´Ð°Ñ€ÑÐµÑ‚ $c4.", victim, 0, 0, TO_ROOM);
+	act("Ð’Ð¸Ñ…Ñ€ÑŒ Ð¿ÐµÑÐºÐ° Ð¿Ð¾Ð´Ð½Ð¸Ð¼Ð°ÐµÑ‚ÑÑ Ñ Ð·ÐµÐ¼Ð»Ð¸, Ð¾Ð±Ñ€Ð°Ð·ÑƒÑ Ð¾Ð³Ñ€Ð¾Ð¼Ð½Ñ‹Ð¹ ÐºÑƒÐ»Ð°Ðº, Ð¸ ÑƒÐ´Ð°Ñ€ÑÐµÑ‚ Ñ‚ÐµÐ±Ñ.", victim, 0, 0, TO_CHAR);
 	dam = dice( level , 14 );
 
 	try {
@@ -301,7 +301,7 @@ VOID_SPELL(Disruption)::run( Character *ch, Character *victim, int sn, int level
     if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
 	dam /= 2;
 
-    act("úÁÇÁÄÏÞÎÁÑ ÓÉÌÁ ÏÈ×ÁÔÙ×ÁÅÔ $C4, ÚÁÓÔÁ×ÌÑÑ ÕÓÏÍÎÉÔØÓÑ × $S ÄÁÌØÎÅÊÛÅÍ ÓÕÝÅÓÔ×Ï×ÁÎÉÉ.", ch,0,victim,TO_NOTVICT);
+    act("Ð—Ð°Ð³Ð°Ð´Ð¾Ñ‡Ð½Ð°Ñ ÑÐ¸Ð»Ð° Ð¾Ñ…Ð²Ð°Ñ‚Ñ‹Ð²Ð°ÐµÑ‚ $C4, Ð·Ð°ÑÑ‚Ð°Ð²Ð»ÑÑ ÑƒÑÐ¾Ð¼Ð½Ð¸Ñ‚ÑŒÑÑ Ð² $S Ð´Ð°Ð»ÑŒÐ½ÐµÐ¹ÑˆÐµÐ¼ ÑÑƒÑ‰ÐµÑÑ‚Ð²Ð¾Ð²Ð°Ð½Ð¸Ð¸.", ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
 
@@ -319,7 +319,7 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
 	
     if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
 	dam /= 2;
-    act("ëÕÌÁË ÉÚ ÔÅÍÎÏÇÏ ÜÆÉÒÁ ÉÎÙÈ ÍÉÒÏ× ÓÏËÒÕÛÁÅÔ $C4, ÐÏ×ÅÒÇÁÑ $S × ÏÛÅÌÏÍÌÅÎÉÅ!",
+    act("ÐšÑƒÐ»Ð°Ðº Ð¸Ð· Ñ‚ÐµÐ¼Ð½Ð¾Ð³Ð¾ ÑÑ„Ð¸Ñ€Ð° Ð¸Ð½Ñ‹Ñ… Ð¼Ð¸Ñ€Ð¾Ð² ÑÐ¾ÐºÑ€ÑƒÑˆÐ°ÐµÑ‚ $C4, Ð¿Ð¾Ð²ÐµÑ€Ð³Ð°Ñ $S Ð² Ð¾ÑˆÐµÐ»Ð¾Ð¼Ð»ÐµÐ½Ð¸Ðµ!",
            ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
@@ -363,7 +363,7 @@ VOID_SPELL(GalvanicWhip)::run( Character *ch, Character *victim, int sn, int lev
     if ( saves_spell( level, victim, DAM_LIGHTNING,ch, DAMF_SPELL ) )
 	dam /= 2;
     
-    act("$c1 ÚÁËÌÉÎÁÅÔ ÈÌÙÓÔ ÉÏÎÉÚÉÒÏ×ÁÎÎÙÈ ÞÁÓÔÉÃ, ËÏÔÏÒÙÊ ÑÒÏÓÔÎÏ ÈÌÅÝÅÔ $C4.",
+    act("$c1 Ð·Ð°ÐºÐ»Ð¸Ð½Ð°ÐµÑ‚ Ñ…Ð»Ñ‹ÑÑ‚ Ð¸Ð¾Ð½Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ñ… Ñ‡Ð°ÑÑ‚Ð¸Ñ†, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ ÑÑ€Ð¾ÑÑ‚Ð½Ð¾ Ñ…Ð»ÐµÑ‰ÐµÑ‚ $C4.",
            ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_LIGHTNING,true, DAMF_SPELL);
 }
@@ -378,15 +378,15 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
     {
-	ch->send_to("îÅ ÐÏÌÕÞÉÌÏÓØ...\n");
-	act("ôÙ ÎÁ ÍÇÎÏ×ÅÎÉÅ ÐÏÞÕ×ÓÔ×Ï×Á$gÌÏ|Ì|ÌÁ ÏÚÎÏÂ.", victim, 0, 0, TO_CHAR);
+	ch->send_to("ÐÐµ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ð»Ð¾ÑÑŒ...\n");
+	act("Ð¢Ñ‹ Ð½Ð° Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ñ‡ÑƒÐ²ÑÑ‚Ð²Ð¾Ð²Ð°$gÐ»Ð¾|Ð»|Ð»Ð° Ð¾Ð·Ð½Ð¾Ð±.", victim, 0, 0, TO_CHAR);
 	return;
     }
 
     if ( (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD))
 	|| IS_VAMPIRE(victim) )
 	{
-	    ch->println("òÕËÁ ÕÍÅÒÔ×ÉÑ ÎÅ ×ÌÁÓÔÎÁ ÎÁÄ Ô×ÏÅÊ ÖÅÒÔ×ÏÊ.");
+	    ch->println("Ð ÑƒÐºÐ° ÑƒÐ¼ÐµÑ€Ñ‚Ð²Ð¸Ñ Ð½Ðµ Ð²Ð»Ð°ÑÑ‚Ð½Ð° Ð½Ð°Ð´ Ñ‚Ð²Ð¾ÐµÐ¹ Ð¶ÐµÑ€Ñ‚Ð²Ð¾Ð¹.");
 	     return;
 	}
     if( victim->getModifyLevel() <= 2 )
@@ -401,8 +401,8 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
      ch->hit		+= dam / 2;
     }
     
-    victim->println("ôÙ ÞÕ×ÓÔ×ÕÅÛØ, ËÁË ÖÉÚÎØ ÕÓËÏÌØÚÁÅÔ ÏÔ ÔÅÂÑ!");
-    act("îÅÐÏÓÔÉÖÉÍÁÑ òÕËÁ õÍÅÒÔ×ÉÑ È×ÁÔÁÅÔ $C4!", ch,0,victim,TO_NOTVICT);
+    victim->println("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ, ÐºÐ°Ðº Ð¶Ð¸Ð·Ð½ÑŒ ÑƒÑÐºÐ¾Ð»ÑŒÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ!");
+    act("ÐÐµÐ¿Ð¾ÑÑ‚Ð¸Ð¶Ð¸Ð¼Ð°Ñ Ð ÑƒÐºÐ° Ð£Ð¼ÐµÑ€Ñ‚Ð²Ð¸Ñ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ $C4!", ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_SPELL);
 }
 
@@ -478,10 +478,10 @@ VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int lev
     int dam;
 
     if (victim->isAffected(gsn_shield ))  {
-	act("ô×ÏÑ ×ÏÌÛÅÂÎÁÑ ÓÔÒÅÌÁ ÉÓÞÅÚÁÅÔ, ÎÅ ÄÏÓÔÉÇÎÕ× ÃÅÌÉ.", ch, 0, victim, TO_CHAR);
+	act("Ð¢Ð²Ð¾Ñ Ð²Ð¾Ð»ÑˆÐµÐ±Ð½Ð°Ñ ÑÑ‚Ñ€ÐµÐ»Ð° Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚, Ð½Ðµ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÐ² Ñ†ÐµÐ»Ð¸.", ch, 0, victim, TO_CHAR);
 
 	if (victim != ch)
-	    act("ô×ÏÊ ÝÉÔ ÂÌÏËÉÒÕÅÔ ×ÏÌÛÅÂÎÕÀ ÓÔÒÅÌÕ $c2.", ch, 0, victim, TO_VICT);
+	    act("Ð¢Ð²Ð¾Ð¹ Ñ‰Ð¸Ñ‚ Ð±Ð»Ð¾ÐºÐ¸Ñ€ÑƒÐµÑ‚ Ð²Ð¾Ð»ÑˆÐµÐ±Ð½ÑƒÑŽ ÑÑ‚Ñ€ÐµÐ»Ñƒ $c2.", ch, 0, victim, TO_VICT);
 
 	return;
     }
@@ -538,7 +538,7 @@ VOID_SPELL(MagneticTrust)::run( Character *ch, Character *victim, int sn, int le
     if ( saves_spell( level, victim, DAM_LIGHTNING,ch, DAMF_SPELL ) )
 	dam /= 2;
 
-    act("ô×ÏÉ ×ÏÌÏÓÙ ×ÓÔÁÀÔ ÄÙÂÏÍ ÏÔ ÏÝÕÝÅÎÉÑ ÎÅ×ÉÄÉÍÙÈ ÐÏÔÏËÏ× ÜÎÅÒÇÉÉ ÒÑÄÏÍ Ó ÔÏÂÏÊ.", ch, 0, victim, TO_NOTVICT);
+    act("Ð¢Ð²Ð¾Ð¸ Ð²Ð¾Ð»Ð¾ÑÑ‹ Ð²ÑÑ‚Ð°ÑŽÑ‚ Ð´Ñ‹Ð±Ð¾Ð¼ Ð¾Ñ‚ Ð¾Ñ‰ÑƒÑ‰ÐµÐ½Ð¸Ñ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼Ñ‹Ñ… Ð¿Ð¾Ñ‚Ð¾ÐºÐ¾Ð² ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ñ€ÑÐ´Ð¾Ð¼ Ñ Ñ‚Ð¾Ð±Ð¾Ð¹.", ch, 0, victim, TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_LIGHTNING,true, DAMF_SPELL);
 }
 
@@ -550,7 +550,7 @@ VOID_SPELL(MindWrack)::run( Character *ch, Character *victim, int sn, int level 
     dam = dice( level, 7 );
     if ( saves_spell( level, victim, DAM_MENTAL,ch, DAMF_SPELL ) )
 	dam /= 2;
-    act("$c1 ÐÒÉÓÔÁÌØÎÏ ÓÍÏÔÒÉÔ ÎÁ $C4, ÐÏ×ÅÒÇÁÑ $S × ÓÏÎÌÉ×ÏÓÔØ.",
+    act("$c1 Ð¿Ñ€Ð¸ÑÑ‚Ð°Ð»ÑŒÐ½Ð¾ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð½Ð° $C4, Ð¿Ð¾Ð²ÐµÑ€Ð³Ð°Ñ $S Ð² ÑÐ¾Ð½Ð»Ð¸Ð²Ð¾ÑÑ‚ÑŒ.",
 	   ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_MENTAL,true, DAMF_SPELL);
 }
@@ -564,7 +564,7 @@ VOID_SPELL(MindWrench)::run( Character *ch, Character *victim, int sn, int level
     dam = dice( level, 9 );
     if ( saves_spell( level, victim, DAM_MENTAL,ch, DAMF_SPELL ) )
 	dam /= 2;
-    act("$c1 ÐÒÉÓÔÁÌØÎÏ ÓÍÏÔÒÉÔ ÎÁ $C4, ×ÙÚÙ×ÁÑ × $Z ÎÅÎÏÒÍÁÌØÎÏÅ ÏÖÉ×ÌÅÎÉÅ.", ch,0,victim,TO_NOTVICT);
+    act("$c1 Ð¿Ñ€Ð¸ÑÑ‚Ð°Ð»ÑŒÐ½Ð¾ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð½Ð° $C4, Ð²Ñ‹Ð·Ñ‹Ð²Ð°Ñ Ð² $Z Ð½ÐµÐ½Ð¾Ñ€Ð¼Ð°Ð»ÑŒÐ½Ð¾Ðµ Ð¾Ð¶Ð¸Ð²Ð»ÐµÐ½Ð¸Ðµ.", ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_MENTAL,true, DAMF_SPELL);
 }
 
@@ -577,7 +577,7 @@ VOID_SPELL(QuantumSpike)::run( Character *ch, Character *victim, int sn, int lev
     dam = dice( level, 9 );
     if ( saves_spell( level, victim, DAM_LIGHTNING,ch, DAMF_SPELL ) )
 	dam /= 2;
-    act("ëÁÖÅÔÓÑ, ÂÕÄÔÏ $C1 ÒÁÓÐÁÄÁÅÔÓÑ ÎÁ ÍÅÌØÞÁÊÛÉÅ ÎÅÓ×ÑÚÁÎÎÙÅ ÞÁÓÔÉÃÙ É ×ÎÏ×Ø ÍÕÞÉÔÅÌØÎÏ ÓÏÂÉÒÁÅÔÓÑ ×ÏÅÄÉÎÏ.",
+    act("ÐšÐ°Ð¶ÐµÑ‚ÑÑ, Ð±ÑƒÐ´Ñ‚Ð¾ $C1 Ñ€Ð°ÑÐ¿Ð°Ð´Ð°ÐµÑ‚ÑÑ Ð½Ð° Ð¼ÐµÐ»ÑŒÑ‡Ð°Ð¹ÑˆÐ¸Ðµ Ð½ÐµÑÐ²ÑÐ·Ð°Ð½Ð½Ñ‹Ðµ Ñ‡Ð°ÑÑ‚Ð¸Ñ†Ñ‹ Ð¸ Ð²Ð½Ð¾Ð²ÑŒ Ð¼ÑƒÑ‡Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ ÑÐ¾Ð±Ð¸Ñ€Ð°ÐµÑ‚ÑÑ Ð²Ð¾ÐµÐ´Ð¸Ð½Ð¾.",
 	   ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_LIGHTNING,true, DAMF_SPELL);
 }
@@ -595,13 +595,13 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
 		|| ch->in_room->sector_type == SECT_WATER_SWIM
 		|| ch->in_room->sector_type == SECT_WATER_NOSWIM )
 	{
-		ch->send_to("úÄÅÓØ ÎÅÔ ÎÉ ËÒÕÐÉÃÙ ÐÅÓËÁ!\n\r");
+		ch->send_to("Ð—Ð´ÐµÑÑŒ Ð½ÐµÑ‚ Ð½Ð¸ ÐºÑ€ÑƒÐ¿Ð¸Ñ†Ñ‹ Ð¿ÐµÑÐºÐ°!\n\r");
 		ch->wait = 0;
 		return;
 	}
 
-	act_p("$c1 ÓÏÚÄÁÅÔ ÐÅÓÞÁÎÕÀ ÂÕÒÀ ×ÏËÒÕÇ ÓÅÂÑ.",ch,0,0,TO_ROOM,POS_RESTING);
-	ch->send_to("ôÙ ÓÏÚÄÁÅÛØ ÐÅÓÞÁÎÕÀ ÂÕÒÀ ×ÏËÒÕÇ ÓÅÂÑ.\n\r");
+	act_p("$c1 ÑÐ¾Ð·Ð´Ð°ÐµÑ‚ Ð¿ÐµÑÑ‡Ð°Ð½ÑƒÑŽ Ð±ÑƒÑ€ÑŽ Ð²Ð¾ÐºÑ€ÑƒÐ³ ÑÐµÐ±Ñ.",ch,0,0,TO_ROOM,POS_RESTING);
+	ch->send_to("Ð¢Ñ‹ ÑÐ¾Ð·Ð´Ð°ÐµÑˆÑŒ Ð¿ÐµÑÑ‡Ð°Ð½ÑƒÑŽ Ð±ÑƒÑ€ÑŽ Ð²Ð¾ÐºÑ€ÑƒÐ³ ÑÐµÐ±Ñ.\n\r");
 
 	hpch = max( 10, (int)ch->hit );
 	hp_dam = number_range( hpch / 9 + 1, hpch / 5 );
@@ -678,7 +678,7 @@ VOID_SPELL(SonicResonance)::run( Character *ch, Character *victim, int sn, int l
     dam = dice( level, 7 );
     if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
 	dam /= 2;
-    act_p("ãÉÌÉÎÄÒ ×ÉÂÒÉÒÕÀÝÅÊ ÜÎÅÒÇÉÉ ÏËÒÕÖÁÅÔ $C4, ÚÁÓÔÁ×ÌÑÑ $S ÒÅÚÏÎÉÒÏ×ÁÔØ.",
+    act_p("Ð¦Ð¸Ð»Ð¸Ð½Ð´Ñ€ Ð²Ð¸Ð±Ñ€Ð¸Ñ€ÑƒÑŽÑ‰ÐµÐ¹ ÑÐ½ÐµÑ€Ð³Ð¸Ð¸ Ð¾ÐºÑ€ÑƒÐ¶Ð°ÐµÑ‚ $C4, Ð·Ð°ÑÑ‚Ð°Ð²Ð»ÑÑ $S Ñ€ÐµÐ·Ð¾Ð½Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ.",
 		ch,0,victim,TO_NOTVICT,POS_RESTING);
     victim->setWait( skill->getBeats( )  );
     damage( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
@@ -696,7 +696,7 @@ VOID_SPELL(SpectralFuror)::run( Character *ch, Character *victim, int sn, int le
     if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
 	dam /= 2;
 
-    act("ëÏÓÍÉÞÅÓËÁÑ ÍÁÔÅÒÉÑ ÑÒÏÓÔÎÏ ÉÓËÁÖÁÅÔÓÑ ×ÏËÒÕÇ $C2!", ch,0,victim,TO_NOTVICT);
+    act("ÐšÐ¾ÑÐ¼Ð¸Ñ‡ÐµÑÐºÐ°Ñ Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ñ ÑÑ€Ð¾ÑÑ‚Ð½Ð¾ Ð¸ÑÐºÐ°Ð¶Ð°ÐµÑ‚ÑÑ Ð²Ð¾ÐºÑ€ÑƒÐ³ $C2!", ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
 
@@ -711,7 +711,7 @@ VOID_SPELL(SulfurusSpray)::run( Character *ch, Character *victim, int sn, int le
     dam = dice( level, 7 );
     if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
 	dam /= 2;
-    act("÷ÏÎÀÞÁÑ ÓÔÒÕÑ ÓÅÒÎÏÊ ÖÉÄËÏÓÔÉ ÎÉÚ×ÅÒÇÁÅÔÓÑ ÄÏÖÄÅÍ ÎÁ $C4.",
+    act("Ð’Ð¾Ð½ÑŽÑ‡Ð°Ñ ÑÑ‚Ñ€ÑƒÑ ÑÐµÑ€Ð½Ð¾Ð¹ Ð¶Ð¸Ð´ÐºÐ¾ÑÑ‚Ð¸ Ð½Ð¸Ð·Ð²ÐµÑ€Ð³Ð°ÐµÑ‚ÑÑ Ð´Ð¾Ð¶Ð´ÐµÐ¼ Ð½Ð° $C4.",
            ch,0,victim,TO_NOTVICT);
     damage( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
     return;
@@ -749,9 +749,9 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
     Character *vch_next;
     int dam,hp_dam,dice_dam,hpch;
 
-    act_p("$c1 ÐÒÉÚÙ×ÁÅÔ ÐÏ×ÅÌÉÔÅÌÑ ÕÒÁÇÁÎÏ× ÎÁ ÐÏÍÏÝØ.",
+    act_p("$c1 Ð¿Ñ€Ð¸Ð·Ñ‹Ð²Ð°ÐµÑ‚ Ð¿Ð¾Ð²ÐµÐ»Ð¸Ñ‚ÐµÐ»Ñ ÑƒÑ€Ð°Ð³Ð°Ð½Ð¾Ð² Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.",
            ch,0,0,TO_NOTVICT,POS_RESTING);
-    act_p("ôÙ ÐÒÉÚÙ×ÁÅÛØ ÐÏ×ÅÌÉÔÅÌÑ ÕÒÁÇÁÎÏ× ÎÁ ÐÏÍÏÝØ.",
+    act_p("Ð¢Ñ‹ Ð¿Ñ€Ð¸Ð·Ñ‹Ð²Ð°ÐµÑˆÑŒ Ð¿Ð¾Ð²ÐµÐ»Ð¸Ñ‚ÐµÐ»Ñ ÑƒÑ€Ð°Ð³Ð°Ð½Ð¾Ð² Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ.",
            ch,0,0,TO_CHAR,POS_RESTING);
 
     hpch = max(16,(int)ch->hit);

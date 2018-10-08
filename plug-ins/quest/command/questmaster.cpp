@@ -22,7 +22,7 @@ bool QuestMaster::specIdle( )
     if (chance(99))
 	return false;
 
-    interpret_raw(ch, "say", "Хочешь получить интересное задание???");
+    interpret_raw(ch, "say", "п╔п╬я┤п╣я┬я▄ п©п╬п╩я┐я┤п╦я┌я▄ п╦п╫я┌п╣я─п╣я│п╫п╬п╣ п╥п╟п╢п╟п╫п╦п╣???");
     return true;
 }
 

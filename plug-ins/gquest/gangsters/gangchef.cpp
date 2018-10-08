@@ -26,7 +26,7 @@ bool GangChef::death( Character *killer )
     log("GangChef: killed by " << killer->getNameP( ));
 
     if (!gquest->isLevelOK( killer )) {
-	act_p("Ну даешь! Как ты сюда вообще попал?", killer, 0, 0, TO_CHAR, POS_RESTING);
+	act_p("п²я┐ п╢п╟п╣я┬я▄! п п╟п╨ я┌я▀ я│я▌п╢п╟ п╡п╬п╬п╠я┴п╣ п©п╬п©п╟п╩?", killer, 0, 0, TO_CHAR, POS_RESTING);
 	LogStream::sendNotice( ) << "BAD guy in the Lair: " << killer->getNameP( ) 
 				 << " lvl " << killer->getModifyLevel( ) << endl;
 
@@ -45,7 +45,7 @@ void GangChef::greet( Character *mob )
     Gangsters *gquest = Gangsters::getThis( );
 
     if (!gquest->isLevelOK( gquest->getActor( mob ) )) {
-	act_p("$c1 вопит '{RВОН ОТСЮДА!{x'", ch, 0, mob, TO_VICT, POS_RESTING);
+	act_p("$c1 п╡п╬п©п╦я┌ '{Rп▓п·п² п·п╒п║п╝п■п░!{x'", ch, 0, mob, TO_VICT, POS_RESTING);
 	gquest->exorcism( mob );
 	return;
     }
@@ -60,7 +60,7 @@ void GangChef::greet( Character *mob )
 	return;
     
     if (!ch->fighting)
-	act_p("$c1 тушит сигару о ладонь одного из гангстеров и выхватывает кинжал.",
+	act_p("$c1 я┌я┐я┬п╦я┌ я│п╦пЁп╟я─я┐ п╬ п╩п╟п╢п╬п╫я▄ п╬п╢п╫п╬пЁп╬ п╦п╥ пЁп╟п╫пЁя│я┌п╣я─п╬п╡ п╦ п╡я▀я┘п╡п╟я┌я▀п╡п╟п╣я┌ п╨п╦п╫п╤п╟п╩.",
 	       ch, 0, mob, TO_ROOM, POS_RESTING);
 
     /* force guest to begin the fight */

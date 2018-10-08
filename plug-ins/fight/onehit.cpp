@@ -145,9 +145,9 @@ bool OneHit::diceroll()
 bool OneHit::checkShadow( )
 {
     if (SHADOW(ch)) {
-	msgFightChar( "Ты со всей дури лупишь свою тень." );
-	msgFightVict( "%1$^C1 со всей дури лупит свою тень." );
-	msgFightRoom( "%1$^C1 со всей дури лупит свою тень." );
+	msgFightChar( "п╒я▀ я│п╬ п╡я│п╣п╧ п╢я┐я─п╦ п╩я┐п©п╦я┬я▄ я│п╡п╬я▌ я┌п╣п╫я▄." );
+	msgFightVict( "%1$^C1 я│п╬ п╡я│п╣п╧ п╢я┐я─п╦ п╩я┐п©п╦я┌ я│п╡п╬я▌ я┌п╣п╫я▄." );
+	msgFightRoom( "%1$^C1 я│п╬ п╡я│п╣п╧ п╢я┐я─п╦ п╩я┐п©п╦я┌ я│п╡п╬я▌ я┌п╣п╫я▄." );
 	return true;
     }
     return false;

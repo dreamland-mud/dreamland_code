@@ -7,7 +7,7 @@
 #include "descriptor.h"
 #include "character.h"
 
-const char *MSG_HIT_RET       = "\r[Нажмите Return для продолжения]\n\r";
+const char *MSG_HIT_RET       = "\r[п²п╟п╤п╪п╦я┌п╣ Return п╢п╩я▐ п©я─п╬п╢п╬п╩п╤п╣п╫п╦я▐]\n\r";
 
 PagerHandler::PagerHandler()
 {

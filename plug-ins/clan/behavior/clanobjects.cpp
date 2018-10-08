@@ -91,15 +91,15 @@ bool ClanItem::area( )
 
 void ClanItem::actDisappear( )
 {
-    act( "$o1 загадочным образом исчезает.", 
+    act( "$o1 п╥п╟пЁп╟п╢п╬я┤п╫я▀п╪ п╬п╠я─п╟п╥п╬п╪ п╦я│я┤п╣п╥п╟п╣я┌.", 
          obj->getRoom( )->people, obj, 0, TO_ALL );
 }
 
 void ClanItem::get( Character *ch ) 
 { 
     if (ch->is_npc()) {
-	ch->pecho("Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj);
-	ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
+	ch->pecho("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╩п╟п╢п╣я┌я▄ %1$O5 п╦ п╠я─п╬я│п╟п╣я┬я▄ %1$P2.", obj);
+	ch->recho("%2$^C1 п╫п╣ п╪п╬п╤п╣я┌ п╡п╩п╟п╢п╣я┌я▄ %1$O5 п╦ п╠я─п╬я│п╟п╣я┌ %1$P2.", obj, ch);
 	obj_from_char(obj);
 	obj_to_room(obj, ch->in_room);
 	return;
@@ -113,7 +113,7 @@ void ClanItem::give( Character *from, Character *mob )
 
 bool ClanItem::sac( Character *ch ) 
 { 
-    act("{RБОГИ В ГНЕВЕ!{x",ch,0,0,TO_ALL);
+    act("{Rп▒п·п⌠п≤ п▓ п⌠п²п∙п▓п∙!{x",ch,0,0,TO_ALL);
 
     rawdamage( ch, ch, DAM_HOLY, ch->hit - 10, true );
     ch->gold = 0;
@@ -166,19 +166,19 @@ bool ClanAltar::fetch( Character *ch, Object *item )
 
 void ClanAltar::actAppear( )
 {
-    act( "Ты видишь, как медленно появляется $o1.", 
+    act( "п╒я▀ п╡п╦п╢п╦я┬я▄, п╨п╟п╨ п╪п╣п╢п╩п╣п╫п╫п╬ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ $o1.", 
 	 obj->in_room->people, obj, 0, TO_ALL );
 }
 
 void ClanAltar::actDisappear( )
 {
-    act( "$o1 растворяется и исчезает!", 
+    act( "$o1 я─п╟я│я┌п╡п╬я─я▐п╣я┌я│я▐ п╦ п╦я│я┤п╣п╥п╟п╣я┌!", 
          obj->getRoom( )->people, obj, NULL, TO_ALL );
 }
 
 void ClanAltar::actNotify( Character *ch )
 {
-    act_p( "{gТы вздрагиваешь от осознания Силы своего Клана!{x", 
+    act_p( "{gп╒я▀ п╡п╥п╢я─п╟пЁп╦п╡п╟п╣я┬я▄ п╬я┌ п╬я│п╬п╥п╫п╟п╫п╦я▐ п║п╦п╩я▀ я│п╡п╬п╣пЁп╬ п п╩п╟п╫п╟!{x", 
 	    ch, 0, 0, TO_CHAR, POS_DEAD );
 }
 

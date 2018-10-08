@@ -33,11 +33,11 @@ COMMAND(MKey, "mkey")
     }
     
     if (ch->is_immortal( )) {
-	if (arg_oneof( cmd, "give", "grant", "дать" )) {
+	if (arg_oneof( cmd, "give", "grant", "п╢п╟я┌я▄" )) {
 	    doGrant( ch, arguments );
 	    return;
 	}
-	else if (arg_oneof( cmd, "remove", "забрать" )) {
+	else if (arg_oneof( cmd, "remove", "п╥п╟п╠я─п╟я┌я▄" )) {
 	    doRemove( ch, arguments );
 	    return;
 	}
@@ -47,18 +47,18 @@ COMMAND(MKey, "mkey")
 	}
     }
     
-    if (arg_is_list( cmd ) || arg_oneof( cmd, "buy", "купить" )) {
+    if (arg_is_list( cmd ) || arg_oneof( cmd, "buy", "п╨я┐п©п╦я┌я▄" )) {
 	MansionKeyMaker::Pointer maker;
 
 	maker = find_people_behavior<MansionKeyMaker>( ch->in_room );
 
 	if (!maker) {
-	    ch->send_to( "Здесь нет ключника.\r\n" );
+	    ch->send_to( "п≈п╢п╣я│я▄ п╫п╣я┌ п╨п╩я▌я┤п╫п╦п╨п╟.\r\n" );
 	    return;
 	}
 
 	if (ch->is_npc( )) {
-	    ch->send_to( "Ты бездомное.\r\n" );
+	    ch->send_to( "п╒я▀ п╠п╣п╥п╢п╬п╪п╫п╬п╣.\r\n" );
 	    return;
 	}
 	
@@ -87,12 +87,12 @@ void MKey::doRemove( Character *ch, DLString &arguments )
     try {
 	vnum = arguments.getOneArgument( ).toInt( );
     } catch (const ExceptionBadType& e) {
-	ch->send_to( "Неправильный vnum ключа.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ vnum п╨п╩я▌я┤п╟.\r\n" );
 	return;
     }
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-	ch->send_to( "Неправильное имя.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╦п╪я▐.\r\n" );
 	return;
     }
     
@@ -108,7 +108,7 @@ void MKey::doRemove( Character *ch, DLString &arguments )
 	    return;
 	}
     
-    ch->send_to( "Такой ключ не найден.\r\n" );
+    ch->send_to( "п╒п╟п╨п╬п╧ п╨п╩я▌я┤ п╫п╣ п╫п╟п╧п╢п╣п╫.\r\n" );
 }
 
 void MKey::doGrant( Character *ch, DLString &arguments ) 
@@ -130,12 +130,12 @@ void MKey::doGrant( Character *ch, DLString &arguments )
     }
 
     if (get_obj_index( vnum ) == 0) {
-	ch->send_to( "Такого ключа не существует.\r\n" );
+	ch->send_to( "п╒п╟п╨п╬пЁп╬ п╨п╩я▌я┤п╟ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌.\r\n" );
 	return;
     }
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-	ch->send_to( "Неправильное имя.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╦п╪я▐.\r\n" );
 	return;
     }
     
@@ -145,7 +145,7 @@ void MKey::doGrant( Character *ch, DLString &arguments )
 
     for (i = attr->keys.begin( ); i != attr->keys.end( ); i++)
 	if (i->getValue( ) == vnum) {
-	    ch->send_to( "Такой ключ у него уже есть.\r\n" );
+	    ch->send_to( "п╒п╟п╨п╬п╧ п╨п╩я▌я┤ я┐ п╫п╣пЁп╬ я┐п╤п╣ п╣я│я┌я▄.\r\n" );
 	    return;
 	}
     
@@ -163,7 +163,7 @@ void MKey::doShow( Character *ch, DLString &arguments )
     DLString name = arguments.getOneArgument( );
 
     if ( (pci = PCharacterManager::find( name )) == 0) {
-	ch->send_to( "Неправильное имя.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╦п╪я▐.\r\n" );
 	return;
     }
     
@@ -171,11 +171,11 @@ void MKey::doShow( Character *ch, DLString &arguments )
     attr = attributes->findAttr<XMLAttributeMansionKey>( "mkey" );
 
     if (!attr) {
-	ch->send_to( "Ключей не найдено.\r\n" );
+	ch->send_to( "п п╩я▌я┤п╣п╧ п╫п╣ п╫п╟п╧п╢п╣п╫п╬.\r\n" );
 	return;
     }
 
-    ch->printf( "%s владеет такими ключами: \r\n", pci->getName( ).c_str( ) );
+    ch->printf( "%s п╡п╩п╟п╢п╣п╣я┌ я┌п╟п╨п╦п╪п╦ п╨п╩я▌я┤п╟п╪п╦: \r\n", pci->getName( ).c_str( ) );
 
     for (i = attr->keys.begin( ); i != attr->keys.end( ); i++) {
 	int vnum = i->getValue( );
@@ -198,18 +198,18 @@ void MKey::usage( Character *ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "{W{lRключи список{lEmkey list{lx{w" << endl
-        << "     - показать список твоих ключей" << endl
-        << "{W{lRключи купить{lEmkey buy{lx{w <имя ключа>" << endl
-	<< "     - приобрести ключ" << endl;
+    buf << "{W{lRп╨п╩я▌я┤п╦ я│п©п╦я│п╬п╨{lEmkey list{lx{w" << endl
+        << "     - п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ я┌п╡п╬п╦я┘ п╨п╩я▌я┤п╣п╧" << endl
+        << "{W{lRп╨п╩я▌я┤п╦ п╨я┐п©п╦я┌я▄{lEmkey buy{lx{w <п╦п╪я▐ п╨п╩я▌я┤п╟>" << endl
+	<< "     - п©я─п╦п╬п╠я─п╣я│я┌п╦ п╨п╩я▌я┤" << endl;
     
     if (ch->is_immortal( )) 
-	buf << "{W{lRключи показать{lEmkey show{lx{w <victim>" << endl
-	    << "     - показать список ключей жертвы" << endl
-	    << "{W{lRключи дать{lEmkey give{lx{w <victim> <key vnum>" << endl
-	    << "     - дать ключ с заданным внумом жертве" << endl
-	    << "{W{lRключи забрать{lEmkey remove{lx{w <victim> <key vnum>" << endl
-	    << "     - забрать ключ" << endl;
+	buf << "{W{lRп╨п╩я▌я┤п╦ п©п╬п╨п╟п╥п╟я┌я▄{lEmkey show{lx{w <victim>" << endl
+	    << "     - п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ п╨п╩я▌я┤п╣п╧ п╤п╣я─я┌п╡я▀" << endl
+	    << "{W{lRп╨п╩я▌я┤п╦ п╢п╟я┌я▄{lEmkey give{lx{w <victim> <key vnum>" << endl
+	    << "     - п╢п╟я┌я▄ п╨п╩я▌я┤ я│ п╥п╟п╢п╟п╫п╫я▀п╪ п╡п╫я┐п╪п╬п╪ п╤п╣я─я┌п╡п╣" << endl
+	    << "{W{lRп╨п╩я▌я┤п╦ п╥п╟п╠я─п╟я┌я▄{lEmkey remove{lx{w <victim> <key vnum>" << endl
+	    << "     - п╥п╟п╠я─п╟я┌я▄ п╨п╩я▌я┤" << endl;
 
     ch->send_to( buf );
 }
@@ -244,18 +244,18 @@ void MansionKeyMaker::toStream( Character *client, ostringstream &buf )
 
 void MansionKeyMaker::msgListEmpty( Character *client ) 
 {
-    say_act( client, getKeeper( ), "У тебя нет ключей ни от какого дома." );
+    say_act( client, getKeeper( ), "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╣п╧ п╫п╦ п╬я┌ п╨п╟п╨п╬пЁп╬ п╢п╬п╪п╟." );
 }
 
 void MansionKeyMaker::msgListBefore( Character *client ) 
 {
-    tell_dim( client, getKeeper( ), "Я могу изготовить для тебя такие ключи: " );
+    tell_dim( client, getKeeper( ), "п╞ п╪п╬пЁя┐ п╦п╥пЁп╬я┌п╬п╡п╦я┌я▄ п╢п╩я▐ я┌п╣п╠я▐ я┌п╟п╨п╦п╣ п╨п╩я▌я┤п╦: " );
 }
 
 void MansionKeyMaker::msgListAfter( Character *client ) 
 {
     client->send_to( "\r\n" );
-    tell_dim( client, getKeeper( ), "За свою работу я потребую $n4.", price->toString( client ).c_str( ) );
+    tell_dim( client, getKeeper( ), "п≈п╟ я│п╡п╬я▌ я─п╟п╠п╬я┌я┐ я▐ п©п╬я┌я─п╣п╠я┐я▌ $n4.", price->toString( client ).c_str( ) );
 }
 
 void MansionKeyMaker::msgArticleNotFound( Character *client ) 
@@ -269,8 +269,8 @@ bool MansionKeyMaker::canServeClient( Character * )
 
 void MansionKeyMaker::msgListRequest( Character *client )
 {
-    act( "$c1 просит $C4 показать список ключей.", client, 0, getKeeper( ), TO_ROOM );
-    act( "Ты просишь у $C4 показать список ключей.", client, 0, getKeeper( ), TO_CHAR );
+    act( "$c1 п©я─п╬я│п╦я┌ $C4 п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ п╨п╩я▌я┤п╣п╧.", client, 0, getKeeper( ), TO_ROOM );
+    act( "п╒я▀ п©я─п╬я│п╦я┬я▄ я┐ $C4 п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ п╨п╩я▌я┤п╣п╧.", client, 0, getKeeper( ), TO_CHAR );
 }
 
 void MansionKeyMaker::msgBuyRequest( Character *client )
@@ -307,12 +307,12 @@ int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg )
     attr = client->getAttributes( ).findAttr<XMLAttributeMansionKey>( "mkey" );
 
     if (!attr || attr->keys.empty( )) {
-	tell_act( client, getKeeper( ), "Извини, $c1, но тебе не принадлежит ни одного ключа. " );
+	tell_act( client, getKeeper( ), "п≤п╥п╡п╦п╫п╦, $c1, п╫п╬ я┌п╣п╠п╣ п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ п╫п╦ п╬п╢п╫п╬пЁп╬ п╨п╩я▌я┤п╟. " );
 	return 0;
     }
 
     if (arg.empty( )) {
-	tell_act( client, getKeeper( ), "Какой именно ключ ты хочешь купить?" );
+	tell_act( client, getKeeper( ), "п п╟п╨п╬п╧ п╦п╪п╣п╫п╫п╬ п╨п╩я▌я┤ я┌я▀ я┘п╬я┤п╣я┬я▄ п╨я┐п©п╦я┌я▄?" );
 	return 0;
     }
 
@@ -328,7 +328,7 @@ int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg )
 	return i->getValue( );
     }
 
-    tell_act( client, getKeeper( ), "Извини, $c1, но тебе не принадлежит ключ с таким именем." );
+    tell_act( client, getKeeper( ), "п≤п╥п╡п╦п╫п╦, $c1, п╫п╬ я┌п╣п╠п╣ п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ п╨п╩я▌я┤ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪." );
     return 0;
 }
 
@@ -341,7 +341,7 @@ void MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
     
     if (!price->canAfford( client )) {
 	tell_act( client, maker, 
-	          "У тебя недостаточно $n2, чтобы оплатить мою работу, $c1.", 
+	          "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ $n2, я┤я┌п╬п╠я▀ п╬п©п╩п╟я┌п╦я┌я▄ п╪п╬я▌ я─п╟п╠п╬я┌я┐, $c1.", 
 	          price->toCurrency( ).c_str( ) );
 	return;
     }
@@ -350,8 +350,8 @@ void MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
     key = create_object( get_obj_index( vnum ), 1 );
     obj_to_char( key, client );
 
-    act( "$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
-    act( "$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
+    act( "$C1 п╡я─я┐я┤п╟п╣я┌ я┌п╣п╠п╣ $o4.", client, key, maker, TO_CHAR );
+    act( "$C1 п╡я─я┐я┤п╟п╣я┌ $c3 $o4." , client, key, maker, TO_ROOM );
 }
 
 bool MansionKeyArticle::available( Character *client, NPCharacter *maker ) const

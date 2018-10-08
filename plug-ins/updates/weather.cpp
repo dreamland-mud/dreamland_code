@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "weather.h"
 
@@ -32,10 +32,10 @@
 PROF(vampire);
 
 const char * sunlight_ru [4] = {
-    "темно",
-    "светает",
-    "светло",
-    "сумерки"
+    "я┌п╣п╪п╫п╬",
+    "я│п╡п╣я┌п╟п╣я┌",
+    "я│п╡п╣я┌п╩п╬",
+    "я│я┐п╪п╣я─п╨п╦"
 };    
 const char * sunlight_en [4] = {
     "dark",
@@ -52,23 +52,23 @@ struct month_info {
 };
 
 const struct month_info month_table [17] = {
-  { "Зимы",		   -12,    7, 17 },
-  { "Зимнего Волка",	   -14,    7, 18 },
-  { "Холодного Гиганта",   -14,    7, 18 },
-  { "Древних Воинств",	   -12,    7, 19 },   /* весна */
-  { "Великих Битв",	   -8,     6, 19 },
-  { "Весны",		   -4,     5, 19 }, 
-  { "Природы",		   0,      5, 21 },
-  { "Тщетности",	   4,      5, 22 },   /* лето */
-  { "Дракона",		   8,      4, 22 },
-  { "Солнца",		   12,     4, 22 },
-  { "Жары",		   16,     5, 21 },    
-  { "Битвы",		   12,     5, 20 },   /* осень */
-  { "Темноты",		   8,      6, 20 },
-  { "Тени",		   4,      6, 19 },
-  { "Длинных Теней",	   0,      7, 18 },         
-  { "Абсолютной Темноты",  -4,     8, 17 },   /* зима */
-  { "Великого Зла",	   -8,     8, 17 },
+  { "п≈п╦п╪я▀",		   -12,    7, 17 },
+  { "п≈п╦п╪п╫п╣пЁп╬ п▓п╬п╩п╨п╟",	   -14,    7, 18 },
+  { "п╔п╬п╩п╬п╢п╫п╬пЁп╬ п⌠п╦пЁп╟п╫я┌п╟",   -14,    7, 18 },
+  { "п■я─п╣п╡п╫п╦я┘ п▓п╬п╦п╫я│я┌п╡",	   -12,    7, 19 },   /* п╡п╣я│п╫п╟ */
+  { "п▓п╣п╩п╦п╨п╦я┘ п▒п╦я┌п╡",	   -8,     6, 19 },
+  { "п▓п╣я│п╫я▀",		   -4,     5, 19 }, 
+  { "п÷я─п╦я─п╬п╢я▀",		   0,      5, 21 },
+  { "п╒я┴п╣я┌п╫п╬я│я┌п╦",	   4,      5, 22 },   /* п╩п╣я┌п╬ */
+  { "п■я─п╟п╨п╬п╫п╟",		   8,      4, 22 },
+  { "п║п╬п╩п╫я├п╟",		   12,     4, 22 },
+  { "п√п╟я─я▀",		   16,     5, 21 },    
+  { "п▒п╦я┌п╡я▀",		   12,     5, 20 },   /* п╬я│п╣п╫я▄ */
+  { "п╒п╣п╪п╫п╬я┌я▀",		   8,      6, 20 },
+  { "п╒п╣п╫п╦",		   4,      6, 19 },
+  { "п■п╩п╦п╫п╫я▀я┘ п╒п╣п╫п╣п╧",	   0,      7, 18 },         
+  { "п░п╠я│п╬п╩я▌я┌п╫п╬п╧ п╒п╣п╪п╫п╬я┌я▀",  -4,     8, 17 },   /* п╥п╦п╪п╟ */
+  { "п▓п╣п╩п╦п╨п╬пЁп╬ п≈п╩п╟",	   -8,     8, 17 },
 };
 
 void mmhg_update()
@@ -116,19 +116,19 @@ void sunlight_update( )
 
     if (time_info.hour == month_table[time_info.month].sunrise) {
         weather_info.sunlight = SUN_RISE;
-	buf << "Первые лучи солнца пробиваются с востока." << endl;
+	buf << "п÷п╣я─п╡я▀п╣ п╩я┐я┤п╦ я│п╬п╩п╫я├п╟ п©я─п╬п╠п╦п╡п╟я▌я┌я│я▐ я│ п╡п╬я│я┌п╬п╨п╟." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunrise + 1) {
         weather_info.sunlight = SUN_LIGHT;
-        buf << "Начался новый день." << endl;
+        buf << "п²п╟я┤п╟п╩я│я▐ п╫п╬п╡я▀п╧ п╢п╣п╫я▄." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset) {
         weather_info.sunlight = SUN_SET;
-	buf << "Солнце медленно прячется за горизонтом." << endl;
+	buf << "п║п╬п╩п╫я├п╣ п╪п╣п╢п╩п╣п╫п╫п╬ п©я─я▐я┤п╣я┌я│я▐ п╥п╟ пЁп╬я─п╦п╥п╬п╫я┌п╬п╪." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset + 1) {
         weather_info.sunlight = SUN_DARK;
-	buf << "Начинается ночь." << endl;
+	buf << "п²п╟я┤п╦п╫п╟п╣я┌я│я▐ п╫п╬я┤я▄." << endl;
     }
     
     if (time_info.hour == 24) {
@@ -206,7 +206,7 @@ void weather_update( )
         if ( weather_info.mmhg <  990
                 || ( weather_info.mmhg < 1010 && number_bits( 2 ) == 0 ) )
         {
-	    buf << "Небо затягивается тучами." << endl;
+	    buf << "п²п╣п╠п╬ п╥п╟я┌я▐пЁп╦п╡п╟п╣я┌я│я▐ я┌я┐я┤п╟п╪п╦." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -215,13 +215,13 @@ void weather_update( )
         if ( weather_info.mmhg <  970
                 || ( weather_info.mmhg <  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Начинается дождь." << endl;
+            buf << "п²п╟я┤п╦п╫п╟п╣я┌я│я▐ п╢п╬п╤п╢я▄." << endl;
             weather_info.sky = SKY_RAINING;
         }
 
         if ( weather_info.mmhg > 1030 && number_bits( 2 ) == 0 )
         {
-            buf << "Тучи рассеиваются." << endl;
+            buf << "п╒я┐я┤п╦ я─п╟я│я│п╣п╦п╡п╟я▌я┌я│я▐." << endl;
             weather_info.sky = SKY_CLOUDLESS;
         }
         break;
@@ -229,14 +229,14 @@ void weather_update( )
     case SKY_RAINING:
         if ( weather_info.mmhg <  970 && number_bits( 2 ) == 0 )
         {
-            buf << "Молнии сверкают на небе." << endl;
+            buf << "п°п╬п╩п╫п╦п╦ я│п╡п╣я─п╨п╟я▌я┌ п╫п╟ п╫п╣п╠п╣." << endl;
             weather_info.sky = SKY_LIGHTNING;
         }
 
         if ( weather_info.mmhg > 1030
                 || ( weather_info.mmhg > 1010 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Дождь прекращается." << endl;
+            buf << "п■п╬п╤п╢я▄ п©я─п╣п╨я─п╟я┴п╟п╣я┌я│я▐." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -245,7 +245,7 @@ void weather_update( )
         if ( weather_info.mmhg > 1010
                 || ( weather_info.mmhg >  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Молний больше нет." << endl;
+            buf << "п°п╬п╩п╫п╦п╧ п╠п╬п╩я▄я┬п╣ п╫п╣я┌." << endl;
             weather_info.sky = SKY_RAINING;
             break;
         }
@@ -276,15 +276,15 @@ void weather_update( )
 
 const char *	const	day_name	[] =
 {
-    "Луны", "Быка", "Лжи", "Грома", "Свободы",
-    "Великих Богов", "Солнца"
+    "п⌡я┐п╫я▀", "п▒я▀п╨п╟", "п⌡п╤п╦", "п⌠я─п╬п╪п╟", "п║п╡п╬п╠п╬п╢я▀",
+    "п▓п╣п╩п╦п╨п╦я┘ п▒п╬пЁп╬п╡", "п║п╬п╩п╫я├п╟"
 };
 
 static const char * adjective_ext(int d) 
 {
-    static const char * EXT_ONE = "ый";
-    static const char * EXT_TWO = "ой";
-    static const char * EXT_THREE = "ий";
+    static const char * EXT_ONE = "я▀п╧";
+    static const char * EXT_TWO = "п╬п╧";
+    static const char * EXT_THREE = "п╦п╧";
     
     switch (d % 10) {
     case 0: 
@@ -301,13 +301,13 @@ static const char * adjective_ext(int d)
 DLString time_of_day( )
 {
     if ((time_info.hour > 16) && (time_info.hour < 24)) 
-        return "вечера";
+        return "п╡п╣я┤п╣я─п╟";
     if (time_info.hour < 4) 
-        return "ночи";
+        return "п╫п╬я┤п╦";
     if ((time_info.hour > 3) && (time_info.hour < 12)) 
-        return "утра";
+        return "я┐я┌я─п╟";
     if ((time_info.hour > 11) && (time_info.hour < 17)) 
-        return "дня";
+        return "п╢п╫я▐";
     return DLString::emptyString;
 }
 
@@ -327,9 +327,9 @@ void make_date( ostringstream &buf )
     const char * suf = adjective_ext( day );
     
     buf << hour_of_day( ) << " " << time_of_day( ) << ", " 
-	<< "День: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
-	<< "Месяц " << calendar_month( ) << ", "
-	<< "Год " << time_info.year << "." << endl;
+	<< "п■п╣п╫я▄: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
+	<< "п°п╣я│я▐я├ " << calendar_month( ) << ", "
+	<< "п⌠п╬п╢ " << time_info.year << "." << endl;
 }
 
 CMDRUN( time )
@@ -337,22 +337,22 @@ CMDRUN( time )
     ostringstream buf;
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
-	ch->println( "Похоже, в этом месте время остановило свой ход." );
+	ch->println( "п÷п╬я┘п╬п╤п╣, п╡ я█я┌п╬п╪ п╪п╣я│я┌п╣ п╡я─п╣п╪я▐ п╬я│я┌п╟п╫п╬п╡п╦п╩п╬ я│п╡п╬п╧ я┘п╬п╢." );
 	return;
     }
 
-    buf << "Сейчас: ";
+    buf << "п║п╣п╧я┤п╟я│: ";
     make_date( buf );
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
     {
-	buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
+	buf <<  "п▓я─п╣п╪я▐ {rя┐п╠п╦п╡п╟я┌я▄{x, {Dя│п╬п╥п╢п╟п╫п╦п╣ п╫п╬я┤п╦{x!" << endl;
     }
 
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-	ch->printf( "Dream Land загружен %s\r\nСистемное время: %s\r\n",
+	ch->printf( "Dream Land п╥п╟пЁя─я┐п╤п╣п╫ %s\r\nп║п╦я│я┌п╣п╪п╫п╬п╣ п╡я─п╣п╪я▐: %s\r\n",
 	            Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
 	            Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
@@ -361,28 +361,28 @@ CMDRUN( weather )
 {
     static const char * const sky_look[4] =
     {
-	"ясное",
-	"облачное",
-	"дождливое",
-	"во вспышках молний"
+	"я▐я│п╫п╬п╣",
+	"п╬п╠п╩п╟я┤п╫п╬п╣",
+	"п╢п╬п╤п╢п╩п╦п╡п╬п╣",
+	"п╡п╬ п╡я│п©я▀я┬п╨п╟я┘ п╪п╬п╩п╫п╦п╧"
     };
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
-	ch->println( "Похоже, в этом месте погода всегда одинаковая." );
+	ch->println( "п÷п╬я┘п╬п╤п╣, п╡ я█я┌п╬п╪ п╪п╣я│я┌п╣ п©п╬пЁп╬п╢п╟ п╡я│п╣пЁп╢п╟ п╬п╢п╦п╫п╟п╨п╬п╡п╟я▐." );
 	return;
     }
     
     if ( !IS_OUTSIDE(ch) )
     {
-	ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
+	ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╦п╢п╣я┌я▄ п©п╬пЁп╬п╢я┐ п╡ п©п╬п╪п╣я┴п╣п╫п╦п╦.\n\r");
 	return;
     }
 
-    ch->printf( "Небо %s и %s.\n\r",
+    ch->printf( "п²п╣п╠п╬ %s п╦ %s.\n\r",
 	sky_look[weather_info.sky],
 	weather_info.change >= 0
-	? "дует теплый южный ветер"
-	: "дует холодный северный ветер"
+	? "п╢я┐п╣я┌ я┌п╣п©п╩я▀п╧ я▌п╤п╫я▀п╧ п╡п╣я┌п╣я─"
+	: "п╢я┐п╣я┌ я┘п╬п╩п╬п╢п╫я▀п╧ я│п╣п╡п╣я─п╫я▀п╧ п╡п╣я┌п╣я─"
 	);
 }
 

@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 
@@ -42,10 +42,10 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
     
     int dam,hp_dam,dice_dam,hpch;
 
-    act_p("$c1 ÂÒÙÚÇÁÅÔ ËÉÓÌÏÔÏÊ ÎÁ $C4.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-    act_p("$c1 ÂÒÙÚÇÁÅÔ ÓÔÒÕÅÊ ÅÄËÏÊ ËÉÓÌÏÔÙ ÎÁ ÔÅÂÑ.",
+    act_p("$c1 Ð±Ñ€Ñ‹Ð·Ð³Ð°ÐµÑ‚ ÐºÐ¸ÑÐ»Ð¾Ñ‚Ð¾Ð¹ Ð½Ð° $C4.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("$c1 Ð±Ñ€Ñ‹Ð·Ð³Ð°ÐµÑ‚ ÑÑ‚Ñ€ÑƒÐµÐ¹ ÐµÐ´ÐºÐ¾Ð¹ ÐºÐ¸ÑÐ»Ð¾Ñ‚Ñ‹ Ð½Ð° Ñ‚ÐµÐ±Ñ.",
            ch,0,victim,TO_VICT,POS_RESTING);
-    act_p("ôÙ ÂÒÙÚÇÁÅÛØ ËÉÓÌÏÔÏÊ ÎÁ $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("Ð¢Ñ‹ Ð±Ñ€Ñ‹Ð·Ð³Ð°ÐµÑˆÑŒ ÐºÐ¸ÑÐ»Ð¾Ñ‚Ð¾Ð¹ Ð½Ð° $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
 
     hpch = max(12,(int)ch->hit);
     hp_dam = number_range(hpch/11 + 1, hpch/6);
@@ -91,9 +91,9 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 	int dam,hp_dam,dice_dam;
 	int hpch;
 
-	act("ôÙ ÐÒÉÚÙ×ÁÅÛØ ÎÁ ÐÏÍÏÝØ ÍÏÇÕÝÅÓÔ×ÅÎÎÕÀ ÓÉÌÕ ÄÒÁËÏÎÁ.", ch,0,0,TO_CHAR);
-	act("äÙÈÁÎÉÅ $c2 ÐÒÉÏÂÒÅÔÁÅÔ ÓÉÌÕ ÄÒÁËÏÎÁ.", ch,0,victim,TO_ROOM);
-	act("ôÙ ÄÙÛÉÛØ ÄÙÈÁÎÉÅÍ ðÏ×ÅÌÉÔÅÌÑ äÒÁËÏÎÏ×.", ch,0,0,TO_CHAR);
+	act("Ð¢Ñ‹ Ð¿Ñ€Ð¸Ð·Ñ‹Ð²Ð°ÐµÑˆÑŒ Ð½Ð° Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð¼Ð¾Ð³ÑƒÑ‰ÐµÑÑ‚Ð²ÐµÐ½Ð½ÑƒÑŽ ÑÐ¸Ð»Ñƒ Ð´Ñ€Ð°ÐºÐ¾Ð½Ð°.", ch,0,0,TO_CHAR);
+	act("Ð”Ñ‹Ñ…Ð°Ð½Ð¸Ðµ $c2 Ð¿Ñ€Ð¸Ð¾Ð±Ñ€ÐµÑ‚Ð°ÐµÑ‚ ÑÐ¸Ð»Ñƒ Ð´Ñ€Ð°ÐºÐ¾Ð½Ð°.", ch,0,victim,TO_ROOM);
+	act("Ð¢Ñ‹ Ð´Ñ‹ÑˆÐ¸ÑˆÑŒ Ð´Ñ‹Ñ…Ð°Ð½Ð¸ÐµÐ¼ ÐŸÐ¾Ð²ÐµÐ»Ð¸Ñ‚ÐµÐ»Ñ Ð”Ñ€Ð°ÐºÐ¾Ð½Ð¾Ð².", ch,0,0,TO_CHAR);
 
 	hpch = max( 10, (int)ch->hit );
 	hp_dam  = number_range( hpch/9+1, hpch/5 );
@@ -263,9 +263,9 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
     int dam,hp_dam,dice_dam;
     int hpch;
     
-    act("$c1 ×ÙÄÙÈÁÅÔ ×ÏÒÏÎËÕ ÂÕÛÕÀÝÅÇÏ ÏÇÎÑ.", ch,0,victim,TO_NOTVICT);
-    act("$c1 ×ÙÄÙÈÁÅÔ ÎÁ ÔÅÂÑ ×ÏÒÏÎËÕ ÂÕÛÕÀÝÅÇÏ ÏÇÎÑ!", ch,0,victim,TO_VICT);
-    act("ôÙ ×ÙÄÙÈÁÅÛØ ×ÏÒÏÎËÕ ÂÕÛÕÀÝÅÇÏ ÏÇÎÑ.", ch,0,0,TO_CHAR);
+    act("$c1 Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑ‚ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ Ð±ÑƒÑˆÑƒÑŽÑ‰ÐµÐ³Ð¾ Ð¾Ð³Ð½Ñ.", ch,0,victim,TO_NOTVICT);
+    act("$c1 Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑ‚ Ð½Ð° Ñ‚ÐµÐ±Ñ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ Ð±ÑƒÑˆÑƒÑŽÑ‰ÐµÐ³Ð¾ Ð¾Ð³Ð½Ñ!", ch,0,victim,TO_VICT);
+    act("Ð¢Ñ‹ Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑˆÑŒ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ Ð±ÑƒÑˆÑƒÑŽÑ‰ÐµÐ³Ð¾ Ð¾Ð³Ð½Ñ.", ch,0,0,TO_CHAR);
 
     hpch = max( 10, (int)ch->hit );
     hp_dam  = number_range( hpch/9+1, hpch/5 );
@@ -326,9 +326,9 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
     Character *vch, *vch_next;
     int dam,hp_dam,dice_dam, hpch;
     
-    act("$c1 ×ÙÄÙÈÁÅÔ ÌÅÄÅÎÑÝÕÀ ×ÏÒÏÎËÕ ÉÎÅÑ!", ch, 0, victim, TO_NOTVICT);
-    act("$c1 ×ÙÄÙÈÁÅÔ ÎÁ ÔÅÂÑ ÌÅÄÅÎÑÝÕÀ ×ÏÒÏÎËÕ ÉÎÅÑ!", ch, 0, victim, TO_VICT);
-    act("ôÙ ×ÙÄÙÈÁÅÛØ ×ÏÒÏÎËÕ ÉÎÅÑ.", ch, 0, victim, TO_CHAR);
+    act("$c1 Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑ‚ Ð»ÐµÐ´ÐµÐ½ÑÑ‰ÑƒÑŽ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ Ð¸Ð½ÐµÑ!", ch, 0, victim, TO_NOTVICT);
+    act("$c1 Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑ‚ Ð½Ð° Ñ‚ÐµÐ±Ñ Ð»ÐµÐ´ÐµÐ½ÑÑ‰ÑƒÑŽ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ Ð¸Ð½ÐµÑ!", ch, 0, victim, TO_VICT);
+    act("Ð¢Ñ‹ Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑˆÑŒ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ Ð¸Ð½ÐµÑ.", ch, 0, victim, TO_CHAR);
 
     hpch = max(12,(int)ch->hit);
     hp_dam = number_range(hpch/11 + 1, hpch/6);
@@ -390,8 +390,8 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
     Character *vch_next;
     int dam,hp_dam,dice_dam,hpch;
 
-    act("$c1 ×ÙÄÙÈÁÅÔ ×ÏÒÏÎËÕ ÑÄÏ×ÉÔÏÇÏ ÇÁÚÁ!", ch, 0, 0, TO_ROOM);
-    act("ôÙ ×ÙÄÙÈÁÅÛØ ×ÏÒÏÎËÕ ÑÄÏ×ÉÔÏÇÏ ÇÁÚÁ.", ch, 0, 0, TO_CHAR);
+    act("$c1 Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑ‚ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ ÑÐ´Ð¾Ð²Ð¸Ñ‚Ð¾Ð³Ð¾ Ð³Ð°Ð·Ð°!", ch, 0, 0, TO_ROOM);
+    act("Ð¢Ñ‹ Ð²Ñ‹Ð´Ñ‹Ñ…Ð°ÐµÑˆÑŒ Ð²Ð¾Ñ€Ð¾Ð½ÐºÑƒ ÑÐ´Ð¾Ð²Ð¸Ñ‚Ð¾Ð³Ð¾ Ð³Ð°Ð·Ð°.", ch, 0, 0, TO_CHAR);
 
     hpch = max(16,(int)ch->hit);
     hp_dam = number_range(hpch/15+1,8);
@@ -437,9 +437,9 @@ VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int 
 { 
     int dam,hp_dam,dice_dam,hpch;
 
-    act("÷ÙÄÏÈ $c2 ÕÄÁÒÑÅÔ ÐÏ $C3 ÒÁÚÒÑÄÏÍ ÍÏÌÎÉÉ.", ch, 0, victim, TO_NOTVICT);
-    act("÷ÙÄÏÈ $c2 ÕÄÁÒÑÅÔ ÐÏ ÔÅÂÅ ÒÁÚÒÑÄÏÍ ÍÏÌÎÉÉ!", ch, 0, victim, TO_VICT);
-    act("ô×ÏÊ ×ÙÄÏÈ ÕÄÁÒÑÅÔ ÐÏ $C3 ÒÁÚÒÑÄÏÍ ÍÏÌÎÉÉ.", ch, 0, victim, TO_CHAR);
+    act("Ð’Ñ‹Ð´Ð¾Ñ… $c2 ÑƒÐ´Ð°Ñ€ÑÐµÑ‚ Ð¿Ð¾ $C3 Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ Ð¼Ð¾Ð»Ð½Ð¸Ð¸.", ch, 0, victim, TO_NOTVICT);
+    act("Ð’Ñ‹Ð´Ð¾Ñ… $c2 ÑƒÐ´Ð°Ñ€ÑÐµÑ‚ Ð¿Ð¾ Ñ‚ÐµÐ±Ðµ Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ Ð¼Ð¾Ð»Ð½Ð¸Ð¸!", ch, 0, victim, TO_VICT);
+    act("Ð¢Ð²Ð¾Ð¹ Ð²Ñ‹Ð´Ð¾Ñ… ÑƒÐ´Ð°Ñ€ÑÐµÑ‚ Ð¿Ð¾ $C3 Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ Ð¼Ð¾Ð»Ð½Ð¸Ð¸.", ch, 0, victim, TO_CHAR);
 
     hpch = max(10,(int)ch->hit);
     hp_dam = number_range(hpch/9+1,hpch/5);

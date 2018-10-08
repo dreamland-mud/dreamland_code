@@ -14,7 +14,7 @@
 bool PersonalQuestReward::canEquip( Character *ch )
 {
     if (!obj->hasOwner( ch )) {
-	ch->pecho( "Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj );
+	ch->pecho( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╩п╟п╢п╣я┌я▄ %1$O5 п╦ п╠я─п╬я│п╟п╣я┬я▄ %1$P2.", obj );
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
 	return false;
@@ -31,7 +31,7 @@ void PersonalQuestReward::get( Character *ch )
     if (!canEquip( ch ))
 	return;
 
-    act_p("{BМерцающая аура окружает $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
+    act_p("{Bп°п╣я─я├п╟я▌я┴п╟я▐ п╟я┐я─п╟ п╬п╨я─я┐п╤п╟п╣я┌ $o4.\n\r{x", ch, obj, 0, TO_CHAR, POS_SLEEPING);
 }
 
 
@@ -44,7 +44,7 @@ bool PersonalQuestReward::save( ) {
     if (obj->hasOwner( ch )) 
 	return false;
     
-    act_p("$o1 исчезает!", ch, obj, 0, TO_CHAR, POS_RESTING);
+    act_p("$o1 п╦я│я┤п╣п╥п╟п╣я┌!", ch, obj, 0, TO_CHAR, POS_RESTING);
     extract_obj(obj);
     return true;
 }

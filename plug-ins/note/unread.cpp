@@ -32,7 +32,7 @@ COMMAND(Unread, "unread")
 	doSpool( pch, true );
 	doUnfinished( pch );
     }
-    else if (arg_oneof( args, "next", "следующий", "дальше" ))
+    else if (arg_oneof( args, "next", "я│п╩п╣п╢я┐я▌я┴п╦п╧", "п╢п╟п╩я▄я┬п╣" ))
 	doNext( pch );
 }
 
@@ -55,7 +55,7 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
 	ch->send_to( buf );
     }
     else if (fVerbose)
-	ch->println("У тебя нет непрочитанных сообщений.");
+	ch->println("пё я┌п╣п╠я▐ п╫п╣я┌ п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╫я▀я┘ я│п╬п╬п╠я┴п╣п╫п╦п╧.");
 }
 
 
@@ -71,7 +71,7 @@ void Unread::doUnfinished( PCharacter *ch )
 	    const DLString &threadName = i->second.getThreadName( );
 	    NoteThread::Pointer thread = NoteManager::getThis( )->findThread( threadName );
 
-	    ch->pecho("Ты не закончи%Gло|л|ла писать {W%N4{x!", 
+	    ch->pecho("п╒я▀ п╫п╣ п╥п╟п╨п╬п╫я┤п╦%Gп╩п╬|п╩|п╩п╟ п©п╦я│п╟я┌я▄ {W%N4{x!", 
 	              ch, thread ? thread->getRussianThreadName( ).c_str( ) : threadName.c_str( ) );
 	}
 }
@@ -100,7 +100,7 @@ void Unread::doNext( PCharacter *ch )
     }
 
     if (!oldest) 
-	ch->println("У тебя нет непрочитанных сообщений.");
+	ch->println("пё я┌п╣п╠я▐ п╫п╣я┌ п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╫я▀я┘ я│п╬п╬п╠я┴п╣п╫п╦п╧.");
     else {
 	ch->printf( "{W%s{x:\r\n", oldest->getName( ).c_str( ) );
 	oldest->showNoteToChar( ch, onote );

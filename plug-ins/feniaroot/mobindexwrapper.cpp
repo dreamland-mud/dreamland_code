@@ -21,7 +21,7 @@
 
 using Scripting::NativeTraits;
 
-NMI_INIT(MobIndexWrapper, "Прототип для мобов (mob index data)")
+NMI_INIT(MobIndexWrapper, "п÷я─п╬я┌п╬я┌п╦п© п╢п╩я▐ п╪п╬п╠п╬п╡ (mob index data)")
 
 MobIndexWrapper::MobIndexWrapper( ) : target( NULL )
 {
@@ -142,7 +142,7 @@ NMI_GET( MobIndexWrapper, practicer, "")
     return target->practicer.toString( );
 }
 
-NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
+NMI_GET( MobIndexWrapper, repopPlaces, "я│п©п╦я│п╬п╨ п╡п╫я┐п╪п╬п╡ п╨п╬п╪п╫п╟я┌, п╡ п╨п╬я┌п╬я─я▀я┘ я─п╣я│п╣я┌п╦я┌я│я▐ п╪п╬п╠") 
 {
     Room *room;
     RESET_DATA *pReset;
@@ -161,7 +161,7 @@ NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетитс
     return Register( obj );
 }    
 
-NMI_GET( MobIndexWrapper, instances, "список всех экземпляров мобов с этим pIndexData" )
+NMI_GET( MobIndexWrapper, instances, "я│п©п╦я│п╬п╨ п╡я│п╣я┘ я█п╨п╥п╣п╪п©п╩я▐я─п╬п╡ п╪п╬п╠п╬п╡ я│ я█я┌п╦п╪ pIndexData" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
@@ -188,21 +188,21 @@ NMI_INVOKE(MobIndexWrapper, create, "")
 }
 
 
-NMI_INVOKE( MobIndexWrapper, api, "печатает этот API" )
+NMI_INVOKE( MobIndexWrapper, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<MobIndexWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( MobIndexWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( MobIndexWrapper, rtapi, "п©п╣я┤п╟я┌п╟п╣я┌ п╡я│п╣ п©п╬п╩я▐ п╦ п╪п╣я┌п╬п╢я▀, я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╣ п╡ runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( MobIndexWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( MobIndexWrapper, clear, "п╬я┤п╦я│я┌п╨п╟ п╡я│п╣я┘ runtime п©п╬п╩п╣п╧" )
 {
     guts.clear( );
     self->changed();

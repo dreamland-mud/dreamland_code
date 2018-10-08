@@ -53,8 +53,8 @@ VOID_SPELL(AceInSleeves)::run( Character *ch, char *, int sn, int level )
     
     obj_to_char( sleeves, ch );
 
-    act("Ты создаешь $o4!", ch, sleeves, 0, TO_CHAR);
-    act("$c1 создает $o4!", ch, sleeves, 0, TO_ROOM);
+    act("п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $o4!", ch, sleeves, 0, TO_CHAR);
+    act("$c1 я│п╬п╥п╢п╟п╣я┌ $o4!", ch, sleeves, 0, TO_ROOM);
 }
 
 /*
@@ -68,37 +68,37 @@ SKILL_RUNP( sconce )
     int chance;
 
     if (!gsn_sconce->usable( ch )) {
-	ch->send_to("Тебе незнаком карточный стиль ведения боя.\n\r");
+	ch->send_to("п╒п╣п╠п╣ п╫п╣п╥п╫п╟п╨п╬п╪ п╨п╟я─я┌п╬я┤п╫я▀п╧ я│я┌п╦п╩я▄ п╡п╣п╢п╣п╫п╦я▐ п╠п╬я▐.\n\r");
 	return;
     }
 
     if (MOUNTED(ch)) {
-	ch->send_to("Только не верхом!\n\r");
+	ch->send_to("п╒п╬п╩я▄п╨п╬ п╫п╣ п╡п╣я─я┘п╬п╪!\n\r");
 	return;
     }
 
     if ((victim = get_char_room(ch,argument)) == 0) {
-	ch->send_to("Здесь таких нет.\n\r");
+	ch->send_to("п≈п╢п╣я│я▄ я┌п╟п╨п╦я┘ п╫п╣я┌.\n\r");
 	return;
     }
 
     if (ch == victim) {
-	ch->send_to("Не надо.. можешь потерять сознание.\n\r");
+	ch->send_to("п²п╣ п╫п╟п╢п╬.. п╪п╬п╤п╣я┬я▄ п©п╬я┌п╣я─я▐я┌я▄ я│п╬п╥п╫п╟п╫п╦п╣.\n\r");
 	return;
     }
 
     if (victim->fighting) {
-	ch->send_to("Подожди пока закончится сражение.\n\r");
+	ch->send_to("п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐ я│я─п╟п╤п╣п╫п╦п╣.\n\r");
 	return;
     }
 
     if (IS_AFFECTED( ch, AFF_CHARM )) {
-	ch->send_to( "Ты же не хочешь ударить по голове своего любимого хозяина?\n\r");
+	ch->send_to( "п╒я▀ п╤п╣ п╫п╣ я┘п╬я┤п╣я┬я▄ я┐п╢п╟я─п╦я┌я▄ п©п╬ пЁп╬п╩п╬п╡п╣ я│п╡п╬п╣пЁп╬ п╩я▌п╠п╦п╪п╬пЁп╬ я┘п╬п╥я▐п╦п╫п╟?\n\r");
 	return;
     }
 
     if (IS_AFFECTED(victim,AFF_SLEEP)) {
-	act_p("$E уже спит.",ch,0,victim,TO_CHAR,POS_RESTING);
+	act_p("$E я┐п╤п╣ я│п©п╦я┌.",ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
 
@@ -126,9 +126,9 @@ SKILL_RUNP( sconce )
 	chance -= 40;
 
     if (number_percent( ) < chance * k / 100) {
-	act("Ты со всей силы бьешь $C4 канделябром по голове!", ch, 0, victim, TO_CHAR);
-	act("$c1 ударяет тебя канделябром по голове! Ты отключаешься.", ch, 0, victim, TO_VICT);
-	act("$c1 лупит $C4 по голове канделябром.", ch, 0, victim, TO_NOTVICT);
+	act("п╒я▀ я│п╬ п╡я│п╣п╧ я│п╦п╩я▀ п╠я▄п╣я┬я▄ $C4 п╨п╟п╫п╢п╣п╩я▐п╠я─п╬п╪ п©п╬ пЁп╬п╩п╬п╡п╣!", ch, 0, victim, TO_CHAR);
+	act("$c1 я┐п╢п╟я─я▐п╣я┌ я┌п╣п╠я▐ п╨п╟п╫п╢п╣п╩я▐п╠я─п╬п╪ п©п╬ пЁп╬п╩п╬п╡п╣! п╒я▀ п╬я┌п╨п╩я▌я┤п╟п╣я┬я▄я│я▐.", ch, 0, victim, TO_VICT);
+	act("$c1 п╩я┐п©п╦я┌ $C4 п©п╬ пЁп╬п╩п╬п╡п╣ п╨п╟п╫п╢п╣п╩я▐п╠я─п╬п╪.", ch, 0, victim, TO_NOTVICT);
 	gsn_sconce->improve( ch, true, victim );
 
 	af.type = gsn_sconce;
@@ -151,8 +151,8 @@ SKILL_RUNP( sconce )
 	gsn_sconce->improve( ch, false, victim );
 	
 	yell_panic( ch, victim,
-		    "Помогите! Кто-то засветил мне канделябром по голове!",
-		    "Помогите! %1$^C1 засвети%1$Gло|л|ла мне канделябром по голове!" );
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ п╥п╟я│п╡п╣я┌п╦п╩ п╪п╫п╣ п╨п╟п╫п╢п╣п╩я▐п╠я─п╬п╪ п©п╬ пЁп╬п╩п╬п╡п╣!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 п╥п╟я│п╡п╣я┌п╦%1$Gп╩п╬|п╩|п╩п╟ п╪п╫п╣ п╨п╟п╫п╢п╣п╩я▐п╠я─п╬п╪ п©п╬ пЁп╬п╩п╬п╡п╣!" );
     }
 }
 
@@ -173,9 +173,9 @@ public:
 		|| ( IS_AWAKE( victim ) && number_percent() <= 10 ) )
 	    && !victim->is_immortal())
 	{
-	    act_p("Твоя {Rшутка{x над $C5 удалась!",ch,0,victim,TO_CHAR,POS_RESTING);
-	    act_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x над $C5!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-	    act_p("$c1 удачно {R+++ПОШУТИ$gЛО|Л|ЛА+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
+	    act_p("п╒п╡п╬я▐ {Rя┬я┐я┌п╨п╟{x п╫п╟п╢ $C5 я┐п╢п╟п╩п╟я│я▄!",ch,0,victim,TO_CHAR,POS_RESTING);
+	    act_p("$c1 я┐п╢п╟я┤п╫п╬ {R+++п÷п·п╗пёп╒п≤$gп⌡п·|п⌡|п⌡п░+++{x п╫п╟п╢ $C5!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+	    act_p("$c1 я┐п╢п╟я┤п╫п╬ {R+++п÷п·п╗пёп╒п≤$gп⌡п·|п⌡|п⌡п░+++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
 	    gsn_joker->improve( ch, true, victim );
 
@@ -202,27 +202,27 @@ SKILL_RUNP( joker )
     one_argument( argument, arg );
 
     if (!gsn_joker->usable( ch )) {
-	ch->send_to("У тебя плохое чувство юмора.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п©п╩п╬я┘п╬п╣ я┤я┐п╡я│я┌п╡п╬ я▌п╪п╬я─п╟.\n\r");
 	return;
     }
 
     if (IS_AFFECTED( ch, AFF_CHARM )) {
-	ch->send_to( "Нехорошо шутить над своим хозяином.\n\r");
+	ch->send_to( "п²п╣я┘п╬я─п╬я┬п╬ я┬я┐я┌п╦я┌я▄ п╫п╟п╢ я│п╡п╬п╦п╪ я┘п╬п╥я▐п╦п╫п╬п╪.\n\r");
 	return;
     }
 
     if ( arg[0] == '\0' ) {
-	ch->send_to("Пошутить над кем?\n\r");
+	ch->send_to("п÷п╬я┬я┐я┌п╦я┌я▄ п╫п╟п╢ п╨п╣п╪?\n\r");
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 ) {
-	ch->send_to("Этого нет здесь.\n\r");
+	ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	return;
     }
 
     if (victim == ch) {
-	ch->send_to("Сам пошутил - сам посмеялся.\n\r");
+	ch->send_to("п║п╟п╪ п©п╬я┬я┐я┌п╦п╩ - я│п╟п╪ п©п╬я│п╪п╣я▐п╩я│я▐.\n\r");
 	return;
     }
 
@@ -230,12 +230,12 @@ SKILL_RUNP( joker )
 	return;
 
     if (victim->is_immortal( )) {
-	ch->send_to("А вот эта шутка окончится для тебя плачевно.\n\r");
+	ch->send_to("п░ п╡п╬я┌ я█я┌п╟ я┬я┐я┌п╨п╟ п╬п╨п╬п╫я┤п╦я┌я│я▐ п╢п╩я▐ я┌п╣п╠я▐ п©п╩п╟я┤п╣п╡п╫п╬.\n\r");
 	return;
     }
 
     if (victim->fighting != 0) {
-	ch->send_to("Подожди, пока закончится сражение.\n\r");
+	ch->send_to("п÷п╬п╢п╬п╤п╢п╦, п©п╬п╨п╟ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐ я│я─п╟п╤п╣п╫п╦п╣.\n\r");
 	return;
     }
     
@@ -243,7 +243,7 @@ SKILL_RUNP( joker )
 	    && victim->can_see(ch)
 	    && IS_AWAKE(victim) )
     {
-	act( "Нехорошо шутить над больными!", ch, 0, victim, TO_CHAR );
+	act( "п²п╣я┘п╬я─п╬я┬п╬ я┬я┐я┌п╦я┌я▄ п╫п╟п╢ п╠п╬п╩я▄п╫я▀п╪п╦!", ch, 0, victim, TO_CHAR );
 	return;
     }
 
@@ -258,14 +258,14 @@ SKILL_RUNP( joker )
 	}
 	else
 	{
-	    act_p("Твоя шутка не удалась..",ch,0,victim,TO_CHAR,POS_RESTING);
+	    act_p("п╒п╡п╬я▐ я┬я┐я┌п╨п╟ п╫п╣ я┐п╢п╟п╩п╟я│я▄..",ch,0,victim,TO_CHAR,POS_RESTING);
 	    gsn_joker->improve( ch, false, victim );
 	    joke.miss( );
 	}
 
 	yell_panic( ch, victim,
-		    "Помогите! Кто-то пытается ПОШУТИТЬ меня!",
-		    "Помогите! %1$^C1 пытается ПОШУТИТЬ меня!" );
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ п©я▀я┌п╟п╣я┌я│я▐ п÷п·п╗пёп╒п≤п╒п╛ п╪п╣п╫я▐!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 п©я▀я┌п╟п╣я┌я│я▐ п÷п·п╗пёп╒п≤п╒п╛ п╪п╣п╫я▐!" );
     }
     catch (const VictimDeathException& e) {                                     
     }

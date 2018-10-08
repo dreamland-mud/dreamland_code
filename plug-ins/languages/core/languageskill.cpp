@@ -16,7 +16,7 @@
 
 #include "poliglot.h"
 
-const DLString Language::CATEGORY = "Древние языки";
+const DLString Language::CATEGORY = "п■я─п╣п╡п╫п╦п╣ я▐п╥я▀п╨п╦";
 const int Language::SKILL_ADEPT  = 50;
 const int Language::SKILL_SENSE  = 75;
 const int Language::SKILL_NATIVE = 100;
@@ -114,9 +114,9 @@ bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
    
     if (verbose) { 
         if (mob)
-            ch->pecho( "%^C1 отнюдь не полиглот.", mob );
+            ch->pecho( "%^C1 п╬я┌п╫я▌п╢я▄ п╫п╣ п©п╬п╩п╦пЁп╩п╬я┌.", mob );
         else
-            ch->println( "Поищи бродячего монаха." );
+            ch->println( "п÷п╬п╦я┴п╦ п╠я─п╬п╢я▐я┤п╣пЁп╬ п╪п╬п╫п╟я┘п╟." );
     }
 
     return false;
@@ -146,9 +146,9 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     DLString userName;
     bool rus = ch->getConfig( )->ruskills;
 
-    buf << "Язык '{W" << getName( ) << "{x'"
+    buf << "п╞п╥я▀п╨ '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{hg{W" 
+	<< "п╡я┘п╬п╢п╦я┌ п╡ пЁя─я┐п©п©я┐ '{hg{W" 
 	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
 	<< "{x'"
 	<< endl;
@@ -189,11 +189,11 @@ void Language::show( PCharacter *ch, std::ostream & buf )
 		buf << ", ";
 	}
 	     
-        buf << " могут овладеть этим языком в совершенстве." << endl;
+        buf << " п╪п╬пЁя┐я┌ п╬п╡п╩п╟п╢п╣я┌я▄ я█я┌п╦п╪ я▐п╥я▀п╨п╬п╪ п╡ я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡п╣." << endl;
     }
 
     if (!unperfect.empty( )) {
-	buf << "Неполные знания доступны ";
+	buf << "п²п╣п©п╬п╩п╫я▀п╣ п╥п╫п╟п╫п╦я▐ п╢п╬я│я┌я┐п©п╫я▀ ";
 	
 	for (n = unperfect.begin( ); n != unperfect.end( ); ) {
 	    buf << "{w" << *n << "{x";
@@ -208,10 +208,10 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     if (visible( ch )) {
 	int learned = getLearned( ch );
 	
-	buf << "Тебе язык доступен с уровня {W" << getLevel( ch ) << "{x";
+	buf << "п╒п╣п╠п╣ я▐п╥я▀п╨ п╢п╬я│я┌я┐п©п╣п╫ я│ я┐я─п╬п╡п╫я▐ {W" << getLevel( ch ) << "{x";
 
 	if (learned > 0)
-	    buf << ", изучен на {W" << learned << "%{x";
+	    buf << ", п╦п╥я┐я┤п╣п╫ п╫п╟ {W" << learned << "%{x";
 	
 	buf << "." << endl;
     }
@@ -248,7 +248,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;
-    ch->pecho( "Ты совершенствуешь свои познания в %^N6.", nameRus.getValue( ).c_str( ) );
+    ch->pecho( "п╒я▀ я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡я┐п╣я┬я▄ я│п╡п╬п╦ п©п╬п╥п╫п╟п╫п╦я▐ п╡ %^N6.", nameRus.getValue( ).c_str( ) );
 }
 
 const DLString & Language::getName( ) const

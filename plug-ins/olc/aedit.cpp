@@ -220,11 +220,11 @@ AEDIT(reset)
     for (original = area_first; original; original = original->next)
 	if(original->vnum == vnum) {
 	    reset_area(original);
-	    stc("Ария сброшена.\n\r", ch);
+	    stc("п░я─п╦я▐ я│п╠я─п╬я┬п╣п╫п╟.\n\r", ch);
 	    return false;
 	}
 
-    stc("Создание арии не завершено - нечего сбрасывать.\n\r", ch);
+    stc("п║п╬п╥п╢п╟п╫п╦п╣ п╟я─п╦п╦ п╫п╣ п╥п╟п╡п╣я─я┬п╣п╫п╬ - п╫п╣я┤п╣пЁп╬ я│п╠я─п╟я│я▀п╡п╟я┌я▄.\n\r", ch);
     return false;
 }
 
@@ -233,20 +233,20 @@ AEDIT(create)
     OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
     ae->attach(ch);
 
-    stc("Aрия создана.\n\r", ch);
+    stc("Aя─п╦я▐ я│п╬п╥п╢п╟п╫п╟.\n\r", ch);
     return false;
 }
 
 AEDIT(name)
 {
     if (!*argument) {
-	stc("Синтаксис:   name [$имя]\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:   name [$п╦п╪я▐]\n\r", ch);
 	return false;
     }
 
     name = argument;
 
-    stc("Имя присвоено.\n\r", ch);
+    stc("п≤п╪я▐ п©я─п╦я│п╡п╬п╣п╫п╬.\n\r", ch);
     return true;
 }
 
@@ -254,26 +254,26 @@ AEDIT(name)
 AEDIT(credits)
 {
     if (!*argument) {
-	stc("Синтаксис:   credits [$credits]\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:   credits [$credits]\n\r", ch);
 	return false;
     }
 
     credits = argument;
 
-    stc("Копирайт установлен.\n\r", ch);
+    stc("п п╬п©п╦я─п╟п╧я┌ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫.\n\r", ch);
     return true;
 }
 
 AEDIT(message)
 {	
     if (!*argument) {
-	stc("Синтаксис:   message [resetmsg]\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:   message [resetmsg]\n\r", ch);
 	return false;
     }
 
     resetmsg = argument;
 
-    stc("Resetmsg установлен.\n\r", ch);
+    stc("Resetmsg я┐я│я┌п╟п╫п╬п╡п╩п╣п╫.\n\r", ch);
     return true;
 }
 
@@ -282,7 +282,7 @@ AEDIT(flags)
     bitstring_t value;
 
     if (!*argument) {
-	stc("Синтаксис:   flag [$areaflags]\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:   flag [$areaflags]\n\r", ch);
 	return false;
     }
 
@@ -305,14 +305,14 @@ AEDIT(file)
     int i, length;
 
     if (ch->getSecurity( ) < 10) {
-	stc("Недостаточно прав для изменения имени файла арии.\r\n", ch);
+	stc("п²п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ п╦п╥п╪п╣п╫п╣п╫п╦я▐ п╦п╪п╣п╫п╦ я└п╟п╧п╩п╟ п╟я─п╦п╦.\r\n", ch);
 	return false;
     }
 
     one_argument(argument, file);	/* Forces Lowercase */
 
     if (!*argument) {
-	stc("Синтаксис:  filename [$имя_file]\n\r", ch);
+	stc("п║п╦п╫я┌п╟п╨я│п╦я│:  filename [$п╦п╪я▐_file]\n\r", ch);
 	return false;
     }
 
@@ -446,7 +446,7 @@ AEDIT(vnum)
     int iupper;
 
     if (ch->getSecurity() < 10) {
-	stc("Недостаточно прав для изменения внумов арии.\r\n", ch);
+	stc("п²п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ п╦п╥п╪п╣п╫п╣п╫п╦я▐ п╡п╫я┐п╪п╬п╡ п╟я─п╦п╦.\r\n", ch);
 	return false;
     }
     
@@ -484,7 +484,7 @@ AEDIT(lvnum)
     int iupper;
 
     if (ch->getSecurity() < 10) {
-	stc("Недостаточно прав для изменения внумов арии.\r\n", ch);
+	stc("п²п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ п╦п╥п╪п╣п╫п╣п╫п╦я▐ п╡п╫я┐п╪п╬п╡ п╟я─п╦п╦.\r\n", ch);
 	return false;
     }
 
@@ -520,7 +520,7 @@ AEDIT(uvnum)
     int iupper;
 
     if (ch->getSecurity() < 10) {
-	stc("Недостаточно прав для изменения внумов арии.\r\n", ch);
+	stc("п²п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ п╦п╥п╪п╣п╫п╣п╫п╦я▐ п╡п╫я┐п╪п╬п╡ п╟я─п╦п╦.\r\n", ch);
 	return false;
     }
 
@@ -649,13 +649,13 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	    }
 	    OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
 	    ae->attach(ch);
-	    stc("Ария создана.\r\n", ch);
+	    stc("п░я─п╦я▐ я│п╬п╥п╢п╟п╫п╟.\r\n", ch);
 	    return;
 	}
     }
 
     if (!OLCState::can_edit(ch, pArea)) {
-	stc("У тебя недостаточно прав для редактирования арий.\n\r", ch);
+	stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╟я─п╦п╧.\n\r", ch);
 	return;
     }
 

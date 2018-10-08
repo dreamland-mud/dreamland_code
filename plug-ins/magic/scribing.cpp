@@ -42,23 +42,23 @@ DLString SpellBook::extraDescription( Character *ch, const DLString &args )
 void SpellBook::toString( ostringstream &buf )
 {
     if (obj->value[0] == 0) 
-	buf << "÷ ÜÔÏÊ ËÎÉÇÅ ÎÅÔ ÎÉ ÏÄÎÏÊ ÓÔÒÁÎÉÃÙ." << endl;
+	buf << "Ð’ ÑÑ‚Ð¾Ð¹ ÐºÐ½Ð¸Ð³Ðµ Ð½ÐµÑ‚ Ð½Ð¸ Ð¾Ð´Ð½Ð¾Ð¹ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹." << endl;
     else if (obj->value[1] == 0) 
-	buf << "üÔÁ ËÎÉÇÁ ÐÕÓÔÁ." << endl;
+	buf << "Ð­Ñ‚Ð° ÐºÐ½Ð¸Ð³Ð° Ð¿ÑƒÑÑ‚Ð°." << endl;
     else {
-	buf << "ìÉÓÔÁÑ " << obj->getShortDescr( '4' ) << ", "
-	    << "ÔÙ ×ÉÄÉÛØ ÎÁ ÓÔÒÁÎÉÃÁÈ ÔÁËÉÅ ÆÏÒÍÕÌÙ: " << endl << endl;
+	buf << "Ð›Ð¸ÑÑ‚Ð°Ñ " << obj->getShortDescr( '4' ) << ", "
+	    << "Ñ‚Ñ‹ Ð²Ð¸Ð´Ð¸ÑˆÑŒ Ð½Ð° ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ð°Ñ… Ñ‚Ð°ÐºÐ¸Ðµ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñ‹: " << endl << endl;
 	
 	for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++) {
-	    buf << "æÏÒÍÕÌÁ ÚÁËÌÉÎÁÎÉÑ {W" << i->first << "{x, "
-		<< "ÚÁÐÉÓÁÎÎÁÑ Ó ËÁÞÅÓÔ×ÏÍ {W" << i->second << "%{x" << endl;
+	    buf << "Ð¤Ð¾Ñ€Ð¼ÑƒÐ»Ð° Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ {W" << i->first << "{x, "
+		<< "Ð·Ð°Ð¿Ð¸ÑÐ°Ð½Ð½Ð°Ñ Ñ ÐºÐ°Ñ‡ÐµÑÑ‚Ð²Ð¾Ð¼ {W" << i->second << "%{x" << endl;
 	}
 	
 	if (obj->value[1] >= obj->value[0])
-	    buf << endl << "éÓÐÏÌØÚÏ×ÁÎÙ ×ÓÅ ÓÔÒÁÎÉÃÙ ËÎÉÇÉ." << endl;
+	    buf << endl << "Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ñ‹ Ð²ÑÐµ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹ ÐºÐ½Ð¸Ð³Ð¸." << endl;
     }
 
-    buf << endl << "íÁËÓÉÍÁÌØÎÏÅ ËÁÞÅÓÔ×Ï ÚÁÐÉÓÙ×ÁÅÍÙÈ ÚÁËÌÉÎÁÎÉÊ: "
+    buf << endl << "ÐœÐ°ÐºÑÐ¸Ð¼Ð°Ð»ÑŒÐ½Ð¾Ðµ ÐºÐ°Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð·Ð°Ð¿Ð¸ÑÑ‹Ð²Ð°ÐµÐ¼Ñ‹Ñ… Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¹: "
         << obj->value[2] << "%." << endl;
     
 }
@@ -99,12 +99,12 @@ CMDRUN( scribe )
     chance = gsn_scribing->getEffective( ch );
 
     if (ch->is_npc( ) || chance <= 1) {
-	ch->send_to( "ôÙ ÎÅ ×ÌÁÄÅÅÛØ ÉÓËÕÓÓÔ×ÏÍ ÚÁÐÉÓÉ ÚÁËÌÉÎÁÎÉÊ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð²Ð»Ð°Ð´ÐµÐµÑˆÑŒ Ð¸ÑÐºÑƒÑÑÑ‚Ð²Ð¾Ð¼ Ð·Ð°Ð¿Ð¸ÑÐ¸ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¹.\r\n" );
 	return;
     }
 
     if (ch->position != POS_RESTING && ch->position != POS_SITTING) {
-	ch->send_to( "óÑÄØ É ÓÏÓÒÅÄÏÔÏÞØÓÑ.\r\n" );
+	ch->send_to( "Ð¡ÑÐ´ÑŒ Ð¸ ÑÐ¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡ÑŒÑÑ.\r\n" );
 	return;
     }
     
@@ -115,25 +115,25 @@ CMDRUN( scribe )
     arg2.stripWhiteSpace();
     
     if (arg1.empty( ) || arg2.empty( )) {
-	ch->send_to( "úÁÐÉÓÁÔØ ËÕÄÁ É ÞÔÏ?\r\n" );
+	ch->send_to( "Ð—Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ ÐºÑƒÐ´Ð° Ð¸ Ñ‡Ñ‚Ð¾?\r\n" );
 	return;
     }
     
     /* check book */
     if (!( book = get_obj_carry( ch, arg1 ) )) {
-	ch->send_to( "õ ÔÅÂÑ ÎÅÔ ÔÁËÏÊ ËÎÉÇÉ.\r\n" );
+	ch->send_to( "Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð¹ ÐºÐ½Ð¸Ð³Ð¸.\r\n" );
 	return;
     }
     if (book->item_type != ITEM_SPELLBOOK) {
-	ch->send_to( "üÔÏ ÎÅ ËÎÉÇÁ ÚÁËÌÉÎÁÎÉÊ.\r\n" );
+	ch->send_to( "Ð­Ñ‚Ð¾ Ð½Ðµ ÐºÐ½Ð¸Ð³Ð° Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¹.\r\n" );
 	return;
     }
     if (book->value[0] == 0) {
-	ch->send_to( "üÔÁ ËÎÉÇÁ ÂÅÚ ÓÔÒÁÎÉÃ, ÄÁÖÅ × ÍÁËÕÌÁÔÕÒÕ ÎÅ ÇÏÄÉÔÓÑ.\r\n" );
+	ch->send_to( "Ð­Ñ‚Ð° ÐºÐ½Ð¸Ð³Ð° Ð±ÐµÐ· ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†, Ð´Ð°Ð¶Ðµ Ð² Ð¼Ð°ÐºÑƒÐ»Ð°Ñ‚ÑƒÑ€Ñƒ Ð½Ðµ Ð³Ð¾Ð´Ð¸Ñ‚ÑÑ.\r\n" );
 	return;
     }
     if (book->value[1] >= book->value[0]) {
-	ch->send_to( "÷ÓÅ ÓÔÒÁÎÉÃÙ ËÎÉÇÉ ÕÖÅ ÚÁÎÑÔÙ.\r\n" );
+	ch->send_to( "Ð’ÑÐµ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹ ÐºÐ½Ð¸Ð³Ð¸ ÑƒÐ¶Ðµ Ð·Ð°Ð½ÑÑ‚Ñ‹.\r\n" );
 	return;
     }
     
@@ -142,33 +142,33 @@ CMDRUN( scribe )
     skill = SkillManager::getThis( )->find( sn );
 
     if (!skill) {
-	ch->pecho( "ðÏÒÙ×ÛÉÓØ × ÇÏÌÏ×Å, ÔÙ ÎÅ ÓÍÏÇ%GÌÏ|Ì|ÌÁ ×ÓÐÏÍÎÉÔØ ÔÁËÏÇÏ ÚÁËÌÉÎÁÎÉÑ.\r\n", ch );
+	ch->pecho( "ÐŸÐ¾Ñ€Ñ‹Ð²ÑˆÐ¸ÑÑŒ Ð² Ð³Ð¾Ð»Ð¾Ð²Ðµ, Ñ‚Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð³%GÐ»Ð¾|Ð»|Ð»Ð° Ð²ÑÐ¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ.\r\n", ch );
 	return;
     }
     if (!skill->getSpell( ) || !skill->getSpell( )->isCasted( )) {
-	ch->send_to( "üÔÏ ÎÅ ÚÁËÌÉÎÁÎÉÅ. éÓÐÏÌØÚÕÊ ÍÙÛÅÞÎÕÀ ÐÁÍÑÔØ.:)\r\n" );
+	ch->send_to( "Ð­Ñ‚Ð¾ Ð½Ðµ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ. Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹ Ð¼Ñ‹ÑˆÐµÑ‡Ð½ÑƒÑŽ Ð¿Ð°Ð¼ÑÑ‚ÑŒ.:)\r\n" );
 	return;
     }
 
     PCSkillData &data = ch->getPC( )->getSkillData( sn );
     if (data.learned <= 1) {
-	ch->printf( "ôÙ ÎÅ ×ÌÁÄÅÅÛØ ÚÁËÌÉÎÁÎÉÅÍ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+	ch->printf( "Ð¢Ñ‹ Ð½Ðµ Ð²Ð»Ð°Ð´ÐµÐµÑˆÑŒ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸ÐµÐ¼ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 	return;
     }
 
     if (!skill->canForget( ch->getPC( ) )) {
-	ch->printf( "ôÙ ÎÅ ÓÍÏÖÅÛØ ×ÙÂÒÏÓÉÔØ ÉÚ ÐÁÍÑÔÉ ÚÎÁÎÉÑ Ï ÚÁËÌÉÎÁÎÉÉ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+	ch->printf( "Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð²Ñ‹Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ Ð¸Ð· Ð¿Ð°Ð¼ÑÑ‚Ð¸ Ð·Ð½Ð°Ð½Ð¸Ñ Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¸ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 	return;
     }
     
     if (data.learned > book->value[2]) {
-        act("ëÁÞÅÓÔ×Ï ÜÔÏÊ ËÎÉÇÉ ÎÅ ÐÏÚ×ÏÌÑÅÔ ÈÒÁÎÉÔØ ÐÏÌÎÙÅ ÚÎÁÎÉÑ Ï ÚÁËÌÉÎÁÎÉÉ '$T'.", ch, 0, skill->getNameFor( ch ).c_str( ), TO_CHAR );
+        act("ÐšÐ°Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑÑ‚Ð¾Ð¹ ÐºÐ½Ð¸Ð³Ð¸ Ð½Ðµ Ð¿Ð¾Ð·Ð²Ð¾Ð»ÑÐµÑ‚ Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ Ð¿Ð¾Ð»Ð½Ñ‹Ðµ Ð·Ð½Ð°Ð½Ð¸Ñ Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¸ '$T'.", ch, 0, skill->getNameFor( ch ).c_str( ), TO_CHAR );
         return;
     }
 
     if (number_percent( ) > chance) {
-        act("ôÙ ÐÙÔÁÅÛØÓÑ ÓËÏÎÃÅÎÔÒÉÒÏ×ÁÔØ Ó×ÏÉ ÚÎÁÎÉÑ × ÏÄÎÕ ÆÏÒÍÕÌÕ, ÎÏ ÏÎÁ ÕÓËÏÌØÚÁÅÔ ÏÔ ÔÅÂÑ.", ch, 0, 0, TO_CHAR);
-        act("$c1 Ï ÞÅÍ-ÔÏ ÒÁÚÍÙÛÌÑÅÔ, ÕÓÔÁ×É×ÛÉÓØ × $o4.", ch, book, 0, TO_ROOM);
+        act("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ ÑÐºÐ¾Ð½Ñ†ÐµÐ½Ñ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÑÐ²Ð¾Ð¸ Ð·Ð½Ð°Ð½Ð¸Ñ Ð² Ð¾Ð´Ð½Ñƒ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñƒ, Ð½Ð¾ Ð¾Ð½Ð° ÑƒÑÐºÐ¾Ð»ÑŒÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ.", ch, 0, 0, TO_CHAR);
+        act("$c1 Ð¾ Ñ‡ÐµÐ¼-Ñ‚Ð¾ Ñ€Ð°Ð·Ð¼Ñ‹ÑˆÐ»ÑÐµÑ‚, ÑƒÑÑ‚Ð°Ð²Ð¸Ð²ÑˆÐ¸ÑÑŒ Ð² $o4.", ch, book, 0, TO_ROOM);
         gsn_scribing->improve( ch, false );
         ch->setWaitViolence( 1 );
         return;
@@ -186,7 +186,7 @@ CMDRUN( scribe )
 	book->behavior.setPointer( *behavior );
     }
     else if (!( behavior = book->behavior.getDynamicPointer<SpellBook>( ))) {
-	ch->send_to( "õÐÓ.. ÐÏÈÏÖÅ, ÜÔÁ ËÎÉÇÁ ÓÌÕÖÉÔ ÓÏ×ÓÅÍ ÄÒÕÇÉÍ ÃÅÌÑÍ.\r\n" );
+	ch->send_to( "Ð£Ð¿Ñ.. Ð¿Ð¾Ñ…Ð¾Ð¶Ðµ, ÑÑ‚Ð° ÐºÐ½Ð¸Ð³Ð° ÑÐ»ÑƒÐ¶Ð¸Ñ‚ ÑÐ¾Ð²ÑÐµÐ¼ Ð´Ñ€ÑƒÐ³Ð¸Ð¼ Ñ†ÐµÐ»ÑÐ¼.\r\n" );
 	return;
     }
 
@@ -194,9 +194,9 @@ CMDRUN( scribe )
     behavior->spells[skill->getName( )] = quality;
     data.learned = 1;
     
-    act( "ôÙ ËÏÎÃÅÎÔÒÉÒÕÅÛØ ×ÓÅ Ó×ÏÉ ÚÎÁÎÉÑ Ï '$T' × ÏÄÎÕ ÆÏÒÍÕÌÕ É ÎÁÎÏÓÉÛØ ÅÅ ÎÁ ÓÔÒÁÎÉÃÙ $o2.", ch, book, skill->getNameFor( ch ).c_str( ), TO_CHAR );
-    act( "$c1 ÞÔÏ-ÔÏ ÚÁÐÉÓÙ×ÁÅÔ × $o4.", ch, book, 0, TO_ROOM );
-    act( "ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÐÕÓÔÏÔÕ × ÇÏÌÏ×Å. úÎÁÎÉÑ Ï '$t' ÓÔÉÒÁÀÔÓÑ ÉÚ Ô×ÏÅÊ ÐÁÍÑÔÉ.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR ); 
+    act( "Ð¢Ñ‹ ÐºÐ¾Ð½Ñ†ÐµÐ½Ñ‚Ñ€Ð¸Ñ€ÑƒÐµÑˆÑŒ Ð²ÑÐµ ÑÐ²Ð¾Ð¸ Ð·Ð½Ð°Ð½Ð¸Ñ Ð¾ '$T' Ð² Ð¾Ð´Ð½Ñƒ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñƒ Ð¸ Ð½Ð°Ð½Ð¾ÑÐ¸ÑˆÑŒ ÐµÐµ Ð½Ð° ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹ $o2.", ch, book, skill->getNameFor( ch ).c_str( ), TO_CHAR );
+    act( "$c1 Ñ‡Ñ‚Ð¾-Ñ‚Ð¾ Ð·Ð°Ð¿Ð¸ÑÑ‹Ð²Ð°ÐµÑ‚ Ð² $o4.", ch, book, 0, TO_ROOM );
+    act( "Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ Ð¿ÑƒÑÑ‚Ð¾Ñ‚Ñƒ Ð² Ð³Ð¾Ð»Ð¾Ð²Ðµ. Ð—Ð½Ð°Ð½Ð¸Ñ Ð¾ '$t' ÑÑ‚Ð¸Ñ€Ð°ÑŽÑ‚ÑÑ Ð¸Ð· Ñ‚Ð²Ð¾ÐµÐ¹ Ð¿Ð°Ð¼ÑÑ‚Ð¸.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR ); 
     
     gsn_scribing->improve( ch, true );
     ch->setWaitViolence( 1 );
@@ -218,7 +218,7 @@ CMDRUN( memorize )
     chance = gsn_scribing->getEffective( ch );
 
     if (ch->is_npc( ) || chance <= 1) {
-	ch->send_to( "ôÙ ÎÅ ×ÌÁÄÅÅÛØ ÉÓËÕÓÓÔ×ÏÍ ÞÔÅÎÉÑ ÆÏÒÍÕÌÙ ÚÁËÌÉÎÁÎÉÊ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð²Ð»Ð°Ð´ÐµÐµÑˆÑŒ Ð¸ÑÐºÑƒÑÑÑ‚Ð²Ð¾Ð¼ Ñ‡Ñ‚ÐµÐ½Ð¸Ñ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñ‹ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¹.\r\n" );
 	return;
     }
 
@@ -229,20 +229,20 @@ CMDRUN( memorize )
     arg2.stripWhiteSpace( );
     
     if (arg1.empty( ) || arg2.empty( )) {
-	ch->send_to( "ðÒÏÞÅÓÔØ ÏÔËÕÄÁ É ÞÔÏ?\r\n" );
+	ch->send_to( "ÐŸÑ€Ð¾Ñ‡ÐµÑÑ‚ÑŒ Ð¾Ñ‚ÐºÑƒÐ´Ð° Ð¸ Ñ‡Ñ‚Ð¾?\r\n" );
 	return;
     }
 
     /* check book */
     if (!( book = get_obj_carry( ch, arg1 ) )) {
-	ch->send_to( "õ ÔÅÂÑ ÎÅÔ ÔÁËÏÊ ËÎÉÇÉ.\r\n" );
+	ch->send_to( "Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð¹ ÐºÐ½Ð¸Ð³Ð¸.\r\n" );
 	return;
     }
     if (book->behavior) {
 	behavior = book->behavior.getDynamicPointer<SpellBook>( );
     }
     if (!behavior || book->item_type != ITEM_SPELLBOOK) {
-	ch->send_to( "üÔÏ ÎÅ ËÎÉÇÁ ÚÁËÌÉÎÁÎÉÊ.\r\n" );
+	ch->send_to( "Ð­Ñ‚Ð¾ Ð½Ðµ ÐºÐ½Ð¸Ð³Ð° Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ð¹.\r\n" );
 	return;
     }
 
@@ -252,7 +252,7 @@ CMDRUN( memorize )
 	    skill = SkillManager::getThis( )->find( i->first );
 	    
 	    if (!skill) {
-		ch->printf( "ðÏÈÏÖÅ, ÞÔÏ ×ÍÅÓÔÏ ÆÏÒÍÕÌÙ ÚÁËÌÉÎÁÎÉÑ '%s' ÎÁÐÉÓÁÎ ËÁËÏÊ-ÔÏ ÂÒÅÄ.", 
+		ch->printf( "ÐŸÐ¾Ñ…Ð¾Ð¶Ðµ, Ñ‡Ñ‚Ð¾ Ð²Ð¼ÐµÑÑ‚Ð¾ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñ‹ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ '%s' Ð½Ð°Ð¿Ð¸ÑÐ°Ð½ ÐºÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ð±Ñ€ÐµÐ´.", 
 		            i->first.c_str( ) );
 		return;
 	    }
@@ -260,19 +260,19 @@ CMDRUN( memorize )
 	}
 
     if (!skill) {
-	ch->send_to( "ôÙ ÎÅ ÍÏÖÅÛØ ÎÁÊÔÉ ÆÏÒÍÕÌÕ ÜÔÏÇÏ ÚÁËÌÉÎÁÎÉÑ × ËÎÉÇÅ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½Ð°Ð¹Ñ‚Ð¸ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñƒ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ Ð² ÐºÐ½Ð¸Ð³Ðµ.\r\n" );
 	return;
     }
 
     /* can learn? */
     if (!skill->available( ch )) {
-	ch->send_to( "ôÙ ÐÏÎÑÔÉÅ ÎÅ ÉÍÅÅÛØ, ËÁË ÒÁÓÛÉÆÒÏ×ÁÔØ ÜÔÕ ÆÏÒÍÕÌÕ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ð¿Ð¾Ð½ÑÑ‚Ð¸Ðµ Ð½Ðµ Ð¸Ð¼ÐµÐµÑˆÑŒ, ÐºÐ°Ðº Ñ€Ð°ÑÑˆÐ¸Ñ„Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÑÑ‚Ñƒ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñƒ.\r\n" );
 	return;
     }
     
     if (number_percent( ) > chance) {
-        act("ôÙ ÐÙÔÁÅÛØÓÑ ÒÁÓÛÉÆÒÏ×ÁÔØ ÆÏÒÍÕÌÕ, ÎÏ ÏÎÁ ÕÓËÏÌØÚÁÅÔ ÏÔ ÔÅÂÑ.", ch, 0, 0, TO_CHAR);
-        act("$c1 Ï ÞÅÍ-ÔÏ ÒÁÚÍÙÛÌÑÅÔ, ÕÓÔÁ×É×ÛÉÓØ × $o4.", ch, book, 0, TO_ROOM);
+        act("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ñ€Ð°ÑÑˆÐ¸Ñ„Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñƒ, Ð½Ð¾ Ð¾Ð½Ð° ÑƒÑÐºÐ¾Ð»ÑŒÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ.", ch, 0, 0, TO_CHAR);
+        act("$c1 Ð¾ Ñ‡ÐµÐ¼-Ñ‚Ð¾ Ñ€Ð°Ð·Ð¼Ñ‹ÑˆÐ»ÑÐµÑ‚, ÑƒÑÑ‚Ð°Ð²Ð¸Ð²ÑˆÐ¸ÑÑŒ Ð² $o4.", ch, book, 0, TO_ROOM);
         gsn_scribing->improve( ch, false );
         ch->setWaitViolence( 1 );
         return;
@@ -290,9 +290,9 @@ CMDRUN( memorize )
     behavior->spells.erase( i );
     book->value[1]--;
     
-    act( "ôÙ ÒÁÓÛÉÆÒÏ×Ù×ÁÅÛØ ÆÏÒÍÕÌÕ '$t' É ÔÉÈÏ ÛÅÐÞÅÛØ ÅÅ.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR );
-    act( "$c1 ÓÍÏÔÒÉÔ × $o4 É ÞÔÏ-ÔÏ ÛÅÐÞÅÔ.", ch, book, 0, TO_ROOM );
-    act( "æÏÒÍÕÌÁ ÓÌÅÔÁÅÔ ÓÏ ÓÔÒÁÎÉÃ $o2 É ÐÒÏÞÎÏ ÚÁËÒÅÐÌÑÅÔÓÑ × Ô×ÏÅÊ ÐÁÍÑÔÉ.", ch, book, 0, TO_CHAR );
+    act( "Ð¢Ñ‹ Ñ€Ð°ÑÑˆÐ¸Ñ„Ñ€Ð¾Ð²Ñ‹Ð²Ð°ÐµÑˆÑŒ Ñ„Ð¾Ñ€Ð¼ÑƒÐ»Ñƒ '$t' Ð¸ Ñ‚Ð¸Ñ…Ð¾ ÑˆÐµÐ¿Ñ‡ÐµÑˆÑŒ ÐµÐµ.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR );
+    act( "$c1 ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð² $o4 Ð¸ Ñ‡Ñ‚Ð¾-Ñ‚Ð¾ ÑˆÐµÐ¿Ñ‡ÐµÑ‚.", ch, book, 0, TO_ROOM );
+    act( "Ð¤Ð¾Ñ€Ð¼ÑƒÐ»Ð° ÑÐ»ÐµÑ‚Ð°ÐµÑ‚ ÑÐ¾ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ† $o2 Ð¸ Ð¿Ñ€Ð¾Ñ‡Ð½Ð¾ Ð·Ð°ÐºÑ€ÐµÐ¿Ð»ÑÐµÑ‚ÑÑ Ð² Ñ‚Ð²Ð¾ÐµÐ¹ Ð¿Ð°Ð¼ÑÑ‚Ð¸.", ch, book, 0, TO_CHAR );
     
     gsn_scribing->improve( ch, true );
     ch->setWaitViolence( 1 );

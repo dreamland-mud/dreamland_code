@@ -32,24 +32,24 @@ COMMAND(COrder, "order")
     argOrder = argument;
     
     if (argTarget.empty( ) || argOrder.empty( )) {
-	ch->println( "ðÒÉËÁÚÁÔØ ËÏÍÕ É ÞÔÏ?" );
+	ch->println( "ÐŸÑ€Ð¸ÐºÐ°Ð·Ð°Ñ‚ÑŒ ÐºÐ¾Ð¼Ñƒ Ð¸ Ñ‡Ñ‚Ð¾?" );
 	return;
     }
 
     if (IS_AFFECTED( ch, AFF_CHARM )) {
-	ch->println( "ôÙ ÍÏÖÅÛØ ÔÏÌØËÏ ÐÒÉÎÉÍÁÔØ ÐÒÉËÁÚÙ, Á ÎÅ ÏÔÄÁ×ÁÔØ ÉÈ." );
+	ch->println( "Ð¢Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ñ€Ð¸Ð½Ð¸Ð¼Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¸ÐºÐ°Ð·Ñ‹, Ð° Ð½Ðµ Ð¾Ñ‚Ð´Ð°Ð²Ð°Ñ‚ÑŒ Ð¸Ñ…." );
 	return;
     }
     
     if (argTarget == "all") {
-	ch->println( "ôÙ ÎÅ ÍÏÖÅÛØ ÏÔÄÁÔØ ÐÒÉËÁÚ ×ÓÅÍ ÓÒÁÚÕ." );
+	ch->println( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¾Ñ‚Ð´Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¸ÐºÐ°Ð· Ð²ÑÐµÐ¼ ÑÑ€Ð°Ð·Ñƒ." );
 	return;
     }
     
     victim = findVictim( ch, argTarget );
     
     if (!victim) {
-	ch->println( "óÒÅÄÉ Ô×ÏÉÈ ÐÏÓÌÅÄÏ×ÁÔÅÌÅÊ ÔÁËÏÇÏ ÎÅÔ." );
+	ch->println( "Ð¡Ñ€ÐµÐ´Ð¸ Ñ‚Ð²Ð¾Ð¸Ñ… Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð½ÐµÑ‚." );
 	return;
     }
 
@@ -57,12 +57,12 @@ COMMAND(COrder, "order")
     
     if (!iargs.pCommand || !iargs.pCommand->properOrder( victim )) {
 	if (victim->isAffected( gsn_manacles ))
-	    act( "$C1 ÇÏ×ÏÒÉÔ ÔÅÂÅ '{Gñ ÎÅ ÂÕÄÕ ÄÅÌÁÔØ ÜÔÏ.{x'", ch, 0, victim, TO_CHAR );
+	    act( "$C1 Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ '{GÐ¯ Ð½Ðµ Ð±ÑƒÐ´Ñƒ Ð´ÐµÐ»Ð°Ñ‚ÑŒ ÑÑ‚Ð¾.{x'", ch, 0, victim, TO_CHAR );
 	else
-	    act( "$C1 ÇÏ×ÏÒÉÔ ÔÅÂÅ '{Gñ ÎÅ ÐÏÎÉÍÁÀ, ÞÅÇÏ ÔÙ ÈÏÞÅÛØ, ÈÏÚÑ$gÉÎ|ÉÎ|ÊËÁ.{x'", ch, 0, victim, TO_CHAR );
+	    act( "$C1 Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ '{GÐ¯ Ð½Ðµ Ð¿Ð¾Ð½Ð¸Ð¼Ð°ÑŽ, Ñ‡ÐµÐ³Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ, Ñ…Ð¾Ð·Ñ$gÐ¸Ð½|Ð¸Ð½|Ð¹ÐºÐ°.{x'", ch, 0, victim, TO_CHAR );
     }
     else {
-	act( "$c1 ÐÒÉËÁÚÙ×ÁÅÔ ÔÅÂÅ '$t', ÔÙ ÐÏËÏÒÎÏ ÉÓÐÏÌÎÑÅÛØ ÐÒÉËÁÚ.", ch, iargs.pCommand->getName( ).c_str( ), victim, TO_VICT );
+	act( "$c1 Ð¿Ñ€Ð¸ÐºÐ°Ð·Ñ‹Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ '$t', Ñ‚Ñ‹ Ð¿Ð¾ÐºÐ¾Ñ€Ð½Ð¾ Ð¸ÑÐ¿Ð¾Ð»Ð½ÑÐµÑˆÑŒ Ð¿Ñ€Ð¸ÐºÐ°Ð·.", ch, iargs.pCommand->getName( ).c_str( ), victim, TO_VICT );
 	
 	if (iargs.pCommand->dispatchOrder( iargs ))
 	    iargs.pCommand->run( victim, iargs.cmdArgs );

@@ -37,7 +37,7 @@ COMMAND(Whois, "whois")
 	return;
 
     if (constArguments.empty( )) {
-	ch->send_to( "Имя, сестра, имя!\r\n" );
+	ch->send_to( "п≤п╪я▐, я│п╣я│я┌я─п╟, п╦п╪я▐!\r\n" );
 	return;
     }
 	
@@ -60,7 +60,7 @@ COMMAND(Whois, "whois")
     }
 
     if (!d) {
-	ch->send_to( "Никого нет с таким именем.\r\n" );
+	ch->send_to( "п²п╦п╨п╬пЁп╬ п╫п╣я┌ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪.\r\n" );
 	return;
     }
     
@@ -79,21 +79,21 @@ COMMAND(Whois, "whois")
     buf << "{w";
     
     if (ch->getPC( )->canSeeProfession( pch )) {
-	buf << ", профессия {W" << pch->getProfession( )->getNameFor( ch ) << "{w";
+	buf << ", п©я─п╬я└п╣я│я│п╦я▐ {W" << pch->getProfession( )->getNameFor( ch ) << "{w";
 	
 	if (pch->getSubProfession( ) != prof_none)
 	    buf << " ({W" << pch->getSubProfession( )->getWhoNameFor( ch ) << "{w)";
     }
     
     if (ch->getPC( )->canSeeLevel( pch ))
-	buf << ", уровень {W" << pch->getRealLevel( ) << "{w";
+	buf << ", я┐я─п╬п╡п╣п╫я▄ {W" << pch->getRealLevel( ) << "{w";
 
     lines.add( buf );
 
     /* Ethos-Align */
     if (ch->getClan( ) == pch->getClan( ) && !ch->getClan( )->isDispersed( ))
     {
-	buf << "характер {W"
+	buf << "я┘п╟я─п╟п╨я┌п╣я─ {W"
 	    << ethos_table.name( pch->ethos ) << "-"
 	    << align_table.name( ALIGNMENT(pch) ) << "{w";
 	lines.add( buf );
@@ -101,10 +101,10 @@ COMMAND(Whois, "whois")
 
     /* Remorts. PK */
     if (pch->getRemorts( ).size( )) 
-	buf << "количество перерождений: {W" << pch->getRemorts( ).size( ) << "{w    ";
+	buf << "п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п©п╣я─п╣я─п╬п╤п╢п╣п╫п╦п╧: {W" << pch->getRemorts( ).size( ) << "{w    ";
 
     if (pch->getRealLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, pch )) 
-	buf << "находится в твоем {R(PK){w";
+	buf << "п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡ я┌п╡п╬п╣п╪ {R(PK){w";
 
     lines.add( buf );
 
@@ -112,13 +112,13 @@ COMMAND(Whois, "whois")
     if (!pch->getClan( )->isHidden( )) {
 	const Clan &clan = *pch->getClan( );
 	
-	buf << "клан {" << clan.getColor( ) << clan.getShortName( ) << "{w, "
-	    << "клановое звание [{" << clan.getColor( ) << clan.getTitle( pch ) << "{w]";
+	buf << "п╨п╩п╟п╫ {" << clan.getColor( ) << clan.getShortName( ) << "{w, "
+	    << "п╨п╩п╟п╫п╬п╡п╬п╣ п╥п╡п╟п╫п╦п╣ [{" << clan.getColor( ) << clan.getTitle( pch ) << "{w]";
 	
 	if (clan.isLeader( pch ))
-	    buf << ", лидер";
+	    buf << ", п╩п╦п╢п╣я─";
 	else if (clan.isRecruiter( pch ))
-	    buf << ", рекрутер";
+	    buf << ", я─п╣п╨я─я┐я┌п╣я─";
 
 	lines.add( buf );
     }
@@ -136,19 +136,19 @@ COMMAND(Whois, "whois")
     std::vector<const char *> flags;
     
     if (IS_SET( pch->comm, COMM_AFK ))  flags.push_back( " {CA{w(afk)" );
-    if (pch->incog_level >= LEVEL_HERO) flags.push_back( " {DI{w(инкогнито)" );
+    if (pch->incog_level >= LEVEL_HERO) flags.push_back( " {DI{w(п╦п╫п╨п╬пЁп╫п╦я┌п╬)" );
     if (pch->invis_level >= LEVEL_HERO) flags.push_back( " {DW{w(wizinv)" );
-    if (IS_KILLER( pch ))               flags.push_back( " {RK{w(убийца)" );
-    if (IS_THIEF( pch ))                flags.push_back( " {RT{w(вор)" );
-    if (IS_SLAIN( pch ))                flags.push_back( " {DS{w(убит)" );
-    if (IS_GHOST( pch ))                flags.push_back( " {DG{w(призрак)" );
-    if (IS_DEATH_TIME( pch ))           flags.push_back( " {DP{w(защита богов)" );
-    if (IS_VIOLENT( pch ))              flags.push_back( " {BV{w(адреналин в крови)" );
-    if (pch->curse != 100)              flags.push_back( " {DC{w(проклят богами)" );
-    if (pch->bless)                     flags.push_back( " {CB{w(благословлен богами)" );
-    if (IS_SET( pch->act, PLR_WANTED))  flags.push_back( " {RW{w(в розыске)" );
-    if (pch->isAffected(gsn_manacles)) flags.push_back( " {mM{w(в кандалах)" );
-    if (pch->isAffected(gsn_jail ))   flags.push_back( " {mJ{w(в тюрьме)" );
+    if (IS_KILLER( pch ))               flags.push_back( " {RK{w(я┐п╠п╦п╧я├п╟)" );
+    if (IS_THIEF( pch ))                flags.push_back( " {RT{w(п╡п╬я─)" );
+    if (IS_SLAIN( pch ))                flags.push_back( " {DS{w(я┐п╠п╦я┌)" );
+    if (IS_GHOST( pch ))                flags.push_back( " {DG{w(п©я─п╦п╥я─п╟п╨)" );
+    if (IS_DEATH_TIME( pch ))           flags.push_back( " {DP{w(п╥п╟я┴п╦я┌п╟ п╠п╬пЁп╬п╡)" );
+    if (IS_VIOLENT( pch ))              flags.push_back( " {BV{w(п╟п╢я─п╣п╫п╟п╩п╦п╫ п╡ п╨я─п╬п╡п╦)" );
+    if (pch->curse != 100)              flags.push_back( " {DC{w(п©я─п╬п╨п╩я▐я┌ п╠п╬пЁп╟п╪п╦)" );
+    if (pch->bless)                     flags.push_back( " {CB{w(п╠п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫ п╠п╬пЁп╟п╪п╦)" );
+    if (IS_SET( pch->act, PLR_WANTED))  flags.push_back( " {RW{w(п╡ я─п╬п╥я▀я│п╨п╣)" );
+    if (pch->isAffected(gsn_manacles)) flags.push_back( " {mM{w(п╡ п╨п╟п╫п╢п╟п╩п╟я┘)" );
+    if (pch->isAffected(gsn_jail ))   flags.push_back( " {mJ{w(п╡ я┌я▌я─я▄п╪п╣)" );
 
     if (pch->getAttributes( ).isAvailable( "nochannel" ))
 	flags.push_back( " {mN{w(nochannel)" );
@@ -157,10 +157,10 @@ COMMAND(Whois, "whois")
 	flags.push_back( " {mP{w(nopost)" );
 
     if (pch->getAttributes( ).isAvailable( "teacher" ))
-	flags.push_back( " {gT{w(может обучать других)" );
+	flags.push_back( " {gT{w(п╪п╬п╤п╣я┌ п╬п╠я┐я┤п╟я┌я▄ п╢я─я┐пЁп╦я┘)" );
     
     if (!flags.empty( ))
-	buf << "флаги:";
+	buf << "я└п╩п╟пЁп╦:";
 
     for (std::vector<const char *>::iterator i = flags.begin( ); i != flags.end( ); i++) {
 	if (DLString(buf.str()).colorLength() + DLString(*i).colorLength() > 70) {

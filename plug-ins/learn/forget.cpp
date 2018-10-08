@@ -27,17 +27,17 @@ CMDRUN( forget )
     SkillManager *manager = SkillManager::getThis( );
     
     if (!pch) {
-	ch->send_to( "á Õ ÔÅÂÑ × ÍÏÚÇÁÈ ÅÓÔØ ÞÅÇÏ ÚÁÂÙ×ÁÔØ??\r\n" );
+	ch->send_to( "Ð Ñƒ Ñ‚ÐµÐ±Ñ Ð² Ð¼Ð¾Ð·Ð³Ð°Ñ… ÐµÑÑ‚ÑŒ Ñ‡ÐµÐ³Ð¾ Ð·Ð°Ð±Ñ‹Ð²Ð°Ñ‚ÑŒ??\r\n" );
 	return;
     }
     
     if (ch->getProfession( ) != prof_universal) {
-	ch->send_to( "ôÙ ÎÉÞÅÇÏ ÎÅ ÍÏÖÅÛØ ÚÁÂÙÔØ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ñ‚ÑŒ.\r\n" );
 	return;
     }
     
     if (argument.empty( )) {
-	ch->println( "þÔÏ ÉÍÅÎÎÏ ÔÙ ÈÏÞÅÛØ ÚÁÂÙÔØ?" );
+	ch->println( "Ð§Ñ‚Ð¾ Ð¸Ð¼ÐµÐ½Ð½Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ñ‚ÑŒ?" );
 	return;
     }
     
@@ -63,9 +63,9 @@ CMDRUN( forget )
 	}
 
 	if (buf.str( ).empty( ))
-	    ch->send_to( "õ ÔÅÂÑ ÏÔÌÉÞÎÁÑ ÐÁÍÑÔØ: ÔÙ ÎÉÞÅÇÏ ÎÅ ÍÏÖÅÛØ ÚÁÂÙÔØ\r\n" );
+	    ch->send_to( "Ð£ Ñ‚ÐµÐ±Ñ Ð¾Ñ‚Ð»Ð¸Ñ‡Ð½Ð°Ñ Ð¿Ð°Ð¼ÑÑ‚ÑŒ: Ñ‚Ñ‹ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ñ‚ÑŒ\r\n" );
 	else 
-	    ch->printf( "ôÅÐÅÒØ ÔÙ ÂÕÄÅÛØ ÚÁÂÙ×ÁÔØ '%s'.\r\n", buf.str( ).c_str( ) );
+	    ch->printf( "Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ Ð±ÑƒÐ´ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ð²Ð°Ñ‚ÑŒ '%s'.\r\n", buf.str( ).c_str( ) );
 	
 	return;
     }
@@ -74,24 +74,24 @@ CMDRUN( forget )
     skill = manager->find( sn );
     
     if (!skill) {
-	ch->send_to( "óÒÅÄÉ ÄÏÓÔÕÐÎÙÈ ÔÅÂÅ ÕÍÅÎÉÊ ÎÅÔ ÎÉÞÅÇÏ ÐÏÈÏÖÅÇÏ.\r\n" );
+	ch->send_to( "Ð¡Ñ€ÐµÐ´Ð¸ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ñ… Ñ‚ÐµÐ±Ðµ ÑƒÐ¼ÐµÐ½Ð¸Ð¹ Ð½ÐµÑ‚ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð¿Ð¾Ñ…Ð¾Ð¶ÐµÐ³Ð¾.\r\n" );
 	return;
     }
 
     if (!skill->canForget( pch )) {
-	ch->printf( "ôÙ ÎÅ ÍÏÖÅÛØ ÚÁÂÙÔØ ÉÓÓËÕÓÔ×Ï '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+	ch->printf( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ñ‚ÑŒ Ð¸ÑÑÐºÑƒÑÑ‚Ð²Ð¾ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 	return;
     }
 
     bool &forgetting = pch->getSkillData( sn ).forgetting;
 
     if (forgetting) {
-	ch->printf( "ôÙ É ÔÁË ÔÏÌØËÏ É ÄÅÌÁÅÛØ, ÞÔÏ ÚÁÂÙ×ÁÅÛØ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+	ch->printf( "Ð¢Ñ‹ Ð¸ Ñ‚Ð°Ðº Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¸ Ð´ÐµÐ»Ð°ÐµÑˆÑŒ, Ñ‡Ñ‚Ð¾ Ð·Ð°Ð±Ñ‹Ð²Ð°ÐµÑˆÑŒ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 	return;
     }
 
     forgetting = true;
-    ch->printf( "ôÅÐÅÒØ ÔÙ ÂÕÄÅÛØ ÚÁÂÙ×ÁÔØ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+    ch->printf( "Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ Ð±ÑƒÐ´ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ð²Ð°Ñ‚ÑŒ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 }
 
 CMDRUN( remember )
@@ -101,12 +101,12 @@ CMDRUN( remember )
     DLString argument = constArguments;
 
     if (ch->is_npc( )) {
-	ch->send_to("ôÅÂÅ ÔÑÖÅÌÏ ×ÓÐÏÍÎÉÔØ ÄÁÖÅ ÐÁÐÕ É ÍÁÍÕ..\n\r");
+	ch->send_to("Ð¢ÐµÐ±Ðµ Ñ‚ÑÐ¶ÐµÐ»Ð¾ Ð²ÑÐ¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ Ð´Ð°Ð¶Ðµ Ð¿Ð°Ð¿Ñƒ Ð¸ Ð¼Ð°Ð¼Ñƒ..\n\r");
 	return;
     }
 
     if (argument.empty( )) {
-	ch->println( "þÔÏ ÉÍÅÎÎÏ ÔÙ ÈÏÞÅÛØ ×ÓÐÏÍÎÉÔØ?" );
+	ch->println( "Ð§Ñ‚Ð¾ Ð¸Ð¼ÐµÐ½Ð½Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð²ÑÐ¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ?" );
 	return;
     }
     
@@ -129,9 +129,9 @@ CMDRUN( remember )
 	}
 
 	if (buf.empty( ))
-	    ch->send_to( "ôÅÂÅ ÎÅÞÅÇÏ ×ÓÐÏÍÉÎÁÔØ.\r\n" );
+	    ch->send_to( "Ð¢ÐµÐ±Ðµ Ð½ÐµÑ‡ÐµÐ³Ð¾ Ð²ÑÐ¿Ð¾Ð¼Ð¸Ð½Ð°Ñ‚ÑŒ.\r\n" );
 	else 
-	    ch->printf( "ôÙ ×ÓÐÏÍÉÎÁÅÛØ '%s'.\r\n", buf.c_str( ) );
+	    ch->printf( "Ð¢Ñ‹ Ð²ÑÐ¿Ð¾Ð¼Ð¸Ð½Ð°ÐµÑˆÑŒ '%s'.\r\n", buf.c_str( ) );
 
 	return;
     }
@@ -140,25 +140,25 @@ CMDRUN( remember )
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill) {
-	ch->send_to( "òÁÚ×Å ÍÏÖÎÏ ×ÓÐÏÍÎÉÔØ ÔÏ, ÞÅÇÏ ÎÅ ÚÎÁÅÛØ?\n\r");
+	ch->send_to( "Ð Ð°Ð·Ð²Ðµ Ð¼Ð¾Ð¶Ð½Ð¾ Ð²ÑÐ¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ Ñ‚Ð¾, Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð·Ð½Ð°ÐµÑˆÑŒ?\n\r");
 	return;
     }
     
     PCSkillData &data = ch->getPC( )->getSkillData( sn );
 
     if (!data.forgetting) {
-	act_p( "ôÙ É ÎÅ ÐÙÔÁÌ$gÏÓØ|ÓÑ|ÁÓØ ÚÁÂÙÔØ $t.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR, POS_DEAD );
+	act_p( "Ð¢Ñ‹ Ð¸ Ð½Ðµ Ð¿Ñ‹Ñ‚Ð°Ð»$gÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ Ð·Ð°Ð±Ñ‹Ñ‚ÑŒ $t.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR, POS_DEAD );
 	return;
     }
     
     if (data.learned <= 1) {
-	ch->send_to( "éÄÉ ÓÎÁÞÁÌÁ ÐÏÐÒÁËÔÉËÕÊÓÑ.\n\r");
+	ch->send_to( "Ð˜Ð´Ð¸ ÑÐ½Ð°Ñ‡Ð°Ð»Ð° Ð¿Ð¾Ð¿Ñ€Ð°ÐºÑ‚Ð¸ÐºÑƒÐ¹ÑÑ.\n\r");
 	return;
     }
 
     data.forgetting = false;
 
-    ch->printf( "ôÙ ×ÓÐÏÍÉÎÁÅÛØ '%s'.\n\r", skill->getNameFor( ch ).c_str( ) );
+    ch->printf( "Ð¢Ñ‹ Ð²ÑÐ¿Ð¾Ð¼Ð¸Ð½Ð°ÐµÑˆÑŒ '%s'.\n\r", skill->getNameFor( ch ).c_str( ) );
 }
 
 void SkillTimerUpdate::run( PCharacter *ch ) 
@@ -172,7 +172,7 @@ void SkillTimerUpdate::run( PCharacter *ch )
 	
 	if (!skill->canForget( ch ) || ch->getProfession( ) != prof_universal) {
 	    if (data.forgetting) {
-		ch->printf( "ôÙ ÐÒÅËÒÁÝÁÅÛØ ÚÁÂÙ×ÁÔØ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+		ch->printf( "Ð¢Ñ‹ Ð¿Ñ€ÐµÐºÑ€Ð°Ñ‰Ð°ÐµÑˆÑŒ Ð·Ð°Ð±Ñ‹Ð²Ð°Ñ‚ÑŒ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 		data.forgetting = false;
 	    }
 
@@ -226,6 +226,6 @@ void SkillTimerUpdate::forget( PCharacter *ch, int sn )
 	
     data.learned = std::max(1, data.learned.getValue( ));
 
-    ch->printf( "{gôÙ ÚÁÂÙ×ÁÅÛØ ÉÓËÕÓÓÔ×Ï '%s'.{x\n\r", 
+    ch->printf( "{gÐ¢Ñ‹ Ð·Ð°Ð±Ñ‹Ð²Ð°ÐµÑˆÑŒ Ð¸ÑÐºÑƒÑÑÑ‚Ð²Ð¾ '%s'.{x\n\r", 
                 SkillManager::getThis( )->find( sn )->getNameFor( ch ).c_str( ) ); 
 }

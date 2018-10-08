@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include <math.h>
 
@@ -130,7 +130,7 @@ CMDRUN( buy )
 {
     if (constArguments.empty( ))
     {
-	ch->send_to("Купить что?\n\r");
+	ch->send_to("п я┐п©п╦я┌я▄ я┤я┌п╬?\n\r");
 	return;
     }
 
@@ -153,7 +153,7 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-	act_p( "$c1 говорит тебе '{gЯ не продаю этого - используй 'list'{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
+	act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╞ п╫п╣ п©я─п╬п╢п╟я▌ я█я┌п╬пЁп╬ - п╦я│п©п╬п╩я▄п╥я┐п╧ 'list'{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
 	ch->reply = keeper;
 	return;
     }
@@ -172,7 +172,7 @@ CMDRUN( buy )
 	}
 
 	if ( count < number ) {
-	    act_p( "$c1 говорит тебе '{gУ меня нет столько.{x'",
+	    act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gпё п╪п╣п╫я▐ п╫п╣я┌ я│я┌п╬п╩я▄п╨п╬.{x'",
 	    keeper, 0, ch, TO_VICT, POS_RESTING );
 	    ch->reply = keeper;
 	    return;
@@ -180,7 +180,7 @@ CMDRUN( buy )
     }
 
     if (obj->pIndexData->limit > 0 && obj->pIndexData->limit < obj->pIndexData->count - 1 + number) {
-	act_p("$c1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",
+	act_p("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╒п╟п╨п╬пЁп╬ п╨п╬п╩п╦я┤п╣я│я┌п╡п╟ п╫п╦я┬я┌я▐п╨п╬п╡ я┐ п╪п╣п╫я▐ п╫п╣я┌я┐.{x'",
 	keeper, 0, ch, TO_VICT, POS_RESTING );
 	ch->reply = keeper;
 	return;
@@ -189,10 +189,10 @@ CMDRUN( buy )
     if ( ( ch->silver + ch->gold * 100) < cost * number )
     {
 	if ( number > 1 )
-	    act_p( "$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
+	    act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п©п╩п╟я┌п╦я┌я▄ п╥п╟ я│я┌п╬п╩я▄п╨п╬.{x'",
 		    keeper, obj, ch, TO_VICT, POS_RESTING );
 	else
-	    act_p( "$c1 говорит тебе '{gУ тебя нет нужной суммы, чтоб купить $o4.{x'",
+	    act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gпё я┌п╣п╠я▐ п╫п╣я┌ п╫я┐п╤п╫п╬п╧ я│я┐п╪п╪я▀, я┤я┌п╬п╠ п╨я┐п©п╦я┌я▄ $o4.{x'",
 		    keeper, obj, ch, TO_VICT,POS_RESTING );
 	
 	ch->reply = keeper;
@@ -201,7 +201,7 @@ CMDRUN( buy )
 
     if ( ch->getRealLevel( ) < get_wear_level( ch, obj ) )
     {
-	act_p( "$c1 говорит тебе '{gТы не сможешь использовать $o4{x'.",
+	act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ $o4{x'.",
 		keeper, obj, ch, TO_VICT,POS_RESTING );
 
 	ch->reply = keeper;
@@ -210,13 +210,13 @@ CMDRUN( buy )
 
     if ( ch->carry_number + number * obj->getNumber( ) > ch->canCarryNumber( ) )
     {
-	ch->send_to("Ты не можешь нести так много вещей.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╣я│я┌п╦ я┌п╟п╨ п╪п╫п╬пЁп╬ п╡п╣я┴п╣п╧.\n\r");
 	return;
     }
 
     if ( ch->carry_weight + number * obj->getWeight( ) > ch->canCarryWeight( ) )
     {
-	ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╣я│я┌п╦ я┌п╟п╨я┐я▌ я┌я▐п╤п╣я│я┌я▄.\n\r");
 	return;
     }
 
@@ -225,24 +225,24 @@ CMDRUN( buy )
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && roll < gsn_haggle->getEffective( ch ) )
     {
 	cost -= obj->cost / 2 * roll / 100;
-	act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
+	act_p( "п╒я▀ я┌п╬я─пЁя┐п╣я┬я▄я│я▐ я│ $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
 	gsn_haggle->improve( ch, true );
     }
 
     if ( number > 1 )
     {
-	sprintf( buf, "$c1 покупает $o4[%d].", number );
+	sprintf( buf, "$c1 п©п╬п╨я┐п©п╟п╣я┌ $o4[%d].", number );
 	act_p( buf, ch, obj, 0, TO_ROOM, POS_RESTING );
-	sprintf( buf, "Ты покупаешь $o4[%d] за %d серебрян%s.",
+	sprintf( buf, "п╒я▀ п©п╬п╨я┐п©п╟п╣я┬я▄ $o4[%d] п╥п╟ %d я│п╣я─п╣п╠я─я▐п╫%s.",
 			number, cost * number,
-			GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
+			GET_COUNT( cost * number, "я┐я▌ п╪п╬п╫п╣я┌я┐", "я▀п╣ п╪п╬п╫п╣я┌я▀", "я▀я┘ п╪п╬п╫п╣я┌" ) );
 	act_p( buf, ch, obj, 0, TO_CHAR, POS_RESTING );
     }
     else
     {
-	act_p( "$c1 покупает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
-	sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
-			cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
+	act_p( "$c1 п©п╬п╨я┐п©п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+	sprintf( buf, "п╒я▀ п©п╬п╨я┐п©п╟п╣я┬я▄ $o4 п╥п╟ %d я│п╣я─п╣п╠я─я▐п╫%s.",
+			cost, GET_COUNT( cost, "я┐я▌ п╪п╬п╫п╣я┌я┐", "я▀п╣ п╪п╬п╫п╣я┌я▀", "я▀я┘ п╪п╬п╫п╣я┌" ) );
 	act_p( buf, ch, obj, 0, TO_CHAR,POS_RESTING );
     }
 
@@ -250,9 +250,9 @@ CMDRUN( buy )
     mprog_sell( keeper, ch, obj, cost, number );
 
     cost += keeper->silver;
-    /* 'number' процентов от цены и кассы - в банк */
+    /* 'number' п©я─п╬я├п╣п╫я┌п╬п╡ п╬я┌ я├п╣п╫я▀ п╦ п╨п╟я│я│я▀ - п╡ п╠п╟п╫п╨ */
     dreamland->putToMerchantBank( cost * number / 100 );
-    /* положить доход в кассу и вычесть то, что ушло в банк */
+    /* п©п╬п╩п╬п╤п╦я┌я▄ п╢п╬я┘п╬п╢ п╡ п╨п╟я│я│я┐ п╦ п╡я▀я┤п╣я│я┌я▄ я┌п╬, я┤я┌п╬ я┐я┬п╩п╬ п╡ п╠п╟п╫п╨ */
     keeper->silver = cost * number - ( cost * number / 100 ) * 100;
 
     for ( count = 0; count < number; count++ )
@@ -298,7 +298,7 @@ CMDRUN( sell )
 
     if (arg.empty( ))
     {
-	ch->send_to("Продать что?\n\r");
+	ch->send_to("п÷я─п╬п╢п╟я┌я▄ я┤я┌п╬?\n\r");
 	return;
     }
 
@@ -309,13 +309,13 @@ CMDRUN( sell )
 
     ShopStock stock = get_stock_keeper( trader, NULL, "" );
     if (stock.size( ) > 25) {
-        tell_dim( ch, keeper, "Я ничего не покупаю! Мне некуда ставить товар!");
+        tell_dim( ch, keeper, "п╞ п╫п╦я┤п╣пЁп╬ п╫п╣ п©п╬п╨я┐п©п╟я▌! п°п╫п╣ п╫п╣п╨я┐п╢п╟ я│я┌п╟п╡п╦я┌я▄ я┌п╬п╡п╟я─!");
         return;
     }
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
     {
-	act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
+	act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gпё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.{x'",
 	keeper, 0, ch, TO_VICT,POS_RESTING );
 	ch->reply = keeper;
 	return;
@@ -323,25 +323,25 @@ CMDRUN( sell )
 
     if ( !can_drop_obj( ch, obj ) )
     {
-	ch->send_to("Ты не можешь избавиться от этого.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
     if (!keeper->can_see(obj))
     {
-	act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
+	act_p("$c1 п╫п╣ п╡п╦п╢п╦я┌ я█я┌п╬пЁп╬.",keeper,0,ch,TO_VICT,POS_RESTING);
 	return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-	act_p( "$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
+	act_p( "$c1 п╫п╣ п╦п╫я┌п╣я─п╣я│я┐п╣я┌я│я▐ $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
 	return;
     }
 
     if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
     {
-	act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
+	act_p("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gпё п╪п╣п╫я▐ п╫п╣я┌ п╢п╣п╫п╣пЁ, я┤я┌п╬п╠ п╥п╟п©п╩п╟я┌п╦я┌я▄ я┌п╣п╠п╣ п╥п╟ $o4.{x'",
 	      keeper,obj,ch,TO_VICT,POS_RESTING);
 	return;
     }
@@ -352,7 +352,7 @@ CMDRUN( sell )
     if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( ch ))
     {
 	roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
-	ch->send_to("Ты торгуешься с продавцом.\n\r");
+	ch->send_to("п╒я▀ я┌п╬я─пЁя┐п╣я┬я▄я│я▐ я│ п©я─п╬п╢п╟п╡я├п╬п╪.\n\r");
 
 	cost += obj->cost / 2 * roll / 100;
 	cost = min(cost,95 * get_cost(keeper,obj,true, trader) / 100);
@@ -361,20 +361,20 @@ CMDRUN( sell )
 	
 	if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
 	{
-	    act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
+	    act_p("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gпё п╪п╣п╫я▐ п╫п╣я┌ п╢п╣п╫п╣пЁ, я┤я┌п╬п╠ п╥п╟п©п╩п╟я┌п╦я┌я▄ я┌п╣п╠п╣ п╥п╟ $o4.{x'",
 	    keeper,obj,ch,TO_VICT,POS_RESTING);
 	    return;
 	}
     }
 
-    act_p( "$c1 продает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+    act_p( "$c1 п©я─п╬п╢п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
     silver = cost - (cost/100) * 100;
     gold   = cost/100;
 
-    sprintf( buf2, "Ты продаешь $o4 за %s%s%s.",
-		    silver != 0 ? "%d серебра":"",    
-		    ( silver != 0 && gold != 0 ) ? " и ":"",	      
-		    gold != 0 ? "%d золота":"");		      
+    sprintf( buf2, "п╒я▀ п©я─п╬п╢п╟п╣я┬я▄ $o4 п╥п╟ %s%s%s.",
+		    silver != 0 ? "%d я│п╣я─п╣п╠я─п╟":"",    
+		    ( silver != 0 && gold != 0 ) ? " п╦ ":"",	      
+		    gold != 0 ? "%d п╥п╬п╩п╬я┌п╟":"");		      
 
     if (silver != 0 && gold != 0)
 	sprintf( buf, buf2, silver, gold );
@@ -393,7 +393,7 @@ CMDRUN( sell )
 	
 	if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
 	{
-	    act_p("$c1 говорит тебе '{GУ меня нет денег.{x'",
+	    act_p("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gпё п╪п╣п╫я▐ п╫п╣я┌ п╢п╣п╫п╣пЁ.{x'",
 	    keeper,0,ch,TO_VICT,POS_RESTING);
 	    return;
 	}
@@ -410,9 +410,9 @@ CMDRUN( sell )
     {
 	ch->gold = gold_old;
 	ch->silver = silver_old;
-	act_p( "$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
+	act_p( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╢п╟я┌я▄ я┌п╣п╠п╣ п╢п╣п╫я▄пЁп╦, п╫п╬ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я┘ я┐п╢п╣я─п╤п╟я┌я▄.",
 	keeper, 0, ch, TO_VICT,POS_RESTING );
-	act_p( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM,POS_RESTING );
+	act_p( "$c1 я─п╬п╫я▐п╣я┌ п╫п╟ п©п╬п╩ п╨я┐я┤п╨я┐ п╪п╬п╫п╣я┌.", ch,0,0,TO_ROOM,POS_RESTING );
 	obj_to_room( create_money( gold, silver ), ch->in_room );
     }
 
@@ -452,13 +452,13 @@ CMDRUN( list )
 
     if (stock.empty( )) {
 	if (arg.empty( ))
-	    tell_dim( ch, keeper, "Мне сегодня нечего тебе предложить.");
+	    tell_dim( ch, keeper, "п°п╫п╣ я│п╣пЁп╬п╢п╫я▐ п╫п╣я┤п╣пЁп╬ я┌п╣п╠п╣ п©я─п╣п╢п╩п╬п╤п╦я┌я▄.");
 	else
-	    tell_dim( ch, keeper, "Я не продаю '$t'.", arg.c_str( ) );
+	    tell_dim( ch, keeper, "п╞ п╫п╣ п©я─п╬п╢п╟я▌ '$t'.", arg.c_str( ) );
         return;
     }
 
-    buf << "[ Ном.| Ур.  Цена Кол-во] Товар" << endl;
+    buf << "[ п²п╬п╪.| пёя─.  п╕п╣п╫п╟ п п╬п╩-п╡п╬] п╒п╬п╡п╟я─" << endl;
 
     for (int i = 0; i < stock.size( ); i++) {
         const StockInfo &si = stock.at( i );
@@ -476,7 +476,7 @@ CMDRUN( list )
     }
 
     ch->send_to( buf );
-    tell_dim( ch, keeper, "Скажи мне название товара, и я расскажу всё, что о нем знаю, за 1%% от стоимости." );
+    tell_dim( ch, keeper, "п║п╨п╟п╤п╦ п╪п╫п╣ п╫п╟п╥п╡п╟п╫п╦п╣ я┌п╬п╡п╟я─п╟, п╦ я▐ я─п╟я│я│п╨п╟п╤я┐ п╡я│я▒, я┤я┌п╬ п╬ п╫п╣п╪ п╥п╫п╟я▌, п╥п╟ 1%% п╬я┌ я│я┌п╬п╦п╪п╬я│я┌п╦." );
 }
 
 /*----------------------------------------------------------------------------
@@ -493,7 +493,7 @@ CMDRUN( value )
 
     if (arg.empty( ))
     {
-	ch->send_to("Узнать цену чего?\n\r");
+	ch->send_to("пёп╥п╫п╟я┌я▄ я├п╣п╫я┐ я┤п╣пЁп╬?\n\r");
 	return;
     }
 
@@ -504,7 +504,7 @@ CMDRUN( value )
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
     {
-	act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
+	act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gпё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.{x'",
 		keeper, 0, ch, TO_VICT,POS_RESTING );
 	ch->reply = keeper;
 	return;
@@ -512,32 +512,32 @@ CMDRUN( value )
 
     if (!keeper->can_see(obj))
     {
-	act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
+	act_p("$c1 п╫п╣ п╡п╦п╢п╦я┌ я█я┌п╬пЁп╬.",keeper,0,ch,TO_VICT,POS_RESTING);
 	return;
     }
 
     if ( !can_drop_obj( ch, obj ) )
     {
-	ch->send_to("Ты не можешь избавиться от этого.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-	act_p("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
+	act_p("$c1 п╫п╣ п╦п╫я┌п╣я─п╣я│я┐п╣я┌я│я▐ $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
 	return;
     }
 
     if ( dreamland->getBalanceMerchantBank() < (cost / 100 + 1) )
     {
 	sprintf( buf,
-		"$c1 говорит тебе '{gЯ дал бы тебе %d серебра и %d золота за $o4, но у меня нет денег.{x'",
+		"$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╞ п╢п╟п╩ п╠я▀ я┌п╣п╠п╣ %d я│п╣я─п╣п╠я─п╟ п╦ %d п╥п╬п╩п╬я┌п╟ п╥п╟ $o4, п╫п╬ я┐ п╪п╣п╫я▐ п╫п╣я┌ п╢п╣п╫п╣пЁ.{x'",
 		cost - (cost/100) * 100, cost/100 );
     }
     else
     {	
 	sprintf( buf,
-		"$c1 говорит тебе '{gЯ дам тебе %d серебра и %d золота за $o4.{x'",
+		"$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╞ п╢п╟п╪ я┌п╣п╠п╣ %d я│п╣я─п╣п╠я─п╟ п╦ %d п╥п╬п╩п╬я┌п╟ п╥п╟ $o4.{x'",
 		cost - (cost/100) * 100, cost/100 );
     }
 
@@ -555,7 +555,7 @@ CMDRUN( properties )
 
     if (arg.empty( ))
     {
-	ch->send_to("Узнать характеристики чего?\n\r");
+	ch->send_to("пёп╥п╫п╟я┌я▄ я┘п╟я─п╟п╨я┌п╣я─п╦я│я┌п╦п╨п╦ я┤п╣пЁп╬?\n\r");
 	return;
     }
 
@@ -615,7 +615,7 @@ ShopTrader::Pointer find_keeper( Character *ch )
     
     trader = find_attracted_mob_behavior<ShopTrader>( ch, OCC_SHOPPER );
     if (!trader) {
-	ch->send_to("Здесь нет продавцов.\n\r");
+	ch->send_to("п≈п╢п╣я│я▄ п╫п╣я┌ п©я─п╬п╢п╟п╡я├п╬п╡.\n\r");
 	return null;
     }
 
@@ -629,8 +629,8 @@ ShopTrader::Pointer find_keeper( Character *ch )
     if ( IS_SET(keeper->in_room->area->area_flag,AREA_HOMETOWN)
 	 && !ch->is_npc() && IS_SET(ch->act,PLR_WANTED) )
     {
-	do_say( keeper, "Преступникам не место здесь!" );
-        DLString msg = fmt( 0, "%1$C1 - преступни%1$Gк|к|ца|ки! Хватайте %1$P2!", ch );
+	do_say( keeper, "п÷я─п╣я│я┌я┐п©п╫п╦п╨п╟п╪ п╫п╣ п╪п╣я│я┌п╬ п╥п╢п╣я│я▄!" );
+        DLString msg = fmt( 0, "%1$C1 - п©я─п╣я│я┌я┐п©п╫п╦%1$Gп╨|п╨|я├п╟|п╨п╦! п╔п╡п╟я┌п╟п╧я┌п╣ %1$P2!", ch );
 	do_yell( keeper, msg.c_str( ) );
 	return null;
     }
@@ -640,7 +640,7 @@ ShopTrader::Pointer find_keeper( Character *ch )
     */
     if (time_info.hour > trader->closeHour) 
     {
-	do_say( keeper, "Извини, магазин уже закрыт. Приходи завтра." );
+	do_say( keeper, "п≤п╥п╡п╦п╫п╦, п╪п╟пЁп╟п╥п╦п╫ я┐п╤п╣ п╥п╟п╨я─я▀я┌. п÷я─п╦я┘п╬п╢п╦ п╥п╟п╡я┌я─п╟." );
 	return null;
     }
 
@@ -649,19 +649,19 @@ ShopTrader::Pointer find_keeper( Character *ch )
     */
     if ( !keeper->can_see( ch ) && !ch->is_immortal() )
     {
-	do_say( keeper, "Я не торгую с тем, кого не вижу." );
+	do_say( keeper, "п╞ п╫п╣ я┌п╬я─пЁя┐я▌ я│ я┌п╣п╪, п╨п╬пЁп╬ п╫п╣ п╡п╦п╤я┐." );
 	return null;
     }
 
     if (keeper->fighting) {
-	do_say( keeper, "Подожди немного, мне сейчас не до тебя." );
+	do_say( keeper, "п÷п╬п╢п╬п╤п╢п╦ п╫п╣п╪п╫п╬пЁп╬, п╪п╫п╣ я│п╣п╧я┤п╟я│ п╫п╣ п╢п╬ я┌п╣п╠я▐." );
 	return null;
     }
 /*    
     if (ch->getCurrStat( STAT_CHA ) < 18) {
 	switch (number_range( 1, 10 )) {
 	case 1:
-	    do_say( keeper, "Физиономия мне твоя несимпатична, не буду я тебя обслуживать." );
+	    do_say( keeper, "п╓п╦п╥п╦п╬п╫п╬п╪п╦я▐ п╪п╫п╣ я┌п╡п╬я▐ п╫п╣я│п╦п╪п©п╟я┌п╦я┤п╫п╟, п╫п╣ п╠я┐п╢я┐ я▐ я┌п╣п╠я▐ п╬п╠я│п╩я┐п╤п╦п╡п╟я┌я▄." );
 	    return 0;
 	case 2:
 	    do_say();

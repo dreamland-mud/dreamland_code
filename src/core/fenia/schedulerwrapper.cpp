@@ -18,7 +18,7 @@ int PlugLock::cnt = 0;
 using namespace Scripting;
 using namespace std;
 
-NMI_INIT(FeniaProcess, "поток")
+NMI_INIT(FeniaProcess, "п©п╬я┌п╬п╨")
 
 FeniaProcess::FeniaProcess() : running(false)
 {
@@ -201,7 +201,7 @@ NMI_INVOKE(FeniaProcess, stop, "")
 
 template class Scripting::NativeImpl<SchedulerWrapper>;
 
-NMI_INIT(SchedulerWrapper, "планировщик для потоков")
+NMI_INIT(SchedulerWrapper, "п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨ п╢п╩я▐ п©п╬я┌п╬п╨п╬п╡")
 
 NMI_INVOKE(SchedulerWrapper, Thread, "") {
     if(args.empty( ))

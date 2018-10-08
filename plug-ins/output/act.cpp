@@ -82,7 +82,7 @@ static DLString act_to_fmt(const char *s)
 	++s;
     }
     
-    // слово 'люди' пишется с большой буквы
+    // я│п╩п╬п╡п╬ 'п╩я▌п╢п╦' п©п╦я┬п╣я┌я│я▐ я│ п╠п╬п╩я▄я┬п╬п╧ п╠я┐п╨п╡я▀
     DLString rc = buf.str();
     DLString r = rc.colourStrip();
     if (r.length() > 2 && r.at(0) == '%' && isdigit(r.at(1)) && r.at(2) == '$') {
@@ -459,7 +459,7 @@ void tell_fmt( const char *msg, ... )
     typedef union { Character *ch; } arg_t;
     arg_t listener;
     
-    buf << "%2$^C1 говорит тебе '{G" << msg << "{x'";
+    buf << "%2$^C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{G" << msg << "{x'";
     va_start( ap, msg );
     va_copy( ap0, ap );
     listener = va_arg(ap, arg_t);
@@ -475,7 +475,7 @@ void say_fmt( const char *msg, ... )
     typedef union { Character *ch; } arg_t;
     arg_t teller;
     
-    buf << "%1$^C1 произносит '{g" << msg << "{x'";
+    buf << "%1$^C1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g" << msg << "{x'";
     va_start( ap, msg );
     va_copy( ap0, ap );
     teller = va_arg(ap, arg_t);
@@ -489,7 +489,7 @@ void tell_raw( Character *ch, NPCharacter *talker, const char *format, ... )
     char buf[MAX_STRING_LENGTH], buf0[MAX_STRING_LENGTH];
     va_list ap;
     
-    sprintf( buf0, "%s говорит тебе '{G%s{x'\n\r", ch->seeFullNameD( talker, '1' ).c_str( ), format );
+    sprintf( buf0, "%s пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{G%s{x'\n\r", ch->seeFullNameD( talker, '1' ).c_str( ), format );
     
     va_start( ap, format );
     vsprintf( buf,  buf0, ap );
@@ -504,7 +504,7 @@ void say_act( Character *listener, Character *teller,
 {
     ostringstream buf;
 
-    buf << "$C1 произносит '{g" << msg << "{x'";
+    buf << "$C1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g" << msg << "{x'";
     act( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
 }
 
@@ -513,7 +513,7 @@ void tell_act( Character *listener, Character *teller,
 {
     ostringstream buf;
 
-    buf << "$C1 говорит тебе '{G" << msg << "{x'";
+    buf << "$C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{G" << msg << "{x'";
     act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
@@ -522,7 +522,7 @@ void tell_dim( Character *listener, Character *teller,
 {
     ostringstream buf;
 
-    buf << "$C1 говорит тебе '{g" << msg << "{x'";
+    buf << "$C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{g" << msg << "{x'";
     act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 

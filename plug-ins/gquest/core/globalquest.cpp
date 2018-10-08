@@ -131,9 +131,9 @@ void GlobalQuest::printRemainedTime( ostringstream &buf ) const
 
     if (t > 0)
         buf << GQChannel::BOLD << t << GQChannel::NORMAL
-            << " минут" << GET_COUNT( t, "а", "ы", "");
+            << " п╪п╦п╫я┐я┌" << GET_COUNT( t, "п╟", "я▀", "");
     else
-        buf << "меньше минуты";
+        buf << "п╪п╣п╫я▄я┬п╣ п╪п╦п╫я┐я┌я▀";
 }
 
 bool GlobalQuest::isLevelOK( Character *ch ) const
@@ -149,7 +149,7 @@ bool GlobalQuest::isLevelOK( Character *ch ) const
     if (level >= getMinLevel( ) && level <= getMaxLevel( ))
 	return true;
     
-    /* проверка ситуации, когда игрок набрал уровень за время глобала */
+    /* п©я─п╬п╡п╣я─п╨п╟ я│п╦я┌я┐п╟я├п╦п╦, п╨п╬пЁп╢п╟ п╦пЁя─п╬п╨ п╫п╟п╠я─п╟п╩ я┐я─п╬п╡п╣п╫я▄ п╥п╟ п╡я─п╣п╪я▐ пЁп╩п╬п╠п╟п╩п╟ */
     if (level > maxLevel.getValue( ) && level <= maxLevel.getValue( ) + 2) {
 	XMLAttributeGlobalQuest::Pointer attr;
 
@@ -189,8 +189,8 @@ void GlobalQuest::exorcism( Character *ch ) const
     Room *recall;
     Character *actor = getActor( ch );
     
-    act_p( "$c1 улетучивается.", ch, 0, 0, TO_ROOM, POS_RESTING);
-    act_p( "Ты исчезаешь отсюда.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p( "$c1 я┐п╩п╣я┌я┐я┤п╦п╡п╟п╣я┌я│я▐.", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p( "п╒я▀ п╦я│я┤п╣п╥п╟п╣я┬я▄ п╬я┌я│я▌п╢п╟.", ch, 0, 0, TO_CHAR, POS_RESTING);
     
     if (ch->is_npc( ) && ch == actor) {
 	extract_char(ch);
@@ -213,7 +213,7 @@ void GlobalQuest::exorcism( Character *ch ) const
 	recall = get_room_index( ROOM_VNUM_TEMPLE );
 
     transfer_char( ch, ch, recall,
-                   NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+                   NULL, NULL, "%1$^C1 п©п╬я▐п╡п╦п╩%1$Gп╬я│я▄|я│я▐|п╟я│я▄ п╡ п╨п╬п╪п╫п╟я┌п╣." );
 }
 
 void GlobalQuest::wipeRoom( Room *room ) const

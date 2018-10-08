@@ -437,7 +437,7 @@ static void xml_node_set( Character *ch, XMLNode::Pointer root, const DLString &
     XMLNode::Pointer node;
     
     if (!root) {
-	stc("Корневой элемент документа пуст!\n\r", ch);
+	stc("п п╬я─п╫п╣п╡п╬п╧ я█п╩п╣п╪п╣п╫я┌ п╢п╬п╨я┐п╪п╣п╫я┌п╟ п©я┐я│я┌!\n\r", ch);
 	return;
     }
 
@@ -447,7 +447,7 @@ static void xml_node_set( Character *ch, XMLNode::Pointer root, const DLString &
 	    node->getFirstNode( )->setType( XMLNode::XML_TEXT );
 	    node->getFirstNode( )->setName( nodeValue );
 	} else {
-	    stc("Ошибка: неправильный элемент.\n\r", ch);
+	    stc("п·я┬п╦п╠п╨п╟: п╫п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ я█п╩п╣п╪п╣п╫я┌.\n\r", ch);
 	    return;
 	}
     }
@@ -462,7 +462,7 @@ static void xml_node_set( Character *ch, XMLNode::Pointer root, const DLString &
 	node->appendChild( child );
     }
 
-    ptc(ch, "Полю {W%s{x присвоено значение {G%s{x.\n\r", nodeName.c_str( ), nodeValue.c_str( ));
+    ptc(ch, "п÷п╬п╩я▌ {W%s{x п©я─п╦я│п╡п╬п╣п╫п╬ п╥п╫п╟я┤п╣п╫п╦п╣ {G%s{x.\n\r", nodeName.c_str( ), nodeValue.c_str( ));
 }
 
 MEDIT(shop)
@@ -475,12 +475,12 @@ MEDIT(shop)
     argument = one_argument( argument, cmd );
     
     if (!cmd[0]) {
-	stc("Используйте 'shop help' для справки.\r\n", ch);
+	stc("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣ 'shop help' п╢п╩я▐ я│п©я─п╟п╡п╨п╦.\r\n", ch);
 	return false;
     }
 
     if (!mob.behavior) {
-	stc("Поведение продавца не задано, используйте 'behavior shopper'.\r\n", ch);
+	stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ п©я─п╬п╢п╟п╡я├п╟ п╫п╣ п╥п╟п╢п╟п╫п╬, п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ 'behavior shopper'.\r\n", ch);
 	return false;
     }
 
@@ -532,19 +532,19 @@ MEDIT(shop)
 	}
     }
 
-    stc("shop sellprofit <number>  - наценка от продажи, в процентах\r\n"
-	"shop buyprofit  <number>  - наценка от покупки, в процентах\r\n"
-	"shop openhour   <number>  - в котором часу открывается (0..23)\r\n"
-	"shop closehour  <number>  - в котором часу закрывается (0..23)\r\n"
-	"shop buys <item types>    - какие типы предметов покупает \r\n"
-	"shop repairs <item types> - какие типы предметов ремонтирует \r\n",
+    stc("shop sellprofit <number>  - п╫п╟я├п╣п╫п╨п╟ п╬я┌ п©я─п╬п╢п╟п╤п╦, п╡ п©я─п╬я├п╣п╫я┌п╟я┘\r\n"
+	"shop buyprofit  <number>  - п╫п╟я├п╣п╫п╨п╟ п╬я┌ п©п╬п╨я┐п©п╨п╦, п╡ п©я─п╬я├п╣п╫я┌п╟я┘\r\n"
+	"shop openhour   <number>  - п╡ п╨п╬я┌п╬я─п╬п╪ я┤п╟я│я┐ п╬я┌п╨я─я▀п╡п╟п╣я┌я│я▐ (0..23)\r\n"
+	"shop closehour  <number>  - п╡ п╨п╬я┌п╬я─п╬п╪ я┤п╟я│я┐ п╥п╟п╨я─я▀п╡п╟п╣я┌я│я▐ (0..23)\r\n"
+	"shop buys <item types>    - п╨п╟п╨п╦п╣ я┌п╦п©я▀ п©я─п╣п╢п╪п╣я┌п╬п╡ п©п╬п╨я┐п©п╟п╣я┌ \r\n"
+	"shop repairs <item types> - п╨п╟п╨п╦п╣ я┌п╦п©я▀ п©я─п╣п╢п╪п╣я┌п╬п╡ я─п╣п╪п╬п╫я┌п╦я─я┐п╣я┌ \r\n",
 	ch);
     return false;
 }
 
 MEDIT(where)
 {
-    ptc(ch, "%s находится в:\r\n", DLString( mob.short_descr ).ruscase('1').c_str( ));
+    ptc(ch, "%s п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡:\r\n", DLString( mob.short_descr ).ruscase('1').c_str( ));
 
     for (Character *wch = char_list; wch; wch = wch->next) {
 	if (!wch->is_npc( ))
@@ -649,14 +649,14 @@ MEDIT(desc)
     if (command[0] == '\0') {
 	if(!sedit(mob.description)) 
 	    return false;
-	stc("Описание установлено.\n\r", ch);
+	stc("п·п©п╦я│п╟п╫п╦п╣ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╬.\n\r", ch);
 	return true;
     }
 
     if (is_name(command, "copy")) {
         DLString str = mob.description;
         ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(str);
-        ptc(ch, "Описание скопировано в буфер.\r\n");
+        ptc(ch, "п·п©п╦я│п╟п╫п╦п╣ я│п╨п╬п©п╦я─п╬п╡п╟п╫п╬ п╡ п╠я┐я└п╣я─.\r\n");
         return true;
     }
 
@@ -664,22 +664,22 @@ MEDIT(desc)
         DLString str = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
         free_string(mob.description);
         mob.description = str_dup(str.c_str());
-        ptc(ch, "Описание вставлено из буфера.\r\n");
+        ptc(ch, "п·п©п╦я│п╟п╫п╦п╣ п╡я│я┌п╟п╡п╩п╣п╫п╬ п╦п╥ п╠я┐я└п╣я─п╟.\r\n");
         return true;
     }
 
     if (is_name(command, "help") || is_name(command, "?")) {
         stc("Syntax:\n\r", ch);
-        stc("    desc        : войти в редактор описаний\n\r", ch);
-        stc("    desc строка : заменить описание на указанную строку\n\r", ch);
-        stc("    desc copy   : скопировать описание в буфер\n\r", ch);
-        stc("    desc paste  : заменить описание на то, что в буфере\n\r", ch);
+        stc("    desc        : п╡п╬п╧я┌п╦ п╡ я─п╣п╢п╟п╨я┌п╬я─ п╬п©п╦я│п╟п╫п╦п╧\n\r", ch);
+        stc("    desc я│я┌я─п╬п╨п╟ : п╥п╟п╪п╣п╫п╦я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╫п╟ я┐п╨п╟п╥п╟п╫п╫я┐я▌ я│я┌я─п╬п╨я┐\n\r", ch);
+        stc("    desc copy   : я│п╨п╬п©п╦я─п╬п╡п╟я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╡ п╠я┐я└п╣я─\n\r", ch);
+        stc("    desc paste  : п╥п╟п╪п╣п╫п╦я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╫п╟ я┌п╬, я┤я┌п╬ п╡ п╠я┐я└п╣я─п╣\n\r", ch);
         return false;
     }
 
     free_string(mob.description);
     mob.description = str_dup(origArg.c_str( ));
-    stc("Описание заменено на новую строку.\n\r", ch);
+    stc("п·п©п╦я│п╟п╫п╦п╣ п╥п╟п╪п╣п╫п╣п╫п╬ п╫п╟ п╫п╬п╡я┐я▌ я│я┌я─п╬п╨я┐.\n\r", ch);
     return false;
 }
 
@@ -712,18 +712,18 @@ MEDIT(behavior)
 	if(!xmledit(mob.behavior))
 	    return false;
 
-	stc("Поведение установлено.\r\n", ch);
+	stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╬.\r\n", ch);
 	return true;
     }
 
     if (mob.behavior) {
 	if (!str_cmp( argument, "clear" )) {
 	    mob.behavior.clear( );
-	    stc("Поведение очищено.\r\n", ch);
+	    stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ п╬я┤п╦я┴п╣п╫п╬.\r\n", ch);
 	    return true;
 	}
 
-	stc("Поведение уже задано, используйте 'behavior' для редактирования или 'behavior clear' для очистки.\r\n", ch);
+	stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ я┐п╤п╣ п╥п╟п╢п╟п╫п╬, п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ 'behavior' п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╦п╩п╦ 'behavior clear' п╢п╩я▐ п╬я┤п╦я│я┌п╨п╦.\r\n", ch);
 	return false;
     }
 
@@ -740,7 +740,7 @@ MEDIT(behavior)
 	type = trainerType;
     }
     else { 
-	stc("Допустимые значения поведения: shopper, pet, trainer.\r\n", ch);
+	stc("п■п╬п©я┐я│я┌п╦п╪я▀п╣ п╥п╫п╟я┤п╣п╫п╦я▐ п©п╬п╡п╣п╢п╣п╫п╦я▐: shopper, pet, trainer.\r\n", ch);
 	return false;
     }
 
@@ -751,7 +751,7 @@ MEDIT(behavior)
     node->setName( "behavior" );
     mob.behavior->appendChild( node );
 
-    ptc(ch, "Поведение {G%s{x установлено.\r\n", type.c_str( ));
+    ptc(ch, "п÷п╬п╡п╣п╢п╣п╫п╦п╣ {G%s{x я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╬.\r\n", type.c_str( ));
     return true;
 }
 MEDIT(long)
@@ -1630,7 +1630,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 
 	if (!OLCState::can_edit( ch, pMob->vnum )) {
-	    stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╪п╬п╫я│я┌я─п╬п╡.\n\r", ch);
 	    return;
 	}
 
@@ -1657,7 +1657,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 
 	if (!OLCState::can_edit( ch, value )) {
-	    stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╪п╬п╫я│я┌я─п╬п╡.\n\r", ch);
 	    return;
 	}
 	
@@ -1676,12 +1676,12 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 	pMob = get_mob_index(atoi(argument));
 	if(!pMob) {
-	    stc("Нет такого моба.\n\r", ch);
+	    stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╪п╬п╠п╟.\n\r", ch);
 	    return;
 	}
 	
 	if (!OLCState::can_edit(ch, pMob->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╪п╬п╫я│я┌я─п╬п╡.\n\r", ch);
 	    return;
 	}
 
@@ -1694,12 +1694,12 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	}
 	pMob = get_mob_index(atoi(argument));
 	if(!pMob) {
-	    stc("Нет такого моба.\n\r", ch);
+	    stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╪п╬п╠п╟.\n\r", ch);
 	    return;
 	}
 	
 	if (!OLCState::can_edit(ch, pMob->vnum)) {
-	    stc("У тебя недостаточно прав для создания этого монстра.\n\r", ch);
+	    stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я│п╬п╥п╢п╟п╫п╦я▐ я█я┌п╬пЁп╬ п╪п╬п╫я│я┌я─п╟.\n\r", ch);
 	    return;
 	}
 	
@@ -1707,8 +1707,8 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	if (mob->in_room == 0)
 	    char_to_room( mob, ch->in_room );
 	
-	act_p( "$c1 создает $C4!", ch, 0, mob, TO_ROOM,POS_RESTING );
-	act_p( "Ты создаешь $C4!", ch, 0, mob, TO_CHAR,POS_RESTING );
+	act_p( "$c1 я│п╬п╥п╢п╟п╣я┌ $C4!", ch, 0, mob, TO_ROOM,POS_RESTING );
+	act_p( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $C4!", ch, 0, mob, TO_CHAR,POS_RESTING );
 	return;
     }
     

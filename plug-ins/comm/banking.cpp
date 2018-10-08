@@ -49,7 +49,7 @@ void BankAction::doBalance( PCharacter *ch )
     long bank_g, bank_s;
 
     if ( ch->bank_s + ch->bank_g == 0 )  {
-	ch->send_to("ı ‘≈¬— Œ≈‘ Œ…À¡À…» ƒ≈Œ≈« ◊ ¬¡ŒÀ≈.\n\r");
+	ch->send_to("–£ —Ç–µ–±—è –Ω–µ—Ç –Ω–∏–∫–∞–∫–∏—Ö –¥–µ–Ω–µ–≥ –≤ –±–∞–Ω–∫–µ.\n\r");
 	return;
     }
 
@@ -57,17 +57,17 @@ void BankAction::doBalance( PCharacter *ch )
     bank_s = ch->getPC( )->bank_s;
 
     if  (bank_g!=0 && bank_s!=0)
-	ch->printf( "ı ‘≈¬— %ld ⁄œÃœ‘%s … %ld ”≈“≈¬“—Œ%s ◊ ¬¡ŒÀ≈.\n\r",
-	 bank_g,GET_COUNT(bank_g,"¡—","Ÿ≈","Ÿ»"),
-	 bank_s,GET_COUNT(bank_s,"¡— ÕœŒ≈‘¡","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘"));
+	ch->printf( "–£ —Ç–µ–±—è %ld –∑–æ–ª–æ—Ç%s –∏ %ld —Å–µ—Ä–µ–±—Ä—è–Ω%s –≤ –±–∞–Ω–∫–µ.\n\r",
+	 bank_g,GET_COUNT(bank_g,"–∞—è","—ã–µ","—ã—Ö"),
+	 bank_s,GET_COUNT(bank_s,"–∞—è –º–æ–Ω–µ—Ç–∞","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç"));
 
     if  (bank_g!=0 && bank_s == 0)
-	ch->printf( "ı ‘≈¬— %ld ⁄œÃœ‘%s ◊ ¬¡ŒÀ≈.\n\r",
-	 bank_g,GET_COUNT(bank_g,"¡— ÕœŒ≈‘¡","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘"));
+	ch->printf( "–£ —Ç–µ–±—è %ld –∑–æ–ª–æ—Ç%s –≤ –±–∞–Ω–∫–µ.\n\r",
+	 bank_g,GET_COUNT(bank_g,"–∞—è –º–æ–Ω–µ—Ç–∞","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç"));
 
     if  (bank_g == 0 && bank_s!= 0)
-	ch->printf( "ı ‘≈¬— %ld ”≈“≈¬“—Œ%s ◊ ¬¡ŒÀ≈.\n\r",
-	 bank_s,GET_COUNT(bank_s,"¡— ÕœŒ≈‘¡","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘"));
+	ch->printf( "–£ —Ç–µ–±—è %ld —Å–µ—Ä–µ–±—Ä—è–Ω%s –≤ –±–∞–Ω–∫–µ.\n\r",
+	 bank_s,GET_COUNT(bank_s,"–∞—è –º–æ–Ω–µ—Ç–∞","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç"));
 }
 
 /*
@@ -88,19 +88,19 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
 	|| !argOne.isNumber( ) 
 	|| (!arg_is_gold( argTwo) && !arg_is_silver( argTwo )))
     {
-	ch->println( "ıÀ¡÷… ”’ÕÕ’ … ƒ≈Œ≈÷Œ’¿ ≈ƒ…Œ…√’. Ó¡–“…Õ≈“: '{lR”œ”ﬁ≈‘¡ 77 ⁄œÃœ‘¡{lEwithdraw 77 gold{x' …Ã… '{lR”œ”ﬁ≈‘¡ 9000 ”≈“≈¬“¡{lEwithdraw 9000 silver{lx'.");
+	ch->println( "–£–∫–∞–∂–∏ —Å—É–º–º—É –∏ –¥–µ–Ω–µ–∂–Ω—É—é –µ–¥–∏–Ω–∏—Ü—É. –ù–∞–ø—Ä–∏–º–µ—Ä: '{lR—Å–æ—Å—á–µ—Ç–∞ 77 –∑–æ–ª–æ—Ç–∞{lEwithdraw 77 gold{x' –∏–ª–∏ '{lR—Å–æ—Å—á–µ—Ç–∞ 9000 —Å–µ—Ä–µ–±—Ä–∞{lEwithdraw 9000 silver{lx'.");
 	return;
     }
     
     try {
 	amount = argOne.toInt( );
     } catch (const ExceptionBadType &) {
-	ch->println( "Û’ÕÕ¡ ’À¡⁄¡Œ¡ Œ≈◊≈“Œœ." );
+	ch->println( "–°—É–º–º–∞ —É–∫–∞–∑–∞–Ω–∞ –Ω–µ–≤–µ—Ä–Ω–æ." );
 	return;
     }
 
     if (amount <= 0) {
-	ch->println( "Ôﬁ≈Œÿ ›≈ƒ“œ." );
+	ch->println( "–û—á–µ–Ω—å —â–µ–¥—Ä–æ." );
 	return;
     }
 
@@ -110,7 +110,7 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
 	amount_g = amount;
     
     if (amount_g > ch->bank_g || amount_s > ch->bank_s) {
-	ch->send_to("È⁄◊…Œ…, ÕŸ Œ≈ ƒ¡≈Õ ◊⁄¡ ÕŸ.\n\r");
+	ch->send_to("–ò–∑–≤–∏–Ω–∏, –º—ã –Ω–µ –¥–∞–µ–º –≤–∑–∞–π–º—ã.\n\r");
 	return;
     }
 
@@ -119,12 +119,12 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
 	if (amount_s < 10)
 	{
 	    if (amount_s == 1)
-		buf << "ÔƒŒ’";
+		buf << "–û–¥–Ω—É";
 	    else
 		buf << amount_s;
 
-	    buf << " ÕœŒ≈" << GET_COUNT(amount_s, "‘’", "‘Ÿ", "‘")
-		<< "?! Ó≈ Õ¡Ãœ?!" << endl;
+	    buf << " –º–æ–Ω–µ" << GET_COUNT(amount_s, "—Ç—É", "—Ç—ã", "—Ç")
+		<< "?! –ù–µ –º–∞–ª–æ?!" << endl;
 	}
 	else
 	{
@@ -132,10 +132,10 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
 	    ch->bank_s -= amount_s;
 	    ch->silver += amount_s - fee;
 
-	    buf << "ÙŸ ”Œ…Õ¡≈€ÿ ”œ ”ﬁ≈‘¡ " << amount_s 
-	        << " ”≈“≈¬“—Œ" << GET_COUNT(amount_s,"’¿ ÕœŒ≈‘’","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘")
-		<< "." << endl << "ı”Ã’«… ¬¡ŒÀ¡ ”œ”‘¡◊…Ã… " << fee 
-		<< " ”≈“≈¬“—Œ" << GET_COUNT(fee,"’¿ ÕœŒ≈‘’","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘") << endl;
+	    buf << "–¢—ã —Å–Ω–∏–º–∞–µ—à—å —Å–æ —Å—á–µ—Ç–∞ " << amount_s 
+	        << " —Å–µ—Ä–µ–±—Ä—è–Ω" << GET_COUNT(amount_s,"—É—é –º–æ–Ω–µ—Ç—É","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç")
+		<< "." << endl << "–£—Å–ª—É–≥–∏ –±–∞–Ω–∫–∞ —Å–æ—Å—Ç–∞–≤–∏–ª–∏ " << fee 
+		<< " —Å–µ—Ä–µ–±—Ä—è–Ω" << GET_COUNT(fee,"—É—é –º–æ–Ω–µ—Ç—É","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç") << endl;
 	}
     }
 
@@ -143,8 +143,8 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
     {
 	if (amount_g == 1)
 	{
-	    buf << "ÔƒŒ’ ⁄œÃœ‘’¿ ÕœŒ≈" << GET_COUNT(amount_g, "‘’", "‘Ÿ", "‘")
-		<< "?! Ó≈ Õ¡Ãœ?!" << endl;
+	    buf << "–û–¥–Ω—É –∑–æ–ª–æ—Ç—É—é –º–æ–Ω–µ" << GET_COUNT(amount_g, "—Ç—É", "—Ç—ã", "—Ç")
+		<< "?! –ù–µ –º–∞–ª–æ?!" << endl;
 	}
 	else
 	{
@@ -152,15 +152,15 @@ void BankAction::doWithdraw( PCharacter *ch, DLString &arguments )
 	    ch->bank_g -= amount_g;
 	    ch->gold += amount_g - fee;
 
-	    buf << "ÙŸ ”Œ…Õ¡≈€ÿ ”œ ”ﬁ≈‘¡ " << amount_g 
-	        << " ⁄œÃœ‘" << GET_COUNT(amount_g,"’¿ ÕœŒ≈‘’","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘")
-		<< "." << endl << "ı”Ã’«… ¬¡ŒÀ¡ ”œ”‘¡◊…Ã… " << fee 
-		<< " ⁄œÃœ‘" << GET_COUNT(fee,"’¿ ÕœŒ≈‘’","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘") << endl;
+	    buf << "–¢—ã —Å–Ω–∏–º–∞–µ—à—å —Å–æ —Å—á–µ—Ç–∞ " << amount_g 
+	        << " –∑–æ–ª–æ—Ç" << GET_COUNT(amount_g,"—É—é –º–æ–Ω–µ—Ç—É","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç")
+		<< "." << endl << "–£—Å–ª—É–≥–∏ –±–∞–Ω–∫–∞ —Å–æ—Å—Ç–∞–≤–∏–ª–∏ " << fee 
+		<< " –∑–æ–ª–æ—Ç" << GET_COUNT(fee,"—É—é –º–æ–Ω–µ—Ç—É","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç") << endl;
 	}
     }
 
     ch->send_to(buf);
-    act("$c1 –“œ…⁄◊œƒ…‘ ¬¡ŒÀœ◊”À…≈ œ–≈“¡√…….",ch,0,0,TO_ROOM);
+    act("$c1 –ø—Ä–æ–∏–∑–≤–æ–¥–∏—Ç –±–∞–Ω–∫–æ–≤—Å–∫–∏–µ –æ–ø–µ—Ä–∞—Ü–∏–∏.",ch,0,0,TO_ROOM);
 }
 
 /*
@@ -174,7 +174,7 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     DLString arg;
 
     if (arguments.empty( )) {
-	ch->send_to("œÃœ÷…‘ÿ Œ¡ ”ﬁ≈‘ ”ÀœÃÿÀœ?\n\r");
+	ch->send_to("–ü–æ–ª–æ–∂–∏—Ç—å –Ω–∞ —Å—á–µ—Ç —Å–∫–æ–ª—å–∫–æ?\n\r");
 	return;
     }
     
@@ -188,12 +188,12 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
 		    throw Exception( );
 	    }
 	    catch (const Exception &) {
-		ch->send_to( "Û’ÕÕ¡ ’À¡⁄¡Œ¡ Œ≈◊≈“Œœ.\r\n" );
+		ch->send_to( "–°—É–º–º–∞ —É–∫–∞–∑–∞–Ω–∞ –Ω–µ–≤–µ—Ä–Ω–æ.\r\n" );
 		return;
 	    }
 
 	    if (( arg = arguments.getOneArgument( ) ).empty( )) {
-		ch->send_to( "ıÀ¡÷… ƒ≈Œ≈÷Œ’¿ ≈ƒ…Œ…√’: {lR⁄œÃœ‘œ …Ã… ”≈“≈¬“œ{lEgold …Ã… silver{lx.\r\n" );
+		ch->send_to( "–£–∫–∞–∂–∏ –¥–µ–Ω–µ–∂–Ω—É—é –µ–¥–∏–Ω–∏—Ü—É: {lR–∑–æ–ª–æ—Ç–æ –∏–ª–∏ —Å–µ—Ä–µ–±—Ä–æ{lEgold –∏–ª–∏ silver{lx.\r\n" );
 		return;
 	    }
 
@@ -202,25 +202,25 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
 	    else if (arg_is_gold( arg ) && amount_g == 0)
 		amount_g = amount;
 	    else {
-		ch->send_to("ÙŸ Õœ÷≈€ÿ –œÃœ÷…‘ÿ Œ¡ ”ﬁ≈‘ ‘œÃÿÀœ ⁄œÃœ‘Ÿ≈ …Ã… ”≈“≈¬“—ŒŸ≈ ÕœŒ≈‘Ÿ.\r\n"
-		            "“…Õ≈“: {lEdeposit 3 silver 18 gold{lRŒ¡”ﬁ≈‘ 3 ”≈“≈¬“¡ 18 ⁄œÃœ‘¡{lx\r\n" );
+		ch->send_to("–¢—ã –º–æ–∂–µ—à—å –ø–æ–ª–æ–∂–∏—Ç—å –Ω–∞ —Å—á–µ—Ç —Ç–æ–ª—å–∫–æ –∑–æ–ª–æ—Ç—ã–µ –∏–ª–∏ —Å–µ—Ä–µ–±—Ä—è–Ω—ã–µ –º–æ–Ω–µ—Ç—ã.\r\n"
+		            "–ü—Ä–∏–º–µ—Ä: {lEdeposit 3 silver 18 gold{lR–Ω–∞—Å—á–µ—Ç 3 —Å–µ—Ä–µ–±—Ä–∞ 18 –∑–æ–ª–æ—Ç–∞{lx\r\n" );
 		return;
 	    }
 	}
 	else if (victim != ch) {
-	    ch->send_to( "‰◊œ…Õ ”“¡⁄’ ƒ¡◊¡‘ÿ ƒ≈Œÿ«… Œ≈ ”‘œ…‘. œƒ≈“’‘”— ≈›≈..\r\n" );
+	    ch->send_to( "–î–≤–æ–∏–º —Å—Ä–∞–∑—É –¥–∞–≤–∞—Ç—å –¥–µ–Ω—å–≥–∏ –Ω–µ —Å—Ç–æ–∏—Ç. –ü–æ–¥–µ—Ä—É—Ç—Å—è –µ—â–µ..\r\n" );
 	    return;
 	}
 	else {
 	    PCMemoryInterface *pci = PCharacterManager::find( arg );
 
 	    if (!pci) {
-		ch->send_to( "·ƒ“≈”¡‘ –≈“≈◊œƒ¡ Œ≈ Œ¡ ƒ≈Œ. ıÀ¡÷… …Õ— –“¡◊…ÃÿŒœ … –œÃŒœ”‘ÿ¿.\r\n" );
+		ch->send_to( "–ê–¥—Ä–µ—Å–∞—Ç –ø–µ—Ä–µ–≤–æ–¥–∞ –Ω–µ –Ω–∞–π–¥–µ–Ω. –£–∫–∞–∂–∏ –∏–º—è –ø—Ä–∞–≤–∏–ª—å–Ω–æ –∏ –ø–æ–ª–Ω–æ—Å—Ç—å—é.\r\n" );
 		return;
 	    }
 
 	    if (!( victim = dynamic_cast<PCharacter *>( pci ) ) || !ch->can_see( victim )) {
-		ch->send_to( "Ó≈◊…ƒ…ÕŸ  …Ã… œ‘”’‘”‘◊’¿›…  ◊ Õ…“≈ ¡ƒ“≈”¡‘ Œ≈ œ√≈Œ…‘ ‘◊œ≈  ›≈ƒ“œ”‘….\r\n" );
+		ch->send_to( "–ù–µ–≤–∏–¥–∏–º—ã–π –∏–ª–∏ –æ—Ç—Å—É—Ç—Å—Ç–≤—É—é—â–∏–π –≤ –º–∏—Ä–µ –∞–¥—Ä–µ—Å–∞—Ç –Ω–µ –æ—Ü–µ–Ω–∏—Ç —Ç–≤–æ–µ–π —â–µ–¥—Ä–æ—Å—Ç–∏.\r\n" );
 		return;
 	    }
 	}
@@ -228,12 +228,12 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
 
 
     if (amount_g > ch->gold || amount_s > ch->silver) {
-	ch->send_to("¸‘œ ¬œÃÿ€≈, ﬁ≈Õ ≈”‘ÿ ’ ‘≈¬— ◊ Àœ€≈ÃÿÀ≈.\n\r");
+	ch->send_to("–≠—Ç–æ –±–æ–ª—å—à–µ, —á–µ–º –µ—Å—Ç—å —É —Ç–µ–±—è –≤ –∫–æ—à–µ–ª—å–∫–µ.\n\r");
 	return;
     }
 
     if ( (amount_g + victim->getPC( )->bank_g) > 100000 ) {
-	ch->send_to("Ú¡⁄Õ≈“ ¬¡ŒÀœ◊”Àœ«œ ”ﬁ≈‘¡ Œ≈ Õœ÷≈‘ –“≈◊Ÿ€¡‘ÿ 100.000 ⁄œÃœ‘Ÿ».\n\r");
+	ch->send_to("–†–∞–∑–º–µ—Ä –±–∞–Ω–∫–æ–≤—Å–∫–æ–≥–æ —Å—á–µ—Ç–∞ –Ω–µ –º–æ–∂–µ—Ç –ø—Ä–µ–≤—ã—à–∞—Ç—å 100.000 –∑–æ–ª–æ—Ç—ã—Ö.\n\r");
 	return;
     }
 
@@ -243,22 +243,22 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     ch->silver -= amount_s;
     
     if (victim == ch)
-	cbuf << "Ó¡ ‘◊œ  ¬¡ŒÀœ◊”À…  ”ﬁ≈‘ ";
+	cbuf << "–ù–∞ —Ç–≤–æ–π –±–∞–Ω–∫–æ–≤—Å–∫–∏–π —Å—á–µ—Ç ";
     else {
-	cbuf << "Ó¡ ¬¡ŒÀœ◊”À…  ”ﬁ≈‘ {W" << victim->getName( ) << "{x ";
-	vbuf << "{W" << ch->getName( ) << "{x –≈“≈◊œƒ…‘ Œ¡ ‘◊œ  ¬¡ŒÀœ◊”À…  ”ﬁ≈‘ ";
+	cbuf << "–ù–∞ –±–∞–Ω–∫–æ–≤—Å–∫–∏–π —Å—á–µ—Ç {W" << victim->getName( ) << "{x ";
+	vbuf << "{W" << ch->getName( ) << "{x –ø–µ—Ä–µ–≤–æ–¥–∏—Ç –Ω–∞ —Ç–≤–æ–π –±–∞–Ω–∫–æ–≤—Å–∫–∏–π —Å—á–µ—Ç ";
     }
     
-    cbuf << "–≈“≈◊≈ƒ≈Œœ: ";
+    cbuf << "–ø–µ—Ä–µ–≤–µ–¥–µ–Ω–æ: ";
     
     if (amount_g > 0) 
-	mbuf << "{Y" << amount_g << "{x ⁄œÃœ‘" << GET_COUNT(amount_g,"¡— ÕœŒ≈‘¡","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘");
+	mbuf << "{Y" << amount_g << "{x –∑–æ–ª–æ—Ç" << GET_COUNT(amount_g,"–∞—è –º–æ–Ω–µ—Ç–∞","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç");
     
     if (amount_s > 0) {
 	if (amount_g > 0)
-	    mbuf << " … ";
+	    mbuf << " –∏ ";
 
-	mbuf << "{W" << amount_s << "{x ”≈“≈¬“—Œ" << GET_COUNT(amount_s,"¡— ÕœŒ≈‘¡","Ÿ≈ ÕœŒ≈‘Ÿ","Ÿ» ÕœŒ≈‘");
+	mbuf << "{W" << amount_s << "{x —Å–µ—Ä–µ–±—Ä—è–Ω" << GET_COUNT(amount_s,"–∞—è –º–æ–Ω–µ—Ç–∞","—ã–µ –º–æ–Ω–µ—Ç—ã","—ã—Ö –º–æ–Ω–µ—Ç");
     }
     
     cbuf << mbuf.str( ) << "." << endl;
@@ -268,7 +268,7 @@ void BankAction::doDeposit( PCharacter *ch, DLString &arguments )
     if (victim != ch) 
 	victim->send_to( vbuf );
 
-    act( "$c1 –“œ…⁄◊œƒ…‘ ¬¡ŒÀœ◊”À…≈ œ–≈“¡√…….", ch, 0, 0, TO_ROOM );
+    act( "$c1 –ø—Ä–æ–∏–∑–≤–æ–¥–∏—Ç –±–∞–Ω–∫–æ–≤—Å–∫–∏–µ –æ–ø–µ—Ä–∞—Ü–∏–∏.", ch, 0, 0, TO_ROOM );
 }
 
 /*------------------------------------------------------------------------
@@ -309,7 +309,7 @@ void TaxesListener::run( int oldState, int newState, Descriptor *d )
 	return;
     
     if (ch->gold > 6000) {
-	ch->printf("Û ‘≈¬— ◊⁄Ÿ”À¡Ã… %d ⁄œÃœ‘Ÿ» Œ¡Ãœ«¡ Œ¡ œ–Ã¡‘’ ¡ƒ◊œÀ¡‘œ◊ Õ‹“…….\n\r",
+	ch->printf("–° —Ç–µ–±—è –≤–∑—ã—Å–∫–∞–ª–∏ %d –∑–æ–ª–æ—Ç—ã—Ö –Ω–∞–ª–æ–≥–∞ –Ω–∞ –æ–ø–ª–∞—Ç—É –∞–¥–≤–æ–∫–∞—Ç–æ–≤ –º—ç—Ä–∏–∏.\n\r",
 	           (ch->gold - 6000) / 2);
 	ch->gold -= (ch->gold - 6000) / 2;
     }
@@ -320,7 +320,7 @@ void TaxesListener::run( int oldState, int newState, Descriptor *d )
 	
 	silver = ch->bank_g + ch->bank_s / 100 - 20000;
 	
-	ch->printf( "Û ‘≈¬— ◊⁄Ÿ”À¡Ã… %ld ⁄œÃœ‘Ÿ» Œ¡Ãœ«¡ Œ¡ œ–Ã¡‘’ ◊œ≈ŒŒŸ» “¡”»œƒœ◊ Û’Ã‘¡Œ¡.\n\r", silver );
+	ch->printf( "–° —Ç–µ–±—è –≤–∑—ã—Å–∫–∞–ª–∏ %ld –∑–æ–ª–æ—Ç—ã—Ö –Ω–∞–ª–æ–≥–∞ –Ω–∞ –æ–ø–ª–∞—Ç—É –≤–æ–µ–Ω–Ω—ã—Ö —Ä–∞—Å—Ö–æ–¥–æ–≤ –°—É–ª—Ç–∞–Ω–∞.\n\r", silver );
     
 	if( silver < ch->bank_s / 100 ) {
 	    ch->bank_s -= ( silver * 100 );

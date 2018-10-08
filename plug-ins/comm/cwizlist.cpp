@@ -3,15 +3,15 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    Zadvinsky Alexandr   {Kiddy}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "cwizlist.h"
@@ -49,22 +49,22 @@ void CWizlist::initSwords( )
     cSwordLine = lineCounter = 0;
 }
 
-/* добавляет в буффер строку текста, окруженную с 2-х сторон мечами */
+/* п╢п╬п╠п╟п╡п╩я▐п╣я┌ п╡ п╠я┐я└я└п╣я─ я│я┌я─п╬п╨я┐ я┌п╣п╨я│я┌п╟, п╬п╨я─я┐п╤п╣п╫п╫я┐я▌ я│ 2-я┘ я│я┌п╬я─п╬п╫ п╪п╣я┤п╟п╪п╦ */
 void CWizlist::writeSwordLine( std::ostream &buf, char *str, char * color )
 {
     int clen, i;
 
-    if ((int) strlen(str) > textLine)        /* Урезаем текст, чтобы он поместился */
+    if ((int) strlen(str) > textLine)        /* пёя─п╣п╥п╟п╣п╪ я┌п╣п╨я│я┌, я┤я┌п╬п╠я▀ п╬п╫ п©п╬п╪п╣я│я┌п╦п╩я│я▐ */
 	str[textLine] = '\0';
 
-    clen = (textLine-strlen(str))/2; /* Считаем пробелы перед текстом*/
+    clen = (textLine-strlen(str))/2; /* п║я┤п╦я┌п╟п╣п╪ п©я─п╬п╠п╣п╩я▀ п©п╣я─п╣п╢ я┌п╣п╨я│я┌п╬п╪*/
 
-    buf << swordLines[cSwordLine].name.c_str( ); /* рисуем меч */
+    buf << swordLines[cSwordLine].name.c_str( ); /* я─п╦я│я┐п╣п╪ п╪п╣я┤ */
 
     if ( color && color[0] != '\0' )
 	buf << color;
 
-    for( i=0;i<clen;++i)             /* Рисуем пробелы и текст */
+    for( i=0;i<clen;++i)             /* п═п╦я│я┐п╣п╪ п©я─п╬п╠п╣п╩я▀ п╦ я┌п╣п╨я│я┌ */
 	buf << " ";
     
     buf << str;
@@ -72,21 +72,21 @@ void CWizlist::writeSwordLine( std::ostream &buf, char *str, char * color )
     if ( color && color[0] != '\0' )
 	buf << "{x";
 
-    clen = textLine-(clen+strlen( str )); /* Считаем пробелы после текста */
-    for( i=0;i<clen;++i)                  /* и рисуем их */
+    clen = textLine-(clen+strlen( str )); /* п║я┤п╦я┌п╟п╣п╪ п©я─п╬п╠п╣п╩я▀ п©п╬я│п╩п╣ я┌п╣п╨я│я┌п╟ */
+    for( i=0;i<clen;++i)                  /* п╦ я─п╦я│я┐п╣п╪ п╦я┘ */
 	buf << " ";
 
-    buf << swordLines[cSwordLine].name.c_str( ); /* рисуем второй меч */
+    buf << swordLines[cSwordLine].name.c_str( ); /* я─п╦я│я┐п╣п╪ п╡я┌п╬я─п╬п╧ п╪п╣я┤ */
     buf << "\n\r";
 
-    /* Проверяем, не пора ли переходить к следующему кусочку меча */
+    /* п÷я─п╬п╡п╣я─я▐п╣п╪, п╫п╣ п©п╬я─п╟ п╩п╦ п©п╣я─п╣я┘п╬п╢п╦я┌я▄ п╨ я│п╩п╣п╢я┐я▌я┴п╣п╪я┐ п╨я┐я│п╬я┤п╨я┐ п╪п╣я┤п╟ */
     if ( (++lineCounter >= swordLines[cSwordLine].count) && (swordLines[cSwordLine].count>0) ) {
 	lineCounter = 0;
 	cSwordLine++;
     }
 }
 
-/* Добавляет в буфер строку пикселов между мечей */
+/* п■п╬п╠п╟п╡п╩я▐п╣я┌ п╡ п╠я┐я└п╣я─ я│я┌я─п╬п╨я┐ п©п╦п╨я│п╣п╩п╬п╡ п╪п╣п╤п╢я┐ п╪п╣я┤п╣п╧ */
 void CWizlist::writeSwordPixels( std::ostream &res, char pixel, int count ) 
 {
     char buf[textLine+1];
@@ -125,14 +125,14 @@ COMMAND(CWizlist, "wizlist")
 
     initSwords();
 
-    /* Рисуем заголовок */
+    /* п═п╦я│я┐п╣п╪ п╥п╟пЁп╬п╩п╬п╡п╬п╨ */
     buf <<
     "        ________            **********************           ________\n\r"
     "      /+_+_+_+_+_\\       ** The gods of Dream Land **      /+_+_+_+_+_\\\n\r"
     "      \\__________/          **********************         \\__________/\n\r";
 
 
-    /* Для каждого уровня богов */
+    /* п■п╩я▐ п╨п╟п╤п╢п╬пЁп╬ я┐я─п╬п╡п╫я▐ п╠п╬пЁп╬п╡ */
     for ( cLevel = 0; cLevel < ( int )( sizeof(names)/sizeof(GodLevelName) ); cLevel ++ ) {
 	writeSwordLine( buf, "", 0 );
 
@@ -141,14 +141,14 @@ COMMAND(CWizlist, "wizlist")
 	writeSwordPixels( buf, '*', names[cLevel].name.length( )+5 );
 	writeSwordLine( buf, "", 0 );
 
-	/* Выводим всех богов этого уровня */
+	/* п▓я▀п╡п╬п╢п╦п╪ п╡я│п╣я┘ п╠п╬пЁп╬п╡ я█я┌п╬пЁп╬ я┐я─п╬п╡п╫я▐ */
 	for ( ; j != gods.end( ) && (*j)->getLevel( ) >= names[cLevel].level; j++) {
 	    sprintf( bbuf, "%s", (*j)->getName( ).c_str( ) );
 	    writeSwordLine( buf, bbuf, names[cLevel].color );
 	}
     }
 
-    /* Рисуем кончики мечей */
+    /* п═п╦я│я┐п╣п╪ п╨п╬п╫я┤п╦п╨п╦ п╪п╣я┤п╣п╧ */
     buf <<
     "       \\        /                                           \\        /\n\r"
     "        \\      /                                             \\      /\n\r"
@@ -156,7 +156,7 @@ COMMAND(CWizlist, "wizlist")
     "          \\  /                                                 \\  /\n\r"
     "           \\/                                                   \\/\n\r" ;
   
-    /* Бухаем все это на экран */
+    /* п▒я┐я┘п╟п╣п╪ п╡я│п╣ я█я┌п╬ п╫п╟ я█п╨я─п╟п╫ */
     page_to_char( buf.str( ).c_str( ), ch );
 #endif    
 }

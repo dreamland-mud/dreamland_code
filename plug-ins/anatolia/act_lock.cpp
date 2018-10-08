@@ -88,13 +88,13 @@ void open_door_extra ( Character *ch, int door, void *pexit )
 
     if ( !IS_SET(exit_info, EX_CLOSED) )
     {
-	    ch->println( "Здесь уже открыто." );
+	    ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╬я┌п╨я─я▀я┌п╬." );
 	    return;
     }
 
     if ( IS_SET(exit_info, EX_LOCKED) )
     {
-	    ch->println( "Здесь заперто." );
+	    ch->println( "п≈п╢п╣я│я▄ п╥п╟п©п╣я─я┌п╬." );
 	    return;
     }
 
@@ -103,13 +103,13 @@ void open_door_extra ( Character *ch, int door, void *pexit )
 	    : ((EXIT_DATA *) pexit)->exit_info, EX_CLOSED);
 
     if ( eexit ) {
-	act( "$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
-	act( "Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
+	act( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
+	act( "п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
     }
     else {
         const char *doorname = direction_doorname((EXIT_DATA *) pexit);
-	act( "$c1 открывает $N4.", ch, 0, doorname, TO_ROOM );
-	act( "Ты открываешь $N4.", ch, 0, doorname, TO_CHAR );
+	act( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ $N4.", ch, 0, doorname, TO_ROOM );
+	act( "п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ $N4.", ch, 0, doorname, TO_CHAR );
     }
 
 
@@ -117,7 +117,7 @@ void open_door_extra ( Character *ch, int door, void *pexit )
     if (!eexit && (pexit_rev = direction_reverse(room, door)))
     {
 	    REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 открывается.", direction_doorname(pexit_rev));
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 п╬я┌п╨я─я▀п╡п╟п╣я┌я│я▐.", direction_doorname(pexit_rev));
     }
 }
 
@@ -133,25 +133,25 @@ bool open_portal( Character *ch, Object *obj )
 {
     if ( !IS_SET(obj->value[1], EX_ISDOOR) )
     {
-	    ch->println( "Ты не можешь сделать этого." );
+	    ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬." );
 	    return false;
     }
 
     if ( !IS_SET(obj->value[1], EX_CLOSED) )
     {
-	    ch->println( "Это уже открыто." );
+	    ch->println( "п╜я┌п╬ я┐п╤п╣ п╬я┌п╨я─я▀я┌п╬." );
 	    return false;
     }
 
     if ( IS_SET(obj->value[1], EX_LOCKED) )
     {
-	    ch->println( "Здесь заперто." );
+	    ch->println( "п≈п╢п╣я│я▄ п╥п╟п©п╣я─я┌п╬." );
 	    return false;
     }
 
     REMOVE_BIT(obj->value[1], EX_CLOSED);
-    act_p("Ты открываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-    act_p("$c1 открывает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+    act_p("п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+    act_p("$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
 
     return true;
 }
@@ -159,19 +159,19 @@ bool open_portal( Character *ch, Object *obj )
 bool open_drink_container( Character *ch, Object *obj )
 {
     if (!IS_SET(obj->value[3], DRINK_CLOSED)) {
-	ch->pecho( "%1$^O1 и так не запер%1$Gто|т|та.", obj );
+	ch->pecho( "%1$^O1 п╦ я┌п╟п╨ п╫п╣ п╥п╟п©п╣я─%1$Gя┌п╬|я┌|я┌п╟.", obj );
 	return false;
     }
     
     if (IS_SET(obj->value[3], DRINK_LOCKED)) {
 	if (IS_SET(obj->value[3], DRINK_CLOSE_CORK))
-	    ch->pecho( "%1$^O1 плотно закупоре%1$Gно|н|на пробкой, поищи штопор.", obj );
+	    ch->pecho( "%1$^O1 п©п╩п╬я┌п╫п╬ п╥п╟п╨я┐п©п╬я─п╣%1$Gп╫п╬|п╫|п╫п╟ п©я─п╬п╠п╨п╬п╧, п©п╬п╦я┴п╦ я┬я┌п╬п©п╬я─.", obj );
 	else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL))
-	    ch->pecho( "%1$^O1 закры%1$Gто|т|та крышкой и заколоче%1$Gн|но|на.", obj );
+	    ch->pecho( "%1$^O1 п╥п╟п╨я─я▀%1$Gя┌п╬|я┌|я┌п╟ п╨я─я▀я┬п╨п╬п╧ п╦ п╥п╟п╨п╬п╩п╬я┤п╣%1$Gп╫|п╫п╬|п╫п╟.", obj );
 	else if (IS_SET(obj->value[3], DRINK_CLOSE_KEY))
-	    ch->pecho( "%1$^O1 крепко запер%1$Gто|т|та.", obj );
+	    ch->pecho( "%1$^O1 п╨я─п╣п©п╨п╬ п╥п╟п©п╣я─%1$Gя┌п╬|я┌|я┌п╟.", obj );
 	else
-	    ch->pecho( "%1$^O1 запер%1$Gто|т|та.", obj );
+	    ch->pecho( "%1$^O1 п╥п╟п©п╣я─%1$Gя┌п╬|я┌|я┌п╟.", obj );
 
 	return false;
     }
@@ -184,16 +184,16 @@ bool open_drink_container( Character *ch, Object *obj )
 	cork = create_object( get_obj_index( OBJ_VNUM_CORK ), 0 );
 	obj_to_char( cork, ch );
 
-	act( "Ты вынимаешь пробку из $O2.", ch, 0, obj, TO_CHAR );
-	act( "$c1 вынимает пробку из $O2.", ch, 0, obj, TO_ROOM );
+	act( "п╒я▀ п╡я▀п╫п╦п╪п╟п╣я┬я▄ п©я─п╬п╠п╨я┐ п╦п╥ $O2.", ch, 0, obj, TO_CHAR );
+	act( "$c1 п╡я▀п╫п╦п╪п╟п╣я┌ п©я─п╬п╠п╨я┐ п╦п╥ $O2.", ch, 0, obj, TO_ROOM );
     }
     else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL)) {
-	act( "Ты открываешь крышку $O2.", ch, 0, obj, TO_CHAR );
-	act( "$c1 открывает крышку $O2.", ch, 0, obj, TO_ROOM );
+	act( "п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ п╨я─я▀я┬п╨я┐ $O2.", ch, 0, obj, TO_CHAR );
+	act( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ п╨я─я▀я┬п╨я┐ $O2.", ch, 0, obj, TO_ROOM );
     }
     else {
-	act( "Ты открываешь $O4.", ch, 0, obj, TO_CHAR );
-	act( "$c1 открывает $O4.", ch, 0, obj, TO_ROOM );
+	act( "п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ $O4.", ch, 0, obj, TO_CHAR );
+	act( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ $O4.", ch, 0, obj, TO_ROOM );
     }
 
     return true;
@@ -203,19 +203,19 @@ bool open_container( Character *ch, Object *obj )
 {
     if ( !IS_SET(obj->value[1], CONT_CLOSED) )
     {
-	    ch->println( "Это уже открыто." );
+	    ch->println( "п╜я┌п╬ я┐п╤п╣ п╬я┌п╨я─я▀я┌п╬." );
 	    return false;
     }
 
     if ( !IS_SET(obj->value[1], CONT_CLOSEABLE) )
     {
-	    ch->println( "Ты не можешь сделать этого." );
+	    ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬." );
 	    return false;
     }
 
     if ( IS_SET(obj->value[1], CONT_LOCKED) )
     {
-	    ch->println( "Здесь заперто." );
+	    ch->println( "п≈п╢п╣я│я▄ п╥п╟п©п╣я─я┌п╬." );
 	    return false;
     }
     
@@ -225,8 +225,8 @@ bool open_container( Character *ch, Object *obj )
     REMOVE_BIT(obj->value[1], CONT_CLOSED);
 
     if (!oprog_open_msg( obj, ch )) {
-	act_p("Ты открываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-	act_p("$c1 открывает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+	act_p("п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+	act_p("$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
     }
 
     oprog_open( obj, ch );
@@ -246,7 +246,7 @@ CMDRUNP( open )
 
     if ( arg[0] == '\0' )
     {
-	ch->println( "Открыть что?" );
+	ch->println( "п·я┌п╨я─я▀я┌я▄ я┤я┌п╬?" );
 	return;
     }
 
@@ -274,7 +274,7 @@ CMDRUNP( open )
 	    break;
 
 	default:
-	    ch->pecho( "%^O4 невозможно открыть.", obj );
+	    ch->pecho( "%^O4 п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬я┌п╨я─я▀я┌я▄.", obj );
 	    return;
 	}
 	
@@ -315,21 +315,21 @@ static void close_door( Character *ch, int door )
     pexit	= ch->in_room->exit[door];
     if ( IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-	    ch->println( "Здесь уже закрыто." );
+	    ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п╨я─я▀я┌п╬." );
 	    return;
     }
 
     SET_BIT(pexit->exit_info, EX_CLOSED);
     
     const char *doorname = direction_doorname(pexit);
-    act( "$c1 закрывает $N4.", ch, 0, doorname, TO_ROOM );
-    act( "Ты закрываешь $N4.", ch, 0, doorname, TO_CHAR );
+    act( "$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $N4.", ch, 0, doorname, TO_ROOM );
+    act( "п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $N4.", ch, 0, doorname, TO_CHAR );
 
     // close the other side
     if ((pexit_rev = direction_reverse(room, door)))
     {
 	    SET_BIT( pexit_rev->exit_info, EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 закрывается.", direction_doorname(pexit_rev));
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 п╥п╟п╨я─я▀п╡п╟п╣я┌я│я▐.", direction_doorname(pexit_rev));
     }
 }
 
@@ -344,7 +344,7 @@ CMDRUNP( close )
 
     if ( arg[0] == '\0' )
     {
-	ch->println( "Закрыть что?" );
+	ch->println( "п≈п╟п╨я─я▀я┌я▄ я┤я┌п╬?" );
 	return;
     }
 
@@ -362,50 +362,50 @@ CMDRUNP( close )
 	    if ( !IS_SET(obj->value[1],EX_ISDOOR)
 		    || IS_SET(obj->value[1],EX_NOCLOSE) )
 	    {
-		ch->println( "Ты не можешь сделать этого." );
+		ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬." );
 		return;
 	    }
 
 	    if ( IS_SET(obj->value[1],EX_CLOSED) )
 	    {
-		ch->println( "Здесь уже закрыто." );
+		ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п╨я─я▀я┌п╬." );
 		return;
 	    }
 
 	    SET_BIT(obj->value[1],EX_CLOSED);
-	    act_p("Ты закрываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-	    act_p("$c1 закрывает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+	    act_p("п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+	    act_p("$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
 	}
 	else if ( obj->item_type == ITEM_CONTAINER )
 	{
 	    // 'close object'
 	    if ( IS_SET(obj->value[1], CONT_CLOSED) )
 	    {
-		ch->println( "Здесь уже закрыто." );
+		ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п╨я─я▀я┌п╬." );
 		return;
 	    }
 
 	    if ( !IS_SET(obj->value[1], CONT_CLOSEABLE) )
 	    {
-		ch->println( "Ты не можешь сделать этого." );
+		ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬." );
 		return;
 	    }
 
 	    SET_BIT(obj->value[1], CONT_CLOSED);
-	    act_p("Ты закрываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-	    act_p( "$c1 закрывает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+	    act_p("п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+	    act_p( "$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
 	    oprog_close( obj, ch );
 	}
 	else if (obj->item_type == ITEM_DRINK_CON) {
 	    // cork a bottle 
 	    
 	    if (!IS_SET(obj->value[3], DRINK_CLOSE_CORK|DRINK_CLOSE_NAIL|DRINK_CLOSE_KEY)) {
-		act( "$O4 невозможно закрыть или закупорить.", ch, 0, obj, TO_CHAR );
+		act( "$O4 п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╥п╟п╨я─я▀я┌я▄ п╦п╩п╦ п╥п╟п╨я┐п©п╬я─п╦я┌я▄.", ch, 0, obj, TO_CHAR );
 		return;
 	    }
 
 	    if (IS_SET(obj->value[3], DRINK_CLOSED)) {
-		act( "$O4 уже закрыли.", ch, 0, obj, TO_CHAR );
+		act( "$O4 я┐п╤п╣ п╥п╟п╨я─я▀п╩п╦.", ch, 0, obj, TO_CHAR );
 		return;
 	    }
 	    
@@ -413,28 +413,28 @@ CMDRUNP( close )
 		Object *cork = get_obj_carry_vnum( ch, OBJ_VNUM_CORK );
 
 		if (!cork) {
-		    act( "У тебя нет пробки от $O2.", ch, 0, obj, TO_CHAR );
-		    act( "$c1 шарит по карманам в поисках пробки.", ch, 0, obj, TO_ROOM );
+		    act( "пё я┌п╣п╠я▐ п╫п╣я┌ п©я─п╬п╠п╨п╦ п╬я┌ $O2.", ch, 0, obj, TO_CHAR );
+		    act( "$c1 я┬п╟я─п╦я┌ п©п╬ п╨п╟я─п╪п╟п╫п╟п╪ п╡ п©п╬п╦я│п╨п╟я┘ п©я─п╬п╠п╨п╦.", ch, 0, obj, TO_ROOM );
 		    return;
 		}
 
 		extract_obj( cork );
-		act( "Ты закупориваешь $O4 пробкой.", ch, 0, obj, TO_CHAR );
-		act( "$c1 закупоривает $O4 пробкой.", ch, 0, obj, TO_ROOM );
+		act( "п╒я▀ п╥п╟п╨я┐п©п╬я─п╦п╡п╟п╣я┬я▄ $O4 п©я─п╬п╠п╨п╬п╧.", ch, 0, obj, TO_CHAR );
+		act( "$c1 п╥п╟п╨я┐п©п╬я─п╦п╡п╟п╣я┌ $O4 п©я─п╬п╠п╨п╬п╧.", ch, 0, obj, TO_ROOM );
 	    }
 	    else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL)) {
-		act( "Ты закрываешь $O4 крышкой.", ch, 0, obj, TO_CHAR );
-		act( "$c1 закрывает $O4 крышкой.", ch, 0, obj, TO_ROOM );
+		act( "п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $O4 п╨я─я▀я┬п╨п╬п╧.", ch, 0, obj, TO_CHAR );
+		act( "$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $O4 п╨я─я▀я┬п╨п╬п╧.", ch, 0, obj, TO_ROOM );
 	    }
 	    else {
-		act( "Ты закрываешь $O4.", ch, 0, obj, TO_CHAR );
-		act( "$c1 закрывает $O4.", ch, 0, obj, TO_ROOM );
+		act( "п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $O4.", ch, 0, obj, TO_CHAR );
+		act( "$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $O4.", ch, 0, obj, TO_ROOM );
 	    }
 	    
 	    SET_BIT(obj->value[3], DRINK_CLOSED);
 	}
 	else {
-	    ch->println( "Это не контейнер." );
+	    ch->println( "п╜я┌п╬ п╫п╣ п╨п╬п╫я┌п╣п╧п╫п╣я─." );
 	    return;
 	}
 
@@ -449,19 +449,19 @@ CMDRUNP( close )
     {
 	if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
 	{
-		ch->println( "Это не дверь!" );
+		ch->println( "п╜я┌п╬ п╫п╣ п╢п╡п╣я─я▄!" );
 		return;
 	}
 
 	if ( IS_SET(peexit->exit_info, EX_CLOSED) )
 	{
-		ch->println( "Здесь уже закрыто." );
+		ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п╨я─я▀я┌п╬." );
 		return;
 	}
 
 	SET_BIT(peexit->exit_info, EX_CLOSED);
-	act( "$c1 закрывает $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
-	act( "Ты закрываешь $N4.", ch, 0, peexit->short_desc_from, TO_CHAR);
+	act( "$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $N4.", ch, 0, peexit->short_desc_from, TO_ROOM);
+	act( "п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $N4.", ch, 0, peexit->short_desc_from, TO_CHAR);
 
 	return;
     }	
@@ -483,43 +483,43 @@ static void lock_door( Character *ch, int door )
     pexit	= ch->in_room->exit[door];
     if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-	    ch->println( "Здесь не закрыто." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 	    return;
     }
 
     if ( IS_SET(pexit->exit_info, EX_NOLOCK) ) 
     {
-	ch->println( "Это невозможно запереть." );
+	ch->println( "п╜я┌п╬ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╥п╟п©п╣я─п╣я┌я▄." );
 	return;
     }
 
     if ( pexit->key <= 0 )
     {
-	    ch->println( "Здесь нет замочной скважины." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 	    return;
     }
 
     if (!get_key_carry( ch, pexit->key))
     {
-	    ch->println( "У тебя нет ключа." );
+	    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 	    return;
     }
 
     if ( IS_SET(pexit->exit_info, EX_LOCKED) )
     {
-	    ch->println( "Здесь уже заперто." );
+	    ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п©п╣я─я┌п╬." );
 	    return;
     }
 
     SET_BIT(pexit->exit_info, EX_LOCKED);
-    ch->println( "*Щелк*" );
-    act( "$c1 запирает $N4 на ключ.", ch, 0, direction_doorname(pexit), TO_ROOM);
+    ch->println( "*п╘п╣п╩п╨*" );
+    act( "$c1 п╥п╟п©п╦я─п╟п╣я┌ $N4 п╫п╟ п╨п╩я▌я┤.", ch, 0, direction_doorname(pexit), TO_ROOM);
 
     /* lock the other side */
     if ((pexit_rev = direction_reverse(room, door)))
     {
 	    SET_BIT( pexit_rev->exit_info, EX_LOCKED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 защелкивается.", direction_doorname(pexit_rev));
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 п╥п╟я┴п╣п╩п╨п╦п╡п╟п╣я┌я│я▐.", direction_doorname(pexit_rev));
     }
 }
 
@@ -534,7 +534,7 @@ CMDRUNP( lock )
 
     if ( arg[0] == '\0' )
     {
-	    ch->println( "Запереть что?" );
+	    ch->println( "п≈п╟п©п╣я─п╣я┌я▄ я┤я┌п╬?" );
 	    return;
     }
 
@@ -552,62 +552,62 @@ CMDRUNP( lock )
 		if ( !IS_SET(obj->value[1],EX_ISDOOR)
 			|| IS_SET(obj->value[1],EX_NOCLOSE) )
 		{
-			ch->println( "Ты не можешь сделать этого." );
+			ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬." );
 			return;
 		}
 
 		if (!IS_SET(obj->value[1],EX_CLOSED))
 		{
-			ch->println( "Здесь не закрыто." );
+			ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 			return;
 		}
 
 	    	if (IS_SET(obj->value[1],EX_NOLOCK))
 		{
-			ch->println( "Это невозможно запереть." );
+			ch->println( "п╜я┌п╬ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╥п╟п©п╣я─п╣я┌я▄." );
 			return;
 		}
 
 		if (obj->value[4] <= 0) 
 		{
-		    ch->println( "Здесь нет замочной скважины." );
+		    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 		    return;
 		}
 
 		if (!get_key_carry(ch,obj->value[4]))
 		{
-			ch->println( "У тебя нет ключа." );
+			ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 			return;
 		}
 
 		if (IS_SET(obj->value[1],EX_LOCKED))
 		{
-			ch->println( "Здесь уже заперто." );
+			ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п©п╣я─я┌п╬." );
 			return;
 		}
 
 		SET_BIT(obj->value[1],EX_LOCKED);
-		act_p("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR,POS_RESTING);
-		act_p("$c1 закрывает $o4 на ключ.",ch,obj,0,TO_ROOM,POS_RESTING);
+		act_p("п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $o4 п╫п╟ п╨п╩я▌я┤.",ch,obj,0,TO_CHAR,POS_RESTING);
+		act_p("$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $o4 п╫п╟ п╨п╩я▌я┤.",ch,obj,0,TO_ROOM,POS_RESTING);
 	}
 	else if ( obj->item_type == ITEM_CONTAINER )
 	{
 	    // 'lock object'
 	    if ( !IS_SET(obj->value[1], CONT_CLOSED) )
 	    {
-		    ch->println( "Это не закрыто." );
+		    ch->println( "п╜я┌п╬ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 		    return;
 	    }
 
 	    if ( obj->value[2] < 0 )
 	    {
-		    ch->println( "Здесь нет замочной скважины." );
+		    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 		    return;
 	    }
 	    
 	    if ( IS_SET(obj->value[1], CONT_LOCKED) )
 	    {
-		    ch->println( "Это уже заперто." );
+		    ch->println( "п╜я┌п╬ я┐п╤п╣ п╥п╟п©п╣я─я┌п╬." );
 		    return;
 	    }
 
@@ -615,11 +615,11 @@ CMDRUNP( lock )
 		|| get_key_carry( ch, obj->value[2])) 
 	    {
 		SET_BIT(obj->value[1], CONT_LOCKED);
-		act("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR);
-		act("$c1 закрывает $o4 на ключ.", ch, obj, 0, TO_ROOM);
+		act("п╒я▀ п╥п╟п╨я─я▀п╡п╟п╣я┬я▄ $o4 п╫п╟ п╨п╩я▌я┤.",ch,obj,0,TO_CHAR);
+		act("$c1 п╥п╟п╨я─я▀п╡п╟п╣я┌ $o4 п╫п╟ п╨п╩я▌я┤.", ch, obj, 0, TO_ROOM);
 		
 	    } else {
-		ch->println( "У тебя нет ключа." );
+		ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 		return;
 	    }
 	}
@@ -628,20 +628,20 @@ CMDRUNP( lock )
 
 	    if (IS_SET(obj->value[3], DRINK_LOCKED)) {
 		if (IS_SET(obj->value[3], DRINK_CLOSE_CORK))
-		    ch->pecho( "%1$^O1 и так плотно закупоре%1$Gно|н|но пробкой.", obj );
+		    ch->pecho( "%1$^O1 п╦ я┌п╟п╨ п©п╩п╬я┌п╫п╬ п╥п╟п╨я┐п©п╬я─п╣%1$Gп╫п╬|п╫|п╫п╬ п©я─п╬п╠п╨п╬п╧.", obj );
 		else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL))
-		    ch->pecho( "%1$^O1 и так закры%1$Gто|т|то крышкой и заколоче%1$Gно|н|но.", obj );
+		    ch->pecho( "%1$^O1 п╦ я┌п╟п╨ п╥п╟п╨я─я▀%1$Gя┌п╬|я┌|я┌п╬ п╨я─я▀я┬п╨п╬п╧ п╦ п╥п╟п╨п╬п╩п╬я┤п╣%1$Gп╫п╬|п╫|п╫п╬.", obj );
 		else
-		    ch->pecho( "%1$^O1 и так крепко запер%1$Gто|т|то.", obj );
+		    ch->pecho( "%1$^O1 п╦ я┌п╟п╨ п╨я─п╣п©п╨п╬ п╥п╟п©п╣я─%1$Gя┌п╬|я┌|я┌п╬.", obj );
 	    }
 	    else {
-		ch->pecho("%1$^O1 уже невозможно закупорить или заколотить намертво.", obj );
+		ch->pecho("%1$^O1 я┐п╤п╣ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╥п╟п╨я┐п©п╬я─п╦я┌я▄ п╦п╩п╦ п╥п╟п╨п╬п╩п╬я┌п╦я┌я▄ п╫п╟п╪п╣я─я┌п╡п╬.", obj );
 	    }
 	    
 	    return;
 	}
 	else {
-	    ch->println( "Это не контейнер." );
+	    ch->println( "п╜я┌п╬ п╫п╣ п╨п╬п╫я┌п╣п╧п╫п╣я─." );
 	    return;
 	}
 
@@ -656,43 +656,43 @@ CMDRUNP( lock )
     {
 	if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
 	{
-		ch->println( "Это не дверь!" );
+		ch->println( "п╜я┌п╬ п╫п╣ п╢п╡п╣я─я▄!" );
 		return;
 	}
 
 	if ( !IS_SET(peexit->exit_info, EX_CLOSED) )
 	{
-		ch->println( "Здесь не закрыто." );
+		ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 		return;
 	}
 
 	if ( IS_SET(peexit->exit_info, EX_NOLOCK) ) 
 	{
-	    ch->println( "Это невозможно запереть." );
+	    ch->println( "п╜я┌п╬ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╥п╟п©п╣я─п╣я┌я▄." );
 	    return;
 	}
 
 	if ( peexit->key <= 0 )
 	{
-		ch->println( "Здесь нет замочной скважины." );
+		ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 		return;
 	}
 
 	if (!get_key_carry( ch, peexit->key))
 	{
-		ch->println( "У тебя нет ключа." );
+		ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 		return;
 	}
 
 	if ( IS_SET(peexit->exit_info, EX_LOCKED) )
 	{
-		ch->println( "Здесь уже заперто." );
+		ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╥п╟п©п╣я─я┌п╬." );
 		return;
 	}
 
 	SET_BIT(peexit->exit_info, EX_LOCKED);
-	ch->println( "*Щелк*" );
-	act_p( "$c1 запирает $N4 на ключ.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
+	ch->println( "*п╘п╣п╩п╨*" );
+	act_p( "$c1 п╥п╟п©п╦я─п╟п╣я┌ $N4 п╫п╟ п╨п╩я▌я┤.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
 
 	return;
     }
@@ -716,37 +716,37 @@ static void unlock_door( Character *ch, int door )
     pexit = ch->in_room->exit[door];
     if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
     {
-	    ch->println( "Здесь не закрыто." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 	    return;
     }
 
     if ( pexit->key <= 0 )
     {
-	    ch->println( "Здесь нет замочной скважины." );
+	    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 	    return;
     }
 
     if (!get_key_carry( ch, pexit->key))
     {
-	    ch->println( "У тебя нет ключа." );
+	    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 	    return;
     }
 
     if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
     {
-	    ch->println( "Здесь уже не заперто." );
+	    ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╫п╣ п╥п╟п©п╣я─я┌п╬." );
 	    return;
     }
 
     REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-    ch->println( "*Щелк*" );
-    act( "$c1 открывает ключом $N4.", ch, 0, direction_doorname(pexit), TO_ROOM);
+    ch->println( "*п╘п╣п╩п╨*" );
+    act( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ п╨п╩я▌я┤п╬п╪ $N4.", ch, 0, direction_doorname(pexit), TO_ROOM);
 
     // unlock the other side
     if ((pexit_rev = direction_reverse(room, door)))
     {
 	    REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 щелкает.", direction_doorname(pexit_rev));
+            direction_target(room, door)->echo(POS_RESTING, "%^N1 я┴п╣п╩п╨п╟п╣я┌.", direction_doorname(pexit_rev));
     }
 }
 
@@ -761,7 +761,7 @@ CMDRUNP( unlock )
 
     if ( arg[0] == '\0' )
     {
-	    ch->println( "Отпереть что?" );
+	    ch->println( "п·я┌п©п╣я─п╣я┌я▄ я┤я┌п╬?" );
 	    return;
     }
 
@@ -778,37 +778,37 @@ CMDRUNP( unlock )
 	{
 	    if (!IS_SET(obj->value[1],EX_ISDOOR))
 	    {
-		    ch->println( "Ты не можешь этого сделать." );
+		    ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄." );
 		    return;
 	    }
 
 	    if (!IS_SET(obj->value[1],EX_CLOSED))
 	    {
-		    ch->println( "Здесь не закрыто." );
+		    ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 		    return;
 	    }
 
 	    if (obj->value[4] <= 0)
 	    {
-		ch->println( "Здесь нет замочной скважины." );
+		ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 		return;
 	    }
 
 	    if (!get_key_carry(ch,obj->value[4]))
 	    {
-		    ch->println( "У тебя нет ключа." );
+		    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 		    return;
 	    }
 
 	    if (!IS_SET(obj->value[1],EX_LOCKED))
 	    {
-		    ch->println( "Здесь уже не заперто." );
+		    ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╫п╣ п╥п╟п©п╣я─я┌п╬." );
 		    return;
 	    }
 
 	    REMOVE_BIT(obj->value[1],EX_LOCKED);
-	    act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-	    act_p("$c1 открывает ключом $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+	    act_p("п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ п╨п╩я▌я┤п╬п╪ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+	    act_p("$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ п╨п╩я▌я┤п╬п╪ $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
 	}
 	else if ( obj->item_type == ITEM_CONTAINER )
 	{
@@ -816,19 +816,19 @@ CMDRUNP( unlock )
 
 	    if ( !IS_SET(obj->value[1], CONT_CLOSED) )
 	    {
-		    ch->println( "Здесь не закрыто." );
+		    ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 		    return;
 	    }
 
 	    if ( obj->value[2] < 0 )
 	    {
-		    ch->println( "Здесь нет замочной скважины." );
+		    ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 		    return;
 	    }
 
 	    if ( !IS_SET(obj->value[1], CONT_LOCKED) )
 	    {
-		    ch->println( "Здесь уже не заперто." );
+		    ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╫п╣ п╥п╟п©п╣я─я┌п╬." );
 		    return;
 	    }
 
@@ -836,11 +836,11 @@ CMDRUNP( unlock )
 		|| get_key_carry( ch, obj->value[2])) 
 	    {
 		REMOVE_BIT(obj->value[1], CONT_LOCKED);
-		act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-		act_p("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+		act_p("п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ п╨п╩я▌я┤п╬п╪ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+		act_p("$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ п╨п╩я▌я┤п╬п╪ $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
 		
 	    } else {
-		ch->println( "У тебя нет ключа." );
+		ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 		return;
 	    }
 	}
@@ -849,7 +849,7 @@ CMDRUNP( unlock )
 	    
 	    // uncork a bottle
 	    if (!IS_SET(obj->value[3], DRINK_LOCKED)) {
-		ch->println( "Тут не заперто и не закупорено." );
+		ch->println( "п╒я┐я┌ п╫п╣ п╥п╟п©п╣я─я┌п╬ п╦ п╫п╣ п╥п╟п╨я┐п©п╬я─п╣п╫п╬." );
 		return;
 	    }
 
@@ -857,26 +857,26 @@ CMDRUNP( unlock )
 
 	    if (!key) {
 		if (IS_SET(obj->value[3], DRINK_CLOSE_CORK)) 
-		    ch->println( "У тебя нечем вытащить пробку." );
+		    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┤п╣п╪ п╡я▀я┌п╟я┴п╦я┌я▄ п©я─п╬п╠п╨я┐." );
 		else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL))
-		    ch->println( "У тебя нечем оторвать крышку." );
+		    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┤п╣п╪ п╬я┌п╬я─п╡п╟я┌я▄ п╨я─я▀я┬п╨я┐." );
 		else
-		    ch->println( "У тебя нечем открыть эту емкость." );
+		    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┤п╣п╪ п╬я┌п╨я─я▀я┌я▄ я█я┌я┐ п╣п╪п╨п╬я│я┌я▄." );
 		
 		return;
 	    }
 
 	    if (IS_SET(obj->value[3], DRINK_CLOSE_CORK)) {
-		act( "Ты расшатываешь пробку в $O6 с помощью $o4.", ch, key, obj, TO_CHAR );
-		act( "$c1 расшатывает пробку в $O6 с помощью $o4.", ch, key, obj, TO_ROOM );
+		act( "п╒я▀ я─п╟я│я┬п╟я┌я▀п╡п╟п╣я┬я▄ п©я─п╬п╠п╨я┐ п╡ $O6 я│ п©п╬п╪п╬я┴я▄я▌ $o4.", ch, key, obj, TO_CHAR );
+		act( "$c1 я─п╟я│я┬п╟я┌я▀п╡п╟п╣я┌ п©я─п╬п╠п╨я┐ п╡ $O6 я│ п©п╬п╪п╬я┴я▄я▌ $o4.", ch, key, obj, TO_ROOM );
 	    }
 	    else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL)) {
-		act( "Ты выдергиваешь гвозди из крышки $O2 с помощью $o4.", ch, key, obj, TO_CHAR );
-		act( "$c1 выдергивает гвозди из крышки $O2 с помощью $o4.", ch, key, obj, TO_ROOM );
+		act( "п╒я▀ п╡я▀п╢п╣я─пЁп╦п╡п╟п╣я┬я▄ пЁп╡п╬п╥п╢п╦ п╦п╥ п╨я─я▀я┬п╨п╦ $O2 я│ п©п╬п╪п╬я┴я▄я▌ $o4.", ch, key, obj, TO_CHAR );
+		act( "$c1 п╡я▀п╢п╣я─пЁп╦п╡п╟п╣я┌ пЁп╡п╬п╥п╢п╦ п╦п╥ п╨я─я▀я┬п╨п╦ $O2 я│ п©п╬п╪п╬я┴я▄я▌ $o4.", ch, key, obj, TO_ROOM );
 	    }
 	    else {
-		act( "Ты открываешь $o5 $O2.", ch, key, obj, TO_CHAR );
-		act( "$c1 открывает $o5 $O2.", ch, key, obj, TO_ROOM );
+		act( "п╒я▀ п╬я┌п╨я─я▀п╡п╟п╣я┬я▄ $o5 $O2.", ch, key, obj, TO_CHAR );
+		act( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ $o5 $O2.", ch, key, obj, TO_ROOM );
 	    }
 
 	    REMOVE_BIT(obj->value[3], DRINK_LOCKED);
@@ -884,7 +884,7 @@ CMDRUNP( unlock )
 	}
 	else
 	{
-	    ch->println( "Это не контейнер." );
+	    ch->println( "п╜я┌п╬ п╫п╣ п╨п╬п╫я┌п╣п╧п╫п╣я─." );
 	    return;
 	}
 
@@ -899,37 +899,37 @@ CMDRUNP( unlock )
     {
 	if ( !IS_SET(peexit->exit_info, EX_ISDOOR) )
 	{
-		ch->println( "Это не дверь!" );
+		ch->println( "п╜я┌п╬ п╫п╣ п╢п╡п╣я─я▄!" );
 		return;
 	}
 
 	if ( !IS_SET(peexit->exit_info, EX_CLOSED) )
 	{
-		ch->println( "Здесь не закрыто." );
+		ch->println( "п≈п╢п╣я│я▄ п╫п╣ п╥п╟п╨я─я▀я┌п╬." );
 		return;
 	}
 
 	if ( peexit->key <= 0 )
 	{
-		ch->println( "Здесь нет замочной скважины." );
+		ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 		return;
 	}
 
 	if (!get_key_carry( ch, peexit->key))
 	{
-		ch->println( "У тебя нет ключа." );
+		ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩я▌я┤п╟." );
 		return;
 	}
 
 	if ( !IS_SET(peexit->exit_info, EX_LOCKED) )
 	{
-		ch->println( "Здесь уже не заперто." );
+		ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╫п╣ п╥п╟п©п╣я─я┌п╬." );
 		return;
 	}
 
 	REMOVE_BIT(peexit->exit_info, EX_LOCKED);
-	ch->println( "*Щелк*" );
-	act_p( "$c1 открывает ключом $N4.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
+	ch->println( "*п╘п╣п╩п╨*" );
+	act_p( "$c1 п╬я┌п╨я─я▀п╡п╟п╣я┌ п╨п╩я▌я┤п╬п╪ $N4.", ch, 0, peexit->short_desc_from, TO_ROOM,POS_RESTING );
 
 	return;
     }
@@ -1017,7 +1017,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
 	if (obj->item_type == ITEM_CONTAINER)
 	    return ContainerKeyhole::Pointer( NEW, ch, obj );
 
-	act( "В $o6 нет замочной скважины.", ch, obj, 0, TO_CHAR );
+	act( "п▓ $o6 п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀.", ch, obj, 0, TO_CHAR );
 	return null;
     }
 
@@ -1091,12 +1091,12 @@ bool Keyhole::doPick( const DLString &arg )
     bitstring_t flags = getLockFlags( );
 
     if (!isLockable( )) {
-	ch->println( "Здесь нет замочной скважины." );
+	ch->println( "п≈п╢п╣я│я▄ п╫п╣я┌ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫я▀." );
 	return false;
     }
 
     if (!IS_SET(flags, bitLocked( ))) {
-	ch->println( "Здесь уже не заперто." );
+	ch->println( "п≈п╢п╣я│я▄ я┐п╤п╣ п╫п╣ п╥п╟п©п╣я─я┌п╬." );
 	return false;
     }
     
@@ -1104,7 +1104,7 @@ bool Keyhole::doPick( const DLString &arg )
 	return false;
     
     if (isPickProof( )) {
-	ch->println( "Этот замок защищен от взлома." );
+	ch->println( "п╜я┌п╬я┌ п╥п╟п╪п╬п╨ п╥п╟я┴п╦я┴п╣п╫ п╬я┌ п╡п╥п╩п╬п╪п╟." );
 	return false;
     }
     
@@ -1116,7 +1116,7 @@ bool Keyhole::doPick( const DLString &arg )
     msgTryPickOther( );
 
     if (!checkLockPick( lockpick )) {
-	act( "Ты не смо$gгло|г|гла пропихнуть $o4 в эту замочную скважину.", ch, lockpick, 0, TO_CHAR );
+	act( "п╒я▀ п╫п╣ я│п╪п╬$gпЁп╩п╬|пЁ|пЁп╩п╟ п©я─п╬п©п╦я┘п╫я┐я┌я▄ $o4 п╡ я█я┌я┐ п╥п╟п╪п╬я┤п╫я┐я▌ я│п╨п╡п╟п╤п╦п╫я┐.", ch, lockpick, 0, TO_CHAR );
 	ch->setWait( gsn_pick_lock->getBeats( ) / 2 );
 	return false;
     }
@@ -1127,11 +1127,11 @@ bool Keyhole::doPick( const DLString &arg )
 	if (number_percent( ) >= gsn_pick_lock->getEffective( ch )
 	    && number_percent( ) > lockpick->value[1]) 
 	{
-	    ch->pecho( "  ... но слишком резко надавив, ломаешь %1$P2!", lockpick );
+	    ch->pecho( "  ... п╫п╬ я│п╩п╦я┬п╨п╬п╪ я─п╣п╥п╨п╬ п╫п╟п╢п╟п╡п╦п╡, п╩п╬п╪п╟п╣я┬я▄ %1$P2!", lockpick );
 	    extract_obj( lockpick );
 	}
 	else
-	    ch->println( "  ... но твои манипуляции ни к чему не приводят." );
+	    ch->println( "  ... п╫п╬ я┌п╡п╬п╦ п╪п╟п╫п╦п©я┐п╩я▐я├п╦п╦ п╫п╦ п╨ я┤п╣п╪я┐ п╫п╣ п©я─п╦п╡п╬п╢я▐я┌." );
 
 	gsn_pick_lock->improve( ch, false );
 	ch->setWait( gsn_pick_lock->getBeats( ) );
@@ -1149,7 +1149,7 @@ bool Keyhole::doPick( const DLString &arg )
 void Keyhole::unlock( )
 {
     REMOVE_BIT(getLockFlags( ), bitLocked( ));
-    ch->in_room->echo( POS_RESTING, "*Щелк*" );
+    ch->in_room->echo( POS_RESTING, "*п╘п╣п╩п╨*" );
 }
 
 bool Keyhole::checkLockPick( Object *o )
@@ -1173,7 +1173,7 @@ bool Keyhole::checkGuards( )
 		&& IS_AWAKE(rch)
 		&& ch->getModifyLevel( ) + 5 < rch->getModifyLevel( ))
 	{
-	    act( "$C1 маячит перед тобой, загораживая вожделенный замок.", ch, 0, rch, TO_CHAR );
+	    act( "$C1 п╪п╟я▐я┤п╦я┌ п©п╣я─п╣п╢ я┌п╬п╠п╬п╧, п╥п╟пЁп╬я─п╟п╤п╦п╡п╟я▐ п╡п╬п╤п╢п╣п╩п╣п╫п╫я▀п╧ п╥п╟п╪п╬п╨.", ch, 0, rch, TO_CHAR );
 	    return false;
 	}
 
@@ -1184,17 +1184,17 @@ bool Keyhole::findLockpick( )
 {
     if (!argKeyring.empty( )) {
 	if (!( keyring = get_obj_list_type( ch, argKeyring, ITEM_KEYRING, ch->carrying ) )) {
-	    ch->println( "У тебя нет такого кольца для ключей." );
+	    ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╟п╨п╬пЁп╬ п╨п╬п╩я▄я├п╟ п╢п╩я▐ п╨п╩я▌я┤п╣п╧." );
 	    return false;
 	}
 
 	if (!( lockpick = get_obj_list_type( ch, argLockpick, ITEM_LOCKPICK, keyring->contains ) )) {
-	    act( "На $o6 не нанизано ничего похожего.", ch, keyring, 0, TO_CHAR );
+	    act( "п²п╟ $o6 п╫п╣ п╫п╟п╫п╦п╥п╟п╫п╬ п╫п╦я┤п╣пЁп╬ п©п╬я┘п╬п╤п╣пЁп╬.", ch, keyring, 0, TO_CHAR );
 	    return false;
 	}
     }
     else if (!( lockpick = get_obj_list_type( ch, argLockpick, ITEM_LOCKPICK, ch->carrying )) ) {
-	ch->println( "У тебя нет такой отмычки." );
+	ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╟п╨п╬п╧ п╬я┌п╪я▀я┤п╨п╦." );
 	return false;
     }
 
@@ -1228,19 +1228,19 @@ bool Keyhole::doLore( ostringstream &buf )
 	return false;
 
     if (!isLockable( )) 
-	buf << "Это ключ от поломанного замка." << endl;
+	buf << "п╜я┌п╬ п╨п╩я▌я┤ п╬я┌ п©п╬п╩п╬п╪п╟п╫п╫п╬пЁп╬ п╥п╟п╪п╨п╟." << endl;
     else if (isPickProof( )) 
-	buf << "Открывает защищенный от взлома замок на "
+	buf << "п·я┌п╨я─я▀п╡п╟п╣я┌ п╥п╟я┴п╦я┴п╣п╫п╫я▀п╧ п╬я┌ п╡п╥п╩п╬п╪п╟ п╥п╟п╪п╬п╨ п╫п╟ "
 	    << getDescription( ).ruscase( '6' ) << "." << endl;
     else
-	buf << "Открывает замок на "
+	buf << "п·я┌п╨я─я▀п╡п╟п╣я┌ п╥п╟п╪п╬п╨ п╫п╟ "
 	    << getDescription( ).ruscase( '6' ) << "." << endl;
     
     if (key->value[0] == 0)
-	buf << "Рассыпается, лежа в кармане." << endl;
+	buf << "п═п╟я│я│я▀п©п╟п╣я┌я│я▐, п╩п╣п╤п╟ п╡ п╨п╟я─п╪п╟п╫п╣." << endl;
 
     if (key->value[1] > 0)
-	buf << "Рассыпается, лежа на земле." << endl;
+	buf << "п═п╟я│я│я▀п©п╟п╣я┌я│я▐, п╩п╣п╤п╟ п╫п╟ п╥п╣п╪п╩п╣." << endl;
 
     gsn_golden_eye->improve( ch, true );
     return true;
@@ -1255,13 +1255,13 @@ bool Keyhole::doExamine( )
 	return false;
 	
     if (isPickProof( )) 
-	act( "Замок защищен от взлома.", ch, 0, 0, TO_CHAR );
+	act( "п≈п╟п╪п╬п╨ п╥п╟я┴п╦я┴п╣п╫ п╬я┌ п╡п╥п╩п╬п╪п╟.", ch, 0, 0, TO_CHAR );
     else {
-	act( "Замок не устоит перед хорошим взломщиком.", ch, 0, 0, TO_CHAR );
+	act( "п≈п╟п╪п╬п╨ п╫п╣ я┐я│я┌п╬п╦я┌ п©п╣я─п╣п╢ я┘п╬я─п╬я┬п╦п╪ п╡п╥п╩п╬п╪я┴п╦п╨п╬п╪.", ch, 0, 0, TO_CHAR );
 
 	for (Object *o = ch->carrying; o; o = o->next_content) {
 	    if (checkLockPick( o )) {
-		ch->pecho( "%1$^O1 тихонько звяка%1$nет|ют.", o );
+		ch->pecho( "%1$^O1 я┌п╦я┘п╬п╫я▄п╨п╬ п╥п╡я▐п╨п╟%1$nп╣я┌|я▌я┌.", o );
 		continue;
 	    }
 
@@ -1271,7 +1271,7 @@ bool Keyhole::doExamine( )
 	    if (o->item_type == ITEM_KEYRING) 
 		for (Object *l = o->contains; l; l = l->next_content)
 		    if (checkLockPick( l )) 
-			ch->pecho( "%1$^O1 на %2$O6 тихонько звяка%1$nет|ют.", o, l );
+			ch->pecho( "%1$^O1 п╫п╟ %2$O6 я┌п╦я┘п╬п╫я▄п╨п╬ п╥п╡я▐п╨п╟%1$nп╣я┌|я▌я┌.", o, l );
 	}
     }
     
@@ -1311,11 +1311,11 @@ void ItemKeyhole::unlock( )
 }
 void ItemKeyhole::msgTryPickSelf( )
 {
-    act( "Ты осторожно поворачиваешь $o4 в замочной скважине $O2.", ch, lockpick, obj, TO_CHAR );
+    act( "п╒я▀ п╬я│я┌п╬я─п╬п╤п╫п╬ п©п╬п╡п╬я─п╟я┤п╦п╡п╟п╣я┬я▄ $o4 п╡ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫п╣ $O2.", ch, lockpick, obj, TO_CHAR );
 }
 void ItemKeyhole::msgTryPickOther( )
 {
-    act( "$c1 ковыряется в замке $O2.", ch, lockpick, obj, TO_ROOM );
+    act( "$c1 п╨п╬п╡я▀я─я▐п╣я┌я│я▐ п╡ п╥п╟п╪п╨п╣ $O2.", ch, lockpick, obj, TO_ROOM );
 }
 DLString ItemKeyhole::getDescription( )
 {
@@ -1323,7 +1323,7 @@ DLString ItemKeyhole::getDescription( )
 
     buf << obj->getShortDescr( );
     if (obj->getCarrier( ) == 0)
-	buf << " из '" << obj->getRoom( )->name << "'";
+	buf << " п╦п╥ '" << obj->getRoom( )->name << "'";
 
     return buf;
 }
@@ -1426,24 +1426,24 @@ void DoorKeyhole::unlock( )
     
     if (pexit_rev && pexit_rev->u1.to_room == room) {
 	REMOVE_BIT(pexit_rev->exit_info, bitLocked( ));
-	to_room->echo( POS_RESTING, "Дверной замок щелкает." );
+	to_room->echo( POS_RESTING, "п■п╡п╣я─п╫п╬п╧ п╥п╟п╪п╬п╨ я┴п╣п╩п╨п╟п╣я┌." );
     }
 }
 void DoorKeyhole::msgTryPickSelf( )
 {
-    act( "Ты осторожно поворачиваешь $o4 в замочной скважине.", ch, lockpick, 0, TO_CHAR );
+    act( "п╒я▀ п╬я│я┌п╬я─п╬п╤п╫п╬ п©п╬п╡п╬я─п╟я┤п╦п╡п╟п╣я┬я▄ $o4 п╡ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫п╣.", ch, lockpick, 0, TO_CHAR );
 }
 void DoorKeyhole::msgTryPickOther( )
 {
-    act( "$c1 ковыряется в замке двери $t отсюда.", ch, dirs[door].leave, 0, TO_ROOM );
+    act( "$c1 п╨п╬п╡я▀я─я▐п╣я┌я│я▐ п╡ п╥п╟п╪п╨п╣ п╢п╡п╣я─п╦ $t п╬я┌я│я▌п╢п╟.", ch, dirs[door].leave, 0, TO_ROOM );
 }
 DLString DoorKeyhole::getDescription( )
 {
     DLString buf;
     
-    buf << "двер|ь|и|и|ь|ью|и из '" << room->name << "'";
+    buf << "п╢п╡п╣я─|я▄|п╦|п╦|я▄|я▄я▌|п╦ п╦п╥ '" << room->name << "'";
     if (to_room)
-	buf <<  " в '" << to_room->name << "'";
+	buf <<  " п╡ '" << to_room->name << "'";
 
     return buf;
 }
@@ -1476,11 +1476,11 @@ int & ExtraExitKeyhole::getLockFlags( )
 
 void ExtraExitKeyhole::msgTryPickSelf( )
 {
-    act( "Ты осторожно поворачиваешь $o4 в замочной скважине $N2.", ch, lockpick, peexit->short_desc_from, TO_CHAR );
+    act( "п╒я▀ п╬я│я┌п╬я─п╬п╤п╫п╬ п©п╬п╡п╬я─п╟я┤п╦п╡п╟п╣я┬я▄ $o4 п╡ п╥п╟п╪п╬я┤п╫п╬п╧ я│п╨п╡п╟п╤п╦п╫п╣ $N2.", ch, lockpick, peexit->short_desc_from, TO_CHAR );
 }
 void ExtraExitKeyhole::msgTryPickOther( )
 {
-    act( "$c1 ковыряется в замке $N2.", ch, 0, peexit->short_desc_from, TO_ROOM );
+    act( "$c1 п╨п╬п╡я▀я─я▐п╣я┌я│я▐ п╡ п╥п╟п╪п╨п╣ $N2.", ch, 0, peexit->short_desc_from, TO_ROOM );
 }
 
 DLString ExtraExitKeyhole::getDescription( )

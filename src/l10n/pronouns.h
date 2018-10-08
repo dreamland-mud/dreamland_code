@@ -22,7 +22,7 @@ public:
     virtual ~Pronoun();
 };
 
-// (кто? кого? кому?)
+// (п╨я┌п╬? п╨п╬пЁп╬? п╨п╬п╪я┐?)
 class PersonalPronoun : public Pronoun {
 public:    
     PersonalPronoun();
@@ -34,7 +34,7 @@ private:
     const Persons &persons;
 };
 
-// (чей? чьим?)
+// (я┤п╣п╧? я┤я▄п╦п╪?)
 class PosessivePronoun : public Pronoun {
 public:    
     typedef Persons PosessionGenders [MultiGender::MAX];
@@ -49,7 +49,7 @@ private:
     const PosessionGenders &posessions;
 };
 
-// (некто, нечто)
+// (п╫п╣п╨я┌п╬, п╫п╣я┤я┌п╬)
 class IndefinitePronoun : public Pronoun {
 public:    
     typedef Cases AnimacyCases [Animacy::MAX];

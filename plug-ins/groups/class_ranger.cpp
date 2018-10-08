@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "logstream.h"
@@ -73,17 +73,17 @@ SKILL_RUNP( track )
     int d;
 
     if (gsn_track->getEffective( ch ) < 2) {
-	ch->send_to("Здесь нет следов.\r\n");
+	ch->send_to("п≈п╢п╣я│я▄ п╫п╣я┌ я│п╩п╣п╢п╬п╡.\r\n");
 	return;
     }
 
     if (arg.empty( )) {
-	ch->println( "Кого ты хочешь выследить?" );
+	ch->println( "п п╬пЁп╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п╡я▀я│п╩п╣п╢п╦я┌я▄?" );
 	return;
     }
 
     ch->setWait( gsn_track->getBeats( ) );
-    act_p("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM,POS_RESTING);
+    act_p("$c1 п╡я│п╪п╟я┌я─п╦п╡п╟п╣я┌я│я▐ п╡ п╥п╣п╪п╩я▌ п╡ п©п╬п╦я│п╨п╟я┘ я│п╩п╣п╢п╬п╡.",ch,0,0,TO_ROOM,POS_RESTING);
 
     if (number_percent() < gsn_track->getEffective( ch ))
 	if (( d = ch->in_room->history.went( arg, false ) ) != -1)
@@ -98,7 +98,7 @@ SKILL_RUNP( track )
 		return;
 	    }
     
-    ch->send_to("Ты не видишь здесь следов.\n\r");
+    ch->send_to("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я│п╩п╣п╢п╬п╡.\n\r");
     gsn_track->improve( ch, false );
 }
 
@@ -116,12 +116,12 @@ static Object * find_arrow( Character *ch, Object *quiver )
 	}
 
     if (!arrow) {
-	act("В $o6 закончились стрелы.", ch, quiver, 0, TO_CHAR);
+	act("п▓ $o6 п╥п╟п╨п╬п╫я┤п╦п╩п╦я│я▄ я│я┌я─п╣п╩я▀.", ch, quiver, 0, TO_CHAR);
 	return NULL;
     }
 
     if (ch->getRealLevel( ) + 10 < arrow->level) {
-	ch->println("Тебе не хватает опыта воспользоватся этой стрелой.");
+	ch->println("п╒п╣п╠п╣ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ п╬п©я▀я┌п╟ п╡п╬я│п©п╬п╩я▄п╥п╬п╡п╟я┌я│я▐ я█я┌п╬п╧ я│я┌я─п╣п╩п╬п╧.");
 	return NULL;
     }
 
@@ -148,7 +148,7 @@ SKILL_RUNP( shoot )
 
     if (!gsn_bow->usable( ch ))
     {
-	  ch->send_to("Ты не умеешь стрелять из лука.\n\r");
+	  ch->send_to("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ я│я┌я─п╣п╩я▐я┌я▄ п╦п╥ п╩я┐п╨п╟.\n\r");
 	  return;
     }
 
@@ -157,13 +157,13 @@ SKILL_RUNP( shoot )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-	    ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
+	    ch->send_to("п▓я▀я│я┌я─п╣п╩п╦я┌я▄ п╡ п╨п╟п╨п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦ п╦ п╡ п╨п╬пЁп╬?\n\r");
 	    return;
     }
 
     if ( ch->fighting )
     {
-	    ch->send_to("Сражаясь, ты не можешь прицелиться.\n\r");
+	    ch->send_to("п║я─п╟п╤п╟я▐я│я▄, я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©я─п╦я├п╣п╩п╦я┌я▄я│я▐.\n\r");
 	    return;
     }
 
@@ -171,32 +171,32 @@ SKILL_RUNP( shoot )
 
     if (direction < 0)
     {
-	    ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
+	    ch->send_to("п▓я▀я│я┌я─п╣п╩п╦я┌я▄ п╡ п╨п╟п╨п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦ п╦ п╡ п╨п╬пЁп╬?\n\r");
 	    return;
     }
     
     range = range0;
     if ( ( victim = find_char( ch, arg2, direction, &range) ) == 0 )
     {
-	    ch->send_to("Там таких нет.\n\r");
+	    ch->send_to("п╒п╟п╪ я┌п╟п╨п╦я┘ п╫п╣я┌.\n\r");
 	    return;
     }
 
     if ( !victim->is_npc() && victim->desc == 0 )
     {
-	    ch->send_to("Ты не можешь сделать этого.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬.\n\r");
 	    return;
     }
 
     if ( victim == ch )
     {
-	    ch->send_to("Это невозможно!\n\r");
+	    ch->send_to("п╜я┌п╬ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬!\n\r");
 	    return;
     }
 
     if (is_safe(ch,victim))
     {
-	    ch->pecho("Боги покровительствуют %C3.", victim);
+	    ch->pecho("п▒п╬пЁп╦ п©п╬п╨я─п╬п╡п╦я┌п╣п╩я▄я│я┌п╡я┐я▌я┌ %C3.", victim);
 	    return;
     }
 
@@ -208,7 +208,7 @@ SKILL_RUNP( shoot )
 	    || wield->item_type != ITEM_WEAPON
 	    || wield->value[0] != WEAPON_BOW )
     {
-	    ch->send_to("Для того, чтобы стрелять тебе нужен лук!\n\r");
+	    ch->send_to("п■п╩я▐ я┌п╬пЁп╬, я┤я┌п╬п╠я▀ я│я┌я─п╣п╩я▐я┌я▄ я┌п╣п╠п╣ п╫я┐п╤п╣п╫ п╩я┐п╨!\n\r");
 	    return;    	
     }
 
@@ -216,26 +216,26 @@ SKILL_RUNP( shoot )
 	&& (get_eq_char(ch,wear_second_wield)
 	    || get_eq_char(ch,wear_shield)) )
     {
-	    ch->send_to("Твоя вторая рука должна быть свободна!\n\r");
+	    ch->send_to("п╒п╡п╬я▐ п╡я┌п╬я─п╟я▐ я─я┐п╨п╟ п╢п╬п╩п╤п╫п╟ п╠я▀я┌я▄ я│п╡п╬п╠п╬п╢п╫п╟!\n\r");
 	    return;    	
     }
 
     if (!ch->is_npc( ) && !quiver)
     {
-	    ch->send_to("У тебя в руках ничего нет!\n\r");
+	    ch->send_to("пё я┌п╣п╠я▐ п╡ я─я┐п╨п╟я┘ п╫п╦я┤п╣пЁп╬ п╫п╣я┌!\n\r");
 	    return;    	
     }	
     
     if (!ch->is_npc( ) && 
 	(quiver->item_type != ITEM_CONTAINER || !IS_SET(quiver->value[1], CONT_FOR_ARROW)))
     {
-	    ch->send_to("Возьми в руки колчан.\n\r");
+	    ch->send_to("п▓п╬п╥я▄п╪п╦ п╡ я─я┐п╨п╦ п╨п╬п╩я┤п╟п╫.\n\r");
 	    return;
     }
 
     if ( ch->in_room == victim->in_room )
     {
-	    ch->send_to("Ты не можешь стрелять из лука в упор.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│я┌я─п╣п╩я▐я┌я▄ п╦п╥ п╩я┐п╨п╟ п╡ я┐п©п╬я─.\n\r");
 	    return;
     }
 
@@ -260,8 +260,8 @@ SKILL_RUNP( shoot )
 	    chance -= 40;
     chance += ch->hitroll;
     
-    ch->pecho( "%1$^O1, посланн%1$Gое|ый|ая тобой, улетела %2$s.", arrow, dirs[ direction ].leave );
-    ch->recho( "%1$^O1, посланн%1$Gое|ый|ая %3$C5, улетела %2$s.", arrow, dirs[ direction ].leave, ch );
+    ch->pecho( "%1$^O1, п©п╬я│п╩п╟п╫п╫%1$Gп╬п╣|я▀п╧|п╟я▐ я┌п╬п╠п╬п╧, я┐п╩п╣я┌п╣п╩п╟ %2$s.", arrow, dirs[ direction ].leave );
+    ch->recho( "%1$^O1, п©п╬я│п╩п╟п╫п╫%1$Gп╬п╣|я▀п╧|п╟я▐ %3$C5, я┐п╩п╣я┌п╣п╩п╟ %2$s.", arrow, dirs[ direction ].leave, ch );
 
     set_violent( ch, victim, false );
     
@@ -276,8 +276,8 @@ SKILL_RUNP( shoot )
     gsn_bow->improve( ch, success, victim );
     
     yell_panic( ch, victim,
-                "Помогите! Меня кто-то обстреливает!",
-		"Помогите! Меня обстреливает %1$C1!",
+                "п÷п╬п╪п╬пЁп╦я┌п╣! п°п╣п╫я▐ п╨я┌п╬-я┌п╬ п╬п╠я│я┌я─п╣п╩п╦п╡п╟п╣я┌!",
+		"п÷п╬п╪п╬пЁп╦я┌п╣! п°п╣п╫я▐ п╬п╠я│я┌я─п╣п╩п╦п╡п╟п╣я┌ %1$C1!",
 		FYP_VICT_ANY );
     
     if (ch->is_npc( ))
@@ -322,7 +322,7 @@ SKILL_RUNP( herbs )
 
   if (ch->isAffected(gsn_herbs))
     {
-      ch->send_to("Ты пока не можешь искать травы.\n\r");
+      ch->send_to("п╒я▀ п©п╬п╨п╟ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│п╨п╟я┌я▄ я┌я─п╟п╡я▀.\n\r");
       return;
     }
 
@@ -330,7 +330,7 @@ SKILL_RUNP( herbs )
     victim = ch;
   else if ( (victim = get_char_room(ch,arg)) == 0)
     {
-      ch->send_to("Таких тут нет.\n\r");
+      ch->send_to("п╒п╟п╨п╦я┘ я┌я┐я┌ п╫п╣я┌.\n\r");
       return;
     }
   ch->setWait( gsn_herbs->getBeats( )  );
@@ -352,20 +352,20 @@ SKILL_RUNP( herbs )
 
       affect_to_char(ch,&af);
 
-      ch->send_to("Ты собираешь целебные травы.\n\r");
-      act_p("$c1 собирает какие-то травы.",ch,0,0,TO_ROOM,POS_RESTING);
+      ch->send_to("п╒я▀ я│п╬п╠п╦я─п╟п╣я┬я▄ я├п╣п╩п╣п╠п╫я▀п╣ я┌я─п╟п╡я▀.\n\r");
+      act_p("$c1 я│п╬п╠п╦я─п╟п╣я┌ п╨п╟п╨п╦п╣-я┌п╬ я┌я─п╟п╡я▀.",ch,0,0,TO_ROOM,POS_RESTING);
 
       if (ch != victim)
 	{
-	  act_p("$c1 дает тебе покушать травы.",ch,0,victim,TO_VICT,POS_RESTING);
-	  act_p("Ты даешь травы $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
-	  act_p("$c1 дает травы $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+	  act_p("$c1 п╢п╟п╣я┌ я┌п╣п╠п╣ п©п╬п╨я┐я┬п╟я┌я▄ я┌я─п╟п╡я▀.",ch,0,victim,TO_VICT,POS_RESTING);
+	  act_p("п╒я▀ п╢п╟п╣я┬я▄ я┌я─п╟п╡я▀ $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
+	  act_p("$c1 п╢п╟п╣я┌ я┌я─п╟п╡я▀ $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
 	}
 	
       if (victim->hit < victim->max_hit)
 	{
-	  victim->send_to("Ты чувствуешь себя лучше.\n\r");
-	  act_p("$c1 выглядит лучше.",victim,0,0,TO_ROOM,POS_RESTING);
+	  victim->send_to("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╩я┐я┤я┬п╣.\n\r");
+	  act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╩я┐я┤я┬п╣.",victim,0,0,TO_ROOM,POS_RESTING);
 	}
       victim->hit = min((int)victim->max_hit,victim->hit + 5 * ch->getModifyLevel() );
       gsn_herbs->improve( ch, true, victim );
@@ -375,8 +375,8 @@ SKILL_RUNP( herbs )
     }
   else
     {
-      ch->send_to("Ты ищешь травы, но ничего не находишь.\n\r");
-      act_p("$c1 озирается в поисках травы.",ch,0,0,TO_ROOM,POS_RESTING);
+      ch->send_to("п╒я▀ п╦я┴п╣я┬я▄ я┌я─п╟п╡я▀, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄.\n\r");
+      act_p("$c1 п╬п╥п╦я─п╟п╣я┌я│я▐ п╡ п©п╬п╦я│п╨п╟я┘ я┌я─п╟п╡я▀.",ch,0,0,TO_ROOM,POS_RESTING);
       gsn_herbs->improve( ch, false, victim );
     }
 }
@@ -391,20 +391,20 @@ SKILL_RUNP( camp )
 
   if (ch->is_npc() || !gsn_camp->usable( ch ) )
     {
-      ch->send_to( "Чего?\n\r");
+      ch->send_to( "п╖п╣пЁп╬?\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_camp))
     {
-      ch->println("У тебя нет сил разбить новый лагерь.");
+      ch->println("пё я┌п╣п╠я▐ п╫п╣я┌ я│п╦п╩ я─п╟п╥п╠п╦я┌я▄ п╫п╬п╡я▀п╧ п╩п╟пЁп╣я─я▄.");
       return;
     }
 
 
   if ( number_percent( ) > gsn_camp->getEffective( ch ) )
   {
-	ch->println("Ты пытаешься разбить лагерь, но у тебя ничего не получается.");
+	ch->println("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я─п╟п╥п╠п╦я┌я▄ п╩п╟пЁп╣я─я▄, п╫п╬ я┐ я┌п╣п╠я▐ п╫п╦я┤п╣пЁп╬ п╫п╣ п©п╬п╩я┐я┤п╟п╣я┌я│я▐.");
 	gsn_camp->improve( ch, true );
 	return;
   }
@@ -417,13 +417,13 @@ SKILL_RUNP( camp )
            ch->in_room->sector_type != SECT_MOUNTAIN &&
            ch->in_room->sector_type != SECT_HILLS ) )
   {
-    ch->println("Здесь недостаточно растительности для разбивки лагеря.");
+    ch->println("п≈п╢п╣я│я▄ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я─п╟я│я┌п╦я┌п╣п╩я▄п╫п╬я│я┌п╦ п╢п╩я▐ я─п╟п╥п╠п╦п╡п╨п╦ п╩п╟пЁп╣я─я▐.");
     return;
   }
 
   if ( ch->mana < gsn_camp->getMana( ))
   {
-     ch->println("У тебя не хватает энергии для разбивки лагеря.");
+     ch->println("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я─п╟п╥п╠п╦п╡п╨п╦ п╩п╟пЁп╣я─я▐.");
      return;
   }
 
@@ -431,8 +431,8 @@ SKILL_RUNP( camp )
   ch->mana -= gsn_camp->getMana( );
   ch->setWait( gsn_camp->getBeats( ) );
 
-  act("Ты разбиваешь лагерь.", ch, 0, 0, TO_CHAR);
-  act("$c1 разбивает лагерь.", ch, 0, 0, TO_ROOM);
+  act("п╒я▀ я─п╟п╥п╠п╦п╡п╟п╣я┬я▄ п╩п╟пЁп╣я─я▄.", ch, 0, 0, TO_CHAR);
+  act("$c1 я─п╟п╥п╠п╦п╡п╟п╣я┌ п╩п╟пЁп╣я─я▄.", ch, 0, 0, TO_ROOM);
 
   af.where		= TO_AFFECTS;
   af.type               = gsn_camp;
@@ -464,8 +464,8 @@ VOID_AFFECT(Camp)::toStream( ostringstream &buf, Affect *paf )
     if (!paf->next || paf->next->type != gsn_camp)
 	return;
 
-    buf << fmt( 0, "Здесь разбит лагерь, который в течение {W%1$d{x ча%1$Iса|сов|сов "
-                   "улучшает восстановление здоровья на {W%2$d{x и маны на {W%3$d{x.",
+    buf << fmt( 0, "п≈п╢п╣я│я▄ я─п╟п╥п╠п╦я┌ п╩п╟пЁп╣я─я▄, п╨п╬я┌п╬я─я▀п╧ п╡ я┌п╣я┤п╣п╫п╦п╣ {W%1$d{x я┤п╟%1$Iя│п╟|я│п╬п╡|я│п╬п╡ "
+                   "я┐п╩я┐я┤я┬п╟п╣я┌ п╡п╬я│я│я┌п╟п╫п╬п╡п╩п╣п╫п╦п╣ п╥п╢п╬я─п╬п╡я▄я▐ п╫п╟ {W%2$d{x п╦ п╪п╟п╫я▀ п╫п╟ {W%3$d{x.",
 		   paf->duration, paf->modifier, paf->next->modifier )
 	<< endl;
 }
@@ -482,13 +482,13 @@ SKILL_RUNP( bearcall )
 
   if (!gsn_bear_call->usable( ch ) )
     {
-      ch->send_to( "Чего?\n\r");
+      ch->send_to( "п╖п╣пЁп╬?\n\r");
       return;
     }
 
   if ( ch->mana < gsn_bear_call->getMana( ))
   {
-     ch->send_to( "У тебя не хватает сил, чтобы крикнуть медведям.\n\r");
+     ch->send_to( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩, я┤я┌п╬п╠я▀ п╨я─п╦п╨п╫я┐я┌я▄ п╪п╣п╢п╡п╣п╢я▐п╪.\n\r");
      return;
   }
 
@@ -499,7 +499,7 @@ SKILL_RUNP( bearcall )
 
   if ( number_percent( ) > gsn_bear_call->getEffective( ch ) )
   {
-	ch->send_to( "Медведи не слушают тебя.\n\r");
+	ch->send_to( "п°п╣п╢п╡п╣п╢п╦ п╫п╣ я│п╩я┐я┬п╟я▌я┌ я┌п╣п╠я▐.\n\r");
 	gsn_bear_call->improve( ch, false );
 	return;
   }
@@ -526,7 +526,7 @@ TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const
 {
   if ( ch->in_room != 0 && IS_SET(ch->in_room->room_flags, ROOM_NO_MOB) )
   {
-     ch->send_to( "Здесь медведи не услышат тебя.\n\r");
+     ch->send_to( "п≈п╢п╣я│я▄ п╪п╣п╢п╡п╣п╢п╦ п╫п╣ я┐я│п╩я▀я┬п╟я┌ я┌п╣п╠я▐.\n\r");
      return false;
   }
 
@@ -545,7 +545,7 @@ TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const
            ch->in_room->sector_type != SECT_MOUNTAIN &&
            ch->in_room->sector_type != SECT_HILLS ) )
   {
-    ch->send_to( "Медведи не пришли к тебе на помощь.\n\r");
+    ch->send_to( "п°п╣п╢п╡п╣п╢п╦ п╫п╣ п©я─п╦я┬п╩п╦ п╨ я┌п╣п╠п╣ п╫п╟ п©п╬п╪п╬я┴я▄.\n\r");
     return false;
   }
 
@@ -563,13 +563,13 @@ SKILL_RUNP( lioncall )
 
   if (!gsn_lion_call->usable( ch ) )
     {
-          ch->send_to( "Чего?\n\r");
+          ch->send_to( "п╖п╣пЁп╬?\n\r");
           return;
         }
 
   if ( ch->mana < gsn_lion_call->getMana( ))
   {
-       ch->send_to( "У тебя не хватает сил, чтобы позвать львов.\n\r");
+       ch->send_to( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩, я┤я┌п╬п╠я▀ п©п╬п╥п╡п╟я┌я▄ п╩я▄п╡п╬п╡.\n\r");
        return;
     }
 
@@ -580,7 +580,7 @@ SKILL_RUNP( lioncall )
 
   if ( number_percent( ) > gsn_lion_call->getEffective( ch ) )
   {
-    ch->send_to( "Львы не слушают тебя.\n\r");
+    ch->send_to( "п⌡я▄п╡я▀ п╫п╣ я│п╩я┐я┬п╟я▌я┌ я┌п╣п╠я▐.\n\r");
     gsn_lion_call->improve( ch, false );
     return;
     }
@@ -607,7 +607,7 @@ TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const
 {
   if ( ch->in_room != 0 && IS_SET(ch->in_room->room_flags, ROOM_NO_MOB) )
   {
-     ch->send_to( "Здесь львы не услышат тебя.\n\r");
+     ch->send_to( "п≈п╢п╣я│я▄ п╩я▄п╡я▀ п╫п╣ я┐я│п╩я▀я┬п╟я┌ я┌п╣п╠я▐.\n\r");
      return false;
   }
 
@@ -626,7 +626,7 @@ TYPE_SPELL(bool, LionCall)::canSummonHere( Character *ch ) const
            ch->in_room->sector_type != SECT_MOUNTAIN &&
            ch->in_room->sector_type != SECT_HILLS ) )
   {
-    ch->send_to( "Львы не пришли к тебе на помощь.\n\r");
+    ch->send_to( "п⌡я▄п╡я▀ п╫п╣ п©я─п╦я┬п╩п╦ п╨ я┌п╣п╠п╣ п╫п╟ п©п╬п╪п╬я┴я▄.\n\r");
     return false;
   }
 
@@ -677,36 +677,36 @@ static Object * create_arrow( int color, int level )
 	if ( color == gsn_green_arrow )
 	{
 	    saf.bitvector	= WEAPON_POISON;
-	    str_name = "green зеленая";
-	    str_long = "{GЗеленая";
-	    str_short = "{Gзелен|ая|ой|ой|ую|ой|ой";
+	    str_name = "green п╥п╣п╩п╣п╫п╟я▐";
+	    str_long = "{Gп≈п╣п╩п╣п╫п╟я▐";
+	    str_short = "{Gп╥п╣п╩п╣п╫|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧";
 	    arrow->value[1] = 4 + level / 12;
 	    arrow->value[2] = 4 + level / 10;
 	}
 	else if (color == gsn_red_arrow)
 	{
 	    saf.bitvector	= WEAPON_FLAMING;
-	    str_name = "red красная";
-	    str_long = "{RКрасная";
-	    str_short = "{Rкрасн|ая|ой|ой|ую|ой|ой";
+	    str_name = "red п╨я─п╟я│п╫п╟я▐";
+	    str_long = "{Rп я─п╟я│п╫п╟я▐";
+	    str_short = "{Rп╨я─п╟я│п╫|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧";
 	    arrow->value[1] = 4 + level / 15;
 	    arrow->value[2] = 4 + level / 30;
 	}
 	else if (color == gsn_white_arrow)
 	{
 	    saf.bitvector	= WEAPON_FROST;
-	    str_name = "white белая";
-	    str_long = "{WБелая";
-	    str_short = "{Wбел|ая|ой|ой|ую|ой|ой";
+	    str_name = "white п╠п╣п╩п╟я▐";
+	    str_long = "{Wп▒п╣п╩п╟я▐";
+	    str_short = "{Wп╠п╣п╩|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧";
 	    arrow->value[1] = 4 + level / 15;
 	    arrow->value[2] = 4 + level / 30;
 	}
 	else
 	{
 	    saf.bitvector	= WEAPON_SHOCKING;
-	    str_name = "blue голубая";
-	    str_long = "{CГолубая";
-	    str_short = "{Cголуб|ая|ой|ой|ую|ой|ой";
+	    str_name = "blue пЁп╬п╩я┐п╠п╟я▐";
+	    str_long = "{Cп⌠п╬п╩я┐п╠п╟я▐";
+	    str_short = "{CпЁп╬п╩я┐п╠|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧";
 	    arrow->value[1] = 4 + level / 15;
 	    arrow->value[2] = 4 + level / 30;
 	}
@@ -715,9 +715,9 @@ static Object * create_arrow( int color, int level )
     }
     else
     {
-	str_name = "wooden деревянная";
-	str_long = "{yДеревянная";
-	str_short = "{yдеревянн|ая|ой|ой|ую|ой|ой";
+	str_name = "wooden п╢п╣я─п╣п╡я▐п╫п╫п╟я▐";
+	str_long = "{yп■п╣я─п╣п╡я▐п╫п╫п╟я▐";
+	str_short = "{yп╢п╣я─п╣п╡я▐п╫п╫|п╟я▐|п╬п╧|п╬п╧|я┐я▌|п╬п╧|п╬п╧";
 	arrow->value[1] = 4 + level / 12;
 	arrow->value[2] = 4 + level / 10;
     }
@@ -743,7 +743,7 @@ SKILL_RUNP( makearrow )
 	return;
 
     if (!gsn_make_arrow->usable( ch )) {
-	ch->println("Ты не умеешь изготавливать стрелы.");
+	ch->println("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟я┌я▄ я│я┌я─п╣п╩я▀.");
 	return;
     }
 
@@ -751,7 +751,7 @@ SKILL_RUNP( makearrow )
 	    && ch->in_room->sector_type != SECT_FOREST
 	    && ch->in_room->sector_type != SECT_HILLS )
     {
-	ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
+	ch->send_to( "п≈п╢п╣я│я▄ п╫п╣я┌ п╫п╦ п╨я┐я│п╬я┤п╨п╟ п╢п╣я─п╣п╡п╟ (п╨я─п╬п╪п╣ я┌п╣п╠я▐)! п÷п╬п©я─п╬п╠я┐п╧ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬ п╡ п╩п╣я│я┐!\n\r");
 	return;
     }
 
@@ -764,21 +764,21 @@ SKILL_RUNP( makearrow )
 	arrowSkill = &*gsn_make_arrow;
     }
     else { 
-        if (arg_oneof(arg, "green", "зеленая", "зеленые"))
+        if (arg_oneof(arg, "green", "п╥п╣п╩п╣п╫п╟я▐", "п╥п╣п╩п╣п╫я▀п╣"))
 	    arrowSkill = &*gsn_green_arrow;
-        else if (arg_oneof(arg, "red", "красная", "красные"))
+        else if (arg_oneof(arg, "red", "п╨я─п╟я│п╫п╟я▐", "п╨я─п╟я│п╫я▀п╣"))
 	    arrowSkill = &*gsn_red_arrow;
-        else if (arg_oneof(arg, "white", "белая", "белые"))
+        else if (arg_oneof(arg, "white", "п╠п╣п╩п╟я▐", "п╠п╣п╩я▀п╣"))
 	    arrowSkill = &*gsn_white_arrow;
-        else if (arg_oneof(arg, "blue", "голубая", "голубые"))
+        else if (arg_oneof(arg, "blue", "пЁп╬п╩я┐п╠п╟я▐", "пЁп╬п╩я┐п╠я▀п╣"))
 	    arrowSkill = &*gsn_blue_arrow;
 	else {
-	    ch->send_to("Можно изготовить только зеленые, красные, белые или голубые стрелы.\n\r");
+	    ch->send_to("п°п╬п╤п╫п╬ п╦п╥пЁп╬я┌п╬п╡п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╥п╣п╩п╣п╫я▀п╣, п╨я─п╟я│п╫я▀п╣, п╠п╣п╩я▀п╣ п╦п╩п╦ пЁп╬п╩я┐п╠я▀п╣ я│я┌я─п╣п╩я▀.\n\r");
 	    return;
 	}
 
 	if (!arrowSkill->usable( ch )) {
-	    ch->send_to("Ты не умеешь изготавливать такие стрелы.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟я┌я▄ я┌п╟п╨п╦п╣ я│я┌я─п╣п╩я▀.\n\r");
 	    return;
 	}
 
@@ -787,18 +787,18 @@ SKILL_RUNP( makearrow )
     }
 
     if (ch->mana < mana) {
-	ch->send_to( "У тебя не хватает энергии для изготовления стрел.\n\r");
+	ch->send_to( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ п╦п╥пЁп╬я┌п╬п╡п╩п╣п╫п╦я▐ я│я┌я─п╣п╩.\n\r");
 	return;
     }
 
     ch->mana -= mana;
     ch->setWait( wait );
 
-    ch->send_to("Ты сосредотачиваешься на изготовлении стрел!\n\r");
-    act_p("$c1 сосредотачивается на изготовлении стрел!",ch,0,0,TO_ROOM,POS_RESTING);
+    ch->send_to("п╒я▀ я│п╬я│я─п╣п╢п╬я┌п╟я┤п╦п╡п╟п╣я┬я▄я│я▐ п╫п╟ п╦п╥пЁп╬я┌п╬п╡п╩п╣п╫п╦п╦ я│я┌я─п╣п╩!\n\r");
+    act_p("$c1 я│п╬я│я─п╣п╢п╬я┌п╟я┤п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╦п╥пЁп╬я┌п╬п╡п╩п╣п╫п╦п╦ я│я┌я─п╣п╩!",ch,0,0,TO_ROOM,POS_RESTING);
 
     if (number_percent() > arrowSkill->getEffective( ch )) {
-	ch->send_to("..но у тебя ничего не выходит.\n\r");
+	ch->send_to("..п╫п╬ я┐ я┌п╣п╠я▐ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я┘п╬п╢п╦я┌.\n\r");
 	arrowSkill->improve( ch, false );
 	return;
     }
@@ -807,12 +807,12 @@ SKILL_RUNP( makearrow )
 
     for (int i = 0; i < count; i++) {
 	if (number_percent( ) > gsn_make_arrow->getEffective( ch )) {
-	    ch->send_to( "Ты пытаешься изготовить стрелу... но она ломается.\n\r");
+	    ch->send_to( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╦п╥пЁп╬я┌п╬п╡п╦я┌я▄ я│я┌я─п╣п╩я┐... п╫п╬ п╬п╫п╟ п╩п╬п╪п╟п╣я┌я│я▐.\n\r");
 	    gsn_make_arrow->improve( ch, false );
 	    continue;
 	}
 
-	ch->send_to( "Ты изготавливаешь стрелу.\n\r");
+	ch->send_to( "п╒я▀ п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┬я▄ я│я┌я─п╣п╩я┐.\n\r");
 	obj_to_char( create_arrow( arrowSkill->getIndex( ), ch->getModifyLevel( ) ), ch );
     }
 
@@ -836,7 +836,7 @@ SKILL_RUNP( makebow )
 
   if (!gsn_make_bow->usable( ch ))
     {
-      ch->send_to("Ты не знаешь как изготовить лук.\n\r");
+      ch->send_to("п╒я▀ п╫п╣ п╥п╫п╟п╣я┬я▄ п╨п╟п╨ п╦п╥пЁп╬я┌п╬п╡п╦я┌я▄ п╩я┐п╨.\n\r");
       return;
     }
 
@@ -844,7 +844,7 @@ SKILL_RUNP( makebow )
        ch->in_room->sector_type != SECT_FOREST &&
        ch->in_room->sector_type != SECT_HILLS )
   {
-    ch->send_to( "Здесь нет ни кусочка дерева (кроме тебя)! Попробуй сделать это в лесу!\n\r");
+    ch->send_to( "п≈п╢п╣я│я▄ п╫п╣я┌ п╫п╦ п╨я┐я│п╬я┤п╨п╟ п╢п╣я─п╣п╡п╟ (п╨я─п╬п╪п╣ я┌п╣п╠я▐)! п÷п╬п©я─п╬п╠я┐п╧ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬ п╡ п╩п╣я│я┐!\n\r");
     return;
   }
 
@@ -853,7 +853,7 @@ SKILL_RUNP( makebow )
 
   if ( ch->mana < mana )
   {
-     ch->send_to( "У тебя не хватает энергии для изготовления лука.\n\r");
+     ch->send_to( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ п╦п╥пЁп╬я┌п╬п╡п╩п╣п╫п╦я▐ п╩я┐п╨п╟.\n\r");
      return;
   }
   ch->mana -= mana;
@@ -861,11 +861,11 @@ SKILL_RUNP( makebow )
 
   if ( number_percent( ) > gsn_make_bow->getEffective( ch ) )
    {
-	ch->send_to( "Ты пытаешься изготовить лук... но он ломается.\n\r");
+	ch->send_to( "п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╦п╥пЁп╬я┌п╬п╡п╦я┌я▄ п╩я┐п╨... п╫п╬ п╬п╫ п╩п╬п╪п╟п╣я┌я│я▐.\n\r");
 	gsn_make_bow->improve( ch, false );
 	return;
    }
-  ch->send_to( "Ты изготавливаешь лук.\n\r");
+  ch->send_to( "п╒я▀ п╦п╥пЁп╬я┌п╟п╡п╩п╦п╡п╟п╣я┬я▄ п╩я┐п╨.\n\r");
   gsn_make_bow->improve( ch, true );
 
   bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel() );
@@ -911,23 +911,23 @@ SKILL_RUNP( forest )
     int mana;
 
     if (ch->is_npc() || !gsn_forest_fighting->getEffective( ch )) {
-	ch->send_to("Что?\n");
+	ch->send_to("п╖я┌п╬?\n");
 	return;
     }
     
     argument = one_argument( argument, arg );
 
     if (!*arg) {
-	ch->send_to("Использование: forest {{ attack|defence|normal }\n\r");
+	ch->send_to("п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: forest {{ attack|defence|normal }\n\r");
 	return;
     }
     else if (!str_prefix(arg, "normal")) {
 	if (!ch->isAffected(gsn_forest_fighting)) {
-	    ch->send_to("Ты не используешь в бою твои знания о лесе.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╦я│п©п╬п╩я▄п╥я┐п╣я┬я▄ п╡ п╠п╬я▌ я┌п╡п╬п╦ п╥п╫п╟п╫п╦я▐ п╬ п╩п╣я│п╣.\n\r");
 	    return;
 	}
 	else {
-	    ch->send_to("Ты прекращаешь использовать в бою твои знания о лесе.\n\r");
+	    ch->send_to("п╒я▀ п©я─п╣п╨я─п╟я┴п╟п╣я┬я▄ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╡ п╠п╬я▌ я┌п╡п╬п╦ п╥п╫п╟п╫п╦я▐ п╬ п╩п╣я│п╣.\n\r");
 	    affect_strip(ch, gsn_forest_fighting);
 	    return;
 	}
@@ -944,7 +944,7 @@ SKILL_RUNP( forest )
     mana = gsn_forest_fighting->getMana( );
 
     if (ch->mana < mana) {
-	ch->send_to("У тебя недостаточно энергии (mana).\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦ (mana).\n\r");
 	return;
     }
     
@@ -964,13 +964,13 @@ SKILL_RUNP( forest )
 
     if (attack) {
 	af.modifier  = FOREST_ATTACK; 
-	act_p("Ты чувствуешь себя дик$gим|им|ой!", ch, 0, 0, TO_CHAR, POS_DEAD);
-	act_p("$c1 выглядит дик$gим|им|ой.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╢п╦п╨$gп╦п╪|п╦п╪|п╬п╧!", ch, 0, 0, TO_CHAR, POS_DEAD);
+	act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╢п╦п╨$gп╦п╪|п╦п╪|п╬п╧.", ch, 0, 0, TO_ROOM, POS_RESTING);
     }
     else {
 	af.modifier  = FOREST_DEFENCE;
-	act_p("Ты чувствуешь себя защищенн$gым|ым|ой.", ch, 0, 0, TO_CHAR, POS_DEAD);
-	act_p("$c1 выглядит защищенн$gым|ым|ой.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ п╥п╟я┴п╦я┴п╣п╫п╫$gя▀п╪|я▀п╪|п╬п╧.", ch, 0, 0, TO_CHAR, POS_DEAD);
+	act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╥п╟я┴п╦я┴п╣п╫п╫$gя▀п╪|я▀п╪|п╬п╧.", ch, 0, 0, TO_ROOM, POS_RESTING);
     }
 
     affect_to_char(ch, &af);
@@ -1015,41 +1015,41 @@ SKILL_RUNP( butcher )
 	one_argument(argument,arg);
 	if ( arg[0]=='\0' )
 	{
-		ch->send_to("Разделать что?\n\r");
+		ch->send_to("п═п╟п╥п╢п╣п╩п╟я┌я▄ я┤я┌п╬?\n\r");
 		return;
 	}
 
 	if ( (obj = get_obj_here(ch,arg)) == 0 )
 	{
-		ch->send_to("Ты не видишь этого здесь.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄.\n\r");
 		return;
 	}
 
 	if ( obj->item_type != ITEM_CORPSE_PC && obj->item_type != ITEM_CORPSE_NPC )
 	{
-		ch->send_to("Ты не сможешь разделать это на мясо.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ я─п╟п╥п╢п╣п╩п╟я┌я▄ я█я┌п╬ п╫п╟ п╪я▐я│п╬.\n\r");
 		return;
 	}
 
 	if ( obj->carried_by != 0 )
 	{
-		ch->send_to("Сперва положи это на землю.\n\r");
+		ch->send_to("п║п©п╣я─п╡п╟ п©п╬п╩п╬п╤п╦ я█я┌п╬ п╫п╟ п╥п╣п╪п╩я▌.\n\r");
 		return;
 	}
 
 	if ( gsn_butcher->getEffective( ch ) < 1 )
 	{
-		ch->send_to("Для этого у тебя недостаточно опыта!\n\r");
+		ch->send_to("п■п╩я▐ я█я┌п╬пЁп╬ я┐ я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╬п©я▀я┌п╟!\n\r");
 		return;
 	}
 
 	if ( obj->value[0] <= 0 )
 	{
-		ch->send_to("Ты разве видишь мясо в этом трупе?!\n\r");
+		ch->send_to("п╒я▀ я─п╟п╥п╡п╣ п╡п╦п╢п╦я┬я▄ п╪я▐я│п╬ п╡ я█я┌п╬п╪ я┌я─я┐п©п╣?!\n\r");
 		return;
 	}
 
-	act_p("$c1 ковыряет кинжалом $o4, надеясь срезать немного мяса.",
+	act_p("$c1 п╨п╬п╡я▀я─я▐п╣я┌ п╨п╦п╫п╤п╟п╩п╬п╪ $o4, п╫п╟п╢п╣я▐я│я▄ я│я─п╣п╥п╟я┌я▄ п╫п╣п╪п╫п╬пЁп╬ п╪я▐я│п╟.",
 		ch,obj,0,TO_ROOM,POS_RESTING);
 
 	int numsteaks;
@@ -1066,9 +1066,9 @@ SKILL_RUNP( butcher )
 		int i;
 		Object *steak;
 
-		sprintf(buf, "Ты срезаешь с $o2 %i кус%s мяса.",
+		sprintf(buf, "п╒я▀ я│я─п╣п╥п╟п╣я┬я▄ я│ $o2 %i п╨я┐я│%s п╪я▐я│п╟.",
 			numsteaks,
-			GET_COUNT(numsteaks,"ок","ка","ков"));
+			GET_COUNT(numsteaks,"п╬п╨","п╨п╟","п╨п╬п╡"));
 		act_p(buf,ch,obj,0,TO_CHAR,POS_RESTING);
 
 		gsn_butcher->improve( ch, true );
@@ -1092,7 +1092,7 @@ SKILL_RUNP( butcher )
 	}	
 	else
 	{
-		act_p("Неумеха! Ты испорти$gлo|л|лa столько мяса!",ch,0,0,TO_CHAR,POS_RESTING);
+		act_p("п²п╣я┐п╪п╣я┘п╟! п╒я▀ п╦я│п©п╬я─я┌п╦$gп╩o|п╩|п╩a я│я┌п╬п╩я▄п╨п╬ п╪я▐я│п╟!",ch,0,0,TO_CHAR,POS_RESTING);
 		gsn_butcher->improve( ch, false );
 	}
 }
@@ -1107,21 +1107,21 @@ SKILL_RUNP( tiger )
 
     if ((chance = gsn_tiger_power->getEffective( ch )) == 0)
     {
-	ch->send_to("Что?\n\r");
+	ch->send_to("п╖я┌п╬?\n\r");
 	return;
     }
-    act_p("$c1 призывает силу 10 тигров!.",ch,0,0,TO_ROOM,POS_RESTING);
+    act_p("$c1 п©я─п╦п╥я▀п╡п╟п╣я┌ я│п╦п╩я┐ 10 я┌п╦пЁя─п╬п╡!.",ch,0,0,TO_ROOM,POS_RESTING);
 
     if (IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk) ||
     ch->isAffected(gsn_tiger_power) || ch->isAffected(gsn_frenzy))
     {
-	ch->send_to("Ты немного злишься.\n\r");
+	ch->send_to("п╒я▀ п╫п╣п╪п╫п╬пЁп╬ п╥п╩п╦я┬я▄я│я▐.\n\r");
 	return;
     }
 
     if (IS_AFFECTED(ch,AFF_CALM))
     {
-	ch->send_to("Ты слишком миролюбив для этого.\n\r");
+	ch->send_to("п╒я▀ я│п╩п╦я┬п╨п╬п╪ п╪п╦я─п╬п╩я▌п╠п╦п╡ п╢п╩я▐ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
     if (ch->in_room->sector_type != SECT_FIELD &&
@@ -1129,7 +1129,7 @@ SKILL_RUNP( tiger )
            ch->in_room->sector_type != SECT_MOUNTAIN &&
            ch->in_room->sector_type != SECT_HILLS )
   {
-    ch->send_to("Нет никого, кто услышал бы твой призыв.\n\r");
+    ch->send_to("п²п╣я┌ п╫п╦п╨п╬пЁп╬, п╨я┌п╬ я┐я│п╩я▀я┬п╟п╩ п╠я▀ я┌п╡п╬п╧ п©я─п╦п╥я▀п╡.\n\r");
     return;
   }
 
@@ -1137,7 +1137,7 @@ SKILL_RUNP( tiger )
     
     if (ch->mana < mana)
     {
-	ch->send_to("У тебя не хватает энергии для этого.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
@@ -1161,8 +1161,8 @@ SKILL_RUNP( tiger )
 	ch->hit += ch->getModifyLevel() * 2;
 	ch->hit = min(ch->hit,ch->max_hit);
 
-	ch->send_to("10 тигров приходят на твой призыв, когда ты зовешь их!\n\r");
-	act_p("10 тигров приходят на призыв $c2, и присоединяются к не$gму|му|й.",
+	ch->send_to("10 я┌п╦пЁя─п╬п╡ п©я─п╦я┘п╬п╢я▐я┌ п╫п╟ я┌п╡п╬п╧ п©я─п╦п╥я▀п╡, п╨п╬пЁп╢п╟ я┌я▀ п╥п╬п╡п╣я┬я▄ п╦я┘!\n\r");
+	act_p("10 я┌п╦пЁя─п╬п╡ п©я─п╦я┘п╬п╢я▐я┌ п╫п╟ п©я─п╦п╥я▀п╡ $c2, п╦ п©я─п╦я│п╬п╣п╢п╦п╫я▐я▌я┌я│я▐ п╨ п╫п╣$gп╪я┐|п╪я┐|п╧.",
                ch,0,0,TO_ROOM,POS_RESTING);
 	gsn_tiger_power->improve( ch, true );
 
@@ -1190,7 +1190,7 @@ SKILL_RUNP( tiger )
 	ch->setWaitViolence( 2 );
 	ch->mana -= mana / 2;
 
-	ch->send_to("Твоя сила повышается, но ничего не выходит.\n\r");
+	ch->send_to("п╒п╡п╬я▐ я│п╦п╩п╟ п©п╬п╡я▀я┬п╟п╣я┌я│я▐, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я┘п╬п╢п╦я┌.\n\r");
 	gsn_tiger_power->improve( ch, false );
     }
 }
@@ -1242,7 +1242,7 @@ SKILL_RUNP( ambush )
 
     if ( MOUNTED(ch) )
     {
-	    ch->send_to("Ты не можешь быть в засаде верхом!\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╠я▀я┌я▄ п╡ п╥п╟я│п╟п╢п╣ п╡п╣я─я┘п╬п╪!\n\r");
 	    return;
     }
 
@@ -1250,7 +1250,7 @@ SKILL_RUNP( ambush )
 
     if ( ch->is_npc() || !gsn_ambush->usable( ch ) )
     {
-	    ch->send_to("Ты не знаешь, как устроить засаду.\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╥п╫п╟п╣я┬я▄, п╨п╟п╨ я┐я│я┌я─п╬п╦я┌я▄ п╥п╟я│п╟п╢я┐.\n\r");
 	    return;
     }
 
@@ -1258,12 +1258,12 @@ SKILL_RUNP( ambush )
     {
 	    if ( ch->ambushing[0] == '\0' )
 	    {
-		    ch->send_to("Засаду кому?\n\r");
+		    ch->send_to("п≈п╟я│п╟п╢я┐ п╨п╬п╪я┐?\n\r");
 		    return;
 	    }
 	    else
 	    {
-		    sprintf(buf, "Ты сидишь в засаде на %s.\n\r", ch->ambushing);
+		    sprintf(buf, "п╒я▀ я│п╦п╢п╦я┬я▄ п╡ п╥п╟я│п╟п╢п╣ п╫п╟ %s.\n\r", ch->ambushing);
 		    ch->send_to(buf);
 		    return;
 	    }
@@ -1273,23 +1273,23 @@ SKILL_RUNP( ambush )
     {
 	    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
 	    {
-		    ch->send_to("Сначала тебе стоит замаскироваться.\n\r");
+		    ch->send_to("п║п╫п╟я┤п╟п╩п╟ я┌п╣п╠п╣ я│я┌п╬п╦я┌ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄я│я▐.\n\r");
 		    return;
 	    }
-	    ch->send_to("Ты готовишься к засаде.\n\r");
+	    ch->send_to("п╒я▀ пЁп╬я┌п╬п╡п╦я┬я▄я│я▐ п╨ п╥п╟я│п╟п╢п╣.\n\r");
 	    ch->ambushing = str_dup(arg);
 	    return;
     }
 
     if ( victim == ch )
     {
-	    ch->send_to("Засаду себе? Это еще как?!\n\r");
+	    ch->send_to("п≈п╟я│п╟п╢я┐ я│п╣п╠п╣? п╜я┌п╬ п╣я┴п╣ п╨п╟п╨?!\n\r");
 	    return;
     }
 
     if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) || victim->can_see(ch) )
     {
-	    ch->send_to("Твоя жертва тебя видит.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ п╤п╣я─я┌п╡п╟ я┌п╣п╠я▐ п╡п╦п╢п╦я┌.\n\r");
 	    return;
     }
 
@@ -1314,8 +1314,8 @@ SKILL_RUNP( ambush )
 	}
 
 	yell_panic( ch, victim,
-		    "Помогите! На меня кто-то напал из засады!",
-		    "Помогите! На меня из засады напа%1$Gло|л|ла %1$C1!" );
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! п²п╟ п╪п╣п╫я▐ п╨я┌п╬-я┌п╬ п╫п╟п©п╟п╩ п╦п╥ п╥п╟я│п╟п╢я▀!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! п²п╟ п╪п╣п╫я▐ п╦п╥ п╥п╟я│п╟п╢я▀ п╫п╟п©п╟%1$Gп╩п╬|п╩|п╩п╟ %1$C1!" );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -1343,7 +1343,7 @@ BOOL_SKILL( ambush )::run( Character *ch )
 		&& !is_safe_nomessage(ch,vch)
 		&& is_name(ch->ambushing, vch->getNameP()))
 	{
-	    ch->println( "{YТЫ ВЫСКАКИВАЕШЬ ИЗ ЗАСАДЫ!{x" );
+	    ch->println( "{Yп╒п╚ п▓п╚п║п п░п п≤п▓п░п∙п╗п╛ п≤п≈ п≈п░п║п░п■п╚!{x" );
 	    run( ch, ch->ambushing );
 	    return true;
 	}
@@ -1361,25 +1361,25 @@ SKILL_RUNP( camouflage )
 {
 	if ( ch->is_npc() || !gsn_camouflage->usable( ch ) )
 	{
-		ch->send_to("Ты не знаешь, как замаскировать себя.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╥п╫п╟п╣я┬я▄, п╨п╟п╨ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄ я│п╣п╠я▐.\n\r");
 		return;
 	}
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Ты не можешь замаскироваться, когда ты в седле.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄я│я▐, п╨п╬пЁп╢п╟ я┌я▀ п╡ я│п╣п╢п╩п╣.\n\r");
 		return;
 	}
 
 	if ( RIDDEN(ch) )
 	{
-		ch->send_to("Ты не можешь замаскироваться, когда ты оседлан.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄я│я▐, п╨п╬пЁп╢п╟ я┌я▀ п╬я│п╣п╢п╩п╟п╫.\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
 	{
-		ch->send_to("Ты не можешь замаскироваться, когда светишься.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄я│я▐, п╨п╬пЁп╢п╟ я│п╡п╣я┌п╦я┬я▄я│я▐.\n\r");
 		return;
 	}
 
@@ -1387,11 +1387,11 @@ SKILL_RUNP( camouflage )
 		&& ch->in_room->sector_type != SECT_HILLS
 		&& ch->in_room->sector_type != SECT_MOUNTAIN )
 	{
-		ch->send_to("Здесь негде укрыться.\n\r");
-		act_p("$c1 пытается замаскироваться, но не может найти укрытия.",ch,0,0,TO_ROOM,POS_RESTING);
+		ch->send_to("п≈п╢п╣я│я▄ п╫п╣пЁп╢п╣ я┐п╨я─я▀я┌я▄я│я▐.\n\r");
+		act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄я│я▐, п╫п╬ п╫п╣ п╪п╬п╤п╣я┌ п╫п╟п╧я┌п╦ я┐п╨я─я▀я┌п╦я▐.",ch,0,0,TO_ROOM,POS_RESTING);
 		return;
 	}
-	ch->send_to("Ты пытаешься замаскироваться.\n\r");
+	ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╥п╟п╪п╟я│п╨п╦я─п╬п╡п╟я┌я▄я│я▐.\n\r");
 
 	int k = ch->getLastFightDelay( );
 
@@ -1433,8 +1433,8 @@ VOID_SPELL(RangerStaff)::run( Character *ch, char *, int sn, int level )
   Affect todam;
 
   staff = create_object( get_obj_index(OBJ_VNUM_RANGER_STAFF),level);
-  ch->send_to("Ты создаешь посох рейнджера!\n\r");
-  act_p("$c1 создает посох рейнджера!",ch,0,0,TO_ROOM,POS_RESTING);
+  ch->send_to("п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ п©п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟!\n\r");
+  act_p("$c1 я│п╬п╥п╢п╟п╣я┌ п©п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟!",ch,0,0,TO_ROOM,POS_RESTING);
 
   staff->value[1] = 4 + level / 15;
   staff->value[2] = 4 + level / 15;
@@ -1476,16 +1476,16 @@ void RangerStaff::fight( Character *ch )
     if (chance( 90 ))
 	return;
 
-    act_p( "{BТвой посох рейнджера вспыхивает голубым светом!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "{BПосох рейнджера $c2 вспыхивает голубым светом!{x", ch, 0, 0, TO_ROOM );
+    act_p( "{Bп╒п╡п╬п╧ п©п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ пЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪!{x", ch, 0, 0, TO_CHAR, POS_DEAD );
+    act( "{Bп÷п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟ $c2 п╡я│п©я▀я┘п╦п╡п╟п╣я┌ пЁп╬п╩я┐п╠я▀п╪ я│п╡п╣я┌п╬п╪!{x", ch, 0, 0, TO_ROOM );
 
     spell( gsn_cure_critical, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
 }
 
 bool RangerStaff::death( Character *ch )
 {
-    act_p( "Твой посох рейнджера исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "Посох рейнджера $c2 исчезает.", ch, 0, 0, TO_ROOM );
+    act_p( "п╒п╡п╬п╧ п©п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟ п╦я│я┤п╣п╥п╟п╣я┌.", ch, 0, 0, TO_CHAR, POS_DEAD );
+    act( "п÷п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟ $c2 п╦я│я┤п╣п╥п╟п╣я┌.", ch, 0, 0, TO_ROOM );
     extract_obj( obj );
     return false;
 }
@@ -1493,9 +1493,9 @@ bool RangerStaff::death( Character *ch )
 bool RangerStaff::canEquip( Character *ch )
 {
   if (ch->getTrueProfession( ) != prof_ranger) {
-	ch->println("Ты не знаешь как использовать эту вещь.");
-	act( "Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
-	act( "Посох рейнджера выскальзывает из рук $c2.", ch, 0, 0, TO_ROOM );
+	ch->println("п╒я▀ п╫п╣ п╥п╫п╟п╣я┬я▄ п╨п╟п╨ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я█я┌я┐ п╡п╣я┴я▄.");
+	act( "п÷п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟ п╡я▀я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ п╦п╥ я┌п╡п╬п╦я┘ я─я┐п╨.", ch, 0, 0, TO_CHAR );
+	act( "п÷п╬я│п╬я┘ я─п╣п╧п╫п╢п╤п╣я─п╟ п╡я▀я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ п╦п╥ я─я┐п╨ $c2.", ch, 0, 0, TO_ROOM );
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
 	return false;

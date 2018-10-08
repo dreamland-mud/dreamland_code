@@ -87,7 +87,7 @@ bool GangMember::spec( )
 	state = STAT_SLEEP;
 
     if (hasLastFought( )) {
-	/* range-атака */
+	/* range-п╟я┌п╟п╨п╟ */
 	if (state == STAT_NORMAL) {
 	    if (ch->hit < ch->max_hit / 4) {
 		state = STAT_FLEE;
@@ -151,19 +151,19 @@ void GangMember::bribe( Character *briber, int gold, int silver )
     if (confessed || amount / 100 < number_range( b, b + 50 ) || number_percent( ) < 50) {
 	switch (number_range( 1, 3 )) {
 	case 1: 
-	    act_p("$c1 громко вопит '{gПытаешься подкупить меня, щенок?!{x'", ch, 0, briber, TO_ROOM, POS_RESTING);
+	    act_p("$c1 пЁя─п╬п╪п╨п╬ п╡п╬п©п╦я┌ '{gп÷я▀я┌п╟п╣я┬я▄я│я▐ п©п╬п╢п╨я┐п©п╦я┌я▄ п╪п╣п╫я▐, я┴п╣п╫п╬п╨?!{x'", ch, 0, briber, TO_ROOM, POS_RESTING);
 	    interpret_raw(ch, "murder", briber->getNameP( ));
 	    break;
 	case 2:
-	    act_p("$c1 произносит '{gПлакали твои денежки, $C1!{x'", ch, 0, briber, TO_ROOM, POS_RESTING);
-	    act_p("$c1 мерзко ухмыляется.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	    act_p("$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп÷п╩п╟п╨п╟п╩п╦ я┌п╡п╬п╦ п╢п╣п╫п╣п╤п╨п╦, $C1!{x'", ch, 0, briber, TO_ROOM, POS_RESTING);
+	    act_p("$c1 п╪п╣я─п╥п╨п╬ я┐я┘п╪я▀п╩я▐п╣я┌я│я▐.", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    break;
 	case 3:
 	    for (int j = 0; j < 2; j++)
 		for (int i = 0; i < DIR_SOMEWHERE; i++)
 		    if (ch->in_room->exit[i]) {
 			if (!j)
-			    act_p("$c1 потирает руки и удаляется в сторону ближайшей таверны.", ch, 0, 0, TO_ROOM, POS_RESTING);
+			    act_p("$c1 п©п╬я┌п╦я─п╟п╣я┌ я─я┐п╨п╦ п╦ я┐п╢п╟п╩я▐п╣я┌я│я▐ п╡ я│я┌п╬я─п╬п╫я┐ п╠п╩п╦п╤п╟п╧я┬п╣п╧ я┌п╟п╡п╣я─п╫я▀.", ch, 0, 0, TO_ROOM, POS_RESTING);
 			move_char(ch, i, "slink");
 			break;
 		    }
@@ -172,10 +172,10 @@ void GangMember::bribe( Character *briber, int gold, int silver )
 	}
     }
     else {
-	act_p("$c1 тяжко вздыхает.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	act_p("$c1 произносит '{gУговорил, красноречивый.. Я открою тебе тайну!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
-        act_p("$c1 что-то говорит на ухо $C3.", ch, 0, briber, TO_NOTVICT, POS_RESTING);	
-	act_p("$c1 говорит тебе '{GВход в логово я видел около $t. Но больше мне ничего не известно.{x'",
+	act_p("$c1 я┌я▐п╤п╨п╬ п╡п╥п╢я▀я┘п╟п╣я┌.", ch, 0, 0, TO_ROOM, POS_RESTING);
+	act_p("$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gпёпЁп╬п╡п╬я─п╦п╩, п╨я─п╟я│п╫п╬я─п╣я┤п╦п╡я▀п╧.. п╞ п╬я┌п╨я─п╬я▌ я┌п╣п╠п╣ я┌п╟п╧п╫я┐!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
+        act_p("$c1 я┤я┌п╬-я┌п╬ пЁп╬п╡п╬я─п╦я┌ п╫п╟ я┐я┘п╬ $C3.", ch, 0, briber, TO_NOTVICT, POS_RESTING);	
+	act_p("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп▓я┘п╬п╢ п╡ п╩п╬пЁп╬п╡п╬ я▐ п╡п╦п╢п╣п╩ п╬п╨п╬п╩п╬ $t. п²п╬ п╠п╬п╩я▄я┬п╣ п╪п╫п╣ п╫п╦я┤п╣пЁп╬ п╫п╣ п╦п╥п╡п╣я│я┌п╫п╬.{x'",
 	       ch, gquest->lairHint( ).c_str( ), briber, TO_VICT, POS_RESTING);
 	
 	confessed = true;
@@ -195,13 +195,13 @@ void GangMember::greet( Character *mob )
 	meetCnt = number_range( meetCnt, meetCnt + 1 );
 	switch(number_range( 1, 3 )) {
 	case 1:
-	    act_p("$c1 произносит '{g$C1, ну че ты за мной ходишь, влюбил$Gось|ся|ась?{x'", ch, 0, mob, TO_ROOM, POS_RESTING);
+	    act_p("$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g$C1, п╫я┐ я┤п╣ я┌я▀ п╥п╟ п╪п╫п╬п╧ я┘п╬п╢п╦я┬я▄, п╡п╩я▌п╠п╦п╩$Gп╬я│я▄|я│я▐|п╟я│я▄?{x'", ch, 0, mob, TO_ROOM, POS_RESTING);
 	    break;
 	case 2:
-	    act_p("$c1 произносит '{gО господи, это опять ты?{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
+	    act_p("$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп· пЁп╬я│п©п╬п╢п╦, я█я┌п╬ п╬п©я▐я┌я▄ я┌я▀?{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    break;
 	case 3:
-	    act_p("$c1 рычит '{g$C1, как же ты меня доста$Gло|л|ла!{x'", ch, 0, mob, TO_ROOM, POS_RESTING);
+	    act_p("$c1 я─я▀я┤п╦я┌ '{g$C1, п╨п╟п╨ п╤п╣ я┌я▀ п╪п╣п╫я▐ п╢п╬я│я┌п╟$Gп╩п╬|п╩|п╩п╟!{x'", ch, 0, mob, TO_ROOM, POS_RESTING);
 	    interpret_raw(ch, "murder", mob->getNameP( ) );
 	    break;
 	}
@@ -215,10 +215,10 @@ void GangMember::greet( Character *mob )
 	if (ch->getRealLevel( ) > mob->getRealLevel( ) && ch->can_see( mob )) {
 	    switch (number_range(1, 2)) {
 	    case 1:
-		act_p("$c1 произносит '{gЧертов фараон! Сейчас я тебе покажу!{x'", ch, 0, 0, TO_ROOM, POS_RESTING );
+		act_p("$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп╖п╣я─я┌п╬п╡ я└п╟я─п╟п╬п╫! п║п╣п╧я┤п╟я│ я▐ я┌п╣п╠п╣ п©п╬п╨п╟п╤я┐!{x'", ch, 0, 0, TO_ROOM, POS_RESTING );
 		break;
 	    case 2:
-		act_p("$c1 произносит '{gМент поганый! Получай!{x'", ch, 0, 0, TO_ROOM, POS_RESTING );
+		act_p("$c1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп°п╣п╫я┌ п©п╬пЁп╟п╫я▀п╧! п÷п╬п╩я┐я┤п╟п╧!{x'", ch, 0, 0, TO_ROOM, POS_RESTING );
 		break;
 	    }
 	    multi_hit( ch, mob );
@@ -226,15 +226,15 @@ void GangMember::greet( Character *mob )
 	    if (ch->can_see( mob )) {
 		switch (number_range(1, 2)) {
 		case 1:
-		    act_p("$c1 бормочет '{gОппа.. менты.. менты{x'", ch, 0, 0, TO_ROOM, POS_RESTING );
+		    act_p("$c1 п╠п╬я─п╪п╬я┤п╣я┌ '{gп·п©п©п╟.. п╪п╣п╫я┌я▀.. п╪п╣п╫я┌я▀{x'", ch, 0, 0, TO_ROOM, POS_RESTING );
 		    break;
 		case 2:
-		    act_p("$c1 дрожит от страха перед $C5", ch, 0, mob, TO_ROOM, POS_RESTING );
+		    act_p("$c1 п╢я─п╬п╤п╦я┌ п╬я┌ я│я┌я─п╟я┘п╟ п©п╣я─п╣п╢ $C5", ch, 0, mob, TO_ROOM, POS_RESTING );
 		    break;
 		}
 	    }
 	    if (mob->can_see(ch)) {
-		yell( mob, "Смерть преступникам!");
+		yell( mob, "п║п╪п╣я─я┌я▄ п©я─п╣я│я┌я┐п©п╫п╦п╨п╟п╪!");
 		multi_hit( mob, ch );
 	    }
 	}
@@ -259,10 +259,10 @@ void GangMember::greet( Character *mob )
 	    }
 	    
 	    if (mob->can_see( ch )) {
-		yell( mob, "Это преступник! Хватайте его!" );
+		yell( mob, "п╜я┌п╬ п©я─п╣я│я┌я┐п©п╫п╦п╨! п╔п╡п╟я┌п╟п╧я┌п╣ п╣пЁп╬!" );
 
 		if (number_percent( ) < 50 && canAttack( mob ) && ch->can_see( mob )) {
-		    do_say( ch, "Да заткнись ты, зараза!" );
+		    do_say( ch, "п■п╟ п╥п╟я┌п╨п╫п╦я│я▄ я┌я▀, п╥п╟я─п╟п╥п╟!" );
 		    multi_hit( ch, mob );
 		}
 	    }
@@ -316,7 +316,7 @@ void GangMember::fight( Character *victim )
     if (ch->hit < ch->max_hit / 4) {
 	switch (number_range(1, 7)) {
 	case 1: 
-	    act_p("$c1 вопит '{gMamma mia!{x'", ch, 0, 0, TO_ROOM, POS_RESTING); 
+	    act_p("$c1 п╡п╬п©п╦я┌ '{gMamma mia!{x'", ch, 0, 0, TO_ROOM, POS_RESTING); 
 	    break;
 	case 2:
 	    interpret(ch, "curse"); 
@@ -328,7 +328,7 @@ void GangMember::fight( Character *victim )
 	    interpret_fmt(ch, "cramp %s", victim->getNameP( ));
 	    break;
 	case 5:
-	    act_p("$c1 вопит '{gПомогите! Хулиганы зрения лишают!{x'", ch, 0, 0, TO_ROOM, POS_RESTING); 
+	    act_p("$c1 п╡п╬п©п╦я┌ '{gп÷п╬п╪п╬пЁп╦я┌п╣! п╔я┐п╩п╦пЁп╟п╫я▀ п╥я─п╣п╫п╦я▐ п╩п╦я┬п╟я▌я┌!{x'", ch, 0, 0, TO_ROOM, POS_RESTING); 
 	    break;
 	}
 
@@ -355,17 +355,17 @@ bool GangMember::death( Character *killer )
     
     if (gquest->isLevelOK( killer )) {
 	if (killer->in_room == ch->in_room && number_percent( ) < 10) {
-	    act_p( "$c1 предсмертной хваткой цепляется за твою одежду.", 
+	    act_p( "$c1 п©я─п╣п╢я│п╪п╣я─я┌п╫п╬п╧ я┘п╡п╟я┌п╨п╬п╧ я├п╣п©п╩я▐п╣я┌я│я▐ п╥п╟ я┌п╡п╬я▌ п╬п╢п╣п╤п╢я┐.", 
 		    ch, 0, killer, TO_VICT, POS_RESTING );
 
 	    if (IS_GOOD( killer ))
-		act_p("$c1 хрипит '{gТолько сейчас я понял, как неправильно жил.. Я раскаиваюсь и перед смертью открою тебе тайну.{x'", ch, 0, killer, TO_VICT, POS_RESTING );
+		act_p("$c1 я┘я─п╦п©п╦я┌ '{gп╒п╬п╩я▄п╨п╬ я│п╣п╧я┤п╟я│ я▐ п©п╬п╫я▐п╩, п╨п╟п╨ п╫п╣п©я─п╟п╡п╦п╩я▄п╫п╬ п╤п╦п╩.. п╞ я─п╟я│п╨п╟п╦п╡п╟я▌я│я▄ п╦ п©п╣я─п╣п╢ я│п╪п╣я─я┌я▄я▌ п╬я┌п╨я─п╬я▌ я┌п╣п╠п╣ я┌п╟п╧п╫я┐.{x'", ch, 0, killer, TO_VICT, POS_RESTING );
 	    else if (IS_EVIL( killer ))
-		act_p("$c1 хрипит '{gБратан, передай от меня привет шефу!{x'", ch, 0, killer, TO_VICT, POS_RESTING );
+		act_p("$c1 я┘я─п╦п©п╦я┌ '{gп▒я─п╟я┌п╟п╫, п©п╣я─п╣п╢п╟п╧ п╬я┌ п╪п╣п╫я▐ п©я─п╦п╡п╣я┌ я┬п╣я└я┐!{x'", ch, 0, killer, TO_VICT, POS_RESTING );
 	    else 
-		act_p("$c1 хрипит '{gЭх, все равно помирать.. Так слушай же..{x'", ch, 0, killer, TO_VICT, POS_RESTING );
+		act_p("$c1 я┘я─п╦п©п╦я┌ '{gп╜я┘, п╡я│п╣ я─п╟п╡п╫п╬ п©п╬п╪п╦я─п╟я┌я▄.. п╒п╟п╨ я│п╩я┐я┬п╟п╧ п╤п╣..{x'", ch, 0, killer, TO_VICT, POS_RESTING );
 
-	    act_p("$c1 хрипит '{gВход в логово найдешь неподалеку от $t..{x'",
+	    act_p("$c1 я┘я─п╦п©п╦я┌ '{gп▓я┘п╬п╢ п╡ п╩п╬пЁп╬п╡п╬ п╫п╟п╧п╢п╣я┬я▄ п╫п╣п©п╬п╢п╟п╩п╣п╨я┐ п╬я┌ $t..{x'",
 	           ch, gquest->lairHint( ).c_str( ), killer, TO_VICT, POS_RESTING );
 	}
 	
@@ -376,20 +376,20 @@ bool GangMember::death( Character *killer )
 	    
     if (killer == ch) {
 	if (ch->fighting) {
-	    act_p("$c1 хрипит '{gЛучше сдохнуть своей смертью, чем от руки такой собаки, как ты, $C2.{x'",
+	    act_p("$c1 я┘я─п╦п©п╦я┌ '{gп⌡я┐я┤я┬п╣ я│п╢п╬я┘п╫я┐я┌я▄ я│п╡п╬п╣п╧ я│п╪п╣я─я┌я▄я▌, я┤п╣п╪ п╬я┌ я─я┐п╨п╦ я┌п╟п╨п╬п╧ я│п╬п╠п╟п╨п╦, п╨п╟п╨ я┌я▀, $C2.{x'",
 		  ch, 0, ch->fighting, TO_ROOM, POS_RESTING );
 	}
 	else {
 	    switch (number_range( 1, 3 )) {
-	    case 1: act_p("$c1 хрипит '{gМне крышка...{x'", ch, 0, 0, TO_ROOM, POS_RESTING); break;
-	    case 2: act_p("$c1 хрипит '{gКонец моим мучениям...{x'", ch, 0, 0, TO_ROOM, POS_RESTING); break;
-	    case 3: act_p("$c1 хрипит '{gЭта напасть доконала меня..{x'", ch, 0, 0, TO_ROOM, POS_RESTING); break;
+	    case 1: act_p("$c1 я┘я─п╦п©п╦я┌ '{gп°п╫п╣ п╨я─я▀я┬п╨п╟...{x'", ch, 0, 0, TO_ROOM, POS_RESTING); break;
+	    case 2: act_p("$c1 я┘я─п╦п©п╦я┌ '{gп п╬п╫п╣я├ п╪п╬п╦п╪ п╪я┐я┤п╣п╫п╦я▐п╪...{x'", ch, 0, 0, TO_ROOM, POS_RESTING); break;
+	    case 3: act_p("$c1 я┘я─п╦п©п╦я┌ '{gп╜я┌п╟ п╫п╟п©п╟я│я┌я▄ п╢п╬п╨п╬п╫п╟п╩п╟ п╪п╣п╫я▐..{x'", ch, 0, 0, TO_ROOM, POS_RESTING); break;
 	    }
 	}		
     } else {
 	switch(number_range(1, 2)) {
-	case 1: act_p("$c1 хрипит '{g$C1, тебе незнакомо понятие чести...{x'", ch, 0, killer, TO_ROOM, POS_RESTING); break;
-	case 2: act_p("$c1 хрипит '{gЯ не должен был умереть от твоей руки, $C1..{x'", ch, 0, killer, TO_ROOM, POS_RESTING); break;    
+	case 1: act_p("$c1 я┘я─п╦п©п╦я┌ '{g$C1, я┌п╣п╠п╣ п╫п╣п╥п╫п╟п╨п╬п╪п╬ п©п╬п╫я▐я┌п╦п╣ я┤п╣я│я┌п╦...{x'", ch, 0, killer, TO_ROOM, POS_RESTING); break;
+	case 2: act_p("$c1 я┘я─п╦п©п╦я┌ '{gп╞ п╫п╣ п╢п╬п╩п╤п╣п╫ п╠я▀п╩ я┐п╪п╣я─п╣я┌я▄ п╬я┌ я┌п╡п╬п╣п╧ я─я┐п╨п╦, $C1..{x'", ch, 0, killer, TO_ROOM, POS_RESTING); break;    
 	}
     }
     
@@ -408,7 +408,7 @@ void GangMember::yell( Character *mob, const DLString &msg )
     DLString name = mob->getNameP( '1' );
     name.upperFirstCharacter( );
 	
-    buf << name << " пронзительно кричит '{Y" << msg << "{x'" << endl;
+    buf << name << " п©я─п╬п╫п╥п╦я┌п╣п╩я▄п╫п╬ п╨я─п╦я┤п╦я┌ '{Y" << msg << "{x'" << endl;
     GQChannel::zecho( Gangsters::getThis( ), mob->in_room->area, buf.str( ) );
 }
 
@@ -419,7 +419,7 @@ bool GangMember::eatKey( )
     for (obj = ch->carrying; obj; obj = obj->next_content)
 	if (obj->pIndexData->vnum == GangstersInfo::getThis( )->vnumKey) {
 	    extract_obj( obj );
-	    act_p("$c1 выхватывает из кармана ключ и съедает его!", ch, 0, 0, TO_ROOM, POS_RESTING);
+	    act_p("$c1 п╡я▀я┘п╡п╟я┌я▀п╡п╟п╣я┌ п╦п╥ п╨п╟я─п╪п╟п╫п╟ п╨п╩я▌я┤ п╦ я│я┼п╣п╢п╟п╣я┌ п╣пЁп╬!", ch, 0, 0, TO_ROOM, POS_RESTING);
 	    return true;
 	}
     
@@ -502,7 +502,7 @@ bool GangMember::runaway( )
 	return true;
     }
 
-    /* добегался */
+    /* п╢п╬п╠п╣пЁп╟п╩я│я▐ */
     state = STAT_NORMAL;
     return false;
 }

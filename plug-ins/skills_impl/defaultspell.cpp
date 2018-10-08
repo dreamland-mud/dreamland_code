@@ -215,7 +215,7 @@ void DefaultSpell::utter( Character *ch )
 	    length = 1;
     }
 
-    const char *pat = "$c1 бормочет '$t'.";
+    const char *pat = "$c1 п╠п╬я─п╪п╬я┤п╣я┌ '$t'.";
 
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
 	if (rch != ch) {
@@ -288,8 +288,8 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 	if (number_percent( ) < chance) {
 	    slevel = mlevel;
 	    slevel += chance / 20;
-	    act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
-	    act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
+	    act( "п║п╡п╣я┌ п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ я┌п╡п╬п╦ п╩п╟п╢п╬п╫п╦.", ch, 0, 0, TO_CHAR );
+	    act( "п║п╡п╣я┌ п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣ п©я─п╬п╫п╦п╥я▀п╡п╟п╣я┌ п╩п╟п╢п╬п╫п╦ $c2.", ch, 0, 0, TO_ROOM );
 	    gsn_holy_remedy->improve( ch, true );
 	}
     }
@@ -298,10 +298,10 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
      * Magic Concentrate, by Kind
      *   f(x) = A0 / (1 + x / B0)
      *     A0 = a / (B0 * Ln(1 + a / B0))
-     *      A0 - усиление на нулевом расстоянии - в стее
-     *      x  - расстояние до цели
-     *      B0 - свободный параметр
-     *      a  - дальность действия спелла
+     *      A0 - я┐я│п╦п╩п╣п╫п╦п╣ п╫п╟ п╫я┐п╩п╣п╡п╬п╪ я─п╟я│я│я┌п╬я▐п╫п╦п╦ - п╡ я│я┌п╣п╣
+     *      x  - я─п╟я│я│я┌п╬я▐п╫п╦п╣ п╢п╬ я├п╣п╩п╦
+     *      B0 - я│п╡п╬п╠п╬п╢п╫я▀п╧ п©п╟я─п╟п╪п╣я┌я─
+     *      a  - п╢п╟п╩я▄п╫п╬я│я┌я▄ п╢п╣п╧я│я┌п╡п╦я▐ я│п©п╣п╩п╩п╟
      */
     if (skill->getGroup( ) == group_combat
 	&& range >= 0
@@ -357,7 +357,7 @@ static bool is_self_name( const DLString &arg, Character *ch )
     if (arg.empty( ))
 	return false;
     
-    if (arg == "self" || arg == "я")
+    if (arg == "self" || arg == "я▐")
 	return true;
 
     if (is_name( arg.c_str( ), ch->getNameP( '7' ).c_str( ) ))
@@ -388,7 +388,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     if (target.isSet( TAR_CREATE_MOB )) {
 	if (!arg.empty( )) {
 	    if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
-		buf << "Кого именно ты хочешь позвать?" << endl;
+		buf << "п п╬пЁп╬ п╦п╪п╣п╫п╫п╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п©п╬п╥п╡п╟я┌я▄?" << endl;
 		return null;
 	    }
 
@@ -412,7 +412,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 	
 	if (target.isSet( TAR_CHAR_SELF )) {
 	    if (!is_self_name( arg, ch )) {
-		buf << "Ты не можешь использовать это заклинание на других." << endl;
+		buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я█я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╫п╟ п╢я─я┐пЁп╦я┘." << endl;
 		return null;
 	    }
 
@@ -421,13 +421,13 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 	    return result;
 	}
 
-	buf << "Этому заклинанию не нужно указывать цель." << endl;
+	buf << "п╜я┌п╬п╪я┐ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▌ п╫п╣ п╫я┐п╤п╫п╬ я┐п╨п╟п╥я▀п╡п╟я┌я▄ я├п╣п╩я▄." << endl;
 	return null;
     }
 
     if (target.isSet( TAR_CHAR_WORLD )) {
 	if (arg.empty( )) {
-	    buf << "Колдовать на кого?" << endl;
+	    buf << "п п╬п╩п╢п╬п╡п╟я┌я▄ п╫п╟ п╨п╬пЁп╬?" << endl;
 	    return null;
 	}
 
@@ -443,7 +443,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 	    return result;
 	
 	buf.str( "" );
-	buf << "Твоя попытка закончилась неудачей." << endl;
+	buf << "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧." << endl;
 	return null;
     }
     
@@ -453,7 +453,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 		return result;
 
 	    buf.str( "" );
-	    buf << "Ты не можешь использовать это заклинание на других." << endl;
+	    buf << "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я█я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╫п╟ п╢я─я┐пЁп╦я┘." << endl;
 	    return null;
 	}
 
@@ -487,8 +487,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 		    if (victim->is_npc() && IS_SET(victim->act,ACT_NOTRACK )
                         && victim->in_room != ch->in_room )
 		    {
-			buf << "Твое заклинание не действует на "
-			    << victim->getNameP( '4' ) << " на таком расстоянии." << endl;
+			buf << "п╒п╡п╬п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╫п╣ п╢п╣п╧я│я┌п╡я┐п╣я┌ п╫п╟ "
+			    << victim->getNameP( '4' ) << " п╫п╟ я┌п╟п╨п╬п╪ я─п╟я│я│я┌п╬я▐п╫п╦п╦." << endl;
 			return null;
 		    }
 		    
@@ -512,7 +512,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 	    return result;
 	    
 	buf.str( "" );
-	buf << "Произнести заклинание.. на кого?" << endl;
+	buf << "п÷я─п╬п╦п╥п╫п╣я│я┌п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣.. п╫п╟ п╨п╬пЁп╬?" << endl;
 	return null;
     }
 
@@ -520,7 +520,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
 	return result;
     
     if (buf.str( ).empty( ))
-	buf << "Произнести заклинание... на кого?" << endl;
+	buf << "п÷я─п╬п╦п╥п╫п╣я│я┌п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣... п╫п╟ п╨п╬пЁп╬?" << endl;
 
     return null;
 }
@@ -541,7 +541,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 	obj = NULL;
 
 	if (arg.empty( )) {
-	    buf << "Произнести заклинание на что?" << endl;
+	    buf << "п÷я─п╬п╦п╥п╫п╣я│я┌п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╫п╟ я┤я┌п╬?" << endl;
 	    return null;
 	}
 	
@@ -565,11 +565,11 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 	}
 
 	if (target.isSet( TAR_OBJ_INV|TAR_OBJ_EQUIP ))
-	    buf << "У тебя нет этого." << endl;
+	    buf << "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬." << endl;
 	else if (target.isSet( TAR_OBJ_ROOM ))
-	    buf << "Ты не видишь здесь такого предмета." << endl;
+	    buf << "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я┌п╟п╨п╬пЁп╬ п©я─п╣п╢п╪п╣я┌п╟." << endl;
 	else if (target.isSet( TAR_OBJ_WORLD ))
-	    buf << "В Dream Land нет ничего похожего на это." << endl;
+	    buf << "п▓ Dream Land п╫п╣я┌ п╫п╦я┤п╣пЁп╬ п©п╬я┘п╬п╤п╣пЁп╬ п╫п╟ я█я┌п╬." << endl;
     }
 
     return null;
@@ -578,7 +578,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
-	ch->println("Ты не можешь сконцентрироваться.");
+	ch->println("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐.");
 	return false;
     }
     
@@ -620,18 +620,18 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-	act("Твои боги неблагосклонны к $C3.", ch, 0, vch, TO_CHAR);
-	act("Боги $c2 неблагосклонны к тебе.", ch, 0, vch, TO_VICT);
-	act("Боги $c2 неблагосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
+	act("п╒п╡п╬п╦ п╠п╬пЁп╦ п╫п╣п╠п╩п╟пЁп╬я│п╨п╩п╬п╫п╫я▀ п╨ $C3.", ch, 0, vch, TO_CHAR);
+	act("п▒п╬пЁп╦ $c2 п╫п╣п╠п╩п╟пЁп╬я│п╨п╩п╬п╫п╫я▀ п╨ я┌п╣п╠п╣.", ch, 0, vch, TO_VICT);
+	act("п▒п╬пЁп╦ $c2 п╫п╣п╠п╩п╟пЁп╬я│п╨п╩п╬п╫п╫я▀ п╨ $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
-	act("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
-	act("Ты отклоняешь заклинание $c2!", ch, 0, vch, TO_VICT);
-	act("$C1 отклоняет заклинание $c2!", ch, 0, vch, TO_NOTVICT);
+	act("$C1 п╬я┌п╨п╩п╬п╫я▐п╣я┌ я┌п╡п╬п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣!", ch, 0, vch, TO_CHAR);
+	act("п╒я▀ п╬я┌п╨п╩п╬п╫я▐п╣я┬я▄ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ $c2!", ch, 0, vch, TO_VICT);
+	act("$C1 п╬я┌п╨п╩п╬п╫я▐п╣я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ $c2!", ch, 0, vch, TO_NOTVICT);
     }
     else {
-	act("Ты отклоняешь заклинание!", ch, 0, vch, TO_VICT);
-	act("$C1 отклоняет заклинание!", ch, 0, vch, TO_NOTVICT);
+	act("п╒я▀ п╬я┌п╨п╩п╬п╫я▐п╣я┬я▄ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣!", ch, 0, vch, TO_VICT);
+	act("$C1 п╬я┌п╨п╩п╬п╫я▐п╣я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣!", ch, 0, vch, TO_NOTVICT);
     }
 }
 
@@ -808,20 +808,20 @@ DefaultSpell::spellbane( Character *ch, Character *victim ) const
     }
 
     if (ch == victim) {
-	act("Твоя магическая защита (spellbane) отклоняет заклинание!", ch,0,0,TO_CHAR);
-	act("Магическая защита (spellbane) $c2 отклоняет заклинание!", ch,0,0,TO_ROOM);
+	act("п╒п╡п╬я▐ п╪п╟пЁп╦я┤п╣я│п╨п╟я▐ п╥п╟я┴п╦я┌п╟ (spellbane) п╬я┌п╨п╩п╬п╫я▐п╣я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣!", ch,0,0,TO_CHAR);
+	act("п°п╟пЁп╦я┤п╣я│п╨п╟я▐ п╥п╟я┴п╦я┌п╟ (spellbane) $c2 п╬я┌п╨п╩п╬п╫я▐п╣я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣!", ch,0,0,TO_ROOM);
 	damage( victim, ch, 3 * victim->getModifyLevel(), gsn_spellbane,DAM_NEGATIVE, true, DAMF_SPELL);
     }
     else {
 	if (fPrayer) {
-	    act("Твои боги неблагосклонны к $C3.", ch, 0, victim, TO_CHAR);
-	    act("Боги $c2 неблагосклонны к тебе.", ch, 0, victim, TO_VICT);
-	    act("Боги $c2 неблагосклонны к $C3.", ch, 0, victim, TO_NOTVICT);
+	    act("п╒п╡п╬п╦ п╠п╬пЁп╦ п╫п╣п╠п╩п╟пЁп╬я│п╨п╩п╬п╫п╫я▀ п╨ $C3.", ch, 0, victim, TO_CHAR);
+	    act("п▒п╬пЁп╦ $c2 п╫п╣п╠п╩п╟пЁп╬я│п╨п╩п╬п╫п╫я▀ п╨ я┌п╣п╠п╣.", ch, 0, victim, TO_VICT);
+	    act("п▒п╬пЁп╦ $c2 п╫п╣п╠п╩п╟пЁп╬я│п╨п╩п╬п╫п╫я▀ п╨ $C3.", ch, 0, victim, TO_NOTVICT);
 	}
 	else {
-	    act("$C1 отклоняет твое заклинание!",ch,0,victim,TO_CHAR);
-	    act("Ты отклоняешь заклинание $c2!",ch,0,victim,TO_VICT);
-	    act("$C1 отклоняет заклинание $c2!",ch,0,victim,TO_NOTVICT);
+	    act("$C1 п╬я┌п╨п╩п╬п╫я▐п╣я┌ я┌п╡п╬п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣!",ch,0,victim,TO_CHAR);
+	    act("п╒я▀ п╬я┌п╨п╩п╬п╫я▐п╣я┬я▄ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ $c2!",ch,0,victim,TO_VICT);
+	    act("$C1 п╬я┌п╨п╩п╬п╫я▐п╣я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ $c2!",ch,0,victim,TO_NOTVICT);
 	}
 	
 	if (fAttack) {

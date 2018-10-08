@@ -20,7 +20,7 @@ CMDRUN( showskill )
 	return;
     
     if (argument.empty( )) {
-	ch->send_to( "Использование: showskill|slook <умение или заклинание>\r\n" );
+	ch->send_to( "п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: showskill|slook <я┐п╪п╣п╫п╦п╣ п╦п╩п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣>\r\n" );
 	return;
     }
 
@@ -28,7 +28,7 @@ CMDRUN( showskill )
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill) {
-	ch->send_to( "Такого умения нет.\r\n" );
+	ch->send_to( "п╒п╟п╨п╬пЁп╬ я┐п╪п╣п╫п╦я▐ п╫п╣я┌.\r\n" );
 	return;
     }
     

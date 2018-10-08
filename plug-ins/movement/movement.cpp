@@ -98,7 +98,7 @@ void Movement::place( Character *wch )
             && !eyes_blinded( wch )
             && !eyes_darkened( wch ))
     {
-        wch->printf("Ты попадаешь в местность '{c%s{x'.\r\n\r\n", to_room->area->name);
+        wch->printf("п╒я▀ п©п╬п©п╟п╢п╟п╣я┬я▄ п╡ п╪п╣я│я┌п╫п╬я│я┌я▄ '{c%s{x'.\r\n\r\n", to_room->area->name);
     }
  
     interpret_raw( wch, "look", "move" );

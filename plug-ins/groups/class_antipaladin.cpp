@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "class_antipaladin.h"
 
@@ -81,9 +81,9 @@ void CleaveOneHit::calcDamage( )
     }
 
     if (number_percent( ) < chance) {
-	act_p("Ты рассекаешь $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 рассекает тебя {RПОПОЛАМ{x!",ch,0,victim,TO_VICT,POS_RESTING);
-	act_p("$c1 рассекает $C4 {RПОПОЛАМ{x!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+	act_p("п╒я▀ я─п╟я│я│п╣п╨п╟п╣я┬я▄ $C4 {Rп÷п·п÷п·п⌡п░п°{x!",ch,0,victim,TO_CHAR,POS_RESTING);
+	act_p("$c1 я─п╟я│я│п╣п╨п╟п╣я┌ я┌п╣п╠я▐ {Rп÷п·п÷п·п⌡п░п°{x!",ch,0,victim,TO_VICT,POS_RESTING);
+	act_p("$c1 я─п╟я│я│п╣п╨п╟п╣я┌ $C4 {Rп÷п·п÷п·п⌡п░п°{x!",ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 	ch->setWait( 2 );
 
@@ -122,17 +122,17 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   Affect af;
 
   if (ch == victim) {
-    ch->send_to("Оглушить кого?\n\r");
+    ch->send_to("п·пЁп╩я┐я┬п╦я┌я▄ п╨п╬пЁп╬?\n\r");
     return;
   }
 
   if (victim->isAffected(sn)) {
-    act_p("$C1 уже ничего не слышит.",ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("$C1 я┐п╤п╣ п╫п╦я┤п╣пЁп╬ п╫п╣ я│п╩я▀я┬п╦я┌.",ch,0,victim,TO_CHAR,POS_RESTING);
     return;
   }
 
   if (saves_spell(level,victim, DAM_SOUND,ch, DAMF_SPELL)) {
-	act("Тебе не удалось оглушить $C4.", ch, 0, victim, TO_CHAR);
+	act("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╬пЁп╩я┐я┬п╦я┌я▄ $C4.", ch, 0, victim, TO_CHAR);
 	return;
   }
 
@@ -145,8 +145,8 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   af.bitvector = 0;
   affect_to_char(victim,&af);
 
-  act_p("$C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR,POS_RESTING);
-  victim->send_to("Пронзительный звон оглушает тебя...ты ничего не слышишь!\n\r");
+  act_p("$C1 я┌п╣п©п╣я─я▄ п╫п╦я┤п╣пЁп╬ п╫п╣ я│п╩я▀я┬п╦я┌!",ch,0,victim,TO_CHAR,POS_RESTING);
+  victim->send_to("п÷я─п╬п╫п╥п╦я┌п╣п╩я▄п╫я▀п╧ п╥п╡п╬п╫ п╬пЁп╩я┐я┬п╟п╣я┌ я┌п╣п╠я▐...я┌я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ я│п╩я▀я┬п╦я┬я▄!\n\r");
 
 }
 
@@ -161,7 +161,7 @@ SKILL_RUNP( cleave )
     Object *obj;
 
     if ( MOUNTED(ch) ) {
-	ch->send_to("Находясь в седле, трудно это сделать!\n\r");
+	ch->send_to("п²п╟я┘п╬п╢я▐я│я▄ п╡ я│п╣п╢п╩п╣, я┌я─я┐п╢п╫п╬ я█я┌п╬ я│п╢п╣п╩п╟я┌я▄!\n\r");
 	return;
     }
 
@@ -171,22 +171,22 @@ SKILL_RUNP( cleave )
 	return;
 
     if (!ch->is_npc() && !gsn_cleave->usable( ch )) {
-	ch->send_to("Ты не умеешь рассекать пополам.\n\r");
+	ch->send_to("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ я─п╟я│я│п╣п╨п╟я┌я▄ п©п╬п©п╬п╩п╟п╪.\n\r");
 	return;
     }
 
     if (arg[0] == '\0') {
-	ch->send_to("Расколоть что?\n\r");
+	ch->send_to("п═п╟я│п╨п╬п╩п╬я┌я▄ я┤я┌п╬?\n\r");
 	return;
     }
 
     if (( victim = get_char_room( ch, arg ) ) == 0) {
-	ch->send_to("Этого нет здесь.\n\r");
+	ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	return;
     }
 
     if (victim == ch) {
-	ch->send_to("Себя???\n\r");
+	ch->send_to("п║п╣п╠я▐???\n\r");
 	return;
     }
 
@@ -194,23 +194,23 @@ SKILL_RUNP( cleave )
 	return;
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0) {
-	ch->send_to("Вооружись для начала.\n\r");
+	ch->send_to("п▓п╬п╬я─я┐п╤п╦я│я▄ п╢п╩я▐ п╫п╟я┤п╟п╩п╟.\n\r");
 	return;
     }
 
     if (attack_table[obj->value[3]].damage != DAM_SLASH) {
-	ch->send_to("Чтобы рассечь кого-то, нужно вооружится режущим оружием.\n\r");
+	ch->send_to("п╖я┌п╬п╠я▀ я─п╟я│я│п╣я┤я▄ п╨п╬пЁп╬-я┌п╬, п╫я┐п╤п╫п╬ п╡п╬п╬я─я┐п╤п╦я┌я│я▐ я─п╣п╤я┐я┴п╦п╪ п╬я─я┐п╤п╦п╣п╪.\n\r");
 	return;
     }
 
     if (victim->fighting != 0) {
-	ch->send_to("Подожди, пока закончится сражение.\n\r");
+	ch->send_to("п÷п╬п╢п╬п╤п╢п╦, п©п╬п╨п╟ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐ я│я─п╟п╤п╣п╫п╦п╣.\n\r");
 	return;
     }
 
     if (victim->hit < 0.9 * victim->max_hit && IS_AWAKE(victim) )
     {
-	act_p( "$C1 ране$Gно|н|на и настороженно оглядывается... ты не сможешь подкрасться незаметно.",
+	act_p( "$C1 я─п╟п╫п╣$Gп╫п╬|п╫|п╫п╟ п╦ п╫п╟я│я┌п╬я─п╬п╤п╣п╫п╫п╬ п╬пЁп╩я▐п╢я▀п╡п╟п╣я┌я│я▐... я┌я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п©п╬п╢п╨я─п╟я│я┌я▄я│я▐ п╫п╣п╥п╟п╪п╣я┌п╫п╬.",
 		ch, 0, victim, TO_CHAR,POS_RESTING);
 	return;
     }
@@ -232,8 +232,8 @@ SKILL_RUNP( cleave )
 	}
 
 	yell_panic( ch, victim,
-	            "Помогите! Кто-то напал на меня!",
-		    "Помогите! %1$^C1 хочет меня рассечь пополам!" );
+	            "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ п╫п╟п©п╟п╩ п╫п╟ п╪п╣п╫я▐!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я┘п╬я┤п╣я┌ п╪п╣п╫я▐ я─п╟я│я│п╣я┤я▄ п©п╬п©п╬п╩п╟п╪!" );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -326,7 +326,7 @@ void ShadowBlade::fight( Character *ch )
 	    obj->value[1] = std::max( obj->value[1], p->value1 );
 	    obj->value[2] = std::max( obj->value[2], p->value2 );
 	    obj->level = ch->getModifyLevel( );
-	    act("{cСлабое {Cсияние{c окутывает $o4.{x", ch, obj, 0, TO_CHAR);
+	    act("{cп║п╩п╟п╠п╬п╣ {Cя│п╦я▐п╫п╦п╣{c п╬п╨я┐я┌я▀п╡п╟п╣я┌ $o4.{x", ch, obj, 0, TO_CHAR);
 	}
     }
     
@@ -336,28 +336,28 @@ void ShadowBlade::fight( Character *ch )
     switch (number_range( 1, 4 )) {
     case 1:
 	if (!IS_SET(victim->imm_flags, IMM_POISON)) {
-	    act("Капли {Gяда{x стекают по лезвию твоего $o2.", ch, obj, 0, TO_CHAR);
-	    act("Капли {Gяда{x стекают по лезвию $o2 в руках $c2.", ch, obj, 0, TO_ROOM);
+	    act("п п╟п©п╩п╦ {Gя▐п╢п╟{x я│я┌п╣п╨п╟я▌я┌ п©п╬ п╩п╣п╥п╡п╦я▌ я┌п╡п╬п╣пЁп╬ $o2.", ch, obj, 0, TO_CHAR);
+	    act("п п╟п©п╩п╦ {Gя▐п╢п╟{x я│я┌п╣п╨п╟я▌я┌ п©п╬ п╩п╣п╥п╡п╦я▌ $o2 п╡ я─я┐п╨п╟я┘ $c2.", ch, obj, 0, TO_ROOM);
 	    spell( gsn_poison, level + 1, ch, victim, FSPELL_BANE );
 	}
 	break;
     case 2:
 	if (!IS_SET(victim->imm_flags, IMM_DISEASE)) {
-	    ch->pecho("{cТлетворная аура{x окружает тво%1$Gе|й|ю|и %1$O4.", obj );
-	    act("{cТлетворная аура{x окружает $o4 $c2.", ch, obj, 0, TO_ROOM);
+	    ch->pecho("{cп╒п╩п╣я┌п╡п╬я─п╫п╟я▐ п╟я┐я─п╟{x п╬п╨я─я┐п╤п╟п╣я┌ я┌п╡п╬%1$Gп╣|п╧|я▌|п╦ %1$O4.", obj );
+	    act("{cп╒п╩п╣я┌п╡п╬я─п╫п╟я▐ п╟я┐я─п╟{x п╬п╨я─я┐п╤п╟п╣я┌ $o4 $c2.", ch, obj, 0, TO_ROOM);
 	    spell( gsn_plague, level + 1, ch, victim, FSPELL_BANE );
 	}
 	break;
     case 3:
 	if (!IS_AFFECTED( victim, AFF_CURSE )) {
-	    ch->pecho("{DЗловещая аура{x окутывает тво%1$Gе|й|ю|и %1$O4.", obj );
-	    ch->recho("%1$^O1 %2$C2 окутыва%1$nется|ются {Dзловещей аурой{x.", obj, ch );
+	    ch->pecho("{Dп≈п╩п╬п╡п╣я┴п╟я▐ п╟я┐я─п╟{x п╬п╨я┐я┌я▀п╡п╟п╣я┌ я┌п╡п╬%1$Gп╣|п╧|я▌|п╦ %1$O4.", obj );
+	    ch->recho("%1$^O1 %2$C2 п╬п╨я┐я┌я▀п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ {Dп╥п╩п╬п╡п╣я┴п╣п╧ п╟я┐я─п╬п╧{x.", obj, ch );
 	    spell( gsn_curse, level + 1, ch, victim, FSPELL_BANE );
 	}
 	break;
     case 4:
-	ch->pecho("{DТво%1$Gе|й|ю|и %1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
-	ch->recho("%1$^O1 %2$C2 вспыхива%1$nет|ют мертвенно-бледным светом.", obj, ch );
+	ch->pecho("{Dп╒п╡п╬%1$Gп╣|п╧|я▌|п╦ %1$O1 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ {xп╪п╣я─я┌п╡п╣п╫п╫п╬-п╠п╩п╣п╢п╫я▀п╪{D я│п╡п╣я┌п╬п╪.{x", obj );
+	ch->recho("%1$^O1 %2$C2 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ п╪п╣я─я┌п╡п╣п╫п╫п╬-п╠п╩п╣п╢п╫я▀п╪ я│п╡п╣я┌п╬п╪.", obj, ch );
 	spell( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );	
 	break;
     }
@@ -379,8 +379,8 @@ bool ShadowBlade::area( )
     if (ch->fighting == 0)
 	return false;
 
-    act( "$o1 внезапно вонзается тебе в сердце!", ch, obj, 0, TO_CHAR );
-    act( "$o1 внезапно вонзается $c4 в сердце!", ch, obj, 0, TO_ROOM );
+    act( "$o1 п╡п╫п╣п╥п╟п©п╫п╬ п╡п╬п╫п╥п╟п╣я┌я│я▐ я┌п╣п╠п╣ п╡ я│п╣я─п╢я├п╣!", ch, obj, 0, TO_CHAR );
+    act( "$o1 п╡п╫п╣п╥п╟п©п╫п╬ п╡п╬п╫п╥п╟п╣я┌я│я▐ $c4 п╡ я│п╣я─п╢я├п╣!", ch, obj, 0, TO_ROOM );
     unequip_char( ch, obj );
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
@@ -391,7 +391,7 @@ bool ShadowBlade::area( )
 bool ShadowBlade::canEquip( Character *ch )
 {
     if (ch->getTrueProfession( ) != prof_anti_paladin) {
-	act( "$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
+	act( "$o1 п╡я▀я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ п╦п╥ я┌п╡п╬п╦я┘ я─я┐п╨.", ch, obj, 0, TO_CHAR );
 	unequip_char( ch, obj );
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
@@ -404,7 +404,7 @@ bool ShadowBlade::canEquip( Character *ch )
 bool ShadowBlade::quit( Character *ch, bool count )
 {
     if (ch->getName( ) != owner.getValue( )) {
-	act( "$o1 не принадлежит тебе и не хочет покидать мир вместе с тобой.", ch, obj, 0, TO_CHAR );
+	act( "$o1 п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ я┌п╣п╠п╣ п╦ п╫п╣ я┘п╬я┤п╣я┌ п©п╬п╨п╦п╢п╟я┌я▄ п╪п╦я─ п╡п╪п╣я│я┌п╣ я│ я┌п╬п╠п╬п╧.", ch, obj, 0, TO_CHAR );
 
 	if (obj->carried_by)
 	    obj_from_char( obj );
@@ -431,12 +431,12 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     if (!blade->behavior 
 	|| !(behavior = blade->behavior.getDynamicPointer<ShadowBlade>( ))) 
     {
-        ch->send_to( "Но это не призрачный клинок!\n\r" );
+        ch->send_to( "п²п╬ я█я┌п╬ п╫п╣ п©я─п╦п╥я─п╟я┤п╫я▀п╧ п╨п╩п╦п╫п╬п╨!\n\r" );
         return;
     }
     
     if (ch->getName( ) != behavior->owner.getValue( )) {
-	ch->send_to( "Ты можешь направить это заклинание только на твой собственный клинок.\n\r" );
+	ch->send_to( "п╒я▀ п╪п╬п╤п╣я┬я▄ п╫п╟п©я─п╟п╡п╦я┌я▄ я█я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ я┌п╬п╩я▄п╨п╬ п╫п╟ я┌п╡п╬п╧ я│п╬п╠я│я┌п╡п╣п╫п╫я▀п╧ п╨п╩п╦п╫п╬п╨.\n\r" );
 	return;
     }
     
@@ -446,12 +446,12 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     ||   IS_WEAPON_STAT(blade, WEAPON_POISON)
     ||   IS_WEAPON_STAT(blade, WEAPON_SHOCKING) )
     {
-        ch->send_to( "Ничего не произошло..\r\n" );
+        ch->send_to( "п²п╦я┤п╣пЁп╬ п╫п╣ п©я─п╬п╦п╥п╬я┬п╩п╬..\r\n" );
         return;
     }
 
     if (IS_WEAPON_STAT(blade, WEAPON_FADING)) {
-        act( "Тьма уже окутывает $o4.", ch, blade, 0, TO_CHAR );
+        act( "п╒я▄п╪п╟ я┐п╤п╣ п╬п╨я┐я┌я▀п╡п╟п╣я┌ $o4.", ch, blade, 0, TO_CHAR );
         return;
     }
 
@@ -464,8 +464,8 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     af.bitvector        = WEAPON_FADING;
     affect_to_obj( blade, &af );
 
-    act( "Ты окутываешь $o4 темнотой.", ch, blade, 0, TO_CHAR );
-    act( "$c1 окутывает $o4 темнотой.", ch, blade, 0, TO_ROOM );
+    act( "п╒я▀ п╬п╨я┐я┌я▀п╡п╟п╣я┬я▄ $o4 я┌п╣п╪п╫п╬я┌п╬п╧.", ch, blade, 0, TO_CHAR );
+    act( "$c1 п╬п╨я┐я┌я▀п╡п╟п╣я┌ $o4 я┌п╣п╪п╫п╬я┌п╬п╧.", ch, blade, 0, TO_ROOM );
 }
 
 /*
@@ -489,17 +489,17 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
 	}
 	
     if (!blade) {
-	ch->send_to( "Ничего не произошло..\n\r" );
+	ch->send_to( "п²п╦я┤п╣пЁп╬ п╫п╣ п©я─п╬п╦п╥п╬я┬п╩п╬..\n\r" );
 	return;
     }
 
     if (blade->carried_by) {
-	act( "$o1 медленно исчезает.", blade->carried_by, blade, NULL, TO_ALL );
+	act( "$o1 п╪п╣п╢п╩п╣п╫п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌.", blade->carried_by, blade, NULL, TO_ALL );
 	obj_from_char( blade );
     }
     else if (blade->in_room) {
 	if (blade->in_room->people)
-	    act( "$o1 медленно исчезает.", blade->in_room->people, blade, NULL, TO_ALL );
+	    act( "$o1 п╪п╣п╢п╩п╣п╫п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌.", blade->in_room->people, blade, NULL, TO_ALL );
 
 	obj_from_room( blade );
     }
@@ -507,7 +507,7 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
 	obj_from_obj( blade );
 
     obj_to_char( blade, ch );
-    act( "$o1 появляется, мерцая.", ch, blade, NULL, TO_ALL );
+    act( "$o1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐, п╪п╣я─я├п╟я▐.", ch, blade, NULL, TO_ALL );
 }
 
 
@@ -532,7 +532,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
 		cnt++;
 
 		if (cnt >= 2) {
-		    ch->send_to( "Но у тебя уже есть призрачный клинок.\r\n" );
+		    ch->send_to( "п²п╬ я┐ я┌п╣п╠я▐ я┐п╤п╣ п╣я│я┌я▄ п©я─п╦п╥я─п╟я┤п╫я▀п╧ п╨п╩п╦п╫п╬п╨.\r\n" );
 		    return;
 		}
 	    }
@@ -540,7 +540,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     
     pObjIndex = find_obj_unique_index<ShadowBlade>( );
     if (!pObjIndex) {
-	ch->send_to( "В Мире что-то нарушилось.. Ты не можешь сейчас создать свой клинок.\r\n" );
+	ch->send_to( "п▓ п°п╦я─п╣ я┤я┌п╬-я┌п╬ п╫п╟я─я┐я┬п╦п╩п╬я│я▄.. п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╣п╧я┤п╟я│ я│п╬п╥п╢п╟я┌я▄ я│п╡п╬п╧ п╨п╩п╦п╫п╬п╨.\r\n" );
 	LogStream::sendError( ) << "ShadowBlade: NULL obj index" << endl;
 	return;
     }
@@ -570,8 +570,8 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     
     obj_to_char( blade, ch );
 
-    act( "Ты создаешь $o4!", ch, blade, NULL, TO_CHAR );
-    act( "$c1 создает $o4!", ch, blade, NULL, TO_ROOM );
+    act( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $o4!", ch, blade, NULL, TO_CHAR );
+    act( "$c1 я│п╬п╥п╢п╟п╣я┌ $o4!", ch, blade, NULL, TO_ROOM );
 }
 
 /*---------------------------------------------------------------------------
@@ -583,27 +583,27 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
     int price = 300;
 
     if (!obj->behavior || !(behavior = obj->behavior.getDynamicPointer<ShadowBlade>( ))) {
-	say_act( victim, ch, "Это не призрачный клинок, $c1." );
+	say_act( victim, ch, "п╜я┌п╬ п╫п╣ п©я─п╦п╥я─п╟я┤п╫я▀п╧ п╨п╩п╦п╫п╬п╨, $c1." );
     }
     else if (victim->getName( ) != behavior->owner.getValue( )) {
-	say_act( victim, ch, "Этот клинок не принадлежит тебе, $c1." );
+	say_act( victim, ch, "п╜я┌п╬я┌ п╨п╩п╦п╫п╬п╨ п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ я┌п╣п╠п╣, $c1." );
     }
     else if (IS_SET(obj->extra_flags, ITEM_NOSAC)
 	     || IS_SET(obj->wear_flags, ITEM_NO_SAC)) {
-	say_act( victim, ch, "Над этим клинком уже совершили защитный ритуал." );
+	say_act( victim, ch, "п²п╟п╢ я█я┌п╦п╪ п╨п╩п╦п╫п╨п╬п╪ я┐п╤п╣ я│п╬п╡п╣я─я┬п╦п╩п╦ п╥п╟я┴п╦я┌п╫я▀п╧ я─п╦я┌я┐п╟п╩." );
     }
     else if (victim->is_npc( ) || victim->getPC( )->questpoints < price) {
-	say_act( victim, ch, "У тебя не хватит qp для оплаты ритуала." );
+	say_act( victim, ch, "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╦я┌ qp п╢п╩я▐ п╬п©п╩п╟я┌я▀ я─п╦я┌я┐п╟п╩п╟." );
     }
     else {
 	victim->getPC( )->questpoints -= price;
 	SET_BIT(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
 	SET_BIT(obj->wear_flags, ITEM_NO_SAC);
-	act("$c1 прикасается к лезвию клинка и произносит странное заклинание.", ch, 0, 0, TO_ROOM);
+	act("$c1 п©я─п╦п╨п╟я│п╟п╣я┌я│я▐ п╨ п╩п╣п╥п╡п╦я▌ п╨п╩п╦п╫п╨п╟ п╦ п©я─п╬п╦п╥п╫п╬я│п╦я┌ я│я┌я─п╟п╫п╫п╬п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣.", ch, 0, 0, TO_ROOM);
     }
 
-    act( "$c1 возвращает $o4 $C3.", ch, obj, victim, TO_NOTVICT );
-    act( "$c1 возвращает тебе $o4.", ch, obj, victim, TO_VICT );
+    act( "$c1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $o4 $C3.", ch, obj, victim, TO_NOTVICT );
+    act( "$c1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, obj, victim, TO_VICT );
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
@@ -618,15 +618,15 @@ VOID_SPELL(PowerWordStun)::run( Character *ch, Character *victim, int sn, int le
 
 	if ( saves_spell( level, victim, DAM_OTHER, ch, DAMF_SPELL) )
 	{
-		ch->send_to("Не получилось..\n\r");
+		ch->send_to("п²п╣ п©п╬п╩я┐я┤п╦п╩п╬я│я▄..\n\r");
 		return;
 	}
 
 	if (victim->isAffected(sn )) {
 	    if (ch == victim)
-		act("Ты уже оглуше$gно|н|на.", ch, 0, 0, TO_CHAR);
+		act("п╒я▀ я┐п╤п╣ п╬пЁп╩я┐я┬п╣$gп╫п╬|п╫|п╫п╟.", ch, 0, 0, TO_CHAR);
 	    else
-		act("$C1 уже оглуше$gно|н|на.", ch, 0, victim, TO_CHAR);
+		act("$C1 я┐п╤п╣ п╬пЁп╩я┐я┬п╣$gп╫п╬|п╫|п╫п╟.", ch, 0, victim, TO_CHAR);
 	    return;
 	}
 
@@ -639,7 +639,7 @@ VOID_SPELL(PowerWordStun)::run( Character *ch, Character *victim, int sn, int le
 	af.bitvector = AFF_STUN;
 	affect_to_char( victim, &af );
 
-	act("{r$c1 оглуше$gно|н|на{x.",victim, 0, 0,TO_ROOM);
-	act("{RТы оглуше$gно|н|на{x.",victim, 0, 0, TO_CHAR);
+	act("{r$c1 п╬пЁп╩я┐я┬п╣$gп╫п╬|п╫|п╫п╟{x.",victim, 0, 0,TO_ROOM);
+	act("{Rп╒я▀ п╬пЁп╩я┐я┬п╣$gп╫п╬|п╫|п╫п╟{x.",victim, 0, 0, TO_CHAR);
 }
 

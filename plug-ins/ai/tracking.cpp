@@ -94,18 +94,18 @@ bool BasicMobileBehavior::trackLastFought( Character *wch )
     int d;
 
     ch->setWait( gsn_track->getBeats( ) );
-    act("$c1 ×ÓÍÁÔÒÉ×ÁÅÔÓÑ × ÚÅÍÌÀ × ÐÏÉÓËÁÈ ÓÌÅÄÏ×.",ch,0,0,TO_ROOM);
+    act("$c1 Ð²ÑÐ¼Ð°Ñ‚Ñ€Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð² Ð·ÐµÐ¼Ð»ÑŽ Ð² Ð¿Ð¾Ð¸ÑÐºÐ°Ñ… ÑÐ»ÐµÐ´Ð¾Ð².",ch,0,0,TO_ROOM);
 
     d = room->history.went( wch );
     pexit = (d == -1 ? NULL : room->exit[d]);
 
     if (!pexit) {
-	act("ôÙ ÎÅ ×ÉÄÉÛØ ÚÄÅÓØ ÓÌÅÄÏ× $C2.", ch, 0, wch, TO_CHAR);
+	act("Ð¢Ñ‹ Ð½Ðµ Ð²Ð¸Ð´Ð¸ÑˆÑŒ Ð·Ð´ÐµÑÑŒ ÑÐ»ÐµÐ´Ð¾Ð² $C2.", ch, 0, wch, TO_CHAR);
 	lostTrack = true;
 	return true;
     }
     
-    act("óÌÅÄÙ $C2 ×ÅÄÕÔ $t.", ch, dirs[d].leave, wch, TO_CHAR);
+    act("Ð¡Ð»ÐµÐ´Ñ‹ $C2 Ð²ÐµÐ´ÑƒÑ‚ $t.", ch, dirs[d].leave, wch, TO_CHAR);
     
     if (!move( d, pexit, wch )) 
 	lostTrack = true;
@@ -215,7 +215,7 @@ void BasicMobileBehavior::shooted( Character *attacker, int door )
 	int d;
 	EXIT_DATA *pexit;
     
-	act("$c1 ×ÓÍÁÔÒÉ×ÁÅÔÓÑ × ÚÅÍÌÀ × ÐÏÉÓËÁÈ ÓÌÅÄÏ×.",ch,0,0,TO_ROOM);
+	act("$c1 Ð²ÑÐ¼Ð°Ñ‚Ñ€Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ð² Ð·ÐµÐ¼Ð»ÑŽ Ð² Ð¿Ð¾Ð¸ÑÐºÐ°Ñ… ÑÐ»ÐµÐ´Ð¾Ð².",ch,0,0,TO_ROOM);
 	d = ch->in_room->history.went( victim );
 	pexit = ch->in_room->exit[d];
 

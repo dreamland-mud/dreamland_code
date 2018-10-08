@@ -41,12 +41,12 @@ bool PetShopStorage::canServeClient( Character *client )
 
 void PetShopStorage::msgListEmpty( Character *client )
 {
-    client->println( "Извини, все животные давно разбежались." );
+    client->println( "п≤п╥п╡п╦п╫п╦, п╡я│п╣ п╤п╦п╡п╬я┌п╫я▀п╣ п╢п╟п╡п╫п╬ я─п╟п╥п╠п╣п╤п╟п╩п╦я│я▄." );
 }
 
 void PetShopStorage::msgListBefore( Character *client )
 {
-    client->println( "Животные для продажи:" );
+    client->println( "п√п╦п╡п╬я┌п╫я▀п╣ п╢п╩я▐ п©я─п╬п╢п╟п╤п╦:" );
 }
 
 void PetShopStorage::msgListAfter( Character *client )
@@ -99,12 +99,12 @@ void PetShopStorage::toStream( Character *client, ostringstream &buf )
 
 void PetShopStorage::msgArticleNotFound( Character *client )
 {
-    client->println( "Извини, ты не можешь купить этого здесь." );
+    client->println( "п≤п╥п╡п╦п╫п╦, я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╨я┐п©п╦я┌я▄ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄." );
 }
 
 void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    client->println( "Ты можешь купить только одно животное." );
+    client->println( "п╒я▀ п╪п╬п╤п╣я┬я▄ п╨я┐п©п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╬п╢п╫п╬ п╤п╦п╡п╬я┌п╫п╬п╣." );
 }
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )

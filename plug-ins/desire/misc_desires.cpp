@@ -39,7 +39,7 @@ void BloodlustDesire::damage( PCharacter *ch )
 		&& ch->can_see(vch) 
 		&& !is_safe_nomessage(ch, vch))
 	    {
-		interpret_raw( ch, "yell", "ÎÚÔ˜È! Ò ˆ·ˆ‰ı ÎÚÔ˜È!");
+		interpret_raw( ch, "yell", "–ö–†–û–í–ò! –Ø –ñ–ê–ñ–î–£ –ö–†–û–í–ò!");
 		interpret_raw( ch, "murder",  vch->getNameP( ));
 		return;
 	    }
@@ -84,7 +84,7 @@ bool DrunkDesire::isActive( PCharacter *ch )
 bool DrunkDesire::canDrink( PCharacter *ch )
 {
     if (isActive( ch )) {
-	ch->println( "ÙŸ –“œŒœ”…€ÿ Õ…Õœ “‘¡.. *ÈÎ*" );
+	ch->println( "–¢—ã –ø—Ä–æ–Ω–æ—Å–∏—à—å –º–∏–º–æ —Ä—Ç–∞.. *–ò–ö*" );
 	return false;
     }
 
@@ -107,7 +107,7 @@ bool FullDesire::applicable( PCharacter *ch )
 bool FullDesire::canDrink( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-	ch->println( "ÙŸ ¬œÃÿ€≈ Œ≈ Õœ÷≈€ÿ ◊Ÿ–…‘ÿ Œ… À¡–Ã…." );
+	ch->println( "–¢—ã –±–æ–ª—å—à–µ –Ω–µ –º–æ–∂–µ—à—å –≤—ã–ø–∏—Ç—å –Ω–∏ –∫–∞–ø–ª–∏." );
 	return false;
     }
 
@@ -117,7 +117,7 @@ bool FullDesire::canDrink( PCharacter *ch )
 bool FullDesire::canEat( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-	ch->println( "ÙŸ ¬œÃÿ€≈ Œ≈ Õœ÷≈€ÿ ”ﬂ≈”‘ÿ Œ… À’”œﬁÀ¡." );
+	ch->println( "–¢—ã –±–æ–ª—å—à–µ –Ω–µ –º–æ–∂–µ—à—å —Å—ä–µ—Å—Ç—å –Ω–∏ –∫—É—Å–æ—á–∫–∞." );
 	return false;
     }
 

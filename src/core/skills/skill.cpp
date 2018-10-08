@@ -67,7 +67,7 @@ int Skill::getMana( ) const
 }
 const RussianString &Skill::getDammsg( ) const
 {
-    static RussianString dammsg("тупость");
+    static RussianString dammsg("я┌я┐п©п╬я│я┌я▄");
     return dammsg;
 }
 bool Skill::visible( Character * ) const

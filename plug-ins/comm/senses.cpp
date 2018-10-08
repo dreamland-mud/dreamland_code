@@ -44,7 +44,7 @@ CMDRUNP( listen )
     argument = one_argument( argument, arg );
 
     if (!arg[0]) {
-	ch->send_to("Послушать что?\n\r");
+	ch->send_to("п÷п╬я│п╩я┐я┬п╟я┌я▄ я┤я┌п╬?\n\r");
 	return;
     }
 
@@ -52,12 +52,12 @@ CMDRUNP( listen )
 	 || ( obj = get_obj_room( ch, arg ) ))
     {
 	if (obj->carried_by == ch) {
-	    act("Ты подносишь к уху $o4 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-	    act("$c1 подносит к уху $o4 и прислушивается.", ch, obj, 0, TO_ROOM);
+	    act("п╒я▀ п©п╬п╢п╫п╬я│п╦я┬я▄ п╨ я┐я┘я┐ $o4 п╦ п©я─п╦я│п╩я┐я┬п╦п╡п╟п╣я┬я▄я│я▐.", ch, obj, 0, TO_CHAR);
+	    act("$c1 п©п╬п╢п╫п╬я│п╦я┌ п╨ я┐я┘я┐ $o4 п╦ п©я─п╦я│п╩я┐я┬п╦п╡п╟п╣я┌я│я▐.", ch, obj, 0, TO_ROOM);
 	}
 	else {
-	    act("Ты прикладываешь ухо к $o3 и прислушиваешься.", ch, obj, 0, TO_CHAR);
-	    act("$c1 прикладывает ухо к $o3 и прислушивается.", ch, obj, 0, TO_ROOM);
+	    act("п╒я▀ п©я─п╦п╨п╩п╟п╢я▀п╡п╟п╣я┬я▄ я┐я┘п╬ п╨ $o3 п╦ п©я─п╦я│п╩я┐я┬п╦п╡п╟п╣я┬я▄я│я▐.", ch, obj, 0, TO_CHAR);
+	    act("$c1 п©я─п╦п╨п╩п╟п╢я▀п╡п╟п╣я┌ я┐я┘п╬ п╨ $o3 п╦ п©я─п╦я│п╩я┐я┬п╦п╡п╟п╣я┌я│я▐.", ch, obj, 0, TO_ROOM);
 	}
 
 	if (oprog_listen( obj, ch, argument ))
@@ -69,16 +69,16 @@ CMDRUNP( listen )
 	}
 
 	if (IS_OBJ_STAT(obj, ITEM_HUM))
-	    ch->pecho( "Ты чувствуешь слабую вибрацию." );
+	    ch->pecho( "п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╩п╟п╠я┐я▌ п╡п╦п╠я─п╟я├п╦я▌." );
 	else
-	    ch->pecho("  ... но оттуда не доносится ни звука.");
+	    ch->pecho("  ... п╫п╬ п╬я┌я┌я┐п╢п╟ п╫п╣ п╢п╬п╫п╬я│п╦я┌я│я▐ п╫п╦ п╥п╡я┐п╨п╟.");
 
 	return;
     }
     
     /* TODO: listen to a mob */
 
-    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    act("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я█я┌п╬пЁп╬.", ch, 0, 0, TO_CHAR);
 }	
 
 /*---------------------------------------------------------------------------
@@ -125,9 +125,9 @@ CMDRUNP( smell )
 
     argument = one_argument( argument, arg );
 
-    if (!arg[0] || arg_oneof_strict( arg, "room", "комната" )) {
-	act("Ты нюхаешь воздух.", ch, 0, 0, TO_CHAR);
-	act("$c1 принюхивается.", ch, 0, 0, TO_ROOM);
+    if (!arg[0] || arg_oneof_strict( arg, "room", "п╨п╬п╪п╫п╟я┌п╟" )) {
+	act("п╒я▀ п╫я▌я┘п╟п╣я┬я▄ п╡п╬п╥п╢я┐я┘.", ch, 0, 0, TO_CHAR);
+	act("$c1 п©я─п╦п╫я▌я┘п╦п╡п╟п╣я┌я│я▐.", ch, 0, 0, TO_ROOM);
 
 	if (rprog_smell( ch->in_room, ch, argument ))
 	    return;
@@ -138,11 +138,11 @@ CMDRUNP( smell )
             return;
         }
 
-	ch->println("Вокруг пахнет вполне обычно.");
+	ch->println("п▓п╬п╨я─я┐пЁ п©п╟я┘п╫п╣я┌ п╡п©п╬п╩п╫п╣ п╬п╠я▀я┤п╫п╬.");
 	return;
     }
 
-    if (arg_oneof_strict( arg, "description", "описание")) {
+    if (arg_oneof_strict( arg, "description", "п╬п©п╦я│п╟п╫п╦п╣")) {
 	if (ch->is_npc( ))
 	    return;
 	
@@ -150,26 +150,26 @@ CMDRUNP( smell )
 
 	if (!argument[0]) {
 	    if (attr && !attr->getValue( ).empty( ))
-		ch->printf("Ты пахнешь:\n\r%s\n\r", attr->getValue( ).c_str( ) ); 
+		ch->printf("п╒я▀ п©п╟я┘п╫п╣я┬я▄:\n\r%s\n\r", attr->getValue( ).c_str( ) ); 
 	    else
-		ch->println("Ты ничем особенным не пахнешь.");
+		ch->println("п╒я▀ п╫п╦я┤п╣п╪ п╬я│п╬п╠п╣п╫п╫я▀п╪ п╫п╣ п©п╟я┘п╫п╣я┬я▄.");
 	    return;
 	}
 
-	if (arg_oneof_strict( argument, "clear", "очистить" )) {
+	if (arg_oneof_strict( argument, "clear", "п╬я┤п╦я│я┌п╦я┌я▄" )) {
 	    attr->setValue( "" );
-	    ch->println( "Теперь ты никак не пахнешь." );
+	    ch->println( "п╒п╣п©п╣я─я▄ я┌я▀ п╫п╦п╨п╟п╨ п╫п╣ п©п╟я┘п╫п╣я┬я▄." );
 	    return;
 	}
 
 	if (arg_is_help( argument )) {
-	    ch->println( "Используй 'smell description <строка>' для установки запаха\n\r"
-		         "или 'smell description clear' для его очистки." );
+	    ch->println( "п≤я│п©п╬п╩я▄п╥я┐п╧ 'smell description <я│я┌я─п╬п╨п╟>' п╢п╩я▐ я┐я│я┌п╟п╫п╬п╡п╨п╦ п╥п╟п©п╟я┘п╟\n\r"
+		         "п╦п╩п╦ 'smell description clear' п╢п╩я▐ п╣пЁп╬ п╬я┤п╦я│я┌п╨п╦." );
 	    return;
 	}
 	
 	attr->setValue( argument );
-	ch->printf("Теперь ты будешь пахнуть так:\n\r%s\n\r", argument );
+	ch->printf("п╒п╣п©п╣я─я▄ я┌я▀ п╠я┐п╢п╣я┬я▄ п©п╟я┘п╫я┐я┌я▄ я┌п╟п╨:\n\r%s\n\r", argument );
 	return;
     }
 
@@ -177,8 +177,8 @@ CMDRUNP( smell )
     if ( ( obj = get_obj_wear_carry( ch, arg ) ) 
 	 || ( obj = get_obj_room( ch, arg ) ))
     {
-	act("Ты нюхаешь $o4.", ch, obj, 0, TO_CHAR);
-	act("$c1 нюхает $o4.", ch, obj, 0, TO_ROOM);
+	act("п╒я▀ п╫я▌я┘п╟п╣я┬я▄ $o4.", ch, obj, 0, TO_CHAR);
+	act("$c1 п╫я▌я┘п╟п╣я┌ $o4.", ch, obj, 0, TO_ROOM);
 
 	if (oprog_smell( obj, ch, argument ))
 	    return;
@@ -188,7 +188,7 @@ CMDRUNP( smell )
 	    return;
 	}
 
-	ch->println("Пахнет вполне обычно.");
+	ch->println("п÷п╟я┘п╫п╣я┌ п╡п©п╬п╩п╫п╣ п╬п╠я▀я┤п╫п╬.");
 	return;
     }
 
@@ -196,12 +196,12 @@ CMDRUNP( smell )
 	bool rc = false;
 
 	if (ch == victim) {
-	    act("Ты обнюхиваешь себя.", ch, 0, 0, TO_CHAR);
-	    act("$c1 обнюхивает себя.", ch, 0, 0, TO_ROOM);
+	    act("п╒я▀ п╬п╠п╫я▌я┘п╦п╡п╟п╣я┬я▄ я│п╣п╠я▐.", ch, 0, 0, TO_CHAR);
+	    act("$c1 п╬п╠п╫я▌я┘п╦п╡п╟п╣я┌ я│п╣п╠я▐.", ch, 0, 0, TO_ROOM);
 	} else {
-	    act("Ты обнюхиваешь $C4.", ch, 0, victim, TO_CHAR);
-	    act("$c1 обнюхивает $C4.", ch, 0, victim, TO_NOTVICT);
-	    act("$c1 обнюхивает тебя.", ch, 0, victim, TO_VICT);
+	    act("п╒я▀ п╬п╠п╫я▌я┘п╦п╡п╟п╣я┬я▄ $C4.", ch, 0, victim, TO_CHAR);
+	    act("$c1 п╬п╠п╫я▌я┘п╦п╡п╟п╣я┌ $C4.", ch, 0, victim, TO_NOTVICT);
+	    act("$c1 п╬п╠п╫я▌я┘п╦п╡п╟п╣я┌ я┌п╣п╠я▐.", ch, 0, victim, TO_VICT);
 	}
 
 	if (!( rc = mprog_smell( victim, ch, argument ) )) {
@@ -224,12 +224,12 @@ CMDRUNP( smell )
 	rc = afprog_smell( victim, ch, argument ) || rc;
 	
 	if (!rc)
-	    ch->println("Пахнет вполне обычно.");
+	    ch->println("п÷п╟я┘п╫п╣я┌ п╡п©п╬п╩п╫п╣ п╬п╠я▀я┤п╫п╬.");
 
 	return;
     }
 
-    act("Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR);
+    act("п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ п╥п╢п╣я│я▄ я█я┌п╬пЁп╬.", ch, 0, 0, TO_CHAR);
 }	
 
 

@@ -37,9 +37,9 @@ COMMAND(CPractice, "practice")
 	
     if (argument.empty( ) || arg_is_all( argument ))
 	pracShow( ch->getPC( ), true, false );
-    else if (arg_oneof_strict( argument, "now", "сейчас" ))
+    else if (arg_oneof_strict( argument, "now", "я│п╣п╧я┤п╟я│" ))
 	pracShow( ch->getPC( ), true, true );
-    else if (arg_oneof_strict( argument, "here", "здесь" ))
+    else if (arg_oneof_strict( argument, "here", "п╥п╢п╣я│я▄" ))
         pracHere( ch->getPC( ) );
     else
 	pracLearn( ch->getPC( ), argument );
@@ -165,11 +165,11 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
 	buf << endl;
     }
     
-    buf << dlprintf( "У тебя %d сесси%s практики (practice).\n\r",
-                 ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
+    buf << dlprintf( "пё я┌п╣п╠я▐ %d я│п╣я│я│п╦%s п©я─п╟п╨я┌п╦п╨п╦ (practice).\n\r",
+                 ch->practice.getValue( ), GET_COUNT(ch->practice, "я▐","п╦","п╧") );
 #if 0    
     if ((sp = ch->skill_points( )) > 0)
-	buf << "{cУ тебя " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
+	buf << "{cпё я┌п╣п╠я▐ " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
 #endif
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -183,11 +183,11 @@ void CPractice::pracHere( PCharacter *ch )
 
     if (!( teacher = findTeacher( ch ) ))
 	if (!( teacher = findPracticer( ch ) )) {
-            ch->println("Тебе не с кем практиковаться здесь.");
+            ch->println("п╒п╣п╠п╣ п╫п╣ я│ п╨п╣п╪ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄я│я▐ п╥п╢п╣я│я▄.");
 	    return;
         }
 
-    buf << fmt( ch, "%1$^C1 может научить тебя таким навыкам:", teacher ) << endl;
+    buf << fmt( ch, "%1$^C1 п╪п╬п╤п╣я┌ п╫п╟я┐я┤п╦я┌я▄ я┌п╣п╠я▐ я┌п╟п╨п╦п╪ п╫п╟п╡я▀п╨п╟п╪:", teacher ) << endl;
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         ostringstream errbuf;
 	Skill *skill = SkillManager::getThis( )->find( sn );
@@ -212,7 +212,7 @@ void CPractice::pracHere( PCharacter *ch )
     if (found) 
         page_to_char( buf.str( ).c_str( ), ch );
     else
-        ch->pecho("Тебе нечему научиться у %C2.", teacher );
+        ch->pecho("п╒п╣п╠п╣ п╫п╣я┤п╣п╪я┐ п╫п╟я┐я┤п╦я┌я▄я│я▐ я┐ %C2.", teacher );
 }
 
 void CPractice::pracLearn( PCharacter *ch, DLString &arg )
@@ -224,7 +224,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     ostringstream buf;
 
     if (!IS_AWAKE( ch )) {
-	ch->send_to( "Во сне или как?\n\r");
+	ch->send_to( "п▓п╬ я│п╫п╣ п╦п╩п╦ п╨п╟п╨?\n\r");
 	return;
     }
 
@@ -232,7 +232,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     skill = skillManager->find( sn );
 
     if (!skill) {
-        ch->printf("Умение %s не существует или еще тебе не доступно.\r\n", arg.c_str());
+        ch->printf("пёп╪п╣п╫п╦п╣ %s п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п╦п╩п╦ п╣я┴п╣ я┌п╣п╠п╣ п╫п╣ п╢п╬я│я┌я┐п©п╫п╬.\r\n", arg.c_str());
 	return;
     }
 
@@ -246,7 +246,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 	    return;
 
     if (ch->practice <= 0) {
-	ch->send_to( "У тебя нет сессий практики (practice).\n\r");
+	ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я│п╣я│я│п╦п╧ п©я─п╟п╨я┌п╦п╨п╦ (practice).\n\r");
 	return;
     }
 
@@ -256,7 +256,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     sname = skill->getNameFor( ch ).c_str( );
 
     if (learned >= adept) {
-	ch->printf( "Ты уже знаешь искусство '%s'.\r\n", sname );
+	ch->printf( "п╒я▀ я┐п╤п╣ п╥п╫п╟п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬ '%s'.\r\n", sname );
 	return;
     }
 
@@ -264,15 +264,15 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     
     skill->practice( ch );
 
-    act("$c1 обучает тебя искусству '$t'.", teacher, sname, ch, TO_VICT);
-    act("Ты обучаешь $C4 искусству '$t'.", teacher, sname, ch, TO_CHAR);
-    act("$c1 обучает $C4 искусству '$t'.", teacher, sname, ch, TO_NOTVICT);
+    act("$c1 п╬п╠я┐я┤п╟п╣я┌ я┌п╣п╠я▐ п╦я│п╨я┐я│я│я┌п╡я┐ '$t'.", teacher, sname, ch, TO_VICT);
+    act("п╒я▀ п╬п╠я┐я┤п╟п╣я┬я▄ $C4 п╦я│п╨я┐я│я│я┌п╡я┐ '$t'.", teacher, sname, ch, TO_CHAR);
+    act("$c1 п╬п╠я┐я┤п╟п╣я┌ $C4 п╦я│п╨я┐я│я│я┌п╡я┐ '$t'.", teacher, sname, ch, TO_NOTVICT);
     
     if (learned < adept)
-	ch->printf( "Ты теперь знаешь '%s' на %d процентов.\n\r", sname, learned );
+	ch->printf( "п╒я▀ я┌п╣п©п╣я─я▄ п╥п╫п╟п╣я┬я▄ '%s' п╫п╟ %d п©я─п╬я├п╣п╫я┌п╬п╡.\n\r", sname, learned );
     else {
-	act_p("Ты теперь знаешь '$t'.",ch, sname, 0, TO_CHAR, POS_RESTING);
-	act_p("$c1 теперь знает '$t'.",ch, sname, 0, TO_ROOM, POS_RESTING);
+	act_p("п╒я▀ я┌п╣п©п╣я─я▄ п╥п╫п╟п╣я┬я▄ '$t'.",ch, sname, 0, TO_CHAR, POS_RESTING);
+	act_p("$c1 я┌п╣п©п╣я─я▄ п╥п╫п╟п╣я┌ '$t'.",ch, sname, 0, TO_ROOM, POS_RESTING);
     }
 }
 

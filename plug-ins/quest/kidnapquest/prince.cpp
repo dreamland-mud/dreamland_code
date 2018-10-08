@@ -169,7 +169,7 @@ void KidnapPrince::give( Character *victim, Object *obj )
 	quest->getScenario( ).actWrongGiver( ch, victim, obj );
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
-	act( "$c1 ÂÒÏÓÁÅÔ $o4.", ch, obj, 0, TO_ROOM );
+	act( "$c1 Ð±Ñ€Ð¾ÑÐ°ÐµÑ‚ $o4.", ch, obj, 0, TO_ROOM );
 	return;
     }
 	
@@ -185,7 +185,7 @@ void KidnapPrince::give( Character *victim, Object *obj )
     }
     
     if (obj->item_type == ITEM_POTION || obj->item_type == ITEM_PILL) {
-	act( "$c1 $T $o4.", ch, obj, (obj->item_type == ITEM_PILL ? "ÓßÅÄÁÅÔ" : "ÏÓÕÛÁÅÔ"), TO_ROOM );
+	act( "$c1 $T $o4.", ch, obj, (obj->item_type == ITEM_PILL ? "ÑÑŠÐµÐ´Ð°ÐµÑ‚" : "Ð¾ÑÑƒÑˆÐ°ÐµÑ‚"), TO_ROOM );
 	spell_by_item( ch, obj );
 	extract_obj( obj );
 	return;
@@ -273,10 +273,10 @@ void KidnapPrince::kingReunion( NPCharacter *king )
 	time = quest->getAccidentTime( pci );
 
 	if (hero) {
-	    buf << king->getNameP( '1' ) << " É " << ch->getNameP( '1' ) 
-		<< " ×ÓÔÒÅÔÉÌÉÓØ ÂÅÚ Ô×ÏÅÊ ÐÏÍÏÝÉ." << endl
-		<< "ë×ÅÓÔ ÏÔÍÅÎÅÎ, ÞÅÒÅÚ {Y" << time 
-		<< "{x ÍÉÎÕÔ ÔÙ ÓÍÏÖÅÛØ ÐÏÌÕÞÉÔØ ÎÏ×ÏÅ ÚÁÄÁÎÉÅ." << endl;
+	    buf << king->getNameP( '1' ) << " Ð¸ " << ch->getNameP( '1' ) 
+		<< " Ð²ÑÑ‚Ñ€ÐµÑ‚Ð¸Ð»Ð¸ÑÑŒ Ð±ÐµÐ· Ñ‚Ð²Ð¾ÐµÐ¹ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸." << endl
+		<< "ÐšÐ²ÐµÑÑ‚ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½, Ñ‡ÐµÑ€ÐµÐ· {Y" << time 
+		<< "{x Ð¼Ð¸Ð½ÑƒÑ‚ Ñ‚Ñ‹ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ð½Ð¾Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ." << endl;
 	    hero->send_to( buf );
 	}
 	

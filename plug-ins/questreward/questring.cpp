@@ -17,7 +17,7 @@
 
 void QuestRing::wear( Character *ch ) 
 {
-    ch->send_to( "{CÙ◊œ≈ ÀœÃÿ√œ —“Àœ ◊”–Ÿ»…◊¡≈‘.{x\r\n" );
+    ch->send_to( "{C–¢–≤–æ–µ –∫–æ–ª—å—Ü–æ —è—Ä–∫–æ –≤—Å–ø—ã—Ö–∏–≤–∞–µ—Ç.{x\r\n" );
 }
 
 void QuestRing::equip( Character *ch ) {

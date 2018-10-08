@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
@@ -831,13 +831,13 @@ CMDWIZP( stat )
 
     if (fChar || fMob) {
 	if (!string[0]) {
-	   ch->println("Stat на кого?");
+	   ch->println("Stat п╫п╟ п╨п╬пЁп╬?");
 	   return;
 	}
 	
 	victim =  fChar ? get_player_world( ch->getPC( ), string ) : get_char_world( ch, string );
 	if (!victim) {
-	    ch->pecho("%s с таким именем не найден.", fMob ? "Персонаж" : "Игрок");
+	    ch->pecho("%s я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫.", fMob ? "п÷п╣я─я│п╬п╫п╟п╤" : "п≤пЁя─п╬п╨");
 	    return;
 	}
 	
@@ -1034,7 +1034,7 @@ CMDWIZP( stat )
 
         if (obj->timestamp > 0) {
             DLString d = Date( obj->timestamp ).getTimeAsString( );
-            ch->printf("Лимит исчезнет в %s.\r\n", d.c_str( ) );
+            ch->printf("п⌡п╦п╪п╦я┌ п╦я│я┤п╣п╥п╫п╣я┌ п╡ %s.\r\n", d.c_str( ) );
         }
 
 	sprintf( buf, "Short description: %s\n\rLong description: %s\n\r",
@@ -1388,7 +1388,7 @@ static bool has_nopost(Character *ch)
     buf << endl;
     
     if (victim->getReligion( ) == god_none)
-	buf << "Не верит в богов." << endl;
+	buf << "п²п╣ п╡п╣я─п╦я┌ п╡ п╠п╬пЁп╬п╡." << endl;
     else
 	buf << "Believes the religion of " << victim->getReligion( )->getShortDescr( ) << endl;
     
@@ -2119,7 +2119,7 @@ CMDWIZP( return )
     NPCharacter *mob = ch->getNPC();
 
     if(!mob) {
-	ch->println("Ты и так в своем теле.");
+	ch->println("п╒я▀ п╦ я┌п╟п╨ п╡ я│п╡п╬п╣п╪ я┌п╣п╩п╣.");
 	return;
     }
     
@@ -2246,10 +2246,10 @@ CMDWIZP( clone )
 
 		recursive_clone(ch,obj,clone);
 
-		act_p("$c1 создает $o4.",ch,clone,0,TO_ROOM,POS_RESTING);
-		act_p("Ты создаешь дубликат $o2.",ch,clone,0,TO_CHAR,POS_RESTING);
+		act_p("$c1 я│п╬п╥п╢п╟п╣я┌ $o4.",ch,clone,0,TO_ROOM,POS_RESTING);
+		act_p("п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ п╢я┐п╠п╩п╦п╨п╟я┌ $o2.",ch,clone,0,TO_CHAR,POS_RESTING);
 		wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
-		        "%C1 клонирует %O4.", ch, obj );
+		        "%C1 п╨п╩п╬п╫п╦я─я┐п╣я┌ %O4.", ch, obj );
 		return;
 	}
 	else if (mob != 0)
@@ -2289,10 +2289,10 @@ CMDWIZP( clone )
 		}
 
 		char_to_room(clone,ch->in_room);
-		act_p("$c1 создает $C4.",ch,0,clone,TO_ROOM,POS_RESTING);
-		act_p("Ты клонируешь $C4.",ch,0,clone,TO_CHAR,POS_RESTING);
+		act_p("$c1 я│п╬п╥п╢п╟п╣я┌ $C4.",ch,0,clone,TO_ROOM,POS_RESTING);
+		act_p("п╒я▀ п╨п╩п╬п╫п╦я─я┐п╣я┬я▄ $C4.",ch,0,clone,TO_CHAR,POS_RESTING);
 		wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), 
-		        "%C1 клонирует %C4.", ch, clone );
+		        "%C1 п╨п╩п╬п╫п╦я─я┐п╣я┌ %C4.", ch, clone );
 		
 		return;
 	}
@@ -2355,12 +2355,12 @@ CMDWIZP( load )
 	if (victim->in_room == 0)
 	    char_to_room( victim, ch->in_room );
 
-	act_p( "$c1 создает $C4!", ch, 0, victim, TO_ROOM,POS_RESTING );
-	act_p( "Ты создаешь $C4!", ch, 0, victim, TO_CHAR,POS_RESTING );
+	act_p( "$c1 я│п╬п╥п╢п╟п╣я┌ $C4!", ch, 0, victim, TO_ROOM,POS_RESTING );
+	act_p( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $C4!", ch, 0, victim, TO_CHAR,POS_RESTING );
 
 
 	wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
-	        "%C1 создает %C4.", ch, victim );
+	        "%C1 я│п╬п╥п╢п╟п╣я┌ %C4.", ch, victim );
 	ch->send_to("Ok.\n\r");
 	return;
 }
@@ -2412,8 +2412,8 @@ CMDWIZP( load )
     else
 	obj_to_room( obj, ch->in_room );
 	
-    act_p( "$c1 создает $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
-    act_p( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
+    act_p( "$c1 я│п╬п╥п╢п╟п╣я┌ $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
+    act_p( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
     wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust( ), "%C1 loads %O4.", ch, obj );
     
     LogStream::sendNotice( ) 
@@ -2969,7 +2969,7 @@ CMDWIZP( string )
 
 		if ( obj->pIndexData->limit != -1 )
 		{
-			ch->send_to("Хмм.. Мохам будет возмущен, не надо.\n\r");
+			ch->send_to("п╔п╪п╪.. п°п╬я┘п╟п╪ п╠я┐п╢п╣я┌ п╡п╬п╥п╪я┐я┴п╣п╫, п╫п╣ п╫п╟п╢п╬.\n\r");
 			return;
 		}
     	
@@ -3048,7 +3048,7 @@ CMDWIZP( string )
 			}
 			else
 			{
-				ch->send_to ("А может все таки синтакс проверим, а?\n\r");
+				ch->send_to ("п░ п╪п╬п╤п╣я┌ п╡я│п╣ я┌п╟п╨п╦ я│п╦п╫я┌п╟п╨я│ п©я─п╬п╡п╣я─п╦п╪, п╟?\n\r");
 				return;
 			}
 		}
@@ -3313,14 +3313,14 @@ CMDWIZP( incognito )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          act_p( "$c1 больше не маскируется.", ch, 0, 0, TO_ROOM,POS_RESTING );
-          ch->send_to("Ты больше не маскируешься.\n\r");
+          act_p( "$c1 п╠п╬п╩я▄я┬п╣ п╫п╣ п╪п╟я│п╨п╦я─я┐п╣я┌я│я▐.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          ch->send_to("п╒я▀ п╠п╬п╩я▄я┬п╣ п╫п╣ п╪п╟я│п╨п╦я─я┐п╣я┬я▄я│я▐.\n\r");
       }
       else
       {
           ch->incog_level = 102;
-          act_p( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM,POS_RESTING );
-          ch->send_to("Ты скрываешь свое присутствие.\n\r");
+          act_p( "$c1 я│п╨я─я▀п╡п╟п╣я┌ $s п©я─п╦я│я┐я┌я│я┌п╡п╦п╣.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          ch->send_to("п╒я▀ я│п╨я─я▀п╡п╟п╣я┬я▄ я│п╡п╬п╣ п©я─п╦я│я┐я┌я│я┌п╡п╦п╣.\n\r");
       }
     else
     /* do the level thing */
@@ -3335,8 +3335,8 @@ CMDWIZP( incognito )
       {
           ch->reply = 0;
           ch->incog_level = level;
-          act_p( "$c1 скрывает $s присутствие.", ch, 0, 0, TO_ROOM,POS_RESTING );
-          ch->send_to("Ты скрываешь свое присутствие.\n\r");
+          act_p( "$c1 я│п╨я─я▀п╡п╟п╣я┌ $s п©я─п╦я│я┐я┌я│я┌п╡п╦п╣.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          ch->send_to("п╒я▀ я│п╨я─я▀п╡п╟п╣я┬я▄ я│п╡п╬п╣ п©я─п╦я│я┐я┌я│я┌п╡п╦п╣.\n\r");
       }
     }
 
@@ -3447,38 +3447,38 @@ CMDWIZP( smite )
 
   if (argument[0] == '\0')
     {
-      ch->send_to("От расстройства ты бьешь молнией себя!  Oххх!\n\r");
+      ch->send_to("п·я┌ я─п╟я│я│я┌я─п╬п╧я│я┌п╡п╟ я┌я▀ п╠я▄п╣я┬я▄ п╪п╬п╩п╫п╦п╣п╧ я│п╣п╠я▐!  Oя┘я┘я┘!\n\r");
       return;
     }
 
   if ((victim = get_char_world(ch, argument)) == 0)
     {
-      ch->send_to("Придеться подождать немного и послать на них молнию в другой раз.\n\r");
+      ch->send_to("п÷я─п╦п╢п╣я┌я▄я│я▐ п©п╬п╢п╬п╤п╢п╟я┌я▄ п╫п╣п╪п╫п╬пЁп╬ п╦ п©п╬я│п╩п╟я┌я▄ п╫п╟ п╫п╦я┘ п╪п╬п╩п╫п╦я▌ п╡ п╢я─я┐пЁп╬п╧ я─п╟п╥.\n\r");
       return;
     }
 
   if (victim->is_npc())
     {
-      ch->send_to("Этот бедный моб не сделал тебе ничего плохого.\n\r");
+      ch->send_to("п╜я┌п╬я┌ п╠п╣п╢п╫я▀п╧ п╪п╬п╠ п╫п╣ я│п╢п╣п╩п╟п╩ я┌п╣п╠п╣ п╫п╦я┤п╣пЁп╬ п©п╩п╬я┘п╬пЁп╬.\n\r");
       return;
     }
 
   if (victim->getRealLevel() > ch->getRealLevel())
     {
-      ch->send_to("Как ты смеешь!\n\r");
+      ch->send_to("п п╟п╨ я┌я▀ я│п╪п╣п╣я┬я▄!\n\r");
       return;
     }
 
   if (victim->position < POS_SLEEPING)
     {
-      ch->send_to("Грешно издеваться над больными людьми.\n\r");
+      ch->send_to("п⌠я─п╣я┬п╫п╬ п╦п╥п╢п╣п╡п╟я┌я▄я│я▐ п╫п╟п╢ п╠п╬п╩я▄п╫я▀п╪п╦ п╩я▌п╢я▄п╪п╦.\n\r");
       return;
     }
 
-  act_p("{CБоги {Rв гневе{C!{/{cОгромная молния, сорвавшаяся с небес, поражает тебя!{/{RЭто было БОЛЬНО! Это было МУЧИТЕЛЬНО БОЛЬНО!{x\n\r", victim, 0,
+  act_p("{Cп▒п╬пЁп╦ {Rп╡ пЁп╫п╣п╡п╣{C!{/{cп·пЁя─п╬п╪п╫п╟я▐ п╪п╬п╩п╫п╦я▐, я│п╬я─п╡п╟п╡я┬п╟я▐я│я▐ я│ п╫п╣п╠п╣я│, п©п╬я─п╟п╤п╟п╣я┌ я┌п╣п╠я▐!{/{Rп╜я┌п╬ п╠я▀п╩п╬ п▒п·п⌡п╛п²п·! п╜я┌п╬ п╠я▀п╩п╬ п°пёп╖п≤п╒п∙п⌡п╛п²п· п▒п·п⌡п╛п²п·!{x\n\r", victim, 0,
 	ch, TO_CHAR,POS_DEAD);
-  act_p("Твоя молния поражает $c4!\n\r", victim, 0, ch, TO_VICT,POS_DEAD);
-  act_p("{cОгромная молния, сорвавшаяся с небес, поражает $c4!{x\n\r", victim, 0, ch, TO_NOTVICT,POS_DEAD);
+  act_p("п╒п╡п╬я▐ п╪п╬п╩п╫п╦я▐ п©п╬я─п╟п╤п╟п╣я┌ $c4!\n\r", victim, 0, ch, TO_VICT,POS_DEAD);
+  act_p("{cп·пЁя─п╬п╪п╫п╟я▐ п╪п╬п╩п╫п╦я▐, я│п╬я─п╡п╟п╡я┬п╟я▐я│я▐ я│ п╫п╣п╠п╣я│, п©п╬я─п╟п╤п╟п╣я┌ $c4!{x\n\r", victim, 0, ch, TO_NOTVICT,POS_DEAD);
   victim->hit = victim->hit / 2;
   victim->move = victim->move / 2;
   victim->mana = victim->mana / 2;
@@ -3593,7 +3593,7 @@ CMDWIZP( rename )
 	return;		
     }
 
-    // Переименовываем объекты
+    // п÷п╣я─п╣п╦п╪п╣п╫п╬п╡я▀п╡п╟п╣п╪ п╬п╠я┼п╣п╨я┌я▀
     Object *obj;
     Object *obj_next;
     for ( obj = object_list; obj != 0; obj = obj_next )
@@ -3618,7 +3618,7 @@ CMDWIZP( rename )
 	    PCharacterManager::ext ).remove( );
 
     ch->send_to("Character renamed.\n\r");
-    act_p("$c1 переименова$gло|л|ла тебя в $C4!",ch,0,victim,TO_VICT,POS_DEAD);
+    act_p("$c1 п©п╣я─п╣п╦п╪п╣п╫п╬п╡п╟$gп╩п╬|п╩|п╩п╟ я┌п╣п╠я▐ п╡ $C4!",ch,0,victim,TO_VICT,POS_DEAD);
 }
 
 CMDWIZP( notitle )
@@ -3837,20 +3837,20 @@ CMDWIZP( nopk )
 {
   if( !*argument ) {
     if( dreamland->hasOption( DL_PK ) ) {
-      ch->send_to("{RPK{x разрешен.\n\r");
+      ch->send_to("{RPK{x я─п╟п╥я─п╣я┬п╣п╫.\n\r");
     } else {
-      ch->send_to("{RPK{x запрещен.\n\r");
+      ch->send_to("{RPK{x п╥п╟п©я─п╣я┴п╣п╫.\n\r");
     }
   } else {
     if( !str_cmp( argument, "off" ) ) {
       dreamland->setOption( DL_PK );
-      ch->send_to("{RPK{x разрешен.\n\r");
+      ch->send_to("{RPK{x я─п╟п╥я─п╣я┬п╣п╫.\n\r");
     } else {
       if( !str_cmp( argument, "on" ) ) {
         dreamland->removeOption( DL_PK );
-        ch->send_to("{RPK{x запрещен.\n\r");
+        ch->send_to("{RPK{x п╥п╟п©я─п╣я┴п╣п╫.\n\r");
       } else {
-        ch->send_to("Синтаксис: nopk [on/off]");
+        ch->send_to("п║п╦п╫я┌п╟п╨я│п╦я│: nopk [on/off]");
         return;
       }
     }
@@ -3866,7 +3866,7 @@ CMDWIZP( curse )
 
 	if( !argument[0] )
 	{
-		ch->send_to("Используйте:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣:\n\r   curse <п╦пЁя─п╬п╨> <+/-п╨п╬п╩п╦я┤п╣я│я┌п╡п╬> <п©я─п╦я┤п╦п╫п╟>\n\r");
 		return;
 	}
 
@@ -3874,18 +3874,18 @@ CMDWIZP( curse )
 
 	if ( !( victim = get_char_world(ch ,arg1 ) ) )
 	{
-		ch->send_to("Не присутствует в игре.\n\r");
+		ch->send_to("п²п╣ п©я─п╦я│я┐я┌я│я┌п╡я┐п╣я┌ п╡ п╦пЁя─п╣.\n\r");
 		return;
 	}
 	if ( victim->is_npc() )
 	{
-		ch->send_to("Это не есть игрок.\n\r");
+		ch->send_to("п╜я┌п╬ п╫п╣ п╣я│я┌я▄ п╦пЁя─п╬п╨.\n\r");
 		return;
 	}
 
 	if ( !argument[0] )
 	{
-	    ch->pecho( "%#^C1 хуже использует умения на %d%%.",
+	    ch->pecho( "%#^C1 я┘я┐п╤п╣ п╦я│п©п╬п╩я▄п╥я┐п╣я┌ я┐п╪п╣п╫п╦я▐ п╫п╟ %d%%.",
 	               victim, 100 - victim->getPC( )->curse.getValue( ) );
 	    return;
 	}
@@ -3898,7 +3898,7 @@ CMDWIZP( curse )
 		modif = 1;
 	else
 	{
-		ch->send_to("Используйте:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣:\n\r   curse <п╦пЁя─п╬п╨> <+/-п╨п╬п╩п╦я┤п╣я│я┌п╡п╬> <п©я─п╦я┤п╦п╫п╟>\n\r");
 		return;
 	}
 
@@ -3906,30 +3906,30 @@ CMDWIZP( curse )
 
 	if ( !argument[0] )
 	{
-		ch->send_to("Используйте:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣:\n\r   curse <п╦пЁя─п╬п╨> <+/-п╨п╬п╩п╦я┤п╣я│я┌п╡п╬> <п©я─п╦я┤п╦п╫п╟>\n\r");
 		return;
 	}
 
 	if ( victim->getPC( )->curse + modif < 0
 		|| victim->getPC( )->curse + modif > 100 )
 	{
-		ch->send_to("Проклятие должно лежать в пределах 0..100\n\r");
+		ch->send_to("п÷я─п╬п╨п╩я▐я┌п╦п╣ п╢п╬п╩п╤п╫п╬ п╩п╣п╤п╟я┌я▄ п╡ п©я─п╣п╢п╣п╩п╟я┘ 0..100\n\r");
 		return;
 	}
 
 	if ( victim->getPC( )->bless )
 	{
-		ch->send_to("Ты не можешь проклясть благословленного.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©я─п╬п╨п╩я▐я│я┌я▄ п╠п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫п╫п╬пЁп╬.\n\r");
 		return;
 	}
 
 	victim->getPC( )->curse += modif;
 	interpret_raw( ch, "noaffect", victim->getNameP() );
 	if ( modif > 0 )
-		sprintf( buf, "Боги становятся более блакосклонны к тебе.\n\rПричина: %s\n\r",
+		sprintf( buf, "п▒п╬пЁп╦ я│я┌п╟п╫п╬п╡я▐я┌я│я▐ п╠п╬п╩п╣п╣ п╠п╩п╟п╨п╬я│п╨п╩п╬п╫п╫я▀ п╨ я┌п╣п╠п╣.\n\rп÷я─п╦я┤п╦п╫п╟: %s\n\r",
 			argument );
 	else
-		sprintf( buf, "Боги проклинают тебя.\n\rПричина: %s", argument );
+		sprintf( buf, "п▒п╬пЁп╦ п©я─п╬п╨п╩п╦п╫п╟я▌я┌ я┌п╣п╠я▐.\n\rп÷я─п╦я┤п╦п╫п╟: %s", argument );
 			victim->send_to(buf);
 }
 
@@ -3942,7 +3942,7 @@ CMDWIZP( bless )
 
 	if( !argument[0] )
 	{
-		ch->send_to("Используйте:\n\r   bless <игрок> <+/-количество> <причина>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣:\n\r   bless <п╦пЁя─п╬п╨> <+/-п╨п╬п╩п╦я┤п╣я│я┌п╡п╬> <п©я─п╦я┤п╦п╫п╟>\n\r");
 		return;
 	}
 
@@ -3950,18 +3950,18 @@ CMDWIZP( bless )
 
 	if ( !( victim = get_char_world(ch ,arg1 ) ) )
 	{
-		ch->send_to("Не присутствует в игре.\n\r");
+		ch->send_to("п²п╣ п©я─п╦я│я┐я┌я│я┌п╡я┐п╣я┌ п╡ п╦пЁя─п╣.\n\r");
 		return;
 	}
 	if ( victim->is_npc() )
 	{
-		ch->send_to("Это не есть игрок.\n\r");
+		ch->send_to("п╜я┌п╬ п╫п╣ п╣я│я┌я▄ п╦пЁя─п╬п╨.\n\r");
 		return;
 	}
 
 	if ( !argument[0] )
 	{
-	    ch->pecho( "%#^C1 лучше использует умения на %d%%.",
+	    ch->pecho( "%#^C1 п╩я┐я┤я┬п╣ п╦я│п©п╬п╩я▄п╥я┐п╣я┌ я┐п╪п╣п╫п╦я▐ п╫п╟ %d%%.",
 	               victim, 100 - victim->getPC( )->bless.getValue( ) );
 	    return;
 	}
@@ -3974,7 +3974,7 @@ CMDWIZP( bless )
 		modif = 1;
 	else
 	{
-		ch->send_to("Используйте:\n\r   bless <игрок> <+/-количество> <причина>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣:\n\r   bless <п╦пЁя─п╬п╨> <+/-п╨п╬п╩п╦я┤п╣я│я┌п╡п╬> <п©я─п╦я┤п╦п╫п╟>\n\r");
 		return;
 	}
 
@@ -3982,30 +3982,30 @@ CMDWIZP( bless )
 
 	if ( !argument[0] )
 	{
-		ch->send_to("Используйте:\n\r   bless <игрок> <+/-количество> <причина>\n\r");
+		ch->send_to("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣:\n\r   bless <п╦пЁя─п╬п╨> <+/-п╨п╬п╩п╦я┤п╣я│я┌п╡п╬> <п©я─п╦я┤п╦п╫п╟>\n\r");
 		return;
 	}
 
 	if ( victim->getPC( )->bless + modif < 0
 		|| victim->getPC( )->bless + modif > 50 )
 	{
-		ch->send_to("Благословление должно лежать в пределах 0..50\n\r");
+		ch->send_to("п▒п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫п╦п╣ п╢п╬п╩п╤п╫п╬ п╩п╣п╤п╟я┌я▄ п╡ п©я─п╣п╢п╣п╩п╟я┘ 0..50\n\r");
 		return;
 	}
 
 	if ( victim->getPC( )->curse != 100 )
 	{
-		ch->send_to("Ты не можешь благословить проклятого.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╠п╩п╟пЁп╬я│п╩п╬п╡п╦я┌я▄ п©я─п╬п╨п╩я▐я┌п╬пЁп╬.\n\r");
 		return;
 	}
 
 	victim->getPC( )->bless += modif;
 	interpret_raw( ch, "noaffect", victim->getNameP( ) );
 	if ( modif > 0 )
-		sprintf( buf, "Ты чувствуешь {CБожественное Благословление{x!\n\rПричина: %s\n\r",
+		sprintf( buf, "п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ {Cп▒п╬п╤п╣я│я┌п╡п╣п╫п╫п╬п╣ п▒п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫п╦п╣{x!\n\rп÷я─п╦я┤п╦п╫п╟: %s\n\r",
 			argument );
 	else
-		sprintf( buf, "Ты теряешь расположение Богов.\n\rПричина: %s", argument );
+		sprintf( buf, "п╒я▀ я┌п╣я─я▐п╣я┬я▄ я─п╟я│п©п╬п╩п╬п╤п╣п╫п╦п╣ п▒п╬пЁп╬п╡.\n\rп÷я─п╦я┤п╦п╫п╟: %s", argument );
 			victim->send_to(buf);
 }
 
@@ -4013,7 +4013,7 @@ CMDWIZP( bless )
 CMDWIZP( merchant )
 {
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf,"Состояние всемирного банка : {Y%ld gold{x\n\r",
+	sprintf(buf,"п║п╬я│я┌п╬я▐п╫п╦п╣ п╡я│п╣п╪п╦я─п╫п╬пЁп╬ п╠п╟п╫п╨п╟ : {Y%ld gold{x\n\r",
 		dreamland->getBalanceMerchantBank());
 	ch->send_to(buf);
 }

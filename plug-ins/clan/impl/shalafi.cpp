@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "shalafi.h"
@@ -51,12 +51,12 @@ GSN(dispel_affects);
  *-------------------------------------------------------------------------*/
 void ClanGuardShalafi::actGreet( PCharacter *wch )
 {
-    do_say(ch, "“…◊≈‘”‘◊’¿ ‘≈¬—, Õ’ƒ“≈√.");
+    do_say(ch, "–ü—Ä–∏–≤–µ—Ç—Å—Ç–≤—É—é —Ç–µ–±—è, –º—É–¥—Ä–µ—Ü.");
 }
 void ClanGuardShalafi::actPush( PCharacter *wch )
 {
-    act( "$C1 ¬“œ”¡≈‘ Œ¡ ‘≈¬— Õ…ÕœÃ≈‘ŒŸ  ◊⁄«Ã—ƒ.\n\rÈ ‘’‘ ÷≈ ‘Ÿ ﬁ’◊”‘◊’≈€ÿ, À¡À Œ≈À¡— Õ¡«…ﬁ≈”À¡— ”…Ã¡ ◊Ÿ€◊Ÿ“…◊¡≈‘ ‘≈¬— ◊œŒ.", wch, 0, ch, TO_CHAR );
-    act( "$C1 ¬“œ”¡≈‘ Œ¡ $c4 Õ…ÕœÃ≈‘ŒŸ  ◊⁄«Ã—ƒ … $c1 Õ«Œœ◊≈ŒŒœ …”ﬁ≈⁄¡≈‘.", wch, 0, ch, TO_ROOM );
+    act( "$C1 –±—Ä–æ—Å–∞–µ—Ç –Ω–∞ —Ç–µ–±—è –º–∏–º–æ–ª–µ—Ç–Ω—ã–π –≤–∑–≥–ª—è–¥.\n\r–ò —Ç—É—Ç –∂–µ —Ç—ã —á—É–≤—Å—Ç–≤—É–µ—à—å, –∫–∞–∫ –Ω–µ–∫–∞—è –º–∞–≥–∏—á–µ—Å–∫–∞—è —Å–∏–ª–∞ –≤—ã—à–≤—ã—Ä–∏–≤–∞–µ—Ç —Ç–µ–±—è –≤–æ–Ω.", wch, 0, ch, TO_CHAR );
+    act( "$C1 –±—Ä–æ—Å–∞–µ—Ç –Ω–∞ $c4 –º–∏–º–æ–ª–µ—Ç–Ω—ã–π –≤–∑–≥–ª—è–¥ –∏ $c1 –º–≥–Ω–æ–≤–µ–Ω–Ω–æ –∏—Å—á–µ–∑–∞–µ—Ç.", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardShalafi::getCast( Character *victim )
 {
@@ -125,13 +125,13 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
 	&& obj->item_type != ITEM_LOCKPICK
 	&& obj->item_type != ITEM_KEY)
       {
-	ch->send_to("¸‘¡ ◊≈›ÿ Œ≈ Õœ÷≈‘ ¬Ÿ‘ÿ –“≈◊“¡›≈Œ¡ ◊ ⁄≈Ãÿ≈.\n\r");
+	ch->send_to("–≠—Ç–∞ –≤–µ—â—å –Ω–µ –º–æ–∂–µ—Ç –±—ã—Ç—å –ø—Ä–µ–≤—Ä–∞—â–µ–Ω–∞ –≤ –∑–µ–ª—å–µ.\n\r");
 	return;
       }
 
     if (obj->wear_loc != wear_none)
       {
-	ch->send_to("˜≈›ÿ ƒœÃ÷Œ¡ Œ¡»œƒ…‘ÿ”— ◊ ”–…”À≈ …Œ◊≈Œ‘¡“—.\n\r");
+	ch->send_to("–í–µ—â—å –¥–æ–ª–∂–Ω–∞ –Ω–∞—Ö–æ–¥–∏—Ç—å—Å—è –≤ —Å–ø–∏—Å–∫–µ –∏–Ω–≤–µ–Ω—Ç–∞—Ä—è.\n\r");
 	return;
       }
 
@@ -139,14 +139,14 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
       if ( vial->pIndexData->vnum == OBJ_VNUM_POTION_VIAL )
         break;
     if (  vial == 0 )  {
-	ch->send_to("ı ‘≈¬— Œ≈‘ ”œ”’ƒ¡, Œ≈œ¬»œƒ…Õœ«œ ƒÃ— …⁄«œ‘œ◊Ã≈Œ…— ⁄≈Ãÿ—.\n\r");
+	ch->send_to("–£ —Ç–µ–±—è –Ω–µ—Ç —Å–æ—Å—É–¥–∞, –Ω–µ–æ–±—Ö–æ–¥–∏–º–æ–≥–æ –¥–ª—è –∏–∑–≥–æ—Ç–æ–≤–ª–µ–Ω–∏—è –∑–µ–ª—å—è.\n\r");
 	return;
     }
 
 
     if (number_percent() < 50)
       {
-	ch->send_to("Ù◊œ— –œ–Ÿ‘À¡ ⁄¡ÀœŒﬁ…Ã¡”ÿ Œ≈’ƒ¡ﬁ≈ , “¡⁄¬…◊ ”œ”’ƒ.\n\r");
+	ch->send_to("–¢–≤–æ—è –ø–æ–ø—ã—Ç–∫–∞ –∑–∞–∫–æ–Ω—á–∏–ª–∞—Å—å –Ω–µ—É–¥–∞—á–µ–π, —Ä–∞–∑–±–∏–≤ —Å–æ—Å—É–¥.\n\r");
 	extract_obj(obj);
 	return;
       }
@@ -219,9 +219,9 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
 
     potion->value[1] = spell;
     extract_obj(obj);
-    act_p("È”–œÃÿ⁄’— Õ¡«…ﬁ≈”À…≈ ”…ÃŸ, ‘Ÿ …⁄«œ‘¡◊Ã…◊¡≈€ÿ $o4!",
+    act_p("–ò—Å–ø–æ–ª—å–∑—É—è –º–∞–≥–∏—á–µ—Å–∫–∏–µ —Å–∏–ª—ã, —Ç—ã –∏–∑–≥–æ—Ç–∞–≤–ª–∏–≤–∞–µ—à—å $o4!",
            ch, potion, 0, TO_CHAR,POS_RESTING);
-    act_p("È”–œÃÿ⁄’— Õ¡«…ﬁ≈”À…≈ ”…ÃŸ $c1 …⁄«œ‘œ◊Ã—≈‘ $o4!",
+    act_p("–ò—Å–ø–æ–ª—å–∑—É—è –º–∞–≥–∏—á–µ—Å–∫–∏–µ —Å–∏–ª—ã $c1 –∏–∑–≥–æ—Ç–æ–≤–ª—è–µ—Ç $o4!",
            ch, potion, 0, TO_ROOM,POS_RESTING);
 
     obj_to_char(potion, ch);
@@ -261,9 +261,9 @@ void ShalafiDemon::conjure( )
     ch->leader = ch->master = NULL;
 
     if (ch->can_see( mch ))
-	do_say(ch, "ÙŸ “…”ÀŒ’Ã Œ¡“’€…‘ÿ Õœ  –œÀœ ?!!!");
+	do_say(ch, "–¢—ã —Ä–∏—Å–∫–Ω—É–ª –Ω–∞—Ä—É—à–∏—Ç—å –º–æ–π –ø–æ–∫–æ–π?!!!");
     else
-	do_say(ch, "Î‘œ “…”ÀŒ’Ã Œ¡“’€…‘ÿ Õœ  –œÀœ ?!!!");
+	do_say(ch, "–ö—Ç–æ —Ä–∏—Å–∫–Ω—É–ª –Ω–∞—Ä—É—à–∏—Ç—å –º–æ–π –ø–æ–∫–æ–π?!!!");
 
     interpret_raw( ch, "murder", mch->getNameP( ) );
 }
@@ -313,13 +313,13 @@ VOID_SPELL(MentalKnife)::run( Character *ch, Character *victim, int sn, int leve
 	  affect_to_char(victim,&af);
 
 	  if (ch != victim) {
-	    act("Ù◊œ  Õ≈Œ‘¡ÃÿŒŸ  ’ƒ¡“ –œ◊“≈÷ƒ¡≈‘ “¡⁄’Õ $C2!", ch,0,victim,TO_CHAR);
-	    act("Ì≈Œ‘¡ÃÿŒŸ  ’ƒ¡“ $c2 –œ◊“≈÷ƒ¡≈‘ ‘◊œ  “¡⁄’Õ!", ch,0,victim,TO_VICT);
-	    act("Ì≈Œ‘¡ÃÿŒŸ  ’ƒ¡“ $c2 –œ◊“≈÷ƒ¡≈‘ “¡⁄’Õ $C2!", ch,0,victim,TO_NOTVICT);
+	    act("–¢–≤–æ–π –º–µ–Ω—Ç–∞–ª—å–Ω—ã–π —É–¥–∞—Ä –ø–æ–≤—Ä–µ–∂–¥–∞–µ—Ç —Ä–∞–∑—É–º $C2!", ch,0,victim,TO_CHAR);
+	    act("–ú–µ–Ω—Ç–∞–ª—å–Ω—ã–π —É–¥–∞—Ä $c2 –ø–æ–≤—Ä–µ–∂–¥–∞–µ—Ç —Ç–≤–æ–π —Ä–∞–∑—É–º!", ch,0,victim,TO_VICT);
+	    act("–ú–µ–Ω—Ç–∞–ª—å–Ω—ã–π —É–¥–∞—Ä $c2 –ø–æ–≤—Ä–µ–∂–¥–∞–µ—Ç —Ä–∞–∑—É–º $C2!", ch,0,victim,TO_NOTVICT);
 	  }
 	  else {
-	    act("Ì≈Œ‘¡ÃÿŒŸ  ’ƒ¡“ –œ◊“≈÷ƒ¡≈‘ ‘◊œ  “¡⁄’Õ!", ch,0,0,TO_CHAR);
-	    act("Ì≈Œ‘¡ÃÿŒŸ  ’ƒ¡“ $c2 –œ◊“≈÷ƒ¡≈‘ $s “¡⁄’Õ!", ch,0,0,TO_ROOM);
+	    act("–ú–µ–Ω—Ç–∞–ª—å–Ω—ã–π —É–¥–∞—Ä –ø–æ–≤—Ä–µ–∂–¥–∞–µ—Ç —Ç–≤–æ–π —Ä–∞–∑—É–º!", ch,0,0,TO_CHAR);
+	    act("–ú–µ–Ω—Ç–∞–ª—å–Ω—ã–π —É–¥–∞—Ä $c2 –ø–æ–≤—Ä–µ–∂–¥–∞–µ—Ç $s —Ä–∞–∑—É–º!", ch,0,0,TO_ROOM);
 	  }
 	}
   } catch (const VictimDeathException &) {
@@ -392,7 +392,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
 
   if (ch->isAffected(sn) || ch->hit > ch->max_hit)
     {
-      act("ÙŸ ’÷≈ –≈“≈–œÃŒ≈$gŒœ|Œ|Œ¡ ÷…⁄Œ≈ŒŒœ  ‹Œ≈“«…≈ .", ch, 0, 0, TO_CHAR);
+      act("–¢—ã —É–∂–µ –ø–µ—Ä–µ–ø–æ–ª–Ω–µ$g–Ω–æ|–Ω|–Ω–∞ –∂–∏–∑–Ω–µ–Ω–Ω–æ–π —ç–Ω–µ—Ä–≥–∏–µ–π.", ch, 0, 0, TO_CHAR);
       return;
     }
 
@@ -419,7 +419,7 @@ VOID_SPELL(Transform)::run( Character *ch, Character *, int sn, int level )
     af.bitvector = 0;
     affect_to_char( ch, &af );
 
-  ch->send_to("“…Ã…◊ ÷…⁄Œ≈ŒŒœ  ”…ÃŸ ⁄¡‘Õ≈◊¡≈‘ ‘◊œ  “¡⁄’Õ.\n\r");
+  ch->send_to("–ü—Ä–∏–ª–∏–≤ –∂–∏–∑–Ω–µ–Ω–Ω–æ–π —Å–∏–ª—ã –∑–∞—Ç–º–µ–≤–∞–µ—Ç —Ç–≤–æ–π —Ä–∞–∑—É–º.\n\r");
 
 }
 

@@ -56,9 +56,9 @@ void follower_add( Character *ch, Character *mch )
     ch->leader        = NULL;
 
     if (ch->master->can_see( ch ))
-       act( "$c1 ÔÅĞÅÒØ ÓÌÅÄÕÅÔ ÚÁ ÔÏÂÏÊ.", ch, 0, mch, TO_VICT );
+       act( "$c1 Ñ‚ĞµĞ¿ĞµÑ€ÑŒ ÑĞ»ĞµĞ´ÑƒĞµÑ‚ Ğ·Ğ° Ñ‚Ğ¾Ğ±Ğ¾Ğ¹.", ch, 0, mch, TO_VICT );
        
-    act( "ôÙ ÔÅĞÅÒØ ÓÌÅÄÕÅÛØ ÚÁ $C5.",  ch, 0, mch, TO_CHAR );
+    act( "Ğ¢Ñ‹ Ñ‚ĞµĞ¿ĞµÑ€ÑŒ ÑĞ»ĞµĞ´ÑƒĞµÑˆÑŒ Ğ·Ğ° $C5.",  ch, 0, mch, TO_CHAR );
 }
 
 static void afprog_stopfol( Character *ch )
@@ -94,9 +94,9 @@ void follower_stop( Character *ch )
     }
 
     if (master->can_see( ch )) 
-       act( "$c1 ÔÅĞÅÒØ ÎÅ ÓÌÅÄÕÅÔ ÚÁ ÔÏÂÏÊ.", ch, 0, master, TO_VICT );
+       act( "$c1 Ñ‚ĞµĞ¿ĞµÑ€ÑŒ Ğ½Ğµ ÑĞ»ĞµĞ´ÑƒĞµÑ‚ Ğ·Ğ° Ñ‚Ğ¾Ğ±Ğ¾Ğ¹.", ch, 0, master, TO_VICT );
 
-    act( "ôÙ ÔÅĞÅÒØ ÎÅ ÓÌÅÄÕÅÛØ ÚÁ $C5.", ch, 0, master, TO_CHAR );
+    act( "Ğ¢Ñ‹ Ñ‚ĞµĞ¿ĞµÑ€ÑŒ Ğ½Ğµ ÑĞ»ĞµĞ´ÑƒĞµÑˆÑŒ Ğ·Ğ° $C5.", ch, 0, master, TO_CHAR );
 
     afprog_stopfol( ch );
 
@@ -166,7 +166,7 @@ Character * follower_find( Character *ch, const char *cargument )
     number = number_argument( argument, arg );
     count  = 0;
 
-    if (!str_cmp( arg, "self" ) || !str_cmp( arg, "Ñ" ))
+    if (!str_cmp( arg, "self" ) || !str_cmp( arg, "Ñ" ))
 	return ch;
     
     for (wch = char_list; wch; wch = wch->next) {
@@ -195,7 +195,7 @@ Character * follower_find_nosee( Character *ch, const char *cargument )
     number = number_argument( argument, arg );
     count  = 0;
 
-    if (!str_cmp( arg, "self" ) || !str_cmp( arg, "Ñ" ))
+    if (!str_cmp( arg, "self" ) || !str_cmp( arg, "Ñ" ))
 	return ch;
     
     for (wch = char_list; wch; wch = wch->next) {
@@ -217,9 +217,9 @@ Character * follower_find_nosee( Character *ch, const char *cargument )
  */
 void guarding_stop( PCharacter *guard, PCharacter *victim )
 {
-    act("ôÙ ĞÒÅËÒÁİÁÅÛØ ÏÈÒÁÎÑÔØ $C4.", guard, 0, victim, TO_CHAR);
-    act("$c1 ĞÒÅËÒÁİÁÅÔ ÏÈÒÁÎÑÔØ ÔÅÂÑ.", guard, 0, victim, TO_VICT);
-    act("$c1 ĞÒÅËÒÁİÁÅÔ ÏÈÒÁÎÑÔØ $C4.", guard, 0, victim, TO_NOTVICT);
+    act("Ğ¢Ñ‹ Ğ¿Ñ€ĞµĞºÑ€Ğ°Ñ‰Ğ°ĞµÑˆÑŒ Ğ¾Ñ…Ñ€Ğ°Ğ½ÑÑ‚ÑŒ $C4.", guard, 0, victim, TO_CHAR);
+    act("$c1 Ğ¿Ñ€ĞµĞºÑ€Ğ°Ñ‰Ğ°ĞµÑ‚ Ğ¾Ñ…Ñ€Ğ°Ğ½ÑÑ‚ÑŒ Ñ‚ĞµĞ±Ñ.", guard, 0, victim, TO_VICT);
+    act("$c1 Ğ¿Ñ€ĞµĞºÑ€Ğ°Ñ‰Ğ°ĞµÑ‚ Ğ¾Ñ…Ñ€Ğ°Ğ½ÑÑ‚ÑŒ $C4.", guard, 0, victim, TO_NOTVICT);
     guard->guarding  = 0;
     victim->guarded_by = 0;
 }

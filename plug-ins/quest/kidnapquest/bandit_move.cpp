@@ -13,7 +13,7 @@
 
 
 /*
- * бандитская ходилка
+ * п╠п╟п╫п╢п╦я┌я│п╨п╟я▐ я┘п╬п╢п╦п╩п╨п╟
  */
 
 bool KidnapBandit::canEnter( Room *const room )
@@ -42,13 +42,13 @@ void KidnapBandit::princeHunt( )
     
     if (!path.empty( )) {
 	quest->getScenario( ).actHuntStep( ch );
-	debug( "Все назад, я делаю первый шаг как охотник!" );
+	debug( "п▓я│п╣ п╫п╟п╥п╟п╢, я▐ п╢п╣п╩п╟я▌ п©п╣я─п╡я▀п╧ я┬п╟пЁ п╨п╟п╨ п╬я┘п╬я┌п╫п╦п╨!" );
 	makeOneStep( );
     }
 
     if (ch->in_room == old_room && path.empty( )) {
 	quest->getScenario( ).actEmptyPath( ch, prince );
-	debug( "Не могу добраться до цели, ну-ка кто здесь?" );
+	debug( "п²п╣ п╪п╬пЁя┐ п╢п╬п╠я─п╟я┌я▄я│я▐ п╢п╬ я├п╣п╩п╦, п╫я┐-п╨п╟ п╨я┌п╬ п╥п╢п╣я│я▄?" );
 	heroAttack( );
     }
 }
@@ -69,13 +69,13 @@ void KidnapBandit::princeKidnap( )
 
     if (!path.empty( )) {
 	quest->getScenario( ).actKidnapStep( ch, prince );
-	debug( "Все назад, я делаю первый шаг как похититель!" );
+	debug( "п▓я│п╣ п╫п╟п╥п╟п╢, я▐ п╢п╣п╩п╟я▌ п©п╣я─п╡я▀п╧ я┬п╟пЁ п╨п╟п╨ п©п╬я┘п╦я┌п╦я┌п╣п╩я▄!" );
 	makeOneStep( );
     }
 
     if (ch->in_room == old_room && path.empty( )) {
 	quest->getScenario( ).actEmptyPath( ch, prince );
-	debug( "Мне некуда его волочь, ну-ка кто здесь?" );
+	debug( "п°п╫п╣ п╫п╣п╨я┐п╢п╟ п╣пЁп╬ п╡п╬п╩п╬я┤я▄, п╫я┐-п╨п╟ п╨я┌п╬ п╥п╢п╣я│я▄?" );
 	heroAttack( );
     }
 }

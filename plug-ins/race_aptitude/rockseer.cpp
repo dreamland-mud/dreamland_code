@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "skillmanager.h"
 #include "spelltemplate.h"
@@ -34,9 +34,9 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
   if ( victim->isAffected(sn ) )
     {
       if (victim == ch)
-       	ch->send_to("Твоя кожа уже подобна камню.\n\r");
+       	ch->send_to("п╒п╡п╬я▐ п╨п╬п╤п╟ я┐п╤п╣ п©п╬п╢п╬п╠п╫п╟ п╨п╟п╪п╫я▌.\n\r");
       else
-       	act_p("Кожа $C2 уже подобна камню.",ch,0,victim,TO_CHAR,POS_RESTING);
+       	act_p("п п╬п╤п╟ $C2 я┐п╤п╣ п©п╬п╢п╬п╠п╫п╟ п╨п╟п╪п╫я▌.",ch,0,victim,TO_CHAR,POS_RESTING);
       return;
     }
   af.where	= TO_AFFECTS;
@@ -47,9 +47,9 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
   af.modifier  = -100;
   af.bitvector = 0;
   affect_to_char( victim, &af );
-  act_p( "Кожа $c2 затвердевает, становясь подобной камню.",
+  act_p( "п п╬п╤п╟ $c2 п╥п╟я┌п╡п╣я─п╢п╣п╡п╟п╣я┌, я│я┌п╟п╫п╬п╡я▐я│я▄ п©п╬п╢п╬п╠п╫п╬п╧ п╨п╟п╪п╫я▌.",
           victim,0,0,TO_ROOM,POS_RESTING);
-  victim->send_to("Твоя кожа затвердевает, становясь подобной камню.\n\r");
+  victim->send_to("п╒п╡п╬я▐ п╨п╬п╤п╟ п╥п╟я┌п╡п╣я─п╢п╣п╡п╟п╣я┌, я│я┌п╟п╫п╬п╡я▐я│я▄ п©п╬п╢п╬п╠п╫п╬п╧ п╨п╟п╪п╫я▌.\n\r");
   return;
 
 }

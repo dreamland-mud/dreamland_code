@@ -42,12 +42,12 @@ void Language::run( Character *ach, const DLString &constArguments )
     ch = ach->getPC( );
 
     if (!ch) {
-	ch->println( "Ì’’-’-’." );
+	ch->println( "–ú—É—É-—É-—É." );
 	return;
     }
 
     if (arg.empty( )) {
-	ch->pecho( "˛‘œ ‘Ÿ »œﬁ≈€ÿ –“œ…⁄Œ≈”‘… Œ¡ %^N6?", nameRus.getValue( ).c_str( ) );
+	ch->pecho( "–ß—Ç–æ —Ç—ã —Ö–æ—á–µ—à—å –ø—Ä–æ–∏–∑–Ω–µ—Å—Ç–∏ –Ω–∞ %^N6?", nameRus.getValue( ).c_str( ) );
 	return;
     }
     
@@ -62,7 +62,7 @@ void Language::run( Character *ach, const DLString &constArguments )
     }
     
     if (!available( ch )) {
-	ch->pecho( "ÙŸ Œ≈ ’Õ≈≈€ÿ “¡⁄«œ◊¡“…◊¡‘ÿ Œ¡ %^N6.", nameRus.getValue( ).c_str( ) );
+	ch->pecho( "–¢—ã –Ω–µ —É–º–µ–µ—à—å —Ä–∞–∑–≥–æ–≤–∞—Ä–∏–≤–∞—Ç—å –Ω–∞ %^N6.", nameRus.getValue( ).c_str( ) );
 	return;
     }
 
@@ -71,12 +71,12 @@ void Language::run( Character *ach, const DLString &constArguments )
 	return;
     }
         
-    if (arg_oneof( arg, "sense", "”ÕŸ”Ã" )) {
+    if (arg_oneof( arg, "sense", "—Å–º—ã—Å–ª" )) {
 	doIdent( ch, arguments );
 	return;
     }
 
-    if (arg_oneof( arg, "forget", "⁄¡¬Ÿ‘ÿ" )) {
+    if (arg_oneof( arg, "forget", "–∑–∞–±—ã—Ç—å" )) {
 	doForget( ch );
 	return;
     }
@@ -100,8 +100,8 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     chance = getEffective( ch );
     
     if (number_percent( ) > chance || ch->isAffected( gsn_garble )) {
-	ch->println( "Ù≈¬— –œƒ◊≈Ãœ –“œ…⁄Œœ€≈Œ…≈." );
-	ch->recho( POS_RESTING, "%^C1 ¬œ“Õœﬁ≈‘ ﬁ‘œ-‘œ Œ≈“¡⁄¬œ“ﬁ…◊œ≈.", ch );
+	ch->println( "–¢–µ–±—è –ø–æ–¥–≤–µ–ª–æ –ø—Ä–æ–∏–∑–Ω–æ—à–µ–Ω–∏–µ." );
+	ch->recho( POS_RESTING, "%^C1 –±–æ—Ä–º–æ—á–µ—Ç —á—Ç–æ-—Ç–æ –Ω–µ—Ä–∞–∑–±–æ—Ä—á–∏–≤–æ–µ.", ch );
 	ch->setWait( getBeats( ) / 2 );
 	return;
     }
@@ -127,20 +127,20 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
   
     if (obj) {
 	if (number_bits( 1 ))
-	    ch->pecho( "ÙŸ –“œ◊œƒ…€ÿ “’Àœ  Œ¡ƒ %O5 … …⁄“≈À¡≈€ÿ '{C%s{x'.", obj, arg1.c_str( ) );
+	    ch->pecho( "–¢—ã –ø—Ä–æ–≤–æ–¥–∏—à—å —Ä—É–∫–æ–π –Ω–∞–¥ %O5 –∏ –∏–∑—Ä–µ–∫–∞–µ—à—å '{C%s{x'.", obj, arg1.c_str( ) );
 	else
-	    ch->pecho( "ÙŸ …⁄“≈À¡≈€ÿ, «Ã—ƒ— Œ¡ %O4: '{C%s{x'.", obj, arg1.c_str( ) );
+	    ch->pecho( "–¢—ã –∏–∑—Ä–µ–∫–∞–µ—à—å, –≥–ª—è–¥—è –Ω–∞ %O4: '{C%s{x'.", obj, arg1.c_str( ) );
     }
     else if (!victim || victim == ch)
-	ch->pecho( "ÙŸ …⁄“≈À¡≈€ÿ '{C%s{x'", arg1.c_str( ) );
+	ch->pecho( "–¢—ã –∏–∑—Ä–µ–∫–∞–µ—à—å '{C%s{x'", arg1.c_str( ) );
     else {
-	ch->pecho( "ÙŸ …⁄“≈À¡≈€ÿ, ’À¡⁄Ÿ◊¡— Œ¡ %^C4: '{C%s{x'", victim, arg1.c_str( ) );
+	ch->pecho( "–¢—ã –∏–∑—Ä–µ–∫–∞–µ—à—å, —É–∫–∞–∑—ã–≤–∞—è –Ω–∞ %^C4: '{C%s{x'", victim, arg1.c_str( ) );
 	
 	if (IS_AWAKE(victim) && !victim->isAffected( gsn_deafen )) {
 	    if (getEffective( victim ) < number_percent( ))
-		victim->pecho( "%^C1 ﬁ‘œ-‘œ –“œ…⁄Œœ”…‘, ’À¡⁄Ÿ◊¡— ◊ ‘◊œ¿ ”‘œ“œŒ’.", ch );
+		victim->pecho( "%^C1 —á—Ç–æ-—Ç–æ –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç, —É–∫–∞–∑—ã–≤–∞—è –≤ —Ç–≤–æ—é —Å—Ç–æ—Ä–æ–Ω—É.", ch );
 	    else 
-		victim->pecho( "%^C1 …⁄“≈À¡≈‘ Œ¡ %^N6, ’À¡⁄Ÿ◊¡— ◊ ‘◊œ¿ ”‘œ“œŒ’: '{C%s{x'",
+		victim->pecho( "%^C1 –∏–∑—Ä–µ–∫–∞–µ—Ç –Ω–∞ %^N6, —É–∫–∞–∑—ã–≤–∞—è –≤ —Ç–≤–æ—é —Å—Ç–æ—Ä–æ–Ω—É: '{C%s{x'",
 		               ch, nameRus.getValue( ).c_str( ), arg1.c_str( ) );
         }
     }
@@ -156,19 +156,19 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
 	    continue;
 
 	if (getEffective( rch ) < number_percent( ))
-	    rch->pecho( "%^C1 ﬁ‘œ-‘œ ¬œ“Õœﬁ≈‘ Œ¡ ”‘“¡ŒŒœÕ —⁄ŸÀ≈.", ch );
+	    rch->pecho( "%^C1 —á—Ç–æ-—Ç–æ –±–æ—Ä–º–æ—á–µ—Ç –Ω–∞ —Å—Ç—Ä–∞–Ω–Ω–æ–º —è–∑—ã–∫–µ.", ch );
 	else 
-	    rch->pecho( "%^C1 …⁄“≈À¡≈‘ Œ¡ %^N6 '{C%s{x'", 
+	    rch->pecho( "%^C1 –∏–∑—Ä–µ–∫–∞–µ—Ç –Ω–∞ %^N6 '{C%s{x'", 
 	                ch, nameRus.getValue( ).c_str( ), arg1.c_str( ) );
     }
     
     if (word.empty( ) || !effect) {
-	act( "{CÓ¡ Õ«Œœ◊≈Œ…≈ ◊”≈ ◊œÀ“’« ”‘…»Ãœ.{x", ch, 0, 0, TO_ALL );
+	act( "{C–ù–∞ –º–≥–Ω–æ–≤–µ–Ω–∏–µ –≤—Å–µ –≤–æ–∫—Ä—É–≥ —Å—Ç–∏—Ö–ª–æ.{x", ch, 0, 0, TO_ALL );
 	return;
     }
 
     if (effect->isObject( ) && !obj) {
-	ch->println("ÛÃœ◊œ Œ≈ ƒœ”‘…«Ãœ √≈Ã….");
+	ch->println("–°–ª–æ–≤–æ –Ω–µ –¥–æ—Å—Ç–∏–≥–ª–æ —Ü–µ–ª–∏.");
 	fUsed = false;
     }
     else if (obj) {
@@ -176,7 +176,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     }
     else {
 	if (fMiss)
-	    ch->pecho( "Ù◊œ… ”Ãœ◊¡, Œ≈ ƒœ”‘…«Œ’◊ √≈Ã…, œ¬“¡‘…Ã…”ÿ Œ¡ ‘≈¬— ”¡Õ%Gœ«œ|œ«œ|’.", ch );
+	    ch->pecho( "–¢–≤–æ–∏ —Å–ª–æ–≤–∞, –Ω–µ –¥–æ—Å—Ç–∏–≥–Ω—É–≤ —Ü–µ–ª–∏, –æ–±—Ä–∞—Ç–∏–ª–∏—Å—å –Ω–∞ —Ç–µ–±—è —Å–∞–º%G–æ–≥–æ|–æ–≥–æ|—É.", ch );
 	
 	fUsed = effect->run( ch, (!victim ? ch : victim) );
     }
@@ -184,10 +184,10 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     if (fUsed) {
 	wcontainer->wordUsed( word, ch );
 	improve( ch, true );
-	wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 …⁄“≈À¡≈‘ ”Ãœ◊œ '%s' (%s) Œ¡ %s.", 
+	wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 –∏–∑—Ä–µ–∫–∞–µ—Ç —Å–ª–æ–≤–æ '%s' (%s) –Ω–∞ %s.", 
 		ch, word.toStr( ), word.effect.getValue( ).c_str( ),
 		(obj ? obj->getShortDescr( '4' ).c_str( ) :
-		       !victim || victim == ch ? "”≈¬—" : 
+		       !victim || victim == ch ? "—Å–µ–±—è" : 
 		                                 victim->getNameP( '4' ).c_str( ) ));
     }
 
@@ -199,7 +199,7 @@ void Language::doList( PCharacter *ch ) const
     const LanguageManager::Words &words = languageManager->getWords( );
     LanguageManager::Words::const_iterator i;
     
-    ch->pecho( "Ù≈À’›…  ”Ãœ◊¡“ŒŸ  ⁄¡–¡” ƒÃ— —⁄ŸÀ¡ {c%N1{x: ", nameRus.getValue( ).c_str( ) );
+    ch->pecho( "–¢–µ–∫—É—â–∏–π —Å–ª–æ–≤–∞—Ä–Ω—ã–π –∑–∞–ø–∞—Å –¥–ª—è —è–∑—ã–∫–∞ {c%N1{x: ", nameRus.getValue( ).c_str( ) );
 	
     for (i = words.begin( ); i != words.end( ); i++) {
 	const Word & w = i->second;
@@ -223,7 +223,7 @@ void Language::doKnown( PCharacter *ch ) const
     bool hasDreams = showDreams( ch );
     bool hasRewards = showRewards( ch );
     if (!hasDreams && !hasRewards)
-	ch->println( "ÙŸ Œ≈ Õœ÷≈€ÿ ◊”–œÕŒ…‘ÿ Œ… œƒŒœ«œ ”Ãœ◊¡." );
+	ch->println( "–¢—ã –Ω–µ –º–æ–∂–µ—à—å –≤—Å–ø–æ–º–Ω–∏—Ç—å –Ω–∏ –æ–¥–Ω–æ–≥–æ —Å–ª–æ–≤–∞." );
 }
 
 /*
@@ -240,14 +240,14 @@ bool Language::showDreams( PCharacter *ch ) const
     attrHints = ch->getAttributes( ).findAttr<XMLAttributeLanguageHints>( "languageHints" );
     
     if (!attr) {
-//	ch->println( "Ù≈¬≈ Œ… “¡⁄’ Œ…ﬁ≈«œ Œ≈ ”Œ…Ãœ”ÿ." );
+//	ch->println( "–¢–µ–±–µ –Ω–∏ —Ä–∞–∑—É –Ω–∏—á–µ–≥–æ –Ω–µ —Å–Ω–∏–ª–æ—Å—å." );
 	return false;
     }
 	
     XMLAttributeLanguage::Words &words = attr->getWords( );
 
     if (words.empty( )) {
-//	ch->println( "˜”≈ ”ŒŸ ƒ¡◊Œœ ⁄¡¬ŸÃ…”ÿ." );
+//	ch->println( "–í—Å–µ —Å–Ω—ã –¥–∞–≤–Ω–æ –∑–∞–±—ã–ª–∏—Å—å." );
 	return false;
     }
     
@@ -274,12 +274,12 @@ bool Language::showDreams( PCharacter *ch ) const
     }
 
     if (buf.str( ).empty( )) {
-        ch->pecho( "Ù≈¬≈ Œ… “¡⁄’ Œ…ﬁ≈«œ Œ≈ ”Œ…Ãœ”ÿ Œ¡ %N6.", nameRus.getValue( ).c_str( ) );
+        ch->pecho( "–¢–µ–±–µ –Ω–∏ —Ä–∞–∑—É –Ω–∏—á–µ–≥–æ –Ω–µ —Å–Ω–∏–ª–æ—Å—å –Ω–∞ %N6.", nameRus.getValue( ).c_str( ) );
         return true;
     }
 
     buf << endl;
-    ch->pecho( "Ù≈¬≈ –“…”Œ…Ã…”ÿ … ⁄¡–œÕŒ…Ã…”ÿ ”Ãœ◊¡ Œ¡ %N6: ", nameRus.getValue( ).c_str( ) );
+    ch->pecho( "–¢–µ–±–µ –ø—Ä–∏—Å–Ω–∏–ª–∏—Å—å –∏ –∑–∞–ø–æ–º–Ω–∏–ª–∏—Å—å —Å–ª–æ–≤–∞ –Ω–∞ %N6: ", nameRus.getValue( ).c_str( ) );
     ch->send_to( buf );
     return true;
 }
@@ -344,7 +344,7 @@ bool Language::showRewards( PCharacter *ch ) const
         return false;
     }
 
-    ch->println( "Ù≈¬≈ ”œœ¬›…Ã… ‘¡À…≈ ”Ãœ◊¡ Œ¡ “¡⁄ŒŸ» —⁄ŸÀ¡»: " );
+    ch->println( "–¢–µ–±–µ —Å–æ–æ–±—â–∏–ª–∏ —Ç–∞–∫–∏–µ —Å–ª–æ–≤–∞ –Ω–∞ —Ä–∞–∑–Ω—ã—Ö —è–∑—ã–∫–∞—Ö: " );
     ch->send_to( buf );
     return true;
 }
@@ -356,25 +356,25 @@ void Language::doIdent( PCharacter *ch, DLString &arg ) const
     Word word;
     
     if (arg.empty( )) {
-	ch->println( "ÛÕŸ”Ã ﬁ≈«œ ‘Ÿ –Ÿ‘¡≈€ÿ”— –œŒ—‘ÿ?" );
+	ch->println( "–°–º—ã—Å–ª —á–µ–≥–æ —Ç—ã –ø—ã—Ç–∞–µ—à—å—Å—è –ø–æ–Ω—è—Ç—å?" );
 	return;
     }
     
     chance = getLearned( ch );
     
     if (chance < SKILL_SENSE || number_percent( ) > chance) {
-	ch->pecho( "Ù¡ ŒŸ  ”ÕŸ”Ã ”Ãœ◊ %^N2 ’”ÀœÃÿ⁄¡≈‘ œ‘ ‘≈¬—.", nameRus.getValue( ).c_str( ) );
+	ch->pecho( "–¢–∞–π–Ω—ã–π —Å–º—ã—Å–ª —Å–ª–æ–≤ %^N2 —É—Å–∫–æ–ª—å–∑–∞–µ—Ç –æ—Ç —Ç–µ–±—è.", nameRus.getValue( ).c_str( ) );
 	return;
     }
 
     if (!locateWord( word, ch, arg ) || !( ef = word.getEffect( ) )) {
-	ch->pecho( "˙◊’ﬁ¡Œ…≈ ”Ãœ◊¡ %s À¡÷≈‘”— ‘≈¬≈ ¬≈””ÕŸ”Ã≈ŒŒŸÕ.", arg.c_str( ) );
+	ch->pecho( "–ó–≤—É—á–∞–Ω–∏–µ —Å–ª–æ–≤–∞ %s –∫–∞–∂–µ—Ç—Å—è —Ç–µ–±–µ –±–µ—Å—Å–º—ã—Å–ª–µ–Ω–Ω—ã–º.", arg.c_str( ) );
 	return;
     }
 
-    ch->pecho( "˙Œ¡Œ…≈ —⁄ŸÀ¡ –œÕœ«¡≈‘ ‘≈¬≈ –“…–œƒŒ—‘ÿ ⁄¡◊≈”’ ‘¡ ŒŸ Œ¡ƒ ”Ãœ◊œÕ '{c%s{x':", arg.c_str( ) );
-    ch->pecho( "œŒœ ”œƒ≈“÷…‘ ◊ ”≈¬≈ ”≈À“≈‘ {c%N2{x.", ef->getMeaning( ).c_str( ) );
-    wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 ’⁄Œ¡≈‘ ”ÕŸ”Ã ”Ãœ◊¡ '%s' (%s).", 
+    ch->pecho( "–ó–Ω–∞–Ω–∏–µ —è–∑—ã–∫–∞ –ø–æ–º–æ–≥–∞–µ—Ç —Ç–µ–±–µ –ø—Ä–∏–ø–æ–¥–Ω—è—Ç—å –∑–∞–≤–µ—Å—É —Ç–∞–π–Ω—ã –Ω–∞–¥ —Å–ª–æ–≤–æ–º '{c%s{x':", arg.c_str( ) );
+    ch->pecho( "–æ–Ω–æ —Å–æ–¥–µ—Ä–∂–∏—Ç –≤ —Å–µ–±–µ —Å–µ–∫—Ä–µ—Ç {c%N2{x.", ef->getMeaning( ).c_str( ) );
+    wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 —É–∑–Ω–∞–µ—Ç —Å–º—ã—Å–ª —Å–ª–æ–≤–∞ '%s' (%s).", 
 	    ch, word.toStr( ), word.effect.getValue( ).c_str( ) );
 
     XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).getAttr<XMLAttributeLanguageHints>( "languageHints" );
@@ -396,9 +396,9 @@ void Language::doForget( PCharacter *ch ) const
         }
 
 	attr->getWords( ).clear( );
-	ch->println( "˜”≈ –“…”Œ…◊€…≈”— ‘≈¬≈ ”Ãœ◊¡ ’”ÀœÃÿ⁄¡¿‘ …⁄ ‘◊œ≈  –¡Õ—‘…." );
+	ch->println( "–í—Å–µ –ø—Ä–∏—Å–Ω–∏–≤—à–∏–µ—Å—è —Ç–µ–±–µ —Å–ª–æ–≤–∞ —É—Å–∫–æ–ª—å–∑–∞—é—Ç –∏–∑ —Ç–≤–æ–µ–π –ø–∞–º—è—Ç–∏." );
     }
     else
-	ch->println( "Ù≈¬≈ Œ≈ﬁ≈«œ ⁄¡¬Ÿ◊¡‘ÿ." );
+	ch->println( "–¢–µ–±–µ –Ω–µ—á–µ–≥–æ –∑–∞–±—ã–≤–∞—Ç—å." );
 }
 

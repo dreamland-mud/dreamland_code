@@ -77,16 +77,16 @@ bool Character::is_adrenalined( ) const
  */
 void PCharacter::check_hit_newbie( Character *victim )
 {
-	// памятка: "как попасть в аутсайдеры"
-#warning надо б добавить код дуэлей к Character::check_hit_newbie()
+	// п©п╟п╪я▐я┌п╨п╟: "п╨п╟п╨ п©п╬п©п╟я│я┌я▄ п╡ п╟я┐я┌я│п╟п╧п╢п╣я─я▀"
+#warning п╫п╟п╢п╬ п╠ п╢п╬п╠п╟п╡п╦я┌я▄ п╨п╬п╢ п╢я┐я█п╩п╣п╧ п╨ Character::check_hit_newbie()
 
-	if ( getClan() != clan_none ) // клановые не считаются
+	if ( getClan() != clan_none ) // п╨п╩п╟п╫п╬п╡я▀п╣ п╫п╣ я│я┤п╦я┌п╟я▌я┌я│я▐
 		return;
 
-	if ( victim->is_npc() ) // на всякий случай
+	if ( victim->is_npc() ) // п╫п╟ п╡я│я▐п╨п╦п╧ я│п╩я┐я┤п╟п╧
 		return;
 
-	if ( victim->getClan() != clan_none ) // нападения на клановых - прямой путь в out-s :)
+	if ( victim->getClan() != clan_none ) // п╫п╟п©п╟п╢п╣п╫п╦я▐ п╫п╟ п╨п╩п╟п╫п╬п╡я▀я┘ - п©я─я▐п╪п╬п╧ п©я┐я┌я▄ п╡ out-s :)
 	{
 		interpret_raw(this, "clan", "petition outsider");
 		return;
@@ -94,7 +94,7 @@ void PCharacter::check_hit_newbie( Character *victim )
 
 	newbie_hit_counter.setValue( newbie_hit_counter.getValue() + 1 );
 	
-	if ( newbie_hit_counter.getValue() > 10 ) // на неклановых можно нападать.. но недолго
+	if ( newbie_hit_counter.getValue() > 10 ) // п╫п╟ п╫п╣п╨п╩п╟п╫п╬п╡я▀я┘ п╪п╬п╤п╫п╬ п╫п╟п©п╟п╢п╟я┌я▄.. п╫п╬ п╫п╣п╢п╬п╩пЁп╬
 	{
 		interpret_raw(this, "clan", "petition outsider");
 		return;

@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -38,14 +38,14 @@ SPELL_DECL(Aid);
 VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     if (ch->isAffected(sn)) {
-	ch->send_to("üÔÏ ÚÁËÌÉÎÁÎÉÅ ÉÓÐÏÌØÚÏ×ÁÌÏÓØ ÓÏ×ÓÅÍ ÎÅÄÁ×ÎÏ.\n\r");
+	ch->send_to("Ð­Ñ‚Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ´Ð°Ð²Ð½Ð¾.\n\r");
 	return;
     }
 
     victim->hit += level * 5;
     update_pos( victim );
-    victim->send_to("÷ÏÌÎÁ ÔÅÐÌÁ ÓÏÇÒÅ×ÁÅÔ Ô×ÏÅ ÔÅÌÏ.\n\r");
-    act_p("$c1 ×ÙÇÌÑÄÉÔ ÌÕÞÛÅ.", victim, 0, 0, TO_ROOM,POS_RESTING);
+    victim->send_to("Ð’Ð¾Ð»Ð½Ð° Ñ‚ÐµÐ¿Ð»Ð° ÑÐ¾Ð³Ñ€ÐµÐ²Ð°ÐµÑ‚ Ñ‚Ð²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.\n\r");
+    act_p("$c1 Ð²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ Ð»ÑƒÑ‡ÑˆÐµ.", victim, 0, 0, TO_ROOM,POS_RESTING);
     if (ch != victim) ch->send_to("Ok.\n\r");
 
     postaffect_to_char(ch, sn, level / 50);
@@ -57,14 +57,14 @@ VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level )
 { 
 	if ( ch->isAffected(sn ) )
 	{
-		ch->send_to("üÔÏ ÚÁËÌÉÎÁÎÉÅ ÉÓÐÏÌØÚÏ×ÁÌÏÓØ ÓÏ×ÓÅÍ ÎÅÄÁ×ÎÏ.\n\r");
+		ch->send_to("Ð­Ñ‚Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ´Ð°Ð²Ð½Ð¾.\n\r");
 		return;
 	}
 
 	victim->hit += 100 + level * 5;
 	update_pos( victim );
-	victim->send_to("÷ÏÌÎÁ ÔÅÐÌÁ ÓÏÇÒÅ×ÁÅÔ Ô×ÏÅ ÔÅÌÏ.\n\r");
-	act_p("$c1 ×ÙÇÌÑÄÉÔ ÌÕÞÛÅ.", victim, 0, 0, TO_ROOM,POS_RESTING);
+	victim->send_to("Ð’Ð¾Ð»Ð½Ð° Ñ‚ÐµÐ¿Ð»Ð° ÑÐ¾Ð³Ñ€ÐµÐ²Ð°ÐµÑ‚ Ñ‚Ð²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.\n\r");
+	act_p("$c1 Ð²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ Ð»ÑƒÑ‡ÑˆÐµ.", victim, 0, 0, TO_ROOM,POS_RESTING);
 	if ( ch != victim )
 		ch->send_to("Ok.\n\r");
 
@@ -77,10 +77,10 @@ VOID_SPELL(Refresh)::run( Character *ch, Character *victim, int sn, int level )
     victim->move = min( victim->move + level, (int)victim->max_move );
     if (victim->max_move == victim->move)
     {
-        act("ôÙ ÐÏÌ$gÎÏ|ÏÎ|ÎÁ ÓÉÌ!", victim, 0, 0, TO_CHAR);
+        act("Ð¢Ñ‹ Ð¿Ð¾Ð»$gÐ½Ð¾|Ð¾Ð½|Ð½Ð° ÑÐ¸Ð»!", victim, 0, 0, TO_CHAR);
     }
     else
-	victim->send_to("õÓÔÁÌÏÓÔØ ÐÒÏÈÏÄÉÔ.\n\r");
+	victim->send_to("Ð£ÑÑ‚Ð°Ð»Ð¾ÑÑ‚ÑŒ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ñ‚.\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -98,7 +98,7 @@ VOID_SPELL(CureLight)::run( Character *ch, Character *victim, int sn, int level 
     
     victim->hit = min( victim->hit + heal, (int)victim->max_hit );
     update_pos( victim );
-    victim->send_to("ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÓÅÂÑ ÓÌÅÇËÁ ÌÕÞÛÅ!\n\r");
+    victim->send_to("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÑÐµÐ±Ñ ÑÐ»ÐµÐ³ÐºÐ° Ð»ÑƒÑ‡ÑˆÐµ!\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -113,7 +113,7 @@ VOID_SPELL(CureSerious)::run( Character *ch, Character *victim, int sn, int leve
 
     victim->hit = min( victim->hit + heal, (int)victim->max_hit );
     update_pos( victim );
-    victim->send_to("ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÓÅÂÑ ÌÕÞÛÅ!\n\r");
+    victim->send_to("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÑÐµÐ±Ñ Ð»ÑƒÑ‡ÑˆÐµ!\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -128,7 +128,7 @@ VOID_SPELL(CureCritical)::run( Character *ch, Character *victim, int sn, int lev
     
     victim->hit = min( victim->hit + heal, (int)victim->max_hit );
     update_pos( victim );
-    victim->send_to("ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÓÅÂÑ ÎÁÍÎÏÇÏ ÌÕÞÛÅ!\n\r");
+    victim->send_to("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÑÐµÐ±Ñ Ð½Ð°Ð¼Ð½Ð¾Ð³Ð¾ Ð»ÑƒÑ‡ÑˆÐµ!\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -144,7 +144,7 @@ VOID_SPELL(Heal)::run( Character *ch, Character *victim, int sn, int level )
     victim->hit = min( victim->hit, victim->max_hit );
     
     update_pos( victim );
-    victim->send_to("÷ÏÌÎÁ ÔÅÐÌÁ ÓÏÇÒÅ×ÁÅÔ Ô×ÏÅ ÔÅÌÏ.\n\r");
+    victim->send_to("Ð’Ð¾Ð»Ð½Ð° Ñ‚ÐµÐ¿Ð»Ð° ÑÐ¾Ð³Ñ€ÐµÐ²Ð°ÐµÑ‚ Ñ‚Ð²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -159,7 +159,7 @@ VOID_SPELL(SuperiorHeal)::run( Character *ch, Character *victim, int sn, int lev
     victim->hit = min( victim->hit, victim->max_hit );
 
     update_pos( victim );
-    victim->send_to("÷ÏÌÎÁ ÔÅÐÌÁ ÏËÕÔÙ×ÁÅÔ ÔÅÂÑ.\n\r");
+    victim->send_to("Ð’Ð¾Ð»Ð½Ð° Ñ‚ÐµÐ¿Ð»Ð° Ð¾ÐºÑƒÑ‚Ñ‹Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -175,7 +175,7 @@ VOID_SPELL(MasterHealing)::run( Character *ch, Character *victim, int sn, int le
     victim->hit = min( victim->hit, victim->max_hit );
 
     update_pos( victim );
-    victim->send_to("÷ÏÌÎÁ ÔÅÐÌÁ ÓÏÇÒÅ×ÁÅÔ Ô×ÏÅ ÔÅÌÏ.\n\r");
+    victim->send_to("Ð’Ð¾Ð»Ð½Ð° Ñ‚ÐµÐ¿Ð»Ð° ÑÐ¾Ð³Ñ€ÐµÐ²Ð°ÐµÑ‚ Ñ‚Ð²Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.\n\r");
 
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -238,12 +238,12 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     bool removed = false;
 
     if (ch == victim) {
-	ch->send_to( "üÔÏ ÚÁËÌÉÎÁÎÉÅ ÔÙ ÍÏÖÅÛØ ÉÓÐÏÌØÚÏ×ÁÔØ ÔÏÌØËÏ ÎÁ ÄÒÕÇÉÈ.\r\n" );
+	ch->send_to( "Ð­Ñ‚Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð½Ð° Ð´Ñ€ÑƒÐ³Ð¸Ñ….\r\n" );
 	return;
     }
 
     if (ch->isAffected(sn )) {
-	ch->send_to( "üÔÏ ÚÁËÌÉÎÁÎÉÅ ÉÓÐÏÌØÚÏ×ÁÌÏÓØ ÓÏ×ÓÅÍ ÎÅÄÁ×ÎÏ.\r\n" );
+	ch->send_to( "Ð­Ñ‚Ð¾ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ´Ð°Ð²Ð½Ð¾.\r\n" );
 	return;
     }
 
@@ -251,7 +251,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
 	&& (paf = victim->affected->affect_find(gsn_plague)) != NULL)
     {
         affect_join( ch, paf );
-	ch->send_to( "ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÖÁÒ É ÌÉÈÏÒÁÄËÕ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ Ð¶Ð°Ñ€ Ð¸ Ð»Ð¸Ñ…Ð¾Ñ€Ð°Ð´ÐºÑƒ.\r\n" );
 	removed = true;
         affect_strip( victim, gsn_plague );
     }
@@ -260,7 +260,7 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
 	&& (paf = victim->affected->affect_find(gsn_poison)) != NULL)
     {
         affect_join( ch, paf );
-	ch->send_to( "ôÙ ÞÕ×ÓÔ×ÕÅÛØ ÓÅÂÑ ÏÞÅÎØ ÂÏÌÅÚÎÅÎÎÏ.\r\n" );
+	ch->send_to( "Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÑÐµÐ±Ñ Ð¾Ñ‡ÐµÐ½ÑŒ Ð±Ð¾Ð»ÐµÐ·Ð½ÐµÐ½Ð½Ð¾.\r\n" );
 	removed = true;
         affect_strip( victim, gsn_poison );
     }
@@ -272,13 +272,13 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     af.modifier         = 0;
 
     if (!removed && victim->max_hit == victim->hit) {
-	act_p( "ëÁÖÅÔÓÑ, $C1 ÁÂÓÏÌÀÔÎÏ ÚÄÏÒÏ$G×Ï|×|×Á", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p( "ÐšÐ°Ð¶ÐµÑ‚ÑÑ, $C1 Ð°Ð±ÑÐ¾Ð»ÑŽÑ‚Ð½Ð¾ Ð·Ð´Ð¾Ñ€Ð¾$GÐ²Ð¾|Ð²|Ð²Ð°", ch, 0, victim, TO_CHAR, POS_RESTING);
 	af.duration = 1;
     
     } else {
-	act_p( "óÏÓÒÅÄÏÔÏÞÉ×ÛÉÓØ, ÔÙ ÐÅÒÅÎÏÓÉÛØ ÒÁÎÙ $C2 ÎÁ ÓÏÂÓÔ×ÅÎÎÏÅ ÔÅÌÏ.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	act_p( "óÏÓÒÅÄÏÔÏÞÉ×ÛÉÓØ, $c1 ÐÅÒÅÎÏÓÉÔ Ô×ÏÉ ÒÁÎÙ ÎÁ ÓÏÂÓÔ×ÅÎÎÏÅ ÔÅÌÏ.", ch, 0, victim, TO_VICT, POS_RESTING);
-	act_p( "óÏÓÒÅÄÏÔÏÞÉ×ÛÉÓØ, $c1 ÐÅÒÅÎÏÓÉÔ ÒÁÎÙ $C2 ÎÁ ÓÏÂÓÔ×ÅÎÎÏÅ ÔÅÌÏ.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+	act_p( "Ð¡Ð¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡Ð¸Ð²ÑˆÐ¸ÑÑŒ, Ñ‚Ñ‹ Ð¿ÐµÑ€ÐµÐ½Ð¾ÑÐ¸ÑˆÑŒ Ñ€Ð°Ð½Ñ‹ $C2 Ð½Ð° ÑÐ¾Ð±ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.", ch, 0, victim, TO_CHAR, POS_RESTING);
+	act_p( "Ð¡Ð¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡Ð¸Ð²ÑˆÐ¸ÑÑŒ, $c1 Ð¿ÐµÑ€ÐµÐ½Ð¾ÑÐ¸Ñ‚ Ñ‚Ð²Ð¾Ð¸ Ñ€Ð°Ð½Ñ‹ Ð½Ð° ÑÐ¾Ð±ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.", ch, 0, victim, TO_VICT, POS_RESTING);
+	act_p( "Ð¡Ð¾ÑÑ€ÐµÐ´Ð¾Ñ‚Ð¾Ñ‡Ð¸Ð²ÑˆÐ¸ÑÑŒ, $c1 Ð¿ÐµÑ€ÐµÐ½Ð¾ÑÐ¸Ñ‚ Ñ€Ð°Ð½Ñ‹ $C2 Ð½Ð° ÑÐ¾Ð±ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ðµ Ñ‚ÐµÐ»Ð¾.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
 
 	hp = victim->max_hit - victim->hit;
 	hp = URANGE( 0, hp, ch->hit - 1 );

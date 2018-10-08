@@ -24,7 +24,7 @@ public:
 	static const DLString TYPE;
 
 public:	
-	/** По умолчанию значение \0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ \0 */
 	inline Char( ) : value( '\0' )
 	{
 	}
@@ -59,10 +59,10 @@ public:
 	    return value;
 	}
 
-	/** Переводит символ в нижний регистр */
+	/** п÷п╣я─п╣п╡п╬п╢п╦я┌ я│п╦п╪п╡п╬п╩ п╡ п╫п╦п╤п╫п╦п╧ я─п╣пЁп╦я│я┌я─ */
 	static char lower( char c );
 	
-	/** Переводит символ в верхний регистр */
+	/** п÷п╣я─п╣п╡п╬п╢п╦я┌ я│п╦п╪п╡п╬п╩ п╡ п╡п╣я─я┘п╫п╦п╧ я─п╣пЁп╦я│я┌я─ */
 	static char upper( char c );
 	
 private:
@@ -71,7 +71,7 @@ private:
 
 
 
-/** Вывод в ostream типа Char */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ Char */
 inline std::ostream& operator << ( std::ostream& ostr, const Char& charValue )
 {
 	ostr << charValue.getValue( );

@@ -126,7 +126,7 @@ void LanguageManager::run( PCharacter *ch )
     attr->lastDreamTime = now; 
      
     lang->dream( word, ch );
-    wiznet( WIZ_LANGUAGE, 0, 0, "%^C3 ÓÎÉÔÓÑ ÓÌÏ×Ï '%s' (%s).", ch, word.toStr( ), word.effect.getValue( ).c_str( ) );
+    wiznet( WIZ_LANGUAGE, 0, 0, "%^C3 ÑÐ½Ð¸Ñ‚ÑÑ ÑÐ»Ð¾Ð²Ð¾ '%s' (%s).", ch, word.toStr( ), word.effect.getValue( ).c_str( ) );
 }
 
 void LanguageManager::after( )
@@ -180,7 +180,7 @@ void LanguageManager::wordUsed( const Word &word, PCharacter *ch )
     if (--w->second.count > 0)
 	return;
 
-    ch->pecho( "{wóÌÏ×Ï {w%s{w ÕÔÒÁÞÉ×ÁÅÔ ÓÉÌÕ.{x", 
+    ch->pecho( "{wÐ¡Ð»Ð¾Ð²Ð¾ {w%s{w ÑƒÑ‚Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÑ‚ ÑÐ¸Ð»Ñƒ.{x", 
                w->second.dictum.getValue( ).c_str( ) );
 
     words.erase( w );

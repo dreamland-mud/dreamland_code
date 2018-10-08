@@ -15,7 +15,7 @@
 #include "merc.h"
 #include "def.h"
 
-const DLString RaceAptitude::CATEGORY = "Расовые способности";
+const DLString RaceAptitude::CATEGORY = "п═п╟я│п╬п╡я▀п╣ я│п©п╬я│п╬п╠п╫п╬я│я┌п╦";
 
 RaceAptitude::RaceAptitude( ) 
 {
@@ -83,7 +83,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
         if (verbose)
-            ch->println( "Тебе не с кем практиковаться здесь." );
+            ch->println( "п╒п╣п╠п╣ п╫п╣ я│ п╨п╣п╪ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄я│я▐ п╥п╢п╣я│я▄." );
 	return false;
     }
     
@@ -91,7 +91,7 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 	return true;
 
     if (verbose)
-        ch->println( "Ты не можешь практиковать это здесь." );
+        ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©я─п╟п╨я┌п╦п╨п╬п╡п╟я┌я▄ я█я┌п╬ п╥п╢п╣я│я▄." );
     return false;
 }
 
@@ -99,20 +99,20 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
 {
     Races::iterator i;
 
-    buf << (spell ? "Заклинание" : "Умение") 
+    buf << (spell ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣") 
 	<< " '{W" << getName( ) << "{x'" 
 	<< " '{W" << getRussianName( ) << "{x'"
-	<< ", особенность ";
+	<< ", п╬я│п╬п╠п╣п╫п╫п╬я│я┌я▄ ";
 
     switch (races.size( )) {
     case 0:
-	buf << "неизвестной расы ";
+	buf << "п╫п╣п╦п╥п╡п╣я│я┌п╫п╬п╧ я─п╟я│я▀ ";
 	break;
     case 1:
-	buf << "расы ";
+	buf << "я─п╟я│я▀ ";
 	break;
     default:
-	buf << "рас ";
+	buf << "я─п╟я│ ";
 	break;
     }
 
@@ -124,17 +124,17 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     }
     
     buf << endl
-	<< "Входит в группу '{hg{W" << getGroup( )->getName( ) << "{x'";
+	<< "п▓я┘п╬п╢п╦я┌ п╡ пЁя─я┐п©п©я┐ '{hg{W" << getGroup( )->getName( ) << "{x'";
 	
     if (!visible( ch )) {
 	buf << endl;
 	return;
     }
 	
-    buf << ", уровень {W" << getLevel( ch ) << "{x";
+    buf << ", я┐я─п╬п╡п╣п╫я▄ {W" << getLevel( ch ) << "{x";
 
     if (available( ch ))
-	buf << ", изучено на {W" 
+	buf << ", п╦п╥я┐я┤п╣п╫п╬ п╫п╟ {W" 
 	    << ch->getSkillData( getIndex( ) ).learned 
 	    << "%{x";
 

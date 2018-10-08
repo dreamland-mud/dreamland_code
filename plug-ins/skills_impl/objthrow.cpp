@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "objthrow.h"
 
@@ -93,20 +93,20 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
 	return false;
 
     if (canCatchRock) {
-	act_p("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
-	act_p("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+	act_p("п╒я▀ п╩п╬п╡п╦я┬я▄ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
+	act_p("$C1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
+	act_p("$c1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
 	obj_to_char(obj,victim);
     }
     else if (canCatchMissile) {
-	act_p("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
-	act_p("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+	act_p("п╒я▀ п╩п╬п╡п╦я┬я▄ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
+	act_p("$C1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
+	act_p("$c1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
 	obj_to_char(obj,victim);
     } else {
-        act_p("Ты уклоняешься от $o2.",ch,obj,victim,TO_VICT,POS_RESTING);
-        act_p("$C1 уклоняется от $o2.",ch,obj,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 уклоняется от $o2.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+        act_p("п╒я▀ я┐п╨п╩п╬п╫я▐п╣я┬я▄я│я▐ п╬я┌ $o2.",ch,obj,victim,TO_VICT,POS_RESTING);
+        act_p("$C1 я┐п╨п╩п╬п╫я▐п╣я┌я│я▐ п╬я┌ $o2.",ch,obj,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 я┐п╨п╩п╬п╫я▐п╣я┌я│я▐ п╬я┌ $o2.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
         obj_to_room(obj,victim->in_room);
         gsn_dodge->improve( victim, true, ch );
     }
@@ -139,28 +139,28 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 	chance -= 10;
 
 	if (victim->in_room == dest_room)
-	{/* снайперским выстрелом попали в комнату с мишенью :-) */
+	{/* я│п╫п╟п╧п©п╣я─я│п╨п╦п╪ п╡я▀я│я┌я─п╣п╩п╬п╪ п©п╬п©п╟п╩п╦ п╡ п╨п╬п╪п╫п╟я┌я┐ я│ п╪п╦я┬п╣п╫я▄я▌ :-) */
 	    if (number_percent() < chance)
 	    {
 		if ( check_obj_dodge(ch,victim,arrow,chance))
 			return 0;
 			
-		act_p("$o1 поражает тебя!", victim, arrow, 0, TO_CHAR,POS_RESTING);
-		act_p("$o1 поражает $C4!", ch, arrow, victim, TO_CHAR,POS_RESTING);
+		act_p("$o1 п©п╬я─п╟п╤п╟п╣я┌ я┌п╣п╠я▐!", victim, arrow, 0, TO_CHAR,POS_RESTING);
+		act_p("$o1 п©п╬я─п╟п╤п╟п╣я┌ $C4!", ch, arrow, victim, TO_CHAR,POS_RESTING);
 
 		if (ch->in_room == victim->in_room)
-		    act_p("$o1 $c2 поражает $C4!", ch, arrow, victim, TO_NOTVICT,POS_RESTING);
+		    act_p("$o1 $c2 п©п╬я─п╟п╤п╟п╣я┌ $C4!", ch, arrow, victim, TO_NOTVICT,POS_RESTING);
 		else
 		{
-		    act_p("$o1 $c2 поражает $C4!", ch, arrow, victim, TO_ROOM,POS_RESTING);
-		    act_p("$o1 поражает $c4!", victim, arrow, 0, TO_ROOM,POS_RESTING);
+		    act_p("$o1 $c2 п©п╬я─п╟п╤п╟п╣я┌ $C4!", ch, arrow, victim, TO_ROOM,POS_RESTING);
+		    act_p("$o1 п©п╬я─п╟п╤п╟п╣я┌ $c4!", victim, arrow, 0, TO_ROOM,POS_RESTING);
 		}
 
 		if ( is_safe(ch,victim)
 			|| ( victim->is_npc() && IS_SET(victim->act,ACT_NOTRACK)) )
 		{
-		    act_p("$o1 отскакивает от $c2, не причиняя вреда...",victim,arrow,0,TO_ALL,POS_RESTING);
-		    act_p("$o1 отскакивает от $c2, не причиняя вреда...",victim,arrow,0,TO_CHAR,POS_RESTING);
+		    act_p("$o1 п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ $c2, п╫п╣ п©я─п╦я┤п╦п╫я▐я▐ п╡я─п╣п╢п╟...",victim,arrow,0,TO_ALL,POS_RESTING);
+		    act_p("$o1 п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ $c2, п╫п╣ п©я─п╦я┤п╦п╫я▐я▐ п╡я─п╣п╢п╟...",victim,arrow,0,TO_CHAR,POS_RESTING);
 		    obj_to_room(arrow,victim->in_room);
 		}
 		else
@@ -173,7 +173,7 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 	    else
 	    {
 		obj_to_room(arrow,victim->in_room);
-		act_p("$o1 падает на землю у твоих ног!",victim,arrow,0, TO_ALL,POS_RESTING);
+		act_p("$o1 п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌ я┐ я┌п╡п╬п╦я┘ п╫п╬пЁ!",victim,arrow,0, TO_ALL,POS_RESTING);
 		return 0;
 	    }
 	}
@@ -185,7 +185,7 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 	else
 	{
 	    dest_room = pExit->u1.to_room;
-	    act("$o1 прилетает $T!", dest_room->people, arrow, 
+	    act("$o1 п©я─п╦п╩п╣я┌п╟п╣я┌ $T!", dest_room->people, arrow, 
 	                             dirs[dirs[door].rev].enter, TO_ALL);
 	}
     }
@@ -225,8 +225,8 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
 
 	if (!saves_spell(level,victim,DAM_POISON))
 	{
-	    victim->send_to("Ты чувствуешь как яд растекается по твоим венам.");
-	    act_p("$c1 отравле$gно|н|на ядом от $o2.", victim,arrow,0,TO_ROOM,POS_RESTING);
+	    victim->send_to("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╨п╟п╨ я▐п╢ я─п╟я│я┌п╣п╨п╟п╣я┌я│я▐ п©п╬ я┌п╡п╬п╦п╪ п╡п╣п╫п╟п╪.");
+	    act_p("$c1 п╬я┌я─п╟п╡п╩п╣$gп╫п╬|п╫|п╫п╟ я▐п╢п╬п╪ п╬я┌ $o2.", victim,arrow,0,TO_ROOM,POS_RESTING);
 
 	    af.where     = TO_AFFECTS;
 	    af.type      = gsn_poison;
@@ -242,22 +242,22 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
 
     if (IS_WEAPON_STAT(arrow,WEAPON_FLAMING))
     {
-	act_p("$o1 обжигает $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
-	act_p("$o1 обжигает тебя.",victim,arrow,0,TO_CHAR,POS_RESTING);
+	act_p("$o1 п╬п╠п╤п╦пЁп╟п╣я┌ $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
+	act_p("$o1 п╬п╠п╤п╦пЁп╟п╣я┌ я┌п╣п╠я▐.",victim,arrow,0,TO_CHAR,POS_RESTING);
 	fire_effect( (void *) victim,arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_FROST))
     {
-	act_p("$o1 обмораживает $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
-	act_p("$o1 обмораживает тебя.",victim,arrow,0,TO_CHAR,POS_RESTING);
+	act_p("$o1 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
+	act_p("$o1 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ я┌п╣п╠я▐.",victim,arrow,0,TO_CHAR,POS_RESTING);
 	cold_effect(victim,arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_SHOCKING))
     {
-	act_p("$o1 парализует $c4 разрядом молнии.",victim,arrow,0,TO_ROOM,POS_RESTING);
-	act_p("$o1 парализует тебя разрядом молнии.",victim,arrow,0,TO_CHAR,POS_RESTING);
+	act_p("$o1 п©п╟я─п╟п╩п╦п╥я┐п╣я┌ $c4 я─п╟п╥я─я▐п╢п╬п╪ п╪п╬п╩п╫п╦п╦.",victim,arrow,0,TO_ROOM,POS_RESTING);
+	act_p("$o1 п©п╟я─п╟п╩п╦п╥я┐п╣я┌ я┌п╣п╠я▐ я─п╟п╥я─я▐п╢п╬п╪ п╪п╬п╩п╫п╦п╦.",victim,arrow,0,TO_CHAR,POS_RESTING);
 	shock_effect(victim,arrow->level,dam,TARGET_CHAR);
     }
 

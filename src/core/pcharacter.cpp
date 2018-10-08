@@ -139,7 +139,7 @@ void CachedNoun::clear( )
 
 void CachedNoun::update( PCharacter *ch )
 {
-    static const DLString vampireName = "{DСоздани|е|я|ю|е|ем|и ночи{x";
+    static const DLString vampireName = "{Dп║п╬п╥п╢п╟п╫п╦|п╣|я▐|я▌|п╣|п╣п╪|п╦ п╫п╬я┤п╦{x";
     static const DLString immortalName = "Immortal";
     MultiGender mg( ch->getSex( ), Number::SINGULAR );
     
@@ -722,7 +722,7 @@ DLString PCharacter::getNameP( char gram_case ) const
  *  pc skills 
  **************************************************************************/
 /*
- * сколько всего skill points потрачено на все разученные скилы
+ * я│п╨п╬п╩я▄п╨п╬ п╡я│п╣пЁп╬ skill points п©п╬я┌я─п╟я┤п╣п╫п╬ п╫п╟ п╡я│п╣ я─п╟п╥я┐я┤п╣п╫п╫я▀п╣ я│п╨п╦п╩я▀
  */
 int PCharacter::skill_points( ) 
 {
@@ -736,7 +736,7 @@ int PCharacter::skill_points( )
 }
 
 /* 
- * сколько skill points потрачено на данный скил 
+ * я│п╨п╬п╩я▄п╨п╬ skill points п©п╬я┌я─п╟я┤п╣п╫п╬ п╫п╟ п╢п╟п╫п╫я▀п╧ я│п╨п╦п╩ 
  */
 int PCharacter::skill_points( int sn )
 {

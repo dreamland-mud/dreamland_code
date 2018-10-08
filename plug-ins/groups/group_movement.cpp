@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -67,13 +67,13 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 
 	if (arg[0] == '\0')
 	{
-		ch->send_to("ðÏÓÔÕÞÁÔØ × ËÁËÕÀ Ä×ÅÒØ ÉÌÉ × ËÁËÏÍ ÎÁÐÒÁ×ÌÅÎÉÉ.\n\r");
+		ch->send_to("ÐŸÐ¾ÑÑ‚ÑƒÑ‡Ð°Ñ‚ÑŒ Ð² ÐºÐ°ÐºÑƒÑŽ Ð´Ð²ÐµÑ€ÑŒ Ð¸Ð»Ð¸ Ð² ÐºÐ°ÐºÐ¾Ð¼ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¸.\n\r");
 		return;
 	}
 
 	if (ch->fighting)
 	{	
-		ch->send_to("ðÏÄÏÖÄÉ ÐÏËÁ ÚÁËÏÎÞÉÔÓÑ ÓÒÁÖÅÎÉÅ.\n\r");
+		ch->send_to("ÐŸÐ¾Ð´Ð¾Ð¶Ð´Ð¸ Ð¿Ð¾ÐºÐ° Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ñ‚ÑÑ ÑÑ€Ð°Ð¶ÐµÐ½Ð¸Ðµ.\n\r");
 		return;
 	}
 	
@@ -97,24 +97,24 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 
 		if ( !IS_SET(exit_info, EX_CLOSED) )
 		{
-			ch->send_to("úÄÅÓØ ÕÖÅ ÏÔËÒÙÔÏ.\n\r");
+			ch->send_to("Ð—Ð´ÐµÑÑŒ ÑƒÐ¶Ðµ Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚Ð¾.\n\r");
 			return;
 		}
 		if ( !IS_SET(exit_info, EX_LOCKED) )
 		{
-			ch->send_to("ðÏÐÒÏÂÕÊ ÐÒÏÓÔÏ ÏÔËÒÙÔØ...\n\r");
+			ch->send_to("ÐŸÐ¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ Ð¿Ñ€Ð¾ÑÑ‚Ð¾ Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚ÑŒ...\n\r");
 			return;
 		}
 		if ( IS_SET(exit_info, EX_NOPASS) )
 		{
-			ch->send_to("ôÁÉÎÓÔ×ÅÎÎÁÑ ÓÉÌÁ ÂÌÏËÉÒÕÅÔ ÐÒÏÈÏÄ.\n\r");
+			ch->send_to("Ð¢Ð°Ð¸Ð½ÑÑ‚Ð²ÐµÐ½Ð½Ð°Ñ ÑÐ¸Ð»Ð° Ð±Ð»Ð¾ÐºÐ¸Ñ€ÑƒÐµÑ‚ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´.\n\r");
 			return;
 		}
 		chance = ch->getModifyLevel() / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
 
                 const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
-		act("õÄÁÒÏÍ íÁÇÉÞÅÓËÏÊ óÉÌÙ ÔÙ ÐÙÔÁÅÛØÓÑ ÏÔËÒÙÔØ $N4!", ch, 0, doorname, TO_CHAR);
-		act("õÄÁÒÏÍ íÁÇÉÞÅÓËÏÊ óÉÌÙ $c1 ÐÙÔÁÅÔÓÑ ÏÔËÒÙÔØ $N4!", ch, 0, doorname,TO_ROOM);
+		act("Ð£Ð´Ð°Ñ€Ð¾Ð¼ ÐœÐ°Ð³Ð¸Ñ‡ÐµÑÐºÐ¾Ð¹ Ð¡Ð¸Ð»Ñ‹ Ñ‚Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚ÑŒ $N4!", ch, 0, doorname, TO_CHAR);
+		act("Ð£Ð´Ð°Ñ€Ð¾Ð¼ ÐœÐ°Ð³Ð¸Ñ‡ÐµÑÐºÐ¾Ð¹ Ð¡Ð¸Ð»Ñ‹ $c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚ÑŒ $N4!", ch, 0, doorname,TO_ROOM);
 
 		if (room->isDark())
 			chance /= 2;
@@ -126,31 +126,31 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                     {
                         REMOVE_BIT(peexit->exit_info, EX_LOCKED);
                         REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-			act( "$N1 Ó ÇÒÏÈÏÔÏÍ ÒÁÓÐÁÈÉ×ÁÅÔÓÑ.", ch, 0, doorname, TO_ALL);
+			act( "$N1 Ñ Ð³Ñ€Ð¾Ñ…Ð¾Ñ‚Ð¾Ð¼ Ñ€Ð°ÑÐ¿Ð°Ñ…Ð¸Ð²Ð°ÐµÑ‚ÑÑ.", ch, 0, doorname, TO_ALL);
 
                     } else {
 			REMOVE_BIT(pexit->exit_info, EX_LOCKED);
 			REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-			act( "$N1 Ó ÇÒÏÈÏÔÏÍ ÒÁÓÐÁÈÉ×ÁÅÔÓÑ.", ch, 0, doorname, TO_ALL);
+			act( "$N1 Ñ Ð³Ñ€Ð¾Ñ…Ð¾Ñ‚Ð¾Ð¼ Ñ€Ð°ÑÐ¿Ð°Ñ…Ð¸Ð²Ð°ÐµÑ‚ÑÑ.", ch, 0, doorname, TO_ALL);
 
 			// open the other side
                         if ((pexit_rev = direction_reverse(room, door)))
 			{
 				REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
 				REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-                                direction_target(room, door)->echo(POS_RESTING, "÷ÎÅÚÁÐÎÏ Ó ÇÒÏÈÏÔÏÍ ÒÁÓÐÁÈÉ×ÁÅÔÓÑ %N1.", doorname);
+                                direction_target(room, door)->echo(POS_RESTING, "Ð’Ð½ÐµÐ·Ð°Ð¿Ð½Ð¾ Ñ Ð³Ñ€Ð¾Ñ…Ð¾Ñ‚Ð¾Ð¼ Ñ€Ð°ÑÐ¿Ð°Ñ…Ð¸Ð²Ð°ÐµÑ‚ÑÑ %N1.", doorname);
 			}
                     }
 		}
 		else
 		{
-			act("ô×ÏÊ ÕÄÁÒ ÓÏÔÒÑÓÁÅÔ ×ÓÅ ×ÏËÒÕÇ, ÎÏ $N1 ÎÅ ÐÏÄÄÁÅÔÓÑ.", ch,0, doorname,TO_CHAR);
-			act("õÄÁÒ $c2 ÓÏÔÒÑÓÁÅÔ ×ÓÅ ×ÏËÒÕÇ, ÎÏ $N1 ÎÅ ÐÏÄÄÁÅÔÓÑ.", ch,0, doorname,TO_ROOM);
+			act("Ð¢Ð²Ð¾Ð¹ ÑƒÐ´Ð°Ñ€ ÑÐ¾Ñ‚Ñ€ÑÑÐ°ÐµÑ‚ Ð²ÑÐµ Ð²Ð¾ÐºÑ€ÑƒÐ³, Ð½Ð¾ $N1 Ð½Ðµ Ð¿Ð¾Ð´Ð´Ð°ÐµÑ‚ÑÑ.", ch,0, doorname,TO_CHAR);
+			act("Ð£Ð´Ð°Ñ€ $c2 ÑÐ¾Ñ‚Ñ€ÑÑÐ°ÐµÑ‚ Ð²ÑÐµ Ð²Ð¾ÐºÑ€ÑƒÐ³, Ð½Ð¾ $N1 Ð½Ðµ Ð¿Ð¾Ð´Ð´Ð°ÐµÑ‚ÑÑ.", ch,0, doorname,TO_ROOM);
 		}
 		return;
 	}
 
-	ch->send_to("ôÕÔ ÎÅÔ ÔÁËÏÊ Ä×ÅÒÉ.\n\r");
+	ch->send_to("Ð¢ÑƒÑ‚ Ð½ÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð¹ Ð´Ð²ÐµÑ€Ð¸.\n\r");
 }
 
 
@@ -164,15 +164,15 @@ SKILL_RUNP( sneak )
 
     if (MOUNTED(ch))
     {
-        ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ Ä×ÉÇÁÔØÓÑ ÂÅÓÛÕÍÎÏ, ËÏÇÄÁ ÔÙ × ÓÅÄÌÅ.\n\r");
+        ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒÑÑ Ð±ÐµÑÑˆÑƒÐ¼Ð½Ð¾, ÐºÐ¾Ð³Ð´Ð° Ñ‚Ñ‹ Ð² ÑÐµÐ´Ð»Ðµ.\n\r");
         return;
     }
 
-//    ch->send_to("ôÙ ÐÙÔÁÅÛØÓÑ Ä×ÉÇÁÔØÓÑ ÂÏÌÅÅ ÂÅÓÛÕÍÎÏ.\n\r");
+//    ch->send_to("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ð´Ð²Ð¸Ð³Ð°Ñ‚ÑŒÑÑ Ð±Ð¾Ð»ÐµÐµ Ð±ÐµÑÑˆÑƒÐ¼Ð½Ð¾.\n\r");
     affect_strip( ch, gsn_sneak );
 
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
-      ch->send_to("ôÙ É ÔÁË Ä×ÉÇÁÅÛØÓÑ ÂÅÓÛÕÍÎÏ.\n\r");
+      ch->send_to("Ð¢Ñ‹ Ð¸ Ñ‚Ð°Ðº Ð´Ð²Ð¸Ð³Ð°ÐµÑˆÑŒÑÑ Ð±ÐµÑÑˆÑƒÐ¼Ð½Ð¾.\n\r");
       return;
     }
 
@@ -187,10 +187,10 @@ SKILL_RUNP( sneak )
 	af.modifier  = 0;
 	af.bitvector = AFF_SNEAK;
 	affect_to_char( ch, &af );
-	ch->send_to("ôÙ ÎÁÞÉÎÁÅÛØ ÓËÒÙÔÎÏ ÐÅÒÅÄ×ÉÇÁÔØÓÑ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÑˆÑŒ ÑÐºÑ€Ñ‹Ñ‚Ð½Ð¾ Ð¿ÐµÑ€ÐµÐ´Ð²Ð¸Ð³Ð°Ñ‚ÑŒÑÑ.\n\r");
     } else {
       gsn_sneak->improve( ch, false );
-      ch->send_to("ôÅÂÅ ÎÅ ÕÄÁÅÔÓÑ ÓËÒÙÔÎÏ ÐÅÒÅÄ×ÉÇÁÔØÓÑ.\n\r");
+      ch->send_to("Ð¢ÐµÐ±Ðµ Ð½Ðµ ÑƒÐ´Ð°ÐµÑ‚ÑÑ ÑÐºÑ€Ñ‹Ñ‚Ð½Ð¾ Ð¿ÐµÑ€ÐµÐ´Ð²Ð¸Ð³Ð°Ñ‚ÑŒÑÑ.\n\r");
     }
 
     ch->setWait( gsn_sneak->getBeats( ) );
@@ -204,26 +204,26 @@ SKILL_RUNP( hide )
 {
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓËÒÙÔØÓÑ, ËÏÇÄÁ ÔÙ × ÓÅÄÌÅ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐºÑ€Ñ‹Ñ‚ÑŒÑÑ, ÐºÐ¾Ð³Ð´Ð° Ñ‚Ñ‹ Ð² ÑÐµÐ´Ð»Ðµ.\n\r");
 		return;
 	}
 
 	if ( RIDDEN(ch) )
 	{
-		ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓËÒÙÔØÓÑ, ËÏÇÄÁ ÔÙ ÏÓÅÄÌÁÎ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐºÑ€Ñ‹Ñ‚ÑŒÑÑ, ÐºÐ¾Ð³Ð´Ð° Ñ‚Ñ‹ Ð¾ÑÐµÐ´Ð»Ð°Ð½.\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
 	{
-		ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÓËÒÙÔØÓÑ, ËÏÇÄÁ Ó×ÅÔÉÛØÓÑ.\n\r");
+		ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐºÑ€Ñ‹Ñ‚ÑŒÑÑ, ÐºÐ¾Ð³Ð´Ð° ÑÐ²ÐµÑ‚Ð¸ÑˆÑŒÑÑ.\n\r");
 		return;
 	}
 
 	int forest = ch->in_room->sector_type == SECT_FOREST ? 60 : 0;
 	forest += ch->in_room->sector_type == SECT_FIELD ? 60 : 0;
 
-	ch->send_to("ôÙ ÐÙÔÁÅÛØÓÑ ÓËÒÙÔØÓÑ.\n\r");
+	ch->send_to("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ ÑÐºÑ€Ñ‹Ñ‚ÑŒÑÑ.\n\r");
 
 	int k = ch->getLastFightDelay( );
 
@@ -267,18 +267,18 @@ protected:
     {
 	if (fLeaving)
 	    msgRoomNoParty( wch, 
-		            "%1$^C1 ÒÁÓÔ×ÏÒÉÌ%1$GÏÓØ|ÓÑ|ÁÓØ × ×ÏÚÄÕÈÅ.",
-		            "%1$^C1 É %2$C1 ÒÁÓÔ×ÏÒÑÀÔÓÑ × ×ÏÚÄÕÈÅ." );
+		            "%1$^C1 Ñ€Ð°ÑÑ‚Ð²Ð¾Ñ€Ð¸Ð»%1$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ Ð² Ð²Ð¾Ð·Ð´ÑƒÑ…Ðµ.",
+		            "%1$^C1 Ð¸ %2$C1 Ñ€Ð°ÑÑ‚Ð²Ð¾Ñ€ÑÑŽÑ‚ÑÑ Ð² Ð²Ð¾Ð·Ð´ÑƒÑ…Ðµ." );
 	else
 	    msgRoomNoParty( wch, 
-	                    "%1$^C1 ÐÏÑ×ÉÌ%1$GÏÓØ|ÓÑ|ÁÓØ × ËÏÍÎÁÔÅ.",
-			    "%1$^C1 É %2$C1 ÐÏÑ×ÌÑÀÔÓÑ × ËÏÍÎÁÔÅ." );
+	                    "%1$^C1 Ð¿Ð¾ÑÐ²Ð¸Ð»%1$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ Ð² ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ðµ.",
+			    "%1$^C1 Ð¸ %2$C1 Ð¿Ð¾ÑÐ²Ð»ÑÑŽÑ‚ÑÑ Ð² ÐºÐ¾Ð¼Ð½Ð°Ñ‚Ðµ." );
     }
     virtual void msgOnStart( )
     {
 	msgRoomNoParty( ch, 
-	                "%1$^C1 ÐÒÏÓÉÔ Ï ×ÏÚ×ÒÁÝÅÎÉÉ!",
-			"%1$^C1 É %2$C1 ÐÒÏÓÑÔ Ï ×ÏÚ×ÒÁÝÅÎÉÉ!" );
+	                "%1$^C1 Ð¿Ñ€Ð¾ÑÐ¸Ñ‚ Ð¾ Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ð¸!",
+			"%1$^C1 Ð¸ %2$C1 Ð¿Ñ€Ð¾ÑÑÑ‚ Ð¾ Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ð¸!" );
     }
     virtual void movePet( NPCharacter *pet )
     {
@@ -294,7 +294,7 @@ protected:
 	if (!ch->getPC( )
 	    && (!ch->leader || ch->leader->is_npc( ) || ch->leader->getPC( )->pet != ch))
 	{
-	    ch->pecho( "ôÅÂÅ ÎÅËÕÄÁ ×ÏÚ×ÒÁÝÁÔØÓÑ." );
+	    ch->pecho( "Ð¢ÐµÐ±Ðµ Ð½ÐµÐºÑƒÐ´Ð° Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°Ñ‚ÑŒÑÑ." );
 	    return false;
 	}
 
@@ -304,7 +304,7 @@ protected:
 	    point = ch->leader->getPC( )->getHometown( )->getRecall( );
 
 	if (!( to_room = get_room_index( point ) )) {
-	    ch->pecho( "ôÙ ÏËÏÎÞÁÔÅÌØÎÏ ÚÁÂÌÕÄÉÌ%1$GÏÓØ|ÓÑ|ÁÓØ.", ch );
+	    ch->pecho( "Ð¢Ñ‹ Ð¾ÐºÐ¾Ð½Ñ‡Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð·Ð°Ð±Ð»ÑƒÐ´Ð¸Ð»%1$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ.", ch );
 	    return false;
 	}
 	
@@ -322,7 +322,7 @@ protected:
 	    return checkPumped( );
 	
 	if (rated_as_guru( ch->getPC( ) )) {
-	    ch->pecho( "ôÙ ×ÅÄØ ÎÅ ÉÝÅÛØ ÌÅÇËÉÈ ÐÕÔÅÊ, ÎÅ ÔÁË ÌÉ?" );
+	    ch->pecho( "Ð¢Ñ‹ Ð²ÐµÐ´ÑŒ Ð½Ðµ Ð¸Ñ‰ÐµÑˆÑŒ Ð»ÐµÐ³ÐºÐ¸Ñ… Ð¿ÑƒÑ‚ÐµÐ¹, Ð½Ðµ Ñ‚Ð°Ðº Ð»Ð¸?" );
 	    return false;
 	}
 
@@ -378,7 +378,7 @@ protected:
 	door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
 
 	if ((!peexit || !ch->can_see( peexit )) && door < 0) {
-	    ch->pecho( "é ËÕÄÁ ÜÔÏ ÍÙ ÎÁÍÙÌÉÌÉÓØ?" );
+	    ch->pecho( "Ð˜ ÐºÑƒÐ´Ð° ÑÑ‚Ð¾ Ð¼Ñ‹ Ð½Ð°Ð¼Ñ‹Ð»Ð¸Ð»Ð¸ÑÑŒ?" );
 	    return false;
 	}
 
@@ -401,7 +401,7 @@ protected:
 	    return false;
 
 	if (!canFlee( wch )) {
-	    ch->pecho( "þÔÏ-ÔÏ ÎÅ ÄÁÅÔ ÔÅÂÅ ÓÂÅÖÁÔØ × ÜÔÏÍ ÎÁÐÒÁ×ÌÅÎÉÉ." );
+	    ch->pecho( "Ð§Ñ‚Ð¾-Ñ‚Ð¾ Ð½Ðµ Ð´Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ ÑÐ±ÐµÐ¶Ð°Ñ‚ÑŒ Ð² ÑÑ‚Ð¾Ð¼ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¸." );
 	    return false;
 	}
 	else
@@ -424,7 +424,7 @@ protected:
     virtual bool checkCyclicRooms( Character *wch ) 
     {
 	if (from_room == to_room) {
-	    ch->pecho( "ôÙ ÎÅ ÍÏÖÅÛØ ÓÂÅÖÁÔØ ÔÕÄÁ, ÐÏÐÒÏÂÕÊ ÄÒÕÇÏÅ ÍÅÓÔÏ." );
+	    ch->pecho( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ±ÐµÐ¶Ð°Ñ‚ÑŒ Ñ‚ÑƒÐ´Ð°, Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ Ð´Ñ€ÑƒÐ³Ð¾Ðµ Ð¼ÐµÑÑ‚Ð¾." );
 	    return false;
 	}
 
@@ -432,12 +432,12 @@ protected:
     }
     virtual bool checkPositionHorse( )
     {
-	ch->pecho( "óÎÁÞÁÌÁ ÓÌÅÚØ, Á ÐÏÔÏÍ ÕÖÅ ÕÂÅÇÁÊ." );
+	ch->pecho( "Ð¡Ð½Ð°Ñ‡Ð°Ð»Ð° ÑÐ»ÐµÐ·ÑŒ, Ð° Ð¿Ð¾Ñ‚Ð¾Ð¼ ÑƒÐ¶Ðµ ÑƒÐ±ÐµÐ³Ð°Ð¹." );
 	return false;
     }
     virtual bool checkPositionRider( )
     {
-	ch->pecho( "îÁ ÔÅÂÅ Ó×ÅÒÈÕ ËÔÏ-ÔÏ ÓÉÄÉÔ É ÎÅ ÄÁÅÔ ÓÂÅÖÁÔØ." );
+	ch->pecho( "ÐÐ° Ñ‚ÐµÐ±Ðµ ÑÐ²ÐµÑ€Ñ…Ñƒ ÐºÑ‚Ð¾-Ñ‚Ð¾ ÑÐ¸Ð´Ð¸Ñ‚ Ð¸ Ð½Ðµ Ð´Ð°ÐµÑ‚ ÑÐ±ÐµÐ¶Ð°Ñ‚ÑŒ." );
 	return false;
     }
     virtual bool checkPositionWalkman( )
@@ -446,7 +446,7 @@ protected:
 	    if (ch->position == POS_FIGHTING)
 		ch->position = POS_STANDING;
 
-	    ch->pecho( "ôÙ ÓÅÊÞÁÓ ÎÉ Ó ËÅÍ ÎÅ ÄÅÒÅÛØÓÑ." );
+	    ch->pecho( "Ð¢Ñ‹ ÑÐµÐ¹Ñ‡Ð°Ñ Ð½Ð¸ Ñ ÐºÐµÐ¼ Ð½Ðµ Ð´ÐµÑ€ÐµÑˆÑŒÑÑ." );
 	    return false;
 	}
 
@@ -467,12 +467,12 @@ SKILL_RUNP( escape )
     argument = one_argument( argument, arg );
 
     if (!gsn_escape->usable( ch )) {
-	ch->println( "ðÏÐÒÏÂÕÊ flee. íÏÖÅÔ, ÜÔÏ ÔÅÂÑ ÓÐÁÓÅÔ?" );
+	ch->println( "ÐŸÐ¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹ flee. ÐœÐ¾Ð¶ÐµÑ‚, ÑÑ‚Ð¾ Ñ‚ÐµÐ±Ñ ÑÐ¿Ð°ÑÐµÑ‚?" );
 	return;
     }
 
     if (arg[0] == '\0') {
-	ch->println( "õËÁÖÉ ÎÁÐÒÁ×ÌÅÎÉÅ." );
+	ch->println( "Ð£ÐºÐ°Ð¶Ð¸ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ." );
 	return;
     }
 

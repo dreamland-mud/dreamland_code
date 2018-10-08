@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "cmlt.h"
@@ -53,12 +53,12 @@ COMMAND(CMlt, "mlt")
     
     if (!arg.empty( )) 
 	if (!( pcm = PCharacterManager::find( arg ) )) {
-	    ch->println( "В DreamLand нет жителя с таким именем." );
+	    ch->println( "п▓ DreamLand п╫п╣я┌ п╤п╦я┌п╣п╩я▐ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪." );
 	    return;
 	}
 
     if (!ch->is_immortal( ) && ch->getPC( ) != pcm ) {
-	ch->send_to("Эта информация скрыта от Вас.\n\r");
+	ch->send_to("п╜я┌п╟ п╦п╫я└п╬я─п╪п╟я├п╦я▐ я│п╨я─я▀я┌п╟ п╬я┌ п▓п╟я│.\n\r");
 	return;
     }
     
@@ -72,7 +72,7 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
 {
     Remorts &r = pcm->getRemorts( );
 
-    ch->send_to("{B Раса         Класс        Время игры   Бонус{x\n\r");
+    ch->send_to("{B п═п╟я│п╟         п п╩п╟я│я│        п▓я─п╣п╪я▐ п╦пЁя─я▀   п▒п╬п╫я┐я│{x\n\r");
 
     for (unsigned int i = 0; i < r.size( ); i++) {
 	LifeData &life = r[i];
@@ -104,36 +104,36 @@ void CMlt::doShowSelf( PCharacter *ch )
     
     if (victories > 0) {
 	str << fmt( ch, 
-	            "Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов",
+	            "п▓я│п╣пЁп╬ я┌я▀ п╡я▀п©п╬п╩п╫п╦%1$Gп╩п╬|п╩|п╩п╟ {W%2$d{x п©п╣я─я│п╬п╫п╟п╩я▄п╫%2$Iя▀п╧|я▀я┘|я▀я┘ п╨п╡п╣я│%2$Iя┌|я┌п╟|я┌п╬п╡",
 	            ch, victories );
 	
 	if (vasted)
-	    str << ", обменяв {W" << vasted << "{x из этих побед на плюшки";
+	    str << ", п╬п╠п╪п╣п╫я▐п╡ {W" << vasted << "{x п╦п╥ я█я┌п╦я┘ п©п╬п╠п╣п╢ п╫п╟ п©п╩я▌я┬п╨п╦";
 	else if (victories >= VictoryPrice::COUNT_PER_LIFE)  
-	    str << ", пока не обменяв ни одну победу на плюшки";
+	    str << ", п©п╬п╨п╟ п╫п╣ п╬п╠п╪п╣п╫я▐п╡ п╫п╦ п╬п╢п╫я┐ п©п╬п╠п╣п╢я┐ п╫п╟ п©п╩я▌я┬п╨п╦";
 
 	str << "." << endl;
     }
     else
-	str << fmt( ch, "Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста.", ch )
+	str << fmt( ch, "п╒я▀ п©п╬п╨п╟ п╫п╣ п╡я▀п©п╬п╩п╫п╦%1$Gп╩п╬|п╩|п╩п╟ п╫п╦ п╬п╢п╫п╬пЁп╬ п©п╣я─я│п╬п╫п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟.", ch )
 	    << endl;
     
     Remorts &r = ch->getRemorts( );
     int r_cnt = r.size( ), b_cnt = r.countBonusLifes( );
 
     if (r_cnt > 0) {
-	str << fmt( ch, "Ты прожи%1$Gло|л|ла {W%2$d{x жизн%2$Iь|и|ей, ", ch, r_cnt );
+	str << fmt( ch, "п╒я▀ п©я─п╬п╤п╦%1$Gп╩п╬|п╩|п╩п╟ {W%2$d{x п╤п╦п╥п╫%2$Iя▄|п╦|п╣п╧, ", ch, r_cnt );
 
 	if (r_cnt == b_cnt) {
 	    if (r_cnt == 1)
-		str << "которая дает право на бонусы";
+		str << "п╨п╬я┌п╬я─п╟я▐ п╢п╟п╣я┌ п©я─п╟п╡п╬ п╫п╟ п╠п╬п╫я┐я│я▀";
 	    else
-		str << "{Wвсе{x из которых дают право на бонусы";
+		str << "{Wп╡я│п╣{x п╦п╥ п╨п╬я┌п╬я─я▀я┘ п╢п╟я▌я┌ п©я─п╟п╡п╬ п╫п╟ п╠п╬п╫я┐я│я▀";
 	}
 	else
-	    str << "{W" << b_cnt << "{x из которых "
-		<< (b_cnt > 1 ? "дают" : "дает")
-		<< " право на бонусы";
+	    str << "{W" << b_cnt << "{x п╦п╥ п╨п╬я┌п╬я─я▀я┘ "
+		<< (b_cnt > 1 ? "п╢п╟я▌я┌" : "п╢п╟п╣я┌")
+		<< " п©я─п╟п╡п╬ п╫п╟ п╠п╬п╫я┐я│я▀";
 	str << ":" << endl; 
 
 	for (int i = 0; i < r_cnt; i++) {
@@ -142,36 +142,36 @@ void CMlt::doShowSelf( PCharacter *ch )
 	    int age = 17 + life.time / 20;
 
 	    str << fmt( ch,
-			"     %N1 %N1, переродил%Gось|ся|ась в возрасте %d %s",
+			"     %N1 %N1, п©п╣я─п╣я─п╬п╢п╦п╩%Gп╬я│я▄|я│я▐|п╟я│я▄ п╡ п╡п╬п╥я─п╟я│я┌п╣ %d %s",
 			(ch->getSex( ) == SEX_FEMALE ?
 			      race->getFemaleName( ).c_str( )
 			    : race->getMaleName( ).c_str( )),
 			professionManager->find( life.classCh )->getRusName( ).c_str( ),
 			ch,
-			age, GET_COUNT(age, "года", "лет", "лет") )
+			age, GET_COUNT(age, "пЁп╬п╢п╟", "п╩п╣я┌", "п╩п╣я┌") )
 		<< endl;
 	}
 
 	str << endl;
     }
     else
-	str << "Ты живешь первую жизнь." << endl;
+	str << "п╒я▀ п╤п╦п╡п╣я┬я▄ п©п╣я─п╡я┐я▌ п╤п╦п╥п╫я▄." << endl;
     
     if (r_cnt > 0 || vasted > 0) {
 	str << endl
-	    << fmt( ch, "Ты выкупи%1$Gло|л|ла {W%2$d{x owner купо%2$Iн|на|нов и выбра%1$Gло|л|ла в качестве бонусов:", 
+	    << fmt( ch, "п╒я▀ п╡я▀п╨я┐п©п╦%1$Gп╩п╬|п╩|п╩п╟ {W%2$d{x owner п╨я┐п©п╬%2$Iп╫|п╫п╟|п╫п╬п╡ п╦ п╡я▀п╠я─п╟%1$Gп╩п╬|п╩|п╩п╟ п╡ п╨п╟я┤п╣я│я┌п╡п╣ п╠п╬п╫я┐я│п╬п╡:", 
 			ch, r.owners.getValue( ) ) 
 	    << endl;
 
-	str << (r.hp > 0          ? fmt( ch, "     %d здоровья\n", r.hp.getValue( ) ) : "")
-	    << (r.mana > 0        ? fmt( ch, "     %d маны\n", r.mana.getValue( ) ) : "")
+	str << (r.hp > 0          ? fmt( ch, "     %d п╥п╢п╬я─п╬п╡я▄я▐\n", r.hp.getValue( ) ) : "")
+	    << (r.mana > 0        ? fmt( ch, "     %d п╪п╟п╫я▀\n", r.mana.getValue( ) ) : "")
 	    << (r.skillPoints > 0 ? fmt( ch, "     %d skill points\n", r.skillPoints.getValue( ) ) : "")
-	    << (r.level > 0       ? fmt( ch, "     %1$d уров%1$Iень|ня|ней \n", r.level.getValue( ) ) : "")
-	    << (r.pretitle        ?          "     цветной претитул\n" : "");
+	    << (r.level > 0       ? fmt( ch, "     %1$d я┐я─п╬п╡%1$Iп╣п╫я▄|п╫я▐|п╫п╣п╧ \n", r.level.getValue( ) ) : "")
+	    << (r.pretitle        ?          "     я├п╡п╣я┌п╫п╬п╧ п©я─п╣я┌п╦я┌я┐п╩\n" : "");
 
 	for (int i = 0; i < stat_table.size; i++)
 	    if (r.stats[i] > 0)
-		str << fmt( ch, "     +%d к %s\n", 
+		str << fmt( ch, "     +%d п╨ %s\n", 
 				r.stats[i].getValue( ), 
 				stat_table.message( i, '3' ).c_str( ) );
     }
@@ -204,13 +204,13 @@ void CMlt::doCount( Character* ch, int n )
     }
     
     if (cnt > 80)
-        ch->printf( "Их слишком много. %d тел.\r\n", cnt );
+        ch->printf( "п≤я┘ я│п╩п╦я┬п╨п╬п╪ п╪п╫п╬пЁп╬. %d я┌п╣п╩.\r\n", cnt );
     else if (!buf.str( ).empty( )) {
         buf << "Count: " << cnt << endl;
         ch->send_to( buf );
     }
     else
-        ch->send_to( "Никого нет.\r\n" );
+        ch->send_to( "п²п╦п╨п╬пЁп╬ п╫п╣я┌.\r\n" );
 }
 
 void CMlt::doLimit( Character *ch )

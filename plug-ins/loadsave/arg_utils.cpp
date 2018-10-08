@@ -82,108 +82,108 @@ bool arg_oneof( const DLString &arg, const char *var1, const char *var2, const c
 
 bool arg_is_help( const DLString &arg )
 {
-    return arg_oneof( arg, "help", "?", "помощь", "справка" );
+    return arg_oneof( arg, "help", "?", "п©п╬п╪п╬я┴я▄", "я│п©я─п╟п╡п╨п╟" );
 }
 
 bool arg_is_list( const DLString &arg )
 {
-    return arg_oneof( arg, "list", "список" );
+    return arg_oneof( arg, "list", "я│п©п╦я│п╬п╨" );
 }
 
 bool arg_is_info( const DLString &arg )
 {
-    return arg_oneof( arg, "info", "информация" );
+    return arg_oneof( arg, "info", "п╦п╫я└п╬я─п╪п╟я├п╦я▐" );
 }
 
 bool arg_is_time( const DLString &arg )
 {
-    return arg_oneof( arg, "time", "время" );
+    return arg_oneof( arg, "time", "п╡я─п╣п╪я▐" );
 }
 
 bool arg_is_pk( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "pk", "пк" );
+    return arg_oneof_strict( arg, "pk", "п©п╨" );
 }
 
 bool arg_is_show( const DLString &arg )
 {
-    return arg_oneof( arg, "show", "показ", "показать" );
+    return arg_oneof( arg, "show", "п©п╬п╨п╟п╥", "п©п╬п╨п╟п╥п╟я┌я▄" );
 }
 
 bool arg_is_in( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "i", "in", "в" );
+    return arg_oneof_strict( arg, "i", "in", "п╡" );
 }
 
 bool arg_is_on( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "on", "на" );
+    return arg_oneof_strict( arg, "on", "п╫п╟" );
 }
 
 bool arg_is_from( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "from", "из", "с", "со" );
+    return arg_oneof_strict( arg, "from", "п╦п╥", "я│", "я│п╬" );
 }
 
 bool arg_is_to( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "to", "на" );
+    return arg_oneof_strict( arg, "to", "п╫п╟" );
 }
 
 bool arg_is_yes( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "yes", "y", "да", "д" );
+    return arg_oneof_strict( arg, "yes", "y", "п╢п╟", "п╢" );
 }
 
 bool arg_is_no( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "no", "n", "нет", "н" );
+    return arg_oneof_strict( arg, "no", "n", "п╫п╣я┌", "п╫" );
 }
 
 bool arg_is_switch_off( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "off", "офф", "выкл" );
+    return arg_oneof_strict( arg, "off", "п╬я└я└", "п╡я▀п╨п╩" );
 }
 
 bool arg_is_switch_on( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "on", "вкл" );
+    return arg_oneof_strict( arg, "on", "п╡п╨п╩" );
 }
 
 bool arg_is_self( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "self", "я", "себе", "себя" );
+    return arg_oneof_strict( arg, "self", "я▐", "я│п╣п╠п╣", "я│п╣п╠я▐" );
 }
 
 bool arg_is_ugly( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "ugly", "vampire", "вампир" );
+    return arg_oneof_strict( arg, "ugly", "vampire", "п╡п╟п╪п©п╦я─" );
 }
 
 bool arg_is_silver( const DLString &arg )
 {
     return arg_oneof_strict( arg, "coin", "coins", "silver" )
-           || arg_oneof_strict( arg, "серебро", "серебра", "монет" );
+           || arg_oneof_strict( arg, "я│п╣я─п╣п╠я─п╬", "я│п╣я─п╣п╠я─п╟", "п╪п╬п╫п╣я┌" );
 }
 
 bool arg_is_gold( const DLString &arg )
 {
-    return arg_oneof_strict( arg, "gold", "золото", "золота", "золотых" );
+    return arg_oneof_strict( arg, "gold", "п╥п╬п╩п╬я┌п╬", "п╥п╬п╩п╬я┌п╟", "п╥п╬п╩п╬я┌я▀я┘" );
 }
 
 bool arg_is_alldot( const DLString &arg )
 {
     return arg == "all" 
-           || arg == "все" 
-           || arg == "всё" 
+           || arg == "п╡я│п╣" 
+           || arg == "п╡я│я▒" 
 	   || !str_prefix( "all.", arg.c_str( ) )
-	   || !str_prefix( "все.", arg.c_str( ) )
-	   || !str_prefix( "всё.", arg.c_str( ) );
+	   || !str_prefix( "п╡я│п╣.", arg.c_str( ) )
+	   || !str_prefix( "п╡я│я▒.", arg.c_str( ) );
 }
 
 bool arg_is_all( const DLString &arg )
 {
-    return arg == "all" || arg == "все" || arg == "всё"; 
+    return arg == "all" || arg == "п╡я│п╣" || arg == "п╡я│я▒"; 
 }
 
 

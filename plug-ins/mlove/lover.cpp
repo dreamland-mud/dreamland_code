@@ -26,13 +26,13 @@ COMMAND(Lover, "lover")
     DLString cmd = arguments.getOneArgument( );
     
     if (ch->is_npc()) {
-	ch->send_to("Тебе нельзя.\n\r");
+	ch->send_to("п╒п╣п╠п╣ п╫п╣п╩я▄п╥я▐.\n\r");
 	return;
     }
 
     if (IS_AFFECTED(ch,AFF_CHARM)) {
-	act_p("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR, POS_RESTING);  
-	act_p("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT, POS_RESTING);
+	act_p("... п╫п╬ я│п╣я─п╢я├я┐ п╫п╣ п©я─п╦п╨п╟п╤п╣я┬я▄.", ch, 0, 0, TO_CHAR, POS_RESTING);  
+	act_p("$c1 я┐я┘п╪я▀п╩я▐п╣я┌я│я▐ - я│п╣я─п╢я├я┐ п╫п╣ п©я─п╦п╨п╟п╤п╣я┬я▄.", ch, 0, ch->master, TO_VICT, POS_RESTING);
 	return;
     }
     
@@ -40,9 +40,9 @@ COMMAND(Lover, "lover")
 	usage( ch );
     else if (arg_is_list( cmd ))
 	list( ch, arguments );
-    else if (arg_oneof( cmd, "add", "добавить" ))
+    else if (arg_oneof( cmd, "add", "п╢п╬п╠п╟п╡п╦я┌я▄" ))
 	add( ch, arguments );
-    else if (arg_oneof( cmd, "del", "удалить" ))
+    else if (arg_oneof( cmd, "del", "я┐п╢п╟п╩п╦я┌я▄" ))
 	del( ch, arguments );
     else 
 	usage( ch );
@@ -61,10 +61,10 @@ void Lover::list( Character* ch, DLString arguments)
     if (ipos == attributes->end( ) ||
 	(pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( )) 
     {
-	str << "Ты никого не любишь." << endl;
+	str << "п╒я▀ п╫п╦п╨п╬пЁп╬ п╫п╣ п╩я▌п╠п╦я┬я▄." << endl;
     }
     else {
-	str << "{W- {RЛюбовники{W -" << endl;
+	str << "{W- {Rп⌡я▌п╠п╬п╡п╫п╦п╨п╦{W -" << endl;
 	
 	for (XMLLovers::iterator loverpos = pointer->lovers.begin( );
 	     loverpos != pointer->lovers.end( );
@@ -88,10 +88,10 @@ void Lover::add( Character* ch, DLString arguments)
 	ch->getPC( )->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->
 			    lovers.put( pci->getName( ) );
 
-	str << "Ты отдаешь свое сердце "<<  pci->getName( ) << "." << endl;
+	str << "п╒я▀ п╬я┌п╢п╟п╣я┬я▄ я│п╡п╬п╣ я│п╣я─п╢я├п╣ "<<  pci->getName( ) << "." << endl;
     }
     else {
-	str << "Таких нет." << endl;
+	str << "п╒п╟п╨п╦я┘ п╫п╣я┌." << endl;
     }
 
     ch->send_to( str );
@@ -110,7 +110,7 @@ void Lover::del( Character* ch, DLString arguments)
     if (ipos == attributes->end( ) ||
 	(pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( )) 
     {	
-	str << "Но твой список любовников и так пуст!" << endl;
+	str << "п²п╬ я┌п╡п╬п╧ я│п©п╦я│п╬п╨ п╩я▌п╠п╬п╡п╫п╦п╨п╬п╡ п╦ я┌п╟п╨ п©я┐я│я┌!" << endl;
     }
     else {
 	name.toLower( ).upperFirstCharacter( );
@@ -121,14 +121,14 @@ void Lover::del( Character* ch, DLString arguments)
 	    mattr = attributes->findAttr<XMLAttributeMarriage>( "marriage" );
 
 	    if (mattr && mattr->spouse.getValue( ) == name) {
-		str << "Только развод поможет тебе." << endl;
+		str << "п╒п╬п╩я▄п╨п╬ я─п╟п╥п╡п╬п╢ п©п╬п╪п╬п╤п╣я┌ я┌п╣п╠п╣." << endl;
 	    } else {
 		pointer->lovers.erase( name );
-		str << "Твое сердце больше не трепещет при виде " << name << "." << endl;
+		str << "п╒п╡п╬п╣ я│п╣я─п╢я├п╣ п╠п╬п╩я▄я┬п╣ п╫п╣ я┌я─п╣п©п╣я┴п╣я┌ п©я─п╦ п╡п╦п╢п╣ " << name << "." << endl;
 	    }
 	}
 	else 
-	    str << "Ты и так не пылаешь страстью к " << name << ". " << endl;	
+	    str << "п╒я▀ п╦ я┌п╟п╨ п╫п╣ п©я▀п╩п╟п╣я┬я▄ я│я┌я─п╟я│я┌я▄я▌ п╨ " << name << ". " << endl;	
     }
     
     ch->send_to( str );
@@ -138,9 +138,9 @@ void Lover::usage( Character* ch )
 {
     std::basic_ostringstream<char> str;
     
-    str << "{lRлюбовники список{lElover list{lx - просмотр списка любовников" << endl
-        << "{lRлюбовники добавить{lElover add{lx <жертва> - отдать свое сердце кому-то" << endl
-	<< "{lRлюбовники удалить{lElover del{lx <жертва> - удалить кого-то из списка любовников" << endl;
+    str << "{lRп╩я▌п╠п╬п╡п╫п╦п╨п╦ я│п©п╦я│п╬п╨{lElover list{lx - п©я─п╬я│п╪п╬я┌я─ я│п©п╦я│п╨п╟ п╩я▌п╠п╬п╡п╫п╦п╨п╬п╡" << endl
+        << "{lRп╩я▌п╠п╬п╡п╫п╦п╨п╦ п╢п╬п╠п╟п╡п╦я┌я▄{lElover add{lx <п╤п╣я─я┌п╡п╟> - п╬я┌п╢п╟я┌я▄ я│п╡п╬п╣ я│п╣я─п╢я├п╣ п╨п╬п╪я┐-я┌п╬" << endl
+	<< "{lRп╩я▌п╠п╬п╡п╫п╦п╨п╦ я┐п╢п╟п╩п╦я┌я▄{lElover del{lx <п╤п╣я─я┌п╡п╟> - я┐п╢п╟п╩п╦я┌я▄ п╨п╬пЁп╬-я┌п╬ п╦п╥ я│п©п╦я│п╨п╟ п╩я▌п╠п╬п╡п╫п╦п╨п╬п╡" << endl;
 
     ch->send_to( str );
 }

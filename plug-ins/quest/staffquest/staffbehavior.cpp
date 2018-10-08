@@ -26,7 +26,7 @@ void StaffBehavior::getByOther( Character *ch )
 {
     short level = max( 1, ch->getModifyLevel( ) - 9 );
 
-    ch->pecho( "%1$O1 не принадлежит тебе, и ты бросаешь %1$P2.", obj );
+    ch->pecho( "%1$O1 п╫п╣ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ я┌п╣п╠п╣, п╦ я┌я▀ п╠я─п╬я│п╟п╣я┬я▄ %1$P2.", obj );
 
     switch (dice( 1, 10 ))  {
     case 1:
@@ -41,17 +41,17 @@ void StaffBehavior::getByOther( Character *ch )
 void StaffBehavior::getByHero( PCharacter *ch ) 
 {
     if (IS_AFFECTED( ch, AFF_POISON ) && (dice( 1, 5) == 1))  {
-	act( "$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+	act( "$o1 п╥п╟пЁп╬я─п╟п╣я┌я│я▐ пЁп╬п╩я┐п╠я▀п╪ п©п╩п╟п╪п╣п╫п╣п╪.", ch, obj, 0, TO_CHAR );
 	spell( gsn_cure_poison, 30, ch, ch );
 	return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CURSE ) && (dice(1,5)==1) )  {
-	act( "$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+	act( "$o1 п╥п╟пЁп╬я─п╟п╣я┌я│я▐ пЁп╬п╩я┐п╠я▀п╪ п©п╩п╟п╪п╣п╫п╣п╪.", ch, obj, 0, TO_CHAR );
 	spell( gsn_remove_curse, 30, ch, ch );
 	return;
     }
     
-    act( "Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );
+    act( "п°п╣я─я├п╟я▌я┴п╟я▐ п╟я┐я─п╟ п╬п╨я─я┐п╤п╟п╣я┌ $o4.", ch, obj, 0, TO_CHAR );
 }
 

@@ -72,7 +72,7 @@ DLString DruidicLanguage::createDictum( ) const
 
 void DruidicLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "В шорохе листьев древних дубов тебе слышится слово {c%s.{x\r\n",
+    ch->printf( "п▓ я┬п╬я─п╬я┘п╣ п╩п╦я│я┌я▄п╣п╡ п╢я─п╣п╡п╫п╦я┘ п╢я┐п╠п╬п╡ я┌п╣п╠п╣ я│п╩я▀я┬п╦я┌я│я▐ я│п╩п╬п╡п╬ {c%s.{x\r\n",
                 word.toStr( ) ); 
 }
 

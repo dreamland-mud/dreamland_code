@@ -12,31 +12,31 @@ void ShopArticle::purchase( PCharacter *client, NPCharacter *keeper, const DLStr
 
     if (!price->canAfford( client )) {
 	if (quantity > 1)
-	    tell_dim( client, keeper, "ôÙ ÎÅ ÓÍÏÖÅÛØ ÚÁÐÌÁÔÉÔØ ÚÁ ÓÔÏÌØËÏ." );
+	    tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð·Ð°Ð¿Ð»Ð°Ñ‚Ð¸Ñ‚ÑŒ Ð·Ð° ÑÑ‚Ð¾Ð»ÑŒÐºÐ¾." );
 	else
-	    tell_dim( client, keeper, "õ ÔÅÂÑ ÎÅÔ ÎÕÖÎÏÊ ÓÕÍÍÙ, ÞÔÏÂ ËÕÐÉÔØ $o4.", obj );
+	    tell_dim( client, keeper, "Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ Ð½ÑƒÐ¶Ð½Ð¾Ð¹ ÑÑƒÐ¼Ð¼Ñ‹, Ñ‡Ñ‚Ð¾Ð± ÐºÑƒÐ¿Ð¸Ñ‚ÑŒ $o4.", obj );
 	
 	return;
     }
 
     if (client->carry_number + number * obj->getNumber( ) > client->canCarryNumber( )) {
-	tell_dim( client, keeper, "ôÙ ÎÅ ÍÏÖÅÛØ ÎÅÓÔÉ ÔÁË ÍÎÏÇÏ ×ÅÝÅÊ." );
+	tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½ÐµÑÑ‚Ð¸ Ñ‚Ð°Ðº Ð¼Ð½Ð¾Ð³Ð¾ Ð²ÐµÑ‰ÐµÐ¹." );
 	return;
     }
 
     if (client->carry_weight + number * obj->getWeight( ) > client->canCarryWeight( )) {
-	tell_dim( client, keeper, "ôÙ ÎÅ ÍÏÖÅÛØ ÎÅÓÔÉ ÔÁËÕÀ ÔÑÖÅÓÔØ." );
+	tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½ÐµÑÑ‚Ð¸ Ñ‚Ð°ÐºÑƒÑŽ Ñ‚ÑÐ¶ÐµÑÑ‚ÑŒ." );
 	return;
     }
     
     if (quantity > 1) {
-	ch->recho( "%^C1 ÐÏËÕÐÁÅÔ %O4 [%d].", ch, obj, quantity );
-	ch->pecho( "ôÙ ÐÏËÕÐÁÅÛØ %O4[%d] ÚÁ %N4.", 
+	ch->recho( "%^C1 Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑ‚ %O4 [%d].", ch, obj, quantity );
+	ch->pecho( "Ð¢Ñ‹ Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑˆÑŒ %O4[%d] Ð·Ð° %N4.", 
 	            obj, quantity, price->toString( client ).c_str( ) );
     }
     else {
-	ch->recho( "%^C1 ÐÏËÕÐÁÅÔ %O4.", ch, obj );
-	ch->pecho( "ôÙ ÐÏËÕÐÁÅÛØ %O4 ÚÁ %N4.", 
+	ch->recho( "%^C1 Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑ‚ %O4.", ch, obj );
+	ch->pecho( "Ð¢Ñ‹ Ð¿Ð¾ÐºÑƒÐ¿Ð°ÐµÑˆÑŒ %O4 Ð·Ð° %N4.", 
 	            obj, price->toString( client ).c_str( ) );
     }
 
@@ -69,7 +69,7 @@ void ShopArticle::purchase( PCharacter *client, NPCharacter *keeper, const DLStr
 bool ShopArticle::available( PCharacter *client, NPCharacter *keeper ) const
 {
     if (client->getRealLevel( ) < get_wear_level( client, obj )) {
-	tell_dim( client, keeper, "ôÙ ÎÅ ÓÍÏÖÅÛØ ÉÓÐÏÌØÚÏ×ÁÔØ $o4.", obj );
+	tell_dim( client, keeper, "Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ $o4.", obj );
 	return false;
     }
 

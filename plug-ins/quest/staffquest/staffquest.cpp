@@ -46,12 +46,12 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman );
-    tell_raw( pch, questman, "Придворные волшебники определили, где спрятано украденное сокровище." );
-    tell_raw( pch, questman, "Тебе поручается доставить его мне!" );	
-    tell_raw( pch, questman, "Место, где оно спрятано, называется {W%s{G", roomName.c_str( ) );
-    tell_raw( pch, questman, "И находится это место в районе под названием - {W%s{G", areaName.c_str( ) );
-    tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s на выполнение задания.",
-		  time, GET_COUNT(time,"а","ы","") ); 
+    tell_raw( pch, questman, "п÷я─п╦п╢п╡п╬я─п╫я▀п╣ п╡п╬п╩я┬п╣п╠п╫п╦п╨п╦ п╬п©я─п╣п╢п╣п╩п╦п╩п╦, пЁп╢п╣ я│п©я─я▐я┌п╟п╫п╬ я┐п╨я─п╟п╢п╣п╫п╫п╬п╣ я│п╬п╨я─п╬п╡п╦я┴п╣." );
+    tell_raw( pch, questman, "п╒п╣п╠п╣ п©п╬я─я┐я┤п╟п╣я┌я│я▐ п╢п╬я│я┌п╟п╡п╦я┌я▄ п╣пЁп╬ п╪п╫п╣!" );	
+    tell_raw( pch, questman, "п°п╣я│я┌п╬, пЁп╢п╣ п╬п╫п╬ я│п©я─я▐я┌п╟п╫п╬, п╫п╟п╥я▀п╡п╟п╣я┌я│я▐ {W%s{G", roomName.c_str( ) );
+    tell_raw( pch, questman, "п≤ п╫п╟я┘п╬п╢п╦я┌я│я▐ я█я┌п╬ п╪п╣я│я┌п╬ п╡ я─п╟п╧п╬п╫п╣ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ - {W%s{G", areaName.c_str( ) );
+    tell_raw( pch, questman, "пё я┌п╣п╠я▐ п╣я│я┌я▄ {Y%d{G п╪п╦п╫я┐я┌%s п╫п╟ п╡я▀п©п╬п╩п╫п╣п╫п╦п╣ п╥п╟п╢п╟п╫п╦я▐.",
+		  time, GET_COUNT(time,"п╟","я▀","") ); 
     
     wiznet( scenName.c_str( ), "in room \"%s\" area \"%s\"", 
                                roomName.c_str( ), areaName.c_str( ) );
@@ -77,20 +77,20 @@ Room * StaffQuest::helpLocation( )
 void StaffQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-	    << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+	buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ {Yп▓п╚п÷п·п⌡п²п∙п²п·{x!" << endl
+	    << "п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪, п╢п╬ я┌п╬пЁп╬ п╨п╟п╨ п╡я▀п╧п╢п╣я┌ п╡я─п╣п╪я▐!" << endl;
     else 
-	buf << "У тебя задание - вернуть " << russian_case( objName.getValue( ), '4' ) << "." << endl
-	    << "Место, где он спрятан, называется " << roomName << "." << endl
-	    << "И находится это место в районе под названием " << areaName << endl;
+	buf << "пё я┌п╣п╠я▐ п╥п╟п╢п╟п╫п╦п╣ - п╡п╣я─п╫я┐я┌я▄ " << russian_case( objName.getValue( ), '4' ) << "." << endl
+	    << "п°п╣я│я┌п╬, пЁп╢п╣ п╬п╫ я│п©я─я▐я┌п╟п╫, п╫п╟п╥я▀п╡п╟п╣я┌я│я▐ " << roomName << "." << endl
+	    << "п≤ п╫п╟я┘п╬п╢п╦я┌я│я▐ я█я┌п╬ п╪п╣я│я┌п╬ п╡ я─п╟п╧п╬п╫п╣ п©п╬п╢ п╫п╟п╥п╡п╟п╫п╦п╣п╪ " << areaName << endl;
 }
 
 void StaffQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "Вернуться к квестору за наградой.";
+	buf << "п▓п╣я─п╫я┐я┌я▄я│я▐ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ п╫п╟пЁя─п╟п╢п╬п╧.";
     else 
-        buf << "Доставить квестору " << russian_case( objName.getValue( ), '4' ) << " из "
+        buf << "п■п╬я│я┌п╟п╡п╦я┌я▄ п╨п╡п╣я│я┌п╬я─я┐ " << russian_case( objName.getValue( ), '4' ) << " п╦п╥ "
 	    << roomName << " (" << areaName << ").";
 }
 
@@ -114,8 +114,8 @@ Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman
     
     r->exp = (r->points + r->clanpoints) * 10;
 
-    act_p("Ты передаешь $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR, POS_RESTING);
-    act_p("$c1 передает $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM, POS_RESTING);
+    act_p("п╒я▀ п©п╣я─п╣п╢п╟п╣я┬я▄ $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_CHAR, POS_RESTING);
+    act_p("$c1 п©п╣я─п╣п╢п╟п╣я┌ $n4 $C3.", ch, objName.getValue( ).c_str( ), questman, TO_ROOM, POS_RESTING);
 
     return Reward::Pointer( r );
 }
@@ -165,7 +165,7 @@ bool StaffScenario::applicable( PCharacter *pch )
 void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman )
 {
     if (msg.empty( ))
-	tell_raw( pch, questman, "Из королевской сокровищницы похитили {W%s{G!", 
+	tell_raw( pch, questman, "п≤п╥ п╨п╬я─п╬п╩п╣п╡я│п╨п╬п╧ я│п╬п╨я─п╬п╡п╦я┴п╫п╦я├я▀ п©п╬я┘п╦я┌п╦п╩п╦ {W%s{G!", 
 	          shortDesc.ruscase( '4' ).c_str( ) );
     else
 	tell_raw( pch, questman, msg.c_str( ) );

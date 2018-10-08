@@ -52,7 +52,7 @@ CMDADM( nopost )
 	pci = PCharacterManager::find( name );
 	
 	if (!pci) {
-	    ch->send_to( "Жертва не найдена. Укажите имя правильно и полностью.\n\r" );
+	    ch->send_to( "п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟. пёп╨п╟п╤п╦я┌п╣ п╦п╪я▐ п©я─п╟п╡п╦п╩я▄п╫п╬ п╦ п©п╬п╩п╫п╬я│я┌я▄я▌.\n\r" );
 	    return;
 	}
 
@@ -72,12 +72,12 @@ CMDADM( nopost )
 		attributes->eraseAttribute( "nopost" );
 		PCharacterManager::saveMemory( pci );
 
-		ch->send_to( "NOPOST снят.\n\r" );
+		ch->send_to( "NOPOST я│п╫я▐я┌.\n\r" );
 		wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
 		        "%^C1 restores notes to %s.", ch, pci->getName( ).c_str( ) );
 	    }
 	    else {
-		ch->send_to( "Не получилось.\n\r" );
+		ch->send_to( "п²п╣ п©п╬п╩я┐я┤п╦п╩п╬я│я▄.\n\r" );
 	    }
 	}
 	else if( arguments.empty( ) )
@@ -100,7 +100,7 @@ CMDADM( nopost )
 	    attr->start( pci );
 	    PCharacterManager::saveMemory(pci);
 
-	    ch->send_to( "NOPOST установлен.\n\r" );
+	    ch->send_to( "NOPOST я┐я│я┌п╟п╫п╬п╡п╩п╣п╫.\n\r" );
 	    
 	    wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
 	            "%^C1 revokes %s's notes.", ch, pci->getName( ).c_str( ) );
@@ -126,7 +126,7 @@ void XMLAttributeNoPost::start( PCMemoryInterface *pcm ) const
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) {
 	std::basic_ostringstream<char> ostr;
 	
-	ostr << "Боги отняли у тебя привилегию писать письма " << getUntilString( true ) << "." << std::endl;
+	ostr << "п▒п╬пЁп╦ п╬я┌п╫я▐п╩п╦ я┐ я┌п╣п╠я▐ п©я─п╦п╡п╦п╩п╣пЁп╦я▌ п©п╦я│п╟я┌я▄ п©п╦я│я▄п╪п╟ " << getUntilString( true ) << "." << std::endl;
 	pch->send_to( ostr );
     }
 }
@@ -136,6 +136,6 @@ void XMLAttributeNoPost::end( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) 
-	pch->send_to( "Боги вернули тебе привилегию писать письма.\n\r" );
+	pch->send_to( "п▒п╬пЁп╦ п╡п╣я─п╫я┐п╩п╦ я┌п╣п╠п╣ п©я─п╦п╡п╦п╩п╣пЁп╦я▌ п©п╦я│п╟я┌я▄ п©п╦я│я▄п╪п╟.\n\r" );
 }
 

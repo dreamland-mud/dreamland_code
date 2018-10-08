@@ -68,7 +68,7 @@ int ShopBuyPrice::haggle( Character *client ) const
     if (!IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && roll < gsn_haggle->getEffective( client )) {
 	cost -= obj->cost / 2 * roll / 100;
 
-	act( "Ты торгуешься с $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
+	act( "п╒я▀ я┌п╬я─пЁя┐п╣я┬я▄я│я▐ я│ $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
 	gsn_haggle->improve( client, true );
     }
 
@@ -80,9 +80,9 @@ int ShopBuyPrice::haggle( Character *client ) const
 void ShopBuyPrice::taxes( int cost ) const
 {
     cost += keeper->silver;
-    /* 'number' процентов от цены и кассы - в банк */
+    /* 'number' п©я─п╬я├п╣п╫я┌п╬п╡ п╬я┌ я├п╣п╫я▀ п╦ п╨п╟я│я│я▀ - п╡ п╠п╟п╫п╨ */
     dreamland->putToMerchantBank( cost * number / 100 );
-    /* положить доход в кассу и вычесть то, что ушло в банк */
+    /* п©п╬п╩п╬п╤п╦я┌я▄ п╢п╬я┘п╬п╢ п╡ п╨п╟я│я│я┐ п╦ п╡я▀я┤п╣я│я┌я▄ я┌п╬, я┤я┌п╬ я┐я┬п╩п╬ п╡ п╠п╟п╫п╨ */
     keeper->silver = cost * number - ( cost * number / 100 ) * 100;
 }
 
@@ -126,7 +126,7 @@ int ShopSellPrice::haggle( Character *client ) const
 	cost += obj->cost / 2 * roll / 100;
 	cost = min(cost, 95 * ocost / 100);
 
-	act( "Ты торгуешься с $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
+	act( "п╒я▀ я┌п╬я─пЁя┐п╣я┬я▄я│я▐ я│ $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );
 	gsn_haggle->improve( ch, true );
     }
 
@@ -154,7 +154,7 @@ void ShopSellPrice::taxes( int cost ) const
 	
 	if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
 	{
-	    act_p("$c1 говорит тебе '{GУ меня нет денег.{x'",
+	    act_p("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gпё п╪п╣п╫я▐ п╫п╣я┌ п╢п╣п╫п╣пЁ.{x'",
 	    keeper,0,ch,TO_VICT,POS_RESTING);
 	    return;
 	}

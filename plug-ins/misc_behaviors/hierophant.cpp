@@ -57,11 +57,11 @@ void Hierophant::tell( Character *victim, const char *speech )
     
     pet = victim->getPC( )->pet;
 
-    if (arg_has_oneof( speech, "hello", "hi", "приветствую", "здравствуй" )) 
+    if (arg_has_oneof( speech, "hello", "hi", "п©я─п╦п╡п╣я┌я│я┌п╡я┐я▌", "п╥п╢я─п╟п╡я│я┌п╡я┐п╧" )) 
 	fHello = true;
-    else if ((arg_has_oneof( speech, "pet", "пет", "животное", "любимец" )
+    else if ((arg_has_oneof( speech, "pet", "п©п╣я┌", "п╤п╦п╡п╬я┌п╫п╬п╣", "п╩я▌п╠п╦п╪п╣я├" )
 		|| (pet && arg_contains_someof( speech, pet->getName( ).c_str( ) )))
-	     && arg_has_oneof( speech, "заклинаниями", "владеет", "колдовать", "умениями" )) 
+	     && arg_has_oneof( speech, "п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐п╪п╦", "п╡п╩п╟п╢п╣п╣я┌", "п╨п╬п╩п╢п╬п╡п╟я┌я▄", "я┐п╪п╣п╫п╦я▐п╪п╦" )) 
 	fWhat = true;
     else 
 	return;
@@ -70,9 +70,9 @@ void Hierophant::tell( Character *victim, const char *speech )
 	if (!pet || pet->in_room != victim->in_room)
 	    return;
 
-	say_act( victim, ch, "Здравствуй, $c1." );
-	say_act( victim, ch, "Ты приш$gло|ел|ла спросить меня, какими заклинаниями владеет твое домашнее животное?" );
-	say_act( victim, ch, "Так не стесняйся, спрашивай." );
+	say_act( victim, ch, "п≈п╢я─п╟п╡я│я┌п╡я┐п╧, $c1." );
+	say_act( victim, ch, "п╒я▀ п©я─п╦я┬$gп╩п╬|п╣п╩|п╩п╟ я│п©я─п╬я│п╦я┌я▄ п╪п╣п╫я▐, п╨п╟п╨п╦п╪п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐п╪п╦ п╡п╩п╟п╢п╣п╣я┌ я┌п╡п╬п╣ п╢п╬п╪п╟я┬п╫п╣п╣ п╤п╦п╡п╬я┌п╫п╬п╣?" );
+	say_act( victim, ch, "п╒п╟п╨ п╫п╣ я│я┌п╣я│п╫я▐п╧я│я▐, я│п©я─п╟я┬п╦п╡п╟п╧." );
 	interpret_fmt( ch, "smile %s", victim->getNameP( ) );
 	return;
     }
@@ -81,18 +81,18 @@ void Hierophant::tell( Character *victim, const char *speech )
 	return;
 
     if (!pet) {
-	say_act( victim, ch, "$c1, у тебя нет домашнего животного." );
+	say_act( victim, ch, "$c1, я┐ я┌п╣п╠я▐ п╫п╣я┌ п╢п╬п╪п╟я┬п╫п╣пЁп╬ п╤п╦п╡п╬я┌п╫п╬пЁп╬." );
 	return;
     }
 
     if (pet->in_room != victim->in_room) {
-	say_act( victim, ch, "$c1, приводи его сюда - тогда и поговорим." );
+	say_act( victim, ch, "$c1, п©я─п╦п╡п╬п╢п╦ п╣пЁп╬ я│я▌п╢п╟ - я┌п╬пЁп╢п╟ п╦ п©п╬пЁп╬п╡п╬я─п╦п╪." );
 	return;
     }
     
     if (!pet->getProfession( )->getFlags( pet ).isSet(PROF_CASTER)) {
-	act("$C1 внимательно смотрит на $c4 и качает головой.", pet, 0, ch, TO_ALL);
-	say_act( pet, ch, "Похоже, $c1 совершенно не способ$gно|ен|на к магии.." );
+	act("$C1 п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $c4 п╦ п╨п╟я┤п╟п╣я┌ пЁп╬п╩п╬п╡п╬п╧.", pet, 0, ch, TO_ALL);
+	say_act( pet, ch, "п÷п╬я┘п╬п╤п╣, $c1 я│п╬п╡п╣я─я┬п╣п╫п╫п╬ п╫п╣ я│п©п╬я│п╬п╠$gп╫п╬|п╣п╫|п╫п╟ п╨ п╪п╟пЁп╦п╦.." );
 	return;
     }
     
@@ -111,14 +111,14 @@ void Hierophant::tell( Character *victim, const char *speech )
     }
     
     if (groups.empty( )) {
-	act("$C1 внимательно смотрит на $c4 и вздыхает.", pet, 0, ch, TO_ALL);
-	say_act( pet, ch, "Похоже, что в голове у $x пусто.." );
+	act("$C1 п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ я│п╪п╬я┌я─п╦я┌ п╫п╟ $c4 п╦ п╡п╥п╢я▀я┘п╟п╣я┌.", pet, 0, ch, TO_ALL);
+	say_act( pet, ch, "п÷п╬я┘п╬п╤п╣, я┤я┌п╬ п╡ пЁп╬п╩п╬п╡п╣ я┐ $x п©я┐я│я┌п╬.." );
 	return;
     }
     
-    act("$C1 тихо беседует с $c5 на странном языке.", pet, 0, ch, TO_ALL);
+    act("$C1 я┌п╦я┘п╬ п╠п╣я│п╣п╢я┐п╣я┌ я│ $c5 п╫п╟ я│я┌я─п╟п╫п╫п╬п╪ я▐п╥я▀п╨п╣.", pet, 0, ch, TO_ALL);
     buf << endl << "{G" << pet->getNameP( '1' ) << "{g "
-	<< "обладает познаниями в таких науках: " << endl << endl;
+	<< "п╬п╠п╩п╟п╢п╟п╣я┌ п©п╬п╥п╫п╟п╫п╦я▐п╪п╦ п╡ я┌п╟п╨п╦я┘ п╫п╟я┐п╨п╟я┘: " << endl << endl;
     
     for (GroupsMap::iterator i = groups.begin( ); i != groups.end( ); i++) {
 	SkillGroup *group = skillGroupManager->find( i->first );
@@ -138,7 +138,7 @@ void Hierophant::tell( Character *victim, const char *speech )
     
     pObjIndex = get_obj_index( 9606 );
     if (!pObjIndex) {
-	say_act( victim, ch, "Извини, $c1, но у меня кончилась бумага." );
+	say_act( victim, ch, "п≤п╥п╡п╦п╫п╦, $c1, п╫п╬ я┐ п╪п╣п╫я▐ п╨п╬п╫я┤п╦п╩п╟я│я▄ п╠я┐п╪п╟пЁп╟." );
 	interpret_fmt( ch, "snick" );
 	return;
     }
@@ -147,7 +147,7 @@ void Hierophant::tell( Character *victim, const char *speech )
     obj->addExtraDescr( obj->getName( ), buf.str( ) );
     obj_to_char( obj, victim );
 
-    act( "$c1 делает запись на свитке пергамента и дает его $C3.", ch, 0, victim, TO_NOTVICT );
-    act( "$c1 делает запись на свитке пергамента и дает его тебе.", ch, 0, victim, TO_VICT );
+    act( "$c1 п╢п╣п╩п╟п╣я┌ п╥п╟п©п╦я│я▄ п╫п╟ я│п╡п╦я┌п╨п╣ п©п╣я─пЁп╟п╪п╣п╫я┌п╟ п╦ п╢п╟п╣я┌ п╣пЁп╬ $C3.", ch, 0, victim, TO_NOTVICT );
+    act( "$c1 п╢п╣п╩п╟п╣я┌ п╥п╟п©п╦я│я▄ п╫п╟ я│п╡п╦я┌п╨п╣ п©п╣я─пЁп╟п╪п╣п╫я┌п╟ п╦ п╢п╟п╣я┌ п╣пЁп╬ я┌п╣п╠п╣.", ch, 0, victim, TO_VICT );
 }
 

@@ -38,19 +38,19 @@ CMDRUNP( wear )
     argument = one_argument( argument, argVict );
 
     if (!argObj[0]) {
-	ch->println("îÁÄÅÔØ, ×ÏÏÒÕÖÉÔØÓÑ ÉÌÉ ×ÚÑÔØ ÜÔÏ × ÒÕËÉ?");
+	ch->println("ÐÐ°Ð´ÐµÑ‚ÑŒ, Ð²Ð¾Ð¾Ñ€ÑƒÐ¶Ð¸Ñ‚ÑŒÑÑ Ð¸Ð»Ð¸ Ð²Ð·ÑÑ‚ÑŒ ÑÑ‚Ð¾ Ð² Ñ€ÑƒÐºÐ¸?");
 	return;
     }
     
     if (arg_is_to( argTo ) || arg_is_in( argTo )) {
-        if (arg_oneof( argVict, "×ÏÌÏÓÙ", "hair" )) {
+        if (arg_oneof( argVict, "Ð²Ð¾Ð»Ð¾ÑÑ‹", "hair" )) {
             fHair = true;
         }
         else if (( victim = get_char_room( ch, argVict  ) ) == 0) {
-	    ch->println("îÁ ËÏÇÏ ÔÙ ÈÏÞÅÛØ ÜÔÏ ÎÁÄÅÔØ?");
+	    ch->println("ÐÐ° ÐºÐ¾Ð³Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ ÑÑ‚Ð¾ Ð½Ð°Ð´ÐµÑ‚ÑŒ?");
 	    return;
 	} else if (victim != ch && !victim->is_npc( )) {
-	    act("$C1 × ÓÏÓÔÏÑÎÉÉ ÏÄÅÔØÓÑ ÓÁ$GÍÏ|Í|ÍÁ!", ch, 0, victim, TO_CHAR);
+	    act("$C1 Ð² ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ð¸ Ð¾Ð´ÐµÑ‚ÑŒÑÑ ÑÐ°$GÐ¼Ð¾|Ð¼|Ð¼Ð°!", ch, 0, victim, TO_CHAR);
 	    return;
 	}
     }
@@ -61,7 +61,7 @@ CMDRUNP( wear )
 	Object *obj_next;
 	
 	if (victim != ch) {
-	    ch->println("ôÙ ÎÅ ÍÏÖÅÛØ ÓÄÅÌÁÔØ ÜÔÏÇÏ.");
+	    ch->println("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ ÑÑ‚Ð¾Ð³Ð¾.");
 	    return;
 	}
 	
@@ -76,13 +76,13 @@ CMDRUNP( wear )
     }
     
     if (( obj = get_obj_carry( ch, argObj ) ) == 0) {
-	ch->println("õ ÔÅÂÑ ÎÅÔ ÜÔÏÇÏ.");
+	ch->println("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾.");
 	return;
     }
 
     if (ch == victim && fHair) {
         if (obj->getWeight( ) / 10 > 3) {
-            ch->pecho( "%1$^O1 ÓÌÉÛËÏÍ ÔÑÖÅÌ%1$GÏÅ|ÙÊ|ÁÑ|ÙÅ, ÞÔÏÂÙ ÕÄÅÒÖÁÔØÓÑ × Ô×ÏÉÈ ×ÏÌÏÓÁÈ.", obj );
+            ch->pecho( "%1$^O1 ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ñ‚ÑÐ¶ÐµÐ»%1$GÐ¾Ðµ|Ñ‹Ð¹|Ð°Ñ|Ñ‹Ðµ, Ñ‡Ñ‚Ð¾Ð±Ñ‹ ÑƒÐ´ÐµÑ€Ð¶Ð°Ñ‚ÑŒÑÑ Ð² Ñ‚Ð²Ð¾Ð¸Ñ… Ð²Ð¾Ð»Ð¾ÑÐ°Ñ….", obj );
             return;
         }
 
@@ -92,12 +92,12 @@ CMDRUNP( wear )
 	
     if (ch == victim) {
 	if (wear_obj( ch, obj, F_WEAR_VERBOSE | F_WEAR_REPLACE) == RC_WEAR_NOMATCH)
-	    ch->println("ôÙ ÎÅ ÍÏÖÅÛØ ÎÁÄÅÔØ, ×ÏÏÒÕÖÉÔØÓÑ ÉÌÉ ÄÅÒÖÁÔØ ÜÔÏ × ÒÕËÁÈ.");
+	    ch->println("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð½Ð°Ð´ÐµÑ‚ÑŒ, Ð²Ð¾Ð¾Ñ€ÑƒÐ¶Ð¸Ñ‚ÑŒÑÑ Ð¸Ð»Ð¸ Ð´ÐµÑ€Ð¶Ð°Ñ‚ÑŒ ÑÑ‚Ð¾ Ð² Ñ€ÑƒÐºÐ°Ñ….");
 	return;
     }
     
     if (!obj->behavior || !obj->behavior->canDress( ch, victim )) {
-	act("ôÙ ÎÅ ÓÍÏÖÅÛØ ÎÁÄÅÔØ $o4 ÎÁ $C4.", ch, obj, victim, TO_CHAR);
+	act("Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð½Ð°Ð´ÐµÑ‚ÑŒ $o4 Ð½Ð° $C4.", ch, obj, victim, TO_CHAR);
 	return;
     }
 
@@ -109,15 +109,15 @@ CMDRUNP( wear )
 	    obj_from_char( obj );
 	    obj_to_char( obj, ch );
 	}
-	act("ôÙ ÐÙÔÁÅÛØÓÑ ÎÁÄÅÔØ $o4 ÎÁ $C4, ÎÏ ÂÅÚÕÓÐÅÛÎÏ.", ch, obj, victim, TO_CHAR);
-	act("$c1 ÐÙÔÁÅÔÓÑ ÎÁÄÅÔØ ÎÁ ÔÅÂÑ $o4, ÎÏ ÎÅ ÍÏÖÅÔ.", ch, obj, victim, TO_VICT);
-	act("$c1 ÐÙÔÁÅÔÓÑ ÎÁÄÅÔØ ÎÁ $C4 $o4, ÎÏ ÎÅ ÍÏÖÅÔ.", ch, obj, victim, TO_NOTVICT);
+	act("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ Ð½Ð°Ð´ÐµÑ‚ÑŒ $o4 Ð½Ð° $C4, Ð½Ð¾ Ð±ÐµÐ·ÑƒÑÐ¿ÐµÑˆÐ½Ð¾.", ch, obj, victim, TO_CHAR);
+	act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð½Ð°Ð´ÐµÑ‚ÑŒ Ð½Ð° Ñ‚ÐµÐ±Ñ $o4, Ð½Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚.", ch, obj, victim, TO_VICT);
+	act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ Ð½Ð°Ð´ÐµÑ‚ÑŒ Ð½Ð° $C4 $o4, Ð½Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚.", ch, obj, victim, TO_NOTVICT);
 	return;
     }
 
-    act("ôÙ ÎÁÄÅ×ÁÅÛØ $o4 ÎÁ $C4.", ch, obj, victim, TO_CHAR);
-    act("$c1 ÎÁÄÅ×ÁÅÔ ÎÁ ÔÅÂÑ $o4.", ch, obj, victim, TO_VICT);
-    act("$c1 ÎÁÄÅ×ÁÅÔ ÎÁ $C4 $o4.", ch, obj, victim, TO_NOTVICT);
+    act("Ð¢Ñ‹ Ð½Ð°Ð´ÐµÐ²Ð°ÐµÑˆÑŒ $o4 Ð½Ð° $C4.", ch, obj, victim, TO_CHAR);
+    act("$c1 Ð½Ð°Ð´ÐµÐ²Ð°ÐµÑ‚ Ð½Ð° Ñ‚ÐµÐ±Ñ $o4.", ch, obj, victim, TO_VICT);
+    act("$c1 Ð½Ð°Ð´ÐµÐ²Ð°ÐµÑ‚ Ð½Ð° $C4 $o4.", ch, obj, victim, TO_NOTVICT);
 }
 
 
@@ -140,18 +140,18 @@ CMDRUNP( remove )
     argument = one_argument( argument, argVict );
 
     if (!argObj[0]) {
-	ch->println("óÎÑÔØ ÞÔÏ?");
+	ch->println("Ð¡Ð½ÑÑ‚ÑŒ Ñ‡Ñ‚Ð¾?");
 	return;
     }
 
     if (arg_is_from( argFrom )) {
 	if (( victim = get_char_room( ch, argVict ) ) == 0) {
-	    ch->println("ó ËÏÇÏ ÔÙ ÈÏÞÅÛØ ÜÔÏ ÓÎÑÔØ?");
+	    ch->println("Ð¡ ÐºÐ¾Ð³Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ ÑÑ‚Ð¾ ÑÐ½ÑÑ‚ÑŒ?");
 	    return;
 	}
 	
 	if (victim != ch && !victim->is_npc( )) {
-	    act("$C1 × ÓÏÓÔÏÑÎÉÉ ÒÁÚÄÅÔØÓÑ ÓÁ$GÍÏ|Í|ÍÁ!", ch, 0, victim, TO_CHAR);
+	    act("$C1 Ð² ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ð¸ Ñ€Ð°Ð·Ð´ÐµÑ‚ÑŒÑÑ ÑÐ°$GÐ¼Ð¾|Ð¼|Ð¼Ð°!", ch, 0, victim, TO_CHAR);
 	    return;
 	}
     }
@@ -162,7 +162,7 @@ CMDRUNP( remove )
         Object *obj_next;
 
 	if (victim != ch) {
-	    ch->println("ôÙ ÎÅ ÍÏÖÅÛØ ÓÄÅÌÁÔØ ÜÔÏÇÏ.");
+	    ch->println("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ´ÐµÐ»Ð°Ñ‚ÑŒ ÑÑ‚Ð¾Ð³Ð¾.");
 	    return;
 	}
 
@@ -178,7 +178,7 @@ CMDRUNP( remove )
     
     if (ch == victim) {
 	if (( obj = get_obj_wear( ch, argObj ) ) == 0) {
-	    ch->println("õ ÔÅÂÑ ÎÅÔ ÜÔÏÇÏ.");
+	    ch->println("Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾.");
 	    return;
 	}
 
@@ -187,25 +187,25 @@ CMDRUNP( remove )
     }
     
     if (( obj = get_obj_wear_victim( victim, argObj, ch ) ) == 0) {
-	act("õ $C2 ÎÅÔ ÜÔÏÇÏ.", ch, 0, victim, TO_CHAR);
+	act("Ð£ $C2 Ð½ÐµÑ‚ ÑÑ‚Ð¾Ð³Ð¾.", ch, 0, victim, TO_CHAR);
 	return;
     }
 
     if (!obj->behavior || !obj->behavior->canDress( ch, victim )) {
-	act("ôÙ ÎÅ ÓÍÏÖÅÛØ ÓÎÑÔØ $o4 Ó $C2.", ch, obj, victim, TO_CHAR);
+	act("Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ½ÑÑ‚ÑŒ $o4 Ñ $C2.", ch, obj, victim, TO_CHAR);
 	return;
     }
     
     if (!obj->wear_loc->remove( obj, 0 )) {
-	act("ôÙ ÐÙÔÁÅÛØÓÑ ÓÎÑÔØ $o4 Ó $C2, ÎÏ ÂÅÚÕÓÐÅÛÎÏ.", ch, obj, victim, TO_CHAR);
-	act("$c1 ÐÙÔÁÅÔÓÑ ÓÎÑÔØ Ó ÔÅÂÑ $o4, ÎÏ ÎÅ ÍÏÖÅÔ.", ch, obj, victim, TO_VICT);
-	act("$c1 ÐÙÔÁÅÔÓÑ ÓÎÑÔØ Ó $C2 $o4, ÎÏ ÎÅ ÍÏÖÅÔ.", ch, obj, victim, TO_NOTVICT);
+	act("Ð¢Ñ‹ Ð¿Ñ‹Ñ‚Ð°ÐµÑˆÑŒÑÑ ÑÐ½ÑÑ‚ÑŒ $o4 Ñ $C2, Ð½Ð¾ Ð±ÐµÐ·ÑƒÑÐ¿ÐµÑˆÐ½Ð¾.", ch, obj, victim, TO_CHAR);
+	act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ ÑÐ½ÑÑ‚ÑŒ Ñ Ñ‚ÐµÐ±Ñ $o4, Ð½Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚.", ch, obj, victim, TO_VICT);
+	act("$c1 Ð¿Ñ‹Ñ‚Ð°ÐµÑ‚ÑÑ ÑÐ½ÑÑ‚ÑŒ Ñ $C2 $o4, Ð½Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚.", ch, obj, victim, TO_NOTVICT);
 	return;
     }
     
-    act("ôÙ ÓÎÉÍÁÅÛØ $o4 Ó $C2.", ch, obj, victim, TO_CHAR);
-    act("$c1 ÓÎÉÍÁÅÔ Ó ÔÅÂÑ $o4.", ch, obj, victim, TO_VICT);
-    act("$c1 ÓÎÉÍÁÅÔ Ó $C2 $o4.", ch, obj, victim, TO_NOTVICT);
+    act("Ð¢Ñ‹ ÑÐ½Ð¸Ð¼Ð°ÐµÑˆÑŒ $o4 Ñ $C2.", ch, obj, victim, TO_CHAR);
+    act("$c1 ÑÐ½Ð¸Ð¼Ð°ÐµÑ‚ Ñ Ñ‚ÐµÐ±Ñ $o4.", ch, obj, victim, TO_VICT);
+    act("$c1 ÑÐ½Ð¸Ð¼Ð°ÐµÑ‚ Ñ $C2 $o4.", ch, obj, victim, TO_NOTVICT);
     
     if (obj->carried_by == victim) {
 	obj_from_char( obj );

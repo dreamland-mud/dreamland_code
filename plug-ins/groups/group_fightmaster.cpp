@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "logstream.h"
@@ -67,37 +67,37 @@ SKILL_RUNP( bashdoor )
 
 	if (!gsn_bash_door->getEffective( ch ))
 	{
-		ch->send_to("Выбить дверь? Как это?\n\r");
+		ch->send_to("п▓я▀п╠п╦я┌я▄ п╢п╡п╣я─я▄? п п╟п╨ я█я┌п╬?\n\r");
 		return;
 	}
 
 	if (MOUNTED(ch))
 	{
-		ch->send_to("Ты не можешь выбить дверь, когда ты в седле.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡я▀п╠п╦я┌я▄ п╢п╡п╣я─я▄, п╨п╬пЁп╢п╟ я┌я▀ п╡ я│п╣п╢п╩п╣.\n\r");
 		return;
 	}
 
 	if (RIDDEN(ch))
 	{
-		ch->send_to("Ты не можешь выбить дверь, когда оседлан.\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡я▀п╠п╦я┌я▄ п╢п╡п╣я─я▄, п╨п╬пЁп╢п╟ п╬я│п╣п╢п╩п╟п╫.\n\r");
 		return;
 	}
 
 	if (arg[0] == '\0')
 	{
-		ch->send_to("Выбить дверь в каком направлении?\n\r");
+		ch->send_to("п▓я▀п╠п╦я┌я▄ п╢п╡п╣я─я▄ п╡ п╨п╟п╨п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦?\n\r");
 		return;
 	}
 
 	if (ch->fighting)
 	{	
-		ch->send_to("Сначала закончи сражение.\n\r");
+		ch->send_to("п║п╫п╟я┤п╟п╩п╟ п╥п╟п╨п╬п╫я┤п╦ я│я─п╟п╤п╣п╫п╦п╣.\n\r");
 		return;
 	}
         if ( ( ( peexit = get_extra_exit( arg, room->extra_exit ) ) == 0 || !ch->can_see( peexit ) )
 	     && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
 	{
-		ch->send_to("Но тут нечего выбивать!\n\r");
+		ch->send_to("п²п╬ я┌я┐я┌ п╫п╣я┤п╣пЁп╬ п╡я▀п╠п╦п╡п╟я┌я▄!\n\r");
 		return;
 	}
 
@@ -106,7 +106,7 @@ SKILL_RUNP( bashdoor )
 	{
 		if ( gch->is_npc() && IS_AWAKE(gch) && ch->getModifyLevel() + 5 < gch->getModifyLevel() )
 		{
-			act_p( "$C1 стоит слишком близко к двери.", ch, 0, gch, TO_CHAR,POS_RESTING);
+			act_p( "$C1 я│я┌п╬п╦я┌ я│п╩п╦я┬п╨п╬п╪ п╠п╩п╦п╥п╨п╬ п╨ п╢п╡п╣я─п╦.", ch, 0, gch, TO_CHAR,POS_RESTING);
 			return;
 		}
 	}
@@ -129,19 +129,19 @@ SKILL_RUNP( bashdoor )
 
 	if ( !IS_SET(exit_info, EX_CLOSED) )
 	{
-		ch->send_to("Здесь уже открыто.\n\r");
+		ch->send_to("п≈п╢п╣я│я▄ я┐п╤п╣ п╬я┌п╨я─я▀я┌п╬.\n\r");
 		return;
 	}
 
 	if ( !IS_SET(exit_info, EX_LOCKED) )
 	{
-		ch->send_to("Просто поробуй открыть.\n\r");
+		ch->send_to("п÷я─п╬я│я┌п╬ п©п╬я─п╬п╠я┐п╧ п╬я┌п╨я─я▀я┌я▄.\n\r");
 		return;
 	}
 
 	if ( IS_SET(exit_info, EX_NOPASS) && !IS_SET(exit_info, EX_BASH_ONLY))
 	{
-		ch->println("Эту дверь невозможно вышибить.");
+		ch->println("п╜я┌я┐ п╢п╡п╣я─я▄ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╡я▀я┬п╦п╠п╦я┌я▄.");
 		return;
 	}
 
@@ -164,8 +164,8 @@ SKILL_RUNP( bashdoor )
 
 	chance += ( gsn_bash_door->getEffective( ch ) - 90 );
         const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
-        act("Ты бьешь в $N4, пытаясь выбить!", ch,0, doorname,TO_CHAR);
-        act("$c1 бьет в $N4, пытаясь выбить!", ch,0, doorname,TO_ROOM);
+        act("п╒я▀ п╠я▄п╣я┬я▄ п╡ $N4, п©я▀я┌п╟я▐я│я▄ п╡я▀п╠п╦я┌я▄!", ch,0, doorname,TO_CHAR);
+        act("$c1 п╠я▄п╣я┌ п╡ $N4, п©я▀я┌п╟я▐я│я▄ п╡я▀п╠п╦я┌я▄!", ch,0, doorname,TO_ROOM);
 
 	if (room->isDark( ))
 		chance /= 2;
@@ -179,22 +179,22 @@ SKILL_RUNP( bashdoor )
 		{
 			REMOVE_BIT(peexit->exit_info, EX_LOCKED);
 			REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-                        act("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
-                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
+                        act("$c1 п╡я▀п╠п╦п╡п╟п╣я┌ п╢п╡п╣я─я▄.", ch, 0, 0, TO_ROOM);
+                        act("п╒я▀ п╡я▀п╠п╦п╡п╟п╣я┬я▄ п╢п╡п╣я─я▄!", ch, 0, 0, TO_CHAR);
 		}
 		else
 		{
 			REMOVE_BIT(pexit->exit_info, EX_LOCKED);
 			REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-                        act("$c1 выбивает дверь.", ch, 0, 0, TO_ROOM);
-                        act("Ты выбиваешь дверь!", ch, 0, 0, TO_CHAR);
+                        act("$c1 п╡я▀п╠п╦п╡п╟п╣я┌ п╢п╡п╣я─я▄.", ch, 0, 0, TO_ROOM);
+                        act("п╒я▀ п╡я▀п╠п╦п╡п╟п╣я┬я▄ п╢п╡п╣я─я▄!", ch, 0, 0, TO_CHAR);
 
 			/* open the other side */
                         if ((pexit_rev = direction_reverse(room, door)))
 			{
 				REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
 				REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-                                direction_target(room, door)->echo(POS_RESTING, "%^N1 с грохотом вылетает.", doorname);
+                                direction_target(room, door)->echo(POS_RESTING, "%^N1 я│ пЁя─п╬я┘п╬я┌п╬п╪ п╡я▀п╩п╣я┌п╟п╣я┌.", doorname);
 			}
 		}
 
@@ -203,8 +203,8 @@ SKILL_RUNP( bashdoor )
 	}
 	else
 	{
-		act("Обессилев, ты падаешь лицом вниз!", ch,0,0,TO_CHAR);
-		act("Обессилев, $c1 упа$gло|л|ла лицом вниз.", ch,0,0,TO_ROOM);
+		act("п·п╠п╣я│я│п╦п╩п╣п╡, я┌я▀ п©п╟п╢п╟п╣я┬я▄ п╩п╦я├п╬п╪ п╡п╫п╦п╥!", ch,0,0,TO_CHAR);
+		act("п·п╠п╣я│я│п╦п╩п╣п╡, $c1 я┐п©п╟$gп╩п╬|п╩|п╩п╟ п╩п╦я├п╬п╪ п╡п╫п╦п╥.", ch,0,0,TO_ROOM);
 		gsn_bash_door->improve( ch, false );
 		ch->position = POS_RESTING;
 		ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );
@@ -230,7 +230,7 @@ SKILL_RUNP( bash )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Ты не можешь сбить с ног, если ты верхом!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╠п╦я┌я▄ я│ п╫п╬пЁ, п╣я│п╩п╦ я┌я▀ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	}
 
@@ -249,7 +249,7 @@ SKILL_RUNP( bash )
 
 	if ( (chance = gsn_bash->getEffective( ch )) <= 1)
 	{	
-		ch->send_to("Ударить щитом? Но как это сделать?\n\r");
+		ch->send_to("пёп╢п╟я─п╦я┌я▄ я┴п╦я┌п╬п╪? п²п╬ п╨п╟п╨ я█я┌п╬ я│п╢п╣п╩п╟я┌я▄?\n\r");
 		return;
 	}
 
@@ -260,37 +260,37 @@ SKILL_RUNP( bash )
 		victim = ch->fighting;
 		if ( victim == 0 )
 		{
-			ch->send_to("Сейчас ты не сражаешься!\n\r");
+			ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
 			return;
 		}
 	}
 	else if ( (victim = get_char_room(ch,arg)) == 0 )
 	{
-		ch->send_to("Этого нет здесь.\n\r");
+		ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 		return;
 	}
 
 	if ( victim->position < POS_FIGHTING )
 	{
-		act_p("Подожди пока $E встанет.",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ $E п╡я│я┌п╟п╫п╣я┌.",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if ( victim == ch )
 	{
-		ch->send_to("Ударить щитом себя?\n\r");
+		ch->send_to("пёп╢п╟я─п╦я┌я▄ я┴п╦я┌п╬п╪ я│п╣п╠я▐?\n\r");
 		return;
 	}
 
 	if ( get_eq_char( ch, wear_shield ) == 0 )
 	{
-		ch->send_to("Тебе нужен щит чтобы сделать это!\n\r");
+		ch->send_to("п╒п╣п╠п╣ п╫я┐п╤п╣п╫ я┴п╦я┌ я┤я┌п╬п╠я▀ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬!\n\r");
 		return;
 	}
 	
 	if ( is_flying( ch ) )
 	{
-		ch->send_to("В полете? И как ты себе это представляешь?\n\r");
+		ch->send_to("п▓ п©п╬п╩п╣я┌п╣? п≤ п╨п╟п╨ я┌я▀ я│п╣п╠п╣ я█я┌п╬ п©я─п╣п╢я│я┌п╟п╡п╩я▐п╣я┬я▄?\n\r");
 		return;
 	}
 
@@ -299,27 +299,27 @@ SKILL_RUNP( bash )
 
 	if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
 	{
-		act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ $C1 я┌п╡п╬п╧ п╢я─я┐пЁ!!!",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if (SHADOW(ch))
 	{
-		ch->send_to("Ты безуспешно пытаешься бороться со своей тенью.\n\r");
-		act_p("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM,POS_RESTING);
+		ch->send_to("п╒я▀ п╠п╣п╥я┐я│п©п╣я┬п╫п╬ п©я▀я┌п╟п╣я┬я▄я│я▐ п╠п╬я─п╬я┌я▄я│я▐ я│п╬ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.\n\r");
+		act_p("$c1 п╠я▄п╣я┌ я┴п╦я┌п╬п╪ я│п╡п╬я▌ я┌п╣п╫я▄.",ch,0,0,TO_ROOM,POS_RESTING);
 		return;
 	}
 
 	if ( !ch->is_npc() && !ch->move )
 	{
-		ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+		ch->pecho("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟%Gп╩п╬|п╩|п╩п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch);
 		return;
 	}
 
 	if ( MOUNTED(victim) )
 	{
 	    if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-		ch->send_to("Ты не можешь сбить с ног того, кто верхом!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╠п╦я┌я▄ я│ п╫п╬пЁ я┌п╬пЁп╬, п╨я┌п╬ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	    }
 	    
@@ -330,11 +330,11 @@ SKILL_RUNP( bash )
 
 	if ( victim->isAffected(gsn_protective_shield) )
 	{
-		act_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
+		act_p("{Yп╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я│п╠п╦я┌я▄ я│ п╫п╬пЁ $C4, п╫п╬ я┤я┌п╬-я┌п╬ я┌п╣п╠п╣ п╪п╣я┬п╟п╣я┌ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.{x",
 			ch, 0, victim,TO_CHAR,POS_FIGHTING);
-		act_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
+		act_p("{Y$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я┌п╣п╠я▐ я│ п╫п╬пЁ, п╫п╬ я┌п╡п╬я▐ п╥п╟я┴п╦я┌п╟ п╪п╣я┬п╟п╣я┌ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.{x",
 			ch, 0,victim,TO_VICT,POS_FIGHTING);
-		act_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
+		act_p("{Y$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я│ п╫п╬пЁ $C4, п╫п╬ я┤я┌п╬-я┌п╬ п╪п╣я┬п╟п╣я┌ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.{x",
 			ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 		return;
 	}
@@ -375,10 +375,10 @@ SKILL_RUNP( bash )
 	{
 		if ( number_percent() < 50 )
 		{
-			act_p("Сильнейшим ударом щита $c1 сбивает тебя с ног и ты падаешь!",
+			act_p("п║п╦п╩я▄п╫п╣п╧я┬п╦п╪ я┐п╢п╟я─п╬п╪ я┴п╦я┌п╟ $c1 я│п╠п╦п╡п╟п╣я┌ я┌п╣п╠я▐ я│ п╫п╬пЁ п╦ я┌я▀ п©п╟п╢п╟п╣я┬я▄!",
 				ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("Ты сбиваешь $C4 с ног ударом щита!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 сильнейшим ударом щита сбивает $C4 с ног.",
+			act_p("п╒я▀ я│п╠п╦п╡п╟п╣я┬я▄ $C4 я│ п╫п╬пЁ я┐п╢п╟я─п╬п╪ я┴п╦я┌п╟!",ch,0,victim,TO_CHAR,POS_RESTING);
+			act_p("$c1 я│п╦п╩я▄п╫п╣п╧я┬п╦п╪ я┐п╢п╟я─п╬п╪ я┴п╦я┌п╟ я│п╠п╦п╡п╟п╣я┌ $C4 я│ п╫п╬пЁ.",
 				ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 			wait = 3;
@@ -404,9 +404,9 @@ SKILL_RUNP( bash )
 		}
 		else
 		{
-			act_p("$c1 наносит тебе удар щитом!",ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("Ты наносишь удар щитом $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 наносит удар щитом $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+			act_p("$c1 п╫п╟п╫п╬я│п╦я┌ я┌п╣п╠п╣ я┐п╢п╟я─ я┴п╦я┌п╬п╪!",ch,0,victim,TO_VICT,POS_RESTING);
+			act_p("п╒я▀ п╫п╟п╫п╬я│п╦я┬я▄ я┐п╢п╟я─ я┴п╦я┌п╬п╪ $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
+			act_p("$c1 п╫п╟п╫п╬я│п╦я┌ я┐п╢п╟я─ я┴п╦я┌п╬п╪ $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}	
 		gsn_bash->improve( ch, true, victim );
 		ch->setWait( gsn_bash->getBeats( ) );
@@ -419,20 +419,20 @@ SKILL_RUNP( bash )
 	{
 		if (number_percent() < 50)
 		{
-			act_p("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 промахивается и падает.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-			act_p("$c1 пытается сбить тебя с ног, но промахивается и падает.",
+			act_p("п╒я▀ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐ п╦ п©п╟п╢п╟п╣я┬я▄!",ch,0,victim,TO_CHAR,POS_RESTING);
+			act_p("$c1 п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ п©п╟п╢п╟п╣я┌.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+			act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я┌п╣п╠я▐ я│ п╫п╬пЁ, п╫п╬ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ п©п╟п╢п╟п╣я┌.",
 				ch,0,victim,TO_VICT,POS_RESTING);
 			ch->position = POS_RESTING;
 			ch->setWait( gsn_bash->getBeats( ) * 3/2 );
 		}
 		else
 		{
-			act_p("Ты промахиваешься и едва не падаешь!",
+			act_p("п╒я▀ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐ п╦ п╣п╢п╡п╟ п╫п╣ п©п╟п╢п╟п╣я┬я▄!",
 				ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 промахивается и едва не падает.",
+			act_p("$c1 п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ п╣п╢п╡п╟ п╫п╣ п©п╟п╢п╟п╣я┌.",
 				ch,0,victim,TO_NOTVICT,POS_RESTING);
-			act_p("$c1 пытается сбить тебя с ног, но промахивается и едва не падает.",
+			act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я┌п╣п╠я▐ я│ п╫п╬пЁ, п╫п╬ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ п╣п╢п╡п╟ п╫п╣ п©п╟п╢п╟п╣я┌.",
 				ch,0,victim,TO_VICT,POS_RESTING);
 		}	
 		damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
@@ -442,8 +442,8 @@ SKILL_RUNP( bash )
 	
     if (!FightingCheck)
 	yell_panic( ch, victim,
-		    "Помогите! Кто-то бьет меня щитом!",
-		    "Помогите! %1$^C1 бьет меня щитом!" );
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ п╠я▄п╣я┌ п╪п╣п╫я▐ я┴п╦я┌п╬п╪!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 п╠я▄п╣я┌ п╪п╣п╫я▐ я┴п╦я┌п╬п╪!" );
 }
 
 
@@ -460,7 +460,7 @@ SKILL_RUNP( trip )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Ты не можешь подсечь противника, находясь в седле!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╢я│п╣я┤я▄ п©я─п╬я┌п╦п╡п╫п╦п╨п╟, п╫п╟я┘п╬п╢я▐я│я▄ п╡ я│п╣п╢п╩п╣!\n\r");
 		return;
 	}
 
@@ -473,7 +473,7 @@ SKILL_RUNP( trip )
 
 	if ( (chance = gsn_trip->getEffective( ch )) <= 1)
 	{
-		ch->send_to("Подсечь? Как это?\n\r");
+		ch->send_to("п÷п╬п╢я│п╣я┤я▄? п п╟п╨ я█я┌п╬?\n\r");
 		return;
 	}
 
@@ -484,13 +484,13 @@ SKILL_RUNP( trip )
 		victim = ch->fighting;
 		if ( victim == 0 )
 		{
-			ch->send_to("Сейчас ты не сражаешься!\n\r");
+			ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
 			return;
 		}
 	}
 	else if ( (victim = get_char_room(ch,arg)) == 0 )
 	{
-		ch->send_to("Этого нет здесь.\n\r");
+		ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 		return;
 	}
 
@@ -499,54 +499,54 @@ SKILL_RUNP( trip )
 
 	if ( is_flying( victim ) )
 	{
-		act_p("Но $S ноги не на земле.",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ $S п╫п╬пЁп╦ п╫п╣ п╫п╟ п╥п╣п╪п╩п╣.",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if ( is_flying( ch ) )
 	{
-		ch->send_to("В полете? И как ты себе это представляешь?\n\r");
+		ch->send_to("п▓ п©п╬п╩п╣я┌п╣? п≤ п╨п╟п╨ я┌я▀ я│п╣п╠п╣ я█я┌п╬ п©я─п╣п╢я│я┌п╟п╡п╩я▐п╣я┬я▄?\n\r");
 		return;
 	}
 
 	if ( victim->position < POS_FIGHTING )
 	{
-		act_p("Но $C1 уже лежит...",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ $C1 я┐п╤п╣ п╩п╣п╤п╦я┌...",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if ( !ch->is_npc() && !ch->move )
 	{
-		ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+		ch->pecho("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟%Gп╩п╬|п╩|п╩п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch);
 		return;
 	}
 
 	if (SHADOW(ch))
 	{
-		ch->send_to("Твоя нога вязнет в твоей тени...\n\r");
-		act_p("$c1 выделывает балетные па перед своей тенью.",
+		ch->send_to("п╒п╡п╬я▐ п╫п╬пЁп╟ п╡я▐п╥п╫п╣я┌ п╡ я┌п╡п╬п╣п╧ я┌п╣п╫п╦...\n\r");
+		act_p("$c1 п╡я▀п╢п╣п╩я▀п╡п╟п╣я┌ п╠п╟п╩п╣я┌п╫я▀п╣ п©п╟ п©п╣я─п╣п╢ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.",
 			ch, 0, 0, TO_ROOM,POS_RESTING);
 		return;
 	}
 
 	if ( victim == ch )
 	{
-		ch->send_to("Ты запинаешься и падаешь!\n\r");
+		ch->send_to("п╒я▀ п╥п╟п©п╦п╫п╟п╣я┬я▄я│я▐ п╦ п©п╟п╢п╟п╣я┬я▄!\n\r");
 		ch->setWait( 2 * gsn_trip->getBeats( ) );
-		act_p("$c1 спотыкается о свои собственные ноги!",ch,0,0,TO_ROOM,POS_RESTING);
+		act_p("$c1 я│п©п╬я┌я▀п╨п╟п╣я┌я│я▐ п╬ я│п╡п╬п╦ я│п╬п╠я│я┌п╡п╣п╫п╫я▀п╣ п╫п╬пЁп╦!",ch,0,0,TO_ROOM,POS_RESTING);
 		return;
 	}
 
 	if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
 	{
-		act_p("Но ведь $C1 - твой хозяин.",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ п╡п╣п╢я▄ $C1 - я┌п╡п╬п╧ я┘п╬п╥я▐п╦п╫.",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if ( MOUNTED(victim) )
 	{
 	    if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-		ch->send_to("Ты не можешь подсечь того, кто верхом!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╢я│п╣я┤я▄ я┌п╬пЁп╬, п╨я┌п╬ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	    }
 
@@ -582,17 +582,17 @@ SKILL_RUNP( trip )
 	{
 		if ( number_percent() < 70 )
 		{
-			act_p("$c1 подсекает тебя и ты падаешь!",ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("Ты подсекаешь $C4 и $C1 падает!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 подсекает $C4, и $C1 падает!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+			act_p("$c1 п©п╬п╢я│п╣п╨п╟п╣я┌ я┌п╣п╠я▐ п╦ я┌я▀ п©п╟п╢п╟п╣я┬я▄!",ch,0,victim,TO_VICT,POS_RESTING);
+			act_p("п╒я▀ п©п╬п╢я│п╣п╨п╟п╣я┬я▄ $C4 п╦ $C1 п©п╟п╢п╟п╣я┌!",ch,0,victim,TO_CHAR,POS_RESTING);
+			act_p("$c1 п©п╬п╢я│п╣п╨п╟п╣я┌ $C4, п╦ $C1 п©п╟п╢п╟п╣я┌!",ch,0,victim,TO_NOTVICT,POS_RESTING);
 			victim->setWaitViolence( 2 );
 			victim->position = POS_RESTING;
 		}
 		else
 		{
-			act_p("$c1 пытается подсечь тебя, но ты ухитряешься не упасть!",ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("Ты пытаешься подсечь $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 пытается подсечь $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+			act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п©п╬п╢я│п╣я┤я▄ я┌п╣п╠я▐, п╫п╬ я┌я▀ я┐я┘п╦я┌я─я▐п╣я┬я▄я│я▐ п╫п╣ я┐п©п╟я│я┌я▄!",ch,0,victim,TO_VICT,POS_RESTING);
+			act_p("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п©п╬п╢я│п╣я┤я▄ $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
+			act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п©п╬п╢я│п╣я┤я▄ $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
 		}
 		ch->setWait( gsn_trip->getBeats( ) );
 		gsn_trip->improve( ch, true, victim );
@@ -607,8 +607,8 @@ SKILL_RUNP( trip )
 
     if (!FightingCheck)
 	yell_panic( ch, victim,
-		    "Помогите! Кто-то только что подсек меня!",
-		    "Помогите! %1$^C1 только что подсе%1$Gкло|к|кла меня!" );
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ я┌п╬п╩я▄п╨п╬ я┤я┌п╬ п©п╬п╢я│п╣п╨ п╪п╣п╫я▐!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я┌п╬п╩я▄п╨п╬ я┤я┌п╬ п©п╬п╢я│п╣%1$Gп╨п╩п╬|п╨|п╨п╩п╟ п╪п╣п╫я▐!" );
 }
 
 /*
@@ -626,13 +626,13 @@ SKILL_RUNP( kick )
 
 	if (gsn_kick->getEffective( ch ) <= 1)
 	{
-		ch->send_to("У тебя плохая растяжка.\n\r");
+		ch->send_to("пё я┌п╣п╠я▐ п©п╩п╬я┘п╟я▐ я─п╟я│я┌я▐п╤п╨п╟.\n\r");
 		return;
 	}
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Ты не можешь ударить ногой, если ты верхом!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐п╢п╟я─п╦я┌я▄ п╫п╬пЁп╬п╧, п╣я│п╩п╦ я┌я▀ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	}
 
@@ -648,19 +648,19 @@ SKILL_RUNP( kick )
 		victim = ch->fighting;
 		if (victim == 0)
 		{
-			ch->send_to("Сейчас ты не сражаешься!\n\r");
+			ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
 			return;
 		}
 	}
 	else if ((victim = get_char_room(ch,arg)) == 0)
 	{
-		ch->send_to("Этого нет здесь.\n\r");
+		ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 		return;
 	}
 
 	if (victim == ch)
 	{
-		ch->send_to("Ударить себя ногой? Довольно тяжело...\n\r");
+		ch->send_to("пёп╢п╟я─п╦я┌я▄ я│п╣п╠я▐ п╫п╬пЁп╬п╧? п■п╬п╡п╬п╩я▄п╫п╬ я┌я▐п╤п╣п╩п╬...\n\r");
 		return;
 	}
 
@@ -671,13 +671,13 @@ SKILL_RUNP( kick )
 
 	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
 	{
-		act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ $C1 я┌п╡п╬п╧ п╢я─я┐пЁ!!!",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if( !ch->is_npc() && !ch->move )
 	{
-		ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+		ch->pecho("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟%Gп╩п╬|п╩|п╩п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch);
 		return;
 	}
 	else
@@ -685,8 +685,8 @@ SKILL_RUNP( kick )
 
 	if(SHADOW(ch))
 	{
-		ch->send_to("Твоя нога вязнет в твоей тени...\n\r");
-		act_p("$c1 выделывает балетные па перед своей тенью.",
+		ch->send_to("п╒п╡п╬я▐ п╫п╬пЁп╟ п╡я▐п╥п╫п╣я┌ п╡ я┌п╡п╬п╣п╧ я┌п╣п╫п╦...\n\r");
+		act_p("$c1 п╡я▀п╢п╣п╩я▀п╡п╟п╣я┌ п╠п╟п╩п╣я┌п╫я▀п╣ п©п╟ п©п╣я─п╣п╢ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.",
 					ch, 0, 0, TO_ROOM,POS_RESTING);
 		return;
 	}
@@ -736,12 +736,12 @@ SKILL_RUNP( kick )
     if (!FightingCheck) {
 	if (IS_SET(ch->parts, PART_TWO_HOOVES|PART_FOUR_HOOVES))
 	    yell_panic( ch, victim,
-			"Помогите! Кто-то ударил меня копытом!",
-			"Помогите! %1$^C1 удари%1$Gло|л|ла меня копытом!" );
+			"п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ я┐п╢п╟я─п╦п╩ п╪п╣п╫я▐ п╨п╬п©я▀я┌п╬п╪!",
+			"п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я┐п╢п╟я─п╦%1$Gп╩п╬|п╩|п╩п╟ п╪п╣п╫я▐ п╨п╬п©я▀я┌п╬п╪!" );
 	else
 	    yell_panic( ch, victim,
-			"Помогите! Кто-то ударил меня ногой!",
-			"Помогите! %1$^C1 удари%1$Gло|л|ла меня ногой!" );
+			"п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ я┐п╢п╟я─п╦п╩ п╪п╣п╫я▐ п╫п╬пЁп╬п╧!",
+			"п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я┐п╢п╟я─п╦%1$Gп╩п╬|п╩|п╩п╟ п╪п╣п╫я▐ п╫п╬пЁп╬п╧!" );
     }
 }
 
@@ -756,39 +756,39 @@ SKILL_RUNP( concentrate )
 
     if ( MOUNTED(ch) )
     {
-        ch->send_to("Ты не можешь сконцентрироваться, если ты верхом!\n\r");
+        ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐, п╣я│п╩п╦ я┌я▀ п╡п╣я─я┘п╬п╪!\n\r");
         return;
     }
 
     if ((chance = gsn_concentrate->getEffective( ch )) == 0)
     {
-	ch->send_to("Ты пытаешься сконцентрироваться, но не выходит.\n\r");
+	ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐, п╫п╬ п╫п╣ п╡я▀я┘п╬п╢п╦я┌.\n\r");
 	return;
     }
 
     if (ch->isAffected(gsn_concentrate))
     {
-	act( "Ты уже сконцентрировал$gось|ся|ась для сражения.", ch, 0, 0, TO_CHAR );
+	act( "п╒я▀ я┐п╤п╣ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟п╩$gп╬я│я▄|я│я▐|п╟я│я▄ п╢п╩я▐ я│я─п╟п╤п╣п╫п╦я▐.", ch, 0, 0, TO_CHAR );
 	return;
     }
 	
     if (ch->mana < gsn_concentrate->getMana( ))
     {
-	ch->send_to("У тебя не хватает энергии для этого.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
     /* fighting */
     if (ch->fighting)
     {
-	ch->send_to("Концентрируется для сражения!\n\r");
+	ch->send_to("п п╬п╫я├п╣п╫я┌я─п╦я─я┐п╣я┌я│я▐ п╢п╩я▐ я│я─п╟п╤п╣п╫п╦я▐!\n\r");
 	return;
     }
 
 
     if(SHADOW(ch)) {
-      ch->send_to("Эта странная тень не дает тебе сконцентрироваться.\n\r");
-      act_p("$c1 пыжится, но никак не сконцентрируется.\n...гляди, а то лопнет.",
+      ch->send_to("п╜я┌п╟ я│я┌я─п╟п╫п╫п╟я▐ я┌п╣п╫я▄ п╫п╣ п╢п╟п╣я┌ я┌п╣п╠п╣ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐.\n\r");
+      act_p("$c1 п©я▀п╤п╦я┌я│я▐, п╫п╬ п╫п╦п╨п╟п╨ п╫п╣ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─я┐п╣я┌я│я▐.\n...пЁп╩я▐п╢п╦, п╟ я┌п╬ п╩п╬п©п╫п╣я┌.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -802,8 +802,8 @@ SKILL_RUNP( concentrate )
 	ch->mana -= gsn_concentrate->getMana( );
 
 	interpret_raw( ch, "sit" );
-	ch->send_to("Ты отдыхаешь, концентрируясь для следующего сражения!\n\r");
-	act_p("$c1 концентрируется для следующего сражения.",
+	ch->send_to("п╒я▀ п╬я┌п╢я▀я┘п╟п╣я┬я▄, п╨п╬п╫я├п╣п╫я┌я─п╦я─я┐я▐я│я▄ п╢п╩я▐ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я│я─п╟п╤п╣п╫п╦я▐!\n\r");
+	act_p("$c1 п╨п╬п╫я├п╣п╫я┌я─п╦я─я┐п╣я┌я│я▐ п╢п╩я▐ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я│я─п╟п╤п╣п╫п╦я▐.",
                ch,0,0,TO_ROOM,POS_FIGHTING);
 	gsn_concentrate->improve( ch, true );
 
@@ -827,7 +827,7 @@ SKILL_RUNP( concentrate )
 
     else
     {
-	ch->send_to("Ты пытаешься сконцентрироваться для следующего сражения, но не выходит.\n\r");
+	ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐ п╢п╩я▐ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я│я─п╟п╤п╣п╫п╦я▐, п╫п╬ п╫п╣ п╡я▀я┘п╬п╢п╦я┌.\n\r");
 	gsn_concentrate->improve( ch, false );
     }
 }
@@ -868,11 +868,11 @@ SKILL_RUNP( crush )
 
 	if ( victim->isAffected(gsn_protective_shield) )
 	{
-		act("{YТвой мощный удар как будто соскальзывает c $C2, не причиняя вреда.",
+		act("{Yп╒п╡п╬п╧ п╪п╬я┴п╫я▀п╧ я┐п╢п╟я─ п╨п╟п╨ п╠я┐п╢я┌п╬ я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ c $C2, п╫п╣ п©я─п╦я┤п╦п╫я▐я▐ п╡я─п╣п╢п╟.",
 			ch,0,victim,TO_CHAR);
-		act("{Y$Мощный удар $c2 скользит по поверхности твоего охранного щита.{x",
+		act("{Y$п°п╬я┴п╫я▀п╧ я┐п╢п╟я─ $c2 я│п╨п╬п╩я▄п╥п╦я┌ п©п╬ п©п╬п╡п╣я─я┘п╫п╬я│я┌п╦ я┌п╡п╬п╣пЁп╬ п╬я┘я─п╟п╫п╫п╬пЁп╬ я┴п╦я┌п╟.{x",
 			ch,0,victim,TO_VICT);
-		act("{Y$Мощный удар $c2 как будто соскальзывает с $C2.{x",
+		act("{Y$п°п╬я┴п╫я▀п╧ я┐п╢п╟я─ $c2 п╨п╟п╨ п╠я┐п╢я┌п╬ я│п╬я│п╨п╟п╩я▄п╥я▀п╡п╟п╣я┌ я│ $C2.{x",
 			ch,0,victim,TO_NOTVICT);
 		return;
 	}
@@ -907,10 +907,10 @@ SKILL_RUNP( crush )
 	/* now the attack */
 	if ( number_percent() < chance )
 	{
-		act_p("$c1 сбивает тебя с ног мощнейшим ударом!",
+		act_p("$c1 я│п╠п╦п╡п╟п╣я┌ я┌п╣п╠я▐ я│ п╫п╬пЁ п╪п╬я┴п╫п╣п╧я┬п╦п╪ я┐п╢п╟я─п╬п╪!",
 			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("Ты бросаешься на $C4, и сбиваешь $S с ног!",ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 сбивает $C4 с ног мощнейшим ударом.",
+		act_p("п╒я▀ п╠я─п╬я│п╟п╣я┬я▄я│я▐ п╫п╟ $C4, п╦ я│п╠п╦п╡п╟п╣я┬я▄ $S я│ п╫п╬пЁ!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("$c1 я│п╠п╦п╡п╟п╣я┌ $C4 я│ п╫п╬пЁ п╪п╬я┴п╫п╣п╧я┬п╦п╪ я┐п╢п╟я─п╬п╪.",
 			ch,0,victim,TO_NOTVICT,POS_RESTING);
 
 		wait = 3;
@@ -932,9 +932,9 @@ SKILL_RUNP( crush )
 	else
 	{
 		damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
-		act_p("Ты промахиваешься и падаешь!",ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 делает резкое движение и падает.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-		act_p("$c1 пытается сбить тебя с ног, но ты делаешь шаг в сторону, и $e падает!",
+		act_p("п╒я▀ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐ п╦ п©п╟п╢п╟п╣я┬я▄!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("$c1 п╢п╣п╩п╟п╣я┌ я─п╣п╥п╨п╬п╣ п╢п╡п╦п╤п╣п╫п╦п╣ п╦ п©п╟п╢п╟п╣я┌.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+		act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я┌п╣п╠я▐ я│ п╫п╬пЁ, п╫п╬ я┌я▀ п╢п╣п╩п╟п╣я┬я▄ я┬п╟пЁ п╡ я│я┌п╬я─п╬п╫я┐, п╦ $e п©п╟п╢п╟п╣я┌!",
 			ch,0,victim,TO_VICT,POS_RESTING);
 		ch->position = POS_RESTING;
 		ch->setWait( gsn_crush->getBeats( ) * 3/2 );
@@ -952,20 +952,20 @@ SKILL_RUNP( berserk )
 
 	if ( (chance = gsn_berserk->getEffective( ch )) <= 1)
 	{
-		ch->send_to("Ты краснеешь от напряжения, но ничего не получается.\n\r");
+		ch->send_to("п╒я▀ п╨я─п╟я│п╫п╣п╣я┬я▄ п╬я┌ п╫п╟п©я─я▐п╤п╣п╫п╦я▐, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п©п╬п╩я┐я┤п╟п╣я┌я│я▐.\n\r");
 		return;
 	}
 
 	if ( IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk)
 		|| ch->isAffected(gsn_frenzy) )
 	{
-		act("Ты становишься немного дик$gим|им|ой.", ch, 0, 0, TO_CHAR);
+		act("п╒я▀ я│я┌п╟п╫п╬п╡п╦я┬я▄я│я▐ п╫п╣п╪п╫п╬пЁп╬ п╢п╦п╨$gп╦п╪|п╦п╪|п╬п╧.", ch, 0, 0, TO_CHAR);
 		return;
 	}
 
 	if ( IS_AFFECTED(ch,AFF_CALM) )
 	{
-		act("Ты слишком миролюби$gво|в|ва для этого.", ch, 0, 0, TO_CHAR);
+		act("п╒я▀ я│п╩п╦я┬п╨п╬п╪ п╪п╦я─п╬п╩я▌п╠п╦$gп╡п╬|п╡|п╡п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch, 0, 0, TO_CHAR);
 		return;
 	}
 	
@@ -973,7 +973,7 @@ SKILL_RUNP( berserk )
 	
 	if ( ch->mana < mana )
 	{
-		ch->send_to("У тебя недостаточно энергии для этого.\n\r");
+		ch->send_to("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ я█я┌п╬пЁп╬.\n\r");
 		return;
 	}
 
@@ -1000,8 +1000,8 @@ SKILL_RUNP( berserk )
 		ch->hit += ch->getModifyLevel() * 2;
 		ch->hit = min(ch->hit,ch->max_hit);
 
-		ch->send_to("Твой пульс учащается, когда ты входишь в ярость!\n\r");
-		act_p("Глаза $c2 загораются {rдиким огнем{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
+		ch->send_to("п╒п╡п╬п╧ п©я┐п╩я▄я│ я┐я┤п╟я┴п╟п╣я┌я│я▐, п╨п╬пЁп╢п╟ я┌я▀ п╡я┘п╬п╢п╦я┬я▄ п╡ я▐я─п╬я│я┌я▄!\n\r");
+		act_p("п⌠п╩п╟п╥п╟ $c2 п╥п╟пЁп╬я─п╟я▌я┌я│я▐ {rп╢п╦п╨п╦п╪ п╬пЁп╫п╣п╪{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
 		gsn_berserk->improve( ch, true );
 
 		af.where	= TO_AFFECTS;
@@ -1027,7 +1027,7 @@ SKILL_RUNP( berserk )
 		ch->setWaitViolence( 2 );
 		ch->mana -= mana / 2;
 
-		ch->send_to("Твой пульс ускоряется, но ничего не происходит.\n\r");
+		ch->send_to("п╒п╡п╬п╧ п©я┐п╩я▄я│ я┐я│п╨п╬я─я▐п╣я┌я│я▐, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п©я─п╬п╦я│я┘п╬п╢п╦я┌.\n\r");
 		gsn_berserk->improve( ch, false );
 	}
 
@@ -1046,7 +1046,7 @@ SKILL_RUNP( dirt )
 
 	if ( MOUNTED(ch) )
 	{
-		ch->send_to("Ты не можешь ослепить пылью, если ты верхом!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╬я│п╩п╣п©п╦я┌я▄ п©я▀п╩я▄я▌, п╣я│п╩п╦ я┌я▀ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	}
 
@@ -1059,7 +1059,7 @@ SKILL_RUNP( dirt )
 
 	if ( ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
 	{
-		ch->send_to("Ты лишь пачкаешь свои ноги в пыли.\n\r");
+		ch->send_to("п╒я▀ п╩п╦я┬я▄ п©п╟я┤п╨п╟п╣я┬я▄ я│п╡п╬п╦ п╫п╬пЁп╦ п╡ п©я▀п╩п╦.\n\r");
 		return;
 	}
 
@@ -1068,31 +1068,31 @@ SKILL_RUNP( dirt )
 		victim = ch->fighting;
 		if (victim == 0)
 		{
-			ch->send_to("Сейчас ты не сражаешься!\n\r");
+			ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
 			return;
 		}
 	}
 	else if ((victim = get_char_room(ch,arg)) == 0)
 	{
-		ch->send_to("Этого нет здесь.\n\r");
+		ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 		return;
 	}
 
 	if (is_flying( ch ) )
 	{
-		ch->send_to("Когда летаешь?\n\r");
+		ch->send_to("п п╬пЁп╢п╟ п╩п╣я┌п╟п╣я┬я▄?\n\r");
 		return;
 	}
 
 	if (IS_AFFECTED(victim,AFF_BLIND))
 	{
-		act_p("Но $E уже ничего не видит.",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ $E я┐п╤п╣ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┌.",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if (victim == ch)
 	{
-		ch->send_to("Довольно глупая мысль.\n\r");
+		ch->send_to("п■п╬п╡п╬п╩я▄п╫п╬ пЁп╩я┐п©п╟я▐ п╪я▀я│п╩я▄.\n\r");
 		return;
 	}
 
@@ -1101,27 +1101,27 @@ SKILL_RUNP( dirt )
 
 	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
 	{
-		act_p("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR,POS_RESTING);
+		act_p("п²п╬ $C1 я┌п╡п╬п╧ п╩я┐я┤я┬п╦п╧ п╢я─я┐пЁ!",ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if( !ch->is_npc() && !ch->move )
 	{
-		ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+		ch->pecho("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟%Gп╩п╬|п╩|п╩п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch);
 		return;
 	} 
 
 	if(SHADOW(ch))
 	{
-		ch->send_to("Твоя бездонная тень поглощает пыль.\n\r");
-		act_p("$c1 бросает в свою тень пыль.",ch, 0, 0, TO_ROOM,POS_RESTING);
+		ch->send_to("п╒п╡п╬я▐ п╠п╣п╥п╢п╬п╫п╫п╟я▐ я┌п╣п╫я▄ п©п╬пЁп╩п╬я┴п╟п╣я┌ п©я▀п╩я▄.\n\r");
+		act_p("$c1 п╠я─п╬я│п╟п╣я┌ п╡ я│п╡п╬я▌ я┌п╣п╫я▄ п©я▀п╩я▄.",ch, 0, 0, TO_ROOM,POS_RESTING);
 		return;
 	}
 
 	if ( MOUNTED(victim) )
 	{
 	    if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-		ch->send_to("Ты не можешь ослепить пылью того, кто верхом!\n\r");
+		ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╬я│п╩п╣п©п╦я┌я▄ п©я▀п╩я▄я▌ я┌п╬пЁп╬, п╨я┌п╬ п╡п╣я─я┘п╬п╪!\n\r");
 		return;
 	    }
 
@@ -1166,7 +1166,7 @@ SKILL_RUNP( dirt )
 
 	if (chance == 0)
 	{
-		ch->send_to("Здесь нет пыли..\n\r");
+		ch->send_to("п≈п╢п╣я│я▄ п╫п╣я┌ п©я▀п╩п╦..\n\r");
 		return;
 	}
 
@@ -1177,14 +1177,14 @@ SKILL_RUNP( dirt )
 	if (number_percent() < chance)
 	{
 		Affect af;
-		act_p("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",
+		act_p("$c1 п╬я│п╩п╣п©п╩п╣$gп╫п╬|п╫|п╫п╟ п©я▀п╩я▄я▌, п©п╬п©п╟п╡я┬п╣п╧ $m п╡ пЁп╩п╟п╥п╟!",
 			victim,0,0,TO_ROOM,POS_RESTING);
 
 		ch->setWait( gsn_dirt_kicking->getBeats( ) );
 
 		try {
 		    damage_nocatch(ch,victim,number_range(2,5),gsn_dirt_kicking,DAM_NONE, true);
-		    victim->send_to("Ты ничего не видишь!\n\r");
+		    victim->send_to("п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄!\n\r");
 		    gsn_dirt_kicking->improve( ch, true, victim );
 
 		    af.where	= TO_AFFECTS;
@@ -1209,8 +1209,8 @@ SKILL_RUNP( dirt )
 
     if (!FightingCheck)
 	yell_panic( ch, victim,
-		    "Кто-то только что ослепил меня пылью, которая попала в глаза!",
-		    "Умри, %1$C1, грязное животное!" );	
+		    "п я┌п╬-я┌п╬ я┌п╬п╩я▄п╨п╬ я┤я┌п╬ п╬я│п╩п╣п©п╦п╩ п╪п╣п╫я▐ п©я▀п╩я▄я▌, п╨п╬я┌п╬я─п╟я▐ п©п╬п©п╟п╩п╟ п╡ пЁп╩п╟п╥п╟!",
+		    "пёп╪я─п╦, %1$C1, пЁя─я▐п╥п╫п╬п╣ п╤п╦п╡п╬я┌п╫п╬п╣!" );	
 }
 
 /*
@@ -1224,19 +1224,19 @@ SKILL_RUNP( warcry )
 
   if (!gsn_warcry->usable( ch ) )
     {
-      ch->send_to("Что?\n\r");
+      ch->send_to("п╖я┌п╬?\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_bless) || ch->isAffected(gsn_warcry))
     {
-      ch->send_to("Боевой клич не может помочь тебе еще больше.\n\r");
+      ch->send_to("п▒п╬п╣п╡п╬п╧ п╨п╩п╦я┤ п╫п╣ п╪п╬п╤п╣я┌ п©п╬п╪п╬я┤я▄ я┌п╣п╠п╣ п╣я┴п╣ п╠п╬п╩я▄я┬п╣.\n\r");
       return;
     }
 
   if (ch->mana < gsn_warcry->getMana( ))
     {
-      ch->send_to("Ты не можешь сконцентрироваться.\n\r");
+      ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╨п╬п╫я├п╣п╫я┌я─п╦я─п╬п╡п╟я┌я▄я│я▐.\n\r");
       return;
     }
 
@@ -1245,12 +1245,12 @@ SKILL_RUNP( warcry )
     if (number_percent() > gsn_warcry->getEffective( ch )) {
 	switch (number_range( 1, 2 )) {
 	case 1: 
-	    act("Ты тихонько хрюкаешь.", ch, 0, 0, TO_CHAR);
-	    act("$c1 тихонько хрюкает.", ch, 0, 0, TO_ROOM);
+	    act("п╒я▀ я┌п╦я┘п╬п╫я▄п╨п╬ я┘я─я▌п╨п╟п╣я┬я▄.", ch, 0, 0, TO_CHAR);
+	    act("$c1 я┌п╦я┘п╬п╫я▄п╨п╬ я┘я─я▌п╨п╟п╣я┌.", ch, 0, 0, TO_ROOM);
 	    break;
 	case 2:
-	    act("Ты сдавленно стонешь.", ch, 0, 0, TO_CHAR);
-	    act("$c1 издает сдавленные стоны.", ch, 0, 0, TO_ROOM);
+	    act("п╒я▀ я│п╢п╟п╡п╩п╣п╫п╫п╬ я│я┌п╬п╫п╣я┬я▄.", ch, 0, 0, TO_CHAR);
+	    act("$c1 п╦п╥п╢п╟п╣я┌ я│п╢п╟п╡п╩п╣п╫п╫я▀п╣ я│я┌п╬п╫я▀.", ch, 0, 0, TO_ROOM);
 	    break;
 	}
 	
@@ -1280,8 +1280,8 @@ SKILL_RUNP( warcry )
 	interpret_raw( ch, "yell", attr->getValue( ).c_str( ) );
     }
     else {
-	act("Ты издаешь боевой клич и чувствуешь, что теперь тебе все по плечу!", ch, 0, 0, TO_CHAR);
-	act("$c1 издает боевой клич!", ch, 0, 0, TO_ROOM);
+	act("п╒я▀ п╦п╥п╢п╟п╣я┬я▄ п╠п╬п╣п╡п╬п╧ п╨п╩п╦я┤ п╦ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄, я┤я┌п╬ я┌п╣п©п╣я─я▄ я┌п╣п╠п╣ п╡я│п╣ п©п╬ п©п╩п╣я┤я┐!", ch, 0, 0, TO_CHAR);
+	act("$c1 п╦п╥п╢п╟п╣я┌ п╠п╬п╣п╡п╬п╧ п╨п╩п╦я┤!", ch, 0, 0, TO_ROOM);
     }
 
     gsn_warcry->improve( ch, true );
@@ -1301,7 +1301,7 @@ SKILL_RUNP( smash )
 
     if ( MOUNTED(ch) ) 
     {
-        ch->send_to("Ты не можешь сбить с ног, если ты верхом!\n\r");
+        ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╠п╦я┌я▄ я│ п╫п╬пЁ, п╣я│п╩п╦ я┌я▀ п╡п╣я─я┘п╬п╪!\n\r");
         return;
     }
 
@@ -1313,29 +1313,29 @@ SKILL_RUNP( smash )
     argument = one_argument(argument,arg);
 
     if ((chance = gsn_smash->getEffective( ch )) <= 1) {	
-	ch->send_to("Сбить с ног? Но как это сделать?\n\r");
+	ch->send_to("п║п╠п╦я┌я▄ я│ п╫п╬пЁ? п²п╬ п╨п╟п╨ я█я┌п╬ я│п╢п╣п╩п╟я┌я▄?\n\r");
 	return;
     }
 
     if (arg[0] == '\0') {
 	victim = ch->fighting;
 	if (victim == NULL) {
-	    ch->send_to("Сейчас ты не сражаешься!\n\r");
+	    ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
 	    return;
 	}
     }
     else if ((victim = get_char_room(ch,arg)) == NULL) {
-	ch->send_to("Этого нет здесь.\n\r");
+	ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	return;
     }
 
     if (victim->position < POS_FIGHTING) {
-	act_p("Подожди пока $E встанет.", ch,NULL,victim,TO_CHAR,POS_RESTING);
+	act_p("п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ $E п╡я│я┌п╟п╫п╣я┌.", ch,NULL,victim,TO_CHAR,POS_RESTING);
 	return;
     } 
 
     if (victim == ch) {
-	ch->send_to("Сбить с ног себя??? Не получится...\n\r");
+	ch->send_to("п║п╠п╦я┌я▄ я│ п╫п╬пЁ я│п╣п╠я▐??? п²п╣ п©п╬п╩я┐я┤п╦я┌я│я▐...\n\r");
 	return;
     }
 
@@ -1343,24 +1343,24 @@ SKILL_RUNP( smash )
 	return;
 
     if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim) {
-	act_p("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR,POS_RESTING);
+	act_p("п²п╬ $C1 я┌п╡п╬п╧ п╢я─я┐пЁ!!!",ch,NULL,victim,TO_CHAR,POS_RESTING);
 	return;
     }
 
     if( !ch->is_npc() && !ch->move ) {
-	  act("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR);
+	  act("п╒я▀ я│п╩п╦я┬п╨п╬п╪ я┐я│я┌п╟$gп╩п╬|п╩|п╩п╟ п╢п╩я▐ я█я┌п╬пЁп╬.", ch, 0, 0, TO_CHAR);
 	  return;
     } 
 
     if(SHADOW(ch)) {
-      ch->send_to("Ты безуспешно пытаешься бороться со своей тенью.\n\r");
-      act_p("$c1 обнимается со своей тенью.", ch, NULL, NULL, TO_ROOM,POS_RESTING);
+      ch->send_to("п╒я▀ п╠п╣п╥я┐я│п©п╣я┬п╫п╬ п©я▀я┌п╟п╣я┬я▄я│я▐ п╠п╬я─п╬я┌я▄я│я▐ я│п╬ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.\n\r");
+      act_p("$c1 п╬п╠п╫п╦п╪п╟п╣я┌я│я▐ я│п╬ я│п╡п╬п╣п╧ я┌п╣п╫я▄я▌.", ch, NULL, NULL, TO_ROOM,POS_RESTING);
       return;
     }
    
     if ( MOUNTED(victim) ) {
 	if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-	    ch->send_to("Ты не можешь сбить с ног того, кто верхом!\n\r");
+	    ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╠п╦я┌я▄ я│ п╫п╬пЁ я┌п╬пЁп╬, п╨я┌п╬ п╡п╣я─я┘п╬п╪!\n\r");
 	    return;
 	}
 
@@ -1370,11 +1370,11 @@ SKILL_RUNP( smash )
     ch->move -= move_dec( ch );
 
     if (victim->isAffected(gsn_protective_shield)) {
-	act_p("{YТы пытаешься сбить с ног $C4, но что-то тебе мешает сделать это.{x",
+	act_p("{Yп╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я│п╠п╦я┌я▄ я│ п╫п╬пЁ $C4, п╫п╬ я┤я┌п╬-я┌п╬ я┌п╣п╠п╣ п╪п╣я┬п╟п╣я┌ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.{x",
 		ch, NULL, victim,TO_CHAR,POS_FIGHTING);
-	act_p("{Y$c1 пытается сбить тебя с ног, но твоя защита мешает сделать это.{x",
+	act_p("{Y$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я┌п╣п╠я▐ я│ п╫п╬пЁ, п╫п╬ я┌п╡п╬я▐ п╥п╟я┴п╦я┌п╟ п╪п╣я┬п╟п╣я┌ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.{x",
 		ch, NULL,victim,TO_VICT,POS_FIGHTING);
-	act_p("{Y$c1 пытается сбить с ног $C4, но что-то мешает сделать это.{x",
+	act_p("{Y$c1 п©я▀я┌п╟п╣я┌я│я▐ я│п╠п╦я┌я▄ я│ п╫п╬пЁ $C4, п╫п╬ я┤я┌п╬-я┌п╬ п╪п╣я┬п╟п╣я┌ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.{x",
 		ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
 	return;
      }
@@ -1417,11 +1417,11 @@ SKILL_RUNP( smash )
     /* now the attack */
 
     if (number_percent() < chance) {
-	act_p("Сильнейшим ударом $c1 сбивает тебя с ног и ты падаешь на землю!",
+	act_p("п║п╦п╩я▄п╫п╣п╧я┬п╦п╪ я┐п╢п╟я─п╬п╪ $c1 я│п╠п╦п╡п╟п╣я┌ я┌п╣п╠я▐ я│ п╫п╬пЁ п╦ я┌я▀ п©п╟п╢п╟п╣я┬я▄ п╫п╟ п╥п╣п╪п╩я▌!",
 	       ch,NULL,victim,TO_VICT,POS_RESTING);
-	act_p("Ты сбиваешь $C4 с ног, посылая $S на землю!",
+	act_p("п╒я▀ я│п╠п╦п╡п╟п╣я┬я▄ $C4 я│ п╫п╬пЁ, п©п╬я│я▀п╩п╟я▐ $S п╫п╟ п╥п╣п╪п╩я▌!",
                ch,NULL,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 сильнейшим ударом сбивает $C4 с ног.",
+	act_p("$c1 я│п╦п╩я▄п╫п╣п╧я┬п╦п╪ я┐п╢п╟я─п╬п╪ я│п╠п╦п╡п╟п╣я┌ $C4 я│ п╫п╬пЁ.",
 	       ch,NULL,victim,TO_NOTVICT,POS_RESTING);
 	gsn_smash->improve( ch, true, victim );
 
@@ -1456,11 +1456,11 @@ SKILL_RUNP( smash )
     else
     {
 	damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
-	act_p("Ты промахиваешься и падаешь лицом на пол!",
+	act_p("п╒я▀ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┬я▄я│я▐ п╦ п©п╟п╢п╟п╣я┬я▄ п╩п╦я├п╬п╪ п╫п╟ п©п╬п╩!",
                ch,NULL,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 промахивается и падает лицом на пол.", 
+	act_p("$c1 п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ п©п╟п╢п╟п╣я┌ п╩п╦я├п╬п╪ п╫п╟ п©п╬п╩.", 
                ch,NULL,victim,TO_NOTVICT,POS_RESTING);
-	act_p("$c1 пытается ударить тебя, но промахивается и падает на пол.",
+	act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ я┐п╢п╟я─п╦я┌я▄ я┌п╣п╠я▐, п╫п╬ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ п©п╟п╢п╟п╣я┌ п╫п╟ п©п╬п╩.",
                ch,NULL,victim,TO_VICT,POS_RESTING);
 	gsn_smash->improve( ch, false, victim );
 
@@ -1473,8 +1473,8 @@ SKILL_RUNP( smash )
 
     if (!FightingCheck)
 	yell_panic( ch, victim,
-	            "Помогите! Кто-то сбил меня с ног!",
-		    "Помогите! %1$^C1 сбивает меня с ног!" );
+	            "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ я│п╠п╦п╩ п╪п╣п╫я▐ я│ п╫п╬пЁ!",
+		    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 я│п╠п╦п╡п╟п╣я┌ п╪п╣п╫я▐ я│ п╫п╬пЁ!" );
 }
 
 /*

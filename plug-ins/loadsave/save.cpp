@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
@@ -704,7 +704,7 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 	{
 	    if (!obj->hasOwner( ch ) && obj->mustDisappear( ch ))
 	    {
-		act_p("$o1 рассыпается трухой!",ch,obj,0,TO_CHAR,POS_RESTING);
+		act_p("$o1 я─п╟я│я│я▀п©п╟п╣я┌я│я▐ я┌я─я┐я┘п╬п╧!",ch,obj,0,TO_CHAR,POS_RESTING);
 		extract_obj( obj );
 		return;
 	    }
@@ -1774,7 +1774,7 @@ void fread_mlt( PCharacter *ch, FILE *fp ) {
       i++;
       word   = feof( fp ) ? "End" : fread_word( fp );
     }
-    if( i < 0 ) i++; // на всяк случай
+    if( i < 0 ) i++; // п╫п╟ п╡я│я▐п╨ я│п╩я┐я┤п╟п╧
     switch( Char::upper( word[0] ) ) {
       case '*':
         fMatch = true;

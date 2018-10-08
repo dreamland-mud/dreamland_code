@@ -65,7 +65,7 @@ void PCDeleteIdle::run( int oldState, int newState, Descriptor *d )
     if (diff < 0)
 	return;
 
-    buf << "{xðÅÒÓÏÎÁÖ ÂÕÄÅÔ Á×ÔÏÍÁÔÉÞÅÓËÉ {Rõäáìåî{x {Y" 
+    buf << "{xÐŸÐµÑ€ÑÐ¾Ð½Ð°Ð¶ Ð±ÑƒÐ´ÐµÑ‚ Ð°Ð²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸ {RÐ£Ð”ÐÐ›Ð•Ð{x {Y" 
 	<< Date::getTimeAsString( dreamland->getCurrentTime( ) + diff ) 
 	<< "{x." << endl;
 

@@ -832,7 +832,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	    LogStream::sendNotice() << "Saving: " << pArea->area_file->file_name << endl;
 	    save_area(pArea);
 	}
-	stc("÷ÓÅ ÁÒÉÉ ÓÏÈÒÁÎÅÎÙ.\n\r", ch);
+	stc("Ð’ÑÐµ Ð°Ñ€Ð¸Ð¸ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ñ‹.\n\r", ch);
 	return;
     }
 
@@ -881,7 +881,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 	    return;
 	}
 	if (!pArea || !OLCState::can_edit(ch, pArea)) {
-	    stc("õ ×ÁÓ ÎÅÔ ÐÒÁ× ÉÚÍÅÎÑÔØ ÜÔÕ ÁÒÉÀ\n\r", ch);
+	    stc("Ð£ Ð²Ð°Ñ Ð½ÐµÑ‚ Ð¿Ñ€Ð°Ð² Ð¸Ð·Ð¼ÐµÐ½ÑÑ‚ÑŒ ÑÑ‚Ñƒ Ð°Ñ€Ð¸ÑŽ\n\r", ch);
 	    return;
 	}
 

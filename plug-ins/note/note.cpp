@@ -28,20 +28,20 @@ inline bool isSingleOrPlural( const DLString &a, const DLString &b )
 }
 inline bool argIsAll( const DLString &arg )
 {
-    return (arg ^ "all" || arg ^ "все" || arg ^ "всем");
+    return (arg ^ "all" || arg ^ "п╡я│п╣" || arg ^ "п╡я│п╣п╪");
 }
 inline bool argIsImmortal( const DLString &arg )
 {
     return (isSingleOrPlural( arg, "immortal" ) 
 	    || isSingleOrPlural( arg, "imm" )
-	    || arg ^ "боги"
-	    || arg ^ "богам");
+	    || arg ^ "п╠п╬пЁп╦"
+	    || arg ^ "п╠п╬пЁп╟п╪");
 }
 inline bool argIsCoder( const DLString &arg )
 {
     return (isSingleOrPlural( arg, "coder" )
-	    || arg ^ "кодеры"
-	    || arg ^ "кодерам");
+	    || arg ^ "п╨п╬п╢п╣я─я▀"
+	    || arg ^ "п╨п╬п╢п╣я─п╟п╪");
 }
 inline bool argIsPlayer( const DLString &arg, const PCMemoryInterface *pcm )
 {
@@ -139,15 +139,15 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
 
 	if (( clan = findClan( arg ) )) 
 	{
-	    ostr << "члены клана {" << clan->getColor( ) << clan->getShortName( ) << "{x";
+	    ostr << "я┤п╩п╣п╫я▀ п╨п╩п╟п╫п╟ {" << clan->getColor( ) << clan->getShortName( ) << "{x";
 	}
 	else if (( race = findRace( arg ) )) 
 	{
-	    ostr << "представители расы {W" << race->getName( ) << "{x";
+	    ostr << "п©я─п╣п╢я│я┌п╟п╡п╦я┌п╣п╩п╦ я─п╟я│я▀ {W" << race->getName( ) << "{x";
 	}
 	else if (( prof = findProf( arg ) )) 
 	{
-	    ostr << "представители профессии {W" << prof->getName( ) << "{x";
+	    ostr << "п©я─п╣п╢я│я┌п╟п╡п╦я┌п╣п╩п╦ п©я─п╬я└п╣я│я│п╦п╦ {W" << prof->getName( ) << "{x";
 	}
 	else if (( pci = PCharacterManager::find( arg ) ))
 	{
@@ -166,12 +166,12 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
 bool Note::findRecipient( PCMemoryInterface *pcm, DLString &arg, ostringstream &buf )
 {
     if (argIsAll( arg )) {
-	buf << "все";
+	buf << "п╡я│п╣";
 	return true;
     }
     
     if (argIsImmortal( arg )) {
-	buf << "Боги";
+	buf << "п▒п╬пЁп╦";
 	return (pcm->get_trust( ) >= LEVEL_IMMORTAL);
     }
     
@@ -180,7 +180,7 @@ bool Note::findRecipient( PCMemoryInterface *pcm, DLString &arg, ostringstream &
     }
     
     if (argIsCoder( arg )) {
-	buf << "кодеры";
+	buf << "п╨п╬п╢п╣я─я▀";
 	return (pcm->get_trust( ) >= MAX_LEVEL);
     }
 

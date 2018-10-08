@@ -12,7 +12,7 @@
 #include "merc.h"
 #include "def.h"
 
-const DLString OLCStubSkill::CATEGORY = "Умения, доступные из OLC"; 
+const DLString OLCStubSkill::CATEGORY = "пёп╪п╣п╫п╦я▐, п╢п╬я│я┌я┐п©п╫я▀п╣ п╦п╥ OLC"; 
 
 OLCStubSkill::OLCStubSkill( )
 {
@@ -50,10 +50,10 @@ int OLCStubSkill::getLevel( Character * ) const
 
 void OLCStubSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
-    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
+    buf << (spell && spell->isCasted( ) ? "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣" : "пёп╪п╣п╫п╦п╣")
         << " '{W" << getName( ) << "{x'"
 	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{W" << getGroup( )->getName( ) << "{x'"
+	<< "п╡я┘п╬п╢п╦я┌ п╡ пЁя─я┐п©п©я┐ '{W" << getGroup( )->getName( ) << "{x'"
 	<< endl;
 }
 

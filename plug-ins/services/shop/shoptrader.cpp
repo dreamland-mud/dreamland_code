@@ -63,8 +63,8 @@ void ShopTrader::load( DLString str )
 
 void ShopTrader::give( Character *from, Object *obj )
 {
-    tell_dim( from, ch, "Извини, но я не беру взяток!" );
-    act("$c1 роняет $o4.", ch, obj, 0, TO_ROOM );
+    tell_dim( from, ch, "п≤п╥п╡п╦п╫п╦, п╫п╬ я▐ п╫п╣ п╠п╣я─я┐ п╡п╥я▐я┌п╬п╨!" );
+    act("$c1 я─п╬п╫я▐п╣я┌ $o4.", ch, obj, 0, TO_ROOM );
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
 }
@@ -86,25 +86,25 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
 
     if (!obj) {
         if (verbose)
-            tell_dim( client, ch, "Я не продаю этого - используй '{lRсписок{lElist{x'." );
+            tell_dim( client, ch, "п╞ п╫п╣ п©я─п╬п╢п╟я▌ я█я┌п╬пЁп╬ - п╦я│п©п╬п╩я▄п╥я┐п╧ '{lRя│п©п╦я│п╬п╨{lElist{x'." );
         return;
     }
 
-    client->recho( ch, "%^C1 просит %C4 подробнее рассказать о %O6.", client, ch, obj );
+    client->recho( ch, "%^C1 п©я─п╬я│п╦я┌ %C4 п©п╬п╢я─п╬п╠п╫п╣п╣ я─п╟я│я│п╨п╟п╥п╟я┌я▄ п╬ %O6.", client, ch, obj );
 
     if (!IS_OBJ_STAT( obj, ITEM_INVENTORY )) {
-        client->pecho( "%1$^C1 говорит тебе '{gЯ раньше в глаза не виде%1$Gло|л|ла %2$O4.{x'", ch, obj );
+        client->pecho( "%1$^C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{gп╞ я─п╟п╫я▄я┬п╣ п╡ пЁп╩п╟п╥п╟ п╫п╣ п╡п╦п╢п╣%1$Gп╩п╬|п╩|п╩п╟ %2$O4.{x'", ch, obj );
         return;
     }
 
     int itemCost = get_cost( ch, obj, true, this );
     int serviceCost = itemCost / 100;
     if ((client->silver + client->gold * 100) < serviceCost) {
-        tell_dim( client, ch, "Я не справочная контора. Будут деньги, тогда и возвращайся." );
+        tell_dim( client, ch, "п╞ п╫п╣ я│п©я─п╟п╡п╬я┤п╫п╟я▐ п╨п╬п╫я┌п╬я─п╟. п▒я┐п╢я┐я┌ п╢п╣п╫я▄пЁп╦, я┌п╬пЁп╢п╟ п╦ п╡п╬п╥п╡я─п╟я┴п╟п╧я│я▐." );
         return;
     }
 
-    tell_dim( client, ch, "Нигде больше не найдешь такого замечательного товара:" );
+    tell_dim( client, ch, "п²п╦пЁп╢п╣ п╠п╬п╩я▄я┬п╣ п╫п╣ п╫п╟п╧п╢п╣я┬я▄ я┌п╟п╨п╬пЁп╬ п╥п╟п╪п╣я┤п╟я┌п╣п╩я▄п╫п╬пЁп╬ я┌п╬п╡п╟я─п╟:" );
 
     lore_fmt_item( client, obj, buf, false );
     client->send_to( " {Y+------------------------------------------------------------------------------------+{x\r\n" );
@@ -116,10 +116,10 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
     client->send_to( " {Y+------------------------------------------------------------------------------------+{x\r\n" );
 
     if (serviceCost < 1) {
-        tell_dim( client, ch, "Я сообщаю тебе это совершенно бесплатно." );
+        tell_dim( client, ch, "п╞ я│п╬п╬п╠я┴п╟я▌ я┌п╣п╠п╣ я█я┌п╬ я│п╬п╡п╣я─я┬п╣п╫п╫п╬ п╠п╣я│п©п╩п╟я┌п╫п╬." );
     } else {
         deduct_cost( client, serviceCost );
-        client->pecho( "%1$^C1 взя%1$Gло|л|ла с тебя {W%2$d{x моне%2$Iту|ты|т за услуги.", ch, serviceCost );
+        client->pecho( "%1$^C1 п╡п╥я▐%1$Gп╩п╬|п╩|п╩п╟ я│ я┌п╣п╠я▐ {W%2$d{x п╪п╬п╫п╣%2$Iя┌я┐|я┌я▀|я┌ п╥п╟ я┐я│п╩я┐пЁп╦.", ch, serviceCost );
     }
 }
 
@@ -159,22 +159,22 @@ bool ShopTrader::canServeClient( PCharacter *client )
     }
 
     if (time_info.hour > closeHour) {
-	do_say( ch, "Извини, магазин уже закрыт. Приходи завтра." );
+	do_say( ch, "п≤п╥п╡п╦п╫п╦, п╪п╟пЁп╟п╥п╦п╫ я┐п╤п╣ п╥п╟п╨я─я▀я┌. п÷я─п╦я┘п╬п╢п╦ п╥п╟п╡я┌я─п╟." );
 	return false;
     }
 
     if (time_info.hour < openHour) {
-	do_say( ch, "Извини, магазин еще не открылся. Подожди немного." );
+	do_say( ch, "п≤п╥п╡п╦п╫п╦, п╪п╟пЁп╟п╥п╦п╫ п╣я┴п╣ п╫п╣ п╬я┌п╨я─я▀п╩я│я▐. п÷п╬п╢п╬п╤п╢п╦ п╫п╣п╪п╫п╬пЁп╬." );
 	return false;
     }
 
     if (!ch->can_see( client ) && !client->is_immortal( )) {
-	do_say( ch, "Я не торгую с тем, кого не вижу." );
+	do_say( ch, "п╞ п╫п╣ я┌п╬я─пЁя┐я▌ я│ я┌п╣п╪, п╨п╬пЁп╬ п╫п╣ п╡п╦п╤я┐." );
 	return false;
     }
 
     if (ch->fighting) {
-	do_say( ch, "Подожди немного, мне сейчас не до тебя." );
+	do_say( ch, "п÷п╬п╢п╬п╤п╢п╦ п╫п╣п╪п╫п╬пЁп╬, п╪п╫п╣ я│п╣п╧я┤п╟я│ п╫п╣ п╢п╬ я┌п╣п╠я▐." );
 	return false;
     }
 
@@ -240,12 +240,12 @@ void ShopTrader::toStream( PCharacter *client, ostringstream &buf )
 
 void ShopTrader::msgListEmpty( PCharacter *client )
 {
-    tell_dim( client, ch, "Мне сегодня нечего тебе предложить.");
+    tell_dim( client, ch, "п°п╫п╣ я│п╣пЁп╬п╢п╫я▐ п╫п╣я┤п╣пЁп╬ я┌п╣п╠п╣ п©я─п╣п╢п╩п╬п╤п╦я┌я▄.");
 }
 
 void ShopTrader::msgListBefore( PCharacter *client )
 {
-    client->send_to("[ Ном.| Ур.  Цена Кол-во] Объект\n\r");
+    client->send_to("[ п²п╬п╪.| пёя─.  п╕п╣п╫п╟ п п╬п╩-п╡п╬] п·п╠я┼п╣п╨я┌\n\r");
 }
 
 void ShopTrader::msgListAfter( PCharacter *client )

@@ -3,7 +3,7 @@
 trump
 
 
-X убивает карту Y:
+X я┐п╠п╦п╡п╟п╣я┌ п╨п╟я─я┌я┐ Y:
     if (X < Y || isTrump(Y))
 	X = min(ace, X+1)
 	Y--;
@@ -31,12 +31,12 @@ CardStarterBehavior
 
 
 skills: CardSkill
-6 :   'fetch card'  :  use pack <player name>. запомнить качество карты
-6 :   'peek card'   :  examine <card name>, шанс увидеть не то
-8 :   'enter card'  :  use <card name>, шанс попасть на северный полюс
+6 :   'fetch card'  :  use pack <player name>. п╥п╟п©п╬п╪п╫п╦я┌я▄ п╨п╟я┤п╣я│я┌п╡п╬ п╨п╟я─я┌я▀
+6 :   'peek card'   :  examine <card name>, я┬п╟п╫я│ я┐п╡п╦п╢п╣я┌я▄ п╫п╣ я┌п╬
+8 :   'enter card'  :  use <card name>, я┬п╟п╫я│ п©п╬п©п╟я│я┌я▄ п╫п╟ я│п╣п╡п╣я─п╫я▀п╧ п©п╬п╩я▌я│
 10:   ace in sleeves:  group healing, obj with fight_prog 
 J :   frame         :  from FD
-Q :   sconce        :  удар канделябром (усыплялка)
+Q :   sconce        :  я┐п╢п╟я─ п╨п╟п╫п╢п╣п╩я▐п╠я─п╬п╪ (я┐я│я▀п©п╩я▐п╩п╨п╟)
 K :   joker         :  instant kill
 
 trump has all skills

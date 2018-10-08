@@ -16,19 +16,19 @@ CMDRUN( mtalk )
     PCharacter *victim;
     
     if (ch->is_npc( )) {
-	ch->send_to( "ôÅÂÅ ÎÅÌØÚÑ.\r\n" );
+	ch->send_to( "Ð¢ÐµÐ±Ðµ Ð½ÐµÐ»ÑŒÐ·Ñ.\r\n" );
 	return;
     }
 
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeMarriage>( "marriage" );
     
     if (!attr || attr->spouse.getValue( ).empty( )) {
-	ch->send_to( "óÎÁÞÁÌÁ ÖÅÎÉÓØ, ÐÏÔÏÍ ÐÏÇÏ×ÏÒÉÍ.\r\n" );
+	ch->send_to( "Ð¡Ð½Ð°Ñ‡Ð°Ð»Ð° Ð¶ÐµÐ½Ð¸ÑÑŒ, Ð¿Ð¾Ñ‚Ð¾Ð¼ Ð¿Ð¾Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ð¼.\r\n" );
 	return;
     }
 
     if (constArguments.empty( )) {
-	ch->send_to( "óËÁÚÁÔØ ÞÔÏ?" );
+	ch->send_to( "Ð¡ÐºÐ°Ð·Ð°Ñ‚ÑŒ Ñ‡Ñ‚Ð¾?" );
 	return;
     }
     
@@ -36,20 +36,20 @@ CMDRUN( mtalk )
 
     if (!victim) {
 	if (attr->wife.getValue( ))
-	    ch->send_to( "ô×ÏÊ ÍÕÖ ÏÔÓÕÔÓÔ×ÕÅÔ × ÍÉÒÅ.\r\n" );
+	    ch->send_to( "Ð¢Ð²Ð¾Ð¹ Ð¼ÑƒÐ¶ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² Ð¼Ð¸Ñ€Ðµ.\r\n" );
 	else
-	    ch->send_to( "ô×ÏÑ ÖÅÎÁ ÏÔÓÕÔÓÔ×ÕÅÔ × ÍÉÒÅ.\r\n" );
+	    ch->send_to( "Ð¢Ð²Ð¾Ñ Ð¶ÐµÐ½Ð° Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² Ð¼Ð¸Ñ€Ðµ.\r\n" );
 	
 	return;
     }
     
     if (attr->wife.getValue( )) {
-	buf << "ô×ÏÑ ÖÅÎÁ ÇÏ×ÏÒÉÔ ÔÅÂÅ '{G";
-	buf0 << "ôÙ ÇÏ×ÏÒÉÛØ ÍÕÖÕ '{G";
+	buf << "Ð¢Ð²Ð¾Ñ Ð¶ÐµÐ½Ð° Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ '{G";
+	buf0 << "Ð¢Ñ‹ Ð³Ð¾Ð²Ð¾Ñ€Ð¸ÑˆÑŒ Ð¼ÑƒÐ¶Ñƒ '{G";
     }
     else {
-	buf << "ô×ÏÊ ÍÕÖ ÇÏ×ÏÒÉÔ ÔÅÂÅ  '{G";
-	buf0 << "ôÙ ÇÏ×ÏÒÉÛØ ÖÅÎÅ '{G";
+	buf << "Ð¢Ð²Ð¾Ð¹ Ð¼ÑƒÐ¶ Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ  '{G";
+	buf0 << "Ð¢Ñ‹ Ð³Ð¾Ð²Ð¾Ñ€Ð¸ÑˆÑŒ Ð¶ÐµÐ½Ðµ '{G";
     }
 
     buf << constArguments << "{x'" << endl;

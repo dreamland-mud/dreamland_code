@@ -75,8 +75,8 @@ bool RainbowMob::specIdle( )
     
     obj = gq->createPiece( number ); 
     obj_to_char( obj, wch );
-    act("$c1 вручает тебе $o4.", ch, obj, wch, TO_VICT);
-    act("$c1 вручает $C3 $o4.", ch, obj, wch, TO_NOTVICT);
+    act("$c1 п╡я─я┐я┤п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, obj, wch, TO_VICT);
+    act("$c1 п╡я─я┐я┤п╟п╣я┌ $C3 $o4.", ch, obj, wch, TO_NOTVICT);
     obj->behavior->get( wch );
     return false;
 }
@@ -109,7 +109,7 @@ bool RainbowMob::death( Character *killer )
     } 
 
     gq->recreateMob( this );
-    act("Божественные силы возвращают $c4 к жизни!", ch, 0, 0, TO_ROOM);
+    act("п▒п╬п╤п╣я│я┌п╡п╣п╫п╫я▀п╣ я│п╦п╩я▀ п╡п╬п╥п╡я─п╟я┴п╟я▌я┌ $c4 п╨ п╤п╦п╥п╫п╦!", ch, 0, 0, TO_ROOM);
     return false;
 }
 

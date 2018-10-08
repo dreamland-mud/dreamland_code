@@ -14,12 +14,12 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная long long
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ long long
  */
 class XMLLongLong : public LongLong
 {
 public:
-	/** По умолчанию значение \0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ \0 */
 	inline XMLLongLong( ) : LongLong( )
 	{
 	}
@@ -33,14 +33,14 @@ public:
 	{
 	}
 	
-	/** Возвращает xml представление переменной */
+	/** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
 	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
+	/** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
 	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
-/** Вывод в ostream типа XMLLongLong */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLLongLong */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLLongLong& xmlLongLong )
 {
 	ostr << xmlLongLong.getValue( );

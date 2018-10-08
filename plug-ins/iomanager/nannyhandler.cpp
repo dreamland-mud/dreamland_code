@@ -41,7 +41,7 @@
 HOMETOWN(frigate);
 
 using namespace Scripting;
-NMI_INIT(NannyHandler, "няня");
+NMI_INIT(NannyHandler, "п╫я▐п╫я▐");
 Register NannyHandler::tmpNanny;
 bool password_check( PCMemoryInterface *pci, const DLString &input );
 

@@ -25,7 +25,7 @@ using std::string;
 
 /**
  * @author Igor S. Petrenko
- * @short Вывод всякой информации на консоль
+ * @short п▓я▀п╡п╬п╢ п╡я│я▐п╨п╬п╧ п╦п╫я└п╬я─п╪п╟я├п╦п╦ п╫п╟ п╨п╬п╫я│п╬п╩я▄
  */
 class LogStream
 {

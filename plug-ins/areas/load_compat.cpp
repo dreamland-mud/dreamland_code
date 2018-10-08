@@ -726,7 +726,7 @@ void load_rooms( FILE *fp )
 			    pexit->exit_info_default = pexit->exit_info;
 
 			    if (pexit->keyword == &str_empty[0] && IS_SET(pexit->exit_info, EX_ISDOOR))
-				pexit->keyword = str_dup("Ä×ÅÒØ");
+				pexit->keyword = str_dup("Ð´Ð²ÐµÑ€ÑŒ");
 
 			    pRoomIndex->exit[door]= pexit;
 			    pRoomIndex->old_exit[door]= pexit;

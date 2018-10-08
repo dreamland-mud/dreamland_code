@@ -22,7 +22,7 @@
 class XMLDate : public Date
 {
 public:
-	/** По умолчанию значение 0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ 0 */
 	inline XMLDate( ) 
 	{
 	}
@@ -37,9 +37,9 @@ public:
 		return *this;
 	}
 
-	/** Возвращает xml представление переменной */
+	/** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
 	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
+	/** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
 	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
@@ -59,7 +59,7 @@ public:
 };
 
 
-/** Вывод в ostream типа XMLDate */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLDate */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLDate& xmlDate )
 {
 	ostr << xmlDate.getTimeAsString( );

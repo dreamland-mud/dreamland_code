@@ -53,19 +53,19 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
     time = number_range( 15, 25 );
     setTime( pch, time );
 
-    tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
+    tell_raw( pch, questman, "пё п╪п╣п╫я▐ п╣я│я┌я▄ п╢п╩я▐ я┌п╣п╠я▐ я│я─п╬я┤п╫п╬п╣ п©п╬я─я┐я┤п╣п╫п╦п╣!" );
     tell_raw( pch, questman, 
-	"{W%s{G из местности {W%s{G хочет подать к столу {W%d{G кус%s мяса {W%s{G, обитающих в {W%s{G.", 
+	"{W%s{G п╦п╥ п╪п╣я│я┌п╫п╬я│я┌п╦ {W%s{G я┘п╬я┤п╣я┌ п©п╬п╢п╟я┌я▄ п╨ я│я┌п╬п╩я┐ {W%d{G п╨я┐я│%s п╪я▐я│п╟ {W%s{G, п╬п╠п╦я┌п╟я▌я┴п╦я┘ п╡ {W%s{G.", 
 	customerName.c_str( ),
 	customerArea.c_str( ),
 	ordered.getValue( ),
-	GET_COUNT(ordered.getValue( ), "ок", "ка", "ков"),
+	GET_COUNT(ordered.getValue( ), "п╬п╨", "п╨п╟", "п╨п╬п╡"),
 	raceRusName.ruscase( '2' ).c_str( ),
 	areaName.c_str( ));
 
-    tell_raw( pch, questman, "Доставь мясо заказчику и вернись сюда за вознаграждением." );
-    tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s на выполнение задания.",
-                  time, GET_COUNT(time,"а","ы","") ); 
+    tell_raw( pch, questman, "п■п╬я│я┌п╟п╡я▄ п╪я▐я│п╬ п╥п╟п╨п╟п╥я┤п╦п╨я┐ п╦ п╡п╣я─п╫п╦я│я▄ я│я▌п╢п╟ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪." );
+    tell_raw( pch, questman, "пё я┌п╣п╠я▐ п╣я│я┌я▄ {Y%d{G п╪п╦п╫я┐я┌%s п╫п╟ п╡я▀п©п╬п╩п╫п╣п╫п╦п╣ п╥п╟п╢п╟п╫п╦я▐.",
+                  time, GET_COUNT(time,"п╟","я▀","") ); 
 
     wiznet( "", "%d steaks of %s from %s, customer %s.",
 		ordered.getValue( ),
@@ -82,28 +82,28 @@ bool ButcherQuest::isComplete( )
 void ButcherQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-	    << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+	buf << "п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ {Yп▓п╚п÷п·п⌡п²п∙п²п·{x!" << endl
+	    << "п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪, п╢п╬ я┌п╬пЁп╬ п╨п╟п╨ п╡я▀п╧п╢п╣я┌ п╡я─п╣п╪я▐!" << endl;
     else { 
-	buf << customerName << " из " << customerArea
-	    << " просит тебя доставить к столу "
-	    << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
-	    << " мяса " << raceRusName.ruscase( '2' ) 
-	    << ", oбитающих в местности " << areaName << "." << endl;
+	buf << customerName << " п╦п╥ " << customerArea
+	    << " п©я─п╬я│п╦я┌ я┌п╣п╠я▐ п╢п╬я│я┌п╟п╡п╦я┌я▄ п╨ я│я┌п╬п╩я┐ "
+	    << ordered << " п╨я┐я│" << GET_COUNT(ordered.getValue( ), "п╬п╨", "п╨п╟", "п╨п╬п╡")
+	    << " п╪я▐я│п╟ " << raceRusName.ruscase( '2' ) 
+	    << ", oп╠п╦я┌п╟я▌я┴п╦я┘ п╡ п╪п╣я│я┌п╫п╬я│я┌п╦ " << areaName << "." << endl;
 	    
 	if (delivered > 0)
-	    buf << "Доставлено кусков: " << delivered << "." << endl;    
+	    buf << "п■п╬я│я┌п╟п╡п╩п╣п╫п╬ п╨я┐я│п╨п╬п╡: " << delivered << "." << endl;    
     }	
 }
 
 void ButcherQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "Вернуться к квестору за наградой.";
+	buf << "п▓п╣я─п╫я┐я┌я▄я│я▐ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ п╫п╟пЁя─п╟п╢п╬п╧.";
     else { 
-        buf << customerName << " из " << customerArea << " заказал "
-	    << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
-	    << " мяса " << raceRusName.ruscase( '2' )  << " из " << areaName << ".";
+        buf << customerName << " п╦п╥ " << customerArea << " п╥п╟п╨п╟п╥п╟п╩ "
+	    << ordered << " п╨я┐я│" << GET_COUNT(ordered.getValue( ), "п╬п╨", "п╨п╟", "п╨п╬п╡")
+	    << " п╪я▐я│п╟ " << raceRusName.ruscase( '2' )  << " п╦п╥ " << areaName << ".";
     }	
 }
 

@@ -26,7 +26,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML "единица"
+ * @short XML "п╣п╢п╦п╫п╦я├п╟"
  */
 class XMLNode : public virtual DLObject
 {
@@ -41,7 +41,7 @@ public:
 public:
 	/**
 	 * @author Igor S. Petrenko
-	 * @short список in nodes
+	 * @short я│п©п╦я│п╬п╨ in nodes
 	 */
 	struct NodeList : public std::vector<XMLNode::Pointer>, public virtual DLObject
 	{

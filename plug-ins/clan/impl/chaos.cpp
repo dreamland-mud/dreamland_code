@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "chaos.h"
@@ -48,12 +48,12 @@ GSN(dispel_affects);
  *-------------------------------------------------------------------------*/
 void ClanGuardChaos::actGreet( PCharacter *wch )
 {
-    interpret_raw( ch, "say", "Растворись в Хаосе, %s!", wch->getNameP( '1' ).c_str( ) );
+    interpret_raw( ch, "say", "п═п╟я│я┌п╡п╬я─п╦я│я▄ п╡ п╔п╟п╬я│п╣, %s!", wch->getNameP( '1' ).c_str( ) );
 }
 void ClanGuardChaos::actPush( PCharacter *wch )
 {
-    act( "На мгновенье ты теряешь представление о реальности...", wch, 0, ch, TO_CHAR );
-    act( "$C1 выпускает частицу ХАОСА в $c2\n\r...и $c1 растворяется в нем...", wch, 0, ch, TO_ROOM );
+    act( "п²п╟ п╪пЁп╫п╬п╡п╣п╫я▄п╣ я┌я▀ я┌п╣я─я▐п╣я┬я▄ п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п╬ я─п╣п╟п╩я▄п╫п╬я│я┌п╦...", wch, 0, ch, TO_CHAR );
+    act( "$C1 п╡я▀п©я┐я│п╨п╟п╣я┌ я┤п╟я│я┌п╦я├я┐ п╔п░п·п║п░ п╡ $c2\n\r...п╦ $c1 я─п╟я│я┌п╡п╬я─я▐п╣я┌я│я▐ п╡ п╫п╣п╪...", wch, 0, ch, TO_ROOM );
 }
 int ClanGuardChaos::getCast( Character *victim )
 {
@@ -102,22 +102,22 @@ void ChaosBlade::fight( Character *ch )
 
     switch(number_bits(6)) {
     case 0:
-	    act_p("{MКлинок Хаоса{x неистово вздрагивает!",ch,0,0,TO_ROOM,POS_RESTING);
-	    ch->send_to("Твой {MКлинок Хаоса{x неистово вздрагивает!\n\r");
+	    act_p("{Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x п╫п╣п╦я│я┌п╬п╡п╬ п╡п╥п╢я─п╟пЁп╦п╡п╟п╣я┌!",ch,0,0,TO_ROOM,POS_RESTING);
+	    ch->send_to("п╒п╡п╬п╧ {Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x п╫п╣п╦я│я┌п╬п╡п╬ п╡п╥п╢я─п╟пЁп╦п╡п╟п╣я┌!\n\r");
 	    spell(gsn_mirror, ch->getModifyLevel(),ch,ch, FSPELL_BANE );
 	    ch->setWaitViolence( 2 );
 	    break;
 
     case 1:
-	    act_p("{MКлинок Хаоса{x устрашающе звенит!",ch,0,0,TO_ROOM,POS_RESTING);
-	    ch->send_to("Твой {MКлинок Хаоса{x устрашающе звенит!\n\r");
+	    act_p("{Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x я┐я│я┌я─п╟я┬п╟я▌я┴п╣ п╥п╡п╣п╫п╦я┌!",ch,0,0,TO_ROOM,POS_RESTING);
+	    ch->send_to("п╒п╡п╬п╧ {Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x я┐я│я┌я─п╟я┬п╟я▌я┴п╣ п╥п╡п╣п╫п╦я┌!\n\r");
 	    spell(gsn_garble, ch->getModifyLevel()+5, ch, ch->fighting, FSPELL_BANE );
 	    ch->setWaitViolence( 2 );
 	    break;
 
     case 2:
-	    act_p("{MКлинок Хаоса{x неудержимо дрожит!",ch,0,0,TO_ROOM,POS_RESTING);
-	    ch->send_to("Твой {MКлинок Хаоса{x неудержимо дрожит!\n\r");
+	    act_p("{Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x п╫п╣я┐п╢п╣я─п╤п╦п╪п╬ п╢я─п╬п╤п╦я┌!",ch,0,0,TO_ROOM,POS_RESTING);
+	    ch->send_to("п╒п╡п╬п╧ {Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x п╫п╣я┐п╢п╣я─п╤п╦п╪п╬ п╢я─п╬п╤п╦я┌!\n\r");
 	    spell(gsn_confuse, ch->getModifyLevel()+5,ch,ch->fighting, FSPELL_BANE );
 	    ch->setWaitViolence( 2 );
 	    break;
@@ -126,8 +126,8 @@ void ChaosBlade::fight( Character *ch )
 
 bool ChaosBlade::death( Character *ch )
 {
-    act_p( "Твой {MКлинок Хаоса{x исчезает.", ch, 0, 0, TO_CHAR, POS_DEAD );
-    act( "{MКлинок Хаоса{x $c2 исчезает.", ch, 0, 0, TO_ROOM );
+    act_p( "п╒п╡п╬п╧ {Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x п╦я│я┤п╣п╥п╟п╣я┌.", ch, 0, 0, TO_CHAR, POS_DEAD );
+    act( "{Mп п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟{x $c2 п╦я│я┤п╣п╥п╟п╣я┌.", ch, 0, 0, TO_ROOM );
     extract_obj( obj );
     return false;
 }
@@ -139,8 +139,8 @@ VOID_SPELL(ChaosBlade)::run( Character *ch, char *, int sn, int level )
   Affect af;
 
   blade = create_object( get_obj_index(OBJ_VNUM_CHAOS_BLADE),level);
-  ch->send_to("Ты взмахиваешь руками и создаешь Клинок Хаоса!\n\r");
-  act_p("$c1 взмахивает руками и создает Клинок Хаоса!",
+  ch->send_to("п╒я▀ п╡п╥п╪п╟я┘п╦п╡п╟п╣я┬я▄ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┬я▄ п п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟!\n\r");
+  act_p("$c1 п╡п╥п╪п╟я┘п╦п╡п╟п╣я┌ я─я┐п╨п╟п╪п╦ п╦ я│п╬п╥п╢п╟п╣я┌ п п╩п╦п╫п╬п╨ п╔п╟п╬я│п╟!",
          ch,0,0,TO_ROOM,POS_RESTING);
 
   blade->timer = level * 2;
@@ -176,19 +176,19 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
 
 	if ( victim->isAffected(gsn_confuse) )
 	{
-		act_p("Кто-то совсем недавно уже ввел в заблуждение $C4.",
+		act_p("п я┌п╬-я┌п╬ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬ я┐п╤п╣ п╡п╡п╣п╩ п╡ п╥п╟п╠п╩я┐п╤п╢п╣п╫п╦п╣ $C4.",
 			ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
 
 	if ( saves_spell(level,victim, DAM_MENTAL, ch, DAMF_SPELL) )
 	{
-		ch->send_to("Не получилось.");
+		ch->send_to("п²п╣ п©п╬п╩я┐я┤п╦п╩п╬я│я▄.");
 		return;
 	}
 
-	victim->send_to("Тебя сконфузили!\n\r");
-	act_p("$c1 выглядит очень сконфуженно.",victim,0,0,TO_ROOM,POS_RESTING);
+	victim->send_to("п╒п╣п╠я▐ я│п╨п╬п╫я└я┐п╥п╦п╩п╦!\n\r");
+	act_p("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п╬я┤п╣п╫я▄ я│п╨п╬п╫я└я┐п╤п╣п╫п╫п╬.",victim,0,0,TO_ROOM,POS_RESTING);
 
 	af.where		= TO_AFFECTS;
 	af.type      = sn;
@@ -246,11 +246,11 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
       af.bitvector          = 0;
       affect_to_char(victim,&af);
       
-      act("$c1 выглядит гораздо менее уверенн$gым|ым|ой в себе!", victim, 0, 0, TO_ROOM);
-      act("Ты чувствуешь себя гораздо менее уверенно!", victim, 0, 0, TO_CHAR);
+      act("$c1 п╡я▀пЁп╩я▐п╢п╦я┌ пЁп╬я─п╟п╥п╢п╬ п╪п╣п╫п╣п╣ я┐п╡п╣я─п╣п╫п╫$gя▀п╪|я▀п╪|п╬п╧ п╡ я│п╣п╠п╣!", victim, 0, 0, TO_ROOM);
+      act("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ я│п╣п╠я▐ пЁп╬я─п╟п╥п╢п╬ п╪п╣п╫п╣п╣ я┐п╡п╣я─п╣п╫п╫п╬!", victim, 0, 0, TO_CHAR);
     }
       else
-      ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+      ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 
 }
 
@@ -267,12 +267,12 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-	ch->send_to("У тебя не хватает сил разогнать эту группу.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я│п╦п╩ я─п╟п╥п╬пЁп╫п╟я┌я▄ я█я┌я┐ пЁя─я┐п©п©я┐.\n\r");
 	return;
     }
 
     if (IS_SET(room->room_flags, ROOM_NO_RECALL)) {
-	ch->println("Отсюда ты никого не сможешь вышвырнуть.");
+	ch->println("п·я┌я│я▌п╢п╟ я┌я▀ п╫п╦п╨п╬пЁп╬ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╡я▀я┬п╡я▀я─п╫я┐я┌я▄.");
 	return;
     }
 
@@ -316,15 +316,15 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
 	cnt++;
 	vch->dismount( );
 	transfer_char( vch, ch, pRoomIndex,
-		"%1$^C1 исчезает!",
-		"Мир закружился вокруг тебя подчиняясь Силам Хаоса!",
-		"%1$^C1 с озадаченным видом появляется рядом с тобой." );
+		"%1$^C1 п╦я│я┤п╣п╥п╟п╣я┌!",
+		"п°п╦я─ п╥п╟п╨я─я┐п╤п╦п╩я│я▐ п╡п╬п╨я─я┐пЁ я┌п╣п╠я▐ п©п╬п╢я┤п╦п╫я▐я▐я│я▄ п║п╦п╩п╟п╪ п╔п╟п╬я│п╟!",
+		"%1$^C1 я│ п╬п╥п╟п╢п╟я┤п╣п╫п╫я▀п╪ п╡п╦п╢п╬п╪ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ я┌п╬п╠п╬п╧." );
     }
     
     postaffect_to_char( ch, sn, 15 );
     
     if (cnt == 0)
-	ch->println("Подходящей жертвы не нашлось.");
+	ch->println("п÷п╬п╢я┘п╬п╢я▐я┴п╣п╧ п╤п╣я─я┌п╡я▀ п╫п╣ п╫п╟я┬п╩п╬я│я▄.");
 }
 
 
@@ -337,31 +337,31 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 
   if (ch->is_npc() || victim->is_npc())
     {
-     act_p("Ты не можешь подражать $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
+     act_p("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п©п╬п╢я─п╟п╤п╟я┌я▄ $C3.",ch,0,victim,TO_CHAR,POS_RESTING);
      return;
    }
 
   if (ch == victim || ch->getDoppel( ) == victim)
     {
-      act_p("Ты уже выглядишь как $E.",ch,0,victim,TO_CHAR,POS_RESTING);
+      act_p("п╒я▀ я┐п╤п╣ п╡я▀пЁп╩я▐п╢п╦я┬я▄ п╨п╟п╨ $E.",ch,0,victim,TO_CHAR,POS_RESTING);
       return;
     }
 
   if (victim->is_immortal() || victim->getDoppel( ) == ch)
     {
-      ch->send_to("Ну..Ну...\n\r");
+      ch->send_to("п²я┐..п²я┐...\n\r");
       return;
     }
 
   if (saves_spell(level,victim, DAM_CHARM, ch, DAMF_SPELL))
    {
-    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+    ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
     return;
    }
 
-  act("Ты меняешь свой облик, подражая $C3.", ch,0,victim,TO_CHAR);
-  act("$c1 меняет свой облик, подражая ТЕБЕ!", ch,0,victim,TO_VICT);
-  act("$c1 меняет свой облик, подражая $C3!", ch,0,victim,TO_NOTVICT);
+  act("п╒я▀ п╪п╣п╫я▐п╣я┬я▄ я│п╡п╬п╧ п╬п╠п╩п╦п╨, п©п╬п╢я─п╟п╤п╟я▐ $C3.", ch,0,victim,TO_CHAR);
+  act("$c1 п╪п╣п╫я▐п╣я┌ я│п╡п╬п╧ п╬п╠п╩п╦п╨, п©п╬п╢я─п╟п╤п╟я▐ п╒п∙п▒п∙!", ch,0,victim,TO_VICT);
+  act("$c1 п╪п╣п╫я▐п╣я┌ я│п╡п╬п╧ п╬п╠п╩п╦п╨, п©п╬п╢я─п╟п╤п╟я▐ $C3!", ch,0,victim,TO_NOTVICT);
 
   af.where 		= TO_AFFECTS;
   af.type               = sn;
@@ -386,23 +386,23 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
   Affect af;
 
   if( ch == victim ) {
-    ch->send_to("Это просто глупо.\n\r");
+    ch->send_to("п╜я┌п╬ п©я─п╬я│я┌п╬ пЁп╩я┐п©п╬.\n\r");
     return;
   }
 
   if( victim->isAffected(sn ) )  {
-    act_p( "$C1 и так уже не может ничего внятно произнести.",
+    act_p( "$C1 п╦ я┌п╟п╨ я┐п╤п╣ п╫п╣ п╪п╬п╤п╣я┌ п╫п╦я┤п╣пЁп╬ п╡п╫я▐я┌п╫п╬ п©я─п╬п╦п╥п╫п╣я│я┌п╦.",
             ch, 0, victim, TO_CHAR,POS_RESTING);
     return;
   }
 
   if( is_safe_nomessage( ch, victim ) ) {
-    ch->send_to("Тебе не дано здесь чего-нибудь добиться.\n\r");
+    ch->send_to("п╒п╣п╠п╣ п╫п╣ п╢п╟п╫п╬ п╥п╢п╣я│я▄ я┤п╣пЁп╬-п╫п╦п╠я┐п╢я▄ п╢п╬п╠п╦я┌я▄я│я▐.\n\r");
     return;
   }
 
   if( saves_spell( level, victim, DAM_MENTAL, ch, DAMF_SPELL ) ) {
-    ch->send_to("Хаос остался в тебе.\n\r");
+    ch->send_to("п╔п╟п╬я│ п╬я│я┌п╟п╩я│я▐ п╡ я┌п╣п╠п╣.\n\r");
     return;
   }
 
@@ -415,9 +415,9 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
   af.bitvector = 0;
   affect_to_char( victim, &af );
 
-  act_p( "Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
+  act_p( "п╒я▀ п©п╬п╢п╣п╩п╦п╩$gп╬я│я▄|я│я▐|п╟я│я▄ я┤п╟я│я┌п╦я├п╣п╧ я┘п╟п╬я│п╟ я│ я▐п╥я▀п╨п╬п╪ $C2.",
           ch, 0, victim, TO_CHAR,POS_RESTING);
-  victim->send_to("Такое впечатление, что твой язык завязали узлом.\n\r");
+  victim->send_to("п╒п╟п╨п╬п╣ п╡п©п╣я┤п╟я┌п╩п╣п╫п╦п╣, я┤я┌п╬ я┌п╡п╬п╧ я▐п╥я▀п╨ п╥п╟п╡я▐п╥п╟п╩п╦ я┐п╥п╩п╬п╪.\n\r");
 
 }
 
@@ -436,13 +436,13 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 
 	if (victim->is_npc())
 	{
-		ch->send_to("Зеркальные отражения могут иметь только персонажи.\n\r");
+		ch->send_to("п≈п╣я─п╨п╟п╩я▄п╫я▀п╣ п╬я┌я─п╟п╤п╣п╫п╦я▐ п╪п╬пЁя┐я┌ п╦п╪п╣я┌я▄ я┌п╬п╩я▄п╨п╬ п©п╣я─я│п╬п╫п╟п╤п╦.\n\r");
 		return;
 	}
 
         if ( ch->isAffected(sn ) )
 	{
-	    ch->send_to("Ты пытаешься сотворить зеркальные отражения, но безуспешно.\n\r");
+	    ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ я│п╬я┌п╡п╬я─п╦я┌я▄ п╥п╣я─п╨п╟п╩я▄п╫я▀п╣ п╬я┌я─п╟п╤п╣п╫п╦я▐, п╫п╬ п╠п╣п╥я┐я│п©п╣я┬п╫п╬.\n\r");
 	    return;
 	}
 
@@ -453,9 +453,9 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 	if ( ( mirrors >= level/5 ) || ( mirrors >= 10 ) )
 	{
 		if (ch==victim)
-			ch->send_to("Зеркальных отражений уже слишком много.\n\r");
+			ch->send_to("п≈п╣я─п╨п╟п╩я▄п╫я▀я┘ п╬я┌я─п╟п╤п╣п╫п╦п╧ я┐п╤п╣ я│п╩п╦я┬п╨п╬п╪ п╪п╫п╬пЁп╬.\n\r");
 		else
-			act_p("Зеркальных отражений $C2 уже слишком много.",
+			act_p("п≈п╣я─п╨п╟п╩я▄п╫я▀я┘ п╬я┌я─п╟п╤п╣п╫п╦п╧ $C2 я┐п╤п╣ я│п╩п╦я┬п╨п╬п╪ п╪п╫п╬пЁп╬.",
 				ch,0,victim,TO_CHAR,POS_RESTING);
 		return;
 	}
@@ -477,23 +477,23 @@ VOID_SPELL(Mirror)::run( Character *ch, Character *victim, int sn, int level )
 	
 	tmp_vict = victim->getDoppel( );
 
-	sprintf(long_buf, "{W%s{x%s здесь.\n\r",
+	sprintf(long_buf, "{W%s{x%s п╥п╢п╣я│я▄.\n\r",
 		tmp_vict->getNameP( '1' ).c_str(), tmp_vict->getPC( )->getParsedTitle( ).c_str( ));
 	strcpy(short_buf, tmp_vict->getNameP( ) );
 
 	if ( ch == victim )
 	{
-		ch->send_to("Около тебя появляется твое зеркальное отражение!\n\r");
-		act_p("Зеркальное отражение $c2 появляется рядом с $y!",
+		ch->send_to("п·п╨п╬п╩п╬ я┌п╣п╠я▐ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я┌п╡п╬п╣ п╥п╣я─п╨п╟п╩я▄п╫п╬п╣ п╬я┌я─п╟п╤п╣п╫п╦п╣!\n\r");
+		act_p("п≈п╣я─п╨п╟п╩я▄п╫п╬п╣ п╬я┌я─п╟п╤п╣п╫п╦п╣ $c2 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ $y!",
 			ch,0,victim,TO_ROOM,POS_RESTING);
 	}
 	else
 	{
-		act_p("Зеркальное отражение $C2 появляется рядом с $Y!",
+		act_p("п≈п╣я─п╨п╟п╩я▄п╫п╬п╣ п╬я┌я─п╟п╤п╣п╫п╦п╣ $C2 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ $Y!",
 			ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("Зеркальное отражение $C2 появляется рядом с $Y!",
+		act_p("п≈п╣я─п╨п╟п╩я▄п╫п╬п╣ п╬я┌я─п╟п╤п╣п╫п╦п╣ $C2 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ $Y!",
 			ch,0,victim,TO_NOTVICT,POS_RESTING);
-		victim->send_to("Рядом с тобой появляется твое зеркальное отражение!\n\r");
+		victim->send_to("п═я▐п╢п╬п╪ я│ я┌п╬п╠п╬п╧ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я┌п╡п╬п╣ п╥п╣я─п╨п╟п╩я▄п╫п╬п╣ п╬я┌я─п╟п╤п╣п╫п╦п╣!\n\r");
 	}
 
 	for (new_mirrors=0;
@@ -539,24 +539,24 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-      ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+      ch->send_to("п╜я┌п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╣ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╩п╬я│я▄ я│п╬п╡я│п╣п╪ п╫п╣п╢п╟п╡п╫п╬.\n\r");
       return;
     }
 
 //  if (IS_SET(room->room_flags, ROOM_LAW))
 //    {
-//      ch->send_to("Здесь тебе противостоят Силы Порядка.\n\r");
+//      ch->send_to("п≈п╢п╣я│я▄ я┌п╣п╠п╣ п©я─п╬я┌п╦п╡п╬я│я┌п╬я▐я┌ п║п╦п╩я▀ п÷п╬я─я▐п╢п╨п╟.\n\r");
 //      return;
 //    }
     if (IS_ROOM_AFFECTED(room, AFF_ROOM_RANDOMIZER))
     {
-	ch->send_to("Магические Силы Хаоса уже изменили окружающий мир.\n\r");
+	ch->send_to("п°п╟пЁп╦я┤п╣я│п╨п╦п╣ п║п╦п╩я▀ п╔п╟п╬я│п╟ я┐п╤п╣ п╦п╥п╪п╣п╫п╦п╩п╦ п╬п╨я─я┐п╤п╟я▌я┴п╦п╧ п╪п╦я─.\n\r");
 	return;
     }
 
   if (number_bits(1) == 0)
     {
-      ch->send_to("Несмотря на твои усилия, окружающий мир противостоит Хаосу.\n\r");
+      ch->send_to("п²п╣я│п╪п╬я┌я─я▐ п╫п╟ я┌п╡п╬п╦ я┐я│п╦п╩п╦я▐, п╬п╨я─я┐п╤п╟я▌я┴п╦п╧ п╪п╦я─ п©я─п╬я┌п╦п╡п╬я│я┌п╬п╦я┌ п╔п╟п╬я│я┐.\n\r");
       af2.where     = TO_AFFECTS;
       af2.type      = sn;
       af2.level	    = ch->getModifyLevel();
@@ -585,10 +585,10 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
     af2.location  = APPLY_NONE;
     af2.bitvector = 0;
     affect_to_char( ch, &af2 );
-    ch->send_to("Окружающее тебя пространство теперь находится под властью Хаоса!\n\r");
-    ch->send_to("Использование Магических Сил Хаоса опустошает тебя.\n\r");
+    ch->send_to("п·п╨я─я┐п╤п╟я▌я┴п╣п╣ я┌п╣п╠я▐ п©я─п╬я│я┌я─п╟п╫я│я┌п╡п╬ я┌п╣п©п╣я─я▄ п╫п╟я┘п╬п╢п╦я┌я│я▐ п©п╬п╢ п╡п╩п╟я│я┌я▄я▌ п╔п╟п╬я│п╟!\n\r");
+    ch->send_to("п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣ п°п╟пЁп╦я┤п╣я│п╨п╦я┘ п║п╦п╩ п╔п╟п╬я│п╟ п╬п©я┐я│я┌п╬я┬п╟п╣я┌ я┌п╣п╠я▐.\n\r");
     ch->hit -= min(200, ch->hit/2);
-    act_p("Магические Силы Хаоса изменяют окружающий мир.",
+    act_p("п°п╟пЁп╦я┤п╣я│п╨п╦п╣ п║п╦п╩я▀ п╔п╟п╬я│п╟ п╦п╥п╪п╣п╫я▐я▌я┌ п╬п╨я─я┐п╤п╟я▌я┴п╦п╧ п╪п╦я─.",
            ch,0,0,TO_ROOM,POS_RESTING);
     return;
 
@@ -598,8 +598,8 @@ VOID_SPELL(Randomizer)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(Randomizer);
 VOID_AFFECT(Randomizer)::toStream( ostringstream &buf, Affect *paf ) 
 {
-    buf << fmt( 0, "Окружающее тебя пространство на ближайш%1$Iий|ие|ие {W%1$d{x "
-                   "ча%1$Iс|са|сов попало под власть Хаоса!", paf->duration ) 
+    buf << fmt( 0, "п·п╨я─я┐п╤п╟я▌я┴п╣п╣ я┌п╣п╠я▐ п©я─п╬я│я┌я─п╟п╫я│я┌п╡п╬ п╫п╟ п╠п╩п╦п╤п╟п╧я┬%1$Iп╦п╧|п╦п╣|п╦п╣ {W%1$d{x "
+                   "я┤п╟%1$Iя│|я│п╟|я│п╬п╡ п©п╬п©п╟п╩п╬ п©п╬п╢ п╡п╩п╟я│я┌я▄ п╔п╟п╬я│п╟!", paf->duration ) 
 	<< endl;
 }
 

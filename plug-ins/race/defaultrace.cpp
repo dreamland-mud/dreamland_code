@@ -76,37 +76,37 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     DLString nameF = race->getFemaleName( ).ruscase( '1' ); 
     DLString nameM = race->getMaleName( ).ruscase( '1' ); 
 
-    in << "òÁÓÁ {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
+    in << "Ð Ð°ÑÐ° {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " ÉÌÉ {C" << race->getName( ) << "{x" << endl << endl;
+    in << " Ð¸Ð»Ð¸ {C" << race->getName( ) << "{x" << endl << endl;
 
     in << *this << endl;
 
     const PCRace *r = (const_cast<Race *>(race.getPointer( )))->getPC( );
     if (r) {
         
-        in << "{cèÁÒÁËÔÅÒ{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
+        in << "{cÐ¥Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
         if (!r->getStats( ).empty( )) {
             bool found = false;
 
-            in << "{cðÁÒÁÍÅÔÒÙ{x : ";
+            in << "{cÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹{x : ";
             for (int i = 0; i < stat_table.size; i++) {
                 int stat = r->getStats( )[i];
                 if (stat != 0) {
                     if (found) 
                         in << ", ";
-                    in << (stat > 0 ? "+" : "") << stat << " Ë " << stat_table.message( i, '3' );
+                    in << (stat > 0 ? "+" : "") << stat << " Ðº " << stat_table.message( i, '3' );
                     found = true;
                 }
             }
             if (!found)
-                in << "ÂÅÚ ÉÚÍÅÎÅÎÉÊ";
+                in << "Ð±ÐµÐ· Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹";
             in << endl;
         }
-        in << "{còÁÚÍÅÒ{x    : " << size_table.message( r->getSize( ) ) << endl; 
+        in << "{cÐ Ð°Ð·Ð¼ÐµÑ€{x    : " << size_table.message( r->getSize( ) ) << endl; 
         
-        in << "{cðÒÏÆÅÓÓÉÉ{x : ";
+        in << "{cÐŸÑ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸{x : ";
         bool found = false;
         for (int i = 0; i < professionManager->size( ); i++) {
             Profession *prof = professionManager->find( i );
@@ -120,21 +120,21 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         in << endl;
 
         if (r->getPoints( ) > 0) {
-            in << "{cäÏÐ. ÏÐÙÔ{x : " << r->getPoints( ) << endl;
+            in << "{cÐ”Ð¾Ð¿. Ð¾Ð¿Ñ‹Ñ‚{x : " << r->getPoints( ) << endl;
         }
 
         DLString res = imm_flags.messages( r->getRes( ), true, '1' );
         if (!res.empty( )) {
-            in << "{cõÓÔÏÊÞÉ×Ù{x : Ë " << res << endl;
+            in << "{cÐ£ÑÑ‚Ð¾Ð¹Ñ‡Ð¸Ð²Ñ‹{x : Ðº " << res << endl;
         }
         DLString vuln = imm_flags.messages( r->getVuln( ), true, '1' );
         if (!vuln.empty( )) {
-            in << "{cõÑÚ×ÉÍÙ{x   : Ë " << vuln << endl;
+            in << "{cÐ£ÑÐ·Ð²Ð¸Ð¼Ñ‹{x   : Ðº " << vuln << endl;
         }
 
         DLString aff = r->getAff( ).messages( true, '1' );
         if (!aff.empty( )) {
-            in << "{cáÆÆÅËÔÙ{x   : " << aff << endl;
+            in << "{cÐÑ„Ñ„ÐµÐºÑ‚Ñ‹{x   : " << aff << endl;
         }
     }
 
@@ -177,16 +177,16 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     }
     
     if (!raceApt.empty( )) {
-        in << "{WòÁÓÏ×ÙÅ cÐÏÓÏÂÎÏÓÔÉ{x: " << raceApt << endl;
+        in << "{WÐ Ð°ÑÐ¾Ð²Ñ‹Ðµ cÐ¿Ð¾ÑÐ¾Ð±Ð½Ð¾ÑÑ‚Ð¸{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
-        in << "{WâÏÎÕÓÙ ÎÁ ÐÒÏÆÅÓÓÉÏÎÁÌØÎÙÅ ÕÍÅÎÉÑ{x: " << prof100 << endl;
+        in << "{WÐ‘Ð¾Ð½ÑƒÑÑ‹ Ð½Ð° Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ðµ ÑƒÐ¼ÐµÐ½Ð¸Ñ{x: " << prof100 << endl;
     }
     if (!noprof100.empty( )) {
-        in << "{WâÏÎÕÓÙ ÎÅÚÁ×ÉÓÉÍÏ ÏÔ ÐÒÏÆÅÓÓÉÉ{x: " << noprof100 << endl;
+        in << "{WÐ‘Ð¾Ð½ÑƒÑÑ‹ Ð½ÐµÐ·Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ Ð¾Ñ‚ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸{x: " << noprof100 << endl;
     }
 
-    in << endl << "ðÏÄÒÏÂÎÅÅ ÏÂÏ ×ÓÅÈ ÐÁÒÁÍÅÔÒÁÈ ÞÉÔÁÊ × %H% [(race stats,ÒÁÓÁ ÈÁÒÁËÔÅÒÉÓÔÉËÉ)]" << endl;
+    in << endl << "ÐŸÐ¾Ð´Ñ€Ð¾Ð±Ð½ÐµÐµ Ð¾Ð±Ð¾ Ð²ÑÐµÑ… Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°Ñ… Ñ‡Ð¸Ñ‚Ð°Ð¹ Ð² %H% [(race stats,Ñ€Ð°ÑÐ° Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸)]" << endl;
 }
 
 /* ------------------------------------------------------------------

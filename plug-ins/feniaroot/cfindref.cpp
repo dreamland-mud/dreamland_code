@@ -72,12 +72,12 @@ CMDADM(findrefs)
 	return;
     
     if (!has_fenia_security( pch )) {
-	ch->println("Ты не ботаешь по фене.");
+	ch->println("п╒я▀ п╫п╣ п╠п╬я┌п╟п╣я┬я▄ п©п╬ я└п╣п╫п╣.");
 	return;
     }
 
     if (constArguments.empty( )) {
-	ch->println("Синтаксис: {Wfindrefs {x<cs id>");
+	ch->println("п║п╦п╫я┌п╟п╨я│п╦я│: {Wfindrefs {x<cs id>");
 	return;
     }
 

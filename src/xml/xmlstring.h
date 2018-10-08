@@ -15,7 +15,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная DLString
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ DLString
  */
 class XMLString : public DLString 
 {
@@ -32,7 +32,7 @@ public:
     {
     }
     
-    /** Возвращает xml представление переменной */
+    /** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
     bool toXML( XMLNode::Pointer& node ) const;
     void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
     

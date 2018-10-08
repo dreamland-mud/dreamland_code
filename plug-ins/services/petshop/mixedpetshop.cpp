@@ -119,11 +119,11 @@ void MixedPetShopRoom::doList( Character *client )
     createMixedList( list, client );
 
     if (list.empty( )) {
-	client->println( "Магазин не работает." );
+	client->println( "п°п╟пЁп╟п╥п╦п╫ п╫п╣ я─п╟п╠п╬я┌п╟п╣я┌." );
 	return;
     }
 
-    buf << "[ Ном.| Ур.  Цена ] Товар" << endl;
+    buf << "[ п²п╬п╪.| пёя─.  п╕п╣п╫п╟ ] п╒п╬п╡п╟я─" << endl;
     
     for (i = list.begin( ); i != list.end( ); i++)
 	buf << dlprintf( "[ {Y%3d{x |%3d %5d ] %s\n\r",
@@ -205,6 +205,6 @@ void MixedPetShopRoom::doBuy( Character *client, const DLString &constArguments 
 	}
     }
     
-    client->println( "Извини, ты не можешь купить этого здесь." );
+    client->println( "п≤п╥п╡п╦п╫п╦, я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╨я┐п©п╦я┌я▄ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄." );
 }
 

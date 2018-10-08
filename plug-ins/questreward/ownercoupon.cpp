@@ -23,33 +23,33 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
 	return false;
     
     if (!arg[0]) {
-	ch->println( "Какую именно вещь ты хочешь сделать своей собственностью?" );
+	ch->println( "п п╟п╨я┐я▌ п╦п╪п╣п╫п╫п╬ п╡п╣я┴я▄ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я│п╡п╬п╣п╧ я│п╬п╠я│я┌п╡п╣п╫п╫п╬я│я┌я▄я▌?" );
 	return true;
     }
 
     if (!( item = get_obj_carry( ch, arg ) )) {
-	ch->println( "У тебя нет этого." );
+	ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬." );
 	return true;
     }
 
     if (item->pIndexData->limit >= 0) {
-	ch->println( "Лимиты нельзя приватизировать!" );
+	ch->println( "п⌡п╦п╪п╦я┌я▀ п╫п╣п╩я▄п╥я▐ п©я─п╦п╡п╟я┌п╦п╥п╦я─п╬п╡п╟я┌я▄!" );
 	return true;
     }
 
     if (item->timer > 0) {
-	ch->pecho( "%^O1 исчезнет через некоторое время, не жалко купон тратить?", item );
+	ch->pecho( "%^O1 п╦я│я┤п╣п╥п╫п╣я┌ я┤п╣я─п╣п╥ п╫п╣п╨п╬я┌п╬я─п╬п╣ п╡я─п╣п╪я▐, п╫п╣ п╤п╟п╩п╨п╬ п╨я┐п©п╬п╫ я┌я─п╟я┌п╦я┌я▄?", item );
 	return true;
     }
 
     if (item->pIndexData == obj->pIndexData) {
-	ch->println( "Это неразумно." );
+	ch->println( "п╜я┌п╬ п╫п╣я─п╟п╥я┐п╪п╫п╬." );
 	return true;
     }
 
     if (item->behavior) {
 	if (item->behavior.getDynamicPointer<PersonalQuestReward>( )) {
-	    ch->pecho( "У %O2 уже есть постоянный владелец.", item );
+	    ch->pecho( "пё %O2 я┐п╤п╣ п╣я│я┌я▄ п©п╬я│я┌п╬я▐п╫п╫я▀п╧ п╡п╩п╟п╢п╣п╩п╣я├.", item );
 	    return true;
 	}
 
@@ -68,9 +68,9 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
 	<< " using " << (obj->getOwner( ) ? obj->getOwner( ) : "nobody") 
 	<< "'s coupon [ID " << obj->getID( ) << "]" << endl;
 
-    ch->recho( POS_RESTING, "%^C1 проделывает манипуляции с %O5 и %O5.", ch, item, obj );
-    ch->pecho( "Ты превращаешь %O4 в свою личную вещь.", item );
-    ch->pecho( "(во избежание недоразумений внимательно прочти help owner!)" );
+    ch->recho( POS_RESTING, "%^C1 п©я─п╬п╢п╣п╩я▀п╡п╟п╣я┌ п╪п╟п╫п╦п©я┐п╩я▐я├п╦п╦ я│ %O5 п╦ %O5.", ch, item, obj );
+    ch->pecho( "п╒я▀ п©я─п╣п╡я─п╟я┴п╟п╣я┬я▄ %O4 п╡ я│п╡п╬я▌ п╩п╦я┤п╫я┐я▌ п╡п╣я┴я▄.", item );
+    ch->pecho( "(п╡п╬ п╦п╥п╠п╣п╤п╟п╫п╦п╣ п╫п╣п╢п╬я─п╟п╥я┐п╪п╣п╫п╦п╧ п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╬ п©я─п╬я┤я┌п╦ help owner!)" );
     extract_obj( obj );
     return true; 
 }

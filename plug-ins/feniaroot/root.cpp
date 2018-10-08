@@ -52,28 +52,28 @@ Profession * find_prof_unstrict( const DLString &className);
 using namespace std;
 using namespace Scripting;
 
-NMI_INIT(Root, "корневой объект");
+NMI_INIT(Root, "п╨п╬я─п╫п╣п╡п╬п╧ п╬п╠я┼п╣п╨я┌");
 
 /*
  * METHODS
  */
 
-NMI_INVOKE( Root, Map , "конструктор для структуры") 
+NMI_INVOKE( Root, Map , "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ я│я┌я─я┐п╨я┌я┐я─я▀") 
 {
     return Register::handler<IdContainer>();
 }
 
-NMI_INVOKE( Root, Array, "конструктор для массива") 
+NMI_INVOKE( Root, Array, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╪п╟я│я│п╦п╡п╟") 
 {
     return Register::handler<RegContainer>();
 }
 
-NMI_INVOKE( Root, List , "конструктор для списка") 
+NMI_INVOKE( Root, List , "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ я│п©п╦я│п╨п╟") 
 {
     return Register::handler<RegList>();
 }
 
-NMI_INVOKE( Root, Affect, "конструктор для аффекта" )
+NMI_INVOKE( Root, Affect, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╟я└я└п╣п╨я┌п╟" )
 {
     if (args.empty( ))
 	return Register::handler<AffectWrapper>( );
@@ -88,33 +88,33 @@ NMI_INVOKE( Root, Affect, "конструктор для аффекта" )
 
 DLString regfmt(Character *to, const RegisterList &argv);
 
-NMI_INVOKE( Root, fmt, "отформатировать строку") 
+NMI_INVOKE( Root, fmt, "п╬я┌я└п╬я─п╪п╟я┌п╦я─п╬п╡п╟я┌я▄ я│я┌я─п╬п╨я┐") 
 {
     return regfmt( NULL, args );
 }
 
-NMI_INVOKE( Root, print , "вывести строку в системные логи") 
+NMI_INVOKE( Root, print , "п╡я▀п╡п╣я│я┌п╦ я│я┌я─п╬п╨я┐ п╡ я│п╦я│я┌п╣п╪п╫я▀п╣ п╩п╬пЁп╦") 
 {
     LogStream::sendNotice() << ">> " << args.front().toString() << endl;
     return Register();
 }
 
-NMI_GET( Root, current_time, "текущее время в секундах") 
+NMI_GET( Root, current_time, "я┌п╣п╨я┐я┴п╣п╣ п╡я─п╣п╪я▐ п╡ я│п╣п╨я┐п╫п╢п╟я┘") 
 {
     return Register((int)dreamland->getCurrentTime( ));
 }
 
-NMI_INVOKE( Root, getCurrentTime , "текущее время в секундах") 
+NMI_INVOKE( Root, getCurrentTime , "я┌п╣п╨я┐я┴п╣п╣ п╡я─п╣п╪я▐ п╡ я│п╣п╨я┐п╫п╢п╟я┘") 
 {
     return Register((int)dreamland->getCurrentTime( ));
 }
 
-NMI_INVOKE( Root, player_exists, "существует ли в мире игрок с данным именем")
+NMI_INVOKE( Root, player_exists, "я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п╩п╦ п╡ п╪п╦я─п╣ п╦пЁя─п╬п╨ я│ п╢п╟п╫п╫я▀п╪ п╦п╪п╣п╫п╣п╪")
 {
     return Register( PCharacterManager::find( args2string( args ) ) != NULL );
 }
 
-NMI_INVOKE( Root, player_name, "английское имя игрока по его русскому/английскому имени")
+NMI_INVOKE( Root, player_name, "п╟п╫пЁп╩п╦п╧я│п╨п╬п╣ п╦п╪я▐ п╦пЁя─п╬п╨п╟ п©п╬ п╣пЁп╬ я─я┐я│я│п╨п╬п╪я┐/п╟п╫пЁп╩п╦п╧я│п╨п╬п╪я┐ п╦п╪п╣п╫п╦")
 {
     PCMemoryInterface *pci = PCharacterManager::find( args2string( args ) );
     
@@ -124,7 +124,7 @@ NMI_INVOKE( Root, player_name, "английское имя игрока по его русскому/английском
 	return DLString::emptyString;
 }
 
-NMI_INVOKE( Root, player_russian_name, "русское имя игрока с падежами по его русскому/английскому имени")
+NMI_INVOKE( Root, player_russian_name, "я─я┐я│я│п╨п╬п╣ п╦п╪я▐ п╦пЁя─п╬п╨п╟ я│ п©п╟п╢п╣п╤п╟п╪п╦ п©п╬ п╣пЁп╬ я─я┐я│я│п╨п╬п╪я┐/п╟п╫пЁп╩п╦п╧я│п╨п╬п╪я┐ п╦п╪п╣п╫п╦")
 {
     PCMemoryInterface *pci = PCharacterManager::find( args2string( args ) );
     
@@ -145,7 +145,7 @@ NMI_INVOKE( Root, player_clan, "")
 	return DLString::emptyString;
 }
 
-NMI_INVOKE( Root, player_attribute, "значение данного аттрибута игрока")
+NMI_INVOKE( Root, player_attribute, "п╥п╫п╟я┤п╣п╫п╦п╣ п╢п╟п╫п╫п╬пЁп╬ п╟я┌я┌я─п╦п╠я┐я┌п╟ п╦пЁя─п╬п╨п╟")
 {
     if (args.size( ) != 2)
 	throw Scripting::NotEnoughArgumentsException( );
@@ -164,7 +164,7 @@ NMI_INVOKE( Root, player_attribute, "значение данного аттрибута игрока")
 	return DLString::emptyString;
 }
 
-NMI_INVOKE( Root, get_obj_world , "ищет в мире предмет с указанным именем")
+NMI_INVOKE( Root, get_obj_world , "п╦я┴п╣я┌ п╡ п╪п╦я─п╣ п©я─п╣п╢п╪п╣я┌ я│ я┐п╨п╟п╥п╟п╫п╫я▀п╪ п╦п╪п╣п╫п╣п╪")
 {
     ::Object *obj;
     const char *name = args.front( ).toString( ).c_str( );
@@ -176,7 +176,7 @@ NMI_INVOKE( Root, get_obj_world , "ищет в мире предмет с указанным именем")
     return Register( );
 }
 
-NMI_INVOKE( Root, get_char_world , "ищет в мире чара с указанным именем")
+NMI_INVOKE( Root, get_char_world , "п╦я┴п╣я┌ п╡ п╪п╦я─п╣ я┤п╟я─п╟ я│ я┐п╨п╟п╥п╟п╫п╫я▀п╪ п╦п╪п╣п╫п╣п╪")
 {
     Character *wch;
     const char *name = args.front( ).toString( ).c_str( );
@@ -188,7 +188,7 @@ NMI_INVOKE( Root, get_char_world , "ищет в мире чара с указанным именем")
     return Register( );
 }
 
-NMI_INVOKE( Root, get_mob_index , "возвращает прототип моба с заданным vnum")
+NMI_INVOKE( Root, get_mob_index , "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©я─п╬я┌п╬я┌п╦п© п╪п╬п╠п╟ я│ п╥п╟п╢п╟п╫п╫я▀п╪ vnum")
 {
     int vnum;
     MOB_INDEX_DATA *pIndex;
@@ -202,7 +202,7 @@ NMI_INVOKE( Root, get_mob_index , "возвращает прототип моба с заданным vnum")
     return WrapperManager::getThis( )->getWrapper( pIndex );
 }
 
-NMI_INVOKE( Root, get_obj_index , "возвращает прототип предмета с заданным vnum")
+NMI_INVOKE( Root, get_obj_index , "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п©я─п╬я┌п╬я┌п╦п© п©я─п╣п╢п╪п╣я┌п╟ я│ п╥п╟п╢п╟п╫п╫я▀п╪ vnum")
 {
     int vnum;
     OBJ_INDEX_DATA *pIndex;
@@ -216,7 +216,7 @@ NMI_INVOKE( Root, get_obj_index , "возвращает прототип предмета с заданным vnum"
     return WrapperManager::getThis( )->getWrapper( pIndex );
 }
 
-NMI_INVOKE( Root, get_room_index , "возвращает комнату с заданным vnum")
+NMI_INVOKE( Root, get_room_index , "п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ п╨п╬п╪п╫п╟я┌я┐ я│ п╥п╟п╢п╟п╫п╫я▀п╪ vnum")
 {
     int vnum;
     Room *room;
@@ -230,7 +230,7 @@ NMI_INVOKE( Root, get_room_index , "возвращает комнату с заданным vnum")
     return WrapperManager::getThis( )->getWrapper( room ); 
 }
 
-NMI_INVOKE( Root, min, "минимальное из двух чисел") 
+NMI_INVOKE( Root, min, "п╪п╦п╫п╦п╪п╟п╩я▄п╫п╬п╣ п╦п╥ п╢п╡я┐я┘ я┤п╦я│п╣п╩") 
 {
     if (args.size( ) != 2)
 	throw Scripting::NotEnoughArgumentsException( );
@@ -238,7 +238,7 @@ NMI_INVOKE( Root, min, "минимальное из двух чисел")
     return Register( ::min(args.front( ).toNumber( ), args.back( ).toNumber( )) );
 }
 
-NMI_INVOKE( Root, max, "максимальное из двух чисел") 
+NMI_INVOKE( Root, max, "п╪п╟п╨я│п╦п╪п╟п╩я▄п╫п╬п╣ п╦п╥ п╢п╡я┐я┘ я┤п╦я│п╣п╩") 
 {
     if (args.size( ) != 2)
 	throw Scripting::NotEnoughArgumentsException( );
@@ -246,7 +246,7 @@ NMI_INVOKE( Root, max, "максимальное из двух чисел")
     return Register( ::max(args.front( ).toNumber( ), args.back( ).toNumber( )) );
 }
 
-NMI_INVOKE( Root, abs, "модуль числа") 
+NMI_INVOKE( Root, abs, "п╪п╬п╢я┐п╩я▄ я┤п╦я│п╩п╟") 
 {
     int x;
 
@@ -257,7 +257,7 @@ NMI_INVOKE( Root, abs, "модуль числа")
     return ::abs( x );
 }
 
-NMI_INVOKE( Root, dice, "(x, y) x раз кинуть кубик с y гранями") 
+NMI_INVOKE( Root, dice, "(x, y) x я─п╟п╥ п╨п╦п╫я┐я┌я▄ п╨я┐п╠п╦п╨ я│ y пЁя─п╟п╫я▐п╪п╦") 
 {
     RegisterList::const_iterator i;
     int a, b;
@@ -273,7 +273,7 @@ NMI_INVOKE( Root, dice, "(x, y) x раз кинуть кубик с y гранями")
     return Register( ::dice( a, b ) );
 }
 
-NMI_INVOKE( Root, number_range , "(x, y) произвольное число в промежутке от x до y") 
+NMI_INVOKE( Root, number_range , "(x, y) п©я─п╬п╦п╥п╡п╬п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬ п╡ п©я─п╬п╪п╣п╤я┐я┌п╨п╣ п╬я┌ x п╢п╬ y") 
 {
     RegisterList::const_iterator i;
     int a, b;
@@ -289,12 +289,12 @@ NMI_INVOKE( Root, number_range , "(x, y) произвольное число в промежутке от x до
     return Register( ::number_range( a, b ) );
 }
 
-NMI_INVOKE( Root, number_percent , "произвольное число от 1 до 100") 
+NMI_INVOKE( Root, number_percent , "п©я─п╬п╦п╥п╡п╬п╩я▄п╫п╬п╣ я┤п╦я│п╩п╬ п╬я┌ 1 п╢п╬ 100") 
 {
     return Register( ::number_percent( ) );
 }
 
-NMI_INVOKE( Root, chance , "(x) true если x < .number_percent()") 
+NMI_INVOKE( Root, chance , "(x) true п╣я│п╩п╦ x < .number_percent()") 
 {
     int a;
 
@@ -305,7 +305,7 @@ NMI_INVOKE( Root, chance , "(x) true если x < .number_percent()")
     return Register( ::chance( a ) );
 }
 
-NMI_INVOKE( Root, chanceOneOf, "(x) true если .number_range(1, x) == 1") 
+NMI_INVOKE( Root, chanceOneOf, "(x) true п╣я│п╩п╦ .number_range(1, x) == 1") 
 {
     if (args.size( ) < 1)
 	throw Scripting::NotEnoughArgumentsException( );
@@ -313,7 +313,7 @@ NMI_INVOKE( Root, chanceOneOf, "(x) true если .number_range(1, x) == 1")
     return Register( ::number_range( 1, args.front( ).toNumber( ) ) == 1);
 }
 
-NMI_INVOKE( Root, set_bit, "(mask, b) вернет mask с установленными битом b (логическое 'или')") 
+NMI_INVOKE( Root, set_bit, "(mask, b) п╡п╣я─п╫п╣я┌ mask я│ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╪п╦ п╠п╦я┌п╬п╪ b (п╩п╬пЁп╦я┤п╣я│п╨п╬п╣ 'п╦п╩п╦')") 
 {
     RegisterList::const_iterator i;
     int a, bit;
@@ -329,7 +329,7 @@ NMI_INVOKE( Root, set_bit, "(mask, b) вернет mask с установленными битом b (логи
     return a | bit;
 }
 
-NMI_INVOKE( Root, unset_bit, "(mask, b) вернет mask со сброшенным битом b") 
+NMI_INVOKE( Root, unset_bit, "(mask, b) п╡п╣я─п╫п╣я┌ mask я│п╬ я│п╠я─п╬я┬п╣п╫п╫я▀п╪ п╠п╦я┌п╬п╪ b") 
 {
     RegisterList::const_iterator i;
     int a, bit;
@@ -345,7 +345,7 @@ NMI_INVOKE( Root, unset_bit, "(mask, b) вернет mask со сброшенным битом b")
     return a & ~bit;
 }
 
-NMI_INVOKE( Root, isset_bit, "(mask, b) true если бит b установлен в mask (логическое 'и')") 
+NMI_INVOKE( Root, isset_bit, "(mask, b) true п╣я│п╩п╦ п╠п╦я┌ b я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ п╡ mask (п╩п╬пЁп╦я┤п╣я│п╨п╬п╣ 'п╦')") 
 {
     RegisterList::const_iterator i;
     int a, bit;
@@ -361,7 +361,7 @@ NMI_INVOKE( Root, isset_bit, "(mask, b) true если бит b установлен в mask (логич
     return a & bit;
 }
 
-NMI_INVOKE( Root, eval , "выполнить выражение указанное в строке") 
+NMI_INVOKE( Root, eval , "п╡я▀п©п╬п╩п╫п╦я┌я▄ п╡я▀я─п╟п╤п╣п╫п╦п╣ я┐п╨п╟п╥п╟п╫п╫п╬п╣ п╡ я│я┌я─п╬п╨п╣") 
 {
     if (args.empty())
 	throw Scripting::NotEnoughArgumentsException( );
@@ -383,7 +383,7 @@ delim(char c)
     return c == ' ' || c == '-';
 }
 
-NMI_INVOKE( Root, makeShort , "конструирует строку с палками из шести строк с падежами")
+NMI_INVOKE( Root, makeShort , "п╨п╬п╫я│я┌я─я┐п╦я─я┐п╣я┌ я│я┌я─п╬п╨я┐ я│ п©п╟п╩п╨п╟п╪п╦ п╦п╥ я┬п╣я│я┌п╦ я│я┌я─п╬п╨ я│ п©п╟п╢п╣п╤п╟п╪п╦")
 {
     if(args.size() != 6)
 	throw Scripting::NotEnoughArgumentsException( );
@@ -445,7 +445,7 @@ NMI_INVOKE( Root, makeShort , "конструирует строку с палками из шести строк с па
 }
 
 
-NMI_INVOKE(Root, get_random_room, "произвольная комната из числа общедоступных" )
+NMI_INVOKE(Root, get_random_room, "п©я─п╬п╦п╥п╡п╬п╩я▄п╫п╟я▐ п╨п╬п╪п╫п╟я┌п╟ п╦п╥ я┤п╦я│п╩п╟ п╬п╠я┴п╣п╢п╬я│я┌я┐п©п╫я▀я┘" )
 {
     std::vector<Room *> rooms;
     Room *r;
@@ -462,7 +462,7 @@ NMI_INVOKE(Root, get_random_room, "произвольная комната из числа общедоступных" 
     }
 }
 
-NMI_INVOKE(Root, date, "строка с датой, как ее видно по команде time" )
+NMI_INVOKE(Root, date, "я│я┌я─п╬п╨п╟ я│ п╢п╟я┌п╬п╧, п╨п╟п╨ п╣п╣ п╡п╦п╢п╫п╬ п©п╬ п╨п╬п╪п╟п╫п╢п╣ time" )
 {
     ostringstream buf;
 
@@ -470,7 +470,7 @@ NMI_INVOKE(Root, date, "строка с датой, как ее видно по команде time" )
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(Root, api, "печатает этот API" )
+NMI_INVOKE(Root, api, "п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     
@@ -478,7 +478,7 @@ NMI_INVOKE(Root, api, "печатает этот API" )
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(Root, gecho, "сообщение всем" )
+NMI_INVOKE(Root, gecho, "я│п╬п╬п╠я┴п╣п╫п╦п╣ п╡я│п╣п╪" )
 {
     Descriptor *d;
 
@@ -494,7 +494,7 @@ NMI_INVOKE(Root, gecho, "сообщение всем" )
     return Register( );
 }
 
-NMI_INVOKE(Root, infonet, "сообщение по infonet" )
+NMI_INVOKE(Root, infonet, "я│п╬п╬п╠я┴п╣п╫п╦п╣ п©п╬ infonet" )
 {
     if (args.size() != 2)
 	throw Scripting::NotEnoughArgumentsException( );
@@ -505,7 +505,7 @@ NMI_INVOKE(Root, infonet, "сообщение по infonet" )
     return Register( );
 }
 
-NMI_INVOKE(Root, wiznet, "сообщение по wiznet" )
+NMI_INVOKE(Root, wiznet, "я│п╬п╬п╠я┴п╣п╫п╦п╣ п©п╬ wiznet" )
 {
     DLString msg;
     int trust = 0, wiztype = WIZ_QUEST, wiznum;
@@ -532,7 +532,7 @@ NMI_INVOKE(Root, wiznet, "сообщение по wiznet" )
     return Register( );
 }
 
-NMI_INVOKE(Root, sync, "(системное) test for objects sync")
+NMI_INVOKE(Root, sync, "(я│п╦я│я┌п╣п╪п╫п╬п╣) test for objects sync")
 {
     while(!Scripting::Object::manager->sync(0))
 	;
@@ -540,7 +540,7 @@ NMI_INVOKE(Root, sync, "(системное) test for objects sync")
 }
 
 
-NMI_INVOKE(Root, object, "(cистемное) поиск феневого объекта" )
+NMI_INVOKE(Root, object, "(cп╦я│я┌п╣п╪п╫п╬п╣) п©п╬п╦я│п╨ я└п╣п╫п╣п╡п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟" )
 {
     Scripting::Object::id_t id;
 
@@ -557,7 +557,7 @@ NMI_INVOKE(Root, object, "(cистемное) поиск феневого объекта" )
 }
 
 #if 0
-NMI_INVOKE( Root, clearGuts, "(системное) удаление феневого объекта" )
+NMI_INVOKE( Root, clearGuts, "(я│п╦я│я┌п╣п╪п╫п╬п╣) я┐п╢п╟п╩п╣п╫п╦п╣ я└п╣п╫п╣п╡п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟" )
 {
     GutsContainer *gc;
     
@@ -573,54 +573,54 @@ NMI_INVOKE( Root, clearGuts, "(системное) удаление феневого объекта" )
 /*
  * FIELDS
  */
-NMI_GET( Root, buildplot, "true для мира-стройплощадки")
+NMI_GET( Root, buildplot, "true п╢п╩я▐ п╪п╦я─п╟-я│я┌я─п╬п╧п©п╩п╬я┴п╟п╢п╨п╦")
 {
     return dreamland->hasOption( DL_BUILDPLOT );
 }
 
-NMI_GET( Root, object_list , "список всех предметов, поле предмета next указывает на следующий") 
+NMI_GET( Root, object_list , "я│п©п╦я│п╬п╨ п╡я│п╣я┘ п©я─п╣п╢п╪п╣я┌п╬п╡, п©п╬п╩п╣ п©я─п╣п╢п╪п╣я┌п╟ next я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╫п╟ я│п╩п╣п╢я┐я▌я┴п╦п╧") 
 {
     return WrapperManager::getThis( )->getWrapper(object_list); 
 }
 
 extern Room *room_list;
 
-NMI_GET( Root, room_list , "список всех комнат, поле комнаты rnext указывает на следующую") 
+NMI_GET( Root, room_list , "я│п©п╦я│п╬п╨ п╡я│п╣я┘ п╨п╬п╪п╫п╟я┌, п©п╬п╩п╣ п╨п╬п╪п╫п╟я┌я▀ rnext я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╫п╟ я│п╩п╣п╢я┐я▌я┴я┐я▌") 
 {
     return WrapperManager::getThis( )->getWrapper(room_list); 
 }
 
-NMI_GET( Root, char_list , "список всех чаров, поле чара next указывает на следующего") 
+NMI_GET( Root, char_list , "я│п©п╦я│п╬п╨ п╡я│п╣я┘ я┤п╟я─п╬п╡, п©п╬п╩п╣ я┤п╟я─п╟ next я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╫п╟ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬") 
 {
     return WrapperManager::getThis( )->getWrapper(char_list); 
 }
 
-NMI_GET( Root, hour , "текущий час суток, 0..23") 
+NMI_GET( Root, hour , "я┌п╣п╨я┐я┴п╦п╧ я┤п╟я│ я│я┐я┌п╬п╨, 0..23") 
 {
     return Register( time_info.hour ); 
 }
 
-NMI_GET( Root, day, "текущий день недели, 0..6") 
+NMI_GET( Root, day, "я┌п╣п╨я┐я┴п╦п╧ п╢п╣п╫я▄ п╫п╣п╢п╣п╩п╦, 0..6") 
 {
     return Register( time_info.day); 
 }
 
-NMI_GET( Root, year, "текущий год") 
+NMI_GET( Root, year, "я┌п╣п╨я┐я┴п╦п╧ пЁп╬п╢") 
 {
     return Register( time_info.year); 
 }
 
-NMI_GET( Root, month, "текущий месяц, 0..16" ) 
+NMI_GET( Root, month, "я┌п╣п╨я┐я┴п╦п╧ п╪п╣я│я▐я├, 0..16" ) 
 {
     return Register( time_info.month ); 
 }
 
-NMI_GET( Root, sunlight , "время суток: 0=ночь, 1=рассвет, 2=день, 3=закат") 
+NMI_GET( Root, sunlight , "п╡я─п╣п╪я▐ я│я┐я┌п╬п╨: 0=п╫п╬я┤я▄, 1=я─п╟я│я│п╡п╣я┌, 2=п╢п╣п╫я▄, 3=п╥п╟п╨п╟я┌") 
 {
     return Register( weather_info.sunlight ); 
 }
 
-NMI_GET( Root, sky , "текущая погода: 0=безоблачно, 1=облачно, 2=дождь, 3=молнии") 
+NMI_GET( Root, sky , "я┌п╣п╨я┐я┴п╟я▐ п©п╬пЁп╬п╢п╟: 0=п╠п╣п╥п╬п╠п╩п╟я┤п╫п╬, 1=п╬п╠п╩п╟я┤п╫п╬, 2=п╢п╬п╤п╢я▄, 3=п╪п╬п╩п╫п╦п╦") 
 {
     return Register( weather_info.sky ); 
 }
@@ -633,7 +633,7 @@ NMI_GET( Root, tmp, "") {
     return tmp;
 }
     
-NMI_GET( Root, scheduler , "объект-планировщик")
+NMI_GET( Root, scheduler , "п╬п╠я┼п╣п╨я┌-п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨")
 {
     if(scheduler.type == Register::NONE) {
 	scheduler = Register::handler<SchedulerWrapper>();
@@ -643,7 +643,7 @@ NMI_GET( Root, scheduler , "объект-планировщик")
     return scheduler;
 }
 
-NMI_GET( Root, tables, "доступ ко всем таблицам" )
+NMI_GET( Root, tables, "п╢п╬я│я┌я┐п© п╨п╬ п╡я│п╣п╪ я┌п╟п╠п╩п╦я├п╟п╪" )
 {
     if(tables.type == Register::NONE) {
 	tables = Register::handler<TablesWrapper>();
@@ -663,7 +663,7 @@ NMI_GET( Root, nanny, "" )
     return nanny;
 }
 
-NMI_GET( Root, hometowns, "список всех хометаунов") 
+NMI_GET( Root, hometowns, "я│п©п╦я│п╬п╨ п╡я│п╣я┘ я┘п╬п╪п╣я┌п╟я┐п╫п╬п╡") 
 {
     RegList::Pointer list(NEW);
     Hometown *ht;
@@ -680,7 +680,7 @@ NMI_GET( Root, hometowns, "список всех хометаунов")
     return Register( listObj );
 }
 
-NMI_INVOKE( Root, Hometown, "конструктор для хометауна по имени" )
+NMI_INVOKE( Root, Hometown, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ я┘п╬п╪п╣я┌п╟я┐п╫п╟ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name;
 
@@ -692,7 +692,7 @@ NMI_INVOKE( Root, Hometown, "конструктор для хометауна по имени" )
     return HometownWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, Area, "конструктор для зоны по имени файла" )
+NMI_INVOKE( Root, Area, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╥п╬п╫я▀ п©п╬ п╦п╪п╣п╫п╦ я└п╟п╧п╩п╟" )
 {
     DLString name;
 
@@ -704,7 +704,7 @@ NMI_INVOKE( Root, Area, "конструктор для зоны по имени файла" )
     return AreaWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, find_profession, "нестрогий поиск профессии по русскому или англ названию" )
+NMI_INVOKE( Root, find_profession, "п╫п╣я│я┌я─п╬пЁп╦п╧ п©п╬п╦я│п╨ п©я─п╬я└п╣я│я│п╦п╦ п©п╬ я─я┐я│я│п╨п╬п╪я┐ п╦п╩п╦ п╟п╫пЁп╩ п╫п╟п╥п╡п╟п╫п╦я▌" )
 {
     if (args.empty( ))
 	throw Scripting::NotEnoughArgumentsException( );
@@ -717,7 +717,7 @@ NMI_INVOKE( Root, find_profession, "нестрогий поиск профессии по русскому или ан
     return ProfessionWrapper::wrap( prof->getName( ) );
 }
 
-NMI_GET( Root, professions, "список всех профессий, доступных игрокам") 
+NMI_GET( Root, professions, "я│п©п╦я│п╬п╨ п╡я│п╣я┘ п©я─п╬я└п╣я│я│п╦п╧, п╢п╬я│я┌я┐п©п╫я▀я┘ п╦пЁя─п╬п╨п╟п╪") 
 {
     RegList::Pointer list(NEW);
     Profession *prof;
@@ -734,7 +734,7 @@ NMI_GET( Root, professions, "список всех профессий, доступных игрокам")
     return Register( listObj );
 }
 
-NMI_INVOKE( Root, Profession, "конструктор для профессии по имени" )
+NMI_INVOKE( Root, Profession, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п©я─п╬я└п╣я│я│п╦п╦ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name;
 
@@ -746,7 +746,7 @@ NMI_INVOKE( Root, Profession, "конструктор для профессии по имени" )
     return ProfessionWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, CraftProfession, "конструктор для крафтовой профессии по имени" )
+NMI_INVOKE( Root, CraftProfession, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╨я─п╟я└я┌п╬п╡п╬п╧ п©я─п╬я└п╣я│я│п╦п╦ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name;
 
@@ -758,7 +758,7 @@ NMI_INVOKE( Root, CraftProfession, "конструктор для крафтовой профессии по имени
     return CraftProfessionWrapper::wrap( name );
 }
 
-NMI_GET( Root, races, "список всех рас") 
+NMI_GET( Root, races, "я│п©п╦я│п╬п╨ п╡я│п╣я┘ я─п╟я│") 
 {
     RegList::Pointer list(NEW);
     Race *race;
@@ -775,7 +775,7 @@ NMI_GET( Root, races, "список всех рас")
     return Register( listObj );
 }
 
-NMI_GET( Root, pcraces, "список рас, доступных игрокам") 
+NMI_GET( Root, pcraces, "я│п©п╦я│п╬п╨ я─п╟я│, п╢п╬я│я┌я┐п©п╫я▀я┘ п╦пЁя─п╬п╨п╟п╪") 
 {
     RegList::Pointer list(NEW);
     Race *race;
@@ -792,7 +792,7 @@ NMI_GET( Root, pcraces, "список рас, доступных игрокам")
     return Register( listObj );
 }
 
-NMI_INVOKE( Root, Race, "конструктор для расы по имени" )
+NMI_INVOKE( Root, Race, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ я─п╟я│я▀ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name;
 
@@ -804,7 +804,7 @@ NMI_INVOKE( Root, Race, "конструктор для расы по имени" )
     return RaceWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, findPlayer, "поиск игрока по точному имени" )
+NMI_INVOKE( Root, findPlayer, "п©п╬п╦я│п╨ п╦пЁя─п╬п╨п╟ п©п╬ я┌п╬я┤п╫п╬п╪я┐ п╦п╪п╣п╫п╦" )
 {
     DLString name;
     
@@ -817,7 +817,7 @@ NMI_INVOKE( Root, findPlayer, "поиск игрока по точному имени" )
 		PCharacterManager::findPlayer( name ) ); 
 }
 
-NMI_INVOKE( Root, Liquid, "конструктор для жидкости по имени" )
+NMI_INVOKE( Root, Liquid, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╤п╦п╢п╨п╬я│я┌п╦ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name;
 
@@ -833,7 +833,7 @@ NMI_INVOKE( Root, Liquid, "конструктор для жидкости по имени" )
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
-NMI_INVOKE( Root, Skill, "конструктор для умения по имени" )
+NMI_INVOKE( Root, Skill, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ я┐п╪п╣п╫п╦я▐ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name = args2string(args);
     if (!skillManager->findExisting(name))
@@ -841,7 +841,7 @@ NMI_INVOKE( Root, Skill, "конструктор для умения по имени" )
     return SkillWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
-NMI_INVOKE( Root, Clan, "конструктор для клана по имени" )
+NMI_INVOKE( Root, Clan, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╨п╩п╟п╫п╟ п©п╬ п╦п╪п╣п╫п╦" )
 {
     DLString name;
 
@@ -853,12 +853,12 @@ NMI_INVOKE( Root, Clan, "конструктор для клана по имени" )
     return ClanWrapper::wrap( name );
 }
 
-NMI_INVOKE( Root, Command, "конструктор для команды" )
+NMI_INVOKE( Root, Command, "п╨п╬п╫я│я┌я─я┐п╨я┌п╬я─ п╢п╩я▐ п╨п╬п╪п╟п╫п╢я▀" )
 {
     return Register::handler<CommandWrapper>();
 }
 
-NMI_GET( Root, players, "список (List) всех игроков") 
+NMI_GET( Root, players, "я│п©п╦я│п╬п╨ (List) п╡я│п╣я┘ п╦пЁя─п╬п╨п╬п╡") 
 {
     Descriptor *d;
     RegList::Pointer list(NEW);
@@ -872,7 +872,7 @@ NMI_GET( Root, players, "список (List) всех игроков")
     return Register( listObj );
 }
 
-NMI_GET( Root, feniadbStats, "статистика базы данных скриптовых объектов")
+NMI_GET( Root, feniadbStats, "я│я┌п╟я┌п╦я│я┌п╦п╨п╟ п╠п╟п╥я▀ п╢п╟п╫п╫я▀я┘ я│п╨я─п╦п©я┌п╬п╡я▀я┘ п╬п╠я┼п╣п╨я┌п╬п╡")
 {
     return Register(Scripting::Object::manager->stats());
 }

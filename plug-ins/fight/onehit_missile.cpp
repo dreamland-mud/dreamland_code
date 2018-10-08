@@ -117,16 +117,16 @@ bool MissileOneHit::defenseParry( )
 	return false;
     
     if (number_bits( 1 )) {
-	msgFightVict( "ôÙ ÒÁÚÒÕÂÁÅÛØ %3$O4 Ó×ÏÉÍ ÍÅÞÏÍ." );
-	msgFightRoom( "%2$^C1 ÒÁÚÒÕÂÁÅÔ %3$O4 Ó×ÏÉÍ ÍÅÞÏÍ." );
-	msgFightChar( "%2$^C1 ÒÁÚÒÕÂÁÅÔ %3$O4 Ó×ÏÉÍ ÍÅÞÏÍ." );
+	msgFightVict( "Ð¢Ñ‹ Ñ€Ð°Ð·Ñ€ÑƒÐ±Ð°ÐµÑˆÑŒ %3$O4 ÑÐ²Ð¾Ð¸Ð¼ Ð¼ÐµÑ‡Ð¾Ð¼." );
+	msgFightRoom( "%2$^C1 Ñ€Ð°Ð·Ñ€ÑƒÐ±Ð°ÐµÑ‚ %3$O4 ÑÐ²Ð¾Ð¸Ð¼ Ð¼ÐµÑ‡Ð¾Ð¼." );
+	msgFightChar( "%2$^C1 Ñ€Ð°Ð·Ñ€ÑƒÐ±Ð°ÐµÑ‚ %3$O4 ÑÐ²Ð¾Ð¸Ð¼ Ð¼ÐµÑ‡Ð¾Ð¼." );
 	extract_obj( missile );
 	missile = NULL;
     }
     else {
-	msgFightVict( "ôÙ ÏÔÂÉ×ÁÅÛØ %3$O4 Ó×ÏÉÍ ÏÒÕÖÉÅÍ." );
-	msgFightRoom( "%2$^C1 ÏÔÂÉ×ÁÅÔ %3$O4 Ó×ÏÉÍ ÏÒÕÖÉÅÍ." );
-	msgFightChar( "%2$^C1 ÏÔÂÉ×ÁÅÔ %3$O4 Ó×ÏÉÍ ÏÒÕÖÉÅÍ." );
+	msgFightVict( "Ð¢Ñ‹ Ð¾Ñ‚Ð±Ð¸Ð²Ð°ÐµÑˆÑŒ %3$O4 ÑÐ²Ð¾Ð¸Ð¼ Ð¾Ñ€ÑƒÐ¶Ð¸ÐµÐ¼." );
+	msgFightRoom( "%2$^C1 Ð¾Ñ‚Ð±Ð¸Ð²Ð°ÐµÑ‚ %3$O4 ÑÐ²Ð¾Ð¸Ð¼ Ð¾Ñ€ÑƒÐ¶Ð¸ÐµÐ¼." );
+	msgFightChar( "%2$^C1 Ð¾Ñ‚Ð±Ð¸Ð²Ð°ÐµÑ‚ %3$O4 ÑÐ²Ð¾Ð¸Ð¼ Ð¾Ñ€ÑƒÐ¶Ð¸ÐµÐ¼." );
 	obj_to_room( missile, victim->in_room );
     }
 
@@ -188,16 +188,16 @@ bool MissileOneHit::defenseDodge( )
 	&& victim->getClan( ) == clan_battlerager 
 	&& victim->getClan( )->isRecruiter( victim->getPC( ) ))
     {
-	msgFightVict( "ôÙ ÌÏ×ÉÛØ ÒÕËÁÍÉ %3$O4." );
-	msgFightRoom( "%2$^C1 ÌÏ×ÉÔ ÒÕËÁÍÉ %3$O4." );
-	msgFightChar( "%2$^C1 ÌÏ×ÉÔ ÒÕËÁÍÉ %3$O4." );
+	msgFightVict( "Ð¢Ñ‹ Ð»Ð¾Ð²Ð¸ÑˆÑŒ Ñ€ÑƒÐºÐ°Ð¼Ð¸ %3$O4." );
+	msgFightRoom( "%2$^C1 Ð»Ð¾Ð²Ð¸Ñ‚ Ñ€ÑƒÐºÐ°Ð¼Ð¸ %3$O4." );
+	msgFightChar( "%2$^C1 Ð»Ð¾Ð²Ð¸Ñ‚ Ñ€ÑƒÐºÐ°Ð¼Ð¸ %3$O4." );
 	obj_to_char( missile, victim );
 	return true;
     }
 
-    msgFightVict( "ôÙ ÕËÌÏÎÑÅÛØÓÑ ÏÔ %3$O2." );
-    msgFightRoom( "%2$^C1 ÕËÌÏÎÑÅÔÓÑ ÏÔ %3$O2" );
-    msgFightChar( "%2$^C1 ÕËÌÏÎÑÅÔÓÑ ÏÔ %3$O2." );
+    msgFightVict( "Ð¢Ñ‹ ÑƒÐºÐ»Ð¾Ð½ÑÐµÑˆÑŒÑÑ Ð¾Ñ‚ %3$O2." );
+    msgFightRoom( "%2$^C1 ÑƒÐºÐ»Ð¾Ð½ÑÐµÑ‚ÑÑ Ð¾Ñ‚ %3$O2" );
+    msgFightChar( "%2$^C1 ÑƒÐºÐ»Ð¾Ð½ÑÐµÑ‚ÑÑ Ð¾Ñ‚ %3$O2." );
 
     obj_to_room( missile, victim->in_room );
     gsn_dodge->improve( victim, true, ch );
@@ -376,8 +376,8 @@ void MissileOneHit::damEffectFunkyWeapon( )
 
 	if (!saves_spell(level,victim,DAM_POISON))
 	{
-	    msgWeaponVict("ôÙ ÞÕ×ÓÔ×ÕÅÛØ, ËÁË ÑÄ ÒÁÓÔÅËÁÅÔÓÑ ÐÏ Ô×ÏÉÍ ×ÅÎÁÍ.");
-	    msgWeaponRoom("%2$^C1 ÏÔÒÁ×ÌÅ%2$GÎÏ|Î|ÎÁ ÑÄÏÍ ÏÔ %3$O2.");
+	    msgWeaponVict("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ, ÐºÐ°Ðº ÑÐ´ Ñ€Ð°ÑÑ‚ÐµÐºÐ°ÐµÑ‚ÑÑ Ð¿Ð¾ Ñ‚Ð²Ð¾Ð¸Ð¼ Ð²ÐµÐ½Ð°Ð¼.");
+	    msgWeaponRoom("%2$^C1 Ð¾Ñ‚Ñ€Ð°Ð²Ð»Ðµ%2$GÐ½Ð¾|Ð½|Ð½Ð° ÑÐ´Ð¾Ð¼ Ð¾Ñ‚ %3$O2.");
 
 	    af.where     = TO_AFFECTS;
 	    af.type      = gsn_poison;
@@ -392,22 +392,22 @@ void MissileOneHit::damEffectFunkyWeapon( )
 
     if (IS_WEAPON_STAT(missile,WEAPON_FLAMING))
     {
-	msgWeaponVict("%3$^O1 ÏÂÖÉÇÁÅÔ ÔÅÂÑ.");
-	msgWeaponRoom("%3$^O1 ÏÂÖÉÇÁÅÔ %2$C4.");
+	msgWeaponVict("%3$^O1 Ð¾Ð±Ð¶Ð¸Ð³Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.");
+	msgWeaponRoom("%3$^O1 Ð¾Ð±Ð¶Ð¸Ð³Ð°ÐµÑ‚ %2$C4.");
 	fire_effect( (void *) victim,missile->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(missile,WEAPON_FROST))
     {
-	msgWeaponVict("%3$^O1 ÏÂÍÏÒÁÖÉ×ÁÅÔ ÔÅÂÑ.");
-	msgWeaponRoom("%3$^O1 ÏÂÍÏÒÁÖÉ×ÁÅÔ %2$C4.");
+	msgWeaponVict("%3$^O1 Ð¾Ð±Ð¼Ð¾Ñ€Ð°Ð¶Ð¸Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.");
+	msgWeaponRoom("%3$^O1 Ð¾Ð±Ð¼Ð¾Ñ€Ð°Ð¶Ð¸Ð²Ð°ÐµÑ‚ %2$C4.");
 	cold_effect(victim,missile->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(missile,WEAPON_SHOCKING))
     {
-	msgWeaponVict("%3$^O1 ÐÁÒÁÌÉÚÕÅÔ ÔÅÂÑ ÒÁÚÒÑÄÏÍ ÍÏÌÎÉÉ.");
-	msgWeaponRoom("%3$^O1 ÐÁÒÁÌÉÚÕÅÔ %2$C4 ÒÁÚÒÑÄÏÍ ÍÏÌÎÉÉ.");
+	msgWeaponVict("%3$^O1 Ð¿Ð°Ñ€Ð°Ð»Ð¸Ð·ÑƒÐµÑ‚ Ñ‚ÐµÐ±Ñ Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ Ð¼Ð¾Ð»Ð½Ð¸Ð¸.");
+	msgWeaponRoom("%3$^O1 Ð¿Ð°Ñ€Ð°Ð»Ð¸Ð·ÑƒÐµÑ‚ %2$C4 Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ Ð¼Ð¾Ð»Ð½Ð¸Ð¸.");
 	shock_effect(victim,missile->level,dam,TARGET_CHAR);
     }
 }

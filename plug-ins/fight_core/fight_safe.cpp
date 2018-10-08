@@ -37,8 +37,8 @@ bool is_safe(Character *ch, Character *victim)
 {
   if (is_safe_nomessage(ch,victim))
     {
-      act_p("$C1 находится под защитой богов.",ch,0,victim,TO_CHAR,POS_RESTING);
-      act_p("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM,POS_RESTING);
+      act_p("$C1 п╫п╟я┘п╬п╢п╦я┌я│я▐ п©п╬п╢ п╥п╟я┴п╦я┌п╬п╧ п╠п╬пЁп╬п╡.",ch,0,victim,TO_CHAR,POS_RESTING);
+      act_p("п▒п╬пЁп╦ п╥п╟я┴п╦я┌п╦п╩п╦ $C4 п╬я┌ $c2.",ch,0,victim,TO_ROOM,POS_RESTING);
 
     if ( victim->fighting == ch ) stop_fighting (victim, false);
     
@@ -82,7 +82,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
 
     if (mprog_safe( ch, victim ))
 	return true;
-    /* мертвi бджоли не гудуть */
+    /* п╪п╣я─я┌п╡i п╠п╢п╤п╬п╩п╦ п╫п╣ пЁя┐п╢я┐я┌я▄ */
     if (victim->isDead( ) || ch->isDead( ))
 	return true;
 
@@ -207,8 +207,8 @@ bool is_safe_rspell_nom( short level, Character *victim )
 bool is_safe_rspell(short level, Character *victim)
 {
     if (is_safe_rspell_nom(level, victim)) {
-	act("Боги защищают тебя от заклинаний в этой местности.", victim, 0, 0, TO_CHAR);
-	act("Боги защищают $c4 от заклинаний в этой местности.", victim, 0, 0, TO_ROOM);
+	act("п▒п╬пЁп╦ п╥п╟я┴п╦я┴п╟я▌я┌ я┌п╣п╠я▐ п╬я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧ п╡ я█я┌п╬п╧ п╪п╣я│я┌п╫п╬я│я┌п╦.", victim, 0, 0, TO_CHAR);
+	act("п▒п╬пЁп╦ п╥п╟я┴п╦я┴п╟я▌я┌ $c4 п╬я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧ п╡ я█я┌п╬п╧ п╪п╣я│я┌п╫п╬я│я┌п╦.", victim, 0, 0, TO_ROOM);
 	return true;
     }
 

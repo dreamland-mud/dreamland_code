@@ -41,13 +41,13 @@ bool PocketWatch::prompt( Character *ch, char letter, ostringstream &buf )
     buf << ((hour % 12 == 0) ? 12 : hour % 12) << " ";
 
     if ((hour > 16) && (hour < 24)) 
-	buf << "×ÅÞÅÒÁ";
+	buf << "Ð²ÐµÑ‡ÐµÑ€Ð°";
     if (hour < 4) 
-	buf << "ÎÏÞÉ";
+	buf << "Ð½Ð¾Ñ‡Ð¸";
     if ((hour > 3) && (hour < 12)) 
-	buf << "ÕÔÒÁ";
+	buf << "ÑƒÑ‚Ñ€Ð°";
     if ((hour > 11) && (hour < 17)) 
-	buf << "ÄÎÑ";
+	buf << "Ð´Ð½Ñ";
 
     return true;
 }

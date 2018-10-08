@@ -64,53 +64,53 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
     Clan *clan;
     
     if (cmd.empty( )) {
-	buf << "õËÁÖÉ ÏÄÎÏ ÉÚ ÄÅÊÓÔ×ÉÊ: {lRÓÐÉÓÏË, ÒÁÚÒÅÛÉÔØ ÉÌÉ ÚÁÐÒÅÔÉÔØ{lElist, allow ÉÌÉ deny{lx.";
+	buf << "Ð£ÐºÐ°Ð¶Ð¸ Ð¾Ð´Ð½Ð¾ Ð¸Ð· Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹: {lRÑÐ¿Ð¸ÑÐ¾Ðº, Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ Ð¸Ð»Ð¸ Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ{lElist, allow Ð¸Ð»Ð¸ deny{lx.";
 	return false;
     }
     
-    if (cmd.strPrefix( "list" ) || cmd.strPrefix( "ÓÐÉÓÏË" )) {
+    if (cmd.strPrefix( "list" ) || cmd.strPrefix( "ÑÐ¿Ð¸ÑÐ¾Ðº" )) {
 	if (all) {
-	    buf << "ÒÁÚÒÅÛÅÎÏ ×ÓÅÍ";
+	    buf << "Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ð²ÑÐµÐ¼";
 	    
 	    if (!clansDeny.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÞÌÅÎÏ× ËÌÁÎÁ " << clansDeny.toString( );
+		buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ñ‡Ð»ÐµÐ½Ð¾Ð² ÐºÐ»Ð°Ð½Ð° " << clansDeny.toString( );
 
 	    if (!playersDeny.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÐÅÒÓÏÎÁÖÁ " << playersDeny.toString( );
+		buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð° " << playersDeny.toString( );
 	}
 	else { 
-	    buf << "ÚÁÐÒÅÝÅÎÏ ×ÓÅÍ";
+	    buf << "Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ð²ÑÐµÐ¼";
 
 	    if (!clansAllow.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÞÌÅÎÏ× ËÌÁÎÁ " << clansAllow.toString( );
+		buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ñ‡Ð»ÐµÐ½Ð¾Ð² ÐºÐ»Ð°Ð½Ð° " << clansAllow.toString( );
 
 	    if (!playersAllow.empty( ))
-		buf << endl << "   ËÒÏÍÅ ÐÅÒÓÏÎÁÖÁ " << playersAllow.toString( );
+		buf << endl << "   ÐºÑ€Ð¾Ð¼Ðµ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð° " << playersAllow.toString( );
 	}
 
 	return true;
     }
 
-    if (cmd.strPrefix( "allow" ) || cmd.strPrefix( "ÒÁÚÒÅÛÉÔØ" ))
+    if (cmd.strPrefix( "allow" ) || cmd.strPrefix( "Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ" ))
 	fAllow = true;
-    else if (cmd.strPrefix( "deny" ) || cmd.strPrefix( "ÚÁÐÒÅÔÉÔØ" ))
+    else if (cmd.strPrefix( "deny" ) || cmd.strPrefix( "Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ" ))
 	fAllow = false;
     else {
-	buf << "õËÁÖÉ ÏÄÎÏ ÉÚ ÄÅÊÓÔ×ÉÊ: {lRÓÐÉÓÏË, ÒÁÚÒÅÛÉÔØ ÉÌÉ ÚÁÐÒÅÔÉÔØ{lElist, allow ÉÌÉ deny{lx.";
+	buf << "Ð£ÐºÐ°Ð¶Ð¸ Ð¾Ð´Ð½Ð¾ Ð¸Ð· Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹: {lRÑÐ¿Ð¸ÑÐ¾Ðº, Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ Ð¸Ð»Ð¸ Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ{lElist, allow Ð¸Ð»Ð¸ deny{lx.";
 	return false;
     }
 
     if (args.empty( )) {
-	buf << "ëÏÍÕ ÉÍÅÎÎÏ ÔÙ ÈÏÞÅÛØ " 
-	    << (fAllow ? "ÒÁÚÒÅÛÉÔØ" : "ÚÁÐÒÅÔÉÔØ") << " ÜÔÏ ÄÅÌÁÔØ?";
+	buf << "ÐšÐ¾Ð¼Ñƒ Ð¸Ð¼ÐµÐ½Ð½Ð¾ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ " 
+	    << (fAllow ? "Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ" : "Ð·Ð°Ð¿Ñ€ÐµÑ‚Ð¸Ñ‚ÑŒ") << " ÑÑ‚Ð¾ Ð´ÐµÐ»Ð°Ñ‚ÑŒ?";
 	return false;
     }
     
-    if (args == "all" || args == "×ÓÅ" || args == "×ÓÅÍ") {
+    if (args == "all" || args == "Ð²ÑÐµ" || args == "Ð²ÑÐµÐ¼") {
 	if (fAllow)
-	    buf << "ÏÔÎÙÎÅ ÒÁÚÒÅÛÅÎÏ ×ÓÅÍ (ËÒÏÍÅ ÔÅÈ, ËÏÍÕ ÚÁÐÒÅÝÅÎÏ Ñ×ÎÏ).";
+	    buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ð²ÑÐµÐ¼ (ÐºÑ€Ð¾Ð¼Ðµ Ñ‚ÐµÑ…, ÐºÐ¾Ð¼Ñƒ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ ÑÐ²Ð½Ð¾).";
 	else
-	    buf << "ÏÔÎÙÎÅ ÚÁÐÒÅÝÅÎÏ ×ÓÅÍ (ËÒÏÍÅ ÔÅÈ, ËÏÍÕ ÒÁÚÒÅÛÅÎÏ Ñ×ÎÏ).";
+	    buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ð²ÑÐµÐ¼ (ÐºÑ€Ð¾Ð¼Ðµ Ñ‚ÐµÑ…, ÐºÐ¾Ð¼Ñƒ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ ÑÐ²Ð½Ð¾).";
 
 	all = fAllow;
 	return true;
@@ -125,14 +125,14 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
 		playersDeny.remove( pci->getName( ) );
 	    else
 		playersAllow.add( pci->getName( ) );
-	    buf << "ÏÔÎÙÎÅ ÒÁÚÒÅÛÅÎÏ ÐÅÒÓÏÎÁÖÕ " << pci->getName( ) << ".";
+	    buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ñƒ " << pci->getName( ) << ".";
 	}
 	else {
 	    if (all)
 		playersDeny.add( pci->getName( ) );
 	    else
 		playersAllow.remove( pci->getName( ) );
-	    buf << "ÏÔÎÙÎÅ ÚÁÐÒÅÝÅÎÏ ÐÅÒÓÏÎÁÖÕ " << pci->getName( ) << ".";
+	    buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ñƒ " << pci->getName( ) << ".";
 	}
 	return true;
     }
@@ -143,19 +143,19 @@ bool XMLAttributeTrust::parse( const DLString &constArguments, ostringstream &bu
 		clansDeny.remove( *clan );
 	    else
 		clansAllow.set( *clan );
-	    buf << "ÏÔÎÙÎÅ ÒÁÚÒÅÛÅÎÏ ÞÌÅÎÁÍ ËÌÁÎÁ " << clan->getShortName( ) << ".";
+	    buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¾ Ñ‡Ð»ÐµÐ½Ð°Ð¼ ÐºÐ»Ð°Ð½Ð° " << clan->getShortName( ) << ".";
 	}
 	else {
 	    if (all)
 		clansDeny.set( *clan );
 	    else
 		clansAllow.remove( *clan );
-	    buf << "ÏÔÎÙÎÅ ÚÁÐÒÅÝÅÎÏ ÞÌÅÎÁÍ ËÌÁÎÁ " << clan->getShortName( ) << ".";
+	    buf << "Ð¾Ñ‚Ð½Ñ‹Ð½Ðµ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½Ð¾ Ñ‡Ð»ÐµÐ½Ð°Ð¼ ÐºÐ»Ð°Ð½Ð° " << clan->getShortName( ) << ".";
 	}
 	return true; 
     }
 
-    buf << "ëÌÁÎ ÉÌÉ ÐÅÒÓÏÎÁÖ Ó ÔÁËÉÍ ÉÍÅÎÅÍ ÎÅ ÎÁÊÄÅÎÙ.";
+    buf << "ÐšÐ»Ð°Ð½ Ð¸Ð»Ð¸ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶ Ñ Ñ‚Ð°ÐºÐ¸Ð¼ Ð¸Ð¼ÐµÐ½ÐµÐ¼ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ñ‹.";
     return false;
 }
 

@@ -352,7 +352,7 @@ void reset_room(Room *pRoom)
 void reset_area( AREA_DATA *pArea )
 {
     const char *resetmsg;
-    static const char *default_resetmsg = "Ты слышишь мелодичный перезвон колокольчиков.";	
+    static const char *default_resetmsg = "п╒я▀ я│п╩я▀я┬п╦я┬я▄ п╪п╣п╩п╬п╢п╦я┤п╫я▀п╧ п©п╣я─п╣п╥п╡п╬п╫ п╨п╬п╩п╬п╨п╬п╩я▄я┤п╦п╨п╬п╡.";	
 
     for (map<int, Room *>::iterator i = pArea->rooms.begin( ); i != pArea->rooms.end( ); i++)
 	reset_room( i->second );
@@ -379,7 +379,7 @@ void reset_area( AREA_DATA *pArea )
 		&& !IS_SET(ch->in_room->room_flags, ROOM_INDOORS)
 		&& gsn_track->getEffective( ch ) > 50)
 	    {
-		ch->println( "Внезапно налетевший дождь смывает все следы." );
+		ch->println( "п▓п╫п╣п╥п╟п©п╫п╬ п╫п╟п╩п╣я┌п╣п╡я┬п╦п╧ п╢п╬п╤п╢я▄ я│п╪я▀п╡п╟п╣я┌ п╡я│п╣ я│п╩п╣п╢я▀." );
 	    }
 
 	    ch->println( resetmsg );

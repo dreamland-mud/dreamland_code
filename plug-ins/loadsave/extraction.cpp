@@ -102,7 +102,7 @@ void extract_obj_1( Object *obj, bool count )
  * character extraction
  *--------------------------------------------------------------*/
 /*
- * Extract плоходропнутого моба >8)
+ * Extract п©п╩п╬я┘п╬п╢я─п╬п©п╫я┐я┌п╬пЁп╬ п╪п╬п╠п╟ >8)
  */
 void extract_mob_baddrop( NPCharacter *mob ) 
 {
@@ -126,7 +126,7 @@ bool mprog_extract( Character *ch, bool count )
 }
 
 /*
- * Extract хорошодропнутого моба
+ * Extract я┘п╬я─п╬я┬п╬п╢я─п╬п©п╫я┐я┌п╬пЁп╬ п╪п╬п╠п╟
  */
 void extract_mob_dropped( NPCharacter *mob )
 {

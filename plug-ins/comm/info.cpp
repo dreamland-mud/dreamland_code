@@ -20,8 +20,8 @@
 static void desc_show( Character *ch )
 {
 	if (ch->desc) {
-	    ch->send_to( "Твое описание:\n\r");
-	    ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
+	    ch->send_to( "п╒п╡п╬п╣ п╬п©п╦я│п╟п╫п╦п╣:\n\r");
+	    ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(п·я┌я│я┐я┌я│я┌п╡я┐п╣я┌).\n\r");
 	}
 }
 
@@ -29,12 +29,12 @@ static void desc_usage( Character *ch )
 {
     ostringstream buf;
 
-    buf << "Формат: " << endl
-        << "    {W{lRописание показать{lEdescription show{x: показать описание в 'сыром' виде с тегами цветов" << endl
-        << "    {W{lRописание +{lEdescription +{x: добавить строку к описанию" << endl
-        << "    {W{lRописание -{lEdescription -{x: удалить последнюю строку" << endl
-        << "    {W{lRописание копировать{lEdescription copy{x: скопировать описание в буфер редактора (только в веб-клиенте)" << endl
-        << "    {W{lRописание вставить{lEdescription paste{x: заменить описание на содержимого буфера редактора (только в веб-клиенте)" << endl;
+    buf << "п╓п╬я─п╪п╟я┌: " << endl
+        << "    {W{lRп╬п©п╦я│п╟п╫п╦п╣ п©п╬п╨п╟п╥п╟я┌я▄{lEdescription show{x: п©п╬п╨п╟п╥п╟я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╡ 'я│я▀я─п╬п╪' п╡п╦п╢п╣ я│ я┌п╣пЁп╟п╪п╦ я├п╡п╣я┌п╬п╡" << endl
+        << "    {W{lRп╬п©п╦я│п╟п╫п╦п╣ +{lEdescription +{x: п╢п╬п╠п╟п╡п╦я┌я▄ я│я┌я─п╬п╨я┐ п╨ п╬п©п╦я│п╟п╫п╦я▌" << endl
+        << "    {W{lRп╬п©п╦я│п╟п╫п╦п╣ -{lEdescription -{x: я┐п╢п╟п╩п╦я┌я▄ п©п╬я│п╩п╣п╢п╫я▌я▌ я│я┌я─п╬п╨я┐" << endl
+        << "    {W{lRп╬п©п╦я│п╟п╫п╦п╣ п╨п╬п©п╦я─п╬п╡п╟я┌я▄{lEdescription copy{x: я│п╨п╬п©п╦я─п╬п╡п╟я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╡ п╠я┐я└п╣я─ я─п╣п╢п╟п╨я┌п╬я─п╟ (я┌п╬п╩я▄п╨п╬ п╡ п╡п╣п╠-п╨п╩п╦п╣п╫я┌п╣)" << endl
+        << "    {W{lRп╬п©п╦я│п╟п╫п╦п╣ п╡я│я┌п╟п╡п╦я┌я▄{lEdescription paste{x: п╥п╟п╪п╣п╫п╦я┌я▄ п╬п©п╦я│п╟п╫п╦п╣ п╫п╟ я│п╬п╢п╣я─п╤п╦п╪п╬пЁп╬ п╠я┐я└п╣я─п╟ я─п╣п╢п╟п╨я┌п╬я─п╟ (я┌п╬п╩я▄п╨п╬ п╡ п╡п╣п╠-п╨п╩п╦п╣п╫я┌п╣)" << endl;
 
     ch->send_to( buf );
 }
@@ -45,17 +45,17 @@ CMDRUNP( description )
     DLString arg = args.getOneArgument();
     char buf[MAX_STRING_LENGTH];
 
-    if (arg_oneof( arg, "show", "показать" )) {
+    if (arg_oneof( arg, "show", "п©п╬п╨п╟п╥п╟я┌я▄" )) {
 	desc_show( ch );
 	return;
     }
 
-    if (arg_oneof( arg, "copy", "копировать" )) {
+    if (arg_oneof( arg, "copy", "п╨п╬п©п╦я─п╬п╡п╟я┌я▄" )) {
         if (!ch->getPC( )) 
             return;
 
 	if (!ch->getDescription( ) || !ch->getDescription( )[0]) {
-		ch->println("Твое описание пусто, копировать в буфер нечего.");
+		ch->println("п╒п╡п╬п╣ п╬п©п╦я│п╟п╫п╦п╣ п©я┐я│я┌п╬, п╨п╬п©п╦я─п╬п╡п╟я┌я▄ п╡ п╠я┐я└п╣я─ п╫п╣я┤п╣пЁп╬.");
 		return;
 	}	
 
@@ -63,36 +63,36 @@ CMDRUNP( description )
 	    ->regs[0].split(ch->getDescription( )); 
 
 	if (ch->desc->websock.state != WS_ESTABLISHED) {
-		ch->println("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента.");
+		ch->println("п·п©п╦я│п╟п╫п╦п╣ я│п╨п╬п©п╦я─п╬п╡п╟п╫п╬ п╡ п╠я┐я└п╣я─ я─п╣п╢п╟п╨я┌п╬я─п╟, п╬п╢п╫п╟п╨п╬ п©п╬п╩я▄п╥п╬п╡п╟я┌я▄я│я▐ я─п╣п╢п╟п╨я┌п╬я─п╬п╪ п╪п╬п╤п╫п╬ я┌п╬п╩я▄п╨п╬ п╦п╥п╫я┐я┌я─п╦ п╡п╣п╠-п╨п╩п╦п╣п╫я┌п╟.");
 	} else {
-		ch->println("Описание скопировано в буфер редактора, используй команду {lRвебредактор{lEwebedit{x для редактирования.");
+		ch->println("п·п©п╦я│п╟п╫п╦п╣ я│п╨п╬п©п╦я─п╬п╡п╟п╫п╬ п╡ п╠я┐я└п╣я─ я─п╣п╢п╟п╨я┌п╬я─п╟, п╦я│п©п╬п╩я▄п╥я┐п╧ п╨п╬п╪п╟п╫п╢я┐ {lRп╡п╣п╠я─п╣п╢п╟п╨я┌п╬я─{lEwebedit{x п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐.");
 	}
         return;
     }
 
-    if (arg_oneof( arg, "paste", "вставить" )) {
+    if (arg_oneof( arg, "paste", "п╡я│я┌п╟п╡п╦я┌я▄" )) {
         if (!ch->getPC( )) 
             return;
 
 	DLString str = ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
 	if (str.empty( )) {
-	    ch->println( "Буфер редактора пуст!" );
+	    ch->println( "п▒я┐я└п╣я─ я─п╣п╢п╟п╨я┌п╬я─п╟ п©я┐я│я┌!" );
 	    return;
 	}
 	if (str.size( ) >= MAX_STRING_LENGTH) {
-	    ch->println("Слишком длиное описание.");
+	    ch->println("п║п╩п╦я┬п╨п╬п╪ п╢п╩п╦п╫п╬п╣ п╬п©п╦я│п╟п╫п╦п╣.");
 	    return;
 	}
 
 	ch->setDescription( str.c_str( ));
-	ch->println( "Новое описание вставлено из буфера редактора." );
+	ch->println( "п²п╬п╡п╬п╣ п╬п©п╦я│п╟п╫п╦п╣ п╡я│я┌п╟п╡п╩п╣п╫п╬ п╦п╥ п╠я┐я└п╣я─п╟ я─п╣п╢п╟п╨я┌п╬я─п╟." );
 	desc_show( ch );
         return;
     }
 
     if (argument[0] == '\0') {
         desc_show( ch );
-        ch->println("\r\nПодробности читай в {W? {lRописание{lEdescription{x.");
+        ch->println("\r\nп÷п╬п╢я─п╬п╠п╫п╬я│я┌п╦ я┤п╦я┌п╟п╧ п╡ {W? {lRп╬п©п╦я│п╟п╫п╦п╣{lEdescription{x.");
         return;
     }
 
@@ -106,7 +106,7 @@ CMDRUNP( description )
 	    
 	    if (!ch->getDescription( ) || !ch->getDescription( )[0])
             {
-                ch->send_to("Нет ничего для удаления.\n\r");
+                ch->send_to("п²п╣я┌ п╫п╦я┤п╣пЁп╬ п╢п╩я▐ я┐п╢п╟п╩п╣п╫п╦я▐.\n\r");
                 return;
             }
 	
@@ -128,8 +128,8 @@ CMDRUNP( description )
 			ch->setDescription( buf );
 
 			if (ch->desc) {
-			    ch->send_to( "Твое описание:\n\r");
-			    ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Отсутствует).\n\r");
+			    ch->send_to( "п╒п╡п╬п╣ п╬п©п╦я│п╟п╫п╦п╣:\n\r");
+			    ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(п·я┌я│я┐я┌я│я┌п╡я┐п╣я┌).\n\r");
 			}
                         return;
                     }
@@ -137,7 +137,7 @@ CMDRUNP( description )
             }
             buf[0] = '\0';
 	    ch->setDescription( buf );
-	    ch->send_to("Описание удалено.\n\r");
+	    ch->send_to("п·п©п╦я│п╟п╫п╦п╣ я┐п╢п╟п╩п╣п╫п╬.\n\r");
 	    return;
         }
 	else if ( argument[0] == '+' )
@@ -154,7 +154,7 @@ CMDRUNP( description )
 
 	if ( strlen(buf) + strlen(argument) >= MAX_STRING_LENGTH - 2 )
 	{
-	    ch->send_to( "Слишком длинное описание.\n\r");
+	    ch->send_to( "п║п╩п╦я┬п╨п╬п╪ п╢п╩п╦п╫п╫п╬п╣ п╬п©п╦я│п╟п╫п╦п╣.\n\r");
 	    return;
 	}
 

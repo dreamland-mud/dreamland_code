@@ -44,30 +44,30 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
 	return true;
 
     if (wch != ch) {
-	msgSelf( ch, "Но %2$C1 сражается!" );
+	msgSelf( ch, "п²п╬ %2$C1 я│я─п╟п╤п╟п╣я┌я│я▐!" );
 	return false;
     }
 
-    wch->pecho( "Ты долж%1$Gно|ен|на сражаться!", wch );
+    wch->pecho( "п╒я▀ п╢п╬п╩п╤%1$Gп╫п╬|п╣п╫|п╫п╟ я│я─п╟п╤п╟я┌я▄я│я▐!", wch );
     chance = skill->getEffective( wch );
     chance = 80 * chance / 100;
     
     if (number_percent( ) < chance) { /* historical bug here */
 	skill->improve( wch, false );
 	wch->setWaitViolence( 1 );
-	wch->pecho( "Твоя попытка закончилась неудачей!" );
+	wch->pecho( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧!" );
 	return false;
     }
 
     skill->improve( wch, false );
-    msgSelfParty( wch, "Ты убегаешь с поля битвы!", "%2$^C1 убегает с поля битвы!" );
+    msgSelfParty( wch, "п╒я▀ я┐п╠п╣пЁп╟п╣я┬я▄ я│ п©п╬п╩я▐ п╠п╦я┌п╡я▀!", "%2$^C1 я┐п╠п╣пЁп╟п╣я┌ я│ п©п╬п╩я▐ п╠п╦я┌п╡я▀!" );
     return true;
 }
 
 bool RecallMovement::checkMount( )
 {
     if (actor->is_npc( ) && actor == ch && actor->mount) {
-	msgSelfMaster( actor, "Ты не сможешь этого сделать.", "%3$^C1 не сможет этого сделать." );
+	msgSelfMaster( actor, "п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄.", "%3$^C1 п╫п╣ я│п╪п╬п╤п╣я┌ я█я┌п╬пЁп╬ я│п╢п╣п╩п╟я┌я▄." );
 	return false;
     }
 
@@ -75,7 +75,7 @@ bool RecallMovement::checkMount( )
 	return true;
 
     if (!canOrderHorse( )) {
-	ch->pecho( "Тебе необходимо сначала спешиться." );
+	ch->pecho( "п╒п╣п╠п╣ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬ я│п╫п╟я┤п╟п╩п╟ я│п©п╣я┬п╦я┌я▄я│я▐." );
 	return false;
     }
 
@@ -85,7 +85,7 @@ bool RecallMovement::checkMount( )
 bool RecallMovement::checkShadow( )
 {
     if (!ch->is_npc( ) && ch->getPC( )->shadow != -1) {
-	ch->pecho( "Твои молитвы о возвращении тонут в пустоте твоей {Dтени{x." );
+	ch->pecho( "п╒п╡п╬п╦ п╪п╬п╩п╦я┌п╡я▀ п╬ п╡п╬п╥п╡я─п╟я┴п╣п╫п╦п╦ я┌п╬п╫я┐я┌ п╡ п©я┐я│я┌п╬я┌п╣ я┌п╡п╬п╣п╧ {Dя┌п╣п╫п╦{x." );
 	return false;
     }
 
@@ -96,8 +96,8 @@ bool RecallMovement::checkBloody( Character *wch )
 {
     if (IS_BLOODY(wch)) {
 	msgSelfParty( wch, 
-		      "Богам нет дела до тебя, смертн%1$Gое|ый|ая.",
-		      "Богам нет дела до %1$C2." );
+		      "п▒п╬пЁп╟п╪ п╫п╣я┌ п╢п╣п╩п╟ п╢п╬ я┌п╣п╠я▐, я│п╪п╣я─я┌п╫%1$Gп╬п╣|я▀п╧|п╟я▐.",
+		      "п▒п╬пЁп╟п╪ п╫п╣я┌ п╢п╣п╩п╟ п╢п╬ %1$C2." );
 	return false;
     }
 
@@ -108,8 +108,8 @@ bool RecallMovement::checkForsaken( Character *wch )
 {
     if (!checkNorecall( wch ) || !checkCurse( wch )) {
 	msgSelfParty( wch, 
-		      "Боги покинули тебя.",
-		      "Боги покинули %1$C4." );
+		      "п▒п╬пЁп╦ п©п╬п╨п╦п╫я┐п╩п╦ я┌п╣п╠я▐.",
+		      "п▒п╬пЁп╦ п©п╬п╨п╦п╫я┐п╩п╦ %1$C4." );
 	return false;
     }
 
@@ -178,7 +178,7 @@ void RecallMovement::moveFollowers( Character *wch )
 bool RecallMovement::checkPumped( )
 {
     if (ch->getLastFightDelay( ) < FIGHT_DELAY_TIME) {
-	ch->pecho( "Твой пульс стучит слишком часто, ты не можешь сосредоточиться на молитве." );
+	ch->pecho( "п╒п╡п╬п╧ п©я┐п╩я▄я│ я│я┌я┐я┤п╦я┌ я│п╩п╦я┬п╨п╬п╪ я┤п╟я│я┌п╬, я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╬я│я─п╣п╢п╬я┌п╬я┤п╦я┌я▄я│я▐ п╫п╟ п╪п╬п╩п╦я┌п╡п╣." );
 	return false;
     }
 

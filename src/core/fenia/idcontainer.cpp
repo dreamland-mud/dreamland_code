@@ -11,7 +11,7 @@ using namespace Scripting;
 
 const DLString IdContainer::TYPE = "IdContainer";
     
-NMI_INIT(IdContainer, "”‘“’À‘’“¡")
+NMI_INIT(IdContainer, "—Å—Ç—Ä—É–∫—Ç—É—Ä–∞")
 
 Register 
 IdContainer::getField(const Register &key)

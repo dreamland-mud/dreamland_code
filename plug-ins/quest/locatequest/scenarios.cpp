@@ -38,23 +38,23 @@ int LocateScenario::getCount( PCharacter *pch )
 
 void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj )
 {
-    act( "$c1 ÐÒÏÉÚÎÏÓÉÔ '{góÐÁÓÉÂÏ, ËÏÎÅÞÎÏ, ÎÏ Ñ ÎÅ ÏÂ ÜÔÏÍ ÐÒÏÓÉ$gÌÏ|Ì|ÌÁ ÔÅÂÑ.'{x'", ch, 0, 0, TO_ROOM );
-    act( "$c1 ×ÏÚ×ÒÁÝÁÅÔ ÔÅÂÅ $o4.", ch, obj, hero, TO_VICT );
-    act( "$c1 ×ÏÚ×ÒÁÝÁÅÔ $C3 $o4.", ch, obj, hero, TO_NOTVICT );
+    act( "$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gÐ¡Ð¿Ð°ÑÐ¸Ð±Ð¾, ÐºÐ¾Ð½ÐµÑ‡Ð½Ð¾, Ð½Ð¾ Ñ Ð½Ðµ Ð¾Ð± ÑÑ‚Ð¾Ð¼ Ð¿Ñ€Ð¾ÑÐ¸$gÐ»Ð¾|Ð»|Ð»Ð° Ñ‚ÐµÐ±Ñ.'{x'", ch, 0, 0, TO_ROOM );
+    act( "$c1 Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ $o4.", ch, obj, hero, TO_VICT );
+    act( "$c1 Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
 void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
 {
-    act( "$c1 ÐÒÏÉÚÎÏÓÉÔ '{g÷ÏÔ ÓÐÁÓÉÂÏ, $C1. ôÅÐÅÒØ ×ÓÅ ÎÁÊÄÅÎÏ É Ñ ÍÏÇÕ ÓÐÁÔØ ÓÐÏËÏÊÎÏ.{x'", 
+    act( "$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gÐ’Ð¾Ñ‚ ÑÐ¿Ð°ÑÐ¸Ð±Ð¾, $C1. Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ð²ÑÐµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ Ð¸ Ñ Ð¼Ð¾Ð³Ñƒ ÑÐ¿Ð°Ñ‚ÑŒ ÑÐ¿Ð¾ÐºÐ¾Ð¹Ð½Ð¾.{x'", 
 	ch, 0, hero, TO_ROOM );
-    act( "$c1 ÐÒÏÉÚÎÏÓÉÔ '{gá ×ÏÚÎÁÇÒÁÖÄÅÎÉÅ Ñ ÕÖÅ ÐÅÒÅÄÁ$gÌÏ|Ì|ÌÁ Ô×ÏÅÍÕ Ë×ÅÓÔÏÒÕ. óÈÏÄÉ É ÚÁÂÅÒÉ ÅÇÏ.{x'",
+    act( "$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gÐ Ð²Ð¾Ð·Ð½Ð°Ð³Ñ€Ð°Ð¶Ð´ÐµÐ½Ð¸Ðµ Ñ ÑƒÐ¶Ðµ Ð¿ÐµÑ€ÐµÐ´Ð°$gÐ»Ð¾|Ð»|Ð»Ð° Ñ‚Ð²Ð¾ÐµÐ¼Ñƒ ÐºÐ²ÐµÑÑ‚Ð¾Ñ€Ñƒ. Ð¡Ñ…Ð¾Ð´Ð¸ Ð¸ Ð·Ð°Ð±ÐµÑ€Ð¸ ÐµÐ³Ð¾.{x'",
 	ch, 0, hero, TO_ROOM );
 }
 
 void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
 {
     if (chance(1) && quest->delivered == 1) {
-	act( "$c1 ÐÒÏÉÚÎÏÓÉÔ '{gäÁ-ÄÁ, ËÁË ÇÏ×ÏÒÉÔÓÑ, ÅÝÅ 65535 ×ÅÄÅÒ - É ÚÏÌÏÔÏÊ ËÌÀÞÉË Õ ÎÁÓ × ËÁÒÍÁÎÅ.{x'", ch, 0, hero, TO_ROOM );
+	act( "$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gÐ”Ð°-Ð´Ð°, ÐºÐ°Ðº Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ÑÑ, ÐµÑ‰Ðµ 65535 Ð²ÐµÐ´ÐµÑ€ - Ð¸ Ð·Ð¾Ð»Ð¾Ñ‚Ð¾Ð¹ ÐºÐ»ÑŽÑ‡Ð¸Ðº Ñƒ Ð½Ð°Ñ Ð² ÐºÐ°Ñ€Ð¼Ð°Ð½Ðµ.{x'", ch, 0, hero, TO_ROOM );
 	interpret_raw( ch, "grin" );
 	return;
     } 
@@ -62,13 +62,13 @@ void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQu
     switch (number_range( 1, 3 )) {
     case 1:
 	if (quest->delivered > 1) {
-	    act( "$c1 ÐÒÏÉÚÎÏÓÉÔ '{gï, ÔÙ ÎÁÛ$GÌÏ|ÅÌ|ÌÁ ÅÝÅ $t!{x'", 
+	    act( "$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gÐž, Ñ‚Ñ‹ Ð½Ð°Ñˆ$GÐ»Ð¾|ÐµÐ»|Ð»Ð° ÐµÑ‰Ðµ $t!{x'", 
 		    ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
 	    break;
 	}
 	/* FALLTHROUGH */
     case 2:
-        act( "$c1 ÐÒÏÉÚÎÏÓÉÔ '{gôÅÐÅÒØ ÉÈ ÕÖÅ $t, ÏÓÔÁÌÏÓØ ÓÏ×ÓÅÍ ÎÅÍÎÏÇÏ.{x'", 
+        act( "$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gÐ¢ÐµÐ¿ÐµÑ€ÑŒ Ð¸Ñ… ÑƒÐ¶Ðµ $t, Ð¾ÑÑ‚Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð²ÑÐµÐ¼ Ð½ÐµÐ¼Ð½Ð¾Ð³Ð¾.{x'", 
 		ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
 	break;
     case 3:

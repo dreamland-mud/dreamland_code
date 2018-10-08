@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
@@ -143,12 +143,12 @@ CMDRUNP( prompt )
     {
 	if (IS_SET(ch->comm,COMM_PROMPT))
 	{
-	    ch->send_to("Вывод строки состояния (prompt) выключен.\n\r");
+	    ch->send_to("п▓я▀п╡п╬п╢ я│я┌я─п╬п╨п╦ я│п╬я│я┌п╬я▐п╫п╦я▐ (prompt) п╡я▀п╨п╩я▌я┤п╣п╫.\n\r");
 	    REMOVE_BIT(ch->comm,COMM_PROMPT);
 	}
 	else
 	{
-	    ch->send_to("Вывод строки состояния (prompt) включен.\n\r");
+	    ch->send_to("п▓я▀п╡п╬п╢ я│я┌я─п╬п╨п╦ я│п╬я│я┌п╬я▐п╫п╦я▐ (prompt) п╡п╨п╩я▌я┤п╣п╫.\n\r");
 	    SET_BIT(ch->comm,COMM_PROMPT);
 	}
 	return;
@@ -156,10 +156,10 @@ CMDRUNP( prompt )
 
     if (arg_is_all( argument )) {
 	old = ch->prompt;
-	ch->prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x>%c";
+	ch->prompt = "<{r%h{x/{R%H{xп╥п╢ {c%m{x/{C%M{xп╪п╟п╫ %v/%Vя┬пЁ {W%X{xп╬п© п▓я▀я┘:{g%d{x>%c";
     }
     else if (arg_is_show( argument )) {
-	ch->println( "Текущая строка состояния:" );
+	ch->println( "п╒п╣п╨я┐я┴п╟я▐ я│я┌я─п╬п╨п╟ я│п╬я│я┌п╬я▐п╫п╦я▐:" );
 	ch->desc->send( ch->prompt.c_str( ) );
 	ch->send_to( "\n\r" );
 	return;
@@ -171,11 +171,11 @@ CMDRUNP( prompt )
     }
     
     if (!old.empty( )) {
-	    ch->send_to( "Предыдущая строка состояния: " );
+	    ch->send_to( "п÷я─п╣п╢я▀п╢я┐я┴п╟я▐ я│я┌я─п╬п╨п╟ я│п╬я│я┌п╬я▐п╫п╦я▐: " );
 	    ch->desc->send(  old.c_str( ) );   
    	    ch->send_to( "\n\r" );
     }
-    ch->printf("Новая строка состояния: %s\n\r",ch->prompt.c_str( ) );
+    ch->printf("п²п╬п╡п╟я▐ я│я┌я─п╬п╨п╟ я│п╬я│я┌п╬я▐п╫п╦я▐: %s\n\r",ch->prompt.c_str( ) );
 }
 
 CMDRUNP( battleprompt )
@@ -184,16 +184,16 @@ CMDRUNP( battleprompt )
 
    if ( argument[0] == '\0' )
    {
-      ch->send_to("Необходимо указать вид строки состояния.\nДля получения более подробной информации используй 'help prompt'\n\r");
+      ch->send_to("п²п╣п╬п╠я┘п╬п╢п╦п╪п╬ я┐п╨п╟п╥п╟я┌я▄ п╡п╦п╢ я│я┌я─п╬п╨п╦ я│п╬я│я┌п╬я▐п╫п╦я▐.\nп■п╩я▐ п©п╬п╩я┐я┤п╣п╫п╦я▐ п╠п╬п╩п╣п╣ п©п╬п╢я─п╬п╠п╫п╬п╧ п╦п╫я└п╬я─п╪п╟я├п╦п╦ п╦я│п©п╬п╩я▄п╥я┐п╧ 'help prompt'\n\r");
       return;
    }
 
     if (arg_is_all( argument )) {
 	old = ch->batle_prompt;
-	ch->batle_prompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг %Xоп Вых:{g%d{x> [{r%y{x:{Y%o{x]%c";
+	ch->batle_prompt = "<{r%h{x/{R%H{xп╥п╢ {c%m{x/{C%M{xп╪п╟п╫ %v/%Vя┬пЁ %Xп╬п© п▓я▀я┘:{g%d{x> [{r%y{x:{Y%o{x]%c";
     }
     else if (arg_is_show( argument )) {
-	ch->println( "Текущая строка состояния в бою:" );
+	ch->println( "п╒п╣п╨я┐я┴п╟я▐ я│я┌я─п╬п╨п╟ я│п╬я│я┌п╬я▐п╫п╦я▐ п╡ п╠п╬я▌:" );
 	ch->desc->send( ch->batle_prompt.c_str( ) );
 	ch->send_to( "\n\r" );
 	return;
@@ -205,11 +205,11 @@ CMDRUNP( battleprompt )
     }
 
     if (!old.empty( )) {
-	    ch->send_to( "Предыдущая строка состояния в бою: " );
+	    ch->send_to( "п÷я─п╣п╢я▀п╢я┐я┴п╟я▐ я│я┌я─п╬п╨п╟ я│п╬я│я┌п╬я▐п╫п╦я▐ п╡ п╠п╬я▌: " );
 	    ch->desc->send(  old.c_str( ) );   
    	    ch->send_to( "\n\r" );
     }
-    ch->printf("Новая строка состояния в бою: %s\n\r",ch->batle_prompt.c_str( ) );
+    ch->printf("п²п╬п╡п╟я▐ я│я┌я─п╬п╨п╟ я│п╬я│я┌п╬я▐п╫п╦я▐ п╡ п╠п╬я▌: %s\n\r",ch->batle_prompt.c_str( ) );
 }
 
 CMDRUNP( clear )
@@ -223,20 +223,20 @@ static DLString show_money( int g, int s )
     ostringstream buf;
 
     if (g > 0 || s > 0)
-	buf << (g > 0 ? "%1$d золот%1$Iая|ые|ых" : "")
-	    << (g * s == 0 ? "" : " и ")
-	    << (s > 0 ? "%2$d серебрян%2$Iая|ые|ых" : "")
-	    << " моне%" << (s == 0 ? "1" : "2") << "$Iта|ты|т.";
+	buf << (g > 0 ? "%1$d п╥п╬п╩п╬я┌%1$Iп╟я▐|я▀п╣|я▀я┘" : "")
+	    << (g * s == 0 ? "" : " п╦ ")
+	    << (s > 0 ? "%2$d я│п╣я─п╣п╠я─я▐п╫%2$Iп╟я▐|я▀п╣|я▀я┘" : "")
+	    << " п╪п╬п╫п╣%" << (s == 0 ? "1" : "2") << "$Iя┌п╟|я┌я▀|я┌.";
     else
-	buf << "нет денег.";
+	buf << "п╫п╣я┌ п╢п╣п╫п╣пЁ.";
     
     return fmt( NULL, buf.str( ).c_str( ), g, s );
 }
 
 static DLString show_experience( PCharacter *ch )
 {
-    return fmt( NULL, "У тебя %1$d очк%1$Iо|а|ов опыта. "
-	       "До следующего уровня осталось %2$d очк%2$Iо|а|ов из %3$d.",
+    return fmt( NULL, "пё я┌п╣п╠я▐ %1$d п╬я┤п╨%1$Iп╬|п╟|п╬п╡ п╬п©я▀я┌п╟. "
+	       "п■п╬ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я┐я─п╬п╡п╫я▐ п╬я│я┌п╟п╩п╬я│я▄ %2$d п╬я┤п╨%2$Iп╬|п╟|п╬п╡ п╦п╥ %3$d.",
 	       ch->exp.getValue( ),
 	       ch->getExpToLevel( ),
 	       ch->getExpPerLevel( ch->getLevel( ) + 1 ) - ch->getExpPerLevel( ) );
@@ -244,7 +244,7 @@ static DLString show_experience( PCharacter *ch )
 
 CMDRUNP( money )
 {
-    ch->send_to( "У тебя в кошельке " );
+    ch->send_to( "пё я┌п╣п╠я▐ п╡ п╨п╬я┬п╣п╩я▄п╨п╣ " );
     ch->println( show_money( ch->gold, ch->silver ) );
 }
 
@@ -258,7 +258,7 @@ CMDRUNP( experience )
 
 CMDRUNP( worth )
 {
-    ch->send_to( "У тебя " );
+    ch->send_to( "пё я┌п╣п╠я▐ " );
     ch->println( show_money( ch->gold, ch->silver ) );
 
     if ( ch->is_npc() )
@@ -266,12 +266,12 @@ CMDRUNP( worth )
 
     ch->println( show_experience( ch->getPC( ) ) );
 
-    ch->pecho("Ты уби%Gло|л|ла %3d %s и %3d %s персонажей.",
+    ch->pecho("п╒я▀ я┐п╠п╦%Gп╩п╬|п╩|п╩п╟ %3d %s п╦ %3d %s п©п╣я─я│п╬п╫п╟п╤п╣п╧.",
 	    ch, 
 	    ch->getPC( )->has_killed.getValue( ),
-	    IS_GOOD(ch) ? "не добрых" : IS_EVIL(ch) ? "не злых" : "не нейтральных",
+	    IS_GOOD(ch) ? "п╫п╣ п╢п╬п╠я─я▀я┘" : IS_EVIL(ch) ? "п╫п╣ п╥п╩я▀я┘" : "п╫п╣ п╫п╣п╧я┌я─п╟п╩я▄п╫я▀я┘",
 	    ch->getPC( )->anti_killed.getValue( ),
-	    IS_GOOD(ch) ? "добрых" : IS_EVIL(ch) ? "злых" : "нейтральных" );
+	    IS_GOOD(ch) ? "п╢п╬п╠я─я▀я┘" : IS_EVIL(ch) ? "п╥п╩я▀я┘" : "п╫п╣п╧я┌я─п╟п╩я▄п╫я▀я┘" );
 }
 
 
@@ -297,15 +297,15 @@ const char * msgtable_lookup( const msgtable_t &table, int value )
 }
 
 msgtable_t msg_positions = {
-    { POS_DEAD,     "Ты ТРУП!!!"                  },
-    { POS_MORTAL,   "Ты присмерти."               },
-    { POS_INCAP,    "Ты в беспомощном состоянии." },
-    { POS_STUNNED,  "Тебя оглушили."              },
-    { POS_SLEEPING, "Ты спишь."                   },
-    { POS_RESTING,  "Ты отдыхаешь."               },
-    { POS_SITTING,  "Ты сидишь."                  },
-    { POS_FIGHTING, "Ты сражаешься."              },
-    { POS_STANDING, "Ты стоишь."                  },
+    { POS_DEAD,     "п╒я▀ п╒п═пёп÷!!!"                  },
+    { POS_MORTAL,   "п╒я▀ п©я─п╦я│п╪п╣я─я┌п╦."               },
+    { POS_INCAP,    "п╒я▀ п╡ п╠п╣я│п©п╬п╪п╬я┴п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦." },
+    { POS_STUNNED,  "п╒п╣п╠я▐ п╬пЁп╩я┐я┬п╦п╩п╦."              },
+    { POS_SLEEPING, "п╒я▀ я│п©п╦я┬я▄."                   },
+    { POS_RESTING,  "п╒я▀ п╬я┌п╢я▀я┘п╟п╣я┬я▄."               },
+    { POS_SITTING,  "п╒я▀ я│п╦п╢п╦я┬я▄."                  },
+    { POS_FIGHTING, "п╒я▀ я│я─п╟п╤п╟п╣я┬я▄я│я▐."              },
+    { POS_STANDING, "п╒я▀ я│я┌п╬п╦я┬я▄."                  },
     { -1 }
 };
 
@@ -371,34 +371,34 @@ msgtable_t msg_stat_wis = {
 
 
 msgtable_t msg_armor_oscore = {
-    { -101, "божественно защищен"   },
-    { -100, "неуязвимо защищен"     },
-    {  -80, "первоклассно защищен"  },
-    {  -60, "отлично защищен"       },
-    {  -40, "очень хорошо защищен"  },
-    {  -20, "хорошо защищен"        },
-    {    0, "защищен"               },
-    {   20, "кое-как защищен"       },
-    {   40, "слабо защищен"         },
-    {   60, "едва защищен"          },
-    {   80, "не защищен"            },
-    {  101, "совершенно не защищен" },
+    { -101, "п╠п╬п╤п╣я│я┌п╡п╣п╫п╫п╬ п╥п╟я┴п╦я┴п╣п╫"   },
+    { -100, "п╫п╣я┐я▐п╥п╡п╦п╪п╬ п╥п╟я┴п╦я┴п╣п╫"     },
+    {  -80, "п©п╣я─п╡п╬п╨п╩п╟я│я│п╫п╬ п╥п╟я┴п╦я┴п╣п╫"  },
+    {  -60, "п╬я┌п╩п╦я┤п╫п╬ п╥п╟я┴п╦я┴п╣п╫"       },
+    {  -40, "п╬я┤п╣п╫я▄ я┘п╬я─п╬я┬п╬ п╥п╟я┴п╦я┴п╣п╫"  },
+    {  -20, "я┘п╬я─п╬я┬п╬ п╥п╟я┴п╦я┴п╣п╫"        },
+    {    0, "п╥п╟я┴п╦я┴п╣п╫"               },
+    {   20, "п╨п╬п╣-п╨п╟п╨ п╥п╟я┴п╦я┴п╣п╫"       },
+    {   40, "я│п╩п╟п╠п╬ п╥п╟я┴п╦я┴п╣п╫"         },
+    {   60, "п╣п╢п╡п╟ п╥п╟я┴п╦я┴п╣п╫"          },
+    {   80, "п╫п╣ п╥п╟я┴п╦я┴п╣п╫"            },
+    {  101, "я│п╬п╡п╣я─я┬п╣п╫п╫п╬ п╫п╣ п╥п╟я┴п╦я┴п╣п╫" },
     { -1 }
 };
 
 msgtable_t msg_armor = {
-    { -101, "божественно"   },
-    { -100, "неуязвимо"     },
-    {  -80, "первоклассно"  },
-    {  -60, "отлично"       },
-    {  -40, "очень хорошо"  },
-    {  -20, "хорошо"        },
-    {    0, "защищен"       },
-    {   20, "хоть как-то"   },
-    {   40, "слегка"        },
-    {   60, "едва"          },
-    {   80, "очень слабо"   },
-    {  101, "не защищен"    },
+    { -101, "п╠п╬п╤п╣я│я┌п╡п╣п╫п╫п╬"   },
+    { -100, "п╫п╣я┐я▐п╥п╡п╦п╪п╬"     },
+    {  -80, "п©п╣я─п╡п╬п╨п╩п╟я│я│п╫п╬"  },
+    {  -60, "п╬я┌п╩п╦я┤п╫п╬"       },
+    {  -40, "п╬я┤п╣п╫я▄ я┘п╬я─п╬я┬п╬"  },
+    {  -20, "я┘п╬я─п╬я┬п╬"        },
+    {    0, "п╥п╟я┴п╦я┴п╣п╫"       },
+    {   20, "я┘п╬я┌я▄ п╨п╟п╨-я┌п╬"   },
+    {   40, "я│п╩п╣пЁп╨п╟"        },
+    {   60, "п╣п╢п╡п╟"          },
+    {   80, "п╬я┤п╣п╫я▄ я│п╩п╟п╠п╬"   },
+    {  101, "п╫п╣ п╥п╟я┴п╦я┴п╣п╫"    },
     { -1 }
 };
 
@@ -409,23 +409,23 @@ CMDRUNP( oscore )
     int i;
     PCharacter *pch = ch->getPC( );
 
-    buf << fmt( 0, "Ты %1$s%2$s{x, уровень %3$d",
+    buf << fmt( 0, "п╒я▀ %1$s%2$s{x, я┐я─п╬п╡п╣п╫я▄ %3$d",
 		   ch->seeName( ch, '1' ).c_str( ),
 		   ch->is_npc( ) ? "" : ch->getPC( )->getParsedTitle( ).c_str( ),
 		   ch->getRealLevel( ));
     
     if (!ch->is_npc( ))
-	buf << fmt( 0, ", тебе %1$d %1$Iгод|года|лет (%2$d ча%2$Iс)|са)|сов).",
+	buf << fmt( 0, ", я┌п╣п╠п╣ %1$d %1$IпЁп╬п╢|пЁп╬п╢п╟|п╩п╣я┌ (%2$d я┤п╟%2$Iя│)|я│п╟)|я│п╬п╡).",
 			pch->age.getYears( ), pch->age.getHours( ) ); 
     
     buf << endl;
 
     if (ch->getRealLevel( ) != ch->get_trust( ))
-	buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
+	buf << "пёя─п╬п╡п╣п╫я▄ п╢п╬п╡п╣я─п╦я▐ п╨ я┌п╣п╠п╣ я│п╬я│я┌п╟п╡п╩я▐п╣я┌ " << ch->get_trust( ) << "." << endl;
 
-    buf << "Раса " << ch->getRace( )->getNameFor( ch, ch )
-	<< "  Пол: " << sex_table.message( ch->getSex( ) )
-	<< "  Класс: " << ch->getProfession( )->getNameFor( ch );
+    buf << "п═п╟я│п╟ " << ch->getRace( )->getNameFor( ch, ch )
+	<< "  п÷п╬п╩: " << sex_table.message( ch->getSex( ) )
+	<< "  п п╩п╟я│я│: " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
 	if (pch->getSubProfession( ) != prof_none)
@@ -436,25 +436,25 @@ CMDRUNP( oscore )
     else
 	room = get_room_index( ROOM_VNUM_TEMPLE );
     
-    buf << "  Дом: " << (room ? room->area->name : "Потерян" ) << endl
-	<< dlprintf( "У тебя %d/%d жизни, %d/%d энергии и %d/%d движения.\n\r",
+    buf << "  п■п╬п╪: " << (room ? room->area->name : "п÷п╬я┌п╣я─я▐п╫" ) << endl
+	<< dlprintf( "пё я┌п╣п╠я▐ %d/%d п╤п╦п╥п╫п╦, %d/%d я█п╫п╣я─пЁп╦п╦ п╦ %d/%d п╢п╡п╦п╤п╣п╫п╦я▐.\n\r",
 		    ch->hit.getValue( ), ch->max_hit.getValue( ), 
 		    ch->mana.getValue( ), ch->max_mana.getValue( ), 
 		    ch->move.getValue( ), ch->max_move.getValue( ));
     
     if (!ch->is_npc( )) 
-	buf << fmt( 0, "У тебя %1$d практи%1$Iка|ки|к и %2$d тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й.",
+	buf << fmt( 0, "пё я┌п╣п╠я▐ %1$d п©я─п╟п╨я┌п╦%1$Iп╨п╟|п╨п╦|п╨ п╦ %2$d я┌я─п╣п╫п╦я─п╬п╡п╬я┤п╫%2$Iп╟я▐|я▀п╣|я▀я┘ я│п╣я│я│п╦%2$Iя▐|п╦|п╧.",
 		       pch->practice.getValue( ), pch->train.getValue( ) )
 	    << endl;
     
-   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
+   buf << dlprintf( "п╒я▀ п╫п╣я│п╣я┬я▄ %d/%d п╡п╣я┴п╣п╧ я│ п╡п╣я│п╬п╪ %d/%d я└я┐п╫я┌п╬п╡.\n\r",
 		ch->carry_number, ch->canCarryNumber( ),
 		ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
     buf << dlprintf( 
-	    "Твои параметры:   Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
-	    "              Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
-	    "              Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
+	    "п╒п╡п╬п╦ п©п╟я─п╟п╪п╣я┌я─я▀:   п║п╦п╩п╟(Str): %d(%d) п≤п╫я┌п╣п╩п╩п╣п╨я┌(Int): %d(%d)\n\r"
+	    "              п°я┐п╢я─п╬я│я┌я▄(Wis): %d(%d)  п⌡п╬п╡п╨п╬я│я┌я▄(Dex): %d(%d)\n\r"
+	    "              п║п╩п╬п╤п╣п╫п╦п╣(Con): %d(%d)   п·п╠п╟я▐п╫п╦п╣(Cha): %d(%d)\n\r",
 	    ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR),
 	    ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT),
 	    ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS),
@@ -462,13 +462,13 @@ CMDRUNP( oscore )
 	    ch->perm_stat[STAT_CON], ch->getCurrStat(STAT_CON),
 	    ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA) );
 
-    buf << dlprintf( "У тебя %d очков опыта, и %s\n\r",
+    buf << dlprintf( "пё я┌п╣п╠я▐ %d п╬я┤п╨п╬п╡ п╬п©я▀я┌п╟, п╦ %s\n\r",
                   ch->exp.getValue( ),
                   show_money( ch->gold, ch->silver ).c_str( ) );
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
-	buf << dlprintf( "Тебе нужно набрать %d очков опыта до следующего уровня.\n\r",
+	buf << dlprintf( "п╒п╣п╠п╣ п╫я┐п╤п╫п╬ п╫п╟п╠я─п╟я┌я▄ %d п╬я┤п╨п╬п╡ п╬п©я▀я┌п╟ п╢п╬ я│п╩п╣п╢я┐я▌я┴п╣пЁп╬ я┐я─п╬п╡п╫я▐.\n\r",
 		    ch->getPC()->getExpToLevel( ) );
 
     if (!ch->is_npc( )) {
@@ -476,27 +476,27 @@ CMDRUNP( oscore )
 	int qtime = qd ? qd->getTime( ) : 0;
 	bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
 	
-	buf << fmt( 0, "У тебя %1$d квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
+	buf << fmt( 0, "пё я┌п╣п╠я▐ %1$d п╨п╡п╣я│я┌п╬п╡%1$Iп╟я▐|я▀п╣|я▀я┘ п╣п╢п╦п╫п╦%1$Iя├п╟|я├я▀|я├. ",
 	               pch->questpoints.getValue( ) );
 	if (qtime == 0)
-	    buf << "У тебя сейчас нет задания.";
+	    buf << "пё я┌п╣п╠я▐ я│п╣п╧я┤п╟я│ п╫п╣я┌ п╥п╟п╢п╟п╫п╦я▐.";
 	else
-	    buf << fmt( 0, "До %1$s квеста осталось %2$d ти%2$Iк|ка|ков.",
-		       hasQuest ? "конца" : "следующего",
+	    buf << fmt( 0, "п■п╬ %1$s п╨п╡п╣я│я┌п╟ п╬я│я┌п╟п╩п╬я│я▄ %2$d я┌п╦%2$Iп╨|п╨п╟|п╨п╬п╡.",
+		       hasQuest ? "п╨п╬п╫я├п╟" : "я│п╩п╣п╢я┐я▌я┴п╣пЁп╬",
 		       qtime );
 
 	buf << endl;
 
 	if (ch->getProfession( ) != prof_samurai)
-	    buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
+	    buf << dlprintf( "п╒я▀ п©п╬п©я▀я┌п╟п╣я┬я▄я│я▐ я┐п╠п╣п╤п╟я┌я▄ п©я─п╦ %d п╤п╦п╥п╫п╦.  ", ch->wimpy.getValue( ) );
 	else
-	    buf << dlprintf( "Тебя убили уже %d раз.  ", ch->getPC( )->death.getValue( ));
+	    buf << dlprintf( "п╒п╣п╠я▐ я┐п╠п╦п╩п╦ я┐п╤п╣ %d я─п╟п╥.  ", ch->getPC( )->death.getValue( ));
 
 	if (ch->getPC()->guarding != 0)
-	    buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
+	    buf << dlprintf( "п╒я▀ п╬я┘я─п╟п╫я▐п╣я┬я▄: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
 
 	if (ch->getPC()->guarded_by != 0)
-	    buf << dlprintf( "Ты охраняешься: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
+	    buf << dlprintf( "п╒я▀ п╬я┘я─п╟п╫я▐п╣я┬я▄я│я▐: %s.", ch->seeName( ch->getPC()->guarded_by, '5' ).c_str( ) );
 	
 	buf << endl;
     }
@@ -520,41 +520,41 @@ CMDRUNP( oscore )
     buf << msgtable_lookup( msg_positions, ch->position );
 
     if (ch->is_adrenalined( ) && ch->position > POS_INCAP)
-	buf << " Твоя кровь полна адреналина!";
+	buf << " п╒п╡п╬я▐ п╨я─п╬п╡я▄ п©п╬п╩п╫п╟ п╟п╢я─п╣п╫п╟п╩п╦п╫п╟!";
     
     buf << endl;
 
     /* print AC values */
     if (ch->getRealLevel( ) >= 20) {	
-	buf << dlprintf( "Защита от укола %d, от удара %d, от разрезания %d, от экзотики %d.\n\r",
+	buf << dlprintf( "п≈п╟я┴п╦я┌п╟ п╬я┌ я┐п╨п╬п╩п╟ %d, п╬я┌ я┐п╢п╟я─п╟ %d, п╬я┌ я─п╟п╥я─п╣п╥п╟п╫п╦я▐ %d, п╬я┌ я█п╨п╥п╬я┌п╦п╨п╦ %d.\n\r",
 		GET_AC(ch,AC_PIERCE),
 		GET_AC(ch,AC_BASH),
 		GET_AC(ch,AC_SLASH),
 		GET_AC(ch,AC_EXOTIC));
-	buf << dlprintf( "{lRТочность{lEHitroll{lx: %d  {lRУрон{lEDamroll{lx: %d  {lRЗащита от заклинаний{lESaves vs Spell{lx: %d\n\r",
+	buf << dlprintf( "{lRп╒п╬я┤п╫п╬я│я┌я▄{lEHitroll{lx: %d  {lRпёя─п╬п╫{lEDamroll{lx: %d  {lRп≈п╟я┴п╦я┌п╟ п╬я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧{lESaves vs Spell{lx: %d\n\r",
 		    ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
     }
     else
 	for (i = 0; i < ac_type.size; i++)
-	    buf << dlprintf( "Ты %s от %s.\n\r",
+	    buf << dlprintf( "п╒я▀ %s п╬я┌ %s.\n\r",
 	                msgtable_lookup( msg_armor_oscore, GET_AC(ch, i) ),
 			ac_type.message( i, '2' ).c_str( ) );
 
-    buf << dlprintf( "У тебя %s характер.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
+    buf << dlprintf( "пё я┌п╣п╠я▐ %s я┘п╟я─п╟п╨я┌п╣я─.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
     
     switch (ch->ethos.getValue( )) {
     case ETHOS_LAWFUL:
-	    buf << "Ты почитаешь порядок.\n\r";
+	    buf << "п╒я▀ п©п╬я┤п╦я┌п╟п╣я┬я▄ п©п╬я─я▐п╢п╬п╨.\n\r";
 	    break;
     case ETHOS_NEUTRAL:
-	    buf << "У тебя нейтральный этос.\n\r";
+	    buf << "пё я┌п╣п╠я▐ п╫п╣п╧я┌я─п╟п╩я▄п╫я▀п╧ я█я┌п╬я│.\n\r";
 	    break;
     case ETHOS_CHAOTIC:
-	    buf << "Ты хаотик.\n\r";
+	    buf << "п╒я▀ я┘п╟п╬я┌п╦п╨.\n\r";
 	    break;
     default:
 	    if (!ch->is_npc( ))
-		buf << "У тебя нет этоса, сообщи об этом Богам!\n\r";
+		buf << "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬я│п╟, я│п╬п╬п╠я┴п╦ п╬п╠ я█я┌п╬п╪ п▒п╬пЁп╟п╪!\n\r";
 	    else
 		buf << "\n\r";
 	    break;
@@ -562,31 +562,31 @@ CMDRUNP( oscore )
     
     if (!ch->is_npc( )) {
 	if (ch->getReligion( ) == god_none)
-	    buf << "Ты не веришь в бога.  ";
+	    buf << "п╒я▀ п╫п╣ п╡п╣я─п╦я┬я▄ п╡ п╠п╬пЁп╟.  ";
 	else
-	    buf << dlprintf( "Твоя религия: %s.  ",
+	    buf << dlprintf( "п╒п╡п╬я▐ я─п╣п╩п╦пЁп╦я▐: %s.  ",
 			ch->getReligion( )->getShortDescr( ).c_str( ) );
 	
-	buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
+	buf << dlprintf("п╒п╡п╬п╦ п╥п╟я│п╩я┐пЁп╦ п©п╣я─п╣п╢ п╥п╟п╨п╬п╫п╬п╪:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
 
 	if (ch->getPC( )->curse != 100)
-	    buf << dlprintf( "Проклятье, наложенное на тебя, ухудшает все твои умения на %d%%.\n\r",
+	    buf << dlprintf( "п÷я─п╬п╨п╩я▐я┌я▄п╣, п╫п╟п╩п╬п╤п╣п╫п╫п╬п╣ п╫п╟ я┌п╣п╠я▐, я┐я┘я┐п╢я┬п╟п╣я┌ п╡я│п╣ я┌п╡п╬п╦ я┐п╪п╣п╫п╦я▐ п╫п╟ %d%%.\n\r",
 			100 - ch->getPC( )->curse.getValue( ));
 
 	if (ch->getPC( )->bless)
-	    buf << dlprintf( "Благословление богов улучшает все твои умения на %d%%.\n\r",
+	    buf << dlprintf( "п▒п╩п╟пЁп╬я│п╩п╬п╡п╩п╣п╫п╦п╣ п╠п╬пЁп╬п╡ я┐п╩я┐я┤я┬п╟п╣я┌ п╡я│п╣ я┌п╡п╬п╦ я┐п╪п╣п╫п╦я▐ п╫п╟ %d%%.\n\r",
 			ch->getPC( )->bless.getValue( ));
     }
 #if 0
     if (ch->getProfession( ) == prof_universal)
-	buf << dlprintf( "У тебя %d/%d {lRочков умений{lEskill points{lx.\n\r",
+	buf << dlprintf( "пё я┌п╣п╠я▐ %d/%d {lRп╬я┤п╨п╬п╡ я┐п╪п╣п╫п╦п╧{lEskill points{lx.\n\r",
 		    ch->getPC()->skill_points(),
 		    ch->getPC()->max_skill_points.getValue( ));
 #endif
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
-	buf << dlprintf( "Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня.",
-	           (IS_SET(ch->act, PLR_HOLYLIGHT) ? "включен" : "выключен"),
+	buf << dlprintf( "п▒п╬п╤п╣я│я┌п╡п╣п╫п╫я▀п╧ п╡п╥п╬я─ %s. п²п╣п╡п╦п╢п╦п╪п╬я│я┌я▄ %d я┐я─п╬п╡п╫я▐, п╦п╫п╨п╬пЁп╫п╦я┌п╬ %d я┐я─п╬п╡п╫я▐.",
+	           (IS_SET(ch->act, PLR_HOLYLIGHT) ? "п╡п╨п╩я▌я┤п╣п╫" : "п╡я▀п╨п╩я▌я┤п╣п╫"),
 		   ch->getPC( )->invis_level.getValue( ),
 		   ch->getPC( )->incog_level.getValue( ) )
 	    << endl;
@@ -623,11 +623,11 @@ CMDRUNP( count )
     max_on = Descriptor::getMaxOnline( );
 
     if (max_on == count)
-        sprintf(buf,"Всего %d %s. Это максимум на сегодня.\n\r",count,
-                count == 1 ? "игрок" : ((count > 1 && count < 5) ? "игрока" : "игроков"));
+        sprintf(buf,"п▓я│п╣пЁп╬ %d %s. п╜я┌п╬ п╪п╟п╨я│п╦п╪я┐п╪ п╫п╟ я│п╣пЁп╬п╢п╫я▐.\n\r",count,
+                count == 1 ? "п╦пЁя─п╬п╨" : ((count > 1 && count < 5) ? "п╦пЁя─п╬п╨п╟" : "п╦пЁя─п╬п╨п╬п╡"));
     else
-	sprintf(buf,"Всего %d %s. Максимум на сегодня был: %d.\n\r",count,
-                count == 1 ? "игрок" : ((count > 1 && count < 5) ? "игрока" : "игроков"),
+	sprintf(buf,"п▓я│п╣пЁп╬ %d %s. п°п╟п╨я│п╦п╪я┐п╪ п╫п╟ я│п╣пЁп╬п╢п╫я▐ п╠я▀п╩: %d.\n\r",count,
+                count == 1 ? "п╦пЁя─п╬п╨" : ((count > 1 && count < 5) ? "п╦пЁя─п╬п╨п╟" : "п╦пЁя─п╬п╨п╬п╡"),
                 max_on);
 
     ch->send_to(buf);
@@ -647,13 +647,13 @@ CMDRUNP( compare )
     argument = one_argument( argument, arg2 );
     if ( arg1[0] == '\0' )
     {
-	ch->send_to( "Сравнить что и с чем.?\n\r");
+	ch->send_to( "п║я─п╟п╡п╫п╦я┌я▄ я┤я┌п╬ п╦ я│ я┤п╣п╪.?\n\r");
 	return;
     }
 
     if ( ( obj1 = get_obj_carry( ch, arg1 ) ) == 0 )
     {
-	ch->send_to( "У тебя нет этого.\n\r");
+	ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
@@ -670,14 +670,14 @@ CMDRUNP( compare )
 
 	if (obj2 == 0)
 	{
-	    ch->send_to("На тебе нет ничего, с чем можно было бы сравнить.\n\r");
+	    ch->send_to("п²п╟ я┌п╣п╠п╣ п╫п╣я┌ п╫п╦я┤п╣пЁп╬, я│ я┤п╣п╪ п╪п╬п╤п╫п╬ п╠я▀п╩п╬ п╠я▀ я│я─п╟п╡п╫п╦я┌я▄.\n\r");
 	    return;
 	}
     }
 
     else if ( (obj2 = get_obj_carry(ch,arg2) ) == 0 )
     {
-	ch->send_to("У тебя нет этого.\n\r");
+	ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
 	return;
     }
 
@@ -687,18 +687,18 @@ CMDRUNP( compare )
 
     if ( obj1 == obj2 )
     {
-	msg = "Ты сравниваешь %1$O4 с сам%1$Gим|им|ой|ими собой. Выглядят одинаково.";
+	msg = "п╒я▀ я│я─п╟п╡п╫п╦п╡п╟п╣я┬я▄ %1$O4 я│ я│п╟п╪%1$Gп╦п╪|п╦п╪|п╬п╧|п╦п╪п╦ я│п╬п╠п╬п╧. п▓я▀пЁп╩я▐п╢я▐я┌ п╬п╢п╦п╫п╟п╨п╬п╡п╬.";
     }
     else if ( obj1->item_type != obj2->item_type )
     {
-	msg = "Ты не можешь сравнить %1$O4 и %2$O4.";
+	msg = "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│я─п╟п╡п╫п╦я┌я▄ %1$O4 п╦ %2$O4.";
     }
     else
     {
 	switch ( obj1->item_type )
 	{
 	default:
-	    msg = "Ты не можешь сравнить %1$O4 и %2$O4.";
+	    msg = "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│я─п╟п╡п╫п╦я┌я▄ %1$O4 п╦ %2$O4.";
 	    break;
 
 	case ITEM_ARMOR:
@@ -722,9 +722,9 @@ CMDRUNP( compare )
 
     if ( msg == 0 )
     {
-	     if ( value1 == value2 ) msg = "%1$^O1 и %2$O1 выглядят одинаково.";
-	else if ( value1  > value2 ) msg = "%1$^O1 выгляд%1$nит|ят лучше чем %2$O1.";
-	else                         msg = "%1$^O1 выгляд%1$nит|ят хуже чем %2$O1.";
+	     if ( value1 == value2 ) msg = "%1$^O1 п╦ %2$O1 п╡я▀пЁп╩я▐п╢я▐я┌ п╬п╢п╦п╫п╟п╨п╬п╡п╬.";
+	else if ( value1  > value2 ) msg = "%1$^O1 п╡я▀пЁп╩я▐п╢%1$nп╦я┌|я▐я┌ п╩я┐я┤я┬п╣ я┤п╣п╪ %2$O1.";
+	else                         msg = "%1$^O1 п╡я▀пЁп╩я▐п╢%1$nп╦я┌|я▐я┌ я┘я┐п╤п╣ я┤п╣п╪ %2$O1.";
     }
     
     ch->pecho( msg, obj1, obj2 );
@@ -771,12 +771,12 @@ CMDRUNP( where )
     ch->setWaitViolence( 1 );
 
     if (eyes_blinded( ch )) {
-	ch->println( "Ты не можешь видеть вещи!" );
+	ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡п╦п╢п╣я┌я▄ п╡п╣я┴п╦!" );
 	return;
     }
     
     if (eyes_darkened( ch )) {
-	ch->println( "Ты ничего не видишь! Слишком темно!" );
+	ch->println( "п╒я▀ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╦п╢п╦я┬я▄! п║п╩п╦я┬п╨п╬п╪ я┌п╣п╪п╫п╬!" );
 	return;
     }
 
@@ -791,7 +791,7 @@ CMDRUNP( where )
 
     if (arg.empty( ) || fPKonly)
     {
-	ch->printf( "Ты находишься в местности {W%s{x. Недалеко от тебя:\r\n",
+	ch->printf( "п╒я▀ п╫п╟я┘п╬п╢п╦я┬я▄я│я▐ п╡ п╪п╣я│я┌п╫п╬я│я┌п╦ {W%s{x. п²п╣п╢п╟п╩п╣п╨п╬ п╬я┌ я┌п╣п╠я▐:\r\n",
 	             ch->in_room->area->name );
 	found = false;
 
@@ -817,7 +817,7 @@ CMDRUNP( where )
 	}
 
 	if (!found)
-	    ch->send_to( "Никого.\n\r");
+	    ch->send_to( "п²п╦п╨п╬пЁп╬.\n\r");
     }
     else
     {
@@ -838,7 +838,7 @@ CMDRUNP( where )
 	}
 
 	if (!found)
-	    act_p( "Ты не находишь $T.", ch, 0, arg.c_str(), TO_CHAR,POS_RESTING );
+	    act_p( "п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄ $T.", ch, 0, arg.c_str(), TO_CHAR,POS_RESTING );
     }
 }
 
@@ -857,19 +857,19 @@ CMDRUNP( consider )
 
     if ( arg[0] == '\0' )
     {
-	ch->send_to( "Сравнить свои силы с кем?\n\r");
+	ch->send_to( "п║я─п╟п╡п╫п╦я┌я▄ я│п╡п╬п╦ я│п╦п╩я▀ я│ п╨п╣п╪?\n\r");
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-	ch->send_to( "Его нет здесь.\n\r");
+	ch->send_to( "п∙пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
 	return;
     }
 
     if (is_safe(ch,victim))
     {
-	ch->send_to("Даже не думай об этом.\n\r");
+	ch->send_to("п■п╟п╤п╣ п╫п╣ п╢я┐п╪п╟п╧ п╬п╠ я█я┌п╬п╪.\n\r");
 	return;
     }
 
@@ -877,30 +877,30 @@ CMDRUNP( consider )
 
     diff = victim->getModifyLevel() - ch->getModifyLevel();
 
-         if ( diff <= -10 ) msg = "Ты можешь убить $C4 даже без оружия.";
-    else if ( diff <=  -5 ) msg = "$C1 не соперник тебе.";
-    else if ( diff <=  -2 ) msg = "Ты похоже легко убьешь $C4.";
-    else if ( diff <=   1 ) msg = "Прекрасный поединок!";
-    else if ( diff <=   4 ) msg = "$C1 говорит 'Чувствуешь удачу, шпана?'.";
-    else if ( diff <=   9 ) msg = "$C1 смеется над твоей беспомощностью.";
-    else                    msg = "Ты станешь приятным подарком СМЕРТИ!";
+         if ( diff <= -10 ) msg = "п╒я▀ п╪п╬п╤п╣я┬я▄ я┐п╠п╦я┌я▄ $C4 п╢п╟п╤п╣ п╠п╣п╥ п╬я─я┐п╤п╦я▐.";
+    else if ( diff <=  -5 ) msg = "$C1 п╫п╣ я│п╬п©п╣я─п╫п╦п╨ я┌п╣п╠п╣.";
+    else if ( diff <=  -2 ) msg = "п╒я▀ п©п╬я┘п╬п╤п╣ п╩п╣пЁп╨п╬ я┐п╠я▄п╣я┬я▄ $C4.";
+    else if ( diff <=   1 ) msg = "п÷я─п╣п╨я─п╟я│п╫я▀п╧ п©п╬п╣п╢п╦п╫п╬п╨!";
+    else if ( diff <=   4 ) msg = "$C1 пЁп╬п╡п╬я─п╦я┌ 'п╖я┐п╡я│я┌п╡я┐п╣я┬я▄ я┐п╢п╟я┤я┐, я┬п©п╟п╫п╟?'.";
+    else if ( diff <=   9 ) msg = "$C1 я│п╪п╣п╣я┌я│я▐ п╫п╟п╢ я┌п╡п╬п╣п╧ п╠п╣я│п©п╬п╪п╬я┴п╫п╬я│я┌я▄я▌.";
+    else                    msg = "п╒я▀ я│я┌п╟п╫п╣я┬я▄ п©я─п╦я▐я┌п╫я▀п╪ п©п╬п╢п╟я─п╨п╬п╪ п║п°п∙п═п╒п≤!";
 
     if (IS_EVIL(ch) && IS_EVIL(victim))
-      align = "$C1 злобно усмехается тебе.";
+      align = "$C1 п╥п╩п╬п╠п╫п╬ я┐я│п╪п╣я┘п╟п╣я┌я│я▐ я┌п╣п╠п╣.";
     else if (IS_GOOD(victim) && IS_GOOD(ch))
-      align = "$C1 радушно приветствует тебя.";
+      align = "$C1 я─п╟п╢я┐я┬п╫п╬ п©я─п╦п╡п╣я┌я│я┌п╡я┐п╣я┌ я┌п╣п╠я▐.";
     else if (IS_GOOD(victim) && IS_EVIL(ch))
-      align = "$C1 улыбается тебе, надеясь привлечь тебя на путь добра.";
+      align = "$C1 я┐п╩я▀п╠п╟п╣я┌я│я▐ я┌п╣п╠п╣, п╫п╟п╢п╣я▐я│я▄ п©я─п╦п╡п╩п╣я┤я▄ я┌п╣п╠я▐ п╫п╟ п©я┐я┌я▄ п╢п╬п╠я─п╟.";
     else if (IS_EVIL(victim) && IS_GOOD(ch))
-      align = "$C1 злобно смеется над тобой.";
+      align = "$C1 п╥п╩п╬п╠п╫п╬ я│п╪п╣п╣я┌я│я▐ п╫п╟п╢ я┌п╬п╠п╬п╧.";
     else if (IS_NEUTRAL(ch) && IS_EVIL(victim))
-      align = "$C1 злобно усмехается.";
+      align = "$C1 п╥п╩п╬п╠п╫п╬ я┐я│п╪п╣я┘п╟п╣я┌я│я▐.";
     else if (IS_NEUTRAL(ch) && IS_GOOD(victim))
-      align = "$C1 счастливо улыбается.";
+      align = "$C1 я│я┤п╟я│я┌п╩п╦п╡п╬ я┐п╩я▀п╠п╟п╣я┌я│я▐.";
     else if (IS_NEUTRAL(ch) && IS_NEUTRAL(victim))
-      align = "$C1 выглядит довольно непривлекательно.";
+      align = "$C1 п╡я▀пЁп╩я▐п╢п╦я┌ п╢п╬п╡п╬п╩я▄п╫п╬ п╫п╣п©я─п╦п╡п╩п╣п╨п╟я┌п╣п╩я▄п╫п╬.";
     else
-      align = "$C1 выглядит совершенно непривлекательно.";
+      align = "$C1 п╡я▀пЁп╩я▐п╢п╦я┌ я│п╬п╡п╣я─я┬п╣п╫п╫п╬ п╫п╣п©я─п╦п╡п╩п╣п╨п╟я┌п╣п╩я▄п╫п╬.";
 
     act_p( msg, ch, 0, victim, TO_CHAR,POS_RESTING );
     act_p( align, ch, 0, victim, TO_CHAR,POS_RESTING);
@@ -920,7 +920,7 @@ static bool fix_title( PCharacter *ch, DLString &title )
     title.replaces( "{+", "" );
 
     if (title.colorLength( ) > 50) {
-	ch->println( "Слишком длинный титул." );
+	ch->println( "п║п╩п╦я┬п╨п╬п╪ п╢п╩п╦п╫п╫я▀п╧ я┌п╦я┌я┐п╩." );
 	return false;
     }
     
@@ -936,7 +936,7 @@ CMDRUNP( title )
 	return;
 
     if (IS_SET(ch->act, PLR_NO_TITLE)) {
-	ch->println( "Ты не можешь сменить титул." );
+	ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╪п╣п╫п╦я┌я▄ я┌п╦я┌я┐п╩." );
 	return;
     }
     
@@ -947,10 +947,10 @@ CMDRUNP( title )
 	parsed.stripWhiteSpace( );
 	
 	if (parsed.empty( )) {
-	    buf << "У тебя нет титула." << endl;
+	    buf << "пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╦я┌я┐п╩п╟." << endl;
 	}
 	else {
-	    buf << "Ты носишь титул " << parsed << "{x";
+	    buf << "п╒я▀ п╫п╬я│п╦я┬я▄ я┌п╦я┌я┐п╩ " << parsed << "{x";
 	    if (parsed != title)
 		buf << " (" << title << "{x)";
 	    buf << "." << endl;
@@ -960,9 +960,9 @@ CMDRUNP( title )
 	return;
     }
 
-    if (arg == "clear" || arg == "очистить") {
+    if (arg == "clear" || arg == "п╬я┤п╦я│я┌п╦я┌я▄") {
 	pch->setTitle( DLString::emptyString );
-	pch->println( "Титул удален." );
+	pch->println( "п╒п╦я┌я┐п╩ я┐п╢п╟п╩п╣п╫." );
 	return;
     }
 
@@ -971,7 +971,7 @@ CMDRUNP( title )
 
     pch->setTitle( arg );
 
-    pch->printf( "Теперь ты {W%s{x%s{x\n\r", 
+    pch->printf( "п╒п╣п©п╣я─я▄ я┌я▀ {W%s{x%s{x\n\r", 
 	         pch->getName( ).c_str( ), 
 		 pch->getParsedTitle( ).c_str( ) );
 }
@@ -986,12 +986,12 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
     nospace.stripWhiteSpace( );
     
     if (stripped.size( ) > 25) {
-	ch->println( "Слишком длинный претитул!" );
+	ch->println( "п║п╩п╦я┬п╨п╬п╪ п╢п╩п╦п╫п╫я▀п╧ п©я─п╣я┌п╦я┌я┐п╩!" );
 	return false;
     }
     
     if (nospace.size( ) != stripped.size( )) {
-	ch->println( "В начале или в конце претитула не должно быть пробелов." );
+	ch->println( "п▓ п╫п╟я┤п╟п╩п╣ п╦п╩п╦ п╡ п╨п╬п╫я├п╣ п©я─п╣я┌п╦я┌я┐п╩п╟ п╫п╣ п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ п©я─п╬п╠п╣п╩п╬п╡." );
 	return false;
     }
     
@@ -1000,7 +1000,7 @@ static bool fix_pretitle( PCharacter *ch, DLString &title )
 		&& stripped[i] != ' ' 
 		&& stripped[i] != '\'') 
 	{
-	    ch->println( "В претитуле разрешено использовать только буквы, пробелы и одинарные кавычки." );
+	    ch->println( "п▓ п©я─п╣я┌п╦я┌я┐п╩п╣ я─п╟п╥я─п╣я┬п╣п╫п╬ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я┌п╬п╩я▄п╨п╬ п╠я┐п╨п╡я▀, п©я─п╬п╠п╣п╩я▀ п╦ п╬п╢п╦п╫п╟я─п╫я▀п╣ п╨п╟п╡я▀я┤п╨п╦." );
 	    return false;
 	}
 
@@ -1023,7 +1023,7 @@ CMDRUNP( pretitle )
         return;
 
     if (IS_SET(pch->act, PLR_NO_TITLE)) {
-         pch->println( "Ты не можешь изменить претитул.");
+         pch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦п╥п╪п╣п╫п╦я┌я▄ п©я─п╣я┌п╦я┌я┐п╩.");
          return;
     }
     
@@ -1031,27 +1031,27 @@ CMDRUNP( pretitle )
 	DLString eng = pch->getPretitle( );
 	DLString rus = pch->getRussianPretitle( );
 
-	pch->printf( "Твой претитул: %s\r\nРусский претитул: %s\r\n",
-	             (eng.empty( ) ? "(нет)" : eng.c_str( )),
-		     (rus.empty( ) ? "(нет)" : rus.c_str( )) );
+	pch->printf( "п╒п╡п╬п╧ п©я─п╣я┌п╦я┌я┐п╩: %s\r\nп═я┐я│я│п╨п╦п╧ п©я─п╣я┌п╦я┌я┐п╩: %s\r\n",
+	             (eng.empty( ) ? "(п╫п╣я┌)" : eng.c_str( )),
+		     (rus.empty( ) ? "(п╫п╣я┌)" : rus.c_str( )) );
         return;
     }
     
-    if (arg == "clear" || arg == "очистить") {
+    if (arg == "clear" || arg == "п╬я┤п╦я│я┌п╦я┌я▄") {
 	pch->setPretitle( DLString::emptyString );
 	pch->setRussianPretitle( DLString::emptyString );
-	pch->println("Русский и английский претитулы очищены.");
+	pch->println("п═я┐я│я│п╨п╦п╧ п╦ п╟п╫пЁп╩п╦п╧я│п╨п╦п╧ п©я─п╣я┌п╦я┌я┐п╩я▀ п╬я┤п╦я┴п╣п╫я▀.");
 	return;
     }
     
     rus = arg.getOneArgument( );
 
-    if (rus == "rus" || rus == "рус") {
+    if (rus == "rus" || rus == "я─я┐я│") {
 	if (!fix_pretitle( pch, arg ))
 	    return;
 
 	pch->setRussianPretitle( arg );
-	pch->printf( "Русский претитул: %s\r\n", arg.c_str( ) );
+	pch->printf( "п═я┐я│я│п╨п╦п╧ п©я─п╣я┌п╦я┌я┐п╩: %s\r\n", arg.c_str( ) );
     }
     else { 
 	arg = argument;
@@ -1060,7 +1060,7 @@ CMDRUNP( pretitle )
 	    return;
 
 	pch->setPretitle( arg );
-	pch->printf( "Твой претитул: %s\r\n", arg.c_str( ) );
+	pch->printf( "п╒п╡п╬п╧ п©я─п╣я┌п╦я┌я┐п╩: %s\r\n", arg.c_str( ) );
     }
 }
 
@@ -1070,7 +1070,7 @@ CMDRUNP( report )
     char buf[MAX_INPUT_LENGTH];
 
     sprintf( buf,
-	"У меня %d/%d жизни (hp) %d/%d энергии (mana) %d/%d движения (mv).",
+	"пё п╪п╣п╫я▐ %d/%d п╤п╦п╥п╫п╦ (hp) %d/%d я█п╫п╣я─пЁп╦п╦ (mana) %d/%d п╢п╡п╦п╤п╣п╫п╦я▐ (mv).",
 	ch->hit.getValue( ),  ch->max_hit.getValue( ),
 	ch->mana.getValue( ), ch->max_mana.getValue( ),
 	ch->move.getValue( ), ch->max_move.getValue( ) );
@@ -1092,7 +1092,7 @@ CMDRUNP( wimpy )
 
     if ((ch->getProfession( ) == prof_samurai) && (ch->getRealLevel( ) >=10))
 	{
-	 sprintf(buf,"Стыдись!!! Это будет слишком большим позором для Самурая.\n\r");
+	 sprintf(buf,"п║я┌я▀п╢п╦я│я▄!!! п╜я┌п╬ п╠я┐п╢п╣я┌ я│п╩п╦я┬п╨п╬п╪ п╠п╬п╩я▄я┬п╦п╪ п©п╬п╥п╬я─п╬п╪ п╢п╩я▐ п║п╟п╪я┐я─п╟я▐.\n\r");
 	 ch->send_to(buf);
 	 if (ch->wimpy != 0) ch->wimpy = 0;
 	 return;
@@ -1104,19 +1104,19 @@ CMDRUNP( wimpy )
 
     if ( wimpy < 0 )
     {
-	ch->send_to( "Твоя отвага превосходит твою мудрость.\n\r");
+	ch->send_to( "п╒п╡п╬я▐ п╬я┌п╡п╟пЁп╟ п©я─п╣п╡п╬я│я┘п╬п╢п╦я┌ я┌п╡п╬я▌ п╪я┐п╢я─п╬я│я┌я▄.\n\r");
 	return;
     }
 
     if ( wimpy > ch->max_hit/2 )
     {
-	ch->send_to( "Это будет слишком большим позором для тебя.\n\r");
+	ch->send_to( "п╜я┌п╬ п╠я┐п╢п╣я┌ я│п╩п╦я┬п╨п╬п╪ п╠п╬п╩я▄я┬п╦п╪ п©п╬п╥п╬я─п╬п╪ п╢п╩я▐ я┌п╣п╠я▐.\n\r");
 	return;
     }
 
     ch->wimpy	= wimpy;
 
-    sprintf( buf, "Ты попытаешься убежать при %d жизни (hit points).\n\r", wimpy );
+    sprintf( buf, "п╒я▀ п©п╬п©я▀я┌п╟п╣я┬я▄я│я▐ я┐п╠п╣п╤п╟я┌я▄ п©я─п╦ %d п╤п╦п╥п╫п╦ (hit points).\n\r", wimpy );
     ch->send_to( buf);
     return;
 }
@@ -1179,20 +1179,20 @@ CMDRUNP( password )
     
     if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-	ch->send_to( "Синтаксис: {lRпароль{lEpassword{lx <старый> <новый>.\n\r");
+	ch->send_to( "п║п╦п╫я┌п╟п╨я│п╦я│: {lRп©п╟я─п╬п╩я▄{lEpassword{lx <я│я┌п╟я─я▀п╧> <п╫п╬п╡я▀п╧>.\n\r");
 	return;
     }
     
     if (!password_check( ch->getPC( ), arg1 ))
     {
 	ch->setWait(40 );
-	ch->send_to( "Неверный пароль. Подождите 10 секунд.\n\r");
+	ch->send_to( "п²п╣п╡п╣я─п╫я▀п╧ п©п╟я─п╬п╩я▄. п÷п╬п╢п╬п╤п╢п╦я┌п╣ 10 я│п╣п╨я┐п╫п╢.\n\r");
 	return;
     }
 
     if ( strlen(arg2) < 5 )
     {
-	ch->send_to("Новый пароль должен содержать более пяти символов.\n\r");
+	ch->send_to("п²п╬п╡я▀п╧ п©п╟я─п╬п╩я▄ п╢п╬п╩п╤п╣п╫ я│п╬п╢п╣я─п╤п╟я┌я▄ п╠п╬п╩п╣п╣ п©я▐я┌п╦ я│п╦п╪п╡п╬п╩п╬п╡.\n\r");
 	return;
     }
 
@@ -1204,7 +1204,7 @@ CMDRUNP( password )
     {
 	if ( *p == '~' )
 	{
-	    ch->send_to("Новый пароль неприемлем, попробуй еще раз.\n\r");
+	    ch->send_to("п²п╬п╡я▀п╧ п©п╟я─п╬п╩я▄ п╫п╣п©я─п╦п╣п╪п╩п╣п╪, п©п╬п©я─п╬п╠я┐п╧ п╣я┴п╣ я─п╟п╥.\n\r");
 	    return;
 	}
     }
@@ -1228,7 +1228,7 @@ CMDRUNP( request )
 
 	if ( ch->isAffected(gsn_gratitude))
 	{
-		ch->send_to("Подожди немного.\n\r");
+		ch->send_to("п÷п╬п╢п╬п╤п╢п╦ п╫п╣п╪п╫п╬пЁп╬.\n\r");
 		return;
 	}
 
@@ -1240,26 +1240,26 @@ CMDRUNP( request )
 
 	if ( arg1[0] == '\0' || arg2[0] == '\0' )
 	{
-		ch->send_to( "Что и у кого ты хочешь попросить?\n\r");
+		ch->send_to( "п╖я┌п╬ п╦ я┐ п╨п╬пЁп╬ я┌я▀ я┘п╬я┤п╣я┬я▄ п©п╬п©я─п╬я│п╦я┌я▄?\n\r");
 		return;
 	}
 
 	if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
 	{
-		ch->send_to( "Здесь таких нет.\n\r");
+		ch->send_to( "п≈п╢п╣я│я▄ я┌п╟п╨п╦я┘ п╫п╣я┌.\n\r");
 		return;
 	}
 
 	if (!victim->is_npc())
 	{
-		ch->send_to("Проси другой командой: say <Подари мне ЭТО>!\n\r");
+		ch->send_to("п÷я─п╬я│п╦ п╢я─я┐пЁп╬п╧ п╨п╬п╪п╟п╫п╢п╬п╧: say <п÷п╬п╢п╟я─п╦ п╪п╫п╣ п╜п╒п·>!\n\r");
 		return;
 	}
 
 	if (victim->getNPC()->behavior 
 	    && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
 	{
-		ch->send_to("Хочешь -- купи!\n\r");
+		ch->send_to("п╔п╬я┤п╣я┬я▄ -- п╨я┐п©п╦!\n\r");
 		return;
 	}
 
@@ -1271,13 +1271,13 @@ CMDRUNP( request )
 	if ((!IS_GOOD(ch) && !victim->getRace( )->getAttitude( *ch->getRace( ) ).isSet( RACE_DONATES ))
 		|| IS_EVIL(ch))
 	{
-		do_say(victim, "У тебя нечистая душа, я ничего тебе не дам!");
+		do_say(victim, "пё я┌п╣п╠я▐ п╫п╣я┤п╦я│я┌п╟я▐ п╢я┐я┬п╟, я▐ п╫п╦я┤п╣пЁп╬ я┌п╣п╠п╣ п╫п╣ п╢п╟п╪!");
 		return;
 	}
 
 	if (ch->move < (50 + ch->getRealLevel( )))
 	{
-		do_say(victim, "Ты выглядишь устало, может, отдохнешь сначала?");
+		do_say(victim, "п╒я▀ п╡я▀пЁп╩я▐п╢п╦я┬я▄ я┐я│я┌п╟п╩п╬, п╪п╬п╤п╣я┌, п╬я┌п╢п╬я┘п╫п╣я┬я▄ я│п╫п╟я┤п╟п╩п╟?");
 		return;
 	}
 
@@ -1287,7 +1287,7 @@ CMDRUNP( request )
 
 	if (victim->getRealLevel( ) >= ch->getRealLevel( ) + 10 || victim->getRealLevel( ) >= ch->getRealLevel( ) * 2)
 	{
-		do_say(victim, "Всему свое время, малыш.");
+		do_say(victim, "п▓я│п╣п╪я┐ я│п╡п╬п╣ п╡я─п╣п╪я▐, п╪п╟п╩я▀я┬.");
 		return;
 	}
 
@@ -1295,7 +1295,7 @@ CMDRUNP( request )
 			&& (obj = get_obj_wear(victim, arg1)) == 0)
 		|| IS_SET(obj->extra_flags, ITEM_INVENTORY))
 	{
-		do_say(victim, "Извини, у меня нет этого.");
+		do_say(victim, "п≤п╥п╡п╦п╫п╦, я┐ п╪п╣п╫я▐ п╫п╣я┌ я█я┌п╬пЁп╬.");
 		return;
 	}
 	
@@ -1308,7 +1308,7 @@ CMDRUNP( request )
 
 	} else if (!IS_GOOD(victim))
 	{
-		do_say(victim, "Я не дам тебе ничего!!");
+		do_say(victim, "п╞ п╫п╣ п╢п╟п╪ я┌п╣п╠п╣ п╫п╦я┤п╣пЁп╬!!");
 		interpret_raw( victim, "murder", ch->getNameP( ));
 		return;
 	}
@@ -1318,39 +1318,39 @@ CMDRUNP( request )
 
 	if ( !can_drop_obj( ch, obj ) )
 	{
-		do_say(victim, "Извини, но эта вешь проклята, я не могу избавиться от нее.");
+		do_say(victim, "п≤п╥п╡п╦п╫п╦, п╫п╬ я█я┌п╟ п╡п╣я┬я▄ п©я─п╬п╨п╩я▐я┌п╟, я▐ п╫п╣ п╪п╬пЁя┐ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ п╫п╣п╣.");
 		return;
 	}
 
 	if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
 	{
-		ch->send_to( "Твои руки полны.\n\r");
+		ch->send_to( "п╒п╡п╬п╦ я─я┐п╨п╦ п©п╬п╩п╫я▀.\n\r");
 		return;
 	}
 
 	if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
 	{
-		ch->send_to( "Ты не можешь нести такой вес.\n\r");
+		ch->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╣я│я┌п╦ я┌п╟п╨п╬п╧ п╡п╣я│.\n\r");
 		return;
 	}
 
 	if ( !ch->can_see( obj ) )
 	{
-		ch->send_to( "Ты не видишь этого.\n\r");
+		ch->send_to( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬.\n\r");
 		return;
 	}
 
 	if ( obj->pIndexData->vnum == 520 ) // Knight's key
 	{
-		ch->send_to("Извини, он не отдаст тебе это.\n\r");
+		ch->send_to("п≤п╥п╡п╦п╫п╦, п╬п╫ п╫п╣ п╬я┌п╢п╟я│я┌ я┌п╣п╠п╣ я█я┌п╬.\n\r");
 		return;
 	}
 
 	obj_from_char( obj );
 	obj_to_char( obj, ch );
-	act_p( "$c1 просит $o4 у $C2.", ch, obj, victim, TO_NOTVICT,POS_RESTING );
-	act_p( "Ты просишь $o4 у $C2.",   ch, obj, victim, TO_CHAR,POS_RESTING    );
-	act_p( "$c1 просит $o4 у тебя.", ch, obj, victim, TO_VICT,POS_RESTING    );
+	act_p( "$c1 п©я─п╬я│п╦я┌ $o4 я┐ $C2.", ch, obj, victim, TO_NOTVICT,POS_RESTING );
+	act_p( "п╒я▀ п©я─п╬я│п╦я┬я▄ $o4 я┐ $C2.",   ch, obj, victim, TO_CHAR,POS_RESTING    );
+	act_p( "$c1 п©я─п╬я│п╦я┌ $o4 я┐ я┌п╣п╠я▐.", ch, obj, victim, TO_VICT,POS_RESTING    );
 	
 	omprog_give( obj, victim, ch );
 
@@ -1359,7 +1359,7 @@ CMDRUNP( request )
 	ch->hit -= 3 * ( ch->getModifyLevel() / 2 );
 	ch->hit = max( (int)ch->hit, 0 );
 
-	act_p("Ты чувствуешь благодарность за доверие $C2.", ch, 0, victim,TO_CHAR,POS_RESTING);
+	act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╠п╩п╟пЁп╬п╢п╟я─п╫п╬я│я┌я▄ п╥п╟ п╢п╬п╡п╣я─п╦п╣ $C2.", ch, 0, victim,TO_CHAR,POS_RESTING);
 
 	af.type = gsn_gratitude;
 	af.where = TO_AFFECTS;
@@ -1383,7 +1383,7 @@ CMDRUNP( identify )
 
     if ( ( obj = get_obj_carry( ch, argument ) ) == 0 )
     {
-       ch->send_to( "У тебя нет этого.\n\r");
+       ch->send_to( "пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
        return;
     }
 
@@ -1391,23 +1391,23 @@ CMDRUNP( identify )
 
     if (!rch)
     {
-       ch->send_to("Тут никто ничего толкового не скажет об этой вещи.\n\r");
+       ch->send_to("п╒я┐я┌ п╫п╦п╨я┌п╬ п╫п╦я┤п╣пЁп╬ я┌п╬п╩п╨п╬п╡п╬пЁп╬ п╫п╣ я│п╨п╟п╤п╣я┌ п╬п╠ я█я┌п╬п╧ п╡п╣я┴п╦.\n\r");
        return;
     }
 
     if (ch->is_immortal( )) {
-	act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
+	act_p( "$c1 я│п╪п╬я┌я─п╦я┌ п╫п╟ я┌п╣п╠я▐!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
     }
     else if (ch->gold < 20) {
-	tell_dim( ch, rch, "У тебя даже 20 золотых нету, чтобы мне заплатить!" );
+	tell_dim( ch, rch, "пё я┌п╣п╠я▐ п╢п╟п╤п╣ 20 п╥п╬п╩п╬я┌я▀я┘ п╫п╣я┌я┐, я┤я┌п╬п╠я▀ п╪п╫п╣ п╥п╟п©п╩п╟я┌п╦я┌я▄!" );
 	return;
     }
     else {
        ch->gold -= 20;
-       ch->send_to("Твой кошелек становится значительно легче.\n\r");
+       ch->send_to("п╒п╡п╬п╧ п╨п╬я┬п╣п╩п╣п╨ я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╥п╫п╟я┤п╦я┌п╣п╩я▄п╫п╬ п╩п╣пЁя┤п╣.\n\r");
     }
 
-    act_p( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
+    act_p( "$c1 п╦п╥я┐я┤п╟я▌я┴п╣ я│п╪п╬я┌я─п╦я┌ п╫п╟ $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
     
     if (gsn_identify->getSpell( ))
 	gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );
@@ -1423,7 +1423,7 @@ CMDRUNP( raffects )
 	    paf->type->getAffect( )->toStream( buf, paf );
     
     if (buf.str( ).empty( )) 
-	buf << "В этом месте нет ничего необычного." << endl;
+	buf << "п▓ я█я┌п╬п╪ п╪п╣я│я┌п╣ п╫п╣я┌ п╫п╦я┤п╣пЁп╬ п╫п╣п╬п╠я▀я┤п╫п╬пЁп╬." << endl;
 
     ch->send_to( buf );
 }
@@ -1447,36 +1447,36 @@ CMDRUNP( demand )
 
   if (ch->getTrueProfession( ) != prof_anti_paladin)
     {
-	ch->println( "Ты никого не запугаешь своим видом." );
+	ch->println( "п╒я▀ п╫п╦п╨п╬пЁп╬ п╫п╣ п╥п╟п©я┐пЁп╟п╣я┬я▄ я│п╡п╬п╦п╪ п╡п╦п╢п╬п╪." );
       return;
     }
 
   if ( arg1[0] == '\0' || arg2[0] == '\0' )
     {
-	ch->println( "Потребовать что и у кого?" );
+	ch->println( "п÷п╬я┌я─п╣п╠п╬п╡п╟я┌я▄ я┤я┌п╬ п╦ я┐ п╨п╬пЁп╬?" );
       return;
     }
 
   if ( ( victim = get_char_room( ch, arg2 ) ) == 0 )
     {
-	ch->println( "Таких тут нет." );
+	ch->println( "п╒п╟п╨п╦я┘ я┌я┐я┌ п╫п╣я┌." );
       return;
     }
 
     if (!victim->is_npc( )) {
-	ch->println( "Просто убей и отбери." );
+	ch->println( "п÷я─п╬я│я┌п╬ я┐п╠п╣п╧ п╦ п╬я┌п╠п╣я─п╦." );
 	return;
     }
 
     if (IS_SET(victim->act, ACT_NODEMAND)) {
-	act( "$C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
+	act( "$C1 п╫п╣ п©п╬п╢я┤п╦п╫п╦я┌я│я▐ я┌п╡п╬п╣п╪я┐ я┌я─п╣п╠п╬п╡п╟п╫п╦я▌.", ch, 0, victim, TO_CHAR);
 	return;
     }
   
     if (victim->getNPC()->behavior 
 	&& IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER))) 
     {
-	ch->send_to("Хочешь -- купи!\n\r");
+	ch->send_to("п╔п╬я┤п╣я┬я▄ -- п╨я┐п©п╦!\n\r");
 	return;
     }
   
@@ -1490,7 +1490,7 @@ CMDRUNP( demand )
 	chance = 0;
 
     if (number_percent() > chance) {
-	 do_say(victim, "Я не собираюсь ничего отдавать тебе!");
+	 do_say(victim, "п╞ п╫п╣ я│п╬п╠п╦я─п╟я▌я│я▄ п╫п╦я┤п╣пЁп╬ п╬я┌п╢п╟п╡п╟я┌я▄ я┌п╣п╠п╣!");
 	 interpret_raw( victim, "murder", ch->getNameP( ));
 	 return;
     }
@@ -1499,7 +1499,7 @@ CMDRUNP( demand )
       && (obj = get_obj_wear(victim, arg1)) == 0)
       || IS_SET(obj->extra_flags, ITEM_INVENTORY))
     {
-      do_say(victim, "Извини, у меня нет этого.");
+      do_say(victim, "п≤п╥п╡п╦п╫п╦, я┐ п╪п╣п╫я▐ п╫п╣я┌ я█я┌п╬пЁп╬.");
       return;
     }
 
@@ -1510,38 +1510,38 @@ CMDRUNP( demand )
   if ( !can_drop_obj( ch, obj ) )
     {
       do_say(victim,
-	"Эта вещь проклята, и я не могу избавиться от нее. Прости меня, повелитель.");
+	"п╜я┌п╟ п╡п╣я┴я▄ п©я─п╬п╨п╩я▐я┌п╟, п╦ я▐ п╫п╣ п╪п╬пЁя┐ п╦п╥п╠п╟п╡п╦я┌я▄я│я▐ п╬я┌ п╫п╣п╣. п÷я─п╬я│я┌п╦ п╪п╣п╫я▐, п©п╬п╡п╣п╩п╦я┌п╣п╩я▄.");
       return;
     }
 
   if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
     {
-      ch->send_to( "Твои руки полны.\n\r");
+      ch->send_to( "п╒п╡п╬п╦ я─я┐п╨п╦ п©п╬п╩п╫я▀.\n\r");
       return;
     }
 
   if ( ch->carry_weight + obj->getWeight( ) > ch->canCarryWeight( ) )
     {
-      ch->send_to( "Ты не сможешь нести такую тяжесть.\n\r");
+      ch->send_to( "п╒я▀ п╫п╣ я│п╪п╬п╤п╣я┬я▄ п╫п╣я│я┌п╦ я┌п╟п╨я┐я▌ я┌я▐п╤п╣я│я┌я▄.\n\r");
       return;
     }
 
   if ( !ch->can_see( obj ) )
     {
-      act_p( "Ты не видишь этого.", ch, 0, victim, TO_CHAR,POS_RESTING );
+      act_p( "п╒я▀ п╫п╣ п╡п╦п╢п╦я┬я▄ я█я┌п╬пЁп╬.", ch, 0, victim, TO_CHAR,POS_RESTING );
       return;
     }
 
-    act( "$c1 требует $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
-    act( "Ты требуешь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
-    act( "$c1 требует у тебя $o4.", ch, obj, victim, TO_VICT);
+    act( "$c1 я┌я─п╣п╠я┐п╣я┌ $o4 я┐ $C2.", ch, obj, victim, TO_NOTVICT);
+    act( "п╒я▀ я┌я─п╣п╠я┐п╣я┬я▄ $o4 я┐ $C2.",   ch, obj, victim, TO_CHAR);
+    act( "$c1 я┌я─п╣п╠я┐п╣я┌ я┐ я┌п╣п╠я▐ $o4.", ch, obj, victim, TO_VICT);
 
     obj_from_char( obj );
     obj_to_char( obj, ch );
 
     omprog_give( obj, victim, ch );
 
-    ch->println("Твое могущество повергает всех в трепет.");
+    ch->println("п╒п╡п╬п╣ п╪п╬пЁя┐я┴п╣я│я┌п╡п╬ п©п╬п╡п╣я─пЁп╟п╣я┌ п╡я│п╣я┘ п╡ я┌я─п╣п©п╣я┌.");
 }
 
 
@@ -1588,19 +1588,19 @@ CMDRUNP( score )
 		CLR_CAPT,
 		name.str( ).c_str( ),
 		age,
-		GET_COUNT(age, "год", "года", "лет"),
+		GET_COUNT(age, "пЁп╬п╢", "пЁп╬п╢п╟", "п╩п╣я┌"),
 		CLR_FRAME ) );
 		
 	
     ch->printf(
 "     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
-"     | %sУровень:{x  %3d        %s|%s {lRСила:{lE Str:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sРелигия   :{x %-10s %s|\n\r"
-"     | %sРаса :{x  %-12s %s| %s{lRУм  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
-"     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
-"     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-5d%s  |\n\r"
-"     | %s{lRНатура:{lEAlign: {lx{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %s{lRЭтос {lEEthos{lx:{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
-"     | %sДом  :{x  %-30s %s| {Y%-22s %s|\n\r"		
+"     | %sпёя─п╬п╡п╣п╫я▄:{x  %3d        %s|%s {lRп║п╦п╩п╟:{lE Str:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sп═п╣п╩п╦пЁп╦я▐   :{x %-10s %s|\n\r"
+"     | %sп═п╟я│п╟ :{x  %-12s %s| %s{lRпёп╪  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sп÷я─п╟п╨я┌п╦п╨   :{x   %3d      %s|\n\r"
+"     | %sп÷п╬п╩  :{x  %-11s  %s| %s{lRп°я┐п╢я─:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sп╒я─п╣п╫п╦я─п╬п╡п╬п╨:{x   %3d      %s|\n\r"
+"     | %sп п╩п╟я│я│:{x  %-13s%s| %s{lRп⌡п╬п╡п╨:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sп п╡п╣я│я┌. п╣п╢п╦п╫п╦я├:{x  %-5d%s  |\n\r"
+"     | %s{lRп²п╟я┌я┐я─п╟:{lEAlign: {lx{x %-11s  %s| %s{lRп║п╩п╬п╤:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sп п╡п╣я│я┌. п╡я─п╣п╪я▐:{x   %-3d %s   |\n\r"
+"     | %s{lRп╜я┌п╬я│ {lEEthos{lx:{x  %-12s %s| %s{lRп·п╠п╟я▐:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
+"     | %sп■п╬п╪  :{x  %-30s %s| {Y%-22s %s|\n\r"		
 "     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
 
 	    CLR_BAR, CLR_FRAME,
@@ -1626,7 +1626,7 @@ CMDRUNP( score )
 	    CLR_FRAME,
 
 	    CLR_CAPT,
-	    ch->getSex( ) == 0 ? "потерян" : ch->getSex( ) == SEX_MALE ? "мужской" : "женский",
+	    ch->getSex( ) == 0 ? "п©п╬я┌п╣я─я▐п╫" : ch->getSex( ) == SEX_MALE ? "п╪я┐п╤я│п╨п╬п╧" : "п╤п╣п╫я│п╨п╦п╧",
 	    CLR_BAR,
 	    CLR_CAPT,
 	    ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
@@ -1646,7 +1646,7 @@ CMDRUNP( score )
 	    CLR_FRAME,
     
 	    CLR_CAPT,
-	    fRus ? (IS_GOOD(ch) ? "добрая" : IS_EVIL(ch) ? "злая" : "нейтральная")
+	    fRus ? (IS_GOOD(ch) ? "п╢п╬п╠я─п╟я▐" : IS_EVIL(ch) ? "п╥п╩п╟я▐" : "п╫п╣п╧я┌я─п╟п╩я▄п╫п╟я▐")
 		 : align_table.name( ALIGNMENT(ch) ).c_str( ),
 	    CLR_BAR,
 	    CLR_CAPT,
@@ -1665,13 +1665,13 @@ CMDRUNP( score )
 	    CLR_BAR,
 	    CLR_CAPT,
 	    ch->getProfession( ) == prof_samurai 
-		?  "{lRСмертей  {lEDeath    {lx" : "{lRТрусость {lEWimpy    {lx" ,
+		?  "{lRп║п╪п╣я─я┌п╣п╧  {lEDeath    {lx" : "{lRп╒я─я┐я│п╬я│я┌я▄ {lEWimpy    {lx" ,
 	    ch->getProfession( ) == prof_samurai 
 		? pch->death.getValue( ) : ch->wimpy.getValue( ),
 	    CLR_FRAME,
 
 	    CLR_CAPT,
-	    room ? room->area->name : "Потерян",
+	    room ? room->area->name : "п÷п╬я┌п╣я─я▐п╫",
 	    CLR_BAR,
 	    msgtable_lookup( msg_positions, ch->position ),
 	    CLR_FRAME,
@@ -1681,7 +1681,7 @@ CMDRUNP( score )
     if (pch->guarding != 0) {
 	ekle = 1;
 	ch->printf( 
-"     | {wТы охраняешь    :{Y %-10s                                    %s|\n\r",
+"     | {wп╒я▀ п╬я┘я─п╟п╫я▐п╣я┬я▄    :{Y %-10s                                    %s|\n\r",
 	    ch->seeName( pch->guarding, '4' ).c_str(),
 	    CLR_FRAME);
     }
@@ -1689,7 +1689,7 @@ CMDRUNP( score )
     if (pch->guarded_by != 0) {
 	ekle = 1;
 	ch->printf( 
-"     | {wТебя охраняет     :{Y %-10s                                  %s|\n\r",
+"     | {wп╒п╣п╠я▐ п╬я┘я─п╟п╫я▐п╣я┌     :{Y %-10s                                  %s|\n\r",
 	ch->seeName( pch->guarded_by, '1' ).c_str(),
 	CLR_FRAME);
     }
@@ -1710,15 +1710,15 @@ CMDRUNP( score )
     if (ch->is_adrenalined()) {
 	ekle = 1;
 	ch->printf( 
-"     | {yАдреналин кипит в твоих венах!                                  %s|\n\r",
+"     | {yп░п╢я─п╣п╫п╟п╩п╦п╫ п╨п╦п©п╦я┌ п╡ я┌п╡п╬п╦я┘ п╡п╣п╫п╟я┘!                                  %s|\n\r",
                  CLR_FRAME );
     }
 
     if (ch->is_immortal()) {
 	ekle = 1;
 	ch->printf( 
-"     | {w{lRНевидимость:{lEInvisible:  {lx {lRуровня{lElevel{lx %3d   "
-         "{lRИнкогнито{lEIncognito  {lx: {lRуровня{lElevel{lx %3d                 %s|\n\r",
+"     | {w{lRп²п╣п╡п╦п╢п╦п╪п╬я│я┌я▄:{lEInvisible:  {lx {lRя┐я─п╬п╡п╫я▐{lElevel{lx %3d   "
+         "{lRп≤п╫п╨п╬пЁп╫п╦я┌п╬{lEIncognito  {lx: {lRя┐я─п╬п╡п╫я▐{lElevel{lx %3d                 %s|\n\r",
               pch->invis_level.getValue( ),
 	      pch->incog_level.getValue( ),
 	      CLR_FRAME);
@@ -1745,11 +1745,11 @@ CMDRUNP( score )
 if ( ch->getRealLevel( ) >= 20 )
 {
     ch->printf( 
-"     | %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
-"     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
-"     | %sЗолото        :{Y %-10d          %sЗащита от разрезов:{x %-5d   %s|\n\r"
-"     | %sСеребро       :{W %-10d          %sЗащита от экзотики:{x %-5d   %s|\n\r"
-"     | %sЕдиниц опыта  :{x %-6d              %s{lRЗащита от заклинаний{lESaves vs Spell      {lx:{x %4d  %s|\n\r",
+"     | %sп▓п╣я┴п╦          :{x     %3d/%-4d        %sп≈п╟я┴п╦я┌п╟ п╬я┌ я┐п╨п╬п╩п╬п╡:{x   %-5d   %s|\n\r"
+"     | %sп▓п╣я│           :{x  %6d/%-8d    %sп≈п╟я┴п╦я┌п╟ п╬я┌ я┐п╢п╟я─п╬п╡:{x   %-5d   %s|\n\r"
+"     | %sп≈п╬п╩п╬я┌п╬        :{Y %-10d          %sп≈п╟я┴п╦я┌п╟ п╬я┌ я─п╟п╥я─п╣п╥п╬п╡:{x %-5d   %s|\n\r"
+"     | %sп║п╣я─п╣п╠я─п╬       :{W %-10d          %sп≈п╟я┴п╦я┌п╟ п╬я┌ я█п╨п╥п╬я┌п╦п╨п╦:{x %-5d   %s|\n\r"
+"     | %sп∙п╢п╦п╫п╦я├ п╬п©я▀я┌п╟  :{x %-6d              %s{lRп≈п╟я┴п╦я┌п╟ п╬я┌ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧{lESaves vs Spell      {lx:{x %4d  %s|\n\r",
 	CLR_CAPT,
 	ch->carry_number, ch->canCarryNumber( ),
 	CLR_CAPT,
@@ -1783,11 +1783,11 @@ if ( ch->getRealLevel( ) >= 20 )
 else
 {
     ch->printf( 
-"     | %sВещи   :{x %3d/%-4d            %sЗащита от уколов:{x   %-12s   %s|\n\r"
-"     | %sВес    :{x %6d/%-8d     %sЗащита от ударов:{x   %-12s   %s|\n\r"
-"     | %sЗолото :{Y %-10d          %sЗащита от разрезов:{x %-12s   %s|\n\r"
-"     | %sСеребро:{W %-10d          %sЗащита от экзотики:{x %-12s   %s|\n\r"
-"     | %sЕдиниц опыта:{x   %-6d                                          %s|\n\r",
+"     | %sп▓п╣я┴п╦   :{x %3d/%-4d            %sп≈п╟я┴п╦я┌п╟ п╬я┌ я┐п╨п╬п╩п╬п╡:{x   %-12s   %s|\n\r"
+"     | %sп▓п╣я│    :{x %6d/%-8d     %sп≈п╟я┴п╦я┌п╟ п╬я┌ я┐п╢п╟я─п╬п╡:{x   %-12s   %s|\n\r"
+"     | %sп≈п╬п╩п╬я┌п╬ :{Y %-10d          %sп≈п╟я┴п╦я┌п╟ п╬я┌ я─п╟п╥я─п╣п╥п╬п╡:{x %-12s   %s|\n\r"
+"     | %sп║п╣я─п╣п╠я─п╬:{W %-10d          %sп≈п╟я┴п╦я┌п╟ п╬я┌ я█п╨п╥п╬я┌п╦п╨п╦:{x %-12s   %s|\n\r"
+"     | %sп∙п╢п╦п╫п╦я├ п╬п©я▀я┌п╟:{x   %-6d                                          %s|\n\r",
 	CLR_CAPT,
 	ch->carry_number, ch->canCarryNumber( ),
 	CLR_CAPT,
@@ -1818,8 +1818,8 @@ else
 }
 
     ch->printf( 
-"     | %sОпыта до уровня:{x %-6d                                         %s|\n\r"
-"     |                                    %sЖизни:{x %5d / %5d         %s|\n\r",
+"     | %sп·п©я▀я┌п╟ п╢п╬ я┐я─п╬п╡п╫я▐:{x %-6d                                         %s|\n\r"
+"     |                                    %sп√п╦п╥п╫п╦:{x %5d / %5d         %s|\n\r",
 	CLR_CAPT,
 	pch->getExpToLevel( ),
 	CLR_FRAME,
@@ -1831,8 +1831,8 @@ else
 if ( ch->getRealLevel( ) >= 20 )
 {
     ch->printf( 
-"     | %s{lRТочность{lEHitroll {lx      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
-"     | %s{lRУрон   {lEDamroll{lx       :{x   %-3d           %sДвижения:{x %5d / %5d         %s|\n\r",
+"     | %s{lRп╒п╬я┤п╫п╬я│я┌я▄{lEHitroll {lx      :{x   %-3d            %sп╜п╫п╣я─пЁп╦п╦:{x %5d / %5d         %s|\n\r"
+"     | %s{lRпёя─п╬п╫   {lEDamroll{lx       :{x   %-3d           %sп■п╡п╦п╤п╣п╫п╦я▐:{x %5d / %5d         %s|\n\r",
 	CLR_CAPT,
 	ch->hitroll.getValue( ),
 	CLR_CAPT,
@@ -1847,8 +1847,8 @@ if ( ch->getRealLevel( ) >= 20 )
 }
 else {
     ch->printf( 
-"     |                                  %sЭнергии:{x %5d / %5d         %s|\n\r"
-"     |                                 %sДвижения:{x %5d / %5d         %s|\n\r",
+"     |                                  %sп╜п╫п╣я─пЁп╦п╦:{x %5d / %5d         %s|\n\r"
+"     |                                 %sп■п╡п╦п╤п╣п╫п╦я▐:{x %5d / %5d         %s|\n\r",
 	CLR_CAPT,
 	ch->mana.getValue( ), ch->max_mana.getValue( ),
 	CLR_FRAME,
@@ -1881,9 +1881,9 @@ CMDRUNP( areas )
     arg2 = arguments.getOneArgument( );
     
     if (!arg1.empty( ) && !arg2.empty( ) && arg1.isNumber( ) != arg2.isNumber( )) {
-	ch->println( "Использование: \r\n"
+	ch->println( "п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: \r\n"
 	             "{lEareas [<level> | <min level> <max level> | <string>]"
-		     "{lRзоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]{lx" );
+		     "{lRп╥п╬п╫я▀ [<я┐я─п╬п╡п╣п╫я▄> | <п╪п╦п╫.я┐я─п╬п╡п╣п╫я▄> <п╪п╟п╨я│.я┐я─п╬п╡п╣п╫я▄> | <п╫п╟п╥п╡п╟п╫п╦п╣>]{lx" );
 	return;
     }
     
@@ -1899,21 +1899,21 @@ CMDRUNP( areas )
 	    args.clear( );
 	}
     } catch (const ExceptionBadType & ) {
-	ch->send_to( "Уровень зоны указан неверно.\r\n" );
+	ch->send_to( "пёя─п╬п╡п╣п╫я▄ п╥п╬п╫я▀ я┐п╨п╟п╥п╟п╫ п╫п╣п╡п╣я─п╫п╬.\r\n" );
 	return;
     }
     
     if (level != -1) 
-	buf << "Арии мира Dream Land для уровня " << level << ":" << endl;
+	buf << "п░я─п╦п╦ п╪п╦я─п╟ Dream Land п╢п╩я▐ я┐я─п╬п╡п╫я▐ " << level << ":" << endl;
     else if (!args.empty( ))
-	buf << "Найдены арии: " << endl;
+	buf << "п²п╟п╧п╢п╣п╫я▀ п╟я─п╦п╦: " << endl;
     else if (minLevel != -1 && maxLevel != -1)
-	buf << "Арии мира Dream Land, для уровней " 
+	buf << "п░я─п╦п╦ п╪п╦я─п╟ Dream Land, п╢п╩я▐ я┐я─п╬п╡п╫п╣п╧ " 
 	    << minLevel << " - " << maxLevel << ":" << endl;
     else
-	buf << "Все арии мира Dream Land: " << endl;
+	buf << "п▓я│п╣ п╟я─п╦п╦ п╪п╦я─п╟ Dream Land: " << endl;
     
-    buf << "Уровни    Название                                 Авторы  {W({xПереводчики{W){x" << endl
+    buf << "пёя─п╬п╡п╫п╦    п²п╟п╥п╡п╟п╫п╦п╣                                 п░п╡я┌п╬я─я▀  {W({xп÷п╣я─п╣п╡п╬п╢я┤п╦п╨п╦{W){x" << endl
         << "------------------------------------------------------------------------" << endl;
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
@@ -1989,7 +1989,7 @@ struct ShadowAffectOutput : public AffectOutput {
 ShadowAffectOutput::ShadowAffectOutput( int shadow, int flags )
 {
     duration = shadow * 4; 
-    name = "вторая тень";
+    name = "п╡я┌п╬я─п╟я▐ я┌п╣п╫я▄";
     type = -1;
     unitMinutes = false;
 }
@@ -2011,7 +2011,7 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
     if (IS_SET(flags, FSHOW_RUSSIAN))
 	f << "{Y%1$-23s{x";
     else
-	f << "{rАффект{y: {Y%1$-15s{x";
+	f << "{rп░я└я└п╣п╨я┌{y: {Y%1$-15s{x";
     
     if (IS_SET(flags, FSHOW_LINES|FSHOW_TIME)) 
 	f << "{y:";
@@ -2026,10 +2026,10 @@ void AffectOutput::show_affect( ostringstream &buf, int flags )
     
     if (IS_SET(flags, FSHOW_TIME)) {
 	if (duration < 0)
-	    f << " {cпостоянно";
+	    f << " {cп©п╬я│я┌п╬я▐п╫п╫п╬";
 	else
-	    f << " {yв течение {m%2$d{y "
-	      << (unitMinutes ? "час%2$Iа|ов|ов" : "секун%2$Iды|д|д");
+	    f << " {yп╡ я┌п╣я┤п╣п╫п╦п╣ {m%2$d{y "
+	      << (unitMinutes ? "я┤п╟я│%2$Iп╟|п╬п╡|п╬п╡" : "я│п╣п╨я┐п╫%2$Iп╢я▀|п╢|п╢");
     }
     
     fmtResult = fmt( 0, f.str( ).c_str( ), name.c_str( ), duration );
@@ -2060,18 +2060,18 @@ DLString AffectOutput::format_affect_location( Affect *paf )
 	case APPLY_HEAL_GAIN:
 	case APPLY_MANA_GAIN:
 	    if (paf->modifier > 100)
-		buf << fmt( 0, "улучшает {m%1$s{y на {m%2$d%%{y",
+		buf << fmt( 0, "я┐п╩я┐я┤я┬п╟п╣я┌ {m%1$s{y п╫п╟ {m%2$d%%{y",
 		               apply_flags.message( paf->location ).c_str( ),
 			       paf->modifier - 100 );
 	    else if (paf->modifier < 100 && paf->modifier > 0)
-		buf << fmt( 0, "ухудшает {m%1$s{y на {m%2$d%%{y",
+		buf << fmt( 0, "я┐я┘я┐п╢я┬п╟п╣я┌ {m%1$s{y п╫п╟ {m%2$d%%{y",
 		               apply_flags.message( paf->location ).c_str( ),
 			       100 - paf->modifier );
 	    break;
 	    
 	default:
-	    buf << "изменяет {m" << apply_flags.message( paf->location ) << "{y "
-		<< "на {m" << paf->modifier << "{y";
+	    buf << "п╦п╥п╪п╣п╫я▐п╣я┌ {m" << apply_flags.message( paf->location ) << "{y "
+		<< "п╫п╟ {m" << paf->modifier << "{y";
 	    break;
 	}
 
@@ -2091,24 +2091,24 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
 	switch(paf->where) {
 	case TO_AFFECTS: 
 	    table = &affect_flags;
-	    word = "добавляет";
+	    word = "п╢п╬п╠п╟п╡п╩я▐п╣я┌";
 	    gcase = '4';
 	    break;
 	case TO_IMMUNE:	
 	    table = &imm_flags;
-	    word = "иммунитет к";
+	    word = "п╦п╪п╪я┐п╫п╦я┌п╣я┌ п╨";
 	    break;
 	case TO_RESIST:	
 	    table = &imm_flags;
-	    word = "сопротивляемость к";
+	    word = "я│п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ п╨";
 	    break;
 	case TO_VULN:	
 	    table = &imm_flags;
-	    word = "уязвимость к";
+	    word = "я┐я▐п╥п╡п╦п╪п╬я│я┌я▄ п╨";
 	    break;
 	case TO_DETECTS: 
 	    table = &detect_flags;
-	    word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "добавляет" : "обнаружение");
+	    word = (IS_SET(b, ADET_WEB|ADET_FEAR) ?  "п╢п╬п╠п╟п╡п╩я▐п╣я┌" : "п╬п╠п╫п╟я─я┐п╤п╣п╫п╦п╣");
 	    gcase = (IS_SET(b, ADET_WEB|ADET_FEAR) ? '4': '2');
 	    break;
 	}
@@ -2139,16 +2139,16 @@ DLString AffectOutput::format_affect_global( Affect *paf )
 		s << "{m" <<  liq->getShortDescr( ).ruscase( '2' ).colourStrip( ) << "{x";
 	    }
 
-	    buf << "запах " << s.str( );
+	    buf << "п╥п╟п©п╟я┘ " << s.str( );
 	    break;
 
 	case TO_LOCATIONS:
 	    if (paf->global.isSet( wear_wrist_r ))
-		buf << "отрезанная правая рука";
+		buf << "п╬я┌я─п╣п╥п╟п╫п╫п╟я▐ п©я─п╟п╡п╟я▐ я─я┐п╨п╟";
 	    else if (paf->global.isSet( wear_wrist_l ))
-		buf << "отрезанная левая рука";
+		buf << "п╬я┌я─п╣п╥п╟п╫п╫п╟я▐ п╩п╣п╡п╟я▐ я─я┐п╨п╟";
 	    else
-		buf << "отрезанная конечность";
+		buf << "п╬я┌я─п╣п╥п╟п╫п╫п╟я▐ п╨п╬п╫п╣я┤п╫п╬я│я┌я▄";
 	    break;
 	}
     }
@@ -2189,19 +2189,19 @@ CMDRUNP( affects )
     if (HAS_SHADOW(ch))
 	output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, flags ) );
     
-    if (arg_has_oneof( argument, "time", "время" ))
+    if (arg_has_oneof( argument, "time", "п╡я─п╣п╪я▐" ))
 	output.sort( __aff_sort_time__ );
     
-    if (arg_has_oneof( argument, "name", "имя" ))
+    if (arg_has_oneof( argument, "name", "п╦п╪я▐" ))
 	output.sort( __aff_sort_name__ );
 
-    if (arg_has_oneof( argument, "desc", "убыв" ))
+    if (arg_has_oneof( argument, "desc", "я┐п╠я▀п╡" ))
 	output.reverse( );
 
-    if (arg_has_oneof( argument, "short", "brief", "кратко" ))
+    if (arg_has_oneof( argument, "short", "brief", "п╨я─п╟я┌п╨п╬" ))
 	REMOVE_BIT(flags, FSHOW_LINES);
 
-    if (arg_has_oneof( argument, "nocolor", "безцвета" ))
+    if (arg_has_oneof( argument, "nocolor", "п╠п╣п╥я├п╡п╣я┌п╟" ))
 	REMOVE_BIT(flags, FSHOW_COLOR);
 
     if (arg_has_oneof( argument, "noempty" ))
@@ -2215,10 +2215,10 @@ CMDRUNP( affects )
 
     if (buf.str( ).empty( )) {
 	if (IS_SET(flags, FSHOW_EMPTY))
-	    ch->println( "Ты не находишься под действием каких-либо аффектов." );
+	    ch->println( "п╒я▀ п╫п╣ п╫п╟я┘п╬п╢п╦я┬я▄я│я▐ п©п╬п╢ п╢п╣п╧я│я┌п╡п╦п╣п╪ п╨п╟п╨п╦я┘-п╩п╦п╠п╬ п╟я└я└п╣п╨я┌п╬п╡." );
     } 
     else {
-	ch->println( "Ты находишься под действием следующих аффектов:" );
+	ch->println( "п╒я▀ п╫п╟я┘п╬п╢п╦я┬я▄я│я▐ п©п╬п╢ п╢п╣п╧я│я┌п╡п╦п╣п╪ я│п╩п╣п╢я┐я▌я┴п╦я┘ п╟я└я└п╣п╨я┌п╬п╡:" );
 	buf << "{x";
 
 	if (!IS_SET(flags, FSHOW_COLOR)) {
@@ -2236,12 +2236,12 @@ CMDRUNP( nohelp )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("Об отсутствии какого раздела справки ты хочешь сообщить?");
+        ch->println("п·п╠ п╬я┌я│я┐я┌я│я┌п╡п╦п╦ п╨п╟п╨п╬пЁп╬ я─п╟п╥п╢п╣п╩п╟ я│п©я─п╟п╡п╨п╦ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╬п╬п╠я┴п╦я┌я▄?");
         return;
     }
 
     bugTracker->reportNohelp( ch, txt );
-    ch->println("Записано.");
+    ch->println("п≈п╟п©п╦я│п╟п╫п╬.");
 }
 
 CMDRUNP( bug )
@@ -2249,12 +2249,12 @@ CMDRUNP( bug )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("О какой именно ошибке ты хочешь сообщить?");
+        ch->println("п· п╨п╟п╨п╬п╧ п╦п╪п╣п╫п╫п╬ п╬я┬п╦п╠п╨п╣ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╬п╬п╠я┴п╦я┌я▄?");
         return;
     }
 
     bugTracker->reportBug( ch, txt );
-    ch->println( "Ошибка записана.");
+    ch->println( "п·я┬п╦п╠п╨п╟ п╥п╟п©п╦я│п╟п╫п╟.");
 }
 
 CMDRUNP( typo )
@@ -2262,12 +2262,12 @@ CMDRUNP( typo )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("О какой именно опечатке ты хочешь сообщить?");
+        ch->println("п· п╨п╟п╨п╬п╧ п╦п╪п╣п╫п╫п╬ п╬п©п╣я┤п╟я┌п╨п╣ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╬п╬п╠я┴п╦я┌я▄?");
         return;
     }
 
     bugTracker->reportTypo( ch, txt );
-    ch->println( "Опечатка записана.");
+    ch->println( "п·п©п╣я┤п╟я┌п╨п╟ п╥п╟п©п╦я│п╟п╫п╟.");
 }
 
 CMDRUNP( iidea )
@@ -2275,12 +2275,12 @@ CMDRUNP( iidea )
     DLString txt = argument;
     txt.stripWhiteSpace( );
     if (txt.empty( )) {
-        ch->println("О какой именно идее ты хочешь сообщить?");
+        ch->println("п· п╨п╟п╨п╬п╧ п╦п╪п╣п╫п╫п╬ п╦п╢п╣п╣ я┌я▀ я┘п╬я┤п╣я┬я▄ я│п╬п╬п╠я┴п╦я┌я▄?");
         return;
     }
 
     bugTracker->reportIdea( ch, txt );
-    ch->println( "Идея записана.");
+    ch->println( "п≤п╢п╣я▐ п╥п╟п©п╦я│п╟п╫п╟.");
 }
 
 
@@ -2301,12 +2301,12 @@ CMDRUNP( help )
     }
 
     argall[0] = '\0';
-    // Вариант 2.create?
+    // п▓п╟я─п╦п╟п╫я┌ 2.create?
     if (strchr( argument , '.')){
 	number = number_argument(argument, argall);
 	strcpy(argument,argall);	
 	if ( number < 1){
-	    ch->send_to( "Нет подсказки по данному слову.\n\r");
+	    ch->send_to( "п²п╣я┌ п©п╬п╢я│п╨п╟п╥п╨п╦ п©п╬ п╢п╟п╫п╫п╬п╪я┐ я│п╩п╬п╡я┐.\n\r");
 	    bugTracker->reportNohelp( ch, origArgument.c_str( ) );
     	    return;
 	}
@@ -2342,7 +2342,7 @@ CMDRUNP( help )
 	    strcat(argall,argone);
 	}
 
-        buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
+        buf << "п÷п╬ п╥п╟п©я─п╬я│я┐ '{C" << origArgument << "{x' п╫п╟п╧п╢п╣п╫п╬ п╫п╣я│п╨п╬п╩я▄п╨п╬ я─п╟п╥п╢п╣п╩п╬п╡ я│п©я─п╟п╡п╨п╦:" << endl << endl;
 
 	count=0;
 	for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
@@ -2365,11 +2365,11 @@ CMDRUNP( help )
 	page_to_char( findHelp->getText( ch ).c_str( ), ch );
     }
     else if (count==0) {
-	ch->send_to( "Нет подсказки по данному слову.\n\r");
+	ch->send_to( "п²п╣я┌ п©п╬п╢я│п╨п╟п╥п╨п╦ п©п╬ п╢п╟п╫п╫п╬п╪я┐ я│п╩п╬п╡я┐.\n\r");
 	bugTracker->reportNohelp( ch, origArgument.c_str( ) );
     }
     else if (count > 1) {
-        buf << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." << endl;
+        buf << "п■п╩я▐ п╡я▀п╠п╬я─п╟ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬пЁп╬ я─п╟п╥п╢п╣п╩п╟ п╦я│п©п╬п╩я▄п╥я┐п╧ {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x п╦ я┌п╟п╨ п╢п╟п╩п╣п╣." << endl;
         ch->send_to(buf.str().c_str());
     }
 }                  
@@ -2387,11 +2387,11 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
     if (paf->location == APPLY_NONE || paf->modifier == 0)
 	return;
 
-    buf << "Изменяет " << apply_flags.message(paf->location ) 
-	<< " на " << paf->modifier;
+    buf << "п≤п╥п╪п╣п╫я▐п╣я┌ " << apply_flags.message(paf->location ) 
+	<< " п╫п╟ " << paf->modifier;
 
     if (d > -1)
-	buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+	buf << ", п╡ я┌п╣я┤п╣п╫п╦п╦ " << d << " я┤п╟я│" << GET_COUNT(d, "п╟", "п╬п╡", "п╬п╡");
     
     buf << endl;
 
@@ -2400,19 +2400,19 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
     
     switch(paf->where) {
 	case TO_AFFECTS:
-	    buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
+	    buf << "п■п╬п╠п╟п╡п╩я▐п╣я┌ п╟я└я└п╣п╨я┌ " << affect_flags.messages(b ) << endl;
 	    break;
 	case TO_IMMUNE:
-	    buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
+	    buf << "п■п╬п╠п╟п╡п╩я▐п╣я┌ п╦п╪п╪я┐п╫п╦я┌п╣я┌ п╨ " << imm_flags.messages(b ) << endl;
 	    break;
 	case TO_RESIST:
-	    buf << "Добавляет сопротивляемость к " << res_flags.messages(b ) << endl;
+	    buf << "п■п╬п╠п╟п╡п╩я▐п╣я┌ я│п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ п╨ " << res_flags.messages(b ) << endl;
 	    break;
 	case TO_VULN:
-	    buf << "Добавляет уязвимость к " << vuln_flags.messages(b ) << endl;
+	    buf << "п■п╬п╠п╟п╡п╩я▐п╣я┌ я┐я▐п╥п╡п╦п╪п╬я│я┌я▄ п╨ " << vuln_flags.messages(b ) << endl;
 	    break;
 	case TO_DETECTS:
-	    buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
+	    buf << "п■п╬п╠п╟п╡п╩я▐п╣я┌ п╬п╠п╫п╟я─я┐п╤п╣п╫п╦п╣ " << detect_flags.messages(b ) << endl;
 	    break;
     }
 }
@@ -2420,7 +2420,7 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
 void lore_fmt_wear( int type, int wear, ostringstream &buf )
 {
     if (type == ITEM_LIGHT) {
-	buf << "Используется как освещение" << endl;
+	buf << "п≤я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ п╨п╟п╨ п╬я│п╡п╣я┴п╣п╫п╦п╣" << endl;
 	return;
     }
     
@@ -2428,37 +2428,37 @@ void lore_fmt_wear( int type, int wear, ostringstream &buf )
 	return;
 
     if (IS_SET( wear, ITEM_WEAR_FINGER ))
-       buf << "Надевается на палец" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п©п╟п╩п╣я├" << endl;	
     if (IS_SET( wear, ITEM_WEAR_NECK ))
-       buf << "Надевается на шею" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ я┬п╣я▌" << endl;	
     if (IS_SET( wear, ITEM_WEAR_BODY ))
-       buf << "Надевается на тело" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ я┌п╣п╩п╬" << endl;	
     if (IS_SET( wear, ITEM_WEAR_HEAD ))
-       buf << "Надевается на голову" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ пЁп╬п╩п╬п╡я┐" << endl;	
     if (IS_SET( wear, ITEM_WEAR_EARS ))
-       buf << "Надевается в уши" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╡ я┐я┬п╦" << endl;	
     if (IS_SET( wear, ITEM_WEAR_FACE ))
-       buf << "Надевается на лицо" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п╩п╦я├п╬" << endl;	
     if (IS_SET( wear, ITEM_WEAR_FEET ))
-       buf << "Надевается на ступни" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ я│я┌я┐п©п╫п╦" << endl;	
     if (IS_SET( wear, ITEM_WEAR_LEGS ))
-       buf << "Надевается на бедра" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п╠п╣п╢я─п╟" << endl;	
     if (IS_SET( wear, ITEM_WEAR_HANDS ))
-       buf << "Надевается на руки" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ я─я┐п╨п╦" << endl;	
     if (IS_SET( wear, ITEM_WEAR_ARMS ))
-       buf << "Надевается на плечи" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п©п╩п╣я┤п╦" << endl;	
     if (IS_SET( wear, ITEM_WEAR_ABOUT ))
-       buf << "Накидывается вокруг тела" << endl;	
+       buf << "п²п╟п╨п╦п╢я▀п╡п╟п╣я┌я│я▐ п╡п╬п╨я─я┐пЁ я┌п╣п╩п╟" << endl;	
     if (IS_SET( wear, ITEM_WEAR_WAIST ))
-       buf << "Надевается на талию" << endl;	
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ я┌п╟п╩п╦я▌" << endl;	
     if (IS_SET( wear, ITEM_WEAR_WRIST ))
-       buf << "Надевается на запястье" << endl;
+       buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п╥п╟п©я▐я│я┌я▄п╣" << endl;
     if (IS_SET( wear, ITEM_WEAR_SHIELD ))
-       buf << "Используется как щит" << endl;
+       buf << "п≤я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ п╨п╟п╨ я┴п╦я┌" << endl;
     if (IS_SET( wear, ITEM_WEAR_HORSE ))
-	buf << "Надевается на лошадиную часть" << endl;
+	buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п╩п╬я┬п╟п╢п╦п╫я┐я▌ я┤п╟я│я┌я▄" << endl;
     if (IS_SET( wear, ITEM_WEAR_HOOVES ))
-	buf << "Надевается на копыта" << endl;
+	buf << "п²п╟п╢п╣п╡п╟п╣я┌я│я▐ п╫п╟ п╨п╬п©я▀я┌п╟" << endl;
 }
 
 void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showName )
@@ -2473,44 +2473,44 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     buf << "{W" << obj->getShortDescr( '1' ) << "{x";
     
     if (showName)
-        buf << ", откликается на имена '{W" << obj->getName( ) << "{x'";
+        buf << ", п╬я┌п╨п╩п╦п╨п╟п╣я┌я│я▐ п╫п╟ п╦п╪п╣п╫п╟ '{W" << obj->getName( ) << "{x'";
 
     buf << endl
 	<< "{W" << item_table.message(obj->item_type ) << "{x, "
-	<< "уровня {W" << obj->level << "{x" << endl;
+	<< "я┐я─п╬п╡п╫я▐ {W" << obj->level << "{x" << endl;
 
     if (obj->weight > 10)
-	buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
+	buf << "п╡п╣я│п╦я┌ {W" << obj->weight / 10 << "{x я└я┐п╫" << GET_COUNT(obj->weight/10, "я┌", "я┌п╟", "я┌п╬п╡"); 
     else
-	buf << "ничего не весит";
+	buf << "п╫п╦я┤п╣пЁп╬ п╫п╣ п╡п╣я│п╦я┌";
 
     if (IS_SET(obj->extra_flags, ITEM_NOIDENT)) {
-	buf << endl << "Более про эту вещь невозможно ничего сказать." << endl;
+	buf << endl << "п▒п╬п╩п╣п╣ п©я─п╬ я█я┌я┐ п╡п╣я┴я▄ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╫п╦я┤п╣пЁп╬ я│п╨п╟п╥п╟я┌я▄." << endl;
 	return;
     }
     
     buf << ", ";
     
     if (obj->cost)
-	buf << "стоит {W" << obj->cost << "{x серебра";
+	buf << "я│я┌п╬п╦я┌ {W" << obj->cost << "{x я│п╣я─п╣п╠я─п╟";
     else
-	buf << "ничего не стоит";
+	buf << "п╫п╦я┤п╣пЁп╬ п╫п╣ я│я┌п╬п╦я┌";
    
-    // XXX 'изготовлено из' + падежи
+    // XXX 'п╦п╥пЁп╬я┌п╬п╡п╩п╣п╫п╬ п╦п╥' + п©п╟п╢п╣п╤п╦
     mat = obj->getMaterial( );
     if (mat && strcmp( mat, "none" ) && strcmp( mat, "oldstyle" ))
-	buf << ", материал {W" << mat << "{x";
+	buf << ", п╪п╟я┌п╣я─п╦п╟п╩ {W" << mat << "{x";
     
     buf << endl;
     
     bitstring_t extra = obj->extra_flags;
     REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
     if (extra)
-	buf << "Особые свойства: " << extra_flags.messages(extra, true ) << endl;
+	buf << "п·я│п╬п╠я▀п╣ я│п╡п╬п╧я│я┌п╡п╟: " << extra_flags.messages(extra, true ) << endl;
 
     lim = obj->pIndexData->limit;
     if (lim != -1 && lim < 100)
-	buf << "Таких вещей в мире может быть не более {W" << lim << "{x!" << endl;
+	buf << "п╒п╟п╨п╦я┘ п╡п╣я┴п╣п╧ п╡ п╪п╦я─п╣ п╪п╬п╤п╣я┌ п╠я▀я┌я▄ п╫п╣ п╠п╬п╩п╣п╣ {W" << lim << "{x!" << endl;
 
     switch (obj->item_type) {
     case ITEM_KEY:
@@ -2518,37 +2518,37 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 	    keyhole->doLore( buf );
 	break;
     case ITEM_KEYRING:
-	buf << "Нанизано " << obj->value[1] << " ключей из возможных " << obj->value[0] << "." << endl;
+	buf << "п²п╟п╫п╦п╥п╟п╫п╬ " << obj->value[1] << " п╨п╩я▌я┤п╣п╧ п╦п╥ п╡п╬п╥п╪п╬п╤п╫я▀я┘ " << obj->value[0] << "." << endl;
 	break;
     case ITEM_LOCKPICK:
 	if (obj->value[0] == Keyhole::LOCK_VALUE_BLANK) {
-	    buf << "Это заготовка для ключа или отмычки." << endl;
+	    buf << "п╜я┌п╬ п╥п╟пЁп╬я┌п╬п╡п╨п╟ п╢п╩я▐ п╨п╩я▌я┤п╟ п╦п╩п╦ п╬я┌п╪я▀я┤п╨п╦." << endl;
 	}
 	else {
 	    if (obj->value[0] == Keyhole::LOCK_VALUE_MULTI)
-		buf << "Открывает любой замок. ";
+		buf << "п·я┌п╨я─я▀п╡п╟п╣я┌ п╩я▌п╠п╬п╧ п╥п╟п╪п╬п╨. ";
 	    else
-		buf << "Открывает один из видов замков. ";
+		buf << "п·я┌п╨я─я▀п╡п╟п╣я┌ п╬п╢п╦п╫ п╦п╥ п╡п╦п╢п╬п╡ п╥п╟п╪п╨п╬п╡. ";
 	    
-	    buf << "Отмычка " 
+	    buf << "п·я┌п╪я▀я┤п╨п╟ " 
 		<< quality_percent( obj->value[1] ).colourStrip( ).ruscase( '2' ) 
-		<< " качества." << endl;
+		<< " п╨п╟я┤п╣я│я┌п╡п╟." << endl;
 	}
 	break;
     case ITEM_SPELLBOOK:
-	buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
-            << "Максимальное качество заклинаний в книге: " << obj->value[2] << "." << endl;
+	buf << "п▓я│п╣пЁп╬ я│я┌я─п╟п╫п╦я├: " << obj->value[0] << ", п╦п╥ п╫п╦я┘ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╬: " << obj->value[1] << "." << endl
+            << "п°п╟п╨я│п╦п╪п╟п╩я▄п╫п╬п╣ п╨п╟я┤п╣я│я┌п╡п╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧ п╡ п╨п╫п╦пЁп╣: " << obj->value[2] << "." << endl;
 	break;
 
     case ITEM_TEXTBOOK:
-	buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
-            << "Максимальное качество записей в учебнике: " << obj->value[2] << "." << endl;
+	buf << "п▓я│п╣пЁп╬ я│я┌я─п╟п╫п╦я├: " << obj->value[0] << ", п╦п╥ п╫п╦я┘ п╦я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╬: " << obj->value[1] << "." << endl
+            << "п°п╟п╨я│п╦п╪п╟п╩я▄п╫п╬п╣ п╨п╟я┤п╣я│я┌п╡п╬ п╥п╟п©п╦я│п╣п╧ п╡ я┐я┤п╣п╠п╫п╦п╨п╣: " << obj->value[2] << "." << endl;
 	break;
 
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-	buf << "Заклинания " << obj->value[0] << " уровня:";
+	buf << "п≈п╟п╨п╩п╦п╫п╟п╫п╦я▐ " << obj->value[0] << " я┐я─п╬п╡п╫я▐:";
 
 	for (int i = 1; i <= 4; i++) 
 	    if (( skill = SkillManager::getThis( )->find( obj->value[i] ) ))
@@ -2560,8 +2560,8 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     case ITEM_WAND:
     case ITEM_STAFF:
-	buf << "Имеет " << obj->value[2] << " заклинани" << GET_COUNT(obj->value[2], "е", "я", "й") << " " 
-	    << obj->value[0] << " уровня:";
+	buf << "п≤п╪п╣п╣я┌ " << obj->value[2] << " п╥п╟п╨п╩п╦п╫п╟п╫п╦" << GET_COUNT(obj->value[2], "п╣", "я▐", "п╧") << " " 
+	    << obj->value[0] << " я┐я─п╬п╡п╫я▐:";
 	
 	if (( skill = SkillManager::getThis( )->find( obj->value[3] ) ))
 	    if (skill->getIndex( ) != gsn_none)
@@ -2572,40 +2572,40 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     case ITEM_DRINK_CON:
 	liquid = liquidManager->find( obj->value[2] );
-	buf << "Содержит " 
+	buf << "п║п╬п╢п╣я─п╤п╦я┌ " 
 	    << liquid->getShortDescr( ).ruscase( '4' ) << " "
 	    << liquid->getColor( ).ruscase( '2' ) 
-	    << " цвета." << endl;
+	    << " я├п╡п╣я┌п╟." << endl;
         break;
 
     case ITEM_CONTAINER:
-	buf << "Вместительность: " << obj->value[0] << "  "
-	    << "Максим. вес: " << obj->value[3] << " фун" << GET_COUNT(obj->value[3], "т", "та", "тов") << " ";
+	buf << "п▓п╪п╣я│я┌п╦я┌п╣п╩я▄п╫п╬я│я┌я▄: " << obj->value[0] << "  "
+	    << "п°п╟п╨я│п╦п╪. п╡п╣я│: " << obj->value[3] << " я└я┐п╫" << GET_COUNT(obj->value[3], "я┌", "я┌п╟", "я┌п╬п╡") << " ";
 	
 	if (obj->value[4] != 100)
-	    buf << " Коэф. снижения веса: " << obj->value[4] << "%";
+	    buf << " п п╬я█я└. я│п╫п╦п╤п╣п╫п╦я▐ п╡п╣я│п╟: " << obj->value[4] << "%";
 	    
 	if (obj->value[1])
-	    buf << endl << "Особенности: " << container_flags.messages(obj->value[1], true );
+	    buf << endl << "п·я│п╬п╠п╣п╫п╫п╬я│я┌п╦: " << container_flags.messages(obj->value[1], true );
 	
 	buf << endl;
 	break;
 
     case ITEM_WEAPON:
-	buf << "Тип оружия: " 
+	buf << "п╒п╦п© п╬я─я┐п╤п╦я▐: " 
 	    << weapon_class.message(obj->value[0] ) << " "
 	    << "(" << weapon_class.name( obj->value[0] ) << "), ";
 	
-	buf << "повреждения " << obj->value[1] << "d" << obj->value[2] << " "
-	    << "(среднее " << (1 + obj->value[2]) * obj->value[1] / 2 << ")" << endl;
+	buf << "п©п╬п╡я─п╣п╤п╢п╣п╫п╦я▐ " << obj->value[1] << "d" << obj->value[2] << " "
+	    << "(я│я─п╣п╢п╫п╣п╣ " << (1 + obj->value[2]) * obj->value[1] / 2 << ")" << endl;
     
         if (obj->value[4])  /* weapon flags */
-            buf << "Особенности оружия: " << weapon_type2.messages(obj->value[4], true ) << endl;
+            buf << "п·я│п╬п╠п╣п╫п╫п╬я│я┌п╦ п╬я─я┐п╤п╦я▐: " << weapon_type2.messages(obj->value[4], true ) << endl;
 
 	break;
 
     case ITEM_ARMOR:
-	buf << "Класс брони: ";
+	buf << "п п╩п╟я│я│ п╠я─п╬п╫п╦: ";
 
 	for (int i = 0; i <= 3; i++)
 	    buf << obj->value[i] << " " << ac_type.message(i )

@@ -157,7 +157,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 	if (number_percent( ) >= chance)
 	    return;
 	    
-	act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
+	act_p("{Gп╒п╣п©п╣я─я▄ я┌я▀ пЁп╬я─п╟п╥п╢п╬ п╩я┐я┤я┬п╣ п╡п╩п╟п╢п╣п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬п╪ '$t'!{x",
 		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
 	    
 	data.learned++;
@@ -173,7 +173,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 	if (number_percent( ) >= chance)
 	    return;
 
-	act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
+	act_p("{Gп╒я▀ я┐я┤п╦я┬я▄я│я▐ п╫п╟ я│п╡п╬п╦я┘ п╬я┬п╦п╠п╨п╟я┘, п╦ я┌п╡п╬п╣ я┐п╪п╣п╫п╦п╣ '$t' я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡я┐п╣я┌я│я▐.{x",
 		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
 	
 	data.learned += number_range( 1, wis_mod );
@@ -187,7 +187,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 	xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-	act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
+	act_p("{Wп╒п╣п©п╣я─я▄ я┌я▀ {Cп╪п╟я│я┌п╣я─я│п╨п╦{W п╡п╩п╟п╢п╣п╣я┬я▄ п╦я│п╨я┐я│я│я┌п╡п╬п╪ {C$t{W!{x",
 	      pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
 	
 	xp += 98 * getRating( pch );

@@ -21,7 +21,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Чтение времени с помощью flex
+ * @short п╖я┌п╣п╫п╦п╣ п╡я─п╣п╪п╣п╫п╦ я│ п©п╬п╪п╬я┴я▄я▌ flex
  */
 class DateParser : public yyFlexLexer, public virtual DLObject
 {

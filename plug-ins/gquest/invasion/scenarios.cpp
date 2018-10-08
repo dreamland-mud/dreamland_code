@@ -137,7 +137,7 @@ void InvasionBubblesMob::actDeath( Character *killer )
     else
 	sprintf(buf, "{x");
    
-    strcat(buf+strlen(buf), "(*)!(*)!(*) şğïë !!! (*)!(*)!(*){x\r\n");
+    strcat(buf+strlen(buf), "(*)!(*)!(*) Ğ§ĞŸĞĞš !!! (*)!(*)!(*){x\r\n");
     
     for (d = descriptor_list; d != 0; d = d->next) 
 	if (d->connected == CON_PLAYING && d->character)

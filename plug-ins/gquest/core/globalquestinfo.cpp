@@ -189,12 +189,12 @@ bool GlobalQuestInfo::Config::parseLevels( DLString &arguments, ostringstream &b
 	maxLevel = arguments.getOneArgument( ).toInt( );
 	
 	if (minLevel > maxLevel) {
-	    buf << "Уровни не в том порядке." << endl;
+	    buf << "пёя─п╬п╡п╫п╦ п╫п╣ п╡ я┌п╬п╪ п©п╬я─я▐п╢п╨п╣." << endl;
 	    return false;
 	}
     
     } catch (const ExceptionBadType &e) {
-	buf << "Неправильный диапазон уровней." << endl;
+	buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╢п╦п╟п©п╟п╥п╬п╫ я┐я─п╬п╡п╫п╣п╧." << endl;
 	return false;
     }
     return true;
@@ -207,7 +207,7 @@ bool GlobalQuestInfo::Config::parsePlayerCount( DLString &arguments, int default
         else 
             playerCnt = defaultValue;
     } catch (const ExceptionBadType &e) {
-	buf << "Неправильное кол-во игроков." << endl;
+	buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╨п╬п╩-п╡п╬ п╦пЁя─п╬п╨п╬п╡." << endl;
 	return false;
     }
     return true;
@@ -221,7 +221,7 @@ bool GlobalQuestInfo::Config::parseTime( DLString &arguments, int defaultValue, 
 	    time = defaultValue; 
 	
     } catch (const ExceptionBadType &e) {
-	buf << "Неправильное время." << endl;
+	buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╡я─п╣п╪я▐." << endl;
 	return false;
     }
     return true;

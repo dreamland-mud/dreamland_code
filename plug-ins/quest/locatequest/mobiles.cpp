@@ -69,24 +69,24 @@ void LocateCustomer::givenBad( PCharacter *hero, Object *obj )
 
 void LocateCustomer::deadFromIdiot( PCMemoryInterface *pcm )
 {
-    act("{YôÙ ÐÒÉÎÅ$gÓÌÏ|Ó|ÓÌÁ $C3 ÓÍÅÒÔØ, Á ÔÅÂÑ ÐÒÏÓÉÌÉ ÐÒÉÎÅÓÔÉ ËÏÅ-ÞÔÏ ÄÒÕÇÏÅ.{x", pcm->getPlayer( ), 0, ch, TO_CHAR);
+    act("{YÐ¢Ñ‹ Ð¿Ñ€Ð¸Ð½Ðµ$gÑÐ»Ð¾|Ñ|ÑÐ»Ð° $C3 ÑÐ¼ÐµÑ€Ñ‚ÑŒ, Ð° Ñ‚ÐµÐ±Ñ Ð¿Ñ€Ð¾ÑÐ¸Ð»Ð¸ Ð¿Ñ€Ð¸Ð½ÐµÑÑ‚Ð¸ ÐºÐ¾Ðµ-Ñ‡Ñ‚Ð¾ Ð´Ñ€ÑƒÐ³Ð¾Ðµ.{x", pcm->getPlayer( ), 0, ch, TO_CHAR);
 }
 
 void LocateCustomer::deadFromSuicide( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) 
-	act_p("{Y$c1 ×ÎÅÚÁÐÎÏ ÓËÏÎÞÁÌ$gÏÓØ|ÓÑ|ÁÓØ. úÁÄÁÎÉÅ ÏÔÍÅÎÑÅÔÓÑ.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+	act_p("{Y$c1 Ð²Ð½ÐµÐ·Ð°Ð¿Ð½Ð¾ ÑÐºÐ¾Ð½Ñ‡Ð°Ð»$gÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ. Ð—Ð°Ð´Ð°Ð½Ð¸Ðµ Ð¾Ñ‚Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ.{x", ch, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void LocateCustomer::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-	act_p("{Y$c1 ÐÏÄÌÏ ÕÂÉ$gÌÏ|Ì|ÌÁ ÔÏÇÏ, ËÔÏ ÎÕÖÄÁÌÓÑ × Ô×ÏÅÊ ÐÏÍÏÝÉ.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
+	act_p("{Y$c1 Ð¿Ð¾Ð´Ð»Ð¾ ÑƒÐ±Ð¸$gÐ»Ð¾|Ð»|Ð»Ð° Ñ‚Ð¾Ð³Ð¾, ÐºÑ‚Ð¾ Ð½ÑƒÐ¶Ð´Ð°Ð»ÑÑ Ð² Ñ‚Ð²Ð¾ÐµÐ¹ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸.{x", killer, 0, pcm->getPlayer( ), TO_VICT, POS_DEAD);
 }
 
 void LocateCustomer::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ) && getQuest( ) && !quest->isComplete( )) 
-	buf << "{x({YöÄÅÔ ËÏÇÏ-ÔÏ{x) ";
+	buf << "{x({YÐ–Ð´ÐµÑ‚ ÐºÐ¾Ð³Ð¾-Ñ‚Ð¾{x) ";
 }
 

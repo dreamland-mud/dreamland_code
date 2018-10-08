@@ -69,7 +69,7 @@ SKILL_RUNP( searchstones )
     int chance, count, mlevel;
     
     if (!gsn_search_stones->usable( ch )) {
-	ch->println("Ты не умеешь это делать.");
+	ch->println("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ я█я┌п╬ п╢п╣п╩п╟я┌я▄.");
 	return;
     }
     
@@ -84,7 +84,7 @@ SKILL_RUNP( searchstones )
     }
     
     if (number_percent( ) > gsn_search_stones->getEffective( ch ) * chance / 100) {
-	ch->println("Тебе не удалось отыскать ни одного камня.");
+	ch->println("п╒п╣п╠п╣ п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╬я┌я▀я│п╨п╟я┌я▄ п╫п╦ п╬п╢п╫п╬пЁп╬ п╨п╟п╪п╫я▐.");
 
 	if (number_percent( ) < chance)
 	    gsn_search_stones->improve( ch, false );
@@ -93,7 +93,7 @@ SKILL_RUNP( searchstones )
     }
 
     if (ch->mana < gsn_search_stones->getMana( )) {
-	ch->println( "У тебя не хватает энергии для поиска." );
+	ch->println( "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ я█п╫п╣я─пЁп╦п╦ п╢п╩я▐ п©п╬п╦я│п╨п╟." );
 	return;
     }
 
@@ -103,14 +103,14 @@ SKILL_RUNP( searchstones )
     mlevel = ch->getModifyLevel( );
     count = number_range( 1, mlevel / 20 );
 
-    act( "Ты подбираешь с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
-    act( "$c1 подбирает с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
+    act( "п╒я▀ п©п╬п╢п╠п╦я─п╟п╣я┬я▄ я│ п╥п╣п╪п╩п╦ $t.", ch, (count == 1 ? "п╨п╟п╪п╣п╫я▄" : "п╫п╣я│п╨п╬п╩я▄п╨п╬ п╨п╟п╪п╫п╣п╧"), 0, TO_CHAR );
+    act( "$c1 п©п╬п╢п╠п╦я─п╟п╣я┌ я│ п╥п╣п╪п╩п╦ $t.", ch, (count == 1 ? "п╨п╟п╪п╣п╫я▄" : "п╫п╣я│п╨п╬п╩я▄п╨п╬ п╨п╟п╪п╫п╣п╧"), 0, TO_ROOM );
     
     for (int i = 0; i < count; i++) {
 	stone = create_stone( mlevel );
 
 	if (ch->getCarryWeight( ) + stone->getWeight( ) > ch->canCarryWeight( )) {
-	    ch->pecho( "Ты не в силах удержать %1$O4 и роняешь %1$P2.", stone );
+	    ch->pecho( "п╒я▀ п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ %1$O4 п╦ я─п╬п╫я▐п╣я┬я▄ %1$P2.", stone );
 	    obj_to_room( stone, ch->in_room );
 	    break;
 	}
@@ -135,7 +135,7 @@ SKILL_RUNP( throwstone )
     DLString args = argument, arg1, arg2;
 
     if (chance <= 1) {
-	ch->println("Ты не умеешь швыряться камнями.");
+	ch->println("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ я┬п╡я▀я─я▐я┌я▄я│я▐ п╨п╟п╪п╫я▐п╪п╦.");
 	return;
     }
     
@@ -143,14 +143,14 @@ SKILL_RUNP( throwstone )
     arg2 = args.getOneArgument( );
 
     if (arg1.empty( ) || arg2.empty( )) {
-	ch->println("Швырнуть камень куда и в кого?");
+	ch->println("п╗п╡я▀я─п╫я┐я┌я▄ п╨п╟п╪п╣п╫я▄ п╨я┐п╢п╟ п╦ п╡ п╨п╬пЁп╬?");
 	return;
     }
 
     direction = direction_lookup( arg1.c_str( ) );
 
     if (direction < 0) {
-	ch->println("Швырнуть в каком направлении?");
+	ch->println("п╗п╡я▀я─п╫я┐я┌я▄ п╡ п╨п╟п╨п╬п╪ п╫п╟п©я─п╟п╡п╩п╣п╫п╦п╦?");
 	return;
     }
 
@@ -162,22 +162,22 @@ SKILL_RUNP( throwstone )
 	return;
 
     if (scanRange0 - scanRange > throwRange) {
-	ch->println("Жертва стоит слишком далеко.");
+	ch->println("п√п╣я─я┌п╡п╟ я│я┌п╬п╦я┌ я│п╩п╦я┬п╨п╬п╪ п╢п╟п╩п╣п╨п╬.");
 	return;
     }
 
     if (victim == ch) {
-	ch->println("Просто ударь себя этим камнем по лбу.");
+	ch->println("п÷я─п╬я│я┌п╬ я┐п╢п╟я─я▄ я│п╣п╠я▐ я█я┌п╦п╪ п╨п╟п╪п╫п╣п╪ п©п╬ п╩п╠я┐.");
 	return;
     }
 
     if (is_safe_nomessage( ch, victim )) {
-	act( "Боги покровительствуют $C3.", ch, 0, victim, TO_CHAR);
+	act( "п▒п╬пЁп╦ п©п╬п╨я─п╬п╡п╦я┌п╣п╩я▄я│я┌п╡я┐я▌я┌ $C3.", ch, 0, victim, TO_CHAR);
 	return;
     }
 
     if (ch->in_room == victim->in_room) {
-	ch->println("Ты не можешь швыряться камнями в упор.");
+	ch->println("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┬п╡я▀я─я▐я┌я▄я│я▐ п╨п╟п╪п╫я▐п╪п╦ п╡ я┐п©п╬я─.");
 	return;
     }
 
@@ -185,19 +185,19 @@ SKILL_RUNP( throwstone )
 	|| stone->item_type != ITEM_WEAPON
 	|| stone->value[0] != WEAPON_STONE)
     {
-	ch->println("Возьми в руку камень!");
+	ch->println("п▓п╬п╥я▄п╪п╦ п╡ я─я┐п╨я┐ п╨п╟п╪п╣п╫я▄!");
 	return;
     }
 /*
     if (get_eq_char(ch, wear_wield)) {
-	ch->println("Твоя вторая рука дожна быть свободна!");
+	ch->println("п╒п╡п╬я▐ п╡я┌п╬я─п╟я▐ я─я┐п╨п╟ п╢п╬п╤п╫п╟ п╠я▀я┌я▄ я│п╡п╬п╠п╬п╢п╫п╟!");
 	return;    	
     }
 */
     ch->setWait( gsn_throw_stone->getBeats( ) );
     set_violent( ch, victim, false );
-    act( "Ты швыряешь $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
-    act( "$c1 швыряет $o4 $T.", ch, stone, dirs[ direction ].leave, TO_ROOM );
+    act( "п╒я▀ я┬п╡я▀я─я▐п╣я┬я▄ $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
+    act( "$c1 я┬п╡я▀я─я▐п╣я┌ $o4 $T.", ch, stone, dirs[ direction ].leave, TO_ROOM );
 
     if (victim->position == POS_SLEEPING)
 	chance += 40;

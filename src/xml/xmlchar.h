@@ -14,12 +14,12 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная char
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ char
  */
 class XMLChar : public Char
 {
 public:
-	/** По умолчанию значение \0 */
+	/** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ \0 */
 	inline XMLChar( ) : Char( )
 	{
 	}
@@ -33,9 +33,9 @@ public:
 	{
 	}
 	
-	/** Возвращает xml представление переменной */
+	/** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
 	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
+	/** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
 	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
@@ -43,7 +43,7 @@ public:
 
 
 
-/** Вывод в ostream типа XMLChar */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLChar */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLChar& xmlChar )
 {
 	ostr << xmlChar.getValue( );

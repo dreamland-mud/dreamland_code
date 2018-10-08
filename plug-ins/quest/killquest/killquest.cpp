@@ -70,23 +70,23 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
 		 victim->getRealLevel( ), 
 		 mode.getValue( ) );
 
-    tell_raw( pch, questman, "ı Õ≈Œ— ≈”‘ÿ ƒÃ— ‘≈¬— ”“œﬁŒœ≈ –œ“’ﬁ≈Œ…≈!" );
+    tell_raw( pch, questman, "–£ –º–µ–Ω—è –µ—Å—Ç—å –¥–ª—è —Ç–µ–±—è —Å—Ä–æ—á–Ω–æ–µ –ø–æ—Ä—É—á–µ–Ω–∏–µ!" );
 
     if (IS_GOOD( pch ))	{	
-	tell_raw( pch, questman, "Û–œÀœ ”‘◊…≈ Œ¡€≈«œ Ì…“¡ ¬ŸÃœ Œ¡“’€≈Œœ!" );
-	tell_fmt( "Ò –œ“’ﬁ¡¿ ‘≈¬≈ Œ¡À¡⁄¡‘ÿ {W%3$#C4{G, ”œ◊≈“€…◊€%3$G≈≈|≈«œ|’¿ ÕŒœ÷≈”‘◊œ ⁄Ãœƒ≈—Œ… .", pch, questman, victim );
+	tell_raw( pch, questman, "–°–ø–æ–∫–æ–π—Å—Ç–≤–∏–µ –Ω–∞—à–µ–≥–æ –ú–∏—Ä–∞ –±—ã–ª–æ –Ω–∞—Ä—É—à–µ–Ω–æ!" );
+	tell_fmt( "–Ø –ø–æ—Ä—É—á–∞—é —Ç–µ–±–µ –Ω–∞–∫–∞–∑–∞—Ç—å {W%3$#C4{G, —Å–æ–≤–µ—Ä—à–∏–≤—à%3$G–µ–µ|–µ–≥–æ|—É—é –º–Ω–æ–∂–µ—Å—Ç–≤–æ –∑–ª–æ–¥–µ—è–Ω–∏–π.", pch, questman, victim );
     }
     else if (IS_EVIL( pch )) {
-	tell_fmt( "Ù≈ÕŒŸ≈ ”…ÃŸ Œ¡€≈«œ Ì…“¡ œ”Ã¡¬Ã≈ŒŸ ƒ≈ ”‘◊…—Õ… {W%3$#C2{G.", pch, questman,victim );
-	tell_fmt( "Ù≈¬≈ –œ“’ﬁ¡≈‘”— ’¬…‘ÿ %3$P2!",  pch, questman, victim );
+	tell_fmt( "–¢–µ–º–Ω—ã–µ —Å–∏–ª—ã –Ω–∞—à–µ–≥–æ –ú–∏—Ä–∞ –æ—Å–ª–∞–±–ª–µ–Ω—ã –¥–µ–π—Å—Ç–≤–∏—è–º–∏ {W%3$#C2{G.", pch, questman,victim );
+	tell_fmt( "–¢–µ–±–µ –ø–æ—Ä—É—á–∞–µ—Ç—Å—è —É–±–∏—Ç—å %3$P2!",  pch, questman, victim );
     } else {
-	tell_raw( pch, questman, "Ú¡◊Œœ◊≈”…≈ Œ¡€≈«œ Ì…“¡ ¬ŸÃœ Œ¡“’€≈Œœ!");
-	tell_fmt( "˜ ‹‘œÕ ◊…Œœ◊%3$GŒœ|≈Œ|Œ¡ {W%3$#C1{G, — –œ“’ﬁ¡¿ ‘≈¬≈ Œ¡À¡⁄¡‘ÿ %3$P2.",  pch, questman, victim );
+	tell_raw( pch, questman, "–†–∞–≤–Ω–æ–≤–µ—Å–∏–µ –Ω–∞—à–µ–≥–æ –ú–∏—Ä–∞ –±—ã–ª–æ –Ω–∞—Ä—É—à–µ–Ω–æ!");
+	tell_fmt( "–í —ç—Ç–æ–º –≤–∏–Ω–æ–≤%3$G–Ω–æ|–µ–Ω|–Ω–∞ {W%3$#C1{G, —è –ø–æ—Ä—É—á–∞—é —Ç–µ–±–µ –Ω–∞–∫–∞–∑–∞—Ç—å %3$P2.",  pch, questman, victim );
     }
 
-    tell_fmt( "Ì≈”‘œ, «ƒ≈ %3$P2 ◊…ƒ≈Ã… ◊ –œ”Ã≈ƒŒ…  “¡⁄ - {W%4$s{G!",  pch, questman, victim, pRoom->name );
-    tell_fmt( "¸‘œ Œ¡»œƒ…‘”— ◊ “¡ œŒ≈ –œƒ Œ¡⁄◊¡Œ…≈Õ {W%3$s{G.",  pch, questman, pRoom->area->name );
-    tell_fmt( "ı ‘≈¬— ≈”‘ÿ {Y%3$d{G Õ…Œ’%3$I‘¡|‘Ÿ|‘ Œ¡ ◊Ÿ–œÃŒ≈Œ…≈ ⁄¡ƒ¡Œ…—.",  pch, questman, time );
+    tell_fmt( "–ú–µ—Å—Ç–æ, –≥–¥–µ %3$P2 –≤–∏–¥–µ–ª–∏ –≤ –ø–æ—Å–ª–µ–¥–Ω–∏–π —Ä–∞–∑ - {W%4$s{G!",  pch, questman, victim, pRoom->name );
+    tell_fmt( "–≠—Ç–æ –Ω–∞—Ö–æ–¥–∏—Ç—Å—è –≤ —Ä–∞–π–æ–Ω–µ –ø–æ–¥ –Ω–∞–∑–≤–∞–Ω–∏–µ–º {W%3$s{G.",  pch, questman, pRoom->area->name );
+    tell_fmt( "–£ —Ç–µ–±—è –µ—Å—Ç—å {Y%3$d{G –º–∏–Ω—É%3$I—Ç–∞|—Ç—ã|—Ç –Ω–∞ –≤—ã–ø–æ–ª–Ω–µ–Ω–∏–µ –∑–∞–¥–∞–Ω–∏—è.",  pch, questman, time );
 }
 
 void KillQuest::destroy( ) 
@@ -155,20 +155,20 @@ Quest::Reward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman 
 void KillQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "Ù◊œ≈ ⁄¡ƒ¡Œ…≈ {Y˜˘ÔÏÓÂÓÔ{x!" << endl
-	    << "˜≈“Œ…”ÿ ⁄¡ ◊œ⁄Œ¡«“¡÷ƒ≈Œ…≈Õ, ƒœ ‘œ«œ À¡À ◊Ÿ ƒ≈‘ ◊“≈Õ—!" << endl;
+	buf << "–¢–≤–æ–µ –∑–∞–¥–∞–Ω–∏–µ {Y–í–´–ü–û–õ–ù–ï–ù–û{x!" << endl
+	    << "–í–µ—Ä–Ω–∏—Å—å –∑–∞ –≤–æ–∑–Ω–∞–≥—Ä–∞–∂–¥–µ–Ω–∏–µ–º, –¥–æ —Ç–æ–≥–æ –∫–∞–∫ –≤—ã–π–¥–µ—Ç –≤—Ä–µ–º—è!" << endl;
     else 
-	buf << "ı ‘≈¬— ⁄¡ƒ¡Œ…≈ - ’Œ…ﬁ‘œ÷…‘ÿ " << russian_case( mobName, '4' ) << "!" << endl
-	    << "Ì≈”‘œ, «ƒ≈ ÷≈“‘◊’ ◊…ƒ≈Ã… ◊ –œ”Ã≈ƒŒ…  “¡⁄ - " << roomName << endl
-	    << "¸‘œ Œ¡»œƒ…‘”— ◊ “¡ œŒ≈ –œƒ Œ¡⁄◊¡Œ…≈Õ " << areaName << "." << endl;
+	buf << "–£ —Ç–µ–±—è –∑–∞–¥–∞–Ω–∏–µ - —É–Ω–∏—á—Ç–æ–∂–∏—Ç—å " << russian_case( mobName, '4' ) << "!" << endl
+	    << "–ú–µ—Å—Ç–æ, –≥–¥–µ –∂–µ—Ä—Ç–≤—É –≤–∏–¥–µ–ª–∏ –≤ –ø–æ—Å–ª–µ–¥–Ω–∏–π —Ä–∞–∑ - " << roomName << endl
+	    << "–≠—Ç–æ –Ω–∞—Ö–æ–¥–∏—Ç—Å—è –≤ —Ä–∞–π–æ–Ω–µ –ø–æ–¥ –Ω–∞–∑–≤–∞–Ω–∏–µ–º " << areaName << "." << endl;
 }
 
 void KillQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "˜≈“Œ’‘ÿ”— À À◊≈”‘œ“’ ⁄¡ Œ¡«“¡ƒœ .";
+	buf << "–í–µ—Ä–Ω—É—Ç—å—Å—è –∫ –∫–≤–µ—Å—Ç–æ—Ä—É –∑–∞ –Ω–∞–≥—Ä–∞–¥–æ–π.";
     else 
-        buf << "ıŒ…ﬁ‘œ÷…‘ÿ " << russian_case( mobName, '4' ) << " …⁄ "
+        buf << "–£–Ω–∏—á—Ç–æ–∂–∏—Ç—å " << russian_case( mobName, '4' ) << " –∏–∑ "
             << roomName << " (" << areaName << ").";
 }
 

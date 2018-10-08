@@ -43,7 +43,7 @@ bool BadSpellWE::run( PCharacter *ch, Character *victim ) const
 
     int i;
     
-    act( "{CСила древних проклятий проникает в мир.{x", ch, 0, 0, TO_ALL );
+    act( "{Cп║п╦п╩п╟ п╢я─п╣п╡п╫п╦я┘ п©я─п╬п╨п╩я▐я┌п╦п╧ п©я─п╬п╫п╦п╨п╟п╣я┌ п╡ п╪п╦я─.{x", ch, 0, 0, TO_ALL );
 
     if (is_safe( ch, victim ))
 	return true;
@@ -69,8 +69,8 @@ bool InspirationWE::run( PCharacter *ch, Character *victim ) const
     
     affect_join( victim, &af );
 
-    act( "{CЖажда творить и совершенствовать переполняет тебя.{x", victim, 0, 0, TO_CHAR );
-    act( "{C$c1 выглядит просветленн$gым|ым|ой.{x", victim, 0, 0, TO_ROOM );
+    act( "{Cп√п╟п╤п╢п╟ я┌п╡п╬я─п╦я┌я▄ п╦ я│п╬п╡п╣я─я┬п╣п╫я│я┌п╡п╬п╡п╟я┌я▄ п©п╣я─п╣п©п╬п╩п╫я▐п╣я┌ я┌п╣п╠я▐.{x", victim, 0, 0, TO_CHAR );
+    act( "{C$c1 п╡я▀пЁп╩я▐п╢п╦я┌ п©я─п╬я│п╡п╣я┌п╩п╣п╫п╫$gя▀п╪|я▀п╪|п╬п╧.{x", victim, 0, 0, TO_ROOM );
     return true;
 }
 

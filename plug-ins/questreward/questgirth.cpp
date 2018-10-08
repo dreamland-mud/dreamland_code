@@ -17,7 +17,7 @@
 
 void QuestGirth::wear( Character *ch ) 
 {
-    ch->send_to( "{CÙ◊œ  –œ—” —“Àœ ◊”–Ÿ»…◊¡≈‘.{x\r\n" );
+    ch->send_to( "{C–¢–≤–æ–π –ø–æ—è—Å —è—Ä–∫–æ –≤—Å–ø—ã—Ö–∏–≤–∞–µ—Ç.{x\r\n" );
 }
 
 void QuestGirth::equip( Character *ch ) 

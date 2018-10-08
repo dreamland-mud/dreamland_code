@@ -26,7 +26,7 @@ void HelpFormatter::setup( Character * )
 // *...*     ->  {y...{w                      (bold text)
 // _..._     ->  {D<{w...{D>{w                (italic with <>)
 // =...=     ->  {c...{w                      (header text)
-// (eng,ÒÕÓ) ->  {lEeng{lRÒÕÓ{lx              (language choice)
+// (eng,Ñ€ÑƒÑ) ->  {lEeng{lRÑ€ÑƒÑ{lx              (language choice)
 // [...]     ->  {W...{w                      (reference)
 // %KEYWORD%
 void HelpFormatter::run( Character *ch, ostringstream &out )
@@ -134,26 +134,26 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 }
 
 // %KEYWORD%:
-// H, HELP     ->  {W{lEhelp{lRÓÐÒÁ×ËÁ{lx{w
-// SA, SEEALSO ->  óÍ. ÔÁËÖÅ
-// U, USAGE    ->  éÓÐÏÌØÚÏ×ÁÎÉÅ
-// FMT         ->  {wæÏÒÍÁÔ:{w
+// H, HELP     ->  {W{lEhelp{lRÑÐ¿Ñ€Ð°Ð²ÐºÐ°{lx{w
+// SA, SEEALSO ->  Ð¡Ð¼. Ñ‚Ð°ÐºÐ¶Ðµ
+// U, USAGE    ->  Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ
+// FMT         ->  {wÐ¤Ð¾Ñ€Ð¼Ð°Ñ‚:{w
 // FFF         ->  {w       {w
 // PAUSE       ->  stops help tag parsing
 // RESUME      ->  resumes help tag parsing
 // A           ->  * 
-// CAST        ->  {lEcast{lRËÏÌÄÏ×ÁÔØ{lx
-// OBJ         ->  ÐÒÅÄÍÅÔ
-// CHAR        ->  ÐÅÒÓÏÎÁÖ
-// PLR         ->  ÉÇÒÏË
-// MOB         ->  ÍÏÎÓÔÒ
-// VICT        ->  ÖÅÒÔ×Á
-// DIR         ->  ÎÁÐÒÁ×ÌÅÎÉÅ
-// YES, NO     ->  {lRÄÁ{lEyes{lx, {lRÎÅÔ{lEno{lx
-// ALL         ->  {lR×ÓÅ{lEall{lx
-// SHOW        ->  {lRÐÏËÁÚ{lEshow{lx
-// ON          ->  {lR×ËÌ{lEon{lx
-// OFF         ->  {lR×ÙËÌ{lEoff{lx
+// CAST        ->  {lEcast{lRÐºÐ¾Ð»Ð´Ð¾Ð²Ð°Ñ‚ÑŒ{lx
+// OBJ         ->  Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚
+// CHAR        ->  Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶
+// PLR         ->  Ð¸Ð³Ñ€Ð¾Ðº
+// MOB         ->  Ð¼Ð¾Ð½ÑÑ‚Ñ€
+// VICT        ->  Ð¶ÐµÑ€Ñ‚Ð²Ð°
+// DIR         ->  Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ
+// YES, NO     ->  {lRÐ´Ð°{lEyes{lx, {lRÐ½ÐµÑ‚{lEno{lx
+// ALL         ->  {lRÐ²ÑÐµ{lEall{lx
+// SHOW        ->  {lRÐ¿Ð¾ÐºÐ°Ð·{lEshow{lx
+// ON          ->  {lRÐ²ÐºÐ»{lEon{lx
+// OFF         ->  {lRÐ²Ñ‹ÐºÐ»{lEoff{lx
 bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (kw == "H" || kw == "HELP") {
@@ -167,7 +167,7 @@ bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "FMT") {
-	out << "{wæÏÒÍÁÔ:{w";
+	out << "{wÐ¤Ð¾Ñ€Ð¼Ð°Ñ‚:{w";
 	return true;
     }
 
@@ -177,78 +177,78 @@ bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     }
 
     if (kw == "U" || kw == "USAGE") {
-	out << "éÓÐÏÌØÚÏ×ÁÎÉÅ";
+	out << "Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ";
 	return true;
     }
 
     if (kw == "SA" || kw == "SEEALSO") {
-	out << "óÍ. ÔÁËÖÅ";
+	out << "Ð¡Ð¼. Ñ‚Ð°ÐºÐ¶Ðµ";
 	return true;
     }
 
     if (kw == "CAST") {
-	out << "{lEcast{lRËÏÌÄÏ×ÁÔØ{lx";
+	out << "{lEcast{lRÐºÐ¾Ð»Ð´Ð¾Ð²Ð°Ñ‚ÑŒ{lx";
 	return true;
     }
 
     if (kw == "OBJ") {
-	out << "ÐÒÅÄÍÅÔ";
+	out << "Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚";
 	return true;
     }
 
     if (kw == "CHAR") {
-	out << "ÐÅÒÓÏÎÁÖ";
+	out << "Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶";
 	return true;
     }
 
     if (kw == "PLR") {
-	out << "ÉÇÒÏË";
+	out << "Ð¸Ð³Ñ€Ð¾Ðº";
 	return true;
     }
 
     if (kw == "MOB") {
-	out << "ÍÏÎÓÔÒ";
+	out << "Ð¼Ð¾Ð½ÑÑ‚Ñ€";
 	return true;
     }
 
 
     if (kw == "VICT") {
-	out << "ÖÅÒÔ×Á";
+	out << "Ð¶ÐµÑ€Ñ‚Ð²Ð°";
 	return true;
     }
 
     if (kw == "DIR") {
-	out << "ÎÁÐÒÁ×ÌÅÎÉÅ";
+	out << "Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ";
 	return true;
     }
 
     if (kw == "YES") {
-	out << "{lRÄÁ{lEyes{lx";
+	out << "{lRÐ´Ð°{lEyes{lx";
 	return true;
     }
 
     if (kw == "NO") {
-	out << "{lRÎÅÔ{lEno{lx";
+	out << "{lRÐ½ÐµÑ‚{lEno{lx";
 	return true;
     }
 
     if (kw == "ALL") {
-	out << "{lR×ÓÅ{lEall{lx";
+	out << "{lRÐ²ÑÐµ{lEall{lx";
 	return true;
     }
 
     if (kw == "SHOW") {
-	out << "{lRÐÏËÁÚ{lEshow{lx";
+	out << "{lRÐ¿Ð¾ÐºÐ°Ð·{lEshow{lx";
 	return true;
     }
 
     if (kw == "ON") {
-	out << "{lR×ËÌ{lEon{lx";
+	out << "{lRÐ²ÐºÐ»{lEon{lx";
 	return true;
     }
 
     if (kw == "OFF") {
-	out << "{lR×ÙËÌ{lEoff{lx";
+	out << "{lRÐ²Ñ‹ÐºÐ»{lEoff{lx";
 	return true;
     }
 

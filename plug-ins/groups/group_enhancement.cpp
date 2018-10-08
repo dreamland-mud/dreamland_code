@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 
@@ -45,9 +45,9 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
     if ( victim->isAffected(sn ) )
     {
 	if (victim == ch)
-	  ch->send_to("Ты не можешь быть еще сильнее!\n\r");
+	  ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╠я▀я┌я▄ п╣я┴п╣ я│п╦п╩я▄п╫п╣п╣!\n\r");
 	else
-	  act_p("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR,POS_RESTING);
+	  act_p("$C1 п╫п╣ п╪п╬п╤п╣я┌ п╠я▀я┌я▄ п╣я┴п╣ я│п╦п╩я▄п╫п╣п╣.",ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
 
@@ -57,9 +57,9 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
 	    return;
 	
 	if (victim != ch)
-	    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 
-	victim->send_to("Слабость проходит... но лишь на мгновение.\n\r");
+	victim->send_to("п║п╩п╟п╠п╬я│я┌я▄ п©я─п╬я┘п╬п╢п╦я┌... п╫п╬ п╩п╦я┬я▄ п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣.\n\r");
 	return;
     }
 
@@ -71,8 +71,8 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
     af.modifier  = max(2,level / 10);
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    victim->send_to("Ты становишься намного сильнее!\n\r");
-    act_p("$c1 становится намного сильнее.",
+    victim->send_to("п╒я▀ я│я┌п╟п╫п╬п╡п╦я┬я▄я│я▐ п╫п╟п╪п╫п╬пЁп╬ я│п╦п╩я▄п╫п╣п╣!\n\r");
+    act_p("$c1 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╫п╟п╪п╫п╬пЁп╬ я│п╦п╩я▄п╫п╣п╣.",
            victim,0,0,TO_ROOM,POS_RESTING);
     return;
 
@@ -87,9 +87,9 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     if (victim->isAffected(sn) || IS_QUICK(victim))
     {
 	if (victim == ch)
-	  ch->send_to("Ты не можешь двигаться быстрее, чем сейчас!\n\r");
+	  ch->send_to("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╢п╡п╦пЁп╟я┌я▄я│я▐ п╠я▀я│я┌я─п╣п╣, я┤п╣п╪ я│п╣п╧я┤п╟я│!\n\r");
 	else
-	  act_p("$C1 не может двигаться еще быстрее.",
+	  act_p("$C1 п╫п╣ п╪п╬п╤п╣я┌ п╢п╡п╦пЁп╟я┌я▄я│я▐ п╣я┴п╣ п╠я▀я│я┌я─п╣п╣.",
 	         ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
@@ -100,9 +100,9 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
 	    return;
 	
 	if (victim != ch)
-	    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+	    ch->send_to("п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧.\n\r");
 
-	victim->send_to("Твои движения становятся быстрее... но лишь на мгновение.\n\r");
+	victim->send_to("п╒п╡п╬п╦ п╢п╡п╦п╤п╣п╫п╦я▐ я│я┌п╟п╫п╬п╡я▐я┌я│я▐ п╠я▀я│я┌я─п╣п╣... п╫п╬ п╩п╦я┬я▄ п╫п╟ п╪пЁп╫п╬п╡п╣п╫п╦п╣.\n\r");
 	return;
     }
 
@@ -117,8 +117,8 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = max(2,level / 12 );
     af.bitvector = AFF_HASTE;
     affect_to_char( victim, &af );
-    victim->send_to("Твои движения становятся намного быстрее.\n\r");
-    act_p("Движения $c2 становятся намного быстрее.",
+    victim->send_to("п╒п╡п╬п╦ п╢п╡п╦п╤п╣п╫п╦я▐ я│я┌п╟п╫п╬п╡я▐я┌я│я▐ п╫п╟п╪п╫п╬пЁп╬ п╠я▀я│я┌я─п╣п╣.\n\r");
+    act_p("п■п╡п╦п╤п╣п╫п╦я▐ $c2 я│я┌п╟п╫п╬п╡я▐я┌я│я▐ п╫п╟п╪п╫п╬пЁп╬ п╠я▀я│я┌я─п╣п╣.",
            victim,0,0,TO_ROOM,POS_RESTING);
     if ( ch != victim )
 	ch->send_to("Ok.\n\r");
@@ -138,13 +138,13 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
     if ( IS_AFFECTED(victim, AFF_INFRARED) )
     {
 	if (victim == ch)
-	  ch->send_to("Ты уже видишь в темноте.\n\r");
+	  ch->send_to("п╒я▀ я┐п╤п╣ п╡п╦п╢п╦я┬я▄ п╡ я┌п╣п╪п╫п╬я┌п╣.\n\r");
 	else
-	  act_p("$C1 уже видит в темноте.\n\r",
+	  act_p("$C1 я┐п╤п╣ п╡п╦п╢п╦я┌ п╡ я┌п╣п╪п╫п╬я┌п╣.\n\r",
                  ch,0,victim,TO_CHAR,POS_RESTING);
 	return;
     }
-    act_p( "Глаза $c2 загораются красным светом.\n\r",
+    act_p( "п⌠п╩п╟п╥п╟ $c2 п╥п╟пЁп╬я─п╟я▌я┌я│я▐ п╨я─п╟я│п╫я▀п╪ я│п╡п╣я┌п╬п╪.\n\r",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 
     af.where	 = TO_AFFECTS;
@@ -155,7 +155,7 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
     af.modifier  = 0;
     af.bitvector = AFF_INFRARED;
     affect_to_char( victim, &af );
-    victim->send_to("Твои глаза загораются красным светом.\n\r");
+    victim->send_to("п╒п╡п╬п╦ пЁп╩п╟п╥п╟ п╥п╟пЁп╬я─п╟я▌я┌я│я▐ п╨я─п╟я│п╫я▀п╪ я│п╡п╣я┌п╬п╪.\n\r");
     return;
 
 }
@@ -167,16 +167,16 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
 
     if ( victim->is_npc() )
     {
-        ch->send_to("Ему это не поможет.\n\r");
+        ch->send_to("п∙п╪я┐ я█я┌п╬ п╫п╣ п©п╬п╪п╬п╤п╣я┌.\n\r");
         return;
     }
 
     if( victim->isAffected(gsn_learning) ) 
     {
         if (victim == ch)
-            ch->send_to("Куда уж больше.\n\r");
+            ch->send_to("п я┐п╢п╟ я┐п╤ п╠п╬п╩я▄я┬п╣.\n\r");
         else
-            act_p("$C1 уже учится.\n\r", ch,0,victim,TO_CHAR,POS_RESTING);
+            act_p("$C1 я┐п╤п╣ я┐я┤п╦я┌я│я▐.\n\r", ch,0,victim,TO_CHAR,POS_RESTING);
         return;
   }
 
@@ -189,9 +189,9 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
   af.bitvector	= 0;
   affect_to_char( victim, &af );
     
-  victim->send_to("Ты концентрируешься на учебе.\n\r");
+  victim->send_to("п╒я▀ п╨п╬п╫я├п╣п╫я┌я─п╦я─я┐п╣я┬я▄я│я▐ п╫п╟ я┐я┤п╣п╠п╣.\n\r");
 
   if (ch != victim)
-      act_p("$C1 будет учиться лучше!\n\r", ch,0,victim,TO_CHAR,POS_RESTING);
+      act_p("$C1 п╠я┐п╢п╣я┌ я┐я┤п╦я┌я▄я│я▐ п╩я┐я┤я┬п╣!\n\r", ch,0,victim,TO_CHAR,POS_RESTING);
 
 }

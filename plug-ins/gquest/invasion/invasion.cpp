@@ -158,7 +158,7 @@ void InvasionGQuest::cleanup( bool performance )
 	    if (mob->behavior) {
 		if (mob->behavior.getDynamicPointer<InvasionMob>( )) {
 		    if (performance) 
-			act("$c1 ÌÏÐÁÅÔÓÑ.", ch, 0, 0, TO_ROOM);
+			act("$c1 Ð»Ð¾Ð¿Ð°ÐµÑ‚ÑÑ.", ch, 0, 0, TO_ROOM);
 		    
 		    extract_char( mob );
 		}
@@ -174,7 +174,7 @@ void InvasionGQuest::cleanup( bool performance )
 	if (obj->behavior) {
 	    if (obj->behavior.getDynamicPointer<InvasionObj>( )) {
 		if (performance && obj->in_room)
-		    act("$o1 ÉÓÞÅÚÁÅÔ.", obj->in_room->people, obj, 0, TO_ROOM);
+		    act("$o1 Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚.", obj->in_room->people, obj, 0, TO_ROOM);
 
 		extract_obj( obj );
 	    }
@@ -197,10 +197,10 @@ void InvasionGQuest::report( std::ostringstream &buf, PCharacter *ch ) const
     attr = ch->getAttributes( ).findAttr<XMLAttributeInvasion>( getQuestID( ) );
     
     if (attr && attr->getKilled( ) > 0)
-	buf << "þÉÓÌÏ ÕÎÉÞÔÏÖÅÎÎÙÈ ÔÏÂÏÊ ÂÅÚÏÂÒÁÚÉÊ: " 
+	buf << "Ð§Ð¸ÑÐ»Ð¾ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð½Ñ‹Ñ… Ñ‚Ð¾Ð±Ð¾Ð¹ Ð±ÐµÐ·Ð¾Ð±Ñ€Ð°Ð·Ð¸Ð¹: " 
 	    << GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
     
-    buf << "äÏ ËÏÎÃÁ ÏÈÏÔÙ ÏÓÔÁÅÔÓÑ ";
+    buf << "Ð”Ð¾ ÐºÐ¾Ð½Ñ†Ð° Ð¾Ñ…Ð¾Ñ‚Ñ‹ Ð¾ÑÑ‚Ð°ÐµÑ‚ÑÑ ";
     printRemainedTime( buf );
     buf << "." << endl;
 }
@@ -271,7 +271,7 @@ void InvasionGQuest::rewardLeader( )
     
     if (leaders.empty( )) {
 	buf << scen->getNoWinnerMsg( ) << endl;
-//	"öÉÔÅÌÉ íÉÒÁ ÐÒÏÑ×ÉÌÉ ÎÅ×ÅÒÏÑÔÎÏÅ ÍÉÌÏÓÅÒÄÉÅ: ÎÉ ÏÄÎÁ ÂÕËÁÛËÁ ÎÅ ÐÏÓÔÒÁÄÁÌÁ."  << endl;
+//	"Ð–Ð¸Ñ‚ÐµÐ»Ð¸ ÐœÐ¸Ñ€Ð° Ð¿Ñ€Ð¾ÑÐ²Ð¸Ð»Ð¸ Ð½ÐµÐ²ÐµÑ€Ð¾ÑÑ‚Ð½Ð¾Ðµ Ð¼Ð¸Ð»Ð¾ÑÐµÑ€Ð´Ð¸Ðµ: Ð½Ð¸ Ð¾Ð´Ð½Ð° Ð±ÑƒÐºÐ°ÑˆÐºÐ° Ð½Ðµ Ð¿Ð¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð»Ð°."  << endl;
     }
     else { 
 	XMLReward reward;

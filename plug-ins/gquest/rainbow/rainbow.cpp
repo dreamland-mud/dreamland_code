@@ -277,7 +277,7 @@ void RainbowGQuest::getQuestDescription( std::ostringstream &str ) const
 	    continue;
 	
 	
-	sprintf(buf, "%s%-30s%s ÉÚ %s%s",
+	sprintf(buf, "%s%-30s%s Ð¸Ð· %s%s",
 		     GQChannel::NORMAL, ch->getNameP( '1' ).c_str( ), 
 		     GQChannel::NORMAL, ch->in_room->name, GQChannel::NORMAL);
 	str << buf;

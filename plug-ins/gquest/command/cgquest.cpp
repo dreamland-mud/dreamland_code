@@ -37,7 +37,7 @@ COMMAND(CGQuest, "gquest")
     cmd = arguments.getOneArgument( );
     
     if (!pch) {
-	ch->send_to( "Тебе нельзя.\n\r" );
+	ch->send_to( "п╒п╣п╠п╣ п╫п╣п╩я▄п╥я▐.\n\r" );
 	return;
     }
     
@@ -45,31 +45,31 @@ COMMAND(CGQuest, "gquest")
 	usage( pch );
     else if (arg_is_info( cmd ))
 	doInfo( pch );
-    else if (arg_oneof( cmd, "progress", "прогресс" ))
+    else if (arg_oneof( cmd, "progress", "п©я─п╬пЁя─п╣я│я│" ))
 	doProgress( pch );
-    else if (arg_oneof( cmd, "noexp", "безопыта" ))
+    else if (arg_oneof( cmd, "noexp", "п╠п╣п╥п╬п©я▀я┌п╟" ))
 	doNoExp( pch, arguments );
-    else if (arg_oneof( cmd, "victory", "победа", "победы" ))
+    else if (arg_oneof( cmd, "victory", "п©п╬п╠п╣п╢п╟", "п©п╬п╠п╣п╢я▀" ))
 	doVictory( pch );
-    else if (arg_oneof( cmd, "stat", "статистика" ))
+    else if (arg_oneof( cmd, "stat", "я│я┌п╟я┌п╦я│я┌п╦п╨п╟" ))
 	doStat( pch );
     else if (pch->is_immortal( )) {
 	if (arg_is_list( cmd ))
 	    doList( pch );
-	else if (arg_oneof( cmd, "start", "старт" ))
+	else if (arg_oneof( cmd, "start", "я│я┌п╟я─я┌" ))
 	    doStart( pch, arguments );
-	else if (arg_oneof( cmd, "stop", "стоп" ))
+	else if (arg_oneof( cmd, "stop", "я│я┌п╬п©" ))
 	    doStop( pch, arguments );
-	else if (arg_oneof( cmd, "time", "время" ))
+	else if (arg_oneof( cmd, "time", "п╡я─п╣п╪я▐" ))
 	    doTime( pch, arguments );
-	else if (arg_oneof( cmd, "talk", "сказать", "говорить" ))
+	else if (arg_oneof( cmd, "talk", "я│п╨п╟п╥п╟я┌я▄", "пЁп╬п╡п╬я─п╦я┌я▄" ))
 	    doTalk( pch, arguments );
-	else if (arg_oneof( cmd, "auto", "авто" ))
+	else if (arg_oneof( cmd, "auto", "п╟п╡я┌п╬" ))
 	    doAuto( pch, arguments );
 	else if (pch->isCoder( )) {
-	    if (arg_oneof( cmd, "set", "установить" ))
+	    if (arg_oneof( cmd, "set", "я┐я│я┌п╟п╫п╬п╡п╦я┌я▄" ))
 		doSet( pch, arguments );
-	    else if (arg_oneof( cmd, "read", "прочесть" ))
+	    else if (arg_oneof( cmd, "read", "п©я─п╬я┤п╣я│я┌я▄" ))
 		doRead( pch, arguments );
 	    else
 		usage( pch );
@@ -158,16 +158,16 @@ void CGQuest::doProgress( PCharacter *ch )
 	if (gq->isHidden( ))
 	    continue;
 
-	buf << GQChannel::NORMAL << "Квест "<< GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
-	    << GQChannel::NORMAL << " (для ";
+	buf << GQChannel::NORMAL << "п п╡п╣я│я┌ "<< GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
+	    << GQChannel::NORMAL << " (п╢п╩я▐ ";
 	    
 	if (gq->hasLevels( ))
 	    buf << GQChannel::BOLD << gq->getMinLevel( ) 
 		<< "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
 	else
-	    buf << "всех";
+	    buf << "п╡я│п╣я┘";
 	
-	buf << " уровней)" << endl;
+	buf << " я┐я─п╬п╡п╫п╣п╧)" << endl;
 	gq->progress( buf );
 	GQChannel::pecho( ch, buf );
     }
@@ -193,7 +193,7 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
 	} else if (arg_is_no( arguments )) {
 	    attribute->setNoExp( false );
 	} else {
-	    ch->println("Используй '{lEgquest noexp yes{lRгквест безопыта да{lx' или '{lEgquest noexp no{lRгквест безопыта нет{lx'.");
+	    ch->println("п≤я│п©п╬п╩я▄п╥я┐п╧ '{lEgquest noexp yes{lRпЁп╨п╡п╣я│я┌ п╠п╣п╥п╬п©я▀я┌п╟ п╢п╟{lx' п╦п╩п╦ '{lEgquest noexp no{lRпЁп╨п╡п╣я│я┌ п╠п╣п╥п╬п©я▀я┌п╟ п╫п╣я┌{lx'.");
 	    return;
 	}
 
@@ -201,9 +201,9 @@ void CGQuest::doNoExp( PCharacter *ch, DLString& arguments )
     }
 
     if (attribute->getNoExp( ) == true) {
-	ch->send_to("Ты не будешь получать опыт как награду за глобальные квесты.\r\n" );
+	ch->send_to("п╒я▀ п╫п╣ п╠я┐п╢п╣я┬я▄ п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌ п╨п╟п╨ п╫п╟пЁя─п╟п╢я┐ п╥п╟ пЁп╩п╬п╠п╟п╩я▄п╫я▀п╣ п╨п╡п╣я│я┌я▀.\r\n" );
     } else {
-	ch->send_to("Ты будешь получать опыт как награду за глобальные квесты.\r\n" );
+	ch->send_to("п╒я▀ п╠я┐п╢п╣я┬я▄ п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌ п╨п╟п╨ п╫п╟пЁя─п╟п╢я┐ п╥п╟ пЁп╩п╬п╠п╟п╩я▄п╫я▀п╣ п╨п╡п╣я│я┌я▀.\r\n" );
     }
 }
 
@@ -213,7 +213,7 @@ void CGQuest::doVictory( PCharacter *ch )
     XMLAttributeGlobalQuest::Pointer gqAttr;
     int cnt = 0;
 
-    buf << "Твои победы в глобальных квестах:" << endl;
+    buf << "п╒п╡п╬п╦ п©п╬п╠п╣п╢я▀ п╡ пЁп╩п╬п╠п╟п╩я▄п╫я▀я┘ п╨п╡п╣я│я┌п╟я┘:" << endl;
 
     gqAttr = ch->getAttributes( ).findAttr<XMLAttributeGlobalQuest>( "gquest" );
     if (gqAttr) {
@@ -233,7 +233,7 @@ void CGQuest::doVictory( PCharacter *ch )
     }
     
     if (cnt == 0) 
-	buf << "    ни одной, увы" << endl;
+	buf << "    п╫п╦ п╬п╢п╫п╬п╧, я┐п╡я▀" << endl;
 
     GQChannel::pecho( ch, buf );
 }
@@ -247,7 +247,7 @@ void CGQuest::doStat( PCharacter *ch )
    
     stat = XMLAttributeStatistic::gatherAll( "gquest" );
 
-    buf << "Лучшие квестодеятели Мира Грез: " << endl;
+    buf << "п⌡я┐я┤я┬п╦п╣ п╨п╡п╣я│я┌п╬п╢п╣я▐я┌п╣п╩п╦ п°п╦я─п╟ п⌠я─п╣п╥: " << endl;
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
 	XMLAttributeStatistic::StatRecordList::iterator r;
@@ -286,11 +286,11 @@ void CGQuest::doList( PCharacter *ch )
     GlobalQuestManager::RegistryList::iterator i;
     GlobalQuestManager::RegistryList& reg = GlobalQuestManager::getThis( )->getRegistry( );
 
-    sprintf( buf, "%sСписок глобальных квестов Мира Грез\r\n", GQChannel::NORMAL );
+    sprintf( buf, "%sп║п©п╦я│п╬п╨ пЁп╩п╬п╠п╟п╩я▄п╫я▀я┘ п╨п╡п╣я│я┌п╬п╡ п°п╦я─п╟ п⌠я─п╣п╥\r\n", GQChannel::NORMAL );
     ch->send_to( buf );
    
     sprintf( buf, "%s%-10s %-10s %s %-4s %s %7s %9s %s%s\r\n",
-	    GQChannel::BOLD, "Название", "ID", "A", "idle", "R", "Уровни", "Время", "Описание", GQChannel::NORMAL );
+	    GQChannel::BOLD, "п²п╟п╥п╡п╟п╫п╦п╣", "ID", "A", "idle", "R", "пёя─п╬п╡п╫п╦", "п▓я─п╣п╪я▐", "п·п©п╦я│п╟п╫п╦п╣", GQChannel::NORMAL );
     ch->send_to( buf );
     
     for (i = reg.begin( ); i != reg.end( ); i++) {
@@ -326,9 +326,9 @@ void CGQuest::doList( PCharacter *ch )
 	ch->send_to( buf );
     }
 
-    ch->send_to( "\r\nПоля: "
-	         "A - автостарт, "
-	         "idle - минут между автостартами, "
+    ch->send_to( "\r\nп÷п╬п╩я▐: "
+	         "A - п╟п╡я┌п╬я│я┌п╟я─я┌, "
+	         "idle - п╪п╦п╫я┐я┌ п╪п╣п╤п╢я┐ п╟п╡я┌п╬я│я┌п╟я─я┌п╟п╪п╦, "
 		 "R - running{x\r\n" );
 }
 
@@ -339,14 +339,14 @@ void CGQuest::doStart( PCharacter *ch, DLString& arguments )
     GlobalQuestInfo::Config config;
     
     if (arguments.empty( )) {
-	ch->send_to( "Укажите ID глобального квеста.\r\n" );
+	ch->send_to( "пёп╨п╟п╤п╦я┌п╣ ID пЁп╩п╬п╠п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟.\r\n" );
 	return;
     }
     
     gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( arguments.getOneArgument( ) );
 
     if (!gqi) {
-	ch->send_to( "Неправильный ID.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID.\r\n" );
 	return;
     }
 
@@ -366,13 +366,13 @@ void CGQuest::doStop( PCharacter *ch, DLString& arguments )
     GlobalQuest::Pointer gq;
     
     if (arguments.empty( )) {
-	ch->send_to( "Укажите ID глобального квеста.\r\n" );
+	ch->send_to( "пёп╨п╟п╤п╦я┌п╣ ID пЁп╩п╬п╠п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟.\r\n" );
 	return;
     }
     
     gq = GlobalQuestManager::getThis( )->findGlobalQuest( arguments.getOneArgument( ) );
     if (!gq) {
-	ch->send_to( "Неправильный ID, либо квест не запущен.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID, п╩п╦п╠п╬ п╨п╡п╣я│я┌ п╫п╣ п╥п╟п©я┐я┴п╣п╫.\r\n" );
 	return;
     }
     
@@ -382,7 +382,7 @@ void CGQuest::doStop( PCharacter *ch, DLString& arguments )
 	ch->send_to( e.what( ) );
 	return;
     }
-    ch->println( "Глобальный квест остановлен." );
+    ch->println( "п⌠п╩п╬п╠п╟п╩я▄п╫я▀п╧ п╨п╡п╣я│я┌ п╬я│я┌п╟п╫п╬п╡п╩п╣п╫." );
 }
 
 void CGQuest::doTime( PCharacter *ch, DLString& arguments ) 
@@ -390,13 +390,13 @@ void CGQuest::doTime( PCharacter *ch, DLString& arguments )
     GlobalQuest::Pointer gq;
     
     if (arguments.empty( )) {
-	ch->send_to( "Укажите ID глобального квеста.\r\n" );
+	ch->send_to( "пёп╨п╟п╤п╦я┌п╣ ID пЁп╩п╬п╠п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟.\r\n" );
 	return;
     }
     
     gq = GlobalQuestManager::getThis( )->findGlobalQuest( arguments.getOneArgument( ) );
     if (!gq) {
-	ch->send_to( "Неправильный ID, либо квест не запущен.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID, п╩п╦п╠п╬ п╨п╡п╣я│я┌ п╫п╣ п╥п╟п©я┐я┴п╣п╫.\r\n" );
 	return;
     }
     
@@ -404,14 +404,14 @@ void CGQuest::doTime( PCharacter *ch, DLString& arguments )
         int newTotalTime = arguments.getOneArgument( ).toInt( );
         int minTotalTime = gq->getElapsedTime( ) + 1;
         if (newTotalTime < minTotalTime) {
-            ch->printf( "Неверное время, минимум %d минут.\r\n", minTotalTime );
+            ch->printf( "п²п╣п╡п╣я─п╫п╬п╣ п╡я─п╣п╪я▐, п╪п╦п╫п╦п╪я┐п╪ %d п╪п╦п╫я┐я┌.\r\n", minTotalTime );
             return;
         }
 
         gq->suspend( );
         gq->setTotalTime( newTotalTime );
         gq->resume( );
-        ch->printf( "Новое время квеста %d минут, до конца остается %d минут.\r\n",
+        ch->printf( "п²п╬п╡п╬п╣ п╡я─п╣п╪я▐ п╨п╡п╣я│я┌п╟ %d п╪п╦п╫я┐я┌, п╢п╬ п╨п╬п╫я├п╟ п╬я│я┌п╟п╣я┌я│я▐ %d п╪п╦п╫я┐я┌.\r\n",
                 gq->getTotalTime( ), gq->getRemainedTime( ) );
     }  catch (const Exception &e) {
 	ch->send_to( e.what( ) );
@@ -425,7 +425,7 @@ void CGQuest::doTalk( PCharacter *ch, DLString& arguments )
     DLString id, arg = arguments;
     
     if (arguments.empty( )) {
-	ch->send_to( "Сказать что?\r\n" );
+	ch->send_to( "п║п╨п╟п╥п╟я┌я▄ я┤я┌п╬?\r\n" );
 	return;
     }
    
@@ -434,7 +434,7 @@ void CGQuest::doTalk( PCharacter *ch, DLString& arguments )
 
     if (gqi) {
 	if (arguments.empty( ))
-	    ch->send_to( "Сказать что?\r\n" );
+	    ch->send_to( "п║п╨п╟п╥п╟я┌я▄ я┤я┌п╬?\r\n" );
 	else 
 	    GQChannel::gecho( *gqi, arguments );
     }
@@ -452,7 +452,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
     int time = 0;
 
     if (arguments.empty( )) {
-	ch->send_to( "Укажите ID глобального квеста.\r\n" );
+	ch->send_to( "пёп╨п╟п╤п╦я┌п╣ ID пЁп╩п╬п╠п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟.\r\n" );
 	return;
     }
 
@@ -460,7 +460,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
     gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( id );
 
     if (!gqi) {
-	ch->send_to( "Неправильный ID.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID.\r\n" );
 	return;
     }
 
@@ -475,7 +475,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
 	else if (arg_is_no( on ) || arg_is_switch_off( on ))
 	    autostart = false;
 	else {
-	    ch->println( "Неправильный параметр: пишите {lRвкл{lEon{lx или {lRвыкл{lEoff{lx, {lRда{lEyes{lx или {lRнет{lEno{lx." );
+	    ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п©п╟я─п╟п╪п╣я┌я─: п©п╦я┬п╦я┌п╣ {lRп╡п╨п╩{lEon{lx п╦п╩п╦ {lRп╡я▀п╨п╩{lEoff{lx, {lRп╢п╟{lEyes{lx п╦п╩п╦ {lRп╫п╣я┌{lEno{lx." );
 	    return;
 	}
 
@@ -486,7 +486,7 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
 	    } 
 	    
 	    if (time <= 0) {
-		ch->send_to( "Неправильное время.\r\n" );
+		ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╡я─п╣п╪я▐.\r\n" );
 		return;
 	    }
 	}
@@ -497,10 +497,10 @@ void CGQuest::doAuto( PCharacter *ch, DLString& arguments )
     gqi->setWaitingTime( time * 60 );
 
     if (autostart) 
-	buf << "Квест " << id << " будет стартовать автоматически"
-	    << " с интервалом в " << time << " минут." << endl;
+	buf << "п п╡п╣я│я┌ " << id << " п╠я┐п╢п╣я┌ я│я┌п╟я─я┌п╬п╡п╟я┌я▄ п╟п╡я┌п╬п╪п╟я┌п╦я┤п╣я│п╨п╦"
+	    << " я│ п╦п╫я┌п╣я─п╡п╟п╩п╬п╪ п╡ " << time << " п╪п╦п╫я┐я┌." << endl;
     else
-	buf << "Квест " << id << " не будет стартовать автоматически." << endl;
+	buf << "п п╡п╣я│я┌ " << id << " п╫п╣ п╠я┐п╢п╣я┌ я│я┌п╟я─я┌п╬п╡п╟я┌я▄ п╟п╡я┌п╬п╪п╟я┌п╦я┤п╣я│п╨п╦." << endl;
 
     ch->send_to( buf );
 }
@@ -510,13 +510,13 @@ void CGQuest::doRead( PCharacter *ch, DLString& arguments )
     GlobalQuestInfo::Pointer gqi;
     
     if (arguments.empty( )) {
-	ch->send_to( "Укажите ID глобального квеста.\r\n" );
+	ch->send_to( "пёп╨п╟п╤п╦я┌п╣ ID пЁп╩п╬п╠п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟.\r\n" );
 	return;
     }
     
     gqi = GlobalQuestManager::getThis( )->findGlobalQuestInfo( arguments.getOneArgument( ) );
     if (!gqi) {
-	ch->send_to( "Неправильный ID.\r\n" );
+	ch->send_to( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID.\r\n" );
 	return;
     }
     
@@ -527,7 +527,7 @@ void CGQuest::doRead( PCharacter *ch, DLString& arguments )
 	return;
     }
     
-    ch->send_to( "Конфигурация глобального квеста обновлена.\r\n" );
+    ch->send_to( "п п╬п╫я└п╦пЁя┐я─п╟я├п╦я▐ пЁп╩п╬п╠п╟п╩я▄п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟ п╬п╠п╫п╬п╡п╩п╣п╫п╟.\r\n" );
 }
 
 void CGQuest::doSet( PCharacter *ch, DLString &arguments )
@@ -544,19 +544,19 @@ void CGQuest::doSet( PCharacter *ch, DLString &arguments )
     plus = false;
 
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
-	ch->send_to("Использование: gquest set <player> <quest id> <num. of victories>\r\n");
+	ch->send_to("п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: gquest set <player> <quest id> <num. of victories>\r\n");
 	return;
     }
     
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-	ch->send_to("Укажите имя правильно и полностью.\r\n");
+	ch->send_to("пёп╨п╟п╤п╦я┌п╣ п╦п╪я▐ п©я─п╟п╡п╦п╩я▄п╫п╬ п╦ п©п╬п╩п╫п╬я│я┌я▄я▌.\r\n");
 	return;
     }
     
     if (!GlobalQuestManager::getThis( )->findGlobalQuestInfo( questID )) {
-	ch->send_to("Неправильный ID.\r\n");
+	ch->send_to("п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ ID.\r\n");
 	return;
     }
     
@@ -568,7 +568,7 @@ void CGQuest::doSet( PCharacter *ch, DLString &arguments )
 	
 	count = number.toInt( );
     } catch (const ExceptionBadType&) {
-	ch->send_to("Неверное количество побед.\r\n");
+	ch->send_to("п²п╣п╡п╣я─п╫п╬п╣ п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п©п╬п╠п╣п╢.\r\n");
 	return;
     }
     
@@ -586,41 +586,41 @@ void CGQuest::usage( PCharacter *ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "{W{lEgquest{lRгквест{lx {lEinfo{lRинфо {lx       {w - информация о текущих глобальных квестах" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEprogress{lRпрогресс {lx   {w - прогресс каждого участника глобальных квестов" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEstat{lRстат {lx       {w - показать статистику побед" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEvictory{lRпобеды  {lx    {w - показать твои победы" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEnoexp{lRбезопыта{lx {lEyes  {lRда {lx{w - не получать опыт в награду" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEnoexp{lRбезопыта{lx {lEno   {lRнет{lx{w - получать опыт в награду" << endl;
+    buf << "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEinfo{lRп╦п╫я└п╬ {lx       {w - п╦п╫я└п╬я─п╪п╟я├п╦я▐ п╬ я┌п╣п╨я┐я┴п╦я┘ пЁп╩п╬п╠п╟п╩я▄п╫я▀я┘ п╨п╡п╣я│я┌п╟я┘" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEprogress{lRп©я─п╬пЁя─п╣я│я│ {lx   {w - п©я─п╬пЁя─п╣я│я│ п╨п╟п╤п╢п╬пЁп╬ я┐я┤п╟я│я┌п╫п╦п╨п╟ пЁп╩п╬п╠п╟п╩я▄п╫я▀я┘ п╨п╡п╣я│я┌п╬п╡" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEstat{lRя│я┌п╟я┌ {lx       {w - п©п╬п╨п╟п╥п╟я┌я▄ я│я┌п╟я┌п╦я│я┌п╦п╨я┐ п©п╬п╠п╣п╢" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEvictory{lRп©п╬п╠п╣п╢я▀  {lx    {w - п©п╬п╨п╟п╥п╟я┌я▄ я┌п╡п╬п╦ п©п╬п╠п╣п╢я▀" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEnoexp{lRп╠п╣п╥п╬п©я▀я┌п╟{lx {lEyes  {lRп╢п╟ {lx{w - п╫п╣ п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌ п╡ п╫п╟пЁя─п╟п╢я┐" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEnoexp{lRп╠п╣п╥п╬п©я▀я┌п╟{lx {lEno   {lRп╫п╣я┌{lx{w - п©п╬п╩я┐я┤п╟я┌я▄ п╬п©я▀я┌ п╡ п╫п╟пЁя─п╟п╢я┐" << endl;
 
     if (!ch->is_immortal( )) {
 	ch->send_to( buf );
 	return;
     }
 
-    buf << "{W{lEgquest{lRгквест{lx {lElist{lRсписок{lx       {w - список всех существующих глобалов" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEstart{lRстарт{lx <id> [<min_level> <max_level>] [<time>] [<arg>] [<playerCnt>]" << endl
-	<< "                  {w - запуск глобала:" << endl
-	<< "                  {w - <id> имя глобала, список см. по {lEgquest list{lRгквест список{lx" << endl
-	<< "                  {w - <levels> указывают диапазн уровней для квестов типа gangsters" << endl
-	<< "                  {w - <time> указывает длительность в минутах, по умолчанию 30" << endl
-	<< "                  {w - <arg> указывает имя сценария, если они поддерживаются квестом" << endl
-	<< "                  {w - <playerCnt> имитирует запуск квеста как будто онлайн такое кол-во игроков" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEstop{lRстоп{lx <id>  {w - завершение уже запущенного квеста" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEtime{lвремя{lx <id> <time>{w - установить время запущенного квеста в <time> минут" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEtalk{lRговорить{lx <text>{w - посылка сообщения в канал [Global Quest]" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEtalk{lRговорить{lx <id> <text>{w - сообщение в канал [Global Quest: <имя квеста>]" << endl
-	<< "{W{lEgquest{lRгквест{lx {lEauto{lRавто{lx <id> [{lEon|off{lRвкл|выкл{lx] [<time>]" << endl
-	<< "                  {w - вкл./выкл. автозапуск с интервалом в <time> минут" << endl;
+    buf << "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lElist{lRя│п©п╦я│п╬п╨{lx       {w - я│п©п╦я│п╬п╨ п╡я│п╣я┘ я│я┐я┴п╣я│я┌п╡я┐я▌я┴п╦я┘ пЁп╩п╬п╠п╟п╩п╬п╡" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEstart{lRя│я┌п╟я─я┌{lx <id> [<min_level> <max_level>] [<time>] [<arg>] [<playerCnt>]" << endl
+	<< "                  {w - п╥п╟п©я┐я│п╨ пЁп╩п╬п╠п╟п╩п╟:" << endl
+	<< "                  {w - <id> п╦п╪я▐ пЁп╩п╬п╠п╟п╩п╟, я│п©п╦я│п╬п╨ я│п╪. п©п╬ {lEgquest list{lRпЁп╨п╡п╣я│я┌ я│п©п╦я│п╬п╨{lx" << endl
+	<< "                  {w - <levels> я┐п╨п╟п╥я▀п╡п╟я▌я┌ п╢п╦п╟п©п╟п╥п╫ я┐я─п╬п╡п╫п╣п╧ п╢п╩я▐ п╨п╡п╣я│я┌п╬п╡ я┌п╦п©п╟ gangsters" << endl
+	<< "                  {w - <time> я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╢п╩п╦я┌п╣п╩я▄п╫п╬я│я┌я▄ п╡ п╪п╦п╫я┐я┌п╟я┘, п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ 30" << endl
+	<< "                  {w - <arg> я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╦п╪я▐ я│я├п╣п╫п╟я─п╦я▐, п╣я│п╩п╦ п╬п╫п╦ п©п╬п╢п╢п╣я─п╤п╦п╡п╟я▌я┌я│я▐ п╨п╡п╣я│я┌п╬п╪" << endl
+	<< "                  {w - <playerCnt> п╦п╪п╦я┌п╦я─я┐п╣я┌ п╥п╟п©я┐я│п╨ п╨п╡п╣я│я┌п╟ п╨п╟п╨ п╠я┐п╢я┌п╬ п╬п╫п╩п╟п╧п╫ я┌п╟п╨п╬п╣ п╨п╬п╩-п╡п╬ п╦пЁя─п╬п╨п╬п╡" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEstop{lRя│я┌п╬п©{lx <id>  {w - п╥п╟п╡п╣я─я┬п╣п╫п╦п╣ я┐п╤п╣ п╥п╟п©я┐я┴п╣п╫п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEtime{lп╡я─п╣п╪я▐{lx <id> <time>{w - я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╡я─п╣п╪я▐ п╥п╟п©я┐я┴п╣п╫п╫п╬пЁп╬ п╨п╡п╣я│я┌п╟ п╡ <time> п╪п╦п╫я┐я┌" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEtalk{lRпЁп╬п╡п╬я─п╦я┌я▄{lx <text>{w - п©п╬я│я▀п╩п╨п╟ я│п╬п╬п╠я┴п╣п╫п╦я▐ п╡ п╨п╟п╫п╟п╩ [Global Quest]" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEtalk{lRпЁп╬п╡п╬я─п╦я┌я▄{lx <id> <text>{w - я│п╬п╬п╠я┴п╣п╫п╦п╣ п╡ п╨п╟п╫п╟п╩ [Global Quest: <п╦п╪я▐ п╨п╡п╣я│я┌п╟>]" << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEauto{lRп╟п╡я┌п╬{lx <id> [{lEon|off{lRп╡п╨п╩|п╡я▀п╨п╩{lx] [<time>]" << endl
+	<< "                  {w - п╡п╨п╩./п╡я▀п╨п╩. п╟п╡я┌п╬п╥п╟п©я┐я│п╨ я│ п╦п╫я┌п╣я─п╡п╟п╩п╬п╪ п╡ <time> п╪п╦п╫я┐я┌" << endl;
 
     if (!ch->isCoder( )) {
 	ch->send_to( buf );
 	return;
     }
     
-    buf << "{W{lEgquest{lRгквест{lx {lEset{lRустановить{lx <player> <id> [+]<count>" << endl
-	<< "                  {w - установить чару статистику побед по этому виду квеста." << endl
-	<< "{W{lEgquest{lRгквест{lx {lEread{lRпрочесть{lx <id>  {w - обновить конфигурацию квеста (перечитать профайл)" << endl;
+    buf << "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEset{lRя┐я│я┌п╟п╫п╬п╡п╦я┌я▄{lx <player> <id> [+]<count>" << endl
+	<< "                  {w - я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ я┤п╟я─я┐ я│я┌п╟я┌п╦я│я┌п╦п╨я┐ п©п╬п╠п╣п╢ п©п╬ я█я┌п╬п╪я┐ п╡п╦п╢я┐ п╨п╡п╣я│я┌п╟." << endl
+	<< "{W{lEgquest{lRпЁп╨п╡п╣я│я┌{lx {lEread{lRп©я─п╬я┤п╣я│я┌я▄{lx <id>  {w - п╬п╠п╫п╬п╡п╦я┌я▄ п╨п╬п╫я└п╦пЁя┐я─п╟я├п╦я▌ п╨п╡п╣я│я┌п╟ (п©п╣я─п╣я┤п╦я┌п╟я┌я▄ п©я─п╬я└п╟п╧п╩)" << endl;
     ch->send_to( buf );
 }
 

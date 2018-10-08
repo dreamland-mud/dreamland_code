@@ -50,7 +50,7 @@ GateMovement::~GateMovement( )
 bool GateMovement::moveAtomic( )
 {
     if (!JumpMovement::moveAtomic( )) {
-	ch->pecho( "Твоя попытка закончилась неудачей." );
+	ch->pecho( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧." );
 	return false;
     }
 
@@ -278,7 +278,7 @@ SummonMovement::~SummonMovement( )
 bool SummonMovement::moveAtomic( )
 {
     if (!JumpMovement::moveAtomic( )) {
-	caster->pecho( "Твоя попытка закончилась неудачей." );
+	caster->pecho( "п╒п╡п╬я▐ п©п╬п©я▀я┌п╨п╟ п╥п╟п╨п╬п╫я┤п╦п╩п╟я│я▄ п╫п╣я┐п╢п╟я┤п╣п╧." );
 	return false;
     }
 
@@ -307,7 +307,7 @@ bool SummonMovement::tryMove( Character *wch )
 bool SummonMovement::applyLazy( )
 {
     if (caster->in_room->area == ch->in_room->area) {
-	caster->pecho( "Может, пора пройтись пешком?" );
+	caster->pecho( "п°п╬п╤п╣я┌, п©п╬я─п╟ п©я─п╬п╧я┌п╦я│я▄ п©п╣я┬п╨п╬п╪?" );
 	return false;
     }
 
@@ -406,13 +406,13 @@ void SummonMovement::msgEcho( Character *listener, Character *wch, const char *m
 void SummonMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (fLeaving) {
-	msgRoomNoParty( wch, "%1$^C1 внезапно исчезает." );     
+	msgRoomNoParty( wch, "%1$^C1 п╡п╫п╣п╥п╟п©п╫п╬ п╦я│я┤п╣п╥п╟п╣я┌." );     
 	msgSelfParty( wch, 
-	              "%3$^C1 призывает тебя!",
-		      "%3$^C1 призывает %2$^C4!" );
+	              "%3$^C1 п©я─п╦п╥я▀п╡п╟п╣я┌ я┌п╣п╠я▐!",
+		      "%3$^C1 п©я─п╦п╥я▀п╡п╟п╣я┌ %2$^C4!" );
     }
     else {
-	msgRoomNoParty( wch, "%1$^C1 появляется рядом с тобой." );
+	msgRoomNoParty( wch, "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ я┌п╬п╠п╬п╧." );
     }
 }
 

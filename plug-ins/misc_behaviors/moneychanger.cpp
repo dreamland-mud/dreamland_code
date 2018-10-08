@@ -18,8 +18,8 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
     int o_gold = vch->gold, o_silver = vch->silver;
 
     if (!ch->can_see( vch )) {
-	tell_dim( vch, ch, "Я не торгую с тем, кого не вижу. Забирай свои деньги." );
-	act( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM);
+	tell_dim( vch, ch, "п╞ п╫п╣ я┌п╬я─пЁя┐я▌ я│ я┌п╣п╪, п╨п╬пЁп╬ п╫п╣ п╡п╦п╤я┐. п≈п╟п╠п╦я─п╟п╧ я│п╡п╬п╦ п╢п╣п╫я▄пЁп╦." );
+	act( "$c1 я─п╬п╫я▐п╣я┌ п╫п╟ п©п╬п╩ п╨я┐я┤п╨я┐ п╪п╬п╫п╣я┌.", ch,0,0,TO_ROOM);
 	ch->silver 	-= silver;
 	ch->gold	-= gold;
 	obj_to_room( create_money( gold, silver ), vch->in_room );
@@ -32,7 +32,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
 
 	if (a_gold < 1)
 	{
-	    tell_dim( vch, ch, "Извини, но эта сумма слишком мала для обмена." );
+	    tell_dim( vch, ch, "п≤п╥п╡п╦п╫п╦, п╫п╬ я█я┌п╟ я│я┐п╪п╪п╟ я│п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╟ п╢п╩я▐ п╬п╠п╪п╣п╫п╟." );
 	    interpret_raw( ch, "give", "%d silver %s", silver, vch->getNameP( ) );
 	    return;
 	}
@@ -58,9 +58,9 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
 	vch->gold = o_gold;
 	vch->silver = o_silver;
 	
-	act_p( "$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
+	act_p( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╢п╟я┌я▄ я┌п╣п╠п╣ п╢п╣п╫я▄пЁп╦, п╫п╬ я┌я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╦я┘ я┐п╢п╣я─п╤п╟я┌я▄.",
 		ch, 0, vch, TO_VICT,POS_RESTING );
-	act_p( "$c1 роняет на пол кучку монет.", vch,0,0,TO_ROOM,POS_RESTING );
+	act_p( "$c1 я─п╬п╫я▐п╣я┌ п╫п╟ п©п╬п╩ п╨я┐я┤п╨я┐ п╪п╬п╫п╣я┌.", vch,0,0,TO_ROOM,POS_RESTING );
 	obj_to_room( create_money( a_gold, a_silver ), vch->in_room );
     }
     else if ( !ch->can_see( vch ) )
@@ -68,9 +68,9 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
 	vch->gold = o_gold;
 	vch->silver = o_silver;
 
-	act_p( "$c1 пытается дать тебе деньги, но промахивается и роняет их на пол.",
+	act_p( "$c1 п©я▀я┌п╟п╣я┌я│я▐ п╢п╟я┌я▄ я┌п╣п╠п╣ п╢п╣п╫я▄пЁп╦, п╫п╬ п©я─п╬п╪п╟я┘п╦п╡п╟п╣я┌я│я▐ п╦ я─п╬п╫я▐п╣я┌ п╦я┘ п╫п╟ п©п╬п╩.",
 		ch, 0, vch, TO_VICT,POS_RESTING );
-	act_p( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM,POS_RESTING );
+	act_p( "$c1 я─п╬п╫я▐п╣я┌ п╫п╟ п©п╬п╩ п╨я┐я┤п╨я┐ п╪п╬п╫п╣я┌.", ch,0,0,TO_ROOM,POS_RESTING );
 	obj_to_room( create_money( a_gold, a_silver ), vch->in_room );
     }
     else
@@ -90,7 +90,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
 	    interpret_raw( ch, "give", "%d silver %s", a_silver, vch->getNameP( ) );
 	}
 
-	tell_dim( vch, ch, "Спасибо, приходи еще!" );
+	tell_dim( vch, ch, "п║п©п╟я│п╦п╠п╬, п©я─п╦я┘п╬п╢п╦ п╣я┴п╣!" );
     }
 }
 
