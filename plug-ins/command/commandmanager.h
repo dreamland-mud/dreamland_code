@@ -20,7 +20,7 @@ class Character;
 class CommandList {
 public:
         Command::Pointer findExact( const DLString & ) const;
-	Command::Pointer chooseCommand( Character *, const DLString & ) const;
+        Command::Pointer chooseCommand( Character *, const DLString & ) const;
 
         void add( Command::Pointer & );
         void remove( Command::Pointer & );
@@ -44,64 +44,64 @@ inline const list<Command::Pointer> &CommandList::getCommandsRU( ) const
 
 class CommandLoader : public virtual Plugin, public DLXMLLoader {
 public:    
-	virtual void loadCommand( XMLCommand::Pointer );
-	virtual void saveCommand( XMLCommand::Pointer );
+        virtual void loadCommand( XMLCommand::Pointer );
+        virtual void saveCommand( XMLCommand::Pointer );
 
-	virtual DLString getNodeName( ) const;
+        virtual DLString getNodeName( ) const;
 protected:        
         virtual void initialization( ) { }
         virtual void destruction( ) { }
-	static const DLString NODE_NAME;
+        static const DLString NODE_NAME;
 };
 
 class CommandManager : public InterpretLayer,
                        public OneAllocate, 
-		       public CommandLoader 
+                       public CommandLoader 
 {
 public:
-	typedef ::Pointer<CommandManager> Pointer;
-	typedef std::map<DLString, int> Priorities;
+        typedef ::Pointer<CommandManager> Pointer;
+        typedef std::map<DLString, int> Priorities;
         typedef std::list<Command::Pointer> CategoryCommands;
         typedef std::map<bitnumber_t, CategoryCommands> CategoryMap;
 
 public:
-	CommandManager( );
-	virtual ~CommandManager( );
-	
-	void load( XMLCommand::Pointer );
-	void save( XMLCommand::Pointer );
+        CommandManager( );
+        virtual ~CommandManager( );
+        
+        void load( XMLCommand::Pointer );
+        void save( XMLCommand::Pointer );
 
-	void registrate( Command::Pointer );
-	void unregistrate( Command::Pointer );
-	
-	Command::Pointer findExact( const DLString & ) const;
-	inline const Priorities & getPriorities( ) const;
-	inline const Priorities & getPrioritiesRU( ) const;
-	inline CommandList & getCommands( );
-	inline const CommandList & getCommands( ) const;
+        void registrate( Command::Pointer );
+        void unregistrate( Command::Pointer );
+        
+        Command::Pointer findExact( const DLString & ) const;
+        inline const Priorities & getPriorities( ) const;
+        inline const Priorities & getPrioritiesRU( ) const;
+        inline CommandList & getCommands( );
+        inline const CommandList & getCommands( ) const;
         CategoryMap getCategorizedCommands() const;
-	bool compare( const Command &, const Command &, bool fRussian ) const;
+        bool compare( const Command &, const Command &, bool fRussian ) const;
 
-	virtual bool process( InterpretArguments & );
+        virtual bool process( InterpretArguments & );
 
-	virtual DLString getTableName( ) const;
+        virtual DLString getTableName( ) const;
 
 protected:
-	virtual void initialization( );
+        virtual void initialization( );
         virtual void destruction( );
-	virtual void putInto( );
-	
+        virtual void putInto( );
+        
 private:
-	void loadPriorities( );
+        void loadPriorities( );
         void savePrioritiesRU( );
 
-	static const DLString TABLE_NAME;
-	static const DLString PRIO_FILE;
-	static const DLString PRIO_FILE_RU;
+        static const DLString TABLE_NAME;
+        static const DLString PRIO_FILE;
+        static const DLString PRIO_FILE_RU;
 
-	Priorities priorities;
-	Priorities priorities_ru;
-	CommandList commands;
+        Priorities priorities;
+        Priorities priorities_ru;
+        CommandList commands;
 };
 
 inline CommandList & CommandManager::getCommands( )

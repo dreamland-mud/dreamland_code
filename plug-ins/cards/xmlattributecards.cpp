@@ -66,9 +66,9 @@ DLString XMLAttributeCards::getFace( char needcase ) const
     DLString face, suit;
     
     if (getLevelFace( ).gender == SEX_MALE)
-	suit = russian_case( getSuitFace( ).male, needcase );
+        suit = russian_case( getSuitFace( ).male, needcase );
     else
-	suit = russian_case( getSuitFace( ).female, needcase );
+        suit = russian_case( getSuitFace( ).female, needcase );
     
     face = suit + " " + russian_case( getLevelFace( ).name, needcase );
     return face;
@@ -80,32 +80,32 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
     Pointer card;
     
     if (!args.killer || args.killer->is_npc( ) || args.killer == args.pch)
-	return false;
+        return false;
 
     pkiller = args.killer->getPC( );
 
     card = pkiller->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
     
     if (card->level < level || isTrump( )) {
-	if (card->level < getMaxLevel( )) {
-	    card->level++;
+        if (card->level < getMaxLevel( )) {
+            card->level++;
 
-	    if (card->suit < 0)
-		card->suit = getRandomSuit( );
+            if (card->suit < 0)
+                card->suit = getRandomSuit( );
 
-	    act( "{cТы уби$gло|л|ла $t из Колоды.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
-	    act( "{cТеперь ты $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
-	}
+            act( "{cТы уби$gло|л|ла $t из Колоды.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
+            act( "{cТеперь ты $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
+        }
     
-	level--;
+        level--;
 
-	if (level >= 0)
-	    args.pch->printf( "{cТы становишься %s.{x\r\n", getFace( '5' ).c_str( ) );
-	else {
-	    args.pch->send_to( "{cТы выбываешь из колоды!{x\r\n" );
-	    args.pch->getAttributes( ).eraseAttribute( "cards" );
-	    return false;
-	}
+        if (level >= 0)
+            args.pch->printf( "{cТы становишься %s.{x\r\n", getFace( '5' ).c_str( ) );
+        else {
+            args.pch->send_to( "{cТы выбываешь из колоды!{x\r\n" );
+            args.pch->getAttributes( ).eraseAttribute( "cards" );
+            return false;
+        }
     }
 
     return false;

@@ -2,8 +2,8 @@
  *
  * ruffina, 2004
  */
-#ifndef	__SPELL_H__
-#define	__SPELL_H__
+#ifndef        __SPELL_H__
+#define        __SPELL_H__
 
 #include <sstream>
 

@@ -15,16 +15,16 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
 
     for (i = elements.begin( ); i != elements.end( ); i++) {
         DLString swalk = i->speedwalk( );
-	
+        
         if (colon && swalk.size( ) <= 1)
-	    buf << ";";
-	    
+            buf << ";";
+            
         colon = (swalk.size( ) > 1);
-	
+        
         if (colon)
-	    buf << ";";
-	
-	buf << swalk;
+            buf << ";";
+        
+        buf << swalk;
     }
 }
 
@@ -35,10 +35,10 @@ void make_speedwalk( RoomTraverseResult &elements, ostringstream &buf )
 bool checkRoom( Character *ch, Room * room )
 {
     if (!ch->canEnter( room ))
-	return false;
+        return false;
     
     if (room->isPrivate( ))
-	return false;
+        return false;
 
     return true;
 }
@@ -48,7 +48,7 @@ struct DoorFunc {
 
     bool operator () ( Room *const room, EXIT_DATA *exit ) const
     {
-	return enabled && checkRoom( ch, exit->u1.to_room );
+        return enabled && checkRoom( ch, exit->u1.to_room );
     }
     
     Character *ch;
@@ -60,7 +60,7 @@ struct ExtraExitFunc {
 
     bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
     {
-	return enabled && checkRoom( ch, eexit->u1.to_room );
+        return enabled && checkRoom( ch, eexit->u1.to_room );
     }
     
     Character *ch;
@@ -72,7 +72,7 @@ struct PortalFunc {
 
     bool operator () ( Room *const room, Object *portal ) const
     {
-	return enabled && checkRoom( ch, get_room_index( portal->value[3] ) );
+        return enabled && checkRoom( ch, get_room_index( portal->value[3] ) );
     }
     
     Character *ch;
@@ -86,25 +86,25 @@ struct RoomDistanceComplete
     typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
 
     RoomDistanceComplete( Room *t, int &d, RoomTraverseResult &p ) 
-		: target( t ), distance( d ), path( p ) 
+                : target( t ), distance( d ), path( p ) 
     { 
     }
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->node == target) {
-	    distance = head->generation;
-	    
-	    for (const MyNodesEntry *i = head; i->prev; i = i->prev) {
-		Road road = i->hook;
-		
-		path.push_front( road );
-	    }
+        if (head->node == target) {
+            distance = head->generation;
+            
+            for (const MyNodesEntry *i = head; i->prev; i = i->prev) {
+                Road road = i->hook;
+                
+                path.push_front( road );
+            }
 
-	    return true;
-	}
+            return true;
+        }
 
-	return false;
+        return false;
     }
     
     Room *target;
@@ -114,7 +114,7 @@ struct RoomDistanceComplete
 
 typedef 
     BroadTraverse<RoomTraverseTraits, 
-		  MyHookIterator, RoomDistanceComplete> RoomDistanceTraverse;
+                  MyHookIterator, RoomDistanceComplete> RoomDistanceTraverse;
 
 int room_distance( Character *ch, Room *src, Room *dst, int limit )
 {
@@ -152,7 +152,7 @@ Road room_first_step( Character *ch, Room *start_room, Room *target_room,
     traverse( start_room, limit );
 
     if (!result.empty( ))
-	road = result.front( );
+        road = result.front( );
 
     return road;
 }

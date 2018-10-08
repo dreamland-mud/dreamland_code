@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-#ifndef	__SKILLCOMMANDTEMPLATE_H__
+#ifndef        __SKILLCOMMANDTEMPLATE_H__
 #define __SKILLCOMMANDTEMPLATE_H__
 
 // MOC_SKIP_BEGIN
@@ -15,29 +15,29 @@ struct SkillCommandTemplate : public DefaultSkillCommand, public ClassSelfRegist
     typedef ::Pointer<SkillCommandTemplate> Pointer;
 
     SkillCommandTemplate( ) {
-	name = cmdName;
+        name = cmdName;
     }
 
     virtual void run( Character * ch, const DLString & constArguments ) {
-	DefaultSkillCommand::run( ch, constArguments );
+        DefaultSkillCommand::run( ch, constArguments );
     }
     virtual void run( Character * ch, char *argument ) { 
-	DefaultSkillCommand::run( ch, argument );
+        DefaultSkillCommand::run( ch, argument );
     }
     virtual bool run( Character * ch, Character *victim ) { 
-	return DefaultSkillCommand::run( ch, victim );
+        return DefaultSkillCommand::run( ch, victim );
     }
     virtual bool run( Character * ch ) { 
-	return DefaultSkillCommand::run( ch );
+        return DefaultSkillCommand::run( ch );
     }
     virtual bool run( Character * ch, int value ) { 
-	return DefaultSkillCommand::run( ch, value );
+        return DefaultSkillCommand::run( ch, value );
     }
     virtual void run( Character *ch, Character *victim, Character *& result ) { 
-	DefaultSkillCommand::run( ch, victim, result );
+        DefaultSkillCommand::run( ch, victim, result );
     }
     virtual void run( Character *ch, Character *victim, int &result ) { 
-	DefaultSkillCommand::run( ch, victim, result );
+        DefaultSkillCommand::run( ch, victim, result );
     } 
 
     virtual const DLString &getType( ) const {

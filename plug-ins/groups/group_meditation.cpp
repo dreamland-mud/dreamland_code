@@ -45,7 +45,7 @@ VOID_SPELL(MagicConcentrate)::run( Character *ch, Character *, int sn, int level
       return;
   }
 
-  af.where		= TO_AFFECTS;
+  af.where                = TO_AFFECTS;
   af.type               = sn;
   af.level              = level;
   af.duration           = 7;

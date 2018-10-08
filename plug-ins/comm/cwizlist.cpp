@@ -55,34 +55,34 @@ void CWizlist::writeSwordLine( std::ostream &buf, char *str, char * color )
     int clen, i;
 
     if ((int) strlen(str) > textLine)        /* Урезаем текст, чтобы он поместился */
-	str[textLine] = '\0';
+        str[textLine] = '\0';
 
     clen = (textLine-strlen(str))/2; /* Считаем пробелы перед текстом*/
 
     buf << swordLines[cSwordLine].name.c_str( ); /* рисуем меч */
 
     if ( color && color[0] != '\0' )
-	buf << color;
+        buf << color;
 
     for( i=0;i<clen;++i)             /* Рисуем пробелы и текст */
-	buf << " ";
+        buf << " ";
     
     buf << str;
 
     if ( color && color[0] != '\0' )
-	buf << "{x";
+        buf << "{x";
 
     clen = textLine-(clen+strlen( str )); /* Считаем пробелы после текста */
     for( i=0;i<clen;++i)                  /* и рисуем их */
-	buf << " ";
+        buf << " ";
 
     buf << swordLines[cSwordLine].name.c_str( ); /* рисуем второй меч */
     buf << "\n\r";
 
     /* Проверяем, не пора ли переходить к следующему кусочку меча */
     if ( (++lineCounter >= swordLines[cSwordLine].count) && (swordLines[cSwordLine].count>0) ) {
-	lineCounter = 0;
-	cSwordLine++;
+        lineCounter = 0;
+        cSwordLine++;
     }
 }
 
@@ -93,10 +93,10 @@ void CWizlist::writeSwordPixels( std::ostream &res, char pixel, int count )
     int i;
 
     if (count>textLine)
-	count = textLine;
+        count = textLine;
 
     for (i=0;i<count;++i)
-	buf[i] = pixel;
+        buf[i] = pixel;
 
     buf[count] = '\0';
     writeSwordLine( res, buf, 0 );
@@ -117,8 +117,8 @@ COMMAND(CWizlist, "wizlist")
     GodList::iterator j;
 
     for (i = pcm.begin( ); i != pcm.end( ); i++) 
-	if (i->second->getLevel( ) > LEVEL_HERO)
-	    gods.push_back( i->second );
+        if (i->second->getLevel( ) > LEVEL_HERO)
+            gods.push_back( i->second );
 
     gods.sort( CompareGods( ) );
     j = gods.begin( );
@@ -134,18 +134,18 @@ COMMAND(CWizlist, "wizlist")
 
     /* Для каждого уровня богов */
     for ( cLevel = 0; cLevel < ( int )( sizeof(names)/sizeof(GodLevelName) ); cLevel ++ ) {
-	writeSwordLine( buf, "", 0 );
+        writeSwordLine( buf, "", 0 );
 
-	sprintf( bbuf, "%s [%d]", names[cLevel].name.c_str( ), names[cLevel].level );
-	writeSwordLine( buf, bbuf, 0 );
-	writeSwordPixels( buf, '*', names[cLevel].name.length( )+5 );
-	writeSwordLine( buf, "", 0 );
+        sprintf( bbuf, "%s [%d]", names[cLevel].name.c_str( ), names[cLevel].level );
+        writeSwordLine( buf, bbuf, 0 );
+        writeSwordPixels( buf, '*', names[cLevel].name.length( )+5 );
+        writeSwordLine( buf, "", 0 );
 
-	/* Выводим всех богов этого уровня */
-	for ( ; j != gods.end( ) && (*j)->getLevel( ) >= names[cLevel].level; j++) {
-	    sprintf( bbuf, "%s", (*j)->getName( ).c_str( ) );
-	    writeSwordLine( buf, bbuf, names[cLevel].color );
-	}
+        /* Выводим всех богов этого уровня */
+        for ( ; j != gods.end( ) && (*j)->getLevel( ) >= names[cLevel].level; j++) {
+            sprintf( bbuf, "%s", (*j)->getName( ).c_str( ) );
+            writeSwordLine( buf, bbuf, names[cLevel].color );
+        }
     }
 
     /* Рисуем кончики мечей */

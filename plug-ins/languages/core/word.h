@@ -49,7 +49,7 @@ public:
 
     inline Words & getWords( )
     {
-	return words;
+        return words;
     }
 
 protected:

@@ -21,68 +21,68 @@
  * @author Igor S. Petrenko
  */
 class SchedulerTaskAttributeManager :
-	public virtual SchedulerTaskRoundPlugin,
-	public virtual SchedulerTaskRoundPCharacter,
-	public AllocateClass
+        public virtual SchedulerTaskRoundPlugin,
+        public virtual SchedulerTaskRoundPCharacter,
+        public AllocateClass
 {
 public:
-	typedef ::Pointer<SchedulerTaskAttributeManager> Pointer;
+        typedef ::Pointer<SchedulerTaskAttributeManager> Pointer;
 
 public:
-	SchedulerTaskAttributeManager( );
-	virtual ~SchedulerTaskAttributeManager( );
-	
-	inline virtual const DLString& getName( ) const
-	{
-	    return PLUGIN_NAME;
-	}
-	
-	virtual void run( PCharacter*  );
-	virtual void after( );
-	
-	
-	static inline SchedulerTaskAttributeManager* getThis( )
-	{
-	    return thisClass;
-	}
-	
-	virtual DLObject::Pointer set( DLObject::Pointer arg1, DLObject::Pointer arg2 );
+        SchedulerTaskAttributeManager( );
+        virtual ~SchedulerTaskAttributeManager( );
+        
+        inline virtual const DLString& getName( ) const
+        {
+            return PLUGIN_NAME;
+        }
+        
+        virtual void run( PCharacter*  );
+        virtual void after( );
+        
+        
+        static inline SchedulerTaskAttributeManager* getThis( )
+        {
+            return thisClass;
+        }
+        
+        virtual DLObject::Pointer set( DLObject::Pointer arg1, DLObject::Pointer arg2 );
 private:
-	static SchedulerTaskAttributeManager* thisClass;
+        static SchedulerTaskAttributeManager* thisClass;
 
-	static const DLString PLUGIN_NAME;
+        static const DLString PLUGIN_NAME;
 };
 
 
 class ScheduledPCMemoryAttributeManager :
-	public virtual SchedulerTaskRoundPlugin,
-	public virtual SchedulerTaskRoundPCMemory,
-	public AllocateClass
+        public virtual SchedulerTaskRoundPlugin,
+        public virtual SchedulerTaskRoundPCMemory,
+        public AllocateClass
 {
 public:
-	typedef ::Pointer<ScheduledPCMemoryAttributeManager> Pointer;
+        typedef ::Pointer<ScheduledPCMemoryAttributeManager> Pointer;
 
-	ScheduledPCMemoryAttributeManager( );
-	virtual ~ScheduledPCMemoryAttributeManager( );
-	
-	virtual void run( PCMemoryInterface * );
-	virtual void after( );
-	
-	inline virtual const DLString& getName( ) const
-	{
-	    return PLUGIN_NAME;
-	}
-	
-	static inline ScheduledPCMemoryAttributeManager* getThis( )
-	{
-	    return thisClass;
-	}
-	
-	virtual DLObject::Pointer set( DLObject::Pointer arg1, DLObject::Pointer arg2 );
+        ScheduledPCMemoryAttributeManager( );
+        virtual ~ScheduledPCMemoryAttributeManager( );
+        
+        virtual void run( PCMemoryInterface * );
+        virtual void after( );
+        
+        inline virtual const DLString& getName( ) const
+        {
+            return PLUGIN_NAME;
+        }
+        
+        static inline ScheduledPCMemoryAttributeManager* getThis( )
+        {
+            return thisClass;
+        }
+        
+        virtual DLObject::Pointer set( DLObject::Pointer arg1, DLObject::Pointer arg2 );
 private:
-	static ScheduledPCMemoryAttributeManager* thisClass;
+        static ScheduledPCMemoryAttributeManager* thisClass;
 
-	static const DLString PLUGIN_NAME;
+        static const DLString PLUGIN_NAME;
 };
 
 #endif

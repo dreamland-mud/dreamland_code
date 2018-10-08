@@ -20,8 +20,8 @@ void traitsAPIAux( ostringstream &buf )
     typename TT::List *list = TT::List::begin();
     
     for ( ; list; list = list->getNext())
-	buf << "{g" << list->getKey().name 
-	    << "{x: " << list->getVal().help << endl;
+        buf << "{g" << list->getKey().name 
+            << "{x: " << list->getVal().help << endl;
 }
 
 template <typename T>
@@ -30,7 +30,7 @@ void traitsAPI( ostringstream &buf )
     typedef NativeTraits<T> Traits;
     
     buf << "{Y" << Traits::NAME << "{x" << endl
-	<< Traits::HELP << endl;
+        << Traits::HELP << endl;
     
     buf << endl << "{WПоля, доступные для записи: {x" << endl;
     traitsAPIAux<typename Traits::Set>( buf );

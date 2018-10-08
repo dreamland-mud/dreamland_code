@@ -35,8 +35,8 @@ NPCharacter * KidnapMobile::getKingRoom( Room *room )
     Character *king;
     
     for (king = room->people; king; king = king->next_in_room)
-	if (ourKing( king ))
-	    return king->getNPC( );
+        if (ourKing( king ))
+            return king->getNPC( );
     
     return NULL;
 }
@@ -46,23 +46,23 @@ Character * KidnapMobile::getAggrRoom( Room *room )
     Character *wch;
 
     for (wch = room->people; wch; wch = wch->next_in_room) {
-	if (!wch->is_npc( ))
-	    continue;
-	    
-	if (IS_AFFECTED( wch, AFF_BLOODTHIRST ))
-	    break;
-	
-	if (!IS_AWAKE( wch ))
-	    continue;
-	
-	if (wch->last_fought)
-	    continue;
-	
-	if (wch->getModifyLevel( ) < ch->getModifyLevel( ) + 10)
-	    continue;
-	
-	if (IS_SET( wch->act, ACT_AGGRESSIVE ))
-	    break;
+        if (!wch->is_npc( ))
+            continue;
+            
+        if (IS_AFFECTED( wch, AFF_BLOODTHIRST ))
+            break;
+        
+        if (!IS_AWAKE( wch ))
+            continue;
+        
+        if (wch->last_fought)
+            continue;
+        
+        if (wch->getModifyLevel( ) < ch->getModifyLevel( ) + 10)
+            continue;
+        
+        if (IS_SET( wch->act, ACT_AGGRESSIVE ))
+            break;
     }
 
     return wch;
@@ -71,6 +71,6 @@ Character * KidnapMobile::getAggrRoom( Room *room )
 void KidnapMobile::debug( const DLString &msg )
 {
     if (getQuest( ) && quest->debug) 
-	interpret_raw( ch, "say", msg.c_str( ) );
+        interpret_raw( ch, "say", msg.c_str( ) );
 }
 

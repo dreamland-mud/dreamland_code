@@ -42,7 +42,7 @@ ClanArea::Pointer ClanObject::getClanArea( )
     area = obj->pIndexData->area;
 
     if (area->behavior) 
-	clanArea = area->behavior.getDynamicPointer<ClanArea>( );
+        clanArea = area->behavior.getDynamicPointer<ClanArea>( );
 
     return clanArea;
 }
@@ -59,19 +59,19 @@ bool ClanItem::isHolded( ) const
     Character *carrier = obj->carried_by;
     
     if (!carrier)
-	return false;
+        return false;
 
     if (carrier->is_npc( ))
-	return false;
+        return false;
 
     if (IS_SET(carrier->in_room->room_flags, ROOM_SAFE|ROOM_SOLITARY|ROOM_PRIVATE))
-	return false;
+        return false;
      
     if (!carrier->in_room->guilds.empty( ))
-	return false;
+        return false;
 
     if (carrier->getModifyLevel( ) < obj->level - 3)
-	return false;
+        return false;
 
     return true;
 }
@@ -79,10 +79,10 @@ bool ClanItem::isHolded( ) const
 bool ClanItem::area( ) 
 { 
     if (!clan->getData( ) || clan->getData( )->hasItem( ))
-	return false;
+        return false;
     
     if (isHolded( ))
-	return false;
+        return false;
     
     actDisappear( );
     extract_obj( obj );
@@ -98,11 +98,11 @@ void ClanItem::actDisappear( )
 void ClanItem::get( Character *ch ) 
 { 
     if (ch->is_npc()) {
-	ch->pecho("Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj);
-	ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
-	obj_from_char(obj);
-	obj_to_room(obj, ch->in_room);
-	return;
+        ch->pecho("Ты не можешь владеть %1$O5 и бросаешь %1$P2.", obj);
+        ch->recho("%2$^C1 не может владеть %1$O5 и бросает %1$P2.", obj, ch);
+        obj_from_char(obj);
+        obj_to_room(obj, ch->in_room);
+        return;
     }
 }
 
@@ -124,7 +124,7 @@ bool ClanItem::sac( Character *ch )
 bool ClanItem::extract( bool count ) 
 { 
     if (clan->getData( ))
-	clan->getData( )->unsetItem( obj );
+        clan->getData( )->unsetItem( obj );
 
     return ClanObject::extract( count );
 }
@@ -142,23 +142,23 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     ClanArea::Pointer clanArea = getClanArea( ); 
     
     if (!clanArea)
-	return false;
+        return false;
     
     if (item->pIndexData->vnum != clanArea->itemVnum)
-	return false;
+        return false;
     
     actDisappear( );
 
     for (d = descriptor_list; d; d = d->next) 
-	if (d->connected == CON_PLAYING 
-	    && d->character 
-	    && d->character->getClan( ) == clanArea->getClan( ))
-	{
-	    actNotify( d->character );
-	}
+        if (d->connected == CON_PLAYING 
+            && d->character 
+            && d->character->getClan( ) == clanArea->getClan( ))
+        {
+            actNotify( d->character );
+        }
     
     if (clan->getData( ))
-	clan->getData( )->unsetItem( item );
+        clan->getData( )->unsetItem( item );
 
     extract_obj(obj);
     return true;
@@ -167,7 +167,7 @@ bool ClanAltar::fetch( Character *ch, Object *item )
 void ClanAltar::actAppear( )
 {
     act( "Ты видишь, как медленно появляется $o1.", 
-	 obj->in_room->people, obj, 0, TO_ALL );
+         obj->in_room->people, obj, 0, TO_ALL );
 }
 
 void ClanAltar::actDisappear( )
@@ -179,6 +179,6 @@ void ClanAltar::actDisappear( )
 void ClanAltar::actNotify( Character *ch )
 {
     act_p( "{gТы вздрагиваешь от осознания Силы своего Клана!{x", 
-	    ch, 0, 0, TO_CHAR, POS_DEAD );
+            ch, 0, 0, TO_CHAR, POS_DEAD );
 }
 

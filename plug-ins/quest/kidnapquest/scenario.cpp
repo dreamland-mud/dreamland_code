@@ -23,7 +23,7 @@ void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king )
     QuestMobileAppearence::dress( mob );
 
     if (mob->getRace( ) == race_none)
-	mob->setRace( king->getRace( )->getName( ) );
+        mob->setRace( king->getRace( )->getName( ) );
 }
 
 
@@ -33,10 +33,10 @@ void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king )
 void KidnapScenario::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *king )
 {
     tell_raw( hero, questman, 
-	      "У {W%s{G случилось несчастье. Срочно требуется твоя помощь.",
+              "У {W%s{G случилось несчастье. Срочно требуется твоя помощь.",
                    king->getNameP( '2' ).c_str() );
     tell_raw( hero, questman, 
-	     "Ищи %s в местности под названием {W%s{G ({W%s{G).",
+             "Ищи %s в местности под названием {W%s{G ({W%s{G).",
                    GET_SEX(king, "его", "его", "ее"), king->in_room->name, king->in_room->area->name );
 }
 

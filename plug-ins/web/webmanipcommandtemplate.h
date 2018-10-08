@@ -40,11 +40,11 @@ protected:
     virtual void initialization( ) 
     {
         ClassSelfRegistratorPlugin<tn>::initialization( );
-	WebManipCommand::initialization( );
+        WebManipCommand::initialization( );
     }
     virtual void destruction( ) 
     {
-	WebManipCommand::destruction( );
+        WebManipCommand::destruction( );
         ClassSelfRegistratorPlugin<tn>::destruction( );
     }
     

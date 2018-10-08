@@ -122,8 +122,8 @@ public:
     DLString name;
     
     union {
-	BinOp bin;
-	UnOp un;
+        BinOp bin;
+        UnOp un;
     } op;
 };
 

@@ -39,7 +39,7 @@ NPCharacter::NPCharacter( ) :
                 description( 0 ),
                 short_descr( 0 ),
                 long_descr( 0 ),
-		behavior( MobileBehavior::NODE_NAME )
+                behavior( MobileBehavior::NODE_NAME )
 {
     init( );
 }
@@ -66,11 +66,11 @@ void NPCharacter::init( )
     free_string(long_descr);
     long_descr = 0;
     cachedNoun.clear( );
-	
+        
     group = 0;
     off_flags = 0;
     for (int i = 0; i < 3; i++ ) 
-	damage[i] = 0;
+        damage[i] = 0;
     start_pos = POS_STANDING;
     default_pos = POS_STANDING;
     
@@ -127,7 +127,7 @@ short NPCharacter::getModifyLevel( ) const
 void NPCharacter::setDescription( const DLString& d )
 {
     if (description)
-	free_string( description );
+        free_string( description );
 
     description = str_dup( d.c_str( ) );
 }
@@ -138,7 +138,7 @@ const char * NPCharacter::getDescription( ) const
 void NPCharacter::setShortDescr( const char *d )
 {
     if (short_descr)
-	free_string( short_descr );
+        free_string( short_descr );
 
     short_descr = str_dup( d );
     updateCachedNoun( );
@@ -146,7 +146,7 @@ void NPCharacter::setShortDescr( const char *d )
 void NPCharacter::setLongDescr( const char *d )
 {
     if (long_descr)
-	free_string( long_descr );
+        free_string( long_descr );
 
     long_descr = str_dup( d );
 }
@@ -169,8 +169,8 @@ Noun::Pointer NPCharacter::toNoun( const DLObject *forWhom, int flags ) const
     const Character *wch = dynamic_cast<const Character *>(forWhom);
     
     if (IS_SET(flags, FMT_INVIS)) {
-	if (wch && !wch->can_see( this ))
-	    return somebody;
+        if (wch && !wch->can_see( this ))
+            return somebody;
     }
     
     return cachedNoun;
@@ -179,14 +179,14 @@ Noun::Pointer NPCharacter::toNoun( const DLObject *forWhom, int flags ) const
 void NPCharacter::updateCachedNoun( )
 {
     if (!cachedNoun) {
-	cachedNoun = RussianString::Pointer( 
-			NEW, 
-			getShortDescr( ), 
-			MultiGender( getSex( ), pIndexData->gram_number) );
+        cachedNoun = RussianString::Pointer( 
+                        NEW, 
+                        getShortDescr( ), 
+                        MultiGender( getSex( ), pIndexData->gram_number) );
     }
     else {
-	cachedNoun->setFullForm( getShortDescr( ) );
-	cachedNoun->setGender( MultiGender( getSex( ), pIndexData->gram_number ) );
+        cachedNoun->setFullForm( getShortDescr( ) );
+        cachedNoun->setGender( MultiGender( getSex( ), pIndexData->gram_number ) );
     }
 }
 
@@ -197,7 +197,7 @@ DLString NPCharacter::getNameP( char gram_case ) const
     buf << toNoun( )->decline( gram_case );
 
     if (gram_case == '7')
-	buf << " " << getName( );
+        buf << " " << getName( );
 
     return buf.str( );
 }
@@ -217,7 +217,7 @@ int NPCharacter::applyCurse( int def )
 int NPCharacter::get_trust( ) const
 {
     if ( switchedFrom )
-	return switchedFrom->get_trust();
+        return switchedFrom->get_trust();
     
     return std::min( (int)getRealLevel( ), LEVEL_HERO );
 }
@@ -263,8 +263,8 @@ bool NPCharacter::is_mirror( ) const
 PlayerConfig::Pointer NPCharacter::getConfig( ) const
 {
     if (switchedFrom)
-	return switchedFrom->getConfig( );
+        return switchedFrom->getConfig( );
     else
-	return PlayerConfig::Pointer( NEW );
+        return PlayerConfig::Pointer( NEW );
 }
 

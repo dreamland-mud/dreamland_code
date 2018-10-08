@@ -31,9 +31,9 @@
 bool RainbowScenario::checkArea( AREA_DATA *area ) const
 {
     if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_NOQUEST|AREA_HOMETOWN|AREA_NOGATE))
-	return false;
+        return false;
     if (area->low_range > 20)
-	return false;
+        return false;
 
     return true;
 }
@@ -41,17 +41,17 @@ bool RainbowScenario::checkArea( AREA_DATA *area ) const
 bool RainbowScenario::checkMobile( NPCharacter *ch ) const
 {
     if (!IS_SET(ch->form, FORM_BIPED))
-	return false;
+        return false;
     if (!IS_SET(ch->form, FORM_MAMMAL))
-	return false;
+        return false;
     if (IS_SET(ch->imm_flags, IMM_SUMMON|IMM_CHARM))
-	return false;
+        return false;
     if ((ch->behavior && ch->behavior->hasDestiny( )) || ch->fighting)
-	return false;
+        return false;
     if (IS_AFFECTED(ch, AFF_CHARM)) 
-	return false;
+        return false;
     if (IS_SET(ch->act, ACT_AGGRESSIVE))
-	return false;
+        return false;
 
     return true;
 }
@@ -59,17 +59,17 @@ bool RainbowScenario::checkMobile( NPCharacter *ch ) const
 bool RainbowScenario::checkRoom( Room *room ) const    
 {
     if (IS_SET(room->room_flags, ROOM_NO_QUEST))
-	return false;
+        return false;
 
     if (!room->isCommon( ))
-	return false;
+        return false;
 
     for (int d = 0; d < DIR_SOMEWHERE; d++)
-	if (room->exit[d] 
-	    && room->exit[d]->u1.to_room
-	    && room->exit[d]->u1.to_room->exit[dirs[d].rev]
-	    && room->exit[d]->u1.to_room->exit[dirs[d].rev]->u1.to_room == room)
-	    return true;
+        if (room->exit[d] 
+            && room->exit[d]->u1.to_room
+            && room->exit[d]->u1.to_room->exit[dirs[d].rev]
+            && room->exit[d]->u1.to_room->exit[dirs[d].rev]->u1.to_room == room)
+            return true;
 
     return false;
 }
@@ -80,16 +80,16 @@ void RainbowScenario::onQuestInit( ) const
     Character *ch;
     
     for ( d = descriptor_list; d; d = d->next ) {
-	if (d->connected != CON_PLAYING)
-	    continue;
-	if (!(ch = d->character))
-	    continue;
-	if (ch->is_npc( ))
-	    continue;
-	if (!canHearInitMsg( ch->getPC( ) ))
-	    continue;
+        if (d->connected != CON_PLAYING)
+            continue;
+        if (!(ch = d->character))
+            continue;
+        if (ch->is_npc( ))
+            continue;
+        if (!canHearInitMsg( ch->getPC( ) ))
+            continue;
 
-	ch->send_to( getInitMsg( ) + "\r\n" );
+        ch->send_to( getInitMsg( ) + "\r\n" );
     }
 }
 
@@ -100,16 +100,16 @@ void RainbowScenario::onQuestInit( ) const
 void RainbowDefaultScenario::canStart( ) const throw ( GQCannotStartException )
 {
     if (weather_info.sky != SKY_RAINING)
-	throw GQCannotStartException( "wrong weather" );
-	
+        throw GQCannotStartException( "wrong weather" );
+        
     if (weather_info.sunlight != SUN_LIGHT)
-	throw GQCannotStartException( "wrong hour" );
+        throw GQCannotStartException( "wrong hour" );
 }
 
 bool RainbowDefaultScenario::checkRoom( Room *room ) const
 {
     if (IS_SET(room->room_flags, ROOM_INDOORS|ROOM_DARK))
-	return false;
+        return false;
 
     return RainbowScenario::checkRoom( room );
 }
@@ -117,8 +117,8 @@ bool RainbowDefaultScenario::checkRoom( Room *room ) const
 void RainbowDefaultScenario::printCount( int cnt, ostringstream& buf ) const
 {
     buf << "У тебя уже есть " << GQChannel::BOLD << cnt << GQChannel::NORMAL
-	<< " разноцветн" << GET_COUNT(cnt, "ый", "ых", "ых")
-	<< " кусоч" << GET_COUNT(cnt, "ек", "ка", "ков") << ". ";
+        << " разноцветн" << GET_COUNT(cnt, "ый", "ых", "ых")
+        << " кусоч" << GET_COUNT(cnt, "ек", "ка", "ков") << ". ";
 }
 
 void RainbowDefaultScenario::printTime( ostringstream& buf ) const
@@ -131,8 +131,8 @@ void RainbowDefaultScenario::printTime( ostringstream& buf ) const
 void RainbowDefaultScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
     buf << GQChannel::BOLD << name << GQChannel::NORMAL
-	<< " зажигает {Yр{Rа{Mд{Gу{Bг{Cу{x " << GQChannel::NORMAL 
-	<< "над Миром!";
+        << " зажигает {Yр{Rа{Mд{Gу{Bг{Cу{x " << GQChannel::NORMAL 
+        << "над Миром!";
 }
 
 bool RainbowDefaultScenario::canHearInitMsg( PCharacter *ch ) const
@@ -149,9 +149,9 @@ void RainbowDefaultScenario::onQuestFinish( PCharacter *ch ) const
     af.duration = 180;
     af.level = 106;
     af.bitvector = RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
-		   |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
-		   |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
-		   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON;
+                   |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
+                   |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
+                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON;
     af.location = 0;
     af.modifier = 0;
     affect_join(ch, &af);
@@ -198,8 +198,8 @@ void RainbowSinsScenario::canStart( ) const throw ( GQCannotStartException )
 void RainbowSinsScenario::printCount( int cnt, ostringstream& buf ) const
 {
     buf << "Тебе удалось собрать " << GQChannel::BOLD << cnt << GQChannel::NORMAL
-	<< " смертн" << GET_COUNT(cnt, "ый", "ых", "ых")
-	<< " грех" << GET_COUNT(cnt, "", "а", "ов") << ". ";
+        << " смертн" << GET_COUNT(cnt, "ый", "ых", "ых")
+        << " грех" << GET_COUNT(cnt, "", "а", "ов") << ". ";
 }
 
 void RainbowSinsScenario::printTime( ostringstream& buf ) const
@@ -212,7 +212,7 @@ void RainbowSinsScenario::printTime( ostringstream& buf ) const
 void RainbowSinsScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
     buf << GQChannel::BOLD << name << GQChannel::NORMAL
-	<< "  приняли на адскую должность!";
+        << "  приняли на адскую должность!";
 }
 
 bool RainbowSinsScenario::canHearInitMsg( PCharacter *ch ) const
@@ -229,9 +229,9 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
     af.duration = 180;
     af.level = 106;
     af.bitvector = RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
-		   |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
-		   |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
-		   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON;
+                   |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
+                   |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
+                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON;
     af.location = 0;
     af.modifier = 0;
     affect_join(ch, &af);

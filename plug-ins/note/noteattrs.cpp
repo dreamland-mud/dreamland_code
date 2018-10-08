@@ -27,9 +27,9 @@ time_t XMLAttributeLastRead::getStamp( const NoteThread * thread ) const
     i = stamps.find( thread->getName( ) );
 
     if (i == stamps.end( ))
-	return 0;
+        return 0;
     else
-	return i->second.getValue( );
+        return i->second.getValue( );
 }
 
 void XMLAttributeLastRead::updateStamp( const NoteThread * thread )
@@ -49,9 +49,9 @@ void XMLAttributeLastRead::updateStamp( const NoteThread * thread, const Note* n
     i = stamps.find( thread->getName( ) );
 
     if (i == stamps.end( ))
-	stamps[thread->getName( )] = note->getID( );
+        stamps[thread->getName( )] = note->getID( );
     else
-	stamps[thread->getName( )] = std::max( note->getID( ), (time_t)i->second.getValue( ) );
+        stamps[thread->getName( )] = std::max( note->getID( ), (time_t)i->second.getValue( ) );
 }
 
 /*-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ int XMLNoteData::getBodySize( ) const
     Lines::const_iterator i; 
 
     for (i = body.begin( ); i != body.end( ); i++)
-	size += i->getValue( ).size( ); 
+        size += i->getValue( ).size( ); 
 
     return size;
 }
@@ -92,13 +92,13 @@ int XMLNoteData::getBodySize( ) const
 void XMLNoteData::linesToStream( ostringstream& buf ) const
 {
     for (Lines::const_iterator i = body.begin( ); i != body.end( ); i++)
-	buf << *i << endl;
+        buf << *i << endl;
 }
 void XMLNoteData::toStream( ostringstream& buf ) const
 {
     buf << getFrom( ) << "{x: "
-	<< getSubject( ) << "{x" << endl
-	<< "To: " << getRecipient( ) << "{x" << endl;
+        << getSubject( ) << "{x" << endl
+        << "To: " << getRecipient( ) << "{x" << endl;
     linesToStream( buf );
 }
 void XMLNoteData::commit( Note *note ) const
@@ -114,7 +114,7 @@ void XMLNoteData::commit( Note *note ) const
     note->setDate( );
 
     if (!from.getValue( ).empty( ))
-	note->setFrom( getFrom( ) );
+        note->setFrom( getFrom( ) );
 }
 
 /*-----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void XMLAttributeNoteData::clearNote( const NoteThread *thread )
     iterator i = find( thread->getName( ) );
 
     if (i != end( ))
-	erase( i );
+        erase( i );
 }
 
 
@@ -136,9 +136,9 @@ XMLNoteData * XMLAttributeNoteData::findNote( const NoteThread *thread )
     iterator i = find( thread->getName( ) );
 
     if (i != end( ))
-	return &i->second;
+        return &i->second;
     else
-	return NULL;
+        return NULL;
 }
 
 XMLNoteData * XMLAttributeNoteData::makeNote( PCharacter *ch, const NoteThread *thread )

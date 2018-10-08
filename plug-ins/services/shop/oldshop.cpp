@@ -88,20 +88,20 @@ ShopStock get_stock_keeper( ShopTrader::Pointer trader, Character *client, const
     NPCharacter *keeper = trader->getChar( );
 
     for( obj = keeper->carrying; obj; obj = obj->next_content) {
-	if (obj->wear_loc != wear_none)
+        if (obj->wear_loc != wear_none)
             continue;
         
         if (client && !client->can_see( obj ))
             continue;
 
-	int cost = get_cost( keeper, obj, true, trader );
+        int cost = get_cost( keeper, obj, true, trader );
         if (cost <= 0)
             continue;
 
         if (!arg.empty( ) && !obj_has_name( obj, arg, client ))
             continue;
         
-	int count = 1;
+        int count = 1;
 
         if (!IS_OBJ_STAT( obj, ITEM_INVENTORY )) {
             while (obj->next_content
@@ -130,20 +130,20 @@ CMDRUN( buy )
 {
     if (constArguments.empty( ))
     {
-	ch->send_to("Купить что?\n\r");
-	return;
+        ch->send_to("Купить что?\n\r");
+        return;
     }
 
     char buf[MAX_STRING_LENGTH], arg[MAX_STRING_LENGTH];
     char argument[MAX_INPUT_LENGTH];
-    int	cost, roll;
+    int        cost, roll;
     NPCharacter*  keeper;
     ShopTrader::Pointer trader;
-    Object*	    obj,*t_obj;
-    int	    number, count = 1;
+    Object*            obj,*t_obj;
+    int            number, count = 1;
 
     if ( !( trader = find_keeper( ch ) ) )
-	return;
+        return;
     
     keeper = trader->getChar( );
     strcpy( argument, constArguments.c_str( ) );
@@ -153,97 +153,97 @@ CMDRUN( buy )
 
     if ( cost <= 0 || !ch->can_see( obj ) )
     {
-	act_p( "$c1 говорит тебе '{gЯ не продаю этого - используй 'list'{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
-	ch->reply = keeper;
-	return;
+        act_p( "$c1 говорит тебе '{gЯ не продаю этого - используй 'list'{x'.", keeper, 0, ch, TO_VICT, POS_RESTING );
+        ch->reply = keeper;
+        return;
     }
 
 
     if ( !IS_OBJ_STAT( obj, ITEM_INVENTORY ) ) {
-	for ( t_obj = obj->next_content; count < number && t_obj; t_obj = t_obj->next_content )
-	{
-	    if ( t_obj->pIndexData == obj->pIndexData
-		&& !str_cmp( t_obj->getShortDescr( ), obj->getShortDescr( ) ) )
-	    {
-		count++;
-	    }
-	    else
-		break;
-	}
+        for ( t_obj = obj->next_content; count < number && t_obj; t_obj = t_obj->next_content )
+        {
+            if ( t_obj->pIndexData == obj->pIndexData
+                && !str_cmp( t_obj->getShortDescr( ), obj->getShortDescr( ) ) )
+            {
+                count++;
+            }
+            else
+                break;
+        }
 
-	if ( count < number ) {
-	    act_p( "$c1 говорит тебе '{gУ меня нет столько.{x'",
-	    keeper, 0, ch, TO_VICT, POS_RESTING );
-	    ch->reply = keeper;
-	    return;
-	}
+        if ( count < number ) {
+            act_p( "$c1 говорит тебе '{gУ меня нет столько.{x'",
+            keeper, 0, ch, TO_VICT, POS_RESTING );
+            ch->reply = keeper;
+            return;
+        }
     }
 
     if (obj->pIndexData->limit > 0 && obj->pIndexData->limit < obj->pIndexData->count - 1 + number) {
-	act_p("$c1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",
-	keeper, 0, ch, TO_VICT, POS_RESTING );
-	ch->reply = keeper;
-	return;
+        act_p("$c1 говорит тебе '{gТакого количества ништяков у меня нету.{x'",
+        keeper, 0, ch, TO_VICT, POS_RESTING );
+        ch->reply = keeper;
+        return;
     }
 
     if ( ( ch->silver + ch->gold * 100) < cost * number )
     {
-	if ( number > 1 )
-	    act_p( "$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
-		    keeper, obj, ch, TO_VICT, POS_RESTING );
-	else
-	    act_p( "$c1 говорит тебе '{gУ тебя нет нужной суммы, чтоб купить $o4.{x'",
-		    keeper, obj, ch, TO_VICT,POS_RESTING );
-	
-	ch->reply = keeper;
-	return;
+        if ( number > 1 )
+            act_p( "$c1 говорит тебе '{gТы не можешь заплатить за столько.{x'",
+                    keeper, obj, ch, TO_VICT, POS_RESTING );
+        else
+            act_p( "$c1 говорит тебе '{gУ тебя нет нужной суммы, чтоб купить $o4.{x'",
+                    keeper, obj, ch, TO_VICT,POS_RESTING );
+        
+        ch->reply = keeper;
+        return;
     }
 
     if ( ch->getRealLevel( ) < get_wear_level( ch, obj ) )
     {
-	act_p( "$c1 говорит тебе '{gТы не сможешь использовать $o4{x'.",
-		keeper, obj, ch, TO_VICT,POS_RESTING );
+        act_p( "$c1 говорит тебе '{gТы не сможешь использовать $o4{x'.",
+                keeper, obj, ch, TO_VICT,POS_RESTING );
 
-	ch->reply = keeper;
-	return;
+        ch->reply = keeper;
+        return;
     }
 
     if ( ch->carry_number + number * obj->getNumber( ) > ch->canCarryNumber( ) )
     {
-	ch->send_to("Ты не можешь нести так много вещей.\n\r");
-	return;
+        ch->send_to("Ты не можешь нести так много вещей.\n\r");
+        return;
     }
 
     if ( ch->carry_weight + number * obj->getWeight( ) > ch->canCarryWeight( ) )
     {
-	ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
-	return;
+        ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
+        return;
     }
 
     /* haggle */
     roll = number_percent( );
     if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && roll < gsn_haggle->getEffective( ch ) )
     {
-	cost -= obj->cost / 2 * roll / 100;
-	act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
-	gsn_haggle->improve( ch, true );
+        cost -= obj->cost / 2 * roll / 100;
+        act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
+        gsn_haggle->improve( ch, true );
     }
 
     if ( number > 1 )
     {
-	sprintf( buf, "$c1 покупает $o4[%d].", number );
-	act_p( buf, ch, obj, 0, TO_ROOM, POS_RESTING );
-	sprintf( buf, "Ты покупаешь $o4[%d] за %d серебрян%s.",
-			number, cost * number,
-			GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
-	act_p( buf, ch, obj, 0, TO_CHAR, POS_RESTING );
+        sprintf( buf, "$c1 покупает $o4[%d].", number );
+        act_p( buf, ch, obj, 0, TO_ROOM, POS_RESTING );
+        sprintf( buf, "Ты покупаешь $o4[%d] за %d серебрян%s.",
+                        number, cost * number,
+                        GET_COUNT( cost * number, "ую монету", "ые монеты", "ых монет" ) );
+        act_p( buf, ch, obj, 0, TO_CHAR, POS_RESTING );
     }
     else
     {
-	act_p( "$c1 покупает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
-	sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
-			cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
-	act_p( buf, ch, obj, 0, TO_CHAR,POS_RESTING );
+        act_p( "$c1 покупает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
+        sprintf( buf, "Ты покупаешь $o4 за %d серебрян%s.",
+                        cost, GET_COUNT( cost, "ую монету", "ые монеты", "ых монет" ) );
+        act_p( buf, ch, obj, 0, TO_CHAR,POS_RESTING );
     }
 
     deduct_cost( ch, cost * number );
@@ -257,27 +257,27 @@ CMDRUN( buy )
 
     for ( count = 0; count < number; count++ )
     {
-	if ( IS_SET( obj->extra_flags, ITEM_INVENTORY ) 
-		&& (obj->pIndexData->limit < 0 
-	    || obj->pIndexData->limit > obj->pIndexData->count))
-	{
-	    t_obj = create_object( obj->pIndexData, obj->level );
-	}
-	else
-	{
-	    t_obj = obj;
-	    obj = obj->next_content;
-	    obj_from_char( t_obj );
-	}
+        if ( IS_SET( obj->extra_flags, ITEM_INVENTORY ) 
+                && (obj->pIndexData->limit < 0 
+            || obj->pIndexData->limit > obj->pIndexData->count))
+        {
+            t_obj = create_object( obj->pIndexData, obj->level );
+        }
+        else
+        {
+            t_obj = obj;
+            obj = obj->next_content;
+            obj_from_char( t_obj );
+        }
 
-	if ( t_obj->timer > 0 && !IS_OBJ_STAT( t_obj, ITEM_HAD_TIMER ) )
-	    t_obj->timer = 0;
-	
-	REMOVE_BIT( t_obj->extra_flags, ITEM_HAD_TIMER );
-	obj_to_char( t_obj, ch );
+        if ( t_obj->timer > 0 && !IS_OBJ_STAT( t_obj, ITEM_HAD_TIMER ) )
+            t_obj->timer = 0;
+        
+        REMOVE_BIT( t_obj->extra_flags, ITEM_HAD_TIMER );
+        obj_to_char( t_obj, ch );
 
-	if ( cost < t_obj->cost )
-	    t_obj->cost = cost;
+        if ( cost < t_obj->cost )
+            t_obj->cost = cost;
     }
 }
 
@@ -298,12 +298,12 @@ CMDRUN( sell )
 
     if (arg.empty( ))
     {
-	ch->send_to("Продать что?\n\r");
-	return;
+        ch->send_to("Продать что?\n\r");
+        return;
     }
 
     if ( !( trader = find_keeper( ch ) ) )
-	return;
+        return;
     
     keeper = trader->getChar( );
 
@@ -315,35 +315,35 @@ CMDRUN( sell )
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
     {
-	act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
-	keeper, 0, ch, TO_VICT,POS_RESTING );
-	ch->reply = keeper;
-	return;
+        act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
+        keeper, 0, ch, TO_VICT,POS_RESTING );
+        ch->reply = keeper;
+        return;
     }
 
     if ( !can_drop_obj( ch, obj ) )
     {
-	ch->send_to("Ты не можешь избавиться от этого.\n\r");
-	return;
+        ch->send_to("Ты не можешь избавиться от этого.\n\r");
+        return;
     }
 
     if (!keeper->can_see(obj))
     {
-	act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
-	return;
+        act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
+        return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-	act_p( "$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
-	return;
+        act_p( "$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
+        return;
     }
 
     if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
     {
-	act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
-	      keeper,obj,ch,TO_VICT,POS_RESTING);
-	return;
+        act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
+              keeper,obj,ch,TO_VICT,POS_RESTING);
+        return;
     }
 
     /* haggle */
@@ -351,20 +351,20 @@ CMDRUN( sell )
 
     if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) && roll < gsn_haggle->getEffective( ch ))
     {
-	roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
-	ch->send_to("Ты торгуешься с продавцом.\n\r");
+        roll = gsn_haggle->getEffective( ch ) + number_range(1, 20) - 10;
+        ch->send_to("Ты торгуешься с продавцом.\n\r");
 
-	cost += obj->cost / 2 * roll / 100;
-	cost = min(cost,95 * get_cost(keeper,obj,true, trader) / 100);
-	//cost = min(cost, static_cast<int>( keeper->silver + 100 * keeper->gold ) );
-	gsn_haggle->improve( ch, true );
-	
-	if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
-	{
-	    act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
-	    keeper,obj,ch,TO_VICT,POS_RESTING);
-	    return;
-	}
+        cost += obj->cost / 2 * roll / 100;
+        cost = min(cost,95 * get_cost(keeper,obj,true, trader) / 100);
+        //cost = min(cost, static_cast<int>( keeper->silver + 100 * keeper->gold ) );
+        gsn_haggle->improve( ch, true );
+        
+        if ( (cost / 100 + 1) > dreamland->getBalanceMerchantBank() )
+        {
+            act_p("$c1 говорит тебе '{gУ меня нет денег, чтоб заплатить тебе за $o4.{x'",
+            keeper,obj,ch,TO_VICT,POS_RESTING);
+            return;
+        }
     }
 
     act_p( "$c1 продает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
@@ -372,33 +372,33 @@ CMDRUN( sell )
     gold   = cost/100;
 
     sprintf( buf2, "Ты продаешь $o4 за %s%s%s.",
-		    silver != 0 ? "%d серебра":"",    
-		    ( silver != 0 && gold != 0 ) ? " и ":"",	      
-		    gold != 0 ? "%d золота":"");		      
+                    silver != 0 ? "%d серебра":"",    
+                    ( silver != 0 && gold != 0 ) ? " и ":"",              
+                    gold != 0 ? "%d золота":"");                      
 
     if (silver != 0 && gold != 0)
-	sprintf( buf, buf2, silver, gold );
+        sprintf( buf, buf2, silver, gold );
     else if (silver != 0 )
-	sprintf( buf, buf2, silver );
+        sprintf( buf, buf2, silver );
     else
-	sprintf( buf, buf2, gold );
+        sprintf( buf, buf2, gold );
 
     act_p( buf, ch, obj, 0, TO_CHAR,POS_RESTING );
 
     if ( cost <= keeper->silver )
-	keeper->silver -= cost;
+        keeper->silver -= cost;
     else
     {
-	cost -= keeper->silver;
-	
-	if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
-	{
-	    act_p("$c1 говорит тебе '{GУ меня нет денег.{x'",
-	    keeper,0,ch,TO_VICT,POS_RESTING);
-	    return;
-	}
+        cost -= keeper->silver;
+        
+        if ( !dreamland->getFromMerchantBank( cost / 100 + 1 ) )
+        {
+            act_p("$c1 говорит тебе '{GУ меня нет денег.{x'",
+            keeper,0,ch,TO_VICT,POS_RESTING);
+            return;
+        }
 
-	keeper->silver = ( cost / 100 + 1 ) * 100 - cost;
+        keeper->silver = ( cost / 100 + 1 ) * 100 - cost;
     }
 
     int gold_old = ch->gold;
@@ -408,28 +408,28 @@ CMDRUN( sell )
 
     if ( ch->getCarryWeight( ) > ch->canCarryWeight( ) )
     {
-	ch->gold = gold_old;
-	ch->silver = silver_old;
-	act_p( "$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
-	keeper, 0, ch, TO_VICT,POS_RESTING );
-	act_p( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM,POS_RESTING );
-	obj_to_room( create_money( gold, silver ), ch->in_room );
+        ch->gold = gold_old;
+        ch->silver = silver_old;
+        act_p( "$c1 пытается дать тебе деньги, но ты не можешь их удержать.",
+        keeper, 0, ch, TO_VICT,POS_RESTING );
+        act_p( "$c1 роняет на пол кучку монет.", ch,0,0,TO_ROOM,POS_RESTING );
+        obj_to_room( create_money( gold, silver ), ch->in_room );
     }
 
     if ( obj->item_type == ITEM_TRASH || IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT) )
     {
-	extract_obj( obj );
+        extract_obj( obj );
     }
     else
     {
-	obj_from_char( obj );
-	
-	if (obj->timer)
-	    SET_BIT(obj->extra_flags,ITEM_HAD_TIMER);
-	else
-	    obj->timer = number_range(50,100);
-	
-	obj_to_keeper( obj, keeper );
+        obj_from_char( obj );
+        
+        if (obj->timer)
+            SET_BIT(obj->extra_flags,ITEM_HAD_TIMER);
+        else
+            obj->timer = number_range(50,100);
+        
+        obj_to_keeper( obj, keeper );
     }
 }
 
@@ -445,16 +445,16 @@ CMDRUN( list )
     ostringstream buf;
 
     if ( !( trader = find_keeper( ch ) ) )
-	return;
+        return;
     
     keeper = trader->getChar( );
     ShopStock stock = get_stock_keeper( trader, ch, arg );
 
     if (stock.empty( )) {
-	if (arg.empty( ))
-	    tell_dim( ch, keeper, "Мне сегодня нечего тебе предложить.");
-	else
-	    tell_dim( ch, keeper, "Я не продаю '$t'.", arg.c_str( ) );
+        if (arg.empty( ))
+            tell_dim( ch, keeper, "Мне сегодня нечего тебе предложить.");
+        else
+            tell_dim( ch, keeper, "Я не продаю '$t'.", arg.c_str( ) );
         return;
     }
 
@@ -463,12 +463,12 @@ CMDRUN( list )
     for (int i = 0; i < stock.size( ); i++) {
         const StockInfo &si = stock.at( i );
         
-	if (IS_OBJ_STAT( si.obj, ITEM_INVENTORY ))
-	    buf << dlprintf( "[ {Y%3d{x |%3d %5d   --   ] ",
+        if (IS_OBJ_STAT( si.obj, ITEM_INVENTORY ))
+            buf << dlprintf( "[ {Y%3d{x |%3d %5d   --   ] ",
                     i+1, si.obj->level, si.cost );
 
         else 
-	    buf << dlprintf( "[ {Y%3d{x |%3d %5d %6d ] ",
+            buf << dlprintf( "[ {Y%3d{x |%3d %5d %6d ] ",
                     i+1, si.obj->level, si.cost, si.count );
 
         webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1' ), si.obj, ch );
@@ -493,52 +493,52 @@ CMDRUN( value )
 
     if (arg.empty( ))
     {
-	ch->send_to("Узнать цену чего?\n\r");
-	return;
+        ch->send_to("Узнать цену чего?\n\r");
+        return;
     }
 
     if ( !( trader = find_keeper( ch ) ) )
-	return;
+        return;
     
     keeper = trader->getChar( );
 
     if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
     {
-	act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
-		keeper, 0, ch, TO_VICT,POS_RESTING );
-	ch->reply = keeper;
-	return;
+        act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
+                keeper, 0, ch, TO_VICT,POS_RESTING );
+        ch->reply = keeper;
+        return;
     }
 
     if (!keeper->can_see(obj))
     {
-	act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
-	return;
+        act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
+        return;
     }
 
     if ( !can_drop_obj( ch, obj ) )
     {
-	ch->send_to("Ты не можешь избавиться от этого.\n\r");
-	return;
+        ch->send_to("Ты не можешь избавиться от этого.\n\r");
+        return;
     }
 
     if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
     {
-	act_p("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
-	return;
+        act_p("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
+        return;
     }
 
     if ( dreamland->getBalanceMerchantBank() < (cost / 100 + 1) )
     {
-	sprintf( buf,
-		"$c1 говорит тебе '{gЯ дал бы тебе %d серебра и %d золота за $o4, но у меня нет денег.{x'",
-		cost - (cost/100) * 100, cost/100 );
+        sprintf( buf,
+                "$c1 говорит тебе '{gЯ дал бы тебе %d серебра и %d золота за $o4, но у меня нет денег.{x'",
+                cost - (cost/100) * 100, cost/100 );
     }
     else
-    {	
-	sprintf( buf,
-		"$c1 говорит тебе '{gЯ дам тебе %d серебра и %d золота за $o4.{x'",
-		cost - (cost/100) * 100, cost/100 );
+    {        
+        sprintf( buf,
+                "$c1 говорит тебе '{gЯ дам тебе %d серебра и %d золота за $o4.{x'",
+                cost - (cost/100) * 100, cost/100 );
     }
 
     act_p( buf, keeper, obj, ch, TO_VICT,POS_RESTING );
@@ -555,12 +555,12 @@ CMDRUN( properties )
 
     if (arg.empty( ))
     {
-	ch->send_to("Узнать характеристики чего?\n\r");
-	return;
+        ch->send_to("Узнать характеристики чего?\n\r");
+        return;
     }
 
     if ( !( trader = find_keeper( ch ) ) )
-	return;
+        return;
     
     trader->describeGoods( ch, arg, true );
 }
@@ -573,36 +573,36 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
     int cost;
 
     if(!obj)
-	return 0;
+        return 0;
 
     if( IS_OBJ_STAT( obj, ITEM_NOSELL ) ) 
-	return 0;
+        return 0;
 
     if( fBuy ) {
-	cost = obj->cost * trader->profitBuy  / 100;
+        cost = obj->cost * trader->profitBuy  / 100;
     } else {
-	Object *obj2;
+        Object *obj2;
 
-	cost = 0;
+        cost = 0;
     
-	if (trader->buys.isSetBitNumber( obj->item_type ))
-	    cost = obj->cost * trader->profitSell / 100;
+        if (trader->buys.isSetBitNumber( obj->item_type ))
+            cost = obj->cost * trader->profitSell / 100;
 
-	if( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) )
-	    for( obj2 = keeper->carrying; obj2; obj2 = obj2->next_content ) {
-		if( obj->pIndexData == obj2->pIndexData &&
-		    !str_cmp( obj->getShortDescr( ), obj2->getShortDescr( ) ) )
-		{
-		    cost /= 2;
-		}
-	    }
+        if( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) )
+            for( obj2 = keeper->carrying; obj2; obj2 = obj2->next_content ) {
+                if( obj->pIndexData == obj2->pIndexData &&
+                    !str_cmp( obj->getShortDescr( ), obj2->getShortDescr( ) ) )
+                {
+                    cost /= 2;
+                }
+            }
     }
 
     if( obj->item_type == ITEM_STAFF || obj->item_type == ITEM_WAND ) {
-	if( !obj->value[1] ) 
-	    cost /= 4;
-	else 
-	    cost = cost * obj->value[2] / obj->value[1];
+        if( !obj->value[1] ) 
+            cost /= 4;
+        else 
+            cost = cost * obj->value[2] / obj->value[1];
     }
 
     return cost;
@@ -615,24 +615,24 @@ ShopTrader::Pointer find_keeper( Character *ch )
     
     trader = find_attracted_mob_behavior<ShopTrader>( ch, OCC_SHOPPER );
     if (!trader) {
-	ch->send_to("Здесь нет продавцов.\n\r");
-	return null;
+        ch->send_to("Здесь нет продавцов.\n\r");
+        return null;
     }
 
     keeper = trader->getChar( );
 
     if (!IS_AWAKE(keeper)) {
-	interpret_raw( keeper, "snore" );
-	return null;
+        interpret_raw( keeper, "snore" );
+        return null;
     }
     
     if ( IS_SET(keeper->in_room->area->area_flag,AREA_HOMETOWN)
-	 && !ch->is_npc() && IS_SET(ch->act,PLR_WANTED) )
+         && !ch->is_npc() && IS_SET(ch->act,PLR_WANTED) )
     {
-	do_say( keeper, "Преступникам не место здесь!" );
+        do_say( keeper, "Преступникам не место здесь!" );
         DLString msg = fmt( 0, "%1$C1 - преступни%1$Gк|к|ца|ки! Хватайте %1$P2!", ch );
-	do_yell( keeper, msg.c_str( ) );
-	return null;
+        do_yell( keeper, msg.c_str( ) );
+        return null;
     }
 
     /*
@@ -640,8 +640,8 @@ ShopTrader::Pointer find_keeper( Character *ch )
     */
     if (time_info.hour > trader->closeHour) 
     {
-	do_say( keeper, "Извини, магазин уже закрыт. Приходи завтра." );
-	return null;
+        do_say( keeper, "Извини, магазин уже закрыт. Приходи завтра." );
+        return null;
     }
 
     /*
@@ -649,24 +649,24 @@ ShopTrader::Pointer find_keeper( Character *ch )
     */
     if ( !keeper->can_see( ch ) && !ch->is_immortal() )
     {
-	do_say( keeper, "Я не торгую с тем, кого не вижу." );
-	return null;
+        do_say( keeper, "Я не торгую с тем, кого не вижу." );
+        return null;
     }
 
     if (keeper->fighting) {
-	do_say( keeper, "Подожди немного, мне сейчас не до тебя." );
-	return null;
+        do_say( keeper, "Подожди немного, мне сейчас не до тебя." );
+        return null;
     }
 /*    
     if (ch->getCurrStat( STAT_CHA ) < 18) {
-	switch (number_range( 1, 10 )) {
-	case 1:
-	    do_say( keeper, "Физиономия мне твоя несимпатична, не буду я тебя обслуживать." );
-	    return 0;
-	case 2:
-	    do_say();
-	    return 0;
-	}
+        switch (number_range( 1, 10 )) {
+        case 1:
+            do_say( keeper, "Физиономия мне твоя несимпатична, не буду я тебя обслуживать." );
+            return 0;
+        case 2:
+            do_say();
+            return 0;
+        }
     }
 */  
     return trader;
@@ -680,31 +680,31 @@ void obj_to_keeper( Object *obj, NPCharacter *ch )
     /* see if any duplicates are found */
     for (t_obj = ch->carrying; t_obj != 0; t_obj = t_obj_next)
     {
-	t_obj_next = t_obj->next_content;
+        t_obj_next = t_obj->next_content;
 
-	if (obj->pIndexData == t_obj->pIndexData
-	    &&  !str_cmp(obj->getShortDescr( ), t_obj->getShortDescr( )))
-	{
-	    if (IS_OBJ_STAT(t_obj,ITEM_INVENTORY))
-	    {
-		extract_obj(obj);
-		return;
-	    }
+        if (obj->pIndexData == t_obj->pIndexData
+            &&  !str_cmp(obj->getShortDescr( ), t_obj->getShortDescr( )))
+        {
+            if (IS_OBJ_STAT(t_obj,ITEM_INVENTORY))
+            {
+                extract_obj(obj);
+                return;
+            }
 
-	    obj->cost = t_obj->cost; /* keep it standard */
-	    break;
-	}
+            obj->cost = t_obj->cost; /* keep it standard */
+            break;
+        }
     }
 
     if (t_obj == 0)
     {
-	obj->next_content = ch->carrying;
-	ch->carrying = obj;
+        obj->next_content = ch->carrying;
+        ch->carrying = obj;
     }
     else
     {
-	obj->next_content = t_obj->next_content;
-	t_obj->next_content = obj;
+        obj->next_content = t_obj->next_content;
+        t_obj->next_content = obj;
     }
 
     obj->carried_by      = ch;
@@ -730,39 +730,39 @@ Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLStrin
     long long id = get_arg_id( argument );
 
     if( is_number( argument ) && !id) {
-	item_number = atoi( argument );
-	
-	for( obj = keeper->carrying, item = 1; obj;obj = obj->next_content ) {
-	    if( obj->wear_loc == wear_none 
-		&& get_cost( keeper, obj, true, trader ) > 0 
-		&& ch->can_see( obj ) )  
-	    {
-		/* skip other objects of the same name */
-		while( obj->next_content &&
-			obj->pIndexData == obj->next_content->pIndexData &&
-			!str_cmp( obj->getShortDescr( ), obj->next_content->getShortDescr( ) ) )
-		    obj = obj->next_content;
-		
-		if( item == item_number )  
-		    return obj;
-		
-		item++;
-	    }
-	}
-	
-	return 0;
-	
+        item_number = atoi( argument );
+        
+        for( obj = keeper->carrying, item = 1; obj;obj = obj->next_content ) {
+            if( obj->wear_loc == wear_none 
+                && get_cost( keeper, obj, true, trader ) > 0 
+                && ch->can_see( obj ) )  
+            {
+                /* skip other objects of the same name */
+                while( obj->next_content &&
+                        obj->pIndexData == obj->next_content->pIndexData &&
+                        !str_cmp( obj->getShortDescr( ), obj->next_content->getShortDescr( ) ) )
+                    obj = obj->next_content;
+                
+                if( item == item_number )  
+                    return obj;
+                
+                item++;
+            }
+        }
+        
+        return 0;
+        
     } else {
-	number = number_argument( argument, arg );
-	count = 0;
-	
-	for( obj = keeper->carrying; obj; obj = obj->next_content ) {
-	    if( obj->wear_loc == wear_none &&
-		keeper->can_see( obj ) &&
-		ch->can_see( obj )  &&
-		get_cost( keeper, obj, true, trader ) > 0 &&
+        number = number_argument( argument, arg );
+        count = 0;
+        
+        for( obj = keeper->carrying; obj; obj = obj->next_content ) {
+            if( obj->wear_loc == wear_none &&
+                keeper->can_see( obj ) &&
+                ch->can_see( obj )  &&
+                get_cost( keeper, obj, true, trader ) > 0 &&
                 ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))))
-	    {
+            {
                 
                 if (!id)
                     /* skip other objects of the same name */
@@ -770,11 +770,11 @@ Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLStrin
                             obj->pIndexData == obj->next_content->pIndexData &&
                             !str_cmp( obj->getShortDescr( ), obj->next_content->getShortDescr( ) ) )
                         obj = obj->next_content;
-		
-		if(id || ++count == number ) 
-		    return obj;
-	    }
-	}
+                
+                if(id || ++count == number ) 
+                    return obj;
+            }
+        }
     }
 
     return 0;
@@ -783,28 +783,28 @@ Object *get_obj_keeper( Character *ch, ShopTrader::Pointer trader, const DLStrin
 /* deduct cost from a character */
 void deduct_cost(Character *ch, int cost)
 {
-	int silver = 0, gold = 0;
+        int silver = 0, gold = 0;
 
-	silver = min((int)ch->silver,cost);
+        silver = min((int)ch->silver,cost);
 
-	if (silver < cost)
-	{
-		gold = ((cost - silver + 99) / 100);
-		silver = cost - 100 * gold;
-	}
+        if (silver < cost)
+        {
+                gold = ((cost - silver + 99) / 100);
+                silver = cost - 100 * gold;
+        }
 
-	ch->gold -= gold;
-	ch->silver -= silver;
+        ch->gold -= gold;
+        ch->silver -= silver;
 
-	if (ch->gold < 0)
-	{
-		bug("deduct costs: gold %d < 0",ch->gold.getValue( ));
-		ch->gold = 0;
-	}
-	if (ch->silver < 0)
-	{
-		bug("deduct costs: silver %d < 0",ch->silver.getValue( ));
-		ch->silver = 0;
-	}
+        if (ch->gold < 0)
+        {
+                bug("deduct costs: gold %d < 0",ch->gold.getValue( ));
+                ch->gold = 0;
+        }
+        if (ch->silver < 0)
+        {
+                bug("deduct costs: silver %d < 0",ch->silver.getValue( ));
+                ch->silver = 0;
+        }
 }
 

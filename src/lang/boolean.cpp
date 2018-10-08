@@ -19,11 +19,11 @@ const DLString Boolean::VAL_FALSE = "false";
 void Boolean::fromString( const DLString & value ) throw( ExceptionBadType )
 {
     if( value == VAL_TRUE )
-	this->value = true;
+        this->value = true;
     else if( value == VAL_FALSE )
-	this->value = false;
+        this->value = false;
     else
-	throw ExceptionBadType( TYPE, value );
+        throw ExceptionBadType( TYPE, value );
 }
 
 DLString Boolean::toString( ) const throw( )

@@ -16,15 +16,15 @@ bool QuestBag::canLock( Character *ch )
     PCMemoryInterface *pcm;
     
     if (!obj->getOwner( ))
-	return false;
+        return false;
 
     pcm = PCharacterManager::find( obj->getOwner( ) );
 
     if (!pcm)
-	return false;
+        return false;
 
     if (pcm->getAttributes( ).isAvailable( "fullloot" ))
-	return true;
+        return true;
     
     return obj->hasOwner( ch );
 }

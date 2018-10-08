@@ -26,6 +26,6 @@ bool XMLChar::toXML( XMLNode::Pointer& parent ) const
         node->setType( XMLNode::XML_TEXT );
         node->setCData( toString( ) );
         parent->appendChild( node );
-	return true;
+        return true;
 }
 

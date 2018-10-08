@@ -17,7 +17,7 @@ XMLRefBase::refid_t
 XMLRefBase::nextReferenceId( )
 {
     while(refmap.find(++lastRefId) != refmap.end())
-	;
+        ;
 
     return lastRefId;
 }
@@ -45,20 +45,20 @@ void
 XMLRefVariable::setReferenceId(refid_t id)
 {
     if(id == refid)
-	return;
+        return;
 
     if(id)
-	refmap[id] = this;
+        refmap[id] = this;
 
     if(refid) {
-	refmap_t::iterator i = refmap.find(refid);
+        refmap_t::iterator i = refmap.find(refid);
 
-	if(i == refmap.end( ))
-	    LogStream::sendError()
-		<< "refmap: key " << refid 
-		<< " not found for erase. duplicate erase?" << endl;
-	else
-	    refmap.erase(i);
+        if(i == refmap.end( ))
+            LogStream::sendError()
+                << "refmap: key " << refid 
+                << " not found for erase. duplicate erase?" << endl;
+        else
+            refmap.erase(i);
     }
 
     refid = id;

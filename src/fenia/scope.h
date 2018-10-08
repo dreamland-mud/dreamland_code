@@ -31,20 +31,20 @@ public:
 class CppScopeClobber : public Scope {
 public:
     CppScopeClobber() : Scope(Context::current->scope) {
-	Context::current->scope = this;
+        Context::current->scope = this;
     }
     ~CppScopeClobber() {
-	Context::current->scope = parent;
+        Context::current->scope = parent;
     }
 };
 
 class CppScopeClobberRoot : public Scope {
 public:
     CppScopeClobberRoot() : save(Context::current->scope) { 
-	Context::current->scope = this;
+        Context::current->scope = this;
     }
     ~CppScopeClobberRoot() {
-	Context::current->scope = save;
+        Context::current->scope = save;
     }
 
     Scope *save;

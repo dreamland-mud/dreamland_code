@@ -17,8 +17,8 @@
 class PCharacter;
 
 class SpeedWalkUpdateTask : 
-			    public SchedulerTaskRoundPlugin,
-			    public virtual SchedulerTaskRoundPCharacter
+                            public SchedulerTaskRoundPlugin,
+                            public virtual SchedulerTaskRoundPCharacter
 {
 public:
     typedef ::Pointer<SpeedWalkUpdateTask> Pointer;

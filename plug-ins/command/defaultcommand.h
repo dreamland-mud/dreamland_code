@@ -3,8 +3,8 @@
  * ruffina, 2004
  */
 
-#ifndef	DEFAULTCOMMAND_H
-#define	DEFAULTCOMMAND_H
+#ifndef        DEFAULTCOMMAND_H
+#define        DEFAULTCOMMAND_H
 
 #include "xmlvariablecontainer.h"
 #include "xmlshort.h"
@@ -21,39 +21,39 @@
 class DefaultCommand : public virtual Command, public virtual XMLVariableContainer {
 XML_OBJECT;
 public:
-	typedef ::Pointer<DefaultCommand> Pointer;
+        typedef ::Pointer<DefaultCommand> Pointer;
 
-	DefaultCommand( );
-	virtual ~DefaultCommand( );
-	
-	virtual const DLString& getName( ) const;
-	virtual const DLString& getRussianName( ) const;
-	virtual const XMLStringList &getAliases( ) const;
-	virtual const XMLStringList &getRussianAliases( ) const;
-	virtual const DLString & getHint( ) const;
-	virtual ::Pointer<CommandHelp> getHelp( ) const;
-	virtual short getLog( ) const;
-	virtual const Flags & getExtra( ) const;
-	virtual short getLevel( ) const;
-	virtual const Enumeration & getPosition( ) const;
-	virtual const Flags & getOrder( ) const;
+        DefaultCommand( );
+        virtual ~DefaultCommand( );
+        
+        virtual const DLString& getName( ) const;
+        virtual const DLString& getRussianName( ) const;
+        virtual const XMLStringList &getAliases( ) const;
+        virtual const XMLStringList &getRussianAliases( ) const;
+        virtual const DLString & getHint( ) const;
+        virtual ::Pointer<CommandHelp> getHelp( ) const;
+        virtual short getLog( ) const;
+        virtual const Flags & getExtra( ) const;
+        virtual short getLevel( ) const;
+        virtual const Enumeration & getPosition( ) const;
+        virtual const Flags & getOrder( ) const;
 
-	virtual bool matchesAlias( const DLString & ) const;
-	virtual bool matchesExactly( const DLString & ) const;
+        virtual bool matchesAlias( const DLString & ) const;
+        virtual bool matchesExactly( const DLString & ) const;
 
-	virtual void run( Character * ch, const DLString & );
-	virtual void run( Character *, char * );
+        virtual void run( Character * ch, const DLString & );
+        virtual void run( Character *, char * );
 
-protected:	
-	XML_VARIABLE XMLString name;
-	XML_VARIABLE XMLStringList aliases, russian;
-	XML_VARIABLE XMLFlagsNoEmpty extra;
-	XML_VARIABLE XMLShortNoEmpty level;
-	XML_VARIABLE XMLShortNoEmpty log;
-	XML_VARIABLE XMLEnumeration position;
-	XML_VARIABLE XMLFlagsNoEmpty order; 
-	XML_VARIABLE XMLStringNoEmpty hint;
-	XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
+protected:        
+        XML_VARIABLE XMLString name;
+        XML_VARIABLE XMLStringList aliases, russian;
+        XML_VARIABLE XMLFlagsNoEmpty extra;
+        XML_VARIABLE XMLShortNoEmpty level;
+        XML_VARIABLE XMLShortNoEmpty log;
+        XML_VARIABLE XMLEnumeration position;
+        XML_VARIABLE XMLFlagsNoEmpty order; 
+        XML_VARIABLE XMLStringNoEmpty hint;
+        XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
 };
 
 

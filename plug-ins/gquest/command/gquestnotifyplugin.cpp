@@ -18,16 +18,16 @@
 void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d ) 
 {
     if (newState != CON_PLAYING)
-	return;
+        return;
     
     if (!d->character)
-	return;
+        return;
 
     std::basic_ostringstream<char> buf;
     Character *ch = d->character;
 
     if (ch->is_npc( ))
-	return;
+        return;
     
     GlobalQuest::Pointer gq;
     GlobalQuestInfo::Pointer gqi;
@@ -36,31 +36,31 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
     GlobalQuestManager::RunList &rl = manager->getRunning( );
 
     for (i = rl.begin( ); i != rl.end( ); i++) {
-	gq = i->second;
-	gqi = manager->findGlobalQuestInfo( i->first );
-	
-	if (!gqi->canParticipate( ch->getPC( ) ))
-	    continue;
+        gq = i->second;
+        gqi = manager->findGlobalQuestInfo( i->first );
+        
+        if (!gqi->canParticipate( ch->getPC( ) ))
+            continue;
 
-	if (!gq->isLevelOK( ch ))
-	    continue;
-	    
-	buf << "         Квест " 
-	    << GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
-	    << GQChannel::NORMAL << " (для ";
-	    
-	if (gq->hasLevels( ))
-	    buf << GQChannel::BOLD << gq->getMinLevel( ) 
-		<< "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
-	else
-	    buf << "всех";
-	
-	buf << " уровней)" << endl;
+        if (!gq->isLevelOK( ch ))
+            continue;
+            
+        buf << "         Квест " 
+            << GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
+            << GQChannel::NORMAL << " (для ";
+            
+        if (gq->hasLevels( ))
+            buf << GQChannel::BOLD << gq->getMinLevel( ) 
+                << "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
+        else
+            buf << "всех";
+        
+        buf << " уровней)" << endl;
     }
 
     if (!buf.str( ).empty( )) {
-	GQChannel::pecho( ch, "\r\nГлобальные квесты, в которых ты можешь принять участие: ");
-	GQChannel::pecho( ch, buf );
+        GQChannel::pecho( ch, "\r\nГлобальные квесты, в которых ты можешь принять участие: ");
+        GQChannel::pecho( ch, buf );
     }
 }
     

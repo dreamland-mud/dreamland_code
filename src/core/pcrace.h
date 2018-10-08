@@ -15,7 +15,7 @@ class EnumerationArray;
  * PCRace
  */
 class PCRace : public virtual Race {
-public:	
+public:        
     typedef ::Pointer<PCRace> Pointer;
     
     PCRace( );

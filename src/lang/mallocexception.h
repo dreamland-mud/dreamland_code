@@ -11,11 +11,11 @@
 
 class MallocException : public Exception {
 public:
-	MallocException( const DLString &msg, int count ) throw( ) 
-	      : Exception( "Cannot allocate " + DLString(count) + " bytes for " + msg )
-	{
-	}
+        MallocException( const DLString &msg, int count ) throw( ) 
+              : Exception( "Cannot allocate " + DLString(count) + " bytes for " + msg )
+        {
+        }
 };
-			
+                        
 
 #endif

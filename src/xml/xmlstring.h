@@ -39,11 +39,11 @@ public:
     // compat
     inline const DLString& getValue( ) const
     {
-	    return *this;
+            return *this;
     }
     inline void setValue( const DLString& value )
     {
-	    assign( value );
+            assign( value );
     }
 };
 
@@ -79,25 +79,25 @@ public:
    
     inline bool empty( ) const
     {
-	return node.isEmpty( );
+        return node.isEmpty( );
     }
     
     inline const DLString & getString( ) const
     {
-	return node->getCData( );
+        return node->getCData( );
     }
 
     inline void setNode( const XMLNode::Pointer node ) 
     {
-	this->node = node;
+        this->node = node;
     }
 
     inline XMLNode::Pointer getNode( ) const
     {
-	return node;
+        return node;
     }
 
-private:	
+private:        
     XMLNode::Pointer node;
 };
 

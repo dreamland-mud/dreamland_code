@@ -12,8 +12,8 @@ class HealQuest;
 
 class PatientBehavior : public MandatoryMobile, 
                         public ProtectedClient,
-			public PeacefulClient,
-			public DedicatedMobile<HealQuest>
+                        public PeacefulClient,
+                        public DedicatedMobile<HealQuest>
 {
 XML_OBJECT
 public:

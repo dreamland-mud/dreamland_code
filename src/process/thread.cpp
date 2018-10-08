@@ -12,12 +12,12 @@ Thread::Thread( ) : thread( 0 )
 
 #else
     thread = CreateThread( 
-	NULL,              // default security attributes
-	0,                 // use default stack size  
-	(LPTHREAD_START_ROUTINE)loop_pthread,      // thread function 
-	this,              // argument to thread function 
-	CREATE_SUSPENDED,  // use default creation flags 
-	&threadId);	   // returns the thread identifier 
+        NULL,              // default security attributes
+        0,                 // use default stack size  
+        (LPTHREAD_START_ROUTINE)loop_pthread,      // thread function 
+        this,              // argument to thread function 
+        CREATE_SUSPENDED,  // use default creation flags 
+        &threadId);           // returns the thread identifier 
 #endif
 }
 

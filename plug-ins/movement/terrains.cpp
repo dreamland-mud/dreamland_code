@@ -46,13 +46,13 @@ Object * boat_object_find( Character *ch )
     Object *obj;
 
     for (obj = ch->carrying; obj; obj = obj->next_content)
-	if (obj->wear_loc != wear_none && obj->item_type == ITEM_BOAT)
-	    return obj;
-		
+        if (obj->wear_loc != wear_none && obj->item_type == ITEM_BOAT)
+            return obj;
+                
     for (obj = ch->carrying; obj; obj = obj->next_content)
-	if (obj->wear_loc == wear_none && obj->item_type == ITEM_BOAT)
-	    if (!obj_is_wearable( obj ))
-		return obj;
+        if (obj->wear_loc == wear_none && obj->item_type == ITEM_BOAT)
+            if (!obj_is_wearable( obj ))
+                return obj;
 
     return NULL;
 }
@@ -62,23 +62,23 @@ int boat_get_type( Character *ch )
     Object *boat;
     
     if (ch->is_immortal( ) || ch->is_mirror( ))
-	return BOAT_FLY;
+        return BOAT_FLY;
 
     if (is_flying( ch ) || IS_GHOST(ch))
-	return BOAT_FLY;
+        return BOAT_FLY;
 
     if (IS_AFFECTED(ch, AFF_SWIM))
-	return BOAT_SWIM;
+        return BOAT_SWIM;
 
     boat = boat_object_find( ch );
 
     if (!boat)
-	return BOAT_NONE;
+        return BOAT_NONE;
 
     if (boat->wear_loc == wear_none)
-	return BOAT_INV;
+        return BOAT_INV;
     else
-	return BOAT_EQ;
+        return BOAT_EQ;
 }
 
 

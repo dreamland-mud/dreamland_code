@@ -13,8 +13,8 @@
  * DefaultLiquid
  *------------------------------------------------------------------*/
 DefaultLiquid::DefaultLiquid( )
-		: desires( desireManager ),
-		  flags( 0, &liquid_flags )
+                : desires( desireManager ),
+                  flags( 0, &liquid_flags )
 {
 }
 

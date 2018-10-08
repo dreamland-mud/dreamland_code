@@ -31,13 +31,13 @@ SkillGroupReference & Language::getGroup( )
 bool Language::visible( Character * ch ) const
 {
     if (!Command::available( ch ))
-	return false;
+        return false;
 
     if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return true;
+        return true;
     
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     const RaceLangInfo *race = getRaceInfo( ch->getPC( ) );
     const ClassLangInfo *prof = getClassInfo( ch->getPC( ) );
@@ -54,10 +54,10 @@ bool Language::available( Character * ch ) const
 bool Language::usable( Character * ch, bool message = false ) const 
 {
     if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return true;
+        return true;
 
     if (!available( ch ))
-	return false;
+        return false;
 
     return true;
 }
@@ -65,10 +65,10 @@ bool Language::usable( Character * ch, bool message = false ) const
 int Language::getLevel( Character *ch ) const
 {
     if (ch->is_immortal( ) && ch->getRealLevel( ) >= LEVEL_IMMORTAL)
-	return 1;
+        return 1;
 
     if (!visible( ch ))
-	return 999;
+        return 999;
 
     const RaceLangInfo *race = getRaceInfo( ch->getPC( ) );
     const ClassLangInfo *prof = getClassInfo( ch->getPC( ) );
@@ -81,10 +81,10 @@ int Language::getLearned( Character *ch ) const
     int learned, maximum;
     
     if (ch->is_immortal( ) && ch->getRealLevel( ) > LEVEL_IMMORTAL)
-	return SKILL_NATIVE;
-	
+        return SKILL_NATIVE;
+        
     if (!usable( ch ))
-	return 0;
+        return 0;
 
     learned = ch->getPC( )->getSkillData( getIndex( ) ).learned.getValue( );
     maximum = getMaximum( ch );
@@ -110,7 +110,7 @@ bool Language::canPractice( PCharacter * ch, std::ostream & ) const
 bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<Poliglot>( ))
-	return true;
+        return true;
    
     if (verbose) { 
         if (mob)
@@ -125,9 +125,9 @@ bool Language::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 int Language::getAdept( PCharacter *ch ) const
 {
     if (!visible( ch ))
-	return 0;
+        return 0;
     else
-	return SKILL_ADEPT;
+        return SKILL_ADEPT;
 }
 
 void Language::practice( PCharacter *ch ) const
@@ -147,73 +147,73 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     bool rus = ch->getConfig( )->ruskills;
 
     buf << "Язык '{W" << getName( ) << "{x'"
-	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{hg{W" 
-	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-	<< "{x'"
-	<< endl;
+        << " '{W" << getRussianName( ) << "{x', "
+        << "входит в группу '{hg{W" 
+        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << "{x'"
+        << endl;
     
     for (r = races.begin( ); r != races.end( ); r++) {
-	Race *race = raceManager->findExisting( r->first );
+        Race *race = raceManager->findExisting( r->first );
     
-	if (!race || !race->isPC( ))
-	    continue;
-	    
-	if (r->second.maximum == SKILL_NATIVE) 
-	    perfect.push_back( russian_case( race->getPC( )->getMltName( ), '1' ) );
-	else 
-	    unperfect.push_back( russian_case( race->getPC( )->getMltName( ), '3' ) );
+        if (!race || !race->isPC( ))
+            continue;
+            
+        if (r->second.maximum == SKILL_NATIVE) 
+            perfect.push_back( russian_case( race->getPC( )->getMltName( ), '1' ) );
+        else 
+            unperfect.push_back( russian_case( race->getPC( )->getMltName( ), '3' ) );
     }
 
     for (c = classes.begin( ); c != classes.end( ); c++) {
-	Profession *prof = professionManager->findExisting( c->first );
-	if (!prof)
-	    continue;
+        Profession *prof = professionManager->findExisting( c->first );
+        if (!prof)
+            continue;
 
-	if (r->second.maximum == SKILL_NATIVE)
-	    perfect.push_back( prof->getMltName( ).ruscase('1') );
-	else 
-	    unperfect.push_back( prof->getMltName( ).ruscase('3') );
+        if (r->second.maximum == SKILL_NATIVE)
+            perfect.push_back( prof->getMltName( ).ruscase('1') );
+        else 
+            unperfect.push_back( prof->getMltName( ).ruscase('3') );
     }
     
     if (!perfect.empty( )) {
-	for (n = perfect.begin( ); n != perfect.end( ); ) {
-	    userName = *n;
+        for (n = perfect.begin( ); n != perfect.end( ); ) {
+            userName = *n;
 
-	    if (n == perfect.begin( ))
-		userName.upperFirstCharacter( );
+            if (n == perfect.begin( ))
+                userName.upperFirstCharacter( );
 
-	    buf << "{w" << userName  << "{x";
+            buf << "{w" << userName  << "{x";
 
-	    if (++n != perfect.end( ))
-		buf << ", ";
-	}
-	     
+            if (++n != perfect.end( ))
+                buf << ", ";
+        }
+             
         buf << " могут овладеть этим языком в совершенстве." << endl;
     }
 
     if (!unperfect.empty( )) {
-	buf << "Неполные знания доступны ";
-	
-	for (n = unperfect.begin( ); n != unperfect.end( ); ) {
-	    buf << "{w" << *n << "{x";
+        buf << "Неполные знания доступны ";
+        
+        for (n = unperfect.begin( ); n != unperfect.end( ); ) {
+            buf << "{w" << *n << "{x";
 
-	    if (++n != unperfect.end( ))
-		buf << ", ";
-	}
-	
-	buf << "." << endl;
+            if (++n != unperfect.end( ))
+                buf << ", ";
+        }
+        
+        buf << "." << endl;
     }
 
     if (visible( ch )) {
-	int learned = getLearned( ch );
-	
-	buf << "Тебе язык доступен с уровня {W" << getLevel( ch ) << "{x";
+        int learned = getLearned( ch );
+        
+        buf << "Тебе язык доступен с уровня {W" << getLevel( ch ) << "{x";
 
-	if (learned > 0)
-	    buf << ", изучен на {W" << learned << "%{x";
-	
-	buf << "." << endl;
+        if (learned > 0)
+            buf << ", изучен на {W" << learned << "%{x";
+        
+        buf << "." << endl;
     }
 }
 
@@ -234,17 +234,17 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     PCharacter *pch = ch->getPC( );
 
     if (learned < SKILL_ADEPT || learned >= maximum)
-	return;
+        return;
 
     if (maximum <= SKILL_ADEPT) 
-	return;
+        return;
 
     if (!chance( maximum / 2 ))
-	return;
+        return;
     
     if (number_percent( ) >= 4 * ch->getCurrStat( STAT_INT )) 
-	return;
-	
+        return;
+        
     PCSkillData &data = pch->getSkillData( getIndex( ) );
 
     data.learned++;

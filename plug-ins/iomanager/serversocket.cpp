@@ -26,12 +26,12 @@
 #include "exceptionserversocket.h"
 
 ServerSocket::ServerSocket( )
-	: listen( DEFAULT_LISTEN ),
-		wrapped( false ),
-		local( false ),
-		backdoor( false ),
+        : listen( DEFAULT_LISTEN ),
+                wrapped( false ),
+                local( false ),
+                backdoor( false ),
                 websock( false ),
-		fd( -1 )
+                fd( -1 )
 {
 }
 
@@ -48,14 +48,14 @@ void ServerSocket::initialize( ) throw( ExceptionServerSocket )
     LogStream::sendNotice( ) << "port::trying::" << getPort( ) << endl;
     
     if( ( fd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP ) ) < 0 ) {
-	fd = -1;
-	throw ExceptionServerSocket( "socket", strerror( errno ), getPort( ), getListen( ) );
+        fd = -1;
+        throw ExceptionServerSocket( "socket", strerror( errno ), getPort( ), getListen( ) );
     }
 
 #ifndef __MINGW32__
     if( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, &x, sizeof( x ) ) < 0 ) {
-	destroy( );
-	throw ExceptionServerSocket( "SO_REUSEADDR", strerror( errno ), getPort( ), getListen( ) );
+        destroy( );
+        throw ExceptionServerSocket( "SO_REUSEADDR", strerror( errno ), getPort( ), getListen( ) );
     }
 #endif
 
@@ -64,13 +64,13 @@ void ServerSocket::initialize( ) throw( ExceptionServerSocket )
     sa.sin_port = htons( getPort( ) );
 
     if(bind(fd, reinterpret_cast<struct sockaddr*>(&sa ), sizeof(sa) ) < 0 ) {
-	destroy( );
-	throw ExceptionServerSocket( "bind", strerror( errno ), getPort( ), getListen( ) );
+        destroy( );
+        throw ExceptionServerSocket( "bind", strerror( errno ), getPort( ), getListen( ) );
     }
 
     if( ::listen( fd, getListen( ) ) < 0 ) {
-	destroy( );
-	throw ExceptionServerSocket( "listen", strerror( errno ), getPort( ), getListen( ) );
+        destroy( );
+        throw ExceptionServerSocket( "listen", strerror( errno ), getPort( ), getListen( ) );
     }
 }
 
@@ -78,9 +78,9 @@ void ServerSocket::destroy( )
 {
     if(fd >= 0) {
 #ifndef __MINGW32__
-	close(fd);
+        close(fd);
 #else
-	closesocket(fd);
+        closesocket(fd);
 #endif
     }
     fd = -1;
@@ -89,9 +89,9 @@ void ServerSocket::destroy( )
 void ServerSocket::loaded( )
 {
     try {
-	initialize( );
+        initialize( );
     } catch( const ExceptionServerSocket& ex ) {
-	LogStream::sendError( ) << ex << endl;
+        LogStream::sendError( ) << ex << endl;
     }
 }
 

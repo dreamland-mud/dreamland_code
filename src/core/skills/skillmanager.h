@@ -15,7 +15,7 @@ class SkillManager;
 extern SkillManager *skillManager;
 
 class SkillManager : public GlobalRegistry<Skill>, public OneAllocate {
-public:	
+public:        
     typedef ::Pointer<SkillManager> Pointer;
     
     SkillManager( );
@@ -23,9 +23,9 @@ public:
     
     int unstrictLookup( const DLString &, Character * ch = NULL ) const;
 
-    static inline SkillManager* getThis( )	
+    static inline SkillManager* getThis( )        
     {
-	return skillManager;
+        return skillManager;
     }
     
 private:

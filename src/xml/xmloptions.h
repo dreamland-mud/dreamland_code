@@ -12,7 +12,7 @@
 
 template <typename ValType, typename ParentType>
 class XMLOption : public ParentType {
-public:	
+public:        
     using ParentType::fromXML;
     using ParentType::getValue;
     
@@ -21,15 +21,15 @@ public:
     }
     
     inline void override( ValType value ) {
-	isOverriden = true;	
-	setValue( value );
+        isOverriden = true;        
+        setValue( value );
     }
     
     inline void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) {
-	if (isOverriden)
-	    return;
+        if (isOverriden)
+            return;
 
-	ParentType::fromXML( node );
+        ParentType::fromXML( node );
     }
 
 private:
@@ -51,15 +51,15 @@ public:
 class XMLStringOption : public XMLStringNoEmpty {
 public:
     void override( const char *value ) {
-	isOverriden = true;
-	assign( value );
+        isOverriden = true;
+        assign( value );
     }
     
     inline void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) {
-	if (isOverriden)
-	    return;
+        if (isOverriden)
+            return;
 
-	XMLStringNoEmpty::fromXML( node );
+        XMLStringNoEmpty::fromXML( node );
     }
 
 private:

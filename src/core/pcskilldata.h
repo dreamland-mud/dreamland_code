@@ -16,24 +16,24 @@
 class PCSkillData : public XMLVariableContainer {
 XML_OBJECT
 public:
-	typedef ::Pointer<PCSkillData> Pointer;
-	
-	PCSkillData( );
+        typedef ::Pointer<PCSkillData> Pointer;
+        
+        PCSkillData( );
 
-	XML_VARIABLE XMLInteger learned;
-	XML_VARIABLE XMLInteger timer;
-	XML_VARIABLE XMLBoolean forgetting;
+        XML_VARIABLE XMLInteger learned;
+        XML_VARIABLE XMLInteger timer;
+        XML_VARIABLE XMLBoolean forgetting;
 };
 
 class PCSkills : public XMLVariableContainer, public std::vector<PCSkillData> {
 XML_OBJECT
 public:
-	typedef ::Pointer<PCSkills> Pointer;
+        typedef ::Pointer<PCSkills> Pointer;
 
-	virtual bool toXML( XMLNode::Pointer& ) const;
-	virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+        virtual bool toXML( XMLNode::Pointer& ) const;
+        virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
 
-	PCSkillData & get( int );
+        PCSkillData & get( int );
         bool forEachLearned( SkillEventHandler::Method, ... );
 };
 

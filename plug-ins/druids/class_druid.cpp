@@ -41,7 +41,7 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
     staff->value[1] = 4 + level / 15;
     staff->value[2] = 4 + level / 15;
 
-    tohit.where		   = TO_OBJECT;
+    tohit.where                   = TO_OBJECT;
     tohit.type               = sn;
     tohit.level              = ch->getModifyLevel();
     tohit.duration           = -1;
@@ -50,7 +50,7 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
     tohit.bitvector          = 0;
     affect_to_obj( staff, &tohit);
 
-    todam.where		   = TO_OBJECT;
+    todam.where                   = TO_OBJECT;
     todam.type               = sn;
     todam.level              = ch->getModifyLevel();
     todam.duration           = -1;
@@ -71,10 +71,10 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
 void DruidStaff::fight( Character *ch )
 {
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
-	return;
+        return;
 
     if (chance( 90 ))
-	return;
+        return;
 
     act_p( "{BСиневатое свечение окутывает твой посох друида.{x", ch, 0, 0, TO_CHAR, POS_DEAD );
     act( "{BСиневатое свечение окутывает посох друида $c2.{x", ch, 0, 0, TO_ROOM );
@@ -93,12 +93,12 @@ bool DruidStaff::death( Character *ch )
 bool DruidStaff::canEquip( Character *ch )
 {
   if (ch->getTrueProfession( ) != prof_druid) {
-	ch->println("Ты не знаешь как использовать эту вещь.");
-	act( "$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
-	act( "$o1 выскальзывает из рук $c2.", ch, obj, 0, TO_ROOM );
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	return false;
+        ch->println("Ты не знаешь как использовать эту вещь.");
+        act( "$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
+        act( "$o1 выскальзывает из рук $c2.", ch, obj, 0, TO_ROOM );
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        return false;
     }
 
     return true;

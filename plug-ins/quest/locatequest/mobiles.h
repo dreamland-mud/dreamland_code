@@ -12,10 +12,10 @@ class LocateQuest;
 
 class LocateCustomer : public TalkativeClient, 
                        public MandatoryMobile,
-		       public ProtectedClient,
-		       public PeacefulClient,
-		       public GreedyClient,
-		       public DedicatedMobile<LocateQuest>
+                       public ProtectedClient,
+                       public PeacefulClient,
+                       public GreedyClient,
+                       public DedicatedMobile<LocateQuest>
 {
 XML_OBJECT
 public:

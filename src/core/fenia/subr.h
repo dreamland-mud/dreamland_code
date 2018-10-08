@@ -15,8 +15,8 @@ WT *wrapper_cast(const Scripting::Register &reg)
     WT *t = dynamic_cast<WT *>(reg.toHandler().getPointer());
     
     if(!t)
-	throw Scripting::InvalidCastException(typeid(WT).name( ),
-		reg.toHandler()->getType( ));
+        throw Scripting::InvalidCastException(typeid(WT).name( ),
+                reg.toHandler()->getType( ));
 
     return t;
 }
@@ -27,8 +27,8 @@ WT *wrapper_cast(Scripting::Object *obj)
     WT *t = dynamic_cast<WT *>(obj->getHandler().getPointer());
     
     if(!t)
-	throw Scripting::InvalidCastException(typeid(WT).name( ), 
-		 obj->getHandler()->getType( ));
+        throw Scripting::InvalidCastException(typeid(WT).name( ), 
+                 obj->getHandler()->getType( ));
 
     return t;
 }

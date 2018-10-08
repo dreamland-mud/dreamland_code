@@ -12,13 +12,13 @@
 class ClanGuardLion: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardLion> Pointer;
+        typedef ::Pointer<ClanGuardLion> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual int getCast( Character * );
-	virtual bool specFight( );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual int getCast( Character * );
+        virtual bool specFight( );
 };
 
 class LionEyedSword : public ObjectBehavior {

@@ -10,8 +10,8 @@ extern "C"
 {
     SO::PluginList initialize_services_command( )
     {
-	SO::PluginList ppl;
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        return ppl;
     }
 }

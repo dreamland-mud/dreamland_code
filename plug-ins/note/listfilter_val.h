@@ -15,7 +15,7 @@ struct SValue {
 
 #define YYSTYPE SValue
 
-#define YY_DECL	    int listfilter_yylex( struct SValue *value )
+#define YY_DECL            int listfilter_yylex( struct SValue *value )
 YY_DECL;
 
 struct ListFilterParam {
@@ -29,5 +29,5 @@ extern ListFilterParam lfParam;
 int listfilter_yyparse( );
 
 bool listfilter_parse( PCharacter *ch, int cnt, int last, const Note *note,
-		       bool hidden, const char *args );
+                       bool hidden, const char *args );
 #endif

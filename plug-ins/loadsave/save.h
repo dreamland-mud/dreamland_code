@@ -24,8 +24,8 @@ class PCharacter;
 class Object;
 class Room;
 
-#define MAX_NEST	100
-extern Object *	rgObjNest [MAX_NEST];
+#define MAX_NEST        100
+extern Object *        rgObjNest [MAX_NEST];
 
 void fwrite_mob( NPCharacter *mob, FILE *fp );
 void fwrite_char( PCharacter *ch,  FILE *fp );

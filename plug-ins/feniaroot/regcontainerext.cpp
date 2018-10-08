@@ -19,7 +19,7 @@ NMI_GET(RegContainer, keys, "список ключей")
     Map::const_iterator i;
     
     for(i = map.begin(); i != map.end(); i++)
-	rc->push_back( i->first );
+        rc->push_back( i->first );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -34,7 +34,7 @@ NMI_GET(RegContainer, values, "список значений")
     Map::const_iterator i;
     
     for(i = map.begin(); i != map.end(); i++)
-	rc->push_back( i->second );
+        rc->push_back( i->second );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -54,7 +54,7 @@ NMI_INVOKE( RegContainer, clone , "")
     Map::const_iterator i;
     
     for(i = map.begin(); i != map.end(); i++)
-	(*rc)->map[i->first] = i->second;
+        (*rc)->map[i->first] = i->second;
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);

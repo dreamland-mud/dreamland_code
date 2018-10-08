@@ -47,7 +47,7 @@ void
 Object::fromList()
 {
     if(!next)
-	return;
+        return;
 
     next->prev = prev;
     prev->next = next;
@@ -58,7 +58,7 @@ void
 Object::changed()
 {
     if(!next)
-	toList(manager->changed);
+        toList(manager->changed);
 }
 
 void 
@@ -78,26 +78,26 @@ void
 Object::backup()
 {
     if(handler) {
-	backupNode = XMLNode::Pointer(NEW);
+        backupNode = XMLNode::Pointer(NEW);
     
-	handler.toXML( backupNode );
-	
-	if(dynamicHandler) {
+        handler.toXML( backupNode );
+        
+        if(dynamicHandler) {
             handler->backup();
-	    handler.clear();
+            handler.clear();
         }
     } else
-	backupNode.clear();
+        backupNode.clear();
 }
 
 void
 Object::recover()
 {
     if(handler)
-	return;
+        return;
 
     if(!backupNode)
-	return;
+        return;
 
     handler.fromXML( backupNode );
     setHandler(handler);
@@ -111,10 +111,10 @@ Object::save()
     ostringstream of;
 
     if(handler) {
-	node.construct( );
-	handler.toXML( node );
+        node.construct( );
+        handler.toXML( node );
     } else
-	node = backupNode;
+        node = backupNode;
 
     node->setName( "object" );
     doc->appendChild( node );
@@ -141,9 +141,9 @@ Object::finalize()
     fromList( );
     
     if(justCreated)
-	manager->erase( id );
+        manager->erase( id );
     else
-	toList( manager->deleted );
+        toList( manager->deleted );
 }
 
 Object::NotRecoveredException::~NotRecoveredException( ) throw( )
@@ -202,12 +202,12 @@ Object::Manager::seq(id_t id, Data &val)
     
     XMLNode::Pointer node = doc->getFirstNode( );
     if(!node)
-	throw Exception("empty document");
+        throw Exception("empty document");
 
     at( id ).fromXML( node );
 
     if(id > lastId)
-	lastId = id;
+        lastId = id;
 }
 
 void
@@ -224,7 +224,7 @@ bool
 Object::Manager::tlim(clock_t finishAt)
 {
     if(!finishAt)
-	return true;
+        return true;
 
     return clock( ) < finishAt;
 }
@@ -238,7 +238,7 @@ Object::Manager::syncPut(clock_t finishAt)
     prof.start( );
     
     for(cnt = 0; changed.next != &changed && tlim(finishAt); cnt++)
-	changed.next->save( );
+        changed.next->save( );
 
     prof.stop();
 
@@ -273,11 +273,11 @@ Object::Manager::syncDel(clock_t finishAt)
     prof.start( );
     
     for(cnt = 0; deleted.next != &deleted && tlim(finishAt); cnt++) {
-	id_t id = deleted.next->getId( );
-	deleted.next->fromList( );
+        id_t id = deleted.next->getId( );
+        deleted.next->fromList( );
 
-	del(id);
-	erase(id);
+        del(id);
+        erase(id);
     }
     
     prof.stop();
@@ -292,16 +292,16 @@ bool
 Object::Manager::sync(clock_t tickEnd)
 {
     if(tickEnd) {
-	tickEnd -= 40*CLOCKS_PER_SEC/1000; // 40ms gap for sure
+        tickEnd -= 40*CLOCKS_PER_SEC/1000; // 40ms gap for sure
     }
 
     bool consistent = syncPut(tickEnd) && syncDel(tickEnd);
 
     if(consistent && txnRunning( )) {
-	Profiler prof;
-	prof.start( );
-	commit( );
-	prof.stop();
+        Profiler prof;
+        prof.start( );
+        commit( );
+        prof.stop();
 
         if(maxCommit < prof.msec( ))
             maxCommit = prof.msec( );
@@ -316,7 +316,7 @@ Object::Manager::backup()
     iterator i;
     
     for(i = begin(); i != end(); i++) 
-	i->backup();
+        i->backup();
 }
 
 void
@@ -325,7 +325,7 @@ Object::Manager::recover()
     iterator i;
     
     for(i = begin(); i != end(); i++) 
-	i->recover();
+        i->recover();
 }
 
 Object &
@@ -333,11 +333,11 @@ Object::Manager::allocate()
 {
     Object *rc;
     if(deleted.next != &deleted) {
-	rc = deleted.next;
-	rc->fromList( );
+        rc = deleted.next;
+        rc->fromList( );
     } else {
-	rc = &BaseManager<Object>::allocate();
-	rc->justCreated = true;
+        rc = &BaseManager<Object>::allocate();
+        rc->justCreated = true;
     }
 
     rc->toList(changed);

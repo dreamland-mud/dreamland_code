@@ -13,14 +13,14 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT		           *	
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *
- *	 Ibrahim Canpunar  {Mandrake}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *	
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT                           *        
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *
+ *         Ibrahim Canpunar  {Mandrake}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 
 #include "anatolia_limits.h"
@@ -57,7 +57,7 @@ void Excalibur::equip( Character *ch )
 {
   short level = ch->getModifyLevel();
 
-  if ( level > 20 && level <= 30)	obj->value[2] = 4;
+  if ( level > 20 && level <= 30)        obj->value[2] = 4;
   else if ( level > 30 && level <= 40)   obj->value[2] = 5;
   else if ( level > 40 && level <= 50)   obj->value[2] = 6;
   else if ( level > 50 && level <= 60)   obj->value[2] = 8;
@@ -75,7 +75,7 @@ void Excalibur::remove( Character *ch )
 bool Excalibur::death( Character *ch )
 {
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
-	return false;
+        return false;
 
     act_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_CHAR,POS_DEAD);
     act_p("$o1 начинает светиться голубым пламенем.", ch,obj,0,TO_ROOM,POS_RESTING);
@@ -88,11 +88,11 @@ bool Excalibur::death( Character *ch )
 void Excalibur::speech( Character *ch, const char *speech )
 {
     if (ch != obj->getCarrier( ))
-	return;
+        return;
 
   if ((!str_cmp(speech, "sword of acid") || !str_cmp(speech, "меч кислоты"))
       && (ch->fighting) && ((get_eq_char(ch,wear_wield) == obj) ||
-			(get_eq_char(ch,wear_second_wield) == obj)  ) )
+                        (get_eq_char(ch,wear_second_wield) == obj)  ) )
     {
       ch->send_to("Лезвие Экскалибра брызжет кислотой.\n\r");
       act_p("Кислота брызжет с лезвия Экскалибра.",
@@ -154,21 +154,21 @@ void SubissueWeapon::fight( Character *ch )
     int hp;
     
     if (obj->wear_loc != wear_wield)
-	return;
+        return;
 
     if (chance( 70 ))
-	return;
+        return;
     
     hp = HEALTH(ch);
     
     if (hp > 90)
-	ch->send_to("Твое оружие свистит, {Y'Это было великолепно!'{x\n\r");
+        ch->send_to("Твое оружие свистит, {Y'Это было великолепно!'{x\n\r");
     else if (hp > 60)
-	ch->send_to("Твое оружие свистит, {Y'Так держать! Хорошая работа!'{x\n\r");
+        ch->send_to("Твое оружие свистит, {Y'Так держать! Хорошая работа!'{x\n\r");
     else if (hp > 40)
-	ch->send_to("Твое оружие свистит, {Y'Ты можешь сделать это!'{x\n\r");
+        ch->send_to("Твое оружие свистит, {Y'Ты можешь сделать это!'{x\n\r");
     else
-	ch->send_to("Твое оружие свистит, {Y'Бежим прочь! Подальше отсюда!'{x\n\r");
+        ch->send_to("Твое оружие свистит, {Y'Бежим прочь! Подальше отсюда!'{x\n\r");
 }
 
 /*
@@ -177,16 +177,16 @@ void SubissueWeapon::fight( Character *ch )
 void TwoSnakeWhip::wear( Character *ch )
 {
   act_p("{GЗмеи на хлысте выдыхают пары яда.{x",
-		ch,obj,0,TO_CHAR,POS_DEAD);
+                ch,obj,0,TO_CHAR,POS_DEAD);
   act_p("{GЗмеи на хлысте выдыхают пары яда.{x",
-		ch,obj,0,TO_ROOM,POS_DEAD);
+                ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
 void TwoSnakeWhip::equip( Character *ch )
 {
   short level = ch->getModifyLevel();
 
-  if (  level <= 10)			obj->value[2] = 3;
+  if (  level <= 10)                        obj->value[2] = 3;
   else if ( level > 10 && level <= 20)   obj->value[2] = 4;
   else if ( level > 20 && level <= 30)   obj->value[2] = 5;
   else if ( level > 30 && level <= 40)   obj->value[2] = 6;
@@ -201,9 +201,9 @@ void TwoSnakeWhip::equip( Character *ch )
 void TwoSnakeWhip::remove( Character *ch )
 {
   act_p("{rЗмеи на хлысте повисают безжизненным куском кожи.{x",
-		ch,obj,0,TO_CHAR,POS_DEAD);
+                ch,obj,0,TO_CHAR,POS_DEAD);
   act_p("{rЗмеи на хлысте повисают безжизненным куском кожи.{x",
-		ch,obj,0,TO_ROOM,POS_DEAD);
+                ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
 void TwoSnakeWhip::get( Character *ch )
@@ -214,27 +214,27 @@ void TwoSnakeWhip::get( Character *ch )
 void TwoSnakeWhip::fight( Character *ch )
 {
   if ( (get_eq_char(ch, wear_wield) == obj) ||
-	( get_eq_char(ch,wear_second_wield) == obj) )
+        ( get_eq_char(ch,wear_second_wield) == obj) )
     {
       switch(number_bits(7)) {
       case 0:
-  	act_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
-		ch->fighting, TO_CHAR,POS_RESTING);
-	act_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
-		ch->fighting, TO_VICT,POS_RESTING);
-	act_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
-		ch->fighting, TO_NOTVICT,POS_RESTING);
-	spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
-	break;
+          act_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
+                ch->fighting, TO_CHAR,POS_RESTING);
+        act_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
+                ch->fighting, TO_VICT,POS_RESTING);
+        act_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
+                ch->fighting, TO_NOTVICT,POS_RESTING);
+        spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
+        break;
       case 1:
-  	act_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
-		ch->fighting, TO_CHAR,POS_RESTING);
-	act_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
-		ch->fighting, TO_VICT,POS_RESTING);
-	act_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
-		ch->fighting, TO_NOTVICT,POS_RESTING);
-	spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
-	break;
+          act_p("Одна из змей на твоем хлысте жалит $C4!", ch, 0,
+                ch->fighting, TO_CHAR,POS_RESTING);
+        act_p("Змея с хлыста $c2 внезапно жалит тебя!", ch, 0,
+                ch->fighting, TO_VICT,POS_RESTING);
+        act_p("Змея с хлыста $c2 жалит $C4!", ch, 0,
+                ch->fighting, TO_NOTVICT,POS_RESTING);
+        spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting, FSPELL_BANE );
+        break;
       }
     }
 }
@@ -245,24 +245,24 @@ void TwoSnakeWhip::fight( Character *ch )
 void Thunderbolt::fight( Character *ch )
 {
     if ( (get_eq_char(ch, wear_wield) == obj) ||
-	(get_eq_char(ch,wear_second_wield) == obj) )
+        (get_eq_char(ch,wear_second_wield) == obj) )
     {
-	int dam;
-	Character *victim = ch->fighting;
-	int level = ch->getModifyLevel( );
+        int dam;
+        Character *victim = ch->fighting;
+        int level = ch->getModifyLevel( );
 
-	switch(number_bits(6)) {
-	case 0:
-	    act("Разряд молнии вылетает из твоего меча и поражает $C4!", ch, 0, victim, TO_CHAR);
-	    act("Разряд молнии потрескивает вдоль лезвия меча $c2 и изгибается в твою сторону!", ch, 0, victim, TO_VICT);
-	    act("Разряд молнии вылетает из меча $c2, изгибаясь в сторону $C2!", ch, 0, victim, TO_NOTVICT);
+        switch(number_bits(6)) {
+        case 0:
+            act("Разряд молнии вылетает из твоего меча и поражает $C4!", ch, 0, victim, TO_CHAR);
+            act("Разряд молнии потрескивает вдоль лезвия меча $c2 и изгибается в твою сторону!", ch, 0, victim, TO_VICT);
+            act("Разряд молнии вылетает из меча $c2, изгибаясь в сторону $C2!", ch, 0, victim, TO_NOTVICT);
 
-	    dam = dice(level,4) + 12;
-	    if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
-		dam /= 2;
-	    damage( ch, victim, dam, gsn_lightning_bolt, DAM_LIGHTNING , false, DAMF_SPELL);
-	    break;
-	}
+            dam = dice(level,4) + 12;
+            if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
+                dam /= 2;
+            damage( ch, victim, dam, gsn_lightning_bolt, DAM_LIGHTNING , false, DAMF_SPELL);
+            break;
+        }
     }
 }
 
@@ -275,26 +275,26 @@ void FireGauntlets::fight( Character *ch )
 int dam;
 
   if ( !(get_eq_char( ch, wear_wield ) == 0  &&
-	get_eq_char( ch, wear_second_wield) == 0) )
-	return;
+        get_eq_char( ch, wear_second_wield) == 0) )
+        return;
 
   if ( get_eq_char( ch, wear_hands ) != obj )
-	return;
+        return;
   if ( ch->is_npc() )
-	return;
+        return;
 
     if ( number_percent() < 50 )  {
-	dam = number_percent()/2 + 30 + 2 * ch->getModifyLevel();
-	act_p( "Твои перчатки обжигают лицо $C3!",
-		ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-	act_p( "Перчатки $c2 обжигают лицо $C3!",
-		ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-	act_p( "Перчатки $C2 обжигают твое лицо!",
-		ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
-	damage( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
-	if ( ch == 0 || ch->fighting == 0 )
-	  return;
-	fire_effect( ch->fighting, obj->level/2, dam/2, TARGET_CHAR );
+        dam = number_percent()/2 + 30 + 2 * ch->getModifyLevel();
+        act_p( "Твои перчатки обжигают лицо $C3!",
+                ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
+        act_p( "Перчатки $c2 обжигают лицо $C3!",
+                ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
+        act_p( "Перчатки $C2 обжигают твое лицо!",
+                ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
+        damage( ch, ch->fighting, dam/2, gsn_burning_hands, DAM_FIRE, false);
+        if ( ch == 0 || ch->fighting == 0 )
+          return;
+        fire_effect( ch->fighting, obj->level/2, dam/2, TARGET_CHAR );
     }
 }
 
@@ -315,23 +315,23 @@ void VolcanoeArmbands::fight( Character *ch )
 {
 int dam;
   if ( get_eq_char( ch, wear_arms ) != obj )
-	return;
+        return;
 
   if ( ch->is_npc() )
-	return;
+        return;
 
   if ( number_percent() < 20 )  {
-	dam = number_percent()/2 + 30 + 5 * ch->getModifyLevel();
-	act_p( "Твои нарукавники обжигают $C4!",
+        dam = number_percent()/2 + 30 + 5 * ch->getModifyLevel();
+        act_p( "Твои нарукавники обжигают $C4!",
                 ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-	act_p( "Нарукавники $c2 обжигают $C4!",
+        act_p( "Нарукавники $c2 обжигают $C4!",
                 ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-	act_p( "Нарукавники $C2 обжигают тебя!",
+        act_p( "Нарукавники $C2 обжигают тебя!",
                 ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
-	damage( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
-	if ( ch == 0 || ch->fighting == 0 )
-	  return;
-	fire_effect( ch->fighting, obj->level/2, dam, TARGET_CHAR );
+        damage( ch, ch->fighting, dam, gsn_burning_hands, DAM_FIRE, false);
+        if ( ch == 0 || ch->fighting == 0 )
+          return;
+        fire_effect( ch->fighting, obj->level/2, dam, TARGET_CHAR );
   }
   return;
 }
@@ -355,21 +355,21 @@ void DemonfireShield::fight( Character *ch )
 int dam;
 
   if ( get_eq_char( ch, wear_shield ) != obj )
-	return;
+        return;
   if ( ch->is_npc() )
-	return;
+        return;
 
   if ( number_percent() < 15 )  {
-	dam = number_percent()/2 + 5 * ch->getModifyLevel();
+        dam = number_percent()/2 + 5 * ch->getModifyLevel();
 
-	act_p( "Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
-	act_p( "Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
-	act_p( "Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
+        act_p( "Твой щит обжигает лицо $C3!", ch, 0, ch->fighting, TO_CHAR,POS_RESTING);
+        act_p( "Щит $c2 обжигает лицо $C3!", ch, 0, ch->fighting, TO_NOTVICT,POS_RESTING);
+        act_p( "Щит $C2 обжигает твое лицо!", ch->fighting, 0, ch, TO_CHAR,POS_RESTING);
 
-	damage( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
-	if ( ch == 0 || ch->fighting == 0 )
-	  return;
-	fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );
+        damage( ch, ch->fighting, dam, gsn_demonfire, DAM_FIRE, false);
+        if ( ch == 0 || ch->fighting == 0 )
+          return;
+        fire_effect( ch->fighting, obj->level,dam, TARGET_CHAR );
   }
   return;
 }
@@ -397,7 +397,7 @@ void SwordOfSun::equip( Character *ch )
 {
   short level = ch->getModifyLevel();
 
-  if ( level > 20 && level <= 30)	obj->value[2] = 4;
+  if ( level > 20 && level <= 30)        obj->value[2] = 4;
   else if ( level > 30 && level <= 40)   obj->value[2] = 5;
   else if ( level > 40 && level <= 50)   obj->value[2] = 6;
   else if ( level > 50 && level <= 60)   obj->value[2] = 8;
@@ -411,36 +411,36 @@ void SwordOfSun::fight( Character *ch )
     Character *victim;
 
     if ( ch->is_npc() )
-	    return;
+            return;
 
     if ( ( get_eq_char( ch, wear_wield ) != obj )
-	    && ( get_eq_char(ch, wear_second_wield) !=obj ) )
+            && ( get_eq_char(ch, wear_second_wield) !=obj ) )
     {
-	    return;
+            return;
     }
 
     victim = ch->fighting;
 
     if ( !victim->is_immortal()
-	    && number_percent() < 5 )
+            && number_percent() < 5 )
     {
-	ch->send_to("Твое оружие неконтролируемо тянется к шее твоего противника!\n\r");
+        ch->send_to("Твое оружие неконтролируемо тянется к шее твоего противника!\n\r");
 
-	if ( number_percent() < 40 )
-	{
-	    act_p( "Описав гигантскую дугу, $o1 отрубает голову $C3!",
-		    ch, obj, victim, TO_CHAR,POS_RESTING);
-	    act_p( "Оружие $c2 со свистом отрубает тебе голову!",
-		    ch, 0, victim, TO_VICT,POS_RESTING);
-	    act_p( "Оружие $c2 со свистом отрубает голову $C3!",
-		    ch, 0, victim, TO_NOTVICT,POS_RESTING);
+        if ( number_percent() < 40 )
+        {
+            act_p( "Описав гигантскую дугу, $o1 отрубает голову $C3!",
+                    ch, obj, victim, TO_CHAR,POS_RESTING);
+            act_p( "Оружие $c2 со свистом отрубает тебе голову!",
+                    ch, 0, victim, TO_VICT,POS_RESTING);
+            act_p( "Оружие $c2 со свистом отрубает голову $C3!",
+                    ch, 0, victim, TO_NOTVICT,POS_RESTING);
 
-	    act_p( "$c1 уже ТРУП!!", victim, 0, 0, TO_ROOM,POS_RESTING);
+            act_p( "$c1 уже ТРУП!!", victim, 0, 0, TO_ROOM,POS_RESTING);
 
-	    raw_kill( victim, 3, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-	    victim->send_to("Тебя УБИЛИ!!\n\r");
-	    return;
-	}
+            raw_kill( victim, 3, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+            victim->send_to("Тебя УБИЛИ!!\n\r");
+            return;
+        }
     }
     return;
 }
@@ -452,9 +452,9 @@ void SwordOfSun::fight( Character *ch )
 void FlyingBoots::wear( Character *ch )
 {
     if (!ch->isAffected(gsn_fly)) {
-	act( "Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
-	act( "Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
-	act( "$c1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
+        act( "Ты обуваешь $o4, и твои ноги медленно отрываются от земли.", ch, obj, 0, TO_CHAR );
+        act( "Ты поднимаешься в воздух.", ch, 0, 0, TO_CHAR );
+        act( "$c1 поднимается в воздух.", ch, 0, 0, TO_ROOM );
     }
 }
 void FlyingBoots::equip( Character *ch )
@@ -462,7 +462,7 @@ void FlyingBoots::equip( Character *ch )
     Affect af;
 
     if (ch->isAffected(gsn_fly))
-	return;
+        return;
 
     af.where = TO_AFFECTS;
     af.type = gsn_fly;
@@ -477,7 +477,7 @@ void FlyingBoots::equip( Character *ch )
 void FlyingBoots::remove( Character *ch )
 {
     if (!ch->isAffected(gsn_fly))
-	return;
+        return;
     
     affect_strip(ch, gsn_fly);
     act( "Ты падаешь на землю. \r\nДа уж!...", ch, 0, 0, TO_CHAR );
@@ -515,9 +515,9 @@ void GiantStrengthArmor::remove( Character *ch )
 {
     if (ch->isAffected(gsn_giant_strength))
     {
-	affect_strip(ch, gsn_giant_strength);
-	act( "Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
-	act( "Мышцы $c2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
+        affect_strip(ch, gsn_giant_strength);
+        act( "Твои мышцы съеживаются до обычного состояния.", ch, 0, 0, TO_CHAR );
+        act( "Мышцы $c2 съеживаются до обычного состояния.", ch, 0, 0, TO_ROOM );
     }
 }
 
@@ -554,11 +554,11 @@ void LionClaw::fight( Character *ch )
   if ( number_percent() < 90 )  return;
 
   if ( ( obj == get_eq_char(ch,wear_wield)) ||
-	(secondary = (obj == get_eq_char(ch,wear_second_wield))) )
+        (secondary = (obj == get_eq_char(ch,wear_second_wield))) )
    {
      ch->send_to("{WКогти на мгновение показались из львиной лапы.{x\n\r");
      act_p("{WКогти на мгновение показались из львиной лапы $c2.{x",
-		ch,0,0,TO_ROOM,POS_DEAD);
+                ch,0,0,TO_ROOM,POS_DEAD);
      
      one_hit(ch, ch->fighting, secondary);
      one_hit(ch, ch->fighting, secondary);
@@ -576,7 +576,7 @@ void LionClaw::fight( Character *ch )
 void RingOfRa::speech( Character *ch, const char *speech )
 {
     if (ch != obj->getCarrier( ))
-	return;
+        return;
     
   if ((!str_cmp(speech, "punish") || !str_cmp(speech, "наказать") || !str_cmp(speech, "покарать"))
       && (ch->fighting) &&

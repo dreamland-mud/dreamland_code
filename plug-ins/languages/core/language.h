@@ -81,7 +81,7 @@ public:
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual const DLString & getCategory( ) const
     {
-	return CATEGORY;
+        return CATEGORY;
     }
     
     WordEffectPointer findEffect( const DLString & ) const;
@@ -138,10 +138,10 @@ public:
     bool available ( ) const;
 
     inline int getLevel( ) const {
-	return level.getValue( );
+        return level.getValue( );
     }
     inline int getMaximum( ) const {
-	return maximum.getValue( );
+        return maximum.getValue( );
     }
     
     XML_VARIABLE XMLInteger maximum;

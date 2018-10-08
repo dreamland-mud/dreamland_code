@@ -69,16 +69,16 @@ CMDADM(findrefs)
     PCharacter *pch = ch->getPC( );
 
     if (!pch) 
-	return;
+        return;
     
     if (!has_fenia_security( pch )) {
-	ch->println("Ты не ботаешь по фене.");
-	return;
+        ch->println("Ты не ботаешь по фене.");
+        return;
     }
 
     if (constArguments.empty( )) {
-	ch->println("Синтаксис: {Wfindrefs {x<cs id>");
-	return;
+        ch->println("Синтаксис: {Wfindrefs {x<cs id>");
+        return;
     }
 
     try {
@@ -148,7 +148,7 @@ CMDADM(findrefs)
 
         page_to_char(os.str().c_str(), ch);
     } catch (const ::Exception &e) {
-	ch->send_to( e.what( ) );
+        ch->send_to( e.what( ) );
     }
 }
 

@@ -16,33 +16,33 @@ class IdRef;
 
 class CGQuest : public CommandPlugin, public DefaultCommand {
 public:
-	typedef ::Pointer<CGQuest> Pointer;
+        typedef ::Pointer<CGQuest> Pointer;
 
-	CGQuest( );
-	
-	virtual void run( Character*, const DLString& constArguments );
+        CGQuest( );
+        
+        virtual void run( Character*, const DLString& constArguments );
 
 private:
-	void doInfo( PCharacter * );
-	void doProgress( PCharacter * );
-	void doNoExp( PCharacter *, DLString& );
-	void doVictory( PCharacter * );
-	void doStat( PCharacter * );
-	void doSet( PCharacter *, DLString& );
-	void doList( PCharacter * );
-	void doStart( PCharacter *, DLString& );
-	void doStop( PCharacter *, DLString& );
-	void doTime( PCharacter *, DLString& );
-	void doTalk( PCharacter *, DLString& );
-	void doAuto( PCharacter *, DLString& );
-	void doRead( PCharacter *, DLString& );
+        void doInfo( PCharacter * );
+        void doProgress( PCharacter * );
+        void doNoExp( PCharacter *, DLString& );
+        void doVictory( PCharacter * );
+        void doStat( PCharacter * );
+        void doSet( PCharacter *, DLString& );
+        void doList( PCharacter * );
+        void doStart( PCharacter *, DLString& );
+        void doStop( PCharacter *, DLString& );
+        void doTime( PCharacter *, DLString& );
+        void doTalk( PCharacter *, DLString& );
+        void doAuto( PCharacter *, DLString& );
+        void doRead( PCharacter *, DLString& );
 
-	bool gqprog( PCharacter *, Scripting::IdRef & );
-	bool gqprog_info( PCharacter * );
-	bool gqprog_progress( PCharacter * );
-	void usage( PCharacter * );
-	
-	static const DLString COMMAND_NAME;
+        bool gqprog( PCharacter *, Scripting::IdRef & );
+        bool gqprog_info( PCharacter * );
+        bool gqprog_progress( PCharacter * );
+        void usage( PCharacter * );
+        
+        static const DLString COMMAND_NAME;
 };
 
 #endif

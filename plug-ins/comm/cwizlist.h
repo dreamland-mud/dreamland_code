@@ -34,12 +34,12 @@ public:
     
 private:
     static const DLString COMMAND_NAME;
-		
+                
     /* Элемент массива с именами уровней */
     struct GodLevelName {
-	DLString name;
-	int level;
-	const char * color;
+        DLString name;
+        int level;
+        const char * color;
     };
 
     /* Уровни богов */
@@ -47,8 +47,8 @@ private:
     
     /* Кусочки мечей, рисуемых по бокам списка */
     struct SwordLine {
-	DLString name;
-	int count;
+        DLString name;
+        int count;
     };
 
     /* Кусочки меча */
@@ -64,13 +64,13 @@ private:
 
     struct CompareGods : public std::binary_function<PCMemoryInterface *, PCMemoryInterface *, bool>
     {
-	bool operator () ( PCMemoryInterface *a, PCMemoryInterface *b )
-	{
-	    if (a->getLevel( ) == b->getLevel( ))
-		return a->getName( ) < b->getName( );
-	    else
-		return a->getLevel( ) > b->getLevel( );
-	}
+        bool operator () ( PCMemoryInterface *a, PCMemoryInterface *b )
+        {
+            if (a->getLevel( ) == b->getLevel( ))
+                return a->getName( ) < b->getName( );
+            else
+                return a->getLevel( ) > b->getLevel( );
+        }
     };
 
     typedef std::list<PCMemoryInterface *> GodList;

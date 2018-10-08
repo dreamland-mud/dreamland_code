@@ -28,8 +28,8 @@ int Remorts::countBonusLifes( ) const
     int cnt;
     
     for (cnt = 0, i = begin( ); i != end( ); i++)
-	if (i->bonus.getValue( ))
-	    cnt++;
+        if (i->bonus.getValue( ))
+            cnt++;
     
     return min( cnt, MAX_BONUS_LIFES );
 }

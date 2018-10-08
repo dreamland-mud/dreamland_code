@@ -17,35 +17,35 @@ class Character;
 typedef ::Pointer<Spell> SpellPointer;
 
 class SpellManager : public Plugin, public OneAllocate {
-public:	
-	typedef ::Pointer<SpellManager> Pointer;
-	typedef std::list<SpellPointer> SpellList;
-	typedef XMLReverseVector<XMLString> Priorities;
-	
-	SpellManager( );
-	virtual ~SpellManager( );
+public:        
+        typedef ::Pointer<SpellManager> Pointer;
+        typedef std::list<SpellPointer> SpellList;
+        typedef XMLReverseVector<XMLString> Priorities;
+        
+        SpellManager( );
+        virtual ~SpellManager( );
 
-	virtual void initialization( );
-	virtual void destruction( );
-	
-	static void registrate( SpellPointer );
-	static void unregistrate( SpellPointer );
-	static SpellPointer lookup( const DLString &, Character * );
+        virtual void initialization( );
+        virtual void destruction( );
+        
+        static void registrate( SpellPointer );
+        static void unregistrate( SpellPointer );
+        static SpellPointer lookup( const DLString &, Character * );
 
-	static inline SpellManager* getThis( )	
-	{
-	    return thisClass;
-	}
+        static inline SpellManager* getThis( )        
+        {
+            return thisClass;
+        }
 
 private:
-	static const DLString priorityFile;
-	static void loadPriorities( );
-	static Priorities priorities;
-	static bool compare( SpellPointer, SpellPointer );
+        static const DLString priorityFile;
+        static void loadPriorities( );
+        static Priorities priorities;
+        static bool compare( SpellPointer, SpellPointer );
 
-	static SpellManager* thisClass;
+        static SpellManager* thisClass;
 
-	static SpellList spells;
+        static SpellList spells;
 };
 
 

@@ -12,17 +12,17 @@
 class Poliglot : public Wanderer, public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<Poliglot> Pointer;
-	
-	Poliglot( );
+        typedef ::Pointer<Poliglot> Pointer;
+        
+        Poliglot( );
 
-	virtual void speech( Character *victim, const char *speech );
-	virtual int  getOccupation( );
+        virtual void speech( Character *victim, const char *speech );
+        virtual int  getOccupation( );
 
 protected:
-	virtual bool specIdle( );
-	virtual bool handleMoveResult( Road &, int );
-	virtual bool isHomesick( );
+        virtual bool specIdle( );
+        virtual bool handleMoveResult( Road &, int );
+        virtual bool isHomesick( );
 };
 
 #endif

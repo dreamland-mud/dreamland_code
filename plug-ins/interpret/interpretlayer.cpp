@@ -11,7 +11,7 @@
 
 
 InterpretArguments::InterpretArguments( ) 
-	    : d( 0 ), ch( 0 ), index( 0 ), phases( NULL )
+            : d( 0 ), ch( 0 ), index( 0 ), phases( NULL )
 {
 }
 
@@ -20,10 +20,10 @@ void InterpretArguments::advance( int newPhase )
     int i;
 
     for (i = index + 1; phases[i] != 0; i++)
-	if (phases[i] >= newPhase) {
-	    index = i;
-	    return;
-	}
+        if (phases[i] >= newPhase) {
+            index = i;
+            return;
+        }
 }
 
 void InterpretArguments::advance( )
@@ -39,23 +39,23 @@ void InterpretArguments::splitLine( )
     arg = line.c_str( );
     
     if (line.empty( )) {
-	cmdArgs = cmdName = line;
-	return;
+        cmdArgs = cmdName = line;
+        return;
     }
     
     if (dl_isalpha( arg[0] )
-		|| isdigit( arg[0] )
-		|| (arg[0] == '*' && arg[1] != ' '))
+                || isdigit( arg[0] )
+                || (arg[0] == '*' && arg[1] != ' '))
     {
-	cmdArgs = line;
-	cmdName = cmdArgs.getOneArgument( );
+        cmdArgs = line;
+        cmdName = cmdArgs.getOneArgument( );
     }
     else
     {
-	cmdName.assign( arg[0] );
-	cmdArgs = line;
-	cmdArgs.erase( 0, 1 );
-	cmdArgs.stripLeftWhiteSpace( );
+        cmdName.assign( arg[0] );
+        cmdArgs = line;
+        cmdArgs.erase( 0, 1 );
+        cmdArgs.stripLeftWhiteSpace( );
     }
 }   
 

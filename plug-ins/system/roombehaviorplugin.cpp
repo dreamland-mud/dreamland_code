@@ -16,13 +16,13 @@ void RoomBehaviorPlugin::initialization( )
     Room *room;
 
     for (room = room_list; room; room = room->rnext) {
-	if (!room->behavior)
-	    continue;
-	
-	if (room->behavior->getType( ) == getName( )) {
-	    room->behavior.recover( );
-	    room->behavior->setRoom( room );	
-	}
+        if (!room->behavior)
+            continue;
+        
+        if (room->behavior->getType( ) == getName( )) {
+            room->behavior.recover( );
+            room->behavior->setRoom( room );        
+        }
     }
 }
 
@@ -32,15 +32,15 @@ void RoomBehaviorPlugin::destruction( )
 
     /* XXX */
     if (dreamland->isShutdown( ))
-	return;
+        return;
 
     for (room = room_list; room; room = room->rnext) {
-	if (!room->behavior)
-	    continue;
-	
-	if (room->behavior->getType( ) == getName( )) {
-	    room->behavior->unsetRoom( );
-	    room->behavior.backup( );
-	}
+        if (!room->behavior)
+            continue;
+        
+        if (room->behavior->getType( ) == getName( )) {
+            room->behavior->unsetRoom( );
+            room->behavior.backup( );
+        }
     }
 }

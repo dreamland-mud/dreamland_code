@@ -39,33 +39,33 @@ COMMAND(CMlt, "mlt")
     DLString arg = arguments.getOneArgument( );
     
     if (ch->is_npc( )) 
-	return;
+        return;
     
     if (ch->isCoder( ) && !arg.empty( )) {
-	try {
-	    doCount( ch, arg.toInt( ) );
-	    return;
-	} catch (const ExceptionBadType &e) {
-	}
+        try {
+            doCount( ch, arg.toInt( ) );
+            return;
+        } catch (const ExceptionBadType &e) {
+        }
     }
     
     pcm = ch->getPC( );
     
     if (!arg.empty( )) 
-	if (!( pcm = PCharacterManager::find( arg ) )) {
-	    ch->println( "В DreamLand нет жителя с таким именем." );
-	    return;
-	}
+        if (!( pcm = PCharacterManager::find( arg ) )) {
+            ch->println( "В DreamLand нет жителя с таким именем." );
+            return;
+        }
 
     if (!ch->is_immortal( ) && ch->getPC( ) != pcm ) {
-	ch->send_to("Эта информация скрыта от Вас.\n\r");
-	return;
+        ch->send_to("Эта информация скрыта от Вас.\n\r");
+        return;
     }
     
     if (pcm != ch->getPC( )) 
-	doShowOther( ch, pcm );
+        doShowOther( ch, pcm );
     else
-	doShowSelf( ch->getPC( ) );
+        doShowSelf( ch->getPC( ) );
 }
 
 void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
@@ -75,23 +75,23 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
     ch->send_to("{B Раса         Класс        Время игры   Бонус{x\n\r");
 
     for (unsigned int i = 0; i < r.size( ); i++) {
-	LifeData &life = r[i];
+        LifeData &life = r[i];
 
-	ch->printf( " %-12s %-12s     %5ld      %s\r\n", 
-		    life.race.getValue( ).c_str( ),
-		    life.classCh.getValue( ).c_str( ),
-		    life.time.getValue( ),
-		    (life.bonus ? "*" : ""));
+        ch->printf( " %-12s %-12s     %5ld      %s\r\n", 
+                    life.race.getValue( ).c_str( ),
+                    life.classCh.getValue( ).c_str( ),
+                    life.time.getValue( ),
+                    (life.bonus ? "*" : ""));
     }
     
     for (int i = 0; i < stat_table.size; i++)
-	ch->printf("%d %s ", r.stats[i].getValue( ), stat_table.name( i ).c_str( ) );
+        ch->printf("%d %s ", r.stats[i].getValue( ), stat_table.name( i ).c_str( ) );
 
     ch->printf("\n%d lvl, %d hp, %d mana, %d sp %s, %d owners\n",
                 r.level.getValue( ),
-		r.hp.getValue( ), r.mana.getValue( ), r.skillPoints.getValue( ),
-		(r.pretitle ? "pretitle" : ""),
-		r.owners.getValue( ));
+                r.hp.getValue( ), r.mana.getValue( ), r.skillPoints.getValue( ),
+                (r.pretitle ? "pretitle" : ""),
+                r.owners.getValue( ));
 }
 
 void CMlt::doShowSelf( PCharacter *ch )
@@ -103,77 +103,77 @@ void CMlt::doShowSelf( PCharacter *ch )
     int vasted = attr ? attr->getVasted( ) : 0;
     
     if (victories > 0) {
-	str << fmt( ch, 
-	            "Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов",
-	            ch, victories );
-	
-	if (vasted)
-	    str << ", обменяв {W" << vasted << "{x из этих побед на плюшки";
-	else if (victories >= VictoryPrice::COUNT_PER_LIFE)  
-	    str << ", пока не обменяв ни одну победу на плюшки";
+        str << fmt( ch, 
+                    "Всего ты выполни%1$Gло|л|ла {W%2$d{x персональн%2$Iый|ых|ых квес%2$Iт|та|тов",
+                    ch, victories );
+        
+        if (vasted)
+            str << ", обменяв {W" << vasted << "{x из этих побед на плюшки";
+        else if (victories >= VictoryPrice::COUNT_PER_LIFE)  
+            str << ", пока не обменяв ни одну победу на плюшки";
 
-	str << "." << endl;
+        str << "." << endl;
     }
     else
-	str << fmt( ch, "Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста.", ch )
-	    << endl;
+        str << fmt( ch, "Ты пока не выполни%1$Gло|л|ла ни одного персонального квеста.", ch )
+            << endl;
     
     Remorts &r = ch->getRemorts( );
     int r_cnt = r.size( ), b_cnt = r.countBonusLifes( );
 
     if (r_cnt > 0) {
-	str << fmt( ch, "Ты прожи%1$Gло|л|ла {W%2$d{x жизн%2$Iь|и|ей, ", ch, r_cnt );
+        str << fmt( ch, "Ты прожи%1$Gло|л|ла {W%2$d{x жизн%2$Iь|и|ей, ", ch, r_cnt );
 
-	if (r_cnt == b_cnt) {
-	    if (r_cnt == 1)
-		str << "которая дает право на бонусы";
-	    else
-		str << "{Wвсе{x из которых дают право на бонусы";
-	}
-	else
-	    str << "{W" << b_cnt << "{x из которых "
-		<< (b_cnt > 1 ? "дают" : "дает")
-		<< " право на бонусы";
-	str << ":" << endl; 
+        if (r_cnt == b_cnt) {
+            if (r_cnt == 1)
+                str << "которая дает право на бонусы";
+            else
+                str << "{Wвсе{x из которых дают право на бонусы";
+        }
+        else
+            str << "{W" << b_cnt << "{x из которых "
+                << (b_cnt > 1 ? "дают" : "дает")
+                << " право на бонусы";
+        str << ":" << endl; 
 
-	for (int i = 0; i < r_cnt; i++) {
-	    LifeData &life = r[i];
-	    PCRace *race = raceManager->find( life.race )->getPC( );
-	    int age = 17 + life.time / 20;
+        for (int i = 0; i < r_cnt; i++) {
+            LifeData &life = r[i];
+            PCRace *race = raceManager->find( life.race )->getPC( );
+            int age = 17 + life.time / 20;
 
-	    str << fmt( ch,
-			"     %N1 %N1, переродил%Gось|ся|ась в возрасте %d %s",
-			(ch->getSex( ) == SEX_FEMALE ?
-			      race->getFemaleName( ).c_str( )
-			    : race->getMaleName( ).c_str( )),
-			professionManager->find( life.classCh )->getRusName( ).c_str( ),
-			ch,
-			age, GET_COUNT(age, "года", "лет", "лет") )
-		<< endl;
-	}
+            str << fmt( ch,
+                        "     %N1 %N1, переродил%Gось|ся|ась в возрасте %d %s",
+                        (ch->getSex( ) == SEX_FEMALE ?
+                              race->getFemaleName( ).c_str( )
+                            : race->getMaleName( ).c_str( )),
+                        professionManager->find( life.classCh )->getRusName( ).c_str( ),
+                        ch,
+                        age, GET_COUNT(age, "года", "лет", "лет") )
+                << endl;
+        }
 
-	str << endl;
+        str << endl;
     }
     else
-	str << "Ты живешь первую жизнь." << endl;
+        str << "Ты живешь первую жизнь." << endl;
     
     if (r_cnt > 0 || vasted > 0) {
-	str << endl
-	    << fmt( ch, "Ты выкупи%1$Gло|л|ла {W%2$d{x owner купо%2$Iн|на|нов и выбра%1$Gло|л|ла в качестве бонусов:", 
-			ch, r.owners.getValue( ) ) 
-	    << endl;
+        str << endl
+            << fmt( ch, "Ты выкупи%1$Gло|л|ла {W%2$d{x owner купо%2$Iн|на|нов и выбра%1$Gло|л|ла в качестве бонусов:", 
+                        ch, r.owners.getValue( ) ) 
+            << endl;
 
-	str << (r.hp > 0          ? fmt( ch, "     %d здоровья\n", r.hp.getValue( ) ) : "")
-	    << (r.mana > 0        ? fmt( ch, "     %d маны\n", r.mana.getValue( ) ) : "")
-	    << (r.skillPoints > 0 ? fmt( ch, "     %d skill points\n", r.skillPoints.getValue( ) ) : "")
-	    << (r.level > 0       ? fmt( ch, "     %1$d уров%1$Iень|ня|ней \n", r.level.getValue( ) ) : "")
-	    << (r.pretitle        ?          "     цветной претитул\n" : "");
+        str << (r.hp > 0          ? fmt( ch, "     %d здоровья\n", r.hp.getValue( ) ) : "")
+            << (r.mana > 0        ? fmt( ch, "     %d маны\n", r.mana.getValue( ) ) : "")
+            << (r.skillPoints > 0 ? fmt( ch, "     %d skill points\n", r.skillPoints.getValue( ) ) : "")
+            << (r.level > 0       ? fmt( ch, "     %1$d уров%1$Iень|ня|ней \n", r.level.getValue( ) ) : "")
+            << (r.pretitle        ?          "     цветной претитул\n" : "");
 
-	for (int i = 0; i < stat_table.size; i++)
-	    if (r.stats[i] > 0)
-		str << fmt( ch, "     +%d к %s\n", 
-				r.stats[i].getValue( ), 
-				stat_table.message( i, '3' ).c_str( ) );
+        for (int i = 0; i < stat_table.size; i++)
+            if (r.stats[i] > 0)
+                str << fmt( ch, "     +%d к %s\n", 
+                                r.stats[i].getValue( ), 
+                                stat_table.message( i, '3' ).c_str( ) );
     }
 
     ch->send_to( str );
@@ -189,16 +189,16 @@ void CMlt::doCount( Character* ch, int n )
     
     for (pos = list.begin( ); pos != list.end( ); pos++) {
         PCMemoryInterface *pcm = pos->second;
-	
+        
         if (pcm->getRemorts( ).size( ) == (unsigned)n) {
             buf << pcm->getName( );
-	    
-	    if (pcm->getAttributes( ).isAvailable( "fixremort1" ))
-		buf << " *";
-	    if (pcm->getAttributes( ).isAvailable( "fixremort2" ))
-		buf << " **";
-	    
-	    buf << endl;
+            
+            if (pcm->getAttributes( ).isAvailable( "fixremort1" ))
+                buf << " *";
+            if (pcm->getAttributes( ).isAvailable( "fixremort2" ))
+                buf << " **";
+            
+            buf << endl;
             cnt++;
         }
     }
@@ -221,33 +221,33 @@ void CMlt::doLimit( Character *ch )
     
     for (pos = list.begin( ); pos != list.end( ); pos++) {
         PCMemoryInterface *pcm = pos->second;
-	Remorts &r = pcm->getRemorts( );
-	
+        Remorts &r = pcm->getRemorts( );
+        
         if (r.size( ) == 0)
-	    continue;
-	
-	buf << pcm->getName( ) << ": ";
+            continue;
+        
+        buf << pcm->getName( ) << ": ";
 
-	if (r.level) {
-	    buf << "[-" << level << " level]";
-	    r.points += 10 * r.level;
-	    r.level = 0;
-	}
-	
-	if (r.hp > 200) {
-	    buf << " [-" << r.hp - 200 << " hp]";
-	    r.points += 5 * max( r.hp - 200, 0 ) / 50;
-	    r.hp = min( r.hp.getValue( ), 200 );
-	}
+        if (r.level) {
+            buf << "[-" << level << " level]";
+            r.points += 10 * r.level;
+            r.level = 0;
+        }
+        
+        if (r.hp > 200) {
+            buf << " [-" << r.hp - 200 << " hp]";
+            r.points += 5 * max( r.hp - 200, 0 ) / 50;
+            r.hp = min( r.hp.getValue( ), 200 );
+        }
 
-	for (int i = 0; i < stat_table.size; i++) 
-	    if (r.stats[i] > 2) {
-		buf << " [-" << r.stats[i] - 2 << " " << i << "]";
-		r.points += 10 * max( r.stats[i] - 2, 0 );
-		r.stats[i] = min( r.stats[i].getValue( ), 2 );
-	    }
-	
-	buf << endl;
+        for (int i = 0; i < stat_table.size; i++) 
+            if (r.stats[i] > 2) {
+                buf << " [-" << r.stats[i] - 2 << " " << i << "]";
+                r.points += 10 * max( r.stats[i] - 2, 0 );
+                r.stats[i] = min( r.stats[i].getValue( ), 2 );
+            }
+        
+        buf << endl;
     }
 
     page_to_char( buf.str( ).c_str( ), ch );

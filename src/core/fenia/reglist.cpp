@@ -38,12 +38,12 @@ XMLRegisterList::toXML( XMLNode::Pointer& parent ) const
     const_iterator i;
     
     for(i = begin(); i != end(); i++) {
-	XMLNode::Pointer node(NEW);
-	
-	i->toXML(node);
-	node->setName("li");
-	
-	parent->appendChild(node);
+        XMLNode::Pointer node(NEW);
+        
+        i->toXML(node);
+        node->setName("li");
+        
+        parent->appendChild(node);
     }
 
     return true;
@@ -62,7 +62,7 @@ XMLRegisterList::nodeFromXML( const XMLNode::Pointer& child)
     const DLString &name = child->getName();
     
     if(child->getType( ) != XMLNode::XML_NODE || name != "li")
-	return false;
+        return false;
 
     insert(end( ), XMLRegister( ));
     back( ).fromXML(child);
@@ -77,7 +77,7 @@ NMI_INVOKE( RegList, forEach , "")
     RegisterList::const_iterator ai = args.begin();
     
     if(ai == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     Register rfun = *ai++;
     Closure *fun = rfun.toFunction( );
@@ -89,10 +89,10 @@ NMI_INVOKE( RegList, forEach , "")
     RegList::Pointer rc( NEW );
 
     for(iterator i = begin(); i != end(); i++) {
-	Register reg = fun->invoke(*i, av);
+        Register reg = fun->invoke(*i, av);
 
-	if (reg.type != Register::NONE)
-	    rc->push_back( reg );
+        if (reg.type != Register::NONE)
+            rc->push_back( reg );
     }
 
     Object *obj = &Object::manager->allocate();
@@ -127,7 +127,7 @@ RegListCall::getField(const Register &key)
     RegList::iterator i;
     
     for(i = rl->begin(); i != rl->end(); i++)
-	rc->push_back( *(*i)[key] );
+        rc->push_back( *(*i)[key] );
 
     Object *obj = &Object::manager->allocate();
     obj->setHandler(rc);
@@ -143,7 +143,7 @@ RegListCall::setField(const Register &key, const Register &val)
     RegList::iterator i;
     
     for(i = rl->begin(); i != rl->end(); i++)
-	(*i)[key] = val;
+        (*i)[key] = val;
 }
 
 Register 
@@ -155,7 +155,7 @@ RegListCall::callMethod(const Register &key, const RegisterList &args)
     RegList::iterator i;
     
     for(i = rl->begin(); i != rl->end(); i++)
-	rc->push_back( (*i)[key](args) );
+        rc->push_back( (*i)[key](args) );
 
     Object *obj = &Object::manager->allocate();
     obj->setHandler(rc);

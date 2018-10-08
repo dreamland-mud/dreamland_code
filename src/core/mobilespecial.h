@@ -9,12 +9,12 @@
 
 class NPCharacter;
 
-typedef bool SPEC_FUN	( NPCharacter *ch );
+typedef bool SPEC_FUN        ( NPCharacter *ch );
 
 struct spec_type
 {
-    const char * 	name;			/* special function name */
-    SPEC_FUN *	function;		/* the function */
+    const char *         name;                        /* special function name */
+    SPEC_FUN *        function;                /* the function */
 };
 
 extern const   struct  spec_type    *spec_table;
@@ -30,29 +30,29 @@ struct ProgWrapper {
     
     PType * operator * () 
     {
-	if (func)
-	    return func;
-	else
-	    return (PType *)&empty_prog;
+        if (func)
+            return func;
+        else
+            return (PType *)&empty_prog;
     }
 
     PType * operator = ( PType *mp )
     {
-	func = mp;
-	return func;
+        func = mp;
+        return func;
     }
 
     void clear( )
     {
-	func = 0;
-	name.clear( );
+        func = 0;
+        name.clear( );
     }
 
     PType *func;
     DLString name;
 };
 
-SPEC_FUN *	spec_lookup	 ( const char *name );
-const char *	spec_name	( SPEC_FUN *function );
+SPEC_FUN *        spec_lookup         ( const char *name );
+const char *        spec_name        ( SPEC_FUN *function );
 
 #endif

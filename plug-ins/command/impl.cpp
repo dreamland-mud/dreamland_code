@@ -9,13 +9,13 @@
 
 extern "C"
 {
-	SO::PluginList initialize_command( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<XMLVariableRegistrator<CommandHelp> >( ppl );
-		Plugin::registerPlugin<CommandManager>( ppl );
+        SO::PluginList initialize_command( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<XMLVariableRegistrator<CommandHelp> >( ppl );
+                Plugin::registerPlugin<CommandManager>( ppl );
 
-		return ppl;
-	}
+                return ppl;
+        }
 }

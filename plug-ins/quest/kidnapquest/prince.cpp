@@ -35,51 +35,51 @@ bool KidnapPrince::spec( )
     NPCharacter *king;
     
     if (!getQuest( ))
-	return false;
+        return false;
 
     switch (state.getValue( )) {
     case STAT_INIT:
     case STAT_FOLLOW:
     case STAT_LOST:
-	if (( king = getKingRoom( ) )) {
-	    kingReunion( king );	
-	    return true;
-	}
+        if (( king = getKingRoom( ) )) {
+            kingReunion( king );        
+            return true;
+        }
 
-	break;
+        break;
     }
     
     switch (state.getValue( )) {
     case STAT_INIT:
-	quest->getScenario( ).actHeroWait( ch );
-	break;
+        quest->getScenario( ).actHeroWait( ch );
+        break;
 
     case STAT_FOLLOW:
-	if (( hero = getHeroRoom( ) ))
-	    banditsUnleash( hero );
-	else	
-	    heroDetach( hero );
+        if (( hero = getHeroRoom( ) ))
+            banditsUnleash( hero );
+        else        
+            heroDetach( hero );
 
-	break;
-	
+        break;
+        
     case STAT_LOST:
-	hero = getHeroRoom( );
+        hero = getHeroRoom( );
 
-	if (hero && !hero->fighting) 
-	    heroReattach( hero );
-	else {
-	    quest->getScenario( ).actNoHero( ch, hero );
-	    banditsUnleash( getHeroWorld( ) );
-	}
+        if (hero && !hero->fighting) 
+            heroReattach( hero );
+        else {
+            quest->getScenario( ).actNoHero( ch, hero );
+            banditsUnleash( getHeroWorld( ) );
+        }
 
-	break;
+        break;
     case STAT_KIDNAPPED:
-	if (!getBanditRoom( ))
-	    state = STAT_LOST;
-	    
-	break;
+        if (!getBanditRoom( ))
+            state = STAT_LOST;
+            
+        break;
     default:
-	break;
+        break;
     }
   
     return true;
@@ -91,27 +91,27 @@ void KidnapPrince::greet( Character *victim )
     case STAT_INIT:
     case STAT_FOLLOW:
     case STAT_LOST:
-	if (ourKing( victim )) {
-	    kingReunion( victim->getNPC() );
-	    return;
-	}
+        if (ourKing( victim )) {
+            kingReunion( victim->getNPC() );
+            return;
+        }
 
-	break;
+        break;
     }
 
     switch (state.getValue( )) {
     case STAT_INIT:
-	break;
+        break;
     case STAT_LOST:
-	if (ourHero( victim )) {
-	    heroReattach( victim->getPC( ) );
-	    return;
-	}
+        if (ourHero( victim )) {
+            heroReattach( victim->getPC( ) );
+            return;
+        }
 
-	break;
+        break;
 
     default:
-	break;
+        break;
     }
 }
 
@@ -124,38 +124,38 @@ void KidnapPrince::entry(  )
     case STAT_INIT:
     case STAT_FOLLOW:
     case STAT_LOST:
-	king = getKingRoom( );
-	if (king) {
-	    kingReunion( king );	
-	    return;
-	}
+        king = getKingRoom( );
+        if (king) {
+            kingReunion( king );        
+            return;
+        }
 
-	break;
+        break;
     }
 
     switch (state.getValue( )) {
     case STAT_INIT:
-	break;
+        break;
     case STAT_FOLLOW:
-	hero = getHeroRoom( );
-	if (!hero) {
-	    heroDetach( hero );
-	    return;
-	}
+        hero = getHeroRoom( );
+        if (!hero) {
+            heroDetach( hero );
+            return;
+        }
 
-	break;
-	
+        break;
+        
     case STAT_LOST:
-	hero = getHeroRoom( );
-	if (hero && !hero->fighting) {
-	    heroReattach( hero );
-	    return;
-	}
+        hero = getHeroRoom( );
+        if (hero && !hero->fighting) {
+            heroReattach( hero );
+            return;
+        }
 
-	break;
+        break;
 
     default:
-	break;
+        break;
     }
 }
 
@@ -163,39 +163,39 @@ void KidnapPrince::entry(  )
 void KidnapPrince::give( Character *victim, Object *obj ) 
 {
     if (!getQuest( ))
-	return;
+        return;
 
     if (!ourHero( victim )) {
-	quest->getScenario( ).actWrongGiver( ch, victim, obj );
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	act( "$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
-	return;
+        quest->getScenario( ).actWrongGiver( ch, victim, obj );
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        act( "$c1 бросает $o4.", ch, obj, 0, TO_ROOM );
+        return;
     }
-	
+        
     if (state == STAT_INIT) {
-	if (quest->check<KidnapMark>( obj )) {
-	    quest->getScenario( ).actGoodMark( ch, victim, obj );
-	    heroAttach( victim->getPC( ) );    
-	}
-	else
-	    quest->getScenario( ).actWrongMark( ch, victim, obj );
-	    
-	return;
+        if (quest->check<KidnapMark>( obj )) {
+            quest->getScenario( ).actGoodMark( ch, victim, obj );
+            heroAttach( victim->getPC( ) );    
+        }
+        else
+            quest->getScenario( ).actWrongMark( ch, victim, obj );
+            
+        return;
     }
     
     if (obj->item_type == ITEM_POTION || obj->item_type == ITEM_PILL) {
-	act( "$c1 $T $o4.", ch, obj, (obj->item_type == ITEM_PILL ? "съедает" : "осушает"), TO_ROOM );
-	spell_by_item( ch, obj );
-	extract_obj( obj );
-	return;
+        act( "$c1 $T $o4.", ch, obj, (obj->item_type == ITEM_PILL ? "съедает" : "осушает"), TO_ROOM );
+        spell_by_item( ch, obj );
+        extract_obj( obj );
+        return;
     }
 }
 
 void KidnapPrince::deadAction( Quest::Pointer aquest, PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( ) && getQuest( ))
-	quest->getScenario( ).msgKidDeath( ch, killer, pcm->getPlayer( ) );
+        quest->getScenario( ).msgKidDeath( ch, killer, pcm->getPlayer( ) );
 
     ProtectedClient::deadAction( aquest, pcm, killer );
 }
@@ -215,20 +215,20 @@ void KidnapPrince::config( PCharacter *hero )
 void KidnapPrince::heroAttach( PCharacter *hero )
 {
     if (!getQuest( ))
-	return;
+        return;
 
     ch->add_follower( hero );
     
     quest->state.setValue( QSTAT_KID_FOUND );
     quest->wiznet( "", "kid attached" );
-	
+        
     state = STAT_FOLLOW;
 }
 
 void KidnapPrince::heroDetach( PCharacter *hero ) 
 {
     if (!getQuest( ))
-	return;
+        return;
 
     quest->getScenario( ).actHeroDetach( ch, hero );
     quest->wiznet( "", "kid detached" );
@@ -240,7 +240,7 @@ void KidnapPrince::heroDetach( PCharacter *hero )
 void KidnapPrince::heroReattach( PCharacter *hero ) 
 {
     if (!getQuest( ))
-	return;
+        return;
 
     ch->add_follower( hero );
     state = STAT_FOLLOW;
@@ -257,54 +257,54 @@ void KidnapPrince::kingReunion( NPCharacter *king )
     PCharacter *hero;
     
     if (!getQuest( ))
-	return;
+        return;
 
     state.setValue( STAT_REUNION );
     ch->master = NULL;
     
     if (!( pci = getHeroMemory( ) ))
-	return;
+        return;
    
     hero = pci->getPlayer( );
 
     switch (quest->state.getValue( )) {
     case QSTAT_INIT:
     case QSTAT_MARK_RCVD:
-	time = quest->getAccidentTime( pci );
+        time = quest->getAccidentTime( pci );
 
-	if (hero) {
-	    buf << king->getNameP( '1' ) << " и " << ch->getNameP( '1' ) 
-		<< " встретились без твоей помощи." << endl
-		<< "Квест отменен, через {Y" << time 
-		<< "{x минут ты сможешь получить новое задание." << endl;
-	    hero->send_to( buf );
-	}
-	
-	quest->setTime( pci, time );
-	quest->state = QSTAT_BROKEN_BY_OTHERS;
-	quest->scheduleDestroy( );
-	break;
+        if (hero) {
+            buf << king->getNameP( '1' ) << " и " << ch->getNameP( '1' ) 
+                << " встретились без твоей помощи." << endl
+                << "Квест отменен, через {Y" << time 
+                << "{x минут ты сможешь получить новое задание." << endl;
+            hero->send_to( buf );
+        }
+        
+        quest->setTime( pci, time );
+        quest->state = QSTAT_BROKEN_BY_OTHERS;
+        quest->scheduleDestroy( );
+        break;
 
     case QSTAT_KID_FOUND:
-	if (hero == NULL) {
-	    quest->setTime( pci, quest->getAccidentTime( pci ) );
-	    quest->state = QSTAT_BROKEN_BY_OTHERS;
-	    quest->scheduleDestroy( );
-	} 
-	else {
-	    if (hero->in_room == ch->in_room) {
-		quest->getScenario( ).actReunion( ch, king, hero );
-		quest->state = QSTAT_FINISHED;
-	    } 
-	    else {
-		quest->getScenario( ).msgRemoteReunion( ch, king, hero );
-		quest->state = QSTAT_KING_ACK_WAITING;	
-	    }
+        if (hero == NULL) {
+            quest->setTime( pci, quest->getAccidentTime( pci ) );
+            quest->state = QSTAT_BROKEN_BY_OTHERS;
+            quest->scheduleDestroy( );
+        } 
+        else {
+            if (hero->in_room == ch->in_room) {
+                quest->getScenario( ).actReunion( ch, king, hero );
+                quest->state = QSTAT_FINISHED;
+            } 
+            else {
+                quest->getScenario( ).msgRemoteReunion( ch, king, hero );
+                quest->state = QSTAT_KING_ACK_WAITING;        
+            }
 
-	    quest->destroyBandits( );
-	}
-	
-	break;
+            quest->destroyBandits( );
+        }
+        
+        break;
     }
 }
 
@@ -313,9 +313,9 @@ void KidnapPrince::kingReunion( NPCharacter *king )
 NPCharacter * KidnapPrince::getBanditRoom( )
 {
     if (getQuest( ))
-	return quest->getMobileRoom<KidnapBandit>( ch->in_room );
+        return quest->getMobileRoom<KidnapBandit>( ch->in_room );
     else
-	return NULL;
+        return NULL;
 }
 
 void KidnapPrince::banditsUnleash( PCharacter *hero )
@@ -326,19 +326,19 @@ void KidnapPrince::banditsUnleash( PCharacter *hero )
     int number;
     
     if (!hero)
-	return;
+        return;
 
     if (!getQuest( ))
-	return;
+        return;
     
     if ((rated_as_newbie( hero ) && quest->ambushes >= 1) 
             || quest->ambushes >= 3)
-	return;
+        return;
     
     target_room = ch->in_room;
 
     if (!quest->checkRoom( hero, target_room ))
-	return;
+        return;
 
     level = hero->getModifyLevel( );
     quest_time = quest->getTime( hero );
@@ -346,25 +346,25 @@ void KidnapPrince::banditsUnleash( PCharacter *hero )
     probability = (quest->ambushes > 0 ? 5 : 10);
     
     if (number_range( 1, invoc_times ) > probability)
-	return;
+        return;
     
     number = number_range( 2, 2 + level / 50 );
     
     try {
-	for (int i = 0; i < number; i++) {
-	    NPCharacter *bandit;
-	    
-	    bandit = quest->createBandit( );
-	    char_to_room( bandit, target_room );
-	    
-	    if (i == 0)
-		quest->getScenario( ).actBanditsUnleash( ch, hero, bandit );
-		
-	    bandit->behavior->spec( );
-	}
+        for (int i = 0; i < number; i++) {
+            NPCharacter *bandit;
+            
+            bandit = quest->createBandit( );
+            char_to_room( bandit, target_room );
+            
+            if (i == 0)
+                quest->getScenario( ).actBanditsUnleash( ch, hero, bandit );
+                
+            bandit->behavior->spec( );
+        }
     }
     catch (QuestCannotStartException e) {
-	return;
+        return;
     }
     
     quest->ambushes++;

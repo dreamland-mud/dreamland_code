@@ -46,17 +46,17 @@ int ShopTrader::getOccupation( )
 void ShopTrader::load( DLString str )
 {
     if (str == "spec_repairman") {
-	for (int i = 0; i < item_table.size; i++)	
-	    repairs.setBitNumber( i );
+        for (int i = 0; i < item_table.size; i++)        
+            repairs.setBitNumber( i );
     }
     else {
-	for (int i = 0; i < 5; i++) 
-	    buys.setBitNumber( str.getOneArgument( ).toInt( ) );
-	
-	profitBuy  = str.getOneArgument( ).toInt( );
-	profitSell = str.getOneArgument( ).toInt( );
-	openHour   = str.getOneArgument( ).toInt( );
-	closeHour  = str.getOneArgument( ).toInt( );
+        for (int i = 0; i < 5; i++) 
+            buys.setBitNumber( str.getOneArgument( ).toInt( ) );
+        
+        profitBuy  = str.getOneArgument( ).toInt( );
+        profitSell = str.getOneArgument( ).toInt( );
+        openHour   = str.getOneArgument( ).toInt( );
+        closeHour  = str.getOneArgument( ).toInt( );
     }
 }
 
@@ -145,37 +145,37 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
 bool ShopTrader::canServeClient( PCharacter *client )
 {
     if (!IS_AWAKE(ch)) {
-	interpret_raw( ch, "snore" );
-	return false;
+        interpret_raw( ch, "snore" );
+        return false;
     }
     
     if (IS_SET(ch->in_room->area->area_flag, AREA_HOMETOWN)
-	 && !client->is_npc( ) 
-	 && IS_SET(client->act, PLR_WANTED))
+         && !client->is_npc( ) 
+         && IS_SET(client->act, PLR_WANTED))
     {
-	do_say( ch, "Criminals are not welcome!" );
-	interpret_raw( ch, "yell", "%s the CRIMINAL is over here!", client->getNameP( ) );
-	return false;
+        do_say( ch, "Criminals are not welcome!" );
+        interpret_raw( ch, "yell", "%s the CRIMINAL is over here!", client->getNameP( ) );
+        return false;
     }
 
     if (time_info.hour > closeHour) {
-	do_say( ch, "Извини, магазин уже закрыт. Приходи завтра." );
-	return false;
+        do_say( ch, "Извини, магазин уже закрыт. Приходи завтра." );
+        return false;
     }
 
     if (time_info.hour < openHour) {
-	do_say( ch, "Извини, магазин еще не открылся. Подожди немного." );
-	return false;
+        do_say( ch, "Извини, магазин еще не открылся. Подожди немного." );
+        return false;
     }
 
     if (!ch->can_see( client ) && !client->is_immortal( )) {
-	do_say( ch, "Я не торгую с тем, кого не вижу." );
-	return false;
+        do_say( ch, "Я не торгую с тем, кого не вижу." );
+        return false;
     }
 
     if (ch->fighting) {
-	do_say( ch, "Подожди немного, мне сейчас не до тебя." );
-	return false;
+        do_say( ch, "Подожди немного, мне сейчас не до тебя." );
+        return false;
     }
 
     return true;
@@ -200,10 +200,10 @@ bool ShopTrader::canSell( Object *obj, PCharacter *client )
 bool ShopTrader::canBuy( Object *obj, PCharacter *client )
 {
     if (obj->wear_loc != wear_none)
-	return false;
-	
+        return false;
+        
     if (!ch->can_see( obj ) || !client->can_see( obj ))
-	return false;
+        return false;
 
     return true;
 }
@@ -214,28 +214,28 @@ void ShopTrader::toStream( PCharacter *client, ostringstream &buf )
     int number, cost, count;
 
     for (obj = ch->carrying, number = 1; obj; obj = obj->next_content) 
-	if (( cost = getBuyCost( obj ) ) > 0) {
-	    if (IS_OBJ_STAT( obj, ITEM_INVENTORY ))
-		count = 0;
-	    else {
-		count = 1;
+        if (( cost = getBuyCost( obj ) ) > 0) {
+            if (IS_OBJ_STAT( obj, ITEM_INVENTORY ))
+                count = 0;
+            else {
+                count = 1;
 
-		while (obj->next_content
-			&& obj->pIndexData == obj->next_content->pIndexData
-			&& !str_cmp(obj->getShortDescr( ), obj->next_content->getShortDescr( ) ))
-		{
-		    obj = obj->next_content;
-		    count++;
-		}
-	    }
+                while (obj->next_content
+                        && obj->pIndexData == obj->next_content->pIndexData
+                        && !str_cmp(obj->getShortDescr( ), obj->next_content->getShortDescr( ) ))
+                {
+                    obj = obj->next_content;
+                    count++;
+                }
+            }
 
-	    buf << dlprintf( "[ {Y%3d{x |%3d %5d %6d ] %s\n\r",
-			     number++, 
-			     obj->level, 
-			     cost,
-			     count == 0 ? "  --  " : DLString( count ).c_str( ),
-			     obj->getShortDescr( '1' ).c_str( ) );
-	}
+            buf << dlprintf( "[ {Y%3d{x |%3d %5d %6d ] %s\n\r",
+                             number++, 
+                             obj->level, 
+                             cost,
+                             count == 0 ? "  --  " : DLString( count ).c_str( ),
+                             obj->getShortDescr( '1' ).c_str( ) );
+        }
 }
 
 void ShopTrader::msgListEmpty( PCharacter *client )

@@ -25,26 +25,26 @@ int main( int argc, char* argv[] )
 {
     try
     {
-	DreamLand dl;
+        DreamLand dl;
 
-	if (argc > 1)
-	    dl.setConfigFilePath( argv[1] );
-	else
-		dl.setConfigFilePath(DEFAULT_CONFIG_PATH);
-	
-	dl.load( );
+        if (argc > 1)
+            dl.setConfigFilePath( argv[1] );
+        else
+                dl.setConfigFilePath(DEFAULT_CONFIG_PATH);
+        
+        dl.load( );
 
-	try {
-	    dl.run( );
-	} catch (const Exception &e1) {
-	    e1.printStackTrace( LogStream::sendFatal( ) );
-	}
+        try {
+            dl.run( );
+        } catch (const Exception &e1) {
+            e1.printStackTrace( LogStream::sendFatal( ) );
+        }
 
-	dl.save( );
-	
+        dl.save( );
+        
     } catch (const Exception &e1) {
-	e1.printStackTrace( LogStream::sendFatal( ) );
-	return 1;
+        e1.printStackTrace( LogStream::sendFatal( ) );
+        return 1;
     }
 
     return 0;

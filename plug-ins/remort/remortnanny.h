@@ -22,7 +22,7 @@ public:
 
 class RemortWitch : public ServiceTrader, 
                     public Seller, 
-		    public TraderBehavior
+                    public TraderBehavior
 {
 XML_OBJECT
 public:

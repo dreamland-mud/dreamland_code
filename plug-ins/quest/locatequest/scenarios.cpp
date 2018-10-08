@@ -29,11 +29,11 @@ bool LocateScenario::applicable( PCharacter * )
 int LocateScenario::getCount( PCharacter *pch )
 {
     if (rated_as_guru( pch ))
-	return number_range( 6, 10 );
+        return number_range( 6, 10 );
     else if (rated_as_newbie( pch ))
-	return number_range( 2, 4 );
+        return number_range( 2, 4 );
     else
-	return number_range( 2, 10 );
+        return number_range( 2, 10 );
 }
 
 void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj )
@@ -46,34 +46,34 @@ void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQues
 void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
 {
     act( "$c1 произносит '{gВот спасибо, $C1. Теперь все найдено и я могу спать спокойно.{x'", 
-	ch, 0, hero, TO_ROOM );
+        ch, 0, hero, TO_ROOM );
     act( "$c1 произносит '{gА вознаграждение я уже переда$gло|л|ла твоему квестору. Сходи и забери его.{x'",
-	ch, 0, hero, TO_ROOM );
+        ch, 0, hero, TO_ROOM );
 }
 
 void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
 {
     if (chance(1) && quest->delivered == 1) {
-	act( "$c1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
-	interpret_raw( ch, "grin" );
-	return;
+        act( "$c1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );
+        interpret_raw( ch, "grin" );
+        return;
     } 
 
     switch (number_range( 1, 3 )) {
     case 1:
-	if (quest->delivered > 1) {
-	    act( "$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'", 
-		    ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
-	    break;
-	}
-	/* FALLTHROUGH */
+        if (quest->delivered > 1) {
+            act( "$c1 произносит '{gО, ты наш$Gло|ел|ла еще $t!{x'", 
+                    ch, russian_case( quest->itemName.getValue( ), '4' ).c_str( ), hero, TO_ROOM );
+            break;
+        }
+        /* FALLTHROUGH */
     case 2:
         act( "$c1 произносит '{gТеперь их уже $t, осталось совсем немного.{x'", 
-		ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
-	break;
+                ch, DLString(quest->delivered).c_str( ), 0, TO_ROOM );
+        break;
     case 3:
-	interpret_fmt( ch, "nod %s", hero->getNameP( ) );
-	break;
+        interpret_fmt( ch, "nod %s", hero->getNameP( ) );
+        break;
     }
 }
 

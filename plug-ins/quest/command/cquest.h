@@ -14,23 +14,23 @@ class NPCharacter;
 class CQuest : public CommandPlugin, public DefaultCommand {
 XML_OBJECT;
 public:
-	typedef ::Pointer<CQuest> Pointer;
+        typedef ::Pointer<CQuest> Pointer;
 
-	CQuest( );
-	
-	virtual void run( Character*, const DLString& constArguments );
-	
+        CQuest( );
+        
+        virtual void run( Character*, const DLString& constArguments );
+        
 private:
-	void doInfo( PCharacter * );
-	void doPoints( PCharacter * );
-	void doTime( PCharacter * );
-	void doSet( PCharacter *, DLString& );
-	void doStat( PCharacter * );
-	
-	bool gprog_questinfo( PCharacter * );
-	void usage( PCharacter * );
+        void doInfo( PCharacter * );
+        void doPoints( PCharacter * );
+        void doTime( PCharacter * );
+        void doSet( PCharacter *, DLString& );
+        void doStat( PCharacter * );
+        
+        bool gprog_questinfo( PCharacter * );
+        void usage( PCharacter * );
 
-	static const DLString COMMAND_NAME;
+        static const DLString COMMAND_NAME;
 };
 
 

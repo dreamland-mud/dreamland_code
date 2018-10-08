@@ -20,42 +20,42 @@
 class LongLong
 {
 public:
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-public:	
-	/** По умолчанию значение 0 */
-	inline LongLong( ) : value( 0 )
-	{
-	}
+public:        
+        /** По умолчанию значение 0 */
+        inline LongLong( ) : value( 0 )
+        {
+        }
 
-	inline LongLong( long long value ) : value( value )
-	{
-	}
+        inline LongLong( long long value ) : value( value )
+        {
+        }
 
-	inline LongLong( const DLString& value ) throw( ExceptionBadType )
-	{
-		fromString( value );
-	}
+        inline LongLong( const DLString& value ) throw( ExceptionBadType )
+        {
+                fromString( value );
+        }
 
-	
-	DLString toString( ) const throw( );
-	void fromString( const DLString& value ) throw( ExceptionBadType );
-	
-	inline long long getValue( ) const
-	{
-		return value;
-	}
+        
+        DLString toString( ) const throw( );
+        void fromString( const DLString& value ) throw( ExceptionBadType );
+        
+        inline long long getValue( ) const
+        {
+                return value;
+        }
 
-	inline void setValue( long long value )
-	{
-		this->value = value;
-	}
+        inline void setValue( long long value )
+        {
+                this->value = value;
+        }
 
-	inline operator long long & ( ) {
-	    return value;
-	}
+        inline operator long long & ( ) {
+            return value;
+        }
 private:
-	long long value;
+        long long value;
 };
 
 
@@ -64,8 +64,8 @@ private:
 /** Вывод в ostream типа LongLong */
 inline std::ostream& operator << ( std::ostream& ostr, const LongLong& longLongValue )
 {
-	ostr << longLongValue.getValue( );
-	return ostr;
+        ostr << longLongValue.getValue( );
+        return ostr;
 }
 
 #endif

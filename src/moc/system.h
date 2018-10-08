@@ -19,216 +19,216 @@ using namespace std;
 class System
 {
 public:
-	typedef std::vector<string> VectorStringType;
-	typedef	std::list<string> ListStringType;
-	typedef std::map<string,int> MapType;
+        typedef std::vector<string> VectorStringType;
+        typedef        std::list<string> ListStringType;
+        typedef std::map<string,int> MapType;
 
-	struct VariableXMLType
-	{
-		string name;
-		string	type;
-		string	className;
-		bool is_Static;
-		bool is_Pointer;
-		
-		inline VariableXMLType( );
+        struct VariableXMLType
+        {
+                string name;
+                string        type;
+                string        className;
+                bool is_Static;
+                bool is_Pointer;
+                
+                inline VariableXMLType( );
 
-		inline void setName( const string& );
-		inline const string& getName( ) const;
+                inline void setName( const string& );
+                inline const string& getName( ) const;
 
-		inline void setType( const string& );
-		inline const string& getType( ) const;
-	
-		inline void setClassName( const string& );
-		inline const string& getClassName( ) const;
+                inline void setType( const string& );
+                inline const string& getType( ) const;
+        
+                inline void setClassName( const string& );
+                inline const string& getClassName( ) const;
 
-		inline void setStatic( bool );
-		inline bool isStatic( ) const;
-		
-		inline void setPointer( );
-		inline void unsetPointer( );
-		inline bool isPointer( ) const;
-	};
+                inline void setStatic( bool );
+                inline bool isStatic( ) const;
+                
+                inline void setPointer( );
+                inline void unsetPointer( );
+                inline bool isPointer( ) const;
+        };
 
-	struct NodeType {
-		bool has_Variable;
-		VariableXMLType variable;
+        struct NodeType {
+                bool has_Variable;
+                VariableXMLType variable;
 
-		inline NodeType( );
+                inline NodeType( );
 
-		inline void setVariable( );
-		inline bool hasVariable( ) const;
-	};
+                inline void setVariable( );
+                inline bool hasVariable( ) const;
+        };
 
-	struct ClassType
-	{
-		typedef std::map<string, NodeType>	MapNodeType;
+        struct ClassType
+        {
+                typedef std::map<string, NodeType>        MapNodeType;
 
-		string name;
-		string file;
-		System::ListStringType ancestors;
-		MapNodeType nodes;
-		bool xmlObject;
+                string name;
+                string file;
+                System::ListStringType ancestors;
+                MapNodeType nodes;
+                bool xmlObject;
 
-		inline ClassType( );
+                inline ClassType( );
 
-		inline bool isXML_OBJECT( ) const;
-		inline void setXML_OBJECT( );
+                inline bool isXML_OBJECT( ) const;
+                inline void setXML_OBJECT( );
 
-		inline void setFile( const string& );
-		inline const string& getFile( ) const;
+                inline void setFile( const string& );
+                inline const string& getFile( ) const;
 
-		inline void setName( const string& );
-		inline const string& getName( ) const;
+                inline void setName( const string& );
+                inline const string& getName( ) const;
 
-		inline void addAncestor( const string& );
+                inline void addAncestor( const string& );
 
-		inline void addVariable( const VariableXMLType& );
+                inline void addVariable( const VariableXMLType& );
 
-		inline void destroy( );
+                inline void destroy( );
 
-		inline ClassType& operator = ( const ClassType& );
+                inline ClassType& operator = ( const ClassType& );
 
-	};
+        };
 
-	struct MocType
-	{
-		string str;
+        struct MocType
+        {
+                string str;
 
-		inline void setString( const char* );
-		inline void setString( const string& str );
-		inline const string& getString( ) const;
-	};
+                inline void setString( const char* );
+                inline void setString( const string& str );
+                inline const string& getString( ) const;
+        };
 
-	struct IncludeType
-	{
-		int st;
-		void* bufferState;
-		string fileName;
-		ClassType cl;
-		int line;
+        struct IncludeType
+        {
+                int st;
+                void* bufferState;
+                string fileName;
+                ClassType cl;
+                int line;
 
-		inline IncludeType( const ClassType&, const string&, int, int line, void* );
+                inline IncludeType( const ClassType&, const string&, int, int line, void* );
 
-		inline int getST( ) const;
-		inline void* getBuffer( );
-		inline const string& getFileName( ) const;
-		inline ClassType& getClassType( );
-	};
-
-public:
-	typedef	std::list<ClassType>	ListClassType;
-	typedef std::map<string,ClassType> MapClassType;
-	typedef std::stack<IncludeType> StackIncludeType;
-
+                inline int getST( ) const;
+                inline void* getBuffer( );
+                inline const string& getFileName( ) const;
+                inline ClassType& getClassType( );
+        };
 
 public:
+        typedef        std::list<ClassType>        ListClassType;
+        typedef std::map<string,ClassType> MapClassType;
+        typedef std::stack<IncludeType> StackIncludeType;
 
-	System( );
 
-	inline static int getClassLevel( );
-	inline static void inClass( );
-	inline static void outClass( );
+public:
 
-	inline static int getHeaderLevel( );
-	inline static void inHeader( );
-	inline static void outHeader( );
-	inline static void clearHeader( );
+        System( );
 
-	inline static bool isStaticVariable( );
-	inline static void setStaticVariable( );
-	inline static void unsetStaticVariable( );
+        inline static int getClassLevel( );
+        inline static void inClass( );
+        inline static void outClass( );
 
-	inline static void setCurrentFile( const string& );
-	inline static const string& getCurrentFile( );
+        inline static int getHeaderLevel( );
+        inline static void inHeader( );
+        inline static void outHeader( );
+        inline static void clearHeader( );
 
-	inline static ClassType& getCurrentClass( );
-	inline static void setCurrentClass( const ClassType& );
+        inline static bool isStaticVariable( );
+        inline static void setStaticVariable( );
+        inline static void unsetStaticVariable( );
 
-	inline static VariableXMLType& getCurrentVariable( );
+        inline static void setCurrentFile( const string& );
+        inline static const string& getCurrentFile( );
 
-	inline static void openTemplate( );
-	inline static void closeTemplate( );
-	inline static int getTemplate( );
+        inline static ClassType& getCurrentClass( );
+        inline static void setCurrentClass( const ClassType& );
 
-	inline static void openTypedef( );
-	inline static void closeTypedef( );
-	inline static int getTypedef( );
+        inline static VariableXMLType& getCurrentVariable( );
 
-	inline static VectorStringType& getIncludeFiles( );
+        inline static void openTemplate( );
+        inline static void closeTemplate( );
+        inline static int getTemplate( );
 
-	inline static string lower( string );
+        inline static void openTypedef( );
+        inline static void closeTypedef( );
+        inline static int getTypedef( );
 
-	inline static bool isRoot( );
-	inline static void setRoot( );
+        inline static VectorStringType& getIncludeFiles( );
 
-	static void appendIncludePath( const string& );
-	inline static VectorStringType& getIncludePath( );
+        inline static string lower( string );
 
-	inline static void setInputFile( const string& );
-	inline static const string& getInputFile( );
-	inline static bool isInputFile( );
+        inline static bool isRoot( );
+        inline static void setRoot( );
 
-	inline static void setOutputFile( const string& );
-	inline static const string& getOutputFile( );
+        static void appendIncludePath( const string& );
+        inline static VectorStringType& getIncludePath( );
 
-	static ListClassType& getMocClassList( );
+        inline static void setInputFile( const string& );
+        inline static const string& getInputFile( );
+        inline static bool isInputFile( );
 
-	static MapClassType& getClassMap( );
+        inline static void setOutputFile( const string& );
+        inline static const string& getOutputFile( );
 
-	static StackIncludeType& getStackInclude( );
-	static ListStringType& getUsingNamespaceList( );
-	static ListStringType& getNamespaceStack( );
-	static ListStringType& getIncludeList( );
+        static ListClassType& getMocClassList( );
 
-	static VectorStringType& getHeadersVector( );
-	
-	inline static MapType& getNamespaceMap( );
-	inline static void namespaceOpen( );
-	inline static void namespaceClose( );
-	inline static bool isNamespace( );
+        static MapClassType& getClassMap( );
 
-	// generate.cpp
-	static void findAllNodes( ClassType, ClassType::MapNodeType* );
-	static void generateMoc( );
-	static void generateClass( ostream& output, const ClassType& mc, VectorStringType& ifiles );
-	static void generateHeader( VectorStringType& ifiles, VariableXMLType & var );
+        static StackIncludeType& getStackInclude( );
+        static ListStringType& getUsingNamespaceList( );
+        static ListStringType& getNamespaceStack( );
+        static ListStringType& getIncludeList( );
 
-	// moc.l
-	static void setST( int );
-	static int getST( );
-	static void pushST( );
-	static void popST( );
-	static void setST_INITIAL( );
+        static VectorStringType& getHeadersVector( );
+        
+        inline static MapType& getNamespaceMap( );
+        inline static void namespaceOpen( );
+        inline static void namespaceClose( );
+        inline static bool isNamespace( );
+
+        // generate.cpp
+        static void findAllNodes( ClassType, ClassType::MapNodeType* );
+        static void generateMoc( );
+        static void generateClass( ostream& output, const ClassType& mc, VectorStringType& ifiles );
+        static void generateHeader( VectorStringType& ifiles, VariableXMLType & var );
+
+        // moc.l
+        static void setST( int );
+        static int getST( );
+        static void pushST( );
+        static void popST( );
+        static void setST_INITIAL( );
 
 private:
-	typedef std::stack<int>	StatementStackType;
+        typedef std::stack<int>        StatementStackType;
 
 private:
-	static int in_class;
-	static int in_header;
-	static int templateOpen;
-	static int typedefOpen;
-	// Defined in moc.l
-	static bool staticVariable;
-	static string currentFile;
-	static ClassType currentClass;
-	static VariableXMLType currentVariable;
-	static VectorStringType includeFiles;
-	static bool root;
-	static string inputFile;
-	static string outputFile;
-	static VectorStringType includePathVector;
-	static ListClassType mocClassList;
-	static MapClassType classMap;
-	static StackIncludeType staticInclude;
-	static ListStringType namespaceStack;
-	static ListStringType usingNamespaceList;
-	static ListStringType includeList;
-	static VectorStringType headersVector;
-	static int statement;
-	static StatementStackType statementStack;
-	static MapType namespaceMap;
+        static int in_class;
+        static int in_header;
+        static int templateOpen;
+        static int typedefOpen;
+        // Defined in moc.l
+        static bool staticVariable;
+        static string currentFile;
+        static ClassType currentClass;
+        static VariableXMLType currentVariable;
+        static VectorStringType includeFiles;
+        static bool root;
+        static string inputFile;
+        static string outputFile;
+        static VectorStringType includePathVector;
+        static ListClassType mocClassList;
+        static MapClassType classMap;
+        static StackIncludeType staticInclude;
+        static ListStringType namespaceStack;
+        static ListStringType usingNamespaceList;
+        static ListStringType includeList;
+        static VectorStringType headersVector;
+        static int statement;
+        static StatementStackType statementStack;
+        static MapType namespaceMap;
 };
 
 
@@ -238,68 +238,68 @@ private:
 // ------------- System::VariableXMLType-----------------------
  
 System::VariableXMLType::VariableXMLType( )
-		: is_Static( false ), is_Pointer( false )
+                : is_Static( false ), is_Pointer( false )
 {
 }
 
 void System::VariableXMLType::setName( const string& name )
 {
-	this->name = name;
+        this->name = name;
 }
 
 const string& System::VariableXMLType::getName( ) const
 {
-	return name;
+        return name;
 }
 
 void System::VariableXMLType::setType( const string& type )
 {
-	this->type = type;
+        this->type = type;
 }
 
 const string& System::VariableXMLType::getType( ) const
 {
-	return type;
+        return type;
 }
 
 void System::VariableXMLType::setClassName( const string& className )
 {
-	this->className = className;
+        this->className = className;
 }
 
 const string& System::VariableXMLType::getClassName( ) const
 {
-	return className;
+        return className;
 }
 
 void System::VariableXMLType::setStatic( bool is_Static )
 {
-	this->is_Static = is_Static;
+        this->is_Static = is_Static;
 }
 
 bool System::VariableXMLType::isStatic( ) const
 {
-	return is_Static;
+        return is_Static;
 }
 
 void System::VariableXMLType::setPointer( )
 {
-	this->is_Pointer = true;
+        this->is_Pointer = true;
 }
 
 void System::VariableXMLType::unsetPointer( )
 {
-	this->is_Pointer = false;
+        this->is_Pointer = false;
 }
 
 bool System::VariableXMLType::isPointer( ) const
 {
-	return is_Pointer;
+        return is_Pointer;
 }
 
 // ------------- System::NodeType-----------------------
 System::NodeType::NodeType( )
-	    :  has_Variable( false )
+            :  has_Variable( false )
 {
 }
 
@@ -320,32 +320,32 @@ System::ClassType::ClassType( ) : xmlObject( false )
 
 bool System::ClassType::isXML_OBJECT( ) const
 {
-	return xmlObject;
+        return xmlObject;
 }
 
 void System::ClassType::setXML_OBJECT( )
 {
-	xmlObject = true;
+        xmlObject = true;
 }
 
 void System::ClassType::setFile( const string& file )
 {
-	this->file = file;
+        this->file = file;
 }
 
 const string& System::ClassType::getFile( ) const
 {
-	return file;
+        return file;
 }
 
 void System::ClassType::setName( const string& name )
 {
-	this->name = name;
+        this->name = name;
 }
 
 const string& System::ClassType::getName( ) const
 {
-	return name;
+        return name;
 }
 
 void error(const string &text);
@@ -359,52 +359,52 @@ void System::ClassType::addAncestor( const string& name )
     ca = System::getClassMap( ).find( (fqcn = name) );
     
     for(i = System::getNamespaceStack().begin(), nspace = "";
-	    i != System::getNamespaceStack().end() &&
-	    ca == System::getClassMap( ).end(); i++) 
+            i != System::getNamespaceStack().end() &&
+            ca == System::getClassMap( ).end(); i++) 
     {
-	nspace += *i + "::";
-	ca = System::getClassMap( ).find( (fqcn = nspace + name) );
+        nspace += *i + "::";
+        ca = System::getClassMap( ).find( (fqcn = nspace + name) );
     }
     
     for(i = System::getUsingNamespaceList().begin();
-	    i != System::getUsingNamespaceList().end() &&
-	    ca == System::getClassMap( ).end(); i++) 
+            i != System::getUsingNamespaceList().end() &&
+            ca == System::getClassMap( ).end(); i++) 
     {
-	ca = System::getClassMap( ).find( (fqcn = *i + "::" + name) );
+        ca = System::getClassMap( ).find( (fqcn = *i + "::" + name) );
     }
     
     if(ca != System::getClassMap( ).end()) {
-	ancestors.push_back( fqcn );
+        ancestors.push_back( fqcn );
     } else {
-	ancestors.push_back( name );
+        ancestors.push_back( name );
     }
 }
 
 void System::ClassType::addVariable( const VariableXMLType& variable )
 {
-	NodeType &node = nodes[variable.getName( )];
-	
-	node.variable = variable;
-	node.setVariable( );
+        NodeType &node = nodes[variable.getName( )];
+        
+        node.variable = variable;
+        node.setVariable( );
 }
 
 void System::ClassType::destroy( )
 {
-	ancestors.clear( );
-	nodes.clear( );
-	name = "";
-	file = "";
-	xmlObject = false;
+        ancestors.clear( );
+        nodes.clear( );
+        name = "";
+        file = "";
+        xmlObject = false;
 }
 
 System::ClassType& System::ClassType::operator = ( const ClassType& cl )
 {
-	name = cl.name;
-	file = cl.file;
-	ancestors = cl.ancestors;
-	nodes = cl.nodes;
-	xmlObject = cl.xmlObject;
-	return *this;
+        name = cl.name;
+        file = cl.file;
+        ancestors = cl.ancestors;
+        nodes = cl.nodes;
+        xmlObject = cl.xmlObject;
+        return *this;
 }
 
 
@@ -414,17 +414,17 @@ System::ClassType& System::ClassType::operator = ( const ClassType& cl )
 
 void System::MocType::setString( const char* str )
 {
-	this->str = str;
+        this->str = str;
 }
 
 void System::MocType::setString( const string& str )
 {
-	this->str = str;
+        this->str = str;
 }
 
 const string& System::MocType::getString( ) const
 {
-	return str;
+        return str;
 }
 
 
@@ -432,30 +432,30 @@ const string& System::MocType::getString( ) const
 // ------------- System::IncludeType -----------------------
 
 System::IncludeType::IncludeType(
-	const ClassType& cl, const string& fileName, int st, int line, void* bufferState
+        const ClassType& cl, const string& fileName, int st, int line, void* bufferState
 )
-		: st( st ), bufferState( bufferState ), fileName( fileName ), cl( cl ), line( line )
+                : st( st ), bufferState( bufferState ), fileName( fileName ), cl( cl ), line( line )
 {
 }
 
 int System::IncludeType::getST( ) const
 {
-	return st;
+        return st;
 }
 
 void* System::IncludeType::getBuffer( )
 {
-	return bufferState;
+        return bufferState;
 }
 
 const string& System::IncludeType::getFileName( ) const
 {
-	return fileName;
+        return fileName;
 }
 
 System::ClassType& System::IncludeType::getClassType( )
 {
-	return cl;
+        return cl;
 }
 
 
@@ -466,200 +466,200 @@ System::ClassType& System::IncludeType::getClassType( )
 
 int System::getClassLevel( )
 {
-	return in_class;
+        return in_class;
 }
 
 void System::inClass( )
 {
-	in_class++;
+        in_class++;
 }
 
 void System::outClass( )
 {
-	in_class--;
+        in_class--;
 }
 
 int System::getHeaderLevel( )
 {
-	return in_header;
+        return in_header;
 }
 
 void System::inHeader( )
 {
-	in_header++;
+        in_header++;
 }
 
 inline void System::outHeader( )
 {
-	in_header--;
+        in_header--;
 }
 
 void System::clearHeader( )
 {
-	in_header = 0;
+        in_header = 0;
 }
 
 
 
 bool System::isStaticVariable( )
 {
-	return staticVariable;
+        return staticVariable;
 }
 
 void System::setStaticVariable( )
 {
-	staticVariable = true;
+        staticVariable = true;
 }
 
 void System::unsetStaticVariable( )
 {
-	staticVariable = false;
+        staticVariable = false;
 }
 
 
 
 void System::setCurrentFile( const string& currentFile )
 {
-	System::currentFile = currentFile;
+        System::currentFile = currentFile;
 }
 
 const string& System::getCurrentFile( )
 {
-	return currentFile;
+        return currentFile;
 }
 
 
 
 System::ClassType& System::getCurrentClass( )
 {
-	return currentClass;
+        return currentClass;
 }
 
 void System::setCurrentClass( const ClassType& currentClass )
 {
-	System::currentClass = currentClass;
+        System::currentClass = currentClass;
 }
 
 
 
 System::VariableXMLType& System::getCurrentVariable( )
 {
-	return currentVariable;
+        return currentVariable;
 }
 
 
 
 void System::openTemplate( )
 {
-	templateOpen++;
+        templateOpen++;
 }
 
 void System::closeTemplate( )
 {
-	templateOpen--;
+        templateOpen--;
 }
 
 int System::getTemplate( )
 {
-	return templateOpen;
+        return templateOpen;
 }
 
 
 void System::openTypedef( )
 {
-	typedefOpen++;
+        typedefOpen++;
 }
 
 void System::closeTypedef( )
 {
-	typedefOpen--;
+        typedefOpen--;
 }
 
 int System::getTypedef( )
 {
-	return typedefOpen;
+        return typedefOpen;
 }
 
 
 System::VectorStringType& System::getIncludeFiles( )
 {
-	return includeFiles;
+        return includeFiles;
 }
 
 
 
 string System::lower( string str )
 {
-	for( string::size_type i = 0; i < str.length( ); i++ )
-	{
-		if( str[i] >= 'A' && str[i] <= 'Z' )
-		{
-			str[i] += ( 'a' - 'A' );
-		}
-	}
-	return str;
+        for( string::size_type i = 0; i < str.length( ); i++ )
+        {
+                if( str[i] >= 'A' && str[i] <= 'Z' )
+                {
+                        str[i] += ( 'a' - 'A' );
+                }
+        }
+        return str;
 }
 
 bool System::isRoot( )
 {
-	return root;
+        return root;
 }
 
 void System::setRoot( )
 {
-	root = true;
+        root = true;
 }
 
 System::VectorStringType& System::getIncludePath( )
 {
-	return includePathVector;
+        return includePathVector;
 }
 
 
 void System::setInputFile( const string& inputFile )
 {
-	System::inputFile = inputFile;
+        System::inputFile = inputFile;
 }
 
 const string& System::getInputFile( )
 {
-	return inputFile;
+        return inputFile;
 }
 
 bool System::isInputFile( )
 {
-	return !inputFile.empty( );
+        return !inputFile.empty( );
 }
 
 
 
 void System::setOutputFile( const string& outputFile )
 {
-	System::outputFile = outputFile;
+        System::outputFile = outputFile;
 }
 
 const string& System::getOutputFile( )
 {
-	return outputFile;
+        return outputFile;
 }
 
 
 
 inline System::ListClassType& System::getMocClassList( )
 {
-	return mocClassList;
+        return mocClassList;
 }
 
 
 inline System::MapClassType& System::getClassMap( )
 {
-	return classMap;
+        return classMap;
 }
 
 
 inline System::StackIncludeType& System::getStackInclude( )
 {
-	return staticInclude;
+        return staticInclude;
 }
 
 inline System::ListStringType& 
@@ -677,45 +677,45 @@ System::getNamespaceStack( )
 
 inline System::ListStringType& System::getIncludeList( )
 {
-	return includeList;
+        return includeList;
 }
 
 
 inline System::VectorStringType& System::getHeadersVector( )
 {
-	return headersVector;
+        return headersVector;
 }
 
 System::MapType& System::getNamespaceMap( )
 {
-	return namespaceMap;
+        return namespaceMap;
 }
 
 void System::namespaceOpen( )
 {
-	MapType::iterator ipos = namespaceMap.find( getCurrentFile( ) );
-	if( ipos != namespaceMap.end( ) )
-	{
-		ipos->second++;
-	}
-	else
-	{
-		namespaceMap[getCurrentFile( )] = 1;
-	}
+        MapType::iterator ipos = namespaceMap.find( getCurrentFile( ) );
+        if( ipos != namespaceMap.end( ) )
+        {
+                ipos->second++;
+        }
+        else
+        {
+                namespaceMap[getCurrentFile( )] = 1;
+        }
 }
 
 void System::namespaceClose( )
 {
-	MapType::iterator ipos = namespaceMap.find( getCurrentFile( ) );
-	if( ipos != namespaceMap.end( ) )
-	{
-		ipos->second--;
-	}
+        MapType::iterator ipos = namespaceMap.find( getCurrentFile( ) );
+        if( ipos != namespaceMap.end( ) )
+        {
+                ipos->second--;
+        }
 }
 
 bool System::isNamespace( )
 {
-	return namespaceMap[getCurrentFile( )] != 0;
+        return namespaceMap[getCurrentFile( )] != 0;
 }
-	
+        
 #endif 

@@ -25,7 +25,7 @@ public:
 
     virtual const DLString &getType( ) const 
     {
-	return TYPE;
+        return TYPE;
     }
     
     static const DLString TYPE;                                             

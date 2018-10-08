@@ -12,14 +12,14 @@ extern "C"
 {
     SO::PluginList initialize_gquest_rainbow( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MobileBehaviorRegistrator<RainbowMob> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<RainbowPiece> >( ppl );
-	Plugin::registerPlugin<RainbowScenarioRegistrator<RainbowDefaultScenario> >( ppl );
-	Plugin::registerPlugin<RainbowScenarioRegistrator<RainbowSinsScenario> >( ppl );
-	Plugin::registerPlugin<RainbowGQuestInfo>( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MobileBehaviorRegistrator<RainbowMob> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<RainbowPiece> >( ppl );
+        Plugin::registerPlugin<RainbowScenarioRegistrator<RainbowDefaultScenario> >( ppl );
+        Plugin::registerPlugin<RainbowScenarioRegistrator<RainbowSinsScenario> >( ppl );
+        Plugin::registerPlugin<RainbowGQuestInfo>( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

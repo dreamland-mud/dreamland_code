@@ -17,25 +17,25 @@ extern "C"
 {
     SO::PluginList initialize_druids( ) 
     {
-	SO::PluginList ppl;
-		
-	Plugin::registerPlugin<MobileBehaviorRegistrator<DruidSummonedAnimal> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<DruidStaff> >( ppl );
+        SO::PluginList ppl;
+                
+        Plugin::registerPlugin<MobileBehaviorRegistrator<DruidSummonedAnimal> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<DruidStaff> >( ppl );
 
-	Plugin::registerPlugin<DruidicLanguage>( ppl );
+        Plugin::registerPlugin<DruidicLanguage>( ppl );
 
-	Plugin::registerPlugin<MocRegistrator<DruidSpiritAffectHandler> >( ppl );		
+        Plugin::registerPlugin<MocRegistrator<DruidSpiritAffectHandler> >( ppl );                
 /*        
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<AnimalSpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<SnakeSpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<FoxSpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<BoarSpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<WolverineSpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<ForestFaerySpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<ForestTrollSpiritComponent> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<DryadSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<AnimalSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<SnakeSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<FoxSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<BoarSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<WolverineSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ForestFaerySpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ForestTrollSpiritComponent> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<DryadSpiritComponent> >( ppl );
 */
-	return ppl;
+        return ppl;
     }
 }
 

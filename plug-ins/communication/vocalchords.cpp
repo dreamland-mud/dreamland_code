@@ -20,17 +20,17 @@ bool XMLAttributeVocalChords::canSpeak( Character *speaker, GlobalChannel *chan 
     XMLInteger &now;
     
     if (chan->isIC) {
-	cost *= coefIC;
-	now = nowIC;
+        cost *= coefIC;
+        now = nowIC;
     }
     else {
-	cost *= coefOOC;
-	now = nowOOC;
+        cost *= coefOOC;
+        now = nowOOC;
     }
     
     if (now < cost) {
-	speaker->println( msgNoChords.getValue( ).c_str( ) );
-	return false;
+        speaker->println( msgNoChords.getValue( ).c_str( ) );
+        return false;
     }
 
     now = now - cost; 

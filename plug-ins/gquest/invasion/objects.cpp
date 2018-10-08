@@ -48,22 +48,22 @@ bool InvasionInstrument::use( Character *ch, const char *args )
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
     
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     if (obj->wear_loc != wear_hold) {
-	act("Покрепче зажми $o4 в руках - глядишь, поможет..", ch, obj, 0, TO_CHAR);
-	return true;
+        act("Покрепче зажми $o4 в руках - глядишь, поможет..", ch, obj, 0, TO_CHAR);
+        return true;
     }
     
     if (!( trgt = get_obj_room( ch, args ) )) {
-	ch->send_to("Цель не найдена.\r\n");
-	act("$c1 угрожающе размахивает $o5 - берегись!", ch, obj, 0, TO_ROOM);
-	return true;
+        ch->send_to("Цель не найдена.\r\n");
+        act("$c1 угрожающе размахивает $o5 - берегись!", ch, obj, 0, TO_ROOM);
+        return true;
     }
     
     if (!trgt->behavior || !trgt->behavior.getDynamicPointer<InvasionObj>( )) {
-	ch->send_to("То, на что ты замахиваешься, не сделало тебе ничего плохого.\r\n");
-	return true;
+        ch->send_to("То, на что ты замахиваешься, не сделало тебе ничего плохого.\r\n");
+        return true;
     }
 
     actUse( ch, trgt );
@@ -74,8 +74,8 @@ bool InvasionInstrument::use( Character *ch, const char *args )
     gquest->rewardKiller( ch->getPC( ) );
     
     if (--charges <= 0) {
-	actDestroy( ch );
-	extract_obj( obj );
+        actDestroy( ch );
+        extract_obj( obj );
     }
 
     return true; 

@@ -40,5 +40,5 @@ System::MapType System::namespaceMap;
 
 void System::appendIncludePath( const string& include )
 {
-	includePathVector = toList<VectorStringType>( include, ':' );
+        includePathVector = toList<VectorStringType>( include, ':' );
 }

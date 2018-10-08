@@ -20,20 +20,20 @@ void AreaBehaviorManager::parse( AREA_DATA * pArea, FILE *fp ) {
     ungetc( letter, fp );
 
     if (letter != '<') 
-	return;
-	
+        return;
+        
     word = fread_string( fp );
 
     try {
-	std::basic_istringstream<char> istr( word );
-	
-	pArea->behavior.fromStream( istr );
-	pArea->behavior->setArea( pArea );
+        std::basic_istringstream<char> istr( word );
+        
+        pArea->behavior.fromStream( istr );
+        pArea->behavior->setArea( pArea );
 
     } catch (Exception e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
-	
+        
     free_string( word );
 }
 
@@ -41,15 +41,15 @@ void AreaBehaviorManager::save( const AREA_DATA *pArea, FILE *fp ) {
     std::basic_ostringstream<char> ostr;
      
     if (!pArea->behavior)
-	return;
+        return;
 
     try {
-	pArea->behavior.toStream( ostr );
+        pArea->behavior.toStream( ostr );
 
-	fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
+        fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
 
     } catch (ExceptionXMLError e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
 }
 

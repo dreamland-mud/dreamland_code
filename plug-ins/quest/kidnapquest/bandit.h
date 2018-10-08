@@ -21,44 +21,44 @@ enum {
 
 class KidnapBandit : public KidnapMobile, 
                      public Wanderer, 
-		     public ConfiguredMobile 
+                     public ConfiguredMobile 
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<KidnapBandit> Pointer;
+        typedef ::Pointer<KidnapBandit> Pointer;
     
-	KidnapBandit( );
+        KidnapBandit( );
 
-	virtual void fight( Character *victim );
-	virtual void greet( Character *victim );
-	virtual bool extractNotify( Character *, bool, bool );
-	virtual bool spec( );
+        virtual void fight( Character *victim );
+        virtual void greet( Character *victim );
+        virtual bool extractNotify( Character *, bool, bool );
+        virtual bool spec( );
 
-	XML_VARIABLE XMLInteger state;
+        XML_VARIABLE XMLInteger state;
 
 protected:
-	virtual void config( PCharacter * );
+        virtual void config( PCharacter * );
 
 private:
-	bool spec_hunt_prince( );
-	bool spec_kidnap( );
-	bool spec_fight( );
-	bool spec_sleep( );
+        bool spec_hunt_prince( );
+        bool spec_kidnap( );
+        bool spec_fight( );
+        bool spec_sleep( );
 
-	NPCharacter * prince;
+        NPCharacter * prince;
 
-	NPCharacter * getPrince( );
-	NPCharacter * getPrinceWorld( );
-	bool ourPrince( Character * );
-	bool princeHere( );
-	void princeAttach( );
-	void princeDetach( );
-	void princeHunt( );
-	void princeKidnap( );
+        NPCharacter * getPrince( );
+        NPCharacter * getPrinceWorld( );
+        bool ourPrince( Character * );
+        bool princeHere( );
+        void princeAttach( );
+        void princeDetach( );
+        void princeHunt( );
+        void princeKidnap( );
 
-	bool heroAttack( PCharacter * = NULL );
+        bool heroAttack( PCharacter * = NULL );
 
-	bool canEnter( Room *const );
+        bool canEnter( Room *const );
 };
 
 

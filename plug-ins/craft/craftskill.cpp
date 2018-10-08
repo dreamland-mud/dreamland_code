@@ -82,7 +82,7 @@ int CraftSkill::getLevel( Character *ch ) const
 int CraftSkill::getLearned( Character *ch ) const
 {
     if (!usable( ch, false ))
-	return 0;
+        return 0;
 
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
@@ -105,18 +105,18 @@ bool CraftSkill::canPractice( PCharacter *ch, std::ostream &buf ) const
 bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 {
     if (!mob) {
-	if (verbose)
-	    ch->println( "Тебе не с кем практиковаться здесь." );
-	return false;
+        if (verbose)
+            ch->println( "Тебе не с кем практиковаться здесь." );
+        return false;
     }
     
     if (mob->pIndexData->practicer.isSet( (int)getGroup( ) ))
-	return true;
+        return true;
 
     if (verbose)
-	ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-	       "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
-	       mob, getNameFor( ch ).c_str( ) );
+        ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
+               "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
+               mob, getNameFor( ch ).c_str( ) );
     return false;
 }
 
@@ -126,22 +126,22 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf )
 
     buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
         << " '{W" << getName( ) << "{x'"
-	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{hg{W" 
-	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-	<< "{x'"
-	<< endl;
+        << " '{W" << getRussianName( ) << "{x', "
+        << "входит в группу '{hg{W" 
+        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << "{x'"
+        << endl;
 
 
     DLString pbuf;
     CraftProfessions::const_iterator sp;
     bool found = false;
     for (sp = subprofessions.begin(); sp != subprofessions.end(); sp++) {
-	CraftProfession::Pointer prof = craftProfessionManager->get(sp->first);
+        CraftProfession::Pointer prof = craftProfessionManager->get(sp->first);
         if (prof) {
             if (found)
-		pbuf << ", ";        
-	    pbuf << prof->getNameFor(ch);
+                pbuf << ", ";        
+            pbuf << prof->getNameFor(ch);
             found = true;
        }
     }
@@ -161,7 +161,7 @@ static void rprog_skill( Room *room, Character *actor, const char *skill, bool s
     FENIA_VOID_CALL( room, "Skill", "CsiC", actor, skill, success, victim );
 
     for (Character *rch = room->people; rch; rch = rch->next_in_room)
-	mprog_skill( rch, actor, skill, success, victim );
+        mprog_skill( rch, actor, skill, success, victim );
 }
 
 void CraftSkill::improve( Character *ch, bool success, Character *victim, int dam_type, int dam_flags ) const 
@@ -170,74 +170,74 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
     int chance, xp;
     
     if (ch->is_npc( ))
-	return;
+        return;
 
     pch = ch->getPC( );
     PCSkillData &data = pch->getSkillData( getIndex( ) );
     
     if (!usable( pch, false )) 
-	return;     
+        return;     
 
     if (data.learned <= 1)
-	return;
+        return;
     
     rprog_skill( ch->in_room, ch, getName( ).c_str( ), success, victim );
 
     if (data.forgetting)
-	return;
+        return;
 
     data.timer = 0;
 
     if (data.learned >= getMaximum( pch ))
-	return;
+        return;
 
     chance = 1000;
     chance /= max(1, hard.getValue()) * getRating(pch);
     chance = chance * get_int_app(pch).learn  / 100;
     
     if (number_range(1, 1000) > chance)
-	return;
+        return;
    
     if (success) {
-	chance = URANGE(5, 100 - data.learned, 95);
-	
-	if (number_percent( ) >= chance)
-	    return;
-	    
-	act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
-		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
-	    
-	data.learned++;
+        chance = URANGE(5, 100 - data.learned, 95);
+        
+        if (number_percent( ) >= chance)
+            return;
+            
+        act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
+                pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+            
+        data.learned++;
     }
     else {
-	int wis_mod = get_wis_app( ch ).learn;
-	
-	if (wis_mod <= 0)
-	    return;
+        int wis_mod = get_wis_app( ch ).learn;
+        
+        if (wis_mod <= 0)
+            return;
 
-	chance = URANGE(5, data.learned / 2, wis_mod * 15);
-	    
-	if (number_percent( ) >= chance)
-	    return;
+        chance = URANGE(5, data.learned / 2, wis_mod * 15);
+            
+        if (number_percent( ) >= chance)
+            return;
 
-	act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
-		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
-	
-	data.learned += number_range( 1, wis_mod );
-	data.learned = min( (int)data.learned, getMaximum( pch ) );
+        act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
+                pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+        
+        data.learned += number_range( 1, wis_mod );
+        data.learned = min( (int)data.learned, getMaximum( pch ) );
     }
 
     pch->updateSkills( );
     xp = 2 * getRating( pch );
 
     if (pch->isAffected(gsn_learning ))
-	xp += data.learned / 4;
+        xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-	act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
-	      pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
-	
-	xp += 98 * getRating( pch );
+        act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
+              pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+        
+        xp += 98 * getRating( pch );
     }
    
      

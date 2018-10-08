@@ -20,55 +20,55 @@ public:
 
     virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
     {
-	reverse.clear( );
-	XMLVectorBase<T>::fromXML( node );
+        reverse.clear( );
+        XMLVectorBase<T>::fromXML( node );
     }
     virtual bool nodeFromXML( const XMLNode::Pointer& child ) 
     {
-	if (!XMLVectorBase<T>::nodeFromXML( child ))
-	    return false;
+        if (!XMLVectorBase<T>::nodeFromXML( child ))
+            return false;
 
-	reverse[back( )] = size( ) - 1;
-	return true;
+        reverse[back( )] = size( ) - 1;
+        return true;
     }
     bool hasElement( const T &element ) const 
     {
-	return getIndexOf( element ) != -1;
+        return getIndexOf( element ) != -1;
     }
     int getIndexOf( const T &element ) const
     {
-	typename Reverse::const_iterator r = reverse.find( element );
-	if (r == reverse.end( ))
-	    return -1;
-	else
-	    return r->second;
+        typename Reverse::const_iterator r = reverse.find( element );
+        if (r == reverse.end( ))
+            return -1;
+        else
+            return r->second;
     }
     void remove( const T &element ) 
     {
-	typename Reverse::iterator r = reverse.find( element );
-	if (r != reverse.end( )) {
-	    erase( begin( ) + r->second );
-	    reverse.erase( r );
-	}
+        typename Reverse::iterator r = reverse.find( element );
+        if (r != reverse.end( )) {
+            erase( begin( ) + r->second );
+            reverse.erase( r );
+        }
     }
     void add( const T &element )
     {
-	if (!hasElement( element )) {
-	    push_back( element );
-	    reverse[back( )] = size( ) - 1;
-	}
+        if (!hasElement( element )) {
+            push_back( element );
+            reverse[back( )] = size( ) - 1;
+        }
     }
     DLString toString( ) const
     {
-	ostringstream buf;
-	
-	for (unsigned int i = 0; i < size( ); i++) {
-	    if (!buf.str( ).empty( ))
-		buf << ", ";
-	    buf << at( i );
-	}
+        ostringstream buf;
+        
+        for (unsigned int i = 0; i < size( ); i++) {
+            if (!buf.str( ).empty( ))
+                buf << ", ";
+            buf << at( i );
+        }
 
-	return buf.str( );
+        return buf.str( );
     }
     
 private:

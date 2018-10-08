@@ -86,22 +86,22 @@ bool BasicMobileBehavior::specFightNecro( )
     SpellChance * spellTable;
     
     if (!( victim = findCastVictim( ) ))
-	return false;
+        return false;
     
     if (HEALTH(victim) < 25 || HEALTH(ch) < 25) 
-	spellTable = necroSnPanicAttack;
+        spellTable = necroSnPanicAttack;
     else if (HEALTH(ch) <= 70 && HEALTH(ch) >= 25) 
-	spellTable = necroSnAttack;
+        spellTable = necroSnAttack;
     else if (HEALTH(ch) < 30) {
-	spellTable = necroSnHealing;
+        spellTable = necroSnHealing;
 
-	if (SpellChanceTable( spellTable, ch, ch ).findSpell( ) > 0)
-	    victim = ch;
-	else
-	    spellTable = necroSnPassiveDefence;
+        if (SpellChanceTable( spellTable, ch, ch ).findSpell( ) > 0)
+            victim = ch;
+        else
+            spellTable = necroSnPassiveDefence;
     } 
     else 
-	spellTable = necroSnPassiveDefence;
+        spellTable = necroSnPassiveDefence;
     
     return SpellChanceTable( spellTable, ch, victim ).castSpell( );
 }
@@ -109,8 +109,8 @@ bool BasicMobileBehavior::specFightNecro( )
 bool BasicMobileBehavior::healNecro( Character *patient )
 {
     if (chance( HEALTH(patient) ))
-	return false;
-	
+        return false;
+        
     return SpellChanceTable( necroSnHealing, ch, patient ).castSpell( ~FSPELL_OBSTACLES );
 }
 

@@ -16,7 +16,7 @@ void XMLGlobalReference::fromXML( const XMLNode::Pointer& parent ) throw( Except
 bool XMLGlobalReference::toXML( XMLNode::Pointer& parent ) const
 {
     if (name == "none")
-	return false;
+        return false;
     else
-	return XMLString( name ).toXML( parent );
+        return XMLString( name ).toXML( parent );
 }

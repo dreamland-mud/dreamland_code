@@ -86,12 +86,12 @@ XMLAreaHeader::compat( )
 
     AREA_DATA *a = new AREA_DATA;
     
-    a->age		= 15;
-    a->nplayer	= 0;
-    a->empty	= false;
-    a->count	= 0;
-    a->next	= 0;
-    a->vnum		= top_area++;
+    a->age                = 15;
+    a->nplayer        = 0;
+    a->empty        = false;
+    a->count        = 0;
+    a->next        = 0;
+    a->vnum                = top_area++;
 
 
     a->name = str_dup(name.getValue( ).c_str( ));
@@ -119,7 +119,7 @@ XMLAreaHeader::compat( )
     
     if(behavior.getNode( )) {
         a->behavior.fromXML(behavior.getNode( ));
-	if(a->behavior)
+        if(a->behavior)
             a->behavior->setArea(a);
     } else
         a->behavior.clear( );
@@ -138,7 +138,7 @@ XMLArea::init(area_file *af)
     const HelpArticles &articles = helpManager->getArticles( );
 
     for (a = articles.begin( ); a != articles.end( ); a++) 
-	if ((*a)->areafile == af) {
+        if ((*a)->areafile == af) {
             helps.push_back(XMLAreaHelpArticle( ***a ));
         }
 
@@ -151,22 +151,22 @@ XMLArea::init(area_file *af)
 
     MOB_INDEX_DATA *pMobIndex;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
-	pMobIndex = get_mob_index(v);
-	if(pMobIndex)
+        pMobIndex = get_mob_index(v);
+        if(pMobIndex)
             mobiles[pMobIndex->vnum].init(pMobIndex);
     }
     
     OBJ_INDEX_DATA *pObjIndex;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
-	pObjIndex = get_obj_index(v);
-	if(pObjIndex) 
+        pObjIndex = get_obj_index(v);
+        if(pObjIndex) 
             objects[pObjIndex->vnum].init(pObjIndex);
     }
     
     Room *pRoom;
     for (int v = area->min_vnum; v <= area->max_vnum; v++) {
-	pRoom = get_room_index(v);
-	if(pRoom)
+        pRoom = get_room_index(v);
+        if(pRoom)
             rooms[pRoom->vnum].init(pRoom);
     }
 }
@@ -177,13 +177,13 @@ XMLArea::load_helps(area_file *af)
     XMLAreaHelpArticles::iterator hit;
 
     for (hit = helps.begin( ); hit != helps.end( ); hit++) {
-	HelpArticle::Pointer help( NEW );
-	
-	help->addKeyword( hit->getKeyword( ) );
-	help->setLevel( hit->getLevel( ) );
-	help->setText( *hit );
-	help->areafile = af;
-	helpManager->registrate( help );
+        HelpArticle::Pointer help( NEW );
+        
+        help->addKeyword( hit->getKeyword( ) );
+        help->setLevel( hit->getLevel( ) );
+        help->setText( *hit );
+        help->areafile = af;
+        helpManager->registrate( help );
     }
 }
 
@@ -193,29 +193,29 @@ XMLArea::load_rooms(AREA_DATA *a)
     XMLMapBase<XMLRoom>::iterator rit;
     for(rit = rooms.begin( ); rit != rooms.end( ); rit++) {
         int iHash, vnum = rit->first.toInt( );
-	
-	if (dup_room_vnum( vnum ))
-	    throw FileFormatException("Load_rooms: vnum %d duplicated", vnum);
+        
+        if (dup_room_vnum( vnum ))
+            throw FileFormatException("Load_rooms: vnum %d duplicated", vnum);
 
         Room *room = rit->second.compat(vnum);
         room->area = a;
 
-	if(3000 <= vnum && vnum < 3400)
-	    SET_BIT(room->room_flags, ROOM_LAW);
+        if(3000 <= vnum && vnum < 3400)
+            SET_BIT(room->room_flags, ROOM_LAW);
 
-	iHash = vnum % MAX_KEY_HASH;
-	room->next = room_index_hash[iHash];
-	room_index_hash[iHash] = room;
-	top_room++;
-	top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
+        iHash = vnum % MAX_KEY_HASH;
+        room->next = room_index_hash[iHash];
+        room_index_hash[iHash] = room;
+        top_room++;
+        top_vnum_room = top_vnum_room < vnum ? vnum : top_vnum_room;    /* OLC */
 
-	room->rnext = room_list;
-	room_list = room;
+        room->rnext = room_list;
+        room_list = room;
 
-	room->area->rooms[vnum] = room;
+        room->area->rooms[vnum] = room;
 
-	if (FeniaManager::wrapperManager)
-	    FeniaManager::wrapperManager->linkWrapper(room);
+        if (FeniaManager::wrapperManager)
+            FeniaManager::wrapperManager->linkWrapper(room);
     }
 }
 
@@ -226,25 +226,25 @@ XMLArea::load_mobiles(AREA_DATA *a)
     int i = 0;
     for(mit = mobiles.begin( ); mit != mobiles.end( ); mit++, i++) {
         int iHash, vnum = mit->first.toInt( );
-	
-	if (dup_mob_vnum( vnum ))
-	    throw FileFormatException("Load_mobiles: vnum %d duplicated", vnum);
         
-	MOB_INDEX_DATA *pMobIndex = mit->second.compat( );
-	pMobIndex->vnum = vnum;
-	pMobIndex->area	= a;
+        if (dup_mob_vnum( vnum ))
+            throw FileFormatException("Load_mobiles: vnum %d duplicated", vnum);
+        
+        MOB_INDEX_DATA *pMobIndex = mit->second.compat( );
+        pMobIndex->vnum = vnum;
+        pMobIndex->area        = a;
 
-	iHash = vnum % MAX_KEY_HASH;
-	pMobIndex->next = mob_index_hash[iHash];
-	mob_index_hash[iHash] = pMobIndex;
+        iHash = vnum % MAX_KEY_HASH;
+        pMobIndex->next = mob_index_hash[iHash];
+        mob_index_hash[iHash] = pMobIndex;
 
-	if (FeniaManager::wrapperManager)
-	    FeniaManager::wrapperManager->linkWrapper( pMobIndex );
+        if (FeniaManager::wrapperManager)
+            FeniaManager::wrapperManager->linkWrapper( pMobIndex );
 
-	newmobs++;
-	top_mob_index++;
-	top_vnum_mob = top_vnum_mob < vnum ? vnum : top_vnum_mob;
-	kill_table[URANGE(0, pMobIndex->level, MAX_LEVEL-1)].number++;
+        newmobs++;
+        top_mob_index++;
+        top_vnum_mob = top_vnum_mob < vnum ? vnum : top_vnum_mob;
+        kill_table[URANGE(0, pMobIndex->level, MAX_LEVEL-1)].number++;
     }
 }
 
@@ -254,24 +254,24 @@ XMLArea::load_objects(AREA_DATA *a)
     XMLMapBase<XMLObjectFactory>::iterator oit;
     for(oit = objects.begin( ); oit != objects.end( ); oit++) {
         int iHash, vnum = oit->first.toInt( );
-	
-	if (dup_obj_vnum( vnum ))
-	    throw FileFormatException("Load_objects: vnum %d duplicated", vnum);
         
-	OBJ_INDEX_DATA *pObjIndex = oit->second.compat( );
-	pObjIndex->vnum = vnum;
-	pObjIndex->area	= a;
+        if (dup_obj_vnum( vnum ))
+            throw FileFormatException("Load_objects: vnum %d duplicated", vnum);
+        
+        OBJ_INDEX_DATA *pObjIndex = oit->second.compat( );
+        pObjIndex->vnum = vnum;
+        pObjIndex->area        = a;
 
         iHash = vnum % MAX_KEY_HASH;
         pObjIndex->next = obj_index_hash[iHash];
         obj_index_hash[iHash] = pObjIndex;
-	
-	if (FeniaManager::wrapperManager)
-	    FeniaManager::wrapperManager->linkWrapper( pObjIndex );
+        
+        if (FeniaManager::wrapperManager)
+            FeniaManager::wrapperManager->linkWrapper( pObjIndex );
 
-	newobjs++;
+        newobjs++;
         top_obj_index++;
-	top_vnum_obj = top_vnum_obj < vnum ? vnum : top_vnum_obj;       /* OLC */
+        top_vnum_obj = top_vnum_obj < vnum ? vnum : top_vnum_obj;       /* OLC */
     }
 }
 

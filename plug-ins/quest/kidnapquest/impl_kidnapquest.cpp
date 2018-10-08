@@ -23,23 +23,23 @@ extern "C"
 {
     SO::PluginList initialize_quest_kidnap( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MocRegistrator<KidnapDragonScenario> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<KidnapBidonScenario> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<KidnapUrchinScenario> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<KidnapUrkaScenario> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<KidnapUrkaPoliteScenario> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<KidnapCyclopScenario> >( ppl );
-	
-	Plugin::registerPlugin<KidnapQuestRegistrator>( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MocRegistrator<KidnapDragonScenario> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<KidnapBidonScenario> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<KidnapUrchinScenario> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<KidnapUrkaScenario> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<KidnapUrkaPoliteScenario> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<KidnapCyclopScenario> >( ppl );
+        
+        Plugin::registerPlugin<KidnapQuestRegistrator>( ppl );
 
-	Plugin::registerPlugin<MobileBehaviorRegistrator<KidnapKing> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<KidnapPrince> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<KidnapBandit> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<KidnapKing> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<KidnapPrince> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<KidnapBandit> >( ppl );
 
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<KidnapMark> >( ppl );
-		
-	return ppl;
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<KidnapMark> >( ppl );
+                
+        return ppl;
     }
 }

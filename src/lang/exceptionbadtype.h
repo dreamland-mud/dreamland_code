@@ -23,7 +23,7 @@ public:
     }
     
     inline ExceptionBadType( string parentType, string nodeType ) throw( )
-	    : Exception( "Unparsed node <" + parentType + "> <" + nodeType +">" )
+            : Exception( "Unparsed node <" + parentType + "> <" + nodeType +">" )
     {
     }
 

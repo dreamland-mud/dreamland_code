@@ -21,52 +21,52 @@
 class Char
 {
 public:
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-public:	
-	/** По умолчанию значение \0 */
-	inline Char( ) : value( '\0' )
-	{
-	}
+public:        
+        /** По умолчанию значение \0 */
+        inline Char( ) : value( '\0' )
+        {
+        }
 
-	inline Char( char value ) : value( value )
-	{
-	}
+        inline Char( char value ) : value( value )
+        {
+        }
 
-	inline Char( const DLString& value ) throw( ExceptionBadType )
-	{
-		fromString( value );
-	}
-	
-	DLString toString( ) const throw( );
-	void fromString( const DLString& value ) throw( ExceptionBadType );
-	
-	inline char getValue( ) const
-	{
-		return value;
-	}
+        inline Char( const DLString& value ) throw( ExceptionBadType )
+        {
+                fromString( value );
+        }
+        
+        DLString toString( ) const throw( );
+        void fromString( const DLString& value ) throw( ExceptionBadType );
+        
+        inline char getValue( ) const
+        {
+                return value;
+        }
 
-	inline void setValue( char value )
-	{
-		this->value = value;
-	}
+        inline void setValue( char value )
+        {
+                this->value = value;
+        }
 
-	bool isDelimiter( ) const;
-	bool isUpper( ) const;
-	bool isLower( ) const;
+        bool isDelimiter( ) const;
+        bool isUpper( ) const;
+        bool isLower( ) const;
 
-	inline operator char & ( ) {
-	    return value;
-	}
+        inline operator char & ( ) {
+            return value;
+        }
 
-	/** Переводит символ в нижний регистр */
-	static char lower( char c );
-	
-	/** Переводит символ в верхний регистр */
-	static char upper( char c );
-	
+        /** Переводит символ в нижний регистр */
+        static char lower( char c );
+        
+        /** Переводит символ в верхний регистр */
+        static char upper( char c );
+        
 private:
-	char value;
+        char value;
 };
 
 
@@ -74,8 +74,8 @@ private:
 /** Вывод в ostream типа Char */
 inline std::ostream& operator << ( std::ostream& ostr, const Char& charValue )
 {
-	ostr << charValue.getValue( );
-	return ostr;
+        ostr << charValue.getValue( );
+        return ostr;
 }
 
 

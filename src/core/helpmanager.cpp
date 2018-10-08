@@ -12,7 +12,7 @@ const DLString XMLHelpArticle::ATTRIBUTE_REFBY = "refby";
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
-	         level( -1 )
+                 level( -1 )
 {
 }
 
@@ -65,16 +65,16 @@ bool XMLHelpArticle::toXML( XMLNode::Pointer &parent ) const
             return false;
     
     if (!keyword.empty( ))
-	parent->insertAttribute( ATTRIBUTE_KEYWORD, keyword );
+        parent->insertAttribute( ATTRIBUTE_KEYWORD, keyword );
 
     if (level >= -1)
-	parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
+        parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
     
     if (!ref.empty( ))
-	parent->insertAttribute( ATTRIBUTE_REF, ref.toString( ) );
+        parent->insertAttribute( ATTRIBUTE_REF, ref.toString( ) );
 
     if (!refby.empty( ))
-	parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
+        parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
     return true;
 }
@@ -90,7 +90,7 @@ void XMLHelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionB
     addKeyword( keyword );
 
     if (parent->hasAttribute( ATTRIBUTE_LEVEL ))
-	level = parent->getAttribute( ATTRIBUTE_LEVEL ).toInt( );
+        level = parent->getAttribute( ATTRIBUTE_LEVEL ).toInt( );
 
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );

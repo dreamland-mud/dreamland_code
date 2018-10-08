@@ -22,13 +22,13 @@ XML_OBJECT
 public: 
         typedef ::Pointer<XMLAttributeMarriage> Pointer;
 
-	XMLAttributeMarriage( );
+        XMLAttributeMarriage( );
 
-	virtual bool handle( const WhoisArguments & );
+        virtual bool handle( const WhoisArguments & );
 
-	XML_VARIABLE XMLString spouse;
-	XML_VARIABLE XMLBoolean wife;
-	XML_VARIABLE XMLVectorBase<XMLString> history;
+        XML_VARIABLE XMLString spouse;
+        XML_VARIABLE XMLBoolean wife;
+        XML_VARIABLE XMLVectorBase<XMLString> history;
 
 };
 

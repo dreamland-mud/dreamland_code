@@ -49,21 +49,21 @@ inline int Person::resolve(const Gender &g, const Number &n, const Person &p)
 {
     switch (n) {
     case Number::SINGULAR:
-	switch (p) {
-	case THIRD:
-	    switch (g) {
-	    case Gender::NEUTER: 
-		return THIRD_NEUTER;
-	    case Gender::FEMININE:
-		return THIRD_FEMININE;
-	    default:
-		return p;
-	    }
-	default:
-	    return p;
-	}
+        switch (p) {
+        case THIRD:
+            switch (g) {
+            case Gender::NEUTER: 
+                return THIRD_NEUTER;
+            case Gender::FEMININE:
+                return THIRD_FEMININE;
+            default:
+                return p;
+            }
+        default:
+            return p;
+        }
     default:
-	return p;
+        return p;
     }
 }
 
@@ -86,7 +86,7 @@ inline Number::Number(const char * t)
 inline const char * const Number::toString() const
 {
     switch (value) {
-    default:	    
+    default:            
     case SINGULAR:  return "s";
     case PLURAL:    return "p";
     };
@@ -95,10 +95,10 @@ inline const char * const Number::toString() const
 inline void Number::fromString(const char *t)
 {
     if (t) 
-	switch (t[0]) {
-	case 's':   value = SINGULAR; break;
-	case 'p':   value = PLURAL; break;
-	}
+        switch (t[0]) {
+        case 's':   value = SINGULAR; break;
+        case 'p':   value = PLURAL; break;
+        }
 }
 
 inline MultiGender::MultiGender(int v) 
@@ -122,7 +122,7 @@ inline Gender MultiGender::toGender() const
     switch (value) {
     case NEUTER:    return Gender::NEUTER;
     case FEMININE:  return Gender::FEMININE;
-    default:	    return Gender::MASCULINE;
+    default:            return Gender::MASCULINE;
     }
 }
 
@@ -130,7 +130,7 @@ inline Number MultiGender::toNumber() const
 {
     switch (value) {
     case PLURAL:    return Number::PLURAL;
-    default:	    return Number::SINGULAR;
+    default:            return Number::SINGULAR;
     }
 }
 
@@ -138,11 +138,11 @@ inline int MultiGender::resolve(const Gender &g, const Number &n)
 {
     switch (n) {
     case Number::SINGULAR:
-	switch (g) {
-	case Gender::NEUTER:	return NEUTER;
-	case Gender::FEMININE:	return FEMININE;
-	default:		return MASCULINE;
-	}
+        switch (g) {
+        case Gender::NEUTER:        return NEUTER;
+        case Gender::FEMININE:        return FEMININE;
+        default:                return MASCULINE;
+        }
     case Number::PLURAL: return PLURAL;
     default:             return MASCULINE;
     }
@@ -151,7 +151,7 @@ inline int MultiGender::resolve(const Gender &g, const Number &n)
 inline const char * const MultiGender::toString() const
 {
     switch (value) {
-    default:	    
+    default:            
     case MASCULINE: return "m";
     case FEMININE:  return "f";
     case NEUTER:    return "n";
@@ -162,12 +162,12 @@ inline const char * const MultiGender::toString() const
 inline void MultiGender::fromString(const char *t)
 {
     if (t) 
-	switch (t[0]) {
-	case 'n':   value = NEUTER; break;
-	case 'f':   value = FEMININE; break;
-	case 'm':   value = MASCULINE; break;
-	case 'p':   value = PLURAL; break;
-	}
+        switch (t[0]) {
+        case 'n':   value = NEUTER; break;
+        case 'f':   value = FEMININE; break;
+        case 'm':   value = MASCULINE; break;
+        case 'p':   value = PLURAL; break;
+        }
 }
 
 #endif

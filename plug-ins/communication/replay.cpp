@@ -31,7 +31,7 @@ const int DEFAULT_REPLAY_SIZE = 10;
 static bool replay_messages( ostringstream &buf, PCharacter *ch, const DLString &attrName, int limit )
 {
     XMLStringListAttribute::Pointer attr  
-		= ch->getAttributes( ).findAttr<XMLStringListAttribute>( attrName );
+                = ch->getAttributes( ).findAttr<XMLStringListAttribute>( attrName );
     if (!attr)
         return false;
 
@@ -75,7 +75,7 @@ bool replay_history_near( ostringstream &buf, PCharacter *ch, int limit = DEFAUL
 static void remember_one_message( PCharacter *ch, const DLString &msg, const DLString &attrName )
 {
     XMLStringListAttribute::Pointer attr  
-		= ch->getAttributes( ).getAttr<XMLStringListAttribute>( attrName );
+                = ch->getAttributes( ).getAttr<XMLStringListAttribute>( attrName );
 
     attr->push_front( msg );
     if (attr->size( ) > MAX_HISTORY_SIZE)

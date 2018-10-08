@@ -20,7 +20,7 @@ public:
     CWrite( );
 
     virtual void run( Character *, const DLString & );
-	
+        
 private:
     void writeOnWall( Character *, Object *, DLString & );
     void writeOnPaper( Character *, Object *, DLString & );

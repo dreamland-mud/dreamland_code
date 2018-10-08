@@ -16,28 +16,28 @@
 class SocialManager : public InterpretLayer, public DLXMLTableLoader {
 friend class Social;    
 public:
-	typedef ::Pointer<SocialManager> Pointer;
+        typedef ::Pointer<SocialManager> Pointer;
 
-	SocialManager( );
-	virtual ~SocialManager( );
-	
-	virtual DLString getTableName( ) const;
-	virtual DLString getNodeName( ) const;
+        SocialManager( );
+        virtual ~SocialManager( );
+        
+        virtual DLString getTableName( ) const;
+        virtual DLString getNodeName( ) const;
 
-	inline static SocialManager * getThis( );
+        inline static SocialManager * getThis( );
 
-	virtual bool process( InterpretArguments & );
+        virtual bool process( InterpretArguments & );
 protected:
-	virtual void putInto( );
+        virtual void putInto( );
 
-	virtual void initialization( );
-	virtual void destruction( );
+        virtual void initialization( );
+        virtual void destruction( );
 
 private:
-	static SocialManager *thisClass;
+        static SocialManager *thisClass;
 
-	static const DLString NODE_NAME;
-	static const DLString TABLE_NAME;
+        static const DLString NODE_NAME;
+        static const DLString TABLE_NAME;
 };
 
 inline SocialManager * SocialManager::getThis( )

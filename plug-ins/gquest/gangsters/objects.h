@@ -17,13 +17,13 @@ class Room;
 class GangKey : public ObjectBehavior {
 XML_OBJECT    
 public:
-	typedef ::Pointer<GangKey> Pointer;
-	
-	virtual void get( Character * );
-	virtual bool extract( bool );
-	virtual bool canSteal( Character * );
+        typedef ::Pointer<GangKey> Pointer;
+        
+        virtual void get( Character * );
+        virtual bool extract( bool );
+        virtual bool canSteal( Character * );
 
-	XML_VARIABLE XMLBoolean needsReset;
+        XML_VARIABLE XMLBoolean needsReset;
 };
 
 /*
@@ -33,7 +33,7 @@ public:
 class GangPortal : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<GangPortal> Pointer;
+        typedef ::Pointer<GangPortal> Pointer;
     
         static bool canDrop( Room * );
 

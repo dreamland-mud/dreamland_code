@@ -23,15 +23,15 @@ int  MobileProfession::getThac32( Character *ch ) const
     checkTarget( ch );
 
     if (IS_SET(ch->act, ACT_WARRIOR))
-	return -10;
+        return -10;
     else if (IS_SET(ch->act, ACT_THIEF))
-	return -4;
+        return -4;
     else if (IS_SET(ch->act, ACT_CLERIC))
-	return 2;
+        return 2;
     else if (IS_SET(ch->act, ACT_MAGE))
-	return 6;
+        return 6;
     else
-	return DefaultProfession::getThac32( ch );
+        return DefaultProfession::getThac32( ch );
 }
 
 Flags MobileProfession::getFlags( Character *ch ) const
@@ -40,12 +40,12 @@ Flags MobileProfession::getFlags( Character *ch ) const
     checkTarget( ch );
     
     if (IS_SET(ch->act, ACT_CLERIC))
-	flags.setBit( PROF_DIVINE );
+        flags.setBit( PROF_DIVINE );
     else if (IS_SET(ch->act, ACT_MAGE|ACT_NECROMANCER|ACT_UNDEAD|ACT_VAMPIRE))
-	flags.setBit( PROF_MAGIC );
+        flags.setBit( PROF_MAGIC );
 
     if (flags.getValue( ))
-	flags.setBit( PROF_CASTER );
+        flags.setBit( PROF_CASTER );
 
     return flags;
 }
@@ -57,27 +57,27 @@ int MobileProfession::getStat( bitnumber_t s, Character *ch ) const
     checkTarget( ch );
 
     if (IS_SET(ch->act,ACT_WARRIOR)) {
-	bonuses[STAT_STR] += 3;
-	bonuses[STAT_INT] -= 1;
-	bonuses[STAT_CON] += 2;
+        bonuses[STAT_STR] += 3;
+        bonuses[STAT_INT] -= 1;
+        bonuses[STAT_CON] += 2;
     }
 
     if (IS_SET(ch->act,ACT_THIEF)) {
-	bonuses[STAT_DEX] += 3;
-	bonuses[STAT_INT] += 1;
-	bonuses[STAT_WIS] -= 1;
+        bonuses[STAT_DEX] += 3;
+        bonuses[STAT_INT] += 1;
+        bonuses[STAT_WIS] -= 1;
     }
 
     if (IS_SET(ch->act,ACT_CLERIC)) {
-	bonuses[STAT_WIS] += 3;
-	bonuses[STAT_DEX] -= 1;
-	bonuses[STAT_STR] += 1;
+        bonuses[STAT_WIS] += 3;
+        bonuses[STAT_DEX] -= 1;
+        bonuses[STAT_STR] += 1;
     }
 
     if (IS_SET(ch->act,ACT_MAGE)) {
-	bonuses[STAT_INT] += 3;
-	bonuses[STAT_STR] -= 1;
-	bonuses[STAT_DEX] += 1;
+        bonuses[STAT_INT] += 3;
+        bonuses[STAT_STR] -= 1;
+        bonuses[STAT_DEX] += 1;
     }
     
     return bonuses[s];
@@ -110,6 +110,6 @@ GlobalBitvector MobileProfession::toVector( Character *ch ) const
 void MobileProfession::checkTarget( Character *ch ) const throw( Exception )
 {
     if (!ch->is_npc( ))
-	throw Exception( ch->getName( ) + " has mobile profession!" );
+        throw Exception( ch->getName( ) + " has mobile profession!" );
 }
 

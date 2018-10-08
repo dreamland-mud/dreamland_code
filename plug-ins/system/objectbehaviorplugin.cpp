@@ -12,13 +12,13 @@ void ObjectBehaviorPlugin::initialization( ) {
     Object *obj;
 
     for (obj = object_list; obj; obj = obj->next) {
-	if (!obj->behavior)
-	    continue;
+        if (!obj->behavior)
+            continue;
 
-	if (obj->behavior->getType( ) == getName( )) {
-	    obj->behavior.recover( );
-	    obj->behavior->setObj( obj );	
-	}
+        if (obj->behavior->getType( ) == getName( )) {
+            obj->behavior.recover( );
+            obj->behavior->setObj( obj );        
+        }
     }
     
 }
@@ -28,15 +28,15 @@ void ObjectBehaviorPlugin::destruction( ) {
 
     /* XXX */
     if (dreamland->isShutdown( ))
-	return;
+        return;
 
     for (obj = object_list; obj; obj = obj->next) {
-	if (!obj->behavior) 
-	    continue;
+        if (!obj->behavior) 
+            continue;
 
-	if (obj->behavior->getType( ) == getName( )) {
-	    obj->behavior->unsetObj( );	
-	    obj->behavior.backup( );
-	}
+        if (obj->behavior->getType( ) == getName( )) {
+            obj->behavior->unsetObj( );        
+            obj->behavior.backup( );
+        }
     }
 }

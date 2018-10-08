@@ -17,8 +17,8 @@
 class PluginReloadRequest;
 
 class PluginManager : public map<DLString, XMLSharedObject>,
-		      public OneAllocate, 
-		      public virtual XMLLoader
+                      public OneAllocate, 
+                      public virtual XMLLoader
 {
 friend class XMLSharedObject;
 public:
@@ -60,10 +60,10 @@ private:
 
 class PluginException : public Exception {
 public:
-	inline PluginException( const DLString &pluginName, const DLString &error )
-		: Exception( "Error while loading plugin " + pluginName + ": " + error )
-	{
-	}
+        inline PluginException( const DLString &pluginName, const DLString &error )
+                : Exception( "Error while loading plugin " + pluginName + ": " + error )
+        {
+        }
 };
 
 inline PluginManager* PluginManager::getThis( )

@@ -18,7 +18,7 @@ namespace Json {
 }
 
 class WebPromptManager : public Plugin, public OneAllocate {
-public:	
+public:        
     typedef ::Pointer<WebPromptManager> Pointer;
     typedef ::Pointer<WebPromptListener> WebPromptListenerPointer;
     typedef std::list<WebPromptListenerPointer> Listeners;
@@ -47,11 +47,11 @@ inline WebPromptManager * WebPromptManager::getThis( )
 
 class WebPromptListener : public virtual Plugin {
 public:
-	typedef ::Pointer<WebPromptListener> Pointer;
+        typedef ::Pointer<WebPromptListener> Pointer;
 
-	virtual void initialization( );
-	virtual void destruction( );
-	
+        virtual void initialization( );
+        virtual void destruction( );
+        
         virtual void run( Descriptor *, Character *, Json::Value &json ) = 0;
 };
 

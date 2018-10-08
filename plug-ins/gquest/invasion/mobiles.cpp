@@ -29,7 +29,7 @@ bool InvasionMob::death( Character *killer )
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
    
     if (!killer) 
-	return true;
+        return true;
 
     killer = gquest->getActor( killer );
 
@@ -56,18 +56,18 @@ bool InvasionHelper::death( Character *killer )
     InvasionGQuest *gq = InvasionGQuest::getThis( );
 
     if (killer) {
-	Character *wch;
+        Character *wch;
 
-	wch = gq->getActor( killer );
-	log("InvasionHelper killed by " << wch->getName( ));
-	
-	if (!wch->is_npc( )) {
-	    XMLAttributeInvasion::Pointer attr;
+        wch = gq->getActor( killer );
+        log("InvasionHelper killed by " << wch->getName( ));
+        
+        if (!wch->is_npc( )) {
+            XMLAttributeInvasion::Pointer attr;
 
-	    attr = wch->getPC( )->getAttributes( ).getAttr<XMLAttributeInvasion>( gq->getQuestID( ) );
-	    attr->punish( );
-	    wch->send_to("{YВ твоих услугах более никто не нуждается.{x\r\n");
-	}
+            attr = wch->getPC( )->getAttributes( ).getAttr<XMLAttributeInvasion>( gq->getQuestID( ) );
+            attr->punish( );
+            wch->send_to("{YВ твоих услугах более никто не нуждается.{x\r\n");
+        }
     } 
 
     char_to_room( gq->createHelper( ), ch->in_room );
@@ -84,28 +84,28 @@ void InvasionHelper::tell( Character *victim, const char *speech )
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
     
     if (victim->is_npc( ))
-	return;
+        return;
 
     pch = victim->getPC( );
     
     act("$C1 что-то говорит $c3.", ch, 0, victim, TO_NOTVICT);
 
     if (!help.match( speech )) {
-	actWrongSpeech( pch );
-	return;
+        actWrongSpeech( pch );
+        return;
     }
 
     obj = gquest->createInstrument( );
     size = gquest->countInstruments( pch );
     
     if (size >= 3) {
-	actTooMuch( pch, obj );
-	extract_obj( obj );
+        actTooMuch( pch, obj );
+        extract_obj( obj );
     }
     else {
-	obj_to_char( obj, pch );
-	obj->setOwner( pch->getNameP( ) );
-	actGiveInstrument( pch, obj );
+        obj_to_char( obj, pch );
+        obj->setOwner( pch->getNameP( ) );
+        actGiveInstrument( pch, obj );
     }
 }
 

@@ -43,12 +43,12 @@ NPCharacter* NPCharacterManager::getNPCharacter( )
 
     if( !extractList.empty( ) )
     {
-	ch = *extractList.begin( );
-	extractList.erase( extractList.begin( ) );
+        ch = *extractList.begin( );
+        extractList.erase( extractList.begin( ) );
     }
     else
     {
-	ch = dallocate( NPCharacter );
+        ch = dallocate( NPCharacter );
     }
     
     ch->setID( dreamland->genID( ) );

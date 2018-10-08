@@ -16,12 +16,12 @@
 #ifndef _CHARSET_H_
 #define _CHARSET_H_
 
-#define	NCODEPAGES		7
+#define        NCODEPAGES                7
 
 struct codepage_t {
-  const char *		name;
-  unsigned char *	from;
-  unsigned char *	to;
+  const char *                name;
+  unsigned char *        from;
+  unsigned char *        to;
 };
 
 extern unsigned char koi8_koi8[256];

@@ -22,21 +22,21 @@ JumpMovement::JumpMovement( Character *ch, Character *actor, Room *to_room )
 bool JumpMovement::moveAtomic( )
 {
     if (!canMove( ch ))
-	return false;
+        return false;
 
     if (ch->mount && !canMove( ch->mount ))
-	return false;
+        return false;
 
     if (!tryMove( ch ))
-	return false;
+        return false;
 
     if (ch->mount && !tryMove( ch->mount ))
-	return false;
+        return false;
 
     place( ch );
 
     if (ch->mount)
-	place( ch->mount );
+        place( ch->mount );
 
     return true;
 }

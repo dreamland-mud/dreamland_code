@@ -23,10 +23,10 @@ class DBMIO {
 public:
     typedef unsigned long int Key;
     struct Exception : public ::Exception {
-	Exception(const DLString &ex) : ::Exception(ex) { }
+        Exception(const DLString &ex) : ::Exception(ex) { }
     };
     struct EOFException : public Exception { 
-	EOFException() : Exception("eof") { }
+        EOFException() : Exception("eof") { }
     };
 
     DBMIO();

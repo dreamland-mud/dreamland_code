@@ -84,15 +84,15 @@ bool process_output( Descriptor *d, bool fPrompt )
      */
 
     if (!dreamland->isShutdown( ) && fPrompt)
-	if(!d->handle_input.empty( ) && d->handle_input.front( ))
-	    d->handle_input.front( )->prompt(d);
+        if(!d->handle_input.empty( ) && d->handle_input.front( ))
+            d->handle_input.front( )->prompt(d);
 
     /*
      * Short-circuit if nothing to write.
      */
 
     if (!d->outtop)
-	return true;
+        return true;
 
     /*
      * OS-dependent output.
@@ -120,8 +120,8 @@ void init_descriptor( int control )
     getsockname( control, (struct sockaddr *) &sock, &size );
     desc = accept( control, (struct sockaddr *) &sock, &size);
     if ( desc < 0 ) {
-	LogStream::sendError( ) <<"New_descriptor: accept::" << strerror( errno ) << endl;
-	return;
+        LogStream::sendError( ) <<"New_descriptor: accept::" << strerror( errno ) << endl;
+        return;
     }
 
 #if !defined(FNDELAY)
@@ -130,21 +130,21 @@ void init_descriptor( int control )
 
 #ifndef __MINGW32__
     if ( fcntl( desc, F_SETFL, FNDELAY ) < 0 ) {
-	LogStream::sendError( ) << "New_descriptor: fcntl: FNDELAY::" << strerror( errno ) << endl;
-	return;
+        LogStream::sendError( ) << "New_descriptor: fcntl: FNDELAY::" << strerror( errno ) << endl;
+        return;
     }
     
     x = 1;
     if(setsockopt(desc, SOL_SOCKET, SO_KEEPALIVE, &x, sizeof(x)) < 0) {
-	LogStream::sendError( ) << "setsockopt: SO_KEEPALIVE" << endl;
-	close( desc );
+        LogStream::sendError( ) << "setsockopt: SO_KEEPALIVE" << endl;
+        close( desc );
         return;
     }
 #endif
 
     if (!ServerSocketContainer::isAllowed(control, sock)) {
-	close( desc );
-	return;
+        close( desc );
+        return;
     }
     
     /*
@@ -152,11 +152,11 @@ void init_descriptor( int control )
      */
     dnew = new Descriptor;
 
-    dnew->control	= control;
-    dnew->descriptor	= desc;
-    dnew->connected	= CON_CODEPAGE;
-    dnew->outsize	= 2000;
-    dnew->outbuf	= ( char* )malloc( dnew->outsize );
+    dnew->control        = control;
+    dnew->descriptor        = desc;
+    dnew->connected        = CON_CODEPAGE;
+    dnew->outsize        = 2000;
+    dnew->outbuf        = ( char* )malloc( dnew->outsize );
     dnew->buffer_handler= new DefaultBufferHandler;
     
     dnew->inptr = 0;
@@ -165,31 +165,31 @@ void init_descriptor( int control )
     dnew->telnet.ttype = 0;
     dnew->oob_proto = 0;
 
-    dnew->realip	= realip( inet_ntoa( sock.sin_addr ) );
+    dnew->realip        = realip( inet_ntoa( sock.sin_addr ) );
     dnew->host          = realip( inet_ntoa( sock.sin_addr ) );
     LogStream::sendNotice( ) << "New descriptor " << dnew->realip << endl;
 
     if (banManager->checkVerbose( dnew, BAN_ALL )) {
-	LogStream::sendWarning( ) << "Closing banned descriptor  " << buf << endl;
-	close( desc );
-	delete dnew;
-	return;
+        LogStream::sendWarning( ) << "Closing banned descriptor  " << buf << endl;
+        close( desc );
+        delete dnew;
+        return;
     }
     
     /*
      * Init descriptor data.
      */
-    dnew->next			= descriptor_list;
-    descriptor_list		= dnew;
+    dnew->next                        = descriptor_list;
+    descriptor_list                = dnew;
 
     if (ServerSocketContainer::isWrapped( control )) 
-	WrapperHandler::init( dnew );
+        WrapperHandler::init( dnew );
     else if (ServerSocketContainer::isBackdoor( control ))
-	BackdoorHandler::init( dnew );
+        BackdoorHandler::init( dnew );
     else if (ServerSocketContainer::isWebSock( control ))
-	dnew->websock.state = WS_NEGOTIATING;
+        dnew->websock.state = WS_NEGOTIATING;
     else
-	NannyHandler::init( dnew );
+        NannyHandler::init( dnew );
 
     if(dnew->websock.state != WS_NEGOTIATING) {
         dnew->writeFd(eor_on_str, sizeof(eor_on_str));
@@ -210,10 +210,10 @@ void page_to_char( const char *txt, Character *ch )
     Descriptor *d = ch->desc; 
 
     if (!d)
-	return;
+        return;
 
     if (!txt || !*txt)
-	return;
+        return;
     
     mudtags_convert( txt, out, ch );
     
@@ -229,18 +229,18 @@ char *get_multi_command(Descriptor *d, char *argument)
     command[0] = '\0';
 
     for(counter = 0; argument[counter]; counter++) {
-	if(argument[counter] == '|') {
-	    if(argument[counter + 1] != '|') {
-		command[counter] = '\0';
-		counter++;
-		memmove(d->incomm, argument + counter, strlen(argument + counter) + 1);
-		return(command);
-	    } else {
-		memmove(argument + counter, argument + counter + 1, strlen(argument + counter));
-	    }
-	}
+        if(argument[counter] == '|') {
+            if(argument[counter + 1] != '|') {
+                command[counter] = '\0';
+                counter++;
+                memmove(d->incomm, argument + counter, strlen(argument + counter) + 1);
+                return(command);
+            } else {
+                memmove(argument + counter, argument + counter + 1, strlen(argument + counter));
+            }
+        }
 
-	command[counter] = argument[counter];
+        command[counter] = argument[counter];
     }
 
     d->incomm[0] = '\0';
@@ -258,19 +258,19 @@ Descriptor * descriptor_find_named( Descriptor *myD, const DLString &myName, int
     DLString name;
 
     for (d = descriptor_list; d; d = d->next) {
-	if (d == myD)
-	    continue;
-	
-	if (!d->character)
-	    continue;
-	
-	if (state != -1 && d->connected != state)
-	    continue;
+        if (d == myD)
+            continue;
+        
+        if (!d->character)
+            continue;
+        
+        if (state != -1 && d->connected != state)
+            continue;
 
-	name = d->character->getPC( )->getName( );
+        name = d->character->getPC( )->getName( );
 
-	if (name ^ myName)
-	    return d;
+        if (name ^ myName)
+            return d;
     } 
 
     return NULL;
@@ -290,7 +290,7 @@ void do_help( Descriptor *d, const char *topic, bool fColor )
     Character *ch = d->character;
 
     for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-	if (is_name( topic, (*a)->getKeyword( ).c_str( ) )) {
+        if (is_name( topic, (*a)->getKeyword( ).c_str( ) )) {
             ostringstream buf;
 
             if (!fColor)
@@ -300,7 +300,7 @@ void do_help( Descriptor *d, const char *topic, bool fColor )
 
             d->send( buf.str( ).c_str( ));
             return;
-	}
+        }
     }
 
     LogStream::sendError( ) << "nanny: no help for '" << topic << "'" << endl;

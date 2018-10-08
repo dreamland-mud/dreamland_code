@@ -30,12 +30,12 @@ void Timer::sleep()
     Sleep(value.tv_sec * 1000 + value.tv_usec / 1000);
 #else
     if (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &value) < 0) {
-	if (errno != EINTR) {
-	    logsystem("select sleep");
-	    throw Exception();
-	}
+        if (errno != EINTR) {
+            logsystem("select sleep");
+            throw Exception();
+        }
     }
-#endif				    
+#endif                                    
 }
 
 bool Timer::elapsed() const
@@ -65,8 +65,8 @@ Timer Timer::operator + (const Timer &tb) const
     r->tv_usec = a->tv_usec + b->tv_usec;
 
     while (r->tv_usec >= 1000000) {
-	r->tv_usec -= 1000000;
-	r->tv_sec++;
+        r->tv_usec -= 1000000;
+        r->tv_sec++;
     }
 
     return result;
@@ -81,24 +81,24 @@ Timer Timer::operator - (const Timer &tb) const
     const struct timeval *b = &(tb.value);
     
     if (a->tv_sec < b->tv_sec) {
-	*r = null;
+        *r = null;
     }
     else if (a->tv_sec == b->tv_sec) {
-	if (a->tv_usec < b->tv_usec) {
-	    *r = null;
-	} else {
-	    r->tv_sec = 0;
-	    r->tv_usec = a->tv_usec - b->tv_usec;
-	}
+        if (a->tv_usec < b->tv_usec) {
+            *r = null;
+        } else {
+            r->tv_sec = 0;
+            r->tv_usec = a->tv_usec - b->tv_usec;
+        }
     } else {               
-	r->tv_sec = a->tv_sec - b->tv_sec;
-	
-	if (a->tv_usec < b->tv_usec) {
-	    r->tv_usec = a->tv_usec + 1000000 - b->tv_usec;
-	    r->tv_sec--;
-	} else {
-	    r->tv_usec = a->tv_usec - b->tv_usec;
-	}
+        r->tv_sec = a->tv_sec - b->tv_sec;
+        
+        if (a->tv_usec < b->tv_usec) {
+            r->tv_usec = a->tv_usec + 1000000 - b->tv_usec;
+            r->tv_sec--;
+        } else {
+            r->tv_usec = a->tv_usec - b->tv_usec;
+        }
     }
     
     return result;    

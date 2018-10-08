@@ -15,10 +15,10 @@ void XMLRussianString::fromXML( const XMLNode::Pointer& parent ) throw( Exceptio
     XMLNode::Pointer node = parent->getFirstNode( );
     
     if (parent->hasAttribute( ATTRIBUTE_GRAMMAR ))
-	mg = MultiGender(parent->getAttribute( ATTRIBUTE_GRAMMAR ).c_str());
+        mg = MultiGender(parent->getAttribute( ATTRIBUTE_GRAMMAR ).c_str());
 
     if (!node.isEmpty( )) 
-	setFullForm(node->getCData( ));
+        setFullForm(node->getCData( ));
 }
 
 bool XMLRussianString::toXML( XMLNode::Pointer& parent ) const
@@ -29,7 +29,7 @@ bool XMLRussianString::toXML( XMLNode::Pointer& parent ) const
     node->setCData( getFullForm() );
     
     if (mg != MultiGender::MASCULINE)
-	parent->insertAttribute( ATTRIBUTE_GRAMMAR, mg.toString() );
+        parent->insertAttribute( ATTRIBUTE_GRAMMAR, mg.toString() );
 
     parent->appendChild( node );
     return true;

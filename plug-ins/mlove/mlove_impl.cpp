@@ -15,18 +15,18 @@
 
 extern "C"
 {
-	SO::PluginList initialize_mlove( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<Lover>( ppl );
-		Plugin::registerPlugin<Marry>( ppl );
-		Plugin::registerPlugin<Divorce>( ppl );
+        SO::PluginList initialize_mlove( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<Lover>( ppl );
+                Plugin::registerPlugin<Marry>( ppl );
+                Plugin::registerPlugin<Divorce>( ppl );
 
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLovers> >( ppl );
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeMarriage> >( ppl );
-		
-		return ppl;
-	}
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLovers> >( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeMarriage> >( ppl );
+                
+                return ppl;
+        }
 }
-		
+                

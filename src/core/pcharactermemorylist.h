@@ -20,10 +20,10 @@ class PCMemoryInterface;
 
 struct MapCompareIgnoreCase : public std::binary_function<DLString, DLString, bool>
 {
-	inline result_type operator( ) ( const first_argument_type& str1, const second_argument_type& str2 ) const
-	{
-		return str1.lessCase( str2 );
-	}
+        inline result_type operator( ) ( const first_argument_type& str1, const second_argument_type& str2 ) const
+        {
+                return str1.lessCase( str2 );
+        }
 };
 
 
@@ -33,8 +33,8 @@ struct MapCompareIgnoreCase : public std::binary_function<DLString, DLString, bo
 class PCharacterMemoryList : public DLMap<DLString, PCMemoryInterface, MapCompareIgnoreCase>
 {
 public: 
-	PCharacterMemoryList( );
-	virtual ~PCharacterMemoryList( );
+        PCharacterMemoryList( );
+        virtual ~PCharacterMemoryList( );
 };
 
 #endif

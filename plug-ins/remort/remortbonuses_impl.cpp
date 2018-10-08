@@ -20,29 +20,29 @@ StatRemortBonus::StatRemortBonus( )
 DLString StatRemortBonus::getShortDescr( ) const
 {
     if (shortDescr.empty( ))
-	return stat_table.message( stat );
+        return stat_table.message( stat );
     else
-	return RemortBonus::getShortDescr( );
+        return RemortBonus::getShortDescr( );
 }
 
 bool StatRemortBonus::matches( const DLString &arg ) const
 {
     if (arg == stat.name( )
-	|| arg == stat.message( '1' )
-	|| arg == stat.message( '4' ))
-	return true;
+        || arg == stat.message( '1' )
+        || arg == stat.message( '4' ))
+        return true;
 
     if (!shortDescr.empty( )) {
-	if (arg == shortDescr.ruscase( '1' ) 
-	    || arg == shortDescr.ruscase( '4' ))
-	    return true;
+        if (arg == shortDescr.ruscase( '1' ) 
+            || arg == shortDescr.ruscase( '4' ))
+            return true;
 
-	DLString s = shortDescr;
-	s = s.getOneArgument( );
+        DLString s = shortDescr;
+        s = s.getOneArgument( );
 
-	if (arg == s.ruscase( '1' )
-	    || arg == s.ruscase( '4' ))
-	    return true;
+        if (arg == s.ruscase( '1' )
+            || arg == s.ruscase( '4' ))
+            return true;
     }
 
     return false;
@@ -77,16 +77,16 @@ int & LevelRemortBonus::bonusField( PCharacter *ch ) const
 void HealthRemortBonus::bonusApply( PCharacter *ch ) const
 {
     for (int i = 1; i <= ch->getRealLevel( ); i++) {
-	ch->max_hit += ch->getRemorts( ).getHitPerLevel( i );
-	ch->perm_hit += ch->getRemorts( ).getHitPerLevel( i );
+        ch->max_hit += ch->getRemorts( ).getHitPerLevel( i );
+        ch->perm_hit += ch->getRemorts( ).getHitPerLevel( i );
     }
 }
 
 void HealthRemortBonus::bonusRemove( PCharacter *ch ) const
 {
     for (int i = 1; i <= ch->getRealLevel( ); i++) {
-	ch->max_hit -= ch->getRemorts( ).getHitPerLevel( i );
-	ch->perm_hit -= ch->getRemorts( ).getHitPerLevel( i );
+        ch->max_hit -= ch->getRemorts( ).getHitPerLevel( i );
+        ch->perm_hit -= ch->getRemorts( ).getHitPerLevel( i );
     }
 }
 
@@ -106,16 +106,16 @@ int & HealthRemortBonus::bonusField( PCharacter *ch ) const
 void ManaRemortBonus::bonusApply( PCharacter *ch ) const
 {
     for (int i = 1; i <= ch->getRealLevel( ); i++) {
-	ch->max_mana += ch->getRemorts( ).getManaPerLevel( i );
-	ch->perm_mana += ch->getRemorts( ).getManaPerLevel( i );
+        ch->max_mana += ch->getRemorts( ).getManaPerLevel( i );
+        ch->perm_mana += ch->getRemorts( ).getManaPerLevel( i );
     }
 }
 
 void ManaRemortBonus::bonusRemove( PCharacter *ch ) const
 {
     for (int i = 1; i <= ch->getRealLevel( ); i++) {
-	ch->max_mana -= ch->getRemorts( ).getManaPerLevel( i );
-	ch->perm_mana -= ch->getRemorts( ).getManaPerLevel( i );
+        ch->max_mana -= ch->getRemorts( ).getManaPerLevel( i );
+        ch->perm_mana -= ch->getRemorts( ).getManaPerLevel( i );
     }
 }
 
@@ -135,13 +135,13 @@ int & ManaRemortBonus::bonusField( PCharacter *ch ) const
 void SkillPointRemortBonus::bonusApply( PCharacter *ch ) const
 {
     for (int i = 1; i <= ch->getRealLevel( ); i++) 
-	ch->max_skill_points += ch->getRemorts( ).getSkillPointsPerLevel( i );
+        ch->max_skill_points += ch->getRemorts( ).getSkillPointsPerLevel( i );
 }
 
 void SkillPointRemortBonus::bonusRemove( PCharacter *ch ) const
 {
     for (int i = 1; i <= ch->getRealLevel( ); i++) 
-	ch->max_skill_points -= ch->getRemorts( ).getSkillPointsPerLevel( i );
+        ch->max_skill_points -= ch->getRemorts( ).getSkillPointsPerLevel( i );
 }
 
 int SkillPointRemortBonus::bonusMaximum( PCharacter *ch ) const 

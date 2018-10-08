@@ -39,7 +39,7 @@ WrapperManager * WrapperManager::getThis( )
 Scripting::Register WrapperManager::getWrapper( Character *ch )
 {
     if (!ch)
-	return Scripting::Register( );
+        return Scripting::Register( );
 
     return wrapperAux<CharacterWrapper>( ch->getID( ), ch ); 
 }
@@ -47,7 +47,7 @@ Scripting::Register WrapperManager::getWrapper( Character *ch )
 Scripting::Register WrapperManager::getWrapper( ::Object *obj )
 {
     if (!obj)
-	return Scripting::Register( );
+        return Scripting::Register( );
 
     return wrapperAux<ObjectWrapper>( obj->getID( ), obj );
 }
@@ -55,7 +55,7 @@ Scripting::Register WrapperManager::getWrapper( ::Object *obj )
 Scripting::Register WrapperManager::getWrapper( Room *room )
 {
     if (!room)
-	return Scripting::Register( );
+        return Scripting::Register( );
 
     return wrapperAux<RoomWrapper>( ROOM_VNUM2ID( room->vnum ), room );
 }
@@ -63,7 +63,7 @@ Scripting::Register WrapperManager::getWrapper( Room *room )
 Scripting::Register WrapperManager::getWrapper( mob_index_data *mob )
 {
     if (!mob)
-	return Scripting::Register( );
+        return Scripting::Register( );
 
     return wrapperAux<MobIndexWrapper>( MOB_VNUM2ID( mob->vnum ), mob );
 }
@@ -71,7 +71,7 @@ Scripting::Register WrapperManager::getWrapper( mob_index_data *mob )
 Scripting::Register WrapperManager::getWrapper( obj_index_data *obj )
 {
     if (!obj)
-	return Scripting::Register( );
+        return Scripting::Register( );
 
     return wrapperAux<ObjIndexWrapper>( OBJ_VNUM2ID( obj->vnum ), obj );
 }
@@ -80,11 +80,11 @@ template <typename WrapperType, typename TargetType>
 Scripting::Register WrapperManager::wrapperAux( long long id, TargetType t )
 {
     if (!t->wrapper) {
-	typename WrapperType::Pointer wrapper( NEW );
+        typename WrapperType::Pointer wrapper( NEW );
 
-	wrapper->setTarget( t );
-	t->wrapper = &Scripting::Object::manager->allocate( );
-	t->wrapper->setHandler( wrapper );
+        wrapper->setTarget( t );
+        t->wrapper = &Scripting::Object::manager->allocate( );
+        t->wrapper->setHandler( wrapper );
     }
 
     return Scripting::Register( t->wrapper );
@@ -128,7 +128,7 @@ void WrapperManager::linkAux( long long id, TargetType t )
     i = map.find( id );
 
     if (i == map.end( ))
-	return;
+        return;
 
     t->wrapper = i->second;
     wrapper_cast<WrapperType>(t->wrapper)->setTarget( t );

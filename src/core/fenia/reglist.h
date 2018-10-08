@@ -23,7 +23,7 @@ using Scripting::Register;
 using Scripting::RegisterList;
 
 class XMLRegisterList : public std::list<XMLRegister>,
-			public virtual XMLContainer 
+                        public virtual XMLContainer 
 {
 public:
     virtual bool nodeFromXML( const XMLNode::Pointer& node );
@@ -32,8 +32,8 @@ public:
 };
 
 class RegList : public XMLRegisterList,
-		public Scripting::NativeHandler,
-		public Scripting::NativeImpl<RegList>
+                public Scripting::NativeHandler,
+                public Scripting::NativeImpl<RegList>
 {
 NMI_OBJECT
 public:

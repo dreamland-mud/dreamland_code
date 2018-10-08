@@ -15,24 +15,24 @@ CMDADM( idelete )
     DLString name = constArguments;
 
     if (name.empty( )) {
-	ch->println( "Удалить чей профайл?" );
-	return;
+        ch->println( "Удалить чей профайл?" );
+        return;
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-	ch->println( "Персонаж с таким именем не найден." );
-	return;
+        ch->println( "Персонаж с таким именем не найден." );
+        return;
     }
 
     if (pci->isOnline( )) {
-	ch->println( "Персонаж присутствует в мире, удаление невозможно." );
-	return;
+        ch->println( "Персонаж присутствует в мире, удаление невозможно." );
+        return;
     }
     
     if (!PCharacterManager::pfDelete( constArguments ))
-	ch->println( "Ошибка при удалении профайла!" );
+        ch->println( "Ошибка при удалении профайла!" );
     else
-	ch->println( "Ok." );
+        ch->println( "Ok." );
 }
 
 
@@ -44,8 +44,8 @@ CMDADM( ipassword )
     DLString passwd = arguments.getOneArgument( );
 
     if (name.empty( )) {
-	ch->println( "Установить пароль кому?" );
-	return;
+        ch->println( "Установить пароль кому?" );
+        return;
     }
 
     if (name == "all") {
@@ -55,7 +55,7 @@ CMDADM( ipassword )
         int cnt = 0;
 
         for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	    PCMemoryInterface *pci = i->second;
+            PCMemoryInterface *pci = i->second;
             const DLString &pwd = pci->getPassword( );
 
             if (!hashPattern.match( pwd )) {
@@ -74,8 +74,8 @@ CMDADM( ipassword )
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-	ch->println( "Персонаж с таким именем не найден." );
-	return;
+        ch->println( "Персонаж с таким именем не найден." );
+        return;
     }
     
     password_set( pci, passwd );

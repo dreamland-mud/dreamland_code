@@ -23,7 +23,7 @@
  */
 class DefaultClan : public Clan, 
                     public XMLTableElement, 
-		    public XMLVariableContainer 
+                    public XMLVariableContainer 
 {
 XML_OBJECT
 public:

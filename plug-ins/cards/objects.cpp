@@ -56,39 +56,39 @@ bool CardPackBehavior::examine( Character *looker )
     bool fEmpty = true;
     
     if (looker->is_npc( ))
-	return false;
+        return false;
     
     looker->printf( "Сегодня козырь %s.\r\n", 
-	    russian_case( XMLAttributeCards::getTrumpFace( ).mlt, 1 ).c_str( ) );
+            russian_case( XMLAttributeCards::getTrumpFace( ).mlt, 1 ).c_str( ) );
 
     for (d = descriptor_list; d != 0; d = d->next) {
-	PCharacter *victim;
-	XMLAttributeCards::Pointer attr;
-	
-	if (d->connected != CON_PLAYING || !d->character)
-	    continue;
-	
-	victim = d->character->getPC( );
+        PCharacter *victim;
+        XMLAttributeCards::Pointer attr;
+        
+        if (d->connected != CON_PLAYING || !d->character)
+            continue;
+        
+        victim = d->character->getPC( );
 
-	if (!looker->can_see( victim ))
-	    continue;
+        if (!looker->can_see( victim ))
+            continue;
 
-	attr = victim->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
-	
-	if (!attr || attr->getLevel( ) < 0)
-	    continue;
-	
-	if (fEmpty)
-	    looker->printf( "Колода содержит: \r\n" );
-	
-	fEmpty = false;
-	looker->printf( "    %-20s %s\r\n", 
-		victim->getNameP( ),
-		attr->getFace( '1' ).c_str( ) );
+        attr = victim->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
+        
+        if (!attr || attr->getLevel( ) < 0)
+            continue;
+        
+        if (fEmpty)
+            looker->printf( "Колода содержит: \r\n" );
+        
+        fEmpty = false;
+        looker->printf( "    %-20s %s\r\n", 
+                victim->getNameP( ),
+                attr->getFace( '1' ).c_str( ) );
     }
     
     if (fEmpty) 
-	looker->send_to( "Похоже, сейчас твоя колода пуста.\r\n" );
+        looker->send_to( "Похоже, сейчас твоя колода пуста.\r\n" );
 
     return true;
 }
@@ -104,63 +104,63 @@ bool CardPackBehavior::use( Character *user, const char *args )
     int chance;
 
     if (!gsn_fetch_card->usable( user ))
-	return false;
+        return false;
 
     pch = user->getPC( );
     myAttr = pch->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
     
     if (!myAttr)
-	return false;
+        return false;
     
     if (args[0] == '\0') {
-	pch->send_to( "Какую именно карту ты хочешь вытащить из колоды?\r\n" );
-	return true;
+        pch->send_to( "Какую именно карту ты хочешь вытащить из колоды?\r\n" );
+        return true;
     }
     
     victim = get_player_world( pch, args );
     
     if (!victim || !victim->getAttributes( ).isAvailable( "cards" )) {
-	pch->send_to( "Ты сейчас не видишь в колоде такой карты.\r\n" );
-	return true;
+        pch->send_to( "Ты сейчас не видишь в колоде такой карты.\r\n" );
+        return true;
     }
     
     chance = gsn_fetch_card->getEffective( pch );
 
     if (number_percent( ) >= chance) {
-	act("Ты пытаешься вытащить из колоды карту, но она выпадает у тебя из рук.", pch, 0, 0, TO_CHAR);
-	act("$c1 пытается вытащить из колоды карту, но она выпадает у $x из рук.", pch, 0, 0, TO_ROOM);
-	gsn_fetch_card->improve( pch, false );
+        act("Ты пытаешься вытащить из колоды карту, но она выпадает у тебя из рук.", pch, 0, 0, TO_CHAR);
+        act("$c1 пытается вытащить из колоды карту, но она выпадает у $x из рук.", pch, 0, 0, TO_ROOM);
+        gsn_fetch_card->improve( pch, false );
     }
     else {
-	OBJ_INDEX_DATA *pCardIndex;
-	Object *card;
+        OBJ_INDEX_DATA *pCardIndex;
+        Object *card;
 
-	if (!( pCardIndex = get_obj_index( OBJ_VNUM_CARD ) )) 
-	    return true;
+        if (!( pCardIndex = get_obj_index( OBJ_VNUM_CARD ) )) 
+            return true;
     
-	card = create_object( pCardIndex, 0 );
-	card->timer = (1 + myAttr->getLevel( )) * 3 * 60 * 60;
-	card->fmtShortDescr( card->getShortDescr( ), victim->getNameP( '2' ).c_str( ) );
-	card->fmtName( card->getName( ), victim->getName( ).c_str( ) );
-	
-	CardBehavior::Pointer bhv( NEW );
-	bhv->setObj( card );
-	bhv->setPlayerName( victim->getName( ) );
-	bhv->setQuality( chance );
-	card->behavior.setPointer( *bhv );
-	
-	obj_to_char( card, pch );
-	act("Ты перетасовываешь $o4 и сдаешь $O4.", pch, obj, card, TO_CHAR);
-	act("$c1 перетасовывает $o4.", pch, obj, 0, TO_ROOM);
-	
-	gsn_fetch_card->improve( pch, true );
+        card = create_object( pCardIndex, 0 );
+        card->timer = (1 + myAttr->getLevel( )) * 3 * 60 * 60;
+        card->fmtShortDescr( card->getShortDescr( ), victim->getNameP( '2' ).c_str( ) );
+        card->fmtName( card->getName( ), victim->getName( ).c_str( ) );
+        
+        CardBehavior::Pointer bhv( NEW );
+        bhv->setObj( card );
+        bhv->setPlayerName( victim->getName( ) );
+        bhv->setQuality( chance );
+        card->behavior.setPointer( *bhv );
+        
+        obj_to_char( card, pch );
+        act("Ты перетасовываешь $o4 и сдаешь $O4.", pch, obj, card, TO_CHAR);
+        act("$c1 перетасовывает $o4.", pch, obj, 0, TO_ROOM);
+        
+        gsn_fetch_card->improve( pch, true );
     }
     
     throws--;
 
     if (throws <= 0) {
-	act("Это была последняя карта в $o6.", pch, obj, 0, TO_CHAR);
-	extract_obj( obj );
+        act("Это была последняя карта в $o6.", pch, obj, 0, TO_CHAR);
+        extract_obj( obj );
     }
     
     return true; 
@@ -197,64 +197,64 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     DLString args = cArgs;
 
     if (!gsn_enter_card->usable( user ))
-	return false;
+        return false;
 
     pch = user->getPC( );
     
     if (getPlayerName( ).empty( )) {
-	pch->send_to( "Эта карта пуста.\r\n" );
-	return true;
+        pch->send_to( "Эта карта пуста.\r\n" );
+        return true;
     }
    
     if (pch->fighting) {
-	pch->send_to( "Ты не можешь полностью сосредоточиться на карте.\r\n" );
-	return true;
+        pch->send_to( "Ты не можешь полностью сосредоточиться на карте.\r\n" );
+        return true;
     }
     
     pch->setWait( gsn_enter_card->getBeats( ) );
     victim = get_player_world( pch, getPlayerName( ).c_str( ) );
     
     if (!victim 
-	    || !pch->can_see( victim ) 
-	    || !victim->getAttributes( ).isAvailable( "cards" )) 
+            || !pch->can_see( victim ) 
+            || !victim->getAttributes( ).isAvailable( "cards" )) 
     {
-	act("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
-	return true;
+        act("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        return true;
     }
 
     if (victim == pch) {
-	pch->println("Так сильно по себе скучаешь?");
-	return true;
+        pch->println("Так сильно по себе скучаешь?");
+        return true;
     }
 
     if (is_safe_nomessage( pch, victim ) 
-	    || !pch->can_see( victim->in_room )) 
+            || !pch->can_see( victim->in_room )) 
     {
-	act("$o1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
-	return true;
+        act("$o1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
+        return true;
     }
     
     chance = quality * gsn_enter_card->getEffective( pch ) / 100;
     chance = URANGE( 5, chance, 95 );
 
     if (number_percent( ) >= chance) {
-	fSuccess = false;
+        fSuccess = false;
 
-	if (number_percent( ) <= 5) 
-	    room = findHorribleRoom( pch );
-	else
-	    room = get_random_room( pch );
+        if (number_percent( ) <= 5) 
+            room = findHorribleRoom( pch );
+        else
+            room = get_random_room( pch );
     }
     else {
-	room = victim->in_room;
-	fSuccess = true;
+        room = victim->in_room;
+        fSuccess = true;
     }
 
     transfer_char( pch, pch, room,
                 "%1$^C1 пристально смотрит на карту.. Контуры %1$P2 тела расплываются и %1$P1 исчезает.",
                 "{cТы всматриваешься в карту, постепенно замечая все новые и новые детали.{x",
                 "Внезапно возникшее перед тобой плоское изображение %1$C2 постепенно обретает объем.");
-		
+                
     if (pch->pet)
         transfer_char( pch->pet, pch, room );
     
@@ -274,33 +274,33 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     int mana;
     
     if (actor != obj->carried_by)
-	return false;
+        return false;
     
     if (cmdName != "shake" && cmdName != "пожать")
-	return false;
+        return false;
     
     if (!is_name( cmdArgs.c_str( ), getPlayerName( ).c_str( ) ))
-	return false;
+        return false;
 
     if (actor->is_npc( ))
-	return false;
+        return false;
 
     pch = actor->getPC( );
     victim = get_player_world( pch, getPlayerName( ).c_str( ) );
 
     if (pch->fighting) {
-	pch->send_to( "Ты не можешь полностью сосредоточиться на карте.\r\n" );
-	return true;
+        pch->send_to( "Ты не можешь полностью сосредоточиться на карте.\r\n" );
+        return true;
     }
 
     if (!victim || !pch->can_see( victim )) {
-	act("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
-	return true;
+        act("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        return true;
     }
 
     if (pch == victim) {
-	pch->println("Ты хватаешь себя за руку.");
-	return true;
+        pch->println("Ты хватаешь себя за руку.");
+        return true;
     }
 
     mana = gsn_pull_card->getMana( );
@@ -312,91 +312,91 @@ bool CardBehavior::command( Character *actor, const DLString &cmdName, const DLS
     pch->setWait( gsn_pull_card->getBeats( ) );
 
     if (hisAttr 
-	&& hisAttr->getContactName( ) == pch->getName( )
-	&& myCard
-	&& gsn_pull_card->usable( pch ))
+        && hisAttr->getContactName( ) == pch->getName( )
+        && myCard
+        && gsn_pull_card->usable( pch ))
     {
-	int chance;
-	bool fSuccess;
+        int chance;
+        bool fSuccess;
 
-	if (is_safe_nomessage( pch, victim )
-	    || victim->fighting
-	    || victim->position < POS_RESTING
-	    || !gsn_pull_card->usable( pch )) 
-	{
-	    act("$o1 выглядит живой, но тебе не удается дотронуться до $S руки.", pch, obj, victim, TO_CHAR);
-	    return true;
-	}
+        if (is_safe_nomessage( pch, victim )
+            || victim->fighting
+            || victim->position < POS_RESTING
+            || !gsn_pull_card->usable( pch )) 
+        {
+            act("$o1 выглядит живой, но тебе не удается дотронуться до $S руки.", pch, obj, victim, TO_CHAR);
+            return true;
+        }
 
     
-	if (pch->mana < mana) {
-	    pch->send_to("У тебя недостаточно энергии для этого.\n\r");
-	    return true;
-	}
-	else
-	    pch->mana -= mana;
+        if (pch->mana < mana) {
+            pch->send_to("У тебя недостаточно энергии для этого.\n\r");
+            return true;
+        }
+        else
+            pch->mana -= mana;
 
-	chance = quality * gsn_pull_card->getEffective( pch ) / 100;
-	chance = chance * myCard->getQuality( ) / 100;
-	chance = URANGE( 5, chance, 95 );
+        chance = quality * gsn_pull_card->getEffective( pch ) / 100;
+        chance = chance * myCard->getQuality( ) / 100;
+        chance = URANGE( 5, chance, 95 );
 
-	if (number_percent( ) >= chance) {
-	    fSuccess = false;
+        if (number_percent( ) >= chance) {
+            fSuccess = false;
 
-	    if (!IS_AFFECTED(victim, AFF_BLIND))
-		act("Тебе показалось, что картинка на $o6 пошевелилась.", 
-		     victim, myCard->getObj( ), 0, TO_CHAR);
+            if (!IS_AFFECTED(victim, AFF_BLIND))
+                act("Тебе показалось, что картинка на $o6 пошевелилась.", 
+                     victim, myCard->getObj( ), 0, TO_CHAR);
 
-	    act("$c1 не смо$gгло|г|гла пожать твою руку.", pch, 0, victim, TO_VICT);
-	    
-	    if (number_range(1, 100) < 10) {
-		act("{cТы пытаешься затащить $C4 к себе через карту, но вместо этого тащишь кого-то другого!{x",
-		    pch, 0, victim, TO_CHAR);	
-		act("$c1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
+            act("$c1 не смо$gгло|г|гла пожать твою руку.", pch, 0, victim, TO_VICT);
+            
+            if (number_range(1, 100) < 10) {
+                act("{cТы пытаешься затащить $C4 к себе через карту, но вместо этого тащишь кого-то другого!{x",
+                    pch, 0, victim, TO_CHAR);        
+                act("$c1 хватает кого-то за руку и тащит к себе.. упс..", pch, 0, 0, TO_ROOM);
 
-		multi_hit( findHorribleVictim( pch ), pch );
-	    }
-	    else {
-		act("Твоя попытка затащить $C4 к себе провалилась.", pch, 0, victim, TO_CHAR);
-	    }
-	}
-	else {
-	    fSuccess = true;
-	    
-	    act("Ты пожимаешь протянутую тебе руку.", pch, 0, victim, TO_CHAR);
-	    act("$c1 пожимает чью-то руку.", pch, 0, 0, TO_ROOM);
-	    act("{c$o1 оживает. $C1 пожимает твою руку.\r\n{x", victim, myCard->getObj( ), pch, TO_CHAR);
+                multi_hit( findHorribleVictim( pch ), pch );
+            }
+            else {
+                act("Твоя попытка затащить $C4 к себе провалилась.", pch, 0, victim, TO_CHAR);
+            }
+        }
+        else {
+            fSuccess = true;
+            
+            act("Ты пожимаешь протянутую тебе руку.", pch, 0, victim, TO_CHAR);
+            act("$c1 пожимает чью-то руку.", pch, 0, 0, TO_ROOM);
+            act("{c$o1 оживает. $C1 пожимает твою руку.\r\n{x", victim, myCard->getObj( ), pch, TO_CHAR);
 
-	    transfer_char( victim, pch, pch->in_room,
-			   "%1$^C1 сплющивается до размеров игральной карты и исчезает.",
-			   NULL,
-			   "Внезапно возникшее перед тобой плоское изображение %1$C2 постепенно обретает объем.");
+            transfer_char( victim, pch, pch->in_room,
+                           "%1$^C1 сплющивается до размеров игральной карты и исчезает.",
+                           NULL,
+                           "Внезапно возникшее перед тобой плоское изображение %1$C2 постепенно обретает объем.");
 
-	    if (victim->pet)
-		transfer_char( victim->pet, pch, pch->in_room );
-	}
-	
-	hisAttr->setContactName( "" );
-	gsn_pull_card->improve( pch, fSuccess );
-	extract_obj( myCard->getObj( ) );
-	extract_obj( obj );
+            if (victim->pet)
+                transfer_char( victim->pet, pch, pch->in_room );
+        }
+        
+        hisAttr->setContactName( "" );
+        gsn_pull_card->improve( pch, fSuccess );
+        extract_obj( myCard->getObj( ) );
+        extract_obj( obj );
     }
     else {
-	if (!hisAttr || !myCard || !gsn_pull_card->usable( victim )) 
-	    act("$C1 не сможет затащить тебя к себе через карту.", pch, 0, victim, TO_CHAR);
-	else {
-	    if (pch->mana < mana) {
-		pch->send_to("У тебя недостаточно энергии для этого.\n\r");
-		return true;
-	    }
-	    else
-		pch->mana -= mana;
+        if (!hisAttr || !myCard || !gsn_pull_card->usable( victim )) 
+            act("$C1 не сможет затащить тебя к себе через карту.", pch, 0, victim, TO_CHAR);
+        else {
+            if (pch->mana < mana) {
+                pch->send_to("У тебя недостаточно энергии для этого.\n\r");
+                return true;
+            }
+            else
+                pch->mana -= mana;
 
-	    myAttr->setContactName( victim->getName( ) );
-	    act("Ты дотрагиваешься до $o2, мысленно протягивая $M руку.", pch, obj, victim, TO_CHAR);
-	    act("$c1 дотрагивается до $o2.", pch, obj, 0, TO_ROOM);
-	    act("{cИзображение $C2 на карте оживает и протягивает тебе руку.{x", victim, 0, pch, TO_CHAR);
-	}
+            myAttr->setContactName( victim->getName( ) );
+            act("Ты дотрагиваешься до $o2, мысленно протягивая $M руку.", pch, obj, victim, TO_CHAR);
+            act("$c1 дотрагивается до $o2.", pch, obj, 0, TO_ROOM);
+            act("{cИзображение $C2 на карте оживает и протягивает тебе руку.{x", victim, 0, pch, TO_CHAR);
+        }
     }
     
     return true;
@@ -413,65 +413,65 @@ bool CardBehavior::examine( Character *looker )
     int chance, mana;
 
     if (!gsn_peek_card->usable( looker ))
-	return false;
+        return false;
 
     pch = looker->getPC( );
     
     if (getPlayerName( ).empty( )) {
-	pch->send_to( "Эта карта пуста.\r\n" );
-	return true;
+        pch->send_to( "Эта карта пуста.\r\n" );
+        return true;
     }
     
     mana = gsn_peek_card->getMana( );
     
     if (pch->mana < mana) {
-	pch->send_to("У тебя недостаточно энергии для этого.\n\r");
-	return true;
+        pch->send_to("У тебя недостаточно энергии для этого.\n\r");
+        return true;
     }
     
     pch->setWait(gsn_peek_card->getBeats( ) );
-	
+        
     victim = get_player_world( pch, getPlayerName( ).c_str( ) );
    
     if (!victim 
-	    || !pch->can_see( victim ) 
-	    || !victim->getAttributes( ).isAvailable( "cards" )) 
+            || !pch->can_see( victim ) 
+            || !victim->getAttributes( ).isAvailable( "cards" )) 
     {
-	act("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
-	return true;
+        act("$o1 выглядит мертвой.", pch, obj, 0, TO_CHAR);
+        return true;
     }
 
     if (is_safe_nomessage( pch, victim ) 
-	    || !victim->in_room
-	    || !pch->can_see( victim->in_room )) 
+            || !victim->in_room
+            || !pch->can_see( victim->in_room )) 
     {
-	act("$o1 выглядит живой, но ты не можешь сосредоточиться на мелких деталях.", pch, obj, 0, TO_CHAR);
-	return true;
+        act("$o1 выглядит живой, но ты не можешь сосредоточиться на мелких деталях.", pch, obj, 0, TO_CHAR);
+        return true;
     }
 
     chance = quality * quality * gsn_peek_card->getEffective( pch ) / 10000;
     chance = URANGE( 5, chance, 95 );
 
     if (number_percent( ) >= chance) 
-	room = get_random_room( pch );
+        room = get_random_room( pch );
     else
-	room = victim->in_room;
+        room = victim->in_room;
 
     pch->printf("По деталям заднего плана ты начинаешь узнавать место. Кажется, это '%s'.\r\n", room->name );
     gsn_peek_card->improve( pch, true );
     pch->mana -= mana;
 
     if (gsn_card_vision->getLearned( looker ) > 1) {
-	ostringstream buf;
-	
-	buf << "Тебе удается разглядеть некоторые фрагменты пейзажа более подробно:" 
-	    << endl
-	    << spoilDescription( pch, 
-		                 room->description,
-				 3 * gsn_card_vision->getEffective( pch ) / 4 );
-	pch->send_to( buf );
+        ostringstream buf;
+        
+        buf << "Тебе удается разглядеть некоторые фрагменты пейзажа более подробно:" 
+            << endl
+            << spoilDescription( pch, 
+                                 room->description,
+                                 3 * gsn_card_vision->getEffective( pch ) / 4 );
+        pch->send_to( buf );
 
-	gsn_card_vision->improve( pch, true );
+        gsn_card_vision->improve( pch, true );
     }
 
     return true; 
@@ -490,45 +490,45 @@ DLString CardBehavior::extraDescription( Character *ch, const DLString &args )
     PCMemoryInterface *victMemory;
     
     if (ch->is_npc( ) 
-	    || !is_name( args.c_str( ), obj->getName( ) )
-	    || !gsn_card_vision->getLearned( ch ) > 1)
-	return DLString::emptyString;
+            || !is_name( args.c_str( ), obj->getName( ) )
+            || !gsn_card_vision->getLearned( ch ) > 1)
+        return DLString::emptyString;
 
     victPlayer = PCharacterManager::findPlayer( getPlayerName( ) );
     victMemory = PCharacterManager::find( getPlayerName( ) );
 
     if (!victMemory)
-	return DLString::emptyString;
+        return DLString::emptyString;
 
     chance = gsn_card_vision->getEffective( ch );
     
     if (chance > 50) {
-	if (quality == 100)
-	    strQuality = "мастерское ";
-	else if (quality > 90)
-	    strQuality = "очень качественное ";
-	else if (quality > 80)
-	    strQuality = "довольно четкое ";
-	else if (quality > 70)
-	    strQuality = "не очень четкое ";
-	else if (quality > 50)
-	    strQuality = "небрежно нарисованное ";
-	else
-	    strQuality = "отвратительно прорисованное ";
+        if (quality == 100)
+            strQuality = "мастерское ";
+        else if (quality > 90)
+            strQuality = "очень качественное ";
+        else if (quality > 80)
+            strQuality = "довольно четкое ";
+        else if (quality > 70)
+            strQuality = "не очень четкое ";
+        else if (quality > 50)
+            strQuality = "небрежно нарисованное ";
+        else
+            strQuality = "отвратительно прорисованное ";
     }
     
     buf << "На карте ты видишь " 
-	<< strQuality << "изображение " 
-	<< getPlayerName( ) << ". ";
+        << strQuality << "изображение " 
+        << getPlayerName( ) << ". ";
 
     if (victPlayer || chance > 90) {
-	XMLAttributeCards::Pointer victAttr;
+        XMLAttributeCards::Pointer victAttr;
 
-	victAttr = victMemory->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
-	if (victAttr)
-	    buf << "Это " << victAttr->getFace( '1' ) << ".";
-	else
-	    buf << "Это карта неизвестной масти и достоинства.";
+        victAttr = victMemory->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
+        if (victAttr)
+            buf << "Это " << victAttr->getFace( '1' ) << ".";
+        else
+            buf << "Это карта неизвестной масти и достоинства.";
     }
 
     return buf.str( );
@@ -543,12 +543,12 @@ CardBehavior::Pointer CardBehavior::findMyCard( PCharacter *pch, PCharacter *vic
     Object *o;
 
     for (o = victim->carrying; o; o = o->next_content)
-	if (o->behavior) {
-	    CardBehavior::Pointer card= o->behavior.getDynamicPointer<CardBehavior>( );
+        if (o->behavior) {
+            CardBehavior::Pointer card= o->behavior.getDynamicPointer<CardBehavior>( );
 
-	    if (card && card->getPlayerName( ) == pch->getName( ))
-		return card;
-	}
+            if (card && card->getPlayerName( ) == pch->getName( ))
+                return card;
+        }
 
     return CardBehavior::Pointer( );
 }
@@ -560,13 +560,13 @@ DLString CardBehavior::spoilDescription( PCharacter *pch, const char *cText, int
     text.colourStrip( );
 
     for (const char *t = text.c_str( ); *t; t++) {
-	if (!ispunct( *t ) 
-	    && !dl_isspace( *t ) 
-	    && !chance( chance0 ))
-	{
-	    result.append( '.' );
-	} else
-	    result.append( *t );
+        if (!ispunct( *t ) 
+            && !dl_isspace( *t ) 
+            && !chance( chance0 ))
+        {
+            result.append( '.' );
+        } else
+            result.append( *t );
     }
 
     return result;
@@ -607,12 +607,12 @@ CardSleevesBehavior::CardSleevesBehavior( )
 bool CardSleevesBehavior::canEquip( Character *ch ) 
 {
     if (!gsn_ace_in_sleeves->usable( ch )) {
-	act("Ты пытаешься напялить $o4, но шулер из тебя никакущий..", ch, obj, 0, TO_CHAR);
-	act("$c1 пытается напялить $o4, но шулер из $x никакущий..", ch, obj, 0, TO_ROOM);
-	act("$o1 падают на землю.", ch, obj, 0, TO_ALL);
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	return false;
+        act("Ты пытаешься напялить $o4, но шулер из тебя никакущий..", ch, obj, 0, TO_CHAR);
+        act("$c1 пытается напялить $o4, но шулер из $x никакущий..", ch, obj, 0, TO_ROOM);
+        act("$o1 падают на землю.", ch, obj, 0, TO_ALL);
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        return false;
     }
 
     return true;
@@ -621,33 +621,33 @@ bool CardSleevesBehavior::canEquip( Character *ch )
 void CardSleevesBehavior::fight( Character *ch ) 
 {
     static const int plushki [] = {
-	gsn_cure_light,
-	gsn_cure_serious,
-	gsn_cure_critical,
-	gsn_heal,
-	gsn_superior_heal,
-	gsn_master_healing,
+        gsn_cure_light,
+        gsn_cure_serious,
+        gsn_cure_critical,
+        gsn_heal,
+        gsn_superior_heal,
+        gsn_master_healing,
     };
     static const int size = sizeof(plushki) / sizeof(*plushki);
 
     if (obj->wear_loc == wear_none)
-	return;
+        return;
 
     if (number_bits(3))
-	return;
+        return;
 
     if (number_percent( ) >= gsn_ace_in_sleeves->getEffective( ch )) {
-	act("{cТы пытаешься вынуть туза из $o2, но роняешь его! Упс..{x", ch, obj, 0, TO_CHAR);
-	act("{cИз $o2 $c2 выпадает туз! Шулер!{x", ch, obj, 0, TO_ROOM);
-	gsn_ace_in_sleeves->improve( ch, false );
-	ch->setWait(gsn_ace_in_sleeves->getBeats( ));
+        act("{cТы пытаешься вынуть туза из $o2, но роняешь его! Упс..{x", ch, obj, 0, TO_CHAR);
+        act("{cИз $o2 $c2 выпадает туз! Шулер!{x", ch, obj, 0, TO_ROOM);
+        gsn_ace_in_sleeves->improve( ch, false );
+        ch->setWait(gsn_ace_in_sleeves->getBeats( ));
     }
     else {
-	act("{cТы достаешь из $o2 припрятанного туза.{x", ch, obj, 0, TO_CHAR);
-	gsn_ace_in_sleeves->improve( ch, true );
-	
-	spell( plushki[number_range( 0, size - 1 )], 
-		ch->getModifyLevel( ), ch, ch, true );
+        act("{cТы достаешь из $o2 припрятанного туза.{x", ch, obj, 0, TO_CHAR);
+        gsn_ace_in_sleeves->improve( ch, true );
+        
+        spell( plushki[number_range( 0, size - 1 )], 
+                ch->getModifyLevel( ), ch, ch, true );
     }
 }
 

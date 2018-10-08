@@ -16,15 +16,15 @@ void XMLAttributePlugin::initialization( )
     PCharacterMemoryList::const_iterator i;
     const DLString& name = getName( );
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
-	 
+         
     for( i = pcm.begin(); i != pcm.end(); i++ )
     { 
-	XMLAttributes::iterator ipos;
-	XMLAttributes &attrs = i->second->getAttributes( );
+        XMLAttributes::iterator ipos;
+        XMLAttributes &attrs = i->second->getAttributes( );
 
-	for( ipos = attrs.begin( ); ipos != attrs.end( ); ipos++ )
-	    if (ipos->second->getType( ) == name)
-		ipos->second.recover( );
+        for( ipos = attrs.begin( ); ipos != attrs.end( ); ipos++ )
+            if (ipos->second->getType( ) == name)
+                ipos->second.recover( );
     }
 }
 
@@ -36,12 +36,12 @@ void XMLAttributePlugin::destruction( )
 
     for( i = pcm.begin(); i != pcm.end(); i++ )
     {
-	XMLAttributes::iterator ipos;
-	XMLAttributes &attrs = i->second->getAttributes( );
+        XMLAttributes::iterator ipos;
+        XMLAttributes &attrs = i->second->getAttributes( );
 
-	for( ipos = attrs.begin( ); ipos != attrs.end( ); ipos++ )
-	    if (ipos->second->getType( ) == name)
-		ipos->second.backup( );
+        for( ipos = attrs.begin( ); ipos != attrs.end( ); ipos++ )
+            if (ipos->second->getType( ) == name)
+                ipos->second.backup( );
     }
 }
 

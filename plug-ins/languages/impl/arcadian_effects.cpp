@@ -39,8 +39,8 @@ LIQ(water);
 bool LiquidWEBase::checkItemType( PCharacter *ch, Object *obj ) const
 {
     if (obj->item_type != ITEM_DRINK_CON) {
-	act("$o1 мало похоже на емкость для жидкости.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("$o1 мало похоже на емкость для жидкости.", ch, obj, 0, TO_CHAR);
+        return false;
     }
 
     return true;
@@ -49,13 +49,13 @@ bool LiquidWEBase::checkItemType( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 {
     if (obj->value[1] == 0) {
-	act("Слово эхом отозвалось в пустоте $o2.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("Слово эхом отозвалось в пустоте $o2.", ch, obj, 0, TO_CHAR);
+        return false;
     }
     
     if (obj->value[1] > gsn_arcadian->getEffective( ch ) * 10) {
-	act("В $o6 налито слишком много жидкости.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("В $o6 налито слишком много жидкости.", ch, obj, 0, TO_CHAR);
+        return false;
     }
     
     return true;
@@ -64,8 +64,8 @@ bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkWater( PCharacter *ch, Object *obj ) const
 {
     if (obj->value[2] != liq_water) {
-	act("Состав этой жидкости слишком сложен.", ch, 0, 0, TO_CHAR);
-	return false;
+        act("Состав этой жидкости слишком сложен.", ch, 0, 0, TO_CHAR);
+        return false;
     }
     
     return true;
@@ -80,14 +80,14 @@ bool WaterToWineWE::run( PCharacter *ch, Object *obj ) const
     Liquid *wine;
 
     if (!(checkItemType( ch, obj )
-	    && checkVolume( ch, obj )
-	    && checkWater( ch, obj )))
-	return false;
+            && checkVolume( ch, obj )
+            && checkWater( ch, obj )))
+        return false;
 
     wine = liquidManager->random( LIQF_WINE );
     obj->value[2] = wine->getIndex( );
     ch->pecho( "Вода в %O6 начинает шипеть и искриться, постепенно окрашиваясь {1%N5{2 цветом.{x", 
-	        obj, wine->getColor( ).c_str( ) );
+                obj, wine->getColor( ).c_str( ) );
     return true;
 }
 
@@ -99,14 +99,14 @@ bool WaterToBeerWE::run( PCharacter *ch, Object *obj ) const
     Liquid *beer;
 
     if (!(checkItemType( ch, obj )
-	    && checkVolume( ch, obj )
-	    && checkWater( ch, obj )))
-	return false;
+            && checkVolume( ch, obj )
+            && checkWater( ch, obj )))
+        return false;
 
     beer = liquidManager->random( LIQF_BEER );
     obj->value[2] = beer->getIndex( );
     ch->pecho( "Вода в %O6 начинает бурлить и пениться, постепенно окрашиваясь {1%N5{2 цветом.{x", 
-	        obj, beer->getColor( ).c_str( ) );
+                obj, beer->getColor( ).c_str( ) );
     return true;
 }
 
@@ -120,7 +120,7 @@ DrinkContainerWEBase::DrinkContainerWEBase( )
 void DrinkContainerWEBase::setupBehavior( PCharacter *ch, Object *obj ) const
 {
     if (obj->behavior) 
-	obj->behavior->unsetObj( );
+        obj->behavior->unsetObj( );
 
     ArcadianDrinkBehavior::Pointer bhv( NEW );
     bhv->setEffectName( Pointer( this ) );
@@ -134,16 +134,16 @@ bool DrinkContainerWEBase::checkContainer( PCharacter *ch, Object *obj ) const
     ArcadianDrinkBehavior::Pointer bhv;
 
     if (!obj->behavior)
-	return true;
+        return true;
 
     if (!( bhv = obj->behavior.getDynamicPointer<ArcadianDrinkBehavior>( ) )) {
-	act("Повлиять на эту емкость у тебя не получится.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("Повлиять на эту емкость у тебя не получится.", ch, obj, 0, TO_CHAR);
+        return false;
     }
 
     if (bhv->isActive( )) {
-	act("Жидкость в $o6 уже обладает необычными свойствами.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("Жидкость в $o6 уже обладает необычными свойствами.", ch, obj, 0, TO_CHAR);
+        return false;
     }
 
     return true;
@@ -167,19 +167,19 @@ bool WineContainerWEBase::run( PCharacter *ch, Object *obj ) const
     Liquid *liq;
     
     if (!(checkItemType( ch, obj )
-	    && checkVolume( ch, obj )
-	    && checkContainer( ch, obj )))
-	return false;
+            && checkVolume( ch, obj )
+            && checkContainer( ch, obj )))
+        return false;
     
     liq = liquidManager->find( obj->value[2] );
     if (!liq->getFlags( ).isSet( LIQF_WINE )) {
-	act("То, что налито в $o4, мало похоже на вино.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("То, что налито в $o4, мало похоже на вино.", ch, obj, 0, TO_CHAR);
+        return false;
     }
 
     setupBehavior( ch, obj );
     ch->pecho( "Разноцветные искры пробегают по поверхности %N2.", 
-		liq->getShortDescr( ).c_str( ) );
+                liq->getShortDescr( ).c_str( ) );
     return true;
 }
 
@@ -191,19 +191,19 @@ bool BeerContainerWEBase::run( PCharacter *ch, Object *obj ) const
     Liquid *liq;
 
     if (!(checkItemType( ch, obj )
-	    && checkVolume( ch, obj )
-	    && checkContainer( ch, obj )))
-	return false;
+            && checkVolume( ch, obj )
+            && checkContainer( ch, obj )))
+        return false;
     
     liq = liquidManager->find( obj->value[2] );
     if (!liq->getFlags( ).isSet( LIQF_BEER )) {
-	act("То, что налито в $o4, мало похоже на пиво.", ch, obj, 0, TO_CHAR);
-	return false;
+        act("То, что налито в $o4, мало похоже на пиво.", ch, obj, 0, TO_CHAR);
+        return false;
     }
 
     setupBehavior( ch, obj );
     ch->pecho( "Радужные блики играют в пенных пузырьках %N2.", 
-		liq->getShortDescr( ).c_str( ) );
+                liq->getShortDescr( ).c_str( ) );
     return true;
 }
 
@@ -243,12 +243,12 @@ void WineSleepWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     Affect af;
 
     if (!goodQuality( bhv )
-	    || !goodVolume( amount )
-	    || !IS_AWAKE( victim )
-	    || victim->fighting
-	    || is_safe( ch, victim ))
+            || !goodVolume( amount )
+            || !IS_AWAKE( victim )
+            || victim->fighting
+            || is_safe( ch, victim ))
     {
-	return;
+        return;
     }
 
     set_violent( ch, victim, false );
@@ -284,23 +284,23 @@ void WineAwakeWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     int slevel = 0, scount = 0;
     
     if (!goodVolume( amount ) || IS_AWAKE( victim )) {
-	victim->pecho( "Ты чувствуешь мимолетную бодрость." );
-	return;
+        victim->pecho( "Ты чувствуешь мимолетную бодрость." );
+        return;
     }
 
     for (Affect *paf = victim->affected; paf; paf = paf->next)
-	if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_SLEEP)) {
-	    slevel += paf->level;
-	    scount++;
-	}
+        if (paf->where == TO_AFFECTS && IS_SET(paf->bitvector, AFF_SLEEP)) {
+            slevel += paf->level;
+            scount++;
+        }
 
     if (scount)
-	slevel /= scount;
+        slevel /= scount;
 
     if (number_percent( ) > slevel * bhv->getQuality( ) / 100) {
-	act_p( "Ты ворочаешься во сне.", victim, 0, 0, TO_CHAR, POS_SLEEPING );
-	act( "$c1 ворочается во сне.", victim, 0, 0, TO_ROOM );
-	return;
+        act_p( "Ты ворочаешься во сне.", victim, 0, 0, TO_CHAR, POS_SLEEPING );
+        act( "$c1 ворочается во сне.", victim, 0, 0, TO_ROOM );
+        return;
     }
 
     affect_bit_strip( victim, TO_AFFECTS, AFF_SLEEP );
@@ -327,37 +327,37 @@ void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, i
 void WineCalmWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, Character *victim, int amount ) const
 {
     if (!goodQuality( bhv ) || !goodVolume( amount )) {
-	act( "Ты чувствуешь мимолетное умиротворение.", victim, 0, 0, TO_CHAR );
-	act( "$c1 на мгновение кажется более умиротворенн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
-	return;
+        act( "Ты чувствуешь мимолетное умиротворение.", victim, 0, 0, TO_CHAR );
+        act( "$c1 на мгновение кажется более умиротворенн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
+        return;
     }
     
     act( "Ты чувствуешь удивительное спокойствие.", victim, 0, 0, TO_CHAR );
     act( "$c1 выглядит невероятно умиротворенн$gым|ым|ой и спокойн$gым|ым|ой.", victim, 0, 0, TO_ROOM );
     
     if (IS_AFFECTED( victim, AFF_BERSERK ))
-	affect_bit_strip( victim, TO_AFFECTS, AFF_BERSERK );
+        affect_bit_strip( victim, TO_AFFECTS, AFF_BERSERK );
 
     if (victim->isAffected( gsn_frenzy ))
-	affect_strip( victim, gsn_frenzy );
+        affect_strip( victim, gsn_frenzy );
     
     if (victim->fighting && IS_AWAKE(victim))
-	stop_fighting( victim, false );
+        stop_fighting( victim, false );
     
     if (!IS_AFFECTED( victim, AFF_CALM )) {
-	Affect af;
+        Affect af;
 
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_calm;
-	af.level     = bhv->getQuality( );
-	af.duration  = af.level / 4;
-	af.location  = APPLY_HITROLL;
-	af.modifier  = -5;
-	af.bitvector = AFF_CALM;
-	affect_to_char(victim, &af);
+        af.where     = TO_AFFECTS;
+        af.type      = gsn_calm;
+        af.level     = bhv->getQuality( );
+        af.duration  = af.level / 4;
+        af.location  = APPLY_HITROLL;
+        af.modifier  = -5;
+        af.bitvector = AFF_CALM;
+        affect_to_char(victim, &af);
 
-	af.location = APPLY_DAMROLL;
-	affect_to_char(victim, &af);
+        af.location = APPLY_DAMROLL;
+        affect_to_char(victim, &af);
     }
 }
 
@@ -379,23 +379,23 @@ void BeerArmorWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *ch, 
     Affect af;
 
     if (!goodVolume( amount ))
-	return;
+        return;
 
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = gsn_beer_armor;
-    af.level	 = ch->getModifyLevel( ) * bhv->getQuality( ) / 100;
+    af.level         = ch->getModifyLevel( ) * bhv->getQuality( ) / 100;
     af.duration  = 10 + af.level / 5;
     af.location  = APPLY_AC;
     
     if (victim->isAffected( gsn_beer_armor )) {
-	act( "Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );
-	act( "Пивная пленка на коже $c2 становится прочнее.", victim, 0, 0, TO_ROOM );
-	af.modifier = 0;
+        act( "Пивная пленка на твоей коже становится прочнее.", victim, 0, 0, TO_CHAR );
+        act( "Пивная пленка на коже $c2 становится прочнее.", victim, 0, 0, TO_ROOM );
+        af.modifier = 0;
     }
     else {
-	act( "Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0, TO_CHAR );
-	act( "Кожа $c2 покрывается защитной пивной пленкой.", victim, 0, 0, TO_ROOM );
-	af.modifier  = -(af.level * 3 / 2);
+        act( "Твоя кожа покрывается защитной пивной пленкой.", victim, 0, 0, TO_CHAR );
+        act( "Кожа $c2 покрывается защитной пивной пленкой.", victim, 0, 0, TO_ROOM );
+        af.modifier  = -(af.level * 3 / 2);
     }
 
     affect_join( victim, &af );
@@ -414,24 +414,24 @@ void BeerElementalWE::onPourOut( ArcadianDrinkBehavior::Pointer bhv, Character *
     Object *pool = get_obj_room_vnum( ch->in_room, OBJ_VNUM_POOL );
 
     if (ch->is_npc( ))
-	return;
+        return;
 
     if (goodVolume( amount ) && goodQuality( bhv )) {
-	NPCharacter *mob = createElemental( ch->getPC( ), bhv );
+        NPCharacter *mob = createElemental( ch->getPC( ), bhv );
 
-	if (pool) {
-	    act( "$o1 начинает бурлить, рождая из себя $C4!", ch, pool, mob, TO_ALL );
-	    extract_obj( pool );
-	}
-	else
-	    act( "Из пенных брызг рождается $C1!", ch, 0, mob, TO_ALL );
+        if (pool) {
+            act( "$o1 начинает бурлить, рождая из себя $C4!", ch, pool, mob, TO_ALL );
+            extract_obj( pool );
+        }
+        else
+            act( "Из пенных брызг рождается $C1!", ch, 0, mob, TO_ALL );
 
-	if (ch->fighting) 
-	    multi_hit( mob, ch->fighting );
+        if (ch->fighting) 
+            multi_hit( mob, ch->fighting );
     }
     else {
-	if (pool)
-	    act( "$o1 яростно булькает, но ничего не происходит.", ch, pool, 0, TO_ALL );
+        if (pool)
+            act( "$o1 яростно булькает, но ничего не происходит.", ch, pool, 0, TO_ALL );
     }
 }
 
@@ -452,15 +452,15 @@ NPCharacter * BeerElementalWE::createElemental( PCharacter *ch, ArcadianDrinkBeh
     mob = create_mobile( get_mob_index( MOB_VNUM_BEER_ELEMENTAL ) );
 
     for (int i = 0; i < stat_table.size; i++)
-	mob->perm_stat[i] = ch->getCurrStat( i );
+        mob->perm_stat[i] = ch->getCurrStat( i );
 
     mob->hit = mob->max_hit = 10 * ch->perm_hit + 40 * level;
     mob->mana = mob->max_mana = 100;
     mob->setLevel( level );
     
     for (int i = 0; i < 4; i++)
-	mob->armor[i] = interpolate( mob->getRealLevel( ), 100, -100 );
-	    
+        mob->armor[i] = interpolate( mob->getRealLevel( ), 100, -100 );
+            
     mob->damage[DICE_NUMBER] = level / 10 + 3;
     mob->damage[DICE_TYPE] = mob->damage[DICE_NUMBER];
     mob->damage[DICE_BONUS] = level / 2 + 10;

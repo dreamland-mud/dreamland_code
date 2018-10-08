@@ -19,24 +19,24 @@
 class XMLByte : public Byte
 {
 public:
-	/** По умолчанию значение 0 */
-	inline XMLByte( ) : Byte( )
-	{
-	}
-	
-	inline XMLByte( unsigned char value ) : Byte( value )
-	{
-	}
-	
-	inline XMLByte( const DLString& value ) throw( ExceptionBadType )
-		: Byte( value )
-	{
-	}
+        /** По умолчанию значение 0 */
+        inline XMLByte( ) : Byte( )
+        {
+        }
+        
+        inline XMLByte( unsigned char value ) : Byte( value )
+        {
+        }
+        
+        inline XMLByte( const DLString& value ) throw( ExceptionBadType )
+                : Byte( value )
+        {
+        }
 
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** Возвращает xml представление переменной */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** Инициализация класса из xml данных */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
@@ -45,8 +45,8 @@ public:
 /** Вывод в ostream типа XMLByte */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLByte& xmlByte )
 {
-	ostr << xmlByte.getValue( );
-	return ostr;
+        ostr << xmlByte.getValue( );
+        return ostr;
 }
 
 #endif

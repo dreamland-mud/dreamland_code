@@ -27,7 +27,7 @@ using Scripting::NativeHandler;
 class CommandWrapper : public PluginNativeImpl<CommandWrapper>, 
                        public NativeHandler,
                        public DefaultCommand, 
-		       public virtual XMLVariableContainer
+                       public virtual XMLVariableContainer
 {
 XML_OBJECT
 NMI_OBJECT

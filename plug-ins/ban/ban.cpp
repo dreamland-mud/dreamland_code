@@ -45,9 +45,9 @@ const DLString BanManager::FILE_NAME = "ban.xml";
 const DLString BanManager::NODE_NAME = "banlist";
 
 BanManager::BanManager( ) 
-		: banFile( DLFile( dreamland->getDbDir( ), FILE_NAME ).getPath( ),
-		           NODE_NAME,
-			   this )
+                : banFile( DLFile( dreamland->getDbDir( ), FILE_NAME ).getPath( ),
+                           NODE_NAME,
+                           this )
 {
     checkDuplicate( banManager );
     banManager = this;
@@ -62,7 +62,7 @@ BanManager::~BanManager()
 void BanManager::initialization( )
 {
     if (banFile.load( ))
-	LogStream::sendNotice( ) << "Loaded " << size( ) << " ban patterns..." << endl;
+        LogStream::sendNotice( ) << "Loaded " << size( ) << " ban patterns..." << endl;
 
     SchedulerTaskRoundPlugin::initialization( );
 }
@@ -78,7 +78,7 @@ bool BanManager::checkExpire( const Ban &b )
     time_t exp = b.expire.getTime( );
 
     if (exp == 0)
-	return false;
+        return false;
 
     return exp < dreamland->getCurrentTime( );
 }
@@ -87,12 +87,12 @@ void BanManager::run( )
 {
     iterator i = std::remove_if(
                      begin( ), 
-		     end( ), 
-		     std::ptr_fun( &checkExpire ) );
+                     end( ), 
+                     std::ptr_fun( &checkExpire ) );
 
     if (i != end( )) {
-	erase( i, end( ) );
-	save( );
+        erase( i, end( ) );
+        save( );
     }
 }
 
@@ -121,11 +121,11 @@ bool BanManager::set(const DLString &patt, int flags, const Date &exp)
     b.expire = exp;
 
     for(i = begin(); i != end(); i++)
-	if(i->pattern.getValue() == patt)
-	    *i = b;
+        if(i->pattern.getValue() == patt)
+            *i = b;
     
     if(i == end())
-	push_back(b);
+        push_back(b);
 
     save( );
     
@@ -137,10 +137,10 @@ bool BanManager::del(const DLString &patt)
     iterator i;
     
     for(i = begin(); i != end(); i++)
-	if(i->pattern.getValue() == patt) {
-	    erase(i);
-	    return true;
-	}
+        if(i->pattern.getValue() == patt) {
+            erase(i);
+            return true;
+        }
     
     save( );
     return false;
@@ -149,7 +149,7 @@ bool BanManager::del(const DLString &patt)
 bool BanManager::del(int idx)
 {
     if(idx < 0 || idx >= (int)size())
-	return false;
+        return false;
     
     erase(begin() + idx);
 
@@ -162,8 +162,8 @@ bool BanManager::check( const DLString &host, int flags ) const
     const_iterator i;
     
     for (i = begin(); i != end(); i++)
-	if (i->flags.getValue( ) == flags && i->match(host)) 
-	    return true;
+        if (i->flags.getValue( ) == flags && i->match(host)) 
+            return true;
 
     return false;
 }
@@ -173,17 +173,17 @@ bool BanManager::check( Descriptor *d, int flags ) const
     ViaVector::iterator i;
     
     if (check(d->host, flags))
-	return true;
+        return true;
     
     if (check(d->realip, flags))
-	return true;
+        return true;
     
     for (i = d->via.begin(); i != d->via.end(); i++) {
-	if (check(inet_ntoa(i->first), flags))
-	    return true;
-	
-	if (check(i->second.c_str(), flags))
-	    return true;
+        if (check(inet_ntoa(i->first), flags))
+            return true;
+        
+        if (check(i->second.c_str(), flags))
+            return true;
     }
 
     return false;
@@ -192,24 +192,24 @@ bool BanManager::check( Descriptor *d, int flags ) const
 bool BanManager::checkVerbose( Descriptor *d, int flags ) const
 {
     if (!check( d, flags ))
-	return false;
+        return false;
 
     switch (flags) {
     case BAN_ALL:
-	d->send("Your site has been banned from this mud.\n\r");
-	break;
+        d->send("Your site has been banned from this mud.\n\r");
+        break;
 
     case BAN_NEWBIES:
-	d->send("New players are not allowed from your site.\n\r");
-	break;
+        d->send("New players are not allowed from your site.\n\r");
+        break;
 
     case BAN_PLAYER:
-	d->send("Your site has been banned for players.\n\r");
-	break;
+        d->send("Your site has been banned for players.\n\r");
+        break;
 
     case BAN_CONFIRM:
-	d->send("Players from your site cannot request confirmation.\n\r");
-	break;
+        d->send("Players from your site cannot request confirmation.\n\r");
+        break;
     }
 
     return true;

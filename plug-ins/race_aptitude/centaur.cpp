@@ -41,8 +41,8 @@ public:
 };
 
 RearKickOneHit::RearKickOneHit( Character *ch, Character *victim )
-	    : Damage( ch, victim, 0, 0 ), OneHit( ch, victim ),
-	      SkillDamage( ch, victim, gsn_rear_kick, 0, 0, DAMF_WEAPON )
+            : Damage( ch, victim, 0, 0 ), OneHit( ch, victim ),
+              SkillDamage( ch, victim, gsn_rear_kick, 0, 0, DAMF_WEAPON )
 {
 }
 
@@ -72,8 +72,8 @@ void RearKickOneHit::calcDamage( )
     gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
     damApplyPosition( );
     dam = ( ch->getModifyLevel( ) < 50)
-	? ( ch->getModifyLevel( ) / 10 + 1) * dam + ch->getModifyLevel( )
-	: ( ch->getModifyLevel( ) / 10 ) * dam + ch->getModifyLevel( );
+        ? ( ch->getModifyLevel( ) / 10 + 1) * dam + ch->getModifyLevel( )
+        : ( ch->getModifyLevel( ) / 10 ) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
 
     OneHit::calcDamage( );
@@ -94,22 +94,22 @@ SKILL_DECL( rearkick );
 BOOL_SKILL( rearkick )::run( Character *ch, Character *victim ) 
 {
     if (!IS_AWAKE( victim ))
-	return false;
+        return false;
 
     if (number_percent( ) > 33
-	|| number_percent( ) >= gsn_rear_kick->getEffective( victim )) 
+        || number_percent( ) >= gsn_rear_kick->getEffective( victim )) 
     {
-	gsn_rear_kick->improve( victim, false, ch );
-	return false;
+        gsn_rear_kick->improve( victim, false, ch );
+        return false;
     }
    
     try {
-	RearKickOneHit( victim, ch ).hit( );
-	gsn_rear_kick->improve( victim, true, ch );
-	
-	yell_panic( victim, ch,
-		    "Помогите! Кто-то ударил меня копытом по голове!",
-		    "Помогите! %1$^C1 удари%1$Gло|л|ла меня копытом по голове!" );
+        RearKickOneHit( victim, ch ).hit( );
+        gsn_rear_kick->improve( victim, true, ch );
+        
+        yell_panic( victim, ch,
+                    "Помогите! Кто-то ударил меня копытом по голове!",
+                    "Помогите! %1$^C1 удари%1$Gло|л|ла меня копытом по голове!" );
     }
     catch (const VictimDeathException& e) {                                     
     }

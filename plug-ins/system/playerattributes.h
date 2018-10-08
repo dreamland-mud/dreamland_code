@@ -22,14 +22,14 @@ struct ScoreArguments {
     {
     }
 
-	
+        
     PCharacter *pch;
     list<DLString> &lines;
 };
 
 struct DeathArguments {
     DeathArguments( PCharacter *ch, Character *k )
-	    : pch( ch ), killer( k )
+            : pch( ch ), killer( k )
     {
     }
     
@@ -39,7 +39,7 @@ struct DeathArguments {
 
 struct RemortArguments {
     RemortArguments( PCharacter *ch, XMLAttributes *n )
-	    : pch( ch ), newAttributes( n )
+            : pch( ch ), newAttributes( n )
     {
     }
     

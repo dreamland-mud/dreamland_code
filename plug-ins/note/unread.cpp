@@ -24,16 +24,16 @@ COMMAND(Unread, "unread")
     DLString args = constArguments;
     
     if (ch->is_npc( ))
-	return;
+        return;
     
     pch = ch->getPC( );
     
     if (args.empty( )) {
-	doSpool( pch, true );
-	doUnfinished( pch );
+        doSpool( pch, true );
+        doUnfinished( pch );
     }
     else if (arg_oneof( args, "next", "следующий", "дальше" ))
-	doNext( pch );
+        doNext( pch );
 }
 
 void Unread::doSpool( PCharacter *ch, bool fVerbose )
@@ -43,19 +43,19 @@ void Unread::doSpool( PCharacter *ch, bool fVerbose )
     const NoteManager::Threads &th = NoteManager::getThis( )->getThreads( );
 
     for (i = th.begin( ); i != th.end( ); i++) {
-	int count = i->second->countSpool( ch );
+        int count = i->second->countSpool( ch );
 
-	if (count > 0)
-	    i->second->getUnreadMessage( count, buf );
+        if (count > 0)
+            i->second->getUnreadMessage( count, buf );
     }
 
     if (!buf.str( ).empty( )) {
         if (!fVerbose)
             ch->send_to( "\r\n" );
-	ch->send_to( buf );
+        ch->send_to( buf );
     }
     else if (fVerbose)
-	ch->println("У тебя нет непрочитанных сообщений.");
+        ch->println("У тебя нет непрочитанных сообщений.");
 }
 
 
@@ -67,13 +67,13 @@ void Unread::doUnfinished( PCharacter *ch )
     attr = ch->getAttributes( ).findAttr<XMLAttributeNoteData>( "notedata" );
 
     if (attr)
-	for (i = attr->begin( ); i != attr->end( ); i++) {
-	    const DLString &threadName = i->second.getThreadName( );
-	    NoteThread::Pointer thread = NoteManager::getThis( )->findThread( threadName );
+        for (i = attr->begin( ); i != attr->end( ); i++) {
+            const DLString &threadName = i->second.getThreadName( );
+            NoteThread::Pointer thread = NoteManager::getThis( )->findThread( threadName );
 
-	    ch->pecho("Ты не закончи%Gло|л|ла писать {W%N4{x!", 
-	              ch, thread ? thread->getRussianThreadName( ).c_str( ) : threadName.c_str( ) );
-	}
+            ch->pecho("Ты не закончи%Gло|л|ла писать {W%N4{x!", 
+                      ch, thread ? thread->getRussianThreadName( ).c_str( ) : threadName.c_str( ) );
+        }
 }
 
 void Unread::doNext( PCharacter *ch )
@@ -86,24 +86,24 @@ void Unread::doNext( PCharacter *ch )
     time_t minStamp = 2000000000, stamp;
 
     for (i = th.begin( ); i != th.end( ); i++) {
-	const Note *note = i->second->getNextUnreadNote( ch );
+        const Note *note = i->second->getNextUnreadNote( ch );
 
-	if (note) {
-	    stamp = note->getID( );
+        if (note) {
+            stamp = note->getID( );
 
-	    if (stamp <= minStamp) {
-		minStamp = stamp;
-		oldest = *i->second;
-		onote = note;
-	    }
-	}
+            if (stamp <= minStamp) {
+                minStamp = stamp;
+                oldest = *i->second;
+                onote = note;
+            }
+        }
     }
 
     if (!oldest) 
-	ch->println("У тебя нет непрочитанных сообщений.");
+        ch->println("У тебя нет непрочитанных сообщений.");
     else {
-	ch->printf( "{W%s{x:\r\n", oldest->getName( ).c_str( ) );
-	oldest->showNoteToChar( ch, onote );
+        ch->printf( "{W%s{x:\r\n", oldest->getName( ).c_str( ) );
+        oldest->showNoteToChar( ch, onote );
     }
 }
 
@@ -116,25 +116,25 @@ void UnreadListener::run( int oldState, int newState, Descriptor *d )
     PCharacter *ch;
 
     if (!d->character || !( ch = d->character->getPC( ) ))
-	return;
+        return;
     
     if (oldState == CON_CREATE_DONE && ch->getRemorts( ).size( ) == 0) {
-	time_t stamp;
-	XMLAttributeLastRead::Pointer attr;
-	NoteManager::Threads::const_iterator i;
-	const NoteManager::Threads &th = NoteManager::getThis( )->getThreads( );
+        time_t stamp;
+        XMLAttributeLastRead::Pointer attr;
+        NoteManager::Threads::const_iterator i;
+        const NoteManager::Threads &th = NoteManager::getThis( )->getThreads( );
 
-	stamp = dreamland->getCurrentTime( ) - 2 * Date::SECOND_IN_MONTH; // 2 months ago
-	attr = ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" );
-	
-	for (i = th.begin( ); i != th.end( ); i++) 
-	    if (i->second->canRead( ch )) 
-		attr->setStamp( *i->second, stamp );
-	    
+        stamp = dreamland->getCurrentTime( ) - 2 * Date::SECOND_IN_MONTH; // 2 months ago
+        attr = ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" );
+        
+        for (i = th.begin( ); i != th.end( ); i++) 
+            if (i->second->canRead( ch )) 
+                attr->setStamp( *i->second, stamp );
+            
     }
     else if (newState == CON_PLAYING) {
-	Unread::doSpool( ch, false );
-	Unread::doUnfinished( ch );
+        Unread::doSpool( ch, false );
+        Unread::doUnfinished( ch );
     }
 }
 

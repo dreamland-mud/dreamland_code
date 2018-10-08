@@ -16,16 +16,16 @@ XML_OBJECT
 public: 
         typedef ::Pointer<XMLAttributeGangsters> Pointer;
     
-	XMLAttributeGangsters( );
+        XMLAttributeGangsters( );
 
-	int getKilled( ) const;
-	void setKilled( int );
-	void setJoined( );
-	virtual bool isJoined( ) const;
+        int getKilled( ) const;
+        void setKilled( int );
+        void setJoined( );
+        virtual bool isJoined( ) const;
 
-private:	
-	XML_VARIABLE XMLInteger killed;
-	XML_VARIABLE XMLBoolean joined;
+private:        
+        XML_VARIABLE XMLInteger killed;
+        XML_VARIABLE XMLBoolean joined;
 };
 
 

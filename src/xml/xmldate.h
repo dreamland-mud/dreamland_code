@@ -22,48 +22,48 @@
 class XMLDate : public Date
 {
 public:
-	/** По умолчанию значение 0 */
-	inline XMLDate( ) 
-	{
-	}
-	
-	inline XMLDate( long time ) : Date( time )
-	{
-	}
-	
-	inline XMLDate& operator = ( const Date& newDate )
-	{
-		time = newDate.getTime( );
-		return *this;
-	}
+        /** По умолчанию значение 0 */
+        inline XMLDate( ) 
+        {
+        }
+        
+        inline XMLDate( long time ) : Date( time )
+        {
+        }
+        
+        inline XMLDate& operator = ( const Date& newDate )
+        {
+                time = newDate.getTime( );
+                return *this;
+        }
 
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** Возвращает xml представление переменной */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** Инициализация класса из xml данных */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
 class XMLDateNoEmpty : public XMLDate
 {
 public:
-	inline XMLDateNoEmpty( ) 
-	{
-	}
-	
-	inline XMLDateNoEmpty( long time ) : XMLDate( time )
-	{
-	}
-	
-	bool toXML( XMLNode::Pointer& node ) const;
+        inline XMLDateNoEmpty( ) 
+        {
+        }
+        
+        inline XMLDateNoEmpty( long time ) : XMLDate( time )
+        {
+        }
+        
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 
 /** Вывод в ostream типа XMLDate */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLDate& xmlDate )
 {
-	ostr << xmlDate.getTimeAsString( );
-	return ostr;
+        ostr << xmlDate.getTimeAsString( );
+        return ostr;
 }
 
 #endif

@@ -38,7 +38,7 @@ public:
     virtual void run( );
     virtual void after( );
     virtual int getPriority( ) const;
-	
+        
     
     void registrate( GlobalQuestInfo * );
     void unregistrate( GlobalQuestInfo * );
@@ -59,7 +59,7 @@ public:
     void removeRT( GlobalQuest * );
 
     static inline GlobalQuestManager* getThis( ) {
-	return thisClass;
+        return thisClass;
     }
     
 private:

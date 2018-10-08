@@ -43,12 +43,12 @@ Object* ObjectManager::getObject( )
     
     if( !extractList.empty( ) )
     {
-	object = *extractList.begin( );
-	extractList.erase( extractList.begin( ) );
+        object = *extractList.begin( );
+        extractList.erase( extractList.begin( ) );
     }
     else
     {
-	object = dallocate( Object );
+        object = dallocate( Object );
     }
     
     object->setID( dreamland->genID( ) );

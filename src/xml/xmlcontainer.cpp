@@ -13,10 +13,10 @@ XMLContainer::fromXML( const XMLNode::Pointer & parent ) throw( ExceptionBadType
     const XMLNode::NodeList& children = parent->getNodeList( );
 
     for (ipos = children.begin( ); ipos != children.end( ); ipos++) 
-	if (!nodeFromXML( *ipos )) 
-	    LogStream::sendWarning( ) 
-		<< "Unparsed node <" << parent->getName( ) 
-		<< "> <" << (*ipos)->getName( ) 
-		<< "> mytype " << typeid( this ).name( ) << endl;
-//	    throw ExceptionBadType( parent->getName( ), (*ipos)->getName( ) );
+        if (!nodeFromXML( *ipos )) 
+            LogStream::sendWarning( ) 
+                << "Unparsed node <" << parent->getName( ) 
+                << "> <" << (*ipos)->getName( ) 
+                << "> mytype " << typeid( this ).name( ) << endl;
+//            throw ExceptionBadType( parent->getName( ), (*ipos)->getName( ) );
 }

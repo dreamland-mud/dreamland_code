@@ -55,57 +55,57 @@ inline
 Register::Register(const char *c) 
 {
     if(c)
-	safeSet(DLString(c));
+        safeSet(DLString(c));
     else
-	type = NONE;
+        type = NONE;
 }
 
 inline
 Register::Register(Closure *c) 
 {
     if(c) {
-	value.function = c;
-	value.function->link();
-	type = FUNCTION;
+        value.function = c;
+        value.function->link();
+        type = FUNCTION;
     } else
-	type = NONE;
+        type = NONE;
 }
 
 inline
 Register::Register(Object *o) 
 {
     if(o) {
-	value.object = o;
-	value.object->link();
-	type = OBJECT;
+        value.object = o;
+        value.object->link();
+        type = OBJECT;
     } else
-	type = NONE;
+        type = NONE;
 }
 
 inline
 Register::Register(const Register &r) : type(r.type) 
 {
     switch(type) {
-	case NUMBER:
-	    value.number = r.value.number;
-	    break;
-	case IDENTIFIER:
-	    value.identifier = r.value.identifier;
-	    break;
-	case STRING:
-	    strNew( );
-	    *strPtr( ) = *r.strPtr( );
-	    break;
-	case OBJECT:
-	    value.object = r.value.object;
-	    value.object->link();
-	    break;
-	case FUNCTION:
-	    value.function = r.value.function;
-	    value.function->link();
-	    break;
-	default:
-	    type = r.type;
+        case NUMBER:
+            value.number = r.value.number;
+            break;
+        case IDENTIFIER:
+            value.identifier = r.value.identifier;
+            break;
+        case STRING:
+            strNew( );
+            *strPtr( ) = *r.strPtr( );
+            break;
+        case OBJECT:
+            value.object = r.value.object;
+            value.object->link();
+            break;
+        case FUNCTION:
+            value.function = r.value.function;
+            value.function->link();
+            break;
+        default:
+            type = r.type;
     }
 }
 
@@ -180,24 +180,24 @@ const Register &
 Register::operator = (const Register &r) 
 {
     switch(r.type) {
-	case NUMBER:
-	    set(r.value.number);
-	    break;
-	case IDENTIFIER:
-	    set(r.value.identifier);
-	    break;
-	case STRING:
-	    set(*r.strPtr( ));
-	    break;
-	case OBJECT:
-	    set(r.value.object);
-	    break;
-	case FUNCTION:
-	    set(r.value.function);
-	    break;
-	default:
-	    release();
-	    type = r.type;
+        case NUMBER:
+            set(r.value.number);
+            break;
+        case IDENTIFIER:
+            set(r.value.identifier);
+            break;
+        case STRING:
+            set(*r.strPtr( ));
+            break;
+        case OBJECT:
+            set(r.value.object);
+            break;
+        case FUNCTION:
+            set(r.value.function);
+            break;
+        default:
+            release();
+            type = r.type;
     }
     return *this;
 }
@@ -228,17 +228,17 @@ void
 Register::release() 
 {
     switch(type) {
-	case STRING:
-	    strPtr( )->~FeniaString( );
-	    break;
-	case OBJECT:
-	    value.object->unlink();
-	    break;
-	case FUNCTION:
-	    value.function->unlink();
-	    break;
-	default:
-	    ;
+        case STRING:
+            strPtr( )->~FeniaString( );
+            break;
+        case OBJECT:
+            value.object->unlink();
+            break;
+        case FUNCTION:
+            value.function->unlink();
+            break;
+        default:
+            ;
     }
     type = NONE;
 }
@@ -312,12 +312,12 @@ inline
 void 
 Register::set(Closure *a) { 
     if(a) {
-	a->link();
-	release();
-	safeSet(a);
+        a->link();
+        release();
+        safeSet(a);
     } else {
-	release();
-	type = NONE;
+        release();
+        type = NONE;
     }
 }
 
@@ -325,12 +325,12 @@ inline
 void 
 Register::set(Object *a) {
     if(a) {
-	a->link();
-	release();
-	safeSet(a);
+        a->link();
+        release();
+        safeSet(a);
     } else {
-	release();
-	type = NONE;
+        release();
+        type = NONE;
     }
 }
 
@@ -347,12 +347,12 @@ inline const Register
 Register::operator + (const Register &r) const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number + r.toNumber();
-	case STRING:
-	    return DLString(*strPtr( ) + r.toString());
-	default:
-	    throw NotImplementedException();
+        case NUMBER:
+            return value.number + r.toNumber();
+        case STRING:
+            return DLString(*strPtr( ) + r.toString());
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -361,7 +361,7 @@ inline const Register
 Register::operator * (const Register &r) const
 {
     if(type == NUMBER)
-	return value.number * r.toNumber();
+        return value.number * r.toNumber();
     
     throw NotImplementedException();
 }
@@ -370,7 +370,7 @@ inline const Register
 Register::operator - (const Register &r) const
 {
     if(type == NUMBER)
-	return value.number - r.toNumber();
+        return value.number - r.toNumber();
     
     throw NotImplementedException();
 }
@@ -379,12 +379,12 @@ inline const Register
 Register::operator / (const Register &r) const
 {
     if(type == NUMBER) {
-	int d = r.toNumber();
+        int d = r.toNumber();
 
-	if(d == 0)
-	    throw DivisionByZero();
-	    
-	return value.number / d;
+        if(d == 0)
+            throw DivisionByZero();
+            
+        return value.number / d;
     }
     
     throw NotImplementedException();
@@ -394,7 +394,7 @@ inline const Register
 Register::operator & (const Register &r) const
 {
     if(type == NUMBER)
-	return value.number & r.toNumber();
+        return value.number & r.toNumber();
     
     throw NotImplementedException();
 }
@@ -403,7 +403,7 @@ inline const Register
 Register::operator | (const Register &r) const
 {
     if(type == NUMBER)
-	return value.number | r.toNumber();
+        return value.number | r.toNumber();
     
     throw NotImplementedException();
 }
@@ -412,12 +412,12 @@ inline const Register
 Register::operator % (const Register &r) const
 {
     if(type == NUMBER) {
-	int d = r.toNumber();
+        int d = r.toNumber();
 
-	if(d == 0)
-	    throw DivisionByZero();
-	    
-	return value.number % d;
+        if(d == 0)
+            throw DivisionByZero();
+            
+        return value.number % d;
     }
     
     throw NotImplementedException();
@@ -427,7 +427,7 @@ inline const Register
 Register::operator ^ (const Register &r) const
 {
     if(type == NUMBER)
-	return value.number ^ r.toNumber();
+        return value.number ^ r.toNumber();
     
     throw NotImplementedException();
 }
@@ -437,21 +437,21 @@ inline const Register
 Register::operator == (const Register &r) const
 {
     if(type == NONE || r.type == NONE)
-	return type == r.type;
+        return type == r.type;
 
     switch(type) {
-	case NUMBER:
-	    return value.number == r.toNumber();
-	case IDENTIFIER:
-	    return value.identifier == r.toIdentifier();
-	case STRING:
-	    return *strPtr( ) == r.toString();
-	case OBJECT:
-	    return value.object == r.toObject();
-	case FUNCTION:
-	    return value.function == r.toFunction();
-	default:
-	    throw NotImplementedException();
+        case NUMBER:
+            return value.number == r.toNumber();
+        case IDENTIFIER:
+            return value.identifier == r.toIdentifier();
+        case STRING:
+            return *strPtr( ) == r.toString();
+        case OBJECT:
+            return value.object == r.toObject();
+        case FUNCTION:
+            return value.function == r.toFunction();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -459,23 +459,23 @@ inline const Register
 Register::operator != (const Register &r) const
 {
     if(type == NONE || r.type == NONE)
-	return type != r.type;
+        return type != r.type;
 
     switch(type) {
-	case NONE:
-	    return r.type != NONE;
-	case NUMBER:
-	    return value.number != r.toNumber();
-	case IDENTIFIER:
-	    return value.identifier != r.toIdentifier();
-	case STRING:
-	    return *strPtr( ) != r.toString();
-	case OBJECT:
-	    return value.object != r.toObject();
-	case FUNCTION:
-	    return value.function != r.toFunction();
-	default:
-	    throw NotImplementedException();
+        case NONE:
+            return r.type != NONE;
+        case NUMBER:
+            return value.number != r.toNumber();
+        case IDENTIFIER:
+            return value.identifier != r.toIdentifier();
+        case STRING:
+            return *strPtr( ) != r.toString();
+        case OBJECT:
+            return value.object != r.toObject();
+        case FUNCTION:
+            return value.function != r.toFunction();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -483,14 +483,14 @@ inline const Register
 Register::operator > (const Register &r) const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number > r.toNumber();
-	case IDENTIFIER:
-	    return value.identifier > r.toIdentifier();
-	case STRING:
-	    return *strPtr( ) > r.toString();
-	default:
-	    throw NotImplementedException();
+        case NUMBER:
+            return value.number > r.toNumber();
+        case IDENTIFIER:
+            return value.identifier > r.toIdentifier();
+        case STRING:
+            return *strPtr( ) > r.toString();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -498,14 +498,14 @@ inline const Register
 Register::operator < (const Register &r) const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number < r.toNumber();
-	case IDENTIFIER:
-	    return value.identifier < r.toIdentifier();
-	case STRING:
-	    return *strPtr( ) < r.toString();
-	default:
-	    throw NotImplementedException();
+        case NUMBER:
+            return value.number < r.toNumber();
+        case IDENTIFIER:
+            return value.identifier < r.toIdentifier();
+        case STRING:
+            return *strPtr( ) < r.toString();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -513,14 +513,14 @@ inline const Register
 Register::operator >= (const Register &r) const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number >= r.toNumber();
-	case IDENTIFIER:
-	    return value.identifier >= r.toIdentifier();
-	case STRING:
-	    return *strPtr( ) >= r.toString();
-	default:
-	    throw NotImplementedException();
+        case NUMBER:
+            return value.number >= r.toNumber();
+        case IDENTIFIER:
+            return value.identifier >= r.toIdentifier();
+        case STRING:
+            return *strPtr( ) >= r.toString();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -528,14 +528,14 @@ inline const Register
 Register::operator <= (const Register &r) const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number <= r.toNumber();
-	case IDENTIFIER:
-	    return value.identifier <= r.toIdentifier();
-	case STRING:
-	    return *strPtr( ) <= r.toString();
-	default:
-	    throw NotImplementedException();
+        case NUMBER:
+            return value.number <= r.toNumber();
+        case IDENTIFIER:
+            return value.identifier <= r.toIdentifier();
+        case STRING:
+            return *strPtr( ) <= r.toString();
+        default:
+            throw NotImplementedException();
     }
 }
 
@@ -574,12 +574,12 @@ inline int
 Register::toNumber() const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number;
-	case STRING:
-	    return strPtr( )->toInt();
-	default:
-	    throw InvalidCastException("number", getTypeName());
+        case NUMBER:
+            return value.number;
+        case STRING:
+            return strPtr( )->toInt();
+        default:
+            throw InvalidCastException("number", getTypeName());
     }
 }
 
@@ -587,25 +587,25 @@ inline Lex::id_t
 Register::toIdentifier() const 
 {
     if(type == IDENTIFIER)
-	return value.identifier;
+        return value.identifier;
     else
-	throw InvalidCastException("identifier", getTypeName());
+        throw InvalidCastException("identifier", getTypeName());
 }
 
 inline DLString
 Register::toString() const
 {
     switch(type) {
-	case NUMBER:
-	    return Integer(value.number).toString();
-	case IDENTIFIER:
-	    return Lex::getThis()->getName(value.identifier);
-	case STRING:
-	    return *strPtr( );
-	case FUNCTION:
-	    return value.function->toString();
-	default:
-	    throw InvalidCastException("string", getTypeName());
+        case NUMBER:
+            return Integer(value.number).toString();
+        case IDENTIFIER:
+            return Lex::getThis()->getName(value.identifier);
+        case STRING:
+            return *strPtr( );
+        case FUNCTION:
+            return value.function->toString();
+        default:
+            throw InvalidCastException("string", getTypeName());
     }
 }
 
@@ -630,18 +630,18 @@ inline Object *
 Register::toObject() const
 {
     if(type == OBJECT)
-	return value.object;
+        return value.object;
     else
-	throw InvalidCastException("object", getTypeName());
+        throw InvalidCastException("object", getTypeName());
 }
 
 inline Closure *
 Register::toFunction() const
 {
     if(type == FUNCTION)
-	return value.function;
+        return value.function;
     else
-	throw InvalidCastException("function", getTypeName());
+        throw InvalidCastException("function", getTypeName());
 }
 
 inline Handler::Pointer
@@ -654,12 +654,12 @@ inline bool
 Register::toBoolean() const
 {
     switch(type) {
-	case NUMBER:
-	    return value.number != 0;
-	case STRING:
-	    return !strPtr( )->empty();
-	default:
-	    throw InvalidCastException("boolean", getTypeName());
+        case NUMBER:
+            return value.number != 0;
+        case STRING:
+            return !strPtr( )->empty();
+        default:
+            throw InvalidCastException("boolean", getTypeName());
     }
 }
 }

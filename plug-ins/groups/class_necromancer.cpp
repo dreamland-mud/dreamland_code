@@ -46,37 +46,37 @@
 SPELL_DECL(PowerWordKill);
 VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	int dam;
+        int dam;
 
-	if ( victim->fighting )
-	{
-		ch->send_to("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.\n\r");
-		return;
-	}
+        if ( victim->fighting )
+        {
+                ch->send_to("Ты не можешь сосредоточиться.. Жертва слишком быстро движется.\n\r");
+                return;
+        }
 
-	ch->setWait( skill->getBeats( ) );
+        ch->setWait( skill->getBeats( ) );
 
-	act_p("Поток мрака, созданный тобой, окутывает $C4.",
-		ch, 0, victim, TO_CHAR, POS_RESTING);
-	act_p("$c1 создает поток мрака, окутывая $C4.",
-		ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	act_p("$C1 создает поток мрака, окутывая тебя.",
-		victim, 0, ch, TO_CHAR, POS_RESTING);
+        act_p("Поток мрака, созданный тобой, окутывает $C4.",
+                ch, 0, victim, TO_CHAR, POS_RESTING);
+        act_p("$c1 создает поток мрака, окутывая $C4.",
+                ch, 0, victim, TO_NOTVICT, POS_RESTING);
+        act_p("$C1 создает поток мрака, окутывая тебя.",
+                victim, 0, ch, TO_CHAR, POS_RESTING);
 
-	if ( victim->is_immortal()
-		|| saves_spell(level,victim,DAM_MENTAL, ch, DAMF_SPELL)
-		|| number_percent () > 50 )
-	{
-		dam = dice( level , 24 ) ;
-		damage(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_SPELL);
-		return;
-	}
+        if ( victim->is_immortal()
+                || saves_spell(level,victim,DAM_MENTAL, ch, DAMF_SPELL)
+                || number_percent () > 50 )
+        {
+                dam = dice( level , 24 ) ;
+                damage(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_SPELL);
+                return;
+        }
 
-	victim->send_to("Тебя {RУБИЛИ{x!\n\r");
+        victim->send_to("Тебя {RУБИЛИ{x!\n\r");
 
-	group_gain( ch, victim );
-	raw_kill( victim, -1, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-	pk_gain( ch, victim );
+        group_gain( ch, victim );
+        raw_kill( victim, -1, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+        pk_gain( ch, victim );
 }
 
 
@@ -84,37 +84,37 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
 SPELL_DECL(Insanity);
 VOID_SPELL(Insanity)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	
-	Affect af;
+        
+        Affect af;
 
-	if ( victim->is_npc() )
-	{
-		ch->send_to("Это заклинание может использоваться только против игроков.\n\r");
-		return;
-	}
+        if ( victim->is_npc() )
+        {
+                ch->send_to("Это заклинание может использоваться только против игроков.\n\r");
+                return;
+        }
 
-	if ( saves_spell( level, victim,DAM_OTHER, ch, DAMF_SPELL) )
-	{
-		ch->send_to("Не получилось...\n\r");	
-		return;
-	}
+        if ( saves_spell( level, victim,DAM_OTHER, ch, DAMF_SPELL) )
+        {
+                ch->send_to("Не получилось...\n\r");        
+                return;
+        }
 
-	if  (IS_AFFECTED(victim,AFF_BLOODTHIRST )) {
-	    act("$C1 уже жаждет крови!", ch, 0, victim, TO_CHAR);
-	    return;
-	}
+        if  (IS_AFFECTED(victim,AFF_BLOODTHIRST )) {
+            act("$C1 уже жаждет крови!", ch, 0, victim, TO_CHAR);
+            return;
+        }
 
-	af.where     = TO_AFFECTS;
-	af.type      = sn;
-	af.level     = level;
-	af.duration  = level / 10;
-	af.location  = 0;
-	af.modifier  = 0;
-	af.bitvector = AFF_BLOODTHIRST;
-	affect_to_char( victim, &af );
-	victim->send_to("Безумие охватывает тебя!\n\r");
-	act_p("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM,POS_RESTING);
-	return;
+        af.where     = TO_AFFECTS;
+        af.type      = sn;
+        af.level     = level;
+        af.duration  = level / 10;
+        af.location  = 0;
+        af.modifier  = 0;
+        af.bitvector = AFF_BLOODTHIRST;
+        affect_to_char( victim, &af );
+        victim->send_to("Безумие охватывает тебя!\n\r");
+        act_p("Глаза $c2 наливаются кровью.",victim,0,0,TO_ROOM,POS_RESTING);
+        return;
 
 }
 

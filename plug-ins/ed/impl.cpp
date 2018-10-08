@@ -17,10 +17,10 @@ extern "C"
     {
         SO::PluginList ppl;
 
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeEditorState> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<XMLEditorInputHandler> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeEditorState> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<XMLEditorInputHandler> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }
 

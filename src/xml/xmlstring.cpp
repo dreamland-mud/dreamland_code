@@ -17,7 +17,7 @@ void XMLString::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadTyp
     XMLNode::Pointer node = parent->getFirstNode( );
 
     if (!node.isEmpty( )) 
-	    *this = node->getCData( );
+            *this = node->getCData( );
 }
 
 bool XMLString::toXML( XMLNode::Pointer& parent ) const
@@ -34,9 +34,9 @@ bool XMLString::toXML( XMLNode::Pointer& parent ) const
 bool XMLStringNoEmpty::toXML( XMLNode::Pointer& parent ) const
 {
     if (empty( ))
-	return false;
+        return false;
     else
-	return XMLString::toXML( parent );
+        return XMLString::toXML( parent );
 }
 
 void XMLStringVariable::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
@@ -58,7 +58,7 @@ XMLStringNode::XMLStringNode( )
 bool XMLStringNode::toXML( XMLNode::Pointer& parent ) const
 {
     if (empty( )) 
-	return false;
+        return false;
 
     parent = node;
     return true;

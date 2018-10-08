@@ -44,9 +44,9 @@ XMLSharedObject &PluginManager::load( const DLString &name )
     XMLSharedObject &so = (*this)[name];
     
     if (!so.isLoaded( )) {
-	so.setName( name );
-	loadXML( &so, DLString( "lib" ) + name );
-	so.load( );
+        so.setName( name );
+        loadXML( &so, DLString( "lib" ) + name );
+        so.load( );
     }
 
     return so;
@@ -59,15 +59,15 @@ void PluginManager::unload( const DLString &name )
     i = find( name );
 
     if (i != end( )) {
-	i->second.unload( );
-	erase( i );
+        i->second.unload( );
+        erase( i );
     }
 }
 
 void PluginManager::unloadAll( ) 
 {
     while (!empty( ))
-	unload( begin( )->first );
+        unload( begin( )->first );
 }
 
 void PluginManager::loadAll( ) 
@@ -76,11 +76,11 @@ void PluginManager::loadAll( )
     XMLFile file( getTablePath( ) + '/' + PROFILE_NAME, "", &autoexec);
     
     if (!file.load( ))
-	throw PluginException( "autoexec", strerror( errno ) );
+        throw PluginException( "autoexec", strerror( errno ) );
     
     while (!autoexec.empty( )) {
-	load( autoexec.front( ) );
-	autoexec.pop_front( );
+        load( autoexec.front( ) );
+        autoexec.pop_front( );
     }
 }
 
@@ -103,12 +103,12 @@ void PluginManager::reloadChanged( )
     iterator i;
 
     for (i = begin( ); i != end( ); i++)
-	if (i->second.isChanged( ))
-	    todo.push_back( i->first );
+        if (i->second.isChanged( ))
+            todo.push_back( i->first );
 
     while (!todo.empty( )) {
-	unload( todo.front( ) );
-	todo.pop_front( );
+        unload( todo.front( ) );
+        todo.pop_front( );
     }
 
     loadAll( );
@@ -118,7 +118,7 @@ class PluginReloadAllRequest : public PluginReloadRequest {
 public:
     virtual void process( ) 
     {
-	PluginManager::getThis( )->reloadAll( );
+        PluginManager::getThis( )->reloadAll( );
     }
 };
 
@@ -126,7 +126,7 @@ class PluginReloadChangedRequest : public PluginReloadRequest {
 public:
     virtual void process( ) 
     {
-	PluginManager::getThis( )->reloadChanged( );
+        PluginManager::getThis( )->reloadChanged( );
     }
 };
 
@@ -168,11 +168,11 @@ void PluginManager::setReloadOneRequest(const DLString &n, int w)
 void PluginManager::checkReloadRequest( ) 
 {
     try {
-	if (request) 
-	    request->process( );
+        if (request) 
+            request->process( );
     }
     catch (const PluginException &e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
 
     request.clear( );

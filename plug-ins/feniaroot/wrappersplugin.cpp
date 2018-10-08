@@ -37,30 +37,30 @@ void
 WrappersPlugin::linkTargets()
 {
     for (Character *ch = char_list; ch; ch = ch->next) 
-	if (ch->wrapper) 
-	    wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
+        if (ch->wrapper) 
+            wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
 
     for (Character *ch = newbie_list; ch; ch = ch->next) 
-	if (ch->wrapper)  
-	    wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
+        if (ch->wrapper)  
+            wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
     
     for (::Object *obj = object_list; obj; obj = obj->next) 
-	if (obj->wrapper)
-	    wrapper_cast<ObjectWrapper>(obj->wrapper)->setTarget( obj );
+        if (obj->wrapper)
+            wrapper_cast<ObjectWrapper>(obj->wrapper)->setTarget( obj );
         
     for (Room *room = room_list; room; room = room->rnext)
-	if (room->wrapper)
-	    wrapper_cast<RoomWrapper>(room->wrapper)->setTarget( room );
+        if (room->wrapper)
+            wrapper_cast<RoomWrapper>(room->wrapper)->setTarget( room );
 
     for (int i = 0; i < MAX_KEY_HASH; i++)
-	for(MOB_INDEX_DATA *mndx = mob_index_hash[i]; mndx; mndx = mndx->next)
-	    if(mndx->wrapper)
-		wrapper_cast<MobIndexWrapper>(mndx->wrapper)->setTarget( mndx );
-	    
+        for(MOB_INDEX_DATA *mndx = mob_index_hash[i]; mndx; mndx = mndx->next)
+            if(mndx->wrapper)
+                wrapper_cast<MobIndexWrapper>(mndx->wrapper)->setTarget( mndx );
+            
     for (int i = 0; i < MAX_KEY_HASH; i++)
-	for(OBJ_INDEX_DATA *ondx = obj_index_hash[i]; ondx; ondx = ondx->next)
-	    if(ondx->wrapper)
-		wrapper_cast<ObjIndexWrapper>(ondx->wrapper)->setTarget( ondx );
+        for(OBJ_INDEX_DATA *ondx = obj_index_hash[i]; ondx; ondx = ondx->next)
+            if(ondx->wrapper)
+                wrapper_cast<ObjIndexWrapper>(ondx->wrapper)->setTarget( ondx );
 }
 
 void

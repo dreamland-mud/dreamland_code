@@ -16,15 +16,15 @@ extern "C"
 {
     SO::PluginList initialize_learn( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Trainer> >( ppl );
-	
-	Plugin::registerPlugin<CPractice>( ppl );
-	Plugin::registerPlugin<SkillTimerUpdate>( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Trainer> >( ppl );
+        
+        Plugin::registerPlugin<CPractice>( ppl );
+        Plugin::registerPlugin<SkillTimerUpdate>( ppl );
 
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeTeacher> >( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeTeacher> >( ppl );
+        
+        return ppl;
     }
 }

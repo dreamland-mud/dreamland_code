@@ -12,13 +12,13 @@
 class XMLAttributeVocalChords : public XMLAttribute, XMLVariableContainer {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeVocalChords> Pointer;
+        typedef ::Pointer<XMLAttributeVocalChords> Pointer;
 
-	XMLAttributeVocalChords( );
-	virtual ~XMLAttributeVocalChords( );
+        XMLAttributeVocalChords( );
+        virtual ~XMLAttributeVocalChords( );
 
-	XML_VARIABLE XMLInteger maxIC, coefIC, nowIC;
-	XML_VARIABLE XMLInteger maxOOC, coefOOC, nowOOC;
+        XML_VARIABLE XMLInteger maxIC, coefIC, nowIC;
+        XML_VARIABLE XMLInteger maxOOC, coefOOC, nowOOC;
 };
 /*
  * grats       1 

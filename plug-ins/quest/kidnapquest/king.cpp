@@ -23,7 +23,7 @@
 void KidnapKing::deadAction( Quest::Pointer aquest, PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( ) && getQuest( )) 
-	quest->getScenario( ).msgKingDeath( ch, killer, pcm->getPlayer( ) );
+        quest->getScenario( ).msgKingDeath( ch, killer, pcm->getPlayer( ) );
 
     ProtectedClient::deadAction( aquest, pcm, killer );
 }
@@ -36,35 +36,35 @@ void KidnapKing::talkToHero( PCharacter *hero )
 
     switch (quest->state.getValue( )) {
     case QSTAT_INIT:
-	quest->getScenario( ).actLegend( ch, hero, quest );
-	mark = giveMarkHero( hero );
+        quest->getScenario( ).actLegend( ch, hero, quest );
+        mark = giveMarkHero( hero );
 
-	if (mark) {
-	    int time = number_range( 20, 30 );
-	    
-	    quest->state.setValue( QSTAT_MARK_RCVD );
-	    quest->setTime( hero, time );	    
-	    quest->getScenario( ).actGiveMark( ch, hero, mark, time );
-	    quest->wiznet( "", "%s gives mark", ch->getNameP( '1' ).c_str() );
-	}
+        if (mark) {
+            int time = number_range( 20, 30 );
+            
+            quest->state.setValue( QSTAT_MARK_RCVD );
+            quest->setTime( hero, time );            
+            quest->getScenario( ).actGiveMark( ch, hero, mark, time );
+            quest->wiznet( "", "%s gives mark", ch->getNameP( '1' ).c_str() );
+        }
 
-	break;
-	
+        break;
+        
     case QSTAT_MARK_RCVD:
-	if (!quest->getItemWorld<KidnapMark>( )) {
-	    mark = giveMarkHero( hero );
-	    quest->getScenario( ).actMarkLost( ch, hero, mark );
-	}
-	
-	break;
-	
+        if (!quest->getItemWorld<KidnapMark>( )) {
+            mark = giveMarkHero( hero );
+            quest->getScenario( ).actMarkLost( ch, hero, mark );
+        }
+        
+        break;
+        
     case QSTAT_KING_ACK_WAITING: 
-	quest->getScenario( ).actAckWaitComplete( ch, hero );
-	quest->state = QSTAT_FINISHED;
-	break;
+        quest->getScenario( ).actAckWaitComplete( ch, hero );
+        quest->state = QSTAT_FINISHED;
+        break;
     
     default:
-	break;
+        break;
     }
 }
 
@@ -75,17 +75,17 @@ Object * KidnapKing::giveMarkHero( PCharacter *hero )
     getQuest( );
 
     try {
-	mark = quest->createMark( );
-	
+        mark = quest->createMark( );
+        
     } catch (const QuestCannotStartException &e) {
-	act( "Глюк! $C4 нечего тебе дать.", hero, 0, ch, TO_CHAR );
-	hero->send_to( "Задание отменено. Через минуту сможешь получить новое.\r\n" );
-	LogStream::sendError( ) << e.what( ) << endl;
-	
-	quest->setTime( hero, 1 );
-	quest->state = QSTAT_BROKEN_BY_OTHERS;
-	quest->scheduleDestroy( );
-	return NULL;
+        act( "Глюк! $C4 нечего тебе дать.", hero, 0, ch, TO_CHAR );
+        hero->send_to( "Задание отменено. Через минуту сможешь получить новое.\r\n" );
+        LogStream::sendError( ) << e.what( ) << endl;
+        
+        quest->setTime( hero, 1 );
+        quest->state = QSTAT_BROKEN_BY_OTHERS;
+        quest->scheduleDestroy( );
+        return NULL;
     }
 
     obj_to_char( mark, hero );

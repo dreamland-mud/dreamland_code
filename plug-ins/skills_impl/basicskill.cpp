@@ -35,16 +35,16 @@ void BasicSkill::loaded( )
     skillManager->registrate( Pointer( this ) );
 
     if (spell) 
-	spell->setSkill( Pointer( this ) );
+        spell->setSkill( Pointer( this ) );
 
     if (affect) 
-	affect->setSkill( Pointer( this ) );
+        affect->setSkill( Pointer( this ) );
 
     if (command) 
-	command->setSkill( Pointer( this ) );
+        command->setSkill( Pointer( this ) );
 
     if (help) 
-	help->setSkill( Pointer( this ) );
+        help->setSkill( Pointer( this ) );
 
     if (eventHandler)
         eventHandler->setSkill( Pointer( this ) );
@@ -53,16 +53,16 @@ void BasicSkill::loaded( )
 void BasicSkill::unloaded( )
 {
     if (spell) 
-	spell->unsetSkill( );
+        spell->unsetSkill( );
 
     if (affect) 
-	affect->unsetSkill( );
+        affect->unsetSkill( );
 
     if (command) 
-	command->unsetSkill( );
+        command->unsetSkill( );
 
     if (help) 
-	help->unsetSkill( );
+        help->unsetSkill( );
 
     if (eventHandler)
         eventHandler->unsetSkill( );
@@ -81,7 +81,7 @@ static void rprog_skill( Room *room, Character *actor, const char *skill, bool s
     FENIA_VOID_CALL( room, "Skill", "CsiC", actor, skill, success, victim );
 
     for (Character *rch = room->people; rch; rch = rch->next_in_room)
-	mprog_skill( rch, actor, skill, success, victim );
+        mprog_skill( rch, actor, skill, success, victim );
 }
 
 #ifndef FIGHT_STUB
@@ -93,40 +93,40 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     bool fEnlight;
     
     if (ch->is_npc( ))
-	return;
+        return;
 
     pch = ch->getPC( );
     PCSkillData &data = pch->getSkillData( getIndex( ) );
     
     /* skill is beyond reach */
     if (!usable( pch, false )) 
-	return;     
+        return;     
 
     if (data.learned <= 1)
-	return;
+        return;
     
     rprog_skill( ch->in_room, ch, getName( ).c_str( ), success, victim );
 
     if (data.forgetting)
-	return;
+        return;
 
     data.timer = 0;
 
     if (pch->getRealLevel( ) > 19  && !IS_SET( pch->act, PLR_CONFIRMED ))
-	return;
+        return;
     
     /* no improve in safe rooms */
     if (IS_SET(pch->in_room->room_flags, ROOM_SAFE))
-	return;
+        return;
     
     /* no improve on immune mobiles */
     if (victim) {
-	if (dam_type != -1 && immune_check( victim, dam_type, dam_flags ) == RESIST_IMMUNE)
-	    return;
+        if (dam_type != -1 && immune_check( victim, dam_type, dam_flags ) == RESIST_IMMUNE)
+            return;
     }
     
     if (data.learned >= getMaximum( pch ))
-	return;
+        return;
 
     /* check to see if the character has a chance to learn */
     chance = 10 * get_int_app( pch ).learn;
@@ -135,62 +135,62 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     
     /* little victim - small chance */
     if (victim) {
-	int diff = victim->getRealLevel( ) - pch->getModifyLevel( );
-	
-	if (diff < -10)
-	    chance += 20 * (diff + 10);
+        int diff = victim->getRealLevel( ) - pch->getModifyLevel( );
+        
+        if (diff < -10)
+            chance += 20 * (diff + 10);
     }
 
     fEnlight = pch->getAttributes( ).isAvailable( "enlight" );
 
     if (fEnlight)
-	chance *= 2;
+        chance *= 2;
 
     if (number_range(1, 1000) > chance)
-	return;
+        return;
 
    
-    /* now that the character has a CHANCE to learn, see if they really have */	
+    /* now that the character has a CHANCE to learn, see if they really have */        
     if (success) {
-	chance = URANGE(5, 100 - data.learned, 95);
-	
-	if (number_percent( ) >= chance)
-	    return;
-	    
-	act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
-		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
-	    
-	data.learned++;
+        chance = URANGE(5, 100 - data.learned, 95);
+        
+        if (number_percent( ) >= chance)
+            return;
+            
+        act_p("{GТеперь ты гораздо лучше владеешь искусством '$t'!{x",
+                pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+            
+        data.learned++;
     }
     else {
-	int wis_mod = get_wis_app( ch ).learn;
-	
-	if (wis_mod <= 0)
-	    return;
+        int wis_mod = get_wis_app( ch ).learn;
+        
+        if (wis_mod <= 0)
+            return;
 
-	chance = URANGE(5, data.learned / 2, wis_mod * 15);
-	    
-	if (number_percent( ) >= chance)
-	    return;
+        chance = URANGE(5, data.learned / 2, wis_mod * 15);
+            
+        if (number_percent( ) >= chance)
+            return;
 
-	act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
-		pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
-	
-	data.learned += number_range( 1, wis_mod );
-	data.learned = min( (int)data.learned, getMaximum( pch ) );
+        act_p("{GТы учишься на своих ошибках, и твое умение '$t' совершенствуется.{x",
+                pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+        
+        data.learned += number_range( 1, wis_mod );
+        data.learned = min( (int)data.learned, getMaximum( pch ) );
     }
 
     pch->updateSkills( );
     xp = 2 * getRating( pch );
 
     if (pch->isAffected(gsn_learning ))
-	xp += data.learned / 4;
+        xp += data.learned / 4;
 
     if (data.learned >= getMaximum( pch )) {
-	act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
-	      pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
-	
-	xp += 98 * getRating( pch );
+        act_p("{WТеперь ты {Cмастерски{W владеешь искусством {C$t{W!{x",
+              pch, getNameFor( pch ).c_str( ), 0, TO_CHAR, POS_DEAD);
+        
+        xp += 98 * getRating( pch );
     }
     
     pch->gainExp( xp );
@@ -239,27 +239,27 @@ int BasicSkill::getEffective( Character *ch ) const
     int result = getLearned( ch );
 
     if (IS_AFFECTED(ch, AFF_CURSE)) 
-	for (Affect *paf =ch-> affected; paf; paf=paf->next) 
-	    if (paf->type == gsn_anathema && paf->location == APPLY_LEVEL) 
-		result = result * 4 / (4 - paf->modifier/3);
+        for (Affect *paf =ch-> affected; paf; paf=paf->next) 
+            if (paf->type == gsn_anathema && paf->location == APPLY_LEVEL) 
+                result = result * 4 / (4 - paf->modifier/3);
 
     if (ch->daze > 0) {
-	if (getSpell( ))
-	    result /= 2;
-	else
-	    result = 2 * result / 3;
+        if (getSpell( ))
+            result /= 2;
+        else
+            result = 2 * result / 3;
     }
     
     if (!ch->is_npc( )) 
-	if (desire_drunk->isActive( ch->getPC( ) ))
-	    result = 9 * result / 10;
+        if (desire_drunk->isActive( ch->getPC( ) ))
+            result = 9 * result / 10;
 
     result = ch->applyCurse( result );
     result = URANGE(0, result, 100);
     
     if (!ch->is_npc( )) 
-	if (result > 1)
-	    result += ch->getPC( )->bless;
+        if (result > 1)
+            result += ch->getPC( )->bless;
 
     return result;
 }
@@ -288,9 +288,9 @@ SpellPointer BasicSkill::getSpell( ) const
 SkillCommandPointer BasicSkill::getCommand( ) const 
 {
     if (command.isEmpty( ))
-	return Skill::getCommand( );
+        return Skill::getCommand( );
     else
-	return command;
+        return command;
 }
 int BasicSkill::getBeats( ) const
 {

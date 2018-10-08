@@ -22,20 +22,20 @@ class ShadowBlade : public ObjectBehavior {
 XML_OBJECT
 public:
         typedef ::Pointer<ShadowBlade> Pointer;
-	
+        
         ShadowBlade( );
-	
-	void adjustLevel( int level );
+        
+        void adjustLevel( int level );
 
-	virtual bool area( );
-	virtual bool quit( Character *ch, bool count );
-	virtual void fight( Character *victim );
-	virtual bool canEquip( Character * );
+        virtual bool area( );
+        virtual bool quit( Character *ch, bool count );
+        virtual void fight( Character *victim );
+        virtual bool canEquip( Character * );
 
-	XML_VARIABLE XMLString owner;
-	XML_VARIABLE XMLInteger castCnt;
-	XML_VARIABLE XMLInteger castChance;
-	XML_VARIABLE XMLIntegerNoEmpty bonus;
+        XML_VARIABLE XMLString owner;
+        XML_VARIABLE XMLInteger castCnt;
+        XML_VARIABLE XMLInteger castChance;
+        XML_VARIABLE XMLIntegerNoEmpty bonus;
 };
 
 /*
@@ -44,9 +44,9 @@ public:
 class AntipaladinGuildmaster : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<AntipaladinGuildmaster> Pointer;
+        typedef ::Pointer<AntipaladinGuildmaster> Pointer;
     
-	virtual void give( Character *, Object * );
+        virtual void give( Character *, Object * );
 };
 
 #endif

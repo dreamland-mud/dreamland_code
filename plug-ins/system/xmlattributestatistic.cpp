@@ -27,9 +27,9 @@ int XMLAttributeStatistic::getVictories( const DLString &id ) const
     Victories::const_iterator i = victories.find( id );
 
     if (i == victories.end( ))
-	return 0;
+        return 0;
     else
-	return i->second.getValue( );
+        return i->second.getValue( );
 }
 
 const XMLAttributeStatistic::Victories &
@@ -59,7 +59,7 @@ int XMLAttributeStatistic::getAllVictoriesCount( ) const
     int cnt = 0;
 
     for (i = victories.begin( ); i != victories.end( ); i++)
-	cnt += i->second.getValue( );
+        cnt += i->second.getValue( );
 
     return cnt;
 }
@@ -79,21 +79,21 @@ XMLAttributeStatistic::gatherAll( const DLString &name )
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	Pointer attr;
-	PCMemoryInterface *pc;
+        Pointer attr;
+        PCMemoryInterface *pc;
 
-	pc = i->second;
-	attr = pc->getAttributes( ).findAttr<XMLAttributeStatistic>( name );
+        pc = i->second;
+        attr = pc->getAttributes( ).findAttr<XMLAttributeStatistic>( name );
 
-	if (attr && !attr->shy) 
-	    attr->gather( pc, stat );
+        if (attr && !attr->shy) 
+            attr->gather( pc, stat );
     }
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
-	StatRecordList &records = s->second;
+        StatRecordList &records = s->second;
 
-	records.sort( __cmp_stat_records__ );
-    }	
+        records.sort( __cmp_stat_records__ );
+    }        
 
     return stat;
 }
@@ -103,9 +103,9 @@ void XMLAttributeStatistic::gather( PCMemoryInterface *pc, XMLAttributeStatistic
     Victories::const_iterator j;
 
     for (j = victories.begin( ); j != victories.end( ); j++)
-	if (j->second.getValue( ) > 0)		
-	    stat[j->first].push_back( 
-		    make_pair( pc->getName( ), j->second.getValue( ) ) );
+        if (j->second.getValue( ) > 0)                
+            stat[j->first].push_back( 
+                    make_pair( pc->getName( ), j->second.getValue( ) ) );
 }
 
 bool XMLAttributeStatistic::handle( const RemortArguments &args ) 

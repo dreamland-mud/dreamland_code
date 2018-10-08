@@ -49,7 +49,7 @@ OneHit::OneHit( Character *ch, Character *victim )
 void OneHit::hit( )
 {
     if (!canHit( ))
-	return;
+        return;
     
     ch->move -= move_dec( ch );
 
@@ -59,23 +59,23 @@ void OneHit::hit( )
     calcArmorClass( );
 
     if (!diceroll( )) {
-	miss( );
-	return;
+        miss( );
+        return;
     }
     
     if (checkShadow( ))
-	return;
-	
+        return;
+        
     calcDamage( );
    
     if (!canDamage( ))
-	return;
+        return;
 
     priorDamageEffects( );
     message( );
 
     if (dam == 0)
-	return;
+        return;
 
     inflictDamage( );
     postDamageEffects( );
@@ -100,9 +100,9 @@ void OneHit::damNormalize( )
 void OneHit::protectShadowShroud( )
 {
     if (IS_GOOD(ch) 
-	&& victim->isAffected( gsn_shadow_shroud ))
+        && victim->isAffected( gsn_shadow_shroud ))
     {
-	dam -= dam * victim->getModifyLevel( ) / 1200;
+        dam -= dam * victim->getModifyLevel( ) / 1200;
     }
 }
 
@@ -118,7 +118,7 @@ void OneHit::miss( )
     dam = 0;
 
     if (canDamage( ))
-	message( );
+        message( );
 }
 
 
@@ -133,22 +133,22 @@ bool OneHit::diceroll()
 
     // critical miss
     if(dice == 0)
-	return false;
+        return false;
     
     // critical hit
     if(dice == 19)
-	return true;
-	
+        return true;
+        
     return dice >= thac0 - victim_ac;
 }
 
 bool OneHit::checkShadow( )
 {
     if (SHADOW(ch)) {
-	msgFightChar( "Ты со всей дури лупишь свою тень." );
-	msgFightVict( "%1$^C1 со всей дури лупит свою тень." );
-	msgFightRoom( "%1$^C1 со всей дури лупит свою тень." );
-	return true;
+        msgFightChar( "Ты со всей дури лупишь свою тень." );
+        msgFightVict( "%1$^C1 со всей дури лупит свою тень." );
+        msgFightRoom( "%1$^C1 со всей дури лупит свою тень." );
+        return true;
     }
     return false;
 }
@@ -160,22 +160,22 @@ bool OneHit::canHit( )
 {
     // just in case
     if ( ch == 0 || victim == 0 || victim == ch )
-	return false;
+        return false;
 
     // ghosts can't fight
     if ( ( !victim->is_npc() && IS_GHOST( victim ) )
-	|| ( !ch->is_npc() && IS_GHOST( ch ) ) )
-	return false;
+        || ( !ch->is_npc() && IS_GHOST( ch ) ) )
+        return false;
     
     //
     // Can't beat a dead char!
     // Guard against weird room-leavings.
     //
     if ( victim->position == POS_DEAD || ch->in_room != victim->in_room )
-	return false;
+        return false;
 
     if ( !ch->is_npc() && !ch->move )
-	return false;
+        return false;
 
     return true;
 }
@@ -200,10 +200,10 @@ void OneHit::thacBase( )
     thac0  = interpolate( ch->getModifyLevel(), thac0_00, thac0_32 );
 
     if ( thac0 < 0 )
-	thac0 = thac0 / 2;
+        thac0 = thac0 / 2;
 
     if ( thac0 < -5 )
-	thac0 = -5 + ( thac0 + 5 ) / 2;
+        thac0 = -5 + ( thac0 + 5 ) / 2;
 }
 
 void OneHit::thacApplyHitroll( )
@@ -214,7 +214,7 @@ void OneHit::thacApplyHitroll( )
     hr += hr * get_str_app(ch).hit / 100;
 
     if (IS_GOOD(victim) && ch->isAffected( gsn_soul_lust ))
-	hr += 1 + hr / 100;
+        hr += 1 + hr / 100;
 
     thac0 -= hr * skill/100;
 }
@@ -240,14 +240,14 @@ void OneHit::acBase( )
 {
     switch ( dam_type )
     {
-	case(DAM_PIERCE):   victim_ac = GET_AC(victim,AC_PIERCE)/10;    break;
-	case(DAM_BASH):	    victim_ac = GET_AC(victim,AC_BASH)/10;	break;
-	case(DAM_SLASH):    victim_ac = GET_AC(victim,AC_SLASH)/10;	break;
-	default:	    victim_ac = GET_AC(victim,AC_EXOTIC)/10;    break;
+        case(DAM_PIERCE):   victim_ac = GET_AC(victim,AC_PIERCE)/10;    break;
+        case(DAM_BASH):            victim_ac = GET_AC(victim,AC_BASH)/10;        break;
+        case(DAM_SLASH):    victim_ac = GET_AC(victim,AC_SLASH)/10;        break;
+        default:            victim_ac = GET_AC(victim,AC_EXOTIC)/10;    break;
     };
     
     if ( victim_ac < -20 )
-	victim_ac = ( ( victim_ac + 20 ) * 2 ) / 3 - 20;
+        victim_ac = ( ( victim_ac + 20 ) * 2 ) / 3 - 20;
 }
 
 void OneHit::acApplyArmorUse( )
@@ -256,15 +256,15 @@ void OneHit::acApplyArmorUse( )
 
     if ( sk_armor_use > 1 )
     {
-	if ( number_percent() < sk_armor_use )
-	{
-	    gsn_armor_use->improve( victim, true, ch );
-	    victim_ac -= ( victim->getModifyLevel() ) / 2;
-	}
-	else
-	{
-	    gsn_armor_use->improve( victim, false, ch );
-	}
+        if ( number_percent() < sk_armor_use )
+        {
+            gsn_armor_use->improve( victim, true, ch );
+            victim_ac -= ( victim->getModifyLevel() ) / 2;
+        }
+        else
+        {
+            gsn_armor_use->improve( victim, false, ch );
+        }
     }
 
 }
@@ -273,25 +273,25 @@ void OneHit::acApplyBlindFighting( )
 {
     if ( !ch->can_see( victim ) )
     {
-	if (number_percent() < gsn_blind_fighting->getEffective( ch ))
-	{
-	    gsn_blind_fighting->improve( ch, true, victim );
-	}
-	else
-	    victim_ac -= 4;
+        if (number_percent() < gsn_blind_fighting->getEffective( ch ))
+        {
+            gsn_blind_fighting->improve( ch, true, victim );
+        }
+        else
+            victim_ac -= 4;
     }
 }
 
 void OneHit::acApplyPosition( )
 {
     if ( victim->position < POS_FIGHTING )
-	victim_ac += 4;
+        victim_ac += 4;
 
     if (victim->position < POS_RESTING)
-	victim_ac += 6;
+        victim_ac += 6;
 
     if ( !victim->move )
-	victim_ac += 10;
+        victim_ac += 10;
 }
 
 /*-----------------------------------------------------------------------------
@@ -300,9 +300,9 @@ void OneHit::acApplyPosition( )
 void OneHit::damApplyPosition( )
 {
     if ( !IS_AWAKE(victim) )
-	dam *= 2;
+        dam *= 2;
     else if (victim->position < POS_FIGHTING)
-	dam = dam * 3 / 2;
+        dam = dam * 3 / 2;
 }
 
 void OneHit::damApplyDamroll( )
@@ -316,7 +316,7 @@ void OneHit::damApplyAttitude( )
     Flags att = ch->getRace( )->getAttitude( *victim->getRace( ) );
 
     if (att.isSet( RACE_HATES ))
-	dam = dam * 120 / 100;
+        dam = dam * 120 / 100;
 }
 
 /*----------------------------------------------------------------------------
@@ -330,11 +330,11 @@ void OneHit::msgOutput( Character *wch, const char *msg )
 void OneHit::msgEchoNoSpam( Character *wch, const char *msg, int bit, bool fInvert )
 {
     if (!wch->is_npc( )) 
-	if (fInvert == !!IS_SET( wch->getPC( )->config, bit ))
-	    return;
+        if (fInvert == !!IS_SET( wch->getPC( )->config, bit ))
+            return;
     
     if (wch->position < POS_RESTING)
-	return;
+        return;
     
     msgOutput( wch, msg );
 }
@@ -354,8 +354,8 @@ void OneHit::msgWeaponRoom( const char *msg )
     Character *wch;
 
     for (wch = victim->in_room->people; wch; wch = wch->next_in_room) 
-	if (wch != victim && wch != ch)
-	    msgEchoNoSpam( wch, msg, CONFIG_WEAPONSPAM, true );
+        if (wch != victim && wch != ch)
+            msgEchoNoSpam( wch, msg, CONFIG_WEAPONSPAM, true );
 }
 
 void OneHit::msgFightVict( const char *msg )
@@ -373,7 +373,7 @@ void OneHit::msgFightRoom( const char *msg )
     Character *wch;
 
     for (wch = victim->in_room->people; wch; wch = wch->next_in_room) 
-	if (wch != victim && wch != ch)
-	    msgEchoNoSpam( wch, msg, CONFIG_FIGHTSPAM, false );
+        if (wch != victim && wch != ch)
+            msgEchoNoSpam( wch, msg, CONFIG_FIGHTSPAM, false );
 }
 

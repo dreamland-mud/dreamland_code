@@ -14,8 +14,8 @@ public:
 
     virtual bool canPractice( PCharacter *ch, std::ostream & buf ) const
     {
-	buf << "Ты не можешь практиковать это, попробуй пообщаться с гильдмастером." << endl;
-	return false;
+        buf << "Ты не можешь практиковать это, попробуй пообщаться с гильдмастером." << endl;
+        return false;
     }
 };
 

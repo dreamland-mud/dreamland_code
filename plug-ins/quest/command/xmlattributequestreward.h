@@ -16,15 +16,15 @@ class XMLAttributeQuestReward : public XMLAttribute,
 public: 
         typedef ::Pointer<XMLAttributeQuestReward> Pointer;
 
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-	virtual const DLString & getType( ) const
-	{
-	    return TYPE;
-	}
+        virtual const DLString & getType( ) const
+        {
+            return TYPE;
+        }
 
-	int getCount( int ) const;
-	void setCount( int, int );
+        int getCount( int ) const;
+        void setCount( int, int );
 };
 
 #endif

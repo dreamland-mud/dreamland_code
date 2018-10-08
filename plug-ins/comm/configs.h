@@ -70,7 +70,7 @@ public:
 
     inline static ConfigCommand * getThis( )
     {
-	return thisClass;
+        return thisClass;
     }
    
 protected:

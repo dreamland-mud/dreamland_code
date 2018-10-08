@@ -45,24 +45,24 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     state = QSTAT_INIT;
 
     try {
-	scenName = LocateQuestRegistrator::getThis( )->getRandomScenario( pch );
-	customer = getRandomClient( pch );
-	customerName = customer->getShortDescr( );
-	customerRoom = customer->in_room->name;
-	customerArea = customer->in_room->area->name;
+        scenName = LocateQuestRegistrator::getThis( )->getRandomScenario( pch );
+        customer = getRandomClient( pch );
+        customerName = customer->getShortDescr( );
+        customerRoom = customer->in_room->name;
+        customerArea = customer->in_room->area->name;
 
-	if (getScenario( ).needsEndPoint( )) {
-	    endPoint = getRandomRoomClient( pch );
-	    targetArea = endPoint->area->name;
-	}
+        if (getScenario( ).needsEndPoint( )) {
+            endPoint = getRandomRoomClient( pch );
+            targetArea = endPoint->area->name;
+        }
 
-	scatterItems( pch, endPoint, customer );
-	ClientQuestModel::assign<LocateCustomer>( customer );
-	save_mobs( customer->in_room );
+        scatterItems( pch, endPoint, customer );
+        ClientQuestModel::assign<LocateCustomer>( customer );
+        save_mobs( customer->in_room );
     } 
     catch (const QuestCannotStartException &e) {
-	destroy( );
-	throw e;
+        destroy( );
+        throw e;
     }
 
     time = number_range( 5, 10 ); 
@@ -71,16 +71,16 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     tell_fmt( "{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи.",  
               pch, questman, customer );
     tell_fmt( "%3$#^P1 ждет тебя в районе {W%4$s{G ({W%5$s{G).", 
-	       pch, questman, customer, customer->in_room->name, customer->in_room->area->name );
+               pch, questman, customer, customer->in_room->name, customer->in_room->area->name );
     tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.",  
                pch, questman, time );
     
     wiznet( scenName.getValue( ).c_str( ), 
             "customer [%s], item [%s], count %d, path from [%d] to [%d]",
-	    customer->getNameP( '1' ).c_str( ), 
-	    itemName.ruscase( '1' ).c_str( ),
-	    total.getValue( ),
-	    customer->in_room->vnum, (endPoint ? endPoint->vnum : 0) );
+            customer->getNameP( '1' ).c_str( ), 
+            itemName.ruscase( '1' ).c_str( ),
+            total.getValue( ),
+            customer->in_room->vnum, (endPoint ? endPoint->vnum : 0) );
 }
 
 bool LocateQuest::isComplete( ) 
@@ -92,26 +92,26 @@ void LocateQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << customerName.ruscase( '1' ) <<  " хочет отыскать кое-какие свои вещи." << endl
-	    << "Тебя с нетерпением ждут в районе " << customerRoom << "." << endl
-	    << "Это находится в местности под названием " << customerArea << "." << endl;
-	break;
+        buf << customerName.ruscase( '1' ) <<  " хочет отыскать кое-какие свои вещи." << endl
+            << "Тебя с нетерпением ждут в районе " << customerRoom << "." << endl
+            << "Это находится в местности под названием " << customerArea << "." << endl;
+        break;
     case QSTAT_SEARCH:
-	getScenario( ).getLegend( ch, this, buf );
+        getScenario( ).getLegend( ch, this, buf );
 
-	if (delivered > 0)
-	    buf << "Тобой уже доставлено {Y" << delivered << "{x из них." << endl;
-	
-	buf << "Заказчик ждет тебя в районе " << customerRoom << "." << endl
-	    << "Это находится в местности под названием " << customerArea << "." << endl;
+        if (delivered > 0)
+            buf << "Тобой уже доставлено {Y" << delivered << "{x из них." << endl;
+        
+        buf << "Заказчик ждет тебя в районе " << customerRoom << "." << endl
+            << "Это находится в местности под названием " << customerArea << "." << endl;
 
-	break;
+        break;
     case QSTAT_FINISHED:
-	buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-	    << "Вернись за вознаграждением, до того как выйдет время!" << endl;
-	break;
+        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
+            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+        break;
     default:
-	break;
+        break;
     }
 }
 
@@ -121,18 +121,18 @@ void LocateQuest::shortInfo( std::ostream &buf, PCharacter *ch )
     case QSTAT_INIT:
         buf << "Помочь " << customerName.ruscase( '3' ) << " из " << customerRoom
             << " (" << customerArea << ") отыскать свои вещи.";
-	break;
+        break;
     case QSTAT_SEARCH:
         buf << "Найти " << total << " штук" << GET_COUNT(total, "у", "и", "") << " "
             << russian_case( itemMltName.getValue( ), '2' ) << " для "
             << russian_case( customerName.getValue( ), '2' ) << " из " << customerRoom 
             << " (" << customerArea << ").";
-	break;
+        break;
     case QSTAT_FINISHED:
-	buf << "Вернуться к квестору за наградой.";
-	break;
+        buf << "Вернуться к квестору за наградой.";
+        break;
     default:
-	break;
+        break;
     }
 }
 
@@ -141,26 +141,26 @@ Quest::Reward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questma
     Reward::Pointer r( NEW );
     
     if (hint) {
-	r->points = number_range( 3, 9 );
-	r->gold = number_fuzzy( r->points );
+        r->points = number_range( 3, 9 );
+        r->gold = number_fuzzy( r->points );
     } else {
-	if (total <= 5)
-	    r->points = 10;
-	else
-	    r->points = 20;
+        if (total <= 5)
+            r->points = 10;
+        else
+            r->points = 20;
 
-	r->points += number_range( 3 * total, 4 * total );
-	r->gold = number_fuzzy( r->points );
-	r->wordChance = 3 * total;
-	r->scrollChance = number_fuzzy( total );
+        r->points += number_range( 3 * total, 4 * total );
+        r->gold = number_fuzzy( r->points );
+        r->wordChance = 3 * total;
+        r->scrollChance = number_fuzzy( total );
 
-	if (chance( total ))
-	    r->prac = number_range( 1, 3 );
+        if (chance( total ))
+            r->prac = number_range( 1, 3 );
     
-	if (!ch->getClan( )->isDispersed( )) {
-	    r->points /= 2;
-	    r->clanpoints = r->points;
-	}
+        if (!ch->getClan( )->isDispersed( )) {
+            r->points /= 2;
+            r->clanpoints = r->points;
+        }
     }
 
     r->exp = (r->points + r->clanpoints) * 10;
@@ -190,7 +190,7 @@ bool LocateQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 bool LocateQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
     if (!customerArea.empty( ) && customerArea == room->area->name)
-	return false;
+        return false;
 
     return ClientQuestModel::checkRoomClient( pch, room );
 }
@@ -205,13 +205,13 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
     LocateScenario &scen = getScenario( );
 
     if (scen.items.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
     
     scen.findRooms( pch, customer->in_room, endPoint, rooms );
     count = scen.getCount( pch );
 
     if (!count || count > rooms.size( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
     
     itemScen = &scen.items[number_range( 0, scen.items.size( ) - 1 )];
     itemName = itemScen->shortDesc;
@@ -220,16 +220,16 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
     pObjIndex = get_obj_index( LocateQuestRegistrator::getThis( )->itemVnum );
         
     while (!rooms.empty( ) && total < (int)count) {
-	i = number_range( 0, rooms.size( ) - 1 );
-	obj = createItem<LocateItem>( pObjIndex );
-	itemScen->dress( obj );
-	obj_to_room( obj, rooms[i] );
-	total++;
-	rooms.erase( rooms.begin( ) + i );
+        i = number_range( 0, rooms.size( ) - 1 );
+        obj = createItem<LocateItem>( pObjIndex );
+        itemScen->dress( obj );
+        obj_to_room( obj, rooms[i] );
+        total++;
+        rooms.erase( rooms.begin( ) + i );
     }
 
     if (!total)
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }
 
 /*-----------------------------------------------------------------------------
@@ -250,9 +250,9 @@ LocateQuestRegistrator::~LocateQuestRegistrator( )
 bool LocateQuestRegistrator::applicable( PCharacter *pch ) 
 {
     if (pch->getClan( ) == clan_battlerager)
-	return false;
+        return false;
 
     return gsn_locate_object->getEffective( pch ) >= 50
-	    || gsn_find_object->getEffective( pch ) >= 50;
+            || gsn_find_object->getEffective( pch ) >= 50;
 }
 

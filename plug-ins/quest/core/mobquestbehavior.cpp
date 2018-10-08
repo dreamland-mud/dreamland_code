@@ -16,7 +16,7 @@
  * MobQuestBehavior
  *--------------------------------------------------------------------*/
 MobQuestBehavior::MobQuestBehavior( ) 
-		    : imm_flags( 0, &::imm_flags ), act_flags( 0, &::act_flags )
+                    : imm_flags( 0, &::imm_flags ), act_flags( 0, &::act_flags )
 {
 }
 
@@ -34,7 +34,7 @@ void MobQuestBehavior::unsetChar( )
 {
     if (!act_flags.isSet( ACT_NOEYE ))
         REMOVE_BIT( ch->act, ACT_NOEYE );
-	
+        
     if (!imm_flags.isSet( IMM_SUMMON ))
         REMOVE_BIT( ch->imm_flags, IMM_SUMMON );
 
@@ -76,10 +76,10 @@ void ConfiguredMobile::setChar( NPCharacter *mob )
     MobQuestBehavior::setChar( mob );
 
     if (ch->getLevel( ) == 0) {
-	PCMemoryInterface *pcm = getHeroMemory( );
+        PCMemoryInterface *pcm = getHeroMemory( );
 
-	if (pcm && pcm->isOnline( ))
-	    config( pcm->getPlayer( ) );
+        if (pcm && pcm->isOnline( ))
+            config( pcm->getPlayer( ) );
     }
 }
 
@@ -91,8 +91,8 @@ bool TalkativeClient::specIdle( )
     PCharacter *hero;
 
     if (( hero = getHeroRoom( ) )) {
-	talkToHero( hero );
-	return true;
+        talkToHero( hero );
+        return true;
     }
 
     return false; 
@@ -101,7 +101,7 @@ bool TalkativeClient::specIdle( )
 void TalkativeClient::greet( Character *victim ) 
 {
     if (ourHero( victim ))
-	talkToHero( victim->getPC( ) );
+        talkToHero( victim->getPC( ) );
 }
 
 void TalkativeClient::entry( ) 
@@ -109,7 +109,7 @@ void TalkativeClient::entry( )
     PCharacter *hero;
 
     if (( hero = getHeroRoom( ) ))
-	talkToHero( hero );
+        talkToHero( hero );
 }
 
 /*--------------------------------------------------------------------
@@ -118,13 +118,13 @@ void TalkativeClient::entry( )
 bool PeacefulClient::canAggressNormal( Character *victim )
 {
     return !ourHero( victim ) 
-	    && MobQuestBehavior::canAggressNormal( victim );
+            && MobQuestBehavior::canAggressNormal( victim );
 }
 
 bool PeacefulClient::canAggressVampire( Character *victim )
 {
     return !ourHero( victim )
-	    && MobQuestBehavior::canAggressVampire( victim );
+            && MobQuestBehavior::canAggressVampire( victim );
 }
 
 /*--------------------------------------------------------------------
@@ -133,11 +133,11 @@ bool PeacefulClient::canAggressVampire( Character *victim )
 void ProtectedClient::deadAction( Quest::Pointer quest, PCMemoryInterface *pcm, Character *killer )
 {
     if (ourHero( killer )) 
-	deadFromIdiot( pcm );
+        deadFromIdiot( pcm );
     else if (killer && killer->getNPC( ) == ch) 
-	deadFromSuicide( pcm );
+        deadFromSuicide( pcm );
     else
-	deadFromKill( pcm, killer ); 
+        deadFromKill( pcm, killer ); 
 }
 
 void ProtectedClient::deadFromIdiot( PCMemoryInterface *pcm )
@@ -158,23 +158,23 @@ bool ProtectedClient::death( Character *killer )
     Quest::Pointer quest;
 
     if (!( pcm = getHeroMemory( ) ))
-	return false;
+        return false;
 
     if (!( quest = getQuest( pcm ) ))
-	return false;
+        return false;
     
     if (quest->isComplete( ))
-	return false;
+        return false;
 
     killer = quest->getActor( killer );
 
     if (ourHero( killer )) {
-	quest->setTime( pcm, quest->getPunishTime( pcm ) );
-	quest->state = QSTAT_BROKEN_BY_HERO;
+        quest->setTime( pcm, quest->getPunishTime( pcm ) );
+        quest->state = QSTAT_BROKEN_BY_HERO;
     }
     else {
-	quest->setTime( pcm, quest->getAccidentTime( pcm ) );
-	quest->state = QSTAT_BROKEN_BY_OTHERS;
+        quest->setTime( pcm, quest->getAccidentTime( pcm ) );
+        quest->state = QSTAT_BROKEN_BY_OTHERS;
     }
     
     quest->scheduleDestroy( );
@@ -203,23 +203,23 @@ bool HuntedVictim::death( Character *killer )
     Quest::Pointer quest;
 
     if (!( pcm = getHeroMemory( ) ))
-	return false;
+        return false;
 
     if (!( quest = getQuest( pcm ) ))
-	return false;
+        return false;
     
     killer = quest->getActor( killer );
 
     if (ourHero( killer )) {
-	quest->state = QSTAT_FINISHED;
-	deadFromHunter( pcm );
-	return false;
+        quest->state = QSTAT_FINISHED;
+        deadFromHunter( pcm );
+        return false;
     }
 
     if (killer && killer->getNPC( ) != ch)
-	deadFromOther( pcm, killer );
+        deadFromOther( pcm, killer );
     else
-	deadFromSuicide( pcm );
+        deadFromSuicide( pcm );
     
     quest->state = QSTAT_BROKEN_BY_OTHERS;
     quest->setTime( pcm, quest->getAccidentTime( pcm ) );
@@ -233,14 +233,14 @@ bool HuntedVictim::death( Character *killer )
 void GreedyClient::give( Character *victim, Object *obj ) 
 {
     if (!ourHero( victim ))
-	return;
+        return;
     
     if (!givenCheck( victim->getPC( ), obj )) {
-	obj_from_char( obj );
-	obj_to_char( obj, victim );
+        obj_from_char( obj );
+        obj_to_char( obj, victim );
 
-	givenBad( victim->getPC( ), obj );
+        givenBad( victim->getPC( ), obj );
     }
     else
-	givenGood( victim->getPC( ), obj );
+        givenGood( victim->getPC( ), obj );
 }

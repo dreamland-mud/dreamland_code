@@ -145,30 +145,30 @@ Json::Value WhoWebPromptListener::jsonWho( Character *ch )
 
     // Find all visible players.
     for (Descriptor *d = descriptor_list; d; d = d->next) {
-	PCharacter *victim;
-	
-	if (d->connected != CON_PLAYING || !d->character)
-	    continue;
+        PCharacter *victim;
+        
+        if (d->connected != CON_PLAYING || !d->character)
+            continue;
 
-	victim = d->character->getPC( );
+        victim = d->character->getPC( );
 
-	if (!ch->can_see( victim ))
-	    continue;
+        if (!ch->can_see( victim ))
+            continue;
 
-	XMLAttributes *attrs = &victim->getAttributes( );
-	if (attrs->isAvailable("nowho"))
-	    continue;
-	
-	if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
-	    continue;
-	
-	players.push_back( victim );
+        XMLAttributes *attrs = &victim->getAttributes( );
+        if (attrs->isAvailable("nowho"))
+            continue;
+        
+        if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
+            continue;
+        
+        players.push_back( victim );
     }
 
     // Populate player list.
     int pc = 0;
     for (p = players.begin( ); p != players.end( ); p++) {
-	who["p"][pc++] = jsonPlayer( ch, *p );
+        who["p"][pc++] = jsonPlayer( ch, *p );
     }
     // Visible player count.
     who["v"] = DLString(players.size()); 
@@ -222,7 +222,7 @@ Json::Value GroupWebPromptListener::jsonGroupMember( Character *ch, Character *g
     json["level"] = gch->getRealLevel( );
 
     if (gch->is_npc( ))
-	json["tnl"] = "";
+        json["tnl"] = "";
     else
         json["tnl"] = gch->getPC( )->getExpToLevel( );
 
@@ -241,20 +241,20 @@ Json::Value GroupWebPromptListener::jsonGroup( Character *ch )
 
     for (Character *gch = char_list; gch != 0; gch = gch->next )
         if (is_same_group( gch, ch )) {
-		if (gch->is_npc( ))
-		    mobs.push_back( gch );
+                if (gch->is_npc( ))
+                    mobs.push_back( gch );
                 else if (gch != leader)
                     players.push_back( gch );
-	}
+        }
 
     int pc = 0;
     int npc = 0;
     for (p = players.begin( ); p != players.end( ); p++) {
-	group["pc"][pc++] = jsonGroupMember( ch, *p );
+        group["pc"][pc++] = jsonGroupMember( ch, *p );
     }
-	
+        
     for (m = mobs.begin( ); m != mobs.end( ); m++) {
-	group["npc"][npc++] = jsonGroupMember( ch, *m );
+        group["npc"][npc++] = jsonGroupMember( ch, *m );
     }
 
     group["leader"] = jsonGroupMember( ch, leader );
@@ -326,18 +326,18 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
         EXIT_DATA *pexit;
         Room *room;
 
-	if (!( pexit = ch->in_room->exit[door] ))
-	    continue;
-	if (!( room = pexit->u1.to_room ))
-	    continue;
-	if (!ch->can_see( room ))
-	    continue;
+        if (!( pexit = ch->in_room->exit[door] ))
+            continue;
+        if (!( room = pexit->u1.to_room ))
+            continue;
+        if (!ch->can_see( room ))
+            continue;
 
-	if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
+        if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
             visible << dirs[door].name[0];
-	} else if (number_percent() < gsn_perception->getEffective( ch )) {
+        } else if (number_percent() < gsn_perception->getEffective( ch )) {
             hidden << dirs[door].name[0];
-	}
+        }
     }
 
     Json::Value exits;
@@ -940,14 +940,14 @@ public:
 void WebPromptDescriptorStateListener::run( int oldState, int newState, Descriptor *d )
 {
     if (newState != CON_PLAYING)
-	return;
+        return;
 
     if (!d->character || !d->character->getPC( ))
-	return;
+        return;
 
     WebPromptAttribute::Pointer attr = d->character->getPC( )->getAttributes( ).findAttr<WebPromptAttribute>( "webprompt" );
     if (attr)
-    	attr->clear( );
+            attr->clear( );
 }
 
 /*-------------------------------------------------------------------------
@@ -957,19 +957,19 @@ extern "C"
 {
     SO::PluginList initialize_web( )
     {
-	SO::PluginList ppl;
-//	Plugin::registerPlugin<WebItemManip>( ppl );
-	Plugin::registerPlugin<WhoWebPromptListener>( ppl );
-	Plugin::registerPlugin<GroupWebPromptListener>( ppl );
-	Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
-	Plugin::registerPlugin<LocationWebPromptListener>( ppl );
-	Plugin::registerPlugin<AffectsWebPromptListener>( ppl );
-	Plugin::registerPlugin<ParamsWebPromptListener>( ppl );
-	Plugin::registerPlugin<QuestorWebPromptListener>( ppl );
-	Plugin::registerPlugin<WebPromptDescriptorStateListener>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<WebPromptAttribute> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+//        Plugin::registerPlugin<WebItemManip>( ppl );
+        Plugin::registerPlugin<WhoWebPromptListener>( ppl );
+        Plugin::registerPlugin<GroupWebPromptListener>( ppl );
+        Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
+        Plugin::registerPlugin<LocationWebPromptListener>( ppl );
+        Plugin::registerPlugin<AffectsWebPromptListener>( ppl );
+        Plugin::registerPlugin<ParamsWebPromptListener>( ppl );
+        Plugin::registerPlugin<QuestorWebPromptListener>( ppl );
+        Plugin::registerPlugin<WebPromptDescriptorStateListener>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<WebPromptAttribute> >( ppl );
+        
+        return ppl;
     }
 }
 

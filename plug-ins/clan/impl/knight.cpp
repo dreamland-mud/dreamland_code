@@ -68,7 +68,7 @@ void ClanItemKnight::actDisappear( )
 void ClanAltarKnight::actAppear( )
 {
     act( "{WЛучи света пронизывают комнату и в центре материализуется $o1.{x", 
-	 obj->in_room->people, obj, 0, TO_ALL );
+         obj->in_room->people, obj, 0, TO_ALL );
 }
 
 void ClanAltarKnight::actDisappear( )
@@ -80,7 +80,7 @@ void ClanAltarKnight::actDisappear( )
 void ClanAltarKnight::actNotify( Character *ch )
 {
     act_p( "{WХрамовый алтарь вашего замка был осквернен безбожниками!{x", 
-	    ch, 0, 0, TO_CHAR, POS_DEAD );
+            ch, 0, 0, TO_CHAR, POS_DEAD );
 }
 
 /*--------------------------------------------------------------------------
@@ -121,36 +121,36 @@ void ClanGuardKnight::actGiveInvitation( PCharacter *wch, Object *obj )
 
 int ClanGuardKnight::getCast( Character *victim )
 {
-	int sn = -1;
+        int sn = -1;
 
-	switch ( dice(1,16) )
-	{
-	case  0: 
-	case  1:
-		if (!victim->isAffected( gsn_spellbane ))
-		    sn = gsn_dispel_affects;
-		break;
-	case  2:
-	case  3:
-		sn = gsn_acid_arrow;
-		break;
-	case  4: 
-	case  5:
-		sn = gsn_caustic_font;
-		break; 
-	case  6:
-	case  7:
-	case  8:
-	case  9:
-	case 10:
-		sn = gsn_acid_blast;
-		break;
-	default:
-		sn = -1;
-		break;
-	}
+        switch ( dice(1,16) )
+        {
+        case  0: 
+        case  1:
+                if (!victim->isAffected( gsn_spellbane ))
+                    sn = gsn_dispel_affects;
+                break;
+        case  2:
+        case  3:
+                sn = gsn_acid_arrow;
+                break;
+        case  4: 
+        case  5:
+                sn = gsn_caustic_font;
+                break; 
+        case  6:
+        case  7:
+        case  8:
+        case  9:
+        case 10:
+                sn = gsn_acid_blast;
+                break;
+        default:
+                sn = -1;
+                break;
+        }
 
-	return sn;
+        return sn;
 }
 
 /*
@@ -166,28 +166,28 @@ SKILL_RUNP( guard )
 
     if (!gsn_guard->available( ch ))
     {
-	ch->send_to("Ась?\n\r");
-	return;
+        ch->send_to("Ась?\n\r");
+        return;
     }
 
     if (!gsn_guard->usable( ch ))
-	return;
+        return;
 
     one_argument(argument, arg);
 
     if (arg[0] == '\0') {
-	ch->send_to("Охранять кого?\n\r");
-	return;
+        ch->send_to("Охранять кого?\n\r");
+        return;
     }
 
     if (( vict = get_char_room( ch, arg ) ) == 0) {
-	ch->send_to("Этого нет здесь.\n\r");
-	return;
+        ch->send_to("Этого нет здесь.\n\r");
+        return;
     }
 
     if (vict->is_npc()) {
-	act_p("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR,POS_RESTING);
-	return;
+        act_p("$C1 не нуждается в твоей помощи!", ch, 0, vict, TO_CHAR,POS_RESTING);
+        return;
     }
 
     victim = vict->getPC();
@@ -195,60 +195,60 @@ SKILL_RUNP( guard )
 
     if (!str_cmp(arg, "none") || !str_cmp(arg, "self") || victim == pch)
     {
-	if (pch->guarding == 0)
-	{
-	    pch->send_to("Ты не можешь охранять себя же!\n\r");
-	    return;
-	}
-	else
-	{
-	    guarding_stop( pch, pch->guarding );
-	    return;
-	}
+        if (pch->guarding == 0)
+        {
+            pch->send_to("Ты не можешь охранять себя же!\n\r");
+            return;
+        }
+        else
+        {
+            guarding_stop( pch, pch->guarding );
+            return;
+        }
     }
 
     if (pch->guarding != 0)
     {
-	pch->send_to("Но ты охраняешь кого-то другого!\n\r");
-	return;
+        pch->send_to("Но ты охраняешь кого-то другого!\n\r");
+        return;
     }
 
     if (victim->guarded_by != 0)
     {
-	act_p("$C4 уже кто-то охраняет.",pch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        act_p("$C4 уже кто-то охраняет.",pch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (!is_same_group(victim, pch))
     {
-	act_p("Но ты не состоишь в той же группе, что и $C1.", pch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        act_p("Но ты не состоишь в той же группе, что и $C1.", pch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (IS_AFFECTED(pch,AFF_CHARM))
     {
-	act_p("Ты любишь своего хозяина так сильно, что не можешь охранять $C4!", pch,0,victim,TO_VICT,POS_RESTING);
-	return;
+        act_p("Ты любишь своего хозяина так сильно, что не можешь охранять $C4!", pch,0,victim,TO_VICT,POS_RESTING);
+        return;
     }
 
     if (victim->fighting != 0)
     {
-	pch->send_to("Почему бы тебе не позволить им сперва закончить сражение?\n\r");
-	return;
+        pch->send_to("Почему бы тебе не позволить им сперва закончить сражение?\n\r");
+        return;
     }
 
     if (pch->fighting != 0)
     {
-	pch->send_to("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.\n\r");
-	return;
+        pch->send_to("Сперва закончи свое сражение, а потом беспокойся о защите кого-либо еще.\n\r");
+        return;
     }
     
     for (gch = victim->guarding, cnt = 2; gch; gch = gch->guarding, cnt++)
-	if (gch == pch) {
-	    pch->printf( "%d рыцар%s, поставленных стык-в-стык, представляют собой потрясающее зрелище!\r\n", 
-	                 cnt, GET_COUNT(cnt, "ь", "я", "ей") );
-	    return;
-	}
+        if (gch == pch) {
+            pch->printf( "%d рыцар%s, поставленных стык-в-стык, представляют собой потрясающее зрелище!\r\n", 
+                         cnt, GET_COUNT(cnt, "ь", "я", "ей") );
+            return;
+        }
     
     act_p("Теперь ты охраняешь $C4.", pch, 0, victim, TO_CHAR,POS_RESTING);
     act_p("Теперь тебя охраняет $c4.", pch, 0, victim, TO_VICT,POS_RESTING);
@@ -264,26 +264,26 @@ BOOL_SKILL( guard )::run( Character *wch, Character *mob )
     PCharacter *ch = wch->getPC( );
     
     if (wch->is_npc( ))
-	return false;
+        return false;
     
     if (ch->guarded_by == 0 || ch->guarded_by->in_room != ch->in_room)
-	return false;
+        return false;
     
     chance = (gsn_guard->getEffective( ch->guarded_by ) -
     ( int )( 1.5 * ( ch->getModifyLevel() - mob->getModifyLevel() ) ) );
 
     if (number_percent() < min(100,chance))
     {
-	act_p("$c1 прыгает перед $C5!", ch->guarded_by,0,ch,TO_NOTVICT,POS_RESTING);
-	act_p("$c1 прыгает перед тобой!", ch->guarded_by,0,ch,TO_VICT,POS_RESTING);
-	act_p("Ты прыгаешь перед $C5!", ch->guarded_by,0,ch,TO_CHAR,POS_RESTING);
-	gsn_guard->improve( ch->guarded_by, true, mob );
-	return true;
+        act_p("$c1 прыгает перед $C5!", ch->guarded_by,0,ch,TO_NOTVICT,POS_RESTING);
+        act_p("$c1 прыгает перед тобой!", ch->guarded_by,0,ch,TO_VICT,POS_RESTING);
+        act_p("Ты прыгаешь перед $C5!", ch->guarded_by,0,ch,TO_CHAR,POS_RESTING);
+        gsn_guard->improve( ch->guarded_by, true, mob );
+        return true;
     }
     else
     {
-	gsn_guard->improve( ch->guarded_by, false, mob );
-	return false;
+        gsn_guard->improve( ch->guarded_by, false, mob );
+        return false;
     }
 }
 
@@ -337,12 +337,12 @@ bool KnightWeapon::death( Character *ch )
     extract_obj( obj );
     
     if (!wielded || ch->is_npc( ) || chance( 80 ))
-	return false;
+        return false;
     
     ch->hit = 1;
     
     while (ch->affected)
-	affect_remove( ch, ch->affected );
+        affect_remove( ch, ch->affected );
 
     ch->unsetLastFightTime( );
     SET_DEATH_TIME(ch);
@@ -354,18 +354,18 @@ void KnightWeapon::fight( Character *ch )
     int sn = -1;
     
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
-	return;
+        return;
     
     if (chance( 3 )) 
-	sn = gsn_cure_critical;
+        sn = gsn_cure_critical;
     else if (chance( 8 ))
-	sn = gsn_cure_serious;
+        sn = gsn_cure_serious;
 
     if (sn > 0) {
-	act("$o1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
-	act("$o1 $c2 загорается ярким голубым светом!", ch, obj, 0,TO_ROOM);
+        act("$o1 загорается ярким голубым светом!", ch, obj, 0, TO_CHAR);
+        act("$o1 $c2 загорается ярким голубым светом!", ch, obj, 0,TO_ROOM);
 
-	spell( sn, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
+        spell( sn, ch->getModifyLevel( ), ch, ch, FSPELL_BANE );
     }
 }
 
@@ -401,7 +401,7 @@ VOID_SPELL(Dragonsword)::run( Character *ch, char *target_name, int sn, int leve
   sword = create_object( get_obj_index(sword_vnum), level);
   sword->timer = level * 2;
   sword->cost  = 0;
-    if( level <= 30)			  sword->value[2] = 4;
+    if( level <= 30)                          sword->value[2] = 4;
     else if( level > 30 && level <= 40)   sword->value[2] = 5;
     else if( level > 40 && level <= 50)   sword->value[2] = 6;
     else if( level > 50 && level <= 60)   sword->value[2] = 7;
@@ -424,11 +424,11 @@ VOID_SPELL(Dragonsword)::run( Character *ch, char *target_name, int sn, int leve
   affect_to_obj( sword, &af);
 
   if (IS_GOOD(ch))
-	 SET_BIT(sword->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
+         SET_BIT(sword->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL));
   else if (IS_NEUTRAL(ch))
-	 SET_BIT(sword->extra_flags,(ITEM_ANTI_GOOD | ITEM_ANTI_EVIL));
+         SET_BIT(sword->extra_flags,(ITEM_ANTI_GOOD | ITEM_ANTI_EVIL));
   else if (IS_EVIL(ch))
-	 SET_BIT(sword->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_GOOD));	
+         SET_BIT(sword->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_GOOD));        
   obj_to_char(sword, ch);
 
   act_p( "Ты взмахиваешь руками и создаешь $o4!",
@@ -450,22 +450,22 @@ VOID_SPELL(GoldenAura)::run( Character *ch, Room *room, int sn, int level )
   for (vch = room->people; vch != 0; vch = vch->next_in_room)
     {
       if (!is_same_group(vch, ch))
-	continue;
+        continue;
 
-	if (spellbane( ch, vch ))
-	    continue;
+        if (spellbane( ch, vch ))
+            continue;
 
       if( vch->isAffected(sn ) ) {
           if (vch == ch)
            act("Ты уже окруже$gно|н|на {YЗолотой аурой{x.", ch,0,0,TO_CHAR);
           else
            act("$C1 уже окруже$Gно|н|на {YЗолотой аурой{x.", ch,0,vch,TO_CHAR);
-	  continue;
-	}
-	
-      af.where		= TO_AFFECTS;
+          continue;
+        }
+        
+      af.where                = TO_AFFECTS;
       af.type      = sn;
-      af.level	 = level;
+      af.level         = level;
       af.duration  = 6 + level;
       af.modifier  = 0;
       af.location  = APPLY_NONE;
@@ -482,7 +482,7 @@ VOID_SPELL(GoldenAura)::run( Character *ch, Room *room, int sn, int level )
       af.location = APPLY_SAVING_SPELL;
       affect_to_char(vch, &af);
 
-      af.where		= TO_DETECTS;
+      af.where                = TO_DETECTS;
       af.modifier = ch->applyCurse( level / 8 );
       af.location = APPLY_NONE;
       af.bitvector = DETECT_FADE;
@@ -493,7 +493,7 @@ VOID_SPELL(GoldenAura)::run( Character *ch, Room *room, int sn, int level )
 
       vch->send_to("{YЗолотая аура{x окружает тебя.\n\r");
       if ( ch != vch )
-	act_p("{YЗолотая аура{x окружает $C4.",ch,0,vch,TO_CHAR,POS_RESTING);
+        act_p("{YЗолотая аура{x окружает $C4.",ch,0,vch,TO_CHAR,POS_RESTING);
 
     }
 
@@ -513,7 +513,7 @@ VOID_SPELL(HolyArmor)::run( Character *ch, Character *, int sn, int level )
       return;
     }
 
-  af.where	= TO_AFFECTS;
+  af.where        = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = level;
@@ -532,10 +532,10 @@ SPELL_DECL_T(Squire, SummonCreatureSpell);
 TYPE_SPELL(NPCharacter *, Squire)::createMobile( Character *ch, int level ) const 
 {
     NPCharacter *mob = createMobileAux( ch, ch->getModifyLevel( ), 
-				     ch->max_hit, ch->max_mana,
-				     number_range(level/20, level/15),
-				     number_range(level/4, level/3),
-				     number_range(level/10, level/8) );
+                                     ch->max_hit, ch->max_mana,
+                                     number_range(level/20, level/15),
+                                     number_range(level/4, level/3),
+                                     number_range(level/10, level/8) );
     
     
     mob->setLongDescr( fmt( ch, mob->getLongDescr( ), ch ) );
@@ -553,18 +553,18 @@ COMMAND(COrden, "orden")
     DLString arguments, cmd, arg;
 
     if (ch->is_npc( ))
-	return;
+        return;
 
     pch = ch->getPC( );
     
     if (pch->getClan( ) != clan_knight) {
-	pch->println( "Ты не принадлежишь к клану Рыцарей." );
-	return;
+        pch->println( "Ты не принадлежишь к клану Рыцарей." );
+        return;
     }
     
     if (!( orgs = clan_knight->getOrgs( ) )) {
-	pch->println( "Ордена сейчас недоступны." );
-	return;
+        pch->println( "Ордена сейчас недоступны." );
+        return;
     }
     
     arguments = constArguments;
@@ -572,28 +572,28 @@ COMMAND(COrden, "orden")
     arg = arguments.getOneArgument( );
     
     if (cmd.empty( )) {
-	doUsage( pch );
+        doUsage( pch );
     }
     else if (arg_is_list( cmd )) {
-	orgs->doList( pch );
+        orgs->doList( pch );
     }
     else if (arg_oneof( cmd, "induct", "принять" )) {
-	if (arg_is_self( arg ))
-	    orgs->doSelfInduct( pch, arguments );
-	else
-	    orgs->doInduct( pch, arg );
+        if (arg_is_self( arg ))
+            orgs->doSelfInduct( pch, arguments );
+        else
+            orgs->doInduct( pch, arg );
     }
     else if (arg_oneof( cmd, "remove", "выгнать", "уйти" )) {
-	if (arg_is_self( arg ))
-	    orgs->doSelfRemove( pch );
-	else
-	    orgs->doRemove( pch, arg );
+        if (arg_is_self( arg ))
+            orgs->doSelfRemove( pch );
+        else
+            orgs->doRemove( pch, arg );
     }
     else if (arg_oneof( cmd, "members", "члены" )) {
-	orgs->doMembers( pch );
+        orgs->doMembers( pch );
     }
     else {
-	doUsage( pch );
+        doUsage( pch );
     }
 }
 
@@ -603,15 +603,15 @@ void COrden::doUsage( PCharacter *pch )
 
     buf << "Для всех: " << endl
         << "{Worden list{x        - посмотреть список орденов" << endl
-	<< "{Worden members{x     - посмотреть список членов ордена" << endl
-	<< "{Worden remove self{x - выйти из ордена" << endl
-	<< endl
-	<< "Для рекруитеров: " << endl
-	<< "{Worden induct <{xname{W>{x - принять кого-либо в орден" << endl
-	<< "{Worden remove <{xname{W>{x - выгнать кого-либо из ордена" << endl
-	<< endl
-	<< "Для лидера: " << endl
-	<< "{Worden induct self <{xorden name{W>{x - войти в указанный орден" << endl;
+        << "{Worden members{x     - посмотреть список членов ордена" << endl
+        << "{Worden remove self{x - выйти из ордена" << endl
+        << endl
+        << "Для рекруитеров: " << endl
+        << "{Worden induct <{xname{W>{x - принять кого-либо в орден" << endl
+        << "{Worden remove <{xname{W>{x - выгнать кого-либо из ордена" << endl
+        << endl
+        << "Для лидера: " << endl
+        << "{Worden induct self <{xorden name{W>{x - войти в указанный орден" << endl;
 
     pch->send_to( buf );
 }

@@ -32,40 +32,40 @@ COMMAND(COrder, "order")
     argOrder = argument;
     
     if (argTarget.empty( ) || argOrder.empty( )) {
-	ch->println( "Приказать кому и что?" );
-	return;
+        ch->println( "Приказать кому и что?" );
+        return;
     }
 
     if (IS_AFFECTED( ch, AFF_CHARM )) {
-	ch->println( "Ты можешь только принимать приказы, а не отдавать их." );
-	return;
+        ch->println( "Ты можешь только принимать приказы, а не отдавать их." );
+        return;
     }
     
     if (argTarget == "all") {
-	ch->println( "Ты не можешь отдать приказ всем сразу." );
-	return;
+        ch->println( "Ты не можешь отдать приказ всем сразу." );
+        return;
     }
     
     victim = findVictim( ch, argTarget );
     
     if (!victim) {
-	ch->println( "Среди твоих последователей такого нет." );
-	return;
+        ch->println( "Среди твоих последователей такого нет." );
+        return;
     }
 
     interpretOrder( victim, iargs, argOrder );
     
     if (!iargs.pCommand || !iargs.pCommand->properOrder( victim )) {
-	if (victim->isAffected( gsn_manacles ))
-	    act( "$C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
-	else
-	    act( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch, 0, victim, TO_CHAR );
+        if (victim->isAffected( gsn_manacles ))
+            act( "$C1 говорит тебе '{GЯ не буду делать это.{x'", ch, 0, victim, TO_CHAR );
+        else
+            act( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch, 0, victim, TO_CHAR );
     }
     else {
-	act( "$c1 приказывает тебе '$t', ты покорно исполняешь приказ.", ch, iargs.pCommand->getName( ).c_str( ), victim, TO_VICT );
-	
-	if (iargs.pCommand->dispatchOrder( iargs ))
-	    iargs.pCommand->run( victim, iargs.cmdArgs );
+        act( "$c1 приказывает тебе '$t', ты покорно исполняешь приказ.", ch, iargs.pCommand->getName( ).c_str( ), victim, TO_VICT );
+        
+        if (iargs.pCommand->dispatchOrder( iargs ))
+            iargs.pCommand->run( victim, iargs.cmdArgs );
     }
 
 
@@ -76,20 +76,20 @@ COMMAND(COrder, "order")
 bool COrder::canOrder( Character *ch, Character *victim )
 {
     if (ch == victim)
-	return false;
+        return false;
 
     if (ch->getClan( ) == clan_ruler && victim->isAffected(gsn_manacles))
-	return true;
-	
+        return true;
+        
     if (!IS_AFFECTED(victim, AFF_CHARM))
-	return false;
+        return false;
     
     if (victim->master != ch)
-	return false;
-	
+        return false;
+        
     if (victim->is_immortal( ) 
-	&& victim->get_trust( ) >= ch->getModifyLevel( ))
-	return false;
+        && victim->get_trust( ) >= ch->getModifyLevel( ))
+        return false;
     
     return true;
 }
@@ -104,26 +104,26 @@ Character * COrder::findVictim( Character *ch, DLString &argument )
     
     for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room)
     {
-	Character *tch;
-	
-	if (!canOrder( ch, rch ))
-	    continue;
+        Character *tch;
+        
+        if (!canOrder( ch, rch ))
+            continue;
 
-	tch = rch->getDoppel( ch );
+        tch = rch->getDoppel( ch );
 
-	if (tch->is_npc( ))
-	{
-	    if (!is_name( argument.c_str( ), tch->getNameP( ) ))
-		continue;
-	}
-	else
-	{
-	    if (!is_name( argument.c_str( ), tch->getNameP( '7' ).c_str() ))
-		continue;
-	}
+        if (tch->is_npc( ))
+        {
+            if (!is_name( argument.c_str( ), tch->getNameP( ) ))
+                continue;
+        }
+        else
+        {
+            if (!is_name( argument.c_str( ), tch->getNameP( '7' ).c_str() ))
+                continue;
+        }
 
-	if (++count == number)
-	    return rch;
+        if (++count == number)
+            return rch;
     }
 
     return NULL;
@@ -132,11 +132,11 @@ Character * COrder::findVictim( Character *ch, DLString &argument )
 void COrder::interpretOrder( Character *och, InterpretArguments &iargs, const DLString &args )
 {
     static int phases [] = { 
-	CMDP_LOG_INPUT,
-	CMDP_GRAB_WORD,
-	CMDP_FIND,
-	CMDP_LOG_CMD,
-	0
+        CMDP_LOG_INPUT,
+        CMDP_GRAB_WORD,
+        CMDP_FIND,
+        CMDP_LOG_CMD,
+        0
     };
 
     iargs.ch = och;

@@ -12,10 +12,10 @@ extern "C"
 {
     SO::PluginList initialize_occupations( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeAttract> >( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeAttract> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

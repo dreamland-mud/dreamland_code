@@ -42,88 +42,88 @@
 
 SKILL_RUNP( rescue )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *victim;
-	Character *fch;
+        char arg[MAX_INPUT_LENGTH];
+        Character *victim;
+        Character *fch;
 
-	one_argument( argument, arg );
+        one_argument( argument, arg );
 
-	if ( arg[0] == '\0' )
-	{
-		ch->send_to("Спасти кого?\n\r");
-		return;
-	}
+        if ( arg[0] == '\0' )
+        {
+                ch->send_to("Спасти кого?\n\r");
+                return;
+        }
 
-	if ( ( victim = get_char_room( ch, arg ) ) == 0 )
-	{
-		ch->send_to("Этого нет здесь.\n\r");
-		return;
-	}
+        if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+        {
+                ch->send_to("Этого нет здесь.\n\r");
+                return;
+        }
 
-	if ( victim == ch )
-	{
-		ch->send_to("Себя?\n\r");
-		return;
-	}
+        if ( victim == ch )
+        {
+                ch->send_to("Себя?\n\r");
+                return;
+        }
 
-	if ( !ch->is_npc() && victim->is_npc() )
-	{
-		ch->send_to("Твоя помощь не нужна!\n\r");
-		return;
-	}
+        if ( !ch->is_npc() && victim->is_npc() )
+        {
+                ch->send_to("Твоя помощь не нужна!\n\r");
+                return;
+        }
 
-	if ( ch->fighting == victim )
-	{
-		ch->send_to("Слишком поздно...\n\r");
-		return;
-	}
+        if ( ch->fighting == victim )
+        {
+                ch->send_to("Слишком поздно...\n\r");
+                return;
+        }
 
-	if ( ( ( fch = victim->fighting ) == 0 )
-		&& ( victim->death_ground_delay == 0 ) )
-	{
-		ch->send_to("Но никто не нуждается в помощи..\n\r");
-		return;
-	}
+        if ( ( ( fch = victim->fighting ) == 0 )
+                && ( victim->death_ground_delay == 0 ) )
+        {
+                ch->send_to("Но никто не нуждается в помощи..\n\r");
+                return;
+        }
 
-	if ( ch->is_npc() && ch->master != 0 && victim->is_npc() )
-		return;
-	
-	if ((fch && is_safe(ch, fch)) || is_safe( ch, victim ))
-	    return;
+        if ( ch->is_npc() && ch->master != 0 && victim->is_npc() )
+                return;
+        
+        if ((fch && is_safe(ch, fch)) || is_safe( ch, victim ))
+            return;
 
-	if (ch->is_npc( ) && ch->master != 0)
-	    if ((fch && is_safe(ch->master, fch)) || is_safe( ch->master, victim ))
-		return;
+        if (ch->is_npc( ) && ch->master != 0)
+            if ((fch && is_safe(ch->master, fch)) || is_safe( ch->master, victim ))
+                return;
 
-	ch->setWait( gsn_rescue->getBeats( )  );
+        ch->setWait( gsn_rescue->getBeats( )  );
 
-	if ( ( number_percent( ) > gsn_rescue->getEffective( ch ) )
-		|| ( victim->getModifyLevel() > ( ch->getModifyLevel() + 30) )
-		|| ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
-	{
-		ch->send_to("Твоя попытка спасти не удалась.\n\r");
-		gsn_rescue->improve( ch, false, victim );
-		return;
-	}
+        if ( ( number_percent( ) > gsn_rescue->getEffective( ch ) )
+                || ( victim->getModifyLevel() > ( ch->getModifyLevel() + 30) )
+                || ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
+        {
+                ch->send_to("Твоя попытка спасти не удалась.\n\r");
+                gsn_rescue->improve( ch, false, victim );
+                return;
+        }
 
-	act_p( "Ты спасаешь $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING);
-	act_p( "$c1 спасает тебя!", ch, 0, victim, TO_VICT,POS_RESTING);
-	act_p( "$c1 спасает $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
-	gsn_rescue->improve( ch, true, victim );
+        act_p( "Ты спасаешь $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING);
+        act_p( "$c1 спасает тебя!", ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( "$c1 спасает $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+        gsn_rescue->improve( ch, true, victim );
 
-	if ( fch )
-	{
-		stop_fighting( fch, false );
-//		stop_fighting( victim, false );
+        if ( fch )
+        {
+                stop_fighting( fch, false );
+//                stop_fighting( victim, false );
 
-		set_fighting( ch, fch );
-		set_fighting( fch, ch );
-	}
-	else
-	{
-		victim->death_ground_delay = 0;
-		victim->trap.clear( );
-	}
-	return;
+                set_fighting( ch, fch );
+                set_fighting( fch, ch );
+        }
+        else
+        {
+                victim->death_ground_delay = 0;
+                victim->trap.clear( );
+        }
+        return;
 }
 

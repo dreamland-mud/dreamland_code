@@ -145,51 +145,51 @@ void CachedNoun::update( PCharacter *ch )
     
     /* plain english name */
     if (!name) {
-	name = RussianString::Pointer( NEW, ch->getName( ), mg );
+        name = RussianString::Pointer( NEW, ch->getName( ), mg );
     }
     else {
-	name->setFullForm( ch->getName( ) );
-	name->setGender( mg );
+        name->setFullForm( ch->getName( ) );
+        name->setGender( mg );
     }
     
     /* russian name if set. defaults to english */
     DLString rname = ch->getRussianName( ).getFullForm( );
     if (rname.empty( ))
-	rname = ch->getName( );
+        rname = ch->getName( );
     
     if (!russian) {
-	russian = RussianString::Pointer( NEW, rname, mg );
+        russian = RussianString::Pointer( NEW, rname, mg );
     }
     else {
-	russian->setFullForm( rname );
-	russian->setGender( mg );
+        russian->setFullForm( rname );
+        russian->setGender( mg );
     }
     
     /* vampire as visible to non-vampires */
     if (!vampire) {
-	vampire = RussianString::Pointer( NEW, vampireName, mg );
+        vampire = RussianString::Pointer( NEW, vampireName, mg );
     }
     else {
-	vampire->setGender( mg );
+        vampire->setGender( mg );
     }
     
     /* vampire as visible to immortals */
     DLString v2name = vampireName + " [" + ch->getName( ) + "]";
 
     if (!vampire2) {
-	vampire2 = RussianString::Pointer( NEW, v2name, mg );
+        vampire2 = RussianString::Pointer( NEW, v2name, mg );
     }
     else {
-	vampire2->setFullForm( v2name );
-	vampire2->setGender( mg );
+        vampire2->setFullForm( v2name );
+        vampire2->setGender( mg );
     }
     
     /* immortals under wizinvis */
     if (!immortal) {
-	immortal = RussianString::Pointer( NEW, immortalName, mg );
+        immortal = RussianString::Pointer( NEW, immortalName, mg );
     }
     else {
-	immortal->setGender( mg );
+        immortal->setGender( mg );
     }
     
     /* english name with pretitle, russian name with russian or english pretitle */
@@ -197,32 +197,32 @@ void CachedNoun::update( PCharacter *ch )
     bool colored = ch->getRemorts( ).pretitle;
     
     if (ch->getPretitle( ).colorLength( ) > 0) {
-	prt << (colored ? ch->getPretitle( ) : ch->getPretitle( ).colourStrip( )) << " ";
+        prt << (colored ? ch->getPretitle( ) : ch->getPretitle( ).colourStrip( )) << " ";
     }
 
     if (ch->getRussianPretitle( ).colorLength( ) > 0) {
-	rprt << (colored ? ch->getRussianPretitle( ) : ch->getRussianPretitle( ).colourStrip( )) << " "; 
+        rprt << (colored ? ch->getRussianPretitle( ) : ch->getRussianPretitle( ).colourStrip( )) << " "; 
     } else {
-	rprt << prt;
+        rprt << prt;
     }
 
     prt << ch->getName( );
     rprt << rname;
 
     if (!pretitle) {
-	pretitle = RussianString::Pointer( NEW, prt, mg );
+        pretitle = RussianString::Pointer( NEW, prt, mg );
     }
     else {
-	pretitle->setFullForm( prt );
-	pretitle->setGender( mg );
+        pretitle->setFullForm( prt );
+        pretitle->setGender( mg );
     }
 
     if (!pretitleRussian) {
-	pretitleRussian = RussianString::Pointer( NEW, rprt, mg );
+        pretitleRussian = RussianString::Pointer( NEW, rprt, mg );
     }
     else {
-	pretitleRussian->setFullForm( rprt );
-	pretitleRussian->setGender( mg );
+        pretitleRussian->setFullForm( rprt );
+        pretitleRussian->setGender( mg );
     }
 }
 
@@ -231,9 +231,9 @@ void CachedNoun::update( PCharacter *ch )
  **************************************************************************/
 
 PCharacter::PCharacter( )
-	:	wearloc( wearlocationManager ),
-		desires( desireManager ),
-		config( 0, &config_flags )
+        :        wearloc( wearlocationManager ),
+                desires( desireManager ),
+                config( 0, &config_flags )
 {
     init( );
 }
@@ -273,9 +273,9 @@ void PCharacter::init( )
     newbie_hit_counter = 0;
 
     wearloc.clear( );
-    desires.clear( );	
+    desires.clear( );        
     for (int i = 0; i < desireManager->size( ); i++)
-	desireManager->find( i )->reset( this );
+        desireManager->find( i )->reset( this );
     
     bamfin.setValue( "" );
     bamfout.setValue( "" );
@@ -356,49 +356,49 @@ bool PCharacter::is_npc( ) const
  **************************************************************************/
 PCharacterMemory* PCharacter::getMemory( )
 {
-	PCharacterMemory* mem = dallocate( PCharacterMemory );
-	mem->setName( getName( ) );
-	mem->setPassword( getPassword( ) );
-	mem->setLastAccessTime( getLastAccessTime( ) );
-	mem->setLastAccessHost( getLastAccessHost( ) );
-	mem->setLevel( getLevel( ) );
-	mem->setTrust( getTrust( ) );
-	mem->setSecurity( getSecurity( ) );
-	mem->setClan( getClan( ) );
-	mem->setPetition( getPetition( ) );
-	mem->setProfession( getProfession( ) );
-	mem->setRace( getRace( ) );
-	mem->setClanLevel( getClanLevel( ) );
-	mem->setSex( getSex( ) );
-	mem->setHometown( getHometown( ) );
-	mem->setAttributes( getAttributes( ) );
-	mem->setRemorts( getRemorts( ) );
-	mem->setRussianName( getRussianName( ).getFullForm( ) );
-	mem->setReligion( getReligion( ) );
+        PCharacterMemory* mem = dallocate( PCharacterMemory );
+        mem->setName( getName( ) );
+        mem->setPassword( getPassword( ) );
+        mem->setLastAccessTime( getLastAccessTime( ) );
+        mem->setLastAccessHost( getLastAccessHost( ) );
+        mem->setLevel( getLevel( ) );
+        mem->setTrust( getTrust( ) );
+        mem->setSecurity( getSecurity( ) );
+        mem->setClan( getClan( ) );
+        mem->setPetition( getPetition( ) );
+        mem->setProfession( getProfession( ) );
+        mem->setRace( getRace( ) );
+        mem->setClanLevel( getClanLevel( ) );
+        mem->setSex( getSex( ) );
+        mem->setHometown( getHometown( ) );
+        mem->setAttributes( getAttributes( ) );
+        mem->setRemorts( getRemorts( ) );
+        mem->setRussianName( getRussianName( ).getFullForm( ) );
+        mem->setReligion( getReligion( ) );
 
-	return mem;
+        return mem;
 }
 
 void PCharacter::setMemory( PCharacterMemory* pcm )
 {
-	setName( pcm->getName( ) );
-	setPassword( pcm->getPassword( ) );
-	setLastAccessTime( pcm->getLastAccessTime( ) );
-	setLastAccessHost( pcm->getLastAccessHost( ) );
-	setLevel( pcm->getLevel( ) );
-	setTrust( pcm->getTrust( ) );
-	setSecurity( pcm->getSecurity( ) );
-	setClan( pcm->getClan( ) );
-	setPetition( pcm->getPetition( ) );
-	setProfession( pcm->getProfession( ) );
-	setRace( pcm->getRace( ) );
-	setClanLevel( pcm->getClanLevel( ) );
-	setSex( pcm->getSex( ) );
-	setHometown( pcm->getHometown( ) );
-	setAttributes( pcm->getAttributes( ) );
-	setRemorts( pcm->getRemorts( ) );
-	setRussianName( pcm->getRussianName( ).getFullForm( ) );
-	setReligion( pcm->getReligion( ) );
+        setName( pcm->getName( ) );
+        setPassword( pcm->getPassword( ) );
+        setLastAccessTime( pcm->getLastAccessTime( ) );
+        setLastAccessHost( pcm->getLastAccessHost( ) );
+        setLevel( pcm->getLevel( ) );
+        setTrust( pcm->getTrust( ) );
+        setSecurity( pcm->getSecurity( ) );
+        setClan( pcm->getClan( ) );
+        setPetition( pcm->getPetition( ) );
+        setProfession( pcm->getProfession( ) );
+        setRace( pcm->getRace( ) );
+        setClanLevel( pcm->getClanLevel( ) );
+        setSex( pcm->getSex( ) );
+        setHometown( pcm->getHometown( ) );
+        setAttributes( pcm->getAttributes( ) );
+        setRemorts( pcm->getRemorts( ) );
+        setRussianName( pcm->getRussianName( ).getFullForm( ) );
+        setReligion( pcm->getReligion( ) );
 }
 
 /**************************************************************************
@@ -407,8 +407,8 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
 bool PCharacter::nodeFromXML( const XMLNode::Pointer& child )
 {
     if (!XMLVariableContainer::nodeFromXML( child )) 
-	LogStream::sendWarning( ) 
-	    << getName( ) << "::ignoring unhandled node " << child->getName( ) << endl;
+        LogStream::sendWarning( ) 
+            << getName( ) << "::ignoring unhandled node " << child->getName( ) << endl;
     
     return true;
 }
@@ -513,7 +513,7 @@ void PCharacter::setSubProfession( const ProfessionReference &sub )
 ProfessionReference &PCharacter::getTrueProfession( )
 {
     if (subprofession != prof_none)
-	return subprofession;
+        return subprofession;
 
     return getProfession( );
 }
@@ -618,42 +618,42 @@ DLString PCharacter::getParsedTitle( )
     
     switch (str[0]) {
     case '.': case ',': case '!': case '?':
-	break;
+        break;
     default:
-	out << " ";
-	break;
+        out << " ";
+        break;
     }
 
     for (; *str; str++) {
-	if (*str == '%') {
-	    DLString cl;
-	    
-	    if (*++str == '\0')
-		break;
+        if (*str == '%') {
+            DLString cl;
+            
+            if (*++str == '\0')
+                break;
 
-	    switch (*str) {
-	    default:
-		out << *str;
-		break;
-	    
-	    case 'c':
-		out << clan->getTitle( this );
-		break;
-		
-	    case 'C':
-		cl = clan->getTitle( this );
-		if (!cl.empty( ))
-		    cl.upperFirstCharacter( );
-		out << cl;
-		break;
-		
-	    case 'a':
-		out << getProfession( )->getTitle( this );
-		break;
-	    }
-	}
-	else
-	    out << *str;
+            switch (*str) {
+            default:
+                out << *str;
+                break;
+            
+            case 'c':
+                out << clan->getTitle( this );
+                break;
+                
+            case 'C':
+                cl = clan->getTitle( this );
+                if (!cl.empty( ))
+                    cl.upperFirstCharacter( );
+                out << cl;
+                break;
+                
+            case 'a':
+                out << getProfession( )->getTitle( this );
+                break;
+            }
+        }
+        else
+            out << *str;
     }
 
     return out.str( );
@@ -670,35 +670,35 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
     PlayerConfig::Pointer cfg = wch ? wch->getConfig( ) : PlayerConfig::Pointer( );
     
     if (IS_SET(flags, FMT_DOPPEL))
-	return getDoppel( wch )->toNoun( wch, REMOVE_BIT(flags, FMT_DOPPEL) );
+        return getDoppel( wch )->toNoun( wch, REMOVE_BIT(flags, FMT_DOPPEL) );
 
     if (IS_SET(flags, FMT_INVIS) && wch) {
-	if (!wch->can_see( this )) {
-	    if (is_immortal( ))
-		return cachedNoun.immortal;
-	    else
-		return somebody;
+        if (!wch->can_see( this )) {
+            if (is_immortal( ))
+                return cachedNoun.immortal;
+            else
+                return somebody;
         }
-		
-	if (is_vampire( ) && !wch->is_vampire( )) {
-	    if (cfg->holy) 
-		return cachedNoun.vampire2;
-	    else
-		return cachedNoun.vampire;
+                
+        if (is_vampire( ) && !wch->is_vampire( )) {
+            if (cfg->holy) 
+                return cachedNoun.vampire2;
+            else
+                return cachedNoun.vampire;
         }
     }
     
     if (IS_SET(flags, FMT_PRETITLE)) {
-	if (wch && cfg->runames)
-	    return cachedNoun.pretitleRussian;
-	else
-	    return cachedNoun.pretitle;
+        if (wch && cfg->runames)
+            return cachedNoun.pretitleRussian;
+        else
+            return cachedNoun.pretitle;
     }
     
     if (wch && cfg->runames)
-	return cachedNoun.russian;
+        return cachedNoun.russian;
     else
-	return cachedNoun.name;
+        return cachedNoun.name;
 }
 
 void PCharacter::updateCachedNoun( )
@@ -713,7 +713,7 @@ DLString PCharacter::getNameP( char gram_case ) const
     buf << cachedNoun.russian->decline( gram_case );
     
     if (gram_case == '7')
-	buf << " " << getName( );
+        buf << " " << getName( );
 
     return buf.str( );
 }
@@ -726,13 +726,13 @@ DLString PCharacter::getNameP( char gram_case ) const
  */
 int PCharacter::skill_points( ) 
 {
-	int sn;
-	int points = 0;
-	
-	for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) 
-	    points += skill_points( sn );
-	
-	return points / 10;
+        int sn;
+        int points = 0;
+        
+        for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) 
+            points += skill_points( sn );
+        
+        return points / 10;
 }
 
 /* 
@@ -744,7 +744,7 @@ int PCharacter::skill_points( int sn )
     Skill *skill = SkillManager::getThis( )->find( sn );
     
     if (learned <= 1 || !skill->available( this ))
-	return 0;
+        return 0;
 
     return learned * SkillManager::getThis( )->find(sn)->getWeight( this );
 }
@@ -757,16 +757,16 @@ PCSkillData & PCharacter::getSkillData( int sn )
 void PCharacter::updateSkills( )
 {
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	
-	if (skill->visible( this )) {
-	    int &percent = getSkillData( sn ).learned;
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        
+        if (skill->visible( this )) {
+            int &percent = getSkillData( sn ).learned;
 
-	    percent = std::max( 1, percent );
-	    percent = std::max( skill->getLearned( this ), percent );
-	}
+            percent = std::max( 1, percent );
+            percent = std::max( skill->getLearned( this ), percent );
+        }
     }
-}			
+}                        
 
 int PCharacter::applyCurse( int def )
 {
@@ -779,15 +779,15 @@ int PCharacter::applyCurse( int def )
 bool PCharacter::canSeeProfession( PCharacter *victim ) 
 {
     if (is_immortal( ))
-	return true;
+        return true;
     
     if (this == victim)
-	return true;
+        return true;
     
     if (getClan( ) != clan_none 
-	&& getClan( ) == victim->getClan( )
-	&& !getClan( )->isDispersed( ))
-	return true;
+        && getClan( ) == victim->getClan( )
+        && !getClan( )->isDispersed( ))
+        return true;
 
     return false;
 }
@@ -795,7 +795,7 @@ bool PCharacter::canSeeProfession( PCharacter *victim )
 bool PCharacter::canSeeLevel( PCharacter *victim ) 
 {
     if (victim->getCurrStat( STAT_CHA ) < 18)
-	return true;
+        return true;
 
     return canSeeProfession( victim );
 }
@@ -824,10 +824,10 @@ int PCharacter::getExpPerLevel( int lvl, int remort )
     int base = getBaseExp( );
     
     if (lvl < 0)
-	lvl = getLevel( );
+        lvl = getLevel( );
 
     if (remort < 0)
-	remort = remorts.size( );
+        remort = remorts.size( );
 
     // Summ[x=1..lvl] (base + 6 * remort * x)
     return lvl * base + 6 * remort * lvl * (lvl + 1) / 2;
@@ -845,10 +845,10 @@ bool PCharacter::isCoder( ) const
 int PCharacter::get_trust( ) const
 {
     if (getAttributes( ).isAvailable( "coder" ))
-	return 0xFFFF;
+        return 0xFFFF;
     
     if (getTrust( ) != 0)
-	return getTrust( );
+        return getTrust( );
 
     return getLevel( );
 }
@@ -863,14 +863,14 @@ bool PCharacter::is_immortal( ) const
 int PCharacter::getCurrStat( int stat ) 
 {
     return URANGE( MIN_STAT, 
-		   perm_stat[stat] + mod_stat[stat], 
-		   getMaxStat( stat ) );
+                   perm_stat[stat] + mod_stat[stat], 
+                   getMaxStat( stat ) );
 }
 
 int PCharacter::getMaxStat( int i ) 
 {
     if (getRealLevel( ) > LEVEL_IMMORTAL)
-	return MAX_STAT;
+        return MAX_STAT;
 
     int maxStat = getMaxTrain( i ) + remorts.stats[i].getValue( );
 
@@ -885,22 +885,22 @@ int PCharacter::getMaxTrain( int i )
     if (getRealLevel( ) > LEVEL_IMMORTAL)
         return MAX_STAT;
     else
-	return min(MAX_STAT, BASE_STAT
-				+ getRace( )->getPC( )->getStats( )[i]
-				+ getProfession( )->getStat( i ));
+        return min(MAX_STAT, BASE_STAT
+                                + getRace( )->getPC( )->getStats( )[i]
+                                + getProfession( )->getStat( i ));
 }
 
 void PCharacter::updateStats( )
 {
     int i, max_stat;
 
-    for (i = 0; i < stat_table.size; i++) {	
-	max_stat = getMaxTrain( i );
+    for (i = 0; i < stat_table.size; i++) {        
+        max_stat = getMaxTrain( i );
 
-	if (perm_stat[i] > max_stat) {
-	    train += perm_stat[i] - max_stat;
-	    perm_stat[i] = max_stat;
-	}
+        if (perm_stat[i] > max_stat) {
+            train += perm_stat[i] - max_stat;
+            perm_stat[i] = max_stat;
+        }
     }
 }
 

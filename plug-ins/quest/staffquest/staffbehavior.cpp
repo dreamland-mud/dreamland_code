@@ -30,26 +30,26 @@ void StaffBehavior::getByOther( Character *ch )
 
     switch (dice( 1, 10 ))  {
     case 1:
-	spell( gsn_curse, level, ch, ch );
-	break;
+        spell( gsn_curse, level, ch, ch );
+        break;
     case 2:
-	spell( gsn_poison, level, ch, ch );
-	break;
+        spell( gsn_poison, level, ch, ch );
+        break;
     }
 }
 
 void StaffBehavior::getByHero( PCharacter *ch ) 
 {
     if (IS_AFFECTED( ch, AFF_POISON ) && (dice( 1, 5) == 1))  {
-	act( "$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
-	spell( gsn_cure_poison, 30, ch, ch );
-	return;
+        act( "$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+        spell( gsn_cure_poison, 30, ch, ch );
+        return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CURSE ) && (dice(1,5)==1) )  {
-	act( "$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
-	spell( gsn_remove_curse, 30, ch, ch );
-	return;
+        act( "$o1 загорается голубым пламенем.", ch, obj, 0, TO_CHAR );
+        spell( gsn_remove_curse, 30, ch, ch );
+        return;
     }
     
     act( "Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );

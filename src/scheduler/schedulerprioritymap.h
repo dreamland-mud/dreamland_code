@@ -20,22 +20,22 @@ class SchedulerTask;
  */
 class SchedulerPriorityMap : public std::map<int, SchedulerList>, public virtual DLObject {
 public:
-	typedef ::Pointer<SchedulerPriorityMap> Pointer;
-	typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
+        typedef ::Pointer<SchedulerPriorityMap> Pointer;
+        typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
 
 public:
-	SchedulerPriorityMap();
+        SchedulerPriorityMap();
 
-	void tick( );
-	/** Насильно убить все задачи заданного типа */
-	void slay( SchedulerTaskPointer& task );
-	/** Насильно убить все задачи с этим указателем */
-	void slayInstance( SchedulerTaskPointer& task );
-	/** Вернуть текущий приоритет */
-	int getPriority( ) const;
+        void tick( );
+        /** Насильно убить все задачи заданного типа */
+        void slay( SchedulerTaskPointer& task );
+        /** Насильно убить все задачи с этим указателем */
+        void slayInstance( SchedulerTaskPointer& task );
+        /** Вернуть текущий приоритет */
+        int getPriority( ) const;
 
 private:
-	int priority;
+        int priority;
 };
 
 #endif

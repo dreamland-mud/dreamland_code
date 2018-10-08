@@ -22,10 +22,10 @@ public:
     }
 
     virtual void run( Character * ch, const DLString & constArguments ) {
-	DefaultCommand::run( ch, constArguments );
+        DefaultCommand::run( ch, constArguments );
     }
     virtual void run( Character * ch, char *argument ) { 
-	DefaultCommand::run( ch, argument );
+        DefaultCommand::run( ch, argument );
     }
 
     virtual const DLString &getType( ) const {
@@ -38,11 +38,11 @@ protected:
     virtual void initialization( ) 
     {
         ClassSelfRegistratorPlugin<tn>::initialization( );
-	CommandPlugin::initialization( );
+        CommandPlugin::initialization( );
     }
     virtual void destruction( ) 
     {
-	CommandPlugin::destruction( );
+        CommandPlugin::destruction( );
         ClassSelfRegistratorPlugin<tn>::destruction( );
     }
     

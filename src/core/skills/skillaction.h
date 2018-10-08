@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-#ifndef	__SKILLACTION_H__
+#ifndef        __SKILLACTION_H__
 #define __SKILLACTION_H__
 
 #include "pointer.h"

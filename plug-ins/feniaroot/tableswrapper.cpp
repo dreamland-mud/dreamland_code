@@ -40,11 +40,11 @@ void
 TableWrapper::resolveTab()
 {
     if(table == 0) {
-	table = FlagTableRegistry::getTable( tableName );
-	
-	/* (in)sanity check. be even more paranoid. */
-	if(table == 0)
-	    throw Scripting::Exception("no such table defined in bits.conf");
+        table = FlagTableRegistry::getTable( tableName );
+        
+        /* (in)sanity check. be even more paranoid. */
+        if(table == 0)
+            throw Scripting::Exception("no such table defined in bits.conf");
     }
 }
 
@@ -58,12 +58,12 @@ TableWrapper::getField(const Register &key)
     int rc;
     
     if (table->enumerated)
-	rc = table->value( flag, true );
+        rc = table->value( flag, true );
     else
-	rc = table->bitstring( flag, true );
+        rc = table->bitstring( flag, true );
 
     if(rc == NO_FLAG)
-	throw Scripting::Exception("no such flag defined in bits.conf");
+        throw Scripting::Exception("no such flag defined in bits.conf");
 
     return rc;
 }
@@ -76,43 +76,43 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
     resolveTab();
 
     if( (key == ID_API).toBoolean() ) {
-	const FlagTable::Field * f = table->fields;
-	
-	if(f == NULL)
-	    throw Scripting::Exception("no flags in this table");
+        const FlagTable::Field * f = table->fields;
+        
+        if(f == NULL)
+            throw Scripting::Exception("no flags in this table");
 
-	for(int i = 0; i < table->size; i++) {
-	    os << "{g" << f[i].name << "{x";
-	    
-	    if(f[i].message)
-		os << ": " << f[i].message;
+        for(int i = 0; i < table->size; i++) {
+            os << "{g" << f[i].name << "{x";
+            
+            if(f[i].message)
+                os << ": " << f[i].message;
 
-	    os << endl;
-	}
+            os << endl;
+        }
 
-	return Register( os.str() );
+        return Register( os.str() );
     }
     else if (( key == ID_VALUE ).toBoolean( ) 
-	      || ( key == ID_VALUES ).toBoolean( )) 
+              || ( key == ID_VALUES ).toBoolean( )) 
     {
-	if (args.empty( ))
-	    throw Scripting::NotEnoughArgumentsException( );
-	    
-	if (table->enumerated)
-	    return Register( table->value( args.front( ).toString( ) ) );
-	else
-	    return Register( (int)table->bitstring( args.front( ).toString( ) ) );
+        if (args.empty( ))
+            throw Scripting::NotEnoughArgumentsException( );
+            
+        if (table->enumerated)
+            return Register( table->value( args.front( ).toString( ) ) );
+        else
+            return Register( (int)table->bitstring( args.front( ).toString( ) ) );
     }
     else if (( key == ID_NAME ).toBoolean( )
-	     || ( key == ID_NAMES ).toBoolean( ))
+             || ( key == ID_NAMES ).toBoolean( ))
     {
-	if (args.empty( ))
-	    throw Scripting::NotEnoughArgumentsException( );
-	
-	if (table->enumerated)
-	    return Register( table->name( args.front( ).toNumber( ) ) );
-	else
-	    return Register( table->names( args.front( ).toNumber( ) ) );
+        if (args.empty( ))
+            throw Scripting::NotEnoughArgumentsException( );
+        
+        if (table->enumerated)
+            return Register( table->name( args.front( ).toNumber( ) ) );
+        else
+            return Register( table->names( args.front( ).toNumber( ) ) );
     }
 
     throw Scripting::Exception("no such method in this object");
@@ -139,7 +139,7 @@ TablesWrapper::getField(const Register &key)
     const FlagTable * t = FlagTableRegistry::getTable( table );
     
     if(t == 0)
-	throw Scripting::Exception("no such table defined in bits.conf");
+        throw Scripting::Exception("no such table defined in bits.conf");
 
     TableWrapper::Pointer twp(NEW, table);
     Scripting::Object &obj = Scripting::Object::manager->allocate();
@@ -153,14 +153,14 @@ Register
 TablesWrapper::callMethod(const Register &key, const RegisterList &args)
 {
     if( (key != ID_API).toBoolean() )
-	throw Scripting::Exception("no such method in this object");
+        throw Scripting::Exception("no such method in this object");
 
     ostringstream os;
     FlagTableRegistry::NamesMap::const_iterator n;
     const FlagTableRegistry::NamesMap &names = FlagTableRegistry::getNamesMap( );
     
     for (n = names.begin( ); n != names.end( ); n++)
-	os << "{g" << n->first << "{x" << endl;
+        os << "{g" << n->first << "{x" << endl;
 
     return Register( os.str() );
 }

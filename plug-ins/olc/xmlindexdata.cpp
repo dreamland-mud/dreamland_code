@@ -37,9 +37,9 @@ int
 oswritefn(void *cookie, const char *buf, int len)
 {
     if(((ostream *)cookie)->write(buf, len))
-	return len;
+        return len;
     else
-	return -1;
+        return -1;
 }
 #endif 
 
@@ -106,13 +106,13 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
 
     behavior         = 0;
     wrapper          = 0;
-    next	     = NULL;
+    next             = NULL;
     
     act              = mob.act;
     add_affected_by  = mob.add_affected_by;
     affected_by      = mob.affected_by;
     alignment        = mob.alignment;
-    area	     = mob.area;
+    area             = mob.area;
     count            = mob.count;
     dam_type         = mob.dam_type;
     default_pos      = mob.default_pos;
@@ -177,17 +177,17 @@ XMLMobIndexData::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadTyp
     XMLNode::Pointer node = parent->getFirstNode( );
     
     if (!node)
-	return;
+        return;
 
     if(node->getType( ) != XMLNode::XML_CDATA && node->getType( ) != XMLNode::XML_TEXT )
-	throw ExceptionBadType( "XMLMobIndexData", node->getCData( ) );
+        throw ExceptionBadType( "XMLMobIndexData", node->getCData( ) );
  
     istringstream is(node->getCData( ));
 
     FILE *fd = fropen((istream *)&is, isreadfn);
 
     if(!fd)
-	throw ExceptionBadType( "XMLMobIndexData", strerror(errno) );
+        throw ExceptionBadType( "XMLMobIndexData", strerror(errno) );
 
     load_mobile(fd, this);
     fclose(fd);
@@ -214,7 +214,7 @@ XMLMobIndexData::toXML( XMLNode::Pointer& parent ) const
     FILE *fd = fwopen((ostream *)&os, oswritefn);
 
     if(!fd)
-	throw ExceptionBadType( "XMLMobIndexData", strerror(errno) );
+        throw ExceptionBadType( "XMLMobIndexData", strerror(errno) );
 
     save_mobile(fd, this);
     fclose(fd);
@@ -258,7 +258,7 @@ XMLObjIndexData::XMLObjIndexData()
     
     int v;
     for (v = 0; v < 5; v++)
-	value[v] = 0;
+        value[v] = 0;
 
     new_format = true;
     behavior = 0; 
@@ -289,9 +289,9 @@ XMLObjIndexData::XMLObjIndexData(const obj_index_data &original)
     limit        = original.limit;
     area         = original.area;
     if(original.behavior)
-	behavior         = XMLDocument::Pointer( NEW, **original.behavior );
+        behavior         = XMLDocument::Pointer( NEW, **original.behavior );
     else
-	behavior         = 0;
+        behavior         = 0;
 }
 
 XMLObjIndexData::~XMLObjIndexData()
@@ -310,13 +310,13 @@ XMLObjIndexData::clear()
     free_string(description);
 
     for (pAf = affected; pAf; pAf = pAfNext) {
-	pAfNext = pAf->next;
-	ddeallocate(pAf);
+        pAfNext = pAf->next;
+        ddeallocate(pAf);
     }
 
     for (pExtra = extra_descr; pExtra; pExtra = pExtraNext) {
         pExtraNext = pExtra->next;
-	free_extra_descr(pExtra);
+        free_extra_descr(pExtra);
     }
     
     static OBJ_INDEX_DATA zObj;
@@ -331,17 +331,17 @@ XMLObjIndexData::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadTyp
     XMLNode::Pointer node = parent->getFirstNode( );
     
     if (!node)
-	return;
+        return;
 
     if(node->getType( ) != XMLNode::XML_CDATA && node->getType( ) != XMLNode::XML_TEXT )
-	throw ExceptionBadType( "XMLObjIndexData", node->getCData( ) );
+        throw ExceptionBadType( "XMLObjIndexData", node->getCData( ) );
  
     istringstream is(node->getCData( ));
 
     FILE *fd = fropen((istream *)&is, isreadfn);
 
     if(!fd)
-	throw ExceptionBadType( "XMLObjIndexData", strerror(errno) );
+        throw ExceptionBadType( "XMLObjIndexData", strerror(errno) );
 
     load_object(fd, this);
     fclose(fd);
@@ -367,7 +367,7 @@ XMLObjIndexData::toXML( XMLNode::Pointer& parent ) const
     FILE *fd = fwopen((ostream *)&os, oswritefn);
 
     if(!fd)
-	throw ExceptionBadType( "XMLObjIndexData", strerror(errno) );
+        throw ExceptionBadType( "XMLObjIndexData", strerror(errno) );
 
     save_object(fd, this);
     fclose(fd);

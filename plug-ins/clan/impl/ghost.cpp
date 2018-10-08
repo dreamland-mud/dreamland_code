@@ -46,9 +46,9 @@ int ClanGuardGhost::getCast( Character *victim )
     
     switch ( dice(1,20) ) {
     case  0: 
-	if (!victim->isAffected( gsn_spellbane ))
-	    sn = gsn_dispel_affects;
-	break;
+        if (!victim->isAffected( gsn_spellbane ))
+            sn = gsn_dispel_affects;
+        break;
     case  1: sn = gsn_blindness;      break;
     case  2: sn = gsn_weaken;         break;
     case  3: sn = gsn_blindness;      break;
@@ -58,12 +58,12 @@ int ClanGuardGhost::getCast( Character *victim )
     case  7:
     case  8:
     case  9: sn = gsn_acid_blast;       break;
-    case 10: sn = gsn_plague;	   break;
+    case 10: sn = gsn_plague;           break;
     case 11: sn = gsn_acid_blast;         break;
     case 12:
     case 13: sn = gsn_lightning_breath;  break;
     case 14:
-    case 15: sn = gsn_acid_blast;	break;
+    case 15: sn = gsn_acid_blast;        break;
     default: sn = -1;     break;
     }
     
@@ -73,10 +73,10 @@ int ClanGuardGhost::getCast( Character *victim )
 bool ClanGuardGhost::spec_cast( Character *victim )
 {
     return ::spell( getCast( victim ), 
-	            ch->getRealLevel( ), 
-		    ch, 
-		    victim, 
-		    FSPELL_VERBOSE | FSPELL_BANE );
+                    ch->getRealLevel( ), 
+                    ch, 
+                    victim, 
+                    FSPELL_VERBOSE | FSPELL_BANE );
 }
 
 

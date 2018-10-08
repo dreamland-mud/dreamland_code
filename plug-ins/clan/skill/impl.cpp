@@ -17,12 +17,12 @@ extern "C"
 {
     SO::PluginList initialize_clan_skill( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MocRegistrator<ClanSkill> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ClanOrgSkill> >( ppl );
-	Plugin::registerPlugin<ClanSkillLoader>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MocRegistrator<ClanSkill> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ClanOrgSkill> >( ppl );
+        Plugin::registerPlugin<ClanSkillLoader>( ppl );
+        
+        return ppl;
     }
 }

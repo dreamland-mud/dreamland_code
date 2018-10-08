@@ -37,7 +37,7 @@ int Smithman::getOccupation( )
 bool Smithman::specIdle( )
 {
     if (chance(90))
-	return false;
+        return false;
 
     interpret_raw(ch, "say", "Эх, скучно мне!!!");
     return true;
@@ -46,21 +46,21 @@ bool Smithman::specIdle( )
 bool Smithman::canServeClient( Character *client )
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (getKeeper( )->fighting) {
-	say_act( client, getKeeper( ), "Обожди, $c1, мне сейчас не до тебя." );
-	return false;
+        say_act( client, getKeeper( ), "Обожди, $c1, мне сейчас не до тебя." );
+        return false;
     }
     
     if (IS_GHOST( client )) {
-	say_act( client, getKeeper( ), "Э, $c1, так не пойдет.. Нет тела - нет клиента." );
-	return false;
+        say_act( client, getKeeper( ), "Э, $c1, так не пойдет.. Нет тела - нет клиента." );
+        return false;
     }
 
     if (IS_AFFECTED( client, AFF_CHARM )) {
-	say_act( client, getKeeper( ), "Не буду я тебя обслуживать, $c1, слишком уж странно ты себя ведешь." );
-	return false;
+        say_act( client, getKeeper( ), "Не буду я тебя обслуживать, $c1, слишком уж странно ты себя ведешь." );
+        return false;
     }
 
     return true;
@@ -109,9 +109,9 @@ void Smithman::msgBuyRequest( Character *client )
  *------------------------------------------------------------------------*/
 void SmithService::printLine( Character *client, 
                               Price::Pointer price,
-			      const DLString &name,
-			      const DLString &descr,
-			      ostringstream &buf )
+                              const DLString &name,
+                              const DLString &descr,
+                              ostringstream &buf )
 {
     ostringstream mbuf;
     
@@ -119,8 +119,8 @@ void SmithService::printLine( Character *client,
 
     buf << dlprintf( "%9s.....{c%-9s{x - %s\r\n",
                      mbuf.str( ).c_str( ),
-		     name.c_str( ),
-		     descr.c_str( ) );
+                     name.c_str( ),
+                     descr.c_str( ) );
 }
 
 void SmithService::toStream( Character *client, ostringstream &buf ) const
@@ -149,7 +149,7 @@ bool HorseshoeSmithService::visible( Character *client ) const
 bool HorseshoeSmithService::available( Character *client, NPCharacter *smithman ) const
 {
     if (visible( client )) 
-	return true;
+        return true;
 
     say_act( client, smithman, "Ну, $c1, и куда же тебе подковки приделать?" );
     return false;
@@ -162,8 +162,8 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     int level, hr, dr;
 
     if (!price->canAfford( client )) {
-	say_act( client, smithman, "У тебя не хватает $n2, чтобы оплатить мою работу.", price->toCurrency( ).c_str( ) );
-	return;
+        say_act( client, smithman, "У тебя не хватает $n2, чтобы оплатить мою работу.", price->toCurrency( ).c_str( ) );
+        return;
     }
 
     level = client->getModifyLevel( );
@@ -171,20 +171,20 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     shoe->level = level;
 
     for (int j = 0; j < 4; j++)
-	if (level < 25)		shoe->value[j] = min( level , 15 );
-	else if (level < 60)	shoe->value[j] = max( 20, number_fuzzy( 20 ) );
-	else if (level < 80)	shoe->value[j] = max( 23, number_fuzzy( 23 ) );
-	else if (level < 90)	shoe->value[j] = max( 26, number_fuzzy( 26 ) );
-	else			shoe->value[j] = max( 30, number_fuzzy( 30 ) );
+        if (level < 25)                shoe->value[j] = min( level , 15 );
+        else if (level < 60)        shoe->value[j] = max( 20, number_fuzzy( 20 ) );
+        else if (level < 80)        shoe->value[j] = max( 23, number_fuzzy( 23 ) );
+        else if (level < 90)        shoe->value[j] = max( 26, number_fuzzy( 26 ) );
+        else                        shoe->value[j] = max( 30, number_fuzzy( 30 ) );
 
     
-    if (level < 10)		{ hr = 1; dr = 1; }
-    else if (level < 20)	{ hr = 3; dr = 1; }
-    else if (level < 30)	{ hr = 3; dr = 2; }
-    else if (level < 50)	{ hr = 4; dr = 4; }
-    else if (level < 75)	{ hr = 5; dr = 6; }
-    else if (level < 90)	{ hr = 6; dr = 6; }
-    else			{ hr = 10; dr = 10; }
+    if (level < 10)                { hr = 1; dr = 1; }
+    else if (level < 20)        { hr = 3; dr = 1; }
+    else if (level < 30)        { hr = 3; dr = 2; }
+    else if (level < 50)        { hr = 4; dr = 4; }
+    else if (level < 75)        { hr = 5; dr = 6; }
+    else if (level < 90)        { hr = 6; dr = 6; }
+    else                        { hr = 10; dr = 10; }
     
     af.where = TO_OBJECT;
     af.bitvector = 0;
@@ -206,9 +206,9 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
 //    act( "$c1 изготавливает две пары подков.", smithman, 0, 0, TO_ROOM );
 
     if ((old_shoe = get_eq_char( client, wear_hooves ))) {
-	unequip_char( client, old_shoe );
-	act( "$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
-	act( "$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
+        unequip_char( client, old_shoe );
+        act( "$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
+        act( "$c1 снимает с $C2 старые подковы.", smithman, 0, client, TO_NOTVICT );
     }
 
     obj_to_char( shoe, client );
@@ -217,8 +217,8 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     act( "$c1 прилаживает новые подковы на копыта $C2.", smithman, 0, client, TO_NOTVICT );
 
     if (client->getSex( ) == SEX_FEMALE && chance( 50 )) {
-	act( "$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
-	act( "$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
+        act( "$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
+        act( "$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
     }
 }
 
@@ -245,27 +245,27 @@ void ItemSmithService::purchase( Character *client, NPCharacter *smithman, const
     arg = argument.getOneArgument( );
 
     if (arg.empty( )) {
-	say_act( client, smithman, "Не томи, скажи что $t будем?", verb.getValue( ).c_str( ) );
-	return;
+        say_act( client, smithman, "Не томи, скажи что $t будем?", verb.getValue( ).c_str( ) );
+        return;
     }
 
     obj = get_obj_carry( client, arg.c_str( ) );
 
     if (!obj) {
-	say_act( client, smithman, "Издеваешься? У тебя нет этого." );
-	return;
+        say_act( client, smithman, "Издеваешься? У тебя нет этого." );
+        return;
     }
 
     act( "Ты протягиваешь $C3 $o4.", client, obj, smithman, TO_CHAR );
     act( "$c1 протягивает $C3 $o4.", client, obj, smithman, TO_NOTVICT );
 
     if (obj->pIndexData->limit != -1) {
-	say_act( client, smithman, "Эта вещь - уникальна. Я ничего не могу тут поделать." );
-	return;
+        say_act( client, smithman, "Эта вещь - уникальна. Я ничего не могу тут поделать." );
+        return;
     }
     
     if (!checkPrice( client, smithman, price ))
-	return;
+        return;
 
     smith( client, smithman, obj );
 }   
@@ -273,8 +273,8 @@ void ItemSmithService::purchase( Character *client, NPCharacter *smithman, const
 bool ItemSmithService::checkPrice( Character *client, NPCharacter *smithman, Price::Pointer price ) const
 {
     if (!price->canAfford( client )) {
-	say_act( client, smithman, noMoney.getValue( ).c_str( ), price->toCurrency( ).c_str( ) );
-	return false;
+        say_act( client, smithman, noMoney.getValue( ).c_str( ), price->toCurrency( ).c_str( ) );
+        return false;
     }
 
     return true;
@@ -286,13 +286,13 @@ bool ItemSmithService::checkPrice( Character *client, NPCharacter *smithman, Pri
 void BurnproofSmithService::smith( Character *client, NPCharacter *smithman, Object *obj )
 {
     if (obj->item_type != ITEM_CONTAINER && obj->item_type != ITEM_DRINK_CON) {
-	say_act( client, smithman, "Это не контейнер, с этим я не умею." );
-	return;
+        say_act( client, smithman, "Это не контейнер, с этим я не умею." );
+        return;
     }
        
     if (IS_OBJ_STAT(obj, ITEM_BURN_PROOF)) {
-	say_act( client, smithman, "Жаль. Но мою работу сделал кто-то другой." );
-	return;
+        say_act( client, smithman, "Жаль. Но мою работу сделал кто-то другой." );
+        return;
     }
     
     price->deduct( client );
@@ -312,29 +312,29 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
     int boff, bon;
 
     if (!obj->isAntiAligned( client )) {
-	say_act( client, smithman, "Оно и так для тебя подходит, $c1." );
-	return;
+        say_act( client, smithman, "Оно и так для тебя подходит, $c1." );
+        return;
     }
     
     if (!obj->getRealShortDescr( )) {
-	say_act( client, smithman, "$c1, тебе придется сперва потратить рестринг купон и изменить внешний вид вещи." );
-	return;
+        say_act( client, smithman, "$c1, тебе придется сперва потратить рестринг купон и изменить внешний вид вещи." );
+        return;
     }
     
     price->deduct( client );
     obj->level += 1;
     
     if (IS_GOOD( client )) {
-	boff = ITEM_ANTI_GOOD    | ITEM_EVIL;
-	bon  = ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL;
+        boff = ITEM_ANTI_GOOD    | ITEM_EVIL;
+        bon  = ITEM_ANTI_NEUTRAL | ITEM_ANTI_EVIL;
     }
     else if (IS_NEUTRAL( client )) {
-	boff = ITEM_ANTI_NEUTRAL | ITEM_EVIL;
-	bon  = ITEM_ANTI_GOOD    | ITEM_ANTI_EVIL;
+        boff = ITEM_ANTI_NEUTRAL | ITEM_EVIL;
+        bon  = ITEM_ANTI_GOOD    | ITEM_ANTI_EVIL;
     } 
     else {
-	boff = ITEM_ANTI_EVIL;
-	bon  = ITEM_ANTI_GOOD    | ITEM_ANTI_NEUTRAL;
+        boff = ITEM_ANTI_EVIL;
+        bon  = ITEM_ANTI_GOOD    | ITEM_ANTI_NEUTRAL;
     }
     
     REMOVE_BIT( obj->extra_flags, boff );
@@ -358,31 +358,31 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
     Price::Pointer myprice;
 
     if (obj->item_type != ITEM_WEAPON) {
-	say_act( client, smithman, "И с какой стороны? $o1 не оружие.", obj );
-	return;
+        say_act( client, smithman, "И с какой стороны? $o1 не оружие.", obj );
+        return;
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_SHARP|WEAPON_VORPAL)) {
-	say_act( client, smithman, "$o1 и без того острое оружие.", obj );
-	return;
+        say_act( client, smithman, "$o1 и без того острое оружие.", obj );
+        return;
     }
 
     if (IS_WEAPON_STAT( obj, WEAPON_HOLY )) {
-	say_act( client, smithman, "$o1 наполнено священной силой, острота ему ни к чему.", obj );
-	return;
+        say_act( client, smithman, "$o1 наполнено священной силой, острота ему ни к чему.", obj );
+        return;
     }
 
     if (IS_WEAPON_STAT( obj, WEAPON_FLAMING | WEAPON_FROST |
-   			     WEAPON_VAMPIRIC | WEAPON_SHOCKING | WEAPON_POISON ))
+                                WEAPON_VAMPIRIC | WEAPON_SHOCKING | WEAPON_POISON ))
     {
-	myprice = extraPrice;
-	say_act( client, smithman, "У $o2 и без того очень хорошо, сложно будет, потому и дороже.", obj );
+        myprice = extraPrice;
+        say_act( client, smithman, "У $o2 и без того очень хорошо, сложно будет, потому и дороже.", obj );
     }
     else
-	myprice = price;
+        myprice = price;
 
     if (!checkPrice( client, smithman, myprice ))
-	return;
+        return;
 
     myprice->deduct( client );
     obj->level += 1;
@@ -405,18 +405,18 @@ CMDRUN( smith )
     smithman = find_attracted_mob_behavior<Smithman>( ch, OCC_SMITHMAN );
 
     if (!smithman) {
-	ch->send_to( "Здесь нет кузнеца.\r\n" );
-	return;
+        ch->send_to( "Здесь нет кузнеца.\r\n" );
+        return;
     }
 
     if (ch->is_npc( )) {
-	ch->send_to( "Тебя обслуживать не будут, извини.\r\n" );
-	return;
+        ch->send_to( "Тебя обслуживать не будут, извини.\r\n" );
+        return;
     }
     
     if (arguments.empty( ) || arguments == "list")
-	smithman->doList( ch->getPC( ) );
+        smithman->doList( ch->getPC( ) );
     else
-	smithman->doBuy( ch->getPC( ), arguments );
+        smithman->doBuy( ch->getPC( ), arguments );
 }
 

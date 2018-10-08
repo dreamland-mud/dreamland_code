@@ -42,7 +42,7 @@ bool oprog_extract( Object *obj, bool count )
     FENIA_NDX_CALL( obj, "Extract", "Oi", obj, count )
 
     if (obj->wrapper)
-	obj->getWrapper( )->extract( count );
+        obj->getWrapper( )->extract( count );
 
     BEHAVIOR_CALL( obj, extract, count )
     return false;
@@ -53,49 +53,49 @@ bool oprog_extract( Object *obj, bool count )
  */
 void extract_obj_1( Object *obj, bool count )
 {
-	Object *obj_content;
-	Object *obj_next;
-	char buf[MAX_STRING_LENGTH];
+        Object *obj_content;
+        Object *obj_next;
+        char buf[MAX_STRING_LENGTH];
 
-	if (obj->extracted)  /* if the object has already been extracted once */
-	{
-		sprintf(buf, "Warning! Extraction of %s, vnum %d.", obj->getName( ),
-			obj->pIndexData->vnum);
-		bug(buf, 0);
-		return; /* if it's already been extracted, something bad is going on */
-	}
-	else
-		obj->extracted = true;  /* if it hasn't been extracted yet, now
-														 * it's being extracted. */
-	
-	if (IS_SET(obj->pIndexData->area->area_flag, AREA_NOSAVEDROP)
-	    || IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)) 
-	{
-	    count = true;
-	}
-	
-	if ( obj->in_room != 0 )
-		obj_from_room( obj );
-	else if ( obj->carried_by != 0 )
-		obj_from_char( obj );
-	else if ( obj->in_obj != 0 )
-		obj_from_obj( obj );
+        if (obj->extracted)  /* if the object has already been extracted once */
+        {
+                sprintf(buf, "Warning! Extraction of %s, vnum %d.", obj->getName( ),
+                        obj->pIndexData->vnum);
+                bug(buf, 0);
+                return; /* if it's already been extracted, something bad is going on */
+        }
+        else
+                obj->extracted = true;  /* if it hasn't been extracted yet, now
+                                                                                                                 * it's being extracted. */
+        
+        if (IS_SET(obj->pIndexData->area->area_flag, AREA_NOSAVEDROP)
+            || IS_SET(obj->extra_flags, ITEM_NOSAVEDROP)) 
+        {
+            count = true;
+        }
+        
+        if ( obj->in_room != 0 )
+                obj_from_room( obj );
+        else if ( obj->carried_by != 0 )
+                obj_from_char( obj );
+        else if ( obj->in_obj != 0 )
+                obj_from_obj( obj );
 
-	for ( obj_content = obj->contains; obj_content; obj_content = obj_next )
-	{
-		obj_next = obj_content->next_content;
-		extract_obj_1( obj_content, count );
-	}
-	
-	obj_from_list( obj );
+        for ( obj_content = obj->contains; obj_content; obj_content = obj_next )
+        {
+                obj_next = obj_content->next_content;
+                extract_obj_1( obj_content, count );
+        }
+        
+        obj_from_list( obj );
 
-	if (count)
-		--obj->pIndexData->count;
+        if (count)
+                --obj->pIndexData->count;
 
-	oprog_extract( obj, count );
-	ObjectManager::extract( obj );
+        oprog_extract( obj, count );
+        ObjectManager::extract( obj );
 
-	return;
+        return;
 }
 
 /*--------------------------------------------------------------
@@ -119,7 +119,7 @@ bool mprog_extract( Character *ch, bool count )
     FENIA_NDX_CALL( ch->getNPC( ), "Extract", "Ci", ch, count );
 
     if (ch->wrapper)
-	ch->getWrapper( )->extract( count );
+        ch->getWrapper( )->extract( count );
 
     BEHAVIOR_CALL( ch->getNPC( ), extract, count );
     return false;
@@ -133,15 +133,15 @@ void extract_mob_dropped( NPCharacter *mob )
     Object *obj, *obj_next;
     
     if (mob->extracted) {
-	LogStream::sendError( ) << "Warning! Extraction of " << mob->getNameP( ) << endl;
-	return;
+        LogStream::sendError( ) << "Warning! Extraction of " << mob->getNameP( ) << endl;
+        return;
     }
     else
-	mob->extracted = true;
+        mob->extracted = true;
 
     for (obj = mob->carrying; obj != 0; obj = obj_next) {
-	obj_next = obj->next_content;
-	extract_obj_1( obj, true );
+        obj_next = obj->next_content;
+        extract_obj_1( obj, true );
     }
 
     char_from_room( mob );

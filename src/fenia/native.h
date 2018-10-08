@@ -35,35 +35,35 @@ template <typename T>
 struct NativeTraits {
     
     struct MTListComp {
-	bool operator() (IdRef &k1, const Register &k2) {
-	    return (k2 == k1).toBoolean( );
-	}
+        bool operator() (IdRef &k1, const Register &k2) {
+            return (k2 == k1).toBoolean( );
+        }
     };
 
     template <typename MethodType> 
     struct ListEntry {
-	ListEntry( MethodType m, const char * h ) : method( m ), help( h ) { }
-	MethodType method;
-	const char * help;
+        ListEntry( MethodType m, const char * h ) : method( m ), help( h ) { }
+        MethodType method;
+        const char * help;
     };
     
     struct Get {
-	typedef Register (T::*Method)();
-	typedef ListEntry<Method> Entry;
-	typedef ::StaticList<IdRef, ListEntry<Method>, MTListComp> List;
-	template <typename PropName> struct Holder { static List reg; };
+        typedef Register (T::*Method)();
+        typedef ListEntry<Method> Entry;
+        typedef ::StaticList<IdRef, ListEntry<Method>, MTListComp> List;
+        template <typename PropName> struct Holder { static List reg; };
     };
     struct Set {
-	typedef void (T::*Method)(const Register &);
-	typedef ListEntry<Method> Entry;
-	typedef ::StaticList<IdRef, ListEntry<Method>, MTListComp> List;
-	template <typename PropName> struct Holder { static List reg; };
+        typedef void (T::*Method)(const Register &);
+        typedef ListEntry<Method> Entry;
+        typedef ::StaticList<IdRef, ListEntry<Method>, MTListComp> List;
+        template <typename PropName> struct Holder { static List reg; };
     };
     struct Invoke {
-	typedef Register (T::*Method)(const RegisterList &);
-	typedef ListEntry<Method> Entry;
-	typedef ::StaticList<IdRef, ListEntry<Method>, MTListComp> List;
-	template <typename PropName> struct Holder { static List reg; };
+        typedef Register (T::*Method)(const RegisterList &);
+        typedef ListEntry<Method> Entry;
+        typedef ::StaticList<IdRef, ListEntry<Method>, MTListComp> List;
+        template <typename PropName> struct Holder { static List reg; };
     };
 
     static const DLString NAME;
@@ -72,13 +72,13 @@ struct NativeTraits {
     
 
 #define NMI_LIST_INIT(Cls, mode)   \
-template <>			   \
+template <>                           \
 NativeTraits<Cls>::mode::List *NativeTraits<Cls>::mode::List::first = 0
 
 #define NMI_INIT(Cls, help)                     \
-template <>					\
+template <>                                        \
 const DLString NativeTraits<Cls>::NAME = #Cls;  \
-template <>					\
+template <>                                        \
 const DLString NativeTraits<Cls>::HELP = help;  \
 NMI_LIST_INIT(Cls, Get);                        \
 NMI_LIST_INIT(Cls, Set);                        \
@@ -90,9 +90,9 @@ template <typename Property> Register nmiGet();             \
 template <typename Property> void nmiSet(const Register &); \
 template <typename Property> Register nmiInvoke(const RegisterList &); 
 
-#define NMI_ENTRY(Cls, x, mode, help)		    \
-template <> template <>				    \
-NativeTraits<Cls>::mode::List			    \
+#define NMI_ENTRY(Cls, x, mode, help)                    \
+template <> template <>                                    \
+NativeTraits<Cls>::mode::List                            \
     NativeTraits<Cls>::mode::Holder<nmi::x>::reg    \
      ( #x, NativeTraits<Cls>::mode::Entry( &Cls::nmi ## mode< nmi::x >, help ) )
 
@@ -130,32 +130,32 @@ public:
     typedef NativeTraits<T> Traits;
     
     virtual bool setNativeField(const Register &key, const Register &val) {
-	typename Traits::Set::Entry *e = Traits::Set::List::lookup(key);
+        typename Traits::Set::Entry *e = Traits::Set::List::lookup(key);
 
-	if(!e || e->method == 0)
+        if(!e || e->method == 0)
             return false;
 
-	(static_cast<T *>(this)->*(e->method))(val);
+        (static_cast<T *>(this)->*(e->method))(val);
         return true;
     }
 
     virtual bool getNativeField(const Register &key, Register &retval) {
-	typename Traits::Get::Entry *e = Traits::Get::List::lookup(key);
-	
-	if(!e || e->method == 0)
+        typename Traits::Get::Entry *e = Traits::Get::List::lookup(key);
+        
+        if(!e || e->method == 0)
             return false;
 
-	retval = (static_cast<T *>(this)->*(e->method))();
+        retval = (static_cast<T *>(this)->*(e->method))();
         return true;
     }
 
     virtual bool callNativeMethod(const Register &key, const RegisterList &args, Register &retval) {
-	typename Traits::Invoke::Entry *e = Traits::Invoke::List::lookup(key);
+        typename Traits::Invoke::Entry *e = Traits::Invoke::List::lookup(key);
 
-	if(!e || e->method == 0)
+        if(!e || e->method == 0)
             return false;
 
-	retval = (static_cast<T *>(this)->*(e->method))(args);
+        retval = (static_cast<T *>(this)->*(e->method))(args);
         return true;
     }
 };

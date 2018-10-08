@@ -23,64 +23,64 @@
 class UniclassAdept : public virtual BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<UniclassAdept> Pointer;
+        typedef ::Pointer<UniclassAdept> Pointer;
     
-	UniclassAdept( );
+        UniclassAdept( );
 
-	virtual void speech( Character *victim, const char *speech );
-	virtual void tell( Character *victim, const char *speech );
-	
+        virtual void speech( Character *victim, const char *speech );
+        virtual void tell( Character *victim, const char *speech );
+        
 protected:
         bool parseSpeech( Character *victim, const char *speech, DLString &className );
-	XML_VARIABLE XMLString myclass;
+        XML_VARIABLE XMLString myclass;
 };
 
 class UniclassAdeptAndShopTrader : public UniclassAdept, public ShopTrader {
 XML_OBJECT
 public:
-	typedef ::Pointer<UniclassAdeptAndShopTrader> Pointer;
-	
-	virtual ~UniclassAdeptAndShopTrader( );
-	virtual void speech( Character *victim, const char *speech );
-	virtual void tell( Character *victim, const char *speech );
+        typedef ::Pointer<UniclassAdeptAndShopTrader> Pointer;
+        
+        virtual ~UniclassAdeptAndShopTrader( );
+        virtual void speech( Character *victim, const char *speech );
+        virtual void tell( Character *victim, const char *speech );
 };
 
 class XMLAttributeUniclass : public XMLAttribute, public XMLVariableContainer
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeUniclass> Pointer;
+        typedef ::Pointer<XMLAttributeUniclass> Pointer;
 
-	XMLAttributeUniclass( );
+        XMLAttributeUniclass( );
 
-	XML_VARIABLE XMLLong lastTime;
-	XML_VARIABLE XMLMapBase<XMLInteger> history;
+        XML_VARIABLE XMLLong lastTime;
+        XML_VARIABLE XMLMapBase<XMLInteger> history;
 };
 
 class DwarkinAdept : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<DwarkinAdept> Pointer;
+        typedef ::Pointer<DwarkinAdept> Pointer;
     
-	DwarkinAdept( );
+        DwarkinAdept( );
 
-	virtual void speech( Character *victim, const char *speech );
-	virtual void tell( Character *victim, const char *speech );
-	
+        virtual void speech( Character *victim, const char *speech );
+        virtual void tell( Character *victim, const char *speech );
+        
 protected:
-	XML_VARIABLE XMLString myclass;
+        XML_VARIABLE XMLString myclass;
 };
 
 class XMLAttributeEnlight : public ScheduledXMLAttribute, public XMLVariableContainer
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeEnlight> Pointer;
+        typedef ::Pointer<XMLAttributeEnlight> Pointer;
 
-	XMLAttributeEnlight( );
-	virtual bool pull( PCharacter * );
+        XMLAttributeEnlight( );
+        virtual bool pull( PCharacter * );
 
-	XML_VARIABLE XMLInteger age;
+        XML_VARIABLE XMLInteger age;
 };
 
 #endif

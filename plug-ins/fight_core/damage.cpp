@@ -49,7 +49,7 @@ void do_visible( Character * );
  *----------------------------------------------------------------------------*/
 Damage::Damage( )
           : ch( NULL ), victim( NULL ), killer( NULL ),
-	    dam_type( 0 ), dam( 0 ),  immune( false ), dam_flag( 0 )
+            dam_type( 0 ), dam( 0 ),  immune( false ), dam_flag( 0 )
 {
 }
 
@@ -68,16 +68,16 @@ Damage::Damage( Character *ch, Character *victim, int dam_type, int dam, bitstri
 bool Damage::hit( bool show )
 {
     if (!canDamage( ))
-	return false;
+        return false;
 
     calcDamage( );
     priorDamageEffects( );
 
     if (show)
-	message( );
+        message( );
 
     if (dam == 0)
-	return false;
+        return false;
 
     inflictDamage( );
     postDamageEffects( );
@@ -97,19 +97,19 @@ void Damage::postDamageEffects( )
 bool Damage::canDamage( )
 {
     if (victim->position == POS_DEAD)
-	return false;
+        return false;
 
     if (victim->in_room && IS_SET(victim->in_room->room_flags, ROOM_NO_DAMAGE)) 
-	return false;
+        return false;
     
     if (is_safe( ch, victim ))
-	return false;
+        return false;
 
     adjustPosition( );
     adjustFighting( );
     
     if (adjustMasterAttack( ))
-	return false;
+        return false;
 
     adjustFollowers( );
     adjustDeathTime( );
@@ -121,8 +121,8 @@ bool Damage::canDamage( )
 void Damage::adjustPosition( )
 {
     if (ch != victim && victim->position > POS_STUNNED) {
-	if (victim->timer <= 4 && ch->in_room == victim->in_room)
-	    victim->position = POS_FIGHTING;
+        if (victim->timer <= 4 && ch->in_room == victim->in_room)
+            victim->position = POS_FIGHTING;
     }
 }
 
@@ -138,46 +138,46 @@ static void rprog_attack( Character *ch, Character *victim )
     Character *rch, *rch_next;
     
     for (rch = ch->in_room->people; rch; rch = rch_next) {
-	rch_next = rch->next_in_room;
-	mprog_attack( rch, ch, victim );	
+        rch_next = rch->next_in_room;
+        mprog_attack( rch, ch, victim );        
     }
 
     if (ch->in_room != victim->in_room)
-	for (rch = victim->in_room->people; rch; rch = rch_next) {
-	    rch_next = rch->next_in_room;
-	    mprog_attack( rch, ch, victim );	
-	}
+        for (rch = victim->in_room->people; rch; rch = rch_next) {
+            rch_next = rch->next_in_room;
+            mprog_attack( rch, ch, victim );        
+        }
 }
 
 void Damage::adjustFighting( )
 {
     if (ch != victim && victim->position > POS_STUNNED) {
-	if (victim->fighting == 0)
-	    set_fighting( victim, ch );
-	
-	if (ch->fighting == 0) {
-	    set_fighting( ch, victim );
-	    rprog_attack( ch, victim );
-	}
+        if (victim->fighting == 0)
+            set_fighting( victim, ch );
+        
+        if (ch->fighting == 0) {
+            set_fighting( ch, victim );
+            rprog_attack( ch, victim );
+        }
     }
 
     if (ch->isDead( ) || victim->isDead( ))
-	throw VictimDeathException( );
+        throw VictimDeathException( );
 }
 
 void Damage::adjustFollowers( )
 {
     if (ch == victim)
-	return;
+        return;
 
     if (victim->master == ch)
-	victim->stop_follower( );
+        victim->stop_follower( );
 
     if (ch->master == victim)
-	ch->stop_follower( );
+        ch->stop_follower( );
 
     if (victim->mount == ch) 
-	victim->dismount( );
+        victim->dismount( );
 }
 
 /* 
@@ -207,21 +207,21 @@ void Damage::adjustVisibility( )
 bool Damage::adjustMasterAttack( )
 {
     if (victim == ch)
-	return false;
+        return false;
 
     if (victim->position <= POS_STUNNED)
-	return false;
+        return false;
 
     if (ch->is_npc( )
-	&& victim->is_npc( )
-	&& IS_AFFECTED(victim, AFF_CHARM)
-	&& victim->master != 0
-	&& victim->master->in_room == ch->in_room
-	&& number_bits( 3 ) == 0)
+        && victim->is_npc( )
+        && IS_AFFECTED(victim, AFF_CHARM)
+        && victim->master != 0
+        && victim->master->in_room == ch->in_room
+        && number_bits( 3 ) == 0)
     {
-	stop_fighting( ch, false );
-	set_fighting( ch, victim->master );
-	return true;
+        stop_fighting( ch, false );
+        set_fighting( ch, victim->master );
+        return true;
     }
     
     return false;
@@ -234,15 +234,15 @@ void Damage::protectMaterial( Object *obj )
 {
     switch (material_immune( obj, victim )) {
     case RESIST_VULNERABLE:
-	dam += dam / 2;
-	break;
+        dam += dam / 2;
+        break;
     case RESIST_RESISTANT:
-	dam -= dam / 3;
-	break;
+        dam -= dam / 3;
+        break;
     case RESIST_IMMUNE:
-	dam = 0;
-	immune = true;
-	break;
+        dam = 0;
+        immune = true;
+        break;
     }
 }
 void Damage::protectSanctuary( ) 
@@ -251,67 +251,67 @@ void Damage::protectSanctuary( )
     case DAM_POISON:
     case DAM_DISEASE:
     case DAM_DROWNING:
-	return;
+        return;
     }
 
     if (IS_AFFECTED(victim, AFF_SANCTUARY)) {
-	dam /= 2;
+        dam /= 2;
     }
     else if (victim->isAffected(gsn_stardust)) {
-	dam /= 2;
+        dam /= 2;
     }
     else if (victim->isAffected(gsn_dark_shroud)) {
-	if (victim->is_npc( ) 
-		&& victim->getNPC( )->behavior
-		&& IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
-	    dam /= 2;
-	else
-	    dam = dam * 6 / 10;
+        if (victim->is_npc( ) 
+                && victim->getNPC( )->behavior
+                && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
+            dam /= 2;
+        else
+            dam = dam * 6 / 10;
     }
     else 
-	protectResistance( );
+        protectResistance( );
 }
 
 void Damage::protectResistance( )
 {
     if (victim->isAffected(gsn_resistance)) {
-	dam -= victim->applyCurse( dam * 2 / 5 );
+        dam -= victim->applyCurse( dam * 2 / 5 );
     }
 }
 
 void Damage::protectAlign( )
 {
     if (   (IS_AFFECTED(victim, AFF_PROTECT_EVIL) && IS_EVIL(ch))
-	|| (IS_AFFECTED(victim, AFF_PROTECT_GOOD) && IS_GOOD(ch))) 
+        || (IS_AFFECTED(victim, AFF_PROTECT_GOOD) && IS_GOOD(ch))) 
     {
-	dam -= dam / 4;
+        dam -= dam / 4;
     }
 }
 
 void Damage::protectTemperature( )
 {
     if ( victim->isAffected(gsn_protection_heat)
-	&& (dam_type == DAM_FIRE) )
-	dam -= dam / 4;
+        && (dam_type == DAM_FIRE) )
+        dam -= dam / 4;
 
     if ( victim->isAffected(gsn_protection_cold)
-	&& ( dam_type == DAM_COLD) )
-	dam -= dam / 4;
+        && ( dam_type == DAM_COLD) )
+        dam -= dam / 4;
 }
 
 void Damage::protectImmune( )
 {
     switch(immune_check(victim, dam_type, dam_flag)) {
     case RESIST_IMMUNE:
-	immune = true;
-	dam = 0;
-	break;
+        immune = true;
+        dam = 0;
+        break;
     case RESIST_RESISTANT:    
-	dam -= dam/3;
-	break;
+        dam -= dam/3;
+        break;
     case RESIST_VULNERABLE:
-	dam += dam/2;
-	break;
+        dam += dam/2;
+        break;
     }
 }
 
@@ -324,7 +324,7 @@ void Damage::protectRazer( )
 void Damage::protectPrayer( )
 {
     if (victim->isAffected( gsn_prayer )) 
-	dam -= dam * victim->getModifyLevel( ) / 1200;
+        dam -= dam * victim->getModifyLevel( ) / 1200;
 }
 
 void Damage::calcDamage( )
@@ -346,12 +346,12 @@ void Damage::inflictDamage( )
 
     // log damages
     if (!ch->is_immortal( ) && !ch->is_npc( ) && dam > 2000) 
-	wiznet( WIZ_DAMAGES, 0, 0, "%^C1 : повреждения более 2000 : %d", ch, dam );
+        wiznet( WIZ_DAMAGES, 0, 0, "%^C1 : повреждения более 2000 : %d", ch, dam );
     
     victim->hit -= dam;
     
     if (victim->is_immortal( ))
-	victim->hit = max( (int)victim->hit, 1 );
+        victim->hit = max( (int)victim->hit, 1 );
 }
 
 /*-----------------------------------------------------------------------------
@@ -361,28 +361,28 @@ void Damage::reportState( )
 {
     switch( victim->position.getValue( ) ) {
     case POS_MORTAL:
-	act_p( "$c1 смертельно ране$gно|н|на и скоро умрет, если $m не помогут.",
-	    victim, 0, 0, TO_ROOM,POS_RESTING);
-	act_p( "Ты смертельно ране$gно|н|на и скоро умрешь, если тебе не помогут.",
-	    victim, 0, 0, TO_CHAR,POS_DEAD);
-	break;
+        act_p( "$c1 смертельно ране$gно|н|на и скоро умрет, если $m не помогут.",
+            victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p( "Ты смертельно ране$gно|н|на и скоро умрешь, если тебе не помогут.",
+            victim, 0, 0, TO_CHAR,POS_DEAD);
+        break;
     case POS_INCAP:
-	act_p( "$c1 совершенно беспомощ$gно|ен|на и скоро умрет, если $m не помогут.",
-	    victim, 0, 0, TO_ROOM,POS_RESTING);
-	act_p( "Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",
-	    victim, 0, 0, TO_CHAR,POS_DEAD);
-	break;
+        act_p( "$c1 совершенно беспомощ$gно|ен|на и скоро умрет, если $m не помогут.",
+            victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p( "Ты совершенно беспомощ$gно|ен|на и скоро умрешь, если тебе не помогут.",
+            victim, 0, 0, TO_CHAR,POS_DEAD);
+        break;
     case POS_STUNNED:
-	act_p( "$c1 без сознания, но возможно придет в себя.",
-	    victim, 0, 0, TO_ROOM,POS_RESTING);
-	victim->send_to("Ты без сознания, но еще можешь придти в себя.\n\r");
-	break;
+        act_p( "$c1 без сознания, но возможно придет в себя.",
+            victim, 0, 0, TO_ROOM,POS_RESTING);
+        victim->send_to("Ты без сознания, но еще можешь придти в себя.\n\r");
+        break;
     default:
-	if ( dam > victim->max_hit / 4 )
-	    victim->send_to("Это действительно было БОЛЬНО!\n\r");
-	if ( victim->hit < victim->max_hit / 4 )
-	    victim->send_to("Ты истекаешь {RКРОВЬЮ{x!\n\r");
-	break;
+        if ( dam > victim->max_hit / 4 )
+            victim->send_to("Это действительно было БОЛЬНО!\n\r");
+        if ( victim->hit < victim->max_hit / 4 )
+            victim->send_to("Ты истекаешь {RКРОВЬЮ{x!\n\r");
+        break;
     }
 }
 
@@ -391,8 +391,8 @@ void Damage::handlePosition( )
     update_pos( victim );
     
     if (victim->position == POS_DEAD) {
-	handleDeath( );
-	throw VictimDeathException( );
+        handleDeath( );
+        throw VictimDeathException( );
     }
     
     reportState( );
@@ -401,7 +401,7 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      */
     if (!IS_AWAKE(victim)) 
-	stop_fighting( victim, false );
+        stop_fighting( victim, false );
 }
 
 /*-----------------------------------------------------------------------------
@@ -410,26 +410,26 @@ void Damage::handlePosition( )
  bool Damage::checkRetreat( )
  {
      if (victim == killer)
-	 return false;
+         return false;
 
     if (  victim != 0 && !victim->is_npc() && victim->desc == 0 )
     {
-	if ( number_range( 0, victim->wait ) == 0 )
-	{
-	    if( victim->getModifyLevel() < 11 )
-		interpret_raw( victim, "recall" );
-	    else
-		interpret_raw( victim, "flee" );
+        if ( number_range( 0, victim->wait ) == 0 )
+        {
+            if( victim->getModifyLevel() < 11 )
+                interpret_raw( victim, "recall" );
+            else
+                interpret_raw( victim, "flee" );
 
-	    return true;
-	}
+            return true;
+        }
     }
 
     if ( victim != 0 && !victim->is_npc()
-	&& victim->hit > 0
-	&& ( victim->hit <= victim->wimpy || CAN_DETECT(victim, ADET_FEAR) )
-	&& victim->wait < dreamland->getPulseViolence( ) / 2 )
-	interpret_raw( victim, "flee" );
+        && victim->hit > 0
+        && ( victim->hit <= victim->wimpy || CAN_DETECT(victim, ADET_FEAR) )
+        && victim->wait < dreamland->getPulseViolence( ) / 2 )
+        interpret_raw( victim, "flee" );
 
     return false;
 }
@@ -458,22 +458,22 @@ static void drawRushechki(char *buf, const char *msg, const char *art, char colo
     *buf++ = color;
 
     for(s = art; *s; s++)
-	*buf++ = *s;
+        *buf++ = *s;
 
     for(s = msg; *s; s++)
-	*buf++ = *s;
+        *buf++ = *s;
 
     *buf++ = '{';
     *buf++ = color;
 
     for(s = art+strlen(art)-1; s >= art; s--, buf++)
-	switch (*s) {
-	case '>': *buf = '<'; break;
-	case '<': *buf = '>'; break;
-	case ')': *buf = '('; break;
-	case '(': *buf = ')'; break;
-	default:  *buf = *s;  break;
-	}
+        switch (*s) {
+        case '>': *buf = '<'; break;
+        case '<': *buf = '>'; break;
+        case ')': *buf = '('; break;
+        case '(': *buf = ')'; break;
+        default:  *buf = *s;  break;
+        }
 
     *buf++ = '{';
     *buf++ = 'x';
@@ -484,9 +484,9 @@ static void drawRushechki(char *buf, const char *msg, const char *art, char colo
 void Damage::msgNewFormat( bool vs, char *buf )
 {
     static const struct {
-	int dam;
-	char color;
-	const char *art;
+        int dam;
+        char color;
+        const char *art;
     } absTable [] = 
     {
       {   0,  'w', " "                     },
@@ -519,51 +519,51 @@ void Damage::msgNewFormat( bool vs, char *buf )
     };
 
     static const struct {
-	int perc;
-	const char *vs, *vp;
+        int perc;
+        const char *vs, *vp;
     } relTable [] =
     {
       {   0,  "слегка царапаешь",            "слегка царапает"       },
-      {   1,  "царапаешь",                   "царапает"	         },
+      {   1,  "царапаешь",                   "царапает"                 },
       {   2,  "слегка задеваешь",            "слегка задевает"       },
       {   4,  "задеваешь",                   "задевает"              },
       {   5,  "слегка повреждаешь",          "слегка повреждает"     },
       {   6,  "повреждаешь",                 "повреждает"            },
       {   7,  "слегка ранишь",               "слегка ранит"          },
-      {   8,  "ранишь",                      "ранит"	         }, 
+      {   8,  "ранишь",                      "ранит"                 }, 
       {   9,  "сильно ранишь",               "сильно ранит"          },
-      {  10,  "сокрушаешь",                  "сокрушает"		 }, 
-      {  11,  "разрушаешь",                  "разрушает"		 },
+      {  10,  "сокрушаешь",                  "сокрушает"                 }, 
+      {  11,  "разрушаешь",                  "разрушает"                 },
       {  12,  "отбрасываешь",                "отбрасывает"           },
-      {  13,  "калечишь",                    "калечит"		 },
-      {  14,  "уродуешь",                    "уродует"		 },
-      {  15,  "СОКРУШАЕШЬ",                    "СОКРУШАЕТ"		 }, 
-      {  17,  "РАЗРУШАЕШЬ",                    "РАЗРУШАЕТ"		 },
-      {  20,  "РАСЧЛЕНЯЕШЬ",                   "РАСЧЛЕНЯЕТ"	 	 },
-      {  25,  "ОПОТРОШАЕШЬ",                   "ОПОТРОШАЕТ"		 },
-      {  30,  "ТРАВМИРУЕШЬ",                   "ТРАВМИРУЕТ"		 },
-      {  35,  "КАЛЕЧИШЬ",                      "КАЛЕЧИТ" 		 },
-      {  40,  "РАЗИШЬ",                        "РАЗИТ" 	                 },
-      {  50,  "ПОТРОШИШЬ",                     "ПОТРОШИТ"		 },
+      {  13,  "калечишь",                    "калечит"                 },
+      {  14,  "уродуешь",                    "уродует"                 },
+      {  15,  "СОКРУШАЕШЬ",                    "СОКРУШАЕТ"                 }, 
+      {  17,  "РАЗРУШАЕШЬ",                    "РАЗРУШАЕТ"                 },
+      {  20,  "РАСЧЛЕНЯЕШЬ",                   "РАСЧЛЕНЯЕТ"                  },
+      {  25,  "ОПОТРОШАЕШЬ",                   "ОПОТРОШАЕТ"                 },
+      {  30,  "ТРАВМИРУЕШЬ",                   "ТРАВМИРУЕТ"                 },
+      {  35,  "КАЛЕЧИШЬ",                      "КАЛЕЧИТ"                  },
+      {  40,  "РАЗИШЬ",                        "РАЗИТ"                          },
+      {  50,  "ПОТРОШИШЬ",                     "ПОТРОШИТ"                 },
       {  75,  "ПРЕВРАЩАЕШЬ В КРОВАВОЕ МЕСИВО", "ПРЕВРАЩАЕТ В КРОВАВОЕ МЕСИВО"},
-      { 100,  "СМЕРТЕЛЬНО РАНИШЬ",             "СМЕРТЕЛЬНО РАНИТ"	 },
-      { -1,   "{DУБИВАЕШЬ{x",                  "{D! УБИВАЕТ !{x"	 },
+      { 100,  "СМЕРТЕЛЬНО РАНИШЬ",             "СМЕРТЕЛЬНО РАНИТ"         },
+      { -1,   "{DУБИВАЕШЬ{x",                  "{D! УБИВАЕТ !{x"         },
     };
     
     int i, j;
     int perc = dam * 100 / victim->max_hit;
 
     for (i = 0; absTable[i].dam >= 0 && dam > absTable[i].dam; i++)
-	;
+        ;
     for (j = 0; relTable[j].perc >= 0 && perc > relTable[j].perc; j++)
-	;
+        ;
 
     if(dam == 0)
-	strcpy(buf, vs ? " промахиваешься мимо " : " промахивается мимо ");
+        strcpy(buf, vs ? " промахиваешься мимо " : " промахивается мимо ");
     else
-	drawRushechki(buf, 
-		vs ? relTable[j].vs : relTable[j].vp, 
-		absTable[i].art, absTable[i].color);
+        drawRushechki(buf, 
+                vs ? relTable[j].vs : relTable[j].vp, 
+                absTable[i].art, absTable[i].color);
 }
 
 /*-----------------------------------------------------------------------------
@@ -593,9 +593,9 @@ void Damage::msgOldFormat( bool vs, char *buf )
      {   52, 'M', " ", "УНИЧТОЖАЕШЬ",          "УНИЧТОЖАЕТ" },
      {   65, 'M', " ", "РАСЧЛЕНЯЕШЬ",          "РАСЧЛЕНЯЕТ" },
      {   80, 'M', " ", "ОПОТРОШАЕШЬ",          "ОПОТРОШАЕТ" },
-     {  100, 'M', " ", "ПЕРЕМАЛЫВАЕШЬ",        "ПЕРЕМАЛЫВАЕТ"	},
+     {  100, 'M', " ", "ПЕРЕМАЛЫВАЕШЬ",        "ПЕРЕМАЛЫВАЕТ"        },
       
-     {  130, 'G', " *** ",         "СОКРУШАЕШЬ",          "СОКРУШАЕТ"	},
+     {  130, 'G', " *** ",         "СОКРУШАЕШЬ",          "СОКРУШАЕТ"        },
      {  175, 'G', " *** ",         "СНОСИШЬ ВСЕ НА ПУТИ", "СНОСИТ ВСЕ НА ПУТИ" },
      {  250, 'B', " === ",         "СТИРАЕШЬ В ПОРОШОК",  "СТИРАЕТ В ПОРОШОК" },
      {  325, 'B', " === ",         "РАСПЫЛЯЕШЬ НА АТОМЫ", "РАСПЫЛЯЕТ НА АТОМЫ" },
@@ -612,11 +612,11 @@ void Damage::msgOldFormat( bool vs, char *buf )
     int i;
 
     for (i = 0; msgTable[i].dam >= 0 && dam > msgTable[i].dam; i++)
-	;
+        ;
 
     drawRushechki(buf, 
-	    vs ? msgTable[i].vs : msgTable[i].vp, 
-	    msgTable[i].art, msgTable[i].color);
+            vs ? msgTable[i].vs : msgTable[i].vp, 
+            msgTable[i].art, msgTable[i].color);
 }
 
 /*-----------------------------------------------------------------------------
@@ -625,11 +625,11 @@ void Damage::msgOldFormat( bool vs, char *buf )
 char Damage::msgPunct( )
 {
     if( victim->getModifyLevel() < 20 )    
-	return (dam <= 24) ? '.' : '!';
+        return (dam <= 24) ? '.' : '!';
     else if( victim->getModifyLevel() < 50)  
-	return (dam <= 50 ) ? '.' : '!';
+        return (dam <= 50 ) ? '.' : '!';
     else 
-	return (dam <= 75) ? '.' : '!';
+        return (dam <= 75) ? '.' : '!';
 }
 
 int Damage::msgNoSpamBit( )
@@ -640,12 +640,12 @@ int Damage::msgNoSpamBit( )
 void Damage::msgEcho(Character *to, const char *f, va_list va)
 {
     if (!to->getPC( ))
-	return;
+        return;
 
     if (dam == 0
-	&& !to->is_npc( )
-	&& !IS_SET(to->getPC( )->config, msgNoSpamBit( )))
-	return;
+        && !to->is_npc( )
+        && !IS_SET(to->getPC( )->config, msgNoSpamBit( )))
+        return;
     
     if (!IS_AWAKE(to) || !to->can_sense( ch ) || !to->can_sense( victim ))
         return;
@@ -655,26 +655,26 @@ void Damage::msgEcho(Character *to, const char *f, va_list va)
     char damVs[256], damVp[256];
     
     if(!to->is_npc() && IS_SET(to->getPC()->config, CONFIG_NEWDAMAGE)) {
-	msgNewFormat(true, damVs);
-	msgNewFormat(false, damVp);
+        msgNewFormat(true, damVs);
+        msgNewFormat(false, damVp);
     } else {
-	msgOldFormat(true, damVs);
-	msgOldFormat(false, damVp);
+        msgOldFormat(true, damVs);
+        msgOldFormat(false, damVp);
     }
 
     for(;*f;f++)
-	switch(*f) {
-	case '\5':
-	    for(v=damVs;*v;v++)
-		buf << *v;
-	    break;
-	case '\6':
-	    for(v=damVp;*v;v++)
-		buf << *v;
-	    break;
-	default:
-	    buf << *f;
-	}
+        switch(*f) {
+        case '\5':
+            for(v=damVs;*v;v++)
+                buf << *v;
+            break;
+        case '\6':
+            for(v=damVp;*v;v++)
+                buf << *v;
+            break;
+        default:
+            buf << *f;
+        }
 
     buf << msgPunct();
     to->vpecho(buf.str().c_str(), va);
@@ -706,9 +706,9 @@ void Damage::msgRoom( const char *fmt, ... )
     va_start(va, fmt);
 
     for(rch = ch->in_room->people; rch; rch = rch->next_in_room)
-	if(rch != victim && rch != ch) 
-	    msgEcho(rch, fmt, va);
-	    
+        if(rch != victim && rch != ch) 
+            msgEcho(rch, fmt, va);
+            
     va_end(va);
 }
 

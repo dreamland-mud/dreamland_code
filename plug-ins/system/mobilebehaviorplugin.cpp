@@ -14,15 +14,15 @@ void MobileBehaviorPlugin::initialization( )
     Character *wch;
 
     for (wch = char_list; wch; wch = wch->next) {
-	mob = wch->getNPC( );
+        mob = wch->getNPC( );
 
-	if (!mob || !mob->behavior)
-	    continue;
+        if (!mob || !mob->behavior)
+            continue;
 
-	if (mob->behavior->getType( ) == getName( )) {
-	    mob->behavior.recover( );
-	    mob->behavior->setChar( mob );	
-	}
+        if (mob->behavior->getType( ) == getName( )) {
+            mob->behavior.recover( );
+            mob->behavior->setChar( mob );        
+        }
     }
     
 }
@@ -34,17 +34,17 @@ void MobileBehaviorPlugin::destruction( )
 
     /* XXX */
     if (dreamland->isShutdown( ))
-	return;
+        return;
 
     for (wch = char_list; wch; wch = wch->next) {
-	mob = wch->getNPC( );
+        mob = wch->getNPC( );
 
-	if (!mob || !mob->behavior)
-	    continue;
-	
-	if (mob->behavior->getType( ) == getName( )) {
-	    mob->behavior->unsetChar( );	
-	    mob->behavior.backup( );
-	}
+        if (!mob || !mob->behavior)
+            continue;
+        
+        if (mob->behavior->getType( ) == getName( )) {
+            mob->behavior->unsetChar( );        
+            mob->behavior.backup( );
+        }
     }
 }

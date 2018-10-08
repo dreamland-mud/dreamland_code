@@ -50,7 +50,7 @@ public:
     virtual bool applicable( PCharacter * );
 
     static inline ButcherQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
     
     XML_VARIABLE XMLReverseVector<XMLString> races;

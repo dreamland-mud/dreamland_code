@@ -13,8 +13,8 @@ void XMLStringList::toSet( StringSet &aset ) const
     const_iterator i;
 
     for (i = begin( ); i != end( ); i++)
-	if (*i != "\'" && *i != "\"")
-	    aset.insert( *i );
+        if (*i != "\'" && *i != "\"")
+            aset.insert( *i );
 }
 
 

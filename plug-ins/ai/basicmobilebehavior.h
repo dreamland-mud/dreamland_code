@@ -182,20 +182,20 @@ private:
  */
 protected:
     struct SpellChance {
-	int gsn;
-	int chance;
+        int gsn;
+        int chance;
     };
     struct SpellChanceTable {
-	SpellChanceTable( const SpellChance *, NPCharacter *, Character * );
+        SpellChanceTable( const SpellChance *, NPCharacter *, Character * );
 
-	bool canCastSpell( int );
-	bool castSpell( int = 0xFFFF );
-	int  findSpell( );
-	int  findRangedSpell( int );
+        bool canCastSpell( int );
+        bool castSpell( int = 0xFFFF );
+        int  findSpell( );
+        int  findRangedSpell( int );
 
-	const SpellChance * spellTable;
-	NPCharacter * ch;
-	Character   * victim;
+        const SpellChance * spellTable;
+        NPCharacter * ch;
+        Character   * victim;
     };
 
     bool specFightCaster( );

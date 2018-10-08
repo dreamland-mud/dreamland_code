@@ -17,7 +17,7 @@ inline bool Quest::check( Character *victim )
     T *bhv;
     
     if (!victim->is_npc( ) || !victim->getNPC()->behavior)
-	return false;
+        return false;
 
     bhv = dynamic_cast<T *>( *victim->getNPC()->behavior );
     return (bhv && bhv->getHeroName( ) == charName.getValue( ));
@@ -29,8 +29,8 @@ inline bool Quest::check( Object *obj )
     T *bhv;
     
     if (!obj->behavior) 
-	return false;
-	
+        return false;
+        
     bhv = dynamic_cast<T *>( *obj->behavior );
     return (bhv && bhv->getHeroName( ) == charName.getValue( ));
 }

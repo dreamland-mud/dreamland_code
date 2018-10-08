@@ -10,9 +10,9 @@
 struct area_data;
 
 class AreaBehaviorManager {
-public:	
-	static void parse( area_data *, FILE * );
-	static void save( const area_data *, FILE * );
+public:        
+        static void parse( area_data *, FILE * );
+        static void save( const area_data *, FILE * );
 };
 
 #endif

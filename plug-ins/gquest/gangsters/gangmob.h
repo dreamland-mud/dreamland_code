@@ -35,11 +35,11 @@ public:
     typedef ::Pointer<GangMember> Pointer;
 
     enum {
-	STAT_NORMAL,
-	STAT_FIGHTING,
-	STAT_FLEE,
-	STAT_TRACKING,
-	STAT_SLEEP,
+        STAT_NORMAL,
+        STAT_FIGHTING,
+        STAT_FLEE,
+        STAT_TRACKING,
+        STAT_SLEEP,
     };
     
     GangMember( );

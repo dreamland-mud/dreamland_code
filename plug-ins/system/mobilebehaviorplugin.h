@@ -25,17 +25,17 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regMoc<C>( );
-	MobileBehaviorPlugin::initialization( );
+        Class::regMoc<C>( );
+        MobileBehaviorPlugin::initialization( );
     }
     virtual void destruction( ) 
     {
-	MobileBehaviorPlugin::destruction( );
-	Class::unregMoc<C>( );
+        MobileBehaviorPlugin::destruction( );
+        Class::unregMoc<C>( );
     }
     virtual const DLString& getName( ) const 
     {
-	return C::MOC_TYPE;
+        return C::MOC_TYPE;
     }
 };
 

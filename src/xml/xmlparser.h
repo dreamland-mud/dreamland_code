@@ -27,27 +27,27 @@
 class XMLParser : public yyFlexLexer, public virtual DLObject
 {
 public:
-	XMLParser( XMLDocument::Pointer& document, istream* );
-	int yylex( );
-	virtual ~XMLParser( );
-	
+        XMLParser( XMLDocument::Pointer& document, istream* );
+        int yylex( );
+        virtual ~XMLParser( );
+        
 private:
-	typedef std::stack<XMLNode::Pointer> StackType;
+        typedef std::stack<XMLNode::Pointer> StackType;
 
         DLString decode(const DLString &) const;
-	
-	
-	XMLDocument::Pointer root;
-	std::basic_ostringstream<char> ostr;
+        
+        
+        XMLDocument::Pointer root;
+        std::basic_ostringstream<char> ostr;
 
-	XMLDocument::Pointer rootNode;
-	XMLNode::Pointer currentNode;
-	DLString value;
-	DLString space;
-	DLString attributeName;
-	DLString attributeValue;
+        XMLDocument::Pointer rootNode;
+        XMLNode::Pointer currentNode;
+        DLString value;
+        DLString space;
+        DLString attributeName;
+        DLString attributeValue;
 
-	StackType st;
+        StackType st;
 };
 
 #endif

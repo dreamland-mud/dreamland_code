@@ -15,7 +15,7 @@
 
 class DefaultPCRace : public PCRace, public DefaultRace {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<DefaultPCRace> Pointer;
     
     DefaultPCRace( );

@@ -10,7 +10,7 @@
 #include "xmlindexdata.h"
 
 class OLCStateRoom : public OLCStateTemplate<OLCStateRoom>,
-		     public virtual OLCState
+                     public virtual OLCState
 {
 XML_OBJECT
 public:

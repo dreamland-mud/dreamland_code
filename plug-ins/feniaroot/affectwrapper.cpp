@@ -31,31 +31,31 @@ AffectWrapper::AffectWrapper( const RegisterList &args )
     i = args.begin( );
     
     if (i != args.end( ))
-	type.assign( *skillManager->findExisting( i->toString( ).c_str( ) ) );
+        type.assign( *skillManager->findExisting( i->toString( ).c_str( ) ) );
     else
-	return;
+        return;
     if (++i != args.end( ))
-	level = i->toNumber( );
+        level = i->toNumber( );
     else
-	return;
+        return;
     if (++i != args.end( ))
-	duration = i->toNumber( );
+        duration = i->toNumber( );
     else
-	return;
+        return;
     if (++i != args.end( ))
-	location = i->toNumber( );
+        location = i->toNumber( );
     else
-	return;
+        return;
     if (++i != args.end( ))
-	modifier = i->toNumber( );
+        modifier = i->toNumber( );
     else
-	return;
+        return;
     if (++i != args.end( ))
-	where = i->toNumber( );
+        where = i->toNumber( );
     else 
-	return;
+        return;
     if (++i != args.end( ))
-	bitvector = i->toNumber( );
+        bitvector = i->toNumber( );
 }
 
 void AffectWrapper::toAffect( Affect & af ) 
@@ -69,8 +69,8 @@ void AffectWrapper::toAffect( Affect & af )
     af.level = level;
     
     if (!global.empty( )) {
-	af.global.setRegistry( global.getRegistry( ) );
-	af.global.set( global );
+        af.global.setRegistry( global.getRegistry( ) );
+        af.global.set( global );
     }
 }
 
@@ -85,8 +85,8 @@ void AffectWrapper::fromAffect( const Affect & af )
     level = af.level;
 
     if (!af.global.empty( )) {
-	global.setRegistry( af.global.getRegistry( ) );
-	global.set( af.global );
+        global.setRegistry( af.global.getRegistry( ) );
+        global.set( af.global );
     }
 }
 
@@ -95,9 +95,9 @@ NMI_GET( AffectWrapper, type, "название скила, которым эт�
     int sn = type;
 
     if (sn < 0)
-	return Register( "none" );
+        return Register( "none" );
     else
-	return Register( type->getName( ) ); 
+        return Register( type->getName( ) ); 
 } 
 
 NMI_SET( AffectWrapper, type, "название скила, которым этот аффект вешается, или none" ) 
@@ -105,14 +105,14 @@ NMI_SET( AffectWrapper, type, "название скила, которым эт�
     const DLString & name = arg.toString( );
 
     if (name == "none") 
-	type.setName( name.c_str( ) );
+        type.setName( name.c_str( ) );
     else {
-	Skill * skill = skillManager->findExisting( name );
+        Skill * skill = skillManager->findExisting( name );
 
-	if (!skill)
-	    throw Scripting::IllegalArgumentException( );
-	
-	type.assign( *skill );
+        if (!skill)
+            throw Scripting::IllegalArgumentException( );
+        
+        type.assign( *skill );
     }
 }
 
@@ -137,11 +137,11 @@ GS(level, "уровень аффекта")
 NMI_SET( AffectWrapper, global, "" ) 
 {
     if (where == TO_LOCATIONS) {
-	global.setRegistry( wearlocationManager );
-	global.fromString( arg.toString( ) );
+        global.setRegistry( wearlocationManager );
+        global.fromString( arg.toString( ) );
     } else if (where == TO_LIQUIDS) {
-	global.setRegistry( liquidManager );
-	global.fromString( arg.toString( ) );
+        global.setRegistry( liquidManager );
+        global.fromString( arg.toString( ) );
     }
 }
 

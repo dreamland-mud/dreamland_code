@@ -16,35 +16,35 @@ class NPCharacter;
 class QuestRegistratorBase;
 
 class QuestManager : public Plugin, public DLXMLLoader {
-public:	
-	typedef ::Pointer<QuestManager> Pointer;
-	typedef std::vector< ::Pointer<QuestRegistratorBase> > QuestRegistry;
-	
+public:        
+        typedef ::Pointer<QuestManager> Pointer;
+        typedef std::vector< ::Pointer<QuestRegistratorBase> > QuestRegistry;
+        
 public:
-	QuestManager( );
-	virtual ~QuestManager( );
-	
-	virtual void initialization( );
-	virtual void destruction( );
-	
-	virtual DLString getNodeName( ) const;
-	virtual DLString getTableName( ) const;
+        QuestManager( );
+        virtual ~QuestManager( );
+        
+        virtual void initialization( );
+        virtual void destruction( );
+        
+        virtual DLString getNodeName( ) const;
+        virtual DLString getTableName( ) const;
 
-	void generate( PCharacter *, NPCharacter * );
-	void load( QuestRegistratorBase* );
-	void unLoad( QuestRegistratorBase* );
-	::Pointer<QuestRegistratorBase> findQuestRegistrator( const DLString& );
-	
-	static inline QuestManager* getThis( ) {
-	    return thisClass;
-	}
+        void generate( PCharacter *, NPCharacter * );
+        void load( QuestRegistratorBase* );
+        void unLoad( QuestRegistratorBase* );
+        ::Pointer<QuestRegistratorBase> findQuestRegistrator( const DLString& );
+        
+        static inline QuestManager* getThis( ) {
+            return thisClass;
+        }
 
 private:
-	static QuestManager* thisClass;
-	static const DLString TABLE_NAME;
-	static const DLString NODE_NAME;
+        static QuestManager* thisClass;
+        static const DLString TABLE_NAME;
+        static const DLString NODE_NAME;
     
-	QuestRegistry quests;
+        QuestRegistry quests;
 };
 
 #endif

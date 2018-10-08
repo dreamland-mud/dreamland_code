@@ -13,14 +13,14 @@
 class PersonalQuestReward : public QuestReward {
 XML_OBJECT
 public:
-	typedef ::Pointer<PersonalQuestReward> Pointer;
-	
-	virtual void get( Character * );
-	virtual bool save( );
-	virtual void delete_( Character * ); 
-	virtual bool isLevelAdaptive( ); 
-	virtual bool canSteal( Character * );
-	virtual bool canEquip( Character * );
+        typedef ::Pointer<PersonalQuestReward> Pointer;
+        
+        virtual void get( Character * );
+        virtual bool save( );
+        virtual void delete_( Character * ); 
+        virtual bool isLevelAdaptive( ); 
+        virtual bool canSteal( Character * );
+        virtual bool canEquip( Character * );
 };
 
 #endif

@@ -39,9 +39,9 @@ PosessivePronoun::~PosessivePronoun()
 DLString PosessivePronoun::decline(const Noun &item, const Noun &owner, const Person &p, const Case &c) const 
 {
     return posessions
-	    [item.getMultiGender()]
-		[Person(owner.getMultiGender(), p)]
-		    [c];
+            [item.getMultiGender()]
+                [Person(owner.getMultiGender(), p)]
+                    [c];
 }
 
 IndefinitePronoun::IndefinitePronoun(const AnimacyCases &acases)

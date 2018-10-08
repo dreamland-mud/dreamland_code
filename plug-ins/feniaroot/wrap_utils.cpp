@@ -83,7 +83,7 @@ Wearlocation * arg2wearloc( const Register &reg )
     Wearlocation *loc = wearlocationManager->findExisting( locName );
 
     if (!loc)
-	throw Scripting::CustomException( DLString("Invalid wearlocation name '") + locName + "'" );
+        throw Scripting::CustomException( DLString("Invalid wearlocation name '") + locName + "'" );
 
     return loc;
 }

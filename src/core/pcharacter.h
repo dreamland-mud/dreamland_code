@@ -91,7 +91,7 @@ struct CachedNoun {
 class PCharacter : public Character, public PCMemoryInterface
 {
 XML_OBJECT;
-public:	
+public:        
     typedef ::Pointer<PCharacter> Pointer;
 
 public:
@@ -164,7 +164,7 @@ public:
     virtual XMLAttributes& getAttributes( ) throw( );
     virtual void setAttributes( const XMLAttributes& attributes ) throw( );
     virtual const XMLAttributes& getAttributes( ) const throw( );
-	    
+            
     virtual const RussianString& getRussianName( ) const throw( );
     virtual void setRussianName( const DLString& ) throw( );
 
@@ -275,47 +275,47 @@ public:
     XML_VARIABLE XMLPlayerAge age;
 
     // PK/death timers and counters
-    XML_VARIABLE XMLInteger		last_death_time;
-    XML_VARIABLE XMLIntegerNoEmpty	ghost_time;
-    XML_VARIABLE XMLIntegerNoEmpty	PK_time_v;
-    XML_VARIABLE XMLIntegerNoEmpty	PK_time_sk;
-    XML_VARIABLE XMLIntegerNoEmpty	PK_time_t;
-    XML_VARIABLE XMLIntegerNoEmpty	PK_flag;	/* KILLER, SLAIN, VIOLENT, GHOST, THIEF */
-    XML_VARIABLE XMLIntegerNoEmpty	death;
-    XML_VARIABLE XMLIntegerNoEmpty	anti_killed;
-    XML_VARIABLE XMLIntegerNoEmpty	has_killed;
+    XML_VARIABLE XMLInteger                last_death_time;
+    XML_VARIABLE XMLIntegerNoEmpty        ghost_time;
+    XML_VARIABLE XMLIntegerNoEmpty        PK_time_v;
+    XML_VARIABLE XMLIntegerNoEmpty        PK_time_sk;
+    XML_VARIABLE XMLIntegerNoEmpty        PK_time_t;
+    XML_VARIABLE XMLIntegerNoEmpty        PK_flag;        /* KILLER, SLAIN, VIOLENT, GHOST, THIEF */
+    XML_VARIABLE XMLIntegerNoEmpty        death;
+    XML_VARIABLE XMLIntegerNoEmpty        anti_killed;
+    XML_VARIABLE XMLIntegerNoEmpty        has_killed;
     
     // player-specific parameters
-    XML_VARIABLE XMLInteger		perm_hit;
-    XML_VARIABLE XMLInteger		perm_mana;
-    XML_VARIABLE XMLInteger		perm_move;
-    XML_VARIABLE XMLInteger		max_skill_points;
-    XML_VARIABLE XMLIntegerNoEmpty	practice;
-    XML_VARIABLE XMLIntegerNoEmpty	train;
-    XML_VARIABLE XMLIntegerNoEmpty	loyalty;          // real ethos - dynamic
-    XML_VARIABLE XMLInteger		curse;
-    XML_VARIABLE XMLInteger		bless;
+    XML_VARIABLE XMLInteger                perm_hit;
+    XML_VARIABLE XMLInteger                perm_mana;
+    XML_VARIABLE XMLInteger                perm_move;
+    XML_VARIABLE XMLInteger                max_skill_points;
+    XML_VARIABLE XMLIntegerNoEmpty        practice;
+    XML_VARIABLE XMLIntegerNoEmpty        train;
+    XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic
+    XML_VARIABLE XMLInteger                curse;
+    XML_VARIABLE XMLInteger                bless;
 
     // money
-    XML_VARIABLE XMLIntegerNoEmpty	bank_s;
-    XML_VARIABLE XMLIntegerNoEmpty	bank_g;
+    XML_VARIABLE XMLIntegerNoEmpty        bank_s;
+    XML_VARIABLE XMLIntegerNoEmpty        bank_g;
     
     // quest
-    XML_VARIABLE XMLIntegerNoEmpty     questpoints;	
+    XML_VARIABLE XMLIntegerNoEmpty     questpoints;        
 
-    NPCharacter *	pet;
+    NPCharacter *        pet;
 
     // fields used by skills
-    PCharacter *	guarding;
-    PCharacter *	guarded_by;
-    XML_VARIABLE XMLInteger          shadow;		// INVADER (shadow)
+    PCharacter *        guarding;
+    PCharacter *        guarded_by;
+    XML_VARIABLE XMLInteger          shadow;                // INVADER (shadow)
     
     // config
     XML_VARIABLE XMLFlags config;
-    bool              	confirm_delete;
+    bool                      confirm_delete;
 
     // switch
-    NPCharacter		*switchedTo;
+    NPCharacter                *switchedTo;
 
     XML_VARIABLE XMLInteger start_room;
 };

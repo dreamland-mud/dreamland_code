@@ -85,56 +85,56 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
     long long id = get_arg_id( argument );
 
     if (room == 0)
-	return 0;
+        return 0;
 
     count  = 0;
     ugly   = 0;
 
     if (arg_is_self( argument ))
-	return ch;
+        return ch;
 
     if (arg_is_ugly( argument ))
-	ugly = 1;
+        ugly = 1;
 
     for (rch = room->people; rch != 0; rch = rch->next_in_room)
     {
-	if (!ch->can_sense( rch ))
-	    continue;
+        if (!ch->can_sense( rch ))
+            continue;
 
-	if (!ch->can_see( rch ) && fSeenOnly)
-	    continue;
+        if (!ch->can_see( rch ) && fSeenOnly)
+            continue;
 
-	if (ugly) {
-	    if (!IS_VAMPIRE(rch))
-		continue;
+        if (ugly) {
+            if (!IS_VAMPIRE(rch))
+                continue;
 
-	    if (++count == *number)
-		return rch;
-	}
-	else {
+            if (++count == *number)
+                return rch;
+        }
+        else {
 
-	    Character *tch;
-	    
-	    tch = rch->getDoppel( ch );
+            Character *tch;
+            
+            tch = rch->getDoppel( ch );
 
-	    if (tch->is_npc( ))
-	    {
+            if (tch->is_npc( ))
+            {
                 if (id && tch->getID( ) == id)
                     return rch;
-		if (id || !char_has_name(tch, argument))
-		    continue;
-	    }
-	    else
-	    {
+                if (id || !char_has_name(tch, argument))
+                    continue;
+            }
+            else
+            {
                 if (id && tch->getID( ) == id)
                     return rch;
-		if (id || !char_has_name(tch, argument))
-		    continue;
-	    }
+                if (id || !char_has_name(tch, argument))
+                    continue;
+            }
 
-	    if (++count == *number)
-		return rch;
-	}
+            if (++count == *number)
+                return rch;
+        }
     }
 
     *number -= count;
@@ -148,35 +148,35 @@ Character *get_char_room( Character *ch, Room *room, const char *argument, int *
  */
 Character *get_char_area( Character *ch, char *argument )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *ach;
-	int number;
-	int count;
+        char arg[MAX_INPUT_LENGTH];
+        Character *ach;
+        int number;
+        int count;
         long long id;
 
-	if ( ( ach = get_char_room( ch, argument ) ) != 0 )
-		return ach;
+        if ( ( ach = get_char_room( ch, argument ) ) != 0 )
+                return ach;
 
         id = get_arg_id( argument );
-	number = number_argument( argument, arg ) - count_char_room ( ch, argument ) ;
-	count = 0;
+        number = number_argument( argument, arg ) - count_char_room ( ch, argument ) ;
+        count = 0;
 
-	for( ach = char_list; ach != 0; ach = ach->next )
-	{
-		if ( ach->in_room == 0
-			|| ach->in_room == ch->in_room
-			|| ach->in_room->area != ch->in_room->area
-			|| !ch->can_see( ach )
+        for( ach = char_list; ach != 0; ach = ach->next )
+        {
+                if ( ach->in_room == 0
+                        || ach->in_room == ch->in_room
+                        || ach->in_room->area != ch->in_room->area
+                        || !ch->can_see( ach )
                         || (id && ach->getID( ) != id)
-			|| (!id && !char_has_name(ach, arg)) )
-		{
-			continue;
-		}
+                        || (!id && !char_has_name(ach, arg)) )
+                {
+                        continue;
+                }
 
-		if(id || ++count == number )
-			return ach;
-	}
-	return 0;
+                if(id || ++count == number )
+                        return ach;
+        }
+        return 0;
 }
 
 
@@ -189,37 +189,37 @@ Character *get_char_world( Character *ch, const DLString &arg )
 }
 Character *get_char_world( Character *ch, const char *cArgument )
 {
-	char arg[MAX_INPUT_LENGTH];
-	char arg_buf[strlen(cArgument)+1];
-	char *argument = arg_buf;
-	Character *wch;
-	int number;
-	int count;
-	
-	strcpy( arg_buf, cArgument );
+        char arg[MAX_INPUT_LENGTH];
+        char arg_buf[strlen(cArgument)+1];
+        char *argument = arg_buf;
+        Character *wch;
+        int number;
+        int count;
+        
+        strcpy( arg_buf, cArgument );
 
-	if ( ( wch = get_char_room( ch, argument ) ) != 0 )
-		return wch;
+        if ( ( wch = get_char_room( ch, argument ) ) != 0 )
+                return wch;
 
-	number = number_argument( argument, arg ) - count_char_room( ch, argument );
+        number = number_argument( argument, arg ) - count_char_room( ch, argument );
 
-	count  = 0;
-	for ( wch = char_list; wch != 0 ; wch = wch->next )
-	{
-		if (wch->in_room == 0)
-		    continue;
-		if (wch->in_room == ch->in_room)
-		    continue;
-		if (!ch->can_see( wch ))
-		    continue;
-		if (!char_has_name(wch, arg))
-		    continue;
+        count  = 0;
+        for ( wch = char_list; wch != 0 ; wch = wch->next )
+        {
+                if (wch->in_room == 0)
+                    continue;
+                if (wch->in_room == ch->in_room)
+                    continue;
+                if (!ch->can_see( wch ))
+                    continue;
+                if (!char_has_name(wch, arg))
+                    continue;
 
-		if ( ++count >= number )
-			return wch;
-	}
+                if ( ++count >= number )
+                        return wch;
+        }
 
-	return 0;
+        return 0;
 }
 
 /*
@@ -230,39 +230,39 @@ Character *get_char_world( Character *ch, const char *cArgument )
  */
 Object *get_obj_list( Character *ch, const DLString &cArg, Object *list, DLString pocket )
 {
-	char arg[MAX_INPUT_LENGTH];
-	char argument[MAX_INPUT_LENGTH];
-	Object *obj;
-	int number;
-	int count;
+        char arg[MAX_INPUT_LENGTH];
+        char argument[MAX_INPUT_LENGTH];
+        Object *obj;
+        int number;
+        int count;
         long long id;
        
         strcpy(argument, cArg.c_str( ));
         id = get_arg_id( argument );
-	number = number_argument( argument, arg );
-	count  = 0;
-	for ( obj = list; obj != 0; obj = obj->next_content )
-	{
-	    if (!ch->can_see( obj ) && !ch->can_hear( obj ))
-		continue;
-	   
+        number = number_argument( argument, arg );
+        count  = 0;
+        for ( obj = list; obj != 0; obj = obj->next_content )
+        {
+            if (!ch->can_see( obj ) && !ch->can_hear( obj ))
+                continue;
+           
             if (id && obj->getID( ) != id)
-		continue;
+                continue;
 
-	    if (!id && !obj_has_name( obj, arg, ch ))
-		continue;
+            if (!id && !obj_has_name( obj, arg, ch ))
+                continue;
 
-	    if (!pocket.empty( ) && obj->pocket != pocket)
-		continue;
-	    
-	    if (pocket.empty( ) && !obj->pocket.empty( ))
-		continue;
+            if (!pocket.empty( ) && obj->pocket != pocket)
+                continue;
+            
+            if (pocket.empty( ) && !obj->pocket.empty( ))
+                continue;
 
-	    if (id || ++count == number)
-		return obj;
-	}
+            if (id || ++count == number)
+                return obj;
+        }
 
-	return 0;
+        return 0;
 }
 
 DLString get_obj_name_list( Object *target, Object *list, Character *ch )
@@ -272,11 +272,11 @@ DLString get_obj_name_list( Object *target, Object *list, Character *ch )
 
     for (obj = list, count = 1; 
          obj && obj != target; 
-	 obj = obj->next_content) 
+         obj = obj->next_content) 
     {
-	if (obj->getName( ) == target->getName( ))
-	    if (ch->can_see( obj ) || ch->can_hear( obj ))
-		count++;
+        if (obj->getName( ) == target->getName( ))
+            if (ch->can_see( obj ) || ch->can_hear( obj ))
+                count++;
     }
 
     return DLString( count ) + "." + target->getName( );
@@ -289,11 +289,11 @@ DLString get_char_name_list( Character *target, Character *list, Character *ch )
 
     for (rch = list, count = 1; 
          rch && rch != target; 
-	 rch = rch->next_in_room) 
+         rch = rch->next_in_room) 
     {
-	if (rch->getName( ) == target->getName( ))
-	    if (ch->can_see( rch ))
-		count++;
+        if (rch->getName( ) == target->getName( ))
+            if (ch->can_see( rch ))
+                count++;
     }
 
     return DLString( count ) + "." + target->getName( );
@@ -314,28 +314,28 @@ Object * get_obj_carry( Character *ch, const DLString & constArgument )
  */
 Object *get_obj_carry( Character *ch, char *argument )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Object *obj;
-	int number;
-	int count;
+        char arg[MAX_INPUT_LENGTH];
+        Object *obj;
+        int number;
+        int count;
         long long id = get_arg_id( argument );
 
-	number = number_argument( argument, arg );
-	count  = 0;
+        number = number_argument( argument, arg );
+        count  = 0;
 
-	for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
-	{
-		if ( obj->wear_loc == wear_none
-			&& ( ch->can_see( obj ) )
+        for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
+        {
+                if ( obj->wear_loc == wear_none
+                        && ( ch->can_see( obj ) )
                         && ((id && obj->getID( ) == id) 
                              || (!id && obj_has_name( obj, arg, ch ))))
-		{
-			if (id || ++count == number )
-				return obj;
-		}
-	}
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
 
-	return 0;
+        return 0;
 }
 
 /*
@@ -346,28 +346,28 @@ Object *get_obj_carry( Character *ch, char *argument )
  */
 Object *see_obj_carry( Character *stealer, Character *ch, char *argument )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Object *obj;
-	int number;
-	int count;
+        char arg[MAX_INPUT_LENGTH];
+        Object *obj;
+        int number;
+        int count;
         long long id = get_arg_id( argument );
 
-	number = number_argument( argument, arg );
-	count  = 0;
+        number = number_argument( argument, arg );
+        count  = 0;
 
-	for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
-	{
-		if ( obj->wear_loc == wear_none
-			&& ( stealer->can_see( obj ) )
+        for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
+        {
+                if ( obj->wear_loc == wear_none
+                        && ( stealer->can_see( obj ) )
                         && ((id && obj->getID( ) == id) 
                              || (!id && obj_has_name( obj, arg, stealer  ))))
-		{
-			if (id || ++count == number )
-				return obj;
-		}
-	}
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
 
-	return 0;
+        return 0;
 }
 
 
@@ -396,13 +396,13 @@ Object *get_obj_wear( Character *ch, const char *cargument )
     count  = 0;
     for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
     {
-	if ( obj->wear_loc != wear_none
+        if ( obj->wear_loc != wear_none
              && ((id && obj->getID( ) == id) 
                  || (!id && obj_has_name( obj, arg, ch ))))
-	{
-	    if (id || ++count == number)
-		return obj;
-	}
+        {
+            if (id || ++count == number)
+                return obj;
+        }
     }
 
     return 0;
@@ -419,47 +419,47 @@ Object * get_obj_here( Character *ch, const DLString & constArgument )
  */
 Object *get_obj_here( Character *ch, char *argument )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Object *obj;
-	int count = 0;
-	int number = number_argument( argument, arg );
+        char arg[MAX_INPUT_LENGTH];
+        Object *obj;
+        int count = 0;
+        int number = number_argument( argument, arg );
         long long id = get_arg_id( argument );
 
-	// At first look in room...
-	for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content )
-	{
-		if ( ( ch->can_see( obj ) || ch->can_hear( obj ) )
+        // At first look in room...
+        for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content )
+        {
+                if ( ( ch->can_see( obj ) || ch->can_hear( obj ) )
                         && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-		{
-			if (id || ++count == number )
-				return obj;
-		}
-	}
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
 
-	// ... then inventory ...
-	for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
-	{
-		if ( obj->wear_loc == wear_none
-			&& ( ch->can_see( obj ) || ch->can_hear( obj ) )
+        // ... then inventory ...
+        for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
+        {
+                if ( obj->wear_loc == wear_none
+                        && ( ch->can_see( obj ) || ch->can_hear( obj ) )
                         && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-		{
-			if (id || ++count == number )
-				return obj;
-		}
-	}
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
 
-	// ... and equipment, at last!
-	for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
-	{
-		if ( obj->wear_loc != wear_none
+        // ... and equipment, at last!
+        for ( obj = ch->carrying; obj != 0; obj = obj->next_content )
+        {
+                if ( obj->wear_loc != wear_none
                         && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-		{
-			if (id || ++count == number )
-				return obj;
-		}
-	}
+                {
+                        if (id || ++count == number )
+                                return obj;
+                }
+        }
 
-	return 0;
+        return 0;
 }
 
 
@@ -475,17 +475,17 @@ Object *get_obj_world( Character *ch, char *argument )
     int count;
 
     if ( ( obj = get_obj_here( ch, argument ) ) != 0 )
-	return obj;
+        return obj;
 
     number = number_argument( argument, arg );
     count  = 0;
     for ( obj = object_list; obj != 0; obj = obj->next )
     {
-	if ( ch->can_see( obj ) && obj_has_name( obj, arg, ch ) )
-	{
-	    if ( ++count == number )
-		return obj;
-	}
+        if ( ch->can_see( obj ) && obj_has_name( obj, arg, ch ) )
+        {
+            if ( ++count == number )
+                return obj;
+        }
 
     }
 
@@ -498,44 +498,44 @@ Object *get_obj_world( Character *ch, char *argument )
  */
 int count_char_room( Character *ch, char *argument )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *rch;
-	int count;
-	int ugly;
+        char arg[MAX_INPUT_LENGTH];
+        Character *rch;
+        int count;
+        int ugly;
 
-	int number = number_argument( argument, arg );
-	count  = 0;
-	ugly   = 0;
+        int number = number_argument( argument, arg );
+        count  = 0;
+        ugly   = 0;
 
-	if (arg_is_self( arg ))
-		return 1;
+        if (arg_is_self( arg ))
+                return 1;
 
-	if (arg_is_ugly( arg ))
-		ugly = 1;
+        if (arg_is_ugly( arg ))
+                ugly = 1;
 
-	for ( rch = ch->in_room->people; rch != 0; rch = rch->next_in_room )
-	{
-		if ( !ch->can_see( rch ) )
-			continue;
+        for ( rch = ch->in_room->people; rch != 0; rch = rch->next_in_room )
+        {
+                if ( !ch->can_see( rch ) )
+                        continue;
 
-		if ( ugly
-			&& IS_VAMPIRE(rch) )
-		{
-			count++;
-			continue;
-		}
+                if ( ugly
+                        && IS_VAMPIRE(rch) )
+                {
+                        count++;
+                        continue;
+                }
 
-		Character *tch;
-		
-		tch = rch->getDoppel( ch );
+                Character *tch;
+                
+                tch = rch->getDoppel( ch );
 
-		if (!char_has_name(tch, argument))
-			continue;
+                if (!char_has_name(tch, argument))
+                        continue;
 
-		count++;
-	}
+                count++;
+        }
 
-	return count;
+        return count;
 }
 
 /*
@@ -549,8 +549,8 @@ int count_obj_list( OBJ_INDEX_DATA *pObjIndex, Object *list )
     nMatch = 0;
     for ( obj = list; obj != 0; obj = obj->next_content )
     {
-	if ( obj->pIndexData == pObjIndex )
-	    nMatch++;
+        if ( obj->pIndexData == pObjIndex )
+            nMatch++;
     }
 
     return nMatch;
@@ -576,12 +576,12 @@ Object *get_obj_room( Character *ch, const char *cArgument )
     number = number_argument( argument, arg );
 
     for ( obj = ch->in_room->contents; obj != 0; obj = obj->next_content ) {
-	if (( ch->can_see( obj ) || ch->can_hear( obj ) )
+        if (( ch->can_see( obj ) || ch->can_hear( obj ) )
               && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-	{
-	    if (id || ++count == number )
-		return obj;
-	}
+        {
+            if (id || ++count == number )
+                return obj;
+        }
     }
 
     return NULL;
@@ -601,13 +601,13 @@ Object *get_obj_wear_victim( Character *victim, const DLString &cArg, Character 
     count  = 0;
 
     for (obj = victim->carrying; obj; obj = obj->next_content )
-	if (obj->wear_loc != wear_none
+        if (obj->wear_loc != wear_none
             && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) 
-	    && ch->can_see( obj ))
-	{
-	    if (id || ++count == number)
-		return obj;
-	}
+            && ch->can_see( obj ))
+        {
+            if (id || ++count == number)
+                return obj;
+        }
 
     return NULL;
 }
@@ -625,13 +625,13 @@ Object * get_obj_list_type( Character *ch, const DLString &cArg, int type, Objec
     count  = 0;
 
     for (obj = list; obj; obj = obj->next_content )
-	if (obj->item_type == type
-	    && obj_has_name( obj, arg, ch ) 
-	    && (ch->can_see( obj ) || ch->can_hear( obj )))
-	{
-	    if (++count == number)
-		return obj;
-	}
+        if (obj->item_type == type
+            && obj_has_name( obj, arg, ch ) 
+            && (ch->can_see( obj ) || ch->can_hear( obj )))
+        {
+            if (++count == number)
+                return obj;
+        }
 
     return NULL;
 }
@@ -641,9 +641,9 @@ Object * get_obj_list_type( Character *ch, int type, Object *list )
     Object *obj;
 
     for (obj = list; obj; obj = obj->next_content)
-	if (obj->item_type == type
-	    && (ch->can_see( obj ) || ch->can_hear( obj )))
-	    return obj;
+        if (obj->item_type == type
+            && (ch->can_see( obj ) || ch->can_hear( obj )))
+            return obj;
 
     return NULL;
 }
@@ -654,9 +654,9 @@ std::list<Object *> get_objs_list_type( Character *ch, int type, Object *list )
     std::list<Object *> result;    
 
     for (obj = list; obj; obj = obj->next_content)
-	if (obj->item_type == type
-	    && (ch->can_see( obj ) || ch->can_hear( obj )))
-	    result.push_back(obj);
+        if (obj->item_type == type
+            && (ch->can_see( obj ) || ch->can_hear( obj )))
+            result.push_back(obj);
 
     return result;
 }
@@ -687,8 +687,8 @@ Object * get_obj_room_vnum( Room *room, int vnum )
     Object *obj;
 
     for (obj = room->contents; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    return obj;
+        if (obj->pIndexData->vnum == vnum)
+            return obj;
 
     return NULL;
 }
@@ -698,9 +698,9 @@ Object * get_obj_list_vnum( Character *ch, int vnum, Object *list )
     Object *obj;
 
     for (obj = list; obj; obj = obj->next_content) 
-	if (obj->pIndexData->vnum == vnum
-	    && (ch->can_see( obj ) || ch->can_hear( obj )))
-	    return obj;
+        if (obj->pIndexData->vnum == vnum
+            && (ch->can_see( obj ) || ch->can_hear( obj )))
+            return obj;
 
     return NULL;
 }
@@ -725,26 +725,26 @@ Character *get_char_world_doppel( Character *ch, const char *cArgument )
     strcpy( arg_buf, cArgument );
 
     if ( ( wch = get_char_room( ch, argument ) ) != 0 )
-	    return wch;
+            return wch;
 
     number = number_argument( argument, arg ) - count_char_room ( ch, argument ) ;
 
     count  = 0;
     for ( wch = char_list; wch != 0 ; wch = wch->next )
     {
-	Character *dch = wch->getDoppel( ch );
+        Character *dch = wch->getDoppel( ch );
 
-	if (dch->in_room == 0)
-	    continue;
-	if (dch->in_room == ch->in_room)
-	    continue;
-	if (!ch->can_see( dch ))
-	    continue;
-	if (!char_has_name( dch, arg ))
-	    continue;
+        if (dch->in_room == 0)
+            continue;
+        if (dch->in_room == ch->in_room)
+            continue;
+        if (!ch->can_see( dch ))
+            continue;
+        if (!char_has_name( dch, arg ))
+            continue;
 
-	if ( ++count >= number )
-		return wch;
+        if ( ++count >= number )
+                return wch;
     }
 
     return 0;
@@ -757,26 +757,26 @@ PCharacter * get_player_world( PCharacter *ch, const char *arg )
     Descriptor *d;
 
     for (d = descriptor_list; d != 0; d = d->next) {
-	PCharacter *victim;
-	
-	if (d->connected != CON_PLAYING)
-	    continue;
-	
-	if(!d->character)
-	    continue;
+        PCharacter *victim;
+        
+        if (d->connected != CON_PLAYING)
+            continue;
+        
+        if(!d->character)
+            continue;
 
-	victim = d->character->getPC( );
+        victim = d->character->getPC( );
 
-	if(victim->switchedTo)
-	    continue;
+        if(victim->switchedTo)
+            continue;
 
-	if (!ch->can_see( victim ))
-	    continue;
+        if (!ch->can_see( victim ))
+            continue;
 
-	if (!char_has_name( victim, arg ))
-	    continue;
-	
-	return victim;
+        if (!char_has_name( victim, arg ))
+            continue;
+        
+        return victim;
     }
 
     return NULL;
@@ -787,8 +787,8 @@ Object * get_obj_world_unique( int vnum, Character *ch )
     Object *obj;
     
     for (obj = object_list; obj; obj = obj->next) 
-	if (obj->pIndexData->vnum == vnum && obj->hasOwner( ch ))
-	    break;
+        if (obj->pIndexData->vnum == vnum && obj->hasOwner( ch ))
+            break;
 
     return obj;
 }
@@ -799,8 +799,8 @@ std::list<Object *> get_objlist_world_unique( int vnum, Character *ch )
     std::list<Object *> list;
     
     for (obj = object_list; obj; obj = obj->next) 
-	if (obj->pIndexData->vnum == vnum && obj->hasOwner( ch ))
-	    list.push_back( obj );
+        if (obj->pIndexData->vnum == vnum && obj->hasOwner( ch ))
+            list.push_back( obj );
 
     return list;
 }
@@ -808,8 +808,8 @@ std::list<Object *> get_objlist_world_unique( int vnum, Character *ch )
 Object * get_obj_room_unique( Room *room, int itype, Character *ch )
 {
     for (Object *obj = room->contents; obj; obj = obj->next_content)
-	if (obj->item_type == itype && obj->hasOwner( ch ))
-	    return obj;
+        if (obj->item_type == itype && obj->hasOwner( ch ))
+            return obj;
 
     return NULL;
 }
@@ -820,7 +820,7 @@ int count_obj_in_obj( Object *container )
     int count;
 
     for (count = 0, objc = container->contains; objc; objc = objc->next_content, count++)
-	;
+        ;
 
     return count;
 }
@@ -831,8 +831,8 @@ int count_obj_in_obj( Object *container, int itype )
     int count;
 
     for (count = 0, objc = container->contains; objc; objc = objc->next_content)
-	if (objc->item_type == itype)
-	    count++;
+        if (objc->item_type == itype)
+            count++;
 
     return count;
 }
@@ -850,21 +850,21 @@ Object * get_obj_wear_carry( Character *ch, const DLString &cArgument )
     number = number_argument( argument, arg );
 
     for (obj = ch->carrying; obj != 0; obj = obj->next_content)
-	if (obj->wear_loc != wear_none
+        if (obj->wear_loc != wear_none
             && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-	{
-	    if (id || ++count == number)
-		return obj;
-	}
+        {
+            if (id || ++count == number)
+                return obj;
+        }
 
     for (obj = ch->carrying; obj != 0; obj = obj->next_content)
-	if (obj->wear_loc == wear_none
-		&& (ch->can_see( obj ) || ch->can_hear( obj ))
+        if (obj->wear_loc == wear_none
+                && (ch->can_see( obj ) || ch->can_hear( obj ))
                 && ((id && obj->getID( ) == id) || (!id && obj_has_name( obj, arg, ch ))) )
-	{
-	    if (id || ++count == number)
-		return obj;
-	}
+        {
+            if (id || ++count == number)
+                return obj;
+        }
 
     return 0;
 }
@@ -941,8 +941,8 @@ bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long l
 Profession * find_prof_unstrict( const DLString &className) 
 {    
     for (int i = 0; i < professionManager->size( ); i++) {
-	Profession *p = professionManager->find( i );
-	if (!p->isValid( ) || !p->isPlayed( )) 
+        Profession *p = professionManager->find( i );
+        if (!p->isValid( ) || !p->isPlayed( )) 
             continue;
 
         if (className.strPrefix( p->getName( ) )) {

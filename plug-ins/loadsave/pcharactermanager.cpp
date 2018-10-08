@@ -43,31 +43,31 @@ static void load_PET( FILE *pfile )
     word = feof(pfile) ? "End" : fread_word(pfile);
     if (!str_cmp(word,"Vnum"))
     {
-    	int vnum;
-	MOB_INDEX_DATA *pPetIndex;
-    	
-    	vnum = fread_number(pfile);
-	pPetIndex = get_mob_index( vnum );
-	
-	if (pPetIndex)
-	    pPetIndex->count++;
-	else
-	    pFidoIndex->count++; 
+            int vnum;
+        MOB_INDEX_DATA *pPetIndex;
+            
+            vnum = fread_number(pfile);
+        pPetIndex = get_mob_index( vnum );
+        
+        if (pPetIndex)
+            pPetIndex->count++;
+        else
+            pFidoIndex->count++; 
     }
     else
        pFidoIndex->count++; 
     
     for ( ; ; ) {
-	word = feof( pfile ) ? "End" : fread_word( pfile );
-	switch( Char::upper( word[0] ) ) {
-	case '*':
-	    fread_to_eol( pfile );
-	    break;
-	case 'E':
-	    if( !strcmp( word, "End" ) ) {
-		return;
-	    }
-	}
+        word = feof( pfile ) ? "End" : fread_word( pfile );
+        switch( Char::upper( word[0] ) ) {
+        case '*':
+            fread_to_eol( pfile );
+            break;
+        case 'E':
+            if( !strcmp( word, "End" ) ) {
+                return;
+            }
+        }
     }
 }
 
@@ -83,8 +83,8 @@ static void load_MLT( FILE *pfile )
         break;
       case 'E':
         if( !strcmp( word, "End" ) ) {
-	    return;
-	}
+            return;
+        }
     }
   }
 }
@@ -105,7 +105,7 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
       vnum = fread_number( pfile );
 //      pObjIndex =  get_obj_index( vnum );
 //      if (pObjIndex) {
-//	pObjIndex->count++;
+//        pObjIndex->count++;
 //      }
       bVnum = true;
     }
@@ -117,16 +117,16 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
       
       case 'E':
         if( !strcmp( word, "End" ) ) {
-	    if (!feof( pfile )) {
-		char letter = fread_letter( pfile );
-		
-		if (letter != '<')
-		    ungetc( letter, pfile );
-		else {
-		    char * xml = fread_string( pfile );
-		    free_string( xml );
-		}
-	    }
+            if (!feof( pfile )) {
+                char letter = fread_letter( pfile );
+                
+                if (letter != '<')
+                    ungetc( letter, pfile );
+                else {
+                    char * xml = fread_string( pfile );
+                    free_string( xml );
+                }
+            }
 
             if (vnum == 0) {
                 LogStream::sendWarning( ) << "load_OBJECT: no vnum found in player profile " << playerName << endl;
@@ -145,8 +145,8 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
             }
 
             limit_count_on_boot( pObjIndex, ts, playerName );
-	    return;
-	}
+            return;
+        }
         break;
 
       case 'T':
@@ -158,10 +158,10 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
       case 'V':
         if( !strcmp( word, "Vnum" ) && !bVnum ) {
           vnum = fread_number( pfile );
-//	  pObjIndex =  get_obj_index( vnum );
-//	  if (pObjIndex) {
-//	    pObjIndex->count++;
-//	  }
+//          pObjIndex =  get_obj_index( vnum );
+//          if (pObjIndex) {
+//            pObjIndex->count++;
+//          }
           break;
         }
         break;
@@ -176,78 +176,78 @@ static void load_PLAYER( PCharacter *pc, FILE *pfile )
 
     while( !exit )
     {
-	char letter = fread_letter( pfile );
+        char letter = fread_letter( pfile );
 
-	if( letter == '*' )
-	{
-	    fread_to_eol( pfile );
-	    continue;
-	}
+        if( letter == '*' )
+        {
+            fread_to_eol( pfile );
+            continue;
+        }
 
-	if( letter != '#' )
-	{
-	    LogStream::sendError( ) << "load_players_date: # not found." << endl;
-	    break;
-	}
-	
-	word = fread_word( pfile );
-	if( !strcmp( word, "PLAYER" ) )
-	{
-	    while( !exit )
-	    {
-		const char *word0 = feof( pfile ) ? "End" : fread_word( pfile );
-		switch( Char::upper( word0[0] ) )
-		{
-		case '*':
-		    fread_to_eol( pfile );
-		    break;
-						
-		case 'D':
-		    if( !strcmp( word0, "Desc" ) )
-			fread_to_end_string( pfile );
-		    break;
+        if( letter != '#' )
+        {
+            LogStream::sendError( ) << "load_players_date: # not found." << endl;
+            break;
+        }
+        
+        word = fread_word( pfile );
+        if( !strcmp( word, "PLAYER" ) )
+        {
+            while( !exit )
+            {
+                const char *word0 = feof( pfile ) ? "End" : fread_word( pfile );
+                switch( Char::upper( word0[0] ) )
+                {
+                case '*':
+                    fread_to_eol( pfile );
+                    break;
+                                                
+                case 'D':
+                    if( !strcmp( word0, "Desc" ) )
+                        fread_to_end_string( pfile );
+                    break;
 
-		case 'E':
-		    if( !strcmp( word0, "End" ) ) {
-			exit = true;
-		    }
-		    break;
-		case 'N':
-		    if ( !strcmp( word0, "Name" ) )
-		    {
-			char *nm = fread_string( pfile ) ;
-			DLString name( nm );
-			free_string(nm);
-			pc->setName( name );
-		    }
-		    break;
-		case 'P':
-		    if (!strcmp( word0, "Pass" )) {
-			char *pwd = fread_string( pfile );
+                case 'E':
+                    if( !strcmp( word0, "End" ) ) {
+                        exit = true;
+                    }
+                    break;
+                case 'N':
+                    if ( !strcmp( word0, "Name" ) )
+                    {
+                        char *nm = fread_string( pfile ) ;
+                        DLString name( nm );
+                        free_string(nm);
+                        pc->setName( name );
+                    }
+                    break;
+                case 'P':
+                    if (!strcmp( word0, "Pass" )) {
+                        char *pwd = fread_string( pfile );
                         password_set( pc, pwd );
-			free_string( pwd );
-		    }
-		    break;
-		}
-	    }
-	    
-	    exit = false;
-	}
-	else if( !strcmp( word, "OBJECT" ) ||
-		 !strcmp( word, "O" ) )   
-	{
-	    load_OBJECT( pfile, pc->getName( ) );
-	}
-	else if( !strcmp( word, "PET" ) ) 
-	    load_PET( pfile );
-	else if( !strcmp( word, "END" ) ) 
-	    exit = true;
-	else if (!strcmp( word, "MLT" )) {
-	    load_MLT( pfile );
-	} else {
-	    LogStream::sendError( ) << "load_players_date: bad section." << endl;
-	    exit = true;
-	}
+                        free_string( pwd );
+                    }
+                    break;
+                }
+            }
+            
+            exit = false;
+        }
+        else if( !strcmp( word, "OBJECT" ) ||
+                 !strcmp( word, "O" ) )   
+        {
+            load_OBJECT( pfile, pc->getName( ) );
+        }
+        else if( !strcmp( word, "PET" ) ) 
+            load_PET( pfile );
+        else if( !strcmp( word, "END" ) ) 
+            exit = true;
+        else if (!strcmp( word, "MLT" )) {
+            load_MLT( pfile );
+        } else {
+            LogStream::sendError( ) << "load_players_date: bad section." << endl;
+            exit = true;
+        }
     }
 }
 
@@ -262,37 +262,37 @@ void PCharacterManager::loadPlayers( )
     dir.open( );
 
     try {
-	while (true) {
-	    DLFileRead profile( dir, dir.nextTypedEntry( ext ) );
+        while (true) {
+            DLFileRead profile( dir, dir.nextTypedEntry( ext ) );
 
-	    LogStream::sendNotice( ) << "Try " << profile.getPath( ) << ", " << profile.getFileName( ) << endl;
-	    
-	    if (!profile.open( )) 
-		continue;
-	    
-	    pc = getPCharacter( );
-	    pc->setName( profile.getFileName( ).capitalize( ) );
+            LogStream::sendNotice( ) << "Try " << profile.getPath( ) << ", " << profile.getFileName( ) << endl;
+            
+            if (!profile.open( )) 
+                continue;
+            
+            pc = getPCharacter( );
+            pc->setName( profile.getFileName( ).capitalize( ) );
 
-	    load_PLAYER( pc, profile.getFP( ) );
-	    load( pc );
+            load_PLAYER( pc, profile.getFP( ) );
+            load( pc );
 
-	    LogStream::sendNotice( ) << pc->getName( ) << " has race " << pc->getRace( )->getName( ) << " and level " << pc->getLevel( ) << endl;
+            LogStream::sendNotice( ) << pc->getName( ) << " has race " << pc->getRace( )->getName( ) << " and level " << pc->getLevel( ) << endl;
 
-	    if( !pc->getName( ).empty( ) ) {
-		if( allList.find( pc->getName( ) ) == allList.end( ) )
-		{
-		    allList[pc->getName( )] = pc->getMemory( );
-		}
-		else {
-		    LogStream::sendWarning( ) << "Player name: '" << pc->getName( ) << "' is duplicated." << endl;
-		}
-	    }
-	    else {
-		LogStream::sendError( ) << "Bad loaded player file " << buf << endl;
-	    }
+            if( !pc->getName( ).empty( ) ) {
+                if( allList.find( pc->getName( ) ) == allList.end( ) )
+                {
+                    allList[pc->getName( )] = pc->getMemory( );
+                }
+                else {
+                    LogStream::sendWarning( ) << "Player name: '" << pc->getName( ) << "' is duplicated." << endl;
+                }
+            }
+            else {
+                LogStream::sendError( ) << "Bad loaded player file " << buf << endl;
+            }
 
-	    ddeallocate( pc );
-	}
+            ddeallocate( pc );
+        }
 
     } catch (const ExceptionDBIOEOF &exeof) {
     }
@@ -307,16 +307,16 @@ void PCharacterManager::remove( const DLString& name )
 
     if( ipos != allList.end( ) )
     {
-	XMLAttributes& attributes = ipos->second->getAttributes( );
-	
-	while (!attributes.empty( )) 
-	    attributes.eraseAttribute( attributes.begin( )->first );
-	
-	allList.erase( ipos );
+        XMLAttributes& attributes = ipos->second->getAttributes( );
+        
+        while (!attributes.empty( )) 
+            attributes.eraseAttribute( attributes.begin( )->first );
+        
+        allList.erase( ipos );
     }
     else
     {
-	LogStream::sendWarning( ) << "remove::PC " << name << " not found" << endl;
+        LogStream::sendWarning( ) << "remove::PC " << name << " not found" << endl;
     }
 }
 
@@ -326,28 +326,28 @@ void PCharacterManager::rename( const DLString& oldName, const DLString& newName
 
     if( ipos != allList.end( ) )
     {
-	if( PCharacter* pc = dynamic_cast<PCharacter*>( ipos->second ) )
-	{
-	    DLString newNameLower = newName.toLower( );
-	    DLString oldNameLower = oldName.toLower( );
+        if( PCharacter* pc = dynamic_cast<PCharacter*>( ipos->second ) )
+        {
+            DLString newNameLower = newName.toLower( );
+            DLString oldNameLower = oldName.toLower( );
 
-	    allList.erase( ipos );
-	    allList[newName] = pc;
+            allList.erase( ipos );
+            allList[newName] = pc;
 
-	    try
-	    {
-		DBIO dbio( dreamland->getDbDir( ), PLAYER_TABLE );
-		dbio.renameID( oldNameLower, newNameLower );
-	    }
-	    catch( const ExceptionDBIO& ex )
-	    {
-		LogStream::sendWarning( ) << ex << endl;
-	    }
-	}
+            try
+            {
+                DBIO dbio( dreamland->getDbDir( ), PLAYER_TABLE );
+                dbio.renameID( oldNameLower, newNameLower );
+            }
+            catch( const ExceptionDBIO& ex )
+            {
+                LogStream::sendWarning( ) << ex << endl;
+            }
+        }
     }
     else
     {
-	    LogStream::sendWarning( ) << "rename::PCharacter '" << oldName << "' not found" << endl;
+            LogStream::sendWarning( ) << "rename::PCharacter '" << oldName << "' not found" << endl;
     }
 }
 
@@ -358,8 +358,8 @@ void PCharacterManager::saveMemory( PCMemoryInterface *pci )
     PCharacterMemory *pcm;
 
     if( (pc = dynamic_cast<PCharacter *>(pci)) ) {
-	save( pc );	
-	return;
+        save( pc );        
+        return;
     }
     
     pcm = (PCharacterMemory *)pci;
@@ -383,23 +383,23 @@ bool PCharacterManager::pfDelete ( const DLString& playerName )
     DLFile newXml( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
 
     if (!oldProfile.rename( newProfile )) {
-	LogStream::sendSystem( ) << "pfDelete failed for " << playerName << endl;
-	return false;
+        LogStream::sendSystem( ) << "pfDelete failed for " << playerName << endl;
+        return false;
     }
     
     if (!oldXml.copy( newXml )) {
-	LogStream::sendSystem( ) << "pfDelete:: " << name << " : backup failed!" << endl;
-	return false;
+        LogStream::sendSystem( ) << "pfDelete:: " << name << " : backup failed!" << endl;
+        return false;
     }
 
     try {
-	DBIO dbio( dreamland->getDbDir( ), PLAYER_TABLE );
-	dbio.remove( name );
+        DBIO dbio( dreamland->getDbDir( ), PLAYER_TABLE );
+        dbio.remove( name );
     }
     catch( const ExceptionDBIO& ex ) {
-	LogStream::sendWarning( ) << ex << endl;
+        LogStream::sendWarning( ) << ex << endl;
     }
-		
+                
     PCharacterManager::remove( name );
     return true;
 }
@@ -419,10 +419,10 @@ bool PCharacterManager::pfRemort ( PCharacter* pch )
     pch->save( );
     
     if (!oldXml.copy( newXml )) 
-	return false;
+        return false;
 
     if (!oldProfile.copy( newProfile )) 
-	return false;
+        return false;
 
     return true;
 }
@@ -438,10 +438,10 @@ bool PCharacterManager::pfBackup ( const DLString &playerName )
     DLFile newXml( DLFile( dreamland->getDbDir( ), BACKUP_TABLE ), name, ".xml" );
 
     if (!oldXml.copy( newXml )) 
-	return false;
+        return false;
 
     if (!oldProfile.copy( newProfile )) 
-	return false;
+        return false;
 
     return true;
 }
@@ -456,37 +456,37 @@ bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &
 
 
     if (arg=="delete") {
-	oldProfile = DLFile( dreamland->getPlayerDeleteDir( ), name, ".delete" );
-     	oldXml = DLFile( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
+        oldProfile = DLFile( dreamland->getPlayerDeleteDir( ), name, ".delete" );
+             oldXml = DLFile( DLFile( dreamland->getDbDir( ), DELETED_TABLE ), name, ".xml" );
     }
     else if (arg=="remort") {
-	if (n<0)
-	    return false;
+        if (n<0)
+            return false;
 
-	DLString remortExt;
-	remortExt << "."  << n;
+        DLString remortExt;
+        remortExt << "."  << n;
 
-	oldProfile = DLFile( dreamland->getPlayerRemortDir( ), name, remortExt );
-	oldXml = DLFile( DLFile( dreamland->getDbDir( ), REMORTS_TABLE ), name, remortExt );
+        oldProfile = DLFile( dreamland->getPlayerRemortDir( ), name, remortExt );
+        oldXml = DLFile( DLFile( dreamland->getDbDir( ), REMORTS_TABLE ), name, remortExt );
     }
     else {
-	oldProfile = DLFile( dreamland->getPlayerBackupDir( ), name, ext );
-	oldXml = DLFile( DLFile( dreamland->getDbDir( ), BACKUP_TABLE ), name, ".xml" );
+        oldProfile = DLFile( dreamland->getPlayerBackupDir( ), name, ext );
+        oldXml = DLFile( DLFile( dreamland->getDbDir( ), BACKUP_TABLE ), name, ".xml" );
     }
-		
+                
     if (!oldXml.copy( newXml ))
-	return false;
+        return false;
     
     if (!oldProfile.copy( newProfile ))
-	return false;
+        return false;
     
     pc = getPCharacter();
     pc->setName(name);
     load( pc );
-	
+        
     allList[pc->getName()] = pc->getMemory();
     ddeallocate(pc);
-	
+        
     return true;
 }
 

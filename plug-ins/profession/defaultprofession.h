@@ -91,7 +91,7 @@ public:
 
     virtual const DLString & getType( ) const
     {
-	return TYPE;
+        return TYPE;
     }
 
     static const DLString TYPE;
@@ -102,8 +102,8 @@ public:
  * DefaultProfession
  */
 class DefaultProfession : public Profession, 
-			  public XMLTableElement,
-			  public XMLVariableContainer 
+                          public XMLTableElement,
+                          public XMLVariableContainer 
 {
 XML_OBJECT
 public:

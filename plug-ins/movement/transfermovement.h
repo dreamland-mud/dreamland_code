@@ -14,8 +14,8 @@ class TransferMovement : public JumpMovement {
 friend class TransferListener;
 public:
     TransferMovement( Character *, Character *, Room *,
-		      const char * = NULL, const char * = NULL, 
-		      const char * = NULL, const char * = NULL);
+                      const char * = NULL, const char * = NULL, 
+                      const char * = NULL, const char * = NULL);
 
 protected:
     virtual bool tryMove( Character * );

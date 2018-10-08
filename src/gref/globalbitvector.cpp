@@ -29,11 +29,11 @@ void GlobalBitvector::fromString( const DLString &source )
     clear( );
 
     if (!registry)
-	return;
+        return;
 
     while (!arguments.empty( )) {
-	arg = arguments.getOneArgument( );
-	set( registry->lookup( arg ) );
+        arg = arguments.getOneArgument( );
+        set( registry->lookup( arg ) );
     }
 }
 
@@ -44,17 +44,17 @@ DLString GlobalBitvector::toString( ) const
     DLString name;
 
     if (!registry)
-	return DLString::emptyString;
+        return DLString::emptyString;
 
     for (b = 0; b < bits.size( ); b++)
-	if (bits[b]) {
-	    name = registry->getName( b );
+        if (bits[b]) {
+            name = registry->getName( b );
 
-	    if (name.find_first_of( ' ' ) != DLString::npos)
-		name = "\'" + name + "\'";
-	    
-	    result << name << " ";
-	}
+            if (name.find_first_of( ' ' ) != DLString::npos)
+                name = "\'" + name + "\'";
+            
+            result << name << " ";
+        }
 
     return result.str( );
 }
@@ -64,9 +64,9 @@ vector<int> GlobalBitvector::toArray( ) const
     vector<int> array;
 
     if (registry)
-	for (unsigned int b = 0; b < bits.size( ); b++) 
-	    if (bits[b])
-		array.push_back( b );
+        for (unsigned int b = 0; b < bits.size( ); b++) 
+            if (bits[b])
+                array.push_back( b );
 
     return array;
 }

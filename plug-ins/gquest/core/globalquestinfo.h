@@ -28,9 +28,9 @@ public:
     typedef vector<PCharacter *> PlayerList;
 
     struct Config {
-	int minLevel, maxLevel;
-	int time;
-	DLString arguments;
+        int minLevel, maxLevel;
+        int time;
+        DLString arguments;
         bool force;
         int playerCnt;
 

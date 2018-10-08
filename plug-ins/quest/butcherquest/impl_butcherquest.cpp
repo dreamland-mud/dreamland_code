@@ -11,13 +11,13 @@
 
 extern "C"
 {
-	SO::PluginList initialize_quest_butcher( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<MobileBehaviorRegistrator<SteakCustomer> >( ppl );
-		Plugin::registerPlugin<ButcherQuestRegistrator>( ppl );
-		
-		return ppl;
-	}
+        SO::PluginList initialize_quest_butcher( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<MobileBehaviorRegistrator<SteakCustomer> >( ppl );
+                Plugin::registerPlugin<ButcherQuestRegistrator>( ppl );
+                
+                return ppl;
+        }
 }

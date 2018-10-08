@@ -40,24 +40,24 @@ int Healer::getOccupation( )
 bool Healer::canServeClient( Character *client )
 {
     if (client->is_npc( ) && !healPets) {
-	say_act( client, ch, "Я не лечу домашних животных." );
-	return false;
+        say_act( client, ch, "Я не лечу домашних животных." );
+        return false;
     }
 
     if (IS_GHOST( client )) {
-	say_act( client, getKeeper( ), "Я исцеляю тела, а не души, $c1. Обрети плоть - тогда и поговорим." );
-	return false;
+        say_act( client, getKeeper( ), "Я исцеляю тела, а не души, $c1. Обрети плоть - тогда и поговорим." );
+        return false;
     }
 
     if (getKeeper( )->fighting) {
-	say_act( client, getKeeper( ), "Подожди немного, $c1, мне сейчас не до тебя." );
-	return false;
+        say_act( client, getKeeper( ), "Подожди немного, $c1, мне сейчас не до тебя." );
+        return false;
     }
     
     if ((!client->is_npc( ) && client->getClan( ) == clan_battlerager)
-	|| (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
+        || (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
     {
-	act( "$C1 выразительно крутит пальцем у виска, глядя на $c4.", client, 0, getKeeper( ), TO_NOTVICT );
+        act( "$C1 выразительно крутит пальцем у виска, глядя на $c4.", client, 0, getKeeper( ), TO_NOTVICT );
         client->send_to("Напоминаем: ты BattleRager, а не презренный МАГ!\n\r");
         return false;
     }
@@ -109,8 +109,8 @@ void Healer::msgBuyRequest( Character *client )
 void HealService::toStream( Character *client, ostringstream &buf ) const
 {
     buf << "  {c" << setiosflags( ios::left ) << setw( 11 ) << name << "{x: "
-	<< setw( 30 ) << descr << "   " << setiosflags( ios::right ) << setw( 8 );
-	
+        << setw( 30 ) << descr << "   " << setiosflags( ios::right ) << setw( 8 );
+        
     price->toStream( client, buf );
 
     buf << resetiosflags( ios::right ) << endl;
@@ -143,11 +143,11 @@ void HealService::purchase( Character *client, NPCharacter *healer, const DLStri
     payer = client->is_npc( ) && client->master ? client->master : client;
 
     if (!price->canAfford( payer )) {
-	if (payer == client)
-	    say_act( client, healer, "У тебя не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
-	else
-	    say_act( client, healer, "У твоего хозяина не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
-	return;
+        if (payer == client)
+            say_act( client, healer, "У тебя не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
+        else
+            say_act( client, healer, "У твоего хозяина не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
+        return;
     }
     
     price->deduct( payer );
@@ -171,12 +171,12 @@ void ManaHealService::heal( Character *client, NPCharacter *healer )
     act( "$c1 бормочет '$T'.", healer, 0, words.getValue( ).c_str( ), TO_ROOM );
 
     if (enhanced) {
-	client->mana += 300;
-	client->send_to( "Приятное тепло наполняет твое тело.\n\r" );
+        client->mana += 300;
+        client->send_to( "Приятное тепло наполняет твое тело.\n\r" );
     }
     else {
-	client->mana += dice( 2, 8 ) + healer->getModifyLevel( ) / 3;
-	client->send_to( "Ты ощущаешь приятное тепло.\n\r" );
+        client->mana += dice( 2, 8 ) + healer->getModifyLevel( ) / 3;
+        client->send_to( "Ты ощущаешь приятное тепло.\n\r" );
     }
 
     client->mana = std::min( client->mana, client->max_mana );
@@ -193,23 +193,23 @@ CMDRUN( heal )
     healer = find_attracted_mob_behavior<Healer>( ch, OCC_HEALER );
 
     if (!healer) {
-	ch->send_to( "Здесь некому тебя вылечить за деньги.\r\n" );
+        ch->send_to( "Здесь некому тебя вылечить за деньги.\r\n" );
         if (ch->getModifyLevel() < 11) {
             if (!ch->is_npc( ) && ch->getPC( )->getHometown( ) == home_frigate)
                 ch->println("Доктор в лазарете вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
             else
                 ch->println("Лекарь в любом храме вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
         }
-	return;
+        return;
     }
 
     if (ch->is_npc( ) && !ch->master) {
-	ch->send_to( "Извини, тебя никто обслуживать не будет.\r\n" );
-	return;
+        ch->send_to( "Извини, тебя никто обслуживать не будет.\r\n" );
+        return;
     }
 
     if (argument.empty( )) 
-	healer->doList( ch );
+        healer->doList( ch );
     else
-	healer->doBuy( ch, argument );
+        healer->doBuy( ch, argument );
 }

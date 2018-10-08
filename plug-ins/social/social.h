@@ -21,7 +21,7 @@ class Social : public SocialBase, public XMLVariableContainer,
                public XMLTableElement 
 {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<Social> Pointer;
 
     Social( );

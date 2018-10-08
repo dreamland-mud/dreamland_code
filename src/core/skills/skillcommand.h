@@ -2,8 +2,8 @@
  *
  * ruffina, 2004
  */
-#ifndef	SKILLCOMMAND_H
-#define	SKILLCOMMAND_H
+#ifndef        SKILLCOMMAND_H
+#define        SKILLCOMMAND_H
 
 #include "xmlpolymorphvariable.h"
 #include "skillaction.h"

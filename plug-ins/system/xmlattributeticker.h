@@ -13,36 +13,36 @@
 
 class XMLAttributeTimer : public virtual XMLAttribute {
 public:
-	typedef ::Pointer<XMLAttributeTimer> Pointer;
-	
-	virtual ~XMLAttributeTimer( );
+        typedef ::Pointer<XMLAttributeTimer> Pointer;
+        
+        virtual ~XMLAttributeTimer( );
 
-	virtual int getTime( ) const = 0;
-	virtual void setTime( int ) = 0; 
+        virtual int getTime( ) const = 0;
+        virtual void setTime( int ) = 0; 
 };
 
 class XMLAttributeTicker : public XMLVariableContainer {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeTicker> Pointer;
+        typedef ::Pointer<XMLAttributeTicker> Pointer;
 
-	XMLAttributeTicker( );
-	XMLAttributeTicker( int );
-	virtual ~XMLAttributeTicker( );
-	
-	virtual void start( PCMemoryInterface* ) const = 0;
-	virtual void end( PCMemoryInterface* ) const = 0;
+        XMLAttributeTicker( );
+        XMLAttributeTicker( int );
+        virtual ~XMLAttributeTicker( );
+        
+        virtual void start( PCMemoryInterface* ) const = 0;
+        virtual void end( PCMemoryInterface* ) const = 0;
 
-	bool tick( PCMemoryInterface * );
+        bool tick( PCMemoryInterface * );
 
-	virtual int getTime( ) const;
-	virtual void setTime( int );
-	DLString getTimeString( bool ) const;
-	DLString getUntilString( bool ) const;
+        virtual int getTime( ) const;
+        virtual void setTime( int );
+        DLString getTimeString( bool ) const;
+        DLString getUntilString( bool ) const;
 
 protected:
-	XML_VARIABLE XMLInteger time;
-	XML_VARIABLE XMLInteger since;
+        XML_VARIABLE XMLInteger time;
+        XML_VARIABLE XMLInteger since;
 };
 
 class XMLAttributeOnlineTicker : public ScheduledXMLAttribute,  
@@ -50,19 +50,19 @@ class XMLAttributeOnlineTicker : public ScheduledXMLAttribute,
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeOnlineTicker> Pointer;
+        typedef ::Pointer<XMLAttributeOnlineTicker> Pointer;
 
-	virtual bool pull( PCharacter * );
+        virtual bool pull( PCharacter * );
 };
 
 class XMLAttributeMemoryTicker : public ScheduledPCMemoryXMLAttribute,  
-				 public XMLAttributeTicker
+                                 public XMLAttributeTicker
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeMemoryTicker> Pointer;
+        typedef ::Pointer<XMLAttributeMemoryTicker> Pointer;
 
-	virtual bool pull( PCMemoryInterface * );
+        virtual bool pull( PCMemoryInterface * );
 };
 
 

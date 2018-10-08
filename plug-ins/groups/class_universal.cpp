@@ -48,12 +48,12 @@ bool UniclassAdept::parseSpeech( Character *vict, const char *speech, DLString &
     static RegExp pattern2( "([A-Za-zЮ-Ъю-ъ-]+)[.!]*$"); 
     
     if (vict->is_npc( ))
-	return false;
+        return false;
     
     victim = vict->getPC( );
 
     if (victim->getProfession( ) != prof_universal)
-	return false;
+        return false;
 
     if (!pattern1.match( speech ))
         return false;
@@ -61,7 +61,7 @@ bool UniclassAdept::parseSpeech( Character *vict, const char *speech, DLString &
     matches = pattern2.subexpr( speech );
 
     if (matches.size( ) < 1) {
-	return true;
+        return true;
     }
     
     className = matches.front( );
@@ -89,86 +89,86 @@ void UniclassAdept::speech( Character *vict, const char * speech )
 
     victim = vict->getPC( );
     if (className.empty( )) {
-	act( "$c1 произносит '{gКем же ты хочешь стать, $C1?{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gКем же ты хочешь стать, $C1?{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     prof = find_prof_unstrict( className );
 
     if (!prof) {
-	act( "$c1 произносит '{gНикогда не слыша$gло|л|ла о такой странной профессии - '$t', $C1.{x'", ch, className.c_str( ), victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gНикогда не слыша$gло|л|ла о такой странной профессии - '$t', $C1.{x'", ch, className.c_str( ), victim, TO_ALL );
+        return;
     }
     
     if (prof_universal == prof) {
-	interpret_fmt( ch, "bonk %s", victim->getNameP( ) );
-	return;
+        interpret_fmt( ch, "bonk %s", victim->getNameP( ) );
+        return;
     }
     
     className = prof->getName( );
     DLString rusName = prof->getRusName( );
     
     if (myclass.getValue( ) != className) {
-	switch (number_range( 1, 3 )) {
-	case 1: act( "$c1 произносит '{gЯ не могу сделать с тобой то, чего ты просишь, $C1.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
-	case 2: act( "$c1 произносит '{gТы ошиб$Gлось|ся|лась адресом. Уйди, не тревожь мой покой.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
-	case 3: act( "$c1 произносит '{g$C1! А ну-ка марш в гильдию и внимательно читай, что на стенах пишут!{x'", ch, 0, victim, TO_ALL ); break;
-	}
-	return;
+        switch (number_range( 1, 3 )) {
+        case 1: act( "$c1 произносит '{gЯ не могу сделать с тобой то, чего ты просишь, $C1.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
+        case 2: act( "$c1 произносит '{gТы ошиб$Gлось|ся|лась адресом. Уйди, не тревожь мой покой.{x'", ch, className.c_str( ), victim, TO_ALL ); break;
+        case 3: act( "$c1 произносит '{g$C1! А ну-ка марш в гильдию и внимательно читай, что на стенах пишут!{x'", ch, 0, victim, TO_ALL ); break;
+        }
+        return;
     }
     
     if (!prof->getSex( ).isSetBitNumber( victim->getSex( ) )) {
-	if (victim->getSex( ) == SEX_MALE) {
-	    act( "$c1 произносит '{gДля этого придется у тебя кое-что отрезать, $C1.{x'", ch, 0, victim, TO_ALL );
-	    interpret_fmt( ch, "giggle %s", victim->getNameP( ) );
-	}
-	else {
-	    act( "$c1 произносит '{gДля этого тебе не хватает одной маленькой штучки, $C1.{x'", ch, 0, victim, TO_ALL );
-	    interpret_fmt( ch, "smirk" );
-	}
-	
-	return;
+        if (victim->getSex( ) == SEX_MALE) {
+            act( "$c1 произносит '{gДля этого придется у тебя кое-что отрезать, $C1.{x'", ch, 0, victim, TO_ALL );
+            interpret_fmt( ch, "giggle %s", victim->getNameP( ) );
+        }
+        else {
+            act( "$c1 произносит '{gДля этого тебе не хватает одной маленькой штучки, $C1.{x'", ch, 0, victim, TO_ALL );
+            interpret_fmt( ch, "smirk" );
+        }
+        
+        return;
     }
     
     if (!prof->getAlign( ).isSetBitNumber( ALIGNMENT(victim) )) {
-	if (IS_EVIL( victim ))
-	    act( "$c1 произносит '{gУ тебя нечистая душа, $C1. Тебе не место среди нас.{x'", ch, className.c_str( ), victim, TO_ALL );
-	else if (IS_GOOD( victim )) {
-	    act( "$c1 презрительно кривится.", ch, 0, 0, TO_ALL );
-	    act( "$c1 произносит '{gУж больно ты хорош$Gое|ий|ая, $C1. Ступай-ка отсюда подобру-поздорову.{x'", ch, 0, victim, TO_ALL );
-	}
-	else
-	    act( "$c1 произносит '{gТы служишь силам равновесия. Тебе не место среди нас, $C1.{x'", ch, 0, victim, TO_ALL );
-	
-	return;
+        if (IS_EVIL( victim ))
+            act( "$c1 произносит '{gУ тебя нечистая душа, $C1. Тебе не место среди нас.{x'", ch, className.c_str( ), victim, TO_ALL );
+        else if (IS_GOOD( victim )) {
+            act( "$c1 презрительно кривится.", ch, 0, 0, TO_ALL );
+            act( "$c1 произносит '{gУж больно ты хорош$Gое|ий|ая, $C1. Ступай-ка отсюда подобру-поздорову.{x'", ch, 0, victim, TO_ALL );
+        }
+        else
+            act( "$c1 произносит '{gТы служишь силам равновесия. Тебе не место среди нас, $C1.{x'", ch, 0, victim, TO_ALL );
+        
+        return;
     }
     
     if (!prof->getEthos( ).isSetBitNumber( victim->ethos )) {
-	act( "$c1 произносит '{gТвой этос не позволяет стать одн$Gим|им|ой из нас, $C1.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gТвой этос не позволяет стать одн$Gим|им|ой из нас, $C1.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     if (victim->getSubProfession( ) == prof) {
-	act( "$c1 произносит '{gНо ты и так пытаешься изображать из себя $n4, $C1!{x'", ch, rusName.c_str( ), victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gНо ты и так пытаешься изображать из себя $n4, $C1!{x'", ch, rusName.c_str( ), victim, TO_ALL );
+        return;
     }
     
     if (victim->getSubProfession( ) == prof_none)
-	cost = 0;
+        cost = 0;
 
     if (victim->questpoints < cost) {
-	act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     attr = victim->getAttributes( ).getAttr<XMLAttributeUniclass>( "uniclass" );
 
     if (dreamland->getCurrentTime( ) - attr->lastTime < timeout) {
-	switch (number_range( 1, 2 )) {
-	case 1: act( "$c1 произносит '{g$C1, будешь так часто скакать между профессиями, голова закружится.{x'", ch, 0, victim, TO_ALL ); break;
-	case 2: act( "$c1 произносит '{g$C1, твое время еще не пришло. Подожди немного.{x'", ch, 0, victim, TO_ALL ); break;
-	}
-	return;	
+        switch (number_range( 1, 2 )) {
+        case 1: act( "$c1 произносит '{g$C1, будешь так часто скакать между профессиями, голова закружится.{x'", ch, 0, victim, TO_ALL ); break;
+        case 2: act( "$c1 произносит '{g$C1, твое время еще не пришло. Подожди немного.{x'", ch, 0, victim, TO_ALL ); break;
+        }
+        return;        
     }
     
     wiznet( WIZ_LEVELS, 0, 0 , "%^C1 changes uniclass to %s", victim, className.c_str( ) );
@@ -238,23 +238,23 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     static RegExp pattern( "^Я хочу быстре.* учить*ся|^I wish to learn quicker"); 
 
     if (victim->is_npc( ) || victim->getProfession( ) != prof_universal)
-	return;
-	
+        return;
+        
     if (!pattern.match( speech ))
-	return;
+        return;
     
     pch = victim->getPC( );
     cost = 1000;
     age = pch->age.getTrueYears( ) + 3;
 
     if (pch->getAttributes( ).isAvailable( "enlight" )) {
-	act( "$c1 произносит '{gТы уже неплохо учишься, $C1.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gТы уже неплохо учишься, $C1.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
 
     if (pch->questpoints < cost) {
-	act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
-	return;
+        act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
+        return;
     }
     
     attr = pch->getAttributes( ).getAttr<XMLAttributeEnlight>( "enlight" );
@@ -265,7 +265,7 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
     act( "$c1 дотрагивается до твоего лба.", ch, 0, victim, TO_VICT );
     act( "$c1 прикасается к голове $C2.", ch, 0, victim, TO_NOTVICT );
     interpret_raw( ch, "say", "Я даю тебе способность к быстрому обучению. Но она исчезнет, когда тебе исполнится {G%d{g %s.",
-		       age, GET_COUNT(age, "год", "года", "лет") );
+                       age, GET_COUNT(age, "год", "года", "лет") );
 }
 
 /* 
@@ -279,8 +279,8 @@ XMLAttributeEnlight::XMLAttributeEnlight( )
 bool XMLAttributeEnlight::pull( PCharacter *pch ) 
 {
     if (pch->age.getTrueYears( ) >= age) { 
-	pch->send_to( "{GТы чувствуешь, что способность к быстрому обучению покидает тебя.{x\r\n" );
-	return true;		
+        pch->send_to( "{GТы чувствуешь, что способность к быстрому обучению покидает тебя.{x\r\n" );
+        return true;                
     }
 
     return false;

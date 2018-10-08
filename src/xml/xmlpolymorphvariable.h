@@ -24,7 +24,7 @@ public:
 class ExceptionXMLClassAllocate : public ExceptionBadType {
 public:
     ExceptionXMLClassAllocate( const DLString &msg )
-	    : ExceptionBadType( "Polymorph pointer exception: " + msg )
+            : ExceptionBadType( "Polymorph pointer exception: " + msg )
     {
     }
 
@@ -34,7 +34,7 @@ public:
 class ExceptionXMLClassNotRegistered : public ExceptionXMLClassAllocate {
 public:
     ExceptionXMLClassNotRegistered( const DLString &myType, const DLString &type ) 
-	    : ExceptionXMLClassAllocate( "while allocating " + myType + ": class " + type + " not registered" ) 
+            : ExceptionXMLClassAllocate( "while allocating " + myType + ": class " + type + " not registered" ) 
     { 
     }
 
@@ -44,7 +44,7 @@ public:
 class ExceptionXMLClassNotDerived : public ExceptionXMLClassAllocate {
 public:
     ExceptionXMLClassNotDerived( const DLString &myType, const DLString &type ) 
-	    : ExceptionXMLClassAllocate( "class " + type + " not derived from " + myType ) 
+            : ExceptionXMLClassAllocate( "class " + type + " not derived from " + myType ) 
     { 
     }
 
@@ -66,11 +66,11 @@ public:
     
     bool toXML( XMLNode::Pointer& parent ) const
     {
-	if (isEmpty( )) {
-	    parent->setType( XMLNode::XML_LEAF );
-	    return true;
-	}
-	else if(getPointer( )->toXML(parent)) {
+        if (isEmpty( )) {
+            parent->setType( XMLNode::XML_LEAF );
+            return true;
+        }
+        else if(getPointer( )->toXML(parent)) {
             parent->insertAttribute( XMLNode::ATTRIBUTE_TYPE, getPointer( )->getType( ) );
             return true;
         } 
@@ -79,26 +79,26 @@ public:
     
     void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
     {
-	if (parent->getType( ) == XMLNode::XML_LEAF) {
-	    clear( );
-	}
-	else {
-	    const DLString & type = parent->getAttribute( XMLNode::ATTRIBUTE_TYPE );
+        if (parent->getType( ) == XMLNode::XML_LEAF) {
+            clear( );
+        }
+        else {
+            const DLString & type = parent->getAttribute( XMLNode::ATTRIBUTE_TYPE );
 
-	    try {
-		AllocateClass::Pointer p = Class::allocateClass( type );
-			
+            try {
+                AllocateClass::Pointer p = Class::allocateClass( type );
+                        
                 this->setPointer( dynamic_cast<T *>( p.getPointer( ) ) );
 
-		if (isEmpty( ))
-		    throw ExceptionXMLClassNotDerived( typeid( this ).name( ), type );
-			
-		getPointer( )->fromXML( parent );
-	    
-	    } catch (const ExceptionClassNotFound &e) {
-		throw ExceptionXMLClassNotRegistered( typeid( this ).name( ), type );
-	    }
-	}
+                if (isEmpty( ))
+                    throw ExceptionXMLClassNotDerived( typeid( this ).name( ), type );
+                        
+                getPointer( )->fromXML( parent );
+            
+            } catch (const ExceptionClassNotFound &e) {
+                throw ExceptionXMLClassNotRegistered( typeid( this ).name( ), type );
+            }
+        }
     }
 };
 

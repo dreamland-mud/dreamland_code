@@ -35,7 +35,7 @@ public:
     virtual bool fetch( Character *victim, Object *item ); 
     virtual bool drop( Character *victim );
     virtual bool sac( Character *victim );
-    virtual void entry(	);
+    virtual void entry(        );
     virtual void give( Character *from, Character *to );
     virtual void greet( Character *victim );
     virtual void fight( Character *victim );

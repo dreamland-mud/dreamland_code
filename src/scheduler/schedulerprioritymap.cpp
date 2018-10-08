@@ -14,8 +14,8 @@ SchedulerPriorityMap::SchedulerPriorityMap( ) : priority( 0 )
 void SchedulerPriorityMap::tick( )
 {
     for (iterator i = begin( ); i != end( ); i++) {
-	priority = i->first;
-	i->second.tick( );
+        priority = i->first;
+        i->second.tick( );
     }
     
     priority = 0;
@@ -24,13 +24,13 @@ void SchedulerPriorityMap::tick( )
 void SchedulerPriorityMap::slay( SchedulerTaskPointer& task )
 {
     for (iterator i = begin( ); i != end( ); i++)
-	i->second.slay( task );
+        i->second.slay( task );
 }
 
 void SchedulerPriorityMap::slayInstance( SchedulerTaskPointer& task )
 {
     for (iterator i = begin( ); i != end( ); i++)
-	i->second.slayInstance( task );
+        i->second.slayInstance( task );
 }
 
 int SchedulerPriorityMap::getPriority( ) const

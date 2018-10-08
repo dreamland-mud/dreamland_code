@@ -23,32 +23,32 @@ CMDRUN( glist )
     DLString argument = constArguments;
     
     if (!ch->getPC( ))
-	return;
+        return;
 
     if (argument.empty( )) {
-	buf << "Все группы:" << endl << endl;;
-	
-	for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
-	    group = skillGroupManager->find( gn );
-	    buf << fmt( 0, "    %-17s   %-25s",
-	                group->getName( ).c_str( ),
-			group->getRussianName( ).c_str( ) )
-	        << endl;
-	}
+        buf << "Все группы:" << endl << endl;;
+        
+        for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
+            group = skillGroupManager->find( gn );
+            buf << fmt( 0, "    %-17s   %-25s",
+                        group->getName( ).c_str( ),
+                        group->getRussianName( ).c_str( ) )
+                << endl;
+        }
 
-	buf << endl
-	    << "Для просмотра навыков каждой группы используй '{y{lRгруппаумений{lEglist{lx {D<{wгруппа{D>{w'."
-	    << endl;
+        buf << endl
+            << "Для просмотра навыков каждой группы используй '{y{lRгруппаумений{lEglist{lx {D<{wгруппа{D>{w'."
+            << endl;
     }
     else {
-	group = skillGroupManager->findUnstrict( argument );
-	
-	if (!group) {
-	    ch->println("Неправильно указана группа.");
-	    return;
-	}
-	
-	group->show( ch->getPC( ), buf );
+        group = skillGroupManager->findUnstrict( argument );
+        
+        if (!group) {
+            ch->println("Неправильно указана группа.");
+            return;
+        }
+        
+        group->show( ch->getPC( ), buf );
     }
     
     page_to_char( buf.str( ).c_str( ), ch );

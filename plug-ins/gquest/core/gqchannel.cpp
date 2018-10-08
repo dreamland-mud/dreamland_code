@@ -35,25 +35,25 @@ void GQChannel::zecho( GlobalQuest *gquest, AREA_DATA *area, const DLString& msg
     Character *ch;
     
     if (dreamland->isShutdown( ))
-	return;
+        return;
 
     for ( d = descriptor_list; d; d = d->next ) {
-	if (d->connected != CON_PLAYING)
-	    continue;
+        if (d->connected != CON_PLAYING)
+            continue;
 
-	if (!(ch = d->character) || ch->in_room->area != area)
-	    continue;
-	
-	if (gquest->isLevelOK( ch ))
-	    ch->send_to( msg );
+        if (!(ch = d->character) || ch->in_room->area != area)
+            continue;
+        
+        if (gquest->isLevelOK( ch ))
+            ch->send_to( msg );
     }
 }
 
 void GQChannel::gecho( GlobalQuest *gq, ostringstream &buf )
 {
     gecho( GlobalQuestManager::getThis( )->findGlobalQuestInfo( 
-			    gq->getQuestID( ) )->getQuestName( ),
-	    buf.str( ) );
+                            gq->getQuestID( ) )->getQuestName( ),
+            buf.str( ) );
 
     buf.str( "" );
 }
@@ -61,9 +61,9 @@ void GQChannel::gecho( GlobalQuest *gq, ostringstream &buf )
 void GQChannel::gecho( GlobalQuest *gq, const DLString& msg, PCharacter *pch ) 
 {
     gecho( 
-	    GlobalQuestManager::getThis( )->findGlobalQuestInfo( 
-			    gq->getQuestID( ) )->getQuestName( ),
-	    msg, pch );
+            GlobalQuestManager::getThis( )->findGlobalQuestInfo( 
+                            gq->getQuestID( ) )->getQuestName( ),
+            msg, pch );
 }
 
 void GQChannel::gecho( GlobalQuestInfo *gqi, const DLString& msg ) 
@@ -77,16 +77,16 @@ void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pc
     std::basic_ostringstream<char> buf;
     
     if (dreamland->isShutdown( ))
-	return;
+        return;
     
     buf << BOLD << "[" << NORMAL << "Global Quest" << BOLD << ": " 
-	<< NORMAL << name << BOLD << "] "
-	<< NORMAL << msg << "{x" << endl;
+        << NORMAL << name << BOLD << "] "
+        << NORMAL << msg << "{x" << endl;
     
     for ( d = descriptor_list; d; d = d->next ) 
-	if (d->connected == CON_PLAYING)
-	    if (d->character && (!pch || pch != d->character->getPC( ))) 
-		d->character->send_to( buf );
+        if (d->connected == CON_PLAYING)
+            if (d->character && (!pch || pch != d->character->getPC( ))) 
+                d->character->send_to( buf );
 }
 
 
@@ -96,15 +96,15 @@ void GQChannel::gecho( const DLString& msg )
     std::basic_ostringstream<char> buf;
     
     if (dreamland->isShutdown( ))
-	return;
+        return;
     
     buf << BOLD << "[" << NORMAL << "Global Quest" << BOLD << "] " 
-	<< NORMAL << msg << "{x" << endl;
+        << NORMAL << msg << "{x" << endl;
     
     for ( d = descriptor_list; d; d = d->next ) 
-	if (d->connected == CON_PLAYING)
-	    if (d->character)
-		d->character->send_to( buf );
+        if (d->connected == CON_PLAYING)
+            if (d->character)
+                d->character->send_to( buf );
 }
 
 void GQChannel::gechoRaw( const DLString& msg ) 
@@ -112,11 +112,11 @@ void GQChannel::gechoRaw( const DLString& msg )
     Descriptor *d;
     
     if (dreamland->isShutdown( ))
-	return;
+        return;
     
     for ( d = descriptor_list; d; d = d->next ) 
-	if (d->connected == CON_PLAYING && d->character)
-	    d->character->send_to( msg + "\r\n" );
+        if (d->connected == CON_PLAYING && d->character)
+            d->character->send_to( msg + "\r\n" );
 }
 
 void GQChannel::pecho( Character *ch, ostringstream& buf ) 
@@ -127,7 +127,7 @@ void GQChannel::pecho( Character *ch, ostringstream& buf )
 void GQChannel::pecho( Character *ch, const DLString& msg ) 
 {
     if (dreamland->isShutdown( ))
-	return;
+        return;
 
     ch->printf( "%s%s{x\r\n", NORMAL, msg.c_str( ) );
 }

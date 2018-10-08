@@ -20,10 +20,10 @@ bool HiddenChest::canLock( Character *ch )
     StealQuest::Pointer quest;
 
     if (!ourHero( ch ))
-	return false;
+        return false;
     
     if (!( quest = getMyQuest<StealQuest>( ch->getPC( ) ) ))
-	return false;
+        return false;
 
     quest->wiznet( "", "%s tries to unlock the chest", ch->getNameP( '1' ).c_str( ) );
     return quest->getItemList<LockPick>( ch->carrying );
@@ -55,7 +55,7 @@ bool LockPick::ourMobile( NPCharacter *mob )
 
 /* 
  * RobbedItem 
- */	
+ */        
 void RobbedItem::getByHero( PCharacter *ch ) 
 {
     getQuest( ch )->wiznet( "", "%s gets item", ch->getNameP( '1' ).c_str( ) );

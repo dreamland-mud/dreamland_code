@@ -12,8 +12,8 @@ class ButcherQuest;
 
 class SteakCustomer : public MandatoryMobile, 
                       public ProtectedClient,
-		      public GreedyClient,
-		      public DedicatedMobile<ButcherQuest>
+                      public GreedyClient,
+                      public DedicatedMobile<ButcherQuest>
 {
 XML_OBJECT
 public:

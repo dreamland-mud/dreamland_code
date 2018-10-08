@@ -23,13 +23,13 @@ public:
     
     virtual void run( )
     {
-	update_handler( );
-	DLScheduler::getThis( )->putTaskInitiate( Pointer( this ) );
+        update_handler( );
+        DLScheduler::getThis( )->putTaskInitiate( Pointer( this ) );
     }
     
     virtual int getPriority( ) const
     {
-	return SCDP_AUTO;
+        return SCDP_AUTO;
     }
 };
 
@@ -39,14 +39,14 @@ public:
 
     virtual void run( )
     {
-	if(DLScheduler::getThis()->getCurrentTick( ) == 0) {
-	    weather_init( );
-	    area_update( );
-	}
+        if(DLScheduler::getThis()->getCurrentTick( ) == 0) {
+            weather_init( );
+            area_update( );
+        }
     }
     virtual int getPriority( ) const
     {
-	return SCDP_INITIAL;
+        return SCDP_INITIAL;
     }
 };
 
@@ -54,13 +54,13 @@ extern "C"
 {
     SO::PluginList initialize_updates( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<AnatoliaUpdate>( ppl );
-	Plugin::registerPlugin<InitialUpdate>( ppl );
-	Plugin::registerPlugin<CharacterParamsUpdateTask>( ppl );
+        Plugin::registerPlugin<AnatoliaUpdate>( ppl );
+        Plugin::registerPlugin<InitialUpdate>( ppl );
+        Plugin::registerPlugin<CharacterParamsUpdateTask>( ppl );
 
-	return ppl;
+        return ppl;
     }
 }
 

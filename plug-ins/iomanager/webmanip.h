@@ -20,7 +20,7 @@ struct extra_descr_data;
 
 class WebManipCommand : public virtual Plugin {
 public:    
-	typedef ::Pointer<WebManipCommand> Pointer;
+        typedef ::Pointer<WebManipCommand> Pointer;
 
         virtual ~WebManipCommand( );
 
@@ -33,11 +33,11 @@ public:
 
 class WebManipManager : public OneAllocate, public virtual Plugin {
 public:
-	typedef ::Pointer<WebManipManager> Pointer;
+        typedef ::Pointer<WebManipManager> Pointer;
     typedef std::map<DLString, WebManipCommand::Pointer> WebManipMap;
 
-	WebManipManager( );
-	virtual ~WebManipManager( );
+        WebManipManager( );
+        virtual ~WebManipManager( );
 
         void registrate( WebManipCommand::Pointer );
         void unregistrate( WebManipCommand::Pointer );
@@ -59,49 +59,49 @@ protected:
 extern WebManipManager *webManipManager;
 
 struct ManipCommandArgs {
-	ManipCommandArgs(Character *target) {
-		this->target = target;
-	}
-	Character *target;
+        ManipCommandArgs(Character *target) {
+                this->target = target;
+        }
+        Character *target;
 };
 
 struct ItemManipArgs : public ManipCommandArgs {
-	ItemManipArgs(Character *target, Object *item, const DLString &descr, const DLString &pocket, int combined)
-		: ManipCommandArgs(target)
-	{
-		this->item = item;
-		this->descr = descr;
-		this->pocket = pocket;
-		this->combined = combined;
-	}
-	Object *item;
-	DLString descr;
-	DLString pocket;
-	int combined;
+        ItemManipArgs(Character *target, Object *item, const DLString &descr, const DLString &pocket, int combined)
+                : ManipCommandArgs(target)
+        {
+                this->item = item;
+                this->descr = descr;
+                this->pocket = pocket;
+                this->combined = combined;
+        }
+        Object *item;
+        DLString descr;
+        DLString pocket;
+        int combined;
 };
 
 struct ShopItemManipArgs : public ManipCommandArgs {
-	ShopItemManipArgs(Character *target, Object *item, const DLString &descr)
-		: ManipCommandArgs(target)
-	{
-		this->item = item;
-		this->descr = descr;
-	}
+        ShopItemManipArgs(Character *target, Object *item, const DLString &descr)
+                : ManipCommandArgs(target)
+        {
+                this->item = item;
+                this->descr = descr;
+        }
 
-	Object *item;
-	DLString descr;
+        Object *item;
+        DLString descr;
 };
 
 struct PocketManipArgs : public ManipCommandArgs {
-	PocketManipArgs(Character *target, const DLString &pocket, Object *container)
-		: ManipCommandArgs(target)
-	{
-		this->pocket = pocket;
-		this->container = container;
-	}
+        PocketManipArgs(Character *target, const DLString &pocket, Object *container)
+                : ManipCommandArgs(target)
+        {
+                this->pocket = pocket;
+                this->container = container;
+        }
 
-	DLString pocket;
-	Object *container;
+        DLString pocket;
+        Object *container;
 };
 
 struct ExtraDescrManipArgs : public ManipCommandArgs {
@@ -118,10 +118,10 @@ struct ExtraDescrManipArgs : public ManipCommandArgs {
 
 struct PlayerManipArgs : public ManipCommandArgs {
     PlayerManipArgs(Character *target, PCharacter *victim, const DLString &descr)
-	    : ManipCommandArgs(target)
+            : ManipCommandArgs(target)
     {
-	this->victim = victim;
-	this->descr = descr;
+        this->victim = victim;
+        this->descr = descr;
     }
 
     PCharacter *victim;
@@ -131,10 +131,10 @@ struct PlayerManipArgs : public ManipCommandArgs {
 
 struct MobManipArgs : public ManipCommandArgs {
     MobManipArgs(Character *target, NPCharacter *victim, const DLString &descr)
-	    : ManipCommandArgs(target)
+            : ManipCommandArgs(target)
     {
-	this->victim = victim;
-	this->descr = descr;
+        this->victim = victim;
+        this->descr = descr;
     }
 
     NPCharacter *victim;

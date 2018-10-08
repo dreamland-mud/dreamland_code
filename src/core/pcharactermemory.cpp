@@ -23,100 +23,100 @@ PCharacterMemory::~PCharacterMemory( )
 
 const DLString& PCharacterMemory::getName( ) const throw( )
 {
-	return name.getValue( );
+        return name.getValue( );
 }
 
 void PCharacterMemory::setName( const DLString& name ) throw( )
 {
-	this->name.setValue( name );
+        this->name.setValue( name );
 }
 
 const DLString& PCharacterMemory::getPassword( ) const throw( )
 {
-	return password.getValue( );
+        return password.getValue( );
 }
 void PCharacterMemory::setPassword( const DLString &password ) throw( )
 {
-	this->password = password;
+        this->password = password;
 }
 
 const Date& PCharacterMemory::getLastAccessTime( ) const throw( )
 {
-	return lastAccessTime;
+        return lastAccessTime;
 }
 
 void PCharacterMemory::setLastAccessTime( const Date& lastAccessTime ) throw( )
 {
-	this->lastAccessTime = lastAccessTime;
+        this->lastAccessTime = lastAccessTime;
 }
 
 const DLString& PCharacterMemory::getLastAccessHost( ) const throw( )
 {
-	return lastAccessHost;
+        return lastAccessHost;
 }
 
 void PCharacterMemory::setLastAccessHost( const DLString& lastAccessHost ) throw( )
 {
-	this->lastAccessHost.setValue( lastAccessHost );
+        this->lastAccessHost.setValue( lastAccessHost );
 }
 
 short PCharacterMemory::getLevel( ) const throw( )
 {
-	return level.getValue( );
+        return level.getValue( );
 }
 
 void PCharacterMemory::setLevel( short level ) throw( )
 {
-	this->level = level;
+        this->level = level;
 }
 
 int PCharacterMemory::getTrust( ) const throw( )
 {
-	return trust.getValue( );
+        return trust.getValue( );
 }
 
 void PCharacterMemory::setTrust( int trust ) throw( )
 {
-	this->trust = trust;;
+        this->trust = trust;;
 }
 int PCharacterMemory::getSecurity( ) const throw( )
 {
-	return security.getValue( );
+        return security.getValue( );
 }
 
 void PCharacterMemory::setSecurity( int security ) throw( )
 {
-	this->security = security;;
+        this->security = security;;
 }
 
 ClanReference &PCharacterMemory::getPetition( ) throw( )
 {
-	return petition;
+        return petition;
 }
 
 void PCharacterMemory::setPetition( const ClanReference & petition ) throw( )
 {
-	this->petition.assign( petition );
+        this->petition.assign( petition );
 }
 
 ClanReference &PCharacterMemory::getClan( ) throw( )
 {
-	return clan;
+        return clan;
 }
 
 void PCharacterMemory::setClan( const ClanReference & clan ) throw( )
 {
-	this->clan.assign( clan );
+        this->clan.assign( clan );
 }
 
 HometownReference &PCharacterMemory::getHometown( ) throw( )
 {
-	return hometown;
+        return hometown;
 }
 
 void PCharacterMemory::setHometown( const HometownReference & hometown ) throw( )
 {
-	this->hometown.assign( hometown );
+        this->hometown.assign( hometown );
 }
 
 ProfessionReference &PCharacterMemory::getProfession( ) throw( )
@@ -131,47 +131,47 @@ void PCharacterMemory::setProfession( const ProfessionReference & profession ) t
 
 RaceReference &PCharacterMemory::getRace( ) throw( )
 {
-	return race;
+        return race;
 }
 
 void PCharacterMemory::setRace( const RaceReference & race ) throw( )
 {
-	this->race.assign( race );
+        this->race.assign( race );
 }
 
 short PCharacterMemory::getClanLevel( ) const throw( )
 {
-	return clanLevel.getValue( );
+        return clanLevel.getValue( );
 }
 
 void PCharacterMemory::setClanLevel( short clanLevel ) throw( )
 {
-	this->clanLevel.setValue( clanLevel );
+        this->clanLevel.setValue( clanLevel );
 }
 
 short PCharacterMemory::getSex( ) const throw( )
 {
-	return sex.getValue( );
+        return sex.getValue( );
 }
 
 void PCharacterMemory::setSex( short sex ) throw( )
 {
-	this->sex.setValue( sex );
+        this->sex.setValue( sex );
 }
 
 XMLAttributes& PCharacterMemory::getAttributes( ) throw( )
 {
-	return attributes;
+        return attributes;
 }
 
 const XMLAttributes& PCharacterMemory::getAttributes( ) const throw( )
 {
-	return attributes;
+        return attributes;
 }
 
 void PCharacterMemory::setAttributes( const XMLAttributes& attributes ) throw( )
 {
-	this->attributes = attributes;
+        this->attributes = attributes;
 }
 
 Remorts & PCharacterMemory::getRemorts( ) throw( )
@@ -197,10 +197,10 @@ void PCharacterMemory::setRussianName( const DLString& name ) throw( )
 int PCharacterMemory::get_trust( ) const
 {
     if (getAttributes( ).isAvailable( "coder" ))
-	return 0xFFFF;
+        return 0xFFFF;
     
     if (getTrust( ) != 0)
-	return getTrust( );
+        return getTrust( );
 
     return getLevel( );
 }

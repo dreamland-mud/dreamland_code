@@ -106,7 +106,7 @@ void ColorTags::parse_color_web( ostringstream &out )
 
     for (p = text; *p; ++p) {
         // Text output with current colours.
-	if (*p != '{') {
+        if (*p != '{') {
             // Start of special tag (e.g. "<m") is encountered, close current color.
             if (*p == 036) {
                 if (actual_class != "") 
@@ -120,29 +120,29 @@ void ColorTags::parse_color_web( ostringstream &out )
             } else {
                 out << *p;
             }
-	    continue;
-	}
+            continue;
+        }
 
-	switch (*++p) {
-	// special characters
-	case '*':
-	    break;
-	case '+':
-	    break;
-	case '/':	
-	    out << endl;	     
-	    break;
-	case '{':	
-	    out << *p;
-	    break;
+        switch (*++p) {
+        // special characters
+        case '*':
+            break;
+        case '+':
+            break;
+        case '/':        
+            out << endl;             
+            break;
+        case '{':        
+            out << *p;
+            break;
 
-	// total reset
-	case 'x':
-	    reset( );
-	    /* FALLTHROUGH */;
+        // total reset
+        case 'x':
+            reset( );
+            /* FALLTHROUGH */;
 
-	// colors
-	default:
+        // colors
+        default:
             if (is_valid_color( *p )) {
                 DLString clr;
                 clr += *p;
@@ -163,8 +163,8 @@ void ColorTags::parse_color_web( ostringstream &out )
                 }
             }
             // Invalid colour symbols are ignored.
-	    break;
-	}
+            break;
+        }
     }
 
     if (actual_class != "")
@@ -174,41 +174,41 @@ void ColorTags::parse_color_web( ostringstream &out )
 void ColorTags::parse_color_ansi( ostringstream &out )
 {        
     for (p = text; *p; ++p) {
-	if (*p != '{') {
-	    out << *p;
-	    continue;
-	}
+        if (*p != '{') {
+            out << *p;
+            continue;
+        }
 
-	switch (*++p) {
-	// special characters
-	case '*':
-	    if (!raw)
-		out << "\007";	     
-	    break;
-	case '+':
-	    if (!raw)
-		out << C_BLINK;	     
-	    break;
-	case '/':	
-	    out << endl;	     
-	    break;
-	case '{':	
-	    out << *p;
-	    break;
+        switch (*++p) {
+        // special characters
+        case '*':
+            if (!raw)
+                out << "\007";             
+            break;
+        case '+':
+            if (!raw)
+                out << C_BLINK;             
+            break;
+        case '/':        
+            out << endl;             
+            break;
+        case '{':        
+            out << *p;
+            break;
 
-	// total reset
-	case 'x':
-	    reset( );
-	    if (!raw)
-		out << CLEAR << C_WHITE;
-	    break;
+        // total reset
+        case 'x':
+            reset( );
+            if (!raw)
+                out << CLEAR << C_WHITE;
+            break;
 
-	// colors
-	default: 
-	    if (my_color)
-		out << color_tag_ansi( );
-	    break;
-	}
+        // colors
+        default: 
+            if (my_color)
+                out << color_tag_ansi( );
+            break;
+        }
     }
 }
 
@@ -216,10 +216,10 @@ void ColorTags::parse_color_ansi( ostringstream &out )
 
 
 
-// color close: x (see above)	
+// color close: x (see above)        
 // colors: bcgmrwyBCGMRWYD
 // special: +*/ (see above)
-// escape: {	(see above)
+// escape: {        (see above)
 // stack push/pop: 1 2 
 const char * ColorTags::color_tag_ansi( )
 {
@@ -227,41 +227,41 @@ const char * ColorTags::color_tag_ansi( )
 
     switch (t) {
     case CLR_PUSH: case '1':
-	if (color_last) 
-	    color_stack.push_back( color_last );
-	return "";
+        if (color_last) 
+            color_stack.push_back( color_last );
+        return "";
 
     case CLR_POP: case '2':
-	if (color_stack.empty( )) 
-	    return "";
+        if (color_stack.empty( )) 
+            return "";
 
-	t = color_stack.back( );
-	color_stack.pop_back( );
-	/* FALLTROUGH */
+        t = color_stack.back( );
+        color_stack.pop_back( );
+        /* FALLTROUGH */
 
     default:
-	color_last = t;
-	break;
+        color_last = t;
+        break;
     }
 
     switch (t) {
     default:
-    case 'x':	return CLEAR C_WHITE;
-    case 'b':	return C_BLUE;	     
-    case 'c':	return C_CYAN;	     
-    case 'g':	return C_GREEN;	     
-    case 'm':	return C_MAGENTA;    
-    case 'r':	return C_RED;	     
-    case 'w':	return C_WHITE;	     
-    case 'y':	return C_YELLOW;     
-    case 'B':	return C_B_BLUE;     
-    case 'C':	return C_B_CYAN;     
-    case 'G':	return C_B_GREEN;    
-    case 'M':	return C_B_MAGENTA;  
-    case 'R':	return C_B_RED;	     
-    case 'W':	return C_B_WHITE;    
-    case 'Y':	return C_B_YELLOW;   
-    case 'D':	return C_D_GREY;     
+    case 'x':        return CLEAR C_WHITE;
+    case 'b':        return C_BLUE;             
+    case 'c':        return C_CYAN;             
+    case 'g':        return C_GREEN;             
+    case 'm':        return C_MAGENTA;    
+    case 'r':        return C_RED;             
+    case 'w':        return C_WHITE;             
+    case 'y':        return C_YELLOW;     
+    case 'B':        return C_B_BLUE;     
+    case 'C':        return C_B_CYAN;     
+    case 'G':        return C_B_GREEN;    
+    case 'M':        return C_B_MAGENTA;  
+    case 'R':        return C_B_RED;             
+    case 'W':        return C_B_WHITE;    
+    case 'Y':        return C_B_YELLOW;   
+    case 'D':        return C_D_GREY;     
     }
 }
 
@@ -281,9 +281,9 @@ protected:
     RaceLanguage *st_rlang;
 
     enum {
-	LANG_NONE,
-	LANG_ENGLISH,
-	LANG_RUSSIAN,
+        LANG_NONE,
+        LANG_ENGLISH,
+        LANG_RUSSIAN,
     };
     void clang_tag_parse( );
     bool clang_tag_work( );
@@ -302,7 +302,7 @@ protected:
     int st_sex, my_sex;
 
     enum {
-	SUN_NONE = -1,
+        SUN_NONE = -1,
     };
     void time_tag_parse( );
     bool time_tag_work( );
@@ -314,11 +314,11 @@ protected:
     bool invert_align;
 
     enum {
-	INVIS_NONE = 0,
-	INVIS_IMMORTAL = (A),
-	INVIS_CODER = (B),
-	INVIS_RECRUITER = (C),
-	INVIS_LEADER = (D),
+        INVIS_NONE = 0,
+        INVIS_IMMORTAL = (A),
+        INVIS_CODER = (B),
+        INVIS_RECRUITER = (C),
+        INVIS_LEADER = (D),
         INVIS_WEB = (E)
     };
     void invis_tag_parse( ostringstream & );
@@ -359,16 +359,16 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     my_invis = INVIS_NONE;
 
     if (ch) {
-	if (ch->is_immortal( ))
-	    SET_BIT(my_invis, INVIS_IMMORTAL);
-	if (ch->isCoder( ))
-	    SET_BIT(my_invis, INVIS_CODER);
-	if (!ch->is_npc( ) && ch->getClan( )->isRecruiter( ch->getPC( ) ))
-	    SET_BIT(my_invis, INVIS_RECRUITER);
-	if (!ch->is_npc( ) && ch->getClan( )->isLeader( ch->getPC( ) ))
-	    SET_BIT(my_invis, INVIS_LEADER);
+        if (ch->is_immortal( ))
+            SET_BIT(my_invis, INVIS_IMMORTAL);
+        if (ch->isCoder( ))
+            SET_BIT(my_invis, INVIS_CODER);
+        if (!ch->is_npc( ) && ch->getClan( )->isRecruiter( ch->getPC( ) ))
+            SET_BIT(my_invis, INVIS_RECRUITER);
+        if (!ch->is_npc( ) && ch->getClan( )->isLeader( ch->getPC( ) ))
+            SET_BIT(my_invis, INVIS_LEADER);
         if (is_websock(ch))
-	    SET_BIT(my_invis, INVIS_WEB);
+            SET_BIT(my_invis, INVIS_WEB);
     }
    
     reset( );
@@ -426,67 +426,67 @@ void VisibilityTags::run( ostringstream &out )
     reset( );
 
     for (p = text; *p; ++p) {
-	if (*p != '{') {
-	    c = *p;
+        if (*p != '{') {
+            c = *p;
 
-	    if (c != '\n' && c != '\r')
-		if (!rlang_tag_work( )
-		     || !clang_tag_work( )
-		     || !nlang_tag_work( )
-		     || !slang_tag_work( )
-		     || !align_tag_work( )
-		     || !sex_tag_work( )
-		     || !time_tag_work( )
-		     || !invis_tag_work( ))
-	    continue;
-	   
+            if (c != '\n' && c != '\r')
+                if (!rlang_tag_work( )
+                     || !clang_tag_work( )
+                     || !nlang_tag_work( )
+                     || !slang_tag_work( )
+                     || !align_tag_work( )
+                     || !sex_tag_work( )
+                     || !time_tag_work( )
+                     || !invis_tag_work( ))
+            continue;
+           
             html_escape( out );
-	    continue;
-	}
+            continue;
+        }
         
-	switch (*++p) {
-	// composite two-letter tags
-	case 'L':
-	    rlang_tag_parse( );
-	    break;
-	case 'l':
+        switch (*++p) {
+        // composite two-letter tags
+        case 'L':
+            rlang_tag_parse( );
+            break;
+        case 'l':
             clang_tag_parse( );
-	    break;
-	case 'n':
-	    nlang_tag_parse( );
-	    break;
-	case 's':
-	    slang_tag_parse( );
-	    break;
-	case 'A':
-	    align_tag_parse( );
-	    break;
-	case 'S':
-	    sex_tag_parse( );
-	    break;
-	case 'T':
-	    time_tag_parse( );
-	    break;
-	case 'I':
-	    invis_tag_parse( out );
-	    break;
+            break;
+        case 'n':
+            nlang_tag_parse( );
+            break;
+        case 's':
+            slang_tag_parse( );
+            break;
+        case 'A':
+            align_tag_parse( );
+            break;
+        case 'S':
+            sex_tag_parse( );
+            break;
+        case 'T':
+            time_tag_parse( );
+            break;
+        case 'I':
+            invis_tag_parse( out );
+            break;
         case 'h':
             hyper_tag_start( out );
             break;
 
-	// Total reset, but leave {x there for color parser to pick up.
+        // Total reset, but leave {x there for color parser to pick up.
         // Ideally each tag should reset individually, but historically many
         // texts rely on this 'total reset' sequence.
-	case 'x':
+        case 'x':
             hyper_tag_end( out );
-	    reset( );
-	    out << "{" << *p;
-	    break;
+            reset( );
+            out << "{" << *p;
+            break;
 
-	default: 
-	    out << "{" << *p;
-	    break;
-	}
+        default: 
+            out << "{" << *p;
+            break;
+        }
     }
 }
             
@@ -540,13 +540,13 @@ void VisibilityTags::hyper_tag_end( ostringstream &out )
 bool VisibilityTags::rlang_tag_work( )
 {
     if (st_rlang != &*lang_common) {
-	DLString cstr;
+        DLString cstr;
 
-	cstr.assign( c );
-	cstr = st_rlang->translate( cstr, NULL, ch );
-	
-	if (!cstr.empty( ))
-	    c = cstr.at( 0 );
+        cstr.assign( c );
+        cstr = st_rlang->translate( cstr, NULL, ch );
+        
+        if (!cstr.empty( ))
+            c = cstr.at( 0 );
     }
 
     return true;
@@ -555,16 +555,16 @@ bool VisibilityTags::rlang_tag_work( )
 void VisibilityTags::rlang_tag_parse( )
 {
     switch (*++p) {
-    case 'h': st_rlang = &*lang_human;	    break;
-    case 'e': st_rlang = &*lang_elvish;	    break;
+    case 'h': st_rlang = &*lang_human;            break;
+    case 'e': st_rlang = &*lang_elvish;            break;
     case 'd': st_rlang = &*lang_dwarvish;   break;
     case 'n': st_rlang = &*lang_gnomish;    break;
-    case 'g': st_rlang = &*lang_giant;	    break;
+    case 'g': st_rlang = &*lang_giant;            break;
     case 't': st_rlang = &*lang_trollish;   break;
-    case 'c': st_rlang = &*lang_cat;	    break;
+    case 'c': st_rlang = &*lang_cat;            break;
     default:  --p; /* FALLTHROUGH */
     case 'X':
-    case 'x': st_rlang = &*lang_common;	    break;
+    case 'x': st_rlang = &*lang_common;            break;
     }
 }
 
@@ -643,14 +643,14 @@ void VisibilityTags::align_tag_parse( )
 {
     switch (*++p) {
     case 'n': st_align = N_ALIGN_NEUTRAL;   invert_align = false; break;
-    case 'g': st_align = N_ALIGN_GOOD;	    invert_align = false; break;
-    case 'e': st_align = N_ALIGN_EVIL;	    invert_align = false; break;
+    case 'g': st_align = N_ALIGN_GOOD;            invert_align = false; break;
+    case 'e': st_align = N_ALIGN_EVIL;            invert_align = false; break;
     case 'N': st_align = N_ALIGN_NEUTRAL;   invert_align = true; break;
-    case 'G': st_align = N_ALIGN_GOOD;	    invert_align = true; break;
-    case 'E': st_align = N_ALIGN_EVIL;	    invert_align = true; break;
+    case 'G': st_align = N_ALIGN_GOOD;            invert_align = true; break;
+    case 'E': st_align = N_ALIGN_EVIL;            invert_align = true; break;
     default:  --p; /* FALLTHROUGH */
     case 'x':
-    case 'X': st_align = N_ALIGN_NULL;	    invert_align = false; break;
+    case 'X': st_align = N_ALIGN_NULL;            invert_align = false; break;
     }
 }
 

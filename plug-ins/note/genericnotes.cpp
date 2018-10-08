@@ -68,8 +68,8 @@ VOID_NOTE(crime)::getUnreadMessage( int count, ostringstream &buf ) const
 TYPE_NOTE(bool, crime)::canWrite( const PCharacter *ch ) const 
 {
     if (!NoteThread::canWrite( ch ))
-	return false;
-	
+        return false;
+        
     return (const_cast<PCharacter *>(ch))->getClan( ) == clan_ruler;
 }
 
@@ -84,14 +84,14 @@ extern "C"
 {
     SO::PluginList initialize_generic_notes( ) 
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	NoteThreadRegistrator::registrateAll( ppl );
+        NoteThreadRegistrator::registrateAll( ppl );
 
-	Plugin::registerPlugin<DreamThread>( ppl );
-	Plugin::registerPlugin<DreamManager>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeDream> >( ppl );
+        Plugin::registerPlugin<DreamThread>( ppl );
+        Plugin::registerPlugin<DreamManager>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeDream> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

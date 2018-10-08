@@ -2,8 +2,8 @@
  *
  * ruffina, 2004
  */
-#ifndef	__DEFAULTSPELL_H__
-#define	__DEFAULTSPELL_H__
+#ifndef        __DEFAULTSPELL_H__
+#define        __DEFAULTSPELL_H__
 
 #include "spell.h"
 #include "skill.h"
@@ -34,7 +34,7 @@ public:
     virtual void run( Character *, Room *, int, int ) { }
 
     virtual int getManaCost( Character * );
-    virtual int getMaxRange( Character * ) const;		
+    virtual int getMaxRange( Character * ) const;                
     virtual Character * getCharSpell( Character *, const DLString &, int *, int * );
     virtual bool spellbane( Character *, Character * ) const; 
     virtual void utter( Character * );

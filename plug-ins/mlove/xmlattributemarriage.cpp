@@ -19,35 +19,35 @@ bool XMLAttributeMarriage::handle( const WhoisArguments &args )
     DLString buf;
 
     if (!spouse.empty( )) {
-	PCMemoryInterface *spousePCM = PCharacterManager::find( spouse );
+        PCMemoryInterface *spousePCM = PCharacterManager::find( spouse );
 
-	if (spousePCM) {
-	    if (wife)
-		buf << "замужем за ";
-	    else 
-		buf << "женат" << GET_SEX( args.pch, "", "о", "а" ) << " на ";
-	} else {
-	    if (wife)
-		buf << "вдова ";
-	    else
-		buf << "вдовец ";
-	}
+        if (spousePCM) {
+            if (wife)
+                buf << "замужем за ";
+            else 
+                buf << "женат" << GET_SEX( args.pch, "", "о", "а" ) << " на ";
+        } else {
+            if (wife)
+                buf << "вдова ";
+            else
+                buf << "вдовец ";
+        }
 
-	buf << "{W" << spouse << "{w";
+        buf << "{W" << spouse << "{w";
     } 
 
     if (!history.empty( )) {
-	if (!spouse.empty( ))
-	    buf << ", ";
+        if (!spouse.empty( ))
+            buf << ", ";
 
-	buf << "был" << GET_SEX( args.pch, " женат(замужем)", "о", "а замужем(жената)" ) 
-	    << " {W" << history.size( ) 
-	    << "{w раз" << GET_COUNT( history.size( ), "", "а", "" );
+        buf << "был" << GET_SEX( args.pch, " женат(замужем)", "о", "а замужем(жената)" ) 
+            << " {W" << history.size( ) 
+            << "{w раз" << GET_COUNT( history.size( ), "", "а", "" );
     }
 
     if (!buf.empty( )) {
-	args.lines.push_back( buf );
-	return true;
+        args.lines.push_back( buf );
+        return true;
     }
 
     return false;

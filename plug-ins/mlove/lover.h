@@ -12,21 +12,21 @@
 class Lover : public CommandPlugin, public DefaultCommand
 {
 public:
-	typedef ::Pointer<Lover> Pointer;
+        typedef ::Pointer<Lover> Pointer;
 
 public:
-	Lover( );
-	
-	virtual void run( Character*, const DLString& constArguments );
-	
+        Lover( );
+        
+        virtual void run( Character*, const DLString& constArguments );
+        
 private:
-	void list( Character *, DLString );
-	void del( Character *, DLString );
-	void add( Character *, DLString );
-	void usage( Character * );    
-	
-	static const DLString COMMAND_NAME;
-	static const DLString XMLAttributeLoverString;
+        void list( Character *, DLString );
+        void del( Character *, DLString );
+        void add( Character *, DLString );
+        void usage( Character * );    
+        
+        static const DLString COMMAND_NAME;
+        static const DLString XMLAttributeLoverString;
 };
 
 

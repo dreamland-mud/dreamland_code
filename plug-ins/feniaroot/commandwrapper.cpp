@@ -50,7 +50,7 @@ CommandWrapper::run( Character * ch, const DLString &arg )
     try {
         func.toFunction()->invoke(wrap(ch), args);
     } catch (::Exception e) {
-	ch->send_to( e.what( ) );
+        ch->send_to( e.what( ) );
     }
 }
 

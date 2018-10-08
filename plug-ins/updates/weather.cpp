@@ -52,23 +52,23 @@ struct month_info {
 };
 
 const struct month_info month_table [17] = {
-  { "Зимы",		   -12,    7, 17 },
-  { "Зимнего Волка",	   -14,    7, 18 },
+  { "Зимы",                   -12,    7, 17 },
+  { "Зимнего Волка",           -14,    7, 18 },
   { "Холодного Гиганта",   -14,    7, 18 },
-  { "Древних Воинств",	   -12,    7, 19 },   /* весна */
-  { "Великих Битв",	   -8,     6, 19 },
-  { "Весны",		   -4,     5, 19 }, 
-  { "Природы",		   0,      5, 21 },
-  { "Тщетности",	   4,      5, 22 },   /* лето */
-  { "Дракона",		   8,      4, 22 },
-  { "Солнца",		   12,     4, 22 },
-  { "Жары",		   16,     5, 21 },    
-  { "Битвы",		   12,     5, 20 },   /* осень */
-  { "Темноты",		   8,      6, 20 },
-  { "Тени",		   4,      6, 19 },
-  { "Длинных Теней",	   0,      7, 18 },         
+  { "Древних Воинств",           -12,    7, 19 },   /* весна */
+  { "Великих Битв",           -8,     6, 19 },
+  { "Весны",                   -4,     5, 19 }, 
+  { "Природы",                   0,      5, 21 },
+  { "Тщетности",           4,      5, 22 },   /* лето */
+  { "Дракона",                   8,      4, 22 },
+  { "Солнца",                   12,     4, 22 },
+  { "Жары",                   16,     5, 21 },    
+  { "Битвы",                   12,     5, 20 },   /* осень */
+  { "Темноты",                   8,      6, 20 },
+  { "Тени",                   4,      6, 19 },
+  { "Длинных Теней",           0,      7, 18 },         
   { "Абсолютной Темноты",  -4,     8, 17 },   /* зима */
-  { "Великого Зла",	   -8,     8, 17 },
+  { "Великого Зла",           -8,     8, 17 },
 };
 
 void mmhg_update()
@@ -76,8 +76,8 @@ void mmhg_update()
     int diff, d;
     
     if (number_range( 0, 10 * 24 ) == 0) {
-	weather_info.avg_mmhg = 1000 + month_table[time_info.month].pressure;
-	weather_info.avg_mmhg += dice(1, 5) - dice(1, 5);
+        weather_info.avg_mmhg = 1000 + month_table[time_info.month].pressure;
+        weather_info.avg_mmhg += dice(1, 5) - dice(1, 5);
     }
     
     diff = weather_info.mmhg > weather_info.avg_mmhg ? -2 : 2;
@@ -86,11 +86,11 @@ void mmhg_update()
     weather_info.change = URANGE( -12, weather_info.change, 12 );
 
     if(weather_info.change > 0) {
-	if(weather_info.change >= number_range(0, 12*2))
-	    weather_info.mmhg++;
+        if(weather_info.change >= number_range(0, 12*2))
+            weather_info.mmhg++;
     } else {
-	if(weather_info.change <= -number_range(0, 12*2))
-	    weather_info.mmhg--;
+        if(weather_info.change <= -number_range(0, 12*2))
+            weather_info.mmhg--;
     }
 
     d = dice(10, 5) - dice(10, 5);
@@ -116,7 +116,7 @@ void sunlight_update( )
 
     if (time_info.hour == month_table[time_info.month].sunrise) {
         weather_info.sunlight = SUN_RISE;
-	buf << "Первые лучи солнца пробиваются с востока." << endl;
+        buf << "Первые лучи солнца пробиваются с востока." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunrise + 1) {
         weather_info.sunlight = SUN_LIGHT;
@@ -124,11 +124,11 @@ void sunlight_update( )
     }
     else if (time_info.hour == month_table[time_info.month].sunset) {
         weather_info.sunlight = SUN_SET;
-	buf << "Солнце медленно прячется за горизонтом." << endl;
+        buf << "Солнце медленно прячется за горизонтом." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset + 1) {
         weather_info.sunlight = SUN_DARK;
-	buf << "Начинается ночь." << endl;
+        buf << "Начинается ночь." << endl;
     }
     
     if (time_info.hour == 24) {
@@ -147,22 +147,22 @@ void sunlight_update( )
     }
 
     if (!buf.str( ).empty( )) {
-	Descriptor *d;
-	Character *ch;
-	
+        Descriptor *d;
+        Character *ch;
+        
         for (d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
-		continue;
+                continue;
 
-	    ch = d->character;
+            ch = d->character;
 
-	    if (ch
-		&& IS_OUTSIDE(ch) 
-		&& IS_AWAKE(ch) 
-		&& !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
-	    {
-		ch->send_to( buf );
-	    }
+            if (ch
+                && IS_OUTSIDE(ch) 
+                && IS_AWAKE(ch) 
+                && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
+            {
+                ch->send_to( buf );
+            }
         }
     }
 
@@ -173,9 +173,9 @@ void sunlight_update( )
     }
 
     for(int i=0;i<MAX_KEY_HASH;i++)
-	for(Room *r = room_index_hash[i]; r; r = r->next) {
-	    FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
-	}
+        for(Room *r = room_index_hash[i]; r; r = r->next) {
+            FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
+        }
 }
 
 DLString sunlight( )
@@ -206,7 +206,7 @@ void weather_update( )
         if ( weather_info.mmhg <  990
                 || ( weather_info.mmhg < 1010 && number_bits( 2 ) == 0 ) )
         {
-	    buf << "Небо затягивается тучами." << endl;
+            buf << "Небо затягивается тучами." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -253,28 +253,28 @@ void weather_update( )
     }
 
     if (!buf.str( ).empty( )) {
-	Descriptor *d;
-	Character *ch;
-	
+        Descriptor *d;
+        Character *ch;
+        
         for (d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
-		continue;
+                continue;
 
-	    ch = d->character;
+            ch = d->character;
 
-	    if (ch
-		&& IS_OUTSIDE(ch) 
-		&& IS_AWAKE(ch) 
-		&& !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
-	    {
-		ch->send_to( buf );
-	    }
+            if (ch
+                && IS_OUTSIDE(ch) 
+                && IS_AWAKE(ch) 
+                && !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
+            {
+                ch->send_to( buf );
+            }
         }
     }
 }
 
 
-const char *	const	day_name	[] =
+const char *        const        day_name        [] =
 {
     "Луны", "Быка", "Лжи", "Грома", "Свободы",
     "Великих Богов", "Солнца"
@@ -288,13 +288,13 @@ static const char * adjective_ext(int d)
     
     switch (d % 10) {
     case 0: 
-	return d == 0 ? EXT_TWO : EXT_ONE;
+        return d == 0 ? EXT_TWO : EXT_ONE;
     case 1: case 4: case 5: case 9:
-	return EXT_ONE;
+        return EXT_ONE;
     case 3:
-	return EXT_THREE;
+        return EXT_THREE;
     default:
-	return EXT_TWO;
+        return EXT_TWO;
     }
 }
 
@@ -327,9 +327,9 @@ void make_date( ostringstream &buf )
     const char * suf = adjective_ext( day );
     
     buf << hour_of_day( ) << " " << time_of_day( ) << ", " 
-	<< "День: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
-	<< "Месяц " << calendar_month( ) << ", "
-	<< "Год " << time_info.year << "." << endl;
+        << "День: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
+        << "Месяц " << calendar_month( ) << ", "
+        << "Год " << time_info.year << "." << endl;
 }
 
 CMDRUN( time )
@@ -337,8 +337,8 @@ CMDRUN( time )
     ostringstream buf;
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
-	ch->println( "Похоже, в этом месте время остановило свой ход." );
-	return;
+        ch->println( "Похоже, в этом месте время остановило свой ход." );
+        return;
     }
 
     buf << "Сейчас: ";
@@ -346,44 +346,44 @@ CMDRUN( time )
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
     {
-	buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
+        buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
     }
 
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-	ch->printf( "Dream Land загружен %s\r\nСистемное время: %s\r\n",
-	            Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
-	            Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
+        ch->printf( "Dream Land загружен %s\r\nСистемное время: %s\r\n",
+                    Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
+                    Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
 
 CMDRUN( weather )
 {
     static const char * const sky_look[4] =
     {
-	"ясное",
-	"облачное",
-	"дождливое",
-	"во вспышках молний"
+        "ясное",
+        "облачное",
+        "дождливое",
+        "во вспышках молний"
     };
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
-	ch->println( "Похоже, в этом месте погода всегда одинаковая." );
-	return;
+        ch->println( "Похоже, в этом месте погода всегда одинаковая." );
+        return;
     }
     
     if ( !IS_OUTSIDE(ch) )
     {
-	ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
-	return;
+        ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
+        return;
     }
 
     ch->printf( "Небо %s и %s.\n\r",
-	sky_look[weather_info.sky],
-	weather_info.change >= 0
-	? "дует теплый южный ветер"
-	: "дует холодный северный ветер"
-	);
+        sky_look[weather_info.sky],
+        weather_info.change >= 0
+        ? "дует теплый южный ветер"
+        : "дует холодный северный ветер"
+        );
 }
 
 
@@ -394,25 +394,25 @@ void weather_init( )
 {
     long lhour, lday, lmonth;
 
-    lhour		= dreamland->getWorldTime( );
+    lhour                = dreamland->getWorldTime( );
 
     if ( lhour == 0 )
     {
-	    lhour = ( dreamland->getCurrentTime( ) - 650336715)
-		    / (PULSE_TICK / dreamland->getPulsePerSecond( ));
+            lhour = ( dreamland->getCurrentTime( ) - 650336715)
+                    / (PULSE_TICK / dreamland->getPulsePerSecond( ));
 
-	    dreamland->setWorldTime( lhour );
+            dreamland->setWorldTime( lhour );
     }
 
-    time_info.hour	= lhour  % 24;
+    time_info.hour        = lhour  % 24;
 
-    lday		= lhour  / 24;
-    time_info.day	= lday   % 35;
+    lday                = lhour  / 24;
+    time_info.day        = lday   % 35;
 
-    lmonth		= lday   / 35;
-    time_info.month	= lmonth % 17;
+    lmonth                = lday   / 35;
+    time_info.month        = lmonth % 17;
 
-    time_info.year	= lmonth / 17;
+    time_info.year        = lmonth / 17;
 
     if (time_info.hour < month_table[time_info.month].sunrise) 
         weather_info.sunlight = SUN_DARK;
@@ -425,17 +425,17 @@ void weather_init( )
     else
         weather_info.sunlight = SUN_DARK;
 
-    weather_info.change	  = 0;
+    weather_info.change          = 0;
     weather_info.change_  = 0;
-    weather_info.mmhg	  = 960;
+    weather_info.mmhg          = 960;
     weather_info.avg_mmhg = 1000;
 
     if ( time_info.month >= 7 && time_info.month <=12 )
-	weather_info.mmhg += number_range( 1, 50 );
+        weather_info.mmhg += number_range( 1, 50 );
     else
-	weather_info.mmhg += number_range( 1, 80 );
+        weather_info.mmhg += number_range( 1, 80 );
 
-	 if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
+         if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
     else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;

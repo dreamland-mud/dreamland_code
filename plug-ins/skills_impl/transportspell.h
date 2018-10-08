@@ -35,7 +35,7 @@ class SpellTemplate<tn, GateSpell> : public ClassSelfRegistratorPlugin<tn>, publ
 public:
     virtual void run( Character *ch, Character *victim, int sn, int level ) 
     {
-	GateSpell::run( ch, victim, sn, level );
+        GateSpell::run( ch, victim, sn, level );
     }
     virtual const DLString &getType( ) const {
         return ClassSelfRegistratorPlugin<tn>::getType( );

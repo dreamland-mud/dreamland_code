@@ -15,19 +15,19 @@
 
 void ObjectBehaviorManager::assign( Object *obj ) {
     if (!obj->pIndexData->behavior) 
-	return;
+        return;
     
     try {
-	if (obj->behavior) {
-	    obj->behavior->unsetObj( );
-	    obj->behavior.clear( );
-	}
-	
-	obj->behavior.fromXML( obj->pIndexData->behavior->getFirstNode( ) );
-	obj->behavior->setObj( obj );
+        if (obj->behavior) {
+            obj->behavior->unsetObj( );
+            obj->behavior.clear( );
+        }
+        
+        obj->behavior.fromXML( obj->pIndexData->behavior->getFirstNode( ) );
+        obj->behavior->setObj( obj );
 
     } catch (Exception e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
 }
 
@@ -41,20 +41,20 @@ void ObjectBehaviorManager::parse( OBJ_INDEX_DATA * pObjIndex, FILE *fp ) {
     ungetc( letter, fp );
 
     if (letter != '<') 
-	return;
-	
+        return;
+        
     word = fread_string( fp );
 
     try {
-	istr.str( word );
-	
-	doc->load( istr );
-	pObjIndex->behavior = new XMLDocument( **doc );
+        istr.str( word );
+        
+        doc->load( istr );
+        pObjIndex->behavior = new XMLDocument( **doc );
 
     } catch (Exception e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
-	
+        
     free_string( word );
 }
 
@@ -63,31 +63,31 @@ void ObjectBehaviorManager::parse( Object * obj, FILE *fp ) {
     char *word;
     
     if (feof( fp ))
-	return;
+        return;
     
     letter = fread_letter( fp );
     ungetc( letter, fp );
 
     if (letter != '<') 
-	return;
+        return;
     
     word = fread_string( fp );
     
     try {
-	std::basic_istringstream<char> istr( word );
+        std::basic_istringstream<char> istr( word );
 
-	if (obj->behavior) {
-	    obj->behavior->unsetObj( );
-	    obj->behavior.clear( );
-	}
+        if (obj->behavior) {
+            obj->behavior->unsetObj( );
+            obj->behavior.clear( );
+        }
 
-	obj->behavior.fromStream( istr );
-	obj->behavior->setObj( obj );
+        obj->behavior.fromStream( istr );
+        obj->behavior->setObj( obj );
 
     } catch (Exception e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
-	
+        
     free_string( word );
 }
 
@@ -95,14 +95,14 @@ void ObjectBehaviorManager::save( const OBJ_INDEX_DATA *pObjIndex, FILE *fp ) {
     std::basic_ostringstream<char> ostr;
      
     if (!pObjIndex->behavior)
-	return;
+        return;
     
     try {
-	pObjIndex->behavior->save( ostr );
-	fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
+        pObjIndex->behavior->save( ostr );
+        fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
 
     } catch (ExceptionXMLError e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
 }
 
@@ -110,14 +110,14 @@ void ObjectBehaviorManager::save( const Object *obj, FILE *fp ) {
     std::basic_ostringstream<char> ostr;
      
     if (!obj->behavior)
-	return;
+        return;
     
     try {
-	obj->behavior.toStream( ostr );
-	fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
+        obj->behavior.toStream( ostr );
+        fprintf( fp, "%s~\n", ostr.str( ).c_str( ) );
 
     } catch (ExceptionXMLError e) {
-	LogStream::sendError( ) << e.what( ) << endl;
+        LogStream::sendError( ) << e.what( ) << endl;
     }
 }
 

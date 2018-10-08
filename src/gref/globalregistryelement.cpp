@@ -26,10 +26,10 @@ bool GlobalRegistryElement::matchesStrict( const DLString &str ) const
 bool GlobalRegistryElement::matchesUnstrict( const DLString &str ) const 
 {
     if (str.empty( ) || getName( ).empty( ))
-	return false;
+        return false;
 
     if (!str.strPrefix( getName( ) ))
-	return false;
+        return false;
 // TODO unstrict match by russian name, all cases
 // Use getRussianName method in child classes instead of custom getRusName
     return true;

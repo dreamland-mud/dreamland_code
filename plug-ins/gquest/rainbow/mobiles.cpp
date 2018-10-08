@@ -54,21 +54,21 @@ bool RainbowMob::specIdle( )
     RainbowGQuest *gq = RainbowGQuest::getThis( );
 
     if (!gq || gq->isHidden( ))
-	return false;
+        return false;
     
     for (wch = ch->in_room->people; wch; wch = wch->next_in_room) {
-	if (wch->is_npc( )) 
-	    continue;
-	if (wch->getPC( )->getAttributes( ).isAvailable( gq->getQuestID( ) )) 
-	    continue;
-	if (!ch->can_see( wch ))
-	    continue;
-	if (!hasMyNumber( wch ))
-	    break;
+        if (wch->is_npc( )) 
+            continue;
+        if (wch->getPC( )->getAttributes( ).isAvailable( gq->getQuestID( ) )) 
+            continue;
+        if (!ch->can_see( wch ))
+            continue;
+        if (!hasMyNumber( wch ))
+            break;
     }
     
     if (!wch)
-	return false;
+        return false;
      
     log("RainbowMob: [" << number << "] to " << wch->getName( ));
     gq->getScenario( )->onGivePiece( wch->getPC( ), ch );
@@ -96,16 +96,16 @@ bool RainbowMob::death( Character *killer )
     RainbowGQuest *gq = RainbowGQuest::getThis( );
 
     if (!gq)
-	return false;
+        return false;
     
     if (killer) {
-	wch = gq->getActor( killer );
-	log("RainbowMob: [" << number << "] killed by " << wch->getName( ));
-	
-	if (!wch->is_npc( )) {
-	    wch->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( gq->getQuestID( ) );
-	    act("", ch, 0, wch, TO_VICT);
-	}
+        wch = gq->getActor( killer );
+        log("RainbowMob: [" << number << "] killed by " << wch->getName( ));
+        
+        if (!wch->is_npc( )) {
+            wch->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( gq->getQuestID( ) );
+            act("", ch, 0, wch, TO_VICT);
+        }
     } 
 
     gq->recreateMob( this );
@@ -120,12 +120,12 @@ bool RainbowMob::hasMyNumber( Character *wch )
     RainbowPiece::Pointer bhv;
 
     for (obj = wch->carrying; obj; obj = obj->next_content) 
-	if (obj->behavior) {
-	    bhv = obj->behavior.getDynamicPointer<RainbowPiece>( );
+        if (obj->behavior) {
+            bhv = obj->behavior.getDynamicPointer<RainbowPiece>( );
 
-	    if (bhv && bhv->number == number) 
-		return true;
-	}
+            if (bhv && bhv->number == number) 
+                return true;
+        }
     
     return false;
 }

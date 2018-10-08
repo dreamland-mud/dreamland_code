@@ -36,13 +36,13 @@ DLString MoneyPrice::toString( Character *ch ) const
     silver = silver % 100;
 
     if (gold > 0) 
-	buf << gold << " золот" << GET_COUNT(gold, "ая монета", "ые монеты", "ых монет");
+        buf << gold << " золот" << GET_COUNT(gold, "ая монета", "ые монеты", "ых монет");
     
     if (silver > 0) {
-	if (gold > 0)
-	    buf << " и ";
+        if (gold > 0)
+            buf << " и ";
 
-	buf << silver << " серебрян" << GET_COUNT(silver, "ая монета", "ые монеты", "ых монет");
+        buf << silver << " серебрян" << GET_COUNT(silver, "ая монета", "ые монеты", "ых монет");
     }
     
     return buf.str( );
@@ -74,8 +74,8 @@ void MoneyPrice::deduct( Character *ch ) const
     silver = min( (int)ch->silver, cost );
     
     if (silver < cost) {
-	gold = (cost - silver + 99) / 100;
-	silver = cost - 100 * gold;
+        gold = (cost - silver + 99) / 100;
+        silver = cost - 100 * gold;
     }
 
     ch->gold -= gold;
@@ -98,11 +98,11 @@ void MoneyPrice::toStream( Character *ch, ostringstream &buf ) const
     silver = cost % 100;
 
     if (silver == 0) {
-	if (gold != 0)
-	    buf << gold << " gold";
+        if (gold != 0)
+            buf << gold << " gold";
     }
     else
-	buf << cost;
+        buf << cost;
 }
 
 /*----------------------------------------------------------------------
@@ -131,7 +131,7 @@ int LevelPrice::toSilver( Character *ch ) const
     int pow = power.getValue( );
     
     while (--pow > 0)
-	level *= level;
+        level *= level;
     
     return level * coef.getValue( ) + bonus.getValue( );
 }
@@ -155,21 +155,21 @@ DLString QuestPointPrice::toString( Character * ) const
 bool QuestPointPrice::canAfford( Character *ch ) const
 {
     if (ch->is_npc( ))
-	return false;
+        return false;
     else
-	return ch->getPC( )->questpoints >= questpoint.getValue( );
+        return ch->getPC( )->questpoints >= questpoint.getValue( );
 }
 
 void QuestPointPrice::induct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-	ch->getPC( )->questpoints += questpoint.getValue( );
+        ch->getPC( )->questpoints += questpoint.getValue( );
 }
 
 void QuestPointPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-	ch->getPC( )->questpoints -= questpoint.getValue( );
+        ch->getPC( )->questpoints -= questpoint.getValue( );
 }
 
 void QuestPointPrice::toStream( Character *ch, ostringstream &buf ) const

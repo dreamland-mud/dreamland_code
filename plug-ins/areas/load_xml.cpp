@@ -58,7 +58,7 @@ load_xml_areas( )
             a.load(it->getValue( ));
         } catch(const Exception &e) {
             LogStream::sendError() << "load_xml_area: " << e.what( ) << endl;
-	    throw e;
+            throw e;
         }
     }
 }
@@ -68,13 +68,13 @@ public:
     typedef ::Pointer<XMLAreaLoadTask> Pointer;
 
     virtual void run( ) {
-	if (DLScheduler::getThis()->getCurrentTick( ) == 0) 
+        if (DLScheduler::getThis()->getCurrentTick( ) == 0) 
             load_xml_areas( );
     }
 
     virtual int getPriority( ) const
     {
-	return SCDP_BOOT + 5;
+        return SCDP_BOOT + 5;
     }
 };
 

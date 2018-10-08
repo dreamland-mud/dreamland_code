@@ -23,14 +23,14 @@ public:
     template <typename ArgType>
     bool handleEvent( const ArgType &args )
     {
-	EventHandler<ArgType> *handler;
+        EventHandler<ArgType> *handler;
 
-	handler = dynamic_cast<EventHandler<ArgType> *>( this );
-	
-	if (handler)
-	    return handler->handle( args );
-	else
-	    return false;
+        handler = dynamic_cast<EventHandler<ArgType> *>( this );
+        
+        if (handler)
+            return handler->handle( args );
+        else
+            return false;
     }
 
 protected:
@@ -44,7 +44,7 @@ template <typename ArgType>
 class EventHandler : public virtual XMLAttribute {
 public:
     virtual bool handle( const ArgType & ) { 
-	return false;
+        return false;
     };
 };
 

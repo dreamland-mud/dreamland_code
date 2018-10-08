@@ -13,9 +13,9 @@ int XMLAttributeQuestReward::getCount( int vnum ) const
     const_iterator i = find( vnumStr );
 
     if (i == end( ))
-	return 0;
+        return 0;
     else
-	return i->second.getValue( );
+        return i->second.getValue( );
 }
 
 void XMLAttributeQuestReward::setCount( int vnum, int count )
@@ -24,8 +24,8 @@ void XMLAttributeQuestReward::setCount( int vnum, int count )
     iterator i = find( vnumStr );
 
     if (i == end( ))
-	(*this)[vnumStr] = count;
+        (*this)[vnumStr] = count;
     else
-	i->second = count;
+        i->second = count;
 }
 

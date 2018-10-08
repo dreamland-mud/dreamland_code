@@ -40,37 +40,37 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
     mlevel = pch->getModifyLevel( );
     
     if (rated_as_guru( pch )) {
-	minLevel = mlevel + 10;
-	maxLevel = mlevel + 15;
-	count = 1 + chance( 10 ) + chance( 3 );
+        minLevel = mlevel + 10;
+        maxLevel = mlevel + 15;
+        count = 1 + chance( 10 ) + chance( 3 );
     }
     else if (rated_as_expert( pch )) {
-	minLevel = max( 1, (int)(mlevel - 5) );
-	maxLevel = mlevel + 15;
-	count = 1 + chance( 10 ) + chance( 3 );
+        minLevel = max( 1, (int)(mlevel - 5) );
+        maxLevel = mlevel + 15;
+        count = 1 + chance( 10 ) + chance( 3 );
     }
     else {
-	minLevel = max( 1, (int)(mlevel - 5) );
-	maxLevel = mlevel + 5;
-	count = 1;
+        minLevel = max( 1, (int)(mlevel - 5) );
+        maxLevel = mlevel + 5;
+        count = 1;
     }
 
     if (scenarios.size( ) < count)
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
     
     mode = count;
 
     while (!scenarios.empty( ) && maladies.size( ) < count) {
-	int i = number_range( 0, scenarios.size( ) - 1 );
-	HealScenario::Pointer scp = scenarios.at( i );
-	unsigned int level = number_range( minLevel, maxLevel );
+        int i = number_range( 0, scenarios.size( ) - 1 );
+        HealScenario::Pointer scp = scenarios.at( i );
+        unsigned int level = number_range( minLevel, maxLevel );
 
-	scp->infect( patient, time + 1, level );
-	maladies.setElement( scp->malady );
-	scenarios.erase( scenarios.begin( ) + i );
-	
-	if (level >= mlevel + 10)
-	    mode++;
+        scp->infect( patient, time + 1, level );
+        maladies.setElement( scp->malady );
+        scenarios.erase( scenarios.begin( ) + i );
+        
+        if (level >= mlevel + 10)
+            mode++;
     }
 
     if (IS_AFFECTED(patient, AFF_HIDE|AFF_FADE)
@@ -87,17 +87,17 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
 
     tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );   
     tell_fmt( "{W%3$#^C1{G чем-то серьезно бол%3$Gьно|ен|ьна и нуждается в помощи лекаря.",
-	       pch, questman, patient );
+               pch, questman, patient );
     tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{x.",
-	      pch, questman, patient, patient->in_room->name );
+              pch, questman, patient, patient->in_room->name );
     tell_fmt( "Это находится в районе под названием {W%3$s{x.", 
-	      pch, questman, patient->in_room->area->name );
+              pch, questman, patient->in_room->area->name );
     tell_fmt( "Поторопись, пока болезнь не доконала %3$P2!", pch, questman, patient );
     tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания.", pch, questman, time );
 
     wiznet( "", "cure %s [%d] from %d maladies, mode %d",
-		patient->getNameP('1').c_str( ), patient->in_room->vnum,
-		maladies.size( ), mode.getValue( ) );
+                patient->getNameP('1').c_str( ), patient->in_room->vnum,
+                maladies.size( ), mode.getValue( ) );
 }
 
 void HealQuest::clear( NPCharacter *mob )
@@ -121,49 +121,49 @@ Quest::Reward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman 
     Reward::Pointer r( NEW );
     
     if (hint > 0) {
-	r->gold = number_range( 1, 2 );
-	r->points = number_range( 1, 4 );
+        r->gold = number_range( 1, 2 );
+        r->points = number_range( 1, 4 );
 
     } else {
-	unsigned int m;
-	
-	m = max( 0, (int)(mode - (maladies.size( ) - maladies.successHero( ))) );
+        unsigned int m;
+        
+        m = max( 0, (int)(mode - (maladies.size( ) - maladies.successHero( ))) );
 
-	switch (m) {
-	case 0:
-	    r->gold = number_range( 5, 8 );
-	    r->points = number_range( 5, 8 );
-	    r->wordChance = 10;
-	    r->scrollChance = 7;
-	    break;
-	case 1: 
-	    r->gold = number_range( 8, 12 );
-	    r->points = number_range( 8, 12 );
-	    r->prac = max( 0, number_range( -17, 2 ) );
-	    r->wordChance = 15;
-	    r->scrollChance = 10;
-	    break;
-	case 2:
-	    r->gold = number_range( 12, 16 );
-	    r->points = number_range( 12, 16 );
-	    r->prac = max( 0, number_range( -13, 3 ) );
-	    r->wordChance = 25;
-	    r->scrollChance = 13;
-	    break;
-	default:
-	    r->gold = number_range( 16, 20 );
-	    r->points = number_range( 16, 20 );
-	    r->prac = max( 0, number_range( -10, 4 ) );
-	    r->wordChance = 30;
-	    r->scrollChance = 15;
-	    break;
-	}
+        switch (m) {
+        case 0:
+            r->gold = number_range( 5, 8 );
+            r->points = number_range( 5, 8 );
+            r->wordChance = 10;
+            r->scrollChance = 7;
+            break;
+        case 1: 
+            r->gold = number_range( 8, 12 );
+            r->points = number_range( 8, 12 );
+            r->prac = max( 0, number_range( -17, 2 ) );
+            r->wordChance = 15;
+            r->scrollChance = 10;
+            break;
+        case 2:
+            r->gold = number_range( 12, 16 );
+            r->points = number_range( 12, 16 );
+            r->prac = max( 0, number_range( -13, 3 ) );
+            r->wordChance = 25;
+            r->scrollChance = 13;
+            break;
+        default:
+            r->gold = number_range( 16, 20 );
+            r->points = number_range( 16, 20 );
+            r->prac = max( 0, number_range( -10, 4 ) );
+            r->wordChance = 30;
+            r->scrollChance = 15;
+            break;
+        }
     }
 
     if (ch->getClan( )->isDispersed( )) 
-	r->points *= 2;
+        r->points *= 2;
     else
-	r->clanpoints = r->points;
+        r->clanpoints = r->points;
 
     r->exp = (r->points + r->clanpoints) * 10;
     return Reward::Pointer( r );
@@ -172,18 +172,18 @@ Quest::Reward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman 
 void HealQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
-	    << "Вернись за вознаграждением, до того как выйдет время!" << endl;
+        buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
+            << "Вернись за вознаграждением, до того как выйдет время!" << endl;
     else 
-	buf << "У тебя задание - вылечить " << russian_case( mobName, '4' ) << "!" << endl
-	    << "Место, где пациента видели в последний раз - " << roomName << endl
-	    << "Это находится в районе под названием " << areaName << "." << endl;
+        buf << "У тебя задание - вылечить " << russian_case( mobName, '4' ) << "!" << endl
+            << "Место, где пациента видели в последний раз - " << roomName << endl
+            << "Это находится в районе под названием " << areaName << "." << endl;
 }
 
 void HealQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "Вернуться к квестору за наградой.";
+        buf << "Вернуться к квестору за наградой.";
     else 
         buf << "Вылечить " << russian_case( mobName, '4' ) << " из "
             << roomName << " (" << areaName << ").";
@@ -200,16 +200,16 @@ bool HealQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
     int diff, mlevel;
 
     if (!ClientQuestModel::checkMobileClientAggr( pch, mob ))
-	return false;
+        return false;
 
     if (IS_SET( mob->imm_flags, IMM_SPELL ))
-	return false;
+        return false;
 
     mlevel = pch->getModifyLevel( );
     diff = abs( mlevel - mob->getRealLevel( ) );
     
     if (diff > mlevel / 4)
-	return false;
+        return false;
     
     return true;
 }
@@ -217,11 +217,11 @@ bool HealQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 bool HealQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
     if (IS_SET( room->room_flags, ROOM_NO_CAST ))
-	return false;
+        return false;
 
     if (!ClientQuestModel::checkRoomClient( pch, room ))
-	return false;
-	
+        return false;
+        
     return true;
 }
 
@@ -245,11 +245,11 @@ HealQuestRegistrator::~HealQuestRegistrator( )
 void HealMaladies::cleanup( NPCharacter *mob )
 {
     if (!mob)
-	return;
+        return;
 
     for (iterator i = begin( ); i != end( ); i++)
-	if (i->second == HSTAT_INIT) 
-	    affect_strip( mob, skillManager->find( i->first )->getIndex( ) );
+        if (i->second == HSTAT_INIT) 
+            affect_strip( mob, skillManager->find( i->first )->getIndex( ) );
 }
 
 void HealMaladies::setElement( const SkillReference &skill ) 
@@ -270,9 +270,9 @@ bool HealMaladies::hasKey( const DLString &name ) const
 void HealMaladies::setAttempts( int sn )
 {
     for (iterator i = begin( ); i != end( ); i++)
-	if (i->second == HSTAT_INIT)
-	    if (registrator->getMyScenario<HealScenario>( i->first )->healedBy( sn ))
-		i->second = HSTAT_ATTEMPT;
+        if (i->second == HSTAT_INIT)
+            if (registrator->getMyScenario<HealScenario>( i->first )->healedBy( sn ))
+                i->second = HSTAT_ATTEMPT;
 }
 
 bool HealMaladies::checkSuccess( int sn, NPCharacter *patient )
@@ -290,14 +290,14 @@ bool HealMaladies::checkSuccessAny( int sn, NPCharacter *patient, int successSta
     bool result = false;
 
     for (iterator i = begin( ); i != end( ); i++)
-	if (i->second == HSTAT_ATTEMPT) {
-	    if (registrator->getMyScenario<HealScenario>( i->first )->isInfected( patient ))
-		i->second = HSTAT_INIT;
-	    else {
-		i->second = successState;
-		result = true;
-	    }
-	}
+        if (i->second == HSTAT_ATTEMPT) {
+            if (registrator->getMyScenario<HealScenario>( i->first )->isInfected( patient ))
+                i->second = HSTAT_INIT;
+            else {
+                i->second = successState;
+                result = true;
+            }
+        }
 
     return result;
 }
@@ -307,8 +307,8 @@ int HealMaladies::countStates( int state ) const
     int count = 0;
 
     for (const_iterator i = begin( ); i != end( ); i++)
-	if (i->second == state)
-	    count++;
+        if (i->second == state)
+            count++;
 
     return count;
 }

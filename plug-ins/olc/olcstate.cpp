@@ -53,7 +53,7 @@ void OLCCommand::run( Character *ch, const DLString &cArguments )
     char args[MAX_STRING_LENGTH];
 
     strcpy( args, cArguments.c_str( ) );
-    run( ch->getPC( ), args );	
+    run( ch->getPC( ), args );        
 }
 
 /*--------------------------------------------------------------------------
@@ -72,28 +72,28 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
     Descriptor *d;
     
     if (iargs.ch->is_npc( ))
-	return true;
+        return true;
     
     d = iargs.d;
 
     if (!d || d->handle_input.empty( ))
-	return true;
+        return true;
     
     state = d->handle_input.front( ).getDynamicPointer<OLCState>( );
 
     if (!state)
-	return true;
+        return true;
     
     if(iargs.cmdName.empty())
-	iargs.cmdName = "show";
+        iargs.cmdName = "show";
 
     if(iargs.cmdName == "?")
-	iargs.cmdName = "olchelp";
+        iargs.cmdName = "olchelp";
 
     iargs.pCommand = state->findCommand( iargs.ch->getPC( ), iargs.cmdName );
 
     if (iargs.pCommand)
-	iargs.advance( );
+        iargs.advance( );
     
     return true;
 }
@@ -112,9 +112,9 @@ OLCState::handle(Descriptor *d, char *arg)
     
     owner = d;
     if(inSedit.getValue( ))
-	strEditor.eval(arg);
+        strEditor.eval(arg);
     else
-	rc = InterpretHandler::handle(d, arg);
+        rc = InterpretHandler::handle(d, arg);
     owner = 0;
 
     return rc;
@@ -123,52 +123,52 @@ OLCState::handle(Descriptor *d, char *arg)
 void OLCState::prompt( Descriptor *d )
 {
     if(inSedit.getValue( ))
-	strEditor.prompt(d);
+        strEditor.prompt(d);
     else
-	statePrompt(d);
+        statePrompt(d);
 }
 
 void OLCState::attach( PCharacter *ch ) 
 {
     if (ch->desc)
-	ch->desc->handle_input.push_front( this );
+        ch->desc->handle_input.push_front( this );
 }
 
 void OLCState::detach( PCharacter *ch ) 
 {
     if (!ch->desc)
-	return;
+        return;
 
     handle_input_t::iterator i;
     handle_input_t &hi = ch->desc->handle_input;
 
     for(i = hi.begin(); i != hi.end(); i++)
-	if(**i == this) {
-	    hi.erase(i);
-	    return;
-	}
+        if(**i == this) {
+            hi.erase(i);
+            return;
+        }
 }
 
 
 bool OLCState::can_edit( Character *ch, int vnum )
 {
     if (!ch->is_npc( )) {
-	XMLAttributeOLC::Pointer attr;
-	int sec = ch->getPC( )->getSecurity();
-	
-	if (sec <= 0)
-	    return false;
-	else if (sec > 9)
-	    return true;
-	    
-	attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeOLC>( "olc" );
-	
-	if (attr) {
-	    XMLAttributeOLC::RangeList::iterator i;
-	    for (i = attr->vnums.begin( ); i != attr->vnums.end( ); i++) 
-		if (i->minVnum <= vnum && vnum <= i->maxVnum)
-		    return true;
-	}
+        XMLAttributeOLC::Pointer attr;
+        int sec = ch->getPC( )->getSecurity();
+        
+        if (sec <= 0)
+            return false;
+        else if (sec > 9)
+            return true;
+            
+        attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeOLC>( "olc" );
+        
+        if (attr) {
+            XMLAttributeOLC::RangeList::iterator i;
+            for (i = attr->vnums.begin( ); i != attr->vnums.end( ); i++) 
+                if (i->minVnum <= vnum && vnum <= i->maxVnum)
+                    return true;
+        }
     }
 
     return false;
@@ -177,28 +177,28 @@ bool OLCState::can_edit( Character *ch, int vnum )
 bool OLCState::can_edit( Character *ch, AREA_DATA *pArea )
 {
     if (!ch->is_npc( )) {
-	XMLAttributeOLC::Pointer attr;
-	int a = pArea->min_vnum, b = pArea->max_vnum;
-	int sec = ch->getPC( )->getSecurity();
-	
-	if (sec <= 0)
-	    return false;
-	else if (sec > 9)
-	    return true;
-	    
-	attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeOLC>( "olc" );
+        XMLAttributeOLC::Pointer attr;
+        int a = pArea->min_vnum, b = pArea->max_vnum;
+        int sec = ch->getPC( )->getSecurity();
+        
+        if (sec <= 0)
+            return false;
+        else if (sec > 9)
+            return true;
+            
+        attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeOLC>( "olc" );
 
-	if (attr) {
-	    XMLAttributeOLC::RangeList::iterator i;
-	    for (i = attr->vnums.begin( ); i != attr->vnums.end( ); i++) 
-		if ((a <= i->minVnum && i->maxVnum <= b)
-		    || (i->minVnum <= b && b <= i->maxVnum)
-		    || (i->minVnum <= a && a <= i->maxVnum))
-		{
-		    return true;
-		}
-	}
-		
+        if (attr) {
+            XMLAttributeOLC::RangeList::iterator i;
+            for (i = attr->vnums.begin( ); i != attr->vnums.end( ); i++) 
+                if ((a <= i->minVnum && i->maxVnum <= b)
+                    || (i->minVnum <= b && b <= i->maxVnum)
+                    || (i->minVnum <= a && a <= i->maxVnum))
+                {
+                    return true;
+                }
+        }
+                
     }
 
     return false;
@@ -210,9 +210,9 @@ AREA_DATA *OLCState::get_vnum_area(int vnum)
     AREA_DATA *pArea;
 
     for (pArea = area_first; pArea; pArea = pArea->next)
-	if (vnum >= pArea->min_vnum && vnum <= pArea->max_vnum)
-	    return pArea;
-	
+        if (vnum >= pArea->min_vnum && vnum <= pArea->max_vnum)
+            return pArea;
+        
     return 0;
 }
 
@@ -221,17 +221,17 @@ bool
 OLCState::sedit(DLString &original)
 {
     if(inSedit.getValue( )) {
-	ostringstream os;
-	strEditor.lines.tostream(os);
-	original = os.str( );
-	inSedit.setValue( false );
-	return true;
+        ostringstream os;
+        strEditor.lines.tostream(os);
+        original = os.str( );
+        inSedit.setValue( false );
+        return true;
     } else {
-	strEditor.clear( );
-	strEditor.setBuffer( original );
-	strEditor.clear_undo( );
-	inSedit.setValue( true );
-	return false;
+        strEditor.clear( );
+        strEditor.setBuffer( original );
+        strEditor.clear_undo( );
+        inSedit.setValue( true );
+        return false;
     }
 }
 
@@ -241,7 +241,7 @@ OLCState::sedit(XMLString &original)
     DLString orig = original.getValue( );
 
     if(!sedit(orig))
-	return false;
+        return false;
     
     original.setValue(orig);
     return true;
@@ -253,7 +253,7 @@ OLCState::sedit(char *&original)
     DLString orig = original;
     
     if(!sedit(orig))
-	return false;
+        return false;
     
     free_string(original);
     original = str_dup(orig.c_str( ));
@@ -265,21 +265,21 @@ OLCState::xmledit(XMLDocument::Pointer &xml)
 {
     ostringstream os;
     if(xml)
-	xml->save( os );
+        xml->save( os );
     
     DLString buf = os.str( );
     
     if(!sedit(buf))
-	return false;
+        return false;
 
     try {
-	XMLDocument::Pointer doc(NEW);
-	istringstream is( buf );
-	doc->load( is );
-	xml = doc;
-	return true;
+        XMLDocument::Pointer doc(NEW);
+        istringstream is( buf );
+        doc->load( is );
+        xml = doc;
+        return true;
     } catch(const exception &e ) {
-	owner->send((DLString("xml parse error: ") + e.what( ) + "\r\n").c_str( ));
+        owner->send((DLString("xml parse error: ") + e.what( ) + "\r\n").c_str( ));
     }
     return false;
 }
@@ -288,14 +288,14 @@ void
 OLCState::seditDone( )
 {
     if(!owner) {
-	LogStream::sendError() << "olc: seditDone: no owner" << endl;
-	return;
+        LogStream::sendError() << "olc: seditDone: no owner" << endl;
+        return;
     }
     
     Character *ch = owner->character;
     if(!ch) {
-	LogStream::sendError() << "olc: seditDone: no character" << endl;
-	return;
+        LogStream::sendError() << "olc: seditDone: no character" << endl;
+        return;
     }
 
     PCharacter *pch = ch->getPC( );
@@ -305,16 +305,16 @@ OLCState::seditDone( )
     cmd = findCommand(pch, lastCmd.getValue( ).c_str( ));
 
     if(!cmd) {
-	LogStream::sendError() << "olc: seditDone: command not found to repeat" << endl;
-	return;
+        LogStream::sendError() << "olc: seditDone: command not found to repeat" << endl;
+        return;
     }
     
     cmd->run(pch, lastArgs.getValue( ).c_str( ));
 
     if(inSedit.getValue( )) {
-	LogStream::sendError() << "olc: seditDone: still in sedit after command repeat" << endl;
-	inSedit.setValue( false );
-	return;
+        LogStream::sendError() << "olc: seditDone: still in sedit after command repeat" << endl;
+        inSedit.setValue( false );
+        return;
     }
     strEditor.clear( );
 }

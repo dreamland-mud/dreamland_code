@@ -48,28 +48,28 @@ void DLDirectory::open( ) throw( ExceptionDBIO )
     dirp = opendir( path.c_str( ) );
     
     if (dirp == 0) 
-	throw ExceptionDBIO( "Unable to open '" + path + "' directory" );
+        throw ExceptionDBIO( "Unable to open '" + path + "' directory" );
 }
 
 void DLDirectory::close( )
 {
     if (dirp != 0) {
-	CLOSEDIR( dirp );
-	dirp = 0;
+        CLOSEDIR( dirp );
+        dirp = 0;
     }
 }
 
 DLFile DLDirectory::nextEntry( ) throw( ExceptionDBIOEOF )
 {
     if (dirp == 0)
-	throw ExceptionDBIO( "Directory '" + path + "' already closed" );
+        throw ExceptionDBIO( "Directory '" + path + "' already closed" );
 
     dirent *dp = readdir( dirp );
 
 
     if (dp == 0) {
-	close( );
-	throw ExceptionDBIOEOF( );
+        close( );
+        throw ExceptionDBIOEOF( );
     }
 
     return DLFile( dp->d_name );
@@ -81,11 +81,11 @@ DLFile DLDirectory::nextTypedEntry( const DLString &fileExt ) throw( ExceptionDB
     DLFile global( *this, local );
 
     if (global.isDirectory( )) {
-	return nextTypedEntry( fileExt );
+        return nextTypedEntry( fileExt );
     }
     
     if (local.getFileExt( ) != fileExt) {
-	return nextTypedEntry( fileExt );
+        return nextTypedEntry( fileExt );
     }
     
     return local;
@@ -100,7 +100,7 @@ DLFile DLDirectory::tempEntry( ) throw( ExceptionDBIO )
     pTemplate = mktemp( templateBuf );
     
     if (!pTemplate) 
-	throw ExceptionDBIO( "Unable to create tmp file in '" + path + "'" );
+        throw ExceptionDBIO( "Unable to create tmp file in '" + path + "'" );
 
     return DLFile( pTemplate );
 }

@@ -19,24 +19,24 @@
 class XMLChar : public Char
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLChar( ) : Char( )
-	{
-	}
-	
-	inline XMLChar( char value ) : Char( value )
-	{
-	}
-	
-	inline XMLChar( const DLString& value ) throw( ExceptionBadType )
-		: Char( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** По умолчанию значение \0 */
+        inline XMLChar( ) : Char( )
+        {
+        }
+        
+        inline XMLChar( char value ) : Char( value )
+        {
+        }
+        
+        inline XMLChar( const DLString& value ) throw( ExceptionBadType )
+                : Char( value )
+        {
+        }
+        
+        /** Возвращает xml представление переменной */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** Инициализация класса из xml данных */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
@@ -46,8 +46,8 @@ public:
 /** Вывод в ostream типа XMLChar */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLChar& xmlChar )
 {
-	ostr << xmlChar.getValue( );
-	return ostr;
+        ostr << xmlChar.getValue( );
+        return ostr;
 }
 
 #endif

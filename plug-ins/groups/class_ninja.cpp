@@ -51,54 +51,54 @@ SKILL_RUNP( vanish )
 
     if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
     {
-	    ch->send_to("Что?\n\r");
-	    return;
+            ch->send_to("Что?\n\r");
+            return;
     }
     
     if (ch->mana < gsn_vanish->getMana( ))
     {
-	    ch->send_to("У тебя недостаточно энергии для этого.\n\r" );
-	    return;
+            ch->send_to("У тебя недостаточно энергии для этого.\n\r" );
+            return;
     }
 
     if ( ch->death_ground_delay > 0
-	    && ch->trap.isSet( TF_NO_MOVE ) )
+            && ch->trap.isSet( TF_NO_MOVE ) )
     {
-	    ch->send_to("Ты не можешь покинуть это место - без посторонней помощи!\n\r");
-	    return;
+            ch->send_to("Ты не можешь покинуть это место - без посторонней помощи!\n\r");
+            return;
     }
 
     if (ch->mount) {
-	ch->pecho( "Ты не можешь исчезнуть, пока ты верхом или оседла%Gно|н|на!", ch );
-	return;
+        ch->pecho( "Ты не можешь исчезнуть, пока ты верхом или оседла%Gно|н|на!", ch );
+        return;
     }
 
     ch->mana -= gsn_vanish->getMana( );
     ch->setWait( gsn_vanish->getBeats( )  );
     
     if (ch->isAffected(gsn_vanish)) {
-	ch->send_to("Тебе пока нечего бросить.\r\n");
-	return;
+        ch->send_to("Тебе пока нечего бросить.\r\n");
+        return;
     }
     
     if (number_percent() > gsn_vanish->getEffective( ch ) )
     {
-	    ch->send_to("Твоя попытка закончилась неудачей!\n\r");
-	    gsn_vanish->improve( ch, false );
-	    return;
+            ch->send_to("Твоя попытка закончилась неудачей!\n\r");
+            gsn_vanish->improve( ch, false );
+            return;
     }
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
     {
-	ch->send_to("Твоя попытка закончилась неудачей!\n\r");
-	return;
+        ch->send_to("Твоя попытка закончилась неудачей!\n\r");
+        return;
     }
 
     pRoomIndex = get_random_room_vanish( ch );
     
     if (!pRoomIndex) {
-	ch->send_to("Твоя попытка закончилась неудачей!\n\r");
-	return;
+        ch->send_to("Твоя попытка закончилась неудачей!\n\r");
+        return;
     }
     
   act_p( "$c1 бросает на землю небольшой шар.", ch, 0, 0, TO_ROOM,POS_RESTING);
@@ -113,9 +113,9 @@ SKILL_RUNP( vanish )
   }
     
     transfer_char( ch, ch, pRoomIndex,
-	    "%1^C1 исчезает!",
-	    "Ты исчезаешь!",
-	    "%1^C1 появляется из ничего." );
+            "%1^C1 исчезает!",
+            "Ты исчезаешь!",
+            "%1^C1 появляется из ничего." );
 }
 
 /*
@@ -124,78 +124,78 @@ SKILL_RUNP( vanish )
 
 SKILL_RUNP( nerve )
 {
-	Character *victim;
-	char arg[MAX_INPUT_LENGTH];
+        Character *victim;
+        char arg[MAX_INPUT_LENGTH];
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("Только не верхом!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("Только не верхом!\n\r");
+                return;
+        }
 
-	one_argument(argument,arg);
+        one_argument(argument,arg);
 
-	if (!gsn_nerve->usable( ch ) )
-	{
-		ch->send_to("Ты не владеешь этой техникой.\n\r");
-		return;
-	}
+        if (!gsn_nerve->usable( ch ) )
+        {
+                ch->send_to("Ты не владеешь этой техникой.\n\r");
+                return;
+        }
 
-	if (ch->fighting == 0)
-	{
-		ch->send_to("Сейчас ты не сражаешься.\n\r");
-		return;
-	}
+        if (ch->fighting == 0)
+        {
+                ch->send_to("Сейчас ты не сражаешься.\n\r");
+                return;
+        }
 
-	victim = ch->fighting;
+        victim = ch->fighting;
 
-	if ( is_safe(ch,victim) )
-		return;
+        if ( is_safe(ch,victim) )
+                return;
 
-	if ( ch->isAffected(gsn_nerve) )
-	{
-		ch->send_to("Ты не можешь сделать его еще слабее.\n\r");
-		return;
-	}
+        if ( ch->isAffected(gsn_nerve) )
+        {
+                ch->send_to("Ты не можешь сделать его еще слабее.\n\r");
+                return;
+        }
 
-	ch->setWait( gsn_nerve->getBeats( )  );
+        ch->setWait( gsn_nerve->getBeats( )  );
 
-	if ( ch->is_npc()
-		|| number_percent() < (gsn_nerve->getEffective( ch ) + ch->getModifyLevel()
-					+ ch->getCurrStat(STAT_DEX))/2 )
-	{
-		Affect af;
-		af.where  = TO_AFFECTS;
-		af.type 	= gsn_nerve;
-		af.level 	= ch->getModifyLevel();
-		af.duration = ch->getModifyLevel() / 20;
-		af.location = APPLY_STR;
-		af.modifier = -3;
-		af.bitvector = 0;
+        if ( ch->is_npc()
+                || number_percent() < (gsn_nerve->getEffective( ch ) + ch->getModifyLevel()
+                                        + ch->getCurrStat(STAT_DEX))/2 )
+        {
+                Affect af;
+                af.where  = TO_AFFECTS;
+                af.type         = gsn_nerve;
+                af.level         = ch->getModifyLevel();
+                af.duration = ch->getModifyLevel() / 20;
+                af.location = APPLY_STR;
+                af.modifier = -3;
+                af.bitvector = 0;
 
-		affect_to_char(victim,&af);
-		act_p("Ты ослабляешь $C4, пережимая нервные точки.",ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 ослабляет тебя, пережимая твои нервные точки.",ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
-		gsn_nerve->improve( ch, true, victim );
-	}
+                affect_to_char(victim,&af);
+                act_p("Ты ослабляешь $C4, пережимая нервные точки.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("$c1 ослабляет тебя, пережимая твои нервные точки.",ch,0,victim,TO_VICT,POS_RESTING);
+                act_p("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                gsn_nerve->improve( ch, true, victim );
+        }
   else
-	{
-		ch->send_to("Ты нажимаешь не туда, куда надо.\n\r");
-		act_p("$c1 нажимает пальцами на твое тело, но ничего не происходит.",
-			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 нажимает пальцами на тело $C2, но ничего не происходит.",
-			ch,0,victim,TO_NOTVICT,POS_RESTING);
-		gsn_nerve->improve( ch, false, victim );
-	}
+        {
+                ch->send_to("Ты нажимаешь не туда, куда надо.\n\r");
+                act_p("$c1 нажимает пальцами на твое тело, но ничего не происходит.",
+                        ch,0,victim,TO_VICT,POS_RESTING);
+                act_p("$c1 нажимает пальцами на тело $C2, но ничего не происходит.",
+                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                gsn_nerve->improve( ch, false, victim );
+        }
 
-	if (!victim->fighting) {
-	    yell_panic( ch, victim,
-			"Помогите! Меня кто-то трогает!",
-			"Убери свои руки, %1$C1!" );
-	
-	    multi_hit(victim,ch);
-	}
+        if (!victim->fighting) {
+            yell_panic( ch, victim,
+                        "Помогите! Меня кто-то трогает!",
+                        "Убери свои руки, %1$C1!" );
+        
+            multi_hit(victim,ch);
+        }
 }
 
 /*
@@ -227,9 +227,9 @@ SKILL_RUNP( endure )
 
   ch->setWait( gsn_endure->getBeats( )  );
 
-  af.where 	= TO_AFFECTS;
-  af.type 	= gsn_endure;
-  af.level 	= ch->getModifyLevel();
+  af.where         = TO_AFFECTS;
+  af.type         = gsn_endure;
+  af.level         = ch->getModifyLevel();
   af.duration   = ch->getModifyLevel() / 4;
   af.location = APPLY_SAVING_SPELL;
   af.modifier = -1 * (gsn_endure->getEffective( ch ) / 10);
@@ -253,8 +253,8 @@ public:
 };
 
 AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
-	    : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-	      SkillDamage( ch, victim, gsn_assassinate, 0, 0, DAMF_WEAPON )
+            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
+              SkillDamage( ch, victim, gsn_assassinate, 0, 0, DAMF_WEAPON )
 {
 }
 void AssassinateOneHit::calcDamage( )
@@ -266,28 +266,28 @@ void AssassinateOneHit::calcDamage( )
     damApplyPosition( );
     
     if (victim->is_immortal( ))
-	chance = 0;
+        chance = 0;
     else if (IS_AWAKE( victim ))
-	chance = 10;
+        chance = 10;
     else { /* XXX */
-	chance = 5 + (ch->getModifyLevel( ) - victim->getModifyLevel( )) * 2;
-	chance = URANGE( 5, chance, 20 );
+        chance = 5 + (ch->getModifyLevel( ) - victim->getModifyLevel( )) * 2;
+        chance = URANGE( 5, chance, 20 );
     }
 
     if (number_percent( ) <= chance) {
-	act_p("Ты {R+++ASSASSINATE+++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 {R+++ASSASSINATES+++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-	act_p("$c1 {R+++ASSASSINATES+++{x тебя!",ch,0,victim,TO_VICT,POS_DEAD);
+        act_p("Ты {R+++ASSASSINATE+++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 {R+++ASSASSINATES+++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act_p("$c1 {R+++ASSASSINATES+++{x тебя!",ch,0,victim,TO_VICT,POS_DEAD);
 
-	gsn_assassinate->improve( ch, true, victim );
+        gsn_assassinate->improve( ch, true, victim );
 
-	handleDeath( );
-	throw VictimDeathException( );
+        handleDeath( );
+        throw VictimDeathException( );
     }
     else
     {
-	gsn_assassinate->improve( ch, false, victim );
-	dam *= 2;
+        gsn_assassinate->improve( ch, false, victim );
+        dam *= 2;
     }
 
     damApplyDamroll( );
@@ -305,112 +305,112 @@ SKILL_RUNP( assassinate )
 
     if ( MOUNTED(ch) )
     {
-	    ch->send_to("Только не верхом!\n\r");
-	    return;
+            ch->send_to("Только не верхом!\n\r");
+            return;
     }
     one_argument( argument, arg );
 
     if ( ch->master != 0 && ch->is_npc() )
-	    return;
+            return;
 
     if ( !ch->is_npc() && !gsn_assassinate->usable( ch ) )
     {
-	    ch->send_to("Ты не имеешь понятия, как это делается.\n\r");
-	    return;
+            ch->send_to("Ты не имеешь понятия, как это делается.\n\r");
+            return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )
     {
-	    ch->send_to( "Ты же не хочешь убить своего любимого хозяина.\n\r");
-	    return;
+            ch->send_to( "Ты же не хочешь убить своего любимого хозяина.\n\r");
+            return;
     }
 
     if ( arg[0] == '\0' )
     {
-	    ch->send_to("Кого убиваем СЕГОДНЯ?\n\r");
-	    return;
+            ch->send_to("Кого убиваем СЕГОДНЯ?\n\r");
+            return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-	    ch->send_to("Этого нет здесь.\n\r");
-	    return;
+            ch->send_to("Этого нет здесь.\n\r");
+            return;
     }
 
     if ( victim == ch )
     {
-	    ch->send_to("Твой путь не включает в себя суицид.\n\r");
-	    return;
+            ch->send_to("Твой путь не включает в себя суицид.\n\r");
+            return;
     }
 
     if ( is_safe( ch, victim ) )
-	    return;
+            return;
 
     if ( victim->is_immortal() && !victim->is_npc() )
     {
-	    ch->send_to("Оопс.. руки не находят нужного им.\n\r");
-	    return;
+            ch->send_to("Оопс.. руки не находят нужного им.\n\r");
+            return;
     }
 
     if ( victim->fighting != 0 )
     {
-	    ch->send_to("Подожди, пока закончится сражение.\n\r");
-	    return;
+            ch->send_to("Подожди, пока закончится сражение.\n\r");
+            return;
     }
     
     const GlobalBitvector &loc = ch->getWearloc( );
     
     if (!loc.isSet( wear_hands )
-	|| !loc.isSet( wear_wrist_l )
-	|| !loc.isSet( wear_wrist_r ))
+        || !loc.isSet( wear_wrist_l )
+        || !loc.isSet( wear_wrist_r ))
     {
-	ch->send_to("У тебя нет рук.\r\n");
-	return;
+        ch->send_to("У тебя нет рук.\r\n");
+        return;
     }
 
-    if (!check_bare_hands(ch))	
+    if (!check_bare_hands(ch))        
     {
-	    ch->send_to("Освободи обе руки для этого.\n\r");
-	    return;
+            ch->send_to("Освободи обе руки для этого.\n\r");
+            return;
     }
 
     if ( victim->hit < victim->max_hit
-	    && victim->can_see(ch)
-	    && IS_AWAKE(victim) )
+            && victim->can_see(ch)
+            && IS_AWAKE(victim) )
     {
-	    act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается.. ты не можешь подкрасться.",
-		    ch, 0, victim, TO_CHAR,POS_RESTING);
-	    return;
+            act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается.. ты не можешь подкрасться.",
+                    ch, 0, victim, TO_CHAR,POS_RESTING);
+            return;
     }
 
     if (IS_SET(victim->imm_flags, IMM_WEAPON))
     {
-	    act_p("$C1 имеет слишком крепкую шею, чтобы ее можно было сломать.", ch, 0,
-		    victim, TO_CHAR,POS_RESTING);
-	    return;
+            act_p("$C1 имеет слишком крепкую шею, чтобы ее можно было сломать.", ch, 0,
+                    victim, TO_CHAR,POS_RESTING);
+            return;
     }
 
     if (gsn_rear_kick->getCommand( )->run( ch, victim ))
-	return;
+        return;
 
     ch->setWait( gsn_assassinate->getBeats( )  );
     AssassinateOneHit ass( ch, victim );
     
     try {
-	if ( ch->is_npc()
-		|| number_percent( ) < (gsn_assassinate->getEffective( ch ) * 0.7) )
-	{
-		ass.hit( );
-	}
-	else
-	{
-		gsn_assassinate->improve( ch, false, victim );
-		ass.miss( );
-	}
-	
-	yell_panic( ch, victim,
-	            "Помогите! Кто-то пытается УБИТЬ меня!",
-		    "Помогите! %1$^C1 пытается УБИТЬ меня!" );
+        if ( ch->is_npc()
+                || number_percent( ) < (gsn_assassinate->getEffective( ch ) * 0.7) )
+        {
+                ass.hit( );
+        }
+        else
+        {
+                gsn_assassinate->improve( ch, false, victim );
+                ass.miss( );
+        }
+        
+        yell_panic( ch, victim,
+                    "Помогите! Кто-то пытается УБИТЬ меня!",
+                    "Помогите! %1$^C1 пытается УБИТЬ меня!" );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -457,39 +457,39 @@ SKILL_RUNP( caltraps )
       damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
 
       if (!victim->isAffected(gsn_caltraps))
-	{
-	  Affect tohit,todam,todex;
+        {
+          Affect tohit,todam,todex;
 
-	  tohit.where     = TO_AFFECTS;
-	  tohit.type      = gsn_caltraps;
-	  tohit.level     = ch->getModifyLevel();
-	  tohit.duration  = -1;
-	  tohit.location  = APPLY_HITROLL;
-	  tohit.modifier  = -5;
-	  tohit.bitvector = 0;
-	  affect_to_char( victim, &tohit );
+          tohit.where     = TO_AFFECTS;
+          tohit.type      = gsn_caltraps;
+          tohit.level     = ch->getModifyLevel();
+          tohit.duration  = -1;
+          tohit.location  = APPLY_HITROLL;
+          tohit.modifier  = -5;
+          tohit.bitvector = 0;
+          affect_to_char( victim, &tohit );
 
-	  todam.where = TO_AFFECTS;
-	  todam.type = gsn_caltraps;
-	  todam.level = ch->getModifyLevel();
-	  todam.duration = -1;
-	  todam.location = APPLY_DAMROLL;
-	  todam.modifier = -5;
-	  todam.bitvector = 0;
-	  affect_to_char( victim, &todam);
+          todam.where = TO_AFFECTS;
+          todam.type = gsn_caltraps;
+          todam.level = ch->getModifyLevel();
+          todam.duration = -1;
+          todam.location = APPLY_DAMROLL;
+          todam.modifier = -5;
+          todam.bitvector = 0;
+          affect_to_char( victim, &todam);
 
-	  todex.type = gsn_caltraps;
-	  todex.level = ch->getModifyLevel();
-	  todex.duration = -1;
-	  todex.location = APPLY_DEX;
-	  todex.modifier = -5;
-	  todex.bitvector = 0;
-	  affect_to_char( victim, &todex);
+          todex.type = gsn_caltraps;
+          todex.level = ch->getModifyLevel();
+          todex.duration = -1;
+          todex.location = APPLY_DEX;
+          todex.modifier = -5;
+          todex.bitvector = 0;
+          affect_to_char( victim, &todex);
 
-	  act_p("$C1 начинает хромать.",ch,0,victim,TO_CHAR,POS_RESTING);
-	  act_p("Ты начинаешь хромать.",ch,0,victim,TO_VICT,POS_RESTING);
-	  gsn_caltraps->improve( ch, true, victim );
-	}
+          act_p("$C1 начинает хромать.",ch,0,victim,TO_CHAR,POS_RESTING);
+          act_p("Ты начинаешь хромать.",ch,0,victim,TO_VICT,POS_RESTING);
+          gsn_caltraps->improve( ch, true, victim );
+        }
     } catch (const VictimDeathException &) {
     }
 }
@@ -501,121 +501,121 @@ SKILL_RUNP( caltraps )
 
 SKILL_RUNP( throwdown )
 {
-	Character *victim;
-	char arg[MAX_INPUT_LENGTH];
-	int chance, dam;
+        Character *victim;
+        char arg[MAX_INPUT_LENGTH];
+        int chance, dam;
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("Нельзя никого бросить, сидя в седле!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("Нельзя никого бросить, сидя в седле!\n\r");
+                return;
+        }
 
-	argument = one_argument(argument,arg);
+        argument = one_argument(argument,arg);
 
-	if ( ch->is_npc() || !gsn_throw->usable( ch ) )
-	{
-		ch->send_to("Ты не умеешь бросать через плечо!\n\r");
-		return;
-	}
+        if ( ch->is_npc() || !gsn_throw->usable( ch ) )
+        {
+                ch->send_to("Ты не умеешь бросать через плечо!\n\r");
+                return;
+        }
 
-	if (is_flying( ch ))
-	{
-		ch->send_to("Твои ноги должны стоять на земле для упора.\n\r");
-		return;
-	}
+        if (is_flying( ch ))
+        {
+                ch->send_to("Твои ноги должны стоять на земле для упора.\n\r");
+                return;
+        }
 
-	if ( ( victim = ch->fighting ) == 0 )
-	{
-		ch->send_to("Сейчас ты не сражаешься.\n\r");
-		return;
-	}
+        if ( ( victim = ch->fighting ) == 0 )
+        {
+                ch->send_to("Сейчас ты не сражаешься.\n\r");
+                return;
+        }
 
-	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
-	{
-		act_p("Но $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        {
+                act_p("Но $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if (is_safe(ch,victim))
-		return;
+        if (is_safe(ch,victim))
+                return;
 
-	if( !ch->is_npc() && !ch->move )
-	{
-		ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
-		return;
-	}
-	else
-		ch->move -= move_dec( ch );
+        if( !ch->is_npc() && !ch->move )
+        {
+                ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+                return;
+        }
+        else
+                ch->move -= move_dec( ch );
 
-	ch->setWait( gsn_throw->getBeats( )  );
+        ch->setWait( gsn_throw->getBeats( )  );
 
-	if (victim->isAffected(gsn_protective_shield))
-	{
-		act_p("{YУ тебя не получилось добраться до $X.{x",
-					ch,0,victim, TO_CHAR,POS_FIGHTING);
-		act_p("{Y$c1 не смо$gгло|г|гла бросить тебя, натолкнувшись на защитный щит.{x",
-					ch, 0, victim, TO_VICT,POS_FIGHTING);
-		act_p("{Y$c1 распластывается по защитному щиту $C2 в попытке броска.{x",
-					ch,0,victim,TO_NOTVICT,POS_FIGHTING);
-		return;
-	}
+        if (victim->isAffected(gsn_protective_shield))
+        {
+                act_p("{YУ тебя не получилось добраться до $X.{x",
+                                        ch,0,victim, TO_CHAR,POS_FIGHTING);
+                act_p("{Y$c1 не смо$gгло|г|гла бросить тебя, натолкнувшись на защитный щит.{x",
+                                        ch, 0, victim, TO_VICT,POS_FIGHTING);
+                act_p("{Y$c1 распластывается по защитному щиту $C2 в попытке броска.{x",
+                                        ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+                return;
+        }
 
-	chance = gsn_throw->getEffective( ch ) * 4 / 5;
+        chance = gsn_throw->getEffective( ch ) * 4 / 5;
 
-	if (ch->size < victim->size)
-		chance += (ch->size - victim->size) * 25;
-	else
-		chance += (ch->size - victim->size) * 10;
+        if (ch->size < victim->size)
+                chance += (ch->size - victim->size) * 25;
+        else
+                chance += (ch->size - victim->size) * 10;
 
-	/* stats */
-	chance += ch->getCurrStat(STAT_STR);
-	chance -= victim->getCurrStat(STAT_DEX) * 4/3;
+        /* stats */
+        chance += ch->getCurrStat(STAT_STR);
+        chance -= victim->getCurrStat(STAT_DEX) * 4/3;
 
-	if (is_flying( victim ) )
-		chance -= 10;
+        if (is_flying( victim ) )
+                chance -= 10;
 
-	/* speed */
+        /* speed */
         if (IS_QUICK(ch))
-		chance += 10;
+                chance += 10;
         if (IS_QUICK(victim))
-		chance -= 20;
+                chance -= 20;
 
-	/* level */
-	chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        /* level */
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
 
-	if ( ch->is_npc() || number_percent() < chance )
-	{
-	    if ( number_percent() < 70 ) {
-		act_p("Ты бросаешь $C4 с ошеломляющей силой.",
-			ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 бросает тебя с ошеломляющей силой.",
-			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 бросает $C4 с ошеломляющей силой.",
-			ch,0,victim,TO_NOTVICT,POS_RESTING);
-		victim->setWaitViolence( 2 );
+        if ( ch->is_npc() || number_percent() < chance )
+        {
+            if ( number_percent() < 70 ) {
+                act_p("Ты бросаешь $C4 с ошеломляющей силой.",
+                        ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("$c1 бросает тебя с ошеломляющей силой.",
+                        ch,0,victim,TO_VICT,POS_RESTING);
+                act_p("$c1 бросает $C4 с ошеломляющей силой.",
+                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                victim->setWaitViolence( 2 );
 
-		victim->position = POS_RESTING;
-	    }
-	    else {
-		act("Ты бросаешь $C4 через плечо.", ch,0,victim,TO_CHAR);
-		act("$c1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
-		act("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
-	    }	
+                victim->position = POS_RESTING;
+            }
+            else {
+                act("Ты бросаешь $C4 через плечо.", ch,0,victim,TO_CHAR);
+                act("$c1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
+                act("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
+            }        
 
-	    dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
-	    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+            dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
+            gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
 
-	    damage( ch, victim, dam, gsn_throw, DAM_BASH, true, DAMF_WEAPON );
-	    gsn_throw->improve( ch, true, victim );
-	}
-	else
-	{
-	    act( "Твой бросок не удался.", ch, 0, 0, TO_CHAR);
-	    act( "$C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
-	    act( "$c1 пытается ухватиться за $C4 поудобнее. Но безуспешно.", ch, 0, victim, TO_NOTVICT);
-	    gsn_throw->improve( ch, false, victim );
-	}
+            damage( ch, victim, dam, gsn_throw, DAM_BASH, true, DAMF_WEAPON );
+            gsn_throw->improve( ch, true, victim );
+        }
+        else
+        {
+            act( "Твой бросок не удался.", ch, 0, 0, TO_CHAR);
+            act( "$C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
+            act( "$c1 пытается ухватиться за $C4 поудобнее. Но безуспешно.", ch, 0, victim, TO_NOTVICT);
+            gsn_throw->improve( ch, false, victim );
+        }
 }
 
 /*
@@ -624,122 +624,122 @@ SKILL_RUNP( throwdown )
 
 SKILL_RUNP( strangle )
 {
-	Character *victim;
-	Affect af;
-	int chance;
+        Character *victim;
+        Affect af;
+        int chance;
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("Только не верхом!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("Только не верхом!\n\r");
+                return;
+        }
 
-	if ( ch->is_npc() || !gsn_strangle->usable( ch ) )
-	{
-		ch->send_to("Ты не умеешь душить.\n\r");
-		return;
-	}
+        if ( ch->is_npc() || !gsn_strangle->usable( ch ) )
+        {
+                ch->send_to("Ты не умеешь душить.\n\r");
+                return;
+        }
 
-	const GlobalBitvector &loc = ch->getWearloc( );
-	
-	if (!loc.isSet( wear_hands )
-	    || !loc.isSet( wear_wrist_l )
-	    || !loc.isSet( wear_wrist_r ))
-	{
-	    ch->send_to("У тебя нет рук.\r\n");
-	    return;
-	}
+        const GlobalBitvector &loc = ch->getWearloc( );
+        
+        if (!loc.isSet( wear_hands )
+            || !loc.isSet( wear_wrist_l )
+            || !loc.isSet( wear_wrist_r ))
+        {
+            ch->send_to("У тебя нет рук.\r\n");
+            return;
+        }
 
-	if (!check_bare_hands(ch))	
-	{
-		ch->send_to("Освободи обе руки для этого.\n\r");
-		return;
-	}
+        if (!check_bare_hands(ch))        
+        {
+                ch->send_to("Освободи обе руки для этого.\n\r");
+                return;
+        }
 
-	if ( IS_AFFECTED( ch, AFF_CHARM ) )
-	{
-		ch->send_to("Ты же не хочешь придушить своего хозяина?\n\r");
-		return;
-	}
+        if ( IS_AFFECTED( ch, AFF_CHARM ) )
+        {
+                ch->send_to("Ты же не хочешь придушить своего хозяина?\n\r");
+                return;
+        }
 
-	if ( (victim = get_char_room(ch,argument)) == 0 )
-	{
-		ch->send_to("Здесь таких нет.\n\r");
-		return;
-	}
+        if ( (victim = get_char_room(ch,argument)) == 0 )
+        {
+                ch->send_to("Здесь таких нет.\n\r");
+                return;
+        }
 
-	if ( ch == victim )
-	{
-		ch->send_to("У тебя боязнь себя?\n\r");
-		return;
-	}
+        if ( ch == victim )
+        {
+                ch->send_to("У тебя боязнь себя?\n\r");
+                return;
+        }
 
-	if ( victim->isAffected(gsn_strangle) )
-		return;
+        if ( victim->isAffected(gsn_strangle) )
+                return;
 
-	if ( is_safe(ch,victim) )
-	{
-		ch->send_to("Боги защищают твою жертву.\n\r");
-		return;
-	}
-	
-	if (gsn_rear_kick->getCommand( )->run( ch, victim ))
-	    return;
+        if ( is_safe(ch,victim) )
+        {
+                ch->send_to("Боги защищают твою жертву.\n\r");
+                return;
+        }
+        
+        if (gsn_rear_kick->getCommand( )->run( ch, victim ))
+            return;
 
-	int k = victim->getLastFightDelay( );
+        int k = victim->getLastFightDelay( );
 
-	if (k >= 0 && k < FIGHT_DELAY_TIME)
-	    k = k * 100 / FIGHT_DELAY_TIME;
-	else
-	    k = 100;
-	
-	UNSET_DEATH_TIME(ch);
-	victim->setLastFightTime( );
-	ch->setLastFightTime( );
+        if (k >= 0 && k < FIGHT_DELAY_TIME)
+            k = k * 100 / FIGHT_DELAY_TIME;
+        else
+            k = 100;
+        
+        UNSET_DEATH_TIME(ch);
+        victim->setLastFightTime( );
+        ch->setLastFightTime( );
 
-	ch->setWait( gsn_strangle->getBeats( ) );
+        ch->setWait( gsn_strangle->getBeats( ) );
 
-	chance = ( int ) ( 0.6 * gsn_strangle->getEffective( ch ) );
-	chance += URANGE(0, (ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
-	chance += victim->can_see(ch) ? 0 : 5;
+        chance = ( int ) ( 0.6 * gsn_strangle->getEffective( ch ) );
+        chance += URANGE(0, (ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
+        chance += victim->can_see(ch) ? 0 : 5;
 
-	if (victim->isAffected(gsn_backguard)) 
-	    chance /= 2;
-	
-	if ( ch->is_npc() || number_percent() < chance * k / 100 )
-	{
-		act_p("Ты смыкаешь руки на шее $C2 и $E погружается в сон.",
-			ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 смыкает руки на твоей шее и ты погружаешься в сон.",
-			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("$c1 смыкает руки на шее $C2 и $E погружается в сон.",
-			ch,0,victim,TO_NOTVICT,POS_RESTING);
-		gsn_strangle->improve( ch, true, victim );
-	
-		af.type = gsn_strangle;
-		af.where = TO_AFFECTS;
-		af.level = ch->getModifyLevel();
-		af.duration = ch->getModifyLevel() / 20 + 1;
-		af.location = APPLY_NONE;
-		af.modifier = 0;
-		af.bitvector = AFF_SLEEP;
-		affect_join ( victim,&af );
-		
-		set_violent( ch, victim, true );
-		set_backguard( victim );
+        if (victim->isAffected(gsn_backguard)) 
+            chance /= 2;
+        
+        if ( ch->is_npc() || number_percent() < chance * k / 100 )
+        {
+                act_p("Ты смыкаешь руки на шее $C2 и $E погружается в сон.",
+                        ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("$c1 смыкает руки на твоей шее и ты погружаешься в сон.",
+                        ch,0,victim,TO_VICT,POS_RESTING);
+                act_p("$c1 смыкает руки на шее $C2 и $E погружается в сон.",
+                        ch,0,victim,TO_NOTVICT,POS_RESTING);
+                gsn_strangle->improve( ch, true, victim );
+        
+                af.type = gsn_strangle;
+                af.where = TO_AFFECTS;
+                af.level = ch->getModifyLevel();
+                af.duration = ch->getModifyLevel() / 20 + 1;
+                af.location = APPLY_NONE;
+                af.modifier = 0;
+                af.bitvector = AFF_SLEEP;
+                affect_join ( victim,&af );
+                
+                set_violent( ch, victim, true );
+                set_backguard( victim );
 
-		if (IS_AWAKE(victim))
-			victim->position = POS_SLEEPING;
-	}
-	else
-	{
-		damage(ch,victim, 0, gsn_strangle, DAM_NONE, true, DAMF_WEAPON);
-		gsn_strangle->improve( ch, false, victim );
-		
-		yell_panic( ch, victim,
-		            "Помогите! Меня кто-то душит!",
-			    "Помогите! Меня душит %1$C1!" );
-	}
+                if (IS_AWAKE(victim))
+                        victim->position = POS_SLEEPING;
+        }
+        else
+        {
+                damage(ch,victim, 0, gsn_strangle, DAM_NONE, true, DAMF_WEAPON);
+                gsn_strangle->improve( ch, false, victim );
+                
+                yell_panic( ch, victim,
+                            "Помогите! Меня кто-то душит!",
+                            "Помогите! Меня душит %1$C1!" );
+        }
 }
 
 
@@ -749,62 +749,62 @@ SKILL_RUNP( strangle )
 
 SKILL_RUNP( poison )
 {
-	Character *tmp_vict;
+        Character *tmp_vict;
 
-	if (ch->is_npc())
-		return;
+        if (ch->is_npc())
+                return;
 
-	if (!gsn_poison_smoke->usable( ch ))
-	{
-	    ch->send_to("Ась?\n\r");
-	    return;
-	}
+        if (!gsn_poison_smoke->usable( ch ))
+        {
+            ch->send_to("Ась?\n\r");
+            return;
+        }
 
-	if ( ch->mana < gsn_poison_smoke->getMana( ) )
-	{
-		ch->send_to("У тебя не хватает энергии для этого.\n\r");
-		return;
-	}
+        if ( ch->mana < gsn_poison_smoke->getMana( ) )
+        {
+                ch->send_to("У тебя не хватает энергии для этого.\n\r");
+                return;
+        }
 
-	ch->mana -= gsn_poison_smoke->getMana( );
-	ch->setWait( gsn_poison_smoke->getBeats( ) );
-	UNSET_DEATH_TIME(ch);
+        ch->mana -= gsn_poison_smoke->getMana( );
+        ch->setWait( gsn_poison_smoke->getBeats( ) );
+        UNSET_DEATH_TIME(ch);
 
-	if ( number_percent() > gsn_poison_smoke->getEffective( ch ) )
-	{
-		ch->send_to("Твоя попытка закончилась неудачей.\n\r");
-		gsn_poison_smoke->improve( ch, false );
-		return;
-	}
+        if ( number_percent() > gsn_poison_smoke->getEffective( ch ) )
+        {
+                ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+                gsn_poison_smoke->improve( ch, false );
+                return;
+        }
 
-	if (SHADOW(ch))
-	{
-		ch->send_to("Облако поглощается твоей тенью.\n\r");
-		return;
-	}
+        if (SHADOW(ch))
+        {
+                ch->send_to("Облако поглощается твоей тенью.\n\r");
+                return;
+        }
 
-	ch->send_to("Облако отравленного дыма наполнило комнату.\n\r");
-	act_p("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Облако отравленного дыма наполнило комнату.\n\r");
+        act_p("Облако отравленного дыма наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
 
-	gsn_poison_smoke->improve( ch, true );
+        gsn_poison_smoke->improve( ch, true );
 
-	for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
-	{
-		if ( !is_safe_spell(ch,tmp_vict,true) )
-		{
-			if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-			    yell_panic( ch, tmp_vict,
-					"Помогите! Меня пытаются отравить!",
-					"Помогите! %1$^C1 травит меня дымом!",
-					FYP_SLEEP );
+        for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
+        {
+                if ( !is_safe_spell(ch,tmp_vict,true) )
+                {
+                        if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
+                            yell_panic( ch, tmp_vict,
+                                        "Помогите! Меня пытаются отравить!",
+                                        "Помогите! %1$^C1 травит меня дымом!",
+                                        FYP_SLEEP );
 
-			spell( gsn_poison, ch->getModifyLevel( ), ch, tmp_vict );
+                        spell( gsn_poison, ch->getModifyLevel( ), ch, tmp_vict );
 
-			if (tmp_vict != ch)
-				multi_hit(tmp_vict,ch);
-	
-		}
-	}
+                        if (tmp_vict != ch)
+                                multi_hit(tmp_vict,ch);
+        
+                }
+        }
 }
 
 /*
@@ -813,60 +813,60 @@ SKILL_RUNP( poison )
 
 SKILL_RUNP( blindness )
 {
-	Character *tmp_vict;
+        Character *tmp_vict;
 
-	if (ch->is_npc())
-		return;
-	
-	if (!gsn_blindness_dust->usable(ch))
-	{
-	    ch->send_to("Ась?\n\r");
-	    return;
-	}
+        if (ch->is_npc())
+                return;
+        
+        if (!gsn_blindness_dust->usable(ch))
+        {
+            ch->send_to("Ась?\n\r");
+            return;
+        }
 
-	if (ch->mana < gsn_blindness_dust->getMana( ))
-	{
-		ch->send_to("У тебя не хватает энергии для этого.\n\r");
-		return;
-	}
+        if (ch->mana < gsn_blindness_dust->getMana( ))
+        {
+                ch->send_to("У тебя не хватает энергии для этого.\n\r");
+                return;
+        }
 
-	ch->mana -= gsn_blindness_dust->getMana( );
-	ch->setWait( gsn_blindness_dust->getBeats( ) );
-	UNSET_DEATH_TIME(ch);
+        ch->mana -= gsn_blindness_dust->getMana( );
+        ch->setWait( gsn_blindness_dust->getBeats( ) );
+        UNSET_DEATH_TIME(ch);
 
-	if (number_percent() > gsn_blindness_dust->getEffective( ch ) )
-	{
-		ch->send_to("Твоя попытка закончилась неудачей.\n\r");
-		gsn_blindness_dust->improve( ch, false );
-		return;
-	}
+        if (number_percent() > gsn_blindness_dust->getEffective( ch ) )
+        {
+                ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+                gsn_blindness_dust->improve( ch, false );
+                return;
+        }
 
-	if(SHADOW(ch))
-	{
-		ch->send_to("Облако поглощается твоей тенью.\n\r");
-		return;
-	}
+        if(SHADOW(ch))
+        {
+                ch->send_to("Облако поглощается твоей тенью.\n\r");
+                return;
+        }
 
-	ch->send_to("Облако пыли наполнило комнату.\n\r");
-	act_p("Облако пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Облако пыли наполнило комнату.\n\r");
+        act_p("Облако пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
 
-	gsn_blindness_dust->improve( ch, true );
+        gsn_blindness_dust->improve( ch, true );
 
-	for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
-	{
-	    if (!is_safe_spell(ch,tmp_vict,true))
-	    {
-		if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-		    yell_panic( ch, tmp_vict,
-				"Помогите! Кто-то слепит меня пылью!",
-				"Помогите! %1$^C1 слепит меня пылью!",
-				FYP_SLEEP );
-		
-		spell( gsn_blindness, ch->getModifyLevel( ), ch, tmp_vict );
+        for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
+        {
+            if (!is_safe_spell(ch,tmp_vict,true))
+            {
+                if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
+                    yell_panic( ch, tmp_vict,
+                                "Помогите! Кто-то слепит меня пылью!",
+                                "Помогите! %1$^C1 слепит меня пылью!",
+                                FYP_SLEEP );
+                
+                spell( gsn_blindness, ch->getModifyLevel( ), ch, tmp_vict );
 
-		if (tmp_vict != ch)
-			multi_hit(tmp_vict,ch);
-	    }
-	}
+                if (tmp_vict != ch)
+                        multi_hit(tmp_vict,ch);
+            }
+        }
 }
 

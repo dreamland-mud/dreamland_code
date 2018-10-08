@@ -20,19 +20,19 @@ public:
 
     virtual bool toXML( XMLNode::Pointer& parent ) const
     {
-	parent = node;
-	return true;
+        parent = node;
+        return true;
     }
     virtual void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
     {
-	node = parent;
+        node = parent;
     }
     virtual const DLString &getType( ) const
     {
-	return node->getAttribute( XMLNode::ATTRIBUTE_TYPE );
+        return node->getAttribute( XMLNode::ATTRIBUTE_TYPE );
     }
 
-private:	
+private:        
     XMLNode::Pointer node;
 };
 
@@ -48,35 +48,35 @@ public:
     }
 
     XMLPersistent(::Pointer<T> &p) {
-	setPointer(p.getPointer( ));
+        setPointer(p.getPointer( ));
     }
     XMLPersistent(T *p) {
-	setPointer(p);
+        setPointer(p);
     }
     
     void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
     {
-	try {
-	    Ptr::fromXML( parent );
-	
-	} catch (ExceptionXMLClassAllocate e) {
-	    setPointer( new Stub( parent ) );
-	}
+        try {
+            Ptr::fromXML( parent );
+        
+        } catch (ExceptionXMLClassAllocate e) {
+            setPointer( new Stub( parent ) );
+        }
     }
     inline void backup( )
     {
-	XMLNode::Pointer node( NEW );
-	
-	toXML( node );
-	setPointer( new Stub( node ) );
+        XMLNode::Pointer node( NEW );
+        
+        toXML( node );
+        setPointer( new Stub( node ) );
     }
 
     inline void recover( ) 
     {
-	XMLNode::Pointer node( NEW );
+        XMLNode::Pointer node( NEW );
 
-	toXML( node );
-	fromXML( node );
+        toXML( node );
+        fromXML( node );
     }
 };
 

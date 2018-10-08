@@ -23,24 +23,24 @@
 class XMLShort : public Short
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLShort( ) : Short( )
-	{
-	}
-	
-	inline XMLShort( short value ) : Short( value )
-	{
-	}
-	
-	inline XMLShort( const DLString& value ) throw( ExceptionBadType )
-		: Short( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** По умолчанию значение \0 */
+        inline XMLShort( ) : Short( )
+        {
+        }
+        
+        inline XMLShort( short value ) : Short( value )
+        {
+        }
+        
+        inline XMLShort( const DLString& value ) throw( ExceptionBadType )
+                : Short( value )
+        {
+        }
+        
+        /** Возвращает xml представление переменной */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** Инициализация класса из xml данных */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
@@ -48,21 +48,21 @@ public:
 /** Вывод в ostream типа XMLShort */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLShort& xmlShort )
 {
-	ostr << xmlShort.getValue( );
-	return ostr;
+        ostr << xmlShort.getValue( );
+        return ostr;
 }
 
 class XMLShortNoEmpty : public XMLShort {
 public:
-	inline XMLShortNoEmpty( )
-	{
-	}
-	
-	inline XMLShortNoEmpty( int value ) : XMLShort( value )
-	{
-	}
+        inline XMLShortNoEmpty( )
+        {
+        }
+        
+        inline XMLShortNoEmpty( int value ) : XMLShort( value )
+        {
+        }
 
-	bool toXML( XMLNode::Pointer& node ) const;
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 #endif

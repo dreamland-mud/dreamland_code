@@ -12,7 +12,7 @@
  * XMLEnumeration
  */
 XMLEnumeration::XMLEnumeration( int v, const FlagTable *t ) 
-	: Enumeration( v, t ) 
+        : Enumeration( v, t ) 
 {
 }
 
@@ -24,8 +24,8 @@ void XMLEnumeration::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionB
     Integer::setValue( 0 );
 
     if (node) 
-	if (( value = table->value( node->getCData( ) ) ) != NO_FLAG)
-	    setValue( value );
+        if (( value = table->value( node->getCData( ) ) ) != NO_FLAG)
+            setValue( value );
 }
 
 bool XMLEnumeration::toXML( XMLNode::Pointer& parent ) const
@@ -33,7 +33,7 @@ bool XMLEnumeration::toXML( XMLNode::Pointer& parent ) const
     XMLNode::Pointer node( NEW );
     
     if (getTable( ) == NULL)
-	return false;
+        return false;
 
     node->setType( XMLNode::XML_TEXT );
     node->setCData( name( ) );
@@ -62,22 +62,22 @@ bool XMLEnumerationArray::toXML( XMLNode::Pointer& parent ) const
     int i;
     
     for (n = 0; n < size( ); n++) {
-	if (at( n ) != defaultValue) {
-	    XMLNode::Pointer node( NEW );
-	    XMLInteger value( at( n ) );
-	    
-	    if (( i = table->reverse[n] ) != NO_FLAG) {
-		node->setName( table->fields[i].name );
-		value.toXML( node );
-		parent->appendChild( node );
-	    }
-	}
+        if (at( n ) != defaultValue) {
+            XMLNode::Pointer node( NEW );
+            XMLInteger value( at( n ) );
+            
+            if (( i = table->reverse[n] ) != NO_FLAG) {
+                node->setName( table->fields[i].name );
+                value.toXML( node );
+                parent->appendChild( node );
+            }
+        }
     }
 
     if (parent->getNodeList( ).empty( ))
-	return false;
+        return false;
     else 
-	return true;
+        return true;
 }
 
 void XMLEnumerationArray::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
@@ -87,16 +87,16 @@ void XMLEnumerationArray::fromXML( const XMLNode::Pointer& parent ) throw( Excep
     clear( );
 
     for (n = parent->getNodeList( ).begin( ); n != parent->getNodeList( ).end( ); n++) {
-	int i;
-	XMLInteger value;
-	
-	i = table->index( (*n)->getName( ) );
-	
-	if (i == NO_FLAG)
-	    throw ExceptionBadType( parent->getName( ), (*n)->getName( ) );
-	
-	value.fromXML( *n );
-	at( table->fields[i].value ) = value;
+        int i;
+        XMLInteger value;
+        
+        i = table->index( (*n)->getName( ) );
+        
+        if (i == NO_FLAG)
+            throw ExceptionBadType( parent->getName( ), (*n)->getName( ) );
+        
+        value.fromXML( *n );
+        at( table->fields[i].value ) = value;
     }
 }
 
@@ -104,15 +104,15 @@ void XMLEnumerationArray::fromXML( const XMLNode::Pointer& parent ) throw( Excep
  * XMLEnumerationNoEmpty
  */
 XMLEnumerationNoEmpty::XMLEnumerationNoEmpty( int v, const FlagTable *t ) 
-	: XMLEnumeration( v, t ) 
+        : XMLEnumeration( v, t ) 
 {
 }
 
 bool XMLEnumerationNoEmpty::toXML( XMLNode::Pointer& parent ) const
 {
     if (name( ).empty( ))
-	return false;
+        return false;
     else 
-	return XMLEnumeration::toXML( parent );
+        return XMLEnumeration::toXML( parent );
 }
 

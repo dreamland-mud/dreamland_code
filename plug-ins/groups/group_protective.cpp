@@ -43,27 +43,27 @@ GSN(dispel_affects);
 static inline bool has_sanctuary_msg( Character *ch, Character *victim )
 {
     if (IS_AFFECTED(victim, AFF_SANCTUARY)) {
-	if (victim == ch)
-	    act("Ты уже под защитой святилища.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 уже под защитой святилища.", ch, 0, victim, TO_CHAR);
-	return true;
+        if (victim == ch)
+            act("Ты уже под защитой святилища.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 уже под защитой святилища.", ch, 0, victim, TO_CHAR);
+        return true;
     }
 
     if (victim->isAffected(gsn_dark_shroud)) {
-	if (victim == ch)
-	    act("Ты уже под защитой темных богов.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 уже под защитой темных богов.", ch, 0, victim, TO_CHAR);
-	return true;
+        if (victim == ch)
+            act("Ты уже под защитой темных богов.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 уже под защитой темных богов.", ch, 0, victim, TO_CHAR);
+        return true;
     }
 
     if (victim->isAffected(gsn_stardust)) {
-	if (victim == ch)
-	    act("Звездная пыль уже кружится вокруг тебя.", ch, 0, 0, TO_CHAR);
-	else
-	    act("Звездная пыль уже кружится вокруг $C2.", ch, 0, victim, TO_CHAR);
-	return true;
+        if (victim == ch)
+            act("Звездная пыль уже кружится вокруг тебя.", ch, 0, 0, TO_CHAR);
+        else
+            act("Звездная пыль уже кружится вокруг $C2.", ch, 0, victim, TO_CHAR);
+        return true;
     }
 
     return false;
@@ -75,29 +75,29 @@ VOID_SPELL(Armor)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (victim->isAffected(sn)) {
-	if (victim == ch)
-	    act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 уже защище$Gно|н|на заклинанием брони.", ch, 0, victim, TO_CHAR);
-	return;
+        if (victim == ch)
+            act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 уже защище$Gно|н|на заклинанием брони.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 7 + level / 6;
     af.modifier  = -1 * max(20,10 + level / 4); /* af.modifier  = -20;*/
     af.location  = APPLY_AC;
     affect_to_char( victim, &af );
     
     if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-	act("Священная броня окружает тебя.", victim, 0, 0, TO_CHAR);
-	if (ch != victim)
-	    act("Священная броня окружает $C4.", ch, 0, victim, TO_CHAR);
+        act("Священная броня окружает тебя.", victim, 0, 0, TO_CHAR);
+        if (ch != victim)
+            act("Священная броня окружает $C4.", ch, 0, victim, TO_CHAR);
     } else {
-	act("Волшебная броня окружает тебя.", victim, 0, 0, TO_CHAR);
-	if (ch != victim)
-	    act("Волшебная броня окружает $C4.", ch, 0, victim, TO_CHAR);
+        act("Волшебная броня окружает тебя.", victim, 0, 0, TO_CHAR);
+        if (ch != victim)
+            act("Волшебная броня окружает $C4.", ch, 0, victim, TO_CHAR);
     }
 }
 
@@ -110,14 +110,14 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Твоя кожа не может стать еще прочнее.\n\r");
-	else
-	  act_p("Кожа $C2 не может стать еще прочнее.",
+        if (victim == ch)
+          ch->send_to("Твоя кожа не может стать еще прочнее.\n\r");
+        else
+          act_p("Кожа $C2 не может стать еще прочнее.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        return;
     }
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
     af.level     = level;
     af.duration  = level;
@@ -140,38 +140,38 @@ enum {
 static int can_cancel( Character *ch, Character *victim )
 {
     if (ch->is_npc( ) && victim->is_npc( )) {
-	if (!is_same_group( ch, victim ))
-	    return CANCEL_DISPEL;
-	
-	return CANCEL_ALWAYS;
+        if (!is_same_group( ch, victim ))
+            return CANCEL_DISPEL;
+        
+        return CANCEL_ALWAYS;
     }
 
     if (!ch->is_npc( ) && !victim->is_npc( )) {
-	if (ch == victim)
-	    return CANCEL_ALWAYS;
+        if (ch == victim)
+            return CANCEL_ALWAYS;
 
-	if (ch->is_immortal( ))
-	    return CANCEL_ALWAYS;
+        if (ch->is_immortal( ))
+            return CANCEL_ALWAYS;
 
-	if (!IS_SET(victim->add_comm, PLR_NOCANCEL))
-	    return CANCEL_ALWAYS;
+        if (!IS_SET(victim->add_comm, PLR_NOCANCEL))
+            return CANCEL_ALWAYS;
 
-	if (ch->getClan( ) != victim->getClan( ))
-	    return CANCEL_DISPEL;
+        if (ch->getClan( ) != victim->getClan( ))
+            return CANCEL_DISPEL;
 
-	if (ch->getClan( )->isDispersed( ))
-	    return CANCEL_DISPEL;
+        if (ch->getClan( )->isDispersed( ))
+            return CANCEL_DISPEL;
 
-	return CANCEL_ALWAYS;
+        return CANCEL_ALWAYS;
     }
 
     if (ch->is_npc( ) && !victim->is_npc( )) {
-	return CANCEL_NEVER;
+        return CANCEL_NEVER;
     }
 
     if (victim->getNPC( )->behavior
-	&& !victim->getNPC( )->behavior->canCancel( ch ))
-	return CANCEL_NEVER;
+        && !victim->getNPC( )->behavior->canCancel( ch ))
+        return CANCEL_NEVER;
 
     return CANCEL_ALWAYS;
 }
@@ -185,14 +185,14 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
 
     switch (can_cancel( ch, victim )) {
     case CANCEL_ALWAYS:
-	    break;
+            break;
     case CANCEL_NEVER:
-	    ch->println("Твоя попытка закончилась неудачей, попробуй dispel affects.");
-	    return;
+            ch->println("Твоя попытка закончилась неудачей, попробуй dispel affects.");
+            return;
     case CANCEL_DISPEL:
-	    if (!is_safe_spell( ch, victim, false ))	
-		spell(gsn_dispel_affects, level, ch, victim);
-	    return;
+            if (!is_safe_spell( ch, victim, false ))        
+                spell(gsn_dispel_affects, level, ch, victim);
+            return;
     }
 
     level += 2;
@@ -200,17 +200,17 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
     /* unlike dispel affects, the victim gets NO save */
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
-	affect = skillManager->find( sn )->getAffect( );
+        affect = skillManager->find( sn )->getAffect( );
 
-	if (affect && affect->isCancelled( ))
-	    if (checkDispel( level, victim, sn )) 
-		found = true;
+        if (affect && affect->isCancelled( ))
+            if (checkDispel( level, victim, sn )) 
+                found = true;
     }
 
     if (found)
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
     else
-	ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
 }
 
 
@@ -220,15 +220,15 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
     
     if (has_sanctuary_msg( ch, victim ))
-	return;
+        return;
 
     if (IS_GOOD(victim)) // Not for good !!!
     {
        if (victim == ch)
-	  act("Темные боги не будут защищать тебя!!!", ch, 0, 0, TO_CHAR);
+          act("Темные боги не будут защищать тебя!!!", ch, 0, 0, TO_CHAR);
        else
-       	  act("Темные боги не будут защищать $C4!!!", ch, 0, victim, TO_CHAR);
-	return;
+                 act("Темные боги не будут защищать $C4!!!", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -248,26 +248,26 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
     bool found = false;
     
     if (IS_AFFECTED(ch, AFF_CHARM))
-	return;
+        return;
 
     if (saves_spell(level, victim,DAM_OTHER, ch, DAMF_SPELL)) {
-	victim->send_to("Ты чувствуешь легкий звон в ушах.\n\r");
-	ch->send_to("Твоя попытка закончилась неудачей.\n\r");
-	return;
+        victim->send_to("Ты чувствуешь легкий звон в ушах.\n\r");
+        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        return;
     }
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
-	affect = skillManager->find( sn )->getAffect( );
+        affect = skillManager->find( sn )->getAffect( );
 
-	if (affect && affect->isDispelled( ))
-	    if (checkDispel( level, victim, sn )) 
-		found = true;
+        if (affect && affect->isDispelled( ))
+            if (checkDispel( level, victim, sn )) 
+                found = true;
     }
 
     if (found)
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
     else
-	ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
 }
 
 
@@ -280,13 +280,13 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
   if ( victim->isAffected(sn ) )
     {
       if (victim == ch)
-       	ch->send_to("Твоя кожа уже тверда, как драконья.\n\r");
+               ch->send_to("Твоя кожа уже тверда, как драконья.\n\r");
       else
-       	act_p("Кожа $C2 уже тверда, как драконья.",
+               act_p("Кожа $C2 уже тверда, как драконья.",
                ch,0,victim,TO_CHAR,POS_RESTING);
       return;
     }
-  af.where	= TO_AFFECTS;
+  af.where        = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = level;
@@ -309,15 +309,15 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
 
     if ( victim->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Силовое поле уже защищает тебя.\n\r");
-	else
-	  act_p("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        if (victim == ch)
+          ch->send_to("Силовое поле уже защищает тебя.\n\r");
+        else
+          act_p("Силовое поле уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 24;
     af.modifier  = -60;
     af.location  = APPLY_AC;
@@ -325,7 +325,7 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
     affect_to_char( victim, &af );
     victim->send_to("Силовая защита окружает тебя.\n\r");
     if ( ch != victim )
-	act_p("Силовая защита окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("Силовая защита окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
 }
@@ -336,8 +336,8 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (ch->isAffected(sn )) {
-	act_p("Ты уже гото$gво|в|ва к схватке со злом.", ch, 0, 0, TO_CHAR, POS_RESTING);
-	return;
+        act_p("Ты уже гото$gво|в|ва к схватке со злом.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        return;
     }
 
     af.where = TO_RESIST;
@@ -358,24 +358,24 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
 SPELL_DECL(SpellResistance);
 VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	Affect af;
+        Affect af;
 
-	if (!ch->isAffected(sn))
-	{
-		ch->send_to("Теперь заклинания причиняют тебе меньший вред.\n\r");
+        if (!ch->isAffected(sn))
+        {
+                ch->send_to("Теперь заклинания причиняют тебе меньший вред.\n\r");
 
-		af.where = TO_RESIST;
-		af.type = sn;
-		af.duration = level / 10;
-		af.level = ch->getModifyLevel();
-		af.bitvector = RES_SPELL;
-		af.location = 0;
-		af.modifier = 0;
-		affect_to_char(ch, &af);
-	}
-	else
-		ch->send_to("Ты уже имеешь эту защиту.\n\r");
-	return;
+                af.where = TO_RESIST;
+                af.type = sn;
+                af.duration = level / 10;
+                af.level = ch->getModifyLevel();
+                af.bitvector = RES_SPELL;
+                af.location = 0;
+                af.modifier = 0;
+                affect_to_char(ch, &af);
+        }
+        else
+                ch->send_to("Ты уже имеешь эту защиту.\n\r");
+        return;
 
 }
 
@@ -389,25 +389,25 @@ VOID_SPELL(MassSanctuary)::run( Character *ch, Room *room, int sn, int level )
 
     for( gch=room->people; gch != 0; gch=gch->next_in_room)
     {
-	if (!is_same_group( gch, ch ))
-	    continue;
+        if (!is_same_group( gch, ch ))
+            continue;
 
-	if (spellbane( ch, gch ))
-	    continue;
-	
-	if (has_sanctuary_msg( ch, gch ))
-	    continue;
+        if (spellbane( ch, gch ))
+            continue;
+        
+        if (has_sanctuary_msg( ch, gch ))
+            continue;
 
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_sanctuary;
-	af.level     = level;
-	af.duration  = number_fuzzy( level/6 );
-	af.bitvector = AFF_SANCTUARY;
-	affect_to_char( gch, &af );
+        af.where     = TO_AFFECTS;
+        af.type      = gsn_sanctuary;
+        af.level     = level;
+        af.duration  = number_fuzzy( level/6 );
+        af.bitvector = AFF_SANCTUARY;
+        affect_to_char( gch, &af );
 
-	act("{WБелая аура{x окружает тебя.", gch, 0, 0, TO_CHAR);
-	if (ch != gch)
-	    act("{WБелая аура{x окружает $C4.", ch, 0, gch, TO_CHAR);
+        act("{WБелая аура{x окружает тебя.", gch, 0, 0, TO_CHAR);
+        if (ch != gch)
+            act("{WБелая аура{x окружает $C4.", ch, 0, gch, TO_CHAR);
     }
 }
 
@@ -420,29 +420,29 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
 
     if ( victim->isAffected(gsn_protection_cold) )
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на от холода.", ch,0, 0,TO_CHAR);
-	else
+        else
           act("$C1 уже защище$Gно|н|на от холода.", ch,0,victim,TO_CHAR);
-	return;
+        return;
     }
 
     if ( victim->isAffected(gsn_protection_heat) )
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на от огня.", ch,0, 0,TO_CHAR);
-	else
+        else
           act("$C1 уже защище$Gно|н|на от огня.", ch,0,victim,TO_CHAR);
-	return;
+        return;
     }
 
     if ( victim->isAffected(gsn_make_shield) )
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на ледяным щитом.", ch,0,0,TO_CHAR);
-	else
+        else
           act("$C1 уже защище$Gно|н|на ледяным щитом.", ch,0,victim,TO_CHAR);
-	return;
+        return;
     }
     af.where     = TO_AFFECTS;
     af.type      = gsn_protection_cold;
@@ -454,7 +454,7 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->send_to("Твоя защищенность от воздействия низких температур повышается.\n\r");
     if ( ch != victim )
-	act_p("Защищенность $C2 от воздействия низких температур повышается.",
+        act_p("Защищенность $C2 от воздействия низких температур повышается.",
               ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -469,11 +469,11 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     if ( IS_AFFECTED(victim, AFF_PROTECT_EVIL)
     ||   IS_AFFECTED(victim, AFF_PROTECT_GOOD))
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на.", ch,0, 0,TO_CHAR);
-	else
-	  act("$C1 уже защище$Gно|н|на.", ch,0,victim,TO_CHAR);
-	return;
+        else
+          act("$C1 уже защище$Gно|н|на.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -486,7 +486,7 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->send_to("Ты чувствуешь защиту светлых сил.\n\r");
     if ( ch != victim )
-	act_p("$C1 обретает защиту светлых сил.",
+        act_p("$C1 обретает защиту светлых сил.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -501,11 +501,11 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     if ( IS_AFFECTED(victim, AFF_PROTECT_GOOD)
     ||   IS_AFFECTED(victim, AFF_PROTECT_EVIL))
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на.", ch,0, 0,TO_CHAR);
-	else
-	  act("$C1 уже защище$Gно|н|на.", ch,0,victim,TO_CHAR);
-	return;
+        else
+          act("$C1 уже защище$Gно|н|на.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -518,7 +518,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->send_to("Ты чувствуешь защиту темных сил.\n\r");
     if ( ch != victim )
-	act_p("$C1 обретает защиту темных сил.",
+        act_p("$C1 обретает защиту темных сил.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -532,29 +532,29 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
 
     if ( victim->isAffected(gsn_protection_heat) )
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на от огня.", ch,0, 0,TO_CHAR);
-	else
+        else
           act("$C1 уже защище$Gно|н|на от огня.", ch,0,victim,TO_CHAR);
-	return;
+        return;
     }
 
     if ( victim->isAffected(gsn_protection_cold) )
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на от холода.", ch,0, 0,TO_CHAR);
-	else
+        else
           act("$C1 уже защище$Gно|н|на от холода.", ch,0,victim,TO_CHAR);
-	return;
+        return;
     }
 
     if ( victim->isAffected(gsn_make_shield) )
     {
-	if (victim == ch)
+        if (victim == ch)
           act("Ты уже защище$gно|н|на огненным щитом.", ch,0,0,TO_CHAR);
-	else
+        else
           act("$C1 уже защище$Gно|н|на огненным щитом.", ch,0,victim,TO_CHAR);
-	return;
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -567,7 +567,7 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
     affect_to_char( victim, &af );
     victim->send_to("Твоя защищенность от воздействия высоких температур повышается.\n\r");
     if ( ch != victim )
-	act_p("Защищенность $C2 от воздействия высоких температур повышается.",
+        act_p("Защищенность $C2 от воздействия высоких температур повышается.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -606,13 +606,13 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
 
   if (victim->isAffected(sn)) {
       if (victim == ch)
-       	ch->send_to("Охранный щит уже окружает тебя.\n\r");
+               ch->send_to("Охранный щит уже окружает тебя.\n\r");
       else
-       	act_p("Охранный щит уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+               act_p("Охранный щит уже окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
       return;
   }
 
-  af.where	= TO_AFFECTS;
+  af.where        = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = number_fuzzy( level / 30 ) + 3;
@@ -658,7 +658,7 @@ VOID_SPELL(Sanctuary)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (has_sanctuary_msg( ch, victim ))
-	return;
+        return;
 
     af.where     = TO_AFFECTS;
     af.type      = sn;
@@ -676,7 +676,7 @@ VOID_SPELL(Stardust)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (has_sanctuary_msg( ch, victim ))
-	return;
+        return;
 
     af.where     = TO_AFFECTS;
     af.type      = sn;
@@ -694,11 +694,11 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
 
     if ( victim->isAffected(sn ) )
     {
-	if (victim == ch)
-	    act("Ты уже защище$gно|н|на заклинанием щита.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 уже защище$Gно|н|на заклинанием щита.", ch, 0, victim, TO_CHAR);
-	return;
+        if (victim == ch)
+            act("Ты уже защище$gно|н|на заклинанием щита.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 уже защище$Gно|н|на заклинанием щита.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -711,11 +711,11 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char( victim, &af );
 
     if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-	act("Божественная энергия окружает тебя щитом.", victim, 0, 0, TO_CHAR);
-	act("Божественная энергия окружает $c4 щитом.", victim, 0, 0, TO_ROOM);
+        act("Божественная энергия окружает тебя щитом.", victim, 0, 0, TO_CHAR);
+        act("Божественная энергия окружает $c4 щитом.", victim, 0, 0, TO_ROOM);
     } else {
-	act("Волшебный щит окружает тебя.", victim, 0, 0, TO_CHAR);
-	act("Волшебный щит окружает $c4.", victim, 0, 0, TO_ROOM);
+        act("Волшебный щит окружает тебя.", victim, 0, 0, TO_CHAR);
+        act("Волшебный щит окружает $c4.", victim, 0, 0, TO_ROOM);
     }
 }
 
@@ -728,12 +728,12 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
 
     if ( ch->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Твоя кожа уже тверда как камень.\n\r");
-	else
-	  act_p("Кожа $C2 уже тверда как камень.",
+        if (victim == ch)
+          ch->send_to("Твоя кожа уже тверда как камень.\n\r");
+        else
+          act_p("Кожа $C2 уже тверда как камень.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        return;
     }
 
     af.where     = TO_AFFECTS;

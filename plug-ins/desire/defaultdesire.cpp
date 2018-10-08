@@ -52,7 +52,7 @@ bool DefaultDesire::canEat( PCharacter *ch )
 void DefaultDesire::report( PCharacter *ch, ostringstream &buf )
 {
     if (isActive( ch ) && !msgReport.empty( ))
-	buf << fmt( NULL, msgReport.c_str( ), ch );
+        buf << fmt( NULL, msgReport.c_str( ), ch );
 }
 
 bool DefaultDesire::isActive( PCharacter *ch )
@@ -63,26 +63,26 @@ bool DefaultDesire::isActive( PCharacter *ch )
 void DefaultDesire::drink( PCharacter *ch, int amount, Liquid *liq )
 {
     if (applicable( ch )) 
-	gain( ch, amount * liq->getDesires( )[getIndex( )] / drinkCoef );
+        gain( ch, amount * liq->getDesires( )[getIndex( )] / drinkCoef );
 }
 
 void DefaultDesire::eat( PCharacter *ch, int amount )
 {
     if (applicable( ch ))
-	gain( ch, amount );
+        gain( ch, amount );
 }
 
 
 void DefaultDesire::vomit( PCharacter *ch )
 {
     if (applicable( ch ))
-	ch->desires[getIndex( )] = vomitAmount;
+        ch->desires[getIndex( )] = vomitAmount;
 }
 
 void DefaultDesire::update( PCharacter *ch )
 {
     if (applicable( ch ))
-	gain( ch, getUpdateAmount( ch ) );
+        gain( ch, getUpdateAmount( ch ) );
 }
 
 // Helper function to show non-empty messages to the character.
@@ -99,15 +99,15 @@ void DefaultDesire::gain( PCharacter *ch, int value )
     bool isNewbie = ch->getRealLevel( ) <= PK_MIN_LEVEL;
     
     if (!applicable( ch ) || ch->is_immortal( )) {
-	reset( ch );
-	return;
+        reset( ch );
+        return;
     }
 
     if (value == 0)
-	return;
+        return;
 
     if (IS_GHOST( ch ))
-	return;
+        return;
 
     wasActive = isActive( ch );
     oldDesire = ch->desires[getIndex( )];
@@ -121,12 +121,12 @@ void DefaultDesire::gain( PCharacter *ch, int value )
 
     // Too hungry or thirsty, inflict some damage.
     if (desire == damageLimit && !isNewbie) {
-	if (!msgDamageSelf.empty( ))
-	    ch->pecho( msgDamageSelf.c_str( ) );
-	if (!msgDamageRoom.empty( ))
-	    ch->recho( msgDamageRoom.c_str( ), ch );
-	damage( ch );
-	return;
+        if (!msgDamageSelf.empty( ))
+            ch->pecho( msgDamageSelf.c_str( ) );
+        if (!msgDamageRoom.empty( ))
+            ch->recho( msgDamageRoom.c_str( ), ch );
+        damage( ch );
+        return;
     }
 
     // Was hungry but now satisfied, print stop message.

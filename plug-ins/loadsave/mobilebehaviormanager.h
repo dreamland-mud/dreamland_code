@@ -11,13 +11,13 @@ class NPCharacter;
 struct mob_index_data;
 
 class MobileBehaviorManager {
-public:	
-	static void assign( NPCharacter * );
-	static void assignBasic( NPCharacter * );
-	static void parse( mob_index_data *, FILE * );
-	static void parse( NPCharacter *, FILE * );
-	static void save( const mob_index_data *, FILE * );
-	static void save( const NPCharacter *, FILE * );
+public:        
+        static void assign( NPCharacter * );
+        static void assignBasic( NPCharacter * );
+        static void parse( mob_index_data *, FILE * );
+        static void parse( NPCharacter *, FILE * );
+        static void save( const mob_index_data *, FILE * );
+        static void save( const NPCharacter *, FILE * );
 };
 
 #endif

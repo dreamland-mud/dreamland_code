@@ -62,7 +62,7 @@ bool SharedObject::isChanged( ) const
     struct stat sb;
     
     if (stat( getFileName( ).c_str( ), &sb) < 0)
-	throw PluginException( name, strerror(errno) );
+        throw PluginException( name, strerror(errno) );
 
     return loadTime < sb.st_mtime;
 }
@@ -70,12 +70,12 @@ bool SharedObject::isChanged( ) const
 DLString SharedObject::getFileName( ) const
 {
     return PluginManager::getThis( )->getTablePath( ) + '/' +
-	   PluginManager::getThis( )->getTableName( ) + "/lib" +
-	   getName( ) +
+           PluginManager::getThis( )->getTableName( ) + "/lib" +
+           getName( ) +
 #ifndef __MINGW32__
-	   ".so";
+           ".so";
 #else
-	   "-0.dll";
+           "-0.dll";
 #endif
 }
 
@@ -102,7 +102,7 @@ void SharedObject::loadSO( )
     
     if (!handle) {
         current = 0;
-	throw PluginException( name, dlerror( ) );
+        throw PluginException( name, dlerror( ) );
     }
     
     InitType* functionInit = (InitType*)dlsym( handle, initName.c_str( ) );
@@ -126,7 +126,7 @@ void SharedObject::loadSO( )
             0, NULL );
 
         current = 0;
-	throw PluginException( name, (LPTSTR)lpMsgBuf);
+        throw PluginException( name, (LPTSTR)lpMsgBuf);
     }
 
     InitType* functionInit = (InitType*)GetProcAddress( handle, initName.c_str( ) );
@@ -156,7 +156,7 @@ void SharedObject::loadSO( )
     }
     
     for (i = plugins.begin( ); i != plugins.end( ); i++)
-	(*i)->initialization( );
+        (*i)->initialization( );
     
     LogStream::sendNotice( ) << "load [" << name << "] so" << endl;
 }
@@ -166,8 +166,8 @@ void SharedObject::unloadSO( )
     PluginList::iterator i;
 
     for (i = plugins.begin( ); i != plugins.end( ); i++)
-	(*i)->destruction( );
-	
+        (*i)->destruction( );
+        
     plugins.clear( );
 
     if(current)
@@ -177,11 +177,11 @@ void SharedObject::unloadSO( )
     
     if (handle) {
 #ifndef __MINGW32__
-	dlclose( handle );
+        dlclose( handle );
 #else
-	FreeLibrary(handle);
+        FreeLibrary(handle);
 #endif
-	handle = NULL;
+        handle = NULL;
     }
 
     if(!current)
@@ -206,7 +206,7 @@ void XMLSharedObject::load( )
     DependList::iterator i;
 
     for (i = depends.begin( ); i != depends.end( ); i++)
-	use( PluginManager::getThis( )->load( i->getValue( ) ) );
+        use( PluginManager::getThis( )->load( i->getValue( ) ) );
 
     loadSO( );
 }
@@ -214,10 +214,10 @@ void XMLSharedObject::load( )
 void XMLSharedObject::unload( ) 
 {
     while ( !usedBy.empty( ) ) {
-	const DLString &so = usedBy.front( );
-	
-	PluginManager::getThis( )->unload( so );
-	usedBy.pop_front( );
+        const DLString &so = usedBy.front( );
+        
+        PluginManager::getThis( )->unload( so );
+        usedBy.pop_front( );
     }
 
     unloadSO( );

@@ -26,7 +26,7 @@ void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
     this->prof = prof;
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
 
     kwd.insert( prof->getName( ) );
     kwd.insert( prof->getRusName( ).ruscase( '1' ) );
@@ -67,13 +67,13 @@ void CraftProfession::loaded( )
     craftProfessionManager->load( Pointer( this ) );
 
     if (help)
-	help->setProfession( Pointer( this ) );
+        help->setProfession( Pointer( this ) );
 }
 
 void CraftProfession::unloaded( )
 {
     if (help)
-	help->unsetProfession( );
+        help->unsetProfession( );
 
     craftProfessionManager->load( Pointer( this ) );
 }
@@ -81,9 +81,9 @@ void CraftProfession::unloaded( )
 DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
     if (ch && ch->getConfig( )->rucommands)
-	return getRusName( ).ruscase( c );
+        return getRusName( ).ruscase( c );
     else
-	return getName( );
+        return getName( );
 }
 
 int CraftProfession::getLevel( PCharacter *ch ) const
@@ -133,7 +133,7 @@ int CraftProfession::gainExp( PCharacter *ch, int xp ) const
     ch->pecho("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2.", xp, getRusName().c_str());
 
     if (level >= maxLevel)
-    	return total_xp;
+            return total_xp;
     
     while (getExpToLevel(ch) <= 0) {
         level++;
@@ -145,7 +145,7 @@ int CraftProfession::gainExp( PCharacter *ch, int xp ) const
                  ch, 0);
 
         wiznet(WIZ_LEVELS, 0, 0, 
-	          "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
+                  "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
     }
 }

@@ -50,7 +50,7 @@ int key2hash( const DLString &k )
     char h = 0;
     
     while (*pk)
-	h ^= *pk++;
+        h ^= *pk++;
     
     return h % HASH_SIZE;
 }
@@ -69,11 +69,11 @@ template <typename key_t>
 DbContext<key_t>::~DbContext( )
 {
     if (file) {
-	LogStream::sendError( )
-	    << "Scripting::DbContext::~DbContext: "
-	    << "closing pending database" << endl;
+        LogStream::sendError( )
+            << "Scripting::DbContext::~DbContext: "
+            << "closing pending database" << endl;
 
-	close( );
+        close( );
     }
 }
 
@@ -90,8 +90,8 @@ void
 DbContext<key_t>::close( )
 {
     if(!file) {
-	LogStream::sendError() << "DbContext already closed" << endl;
-	return;
+        LogStream::sendError() << "DbContext already closed" << endl;
+        return;
     }
     
     file = NULL;
@@ -109,78 +109,78 @@ DbContext<key_t>::load( )
     dirent *dp;
     
     LogStream::sendNotice( ) 
-	<< "Loading DbContext: "
-	<< (file ? file : "<unknown>") << ":" 
-	<< (dbname ? dbname : "<unknown>") << "..." << endl;
+        << "Loading DbContext: "
+        << (file ? file : "<unknown>") << ":" 
+        << (dbname ? dbname : "<unknown>") << "..." << endl;
 
     for(i=0;i<HASH_SIZE;i++) {
-	ostringstream fname;
-	fname << getDbEnv( )->path << "/" 
-	      << file << "-" << dbname << "/"
-	      << i;
-	    
-	dirp = opendir(fname.str( ).c_str( ));
-	if(dirp == NULL)
-	    continue;
-	
-	while( (dp = readdir(dirp)) != NULL ) {
-	    DLString fileName(dp->d_name);
+        ostringstream fname;
+        fname << getDbEnv( )->path << "/" 
+              << file << "-" << dbname << "/"
+              << i;
+            
+        dirp = opendir(fname.str( ).c_str( ));
+        if(dirp == NULL)
+            continue;
+        
+        while( (dp = readdir(dirp)) != NULL ) {
+            DLString fileName(dp->d_name);
 
-	    DLString::size_type pos = fileName.rfind( '.' );
-	    
-	    if(pos == DLString::npos)
-		continue;
+            DLString::size_type pos = fileName.rfind( '.' );
+            
+            if(pos == DLString::npos)
+                continue;
 
-	    DLString ext = fileName.substr(pos);
-	    
-	    if(ext != ".xml" && ext != ".XML")
-		continue;
+            DLString ext = fileName.substr(pos);
+            
+            if(ext != ".xml" && ext != ".XML")
+                continue;
 
-	    fileName = fileName.substr(0, pos);
-	    
-	    if(fileName.empty( ) || !fileName.isNumber( ))
-		continue;
+            fileName = fileName.substr(0, pos);
+            
+            if(fileName.empty( ) || !fileName.isNumber( ))
+                continue;
 
-	    key_t id;
-	    
-	    string2key(fileName, id);
+            key_t id;
+            
+            string2key(fileName, id);
 
-	    fileName = DLString(fname.str( )) + "/" + dp->d_name;
-	    
-	    struct stat sb;
-	    
-	    if(stat(fileName.c_str( ), &sb) < 0)
-		continue;
-	    
-	    if(!S_ISREG(sb.st_mode))
-		continue;
+            fileName = DLString(fname.str( )) + "/" + dp->d_name;
+            
+            struct stat sb;
+            
+            if(stat(fileName.c_str( ), &sb) < 0)
+                continue;
+            
+            if(!S_ISREG(sb.st_mode))
+                continue;
 
-	    FILE *f = fopen(fileName.c_str( ), "rb");
+            FILE *f = fopen(fileName.c_str( ), "rb");
 
-	    if(f == NULL)
-		continue;
+            if(f == NULL)
+                continue;
 
-	    fseek(f, 0, SEEK_END);
-	    unsigned int size = ftell(f);
-	    fseek(f, 0, SEEK_SET);
-	    char buf[size];
+            fseek(f, 0, SEEK_END);
+            unsigned int size = ftell(f);
+            fseek(f, 0, SEEK_SET);
+            char buf[size];
 
-	    int c;
-	    if((c = fread(buf, size, 1, f)) != 1)
-		LogStream::sendError() 
-		    << "DbContext::seq(" << id << "): "
-		    << "truncated record: " << size 
-		    << ", " << sb.st_size
-		    << ", " << c 
-		    << ": " << strerror(errno) << endl;
+            int c;
+            if((c = fread(buf, size, 1, f)) != 1)
+                LogStream::sendError() 
+                    << "DbContext::seq(" << id << "): "
+                    << "truncated record: " << size 
+                    << ", " << sb.st_size
+                    << ", " << c 
+                    << ": " << strerror(errno) << endl;
 
-	    fclose(f);
-	    
-	    seq(id, buf, size);
-	    cnt++;
-	}
-	
-	closedir(dirp);
+            fclose(f);
+            
+            seq(id, buf, size);
+            cnt++;
+        }
+        
+        closedir(dirp);
     }
     
     LogStream::sendNotice() << "Total " << cnt << " records loaded" << endl;
@@ -192,10 +192,10 @@ DbContext<key_t>::get( key_t k, void *& d_val, size_t &d_size )
 {
     FILE *f = fopen(getFileName( k ).c_str( ), "rb");
     if(f == NULL) {
-	LogStream::sendError() 
-	    << "DbContext::get(" << k << "): "
-	    << strerror(errno) << endl;
-	return;
+        LogStream::sendError() 
+            << "DbContext::get(" << k << "): "
+            << strerror(errno) << endl;
+        return;
     }
 
     fseek(f, 0, SEEK_END);
@@ -205,10 +205,10 @@ DbContext<key_t>::get( key_t k, void *& d_val, size_t &d_size )
     d_val = malloc(d_size);
     
     if (fread(d_val, d_size, 1, f) != 1)
-	LogStream::sendError() 
-	    << "DbContext::get(" << k << "): "
-	    << "promised and actual record size mismatch"
-	    << endl;
+        LogStream::sendError() 
+            << "DbContext::get(" << k << "): "
+            << "promised and actual record size mismatch"
+            << endl;
 
     fclose(f);
 }
@@ -220,17 +220,17 @@ DbContext<key_t>::put( key_t k, void * d_val, size_t d_size )
     DLString fname = getFileName( k );
     FILE *f = fopen(fname.c_str( ), "wb");
     if(f == NULL) {
-	LogStream::sendError() 
-	    << "DbContext::put(" << k << "): " 
-	    << fname << ": " << strerror(errno) << endl;
-	return;
+        LogStream::sendError() 
+            << "DbContext::put(" << k << "): " 
+            << fname << ": " << strerror(errno) << endl;
+        return;
     }
 
     if(fwrite(d_val, d_size, 1, f) != 1)
-	LogStream::sendError() 
-	    << "DbContext::put(" << k << "): "
-	    << "record truncated" << endl;
-	;
+        LogStream::sendError() 
+            << "DbContext::put(" << k << "): "
+            << "record truncated" << endl;
+        ;
 
     fclose(f);
 }
@@ -241,9 +241,9 @@ DbContext<key_t>::del( key_t k )
 {
     DLString fname = getFileName( k );
     if(unlink(fname.c_str( )) < 0)
-	LogStream::sendError() 
-	    << "DbContext::del(" << k << "): " 
-	    << fname << ": " << strerror(errno) << endl;
+        LogStream::sendError() 
+            << "DbContext::del(" << k << "): " 
+            << fname << ": " << strerror(errno) << endl;
 }
 
 template <typename key_t>
@@ -253,9 +253,9 @@ DbContext<key_t>::getFileName( key_t k )
     ostringstream fname;
     
     fname << getDbEnv( )->path << "/" 
-	  << file << "-" << dbname << "/"
-	  << key2hash( k ) << "/"
-	  << k << ".xml";
+          << file << "-" << dbname << "/"
+          << key2hash( k ) << "/"
+          << k << ".xml";
     return fname.str( );
 }
 
@@ -305,18 +305,18 @@ void
 DbTxnContext::commit( )
 {
     LogStream::sendError( )
-	<< "DbTxnContext: "
-	<< "commit is not supported by database vendor"
-	<< endl;
+        << "DbTxnContext: "
+        << "commit is not supported by database vendor"
+        << endl;
 }
 
 void
 DbTxnContext::abort( )
 {
     LogStream::sendError( )
-	<< "DbTxnContext: "
-	<< "rollback is not supported by database vendor"
-	<< endl;
+        << "DbTxnContext: "
+        << "rollback is not supported by database vendor"
+        << endl;
 }
 
 

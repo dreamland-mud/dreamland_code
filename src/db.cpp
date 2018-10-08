@@ -14,13 +14,13 @@
  ***************************************************************************/
 /***************************************************************************
  *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *
- *	 Ibrahim Canpunar  {Asena}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *	
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *
+ *         Ibrahim Canpunar  {Asena}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 
 /***************************************************************************
@@ -41,13 +41,13 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1995 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@pacinfo.com)				   *
-*	    Gabrielle Taylor (gtaylor@pacinfo.com)			   *
-*	    Brian Moore (rom@rom.efn.org)				   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*        ROM 2.4 is copyright 1993-1995 Russ Taylor                           *
+*        ROM has been brought to you by the ROM consortium                   *
+*            Russ Taylor (rtaylor@pacinfo.com)                                   *
+*            Gabrielle Taylor (gtaylor@pacinfo.com)                           *
+*            Brian Moore (rom@rom.efn.org)                                   *
+*        By using this code, you have agreed to follow the terms of the           *
+*        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
 #include <list>
@@ -93,15 +93,15 @@ using namespace std;
 /*
  * Globals.
  */
-Character *		char_list;
+Character *                char_list;
 Character * newbie_list = 0;
-KILL_DATA		kill_table	[MAX_LEVEL];
-Object *		object_list;
-TIME_INFO_DATA		time_info;
-WEATHER_DATA		weather_info;
+KILL_DATA                kill_table        [MAX_LEVEL];
+Object *                object_list;
+TIME_INFO_DATA                time_info;
+WEATHER_DATA                weather_info;
 
-AUCTION_DATA	*	auction = new auction_data( );
-Room	*	top_affected_room = 0;
+AUCTION_DATA        *        auction = new auction_data( );
+Room        *        top_affected_room = 0;
 
 
 Room* room_list = 0;
@@ -109,28 +109,28 @@ Room* room_list = 0;
 /*
  * Locals.
  */
-MOB_INDEX_DATA *	mob_index_hash		[MAX_KEY_HASH];
-OBJ_INDEX_DATA *	obj_index_hash		[MAX_KEY_HASH];
-Room *	room_index_hash		[MAX_KEY_HASH];
-char *			string_hash		[MAX_KEY_HASH];
+MOB_INDEX_DATA *        mob_index_hash                [MAX_KEY_HASH];
+OBJ_INDEX_DATA *        obj_index_hash                [MAX_KEY_HASH];
+Room *        room_index_hash                [MAX_KEY_HASH];
+char *                        string_hash                [MAX_KEY_HASH];
 
-AREA_DATA *		area_first;
-AREA_DATA *		area_last;
+AREA_DATA *                area_first;
+AREA_DATA *                area_last;
 
-char			str_empty	[1];
+char                        str_empty        [1];
 
-int			top_affect;
-int			top_area;
-int			top_ed;
-int			top_exit;
-int			top_mob_index;
-int			top_obj_index;
-int			top_reset;
-int			top_room;
+int                        top_affect;
+int                        top_area;
+int                        top_ed;
+int                        top_exit;
+int                        top_mob_index;
+int                        top_obj_index;
+int                        top_reset;
+int                        top_room;
 
-int			top_vnum_room;
-int			top_vnum_mob;
-int			top_vnum_obj;
+int                        top_vnum_room;
+int                        top_vnum_mob;
+int                        top_vnum_obj;
 
 int mobile_count = 0;
 int newobjs = 0;
@@ -138,18 +138,18 @@ int newmobs = 0;
 
 /*
  * Memory management.
- * Increase MAX_STRING if you have too.	
+ * Increase MAX_STRING if you have too.        
  * Tune the others only if you understand what you're doing.
  */
 
-void *			rgFreeList	[MAX_MEM_LIST];
-const int		rgSizeList	[MAX_MEM_LIST]	=
+void *                        rgFreeList        [MAX_MEM_LIST];
+const int                rgSizeList        [MAX_MEM_LIST]        =
 {
     16, 32, 64, 128, 256, 1024, 2048, 4096, 8192, 16384, 32768-64
 };
 
-int			nAllocPerm;
-int			sAllocPerm;
+int                        nAllocPerm;
+int                        sAllocPerm;
 
 
 /*
@@ -163,7 +163,7 @@ new_area_file(const char *name)
     struct area_file *rc = (struct area_file *)alloc_perm(sizeof (struct area_file));
 
     rc->file_name = str_dup(name);
-	
+        
     rc->next = area_file_list;
     area_file_list = rc;
     return rc;
@@ -207,8 +207,8 @@ char *get_extra_descr( const char *name, EXTRA_DESCR_DATA *ed )
 {
     for ( ; ed != 0; ed = ed->next )
     {
-	if ( is_name( name, ed->keyword ) )
-	    return ed->description;
+        if ( is_name( name, ed->keyword ) )
+            return ed->description;
     }
     return 0;
 }
@@ -224,15 +224,15 @@ MOB_INDEX_DATA *get_mob_index( int vnum )
     MOB_INDEX_DATA *pMobIndex;
 
     for ( pMobIndex  = mob_index_hash[vnum % MAX_KEY_HASH];
-	  pMobIndex != 0;
-	  pMobIndex  = pMobIndex->next )
+          pMobIndex != 0;
+          pMobIndex  = pMobIndex->next )
     {
-	if ( pMobIndex->vnum == vnum )
-	    return pMobIndex;
+        if ( pMobIndex->vnum == vnum )
+            return pMobIndex;
     }
 
     if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
-	throw FileFormatException( "get_mob_index: vnum %d not found on world startup", vnum );
+        throw FileFormatException( "get_mob_index: vnum %d not found on world startup", vnum );
 
     return 0;
 }
@@ -248,15 +248,15 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
     OBJ_INDEX_DATA *pObjIndex;
 
     for ( pObjIndex  = obj_index_hash[vnum % MAX_KEY_HASH];
-	  pObjIndex != 0;
-	  pObjIndex  = pObjIndex->next )
+          pObjIndex != 0;
+          pObjIndex  = pObjIndex->next )
     {
-	if ( pObjIndex->vnum == vnum )
-	    return pObjIndex;
+        if ( pObjIndex->vnum == vnum )
+            return pObjIndex;
     }
 
     if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
-	throw FileFormatException( "get_obj_index: vnum %d not found on world startup", vnum );
+        throw FileFormatException( "get_obj_index: vnum %d not found on world startup", vnum );
 
     return 0;
 }
@@ -272,15 +272,15 @@ Room *get_room_index( int vnum )
     Room *pRoomIndex;
 
     for ( pRoomIndex  = room_index_hash[vnum % MAX_KEY_HASH];
-	  pRoomIndex != 0;
-	  pRoomIndex  = pRoomIndex->next )
+          pRoomIndex != 0;
+          pRoomIndex  = pRoomIndex->next )
     {
-	if ( pRoomIndex->vnum == vnum )
-	    return pRoomIndex;
+        if ( pRoomIndex->vnum == vnum )
+            return pRoomIndex;
     }
 
     if (DLScheduler::getThis( )->getCurrentTick( ) == 0 && !dreamland->hasOption( DL_BUILDPLOT )) 
-	throw FileFormatException( "get_room_index: vnum %d not found on world startup", vnum );
+        throw FileFormatException( "get_room_index: vnum %d not found on world startup", vnum );
 
     return 0;
 }
@@ -295,7 +295,7 @@ Room *get_room_index( int vnum )
 void free_string( char *pstr )
 {
     if (pstr == 0 || pstr == str_empty)
-	return;
+        return;
 
     free_mem( pstr, strlen(pstr) + 1 );
     return;
@@ -312,7 +312,7 @@ char *str_dup( const char *str )
     char *str_new;
 
     if ( !str || !*str )
-	return &str_empty[0];
+        return &str_empty[0];
 
     str_new = ( char* )alloc_mem( strlen(str) + 1 );
     strcpy( str_new, str );
@@ -416,35 +416,35 @@ void free_mem( void *pMem, int sMem )
  */
 void *alloc_perm( int sMem )
 {
-	static char *pMemPerm;
-	static int iMemPerm;
-	void *pMem;
+        static char *pMemPerm;
+        static int iMemPerm;
+        void *pMem;
 
-	while ( sMem % sizeof(long) != 0 )
-		sMem++;
+        while ( sMem % sizeof(long) != 0 )
+                sMem++;
 
-	if ( sMem > MAX_PERM_BLOCK )
-	{
-		bug( "Alloc_perm: %d too large.", sMem );
-		exit( 1 );
-	}
+        if ( sMem > MAX_PERM_BLOCK )
+        {
+                bug( "Alloc_perm: %d too large.", sMem );
+                exit( 1 );
+        }
 
-	if ( pMemPerm == 0 || iMemPerm + sMem > MAX_PERM_BLOCK )
-	{
-		iMemPerm = 0;
+        if ( pMemPerm == 0 || iMemPerm + sMem > MAX_PERM_BLOCK )
+        {
+                iMemPerm = 0;
 
-		if ( ( pMemPerm = ( char* )calloc( 1, MAX_PERM_BLOCK ) ) == 0 )
-		{
-			perror( "Alloc_perm" );
-			exit( 1 );
-		}
-	}
+                if ( ( pMemPerm = ( char* )calloc( 1, MAX_PERM_BLOCK ) ) == 0 )
+                {
+                        perror( "Alloc_perm" );
+                        exit( 1 );
+                }
+        }
 
-	pMem        = pMemPerm + iMemPerm;
-	iMemPerm   += sMem;
-	nAllocPerm += 1;
-	sAllocPerm += sMem;
-	return pMem;
+        pMem        = pMemPerm + iMemPerm;
+        iMemPerm   += sMem;
+        nAllocPerm += 1;
+        sAllocPerm += sMem;
+        return pMem;
 }
 
 

@@ -21,30 +21,30 @@
 
 CMDRUNP( deaf )
 {
-	if (IS_SET(ch->comm,COMM_DEAF))
-	{
-		ch->send_to("Ты опять можешь говорить с кем-либо.\n\r");
-		REMOVE_BIT(ch->comm,COMM_DEAF);
-	}
-	else
-	{
-		ch->send_to("С этого момента ты не хочешь ни с кем говорить.\n\r");
-		SET_BIT(ch->comm,COMM_DEAF);
-	}
+        if (IS_SET(ch->comm,COMM_DEAF))
+        {
+                ch->send_to("Ты опять можешь говорить с кем-либо.\n\r");
+                REMOVE_BIT(ch->comm,COMM_DEAF);
+        }
+        else
+        {
+                ch->send_to("С этого момента ты не хочешь ни с кем говорить.\n\r");
+                SET_BIT(ch->comm,COMM_DEAF);
+        }
 }
 
 CMDRUNP( quiet )
 {
-	if (IS_SET(ch->comm,COMM_QUIET))
-	{
-		ch->send_to("Режим полного молчания выключен.\n\r");
-		REMOVE_BIT(ch->comm,COMM_QUIET);
-	}
-	else
-	{
-		ch->send_to("С этого момента ты будешь слышать только то, что произносят в комнате.\n\r");
-		SET_BIT(ch->comm,COMM_QUIET);
-	}
+        if (IS_SET(ch->comm,COMM_QUIET))
+        {
+                ch->send_to("Режим полного молчания выключен.\n\r");
+                REMOVE_BIT(ch->comm,COMM_QUIET);
+        }
+        else
+        {
+                ch->send_to("С этого момента ты будешь слышать только то, что произносят в комнате.\n\r");
+                SET_BIT(ch->comm,COMM_QUIET);
+        }
 }
 
 
@@ -103,13 +103,13 @@ static bool replay_tells( ostringstream &buf, PCharacter *ch )
 {
     XMLStringListAttribute::iterator i;
     XMLStringListAttribute::Pointer tells
-		= ch->getAttributes( ).findAttr<XMLStringListAttribute>( "tells" );
+                = ch->getAttributes( ).findAttr<XMLStringListAttribute>( "tells" );
     
     if (!tells || tells->size( ) == 0)
-	return false;
+        return false;
 
     for (i = tells->begin( ); i != tells->end( ); i++)
-	buf << " ** " << *i << endl;
+        buf << " ** " << *i << endl;
     
     ch->getAttributes( ).eraseAttribute( "tells" );
     return true;
@@ -159,7 +159,7 @@ CMDRUNP( replay )
     int limit = DEFAULT_REPLAY_SIZE;
 
     if (ch->is_npc( )) {
-	ch->println("Ты не можешь использовать команду replay.");
+        ch->println("Ты не можешь использовать команду replay.");
         return;
     }
 
@@ -268,39 +268,39 @@ CMDRUNP( afk )
     PCharacter *pch = ch->getPC( );
     
     if (ch->is_npc( )) {
-	ch->send_to( "Вдали от чего?!\r\n" );
-	return;
+        ch->send_to( "Вдали от чего?!\r\n" );
+        return;
     }
     
     if (IS_SET(pch->comm,COMM_AFK))
     {
-	XMLStringListAttribute::Pointer tells
-		    = pch->getAttributes( ).findAttr<XMLStringListAttribute>( "tells" );
+        XMLStringListAttribute::Pointer tells
+                    = pch->getAttributes( ).findAttr<XMLStringListAttribute>( "tells" );
 
-	if(tells && tells->size( ) > 0)
-	{
+        if(tells && tells->size( ) > 0)
+        {
             pch->pecho( "Режим AFK выключен. Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий.\r\n"
                          "Используй команду {y{lRпрослушать{lEreplay{x, чтобы %1$Iего|их|их прочитать.", tells->size( ) );
-	}
-	else
-	{
+        }
+        else
+        {
             pch->pecho( "Режим AFK выключен. Сообщений не было.\r\n"
                         "Используй {y{lRпрослушать ?{lEreplay help{x для справки о том, как просмотреть все недавние сообщения." );
-	}
+        }
 
-	REMOVE_BIT(pch->comm,COMM_AFK);
-	pch->getAttributes( ).eraseAttribute( "afk" );	
+        REMOVE_BIT(pch->comm,COMM_AFK);
+        pch->getAttributes( ).eraseAttribute( "afk" );        
     }
     else
     {
-	SET_BIT(pch->comm,COMM_AFK);
-	
-	if (argument[0] != '\0') {
-	    pch->getAttributes( ).getAttr<XMLStringAttribute>( "afk" )->setValue( argument );
-	    pch->printf("Ты в режиме AFK: {c%s.{x\r\n", argument);
-	}
-	else
-	    pch->send_to("Режим AFK включен.\n\r");
+        SET_BIT(pch->comm,COMM_AFK);
+        
+        if (argument[0] != '\0') {
+            pch->getAttributes( ).getAttr<XMLStringAttribute>( "afk" )->setValue( argument );
+            pch->printf("Ты в режиме AFK: {c%s.{x\r\n", argument);
+        }
+        else
+            pch->send_to("Режим AFK включен.\n\r");
     }
 }
 

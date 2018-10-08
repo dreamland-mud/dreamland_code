@@ -92,9 +92,9 @@ private:
  * convenience routines 
  */
 void formattedLog( char logLevel, const char *format, ... );
-#define bug(format...)	     formattedLog( LogStream::LSP_ERROR, format)
+#define bug(format...)             formattedLog( LogStream::LSP_ERROR, format)
 #define logerror             bug
-#define warn(format...)	     formattedLog( LogStream::LSP_WARNING, format)
+#define warn(format...)             formattedLog( LogStream::LSP_WARNING, format)
 #define notice(format...)    formattedLog( LogStream::LSP_NOTICE, format)
 #define logsystem(format...) formattedLog( LogStream::LSP_SYSTEM, format)
 #define syserr               logsystem

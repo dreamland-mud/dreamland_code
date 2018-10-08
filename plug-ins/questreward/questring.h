@@ -15,13 +15,13 @@ class Affect;
 class QuestRing : public PersonalQuestReward {
 XML_OBJECT
 public:
-	typedef ::Pointer<QuestRing> Pointer;
+        typedef ::Pointer<QuestRing> Pointer;
     
-	virtual void wear( Character * );                  
-	virtual void equip( Character * );                           
-	
+        virtual void wear( Character * );                  
+        virtual void equip( Character * );                           
+        
 protected:
-	void addAffect( Character *, Affect * );
+        void addAffect( Character *, Affect * );
 };
 
 

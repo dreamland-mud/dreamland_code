@@ -24,30 +24,30 @@ bool PocketWatch::prompt( Character *ch, char letter, ostringstream &buf )
     int hour;
 
     if (letter != 'T')
-	return false;
+        return false;
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
-	return false;
+        return false;
     
     if (broken.getValue( )) {
-	hour = prevHour;
+        hour = prevHour;
 
-	if (number_range( 1, 7777) == 1)
-	    prevHour = number_range( 0, 23 );
+        if (number_range( 1, 7777) == 1)
+            prevHour = number_range( 0, 23 );
     }
     else
-	hour = time_info.hour;
+        hour = time_info.hour;
 
     buf << ((hour % 12 == 0) ? 12 : hour % 12) << " ";
 
     if ((hour > 16) && (hour < 24)) 
-	buf << "вечера";
+        buf << "вечера";
     if (hour < 4) 
-	buf << "ночи";
+        buf << "ночи";
     if ((hour > 3) && (hour < 12)) 
-	buf << "утра";
+        buf << "утра";
     if ((hour > 11) && (hour < 17)) 
-	buf << "дня";
+        buf << "дня";
 
     return true;
 }
