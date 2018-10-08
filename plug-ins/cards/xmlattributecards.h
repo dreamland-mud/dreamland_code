@@ -21,47 +21,47 @@ class XMLAttributeCards :
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeCards> Pointer;
+        typedef ::Pointer<XMLAttributeCards> Pointer;
 
-	XMLAttributeCards( );
-	virtual ~XMLAttributeCards( );
+        XMLAttributeCards( );
+        virtual ~XMLAttributeCards( );
 
-	virtual bool handle( const DeathArguments & ); 
-	
-	inline void setContactName( const DLString & );
-	inline const DLString & getContactName( ) const;
-	inline int getLevel( ) const;
-	inline void setLevel( int );
-	inline int getSuit( ) const;
-	inline void setSuit( int );
-	static int getRandomSuit( );
-	DLString getFace( char ) const;
-	bool isTrump( ) const;
-	
-	static int getMaxLevel( );
-	struct CardLevelFace {
-	    const char *name;
-	    int gender;
-	};
-	static const CardLevelFace levelFaces[];
+        virtual bool handle( const DeathArguments & ); 
+        
+        inline void setContactName( const DLString & );
+        inline const DLString & getContactName( ) const;
+        inline int getLevel( ) const;
+        inline void setLevel( int );
+        inline int getSuit( ) const;
+        inline void setSuit( int );
+        static int getRandomSuit( );
+        DLString getFace( char ) const;
+        bool isTrump( ) const;
+        
+        static int getMaxLevel( );
+        struct CardLevelFace {
+            const char *name;
+            int gender;
+        };
+        static const CardLevelFace levelFaces[];
 
-	struct CardSuitFace {
-	    const char *mlt;
-	    const char *male;
-	    const char *female;
-	};
-	static const CardSuitFace suitFaces[];
+        struct CardSuitFace {
+            const char *mlt;
+            const char *male;
+            const char *female;
+        };
+        static const CardSuitFace suitFaces[];
 
-	inline const CardLevelFace& getLevelFace( ) const;
-	inline const CardSuitFace& getSuitFace( ) const;
+        inline const CardLevelFace& getLevelFace( ) const;
+        inline const CardSuitFace& getSuitFace( ) const;
 
-	static int getTrump( );
-	static inline const CardSuitFace& getTrumpFace( );
-	
+        static int getTrump( );
+        static inline const CardSuitFace& getTrumpFace( );
+        
 private:
-	XML_VARIABLE XMLInteger level;
-	XML_VARIABLE XMLInteger suit;
-	XML_VARIABLE XMLString contactName;
+        XML_VARIABLE XMLInteger level;
+        XML_VARIABLE XMLInteger suit;
+        XML_VARIABLE XMLString contactName;
 };
 
 inline void XMLAttributeCards::setContactName( const DLString &value )

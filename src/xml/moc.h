@@ -13,15 +13,15 @@ const DLString & Class::mocGetType( ) const \
 
 #define MOC_CLASS_DECLS   \
     struct NodeType {  \
-	typedef void fromXML_t( ContainerType *, const XMLNode::Pointer& );  \
-	typedef bool toXML_t( const ContainerType *, XMLNode::Pointer& );  \
+        typedef void fromXML_t( ContainerType *, const XMLNode::Pointer& );  \
+        typedef bool toXML_t( const ContainerType *, XMLNode::Pointer& );  \
   \
-	void set(fromXML_t *f, toXML_t *t) {  \
-	    fromXML = f;  \
-	    toXML = t;  \
-	}  \
-	fromXML_t *fromXML;  \
-	toXML_t *toXML;  \
+        void set(fromXML_t *f, toXML_t *t) {  \
+            fromXML = f;  \
+            toXML = t;  \
+        }  \
+        fromXML_t *fromXML;  \
+        toXML_t *toXML;  \
     };  \
       \
     typedef std::map<DLString, NodeType> NodesType;  \
@@ -38,7 +38,7 @@ bool Class::mocNodeFromXML( const XMLNode::Pointer &parent ) \
     i = __MetaInfo__::instance.nodes.find( parent->getName( ) ); \
  \
     if (i == __MetaInfo__::instance.nodes.end( )) \
-	return false; \
+        return false; \
  \
     i->second.fromXML( this, parent ); \
     return true; \
@@ -50,18 +50,18 @@ bool Class::mocToXML( XMLNode::Pointer &parent ) const \
     __MetaInfo__::NodesType::const_iterator i; \
      \
     for (i = __MetaInfo__::instance.nodes.begin( );  \
-	 i != __MetaInfo__::instance.nodes.end( );  \
-	 i++)  \
+         i != __MetaInfo__::instance.nodes.end( );  \
+         i++)  \
     { \
         XMLNode::Pointer child( NEW ); \
-	 \
+         \
         try { \
             if (i->second.toXML( this, child )) { \
                 child->setName( i->first ); \
-		parent->appendChild( child ); \
+                parent->appendChild( child ); \
             } \
         }  \
-	catch (const ExceptionSkipVariable &) { \
+        catch (const ExceptionSkipVariable &) { \
         } \
     } \
     return true; \
@@ -70,11 +70,11 @@ bool Class::mocToXML( XMLNode::Pointer &parent ) const \
 #define MOC_VARIABLE(name)  \
     static void var_ ## name ## _fromXML( ContainerType *container, const XMLNode::Pointer& parent ) throw( ExceptionBadType ) \
     { \
-	container->name.fromXML( parent ); \
+        container->name.fromXML( parent ); \
     } \
     static bool var_ ## name ## _toXML( const ContainerType *container, XMLNode::Pointer& parent ) \
     { \
-	return container->name.toXML( parent ); \
+        return container->name.toXML( parent ); \
     }
 
 #endif

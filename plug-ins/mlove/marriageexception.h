@@ -10,9 +10,9 @@
 
 class MarriageException : public Exception {
 public:
-	MarriageException( DLString str ) : Exception( str )
-	{	
-	}
+        MarriageException( DLString str ) : Exception( str )
+        {        
+        }
 };
 
 #endif

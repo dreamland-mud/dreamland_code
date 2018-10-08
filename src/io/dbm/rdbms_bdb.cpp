@@ -55,11 +55,11 @@ template <typename key_t>
 DbContext<key_t>::~DbContext( )
 {
     if(db) {
-	LogStream::sendError( )
-	    << "DbContext::~DbContext: "
-	    << "closing pending database" << endl;
+        LogStream::sendError( )
+            << "DbContext::~DbContext: "
+            << "closing pending database" << endl;
 
-	close( );
+        close( );
     }
 }
 
@@ -68,20 +68,20 @@ void
 DbContext<key_t>::open( const char *file, const char *dbname, bool fDup )
 {
     try {
-	db = new Db(getDbEnv( )->dbEnv, 0);
-	db->open( NULL, 
-	          file, 
-		  dbname, 
-		  DB_BTREE, 
-		  DB_CREATE | DB_AUTO_COMMIT | (fDup ? DB_DUP : 0), 
-		  0 );
+        db = new Db(getDbEnv( )->dbEnv, 0);
+        db->open( NULL, 
+                  file, 
+                  dbname, 
+                  DB_BTREE, 
+                  DB_CREATE | DB_AUTO_COMMIT | (fDup ? DB_DUP : 0), 
+                  0 );
     } 
     catch(const DbException &ex) {
-	LogStream::sendError()
-	    << "Failed to open DbContext: " 
-	    << (file ? file : "<unknown>") << ": " 
-	    << (dbname ? dbname : "<unknown>") << ": " 
-	    << ex.what( ) << endl;
+        LogStream::sendError()
+            << "Failed to open DbContext: " 
+            << (file ? file : "<unknown>") << ": " 
+            << (dbname ? dbname : "<unknown>") << ": " 
+            << ex.what( ) << endl;
     }
 }
 
@@ -90,17 +90,17 @@ void
 DbContext<key_t>::close( )
 {
     if(!db) {
-	LogStream::sendError() << "DbContext already closed" << endl;
-	return;
+        LogStream::sendError() << "DbContext already closed" << endl;
+        return;
     }
     
     try {
-	db->close( 0 );
-	delete db;
-	db = NULL;
+        db->close( 0 );
+        delete db;
+        db = NULL;
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "Failed to close DbContext: " << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "Failed to close DbContext: " << ex.what( ) << endl;
     }
 }
 
@@ -114,9 +114,9 @@ DbContext<key_t>::load( )
     db->get_dbname(&file, &dbname);
 
     LogStream::sendNotice( ) 
-	<< "Loading DbContext: "
-	<< (file ? file : "<unknown>") << ":" 
-	<< (dbname ? dbname : "<unknown>") << "..." << endl;
+        << "Loading DbContext: "
+        << (file ? file : "<unknown>") << ":" 
+        << (dbname ? dbname : "<unknown>") << "..." << endl;
 
     int cnt = 0;
     DbTxn *txn;
@@ -124,28 +124,28 @@ DbContext<key_t>::load( )
     txn = getCurrentTxn( );
 
     try {
-	Dbt key, val;
-	Dbc *cur = 0;
+        Dbt key, val;
+        Dbc *cur = 0;
 
-	db->cursor( txn, &cur, 0 );
-	
-	while(cur->get( &key, &val, DB_NEXT ) != DB_NOTFOUND) {
-	    try {
-		key_t id;
+        db->cursor( txn, &cur, 0 );
+        
+        while(cur->get( &key, &val, DB_NEXT ) != DB_NOTFOUND) {
+            try {
+                key_t id;
 
-		dbt2key(key, id);
-		seq(id, val.get_data( ), val.get_size( ));
-		cnt++;
-	    } catch(const ::Exception &e) {
-		LogStream::sendError() << e.what() << ":" << endl;
-	    }
+                dbt2key(key, id);
+                seq(id, val.get_data( ), val.get_size( ));
+                cnt++;
+            } catch(const ::Exception &e) {
+                LogStream::sendError() << e.what() << ":" << endl;
+            }
         }
-	cur->close( );
-	commit( );
+        cur->close( );
+        commit( );
 
     } catch(const DbException &ex) {
-	LogStream::sendError() << ex.what() << ":" << endl;
-	abort( );
+        LogStream::sendError() << ex.what() << ":" << endl;
+        abort( );
     }
 
     LogStream::sendNotice() << "Total " << cnt << " records loaded" << endl;
@@ -157,16 +157,16 @@ void
 DbContext<key_t>::get( key_t k, void *& d_val, size_t &d_size )
 {
     try {
-	Dbt key = key2dbt( k ), val;
+        Dbt key = key2dbt( k ), val;
 
-	db->get(getCurrentTxn( ), &key, &val, DB_DBT_MALLOC);
-	
-	d_val = val.get_data( );
-	d_size = val.get_size( );
+        db->get(getCurrentTxn( ), &key, &val, DB_DBT_MALLOC);
+        
+        d_val = val.get_data( );
+        d_size = val.get_size( );
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "DbContext::get(" << k << "): " 
-	    << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "DbContext::get(" << k << "): " 
+            << ex.what( ) << endl;
     }
 }
 
@@ -175,12 +175,12 @@ void
 DbContext<key_t>::put( key_t k, void * d_val, size_t d_size )
 {
     try {
-	Dbt key = key2dbt( k ), val(d_val, d_size);
+        Dbt key = key2dbt( k ), val(d_val, d_size);
 
-	db->put( getCurrentTxn( ), &key, &val, 0 );
+        db->put( getCurrentTxn( ), &key, &val, 0 );
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "DbContext::put(" << k << "): " << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "DbContext::put(" << k << "): " << ex.what( ) << endl;
     }
 }
 
@@ -189,12 +189,12 @@ void
 DbContext<key_t>::del( key_t k )
 {
     try {
-	Dbt key = key2dbt( k );
+        Dbt key = key2dbt( k );
 
-	db->del( getCurrentTxn( ), &key, 0 );
+        db->del( getCurrentTxn( ), &key, 0 );
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "DbContext::del(" << k << "): " << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "DbContext::del(" << k << "): " << ex.what( ) << endl;
     }
 }
 
@@ -253,11 +253,11 @@ DbTxnContext::DbTxnContext( ) : currentTxn( 0 )
 DbTxnContext::~DbTxnContext( )
 {
     if(currentTxn) {
-	LogStream::sendError( )
-	    << "Scripting::DbTxnContext::~DbTxnContext: "
-	    << "aborting pending transaction." << endl;
+        LogStream::sendError( )
+            << "Scripting::DbTxnContext::~DbTxnContext: "
+            << "aborting pending transaction." << endl;
 
-	currentTxn->abort( );
+        currentTxn->abort( );
     }
 }
 
@@ -271,7 +271,7 @@ DbTxn *
 DbTxnContext::getCurrentTxn( )
 {
     if(!currentTxn)
-	getDbEnv( )->dbEnv->txn_begin(NULL, &currentTxn, DB_TXN_SYNC);
+        getDbEnv( )->dbEnv->txn_begin(NULL, &currentTxn, DB_TXN_SYNC);
 
     return currentTxn;
 }
@@ -280,7 +280,7 @@ void
 DbTxnContext::commit( )
 {
     if(currentTxn)
-	currentTxn->commit( 0 );
+        currentTxn->commit( 0 );
 
     currentTxn = NULL;
 }
@@ -289,7 +289,7 @@ void
 DbTxnContext::abort( )
 {
     if(currentTxn)
-	currentTxn->abort( );
+        currentTxn->abort( );
 
     currentTxn = NULL;
 }

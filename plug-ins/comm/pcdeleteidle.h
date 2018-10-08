@@ -21,24 +21,24 @@
 #include "descriptorstatelistener.h"
 
 class PCDeleteIdle : public SchedulerTaskRoundPlugin,
-	             public virtual SchedulerTaskRoundPCMemory,
-		     public DescriptorStateListener
+                     public virtual SchedulerTaskRoundPCMemory,
+                     public DescriptorStateListener
 {
 public:
-	typedef ::Pointer<PCDeleteIdle> Pointer;
+        typedef ::Pointer<PCDeleteIdle> Pointer;
 
-	PCDeleteIdle( );
-	virtual ~PCDeleteIdle( );
-	
-	virtual void initialization( );
-	virtual void destruction( );
-	virtual void after( );
-	virtual void run( PCMemoryInterface* pcm );
-	virtual void run( int, int, Descriptor * );
+        PCDeleteIdle( );
+        virtual ~PCDeleteIdle( );
+        
+        virtual void initialization( );
+        virtual void destruction( );
+        virtual void after( );
+        virtual void run( PCMemoryInterface* pcm );
+        virtual void run( int, int, Descriptor * );
 
 protected:
-	std::list<DLString> eraseList;	
-	static int getDiff( PCMemoryInterface * );
+        std::list<DLString> eraseList;        
+        static int getDiff( PCMemoryInterface * );
 };
 
 #endif

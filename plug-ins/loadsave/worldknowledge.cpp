@@ -45,20 +45,20 @@ void WorldKnowledge::save( )
     DLFileWrite file( dreamland->getDbDir( ), FILE_NAME );
     
     if (!file.open( ))
-	return;
+        return;
 
     for (Visits::iterator v = visits.begin( ); v != visits.end( ); v++) {
-#if 0	
+#if 0        
         ostringstream os;
         os << v->first;
-	file.printf( "%s", os.str().c_str( ));
-#else	
-	file.printf( "%lld ", v->first );
+        file.printf( "%s", os.str().c_str( ));
+#else        
+        file.printf( "%lld ", v->first );
 #endif
-	for (VisitedRooms::iterator r = v->second.begin( ); r != v->second.end( ); r++)
-	    file.printf( "%d ", *r );
-	
-	file.writeln( );
+        for (VisitedRooms::iterator r = v->second.begin( ); r != v->second.end( ); r++)
+            file.printf( "%d ", *r );
+        
+        file.writeln( );
     }
     
     file.writeln( "0" );
@@ -72,13 +72,13 @@ void WorldKnowledge::load( )
     DLFileRead file( dreamland->getDbDir( ), FILE_NAME );
 
     if (!file.open( ))
-	return;
+        return;
     
     while (!file.eof( ) && ( num = fread_number64( file.getFP( ) ) )) {
-	if (num > 0xffff) 
-	    playerID = num;
-	else 
-	    visits[playerID].insert( num );
+        if (num > 0xffff) 
+            playerID = num;
+        else 
+            visits[playerID].insert( num );
     }
 
     LogStream::sendNotice( ) << "Loaded room visits for " << visits.size( ) << " players" << endl;
@@ -94,7 +94,7 @@ void WorldKnowledge::report( PCharacter *ch, ostringstream &buf )
     int cnt = visits[ch->getID( )].size( );
     
     buf << "Visited " << cnt * 100 / top_room << "% rooms "
-	<< "(" << cnt << " of " << top_room << ")" << endl;
+        << "(" << cnt << " of " << top_room << ")" << endl;
 }
 
 void WorldKnowledge::run( )

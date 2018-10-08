@@ -13,13 +13,13 @@
 class RainbowPiece: public ObjectBehavior {
 XML_OBJECT    
 public:
-	typedef ::Pointer<RainbowPiece> Pointer;
-	
-	virtual void get( Character * );
-	
-	void config( int );
-	
-	XML_VARIABLE XMLInteger number;
+        typedef ::Pointer<RainbowPiece> Pointer;
+        
+        virtual void get( Character * );
+        
+        void config( int );
+        
+        XML_VARIABLE XMLInteger number;
 };
 
 #endif

@@ -22,46 +22,46 @@
 class Integer 
 {
 public:
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-public:	
-	/** По умолчанию значение 0 */
-	inline Integer( ) : value( 0 )
-	{
-	}
+public:        
+        /** По умолчанию значение 0 */
+        inline Integer( ) : value( 0 )
+        {
+        }
 
-	inline Integer( int value ) : value( value )
-	{
-	}
+        inline Integer( int value ) : value( value )
+        {
+        }
 
-	inline Integer( const DLString& value ) throw( ExceptionBadType )
-	{
-		fromString( value );
-	}
+        inline Integer( const DLString& value ) throw( ExceptionBadType )
+        {
+                fromString( value );
+        }
 
-	DLString toString( ) const throw( );
-	void fromString( const DLString& value ) throw( ExceptionBadType );
+        DLString toString( ) const throw( );
+        void fromString( const DLString& value ) throw( ExceptionBadType );
 
-	inline int getValue( ) const
-	{
-		return value;
-	}
+        inline int getValue( ) const
+        {
+                return value;
+        }
 
-	inline void setValue( int value )
-	{
-		this->value = value;
-	}
+        inline void setValue( int value )
+        {
+                this->value = value;
+        }
 
-	inline operator int & ( ) {
-	    return value;
-	}
+        inline operator int & ( ) {
+            return value;
+        }
 
-	inline operator const int & ( ) const {
-	    return value;
-	}
+        inline operator const int & ( ) const {
+            return value;
+        }
 
 private:
-	int value;
+        int value;
 };
 
 
@@ -70,8 +70,8 @@ private:
 /** Вывод в ostream типа Integer */
 inline std::ostream& operator << ( std::ostream& ostr, const Integer& integer )
 {
-	ostr << integer.getValue( );
-	return ostr;
+        ostr << integer.getValue( );
+        return ostr;
 }
 
 #endif

@@ -22,27 +22,27 @@
 
 extern "C"
 {
-	SO::PluginList initialize_admin( )
-	{
-		SO::PluginList ppl;
+        SO::PluginList initialize_admin( )
+        {
+                SO::PluginList ppl;
 
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeNoChannel> >( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeNoChannel> >( ppl );
 
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeNoPost> >( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeNoPost> >( ppl );
 
-		Plugin::registerPlugin<Confirm>( ppl );
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeConfirm> >( ppl );
-		Plugin::registerPlugin<XMLAttributeConfirmListenerPlugin>( ppl );
-		
-		Plugin::registerPlugin<Deny>( ppl );
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeDeny> >( ppl );
-		
-		Plugin::registerPlugin<CBan>( ppl );
-		
-		
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGodReward> >( ppl );
-		Plugin::registerPlugin<XMLAttributeGodRewardListenerPlugin>( ppl );
-		
-		return ppl;
-	}
+                Plugin::registerPlugin<Confirm>( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeConfirm> >( ppl );
+                Plugin::registerPlugin<XMLAttributeConfirmListenerPlugin>( ppl );
+                
+                Plugin::registerPlugin<Deny>( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeDeny> >( ppl );
+                
+                Plugin::registerPlugin<CBan>( ppl );
+                
+                
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGodReward> >( ppl );
+                Plugin::registerPlugin<XMLAttributeGodRewardListenerPlugin>( ppl );
+                
+                return ppl;
+        }
 }

@@ -16,15 +16,15 @@ extern "C"
 {
     SO::PluginList initialize_services_petshop( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Pet> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<LevelAdaptivePet> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<RideablePet> >( ppl );
-	Plugin::registerPlugin<RoomBehaviorRegistrator<PetShopStorage> >( ppl );
-	Plugin::registerPlugin<RoomBehaviorRegistrator<PetShopRoom> >( ppl );
-	Plugin::registerPlugin<RoomBehaviorRegistrator<MixedPetShopRoom> >( ppl );
-	    
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Pet> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<LevelAdaptivePet> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<RideablePet> >( ppl );
+        Plugin::registerPlugin<RoomBehaviorRegistrator<PetShopStorage> >( ppl );
+        Plugin::registerPlugin<RoomBehaviorRegistrator<PetShopRoom> >( ppl );
+        Plugin::registerPlugin<RoomBehaviorRegistrator<MixedPetShopRoom> >( ppl );
+            
+        return ppl;
     }
 }

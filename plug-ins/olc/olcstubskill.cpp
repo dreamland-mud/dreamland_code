@@ -52,24 +52,24 @@ void OLCStubSkill::show( PCharacter *ch, std::ostream & buf )
 {
     buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
         << " '{W" << getName( ) << "{x'"
-	<< " '{W" << getRussianName( ) << "{x', "
-	<< "входит в группу '{W" << getGroup( )->getName( ) << "{x'"
-	<< endl;
+        << " '{W" << getRussianName( ) << "{x', "
+        << "входит в группу '{W" << getGroup( )->getName( ) << "{x'"
+        << endl;
 }
 
 TABLE_LOADER(OLCStubSkillLoader, "olc-skills", "skill");
 
 extern "C"
 {
-	SO::PluginList initialize_olc_skills( )
-	{
-	    SO::PluginList ppl;
+        SO::PluginList initialize_olc_skills( )
+        {
+            SO::PluginList ppl;
 
-	    Plugin::registerPlugin<MocRegistrator<OLCStubSkill> >( ppl );
-	    Plugin::registerPlugin<OLCStubSkillLoader>( ppl );
+            Plugin::registerPlugin<MocRegistrator<OLCStubSkill> >( ppl );
+            Plugin::registerPlugin<OLCStubSkillLoader>( ppl );
 
-	    return ppl;
-	}
-	
+            return ppl;
+        }
+        
 }
 

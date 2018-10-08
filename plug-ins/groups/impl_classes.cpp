@@ -21,29 +21,29 @@
 
 extern "C"
 {
-	SO::PluginList initialize_class_skills( )
-	{
-	    SO::PluginList ppl;
+        SO::PluginList initialize_class_skills( )
+        {
+            SO::PluginList ppl;
 
-	    Plugin::registerPlugin<ObjectBehaviorRegistrator<ShadowBlade> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<AntipaladinGuildmaster> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<RangerCreature> >( ppl );
-	    Plugin::registerPlugin<ObjectBehaviorRegistrator<RangerStaff> >( ppl );
-	    Plugin::registerPlugin<ObjectBehaviorRegistrator<EnergyShield> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiGuildmaster> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiUniclassAdept> >( ppl );
-	    Plugin::registerPlugin<ObjectBehaviorRegistrator<Katana> >( ppl );
-	    Plugin::registerPlugin<ObjectBehaviorRegistrator<OwnedKatana> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<VampireGuildmaster> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<UniclassAdept> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<UniclassAdeptAndShopTrader> >( ppl );
-	    Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeUniclass> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<DwarkinAdept> >( ppl );
-	    Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeEnlight> >( ppl );
-	
-	    
-	    return ppl;
-	}
-	
+            Plugin::registerPlugin<ObjectBehaviorRegistrator<ShadowBlade> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<AntipaladinGuildmaster> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<RangerCreature> >( ppl );
+            Plugin::registerPlugin<ObjectBehaviorRegistrator<RangerStaff> >( ppl );
+            Plugin::registerPlugin<ObjectBehaviorRegistrator<EnergyShield> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiGuildmaster> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<SamuraiUniclassAdept> >( ppl );
+            Plugin::registerPlugin<ObjectBehaviorRegistrator<Katana> >( ppl );
+            Plugin::registerPlugin<ObjectBehaviorRegistrator<OwnedKatana> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<VampireGuildmaster> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<UniclassAdept> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<UniclassAdeptAndShopTrader> >( ppl );
+            Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeUniclass> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<DwarkinAdept> >( ppl );
+            Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeEnlight> >( ppl );
+        
+            
+            return ppl;
+        }
+        
 }
 

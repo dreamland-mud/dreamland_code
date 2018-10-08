@@ -53,7 +53,7 @@ int CardSkill::getLevel( Character *ch ) const
 int CardSkill::getLearned( Character *ch ) const
 {
     if (!usable( ch, false ))
-	return 0;
+        return 0;
 
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
@@ -76,7 +76,7 @@ bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
 bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<CardSellerBehavior>( ))
-	return true;
+        return true;
 
     if (verbose) {    
         if (mob)
@@ -93,22 +93,22 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf )
     bool rus = ch->getConfig( )->ruskills;
 
     buf << (spell ? "Заклинание" : "Умение") 
-	<< " Колоды '{W" << getName( ) << "{x' или '{W" << getRussianName( ) << "{x', "
+        << " Колоды '{W" << getName( ) << "{x' или '{W" << getRussianName( ) << "{x', "
         << "входит в группу '{hg{W"  
-	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
         << "{x'" << endl;
     
     buf << "Появляется у карт, начиная с {W" 
-	<< russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
-	<< "{x"; 
+        << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
+        << "{x"; 
 
     if (visible( ch )) {
         int learned = getLearned( ch );
         if (learned > 0)
-	    buf << ", изучено на {W" << learned << "%{x";
+            buf << ", изучено на {W" << learned << "%{x";
 
-	if (!usable( ch ))
-	    buf << " (сейчас тебе недоступно)";
+        if (!usable( ch ))
+            buf << " (сейчас тебе недоступно)";
     }
     
     buf << endl; 
@@ -123,15 +123,15 @@ int CardSkill::findCardLevel( Character *ch )
     XMLAttributeCards::Pointer attr;
     
     if (ch->is_npc( ))
-	return -1;
+        return -1;
     
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
 
     if (!attr)
-	return -1;
+        return -1;
 
     if (attr->isTrump( ))
-	return XMLAttributeCards::getMaxLevel( );
+        return XMLAttributeCards::getMaxLevel( );
 
     return attr->getLevel( );
 }

@@ -22,7 +22,7 @@ protected:
     bool defenseParry( );
     bool defenseShieldBlock( );
     bool defenseDodge( );
-	
+        
     virtual void damBase( );
     void damApplySharp( );
     void damApplyHoly( );

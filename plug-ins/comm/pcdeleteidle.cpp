@@ -35,13 +35,13 @@ int PCDeleteIdle::getDiff( PCMemoryInterface *pcm )
     int remorts = pcm->getRemorts( ).size( );
 
     if (remorts == 0 && level < 2)
-	return Date::SECOND_IN_MONTH;
+        return Date::SECOND_IN_MONTH;
     
     if (remorts == 0 && level <= 20)
-	return Date::SECOND_IN_MONTH * 6;
+        return Date::SECOND_IN_MONTH * 6;
     
     if (level <= LEVEL_MORTAL)
-	return Date::SECOND_IN_YEAR;
+        return Date::SECOND_IN_YEAR;
     
     return -1;
 }
@@ -53,21 +53,21 @@ void PCDeleteIdle::run( int oldState, int newState, Descriptor *d )
     ostringstream buf;
 
     if (oldState != CON_PLAYING || newState != CON_QUIT)
-	return;
+        return;
 
     if (!d || !d->character)
-	return;
+        return;
     
     ch = d->character->getPC( );
 
     diff = getDiff( ch );
 
     if (diff < 0)
-	return;
+        return;
 
     buf << "{xПерсонаж будет автоматически {RУДАЛЕН{x {Y" 
-	<< Date::getTimeAsString( dreamland->getCurrentTime( ) + diff ) 
-	<< "{x." << endl;
+        << Date::getTimeAsString( dreamland->getCurrentTime( ) + diff ) 
+        << "{x." << endl;
 
     ch->send_to( buf );
 }
@@ -79,10 +79,10 @@ void PCDeleteIdle::run( PCMemoryInterface* pcm )
     const int currentDate = dreamland->getCurrentTime( );
     
     if (diff < 0)
-	return;
+        return;
 
     if (currentDate <= lastAccessDate + diff)
-	return;
+        return;
     
     eraseList.push_back( pcm->getName( ) );
 }
@@ -90,14 +90,14 @@ void PCDeleteIdle::run( PCMemoryInterface* pcm )
 void PCDeleteIdle::after( )
 {
     while (!eraseList.empty( )) {
-	DLString name = eraseList.front( );
+        DLString name = eraseList.front( );
 
-	eraseList.pop_front( );
+        eraseList.pop_front( );
 
-	if (PCharacterManager::pfDelete( name ))
-	    LogStream::sendWarning( ) << name << "'s deleted" << endl;
+        if (PCharacterManager::pfDelete( name ))
+            LogStream::sendWarning( ) << name << "'s deleted" << endl;
     }
-	
+        
     DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_DAY, Pointer( this ) );
 }
 

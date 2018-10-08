@@ -36,7 +36,7 @@ void RaceHelp::setRace( Race::Pointer race )
     this->race = race;
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
 
     kwd.insert( race->getName( ) );
     kwd.insert( race->getMaleName( ).ruscase( '1' ) );
@@ -154,7 +154,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
         // Collect skills available even for profession 'none',
         // such as race aptitudes or non-professional bonuses.
-	if (skill->visible( &dummy )) {
+        if (skill->visible( &dummy )) {
             if (skill->getLearned( &dummy ) >= 100)
                 noprof100.insert( sname );
             else if (skill->getGroup( ) != group_ancient_languages)
@@ -167,13 +167,13 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
             Profession *prof = professionManager->find( i );
             if (!prof->isPlayed( ))
                 continue;
-	    dummy.setProfession( prof->getName( ) );
+            dummy.setProfession( prof->getName( ) );
             if (skill->visible( &dummy )) {
-		if (skill->getLearned( &dummy ) >= 100)
+                if (skill->getLearned( &dummy ) >= 100)
                     if (raceApt.count( sname ) == 0 && noprof100.count( sname ) == 0)
                         prof100.insert( sname );
             }
-	}
+        }
     }
     
     if (!raceApt.empty( )) {
@@ -194,18 +194,18 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
  *------------------------------------------------------------------*/
 DefaultRace::DefaultRace( ) : 
                 det( 0, &detect_flags ),
-		act( 0, &act_flags ),
-		aff( 0, &affect_flags ),
-		off( 0, &off_flags ),
-		imm( 0, &imm_flags ),
-		res( 0, &res_flags ),
-		vuln( 0, &vuln_flags ),
-		form( 0, &form_flags ),
-		parts( 0, &part_flags ),
-		size( SIZE_MEDIUM, &size_table ),
-		wearloc( wearlocationManager ),
-		hunts( raceManager ),
-		donates( raceManager )
+                act( 0, &act_flags ),
+                aff( 0, &affect_flags ),
+                off( 0, &off_flags ),
+                imm( 0, &imm_flags ),
+                res( 0, &res_flags ),
+                vuln( 0, &vuln_flags ),
+                form( 0, &form_flags ),
+                parts( 0, &part_flags ),
+                size( SIZE_MEDIUM, &size_table ),
+                wearloc( wearlocationManager ),
+                hunts( raceManager ),
+                donates( raceManager )
 {
 }
 
@@ -240,13 +240,13 @@ void DefaultRace::loaded( )
     raceManager->registrate( Pointer( this ) );
 
     if (help)
-	help->setRace( Pointer( this ) );
+        help->setRace( Pointer( this ) );
 }
 
 void DefaultRace::unloaded( )
 {
     if (help)
-	help->unsetRace( );
+        help->unsetRace( );
 
     raceManager->unregistrate( Pointer( this ) );
 }
@@ -316,12 +316,12 @@ const DLString & DefaultRace::getMltName( ) const
 DLString DefaultRace::getNameFor( Character *looker, Character *me, const Grammar::Case &c ) const
 {
     if (looker && me && looker->getConfig( )->rucommands) {
-	if (me->getSex( ) == SEX_MALE)
-	    return getMaleName( ).ruscase( c );
-	if (me->getSex( ) == SEX_FEMALE)
-	    return getFemaleName( ).ruscase( c );
-	if (me->getSex( ) == SEX_NEUTRAL)
-	    return getNeuterName( ).ruscase( c );
+        if (me->getSex( ) == SEX_MALE)
+            return getMaleName( ).ruscase( c );
+        if (me->getSex( ) == SEX_FEMALE)
+            return getFemaleName( ).ruscase( c );
+        if (me->getSex( ) == SEX_NEUTRAL)
+            return getNeuterName( ).ruscase( c );
     }
     
     return getName( );
@@ -332,10 +332,10 @@ Flags DefaultRace::getAttitude( const Race &race ) const
     Flags att( 0, &race_flags );
 
     if (getForm( ).isSet( FORM_CANINE ) && race.getForm( ).isSet( FORM_FELINE ))
-	att.setBit( RACE_HATES );
+        att.setBit( RACE_HATES );
 
     if (getForm( ).isSet( FORM_FELINE ) && race.getForm( ).isSet( FORM_CANINE ))
-	att.setBit( RACE_HATES );
+        att.setBit( RACE_HATES );
 
     return att;
 }

@@ -22,17 +22,17 @@ void Room::affectModify( Affect *paf, bool fAdd )
 
     if ( fAdd )
     {
-	switch (paf->where)
-	{
-	case TO_ROOM_AFFECTS:
-	      SET_BIT(affected_by, paf->bitvector);
-	    break;
-	case TO_ROOM_FLAGS:
-	      SET_BIT(room_flags, paf->bitvector);
-	    break;
-	case TO_ROOM_CONST:
-	    break;
-	}
+        switch (paf->where)
+        {
+        case TO_ROOM_AFFECTS:
+              SET_BIT(affected_by, paf->bitvector);
+            break;
+        case TO_ROOM_FLAGS:
+              SET_BIT(room_flags, paf->bitvector);
+            break;
+        case TO_ROOM_CONST:
+            break;
+        }
     }
     else
     {
@@ -41,24 +41,24 @@ void Room::affectModify( Affect *paf, bool fAdd )
         case TO_ROOM_AFFECTS:
               REMOVE_BIT(affected_by, paf->bitvector);
             break;
-	case TO_ROOM_FLAGS:
-	      REMOVE_BIT(room_flags, paf->bitvector);
-	    break;
+        case TO_ROOM_FLAGS:
+              REMOVE_BIT(room_flags, paf->bitvector);
+            break;
         case TO_ROOM_CONST:
             break;
         }
-	mod = 0 - mod;
+        mod = 0 - mod;
     }
 
     switch ( paf->location )
     {
     default:
-	bug( "Affect_modify_room: unknown location %d.", paf->location );
-	return;
+        bug( "Affect_modify_room: unknown location %d.", paf->location );
+        return;
 
-    case APPLY_ROOM_NONE:					break;
-    case APPLY_ROOM_HEAL:	heal_rate += mod;		break;
-    case APPLY_ROOM_MANA:	mana_rate += mod;		break;
+    case APPLY_ROOM_NONE:                                        break;
+    case APPLY_ROOM_HEAL:        heal_rate += mod;                break;
+    case APPLY_ROOM_MANA:        mana_rate += mod;                break;
     }
 }
 
@@ -71,23 +71,23 @@ void Room::affectTo( Affect *paf )
     Room *pRoomIndex;
 
     if (!affected) {
-	if (top_affected_room) {
-	    for ( pRoomIndex  = top_affected_room; pRoomIndex->aff_next != 0; pRoomIndex  = pRoomIndex->aff_next )
-		continue;
-		
-	    pRoomIndex->aff_next = this;	
-	}
-	else 
-	    top_affected_room = this;
+        if (top_affected_room) {
+            for ( pRoomIndex  = top_affected_room; pRoomIndex->aff_next != 0; pRoomIndex  = pRoomIndex->aff_next )
+                continue;
+                
+            pRoomIndex->aff_next = this;        
+        }
+        else 
+            top_affected_room = this;
 
-	aff_next = 0;
+        aff_next = 0;
     }
 
     paf_new = dallocate( Affect );
 
-    *paf_new		= *paf;
-    paf_new->next	= affected;
-    affected	= paf_new;
+    *paf_new                = *paf;
+    paf_new->next        = affected;
+    affected        = paf_new;
 
     affectModify( paf_new, true );
 }
@@ -97,24 +97,24 @@ void Room::affectCheck( int where, int vector )
     Affect *paf;
 
     if (vector == 0)
-	return;
+        return;
 
     for (paf = affected; paf != 0; paf = paf->next)
-	if (paf->where == where && paf->bitvector == vector)
-	{
-	    switch (where)
-	    {
-	        case TO_ROOM_AFFECTS:
-		      SET_BIT(affected_by,vector);
-		    break;
-		case TO_ROOM_FLAGS:
-	      	      SET_BIT(room_flags, vector);
-	    	    break;
-	        case TO_ROOM_CONST:
-		    break;
-	    }
-	    return;
-	}
+        if (paf->where == where && paf->bitvector == vector)
+        {
+            switch (where)
+            {
+                case TO_ROOM_AFFECTS:
+                      SET_BIT(affected_by,vector);
+                    break;
+                case TO_ROOM_FLAGS:
+                            SET_BIT(room_flags, vector);
+                        break;
+                case TO_ROOM_CONST:
+                    break;
+            }
+            return;
+        }
 }
 
 /*
@@ -127,8 +127,8 @@ void Room::affectRemove( Affect *paf )
 
     if ( affected == 0 )
     {
-	bug( "Affect_remove_room: no affect.", 0 );
-	return;
+        bug( "Affect_remove_room: no affect.", 0 );
+        return;
     }
 
     affectModify( paf, false );
@@ -136,42 +136,42 @@ void Room::affectRemove( Affect *paf )
     vector = paf->bitvector;
 
     if (paf == affected) {
-	affected	= paf->next;
+        affected        = paf->next;
     }
     else {
-	Affect *prev;
+        Affect *prev;
 
-	for (prev = affected; prev != 0; prev = prev->next)
-	    if (prev->next == paf) {
-		prev->next = paf->next;
-		break;
-	    }
+        for (prev = affected; prev != 0; prev = prev->next)
+            if (prev->next == paf) {
+                prev->next = paf->next;
+                break;
+            }
 
-	if (prev == 0) {
-	    bug( "Affect_remove_room: cannot find paf.", 0 );
-	    return;
-	}
+        if (prev == 0) {
+            bug( "Affect_remove_room: cannot find paf.", 0 );
+            return;
+        }
     }
 
     if (!affected) {
-	Room *prev;
+        Room *prev;
 
-	if (top_affected_room  == this)
-	    top_affected_room = aff_next;
-	else {
-	    for(prev = top_affected_room; prev->aff_next; prev = prev->aff_next )
-		if ( prev->aff_next == this ) {
-		    prev->aff_next = aff_next;
-		    break;
-		}
+        if (top_affected_room  == this)
+            top_affected_room = aff_next;
+        else {
+            for(prev = top_affected_room; prev->aff_next; prev = prev->aff_next )
+                if ( prev->aff_next == this ) {
+                    prev->aff_next = aff_next;
+                    break;
+                }
 
-	    if ( prev == 0 ) {
-		bug( "Affect_remove_room: cannot find room.", 0 );
-		return;
-	    }
+            if ( prev == 0 ) {
+                bug( "Affect_remove_room: cannot find room.", 0 );
+                return;
+            }
         }
-	
-	aff_next = 0;
+        
+        aff_next = 0;
      }
 
     ddeallocate( paf );
@@ -189,9 +189,9 @@ void Room::affectStrip( int sn )
 
     for (paf = affected; paf != 0; paf = paf_next )
     {
-	paf_next = paf->next;
-	if ( paf->type == sn )
-	    affectRemove( paf );
+        paf_next = paf->next;
+        if ( paf->type == sn )
+            affectRemove( paf );
     }
 }
 
@@ -207,14 +207,14 @@ void Room::affectJoin( Affect *paf )
     found = false;
     for ( paf_old = affected; paf_old != 0; paf_old = paf_old->next )
     {
-	if ( paf_old->type == paf->type )
-	{
-	    paf->level = (paf->level += paf_old->level) / 2;
-	    paf->duration += paf_old->duration;
-	    paf->modifier += paf_old->modifier;
-	    affectRemove( paf_old );
-	    break;
-	}
+        if ( paf_old->type == paf->type )
+        {
+            paf->level = (paf->level += paf_old->level) / 2;
+            paf->duration += paf_old->duration;
+            paf->modifier += paf_old->modifier;
+            affectRemove( paf_old );
+            break;
+        }
     }
 
     affectTo( paf );
@@ -232,8 +232,8 @@ bool Room::isAffected( int sn ) const
 
     for ( paf = affected; paf != 0; paf = paf->next )
     {
-	if ( paf->type == sn )
-	    return true;
+        if ( paf->type == sn )
+            return true;
     }
 
     return false;

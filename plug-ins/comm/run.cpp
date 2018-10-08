@@ -21,7 +21,7 @@
 static bool isBigLetter( char c )
 {
     return c == 'N' || c == 'S' || c == 'D' || c == 'U' || c == 'E' || c == 'W' ||
-	   c == 'С' || c == 'Ю' || c == 'О' || c == 'П' || c == 'В' || c == 'З';
+           c == 'С' || c == 'Ю' || c == 'О' || c == 'П' || c == 'В' || c == 'З';
 }
 
 static bool isSmallLetter( char c )
@@ -45,52 +45,52 @@ CMDRUN( run )
     walk.stripWhiteSpace( );
 
     if (pch->fighting) {
-	pch->println("Но ты же сражаешься! Используй команду {y{lRсбежать{lEflee{x для побега из боя.");
-	return;
+        pch->println("Но ты же сражаешься! Используй команду {y{lRсбежать{lEflee{x для побега из боя.");
+        return;
     }
 
     if (!pch || walk.empty( )) {
-	ch->send_to( "По какому маршруту ты хочешь бежать?\r\n" );
-	return;
+        ch->send_to( "По какому маршруту ты хочешь бежать?\r\n" );
+        return;
     }
 
     if (pch->position < POS_STANDING) {
-	pch->send_to("Исходное положение для бега - стоя!\n\r");
-	return;
+        pch->send_to("Исходное положение для бега - стоя!\n\r");
+        return;
     }
     
     for (i = 0; i < walk.length( ); i++) {
-	int cnt = 0;
-	
-	while (isdigit( walk[i] )) {
-	    cnt = cnt * 10 + walk[i++] - '0';
+        int cnt = 0;
+        
+        while (isdigit( walk[i] )) {
+            cnt = cnt * 10 + walk[i++] - '0';
 
-	    if (i >= walk.length( )) {
-		pch->send_to( "Маршрут не может оканчиваться на цифру.\r\n" );
-		return;
-	    }
-	}
-	
-	if (isBigLetter( walk[i] )) {
-	    if (cnt > 0) {
-		pch->send_to( "Нельзя побежать 'несколько раз до упора'.\r\n" );
-		return;
-	    }
-	}
-	else if (!isSmallLetter( walk[i] )) {
-	    pch->printf( "Непонятное направление для бега: '%c'.\r\n", walk[i] );
-	    return;
-	}
-	
-	cnt = max( cnt, 1 );
+            if (i >= walk.length( )) {
+                pch->send_to( "Маршрут не может оканчиваться на цифру.\r\n" );
+                return;
+            }
+        }
+        
+        if (isBigLetter( walk[i] )) {
+            if (cnt > 0) {
+                pch->send_to( "Нельзя побежать 'несколько раз до упора'.\r\n" );
+                return;
+            }
+        }
+        else if (!isSmallLetter( walk[i] )) {
+            pch->printf( "Непонятное направление для бега: '%c'.\r\n", walk[i] );
+            return;
+        }
+        
+        cnt = max( cnt, 1 );
 
-	while (cnt-- > 0)
-	    buf << walk[i];
+        while (cnt-- > 0)
+            buf << walk[i];
     }
     
     if (buf.str( ).length( ) > 100) {
-	pch->send_to( "Слишком далеко бежать.\r\n" );
-	return;
+        pch->send_to( "Слишком далеко бежать.\r\n" );
+        return;
     }
     
     pch->getAttributes( ).getAttr<XMLAttributeSpeedWalk>( "speedwalk" )->setValue( buf.str( ) );
@@ -104,7 +104,7 @@ public:
     RunMovement( PCharacter *ch, XMLAttributeSpeedWalk::Pointer walk )
                      : ExitsMovement( ch, MOVETYPE_RUNNING )
     {
-	this->walk = walk;
+        this->walk = walk;
     }
 
     virtual ~RunMovement( )
@@ -113,87 +113,87 @@ public:
     
     virtual int move( )
     {
-	if (walk->getSteps( ) > 100) {
-	    msgSelfRoom( ch, 
-	                 "Ты начинаешь задыхаться и останавливаешься.",
-	                 "%1$^C1 начинает задыхаться и останавливается." );
-	    return RC_MOVE_FAIL;
-	}
+        if (walk->getSteps( ) > 100) {
+            msgSelfRoom( ch, 
+                         "Ты начинаешь задыхаться и останавливаешься.",
+                         "%1$^C1 начинает задыхаться и останавливается." );
+            return RC_MOVE_FAIL;
+        }
 
-	init( );
+        init( );
 
-	if (isSmallLetter( walk->getFirstCommand( ) )) {
-	    if (moveRecursive( )) {
-		walk->clearFirstCommand( );
-		return RC_MOVE_OK;
-	    }
-	    else
-		return RC_MOVE_FAIL;
-	}
+        if (isSmallLetter( walk->getFirstCommand( ) )) {
+            if (moveRecursive( )) {
+                walk->clearFirstCommand( );
+                return RC_MOVE_OK;
+            }
+            else
+                return RC_MOVE_FAIL;
+        }
 
-	if (!checkContinuousWay( )) {
-	    ostringstream buf;
-	    
-	    walk->clearFirstCommand( );
-	    walk->clearSteps( );
-	    
-	    buf << "Ты натыкаешься на препятствие и ";
-	    
-	    if (walk->isEmpty( ))
-		buf << "останавливаешься";
-	    else {
-		int d0 = walk->getFirstDoor( );
-		
-		buf << "продолжаешь свой путь ";
+        if (!checkContinuousWay( )) {
+            ostringstream buf;
+            
+            walk->clearFirstCommand( );
+            walk->clearSteps( );
+            
+            buf << "Ты натыкаешься на препятствие и ";
+            
+            if (walk->isEmpty( ))
+                buf << "останавливаешься";
+            else {
+                int d0 = walk->getFirstDoor( );
+                
+                buf << "продолжаешь свой путь ";
 
-		if (d0 >= 0 && d0 < DIR_SOMEWHERE) 
-		    buf << dirs[d0].leave;
-		else 
-		    buf << "неизвестно куда..";
-	    }
+                if (d0 >= 0 && d0 < DIR_SOMEWHERE) 
+                    buf << dirs[d0].leave;
+                else 
+                    buf << "неизвестно куда..";
+            }
 
-	    buf << "." << endl;
-	    msgSelf( ch, buf.str( ).c_str( ) );
-	    return RC_MOVE_OK;
-	}
+            buf << "." << endl;
+            msgSelf( ch, buf.str( ).c_str( ) );
+            return RC_MOVE_OK;
+        }
 
-	if (moveRecursive( )) {
-	    walk->incSteps( );
-	    return RC_MOVE_OK;
-	}
+        if (moveRecursive( )) {
+            walk->incSteps( );
+            return RC_MOVE_OK;
+        }
 
-	return RC_MOVE_FAIL;
+        return RC_MOVE_FAIL;
     }
 
 protected:
     void init( )
     {
-	door = walk->getFirstDoor( );
+        door = walk->getFirstDoor( );
 
-	if (door < 0) 
-	    return;
+        if (door < 0) 
+            return;
 
-	if (!( pexit = from_room->exit[door] ))
-	    return;
+        if (!( pexit = from_room->exit[door] ))
+            return;
 
-	if (!ch->can_see( pexit ))
-	    return;
-	
-	to_room = pexit->u1.to_room;
-	exit_info = pexit->exit_info;
+        if (!ch->can_see( pexit ))
+            return;
+        
+        to_room = pexit->u1.to_room;
+        exit_info = pexit->exit_info;
     }
 
     bool checkContinuousWay( )
     {
-	bool fOpenWay;
-	
-	if (!pexit || !to_room)
-	    return false;
-	    
-	silence = true;
-	fOpenWay = checkVisibility( ch ) && checkClosedDoor( ch );
-	silence = false;
-	return fOpenWay;
+        bool fOpenWay;
+        
+        if (!pexit || !to_room)
+            return false;
+            
+        silence = true;
+        fOpenWay = checkVisibility( ch ) && checkClosedDoor( ch );
+        silence = false;
+        return fOpenWay;
     }
     
     XMLAttributeSpeedWalk::Pointer walk;
@@ -210,23 +210,23 @@ void SpeedWalkUpdateTask::run( PCharacter *ch )
     walk = attributes.findAttr<XMLAttributeSpeedWalk>( "speedwalk" );
     
     if (!walk)
-	return;
+        return;
 
     if (walk->isEmpty( )) {
-	attributes.eraseAttribute( "speedwalk" );
-	return;
+        attributes.eraseAttribute( "speedwalk" );
+        return;
     }
 
     if (ch->fighting || ch->position < POS_STANDING) {
-	attributes.eraseAttribute( "speedwalk" );
-	return;
+        attributes.eraseAttribute( "speedwalk" );
+        return;
     }
     
     if (ch->wait > 0)
-	return;
+        return;
 
     if (RunMovement( ch, walk ).move( ) != RC_MOVE_OK || walk->isEmpty( )) 
-	attributes.eraseAttribute( "speedwalk" );
+        attributes.eraseAttribute( "speedwalk" );
 }
 
 void SpeedWalkUpdateTask::after( )
@@ -240,22 +240,22 @@ void SpeedWalkUpdateTask::after( )
 char XMLAttributeSpeedWalk::getFirstCommand( ) const
 {
     if (path.getValue( ).empty( ))
-	return '\0';
+        return '\0';
     else
-	return path.getValue( ).at( 0 );
+        return path.getValue( ).at( 0 );
 }
 
 void XMLAttributeSpeedWalk::clearFirstCommand( )
 {
     if (!isEmpty( )) {
-	DLString str = path.getValue( );
+        DLString str = path.getValue( );
 
-	str.erase( 0, 1 );
-	path.setValue( str );
+        str.erase( 0, 1 );
+        path.setValue( str );
     }
 
     if (isEmpty( ))
-	steps = 0;
+        steps = 0;
 }
 
 int XMLAttributeSpeedWalk::getFirstDoor( ) const

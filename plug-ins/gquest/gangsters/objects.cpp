@@ -27,7 +27,7 @@ void GangKey::get( Character *ch )
     Gangsters *gq = Gangsters::getThis( );
 
     if (ch->is_immortal( ) || gq->isLevelOK( ch ))
-	return;
+        return;
 
     obj_from_char( obj );
     obj_to_room( obj, ch->in_room );
@@ -41,7 +41,7 @@ bool GangKey::extract( bool count )
     Gangsters *gq = Gangsters::getThis( );
     
     if (gq && needsReset) 
-	gq->resetKeys( );
+        gq->resetKeys( );
     
     ObjectBehavior::extract( count );
     return false;
@@ -52,7 +52,7 @@ bool GangKey::canSteal( Character *ch )
     Gangsters *gq = Gangsters::getThis( );
 
     if (ch->is_immortal( ) || gq->isLevelOK( ch ))
-	return true;
+        return true;
 
     return false;
 }
@@ -64,18 +64,18 @@ bool GangKey::canSteal( Character *ch )
 bool GangPortal::canDrop( Room *pRoomIndex ) 
 {
     if (!Gangsters::checkRoom( pRoomIndex ))
-	return false;
+        return false;
     
     if (pRoomIndex->exit[DIR_DOWN])
-	return false;
-	    
+        return false;
+            
     if (IS_SET(pRoomIndex->room_flags, ROOM_INDOORS)
-	|| pRoomIndex->sector_type == SECT_INSIDE)
-	return false;
+        || pRoomIndex->sector_type == SECT_INSIDE)
+        return false;
 
     if (!Gangsters::recursiveWalk( pRoomIndex, 0, 4 )) 
-	return false;
-	
+        return false;
+        
     return true;
 }
 

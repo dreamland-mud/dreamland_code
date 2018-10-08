@@ -98,7 +98,7 @@ VOID_SPELL(Sebat)::run( Character *ch, Character *victim, int sn, int level )
       ch->send_to("Кассандра использовалась совсем недавно.\n\r" );
       return;
     }
-  af.where		= TO_AFFECTS;
+  af.where                = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = level;
@@ -135,8 +135,8 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
 { 
     if ( ch->isAffected(sn ) )
       {
-	ch->send_to("Ты совсем недавно пользовался этим заклинанием.\n\r");
-	return;
+        ch->send_to("Ты совсем недавно пользовался этим заклинанием.\n\r");
+        return;
       }
 
     postaffect_to_char( ch, sn, 5 );
@@ -159,7 +159,7 @@ VOID_SPELL(DragonStrength)::run( Character *ch, Character *, int sn, int level )
       return;
     }
 
-  af.where		= TO_AFFECTS;
+  af.where                = TO_AFFECTS;
   af.type = sn;
   af.level = level;
   af.duration = ch->getModifyLevel() / 3;

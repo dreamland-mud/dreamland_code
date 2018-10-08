@@ -13,31 +13,31 @@ class InvasionObj : public ObjectBehavior {
 XML_OBJECT
 friend class InvasionInstrument;
 public:
-	typedef ::Pointer<InvasionObj> Pointer;
+        typedef ::Pointer<InvasionObj> Pointer;
     
-	InvasionObj( );
-	
-	virtual void greet( Character * );
+        InvasionObj( );
+        
+        virtual void greet( Character * );
 
 protected:
-	virtual void actDestroy( Character * );
+        virtual void actDestroy( Character * );
 };
 
 class InvasionInstrument : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<InvasionInstrument> Pointer;
+        typedef ::Pointer<InvasionInstrument> Pointer;
     
-	InvasionInstrument( );
-	
-	virtual void wear( Character * );                 
-	virtual bool use( Character *, const char * );
-	
+        InvasionInstrument( );
+        
+        virtual void wear( Character * );                 
+        virtual bool use( Character *, const char * );
+        
 protected:
-	virtual void actUse( Character *, Object * );
-	virtual void actDestroy( Character * );
+        virtual void actUse( Character *, Object * );
+        virtual void actDestroy( Character * );
 
-	XML_VARIABLE XMLInteger charges;
+        XML_VARIABLE XMLInteger charges;
 };
 
 #endif

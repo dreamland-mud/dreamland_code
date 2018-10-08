@@ -136,8 +136,8 @@ public:
     InvalidCastException() : Exception("Invalid cast") { 
     }
     InvalidCastException(DLString exp, DLString found) 
-	: Exception( DLString( ) +
-		"Invalid cast: expected `" + exp + "' got `" + found + "'") 
+        : Exception( DLString( ) +
+                "Invalid cast: expected `" + exp + "' got `" + found + "'") 
     { 
     }
 

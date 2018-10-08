@@ -66,7 +66,7 @@ public:
     virtual bool applicable( PCharacter * );
 
     static inline LocateQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
     XML_VARIABLE XMLInteger itemVnum;

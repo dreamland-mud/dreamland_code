@@ -14,18 +14,18 @@ class PCharacter;
 class Who : public CommandPlugin, public DefaultCommand {
 XML_OBJECT
 public:
-	typedef ::Pointer<Who> Pointer;
+        typedef ::Pointer<Who> Pointer;
     
-	Who( );
+        Who( );
 
-	virtual void run( Character*, const DLString& constArguments );
-	
+        virtual void run( Character*, const DLString& constArguments );
+        
 private:
-	DLString formatChar( Character *, PCharacter * );
-	DLString leftColumn( Character *, PCharacter * );
-	DLString flags( PCharacter * );
-	
-	static const DLString COMMAND_NAME;
+        DLString formatChar( Character *, PCharacter * );
+        DLString leftColumn( Character *, PCharacter * );
+        DLString flags( PCharacter * );
+        
+        static const DLString COMMAND_NAME;
 };
 
 #endif

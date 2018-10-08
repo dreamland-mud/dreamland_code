@@ -14,31 +14,31 @@
 
 class Wanderer : public virtual MobileBehavior {
 public:
-	typedef ::Pointer<Wanderer> Pointer;
+        typedef ::Pointer<Wanderer> Pointer;
     
-	Wanderer( );
+        Wanderer( );
 
-	virtual bool canWander( Room *const, int );
-	virtual bool canWander( Room *const, EXIT_DATA * );
-	virtual bool canWander( Room *const, EXTRA_EXIT_DATA * );
-	virtual bool canWander( Room *const, Object * );
+        virtual bool canWander( Room *const, int );
+        virtual bool canWander( Room *const, EXIT_DATA * );
+        virtual bool canWander( Room *const, EXTRA_EXIT_DATA * );
+        virtual bool canWander( Room *const, Object * );
 
-	bool makeSpeedwalk( Room *, Room *, ostringstream & );
+        bool makeSpeedwalk( Room *, Room *, ostringstream & );
 
 protected:
-	virtual bool canEnter( Room *const );
+        virtual bool canEnter( Room *const );
 
-	void pathToTarget( Room *const, Room *const, int );
-	void pathWithDepth( Room *const, int, int );
-	
-	bool makeOneStep( Road & );
-	void makeOneStep( );
-	virtual int moveOneStep( int );
-	virtual int moveOneStep( EXTRA_EXIT_DATA * );
-	virtual int moveOneStep( Object * );
-	virtual bool handleMoveResult( Road &, int );
-	
-	RoomTraverseResult path;
+        void pathToTarget( Room *const, Room *const, int );
+        void pathWithDepth( Room *const, int, int );
+        
+        bool makeOneStep( Road & );
+        void makeOneStep( );
+        virtual int moveOneStep( int );
+        virtual int moveOneStep( EXTRA_EXIT_DATA * );
+        virtual int moveOneStep( Object * );
+        virtual bool handleMoveResult( Road &, int );
+        
+        RoomTraverseResult path;
 };
 
 

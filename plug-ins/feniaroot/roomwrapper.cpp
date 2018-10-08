@@ -69,10 +69,10 @@ void RoomWrapper::setTarget( ::Room *r )
 void RoomWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "Room is dead" );
-	
+        throw Scripting::Exception( "Room is dead" );
+        
     if (target == NULL)
-	throw Scripting::Exception( "Room is offline" );
+        throw Scripting::Exception( "Room is offline" );
 }
 
 Room * RoomWrapper::getTarget( ) const
@@ -124,7 +124,7 @@ NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комна
     Character *rch;
     
     for(rch = target->people; rch; rch = rch->next_in_room)
-	rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+        rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -138,7 +138,7 @@ NMI_GET( RoomWrapper, items, "список (List) всех предметов н
     RegList::Pointer rc(NEW);
 
     for (::Object *obj = target->contents; obj; obj = obj->next_content)
-	rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
     
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -203,9 +203,9 @@ NMI_GET( RoomWrapper, clan, "какому клану принадлежит ко
 static Scripting::Register get_direction( Room *r, int dir )
 {
     if (r->exit[dir])
-	return WrapperManager::getThis( )->getWrapper(r->exit[dir]->u1.to_room);
+        return WrapperManager::getThis( )->getWrapper(r->exit[dir]->u1.to_room);
     else 
-	return Scripting::Register( );
+        return Scripting::Register( );
 }
 
 static int get_door_argument( const RegisterList &args )
@@ -214,14 +214,14 @@ static int get_door_argument( const RegisterList &args )
     DLString doorName;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     doorName = args.front( ).toString( );
     if (( door = direction_lookup( doorName.c_str( ) ) ) == -1)
-	door = args.front( ).toNumber( );
+        door = args.front( ).toNumber( );
 
     if (door < 0 || door >= DIR_SOMEWHERE)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
 
     return door;
 }
@@ -267,13 +267,13 @@ NMI_INVOKE(RoomWrapper, doorTo, "вернет номер двери, ведущ�
     
     checkTarget( );
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     room = wrapper_cast<RoomWrapper>( args.front( ) )->getTarget( );
 
     for (int d = 0; d < DIR_SOMEWHERE; d++)
-	if (target->exit[d] && target->exit[d]->u1.to_room == room)
-	    return d;
+        if (target->exit[d] && target->exit[d]->u1.to_room == room)
+            return d;
 
     return -1;
 }
@@ -319,9 +319,9 @@ NMI_INVOKE( RoomWrapper, getExitFlags, "" )
 
     pExit = target->exit[get_door_argument( args )];
     if (pExit)
-	return Register( pExit->exit_info );
+        return Register( pExit->exit_info );
     else
-	return Register( 0 );
+        return Register( 0 );
 }
 
 static void update_door_flags( Room *room, const RegisterList &args, int flags, bool fSet )
@@ -329,10 +329,10 @@ static void update_door_flags( Room *room, const RegisterList &args, int flags, 
     EXIT_DATA *pExit = room->exit[get_door_argument( args )];
 
     if (pExit) {
-	if (fSet)
-	    SET_BIT(pExit->exit_info, flags );
-	else
-	    REMOVE_BIT(pExit->exit_info, flags );
+        if (fSet)
+            SET_BIT(pExit->exit_info, flags );
+        else
+            REMOVE_BIT(pExit->exit_info, flags );
     }
 }
 
@@ -385,13 +385,13 @@ NMI_INVOKE(RoomWrapper, zecho, "сообщение для всех в этой �
     checkTarget( );
 
     if (args.size( ) != 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     msg = args.front( ).toString( ).c_str( );
     
     for (wch = char_list; wch; wch = wch->next) 
-	if (wch->in_room->area == target->area) 
-	    wch->println( msg );
+        if (wch->in_room->area == target->area) 
+            wch->println( msg );
 
     return Register( );
 }
@@ -404,13 +404,13 @@ NMI_INVOKE(RoomWrapper, get_obj_vnum, "поиск объекта в комнат
     checkTarget( );
 
     if (args.size( ) != 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     vnum = args.front( ).toNumber( );
 
     for (obj = target->contents; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    return WrapperManager::getThis( )->getWrapper(obj); 
+        if (obj->pIndexData->vnum == vnum)
+            return WrapperManager::getThis( )->getWrapper(obj); 
 
     return Register( );
 }
@@ -423,8 +423,8 @@ NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объекто�
     int vnum = args2number( args );
 
     for (::Object *obj = target->contents; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        if (obj->pIndexData->vnum == vnum)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -440,13 +440,13 @@ NMI_INVOKE(RoomWrapper, get_mob_vnum, "поиск моба в комнате п�
     checkTarget( );
 
     if (args.size( ) != 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     vnum = args.front( ).toNumber( );
 
     for (rch = target->people; rch; rch = rch->next_in_room)
-	if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
-	    return WrapperManager::getThis( )->getWrapper( rch ); 
+        if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
+            return WrapperManager::getThis( )->getWrapper( rch ); 
 
     return Register( );
 }
@@ -459,8 +459,8 @@ NMI_INVOKE( RoomWrapper, list_mob_vnum, "поиск списка мобов в �
     int vnum = args2number( args );
 
     for (Character *rch = target->people; rch; rch = rch->next_in_room)
-	if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+        if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -478,25 +478,25 @@ struct FeniaDoorFunc {
     }
     bool operator () ( Room *const room, EXIT_DATA *exit ) const
     {
-	if (IS_SET(exit->exit_info, EX_LOCKED))
-	    return false;
-	
-	Room *toRoom = exit->u1.to_room;
-	bitstring_t mysector = (1 << toRoom->sector_type);
+        if (IS_SET(exit->exit_info, EX_LOCKED))
+            return false;
+        
+        Room *toRoom = exit->u1.to_room;
+        bitstring_t mysector = (1 << toRoom->sector_type);
 
-	if (sectorsAllow != 0 && !IS_SET(sectorsAllow, mysector))
-	    return false;
+        if (sectorsAllow != 0 && !IS_SET(sectorsAllow, mysector))
+            return false;
 
-	if (sectorsDeny != 0 && IS_SET(sectorsDeny, mysector))
-	    return false;
+        if (sectorsDeny != 0 && IS_SET(sectorsDeny, mysector))
+            return false;
 
-	if (!toRoom->isCommon( ))
-	    return false;
-	    
-	if (walker && !walker->canEnter( toRoom ))
-	    return false;
-	
-	return true;
+        if (!toRoom->isCommon( ))
+            return false;
+            
+        if (walker && !walker->canEnter( toRoom ))
+            return false;
+        
+        return true;
     }
      
     Character *walker;
@@ -506,14 +506,14 @@ struct FeniaDoorFunc {
 struct FeniaExtraExitFunc {
     bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
     {
-	return false;
+        return false;
     }
 };
 
 struct FeniaPortalFunc {
     bool operator () ( Room *const room, ::Object *portal ) const
     {
-	return false;
+        return false;
     }
 };
 
@@ -528,13 +528,13 @@ struct PathWithDepthComplete {
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->generation < depth && !last)
-	    return false;
+        if (head->generation < depth && !last)
+            return false;
 
-	for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
-	    rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
+            rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
 
-	return true;
+        return true;
     }
 
     int depth;
@@ -550,13 +550,13 @@ struct PathToTargetComplete {
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->node != target)
-	    return false;
-	
-	for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
-	    rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
+        if (head->node != target)
+            return false;
+        
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
+            rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
 
-	return true;
+        return true;
     }
     
     Room *target;
@@ -631,8 +631,8 @@ NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, ко�
     checkTarget( );
     
     for (pReset = target->reset_first; pReset; pReset = pReset->next)
-	if (pReset->command == 'M')
-	    rc->push_back( Register( pReset->arg1 ) );
+        if (pReset->command == 'M')
+            rc->push_back( Register( pReset->arg1 ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate( );
     obj->setHandler( rc );

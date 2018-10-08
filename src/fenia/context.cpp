@@ -39,7 +39,7 @@ BackTrace::report(ostream &os)
     BackTrace *p;
     
     for(p = Context::current->backTrace; p; p = p->parent)
-	os << "    called from " << *p << endl;
+        os << "    called from " << *p << endl;
     
     os << "    Ya-ma-ta!" << endl;
 }
@@ -54,9 +54,9 @@ void
 BTPushNode::print(ostream &os) const 
 {
     if(!node) {
-	os << "<native>";
+        os << "<native>";
     } else {
-	os << node->source;
+        os << node->source;
     }
 }
 

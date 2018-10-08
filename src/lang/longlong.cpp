@@ -19,23 +19,23 @@ const DLString LongLong::TYPE = "LongLong";
 
 void LongLong::fromString( const DLString & str ) throw( ExceptionBadType )
 {
-	std::basic_istringstream<char> s( str.c_str( ) );
-	long long i;
-  		
-	s >> i;
+        std::basic_istringstream<char> s( str.c_str( ) );
+        long long i;
+                  
+        s >> i;
 
-	if( s )
-	{
-		this->value = i;
-		return;
-	}
-	throw ExceptionBadType( TYPE, str );
+        if( s )
+        {
+                this->value = i;
+                return;
+        }
+        throw ExceptionBadType( TYPE, str );
 }
 
 DLString LongLong::toString( ) const throw( )
 {
-	std::basic_ostringstream<char>  buf;
+        std::basic_ostringstream<char>  buf;
 
-	buf << value;
-	return buf.str( );
+        buf << value;
+        return buf.str( );
 }

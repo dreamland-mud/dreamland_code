@@ -76,11 +76,11 @@ TxnContext::~TxnContext( )
 {
 #ifdef HAS_BDB
     if(currentTxn) {
-	LogStream::sendError( )
-	    << "Scripting::TxnContext::~TxnContext: "
-	    << "aborting pending transaction." << endl;
+        LogStream::sendError( )
+            << "Scripting::TxnContext::~TxnContext: "
+            << "aborting pending transaction." << endl;
 
-	currentTxn->abort( );
+        currentTxn->abort( );
     }
 #endif
 }
@@ -96,7 +96,7 @@ TxnContext::getCurrentTxn( )
 {
 #ifdef HAS_BDB
     if(!currentTxn)
-	getDbEnv( )->dbEnv->txn_begin(NULL, &currentTxn, DB_TXN_SYNC);
+        getDbEnv( )->dbEnv->txn_begin(NULL, &currentTxn, DB_TXN_SYNC);
 #endif
 
     return currentTxn;
@@ -107,7 +107,7 @@ TxnContext::commit( )
 {
 #ifdef HAS_BDB
     if(currentTxn)
-	currentTxn->commit( 0 );
+        currentTxn->commit( 0 );
 #endif
 
     currentTxn = NULL;
@@ -118,12 +118,12 @@ TxnContext::abort( )
 {
 #ifdef HAS_BDB
     if(currentTxn)
-	currentTxn->abort( );
+        currentTxn->abort( );
 #else
-	LogStream::sendError( )
-	    << "Scripting::TxnContext::~TxnContext: "
-	    << "rollback is not supported by database vendor"
-	    << endl;
+        LogStream::sendError( )
+            << "Scripting::TxnContext::~TxnContext: "
+            << "rollback is not supported by database vendor"
+            << endl;
 #endif
 
     currentTxn = NULL;
@@ -139,11 +139,11 @@ DbContext::DbContext( ) : db(0)
 DbContext::~DbContext( )
 {
     if(db) {
-	LogStream::sendError( )
-	    << "Scripting::DbContext::~DbContext: "
-	    << "closing pending database" << endl;
+        LogStream::sendError( )
+            << "Scripting::DbContext::~DbContext: "
+            << "closing pending database" << endl;
 
-	close( );
+        close( );
     }
 }
 
@@ -152,14 +152,14 @@ DbContext::open( const char *file, const char *dbname )
 {
 #ifdef HAS_BDB
     try {
-	db = new Db(getDbEnv( )->dbEnv, 0);
-	db->open( NULL, file, dbname, DB_BTREE, DB_CREATE | DB_AUTO_COMMIT, 0 );
+        db = new Db(getDbEnv( )->dbEnv, 0);
+        db->open( NULL, file, dbname, DB_BTREE, DB_CREATE | DB_AUTO_COMMIT, 0 );
     } catch(const DbException &ex) {
-	LogStream::sendError()
-	    << "Failed to open DbContext: " 
-	    << (file ? file : "<unknown>") << ": " 
-	    << (dbname ? dbname : "<unknown>") << ": " 
-	    << ex.what( ) << endl;
+        LogStream::sendError()
+            << "Failed to open DbContext: " 
+            << (file ? file : "<unknown>") << ": " 
+            << (dbname ? dbname : "<unknown>") << ": " 
+            << ex.what( ) << endl;
     }
 #else
     db = new Db( );
@@ -172,18 +172,18 @@ void
 DbContext::close( )
 {
     if(!db) {
-	LogStream::sendError() << "DbContext already closed" << endl;
-	return;
+        LogStream::sendError() << "DbContext already closed" << endl;
+        return;
     }
     
 #if BDB
     try {
-	db->close( 0 );
-	delete db;
-	db = NULL;
+        db->close( 0 );
+        delete db;
+        db = NULL;
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "Failed to close DbContext: " << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "Failed to close DbContext: " << ex.what( ) << endl;
     }
 #else
     delete db;
@@ -205,9 +205,9 @@ DbContext::load( )
 #endif
 
     LogStream::sendNotice( ) 
-	<< "Loading DbContext: "
-	<< (file ? file : "<unknown>") << ":" 
-	<< (dbname ? dbname : "<unknown>") << "..." << endl;
+        << "Loading DbContext: "
+        << (file ? file : "<unknown>") << ":" 
+        << (dbname ? dbname : "<unknown>") << "..." << endl;
 
     int cnt = 0;
     DbTxn *txn;
@@ -216,27 +216,27 @@ DbContext::load( )
 
 #ifdef HAS_BDB
     try {
-	Dbt key, val;
-	Dbc *cur = 0;
+        Dbt key, val;
+        Dbc *cur = 0;
 
-	db->cursor( txn, &cur, 0 );
-	
-	while(cur->get( &key, &val, DB_NEXT ) != DB_NOTFOUND) {
-	    try {
-		key_t id = *(key_t *)key.get_data( );
-		Data dat(val.get_data( ), val.get_size( ));
-		seq(id, dat);
-		cnt++;
-	    } catch(const ::Exception &e) {
-		LogStream::sendError() << e.what() << ":" << endl;
-	    }
+        db->cursor( txn, &cur, 0 );
+        
+        while(cur->get( &key, &val, DB_NEXT ) != DB_NOTFOUND) {
+            try {
+                key_t id = *(key_t *)key.get_data( );
+                Data dat(val.get_data( ), val.get_size( ));
+                seq(id, dat);
+                cnt++;
+            } catch(const ::Exception &e) {
+                LogStream::sendError() << e.what() << ":" << endl;
+            }
         }
-	cur->close( );
-	commit( );
+        cur->close( );
+        commit( );
 
     } catch(const DbException &ex) {
-	LogStream::sendError() << ex.what() << ":" << endl;
-	abort( );
+        LogStream::sendError() << ex.what() << ":" << endl;
+        abort( );
     }
 #else
 
@@ -245,72 +245,72 @@ DbContext::load( )
     dirent *dp;
     
     for(i=0;i<16;i++) {
-	ostringstream fname;
-	fname << getDbEnv( )->dbEnv->path << "/" 
-	      << db->file << "-" << db->name << "/"
-	      << i;
-	    
-	dirp = opendir(fname.str( ).c_str( ));
-	if(dirp == NULL)
-	    continue;
-	
-	while( (dp = readdir(dirp)) != NULL ) {
-	    DLString fileName(dp->d_name);
+        ostringstream fname;
+        fname << getDbEnv( )->dbEnv->path << "/" 
+              << db->file << "-" << db->name << "/"
+              << i;
+            
+        dirp = opendir(fname.str( ).c_str( ));
+        if(dirp == NULL)
+            continue;
+        
+        while( (dp = readdir(dirp)) != NULL ) {
+            DLString fileName(dp->d_name);
 
-	    DLString::size_type pos = fileName.rfind( '.' );
-	    
-	    if(pos == DLString::npos)
-		continue;
+            DLString::size_type pos = fileName.rfind( '.' );
+            
+            if(pos == DLString::npos)
+                continue;
 
-	    DLString ext = fileName.substr(pos);
-	    
-	    if(ext != ".xml" && ext != ".XML")
-		continue;
+            DLString ext = fileName.substr(pos);
+            
+            if(ext != ".xml" && ext != ".XML")
+                continue;
 
-	    fileName = fileName.substr(0, pos);
-	    
-	    if(fileName.empty( ) || !fileName.isNumber( ))
-		continue;
+            fileName = fileName.substr(0, pos);
+            
+            if(fileName.empty( ) || !fileName.isNumber( ))
+                continue;
 
-	    key_t id = fileName.toLong( );
+            key_t id = fileName.toLong( );
 
-	    fileName = DLString(fname.str( )) + "/" + dp->d_name;
-	    
-	    struct stat sb;
-	    
-	    if(stat(fileName.c_str( ), &sb) < 0)
-		continue;
-	    
-	    if(!S_ISREG(sb.st_mode))
-		continue;
+            fileName = DLString(fname.str( )) + "/" + dp->d_name;
+            
+            struct stat sb;
+            
+            if(stat(fileName.c_str( ), &sb) < 0)
+                continue;
+            
+            if(!S_ISREG(sb.st_mode))
+                continue;
 
-	    FILE *f = fopen(fileName.c_str( ), "rb");
+            FILE *f = fopen(fileName.c_str( ), "rb");
 
-	    if(f == NULL)
-		continue;
+            if(f == NULL)
+                continue;
 
-	    fseek(f, 0, SEEK_END);
-	    unsigned int size = ftell(f);
-	    fseek(f, 0, SEEK_SET);
-	    char buf[size];
+            fseek(f, 0, SEEK_END);
+            unsigned int size = ftell(f);
+            fseek(f, 0, SEEK_SET);
+            char buf[size];
 
-	    int c;
-	    if((c = fread(buf, size, 1, f)) != 1)
-		LogStream::sendError() 
-		    << "DbContext::seq(" << id << "): "
-		    << "truncated record: " << size 
-		    << ", " << sb.st_size
-		    << ", " << c 
-		    << ": " << strerror(errno) << endl;
+            int c;
+            if((c = fread(buf, size, 1, f)) != 1)
+                LogStream::sendError() 
+                    << "DbContext::seq(" << id << "): "
+                    << "truncated record: " << size 
+                    << ", " << sb.st_size
+                    << ", " << c 
+                    << ": " << strerror(errno) << endl;
 
-	    fclose(f);
-	    
-	    Data dat(buf, size);
-	    seq(id, dat);
-	    cnt++;
-	}
-	
-	closedir(dirp);
+            fclose(f);
+            
+            Data dat(buf, size);
+            seq(id, dat);
+            cnt++;
+        }
+        
+        closedir(dirp);
     }
     
 #endif
@@ -324,29 +324,29 @@ DbContext::get( key_t k, Data &dat )
 {
 #ifdef HAS_BDB
     try {
-	Dbt key(&k, sizeof(k)), val;
+        Dbt key(&k, sizeof(k)), val;
 
-	db->get(getCurrentTxn( ), &key, &val, 0);
+        db->get(getCurrentTxn( ), &key, &val, 0);
 
-	dat.set(val.get_data( ), val.get_size( ));
+        dat.set(val.get_data( ), val.get_size( ));
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "DbContext::get(" << k << "): " 
-	    << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "DbContext::get(" << k << "): " 
+            << ex.what( ) << endl;
     }
 #else
     ostringstream fname;
     fname << getDbEnv( )->dbEnv->path << "/" 
-	  << db->file << "-" << db->name << "/"
-	  << (k % 16) << "/"
-	  << k << ".xml";
+          << db->file << "-" << db->name << "/"
+          << (k % 16) << "/"
+          << k << ".xml";
     
     FILE *f = fopen(fname.str( ).c_str( ), "rb");
     if(f == NULL) {
-	LogStream::sendError() 
-	    << "DbContext::get(" << k << "): "
-	    << strerror(errno) << endl;
-	return;
+        LogStream::sendError() 
+            << "DbContext::get(" << k << "): "
+            << strerror(errno) << endl;
+        return;
     }
 
     fseek(f, 0, SEEK_END);
@@ -357,15 +357,15 @@ DbContext::get( key_t k, Data &dat )
     static Data dta(0, 0);
 
     if(dta.get_data( ))
-	delete [] (char *)dta.get_data( );
+        delete [] (char *)dta.get_data( );
     
     dta.set(new char[size], size);
 
     if(fread(dta.get_data( ), dta.get_size( ), 1, f) != 1)
-	LogStream::sendError() 
-	    << "DbContext::get(" << k << "): "
-	    << "promised and actual record size missmatch"
-	    << endl;
+        LogStream::sendError() 
+            << "DbContext::get(" << k << "): "
+            << "promised and actual record size missmatch"
+            << endl;
 
     fclose(f);
 
@@ -378,33 +378,33 @@ DbContext::put( key_t k, Data &dat )
 {
 #ifdef HAS_BDB
     try {
-	Dbt key(&k, sizeof(k)), val(dat.get_data( ), dat.get_size( ));
+        Dbt key(&k, sizeof(k)), val(dat.get_data( ), dat.get_size( ));
 
-	db->put( getCurrentTxn( ), &key, &val, 0 );
+        db->put( getCurrentTxn( ), &key, &val, 0 );
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "DbContext::put(" << k << "): " << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "DbContext::put(" << k << "): " << ex.what( ) << endl;
     }
 #else
     ostringstream fname;
     fname << getDbEnv( )->dbEnv->path << "/" 
-	  << db->file << "-" << db->name << "/"
-	  << (k % 16) << "/"
-	  << k << ".xml";
+          << db->file << "-" << db->name << "/"
+          << (k % 16) << "/"
+          << k << ".xml";
     
     FILE *f = fopen(fname.str( ).c_str( ), "wb");
     if(f == NULL) {
-	LogStream::sendError() 
-	    << "DbContext::put(" << k << "): " 
-	    << fname.str( ) << ": " << strerror(errno) << endl;
-	return;
+        LogStream::sendError() 
+            << "DbContext::put(" << k << "): " 
+            << fname.str( ) << ": " << strerror(errno) << endl;
+        return;
     }
 
     if(fwrite(dat.get_data( ), dat.get_size( ), 1, f) != 1)
-	LogStream::sendError() 
-	    << "DbContext::put(" << k << "): "
-	    << "record truncated" << endl;
-	;
+        LogStream::sendError() 
+            << "DbContext::put(" << k << "): "
+            << "record truncated" << endl;
+        ;
 
     fclose(f);
 #endif
@@ -415,24 +415,24 @@ DbContext::del( key_t k )
 {
 #ifdef HAS_BDB
     try {
-	Dbt key(&k, sizeof(k));
+        Dbt key(&k, sizeof(k));
 
-	db->del( getCurrentTxn( ), &key, 0 );
+        db->del( getCurrentTxn( ), &key, 0 );
     } catch(const DbException &ex) {
-	LogStream::sendError() 
-	    << "DbContext::del(" << k << "): " << ex.what( ) << endl;
+        LogStream::sendError() 
+            << "DbContext::del(" << k << "): " << ex.what( ) << endl;
     }
 #else
     ostringstream fname;
     fname << getDbEnv( )->dbEnv->path << "/" 
-	  << db->file << "-" << db->name << "/"
-	  << (k % 16) << "/"
-	  << k << ".xml";
+          << db->file << "-" << db->name << "/"
+          << (k % 16) << "/"
+          << k << ".xml";
     
     if(unlink(fname.str( ).c_str( )) < 0)
-	LogStream::sendError() 
-	    << "DbContext::del(" << k << "): " 
-	    << fname.str( ) << ": " << strerror(errno) << endl;
+        LogStream::sendError() 
+            << "DbContext::del(" << k << "): " 
+            << fname.str( ) << ": " << strerror(errno) << endl;
 #endif
 }
 

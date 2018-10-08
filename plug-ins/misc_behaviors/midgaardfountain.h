@@ -11,9 +11,9 @@
 class MidgaardFountain : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<MidgaardFountain> Pointer;
+        typedef ::Pointer<MidgaardFountain> Pointer;
 
-	virtual bool area( );
+        virtual bool area( );
 };
 
 #endif

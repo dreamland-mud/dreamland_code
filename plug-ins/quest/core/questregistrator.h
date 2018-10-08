@@ -42,29 +42,29 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regMoc<C>( );
-	QuestManager::getThis( )->load( this );
-	XMLAttributePlugin::initialization( );
+        Class::regMoc<C>( );
+        QuestManager::getThis( )->load( this );
+        XMLAttributePlugin::initialization( );
     }
     
     virtual void destruction( ) 
     {
-	XMLAttributePlugin::destruction( );
-	QuestManager::getThis( )->unLoad( this );
-	Class::unregMoc<C>( );
+        XMLAttributePlugin::destruction( );
+        QuestManager::getThis( )->unLoad( this );
+        Class::unregMoc<C>( );
     }
 
     virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) 
     {
-	::Pointer<C> quest( NEW );
+        ::Pointer<C> quest( NEW );
 
-	quest->create( pch, questor );
-	return quest;
+        quest->create( pch, questor );
+        return quest;
     }
 
     virtual const DLString& getName( ) const 
     {
-	return C::MOC_TYPE;
+        return C::MOC_TYPE;
     }
 };
 

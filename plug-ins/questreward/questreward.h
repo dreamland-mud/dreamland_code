@@ -12,11 +12,11 @@
 class QuestReward : public virtual ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<QuestReward> Pointer;
-	
-	virtual bool mayFloat( );
-	virtual bool canConfiscate( );
-			
+        typedef ::Pointer<QuestReward> Pointer;
+        
+        virtual bool mayFloat( );
+        virtual bool canConfiscate( );
+                        
 };
 
 #endif

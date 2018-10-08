@@ -19,83 +19,83 @@ public:
 
     inline bool isSet( unsigned int ndx ) const
     {
-	return ndx < bits.size( ) && bits[ndx];
+        return ndx < bits.size( ) && bits[ndx];
     }
     inline bool isSet( const GlobalRegistryElement &e ) const
     {
-	return isSet( e.getIndex( ) );
+        return isSet( e.getIndex( ) );
     }
     inline bool isSet( const GlobalRegistryElement *e ) const
     {
-	return isSet( e->getIndex( ) );
+        return isSet( e->getIndex( ) );
     }
     inline bool isSet( const GlobalBitvector &bv ) const
     {
-	for (unsigned int b = 0; b < bv.bits.size( ); b++)
-	    if (bv.bits[b])
-		if (!isSet( b ))
-		    return false;
+        for (unsigned int b = 0; b < bv.bits.size( ); b++)
+            if (bv.bits[b])
+                if (!isSet( b ))
+                    return false;
 
-	return true;
+        return true;
     }
 
     inline void set( unsigned int ndx )
     {
-	if (ndx >= bits.size( ))
-	    bits.resize( ndx + 1, false );
+        if (ndx >= bits.size( ))
+            bits.resize( ndx + 1, false );
 
-	bits[ndx] = true;
+        bits[ndx] = true;
     }
     inline void set( const GlobalRegistryElement &e )
     {
-	set( e.getIndex( ) );
+        set( e.getIndex( ) );
     }
     inline void set( const GlobalBitvector &bv )
     {
-	for (unsigned int b = 0; b < bv.bits.size( ); b++)
-	    if (bv.bits[b])
-		set( b );
+        for (unsigned int b = 0; b < bv.bits.size( ); b++)
+            if (bv.bits[b])
+                set( b );
     }
 
     inline void remove( unsigned int ndx )
     {
-	if (ndx < bits.size( ))
-	    bits[ndx] = false;
+        if (ndx < bits.size( ))
+            bits[ndx] = false;
     }
     inline void remove( const GlobalRegistryElement &e )
     {
-	return remove( e.getIndex( ) );
+        return remove( e.getIndex( ) );
     }
     inline void remove( const GlobalBitvector &bv )
     {
-	for (unsigned int b = 0; b < bv.bits.size( ); b++)
-	    if (bv.bits[b])
-		remove( b );
+        for (unsigned int b = 0; b < bv.bits.size( ); b++)
+            if (bv.bits[b])
+                remove( b );
     }
     
     inline void clear( )
     {
-	bits.clear( );
+        bits.clear( );
     }
 
     inline bool empty( ) const
     {
-	for (unsigned int b = 0; b < bits.size( ); b++)
-	    if (bits[b]) 
-		return false;
+        for (unsigned int b = 0; b < bits.size( ); b++)
+            if (bits[b]) 
+                return false;
 
-	return true;
+        return true;
     }
 
     inline void setRegistry( GlobalRegistryBase *reg )
     {
-	clear( );
-	registry = reg;
+        clear( );
+        registry = reg;
     }
 
     inline GlobalRegistryBase * getRegistry( ) const
     {
-	return registry;
+        return registry;
     }
 
     void fromString( const DLString &source );

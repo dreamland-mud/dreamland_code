@@ -27,7 +27,7 @@ void ProfessionHelp::setProfession( Profession::Pointer prof )
     this->prof = prof;
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
 
     kwd.insert( prof->getName( ) );
     kwd.insert( prof->getRusName( ).ruscase( '1' ) );
@@ -109,12 +109,12 @@ const DLString & ProfessionTitlesByLevel::build( const PCMemoryInterface *pcm ) 
     unsigned int level = pcm->getLevel( );
 
     if (level >= size( ))
-	return DLString::emptyString;
-	
+        return DLString::emptyString;
+        
     const ProfessionTitlePair &pair = (*this)[level]; 
 
     return (pcm->getSex( ) == SEX_FEMALE 
-		? pair.female.getValue( ) : pair.male.getValue( ));
+                ? pair.female.getValue( ) : pair.male.getValue( ));
 }
 
 const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm ) const
@@ -126,12 +126,12 @@ const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm
  * DefaultProfession
  *------------------------------------------------------------------*/
 DefaultProfession::DefaultProfession( )
-		: stats( &stat_table ),
-		  wearModifiers( &item_table ),
-		  flags( 0, &prof_flags ),
-		  align( 0, &align_table ),
-		  ethos( 0, &ethos_table ),
-		  sex( 0, &sex_table )
+                : stats( &stat_table ),
+                  wearModifiers( &item_table ),
+                  flags( 0, &prof_flags ),
+                  align( 0, &align_table ),
+                  ethos( 0, &ethos_table ),
+                  sex( 0, &sex_table )
 {
 }
 
@@ -141,13 +141,13 @@ void DefaultProfession::loaded( )
     professionManager->registrate( Pointer( this ) );
 
     if (help)
-	help->setProfession( Pointer( this ) );
+        help->setProfession( Pointer( this ) );
 }
 
 void DefaultProfession::unloaded( )
 {
     if (help)
-	help->unsetProfession( );
+        help->unsetProfession( );
 
     professionManager->unregistrate( Pointer( this ) );
 }
@@ -248,16 +248,16 @@ GlobalBitvector DefaultProfession::toVector( Character * ) const
 DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
     if (ch && ch->getConfig( )->rucommands)
-	return getRusName( ).ruscase( c );
+        return getRusName( ).ruscase( c );
     else
-	return getName( );
+        return getName( );
 }
 
 DLString DefaultProfession::getWhoNameFor( Character *ch ) const
 {
     if (ch && ch->getConfig( )->rucommands)
-	return whoNameRus;
+        return whoNameRus;
     else
-	return whoName;
+        return whoName;
 }
 

@@ -18,11 +18,11 @@ bool interpret( Character *ch, const char *line )
 {
     InterpretArguments iargs;
     static int phases [] = { 
-	CMDP_LOG_INPUT,
-	CMDP_GRAB_WORD,
-	CMDP_FIND,
-	CMDP_LOG_CMD,
-	0
+        CMDP_LOG_INPUT,
+        CMDP_GRAB_WORD,
+        CMDP_FIND,
+        CMDP_LOG_CMD,
+        0
     };
 
     iargs.ch = ch;
@@ -32,10 +32,10 @@ bool interpret( Character *ch, const char *line )
     CommandInterpreter::getThis( )->run( iargs );
     
     if (!iargs.pCommand)
-	return false;
+        return false;
 
     if (iargs.pCommand->dispatch( iargs ))
-	iargs.pCommand->run( ch, iargs.cmdArgs );
+        iargs.pCommand->run( ch, iargs.cmdArgs );
 
     return true;
 }
@@ -56,8 +56,8 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
 {
     InterpretArguments iargs;
     static int phases [] = {
-	CMDP_FIND,
-	0
+        CMDP_FIND,
+        0
     };
     char args[MAX_STRING_LENGTH];
     va_list ap;
@@ -74,10 +74,10 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
     CommandInterpreter::getThis( )->run( iargs );
 
     if (iargs.pCommand)
-	if (iargs.pCommand->dispatch( iargs )) {
-	    iargs.pCommand->run( ch, iargs.cmdArgs );
-	    return true;
-	}
+        if (iargs.pCommand->dispatch( iargs )) {
+            iargs.pCommand->run( ch, iargs.cmdArgs );
+            return true;
+        }
 
     return false;
 }
@@ -88,8 +88,8 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
     va_list ap;
     InterpretArguments iargs;
     static int phases [] = {
-	CMDP_FIND,
-	0
+        CMDP_FIND,
+        0
     };
 
     va_start( ap, format );
@@ -104,9 +104,9 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
     CommandInterpreter::getThis( )->run( iargs );
 
     if (iargs.pCommand)
-	iargs.pCommand->run( ch, iargs.cmdArgs );
+        iargs.pCommand->run( ch, iargs.cmdArgs );
 //    else
-//	LogStream::sendWarning( ) << "No command '" << cmd << "' for raw interpret!" << endl;
+//        LogStream::sendWarning( ) << "No command '" << cmd << "' for raw interpret!" << endl;
 }
 
 

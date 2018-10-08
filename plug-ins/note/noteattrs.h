@@ -23,78 +23,78 @@ class NoteThread;
 class PCharacter;
 
 class XMLAttributeLastRead : public RemortAttribute, 
-			     public XMLVariableContainer 
+                             public XMLVariableContainer 
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeLastRead> Pointer;
+        typedef ::Pointer<XMLAttributeLastRead> Pointer;
 
-	XMLAttributeLastRead( );
-	
-	time_t getStamp( const NoteThread * ) const;
-	void setStamp( const NoteThread *, time_t );
-	void updateStamp( const NoteThread * );
-	void updateStamp( const NoteThread *, const Note * );
+        XMLAttributeLastRead( );
+        
+        time_t getStamp( const NoteThread * ) const;
+        void setStamp( const NoteThread *, time_t );
+        void updateStamp( const NoteThread * );
+        void updateStamp( const NoteThread *, const Note * );
 
 private:
-	XML_VARIABLE XMLMapBase<XMLLong> stamps;
+        XML_VARIABLE XMLMapBase<XMLLong> stamps;
 };
 
 class XMLNoteData : public XMLVariableContainer {
 XML_OBJECT
 public:
-	typedef XMLListBase<XMLString> Lines;
+        typedef XMLListBase<XMLString> Lines;
 
-	XMLNoteData( );
-	
-	inline const DLString& getThreadName( ) const;
-	inline void setThreadName( const DLString & );
+        XMLNoteData( );
+        
+        inline const DLString& getThreadName( ) const;
+        inline void setThreadName( const DLString & );
 
-	inline void setRecipient( const DLString & );
-	inline const DLString& getRecipient( ) const;
-	
-	inline void setFrom( const DLString & );
-	inline const DLString& getFrom( ) const;
-	
-	inline const DLString & getAuthor( ) const;
-	inline void setAuthor( const DLString & );
+        inline void setRecipient( const DLString & );
+        inline const DLString& getRecipient( ) const;
+        
+        inline void setFrom( const DLString & );
+        inline const DLString& getFrom( ) const;
+        
+        inline const DLString & getAuthor( ) const;
+        inline void setAuthor( const DLString & );
 
-	inline void setSubject( const DLString & );
-	inline const DLString& getSubject( ) const;
+        inline void setSubject( const DLString & );
+        inline const DLString& getSubject( ) const;
 
-	void addLine( const DLString& );
-	void delLine( );
-	void clearBody( );
-	bool isBodyEmpty( ) const;
-	int getBodySize( ) const;
-	
-	void toStream( ostringstream& ) const;
+        void addLine( const DLString& );
+        void delLine( );
+        void clearBody( );
+        bool isBodyEmpty( ) const;
+        int getBodySize( ) const;
+        
+        void toStream( ostringstream& ) const;
         void linesToStream( ostringstream & ) const;
-	void commit( Note * ) const;
+        void commit( Note * ) const;
 
 private:
-	XML_VARIABLE XMLString threadName;
-	XML_VARIABLE XMLString recipient;
-	XML_VARIABLE XMLString from;
-	XML_VARIABLE XMLString author;
-	XML_VARIABLE XMLString subject;
-	XML_VARIABLE Lines body;
+        XML_VARIABLE XMLString threadName;
+        XML_VARIABLE XMLString recipient;
+        XML_VARIABLE XMLString from;
+        XML_VARIABLE XMLString author;
+        XML_VARIABLE XMLString subject;
+        XML_VARIABLE Lines body;
 };
 
 class XMLAttributeNoteData: public XMLAttribute, public XMLMapBase<XMLNoteData> {
 public:
-	typedef ::Pointer<XMLAttributeNoteData> Pointer;
+        typedef ::Pointer<XMLAttributeNoteData> Pointer;
 
-	virtual const DLString & getType( ) const
-	{
-	    return TYPE;
-	}
+        virtual const DLString & getType( ) const
+        {
+            return TYPE;
+        }
 
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-	void clearNote( const NoteThread * );
-	XMLNoteData * findNote( const NoteThread * );
-	XMLNoteData * makeNote( PCharacter *, const NoteThread * );
+        void clearNote( const NoteThread * );
+        XMLNoteData * findNote( const NoteThread * );
+        XMLNoteData * makeNote( PCharacter *, const NoteThread * );
 };
 
 inline const DLString& XMLNoteData::getThreadName( ) const

@@ -60,10 +60,10 @@ void
 ObjIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );
+        throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );
 
     if (!target)
-	throw Scripting::Exception( "OBJ_INDEX_DATA is offline?!");
+        throw Scripting::Exception( "OBJ_INDEX_DATA is offline?!");
 }
 
 OBJ_INDEX_DATA *
@@ -129,10 +129,10 @@ NMI_GET( ObjIndexWrapper, cost , "")
 
 #define GETVALUE(x) \
     NMI_GET( ObjIndexWrapper, value##x, "") { \
-	checkTarget( ); \
-	return Register( target->value[x]); \
+        checkTarget( ); \
+        return Register( target->value[x]); \
     } 
-	
+        
 GETVALUE(0)
 GETVALUE(1)
 GETVALUE(2)
@@ -161,8 +161,8 @@ NMI_GET( ObjIndexWrapper, instances, "список всех предметов �
     RegList::Pointer rc(NEW);
 
     for (Object *o = object_list; o; o = o->next)
-	if (o->pIndexData == target)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
+        if (o->pIndexData == target)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);

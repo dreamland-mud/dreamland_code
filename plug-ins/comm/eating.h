@@ -18,7 +18,7 @@ public:
     CEat( );
 
     virtual void run( Character *, const DLString & );
-	
+        
 private:
     void eatFood( Character *, int, int, int );
     void eatCarnivoro( Character *, NPCharacter * );

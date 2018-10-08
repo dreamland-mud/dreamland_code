@@ -12,11 +12,11 @@ extern "C"
 {
     SO::PluginList initialize_ai( ) 
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MobileBehaviorRegistrator<BasicMobileBehavior> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<BasicMobileDestiny> >( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MobileBehaviorRegistrator<BasicMobileBehavior> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<BasicMobileDestiny> >( ppl );
 
-	return ppl;
-    }	
+        return ppl;
+    }        
 }

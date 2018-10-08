@@ -37,7 +37,7 @@ void QuestTrader::doTrouble( PCharacter *client, const DLString &constArguments 
     DLString arguments, arg;
     
     if (!canServeClient( client ))
-	return;
+        return;
     
     arguments = constArguments;
     arg = arguments.getOneArgument( );
@@ -49,41 +49,41 @@ void QuestTrader::doTrouble( PCharacter *client, const DLString &constArguments 
     article = findArticle( client, arg );
 
     if (!article) {
-	msgArticleNotFound( client );
-	return;
+        msgArticleNotFound( client );
+        return;
     }
     
     personal = article.getDynamicPointer<PersonalQuestArticle>( );
     
     if (!personal)
-	tell_act( client, getKeeper( ), "Извини, $c1, я не могу вернуть тебе эту вещь." );
+        tell_act( client, getKeeper( ), "Извини, $c1, я не могу вернуть тебе эту вещь." );
     else
-	personal->trouble( client, getKeeper( ) );
+        personal->trouble( client, getKeeper( ) );
 }
 
 bool QuestTrader::canServeClient( Character *client )
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (IS_GHOST( client )) {
-	say_act( client, getKeeper( ), "Наслажденье жизнью недоступно призракам." );
-	return false;
+        say_act( client, getKeeper( ), "Наслажденье жизнью недоступно призракам." );
+        return false;
     }
 
     if (IS_AFFECTED( client, AFF_CHARM )) {
-	say_act( client, getKeeper( ), "Ты не можешь сделать этого, пока ты не владеешь собой!" );
-	return false;
+        say_act( client, getKeeper( ), "Ты не можешь сделать этого, пока ты не владеешь собой!" );
+        return false;
     }
    
     if (getKeeper( )->fighting) {
-	say_act( client, getKeeper( ), "Подожди немного, $c1, мне сейчас не до тебя." );
-	return false;
+        say_act( client, getKeeper( ), "Подожди немного, $c1, мне сейчас не до тебя." );
+        return false;
     }
 
     if (!getKeeper( )->can_see( client )) {
-	say_act( client, getKeeper( ), "Я не общаюсь с невидимками." );
-	return false;
+        say_act( client, getKeeper( ), "Я не общаюсь с невидимками." );
+        return false;
     }
     
     return true;
@@ -162,11 +162,11 @@ int QuestTradeArticle::getQuantity( ) const
 void QuestTradeArticle::purchase( Character *client, NPCharacter *questman, const DLString &, int )
 {
     if (!price->canAfford( client ))
-	say_act( client, questman, "Извини, $c1, но у тебя недостаточно $n2 для этого.",
-	         price->toCurrency( ).c_str( ) );
+        say_act( client, questman, "Извини, $c1, но у тебя недостаточно $n2 для этого.",
+                 price->toCurrency( ).c_str( ) );
     else if (!client->is_npc( )) {
-	price->deduct( client );
-	buy( client->getPC( ), questman );
+        price->deduct( client );
+        buy( client->getPC( ), questman );
     }
 }
 
@@ -204,35 +204,35 @@ void PersonalQuestArticle::buyObject( Object *obj, PCharacter *client, NPCharact
     switch (gender.getValue( )) {
     default:
     case SEX_NEUTRAL:
-	obj->fmtShortDescr( obj->getShortDescr( ),
-	    IS_GOOD(client)    ? "Священн|ое|ого|ому|ое|ым|ом" :
-	    IS_NEUTRAL(client) ? "Мерцающ|ее|его|ему|ее|им|ем" :
-	     		         "Дьявольск|ое|ого|ому|ое|им|ом", 
-	    client->getNameP( '2' ).c_str());
-	break;
+        obj->fmtShortDescr( obj->getShortDescr( ),
+            IS_GOOD(client)    ? "Священн|ое|ого|ому|ое|ым|ом" :
+            IS_NEUTRAL(client) ? "Мерцающ|ее|его|ему|ее|им|ем" :
+                                      "Дьявольск|ое|ого|ому|ое|им|ом", 
+            client->getNameP( '2' ).c_str());
+        break;
     case SEX_MALE:
-	obj->fmtShortDescr( obj->getShortDescr( ),
-	    IS_GOOD(client)    ? "Священн|ый|ого|ому|ый|ым|ом" :
-	    IS_NEUTRAL(client) ? "Мерцающ|ий|его|ему|ий|им|ем" :
-			         "Дьявольск|ий|ого|ому|ий|им|ом", 
-	    client->getNameP( '2' ).c_str());
-	break;
+        obj->fmtShortDescr( obj->getShortDescr( ),
+            IS_GOOD(client)    ? "Священн|ый|ого|ому|ый|ым|ом" :
+            IS_NEUTRAL(client) ? "Мерцающ|ий|его|ему|ий|им|ем" :
+                                 "Дьявольск|ий|ого|ому|ий|им|ом", 
+            client->getNameP( '2' ).c_str());
+        break;
     case SEX_FEMALE:
-	obj->fmtShortDescr( obj->getShortDescr( ),
-	    IS_GOOD(client)    ? "Священн|ая|ой|ой|ую|ой|ой" :
-	    IS_NEUTRAL(client) ? "Мерцающ|ая|ей|ей|ую|ей|ей" :
-			         "Дьявольск|ая|ой|ой|ую|ой|ой", 
-	    client->getNameP( '2' ).c_str());
-	break;
+        obj->fmtShortDescr( obj->getShortDescr( ),
+            IS_GOOD(client)    ? "Священн|ая|ой|ой|ую|ой|ой" :
+            IS_NEUTRAL(client) ? "Мерцающ|ая|ей|ей|ую|ей|ей" :
+                                 "Дьявольск|ая|ой|ой|ую|ой|ой", 
+            client->getNameP( '2' ).c_str());
+        break;
     }
 
     if (troubled) {
-	XMLAttributeQuestReward::Pointer attr;
+        XMLAttributeQuestReward::Pointer attr;
 
-	attr = client->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" );
+        attr = client->getAttributes( ).getAttr<XMLAttributeQuestReward>( "questreward" );
 
-	if (attr->getCount( vnum ) == 0)
-	    attr->setCount( vnum, 1 );
+        if (attr->getCount( vnum ) == 0)
+            attr->setCount( vnum, 1 );
     }
 }
 
@@ -243,30 +243,30 @@ void PersonalQuestArticle::trouble( PCharacter *client, NPCharacter *questman )
     XMLAttributeQuestReward::Pointer attr;
     
     if (troubled) {
-	attr = client->getAttributes( ).findAttr<XMLAttributeQuestReward>( "questreward" );
-	
-	if (attr)
-	    count = attr->getCount( vnum );
+        attr = client->getAttributes( ).findAttr<XMLAttributeQuestReward>( "questreward" );
+        
+        if (attr)
+            count = attr->getCount( vnum );
     }
 
     if (count == 0 || count > 3) {
-	tell_act( client, questman, "Извини, $c1, я не могу вернуть тебе эту вещь." );
-	return;
+        tell_act( client, questman, "Извини, $c1, я не могу вернуть тебе эту вещь." );
+        return;
     }
     
     obj = get_obj_world_unique( vnum, client );
 
     if (obj) {
-	tell_act( client, questman, "Извини, но у тебя уже есть $o1.", obj );
-	// extract_obj( obj ); у вас все было 
-	return;
+        tell_act( client, questman, "Извини, но у тебя уже есть $o1.", obj );
+        // extract_obj( obj ); у вас все было 
+        return;
     }
 
     buy( client, questman );
     tell_act( client, questman, "Я возвращаю тебе эту вещь $t-й раз.", DLString( count ).c_str( ) );
     
     if (count == 3) 
-	tell_act( client, questman, "Будь внимательнее! В следующий раз я не смогу помочь тебе." );
+        tell_act( client, questman, "Будь внимательнее! В следующий раз я не смогу помочь тебе." );
     
     attr->setCount( vnum, count + 1 );
 }
@@ -296,10 +296,10 @@ void ConQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 bool ConQuestArticle::available( Character *client, NPCharacter *questman ) const 
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (client->perm_stat[STAT_CON] < client->getPC( )->getMaxTrain( STAT_CON ))
-	return true;
+        return true;
     
     say_act( client, questman, "Извини, $c1, но твое сложение на максимуме." );
     return false;
@@ -315,9 +315,9 @@ Object * PocketsQuestArticle::findBag( PCharacter *client ) const
     Object *obj;
 
     for (obj = client->carrying; obj; obj = obj->next_content) 
-	if (obj->pIndexData->vnum == OBJ_VNUM_QUESTBAG 
-	    && !IS_SET(obj->value[1], CONT_WITH_POCKETS)) 
-	    break;
+        if (obj->pIndexData->vnum == OBJ_VNUM_QUESTBAG 
+            && !IS_SET(obj->value[1], CONT_WITH_POCKETS)) 
+            break;
     
     return obj;
 }
@@ -327,19 +327,19 @@ void PocketsQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     Object *obj = findBag( client );
     
     if (obj) {
-	SET_BIT(obj->value[1], CONT_WITH_POCKETS);
-	act("$C1 пришивает карманы на $o4.", client, obj, questman, TO_CHAR);
-	act("$C1 пришивает $c5 карманы на $o4.", client, obj, questman, TO_ROOM);
+        SET_BIT(obj->value[1], CONT_WITH_POCKETS);
+        act("$C1 пришивает карманы на $o4.", client, obj, questman, TO_CHAR);
+        act("$C1 пришивает $c5 карманы на $o4.", client, obj, questman, TO_ROOM);
     }
 }
 
 bool PocketsQuestArticle::available( Character *client, NPCharacter *questman ) const 
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (findBag( client->getPC( ) )) 
-	return true;
+        return true;
 
     say_act( client, questman, "Извини, $c1, но я не вижу у тебя сумки без карманов." );
     return false;
@@ -357,7 +357,7 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     Wearlocation *waist;
     
     if (( girth = get_obj_carry_vnum( client, OBJ_VNUM_QUESTGIRTH ) ) == NULL)
-	return;
+        return;
     
     keyring = create_object( get_obj_index( OBJ_VNUM_QUESTKEYRING ), 0 );
     obj_to_char( keyring, client );
@@ -366,23 +366,23 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     keyring->setShortDescr( girth->getShortDescr( ) );
     
     if (girth->getRealDescription( ))
-	keyring->setDescription( girth->getRealDescription( ) );
-	
+        keyring->setDescription( girth->getRealDescription( ) );
+        
     if (girth->getRealName( ))
-	keyring->setName( girth->getRealName( ) );
-	
+        keyring->setName( girth->getRealName( ) );
+        
     if (girth->getRealMaterial( ))
-	keyring->setMaterial( girth->getRealMaterial( ) );
+        keyring->setMaterial( girth->getRealMaterial( ) );
 
     keyring->extra_flags = girth->extra_flags;
     keyring->condition = girth->condition;
     keyring->level = girth->level;
 
     for (Affect *paf = girth->affected; paf != 0; paf = paf->next)
-	affect_to_obj( keyring, paf );
+        affect_to_obj( keyring, paf );
 
     for (EXTRA_DESCR_DATA *ed = girth->extra_descr; ed != 0; ed = ed->next)
-	keyring->addExtraDescr( ed->keyword, ed->description );
+        keyring->addExtraDescr( ed->keyword, ed->description );
 
     waist = &*girth->wear_loc;
     waist->unequip( girth );
@@ -396,10 +396,10 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
 bool KeyringQuestArticle::available( Character *client, NPCharacter *questman ) const 
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (get_obj_carry_vnum( client, OBJ_VNUM_QUESTGIRTH ))
-	return true;
+        return true;
 
     say_act( client, questman, "Извини, $c1, но я не вижу у тебя пояса без брелков." );
     return false;
@@ -427,7 +427,7 @@ DLString OwnerPrice::toString( Character * ) const
 bool OwnerPrice::canAfford( Character *ch ) const
 {
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     return getValue( ch->getPC( ) ) - ch->getPC( )->getRemorts( ).owners > 0;
 }
@@ -450,8 +450,8 @@ void OwnerPrice::induct( Character *ch ) const
 void OwnerPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( )) {
-	ch->getPC( )->getRemorts( ).owners++;
-	::wiznet( WIZ_QUEST, 0, 0, "%1$^C1 приобретает owner coupon.", ch );
+        ch->getPC( )->getRemorts( ).owners++;
+        ::wiznet( WIZ_QUEST, 0, 0, "%1$^C1 приобретает owner coupon.", ch );
     }
 }
 
@@ -465,16 +465,16 @@ void OwnerPrice::toStream( Character *ch, ostringstream &buf ) const
 bool OwnerQuestArticle::available( Character *client, NPCharacter *questman ) const 
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (lifePrice.getValue( client->getPC( ) ) <= 0) {
-	say_act( client, questman, "Извини, $c1, но у тебя не хватает $n2, чтобы владеть этой вещью.", lifePrice.toCurrency( ).c_str( ) );
-	return false;
+        say_act( client, questman, "Извини, $c1, но у тебя не хватает $n2, чтобы владеть этой вещью.", lifePrice.toCurrency( ).c_str( ) );
+        return false;
     }
 
     if (!lifePrice.canAfford( client )) {
-	say_act( client, questman, "Извини, $c1, но ты уже исчерпа$gло|л|ла отведенное тебе количество этих талонов." );
-	return false;
+        say_act( client, questman, "Извини, $c1, но ты уже исчерпа$gло|л|ла отведенное тебе количество этих талонов." );
+        return false;
     }
 
     return true;
@@ -504,16 +504,16 @@ void PiercingQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 bool PiercingQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
 {
     if (!visible( client )) {
-	say_act( client, tattoer, "У тебя уже проколоты уши, $c1." );
-	say_act( client, tattoer, "Может, тебе еще что-нибудь проколоть?" );
-	interpret_raw( tattoer, "smirk" );
-	return false;
+        say_act( client, tattoer, "У тебя уже проколоты уши, $c1." );
+        say_act( client, tattoer, "Может, тебе еще что-нибудь проколоть?" );
+        interpret_raw( tattoer, "smirk" );
+        return false;
     }
 
     if (get_eq_char( client, wear_head )) {
-	interpret_raw( tattoer, "bonk", client->getNameP( ) );
-	say_act( client, tattoer, "Шляпу сними!" );
-	return false;
+        interpret_raw( tattoer, "bonk", client->getNameP( ) );
+        say_act( client, tattoer, "Шляпу сними!" );
+        return false;
     }
 
     return true;
@@ -550,16 +550,16 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) const 
 {
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (client->getReligion( ) == god_none) {
-	say_act( client, tattoer, "$c1, ты не веришь в бога и не можешь получить татуировку." );
-	return false;
+        say_act( client, tattoer, "$c1, ты не веришь в бога и не можешь получить татуировку." );
+        return false;
     }
 
     if (wear_tattoo->find( client )) {
-	say_act( client, tattoer, "Но у тебя уже есть татуировка, $c1!" );
-	return false;
+        say_act( client, tattoer, "Но у тебя уже есть татуировка, $c1!" );
+        return false;
     }
 
     return true;

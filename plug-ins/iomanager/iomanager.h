@@ -31,7 +31,7 @@ public:
     virtual void destruction();
 
     static IOManager *getThis() {
-	return thisClass;
+        return thisClass;
     }
 protected:
     void ioInit();

@@ -16,37 +16,37 @@ class PCMemoryInterface;
 class Deny : public AdminCommand {
 XML_OBJECT
 public:
-	typedef ::Pointer<Deny> Pointer;
+        typedef ::Pointer<Deny> Pointer;
     
-	Deny( );
+        Deny( );
 
-	virtual void run( Character *, const DLString & );
-	
+        virtual void run( Character *, const DLString & );
+        
 private:
-	void doShow( Character *, PCMemoryInterface * );
-	void doRemove( Character *, PCMemoryInterface * );
-	void doPlace( Character *, PCMemoryInterface *, const DLString & );
-	void doUsage( Character * );
+        void doShow( Character *, PCMemoryInterface * );
+        void doRemove( Character *, PCMemoryInterface * );
+        void doPlace( Character *, PCMemoryInterface *, const DLString & );
+        void doUsage( Character * );
 
-	static const DLString COMMAND_NAME;
+        static const DLString COMMAND_NAME;
 };
 
 class XMLAttributeDeny : public XMLAttributeMemoryTicker {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeDeny> Pointer;
+        typedef ::Pointer<XMLAttributeDeny> Pointer;
 
-	XMLAttributeDeny( );
-	XMLAttributeDeny( int );
+        XMLAttributeDeny( );
+        XMLAttributeDeny( int );
 
-	virtual void start( PCMemoryInterface *pcm ) const;
-	virtual void end( PCMemoryInterface *pcm ) const;
-	
-	inline void setResponsible( const DLString & );
-	inline const DLString &getResponsible( ) const;
+        virtual void start( PCMemoryInterface *pcm ) const;
+        virtual void end( PCMemoryInterface *pcm ) const;
+        
+        inline void setResponsible( const DLString & );
+        inline const DLString &getResponsible( ) const;
 
-protected:			
-	XML_VARIABLE XMLString responsible;
+protected:                        
+        XML_VARIABLE XMLString responsible;
 };
 
 inline void XMLAttributeDeny::setResponsible( const DLString& rp )

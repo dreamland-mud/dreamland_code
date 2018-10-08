@@ -20,43 +20,43 @@
 class Short
 {
 public:
-	static const DLString TYPE;
+        static const DLString TYPE;
 
-public:	
-	/** По умолчанию значение 0 */
-	inline Short( ) : value( 0 )
-	{
-	}
+public:        
+        /** По умолчанию значение 0 */
+        inline Short( ) : value( 0 )
+        {
+        }
 
-	inline Short( short value ) : value( value )
-	{
-	}
+        inline Short( short value ) : value( value )
+        {
+        }
 
-	inline Short( const DLString& value ) throw( ExceptionBadType )
-	{
-		fromString( value );
-	}
+        inline Short( const DLString& value ) throw( ExceptionBadType )
+        {
+                fromString( value );
+        }
 
-	
-	DLString toString( ) const throw( );
-	void fromString( const DLString& value ) throw( ExceptionBadType );
-	
-	inline short getValue( ) const
-	{
-		return value;
-	}
+        
+        DLString toString( ) const throw( );
+        void fromString( const DLString& value ) throw( ExceptionBadType );
+        
+        inline short getValue( ) const
+        {
+                return value;
+        }
 
-	inline void setValue( short value )
-	{
-		this->value = value;
-	}
+        inline void setValue( short value )
+        {
+                this->value = value;
+        }
 
-	inline operator short & ( ) {
-	    return value;
-	}
+        inline operator short & ( ) {
+            return value;
+        }
 
 private:
-	short value;
+        short value;
 };
 
 
@@ -66,8 +66,8 @@ private:
 /** Вывод в ostream типа Short */
 inline std::ostream& operator << ( std::ostream& ostr, const Short& shortValue )
 {
-	ostr << shortValue.getValue( );
-	return ostr;
+        ostr << shortValue.getValue( );
+        return ostr;
 }
 
 

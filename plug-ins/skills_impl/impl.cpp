@@ -23,24 +23,24 @@ TABLE_LOADER(SkillGroupLoader, "skill-groups", "SkillGroup");
 
 extern "C"
 {
-	SO::PluginList initialize_skills_impl( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<SpellManager>( ppl );
-		Plugin::registerPlugin<MocRegistrator<DefaultAffectHandler> >( ppl );		
-		Plugin::registerPlugin<MocRegistrator<DefaultSkillGroup> >( ppl );		
-		Plugin::registerPlugin<XMLVariableRegistrator<SkillGroupHelp> >( ppl );
-		Plugin::registerPlugin<SkillGroupLoader>( ppl );
-		Plugin::registerPlugin<MobileBehaviorRegistrator<SummonedCreature> >( ppl );
-		Plugin::registerPlugin<MocRegistrator<DefaultSpell> >( ppl );		
-		Plugin::registerPlugin<MocRegistrator<GateSpell> >( ppl );		
-		Plugin::registerPlugin<MocRegistrator<SummonSpell> >( ppl );		
-		Plugin::registerPlugin<MocRegistrator<SleepAffectHandler> >( ppl );		
-		Plugin::registerPlugin<XMLVariableRegistrator<SkillHelp> >( ppl );
-		Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );
-		
-		return ppl;
-	}
-	
+        SO::PluginList initialize_skills_impl( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<SpellManager>( ppl );
+                Plugin::registerPlugin<MocRegistrator<DefaultAffectHandler> >( ppl );                
+                Plugin::registerPlugin<MocRegistrator<DefaultSkillGroup> >( ppl );                
+                Plugin::registerPlugin<XMLVariableRegistrator<SkillGroupHelp> >( ppl );
+                Plugin::registerPlugin<SkillGroupLoader>( ppl );
+                Plugin::registerPlugin<MobileBehaviorRegistrator<SummonedCreature> >( ppl );
+                Plugin::registerPlugin<MocRegistrator<DefaultSpell> >( ppl );                
+                Plugin::registerPlugin<MocRegistrator<GateSpell> >( ppl );                
+                Plugin::registerPlugin<MocRegistrator<SummonSpell> >( ppl );                
+                Plugin::registerPlugin<MocRegistrator<SleepAffectHandler> >( ppl );                
+                Plugin::registerPlugin<XMLVariableRegistrator<SkillHelp> >( ppl );
+                Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );
+                
+                return ppl;
+        }
+        
 }

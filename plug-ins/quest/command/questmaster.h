@@ -12,15 +12,15 @@
 class QuestMaster : public QuestTrader, public Questor {
 XML_OBJECT
 public:
-	typedef ::Pointer<QuestMaster> Pointer;
+        typedef ::Pointer<QuestMaster> Pointer;
 
-	QuestMaster( );
-	
-	virtual int getOccupation( );
-	virtual bool canGiveQuest( Character * );
+        QuestMaster( );
+        
+        virtual int getOccupation( );
+        virtual bool canGiveQuest( Character * );
 
 protected:
-	virtual bool specIdle( );
+        virtual bool specIdle( );
 };
 
 #endif

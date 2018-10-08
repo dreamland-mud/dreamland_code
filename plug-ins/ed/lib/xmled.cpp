@@ -22,9 +22,9 @@ XMLEditor::ToXMLState::line2id(const Line *i)
     it = l2i.find(i);
     
     if(it == l2i.end( )) {
-	l2i[i] = ++lastid;
-	core.push_back(i);
-	return lastid;
+        l2i[i] = ++lastid;
+        core.push_back(i);
+        return lastid;
     }
 
     return it->second;
@@ -36,7 +36,7 @@ XMLEditor::ToXMLState::iposToXML( XMLNode::Pointer &parent, const Line * i )
     parent->setType( XMLNode::XML_LEAF );
 
     if(!i)
-	return;
+        return;
 
     parent->insertAttribute("id", line2id(i));
 }
@@ -57,10 +57,10 @@ XMLEditor::ToXMLState::registersToXML(XMLNode::Pointer& parent)
     
     map<char, list_t>::const_iterator i;
     for(i = ed.registers.begin(); i != ed.registers.end(); i++) {
-	XMLNode::Pointer nreg( NEW, "register" );
-	iposToXML(nreg, i->second.end( ).data);
-	nreg->insertAttribute("name", i->first);
-	node->appendChild( nreg );
+        XMLNode::Pointer nreg( NEW, "register" );
+        iposToXML(nreg, i->second.end( ).data);
+        nreg->insertAttribute("name", i->first);
+        node->appendChild( nreg );
     }
     parent->appendChild( node );
 }
@@ -73,10 +73,10 @@ XMLEditor::ToXMLState::marksToXML(XMLNode::Pointer& parent)
     
     marks_t::const_iterator i;
     for(i = ed.marks.begin(); i != ed.marks.end(); i++) {
-	XMLNode::Pointer nmark( NEW, "mark" );
-	iposToXML(nmark, i->second.data);
-	nmark->insertAttribute("name", i->first);
-	node->appendChild( nmark );
+        XMLNode::Pointer nmark( NEW, "mark" );
+        iposToXML(nmark, i->second.data);
+        nmark->insertAttribute("name", i->first);
+        node->appendChild( nmark );
     }
     parent->appendChild( node );
 }
@@ -100,9 +100,9 @@ XMLEditor::ToXMLState::undoListToXML(XMLNode::Pointer& parent, const list<Undo> 
     
     list<Undo>::const_iterator i;
     for(i = u.begin(); i != u.end(); i++) {
-	XMLNode::Pointer nact( NEW, "change" );
-	undoToXML(nact, *i);
-	node->appendChild( nact);
+        XMLNode::Pointer nact( NEW, "change" );
+        undoToXML(nact, *i);
+        node->appendChild( nact);
     }
     parent->appendChild( node );
 }
@@ -115,11 +115,11 @@ XMLEditor::ToXMLState::undoStackToXML(XMLNode::Pointer& parent)
 
     list<CmdUndo>::const_iterator i;
     for(i = ed.undostack.begin(); i != ed.undostack.end(); i++) {
-	XMLNode::Pointer nundo( NEW, "undo" );
-	nundo->setType( XMLNode::XML_NODE );
-	undoListToXML(nundo, i->changes);
-	iposToXML(nundo, "currentline", i->currentline.data);
-	node->appendChild( nundo );
+        XMLNode::Pointer nundo( NEW, "undo" );
+        nundo->setType( XMLNode::XML_NODE );
+        undoListToXML(nundo, i->changes);
+        iposToXML(nundo, "currentline", i->currentline.data);
+        node->appendChild( nundo );
     }
     parent->appendChild( node );
 }
@@ -147,7 +147,7 @@ XMLEditor::ToXMLState::coreToXML(XMLNode::Pointer& parent)
 
     core_t::iterator i;
     for(i = core.begin(); i != core.end(); i++) 
-	lineToXML(node, *i);
+        lineToXML(node, *i);
 
     parent->appendChild( node );
 }
@@ -219,7 +219,7 @@ XMLEditor::FromXMLState::id2line( int i )
     it = i2l.find( i );
 
     if(it == i2l.end( )) 
-	return i2l[i] = new Line;
+        return i2l[i] = new Line;
 
     return it->second;
 }
@@ -240,7 +240,7 @@ XMLEditor::FromXMLState::coreFromXML( const XMLNode::Pointer &parent )
 
     XMLNode::NodeList::const_iterator it;
     for(it = nl.begin( ); it != nl.end( ); it++)
-	lineFromXML(*it);
+        lineFromXML(*it);
 }
 
 void
@@ -259,9 +259,9 @@ XMLEditor::FromXMLState::iposFromXML( const XMLNode::Pointer &parent, ipos_t &i 
     const DLString &id = parent->getAttribute("id");
 
     if(id.empty( ))
-	i.data = 0;
+        i.data = 0;
     else
-	i.data = id2line(id.toInt( ));
+        i.data = id2line(id.toInt( ));
     
 }
 
@@ -279,7 +279,7 @@ XMLEditor::FromXMLState::registersFromXML( const XMLNode::Pointer &parent )
 
     XMLNode::NodeList::const_iterator it;
     for(it = nl.begin( ); it != nl.end( ); it++)
-	registerFromXML(*it);
+        registerFromXML(*it);
 }
 */
 void
@@ -295,7 +295,7 @@ XMLEditor::FromXMLState::marksFromXML( const XMLNode::Pointer &parent )
 
     XMLNode::NodeList::const_iterator it;
     for(it = nl.begin( ); it != nl.end( ); it++)
-	markFromXML(*it);
+        markFromXML(*it);
 }
 
 void
@@ -309,19 +309,19 @@ XMLEditor::FromXMLState::undoFromXML( const XMLNode::Pointer &parent, Undo &u )
 
     XMLNode::NodeList::const_iterator it;
     for(it = nl.begin( ); it != nl.end( ); it++) {
-	XMLNode::Pointer node = *it;
-	/*
-	if(node->getType() != XMLNode::XML_NODE)
-	    throw XXX;
-	*/
-	if(node->getName() == "head")
-	    iposFromXML(node, u.head);
-	else if(node->getName() == "tail")
-	    iposFromXML(node, u.tail);
-	/*
-	else
-	    throw XXX;
-	 */
+        XMLNode::Pointer node = *it;
+        /*
+        if(node->getType() != XMLNode::XML_NODE)
+            throw XXX;
+        */
+        if(node->getName() == "head")
+            iposFromXML(node, u.head);
+        else if(node->getName() == "tail")
+            iposFromXML(node, u.tail);
+        /*
+        else
+            throw XXX;
+         */
     }
     
     u.add = parent->getAttribute("add").toBoolean( );
@@ -339,9 +339,9 @@ XMLEditor::FromXMLState::changesFromXML( const XMLNode::Pointer &parent, list<Un
 
     u.clear( );
     for(it = nl.begin( ); it != nl.end( ); it++) {
-	Undo au;
-	undoFromXML( *it, au );
-	u.push_back( au );
+        Undo au;
+        undoFromXML( *it, au );
+        u.push_back( au );
     }
 }
 
@@ -356,12 +356,12 @@ XMLEditor::FromXMLState::undoCmdFromXML( const XMLNode::Pointer &parent, CmdUndo
     XMLNode::NodeList::const_iterator it;
     
     for(it = nl.begin( ); it != nl.end( ); it++) {
-	XMLNode::Pointer node = *it;
-	
-	if(node->getName( ) == "changes") 
-	    changesFromXML(node, u.changes);
-	else if(node->getName( ) == "currentline")
-	    iposFromXML(node, u.currentline);
+        XMLNode::Pointer node = *it;
+        
+        if(node->getName( ) == "changes") 
+            changesFromXML(node, u.changes);
+        else if(node->getName( ) == "currentline")
+            iposFromXML(node, u.currentline);
     }
 }
 
@@ -377,9 +377,9 @@ XMLEditor::FromXMLState::undoStackFromXML( const XMLNode::Pointer &parent )
     
     ed.undostack.clear( );
     for(it = nl.begin( ); it != nl.end( ); it++) {
-	CmdUndo auc;
-	undoCmdFromXML(*it, auc);
-	ed.undostack.push_back( auc );
+        CmdUndo auc;
+        undoCmdFromXML(*it, auc);
+        ed.undostack.push_back( auc );
     }
 }
 
@@ -393,56 +393,56 @@ XMLEditor::FromXMLState::fromXML( const XMLNode::Pointer &parent )
 
     XMLNode::NodeList::const_iterator it;
     for(it = nl.begin( ); it != nl.end( ); it++) {
-	XMLNode::Pointer node = *it;
-	/*
-	if(node->getType() != XMLNode::XML_NODE)
-	    throw XXX;
-	*/
-	if(node->getName() == "core")
-	    coreFromXML(node);
-	else if(node->getName() == "changes")
-	    changesFromXML(node, ed.undo);
-	else if(node->getName() == "undostack")
-	    undoStackFromXML(node);
-	else if(node->getName() == "marks")
-	    marksFromXML(node);
-//	else if(node->getName() == "registers")
-//	    registersFromXML(node);
-	else if(node->getName() == "append_at")
-	    iposFromXML(node, ed.append_at);
-	else if(node->getName() == "currentline")
-	    iposFromXML(node, ed.currentline);
-	else if(node->getName() == "appendlines")
-	    listFromXML(node, ed.appendlines);
-	else if(node->getName() == "lines")
-	    listFromXML(node, ed.lines);
-	else if(node->getName() == "lastpat") 
-	    ed.lastpat = node->getAttribute("pat");
-	else if(node->getName() == "lastsubst") {
-	    ed.lastsubst.pat = node->getAttribute("pat");
-	    ed.lastsubst.rep = node->getAttribute("rep");
-	}
-	/*
-	else
-	    throw XXX;
-	 */
+        XMLNode::Pointer node = *it;
+        /*
+        if(node->getType() != XMLNode::XML_NODE)
+            throw XXX;
+        */
+        if(node->getName() == "core")
+            coreFromXML(node);
+        else if(node->getName() == "changes")
+            changesFromXML(node, ed.undo);
+        else if(node->getName() == "undostack")
+            undoStackFromXML(node);
+        else if(node->getName() == "marks")
+            marksFromXML(node);
+//        else if(node->getName() == "registers")
+//            registersFromXML(node);
+        else if(node->getName() == "append_at")
+            iposFromXML(node, ed.append_at);
+        else if(node->getName() == "currentline")
+            iposFromXML(node, ed.currentline);
+        else if(node->getName() == "appendlines")
+            listFromXML(node, ed.appendlines);
+        else if(node->getName() == "lines")
+            listFromXML(node, ed.lines);
+        else if(node->getName() == "lastpat") 
+            ed.lastpat = node->getAttribute("pat");
+        else if(node->getName() == "lastsubst") {
+            ed.lastsubst.pat = node->getAttribute("pat");
+            ed.lastsubst.rep = node->getAttribute("rep");
+        }
+        /*
+        else
+            throw XXX;
+         */
     }
 
     i2l_t::iterator mi;
     for(mi = i2l.begin( ); mi != i2l.end( ); mi++)
-	if(!mi->second->prev || !mi->second->next)
-	    throw Exception("ed: broken state loaded");
+        if(!mi->second->prev || !mi->second->next)
+            throw Exception("ed: broken state loaded");
 }
 
 bool
 XMLEditor::nodeFromXML( const XMLNode::Pointer &parent )
 {
     if(parent->getType() == XMLNode::XML_NODE 
-	    && parent->getName() == "state") 
+            && parent->getName() == "state") 
     {
-	FromXMLState s(*this);
-	s.fromXML( parent );
-	return true;
+        FromXMLState s(*this);
+        s.fromXML( parent );
+        return true;
     }
 
     return false;
@@ -457,20 +457,20 @@ XMLEditorRegisters::toXML(XMLNode::Pointer &parent) const
     const_iterator i;
 
     for(i = begin(); i != end(); i++) {
-	XMLNode::Pointer nreg( NEW, "reg" );
-	nreg->setType( XMLNode::XML_NODE );
-	nreg->insertAttribute("name", i->first);
+        XMLNode::Pointer nreg( NEW, "reg" );
+        nreg->setType( XMLNode::XML_NODE );
+        nreg->insertAttribute("name", i->first);
 
-	ostringstream ostr;
-	reg_t::const_iterator li;
-	for(li = i->second.begin( ); li != i->second.end( ); li++)
-	    ostr << *li << endl;
+        ostringstream ostr;
+        reg_t::const_iterator li;
+        for(li = i->second.begin( ); li != i->second.end( ); li++)
+            ostr << *li << endl;
 
-	XMLNode::Pointer cdata( NEW, "'" + ostr.str( ) + "'" );
-	cdata->setType( XMLNode::XML_TEXT );
-	nreg->appendChild( cdata );
+        XMLNode::Pointer cdata( NEW, "'" + ostr.str( ) + "'" );
+        cdata->setType( XMLNode::XML_TEXT );
+        nreg->appendChild( cdata );
 
-	parent->appendChild( nreg );
+        parent->appendChild( nreg );
     }
 
     return true;
@@ -480,17 +480,17 @@ bool
 XMLEditorRegisters::nodeFromXML( const XMLNode::Pointer &parent )
 {
     if(parent->getType() != XMLNode::XML_NODE || parent->getName() != "reg") 
-	return false;
+        return false;
 
     XMLNode::Pointer cdata = parent->getFirstNode( );
 
     if(!cdata)
-	return false;
+        return false;
 
     DLString cd = cdata->getCData();
 
     if(cd.size( ) >= 2 && cd[0] == '\'' && cd[cd.length( ) - 1] == '\'')
-	cd = cd.substr(1, cd.length() - 2);
+        cd = cd.substr(1, cd.length() - 2);
 
     (*this)[parent->getAttribute("name").toInt( )].split(cd);
     

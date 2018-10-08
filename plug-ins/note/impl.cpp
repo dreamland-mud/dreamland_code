@@ -13,16 +13,16 @@
 extern "C"
 {
     SO::PluginList initialize_notes( ) {
-	SO::PluginList ppl;
-		
-	Plugin::registerPlugin<NoteManager>( ppl );
-	Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeNoteData> >( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLastRead> >( ppl );
-	Plugin::registerPlugin<Unread>( ppl );
-	Plugin::registerPlugin<UnreadListener>( ppl );
-	Plugin::registerPlugin<NoteHooks>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+                
+        Plugin::registerPlugin<NoteManager>( ppl );
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeNoteData> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLastRead> >( ppl );
+        Plugin::registerPlugin<Unread>( ppl );
+        Plugin::registerPlugin<UnreadListener>( ppl );
+        Plugin::registerPlugin<NoteHooks>( ppl );
+        
+        return ppl;
     }
 }
 

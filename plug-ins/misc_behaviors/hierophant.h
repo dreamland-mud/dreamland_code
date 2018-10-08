@@ -11,12 +11,12 @@
 class Hierophant : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<Hierophant> Pointer;
+        typedef ::Pointer<Hierophant> Pointer;
     
-	Hierophant( );
+        Hierophant( );
 
-	virtual void speech( Character *victim, const char *speech );
-	virtual void tell ( Character *victim, const char *speech );
+        virtual void speech( Character *victim, const char *speech );
+        virtual void tell ( Character *victim, const char *speech );
 };
 
 #endif

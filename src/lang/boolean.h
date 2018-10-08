@@ -20,48 +20,48 @@
 class Boolean
 {
 public:
-	static const DLString TYPE;
-	static const DLString VAL_TRUE;
-	static const DLString VAL_FALSE;
+        static const DLString TYPE;
+        static const DLString VAL_TRUE;
+        static const DLString VAL_FALSE;
 
-public:	
-	/** По умолчанию значение true */
-	inline Boolean( ) : value( true )
-	{
-	}
+public:        
+        /** По умолчанию значение true */
+        inline Boolean( ) : value( true )
+        {
+        }
 
-	inline Boolean( bool value ) : value( value )
-	{
-	}
+        inline Boolean( bool value ) : value( value )
+        {
+        }
 
-	inline Boolean( const DLString& value ) throw( ExceptionBadType )
-	{
-		fromString( value );
-	}
+        inline Boolean( const DLString& value ) throw( ExceptionBadType )
+        {
+                fromString( value );
+        }
 
-	DLString toString( ) const throw( );
-	void fromString( const DLString& value ) throw( ExceptionBadType );
-	
-	inline bool getValue( ) const
-	{
-		return value;
-	}
+        DLString toString( ) const throw( );
+        void fromString( const DLString& value ) throw( ExceptionBadType );
+        
+        inline bool getValue( ) const
+        {
+                return value;
+        }
 
-	inline void setValue( bool value )
-	{
-		this->value = value;
-	}
+        inline void setValue( bool value )
+        {
+                this->value = value;
+        }
 
-	inline operator bool & ( ) {
-	    return value;
-	}
+        inline operator bool & ( ) {
+            return value;
+        }
 
-	inline operator const bool & ( ) const {
-	    return value;
-	}
+        inline operator const bool & ( ) const {
+            return value;
+        }
 
 private:
-	bool value;
+        bool value;
 };
 
 
@@ -69,8 +69,8 @@ private:
 /** Вывод в ostream типа Boolean */
 inline std::ostream& operator << ( std::ostream& ostr, const Boolean& boolean )
 {
-	ostr << boolean.getValue( );
-	return ostr;
+        ostr << boolean.getValue( );
+        return ostr;
 }
 
 #endif

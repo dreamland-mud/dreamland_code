@@ -58,7 +58,7 @@ NoteThread::Pointer NoteManager::findThread( const DLString& name )
     Threads::iterator i = threads.find( name );
     
     if (i != threads.end( ))
-	return i->second;
+        return i->second;
     else
-	return NoteThread::Pointer( );
+        return NoteThread::Pointer( );
 }

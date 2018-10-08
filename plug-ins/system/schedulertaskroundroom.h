@@ -26,12 +26,12 @@ class Room;
  */
 struct SchedulerTaskRoundRoom : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundRoom> Pointer;
-	
-	virtual void run( );
-	/** Обработать комнату */
-	virtual void run( Room* room ) = 0;
-	virtual int getPriority( ) const;
+        typedef ::Pointer<SchedulerTaskRoundRoom> Pointer;
+        
+        virtual void run( );
+        /** Обработать комнату */
+        virtual void run( Room* room ) = 0;
+        virtual int getPriority( ) const;
 };
 
 #endif

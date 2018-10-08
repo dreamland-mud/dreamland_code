@@ -11,12 +11,12 @@
 class ClanGuardOutsider: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardOutsider> Pointer;
+        typedef ::Pointer<ClanGuardOutsider> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual void actIntruder( PCharacter * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual void actIntruder( PCharacter * );
 };
 
 #endif

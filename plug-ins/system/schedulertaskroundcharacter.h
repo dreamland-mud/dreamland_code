@@ -26,13 +26,13 @@ class Character;
  */
 struct SchedulerTaskRoundCharacter : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundCharacter> Pointer;
-	
-	virtual void run( );
-	/** Обработать моба */
-	virtual void run( Character* ch ) = 0;
-	virtual int getPriority( ) const;
-	    
+        typedef ::Pointer<SchedulerTaskRoundCharacter> Pointer;
+        
+        virtual void run( );
+        /** Обработать моба */
+        virtual void run( Character* ch ) = 0;
+        virtual int getPriority( ) const;
+            
 };
 
 #endif

@@ -13,13 +13,13 @@ void AreaBehaviorPlugin::initialization( ) {
     AREA_DATA *area;
 
     for (area = area_first; area; area = area->next) {
-	if (!area->behavior)
-	    continue;
-	
-	if (area->behavior->getType( ) == getName( )) {
-	    area->behavior.recover( );
-	    area->behavior->setArea( area );	
-	}
+        if (!area->behavior)
+            continue;
+        
+        if (area->behavior->getType( ) == getName( )) {
+            area->behavior.recover( );
+            area->behavior->setArea( area );        
+        }
     }
 }
 
@@ -28,15 +28,15 @@ void AreaBehaviorPlugin::destruction( ) {
 
     /* XXX */
     if (dreamland->isShutdown( ))
-	return;
+        return;
 
     for (area = area_first; area; area = area->next) {
-	if (!area->behavior)
-	    continue;
-	
-	if (area->behavior->getType( ) == getName( )) {
-	    area->behavior->unsetArea( );
-	    area->behavior.backup( );
-	}
+        if (!area->behavior)
+            continue;
+        
+        if (area->behavior->getType( ) == getName( )) {
+            area->behavior->unsetArea( );
+            area->behavior.backup( );
+        }
     }
 }

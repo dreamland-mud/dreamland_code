@@ -13,7 +13,7 @@
  *------------------------------------------------------------------*/
 DefaultRaceLanguage::DefaultRaceLanguage( )
                 : races( raceManager ),
-		  common( false )
+                  common( false )
 {
 }
 
@@ -36,13 +36,13 @@ const DLString & DefaultRaceLanguage::getShortDescr( ) const
 bool DefaultRaceLanguage::available( Character *ch ) const
 {
     if (common.getValue( ))
-	return true;
+        return true;
     
     if (ch->is_immortal( ))
-	return true;
+        return true;
 
     if (races.isSet( ch->getRace( ) ))
-	return true;
+        return true;
 
     return false;
 }
@@ -85,7 +85,7 @@ const struct translation_type translation_table [] =
   {'ш',     "щ"}, {'Ш',     "Щ"}, {'щ',     "ъ"}, {'Щ',     "Ъ"},
   {'ъ',     "б"}, {'Ъ',     "Б"}, {'э',     "ю"}, {'Э',     "Ю"},
   {'ю',     "я"}, {'Ю',     "Я"}, {'я',     "а"}, {'Я',     "А"},
-  { 0, 	0 } 
+  { 0,         0 } 
 };
 
 DLString DefaultRaceLanguage::translate( const DLString &arg, Character *ch, Character *victim ) const
@@ -93,16 +93,16 @@ DLString DefaultRaceLanguage::translate( const DLString &arg, Character *ch, Cha
     ostringstream buf;
 
     if (victim && available( victim ))
-	return arg;
+        return arg;
     
     for (unsigned int i = 0; i < arg.size( ); i++) {
-	char c = arg.at( i );
+        char c = arg.at( i );
 
-	for (int j = 0; translation_table[j].common != '\0'; j++)
-	    if (translation_table[j].common == c) {
-		buf << translation_table[j].language;
-		break;
-	    }
+        for (int j = 0; translation_table[j].common != '\0'; j++)
+            if (translation_table[j].common == c) {
+                buf << translation_table[j].language;
+                break;
+            }
     }
     
     return buf.str( );

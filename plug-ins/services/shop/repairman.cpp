@@ -32,7 +32,7 @@ int Repairman::getOccupation( )
     int occ = BasicMobileDestiny::getOccupation( );
     
     if (repairs.getValue( ) != 0)
-	occ |= (1 << OCC_REPAIRMAN);
+        occ |= (1 << OCC_REPAIRMAN);
 
     return occ;
 }
@@ -40,17 +40,17 @@ int Repairman::getOccupation( )
 bool Repairman::specIdle( )
 {
     if (BasicMobileDestiny::specIdle( ))
-	return true;
-	
+        return true;
+        
     if (!IS_AWAKE( ch ))
-	return false;
+        return false;
 
     if (repairs.getValue( ) == 0)
-	return false;
+        return false;
 
     if (chance( 1 )) {
-	interpret_raw(ch, "say", "Настало время для ремонта ваших доспехов.");
-	return true;
+        interpret_raw(ch, "say", "Настало время для ремонта ваших доспехов.");
+        return true;
     }
 
     return false;
@@ -65,25 +65,25 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     arg = args.getOneArgument( );
     
     if (arg.empty( )) {
-	say_act( client, ch, "Я отремонтирую тебе что-нибудь за деньги.");
-	client->println("Используй repair <item>, чтоб восстановить поврежденный предмет.");
-	client->println("Используй estimate <item>, чтобы узнать, сколько будет стоить починка.");
-	return;
+        say_act( client, ch, "Я отремонтирую тебе что-нибудь за деньги.");
+        client->println("Используй repair <item>, чтоб восстановить поврежденный предмет.");
+        client->println("Используй estimate <item>, чтобы узнать, сколько будет стоить починка.");
+        return;
     }
 
     if (( obj = get_obj_carry(client, arg.c_str( ))) == 0) {
-	say_act( client, ch, "У тебя нет этого");
-	return;
+        say_act( client, ch, "У тебя нет этого");
+        return;
     }
     
     if (!canRepair( obj, client ))
-	return;
+        return;
     
     cost = getRepairCost( obj );
 
     if (cost > client->gold) {
-	say_act( client, ch, "У тебя не хватает денег, чтоб оплатить мои услуги.");
-	return;
+        say_act( client, ch, "У тебя не хватает денег, чтоб оплатить мои услуги.");
+        return;
     }
 
     client->setWaitViolence( 1 );
@@ -95,9 +95,9 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     act("$C1 берет $o4, восстанавливает и возвращает тебе.",client,obj,ch,TO_CHAR);
 
     if (cost) 
-	client->pecho( "Твой кошелек стал легче на %1$d золот%1$Iую|ые|ых моне%1$Iту|ты|т.", cost );
+        client->pecho( "Твой кошелек стал легче на %1$d золот%1$Iую|ые|ых моне%1$Iту|ты|т.", cost );
     else
-	client->println( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
+        client->println( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
 
     obj->condition = 100;
 }
@@ -110,17 +110,17 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
     arg = args.getOneArgument( );
     
     if (arg.empty( )) {
-	say_act( client, ch, "Попробуй использовать estimate <item>.");
-   	return;
+        say_act( client, ch, "Попробуй использовать estimate <item>.");
+           return;
     }
 
     if ((obj = get_obj_carry(client, arg.c_str( ))) == 0) {
-	say_act( client, ch, "У тебя нет этого");
-	return;
+        say_act( client, ch, "У тебя нет этого");
+        return;
     }
     
     if (!canRepair( obj, client ))
-	return;
+        return;
     
     tell_fmt( "Восстановление будет стоить %3$d.", 
                client, ch, getRepairCost( obj ) );
@@ -138,25 +138,25 @@ int Repairman::getRepairCost( Object *obj )
 bool Repairman::canRepair( Object *obj, Character *client )
 {
     if (!repairs.isSetBitNumber( obj->item_type )) {
-	say_act( client, ch, 
-	         "Я не сумею отремонтировать $t.", 
-		 item_table.message( obj->item_type, '4' ).c_str( ) );
-	return false;
+        say_act( client, ch, 
+                 "Я не сумею отремонтировать $t.", 
+                 item_table.message( obj->item_type, '4' ).c_str( ) );
+        return false;
     }
     
     if (obj->pIndexData->vnum == OBJ_VNUM_HAMMER) {
-	say_act( client, ch, "Я не ремонтирую боевые молоты.");
-	return false;
+        say_act( client, ch, "Я не ремонтирую боевые молоты.");
+        return false;
     }
 
     if (obj->condition >= 100) {
-	say_fmt( "%2$^O1 не нужда%2$nется|ются в ремонте.", ch, obj );
+        say_fmt( "%2$^O1 не нужда%2$nется|ются в ремонте.", ch, obj );
         return false;
     }
 
     if (obj->cost == 0) {
-	say_fmt( "%2$^O1 не подлеж%2$nит|ат ремонту.", ch, obj );
-   	return false;
+        say_fmt( "%2$^O1 не подлеж%2$nит|ат ремонту.", ch, obj );
+           return false;
     }
 
     return true;
@@ -172,11 +172,11 @@ CMDRUN( repair )
     
     if (!( man = find_attracted_mob_behavior<Repairman>( ch, OCC_REPAIRMAN ) )) {
         ch->println( "Здесь нет ремонтника.");
-	return;
+        return;
     }
 
     if (!ch->is_npc( )) 
-	man->doRepair( ch, constArguments );
+        man->doRepair( ch, constArguments );
 }
 
 /*
@@ -188,10 +188,10 @@ CMDRUN( estimate )
     
     if (!( man = find_attracted_mob_behavior<Repairman>( ch, OCC_REPAIRMAN ) )) {
         ch->println( "Здесь нет ремонтника.");
-	return;
+        return;
     }
 
     if (!ch->is_npc( )) 
-	man->doEstimate( ch, constArguments );
+        man->doEstimate( ch, constArguments );
 }
 

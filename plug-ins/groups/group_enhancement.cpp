@@ -44,28 +44,28 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
 
     if ( victim->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Ты не можешь быть еще сильнее!\n\r");
-	else
-	  act_p("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        if (victim == ch)
+          ch->send_to("Ты не можешь быть еще сильнее!\n\r");
+        else
+          act_p("$C1 не может быть еще сильнее.",ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (IS_AFFECTED(victim,AFF_WEAKEN))
     {
-	if (checkDispel(level,victim, gsn_weaken))
-	    return;
-	
-	if (victim != ch)
-	    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        if (checkDispel(level,victim, gsn_weaken))
+            return;
+        
+        if (victim != ch)
+            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
 
-	victim->send_to("Слабость проходит... но лишь на мгновение.\n\r");
-	return;
+        victim->send_to("Слабость проходит... но лишь на мгновение.\n\r");
+        return;
     }
 
     af.where     = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = (10 + level / 3);
     af.location  = APPLY_STR;
     af.modifier  = max(2,level / 10);
@@ -86,24 +86,24 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
 
     if (victim->isAffected(sn) || IS_QUICK(victim))
     {
-	if (victim == ch)
-	  ch->send_to("Ты не можешь двигаться быстрее, чем сейчас!\n\r");
-	else
-	  act_p("$C1 не может двигаться еще быстрее.",
-	         ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        if (victim == ch)
+          ch->send_to("Ты не можешь двигаться быстрее, чем сейчас!\n\r");
+        else
+          act_p("$C1 не может двигаться еще быстрее.",
+                 ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (IS_AFFECTED(victim,AFF_SLOW))
     {
-	if (checkDispel(level,victim, gsn_slow))
-	    return;
-	
-	if (victim != ch)
-	    ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        if (checkDispel(level,victim, gsn_slow))
+            return;
+        
+        if (victim != ch)
+            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
 
-	victim->send_to("Твои движения становятся быстрее... но лишь на мгновение.\n\r");
-	return;
+        victim->send_to("Твои движения становятся быстрее... но лишь на мгновение.\n\r");
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -121,7 +121,7 @@ VOID_SPELL(Haste)::run( Character *ch, Character *victim, int sn, int level )
     act_p("Движения $c2 становятся намного быстрее.",
            victim,0,0,TO_ROOM,POS_RESTING);
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
     return;
 
 }
@@ -137,19 +137,19 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
 
     if ( IS_AFFECTED(victim, AFF_INFRARED) )
     {
-	if (victim == ch)
-	  ch->send_to("Ты уже видишь в темноте.\n\r");
-	else
-	  act_p("$C1 уже видит в темноте.\n\r",
+        if (victim == ch)
+          ch->send_to("Ты уже видишь в темноте.\n\r");
+        else
+          act_p("$C1 уже видит в темноте.\n\r",
                  ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        return;
     }
     act_p( "Глаза $c2 загораются красным светом.\n\r",
             victim, 0, 0, TO_ROOM,POS_RESTING);
 
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 2 * level;
     af.location  = APPLY_NONE;
     af.modifier  = 0;
@@ -163,7 +163,7 @@ VOID_SPELL(Infravision)::run( Character *ch, Character *victim, int sn, int leve
 SPELL_DECL(Learning);
 VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    Affect	af;
+    Affect        af;
 
     if ( victim->is_npc() )
     {
@@ -180,13 +180,13 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
         return;
   }
 
-  af.where	= TO_AFFECTS;
-  af.type	= sn;
-  af.level	= level;
-  af.duration	= level / 10 + 1;
-  af.location	= APPLY_NONE;
-  af.modifier	= 0;
-  af.bitvector	= 0;
+  af.where        = TO_AFFECTS;
+  af.type        = sn;
+  af.level        = level;
+  af.duration        = level / 10 + 1;
+  af.location        = APPLY_NONE;
+  af.modifier        = 0;
+  af.bitvector        = 0;
   affect_to_char( victim, &af );
     
   victim->send_to("Ты концентрируешься на учебе.\n\r");

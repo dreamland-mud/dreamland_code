@@ -27,23 +27,23 @@ void BloodlustDesire::damage( PCharacter *ch )
     int dam;
 
     if (ch->in_room->people && !ch->fighting) {
-	Character *vch, *vch_next;
+        Character *vch, *vch_next;
 
-	if (!IS_AWAKE(ch))
-	    interpret_raw( ch, "stand" );
+        if (!IS_AWAKE(ch))
+            interpret_raw( ch, "stand" );
 
-	for (vch = ch->in_room->people; vch != 0 && ch->fighting == 0; vch = vch_next) {
-	    vch_next = vch->next_in_room;
-	    
-	    if (ch != vch 
-		&& ch->can_see(vch) 
-		&& !is_safe_nomessage(ch, vch))
-	    {
-		interpret_raw( ch, "yell", "КРОВИ! Я ЖАЖДУ КРОВИ!");
-		interpret_raw( ch, "murder",  vch->getNameP( ));
-		return;
-	    }
-	}
+        for (vch = ch->in_room->people; vch != 0 && ch->fighting == 0; vch = vch_next) {
+            vch_next = vch->next_in_room;
+            
+            if (ch != vch 
+                && ch->can_see(vch) 
+                && !is_safe_nomessage(ch, vch))
+            {
+                interpret_raw( ch, "yell", "КРОВИ! Я ЖАЖДУ КРОВИ!");
+                interpret_raw( ch, "murder",  vch->getNameP( ));
+                return;
+            }
+        }
     }
 
     dam = ch->max_hit * number_range(2, 4) / 100;
@@ -84,8 +84,8 @@ bool DrunkDesire::isActive( PCharacter *ch )
 bool DrunkDesire::canDrink( PCharacter *ch )
 {
     if (isActive( ch )) {
-	ch->println( "Ты проносишь мимо рта.. *ИК*" );
-	return false;
+        ch->println( "Ты проносишь мимо рта.. *ИК*" );
+        return false;
     }
 
     return true;
@@ -107,8 +107,8 @@ bool FullDesire::applicable( PCharacter *ch )
 bool FullDesire::canDrink( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-	ch->println( "Ты больше не можешь выпить ни капли." );
-	return false;
+        ch->println( "Ты больше не можешь выпить ни капли." );
+        return false;
     }
 
     return true;
@@ -117,8 +117,8 @@ bool FullDesire::canDrink( PCharacter *ch )
 bool FullDesire::canEat( PCharacter *ch )
 {
     if (isOverflow( ch )) {
-	ch->println( "Ты больше не можешь съесть ни кусочка." );
-	return false;
+        ch->println( "Ты больше не можешь съесть ни кусочка." );
+        return false;
     }
 
     return true;
@@ -135,9 +135,9 @@ bool FullDesire::isOverflow( PCharacter *ch )
 int ThirstDesire::getUpdateAmount( PCharacter *ch )
 {
     if (ch->in_room->sector_type == SECT_DESERT)
-	return -3;
+        return -3;
     else
-	return -1;
+        return -1;
 }
 
 void ThirstDesire::damage( PCharacter *ch )

@@ -55,21 +55,21 @@ DLString ArcadianLanguage::createDictum( ) const
     DLString pre, end, root;
     
     if (endings.empty( ) && prefixes.empty( ) && roots.empty( ))
-	throw LanguageException( *this, "totally empty" );
+        throw LanguageException( *this, "totally empty" );
     
     if (!roots.empty( )) {
-	n = number_range( 0, roots.size( ) - 1 );
-	root = roots[n].getValue( );
+        n = number_range( 0, roots.size( ) - 1 );
+        root = roots[n].getValue( );
     } 
     
     if (!prefixes.empty( ) && chance( 70 )) {
-	n = number_range( 0, prefixes.size( ) - 1 );
-	pre = prefixes[n].getValue( );
+        n = number_range( 0, prefixes.size( ) - 1 );
+        pre = prefixes[n].getValue( );
     }
 
     if (!endings.empty( )) {
-	n = number_range( 0, endings.size( ) - 1 );
-	end = endings[n].getValue( );
+        n = number_range( 0, endings.size( ) - 1 );
+        end = endings[n].getValue( );
     }
     
     dictum = pre + root + end;

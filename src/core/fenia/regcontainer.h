@@ -35,9 +35,9 @@ class RegContainer : public Scripting::Handler,
 {
 NMI_OBJECT
     struct RegComp {
-	inline bool operator () (const Register &l, const Register &r) const {
-	    return (l < r).toBoolean( );
-	}
+        inline bool operator () (const Register &l, const Register &r) const {
+            return (l < r).toBoolean( );
+        }
     };
     typedef NativeTraits<RegContainer> Traits;
     typedef std::map<Register, XMLRegister, RegComp> Map;
@@ -54,15 +54,15 @@ public:
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     virtual const DLString &getType() const {
-	return TYPE;
+        return TYPE;
     }
     
     virtual DLObject::Pointer set(DLObject::Pointer o1, DLObject::Pointer o2) {
-	return DLObject::Pointer();
+        return DLObject::Pointer();
     }
 
     virtual void setSelf(Scripting::Object *s) {
-	self = s;
+        self = s;
     }
 
     static const DLString TYPE;

@@ -16,7 +16,7 @@ void XMLAttributeLanguage::wordUsed( const Word &word, PCharacter *ch )
     Words::iterator w = words.find( word.dictum );
     
     if (--w->second.count > 0)
-	return;
+        return;
 
     ch->pecho( "{wСлово {w%s{w ускользает от тебя.{x", 
                w->second.dictum.getValue( ).c_str( ) );
@@ -35,7 +35,7 @@ XMLAttributeLanguageHints::~XMLAttributeLanguageHints( )
 void XMLAttributeLanguageHints::addWord( const Word &word, bool hint )
 {
     if (word.empty( ))
-	return;
+        return;
 
     hints[word.dictum] = hint;
 }    

@@ -14,8 +14,8 @@ bool arg_contains_someof( const DLString &arg, const char *namesList )
     DLString names = namesList, n;
     
     while (!( n = names.getOneArgument( ) ).empty( )) 
-	if (is_name( n.c_str( ), arg.c_str( ) ))
-	    return true;
+        if (is_name( n.c_str( ), arg.c_str( ) ))
+            return true;
     
     return false;
 }
@@ -23,19 +23,19 @@ bool arg_contains_someof( const DLString &arg, const char *namesList )
 bool arg_oneof_strict( const DLString &arg, const char *var1, const char *var2, const char *var3, const char *var4 )
 {
     if (arg.empty( ))
-	return false;
+        return false;
 
     if (var1 && arg ^ var1)
-	return true;
+        return true;
 
     if (var2 && arg ^ var2)
-	return true;
+        return true;
 
     if (var3 && arg ^ var3)
-	return true;
+        return true;
 
     if (var4 && arg ^ var4)
-	return true;
+        return true;
 
     return false;
 }
@@ -43,19 +43,19 @@ bool arg_oneof_strict( const DLString &arg, const char *var1, const char *var2, 
 bool arg_has_oneof( const DLString &arg, const char *var1, const char *var2, const char *var3, const char *var4 )
 {
     if (arg.empty( ))
-	return false;
+        return false;
 
     if (var1 && is_name( var1, arg.c_str( ) ))
-	return true;
+        return true;
 
     if (var2 && is_name( var2, arg.c_str( ) ))
-	return true;
+        return true;
 
     if (var3 && is_name( var3, arg.c_str( ) ))
-	return true;
+        return true;
 
     if (var3 && is_name( var3, arg.c_str( ) ))
-	return true;
+        return true;
 
     return false;
 }
@@ -63,19 +63,19 @@ bool arg_has_oneof( const DLString &arg, const char *var1, const char *var2, con
 bool arg_oneof( const DLString &arg, const char *var1, const char *var2, const char *var3, const char *var4 )
 {
     if (arg.empty( ))
-	return false;
+        return false;
 
     if (var1 && arg.strPrefix( var1 ))
-	return true;
+        return true;
 
     if (var2 && arg.strPrefix( var2 ))
-	return true;
+        return true;
 
     if (var3 && arg.strPrefix( var3 ))
-	return true;
+        return true;
 
     if (var4 && arg.strPrefix( var4 ))
-	return true;
+        return true;
 
     return false;
 }
@@ -176,9 +176,9 @@ bool arg_is_alldot( const DLString &arg )
     return arg == "all" 
            || arg == "все" 
            || arg == "всё" 
-	   || !str_prefix( "all.", arg.c_str( ) )
-	   || !str_prefix( "все.", arg.c_str( ) )
-	   || !str_prefix( "всё.", arg.c_str( ) );
+           || !str_prefix( "all.", arg.c_str( ) )
+           || !str_prefix( "все.", arg.c_str( ) )
+           || !str_prefix( "всё.", arg.c_str( ) );
 }
 
 bool arg_is_all( const DLString &arg )

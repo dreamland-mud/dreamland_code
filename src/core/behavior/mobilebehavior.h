@@ -33,7 +33,7 @@ public:
     virtual bool spec( ) { return false; }
     
     virtual void bribe( Character *victim, int gold, int silver ) { }
-    virtual void entry(	) { }
+    virtual void entry(        ) { }
     virtual void greet( Character *victim ) { }
     virtual void give( Character *victim, Object *obj ) { }
     virtual void fight( Character *victim ) { }

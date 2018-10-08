@@ -15,24 +15,24 @@ bool dl_isdelim( char ch )
 bool dl_isspace( char ch )
 {
     switch(ch) {
-	case ' ':
-//	case '\0':
-	case '\t':
-	case '\r':
-	case '\n':
-	    return true;
+        case ' ':
+//        case '\0':
+        case '\t':
+        case '\r':
+        case '\n':
+            return true;
 
-	default:
-	    return false;
+        default:
+            return false;
     }
 }
 
 bool dl_isrusalpha( char c )
 {
     return (c >= 'Ю' && c < 'Ъ') 
-	   || (c >= 'ю' && c <= 'ъ') 
-	   || c == 'ё' 
-	   || c == 'Ё';
+           || (c >= 'ю' && c <= 'ъ') 
+           || c == 'ё' 
+           || c == 'Ё';
 }
 
 bool dl_isalpha( char c )
@@ -43,15 +43,15 @@ bool dl_isalpha( char c )
 bool dl_isupper( char c )
 {
     return isupper( c ) 
-	    || (c >= 'Ю' && c < 'Ъ') 
-	    || c == 'Ё';
+            || (c >= 'Ю' && c < 'Ъ') 
+            || c == 'Ё';
 }
 
 bool dl_islower( char c )
 {
     return islower( c )
-	   || (c >= 'ю' && c <= 'ъ') 
-	   || c == 'ё';
+           || (c >= 'ю' && c <= 'ъ') 
+           || c == 'ё';
 }
 
 bool dl_isalnum( char c )

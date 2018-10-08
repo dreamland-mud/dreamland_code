@@ -114,13 +114,13 @@ void show_flag_cmds(Character * ch, const FlagTable *flag_table)
     buf1[0] = '\0';
     col = 0;
     for (flag = 0; flag < flag_table->size; flag++) {
-	sprintf(buf, "%-19s", flag_table->fields[flag].name);
-	strcat(buf1, buf);
-	if (++col % 4 == 0)
-	    strcat(buf1, "\n\r");
+        sprintf(buf, "%-19s", flag_table->fields[flag].name);
+        strcat(buf1, buf);
+        if (++col % 4 == 0)
+            strcat(buf1, "\n\r");
     }
     if (col % 4 != 0)
-	strcat(buf1, "\n\r");
+        strcat(buf1, "\n\r");
     stc(buf1, ch);
 }
 
@@ -143,22 +143,22 @@ void show_skill_cmds(Character * ch, int tar)
     buf1[0] = '\0';
     col = 0;
     for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	Spell::Pointer spell = skill->getSpell( );
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        Spell::Pointer spell = skill->getSpell( );
 
-	if (!spell)
-	    continue;
-	
-	if (tar == -1 || IS_SET( spell->getTarget( ), tar )) {
-	    sprintf(buf, "%-19s", skill->getName( ).c_str( ));
-	    strcat(buf1, buf);
-	    if (++col % 4 == 0)
-		strcat(buf1, "\n\r");
-	}
+        if (!spell)
+            continue;
+        
+        if (tar == -1 || IS_SET( spell->getTarget( ), tar )) {
+            sprintf(buf, "%-19s", skill->getName( ).c_str( ));
+            strcat(buf1, buf);
+            if (++col % 4 == 0)
+                strcat(buf1, "\n\r");
+        }
     }
 
     if (col % 4 != 0)
-	strcat(buf1, "\n\r");
+        strcat(buf1, "\n\r");
     stc(buf1, ch);
 }
 
@@ -169,18 +169,18 @@ void show_skill_affects(Character *ch)
 
     buf << fmt(0, "{Y%-20s  %-20s %-10s %s\n\r", "Заклинание", "Группа", "Тип", "Цель");
     for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	Spell::Pointer spell = skill->getSpell( );
-	AffectHandler::Pointer aff = skill->getAffect( );
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        Spell::Pointer spell = skill->getSpell( );
+        AffectHandler::Pointer aff = skill->getAffect( );
 
-	if (!spell || !aff)
-	    continue;
+        if (!spell || !aff)
+            continue;
 
-	buf << fmt( 0, "{g%-20s{x: %-20s %-10s %s\n\r",
-		       skill->getName( ).c_str( ),
-		       skill->getGroup( )->getName( ).c_str( ),
-		       spell_types.name( spell->getSpellType( ) ).c_str( ),
-		       target_table.names( spell->getTarget( ) ).c_str( ) );
+        buf << fmt( 0, "{g%-20s{x: %-20s %-10s %s\n\r",
+                       skill->getName( ).c_str( ),
+                       skill->getGroup( )->getName( ).c_str( ),
+                       spell_types.name( spell->getSpellType( ) ).c_str( ),
+                       target_table.names( spell->getTarget( ) ).c_str( ) );
     }
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -204,14 +204,14 @@ void show_spec_cmds(Character * ch)
     col = 0;
     stc("Все специальные функции начинаются с 'spec_'\n\r\n\r", ch);
     for (spec = 0; spec_table[spec].function != NULL; spec++) {
-	sprintf(buf, "%-19s", &spec_table[spec].name[5]);
-	strcat(buf1, buf);
-	if (++col % 4 == 0)
-	    strcat(buf1, "\n\r");
+        sprintf(buf, "%-19s", &spec_table[spec].name[5]);
+        strcat(buf1, buf);
+        if (++col % 4 == 0)
+            strcat(buf1, "\n\r");
     }
 
     if (col % 4 != 0)
-	strcat(buf1, "\n\r");
+        strcat(buf1, "\n\r");
 
     stc(buf1, ch);
 }
@@ -223,10 +223,10 @@ void show_mat_cmds( Character *ch )
     
     buf << "{gНазвание        Описание               Горючесть{x" << endl;
     for (mat = &material_table[0]; mat->name; mat++)
-	buf << fmt( 0, "%-15s %-22N1 %-3d\n\r", 
-		       mat->name, 
-		       mat->rname ? mat->rname : "",
-		       mat->burns );
+        buf << fmt( 0, "%-15s %-22N1 %-3d\n\r", 
+                       mat->name, 
+                       mat->rname ? mat->rname : "",
+                       mat->burns );
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -239,17 +239,17 @@ void show_liq_cmds(Character * ch)
     buf << "Name                ShowName            Color       Proof Full Thirst Food Size" << endl;
 
     for (int l = 0; l < liquidManager->size( ); l++) {
-	liq = liquidManager->find( l );
-	
-	buf << dlprintf( "%-18s %-18s %-14s ",
-		  liq->getName( ).c_str( ),
-		  liq->getShortDescr( ).ruscase( '1' ).c_str( ),
-		  liq->getColor( ).ruscase( '1' ).c_str( ) );
+        liq = liquidManager->find( l );
+        
+        buf << dlprintf( "%-18s %-18s %-14s ",
+                  liq->getName( ).c_str( ),
+                  liq->getShortDescr( ).ruscase( '1' ).c_str( ),
+                  liq->getColor( ).ruscase( '1' ).c_str( ) );
 
-	for (int i = 0; i < desireManager->size( ); i++)
-	    buf << dlprintf("%3d ", liq->getDesires( )[i] );
-	                    
-	buf << dlprintf( "%3d\r\n", liq->getSipSize( ) );
+        for (int i = 0; i < desireManager->size( ); i++)
+            buf << dlprintf("%3d ", liq->getDesires( )[i] );
+                            
+        buf << dlprintf( "%3d\r\n", liq->getSipSize( ) );
     }
 
     page_to_char(buf.str( ).c_str( ), ch);
@@ -275,80 +275,80 @@ bool show_help(Character * ch, const char *cargument)
 
     /* Display syntax. */
     if (arg[0] == '\0') {
-	stc("Синтаксис: ? [комманда]\n\r\n\r", ch);
-	stc("[комманда]  [описание]\n\r", ch);
-	for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
-	    sprintf(buf, "%-10s -%s\n\r",
-		      DLString(help_table[cnt].command).capitalize( ).c_str( ),
-		      help_table[cnt].desc);
-	    stc(buf, ch);
-	}
-	return false;
+        stc("Синтаксис: ? [комманда]\n\r\n\r", ch);
+        stc("[комманда]  [описание]\n\r", ch);
+        for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
+            sprintf(buf, "%-10s -%s\n\r",
+                      DLString(help_table[cnt].command).capitalize( ).c_str( ),
+                      help_table[cnt].desc);
+            stc(buf, ch);
+        }
+        return false;
     }
 
     // Find the command, show changeable data.
     for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
-	if (arg[0] == help_table[cnt].command[0]
-	    && !str_prefix(arg, help_table[cnt].command)) {
-	    if (help_table[cnt].structure == &spec_table) {
-		show_spec_cmds(ch);
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &liq_table) {
-		show_liq_cmds(ch);
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &mat_table) {
-		show_mat_cmds(ch);
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &wearloc_table) {
-		int cnt = 0;
-		for (int i = 0; i < wearlocationManager->size( ); i++) {
-		    ch->printf( "%10s", wearlocationManager->find( i )->getName( ).c_str( ) );
-		    if (++cnt%5 == 0)
-			ch->send_to( "\r\n" );
-		}
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &skill_table) {
-		if (spell[0] == '\0') {
-		    stc("Синтаксис:  ? spells "
-			"[ignore/room/char/self/object/all]\n\r", ch);
-		    return false;
-		}
+        if (arg[0] == help_table[cnt].command[0]
+            && !str_prefix(arg, help_table[cnt].command)) {
+            if (help_table[cnt].structure == &spec_table) {
+                show_spec_cmds(ch);
+                return false;
+            }
+            else if (help_table[cnt].structure == &liq_table) {
+                show_liq_cmds(ch);
+                return false;
+            }
+            else if (help_table[cnt].structure == &mat_table) {
+                show_mat_cmds(ch);
+                return false;
+            }
+            else if (help_table[cnt].structure == &wearloc_table) {
+                int cnt = 0;
+                for (int i = 0; i < wearlocationManager->size( ); i++) {
+                    ch->printf( "%10s", wearlocationManager->find( i )->getName( ).c_str( ) );
+                    if (++cnt%5 == 0)
+                        ch->send_to( "\r\n" );
+                }
+                return false;
+            }
+            else if (help_table[cnt].structure == &skill_table) {
+                if (spell[0] == '\0') {
+                    stc("Синтаксис:  ? spells "
+                        "[ignore/room/char/self/object/all]\n\r", ch);
+                    return false;
+                }
 
-		if (!str_prefix(spell, "all"))
-		    show_skill_cmds(ch, -1);
-		else if (!str_prefix(spell, "ignore"))
-		    show_skill_cmds(ch, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB);
-		else if (!str_prefix(spell, "room"))
-		    show_skill_cmds(ch, TAR_ROOM|TAR_PEOPLE);
-		else if (!str_prefix(spell, "char"))
-		    show_skill_cmds(ch, TAR_CHAR_ROOM|TAR_CHAR_WORLD);
-		else if (!str_prefix(spell, "self"))
-		    show_skill_cmds(ch, TAR_CHAR_SELF);
-		else if (!str_prefix(spell, "object"))
-		    show_skill_cmds(ch, TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_OBJ_WORLD);
-		else if (!str_prefix(spell, "affect"))
-		    show_skill_affects(ch);
-		else
-		    stc("Синтаксис:  ? spells "
-			"[ignore/affect/self/object/all]\n\r", ch);
-		return false;
-	    } 
-	    else {
-		show_flag_cmds(ch, (const FlagTable*)help_table[cnt].structure);
-		return false;
-	    }
-	}
+                if (!str_prefix(spell, "all"))
+                    show_skill_cmds(ch, -1);
+                else if (!str_prefix(spell, "ignore"))
+                    show_skill_cmds(ch, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB);
+                else if (!str_prefix(spell, "room"))
+                    show_skill_cmds(ch, TAR_ROOM|TAR_PEOPLE);
+                else if (!str_prefix(spell, "char"))
+                    show_skill_cmds(ch, TAR_CHAR_ROOM|TAR_CHAR_WORLD);
+                else if (!str_prefix(spell, "self"))
+                    show_skill_cmds(ch, TAR_CHAR_SELF);
+                else if (!str_prefix(spell, "object"))
+                    show_skill_cmds(ch, TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_OBJ_WORLD);
+                else if (!str_prefix(spell, "affect"))
+                    show_skill_affects(ch);
+                else
+                    stc("Синтаксис:  ? spells "
+                        "[ignore/affect/self/object/all]\n\r", ch);
+                return false;
+            } 
+            else {
+                show_flag_cmds(ch, (const FlagTable*)help_table[cnt].structure);
+                return false;
+            }
+        }
     }
     show_help(ch, "");
     return false;
 }
 
 CMD(olchelp, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
-	"Online editor help command.")
+        "Online editor help command.")
 {
     show_help(ch, argument);
 }

@@ -36,19 +36,19 @@ public:
     }
 
     virtual void croak(const Register &key, const ::Exception &e) const {
-	Register prog;
+        Register prog;
 
-	if (triggerFunction(key, prog)) {
-	    const DLString &author = prog.toFunction( )->getFunction()->source.source->author;
-	    PCMemoryInterface *pcm = PCharacterManager::find( author );
+        if (triggerFunction(key, prog)) {
+            const DLString &author = prog.toFunction( )->getFunction()->source.source->author;
+            PCMemoryInterface *pcm = PCharacterManager::find( author );
 
-	    if (pcm && pcm->isOnline( ))
-		pcm->getPlayer( )->printf(
-			"{CТихий голос из хрустального шара фенера: {WИсключение при вызове %s:{x\n%s\n",
-			key.toString( ).c_str( ),
-			e.what( ) );
+            if (pcm && pcm->isOnline( ))
+                pcm->getPlayer( )->printf(
+                        "{CТихий голос из хрустального шара фенера: {WИсключение при вызове %s:{x\n%s\n",
+                        key.toString( ).c_str( ),
+                        e.what( ) );
                         
-	}
+        }
 
         WrapperBase::croak(key, e);
     }

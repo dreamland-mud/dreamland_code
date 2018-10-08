@@ -17,49 +17,49 @@
 class Masquerade : public AreaBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<Masquerade> Pointer;
-	
-	virtual void setArea( area_data * );
+        typedef ::Pointer<Masquerade> Pointer;
+        
+        virtual void setArea( area_data * );
 
-	virtual void update( );
+        virtual void update( );
 };
 
 class Masquer : public MobileBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<Masquer> Pointer;
+        typedef ::Pointer<Masquer> Pointer;
     
 protected:
-	virtual void speech( Character *victim, const char *speech );
-	virtual void tell( Character *victim, const char *speech );
+        virtual void speech( Character *victim, const char *speech );
+        virtual void tell( Character *victim, const char *speech );
 };
 
 class RoamingPortal : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<RoamingPortal> Pointer;
-	
-	RoamingPortal( );
+        typedef ::Pointer<RoamingPortal> Pointer;
+        
+        RoamingPortal( );
 
-	virtual bool area( );
+        virtual bool area( );
       
 protected:
-	XML_VARIABLE XMLInteger frequency;
-	XML_VARIABLE XMLInteger current;
-	XML_VARIABLE XMLInteger lowlevel;
-	XML_VARIABLE XMLInteger highlevel;
+        XML_VARIABLE XMLInteger frequency;
+        XML_VARIABLE XMLInteger current;
+        XML_VARIABLE XMLInteger lowlevel;
+        XML_VARIABLE XMLInteger highlevel;
 };
 
 class CatsEye : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<CatsEye> Pointer;
-	
-	virtual bool drop( Character *victim );
-	virtual void get( Character *victim );
-	
+        typedef ::Pointer<CatsEye> Pointer;
+        
+        virtual bool drop( Character *victim );
+        virtual void get( Character *victim );
+        
 protected:
-	XML_VARIABLE XMLInteger recall;
+        XML_VARIABLE XMLInteger recall;
 };
 
 #endif

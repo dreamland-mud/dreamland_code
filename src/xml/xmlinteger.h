@@ -20,37 +20,37 @@
 class XMLInteger : public Integer
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLInteger( ) : Integer( )
-	{
-	}
-	
-	inline XMLInteger( int value ) : Integer( value )
-	{
-	}
-	
-	inline XMLInteger( const DLString& value ) throw( ExceptionBadType )
-		: Integer( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** По умолчанию значение \0 */
+        inline XMLInteger( ) : Integer( )
+        {
+        }
+        
+        inline XMLInteger( int value ) : Integer( value )
+        {
+        }
+        
+        inline XMLInteger( const DLString& value ) throw( ExceptionBadType )
+                : Integer( value )
+        {
+        }
+        
+        /** Возвращает xml представление переменной */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** Инициализация класса из xml данных */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 class XMLIntegerNoEmpty : public XMLInteger {
 public:
-	inline XMLIntegerNoEmpty( )
-	{
-	}
-	
-	inline XMLIntegerNoEmpty( int value ) : XMLInteger( value )
-	{
-	}
+        inline XMLIntegerNoEmpty( )
+        {
+        }
+        
+        inline XMLIntegerNoEmpty( int value ) : XMLInteger( value )
+        {
+        }
 
-	bool toXML( XMLNode::Pointer& node ) const;
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 class XMLIntegerVariable : public virtual XMLVariable, public XMLInteger {
@@ -76,8 +76,8 @@ public:
 /** Вывод в ostream типа XMLInteger */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLInteger& xmlInteger )
 {
-	ostr << xmlInteger.getValue( );
-	return ostr;
+        ostr << xmlInteger.getValue( );
+        return ostr;
 }
 
 #endif

@@ -13,8 +13,8 @@
 bool MandatoryItem::extract( bool count )
 {
     if (count)
-	mandatoryExtract( );
-	
+        mandatoryExtract( );
+        
     return ObjQuestBehavior::extract( count );
 }
 
@@ -24,14 +24,14 @@ bool MandatoryItem::extract( bool count )
 void PersonalItem::get( Character *ch ) 
 {
     if (ch->is_immortal( ))
-	return;
+        return;
 
     if (ourHero( ch )) 
-	getByHero( ch->getPC( ) );
+        getByHero( ch->getPC( ) );
     else if (!ourMobile( ch->getNPC( ) )) {
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	getByOther( ch );
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        getByOther( ch );
     }
 }
 

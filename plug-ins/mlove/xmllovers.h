@@ -13,14 +13,14 @@ class XMLLovers : public XMLMapBase<XMLString>
 {
 XML_OBJECT;
 public:
-	XMLLovers ();
-	~XMLLovers ();
+        XMLLovers ();
+        ~XMLLovers ();
 
-public: 		
+public:                 
 
-	void put( const DLString );
-	void erase( const DLString );
-	bool isPresent( const DLString );
+        void put( const DLString );
+        void erase( const DLString );
+        bool isPresent( const DLString );
 };
 
 #endif

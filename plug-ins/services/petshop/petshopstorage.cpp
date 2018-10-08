@@ -63,13 +63,13 @@ void PetShopStorage::msgBuyRequest( Character * )
 
 struct PetSortItem {
     PetSortItem(Character *client, Pet::Pointer &pet)
-	: pet(pet)
+        : pet(pet)
     {
-	level = pet->getLevel( client );
+        level = pet->getLevel( client );
     }
     static bool compare( PetSortItem &a, PetSortItem &b )
     {
-	return a.level <= b.level;
+        return a.level <= b.level;
     }
     int level;
     Pet::Pointer pet;
@@ -83,17 +83,17 @@ void PetShopStorage::toStream( Character *client, ostringstream &buf )
     PetSortList::const_iterator p;
 
     for (rch = room->people; rch; rch = rch->next_in_room) {
-	Pet::Pointer pet = getPetBehavior( rch );
-	
-	if (pet)
-	    pets.push_back( PetSortItem( client, pet ) );
+        Pet::Pointer pet = getPetBehavior( rch );
+        
+        if (pet)
+            pets.push_back( PetSortItem( client, pet ) );
     }
     
     pets.sort( PetSortItem::compare );
 
     for (p = pets.begin( ); p != pets.end( ); p++) {
-	p->pet->toStream( client, buf );
-	buf << endl;
+        p->pet->toStream( client, buf );
+        buf << endl;
     }
 }
 
@@ -117,17 +117,17 @@ Pet::Pointer PetShopStorage::getPetBehavior( Character *pet ) const
     Pet::Pointer null;
     
     if (!pet)
-	return null;
+        return null;
 
     if (!pet->is_npc( ))
-	return null;
+        return null;
 
     if (IS_AFFECTED( pet, AFF_CHARM ) || pet->master)
-	return null;
+        return null;
 
     if (!pet->getNPC( )->behavior)
-	return null;
-	
+        return null;
+        
     return pet->getNPC( )->behavior.getDynamicPointer<Pet>( );
 }
 

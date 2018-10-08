@@ -41,9 +41,9 @@ const struct movetype_t movetypes [] = {
 int movetype_lookup( const char *argument )
 {
     if (argument && argument[0])
-	for (int i = 0; movetypes[i].name; i++)
-	    if (!str_cmp( argument, movetypes[i].name ))
-		return i;
+        for (int i = 0; movetypes[i].name; i++)
+            if (!str_cmp( argument, movetypes[i].name ))
+                return i;
     
     return MOVETYPE_WALK;
 }
@@ -54,11 +54,11 @@ int movetype_resolve( Character *ch, const char *argument )
     int movetype;
     
     if (argument == NULL || argument[0] == 0)
-	movetype = MOVETYPE_WALK;
+        movetype = MOVETYPE_WALK;
     else if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
-	movetype = MOVETYPE_RUNNING;
+        movetype = MOVETYPE_RUNNING;
     else
-	movetype = movetype_lookup( argument );
+        movetype = movetype_lookup( argument );
     
     return movetype;
 }

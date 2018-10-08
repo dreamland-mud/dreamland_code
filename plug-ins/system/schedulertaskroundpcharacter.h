@@ -28,12 +28,12 @@ class PCMemoryInterface;
  */
 struct SchedulerTaskRoundPCharacter : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundPCharacter> Pointer;
-	
-	virtual void run( );
-	/** Обработать игрока */
-	virtual void run( PCharacter* pc ) = 0;
-	virtual int getPriority( ) const;
+        typedef ::Pointer<SchedulerTaskRoundPCharacter> Pointer;
+        
+        virtual void run( );
+        /** Обработать игрока */
+        virtual void run( PCharacter* pc ) = 0;
+        virtual int getPriority( ) const;
 };
 
 /**
@@ -44,15 +44,15 @@ struct SchedulerTaskRoundPCharacter : public virtual SchedulerTask
  */
 struct SchedulerTaskRoundPCMemory : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundPCMemory> Pointer;
-	
-	virtual void run( );
-	/**
-	 * Обработать игрока через PCMemoryInterface
-	 * @see PCMemoryInterface
-	 */
-	virtual void run( PCMemoryInterface* pcm ) = 0;
-	virtual int getPriority( ) const;
+        typedef ::Pointer<SchedulerTaskRoundPCMemory> Pointer;
+        
+        virtual void run( );
+        /**
+         * Обработать игрока через PCMemoryInterface
+         * @see PCMemoryInterface
+         */
+        virtual void run( PCMemoryInterface* pcm ) = 0;
+        virtual int getPriority( ) const;
 };
 
 #endif

@@ -18,52 +18,52 @@ rangematch(const char *pattern, char test, bool casefold, char **newp)
     const char *origpat;
 
     if (*pattern == '!' || *pattern == '^') {
-	negate = 1;
-	++pattern;
+        negate = 1;
+        ++pattern;
     } else
-	negate = 0;
+        negate = 0;
 
     if (casefold)
-	test = dl_tolower(test);
+        test = dl_tolower(test);
 
     ok = 0;
     origpat = pattern;
 
     for (;;) {
-	if (*pattern == ']' && pattern > origpat) {
-	    pattern++;
-	    break;
-	    
-	} else if (*pattern == 0) {
-	    return RANGE_ERROR;
+        if (*pattern == ']' && pattern > origpat) {
+            pattern++;
+            break;
+            
+        } else if (*pattern == 0) {
+            return RANGE_ERROR;
 
-	} else if (*pattern == '\\')
-	    pattern++;
-	
-	c = *pattern++;
+        } else if (*pattern == '\\')
+            pattern++;
+        
+        c = *pattern++;
 
-	if (casefold)
-	    c = dl_tolower(c);
+        if (casefold)
+            c = dl_tolower(c);
 
-	if (*pattern == '-' && pattern[1] != 0 && pattern[1] != ']') {
-	    if (*++pattern == '\\')
-		if (*pattern != 0)
-			pattern++;
+        if (*pattern == '-' && pattern[1] != 0 && pattern[1] != ']') {
+            if (*++pattern == '\\')
+                if (*pattern != 0)
+                        pattern++;
 
-	    c2 = *pattern++;
-	    
-	    if (c2 == 0)
-		return RANGE_ERROR;
+            c2 = *pattern++;
+            
+            if (c2 == 0)
+                return RANGE_ERROR;
 
-	    if (casefold)
-		c2 = dl_tolower(c2);
+            if (casefold)
+                c2 = dl_tolower(c2);
 
-	    /*XXX - invalid for russian*/
-	    if ( c <= test && test <= c2 )
-		ok = 1;
+            /*XXX - invalid for russian*/
+            if ( c <= test && test <= c2 )
+                ok = 1;
 
-	} else if (c == test)
-	    ok = 1;
+        } else if (c == test)
+            ok = 1;
     }
 
     *newp = (char *)pattern;
@@ -79,73 +79,73 @@ dl_match(const char *pattern, const char *string, bool casefold)
     char c, pc, sc;
 
     for (stringstart = string;;) {
-	pc = *pattern++;
-	sc = *string;
+        pc = *pattern++;
+        sc = *string;
 
-	switch (pc) {
-	    case 0:
-		return sc == 0;
-		
-	    case '?':
-		if (sc == 0)
-		    return false;
-		
-		string++;
-		break;
+        switch (pc) {
+            case 0:
+                return sc == 0;
+                
+            case '?':
+                if (sc == 0)
+                    return false;
+                
+                string++;
+                break;
 
-	    case '*':
-		for(c = *pattern; c == '*'; c = *++pattern)
-		    ;
+            case '*':
+                for(c = *pattern; c == '*'; c = *++pattern)
+                    ;
 
-		if (c == 0)
-		    return true;
+                if (c == 0)
+                    return true;
 
-		while (sc != 0) {
-		    if (dl_match(pattern, string, casefold))
-			return true;
-		    
-		    sc = *string++;
-		}
-		return false;
-		
-	    case '[':
-		if (sc == 0)
-		    return false;
-		
-		switch (rangematch(pattern, sc, casefold, &newp)) {
-		    case RANGE_ERROR:
-			goto norm;
-			
-		    case RANGE_MATCH:
-			pattern = newp;
-			break;
-			
-		    case RANGE_NOMATCH:
-			return false;
-		}
-		string++;
-		break;
+                while (sc != 0) {
+                    if (dl_match(pattern, string, casefold))
+                        return true;
+                    
+                    sc = *string++;
+                }
+                return false;
+                
+            case '[':
+                if (sc == 0)
+                    return false;
+                
+                switch (rangematch(pattern, sc, casefold, &newp)) {
+                    case RANGE_ERROR:
+                        goto norm;
+                        
+                    case RANGE_MATCH:
+                        pattern = newp;
+                        break;
+                        
+                    case RANGE_NOMATCH:
+                        return false;
+                }
+                string++;
+                break;
 
-	    case '\\':
-		pc = *pattern;
-		
-		if(pc == 0)
-		    pc = '\\';
-		else
-		    pattern++;
-		
-	    default:
-	    norm:
-		string++;
-		
-		if (pc == sc)
-		    break;
-		
-		if (casefold && dl_tolower(pc) == dl_tolower(sc))
-		    break;
-		
-		return false;
-	}
+            case '\\':
+                pc = *pattern;
+                
+                if(pc == 0)
+                    pc = '\\';
+                else
+                    pattern++;
+                
+            default:
+            norm:
+                string++;
+                
+                if (pc == sc)
+                    break;
+                
+                if (casefold && dl_tolower(pc) == dl_tolower(sc))
+                    break;
+                
+                return false;
+        }
     }
 }
 

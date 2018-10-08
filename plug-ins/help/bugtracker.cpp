@@ -60,11 +60,11 @@ void BugTracker::writeFile( Character *ch, const DLString &filename, const DLStr
     
     // Log typos normally.
     DLFileAppend( dreamland->getMiscDir( ), filename ).printf(
-	"[T][   %2s][%5d][%8s] %s: %s\n", 
-	ch->is_immortal( ) ? "  " : "qp",
-	ch->in_room->vnum, 
-	Date::getCurrentTimeAsString( "%d/%m/%y" ).c_str( ),
-	ch->getNameP( ), 
-	txt.c_str( ) );
+        "[T][   %2s][%5d][%8s] %s: %s\n", 
+        ch->is_immortal( ) ? "  " : "qp",
+        ch->in_room->vnum, 
+        Date::getCurrentTimeAsString( "%d/%m/%y" ).c_str( ),
+        ch->getNameP( ), 
+        txt.c_str( ) );
 }
 

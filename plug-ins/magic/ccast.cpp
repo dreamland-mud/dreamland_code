@@ -53,23 +53,23 @@ static bool mprog_cast( Character *caster, SpellTarget::Pointer target, int sn, 
     /* XXX will it work at all? */
     switch (target->type) {
     case SpellTarget::NONE:
-	FENIA_CALL( caster, "Cast", "sii", target->arg, sn, before );
-	FENIA_NDX_CALL( caster->getNPC( ), "Cast", "Csii", caster, target->arg, sn, before );
-	break;
+        FENIA_CALL( caster, "Cast", "sii", target->arg, sn, before );
+        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "Csii", caster, target->arg, sn, before );
+        break;
     case SpellTarget::OBJECT:
-	FENIA_CALL( caster, "Cast", "Oii", target->obj, sn, before );
-	FENIA_NDX_CALL( caster->getNPC( ), "Cast", "COii", caster, target->obj, sn, before );
-	break;
+        FENIA_CALL( caster, "Cast", "Oii", target->obj, sn, before );
+        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "COii", caster, target->obj, sn, before );
+        break;
     case SpellTarget::CHAR:
-	FENIA_CALL( caster, "Cast", "Cii", target->victim, sn, before );
-	FENIA_NDX_CALL( caster->getNPC( ), "Cast", "CCii", caster, target->victim, sn, before );
-	break;
+        FENIA_CALL( caster, "Cast", "Cii", target->victim, sn, before );
+        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "CCii", caster, target->victim, sn, before );
+        break;
     case SpellTarget::ROOM:
-	FENIA_CALL( caster, "Cast", "Rii", target->room, sn, before );
-	FENIA_NDX_CALL( caster->getNPC( ), "Cast", "CRii", caster, target->room, sn, before );
-	break;
+        FENIA_CALL( caster, "Cast", "Rii", target->room, sn, before );
+        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "CRii", caster, target->room, sn, before );
+        break;
     default:
-	break;
+        break;
     }
     
     BEHAVIOR_VOID_CALL( caster->getNPC( ), cast, target, sn, before );
@@ -89,40 +89,40 @@ CMDRUN( cast )
     DLString arguments, spellName; 
 
     if (ch->is_npc( ) && !( ch->desc != 0 || ch->master != 0 ))
-	return;
+        return;
 
     if (ch->is_npc( ) && ch->master != 0) {
-	if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
-	    act_p( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR, POS_RESTING );
-	    return;
-	}
+        if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_CASTER)) {
+            act_p( "$C1 говорит тебе '{GЯ не понимаю, чего ты хочешь, хозя$gин|ин|йка.{x'", ch->master, 0, ch, TO_CHAR, POS_RESTING );
+            return;
+        }
     }
     
     if (!ch->is_npc( ) && !ch->move) {
-	ch->send_to("У тебя нет сил даже пошевелить языком.\n\r");
-	return;
+        ch->send_to("У тебя нет сил даже пошевелить языком.\n\r");
+        return;
     }
 
     if (ch->isAffected(gsn_shielding ) && number_percent( ) > 50) {
-	ch->send_to("Ты пытаешься сосредоточиться на заклинании, но что-то останавливает тебя.\n\r");
-	return;
+        ch->send_to("Ты пытаешься сосредоточиться на заклинании, но что-то останавливает тебя.\n\r");
+        return;
     }
 
     if ((ch->isAffected(gsn_garble ) || ch->isAffected(gsn_deafen )) && number_percent( ) > 50) {
-	ch->send_to("Ты не можешь настроиться на правильную интонацию.\n\r");
-	return;
+        ch->send_to("Ты не можешь настроиться на правильную интонацию.\n\r");
+        return;
     }
 
     if (HALF_SHADOW(ch)) {
-	ch->send_to("Твоя тень поглощает всякую попытку сотворить заклинание.\n\r");
-	act_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
-		ch, 0, 0, TO_ROOM,POS_RESTING);
-	return;
+        ch->send_to("Твоя тень поглощает всякую попытку сотворить заклинание.\n\r");
+        act_p("$c1 пытается сотворить заклинание, но тень не дает $m сосредоточится.",
+                ch, 0, 0, TO_ROOM,POS_RESTING);
+        return;
     }
 
     if (ch->death_ground_delay > 0 && ch->trap.isSet( TF_NO_CAST )) {
-	ch->send_to("Тебя занимает более важное занятие - спасение своей жизни.\n\r");
-	return;
+        ch->send_to("Тебя занимает более важное занятие - спасение своей жизни.\n\r");
+        return;
     }
 
     arguments = constArguments;
@@ -130,130 +130,130 @@ CMDRUN( cast )
     spellName = arguments.getOneArgument( );
     
     if (spellName.empty( )) {
-	ch->send_to("Колдовать что и на кого?\n\r");
-	return;
+        ch->send_to("Колдовать что и на кого?\n\r");
+        return;
     }
 
     if (ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-	ch->send_to("Ты {RBattleRager{x, а не презренный маг!\n\r");
-	return;
+        ch->send_to("Ты {RBattleRager{x, а не презренный маг!\n\r");
+        return;
     }
 
     if (ch->is_npc( ) && ch->master && ch->master->getClan( ) == clan_battlerager) {
-	do_say(ch,"Хозяин, я уважаю твои убеждения.");
-	return;
+        do_say(ch,"Хозяин, я уважаю твои убеждения.");
+        return;
     }
     
     spell = SpellManager::lookup( spellName, ch );
 
     if (!spell) {
-	if (ch->is_npc( ) && ch->master) 
-	    do_say(ch, "Да не умею я");
-	else
-	    ch->send_to("Ты не знаешь такого заклинания.\n\r");
+        if (ch->is_npc( ) && ch->master) 
+            do_say(ch, "Да не умею я");
+        else
+            ch->send_to("Ты не знаешь такого заклинания.\n\r");
 
-	return;
+        return;
     }
     
     skill = spell->getSkill( );
     sn = skill->getIndex( );
     
     if (!spell->checkPosition( ch ))
-	return;
+        return;
     
     if (!skill->usable( ch, true ))
-	return;
-	
+        return;
+        
     if (IS_SET(ch->in_room->room_flags,ROOM_NO_CAST)) {
-	ch->send_to("Стены этой комнаты поглотили твое заклинание.\n\r");
-	act_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
-		ch, 0, 0, TO_ROOM,POS_RESTING);
-	return;
+        ch->send_to("Стены этой комнаты поглотили твое заклинание.\n\r");
+        act_p("$c1 произне$gсло|с|сла заклинание, но стены комнаты поглотили его.",
+                ch, 0, 0, TO_ROOM,POS_RESTING);
+        return;
     }
 
     mana = spell->getManaCost( ch );
 
     if (ch->mana < mana) {
-	if (ch->is_npc( ) && ch->master != 0) 
-	    do_say(ch,"Хозяин. У меня манна кончилась!");
-	else 
-	    ch->send_to("У тебя не хватает энергии (mana).\n\r");
+        if (ch->is_npc( ) && ch->master != 0) 
+            do_say(ch,"Хозяин. У меня манна кончилась!");
+        else 
+            ch->send_to("У тебя не хватает энергии (mana).\n\r");
 
-	return;
+        return;
     }
 
     if (!( target = spell->locateTargets( ch, arguments, buf ) )) {
-	ch->send_to( buf );
-	return;
+        ch->send_to( buf );
+        return;
     }
 
     victim = target->victim;
     offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
 
     if (offensive && ch->is_npc( ) && ch->master && ch->master != victim) {
-	if (victim && !victim->is_npc( ))
-	    do_say(ch, "Я его боюсь, хозяин!");
-	else
-	    do_say(ch, "Я не буду делать этого.");
+        if (victim && !victim->is_npc( ))
+            do_say(ch, "Я его боюсь, хозяин!");
+        else
+            do_say(ch, "Я не буду делать этого.");
 
-	return;
+        return;
     }
 
     spell->utter( ch );
     ch->setWait(spell->getBeats( ) );
     
     if (offensive) {
-	UNSET_DEATH_TIME(ch);
+        UNSET_DEATH_TIME(ch);
 
-	if (victim && is_safe( ch, victim ))
-	    return;
+        if (victim && is_safe( ch, victim ))
+            return;
 
-	if (victim)
-	    set_violent( ch, victim, false );
-	
-	yell_panic(ch, victim);
+        if (victim)
+            set_violent( ch, victim, false );
+        
+        yell_panic(ch, victim);
     }
      
     if (spell->spellbane( ch, victim ))
-	return;
-	
+        return;
+        
     if (number_percent( ) > skill->getEffective( ch )) {
-	ch->send_to("Ты не можешь сконцентрироваться.\n\r");
-	skill->improve( ch, false, victim );
-	ch->mana -= mana / 2;
-	target->castFar = false;
+        ch->send_to("Ты не можешь сконцентрироваться.\n\r");
+        skill->improve( ch, false, victim );
+        ch->mana -= mana / 2;
+        target->castFar = false;
     }
     else {
-	bool fForbidCasting = false;
+        bool fForbidCasting = false;
 
-	ch->mana -= mana;
-	slevel = spell->getSpellLevel( ch, target->range );
-	
-	if (victim)
-	    fForbidCasting = mprog_spell( victim, ch, sn, true );
-	
-	mprog_cast( ch, target, sn, true );
+        ch->mana -= mana;
+        slevel = spell->getSpellLevel( ch, target->range );
+        
+        if (victim)
+            fForbidCasting = mprog_spell( victim, ch, sn, true );
+        
+        mprog_cast( ch, target, sn, true );
 
-	if (!fForbidCasting)
-	    spell->run( ch, target, slevel );
+        if (!fForbidCasting)
+            spell->run( ch, target, slevel );
 
-	if (victim)
-	    mprog_spell( victim, ch, sn, false );
+        if (victim)
+            mprog_spell( victim, ch, sn, false );
 
-	mprog_cast( ch, target, sn, false );
-	skill->improve( ch, true, victim );
+        mprog_cast( ch, target, sn, false );
+        skill->improve( ch, true, victim );
     }
     
     if (offensive && victim) {
-	if (target->castFar && target->door != -1) {
-	    ch->setLastFightTime( );
-	    victim->setLastFightTime( );
+        if (target->castFar && target->door != -1) {
+            ch->setLastFightTime( );
+            victim->setLastFightTime( );
 
-	    if (victim->is_npc( ) && victim->getNPC( )->behavior)
-		victim->getNPC( )->behavior->shooted( ch, target->door );
-	}
-	else
-	    attack_caster( ch, victim );
+            if (victim->is_npc( ) && victim->getNPC( )->behavior)
+                victim->getNPC( )->behavior->shooted( ch, target->door );
+        }
+        else
+            attack_caster( ch, victim );
     }
 }
 

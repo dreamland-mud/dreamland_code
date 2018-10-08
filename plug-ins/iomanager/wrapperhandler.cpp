@@ -31,27 +31,27 @@ WrapperHandler::handle(Descriptor *d, char *arg)
     host = strtok(NULL," ");
     
     if (!key || strcmp(key,"amaltea")) {
-	LogStream::sendWarning() << "Wrong keyword from " << d->realip << ": " << key << endl;
-	d->send("Wrong keyword!\n\r");
-	d->close( );
-	return -1;
+        LogStream::sendWarning() << "Wrong keyword from " << d->realip << ": " << key << endl;
+        d->send("Wrong keyword!\n\r");
+        d->close( );
+        return -1;
     }
     
     if (d->realip)
-	free_string(d->realip);
+        free_string(d->realip);
     
     d->realip = realip( ip );
     
     if (d->host)
-	free_string(d->host);
+        free_string(d->host);
     
     d->host = realip( ip  );
 
     d->send("Got wrapper response.\n\r");
     
     if (banManager->checkVerbose( d, BAN_ALL )) {
-	d->close( );
-	return -1;
+        d->close( );
+        return -1;
     }
     
     NannyHandler::init( d );

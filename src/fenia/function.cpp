@@ -46,20 +46,20 @@ void
 Function::reverse(ostream &os, const DLString &nextline) const
 {
     if (!argNames || !stmts)
-	throw NullPointerException();
+        throw NullPointerException();
 
     os << "{Gfunction{x {M" << id <<  "{x (";
     
     for(ArgNames::const_iterator i = argNames->begin();i != argNames->end(); i++) {
-	if(i != argNames->begin())
-	    os << ", ";
-	    
-	os << Lex::getThis()->getName(*i);
+        if(i != argNames->begin())
+            os << ", ";
+            
+        os << Lex::getThis()->getName(*i);
     }
     os << ") {{ ";
     
     for(StmtNodeList::const_iterator i = stmts->begin();i != stmts->end(); i++)
-	(*i)->reverse(os, nextline + "    ");
+        (*i)->reverse(os, nextline + "    ");
     
     os << nextline << "} ";
 }
@@ -68,7 +68,7 @@ Register
 Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
 {
     if (!argNames || !stmts)
-	throw NullPointerException();
+        throw NullPointerException();
 
     RegisterList::const_iterator ali = args.begin();
     ArgNames::const_iterator ani = argNames->begin();
@@ -80,9 +80,9 @@ Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
         if(ali == args.end())
             throw NotEnoughArgumentsException();
         else {
-	    sroot.addVar(*ani);
+            sroot.addVar(*ani);
             sroot.setVar(*ani, *ali);
-	}
+        }
     }
     
     if(ali != args.end()) {
@@ -94,14 +94,14 @@ Function::invoke(Scope &sroot, Register thiz, RegisterList const &args)
 
     StmtNodeList::iterator i;
     for(i=stmts->begin();i != stmts->end(); i++) {
-	FlowCtl fc = (*i)->eval();
-	
-	if(fc.type == FlowCtl::BREAK)
-	    throw MissplacedBreakException();
-	if(fc.type == FlowCtl::CONTINUE)
-	    throw MissplacedContinueException();
-	if(fc.type == FlowCtl::RETURN)
-	    return fc.ret;
+        FlowCtl fc = (*i)->eval();
+        
+        if(fc.type == FlowCtl::BREAK)
+            throw MissplacedBreakException();
+        if(fc.type == FlowCtl::CONTINUE)
+            throw MissplacedContinueException();
+        if(fc.type == FlowCtl::RETURN)
+            return fc.ret;
     }
 
     return Register();

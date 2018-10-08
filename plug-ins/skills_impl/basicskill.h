@@ -20,7 +20,7 @@
 #include "skilleventhandler.h"
 
 class BasicSkill : public virtual Skill, 
-		   public XMLTableElement,
+                   public XMLTableElement,
                    public XMLVariableContainer 
 {
 XML_OBJECT

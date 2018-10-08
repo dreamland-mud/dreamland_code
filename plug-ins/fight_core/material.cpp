@@ -16,29 +16,29 @@ material_parse( Object *obj, const material_t **argv, int size )
     const material_t **ap = argv;
     
     if (obj->getMaterial( )) {
-	char *token, name[MAX_STRING_LENGTH];
+        char *token, name[MAX_STRING_LENGTH];
 
-	strcpy( name, obj->getMaterial( ) );
-	
-	token = strtok( name, ", " );
-	
-	for(token=strtok(name, ", "); token; token=strtok(NULL, ", "))
-	    if (*token != '\0') {
-		const material_t *mat;
+        strcpy( name, obj->getMaterial( ) );
+        
+        token = strtok( name, ", " );
+        
+        for(token=strtok(name, ", "); token; token=strtok(NULL, ", "))
+            if (*token != '\0') {
+                const material_t *mat;
 
-		for (mat = &material_table[0]; mat->name; mat++)
-		    if (!str_cmp( token, mat->name )) {
-			*ap++ = mat;
-			break;
-		    }		
+                for (mat = &material_table[0]; mat->name; mat++)
+                    if (!str_cmp( token, mat->name )) {
+                        *ap++ = mat;
+                        break;
+                    }                
 
-		if (ap >= argv + size) 
-		    return;
-	    }
+                if (ap >= argv + size) 
+                    return;
+            }
     }
 
     if (ap < argv + size)
-	*ap = NULL;
+        *ap = NULL;
 }
 
 static const int msize = 10;
@@ -50,8 +50,8 @@ bool material_is_typed( Object *obj, int type )
     material_parse( obj, argv, msize );
     
     for (ap = argv; ap < argv + msize && *ap != NULL; ap++) 
-	if (IS_SET( (*ap)->type, type ))
-	    return true;
+        if (IS_SET( (*ap)->type, type ))
+            return true;
 
     return false;
 }
@@ -63,8 +63,8 @@ bool material_is_flagged( Object *obj, int flags )
     material_parse( obj, argv, msize );
     
     for (ap = argv; ap < argv + msize && *ap != NULL; ap++) 
-	if (IS_SET( (*ap)->flags, flags ))
-	    return true;
+        if (IS_SET( (*ap)->flags, flags ))
+            return true;
 
     return false;
 }
@@ -77,14 +77,14 @@ int material_swims( Object *obj )
     material_parse( obj, argv, msize );
     
     for (swim = 0, ap = argv; ap < argv + msize && *ap != NULL; ap++) 
-	swim += (*ap)->floats;
+        swim += (*ap)->floats;
     
     if (swim > 0)
-	return SWIM_ALWAYS;
+        return SWIM_ALWAYS;
     else if (swim < 0)
-	return SWIM_NEVER;
+        return SWIM_NEVER;
     else
-	return SWIM_UNDEF;
+        return SWIM_UNDEF;
 }
 
 int material_burns( Object *obj )
@@ -95,10 +95,10 @@ int material_burns( Object *obj )
     material_parse( obj, argv, msize );
     
     for (max_burn = 0, ap = argv; ap < argv + msize && *ap != NULL; ap++) 
-	if ((*ap)->burns < 0)
-	    return (*ap)->burns;
-	else if ((*ap)->burns > max_burn)
-	    max_burn = (*ap)->burns;
+        if ((*ap)->burns < 0)
+            return (*ap)->burns;
+        else if ((*ap)->burns > max_burn)
+            max_burn = (*ap)->burns;
 
     return max_burn;
 }
@@ -112,7 +112,7 @@ int material_immune( Object *obj, Character *ch )
     material_parse( obj, argv, msize );
     
     for (ap = argv; ap < argv + msize && *ap != NULL; ap++) 
-	SET_BIT( bits, (*ap)->vuln );
+        SET_BIT( bits, (*ap)->vuln );
     
     immune_from_flags( ch, bits, res );
 

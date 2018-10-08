@@ -43,14 +43,14 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
 
     if ( !IS_OUTSIDE(ch) )
     {
-	ch->send_to("Ты должен находиться вне помещения.\n\r");
-	return;
+        ch->send_to("Ты должен находиться вне помещения.\n\r");
+        return;
     }
 
     if ( weather_info.sky < SKY_RAINING )
     {
-	ch->send_to("Тебе нужна плохая погода.\n\r");
-	return;
+        ch->send_to("Тебе нужна плохая погода.\n\r");
+        return;
     }
 
     dam = dice(level, 9);
@@ -59,19 +59,19 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
     act( "$c1 посылает молнию, которая повергает $s врагов!", ch, 0, 0, TO_ROOM );
     
     for (vch = room->people; vch; vch = vch_next) {
-	vch_next = vch->next_in_room;
+        vch_next = vch->next_in_room;
 
-	if (vch->is_mirror() && number_percent() < 50) 
-	    continue;
+        if (vch->is_mirror() && number_percent() < 50) 
+            continue;
 
-	if (vch == ch)
-	    continue;
-	
-	if (is_safe_spell(ch, vch, true))
-	    continue;
-	
-	vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_SPELL ) ? dam / 2 : dam;
-	damage( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
+        if (vch == ch)
+            continue;
+        
+        if (is_safe_spell(ch, vch, true))
+            continue;
+        
+        vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_SPELL ) ? dam / 2 : dam;
+        damage( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
     }
     
     area_message( ch, "Молнии сверкают на небе.", false );
@@ -80,18 +80,18 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
 SPELL_DECL(ControlWeather);
 VOID_SPELL(ControlWeather)::run( Character *ch, char *target_name, int sn, int level ) 
 { 
-	
+        
     if (arg_oneof( target_name, "better", "лучше", "к лучшему" )) {
-	weather_info.change += dice( level / 3, 4 );
-	ch->println( "Прогноз погоды улучшается." );
+        weather_info.change += dice( level / 3, 4 );
+        ch->println( "Прогноз погоды улучшается." );
     }
     else if (arg_oneof( target_name, "worse", "хуже", "к худшему" )) {
-	weather_info.change -= dice( level / 3, 4 );
-	ch->println( "Прогноз погоды ухудшается." );
+        weather_info.change -= dice( level / 3, 4 );
+        ch->println( "Прогноз погоды ухудшается." );
     }
     else  {
-	ch->send_to("Ты хочешь сделать погоду хуже или лучше?\n\r");
-	return;
+        ch->send_to("Ты хочешь сделать погоду хуже или лучше?\n\r");
+        return;
     }
 }
 
@@ -103,16 +103,16 @@ VOID_SPELL(FaerieFire)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
 
     if (IS_AFFECTED(victim, AFF_FAERIE_FIRE)) {
-	if (victim == ch)
-	    act("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
-	return;
+        if (victim == ch)
+            act("{MРозовая аура{x уже окружает тебя.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 уже окруже$Gно|н|на {Mрозовой аурой{x.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 10 + level / 5;
     af.location  = APPLY_AC;
     af.modifier  = 2 * level;
@@ -136,18 +136,18 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
     for ( ich = room->people; ich != 0; ich = ich->next_in_room )
     {
         if (ich->invis_level > 0)
-	    continue;
+            continue;
 
-	if ( ich == ch || saves_spell( level, ich,DAM_OTHER,ch, DAMF_SPELL) )
-	    continue;
+        if ( ich == ch || saves_spell( level, ich,DAM_OTHER,ch, DAMF_SPELL) )
+            continue;
 
-	affect_strip ( ich, gsn_invisibility		);
-	affect_strip ( ich, gsn_mass_invis		);
-	affect_strip ( ich, gsn_improved_invis		);
-	REMOVE_BIT   ( ich->affected_by, AFF_HIDE	);
-	REMOVE_BIT   ( ich->affected_by, AFF_FADE	);
-	REMOVE_BIT   ( ich->affected_by, AFF_INVISIBLE	);
-	REMOVE_BIT   ( ich->affected_by, AFF_IMP_INVIS	);	
+        affect_strip ( ich, gsn_invisibility                );
+        affect_strip ( ich, gsn_mass_invis                );
+        affect_strip ( ich, gsn_improved_invis                );
+        REMOVE_BIT   ( ich->affected_by, AFF_HIDE        );
+        REMOVE_BIT   ( ich->affected_by, AFF_FADE        );
+        REMOVE_BIT   ( ich->affected_by, AFF_INVISIBLE        );
+        REMOVE_BIT   ( ich->affected_by, AFF_IMP_INVIS        );        
 
         /* An elf sneaks eternally */
         if ( ich->is_npc() || !ich->getRace( )->getAff( ).isSet( AFF_SNEAK ))

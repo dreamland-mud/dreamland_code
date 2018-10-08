@@ -14,7 +14,7 @@
 class ExceptionVariableNotFound : public Exception {
 public:
     inline ExceptionVariableNotFound( string name, string className )
-	    : Exception( string( "Variable '" ) + name + "' not found in class '" + className + '\'' )
+            : Exception( string( "Variable '" ) + name + "' not found in class '" + className + '\'' )
     {
     }
 

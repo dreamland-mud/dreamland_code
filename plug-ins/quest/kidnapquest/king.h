@@ -10,9 +10,9 @@
 
 class KidnapKing : public KidnapMobile, 
                    public TalkativeClient, 
-		   public MandatoryMobile,
-		   public ProtectedClient,
-		   public PeacefulClient
+                   public MandatoryMobile,
+                   public ProtectedClient,
+                   public PeacefulClient
 {
 XML_OBJECT
 public:

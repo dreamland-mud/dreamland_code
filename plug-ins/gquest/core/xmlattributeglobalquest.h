@@ -18,16 +18,16 @@ class XMLAttributeGlobalQuest : public XMLAttributeStatistic
 XML_OBJECT
 public: 
         typedef ::Pointer<XMLAttributeGlobalQuest> Pointer;
-	typedef XMLMapBase<XMLInteger> Victories;
+        typedef XMLMapBase<XMLInteger> Victories;
 
-	XMLAttributeGlobalQuest( );
+        XMLAttributeGlobalQuest( );
 
-	bool getNoExp( ) const;
-	void setNoExp( bool );
-	virtual bool isJoined( ) const;
+        bool getNoExp( ) const;
+        void setNoExp( bool );
+        virtual bool isJoined( ) const;
 
 protected:
-	XML_VARIABLE XMLBoolean noexp;
+        XML_VARIABLE XMLBoolean noexp;
 };
 
 #endif

@@ -38,8 +38,8 @@ SPELL_DECL(Aid);
 VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     if (ch->isAffected(sn)) {
-	ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
-	return;
+        ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+        return;
     }
 
     victim->hit += level * 5;
@@ -55,18 +55,18 @@ VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level )
 SPELL_DECL(Assist);
 VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	if ( ch->isAffected(sn ) )
-	{
-		ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
-		return;
-	}
+        if ( ch->isAffected(sn ) )
+        {
+                ch->send_to("Это заклинание использовалось совсем недавно.\n\r");
+                return;
+        }
 
-	victim->hit += 100 + level * 5;
-	update_pos( victim );
-	victim->send_to("Волна тепла согревает твое тело.\n\r");
-	act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
-	if ( ch != victim )
-		ch->send_to("Ok.\n\r");
+        victim->hit += 100 + level * 5;
+        update_pos( victim );
+        victim->send_to("Волна тепла согревает твое тело.\n\r");
+        act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
+        if ( ch != victim )
+                ch->send_to("Ok.\n\r");
 
         postaffect_to_char(ch, sn, level / 50);
 }
@@ -80,10 +80,10 @@ VOID_SPELL(Refresh)::run( Character *ch, Character *victim, int sn, int level )
         act("Ты пол$gно|он|на сил!", victim, 0, 0, TO_CHAR);
     }
     else
-	victim->send_to("Усталость проходит.\n\r");
+        victim->send_to("Усталость проходит.\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 
@@ -101,7 +101,7 @@ VOID_SPELL(CureLight)::run( Character *ch, Character *victim, int sn, int level 
     victim->send_to("Ты чувствуешь себя слегка лучше!\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 SPELL_DECL(CureSerious);
@@ -116,7 +116,7 @@ VOID_SPELL(CureSerious)::run( Character *ch, Character *victim, int sn, int leve
     victim->send_to("Ты чувствуешь себя лучше!\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 SPELL_DECL(CureCritical);
@@ -131,7 +131,7 @@ VOID_SPELL(CureCritical)::run( Character *ch, Character *victim, int sn, int lev
     victim->send_to("Ты чувствуешь себя намного лучше!\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 
@@ -147,7 +147,7 @@ VOID_SPELL(Heal)::run( Character *ch, Character *victim, int sn, int level )
     victim->send_to("Волна тепла согревает твое тело.\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 SPELL_DECL(SuperiorHeal);
@@ -162,7 +162,7 @@ VOID_SPELL(SuperiorHeal)::run( Character *ch, Character *victim, int sn, int lev
     victim->send_to("Волна тепла окутывает тебя.\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 
@@ -178,7 +178,7 @@ VOID_SPELL(MasterHealing)::run( Character *ch, Character *victim, int sn, int le
     victim->send_to("Волна тепла согревает твое тело.\n\r");
 
     if ( ch != victim )
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
 }
 
 
@@ -189,15 +189,15 @@ VOID_SPELL(MassHealing)::run( Character *ch, Room *room, int sn, int level )
 
     for ( gch = room->people; gch != 0; gch = gch->next_in_room )
     {
-	if ((ch->is_npc() && gch->is_npc()) ||
-	    (!ch->is_npc() && !gch->is_npc()))
-	{
-	    if (spellbane( ch, gch ))
-		continue;
+        if ((ch->is_npc() && gch->is_npc()) ||
+            (!ch->is_npc() && !gch->is_npc()))
+        {
+            if (spellbane( ch, gch ))
+                continue;
 
-	    spell(gsn_heal,level,ch, gch);
-	    spell(gsn_refresh,level,ch, gch);
-	}
+            spell(gsn_heal,level,ch, gch);
+            spell(gsn_refresh,level,ch, gch);
+        }
     }
 
 }
@@ -209,22 +209,22 @@ VOID_SPELL(GroupHeal)::run( Character *ch, Room *room, int sn, int level )
     int heal_sn;
 
     if (gsn_master_healing->usable( ch ))
-	heal_sn = gsn_master_healing;
+        heal_sn = gsn_master_healing;
     else if (gsn_superior_heal->usable( ch ))
-	heal_sn = gsn_superior_heal;
+        heal_sn = gsn_superior_heal;
     else
-	heal_sn = gsn_heal;
+        heal_sn = gsn_heal;
 
     for ( gch = room->people; gch != 0; gch = gch->next_in_room )
     {
-	if( !is_same_group( gch, ch ) )
-		continue;
+        if( !is_same_group( gch, ch ) )
+                continue;
 
-	if (spellbane( ch, gch ))
-	    continue;
-	
-	spell(heal_sn,level,ch, gch);
-	spell(gsn_refresh,level,ch, gch);
+        if (spellbane( ch, gch ))
+            continue;
+        
+        spell(heal_sn,level,ch, gch);
+        spell(gsn_refresh,level,ch, gch);
     }
 
 }
@@ -238,30 +238,30 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     bool removed = false;
 
     if (ch == victim) {
-	ch->send_to( "Это заклинание ты можешь использовать только на других.\r\n" );
-	return;
+        ch->send_to( "Это заклинание ты можешь использовать только на других.\r\n" );
+        return;
     }
 
     if (ch->isAffected(sn )) {
-	ch->send_to( "Это заклинание использовалось совсем недавно.\r\n" );
-	return;
+        ch->send_to( "Это заклинание использовалось совсем недавно.\r\n" );
+        return;
     }
 
     if (IS_AFFECTED(victim, AFF_PLAGUE)
-	&& (paf = victim->affected->affect_find(gsn_plague)) != NULL)
+        && (paf = victim->affected->affect_find(gsn_plague)) != NULL)
     {
         affect_join( ch, paf );
-	ch->send_to( "Ты чувствуешь жар и лихорадку.\r\n" );
-	removed = true;
+        ch->send_to( "Ты чувствуешь жар и лихорадку.\r\n" );
+        removed = true;
         affect_strip( victim, gsn_plague );
     }
 
     if ( IS_AFFECTED(victim, AFF_POISON)
-	&& (paf = victim->affected->affect_find(gsn_poison)) != NULL)
+        && (paf = victim->affected->affect_find(gsn_poison)) != NULL)
     {
         affect_join( ch, paf );
-	ch->send_to( "Ты чувствуешь себя очень болезненно.\r\n" );
-	removed = true;
+        ch->send_to( "Ты чувствуешь себя очень болезненно.\r\n" );
+        removed = true;
         affect_strip( victim, gsn_poison );
     }
    
@@ -272,23 +272,23 @@ VOID_SPELL(EmpathicHealing)::run( Character *ch, Character *victim, int sn, int 
     af.modifier         = 0;
 
     if (!removed && victim->max_hit == victim->hit) {
-	act_p( "Кажется, $C1 абсолютно здоро$Gво|в|ва", ch, 0, victim, TO_CHAR, POS_RESTING);
-	af.duration = 1;
+        act_p( "Кажется, $C1 абсолютно здоро$Gво|в|ва", ch, 0, victim, TO_CHAR, POS_RESTING);
+        af.duration = 1;
     
     } else {
-	act_p( "Сосредоточившись, ты переносишь раны $C2 на собственное тело.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	act_p( "Сосредоточившись, $c1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT, POS_RESTING);
-	act_p( "Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+        act_p( "Сосредоточившись, ты переносишь раны $C2 на собственное тело.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act_p( "Сосредоточившись, $c1 переносит твои раны на собственное тело.", ch, 0, victim, TO_VICT, POS_RESTING);
+        act_p( "Сосредоточившись, $c1 переносит раны $C2 на собственное тело.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
 
-	hp = victim->max_hit - victim->hit;
-	hp = URANGE( 0, hp, ch->hit - 1 );
+        hp = victim->max_hit - victim->hit;
+        hp = URANGE( 0, hp, ch->hit - 1 );
 
-	victim->hit += hp;
-	ch->hit     -= hp;
-	update_pos( victim );
+        victim->hit += hp;
+        ch->hit     -= hp;
+        update_pos( victim );
 
-	af.duration         = hp / 100;
-	af.bitvector        = AFF_REGENERATION;
+        af.duration         = hp / 100;
+        af.bitvector        = AFF_REGENERATION;
     }
 
     affect_join( ch, &af );

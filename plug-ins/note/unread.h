@@ -15,19 +15,19 @@ class PCharacter;
 class Unread : public CommandPlugin, public DefaultCommand {
 XML_OBJECT
 public:
-	typedef ::Pointer<Unread> Pointer;
+        typedef ::Pointer<Unread> Pointer;
     
-	Unread( );
+        Unread( );
 
-	virtual void run( Character *, const DLString & );
-	
-	static void doNext( PCharacter * );
-	static void doSpool( PCharacter *, bool );
-	static void doUnfinished( PCharacter * );
+        virtual void run( Character *, const DLString & );
+        
+        static void doNext( PCharacter * );
+        static void doSpool( PCharacter *, bool );
+        static void doUnfinished( PCharacter * );
 
 private:
-	static const DLString COMMAND_NAME;
-		
+        static const DLString COMMAND_NAME;
+                
 };
 
 class UnreadListener : public DescriptorStateListener {

@@ -18,21 +18,21 @@ struct GoDoor
 {
     inline bool operator () ( Room *r, EXIT_DATA * a ) const
     {
-	return true;
+        return true;
     }
 };
 struct GoEExit
 {
     inline bool operator () ( Room *r, EXTRA_EXIT_DATA * a ) const
     {
-	return true;
+        return true;
     }
 };
 struct GoPortal
 {
     inline bool operator () ( Room *r, Object * a ) const
     {
-	return true;
+        return true;
     }
 };
 
@@ -43,22 +43,22 @@ struct FindComplete {
     typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
     
     FindComplete( Room *t, RoomTraverseResult &r ) 
-	    : target( t ), result( r )
+            : target( t ), result( r )
     { 
     }
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->node != target)
-	    return false;
-	
-	for (const MyNodesEntry *i = head; i->prev; i = i->prev) {
-	    Road road = i->hook;
-	    
-	    result.push_front( road );
-	}
+        if (head->node != target)
+            return false;
+        
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) {
+            Road road = i->hook;
+            
+            result.push_front( road );
+        }
 
-	return true;
+        return true;
     }
     
     Room *target;
@@ -78,19 +78,19 @@ CMDRUN( find )
     Room *msm = ch->in_room;
 
     try {
-	target = constArguments.toInt( );
-	if (target <= 0)
-	    return;
+        target = constArguments.toInt( );
+        if (target <= 0)
+            return;
     } catch (ExceptionBadType e) {
-	ch->send_to( "Usage: find <room vnum>\r\n" );
-	return;
+        ch->send_to( "Usage: find <room vnum>\r\n" );
+        return;
     }
     
     if (!(toRoom = get_room_index( target )))
-	return;
+        return;
     
     for (Room *r = room_list; r; r = r->rnext)
-	REMOVE_BIT(r->room_flags, ROOM_MARKER);
+        REMOVE_BIT(r->room_flags, ROOM_MARKER);
     
     FindComplete complete( toRoom, elements );
     struct timeval tv1, tv2;

@@ -21,7 +21,7 @@ LIQ(water);
 bool 
 XMLResetList::nodeFromXML(const XMLNode::Pointer &child) 
 {
-    insert( end( ), RESET_DATA( ) );		
+    insert( end( ), RESET_DATA( ) );                
     RESET_DATA &r = back( );
     const DLString &t = child->getName( ); 
     

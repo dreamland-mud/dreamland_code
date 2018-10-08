@@ -14,20 +14,20 @@ class PCharacter;
 
 class CMlt : public CommandPlugin, public DefaultCommand {
 public:
-	typedef ::Pointer<CMlt> Pointer;
+        typedef ::Pointer<CMlt> Pointer;
     
-	CMlt( );
+        CMlt( );
 
-	virtual void run( Character*, const DLString& constArguments );
-	
+        virtual void run( Character*, const DLString& constArguments );
+        
 private:
-	void doCount( Character *, int );
-	void doLimit( Character * );
-	void doShowOther( Character *, PCMemoryInterface * );
-	void doShowSelf( PCharacter * );
+        void doCount( Character *, int );
+        void doLimit( Character * );
+        void doShowOther( Character *, PCMemoryInterface * );
+        void doShowSelf( PCharacter * );
 
-	static const DLString COMMAND_NAME;
-		
+        static const DLString COMMAND_NAME;
+                
 };
 
 #endif

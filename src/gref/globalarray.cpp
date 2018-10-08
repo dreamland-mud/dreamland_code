@@ -28,17 +28,17 @@ void GlobalArray::clear( )
     vector<int>::clear( );
 
     if (registry)
-	resize( registry->size( ) );
+        resize( registry->size( ) );
 }
 
 int & GlobalArray::operator [] (size_type ndx)
 {
     if (!registry)
-	return zeroValue;
+        return zeroValue;
     if (!registry->goodIndex( ndx ))
-	return zeroValue;
+        return zeroValue;
     if (ndx >= size( ))
-	resize( ndx + 1 );
+        resize( ndx + 1 );
     
     return vector<int>::operator [](ndx);
 }

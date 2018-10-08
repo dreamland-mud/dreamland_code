@@ -22,19 +22,19 @@ using namespace std;
 namespace Scripting {
 
 #define ID_UNDEF    0
-#define ID_THIS	    1
+#define ID_THIS            1
 #define ID_ORIGIN   2 // parser's "this"
-#define ID_AUTO	    100
+#define ID_AUTO            100
 
 class Lex : virtual public DLObject, public OneAllocate {
 public:
     typedef unsigned long int id_t;
 
     Lex() : lastid(ID_AUTO) {
-	self = this;
+        self = this;
     }
     ~Lex() {
-	self = 0;
+        self = 0;
     }
     
     const DLString &getName(id_t id);
@@ -71,10 +71,10 @@ public:
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     Lex::id_t getValue() const {
-	return value;
+        return value;
     }
     void setValue(Lex::id_t id) {
-	value = id;
+        value = id;
     }
 private:
     Lex::id_t value;

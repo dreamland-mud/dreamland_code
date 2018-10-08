@@ -40,7 +40,7 @@ protected:
 
     virtual bool tryMove( Character * );
             bool applyPassDoor( Character * );
-	     int getPassDoorLevel( Character * );
+             int getPassDoorLevel( Character * );
 
     void randomizeExits( );
     int adjustMovetype( Character * );

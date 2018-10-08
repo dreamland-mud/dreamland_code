@@ -48,7 +48,7 @@ XMLEditorInputHandler::attach(Character *ch)
     Descriptor *d = ch->desc;
     
     if (!d)
-	return;
+        return;
 
     d->handle_input.push_front(this);
 }

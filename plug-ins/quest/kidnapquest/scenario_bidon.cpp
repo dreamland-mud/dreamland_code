@@ -33,21 +33,21 @@ void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero
 void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
 {
     if(hero == killer) {
-	act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
+        hero->send_to("{YЗадание отменяется.{x\r\n");
     } else {
-	act("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
+        hero->send_to("{YЗадание отменяется.{x\r\n");
     }
 }
 void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) 
 {
     if(hero == killer) {
-	act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кого долж$gно|ен|на бы$gло|л|ла спасти.{x", killer, 0, 0, TO_CHAR);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кого долж$gно|ен|на бы$gло|л|ла спасти.{x", killer, 0, 0, TO_CHAR);
+        hero->send_to("{YЗадание отменяется.{x\r\n");
     } else {
-	act("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
+        hero->send_to("{YЗадание отменяется.{x\r\n");
     }
 }
 
@@ -57,7 +57,7 @@ void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero )
 void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) 
 {
     if (!hero->fighting) {
-	act("$c1 сквозь зубы произносит: '{gА вас я попрошу остаться...{x'.", bandit, 0, hero, TO_ROOM);
+        act("$c1 сквозь зубы произносит: '{gА вас я попрошу остаться...{x'.", bandit, 0, hero, TO_ROOM);
     }
 }
 void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) 
@@ -67,17 +67,17 @@ void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid )
 void KS::actHuntStep( NPCharacter *bandit ) 
 {
     if(number_percent() < 10)
-	act("$c1 глубоко затягивается огромной сигарой.", bandit, 0, 0, TO_ROOM);
+        act("$c1 глубоко затягивается огромной сигарой.", bandit, 0, 0, TO_ROOM);
 }
 void KS::actKidnapStep( NPCharacter *bandit, NPCharacter *kid ) 
 {
     if(number_percent() < 10)
-	act("$c1 показывает девочке куклу.", bandit, 0, 0, TO_ROOM);
+        act("$c1 показывает девочке куклу.", bandit, 0, 0, TO_ROOM);
 }
 void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) 
 {
     if(number_percent() < 10)
-	act("$c1 озадаченно оглядывается по сторонам.", bandit, 0, 0, TO_ROOM);
+        act("$c1 озадаченно оглядывается по сторонам.", bandit, 0, 0, TO_ROOM);
 }
 
 /*
@@ -98,14 +98,14 @@ void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int ti
 
     act("$c1 говорит тебе '{GВозьми этот бидончик и передай ей...{x'", king, 0, hero, TO_VICT);
     if(number_percent() < 10) {
-	act("$c1 пронзительно кричит '{YЧТОБ БЕЗ МОЛОКА НЕ ВОЗВРАЩАЛАСЬ!...{x'", king, 0, hero, TO_VICT);
-	sprintf( buf, "$c1 говорит тебе '{GИ учти, что через {Y%d{G минут%s мое терпение лопнет!{x'",
-		 time, GET_COUNT(time, "у", "ы", "") );
+        act("$c1 пронзительно кричит '{YЧТОБ БЕЗ МОЛОКА НЕ ВОЗВРАЩАЛАСЬ!...{x'", king, 0, hero, TO_VICT);
+        sprintf( buf, "$c1 говорит тебе '{GИ учти, что через {Y%d{G минут%s мое терпение лопнет!{x'",
+                 time, GET_COUNT(time, "у", "ы", "") );
     } else {
-	sprintf( buf, "$c1 говорит тебе '{GПоторопись! Материнское сердце подсказывает мне, "
-		      "что если ты не приведешь ее ко мне через {Y%d{G минут%s, "
-		      "с ней случится что-то непоправимое.{x'",
-		 time, GET_COUNT(time, "у", "ы", "") );
+        sprintf( buf, "$c1 говорит тебе '{GПоторопись! Материнское сердце подсказывает мне, "
+                      "что если ты не приведешь ее ко мне через {Y%d{G минут%s, "
+                      "с ней случится что-то непоправимое.{x'",
+                 time, GET_COUNT(time, "у", "ы", "") );
     }
 
     act(buf, king, 0, hero, TO_VICT);
@@ -129,12 +129,12 @@ void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero )
 void KS::actHeroWait( NPCharacter *kid ) 
 {
     if(number_percent( ) < 10)
-	act("$c1 ждет прекрасного принца.", kid, 0, 0, TO_ROOM);
+        act("$c1 ждет прекрасного принца.", kid, 0, 0, TO_ROOM);
 }
 void KS::actNoHero( NPCharacter *kid, PCharacter *hero ) 
 {
     if (number_percent( ) < 10 && hero && hero->in_room != kid->in_room)
-	act("$c1 потерянно озирается в поисках $C2.", kid, 0, hero, TO_ROOM);
+        act("$c1 потерянно озирается в поисках $C2.", kid, 0, hero, TO_ROOM);
 }
 void KS::actHeroDetach( NPCharacter *kid, PCharacter *hero ) 
 {

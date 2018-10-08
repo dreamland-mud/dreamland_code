@@ -13,14 +13,14 @@ class PCharacter;
 class Trainer : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<Trainer> Pointer;
+        typedef ::Pointer<Trainer> Pointer;
     
-	Trainer( );
-	
-	virtual int getOccupation( );
+        Trainer( );
+        
+        virtual int getOccupation( );
 
-	void doGain( PCharacter *, DLString & );
-	void doTrain( PCharacter *, DLString & );
+        void doGain( PCharacter *, DLString & );
+        void doTrain( PCharacter *, DLString & );
 };
 
 #endif

@@ -48,10 +48,10 @@ CommandHelp::Pointer Command::getHelp( ) const
 bool Command::available( Character *ch ) const 
 {
     if (getLevel( ) > ch->get_trust( ))
-	return false;
+        return false;
 
     if (ch->desc && ch->desc->connected != CON_PLAYING)
-	return getExtra( ).isSet( CMD_NANNY );
+        return getExtra( ).isSet( CMD_NANNY );
 
     return true;
 }
@@ -59,10 +59,10 @@ bool Command::available( Character *ch ) const
 bool Command::visible( Character *ch ) const
 {
     if (!available( ch ))
-	return false;
+        return false;
     
     if (getExtra( ).isSet( CMD_HIDDEN ))
-	return false;
+        return false;
 
     return true;
 }
@@ -110,13 +110,13 @@ bool Command::matchesExactly( const DLString &cmdName ) const
 bool Command::matches( const DLString& command ) const
 {
     if (command.empty( ))
-	return false;
+        return false;
 
     if (command.strPrefix( getName( ) ))
-	return true;
+        return true;
 
     if (command.strPrefix( getRussianName( ) ))
-	return true;
+        return true;
     
     return false;
 }
@@ -129,16 +129,16 @@ bool Command::matchesAlias( const DLString& command ) const
 bool Command::properOrder( Character *ch )
 {
     if (!ch->is_npc( )) 
-	return (getOrder( ).isSet( ORDER_ALLOW_RULER ) || !ch->isAffected(gsn_manacles ));
+        return (getOrder( ).isSet( ORDER_ALLOW_RULER ) || !ch->isAffected(gsn_manacles ));
     
     if (getOrder( ).isSet( ORDER_FIGHT_ONLY ) && ch->fighting == 0)
-	return false;
+        return false;
     
     if (getOrder( ).isSet( ORDER_PLAYER_ONLY ))
-	return false;
+        return false;
     
     if (getOrder( ).isSet( ORDER_THIEF_ONLY ) && !IS_SET(ch->act, ACT_THIEF))
-	return false;
+        return false;
 
     return true;
 }    
@@ -148,32 +148,32 @@ bool Command::dispatchOrder( const InterpretArguments &iargs )
     Character *ch = iargs.ch;
 
     if (!ch->is_npc( ) 
-	&& IS_SET(ch->act, PLR_FREEZE)
-	&& !getExtra( ).isSet( CMD_FREEZE ))
+        && IS_SET(ch->act, PLR_FREEZE)
+        && !getExtra( ).isSet( CMD_FREEZE ))
     {
-	ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
-	return false;
+        ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
+        return false;
     }
 
     if (IS_SET( ch->comm, COMM_AFK ) && !getExtra( ).isSet( CMD_AFK )) {
-	ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
-	return false;
+        ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
+        return false;
     }
 
     if (getExtra( ).isSet( CMD_SPELLOUT ) && !matchesExactly( iargs.cmdName.toLower( ) )) {
-	ch->printf("Команду '%s' необходимо ввести полностью.\n\r", getName( ).c_str( ) );
-	return false;
+        ch->printf("Команду '%s' необходимо ввести полностью.\n\r", getName( ).c_str( ) );
+        return false;
     }
-		    
+                    
     if (IS_AFFECTED( ch, AFF_STUN ) && !getExtra( ).isSet( CMD_KEEP_HIDE )) {
-	ch->send_to( "Ты не в состоянии сделать это.\n\r" );
-	return false;
+        ch->send_to( "Ты не в состоянии сделать это.\n\r" );
+        return false;
     }
 
     // prevent ghosts from doing a bunch of commands
     if (IS_GHOST( ch ) && !getExtra( ).isSet( CMD_GHOST )) {
-	ch->send_to( "У тебя нет тела... А твой немощный дух не в состоянии тебе помочь.\n\r" );
-	return false;
+        ch->send_to( "У тебя нет тела... А твой немощный дух не в состоянии тебе помочь.\n\r" );
+        return false;
     }
 
     // Come out of hiding for most commands
@@ -181,7 +181,7 @@ bool Command::dispatchOrder( const InterpretArguments &iargs )
 
     // Character not in position for command?
     if (!checkPosition( ch ))
-	return false;
+        return false;
 
     return true;
 }
@@ -191,15 +191,15 @@ bool Command::dispatch( const InterpretArguments &iargs )
     Character *ch = iargs.ch;
 
     if (IS_AFFECTED(ch, AFF_CHARM) 
-	&& !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
+        && !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
     {
-	ch->send_to( "Сперва спроси разрешения у любимого хозяина!\n\r" );
-	return false;
+        ch->send_to( "Сперва спроси разрешения у любимого хозяина!\n\r" );
+        return false;
     }
 
     if (ch->isAffected(gsn_manacles ) && !getExtra( ).isSet( CMD_MANACLES )) {
-	ch->send_to( "Ты не можешь этого сделать - мешают кандалы!\n\r" );
-	return false;
+        ch->send_to( "Ты не можешь этого сделать - мешают кандалы!\n\r" );
+        return false;
     }
 
     return dispatchOrder( iargs );
@@ -208,62 +208,62 @@ bool Command::dispatch( const InterpretArguments &iargs )
 void Command::visualize( Character *ch )
 {
     if (ch->is_npc( )) /* ? */
-	return;
+        return;
 
     if (IS_AFFECTED( ch, AFF_HIDE | AFF_FADE ) && !getExtra( ).isSet( CMD_KEEP_HIDE ))
     {
-	REMOVE_BIT( ch->affected_by, AFF_HIDE | AFF_FADE );
-	ch->send_to( "Ты выходишь из тени.\n\r" );
-	act_p( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM, POS_RESTING );
+        REMOVE_BIT( ch->affected_by, AFF_HIDE | AFF_FADE );
+        ch->send_to( "Ты выходишь из тени.\n\r" );
+        act_p( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM, POS_RESTING );
     }
 
     if (IS_AFFECTED( ch, AFF_IMP_INVIS ) && getPosition( ).getValue( ) == POS_FIGHTING)
     {
-	affect_strip( ch, gsn_improved_invis );
-	REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
-	act_p( "Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR, POS_RESTING );
-	act_p( "$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM, POS_RESTING );
+        affect_strip( ch, gsn_improved_invis );
+        REMOVE_BIT( ch->affected_by, AFF_IMP_INVIS );
+        act_p( "Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR, POS_RESTING );
+        act_p( "$c1 становится видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_ROOM, POS_RESTING );
     }
 
     if (DIGGED(ch) && (getPosition( ).getValue( ) > POS_RESTING || getExtra( ).isSet( CMD_UNDIG )))
-	undig(ch);
+        undig(ch);
 }
 
 
 bool Command::checkPosition( Character *ch )
 {
     if (ch->position >= getPosition( ).getValue( ))
-	return true;
+        return true;
 
     switch (ch->position.getValue( )) {
-	case POS_DEAD:
-	    ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
-	    break;
+        case POS_DEAD:
+            ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
+            break;
 
-	case POS_MORTAL:
-	case POS_INCAP:
-	    ch->send_to( "Даже не думай об этом! Ты в ужасном состоянии.\n\r" );
-	    break;
+        case POS_MORTAL:
+        case POS_INCAP:
+            ch->send_to( "Даже не думай об этом! Ты в ужасном состоянии.\n\r" );
+            break;
 
-	case POS_STUNNED:
-	    ch->send_to( "Ты не в состоянии сделать это.\n\r" );
-	    break;
+        case POS_STUNNED:
+            ch->send_to( "Ты не в состоянии сделать это.\n\r" );
+            break;
 
-	case POS_SLEEPING:
-	    ch->send_to( "Во сне? Или может сначала проснешься...\n\r" );
-	    break;
+        case POS_SLEEPING:
+            ch->send_to( "Во сне? Или может сначала проснешься...\n\r" );
+            break;
 
-	case POS_RESTING:
-	    ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
-	    break;
+        case POS_RESTING:
+            ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
+            break;
 
-	case POS_SITTING:
-	    ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
-	    break;
+        case POS_SITTING:
+            ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
+            break;
 
-	case POS_FIGHTING:
-	    act_p( "Куда! Ты долж$gно|ен|на сражаться.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
-	    break;
+        case POS_FIGHTING:
+            act_p( "Куда! Ты долж$gно|ен|на сражаться.", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+            break;
     }
     
     return false;

@@ -23,11 +23,11 @@ class ExceptionXMLError : public Exception
 {
 public: 
     inline ExceptionXMLError( string errmsg )
-	    : Exception( errmsg ), line( 0 )
+            : Exception( errmsg ), line( 0 )
     {
     }
     inline ExceptionXMLError( string errmsg, char ch, int line )
-	    : Exception( errmsg + "::" + ch + ": at line " + DLString(line) ), line( line )
+            : Exception( errmsg + "::" + ch + ": at line " + DLString(line) ), line( line )
     {
     }
 

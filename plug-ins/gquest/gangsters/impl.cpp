@@ -16,15 +16,15 @@ extern "C"
 {
     SO::PluginList initialize_gquest_gangsters( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MobileBehaviorRegistrator<GangMember> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<GangChef> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<GangKey> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<GangPortal> >( ppl );
-	Plugin::registerPlugin<GangstersInfo>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGangsters> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MobileBehaviorRegistrator<GangMember> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<GangChef> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<GangKey> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<GangPortal> >( ppl );
+        Plugin::registerPlugin<GangstersInfo>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGangsters> >( ppl );
+        
+        return ppl;
     }
 }

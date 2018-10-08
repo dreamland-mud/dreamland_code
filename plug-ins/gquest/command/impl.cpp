@@ -12,10 +12,10 @@ extern "C"
 {
     SO::PluginList initialize_gquest_command( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<CGQuest>( ppl );
-	Plugin::registerPlugin<GQuestNotifyPlugin>( ppl );
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<CGQuest>( ppl );
+        Plugin::registerPlugin<GQuestNotifyPlugin>( ppl );
+        return ppl;
     }
 }

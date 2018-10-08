@@ -32,25 +32,25 @@ void follower_die( Character *ch )
     Character *fch_next;
 
     if (ch->master) 
-	follower_stop( ch );
+        follower_stop( ch );
 
     ch->leader = 0;
 
     for (fch = char_list; fch != 0; fch = fch_next) {
-	fch_next = fch->next;
+        fch_next = fch->next;
 
-	if (fch->master == ch)
-	    follower_stop( fch );
+        if (fch->master == ch)
+            follower_stop( fch );
 
-	if (fch->leader == ch)
-	    fch->leader = fch;
+        if (fch->leader == ch)
+            fch->leader = fch;
     }
 }
 
 void follower_add( Character *ch, Character *mch )
 {
     if (ch->master != NULL)
-	return;
+        return;
 
     ch->master        = mch;
     ch->leader        = NULL;
@@ -66,10 +66,10 @@ static void afprog_stopfol( Character *ch )
     Affect *paf, *paf_next;
 
     for (paf = ch->affected; paf; paf = paf_next) {
-	paf_next = paf->next;
+        paf_next = paf->next;
 
-	if (paf->type->getAffect( ))
-	    paf->type->getAffect( )->stopfol( ch, paf );
+        if (paf->type->getAffect( ))
+            paf->type->getAffect( )->stopfol( ch, paf );
     }
 }
 
@@ -86,11 +86,11 @@ void follower_stop( Character *ch )
     Character *master = ch->master;
 
     if (master == NULL)
-	return;
+        return;
 
     if (IS_AFFECTED( ch, AFF_CHARM )) { /* XXX causes double affect_strip */
-	REMOVE_BIT( ch->affected_by, AFF_CHARM );
-	affect_strip( ch, gsn_charm_person );
+        REMOVE_BIT( ch->affected_by, AFF_CHARM );
+        affect_strip( ch, gsn_charm_person );
     }
 
     if (master->can_see( ch )) 
@@ -106,13 +106,13 @@ void follower_stop( Character *ch )
     mprog_stopfol( ch, master );
 
     if (!ch->is_npc( )) 
-	return;
+        return;
     
     if (ch->position == POS_SLEEPING && !IS_AFFECTED( ch, AFF_SLEEP ))
-	ch->position = ch->getNPC( )->default_pos;
+        ch->position = ch->getNPC( )->default_pos;
 
     if (!master->is_npc( ) && master->getPC( )->pet == ch)
-	master->getPC( )->pet = NULL;
+        master->getPC( )->pet = NULL;
 
     save_mobs( ch->in_room );
 }
@@ -130,25 +130,25 @@ bool is_same_group( Character *ach, Character *bch )
 
  for (ch = ach; ch != 0; ch = ch_next) {
     if (!ch->in_room)
-	return false;
+        return false;
     
     ch_next = ch->leader;
     
     for(vch = bch; vch != 0; vch = vch_next) {
-	if (!vch->in_room)
-	    return false;
-	
-	vch_next = vch->leader;
-	
-	if (ch == vch) 
-	    return true;
-	
-	if (vch == vch_next)
-	    break;
+        if (!vch->in_room)
+            return false;
+        
+        vch_next = vch->leader;
+        
+        if (ch == vch) 
+            return true;
+        
+        if (vch == vch_next)
+            break;
     }
    
     if (ch == ch_next)
-	break;
+        break;
  }
  return false;
 }
@@ -167,19 +167,19 @@ Character * follower_find( Character *ch, const char *cargument )
     count  = 0;
 
     if (!str_cmp( arg, "self" ) || !str_cmp( arg, "я" ))
-	return ch;
+        return ch;
     
     for (wch = char_list; wch; wch = wch->next) {
-	if (wch->in_room == 0)
-	    continue;
-	if (wch->master != ch && wch->leader != ch)
-	    continue;
-	if (!ch->can_see( wch ))
-	    continue;
-	if (!is_name( arg, wch->getNameP( '7' ).c_str( ) ))
-	    continue;
-	if (++count >= number)
-	    return wch;
+        if (wch->in_room == 0)
+            continue;
+        if (wch->master != ch && wch->leader != ch)
+            continue;
+        if (!ch->can_see( wch ))
+            continue;
+        if (!is_name( arg, wch->getNameP( '7' ).c_str( ) ))
+            continue;
+        if (++count >= number)
+            return wch;
     }
 
     return 0;
@@ -196,17 +196,17 @@ Character * follower_find_nosee( Character *ch, const char *cargument )
     count  = 0;
 
     if (!str_cmp( arg, "self" ) || !str_cmp( arg, "я" ))
-	return ch;
+        return ch;
     
     for (wch = char_list; wch; wch = wch->next) {
-	if (wch->in_room == 0)
-	    continue;
-	if (wch->master != ch && wch->leader != ch)
-	    continue;
-	if (!is_name( arg, wch->getNameP( '7' ).c_str( ) ))
-	    continue;
-	if (++count >= number)
-	    return wch;
+        if (wch->in_room == 0)
+            continue;
+        if (wch->master != ch && wch->leader != ch)
+            continue;
+        if (!is_name( arg, wch->getNameP( '7' ).c_str( ) ))
+            continue;
+        if (++count >= number)
+            return wch;
     }
 
     return 0;
@@ -227,10 +227,10 @@ void guarding_stop( PCharacter *guard, PCharacter *victim )
 void guarding_nuke( Character *ch, Character *victim )
 {
     if (ch->is_npc( ) || victim->is_npc( ))
-	return;
+        return;
 
     if (ch->getPC( )->guarding == victim || victim->getPC( )->guarded_by == ch)
-	guarding_stop( ch->getPC( ), victim->getPC( ) );
+        guarding_stop( ch->getPC( ), victim->getPC( ) );
 }
 
 void guarding_assert( Character *victim )
@@ -238,24 +238,24 @@ void guarding_assert( Character *victim )
     PCharacter *gch;
     
     if (victim->is_npc( ))
-	return;
-	
+        return;
+        
     gch = victim->getPC( )->guarded_by;
 
     if (gch && !is_same_group( victim, gch )) 
-	guarding_stop( gch, victim->getPC( ) );
+        guarding_stop( gch, victim->getPC( ) );
 }
 
 void guarding_clear( Character *ch )
 {
     if (!ch->is_npc( )) {
-	PCharacter *pch = ch->getPC( );
-	
-	if (pch->guarded_by)
-	    guarding_stop( pch->guarded_by, pch );
-	
-	if (pch->guarding)
-	    guarding_stop( pch, pch->guarding );
+        PCharacter *pch = ch->getPC( );
+        
+        if (pch->guarded_by)
+            guarding_stop( pch->guarded_by, pch );
+        
+        if (pch->guarding)
+            guarding_stop( pch, pch->guarding );
     }
 }
 
@@ -264,13 +264,13 @@ GroupMembers party_members_room( Character *ch, Room *room )
     GroupMembers members;
 
     if (!room)
-	room = ch->in_room;
+        room = ch->in_room;
 
     for (Character *gch = room->people; gch != NULL; gch = gch->next_in_room) 
-	if (!gch->is_npc( )
-	    && !IS_AFFECTED(gch, AFF_CHARM) 
-	    && is_same_group( gch, ch ))
-	    members.insert( gch );
+        if (!gch->is_npc( )
+            && !IS_AFFECTED(gch, AFF_CHARM) 
+            && is_same_group( gch, ch ))
+            members.insert( gch );
 
     return members;
 }
@@ -280,10 +280,10 @@ GroupMembers party_members_world( Character *ch )
     GroupMembers members;
 
     for (Character *gch = char_list; gch != NULL; gch = gch->next) 
-	if (!gch->is_npc( )
-	    && !IS_AFFECTED(gch, AFF_CHARM) 
-	    && is_same_group( gch, ch ))
-	    members.insert( gch );
+        if (!gch->is_npc( )
+            && !IS_AFFECTED(gch, AFF_CHARM) 
+            && is_same_group( gch, ch ))
+            members.insert( gch );
 
     return members;
 }
@@ -293,11 +293,11 @@ GroupMembers group_members_room( Character *ch, Room *room )
     GroupMembers members;
 
     if (!room)
-	room = ch->in_room;
+        room = ch->in_room;
 
     for (Character *gch = room->people; gch != NULL; gch = gch->next_in_room) 
-	if (is_same_group( gch, ch ))
-	    members.insert( gch );
+        if (is_same_group( gch, ch ))
+            members.insert( gch );
 
     return members;
 }
@@ -307,8 +307,8 @@ GroupMembers group_members_world( Character *ch )
     GroupMembers members;
 
     for (Character *gch = char_list; gch != NULL; gch = gch->next) 
-	if (is_same_group( gch, ch ))
-	    members.insert( gch );
+        if (is_same_group( gch, ch ))
+            members.insert( gch );
 
     return members;
 }

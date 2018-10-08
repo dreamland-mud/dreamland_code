@@ -12,24 +12,24 @@
 class CardStarterBehavior : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<CardStarterBehavior> Pointer;
+        typedef ::Pointer<CardStarterBehavior> Pointer;
     
-	CardStarterBehavior( );
+        CardStarterBehavior( );
 
-	virtual bool death( Character *killer );
-	
+        virtual bool death( Character *killer );
+        
 };
 
 class CardSellerBehavior : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<CardSellerBehavior> Pointer;
+        typedef ::Pointer<CardSellerBehavior> Pointer;
     
-	CardSellerBehavior( );
+        CardSellerBehavior( );
 
-	virtual void greet( Character *victim );
-	virtual void speech( Character *victim, const char *speech );
-	virtual int  getOccupation( );
+        virtual void greet( Character *victim );
+        virtual void speech( Character *victim, const char *speech );
+        virtual int  getOccupation( );
 };
 
 #endif

@@ -9,9 +9,9 @@
 #include "wearloc_codes.h"
 
 // macros for historical compat
-#define get_eq_char(ch, iWear)	    wearlocationManager->find(iWear)->find( ch )
+#define get_eq_char(ch, iWear)            wearlocationManager->find(iWear)->find( ch )
 #define equip_char(ch, obj, iWear)  (iWear)->equip( obj )
-#define unequip_char(ch, obj)	    obj->wear_loc->unequip( obj )
+#define unequip_char(ch, obj)            obj->wear_loc->unequip( obj )
 #define wear_obj(ch, obj, flags )   wearlocationManager->wear( obj, flags )
 
 // most commonly used wearlocs 

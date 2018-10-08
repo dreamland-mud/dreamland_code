@@ -23,7 +23,7 @@ DLString LifePrice::toString( Character * ) const
     
     str << (p == 0 ? "пол" : p == 1 ? "одну" : DLString( p ))
         << " "
-	<< (p == 0 ? LIFE_ONE.ruscase( '2' ) : p == 1 ? LIFE_ONE : LIFE_MANY);
+        << (p == 0 ? LIFE_ONE.ruscase( '2' ) : p == 1 ? LIFE_ONE : LIFE_MANY);
 
     return str;
 }
@@ -31,21 +31,21 @@ DLString LifePrice::toString( Character * ) const
 bool LifePrice::canAfford( Character *ch ) const
 {
     if (ch->is_npc( ))
-	return false;
+        return false;
     else
-	return ch->getPC( )->getRemorts( ).points >= points.getValue( );
+        return ch->getPC( )->getRemorts( ).points >= points.getValue( );
 }
 
 void LifePrice::induct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-	ch->getPC( )->getRemorts( ).points += points.getValue( );
+        ch->getPC( )->getRemorts( ).points += points.getValue( );
 }
 
 void LifePrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-	ch->getPC( )->getRemorts( ).points -= points.getValue( );
+        ch->getPC( )->getRemorts( ).points -= points.getValue( );
 }
 
 void LifePrice::toStream( Character *ch, ostringstream &buf ) const

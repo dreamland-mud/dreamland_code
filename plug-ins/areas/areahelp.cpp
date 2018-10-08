@@ -44,16 +44,16 @@ bool XMLAreaHelpArticle::toXML( XMLNode::Pointer &parent ) const
         return false;
     
     if (!getKeyword( ).empty( ))
-	parent->insertAttribute( ATTRIBUTE_KEYWORD, getKeyword( ) );
+        parent->insertAttribute( ATTRIBUTE_KEYWORD, getKeyword( ) );
 
     if (level >= -1)
-	parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
+        parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
     
     if (!ref.empty( ))
-	parent->insertAttribute( ATTRIBUTE_REF, ref.toString( ) );
+        parent->insertAttribute( ATTRIBUTE_REF, ref.toString( ) );
 
     if (!refby.empty( ))
-	parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
+        parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
     return true;
 }

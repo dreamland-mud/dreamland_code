@@ -28,10 +28,10 @@ public:
     void setEffectName( const WordEffect::Pointer );
     void setQuality( PCharacter * );
     inline int getQuality( ) const {
-	return quality.getValue( );
+        return quality.getValue( );
     }
     inline bool isActive( ) const {
-	return !effectName.getValue( ).empty( );
+        return !effectName.getValue( ).empty( );
     }
 
 protected:

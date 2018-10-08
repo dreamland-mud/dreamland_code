@@ -31,13 +31,13 @@
 class Descriptor;
 
 class ServerSocketContainer : 
-	    public OneAllocate, 
-	    public DLXMLTableLoader,
-	    public XMLTableLoaderPlugin
+            public OneAllocate, 
+            public DLXMLTableLoader,
+            public XMLTableLoaderPlugin
 {
     friend class ServerSocket;
 
-public:	
+public:        
     typedef ::Pointer<ServerSocketContainer> Pointer;
     typedef LoadedList::iterator iterator;
 
@@ -58,7 +58,7 @@ public:
     static void checkNewConnaection( fd_set* );
 
     static inline ServerSocketContainer* getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
 private:

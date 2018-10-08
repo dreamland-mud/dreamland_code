@@ -17,16 +17,16 @@ void Trader::doList( Character *client )
     msgListRequest( client );
 
     if (!canServeClient( client ))
-	return;
+        return;
     
     toStream( client, buf );
 
     if (buf.str( ).empty( ))
-	msgListEmpty( client );
+        msgListEmpty( client );
     else {
-	msgListBefore( client );
-	client->send_to( buf );
-	msgListAfter( client );
+        msgListBefore( client );
+        client->send_to( buf );
+        msgListAfter( client );
     }
 }
 
@@ -39,7 +39,7 @@ void Trader::doBuy( Character *client, const DLString &constArguments )
     msgBuyRequest( client );
 
     if (!canServeClient( client ))
-	return;
+        return;
 
     arguments = constArguments;
     arg = arguments.getOneArgument( );
@@ -47,16 +47,16 @@ void Trader::doBuy( Character *client, const DLString &constArguments )
     article = findArticle( client, arg );
 
     if (!article) {
-	msgArticleNotFound( client );
-	return;
+        msgArticleNotFound( client );
+        return;
     }
     
     if (!article->available( client, getKeeper( ) )) 
-	return;
+        return;
 
     if (quantity > article->getQuantity( )) {
-	msgArticleTooFew( client, article );
-	return;
+        msgArticleTooFew( client, article );
+        return;
     }
     
     article->purchase( client, getKeeper( ), arguments, quantity );
@@ -80,15 +80,15 @@ void Seller::doSell( Character *client, const DLString &constArguments )
     DLString arguments, arg;
 
     if (!canServeClient( client ))
-	return;
+        return;
     
     arguments = constArguments;
     arg = arguments.getOneArgument( );
     article = findProposal( client, arg );
 
     if (!article) {
-	msgProposalNotFound( client );
-	return;
+        msgProposalNotFound( client );
+        return;
     }
 
     article->sell( client, getKeeper( ) );
@@ -99,10 +99,10 @@ Article::Pointer Seller::findProposal( Character *client, DLString &arg )
     Article::Pointer null, article = findArticle( client, arg );
 
     if (!article)
-	return null;
+        return null;
 
     if (!article->sellable( client ))
-	return null;
+        return null;
 
     return article;
 }

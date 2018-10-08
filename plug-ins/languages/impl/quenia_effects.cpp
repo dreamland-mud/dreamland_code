@@ -31,13 +31,13 @@ GSN(frenzy);
 bool GoodSpellWE::run( PCharacter *ch, Character *victim ) const
 {
     static const int spells [] = {
-	gsn_sanctuary,
-	gsn_haste,
-	gsn_giant_strength,
-	gsn_shield,
-	gsn_bless,
-	gsn_stone_skin,
-	gsn_frenzy,
+        gsn_sanctuary,
+        gsn_haste,
+        gsn_giant_strength,
+        gsn_shield,
+        gsn_bless,
+        gsn_stone_skin,
+        gsn_frenzy,
     };
     static const int spells_size = sizeof( spells ) / sizeof( *spells );
 
@@ -46,9 +46,9 @@ bool GoodSpellWE::run( PCharacter *ch, Character *victim ) const
     act( "{CСила древнего благословления проникает в мир.{x", ch, 0, 0, TO_ALL );
 
     for (i = 0; i < spells_size; i++)
-	spell( spells[i], 
-	       number_range( ch->getModifyLevel( ) + 5, 120 ),
-	       ch, victim, FSPELL_BANE );
+        spell( spells[i], 
+               number_range( ch->getModifyLevel( ) + 5, 120 ),
+               ch, victim, FSPELL_BANE );
 
     return true;
 }

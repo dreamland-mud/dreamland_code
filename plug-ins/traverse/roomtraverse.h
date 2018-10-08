@@ -18,16 +18,16 @@
 
 struct Road {
     enum {
-	NONE,
-	DOOR,
-	EEXIT,
-	PORTAL,
+        NONE,
+        DOOR,
+        EEXIT,
+        PORTAL,
     } type;
     
     union {
-	int door;
-	EXTRA_EXIT_DATA *eexit;
-	Object *portal;
+        int door;
+        EXTRA_EXIT_DATA *eexit;
+        Object *portal;
     } value;
     
     inline Road( ) : type( NONE )
@@ -36,37 +36,37 @@ struct Road {
 
     inline Room * target( Room * const from ) const
     {
-	switch (type) {
-	default:
-	    return NULL;
-	case DOOR:
-	    return from->exit[value.door]->u1.to_room;
-	case EEXIT:
-	    return value.eexit->u1.to_room;
-	case PORTAL:
-	    return get_room_index( value.portal->value[3] );
-	}
+        switch (type) {
+        default:
+            return NULL;
+        case DOOR:
+            return from->exit[value.door]->u1.to_room;
+        case EEXIT:
+            return value.eexit->u1.to_room;
+        case PORTAL:
+            return get_room_index( value.portal->value[3] );
+        }
     }
 
     inline const DLString speedwalk( ) const
     {
-	DLString str;
-	
-	switch (type) {
-	default:
-	    return DLString( );
-	case DOOR:
-	    str.assign( dirs[value.door].name[0] );
-	    return str;
-	case EEXIT:
-	    str = value.eexit->keyword;
-	    str = str.getOneArgument( );
-	    return "walk " + str;
-	case PORTAL:
-	    str = value.portal->getName( );
-	    str = str.getOneArgument( );
-	    return "enter " + str;
-	}
+        DLString str;
+        
+        switch (type) {
+        default:
+            return DLString( );
+        case DOOR:
+            str.assign( dirs[value.door].name[0] );
+            return str;
+        case EEXIT:
+            str = value.eexit->keyword;
+            str = str.getOneArgument( );
+            return "walk " + str;
+        case PORTAL:
+            str = value.portal->getName( );
+            str = str.getOneArgument( );
+            return "enter " + str;
+        }
     }
 };
 
@@ -78,15 +78,15 @@ struct RoomTraverseTraits {
     
     inline static void mark( NodeType *const node )
     {
-	SET_BIT( node->room_flags, ROOM_MARKER );
+        SET_BIT( node->room_flags, ROOM_MARKER );
     }
     inline static void unmark( NodeType *const node )
     {
-	REMOVE_BIT( node->room_flags, ROOM_MARKER );
+        REMOVE_BIT( node->room_flags, ROOM_MARKER );
     }
     inline static bool marked( const NodeType *const node )
     {
-	return IS_SET( node->room_flags, ROOM_MARKER );
+        return IS_SET( node->room_flags, ROOM_MARKER );
     }
 };
 
@@ -94,78 +94,78 @@ template <typename DoorCondFunc, typename EExitCondFunc, typename PortalCondFunc
 struct RoomRoadsIterator 
 {
     RoomRoadsIterator( DoorCondFunc d = DoorCondFunc( ), 
-	               EExitCondFunc e = EExitCondFunc( ), 
-		       PortalCondFunc p = PortalCondFunc( ), 
-		       int s = 0 )
-	    : canGoDoor( d ), canGoEExit( e ), canGoPortal( p ), seed( s )
+                       EExitCondFunc e = EExitCondFunc( ), 
+                       PortalCondFunc p = PortalCondFunc( ), 
+                       int s = 0 )
+            : canGoDoor( d ), canGoEExit( e ), canGoPortal( p ), seed( s )
     {
     }
     
     template <typename Action>
     inline void operator () ( Room *const room, Action act ) const
     {
-	Road road;
-	int dir, i, j0, j1;
-	int shuffle[DIR_SOMEWHERE];
+        Road road;
+        int dir, i, j0, j1;
+        int shuffle[DIR_SOMEWHERE];
 
-	for (dir = 0; dir < DIR_SOMEWHERE; dir++) 
-	    shuffle[dir] = dir;
-	
-	for (i = 0; i < seed; i++) {
-	    j0 = i % DIR_SOMEWHERE;
-	    j1 = number_mm( ) % DIR_SOMEWHERE;
+        for (dir = 0; dir < DIR_SOMEWHERE; dir++) 
+            shuffle[dir] = dir;
+        
+        for (i = 0; i < seed; i++) {
+            j0 = i % DIR_SOMEWHERE;
+            j1 = number_mm( ) % DIR_SOMEWHERE;
 
-	    dir = shuffle[j0];
-	    shuffle[j0] = shuffle[j1];
-	    shuffle[j1] = dir;
-	}
+            dir = shuffle[j0];
+            shuffle[j0] = shuffle[j1];
+            shuffle[j1] = dir;
+        }
 
-	for (dir = 0; dir < DIR_SOMEWHERE; dir++) {
-	    EXIT_DATA *exit = room->exit[shuffle[dir]];
+        for (dir = 0; dir < DIR_SOMEWHERE; dir++) {
+            EXIT_DATA *exit = room->exit[shuffle[dir]];
 
-	    if (!exit || !exit->u1.to_room) 
-		continue;
+            if (!exit || !exit->u1.to_room) 
+                continue;
 
-	    if (!canGoDoor( room, exit ))
-		continue;
+            if (!canGoDoor( room, exit ))
+                continue;
 
-	    road.type = Road::DOOR;
-	    road.value.door = shuffle[dir];
+            road.type = Road::DOOR;
+            road.value.door = shuffle[dir];
 
-	    act( road );
-	}
+            act( road );
+        }
 
-	for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
-	    if (!eexit->u1.to_room)
-		continue;
+        for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
+            if (!eexit->u1.to_room)
+                continue;
 
-	    if (!canGoEExit( room, eexit ))
-		continue;
+            if (!canGoEExit( room, eexit ))
+                continue;
 
-	    road.type = Road::EEXIT;
-	    road.value.eexit = eexit;
+            road.type = Road::EEXIT;
+            road.value.eexit = eexit;
 
-	    act( road );
-	}
+            act( road );
+        }
 
-	for (Object *obj = room->contents; obj; obj = obj->next_content) {
-	    if (obj->item_type != ITEM_PORTAL)
-		continue;
-	    
-	    if (IS_SET(obj->value[2], GATE_RANDOM|GATE_BUGGY)) 
-		continue;
+        for (Object *obj = room->contents; obj; obj = obj->next_content) {
+            if (obj->item_type != ITEM_PORTAL)
+                continue;
+            
+            if (IS_SET(obj->value[2], GATE_RANDOM|GATE_BUGGY)) 
+                continue;
 
-	    if (get_room_index( obj->value[3] ) == NULL)
-		continue;
+            if (get_room_index( obj->value[3] ) == NULL)
+                continue;
 
-	    if (!canGoPortal( room, obj ))
-		continue;
+            if (!canGoPortal( room, obj ))
+                continue;
 
-	    road.type = Road::PORTAL;
-	    road.value.portal = obj;
+            road.type = Road::PORTAL;
+            road.value.portal = obj;
 
-	    act( road );
-	}
+            act( road );
+        }
     }
     
     DoorCondFunc const &canGoDoor;
@@ -181,8 +181,8 @@ void room_traverse( Room *src, HookIterator &iter,
                     RoomTraverseComplete complete, int limit )
 {
     typedef 
-	BroadTraverse<RoomTraverseTraits, 
-	              HookIterator, RoomTraverseComplete> RoomTraverse;
+        BroadTraverse<RoomTraverseTraits, 
+                      HookIterator, RoomTraverseComplete> RoomTraverse;
 
     RoomTraverse traverse( iter, complete );
     

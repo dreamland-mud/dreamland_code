@@ -22,20 +22,20 @@ void QuestEntity::mandatoryExtract( )
     Quest::Pointer quest;
     
     if (!( pcm = getHeroMemory( ) ))
-	return;
+        return;
 
     if (!( quest = getQuest( pcm ) ))
-	return;
+        return;
     
     if (quest->isComplete( ))
-	return;
+        return;
 
     if (quest->state != QSTAT_BROKEN_BY_HERO
-	&& quest->state != QSTAT_BROKEN_BY_OTHERS)
+        && quest->state != QSTAT_BROKEN_BY_OTHERS)
     {
-	quest->state = QSTAT_BROKEN_BY_OTHERS;
-	quest->setTime( pcm, quest->getAccidentTime( pcm ) );
-	quest->scheduleDestroy( );
+        quest->state = QSTAT_BROKEN_BY_OTHERS;
+        quest->setTime( pcm, quest->getAccidentTime( pcm ) );
+        quest->scheduleDestroy( );
     }
 }
 
@@ -43,7 +43,7 @@ bool QuestEntity::ourHero( Character *ch )
 {
     return ch != NULL
            && !ch->is_npc( ) 
-	   && heroName == ch->getName( );
+           && heroName == ch->getName( );
 }
 
 bool QuestEntity::ourMobile( NPCharacter *mob )
@@ -51,9 +51,9 @@ bool QuestEntity::ourMobile( NPCharacter *mob )
     QuestEntity::Pointer entity;
     
     return mob 
-	   && mob->behavior
+           && mob->behavior
            && ( entity = mob->behavior.getDynamicPointer<QuestEntity>( ) )
-	   && entity->getHeroName( ) == getHeroName( );
+           && entity->getHeroName( ) == getHeroName( );
 }
 
 bool QuestEntity::ourObject( Object *obj )
@@ -62,7 +62,7 @@ bool QuestEntity::ourObject( Object *obj )
     
     return obj->behavior
            && ( entity = obj->behavior.getDynamicPointer<QuestEntity>( ) )
-	   && entity->getHeroName( ) == getHeroName( );
+           && entity->getHeroName( ) == getHeroName( );
 }
 
 PCMemoryInterface * QuestEntity::getHeroMemory( )
@@ -80,13 +80,13 @@ Quest::Pointer QuestEntity::getQuest( PCMemoryInterface *hero )
     Quest::Pointer quest, null;
     
     if (!hero)
-	return null;
+        return null;
 
     if (!( quest = hero->getAttributes( ).findAttr<Quest>( "quest" ) ))
-	return null;
+        return null;
 
     if (quest->charName != heroName)
-	return null;
+        return null;
 
     return quest;
 }
@@ -96,11 +96,11 @@ PCharacter * QuestEntity::getHeroWorld( )
     PCMemoryInterface *pcm = getHeroMemory( );
     
     if (pcm 
-	&& pcm->isOnline( ) 
-	&& pcm->getPlayer( )->desc
-	&& pcm->getPlayer( )->desc->connected == CON_PLAYING)
+        && pcm->isOnline( ) 
+        && pcm->getPlayer( )->desc
+        && pcm->getPlayer( )->desc->connected == CON_PLAYING)
     {
-	return pcm->getPlayer( );
+        return pcm->getPlayer( );
     }
 
     return NULL;

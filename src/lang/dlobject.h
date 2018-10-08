@@ -26,47 +26,47 @@
 
 class DLObject  {
 public:
-	typedef ::Pointer<DLObject> Pointer;
+        typedef ::Pointer<DLObject> Pointer;
 
 public:
-	inline DLObject( ) : linkCount( 0 )
-	{
-	}
+        inline DLObject( ) : linkCount( 0 )
+        {
+        }
 
-	/** В идеале private */
-	virtual ~DLObject( );
-	
-	inline void link( ) const
-	{
-		linkCount++;
-	}
+        /** В идеале private */
+        virtual ~DLObject( );
+        
+        inline void link( ) const
+        {
+                linkCount++;
+        }
 
-	inline void unlink( ) const
-	{
-		if( linkCount <= 1 )
-		{
-			delete this;
-		}
-		else
-		{
-			linkCount--;
-		}
-	}
-	
+        inline void unlink( ) const
+        {
+                if( linkCount <= 1 )
+                {
+                        delete this;
+                }
+                else
+                {
+                        linkCount--;
+                }
+        }
+        
 public:
-	inline int getLinkCount( ) const
-	{
-		return linkCount;
-	}
+        inline int getLinkCount( ) const
+        {
+                return linkCount;
+        }
 
-	// Только для Pointer!!!
-	inline void setLinkCount( int linkCount )
-	{
-		this->linkCount = linkCount;
-	}
+        // Только для Pointer!!!
+        inline void setLinkCount( int linkCount )
+        {
+                this->linkCount = linkCount;
+        }
 
 private:
-	mutable int linkCount;
+        mutable int linkCount;
 };
 
 

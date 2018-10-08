@@ -10,10 +10,10 @@
 class Room;
 
 class RoomBehaviorManager {
-public:	
-	static void parse( Room *, FILE * );
-	static void save( const Room *, FILE * );
-	static void setAll( );
+public:        
+        static void parse( Room *, FILE * );
+        static void save( const Room *, FILE * );
+        static void setAll( );
 };
 
 #endif

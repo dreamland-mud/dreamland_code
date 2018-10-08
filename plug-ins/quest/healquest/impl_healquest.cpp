@@ -13,14 +13,14 @@
 
 extern "C"
 {
-	SO::PluginList initialize_quest_heal( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<MobileBehaviorRegistrator<PatientBehavior> >( ppl );
-		Plugin::registerPlugin<MocRegistrator<HealScenario> >( ppl );
-		Plugin::registerPlugin<HealQuestRegistrator>( ppl );
-		
-		return ppl;
-	}
+        SO::PluginList initialize_quest_heal( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<MobileBehaviorRegistrator<PatientBehavior> >( ppl );
+                Plugin::registerPlugin<MocRegistrator<HealScenario> >( ppl );
+                Plugin::registerPlugin<HealQuestRegistrator>( ppl );
+                
+                return ppl;
+        }
 }

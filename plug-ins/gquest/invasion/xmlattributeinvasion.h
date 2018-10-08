@@ -12,17 +12,17 @@ class XMLAttributeInvasion : public XMLAttributeGlobalQuest {
 XML_OBJECT
 public: 
         typedef ::Pointer<XMLAttributeInvasion> Pointer;
-	
-	XMLAttributeInvasion( );
+        
+        XMLAttributeInvasion( );
 
-	int getKilled( ) const;
-	void setKilled( int );
-	bool isPunished( ) const;
-	void punish( );
+        int getKilled( ) const;
+        void setKilled( int );
+        bool isPunished( ) const;
+        void punish( );
 
-private:	
-	XML_VARIABLE XMLInteger killed;
-	XML_VARIABLE XMLBoolean punished;
+private:        
+        XML_VARIABLE XMLInteger killed;
+        XML_VARIABLE XMLBoolean punished;
 };
 
 

@@ -37,7 +37,7 @@
 CLAN(flowers);
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 
-const	short	CONVERT_PRACTICE_QP = 3;
+const        short        CONVERT_PRACTICE_QP = 3;
 
 CMDRUN( remort )
 {
@@ -51,43 +51,43 @@ CMDRUN( remort )
     pch = ch->getPC( );
 
     if (!pch || !( d = pch->desc )) 
-	return;
+        return;
     
     /*
      * can remort?
      */
     if (pch->age.getTrueYears( ) < 25) {
-	pch->pecho("Ты слишком моло%1$Gдо|д|да, чтобы умирать.", pch);
-	return;
+        pch->pecho("Ты слишком моло%1$Gдо|д|да, чтобы умирать.", pch);
+        return;
     }
     
     if (IS_SET(pch->comm, COMM_NOTELL|COMM_NOEMOTE) 
-	|| pch->in_room->vnum == ROOM_VNUM_JAIL 
-	|| pch->in_room->vnum == 10 
-	|| pch->curse < 100)
+        || pch->in_room->vnum == ROOM_VNUM_JAIL 
+        || pch->in_room->vnum == 10 
+        || pch->curse < 100)
     {
-	pch->pecho("Ты еще не искупи%1$Gло|л|ла провинности ЭТОЙ жизни.", pch);
-	return;
+        pch->pecho("Ты еще не искупи%1$Gло|л|ла провинности ЭТОЙ жизни.", pch);
+        return;
     }
     
     if (argument.empty( )) {
-	pch->println("Если хочешь начать новую жизнь, набери remort <password>");
-	return;
+        pch->println("Если хочешь начать новую жизнь, набери remort <password>");
+        return;
     }
     
     if (!password_check( pch, argument )) {
-	pch->println("Неверный пароль.");
-	return;
+        pch->println("Неверный пароль.");
+        return;
     }
 
     if (auction->item && ((pch == auction->buyer) || (pch == auction->seller))) {
-	pch->println("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
-	return;
+        pch->println("Подожди пока вещь, выставленная на аукцион, будет продана или возвращена.");
+        return;
     }
 
     if (!PCharacterManager::pfRemort(pch)) {
-	pch->println("Не удалось сохранить твой профайл: сообщи Богам!");
-	return;
+        pch->println("Не удалось сохранить твой профайл: сообщи Богам!");
+        return;
     }
     
     new_ch = PCharacterManager::getPCharacter( );
@@ -103,11 +103,11 @@ CMDRUN( remort )
     new_ch->act = PLR_COLOR;
 
     if (pch->getClan( ) != clan_flowers) {
-	new_ch->questpoints = pch->questpoints +
-		              pch->practice * CONVERT_PRACTICE_QP +
-		              pch->train * CONVERT_PRACTICE_QP * 10;
-	new_ch->bank_s = pch->bank_s;
-	new_ch->bank_g = pch->bank_g;
+        new_ch->questpoints = pch->questpoints +
+                              pch->practice * CONVERT_PRACTICE_QP +
+                              pch->train * CONVERT_PRACTICE_QP * 10;
+        new_ch->bank_s = pch->bank_s;
+        new_ch->bank_g = pch->bank_g;
     }
     
     /* remember this life and reset remort bonuses */

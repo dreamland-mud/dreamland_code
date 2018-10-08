@@ -23,28 +23,28 @@ extern "C" {
     
     SO::PluginList initialize_iomanager( ) 
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
 #ifdef __MINGW32__
-	WSADATA wsaData;
-	WSAStartup(MAKEWORD(1,1), &wsaData); /*is this a right place? ;)*/
+        WSADATA wsaData;
+        WSAStartup(MAKEWORD(1,1), &wsaData); /*is this a right place? ;)*/
 #endif  
 
-	Plugin::registerPlugin<InputHandlerRegistrator<InterpretHandler> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<WrapperHandler> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<NannyHandler> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<PagerHandler> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<BackdoorHandler> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ServerSocket> >( ppl );
-	Plugin::registerPlugin<ServerSocketContainer>( ppl );
-	Plugin::registerPlugin<DefaultBufferHandlerPlugin>( ppl );
-	Plugin::registerPlugin<IOManager>( ppl );
-	Plugin::registerPlugin<DescriptorStateManager>( ppl );
-	Plugin::registerPlugin<WebPromptManager>( ppl );
-	Plugin::registerPlugin<WebManipManager>( ppl );
-	Plugin::registerPlugin<BadNames>( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<InputHandlerRegistrator<InterpretHandler> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<WrapperHandler> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<NannyHandler> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<PagerHandler> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<BackdoorHandler> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ServerSocket> >( ppl );
+        Plugin::registerPlugin<ServerSocketContainer>( ppl );
+        Plugin::registerPlugin<DefaultBufferHandlerPlugin>( ppl );
+        Plugin::registerPlugin<IOManager>( ppl );
+        Plugin::registerPlugin<DescriptorStateManager>( ppl );
+        Plugin::registerPlugin<WebPromptManager>( ppl );
+        Plugin::registerPlugin<WebManipManager>( ppl );
+        Plugin::registerPlugin<BadNames>( ppl );
+        
+        return ppl;
     }
 }
 

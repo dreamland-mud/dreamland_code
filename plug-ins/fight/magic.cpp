@@ -13,14 +13,14 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *
- *	 Ibrahim Canpunar  {Asena}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *	
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *        
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *
+ *         Ibrahim Canpunar  {Asena}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 /***************************************************************************
  *  Original Diku Mud copyright (C) 1990, 1991 by Sebastian Hammer,        *
@@ -40,13 +40,13 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1995 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@pacinfo.com)				   *
-*	    Gabrielle Taylor (gtaylor@pacinfo.com)			   *
-*	    Brian Moore (rom@rom.efn.org)				   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*        ROM 2.4 is copyright 1993-1995 Russ Taylor                           *
+*        ROM has been brought to you by the ROM consortium                   *
+*            Russ Taylor (rtaylor@pacinfo.com)                                   *
+*            Gabrielle Taylor (gtaylor@pacinfo.com)                           *
+*            Brian Moore (rom@rom.efn.org)                                   *
+*        By using this code, you have agreed to follow the terms of the           *
+*        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
 #include "logstream.h"
@@ -93,37 +93,37 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
     int mlevel = victim->getModifyLevel( );
 
     save = 40 + (mlevel - level) * 4 -
-	(victim->saving_throw * 90) / max( 45, mlevel );
+        (victim->saving_throw * 90) / max( 45, mlevel );
 
     if (IS_AFFECTED(victim,AFF_BERSERK))
-	save += mlevel / 5;
+        save += mlevel / 5;
     
     switch(immune_check(victim, dam_type, dam_flag)) {
-    case RESIST_IMMUNE:		return true;
-    case RESIST_RESISTANT:	save += mlevel / 5; break;
-    case RESIST_VULNERABLE:	save -= mlevel / 5; break;
+    case RESIST_IMMUNE:                return true;
+    case RESIST_RESISTANT:        save += mlevel / 5; break;
+    case RESIST_VULNERABLE:        save -= mlevel / 5; break;
     }
     
     if (ch && IS_GOOD(ch) && IS_EVIL(victim))
-	if (number_percent( ) < gsn_holy_craft->getEffective( ch )) {
-	    save -= mlevel / 5;
-	    gsn_holy_craft->improve( ch, true );
-	}
+        if (number_percent( ) < gsn_holy_craft->getEffective( ch )) {
+            save -= mlevel / 5;
+            gsn_holy_craft->improve( ch, true );
+        }
 
     if (dam_type == DAM_CHARM) {
-	int cha_vict = victim->getCurrStat(STAT_CHA);
-	int cha_diff = ch ? ch->getCurrStat(STAT_CHA) - cha_vict : 0;
-	
-	save -= cha_diff * 2;
+        int cha_vict = victim->getCurrStat(STAT_CHA);
+        int cha_diff = ch ? ch->getCurrStat(STAT_CHA) - cha_vict : 0;
+        
+        save -= cha_diff * 2;
 
-	if (!victim->is_npc( ) && cha_vict < 18)
-	    save -= mlevel / 5;
+        if (!victim->is_npc( ) && cha_vict < 18)
+            save -= mlevel / 5;
     }
     
     if (ch)
-	for (Affect *paf = ch->affected; paf; paf = paf->next)
-	    if (paf->type->getAffect( ))
-		paf->type->getAffect( )->saves( ch, victim, save, dam_type, paf );
+        for (Affect *paf = ch->affected; paf; paf = paf->next)
+            if (paf->type->getAffect( ))
+                paf->type->getAffect( )->saves( ch, victim, save, dam_type, paf );
 
     save = URANGE( 5, save, 95 );
     return number_percent( ) < save;
@@ -132,11 +132,11 @@ bool saves_spell( short level, Character *victim, int dam_type, Character *ch, b
 void attack_caster( Character *caster, Character *victim )
 {
     if (victim && victim != caster && victim->master != caster) 
-	if (victim->in_room == caster->in_room && victim->fighting == 0
-	    && victim->position > POS_SLEEPING && !victim->isDead( ))
-	{
-	    multi_hit( victim, caster );
-	}
+        if (victim->in_room == caster->in_room && victim->fighting == 0
+            && victim->position > POS_SLEEPING && !victim->isDead( ))
+        {
+            multi_hit( victim, caster );
+        }
 }
 
 void area_message( Character *ch, const DLString &msg, bool everywhere )
@@ -144,19 +144,19 @@ void area_message( Character *ch, const DLString &msg, bool everywhere )
     Character *wch;
 
     for (wch = char_list; wch; wch = wch->next) {
-	if (wch == ch)
-	    continue;
-	
-	if (wch->in_room->area != ch->in_room->area)
-	    continue;
+        if (wch == ch)
+            continue;
+        
+        if (wch->in_room->area != ch->in_room->area)
+            continue;
 
-	if (!IS_AWAKE(wch))
-	    continue;
-	    
-	if (!everywhere && !IS_OUTSIDE(wch))
-	    continue;
-	
-	wch->println( msg );
+        if (!IS_AWAKE(wch))
+            continue;
+            
+        if (!everywhere && !IS_OUTSIDE(wch))
+            continue;
+        
+        wch->println( msg );
     }
 }
 
@@ -169,44 +169,44 @@ bool spell( int sn, int level, Character *ch, SpellTarget::Pointer target, int f
     Skill *skill;
 
     if (!target)
-	return false;
+        return false;
     
     if (!( skill = SkillManager::getThis( )->find( sn ) ))
-	return false;
+        return false;
 
     if (!( spell = skill->getSpell( ) ))
-	return false;
+        return false;
     
     if (IS_SET(flags, FSPELL_OBSTACLES)) {
-	if ((ch->isAffected( gsn_garble ) || ch->isAffected( gsn_deafen )) && chance( 50 ))
-	    return false;
-	
-	if (ch->isAffected( gsn_shielding ) && chance( 50 ))
-	    return false;
+        if ((ch->isAffected( gsn_garble ) || ch->isAffected( gsn_deafen )) && chance( 50 ))
+            return false;
+        
+        if (ch->isAffected( gsn_shielding ) && chance( 50 ))
+            return false;
 
-	if (target->type == SpellTarget::CHAR
-	     && target->victim->in_room != ch->in_room
-	     && !ch->can_see( target->victim ))
-	    return false;
+        if (target->type == SpellTarget::CHAR
+             && target->victim->in_room != ch->in_room
+             && !ch->can_see( target->victim ))
+            return false;
     }
     
     if (IS_SET(flags, FSPELL_MANA)) {
-	int mana = spell->getManaCost( ch ) / 2;
+        int mana = spell->getManaCost( ch ) / 2;
 
-	if (ch->mana < mana)
-	    return false;
-	else
-	    ch->mana -= mana;
+        if (ch->mana < mana)
+            return false;
+        else
+            ch->mana -= mana;
     }
 
     if (IS_SET(flags, FSPELL_VERBOSE))
-	spell->utter( ch );
+        spell->utter( ch );
 
     if (IS_SET(flags, FSPELL_WAIT)) 
-	ch->setWait( spell->getBeats( ) );
+        ch->setWait( spell->getBeats( ) );
 
     if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim ))
-	return false;
+        return false;
     
     spell->run( ch, target, level );
     return true;
@@ -236,52 +236,52 @@ bool spell( int sn, int level, Character *ch, char *arg )
 void spell_by_item( Character *ch, Object *obj )
 {
     for (int i = 1; i <= 4; i++) {
-	Skill *skill;
-	Spell::Pointer spell;
-	SpellTarget::Pointer result( NEW );
-	int target;
+        Skill *skill;
+        Spell::Pointer spell;
+        SpellTarget::Pointer result( NEW );
+        int target;
 
-	skill = SkillManager::getThis( )->find( obj->value[i] );
+        skill = SkillManager::getThis( )->find( obj->value[i] );
 
-	if (!skill)
-	    continue;
+        if (!skill)
+            continue;
 
-	spell = skill->getSpell( );
-	
-	if (!spell) {
-	    LogStream::sendError( ) << "obj [" << obj->pIndexData->vnum << "] has bad spell #" << i << endl;
-	    continue;
-	}
-	
-	target = spell->getTarget( );
+        spell = skill->getSpell( );
+        
+        if (!spell) {
+            LogStream::sendError( ) << "obj [" << obj->pIndexData->vnum << "] has bad spell #" << i << endl;
+            continue;
+        }
+        
+        target = spell->getTarget( );
 
-	if (IS_SET(target, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB)) {
-	    result->type = SpellTarget::NONE;
-	    result->arg = "";
-	}
-	else if (IS_SET(target, TAR_ROOM|TAR_PEOPLE)) {
-	    result->type = SpellTarget::ROOM;
-	    result->room = ch->in_room;
-	}
-	else if (IS_SET(target, TAR_CHAR_SELF)) {
-	    result->type = SpellTarget::CHAR;
-	    result->victim = ch;
-	}
-	else if (IS_SET(target, TAR_CHAR_ROOM)) {
-	    result->type = SpellTarget::CHAR;
+        if (IS_SET(target, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB)) {
+            result->type = SpellTarget::NONE;
+            result->arg = "";
+        }
+        else if (IS_SET(target, TAR_ROOM|TAR_PEOPLE)) {
+            result->type = SpellTarget::ROOM;
+            result->room = ch->in_room;
+        }
+        else if (IS_SET(target, TAR_CHAR_SELF)) {
+            result->type = SpellTarget::CHAR;
+            result->victim = ch;
+        }
+        else if (IS_SET(target, TAR_CHAR_ROOM)) {
+            result->type = SpellTarget::CHAR;
 
-	    if (spell->getSpellType( ) == SPELL_OFFENSIVE && ch->fighting)
-		result->victim = ch->fighting;
-	    else
-		result->victim = ch;
-	}
-	else {
-	    LogStream::sendError( ) << "obj [" << obj->pIndexData->vnum << "] has bad spell target #" << i << endl;
-	    continue;
-	}
-	
-	if (!spell->spellbane( ch, result->victim ))
-	    spell->run( ch, result, obj->value[0] );
+            if (spell->getSpellType( ) == SPELL_OFFENSIVE && ch->fighting)
+                result->victim = ch->fighting;
+            else
+                result->victim = ch;
+        }
+        else {
+            LogStream::sendError( ) << "obj [" << obj->pIndexData->vnum << "] has bad spell target #" << i << endl;
+            continue;
+        }
+        
+        if (!spell->spellbane( ch, result->victim ))
+            spell->run( ch, result, obj->value[0] );
     }
 }
 
@@ -303,23 +303,23 @@ bool checkDispel( int dis_level, Character *victim, int sn)
     Affect *af;
 
     for (af = victim->affected; af != 0; af = af->next) {
-	if (af->type != sn) 
-	    continue;
+        if (af->type != sn) 
+            continue;
 
-	if (!savesDispel(dis_level,af->level,af->duration)) {
-	    AffectHandler::Pointer handler = skillManager->find( sn )->getAffect( );
-	    
-	    affect_strip(victim,sn);
-	    
-	    if (handler) {
-		handler->remove( victim );
-		handler->dispel( victim );
-	    }
+        if (!savesDispel(dis_level,af->level,af->duration)) {
+            AffectHandler::Pointer handler = skillManager->find( sn )->getAffect( );
+            
+            affect_strip(victim,sn);
+            
+            if (handler) {
+                handler->remove( victim );
+                handler->dispel( victim );
+            }
 
-	    return true;
-	}
-	else
-	    af->level--;
+            return true;
+        }
+        else
+            af->level--;
     }
 
     return false;
@@ -328,25 +328,25 @@ bool checkDispel( int dis_level, Character *victim, int sn)
 bool is_safe_spell(Character *ch, Character *victim, bool area )
 {
     if (ch == victim && !area)
-	return true;
+        return true;
 
     if (victim->is_immortal() &&  area)
-	return true;
+        return true;
 
     if (is_same_group(ch,victim) && area)
-	return true;
+        return true;
 
     if (ch == victim && area && ch->in_room->sector_type == SECT_INSIDE)
-	return true;
+        return true;
 
     if ((RIDDEN(ch) == victim || MOUNTED(ch) == victim) && area)
-	return true;
+        return true;
 
     return is_safe(ch,victim);
 }
 
 
-bool overcharmed( Character *ch )	
+bool overcharmed( Character *ch )        
 {
     Character *gch;
     int count, max_charm;
@@ -357,13 +357,13 @@ bool overcharmed( Character *ch )
     count = 0;
 
     for (gch = char_list; gch != 0; gch = gch->next) {
-	if (IS_AFFECTED(gch,AFF_CHARM) && gch->master == ch)
-	    count++;
+        if (IS_AFFECTED(gch,AFF_CHARM) && gch->master == ch)
+            count++;
     }
 
     if (count >= max_charm) {
-	ch->send_to("Ты не в состоянии контролировать кого-нибудь еще!\n\r");
-	return true;
+        ch->send_to("Ты не в состоянии контролировать кого-нибудь еще!\n\r");
+        return true;
     }
 
     return false;

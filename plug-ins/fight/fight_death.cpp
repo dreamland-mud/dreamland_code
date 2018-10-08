@@ -5,12 +5,12 @@
 /***************************************************************************
  * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
  * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
- *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
- *    Koval Nazar	    {Nazar, Redrum}                 		   *
- *    Doropey Vladimir	    {Reorx}		                           *
- *    Kulgeyko Denis	    {Burzum}		                           *
- *    Andreyanov Aleksandr  {Manwe}		                           *
- *    и все остальные, кто советовал и играл в этот MUD	                   *
+ *    Igor S. Petrenko            {NoFate, Demogorgon}                           *
+ *    Koval Nazar            {Nazar, Redrum}                                    *
+ *    Doropey Vladimir            {Reorx}                                           *
+ *    Kulgeyko Denis            {Burzum}                                           *
+ *    Andreyanov Aleksandr  {Manwe}                                           *
+ *    и все остальные, кто советовал и играл в этот MUD                           *
  ***************************************************************************/
 
 #include "so.h"
@@ -56,56 +56,56 @@ enum {
 static void loot_transform( Object *obj, Character *ch )
 {
     if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH))
-	obj->timer = number_range( 5, 10 );
+        obj->timer = number_range( 5, 10 );
 
     REMOVE_BIT(obj->extra_flags, ITEM_VIS_DEATH);
     REMOVE_BIT(obj->extra_flags, ITEM_ROT_DEATH);
 
     switch (obj->item_type) {
     case ITEM_POTION:
-	obj->timer = number_range( 500, 1000 );
-	break;
+        obj->timer = number_range( 500, 1000 );
+        break;
     case ITEM_SCROLL:
-	obj->timer = number_range( 1000, 2500 );
-	break;
+        obj->timer = number_range( 1000, 2500 );
+        break;
     case ITEM_WEAPON:
-	if (ch->is_npc( ))
-	    obj->condition = number_range( 30, 80 );
-	break;
+        if (ch->is_npc( ))
+            obj->condition = number_range( 30, 80 );
+        break;
     case ITEM_ARMOR:
-	if (ch->is_npc( ))
-	    obj->condition = number_range( 10, 70 );
-	break;
+        if (ch->is_npc( ))
+            obj->condition = number_range( 10, 70 );
+        break;
     case ITEM_FOOD:
-	if (ch->is_npc( ))
-	    obj->condition = number_range( 10, 50 );
-	break;
+        if (ch->is_npc( ))
+            obj->condition = number_range( 10, 50 );
+        break;
     }
 }
 
 static int loot_position( Object *obj, Character *ch, int flags = 0 )
 {
     if (obj->wear_loc == wear_tattoo) 
-	return LOOT_WEAR;
+        return LOOT_WEAR;
 
     if (IS_SET( obj->extra_flags, ITEM_INVENTORY )) 
-	return LOOT_DESTROY;
+        return LOOT_DESTROY;
    
     if (obj->pIndexData->limit != -1 && obj->pIndexData->count > obj->pIndexData->limit) 
-	return LOOT_DESTROY;
+        return LOOT_DESTROY;
     
     if (IS_SET(flags, FLOOT_PURGE)) {
-	if (IS_SET(obj->extra_flags, ITEM_NOPURGE) 
-	    || IS_SET(obj->pIndexData->extra_flags, ITEM_NOPURGE))
-	    return LOOT_DROP;
+        if (IS_SET(obj->extra_flags, ITEM_NOPURGE) 
+            || IS_SET(obj->pIndexData->extra_flags, ITEM_NOPURGE))
+            return LOOT_DROP;
 
-	return LOOT_DESTROY;
+        return LOOT_DESTROY;
     }
     else {
-	if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "fullloot" ))
-	    return LOOT_DROP;
-	
-	return LOOT_KEEP;
+        if (!ch->is_npc( ) && ch->getPC( )->getAttributes( ).isAvailable( "fullloot" ))
+            return LOOT_DROP;
+        
+        return LOOT_KEEP;
     }
 }
 
@@ -115,19 +115,19 @@ static Object * corpse_create( Character *ch )
     DLString name;
 
     if (ch->is_npc( ) && IS_SET( ch->form, FORM_INSTANT_DECAY|FORM_INTANGIBLE ))
-	return NULL;
+        return NULL;
     
     name = ch->getNameP( '2' );
     corpse = create_object(
-		    get_obj_index(
-			ch->is_npc( ) ? OBJ_VNUM_CORPSE_NPC : OBJ_VNUM_CORPSE_PC), 0);
+                    get_obj_index(
+                        ch->is_npc( ) ? OBJ_VNUM_CORPSE_NPC : OBJ_VNUM_CORPSE_PC), 0);
 
     if (ch->is_npc( )) {
-	corpse->timer = number_range( 3, 6 );
+        corpse->timer = number_range( 3, 6 );
     }
     else {
-	corpse->timer = number_range( 20, 25 );
-	corpse->setOwner( ch->getNameP( ) );
+        corpse->timer = number_range( 20, 25 );
+        corpse->setOwner( ch->getNameP( ) );
     }
 
     corpse->from = str_dup( name.c_str( ) );
@@ -137,7 +137,7 @@ static Object * corpse_create( Character *ch )
     corpse->fmtDescription( corpse->getDescription( ), name.c_str( ) ); 
 
     if (IS_SET(ch->form, FORM_EDIBLE))
-	corpse->value[0] = (1 << ch->size) - 1;
+        corpse->value[0] = (1 << ch->size) - 1;
 
     corpse->value[1] = ch->getModifyLevel( );
     corpse->value[2] = ch->parts;
@@ -153,21 +153,21 @@ static Object * corpse_create( Character *ch )
 static void corpse_looting( Object *corpse, Character *ch, Character *killer )
 {
     if (!corpse)
-	return;
+        return;
 
     if (!killer)
-	return;
-	
+        return;
+        
     if (ch->is_npc( ))
-	return;
+        return;
 
     if (IS_SET(ch->act, PLR_WANTED)) {
-	corpse->killer = str_dup( "!anybody!" );
-	corpse->count = ch->carry_number / 2;
+        corpse->killer = str_dup( "!anybody!" );
+        corpse->count = ch->carry_number / 2;
     }
     else {
-	corpse->killer = str_dup( killer->getNameP( ) );
-	corpse->count = MAX_OBJ_LOOT_KILLER;
+        corpse->killer = str_dup( killer->getNameP( ) );
+        corpse->count = MAX_OBJ_LOOT_KILLER;
     }
 }
 
@@ -176,14 +176,14 @@ static void corpse_money( Object *corpse, Character *ch )
     Object *money;
     
     if (ch->gold <= 0 && ch->silver <= 0)
-	return;
+        return;
     
     money = create_money( ch->gold, ch->silver );
 
     if (corpse)
-	obj_to_obj( money, corpse );
+        obj_to_obj( money, corpse );
     else
-	obj_to_room( money, ch->in_room );
+        obj_to_room( money, ch->in_room );
 
     ch->gold = 0;
     ch->silver = 0;
@@ -194,13 +194,13 @@ static void corpse_place( Object *corpse, Character *ch )
     Room *corpse_room = 0;
     
     if (!corpse)
-	return;
+        return;
 
     if (!ch->is_npc( ) && ch->getModifyLevel( ) < PK_MIN_LEVEL) 
-	corpse_room = get_room_index( ch->getPC()->getHometown( )->getAltar( ) );
+        corpse_room = get_room_index( ch->getPC()->getHometown( )->getAltar( ) );
     
     if (!corpse_room)
-	corpse_room = ch->in_room;
+        corpse_room = ch->in_room;
 
     obj_to_room( corpse, corpse_room );
 }
@@ -211,42 +211,42 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
     Wearlocation *wearloc;
 
     for (obj = ch->carrying; obj; obj = obj_next) {
-	obj_next = obj->next_content;
-	
-	switch (loot_position( obj, ch, flags )) {
-	case LOOT_DESTROY:
-	    extract_obj( obj );
-	    continue;
+        obj_next = obj->next_content;
+        
+        switch (loot_position( obj, ch, flags )) {
+        case LOOT_DESTROY:
+            extract_obj( obj );
+            continue;
 
-	case LOOT_DROP:
-	    obj_from_char( obj );
-	    obj_to_room( obj, ch->in_room );
-	    break;
+        case LOOT_DROP:
+            obj_from_char( obj );
+            obj_to_room( obj, ch->in_room );
+            break;
 
-	case LOOT_KEEP:
-	    obj_from_char( obj );
+        case LOOT_KEEP:
+            obj_from_char( obj );
 
-	    if (corpse)
-		obj_to_obj( obj, corpse );
-	    else 
-		obj_to_room( obj, ch->in_room );
-	    break;
+            if (corpse)
+                obj_to_obj( obj, corpse );
+            else 
+                obj_to_room( obj, ch->in_room );
+            break;
 
-	case LOOT_WEAR:
-	    wearloc = &*obj->wear_loc;
-	    wearloc->unequip( obj );
-	    obj->wear_loc.assign( wearloc );
-	    break;
-	}
+        case LOOT_WEAR:
+            wearloc = &*obj->wear_loc;
+            wearloc->unequip( obj );
+            obj->wear_loc.assign( wearloc );
+            break;
+        }
 
-	loot_transform( obj, ch );
+        loot_transform( obj, ch );
     }
 }    
 
 static void corpse_reequip( Character *victim )
 {
     for (Object *obj = victim->carrying; obj; obj = obj->next_content)
-	obj->wear_loc->equip( obj );
+        obj->wear_loc->equip( obj );
 }
 
 /*  
@@ -276,7 +276,7 @@ void make_corpse( Character *killer, Character *ch )
     Object *corpse;
     
     if (ch->is_mirror( ))
-	return;
+        return;
     
     dreamland->removeOption( DL_SAVE_OBJS );
     dreamland->removeOption( DL_SAVE_MOBS );
@@ -295,7 +295,7 @@ void make_corpse( Character *killer, Character *ch )
     save_mobs( ch->in_room );
 
     if (corpse && corpse->in_room != ch->in_room)
-	save_items( corpse->in_room );
+        save_items( corpse->in_room );
 }
 
 Object * bodypart_create( int vnum, Character *ch, Object *corpse )
@@ -307,32 +307,32 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     Room *body_room;
     
     if (ch) {
-	body_name = ch->getNameP( '2' );
-	body_form = ch->form;
-	body_level = ch->getModifyLevel( );
-	body_room = ch->in_room;
-	body_vnum = ch->is_npc( ) ? ch->getNPC( )->pIndexData->vnum : 0;
+        body_name = ch->getNameP( '2' );
+        body_form = ch->form;
+        body_level = ch->getModifyLevel( );
+        body_room = ch->in_room;
+        body_vnum = ch->is_npc( ) ? ch->getNPC( )->pIndexData->vnum : 0;
     }
     else if (corpse) {
-	body_name = corpse->getShortDescr( '1' ).replaces( "труп (corpse) ", "" );
-	if (body_name.size( ) == corpse->getShortDescr( '1' ).size( ))
-	    body_name = "";
-	
-	if (corpse->value[3]) {
-	    MOB_INDEX_DATA *pBodyOwner;
-	    if (( pBodyOwner = get_mob_index( corpse->value[3] ) ))
-		body_form = pBodyOwner->form;
-	}
+        body_name = corpse->getShortDescr( '1' ).replaces( "труп (corpse) ", "" );
+        if (body_name.size( ) == corpse->getShortDescr( '1' ).size( ))
+            body_name = "";
+        
+        if (corpse->value[3]) {
+            MOB_INDEX_DATA *pBodyOwner;
+            if (( pBodyOwner = get_mob_index( corpse->value[3] ) ))
+                body_form = pBodyOwner->form;
+        }
 
-	body_level = corpse->value[1];
-	body_room = corpse->getRoom( );
-	body_vnum = corpse->value[3];
+        body_level = corpse->value[1];
+        body_room = corpse->getRoom( );
+        body_vnum = corpse->value[3];
     }
     else {
-	body_room = get_room_index( ROOM_VNUM_LIMBO );
+        body_room = get_room_index( ROOM_VNUM_LIMBO );
     }
 
-    obj	= create_object( get_obj_index( vnum ), 0 );
+    obj        = create_object( get_obj_index( vnum ), 0 );
     obj->timer = number_range( 4, 7 );
     
     obj->fmtShortDescr( obj->getShortDescr( ), body_name.c_str( ) );
@@ -341,10 +341,10 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
     obj->level = body_level;
 
     if (obj->item_type == ITEM_FOOD) {
-	if (IS_SET(body_form, FORM_POISON))
-	    obj->value[3] = 1;
-	else if (!IS_SET(body_form, FORM_EDIBLE))
-	    obj->item_type = ITEM_TRASH;
+        if (IS_SET(body_form, FORM_POISON))
+            obj->value[3] = 1;
+        else if (!IS_SET(body_form, FORM_EDIBLE))
+            obj->item_type = ITEM_TRASH;
     }
     
     obj->value[4] = body_vnum;
@@ -363,7 +363,7 @@ void death_cry( Character *ch, int part )
     Bitstring bodyparts( ch->parts );
 
     if (ch->is_mirror( ))
-	return;
+        return;
 
     vnum = 0;
     msg = "Ты слышишь предсмертный крик $c2.";
@@ -373,67 +373,67 @@ void death_cry( Character *ch, int part )
 
     switch (part)
     {
-    case  0: msg  = "$c1 падает на землю ... и {RУМИРАЕТ{x.";	    
-	     break;
+    case  0: msg  = "$c1 падает на землю ... и {RУМИРАЕТ{x.";            
+             break;
     case  1:
-	if (ch->material == 0)
-	{
-	    msg  = "Кровь $c2 покрывает твои доспехи.";	
-	    break;
-	}
-    case  2:			     
-	if (bodyparts.isSet(PART_GUTS))
-	{
-	    msg = "Внутренности $c2 вываливаются на пол.";
-	    vnum = OBJ_VNUM_GUTS;
-	    bodyparts.removeBit(PART_GUTS);
-	}
-	break;
+        if (ch->material == 0)
+        {
+            msg  = "Кровь $c2 покрывает твои доспехи.";        
+            break;
+        }
+    case  2:                             
+        if (bodyparts.isSet(PART_GUTS))
+        {
+            msg = "Внутренности $c2 вываливаются на пол.";
+            vnum = OBJ_VNUM_GUTS;
+            bodyparts.removeBit(PART_GUTS);
+        }
+        break;
     case  3:
-	if (bodyparts.isSet(PART_HEAD))
-	{
-	    msg  = "Отрубленная голова $c2 падает на землю.";
-	    vnum = OBJ_VNUM_SEVERED_HEAD;		
-	    bodyparts.removeBit(PART_HEAD);
-	}
-	break;
+        if (bodyparts.isSet(PART_HEAD))
+        {
+            msg  = "Отрубленная голова $c2 падает на землю.";
+            vnum = OBJ_VNUM_SEVERED_HEAD;                
+            bodyparts.removeBit(PART_HEAD);
+        }
+        break;
     case  4:
-	if (bodyparts.isSet(PART_HEART))
-	{
-	    msg  = "Сердце $c2 выпадает из $s разрубленной груди.";
-	    vnum = OBJ_VNUM_TORN_HEART;		
-	    bodyparts.removeBit(PART_HEART);
-	}
-	break;
+        if (bodyparts.isSet(PART_HEART))
+        {
+            msg  = "Сердце $c2 выпадает из $s разрубленной груди.";
+            vnum = OBJ_VNUM_TORN_HEART;                
+            bodyparts.removeBit(PART_HEART);
+        }
+        break;
     case  5:
-	if (bodyparts.isSet(PART_ARMS))
-	{
-	    msg  = "Рука $c2 отваливается от $s мертвого тела.";
-	    vnum = OBJ_VNUM_SLICED_ARM;		
-	    bodyparts.removeBit(PART_ARMS);
-	}
-	break;
+        if (bodyparts.isSet(PART_ARMS))
+        {
+            msg  = "Рука $c2 отваливается от $s мертвого тела.";
+            vnum = OBJ_VNUM_SLICED_ARM;                
+            bodyparts.removeBit(PART_ARMS);
+        }
+        break;
     case  6:
-	if (bodyparts.isSet(PART_LEGS))
-	{
-	    msg  = "Нога $c2 отваливается от $s мертвого тела.";
-	    vnum = OBJ_VNUM_SLICED_LEG;		
-	    bodyparts.removeBit(PART_LEGS);
-	}
-	break;
+        if (bodyparts.isSet(PART_LEGS))
+        {
+            msg  = "Нога $c2 отваливается от $s мертвого тела.";
+            vnum = OBJ_VNUM_SLICED_LEG;                
+            bodyparts.removeBit(PART_LEGS);
+        }
+        break;
     case 7:
-	if (bodyparts.isSet(PART_BRAINS))
-	{
-	    msg = "Голова $c2 разбивается вдребезги, забрызгивая все вокруг.";
-	    vnum = OBJ_VNUM_BRAINS;
-	    bodyparts.removeBit(PART_BRAINS);
-	}
+        if (bodyparts.isSet(PART_BRAINS))
+        {
+            msg = "Голова $c2 разбивается вдребезги, забрызгивая все вокруг.";
+            vnum = OBJ_VNUM_BRAINS;
+            bodyparts.removeBit(PART_BRAINS);
+        }
     }
 
     act( msg, ch, 0, 0, TO_ROOM );
 
     if (vnum != 0)
-	bodypart_create( vnum, ch, NULL ); 
+        bodypart_create( vnum, ch, NULL ); 
 
     msg = "Ты слышишь чей-то предсмертный крик.";
     ch->in_room->echoAround( POS_RESTING, msg );
@@ -443,7 +443,7 @@ void death_cry( Character *ch, int part )
 void reset_dead_player( PCharacter *victim )
 {
     while (victim->affected)
-	affect_remove( victim, victim->affected );
+        affect_remove( victim, victim->affected );
 
     victim->affected_by    = 0;
     victim->add_affected_by = 0;
@@ -451,13 +451,13 @@ void reset_dead_player( PCharacter *victim )
     victim->armor.clear( );
     victim->armor.fill( 100 );
     victim->position    = POS_STANDING;
-    victim->hit	= victim->max_hit / 10;
+    victim->hit        = victim->max_hit / 10;
     victim->mana    = victim->max_mana / 10;
     victim->move    = victim->max_move;
     victim->shadow = -1;
 
     for (int i = 0; i < desireManager->size( ); i++)
-	desireManager->find( i )->reset( victim );
+        desireManager->find( i )->reset( victim );
 }
 
 void killed_npc_gain( NPCharacter *victim )
@@ -469,12 +469,12 @@ void killed_npc_gain( NPCharacter *victim )
 void ghost_gain( Character *victim )
 {
     if (!victim->is_npc( )) {
-	SET_DEATH_TIME(victim);
+        SET_DEATH_TIME(victim);
 
-	if (victim->getModifyLevel( ) >= PK_MIN_LEVEL) {
-	    victim->println("Ты лишаешься тела на несколько минут.");
-	    set_ghost( victim );
-	}
+        if (victim->getModifyLevel( ) >= PK_MIN_LEVEL) {
+            victim->println("Ты лишаешься тела на несколько минут.");
+            set_ghost( victim );
+        }
     }
 }
 
@@ -483,11 +483,11 @@ static bool oprog_death( Character *victim )
     Object *obj, *obj_next;
     
     for (obj = victim->carrying; obj != 0; obj = obj_next) {
-	obj_next = obj->next_content;    
-	
-	FENIA_CALL( obj, "Death", "C", victim )
-	FENIA_NDX_CALL( obj, "Death", "OC", obj, victim )
-	BEHAVIOR_CALL( obj, death, victim )
+        obj_next = obj->next_content;    
+        
+        FENIA_CALL( obj, "Death", "C", victim )
+        FENIA_NDX_CALL( obj, "Death", "OC", obj, victim )
+        BEHAVIOR_CALL( obj, death, victim )
     }
 
     return false;
@@ -496,19 +496,19 @@ static bool oprog_death( Character *victim )
 void loyalty_gain( Character *ch, Character *victim, int flags )
 {
     if (!ch)
-	return;
+        return;
 
     if (victim->is_npc( ))
-	return;
-	
+        return;
+        
     if (!IS_SET(victim->act, PLR_WANTED))
-	return;
+        return;
     
     if (!ch->is_npc( ))
-	ch->getPC( )->loyalty = min ( ch->getPC( )->loyalty+25, 1000 );
+        ch->getPC( )->loyalty = min ( ch->getPC( )->loyalty+25, 1000 );
     
     if (IS_SET(flags, FKILL_REABILITATE) || victim->getPC( )->loyalty > -900)
-	REMOVE_BIT(victim->act, PLR_WANTED);
+        REMOVE_BIT(victim->act, PLR_WANTED);
 }
 
 static bool mprog_death( Character *victim, Character *killer )
@@ -534,45 +534,45 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
     stop_fighting( victim, true );
     
     if (oprog_death( victim )) {
-	victim->position = POS_STANDING;
-	return;
+        victim->position = POS_STANDING;
+        return;
     }
     
     victim->unsetLastFightTime( );
 
     if (mprog_death( victim, ch )) {
-	victim->setDead( );
-	return;
+        victim->setDead( );
+        return;
     }
     
     if (IS_SET(flags, FKILL_CRY))
-	death_cry( victim, part );
+        death_cry( victim, part );
 
     if (IS_SET(flags, FKILL_CORPSE))
-	make_corpse( ch, victim );
+        make_corpse( ch, victim );
     else if (IS_SET(flags, FKILL_PURGE))
-	purge_corpse( ch, victim );
+        purge_corpse( ch, victim );
     
     wizflag = (victim->is_npc( ) ? WIZ_MOBDEATHS : WIZ_DEATHS);
     if (ch)
-	wiznet( wizflag, 0, victim->get_trust( ),
-	        "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch );
+        wiznet( wizflag, 0, victim->get_trust( ),
+                "%1$C1 па%1$Gло|л|ла от руки %2$C2.", victim, ch );
     else
-	wiznet( wizflag, 0, victim->get_trust( ),
-	        "%1$C1 па%1$Gло|л|ла от неизвестной (божественной) руки.", victim );
+        wiznet( wizflag, 0, victim->get_trust( ),
+                "%1$C1 па%1$Gло|л|ла от неизвестной (божественной) руки.", victim );
 
     if (ch && mprog_kill( ch, victim ))
-	ch = NULL;
+        ch = NULL;
 
     if (victim->is_npc( )) {
-	killed_npc_gain( victim->getNPC( ) );
+        killed_npc_gain( victim->getNPC( ) );
 
-	if (IS_SET(flags, FKILL_MOB_EXTRACT))
-	    extract_char( victim );
-	else
-	    victim->setDead( );
+        if (IS_SET(flags, FKILL_MOB_EXTRACT))
+            extract_char( victim );
+        else
+            victim->setDead( );
 
-	return;
+        return;
     }
 
     victim->getPC( )->getAttributes( ).handleEvent( DeathArguments( victim->getPC( ), ch ) );
@@ -582,7 +582,7 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
     loyalty_gain( ch, victim, flags );
 
     if (IS_SET(flags, FKILL_GHOST))
-	ghost_gain( victim );
+        ghost_gain( victim );
     
     corpse_reequip( victim );
 
@@ -593,10 +593,10 @@ void pk_gain( Character *killer, Character *victim )
 {
     if ( !killer->is_npc() && !victim->is_npc() && killer != victim )
     {
-	set_killer( killer );
-	set_slain( victim );
-	killer->getClan( )->handleVictory( killer->getPC( ), victim->getPC( ) );
-	victim->getClan( )->handleDefeat( victim->getPC( ), killer->getPC( ) );
+        set_killer( killer );
+        set_slain( victim );
+        killer->getClan( )->handleVictory( killer->getPC( ), victim->getPC( ) );
+        victim->getClan( )->handleDefeat( victim->getPC( ), killer->getPC( ) );
     }
 }
 
@@ -609,15 +609,15 @@ public:
 
     virtual bool handleDeath( Character *killer, Character *victim ) const
     {
-	group_gain( killer, victim );
-	raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-	pk_gain( killer, victim );
-	return false;
+        group_gain( killer, victim );
+        raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+        pk_gain( killer, victim );
+        return false;
     }
     
     virtual int getPriority( ) const
     {
-	return 50;
+        return 50;
     }
 };
 
@@ -635,97 +635,97 @@ public:
 
     void run( )
     {
-	if (!applicable( ))
-	    return;
-	
-	findCorpse( );
+        if (!applicable( ))
+            return;
+        
+        findCorpse( );
 
-	autoLook( );
-	autoLoot( );
-	autoGold( );
-	autoBlood( );
-	autoSacrifice( );
+        autoLook( );
+        autoLoot( );
+        autoGold( );
+        autoBlood( );
+        autoSacrifice( );
     }
 
 protected:
     void findCorpse( )
     {
-	for (Object *obj = killer->in_room->contents; obj; obj = obj->next_content)
-	    if (obj->item_type == ITEM_CORPSE_NPC 
-		&& obj->value[3] == ch->getNPC( )->pIndexData->vnum) 
-	    {
-		corpse = obj;
-		break;
-	    }
+        for (Object *obj = killer->in_room->contents; obj; obj = obj->next_content)
+            if (obj->item_type == ITEM_CORPSE_NPC 
+                && obj->value[3] == ch->getNPC( )->pIndexData->vnum) 
+            {
+                corpse = obj;
+                break;
+            }
     }
 
     virtual bool applicable( )
     {
-	if (killer->is_npc( ))
-	    return false;
+        if (killer->is_npc( ))
+            return false;
 
-	if (!ch->is_npc( ))
-	    return false;
+        if (!ch->is_npc( ))
+            return false;
 
-	if (killer->in_room != ch->in_room)
-	    return false;
-	
-	return true;
+        if (killer->in_room != ch->in_room)
+            return false;
+        
+        return true;
     }
 
     void autoLoot( )
     {
-	if (!corpse || !corpse->contains || !killer->can_see( corpse ))
-	    return;
+        if (!corpse || !corpse->contains || !killer->can_see( corpse ))
+            return;
 
-	if (IS_SET(killer->act, PLR_AUTOLOOT))
-	    do_get_all_raw( killer, corpse );
+        if (IS_SET(killer->act, PLR_AUTOLOOT))
+            do_get_all_raw( killer, corpse );
     }
 
     void autoLook( )
     {
-	if (!corpse || !corpse->contains || !killer->can_see( corpse ))
-	    return;
+        if (!corpse || !corpse->contains || !killer->can_see( corpse ))
+            return;
 
-	if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) 
-	    oprog_examine( corpse, killer );
+        if (IS_SET(killer->add_comm, PLR_AUTOLOOK)) 
+            oprog_examine( corpse, killer );
     }
 
     void autoGold( )
     {
-	if (!corpse || !corpse->contains)
-	    return;
+        if (!corpse || !corpse->contains)
+            return;
 
-	if (IS_SET(killer->act, PLR_AUTOGOLD)) {
-	    Object *money = get_obj_list_type( killer, ITEM_MONEY, corpse->contains );
+        if (IS_SET(killer->act, PLR_AUTOGOLD)) {
+            Object *money = get_obj_list_type( killer, ITEM_MONEY, corpse->contains );
 
-	    if (money)
-		do_get_raw( killer, money, corpse );
-	}
+            if (money)
+                do_get_raw( killer, money, corpse );
+        }
     }
 
     void autoBlood( )
     {
-	if (desire_bloodlust->applicable( killer->getPC( ) )) {
-	    act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
-	    act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
-	    desire_bloodlust->gain( killer->getPC( ), 3 );
-	}
+        if (desire_bloodlust->applicable( killer->getPC( ) )) {
+            act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
+            act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
+            desire_bloodlust->gain( killer->getPC( ), 3 );
+        }
     }
 
     void autoSacrifice( )
     {
-	if (!corpse)
-	    return;
-	
-	if (!IS_SET(killer->act, PLR_AUTOSAC))
-	    return;
+        if (!corpse)
+            return;
+        
+        if (!IS_SET(killer->act, PLR_AUTOSAC))
+            return;
 
-	if (IS_SET(killer->act, PLR_AUTOLOOT) && corpse->contains)
-	    return;
+        if (IS_SET(killer->act, PLR_AUTOLOOT) && corpse->contains)
+            return;
 
-	interpret_raw( killer, "sacrifice", 
-		       get_obj_name_list( corpse, corpse->in_room->contents, killer ).c_str( ) );
+        interpret_raw( killer, "sacrifice", 
+                       get_obj_name_list( corpse, corpse->in_room->contents, killer ).c_str( ) );
     }
 
     Character *killer;
@@ -739,12 +739,12 @@ public:
 
     bool handleDeath( Character *killer, Character *victim ) const 
     {
-	DeathAutoCommands( killer, victim ).run( );
-	return false;
+        DeathAutoCommands( killer, victim ).run( );
+        return false;
     }
     int getPriority( ) const
     {
-	return 60;
+        return 60;
     }
 };
 
@@ -759,20 +759,20 @@ public:
     typedef ::Pointer<PlayerDeleteTask> Pointer;
     
     PlayerDeleteTask( PCharacter *p, Character *k, const DLString &m )
-	              : pvict( p ), killer( k ), msgWiznet( m )
+                      : pvict( p ), killer( k ), msgWiznet( m )
     {
     }
     virtual void run( )
     {
-	pvict->println("Ты превращаешься в привидение и покидаешь этот мир.");
-	act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
-	wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
-	
-	delete_player( pvict );
+        pvict->println("Ты превращаешься в привидение и покидаешь этот мир.");
+        act( "$c1 УМЕ$gРЛО|Р|РЛА, и навсегда покину$gло|л|ла этот мир.\n\r", pvict,0,0,TO_ROOM);
+        wiznet( 0, 0, 0, msgWiznet.c_str( ), killer, pvict );
+        
+        delete_player( pvict );
     }
     virtual int getPriority( ) const
     {
-	return SCDP_IOWRITE - 100;
+        return SCDP_IOWRITE - 100;
     }
 
 private:
@@ -786,83 +786,83 @@ public:
     DeathPenalties( Character *killer, Character *ch )
              : killer( killer ), ch( ch )
     {
-	if (!ch->is_npc( ))
-	    pch = ch->getPC( );
+        if (!ch->is_npc( ))
+            pch = ch->getPC( );
     }
 
     bool run( ) 
     {
-	if (!applicable( ))
-	    return false;
+        if (!applicable( ))
+            return false;
 
-	pch->death++;
+        pch->death++;
 
-	return penaltyDelete( ) 
-	       || penaltyConstitution( )
-	       || penaltyCharisma( );
+        return penaltyDelete( ) 
+               || penaltyConstitution( )
+               || penaltyCharisma( );
     }
 
 protected:
     virtual bool applicable( ) 
     {
-	if (ch->is_npc( )) 
-	    return false;
-	
-	if (ch != killer
-	    && !(killer->is_npc( ) && !killer->master && !killer->leader)
-	    && !IS_SET(ch->act, PLR_WANTED))
-	    return false;
+        if (ch->is_npc( )) 
+            return false;
+        
+        if (ch != killer
+            && !(killer->is_npc( ) && !killer->master && !killer->leader)
+            && !IS_SET(ch->act, PLR_WANTED))
+            return false;
 
-	return true;
+        return true;
     }
 
     bool penaltyConstitution( )
     {
-	if (pch->getProfession( ) == prof_samurai)
-	    return false;
+        if (pch->getProfession( ) == prof_samurai)
+            return false;
 
-	if (pch->death % 5)
-	    return false;
+        if (pch->death % 5)
+            return false;
 
-	pch->perm_stat[STAT_CON]--;
+        pch->perm_stat[STAT_CON]--;
 
-	if (pch->perm_stat[STAT_CON] >= 3) {
-	    pch->println("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
-	    return false;
-	}
-	
-	pch->perm_stat[STAT_CON] = 10;
+        if (pch->perm_stat[STAT_CON] >= 3) {
+            pch->println("Ты чувствуешь, как твоя жизненная сила уменьшилась после этой смерти.");
+            return false;
+        }
+        
+        pch->perm_stat[STAT_CON] = 10;
 
-	DLScheduler::getThis( )->putTaskNOW(
-	    PlayerDeleteTask::Pointer( NEW, pch, killer, 
-		"%C1 : %C1 удаляется из-за слабого телосложения." ) );
-	return true;
+        DLScheduler::getThis( )->putTaskNOW(
+            PlayerDeleteTask::Pointer( NEW, pch, killer, 
+                "%C1 : %C1 удаляется из-за слабого телосложения." ) );
+        return true;
     }
 
     bool penaltyCharisma( )
     {
-	if (pch->getProfession( ) == prof_samurai) {
-	    if ((pch->death % 3) == 2)
-		pch->perm_stat[STAT_CHA]--;
-	}
+        if (pch->getProfession( ) == prof_samurai) {
+            if ((pch->death % 3) == 2)
+                pch->perm_stat[STAT_CHA]--;
+        }
 
-	return false;
+        return false;
     }
 
     bool penaltyDelete( )
     {
-	if (pch->getProfession( ) != prof_samurai)
-	    return false;
-	    
-	if (pch->death <= 10)
-	    return false;
-	    
-	pch->death = 0;
+        if (pch->getProfession( ) != prof_samurai)
+            return false;
+            
+        if (pch->death <= 10)
+            return false;
+            
+        pch->death = 0;
 
-	DLScheduler::getThis( )->putTaskNOW(
-	    PlayerDeleteTask::Pointer( NEW, pch, killer, 
-		"%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
-	return true;
+        DLScheduler::getThis( )->putTaskNOW(
+            PlayerDeleteTask::Pointer( NEW, pch, killer, 
+                "%C1 : %C1 удаляется, достигнув предела 10 смертей самурая." ) );
+        return true;
     }
 
     Character *killer;
@@ -876,11 +876,11 @@ public:
 
     bool handleDeath( Character *killer, Character *victim ) const 
     {
-	return DeathPenalties( killer, victim ).run( );
+        return DeathPenalties( killer, victim ).run( );
     }
     int getPriority( ) const
     {
-	return 10;
+        return 10;
     }
 };
 
@@ -888,18 +888,18 @@ extern "C"
 {
     SO::PluginList initialize_fight( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<DefaultDeathHandler>( ppl );
-	Plugin::registerPlugin<DeathAutoCommandsHandler>( ppl );
-	Plugin::registerPlugin<DeathPenaltiesHandler>( ppl );
-	return ppl;
+        Plugin::registerPlugin<DefaultDeathHandler>( ppl );
+        Plugin::registerPlugin<DeathAutoCommandsHandler>( ppl );
+        Plugin::registerPlugin<DeathPenaltiesHandler>( ppl );
+        return ppl;
     }
 }
 
 #else
-void	raw_kill( Character* victim, int part, Character* ch, int flags ) { }
-void	death_cry( Character *ch, int part ) { }
+void        raw_kill( Character* victim, int part, Character* ch, int flags ) { }
+void        death_cry( Character *ch, int part ) { }
 
 extern "C"
 {

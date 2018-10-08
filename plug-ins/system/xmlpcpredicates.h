@@ -35,7 +35,7 @@ public:
     static const DLString TYPE;
     virtual const DLString & getType( ) const 
     {
-	return TYPE;
+        return TYPE;
     }
 
 private:
@@ -49,7 +49,7 @@ public:
     static const DLString TYPE;
     virtual const DLString & getType( ) const 
     {
-	return TYPE;
+        return TYPE;
     }
 
 private:
@@ -63,7 +63,7 @@ public:
     static const DLString TYPE;
     virtual const DLString & getType( ) const 
     {
-	return TYPE;
+        return TYPE;
     }
 
 private:
@@ -77,7 +77,7 @@ public:
     static const DLString TYPE;
     virtual const DLString & getType( ) const 
     {
-	return TYPE;
+        return TYPE;
     }
 
 private:
@@ -91,7 +91,7 @@ public:
     static const DLString TYPE;
     virtual const DLString & getType( ) const 
     {
-	return TYPE;
+        return TYPE;
     }
 
 private:

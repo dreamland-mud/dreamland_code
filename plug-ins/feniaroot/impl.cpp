@@ -12,13 +12,13 @@ extern "C"
 {
     SO::PluginList initialize_feniaroot( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<WrapperManager>( ppl );
-	Plugin::registerPlugin<WrappersPlugin>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCodeSource> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<WrapperManager>( ppl );
+        Plugin::registerPlugin<WrappersPlugin>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeCodeSource> >( ppl );
+        
+        return ppl;
     }
 }
 

@@ -65,16 +65,16 @@ void XMLAttributeGodRewardListenerPlugin::run( int oldState, int newState, Descr
     Character *ch = d->character;
 
     if (!ch)
-	return;
+        return;
     
     if (newState != CON_PLAYING) 
-	return;
+        return;
    
     PCharacter *pch = ch->getPC(); 
     attr = pch->getAttributes( ).findAttr<XMLAttributeGodReward>( ATTRNAME );
     
     if (!attr)
-	return;
+        return;
 
     attr->reward( pch );
     pch->getAttributes().eraseAttribute(ATTRNAME);
@@ -91,8 +91,8 @@ CMDADM( ireward )
     DLString reason = arguments;
 
     if (name.empty( )) {
-	ch->println( "Вознаградить кого?" );
-	return;
+        ch->println( "Вознаградить кого?" );
+        return;
     }
 
     if (qpStr.empty( )) {
@@ -101,8 +101,8 @@ CMDADM( ireward )
     }
 
     if (!( pci = PCharacterManager::find( name ) )) {
-	ch->println( "Персонаж с таким именем не найден." );
-	return;
+        ch->println( "Персонаж с таким именем не найден." );
+        return;
     }
 
     if (arg_oneof(qpStr, "удалить", "delete")) {

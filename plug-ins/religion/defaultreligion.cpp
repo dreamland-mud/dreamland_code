@@ -13,8 +13,8 @@
  * DefaultReligion 
  *---------------------------------------------------------------------*/
 DefaultReligion::DefaultReligion( )
-		: align( 0, &align_table ),
-		  ethos( 0, &ethos_table )
+                : align( 0, &align_table ),
+                  ethos( 0, &ethos_table )
 {
 }
 
@@ -37,10 +37,10 @@ bool DefaultReligion::isValid( ) const
 bool DefaultReligion::isAllowed( Character *ch ) const
 {
     if (!ethos.isSetBitNumber( ch->ethos ))
-	return false;
+        return false;
 
     if (!align.isSetBitNumber( ALIGNMENT(ch) ))
-	return false;
+        return false;
 
     return true;
 }

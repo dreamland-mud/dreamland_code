@@ -31,16 +31,16 @@ public:
 class SamuraiGuildmaster : public virtual BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<SamuraiGuildmaster> Pointer;
+        typedef ::Pointer<SamuraiGuildmaster> Pointer;
     
-	virtual void give( Character *, Object * );
-	virtual void tell( Character *, const char * );
+        virtual void give( Character *, Object * );
+        virtual void tell( Character *, const char * );
 
 protected:
-	void giveBack( Character *, Object * );
-	void doFirstEnchant( Character *, Object * );
-	void doOwner( Character *, Object * );
-	bool checkPrice( Character *, int );
+        void giveBack( Character *, Object * );
+        void doFirstEnchant( Character *, Object * );
+        void doOwner( Character *, Object * );
+        bool checkPrice( Character *, int );
 };
 
 class SamuraiUniclassAdept : public SamuraiGuildmaster, UniclassAdept {

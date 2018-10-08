@@ -16,15 +16,15 @@ extern "C"
 {
     SO::PluginList initialize_languages_core( ) 
     {
-	SO::PluginList ppl;
-		
-	Plugin::registerPlugin<LanguageManager>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguage> >( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguageHints> >( ppl );
-	
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Poliglot> >( ppl );
+        SO::PluginList ppl;
+                
+        Plugin::registerPlugin<LanguageManager>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguage> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguageHints> >( ppl );
+        
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Poliglot> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }
 

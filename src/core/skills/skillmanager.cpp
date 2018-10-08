@@ -28,29 +28,29 @@ int SkillManager::unstrictLookup( const DLString &name, Character *ch ) const
     const Skill *skill;
 
     if (name.empty( ))
-	return -1;
+        return -1;
     
     // strict lookup
     iter = indexes.find( name );
     
     if (iter != indexes.end( )) {
-	i = iter->second;
-	skill = (Skill *)*table[i];
+        i = iter->second;
+        skill = (Skill *)*table[i];
 
-	if (!ch || skill->available( ch ))
-	    return i;
+        if (!ch || skill->available( ch ))
+            return i;
     }
     
     // unstrict lookup, with russian name
     for (i = 0; i < table.size( ); i++) {
-	skill = (Skill *)*table[i];
-	
-	if (name.strPrefix( skill->getName( ) )
-	    || name.strPrefix( skill->getRussianName( ) ))
-	{
-	    if (!ch || skill->available( ch ))
-		return i;
-	}
+        skill = (Skill *)*table[i];
+        
+        if (name.strPrefix( skill->getName( ) )
+            || name.strPrefix( skill->getRussianName( ) ))
+        {
+            if (!ch || skill->available( ch ))
+                return i;
+        }
     }
     
     return -1;

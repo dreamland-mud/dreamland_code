@@ -17,19 +17,19 @@ CMDRUN( showskill )
     PCharacter *pch = ch->getPC( );
     
     if (ch->is_npc( ))
-	return;
+        return;
     
     if (argument.empty( )) {
-	ch->send_to( "Использование: showskill|slook <умение или заклинание>\r\n" );
-	return;
+        ch->send_to( "Использование: showskill|slook <умение или заклинание>\r\n" );
+        return;
     }
 
     sn = SkillManager::getThis( )->unstrictLookup( argument );
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill) {
-	ch->send_to( "Такого умения нет.\r\n" );
-	return;
+        ch->send_to( "Такого умения нет.\r\n" );
+        return;
     }
     
     skill->show( pch, buf );

@@ -20,7 +20,7 @@ friend class GangKey;
 friend class GangPortal;
 
 public:
-    typedef ::Pointer<Gangsters>	Pointer;
+    typedef ::Pointer<Gangsters>        Pointer;
     
     Gangsters( );
     Gangsters( const DLString& );
@@ -84,10 +84,10 @@ protected:
     XML_VARIABLE XMLVectorBase<XMLInteger> portalRoomVnums;
     
     enum {
-	ST_NONE,
-	ST_NO_MORE_HINTS,
-	ST_BROKEN,
-	ST_CHEF_KILLED,
+        ST_NONE,
+        ST_NO_MORE_HINTS,
+        ST_BROKEN,
+        ST_CHEF_KILLED,
     };
     XML_VARIABLE XMLInteger state;
 

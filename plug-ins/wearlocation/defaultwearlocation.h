@@ -17,10 +17,10 @@
 
 
 class DefaultWearlocation : public Wearlocation, 
-			    public XMLTableElement,
+                            public XMLTableElement,
                             public XMLVariableContainer {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<DefaultWearlocation> Pointer;
     
     DefaultWearlocation( );

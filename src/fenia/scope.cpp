@@ -28,15 +28,15 @@ Scope::getVar(Lex::id_t key)
     Scope *s, *s_parent;
 
     for(s = this; ; s = s_parent) {
-	s_parent = s->parent;
-	
-	iterator i = s->find(key);
-	
-	if(i != s->end())
-	    return i->second;
+        s_parent = s->parent;
+        
+        iterator i = s->find(key);
+        
+        if(i != s->end())
+            return i->second;
 
-	if(!s_parent)
-	    return *(*s)[ID_THIS][Register(key)];
+        if(!s_parent)
+            return *(*s)[ID_THIS][Register(key)];
     }
 }
 
@@ -46,19 +46,19 @@ Scope::setVar(Lex::id_t key, const Register &val)
     Scope *s, *s_parent;
 
     for(s = this; ; s = s_parent) {
-	s_parent = s->parent;
-	
-	iterator i = s->find(key);
-	
-	if(i != s->end()) {
-	    i->second = val;
-	    return;
-	}
+        s_parent = s->parent;
+        
+        iterator i = s->find(key);
+        
+        if(i != s->end()) {
+            i->second = val;
+            return;
+        }
 
-	if(!s_parent) {
-	   (*s)[ID_THIS][Register(key)] = val;
-	   return;
-	}
+        if(!s_parent) {
+           (*s)[ID_THIS][Register(key)] = val;
+           return;
+        }
     }
 }
 
@@ -68,15 +68,15 @@ Scope::callVar(Lex::id_t key, const RegisterList &args)
     Scope *s, *s_parent;
 
     for(s = this; ; s = s_parent) {
-	s_parent = s->parent;
-	
-	iterator i = s->find(key);
-	
-	if(i != s->end())
-	   return i->second.toFunction()->invoke(Register(), args);
+        s_parent = s->parent;
+        
+        iterator i = s->find(key);
+        
+        if(i != s->end())
+           return i->second.toFunction()->invoke(Register(), args);
 
-	if(!s_parent)
-	   return (*s)[ID_THIS][Register(key)](args);
+        if(!s_parent)
+           return (*s)[ID_THIS][Register(key)](args);
     }
 }
 

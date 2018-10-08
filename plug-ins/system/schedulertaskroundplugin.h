@@ -23,11 +23,11 @@
 class SchedulerTaskRoundPlugin : public virtual Plugin, public virtual SchedulerTask
 {
 public:
-	typedef ::Pointer<SchedulerTaskRoundPlugin> Pointer;
+        typedef ::Pointer<SchedulerTaskRoundPlugin> Pointer;
 
-protected:	
-	virtual void initialization( );
-	virtual void destruction( );
+protected:        
+        virtual void initialization( );
+        virtual void destruction( );
 };
 
 #endif

@@ -22,11 +22,11 @@ public:
 private:
     static const char FLEX_DELIMITER;
     enum {
-	PHASE_NONE,
-	PHASE_COPYTOBUF,
-	PHASE_FINDNEED,	
-	PHASE_COPYEND,	
-	PHASE_FINDNEXT,	
+        PHASE_NONE,
+        PHASE_COPYTOBUF,
+        PHASE_FINDNEED,        
+        PHASE_COPYEND,        
+        PHASE_FINDNEXT,        
     };
     static DLString flexAux(const DLString &str, int part_num, bool fNeedRoot, bool fNeedEnding);
 };

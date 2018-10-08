@@ -13,7 +13,7 @@
 #include "pcharacter.h"
 
 PCSkillData::PCSkillData( )
-		    : forgetting( false )
+                    : forgetting( false )
 {
 }
 
@@ -25,10 +25,10 @@ void PCSkills::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType
     map.fromXML( parent );
     
     for (i = map.begin( ); i != map.end( ); i++) {
-	int sn = SkillManager::getThis( )->lookup( i->first );
-	PCSkillData & data = get( sn );
+        int sn = SkillManager::getThis( )->lookup( i->first );
+        PCSkillData & data = get( sn );
     
-	data = i->second;
+        data = i->second;
     }
 }
 
@@ -37,12 +37,12 @@ bool PCSkills::toXML( XMLNode::Pointer& parent ) const
     XMLPCSkills map;
     
     for (unsigned int i = 0; i < size( ); i++) {
-	
-	if ((*this) [i].learned.getValue( ) > 0) {
-	    DLString skillName( skillManager->find( i )->getName( ) );
+        
+        if ((*this) [i].learned.getValue( ) > 0) {
+            DLString skillName( skillManager->find( i )->getName( ) );
 
-	    map[skillName] = (*this) [i];
-	}
+            map[skillName] = (*this) [i];
+        }
     }
     
     return map.toXML( parent );
@@ -53,10 +53,10 @@ static PCSkillData emptySkill;
 PCSkillData & PCSkills::get( int sn )
 {
     if (sn < 0)
-	return emptySkill;
+        return emptySkill;
 
     if (sn >= (int) size( ))
-	resize( sn + 1 );
+        resize( sn + 1 );
 
     return (*this) [sn];
 }

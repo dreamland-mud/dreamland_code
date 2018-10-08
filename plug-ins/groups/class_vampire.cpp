@@ -58,8 +58,8 @@ public:
 };
 
 VampiricBiteOneHit::VampiricBiteOneHit( Character *ch, Character *victim )
-	    : Damage( ch, victim, 0, 0 ), OneHit( ch, victim ),
-	      SkillDamage( ch, victim, gsn_vampiric_bite, 0, 0, DAMF_WEAPON )
+            : Damage( ch, victim, 0, 0 ), OneHit( ch, victim ),
+              SkillDamage( ch, victim, gsn_vampiric_bite, 0, 0, DAMF_WEAPON )
 {
 }
 
@@ -87,7 +87,7 @@ void VampiricBiteOneHit::damBase( )
     dam = ave * skill / 100;                   // as weapon with skill bonus
 
     if (number_percent( ) <= skill / 8)        // as sharpness
-	dam = 2 * dam + (dam * 2 * number_percent( ) / 100); 
+        dam = 2 * dam + (dam * 2 * number_percent( ) / 100); 
 }
 
 
@@ -159,7 +159,7 @@ SKILL_RUNP( control )
 
   if (IS_SET( victim->form, FORM_NONADOPTABLE )) {
     ch->send_to("Эта форма жизни не поддается контролю.\n\r");
-    return;	
+    return;        
   }
     
   if (is_safe(ch,victim)) return;
@@ -178,36 +178,36 @@ SKILL_RUNP( control )
 
  if ( IS_AFFECTED(victim, AFF_CHARM)
     ||   IS_AFFECTED(ch, AFF_CHARM)
-    ||	 number_percent() > chance
+    ||         number_percent() > chance
     ||   ch->getModifyLevel() < ( victim->getModifyLevel() + 2 )
     ||   IS_SET(victim->imm_flags,IMM_CHARM)
-    ||	 (victim->is_npc( ) 
-	    && victim->getNPC( )->behavior
-	    && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))))
-	{
-	 gsn_control_animal->improve( ch, false, victim );
-	 do_say(victim,"Я не собираюсь следовать за тобой!");
-	 interpret_raw(victim, "murder", ch->getNameP( ));
-	 return;
-	}
+    ||         (victim->is_npc( ) 
+            && victim->getNPC( )->behavior
+            && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))))
+        {
+         gsn_control_animal->improve( ch, false, victim );
+         do_say(victim,"Я не собираюсь следовать за тобой!");
+         interpret_raw(victim, "murder", ch->getNameP( ));
+         return;
+        }
 
   gsn_control_animal->improve( ch, true, victim );
 
   if ( victim->master )
-	victim->stop_follower( );
+        victim->stop_follower( );
   SET_BIT(victim->affected_by,AFF_CHARM);
 
-	if ( victim->is_npc( )
-		&& victim->in_room )
-	{
-		save_mobs( victim->in_room );
-	}
-		
+        if ( victim->is_npc( )
+                && victim->in_room )
+        {
+                save_mobs( victim->in_room );
+        }
+                
   victim->master = victim->leader = ch;
 
   act_p( "Ну разве $c1 не прелесть?", ch, 0, victim, TO_VICT,POS_RESTING );
   if ( ch != victim )
-	act_p("$C1 смотрит на тебя влюбленными глазами.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$C1 смотрит на тебя влюбленными глазами.",ch,0,victim,TO_CHAR,POS_RESTING);
 
   return;
 }
@@ -237,44 +237,44 @@ SKILL_RUNP( dig )
     chance = gsn_digging->getEffective( ch );
 
     if (chance < 2) {
-	ch->send_to("Ты не умеешь копать!\r\n");
-	return;
+        ch->send_to("Ты не умеешь копать!\r\n");
+        return;
     }
 
     if (IS_WATER( room )) {
-	ch->send_to("Ты же не хочешь промокнуть?\r\n");
-	return;
+        ch->send_to("Ты же не хочешь промокнуть?\r\n");
+        return;
     }
 
     if (room->sector_type == SECT_AIR) {
-	ch->send_to("Копать в воздухе? И как ты себе это представляешь?\r\n");
-	return;
+        ch->send_to("Копать в воздухе? И как ты себе это представляешь?\r\n");
+        return;
     }
 
     if (room->sector_type == SECT_CITY || room->sector_type == SECT_INSIDE) {
-	ch->send_to("Здесь слишком твердая почва..\r\n");
-	return;
+        ch->send_to("Здесь слишком твердая почва..\r\n");
+        return;
     }
     
     if (IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
     {
-	ch->send_to("Здесь неподходящее место для копания могилы.\r\n");
-	return;
+        ch->send_to("Здесь неподходящее место для копания могилы.\r\n");
+        return;
     }
     
     if (get_obj_room_vnum( room, OBJ_VNUM_GRAVE )) {
-	ch->send_to("Опс.. похоже, этот участок уже занял твой коллега.\r\n");
-	return;
+        ch->send_to("Опс.. похоже, этот участок уже занял твой коллега.\r\n");
+        return;
     }
 
     if (IS_VIOLENT( ch )) {
-	act_p("Ты слишком возбужде$gно|н|на, чтобы копать.", ch, 0, 0, TO_CHAR, POS_STANDING);
-	return;
+        act_p("Ты слишком возбужде$gно|н|на, чтобы копать.", ch, 0, 0, TO_CHAR, POS_STANDING);
+        return;
     }
 
     if (ch->move < 100) {
-	act_p("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR, POS_STANDING);
-	return;
+        act_p("Ты слишком уста$gло|л|ла для этого.", ch, 0, 0, TO_CHAR, POS_STANDING);
+        return;
     }
 
     ch->move -= 100;
@@ -282,10 +282,10 @@ SKILL_RUNP( dig )
     ch->setWait( gsn_digging->getBeats( )  );
 
     if (number_percent( ) > chance) {
-	act_p("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	act_p("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR, POS_RESTING);
-	gsn_digging->improve( ch, false );
-	return;
+        act_p("$c1 предпринимает попытку закопать себя.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        act_p("Ты старательно ковыряешься в земле, но ничего не выходит.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        gsn_digging->improve( ch, false );
+        return;
     }
 
     act_p("$c1 выкапывает себе могилку и устраивается в ней со всеми удобствами.", ch, 0, 0, TO_ROOM, POS_RESTING);
@@ -293,7 +293,7 @@ SKILL_RUNP( dig )
     gsn_digging->improve( ch, true );
 
     if (number_percent( ) < 2) 
-	act_p("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL, POS_RESTING);
+        act_p("Откуда-то сверху раздается громовой голос: \"ЛОПАТУ ВЕРНИ!\"", ch, 0, 0, TO_ALL, POS_RESTING);
     
     ch->dismount( );
     char_from_room( ch );
@@ -315,91 +315,91 @@ SKILL_RUNP( dig )
 
 SKILL_RUNP( vampire )
 {
-	Affect af;
-	short level,duration;
+        Affect af;
+        short level,duration;
 
-	if ( ch->isAffected(gsn_vampire ) )
-	{
-		ch->send_to("Ты не можешь стать еще более вампиром!\n\r");
-		return;
-	}
+        if ( ch->isAffected(gsn_vampire ) )
+        {
+                ch->send_to("Ты не можешь стать еще более вампиром!\n\r");
+                return;
+        }
 
-	if ( !ch->is_npc() && !gsn_vampire->usable( ch ) )
-	{
-		ch->send_to("Ты пытаешься выглядеть более уродливо.\n\r");
-		return;
-	}
+        if ( !ch->is_npc() && !gsn_vampire->usable( ch ) )
+        {
+                ch->send_to("Ты пытаешься выглядеть более уродливо.\n\r");
+                return;
+        }
 
         if (gsn_vampire->getLearned( ch ) < 100)
-	{
-		ch->send_to("Попроси гильдмастера помочь тебе.\n\r");
-		return;
-	}
+        {
+                ch->send_to("Попроси гильдмастера помочь тебе.\n\r");
+                return;
+        }
 
-	if ( weather_info.sunlight == SUN_LIGHT
-		|| weather_info.sunlight == SUN_RISE )
-	{
-		ch->send_to("Тебе нужно дождаться вечера, чтобы превратиться в вампира.\n\r");
-	}
+        if ( weather_info.sunlight == SUN_LIGHT
+                || weather_info.sunlight == SUN_RISE )
+        {
+                ch->send_to("Тебе нужно дождаться вечера, чтобы превратиться в вампира.\n\r");
+        }
 
-	level = ch->getModifyLevel();
-	duration = level / 10 ;
-	duration += 5;
+        level = ch->getModifyLevel();
+        duration = level / 10 ;
+        duration += 5;
 
-	/* haste + dex, infrared */
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_vampire;
-	af.level     = level;
-	af.duration  = duration;
-	af.location  = APPLY_DEX;
-	af.modifier  = 1 + (level /20);
-	af.bitvector = AFF_HASTE | AFF_INFRARED;
-	affect_to_char( ch, &af );
+        /* haste + dex, infrared */
+        af.where     = TO_AFFECTS;
+        af.type      = gsn_vampire;
+        af.level     = level;
+        af.duration  = duration;
+        af.location  = APPLY_DEX;
+        af.modifier  = 1 + (level /20);
+        af.bitvector = AFF_HASTE | AFF_INFRARED;
+        affect_to_char( ch, &af );
 
-	/* giant strength + berserk */
-	af.where     = TO_AFFECTS;
-	af.location  = APPLY_STR;
-	af.modifier  = 1 + (level / 20);
-	af.bitvector = AFF_BERSERK;
-	affect_to_char( ch, &af );
+        /* giant strength + berserk */
+        af.where     = TO_AFFECTS;
+        af.location  = APPLY_STR;
+        af.modifier  = 1 + (level / 20);
+        af.bitvector = AFF_BERSERK;
+        affect_to_char( ch, &af );
 
-	/* sneak */
-	af.where     = TO_AFFECTS;
-	af.location  = APPLY_NONE;
-	af.modifier  = 0;
-	af.bitvector = AFF_SNEAK;
-	affect_to_char( ch, &af );
+        /* sneak */
+        af.where     = TO_AFFECTS;
+        af.location  = APPLY_NONE;
+        af.modifier  = 0;
+        af.bitvector = AFF_SNEAK;
+        affect_to_char( ch, &af );
 
-	/* size + vuln light, holy */
-	af.where     = TO_VULN;
-	af.location  = APPLY_SIZE;
-	af.modifier  = 1 + (level / 50 );
-	af.bitvector = VULN_LIGHT | VULN_HOLY;
-	affect_to_char( ch, &af );
+        /* size + vuln light, holy */
+        af.where     = TO_VULN;
+        af.location  = APPLY_SIZE;
+        af.modifier  = 1 + (level / 50 );
+        af.bitvector = VULN_LIGHT | VULN_HOLY;
+        affect_to_char( ch, &af );
 
-	/* damroll + resist cold, lighting */
-	af.where     = TO_RESIST;
-	af.location  = APPLY_DAMROLL;
-	af.modifier  = ch->damroll * 4 / 3;
-	af.bitvector = RES_COLD | RES_LIGHTNING;
-	affect_to_char( ch, &af );
+        /* damroll + resist cold, lighting */
+        af.where     = TO_RESIST;
+        af.location  = APPLY_DAMROLL;
+        af.modifier  = ch->damroll * 4 / 3;
+        af.bitvector = RES_COLD | RES_LIGHTNING;
+        affect_to_char( ch, &af );
 
-	/* negative, charm immunity */
-	af.where = TO_IMMUNE;
-	af.location = APPLY_NONE;
-	af.modifier = 0;
-	af.bitvector = IMM_NEGATIVE | IMM_CHARM;
-	affect_to_char(ch, &af);
+        /* negative, charm immunity */
+        af.where = TO_IMMUNE;
+        af.location = APPLY_NONE;
+        af.modifier = 0;
+        af.bitvector = IMM_NEGATIVE | IMM_CHARM;
+        affect_to_char(ch, &af);
 
-	/* vampire flag */
-	af.where     = TO_ACT_FLAG;
-	af.location  = APPLY_NONE;
-	af.modifier  = 0;
-	af.bitvector = PLR_VAMPIRE;
-	affect_to_char( ch, &af );
+        /* vampire flag */
+        af.where     = TO_ACT_FLAG;
+        af.location  = APPLY_NONE;
+        af.modifier  = 0;
+        af.bitvector = PLR_VAMPIRE;
+        affect_to_char( ch, &af );
 
-	ch->send_to("Превращаясь в кровожадного вампира, ты чувствуешь прилив силы.\r\n");
-	act_p("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Превращаясь в кровожадного вампира, ты чувствуешь прилив силы.\r\n");
+        act_p("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM,POS_RESTING);
 }
 
 void sucking( Character *ch, Character *victim ) 
@@ -407,21 +407,21 @@ void sucking( Character *ch, Character *victim )
     int cond, hp_gain;
 
     if (victim == ch) {
-	ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
-	return;
+        ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
+        return;
     }
 
     if (is_safe( ch, victim ))
-	return;
+        return;
 
     if (IS_AWAKE( victim )) {
-	ch->send_to("Сначала жертва должна уснуть.\r\n");
-	return;
+        ch->send_to("Сначала жертва должна уснуть.\r\n");
+        return;
     }
     
     if (!victim->isAffected(gsn_vampiric_bite )) {
-	ch->send_to("В жертве нет необходимой дырочки.\n\r");
-	return;
+        ch->send_to("В жертве нет необходимой дырочки.\n\r");
+        return;
     }
     
     UNSET_DEATH_TIME(ch);
@@ -432,11 +432,11 @@ void sucking( Character *ch, Character *victim )
     act_p("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
     
     if (!ch->is_npc( )) {
-	desire_bloodlust->gain( ch->getPC( ), 20 );
-	cond = ch->getPC( )->desires[desire_bloodlust];
+        desire_bloodlust->gain( ch->getPC( ), 20 );
+        cond = ch->getPC( )->desires[desire_bloodlust];
     } 
     else 
-	cond = number_range( -10, 60 );
+        cond = number_range( -10, 60 );
 
     hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
     ch->hit += hp_gain;
@@ -446,16 +446,16 @@ void sucking( Character *ch, Character *victim )
     victim->position = POS_STANDING;
     
     try {
-	RawDamage( ch, victim, DAM_OTHER, hp_gain ).hit( true );
+        RawDamage( ch, victim, DAM_OTHER, hp_gain ).hit( true );
 
-	victim->position = POS_SLEEPING;
-			       
-	if (number_percent( ) < cond) {
-	    set_fighting( victim, ch );
-	    act_p("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM, POS_RESTING);
-	    act_p("Твой кошмар проходит - ты просыпаешься.", victim, 0, ch, TO_CHAR, POS_DEAD);
-	    multi_hit( victim, ch );
-	}
+        victim->position = POS_SLEEPING;
+                               
+        if (number_percent( ) < cond) {
+            set_fighting( victim, ch );
+            act_p("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM, POS_RESTING);
+            act_p("Твой кошмар проходит - ты просыпаешься.", victim, 0, ch, TO_CHAR, POS_DEAD);
+            multi_hit( victim, ch );
+        }
     } 
     catch (const VictimDeathException &) {
     }
@@ -474,23 +474,23 @@ SKILL_RUNP( suck )
 
     if (!gsn_vampiric_bite->usable( ch )) 
     {
-	ch->send_to("Хрум, хрум!\n\r");
-	return;
+        ch->send_to("Хрум, хрум!\n\r");
+        return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	 ch->send_to("Высасывать кровь можно, только превратившись в вампира.\n\r");
-	 return;
+         ch->send_to("Высасывать кровь можно, только превратившись в вампира.\n\r");
+         return;
     }
 
     if (arg[0] == '\0') {
-	ch->send_to("Пить кровь из кого?\n\r");
-	return;
+        ch->send_to("Пить кровь из кого?\n\r");
+        return;
     }
 
     if ((victim = get_char_room( ch, arg )) == 0) {
-	ch->send_to("Этого нет здесь.\n\r");
-	return;
+        ch->send_to("Этого нет здесь.\n\r");
+        return;
     }
 
     sucking( ch, victim );
@@ -510,42 +510,42 @@ SKILL_RUNP( bite )
     one_argument( argument, arg );
 
     if (!gsn_vampiric_bite->usable( ch )) {
-	ch->send_to("Ты не умеешь кусаться.\n\r");
-	return;
+        ch->send_to("Ты не умеешь кусаться.\n\r");
+        return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	ch->send_to("Чтоб укусить ты должен сначала превратиться в вампира.\n\r");
-	return;
+        ch->send_to("Чтоб укусить ты должен сначала превратиться в вампира.\n\r");
+        return;
     }
 
     if ( arg[0] == '\0' )
     {
-	ch->send_to("Укусить кого?\n\r");
-	return;
+        ch->send_to("Укусить кого?\n\r");
+        return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-	ch->send_to("Этого нет здесь.\n\r");
-	return;
+        ch->send_to("Этого нет здесь.\n\r");
+        return;
     }
 
     if ( victim == ch )
     {
-	ch->send_to("Поцелуй себя в локоть.\n\r");
-	return;
+        ch->send_to("Поцелуй себя в локоть.\n\r");
+        return;
     }
 
     if ( victim->position != POS_SLEEPING )
     {
-	ch->send_to("Сначала он должен уснуть.\n\r");
-	return;
+        ch->send_to("Сначала он должен уснуть.\n\r");
+        return;
     }
 
     if (victim->isAffected(gsn_vampiric_bite )) {
-	ch->send_to("Отсюда уже можно пить.\r\n");
-	return;
+        ch->send_to("Отсюда уже можно пить.\r\n");
+        return;
     }
     
     if ( is_safe( ch, victim ) )
@@ -553,69 +553,69 @@ SKILL_RUNP( bite )
 
     if ( victim->fighting != 0 )
     {
-	ch->send_to("Ты не можешь укусить того, кто сражается.\n\r");
-	return;
+        ch->send_to("Ты не можешь укусить того, кто сражается.\n\r");
+        return;
     }
 
     UNSET_DEATH_TIME(ch);
     ch->setWait( gsn_vampiric_bite->getBeats( )  );
 
     if ( victim->hit < (0.8 * victim->max_hit) &&
-	 (IS_AWAKE(victim) ) )
+         (IS_AWAKE(victim) ) )
     {
-	act_p( "$C1 ран%Gно|ен|на и подозрител%Gьно|ен|ьна... не стоит даже пытаться.", ch, 0, victim, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "$C1 ран%Gно|ен|на и подозрител%Gьно|ен|ьна... не стоит даже пытаться.", ch, 0, victim, TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
     {
-	act_p( "$C1 настороже, не стоит даже пробовать.",ch, 0, victim, TO_CHAR,POS_RESTING);
-	return;
+        act_p( "$C1 настороже, не стоит даже пробовать.",ch, 0, victim, TO_CHAR,POS_RESTING);
+        return;
     }
     
     VampiricBiteOneHit vb( ch, victim );
     
     try {
-	if ( !IS_AWAKE(victim)
-	    && (number_percent( ) < gsn_vampiric_bite->getEffective( ch )))
-	{
-	    af.type     = gsn_vampiric_bite;
-	    af.level    = ch->getModifyLevel();
-	    af.duration = ch->getModifyLevel() / 40 + 1;
-	    af.location = APPLY_HITROLL;
-	    af.modifier = - ch->getModifyLevel( ) / 2;
-	    affect_join( victim, &af );
+        if ( !IS_AWAKE(victim)
+            && (number_percent( ) < gsn_vampiric_bite->getEffective( ch )))
+        {
+            af.type     = gsn_vampiric_bite;
+            af.level    = ch->getModifyLevel();
+            af.duration = ch->getModifyLevel() / 40 + 1;
+            af.location = APPLY_HITROLL;
+            af.modifier = - ch->getModifyLevel( ) / 2;
+            affect_join( victim, &af );
 
-	    gsn_vampiric_bite->improve( ch, true, victim );
+            gsn_vampiric_bite->improve( ch, true, victim );
 
-	    if (!ch->is_npc( ))
-		cond = ch->getPC( )->desires[desire_bloodlust];
-	    else
-		cond = number_range( -10, 80 );
-		    
-	    if (cond < 0 && number_percent( ) > 50) {
-		
-		af.duration = ch->getModifyLevel( ) / 50;
-		af.location = APPLY_NONE;
-		af.modifier = 0;
-		af.where = TO_AFFECTS;
-		af.bitvector = AFF_CORRUPTION;
-		affect_join( victim, &af );
+            if (!ch->is_npc( ))
+                cond = ch->getPC( )->desires[desire_bloodlust];
+            else
+                cond = number_range( -10, 80 );
+                    
+            if (cond < 0 && number_percent( ) > 50) {
+                
+                af.duration = ch->getModifyLevel( ) / 50;
+                af.location = APPLY_NONE;
+                af.modifier = 0;
+                af.where = TO_AFFECTS;
+                af.bitvector = AFF_CORRUPTION;
+                affect_join( victim, &af );
 
-		vb.hit( );
-	    }
-	    else 
-		sucking( ch, victim );   
-	}
-	else
-	{
-	    gsn_vampiric_bite->improve( ch, false, victim );
-	    vb.miss( );
-	}
-	
-	yell_panic( ch, victim,
-		    "Помогите, {Dсоздание ночи{Y кусает меня!",
-		    "Помогите, {Dсоздание ночи{Y кусает меня!" );
+                vb.hit( );
+            }
+            else 
+                sucking( ch, victim );   
+        }
+        else
+        {
+            gsn_vampiric_bite->improve( ch, false, victim );
+            vb.miss( );
+        }
+        
+        yell_panic( ch, victim,
+                    "Помогите, {Dсоздание ночи{Y кусает меня!",
+                    "Помогите, {Dсоздание ночи{Y кусает меня!" );
     }
     catch (const VictimDeathException& e) {                                     
     }
@@ -634,55 +634,55 @@ SKILL_RUNP( touch )
 
     if (!gsn_vampiric_touch->usable( ch ))
     {
-	ch->send_to("Ты не владеешь этим!\n\r");
-	return;
+        ch->send_to("Ты не владеешь этим!\n\r");
+        return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
     {
-	ch->send_to("Ок, ок.\n\r");
-	return;
+        ch->send_to("Ок, ок.\n\r");
+        return;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )
     {
-	ch->send_to("Ты же не хочешь высосать своего хозяина?\n\r");
-	return;
+        ch->send_to("Ты же не хочешь высосать своего хозяина?\n\r");
+        return;
     }
 
     if ( (victim = get_char_room(ch,argument)) == 0 )
     {
-	ch->send_to("Здесь таких нет.\n\r");
-	return;
+        ch->send_to("Здесь таких нет.\n\r");
+        return;
     }
 
     if ( ch == victim )
     {
-	ch->send_to("Что-что ты хочешь сотворить с собой?\n\r");
-	return;
+        ch->send_to("Что-что ты хочешь сотворить с собой?\n\r");
+        return;
     }
 
     if ( victim->isAffected(gsn_vampiric_touch) )
     {
-	ch->send_to("Твоя жертва еще не отошла от прикосновения.\n\r");
-	return;
+        ch->send_to("Твоя жертва еще не отошла от прикосновения.\n\r");
+        return;
     }
 
     if ( is_safe(ch,victim) )
     {
-	ch->send_to("Боги защищают твою жертву.\n\r");
-	return;
+        ch->send_to("Боги защищают твою жертву.\n\r");
+        return;
     }
 
     if (gsn_rear_kick->getCommand( )->run( ch, victim ))
-	return;
+        return;
 
     int k = victim->getLastFightDelay( );
 
     if ( k >= 0 && k < FIGHT_DELAY_TIME )
-	    k = k * 100 /	FIGHT_DELAY_TIME;
+            k = k * 100 /        FIGHT_DELAY_TIME;
     else
-	    k = 100;
+            k = 100;
 
     UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
@@ -694,42 +694,42 @@ SKILL_RUNP( touch )
     chance = chance * k / 100;
     
     if (victim->isAffected(gsn_backguard)) 
-	chance /= 2;
+        chance /= 2;
 
     if (number_percent() < chance)
     {
-	act_p("Ты прикасаешься к шее $C2 и $E забывается в ужасном кошмаре.",
-				ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.",
-				ch,0,victim,TO_VICT,POS_RESTING);
-	act_p("$c1 прикасается к шее $C2 и $E забывается в ужасном кошмаре.",
-				ch,0,victim,TO_NOTVICT,POS_RESTING);
-	gsn_vampiric_touch->improve( ch, true, victim );
+        act_p("Ты прикасаешься к шее $C2 и $E забывается в ужасном кошмаре.",
+                                ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 прикасается к твоей шее и ты забываешься в ужасном кошмаре.",
+                                ch,0,victim,TO_VICT,POS_RESTING);
+        act_p("$c1 прикасается к шее $C2 и $E забывается в ужасном кошмаре.",
+                                ch,0,victim,TO_NOTVICT,POS_RESTING);
+        gsn_vampiric_touch->improve( ch, true, victim );
 
-	af.type = gsn_vampiric_touch;
-	af.where = TO_AFFECTS;
-	af.level = ch->getModifyLevel();
-	af.duration = ch->getModifyLevel() / 20 + 1;
-	af.location = APPLY_NONE;
-	af.modifier = 0;
-	af.bitvector = AFF_SLEEP;
-	affect_join ( victim,&af );
+        af.type = gsn_vampiric_touch;
+        af.where = TO_AFFECTS;
+        af.level = ch->getModifyLevel();
+        af.duration = ch->getModifyLevel() / 20 + 1;
+        af.location = APPLY_NONE;
+        af.modifier = 0;
+        af.bitvector = AFF_SLEEP;
+        affect_join ( victim,&af );
 
-	set_backguard( victim );
+        set_backguard( victim );
 
-	if (IS_AWAKE(victim))
-		victim->position = POS_SLEEPING;
-	
-	set_violent( ch, victim, true );
+        if (IS_AWAKE(victim))
+                victim->position = POS_SLEEPING;
+        
+        set_violent( ch, victim, true );
     }
     else
     {
-	damage(ch,victim,0,gsn_vampiric_touch,DAM_NONE, true);
-	gsn_vampiric_touch->improve( ch, false, victim );
-	if ( !victim->is_npc() )
-	{
-		do_yell(victim, "Помогите! Вампиры!");
-	}
+        damage(ch,victim,0,gsn_vampiric_touch,DAM_NONE, true);
+        gsn_vampiric_touch->improve( ch, false, victim );
+        if ( !victim->is_npc() )
+        {
+                do_yell(victim, "Помогите! Вампиры!");
+        }
     }
 }
 
@@ -767,35 +767,35 @@ SKILL_RUNP( bloodlet )
     int chance = gsn_bloodlet->getEffective( ch );
     
     if ( chance < 2 ) {
-	ch->send_to("Ты не владеешь этим!\n\r");
-	return;
+        ch->send_to("Ты не владеешь этим!\n\r");
+        return;
     }
 
     if (ch->isAffected(gsn_bloodlet )) {
-	ch->send_to("У тебя еще не зажили старые раны.\r\n");
-	return;
+        ch->send_to("У тебя еще не зажили старые раны.\r\n");
+        return;
     }
     
     if (IS_VAMPIRE( ch )) {
-	ch->send_to("Тебя возбудит только вид человеческой крови.\r\n");
-	return;
+        ch->send_to("Тебя возбудит только вид человеческой крови.\r\n");
+        return;
     }
 
     ch->setWait( gsn_bloodlet->getBeats( ) );
     dam = ch->getModifyLevel( );
     
     if (number_percent( ) < chance) {
-	act_p("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR, POS_RESTING);
-	act_p("$c1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	ch->getPC( )->desires[desire_bloodlust] = 0;
-	gsn_bloodlet->improve( ch, true );
+        act_p("Ты перерезаешь себе вены.\r\nВид собственной {Rкрови{x возбуждает тебя!", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act_p("$c1 разрезает свою руку и жадно смотрит на капающую кровь.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        ch->getPC( )->desires[desire_bloodlust] = 0;
+        gsn_bloodlet->improve( ch, true );
 
     } else {
-	act_p("Упс! Кажется, ты потеря$gло|л|ла СЛИШКОМ много крови!", ch, 0, 0, TO_CHAR, POS_RESTING);
-	act_p("$c1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	ch->getPC( )->desires[desire_bloodlust] = -6;
-	dam *= 2;
-	gsn_bloodlet->improve( ch, false );
+        act_p("Упс! Кажется, ты потеря$gло|л|ла СЛИШКОМ много крови!", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act_p("$c1 слишком сильно ранит свою руку и не может остановить кровь.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        ch->getPC( )->desires[desire_bloodlust] = -6;
+        dam *= 2;
+        gsn_bloodlet->improve( ch, false );
     }
 
     rawdamage(ch, ch, DAM_OTHER, dam, true);
@@ -816,8 +816,8 @@ public:
 
 
 BonedaggerOneHit::BonedaggerOneHit( Character *ch, Character *victim )
-	    : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-	      SkillDamage( ch, victim, gsn_bonedagger, 0, 0, DAMF_WEAPON )
+            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
+              SkillDamage( ch, victim, gsn_bonedagger, 0, 0, DAMF_WEAPON )
 {
 }
 void BonedaggerOneHit::calcDamage( ) 
@@ -848,26 +848,26 @@ SKILL_RUNP( bonedagger )
     int chance = gsn_bonedagger->getEffective( ch );
 
     if (chance < 2) {
-	ch->send_to("Что?\r\n");
-	return;
+        ch->send_to("Что?\r\n");
+        return;
     }
 
     if (!DIGGED(ch)) {
-	ch->send_to("Нападать можно только из-под земли.\r\n");
-	return;
+        ch->send_to("Нападать можно только из-под земли.\r\n");
+        return;
     }
     
     one_argument( argument, arg );
     
     if (arg[0] == '\0') {
-	if (ch->ambushing[0] == '\0') {
-	    ch->send_to("Чью тень ты хочешь подкараулить?\n\r");
-	    return;
-	}
-	else  {
-	    ch->printf("Ты ждешь, пока некто '%s' отбросит тень на твою могилу.\n\r", ch->ambushing);
-	    return;
-	}
+        if (ch->ambushing[0] == '\0') {
+            ch->send_to("Чью тень ты хочешь подкараулить?\n\r");
+            return;
+        }
+        else  {
+            ch->printf("Ты ждешь, пока некто '%s' отбросит тень на твою могилу.\n\r", ch->ambushing);
+            return;
+        }
     }
 
     ch->setWait( gsn_bonedagger->getBeats( )  );
@@ -882,31 +882,31 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
     Room *room = ch->was_in_room;
     
     if (!DIGGED(ch) || !ch->ambushing || ch->ambushing[0] == 0)
-	return false;
+        return false;
     
     if (room->light <= 0) {
-	if (IS_SET(room->room_flags, ROOM_DARK))
-	    return false;
-	
-	if (weather_info.sunlight == SUN_DARK)
-	    return false;
+        if (IS_SET(room->room_flags, ROOM_DARK))
+            return false;
+        
+        if (weather_info.sunlight == SUN_DARK)
+            return false;
     }
 
     for (victim = room->people; victim; victim = victim->next_in_room) {
-	if (!ch->can_see( victim ))
-	    continue;
-	
-	if (is_safe_nomessage( victim, ch ))
-	    continue;
-	
-	if (!is_name( ch->ambushing, victim->getNameP( ) ))
-	    continue;
+        if (!ch->can_see( victim ))
+            continue;
+        
+        if (is_safe_nomessage( victim, ch ))
+            continue;
+        
+        if (!is_name( ch->ambushing, victim->getNameP( ) ))
+            continue;
 
-	break;
+        break;
     }
 
     if (!victim)
-	return false;
+        return false;
     
     act_p("Твоя тень падает на могилу...", victim, 0, 0, TO_CHAR, POS_RESTING);
     act_p("Тень $c2 падает на могилу...", victim, 0, 0, TO_ROOM, POS_RESTING);
@@ -915,34 +915,34 @@ BOOL_SKILL( bonedagger )::run( Character *ch )
     ch->position = POS_STANDING;
     
     try {
-	BonedaggerOneHit bd( ch, victim );
-	
-	if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
-	    act_p("$c1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT, POS_RESTING);
-	    act_p("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	    act_p("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, victim, TO_CHAR, POS_RESTING);
-	    
-	    gsn_bonedagger->improve( ch, false, victim );
-	    bd.miss( );
-	    return true;
-	}
-	
-	gsn_bonedagger->improve( ch, true, victim );
-	
-	act_p("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT, POS_RESTING);
-	act_p("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	act_p("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR, POS_RESTING);
+        BonedaggerOneHit bd( ch, victim );
+        
+        if (number_percent( ) > gsn_bonedagger->getEffective( ch )) {
+            act_p("$c1 костяным ножом промахивается мимо твоей тени!", ch, 0, victim, TO_VICT, POS_RESTING);
+            act_p("$c1 костяным ножом промахивается мимо тени $C2!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            act_p("Ты костяным ножом промахиваешься мимо тени $C2!", ch, 0, victim, TO_CHAR, POS_RESTING);
+            
+            gsn_bonedagger->improve( ch, false, victim );
+            bd.miss( );
+            return true;
+        }
+        
+        gsn_bonedagger->improve( ch, true, victim );
+        
+        act_p("$c1 приковывает твою тень костяным ножом к земле!\r\nТы не можешь сдвинуться с места!", ch, 0, victim, TO_VICT, POS_RESTING);
+        act_p("$c1 приковывает тень $C2 костяным ножом к земле!", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+        act_p("Ты приковываешь тень $C2 костяным ножом к земле!", ch, 0, victim, TO_CHAR, POS_RESTING);
 
-	af.type = gsn_bonedagger;
-	af.level = ch->getModifyLevel( );
-	af.duration = 1;
-	af.location = APPLY_NONE;
-	af.modifier = 0;
-	af.where = TO_DETECTS;
-	af.bitvector = ADET_WEB;
-	affect_to_char( victim, &af );
-	
-	bd.hit( );
+        af.type = gsn_bonedagger;
+        af.level = ch->getModifyLevel( );
+        af.duration = 1;
+        af.location = APPLY_NONE;
+        af.modifier = 0;
+        af.where = TO_DETECTS;
+        af.bitvector = ADET_WEB;
+        affect_to_char( victim, &af );
+        
+        bd.hit( );
     }
     catch (const VictimDeathException &e) {
     }
@@ -990,8 +990,8 @@ SKILL_RUNP( sense )
       Affect af;
 
       af.where  = TO_DETECTS;
-      af.type 	= gsn_sense_life;
-      af.level 	= ch->getModifyLevel();
+      af.type         = gsn_sense_life;
+      af.level         = ch->getModifyLevel();
       af.duration = ch->getModifyLevel();
       af.location = APPLY_NONE;
       af.modifier = 0;
@@ -1022,31 +1022,31 @@ VOID_SPELL(BatSworm)::run( Character *ch, Character *, int sn, int level )
     Affect af;
 
     if (!ch->fighting) {
-	ch->send_to("Сейчас ты не сражаешься!\r\n");
-	return;
+        ch->send_to("Сейчас ты не сражаешься!\r\n");
+        return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	ch->send_to("Для этого тебе необходимо превратиться в вампира.\r\n");
-	return;
+        ch->send_to("Для этого тебе необходимо превратиться в вампира.\r\n");
+        return;
     }
 
     if (ch->isAffected(sn)) {
-	ch->send_to("Две стаи летучих мышей - это слишком.\r\n");
-	return;
+        ch->send_to("Две стаи летучих мышей - это слишком.\r\n");
+        return;
     }
 
     act_p("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL, POS_RESTING);
     act_p("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM, POS_RESTING);
     act_p("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR, POS_RESTING);
 
-    af.where	    = TO_AFFECTS;
-    af.type	    = sn;
-    af.level	    = level;
-    af.duration	    = 1 + level / 10;
+    af.where            = TO_AFFECTS;
+    af.type            = sn;
+    af.level            = level;
+    af.duration            = 1 + level / 10;
     af.bitvector    = 0;
-    af.modifier	    = 0;
-    af.location	    = APPLY_NONE;
+    af.modifier            = 0;
+    af.location            = APPLY_NONE;
     affect_to_char(ch, &af);
 }
 
@@ -1058,28 +1058,28 @@ VOID_SPELL(BatSworm)::run( Character *ch, Character *, int sn, int level )
 bool VampireGuildmaster::social( Character *actor, Character *victim, const DLString &socialName )
 {
     if (victim != ch || actor == ch)
-	return false;
+        return false;
 
     if (socialName != "bow")
-	return false;
+        return false;
 
     if (actor->is_npc( ) || actor->getProfession( ) != prof_vampire) {
-	act( "$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
-	act( "$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
-	return true;
+        act( "$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
+        act( "$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
+        return true;
     }
     
     PCharacter *pActor = actor->getPC( );
     PCSkillData &data = pActor->getSkillData( gsn_vampire );
 
     if (data.learned == 100) {
-	say_act( actor, ch, "Ты уже ста$gло|л|ла одн$gим|им|ой из нас, $c1." );
-	return true;
+        say_act( actor, ch, "Ты уже ста$gло|л|ла одн$gим|им|ой из нас, $c1." );
+        return true;
     }
     
     if (pActor->questpoints < 50) {
-	say_act( actor, ch, "Я потребую с тебя 50 qp, но я вижу, что ты не можешь заплатить такую цену." );
-	return true;
+        say_act( actor, ch, "Я потребую с тебя 50 qp, но я вижу, что ты не можешь заплатить такую цену." );
+        return true;
     }
 
     pActor->questpoints -= 50;

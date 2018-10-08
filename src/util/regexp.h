@@ -20,7 +20,7 @@ public:
 
     struct Exception : public ::Exception 
     { 
-	Exception(const char *e) : ::Exception(e) { }
+        Exception(const char *e) : ::Exception(e) { }
     };
     
     RegExp( const char * );

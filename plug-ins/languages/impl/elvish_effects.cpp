@@ -28,12 +28,12 @@ bool ResistIronWE::run( PCharacter *ch, Character *victim ) const
     Affect af;
 
     if (!victim->getRace( )->getVuln( ).isSet( VULN_IRON )) {
-	if (victim == ch)
-	    act("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
-	
-	return false;
+        if (victim == ch)
+            act("Ты не страдаешь врожденной уязвимостью к железу.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 не страдает врожденной уязвимостью к железу.", ch, 0, victim, TO_CHAR);
+        
+        return false;
     }
  
     af.where     = TO_RESIST;
@@ -56,22 +56,22 @@ bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
 
     af.where     = TO_OBJECT;
     af.type      = gsn_bless;
-    af.location	 = APPLY_SAVES;
+    af.location         = APPLY_SAVES;
     af.bitvector = ITEM_BLESS;
     af.level     = ch->getModifyLevel( );
     
     for (obj = victim->carrying; obj; obj = obj->next_content) {
-	if (obj->wear_loc == wear_none)
-	    continue;
-	
-	if (IS_OBJ_STAT(obj, ITEM_BLESS))
-	    continue;
-	
-	af.modifier = -1 * number_range( 1, 3 );
-	af.duration = number_range( 6 + af.level / 2, 200 );
-	affect_to_obj( obj, &af);
+        if (obj->wear_loc == wear_none)
+            continue;
+        
+        if (IS_OBJ_STAT(obj, ITEM_BLESS))
+            continue;
+        
+        af.modifier = -1 * number_range( 1, 3 );
+        af.duration = number_range( 6 + af.level / 2, 200 );
+        affect_to_obj( obj, &af);
 
-	ch->saving_throw += af.modifier;
+        ch->saving_throw += af.modifier;
     }
 
     act( "{CОбмундирование на $c6 на мгновение загорается священным огнем.{x", victim, 0, 0, TO_ROOM );
@@ -87,7 +87,7 @@ bool RestoringWE::run( PCharacter *ch, Character *victim ) const
     update_pos( victim );
 
     if (ch != victim)
-	act( "{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
+        act( "{CТаинственное мелодичное слово пронизывает $C4 теплом.{x", ch, 0, victim, TO_CHAR );
 
     victim->println( "{CТаинственное мелодичное слово пронизывает тебя теплом.{x" );
     return true;

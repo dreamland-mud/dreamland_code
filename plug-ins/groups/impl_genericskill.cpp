@@ -9,13 +9,13 @@
 
 extern "C"
 {
-	SO::PluginList initialize_genericskill( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<MocRegistrator<GenericSkill> >( ppl );
-		
-		return ppl;
-	}
-	
+        SO::PluginList initialize_genericskill( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<MocRegistrator<GenericSkill> >( ppl );
+                
+                return ppl;
+        }
+        
 }

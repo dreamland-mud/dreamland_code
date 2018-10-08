@@ -52,10 +52,10 @@ bool ServerSocketContainer::isWrapped( int d )
     iterator pos;
 
     for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-	ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
+        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
 
-	if (sock->getFD( ) == d)
-	    return (sock->getWrapped( ) > 0);
+        if (sock->getFD( ) == d)
+            return (sock->getWrapped( ) > 0);
     }
 
     return false;
@@ -66,10 +66,10 @@ bool ServerSocketContainer::isBackdoor( int d )
     iterator pos;
 
     for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-	ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
+        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
 
-	if (sock->getFD( ) == d)
-	    return sock->isBackdoor( );
+        if (sock->getFD( ) == d)
+            return sock->isBackdoor( );
     }
 
     return false;
@@ -80,10 +80,10 @@ bool ServerSocketContainer::isWebSock( int d )
     iterator pos;
 
     for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-	ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
+        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
 
-	if (sock->getFD( ) == d)
-	    return sock->isWebSock( );
+        if (sock->getFD( ) == d)
+            return sock->isWebSock( );
     }
 
     return false;
@@ -94,8 +94,8 @@ bool ServerSocketContainer::isAllowed( int d, struct sockaddr_in &other_sock )
     iterator pos;
 
     for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-	ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
-	
+        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
+        
         if (sock->getFD( ) == d) {
            if (!sock->isLocal( ))
                return true;
@@ -115,10 +115,10 @@ void ServerSocketContainer::FD_SETBeforeSelect( fd_set* in_set )
     iterator pos;
 
     for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-	ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
+        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
 
-	if (sock->isInitialized( ))
-	    FD_SET( sock->getFD( ), in_set );
+        if (sock->isInitialized( ))
+            FD_SET( sock->getFD( ), in_set );
     }
 }
 
@@ -127,9 +127,9 @@ void ServerSocketContainer::checkNewConnaection( fd_set* in_set )
     iterator pos;
 
     for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-	ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
+        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
 
-	if (sock->isInitialized( ) && FD_ISSET( sock->getFD( ), in_set ))
-	    init_descriptor( sock->getFD( ) );
+        if (sock->isInitialized( ) && FD_ISSET( sock->getFD( ), in_set ))
+            init_descriptor( sock->getFD( ) );
     }
 }

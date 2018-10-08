@@ -37,7 +37,7 @@ Monitor::wait()
 #ifndef __MINGW32__
     int rc;
     if((rc=pthread_cond_wait(&cnd, &mux->mux)))
-	LogStream::sendError( ) << "pthread_cond_wait failed! " << strerror(rc) << endl;
+        LogStream::sendError( ) << "pthread_cond_wait failed! " << strerror(rc) << endl;
 #else
     /*XXX - this is a bit dangerous*/
     mux->unlock( );
@@ -80,7 +80,7 @@ Monitor::notifyAll()
     pthread_cond_broadcast(&cnd);
 #else
     while(SetEvent(evt))
-	;
+        ;
 #endif
 }
 

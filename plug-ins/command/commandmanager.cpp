@@ -53,18 +53,18 @@ Command::Pointer CommandList::chooseCommand( Character *ch, const DLString &name
     const list<Command::Pointer> &mylist = name.isRussian( ) ? commands_ru : commands;
 
     for (i = mylist.begin( ); i != mylist.end( ); i++) {
-	Command::Pointer pCommand = *i;
+        Command::Pointer pCommand = *i;
 
-	if (pCommand->available( ch ) && pCommand->matches( name ))  {
-	    return pCommand;
+        if (pCommand->available( ch ) && pCommand->matches( name ))  {
+            return pCommand;
         }
     }
 
     for (i = mylist.begin( ); i != mylist.end( ); i++) {
-	Command::Pointer pCommand = *i;
+        Command::Pointer pCommand = *i;
 
-	if (pCommand->available( ch ) && pCommand->matchesAlias( name ))  {
-	    return pCommand;
+        if (pCommand->available( ch ) && pCommand->matchesAlias( name ))  {
+            return pCommand;
         }
     }
 
@@ -179,13 +179,13 @@ void CommandManager::registrate( Command::Pointer command )
     commands.add( command );
 
     if (command->getHelp( ))
-	command->getHelp( )->setCommand( command );
+        command->getHelp( )->setCommand( command );
 }
 
 void CommandManager::unregistrate( Command::Pointer command )
 {
     if (command->getHelp( ))
-	command->getHelp( )->unsetCommand( );
+        command->getHelp( )->unsetCommand( );
     
     commands.remove( command );
 }
@@ -195,8 +195,8 @@ void CommandManager::loadPriorities( )
     XMLVectorBase<XMLString> v, rv;                                                 
 
     if (!loadXML( &v, PRIO_FILE )) {
-	LogStream::sendError( ) << "Command priorities file not found!" << endl;
-	return;
+        LogStream::sendError( ) << "Command priorities file not found!" << endl;
+        return;
     }
 
     loadXML( &rv, PRIO_FILE_RU );
@@ -208,7 +208,7 @@ void CommandManager::loadPriorities( )
         priorities_ru[rv[i].getValue( )] = i;
 
     LogStream::sendNotice( ) 
-	<< "Loaded " << priorities.size( ) << " command priorities" << endl;
+        << "Loaded " << priorities.size( ) << " command priorities" << endl;
 }
 
 DLString CommandManager::getTableName( ) const
@@ -219,7 +219,7 @@ DLString CommandManager::getTableName( ) const
 
 void CommandManager::putInto( )
 {
-    interp->put( this, CMDP_FIND, 10 );	
+    interp->put( this, CMDP_FIND, 10 );        
 }
 
 bool CommandManager::process( InterpretArguments &iargs )
@@ -227,7 +227,7 @@ bool CommandManager::process( InterpretArguments &iargs )
     iargs.pCommand = commands.chooseCommand( iargs.ch, iargs.cmdName );
 
     if (iargs.pCommand)
-	iargs.advance( );
+        iargs.advance( );
 
     return true;
 }

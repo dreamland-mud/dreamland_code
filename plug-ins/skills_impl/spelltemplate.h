@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-#ifndef	__SPELLTEMPLATE_H__
+#ifndef        __SPELLTEMPLATE_H__
 #define __SPELLTEMPLATE_H__
 
 // MOC_SKIP_BEGIN
@@ -24,16 +24,16 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     virtual void run( Character *, Room *, int, int ) { }
     
     virtual int getMaxRange( Character *ch ) const {
-	return DefaultSpell::getMaxRange( ch );
+        return DefaultSpell::getMaxRange( ch );
     }
     virtual bool spellbane( Character *ch, Character *victim ) const { 
-	return DefaultSpell::spellbane( ch, victim );
+        return DefaultSpell::spellbane( ch, victim );
     }
     virtual void utter( Character * ch ) { 
-	DefaultSpell::utter( ch );
+        DefaultSpell::utter( ch );
     }
     virtual bool checkPosition( Character *ch ) const { 
-	return DefaultSpell::checkPosition( ch );
+        return DefaultSpell::checkPosition( ch );
     }
 
     virtual const DLString &getType( ) const {

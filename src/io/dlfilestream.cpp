@@ -31,7 +31,7 @@ void DLFileStream::openInputStream( ) throw( ExceptionDBIO )
     istr.open( path.c_str( ) );
     
     if (!istr) 
-	throw ExceptionDBIO( "Unable to open input stream for '" + path + "'" );
+        throw ExceptionDBIO( "Unable to open input stream for '" + path + "'" );
 }
 
 void DLFileStream::openOutputStream( ) throw( ExceptionDBIO )
@@ -39,7 +39,7 @@ void DLFileStream::openOutputStream( ) throw( ExceptionDBIO )
     ostr.open( path.c_str( ) );
     
     if (!ostr) 
-	throw ExceptionDBIO( "Unable to open output stream for '" + path + "'" );
+        throw ExceptionDBIO( "Unable to open output stream for '" + path + "'" );
 }
 
 void DLFileStream::toStream( std::ostream &buf ) throw( ExceptionDBIO )
@@ -49,7 +49,7 @@ void DLFileStream::toStream( std::ostream &buf ) throw( ExceptionDBIO )
     openInputStream( );
 
     while (istr.get( c )) {
-	buf << c;
+        buf << c;
     }
 
     istr.close( );

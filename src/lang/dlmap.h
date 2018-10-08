@@ -6,7 +6,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef	DLMAP_H
+#ifndef        DLMAP_H
 #define DLMAP_H
 
 #include <map>
@@ -37,24 +37,24 @@ public:
 template<typename Key, typename Value, typename Compare>
 void DLMap<Key, Value, Compare>::erase_delete( iterator begin, iterator end )
 {
-	for( iterator pos = begin; pos != end; pos++ )
-	{
-		delete( pos->second );
-	}
-	erase( begin, end );
+        for( iterator pos = begin; pos != end; pos++ )
+        {
+                delete( pos->second );
+        }
+        erase( begin, end );
 }
 
 template<typename Key, typename Value, typename Compare>
 void DLMap<Key, Value, Compare>::erase_delete( iterator position )
 {
-	delete( position->second );
-	erase( position );
+        delete( position->second );
+        erase( position );
 }
 
 template<typename Key, typename Value, typename Compare>
 void DLMap<Key, Value, Compare>::clear_delete( )
 {
-	erase_delete( begin( ), end( ) );
+        erase_delete( begin( ), end( ) );
 }
 
 #endif

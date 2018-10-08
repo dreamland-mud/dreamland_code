@@ -27,34 +27,34 @@ struct Test : public XMLEditor {
     bool eof;
     
     virtual void print(const string &str) {
-	cout << "cout: " << str << endl;
+        cout << "cout: " << str << endl;
     }
     virtual void error(const string &str) {
-	cerr << "cerr: " << str << endl;
+        cerr << "cerr: " << str << endl;
     }
     virtual void done() {
-	eof = true;
+        eof = true;
     }
     virtual string shell(const string &cmd, const string &str) {
-	cout << "cmd: " << cmd << endl;
+        cout << "cmd: " << cmd << endl;
 
-	FILE *f = popen(cmd.c_str(), "r+");
-	char buf[1024];
-	
-	if(!f)
-	    perror("popen");
+        FILE *f = popen(cmd.c_str(), "r+");
+        char buf[1024];
+        
+        if(!f)
+            perror("popen");
 
-	fwrite(str.c_str(), str.size(), 1, f);
-	write(1, str.c_str(), str.size());
-	buf[fread(buf, 1, sizeof(buf)-1, f)] = 0;
-	cout << "buf: " << buf << endl;
+        fwrite(str.c_str(), str.size(), 1, f);
+        write(1, str.c_str(), str.size());
+        buf[fread(buf, 1, sizeof(buf)-1, f)] = 0;
+        cout << "buf: " << buf << endl;
 
-	return buf;
+        return buf;
     }
 
     virtual reg_t &registerAt(char r) {
-	cout << "get reg " << (int)r << " size: " << regs[r].size( ) << endl;
-	return regs[r];
+        cout << "get reg " << (int)r << " size: " << regs[r].size( ) << endl;
+        return regs[r];
     }
 
     XMLEditorRegisters regs;
@@ -65,78 +65,78 @@ main(int argc, char **argv)
 {
 //    yydebug = 1;
     {
-	Test ed;
+        Test ed;
 
-	{
-	    ifstream iss("state.xml");
-	    if(iss) {
-		XMLDocument::Pointer doc(NEW);
-		doc->load( iss );
-		ed.fromXML( doc->getFirstNode( ) );
-	    } else
-		cerr << "state.xml not loaded" << endl;
+        {
+            ifstream iss("state.xml");
+            if(iss) {
+                XMLDocument::Pointer doc(NEW);
+                doc->load( iss );
+                ed.fromXML( doc->getFirstNode( ) );
+            } else
+                cerr << "state.xml not loaded" << endl;
 
-	    iss.close( );
-	}
-	
-	{
-	    ifstream iss("regs.xml");
-	    if(iss) {
-		XMLDocument::Pointer doc(NEW);
-		doc->load( iss );
-		ed.regs.fromXML( doc->getFirstNode( ) );
-	    } else
-		cerr << "regs.xml not loaded" << endl;
+            iss.close( );
+        }
+        
+        {
+            ifstream iss("regs.xml");
+            if(iss) {
+                XMLDocument::Pointer doc(NEW);
+                doc->load( iss );
+                ed.regs.fromXML( doc->getFirstNode( ) );
+            } else
+                cerr << "regs.xml not loaded" << endl;
 
-	    iss.close( );
-	}
-	
-	if(argc > 1) {
-	    ifstream is(argv[1]);
-	    ed.lines.fromstream(is);
-	    
-	    ed.currentline = ed.lines.end();
-	    ed.currentline--;
-	    cout << "Total " << ed.lines.size() << " lines" << endl;
-	}
-	
-	char buf[512];
-	while(!ed.eof && cin.getline(buf, sizeof(buf))) {
-	    if(!*buf)
-		ed.eval(" ");
-	    else
-		ed.eval(buf);
-	}
+            iss.close( );
+        }
+        
+        if(argc > 1) {
+            ifstream is(argv[1]);
+            ed.lines.fromstream(is);
+            
+            ed.currentline = ed.lines.end();
+            ed.currentline--;
+            cout << "Total " << ed.lines.size() << " lines" << endl;
+        }
+        
+        char buf[512];
+        while(!ed.eof && cin.getline(buf, sizeof(buf))) {
+            if(!*buf)
+                ed.eval(" ");
+            else
+                ed.eval(buf);
+        }
 
-	{
-	    ofstream oss("state.xml");
-	    if(oss) {
-		XMLDocument::Pointer doc(NEW);
-		
-		XMLNode::Pointer root(NEW, "root");
-		ed.toXML(root);
-		doc->appendChild( root );
-		
-		doc->save( oss );
-	    } else
-		cerr << "state.xml not saved" << endl;
+        {
+            ofstream oss("state.xml");
+            if(oss) {
+                XMLDocument::Pointer doc(NEW);
+                
+                XMLNode::Pointer root(NEW, "root");
+                ed.toXML(root);
+                doc->appendChild( root );
+                
+                doc->save( oss );
+            } else
+                cerr << "state.xml not saved" << endl;
 
-	    oss.close( );
-	}
-	
-	{
-	    ofstream oss("regs.xml");
-	    if(oss) {
-		XMLDocument::Pointer doc(NEW);
-		XMLNode::Pointer regs(NEW, "regs");
-		ed.regs.toXML(regs);
-		doc->appendChild( regs );
-		doc->save( oss );
-	    } else
-		cerr << "regs.xml not saved" << endl;
+            oss.close( );
+        }
+        
+        {
+            ofstream oss("regs.xml");
+            if(oss) {
+                XMLDocument::Pointer doc(NEW);
+                XMLNode::Pointer regs(NEW, "regs");
+                ed.regs.toXML(regs);
+                doc->appendChild( regs );
+                doc->save( oss );
+            } else
+                cerr << "regs.xml not saved" << endl;
 
-	    oss.close( );
-	}
+            oss.close( );
+        }
 
     }
 

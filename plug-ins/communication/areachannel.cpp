@@ -28,7 +28,7 @@ AreaChannel::AreaChannel( )
 bool AreaChannel::isGlobalListener( Character *ch, Character *victim ) const
 {
     if (victim->in_room->area != ch->in_room->area)
-	return false;
+        return false;
 
     return WorldChannel::isGlobalListener( ch, victim );
 }
@@ -41,21 +41,21 @@ void AreaChannel::triggers( Character *ch, const DLString &msg ) const
     chanID.upperFirstCharacter( );
         
     for (Character *wch = char_list; wch; wch = wch->next) {
-	if (wch->in_room->area == ch->in_room->area) {
-	    FENIA_VOID_CALL( wch, chanID, "Cs", ch, str );
-	    
-	    if (wch->is_npc( ))
-		FENIA_NDX_VOID_CALL( wch->getNPC( ), chanID, "CCs", wch, ch, str );
+        if (wch->in_room->area == ch->in_room->area) {
+            FENIA_VOID_CALL( wch, chanID, "Cs", ch, str );
+            
+            if (wch->is_npc( ))
+                FENIA_NDX_VOID_CALL( wch->getNPC( ), chanID, "CCs", wch, ch, str );
 
-	    for (Object *obj = wch->carrying; obj; obj = obj->next_content) {
-		FENIA_VOID_CALL( obj, chanID, "Cs", ch, str );
-		FENIA_NDX_VOID_CALL( obj, chanID, "OCs", obj, ch, str );
-	    }
-	}
+            for (Object *obj = wch->carrying; obj; obj = obj->next_content) {
+                FENIA_VOID_CALL( obj, chanID, "Cs", ch, str );
+                FENIA_NDX_VOID_CALL( obj, chanID, "OCs", obj, ch, str );
+            }
+        }
     }
 
     if (!ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
-	WorldChannel::triggers( ch, msg );
+        WorldChannel::triggers( ch, msg );
 }
 
 void AreaChannel::postOutput( Character *outputTo, const DLString &message ) const

@@ -45,35 +45,35 @@ GlobalQuestManager::~GlobalQuestManager( )
 void GlobalQuestManager::run( ) 
 {
     if (dreamland->getRebootCounter( ) < 36 && dreamland->getRebootCounter( ) != -1) 
-	return;
-	
+        return;
+        
     for (RegistryList::iterator iter = registry.begin( );
-	                    iter != registry.end( );
-			    iter++)
+                            iter != registry.end( );
+                            iter++)
     {
-	GlobalQuestInfo::Config config;
-	GlobalQuestInfo::Pointer gqi = iter->second;
-	GlobalQuestInfo::PlayerList players;
-	
-	if (!gqi->getAutostart( ))
-	    continue;
+        GlobalQuestInfo::Config config;
+        GlobalQuestInfo::Pointer gqi = iter->second;
+        GlobalQuestInfo::PlayerList players;
+        
+        if (!gqi->getAutostart( ))
+            continue;
 
-	if (gqi->getLastTime( ) + gqi->getWaitingTime( ) > dreamland->getCurrentTime( )) 
-	    continue;
+        if (gqi->getLastTime( ) + gqi->getWaitingTime( ) > dreamland->getCurrentTime( )) 
+            continue;
 
-	gqi->findParticipants( players );	
+        gqi->findParticipants( players );        
 
-	if (!gqi->canAutoStart( players, config ))
-	    continue;
+        if (!gqi->canAutoStart( players, config ))
+            continue;
 
-	try {
-	    gqi->tryStart( config );
-	} 
-	catch (const GQAlreadyRunningException &) {
-	} 
-	catch (const Exception &e) { 
-	    LogStream::sendNotice( ) << e.what( ) << endl;
-	}
+        try {
+            gqi->tryStart( config );
+        } 
+        catch (const GQAlreadyRunningException &) {
+        } 
+        catch (const Exception &e) { 
+            LogStream::sendNotice( ) << e.what( ) << endl;
+        }
     }
 }
 
@@ -97,7 +97,7 @@ void GlobalQuestManager::unregistrate( GlobalQuestInfo *gqi )
     RegistryList::iterator i = registry.find( gqi->getQuestID( ) );
 
     if (i != registry.end( ))
-	registry.erase( i );
+        registry.erase( i );
 }
 
 void GlobalQuestManager::activate( GlobalQuest *gq )
@@ -110,7 +110,7 @@ void GlobalQuestManager::deactivate( GlobalQuest *gq )
     RunList::iterator i = running.find( gq->getQuestID( ) );
 
     if (i != running.end( ))
-	running.erase( i );
+        running.erase( i );
 }
 
 GlobalQuestManager::RunList & GlobalQuestManager::getRunning( ) 
@@ -129,7 +129,7 @@ GlobalQuestManager::findGlobalQuest( const DLString &id )
     RunList::iterator i = running.find( id );
     
     if (i == running.end( ))
-	return GlobalQuest::Pointer( );
+        return GlobalQuest::Pointer( );
     
     return i->second;
 }
@@ -153,13 +153,13 @@ void GlobalQuestManager::rewardChar( PCMemoryInterface *pcm, XMLReward &r )
     attribute = pcm->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" ); 
 
     if (attribute && attribute->getNoExp( ) == true) 
-	r.experience = 0;
+        r.experience = 0;
 
     attr = pcm->getAttributes( ).getAttr<XMLAttributeReward>( "reward" );
     attr->addReward( r );
     
     if (pcm->isOnline( )) 
-	attr->reward( pcm->getPlayer( ) );
+        attr->reward( pcm->getPlayer( ) );
 
     PCharacterManager::saveMemory( pcm );
 }
@@ -170,17 +170,17 @@ void GlobalQuestManager::load( GlobalQuestInfo *gqi )
     XMLNode::Pointer node( NEW );
 
     try {
-	DBIO::DBNode dbNode = dbioTable.select( gqi->getQuestID( ) );
-	basic_istringstream<char> istr( dbNode.getXML( ).c_str( ) );
-	
-	doc->load( istr );
-	node = doc->getFirstNode( );
-	
-	if (!node.isEmpty( )) 
-	    gqi->fromXML( node );
-		    
+        DBIO::DBNode dbNode = dbioTable.select( gqi->getQuestID( ) );
+        basic_istringstream<char> istr( dbNode.getXML( ).c_str( ) );
+        
+        doc->load( istr );
+        node = doc->getFirstNode( );
+        
+        if (!node.isEmpty( )) 
+            gqi->fromXML( node );
+                    
     } catch (const Exception &e) {
-	LogStream::sendWarning( ) << e.what( ) << endl;
+        LogStream::sendWarning( ) << e.what( ) << endl;
     }
 }
 
@@ -191,17 +191,17 @@ GlobalQuest::Pointer GlobalQuestManager::loadRT( GlobalQuestInfo *gqi )
     XMLNode::Pointer node( NEW );
 
     try {
-	DBIO::DBNode dbNode = dbioRuntime.select( gqi->getQuestID( ) );
-	basic_istringstream<char> istr( dbNode.getXML( ).c_str( ) );
+        DBIO::DBNode dbNode = dbioRuntime.select( gqi->getQuestID( ) );
+        basic_istringstream<char> istr( dbNode.getXML( ).c_str( ) );
 
-	doc->load( istr );
-	node = doc->getFirstNode( );
+        doc->load( istr );
+        node = doc->getFirstNode( );
 
-	if (!node.isEmpty( )) {
-	    gq = gqi->getQuestInstance( );
-	    gq->fromXML( node );
-	}
-		    
+        if (!node.isEmpty( )) {
+            gq = gqi->getQuestInstance( );
+            gq->fromXML( node );
+        }
+                    
     } catch (...) {
     }
 
@@ -215,14 +215,14 @@ void GlobalQuestManager::save( GlobalQuestInfo *gqi )
     XMLNode::Pointer node( NEW, NODE_NAME_QINFO );
     
     try {
-	doc->appendChild( node );
-	gqi->toXML( node );
-	doc->save( ostr );
+        doc->appendChild( node );
+        gqi->toXML( node );
+        doc->save( ostr );
 
-	dbioTable.insert( gqi->getQuestID( ), ostr.str( ) );
+        dbioTable.insert( gqi->getQuestID( ), ostr.str( ) );
     
     } catch (const Exception& ex) {
-	throw ex;
+        throw ex;
     }
 }
 
@@ -233,21 +233,21 @@ void GlobalQuestManager::saveRT( GlobalQuest *gq )
     XMLNode::Pointer node( NEW, NODE_NAME_QUEST );
     
     try {
-	doc->appendChild( node );
-	gq->toXML( node );
-	doc->save( ostr );
+        doc->appendChild( node );
+        gq->toXML( node );
+        doc->save( ostr );
 
-	dbioRuntime.insert( gq->getQuestID( ), ostr.str( ) );
+        dbioRuntime.insert( gq->getQuestID( ), ostr.str( ) );
     
     } catch (const Exception& ex) {
-	throw ex;
+        throw ex;
     }
 }
 
 void GlobalQuestManager::removeRT( GlobalQuest *gq )
 {
     try {
-	dbioRuntime.remove( gq->getQuestID( ) );
+        dbioRuntime.remove( gq->getQuestID( ) );
     
     } catch (...) {
     }

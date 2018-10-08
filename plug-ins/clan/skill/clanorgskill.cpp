@@ -14,10 +14,10 @@ ClanOrgSkill::ClanOrgSkill( )
 bool ClanOrgSkill::visible( Character * ch ) const
 {
     if (!ClanSkill::visible( ch ))
-	return false;
+        return false;
 
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     return (getOrgInfo( ch->getPC( ) ) != NULL);
 }
@@ -27,15 +27,15 @@ bool ClanOrgSkill::available( Character * ch ) const
     const SkillOrgInfo *org;
     
     if (!ClanSkill::available( ch ))
-	return false;
-	
+        return false;
+        
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     org = getOrgInfo( ch->getPC( ) );
     
     if (!org)
-	return false;
+        return false;
 
     return ch->getPC( )->getClanLevel( ) >= org->clanLevel.getValue( );
 }
@@ -48,12 +48,12 @@ ClanOrgSkill::getOrgInfo( PCharacter *pch ) const
     XMLAttributes &attributes = pch->getAttributes( );
 
     for (o = organizations.begin( ); o != organizations.end( ); o++) 
-	if (attributes.isAvailable( o->first )) {
-	    attr = attributes.findAttr<XMLStringAttribute>( o->first );
-	    
-	    if (attr && attr->getValue( ) == o->second.name.getValue( ))
-		return &o->second;
-	}
+        if (attributes.isAvailable( o->first )) {
+            attr = attributes.findAttr<XMLStringAttribute>( o->first );
+            
+            if (attr && attr->getValue( ) == o->second.name.getValue( ))
+                return &o->second;
+        }
 
     return NULL;
 }

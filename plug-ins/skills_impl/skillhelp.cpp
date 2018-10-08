@@ -56,10 +56,10 @@ void SkillHelpFormatter::reset( )
 void SkillHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-	PlayerConfig::Pointer cfg = ch->getConfig( );
+        PlayerConfig::Pointer cfg = ch->getConfig( );
 
-	fRusCmd = cfg->rucommands;
-	fRusSkill = cfg->ruskills;
+        fRusCmd = cfg->rucommands;
+        fRusSkill = cfg->ruskills;
     }
     
     HelpFormatter::setup( ch );
@@ -74,26 +74,26 @@ void SkillHelpFormatter::setup( Character *ch )
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (HelpFormatter::handleKeyword( kw, out ))
-	return true;
+        return true;
     
     if (kw == "CMD" && cmd) {
-	out << (fRusCmd && !cmd->getRussianName( ).empty( )
-	                ? cmd->getRussianName( )
-	                : cmd->getName( ));
-	return true;
+        out << (fRusCmd && !cmd->getRussianName( ).empty( )
+                        ? cmd->getRussianName( )
+                        : cmd->getName( ));
+        return true;
     }
 
     if (kw == "SKILL") {
-	out << (fRusSkill ? skill->getRussianName( ).quote( )
-	                  : skill->getName( ).quote( ));
-	return true;
+        out << (fRusSkill ? skill->getRussianName( ).quote( )
+                          : skill->getName( ).quote( ));
+        return true;
     }
 
     if (kw == "SPELL") {
-	out << (fRusCmd ? "к" : "c") << " "
-	    << (fRusSkill ? skill->getRussianName( ).quote( )
-	                  : skill->getName( ).quote( ));
-	return true;
+        out << (fRusCmd ? "к" : "c") << " "
+            << (fRusSkill ? skill->getRussianName( ).quote( )
+                          : skill->getName( ).quote( ));
+        return true;
     }
     
     return false;
@@ -104,7 +104,7 @@ void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream 
 {
     SkillHelpFormatter( in.str( ).c_str( ), 
                         skill 
-		      ).run( ch, out );
+                      ).run( ch, out );
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )
@@ -117,16 +117,16 @@ void SkillHelp::setSkill( Skill::Pointer skill )
     kwd.insert( skill->getRussianName( ) );    
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        kwd.fromString( keyword );
     
     if (skill->getCommand( )) {
-	Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
-	
-	if (cmd) {
-	    kwd.insert( cmd->getName( ) );
-	    cmd->getAliases( ).toSet( kwd );
-	    cmd->getRussianAliases( ).toSet( kwd );
-	}
+        Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
+        
+        if (cmd) {
+            kwd.insert( cmd->getName( ) );
+            cmd->getAliases( ).toSet( kwd );
+            cmd->getRussianAliases( ).toSet( kwd );
+        }
     }
     
     fullKeyword = kwd.toString( );

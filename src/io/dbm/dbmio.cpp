@@ -23,13 +23,13 @@ DBMIO::DBMIO() : db(0)
 DBMIO::~DBMIO()
 {
     if(db) {
-	try {
-	    close();
-	} catch(const DBMIO::Exception &ex) {
-	    LogStream::sendError() 
-		<< "Exception " << ex.what()
-		<< " caused by DBMIO::close() called from destructor" << endl;
-	}
+        try {
+            close();
+        } catch(const DBMIO::Exception &ex) {
+            LogStream::sendError() 
+                << "Exception " << ex.what()
+                << " caused by DBMIO::close() called from destructor" << endl;
+        }
     }
 }
 
@@ -37,16 +37,16 @@ u_int32_t
 DBMIO::hash(const void *k, size_t ksize)
 {
     if(ksize != sizeof(Key)) {
-	ostringstream os;
-	DLString key;
-	key.assign((const char *)k, ksize);
-	    
-	os << "hash: wrong key size ksize=" << ksize 
-	   << " sizeof(Key)=" << sizeof(Key) 
-	   << " key='" << key << "'" << endl;
+        ostringstream os;
+        DLString key;
+        key.assign((const char *)k, ksize);
+            
+        os << "hash: wrong key size ksize=" << ksize 
+           << " sizeof(Key)=" << sizeof(Key) 
+           << " key='" << key << "'" << endl;
 
-	LogStream::sendError() << os.str( );
-//	throw DBMIO::Exception(os.str( ));
+        LogStream::sendError() << os.str( );
+//        throw DBMIO::Exception(os.str( ));
     }
 
     return *(Key*)k;
@@ -64,27 +64,27 @@ DBMIO::open(const char *fname, int flags, int mode)
     db = dbopen(fname, flags, mode, DB_HASH, &hi);
 
     if(!db)
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 }
 
 void 
 DBMIO::sync()
 {
     if(!db)
-	throw DBMIO::Exception("no database opened");
+        throw DBMIO::Exception("no database opened");
 
     if(db->sync(db, 0))
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 }
 
 void 
 DBMIO::close()
 {
     if(!db)
-	throw DBMIO::Exception("no database opened");
+        throw DBMIO::Exception("no database opened");
 
     if(db->close(db))
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 
     db = 0;
 }
@@ -98,17 +98,17 @@ DBMIO::del(const Key &k)
     int rc;
     
     if(!db)
-	throw DBMIO::Exception("no database opened");
+        throw DBMIO::Exception("no database opened");
 
     key.data = &kCopy;
     key.size = sizeof(kCopy);
     rc = db->del(db, &key, 0);
     
     if(rc < 0)
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 
     if(rc > 0)
-	throw DBMIO::Exception("key not in database");
+        throw DBMIO::Exception("key not in database");
 }
 
 void 
@@ -120,7 +120,7 @@ DBMIO::get(const Key &k, DLString &v)
     const char *d;
     
     if(!db)
-	throw DBMIO::Exception("no database opened");
+        throw DBMIO::Exception("no database opened");
 
     key.data = &kCopy;
     key.size = sizeof(kCopy);
@@ -129,10 +129,10 @@ DBMIO::get(const Key &k, DLString &v)
     rc = db->get(db, &key, &val, 0);
     
     if(rc < 0)
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 
     if(rc > 0)
-	throw DBMIO::Exception("key not in database");
+        throw DBMIO::Exception("key not in database");
 
     d = (const char *)val.data;
     v.assign(d, val.size);
@@ -147,7 +147,7 @@ DBMIO::put(const Key &k, const DLString &v)
     char data[v.size()];
     
     if(!db)
-	throw DBMIO::Exception("no database opened");
+        throw DBMIO::Exception("no database opened");
 
     copy(v.begin(), v.end(), data);
 
@@ -156,15 +156,15 @@ DBMIO::put(const Key &k, const DLString &v)
     val.data = data;
     val.size = v.size();
     if(val.size > 4096)
-	LogStream::sendError() << k << ": extreme record size: " << val.size << endl;
+        LogStream::sendError() << k << ": extreme record size: " << val.size << endl;
     
     rc = db->put(db, &key, &val, 0);
     
     if(rc < 0)
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 
     if(rc > 0)
-	throw DBMIO::Exception("key already in database");
+        throw DBMIO::Exception("key already in database");
 }
 
 void
@@ -175,7 +175,7 @@ DBMIO::seq(Key &k, DLString &v, unsigned int flags)
     const char *d;
     
     if(!db)
-	throw DBMIO::Exception("no database opened");
+        throw DBMIO::Exception("no database opened");
 
     key.data = 0;
     key.size = 0;
@@ -184,13 +184,13 @@ DBMIO::seq(Key &k, DLString &v, unsigned int flags)
     rc = db->seq(db, &key, &val, flags);
     
     if(rc < 0)
-	throw DBMIO::Exception(strerror(errno));
+        throw DBMIO::Exception(strerror(errno));
 
     if(rc > 0)
-	throw DBMIO::EOFException();
+        throw DBMIO::EOFException();
 
     if(key.size != sizeof(Key))
-	throw DBMIO::Exception("seq: wrong key size");
+        throw DBMIO::Exception("seq: wrong key size");
     
     k = *(Key*)key.data;
     

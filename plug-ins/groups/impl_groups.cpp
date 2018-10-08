@@ -22,32 +22,32 @@ public:
 
     virtual void initialization( )
     {
-	Class::regMoc<VampireSkill>( );
-	Class::regMoc<ExoticSkill>( );
+        Class::regMoc<VampireSkill>( );
+        Class::regMoc<ExoticSkill>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregMoc<ExoticSkill>( );
-	Class::unregMoc<VampireSkill>( );
+        Class::unregMoc<ExoticSkill>( );
+        Class::unregMoc<VampireSkill>( );
     }
 };
 
 
 extern "C"
 {
-	SO::PluginList initialize_group_skills( )
-	{
-	    SO::PluginList ppl;
-	    
-	    Plugin::registerPlugin<GroupSkillsRegistrator>( ppl );
+        SO::PluginList initialize_group_skills( )
+        {
+            SO::PluginList ppl;
+            
+            Plugin::registerPlugin<GroupSkillsRegistrator>( ppl );
 
-	    Plugin::registerPlugin<ObjectBehaviorRegistrator<MagicJar> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<NecroCreature> >( ppl );
-	    Plugin::registerPlugin<MobileBehaviorRegistrator<AdamantiteGolem> >( ppl );
-	    
-	    return ppl;
-	}
-	
+            Plugin::registerPlugin<ObjectBehaviorRegistrator<MagicJar> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<NecroCreature> >( ppl );
+            Plugin::registerPlugin<MobileBehaviorRegistrator<AdamantiteGolem> >( ppl );
+            
+            return ppl;
+        }
+        
 }
 

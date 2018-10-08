@@ -16,10 +16,10 @@ class Object;
  */
 struct SchedulerTaskRoundObject : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundObject> Pointer;
-	
-	virtual void run( );
-	/** Обработать обьект */
-	virtual void run( Object* object ) = 0;
-	virtual int getPriority( ) const;
+        typedef ::Pointer<SchedulerTaskRoundObject> Pointer;
+        
+        virtual void run( );
+        /** Обработать обьект */
+        virtual void run( Object* object ) = 0;
+        virtual int getPriority( ) const;
 };

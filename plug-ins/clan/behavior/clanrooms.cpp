@@ -26,7 +26,7 @@ ClanArea::Pointer ClanRoom::getClanArea( )
     area = getRoom( )->area;
 
     if (area->behavior) 
-	clanArea = area->behavior.getDynamicPointer<ClanArea>( );
+        clanArea = area->behavior.getDynamicPointer<ClanArea>( );
 
     return clanArea;
 }
@@ -40,21 +40,21 @@ bool ClanPetShopStorage::canServeClient( Character *client )
     ClanArea::Pointer clanArea;
     
     if (!PetShopStorage::canServeClient( client ))
-	return false;
+        return false;
 
     if (client->is_npc( ))
-	return false;
+        return false;
 
     if (client->getClan( ) == room->clan) 
-	return true;
+        return true;
 
     clanArea = getClanArea( );
 
     if (!clanArea)
-	return true;
+        return true;
     
     if (clanArea->findInvitation( client->getPC( ) )) 
-	return true;	
+        return true;        
     
     client->println( "Тебя здесь обслуживать не будут." );
     return false;

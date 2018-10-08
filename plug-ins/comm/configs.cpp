@@ -33,43 +33,43 @@ const DLString & ConfigElement::getRussianName( ) const
 void ConfigElement::init( )
 {
     if (autocmd) {
-	commandManager->registrate( Pointer( this ) );
+        commandManager->registrate( Pointer( this ) );
     }
 }
 
 void ConfigElement::destroy( )
 {
     if (autocmd) {
-	commandManager->unregistrate( Pointer( this ) );
+        commandManager->unregistrate( Pointer( this ) );
     }
 }
 
 void ConfigElement::run( Character *ch, const DLString & )
 {
     if (!ch->is_npc( ))
-	handleArgument( ch->getPC( ), "toggle" );
+        handleArgument( ch->getPC( ), "toggle" );
 }
 
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
 {
     if (arg.empty( )) {
-	printLine( ch );
-	return true;
+        printLine( ch );
+        return true;
     }
     
     Flags &field = getField( ch );
 
     if (arg == "yes" || arg == "да")
-	field.setBit( bit.getValue( ) );
+        field.setBit( bit.getValue( ) );
     else if (arg == "no" || arg == "нет")
-	field.removeBit( bit.getValue( ) );
+        field.removeBit( bit.getValue( ) );
     else if (arg.strPrefix( "toggle" ) || arg.strPrefix( "переключить" ))
-	field.toggleBit( bit.getValue( ) );
+        field.toggleBit( bit.getValue( ) );
     else 
-	return false;
+        return false;
     
     if (!printText( ch ))
-	printLine( ch );
+        printLine( ch );
 
     return true;
 }
@@ -84,8 +84,8 @@ bool ConfigElement::printText( PCharacter *ch ) const
     const DLString &msg = (isSetBit( ch ) ? msgOn.getValue( ) : msgOff.getValue( ) );
 
     if (!msg.empty( )) {
-	ch->println( msg );
-	return true;
+        ch->println( msg );
+        return true;
     }
 
     return false;
@@ -97,10 +97,10 @@ void ConfigElement::printRow( PCharacter *ch ) const
     bool rus = ch->getConfig( )->rucommands;
 
     ch->printf( "| {%s%-14s {x|  {%s%-7s {x|\r\n", 
-		      CLR_NAME(ch), 
-		      rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
-		      yes ? CLR_YES(ch) : CLR_NO(ch),
-		      yes ? "ВКЛ." : "ВЫКЛ." );
+                      CLR_NAME(ch), 
+                      rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
+                      yes ? CLR_YES(ch) : CLR_NO(ch),
+                      yes ? "ВКЛ." : "ВЫКЛ." );
 }
 
 void ConfigElement::printLine( PCharacter *ch ) const
@@ -108,19 +108,19 @@ void ConfigElement::printLine( PCharacter *ch ) const
     bool yes = isSetBit( ch );
 
     if (ch->getConfig( )->rucommands)
-	ch->printf( "  {%s%-12s {%s%5s {x%s\n",
-			CLR_NAME(ch),
-			rname.getValue( ).c_str( ),
-			yes ? CLR_YES(ch) : CLR_NO(ch),
-			yes ? "ДА" : "НЕТ",
-			hint.c_str( ) );
+        ch->printf( "  {%s%-12s {%s%5s {x%s\n",
+                        CLR_NAME(ch),
+                        rname.getValue( ).c_str( ),
+                        yes ? CLR_YES(ch) : CLR_NO(ch),
+                        yes ? "ДА" : "НЕТ",
+                        hint.c_str( ) );
     else
-	ch->printf( "  {%s%-12s {%s%5s {x%s\n",
-			CLR_NAME(ch),
-			name.getValue( ).c_str( ),
-			yes ? CLR_YES(ch) : CLR_NO(ch),
-			yes ? "YES" : "NO",
-			hint.c_str( ) );
+        ch->printf( "  {%s%-12s {%s%5s {x%s\n",
+                        CLR_NAME(ch),
+                        name.getValue( ).c_str( ),
+                        yes ? CLR_YES(ch) : CLR_NO(ch),
+                        yes ? "YES" : "NO",
+                        hint.c_str( ) );
 }
 
 Flags & ConfigElement::getField( PCharacter *ch ) const
@@ -129,16 +129,16 @@ Flags & ConfigElement::getField( PCharacter *ch ) const
     const FlagTable *table = bit.getTable( );
 
     if (table == &config_flags)
-	return ch->config;
+        return ch->config;
     
     if (table == &comm_flags)
-	return ch->comm;
+        return ch->comm;
     
     if (table == &plr_flags)
-	return ch->act;
+        return ch->act;
 
     if (table == &add_comm_flags)
-	return ch->add_comm;
+        return ch->add_comm;
     
     return zero;
 }
@@ -149,8 +149,8 @@ Flags & ConfigElement::getField( PCharacter *ch ) const
 void ConfigGroup::printHeader( PCharacter *ch ) const
 {
     ch->printf( "\r\n{%s%s{x\r\n", 
-		    CLR_HEADER(ch),
-		    name.getValue( ).c_str( ) );
+                    CLR_HEADER(ch),
+                    name.getValue( ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -169,10 +169,10 @@ void ConfigCommand::initialization( )
     CommandPlugin::initialization( );
 
     for (g = groups.begin( ); g != groups.end( ); g++) {
-	ConfigGroup::iterator c;
+        ConfigGroup::iterator c;
 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    (*c)->init( );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            (*c)->init( );
     }
 }
 
@@ -181,10 +181,10 @@ void ConfigCommand::destruction( )
     Groups::iterator g;
     
     for (g = groups.begin( ); g != groups.end( ); g++) {
-	ConfigGroup::iterator c;
+        ConfigGroup::iterator c;
 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    (*c)->destroy( );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            (*c)->destroy( );
     }
 
     CommandPlugin::destruction( );
@@ -200,10 +200,10 @@ void ConfigCommand::printAllRows( PCharacter *pch ) const
     ConfigGroup::const_iterator c;
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ))
-		if ((*c)->autolist.getValue( ) && !(*c)->autotext.getValue( )) 
-		    (*c)->printRow( pch );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            if ((*c)->available( pch ))
+                if ((*c)->autolist.getValue( ) && !(*c)->autotext.getValue( )) 
+                    (*c)->printRow( pch );
 }
 
 void ConfigCommand::printAllTexts( PCharacter *pch ) const
@@ -212,10 +212,10 @@ void ConfigCommand::printAllTexts( PCharacter *pch ) const
     ConfigGroup::const_iterator c;
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ))
-		if ((*c)->autolist.getValue( ) && (*c)->autotext.getValue( )) 
-		    (*c)->printText( pch );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            if ((*c)->available( pch ))
+                if ((*c)->autolist.getValue( ) && (*c)->autotext.getValue( )) 
+                    (*c)->printText( pch );
 }
 
 COMMAND(ConfigCommand, "config")
@@ -226,7 +226,7 @@ COMMAND(ConfigCommand, "config")
     ConfigGroup::iterator c;
 
     if (ch->is_npc( ))
-	return;
+        return;
     
     pch = ch->getPC( );
 
@@ -235,27 +235,27 @@ COMMAND(ConfigCommand, "config")
     arg2 = arguments.getOneArgument( );
 
     if (arg1.empty( )) {
-	for (g = groups.begin( ); g != groups.end( ); g++) {
-	    g->printHeader( pch );
-	    
-	    for (c = g->begin( ); c != g->end( ); c++) 
-		if ((*c)->available( pch ))
-		    (*c)->printLine( pch );
-	}
+        for (g = groups.begin( ); g != groups.end( ); g++) {
+            g->printHeader( pch );
+            
+            for (c = g->begin( ); c != g->end( ); c++) 
+                if ((*c)->available( pch ))
+                    (*c)->printLine( pch );
+        }
 
-	return;
+        return;
     }
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ) 
+        for (c = g->begin( ); c != g->end( ); c++) 
+            if ((*c)->available( pch ) 
                     && ((*c)->matches( arg1 ) || (*c)->matchesAlias( arg1 ))) 
             {
-		if (!(*c)->handleArgument( pch, arg2 ))
-		    pch->println("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
+                if (!(*c)->handleArgument( pch, arg2 ))
+                    pch->println("Неправильный переключатель. См. {W? {lRрежим{lEconfig{x.");
 
-		return;
-	    }
+                return;
+            }
 
     
     pch->println("Опция не найдена. Используйте '{y{lRрежим{lEconfig{lx{w' для списка.");
@@ -271,7 +271,7 @@ CMDRUN( autolist )
     PCharacter *pch;
     
     if (ch->is_npc( ))
-	return;
+        return;
 
     pch = ch->getPC( );
     
@@ -283,10 +283,10 @@ CMDRUN( autolist )
     pch->send_to( line );
 
     if (pch->lines != PAGELEN) {
-	if (pch->lines)
-	    pch->printf( "Тебе выводится непрерывно %d линий текста.\r\n", pch->lines.getValue( ) + 2 );
-	else
-	    pch->send_to( "Буфер прокрутки выключен.\r\n" );
+        if (pch->lines)
+            pch->printf( "Тебе выводится непрерывно %d линий текста.\r\n", pch->lines.getValue( ) + 2 );
+        else
+            pch->send_to( "Буфер прокрутки выключен.\r\n" );
     }
 
     ConfigCommand::getThis( )->printAllTexts( pch );
@@ -307,18 +307,18 @@ CMDRUN( scroll )
 
     if (arg.empty( ))
     {
-	if (ch->lines == 0)
-	    ch->send_to("Ты не можешь получать длинные сообщения.\n\r");
-	else
-	    ch->printf( "Тебе непрерывно выводится %d лин%s текста.\n\r",
-		        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "ия","ии","ий") );
+        if (ch->lines == 0)
+            ch->send_to("Ты не можешь получать длинные сообщения.\n\r");
+        else
+            ch->printf( "Тебе непрерывно выводится %d лин%s текста.\n\r",
+                        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "ия","ии","ий") );
 
-	return;
+        return;
     }
 
     if (!arg.isNumber( )) {
-	ch->send_to("Ты должен ввести количество линий.\n\r");
-	return;
+        ch->send_to("Ты должен ввести количество линий.\n\r");
+        return;
     }
 
     try {
@@ -338,11 +338,11 @@ CMDRUN( scroll )
 
     if (lines < 10 || lines > 100)
     {
-	ch->send_to("Ты должен ввести допустимое количество линий.\n\r");
-	return;
+        ch->send_to("Ты должен ввести допустимое количество линий.\n\r");
+        return;
     }
 
     ch->lines = lines - 2;
     ch->printf( "Вывод установлен на %d лин%s.\n\r", lines,
-		GET_COUNT(lines, "ию","ии","ий") );
+                GET_COUNT(lines, "ию","ии","ий") );
 }

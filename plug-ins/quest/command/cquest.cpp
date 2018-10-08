@@ -59,40 +59,40 @@ COMMAND(CQuest, "quest")
     DLString arguments = constArguments;
     DLString cmd = arguments.getOneArgument( );
     PCharacter *pch = ch->getPC( );
-	
+        
     if (!pch)
-	return;
+        return;
 
     if (IS_GHOST( pch )) {
-	pch->send_to("Наслажденье жизнью недоступно призракам.\r\n");
-	return;
+        pch->send_to("Наслажденье жизнью недоступно призракам.\r\n");
+        return;
     }
 
     // Parse commands that can be done anywhere.
     if (cmd.empty( )) {
-	doInfo( pch );
+        doInfo( pch );
         see_also( pch );
-	return;
+        return;
     }
     else if (arg_is_info( cmd )) {
-	doInfo( pch );
-	return;
+        doInfo( pch );
+        return;
     }
     else if (arg_oneof( cmd, "points", "очки" )) {
-	doPoints( pch );
-	return;
+        doPoints( pch );
+        return;
     }
     else if (arg_is_time( cmd )) {
-	doTime( pch );
-	return;
+        doTime( pch );
+        return;
     }
     else if (arg_oneof( cmd, "stat", "статистика" )) {
-	doStat( pch );
-	return;
+        doStat( pch );
+        return;
     }
     else if (arg_oneof( cmd, "set", "установить" ) && pch->isCoder( )) {
-	doSet( pch, arguments );
-	return;
+        doSet( pch, arguments );
+        return;
     } else if (arg_is_help( cmd )) {
         usage( pch );
         return;
@@ -110,15 +110,15 @@ COMMAND(CQuest, "quest")
 
     // Execute quest trading commands.
     if (qcmd != QCMD_NONE) { 
-	QuestTrader::Pointer trader;
+        QuestTrader::Pointer trader;
 
-	trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
+        trader = find_attracted_mob_behavior<QuestTrader>( pch, OCC_QUEST_TRADER );
 
-	if (!trader) {
-	    pch->send_to( "Здесь нет торговца квестовыми благами.\r\n" );
+        if (!trader) {
+            pch->send_to( "Здесь нет торговца квестовыми благами.\r\n" );
             see_also( pch );
-	    return;
-	}
+            return;
+        }
 
         switch(qcmd) {
             case QCMD_LIST:
@@ -132,7 +132,7 @@ COMMAND(CQuest, "quest")
                 break;
         }
 
-	return;
+        return;
     }
    
     // Parse questor commands.
@@ -146,7 +146,7 @@ COMMAND(CQuest, "quest")
         qcmd = QCMD_FIND;
 
     if (qcmd == QCMD_NONE) {
-	usage( pch ); 
+        usage( pch ); 
         return;
     }
 
@@ -174,7 +174,7 @@ COMMAND(CQuest, "quest")
     }
 
     if (!questman->canGiveQuest( pch ))
-	return;
+        return;
    
     // Execute questor commands.
     switch(qcmd) {
@@ -182,13 +182,13 @@ COMMAND(CQuest, "quest")
             questman->doRequest( pch );
             break;
         case QCMD_COMPLETE:
-	    questman->doComplete( pch, arguments );
+            questman->doComplete( pch, arguments );
             break;
         case QCMD_CANCEL:
-	    questman->doCancel( pch );
+            questman->doCancel( pch );
             break;
         case QCMD_FIND:
-	    questman->doFind( pch );
+            questman->doFind( pch );
             break;
     }
 }
@@ -200,16 +200,16 @@ bool CQuest::gprog_questinfo( PCharacter *ch )
     Scripting::RegisterList regList;
 
     if (!FeniaManager::wrapperManager)
-	return false;
+        return false;
 
     try {
-	tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
-	regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
-	return tmpQuest[ID_INFO]( regList ).toBoolean( );
+        tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
+        regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
+        return tmpQuest[ID_INFO]( regList ).toBoolean( );
     }
     catch (const Scripting::Exception &e) {
-	LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
-	return false;
+        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
+        return false;
     }
 }
 
@@ -223,16 +223,16 @@ void CQuest::doInfo( PCharacter *ch )
     time = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getTime( );
 
     if (!quest) {
-	if (ch->getAttributes( ).isAvailable( "quest" )) 
-	    buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
+        if (ch->getAttributes( ).isAvailable( "quest" )) 
+            buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
     } else {
-	quest->info( buf, ch );
-	buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-	    << " на выполнение задания." << endl;
+        quest->info( buf, ch );
+        buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
+            << " на выполнение задания." << endl;
     }
     
     if (!gprog_questinfo( ch ) && buf.str( ).empty( ))
-	buf << "У тебя сейчас нет задания." << endl;
+        buf << "У тебя сейчас нет задания." << endl;
 
     ch->send_to( buf );
 }
@@ -243,7 +243,7 @@ void CQuest::doPoints( PCharacter *ch )
     int points = ch->questpoints;
 
     sprintf( buf, "У тебя {Y%d{x квестов%s единиц%s.\n\r", 
-	     points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));
+             points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));
     ch->send_to(buf);
 }
 
@@ -257,23 +257,23 @@ void CQuest::doTime( PCharacter *ch )
     time = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getTime( );
     
     if (!quest) {
-	if (ch->getAttributes( ).isAvailable( "quest" )) 
-	    buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
-	else {
-	    buf << "У тебя сейчас нет задания." << endl;
-	    
-	    if (time > 1) 
-		buf << "До того, как ты снова сможешь получить задание, {Y"
-		    << time <<  "{x минут"
-		    << GET_COUNT(time, "а", "ы", "") << endl;
-	    else if (time == 1) 
-		buf <<"Осталось меньше минуты до того, как ты снова сможешь получить задание." << endl;
-	}
-	
+        if (ch->getAttributes( ).isAvailable( "quest" )) 
+            buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
+        else {
+            buf << "У тебя сейчас нет задания." << endl;
+            
+            if (time > 1) 
+                buf << "До того, как ты снова сможешь получить задание, {Y"
+                    << time <<  "{x минут"
+                    << GET_COUNT(time, "а", "ы", "") << endl;
+            else if (time == 1) 
+                buf <<"Осталось меньше минуты до того, как ты снова сможешь получить задание." << endl;
+        }
+        
     }
     else {
-	 buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-	     << " на выполнение задания." << endl;
+         buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
+             << " на выполнение задания." << endl;
     }
 
     ch->send_to( buf );
@@ -287,72 +287,72 @@ void CQuest::doSet( PCharacter *ch, DLString& arguments )
     bool plus;
     XMLAttributeQuestData::Pointer attr;
     QuestRegistratorBase::Pointer qbase;
-	
+        
     name = arguments.getOneArgument( );
     questID = arguments.getOneArgument( ); 
     number = arguments.getOneArgument( ); 
     plus = false;
     
     if (name == "clear") {
-	PCharacterMemoryList::const_iterator i;
-	const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
-	
-	for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	    XMLAttributeQuestData::Pointer attr;
-	    PCMemoryInterface *pc;
+        PCharacterMemoryList::const_iterator i;
+        const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
+        
+        for (i = pcm.begin( ); i != pcm.end( ); i++) {
+            XMLAttributeQuestData::Pointer attr;
+            PCMemoryInterface *pc;
 
-	    pc = i->second;
-	    attr = pc->getAttributes( ).findAttr<XMLAttributeQuestData>( "questdata" );
+            pc = i->second;
+            attr = pc->getAttributes( ).findAttr<XMLAttributeQuestData>( "questdata" );
 
-	    if (attr) {
-		XMLAttributeStatistic::Victories::const_iterator j;
-		const XMLAttributeStatistic::Victories &v = attr->getVictories( );
+            if (attr) {
+                XMLAttributeStatistic::Victories::const_iterator j;
+                const XMLAttributeStatistic::Victories &v = attr->getVictories( );
 
-		for (j = v.begin( ); j != v.end( ); j++)
-		    attr->setVictories( j->first, 0 );
+                for (j = v.begin( ); j != v.end( ); j++)
+                    attr->setVictories( j->first, 0 );
 
-		PCharacterManager::saveMemory( pc );
-	    }
-	}
-	
-	return;
+                PCharacterManager::saveMemory( pc );
+            }
+        }
+        
+        return;
     }
     
     if (name.empty( ) || questID.empty( ) || number.empty( )) {
-	ch->send_to("Использование: quest set <player> <quest id> [+]<num. of victories>\r\n");
-	return;
+        ch->send_to("Использование: quest set <player> <quest id> [+]<num. of victories>\r\n");
+        return;
     }
 
     pci = PCharacterManager::find( name );
 
     if (!pci) {
-	ch->printf("%s: имя не найдено.\r\n", name.c_str( ));
-	return;
+        ch->printf("%s: имя не найдено.\r\n", name.c_str( ));
+        return;
     }
     
     qbase = QuestManager::getThis( )->findQuestRegistrator( questID );
 
     if (!qbase) {
-	ch->send_to("Неправильный ID.\r\n");
-	return;
+        ch->send_to("Неправильный ID.\r\n");
+        return;
     }
     
     try {
-	if (number.at( 0 ) == '+') {
-	    plus = true;
-	    number.erase( 0, 1 );
-	}
-	
-	count = number.toInt( );
+        if (number.at( 0 ) == '+') {
+            plus = true;
+            number.erase( 0, 1 );
+        }
+        
+        count = number.toInt( );
     } catch (const ExceptionBadType&) {
-	ch->send_to("Неверное количество побед.\r\n");
-	return;
+        ch->send_to("Неверное количество побед.\r\n");
+        return;
     }
    
     attr = pci->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" );
     
     if (plus)
-	count += attr->getVictories( qbase->getName( ) );
+        count += attr->getVictories( qbase->getName( ) );
 
     attr->setVictories( qbase->getName( ), count );
     PCharacterManager::saveMemory( pci );
@@ -370,30 +370,30 @@ void CQuest::doStat( PCharacter *ch )
     buf << "{wЛучшие квестодеятели Мира Грез: {x" << endl;
 
     for (s = stat.begin( ); s != stat.end( ); s++) {
-	XMLAttributeStatistic::StatRecordList::iterator r;
-	QuestRegistratorBase::Pointer qb;
-	int last = 0, cnt = 0;
-	
-	qb = QuestManager::getThis( )->findQuestRegistrator( s->first );
+        XMLAttributeStatistic::StatRecordList::iterator r;
+        QuestRegistratorBase::Pointer qb;
+        int last = 0, cnt = 0;
+        
+        qb = QuestManager::getThis( )->findQuestRegistrator( s->first );
 
-	if (!qb)
-	    continue;
+        if (!qb)
+            continue;
 
-	XMLAttributeStatistic::StatRecordList &records = s->second;
-	
-	buf << "{W\"" << qb->getShortDescr( ) << "\"{x" << endl;
+        XMLAttributeStatistic::StatRecordList &records = s->second;
+        
+        buf << "{W\"" << qb->getShortDescr( ) << "\"{x" << endl;
 
-	for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
-	    last = r->second;
-	    buf << dlprintf( "          {W%4d{w ", last ); 
+        for (r = records.begin( ); r != records.end( ) && cnt < 5; cnt++) {
+            last = r->second;
+            buf << dlprintf( "          {W%4d{w ", last ); 
 
-	    for ( ; r != records.end( ) && r->second == last; r++)
-		buf << r->first << " ";
+            for ( ; r != records.end( ) && r->second == last; r++)
+                buf << r->first << " ";
 
-	    buf << "{x" << endl;
-	}
-	
-	buf << endl;
+            buf << "{x" << endl;
+        }
+        
+        buf << endl;
     }
 
     ch->send_to( buf );

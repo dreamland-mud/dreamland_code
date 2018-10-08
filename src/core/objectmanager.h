@@ -24,26 +24,26 @@ class Object;
  */
 class ObjectManager : public OneAllocate
 {
-public:	
-	typedef ::Pointer<ObjectManager> Pointer;
-	typedef DLList<Object>	ExtractList;
+public:        
+        typedef ::Pointer<ObjectManager> Pointer;
+        typedef DLList<Object>        ExtractList;
 
 public:
-	ObjectManager( );
-	virtual ~ObjectManager( );
-	
-	
-	static void extract( Object* object );
-	static Object* getObject( );
-	
-	static inline ObjectManager* getThis( )
-	{
-		return thisClass;
-	}
-	
+        ObjectManager( );
+        virtual ~ObjectManager( );
+        
+        
+        static void extract( Object* object );
+        static Object* getObject( );
+        
+        static inline ObjectManager* getThis( )
+        {
+                return thisClass;
+        }
+        
 private:
-	static ObjectManager* thisClass;
-	static ExtractList extractList;
+        static ObjectManager* thisClass;
+        static ExtractList extractList;
 };
 
 #endif

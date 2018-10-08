@@ -33,24 +33,24 @@ inline bool argIsAll( const DLString &arg )
 inline bool argIsImmortal( const DLString &arg )
 {
     return (isSingleOrPlural( arg, "immortal" ) 
-	    || isSingleOrPlural( arg, "imm" )
-	    || arg ^ "боги"
-	    || arg ^ "богам");
+            || isSingleOrPlural( arg, "imm" )
+            || arg ^ "боги"
+            || arg ^ "богам");
 }
 inline bool argIsCoder( const DLString &arg )
 {
     return (isSingleOrPlural( arg, "coder" )
-	    || arg ^ "кодеры"
-	    || arg ^ "кодерам");
+            || arg ^ "кодеры"
+            || arg ^ "кодерам");
 }
 inline bool argIsPlayer( const DLString &arg, const PCMemoryInterface *pcm )
 {
     if (arg.empty( ))
-	return false;
+        return false;
     if (arg ^ pcm->getName( ))
-	return true;
+        return true;
     if ( pcm->getRussianName( ).decline('7').isName( arg ))
-	return true;
+        return true;
     return false;
 }
 
@@ -58,28 +58,28 @@ inline bool argIsPlayer( const DLString &arg, const PCMemoryInterface *pcm )
 void Note::toStream( int vnum, ostringstream &buf ) const
 {
     buf << "[" << vnum << "] "
-	<< "{C" << getFrom( ) << "{x: "
-	<< getSubject( ) << "{x" << endl
-	<< getDate( ).getTimeAsString( ) << endl
-	<< "To: " << getRecipient( ) << "{x" << endl
-	<< getText( ) << "{x" << endl;
+        << "{C" << getFrom( ) << "{x: "
+        << getSubject( ) << "{x" << endl
+        << getDate( ).getTimeAsString( ) << endl
+        << "To: " << getRecipient( ) << "{x" << endl
+        << getText( ) << "{x" << endl;
 }
 
 void Note::toForwardStream( ostringstream &buf ) const
 {
     buf << ">>> Start of original message <<<" << endl
         << ">>> " << getFrom( ) << "{x: " << getSubject( ) << "{x" << endl
-	<< ">>> " << getDate( ).getTimeAsString( ) << endl
-	<< ">>> To: " << getRecipient( ) << "{x" << endl
-	<< endl
-	<< getText( ) << "{x" << endl
-	<< ">>> End of original message <<<" << endl;
+        << ">>> " << getDate( ).getTimeAsString( ) << endl
+        << ">>> To: " << getRecipient( ) << "{x" << endl
+        << endl
+        << getText( ) << "{x" << endl
+        << ">>> End of original message <<<" << endl;
 }
 
 bool Note::isNoteFrom( PCMemoryInterface *pcm ) const
 {
     if (getAuthor( ) == pcm->getName( ))
-	return true;
+        return true;
 
     return false;
 }
@@ -93,18 +93,18 @@ bool Note::isNoteTo( PCMemoryInterface *pcm ) const
     Profession *prof;
 
     while (!( arg = arguments.getOneArgument( ) ).empty( )) {
-	if (findRecipient( pcm, arg, buf ))
-	    return true;
+        if (findRecipient( pcm, arg, buf ))
+            return true;
 
-	if (pcm->getClan( ) != clan_none) 
-	    if (( clan = findClan( arg ) ) && pcm->getClan( ) == clan)
-		return true;
-    	
-	if (( race = findRace( arg ) ) && pcm->getRace( ) == race)
-	    return true;
-	   
-	if (( prof = findProf( arg ) ) && pcm->getProfession( ) == prof)
-	    return true;
+        if (pcm->getClan( ) != clan_none) 
+            if (( clan = findClan( arg ) ) && pcm->getClan( ) == clan)
+                return true;
+            
+        if (( race = findRace( arg ) ) && pcm->getRace( ) == race)
+            return true;
+           
+        if (( prof = findProf( arg ) ) && pcm->getProfession( ) == prof)
+            return true;
     }
     
     return false;
@@ -133,31 +133,31 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
     bool found = false;
 
     while (!( arg = arguments.getOneArgument( ) ).empty( )) {
-	ostringstream ostr;
+        ostringstream ostr;
 
-	findRecipient( ch, arg, ostr );
+        findRecipient( ch, arg, ostr );
 
-	if (( clan = findClan( arg ) )) 
-	{
-	    ostr << "члены клана {" << clan->getColor( ) << clan->getShortName( ) << "{x";
-	}
-	else if (( race = findRace( arg ) )) 
-	{
-	    ostr << "представители расы {W" << race->getName( ) << "{x";
-	}
-	else if (( prof = findProf( arg ) )) 
-	{
-	    ostr << "представители профессии {W" << prof->getName( ) << "{x";
-	}
-	else if (( pci = PCharacterManager::find( arg ) ))
-	{
-	    ostr << "{W" << pci->getName( ) << "{x";
-	}
-	
-	if (!ostr.str( ).empty( )) {
-	    found = true;
-	    buf << ostr.str( ) << endl;
-	}
+        if (( clan = findClan( arg ) )) 
+        {
+            ostr << "члены клана {" << clan->getColor( ) << clan->getShortName( ) << "{x";
+        }
+        else if (( race = findRace( arg ) )) 
+        {
+            ostr << "представители расы {W" << race->getName( ) << "{x";
+        }
+        else if (( prof = findProf( arg ) )) 
+        {
+            ostr << "представители профессии {W" << prof->getName( ) << "{x";
+        }
+        else if (( pci = PCharacterManager::find( arg ) ))
+        {
+            ostr << "{W" << pci->getName( ) << "{x";
+        }
+        
+        if (!ostr.str( ).empty( )) {
+            found = true;
+            buf << ostr.str( ) << endl;
+        }
     }
 
     return found;
@@ -166,22 +166,22 @@ bool Note::parseRecipient( PCharacter *ch, const DLString &cArguments, ostringst
 bool Note::findRecipient( PCMemoryInterface *pcm, DLString &arg, ostringstream &buf )
 {
     if (argIsAll( arg )) {
-	buf << "все";
-	return true;
+        buf << "все";
+        return true;
     }
     
     if (argIsImmortal( arg )) {
-	buf << "Боги";
-	return (pcm->get_trust( ) >= LEVEL_IMMORTAL);
+        buf << "Боги";
+        return (pcm->get_trust( ) >= LEVEL_IMMORTAL);
     }
     
     if (argIsPlayer( arg, pcm )) {
-	return true;
+        return true;
     }
     
     if (argIsCoder( arg )) {
-	buf << "кодеры";
-	return (pcm->get_trust( ) >= MAX_LEVEL);
+        buf << "кодеры";
+        return (pcm->get_trust( ) >= MAX_LEVEL);
     }
 
     return false;
@@ -192,11 +192,11 @@ Profession * Note::findProf( const DLString &arg )
     Profession *profession;
     
     if (( profession = professionManager->findExisting( arg ) ))
-	return profession;
-	
+        return profession;
+        
     if (arg.at( arg.size( ) - 1 ) == 's')
-	if (( profession = professionManager->findExisting( arg.substr( 0, arg.size( ) - 1 ) ) ))
-	    return profession;
+        if (( profession = professionManager->findExisting( arg.substr( 0, arg.size( ) - 1 ) ) ))
+            return profession;
     
     return NULL;
 }
@@ -207,11 +207,11 @@ Clan * Note::findClan( const DLString &arg )
     Clan *clan;
     
     if (( clan = clanManager->findExisting( arg ) ))
-	return clan;
-	
+        return clan;
+        
     if (arg.at( arg.size( ) - 1 ) == 's')
-	if (( clan = clanManager->findExisting( arg.substr( 0, arg.size( ) - 1 ) ) ))
-	    return clan;
+        if (( clan = clanManager->findExisting( arg.substr( 0, arg.size( ) - 1 ) ) ))
+            return clan;
     
     return NULL;
 }
@@ -221,11 +221,11 @@ Race * Note::findRace( const DLString &arg )
     Race *race;
     
     if (( race = raceManager->findExisting( arg ) ))
-	return race;
-	
+        return race;
+        
     if (arg.at( arg.size( ) - 1 ) == 's')
-	if (( race = raceManager->findExisting( arg.substr( 0, arg.size( ) - 1 ) ) ))
-	    return race;
+        if (( race = raceManager->findExisting( arg.substr( 0, arg.size( ) - 1 ) ) ))
+            return race;
     
     return NULL;
 }

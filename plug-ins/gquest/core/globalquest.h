@@ -32,7 +32,7 @@ public:
     typedef vector<NPCharacter *> MobileList;
     typedef vector<Object *> ObjectList;
     typedef vector<Room *> RoomList;
-    typedef vector<area_data *>	AreaList;
+    typedef vector<area_data *>        AreaList;
     typedef GlobalQuestInfo::Config Config;
 
     GlobalQuest( );
@@ -47,7 +47,7 @@ public:
 
     virtual void after( );
     virtual int getPriority( ) const;
-	
+        
     
     virtual void report( std::ostringstream &, PCharacter* ) const = 0;
     virtual void progress( std::ostringstream & ) const = 0;

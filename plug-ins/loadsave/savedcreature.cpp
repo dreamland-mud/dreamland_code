@@ -14,8 +14,8 @@ void SavedCreature::save( )
 bool SavedCreature::extract( bool fCount )
 {
     if (saved) {
-	unsave_creature( ch );
-	saved = false;
+        unsave_creature( ch );
+        saved = false;
     }
 
     return MobileBehavior::extract( fCount );
@@ -24,8 +24,8 @@ bool SavedCreature::extract( bool fCount )
 void SavedCreature::stopfol( Character *master )
 {
     if (saved) {
-	unsave_creature( ch );
-	saved = false;
+        unsave_creature( ch );
+        saved = false;
     }
 
     MobileBehavior::stopfol( master );

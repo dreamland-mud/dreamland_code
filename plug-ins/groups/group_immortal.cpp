@@ -37,22 +37,22 @@
 SPELL_DECL(Amnesia);
 VOID_SPELL(Amnesia)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	if (victim->is_npc())
-		return;
+        if (victim->is_npc())
+                return;
 
-	for (int i = 0; i < SkillManager::getThis( )->size(); i++) {
-	    PCSkillData &data = victim->getPC( )->getSkillData( i );
+        for (int i = 0; i < SkillManager::getThis( )->size(); i++) {
+            PCSkillData &data = victim->getPC( )->getSkillData( i );
 
-	    if (data.learned.getValue( ) > 0) {
-		data.learned /= 2;
-		data.learned++;
-	    }
-	}
+            if (data.learned.getValue( ) > 0) {
+                data.learned /= 2;
+                data.learned++;
+            }
+        }
 
-	act_p("Ты чувствуешь как память ускользает от тебя.",
-		victim,0,0,TO_CHAR,POS_RESTING);
-	act_p("Взгляд $c2 становится бессмысленным.",
-		victim,0,0,TO_ROOM,POS_RESTING);
+        act_p("Ты чувствуешь как память ускользает от тебя.",
+                victim,0,0,TO_CHAR,POS_RESTING);
+        act_p("Взгляд $c2 становится бессмысленным.",
+                victim,0,0,TO_ROOM,POS_RESTING);
 
 }
 

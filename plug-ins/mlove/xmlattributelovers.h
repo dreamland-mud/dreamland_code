@@ -19,10 +19,10 @@ XML_OBJECT
 public: 
         typedef ::Pointer<XMLAttributeLovers> Pointer;
 
-	XMLAttributeLovers( );
-	virtual ~XMLAttributeLovers( );
+        XMLAttributeLovers( );
+        virtual ~XMLAttributeLovers( );
 
-	XML_VARIABLE XMLLovers lovers;
+        XML_VARIABLE XMLLovers lovers;
 };
 
 #endif

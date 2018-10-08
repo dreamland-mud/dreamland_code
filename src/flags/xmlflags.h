@@ -20,23 +20,23 @@ public:
     void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
 
     inline XMLFlags & operator = ( bitstring_t bit ) { 
-	setValue( bit );
-	return *this;
+        setValue( bit );
+        return *this;
     }
 
     inline XMLFlags & operator |= ( bitstring_t bit ) { 
-	value |= bit;
-	return *this;
+        value |= bit;
+        return *this;
     }
 
     inline XMLFlags & operator &= ( bitstring_t bit ) { 
-	value &= bit;
-	return *this;
+        value &= bit;
+        return *this;
     }
 
     inline XMLFlags & operator ^= ( bitstring_t bit ) { 
-	value ^= bit;
-	return *this;
+        value ^= bit;
+        return *this;
     }
 };
 

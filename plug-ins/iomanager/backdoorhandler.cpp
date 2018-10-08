@@ -48,21 +48,21 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     d->echoOn( );
 
     if (!cp || !cp[0] || (num = cp[0] - '1') < 0 || num >= NCODEPAGES) {
-	d->send( "Wrong codepage.\r\n" );
-	d->close( );
-	return -1;
+        d->send( "Wrong codepage.\r\n" );
+        d->close( );
+        return -1;
     }
     
     if (!name || !( pcm = PCharacterManager::find( name ) )) {
-	d->send( "Wrong name.\r\n" );
-	d->close( );
-	return -1;
+        d->send( "Wrong name.\r\n" );
+        d->close( );
+        return -1;
     }
 
     if (!pwd || !password_check( pcm, pwd )) {
-	d->send( "Wrong password.\r\n" );
-	d->close( );
-	return -1;
+        d->send( "Wrong password.\r\n" );
+        d->close( );
+        return -1;
     }
     
     d->buffer_handler = new DefaultBufferHandler( num );
@@ -70,27 +70,27 @@ int BackdoorHandler::handle(Descriptor *d, char *arg)
     
     /* close other descs for this character, waiting in the nanny */
     while (( d0 = descriptor_find_named( d, pcm->getName( ), CON_NANNY ) )) 
-	d0->close( );
+        d0->close( );
     
     /* already playing - reconnect or reanimate */
     if (( pch = pcm->getPlayer( ) )) {
-	oldState = CON_BREAK_CONNECT;
-	if (pch->desc)
-	    pch->desc->close( );
+        oldState = CON_BREAK_CONNECT;
+        if (pch->desc)
+            pch->desc->close( );
     }
     else { /* load and link to the world anew */
-	oldState = CON_READ_MOTD;
-	pch = PCharacterManager::create( pcm->getName( ) );
-	PCharacterManager::update( pch );
-	
-	char_to_list( pch, &char_list );
+        oldState = CON_READ_MOTD;
+        pch = PCharacterManager::create( pcm->getName( ) );
+        PCharacterManager::update( pch );
+        
+        char_to_list( pch, &char_list );
 
         Room *start_room = get_room_index( pch->start_room  );
         if (!start_room)
             start_room = get_room_index( ROOM_VNUM_TEMPLE );
-	char_to_room( pch, start_room );
+        char_to_room( pch, start_room );
 
-	if (pch->pet) {
+        if (pch->pet) {
             // If room was already set in fread_pet, simply place the beast there.
             // Otherwise use master's room.
             if (pch->pet->in_room) 

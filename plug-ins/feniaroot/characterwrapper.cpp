@@ -88,19 +88,19 @@ void CharacterWrapper::setSelf( Scripting::Object *s )
     WrapperBase::setSelf( s );
     
     if (!self && target) {
-	target->wrapper = 0;
-	target = 0;
+        target->wrapper = 0;
+        target = 0;
     }
 }
 
 void CharacterWrapper::extract( bool count )
 {
     if (target) {
-	target->wrapper = 0;
-	target = 0;
+        target->wrapper = 0;
+        target = 0;
     } else {
-	if (Scripting::gc)
-	    LogStream::sendError() << "Character wrapper: extract without target" << endl;
+        if (Scripting::gc)
+            LogStream::sendError() << "Character wrapper: extract without target" << endl;
     }
     
     GutsContainer::extract( count );
@@ -115,10 +115,10 @@ void CharacterWrapper::setTarget( ::Character *target )
 void CharacterWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "Character is dead" );
+        throw Scripting::Exception( "Character is dead" );
 
     if (target == NULL) 
-	throw Scripting::Exception( "Character is offline" );
+        throw Scripting::Exception( "Character is offline" );
 }
 
 Character * CharacterWrapper::getTarget( ) const
@@ -147,10 +147,10 @@ NMI_GET( CharacterWrapper, dead, "переменная true, если персо
 
 #define CHK_PC \
     if (!target->is_npc()) \
-	throw Scripting::Exception( "NPC field requested on PC" ); 
+        throw Scripting::Exception( "NPC field requested on PC" ); 
 #define CHK_NPC \
     if (target->is_npc()) \
-	throw Scripting::Exception( "PC field requested on NPC" ); 
+        throw Scripting::Exception( "PC field requested on NPC" ); 
 
 #define GETWRAP(x, h) NMI_GET(CharacterWrapper, x, h) { \
     checkTarget(); \
@@ -197,18 +197,18 @@ NMI_SET( CharacterWrapper, leader, "лидер группы или тот, кт�
     checkTarget( );
 
     if (arg.type == Register::NONE)
-	target->leader = NULL;
+        target->leader = NULL;
     else
-	target->leader = arg2character( arg );
+        target->leader = arg2character( arg );
 }
 NMI_SET( CharacterWrapper, last_fought, "чар, с которым сражались последний раз" )
 {
     checkTarget( );
 
     if (arg.type == Register::NONE)
-	target->last_fought = NULL;
+        target->last_fought = NULL;
     else
-	target->last_fought = arg2character( arg );
+        target->last_fought = arg2character( arg );
 }
 
 
@@ -253,7 +253,7 @@ NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-кл
     checkTarget( );
     CHK_NPC
     if (!target->desc)
-	return "";
+        return "";
     return ttype_name( target->desc->telnet.ttype );
 }
 
@@ -288,7 +288,7 @@ NMI_INVOKE( CharacterWrapper, setLevel, "установить уровень м�
     CHK_PC
 
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     target->setLevel( args.front( ).toNumber( ) );
     return Register( );
@@ -341,10 +341,10 @@ NMI_GET( CharacterWrapper, trust, "" )
     checkTarget( );
     
     if (!target->is_npc( ) && target->getLevel( ) == 0) { // may be not loaded yet
-	if (( pci = PCharacterManager::find( target->getName( ) ) ))
-	    return pci->get_trust( );
-	else
-	    return 0;
+        if (( pci = PCharacterManager::find( target->getName( ) ) ))
+            return pci->get_trust( );
+        else
+            return 0;
     }
 
     return target->get_trust( );
@@ -386,9 +386,9 @@ NMI_GET( CharacterWrapper, password, "пароль: deprecated" )
     CHK_NPC
 
     if (( pci = PCharacterManager::find( target->getName( ) ) ))
-	return pci->getPassword( );
+        return pci->getPassword( );
     else
-	return target->getPC( )->getPassword( );
+        return target->getPC( )->getPassword( );
 }
 
 NMI_SET( CharacterWrapper, password, "пароль" )
@@ -487,13 +487,13 @@ NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем ил�
     checkTarget( );
     
     if (IS_GHOST(target))
-	return true;
-	
+        return true;
+        
     if (is_flying( target ))
-	return true;
+        return true;
 
     if (MOUNTED(target) && is_flying(MOUNTED(target)))
-	return true;
+        return true;
 
     return false;
 }
@@ -713,9 +713,9 @@ NMI_GET( CharacterWrapper, hostname, "")
     checkTarget( );
 
     if (!target->desc)
-	return "";
+        return "";
     else
-	return target->desc->getRealHost( );
+        return target->desc->getRealHost( );
 }
 
 NMI_GET( CharacterWrapper, level, "настоящий уровень" )
@@ -749,9 +749,9 @@ NMI_SET( CharacterWrapper, profession, "" )
     checkTarget( );
     CHK_NPC
     if (arg.type == Register::NONE)
-	target->getPC( )->setProfession( "none" );
+        target->getPC( )->setProfession( "none" );
     else
-	target->getPC( )->setProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
+        target->getPC( )->setProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
 NMI_GET( CharacterWrapper, uniclass, "под-профессия универсала" )
@@ -766,9 +766,9 @@ NMI_SET( CharacterWrapper, uniclass, "под-профессия универса
     checkTarget( );
     CHK_NPC
     if (arg.type == Register::NONE)
-	target->getPC( )->setSubProfession( "none" );
+        target->getPC( )->setSubProfession( "none" );
     else
-	target->getPC( )->setSubProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
+        target->getPC( )->setSubProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
 NMI_GET( CharacterWrapper, hometown, "" )
@@ -783,9 +783,9 @@ NMI_SET( CharacterWrapper, hometown, "" )
     checkTarget( );
     CHK_NPC
     if (arg.type == Register::NONE)
-	target->getPC( )->setHometown( "none" );
+        target->getPC( )->setHometown( "none" );
     else
-	target->getPC( )->setHometown( wrapper_cast<HometownWrapper>(arg)->name );
+        target->getPC( )->setHometown( wrapper_cast<HometownWrapper>(arg)->name );
 }
 
 NMI_SET( CharacterWrapper, russianName, "" )
@@ -824,9 +824,9 @@ NMI_SET( CharacterWrapper, race, "" )
 {
     checkTarget( );
     if (arg.type == Register::NONE)
-	target->setRace( "none" );
+        target->setRace( "none" );
     else
-	target->setRace( wrapper_cast<RaceWrapper>(arg)->name );
+        target->setRace( wrapper_cast<RaceWrapper>(arg)->name );
 }
 
 NMI_GET( CharacterWrapper, connected, "" )
@@ -836,9 +836,9 @@ NMI_GET( CharacterWrapper, connected, "" )
     checkTarget( );
     
     if (!target->is_npc( ) && target->getPC( )->switchedTo)
-	ch = target->getPC( )->switchedTo;
+        ch = target->getPC( )->switchedTo;
     else
-	ch = target;
+        ch = target;
 
     return (ch->desc != NULL);
 }
@@ -867,7 +867,7 @@ NMI_INVOKE( CharacterWrapper, interpret, "интерпретирует стро�
     checkTarget( );
 
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     DLString d = args.front().toString();
     return ::interpret( target, d.c_str() );
@@ -880,7 +880,7 @@ NMI_INVOKE( CharacterWrapper, interpret_raw, "выполняет команду 
     checkTarget( );
 
     if (args.size( ) < 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     i = args.begin( );
     cmdName = i->toString( );
@@ -899,7 +899,7 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "выполняет команду 
     checkTarget( );
 
     if (args.size( ) < 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     i = args.begin( );
     cmdName = i->toString( );
@@ -914,7 +914,7 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "выполняет команду 
 NMI_INVOKE( CharacterWrapper, say, "(формат, аргументы...) произносит вслух реплику, отформатированную как в методе act" )
 {
     checkTarget( );
-	
+        
     DLString msg = regfmt(target, args).c_str();
     ::interpret_cmd(target, "say", msg.c_str());
     return Register();
@@ -945,12 +945,12 @@ NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(имя жидкости) ве�
     DLString liqName = args2string(args);
     Liquid *liquid = liquidManager->find(liqName);
     if (!liquid)
-	throw Scripting::CustomException( "Invalid liquid name");
+        throw Scripting::CustomException( "Invalid liquid name");
 
     list< ::Object *> drinks = ::get_objs_list_type(target, ITEM_DRINK_CON, target->carrying);
     for (list< ::Object *>::iterator o = drinks.begin(); o != drinks.end(); o++)
-	if (liquidManager->find((*o)->value[2]) == liquid)
-	    return wrap(*o);
+        if (liquidManager->find((*o)->value[2]) == liquid)
+            return wrap(*o);
 
     return Register();
 }
@@ -962,8 +962,8 @@ NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(.tables.recipe_flags.*) вер
     bitstring_t flag = args2number(args);
     list< ::Object *> recipes = ::get_objs_list_type(target, ITEM_RECIPE, target->carrying);
     for (list< ::Object *>::iterator o = recipes.begin(); o != recipes.end(); o++)
-	if (IS_SET((*o)->value[0], flag))
-	    return wrap(*o);
+        if (IS_SET((*o)->value[0], flag))
+            return wrap(*o);
 
     return Register();
 }
@@ -986,8 +986,8 @@ NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "" )
     int vnum = args2number( args );
 
     for (::Object *obj = target->carrying; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum && obj->wear_loc != wear_none)
-	    return wrap( obj );
+        if (obj->pIndexData->vnum == vnum && obj->wear_loc != wear_none)
+            return wrap( obj );
 
     return Register( );
 }
@@ -1000,9 +1000,9 @@ NMI_INVOKE( CharacterWrapper, get_char_room, "параметры: строка �
     DLString name = args2string( args );
 
     if (args.size( ) == 2)
-	room = arg2room( args.back( ) );
+        room = arg2room( args.back( ) );
     else
-	room = target->in_room;
+        room = target->in_room;
     
     return wrap( ::get_char_room( target, room, name ) );
 }
@@ -1024,7 +1024,7 @@ NMI_INVOKE( CharacterWrapper, transfer, "" )
     checkTarget( );
 
     if (args.size( ) != 6)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     room = arg2room( *i );
     actor = arg2character( *++i );
@@ -1043,9 +1043,9 @@ NMI_INVOKE( CharacterWrapper, char_to_room, "параметр: комната. �
     Room *room = arg2room( get_unique_arg( args ) ); 
     
     if (target->in_room) {
-	undig( target );
-	target->dismount( );
-	::char_from_room( target );
+        undig( target );
+        target->dismount( );
+        ::char_from_room( target );
     }
 
     ::char_to_room( target, room );
@@ -1073,9 +1073,9 @@ NMI_INVOKE( CharacterWrapper, setName, "устанавливает имена м
 }
 
 NMI_INVOKE( CharacterWrapper, seeName, 
-	"параметры: чар ch, номер падежа (по умолчанию именительный)."
-	"вернет то, как this видит имя и претитул (короткое описание) чара ch. "
-	"считается, что ch видимый для this." )
+        "параметры: чар ch, номер падежа (по умолчанию именительный)."
+        "вернет то, как this видит имя и претитул (короткое описание) чара ch. "
+        "считается, что ch видимый для this." )
 {
     checkTarget( );
     int cse = 1;
@@ -1083,15 +1083,15 @@ NMI_INVOKE( CharacterWrapper, seeName,
     RegisterList::const_iterator i = args.begin( );
 
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     Character *ch = arg2character( *i );
 
     i++;
     
     if(i != args.end())
-	cse = i->toNumber();
-	
+        cse = i->toNumber();
+        
     return Register( target->seeName(ch, '0' + cse ) );
 }
 
@@ -1121,10 +1121,10 @@ NMI_INVOKE( CharacterWrapper, can_see_exit, "" )
     checkTarget( );
     door = args2number( args );
     if (door < 0 || door >= DIR_SOMEWHERE)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
 
     if (!( pExit = target->in_room->exit[door] ))
-	return false;
+        return false;
 
     return target->can_see( pExit );
 }
@@ -1199,15 +1199,15 @@ NMI_INVOKE( CharacterWrapper, edit, "переводит this в режим ре�
     PCharacter *pch = target->getPC();
     
     if(!pch)
-	throw Scripting::Exception( "only for PCs" );
+        throw Scripting::Exception( "only for PCs" );
     
     DLString str;
     
     XMLEditorInputHandler::Pointer eih( NEW );
     
     if(!args.empty()) {
-	eih->clear( );
-	eih->setBuffer(args.front().toString());
+        eih->clear( );
+        eih->setBuffer(args.front().toString());
     }
 
     eih->attach(pch);
@@ -1224,13 +1224,13 @@ NMI_INVOKE( CharacterWrapper, edReg, "([ndx[, txt]]) -- возвращает/у�
     PCharacter *pch = target->getPC();
     
     if(!pch)
-	throw Scripting::Exception( "only for PCs" );
+        throw Scripting::Exception( "only for PCs" );
     
     unsigned char ndx = 0;
 
     if(i != args.end()) {
-	ndx = i->toNumber();
-	i++;
+        ndx = i->toNumber();
+        i++;
     }
 
     Editor::reg_t &reg = pch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[ndx];
@@ -1238,10 +1238,10 @@ NMI_INVOKE( CharacterWrapper, edReg, "([ndx[, txt]]) -- возвращает/у�
     DLString str;
 
     if(i == args.end())
-	for(Editor::reg_t::const_iterator j = reg.begin(); j != reg.end(); j++)
-	    str.append(*j).append("\n");
+        for(Editor::reg_t::const_iterator j = reg.begin(); j != reg.end(); j++)
+            str.append(*j).append("\n");
     else 
-	reg.split(str = i->toString());
+        reg.split(str = i->toString());
 
     return Register(str);
 }
@@ -1253,7 +1253,7 @@ NMI_INVOKE( CharacterWrapper, gainExp, "параметр: число. добав
     RegisterList::const_iterator i = args.begin( );
 
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     CHK_NPC
     target->getPC()->gainExp(i->toNumber());
@@ -1278,14 +1278,14 @@ NMI_INVOKE( CharacterWrapper, setClan, "устанавливает клан по
     checkTarget();
 
     if (args.empty())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     clan = ClanManager::getThis( )->findUnstrict( args.front( ).toString( ) );
 
     if (!clan)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
     else
-	target->setClan( clan->getName( ) );
+        target->setClan( clan->getName( ) );
     
     return Register( );
 }
@@ -1307,7 +1307,7 @@ NMI_INVOKE( CharacterWrapper, extract, "" )
     RegisterList::const_iterator i = args.begin( );
 
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     extract_char(target, i->toNumber());
     return Register();
@@ -1344,14 +1344,14 @@ NMI_INVOKE( CharacterWrapper, get_random_room, "рандомная рума, к�
     Room *r;
     
     for (r = room_list; r; r = r->rnext)
-	if (target->canEnter(r) && !r->isPrivate())
-	    rooms.push_back(r);
+        if (target->canEnter(r) && !r->isPrivate())
+            rooms.push_back(r);
     
     if (rooms.empty())
-	return Register( );
+        return Register( );
     else {
-	r = rooms[::number_range(0, rooms.size() - 1)];
-	return WrapperManager::getThis( )->getWrapper(r); 
+        r = rooms[::number_range(0, rooms.size() - 1)];
+        return WrapperManager::getThis( )->getWrapper(r); 
     }
 }
 
@@ -1372,7 +1372,7 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "параметры: victim, разме
     checkTarget( );
 
     if (args.size() < 2)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     i = args.begin( );
     victim = arg2character( *i );
@@ -1380,9 +1380,9 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "параметры: victim, разме
 
     if (args.size() > 2) {
         DLString d = (++i)->toString();
-	dam_type = damage_table.value( d.c_str(), true );
-	if (dam_type == NO_FLAG)
-	    throw Scripting::CustomException( "Invalid damage type");
+        dam_type = damage_table.value( d.c_str(), true );
+        if (dam_type == NO_FLAG)
+            throw Scripting::CustomException( "Invalid damage type");
     }
 
     ::rawdamage(target, victim, dam_type, dam, true);
@@ -1411,13 +1411,13 @@ NMI_INVOKE( CharacterWrapper, damage, "параметры: victim, размер 
     skillName = (++i)->toString( );
     skill = skillManager->findExisting( skillName );
     if (!skill)
-	throw Scripting::CustomException( skillName + ": invalid skill name");
+        throw Scripting::CustomException( skillName + ": invalid skill name");
     
     if (args.size() > 2) {
         DLString d = (++i)->toString();
-	dam_type = damage_table.value( d.c_str(), true );
-	if (dam_type == NO_FLAG)
-	    throw Scripting::CustomException( "Invalid damage type");
+        dam_type = damage_table.value( d.c_str(), true );
+        if (dam_type == NO_FLAG)
+            throw Scripting::CustomException( "Invalid damage type");
     }
 
     ::damage(target, victim, dam, skill->getIndex( ), dam_type, true);
@@ -1437,7 +1437,7 @@ NMI_INVOKE( CharacterWrapper, spell, "скастовать заклинание 
     checkTarget( );
 
     if (args.size() < 4)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     i = args.begin( );
     DLString d = i->toString();
@@ -1453,7 +1453,7 @@ NMI_INVOKE( CharacterWrapper, spell, "скастовать заклинание 
     fBane = i->toNumber( );
 
     if (!skill || !victim)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
     
     spell( skill->getIndex( ), level, target, victim, fBane );
     return Register( );
@@ -1477,10 +1477,10 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "убить. необязательны�
     i = args.begin( );
 
     if (i != args.end( )) {
-	part = i->toNumber( );
+        part = i->toNumber( );
 
-	if (++i != args.end( ))
-	    killer = arg2character( *i );
+        if (++i != args.end( ))
+            killer = arg2character( *i );
     }
     
     raw_kill( target, part, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
@@ -1546,9 +1546,9 @@ NMI_INVOKE( CharacterWrapper, isAffected, "находится ли чар под
     skill = skillManager->findExisting( args.front( ).toString( ) );
 
     if (skill)
-	return target->isAffected( skill->getIndex( ) );
+        return target->isAffected( skill->getIndex( ) );
     else
-	return false;
+        return false;
 }
 
 NMI_INVOKE( CharacterWrapper, affectStrip, "" )
@@ -1557,12 +1557,12 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "" )
     Skill *skill;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     skill = skillManager->findExisting( args.front( ).toString( ) );
     
     if (!skill)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
     
     affect_strip( target, skill->getIndex( ) );
     return Register( );
@@ -1587,16 +1587,16 @@ NMI_INVOKE( CharacterWrapper, move_char, "переместит чара, пер�
         throw Scripting::NotEnoughArgumentsException( );
     
     if (args.size( ) > 2)
-	throw Scripting::TooManyArgumentsException( );
+        throw Scripting::TooManyArgumentsException( );
     
     door = args.front( ).toNumber( );
     if (door < 0 || door >= DIR_SOMEWHERE)
-	return false;
+        return false;
     
     if (args.size( ) > 1)
-	movetypeName = args.back( ).toString( );
+        movetypeName = args.back( ).toString( );
     else 
-	movetypeName = "normal";
+        movetypeName = "normal";
 
     rc = ::move_char( target, door, movetypeName.c_str( ) );
     return Register( rc == RC_MOVE_OK );
@@ -1626,7 +1626,7 @@ NMI_INVOKE( CharacterWrapper, isLawProtected, "охраняется ли моб 
     mob = target->getNPC( );
 
     if (IS_SET(mob->pIndexData->area->area_flag, AREA_HOMETOWN))
-	return true;
+        return true;
 
     return false;
 }
@@ -1638,15 +1638,15 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "может ли поднять пр�
     ::Object *obj = arg2item( get_unique_arg( args ) );
 
     if (!obj->can_wear( ITEM_TAKE )) 
-	return false;
+        return false;
     if (obj->getOwner( ))
-	return false;
+        return false;
     if (obj->behavior)
-	return false;
+        return false;
     if (!target->can_see( obj ))
-	return false;
+        return false;
     if (obj->isAntiAligned( target ))
-	return false;
+        return false;
 
     return true;
 }
@@ -1660,8 +1660,8 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "поиск объекта в i
     int vnum = args2number( args );
 
     for (::Object *obj = target->carrying; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    return wrap( obj );
+        if (obj->pIndexData->vnum == vnum)
+            return wrap( obj );
 
     return Register( );
 }
@@ -1678,19 +1678,19 @@ NMI_INVOKE( CharacterWrapper, mortality, "" )
     checkTarget( );
 
     if (target->is_npc( ) || !target->getPC( )->getAttributes( ).isAvailable( "mortality" ))
-	throw Scripting::Exception( "Attribute not found" );
+        throw Scripting::Exception( "Attribute not found" );
     
     if (target->getPC( )->getAttributes( ).isAvailable( "coder" )) {
-	target->getPC( )->getAttributes( ).eraseAttribute( "coder" );
-	target->getPC( )->setSecurity( 0 );
-	target->println("Now you are mortal.");
-	return 1;
+        target->getPC( )->getAttributes( ).eraseAttribute( "coder" );
+        target->getPC( )->setSecurity( 0 );
+        target->println("Now you are mortal.");
+        return 1;
     }
     else {
-	target->getPC( )->getAttributes( ).getAttr<XMLAttributeCoder>( "coder" );
-	target->getPC( )->setSecurity( 999 );
-	target->println("Now you are immortal.");
-	return 0;
+        target->getPC( )->getAttributes( ).getAttr<XMLAttributeCoder>( "coder" );
+        target->getPC( )->setSecurity( 999 );
+        target->println("Now you are immortal.");
+        return 0;
     }
 }
 
@@ -1699,7 +1699,7 @@ NMI_INVOKE( CharacterWrapper, echoOn, "" )
     checkTarget( );
     
     if (target->desc)
-	target->desc->echoOn( );
+        target->desc->echoOn( );
 
     return Register( );
 }
@@ -1709,7 +1709,7 @@ NMI_INVOKE( CharacterWrapper, echoOff, "" )
     checkTarget( );
     
     if (target->desc)
-	target->desc->echoOff( );
+        target->desc->echoOff( );
 
     return Register( );
 }
@@ -1750,15 +1750,15 @@ NMI_INVOKE( CharacterWrapper, canRecall, "" )
     checkTarget( );
 
     if (IS_SET(target->in_room->room_flags, ROOM_NO_RECALL))
-	return false; 
+        return false; 
     if (IS_RAFFECTED(target->in_room, AFF_ROOM_CURSE))
-	return false;
+        return false;
     if (IS_AFFECTED(target, AFF_CURSE))
-	return false;
+        return false;
     if (target->isAffected(gsn_manacles))
-	return false;
+        return false;
     if (target->position <= POS_SLEEPING || target->fighting)
-	return false;
+        return false;
 
     return true;
 }
@@ -1793,7 +1793,7 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "" )
     duration = (i == args.end( ) ? -1 : i->toNumber( ));
 
     if (victim->master)
-	victim->stop_follower( );
+        victim->stop_follower( );
 
     victim->add_follower( target );
     victim->leader = target;
@@ -1820,12 +1820,12 @@ NMI_INVOKE( CharacterWrapper, add_pet, "" )
     
     pet = arg2character( args.front( ) );
     if (!pet->is_npc( ))
-	throw Scripting::Exception( "NPC field requested on PC" ); 
+        throw Scripting::Exception( "NPC field requested on PC" ); 
     
     if (pet->getNPC( )->behavior) {
-	Pet::Pointer bhv = pet->getNPC( )->behavior.getDynamicPointer<Pet>( );
-	if (bhv)
-	    bhv->config( target->getPC( ), pet->getNPC( ) );
+        Pet::Pointer bhv = pet->getNPC( )->behavior.getDynamicPointer<Pet>( );
+        if (bhv)
+            bhv->config( target->getPC( ), pet->getNPC( ) );
     }
 
     SET_BIT( pet->affected_by, AFF_CHARM );
@@ -1850,8 +1850,8 @@ NMI_GET( CharacterWrapper, affected, "" )
     Affect *paf;
 
     for (paf = target->affected; paf != 0; paf = paf->next) 
-	rc->push_back( AffectWrapper::wrap( *paf ) );
-	
+        rc->push_back( AffectWrapper::wrap( *paf ) );
+        
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
     sobj->setHandler(rc);
 
@@ -1864,9 +1864,9 @@ NMI_GET( CharacterWrapper, hasDestiny, "" )
     CHK_PC
     
     if (target->getNPC( )->behavior)
-	return target->getNPC( )->behavior->hasDestiny( );
+        return target->getNPC( )->behavior->hasDestiny( );
     else
-	return Register( false );
+        return Register( false );
 }
 
 NMI_GET( CharacterWrapper, clan, "" )
@@ -1888,22 +1888,22 @@ NMI_INVOKE( CharacterWrapper, hasOccupation, "" )
 NMI_INVOKE( CharacterWrapper, switchTo, "" )
 {
     Character *victim;
-	
+        
     checkTarget();
     CHK_NPC
 
     victim = arg2character( args.front( ) );
     if (!victim->is_npc( ))
-	throw Scripting::Exception( "Impossible to switch to PC" ); 
+        throw Scripting::Exception( "Impossible to switch to PC" ); 
     
     if (target->desc == 0)
-	throw Scripting::Exception( "Zero descriptor for switch" ); 
+        throw Scripting::Exception( "Zero descriptor for switch" ); 
 
     if (target->getPC( )->switchedTo) 
-	throw Scripting::Exception( "Character already switched" ); 
+        throw Scripting::Exception( "Character already switched" ); 
 
     if (victim->desc != 0)
-	throw Scripting::Exception( "Switch victim is already in use" ); 
+        throw Scripting::Exception( "Switch victim is already in use" ); 
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, target->get_trust( ), "%C1 switches into %C4.", target, victim );
 
@@ -1923,10 +1923,10 @@ NMI_INVOKE( CharacterWrapper, switchFrom, "" )
     CHK_PC
     
     if (target->desc == 0)
-	throw Scripting::Exception( "Switched mobile has no descriptor" ); 
+        throw Scripting::Exception( "Switched mobile has no descriptor" ); 
     
     if (!target->getNPC( )->switchedFrom) 
-	throw Scripting::Exception( "Try to return from non-switched mobile" );
+        throw Scripting::Exception( "Try to return from non-switched mobile" );
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, target->get_trust( ), "%C1 returns from %C2.", target->getNPC( )->switchedFrom, target );
     
@@ -1988,8 +1988,8 @@ NMI_INVOKE( CharacterWrapper, eat, "(item) заполнить желудок т�
     ::Object *obj = arg2item( args.front( ) );
 
     if (obj->item_type == ITEM_FOOD) {
-	desire_hunger->eat( target->getPC( ), obj->value[0] * 2 );
-	desire_full->eat( target->getPC( ), obj->value[1] * 2 );
+        desire_hunger->eat( target->getPC( ), obj->value[0] * 2 );
+        desire_full->eat( target->getPC( ), obj->value[1] * 2 );
     }
 
     return Register( );
@@ -2002,17 +2002,17 @@ NMI_INVOKE( CharacterWrapper, drink, "(item, amount) заполнить желу
     int amount;
 
     if (args.size( ) != 2)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     obj = arg2item( args.front( ) );
     amount = args.back( ).toNumber( );
 
     if (obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOUNTAIN) {
-	Liquid *liq = liquidManager->find( obj->value[2] );
+        Liquid *liq = liquidManager->find( obj->value[2] );
 
-	desire_full->drink( target->getPC( ), amount, liq );
-	desire_thirst->drink( target->getPC( ), amount, liq );
-	desire_drunk->drink( target->getPC( ), amount, liq );
+        desire_full->drink( target->getPC( ), amount, liq );
+        desire_thirst->drink( target->getPC( ), amount, liq );
+        desire_drunk->drink( target->getPC( ), amount, liq );
     }
 
     return Register( );
@@ -2023,7 +2023,7 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill, key, names, short, long) уст�
     checkTarget( );
     CHK_NPC
     if (args.size( ) != 5)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     RegisterList::const_iterator i = args.begin( );
     DLString skillName = (i++)->toString();
@@ -2034,18 +2034,18 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill, key, names, short, long) уст�
 
     Skill *skill = skillManager->findExisting( skillName );
     if (!skill)
-	throw Scripting::Exception( "Skill name not found" );
+        throw Scripting::Exception( "Skill name not found" );
 
     XMLAttributeRestring::Pointer attr = target->getPC( )->getAttributes( ).getAttr<XMLAttributeRestring>( skillName );
     XMLAttributeRestring::iterator r = attr->find( key );
     if (r != attr->end( )) {
-	r->second.name = objName;
+        r->second.name = objName;
         r->second.shortDescr = objShort;
-	r->second.longDescr = objLong;
+        r->second.longDescr = objLong;
     } else {
-	(**attr)[key].name = objName;
-	(**attr)[key].shortDescr = objShort;
-	(**attr)[key].longDescr = objLong;
+        (**attr)[key].name = objName;
+        (**attr)[key].shortDescr = objShort;
+        (**attr)[key].longDescr = objLong;
     }
 
     target->getPC( )->save( );

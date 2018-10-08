@@ -15,20 +15,20 @@ class ProfessionRegistrator : public Plugin {
 public:
     virtual void initialization( )
     {
-	Class::regXMLVar<ProfessionHelp>( );
-	Class::regXMLVar<ProfessionTitlesByLevel>( );
-	Class::regMoc<ProfessionTitlesByConstant>( );
-	Class::regMoc<DefaultProfession>( );
-	Class::regMoc<MobileProfession>( );
+        Class::regXMLVar<ProfessionHelp>( );
+        Class::regXMLVar<ProfessionTitlesByLevel>( );
+        Class::regMoc<ProfessionTitlesByConstant>( );
+        Class::regMoc<DefaultProfession>( );
+        Class::regMoc<MobileProfession>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregXMLVar<ProfessionHelp>( );
-	Class::unregXMLVar<ProfessionTitlesByLevel>( );
-	Class::unregMoc<ProfessionTitlesByConstant>( );
-	Class::unregMoc<DefaultProfession>( );
-	Class::unregMoc<MobileProfession>( );
+        Class::unregXMLVar<ProfessionHelp>( );
+        Class::unregXMLVar<ProfessionTitlesByLevel>( );
+        Class::unregMoc<ProfessionTitlesByConstant>( );
+        Class::unregMoc<DefaultProfession>( );
+        Class::unregMoc<MobileProfession>( );
     }
 };
 
@@ -36,12 +36,12 @@ public:
 extern "C"
 {
     SO::PluginList initialize_profession( ) {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<ProfessionRegistrator>( ppl );
-	Plugin::registerPlugin<ProfessionLoader>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<ProfessionRegistrator>( ppl );
+        Plugin::registerPlugin<ProfessionLoader>( ppl );
+        
+        return ppl;
     }
 }
 

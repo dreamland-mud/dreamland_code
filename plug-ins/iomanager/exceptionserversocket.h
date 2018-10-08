@@ -14,10 +14,10 @@
 class ExceptionServerSocket : public Exception
 {
 public:
-	inline ExceptionServerSocket( const char* msg, const char* error, int port, int listen )
-		: Exception( DLString( msg ) << "::port:" << port << "::listen:" << listen << "::" << error )
-	{
-	}
+        inline ExceptionServerSocket( const char* msg, const char* error, int port, int listen )
+                : Exception( DLString( msg ) << "::port:" << port << "::listen:" << listen << "::" << error )
+        {
+        }
 };
 
 #endif

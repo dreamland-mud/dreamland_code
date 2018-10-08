@@ -27,7 +27,7 @@ class Object;
 class NPCharacter;
 struct mob_index_data;
 
-int	    count_users(Object *obj);
+int            count_users(Object *obj);
 void        get_money_here( Object *list, int &gold, int &silver );
 Object *    create_money( int gold, int silver );
 DLString    describe_money( int gold, int silver, const Grammar::Case &gcase );
@@ -54,19 +54,19 @@ void do_yell( Character *, const char * );
 #define    FEXTRACT_TOTAL  (A)
 #define    FEXTRACT_COUNT  (B)
 #define    FEXTRACT_LASTFOUGHT  (C)
-void	extract_dead_player( PCharacter *, int flags );
-void	extract_char( Character *, bool fCount = true );
+void        extract_dead_player( PCharacter *, int flags );
+void        extract_char( Character *, bool fCount = true );
 
-#define IS_OUTSIDE(ch)		(!IS_SET(				    \
-				    (ch)->in_room->room_flags,		    \
-				    ROOM_INDOORS))
+#define IS_OUTSIDE(ch)                (!IS_SET(                                    \
+                                    (ch)->in_room->room_flags,                    \
+                                    ROOM_INDOORS))
 
-#define IS_TRUSTED(ch,level)	(( ch->get_trust() ) >= (level))
+#define IS_TRUSTED(ch,level)        (( ch->get_trust() ) >= (level))
 
-#define	SHADOW_ACTIVE		50	
-#define SHADOW(ch)	    (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE)
-#define HALF_SHADOW(ch)	    (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE/2)
-#define HAS_SHADOW(ch)	    (!(ch)->is_npc() && (ch)->getPC()->shadow >= 0)
+#define        SHADOW_ACTIVE                50        
+#define SHADOW(ch)            (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE)
+#define HALF_SHADOW(ch)            (HAS_SHADOW(ch) && number_percent() > SHADOW_ACTIVE/2)
+#define HAS_SHADOW(ch)            (!(ch)->is_npc() && (ch)->getPC()->shadow >= 0)
 
 
 #endif

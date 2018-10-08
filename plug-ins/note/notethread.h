@@ -31,21 +31,21 @@ class XMLAttributeNoteData;
  */
 class NoteThread : public Command, 
                    public virtual Plugin, 
-		   public DLXMLRuntimeLoader, 
-		   public XMLVariableContainer 
+                   public DLXMLRuntimeLoader, 
+                   public XMLVariableContainer 
 {
 XML_OBJECT    
 public:
     class NoteBucket : public XMLListBase<Note> {
     public:
-	typedef XMLListBase<Note> Base;	
-	
-	NoteBucket( );
-	virtual bool nodeFromXML( const XMLNode::Pointer& child );
-	inline void setThread( NoteThread * );
+        typedef XMLListBase<Note> Base;        
+        
+        NoteBucket( );
+        virtual bool nodeFromXML( const XMLNode::Pointer& child );
+        inline void setThread( NoteThread * );
 
     private:
-	NoteThread *thread;
+        NoteThread *thread;
     };
     
     typedef ::Pointer<NoteThread> Pointer;
@@ -204,23 +204,23 @@ public:
     }
     virtual const DLString& getName( ) const 
     {
-	return THREAD_NAME;
+        return THREAD_NAME;
     }
     virtual void getUnreadMessage( int count, ostringstream &buf ) const 
     {
-	return NoteThread::getUnreadMessage( count, buf );
+        return NoteThread::getUnreadMessage( count, buf );
     }
     virtual bool canWrite( const PCharacter *ch ) const 
     {
-	return NoteThread::canWrite( ch );
+        return NoteThread::canWrite( ch );
     }
 
     struct Registrator : public ::NoteThreadRegistrator
     {
-	virtual void registrate( SO::PluginList &ppl )
-	{
-	    Plugin::registerPlugin<NoteThreadTemplate>( ppl );
-	}
+        virtual void registrate( SO::PluginList &ppl )
+        {
+            Plugin::registerPlugin<NoteThreadTemplate>( ppl );
+        }
     };
 
 protected:

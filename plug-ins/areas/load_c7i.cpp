@@ -63,7 +63,7 @@ static void c7i_area_header( FILE *fp, AREA_DATA *ourArea )
     LogStream::sendNotice() << "Updating area " << ourArea->name << endl;
 
     for ( ; ; ) {
-	char *word = fread_word(fp);
+        char *word = fread_word(fp);
         DLString name = trim(fread_dlstring_to_eol(fp));
         if (!str_cmp( word, "rus" )) {
             LogStream::sendNotice() << "Setting area name to " << name << endl;
@@ -159,7 +159,7 @@ static void c7i_room( FILE *fp, AREA_DATA *ourArea )
             DLString keywords = trim(fread_dlstring_to_eol(fp));
             DLString ed = trimText(fread_dlstring(fp));
 
-	    for (EXTRA_DESCR_DATA *pEd = room->extra_descr; pEd; pEd= pEd->next) {
+            for (EXTRA_DESCR_DATA *pEd = room->extra_descr; pEd; pEd= pEd->next) {
                 if (arg_contains_someof(pEd->keyword, keywords.c_str())) {
                     notice("Updating room extra descr %s.", pEd->keyword);
                     free_string(pEd->keyword);

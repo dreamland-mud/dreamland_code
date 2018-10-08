@@ -23,40 +23,40 @@ public:
 
     virtual bool toXML( XMLNode::Pointer& parent ) const
     {
-	if (empty( ))
-	    return false;
+        if (empty( ))
+            return false;
 
-	for (typename XMLSafeList::const_iterator it = begin( ); it != end( ); ++it) {
-	    XMLNode::Pointer child( NEW );
+        for (typename XMLSafeList::const_iterator it = begin( ); it != end( ); ++it) {
+            XMLNode::Pointer child( NEW );
 
-	    try {
-		if (it->toXML( child )) {
+            try {
+                if (it->toXML( child )) {
                     child->insertAttribute( XMLNode::ATTRIBUTE_TYPE, it->getType( ) );
                     child->setName( XMLNode::ATTRIBUTE_NODE );
-		    parent->appendChild( child );
+                    parent->appendChild( child );
                 }
-	    }
-	    catch (const ExceptionSkipVariable &) {
-	    }
-	}
+            }
+            catch (const ExceptionSkipVariable &) {
+            }
+        }
 
-	return true;
+        return true;
     }
 
     virtual bool nodeFromXML( const XMLNode::Pointer &child )
     {
-	if (child->getName( ) == XMLNode::ATTRIBUTE_NODE) {
-	    const DLString & type = child->getAttribute( XMLNode::ATTRIBUTE_TYPE );
-	    AllocateClass::Pointer ptr = Class::allocateClass( type );
-	    ElementType *element = dynamic_cast<ElementType *>( ptr.getPointer( ) );
-	    
-	    ptr.strip( );
-	    element->fromXML( child );
-	    push_front( element );
-	    return true;
-	}
+        if (child->getName( ) == XMLNode::ATTRIBUTE_NODE) {
+            const DLString & type = child->getAttribute( XMLNode::ATTRIBUTE_TYPE );
+            AllocateClass::Pointer ptr = Class::allocateClass( type );
+            ElementType *element = dynamic_cast<ElementType *>( ptr.getPointer( ) );
+            
+            ptr.strip( );
+            element->fromXML( child );
+            push_front( element );
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
 };

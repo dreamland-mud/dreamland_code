@@ -16,24 +16,24 @@ public:
 
     virtual void initialization( )
     {
-	Class::regMoc<ClanData>( );
-	Class::regMoc<ClanBank>( );
-	Class::regMoc<ClanMembership>( );
-	Class::regMoc<ClanOrder>( );
-	Class::regMoc<ClanOrgs>( );
-	Class::regXMLVar<ClanTitlesByClass>( );
-	Class::regXMLVar<ClanTitlesByLevel>( );
+        Class::regMoc<ClanData>( );
+        Class::regMoc<ClanBank>( );
+        Class::regMoc<ClanMembership>( );
+        Class::regMoc<ClanOrder>( );
+        Class::regMoc<ClanOrgs>( );
+        Class::regXMLVar<ClanTitlesByClass>( );
+        Class::regXMLVar<ClanTitlesByLevel>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregXMLVar<ClanTitlesByClass>( );
-	Class::unregXMLVar<ClanTitlesByLevel>( );
-	Class::unregMoc<ClanOrgs>( );
-	Class::unregMoc<ClanOrder>( );
-	Class::unregMoc<ClanMembership>( );
-	Class::unregMoc<ClanBank>( );
-	Class::unregMoc<ClanData>( );
+        Class::unregXMLVar<ClanTitlesByClass>( );
+        Class::unregXMLVar<ClanTitlesByLevel>( );
+        Class::unregMoc<ClanOrgs>( );
+        Class::unregMoc<ClanOrder>( );
+        Class::unregMoc<ClanMembership>( );
+        Class::unregMoc<ClanBank>( );
+        Class::unregMoc<ClanData>( );
     }
 };
 
@@ -41,10 +41,10 @@ extern "C"
 {
     SO::PluginList initialize_clan_core( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
     
-	Plugin::registerPlugin<ClanCoreRegistrator>( ppl );
+        Plugin::registerPlugin<ClanCoreRegistrator>( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

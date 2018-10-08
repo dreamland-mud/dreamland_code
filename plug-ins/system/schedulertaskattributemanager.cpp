@@ -32,7 +32,7 @@ SchedulerTaskAttributeManager::SchedulerTaskAttributeManager( )
 {
     thisClass = this;
     Class::regClass( PLUGIN_NAME, 
-		    Class::RegisterOneAllocateClass<SchedulerTaskAttributeManager>::Pointer( NEW ) );
+                    Class::RegisterOneAllocateClass<SchedulerTaskAttributeManager>::Pointer( NEW ) );
 }
 
 SchedulerTaskAttributeManager::~SchedulerTaskAttributeManager( )
@@ -49,16 +49,16 @@ void SchedulerTaskAttributeManager::run( PCharacter* ch )
     XMLAttributes &attributes = ch->getAttributes( );
     
     for (i = attributes.begin( ); i != attributes.end( ); i++) {
-	ScheduledXMLAttribute::Pointer attr;
-	
-	attr = i->second.getDynamicPointer<ScheduledXMLAttribute>( );
+        ScheduledXMLAttribute::Pointer attr;
+        
+        attr = i->second.getDynamicPointer<ScheduledXMLAttribute>( );
 
-	if (attr && attr->pull( ch ))
-	    list.push_back( i->first );
+        if (attr && attr->pull( ch ))
+            list.push_back( i->first );
     }
     
     for (KeyList::iterator j = list.begin( ); j != list.end( ); j++) 
-	attributes.eraseAttribute( *j );
+        attributes.eraseAttribute( *j );
 }
 
 void SchedulerTaskAttributeManager::after( )
@@ -83,7 +83,7 @@ ScheduledPCMemoryAttributeManager::ScheduledPCMemoryAttributeManager( )
 {
     thisClass = this;
     Class::regClass( PLUGIN_NAME, 
-		    Class::RegisterOneAllocateClass<ScheduledPCMemoryAttributeManager>::Pointer( NEW ) );
+                    Class::RegisterOneAllocateClass<ScheduledPCMemoryAttributeManager>::Pointer( NEW ) );
 }
 
 ScheduledPCMemoryAttributeManager::~ScheduledPCMemoryAttributeManager( )
@@ -100,16 +100,16 @@ void ScheduledPCMemoryAttributeManager::run( PCMemoryInterface *pcm )
     XMLAttributes &attributes = pcm->getAttributes( );
     
     for (i = attributes.begin( ); i != attributes.end( ); i++) {
-	ScheduledPCMemoryXMLAttribute::Pointer attr;
-	
-	attr = i->second.getDynamicPointer<ScheduledPCMemoryXMLAttribute>( );
-	
-	if (attr && attr->pull( pcm )) 
-	    list.push_back( i->first );
+        ScheduledPCMemoryXMLAttribute::Pointer attr;
+        
+        attr = i->second.getDynamicPointer<ScheduledPCMemoryXMLAttribute>( );
+        
+        if (attr && attr->pull( pcm )) 
+            list.push_back( i->first );
     }
     
     for (KeyList::iterator j = list.begin( ); j != list.end( ); j++) 
-	attributes.eraseAttribute( *j );
+        attributes.eraseAttribute( *j );
 }
 
 

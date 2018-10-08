@@ -13,19 +13,19 @@
 #include "dbio.h"
 
 const DLString DBIO::EXT_XML = ".xml";
-	
+        
 DBIO::DBIO( const DLString & tableName )
-	: table( tableName )
+        : table( tableName )
 {
 }
 
 DBIO::DBIO( const DLString & tablePath, const DLString & tableName )
-	: table( tablePath, tableName )
+        : table( tablePath, tableName )
 {
 }
 
 DBIO::DBIO( const DLDirectory & tableDir, const DLString & tableName )
-	: table( tableDir, tableName )
+        : table( tableDir, tableName )
 {
 }
 
@@ -79,7 +79,7 @@ void DBIO::safeInsert( const DLString& key, const DLString& xml ) throw( Excepti
 
     tmpEntry.rename( getEntryAsFile( key ) );
 }
-	
+        
 DBIO::DBNode DBIO::select( const DLString& key ) throw( ExceptionDBIO )
 {
     DLFileStream stream( getEntryAsFile( key ) );
@@ -93,7 +93,7 @@ DBIO::DBNode DBIO::select( const DLString& key ) throw( ExceptionDBIO )
 void DBIO::remove( const DLString& key ) throw( ExceptionDBIO )
 {
     if (!getEntryAsFile( key ).remove( ))
-	throw ExceptionDBIO( "Unable to delete '" + key + "'" );
+        throw ExceptionDBIO( "Unable to delete '" + key + "'" );
 }
 
 void DBIO::renameID( const DLString& oldKey, const DLString& newKey ) throw( ExceptionDBIO )
@@ -103,7 +103,7 @@ void DBIO::renameID( const DLString& oldKey, const DLString& newKey ) throw( Exc
     DLFile newEntry( backupTable, newKey, EXT_XML );
     
     if (!oldEntry.rename( newEntry ))
-	throw ExceptionDBIO( "Unable to rename id '" + oldKey + "' to '" + newKey + "'" );
+        throw ExceptionDBIO( "Unable to rename id '" + oldKey + "' to '" + newKey + "'" );
 }
 
 DLFile DBIO::getEntryAsFile( const DLString &key )

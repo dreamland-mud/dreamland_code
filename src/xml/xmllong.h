@@ -19,24 +19,24 @@
 class XMLLong : public Long
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLLong( ) : Long( )
-	{
-	}
-	
-	inline XMLLong( long value ) : Long( value )
-	{
-	}
-	
-	inline XMLLong( const DLString& value ) throw( ExceptionBadType )
-		: Long( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** По умолчанию значение \0 */
+        inline XMLLong( ) : Long( )
+        {
+        }
+        
+        inline XMLLong( long value ) : Long( value )
+        {
+        }
+        
+        inline XMLLong( const DLString& value ) throw( ExceptionBadType )
+                : Long( value )
+        {
+        }
+        
+        /** Возвращает xml представление переменной */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** Инициализация класса из xml данных */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
@@ -45,8 +45,8 @@ public:
 /** Вывод в ostream типа XMLLong */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLLong& xmlLong )
 {
-	ostr << xmlLong.getValue( );
-	return ostr;
+        ostr << xmlLong.getValue( );
+        return ostr;
 }
 
 #endif

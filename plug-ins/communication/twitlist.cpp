@@ -21,22 +21,22 @@ COMMAND(CTwit, "twit")
     cmd = arguments.getOneArgument( );
     
     if (ch->is_npc( )) {
-	ch->send_to( "Тебе нельзя.\n\r" );
-	return;
+        ch->send_to( "Тебе нельзя.\n\r" );
+        return;
     }
     
     pch = ch->getPC( );
 
     if (cmd.empty( ))
-	doUsage( pch );
+        doUsage( pch );
     else if (arg_oneof( cmd, "add", "добавить" ))
-	doAdd( pch, arguments );
+        doAdd( pch, arguments );
     else if (arg_is_list( cmd ))
-	doList( pch );
+        doList( pch );
     else if (arg_oneof( cmd, "remove", "удалить" ))
-	doRemove( pch, arguments );
+        doRemove( pch, arguments );
     else
-	doUsage( pch );
+        doUsage( pch );
 }
 
 void CTwit::doAdd( PCharacter *ch, DLString &arg )
@@ -46,22 +46,22 @@ void CTwit::doAdd( PCharacter *ch, DLString &arg )
     PCMemoryInterface *pci;
 
     if (arg.empty( )) {
-	ch->send_to( "Использование: {lRжаба добавить{lEtwit add{lx <имя>\r\n" );
-	return;
+        ch->send_to( "Использование: {lRжаба добавить{lEtwit add{lx <имя>\r\n" );
+        return;
     }
 
     if (( pci = PCharacterManager::find( arg ) ))
-	name = pci->getName( );
+        name = pci->getName( );
     else {
-	ch->println( "Жертва с таким именем не обнаружена." );
-	return;
+        ch->println( "Жертва с таким именем не обнаружена." );
+        return;
     }
     
     attr = ch->getAttributes( ).getAttr<XMLAttributeTwitList>( "twit" );
 
     if (attr->isAvailable( name )) {
-	ch->printf( "Имя \"%s\" уже в списке.\r\n", name.c_str( ) );
-	return;
+        ch->printf( "Имя \"%s\" уже в списке.\r\n", name.c_str( ) );
+        return;
     }
     
     attr->push_back( name );
@@ -74,24 +74,24 @@ void CTwit::doRemove( PCharacter *ch, DLString &arg )
     XMLAttributeTwitList::iterator iter;
 
     if (arg.empty( )) {
-	ch->send_to( "Использование: {lRжаба удалить{lEtwit rem{lx <имя> \r\n" );
-	return;
+        ch->send_to( "Использование: {lRжаба удалить{lEtwit rem{lx <имя> \r\n" );
+        return;
     }
     
     attr = ch->getAttributes( ).findAttr<XMLAttributeTwitList>( "twit" );
 
     if (!attr || attr->size( ) == 0) {
-	ch->send_to( "Список жаб и так пуст.\r\n" );
-	return;
+        ch->send_to( "Список жаб и так пуст.\r\n" );
+        return;
     }
     
     for (iter = attr->begin( ); iter != attr->end( ); iter++)
-	if (arg ^ iter->getValue( )) {
-	    ch->printf( "Имя %s удалено из списка.\r\n", iter->getValue( ).c_str( ) );
-	    attr->erase( iter );
-	    return;
-	}
-	    
+        if (arg ^ iter->getValue( )) {
+            ch->printf( "Имя %s удалено из списка.\r\n", iter->getValue( ).c_str( ) );
+            attr->erase( iter );
+            return;
+        }
+            
     ch->printf( "Но имени \"%s\" нет в списке.\r\n", arg.c_str( ) );
 }
 
@@ -104,12 +104,12 @@ void CTwit::doList( PCharacter *ch )
     attr = ch->getAttributes( ).findAttr<XMLAttributeTwitList>( "twit" );
     
     if (!attr || attr->size( ) == 0)
-	buf << "Список пуст." << endl;
+        buf << "Список пуст." << endl;
     else {
-	buf << "Список людей, которых Вы не желаете слышать: " << endl;
-	
-	for (iter = attr->begin( ); iter != attr->end( ); iter++)
-	    buf << *iter << endl;
+        buf << "Список людей, которых Вы не желаете слышать: " << endl;
+        
+        for (iter = attr->begin( ); iter != attr->end( ); iter++)
+            buf << *iter << endl;
     }
 
     ch->send_to( buf );
@@ -118,8 +118,8 @@ void CTwit::doList( PCharacter *ch )
 void CTwit::doUsage( PCharacter *ch )
 {
     ch->send_to( "twit add <имя> \r\n"
-	         "twit rem <имя> \r\n"
-		 "twit list \r\n" );
+                 "twit rem <имя> \r\n"
+                 "twit list \r\n" );
 }
 
 const DLString XMLAttributeTwitList::TYPE= "XMLAttributeTwitList";
@@ -137,8 +137,8 @@ bool XMLAttributeTwitList::isAvailable( const DLString &arg ) const
     const_iterator iter;
     
     for (iter = begin( ); iter != end( ); iter++)
-	if (arg ^ iter->getValue( ))
-	    return true;
+        if (arg ^ iter->getValue( ))
+            return true;
 
     return false;
 }

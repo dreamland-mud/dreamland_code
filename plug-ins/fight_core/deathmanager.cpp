@@ -41,9 +41,9 @@ void DeathManager::handleDeath( Character *killer, Character *victim )
     HandlersList::iterator hl;
 
     for (hp = handlers.begin( ); hp != handlers.end( ); hp++)
-	for (hl = hp->second.begin( ); hl != hp->second.end( ); hl++)
-	    if ((*hl)->handleDeath( killer, victim ))
-		break;
+        for (hl = hp->second.begin( ); hl != hp->second.end( ); hl++)
+            if ((*hl)->handleDeath( killer, victim ))
+                break;
 }
 
 void DeathManager::registrate( DeathHandler::Pointer h )

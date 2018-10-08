@@ -20,9 +20,9 @@ CLAN(none);
 void Character::setWait( int pulses )
 {
     if (is_immortal( ))
-	wait = 1;
+        wait = 1;
     else
-	wait = max( wait, pulses );
+        wait = max( wait, pulses );
 }
 
 void Character::setWaitViolence( int bticks )
@@ -63,11 +63,11 @@ time_t Character::getLastFightTime( ) const
 bool Character::is_adrenalined( ) const
 {
     if (last_fight_time == -1)
-	return false;
+        return false;
 
     if (is_immortal( ))
-	return false;
-	
+        return false;
+        
     return getLastFightDelay( ) < FIGHT_DELAY_TIME;
 }
 
@@ -77,28 +77,28 @@ bool Character::is_adrenalined( ) const
  */
 void PCharacter::check_hit_newbie( Character *victim )
 {
-	// памятка: "как попасть в аутсайдеры"
+        // памятка: "как попасть в аутсайдеры"
 #warning надо б добавить код дуэлей к Character::check_hit_newbie()
 
-	if ( getClan() != clan_none ) // клановые не считаются
-		return;
+        if ( getClan() != clan_none ) // клановые не считаются
+                return;
 
-	if ( victim->is_npc() ) // на всякий случай
-		return;
+        if ( victim->is_npc() ) // на всякий случай
+                return;
 
-	if ( victim->getClan() != clan_none ) // нападения на клановых - прямой путь в out-s :)
-	{
-		interpret_raw(this, "clan", "petition outsider");
-		return;
-	}
+        if ( victim->getClan() != clan_none ) // нападения на клановых - прямой путь в out-s :)
+        {
+                interpret_raw(this, "clan", "petition outsider");
+                return;
+        }
 
-	newbie_hit_counter.setValue( newbie_hit_counter.getValue() + 1 );
-	
-	if ( newbie_hit_counter.getValue() > 10 ) // на неклановых можно нападать.. но недолго
-	{
-		interpret_raw(this, "clan", "petition outsider");
-		return;
-	}
+        newbie_hit_counter.setValue( newbie_hit_counter.getValue() + 1 );
+        
+        if ( newbie_hit_counter.getValue() > 10 ) // на неклановых можно нападать.. но недолго
+        {
+                interpret_raw(this, "clan", "petition outsider");
+                return;
+        }
 }
 
 

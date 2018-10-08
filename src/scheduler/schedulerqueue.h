@@ -30,19 +30,19 @@ typedef Pointer<SchedulerPriorityMap> SchedulerPriorityMapPointer;
 
 class SchedulerQueue : public std::map<long, SchedulerPriorityMapPointer>, public virtual DLObject
 {
-public:	
-	typedef ::Pointer<SchedulerQueue> Pointer;
-	typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
-	
-public:	
-	/** Положить задачу с определенным временем срабатывания */
-	void put( long time, SchedulerTaskPointer& task );
-	/** Взять список задач для определенного времени срабатывания */
-	SchedulerPriorityMapPointer get( long time );
-	/** Насильно убить все задачи заданного типа */
-	void slay( SchedulerTaskPointer& task );
-	/** Насильно убить все задачи с этим указателем */
-	void slayInstance( SchedulerTaskPointer& task );
+public:        
+        typedef ::Pointer<SchedulerQueue> Pointer;
+        typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
+        
+public:        
+        /** Положить задачу с определенным временем срабатывания */
+        void put( long time, SchedulerTaskPointer& task );
+        /** Взять список задач для определенного времени срабатывания */
+        SchedulerPriorityMapPointer get( long time );
+        /** Насильно убить все задачи заданного типа */
+        void slay( SchedulerTaskPointer& task );
+        /** Насильно убить все задачи с этим указателем */
+        void slayInstance( SchedulerTaskPointer& task );
 };
 
 #endif

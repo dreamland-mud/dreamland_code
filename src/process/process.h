@@ -21,21 +21,21 @@ public:
     typedef ::Pointer<ProcessManager> Pointer;
 
     struct RoundRobinElement {
-	RoundRobinElement( );
-	virtual ~RoundRobinElement( );
+        RoundRobinElement( );
+        virtual ~RoundRobinElement( );
 
-	void fromlist( );
-	void tolist(RoundRobinElement &l);
+        void fromlist( );
+        void tolist(RoundRobinElement &l);
 
-	void speenup( );
-	void yield( );
-	void speendown( );
+        void speenup( );
+        void yield( );
+        void speendown( );
 
-	virtual void getInfo(ostream &os);
+        virtual void getInfo(ostream &os);
 
-	RoundRobinElement *next, *prev;
-	Mutex mux;
-	Monitor sync;
+        RoundRobinElement *next, *prev;
+        Mutex mux;
+        Monitor sync;
     };
 
 public:
@@ -45,7 +45,7 @@ public:
     void yield();
 
     static inline ProcessManager *getThis() {
-	return thisClass;
+        return thisClass;
     }
 
     RoundRobinElement running, stopped;

@@ -16,28 +16,28 @@
 void Koschey::greet( Character *victim )
 {
     if (victim->is_npc( ))
-	return;
+        return;
 
 }
 
 bool Koschey::command( Character *victim, const DLString &cmdName, const DLString &cmdArgs )
 {
     if (victim->is_npc( ))
-	return false;
+        return false;
 
     if (cmdName == "buy") {
-	doBuy( victim, cmdArgs.quote( ) );
-	return true;
+        doBuy( victim, cmdArgs.quote( ) );
+        return true;
     }
 
     if (cmdName == "list") {
-	doList( victim );
-	return true;
+        doList( victim );
+        return true;
     }
 
     if (cmdName == "sell" || cmdName == "value") {
-	tell_dim( victim, ch, "Мне твое жалкое добро ни к чему." );
-	return true;
+        tell_dim( victim, ch, "Мне твое жалкое добро ни к чему." );
+        return true;
     }
     
     return false;
@@ -106,15 +106,15 @@ bool VictoryPrice::canAfford( Character *ch ) const
     int avail;
     
     if (ch->is_npc( ))
-	return false;
-	
+        return false;
+        
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" );
     if (!attr)
-	return false;
+        return false;
 
     avail = min( (int)(Remorts::MAX_BONUS_LIFES
                            - ch->getPC( )->getRemorts( ).size( )) * COUNT_PER_LIFE,
-	         attr->getAllVictoriesCount( ) );
+                 attr->getAllVictoriesCount( ) );
 
     return avail - attr->getVasted( ) >= count.getValue( );
 }
@@ -122,10 +122,10 @@ bool VictoryPrice::canAfford( Character *ch ) const
 void VictoryPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( )) {
-	XMLAttributeStatistic::Pointer attr;
-	
-	attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeStatistic>( "questdata" );
-	attr->setVasted( attr->getVasted( ) + count.getValue( ) );
+        XMLAttributeStatistic::Pointer attr;
+        
+        attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeStatistic>( "questdata" );
+        attr->setVasted( attr->getVasted( ) + count.getValue( ) );
     }
 }
 

@@ -37,7 +37,7 @@ BaseManager<T>::erase(id_t id)
     iterator i = T::Map::find(id);
 
     if(i != T::Map::end())
-	T::Map::erase(i);
+        T::Map::erase(i);
 }
 
 template <typename T>
@@ -47,7 +47,7 @@ BaseManager<T>::at(id_t id)
     iterator i = lower_bound(id);
 
     if(i == T::Map::end() || id < i->getId())
-	i = _M_insert_unique_(i, T(id));
+        i = _M_insert_unique_(i, T(id));
 
 
     return *i;
@@ -58,7 +58,7 @@ T &
 BaseManager<T>::allocate() 
 {
     while(T::Map::find(++lastId) != T::Map::end())
-	;
+        ;
     return at(lastId);
 }
 

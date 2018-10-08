@@ -36,20 +36,20 @@ bool CardStarterBehavior::death( Character *killer )
     int suit;
     
     if (!killer || killer->is_npc( ))
-	return false;
+        return false;
     if (killer->getClan( ) == clan_none || killer->getClan( ) == clan_flowers)
-	return false;
+        return false;
 
     card = killer->getPC( )->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
     suit = card->getRandomSuit( );
 
     act( "{cТы уби$gло|л|ла шестерку $n2 из Колоды.{x", 
-	    killer, XMLAttributeCards::suitFaces[suit].mlt, 0, TO_CHAR );
+            killer, XMLAttributeCards::suitFaces[suit].mlt, 0, TO_CHAR );
 
     if (card->getLevel( ) < 0) {
-	card->setSuit( suit );
-	card->setLevel( 0 );
-	act( "{cТеперь ТЫ займешь ее место.{x", killer, 0, 0, TO_CHAR );
+        card->setSuit( suit );
+        card->setLevel( 0 );
+        act( "{cТеперь ТЫ займешь ее место.{x", killer, 0, 0, TO_CHAR );
     }
     
     return false;
@@ -62,7 +62,7 @@ CardSellerBehavior::CardSellerBehavior( )
 void CardSellerBehavior::greet( Character *victim )
 {
     if (!victim->is_npc( ))
-	act("$c1 перетасовывает карты, хитро поглядывая на тебя.", ch, 0, victim, TO_VICT);
+        act("$c1 перетасовывает карты, хитро поглядывая на тебя.", ch, 0, victim, TO_VICT);
 }
 
 void CardSellerBehavior::speech( Character *victim, const char *speech ) 
@@ -72,20 +72,20 @@ void CardSellerBehavior::speech( Character *victim, const char *speech )
     static RegExp hello( "колод|pack" );
     
     if (victim->is_npc( ))
-	return;
-	
+        return;
+        
     if (!hello.match( speech )) 
-	return;
+        return;
     
     if (victim->getPC( )->questpoints < 50) {
-	act("$c1 ухмыляется.", ch, 0, 0, TO_ROOM);
-	act("$c1 произносит '{gУ тебя недостаточно дурной славы (qp), чтобы пользоваться моими картами.{x'", ch, 0, victim, TO_ROOM);
-	return;
+        act("$c1 ухмыляется.", ch, 0, 0, TO_ROOM);
+        act("$c1 произносит '{gУ тебя недостаточно дурной славы (qp), чтобы пользоваться моими картами.{x'", ch, 0, victim, TO_ROOM);
+        return;
     }
     
     if (!( pPackIndex = get_obj_index( OBJ_VNUM_CARDPACK ) )) {
-	act("$c1 произносит '{gИзвини, у меня закончились карты.{x'", ch, 0, 0, TO_ROOM);
-	return;
+        act("$c1 произносит '{gИзвини, у меня закончились карты.{x'", ch, 0, 0, TO_ROOM);
+        return;
     }
     
     CardPackBehavior::Pointer bhv( NEW );

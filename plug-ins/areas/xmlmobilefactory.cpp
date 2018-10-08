@@ -79,10 +79,10 @@ XMLMobileFactory::init(const mob_index_data *mob)
     const char *c = 0;
     
     if(mob->spec_fun.func)
-	c = spec_name(mob->spec_fun.func);
+        c = spec_name(mob->spec_fun.func);
 
     if(!c)
-	c = mob->spec_fun.name.c_str();
+        c = mob->spec_fun.name.c_str();
 
     if(!c)
         c = "";

@@ -12,7 +12,7 @@
 #include "xmlflags.h"
 
 class OLCStateTrap : public OLCStateTemplate<OLCStateTrap>,
-		     public virtual OLCState
+                     public virtual OLCState
 {
 XML_OBJECT
 public:

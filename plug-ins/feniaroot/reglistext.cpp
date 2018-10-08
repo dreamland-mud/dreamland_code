@@ -20,11 +20,11 @@ NMI_INVOKE( RegList, random, "возвращает рандомный элеме
     const_iterator i;
     
     if (size() == 0)
-	return Register();
+        return Register();
 
     n = number_range( 0, size() - 1 );
     for (i = begin( ); i != end( ) && n > 0; i++, n--)
-	;
+        ;
     
     return *i;
 }
@@ -37,7 +37,7 @@ NMI_INVOKE( RegList, front , "возвращает первый элемент �
 NMI_INVOKE( RegList, pop_front, "удаляет первый элемент списка" )
 {
     if (empty( ))
-	throw Scripting::Exception("list is already empty");
+        throw Scripting::Exception("list is already empty");
 
     pop_front( );
     self->changed();
@@ -53,7 +53,7 @@ NMI_INVOKE( RegList, back , "возвращает последний элеме�
 NMI_INVOKE( RegList, pop_back, "удаляет последний элемент списка" )
 {
     if (empty( ))
-	throw Scripting::Exception("list is already empty");
+        throw Scripting::Exception("list is already empty");
 
     pop_back( );
     self->changed();
@@ -74,8 +74,8 @@ NMI_INVOKE( RegList, add , "добавляет в конец списка все
 NMI_INVOKE( RegList, push_front, "добавляет элемент в начало списка" )
 {
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
-	
+        throw Scripting::NotEnoughArgumentsException( );
+        
     push_front( args.front( ) );
     self->changed();
 
@@ -85,8 +85,8 @@ NMI_INVOKE( RegList, push_front, "добавляет элемент в нача�
 NMI_INVOKE( RegList, push_back, "добавляет элемент в конец списка" )
 {
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
-	
+        throw Scripting::NotEnoughArgumentsException( );
+        
     push_back( args.front( ) );
     self->changed();
 
@@ -97,7 +97,7 @@ struct RemIfEq {
     RemIfEq(const Register &r) : reg(r) { }
     
     bool operator () (const Register &r) {
-	return (reg == r).toBoolean( );
+        return (reg == r).toBoolean( );
     }
 
     const Register &reg;
@@ -106,7 +106,7 @@ struct RemIfEq {
 NMI_INVOKE( RegList, sub , "удаляет из списка все вхождения элементов из списка в параметрах")
 {
     for(RegisterList::const_iterator i = args.begin(); i != args.end(); i++)
-	remove_if( RemIfEq(*i) );
+        remove_if( RemIfEq(*i) );
 
     self->changed();
 
@@ -116,13 +116,13 @@ NMI_INVOKE( RegList, sub , "удаляет из списка все вхожде
 NMI_INVOKE( RegList, has, "true если указанный элемент содержится в списке")
 {
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     const Register &arg = args.front( );
 
     for (const_iterator i = begin( ); i != end( ); i++)
-	if ((arg == *i).toBoolean( ))
-	    return true;
+        if ((arg == *i).toBoolean( ))
+            return true;
 
     return false;
 }
@@ -134,7 +134,7 @@ NMI_INVOKE( RegList, size , "размер списка")
 
 struct RegisterWeakOrder {
     bool operator () ( const Register &k1, const Register &k2 ) {
-	return (k1 < k2).toBoolean( );
+        return (k1 < k2).toBoolean( );
     }
 };
 
@@ -148,7 +148,7 @@ NMI_INVOKE( RegList, sort , "сортирует список по возраст
 
 struct RegisterBinPred {
     bool operator () ( const Register &k1, const Register &k2 ) {
-	return (k1 == k2).toBoolean( );
+        return (k1 == k2).toBoolean( );
     }
 };
 

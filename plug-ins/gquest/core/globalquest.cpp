@@ -48,10 +48,10 @@ void GlobalQuest::resume( )
     int time = getTaskTime( );
 
     if (time <= 0) 
-	scheduleDestroy( );
+        scheduleDestroy( );
     else {
-	DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
-	GlobalQuestManager::getThis( )->activate( this );
+        DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
+        GlobalQuestManager::getThis( )->activate( this );
     }
 }
 
@@ -64,20 +64,20 @@ public:
     }
     virtual void run( )
     {
-	gquest->destroy( );
-	gquest->clearAttributes( );
-	GlobalQuestManager::getThis( )->removeRT( *gquest );
+        gquest->destroy( );
+        gquest->clearAttributes( );
+        GlobalQuestManager::getThis( )->removeRT( *gquest );
     }
     virtual int getPriority( ) const
     {
-	int prio = DLScheduler::getThis( )->getPriority( );
+        int prio = DLScheduler::getThis( )->getPriority( );
 
-	if (prio >= SCDP_IOREAD && prio < SCDP_AUTO) 
-	    prio = SCDP_AUTO + 100;
-	else 
-	    prio = max( prio, (int)SCDP_INITIAL ) + 100;
-	
-	return prio;
+        if (prio >= SCDP_IOREAD && prio < SCDP_AUTO) 
+            prio = SCDP_AUTO + 100;
+        else 
+            prio = max( prio, (int)SCDP_INITIAL ) + 100;
+        
+        return prio;
     }
 
 private:
@@ -96,10 +96,10 @@ void GlobalQuest::after( )
     int time = getTaskTime( );
 
     if (time <= 0) 
-	scheduleDestroy( );
+        scheduleDestroy( );
     else {
-	DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
-	GlobalQuestManager::getThis( )->saveRT( this );
+        DLScheduler::getThis( )->putTaskInSecond( time * 60, GlobalQuest::Pointer( this ) );
+        GlobalQuestManager::getThis( )->saveRT( this );
     }
 }
 
@@ -115,13 +115,13 @@ void GlobalQuest::clearAttributes( ) const
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
     
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	XMLAttributes * attributes = &i->second->getAttributes( );
-	XMLAttributes::iterator ipos = attributes->find( getQuestID( ) );
+        XMLAttributes * attributes = &i->second->getAttributes( );
+        XMLAttributes::iterator ipos = attributes->find( getQuestID( ) );
 
-	if (ipos != attributes->end( )) {
-	    attributes->erase( ipos );
-	    PCharacterManager::saveMemory( i->second );
-	}
+        if (ipos != attributes->end( )) {
+            attributes->erase( ipos );
+            PCharacterManager::saveMemory( i->second );
+        }
     }
 }
 
@@ -141,44 +141,44 @@ bool GlobalQuest::isLevelOK( Character *ch ) const
     int level = ch->getModifyLevel( );
     
     if (ch->is_npc( ))
-	return false;
+        return false;
    
     if (!hasLevels( ))
-	return true;
+        return true;
 
     if (level >= getMinLevel( ) && level <= getMaxLevel( ))
-	return true;
+        return true;
     
     /* проверка ситуации, когда игрок набрал уровень за время глобала */
     if (level > maxLevel.getValue( ) && level <= maxLevel.getValue( ) + 2) {
-	XMLAttributeGlobalQuest::Pointer attr;
+        XMLAttributeGlobalQuest::Pointer attr;
 
-	attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeGlobalQuest>(
-						getQuestID( ) );
+        attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeGlobalQuest>(
+                                                getQuestID( ) );
 
-	if (attr && attr->isJoined( ))
-	    return true;
+        if (attr && attr->isJoined( ))
+            return true;
     }
-	
+        
     return false;
 }
 
 Character * GlobalQuest::getActor( Character *ch ) const
 {
     if (!ch)
-	return ch;
+        return ch;
 
     if (ch->is_mirror( ) && ch->doppel)
-	return getActor( ch->doppel );
+        return getActor( ch->doppel );
     
     if (!ch->is_npc( ) && !IS_AFFECTED( ch, AFF_CHARM ))
-	return ch;
+        return ch;
     
     if (ch->leader && ch->leader != ch)
-	return getActor( ch->leader );
+        return getActor( ch->leader );
     
     if (ch->master && ch->master != ch)
-	return getActor( ch->master );
+        return getActor( ch->master );
     
     return ch;
 }
@@ -193,24 +193,24 @@ void GlobalQuest::exorcism( Character *ch ) const
     act_p( "Ты исчезаешь отсюда.", ch, 0, 0, TO_CHAR, POS_RESTING);
     
     if (ch->is_npc( ) && ch == actor) {
-	extract_char(ch);
-	return;
+        extract_char(ch);
+        return;
     } 
 
     if (ch->is_npc( ) && actor->is_npc( )) {
-	extract_char(ch);
-	return;
+        extract_char(ch);
+        return;
     }
     
     recall_vnum = actor->getClan( )->getRecallVnum( );
 
     if (recall_vnum <= 0)
-	recall = get_room_index( actor->getPC( )->getHometown( )->getRecall( ) );
+        recall = get_room_index( actor->getPC( )->getHometown( )->getRecall( ) );
     else 
-	recall = get_room_index( recall_vnum );
+        recall = get_room_index( recall_vnum );
     
     if (!recall)
-	recall = get_room_index( ROOM_VNUM_TEMPLE );
+        recall = get_room_index( ROOM_VNUM_TEMPLE );
 
     transfer_char( ch, ch, recall,
                    NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
@@ -223,49 +223,49 @@ void GlobalQuest::wipeRoom( Room *room ) const
     Room *office;
     
     if (!room)
-	return;
+        return;
 
     for (Character *ch = room->people; ch; ch = ch_next) {
-	ch_next = ch->next_in_room;
-	exorcism( ch );
+        ch_next = ch->next_in_room;
+        exorcism( ch );
     }
     
     for (pit = get_room_index( ROOM_VNUM_ALTAR )->contents;
-	 pit && !IS_PIT(pit);
-	 pit = pit->next_content)
-	 ;
+         pit && !IS_PIT(pit);
+         pit = pit->next_content)
+         ;
 
     office = get_room_index( ROOM_VNUM_LOST_PROPERTY_OFFICE );
     
     for (Object *obj = room->contents; obj; obj = obj_next) {
-	int v = obj->pIndexData->vnum;
-	obj_next = obj->next_content;
-	
-	obj_from_room( obj );
+        int v = obj->pIndexData->vnum;
+        obj_next = obj->next_content;
+        
+        obj_from_room( obj );
 
-	if (   v == OBJ_VNUM_GUTS       || v == OBJ_VNUM_SEVERED_HEAD
-	    || v == OBJ_VNUM_TORN_HEART || v == OBJ_VNUM_SLICED_ARM
-	    || v == OBJ_VNUM_SLICED_LEG || v == OBJ_VNUM_BRAINS
-	    || v == OBJ_VNUM_CORPSE_NPC || v == OBJ_VNUM_POTION_VIAL)
-	{
-	    extract_obj( obj );
-	    continue;
-	}
+        if (   v == OBJ_VNUM_GUTS       || v == OBJ_VNUM_SEVERED_HEAD
+            || v == OBJ_VNUM_TORN_HEART || v == OBJ_VNUM_SLICED_ARM
+            || v == OBJ_VNUM_SLICED_LEG || v == OBJ_VNUM_BRAINS
+            || v == OBJ_VNUM_CORPSE_NPC || v == OBJ_VNUM_POTION_VIAL)
+        {
+            extract_obj( obj );
+            continue;
+        }
 
-	if (v == OBJ_VNUM_CORPSE_PC) {
-	    Room *pitRoom = get_room_index( obj->value[3] );
+        if (v == OBJ_VNUM_CORPSE_PC) {
+            Room *pitRoom = get_room_index( obj->value[3] );
 
-	    if (pitRoom) 
-		obj_to_room( obj, pitRoom );
-	    else
-		obj_to_room( obj, get_room_index( ROOM_VNUM_ALTAR ) );
+            if (pitRoom) 
+                obj_to_room( obj, pitRoom );
+            else
+                obj_to_room( obj, get_room_index( ROOM_VNUM_ALTAR ) );
 
-	    continue;
-	}
-	    
-	if (office)
-	    obj_to_room( obj, office );
-	else 
-	    obj_to_obj( obj, pit );
+            continue;
+        }
+            
+        if (office)
+            obj_to_room( obj, office );
+        else 
+            obj_to_obj( obj, pit );
     }
 }

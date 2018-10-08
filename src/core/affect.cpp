@@ -17,9 +17,9 @@
 
 
 Affect::Affect( )
-	: 	where( 0 ), level( 0 ),
-		duration( 0 ), location( 0 ), modifier( 0 ),
-		bitvector( 0 )
+        :         where( 0 ), level( 0 ),
+                duration( 0 ), location( 0 ), modifier( 0 ),
+                bitvector( 0 )
 {
 }
 

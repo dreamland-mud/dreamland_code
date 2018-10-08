@@ -36,44 +36,44 @@ CMDRUN( selfrate )
     PCharacter *pch = ch->getPC( );
     
     if (!pch) {
-	ch->send_to( "Ты обычное животное.\r\n" );
-	return;
+        ch->send_to( "Ты обычное животное.\r\n" );
+        return;
     }
 
     if (IS_AFFECTED(pch, AFF_CHARM)) {
-	pch->send_to( "Ничего не произошло.\r\n" );
-	return;
+        pch->send_to( "Ничего не произошло.\r\n" );
+        return;
     }
-	
+        
     attr = pch->getAttributes( ).getAttr<XMLAttributeSelfRate>( "selfrate" );
 
     if (arg.empty( )) {
-	pch->printf( "Твой уровень опытности: {W%s{x.\r\n", attr->getRateAlias( ).c_str( ) );
-	return;
+        pch->printf( "Твой уровень опытности: {W%s{x.\r\n", attr->getRateAlias( ).c_str( ) );
+        return;
     }
 
     if (arg == "newbie" ) 
-	rate = 0;
+        rate = 0;
     else if (arg == "expert" || arg == "experienced" )
-	rate = 1;
+        rate = 1;
     else if (arg == "guru" )
-	rate = 2;
+        rate = 2;
     else {
-	pch->printf( "Выбери, кто ты: newbie, expert или guru.\r\n" );
-	return;
+        pch->printf( "Выбери, кто ты: newbie, expert или guru.\r\n" );
+        return;
     }
 
     if (rate == attr->rate) 
-	pch->printf( "Но ты и так %s!\r\n", attr->getRateAlias( ).c_str( ));
+        pch->printf( "Но ты и так %s!\r\n", attr->getRateAlias( ).c_str( ));
     else if (rate < attr->rate) 
-	pch->send_to( "Ты не можешь понизить оценку своего уровня опытности.\r\n" );
+        pch->send_to( "Ты не можешь понизить оценку своего уровня опытности.\r\n" );
     else {
-	char buf[256];
-	
-	attr->rate = rate;
-	pch->printf( "Поздравляем! Теперь ты {W%s{x.\r\n", attr->getRateAlias( ).c_str( ));
-	sprintf( buf, "{CТоржественный голос из $o2: {W$C1 теперь %s!{x", attr->getRateAlias( ).c_str( ) );
-	infonet( buf, pch, 0 );
+        char buf[256];
+        
+        attr->rate = rate;
+        pch->printf( "Поздравляем! Теперь ты {W%s{x.\r\n", attr->getRateAlias( ).c_str( ));
+        sprintf( buf, "{CТоржественный голос из $o2: {W$C1 теперь %s!{x", attr->getRateAlias( ).c_str( ) );
+        infonet( buf, pch, 0 );
     }
 }
 
@@ -94,9 +94,9 @@ DLString XMLAttributeSelfRate::getRateAlias( PCharacter *looker ) const
     ostringstream buf;
 
     if (looker) {
-     	buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
+             buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
     } else {
-	buf << "{lE" << rate_alias[r] << "{lR" << rate_alias_ru[r] << "{lx";
+        buf << "{lE" << rate_alias[r] << "{lR" << rate_alias_ru[r] << "{lx";
     }
 
     return buf.str();
@@ -114,11 +114,11 @@ bool XMLAttributeSelfRate::handle( const WhoisArguments &args )
 extern "C"
 {
     SO::PluginList initialize_selfrate( ) {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSelfRate> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSelfRate> >( ppl );
+        
+        return ppl;
     }
 }
 

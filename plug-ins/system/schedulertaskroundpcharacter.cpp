@@ -37,14 +37,14 @@ void SchedulerTaskRoundPCMemory::run( )
 {
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
     for( PCharacterMemoryList::const_iterator pos = list.begin( );
-					      pos != list.end( );
-					      pos++ )
-	run( pos->second );
+                                              pos != list.end( );
+                                              pos++ )
+        run( pos->second );
 }
 
 void SchedulerTaskRoundPCharacter::run( )
 {
     for( Descriptor* d = descriptor_list; d != 0; d = d->next )
-	if( d->connected == CON_PLAYING && d->character )
-	    run( d->character->getPC( ) );
+        if( d->connected == CON_PLAYING && d->character )
+            run( d->character->getPC( ) );
 }

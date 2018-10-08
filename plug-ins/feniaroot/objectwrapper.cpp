@@ -51,10 +51,10 @@ void ObjectWrapper::setSelf( Scripting::Object *s )
 void ObjectWrapper::extract( bool count )
 {
     if (target) {
-	target->wrapper = 0;
-	target = 0;
+        target->wrapper = 0;
+        target = 0;
     } else {
-	LogStream::sendError() << "Object wrapper: extract without target" << endl;
+        LogStream::sendError() << "Object wrapper: extract without target" << endl;
     }
 
     GutsContainer::extract( count );
@@ -76,10 +76,10 @@ ObjectWrapper::getTarget() const
 void ObjectWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "Non existent object referenced" );
+        throw Scripting::Exception( "Non existent object referenced" );
 
     if (target == NULL) 
-	throw Scripting::Exception( "Object is offline" );
+        throw Scripting::Exception( "Object is offline" );
 }
 
 NMI_GET( ObjectWrapper, online, "" )
@@ -272,9 +272,9 @@ NMI_GET( ObjectWrapper, owner , "")
     const char *o = target->getOwner( );
 
     if (o == NULL)
-	return Register( "" );
+        return Register( "" );
     else
-	return Register( o );
+        return Register( o );
 }
 
 NMI_SET( ObjectWrapper, owner , "")
@@ -309,14 +309,14 @@ NMI_GET( ObjectWrapper, weight, "вес предмета")
 
 #define SETGETVALUE(x) \
     NMI_GET( ObjectWrapper, value##x, "") { \
-	checkTarget( ); \
-	return Register( target->value[x]); \
+        checkTarget( ); \
+        return Register( target->value[x]); \
     } \
     NMI_SET( ObjectWrapper, value##x, "") { \
-	checkTarget( ); \
-	target->value[x] = arg.toNumber(); \
+        checkTarget( ); \
+        target->value[x] = arg.toNumber(); \
     }
-	
+        
 SETGETVALUE(0)
 SETGETVALUE(1)
 SETGETVALUE(2)
@@ -340,9 +340,9 @@ NMI_INVOKE( ObjectWrapper, getCarrier, "")
     Character *ch = target->getCarrier();
 
     if (ch)
-	return WrapperManager::getThis( )->getWrapper(ch); 
+        return WrapperManager::getThis( )->getWrapper(ch); 
     else
-	return Register();
+        return Register();
 }
 NMI_INVOKE( ObjectWrapper, getRoom, "")
 {
@@ -350,19 +350,19 @@ NMI_INVOKE( ObjectWrapper, getRoom, "")
     Room *r = target->getRoom();
 
     if (r) 
-	return WrapperManager::getThis( )->getWrapper(r); 
+        return WrapperManager::getThis( )->getWrapper(r); 
     else
-	return Register();
+        return Register();
 }
 
 static void obj_from_anywhere( ::Object *obj )
 {
     if (obj->in_room)
-	obj_from_room( obj );
+        obj_from_room( obj );
     else if (obj->carried_by)
-	obj_from_char( obj );
+        obj_from_char( obj );
     else if (obj->in_obj)
-	obj_from_obj( obj );
+        obj_from_obj( obj );
 }
 
 NMI_INVOKE( ObjectWrapper, obj_from_char , "deprecated")
@@ -376,7 +376,7 @@ NMI_INVOKE( ObjectWrapper, obj_to_char , "")
     
     checkTarget();
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     chWrap = wrapper_cast<CharacterWrapper>(args.front( ));
     
@@ -396,7 +396,7 @@ NMI_INVOKE( ObjectWrapper, obj_to_room , "")
     
     checkTarget();
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     roomWrap = wrapper_cast<RoomWrapper>(args.front( ));
     
@@ -416,7 +416,7 @@ NMI_INVOKE( ObjectWrapper, obj_to_obj , "")
     
     checkTarget();
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     objWrap = wrapper_cast<ObjectWrapper>(args.front( ));
     
@@ -433,7 +433,7 @@ NMI_INVOKE( ObjectWrapper, extract , "")
     checkTarget();
     
     if (!args.empty())
-	count = args.front().toNumber();
+        count = args.front().toNumber();
     
     ::extract_obj_1( target, count );
     return Register();
@@ -446,13 +446,13 @@ NMI_INVOKE( ObjectWrapper, get_extra_descr , "")
     checkTarget();
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
 
     DLString d = args.front().toString( );
     desc = ::get_extra_descr(d.c_str( ), target->pIndexData->extra_descr);
     if (desc != 0)
-	return desc;
+        return desc;
 
     return ::get_extra_descr(d.c_str( ), target->extra_descr);
 }
@@ -464,30 +464,30 @@ NMI_INVOKE( ObjectWrapper, set_extra_descr , "")
     RegisterList::const_iterator i = args.begin();
 
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     DLString name = i->toString();
 
     i++;
     
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     DLString text;
     
     if(i->type == Register::STRING)
-	text = i->toString();
+        text = i->toString();
 
     EXTRA_DESCR_DATA **ed, *ned;
     
     for(ed = &target->extra_descr; *ed; )
-	if(!str_cmp((*ed)->keyword, name.c_str())) {
-	    EXTRA_DESCR_DATA *n = (*ed)->next;
-	    
-	    free_extra_descr(*ed);
-	    *ed = n;
-	} else
-	    ed = &(*ed)->next;
+        if(!str_cmp((*ed)->keyword, name.c_str())) {
+            EXTRA_DESCR_DATA *n = (*ed)->next;
+            
+            free_extra_descr(*ed);
+            *ed = n;
+        } else
+            ed = &(*ed)->next;
     
     ned = new_extra_descr();
     ned->next = target->extra_descr;
@@ -506,13 +506,13 @@ NMI_INVOKE( ObjectWrapper, equip, "оденется в указанное мес
     checkTarget( );
     
     if(args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     if (!target->carried_by)
-	throw Scripting::Exception("object not in inventory");
+        throw Scripting::Exception("object not in inventory");
     if (target->wear_loc != wear_none)
-	throw Scripting::Exception("object already equipped");
+        throw Scripting::Exception("object already equipped");
     if (!( loc = wearlocationManager->findExisting( args.front( ).toString( ) ) ))
-	throw Scripting::Exception("unknown wearlocation");
+        throw Scripting::Exception("unknown wearlocation");
 
     loc->equip( target );
     return Register( );
@@ -523,7 +523,7 @@ NMI_INVOKE( ObjectWrapper, unequip, "снимает шмотку и кладет
     checkTarget( );
     
     if (target->wear_loc == wear_none || target->carried_by == NULL)
-	throw Scripting::Exception("object already un-equipped");
+        throw Scripting::Exception("object already un-equipped");
     
     target->wear_loc->unequip( target );
     return Register( );
@@ -540,12 +540,12 @@ NMI_GET( ObjectWrapper, affected, "" )
     Affect *paf;
 
     if (!target->enchanted)
-	for (paf = target->pIndexData->affected; paf != 0; paf = paf->next) 
-	    rc->push_back( AffectWrapper::wrap( *paf ) );
+        for (paf = target->pIndexData->affected; paf != 0; paf = paf->next) 
+            rc->push_back( AffectWrapper::wrap( *paf ) );
     
     for (paf = target->affected; paf != 0; paf = paf->next) 
-	rc->push_back( AffectWrapper::wrap( *paf ) );
-	
+        rc->push_back( AffectWrapper::wrap( *paf ) );
+        
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
     sobj->setHandler(rc);
 
@@ -559,7 +559,7 @@ NMI_INVOKE( ObjectWrapper, affectAdd, "" )
     Affect af;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
     aw->toAffect( af );
@@ -576,20 +576,20 @@ NMI_INVOKE( ObjectWrapper, affectStrip, "" )
     Affect *paf, *paf_next;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     skill = skillManager->findExisting( args.front( ).toString( ) );
     
     if (!skill)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
     
     sn = skill->getIndex( );
 
     for (paf = target->affected; paf; paf = paf_next) {
-	paf_next = paf->next;
+        paf_next = paf->next;
 
-	if (paf->type == sn)
-	    affect_remove_obj( target, paf );
+        if (paf->type == sn)
+            affect_remove_obj( target, paf );
     }
     
     return Register( );
@@ -600,7 +600,7 @@ NMI_INVOKE( ObjectWrapper, affectStripAll, "" )
     checkTarget( );
     
     while (target->affected)
-	affect_remove_obj( target, target->affected );
+        affect_remove_obj( target, target->affected );
 
     return Register( );
 }
@@ -614,13 +614,13 @@ NMI_INVOKE( ObjectWrapper, random_obj_list, "случайный объект и�
     checkTarget( );
 
     if (!args.empty( )) 
-	if (( itype = item_table.value( args2string( args ).c_str( ), true ) ) == NO_FLAG)
-	    throw Scripting::IllegalArgumentException( );
+        if (( itype = item_table.value( args2string( args ).c_str( ), true ) ) == NO_FLAG)
+            throw Scripting::IllegalArgumentException( );
 
     for (::Object *obj = target; obj; obj = obj->next_content) 
-	if (itype == -1 || obj->pIndexData->item_type == itype)
-	    if (number_range( 0, cnt++ ) == 0)
-		result = obj;
+        if (itype == -1 || obj->pIndexData->item_type == itype)
+            if (number_range( 0, cnt++ ) == 0)
+                result = obj;
 
     return wrap( result );
 }
@@ -650,8 +650,8 @@ NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "поиск объекта вн
     int vnum = args2number( args );
 
     for (::Object *obj = target->contains; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    return wrap( obj );
+        if (obj->pIndexData->vnum == vnum)
+            return wrap( obj );
 
     return Register( );
 }
@@ -664,8 +664,8 @@ NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "поиск списка об�
     int vnum = args2number( args );
 
     for (::Object *obj = target->contains; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        if (obj->pIndexData->vnum == vnum)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -679,7 +679,7 @@ NMI_GET( ObjectWrapper, items, "список (List) всех предметов 
     RegList::Pointer rc(NEW);
 
     for (::Object *obj = target->contains; obj; obj = obj->next_content)
-	rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
     
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );

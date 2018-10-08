@@ -13,14 +13,14 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT		           *	
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *
- *	 Ibrahim Canpunar  {Mandrake}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *	
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT                           *        
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *
+ *         Ibrahim Canpunar  {Mandrake}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 
 /***************************************************************************
@@ -41,13 +41,13 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1995 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@pacinfo.com)				   *
-*	    Gabrielle Taylor (gtaylor@pacinfo.com)			   *
-*	    Brian Moore (rom@rom.efn.org)				   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*        ROM 2.4 is copyright 1993-1995 Russ Taylor                           *
+*        ROM has been brought to you by the ROM consortium                   *
+*            Russ Taylor (rtaylor@pacinfo.com)                                   *
+*            Gabrielle Taylor (gtaylor@pacinfo.com)                           *
+*            Brian Moore (rom@rom.efn.org)                                   *
+*        By using this code, you have agreed to follow the terms of the           *
+*        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
 #include "mobilespecial.h"
@@ -67,11 +67,11 @@ SPEC_FUN *spec_lookup( const char *name )
     int i;
     
     if (!name || !name[0])
-	return 0;
+        return 0;
 
     for ( i = 0; spec_table[i].name != 0; i++)
-	if (!str_prefix( name,spec_table[i].name))
-	    return spec_table[i].function;
+        if (!str_prefix( name,spec_table[i].name))
+            return spec_table[i].function;
 
     return 0;
 }
@@ -81,8 +81,8 @@ const char *spec_name( SPEC_FUN *function)
     int i;
 
     for (i = 0; spec_table[i].function != 0; i++)
-	if (function == spec_table[i].function)
-	    return spec_table[i].name;
+        if (function == spec_table[i].function)
+            return spec_table[i].name;
 
     return 0;
 }

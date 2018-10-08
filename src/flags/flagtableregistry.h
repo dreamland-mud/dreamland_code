@@ -12,10 +12,10 @@ struct FlagTable;
 
 struct FlagTableRegistry {
     struct Entry {
-	Entry( const char *, const FlagTable * );
-	~Entry( );
-	
-	const FlagTable *table;
+        Entry( const char *, const FlagTable * );
+        ~Entry( );
+        
+        const FlagTable *table;
     };
 
     typedef map<const FlagTable *, DLString> TablesMap;

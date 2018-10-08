@@ -22,10 +22,10 @@
 class ExceptionBadDateString : public Exception
 {
 public: 
-	inline ExceptionBadDateString( const DLString& date, const char* message, int position )
-		: Exception( DLString( message ) << " '" << date << "' at position " << position )
-	{
-	}
+        inline ExceptionBadDateString( const DLString& date, const char* message, int position )
+                : Exception( DLString( message ) << " '" << date << "' at position " << position )
+        {
+        }
 };
 
 

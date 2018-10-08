@@ -11,12 +11,12 @@
 class ClanGuardShalafi: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardShalafi> Pointer;
+        typedef ::Pointer<ClanGuardShalafi> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual int getCast( Character * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual int getCast( Character * );
 };
 
 class ShalafiDemon : public ClanSummonedCreature {

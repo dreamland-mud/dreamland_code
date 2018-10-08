@@ -33,7 +33,7 @@ public:
 */
 
 class NecroCreature : public SummonedCreature, 
-		      public SavedCreature,
+                      public SavedCreature,
                       public BasicMobileDestiny {
 XML_OBJECT
 public:

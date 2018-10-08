@@ -15,9 +15,9 @@ Liquid * LiquidManager::random( bitstring_t flags )
     int count = 0;
     
     for (int i = 0; i < size( ); i++)
-	if (find( i )->getFlags( ).isSet( flags ))
-	    if (number_range( 0, count++ ) == 0) 
-		result = find( i );
+        if (find( i )->getFlags( ).isSet( flags ))
+            if (number_range( 0, count++ ) == 0) 
+                result = find( i );
 
     return result;
 }
