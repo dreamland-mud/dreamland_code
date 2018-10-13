@@ -10,6 +10,12 @@
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
+Есть несколько способов познакомиться с кодом проекта и начать под него разработку:
+* Собрать у себя локально, например, на виртуальной машине с Ubuntu, пользуясь инструкцией ниже.
+* Собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
+* Воспользоваться Goorm Online IDE согласно [инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE), что даст возможность изучать и изменять код, запускать свой сервер и играть на нем, не покидая окно браузера
+
+
 **Содержание**
 * [Запуск локальной версии](#local)
    * [Подготовка окружения](#env)
@@ -26,7 +32,7 @@
 * [Разработка](#dev)
    * [Пересборка 'ядра'](#core)
    * [Пересборка плагинов](#plugin)
-* [FAQ](https://github.com/dreamland-mud/dreamland_code/wiki/Testing-FAQ)
+* [Wiki проекта](https://github.com/dreamland-mud/dreamland_code/wiki)
 
 ## <a name="local">Запуск локальной версии</a>
 
@@ -38,8 +44,6 @@
 * gcc 6.3
 
 Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
-
-Вы можете либо воспользоваться инструкцией и создать локальное окружение с нуля, либо собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
 
 ### <a name="env">Подготовка окружения</a>
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
