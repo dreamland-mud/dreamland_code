@@ -1,7 +1,6 @@
 #!/bin/bash
 
-ROOT=/workspace
-RUNTIME=$ROOT/runtime
+. $(dirname $(readlink -f $0))/paths
 
 cd $RUNTIME && \
 ./bin/dreamland etc/dreamland.xml &
