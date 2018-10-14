@@ -216,6 +216,7 @@ DefaultBufferHandler::read( Descriptor *d )
     return true;
 }
 
+// TODO use convert method.
 void 
 DefaultBufferHandler::write( Descriptor *d, const char *txt ) 
 {
@@ -332,4 +333,73 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
         d->outtop++;
     }
 }
+
+// Temporary here before descriptor read/write overhaul.
+DLString DefaultBufferHandler::convert(const char *txt) 
+{
+    int size;
+    int length = strlen(txt);
+
+    const unsigned char *to = russian_codepages[codepage].to;
+
+    char txt_buf[length];
+    strcpy(txt_buf, txt);
+    char *txt_ptr = txt_buf;
+
+    /*
+     * utf-8 write
+     */
+    if (!to) {
+        DLString result;
+        static const char *tocode = "utf-8";
+        static const char *fromcode = "koi8-r";
+        iconv_t icnv_desc = iconv_open(tocode, fromcode);
+
+        if (icnv_desc == (iconv_t)(-1)) {
+            syserr("Failed to iconv_open %s to %s.", fromcode, tocode);
+            return result;
+        }
+    
+        size_t icnv_insize = length;
+        char icnv_outbuf[length * 6];
+        char *icnv_outptr = icnv_outbuf;
+        size_t icnv_outsize = sizeof(icnv_outbuf);
+
+        if (iconv(icnv_desc, &txt_ptr, &icnv_insize, &icnv_outptr, &icnv_outsize) < 0) {
+            syserr("Failed to convert characters from %s to %s, txt[%s].", fromcode, tocode, txt);
+            return result;
+        }
+
+        icnv_outbuf[icnv_outptr-icnv_outbuf] = 0;
+        result.assign(icnv_outbuf);    
+        iconv_close(icnv_desc);
+        return result;
+    }
+
+    /*
+    * All other encodings.
+    */
+    ostringstream result;
+    while(length--) {
+        unsigned char c = to[(unsigned char)*txt];
+        result << c;
+        if( to == koi8_tran ) {
+            switch( *txt ) {
+            case 'я': case 'Я': result << 'a'; break;
+            case 'ю': case 'Ю': result << 'u'; break;
+            case 'ч': case 'Ч': result << 'h'; break;
+            case 'ж': case 'Ж': result << 'h'; break;
+            case 'ш': case 'Ш': result << 'h'; break;
+            case 'щ': case 'Щ': result << "ch"; break;
+            }
+        }
+        txt++;
+        if(c == IAC) {
+            result << IAC;
+        }
+    }
+
+    return result.str();
+}
+
 

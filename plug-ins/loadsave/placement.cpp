@@ -6,7 +6,7 @@
 #include "save.h"
 
 #include "affect.h"
-#include "gmcp.h"
+#include "outofband.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -79,6 +79,8 @@ void char_from_room( Character *ch )
         {
                 save_mobs( ch->in_room );
         }
+
+//      outOfBandManager->run("mobListUpdate", MobListUpdateArgs(ch->desc));
 
         ch->in_room      = 0;
         ch->next_in_room = 0;
@@ -155,8 +157,8 @@ void char_to_room( Character *ch, Room *pRoomIndex )
                 save_mobs( pRoomIndex );
         }
 
-        GMCPHandler::sendRoom(ch->desc);
-        return;
+        outOfBandManager->run("charToRoom", CharToRoomArgs(ch->desc));
+//      outOfBandManager->run("mobListUpdate", MobListUpdateArgs(ch->desc));
 }
 
 

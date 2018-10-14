@@ -116,7 +116,11 @@ AC_CREATE_FILE(etc/dreamland.xml)
 AC_CREATE_FILE(libexec/plugin.xml)
 AC_PLAYER_COPY(kadm)
 cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
-cat "$srcdir/admin/fenia/fenia.tbz2" | (cd "$prefix/var/db" && tar xvjf -)
+
+if ! test -d "$prefix/var/db" 
+then
+    cat "$srcdir/admin/fenia/fenia.tbz2" | (cd "$prefix/var/db" && tar xvjf -)
+fi
 
 AC_CONFIG_COMMANDS([src/moc/moc], [
     AC_MSG_NOTICE([Configuring meta object compiller...])
@@ -241,6 +245,7 @@ plug-ins/debug/Makefile \
 plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \
+plug-ins/gmcp/Makefile \
 )
 
 echo ""

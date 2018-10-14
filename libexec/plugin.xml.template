@@ -54,4 +54,5 @@
 	<node>follow_command</node>
 	<node>web</node>
 	<node>craft</node>
+	<node>gmcp</node>
 </PluginManager>

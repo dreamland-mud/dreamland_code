@@ -32,7 +32,7 @@
 #include "pagerhandler.h"
 #include "codepage.h"
 #include "comm.h"
-#include "gmcp.h"
+#include "outofband.h"
 
 #include "char.h"
 #include "dreamland.h"
@@ -242,8 +242,7 @@ int Descriptor::inputTelnet( unsigned char i )
                     break;
 #endif
                 case GMCP:
-                    SET_BIT(oob_proto, OOB_GMCP);
-                    GMCPHandler::sendVersion(this); 
+                    outOfBandManager->run("protoInit", ProtoInitArgs(this, "GMCP"));
                     break;
             }
             telnet.state = TNS_NORMAL;

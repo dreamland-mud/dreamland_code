@@ -34,7 +34,6 @@ mobilebehaviormanager.cpp \
 objectbehaviormanager.cpp \
 areabehaviormanager.cpp \
 roombehaviormanager.cpp \
-gmcp.cpp \
 fread_utils.cpp
 
 libloadsave_la_MOC = \
