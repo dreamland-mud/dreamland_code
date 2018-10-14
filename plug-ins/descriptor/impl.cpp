@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "descriptor.h"
+#include "outofband.h"
 #include "so.h"
 
 /*-------------------------------------------------------------------
@@ -40,6 +41,7 @@ extern "C" {
         SO::PluginList ppl;
         
         Plugin::registerPlugin<DescriptorPlugin>( ppl );
+        Plugin::registerPlugin<OutOfBandManager>( ppl );
         
         return ppl;
     }
