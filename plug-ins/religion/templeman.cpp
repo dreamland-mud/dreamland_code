@@ -45,8 +45,8 @@ void Templeman::speech( Character *victim, const char *speech )
 
     if (arg_oneof(speech, "religion", "религия")) {
         do_say(ch, "Ты действительно интересуешься религией?");
-        do_say(ch, "Чтоб узнать больше используй 'help religion'.");
-        do_say(ch, "Не забудь, что религию сможешь выбрать только один раз.");
+        do_say(ch, "Подробности можешь почитать в 'справка религия'.");
+        do_say(ch, "Не забудь, что ты религию сможешь выбрать только один раз.");
         do_say(ch, "Если ты ошибешься, я не смогу это исправить!");
         return;
     }
@@ -62,8 +62,12 @@ void Templeman::speech( Character *victim, const char *speech )
     }
     
     if (pvict->getReligion( ) != god_none) {
-        say_fmt("Ты уже выбра%2$Gло|л|ла свой путь! Твоя религия - %3$s.",
-                ch, pvict, pvict->getReligion( )->getShortDescr( ).c_str( ) );
+        if (chosen->getName() == pvict->getReligion()->getName())
+            say_fmt("Ты и так поклоняешься %2$N3.",
+                    ch, pvict->getReligion( )->getRussianName( ).c_str( ) );
+        else
+            say_fmt("Ты уже выбра%2$Gло|л|ла свой путь! Твоя религия - %3$N1.",
+                    ch, pvict, pvict->getReligion( )->getRussianName( ).c_str( ) );
         return;
     }
     
@@ -73,8 +77,8 @@ void Templeman::speech( Character *victim, const char *speech )
     }
 
     pvict->setReligion( chosen->getName( ) );
-    interpret_raw( ch, "say", "С этой минуты ты навсегда избираешь своей религией %s",
-                   pvict->getReligion( )->getShortDescr( ).c_str( ) );
+    say_fmt("С этой минуты ты навсегда избираешь своей религией %2$N4.",
+            ch, pvict->getReligion( )->getRussianName( ).c_str( ) );
 }
 
 void Templeman::greet( Character *victim )

@@ -22,11 +22,12 @@ bool GlobalRegistryElement::matchesStrict( const DLString &str ) const
 {
     if (str.empty())
         return false;
-
-    if (str == getName())
+    
+    DLString lstr = str.toLower();
+    if (lstr == getName().toLower())
         return true;
 
-    if (str == getRussianName().ruscase('1'))
+    if (lstr == getRussianName().ruscase('1').toLower())
         return true;
 
     return false;
