@@ -1512,6 +1512,20 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         return;
     }
 
+    if (arg == "relig") {
+        for (int i = 0; i < religionManager->size( ); i++) {
+            Religion *r = religionManager->find(i);
+            if (r)
+                buf << dlprintf("{c%-14s {w%-14s{x : %s",
+                    r->getRussianName().ruscase('1').c_str(), 
+                    r->getShortDescr().c_str(), 
+                    r->getDescription().c_str())
+                    << endl;
+        }
+        page_to_char( buf.str( ).c_str( ), ch );
+        return;
+    }
+
 }
 
 

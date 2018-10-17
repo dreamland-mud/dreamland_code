@@ -4,6 +4,7 @@
  */
 #include "so.h"
 #include "class.h"
+#include "xmlvariableregistrator.h"
 #include "mobilebehaviorplugin.h"
 #include "objectbehaviorplugin.h"
 #include "mocregistrator.h"
@@ -25,6 +26,7 @@ extern "C"
 
         Plugin::registerPlugin<MobileBehaviorRegistrator<Templeman> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ReligionTattoo> >( ppl );
+        Plugin::registerPlugin<XMLVariableRegistrator<ReligionHelp> >( ppl );
         
         Plugin::registerPlugin<MocRegistrator<DefaultReligion> >( ppl );
         Plugin::registerPlugin<MocRegistrator<AtumRaGod> >( ppl );
