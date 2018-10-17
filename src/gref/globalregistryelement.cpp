@@ -20,17 +20,28 @@ const DLString &GlobalRegistryElement::getRussianName( ) const
 
 bool GlobalRegistryElement::matchesStrict( const DLString &str ) const 
 {
-    return !str.empty( ) && str == getName( );
+    if (str.empty())
+        return false;
+
+    if (str == getName())
+        return true;
+
+    if (str == getRussianName().ruscase('1'))
+        return true;
+
+    return false;
 }
 
 bool GlobalRegistryElement::matchesUnstrict( const DLString &str ) const 
 {
-    if (str.empty( ) || getName( ).empty( ))
+    if (str.empty() || getName().empty())
         return false;
+    
+    if (str.strPrefix(getName()))
+        return true;
 
-    if (!str.strPrefix( getName( ) ))
-        return false;
-// TODO unstrict match by russian name, all cases
-// Use getRussianName method in child classes instead of custom getRusName
-    return true;
+    if (str.strPrefix(getRussianName().ruscase('1')))
+        return true;
+    
+    return false;
 }
