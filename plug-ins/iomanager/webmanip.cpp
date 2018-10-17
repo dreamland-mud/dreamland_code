@@ -5,7 +5,7 @@
 #include <string.h>
 #include "webmanip.h"
 #include "character.h"
-
+#include "descriptor.h"
 
 WebManipCommand::~WebManipCommand( )
 {
@@ -100,6 +100,9 @@ void WebManipManager::decorateCharacter( ostringstream &buf, const DLString &des
 bool WebManipManager::run( ostringstream &buf, const DLString &command, const ManipCommandArgs &args ) const
 {
         bool success = false;
+        
+        if (!args.target || !args.target->desc || args.target->desc->connected != CON_PLAYING)
+            return success;
 
         WebManipMap::const_iterator i = manips.find( command );
         if (i != manips.end( )) {
