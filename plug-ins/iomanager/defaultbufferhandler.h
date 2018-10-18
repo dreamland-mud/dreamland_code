@@ -19,6 +19,7 @@ public:
 
     virtual void write(Descriptor *d, const char *txt); 
     virtual bool read( Descriptor *d );
+    virtual DLString convert(const char *txt);
 
     XML_VARIABLE XMLInteger codepage;
 

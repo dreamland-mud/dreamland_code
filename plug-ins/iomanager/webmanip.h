@@ -34,7 +34,7 @@ public:
 class WebManipManager : public OneAllocate, public virtual Plugin {
 public:
         typedef ::Pointer<WebManipManager> Pointer;
-    typedef std::map<DLString, WebManipCommand::Pointer> WebManipMap;
+        typedef std::map<DLString, WebManipCommand::Pointer> WebManipMap;
 
         WebManipManager( );
         virtual ~WebManipManager( );

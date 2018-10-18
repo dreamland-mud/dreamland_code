@@ -51,8 +51,9 @@ misc_behaviors \
 race_aptitude \
 cards \
 religion \
-web \
 riding \
+web \
+gmcp \
 craft \
 feniaroot 
 

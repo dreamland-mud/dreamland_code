@@ -10,6 +10,12 @@
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
+Есть несколько способов познакомиться с кодом проекта и начать под него разработку:
+* Собрать у себя локально, например, на виртуальной машине с Ubuntu, пользуясь инструкцией ниже.
+* Собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
+* Воспользоваться Goorm Online IDE согласно [инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE), что даст возможность изучать и изменять код, запускать свой сервер и играть на нем, не покидая окна браузера.
+
+
 **Содержание**
 * [Запуск локальной версии](#local)
    * [Подготовка окружения](#env)
@@ -26,7 +32,7 @@
 * [Разработка](#dev)
    * [Пересборка 'ядра'](#core)
    * [Пересборка плагинов](#plugin)
-* [FAQ](https://github.com/dreamland-mud/dreamland_code/wiki/Testing-FAQ)
+* [Wiki проекта](https://github.com/dreamland-mud/dreamland_code/wiki)
 
 ## <a name="local">Запуск локальной версии</a>
 
@@ -39,13 +45,11 @@
 
 Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
 
-Вы можете либо воспользоваться инструкцией и создать локальное окружение с нуля, либо собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
-
 ### <a name="env">Подготовка окружения</a>
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
 ```
 
@@ -106,12 +110,13 @@ cd  /home/dreamland/runtime
 
 ### <a name="telnet">Вход в мир</a>
 
-Мир доступен локально на порту 9001, например:
-```bash
-telnet localhost 9001
-```
-Там есть только один персонаж, наделенный всеми полномочиями: Kadm, пароль KadmKadm. 
-При входе через порт 9001 укажите кодировку, логин и пароль, например: 0 Kadm KadmKadm
+Изначально в мире есть только один персонаж, наделенный всеми полномочиями: Kadm, пароль KadmKadm. Остальных персонажей можно создать по мере необходимости. Мир доступен локально на нескольких портах:
+
+* 9001 - "задняя дверь" для быстрого доступа, минуя архивариуса. При входе через этот порт укажите в одной строке кодировку, логин и пароль, например: 0 Kadm KadmKadm.
+* 9000 - обычный вход, тут же можно создать нового персонажа.
+* 1234 - порт web-socket. Можете скачать клиент [mudjs](https://github.com/dreamland-mud/mudjs), установить его согласно инструкции и играть из браузера.
+
+Например: ```telnet localhost 9000``` или ```#connect localhost 9000``` в муд-клиенте. Вместо localhost может понадобиться указать IP-адрес виртуальной машины, на которой установлен и запущен муд-сервер.
 
 ---
 ## <a name="git">Работа с репозиторием</a>

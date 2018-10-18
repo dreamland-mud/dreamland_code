@@ -188,5 +188,7 @@ exit_data *direction_reverse(Room *room, int door)
 
 Room * direction_target(Room *room, int door)
 {
+    if (!room->exit[door])
+        return NULL;
     return room->exit[door]->u1.to_room;
 }

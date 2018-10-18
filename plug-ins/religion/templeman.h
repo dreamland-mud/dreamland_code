@@ -16,6 +16,7 @@ public:
     Templeman( );
 
     virtual void speech( Character *, const char * );
+    virtual void tell( Character *, const char * );
     virtual void greet( Character * );
 };
 
