@@ -17,6 +17,7 @@
 
 #include "merc.h"
 #include "handler.h"
+#include "arg_utils.h"
 #include "magic.h"
 #include "act.h"
 #include "mercdb.h"
@@ -83,13 +84,13 @@ void Healer::msgListBefore( Character *client )
 
 void Healer::msgListAfter( Character *client )
 {
-    tell_dim( client, getKeeper( ), "Используй 'heal <тип заклинания>', и я вылечу тебя за указанную цену." );
+    tell_dim( client, getKeeper( ), "Используй '{lEheal{lRлечить{lx <тип заклинания>', и я вылечу тебя за указанную цену." );
 }
 
 void Healer::msgArticleNotFound( Character *client ) 
 {
     say_act( client, getKeeper( ), "Я не знаю такого заклинания, $c1." );
-    tell_act( client, getKeeper( ), "Используй 'heal', чтобы увидеть список известных мне заклинаний." );
+    tell_act( client, getKeeper( ), "Используй '{lEheal{lRлечить{lx', чтобы увидеть список известных мне заклинаний." );
 }
 
 void Healer::msgArticleTooFew( Character *client, Article::Pointer )
@@ -108,12 +109,10 @@ void Healer::msgBuyRequest( Character *client )
  *-----------------------------------------------------------------------*/
 void HealService::toStream( Character *client, ostringstream &buf ) const
 {
-    buf << "  {c" << setiosflags( ios::left ) << setw( 11 ) << name << "{x: "
-        << setw( 30 ) << descr << "   " << setiosflags( ios::right ) << setw( 8 );
-        
-    price->toStream( client, buf );
-
-    buf << resetiosflags( ios::right ) << endl;
+    DLString myname = client->getConfig()->rucommands ? rname : name;
+    DLString myprice = price->toString(client);
+    buf << dlprintf("  {c%-11s{x: %-30s  %17s\r\n",
+           myname.c_str(), descr.c_str(), myprice.c_str());
 }
 
 bool HealService::visible( Character * ) const
@@ -128,7 +127,10 @@ bool HealService::available( Character *, NPCharacter * ) const
 
 bool HealService::matches( const DLString &argument ) const
 {
-    return !argument.empty( ) && argument.strPrefix( name.getValue( ) );
+    if (argument.empty())
+        return false;
+    
+    return arg_oneof(argument, name.c_str(), rname.c_str());
 }
 
 int HealService::getQuantity( ) const

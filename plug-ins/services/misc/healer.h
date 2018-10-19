@@ -53,6 +53,7 @@ public:
 
 protected:
     XML_VARIABLE XMLString name;
+    XML_VARIABLE XMLString rname;
     XML_VARIABLE XMLString descr;
     XML_VARIABLE XMLPointer<Price> price;
 
