@@ -22,11 +22,12 @@ SkillManager::~SkillManager( )
     skillManager = 0;
 }
 
-int SkillManager::unstrictLookup( const DLString &name, Character *ch ) const
+int SkillManager::unstrictLookup( const DLString &constName, Character *ch ) const
 {
     unsigned int i;
     Indexes::const_iterator iter;
     const Skill *skill;
+    DLString name = constName.quote().getOneArgument();
 
     if (name.empty( ))
         return -1;
