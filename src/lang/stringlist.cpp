@@ -11,10 +11,10 @@ StringList::StringList(const DLString &constStr)
 
 bool StringList::superListOf(const StringList& smallerList) const
 {
-    if (smallerList.size() != this->size())
+    if (smallerList.size() > this->size())
         return false;
     
-    for (int i = 0; i < size(); i++)
+    for (int i = 0; i < smallerList.size(); i++)
        if (!smallerList[i].strPrefix(at(i)))
             return false;
 
