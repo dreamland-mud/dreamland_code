@@ -5,6 +5,7 @@
 
 #include "skillmanager.h"
 #include "skill.h"
+#include "dl_strings.h"
 
 #include "pcharacter.h"
 
@@ -47,6 +48,18 @@ int SkillManager::unstrictLookup( const DLString &name, Character *ch ) const
         
         if (name.strPrefix( skill->getName( ) )
             || name.strPrefix( skill->getRussianName( ) ))
+        {
+            if (!ch || skill->available( ch ))
+                return i;
+        }
+    }
+
+    // unstrict lookup by partial name, e.g. 'cur po' for 'cure poison'
+    for (i = 0; i < table.size( ); i++) {
+        skill = (Skill *)*table[i];
+
+        if (is_name(name.c_str(), skill->getName().c_str())
+            || is_name(name.c_str(), skill->getRussianName().c_str()))
         {
             if (!ch || skill->available( ch ))
                 return i;
