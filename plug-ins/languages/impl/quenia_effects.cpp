@@ -43,7 +43,7 @@ bool GoodSpellWE::run( PCharacter *ch, Character *victim ) const
 
     int i;
 
-    act( "{CСила древнего благословления проникает в мир.{x", ch, 0, 0, TO_ALL );
+    act( "{CСила древнего благословения проникает в мир.{x", ch, 0, 0, TO_ALL );
 
     for (i = 0; i < spells_size; i++)
         spell( spells[i], 

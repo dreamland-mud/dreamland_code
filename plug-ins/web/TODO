@@ -8,13 +8,6 @@
 Манипуляции с предметами:
 <m c='drop $,wear $,look $,use $,lore $,fill 29802834 $,take $ 23423:books' i='23849234'>странный меч</m>
 
-Англ варианты?
-    config ruskill=no rucomm=no
-    входит в группу <m c='glist' a='benediction'><c fg=2'>benediction</c></m>
-
-    config ruskill=yes rucomm=no
-    входит в группу <m c='glist' a='благословления'><c fg=2'>благославления</c></m>
-    ...
 
 =================================================
 (звездочкой помечено сделанное)

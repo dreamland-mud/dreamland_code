@@ -574,7 +574,7 @@ CMDRUNP( oscore )
                         100 - ch->getPC( )->curse.getValue( ));
 
         if (ch->getPC( )->bless)
-            buf << dlprintf( "Благословление богов улучшает все твои умения на %d%%.\n\r",
+            buf << dlprintf( "Благословение богов улучшает все твои умения на %d%%.\n\r",
                         ch->getPC( )->bless.getValue( ));
     }
 #if 0

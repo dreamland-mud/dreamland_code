@@ -3989,7 +3989,7 @@ CMDWIZP( bless )
         if ( victim->getPC( )->bless + modif < 0
                 || victim->getPC( )->bless + modif > 50 )
         {
-                ch->send_to("Благословление должно лежать в пределах 0..50\n\r");
+                ch->send_to("Благословение должно лежать в пределах 0..50\n\r");
                 return;
         }
 
@@ -4002,7 +4002,7 @@ CMDWIZP( bless )
         victim->getPC( )->bless += modif;
         interpret_raw( ch, "noaffect", victim->getNameP( ) );
         if ( modif > 0 )
-                sprintf( buf, "Ты чувствуешь {CБожественное Благословление{x!\n\rПричина: %s\n\r",
+                sprintf( buf, "Ты чувствуешь {CБожественное Благословение{x!\n\rПричина: %s\n\r",
                         argument );
         else
                 sprintf( buf, "Ты теряешь расположение Богов.\n\rПричина: %s", argument );

@@ -84,7 +84,7 @@ VOID_SPELL(Benediction)::run( Character *ch, Character *victim, int sn, int leve
         act_p("$c1 дарит тебе благословение своих Богов.", ch,0,victim,TO_VICT,POS_RESTING);
     }
     else
-        victim->println("Ты чувствуешь божественное благословление.");
+        victim->println("Ты чувствуешь божественное благословение.");
 
 }
 
