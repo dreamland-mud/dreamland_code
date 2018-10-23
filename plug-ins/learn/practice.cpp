@@ -9,6 +9,9 @@
 #include "practice.h"
 
 #include "class.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
 #include "skill.h"
 #include "skillmanager.h"
@@ -215,6 +218,13 @@ void CPractice::pracHere( PCharacter *ch )
         ch->pecho("Тебе нечему научиться у %C2.", teacher );
 }
 
+static bool mprog_cant_teach( PCharacter *client, NPCharacter *teacher, const char *skillName )
+{
+    FENIA_CALL( teacher, "CantTeach", "Cs", client, skillName );
+    FENIA_NDX_CALL( teacher, "CantTeach", "CCs", teacher, client, skillName );
+    return false;
+}
+
 void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 {
     int sn, adept;
@@ -244,6 +254,9 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     if (!( teacher = findTeacher( ch, skill ) ))
         if (!( teacher = findPracticer( ch, skill ) ))
             return;
+    
+    if (teacher->is_npc() && mprog_cant_teach(ch, teacher->getNPC(), skill->getName().c_str()))
+        return;
 
     if (ch->practice <= 0) {
         ch->send_to( "У тебя нет сессий практики (practice).\n\r");
