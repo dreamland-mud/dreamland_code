@@ -66,7 +66,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<SpellHealService> Pointer;
 
-
+    virtual bool available( Character *, NPCharacter * ) const;
 private:
     virtual void heal( Character *, NPCharacter * );
 
@@ -78,11 +78,21 @@ XML_OBJECT
 public:
     typedef ::Pointer<ManaHealService> Pointer;
 
+    virtual bool available( Character *, NPCharacter * ) const;
 private:
     virtual void heal( Character *, NPCharacter * );
 
-    XML_VARIABLE XMLBoolean enhanced;
     XML_VARIABLE XMLString words;
+};
+
+class CustomHealPrice: public MoneyPrice, public XMLVariableContainer {
+XML_OBJECT    
+public:
+    typedef ::Pointer<CustomHealPrice> Pointer;
+    CustomHealPrice( );
+
+protected:
+    virtual int toSilver( Character * ) const;
 };
 
 #endif

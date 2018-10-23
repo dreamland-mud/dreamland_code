@@ -75,7 +75,6 @@ protected:
     XML_VARIABLE XMLInteger power;
 };
 
-
 class QuestPointPrice : public Price, public XMLVariableContainer {
 XML_OBJECT
 public:
