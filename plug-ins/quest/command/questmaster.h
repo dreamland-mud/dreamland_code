@@ -18,6 +18,8 @@ public:
         
         virtual int getOccupation( );
         virtual bool canGiveQuest( Character * );
+        virtual void speech( Character *victim, const char *speech );
+        virtual void tell( Character *victim, const char *speech );
 
 protected:
         virtual bool specIdle( );
