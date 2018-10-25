@@ -3,58 +3,39 @@
  * ruffina, 2004
  */
 #include "areahelp.h"
+#include "plugininitializer.h"
+#include "mocregistrator.h"
+#include "merc.h"
+#include "mercdb.h"
+#include "dl_strings.h"
 
-AreaHelpArticle::AreaHelpArticle( const HelpArticle &art )
+/*-------------------------------------------------------------------
+ * AreaHelp 
+ *------------------------------------------------------------------*/
+const DLString AreaHelp::TYPE = "AreaHelp";
+
+void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    level = art.getLevel( );
-    fullKeyword = art.getKeyword( );
-    assign( art.c_str( ) );
-    areafile = art.areafile;
-}
-
-AreaHelpArticle::AreaHelpArticle( )
-{
-}
-
-AreaHelpArticle::~AreaHelpArticle( )
-{
-}
-
-const DLString XMLAreaHelpArticle::TYPE = "XMLAreaHelpArticle";
-
-XMLAreaHelpArticle::XMLAreaHelpArticle( )
-{
-}
-
-XMLAreaHelpArticle::XMLAreaHelpArticle( const HelpArticle &art )
-                      : AreaHelpArticle( art )
-{
-}
-
-XMLAreaHelpArticle::~XMLAreaHelpArticle( )
-{
-}
-
-
-bool XMLAreaHelpArticle::toXML( XMLNode::Pointer &parent ) const
-{
-    XMLStringNoEmpty xmlString( *this );
-
-    if (!xmlString.toXML( parent ))
-        return false;
+    AREA_DATA *area = areafile->area;
     
-    if (!getKeyword( ).empty( ))
-        parent->insertAttribute( ATTRIBUTE_KEYWORD, getKeyword( ) );
+    if (!selfHelp) {
+        in << *this;
+        return;
+    }
 
-    if (level >= -1)
-        parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
+    in << "Зона {Y" << area->name << "{x, " 
+       << "уровни {Y" << area->low_range << "-" << area->high_range << "{x, "
+       << "автор {y" << area->authors << "{x";
+    if (str_cmp(area->translator, ""))
+        in << ", перевод {y" << area->translator << "{x";
+    in << endl
+       << endl;
+
+    if (!empty())
+       in << *this << endl;
     
-    if (!ref.empty( ))
-        parent->insertAttribute( ATTRIBUTE_REF, ref.toString( ) );
-
-    if (!refby.empty( ))
-        parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
-
-    return true;
+    if (str_cmp(area->speedwalk, ""))
+        in << "{yКак добраться{x: " << area->speedwalk << endl;
 }
 
+PluginInitializer<MocRegistrator<AreaHelp> > initAreaHelp;

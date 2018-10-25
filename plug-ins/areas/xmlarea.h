@@ -50,13 +50,13 @@ public:
     void init(area_file *);
     void save(area_file *af);
     void load(const DLString &fname);
-    void load_helps(area_file *);
+    void load_helps(area_file *, const DLString &areaName);
     void load_objects(area_data *);
     void load_mobiles(area_data *);
     void load_rooms(area_data *);
 
     XML_VARIABLE XMLAreaHeader areadata;
-    XML_VARIABLE XMLAreaHelpArticles helps;
+    XML_VARIABLE XMLListBase<XMLPointer<AreaHelp> > helps;
     XML_VARIABLE XMLMapBase<XMLMobileFactory> mobiles;
     XML_VARIABLE XMLMapBase<XMLObjectFactory> objects;
     XML_VARIABLE XMLMapBase<XMLRoom> rooms;

@@ -15,4 +15,7 @@ public:
         static void save( const area_data *, FILE * );
 };
 
+bool area_is_mansion(area_data *);
+bool area_is_clan(area_data *);
+bool area_is_hometown(area_data *);
 #endif

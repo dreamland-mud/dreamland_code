@@ -139,7 +139,8 @@ XMLArea::init(area_file *af)
 
     for (a = articles.begin( ); a != articles.end( ); a++) 
         if ((*a)->areafile == af) {
-            helps.push_back(XMLAreaHelpArticle( ***a ));
+            HelpArticle::Pointer h = *a;
+            helps.push_back( h.getDynamicPointer<AreaHelp>());
         }
 
     AREA_DATA *area = af->area;
@@ -172,18 +173,25 @@ XMLArea::init(area_file *af)
 }
 
 void
-XMLArea::load_helps(area_file *af)
+XMLArea::load_helps(area_file *af, const DLString &areaName)
 {
-    XMLAreaHelpArticles::iterator hit;
+    XMLListBase<XMLPointer<AreaHelp> >::iterator hit;
+    bool selfHelpExists = false;
 
     for (hit = helps.begin( ); hit != helps.end( ); hit++) {
-        HelpArticle::Pointer help( NEW );
-        
-        help->addKeyword( hit->getKeyword( ) );
-        help->setLevel( hit->getLevel( ) );
-        help->setText( *hit );
+        (*hit)->areafile = af;
+        (*hit)->selfHelp = is_name(areaName.c_str(), (*hit)->getKeyword().c_str());
+        helpManager->registrate( *hit );
+        if ((*hit)->selfHelp)
+            selfHelpExists = true;
+    }
+
+    if (!selfHelpExists) {
+        AreaHelp::Pointer help(NEW);
         help->areafile = af;
-        helpManager->registrate( help );
+        help->selfHelp = true;
+        help->addKeyword(areaName.colourStrip().quote());
+        helpManager->registrate(AreaHelp::Pointer(help));
     }
 }
 
@@ -293,7 +301,7 @@ XMLArea::load(const DLString &fname)
     
     area_file *af = new_area_file(fname.c_str( ));
     
-    load_helps(af);
+    load_helps(af, areadata.name);
 
     AREA_DATA *a = areadata.compat( );
     if(a) {

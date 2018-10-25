@@ -64,7 +64,7 @@
 #include "skillmanager.h"
 #include "spell.h"
 #include "affecthandler.h"
-
+#include "areabehaviormanager.h"
 #include "mobilebehavior.h"
 #include "xmlattributeticker.h"
 #include "commonattributes.h"
@@ -1869,7 +1869,8 @@ else {
 
 CMDRUNP( areas )
 {
-    ostringstream buf;
+    ostringstream buf, areaBuf, clanBuf, mansionBuf;
+    int acnt = 0, ccnt = 0, mcnt = 0;
     AREA_DATA *pArea;
     int minLevel, maxLevel, level;
     DLString arguments( argument ), args, arg1, arg2;
@@ -1904,16 +1905,16 @@ CMDRUNP( areas )
     }
     
     if (level != -1) 
-        buf << "Арии мира Dream Land для уровня " << level << ":" << endl;
+        buf << "{YАрии мира Dream Land для уровня " << level << ":{x" << endl;
     else if (!args.empty( ))
-        buf << "Найдены арии: " << endl;
+        buf << "{YНайдены арии: {x" << endl;
     else if (minLevel != -1 && maxLevel != -1)
-        buf << "Арии мира Dream Land, для уровней " 
-            << minLevel << " - " << maxLevel << ":" << endl;
+        buf << "{YАрии мира Dream Land, для уровней " 
+            << minLevel << " - " << maxLevel << ":{x" << endl;
     else
-        buf << "Все арии мира Dream Land: " << endl;
+        buf << "{YВсе арии мира Dream Land: {x" << endl;
     
-    buf << "Уровни    Название                                 Авторы  {W({xПереводчики{W){x" << endl
+    buf << "{wУровни    Название                       Уровни    Название{x" << endl
         << "------------------------------------------------------------------------" << endl;
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
@@ -1939,18 +1940,37 @@ CMDRUNP( areas )
                 continue;
         }
         
-        buf << fmt( ch, "(%3d %3d) %-40s %s",
+        bool isMansion = area_is_mansion(pArea);
+        bool isClan = area_is_clan(pArea);    
+        ostringstream &str =  isMansion ? mansionBuf : isClan ? clanBuf : areaBuf;
+        int &cnt = isMansion ? mcnt : isClan ? ccnt : acnt;
+
+        str << fmt( ch, "[{w%3d{x {w%3d{x] %-30.30s ",
                         pArea->low_range, pArea->high_range, 
-                        pArea->name, 
-                        pArea->authors );
+                        pArea->name);
 
-        if (str_cmp( pArea->translator, "" ))
-            buf << " {W({x" << pArea->translator << "{W){x";
-
-        buf << endl;
+        if (++cnt % 2 == 0)
+            str << endl;
     }
-    
-    buf << endl;
+  
+    if (!areaBuf.str().empty()) { 
+        buf << areaBuf.str();
+        if (acnt % 2)
+            buf << endl;
+    }
+
+    if (!clanBuf.str().empty()) {
+        buf << "{yКлановые территории:{x" << endl << clanBuf.str();
+        if (ccnt % 2)
+            buf << endl;
+    }
+
+    if (!mansionBuf.str().empty()) {
+        buf << "{yПригороды под застройку:{x" << endl << mansionBuf.str();
+        if (mcnt % 2)
+            buf << endl;
+    }
+
     page_to_char( buf.str( ).c_str( ), ch );        
 }
 
