@@ -2189,6 +2189,64 @@ static bool __aff_sort_name__( const AffectOutput &a, const AffectOutput &b )
     return a.name < b.name;
 }
 
+struct PermanentAffects {
+    PermanentAffects(Character *ch) {
+        this->ch = ch;
+        my_res = ch->res_flags;
+        my_vuln = ch->vuln_flags;
+        my_imm = ch->imm_flags;
+        my_aff = ch->affected_by;
+        my_det = ch->detection;
+    }
+
+    void stripBitsFromAffects(Affect *paf) {
+        switch(paf->where) {
+        case TO_AFFECTS: 
+            REMOVE_BIT(my_aff, paf->bitvector);
+            break;
+        case TO_IMMUNE:        
+            REMOVE_BIT(my_imm, paf->bitvector);
+            break;
+        case TO_RESIST:        
+            REMOVE_BIT(my_res, paf->bitvector);
+            break;
+        case TO_VULN:        
+            REMOVE_BIT(my_vuln, paf->bitvector);
+            break;
+        case TO_DETECTS: 
+            REMOVE_BIT(my_det, paf->bitvector);
+            break;
+        }
+    }
+    
+    void printAll() const {
+        print("У тебя иммунитет против", my_imm, imm_flags, '2');
+        print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
+        print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
+        print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
+        print("Ты под воздействием", my_aff, affect_flags, '2');
+    }
+
+    bool isSet() const {
+        return my_res || my_vuln || my_imm || my_aff || my_det;
+    }
+
+private:
+    void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
+        if (my_flags != 0) {
+            DLString message = DLString(messagePrefix) + " " + my_table.messages(my_flags, true, gcase) + ".";
+            ch->pecho(message.c_str(), ch);
+        }
+    }
+
+    Character *ch;
+    int my_res;
+    int my_vuln;
+    int my_imm;
+    int my_aff;
+    int my_det;
+};
+
 CMDRUNP( affects )
 {
     ostringstream buf;
@@ -2198,17 +2256,24 @@ CMDRUNP( affects )
 
     if (ch->getConfig( )->ruskills)
         SET_BIT(flags, FSHOW_RUSSIAN);
-    
+   
+    // Keep track of res/vuln that are permanent (either from race affects or from items). 
+    PermanentAffects permAff(ch);
+ 
     for (Affect* paf = ch->affected; paf != 0; paf = paf->next ) {
         if (output.empty( ) || output.back( ).type != paf->type) 
             output.push_back( AffectOutput( paf, flags ) );
         
         output.back( ).format_affect( paf );
+
+        // Remove bits that are added via an affect, so that in the end
+        // only permanent bits remain.
+        permAff.stripBitsFromAffects(paf);
     }
     
     if (HAS_SHADOW(ch))
         output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, flags ) );
-    
+
     if (arg_has_oneof( argument, "time", "время" ))
         output.sort( __aff_sort_time__ );
     
@@ -2233,11 +2298,16 @@ CMDRUNP( affects )
     for (o = output.begin( ); o != output.end( ); o++) 
         o->show_affect( buf, flags );
 
+    // Output permanent bits on top.
+    permAff.printAll();
+
     if (buf.str( ).empty( )) {
-        if (IS_SET(flags, FSHOW_EMPTY))
+        if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
             ch->println( "Ты не находишься под действием каких-либо аффектов." );
     } 
     else {
+        if (permAff.isSet())
+            ch->send_to("\r\n");
         ch->println( "Ты находишься под действием следующих аффектов:" );
         buf << "{x";
 
