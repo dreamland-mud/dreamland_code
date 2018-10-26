@@ -46,6 +46,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<ErosGod> >( ppl );
         Plugin::registerPlugin<MocRegistrator<EnkiGod> >( ppl );
         Plugin::registerPlugin<MocRegistrator<GoktengriGod> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<BastGod> >( ppl );
         
         Plugin::registerPlugin<ReligionLoader>( ppl );
 
