@@ -429,8 +429,8 @@ void BastGod::tattooFight( Object *obj, Character *ch ) const
       if (ch->isAffected(gsn_protection_heat))
         ch->println( "{cТатуировка слегка светится.{x");
       else {
-        spell(gsn_protection_heat, ch->getModifyLevel(), ch, ch );
         ch->println("{BТатуировка на твоем плече на мгновение складывается в символ щита.{x");
+        spell(gsn_protection_heat, ch->getModifyLevel(), ch, ch );
       }
       break;
     case 1:
