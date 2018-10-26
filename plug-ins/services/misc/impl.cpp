@@ -25,6 +25,7 @@ extern "C"
 
         Plugin::registerPlugin<MocRegistrator<SpellHealService> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ManaHealService> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<CustomHealPrice> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<Healer> >( ppl );
         
         return ppl;

@@ -64,7 +64,7 @@
 #include "skillmanager.h"
 #include "spell.h"
 #include "affecthandler.h"
-
+#include "areabehaviormanager.h"
 #include "mobilebehavior.h"
 #include "xmlattributeticker.h"
 #include "commonattributes.h"
@@ -574,7 +574,7 @@ CMDRUNP( oscore )
                         100 - ch->getPC( )->curse.getValue( ));
 
         if (ch->getPC( )->bless)
-            buf << dlprintf( "Благословление богов улучшает все твои умения на %d%%.\n\r",
+            buf << dlprintf( "Благословение богов улучшает все твои умения на %d%%.\n\r",
                         ch->getPC( )->bless.getValue( ));
     }
 #if 0
@@ -1869,7 +1869,8 @@ else {
 
 CMDRUNP( areas )
 {
-    ostringstream buf;
+    ostringstream buf, areaBuf, clanBuf, mansionBuf;
+    int acnt = 0, ccnt = 0, mcnt = 0;
     AREA_DATA *pArea;
     int minLevel, maxLevel, level;
     DLString arguments( argument ), args, arg1, arg2;
@@ -1904,16 +1905,16 @@ CMDRUNP( areas )
     }
     
     if (level != -1) 
-        buf << "Арии мира Dream Land для уровня " << level << ":" << endl;
+        buf << "{YАрии мира Dream Land для уровня " << level << ":{x" << endl;
     else if (!args.empty( ))
-        buf << "Найдены арии: " << endl;
+        buf << "{YНайдены арии: {x" << endl;
     else if (minLevel != -1 && maxLevel != -1)
-        buf << "Арии мира Dream Land, для уровней " 
-            << minLevel << " - " << maxLevel << ":" << endl;
+        buf << "{YАрии мира Dream Land, для уровней " 
+            << minLevel << " - " << maxLevel << ":{x" << endl;
     else
-        buf << "Все арии мира Dream Land: " << endl;
+        buf << "{YВсе арии мира Dream Land: {x" << endl;
     
-    buf << "Уровни    Название                                 Авторы  {W({xПереводчики{W){x" << endl
+    buf << "{wУровни    Название                       Уровни    Название{x" << endl
         << "------------------------------------------------------------------------" << endl;
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
@@ -1939,18 +1940,37 @@ CMDRUNP( areas )
                 continue;
         }
         
-        buf << fmt( ch, "(%3d %3d) %-40s %s",
+        bool isMansion = area_is_mansion(pArea);
+        bool isClan = area_is_clan(pArea);    
+        ostringstream &str =  isMansion ? mansionBuf : isClan ? clanBuf : areaBuf;
+        int &cnt = isMansion ? mcnt : isClan ? ccnt : acnt;
+
+        str << fmt( ch, "[{w%3d{x {w%3d{x] %-30.30s ",
                         pArea->low_range, pArea->high_range, 
-                        pArea->name, 
-                        pArea->authors );
+                        pArea->name);
 
-        if (str_cmp( pArea->translator, "" ))
-            buf << " {W({x" << pArea->translator << "{W){x";
-
-        buf << endl;
+        if (++cnt % 2 == 0)
+            str << endl;
     }
-    
-    buf << endl;
+  
+    if (!areaBuf.str().empty()) { 
+        buf << areaBuf.str();
+        if (acnt % 2)
+            buf << endl;
+    }
+
+    if (!clanBuf.str().empty()) {
+        buf << "{yКлановые территории:{x" << endl << clanBuf.str();
+        if (ccnt % 2)
+            buf << endl;
+    }
+
+    if (!mansionBuf.str().empty()) {
+        buf << "{yПригороды под застройку:{x" << endl << mansionBuf.str();
+        if (mcnt % 2)
+            buf << endl;
+    }
+
     page_to_char( buf.str( ).c_str( ), ch );        
 }
 
@@ -2169,6 +2189,64 @@ static bool __aff_sort_name__( const AffectOutput &a, const AffectOutput &b )
     return a.name < b.name;
 }
 
+struct PermanentAffects {
+    PermanentAffects(Character *ch) {
+        this->ch = ch;
+        my_res = ch->res_flags;
+        my_vuln = ch->vuln_flags;
+        my_imm = ch->imm_flags;
+        my_aff = ch->affected_by;
+        my_det = ch->detection;
+    }
+
+    void stripBitsFromAffects(Affect *paf) {
+        switch(paf->where) {
+        case TO_AFFECTS: 
+            REMOVE_BIT(my_aff, paf->bitvector);
+            break;
+        case TO_IMMUNE:        
+            REMOVE_BIT(my_imm, paf->bitvector);
+            break;
+        case TO_RESIST:        
+            REMOVE_BIT(my_res, paf->bitvector);
+            break;
+        case TO_VULN:        
+            REMOVE_BIT(my_vuln, paf->bitvector);
+            break;
+        case TO_DETECTS: 
+            REMOVE_BIT(my_det, paf->bitvector);
+            break;
+        }
+    }
+    
+    void printAll() const {
+        print("У тебя иммунитет против", my_imm, imm_flags, '2');
+        print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
+        print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
+        print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
+        print("Ты под воздействием", my_aff, affect_flags, '2');
+    }
+
+    bool isSet() const {
+        return my_res || my_vuln || my_imm || my_aff || my_det;
+    }
+
+private:
+    void print(const char *messagePrefix, const int &my_flags, const FlagTable &my_table, char gcase) const {
+        if (my_flags != 0) {
+            DLString message = DLString(messagePrefix) + " " + my_table.messages(my_flags, true, gcase) + ".";
+            ch->pecho(message.c_str(), ch);
+        }
+    }
+
+    Character *ch;
+    int my_res;
+    int my_vuln;
+    int my_imm;
+    int my_aff;
+    int my_det;
+};
+
 CMDRUNP( affects )
 {
     ostringstream buf;
@@ -2178,17 +2256,24 @@ CMDRUNP( affects )
 
     if (ch->getConfig( )->ruskills)
         SET_BIT(flags, FSHOW_RUSSIAN);
-    
+   
+    // Keep track of res/vuln that are permanent (either from race affects or from items). 
+    PermanentAffects permAff(ch);
+ 
     for (Affect* paf = ch->affected; paf != 0; paf = paf->next ) {
         if (output.empty( ) || output.back( ).type != paf->type) 
             output.push_back( AffectOutput( paf, flags ) );
         
         output.back( ).format_affect( paf );
+
+        // Remove bits that are added via an affect, so that in the end
+        // only permanent bits remain.
+        permAff.stripBitsFromAffects(paf);
     }
     
     if (HAS_SHADOW(ch))
         output.push_front( ShadowAffectOutput( ch->getPC( )->shadow, flags ) );
-    
+
     if (arg_has_oneof( argument, "time", "время" ))
         output.sort( __aff_sort_time__ );
     
@@ -2213,11 +2298,16 @@ CMDRUNP( affects )
     for (o = output.begin( ); o != output.end( ); o++) 
         o->show_affect( buf, flags );
 
+    // Output permanent bits on top.
+    permAff.printAll();
+
     if (buf.str( ).empty( )) {
-        if (IS_SET(flags, FSHOW_EMPTY))
+        if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
             ch->println( "Ты не находишься под действием каких-либо аффектов." );
     } 
     else {
+        if (permAff.isSet())
+            ch->send_to("\r\n");
         ch->println( "Ты находишься под действием следующих аффектов:" );
         buf << "{x";
 

@@ -53,6 +53,8 @@ enum {
     FLOOT_PURGE = (A),
 };
 
+#define GHOST_MIN_LEVEL (PK_MIN_LEVEL + 10)
+
 static void loot_transform( Object *obj, Character *ch )
 {
     if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH))
@@ -196,7 +198,7 @@ static void corpse_place( Object *corpse, Character *ch )
     if (!corpse)
         return;
 
-    if (!ch->is_npc( ) && ch->getModifyLevel( ) < PK_MIN_LEVEL) 
+    if (!ch->is_npc( ) && ch->getModifyLevel( ) < GHOST_MIN_LEVEL) 
         corpse_room = get_room_index( ch->getPC()->getHometown( )->getAltar( ) );
     
     if (!corpse_room)
@@ -471,7 +473,7 @@ void ghost_gain( Character *victim )
     if (!victim->is_npc( )) {
         SET_DEATH_TIME(victim);
 
-        if (victim->getModifyLevel( ) >= PK_MIN_LEVEL) {
+        if (victim->getModifyLevel( ) >= GHOST_MIN_LEVEL) {
             victim->println("Ты лишаешься тела на несколько минут.");
             set_ghost( victim );
         }

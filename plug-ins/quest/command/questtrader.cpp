@@ -16,6 +16,7 @@
 
 #include "merc.h"
 #include "mercdb.h"
+#include "arg_utils.h"
 #include "wiznet.h"
 #include "interp.h"
 #include "handler.h"
@@ -107,7 +108,7 @@ void QuestTrader::msgListBefore( Character *client )
 
 void QuestTrader::msgListAfter( Character *client )
 {
-    client->send_to( "Для покупки чего-либо используйте QUEST BUY <вещь>.\n\r" );
+    client->println( "Для покупки чего-либо используйте {y{lRквест купить{lEquest buy{lx {Dвещь{x." );
 }
 
 void QuestTrader::msgArticleNotFound( Character *client ) 
@@ -130,12 +131,13 @@ void QuestTrader::msgBuyRequest( Character *client )
  *---------------------------------------------------------------------------*/
 void QuestTradeArticle::toStream( Character *client, ostringstream &buf ) const
 {
+    DLString myname = client->getConfig()->rucommands ? rname : name;
     buf << "    " << setiosflags( ios::right ) << setw( 7 );
     
     price->toStream( client, buf );
 
     buf << resetiosflags( ios::left )
-        << ".........." << descr << " ({c" << name << "{x)" << endl;
+        << ".........." << descr << " ({D" << myname << "{x)" << endl;
 }
 
 bool QuestTradeArticle::visible( Character * ) const
@@ -150,8 +152,10 @@ bool QuestTradeArticle::available( Character *, NPCharacter * ) const
 
 bool QuestTradeArticle::matches( const DLString &argument ) const
 {
-    return !argument.empty( )
-           && is_name( argument.c_str( ), name.getValue( ).c_str( ) );
+    if (argument.empty())
+        return false;
+    
+    return arg_oneof(argument, name.c_str(), rname.c_str());
 }
 
 int QuestTradeArticle::getQuantity( ) const

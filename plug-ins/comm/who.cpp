@@ -112,23 +112,31 @@ COMMAND(Who, "who")
     }
 
 
+    count = 0;
     for (Descriptor *d = descriptor_list; d; d = d->next) {
         Object *obj;
         PCharacter *victim;
         
         if (d->connected != CON_PLAYING || !d->character)
             continue;
-
+        
         victim = d->character->getPC( );
+
+        if (victim->getAttributes( ).isAvailable("nowho"))
+            continue;
+
+        // Add here explicit checks for wizinvis and incognito,
+        // to avoid showing hidden immortals in total count.        
+        if (ch->get_trust() < victim->invis_level)
+            continue;
+        if (ch->get_trust() < victim->incog_level && ch->in_room != victim->in_room)
+            continue;
+
+        count++;
 
         if (!ch->can_see( victim ))
             continue;
 
-        XMLAttributes *attrs = &victim->getAttributes( );
-        
-        if (attrs->isAvailable("nowho"))
-            continue;
-        
         if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
             continue;
         
@@ -163,13 +171,8 @@ COMMAND(Who, "who")
     for (std::list<PCharacter *>::iterator i = victims.begin( ); i != victims.end( ); i++)
         ch->send_to( formatChar( ch, *i ).c_str( ) );
 
-    count = 0;
-    for( Descriptor *d = descriptor_list; d; d = d->next )
-        if( d->connected == CON_PLAYING ) 
-            count++;
-    
     buf << endl 
-        << "Всего игроков: " << victims.size( ) << ". "
+        << "Всего игроков: " << count << ", видимых: " << victims.size( ) << ". "
         << "Максимум на сегодня был: " << Descriptor::getMaxOnline( ) << "." << endl;
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && ch->getPC( )->getRemorts( ).size( ) == 0) 
         buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl

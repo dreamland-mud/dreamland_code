@@ -10,13 +10,14 @@
 #include "occupations.h"
 #include "commandtemplate.h"
 #include "hometown.h"
-
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "clanreference.h"
 
 #include "merc.h"
 #include "handler.h"
+#include "arg_utils.h"
+#include "gsn_plugin.h"
 #include "magic.h"
 #include "act.h"
 #include "mercdb.h"
@@ -83,13 +84,13 @@ void Healer::msgListBefore( Character *client )
 
 void Healer::msgListAfter( Character *client )
 {
-    tell_dim( client, getKeeper( ), "Используй 'heal <тип заклинания>', и я вылечу тебя за указанную цену." );
+    tell_dim( client, getKeeper( ), "Используй '{lEheal{lRлечить{lx <тип заклинания>', и я вылечу тебя за указанную цену." );
 }
 
 void Healer::msgArticleNotFound( Character *client ) 
 {
     say_act( client, getKeeper( ), "Я не знаю такого заклинания, $c1." );
-    tell_act( client, getKeeper( ), "Используй 'heal', чтобы увидеть список известных мне заклинаний." );
+    tell_act( client, getKeeper( ), "Используй '{lEheal{lRлечить{lx', чтобы увидеть список известных мне заклинаний." );
 }
 
 void Healer::msgArticleTooFew( Character *client, Article::Pointer )
@@ -108,12 +109,10 @@ void Healer::msgBuyRequest( Character *client )
  *-----------------------------------------------------------------------*/
 void HealService::toStream( Character *client, ostringstream &buf ) const
 {
-    buf << "  {c" << setiosflags( ios::left ) << setw( 11 ) << name << "{x: "
-        << setw( 30 ) << descr << "   " << setiosflags( ios::right ) << setw( 8 );
-        
-    price->toStream( client, buf );
-
-    buf << resetiosflags( ios::right ) << endl;
+    DLString myname = client->getConfig()->rucommands ? rname : name;
+    DLString myprice = price->toString(client);
+    buf << dlprintf("  {c%-11s{x: %-30s  %17s\r\n",
+           myname.c_str(), descr.c_str(), myprice.c_str());
 }
 
 bool HealService::visible( Character * ) const
@@ -128,7 +127,10 @@ bool HealService::available( Character *, NPCharacter * ) const
 
 bool HealService::matches( const DLString &argument ) const
 {
-    return !argument.empty( ) && argument.strPrefix( name.getValue( ) );
+    if (argument.empty())
+        return false;
+    
+    return arg_oneof(argument, name.c_str(), rname.c_str());
 }
 
 int HealService::getQuantity( ) const
@@ -163,6 +165,38 @@ void SpellHealService::heal( Character *client, NPCharacter *healer )
     ::spell( spell, healer->getModifyLevel( ), healer, client, FSPELL_VERBOSE );
 }
 
+bool SpellHealService::available( Character *client, NPCharacter *healer ) const
+{
+    int sn = skillManager->find(spell.getName())->getIndex();
+
+    if (sn == gsn_master_healing && client->hit >= client->max_hit) {
+        say_fmt("Ты не нуждаешься в услуге лечения, %2$C1: ты здоров%2$Gо||а, как %2$Gжеребец|жеребец|кобыла!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_refresh && client->move >= client->max_move) {
+        say_fmt("Ты не нуждаешься этой услуге, %2$C1: ты и так пол%2$Gон|но|на сил!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_cure_poison && !IS_AFFECTED(client, AFF_POISON)) {
+        say_fmt("Ты не нуждаешься этой услуге, %2$C1: ты не отравлен%2$G|о|а!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_cure_disease && !IS_AFFECTED(client, AFF_PLAGUE)) {
+        say_fmt("Ты не нуждаешься этой услуге, %2$C1: ты не заражен%2$G|о|а чумой!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_cure_blindness && !IS_AFFECTED(client, AFF_BLIND)) {
+        say_fmt("Ты не нуждаешься этой услуге, %2$C1: твое зрение в порядке!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_bless && client->isAffected(sn)) {
+        say_fmt("Я не могу благословить тебя еще больше, %2$C1.", healer, client);
+        return false;
+    }
+
+    return true;
+}
+
 /*------------------------------------------------------------------------
  * ManaHealService 
  *-----------------------------------------------------------------------*/
@@ -170,16 +204,18 @@ void ManaHealService::heal( Character *client, NPCharacter *healer )
 {
     act( "$c1 бормочет '$T'.", healer, 0, words.getValue( ).c_str( ), TO_ROOM );
 
-    if (enhanced) {
-        client->mana += 300;
-        client->send_to( "Приятное тепло наполняет твое тело.\n\r" );
-    }
-    else {
-        client->mana += dice( 2, 8 ) + healer->getModifyLevel( ) / 3;
-        client->send_to( "Ты ощущаешь приятное тепло.\n\r" );
-    }
-
+    client->mana += healer->getModifyLevel() * 5 + number_range(50, 100);
     client->mana = std::min( client->mana, client->max_mana );
+    client->send_to( "Приятное тепло наполняет твое тело.\n\r" );
+}
+
+bool ManaHealService::available( Character *client, NPCharacter *healer ) const
+{
+    if (client->mana >= client->max_mana) {
+        say_act(client, healer, "Твоя мана и так на максимуме, $c1.");
+        return false;
+    }
+    return true;
 }
 
 /*------------------------------------------------------------------------
@@ -194,7 +230,7 @@ CMDRUN( heal )
 
     if (!healer) {
         ch->send_to( "Здесь некому тебя вылечить за деньги.\r\n" );
-        if (ch->getModifyLevel() < 11) {
+        if (ch->getModifyLevel() < 20) {
             if (!ch->is_npc( ) && ch->getPC( )->getHometown( ) == home_frigate)
                 ch->println("Доктор в лазарете вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
             else
@@ -213,3 +249,36 @@ CMDRUN( heal )
     else
         healer->doBuy( ch, argument );
 }
+
+/*------------------------------------------------------------------------
+ * CustomHealPrice 
+ *-----------------------------------------------------------------------*/
+CustomHealPrice::CustomHealPrice()
+{
+}
+
+int CustomHealPrice::toSilver( Character *ch ) const
+{
+    int gold = 0;
+    int lev = ch->getModifyLevel();
+    
+    if (lev <= 5) gold = 5;
+    else if (lev < 10) gold = 10;
+    else if (lev < 15) gold = 15;
+    else if (lev < 20) gold = 20;
+    else if (lev < 25) gold = 30;
+    else if (lev < 30) gold = 40;
+    else if (lev < 35) gold = 50;
+    else if (lev < 40) gold = 80;
+    else if (lev < 45) gold = 100;
+    else if (lev < 50) gold = 120;
+    else if (lev < 55) gold = 150;
+    else if (lev < 60) gold = 200;
+    else if (lev < 70) gold = 220;
+    else if (lev < 80) gold = 250;
+    else if (lev < 90) gold = 270;
+    else gold = 300;
+
+    return gold * 100;
+}
+

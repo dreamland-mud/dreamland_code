@@ -53,7 +53,7 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
         ||  IS_OBJ_STAT(obj,ITEM_DARK)
         ||  IS_OBJ_STAT(obj,ITEM_EVIL) )
     {
-        ch->pecho("Дьявольская сущность %1$O2 отвергает твое благословление.", obj);
+        ch->pecho("Дьявольская сущность %1$O2 отвергает твое благословение.", obj);
         return;
     }
     

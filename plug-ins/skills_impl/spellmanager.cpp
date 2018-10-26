@@ -10,6 +10,7 @@
 #include "skill.h"
 
 #include "logstream.h"
+#include "stringlist.h"
 #include "xmldocument.h"
 #include "dbio.h"
 
@@ -94,14 +95,20 @@ void SpellManager::unregistrate( Spell::Pointer spell )
 
 Spell::Pointer SpellManager::lookup( const DLString &name, Character *ch )
 {
+    StringList argList(name);
+
     for (SpellList::iterator i = spells.begin( ); i != spells.end( ); i++) {
         Skill::Pointer skill = (*i)->getSkill( );
         
-        if ((*i)->isCasted( )
-            && (name.strPrefix( skill->getName( ) ) 
-                || name.strPrefix( skill->getRussianName( ) ))  
-            && skill->available( ch ))
-            return *i;
+        if (!(*i)->isCasted( ))
+            continue;
+        if (!StringList(skill->getName()).superListOf(argList)
+             && !StringList(skill->getRussianName()).superListOf(argList))
+            continue;
+        if (!skill->available(ch))
+            continue;
+
+        return *i;
     }
 
     return Spell::Pointer( );

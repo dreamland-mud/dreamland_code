@@ -8,11 +8,12 @@
 #include "room.h"
 
 #include "act.h"
+#include "gsn_plugin.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
-PROF(vampire);
+#define HUNGER_MIN_LEVEL (PK_MIN_LEVEL + 5)
 
 /*-------------------------------------------------------------------
  * DefaultDesire
@@ -96,7 +97,7 @@ void DefaultDesire::gain( PCharacter *ch, int value )
 {
     int oldDesire, desire;
     bool wasActive;
-    bool isNewbie = ch->getRealLevel( ) <= PK_MIN_LEVEL;
+    bool isNewbie = ch->getRealLevel( ) <  HUNGER_MIN_LEVEL;
     
     if (!applicable( ch ) || ch->is_immortal( )) {
         reset( ch );
@@ -154,7 +155,7 @@ void DefaultDesire::damage( PCharacter * )
 
 bool DefaultDesire::isVampire( PCharacter *ch )
 {
-    return ch->getProfession( ) == prof_vampire && ch->getRealLevel( ) >= 10;
+    return ch->getSkillData(gsn_vampire).learned >= 100;
 }
 
 bool DefaultDesire::applicable( PCharacter * )

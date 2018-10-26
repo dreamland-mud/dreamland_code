@@ -662,6 +662,8 @@ DLString & DLString::capitalize( )
 
 DLString DLString::ruscase( char gram_case ) const
 {
+    if (gram_case == '7')
+        return *this;
     return Flexer::flex( *this, Grammar::Case( gram_case ) + 1 );
 }
 

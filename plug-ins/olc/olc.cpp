@@ -26,7 +26,7 @@
 #include <spell.h>
 #include <skillmanager.h>
 #include "feniamanager.h"
-
+#include "areabehaviormanager.h"
 #include <affect.h>
 #include <object.h>
 #include <pcharacter.h>
@@ -1004,8 +1004,7 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
             useless = !get_obj_resets( pObj->vnum, pArea, where );
             if (useless)
                 continue;
-            static const DLString CLAN_AREA_TYPE = DLString("ClanArea");
-            if (pArea->behavior && CLAN_AREA_TYPE.strPrefix( pArea->behavior->getType( ) ))
+            if (area_is_clan(pArea))
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
@@ -1120,8 +1119,7 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
             bool useless = !get_obj_resets( pObj->vnum, pArea, where );
             if (useless)
                 continue;
-            static const DLString CLAN_AREA_TYPE = DLString("ClanArea");
-            if (pArea->behavior && CLAN_AREA_TYPE.strPrefix( pArea->behavior->getType( ) ))
+            if (area_is_clan(pArea))
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;
@@ -1222,8 +1220,7 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
             bool useless = !get_obj_resets( pObj->vnum, pArea, where );
             if (useless)
                 continue;
-            static const DLString CLAN_AREA_TYPE = DLString("ClanArea");
-            if (pArea->behavior && CLAN_AREA_TYPE.strPrefix( pArea->behavior->getType( ) ))
+            if (area_is_clan(pArea))
                 continue;
             if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
                 continue;

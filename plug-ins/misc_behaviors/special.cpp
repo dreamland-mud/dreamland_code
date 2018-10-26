@@ -92,7 +92,7 @@ PROF(ninja);
 #define MOB_VNUM_PATROLMAN           2106
 #define GROUP_VNUM_TROLLS           2100
 #define GROUP_VNUM_OGRES           2101
-
+#define ADEPT_MAX_LEVEL        (PK_MIN_LEVEL + 14)
 
 /*
  * The following special functions are available for mobiles.
@@ -401,7 +401,7 @@ bool spec_cast_adept( NPCharacter *ch )
                         && ch->can_see( victim )
                         && number_bits( 1 ) == 0
                         && !victim->is_npc()
-                        && ( victim->getModifyLevel() < 11 || IS_GHOST( victim ) )
+                        && ( victim->getModifyLevel() <= ADEPT_MAX_LEVEL || IS_GHOST( victim ) )
                         && victim->getClan() != clan_battlerager)
                         break;
         }

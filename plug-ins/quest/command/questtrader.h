@@ -56,6 +56,7 @@ protected:
     virtual void buy( PCharacter *, NPCharacter * ) = 0;
 
     XML_VARIABLE XMLString name;
+    XML_VARIABLE XMLString rname;
     XML_VARIABLE XMLString descr;
     XML_VARIABLE XMLPointer<Price> price;
 };

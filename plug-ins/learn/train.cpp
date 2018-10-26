@@ -23,6 +23,13 @@
 #include "act.h"
 #include "def.h"
 
+static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
+{
+    FENIA_CALL( trainer, "CantTrain", "C", client );
+    FENIA_NDX_CALL( trainer, "CantTrain", "CC", trainer, client );
+    return false;
+}
+
 Trainer::Trainer( )
 {
 }
@@ -36,6 +43,9 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 {
     DLString arg;
     
+    if (mprog_cant_train( client, ch ))
+        return;
+
     arg = argument.getOneArgument( );
     
     if (arg.empty( )) {
@@ -74,13 +84,6 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
     }
 
     tell_act( client, ch, "Я тебя не могу понять..." );
-}
-
-static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
-{
-    FENIA_CALL( trainer, "CantTrain", "C", client );
-    FENIA_NDX_CALL( trainer, "CantTrain", "CC", trainer, client );
-    return false;
 }
 
 void Trainer::doTrain( PCharacter *client, DLString & argument )

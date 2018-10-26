@@ -22,5 +22,6 @@ integer.cpp \
 long.cpp \
 longlong.cpp \
 short.cpp \
-stringset.cpp
+stringset.cpp \
+stringlist.cpp
 
