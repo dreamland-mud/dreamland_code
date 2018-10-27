@@ -131,7 +131,7 @@ void QuestTrader::msgBuyRequest( Character *client )
  *---------------------------------------------------------------------------*/
 void QuestTradeArticle::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = client->getConfig()->rucommands ? rname : name;
+    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
     buf << "    " << setiosflags( ios::right ) << setw( 7 );
     
     price->toStream( client, buf );
