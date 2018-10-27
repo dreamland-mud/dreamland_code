@@ -26,6 +26,11 @@ const DLString & HelpArticle::getKeyword( ) const
     return fullKeyword;
 }
 
+const StringSet & HelpArticle::getKeywords() const
+{
+    return keywords;
+}
+
 int HelpArticle::getLevel( ) const
 {
     return level;
@@ -43,12 +48,10 @@ void HelpArticle::setText( const DLString &text )
 
 void HelpArticle::addKeyword( const DLString &add )
 {
-    StringSet kwd;
-    
-    kwd.fromString( fullKeyword );
-    kwd.fromString( add );
-
-    fullKeyword = kwd.toString( ).toUpper( );
+    // 'add' can contain a list of keywords, parse them into keywords set.
+    keywords.fromString(add.toLower());
+    // Regenerate concatenated string.
+    fullKeyword = keywords.toString().toUpper();
 }
 
 bool HelpArticle::visible( Character *ch ) const

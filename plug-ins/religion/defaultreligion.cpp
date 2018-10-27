@@ -18,17 +18,14 @@ const DLString ReligionHelp::TYPE = "ReligionHelp";
 
 void ReligionHelp::setReligion( Religion::Pointer religion )
 {
-    StringSet kwd;
-
     this->religion = religion;
     
     if (!keyword.empty( ))
-        kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
 
-    kwd.insert( religion->getName( ) );
-    kwd.insert( religion->getRussianName( ).ruscase( '1' ) );
-    fullKeyword = kwd.toString( ).toUpper( );
-    LogStream::sendNotice() << "registered help for " << religion->getName() << ", kw=" << fullKeyword << endl;
+    keywords.insert( religion->getName( ) );
+    keywords.insert( religion->getRussianName( ).ruscase( '1' ) );
+    fullKeyword = keywords.toString( ).toUpper( );
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -37,6 +34,7 @@ void ReligionHelp::unsetReligion( )
 {
     helpManager->unregistrate( Pointer( this ) );
     religion.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 

@@ -109,28 +109,25 @@ void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream 
 
 void SkillHelp::setSkill( Skill::Pointer skill )
 {
-    StringSet kwd;
-
     this->skill = skill;
     
-    kwd.insert( skill->getName( ) );    
-    kwd.insert( skill->getRussianName( ) );    
+    keywords.insert( skill->getName( ) );    
+    keywords.insert( skill->getRussianName( ) );    
     
     if (!keyword.empty( ))
-        kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
     
     if (skill->getCommand( )) {
         Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
         
         if (cmd) {
-            kwd.insert( cmd->getName( ) );
-            cmd->getAliases( ).toSet( kwd );
-            cmd->getRussianAliases( ).toSet( kwd );
+            keywords.insert( cmd->getName( ) );
+            cmd->getAliases( ).toSet( keywords );
+            cmd->getRussianAliases( ).toSet( keywords );
         }
     }
     
-    fullKeyword = kwd.toString( );
-    fullKeyword.toUpper( );
+    fullKeyword = keywords.toString().toUpper();
     helpManager->registrate( Pointer( this ) );
 }
 
@@ -138,6 +135,7 @@ void SkillHelp::unsetSkill( )
 {
     helpManager->unregistrate( Pointer( this ) );
     skill.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 

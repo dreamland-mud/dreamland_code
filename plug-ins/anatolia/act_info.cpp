@@ -2373,95 +2373,109 @@ CMDRUNP( iidea )
     ch->println( "Идея записана.");
 }
 
+/*---------------------------------------------------------------------------*
+ * Help
+ *---------------------------------------------------------------------------*/
+struct HelpFinder {
+    typedef vector<HelpArticle::Pointer> ArticleArray;
+
+    HelpFinder(Character *ch, const char *argument) {
+        HelpArticles::const_iterator a;
+
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if (!(*a)->visible( ch ))
+                continue;
+            if (!articleMatches(*a, argument))
+                continue;
+            
+            articles.push_back(*a); 
+        }
+    }
+    
+    HelpArticle::Pointer get(int number) const
+    {	
+		unsigned int n = (unsigned int)number;
+        if (n > articles.size() || n < 0)
+            return HelpArticle::Pointer();
+        return articles.at(number-1);
+    }
+	
+	const ArticleArray &getArticles() const {
+		return articles;
+	}
+    
+private:
+    bool articleMatches(const HelpArticle::Pointer &a, const char *argument) const
+    {
+        const DLString &fullKw = a->getKeyword();
+
+        if (is_name(argument, fullKw.c_str()))
+            return true; 
+
+        for (StringSet::const_iterator k = (*a)->getKeywords().begin(); k != (*a)->getKeywords().end(); k++)
+            if (is_name(argument, (*k).c_str()))
+                return true; 
+
+        return false;
+    }
+	
+	ArticleArray articles;
+};
 
 CMDRUNP( help )
 {
     std::basic_ostringstream<char> buf;
-    HelpArticle::Pointer findHelp;
-    HelpArticles::const_iterator a;
-    char argall[MAX_INPUT_LENGTH],argone[MAX_INPUT_LENGTH];
-    int count=0,number=0;
     DLString origArgument( argument );
 
-    if ( argument[0] == '\0' ) {
+    if (argument[0] == '\0') {
         if (ch->getConfig( )->rucommands)
             strcpy(argument, "summary_ru");
         else
             strcpy(argument, "summary_en");
     }
 
-    argall[0] = '\0';
-    // Вариант 2.create?
+    // Вариант 2.create? - needs exact match.
     if (strchr( argument , '.')){
-        number = number_argument(argument, argall);
-        strcpy(argument,argall);        
-        if ( number < 1){
-            ch->send_to( "Нет подсказки по данному слову.\n\r");
-            bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+        char argall[MAX_INPUT_LENGTH];
+        int number = number_argument(argument, argall);
+
+        if (number >= 1) {
+            HelpArticle::Pointer help = HelpFinder(ch, argall).get(number);
+            if (help) {
+                page_to_char( help->getText( ch ).c_str( ), ch );
                 return;
-        }
-        /* this parts handles help a b so that it returns help 'a b' */
-        while (argument[0] != '\0' )
-        {
-            argument = one_argument(argument,argone);
-            if (argall[0] != '\0')
-                strcat(argall," ");
-            strcat(argall,argone);
-        }
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if (!(*a)->visible( ch ))
-                continue;
-
-            if (is_name( argall, (*a)->getKeyword( ).c_str( ) ) ){
-                count++;
-                if (count == number){
-                    findHelp = *a;
-                    break;
-                }
-            }
-        }
-        count=(findHelp.isEmpty( )?0:1);
-    }
-    else{
-        /* this parts handles help a b so that it returns help 'a b' */
-        while (argument[0] != '\0' )
-        {
-            argument = one_argument(argument,argone);
-            if (argall[0] != '\0')
-                strcat(argall," ");
-            strcat(argall,argone);
-        }
-
-        buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
-
-        count=0;
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if (!(*a)->visible( ch ))
-                continue;
-
-            if (is_name( argall, (*a)->getKeyword( ).c_str( ) ) ){
-                count++;
-                buf << "    {C{hh" << count << "." << origArgument << "{x : " << (*a)->getKeyword( ) << endl;
-                findHelp = *a;
             }
         }
 
-        buf << endl;
-    }
-    /*
-     * Strip leading '.' to allow initial blanks.
-     */
-    if (findHelp && count==1 ){
-        page_to_char( findHelp->getText( ch ).c_str( ), ch );
-    }
-    else if (count==0) {
         ch->send_to( "Нет подсказки по данному слову.\n\r");
         bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+        return;
     }
-    else if (count > 1) {
-        buf << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." << endl;
-        ch->send_to(buf.str().c_str());
+    
+    // Поиск по строке без чисел.
+    HelpFinder::ArticleArray articles = HelpFinder(ch, argument).getArticles();
+    // No match.
+    if (articles.empty()) {
+        ch->send_to( "Нет подсказки по данному слову.\n\r");
+        bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+        return;
     }
+
+    // Exact match - bingo.
+    if (articles.size() == 1) {
+        page_to_char( articles.front()->getText( ch ).c_str( ), ch );
+        return;
+    }
+
+    // Several matches, display them all with numbers.
+    buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
+    for (unsigned int a = 0; a < articles.size(); a++) 
+        buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getKeyword() << endl;
+    buf << endl
+        << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." 
+        << endl;
+
+    ch->send_to(buf.str().c_str());
 }                  
 
 

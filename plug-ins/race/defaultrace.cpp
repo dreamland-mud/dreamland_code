@@ -17,6 +17,7 @@
 #include "pcharacter.h"
 #include "wearlocation.h"
 #include "alignment.h"
+#include "logstream.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -31,18 +32,21 @@ GROUP(ancient_languages);
 
 void RaceHelp::setRace( Race::Pointer race )
 {
-    StringSet kwd;
-
     this->race = race;
     
     if (!keyword.empty( ))
-        kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
 
-    kwd.insert( race->getName( ) );
-    kwd.insert( race->getMaleName( ).ruscase( '1' ) );
-    kwd.insert( race->getFemaleName( ).ruscase( '1' ) );
-    kwd.insert( race->getMltName( ).ruscase( '1' ) );
-    fullKeyword = kwd.toString( ).toUpper( );
+    LogStream::sendNotice() << "keyword: " << keyword.toLower() << endl;
+    for (StringSet::iterator k = keywords.begin(); k != keywords.end(); k++)
+        LogStream::sendNotice() << *k << endl;
+    LogStream::sendNotice() << "----------------------" << endl;
+
+    keywords.insert( race->getName( ) );
+    keywords.insert( race->getMaleName( ).ruscase( '1' ) );
+    keywords.insert( race->getFemaleName( ).ruscase( '1' ) );
+    keywords.insert( race->getMltName( ).ruscase( '1' ) );
+    fullKeyword = keywords.toString( ).toUpper( );
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -51,6 +55,7 @@ void RaceHelp::unsetRace( )
 {
     helpManager->unregistrate( Pointer( this ) );
     race.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 

@@ -19,18 +19,15 @@ void SkillGroupHelp::getRawText( Character *ch, ostringstream &buf ) const
 
 void SkillGroupHelp::setSkillGroup( SkillGroup::Pointer group )
 {
-    StringSet kwd;
-
     this->group = group;
     
-    kwd.insert( group->getName( ) );    
-    kwd.insert( group->getRussianName( ) );    
+    keywords.insert( group->getName( ) );    
+    keywords.insert( group->getRussianName( ) );    
     
     if (!keyword.empty( ))
-        kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
     
-    fullKeyword = kwd.toString( );
-    fullKeyword.toUpper( );
+    fullKeyword = keywords.toString().toUpper();
     helpManager->registrate( Pointer( this ) );
 }
 
@@ -38,6 +35,7 @@ void SkillGroupHelp::unsetSkillGroup( )
 {
     helpManager->unregistrate( Pointer( this ) );
     group.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 

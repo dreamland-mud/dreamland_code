@@ -22,17 +22,15 @@ const DLString ProfessionHelp::TYPE = "ProfessionHelp";
 
 void ProfessionHelp::setProfession( Profession::Pointer prof )
 {
-    StringSet kwd;
-
     this->prof = prof;
     
     if (!keyword.empty( ))
-        kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
 
-    kwd.insert( prof->getName( ) );
-    kwd.insert( prof->getRusName( ).ruscase( '1' ) );
-    kwd.insert( prof->getMltName( ).ruscase( '1' ) );
-    fullKeyword = kwd.toString( ).toUpper( );
+    keywords.insert( prof->getName( ) );
+    keywords.insert( prof->getRusName( ).ruscase( '1' ) );
+    keywords.insert( prof->getMltName( ).ruscase( '1' ) );
+    fullKeyword = keywords.toString( ).toUpper( );
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -41,6 +39,7 @@ void ProfessionHelp::unsetProfession( )
 {
     helpManager->unregistrate( Pointer( this ) );
     prof.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 

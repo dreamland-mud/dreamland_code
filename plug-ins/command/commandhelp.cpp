@@ -22,27 +22,26 @@ bool CommandHelp::visible( Character *ch ) const
 
 void CommandHelp::setCommand( Command::Pointer command )
 {
-    StringSet kwd;
     StringSet::const_iterator r;
 
     this->command = command;
     
-    kwd.insert( command->getName( ) );    
-    kwd.insert( command->getRussianName( ) );    
-    command->getAliases( ).toSet( kwd );
-    command->getRussianAliases( ).toSet( kwd );
+    keywords.insert( command->getName( ) );    
+    keywords.insert( command->getRussianName( ) );    
+    command->getAliases( ).toSet( keywords );
+    command->getRussianAliases( ).toSet( keywords );
     
     if (!keyword.empty( ))
-        kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
 
     for (r = ref.begin( ); r != ref.end( ); r++) {
         Command::Pointer cmd = commandManager->findExact( *r );
 
         if (cmd) 
-            kwd.fromString( cmd->getHelp( )->getKeyword( ) );
+            keywords.fromString( cmd->getHelp()->getKeyword().toLower() );
     }
     
-    fullKeyword = kwd.toString( ).toUpper( );
+    fullKeyword = keywords.toString( ).toUpper( );
 
     for (r = refby.begin( ); r != refby.end( ); r++) {
         Command::Pointer cmd = commandManager->findExact( *r );
@@ -63,6 +62,7 @@ void CommandHelp::unsetCommand( )
     /* XXX remove refby keyword */
 
     command.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 

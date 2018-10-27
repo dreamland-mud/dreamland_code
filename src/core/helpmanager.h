@@ -24,16 +24,29 @@ public:
     virtual DLString getText( Character * = NULL ) const;
     virtual bool visible( Character * ) const;
 
+    /** Register new keyword for this article. */
     void addKeyword( const DLString & );
     void setText( const DLString & );
+    /** Return a concatenation of all configured keywords. */
     const DLString & getKeyword( ) const;
+    /** Return set of all configured keywords. */
+    const StringSet & getKeywords() const;
     int getLevel( ) const;
     void setLevel( int );
 
     struct area_file * areafile;
+
 protected:
+    /** Level from which this article is visible. */
     int level;
+
+    /** Strings containing a concatenation of all keywords, with multi-word keywords
+        inside single quotes. */
     DLString fullKeyword;
+
+    /** A set of all configured keywords, single- and multi-word. Their current
+        concatenation is kept inside fullKeyword field. */
+    StringSet keywords;
 };
 
 class XMLHelpArticle : public virtual HelpArticle, public virtual XMLPolymorphVariable {
@@ -48,9 +61,15 @@ protected:
     static const DLString ATTRIBUTE_LEVEL;
     static const DLString ATTRIBUTE_REF;
     static const DLString ATTRIBUTE_REFBY;
-    
+   
+    /** (Extra) keyword specified as an XML attribute for this help article. */
     DLString keyword;
-    StringSet ref, refby;
+    
+    /** List of help articles this one refers to, specified as an XML attribute. */
+    StringSet ref;
+
+    /** List of help articles that refer to this one, specified as an XML attribute. */
+    StringSet refby;
 };
 
 typedef list<HelpArticle::Pointer> HelpArticles;
