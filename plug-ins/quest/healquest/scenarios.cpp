@@ -37,7 +37,7 @@ bool HealScenario::applicable( PCharacter *pch )
     if (!obvious && gsn_observation->getEffective( pch ) < 50)
         return false;
     
-    for (StringList::iterator s = remedies.begin( ); s != remedies.end( ); s++)
+    for (XMLStringVector::iterator s = remedies.begin( ); s != remedies.end( ); s++)
         if (skillManager->find( *s )->getEffective( pch ) >= 50) 
             return true;
 

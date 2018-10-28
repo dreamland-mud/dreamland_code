@@ -111,9 +111,9 @@ struct VnumList : public XMLReverseVector<XMLInteger> {
     Object * randomItem( );
 };
 
-typedef XMLReverseVector<XMLString> StringList;
+typedef XMLReverseVector<XMLString> XMLStringVector;
 
-struct NameList : public StringList {
+struct NameList : public XMLStringVector {
     bool hasName( NPCharacter * );
 };
 

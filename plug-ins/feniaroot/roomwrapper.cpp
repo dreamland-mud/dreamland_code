@@ -226,32 +226,32 @@ static int get_door_argument( const RegisterList &args )
     return door;
 }
 
-NMI_GET( RoomWrapper, north, "")
+NMI_GET( RoomWrapper, north, "комната на север отсюда или null")
 {
     checkTarget( );
     return get_direction( target, DIR_NORTH );
 }
-NMI_GET( RoomWrapper, south, "")
+NMI_GET( RoomWrapper, south, "комната на юг отсюда или null")
 {
     checkTarget( );
     return get_direction( target, DIR_SOUTH );
 }
-NMI_GET( RoomWrapper, east, "")
+NMI_GET( RoomWrapper, east, "комната на восток отсюда или null")
 {
     checkTarget( );
     return get_direction( target, DIR_EAST );
 }
-NMI_GET( RoomWrapper, west, "")
+NMI_GET( RoomWrapper, west, "комната на запад отсюда или null")
 {
     checkTarget( );
     return get_direction( target, DIR_WEST );
 }
-NMI_GET( RoomWrapper, up, "")
+NMI_GET( RoomWrapper, up, "комната вверх отсюда или null")
 {
     checkTarget( );
     return get_direction( target, DIR_UP );
 }
-NMI_GET( RoomWrapper, down, "")
+NMI_GET( RoomWrapper, down, "комната вниз отсюда или null")
 {
     checkTarget( );
     return get_direction( target, DIR_DOWN );
@@ -261,7 +261,31 @@ NMI_GET( RoomWrapper, down, "")
  * METHODS
  */
 
-NMI_INVOKE(RoomWrapper, doorTo, "вернет номер двери, ведущей из этой комнаты в указанную" )
+NMI_INVOKE( RoomWrapper, exits, "(ch) список номеров всех выходов для этого персонажа")
+{
+    RegList::Pointer list(NEW);
+    
+    checkTarget( );
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    Character *ch = args2character(args);
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit;
+        Room *room;
+        if (!( pexit = target->exit[door] ))
+            continue;
+        if (!( room = pexit->u1.to_room ))
+            continue;
+        if (!ch->can_see( room ))
+            continue;
+        list->push_back(Register(door));
+    }
+
+    return Register( listObj );
+}
+
+NMI_INVOKE(RoomWrapper, doorTo, "(room) вернет номер двери, ведущей из этой комнаты в указанную" )
 {
     Room *room;
     
@@ -278,7 +302,7 @@ NMI_INVOKE(RoomWrapper, doorTo, "вернет номер двери, ведущ�
     return -1;
 }
 
-NMI_INVOKE( RoomWrapper, getRoom, "" )
+NMI_INVOKE( RoomWrapper, getRoom, "(имя или номер выхода) вернет комнату по этому направлению" )
 {
     int door;
     
@@ -396,7 +420,7 @@ NMI_INVOKE(RoomWrapper, zecho, "сообщение для всех в этой �
     return Register( );
 }
 
-NMI_INVOKE(RoomWrapper, get_obj_vnum, "поиск объекта в комнате по его внуму" )
+NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum) поиск объекта в комнате по его внуму" )
 {
     int vnum;
     ::Object *obj;
@@ -413,6 +437,17 @@ NMI_INVOKE(RoomWrapper, get_obj_vnum, "поиск объекта в комнат
             return WrapperManager::getThis( )->getWrapper(obj); 
 
     return Register( );
+}
+
+NMI_INVOKE(RoomWrapper, get_obj_type, "(type) поиск объекта в комнате по его типу, item type" )
+{
+    checkTarget( );
+
+    int itemType = args2number(args);
+    ::Object *obj = get_obj_room_type(target, itemType);
+    if (!obj)
+        return Register();
+    return WrapperManager::getThis( )->getWrapper(obj); 
 }
 
 NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объектов в комнате по внуму" )
