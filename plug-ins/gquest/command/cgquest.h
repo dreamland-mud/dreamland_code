@@ -22,6 +22,11 @@ public:
         
         virtual void run( Character*, const DLString& constArguments );
 
+        static bool gqprog( PCharacter *, Scripting::IdRef & );
+        static bool gqprog_info( PCharacter * );
+        static bool gqprog_progress( PCharacter * );
+        static bool gqprog_notify( PCharacter * );
+
 private:
         void doInfo( PCharacter * );
         void doProgress( PCharacter * );
@@ -37,9 +42,6 @@ private:
         void doAuto( PCharacter *, DLString& );
         void doRead( PCharacter *, DLString& );
 
-        bool gqprog( PCharacter *, Scripting::IdRef & );
-        bool gqprog_info( PCharacter * );
-        bool gqprog_progress( PCharacter * );
         void usage( PCharacter * );
         
         static const DLString COMMAND_NAME;

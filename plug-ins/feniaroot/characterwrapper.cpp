@@ -788,6 +788,13 @@ NMI_SET( CharacterWrapper, hometown, "" )
         target->getPC( )->setHometown( wrapper_cast<HometownWrapper>(arg)->name );
 }
 
+NMI_SET(CharacterWrapper, on, "объект, мебель, на которой сидим")
+{
+    checkTarget( );
+    ::Object *obj = arg2item(arg);
+    target->on = obj;
+}
+
 NMI_SET( CharacterWrapper, russianName, "" )
 {
     checkTarget( );

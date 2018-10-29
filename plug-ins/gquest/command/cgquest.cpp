@@ -114,6 +114,12 @@ bool CGQuest::gqprog_progress( PCharacter *ch )
     return gqprog( ch, ID_PROGRESS );
 }
 
+bool CGQuest::gqprog_notify( PCharacter *ch )
+{
+    static Scripting::IdRef ID_NOTIFY( "notify" );
+    return gqprog( ch, ID_NOTIFY );
+}
+
 void CGQuest::doInfo( PCharacter *ch ) 
 {
     GlobalQuestInfo::Pointer gqi;

@@ -9,6 +9,7 @@
 #include "globalquest.h"
 #include "globalquestinfo.h"
 #include "gqchannel.h"
+#include "cgquest.h"
 
 #include "pcharacter.h"
 #include "merc.h"
@@ -62,5 +63,7 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
         GQChannel::pecho( ch, "\r\nГлобальные квесты, в которых ты можешь принять участие: ");
         GQChannel::pecho( ch, buf );
     }
+
+    CGQuest::gqprog_notify(ch->getPC());
 }
     
