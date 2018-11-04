@@ -11,6 +11,9 @@
 #include "admincommand.h"
 #include "commonattributes.h"
 #include "dreamland.h"
+#include "dlfileop.h"
+#include "dlfilestream.h"
+#include "dldirectory.h"
 
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
@@ -158,6 +161,40 @@ CMDADM( codesource )
         return;
     }
     
+    if(cmd.strPrefix("write")) {
+        if (!pch->isCoder( )) {
+            ch->send_to( "Check your privilege.\r\n");
+            return;
+        }
+
+        CodeSource::Manager::iterator i;
+        
+        try {
+            i = CodeSource::manager->find( args.toInt( ) );
+        } catch( ... ) {
+            return;
+        }
+
+        if(i == CodeSource::manager->end( ) ) {
+            page_to_char( "no such CodeSource\r\n", ch );
+            return;
+        }
+
+        ostringstream ostr;
+        string::const_iterator c;
+        for(c = i->content.begin( ); c != i->content.end( ); c++ ) 
+        {
+            ostr << *c;
+        }
+       
+        DLString filecontent = ostr.str();
+        DLDirectory dir( dreamland->getTableDir( ), "fenia.local" );
+        DLFileStream( dir, i->name, ".f++" ).fromString( filecontent );
+        ch->printf("Codesource %d is saved as  %s/%s.f++.\r\n",  
+                     args.toInt(), dir.getAbsolutePath().c_str(), i->name.c_str());
+        return;
+    }
+
     if(cmd.strPrefix("show")) {
         XMLAttributeCodeSource::Pointer csa = pch->getAttributes( 
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
