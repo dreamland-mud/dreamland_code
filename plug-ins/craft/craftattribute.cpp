@@ -51,8 +51,10 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
         if (prof) {
             ostringstream buf;
+            ExperienceCalculator::Pointer calc = prof->getCalculator(args.pch);
+
             buf << "Профессия: " << prof->getNameFor(args.pch) << " уровня " << p->second.level
-                << ", опыт " << prof->getExpToLevel(args.pch) << "/" << prof->getExpThisLevel(args.pch);
+                << ", опыт " << calc->expToLevel() << "/" << calc->expThisLevel();
             args.lines.push_back( buf.str() );
         }
     }

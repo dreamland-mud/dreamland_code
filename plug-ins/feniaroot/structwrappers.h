@@ -112,6 +112,9 @@ public:
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
+
+protected:
+    CraftProfession * getTarget() const;
 };
 
 /*----------------------------------------------------------------------

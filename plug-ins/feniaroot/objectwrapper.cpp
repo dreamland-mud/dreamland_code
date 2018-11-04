@@ -532,6 +532,17 @@ NMI_INVOKE( ObjectWrapper, unequip, "снимает шмотку и кладет
 
 /*-----------------------------------------------------------------------*/
 
+NMI_INVOKE( ObjectWrapper, isAffected, "находится ли предмет под воздействием аффекта с данным именем" )
+{
+    Skill *skill = args2skill(args);
+    
+    checkTarget( );
+
+    if (skill)
+        return target->isAffected( skill->getIndex( ) );
+    else
+        return false;
+}
 
 NMI_GET( ObjectWrapper, affected, "" )
 {

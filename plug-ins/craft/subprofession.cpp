@@ -1,7 +1,7 @@
 #include "subprofession.h"
 #include "craft_utils.h"
 #include "craftattribute.h"
-
+#include "logstream.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
 #include "alignment.h"
@@ -85,6 +85,86 @@ DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) co
         return getName( );
 }
 
+int ExperienceCalculator::expPerLevel(int level_) const
+{
+    throw Exception("not implemented");
+}
+int ExperienceCalculator::expThisLevel() const
+{
+    throw Exception("not implemented");
+}
+int ExperienceCalculator::expToLevel(int level_) const
+{
+    throw Exception("not implemented");
+}
+int ExperienceCalculator::totalExp() const
+{
+    throw Exception("not implemented");
+}
+
+struct DefaultExperienceCalculator : public ExperienceCalculator {
+    typedef ::Pointer<DefaultExperienceCalculator> Pointer;
+
+    DefaultExperienceCalculator(PCharacter *ch, const CraftProfession *profession) 
+    {
+        XMLAttributeCraft::Pointer attr = craft_attr(ch);
+        level = attr->proficiencyLevel(profession->getName());
+        totalExp_ = attr->exp(profession->getName());
+        baseExp = profession->getBaseExp();
+        maxLevel = profession->getMaxLevel();
+    }
+    
+    /**
+     * Return total amount of experience you needed to gain from level 1 to reach this particular level.
+     * If level is unspecified, current one is assumed.
+     */
+    virtual int expPerLevel(int level_ = -1) const
+    {
+        if (level_ < 0)
+            level_ = level;
+            
+        // Summ[x=1..lvl] (base + maxLevel * x)
+        // TNL: base + maxLevel * maxLevel * (level + 1)
+        return baseExp * level_ + maxLevel * maxLevel * level_ * (level_ + 1) / 2;
+    }
+
+    /**
+     * Return total amount of experience you need to gain at your current proficiency
+     * level, in order to progress to the next one.
+     */
+    virtual int expThisLevel() const
+    {
+        return expPerLevel(level + 1) - expPerLevel(level);
+    }
+
+    /**
+     * Return how much exp is left to gain to reach next level after this particular one.
+     * If level is unspecified, current one is assumed.
+     */
+    virtual int expToLevel(int level_ = -1) const
+    {
+        if (level_ < 0)
+            level_ = level;
+
+        int totalExpForNextLevel = expPerLevel(level_ + 1);
+        return max(0, totalExpForNextLevel - totalExp_);
+    }
+    
+    /**
+     * Return total amount of experience gained so far.
+     */
+    virtual int totalExp() const
+    {
+        return totalExp_;
+    }
+
+protected:
+    int level;
+    int totalExp_;
+    int baseExp;
+    int maxLevel;
+};
+
 int CraftProfession::getLevel( PCharacter *ch ) const
 {
     return craft_attr(ch)->proficiencyLevel(getName());
@@ -95,58 +175,43 @@ void CraftProfession::setLevel( PCharacter *ch, int level ) const
     craft_attr(ch)->setProficiencyLevel(getName(), level);
 }
 
-int CraftProfession::getExpToLevel( PCharacter *ch, int level ) const
-{ 
-    if (level < 0)
-        level = getLevel(ch);
-    return max(0, getExpPerLevel(ch,  level + 1) - getTotalExp(ch));
-}
-
-int CraftProfession::getExpThisLevel( PCharacter *ch ) const
+ExperienceCalculator::Pointer CraftProfession::getCalculator(PCharacter *ch) const
 {
-    int level = getLevel(ch);
-    return getExpPerLevel(ch, level + 1) - getExpPerLevel(ch, level);
+    return DefaultExperienceCalculator::Pointer(NEW, ch, this);
 }
 
-int CraftProfession::getExpPerLevel( PCharacter *ch, int level ) const
-{
-    if (level < 0)
-        level = getLevel(ch);
-
-    // Summ[x=1..lvl] (base + maxLevel * x)
-    // TNL: base + maxLevel * maxLevel * (level + 1)
-   return baseExp * level + maxLevel * maxLevel * level * (level + 1) / 2;
-}
-
-int CraftProfession::getTotalExp( PCharacter *ch ) const
-{
-    return craft_attr(ch)->exp(getName());
-}
-
-int CraftProfession::gainExp( PCharacter *ch, int xp ) const
+void CraftProfession::gainExp( PCharacter *ch, int xp ) const
 {
     XMLAttributeCraft::Pointer attr = craft_attr(ch);
     int level = attr->proficiencyLevel(getName());
-    int total_xp = attr->gainExp(getName(), xp);
+
+    attr->gainExp(getName(), xp);
 
     ch->pecho("Ты получаешь %1$d очк%1$Iо|а|ов опыта в профессии %2$N2.", xp, getRusName().c_str());
 
-    if (level >= maxLevel)
-            return total_xp;
-    
-    while (getExpToLevel(ch) <= 0) {
+    if (level >= maxLevel) {
+        ch->save();
+        return;
+    }
+   
+    ExperienceCalculator::Pointer calc = getCalculator(ch);
+ 
+    while (calc->expToLevel(level) <= 0) {
         level++;
         attr->setProficiencyLevel(getName(), level);
         ch->pecho("{CТы достигаешь {Y%1$dго{C уровня мастерства в профессии {Y%2$N2{C!",
                    level, getRusName().c_str());
 
-        infonet("{CРадостный голос из $o2: {W$C1 дости$Gгло|г|гла новой ступени профессионального мастерства.{x", 
+        infonet("{CРадостный голос из $o2: {W$C1 дости$Gгло|г|гла новой ступени мастерства.{x", 
                  ch, 0);
 
         wiznet(WIZ_LEVELS, 0, 0, 
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
     }
+
+    ch->updateSkills();
+    ch->save();
 }
 
 /*-------------------------------------------------------------------

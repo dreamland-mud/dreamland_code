@@ -16,6 +16,7 @@ class Character;
 class PCharacter;
 class Room;
 class Wearlocation;
+class Skill;
 struct obj_index_data;
 struct mob_index_data;
 
@@ -38,6 +39,7 @@ Character * arg2character( const Register & );
 PCharacter * arg2player( const Register & );
 Character * args2character( const RegisterList & );
 PCharacter * args2player( const RegisterList & );
+Skill * args2skill( const RegisterList & );
 
 Character *argnum2character(const RegisterList &args, int num);
 PCharacter *argnum2player(const RegisterList &args, int num);

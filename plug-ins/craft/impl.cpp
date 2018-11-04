@@ -2,19 +2,34 @@
 #include "logstream.h"
 #include "class.h"
 #include "dlxmlloader.h"
+#include "affecthandlertemplate.h"
 #include "xmltableloaderplugin.h"
 #include "xmlattributeplugin.h"
 #include "mocregistrator.h"
 #include "character.h"
+#include "object.h"
 #include "subprofession.h"
 #include "craftattribute.h"
 #include "craftskill.h"
 #include "craftwearloc.h"
+#include "dl_math.h"
 
 TABLE_LOADER(CraftProfessionLoader, "craft-professions", "CraftProfession");
 TABLE_LOADER(CraftSkillLoader, "craft-skills", "skill");
 TABLE_LOADER(CraftWearlocLoader, "craft-wearlocs", "Wearlocation");
 
+AFFECT_DECL(RemoveTattoo);
+VOID_AFFECT(RemoveTattoo)::update( Object *obj, Affect *paf ) 
+{ 
+    DefaultAffectHandler::update( obj, paf );
+
+    if (obj->carried_by) {
+        if (chance(50))
+            obj->carried_by->pecho("%^O1 бледнеет.", obj);
+        else 
+            obj->carried_by->pecho("Краски на %O6 постепенно тускнеют.", obj);
+    }
+}
 
 class CraftProfessionRegistrator : public Plugin {
 public:

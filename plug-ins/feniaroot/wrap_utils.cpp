@@ -12,6 +12,8 @@
 #include "race.h"
 #include "object.h"
 #include "room.h"
+#include "skill.h" 
+#include "skillmanager.h" 
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -147,5 +149,13 @@ PCharacter *argnum2player(const RegisterList &args, int num)
 int argnum2number(const RegisterList &args, int num)
 {
     return argnum(args, num).toNumber();
+}
+
+Skill * args2skill( const RegisterList &args )
+{
+    if (args.size( ) != 1)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    return skillManager->findExisting( args.front( ).toString( ) );
 }
 

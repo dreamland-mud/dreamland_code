@@ -651,6 +651,14 @@ Scripting::Register CraftProfessionWrapper::wrap( const DLString &name )
     return Scripting::Register( sobj );
 }
 
+CraftProfession * CraftProfessionWrapper::getTarget() const
+{
+    CraftProfession::Pointer prof = craftProfessionManager->get(name);
+    if (!prof)
+        throw Scripting::Exception("Profession not found");
+    return *prof;
+}
+
 NMI_INVOKE( CraftProfessionWrapper, api, "печатает этот api" )
 {
     ostringstream buf;
@@ -661,17 +669,17 @@ NMI_INVOKE( CraftProfessionWrapper, api, "печатает этот api" )
 
 NMI_GET( CraftProfessionWrapper, name, "название профессии" ) 
 {
-    return craftProfessionManager->get( name )->getName( );
+    return getTarget()->getName( );
 }
 
 NMI_GET( CraftProfessionWrapper, nameRus, "название по-русски с падежами" ) 
 {
-    return craftProfessionManager->get( name )->getRusName( );
+    return getTarget()->getRusName( );
 }
 
 NMI_GET( CraftProfessionWrapper, nameMlt, "название во множественном числе" ) 
 {
-    return craftProfessionManager->get( name )->getMltName( );
+    return getTarget()->getMltName( );
 }
 
 NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить персонажу уровень мастерства в этой профессии" )
@@ -681,26 +689,26 @@ NMI_INVOKE( CraftProfessionWrapper, setLevel, "(ch, level) установить 
     
     PCharacter *ch = arg2player(args.front());
     int level = args.back().toNumber();
-    craftProfessionManager->get(name)->setLevel(ch, level);
+    getTarget()->setLevel(ch, level);
     return Scripting::Register();
 }
 
 NMI_INVOKE( CraftProfessionWrapper, getLevel, "(ch) получить уровень мастерства персонажа в этой профессии" )
 {
     PCharacter *ch = args2player(args);
-    return craftProfessionManager->get( name )->getLevel(ch);
+    return getTarget()->getLevel(ch);
 }
 
 NMI_INVOKE( CraftProfessionWrapper, getTotalExp, "(ch) суммарный опыт персонажа в этой профессии" )
 {
     PCharacter *ch = args2player(args);
-    return craftProfessionManager->get( name )->getTotalExp(ch);
+    return getTarget()->getCalculator(ch)->totalExp();
 }
 
 NMI_INVOKE( CraftProfessionWrapper, getExpToLevel, "(ch) кол-во опыта до следующего уровня мастерства в этой профессии" )
 {
     PCharacter *ch = args2player(args);
-    return craftProfessionManager->get( name )->getExpToLevel(ch);
+    return getTarget()->getCalculator(ch)->expToLevel();
 }
 
 NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp) заработать очков опыта в этой профессии" )
@@ -710,7 +718,7 @@ NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp) заработать о�
     
     PCharacter *ch = arg2player(args.front());
     int exp = args.back().toNumber();
-    craftProfessionManager->get(name)->gainExp(ch, exp);
+    getTarget()->gainExp(ch, exp);
     return Scripting::Register();
 }
 
