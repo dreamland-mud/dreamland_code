@@ -701,6 +701,11 @@ void obj_update( void )
                 paf->duration--;
                 if (number_range(0,4) == 0 && paf->level > 0)
                     paf->level--;  /* spell strength fades with time */
+
+                // Issue periodic message or action.
+                if (paf->type->getAffect( )) 
+                    paf->type->getAffect( )->update( obj, paf );
+
                 room_to_save( obj );
             }
             else if ( paf->duration < 0 )
@@ -803,6 +808,7 @@ void obj_update( void )
             message = "%1$^O1 исчеза%1$nет|ют в дымке.";
             break;
         case ITEM_FURNITURE:
+        case ITEM_TATTOO:
             message = "%1$^O1 исчеза%1$nет|ют.";
             break;
         case ITEM_CONTAINER:
