@@ -172,7 +172,16 @@ int CraftProfession::getLevel( PCharacter *ch ) const
 
 void CraftProfession::setLevel( PCharacter *ch, int level ) const
 {
-    craft_attr(ch)->setProficiencyLevel(getName(), level);
+    XMLAttributeCraft::Pointer attr = craft_attr(ch);
+    // Set the new level.
+    attr->setProficiencyLevel(getName(), level);
+
+    // Update exp so that remaining tnl is never greater than total exp to next level.
+    ExperienceCalculator::Pointer calc = getCalculator(ch);
+    int totalForNextLevel = calc->expThisLevel();
+    int remainingForNextLevel = calc->expToLevel();
+    if (remainingForNextLevel > totalForNextLevel)
+        attr->gainExp(getName(), remainingForNextLevel - totalForNextLevel);
 }
 
 ExperienceCalculator::Pointer CraftProfession::getCalculator(PCharacter *ch) const
