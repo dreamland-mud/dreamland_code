@@ -12,6 +12,7 @@
 #include "skill.h"
 #include "skillmanager.h"
 #include "loadsave.h"
+#include "recipeflags.h"
 #include "act_lock.h"
 #include "liquid.h"
 #include "def.h"
@@ -42,6 +43,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch, "[v3] Spell to learn    : %s\n\r", get_skill_name( obj->value[3] ));
         ptc(ch, "[v4] Spell to learn    : %s\n\r", get_skill_name( obj->value[4] ));
         break;
+
     case ITEM_TEXTBOOK:
         ptc(ch, "[v0] Total pages       : [%d]\n\r", obj->value[0]);
         ptc(ch, "[v1] Used pages        : [%d]\n\r", obj->value[1]);
@@ -49,6 +51,12 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch, "[v3] Skill to learn    : %s\n\r", get_skill_name( obj->value[3] ));
         ptc(ch, "[v4] Skill to learn    : %s\n\r", get_skill_name( obj->value[4] ));
         break;
+
+    case ITEM_RECIPE:
+        ptc(ch, "[v0] Recipe flags      : %s\r\n", recipe_flags.names(obj->value[0]).c_str());
+        ptc(ch, "[v2] Complexity        : [%d]\r\n", obj->value[2]);
+        break;
+
     case ITEM_MAP:
         ptc(ch, "[v0] Don't rot in inventory : [%d]\n\r", obj->value[0]);
         break;
@@ -259,7 +267,29 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             break;
         }
         break;
-        
+       
+    case ITEM_RECIPE:
+        switch (value_num) {
+            int value;
+        default:
+            stc("Value not used\r\n\r", ch);
+            return false;
+        case 0:
+            if ((value = recipe_flags.bitstring( argument )) != NO_FLAG)
+                TOGGLE_BIT(pObj->value[0], value);
+            else {
+                show_help(ch, "recipe");
+                return false;
+            }
+            stc("Recipe flags toggled.\n\r\n\r", ch);
+            break;
+        case 2:
+            stc("Recipe complexity set.\r\n", ch);
+            pObj->value[2] = atoi(argument);
+            break;
+        }
+        break;
+ 
     case ITEM_MAP:
         switch (value_num) {
             int i;

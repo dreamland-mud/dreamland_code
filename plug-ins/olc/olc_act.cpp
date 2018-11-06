@@ -37,6 +37,7 @@
 #include "olc.h"
 #include "loadsave.h"
 #include "damageflags.h"
+#include "recipeflags.h"
 #include "material.h"
 #include "def.h"
 
@@ -96,6 +97,7 @@ const struct olc_help_type help_table[] =
     {"furniture", &furniture_flags, "Типы диванов и лежаков."},
     {"liquid", &liq_table, "Жидкости"},
     {"drink", &drink_flags, "Емкости для жидкостей"},
+    {"recipe", &recipe_flags, "Рецепты."},
     {NULL, NULL, NULL}
 };
 

@@ -470,6 +470,7 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
         case ITEM_JEWELRY:
         case ITEM_TATTOO:
         case ITEM_SPELLBOOK:
+        case ITEM_RECIPE:
         case ITEM_TEXTBOOK:
         case ITEM_PARCHMENT:
                 break;

@@ -93,6 +93,7 @@
 
 #include "occupations.h"
 #include "raceflags.h"
+#include "recipeflags.h"
 #include "gsn_plugin.h"
 #include "def.h"
 #include "act_move.h"
@@ -2647,6 +2648,11 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     case ITEM_TEXTBOOK:
         buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
             << "Максимальное качество записей в учебнике: " << obj->value[2] << "." << endl;
+        break;
+
+    case ITEM_RECIPE:
+        buf << "Сложность рецепта: " << obj->value[2] << ". " 
+            << "Применяется для создания " << recipe_flags.messages(obj->value[0], true) << "." << endl;
         break;
 
     case ITEM_SCROLL:

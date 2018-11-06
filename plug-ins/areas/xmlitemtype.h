@@ -114,6 +114,14 @@ public:
     XML_VARIABLE XMLFlagsNoEmpty specType;
 };
 
+class XMLItemTypeValuesRecipe : public XMLVariableContainer {
+XML_OBJECT
+public:
+    XMLItemTypeValuesRecipe();
+    XML_VARIABLE XMLFlagsNoEmpty flags;
+    XML_VARIABLE XMLInteger complexity;
+};    
+
 class XMLItemTypeValuesArmor : public XMLVariableContainer {
 XML_OBJECT
 public:

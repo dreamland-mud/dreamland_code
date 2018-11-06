@@ -5,6 +5,7 @@
 
 #include "xmlitemtype.h"
 #include "itemflags.h"
+#include "recipeflags.h"
 #include "autoflags.h"
 
 bool 
@@ -156,6 +157,15 @@ XMLItemType::toXML(XMLNode::Pointer &parent) const
             tmp.quality.setValue(v[2]);
             tmp.skill0 = v[3];
             tmp.skill1 = v[4];
+            tmp.toXML(parent);
+        }
+        break;
+    
+    case ITEM_RECIPE:
+        {
+            XMLItemTypeValuesRecipe tmp;
+            tmp.flags.setValue(v[0]);
+            tmp.complexity = v[2];
             tmp.toXML(parent);
         }
         break;
@@ -354,6 +364,15 @@ XMLItemType::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
         }
         break;
 
+    case ITEM_RECIPE:
+        {
+            XMLItemTypeValuesRecipe tmp;
+            tmp.fromXML(parent);
+            v[0] = tmp.flags.getValue();
+            v[2] = tmp.complexity.getValue();
+        }
+        break;
+
     case ITEM_KEY:
         {
             XMLItemTypeValuesKey tmp;
@@ -425,3 +444,8 @@ XMLItemTypeValuesWeapon::XMLItemTypeValuesWeapon( ) :
             specType(0, &weapon_type2)
 {
 }
+
+XMLItemTypeValuesRecipe::XMLItemTypeValuesRecipe() : flags(0, &recipe_flags)
+{
+}
+

@@ -13,6 +13,7 @@ libloadsave_la_SOURCES = \
 affectflags.cpp \
 compatflags.cpp \
 itemflags.cpp \
+recipeflags.cpp \
 affects.cpp \
 creation.cpp \
 extraction.cpp \
@@ -56,10 +57,14 @@ itemflags.h: itemflags.conf
 compatflags.cpp: compatflags.conf compatflags.h
 compatflags.h: compatflags.conf
 
-libloadsave_la_moc_xml.cpp : compatflags.h itemflags.h affectflags.h
+recipeflags.cpp: recipeflags.conf recipeflags.h
+recipeflags.h: recipeflags.conf
+
+libloadsave_la_moc_xml.cpp : compatflags.h itemflags.h affectflags.h recipeflags.h
 
 CLEANFILES = \
 affectflags.cpp $(top_builddir)/src/affectflags.h \
 compatflags.cpp $(top_builddir)/src/compatflags.h \
+recipeflags.cpp $(top_builddir)/src/recipeflags.h \
 itemflags.cpp $(top_builddir)/src/itemflags.h 
 

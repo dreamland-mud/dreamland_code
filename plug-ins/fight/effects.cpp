@@ -151,6 +151,7 @@ void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                 case ITEM_SCROLL:
                 case ITEM_SPELLBOOK:
                 case ITEM_TEXTBOOK:
+                case ITEM_RECIPE:
                         chance += 10;
                         msg = "$o1 обращается в пепел.";
                         break;
@@ -427,6 +428,7 @@ void fire_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
         case ITEM_SCROLL:
         case ITEM_PARCHMENT:
         case ITEM_SPELLBOOK:
+        case ITEM_RECIPE:
         case ITEM_TEXTBOOK:
             chance += 50;
             msg = "$o1 трескается и сгорает!";
@@ -767,6 +769,7 @@ void sand_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
                         break;
                 case ITEM_SCROLL:
                 case ITEM_SPELLBOOK:
+                case ITEM_RECIPE:
                 case ITEM_TEXTBOOK:
                         chance += 20;
                         msg = "$o1 покрывается слоем песка.";
@@ -952,6 +955,7 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                                 break;
                         case ITEM_SCROLL:
                         case ITEM_SPELLBOOK:
+                        case ITEM_RECIPE:
                         case ITEM_TEXTBOOK:
                                 chance += 50;
                                 msg = "$o1 разрывается на клочки!";

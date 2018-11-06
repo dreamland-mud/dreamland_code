@@ -29,6 +29,7 @@
 #include "gsn_plugin.h"
 #include "handler.h"
 #include "comm.h"
+#include "recipeflags.h"
 #include "act_move.h"
 #include "act_lock.h"
 
@@ -884,7 +885,20 @@ SKILL_RUNP( lore )
         ch->printf( "Страниц: %d из %d. Максимальное качество записей %d%%.\r\n",
                      value1, value0, value2 ); 
         break;
-
+    
+    case ITEM_RECIPE:
+        if (learned < 85) {
+            value0 = obj->value[0];
+            value2 = number_fuzzy( obj->value[2] );
+        }
+        else {
+            value0 = obj->value[0];
+            value2 = obj->value[2];
+        }
+        ch->printf( "Сложность рецепта: %d. Применяется для создания %s.\r\n",
+                     value2, recipe_flags.messages(value0, true).c_str());
+        break;
+        
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
