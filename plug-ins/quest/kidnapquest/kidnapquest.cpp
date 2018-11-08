@@ -61,8 +61,10 @@ void KidnapQuest::create( PCharacter *pch, NPCharacter *questman )
     }
     
     time = std::max( 6, range / 10 );
+
     if (rated_as_newbie( pch ))
-    time *= 2;
+        time *= 2;
+
     setTime( pch, time );
     
     getScenario( ).onQuestStart( pch, questman, king );

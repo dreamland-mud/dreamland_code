@@ -66,6 +66,10 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     }
 
     time = number_range( 5, 10 ); 
+
+    if (rated_as_newbie( pch ))
+        time *= 2;
+
     setTime( pch, time );
 
     tell_fmt( "{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи.",  

@@ -30,6 +30,12 @@ bool InvasionScenario::canStart( )
 
 bool InvasionScenario::checkRoom( Room *room )
 {
+    if (room->clan != clan_none)
+        return false;
+
+    if (!room->guilds.empty( ))
+        return false;
+
     return !IS_SET(room->room_flags, ROOM_NO_QUEST|ROOM_MANSION|ROOM_NO_MOB|ROOM_NO_DAMAGE|ROOM_SAFE|ROOM_SOLITARY)
         && !IS_SET(room->room_flags, ROOM_NEWBIES_ONLY|ROOM_GODS_ONLY|ROOM_NOWHERE);
 }

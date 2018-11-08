@@ -193,6 +193,8 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
         ch->pecho( "%1$^O1 наполне%1$Gно|н|на|ны.", obj );
     }
+    else
+        ch->pecho( "%1$^O1  уже заполне%1$Gно|н|на|ны.", obj );
 
 
 }
