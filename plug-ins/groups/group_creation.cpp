@@ -152,6 +152,11 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     else
         vnum = OBJ_VNUM_SPRING;
 
+    if (get_obj_room_vnum( ch->in_room, vnum )) {
+        ch->send_to("Ты хочешь сделать тут озеро?\r\n");
+        return;
+    }
+
     spring = create_object( get_obj_index( vnum ), 0 );
     spring->timer = level;
     obj_to_room( spring, ch->in_room );
@@ -194,7 +199,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
         ch->pecho( "%1$^O1 наполне%1$Gно|н|на|ны.", obj );
     }
     else
-        ch->pecho( "%1$^O1  уже заполне%1$Gно|н|на|ны.", obj );
+        ch->pecho( "%1$^O1 уже заполне%1$Gно|н|на|ны.", obj );
 
 
 }

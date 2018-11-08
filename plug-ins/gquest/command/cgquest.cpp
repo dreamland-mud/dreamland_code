@@ -613,7 +613,7 @@ void CGQuest::usage( PCharacter *ch )
         << "                  {w - <arg> указывает имя сценария, если они поддерживаются квестом" << endl
         << "                  {w - <playerCnt> имитирует запуск квеста как будто онлайн такое кол-во игроков" << endl
         << "{W{lEgquest{lRгквест{lx {lEstop{lRстоп{lx <id>  {w - завершение уже запущенного квеста" << endl
-        << "{W{lEgquest{lRгквест{lx {lEtime{lвремя{lx <id> <time>{w - установить время запущенного квеста в <time> минут" << endl
+        << "{W{lEgquest{lRгквест{lx {lEtime{lRвремя{lx <id> <time>{w - установить время запущенного квеста в <time> минут" << endl
         << "{W{lEgquest{lRгквест{lx {lEtalk{lRговорить{lx <text>{w - посылка сообщения в канал [Global Quest]" << endl
         << "{W{lEgquest{lRгквест{lx {lEtalk{lRговорить{lx <id> <text>{w - сообщение в канал [Global Quest: <имя квеста>]" << endl
         << "{W{lEgquest{lRгквест{lx {lEauto{lRавто{lx <id> [{lEon|off{lRвкл|выкл{lx] [<time>]" << endl
