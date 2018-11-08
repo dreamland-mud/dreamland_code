@@ -12,6 +12,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
+#include "clanreference.h"
 
 #include "mercdb.h"
 #include "act.h"
@@ -19,6 +20,7 @@
 #include "descriptor.h"
 #include "def.h"
 
+CLAN(none);
 
 /*--------------------------------------------------------------------------
  * Invasion Scenario 

@@ -16,6 +16,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "selfrate.h"
 
 #include "handler.h"
 #include "act.h"
