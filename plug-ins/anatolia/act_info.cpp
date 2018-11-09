@@ -1286,7 +1286,7 @@ CMDRUNP( request )
         ch->move -= 10;
         ch->move = max((int)ch->move, 0);
 
-        if (victim->getRealLevel( ) >= ch->getRealLevel( ) + 10 || victim->getRealLevel( ) >= ch->getRealLevel( ) * 2)
+        if (victim->getModifyLevel( ) >= ch->getModifyLevel( ) + 10 || victim->getModifyLevel( ) >= ch->getModifyLevel( ) * 2)
         {
                 do_say(victim, "Всему свое время, малыш.");
                 return;

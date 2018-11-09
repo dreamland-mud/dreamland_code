@@ -494,6 +494,7 @@ bool QuestScrollBehavior::examine( Character *ch )
                                    data.learned + s->second,
                                    skill->getMaximum( ch ));
             s->second = 0;
+            extract_obj( obj );
         }
     }
     
