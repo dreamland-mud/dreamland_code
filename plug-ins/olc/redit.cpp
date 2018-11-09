@@ -26,6 +26,7 @@
 #include "act.h"
 #include "interp.h"
 #include "clanreference.h"
+#include "profession.h"
 #include "handler.h"
 #include "act_move.h"
 #include "update_areas.h"
@@ -279,7 +280,9 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
               pRoom->name, pRoom->area->vnum, pRoom->area->name);
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
     if(pRoom->clan != clan_none)
-        ptc(ch, "Clan:         [{W%s{x]\n\r", pRoom->clan->getName( ).c_str( ));
+        ptc(ch, "Clan:       [{W%s{x]\n\r", pRoom->clan->getName( ).c_str( ));
+    if (!pRoom->guilds.empty()) 
+        ptc(ch, "Guilds:     [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
     if(pRoom->liquid != liq_none)
         ptc(ch, "Liquid: [{W%s{x]\n\r", pRoom->liquid->getName( ).c_str( ));
     ptc(ch, "Sector:     [{W%s{x]\n\r",
@@ -839,11 +842,17 @@ REDIT(clan)
 
     if (argument[0] == '\0') {
         stc("Syntax:  clan [name]\n\r", ch);
+        stc("         clan clear\n\r", ch);
         return false;
     }
 
+    if (!str_cmp(argument, "clear")) {
+        pRoom->clan.assign(clan_none);
+        stc("Clan cleared.\n\r", ch);
+        return true;
+    }
+
     clan = ClanManager::getThis( )->findUnstrict( argument );
-    
     if (!clan) {
         stc("Clan not found\n\r", ch);
         return false;
@@ -852,6 +861,36 @@ REDIT(clan)
     pRoom->clan.assign( *clan );
 
     stc("Clan set.\n\r", ch);
+    return true;
+}
+
+REDIT(guild)
+{
+    Room *pRoom;
+    Profession *prof;
+
+    EDIT_ROOM(ch, pRoom);
+
+    if (argument[0] == '\0') {
+        stc("Syntax:  guild [name]\n\r", ch);
+        stc("         guild clear\n\r", ch);
+        return false;
+    }
+    
+    if (!str_cmp(argument, "clear")) {
+        pRoom->guilds.clear();
+        stc("All guilds cleared.\n\r", ch);
+        return true;
+    }
+
+    prof = professionManager->findUnstrict( argument );
+    if (!prof) {
+        stc("Guild (profession) not found.\n\r", ch);
+        return false;
+    }
+
+    pRoom->guilds.set(*prof);
+    stc("Guild set.\n\r", ch);
     return true;
 }
 
