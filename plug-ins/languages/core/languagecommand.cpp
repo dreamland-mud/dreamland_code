@@ -77,11 +77,32 @@ void Language::run( Character *ach, const DLString &constArguments )
     }
 
     if (arg_oneof( arg, "forget", "забыть" )) {
-        doForget( ch );
+        doForget( ch, arguments );
+        return;
+    }
+
+    if (arg_oneof( arg, "remember", "запомнить" )) {
+        doRemember( ch, arguments );
         return;
     }
     
     doUtter( ch, arg, arguments );
+}
+
+static void locateTargets(WordEffect::Pointer effect, PCharacter *ch, Character *&victim, Object *&obj, const DLString &arg2)
+{
+    if (effect && effect->isObject()) {
+        obj = get_obj_carry(ch, arg2);
+        return;
+    }
+
+    if (arg2.empty()) {
+        if (effect && effect->isOffensive()) 
+            victim = ch->fighting;
+        return;
+    }
+    
+    victim = get_char_room(ch, arg2);
 }
 
 void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
@@ -112,19 +133,9 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
 
     wcontainer = locateWord( word, ch, arg1 );
     effect = word.getEffect( );
-
-    if (!arg2.empty( )) {
-        if (effect && effect->isObject( )) {
-            obj = get_obj_carry( ch, arg2 );
-        }
-        else {
-            if (!( victim = get_char_room( ch, arg2 ) )) {
-                victim = ch;
-                fMiss = true;
-            }
-        }
-    }
-  
+    locateTargets(effect, ch, victim, obj, arg2);
+    fMiss = effect && !effect->isObject() && !victim;
+         
     if (obj) {
         if (number_bits( 1 ))
             ch->pecho( "Ты проводишь рукой над %O5 и изрекаешь '{C%s{x'.", obj, arg1.c_str( ) );
@@ -184,6 +195,7 @@ void Language::doUtter( PCharacter *ch, DLString &arg1, DLString &arg2 ) const
     if (fUsed) {
         wcontainer->wordUsed( word, ch );
         improve( ch, true );
+        ch->getAttributes( ).getAttr<XMLAttributeLanguageHints>( "languageHints" )->addWord(word, true);
         wiznet( WIZ_LANGUAGE, 0, 0, "%^C1 изрекает слово '%s' (%s) на %s.", 
                 ch, word.toStr( ), word.effect.getValue( ).c_str( ),
                 (obj ? obj->getShortDescr( '4' ).c_str( ) :
@@ -338,7 +350,7 @@ bool Language::showRewards( PCharacter *ch ) const
     }
     
     for (std::list<DLString>::iterator e = expiredWords.begin( ); e != expiredWords.end( ); e++)
-        attrHints->hints.erase( *e );
+        attrHints->removeWord( *e );
     
     if (buf.str( ).empty( )) {
         return false;
@@ -360,7 +372,10 @@ void Language::doIdent( PCharacter *ch, DLString &arg ) const
         return;
     }
     
-    chance = getLearned( ch );
+    if (ch->isCoder())
+        chance = 100;
+    else
+        chance = getLearned( ch );
     
     if (chance < SKILL_SENSE || number_percent( ) > chance) {
         ch->pecho( "Тайный смысл слов %^N2 ускользает от тебя.", nameRus.getValue( ).c_str( ) );
@@ -381,24 +396,71 @@ void Language::doIdent( PCharacter *ch, DLString &arg ) const
     attrHints->addWord( word, true );
 }
 
-void Language::doForget( PCharacter *ch ) const
+void Language::doForget( PCharacter *ch, const DLString &arg ) const
 {
-    XMLAttributeLanguage::Pointer attr;
     XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).findAttr<XMLAttributeLanguageHints>( "languageHints" );
+    XMLAttributeLanguage::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeLanguage>( "language" );
 
-    attr = ch->getAttributes( ).findAttr<XMLAttributeLanguage>( "language" );
+    if (!attr || attr->getWords( ).empty( )) {
+        ch->println( "Тебе нечего забывать." );
+        return;
+    }
+    
+    if (arg.empty()) {
+        ch->println("Что именно ты хочешь забыть?");
+        return;
+    }
 
-    if (attr && !attr->getWords( ).empty( )) {
+    if (arg_is_all(arg)) {
         // Clear all hints pertaining to the dreamed words.
         if (attrHints) {
             for (XMLAttributeLanguage::Words::iterator w = attr->getWords( ).begin( ); w != attr->getWords( ).end( ); w++)
-                attrHints->hints.erase( w->first );
+                attrHints->removeWord( w->first );
         }
 
         attr->getWords( ).clear( );
         ch->println( "Все приснившиеся тебе слова ускользают из твоей памяти." );
+        return;
     }
-    else
-        ch->println( "Тебе нечего забывать." );
+
+    // Find and forget a word among the dreams.    
+    Word word;
+    if (attr->findWord(word, arg)) {
+        attr->removeWord(word, ch);
+        return;
+    }
+
+    // Find and forget a word among the rewards or overheard ones.
+    if (attrHints->hasWord(arg)) {
+        attrHints->removeWord(arg);
+        ch->pecho("Ты забываешь слово %s.", arg.c_str());
+        return;
+    }
+
+    ch->pecho("Ты не знаешь такого слова.");
+}
+
+void Language::doRemember( PCharacter *ch, const DLString &arg ) const
+{
+    XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).getAttr<XMLAttributeLanguageHints>( "languageHints" );
+
+    if (arg.empty()) {
+        ch->println("Что именно ты хочешь запомнить?");
+        return;
+    }
+    
+    if (attrHints->hasWord(arg)) {
+        ch->println("Ты и так помнишь это слово.");
+        return;
+    }
+    
+    Word word;
+    if (!locateWord( word, ch, arg )) {
+        ch->println("Это слово не существует.");
+        return;
+    }
+
+    attrHints->addWord(word, false); 
+    ch->pecho("Ты запоминаешь слово %s.", word.dictum.c_str());
 }
 

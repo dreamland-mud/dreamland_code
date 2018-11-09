@@ -64,7 +64,7 @@ bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 bool LiquidWEBase::checkWater( PCharacter *ch, Object *obj ) const
 {
     if (obj->value[2] != liq_water) {
-        act("Состав этой жидкости слишком сложен.", ch, 0, 0, TO_CHAR);
+        act("Это слово действует только на воду.", ch, 0, 0, TO_CHAR);
         return false;
     }
     

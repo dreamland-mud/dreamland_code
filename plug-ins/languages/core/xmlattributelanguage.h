@@ -25,6 +25,7 @@ public:
         XMLAttributeLanguage( );
     
         virtual void wordUsed( const Word &, PCharacter * );
+        void removeWord( const Word &, PCharacter * );
 
         XML_VARIABLE XMLLong lastDreamTime;
         XML_VARIABLE XMLLong sleepTime;
@@ -46,6 +47,9 @@ public:
         
         void addWord( const Word &, bool );
         bool hasHint( const Word & ) const;
+        bool hasWord( const DLString & ) const;
+        void removeWord(const DLString &);
+        void removeWord(const Word &);
 
         XML_VARIABLE Hints hints;
 };

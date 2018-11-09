@@ -96,7 +96,8 @@ protected:
     bool showDreams( PCharacter * ) const;
     bool showRewards( PCharacter * ) const;
     void doIdent( PCharacter *, DLString & ) const;
-    void doForget( PCharacter * ) const;
+    void doForget( PCharacter *, const DLString & ) const;
+    void doRemember( PCharacter *, const DLString & ) const;
 
 protected:
     Word createGlobalWord( ) const;
