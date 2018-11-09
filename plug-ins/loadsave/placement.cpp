@@ -39,12 +39,12 @@ void char_from_room( Character *ch )
         if ( !ch->is_npc() )
         {
                 --ch->in_room->area->nplayer;
+        }
 
-                if ( ch->death_ground_delay > 0 )
-                {
-                        ch->death_ground_delay = 0;
-                        ch->trap.clear( );
-                }
+        if ( ch->death_ground_delay > 0 )
+        {
+                ch->death_ground_delay = 0;
+                ch->trap.clear( );
         }
 
         if ( ( obj = wear_light->find( ch ) ) != 0
