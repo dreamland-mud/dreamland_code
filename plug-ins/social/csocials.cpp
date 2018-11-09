@@ -25,7 +25,7 @@ CMDRUN( socials )
     ostringstream buf;
 
     buf << "{W==============================================================================={x" << endl
-        <<   " English    {W|{x Russian     {W|{x Description"  << endl
+        <<   " Название   {W|{x По-русски   {W|{x Описание   "  << endl
         << "{W------------+-------------+----------------------------------------------------{x" << endl;
     
     SocialManager::LoadedList::const_iterator i;

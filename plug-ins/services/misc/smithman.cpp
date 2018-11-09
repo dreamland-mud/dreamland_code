@@ -19,6 +19,7 @@
 #include "mercdb.h"
 #include "interp.h"
 #include "handler.h"
+#include "arg_utils.h"
 #include "act.h"
 #include "def.h"
 
@@ -36,10 +37,10 @@ int Smithman::getOccupation( )
 
 bool Smithman::specIdle( )
 {
-    if (chance(90))
+    if (chance(99))
         return false;
 
-    interpret_raw(ch, "say", "Эх, скучно мне!!!");
+    interpret_raw(ch, "say", "Эх, скучно мне! Никому {yкузнец{g не нужен?");
     return true;
 }
 
@@ -90,6 +91,7 @@ void Smithman::msgListEmpty( Character *client )
 void Smithman::msgArticleNotFound( Character *client ) 
 {
     interpret_raw( getKeeper( ), "eyebrow", client->getNameP( ) );
+    say_act(client, getKeeper(), "Я не понимаю, чего ты хочешь. Используй {y{lEsmith list{lRкузница список{lx{g для списка услуг.");
 }
 
 void Smithman::msgArticleTooFew( Character *client, Article::Pointer )
@@ -125,12 +127,16 @@ void SmithService::printLine( Character *client,
 
 void SmithService::toStream( Character *client, ostringstream &buf ) const
 {
-    printLine( client, price, name.getValue( ), descr.getValue( ), buf );
+    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    printLine( client, price, myname, descr, buf );
 }
 
 bool SmithService::matches( const DLString &argument ) const
 {
-    return !argument.empty( ) && argument.strPrefix( name.getValue( ) );
+    if (argument.empty())
+        return false;
+    
+    return arg_oneof(argument, name.c_str(), rname.c_str());
 }
 
 int SmithService::getQuantity( ) const
@@ -349,8 +355,9 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
  *------------------------------------------------------------------------*/
 void SharpSmithService::toStream( Character *client, ostringstream &buf ) const
 {
-    printLine( client, price, name.getValue( ), descr.getValue( ), buf );
-    printLine( client, extraPrice, name.getValue( ), extraDescr.getValue( ), buf );
+    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    printLine( client, price, myname, descr, buf );
+    printLine( client, extraPrice, myname, extraDescr, buf );
 }
 
 void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object *obj )
@@ -363,12 +370,12 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
     }
 
     if (IS_WEAPON_STAT(obj, WEAPON_SHARP|WEAPON_VORPAL)) {
-        say_act( client, smithman, "$o1 и без того острое оружие.", obj );
+        say_act( client, smithman, "Но $o1 и без того острое оружие.", obj );
         return;
     }
 
     if (IS_WEAPON_STAT( obj, WEAPON_HOLY )) {
-        say_act( client, smithman, "$o1 наполнено священной силой, острота ему ни к чему.", obj );
+        say_act( client, smithman, "Но $o1 наполнено священной силой, острота ему ни к чему.", obj );
         return;
     }
 
@@ -414,7 +421,7 @@ CMDRUN( smith )
         return;
     }
     
-    if (arguments.empty( ) || arguments == "list")
+    if (arguments.empty( ) || arg_is_list(arguments))
         smithman->doList( ch->getPC( ) );
     else
         smithman->doBuy( ch->getPC( ), arguments );
