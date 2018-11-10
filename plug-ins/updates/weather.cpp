@@ -26,6 +26,7 @@
 #include "descriptor.h"
 #include "mercdb.h"
 #include "handler.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
@@ -44,31 +45,61 @@ const char * sunlight_en [4] = {
     "sunset"
 };    
 
+enum{
+    SEASON_WINTER = 0,
+    SEASON_SPRING,
+    SEASON_SUMMER,
+    SEASON_AUTUMN
+};
+struct season_info {
+    int number;
+    const char *name;
+    const char *short_descr;
+    const char *adjective;
+    char color;
+};
+
+const struct season_info season_table [4] = {
+    { SEASON_WINTER, "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   'C' },
+    { SEASON_SPRING, "весна", "весн|а|ы|е|у|ой|е", "весеннего", 'g' },
+    { SEASON_SUMMER, "лето",  "лет|о|а|у|о|ом|е",  "летнего",   'Y' },
+    { SEASON_AUTUMN, "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  'y' },
+};
+
 struct month_info {
     const char *name;
     int pressure;
     int sunrise;
     int sunset;
+    int season;
 };
 
 const struct month_info month_table [17] = {
-  { "Зимы",                   -12,    7, 17 },
-  { "Зимнего Волка",           -14,    7, 18 },
-  { "Холодного Гиганта",   -14,    7, 18 },
-  { "Древних Воинств",           -12,    7, 19 },   /* весна */
-  { "Великих Битв",           -8,     6, 19 },
-  { "Весны",                   -4,     5, 19 }, 
-  { "Природы",                   0,      5, 21 },
-  { "Тщетности",           4,      5, 22 },   /* лето */
-  { "Дракона",                   8,      4, 22 },
-  { "Солнца",                   12,     4, 22 },
-  { "Жары",                   16,     5, 21 },    
-  { "Битвы",                   12,     5, 20 },   /* осень */
-  { "Темноты",                   8,      6, 20 },
-  { "Тени",                   4,      6, 19 },
-  { "Длинных Теней",           0,      7, 18 },         
-  { "Абсолютной Темноты",  -4,     8, 17 },   /* зима */
-  { "Великого Зла",           -8,     8, 17 },
+  { "Зимы",                   -12,    7, 17, SEASON_WINTER },
+  { "Зимнего Волка",          -14,    7, 18, SEASON_WINTER },
+  { "Холодного Гиганта",      -14,    7, 18, SEASON_WINTER },
+  { "Древних Воинств",        -12,    7, 19, SEASON_WINTER },   
+  { "Великих Битв",            -8,    6, 19, SEASON_SPRING },
+  { "Весны",                   -4,    5, 19, SEASON_SPRING }, 
+  { "Природы",                  0,    5, 21, SEASON_SPRING },
+  { "Тщетности",                4,    5, 22, SEASON_SPRING },  
+  { "Дракона",                  8,    4, 22, SEASON_SUMMER },
+  { "Солнца",                  12,    4, 22, SEASON_SUMMER },
+  { "Жары",                    16,    5, 21, SEASON_SUMMER },    
+  { "Битвы",                   12,    5, 20, SEASON_SUMMER },   
+  { "Темноты",                  8,    6, 20, SEASON_AUTUMN },
+  { "Тени",                     4,    6, 19, SEASON_AUTUMN },
+  { "Длинных Теней",            0,    7, 18, SEASON_AUTUMN },         
+  { "Абсолютной Темноты",      -4,    8, 17, SEASON_AUTUMN },   
+  { "Великого Зла",            -8,    8, 17, SEASON_WINTER },
+};
+
+const int month_table_size = sizeof(month_table) / sizeof(month_info);
+
+const char *        const        day_name        [] =
+{
+    "Луны", "Быка", "Лжи", "Грома", "Свободы",
+    "Великих Богов", "Солнца"
 };
 
 void mmhg_update()
@@ -109,7 +140,11 @@ void mmhg_update()
  */
 void sunlight_update( )
 {
-    ostringstream buf;
+    ostringstream buf, tbuf;
+    int this_season = month_table[time_info.month].season;
+    int this_day = time_info.day;
+    int this_month = time_info.month;
+    int this_year = time_info.year;
 
     dreamland->setWorldTime( dreamland->getWorldTime( ) + 1 );
     ++time_info.hour;
@@ -130,44 +165,61 @@ void sunlight_update( )
         weather_info.sunlight = SUN_DARK;
         buf << "Начинается ночь." << endl;
     }
-    
+
     if (time_info.hour == 24) {
         time_info.hour = 0;
         time_info.day++;
     }
-
+    
     if (time_info.day >= 35) {
         time_info.day = 0;
         time_info.month++;
-    }
+    } 
 
     if (time_info.month >= 17) {
         time_info.month = 0;
         time_info.year++;
     }
+    
+    if (this_day != time_info.day)
+        tbuf << "Полночь. Начинается день " << day_name[time_info.day % 7] << "." << endl;
+    
+    if (this_month != time_info.month) {
+        const struct month_info &month = month_table[time_info.month];
+        const struct season_info &season = season_table[month.season];
+        tbuf << "Сегодня первый день месяца " << month.name;
+        if (this_season != month.season) 
+            tbuf << " и первый день {" << season.color << russian_case(season.short_descr, '2') << "{x!" << endl;
+        else if (this_year != time_info.year)
+            tbuf << " и {Cновый год{x!" << endl;
+        else
+            tbuf << "." << endl;
+    }
+    
+    string buf_str = buf.str();
+    string tbuf_str = tbuf.str();
 
-    if (!buf.str( ).empty( )) {
-        Descriptor *d;
-        Character *ch;
-        
-        for (d = descriptor_list; d != 0; d = d->next) {
+    if (!buf_str.empty() || !tbuf_str.empty()) {
+        for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
                 continue;
 
-            ch = d->character;
+            Character *ch = d->character;
 
             if (ch
-                && IS_OUTSIDE(ch) 
                 && IS_AWAKE(ch) 
                 && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
             {
-                ch->send_to( buf );
+                if (IS_OUTSIDE(ch) && !buf_str.empty())
+                    ch->send_to(buf_str);
+                if (!tbuf_str.empty())
+                    ch->send_to(tbuf_str);
             }
         }
     }
 
     DLString newTime;
-    if (!buf.str( ).empty( )) {
+    if (!buf_str.empty()) {
         if (weather_info.sunlight >= SUN_DARK && weather_info.sunlight <= SUN_SET)
             newTime = sunlight_en[weather_info.sunlight];
     }
@@ -274,30 +326,6 @@ void weather_update( )
 }
 
 
-const char *        const        day_name        [] =
-{
-    "Луны", "Быка", "Лжи", "Грома", "Свободы",
-    "Великих Богов", "Солнца"
-};
-
-static const char * adjective_ext(int d) 
-{
-    static const char * EXT_ONE = "ый";
-    static const char * EXT_TWO = "ой";
-    static const char * EXT_THREE = "ий";
-    
-    switch (d % 10) {
-    case 0: 
-        return d == 0 ? EXT_TWO : EXT_ONE;
-    case 1: case 4: case 5: case 9:
-        return EXT_ONE;
-    case 3:
-        return EXT_THREE;
-    default:
-        return EXT_TWO;
-    }
-}
-
 DLString time_of_day( )
 {
     if ((time_info.hour > 16) && (time_info.hour < 24)) 
@@ -324,10 +352,9 @@ DLString calendar_month( )
 void make_date( ostringstream &buf )
 {
     int day = time_info.day + 1;
-    const char * suf = adjective_ext( day );
     
     buf << hour_of_day( ) << " " << time_of_day( ) << ", " 
-        << "День: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
+        << "День: " << day_name[day % 7] << ", " << day << "й, "
         << "Месяц " << calendar_month( ) << ", "
         << "Год " << time_info.year << "." << endl;
 }
@@ -341,8 +368,21 @@ CMDRUN( time )
         return;
     }
 
-    buf << "Сейчас: ";
-    make_date( buf );
+    // Output time of day and sunlight.
+    buf << "Сейчас " << hour_of_day() << " " << time_of_day();
+    if (IS_OUTSIDE(ch))
+        buf << ", " << sunlight();
+    buf << ". ";
+
+    // Output day of the week, day, season, month, year.
+    int day = time_info.day + 1;
+    const month_info &month = month_table[time_info.month];
+    const season_info &season = season_table[month.season];
+
+    buf << "Сегодня день " << day_name[day % 7] << ", "
+        << day << "й день "
+        << season.adjective << " месяца " << month.name << ", "
+        << "года " << time_info.year << "." << endl;
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
     {
@@ -377,13 +417,32 @@ CMDRUN( weather )
         ch->send_to( "Ты не можешь видеть погоду в помещении.\n\r");
         return;
     }
+    
+    const char *wind;
+    int season = month_table[time_info.month].season;
+    if (weather_info.change >= 0) {
+        if (season == SEASON_SUMMER)
+            wind = "теплый летний";
+        else if (season == SEASON_SPRING)
+            wind = "теплый весенний";
+        else
+            wind = "теплый южный";
+    }
+    else {
+        if (season == SEASON_WINTER)
+            wind = "холодный зимний";
+        else if (season == SEASON_AUTUMN)
+            wind = "пронизывающий осенний";
+        else if (season == SEASON_SPRING)
+            wind = "прохладный весенний";
+        else
+            wind = "прохладный северный";
+    }
 
-    ch->printf( "Небо %s и %s.\n\r",
+    ch->printf( "Небо %s и дует %s ветер.\n\r",
         sky_look[weather_info.sky],
-        weather_info.change >= 0
-        ? "дует теплый южный ветер"
-        : "дует холодный северный ветер"
-        );
+        wind
+    );
 }
 
 
@@ -440,3 +499,86 @@ void weather_init( )
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;
 }
+
+static void cal_divider(ostringstream &buf)
+{
+    buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
+}
+
+static char cal_day_color(int day, int month)
+{
+    // TODO personalized decorator for each player plus global events.
+    if (day == time_info.day+1 && month == time_info.month)
+        return 'R';
+    return 'x';
+}
+
+static void cal_day(ostringstream &buf, int day, int month)
+{
+    char color = cal_day_color(day, month);
+    if (color != 'x')
+        buf << "{" << color;
+
+    buf << dlprintf("%2d", day);
+
+    if (color != 'x')
+        buf << "{x";
+
+    if (day%7 != 0)
+        buf << " ";
+}
+
+static void cal_week(ostringstream &buf, int week, int month)
+{
+    for (int day = 0; day < 7; day++) 
+        cal_day(buf, (week*7+day+1), month);
+
+    if ((month+1)%4 != 0)
+        buf << "{D|{x";
+
+    if (month == month_table_size - 1)
+        buf << endl;
+}
+
+static void cal_month_name(ostringstream &buf, int m)
+{
+    const month_info &month = month_table[m];
+    buf << " {" << season_table[month.season].color << dlprintf("%-18s", month.name);
+
+    if ((m+1)%4 != 0)
+        buf << "{D|{x";
+    else
+        buf << "{x" << endl;
+
+    if (m == month_table_size - 1)
+        buf << endl;
+}
+
+
+CMDRUN( calendar )
+{
+    ostringstream buf;
+    
+    for (int season = 0; season < 4; season++) {
+        cal_divider(buf);
+
+        for (int month = season*4; month < season*4 + 4; month++) 
+            cal_month_name(buf, month);
+        
+        for (int week = 0; week < 5; week++) {
+            for (int month = 0; month < 4; month++) 
+                cal_week(buf, week, season*4 + month);
+            
+            buf << endl;
+        }
+    }
+
+    cal_divider(buf);
+    cal_month_name(buf, month_table_size-1);
+    for (int week = 0; week < 5; week++) 
+        cal_week(buf, week, month_table_size-1);
+     
+
+    ch->send_to(buf);
+}
+

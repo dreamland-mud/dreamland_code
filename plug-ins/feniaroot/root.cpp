@@ -595,12 +595,40 @@ NMI_GET( Root, char_list , "список всех чаров, поле чара 
     return WrapperManager::getThis( )->getWrapper(char_list); 
 }
 
+static int check_range(const Register &arg, int min, int max)
+{
+    int n = arg.toNumber();
+    if (n < min || n > max)
+        throw Scripting::IllegalArgumentException();
+    return n;
+}
+
+NMI_SET( Root, hour , "текущий час суток, 0..23") 
+{
+    time_info.hour = check_range(arg, 0, 23);
+}
+
+NMI_SET( Root, day, "текущий день месяца, 0..34") 
+{
+    time_info.day = check_range(arg, 0, 34);
+}
+
+NMI_SET( Root, year, "текущий год") 
+{
+    time_info.year = check_range(arg, 0, 700);
+}
+
+NMI_SET( Root, month, "текущий месяц, 0..16" ) 
+{
+    time_info.month = check_range(arg, 0, 16);
+}
+
 NMI_GET( Root, hour , "текущий час суток, 0..23") 
 {
     return Register( time_info.hour ); 
 }
 
-NMI_GET( Root, day, "текущий день недели, 0..6") 
+NMI_GET( Root, day, "текущий день месяца, 0..34") 
 {
     return Register( time_info.day); 
 }
@@ -623,6 +651,11 @@ NMI_GET( Root, sunlight , "время суток: 0=ночь, 1=рассвет, 
 NMI_GET( Root, sky , "текущая погода: 0=безоблачно, 1=облачно, 2=дождь, 3=молнии") 
 {
     return Register( weather_info.sky ); 
+}
+
+NMI_SET( Root, sky , "текущая погода: 0=безоблачно, 1=облачно, 2=дождь, 3=молнии") 
+{
+    weather_info.sky = check_range(arg, 0, 3);
 }
 
 NMI_SET( Root, tmp, "") {
