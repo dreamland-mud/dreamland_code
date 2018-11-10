@@ -261,6 +261,50 @@ void group_gain( Character *ch, Character *victim )
 }
 
 
+/*
+ * Calculate align-based coefficients applied to base exp.
+ * Return 'true' if it looks like a good kill, deserving further bonuses.
+ */
+bool xp_align_coeff(Character *gch, Character *victim, int &align_mult, int &align_div)
+{
+    align_mult = 1;
+    align_div = 1;
+
+    // No change for 'no-align' mobs.
+    if (IS_SET(victim->act,ACT_NOALIGN)) {
+        return false;
+    }
+    
+    // Opposite align - big bonus.
+    if ((IS_EVIL(gch) && IS_GOOD(victim)) || (IS_EVIL(victim) && IS_GOOD(gch))) {
+        align_mult = 8;
+        align_div = 5;
+        return true;
+    }
+    
+    // Good vs good: penalize.
+    if (IS_GOOD(gch) && IS_GOOD(victim)) {
+        align_mult = 1;
+        align_div = 5;
+        return false;
+    }
+    
+    // Neutral vs neutral: boring. 
+    if (IS_NEUTRAL(gch) && IS_NEUTRAL(victim)) {
+        align_mult = 3;
+        align_div = 5;
+        return false;
+    }
+    
+    // Good vs neutral: penalize slightly.
+    if (IS_GOOD(gch) && IS_NEUTRAL(victim)) {
+        align_mult = 4;
+        align_div = 5;
+        return false;
+    }
+
+    return true;
+}
 
 /*
  * Compute xp for a kill.
@@ -272,6 +316,8 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
   int base_exp;
   short level_range;
   int neg_cha=0, pos_cha=0;
+    int align_mult, align_div;
+    bool align_bonus;
 
   level_range = victim->getModifyLevel() - gch->getModifyLevel();
 
@@ -298,26 +344,11 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
     
   base_exp += base_exp_bonus;
 
- // calculate exp multiplier 
-  if (IS_SET(victim->act,ACT_NOALIGN))
-    xp = base_exp;
 
-  // alignment 
-  else 
-    if ( (IS_EVIL(gch) && IS_GOOD(victim)) 
-    || (IS_EVIL(victim) && IS_GOOD(gch)))
-    xp = ( int )( ( base_exp * 8 ) / 5 );
-
-  else if ( IS_GOOD(gch) && IS_GOOD(victim) )
-    xp = ( int ) base_exp / 5;
-
-  else if ( IS_NEUTRAL(gch) && IS_NEUTRAL(victim) )
-    xp = ( int ) base_exp * 3 / 5;
-
-  else if ( IS_GOOD(gch) && IS_NEUTRAL(victim) )
-    xp = ( int )( base_exp * 4 / 5 );
-
-  else xp = base_exp;
+    // calculate and apply exp multiplier 
+    align_bonus = xp_align_coeff(gch, victim, align_mult, align_div);
+    xp = (int)((base_exp * align_mult) / align_div);
+   
 
     // more exp at the low levels 
     if ( gch->getModifyLevel() < 6)
@@ -338,6 +369,7 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
 
     xp = std::max( xp, 0 );
 
+    // Leadership skill.
     if (leader && !leader->is_npc( ) 
         && leader->in_room == gch->in_room
         && xp > 10 
@@ -354,7 +386,16 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
         else 
             gsn_leadership->improve( leader, false );
     }
-    
+
+    // Calendar bonuses: for now simply increase exp on 13th of each month.
+    if (align_bonus && xp > 10 && time_info.day == 12) {
+        xp = number_range(xp + xp / 2, xp * 2);
+        gch->pecho("{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x", 
+                   IS_GOOD(gch) ? "силы добра" : IS_NEUTRAL(gch) ? "нейтральные силы" : "силы зла");
+    }
+   
+
+    // Kill counters and charisma update. 
     if (IS_GOOD(gch))
     {
      if (IS_GOOD(victim)) { gch->getPC( )->anti_killed++; neg_cha = 1; }

@@ -510,6 +510,8 @@ static char cal_day_color(int day, int month)
     // TODO personalized decorator for each player plus global events.
     if (day == time_info.day+1 && month == time_info.month)
         return 'R';
+    if (day == 13)
+        return 'c';
     return 'x';
 }
 
@@ -578,7 +580,8 @@ CMDRUN( calendar )
     for (int week = 0; week < 5; week++) 
         cal_week(buf, week, month_table_size-1);
      
-
+    buf << "--------------------+" << endl
+        << "{WЛегенда{x: {RX{x - сегодняшний день, {cX{x - больше опыта за убийства" << endl;
     ch->send_to(buf);
 }
 
