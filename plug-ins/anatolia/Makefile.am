@@ -11,6 +11,7 @@ act_move.cpp \
 act_obj.cpp \
 automap.cpp \
 handler.cpp \
+today.cpp \
 impl.cpp 
 
 libcmd_wizard_la_SOURCES = \

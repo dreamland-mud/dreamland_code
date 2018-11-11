@@ -22,6 +22,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
+#include "today.h"
 #include "fight.h"
 #include "act.h"
 #include "def.h"
@@ -388,7 +389,7 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
     }
 
     // Calendar bonuses: for now simply increase exp on 13th of each month.
-    if (align_bonus && xp > 10 && time_info.day == 12) {
+    if (align_bonus && xp > 10 && today_kill_bonus(time_info)) {
         xp = number_range(xp + xp / 2, xp * 2);
         gch->pecho("{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x", 
                    IS_GOOD(gch) ? "силы добра" : IS_NEUTRAL(gch) ? "нейтральные силы" : "силы зла");

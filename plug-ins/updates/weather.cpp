@@ -25,6 +25,7 @@
 #include "dreamland.h"
 #include "descriptor.h"
 #include "mercdb.h"
+#include "today.h"
 #include "handler.h"
 #include "act.h"
 #include "merc.h"
@@ -385,9 +386,16 @@ CMDRUN( time )
         << "года " << time_info.year << "." << endl;
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
-    {
         buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
-    }
+    
+    if (today_kill_bonus(time_info))
+        buf << "В этот день можно получить больше опыта за убийства." << endl;     
+
+    if (today_mana_bonus(time_info))
+        buf << "В этот день заклинания и молитвы отнимают меньше маны." << endl;
+
+    if (today_learn_bonus(time_info))
+        buf << "В этот день умения учатся быстрее чем обычно." << endl;
 
     ch->send_to(buf);
 
@@ -500,6 +508,9 @@ void weather_init( )
     else                                  weather_info.sky = SKY_CLOUDLESS;
 }
 
+/*--------------------------------------------------------------------------
+ * Calendar and bonuses.
+ *-------------------------------------------------------------------------*/
 static void cal_divider(ostringstream &buf)
 {
     buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
@@ -508,10 +519,19 @@ static void cal_divider(ostringstream &buf)
 static char cal_day_color(int day, int month)
 {
     // TODO personalized decorator for each player plus global events.
-    if (day == time_info.day+1 && month == time_info.month)
+    struct time_info_data ti;
+    ti.day = day;
+    ti.month = month;
+    ti.year = time_info.year;
+
+    if (day == time_info.day && month == time_info.month)
         return 'R';
-    if (day == 13)
+    if (today_kill_bonus(ti)) 
         return 'c';
+    if (today_mana_bonus(ti))
+        return 'b';
+    if (today_learn_bonus(ti))
+        return 'W';
     return 'x';
 }
 
@@ -521,19 +541,19 @@ static void cal_day(ostringstream &buf, int day, int month)
     if (color != 'x')
         buf << "{" << color;
 
-    buf << dlprintf("%2d", day);
+    buf << dlprintf("%2d", day+1);
 
     if (color != 'x')
         buf << "{x";
 
-    if (day%7 != 0)
+    if (day%7 != 6)
         buf << " ";
 }
 
 static void cal_week(ostringstream &buf, int week, int month)
 {
     for (int day = 0; day < 7; day++) 
-        cal_day(buf, (week*7+day+1), month);
+        cal_day(buf, (week*7+day), month);
 
     if ((month+1)%4 != 0)
         buf << "{D|{x";
@@ -580,8 +600,9 @@ CMDRUN( calendar )
     for (int week = 0; week < 5; week++) 
         cal_week(buf, week, month_table_size-1);
      
-    buf << "--------------------+" << endl
-        << "{WЛегенда{x: {RX{x - сегодняшний день, {cX{x - больше опыта за убийства" << endl;
+    buf << "{D--------------------+" << endl
+        << "{WЛегенда{x: {RX{x - сегодняшний день, {cX{x - больше опыта за убийства, {bX{x - меньше расход маны," << endl
+        << "         {WX{x - быстрее учатся умения" << endl;
     ch->send_to(buf);
 }
 

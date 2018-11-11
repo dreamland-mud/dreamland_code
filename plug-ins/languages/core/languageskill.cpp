@@ -11,7 +11,7 @@
 #include "pcharacter.h"
 #include "pcrace.h"
 
-
+#include "today.h"
 #include "mercdb.h"
 
 #include "poliglot.h"
@@ -239,7 +239,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     if (maximum <= SKILL_ADEPT) 
         return;
 
-    if (!chance( maximum / 2 ))
+    if (!chance( maximum / 2 ) && !today_learn_bonus(time_info))
         return;
     
     if (number_percent( ) >= 4 * ch->getCurrStat( STAT_INT )) 

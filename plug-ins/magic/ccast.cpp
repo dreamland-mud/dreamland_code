@@ -27,6 +27,7 @@
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
+#include "today.h"
 #include "handler.h"
 #include "def.h"
 
@@ -172,6 +173,8 @@ CMDRUN( cast )
     }
 
     mana = spell->getManaCost( ch );
+    if (today_mana_bonus(time_info))
+        mana /= 2;
 
     if (ch->mana < mana) {
         if (ch->is_npc( ) && ch->master != 0) 

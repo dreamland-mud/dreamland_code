@@ -20,6 +20,7 @@
 #include "affectflags.h"
 #include "stats_apply.h"
 #include "act.h"
+#include "today.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "material.h"
@@ -143,12 +144,11 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 
     fEnlight = pch->getAttributes( ).isAvailable( "enlight" );
 
-    if (fEnlight)
+    if (fEnlight || today_learn_bonus(time_info))
         chance *= 2;
 
     if (number_range(1, 1000) > chance)
         return;
-
    
     /* now that the character has a CHANCE to learn, see if they really have */        
     if (success) {
