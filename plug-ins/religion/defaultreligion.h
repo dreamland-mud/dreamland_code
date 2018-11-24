@@ -10,10 +10,15 @@
 #include "xmltableelement.h"
 #include "xmlglobalbitvector.h"
 #include "xmlvariablecontainer.h"
+#include "xmlenumeration.h"
+#include "xmlboolean.h"
 
 #include "religion.h"
 #include "helpmanager.h"
 #include "markuphelparticle.h"
+
+class Skill;
+class Liquid;
 
 /*
  * ReligionHelp
@@ -39,6 +44,26 @@ inline const DLString & ReligionHelp::getType( ) const
     return TYPE;
 }
 
+enum {
+    SAC_NOT_SUPPORTED = -1, 
+    SAC_NOT_ENOUGH, 
+    SAC_ANGER, 
+    SAC_ACCEPTED
+};
+
+class GodLikes : public XMLVariableContainer {
+XML_OBJECT
+public:
+    GodLikes();
+
+    XML_VARIABLE XMLGlobalBitvector skills;
+    XML_VARIABLE XMLGlobalBitvector skillGroups;
+    XML_VARIABLE XMLFlags           items;
+    XML_VARIABLE XMLGlobalBitvector liquids;
+    XML_VARIABLE XMLFlags           liquidFlags;
+    XML_VARIABLE XMLBooleanNoFalse  books;
+};
+
 class DefaultReligion : public Religion, public XMLTableElement, public XMLVariableContainer {
 XML_OBJECT
 public:
@@ -50,6 +75,7 @@ public:
     virtual const DLString &getRussianName( ) const;
     virtual void setName( const DLString & );
     virtual bool isValid( ) const;
+    virtual int getSex() const;
     virtual void loaded( );
     virtual void unloaded( );
     
@@ -57,6 +83,15 @@ public:
     virtual const DLString &getDescription( ) const;
     virtual bool isAllowed( Character * ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    virtual bool hasBonus(Character *, const bitstring_t &, const struct time_info_data &) const;
+    
+    inline const Flags & getAlign() const;
+    inline const Flags & getEthos() const;
+    
+    virtual bool likesSpell(Skill *) const;
+    virtual bool likesDrink(const Liquid *) const;
+    virtual bool likesItem(Object *) const;
+    virtual bool likesBook(Object *) const;
 
 protected:
     XML_VARIABLE XMLString  shortDescr;
@@ -65,6 +100,18 @@ protected:
     XML_VARIABLE XMLFlags   align, ethos;
     XML_VARIABLE XMLGlobalBitvector  races;
     XML_VARIABLE XMLPointerNoEmpty<ReligionHelp> help;
+    XML_VARIABLE XMLEnumeration sex;
+    XML_VARIABLE GodLikes likes;
 };
+
+inline const Flags & DefaultReligion::getAlign() const
+{
+    return align;
+}
+
+inline const Flags & DefaultReligion::getEthos() const
+{
+    return ethos;
+}
 
 #endif

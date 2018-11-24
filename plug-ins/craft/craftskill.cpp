@@ -196,7 +196,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
     chance /= max(1, hard.getValue()) * getRating(pch);
     chance = chance * get_int_app(pch).learn  / 100;
     
-    if (today_learn_bonus(time_info))
+    if (today_learn_bonus(ch, time_info))
         chance *= 2;
 
     if (number_range(1, 1000) > chance)

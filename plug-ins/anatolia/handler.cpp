@@ -87,8 +87,6 @@ void get_money_here( Object *list, int &gold, int &silver )
     }
 }
 
-
-
 /*
  * Create a 'money' obj.
  */
@@ -144,6 +142,7 @@ Object *create_money( int gold, int silver )
 DLString describe_money( int gold, int silver, const Grammar::Case &gcase )
 {
     static const char *cases_gold [] = {
+        "золот%1$Iая|ые|ых",
         "золот%1$Iая|ые|ых",
         "золот%1$Iой|ых|ых",
         "золот%1$Iой|ым|ым",

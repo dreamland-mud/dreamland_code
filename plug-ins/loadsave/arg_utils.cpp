@@ -171,6 +171,13 @@ bool arg_is_gold( const DLString &arg )
     return arg_oneof_strict( arg, "gold", "золото", "золота", "золотых" );
 }
 
+bool arg_is_money( const DLString &arg )
+{
+    return arg_oneof( arg, "coin", "coins", "silver" )
+           || arg_oneof( arg, "серебро", "серебра", "монет" )
+           || arg_oneof( arg, "gold", "золото", "золота", "золотых" );
+}
+
 bool arg_is_alldot( const DLString &arg )
 {
     return arg == "all" 

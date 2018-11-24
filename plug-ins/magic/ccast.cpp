@@ -173,7 +173,7 @@ CMDRUN( cast )
     }
 
     mana = spell->getManaCost( ch );
-    if (today_mana_bonus(time_info))
+    if (today_mana_bonus(ch, time_info))
         mana /= 2;
 
     if (ch->mana < mana) {

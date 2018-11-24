@@ -10,11 +10,13 @@
 #include "mocregistrator.h"
 #include "dlxmlloader.h"
 #include "xmltableloaderplugin.h"
+#include "xmlattributeplugin.h"
 
 #include "templeman.h"
 #include "gods_impl.h"
 #include "tattoo.h"
 #include "defaultreligion.h"
+#include "religionattribute.h"
 
 TABLE_LOADER(ReligionLoader, "religions", "Religion");
 
@@ -27,6 +29,7 @@ extern "C"
         Plugin::registerPlugin<MobileBehaviorRegistrator<Templeman> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ReligionTattoo> >( ppl );
         Plugin::registerPlugin<XMLVariableRegistrator<ReligionHelp> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeReligion> >( ppl );
         
         Plugin::registerPlugin<MocRegistrator<DefaultReligion> >( ppl );
         Plugin::registerPlugin<MocRegistrator<AtumRaGod> >( ppl );

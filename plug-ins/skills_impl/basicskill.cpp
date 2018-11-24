@@ -91,7 +91,6 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
 {
     PCharacter *pch;
     int chance, xp;
-    bool fEnlight;
     
     if (ch->is_npc( ))
         return;
@@ -142,9 +141,10 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
             chance += 20 * (diff + 10);
     }
 
-    fEnlight = pch->getAttributes( ).isAvailable( "enlight" );
+    bool fEnlight = pch->getAttributes( ).isAvailable( "enlight" );
+    bool fBonus = today_learn_bonus(ch, time_info);
 
-    if (fEnlight || today_learn_bonus(time_info))
+    if (fEnlight || fBonus)
         chance *= 2;
 
     if (number_range(1, 1000) > chance)
@@ -153,6 +153,8 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     /* now that the character has a CHANCE to learn, see if they really have */        
     if (success) {
         chance = URANGE(5, 100 - data.learned, 95);
+        if (fBonus)
+            chance += chance / 2;
         
         if (number_percent( ) >= chance)
             return;

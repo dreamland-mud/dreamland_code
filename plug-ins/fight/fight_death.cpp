@@ -148,7 +148,8 @@ static Object * corpse_create( Character *ch )
         corpse->value[3] = ch->getNPC( )->pIndexData->vnum;
     else
         corpse->value[3] = ch->getPC( )->getHometown( )->getPit( );
-
+    
+    corpse->value[4] = ch->alignment;
     return corpse;
 }
 

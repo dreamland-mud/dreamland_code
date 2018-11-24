@@ -53,6 +53,7 @@
 #include "register-impl.h"
 #include "lex.h"
 
+#include "grammar_entities_impl.h"
 #include "commandtemplate.h"
 #include "behavior_utils.h"
 #include "skill.h"
@@ -756,6 +757,26 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
 
 }
 
+static bool can_put_money_into( Character *ch, Object *container )
+{
+    if (container->item_type != ITEM_CONTAINER) {
+        ch->pecho("%^O1 не контейнер.", container);
+        return false;
+    }
+
+    if (IS_SET(container->wear_flags, ITEM_TAKE) || !container->in_room) {
+        ch->println("Ты можешь положить деньги только в стационарные контейнеры: ямы для пожертвований, алтари.");
+        return false;
+    }
+
+    if (IS_SET(container->value[1], CONT_CLOSED)) {
+        ch->pecho("%1$^O1 закрыт%1$Gо||а.", container);
+        return false;
+    }
+
+    return true;
+}
+
 static int can_put_obj_into( Character *ch, Object *obj, Object *container, const DLString &pocket, bool verbose )
 {
     int pcount;
@@ -820,7 +841,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         ||  obj->getWeight( ) > (container->value[3] * 10))
     {
         if (verbose)
-            ch->send_to("Не входит.\n\r");
+            ch->pecho("%1$^O1 не сможет вместить в себя %2$O4.", container, obj);
         return PUT_OBJ_ERR;
     }
 
@@ -912,6 +933,57 @@ static bool put_obj_container( Character *ch, Object *obj, Object *container,
     return oprog_put( obj, ch, container );
 }
 
+void put_money_container(Character *ch, int amount, const char *currencyName, const char *containerArg)
+{
+    /* 'put -N ...' and 'put 0 ...' not allowed. */
+    if (amount <= 0) {
+        ch->println("Сколько-сколько монет?");
+        return;
+    }
+
+    DLString containerArgs = containerArg;
+    DLString containerName = containerArgs.getOneArgument();
+    /* 'put N gold|silver in|on container' becomes 'put N gold|silver container' */
+    if (arg_is_in(containerName) || arg_is_on(containerName))
+        containerName = containerArgs;
+
+    Object *container = get_obj_here(ch, containerName.c_str());
+    if (!container) {
+        act( "Ты не видишь здесь $T.", ch, 0, containerName.c_str(), TO_CHAR);
+        return;
+    }
+
+    // See if it's an open no-take container on the floor.
+    if (!can_put_money_into(ch, container))
+        return;
+
+    // Parse out gold and silver amounts.
+    int gold = 0, silver = 0;
+    if (!parse_money_arguments(ch, currencyName, amount, gold, silver))
+        return;
+
+    // Create temporary money object and see if it fits.
+    Object *money = create_money(gold, silver);
+    obj_to_char(money, ch);
+    if (can_put_obj_into(ch, money, container, "", true) != PUT_OBJ_OK) {
+        extract_obj(money);
+        return;
+    }
+   
+    DLString moneyArg = describe_money(gold, silver, 4);
+    DLString preposition = IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
+    ch->pecho("Ты кладешь %s %s %O4.", moneyArg.c_str(), preposition.c_str(), container);
+    ch->recho("%^C1 кладет %s %O4 несколько монет.", ch, preposition.c_str(), container);
+
+    // Add money to the container or merge with existing coins.
+    ch->silver -= silver;
+    ch->gold -= gold;
+    get_money_here( container->contains, gold, silver );
+    extract_obj(money);
+    money = create_money( gold, silver );
+    obj_to_obj(money, container);
+}
+
 CMDRUNP( put )
 {
     char arg1[MAX_INPUT_LENGTH];
@@ -919,10 +991,18 @@ CMDRUNP( put )
     DLString pocket;
     Object *container;
     Object *obj;
+    DLString origArguments = argument;
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
 
+    /* 'put N gold|silver container' */
+    if (is_number(arg1) && get_arg_id(arg1) == 0 && arg_is_money(arg2)) {
+        put_money_container(ch, atoi(arg1), arg2, argument);
+        return;
+    }
+
+    /* 'put obj in|on container' becomes 'put obj container */
     if (arg_is_in( arg2 ) || arg_is_on( arg2 ))
         argument = one_argument(argument,arg2);
 
@@ -932,6 +1012,7 @@ CMDRUNP( put )
         return;
     }
 
+    /* no 'put obj all.container' syntax allowed */
     if (arg_is_alldot( arg2 ))
     {
         ch->send_to("Ты не можешь сделать этого.\n\r");
@@ -1446,199 +1527,6 @@ CMDRUNP( present )
     }
     
     give_obj_char( ch, obj, victim, GIVE_MODE_PRESENT );
-}
-
-/*
- * 'sacrifice' command
- */
-static bool can_sacrifice( Character *ch, Object *obj, bool needSpam ) 
-{
-        if (!ch->can_see( obj ))
-            return false;
-
-        if (obj->item_type == ITEM_CORPSE_PC)
-        {
-                if (needSpam)
-                        ch->send_to("Богам это не понравится.\n\r");
-                return false;
-        }
-
-        if ( !obj->can_wear(ITEM_TAKE) || obj->can_wear(ITEM_NO_SAC) 
-             || IS_SET(obj->extra_flags, ITEM_NOSAC))
-        {
-                if (needSpam) 
-                    ch->pecho( "%1$^O1 не подлеж%1$nит|ат жертвоприношению.", obj );
-                return false;
-        }
-
-        if ( IS_SET(obj->item_type,ITEM_FURNITURE)
-                && ( count_users(obj) > 0 ) )
-        {
-                if (needSpam) 
-                    ch->pecho( "%1$^O1 использу%1$nется|ются.", obj );
-                return false;
-        }
-
-  return true;
-}
-
-
-static int rescue_nosac_items ( Object *container, Room *room )
-{
-    Object *item;
-    Object *obj_next;
-    int count = 0;
-    
-    for ( item = container->contains; item; item = obj_next ) {
-        obj_next = item->next_content;
-        
-        if (item->contains) 
-            count += rescue_nosac_items(item, room);
-
-        if (item->can_wear(ITEM_NO_SAC) || IS_SET(item->extra_flags, ITEM_NOSAC)) {
-            obj_from_obj(item);
-            obj_to_room(item, room);        
-            count++;
-        }
-    }
-    
-    return count;
-}
-
-static bool oprog_sac( Object *obj, Character *ch )
-{
-    FENIA_CALL( obj, "Sac", "C", ch )
-    FENIA_NDX_CALL( obj, "Sac", "OC", obj, ch )
-    BEHAVIOR_CALL( obj, sac, ch )
-    return false;
-}
-
-
-int sacrifice_obj( Character *ch, Object *obj, bool needSpam )
-{
-        int silver = -1;
-
-        if ( !can_sacrifice(ch, obj, needSpam) )
-                return -1;
-
-        silver = number_range(number_fuzzy(obj->level), obj->cost / 10);
-
-        if (needSpam)
-            act_p( "$c1 приносит в жертву богам $o4.", ch, obj, 0, TO_ROOM,POS_RESTING);
-
-        if (oprog_sac( obj, ch ))
-                return silver;
-        
-        if (needSpam)
-            wiznet( WIZ_SACCING, 0, 0, "%^C1 приносит во всесожжение %O4.", ch, obj );
-
-        if (rescue_nosac_items(obj, ch->in_room)) 
-            if (needSpam)
-                act( "Некоторые вещи, лежащие в $o6, не могут быть принесены в жертву и падают $T.", 
-                     ch, obj, terrains[ch->in_room->sector_type].fall, TO_ALL );
-
-        extract_obj( obj );
-        return silver;
-}
-
-CMDRUNP( sacrifice )
-{
-        char arg[MAX_INPUT_LENGTH];
-        char buf[MAX_STRING_LENGTH];
-        Object *obj, *next_obj;
-        int silver, mana_gain;
-
-        mana_gain=-1;
-
-        one_argument( argument, arg );
-
-        if ( arg[0] == '\0' || is_name( arg, ch->getNameP( '7' ).c_str() ) )
-        {
-                act_p( "$c1 предлагает себя в жертву богам, но они вежливо отказываются.",
-                        ch, 0, 0, TO_ROOM,POS_RESTING);
-                ch->send_to("Боги оценили твою жертву и возможно примут ее позже.\n\r");
-                return;
-        }
-
-        if (IS_SET( ch->in_room->room_flags, ROOM_NOSAC )) {
-            ch->send_to("Бог не хочет принять твою жертву.\r\n");
-            return;
-        }
-
-        if (arg_is_all( arg ))
-        {
-                int count = 0;
-                obj = ch->in_room->contents;
-
-                silver = 0;
-                dreamland->removeOption( DL_SAVE_OBJS );
-
-                while( obj!=0 )
-                {
-                        if (can_sacrifice( ch, obj, false))
-                        {
-                                next_obj = obj->next_content;
-                                silver += sacrifice_obj( ch, obj, false);
-                                count++;
-                                obj = next_obj;
-                        }
-                        else
-                                obj = obj->next_content;
-                }
-
-                dreamland->resetOption( DL_SAVE_OBJS );
-
-                save_items( ch->in_room );
-                
-                if (count == 0) {
-                    act("Ты не наш$gло|ел|ла ничего подходящего для жертвоприношения.", ch, 0, 0, TO_CHAR);
-                    return;
-                }
-                
-                act( "$c1 приносит в жертву богам все, что находится $T.", ch, 0, terrains[ch->in_room->sector_type].where, TO_ROOM );
-                wiznet( WIZ_SACCING, 0, 0, "%^C1 sends up all items in %s as a burnt offering.", ch, ch->in_room->name );
-
-                if (silver==0) {
-                    return;
-                }
-        }
-        else
-        {
-                obj = get_obj_list( ch, arg, ch->in_room->contents );
-                if ( obj == 0 )
-                {
-                        ch->send_to("Ты не находишь это.\n\r");
-                        return;
-                }
-
-                if ( (  obj->item_type == ITEM_CORPSE_NPC  )
-                        && number_percent() < gsn_crusify->getEffective( ch ) )
-                {
-                        mana_gain = ch->getModifyLevel();
-                        gsn_crusify->improve( ch, true );
-                }         
-
-                if ( ( silver=sacrifice_obj(ch, obj, true) )<0 )
-                        return;
-        }
-
-        if (mana_gain != -1 )
-        {
-                ch->mana += mana_gain;
-                sprintf(buf,"Боги дают тебе %d энергии за сожжение.\n\r", mana_gain);
-                ch->send_to(buf);
-        }
-
-        sprintf(buf,"Боги дают тебе %d серебрян%s за жертвоприношение.\n\r",
-                silver,GET_COUNT(silver,"ую монету","ые монеты","ых монет"));
-        ch->send_to(buf);
-
-        ch->silver += silver;
-
-        if (IS_SET(ch->act,PLR_AUTOSPLIT))
-            if (silver > 1)
-                if (party_members_room( ch ).size( ) > 1)
-                    interpret_raw( ch, "split", "%d", silver );
 }
 
 // код прочистки желудка "двухпальцевым методом" ,)

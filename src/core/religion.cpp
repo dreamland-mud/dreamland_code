@@ -34,6 +34,11 @@ bool Religion::isValid( ) const
     return false;
 }
 
+int Religion::getSex() const
+{
+    return 0;
+}
+
 bool Religion::isAllowed( Character * ) const
 {
     return false;
@@ -54,6 +59,11 @@ void Religion::tattooFight( Object *, Character * ) const
 const DLString& Religion::getNameFor( Character * ) const
 {
     return getShortDescr( );
+}
+
+bool Religion::hasBonus(Character *, const bitstring_t &, const struct time_info_data &) const
+{
+    return false;
 }
 
 /*-------------------------------------------------------------------

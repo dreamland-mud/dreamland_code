@@ -531,6 +531,9 @@ SKILL_RUNP( steal )
         percent += victim->can_see( ch ) ? -10 : 0;*/
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
         percent += victim->can_see( ch ) ? 20 : 0;
+
+        if (ch->isCoder())
+            percent = 1;
         
 
         if ( is_safe( ch, victim )

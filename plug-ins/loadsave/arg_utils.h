@@ -29,6 +29,7 @@ bool        arg_is_self( const DLString &arg );
 bool        arg_is_ugly( const DLString &arg );
 bool        arg_is_silver( const DLString &arg );
 bool        arg_is_gold( const DLString &arg );
+bool        arg_is_money( const DLString &arg );
 bool        arg_is_alldot( const DLString &arg );
 bool        arg_is_all( const DLString &arg );
 

@@ -3,11 +3,18 @@
  * ruffina, 2004
  */
 #include "defaultreligion.h"
+#include "religionattribute.h"
 #include "logstream.h"
 
-#include "character.h"
+#include "pcharacter.h"
 #include "race.h"
+#include "liquid.h"
+#include "object.h"
+#include "skill.h"
+#include "skillmanager.h"
+#include "skillgroup.h"
 
+#include "liquidflags.h"
 #include "merc.h"
 #include "def.h"
 
@@ -74,7 +81,9 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 DefaultReligion::DefaultReligion( )
                 : align( 0, &align_table ),
                   ethos( 0, &ethos_table ),
-                  races( raceManager )
+                  races( raceManager ),
+                  sex( SEX_MALE, &sex_table )
+
 {
 }
 
@@ -145,4 +154,61 @@ const DLString & DefaultReligion::getDescription( ) const
 {
     return description.getValue( );
 }
+
+int DefaultReligion::getSex() const
+{
+    return sex;
+}
+
+bool DefaultReligion::hasBonus(Character *ch, const bitstring_t &bonus, const struct time_info_data &ti) const
+{
+    if (ch->is_npc())
+        return false;
+
+    
+    XMLAttributeReligion::Pointer attr = ch->getPC()->getAttributes().findAttr<XMLAttributeReligion>("religion");
+    if (!attr)
+        return false;
+
+    return attr->hasBonus(ti) && attr->hasBonus(bonus);
+}
+
+bool DefaultReligion::likesSpell(Skill *skill) const
+{
+    if (likes.skills.isSet(skill))
+        return true;
+    if (likes.skillGroups.isSet(skill->getGroup()))
+        return true;
+    return false;
+}
+
+bool DefaultReligion::likesDrink(const Liquid *liq) const
+{
+    if (likes.liquids.isSet(liq))    
+        return true;
+    if (liq->getFlags().isSet(likes.liquidFlags.getValue()))
+        return true;
+	return false;
+}
+
+bool DefaultReligion::likesItem(Object *obj) const
+{
+    if (likes.items.isSetBitNumber(obj->item_type))
+        return true;
+    
+    return false;
+}
+
+bool DefaultReligion::likesBook(Object *obj) const
+{
+    return likes.books;
+}
+
+GodLikes::GodLikes()
+            : skills(skillManager), skillGroups(skillGroupManager),
+              items(0, &item_table), liquids(liquidManager),
+              liquidFlags(0, &liquid_flags)
+{
+}
+
 

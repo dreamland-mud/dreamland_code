@@ -9,12 +9,16 @@
 #include "globalregistryelement.h"
 #include "globalregistry.h"
 #include "globalreference.h"
+#include "bitstring.h"
 #include "xmlglobalreference.h"
 
 #define RELIG( name ) static ReligionReference god_##name( #name )
 
 class Character;
+class PCharacter;
 class Object;
+class Flags;
+struct time_info_data;
 
 /*
  * Religion
@@ -30,12 +34,14 @@ public:
     virtual const DLString &getName( ) const;
     virtual const DLString &getRussianName( ) const;
     virtual bool isValid( ) const;
+    virtual int getSex() const;
 
     virtual const DLString & getShortDescr( ) const;
     virtual const DLString & getDescription( ) const;
     virtual bool isAllowed( Character * ) const;
-    virtual void tattooFight( Object *, Character * ) const;
     virtual const DLString& getNameFor( Character * ) const;
+    virtual void tattooFight( Object *, Character * ) const;
+    virtual bool hasBonus(Character *, const bitstring_t &, const struct time_info_data &) const;
 
 protected:
     DLString name;

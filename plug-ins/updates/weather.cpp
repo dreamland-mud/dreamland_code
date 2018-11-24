@@ -22,6 +22,7 @@
 #include "commandtemplate.h"
 #include "pcharacter.h"
 #include "room.h"
+#include "bonusflags.h"
 #include "dreamland.h"
 #include "descriptor.h"
 #include "mercdb.h"
@@ -388,14 +389,24 @@ CMDRUN( time )
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
         buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
     
-    if (today_kill_bonus(time_info))
-        buf << "В этот день можно получить больше опыта за убийства." << endl;     
 
-    if (today_mana_bonus(time_info))
+    if (ch->getReligion()->hasBonus(ch, RB_MANA, time_info))
+        buf << fmt(0, "Сегодня благодаря %N1 заклинания и молитвы отнимают меньше маны.",
+                      ch->getReligion()->getRussianName().c_str()) << endl;
+    else if (today_mana_bonus(ch, time_info))
         buf << "В этот день заклинания и молитвы отнимают меньше маны." << endl;
 
-    if (today_learn_bonus(time_info))
+    if (ch->getReligion()->hasBonus(ch, RB_LEARN, time_info))
+        buf << fmt(0, "Сегодня %N1 помогает тебе быстрее учиться.",
+                      ch->getReligion()->getRussianName().c_str()) << endl;
+    else if (today_learn_bonus(ch, time_info))
         buf << "В этот день умения учатся быстрее чем обычно." << endl;
+
+    if (ch->getReligion()->hasBonus(ch, RB_KILLEXP, time_info))
+        buf << fmt(0, "Сегодня %N1 дарит тебе больше опыта за убийства.",
+                      ch->getReligion()->getRussianName().c_str()) << endl;
+    else if (today_kill_bonus(ch, time_info))
+        buf << "В этот день можно получить больше опыта за убийства." << endl;     
 
     ch->send_to(buf);
 
@@ -511,98 +522,115 @@ void weather_init( )
 /*--------------------------------------------------------------------------
  * Calendar and bonuses.
  *-------------------------------------------------------------------------*/
-static void cal_divider(ostringstream &buf)
-{
-    buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
-}
+struct Calendar {
+    Calendar(Character *ch) {
+        this->ch = ch;
+    }
 
-static char cal_day_color(int day, int month)
-{
-    // TODO personalized decorator for each player plus global events.
-    struct time_info_data ti;
-    ti.day = day;
-    ti.month = month;
-    ti.year = time_info.year;
+    void draw(ostringstream &out) {
+        buf.str().clear();
 
-    if (day == time_info.day && month == time_info.month)
-        return 'R';
-    if (today_kill_bonus(ti)) 
-        return 'c';
-    if (today_mana_bonus(ti))
-        return 'b';
-    if (today_learn_bonus(ti))
-        return 'W';
-    return 'x';
-}
+        for (int season = 0; season < 4; season++) {
+            draw_divider();
 
-static void cal_day(ostringstream &buf, int day, int month)
-{
-    char color = cal_day_color(day, month);
-    if (color != 'x')
-        buf << "{" << color;
+            for (int month = season*4; month < season*4 + 4; month++) 
+                draw_month_name(month);
+            
+            for (int week = 0; week < 5; week++) {
+                for (int month = 0; month < 4; month++) 
+                    draw_week(week, season*4 + month);
+                
+                buf << endl;
+            }
+        }
 
-    buf << dlprintf("%2d", day+1);
+        draw_divider();
+        draw_month_name(month_table_size-1);
+        for (int week = 0; week < 5; week++) 
+            draw_week(week, month_table_size-1);
+        
+        buf << "{D--------------------+{x" << endl;
+        out << buf.str();
+    }
 
-    if (color != 'x')
-        buf << "{x";
+protected:
+    Character *ch;
+    ostringstream buf;
 
-    if (day%7 != 6)
-        buf << " ";
-}
+    void draw_divider()
+    {
+        buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
+    }
 
-static void cal_week(ostringstream &buf, int week, int month)
-{
-    for (int day = 0; day < 7; day++) 
-        cal_day(buf, (week*7+day), month);
+    char day_color(int day, int month)
+    {
+        struct time_info_data ti;
+        ti.day = day;
+        ti.month = month;
+        ti.year = time_info.year;
 
-    if ((month+1)%4 != 0)
-        buf << "{D|{x";
+        if (day == time_info.day && month == time_info.month)
+            return 'R';
+        if (today_kill_bonus(ch, ti)) 
+            return 'c';
+        if (today_mana_bonus(ch, ti))
+            return 'b';
+        if (today_learn_bonus(ch, ti))
+            return 'G';
+        return 'x';
+    }
 
-    if (month == month_table_size - 1)
-        buf << endl;
-}
+    void draw_day(int day, int month)
+    {
+        char color = day_color(day, month);
+        if (color != 'x')
+            buf << "{" << color;
 
-static void cal_month_name(ostringstream &buf, int m)
-{
-    const month_info &month = month_table[m];
-    buf << " {" << season_table[month.season].color << dlprintf("%-18s", month.name);
+        buf << dlprintf("%2d", day+1);
 
-    if ((m+1)%4 != 0)
-        buf << "{D|{x";
-    else
-        buf << "{x" << endl;
+        if (color != 'x')
+            buf << "{x";
 
-    if (m == month_table_size - 1)
-        buf << endl;
-}
+        if (day%7 != 6)
+            buf << " ";
+    }
 
+    void draw_week(int week, int month)
+    {
+        for (int day = 0; day < 7; day++) 
+            draw_day((week*7+day), month);
+
+        if ((month+1)%4 != 0)
+            buf << "{D|{x";
+
+        if (month == month_table_size - 1)
+            buf << endl;
+    }
+
+    void draw_month_name(int m)
+    {
+        const month_info &month = month_table[m];
+        buf << " {" << season_table[month.season].color << dlprintf("%-18s", month.name);
+
+        if ((m+1)%4 != 0)
+            buf << "{D|{x";
+        else
+            buf << "{x" << endl;
+
+        if (m == month_table_size - 1)
+            buf << endl;
+    }
+};
 
 CMDRUN( calendar )
 {
     ostringstream buf;
     
-    for (int season = 0; season < 4; season++) {
-        cal_divider(buf);
+    Calendar calendar(ch); 
 
-        for (int month = season*4; month < season*4 + 4; month++) 
-            cal_month_name(buf, month);
-        
-        for (int week = 0; week < 5; week++) {
-            for (int month = 0; month < 4; month++) 
-                cal_week(buf, week, season*4 + month);
-            
-            buf << endl;
-        }
-    }
-
-    cal_divider(buf);
-    cal_month_name(buf, month_table_size-1);
-    for (int week = 0; week < 5; week++) 
-        cal_week(buf, week, month_table_size-1);
-     
-    buf << "{D--------------------+" << endl
-        << "{WЛегенда{x: {RX{x - сегодняшний день, {cX{x - больше опыта за убийства, {bX{x - меньше расход маны," << endl
-        << "         {WX{x - быстрее учатся умения" << endl;
+    calendar.draw(buf);
+    buf << "{WЛегенда{x: {RX{x - сегодняшний день, {cX{x - больше опыта за убийства, {bX{x - меньше расход маны," << endl
+        << "         {GX{x - быстрее учатся умения" << endl;
     ch->send_to(buf);
 }
 

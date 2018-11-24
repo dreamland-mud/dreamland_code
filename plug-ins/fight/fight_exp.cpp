@@ -19,6 +19,7 @@
 #include "room.h"
 #include "object.h"
 #include "gsn_plugin.h"
+#include "bonusflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -389,10 +390,13 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
     }
 
     // Calendar bonuses: for now simply increase exp on 13th of each month.
-    if (align_bonus && xp > 10 && today_kill_bonus(time_info)) {
+    if (align_bonus && xp > 10 && today_kill_bonus(gch, time_info)) {
         xp = number_range(xp + xp / 2, xp * 2);
-        gch->pecho("{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x", 
-                   IS_GOOD(gch) ? "силы добра" : IS_NEUTRAL(gch) ? "нейтральные силы" : "силы зла");
+        if (gch->getReligion()->hasBonus(gch, RB_KILLEXP, time_info))
+            gch->pecho("{c%^N1 дарует тебе больше опыта.{x", gch->getReligion()->getRussianName().c_str());
+        else
+            gch->pecho("{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x", 
+                       IS_GOOD(gch) ? "силы добра" : IS_NEUTRAL(gch) ? "нейтральные силы" : "силы зла");
     }
    
 

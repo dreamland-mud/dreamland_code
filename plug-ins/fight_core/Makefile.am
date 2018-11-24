@@ -14,6 +14,7 @@ $(INCLUDES_SRC) \
 
 libfight_core_la_SOURCES = \
 damageflags.cpp \
+bonusflags.cpp \
 impl.cpp \
 fight_position.cpp \
 fight_exception.cpp \
@@ -41,7 +42,13 @@ libfight_core_la_LIBADD = \
 damageflags.cpp: damageflags.conf damageflags.h
 damageflags.h: damageflags.conf
 damageflags.cpp: damageflags.h
+bonusflags.cpp: bonusflags.conf bonusflags.h
+bonusflags.h: bonusflags.conf
 
-CLEANFILES = damageflags.cpp $(top_builddir)/src/damageflags.h 
+CLEANFILES = damageflags.cpp $(top_builddir)/src/damageflags.h \
+bonusflags.cpp $(top_builddir)/src/bonusflags.h 
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+
+
+
