@@ -160,18 +160,6 @@ int DefaultReligion::getSex() const
     return sex;
 }
 
-bool DefaultReligion::hasBonus(Character *ch, const bitstring_t &bonus, const struct time_info_data &ti) const
-{
-    if (ch->is_npc())
-        return false;
-
-    
-    XMLAttributeReligion::Pointer attr = ch->getPC()->getAttributes().findAttr<XMLAttributeReligion>("religion");
-    if (!attr)
-        return false;
-
-    return attr->hasBonus(ti) && attr->hasBonus(bonus);
-}
 
 bool DefaultReligion::likesSpell(Skill *skill) const
 {

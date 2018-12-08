@@ -10,6 +10,7 @@
 #include "xmlattribute.h"
 #include "xmlflags.h"
 #include "playerattributes.h"
+#include "bonus.h"
 
 class Flags;
 struct time_info_data;
@@ -18,9 +19,11 @@ class XMLTimeInfo : public XMLVariableContainer
 {
 XML_OBJECT
 public:
+#if 0
     void fromTime(const struct time_info_data &);
     void fromDayOfEpoch(long lday);
     DLString toString() const;
+#endif
 
     XML_VARIABLE XMLInteger year;
     XML_VARIABLE XMLInteger month;
@@ -38,20 +41,12 @@ public:
         virtual ~XMLAttributeReligion( );
         
         virtual bool handle( const ScoreArguments &args ); 
-        bool hasBonus(const bitstring_t &) const;
-        bool hasBonus(const struct time_info_data &) const; 
-        bool bonusUsedRecently(const Flags &) const;
-        void setLuckyWeek(const Flags &bonus);
 
         XML_VARIABLE XMLLong attempts;
         XML_VARIABLE XMLLong successes;
         XML_VARIABLE XMLLong angers;
-
-protected:
-        XML_VARIABLE XMLTimeInfo start;
-        XML_VARIABLE XMLTimeInfo end;
-        XML_VARIABLE XMLFlags bonuses;
-        XML_VARIABLE XMLFlags prevBonuses;
+        XML_VARIABLE XMLBonusReference prevBonus;
+        XML_VARIABLE XMLLong prevBonusEnds;
 };
 
 #endif

@@ -246,6 +246,7 @@ plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \
 plug-ins/gmcp/Makefile \
+plug-ins/bonus/Makefile \
 )
 
 echo ""

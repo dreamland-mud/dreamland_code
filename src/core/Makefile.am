@@ -38,7 +38,8 @@ religion.cpp \
 desire.cpp \
 helpmanager.cpp \
 mobilespecial.cpp \
-dlpluginmanager.cpp
+dlpluginmanager.cpp \
+bonus.cpp
 
 libcore_la_MOC = \
 affect.h \
@@ -49,5 +50,6 @@ pcharacter.h \
 pcharactermemory.h \
 pcskilldata.h \
 remortdata.h \
-xmlattributes.h 
+xmlattributes.h \
+bonus.h
 

@@ -13,6 +13,7 @@ ed \
 profession \
 race \
 hometown \
+bonus \
 occupations \
 communication \
 follow \

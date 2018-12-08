@@ -27,7 +27,6 @@
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
-#include "today.h"
 #include "handler.h"
 #include "def.h"
 
@@ -39,6 +38,7 @@ CLAN(battlerager);
 GSN(shielding);
 GSN(garble);
 GSN(deafen);
+BONUS(mana);
 
 
 static bool mprog_spell( Character *victim, Character *caster, int sn, bool before )
@@ -173,7 +173,7 @@ CMDRUN( cast )
     }
 
     mana = spell->getManaCost( ch );
-    if (today_mana_bonus(ch, time_info))
+    if (!ch->is_npc() && bonus_mana->isActive(ch->getPC(), time_info))
         mana /= 2;
 
     if (ch->mana < mana) {

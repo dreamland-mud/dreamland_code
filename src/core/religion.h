@@ -41,7 +41,6 @@ public:
     virtual bool isAllowed( Character * ) const;
     virtual const DLString& getNameFor( Character * ) const;
     virtual void tattooFight( Object *, Character * ) const;
-    virtual bool hasBonus(Character *, const bitstring_t &, const struct time_info_data &) const;
 
 protected:
     DLString name;

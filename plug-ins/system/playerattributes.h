@@ -74,7 +74,17 @@ struct WhoisArguments {
     PCharacter *looker;
     list<DLString> &lines;
 };
+#if 0
+struct TimeArguments {
+    TimeArguments(PCharacter *ch, ostringstream &b)
+           : pch(ch), buf(b)
+    {
+    }
 
+    PCharacter *pch;
+    ostringstream &buf;
+};
+#endif
 extern template class EventHandler<RemortArguments>;
 extern template class EventHandler<DeathArguments>;
 extern template class EventHandler<PromptArguments>;

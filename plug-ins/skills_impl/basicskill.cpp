@@ -20,7 +20,6 @@
 #include "affectflags.h"
 #include "stats_apply.h"
 #include "act.h"
-#include "today.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "material.h"
@@ -30,6 +29,7 @@
 GSN(learning);
 GSN(anathema);
 DESIRE(drunk);
+BONUS(learning);
 
 void BasicSkill::loaded( )
 {
@@ -142,19 +142,19 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     }
 
     bool fEnlight = pch->getAttributes( ).isAvailable( "enlight" );
-    bool fBonus = today_learn_bonus(ch, time_info);
+    bool fBonus = bonus_learning->isActive(pch, time_info);
 
     if (fEnlight || fBonus)
         chance *= 2;
-
     if (number_range(1, 1000) > chance)
         return;
    
     /* now that the character has a CHANCE to learn, see if they really have */        
     if (success) {
-        chance = URANGE(5, 100 - data.learned, 95);
-        if (fBonus)
-            chance += chance / 2;
+        int learned = data.learned;
+        if (fEnlight || fBonus)
+            learned = min(learned, 60);
+        chance = URANGE(5, 100 - learned, 95);
         
         if (number_percent( ) >= chance)
             return;

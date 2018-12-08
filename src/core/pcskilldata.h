@@ -12,6 +12,7 @@
 #include "xmlboolean.h"
 #include "xmlmap.h"
 #include "skilleventhandler.h"
+#include "globalprofilearray.h"
 
 class PCSkillData : public XMLVariableContainer {
 XML_OBJECT
@@ -21,23 +22,22 @@ public:
         PCSkillData( );
 
         XML_VARIABLE XMLInteger learned;
-        XML_VARIABLE XMLInteger timer;
-        XML_VARIABLE XMLBoolean forgetting;
+        XML_VARIABLE XMLIntegerNoEmpty timer;
+        XML_VARIABLE XMLBooleanNoFalse forgetting;
+    
+        bool isValid() const;
+        static PCSkillData empty;
 };
 
-class PCSkills : public XMLVariableContainer, public std::vector<PCSkillData> {
+class PCSkills : public GlobalProfileArray<PCSkillData> {
 XML_OBJECT
 public:
         typedef ::Pointer<PCSkills> Pointer;
+        typedef GlobalProfileArray<PCSkillData> Base;
 
-        virtual bool toXML( XMLNode::Pointer& ) const;
-        virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
-
-        PCSkillData & get( int );
+        PCSkills();
         bool forEachLearned( SkillEventHandler::Method, ... );
 };
-
-typedef XMLMapBase<PCSkillData> XMLPCSkills;
 
 #define SKILLEVENT_CALL(ch, method...) \
     if (!(ch)->is_npc( )) \

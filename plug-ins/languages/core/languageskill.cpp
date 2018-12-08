@@ -11,7 +11,6 @@
 #include "pcharacter.h"
 #include "pcrace.h"
 
-#include "today.h"
 #include "mercdb.h"
 
 #include "poliglot.h"
@@ -22,6 +21,7 @@ const int Language::SKILL_SENSE  = 75;
 const int Language::SKILL_NATIVE = 100;
 
 GROUP(ancient_languages);
+BONUS(learning);
 
 SkillGroupReference & Language::getGroup( ) 
 {
@@ -239,7 +239,7 @@ void Language::improve( Character *ch, bool, Character *victim, int, int ) const
     if (maximum <= SKILL_ADEPT) 
         return;
 
-    if (!chance( maximum / 2 ) && !today_learn_bonus(ch, time_info))
+    if (!chance( maximum / 2 ) && !bonus_learning->isActive(pch, time_info))
         return;
     
     if (number_percent( ) >= 4 * ch->getCurrStat( STAT_INT )) 

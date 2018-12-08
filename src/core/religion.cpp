@@ -61,11 +61,6 @@ const DLString& Religion::getNameFor( Character * ) const
     return getShortDescr( );
 }
 
-bool Religion::hasBonus(Character *, const bitstring_t &, const struct time_info_data &) const
-{
-    return false;
-}
-
 /*-------------------------------------------------------------------
  * ReligionManager
  *------------------------------------------------------------------*/

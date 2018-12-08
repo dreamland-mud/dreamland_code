@@ -19,18 +19,18 @@
 #include "room.h"
 #include "object.h"
 #include "gsn_plugin.h"
-#include "bonusflags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
-#include "today.h"
+#include "bonus.h"
 #include "fight.h"
 #include "act.h"
 #include "def.h"
 
 PROF(samurai);
+BONUS(experience);
 
-int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
+int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
 
 #ifndef FIGHT_STUB
 void gain_exp_mob( NPCharacter *ch, Character *victim )
@@ -311,7 +311,7 @@ bool xp_align_coeff(Character *gch, Character *victim, int &align_mult, int &ali
 /*
  * Compute xp for a kill.
  */
-int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus )
+int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus )
 {
   char buf[MAX_STRING_LENGTH];
   int xp;
@@ -390,13 +390,11 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
     }
 
     // Calendar bonuses: for now simply increase exp on 13th of each month.
-    if (align_bonus && xp > 10 && today_kill_bonus(gch, time_info)) {
+    if (align_bonus && xp > 10 && bonus_experience->isActive(gch, time_info)) {
+        ostringstream ostr;
         xp = number_range(xp + xp / 2, xp * 2);
-        if (gch->getReligion()->hasBonus(gch, RB_KILLEXP, time_info))
-            gch->pecho("{c%^N1 дарует тебе больше опыта.{x", gch->getReligion()->getRussianName().c_str());
-        else
-            gch->pecho("{cСегодня %s благосклонны к тебе, даруя тебе больше опыта.{x", 
-                       IS_GOOD(gch) ? "силы добра" : IS_NEUTRAL(gch) ? "нейтральные силы" : "силы зла");
+        bonus_experience->reportAction(gch, ostr);
+        gch->send_to(ostr);
     }
    
 

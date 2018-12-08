@@ -22,17 +22,18 @@
 #include "commandtemplate.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "bonusflags.h"
 #include "dreamland.h"
 #include "descriptor.h"
 #include "mercdb.h"
-#include "today.h"
 #include "handler.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
 
 PROF(vampire);
+BONUS(experience);
+BONUS(mana);
+BONUS(learning);
 
 const char * sunlight_ru [4] = {
     "темно",
@@ -386,28 +387,25 @@ CMDRUN( time )
         << season.adjective << " месяца " << month.name << ", "
         << "года " << time_info.year << "." << endl;
 
+    if (ch->is_npc())
+        return;
+
+    PCharacter *pch = ch->getPC();
+
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
         buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
-    
 
-    if (ch->getReligion()->hasBonus(ch, RB_MANA, time_info))
-        buf << fmt(0, "Сегодня благодаря %N1 заклинания и молитвы отнимают меньше маны.",
-                      ch->getReligion()->getRussianName().c_str()) << endl;
-    else if (today_mana_bonus(ch, time_info))
-        buf << "В этот день заклинания и молитвы отнимают меньше маны." << endl;
-
-    if (ch->getReligion()->hasBonus(ch, RB_LEARN, time_info))
-        buf << fmt(0, "Сегодня %N1 помогает тебе быстрее учиться.",
-                      ch->getReligion()->getRussianName().c_str()) << endl;
-    else if (today_learn_bonus(ch, time_info))
-        buf << "В этот день умения учатся быстрее чем обычно." << endl;
-
-    if (ch->getReligion()->hasBonus(ch, RB_KILLEXP, time_info))
-        buf << fmt(0, "Сегодня %N1 дарит тебе больше опыта за убийства.",
-                      ch->getReligion()->getRussianName().c_str()) << endl;
-    else if (today_kill_bonus(ch, time_info))
-        buf << "В этот день можно получить больше опыта за убийства." << endl;     
-
+#if 0   
+    if (!ch->is_npc()) {
+        ch->getPC()->getBonuses().handleEvent(TimeArguments(ch->getPC(), buf));
+    }
+#endif 
+  
+    for (int bn = 0; bn < bonusManager->size(); bn++) {
+        Bonus *bonus = bonusManager->find(bn);
+        if (bonus->isActive(pch, time_info))
+            bonus->reportTime(pch, buf);
+    }
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
@@ -523,7 +521,7 @@ void weather_init( )
  * Calendar and bonuses.
  *-------------------------------------------------------------------------*/
 struct Calendar {
-    Calendar(Character *ch) {
+    Calendar(PCharacter *ch) {
         this->ch = ch;
     }
 
@@ -554,7 +552,7 @@ struct Calendar {
     }
 
 protected:
-    Character *ch;
+    PCharacter *ch;
     ostringstream buf;
 
     void draw_divider()
@@ -571,12 +569,12 @@ protected:
 
         if (day == time_info.day && month == time_info.month)
             return 'R';
-        if (today_kill_bonus(ch, ti)) 
-            return 'c';
-        if (today_mana_bonus(ch, ti))
-            return 'b';
-        if (today_learn_bonus(ch, ti))
-            return 'G';
+        
+        for (int bn = 0; bn < bonusManager->size(); bn++) {
+            Bonus *bonus = bonusManager->find(bn);
+            if (bonus->isActive(ch, ti))
+                return bonus->getColor();
+        }
         return 'x';
     }
 
@@ -624,9 +622,11 @@ protected:
 
 CMDRUN( calendar )
 {
+    if (ch->is_npc())
+        return;
+ 
     ostringstream buf;
-    
-    Calendar calendar(ch); 
+    Calendar calendar(ch->getPC()); 
 
     calendar.draw(buf);
     buf << "{WЛегенда{x: {RX{x - сегодняшний день, {cX{x - больше опыта за убийства, {bX{x - меньше расход маны," << endl

@@ -53,6 +53,7 @@ class LiquidManager;
 class DesireManager;
 class HelpManager;
 class SkillGroupManager;
+class BonusManager;
 
 extern DreamLand * dreamland;
 
@@ -193,6 +194,7 @@ private:
         ::Pointer<DesireManager> desireManager;
         ::Pointer<HelpManager> helpManager;
         ::Pointer<SkillGroupManager> skillGroupManager;
+        ::Pointer<BonusManager> bonusManager;
 
         DbEnvContext *dbEnv;
 };

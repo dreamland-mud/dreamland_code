@@ -269,6 +269,7 @@ void PCharacter::init( )
     russianPretitle.setValue( "" );
     description.setValue( "" );
     skills.clear( );
+    bonuses.clear();
     security = 0;
     newbie_hit_counter = 0;
 

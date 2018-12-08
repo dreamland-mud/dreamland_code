@@ -459,7 +459,6 @@ void water_float_update( )
 {
     Object *obj_next;
     Object *obj;
-    Character *ch;
 
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
@@ -475,8 +474,6 @@ void water_float_update( )
 
         if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))
             continue;
-        
-        ch = obj->in_room->people;
         
         if (obj->water_float == -2) {
             if (obj->may_float( ) || material_swims( obj ) == SWIM_ALWAYS)

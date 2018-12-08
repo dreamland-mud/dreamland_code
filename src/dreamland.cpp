@@ -47,6 +47,7 @@
 #include "desire.h"
 #include "helpmanager.h"
 #include "skillgroup.h"
+#include "bonus.h"
 
 #include "mercdb.h"
 #include "merc.h"
@@ -92,6 +93,7 @@ DreamLand::DreamLand( )
         desireManager.construct( );
         helpManager.construct( );
         skillGroupManager.construct( );
+        bonusManager.construct( );
 
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
@@ -120,6 +122,7 @@ DreamLand::~DreamLand( )
         desireManager.clear( );
         helpManager.clear( );
         skillGroupManager.clear( );
+        bonusManager.clear( );
 
         getDbEnv( )->close( );
         

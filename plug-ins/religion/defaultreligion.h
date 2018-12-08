@@ -44,13 +44,6 @@ inline const DLString & ReligionHelp::getType( ) const
     return TYPE;
 }
 
-enum {
-    SAC_NOT_SUPPORTED = -1, 
-    SAC_NOT_ENOUGH, 
-    SAC_ANGER, 
-    SAC_ACCEPTED
-};
-
 class GodLikes : public XMLVariableContainer {
 XML_OBJECT
 public:
@@ -83,7 +76,6 @@ public:
     virtual const DLString &getDescription( ) const;
     virtual bool isAllowed( Character * ) const;
     virtual const DLString& getNameFor( Character * ) const;
-    virtual bool hasBonus(Character *, const bitstring_t &, const struct time_info_data &) const;
     
     inline const Flags & getAlign() const;
     inline const Flags & getEthos() const;

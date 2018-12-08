@@ -23,7 +23,6 @@
 #include "handler.h"
 #include "interp.h"
 #include "itemflags.h"
-#include "bonusflags.h"
 #include "loadsave.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -36,6 +35,9 @@
 
 RELIG(none);
 GSN(sacrifice);
+BONUS(experience);
+BONUS(learning);
+BONUS(mana);
 
 const int default_threshold = 1000;
 
@@ -328,6 +330,16 @@ protected:
 
 
 
+long day_of_epoch(int year, int month, int day)
+{
+    return year * 35 * 17 + month * 35 + day;
+}
+
+long day_of_epoch(const struct time_info_data &ti)
+{
+    return day_of_epoch(ti.year, ti.month, ti.day);
+}
+
 
 /*
  * 'sacrifice' command
@@ -352,7 +364,6 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     PCharacter *pch = ch->getPC();
     const Religion &religion = *(pch->getReligion());
     const char *rname = religion.getRussianName().c_str();
-    Flags bonus(0, &bonus_flags);
 
     if (religion.getIndex() == god_none) {
         ch->pecho("Но ты же закоренел%1$Gое|ый|ая атеист%1$G||ка.", ch);
@@ -376,25 +387,18 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     }
 
     XMLAttributeReligion::Pointer attr = pch->getAttributes().getAttr<XMLAttributeReligion>("religion");
-    if (attr->hasBonus(time_info)) {
+    if (day_of_epoch(time_info) <= attr->prevBonusEnds) {
         ch->pecho("Ты все еще пользуешься плодами предыдущего жертвоприношения.");
         return;
     }
 
-    if (arg_oneof(arg, "опыт", "experience")) 
-        bonus.setBit(RB_KILLEXP);
-//    else if (arg_oneof(arg, "qp", "кп") || arg_oneof(arg, "reward", "награда"))
-//        bonus.setBit(RB_QUESTP);
-    else if (arg_oneof(arg, "mana", "мана"))
-        bonus.setBit(RB_QUESTP);
-    else if (arg_oneof(arg, "learning", "обучаемость"))
-        bonus.setBit(RB_LEARN);
-    else {
+    Bonus *bonus = bonusManager->findUnstrict(arg);
+    if (!bonus) {
         ch->println("Ты можешь попросить богов об одной из таких вещей: {lRопыт, мана, обучаемость{lEexp, mana, learning{x.");
         return;
     }
 
-    if (attr->bonusUsedRecently(bonus)) {
+    if (attr->prevBonus == bonus->getIndex()) {
         ch->pecho("Не стоит просить %N4 об одном и том же два раза подряд - попроси %p2 о чем-то еще.", rname, religion.getSex());
         return;
     }
@@ -421,11 +425,12 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
         ch->recho("Гнев божий обрушивается на %C2!", ch);
         rawdamage(ch, ch, DAM_HOLY, ch->hit / 4, false);
         ch->pecho("Это было действительно {rБОЛЬНО{x!"); 
+        altar_clear(altar);
 
         postaffect_to_char(ch, gsn_sacrifice, 5);
-        altar_clear(altar);
-        ch->setWaitViolence(2);
         attr->angers++;
+        ch->setWaitViolence(2);
+        pch->save();
         return;
     }
     
@@ -433,17 +438,23 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
         ch->pecho("%^N1 игнорирует твое скудное подношение.", rname);
         ch->recho("... но ничего не происходит.");
         ch->setWaitViolence(1);
+        pch->save();
         return;
     }
 
     ch->pecho("{Y%^N1 благосклонно принимает твою жертву.{x", rname);
-    ch->pecho("{YВсю следующую неделю тебе будет сопутствовать удача в %s.{x", bonus.messages(true, '6').c_str());
+    ch->pecho("{YВсю следующую неделю тебе будет сопутствовать удача в %s.{x", bonus->getShortDescr().ruscase('6').c_str());
     ch->recho("%1$^C1 выглядит просветленн%1$Gым|ым|ой.", ch);
-
-    attr->setLuckyWeek(bonus);
-    attr->successes++;
     altar_clear(altar);
+    
+    PCBonusData &data = pch->getBonuses().get(bonus->getIndex());
+    data.start = day_of_epoch(time_info);
+    data.end = data.start + 8;
+    attr->prevBonusEnds = data.end;
+    attr->prevBonus = bonus->getIndex();
+    attr->successes++;
     ch->setWaitViolence(2);
+    pch->save();
 }
 
 static bool can_sacrifice( Character *ch, Object *obj, bool needSpam ) 

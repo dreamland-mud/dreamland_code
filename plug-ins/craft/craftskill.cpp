@@ -15,13 +15,13 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "stats_apply.h"
-#include "today.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
 #include "def.h"
 
 GSN(learning);
+BONUS(learning);
 
 const DLString CraftSkill::CATEGORY = "Умения дополнительных профессий";
 
@@ -196,7 +196,7 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
     chance /= max(1, hard.getValue()) * getRating(pch);
     chance = chance * get_int_app(pch).learn  / 100;
     
-    if (today_learn_bonus(ch, time_info))
+    if (bonus_learning->isActive(pch, time_info))
         chance *= 2;
 
     if (number_range(1, 1000) > chance)

@@ -29,6 +29,7 @@
 #include "remortdata.h"
 #include "pcskilldata.h"
 #include "hometown.h"
+#include "bonus.h"
 
 class PCharacterMemory;
 
@@ -204,6 +205,7 @@ public:
     virtual int applyCurse( int );
     PCSkillData & getSkillData( int );
     inline PCSkills & getSkills( );
+    inline PCBonuses & getBonuses();
     void updateSkills( );
 
     // experience 
@@ -255,6 +257,7 @@ private:
     XML_VARIABLE XMLStringNoEmpty russianPretitle;
     XML_VARIABLE XMLString description;
     XML_VARIABLE PCSkills skills;
+    XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLIntegerNoEmpty newbie_hit_counter; 
     
@@ -330,6 +333,12 @@ inline PCSkills & PCharacter::getSkills( )
 {
     return skills;
 }
+
+inline PCBonuses & PCharacter::getBonuses()
+{
+    return bonuses;
+}
+
 
 #endif
 
