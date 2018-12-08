@@ -60,6 +60,8 @@ public:
             return value;
         }
 
+        static bool tryParse(Integer &, const DLString &);
+
 private:
         int value;
 };

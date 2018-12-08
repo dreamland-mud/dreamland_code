@@ -30,3 +30,10 @@ bool XMLLong::toXML( XMLNode::Pointer& parent ) const
         return true;
 }
 
+bool XMLLongNoEmpty::toXML( XMLNode::Pointer& parent ) const
+{
+    if (getValue( ) == 0)
+        return false;
+    else 
+        return XMLLong::toXML( parent );
+}

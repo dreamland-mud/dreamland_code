@@ -40,6 +40,19 @@ public:
 };
 
 
+class XMLLongNoEmpty : public XMLLong {
+public:
+        inline XMLLongNoEmpty( )
+        {
+        }
+        
+        inline XMLLongNoEmpty( int value ) : XMLLong( value )
+        {
+        }
+
+        bool toXML( XMLNode::Pointer& node ) const;
+};
+
 
 
 /** Вывод в ostream типа XMLLong */

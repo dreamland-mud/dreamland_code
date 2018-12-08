@@ -39,3 +39,15 @@ DLString Integer::toString( ) const throw( )
         buf << value;
         return buf.str( );
 }
+
+bool Integer::tryParse(Integer &target, const DLString &value)
+{
+    try {
+        target.fromString(value);
+    } catch (const ExceptionBadType &ex) {
+        return false;
+    }
+
+    return true;
+}
+
