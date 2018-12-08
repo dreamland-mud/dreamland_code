@@ -43,7 +43,6 @@ private:
     void replace( int, GlobalRegistryElement::Pointer );
 };
 
-
 template <typename Elem>
 class GlobalRegistry : public GlobalRegistryBase {
 public:
