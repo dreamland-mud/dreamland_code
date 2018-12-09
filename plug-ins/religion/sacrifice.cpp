@@ -394,7 +394,13 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
 
     Bonus *bonus = bonusManager->findUnstrict(arg);
     if (!bonus) {
-        ch->println("Ты можешь попросить богов об одной из таких вещей: {lRопыт, мана, обучаемость{lEexp, mana, learning{x.");
+        ch->println("Ты можешь попросить богов об одной из таких вещей: {lRопыт, мана, обучаемость, воровские умения{lEexp, mana, learning, thief skills{x.");
+        ch->println("Но помни, что не все они для тебя подходят.");
+        return;
+    }
+
+    if (!bonus->available(pch)) {
+        ch->pecho("Ты слышишь насмешливый голос с неба, говорящий тебе, что то, о чем ты просишь, тебе ни к чему.");
         return;
     }
 

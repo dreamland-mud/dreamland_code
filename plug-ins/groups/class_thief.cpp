@@ -30,6 +30,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "object.h"
+#include "bonus.h"
 
 #include "gsn_plugin.h"
 #include "drink_utils.h"
@@ -54,7 +55,7 @@
 #include "def.h"
 
 GSN(key_forgery);
-
+BONUS(thief_skills);
 
 static bool mprog_steal_fail( Character *victim, Character *thief )
 {
@@ -534,7 +535,12 @@ SKILL_RUNP( steal )
 
         if (ch->isCoder())
             percent = 1;
-        
+        if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+            ostringstream ostr;
+            bonus_thief_skills->reportAction(ch->getPC(), ostr);
+            ch->send_to(ostr);
+            percent = 1;
+        }
 
         if ( is_safe( ch, victim )
                 || (!ch->is_npc() && percent > skill)
@@ -608,8 +614,8 @@ SKILL_RUNP( steal )
                 victim->gold -= amount_g;
                 ch->silver     += amount_s;
                 victim->silver -= amount_s;
-                ch->pecho("Bingo! Тебе удалось стащить %s.",
-                          describe_money( amount_g, amount_s, 4 ).c_str( ));
+                    
+                ch->pecho("Bingo! Тебе удалось стащить %s.", describe_money( amount_g, amount_s, 4 ).c_str( ));
                 gsn_steal->improve( ch, true, victim );
 
                 if (mprog_steal_money( victim, ch, amount_g, amount_s ))
@@ -1027,16 +1033,24 @@ SKILL_RUNP( backstab )
         return;
     
     BackstabOneHit bs( ch, victim );
+    bool fBonus = false;
     
+    if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+        ostringstream ostr;
+        bonus_thief_skills->reportAction(ch->getPC(), ostr);
+        ch->send_to(ostr);
+        fBonus = true;
+    }
+
     try {
         if (!IS_AWAKE(victim)
+                || fBonus
                 || number_percent( ) < gsn_backstab->getEffective( ch ))
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
 
-            if (!ch->is_npc()
-                    && number_percent( ) < (gsn_dual_backstab->getEffective( ch ) * 8 ) / 10 )
+            if (fBonus || !ch->is_npc() && number_percent( ) < (gsn_dual_backstab->getEffective( ch ) * 8 ) / 10)
             {
                 gsn_dual_backstab->improve( ch, true, victim );
                 
@@ -1119,9 +1133,18 @@ SKILL_RUNP( circle )
     }
     
     CircleOneHit circ( ch, victim );
+    bool fBonus = false;
+    
+    if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+        ostringstream ostr;
+        bonus_thief_skills->reportAction(ch->getPC(), ostr);
+        ch->send_to(ostr);
+        fBonus = true;
+    }
+
     
     try {
-        if ( ch->is_npc() || number_percent( ) < gsn_circle->getEffective( ch ) )
+        if (ch->is_npc() || fBonus || number_percent( ) < gsn_circle->getEffective( ch ))
         {
                 circ.hit( );
                 gsn_circle->improve( ch, true, victim );
@@ -1219,7 +1242,16 @@ SKILL_RUNP( blackjack )
         if (victim->isAffected(gsn_backguard)) 
             chance /= 2;
 
-        if (number_percent() < chance * k / 100)
+        bool fBonus = false;
+        
+        if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+            ostringstream ostr;
+            bonus_thief_skills->reportAction(ch->getPC(), ostr);
+            ch->send_to(ostr);
+            fBonus = true;
+        }
+
+        if (fBonus || number_percent() < chance * k / 100)
         {
                 act_p("Ты бьешь $C4 по голове мешочком со свинцом.",
                         ch,0,victim,TO_CHAR,POS_RESTING);

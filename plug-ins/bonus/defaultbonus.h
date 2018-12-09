@@ -6,6 +6,7 @@
 #include "xmllist.h"
 #include "xmlstring.h"
 #include "xmlboolean.h"
+#include "xmlglobalbitvector.h"
 
 class DefaultBonus : public XMLVariableContainer, public Bonus, public XMLTableElement {
 XML_OBJECT
@@ -22,9 +23,10 @@ public:
     virtual const DLString &getShortDescr( ) const;
     virtual char getColor() const;
     virtual bool isValid( ) const;
-    virtual bool isReligious() const;
+    virtual bool available(PCharacter *) const;
     virtual bool isActive(PCharacter *, const struct time_info_data &) const;
     virtual void reportTime(PCharacter *, ostringstream &) const;
+    virtual void reportAction(PCharacter *, ostringstream &) const;
 
 protected:
     bool activeForAll(const struct time_info_data &) const;
@@ -37,9 +39,12 @@ protected:
     XML_VARIABLE XMLString shortDescr;
     XML_VARIABLE XMLString msgTodayReligion;
     XML_VARIABLE XMLString msgTodayGlobal;
+    XML_VARIABLE XMLString msgActionReligion;
+    XML_VARIABLE XMLString msgActionGlobal;
     XML_VARIABLE XMLString globalDay;
     XML_VARIABLE XMLString globalMonth;
     XML_VARIABLE XMLBoolean religious;
+    XML_VARIABLE XMLGlobalBitvector professions;
 };
 
 class ExperienceBonus : public DefaultBonus {

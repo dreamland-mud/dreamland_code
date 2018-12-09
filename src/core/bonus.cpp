@@ -35,7 +35,7 @@ bool Bonus::isValid( ) const
     return false;
 }
 
-bool Bonus::isReligious( ) const
+bool Bonus::available(PCharacter *) const
 {
     return false;
 }

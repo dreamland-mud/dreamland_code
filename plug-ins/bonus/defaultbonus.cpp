@@ -5,6 +5,7 @@
 #include "def.h"
 
 DefaultBonus::DefaultBonus( )
+                  : professions( professionManager )
 {
 }
 
@@ -50,9 +51,15 @@ bool DefaultBonus::isValid( ) const
     return true;
 }
 
-bool DefaultBonus::isReligious( ) const
+bool DefaultBonus::available(PCharacter *ch) const
 {
-    return religious;
+    if (!religious)
+        return false;
+
+    if (!professions.empty( ) && !professions.isSet( ch->getProfession( ) ))
+        return false;
+   
+    return true; 
 }
 
 bool DefaultBonus::isActive(PCharacter *ch, const struct time_info_data &ti) const
@@ -62,6 +69,18 @@ bool DefaultBonus::isActive(PCharacter *ch, const struct time_info_data &ti) con
     if (activeForAll(ti))
         return true;
     return false;
+}
+
+void DefaultBonus::reportAction(PCharacter *ch, ostringstream &buf) const
+{
+    if (activeForPlayer(ch, time_info)) {
+        if (!msgActionReligion.empty())
+            buf << fmt(0, msgActionReligion.c_str(), ch->getReligion()->getRussianName().c_str()) << endl;
+        return;
+    }
+
+    if (!msgActionGlobal.empty())
+        buf << msgActionGlobal << endl;
 }
 
 void DefaultBonus::reportTime(PCharacter *ch, ostringstream &buf) const

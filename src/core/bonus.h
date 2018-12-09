@@ -38,7 +38,7 @@ public:
     virtual const DLString &getShortDescr( ) const;
     virtual char getColor() const;
     virtual bool isValid( ) const;
-    virtual bool isReligious() const;
+    virtual bool available(PCharacter *) const;
     virtual bool isActive(PCharacter *, const struct time_info_data &) const;
     virtual void reportTime(PCharacter *, ostringstream &) const;
     virtual void reportAction(PCharacter *, ostringstream &) const;

@@ -18,6 +18,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "object.h"
+#include "bonus.h"
 #include "gsn_plugin.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -29,6 +30,7 @@
 
 PROF(samurai);
 BONUS(experience);
+BONUS(pet_day);
 
 int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
 
@@ -37,8 +39,11 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
 {
     int modifier = 100;
     int diff = victim->getRealLevel() - ch->getRealLevel();
-    
-    if ( diff > 15 )
+    bool fBonus = bonus_pet_day->isActive(NULL, time_info);
+   
+    if (fBonus)
+        modifier = 150;
+    else if (diff > 15)
         modifier = 150;
     else if ( diff > 5 )
         modifier = 125;
@@ -46,7 +51,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         modifier = 110;
     else if ( diff > -5 )
         modifier = 105;
-        
+     
     if ( number_percent() * modifier / 100 > 110 )
     {
         if (victim->getRealLevel() > ch->getRealLevel()) {
@@ -65,7 +70,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
     }
     if ( number_percent() * modifier / 100 > 90 )
     {
-        if (victim->hitroll > ch->hitroll) {
+        if (fBonus || victim->hitroll > ch->hitroll) {
             ch->hitroll++;
             ch->send_to("Теперь ты будешь попадать более метко!\n\r");
             act_p("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
@@ -73,7 +78,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
     }
     if ( number_percent() * modifier / 100 > 110 )
     {
-        if (victim->damroll > ch->damroll) {
+        if (fBonus || victim->damroll > ch->damroll) {
             ch->damroll++;
             ch->send_to("Теперь ты будешь больнее бить!\n\r");
             act_p("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
@@ -86,7 +91,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         gain = max( 0, victim->max_hit - ch->max_hit );
         gain = gain * number_percent() * 20 / 10000;
 
-        if (gain > 0) {
+        if (fBonus || gain > 0) {
             ch->max_hit += gain;
             ch->send_to("Ты здоровеешь!\n\r");
             act_p("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
@@ -99,7 +104,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         gain = max( 0, victim->max_mana - ch->max_mana );
         gain = gain * number_percent() * 20 / 10000;
 
-        if (gain > 0) {
+        if (fBonus || gain > 0) {
             ch->max_mana += gain;
             ch->send_to("Ты чувствуешь прилив энергии!\n\r");
             act_p("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
@@ -111,7 +116,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
 
         if ( number_percent() * modifier / 100 > 110 )
         {
-            if (vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER]) {
+            if (fBonus || vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER]) {
                 ch->damage[DICE_NUMBER]++;
                 ch->send_to("Теперь ты будешь наносить больше повреждений!\n\r");
                 act_p("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
@@ -119,7 +124,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         }
         if ( number_percent() * modifier / 100 > 110 )
         {
-            if (vch->damage[DICE_TYPE] > vch->damage[DICE_TYPE]) {
+            if (fBonus || vch->damage[DICE_TYPE] > vch->damage[DICE_TYPE]) {
                 ch->damage[DICE_TYPE]++;
                 ch->send_to("Теперь ты будешь наносить больше повреждений!\n\r");
                 act_p("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
@@ -153,7 +158,7 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         gain = min( 0, victim->armor[dam_type] - ch->armor[dam_type]);
         gain = gain * number_percent() * 5 / 10000;
         
-        if (gain < 0) {
+        if (fBonus || gain < 0) {
             ch->armor[dam_type] += gain;
             ch->send_to("Твоя защита улучшается!\n\r");
             act_p("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
