@@ -33,6 +33,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "bonus.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -43,6 +44,7 @@
 #include "def.h"
     
 GSN(haggle);
+BONUS(black_friday);
 
 using std::min;
 using std::max;
@@ -476,6 +478,9 @@ CMDRUN( list )
     }
 
     ch->send_to( buf );
+
+    if (bonus_black_friday->isActive(NULL, time_info))
+        tell_dim(ch, keeper, "Сегодня в моем магазине невероятно низкие цены.");
     tell_dim( ch, keeper, "Скажи мне название товара, и я расскажу всё, что о нем знаю, за 1%% от стоимости." );
 }
 
@@ -579,7 +584,10 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
         return 0;
 
     if( fBuy ) {
-        cost = obj->cost * trader->profitBuy  / 100;
+        if (bonus_black_friday->isActive(NULL, time_info))
+            cost = obj->cost / 2;
+        else
+            cost = obj->cost * trader->profitBuy  / 100;
     } else {
         Object *obj2;
 

@@ -57,7 +57,7 @@ bool DefaultBonus::isReligious( ) const
 
 bool DefaultBonus::isActive(PCharacter *ch, const struct time_info_data &ti) const
 {
-    if (activeForPlayer(ch, ti))
+    if (ch && activeForPlayer(ch, ti))
         return true;
     if (activeForAll(ti))
         return true;
