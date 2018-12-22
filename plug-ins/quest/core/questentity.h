@@ -22,19 +22,20 @@ public:
 
     inline const DLString & getHeroName( ) const;
     inline void setHeroName( const DLString & );
-    virtual bool ourHero( Character * );
-    virtual bool ourMobile( NPCharacter * );
-    virtual bool ourObject( Object * );
+    virtual bool ourHero( Character * ) const;
+    virtual bool ourMobile( NPCharacter * ) const;
+    virtual bool ourObject( Object * ) const;
+    virtual bool ourHeroGroup( Character * ) const;
     
 protected:
     void mandatoryExtract( );
-    PCMemoryInterface * getHeroMemory( );
-    PCharacter * getHeroWorld( );
+    PCMemoryInterface * getHeroMemory( ) const;
+    PCharacter * getHeroWorld( ) const;
     
-    QuestPointer getQuest( );
-    QuestPointer getQuest( PCMemoryInterface * );
-    template <typename T> inline ::Pointer<T> getMyQuest( );
-    template <typename T> inline ::Pointer<T> getMyQuest( PCMemoryInterface * );
+    QuestPointer getQuest( ) const;
+    QuestPointer getQuest( PCMemoryInterface * ) const;
+    template <typename T> inline ::Pointer<T> getMyQuest( ) const;
+    template <typename T> inline ::Pointer<T> getMyQuest( PCMemoryInterface * ) const;
     
     XML_VARIABLE XMLString heroName;
 };
@@ -50,13 +51,13 @@ inline void QuestEntity::setHeroName( const DLString &name )
 }
 
 template <typename T> 
-inline ::Pointer<T> QuestEntity::getMyQuest( )
+inline ::Pointer<T> QuestEntity::getMyQuest( ) const
 {
     return getMyQuest<T>( getHeroMemory( ) );
 }
 
 template <typename T> 
-inline ::Pointer<T> QuestEntity::getMyQuest( PCMemoryInterface *pci )
+inline ::Pointer<T> QuestEntity::getMyQuest( PCMemoryInterface *pci ) const
 {
     Quest::Pointer quest;
     ::Pointer<T> myQuest, null;

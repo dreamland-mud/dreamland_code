@@ -12,6 +12,7 @@
 #include "object.h"
 
 #include "mercdb.h"
+#include "follow_utils.h"
 #include "merc.h"
 #include "descriptor.h"
 #include "def.h"
@@ -39,14 +40,31 @@ void QuestEntity::mandatoryExtract( )
     }
 }
 
-bool QuestEntity::ourHero( Character *ch ) 
+bool QuestEntity::ourHero( Character *ch ) const
 {
     return ch != NULL
            && !ch->is_npc( ) 
            && heroName == ch->getName( );
 }
 
-bool QuestEntity::ourMobile( NPCharacter *mob )
+bool QuestEntity::ourHeroGroup( Character *ch ) const
+{
+    if (ch == NULL)
+        return false;
+    if (ch->is_npc())
+        return false;
+
+    PCharacter *hero = getHeroWorld();
+    if (hero == NULL)
+        return false;
+    
+    if (hero->in_room != ch->in_room)
+        return false;
+
+    return is_same_group(ch, hero); 
+}
+
+bool QuestEntity::ourMobile( NPCharacter *mob ) const
 {
     QuestEntity::Pointer entity;
     
@@ -56,7 +74,7 @@ bool QuestEntity::ourMobile( NPCharacter *mob )
            && entity->getHeroName( ) == getHeroName( );
 }
 
-bool QuestEntity::ourObject( Object *obj )
+bool QuestEntity::ourObject( Object *obj ) const
 {
     QuestEntity::Pointer entity;
     
@@ -65,17 +83,17 @@ bool QuestEntity::ourObject( Object *obj )
            && entity->getHeroName( ) == getHeroName( );
 }
 
-PCMemoryInterface * QuestEntity::getHeroMemory( )
+PCMemoryInterface * QuestEntity::getHeroMemory( ) const
 {
     return PCharacterManager::find( heroName );
 }
 
-Quest::Pointer QuestEntity::getQuest( )
+Quest::Pointer QuestEntity::getQuest( ) const
 {
     return getQuest( getHeroMemory( ) );
 }
 
-Quest::Pointer QuestEntity::getQuest( PCMemoryInterface *hero )
+Quest::Pointer QuestEntity::getQuest( PCMemoryInterface *hero ) const
 {
     Quest::Pointer quest, null;
     
@@ -91,7 +109,7 @@ Quest::Pointer QuestEntity::getQuest( PCMemoryInterface *hero )
     return quest;
 }
 
-PCharacter * QuestEntity::getHeroWorld( )
+PCharacter * QuestEntity::getHeroWorld( ) const
 {
     PCMemoryInterface *pcm = getHeroMemory( );
     

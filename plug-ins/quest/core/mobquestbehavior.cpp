@@ -197,6 +197,10 @@ void HuntedVictim::deadFromOther( PCMemoryInterface *pcm, Character *killer )
 {
 }
 
+void HuntedVictim::deadFromGroupMember( PCMemoryInterface *pcm, Character *killer )
+{
+}
+
 bool HuntedVictim::death( Character *killer )
 {
     PCMemoryInterface *pcm;
@@ -213,6 +217,12 @@ bool HuntedVictim::death( Character *killer )
     if (ourHero( killer )) {
         quest->state = QSTAT_FINISHED;
         deadFromHunter( pcm );
+        return false;
+    }
+
+    if (ourHeroGroup(killer)) {
+        quest->state = QSTAT_FINISHED;
+        deadFromGroupMember( pcm, killer );
         return false;
     }
 

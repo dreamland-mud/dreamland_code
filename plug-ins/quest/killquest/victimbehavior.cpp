@@ -22,10 +22,18 @@ void VictimBehavior::deadFromSuicide( PCMemoryInterface *pcm )
 
 void VictimBehavior::deadFromOther( PCMemoryInterface *pcm, Character *killer )
 {
-    killer->println("{YПоздравляю! Но убить Его было поручено другому.{x");
+    killer->println("{YПоздравляю! Но это убийство было поручено другому.{x");
 
     if (pcm->isOnline( ))
         pcm->getPlayer( )->println( "{YКто-то другой выполнил порученное тебе задание.{x" );
+}
+
+void VictimBehavior::deadFromGroupMember( PCMemoryInterface *pcm, Character *killer )
+{
+    killer->pecho("{YПоздравляю! Ты выполнил%Gо||а задание своего согруппника.", killer);
+
+    if (pcm->isOnline( ))
+        pcm->getPlayer( )->pecho("{Y%1$^C1 выполнил%1$Gо||а твое задание.{x", killer);
 }
 
 void VictimBehavior::show( Character *victim, std::basic_ostringstream<char> &buf ) 

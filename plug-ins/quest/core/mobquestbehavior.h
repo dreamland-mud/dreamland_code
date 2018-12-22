@@ -66,6 +66,7 @@ protected:
     virtual void deadFromHunter( PCMemoryInterface * );
     virtual void deadFromSuicide( PCMemoryInterface * );
     virtual void deadFromOther( PCMemoryInterface *, Character * );
+    virtual void deadFromGroupMember( PCMemoryInterface *, Character * );
 };
 
 class ProtectedClient : public virtual MobQuestBehavior {
