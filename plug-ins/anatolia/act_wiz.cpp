@@ -1735,6 +1735,27 @@ CMDWIZP( vnum )
         page_to_char( buf.str( ).c_str( ), ch ); 
 }
 
+CMDWIZP( rwhere )
+{
+    ostringstream buf;
+    bool found = false;
+
+    if (argument[0] == '\0') {
+        ch->send_to("Find what room?\n\r");
+        return;
+    }
+
+    for (Room *r = room_list; r; r = r->rnext)
+        if (is_name(argument, r->name)) {
+            buf << dlprintf("[%6d] %-30s %s\r\n", r->vnum, r->name, r->area->name);
+            found = true;
+        }
+
+    if (!found)
+        ch->println("Room with matching name not found.");
+    else
+        ch->send_to(buf);
+}
 
 CMDWIZP( owhere )
 {
