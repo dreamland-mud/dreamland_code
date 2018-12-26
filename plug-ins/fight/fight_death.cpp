@@ -55,13 +55,13 @@ enum {
 
 #define GHOST_MIN_LEVEL (PK_MIN_LEVEL + 10)
 
-static void loot_transform( Object *obj, Character *ch )
+static bool loot_transform( Object *obj, Character *ch )
 {
-    if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH))
-        obj->timer = number_range( 5, 10 );
+    if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH)) {
+        return false;
+    }
 
     REMOVE_BIT(obj->extra_flags, ITEM_VIS_DEATH);
-    REMOVE_BIT(obj->extra_flags, ITEM_ROT_DEATH);
 
     switch (obj->item_type) {
     case ITEM_POTION:
@@ -83,6 +83,8 @@ static void loot_transform( Object *obj, Character *ch )
             obj->condition = number_range( 10, 50 );
         break;
     }
+
+    return true;
 }
 
 static int loot_position( Object *obj, Character *ch, int flags = 0 )
@@ -242,7 +244,8 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
             break;
         }
 
-        loot_transform( obj, ch );
+        if (!loot_transform( obj, ch ))
+            extract_obj(obj);
     }
 }    
 
