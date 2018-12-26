@@ -170,13 +170,15 @@ NMI_GET( ObjIndexWrapper, instances, "список всех предметов �
     return Register( obj );
 }
 
-NMI_INVOKE( ObjIndexWrapper, property, "(имя) свойство прототипа с данным именем или null" )
+NMI_INVOKE( ObjIndexWrapper, property, "(имя,значение) свойство прототипа с данным именем или значение по умолчанию" )
 {
     checkTarget();
     DLString name = args2string(args);
+    Register defaultValue = args.size() > 1 ? args.back() : Register();
+
     Properties::const_iterator p = target->properties.find(name);
     if (p == target->properties.end())
-        return Register();
+        return defaultValue;
     else
         return Register(p->second);
 }
