@@ -64,14 +64,15 @@ static bool oprog_command( Object *obj, Character *actor, const DLString &cmdNam
 
 static bool omprog_command( Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
-    Character *ch;
-    Object *obj;
-    
-    for (ch = actor->in_room->people; ch; ch = ch->next_in_room) {
+    for (Object *obj = actor->in_room->contents; obj; obj = obj->next_content) 
+        if (oprog_command( obj, actor, cmdName, cmdArgs ))
+            return true;
+ 
+    for (Character *ch = actor->in_room->people; ch; ch = ch->next_in_room) {
         if (mprog_command( ch, actor, cmdName, cmdArgs ))
             return true;
 
-        for (obj = ch->carrying; obj; obj = obj->next_content)
+        for (Object *obj = ch->carrying; obj; obj = obj->next_content)
             if (oprog_command( obj, actor, cmdName, cmdArgs ))
                 return true;
     }
