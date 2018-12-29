@@ -10,6 +10,7 @@
 #include "nativeext.h"
 #include "subr.h"
 
+#include "wrap_utils.h"
 #include "dl_math.h"
 
 using namespace Scripting;
@@ -102,6 +103,20 @@ struct RemIfEq {
 
     const Register &reg;
 };
+
+NMI_INVOKE( RegList, join, "(разделитель) соединяет все элементы списка в строку через указанный разделитель")
+{
+    ostringstream buf;
+    DLString sep = args2string(args);
+
+    for(const_iterator i = begin(); i != end(); i++) {
+        if (i != begin())
+            buf << sep;
+        buf << i->toString();
+    }
+
+    return buf.str();
+}
 
 NMI_INVOKE( RegList, sub , "удаляет из списка все вхождения элементов из списка в параметрах")
 {
