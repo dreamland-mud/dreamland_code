@@ -134,10 +134,10 @@ SECOND			"s"|"с"|"second"|"секунда"
 %%
 
 
-DateParser::DateParser( const DLString& date )
-	: yyFlexLexer( &istr, &cout ), tokenStatus( MONTH ), date( date ),
+DateParser::DateParser( const DLString& date, istream *istr )
+	: yyFlexLexer( &*istr, &cout ), tokenStatus( MONTH ), date( date ),
 		second( 0 ), modifier( 1 ), position( 1 ),
-		lastNumber( 0 ), istr( date.c_str( ) )
+		lastNumber( 0 )
 {
 }
 

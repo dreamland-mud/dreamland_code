@@ -65,7 +65,8 @@ Date Date::newInstance( )
 
 int Date::getSecondFromString( const DLString& date ) throw( ExceptionBadDateString )
 {
-        DateParser parser( date );
+        istringstream istr(date.c_str());
+        DateParser parser( date, &istr );
         return        parser.getSecond( );
 }
 

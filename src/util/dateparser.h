@@ -26,7 +26,7 @@
 class DateParser : public yyFlexLexer, public virtual DLObject
 {
 public: 
-        DateParser( const DLString& date );
+        DateParser( const DLString& date, istream * );
         int dateLex( ) throw( ExceptionBadDateString );
         inline int getSecond( ) throw( ExceptionBadDateString )
         {
