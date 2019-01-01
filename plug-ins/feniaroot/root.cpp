@@ -109,6 +109,36 @@ NMI_INVOKE( Root, getCurrentTime , "текущее время в секунда�
     return Register((int)dreamland->getCurrentTime( ));
 }
 
+NMI_GET( Root, world_time, "внутримировое время в секундах") 
+{
+    return Register((int)dreamland->getWorldTime( ));
+}
+
+NMI_SET( Root, world_time, "внутримировое время в секундах") 
+{
+    dreamland->setWorldTime(arg.toNumber());
+}
+
+NMI_INVOKE( Root, saveConfig, "сохранить конфигурацию DreamLand на диск")
+{
+    try {
+        dreamland->save(false);
+    } catch (const ::Exception &e) {
+        return Register(e.what());
+    }
+    return Register();
+}
+
+NMI_INVOKE( Root, loadConfig, "считать конфигурацию DreamLand с диска")
+{
+    try {
+        dreamland->load(false);
+    } catch (const ::Exception &e) {
+        return Register(e.what());
+    }
+    return Register();
+}
+
 NMI_INVOKE( Root, player_exists, "существует ли в мире игрок с данным именем")
 {
     return Register( PCharacterManager::find( args2string( args ) ) != NULL );
