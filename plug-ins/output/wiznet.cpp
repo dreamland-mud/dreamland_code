@@ -43,6 +43,7 @@ const struct wiznet_type wiznet_table [] =
     { "confirm",                WIZ_CONFIRM,                AVATAR },
     { "quest",                        WIZ_QUEST,                AVATAR },
     { "language",                WIZ_LANGUAGE,                DEITY },
+    { "skills",                        WIZ_SKILLS,                AVATAR },
     {        0, 0, 0 }
 };
 
