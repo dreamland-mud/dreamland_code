@@ -36,7 +36,8 @@ xmlconfigurableplugin.cpp \
 mobilebehaviorplugin.cpp \
 objectbehaviorplugin.cpp \
 areabehaviorplugin.cpp \
-roombehaviorplugin.cpp 
+roombehaviorplugin.cpp \
+calendar_utils.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \

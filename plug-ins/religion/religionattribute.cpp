@@ -1,4 +1,5 @@
 #include "logstream.h"
+#include "calendar_utils.h"
 #include "religionattribute.h"
 #include "defaultreligion.h"
 #include "pcharacter.h"
@@ -8,8 +9,6 @@
 #include "merc.h"
 
 BONUS(none);
-
-long day_of_epoch(const struct time_info_data &ti);
 
 XMLAttributeReligion::XMLAttributeReligion( )
 {

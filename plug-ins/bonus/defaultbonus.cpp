@@ -1,5 +1,6 @@
 #include "defaultbonus.h"
 #include "pcharacter.h"
+#include "calendar_utils.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
@@ -92,16 +93,6 @@ void DefaultBonus::reportTime(PCharacter *ch, ostringstream &buf) const
     buf << endl;
 }
 
-/* TODO find a home for these functions */
-static long day_of_epoch(int year, int month, int day)
-{
-    return year * 35 * 17 + month * 35 + day;
-}
-
-static long day_of_epoch(const struct time_info_data &ti)
-{
-    return day_of_epoch(ti.year, ti.month, ti.day);
-}
 
 static bool check_value(const DLString &value, int i)
 {
