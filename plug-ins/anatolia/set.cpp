@@ -31,6 +31,7 @@
 #include "act_wiz.h"
 #include "act.h"
 #include "clanreference.h"
+#include "arg_utils.h"
 #include "save.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -1444,6 +1445,7 @@ void sset( Character *ch, char *argument )
         ch->send_to("  set skill {y<имя>{x <spell или skill> <число>\n\r");
         ch->send_to("  set skill {y<имя>{x <spell или skill> ?\n\r");
         ch->send_to("  set skill {y<имя>{x all <число>\n\r");
+        ch->send_to("  set skill {y<имя>{x <временное умение> off\n\r");
         ch->send_to("   (use the name of the skill, not the number)\n\r");
         return;
     }
@@ -1480,6 +1482,22 @@ void sset( Character *ch, char *argument )
        ch->send_to(buf);
        return;
     }
+
+    // Clean up temporary skill.
+    if (arg_is_switch_off(arg3)) {
+        PCSkillData &data = victim->getPC( )->getSkillData( sn );
+        if (!data.temporary)
+            ch->println("Это умение не является временным для персонажа.");
+        else {
+            data.end = 0;
+            data.learned = 0;
+            data.temporary = false;
+            victim->getPC()->save();
+            ch->println("Временное умение удалено.");
+        }
+        return;
+    }
+
     if ( !is_number( arg3 ) )
     {
         ch->send_to("Value must be numeric.\n\r");
