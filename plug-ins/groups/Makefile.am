@@ -30,6 +30,7 @@ libgenericskill_la_LIBADD = \
 ../system/libsystem.la \
 ../system/libscheduler_task_round.la \
 ../loadsave/libloadsave.la \
+../fight_core/libfight_core.la \
 ../skills_impl/libskills_impl.la 
 
 libgroup_skills_la_SOURCES = \

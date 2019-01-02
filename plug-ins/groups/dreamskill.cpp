@@ -3,6 +3,7 @@
 #include "skill_utils.h"
 #include "dreamskill.h"
 #include "skillmanager.h"
+#include "skillgroup.h"
 #include "pcharacter.h"
 #include "dreamland.h"
 #include "dlscheduler.h"
@@ -10,11 +11,30 @@
 #include "wiznet.h"
 #include "merc.h"
 #include "mercdb.h"
+#include "itemflags.h"
 #include "def.h"
 
 CLAN(battlerager);
 PROF(universal);
+GROUP(fightmaster);
+GROUP(weaponsmaster);
+GROUP(defensive);
+GROUP(necromancy);
+GROUP(combat);
+GROUP(attack);
+GROUP(healing);
+GROUP(vampiric);
+GROUP(maladictions);
+GROUP(protective);
+GROUP(benedictions);
+GROUP(curative);
+GROUP(harmful);
+GROUP(beguiling);
+GROUP(transportation);
+GROUP(creation);
+RELIG(none);
 
+bitnumber_t get_weapon_for_skill(Skill *skill);
 DreamSkillManager *dreamSkillManager = 0;
     
 DreamSkillManager::DreamSkillManager()
@@ -96,16 +116,86 @@ Skill * DreamSkillManager::findRandomProfSkill(PCharacter *ch) const
 
 /**
  * Show special effects when player is dreaming up a skill/spell.
- * Dream about a battle for group_defense, group_fightmaster etc.
- * Dream about magic/holy books for group_attack, combat, protective.
- * group_vampiric/group_necromancy deserve some effects too.
  */
 void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
 {
-    // TODO
-    ch->pecho("Тебе снится странный сон, будто бы ты владеешь %s {c%s{x.", 
-              (skill->getSpell() && skill->getSpell()->isCasted() ? "заклинанием" : "умением"),
-              skill->getNameFor(ch).c_str());
+    ostringstream buf;
+    DLString sname = skill->getNameFor(ch);
+    bool isSpell = skill->getSpell() && skill->getSpell()->isCasted();
+
+    if (skill->getGroup() == group_weaponsmaster) {
+        buf << "Тебе снится битва с Лаеркаи Мастером." << endl;
+        bitnumber_t weapon = get_weapon_for_skill(skill);       
+        if (weapon != -1)  
+            buf << "Внезапно у тебя в руке оказывается {c" << weapon_class.message(weapon) << "{x, и ты одним движением уничтожаешь противника!" << endl;
+        else
+            buf << "Ловко применив умение {c" << sname << ", ты одним движением разделываешься с противником!" << endl; 
+    }
+    else if (skill->getGroup() == group_defensive) {
+        if (ch->death > 0) 
+            buf << "Во сне ты видишь свое недавнее неудачное сражение." << endl
+                << "В самый ответственный момент ты уверенно пользуешься умением {c" << sname << "{x," << endl
+                << "разворачивая исход сражения в выгодную для тебя сторону." << endl;
+        else
+            buf << "Во сне ты видишь свое недавнее сражение." << endl
+                << "Ты пользуешься невесть откуда взявшимся навыком {c" << sname << "{x," << endl
+                << "завершая битву еще быстрее и эффектнее, чем это было на самом деле." << endl;
+    }
+    else if (skill->getGroup() == group_vampiric || skill->getGroup() == group_necromancy) {
+        buf << "В леденящем душу замогильном шепоте к тебе приходит тайна " << (isSpell ? "заклинания" : "умения") << " {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_fightmaster) {
+        buf << "Тебе снится, как ловко ты разделываешься с Даркеном Ралом, применив на него умение {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_healing || skill->getGroup() == group_curative) {
+        buf << "Во сне ты бродишь по городу, исцеляя всех, кто попадется тебе под руку, молитвой {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_maladictions) {
+        buf << "Перед тобой как будто парит бледное и прекрасное лицо женщины-дроу." << endl
+            << "Она шепчет тебе: '{c" << sname << "'{x. Что бы это могло означать?" << endl;
+    }
+    else if (skill->getGroup() == group_benedictions) {
+        buf << "Монашеская жизнь в приснившемся тебе сюжете кажется очень заманчивой." << endl
+            << "Ты вряд ли вспомнишь детали, когда проснешься, за исключением одной молитвы:" << endl
+            << "                   {c" << sname << "{x." << endl; 
+    }
+    else if (skill->getGroup() == group_harmful) {
+        DLString relig = ch->getReligion() == god_none ? "неизвестное божество" : ch->getReligion()->getRussianName().ruscase('1');
+        buf << "Во сне " << relig << " как будто направляет твою руку, и ты повергаешь врагов молитвой {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_protective) {
+        buf << "Прошептав во сне заклинание {c" << sname << "{x, ты отправляешься на битву с Лагом и, конечно же, побеждаешь его." << endl;
+    }
+    else if (skill->getGroup() == group_combat) {
+        buf << "Ты видишь себя как будто со стороны: ты склоняешься над толстым фолиантом " << endl
+            << "где-то на седьмом этаже Башни Высшего Волшебства. На открытой странице написана формула:" << endl
+            << "                    {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_attack) {
+        buf << "Сила твоей веры во сне так сильна, что позволяет тебе сражать противников молитвой {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_transportation) {
+        buf << "И уносят тебя, и уносят тебя... три белых кентавра!" << endl
+            << "Во сне магия перемещения не выглядит такой уж загадочной, оставляя в твоей памяти одно из заклинаний:" << endl
+            << "                      {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_creation) {
+        buf << "В довольно запутанном сне ты постоянно превращаешь вино в воду, а большие камни - в летающие диски." << endl
+            << "Одно из заклинаний все же задерживается в твоей памяти: это {c" << sname << "{x." << endl;
+    }
+    else if (skill->getGroup() == group_beguiling) {
+        buf << "Никто не может устоять перед тобой - ты в этом сне так" << (ch->getSex() == SEX_MALE ? "ой" : "ая") << " милашка!" << endl
+            << "Соблазнительно хлопая своими длинными ресницами, ты применяешь заклинание {c" << sname << "{x." << endl;
+    }
+    else if (isSpell && chance(50))
+        buf << "Во сне тебе открываются тайны ранее недоступного заклинания {c" << sname << "{x." << endl;
+    else if (chance(50))
+        buf << "Тебе снится странный сон, будто бы ты владеешь " << (isSpell ? "заклинанием" : "умением") << " {c" << sname << "{x." << endl;
+    else
+        buf << "Тебя переполняет неизвестно откуда взявшаяся уверенность, что, проснувшись," << endl
+            << "ты будешь знать умение {c" << sname << "{x не хуже любого профессионала!" << endl;
+
+    ch->send_to(buf);
 }
 
 void DreamSkillManager::run( PCharacter *ch ) 
