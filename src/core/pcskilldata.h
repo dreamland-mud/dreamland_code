@@ -10,6 +10,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"
 #include "xmlboolean.h"
+#include "xmllong.h"
 #include "xmlmap.h"
 #include "skilleventhandler.h"
 #include "globalprofilearray.h"
@@ -24,6 +25,9 @@ public:
         XML_VARIABLE XMLInteger learned;
         XML_VARIABLE XMLIntegerNoEmpty timer;
         XML_VARIABLE XMLBooleanNoFalse forgetting;
+        XML_VARIABLE XMLBooleanNoFalse temporary;
+        XML_VARIABLE XMLLongNoEmpty start;
+        XML_VARIABLE XMLLongNoEmpty end;
     
         bool isValid() const;
         static PCSkillData empty;

@@ -15,7 +15,7 @@
 PCSkillData PCSkillData::empty;
 
 PCSkillData::PCSkillData( )
-                    : forgetting( false )
+                    : forgetting( false ), temporary( false )
 {
 }
 
