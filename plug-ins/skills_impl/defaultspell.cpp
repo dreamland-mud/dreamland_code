@@ -9,6 +9,7 @@
 #include "spelltarget.h"
 #include "spellmanager.h"
 #include "skillgroup.h"
+#include "skill_utils.h"
 
 #include "affect.h"
 #include "pcharacter.h"
@@ -151,70 +152,8 @@ DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, 
  */
 void DefaultSpell::utter( Character *ch )
 {
-    char buf  [MAX_STRING_LENGTH];
-    char spellName [MAX_STRING_LENGTH];
     Character *rch;
-    char *pName;
-    int iSyl;
-    int length;
-
-    struct syl_type
-    {
-        const char *        old;
-        const char *        _new;
-    };
-
-    static const struct syl_type syl_table[] =
-    {
-        { " ",                " "                },
-        { "ar",                "abra"                },
-        { "au",                "kada"                },
-        { "bless",        "fido"                },
-        { "blind",        "nose"                },
-        { "bur",        "mosa"                },
-        { "cu",                "judi"                },
-        { "de",                "oculo"                },
-        { "en",                "unso"                },
-        { "light",        "dies"                },
-        { "lo",                "hi"                    },
-        { "mor",        "zak"                },
-        { "move",        "sido"                },
-        { "ness",        "lacri"                },
-        { "ning",        "illa"                },
-        { "per",        "duda"                },
-        { "ra",                "gru"                },
-        { "fresh",        "ima"                },
-        { "re",                "candus"        },
-        { "son",        "sabru"                },
-        { "tect",        "infra"                },
-        { "tri",        "cula"                },
-        { "ven",        "nofo"                },
-        { "ust",        "lon"           },
-        { "a", "a" }, { "b", "b" }, { "c", "q" }, { "d", "e" },
-        { "e", "z" }, { "f", "y" }, { "g", "o" }, { "h", "p" },
-        { "i", "u" }, { "j", "y" }, { "k", "t" }, { "l", "r" },
-        { "m", "w" }, { "n", "i" }, { "o", "a" }, { "p", "s" },
-        { "q", "d" }, { "r", "f" }, { "s", "g" }, { "t", "h" },
-        { "u", "j" }, { "v", "z" }, { "w", "x" }, { "x", "n" },
-        { "y", "l" }, { "z", "k" },
-        { "", "" }
-    };
-
-    buf[0]        = '\0';
-    strcpy( spellName, skill->getName( ).c_str( ) );
-
-    for ( pName = spellName; *pName != '\0'; pName += length ) {
-        for ( iSyl = 0; (length = strlen(syl_table[iSyl].old)) != 0; iSyl++ ) {
-            if ( !str_prefix( syl_table[iSyl].old, pName ) ) {
-                strcat( buf, syl_table[iSyl]._new );
-                break;
-            }
-        }
-
-        if ( length == 0 )
-            length = 1;
-    }
-
+    DLString utterance = spell_utterance(*skill);
     const char *pat = "$c1 бормочет '$t'.";
 
     for (rch = ch->in_room->people; rch; rch = rch->next_in_room) {
@@ -222,7 +161,7 @@ void DefaultSpell::utter( Character *ch )
             int chance = (gsn_spell_craft->getEffective( rch ) * 9) / 10;
             
             if (chance < number_percent( ))
-                act( pat, ch, buf, rch, TO_VICT );
+                act( pat, ch, utterance.c_str(), rch, TO_VICT );
             else
                 act( pat, ch, skill->getNameFor( rch ).c_str( ), rch, TO_VICT );
         }

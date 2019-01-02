@@ -152,7 +152,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
     }
     else if (skill->getGroup() == group_maladictions) {
         buf << "Перед тобой как будто парит бледное и прекрасное лицо женщины-дроу." << endl
-            << "Она шепчет тебе: '{c" << sname << "'{x. Что бы это могло означать?" << endl;
+            << "Она шепчет тебе: '{c" << spell_utterance(skill) << "'{x. Что бы это могло означать?" << endl;
     }
     else if (skill->getGroup() == group_benedictions) {
         buf << "Монашеская жизнь в приснившемся тебе сюжете кажется очень заманчивой." << endl
@@ -169,7 +169,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
     else if (skill->getGroup() == group_combat) {
         buf << "Ты видишь себя как будто со стороны: ты склоняешься над толстым фолиантом " << endl
             << "где-то на седьмом этаже Башни Высшего Волшебства. На открытой странице написана формула:" << endl
-            << "                    {c" << sname << "{x." << endl;
+            << "                    {c" << spell_utterance(skill) << "{x." << endl;
     }
     else if (skill->getGroup() == group_attack) {
         buf << "Сила твоей веры во сне так сильна, что позволяет тебе сражать противников молитвой {c" << sname << "{x." << endl;
