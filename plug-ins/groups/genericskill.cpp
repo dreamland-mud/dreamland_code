@@ -10,6 +10,7 @@
 #include "skillmanager.h"
 #include "skillreference.h"
 #include "skillgroup.h"
+#include "skill_utils.h"
 
 #include "pcharacter.h"
 #include "room.h"
@@ -42,6 +43,11 @@ GenericSkill::~GenericSkill( )
 SkillGroupReference & GenericSkill::getGroup( )
 {
     return group;
+}
+
+bool GenericSkill::isProfessional() const
+{
+    return !classes.empty();
 }
 
 /*
@@ -100,6 +106,9 @@ bool GenericSkill::visible( Character *ch ) const
     if (ci && ci->visible( ))
         return true;
 
+    if (temporary_skill_active(this, ch))
+        return true;
+ 
     return false;
 }
 
@@ -189,6 +198,7 @@ bool GenericSkill::availableForAll( ) const
 int GenericSkill::getLevel( Character *ch ) const
 {
     const SkillRaceBonus *rb; 
+    const SkillClassInfo *ci;
 
     if (!visible( ch ))
         return 999;
@@ -202,7 +212,11 @@ int GenericSkill::getLevel( Character *ch ) const
     if (rb && !rb->isProfessional( ))
         return rb->getLevel( );
 
-    return getClassInfo( ch )->getLevel( );
+    ci = getClassInfo( ch );
+    if (ci && ci->visible())
+       return ci->getLevel( );
+
+    return ch->getRealLevel();
 }
 
 /*
@@ -224,7 +238,10 @@ int GenericSkill::getLearned( Character *ch ) const
 
     if (isRaceAffect( pch ))
         return pch->getSkillData( getIndex( ) ).learned;
-
+    
+    if (temporary_skill_active(this, ch))
+        return pch->getSkillData( getIndex( ) ).learned;
+   
     adept = pch->getProfession( )->getSkillAdept( ) 
             + pch->getProfession( )->getParentAdept( );
             
@@ -299,9 +316,11 @@ int GenericSkill::getWeight( Character *ch ) const
 int GenericSkill::getMaximum( Character *ch ) const
 {
     const SkillClassInfo *ci;
-
     if (( ci = getClassInfo( ch ) ))
         return ci->getMaximum( );
+
+    if (temporary_skill_active(this, ch))
+        return ch->getProfession( )->getSkillAdept( );
 
     return BasicSkill::getMaximum( ch );
 }
@@ -418,6 +437,9 @@ bool GenericSkill::canForget( PCharacter *ch ) const
     if (getRaceBonus( ch ))
         return false;
 
+    if (temporary_skill_active(this, ch))
+        return false;
+
     return forgetAux( ch );
 }
 
@@ -457,6 +479,11 @@ bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
 
     if (ch->skill_points( ) > ch->max_skill_points) {
         buf << "Тебе уже есть, что {RЗАБЫВАТЬ{x!" << endl;
+        return false;
+    }
+
+    if (ch->getSkillData(getIndex()).temporary) {
+        buf << "Ты уже знаешь '" << getNameFor(ch) << "' так хорошо, как только можешь." << endl;
         return false;
     }
     
@@ -605,10 +632,10 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
     PCSkillData &data = ch->getSkillData( getIndex( ) );
     int percent = data.learned;
     
-    if (!ci)
+    if (!data.temporary && !ci)
         return;
 
-    if (ci->isMarked( ))
+    if (ci && ci->isMarked( ))
         buf << "{D";
     else if (!usable( ch ))
         buf << "{R";
@@ -639,6 +666,9 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
 #endif        
     buf << ", уровень {W" << getLevel( ch ) << "{x)" << endl;
     
+    if (data.temporary)
+        return;
+ 
     ci->mark( );
 
     GenericSkillVector &v = ci->parents.getVector( ch );

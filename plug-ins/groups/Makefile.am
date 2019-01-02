@@ -18,6 +18,7 @@ $(INCLUDES_SRC)
 
 libgenericskill_la_SOURCES = \
 impl_genericskill.cpp \
+dreamskill.cpp \
 genericskill.cpp 
 
 libgenericskill_la_MOC = \
@@ -26,6 +27,9 @@ genericskill.h
 libgenericskill_la_LIBADD = \
 ../descriptor/libdescriptor.la \
 ../output/liboutput.la \
+../system/libsystem.la \
+../system/libscheduler_task_round.la \
+../loadsave/libloadsave.la \
 ../skills_impl/libskills_impl.la 
 
 libgroup_skills_la_SOURCES = \

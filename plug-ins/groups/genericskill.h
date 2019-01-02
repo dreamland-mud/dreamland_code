@@ -63,6 +63,8 @@ public:
         return CATEGORY;
     }
 
+    bool isProfessional() const;
+
 protected:
     static const DLString CATEGORY;                                             
     
