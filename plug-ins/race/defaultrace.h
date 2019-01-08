@@ -22,8 +22,7 @@
 /*
  * RaceHelp
  */
-class RaceHelp : public virtual XMLHelpArticle,
-                 public virtual MarkupHelpArticle {
+class RaceHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<RaceHelp> Pointer;
 

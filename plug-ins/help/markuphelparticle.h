@@ -8,30 +8,22 @@
 #include <sstream>
 #include "helpmanager.h"
 
-class MarkupHelpArticle : public virtual HelpArticle {
+class MarkupHelpArticle : public HelpArticle {
 public:
     typedef ::Pointer<MarkupHelpArticle> Pointer;
 
+    virtual ~MarkupHelpArticle( );
     virtual DLString getText( Character * = NULL ) const;
+    inline virtual const DLString & getType( ) const;
+
+    static const DLString TYPE;
 
 protected:
     virtual void getRawText( Character *, ostringstream & ) const;
     virtual void applyFormatter( Character *, ostringstream &, ostringstream & ) const;
 };
 
-class XMLMarkupHelpArticle : public virtual MarkupHelpArticle,
-                             public virtual XMLHelpArticle
-{
-public:
-    typedef ::Pointer<XMLMarkupHelpArticle> Pointer;
-
-    virtual ~XMLMarkupHelpArticle( );
-    
-    inline virtual const DLString & getType( ) const;
-    static const DLString TYPE;
-};
-
-inline const DLString & XMLMarkupHelpArticle::getType( ) const
+inline const DLString & MarkupHelpArticle::getType( ) const
 {
     return TYPE;
 }

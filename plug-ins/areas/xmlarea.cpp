@@ -134,20 +134,23 @@ XMLArea::XMLArea( ) : mobiles(false), objects(false), rooms(false)
 void
 XMLArea::init(area_file *af)
 {
-    HelpArticles::const_iterator a;
-    const HelpArticles &articles = helpManager->getArticles( );
-
-    for (a = articles.begin( ); a != articles.end( ); a++) 
-        if ((*a)->areafile == af) {
-            HelpArticle::Pointer h = *a;
-            helps.push_back( h.getDynamicPointer<AreaHelp>());
-        }
-
     AREA_DATA *area = af->area;
-    
+
     if(!area)
         return;
     
+    HelpArticles::iterator h;
+    for (h = area->helps.begin( ); h != area->helps.end( ); h++) {
+        AreaHelp *ahelp = h->getDynamicPointer<AreaHelp>();
+        if (ahelp && ahelp->persistent) {
+            XMLAreaHelp help;
+            help.setValue((DLString)(*ahelp));
+            help.keyword = ahelp->getKeywordAttribute();
+            help.level = ahelp->getLevel();
+            helps.push_back(help); 
+        }
+    }
+
     areadata.init(area);
 
     MOB_INDEX_DATA *pMobIndex;
@@ -173,25 +176,40 @@ XMLArea::init(area_file *af)
 }
 
 void
-XMLArea::load_helps(area_file *af, const DLString &areaName)
+XMLArea::load_helps(AREA_DATA *a)
 {
-    XMLListBase<XMLPointer<AreaHelp> >::iterator hit;
+    XMLListBase<XMLAreaHelp>::const_iterator h;
     bool selfHelpExists = false;
 
-    for (hit = helps.begin( ); hit != helps.end( ); hit++) {
-        (*hit)->areafile = af;
-        (*hit)->selfHelp = is_name(areaName.c_str(), (*hit)->getKeyword().c_str());
-        helpManager->registrate( *hit );
-        if ((*hit)->selfHelp)
+    for (h = helps.begin( ); h != helps.end( ); h++) {
+        AreaHelp::Pointer help(NEW);
+
+        help->areafile = a->area_file;
+        help->selfHelp = is_name(a->name, h->keyword.c_str());
+        help->persistent = true;
+        help->setKeywordAttribute(h->keyword);
+        help->setLevel(h->level);
+        help->setText(h->getValue());
+        helpManager->registrate(help);
+        if (help->selfHelp)
             selfHelpExists = true;
+
+        XMLPersistent<HelpArticle> phelp(help.getPointer());
+        a->helps.push_back(phelp);
     }
 
     if (!selfHelpExists) {
         AreaHelp::Pointer help(NEW);
-        help->areafile = af;
+        help->areafile = a->area_file;
         help->selfHelp = true;
-        help->addKeyword(areaName.colourStrip().quote());
-        helpManager->registrate(AreaHelp::Pointer(help));
+        help->persistent = false;
+        help->addKeyword(DLString(a->name).colourStrip().quote());
+        help->addKeyword(DLString(a->credits).colourStrip().quote());
+        help->setText("     ");
+        helpManager->registrate(help);
+        
+        XMLPersistent<HelpArticle> phelp(help.getPointer());
+        a->helps.push_back(phelp);
     }
 }
 
@@ -300,10 +318,8 @@ XMLArea::load(const DLString &fname)
     fromXML(doc->getFirstNode( ));
     
     area_file *af = new_area_file(fname.c_str( ));
-    
-    load_helps(af, areadata.name);
-
     AREA_DATA *a = areadata.compat( );
+
     if(a) {
         af->area = a;
         a->area_file = af;
@@ -311,6 +327,7 @@ XMLArea::load(const DLString &fname)
         load_rooms(a);
         load_mobiles(a);
         load_objects(a);
+        load_helps(a);
         
         if ( area_first == 0 )
             area_first = a;

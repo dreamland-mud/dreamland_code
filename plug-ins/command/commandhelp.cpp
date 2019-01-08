@@ -120,8 +120,3 @@ bool CommandHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out
 
 
 
-bool CommandHelp::toXML( XMLNode::Pointer &parent ) const
-{
-    return XMLHelpArticle::toXML( parent ); 
-}
-

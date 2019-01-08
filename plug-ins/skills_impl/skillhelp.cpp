@@ -139,8 +139,4 @@ void SkillHelp::unsetSkill( )
     fullKeyword = "";
 }
 
-bool SkillHelp::toXML( XMLNode::Pointer &parent ) const
-{
-    return XMLHelpArticle::toXML( parent ); 
-}
 

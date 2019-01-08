@@ -10,9 +10,9 @@
 #include "xmlpointer.h"
 #include "markuphelparticle.h"
 
-typedef XMLPointer<XMLMarkupHelpArticle> XMLMarkupHelpArticlePointer;
+typedef XMLPointer<MarkupHelpArticle> MarkupHelpArticlePointer;
 
-class HelpContainer : public XMLListContainer<XMLMarkupHelpArticlePointer>,
+class HelpContainer : public XMLListContainer<MarkupHelpArticlePointer>,
                       public XMLTableElement
 {
 XML_OBJECT

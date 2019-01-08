@@ -63,24 +63,6 @@ load_xml_areas( )
     }
 }
 
-/**
- * De-register area help articles on shutdown. Otherwise objects of AreaHelp type 
- * are still going to be present in HelpManager and will cause segmentation fault
- * in its destructor.
- */
-void unload_xml_helps()
-{
-    const HelpArticles &articles = helpManager->getArticles( );
-    list<HelpArticle::Pointer> articlesToRemove;
-
-    for (HelpArticles::const_iterator a = articles.begin( ); a != articles.end( ); a++) 
-        if ((*a)->areafile)
-            articlesToRemove.push_back(*a);
-
-    for (list<HelpArticle::Pointer>::iterator a = articlesToRemove.begin(); a != articlesToRemove.end(); a++)
-        helpManager->unregistrate(*a);
-}
-
 class XMLAreaLoadTask : public SchedulerTaskRoundPlugin {
 public:
     typedef ::Pointer<XMLAreaLoadTask> Pointer;
@@ -93,11 +75,6 @@ public:
     virtual int getPriority( ) const
     {
         return SCDP_BOOT + 5;
-    }
-
-    virtual void destruction() {
-        if (dreamland->isShutdown()) 
-            unload_xml_helps();
     }
 };
 

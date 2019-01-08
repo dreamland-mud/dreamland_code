@@ -20,8 +20,7 @@
 /*
  * ProfessionHelp
  */
-class ProfessionHelp : public virtual XMLHelpArticle,
-                       public virtual MarkupHelpArticle {
+class ProfessionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<ProfessionHelp> Pointer;
 

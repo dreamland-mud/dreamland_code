@@ -8,11 +8,23 @@
 #include "oneallocate.h"
 #include "plugin.h"
 #include "xmllist.h"
+#include "xmlpersistent.h"
 #include "markuphelparticle.h"
 
+class XMLAreaHelp : public XMLString {
+XML_OBJECT
+public:
+    typedef ::Pointer<XMLAreaHelp> Pointer;
 
-class AreaHelp : public virtual XMLHelpArticle,
-                 public virtual MarkupHelpArticle {
+    XMLAreaHelp();
+    bool toXML( XMLNode::Pointer& ) const;
+    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+
+    DLString keyword;
+    int level;
+};
+
+class AreaHelp : public MarkupHelpArticle {
 XML_OBJECT
 public:
     typedef ::Pointer<AreaHelp> Pointer;
@@ -22,10 +34,12 @@ public:
     static const DLString TYPE;
     
     bool selfHelp;
+    bool persistent;
 };
 
 inline const DLString & AreaHelp::getType( ) const
 {
     return TYPE;
 }
+
 #endif

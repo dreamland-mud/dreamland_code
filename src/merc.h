@@ -75,6 +75,7 @@
 #include "grammar_entities.h"
 #include "areabehavior.h"
 #include "mobilespecial.h"
+#include "helpmanager.h"
 #include "autoflags.h"
 
 class NPCharacter;
@@ -505,6 +506,7 @@ struct        area_data
     long                area_flag;
     struct area_file *        area_file;
     XMLPersistentStreamable<AreaBehavior> behavior;
+    HelpArticles helps;
     
     /*OLC*/
     int                        security;

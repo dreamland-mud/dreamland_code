@@ -21,7 +21,7 @@ extern "C" {
         SO::PluginList ppl;
         
         Plugin::registerPlugin<BugTracker>( ppl );
-        Plugin::registerPlugin<XMLVariableRegistrator<XMLMarkupHelpArticle> >( ppl );
+        Plugin::registerPlugin<XMLVariableRegistrator<MarkupHelpArticle> >( ppl );
         Plugin::registerPlugin<MocRegistrator<HelpContainer> >( ppl );                
         Plugin::registerPlugin<HelpLoader>( ppl );
 

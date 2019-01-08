@@ -23,8 +23,7 @@ class Liquid;
 /*
  * ReligionHelp
  */
-class ReligionHelp : public virtual XMLHelpArticle,
-                 public virtual MarkupHelpArticle {
+class ReligionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<ReligionHelp> Pointer;
 

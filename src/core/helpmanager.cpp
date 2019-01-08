@@ -5,10 +5,12 @@
 #include "helpmanager.h"
 #include "character.h"
 
-const DLString XMLHelpArticle::ATTRIBUTE_KEYWORD = "keyword";
-const DLString XMLHelpArticle::ATTRIBUTE_LEVEL = "level";
-const DLString XMLHelpArticle::ATTRIBUTE_REF = "ref";
-const DLString XMLHelpArticle::ATTRIBUTE_REFBY = "refby";
+template class XMLStub<HelpArticle>;
+
+const DLString HelpArticle::ATTRIBUTE_KEYWORD = "keyword";
+const DLString HelpArticle::ATTRIBUTE_LEVEL = "level";
+const DLString HelpArticle::ATTRIBUTE_REF = "ref";
+const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
@@ -54,12 +56,23 @@ void HelpArticle::addKeyword( const DLString &add )
     fullKeyword = keywords.toString().toUpper();
 }
 
+const DLString &HelpArticle::getKeywordAttribute() const
+{
+    return keyword;
+}
+
+void HelpArticle::setKeywordAttribute(const DLString &keyword)
+{
+    this->keyword = keyword;
+    addKeyword( keyword );
+}
+
 bool HelpArticle::visible( Character *ch ) const
 {
     return ch->get_trust( ) >= level;
 }
 
-bool XMLHelpArticle::toXML( XMLNode::Pointer &parent ) const
+bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
 {
     XMLStringNoEmpty xmlString( *this );
 
@@ -82,7 +95,7 @@ bool XMLHelpArticle::toXML( XMLNode::Pointer &parent ) const
     return true;
 }
 
-void XMLHelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadType )
+void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadType )
 {
     XMLStringNoEmpty xmlString;
     
@@ -97,8 +110,12 @@ void XMLHelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionB
 
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
+
 }
 
+/*-----------------------------------------------------------------------
+ * HelpManager
+ *-----------------------------------------------------------------------*/
 HelpManager * helpManager = NULL;
 
 HelpManager::HelpManager( )

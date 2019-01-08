@@ -10,17 +10,19 @@
 #include "oneallocate.h"
 #include "xmlstringlist.h"
 #include "xmlstring.h"
-#include "xmlpolymorphvariable.h"
+#include "xmlpersistent.h"
 
 class Character;
 struct area_file;
 
-class HelpArticle : public DLString, public virtual DLObject {
+class HelpArticle : public DLString, public virtual DLObject, public virtual  XMLPolymorphVariable {
 public:
     typedef ::Pointer<HelpArticle> Pointer;
     
     HelpArticle( );
     
+    virtual bool toXML( XMLNode::Pointer& ) const;
+    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
     virtual DLString getText( Character * = NULL ) const;
     virtual bool visible( Character * ) const;
 
@@ -33,10 +35,26 @@ public:
     const StringSet & getKeywords() const;
     int getLevel( ) const;
     void setLevel( int );
+    const DLString &getKeywordAttribute() const;
+    void setKeywordAttribute(const DLString &);
 
     struct area_file * areafile;
 
+    static const DLString ATTRIBUTE_KEYWORD;
+    static const DLString ATTRIBUTE_LEVEL;
+    static const DLString ATTRIBUTE_REF;
+    static const DLString ATTRIBUTE_REFBY;
+   
 protected:
+    /** (Extra) keyword specified as an XML attribute for this help article. */
+    DLString keyword;
+    
+    /** List of help articles this one refers to, specified as an XML attribute. */
+    StringSet ref;
+
+    /** List of help articles that refer to this one, specified as an XML attribute. */
+    StringSet refby;
+
     /** Level from which this article is visible. */
     int level;
 
@@ -49,30 +67,9 @@ protected:
     StringSet keywords;
 };
 
-class XMLHelpArticle : public virtual HelpArticle, public virtual XMLPolymorphVariable {
-public:
-    typedef ::Pointer<XMLHelpArticle> Pointer;
 
-    virtual bool toXML( XMLNode::Pointer& ) const;
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
-
-protected:
-    static const DLString ATTRIBUTE_KEYWORD;
-    static const DLString ATTRIBUTE_LEVEL;
-    static const DLString ATTRIBUTE_REF;
-    static const DLString ATTRIBUTE_REFBY;
-   
-    /** (Extra) keyword specified as an XML attribute for this help article. */
-    DLString keyword;
-    
-    /** List of help articles this one refers to, specified as an XML attribute. */
-    StringSet ref;
-
-    /** List of help articles that refer to this one, specified as an XML attribute. */
-    StringSet refby;
-};
-
-typedef list<HelpArticle::Pointer> HelpArticles;
+typedef list<XMLPersistent<HelpArticle> > HelpArticles;
+extern template class XMLStub<HelpArticle>;
 
 class HelpManager : public OneAllocate {
 public:

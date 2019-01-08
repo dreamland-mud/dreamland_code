@@ -5,6 +5,12 @@
 #include "markuphelparticle.h"
 #include "helpformatter.h"
 
+const DLString MarkupHelpArticle::TYPE = "Help";
+
+MarkupHelpArticle::~MarkupHelpArticle( )
+{
+}
+
 DLString MarkupHelpArticle::getText( Character *ch ) const
 {
     ostringstream in, out;
@@ -26,9 +32,4 @@ void MarkupHelpArticle::applyFormatter( Character *ch, ostringstream &in, ostrin
     DefaultHelpFormatter( in.str( ).c_str( ) ).run( ch, out );
 }
 
-const DLString XMLMarkupHelpArticle::TYPE = "Help";
-
-XMLMarkupHelpArticle::~XMLMarkupHelpArticle( )
-{
-}
 

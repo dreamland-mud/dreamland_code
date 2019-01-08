@@ -318,7 +318,7 @@ void load_helps( FILE *fp )
 {
     for ( ; ; )
     {
-        HelpArticle::Pointer help( NEW );
+        AreaHelp::Pointer help( NEW );
 
         help->setLevel( fread_number( fp ) );
         help->addKeyword( fread_string( fp ) );

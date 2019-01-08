@@ -11,14 +11,12 @@
 #include "skillcommand.h"
 #include "skill.h"
 
-class SkillHelp : public virtual XMLHelpArticle, 
-                  public virtual MarkupHelpArticle,
+class SkillHelp : public MarkupHelpArticle,
                   public SkillAction 
 {
 public:
     typedef ::Pointer<SkillHelp> Pointer;
 
-    virtual bool toXML( XMLNode::Pointer& ) const;
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );
     inline virtual SkillPointer getSkill( ) const;

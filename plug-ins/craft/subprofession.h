@@ -48,8 +48,7 @@ public:
     virtual int totalExp() const;
 };
 
-class CraftProfessionHelp : public virtual XMLHelpArticle,
-                       public virtual MarkupHelpArticle {
+class CraftProfessionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<CraftProfessionHelp> Pointer;
 
