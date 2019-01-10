@@ -83,14 +83,9 @@ int CustomSocial::getPosition( ) const
     return POS_RESTING;
 }
 
-void CustomSocial::reaction( Character *ch, Character *victim, const DLString &arg )
+bool CustomSocial::reaction( Character *ch, Character *victim, const DLString &arg )
 {
-    if (!victim && !arg.empty( )) {
-        if (!getErrorMsg( ).empty( ))
-            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
-        else
-            ch->println("Нет этого здесь.");
-    }
+    return false;
 }
 
 const DLString& CustomSocial::getName( ) const 

@@ -34,7 +34,7 @@ public:
     inline const DLString &getShortDesc( ) const;
 
 protected:
-    virtual void reaction( Character *, Character *, const DLString & );
+    virtual bool reaction( Character *, Character *, const DLString & );
     inline virtual int getPosition( ) const;
     inline virtual const DLString & getNoargOther( ) const;
     inline virtual const DLString & getNoargMe( ) const;
@@ -47,6 +47,11 @@ protected:
     inline virtual const DLString & getArgMe2( ) const;
     inline virtual const DLString & getArgVictim2( ) const;
     inline virtual const DLString & getErrorMsg( ) const;
+    inline virtual const DLString & getObjVictim() const;
+    inline virtual const DLString & getObjChar() const;
+    inline virtual const DLString & getObjOthers() const;
+    inline virtual const DLString & getObjNoVictimSelf() const;
+    inline virtual const DLString & getObjNoVictimOthers() const;
 
 private:
     bool mprog( Character *, Character * );
@@ -62,9 +67,17 @@ private:
     XML_VARIABLE XMLString  msgCharNotFound;
     XML_VARIABLE XMLString  msgCharAuto;
     XML_VARIABLE XMLString  msgOthersAuto;
+
     XML_VARIABLE XMLStringNoEmpty  msgCharFound2;
     XML_VARIABLE XMLStringNoEmpty  msgOthersFound2;
     XML_VARIABLE XMLStringNoEmpty  msgVictimFound2;
+
+    XML_VARIABLE XMLStringNoEmpty  msgVictimObj;
+    XML_VARIABLE XMLStringNoEmpty  msgCharVictimObj;
+    XML_VARIABLE XMLStringNoEmpty  msgOthersVictimObj;
+    XML_VARIABLE XMLStringNoEmpty  msgCharObj;
+    XML_VARIABLE XMLStringNoEmpty  msgOthersObj;
+
     XML_VARIABLE XMLStringList aliases;
 
     XML_VARIABLE XMLEnumeration position;
@@ -135,5 +148,25 @@ inline const DLString & Social::getErrorMsg( ) const
     return msgCharNotFound.getValue( );
 }
 
+inline const DLString & Social::getObjVictim() const
+{
+    return msgVictimObj.getValue();
+}
+inline const DLString & Social::getObjChar() const
+{
+    return msgCharVictimObj.getValue();
+}
+inline const DLString & Social::getObjOthers() const
+{
+    return msgOthersVictimObj.getValue();
+}
+inline const DLString & Social::getObjNoVictimSelf() const
+{
+    return msgCharObj.getValue();
+}
+inline const DLString & Social::getObjNoVictimOthers() const
+{
+    return msgOthersObj.getValue();
+}
 #endif
 

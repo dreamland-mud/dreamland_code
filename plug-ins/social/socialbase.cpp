@@ -95,51 +95,126 @@ static const void *victimOrSelf(Character *ch, Character *victim)
         return victim;
 }
 
+enum {
+    RC_NOARG,
+    RC_VICT,
+    RC_SELF,
+    RC_OBJ,
+    RC_VICT_NOT_FOUND,
+    RC_VICT_VICT,
+    RC_VICT_OBJ,
+    RC_VICT2_NOT_FOUND
+};
+
+static int parseArguments(Character *ch, const DLString &arg1, const DLString &arg2, 
+                                Character *&victim, Character *&victim2, Object *&obj)
+{
+    victim = 0;
+    victim2 = 0;
+    obj = 0;
+
+    // No arguments specified: RC_NOARG.
+    if (arg1.empty())
+        return RC_NOARG;
+
+    // Only one argument. Allowed syntax:
+    // <social> <char1|self>      : RC_VICT, RC_SELF
+    // <social> <char not found>  : RC_VICT_NOT_FOUND
+    // <social> <obj>             : RC_OBJ
+    if (arg2.empty()) {
+        victim = get_char_room(ch, arg1);
+        if (!victim)
+            obj = get_obj_here(ch, arg1);
+
+        if (victim == ch)
+            return RC_SELF;
+        else if (victim)
+            return RC_VICT;
+        else if (obj)
+            return RC_OBJ;
+        else
+            return RC_VICT_NOT_FOUND;
+    }
+
+    // Two arguments. Allowed syntax:
+    // <social> <char1|self> <char2|self>    : RC_VICT_VICT, RC_SELF, RC_VICT
+    // <social> <char|self> <obj>            : RC_VICT_OBJ
+    // <social> <char|not found> <not found> : RC_VICT_NOT_FOUND, RC_VICT2_NOT_FOUND
+    victim = get_char_room(ch, arg1);
+    victim2 = get_char_room(ch, arg2);
+    if (!victim2)
+        obj = get_obj_here(ch, arg2);
+
+    if (!victim)
+        return RC_VICT_NOT_FOUND;
+    else if (obj)
+        return RC_VICT_OBJ;
+    else if (victim2 == ch && victim == ch)
+        return RC_SELF;
+    else if (victim2 == victim)
+        return RC_VICT;
+    else if (victim2)
+        return RC_VICT_VICT;
+    else
+        return RC_VICT2_NOT_FOUND;
+}
+
+/**
+ * Parse arguments and execute the social. Accepted combination of arguments:
+ *
+ * <none>                    : msgCharNoArgument, msgOthersNoArgument
+ * <char1>                   : msgCharFound, msgVictimFound, msgOthersFound
+ * <char not found>          : msgCharNotFound
+ * <self>                    : msgCharAuto, msgOthersAuto
+ * <char1|self> <char2|self> : msgCharFound2, msgVictimFound2, msgOthersFound2
+ *                             hard-coded msg for not found
+ * <obj>                     : msgCharObj, msgOthersObj
+ * <char|self> <obj>         : msgCharVictimObj, msgVictimObj, msgOthersVictimObj
+ */
 void SocialBase::run( Character *ch, const DLString &constArguments )
 {
     Character *victim, *victim2;
-    int pos;
+    const void *arg1, *arg2;
+    Object *obj;
     DLString argument = constArguments;
-
     DLString firstArgument =  argument.getOneArgument( );
     DLString secondArgument = argument.getOneArgument( );
-    pos = getPosition( );
-    victim = 0;
-    victim2 = 0;
+    int rc = parseArguments(ch, firstArgument, secondArgument, victim, victim2, obj);
+    int pos = getPosition( );
 
-    if (firstArgument.empty( )) // вызов без аргументов
-    {
-        act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-        act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR,pos );
-    }
-    else if (( victim = get_char_room( ch, firstArgument ) ) != 0) // найден персонаж по первому аргументу
-    { 
-        victim2 = victim;
-        // See if 2-victim syntax is supported by this social. Find second victim.
-        if (!getArgMe2( ).empty( ) && !secondArgument.empty( )) {
-            victim2 = get_char_room( ch, secondArgument );
-        }
-
-        if ( !victim2 ) { // не найден персонаж по второму аргументу
-            if ( victim == ch )
-                ch->pecho( "Ты видишь только себя здесь, кто такой %s?", secondArgument.c_str( ));
-            else
-                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %s?", victim, secondArgument.c_str( ));
-            return;
-        }
-
-        if (victim == ch && victim2 == ch) { // применение социала на себя
+    switch (rc) {
+        case RC_NOARG:  // вызов без параметров
+            act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+            act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            break;
+    
+        case RC_SELF: // применение социала на себя, в т.ч. если оба аргумента - тоже я
             act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
             act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-        }
-        else if (victim2 == victim) { // применение социала на жертву, в т.ч. если оба аргумента - одна и та же жертва
+            break;
+
+        case RC_VICT: // применение социала на жертву, в т.ч. если оба аргумента - одна и та же жертва
             act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
             act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
             act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
-        } else {
+            break;
+
+        case RC_VICT_NOT_FOUND: // не найдет персонаж или предмет по первому аргументу
+            // Handled after mobprogs had a chance to run.
+            break;
+
+        case RC_VICT2_NOT_FOUND: // не найден персонаж или предмет по второму аргументу
+            if (victim == ch)
+                ch->pecho( "Ты видишь только себя здесь, кто такой %s?", secondArgument.c_str( ));
+            else
+                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %s?", victim, secondArgument.c_str( ));
+            break;
+
+
+        case RC_VICT_VICT:
             // Output to actor and both victims. Substitute actor name with "self" if it matches victim.
-            const void *arg1 = victimOrSelf(ch, victim);
-            const void *arg2 = victimOrSelf(ch, victim2);
+            arg1 = victimOrSelf(ch, victim);
+            arg2 = victimOrSelf(ch, victim2);
 
             ch->pecho( getArgMe2( ).c_str( ), ch, arg1, arg2 );
             if (victim != ch ) victim->pecho( getArgVictim2( ).c_str( ), ch, arg1, arg2 );
@@ -149,10 +224,31 @@ void SocialBase::run( Character *ch, const DLString &constArguments )
             for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
                 if (rch != ch && rch != victim && rch != victim2)
                     rch->pecho( getArgOther2( ).c_str( ), ch, arg1, arg2 );
-        }
+            break;
+
+        case RC_VICT_OBJ:
+            arg1 = victimOrSelf(ch, victim);
+            ch->pecho(getObjChar().c_str(), ch, arg1, obj);
+            if (victim != ch)
+                victim->pecho(getObjVictim().c_str(), ch, arg1, obj);
+            ch->recho(victim, getObjOthers().c_str(), ch, arg1, obj);
+            break;
+
+        case RC_OBJ:
+            ch->pecho(getObjNoVictimSelf().c_str(), ch, obj);
+            ch->recho(getObjNoVictimOthers().c_str(), ch, obj);
+            break;
+    }
+    
+    bool reacted = reaction( ch, victim, firstArgument );
+    if (!reacted && rc == RC_VICT_NOT_FOUND) {
+        if (!getErrorMsg( ).empty( ))
+            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
+        else
+            ch->println("Нет этого здесь.");
+        return;
     }
 
-    reaction( ch, victim, firstArgument );
     if (victim2 && victim2 != victim)
         reaction( ch, victim2, secondArgument );
 }

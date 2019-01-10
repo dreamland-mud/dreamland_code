@@ -61,7 +61,7 @@ public:
     inline void setArgVictim( const DLString & );
    
 protected:
-    virtual void reaction( Character *, Character *, const DLString & );
+    virtual bool reaction( Character *, Character *, const DLString & );
     virtual int getPosition( ) const;
 
 private:

@@ -28,7 +28,7 @@ public:
     virtual void run( Character *, const DLString & );
     
 protected:    
-    virtual void reaction( Character *, Character *, const DLString & ) = 0;
+    virtual bool reaction( Character *, Character *, const DLString & ) = 0;
     virtual int getPosition( ) const = 0;
     virtual const DLString & getNoargOther( ) const = 0;
     virtual const DLString & getNoargMe( ) const = 0;
@@ -41,6 +41,11 @@ protected:
     inline virtual const DLString & getArgOther2( ) const { return DLString::emptyString; }
     inline virtual const DLString & getArgMe2( ) const { return DLString::emptyString; }
     inline virtual const DLString & getArgVictim2( ) const { return DLString::emptyString; }
+    inline virtual const DLString & getObjVictim() const { return DLString::emptyString; }
+    inline virtual const DLString & getObjChar() const { return DLString::emptyString; }
+    inline virtual const DLString & getObjOthers() const { return DLString::emptyString; }
+    inline virtual const DLString & getObjNoVictimSelf() const { return DLString::emptyString; }
+    inline virtual const DLString & getObjNoVictimOthers() const { return DLString::emptyString; }
 
     void visualize( Character * );
     bool checkPosition( Character * );

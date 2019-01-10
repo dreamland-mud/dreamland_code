@@ -87,29 +87,22 @@ static bool rprog_social( Room *room, Character *actor, Character *victim, const
     return false;
 }
 
-void Social::reaction( Character *ch, Character *victim, const DLString &arg )
+bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
 {
     if (rprog_social( ch->in_room, ch, victim, getName( ).c_str( ), arg.c_str( ) ))
-        return;
+        return true;
 
     if (mprog( ch, victim ))
-        return;
+        return true;
     
-    if (!victim && !arg.empty( )) {
-        if (!getErrorMsg( ).empty( ))
-            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
-        else
-            ch->println("Нет этого здесь.");
-    }
-
     if (!victim || victim == ch)
-        return;
+        return false;
 
     if (ch->is_npc( ) || !victim->is_npc( ) || victim->desc)
-        return;
+        return false;
         
     if (IS_AFFECTED(victim, AFF_CHARM) || !IS_AWAKE(victim))
-        return;
+        return false;
     
     switch (number_bits( 4 )) {
     case 0:
@@ -135,5 +128,7 @@ void Social::reaction( Character *ch, Character *victim, const DLString &arg )
         interpret_fmt( victim, "eyebrow %s", ch->getNameP( ) );
         break;
     }
+
+    return false;
 }
 
