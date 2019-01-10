@@ -2682,10 +2682,20 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     case ITEM_DRINK_CON:
         liquid = liquidManager->find( obj->value[2] );
+        int sips, sipsf;
+        sips = max( 0, obj->value[1] / liquid->getSipSize( ) );
+        sipsf = max( 0, obj->value[0] / liquid->getSipSize( ) );
+
+        if (sipsf * liquid->getSipSize( ) < obj->value[0]) {
+            sipsf +=1;
+            if (obj->value[1] > 0) sips +=1;
+        }
+
         buf << "Содержит " 
             << liquid->getShortDescr( ).ruscase( '4' ) << " "
             << liquid->getColor( ).ruscase( '2' ) 
-            << " цвета." << endl;
+            << " цвета. Осталось " << sips 
+            << " из "  << sipsf << " глотков." << endl;
         break;
 
     case ITEM_CONTAINER:
