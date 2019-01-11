@@ -11,7 +11,10 @@
 #include "socialmanager.h"
 
 #include "logstream.h"
+#include "grammar_entities_impl.h"
 #include "npcharacter.h"
+#include "pcharactermanager.h"
+#include "pcharacter.h"
 #include "object.h"
 #include "behavior_utils.h"
 #include "room.h"
@@ -27,12 +30,147 @@
 #include "mercdb.h"
 #include "def.h"
 
+using namespace Grammar;
+
+DLString act_to_fmt(const char *s);
+
+SocialHelp::SocialHelp(Social::Pointer social)
+{
+    this->social = social;
+}
+
+SocialHelp::~SocialHelp()
+{
+}
+
+static const RussianString & object_name()
+{
+    static RussianString obj("кинжал||а|у||ом|е");
+    return obj;
+}
+
+// Tranforms player info into structure that 'format' functions would understand:
+// russian name with cases and gender.
+static RussianString russian_string(PCMemoryInterface *pc)
+{
+    MultiGender mg = MultiGender(pc->getSex(), Number::SINGULAR);
+    return RussianString(pc->getRussianName().getFullForm(), mg);
+}
+
+// Finds random registered player and returns its name+gender.
+static RussianString player_name()
+{
+    static RussianString empty;
+    PCharacterMemoryList::const_iterator i;
+    const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
+    int totalFound = 0;
+    PCMemoryInterface *result = 0;
+
+    for (i = pcm.begin( ); i != pcm.end( ); i++) {
+        PCMemoryInterface *pc = i->second;
+        const DLString &rname = pc->getRussianName().getFullForm();
+    
+        // Ignore players w/o configured Russian name.    
+        if (rname.empty())
+            continue;
+
+        // Ignore players whose names look the same in all cases.
+        if (rname.find('|') == DLString::npos)
+            continue;
+        
+        if (number_range(0, totalFound++) == 0)
+            result = pc;
+    }
+
+    if (!result)
+        return empty;
+
+    return russian_string(result);
+}
+
+
+void SocialHelp::getRawText( Character *ch, ostringstream &buf ) const
+{
+    if (!social)
+        return;
+    if (ch->is_npc())
+        return;
+
+    buf << "Социал {c" << social->getName() << "{x, {c"
+        << social->getRussianName() << "{x: " 
+        << social->getShortDesc() << endl << endl
+        << "Вот как этот социал виден тебе и окружающим, когда он применен..." << endl;
+
+    RussianString me = russian_string(ch->getPC());
+    RussianString vict1 = player_name();
+    RussianString vict2 = player_name();
+    const RussianString &obj = object_name();
+
+    if (!social->getAutoMe().empty()) {
+        buf << endl
+            << "На себя:       " << fmt(0, act_to_fmt(social->getAutoMe().c_str()).c_str(), me) << endl;
+        if (!social->getAutoOther().empty())
+            buf << "               " << fmt(0, act_to_fmt(social->getAutoOther().c_str()).c_str(), me) << endl;
+    }
+
+    if (!social->getNoargMe().empty()) {
+        buf << endl
+            << "Без параметра: " << fmt(0, act_to_fmt(social->getNoargMe().c_str()).c_str(), me) << endl;
+        if (!social->getNoargOther().empty())
+            buf << "               " << fmt(0, act_to_fmt(social->getNoargOther().c_str()).c_str(), me) << endl;
+    }
+    
+    if (!social->getArgVictim().empty()) {
+        buf << endl
+            << "На кого-то:    " <<  fmt(0, act_to_fmt(social->getArgMe().c_str()).c_str(), me, 0, vict1) << endl
+            << "               " <<  fmt(0, act_to_fmt(social->getArgVictim().c_str()).c_str(), me, 0, vict1) << endl
+            << "               " <<  fmt(0, act_to_fmt(social->getArgOther().c_str()).c_str(), me, 0, vict1) << endl;
+        
+        if (!social->getArgVictim2().empty()) {
+            buf << endl
+                << "На двоих:      " <<  fmt(0, social->getArgMe2().c_str(), me, vict1, vict2) << endl
+                << "               " <<  fmt(0, social->getArgVictim2().c_str(), me, vict1, vict2) << endl
+                << "               " <<  fmt(0, social->getArgOther2().c_str(), me, vict1, vict2) << endl;
+        }
+    }
+
+    if (!social->getObjNoVictimSelf().empty()) {
+        buf << endl
+            << "На предмет:    " <<  fmt(0, social->getObjNoVictimSelf().c_str(), me, obj) << endl
+            << "               " <<  fmt(0, social->getObjNoVictimOthers().c_str(), me, obj) << endl;
+    }
+
+    if (!social->getObjVictim().empty()) {
+        buf << endl
+            << "На предмет     " <<  fmt(0, social->getObjChar().c_str(), me, vict1, obj) << endl
+            << "и персонажа:   " <<  fmt(0, social->getObjVictim().c_str(), me, vict1, obj) << endl
+            << "               " <<  fmt(0, social->getObjOthers().c_str(), me, vict1, obj) << endl;
+    }
+}
+
 Social::Social( ) : position( POS_RESTING, &position_table )
 {
 }
 
 Social::~Social( )
 {
+}
+
+void Social::loaded()
+{
+    help = SocialHelp::Pointer(NEW, Pointer(this));
+    help->addKeyword(getName());
+    help->addKeyword(getRussianName());
+    
+    helpManager->registrate(help);
+}
+
+void Social::unloaded()
+{
+    if (help) {
+        helpManager->unregistrate(help);
+        help.clear(); 
+    }
 }
 
 bool Social::matches( const DLString& argument ) const

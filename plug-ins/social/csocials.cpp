@@ -33,9 +33,10 @@ CMDRUN( socials )
 
     for (i = socials.begin( ); i != socials.end( ); i++) {
         const Social *s = i->getConstPointer<Social>( );
+        DLString name = DLString("{hh") + s->getName() + "{hx";
 
-        buf << dlprintf( "{c%-10s{x | %-11s| %-s", 
-                         s->getName( ).c_str( ), 
+        buf << dlprintf( "{c%-12s{x | %-11s| %-s", 
+                          name.c_str(),
                          s->getRussianName( ).c_str( ), 
                          s->getShortDesc( ).c_str( ) )
             << endl;

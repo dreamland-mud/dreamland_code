@@ -27,9 +27,6 @@ public:
     virtual bool dispatchOrder( const InterpretArguments & );
     virtual void run( Character *, const DLString & );
     
-protected:    
-    virtual bool reaction( Character *, Character *, const DLString & ) = 0;
-    virtual int getPosition( ) const = 0;
     virtual const DLString & getNoargOther( ) const = 0;
     virtual const DLString & getNoargMe( ) const = 0;
     virtual const DLString & getAutoOther( ) const = 0;
@@ -47,6 +44,10 @@ protected:
     inline virtual const DLString & getObjNoVictimSelf() const { return DLString::emptyString; }
     inline virtual const DLString & getObjNoVictimOthers() const { return DLString::emptyString; }
 
+
+protected:    
+    virtual bool reaction( Character *, Character *, const DLString & ) = 0;
+    virtual int getPosition( ) const = 0;
     void visualize( Character * );
     bool checkPosition( Character * );
 };

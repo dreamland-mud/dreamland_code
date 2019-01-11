@@ -67,7 +67,7 @@ static const char * actChar_to_fmtChar(char c)
     }
 }
 
-static DLString act_to_fmt(const char *s)
+DLString act_to_fmt(const char *s)
 {
     ostringstream buf;
 

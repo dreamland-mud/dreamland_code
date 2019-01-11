@@ -16,6 +16,9 @@
 #include "xmltableelement.h"
 #include "socialbase.h"
 #include "xmlloader.h"
+#include "markuphelparticle.h"
+
+class SocialHelp;
 
 class Social : public SocialBase, public XMLVariableContainer, 
                public XMLTableElement 
@@ -27,14 +30,14 @@ public:
     Social( );
     virtual ~Social( );
     
+    virtual void loaded( );
+    virtual void unloaded( );
     virtual bool matches( const DLString & ) const;
     inline virtual const DLString &getName( ) const;
     inline virtual void setName( const DLString & );
     inline virtual const DLString &getRussianName( ) const;
     inline const DLString &getShortDesc( ) const;
 
-protected:
-    virtual bool reaction( Character *, Character *, const DLString & );
     inline virtual int getPosition( ) const;
     inline virtual const DLString & getNoargOther( ) const;
     inline virtual const DLString & getNoargMe( ) const;
@@ -52,6 +55,9 @@ protected:
     inline virtual const DLString & getObjOthers() const;
     inline virtual const DLString & getObjNoVictimSelf() const;
     inline virtual const DLString & getObjNoVictimOthers() const;
+
+protected:
+    virtual bool reaction( Character *, Character *, const DLString & );
 
 private:
     bool mprog( Character *, Character * );
@@ -81,6 +87,8 @@ private:
     XML_VARIABLE XMLStringList aliases;
 
     XML_VARIABLE XMLEnumeration position;
+
+    ::Pointer<SocialHelp> help;
 };
 
 inline const DLString& Social::getName( ) const 
@@ -168,5 +176,18 @@ inline const DLString & Social::getObjNoVictimOthers() const
 {
     return msgOthersObj.getValue();
 }
+
+class SocialHelp : public MarkupHelpArticle {
+public:
+    typedef ::Pointer<SocialHelp> Pointer;
+    
+    SocialHelp(Social::Pointer social);
+    virtual ~SocialHelp();
+
+protected:
+    virtual void getRawText( Character *, ostringstream & ) const;
+    Social::Pointer social;
+};
+
 #endif
 
