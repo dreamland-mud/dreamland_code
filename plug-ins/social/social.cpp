@@ -108,43 +108,43 @@ void SocialHelp::getRawText( Character *ch, ostringstream &buf ) const
 
     if (!social->getAutoMe().empty()) {
         buf << endl
-            << "На себя:       " << fmt(0, act_to_fmt(social->getAutoMe().c_str()).c_str(), me) << endl;
+            << "На себя:       " << fmt(0, act_to_fmt(social->getAutoMe().c_str()).c_str(), &me) << endl;
         if (!social->getAutoOther().empty())
-            buf << "               " << fmt(0, act_to_fmt(social->getAutoOther().c_str()).c_str(), me) << endl;
+            buf << "               " << fmt(0, act_to_fmt(social->getAutoOther().c_str()).c_str(), &me) << endl;
     }
 
     if (!social->getNoargMe().empty()) {
         buf << endl
-            << "Без параметра: " << fmt(0, act_to_fmt(social->getNoargMe().c_str()).c_str(), me) << endl;
+            << "Без параметра: " << fmt(0, act_to_fmt(social->getNoargMe().c_str()).c_str(), &me) << endl;
         if (!social->getNoargOther().empty())
-            buf << "               " << fmt(0, act_to_fmt(social->getNoargOther().c_str()).c_str(), me) << endl;
+            buf << "               " << fmt(0, act_to_fmt(social->getNoargOther().c_str()).c_str(), &me) << endl;
     }
     
     if (!social->getArgVictim().empty()) {
         buf << endl
-            << "На кого-то:    " <<  fmt(0, act_to_fmt(social->getArgMe().c_str()).c_str(), me, 0, vict1) << endl
-            << "               " <<  fmt(0, act_to_fmt(social->getArgVictim().c_str()).c_str(), me, 0, vict1) << endl
-            << "               " <<  fmt(0, act_to_fmt(social->getArgOther().c_str()).c_str(), me, 0, vict1) << endl;
+            << "На кого-то:    " <<  fmt(0, act_to_fmt(social->getArgMe().c_str()).c_str(), &me, 0, &vict1) << endl
+            << "               " <<  fmt(0, act_to_fmt(social->getArgVictim().c_str()).c_str(), &me, 0, &vict1) << endl
+            << "               " <<  fmt(0, act_to_fmt(social->getArgOther().c_str()).c_str(), &me, 0, &vict1) << endl;
         
         if (!social->getArgVictim2().empty()) {
             buf << endl
-                << "На двоих:      " <<  fmt(0, social->getArgMe2().c_str(), me, vict1, vict2) << endl
-                << "               " <<  fmt(0, social->getArgVictim2().c_str(), me, vict1, vict2) << endl
-                << "               " <<  fmt(0, social->getArgOther2().c_str(), me, vict1, vict2) << endl;
+                << "На двоих:      " <<  fmt(0, social->getArgMe2().c_str(), &me, &vict1, &vict2) << endl
+                << "               " <<  fmt(0, social->getArgVictim2().c_str(), &me, &vict1, &vict2) << endl
+                << "               " <<  fmt(0, social->getArgOther2().c_str(), &me, &vict1, &vict2) << endl;
         }
     }
 
     if (!social->getObjNoVictimSelf().empty()) {
         buf << endl
-            << "На предмет:    " <<  fmt(0, social->getObjNoVictimSelf().c_str(), me, obj) << endl
-            << "               " <<  fmt(0, social->getObjNoVictimOthers().c_str(), me, obj) << endl;
+            << "На предмет:    " <<  fmt(0, social->getObjNoVictimSelf().c_str(), &me, &obj) << endl
+            << "               " <<  fmt(0, social->getObjNoVictimOthers().c_str(), &me, &obj) << endl;
     }
 
     if (!social->getObjVictim().empty()) {
         buf << endl
-            << "На предмет     " <<  fmt(0, social->getObjChar().c_str(), me, vict1, obj) << endl
-            << "и персонажа:   " <<  fmt(0, social->getObjVictim().c_str(), me, vict1, obj) << endl
-            << "               " <<  fmt(0, social->getObjOthers().c_str(), me, vict1, obj) << endl;
+            << "На предмет     " <<  fmt(0, social->getObjChar().c_str(), &me, &vict1, &obj) << endl
+            << "и персонажа:   " <<  fmt(0, social->getObjVictim().c_str(), &me, &vict1, &obj) << endl
+            << "               " <<  fmt(0, social->getObjOthers().c_str(), &me, &vict1, &obj) << endl;
     }
 }
 
