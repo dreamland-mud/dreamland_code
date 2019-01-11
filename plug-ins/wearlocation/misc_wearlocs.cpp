@@ -41,7 +41,6 @@ void StuckInWearloc::unequip( Character *ch, Object *obj )
 /*
  * hair 
  */
-
 bool HairWearloc::matches( Character *ch )
 {
     return true;
@@ -266,3 +265,35 @@ bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
     return false;
 }
 
+/*
+ * tair 
+ */
+bool TailWearloc::equip( Character *ch, Object *obj )
+{
+    obj->wear_loc.assign( this );
+    saveDrops( ch );
+    return true;
+}
+
+void TailWearloc::unequip( Character *ch, Object *obj )
+{
+    obj->wear_loc.assign( wear_none );
+    saveDrops( ch );
+}
+
+void TailWearloc::affectsOnEquip( Character *ch, Object *obj ) 
+{ 
+}
+
+void TailWearloc::affectsOnUnequip( Character *ch, Object *obj ) 
+{ 
+}
+
+int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
+    if (find( ch ) != NULL) {
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->println("На твой хвост уже что-то надето.");
+        return RC_WEAR_CONFLICT;
+    }
+    return DefaultWearlocation::canWear( ch, obj, flags );
+}

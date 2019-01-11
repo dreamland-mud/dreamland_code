@@ -18,6 +18,7 @@
 #include "def.h"
 
 WEARLOC(hair);
+WEARLOC(tail);
 
 /*
  * 'wear' command
@@ -31,6 +32,7 @@ CMDRUNP( wear )
     char cArg[MAX_INPUT_LENGTH];
     char argObj[MAX_INPUT_LENGTH], argTo[MAX_INPUT_LENGTH], argVict[MAX_INPUT_LENGTH];
     bool fHair = false;
+    bool fTail = false;	
     
     strcpy( cArg, argument );
     argument = one_argument( argument, argObj );
@@ -42,9 +44,12 @@ CMDRUNP( wear )
         return;
     }
     
-    if (arg_is_to( argTo ) || arg_is_in( argTo )) {
+    if (arg_is_to( argTo ) || arg_is_in( argTo ) || arg_is_on(argTo)) {
         if (arg_oneof( argVict, "волосы", "hair" )) {
             fHair = true;
+        }
+        else if (arg_oneof(argVict, "хвост", "tail")) {
+            fTail = true;
         }
         else if (( victim = get_char_room( ch, argVict  ) ) == 0) {
             ch->println("На кого ты хочешь это надеть?");
@@ -90,6 +95,16 @@ CMDRUNP( wear )
         return;
     }
         
+    if (ch == victim && fTail) {
+        if (obj->getWeight( ) / 10 > 4) {
+            ch->pecho( "%1$^O1 слишком тяжел%1$Gое|ый|ая|ые, чтобы удержаться на твоем хвосте.", obj );
+            return;
+        }
+
+        wear_tail->wear( obj, F_WEAR_VERBOSE );
+        return;
+    }
+
     if (ch == victim) {
         if (wear_obj( ch, obj, F_WEAR_VERBOSE | F_WEAR_REPLACE) == RC_WEAR_NOMATCH)
             ch->println("Ты не можешь надеть, вооружиться или держать это в руках.");

@@ -70,4 +70,16 @@ public:
     virtual bool canRemove( Character *ch, Object *obj, int flags );
 };
 
+class TailWearloc : public DefaultWearlocation {
+XML_OBJECT    
+public:
+    typedef ::Pointer<TailWearloc> Pointer;
+
+    virtual bool equip( Character *ch, Object *obj );
+    virtual void unequip( Character *ch, Object *obj );
+    virtual int canWear( Character *ch, Object *obj, int flags );
+protected:    
+    virtual void affectsOnEquip( Character *ch, Object *obj );
+    virtual void affectsOnUnequip( Character *ch, Object *obj );
+};
 #endif

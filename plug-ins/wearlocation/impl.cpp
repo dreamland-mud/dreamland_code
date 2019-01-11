@@ -25,6 +25,7 @@ extern "C"
             Plugin::registerPlugin<MocRegistrator<DefaultWearlocation> >( ppl );
             Plugin::registerPlugin<MocRegistrator<StuckInWearloc> >( ppl );
             Plugin::registerPlugin<MocRegistrator<HairWearloc> >( ppl );
+            Plugin::registerPlugin<MocRegistrator<TailWearloc> >( ppl );
             Plugin::registerPlugin<MocRegistrator<ShieldWearloc> >( ppl );
             Plugin::registerPlugin<MocRegistrator<WieldWearloc> >( ppl );
             Plugin::registerPlugin<MocRegistrator<SecondWieldWearloc> >( ppl );

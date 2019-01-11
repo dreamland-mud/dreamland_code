@@ -406,7 +406,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if (wear_level > ch->getRealLevel( )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( "Чтобы использовать это, тебе необходимо достичь %d уровня.", wear_level );
+            ch->pecho( "Тебе необходимо достичь %d уровня, чтобы использовать %O4.", wear_level, obj );
             ch->recho( "%1$^C3 не хватает опыта, чтобы использовать %2$O4.", ch, obj );
         }
         return RC_WEAR_YOUNG;
