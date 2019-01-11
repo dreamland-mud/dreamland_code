@@ -45,7 +45,7 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
         return;
 
     // TODO: make supported thread names and hook types configurable.
-    if (thread.getName( ) != "news" && thread.getName( ) != "change")
+    if (thread.getName( ) != "news" && thread.getName( ) != "change" && thread.getName() != "qnote")
         return;
 
     ostringstream content;
