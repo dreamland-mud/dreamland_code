@@ -118,7 +118,6 @@ DESIRE(thirst);
 DESIRE(bloodlust);
 WEARLOC(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
-bool limit_check_on_save( Object *obj );
 bool limit_check_on_load( Object *obj );
 
 static void convert_skill( int &sn )
@@ -697,9 +696,6 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
     /*
      * Castrate storage characters and rooms.
      */
-        if (limit_check_on_save( obj ))
-            return;
-
         if (ch != 0 && !ch->is_npc( ) && !ch->is_immortal( ))
         {
             if (!obj->hasOwner( ch ) && obj->mustDisappear( ch ))

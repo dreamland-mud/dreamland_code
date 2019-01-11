@@ -64,7 +64,7 @@ public:
     }
     virtual void after( )
     {
-        DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_DAY, Pointer( this ) );    
+        DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_HOUR, Pointer( this ) );    
     }
     virtual int getPriority( ) const
     {
@@ -82,6 +82,7 @@ extern "C" {
         Plugin::registerPlugin<DropsLoadTask>( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<SavedCreature> >( ppl );
 //        Plugin::registerPlugin<WorldKnowledge>( ppl );
+        Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
 
         return ppl;
     }

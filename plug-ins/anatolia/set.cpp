@@ -1295,6 +1295,10 @@ void oset( Character* ch, char* argument )
                 return;
             }
         }
+        else if (!str_cmp(arg2, "timestamp")) {
+            obj->timestamp = atol(arg3);
+            return;
+        }
         else
         {
                 if ( !str_cmp( arg2, "extra" )
