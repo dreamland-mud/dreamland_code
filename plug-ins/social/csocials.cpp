@@ -42,6 +42,7 @@ CMDRUN( socials )
             << endl;
     }
 
+    buf << "См. справку по каждому социалу, чтобы увидеть, как он выглядит." << endl;
     page_to_char( buf.str( ).c_str( ), ch );
 }
 
