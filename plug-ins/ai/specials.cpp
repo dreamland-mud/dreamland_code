@@ -263,6 +263,8 @@ static bool can_take_obj( Character *ch, Object *obj )
 {
     if (!obj->can_wear( ITEM_TAKE )) 
         return false;
+    if (obj->can_wear(ITEM_NO_SAC) || IS_SET(obj->extra_flags, ITEM_NOSAC))
+	return false;
     if (obj->getOwner( ))
         return false;
     if (obj->behavior)
