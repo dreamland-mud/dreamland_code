@@ -81,7 +81,7 @@ CMDRUN(altar)
 
     Object *altar = create_object(get_obj_index(OBJ_VNUM_ALTAR), 0);
     obj_to_room(altar, ch->in_room);
-    altar->timer = 60*6;
+    altar->timer = 60;
     altar->setOwner(religion.getName().c_str());
     
     ch->pecho("Ты сооружаешь %O4 для подношений %N3.", altar, rname);
