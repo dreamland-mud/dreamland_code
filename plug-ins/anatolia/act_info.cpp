@@ -2299,8 +2299,20 @@ CMDRUNP( affects )
     for (o = output.begin( ); o != output.end( ); o++) 
         o->show_affect( buf, flags );
 
+
+    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master != 0) {
+        if (buf.str( ).empty( )) 
+            act_p( "$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR,POS_RESTING );
+        else 
+            act_p( "$C1 находится под действием следующих аффектов:", ch->master, 0, ch, TO_CHAR,POS_RESTING );
+        buf << "{x";
+        ch->master->send_to( buf );
+        return;
+    }
+
     // Output permanent bits on top.
     permAff.printAll();
+
 
     if (buf.str( ).empty( )) {
         if (IS_SET(flags, FSHOW_EMPTY) && !permAff.isSet())
