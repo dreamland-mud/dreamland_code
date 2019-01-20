@@ -1285,9 +1285,11 @@ void fread_pet( PCharacter *ch, FILE *fp )
             if (!str_cmp(word,"Affc"))
             {
                 Affect *paf = fread_Affc( fp );
-
-                paf->next       = pet->affected;
-                pet->affected   = paf;
+                
+                if (!pet->isAffected(paf->type)) {
+                    paf->next       = pet->affected;
+                    pet->affected   = paf;
+                }
                 fMatch          = true;
                 break;
             }

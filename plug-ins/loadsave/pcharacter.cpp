@@ -34,10 +34,6 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 PROF(universal);
 
-static void limit_update_on_player_load( PCharacter *ch )
-{
-}
-
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
     int &learn1 = ch->getSkillData( skill1 ).learned;
@@ -181,7 +177,6 @@ void PCharacter::load( )
     updateSkills( );
     update_exp( this );
     update_skill_points( this );
-    limit_update_on_player_load( this );
 
     /* fix renamed skills */
     skill_exchange( this, gsn_sanctuary, gsn_stardust );
