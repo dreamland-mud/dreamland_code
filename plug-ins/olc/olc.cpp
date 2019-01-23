@@ -1168,16 +1168,19 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
                 continue;
 
             DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
-            if (type.find("Pet") == DLString::npos)
+            if (type.find("Pet") == DLString::npos && type != "Rat")
                 continue;
+
+            DLString aname = pMob->area->name;
+            csv_escape(aname);
 
             buf << pMob->vnum << "," 
                 << russian_case(pMob->short_descr, '1').colourStrip() << "," 
-                << (type == "LevelAdaptivePet" ? -1 : pMob->level) << ","
-                << act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK)) << ","
+                << (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level) << ","
+                << act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_SAGE|ACT_NOWHERE)) << ","
                 << affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED)) << ","
-                << off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE)) << ","
-                << pMob->area->name << endl;
+                << off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE)) << ","
+                << aname << endl;
         }
 
         page_to_char(buf.str().c_str(), ch);
