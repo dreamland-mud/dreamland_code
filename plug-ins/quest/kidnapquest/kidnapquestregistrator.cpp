@@ -17,3 +17,8 @@ KidnapQuestRegistrator::~KidnapQuestRegistrator( )
     thisClass = NULL;
 }
 
+bool KidnapQuestRegistrator::applicable( PCharacter *pch ) const
+{
+	return true;
+}
+

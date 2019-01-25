@@ -25,3 +25,8 @@ const DLString& QuestRegistratorBase::getShortDescr( ) const
     return shortDesc;
 }
 
+const DLString& QuestRegistratorBase::getDifficulty( ) const
+{
+    return difficulty;
+}
+

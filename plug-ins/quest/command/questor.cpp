@@ -52,77 +52,6 @@ bool Questor::canGiveQuest( Character *ach )
     return !ach->is_npc( );
 }
 
-void Questor::doRequest( PCharacter *client )  
-{
-    XMLAttributeQuestData::Pointer attr;
-    DLString descr;
-    int cha;
-    
-    act("$c1 просит $C4 дать $m задание.",client,0,ch,TO_ROOM);
-    act("Ты просишь $C4 дать тебе задание.",client,0,ch,TO_CHAR);
-
-    if (client->getAttributes( ).isAvailable( "quest" )) {
-        tell_raw( client,ch,"Но у тебя уже есть задание!" );
-        return;
-    }
-
-    attr = client->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" );
-    
-    if (attr->getTime( ) > 0) {
-        tell_fmt( "Ты очень отваж%1$Gно|ен|на, %1$C1, но дай шанс кому-нибудь еще.", client, ch );
-        tell_raw( client, ch, "Приходи позже." );
-        return;
-    }
-    
-    if (client->getDescription( )) {
-        descr = client->getDescription( );
-        descr.stripWhiteSpace( );
-    }
-
-    if (!IS_SET( client->act, PLR_CONFIRMED )) {
-        tell_raw( client, ch, "Сначала попроси у Богов подтверждения своему персонажу.");
-        tell_raw( client, ch, "Если не знаешь, как это делается, прочитай help confirm." );
-        return;
-    } else if (descr.empty( )) {
-        tell_raw( client, ch, "Я не хочу давать задание такой непримечательной личности, как ты!");
-        wiznet( WIZ_CONFIRM, 0, 0, "%C1 is confirmed but has no description!", client );
-        return;
-    } 
-    
-    cha = client->getCurrStat( STAT_CHA );
-    
-    if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
-        tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
-        tell_raw( client, ch, "Приходи позже.");
-        
-        if (rated_as_guru( client ))
-            attr->setTime( 1 );
-        else
-            attr->setTime( number_range(3, 6) );
-
-        return;
-    }
-    
-    tell_fmt( "Спасибо тебе, %1$C1!", client, ch );
-
-    try {
-        QuestManager::getThis( )->generate( client, ch );
-        
-        PCharacterManager::save( client );
-        
-        tell_raw( client, ch,  "Пусть удача сопутствует тебе!");
-
-    } catch (const QuestCannotStartException &e) {
-        tell_raw( client, ch, "Извини, но у меня сейчас нет для тебя задания.");
-        tell_raw( client, ch, "Приходи позже.");
-        
-        if (rated_as_guru( client ))
-            attr->setTime( 1 );
-        else
-            attr->setTime( number_range(3, 6) );
-    }
-}
-
 void Questor::doComplete( PCharacter *client, DLString &args ) 
 {
     ostringstream msg;
@@ -513,7 +442,7 @@ static void delay_noquest(XMLAttributeQuestData::Pointer &attr, PCharacter *clie
         attr->setTime( number_range(3, 6) );
 }
 
-void Questor::doCheat(PCharacter *client, const DLString &arg)  
+void Questor::doRequest(PCharacter *client, const DLString &arg)  
 {
     XMLAttributeQuestData::Pointer attr;
     DLString descr;
@@ -546,8 +475,8 @@ void Questor::doCheat(PCharacter *client, const DLString &arg)
     }
 
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
-        tell_raw( client, ch, "Сначала попроси у Богов подтверждения своему персонажу.");
-        tell_raw( client, ch, "Если не знаешь, как это делается, прочитай help confirm." );
+        tell_raw( client, ch, "Сначала попроси у богов подтверждения своему персонажу.");
+        tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {W{hc{lRсправка подтверждение{lEhelp confirm{x." );
         return;
     } else if (descr.empty( )) {
         tell_raw( client, ch, "Я не хочу давать задание такой непримечательной личности, как ты!");
@@ -580,12 +509,15 @@ void Questor::doCheat(PCharacter *client, const DLString &arg)
         int index;
         ostringstream buf;
         buf << endl;
-        for (index = 1, q = quests.begin(); q != quests.end(); index++, q++)
-            buf << "       {W" << index << "{x. " << (*q)->getShortDescr() << endl;
+        for (index = 1, q = quests.begin(); q != quests.end(); index++, q++) {
+            DLString d = (*q)->getDifficulty();
+            buf << dlprintf("     {W%2d{x. %-25s {D(%s){x \r\n",
+                            index, (*q)->getShortDescr().c_str(), d.c_str());
+        }
         buf << endl;
         client->send_to(buf);
 
-        tell_raw(client, ch, "Подробнее о каждом из них ты можешь прочитать в справке по теме 'виды заданий'.");
+        tell_raw(client, ch, "Подробнее о каждом из них ты можешь прочитать в справке по теме '{W{hhвиды заданий{hx{G'.");
         tell_raw(client, ch, "Выбери поручение и укажи его номер, например {y{lRзадание просить 3{lEquest request 3{x.");
         tell_raw(client, ch, "Или же попроси у меня задание на мое усмотрение: {y{lRзадание просить любое{lEquest request any{x.");
         return;

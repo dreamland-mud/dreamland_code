@@ -7,6 +7,7 @@
 #define QUESTREGISTRATOR_H
 
 #include "class.h"
+#include "logstream.h"
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"
 #include "xmlstring.h"
@@ -28,10 +29,12 @@ public:
 
     virtual bool applicable( PCharacter * ) const ;
     virtual int getPriority( ) const;
-    virtual const DLString& getShortDescr( ) const;
+    const DLString& getShortDescr( ) const;
+    const DLString& getDifficulty( ) const;
     
 protected:
     XML_VARIABLE XMLString shortDesc;
+    XML_VARIABLE XMLString difficulty;
     XML_VARIABLE XMLInteger priority;
 };
 
@@ -44,6 +47,7 @@ public:
     {
         Class::regMoc<C>( );
         QuestManager::getThis( )->load( this );
+        LogStream::sendNotice() << "loaded " << getName() << " difficulty " << getDifficulty() << endl;
         XMLAttributePlugin::initialization( );
     }
     
