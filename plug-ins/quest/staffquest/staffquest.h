@@ -43,9 +43,9 @@ private:
 class StaffScenario : public QuestItemAppearence, public QuestScenario {
 XML_OBJECT
 public:
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
 
-    void onQuestStart( PCharacter *, NPCharacter * );
+    void onQuestStart( PCharacter *, NPCharacter * ) const;
 
     XML_VARIABLE XMLString msg;
 };

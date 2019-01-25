@@ -29,7 +29,7 @@ HealScenario::HealScenario( )
 {
 }
 
-bool HealScenario::applicable( PCharacter *pch )
+bool HealScenario::applicable( PCharacter *pch ) const
 {
     if (pch->getClan( ) == clan_battlerager)
         return false;
@@ -37,7 +37,7 @@ bool HealScenario::applicable( PCharacter *pch )
     if (!obvious && gsn_observation->getEffective( pch ) < 50)
         return false;
     
-    for (XMLStringVector::iterator s = remedies.begin( ); s != remedies.end( ); s++)
+    for (XMLStringVector::const_iterator s = remedies.begin( ); s != remedies.end( ); s++)
         if (skillManager->find( *s )->getEffective( pch ) >= 50) 
             return true;
 
@@ -45,7 +45,7 @@ bool HealScenario::applicable( PCharacter *pch )
 }
 
 
-bool HealScenario::healedBy( int sn )
+bool HealScenario::healedBy( int sn ) 
 {
     if (remedies.hasElement( skillManager->find( sn )->getName( ) ))
         return true;
@@ -62,12 +62,12 @@ bool HealScenario::healedBy( int sn )
     return false;
 }
 
-bool HealScenario::isInfected( NPCharacter *mob )
+bool HealScenario::isInfected( NPCharacter *mob ) 
 {
     return mob->isAffected( malady );
 }
 
-bool HealScenario::applicable( PCharacter *pch, NPCharacter *mob )
+bool HealScenario::applicable( PCharacter *pch, NPCharacter *mob ) const
 {
     if (IS_SET(mob->act, profession)) 
         return false;
@@ -85,7 +85,7 @@ bool HealScenario::applicable( PCharacter *pch, NPCharacter *mob )
 }
 
 
-void HealScenario::infect( NPCharacter *patient, int time, int level ) 
+void HealScenario::infect( NPCharacter *patient, int time, int level )  const
 {
     Affect af;
     

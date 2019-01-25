@@ -239,6 +239,17 @@ HealQuestRegistrator::~HealQuestRegistrator( )
     registrator = 0;
 }
 
+bool HealQuestRegistrator::applicable( PCharacter *pch ) const
+{
+    Scenarios::const_iterator s;
+    for (s = scenarios.begin(); s != scenarios.end(); s++) {
+        if (s->second->applicable(pch))
+            return true;
+    }
+
+    return false;
+}
+
 /*--------------------------------------------------------------------
  * HealMaladies
  *--------------------------------------------------------------------*/

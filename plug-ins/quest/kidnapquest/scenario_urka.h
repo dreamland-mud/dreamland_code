@@ -11,7 +11,7 @@ class KidnapUrkaScenario: public KidnapScenario {
 XML_OBJECT
 public:
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
 
     virtual void msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero );
     virtual void msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero );

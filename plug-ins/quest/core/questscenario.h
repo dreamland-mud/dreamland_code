@@ -24,52 +24,52 @@ public:
     typedef ::Pointer<QuestScenario> Pointer;
 
     virtual ~QuestScenario( );
-    virtual bool applicable( PCharacter * ) = 0;
-    virtual bool applicable( PCharacter *, NPCharacter * );
+    virtual bool applicable( PCharacter * ) const = 0;
+    virtual bool applicable( PCharacter *, NPCharacter * ) const ;
 };
 
 class QuestScenariosContainer : public virtual XMLVariableContainer {
 public:
     typedef XMLMapBase<XMLPointer<QuestScenario> > Scenarios;
     
-    const DLString & getRandomScenario( PCharacter * );
-    QuestScenario::Pointer getScenario( const DLString & );
+    const DLString & getRandomScenario( PCharacter * ) const;
+    QuestScenario::Pointer getScenario( const DLString & ) const;
 
-    template<typename S> inline ::Pointer<S> getMyScenario( const DLString & );
-    template<typename S> inline void getMyScenarios( PCharacter *, vector< ::Pointer<S> > & );
-    template<typename S> inline void getMyScenarios( PCharacter *, NPCharacter *, vector< ::Pointer<S> > & );
+    template<typename S> inline ::Pointer<S> getMyScenario( const DLString & ) const;
+    template<typename S> inline void getMyScenarios( PCharacter *, vector< ::Pointer<S> > & ) const;
+    template<typename S> inline void getMyScenarios( PCharacter *, NPCharacter *, vector< ::Pointer<S> > & ) const;
 
 protected:
     XML_VARIABLE Scenarios scenarios;
 };
 
 template<typename S> 
-inline ::Pointer<S> QuestScenariosContainer::getMyScenario( const DLString &name )
+inline ::Pointer<S> QuestScenariosContainer::getMyScenario( const DLString &name ) const
 {
-    return static_cast<S*>(getScenario( name ).getPointer( ));
+    return static_cast<const S*>(getScenario( name ).getPointer( ));
 }
 
 template<typename S> 
-inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, vector< ::Pointer<S> > &list )
+inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, vector< ::Pointer<S> > &list ) const
 {
-    Scenarios::iterator i;
+    Scenarios::const_iterator i;
     
     for (i = scenarios.begin( ); i != scenarios.end( ); i++)
         if (i->second->applicable( pch ))
-            list.push_back( static_cast<S*>( i->second.getPointer( ) ) );
+            list.push_back( static_cast<const S*>( i->second.getPointer( ) ) );
 
     if (list.empty( ))
         throw QuestCannotStartException( );
 }
 
 template<typename S> 
-inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, NPCharacter *victim, vector< ::Pointer<S> > &list )
+inline void QuestScenariosContainer::getMyScenarios( PCharacter *pch, NPCharacter *victim, vector< ::Pointer<S> > &list ) const
 {
-    Scenarios::iterator i;
+    Scenarios::const_iterator i;
     
     for (i = scenarios.begin( ); i != scenarios.end( ); i++)
         if (i->second->applicable( pch ) && i->second->applicable( pch, victim ))
-            list.push_back( static_cast<S*>( i->second.getPointer( ) ) );
+            list.push_back( static_cast<const S*>( i->second.getPointer( ) ) );
 
     if (list.empty( ))
         throw QuestCannotStartException( );

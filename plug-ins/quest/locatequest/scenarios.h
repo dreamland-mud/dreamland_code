@@ -32,15 +32,15 @@ public:
     typedef VnumList Customers;
     typedef XMLVectorBase<LSItemData> Items;
     
-    virtual bool applicable( PCharacter * );
-    virtual int getCount( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
+    virtual int getCount( PCharacter * ) const;
 
-    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & ) = 0;
-    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) = 0;
+    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & ) const = 0;
+    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const = 0;
 
-    virtual void actWrongItem( NPCharacter *, PCharacter *, ::Pointer<LocateQuest>, Object * );
-    virtual void actLastItem( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> );
-    virtual void actAnotherItem( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> );
+    virtual void actWrongItem( NPCharacter *, PCharacter *, ::Pointer<LocateQuest>, Object * ) const;
+    virtual void actLastItem( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const;
+    virtual void actAnotherItem( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const;
 
     XML_VARIABLE Customers customers;
     XML_VARIABLE Items items;

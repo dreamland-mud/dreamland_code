@@ -23,7 +23,7 @@
  * Urka scenario, basic version (rude)
  *----------------------------------------------------------------------------*/
 
-bool KS::applicable( PCharacter *hero )
+bool KS::applicable( PCharacter *hero ) const
 {
     if (hero->ethos == ETHOS_LAWFUL)
         return false;

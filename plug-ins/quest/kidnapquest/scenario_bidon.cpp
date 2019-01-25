@@ -16,7 +16,7 @@
 
 #define KS KidnapBidonScenario
 
-bool KS::applicable( PCharacter *hero )
+bool KS::applicable( PCharacter *hero ) const
 {
     return !IS_EVIL(hero);
 }

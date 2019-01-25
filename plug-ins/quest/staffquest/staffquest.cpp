@@ -157,12 +157,12 @@ Object * StaffQuest::createStaff( Room *room )
 /*
  * StaffScenario
  */
-bool StaffScenario::applicable( PCharacter *pch ) 
+bool StaffScenario::applicable( PCharacter *pch )  const
 {
     return true;
 }
 
-void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman )
+void StaffScenario::onQuestStart( PCharacter *pch, NPCharacter *questman ) const
 {
     if (msg.empty( ))
         tell_raw( pch, questman, "Из королевской сокровищницы похитили {W%s{G!", 

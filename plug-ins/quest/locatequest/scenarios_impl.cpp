@@ -18,7 +18,7 @@
 /*-----------------------------------------------------------------------------
  * LocateMousesScenario
  *----------------------------------------------------------------------------*/
-void LocateMousesScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf )
+void LocateMousesScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf ) const
 {
     buf << russian_case( quest->customerName.getValue( ), '1' ) << " "
         << "жалуется на банду грызунов, которые растащили " << russian_case( quest->itemMltName.getValue( ), '4' ) << " "
@@ -27,7 +27,7 @@ void LocateMousesScenario::getLegend( PCharacter *hero, LocateQuest::Pointer que
         << "хотя бы {Y" << quest->total << "{x штук" << GET_COUNT(quest->total, "у", "и", "") << "." << endl;
 }
 
-void LocateMousesScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
+void LocateMousesScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     act("$c1, всплеснув руками, бросается тебе навстречу.", ch, 0, hero, TO_VICT);    
     act("$c1, всплеснув руками, бросается навстречу $C3.", ch, 0, hero, TO_NOTVICT);    
@@ -38,7 +38,7 @@ void LocateMousesScenario::actTellStory( NPCharacter *ch, PCharacter *hero, Loca
               quest->total.getValue( ) );
 }
 
-bool LocateMousesScenario::applicable( PCharacter *ch )
+bool LocateMousesScenario::applicable( PCharacter *ch ) const
 {
     return !IS_EVIL(ch);
 }
@@ -46,7 +46,7 @@ bool LocateMousesScenario::applicable( PCharacter *ch )
 /*-----------------------------------------------------------------------------
  * LocateSecretaryScenario
  *----------------------------------------------------------------------------*/
-void LocateSecretaryScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf )
+void LocateSecretaryScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf ) const
 {
     buf << russian_case( quest->customerName.getValue( ), '1' ) << " "
         << "просит тебя собрать пачку " << russian_case( quest->itemMltName.getValue( ), '2' )
@@ -54,7 +54,7 @@ void LocateSecretaryScenario::getLegend( PCharacter *hero, LocateQuest::Pointer 
         << quest->total << "{x штук" << GET_COUNT(quest->total, "у", "и", "") << "." << endl;
 }
 
-void LocateSecretaryScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
+void LocateSecretaryScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     act("$c1 смотрит на тебя широко раскрытыми от ужаса глазами.", ch, 0, hero, TO_VICT);    
     act("$c1 смотрит на $C4 широко раскрытыми от ужаса глазами.", ch, 0, hero, TO_NOTVICT);    
@@ -66,7 +66,7 @@ void LocateSecretaryScenario::actTellStory( NPCharacter *ch, PCharacter *hero, L
               quest->total.getValue( ) );
 }
 
-bool LocateSecretaryScenario::applicable( PCharacter *ch )
+bool LocateSecretaryScenario::applicable( PCharacter *ch ) const
 {
     return !IS_EVIL(ch);
 }
@@ -74,7 +74,7 @@ bool LocateSecretaryScenario::applicable( PCharacter *ch )
 /*-----------------------------------------------------------------------------
  * LocateAlchemistScenario
  *----------------------------------------------------------------------------*/
-void LocateAlchemistScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf )
+void LocateAlchemistScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf ) const
 {
     buf << "В лаборатории " << russian_case( quest->customerName.getValue( ), '2' ) << " "
         << "взрывом расшвыряло " << russian_case( quest->itemMltName.getValue( ), '4' ) << ", "
@@ -82,7 +82,7 @@ void LocateAlchemistScenario::getLegend( PCharacter *hero, LocateQuest::Pointer 
         << russian_case( quest->customerName.getValue( ), '1' ) << " просит тебя попытаться собрать их." << endl;
 }
 
-void LocateAlchemistScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
+void LocateAlchemistScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     act("$c1 отрывает взгляд от пробирок и поворачивается к тебе.", ch, 0, hero, TO_VICT);    
     act("$c1 отрывает взгляд от пробирок и поворачивается к $C2.", ch, 0, hero, TO_NOTVICT);    
@@ -98,7 +98,7 @@ void LocateAlchemistScenario::actTellStory( NPCharacter *ch, PCharacter *hero, L
 /*-----------------------------------------------------------------------------
  * LocateTorturerScenario
  *----------------------------------------------------------------------------*/
-void LocateTorturerScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf )
+void LocateTorturerScenario::getLegend( PCharacter *hero, LocateQuest::Pointer quest, ostream &buf ) const
 {
     buf << "Поставщик не донес " << russian_case( quest->customerName.getValue( ), '3' ) 
         << " орудия пыток, растеряв их на полпути от " << quest->targetArea << "." << endl
@@ -106,7 +106,7 @@ void LocateTorturerScenario::getLegend( PCharacter *hero, LocateQuest::Pointer q
         << russian_case( quest->customerName.getValue( ), '1' ) << " просит тебя собрать их и отдать ему." << endl;
 }
 
-void LocateTorturerScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
+void LocateTorturerScenario::actTellStory( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     tell_act(hero, ch, "Заказа$Gло|л|ла я на днях набор отменнейших пыточных приспособлений. "
                     "Железные девы 'от кутюр', наручники под ключ.. ну, вы меня понимаете.");
@@ -119,7 +119,7 @@ void LocateTorturerScenario::actTellStory( NPCharacter *ch, PCharacter *hero, Lo
             quest->total.getValue( ));
 }
 
-bool LocateTorturerScenario::applicable( PCharacter *ch )
+bool LocateTorturerScenario::applicable( PCharacter *ch ) const
 {
     return !IS_GOOD(ch);
 }

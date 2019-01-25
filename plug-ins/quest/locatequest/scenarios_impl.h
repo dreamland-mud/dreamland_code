@@ -13,9 +13,9 @@
 class LocateMousesScenario : public LocateRadialAlgo, public LocateScenario {
 XML_OBJECT    
 public:
-    virtual bool applicable( PCharacter * );
-    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & );
-    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> );
+    virtual bool applicable( PCharacter * ) const;
+    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & ) const;
+    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const;
 };
 
 /*
@@ -24,9 +24,9 @@ public:
 class LocateSecretaryScenario : public LocateRadialAlgo, public LocateScenario {
 XML_OBJECT    
 public:
-    virtual bool applicable( PCharacter * );
-    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & );
-    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> );
+    virtual bool applicable( PCharacter * ) const;
+    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & ) const;
+    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const;
 };
 
 /*
@@ -35,8 +35,8 @@ public:
 class LocateAlchemistScenario: public LocateRadialAlgo, public LocateScenario {
 XML_OBJECT    
 public:
-    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & );
-    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> );
+    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & ) const;
+    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const;
 };
 
 /*
@@ -45,9 +45,9 @@ public:
 class LocateTorturerScenario: public LocateUniformAlgo, public LocateScenario {
 XML_OBJECT    
 public:
-    virtual bool applicable( PCharacter * );
-    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & );
-    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> );
+    virtual bool applicable( PCharacter * ) const;
+    virtual void getLegend( PCharacter *, ::Pointer<LocateQuest>, ostream & ) const;
+    virtual void actTellStory( NPCharacter *, PCharacter *, ::Pointer<LocateQuest> ) const;
 };
 
 #endif

@@ -19,7 +19,7 @@
 
 CLAN(knight);
 
-bool KS::applicable( PCharacter *hero )
+bool KS::applicable( PCharacter *hero ) const
 {
     return !clan_knight->canInduct( hero );
 }

@@ -639,6 +639,6 @@ void Questor::doCheat(PCharacter *client, const DLString &arg)
     } 
     catch (const QuestCannotStartException &e) {
         tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
-        tell_raw(client, ch, "Выбери что-то другое.");
+        tell_raw(client, ch, "Приходи позже или выбери что-то другое.");
     } 
 }

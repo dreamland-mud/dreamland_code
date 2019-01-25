@@ -21,12 +21,12 @@
 /*-----------------------------------------------------------------------------
  * LocateScenario, default implementation
  *----------------------------------------------------------------------------*/
-bool LocateScenario::applicable( PCharacter * )
+bool LocateScenario::applicable( PCharacter * ) const
 {
     return true;
 }
 
-int LocateScenario::getCount( PCharacter *pch )
+int LocateScenario::getCount( PCharacter *pch ) const
 {
     if (rated_as_guru( pch ))
         return number_range( 6, 10 );
@@ -36,14 +36,14 @@ int LocateScenario::getCount( PCharacter *pch )
         return number_range( 2, 10 );
 }
 
-void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj )
+void LocateScenario::actWrongItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest, Object *obj ) const
 {
     act( "$c1 произносит '{gСпасибо, конечно, но я не об этом проси$gло|л|ла тебя.'{x'", ch, 0, 0, TO_ROOM );
     act( "$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT );
     act( "$c1 возвращает $C3 $o4.", ch, obj, hero, TO_NOTVICT );
 }
 
-void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
+void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     act( "$c1 произносит '{gВот спасибо, $C1. Теперь все найдено и я могу спать спокойно.{x'", 
         ch, 0, hero, TO_ROOM );
@@ -51,7 +51,7 @@ void LocateScenario::actLastItem( NPCharacter *ch, PCharacter *hero, LocateQuest
         ch, 0, hero, TO_ROOM );
 }
 
-void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest )
+void LocateScenario::actAnotherItem( NPCharacter *ch, PCharacter *hero, LocateQuest::Pointer quest ) const
 {
     if (chance(1) && quest->delivered == 1) {
         act( "$c1 произносит '{gДа-да, как говорится, еще 65535 ведер - и золотой ключик у нас в кармане.{x'", ch, 0, hero, TO_ROOM );

@@ -66,6 +66,7 @@ XML_OBJECT
 public:
     HealQuestRegistrator( );
     virtual ~HealQuestRegistrator( );
+    virtual bool applicable( PCharacter * ) const;
 };
 
 extern HealQuestRegistrator *registrator;

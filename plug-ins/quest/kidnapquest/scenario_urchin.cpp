@@ -20,7 +20,7 @@
 
 CLAN(battlerager);
 
-bool KS::applicable( PCharacter *hero )
+bool KS::applicable( PCharacter *hero ) const
 {
     return (hero->getClan( ) != clan_battlerager);
 }

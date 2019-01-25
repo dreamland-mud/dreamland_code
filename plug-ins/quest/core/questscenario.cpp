@@ -20,15 +20,15 @@ QuestScenario::~QuestScenario( )
 {
 }
 
-bool QuestScenario::applicable( PCharacter *, NPCharacter * )
+bool QuestScenario::applicable( PCharacter *, NPCharacter * ) const
 {
     return false;
 }
 
 const DLString &
-QuestScenariosContainer::getRandomScenario( PCharacter *ch )
+QuestScenariosContainer::getRandomScenario( PCharacter *ch ) const
 {
-    Scenarios::iterator i, result = scenarios.end( );
+    Scenarios::const_iterator i, result = scenarios.end( );
     int count = 0;
     
     for (i = scenarios.begin( ); i != scenarios.end( ); i++)
@@ -43,9 +43,9 @@ QuestScenariosContainer::getRandomScenario( PCharacter *ch )
 }
 
 QuestScenario::Pointer
-QuestScenariosContainer::getScenario( const DLString &name )
+QuestScenariosContainer::getScenario( const DLString &name ) const
 {
-    Scenarios::iterator i = scenarios.find( name );
+    Scenarios::const_iterator i = scenarios.find( name );
     
     if (i == scenarios.end( ))
         throw QuestRuntimeException( "wrong scenario name: " + name );
