@@ -6,6 +6,7 @@
 #define XMLATTRIBUTEQUESTDATA_H
 
 #include "xmlinteger.h"
+#include "xmlstring.h"
 
 #include "xmlattributeticker.h"
 #include "playerattributes.h"
@@ -34,9 +35,13 @@ public:
 
     virtual int getTime( ) const;
     virtual void setTime( int );
+    void rememberLastQuest(const DLString &);
+    int getLastQuestCount(const DLString &) const;
 
 protected:
     XML_VARIABLE XMLInteger countdown;
+    XML_VARIABLE XMLString lastQuestType;
+    XML_VARIABLE XMLInteger lastQuestCount;
 };
 
 #endif

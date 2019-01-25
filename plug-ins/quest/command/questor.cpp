@@ -505,3 +505,140 @@ bool QuestScrollBehavior::examine( Character *ch )
     return true;
 }
 
+static void delay_noquest(XMLAttributeQuestData::Pointer &attr, PCharacter *client)
+{
+    if (rated_as_guru( client ))
+        attr->setTime( 1 );
+    else
+        attr->setTime( number_range(3, 6) );
+}
+
+void Questor::doCheat(PCharacter *client, const DLString &arg)  
+{
+    XMLAttributeQuestData::Pointer attr;
+    DLString descr;
+    int cha;
+    
+    if (arg.empty() || arg_is_list(arg)) {
+        act("$c1 просит $C4 показать список заданий.",client, 0, ch, TO_ROOM);
+        act("Ты просишь $C4 показать список заданий.",client, 0, ch, TO_CHAR);
+    } else {
+        act("$c1 просит $C4 дать $m задание.", client, 0, ch, TO_ROOM);
+        act("Ты просишь $C4 дать тебе задание.", client, 0, ch, TO_CHAR);
+    }
+
+    if (client->getAttributes( ).isAvailable( "quest" )) {
+        tell_raw(client, ch, "Но у тебя уже есть задание!");
+        return;
+    }
+
+    attr = client->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" );
+    
+    if (attr->getTime( ) > 0) {
+        tell_fmt( "Ты очень отваж%1$Gно|ен|на, %1$C1, но дай шанс кому-нибудь еще.", client, ch );
+        tell_raw( client, ch, "Приходи позже." );
+        return;
+    }
+    
+    if (client->getDescription( )) {
+        descr = client->getDescription( );
+        descr.stripWhiteSpace( );
+    }
+
+    if (!IS_SET( client->act, PLR_CONFIRMED )) {
+        tell_raw( client, ch, "Сначала попроси у Богов подтверждения своему персонажу.");
+        tell_raw( client, ch, "Если не знаешь, как это делается, прочитай help confirm." );
+        return;
+    } else if (descr.empty( )) {
+        tell_raw( client, ch, "Я не хочу давать задание такой непримечательной личности, как ты!");
+        wiznet( WIZ_CONFIRM, 0, 0, "%C1 is confirmed but has no description!", client );
+        return;
+    } 
+    
+    cha = client->getCurrStat( STAT_CHA );
+    
+    if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
+        tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
+        tell_raw( client, ch, "Приходи позже.");
+        delay_noquest(attr, client);        
+        return;
+    }
+  
+    if (arg.empty() || arg_is_list(arg)) {
+        QuestList quests = QuestManager::getThis()->list(client);
+        if (quests.empty()) {
+            tell_raw(client, ch, "Извини, но у меня не нашлось ни одного подходящего для тебя задания.");
+            tell_raw(client, ch, "Приходи позже.");
+            delay_noquest(attr, client);        
+            return;
+        }
+
+        tell_fmt("Спасибо тебе, %1$C1!", client, ch);
+        tell_raw(client, ch, "Вот какие поручения я могу тебе сегодня дать:");
+        
+        QuestList::const_iterator q;
+        int index;
+        ostringstream buf;
+        buf << endl;
+        for (index = 1, q = quests.begin(); q != quests.end(); index++, q++)
+            buf << "       {W" << index << "{x. " << (*q)->getShortDescr() << endl;
+        buf << endl;
+        client->send_to(buf);
+
+        tell_raw(client, ch, "Подробнее о каждом из них ты можешь прочитать в справке по теме 'виды заданий'.");
+        tell_raw(client, ch, "Выбери поручение и укажи его номер, например {y{lRзадание просить 3{lEquest request 3{x.");
+        tell_raw(client, ch, "Или же попроси у меня задание на мое усмотрение: {y{lRзадание просить любое{lEquest request any{x.");
+        return;
+    }
+
+    if (arg_oneof(arg, "any", "любое", "любой")) {
+        try {
+            QuestManager::getThis( )->generate( client, ch );
+            attr->rememberLastQuest("");
+            PCharacterManager::save( client );
+            
+            tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
+
+        } catch (const QuestCannotStartException &e) {
+            tell_raw(client, ch, "Извини, но я не могу сейчас выбрать для тебя задание.");
+            tell_raw(client, ch, "Приходи позже.");
+            delay_noquest(attr, client);        
+        }
+        return;
+    }
+
+    Integer choice;
+    if (!Integer::tryParse(choice, arg)) {
+        tell_fmt("Я не умею читать мысли, %1$C1. Укажи номер задания или {lRлюбое{lEany{x.", client, ch);
+        return;
+    }
+
+    QuestList quests = QuestManager::getThis()->list(client);
+    if (choice <= 0 || choice > (int)quests.size()) {
+        tell_fmt("Я не предлагал%2$Gо||а тебе задание под таким номером, будь внимательнее!", client, ch);
+        return;
+    }
+    
+    int index;
+    QuestList::const_iterator q;
+    for (index = 1, q = quests.begin(); index != choice; index++, q++)
+        ;
+   
+    if (attr->getLastQuestCount((*q)->getName()) >= 5) {
+        tell_fmt("Я уже заметил%2$Gо||а, что тебе очень нравятся такие задания, %1$C1.", client, ch);
+        tell_raw(client, ch, "Но попробуй свои силы в чем-то еще.");
+        return;
+    }
+
+    try {
+        client->getAttributes( ).addAttribute( 
+                     (*q)->createQuest(client, ch), "quest" );
+        attr->rememberLastQuest((*q)->getName());
+        PCharacterManager::save( client );
+        tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
+    } 
+    catch (const QuestCannotStartException &e) {
+        tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
+        tell_raw(client, ch, "Выбери что-то другое.");
+    } 
+}

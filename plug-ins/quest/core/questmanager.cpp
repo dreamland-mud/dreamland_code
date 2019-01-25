@@ -47,9 +47,29 @@ DLString QuestManager::getTableName( ) const
     return TABLE_NAME;
 }
 
-void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) {
+
+static bool compare(QuestRegistratorBase::Pointer a, QuestRegistratorBase::Pointer b)
+{
+    return a->getPriority() > b->getPriority();
+}
+
+QuestList QuestManager::list(PCharacter *pch) const
+{
+    unsigned int i;
+    QuestList result;
+
+    for (i = 0; i < quests.size(); i++) {
+        if (quests[i]->applicable( pch )) 
+            result.push_back(quests[i]);
+    }
+    
+    result.sort(compare);
+    return result; 
+    
+}
+
+void QuestManager::generate( PCharacter *pch, NPCharacter *questor ) const {
     unsigned int summ, i, dice;
-    typedef std::list<QuestRegistratorBase::Pointer> QuestList;
     QuestList qlist;
     
     for (summ = 0, i = 0; i < quests.size( ); i++) {

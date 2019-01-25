@@ -193,7 +193,7 @@ ButcherQuestRegistrator::~ButcherQuestRegistrator( )
     thisClass = NULL;
 }
 
-bool ButcherQuestRegistrator::applicable( PCharacter *pch ) 
+bool ButcherQuestRegistrator::applicable( PCharacter *pch ) const 
 {
     return (gsn_butcher->getEffective( pch ) >= 25);
 }

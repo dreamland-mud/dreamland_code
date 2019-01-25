@@ -186,7 +186,7 @@ StaffQuestRegistrator::~StaffQuestRegistrator( )
     thisClass = NULL;
 }
 
-bool StaffQuestRegistrator::applicable( PCharacter *pch ) 
+bool StaffQuestRegistrator::applicable( PCharacter *pch ) const
 {
     return !rated_as_guru( pch );
 }

@@ -23,10 +23,10 @@ XML_OBJECT
 public:
     typedef ::Pointer<QuestRegistratorBase> Pointer;
 
-    virtual Quest::Pointer createQuest( PCharacter *, NPCharacter * ) = 0;
+    virtual Quest::Pointer createQuest( PCharacter *, NPCharacter * ) const = 0;
     virtual const DLString& getName( ) const = 0;
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const ;
     virtual int getPriority( ) const;
     virtual const DLString& getShortDescr( ) const;
     
@@ -54,7 +54,7 @@ public:
         Class::unregMoc<C>( );
     }
 
-    virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) 
+    virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) const
     {
         ::Pointer<C> quest( NEW );
 

@@ -47,7 +47,7 @@ public:
     ButcherQuestRegistrator( );
     virtual ~ButcherQuestRegistrator( );
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
 
     static inline ButcherQuestRegistrator * getThis( ) {
         return thisClass;

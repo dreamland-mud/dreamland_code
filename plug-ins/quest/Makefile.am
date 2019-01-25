@@ -7,5 +7,5 @@ butcherquest \
 healquest    \
 kidnapquest  \
 stealquest   \
-locatequest   
+locatequest  
 

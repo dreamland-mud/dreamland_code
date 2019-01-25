@@ -252,7 +252,7 @@ LocateQuestRegistrator::~LocateQuestRegistrator( )
     thisClass = NULL;
 }
 
-bool LocateQuestRegistrator::applicable( PCharacter *pch ) 
+bool LocateQuestRegistrator::applicable( PCharacter *pch ) const
 {
     if (pch->getClan( ) == clan_battlerager)
         return false;

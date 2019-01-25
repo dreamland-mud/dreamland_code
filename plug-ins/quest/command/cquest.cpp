@@ -43,6 +43,7 @@ enum {
     QCMD_LIST,
     QCMD_TROUBLE,
     QCMD_REQUEST,
+    QCMD_CHEAT,
     QCMD_CANCEL,
     QCMD_COMPLETE,
     QCMD_FIND
@@ -144,6 +145,8 @@ COMMAND(CQuest, "quest")
         qcmd = QCMD_CANCEL;
     else if (arg_oneof( cmd, "find", "найти" )) 
         qcmd = QCMD_FIND;
+    else if (arg_oneof( cmd, "cheat", "чит", "шара" )) 
+        qcmd = QCMD_CHEAT;
 
     if (qcmd == QCMD_NONE) {
         usage( pch ); 
@@ -189,6 +192,9 @@ COMMAND(CQuest, "quest")
             break;
         case QCMD_FIND:
             questman->doFind( pch );
+            break;
+        case QCMD_CHEAT:
+            questman->doCheat(pch, arguments);
             break;
     }
 }

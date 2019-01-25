@@ -5,7 +5,7 @@
 #include "questregistrator.h"
 
 
-bool QuestRegistratorBase::applicable( PCharacter * )
+bool QuestRegistratorBase::applicable( PCharacter * ) const
 {
     return true;
 }

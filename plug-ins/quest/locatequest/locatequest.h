@@ -63,7 +63,7 @@ public:
     LocateQuestRegistrator( );
     virtual ~LocateQuestRegistrator( );
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
 
     static inline LocateQuestRegistrator * getThis( ) {
         return thisClass;

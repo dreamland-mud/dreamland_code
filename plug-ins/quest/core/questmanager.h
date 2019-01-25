@@ -15,6 +15,8 @@ class PCharacter;
 class NPCharacter;
 class QuestRegistratorBase;
 
+typedef std::list< ::Pointer<QuestRegistratorBase> > QuestList;
+
 class QuestManager : public Plugin, public DLXMLLoader {
 public:        
         typedef ::Pointer<QuestManager> Pointer;
@@ -30,7 +32,8 @@ public:
         virtual DLString getNodeName( ) const;
         virtual DLString getTableName( ) const;
 
-        void generate( PCharacter *, NPCharacter * );
+        void generate( PCharacter *, NPCharacter * ) const;
+        QuestList list(PCharacter *) const;
         void load( QuestRegistratorBase* );
         void unLoad( QuestRegistratorBase* );
         ::Pointer<QuestRegistratorBase> findQuestRegistrator( const DLString& );

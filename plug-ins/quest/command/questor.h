@@ -23,6 +23,7 @@ public:
         void doComplete( PCharacter *, DLString & );
         void doCancel( PCharacter * );
         void doFind( PCharacter * );
+        void doCheat(PCharacter *, const DLString &);
         
         virtual bool canWander( Room *const, EXIT_DATA * );
         virtual bool canWander( Room *const, EXTRA_EXIT_DATA * );

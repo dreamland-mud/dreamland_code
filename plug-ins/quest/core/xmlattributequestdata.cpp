@@ -86,3 +86,22 @@ void XMLAttributeQuestData::setTime( int value )
     countdown.setValue( value );
 }
 
+void XMLAttributeQuestData::rememberLastQuest(const DLString &questType)
+{
+    if (lastQuestType != questType) {
+        lastQuestCount = 1;
+        lastQuestType = questType;
+        return;
+    }
+
+    lastQuestCount++;
+}
+
+int XMLAttributeQuestData::getLastQuestCount(const DLString &questType) const
+{
+    if (lastQuestType != questType)
+        return 0;
+
+    return lastQuestCount;
+}
+

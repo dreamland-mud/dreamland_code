@@ -58,7 +58,7 @@ public:
     StaffQuestRegistrator( );
     virtual ~StaffQuestRegistrator( );
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
 
     static inline StaffQuestRegistrator * getThis( ) {
         return thisClass;
