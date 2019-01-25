@@ -18,6 +18,7 @@
 #include "magic.h"
 #include "fight.h"
 #include "fight_exception.h"
+#include "stats_apply.h"
 #include "act_move.h"
 #include "profflags.h"
 #include "merc.h"
@@ -267,10 +268,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             gsn_mastering_spell->improve( ch, false );
     }
 
-    if (ch->getCurrStat(STAT_INT ) > 21)
-      slevel = max( 1, (slevel + (ch->getCurrStat(STAT_INT ) - 21)) );
-    else
-      slevel = max( 1, slevel );
+    slevel = max( 1, slevel + get_int_app(ch).slevel );
 
     for (Affect *paf = ch->affected; paf; paf = paf->next)
         if (paf->location == APPLY_LEVEL)
