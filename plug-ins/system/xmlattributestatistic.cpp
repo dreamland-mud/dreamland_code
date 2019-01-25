@@ -5,6 +5,7 @@
 
 #include "xmlattributestatistic.h"
 
+#include "date.h"
 #include "xmlattributes.h"
 #include "pcharactermanager.h"
 #include "pcmemoryinterface.h"
@@ -77,12 +78,17 @@ XMLAttributeStatistic::gatherAll( const DLString &name )
     Statistic::iterator s;
     PCharacterMemoryList::const_iterator i;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
+    static time_t cutoff = 1516851059; // 1/25/2018
     
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
         Pointer attr;
         PCMemoryInterface *pc;
 
         pc = i->second;
+
+        if (pc->getLastAccessTime().getTime() < cutoff)
+            continue;
+
         attr = pc->getAttributes( ).findAttr<XMLAttributeStatistic>( name );
 
         if (attr && !attr->shy) 
