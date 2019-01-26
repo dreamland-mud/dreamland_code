@@ -83,11 +83,15 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *
         return false;
 
     // No additional aggrs in victim room for newbie.    
-    if (rated_as_newbie(pch)) {
-        for (Character *rch = room->people; rch; rch = rch->next_in_room)
-            if (rch != victim && rch->is_npc() && mobileCanAggress(pch, rch->getNPC()))
-                return false;
-    }
+    bool hasOtherAggrs = false;
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (rch != victim && rch->is_npc() && mobileCanAggress(pch, rch->getNPC())) {
+            hasOtherAggrs = true;
+            break;
+        }
+    
+    if (hasOtherAggrs && rated_as_newbie(pch))
+        return false;
  
     return true;
 }
@@ -145,6 +149,119 @@ Room * RoomQuestModel::getDistantRoom( PCharacter *pch, RoomList &rooms, Room *f
     }
     
     throw QuestCannotStartException( );
+}
+
+/*--------------------------------------------------------------------
+ * RoomQuestModel : accessibility checks
+ *--------------------------------------------------------------------*/
+bool RoomQuestModel::checkRoomForTraverse(PCharacter *pch, Room *room)
+{
+    if (!room)
+        return false;
+
+    if (!room->isCommon()) {
+        return false;
+    }
+
+    if (!pch->canEnter( room )) {
+        return false;
+    }
+    return true;
+}
+
+struct DoorFunc {
+    DoorFunc( PCharacter *pch_, RoomQuestModel *rqm ) : pch(pch_), model(rqm) { }
+
+    bool operator () ( Room *const room, EXIT_DATA *exit ) const
+    {
+        if (IS_SET(exit->exit_info, EX_LOCKED)) {
+            return false;
+        }
+
+        return model->checkRoomForTraverse(pch, exit->u1.to_room);
+    }
+    
+    PCharacter *pch;
+    RoomQuestModel *model;
+};
+
+struct ExtraExitFunc {
+    ExtraExitFunc( PCharacter *pch_, RoomQuestModel *rqm ) : pch(pch_), model(rqm) { }
+
+    bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
+    {
+        if (IS_SET(eexit->exit_info, EX_LOCKED)) {
+            return false;
+        }
+
+        return model->checkRoomForTraverse(pch, eexit->u1.to_room);
+    }
+
+    PCharacter *pch;
+    RoomQuestModel *model;
+};
+
+struct PortalFunc {
+    PortalFunc( PCharacter *pch_, RoomQuestModel *rqm ) : pch(pch_), model(rqm) { }
+
+    bool operator () ( Room *const room, Object *portal ) const
+    {
+        if (IS_SET(portal->value[1], EX_LOCKED )) {
+            return false;
+        }
+
+        return model->checkRoomForTraverse(pch, get_room_index( portal->value[3] ));
+    }
+
+    PCharacter *pch;
+    RoomQuestModel *model;
+};
+
+typedef RoomRoadsIterator<DoorFunc, ExtraExitFunc, PortalFunc> MyHookIterator;
+
+struct FindPathComplete {
+    typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
+    
+    FindPathComplete( Room *t, std::vector<Room *> &r ) 
+            : target( t ), result( r )
+    { 
+    }
+
+    inline bool operator () ( const MyNodesEntry *const head, bool last ) 
+    {
+        if (head->node != target)
+            return false;
+        
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
+            result.push_back( i->node );
+
+        return true;
+    }
+    
+    Room *target;
+    std::vector<Room *> &result;
+};
+
+/**
+ * Ensure there is a path between player and target room that doesn't
+ * contain locked doors and rooms they can't go to.
+ */
+bool RoomQuestModel::targetRoomAccessible(PCharacter *pch, Room *target)
+{
+    if (pch->getRemorts().size() > 0 || !rated_as_newbie(pch))
+        return true;
+
+    std::vector<Room *> rooms;
+    MyHookIterator hookIterator(
+        DoorFunc(pch, this), 
+        ExtraExitFunc(pch, this), 
+        PortalFunc(pch, this), 
+        5);
+    FindPathComplete fpComplete( target, rooms );
+    room_traverse<MyHookIterator, FindPathComplete>( 
+            pch->in_room, hookIterator, fpComplete, 10000 );
+    
+    return !rooms.empty();
 }
 
 /*--------------------------------------------------------------------
@@ -362,7 +479,12 @@ NPCharacter * VictimQuestModel::getRandomVictim( PCharacter *pch )
     MobileList victims;
 
     findVictims( pch, victims );
-    return getRandomMobile( victims );
+    NPCharacter *result = getRandomMobile( victims );
+
+    if (!targetRoomAccessible(pch, result->in_room))
+        throw QuestCannotStartException( );
+
+    return result;    
 }
 
 
@@ -423,7 +545,12 @@ NPCharacter * ClientQuestModel::getRandomClient( PCharacter *pch )
     MobileList clients;
 
     findClients( pch, clients );
-    return getRandomMobile( clients );
+    NPCharacter *result = getRandomMobile( clients );
+
+    if (!targetRoomAccessible(pch, result->in_room))
+        throw QuestCannotStartException( );
+
+    return result;    
 }
 
 

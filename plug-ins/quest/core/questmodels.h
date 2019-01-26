@@ -15,6 +15,9 @@ struct mob_index_data;
  * RoomQuestModel
  */
 class RoomQuestModel : public virtual Quest {
+friend struct DoorFunc;
+friend struct ExtraExitFunc;
+friend struct PortalFunc;
 public:
     typedef vector<Room *> RoomList;
 
@@ -22,11 +25,13 @@ protected:
     virtual bool checkRoom( PCharacter *, Room * );
     virtual bool checkRoomVictim( PCharacter *, Room *, NPCharacter * );
     virtual bool checkRoomClient( PCharacter *, Room * );
+    bool checkRoomForTraverse(PCharacter *, Room *);
     void findClientRooms( PCharacter *, RoomList & );
     void findClientRooms( PCharacter *, RoomList &, VnumList & );
     Room * getDistantRoom( PCharacter *, RoomList &, Room *, int, int );
     Room * getRandomRoomClient( PCharacter * );
     bool mobileCanAggress(PCharacter *, NPCharacter *);
+    bool targetRoomAccessible(PCharacter *, Room *);
     static Room * getRandomRoom( RoomList & );
 };
 
