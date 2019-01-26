@@ -199,7 +199,7 @@ bool HealQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 {
     int diff, mlevel;
 
-    if (!ClientQuestModel::checkMobileClientAggr( pch, mob ))
+    if (!ClientQuestModel::checkMobileClient( pch, mob ))
         return false;
 
     if (IS_SET( mob->imm_flags, IMM_SPELL ))
@@ -239,8 +239,11 @@ HealQuestRegistrator::~HealQuestRegistrator( )
     registrator = 0;
 }
 
-bool HealQuestRegistrator::applicable( PCharacter *pch ) const
+bool HealQuestRegistrator::applicable( PCharacter *pch, bool fAuto ) const
 {
+    if (!QuestRegistratorBase::applicable(pch, fAuto))
+        return false;
+
     Scenarios::const_iterator s;
     for (s = scenarios.begin(); s != scenarios.end(); s++) {
         if (s->second->applicable(pch))

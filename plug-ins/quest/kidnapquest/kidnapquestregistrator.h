@@ -18,7 +18,7 @@ public:
     KidnapQuestRegistrator( ); 
     virtual ~KidnapQuestRegistrator( );
     
-    virtual bool applicable( PCharacter * ) const;
+    virtual bool applicable( PCharacter *, bool ) const;
 
     static inline KidnapQuestRegistrator * getThis( ) {
         return thisClass;

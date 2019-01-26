@@ -7,7 +7,6 @@
 #define QUESTREGISTRATOR_H
 
 #include "class.h"
-#include "logstream.h"
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"
 #include "xmlstring.h"
@@ -27,7 +26,7 @@ public:
     virtual Quest::Pointer createQuest( PCharacter *, NPCharacter * ) const = 0;
     virtual const DLString& getName( ) const = 0;
 
-    virtual bool applicable( PCharacter * ) const ;
+    virtual bool applicable( PCharacter *, bool fAuto ) const;
     virtual int getPriority( ) const;
     const DLString& getShortDescr( ) const;
     const DLString& getDifficulty( ) const;
@@ -36,6 +35,7 @@ protected:
     XML_VARIABLE XMLString shortDesc;
     XML_VARIABLE XMLString difficulty;
     XML_VARIABLE XMLInteger priority;
+    XML_VARIABLE XMLIntegerNoEmpty minAutoLevel;
 };
 
 template<typename C>
@@ -47,7 +47,6 @@ public:
     {
         Class::regMoc<C>( );
         QuestManager::getThis( )->load( this );
-        LogStream::sendNotice() << "loaded " << getName() << " difficulty " << getDifficulty() << endl;
         XMLAttributePlugin::initialization( );
     }
     
@@ -61,7 +60,6 @@ public:
     virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) const
     {
         ::Pointer<C> quest( NEW );
-
         quest->create( pch, questor );
         return quest;
     }

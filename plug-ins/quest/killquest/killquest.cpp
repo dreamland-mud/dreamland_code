@@ -65,8 +65,9 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     areaName.setValue( pRoom->area->name );
     mobName.setValue( victim->getShortDescr( ) );
 
-    wiznet( "", "%s Lev %d, Qmode %d",
+    wiznet( "", "%s [%d] Lev %d, Qmode %d",
                  victim->getNameP('1').c_str( ),
+                 victim->in_room->vnum,
                  victim->getRealLevel( ), 
                  mode.getValue( ) );
 

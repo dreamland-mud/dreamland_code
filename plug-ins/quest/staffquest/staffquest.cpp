@@ -186,8 +186,11 @@ StaffQuestRegistrator::~StaffQuestRegistrator( )
     thisClass = NULL;
 }
 
-bool StaffQuestRegistrator::applicable( PCharacter *pch ) const
+bool StaffQuestRegistrator::applicable( PCharacter *pch, bool fAuto ) const
 {
+    if (!QuestRegistratorBase::applicable(pch, fAuto))
+        return false;
+
     return !rated_as_guru( pch );
 }
 

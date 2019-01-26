@@ -3,10 +3,15 @@
  * ruffina, 2004
  */
 #include "questregistrator.h"
+#include "questexceptions.h"
+#include "pcharacter.h"
 
 
-bool QuestRegistratorBase::applicable( PCharacter * ) const
+bool QuestRegistratorBase::applicable( PCharacter *pch, bool fAuto ) const
 {
+    if (fAuto && pch->getRemorts().size() == 0 && pch->getRealLevel() < minAutoLevel)
+        return false;
+
     return true;
 }
 

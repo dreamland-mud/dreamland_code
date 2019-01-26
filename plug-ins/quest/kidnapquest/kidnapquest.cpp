@@ -295,7 +295,7 @@ Object * KidnapQuest::createMark( )
 bool KidnapQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 {
     return getScenario( ).kings.hasElement( mob->pIndexData->vnum )
-           && ClientQuestModel::checkMobileClientAggr( pch, mob );
+           && ClientQuestModel::checkMobileClient( pch, mob );
 }
 
 bool KidnapQuest::checkRoomClient( PCharacter *pch, Room * room ) 

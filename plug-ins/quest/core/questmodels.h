@@ -88,7 +88,6 @@ protected:
 class ClientQuestModel : public virtual MobileQuestModel {
 protected:
     virtual bool checkMobileClient( PCharacter *, NPCharacter * );
-    virtual bool checkMobileClientAggr( PCharacter *, NPCharacter * );
     void findClients( PCharacter *, MobileList & );
     void findClients( PCharacter *, MobIndexMap & );
     NPCharacter * getRandomClient( PCharacter * );

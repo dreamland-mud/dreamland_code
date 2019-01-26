@@ -47,6 +47,7 @@ bool RoomQuestModel::checkRoomClient( PCharacter *pch, Room *room )
     if (!checkRoom( pch, room ))
         return false;
 
+    // No aggressive mobs standing nearby the client. 
     return true;
 }
 
@@ -343,14 +344,14 @@ NPCharacter * VictimQuestModel::getRandomVictim( PCharacter *pch )
  *--------------------------------------------------------------------*/
 bool ClientQuestModel::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 {
-    if (IS_SET( mob->act, ACT_AGGRESSIVE|ACT_VAMPIRE ))
+    int ldiff = mob->getModifyLevel() - pch->getModifyLevel();
+
+    if (IS_SET(mob->act, ACT_AGGRESSIVE) && !IS_SET(mob->act, ACT_WIMPY) && ldiff >= -5)
         return false;
 
-    return checkMobileClientAggr( pch, mob );
-}
+    if (IS_SET(mob->act, ACT_VAMPIRE) && ldiff >= -8)
+        return false;
 
-bool ClientQuestModel::checkMobileClientAggr( PCharacter *pch, NPCharacter *mob )
-{
     if (!checkMobile( pch, mob ))
         return false;
     
