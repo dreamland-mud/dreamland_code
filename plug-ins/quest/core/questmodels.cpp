@@ -10,6 +10,7 @@
 #include "skill.h"
 #include "mobilebehaviormanager.h"
 #include "occupations.h"
+#include "selfrate.h"
 #include "pcharacter.h"
 #include "save.h"
 #include "merc.h"
@@ -25,6 +26,22 @@ GSN(improved_detect);
 /*--------------------------------------------------------------------
  * RoomQuestModel 
  *--------------------------------------------------------------------*/
+bool RoomQuestModel::mobileCanAggress(PCharacter *pch, NPCharacter *mob)
+{
+    int ldiff = mob->getModifyLevel() - pch->getModifyLevel();
+
+    if (IS_SET(mob->act, ACT_AGGRESSIVE) && !IS_SET(mob->act, ACT_WIMPY) && ldiff >= -5)
+        return true;
+
+    if (IS_SET(mob->act, ACT_VAMPIRE) && ldiff >= -8)
+        return true;
+
+    if (IS_AFFECTED( mob, AFF_BLOODTHIRST ))
+        return true;
+
+    return false;
+}
+
 bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room ) 
 {
     if (IS_SET(room->room_flags, ROOM_SOLITARY|ROOM_PRIVATE|ROOM_NO_QUEST ))
@@ -47,11 +64,14 @@ bool RoomQuestModel::checkRoomClient( PCharacter *pch, Room *room )
     if (!checkRoom( pch, room ))
         return false;
 
-    // No aggressive mobs standing nearby the client. 
+    // No aggressive mobs standing nearby the client.
+    for (Character *rch = room->people; rch; rch = rch->next_in_room)
+        if (rch->is_npc() && mobileCanAggress(pch, rch->getNPC()))
+            return false; 
     return true;
 }
 
-bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room ) 
+bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *victim ) 
 {
     if (IS_SET( room->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE ))
         return false;
@@ -61,7 +81,14 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room )
 
     if (!checkRoom( pch, room ))
         return false;
-    
+
+    // No additional aggrs in victim room for newbie.    
+    if (rated_as_newbie(pch)) {
+        for (Character *rch = room->people; rch; rch = rch->next_in_room)
+            if (rch != victim && rch->is_npc() && mobileCanAggress(pch, rch->getNPC()))
+                return false;
+    }
+ 
     return true;
 }
 
@@ -297,7 +324,7 @@ bool VictimQuestModel::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     if (mob->getRealLevel( ) != mob->pIndexData->level)
         return false;
 
-    return checkRoomVictim( pch, mob->in_room );
+    return checkRoomVictim( pch, mob->in_room, mob );
 }
 
 void VictimQuestModel::findVictims( PCharacter *pch, MobileList &victims )
@@ -344,26 +371,18 @@ NPCharacter * VictimQuestModel::getRandomVictim( PCharacter *pch )
  *--------------------------------------------------------------------*/
 bool ClientQuestModel::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 {
-    int ldiff = mob->getModifyLevel() - pch->getModifyLevel();
-
-    if (IS_SET(mob->act, ACT_AGGRESSIVE) && !IS_SET(mob->act, ACT_WIMPY) && ldiff >= -5)
+    if ((IS_GOOD(pch) && IS_EVIL(mob)) || (IS_EVIL(pch) && IS_GOOD(mob)))
         return false;
 
-    if (IS_SET(mob->act, ACT_VAMPIRE) && ldiff >= -8)
+    if (!IS_AWAKE( mob ))
+        return false;
+
+    if (mobileCanAggress(pch, mob))
         return false;
 
     if (!checkMobile( pch, mob ))
         return false;
     
-    if (!IS_AWAKE( mob ))
-        return false;
-
-    if (IS_AFFECTED( mob, AFF_BLOODTHIRST ))
-        return false;
-
-    if ((IS_GOOD(pch) && IS_EVIL(mob)) || (IS_EVIL(pch) && IS_GOOD(mob)))
-        return false;
-
     return checkRoomClient( pch, mob->in_room );
 }
 

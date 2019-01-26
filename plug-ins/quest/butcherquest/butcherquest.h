@@ -36,7 +36,7 @@ public:
     XML_VARIABLE XMLShort  delivered;
 
 protected:
-    virtual bool checkRoomVictim( PCharacter *, Room * );
+    virtual bool checkRoomVictim( PCharacter *, Room *, NPCharacter * );
     virtual bool checkMobileClient( PCharacter *, NPCharacter * );
     virtual bool checkMobileVictim( PCharacter *, NPCharacter * );
 };

@@ -164,7 +164,7 @@ bool ButcherQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
     return false;
 }
 
-bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room )
+bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *victim )
 {
     if (room->area->low_range > pch->getModifyLevel( ))
         return false;
@@ -175,7 +175,7 @@ bool ButcherQuest::checkRoomVictim( PCharacter *pch, Room *room )
            || room->sector_type == SECT_MOUNTAIN))
         return false;
 
-    return VictimQuestModel::checkRoomVictim( pch, room );
+    return VictimQuestModel::checkRoomVictim( pch, room, victim );
 }
 
 /* 

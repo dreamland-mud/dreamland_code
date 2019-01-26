@@ -20,12 +20,13 @@ public:
 
 protected:
     virtual bool checkRoom( PCharacter *, Room * );
-    virtual bool checkRoomVictim( PCharacter *, Room * );
+    virtual bool checkRoomVictim( PCharacter *, Room *, NPCharacter * );
     virtual bool checkRoomClient( PCharacter *, Room * );
     void findClientRooms( PCharacter *, RoomList & );
     void findClientRooms( PCharacter *, RoomList &, VnumList & );
     Room * getDistantRoom( PCharacter *, RoomList &, Room *, int, int );
     Room * getRandomRoomClient( PCharacter * );
+    bool mobileCanAggress(PCharacter *, NPCharacter *);
     static Room * getRandomRoom( RoomList & );
 };
 
