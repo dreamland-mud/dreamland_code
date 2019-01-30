@@ -274,7 +274,7 @@ void Questor::rewardWord( PCharacter *client )
 
 void Questor::rewardScroll( PCharacter *client )
 {
-    int sn, count;
+    int sn, i, count;
     int learned, maximum;
     vector<int> skills;
     Object *scroll;
@@ -304,9 +304,9 @@ void Questor::rewardScroll( PCharacter *client )
     bhv.construct( );
     count = number_range( 1, 2 );
 
-    for (sn = 0; sn < count && !skills.empty( ); sn++) {
+    for (i = 0; i < count && !skills.empty( ); i++) {
         sn = number_range( 0, skills.size( ) - 1 );
-        bhv->addSkill( skills[sn], number_range( 1, 3 ) );        
+        bhv->addSkill( skills[sn], number_range( 2, 4 ) );
         skills.erase( skills.begin( ) + sn );
     }
     
@@ -390,6 +390,7 @@ bool QuestScrollBehavior::examine( Character *ch )
     ostringstream buf, tmpbuf;
     Skill *skill;
     XMLMapBase<XMLInteger>::iterator s;
+    bool extract = true;
     
     if (!isOwner( ch )) {
         act("Знания, заключенные в $o6, недоступны тебе.", ch, obj, 0, TO_CHAR);
@@ -409,6 +410,7 @@ bool QuestScrollBehavior::examine( Character *ch )
 
         if (!skill->canPractice( ch->getPC( ), tmpbuf )) {
             buf << "Ты не можешь сейчас улучшить свои познания в '" << skill->getNameFor( ch ) << "'." << endl;
+            extract = false;
             continue;
         }
 
@@ -416,6 +418,7 @@ bool QuestScrollBehavior::examine( Character *ch )
         
         if (data.learned >= skill->getMaximum( ch )) {
             buf << "Искусство '" << skill->getNameFor( ch ) << "' уже изучено тобой в совершенстве." << endl;
+            extract = false;
         }
         else {
             buf << "Ты узнаешь кое-что новое об искусстве '" << skill->getNameFor( ch ) << "'!" << endl;
@@ -423,7 +426,6 @@ bool QuestScrollBehavior::examine( Character *ch )
                                    data.learned + s->second,
                                    skill->getMaximum( ch ));
             s->second = 0;
-            extract_obj( obj );
         }
     }
     
@@ -431,6 +433,10 @@ bool QuestScrollBehavior::examine( Character *ch )
         buf << "Похоже, знаки на этом свитке потеряли силу." << endl;
 
     ch->send_to( buf );
+    if(extract) {
+        act("Чернила меркнут, и $o1 рассыпается трухой..", ch, obj, 0, TO_CHAR);
+        extract_obj( obj );
+    }
     return true;
 }
 
