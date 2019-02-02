@@ -28,9 +28,8 @@ cd objs && \
 make -j 2 && make install && \
 echo ">>> Installation complete."
 
-echo ">>> Running DreamLand..."
+echo ">>> Starting and shutting down DreamLand..."
 cd $ROOT && \
-./bin/dreamland etc/dreamland.xml
-echo ">>> Success!"
-
+./bin/dreamland admin/travis/dreamland.xml
+echo ">>> All done."
 
