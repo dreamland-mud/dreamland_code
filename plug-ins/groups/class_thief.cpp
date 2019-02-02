@@ -1050,22 +1050,34 @@ SKILL_RUNP( backstab )
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
 
-            if (fBonus || !ch->is_npc() && number_percent( ) < (gsn_dual_backstab->getEffective( ch ) * 8 ) / 10)
-            {
+            int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
+            if (ch->is_npc())
+                dual_chance = 0;
+            else if (fBonus && dual_percent > 50)
+                dual_chance = 100;
+            else
+                dual_chance =  dual_percent * 8 / 10;
+            
+            if (number_percent( ) < dual_chance) {
                 gsn_dual_backstab->improve( ch, true, victim );
                 
                 if (ch->fighting == victim)
                     DualBackstabOneHit( ch, victim ).hit( );
             }
-            else
-            {
+            else {
                 gsn_dual_backstab->improve( ch, false, victim );
 
-                if ( IS_AFFECTED( ch, AFF_HASTE )
-                        && number_percent( ) < ( gsn_backstab->getEffective( ch ) * 4 ) / 10 )
-                {
-                    if (ch->fighting == victim)
-                        BackstabOneHit( ch, victim ).hit( );
+                if (IS_AFFECTED(ch, AFF_HASTE)) {
+                    int haste_chance;
+                    if (fBonus)
+                        haste_chance = 100;
+                    else
+                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
+
+                    if (number_percent() < haste_chance) {
+                        if (ch->fighting == victim)
+                            BackstabOneHit( ch, victim ).hit( );
+                    }
                 }
             }
         }
