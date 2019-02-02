@@ -4,14 +4,15 @@ set -e
 
 set
 
+# Normally /home/travis/build/dreamland-mud/dreamland_code
 ROOT=`pwd`
 
 echo ">>> Building DreamLand in $ROOT"
 
 echo ">>> Installing dependency packages..."
-apt-get update
-apt-get install -y git g++ gcc make automake libtool bison flex telnet vim bzip2
-apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev db-util
+sudo apt-get update
+sudo apt-get install -y git g++ gcc make automake libtool bison flex telnet vim bzip2
+sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev db-util
 
 echo ">>> Cloning dreamland_world..."
 mkdir -p share && \
