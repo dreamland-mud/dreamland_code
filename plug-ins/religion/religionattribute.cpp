@@ -3,7 +3,6 @@
 #include "religionattribute.h"
 #include "defaultreligion.h"
 #include "pcharacter.h"
-#include "bonusflags.h"
 #include "date.h"
 #include "dreamland.h"
 #include "merc.h"
