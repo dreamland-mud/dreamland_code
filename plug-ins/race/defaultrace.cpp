@@ -37,11 +37,6 @@ void RaceHelp::setRace( Race::Pointer race )
     if (!keyword.empty( ))
         keywords.fromString( keyword.toLower() );
 
-    LogStream::sendNotice() << "keyword: " << keyword.toLower() << endl;
-    for (StringSet::iterator k = keywords.begin(); k != keywords.end(); k++)
-        LogStream::sendNotice() << *k << endl;
-    LogStream::sendNotice() << "----------------------" << endl;
-
     keywords.insert( race->getName( ) );
     keywords.insert( race->getMaleName( ).ruscase( '1' ) );
     keywords.insert( race->getFemaleName( ).ruscase( '1' ) );

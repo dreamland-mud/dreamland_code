@@ -2,8 +2,6 @@
 
 set -e
 
-set
-
 # Normally /home/travis/build/dreamland-mud/dreamland_code
 ROOT=`pwd`
 
