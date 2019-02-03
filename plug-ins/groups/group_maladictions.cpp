@@ -707,7 +707,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     ||  IS_SET(victim->imm_flags,IMM_SPELL))
     {
         if (victim != ch)
-            ch->send_to("Ничего не случилось.\n\r");
+            act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
         victim->send_to("Ты чувствуешь себя немного сонно, но это сразу проходит.\n\r");
         return;
     }
@@ -718,7 +718,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
             return;
         
         if (victim != ch)
-            ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+            act("Движения $C2 замедляются, но лишь на мгновение.", ch, 0, victim, TO_CHAR);
 
         victim->send_to("Твои движения замедляются, но лишь на мгновение.\n\r");
         return;
@@ -746,7 +746,10 @@ VOID_SPELL(Weaken)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (saves_spell( level, victim,DAM_OTHER,ch, DAMF_SPELL) ) {
-      ch->send_to("Не получилось...\n\r");        
+      if (ch == victim)
+          ch->send_to("Не получилось...\n\r");        
+      else
+          act("У тебя не получилось ослабить $C4.", ch, 0, victim, TO_CHAR);
       return;
     }
 
