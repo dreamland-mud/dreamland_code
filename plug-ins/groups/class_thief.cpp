@@ -31,6 +31,7 @@
 #include "room.h"
 #include "object.h"
 #include "bonus.h"
+#include "dreamland.h"
 
 #include "gsn_plugin.h"
 #include "drink_utils.h"
@@ -655,30 +656,34 @@ SKILL_RUNP( steal )
                 ch->send_to("Ты не можешь нести такую тяжесть.\n\r");
                 return;
         }
+
+        DLString now(dreamland->getCurrentTime());
+        Object *target;
+
         if ( !IS_SET( obj->extra_flags, ITEM_INVENTORY ) )
         {
                 obj_from_char( obj );
-                obj_to_char( obj, ch );
                 ch->send_to("Есть!\n\r");
-                oprog_get( obj, ch );
-                gsn_steal->improve( ch, true, victim );
+
+                target = obj;
         }
         else
         {
-                obj_inve = 0;
                 obj_inve = create_object( obj->pIndexData, 0 );
                 clone_object( obj, obj_inve );
                 REMOVE_BIT( obj_inve->extra_flags, ITEM_INVENTORY );
-                obj_to_char( obj_inve, ch );
                 ch->pecho("Ты укра%Gло|л|ла одну штуку!", ch);
-                oprog_get( obj, ch );
-                gsn_steal->improve( ch, true, victim );
+
+                target = obj_inve;
         }
 
-        if (mprog_steal_item( victim, ch, obj ))
-            return;
+        obj_to_char( target, ch );
+        target->properties["stolen"] = now;
+        oprog_get( target, ch );
+        gsn_steal->improve( ch, true, victim );
 
-        return;
+        if (mprog_steal_item( victim, ch, target ))
+            return;
 }
 
 /*
