@@ -112,6 +112,7 @@ void Object::extract( )
         water_float = 0;
         killer = &str_empty[0];
         count = 0;
+        properties.clear();
 
         wrapper = 0;
         behavior.clear( );

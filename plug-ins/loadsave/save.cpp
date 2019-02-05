@@ -810,6 +810,9 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                         fprintf( fp, "ExDe %s~ %s~\n", ed->keyword, ed->description );
                 }
 
+                for (Properties::const_iterator p = obj->properties.begin(); p != obj->properties.end(); p++)
+                    fprintf(fp, "X %s %s~\n", p->first.c_str(), p->second.c_str());
+
                 fprintf( fp, "End\n" );
                 ObjectBehaviorManager::save( obj, fp );
                 fprintf( fp, "\n" );
@@ -2160,6 +2163,14 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                         break;
                     }
                     
+                    break;
+            case 'X':
+                    if (!str_cmp(word, "X")) {
+                        DLString key = fread_word(fp);
+                        obj->properties[key] = fread_dlstring(fp);
+                        fMatch = true;
+                        break;
+                    }
                     break;
             }
 
