@@ -524,14 +524,14 @@ void CDarkLeague::doUsage( PCharacter *pch )
 {
     ostringstream buf;
 
-    buf << "Для руководства: " << endl
+    buf << "Для всех: " << endl
         << "{lEdarkleague{lRтемнаялига{x {lElist    {lRсписок{x        - посмотреть список групп" << endl
+        << endl
+        << "Для руководства: " << endl
         << "{lEdarkleague{lRтемнаялига{x {lEmembers{lRчлены{x         - посмотреть список членов группы" << endl
-        << "{lEdarkleague{lRтемнаялига{x {lEremove self{lRвыгнать я{x     - выйти из группы" << endl
         << "{lEdarkleague{lRтемнаялига{x {lEinduct{lRпринять{x {Dимя{x - принять кого-то в группу" << endl
         << "{lEdarkleague{lRтемнаялига{x {lEremove{lRвыгнать{x {Dимя{x - выгнать кого-то из группы" << endl
-        << endl
-        << "Для лидера: " << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEremove self{lRвыгнать я{x     - выйти из группы" << endl
         << "{lEdarkleague{lRтемнаялига{x {lEinduct self{lRпринять я{x {Dимя группы{x - принять себя в группу" << endl;
 
     pch->send_to( buf );

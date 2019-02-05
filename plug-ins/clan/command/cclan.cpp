@@ -1673,7 +1673,7 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
 
     argumentOne = argument.getOneArgument( );
     
-    if (pc->get_trust( ) < DEITY) {
+    if (pc->get_trust( ) < GOD) {
         pc->println("У тебя нет таких полномочий.");
         return;
     }

@@ -121,8 +121,8 @@ void ClanOrgs::doSelfInduct( PCharacter *pch, DLString &arg ) const
 {
     ClanOrder::Pointer ord;
 
-    if (!pch->getClan( )->isLeader( pch )) {
-        pch->pecho( "Принять себя в %O4 может только Лидер.", &name );
+    if (!pch->getClan( )->isRecruiter( pch )) {
+        pch->pecho( "Принять себя в %O4 может только рекрутер или лидер.", &name );
         return;
     }
     
