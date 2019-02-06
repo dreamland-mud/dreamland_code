@@ -52,14 +52,12 @@ RpcCommandManager::run(Character *ch, const DLString &name, const std::vector<DL
 void 
 RpcCommandManager::reg(RpcCommand *cmd)
 {
-    LogStream::sendError() << "RpcCommandManager: registering " << cmd->name << endl;
     commands[cmd->name] = cmd;
 }
 
 void 
 RpcCommandManager::unreg(RpcCommand *cmd)
 {
-    LogStream::sendError() << "RpcCommandManager: unregistering " << cmd->name << endl;
     commands[cmd->name] = NULL;
 }
 

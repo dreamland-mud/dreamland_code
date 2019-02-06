@@ -1179,6 +1179,48 @@ REDIT(cancel)
     return false;
 }
 
+REDIT(behavior)
+{
+    Room *pRoom;
+
+    EDIT_ROOM(ch, pRoom);
+
+    if (!*argument) {
+        XMLDocument::Pointer doc(NEW);
+
+        if (!pRoom->behavior.isEmpty()) {
+            XMLNode::Pointer node(NEW);
+            pRoom->behavior.toXML(node);
+            node->setName("behavior");
+            doc->appendChild(node);
+        }
+
+        if(!xmledit(doc))
+            return false;
+
+        if(doc->getDocumentElement()) {
+            pRoom->behavior.fromXML(doc->getDocumentElement());
+            pRoom->behavior->setRoom(pRoom);
+            stc("Поведение установлено.\r\n", ch);
+        } else {
+            stc("Пустое поведение? Используй behavior clear для очистки.\r\n", ch);
+        }
+
+        return true;
+    }
+
+    if (!str_cmp( argument, "clear" )) {
+        pRoom->behavior.clear( );
+        stc("Поведение очищено.\r\n", ch);
+        return true;
+    }
+
+    stc("Синтаксис:\r\n", ch);
+    stc("behavior       - перейти в текстовый редактор поведенияr\r\n", ch);
+    stc("behavior clear - очистить поведение\r\n", ch);
+    return false;
+}
+
 /*-------------------------------------------------------------------------
  * movements. last declared - first priority
  *-------------------------------------------------------------------------*/

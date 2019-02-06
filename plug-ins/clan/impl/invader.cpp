@@ -481,22 +481,26 @@ COMMAND(CDarkLeague, "darkleague")
         return;
     }
 
-    if (!pch->getClan( )->isRecruiter( pch )) {
-        pch->println( "Твоих полномочий недостаточно." );
-        return;
-    }
-
     arguments = constArguments;
     cmd = arguments.getOneArgument( );
     arg = arguments.getOneArgument( );
     
-    if (cmd.empty( )) {
+    if (cmd.empty( ) || arg_is_help(cmd)) {
         doUsage( pch );
+        return;
     }
-    else if (arg_is_list( cmd )) {
+
+    if (arg_is_list( cmd )) {
         orgs->doList( pch );
+        return;
     }
-    else if (arg_oneof( cmd, "induct", "принять" )) {
+
+    if (!pch->getClan( )->isRecruiter( pch )) {
+        pch->println( "Твоих полномочий хватает только посмотреть список организаций." );
+        return;
+    }
+
+    if (arg_oneof( cmd, "induct", "принять" )) {
         if (arg_is_self( arg ))
             orgs->doSelfInduct( pch, arguments );
         else
@@ -520,15 +524,15 @@ void CDarkLeague::doUsage( PCharacter *pch )
 {
     ostringstream buf;
 
-    buf << "Для руководства: " << endl
-        << "{wdarkleague list{x            - посмотреть список групп" << endl
-        << "{wdarkleague members{x         - посмотреть список членов группы" << endl
-        << "{wdarkleague remove self{x     - выйти из группы" << endl
-        << "{wdarkleague induct <{Dname{w>{x - принять кого-то в группу" << endl
-        << "{wdarkleague remove <{Dname{w>{x - выгнать кого-то из группы" << endl
+    buf << "Для всех: " << endl
+        << "{lEdarkleague{lRтемнаялига{x {lElist    {lRсписок{x        - посмотреть список групп" << endl
         << endl
-        << "Для лидера: " << endl
-        << "{wdarkleague induct self <{Dname{w>{x - принять себя в группу" << endl;
+        << "Для руководства: " << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEmembers{lRчлены{x         - посмотреть список членов группы" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEinduct{lRпринять{x {Dимя{x - принять кого-то в группу" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEremove{lRвыгнать{x {Dимя{x - выгнать кого-то из группы" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEremove self{lRвыгнать я{x     - выйти из группы" << endl
+        << "{lEdarkleague{lRтемнаялига{x {lEinduct self{lRпринять я{x {Dимя группы{x - принять себя в группу" << endl;
 
     pch->send_to( buf );
 }

@@ -78,6 +78,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<TableWrapper>( );
     Class::regMoc<HometownWrapper>( );
     Class::regMoc<AreaWrapper>( );
+    Class::regMoc<ClanWrapper>( );
     Class::regMoc<ProfessionWrapper>( );
     Class::regMoc<CraftProfessionWrapper>( );
     Class::regMoc<RaceWrapper>( );
@@ -101,6 +102,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );
     Class::unregMoc<AreaWrapper>( );
+    Class::unregMoc<ClanWrapper>( );
     Class::unregMoc<CraftProfessionWrapper>( );
     Class::unregMoc<ProfessionWrapper>( );
     Class::unregMoc<RaceWrapper>( );

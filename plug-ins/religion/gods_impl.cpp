@@ -24,6 +24,7 @@
 #include "fight.h"
 #include "magic.h"
 #include "gsn_plugin.h"
+#include "immunity.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "vnum.h"
@@ -444,3 +445,47 @@ void BastGod::tattooFight( Object *obj, Character *ch ) const
       break;
     }
 }
+
+// TODO: move weather & time into a separate plugin, add dependency for religion plugin.
+static bool season_winter()
+{
+    int m = time_info.month;
+    return m == 16 || m <= 3;
+}
+
+void RavenQueenGod::tattooFight( Object *obj, Character *ch ) const 
+{
+    Character *victim = ch->fighting;
+    if (!victim)
+        return;
+
+    // Find all applicable spells for this victim.
+    vector<int> spells;
+
+    if (immune_check(victim, DAM_NEGATIVE, 0) != RESIST_IMMUNE 
+        && !(victim->is_npc() && IS_SET(victim->act, ACT_UNDEAD)))
+    {
+        for (int i = 0; i < 3; i++)
+            spells.push_back(gsn_hand_of_undead);    
+    }
+  
+    if (!IS_AFFECTED(victim, AFF_SLOW)) 
+        spells.push_back(gsn_slow);    
+     
+    if (!IS_AFFECTED(victim, AFF_WEAKEN)) 
+        spells.push_back(gsn_weaken);    
+
+    if (spells.empty())
+        return;
+
+    // See if tattoo has a chance to work, more chance in winter.
+    int tattoo_chance = season_winter() ? 24 : 12;
+    if (!chance(tattoo_chance))
+        return;
+   
+    // Cast random spell out of available ones. 
+    ch->println("{rТатуировка на твоем плече загорается красным светом.{x");
+    int random_spell = spells[number_range(0, spells.size() - 1)];
+    spell(random_spell, ch->getModifyLevel(), ch, victim);
+}
+

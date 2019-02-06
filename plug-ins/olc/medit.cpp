@@ -754,6 +754,7 @@ MEDIT(behavior)
     ptc(ch, "Поведение {G%s{x установлено.\r\n", type.c_str( ));
     return true;
 }
+
 MEDIT(long)
 {
     char buf[MAX_STRING_LENGTH];

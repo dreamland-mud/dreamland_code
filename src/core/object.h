@@ -86,7 +86,7 @@ public:
 
     char              *  killer;  // for corpse
     int                  count;
-
+    Properties           properties;
     XMLPersistentStreamable<ObjectBehavior> behavior;
 
 

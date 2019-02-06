@@ -378,7 +378,8 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
 
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
     {
-        ch->send_to("Не получилось...\n");
+        if (ch != victim)
+            act("Рука умертвия пытается схватить $C4, но безуспешно.", ch, 0, victim, TO_CHAR);
         act("Ты на мгновение почувствова$gло|л|ла озноб.", victim, 0, 0, TO_CHAR);
         return;
     }
