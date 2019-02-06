@@ -129,7 +129,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
         if (weapon != -1)  
             buf << "Внезапно у тебя в руке оказывается {c" << weapon_class.message(weapon) << "{x, и ты одним движением уничтожаешь противника!" << endl;
         else
-            buf << "Ловко применив умение {c" << sname << ", ты одним движением разделываешься с противником!" << endl; 
+            buf << "Ловко применив умение {c" << sname << "{x, ты одним движением разделываешься с противником!" << endl; 
     }
     else if (skill->getGroup() == group_defensive) {
         if (ch->death > 0) 
