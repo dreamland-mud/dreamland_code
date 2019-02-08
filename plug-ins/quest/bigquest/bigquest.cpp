@@ -1,5 +1,4 @@
 #include "bigquest.h"
-#include "bigvictimbehavior.h"
 #include "bandamobile.h"
 #include "questexceptions.h"
 #include "profflags.h"
