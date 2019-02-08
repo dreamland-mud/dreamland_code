@@ -74,8 +74,8 @@ void BandaMobile::config(PCharacter *hero)
     ch->armor[2] = -number_fuzzy(level) * 6; 
     ch->armor[3] = -number_fuzzy(level) * 6; 
     ch->saving_throw = -level / 2;
-    if (IS_NEUTRAL(ch))
-        ch->alignment = number_range(-750, -250);
+    if (IS_NEUTRAL(hero))
+        ch->alignment = number_range(-750, -350);
     else
         ch->alignment = -hero->alignment;
 

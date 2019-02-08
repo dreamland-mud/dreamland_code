@@ -90,7 +90,7 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
     Reward::Pointer r( NEW );
     
     if (mobsKilled == mobsTotal)
-        tell_fmt("Ты доблестно уничтожи%1$Gо||а всех преступников.", ch, questman);
+        tell_fmt("Ты доблестно уничтожил%1$Gо||а всех преступников.", ch, questman);
     else 
         tell_fmt("Ты доблестно уничтожил%1$Gо||а %3$d преступник%3$Iа|ов|ов из %4$d.", 
                  ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
