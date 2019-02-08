@@ -10,6 +10,10 @@
 class VnumList;
 struct obj_index_data;
 struct mob_index_data;
+struct area_data;
+
+typedef vector<area_data *> AreaList;
+typedef vector<Room *> RoomList;
 
 /*
  * RoomQuestModel
@@ -19,7 +23,6 @@ friend struct DoorFunc;
 friend struct ExtraExitFunc;
 friend struct PortalFunc;
 public:
-    typedef vector<Room *> RoomList;
 
 protected:
     virtual bool checkRoom( PCharacter *, Room * );
@@ -33,6 +36,8 @@ protected:
     bool mobileCanAggress(PCharacter *, NPCharacter *);
     bool targetRoomAccessible(PCharacter *, Room *);
     static Room * getRandomRoom( RoomList & );
+    AreaList findAreas(PCharacter *);
+    RoomList findClientRooms(PCharacter *pch, struct area_data *targetArea);
 };
 
 /*
@@ -54,6 +59,7 @@ protected:
     template<typename T> inline void assign( Object * );
     template<typename T> inline Object * getItemWorld( );
     template<typename T> inline Object * getItemList( Object * );
+    template<typename T> inline ItemList getItemsList( Object * );
     template<typename T> inline void clearItems( );
     template<typename T> inline void clearItem( );
     template<typename T> inline void destroyItems( );

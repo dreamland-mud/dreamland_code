@@ -197,3 +197,7 @@ PCMemoryInterface * Quest::getHeroMemory( )
     return PCharacterManager::find( charName );
 }
 
+bool Quest::hasPartialRewards() const
+{
+    return false;
+}

@@ -25,6 +25,11 @@ bool QuestScenario::applicable( PCharacter *, NPCharacter * ) const
     return false;
 }
 
+int QuestScenario::getPriority() const
+{
+    return 1;
+}
+
 const DLString &
 QuestScenariosContainer::getRandomScenario( PCharacter *ch ) const
 {
@@ -40,6 +45,31 @@ QuestScenariosContainer::getRandomScenario( PCharacter *ch ) const
         throw QuestCannotStartException( );
     
     return result->first;
+}
+
+const DLString &
+QuestScenariosContainer::getWeightedRandomScenario( PCharacter *ch ) const
+{
+    int summ = 0;
+    map<DLString, QuestScenario::Pointer> applicable;
+    map<DLString, QuestScenario::Pointer>::const_iterator a;
+ 
+    for (Scenarios::const_iterator i = scenarios.begin( ); i != scenarios.end( ); i++) {
+        if (i->second->applicable( ch )) {
+            summ += i->second->getPriority( );
+            applicable[i->first] = static_cast<const QuestScenario *>(i->second.getPointer());
+        } 
+    }
+
+    int dice = number_range( 0, summ - 1 );
+    int currentSum = 0;
+    for (a = applicable.begin(); a != applicable.end(); a++) {
+        currentSum += a->second->getPriority( );
+        if (currentSum > dice) 
+            return a->first;
+    }
+
+    throw QuestCannotStartException( );
 }
 
 QuestScenario::Pointer

@@ -44,7 +44,7 @@ bool RoomQuestModel::mobileCanAggress(PCharacter *pch, NPCharacter *mob)
 
 bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room ) 
 {
-    if (IS_SET(room->room_flags, ROOM_SOLITARY|ROOM_PRIVATE|ROOM_NO_QUEST ))
+    if (IS_SET(room->room_flags, ROOM_SOLITARY|ROOM_PRIVATE|ROOM_NO_QUEST|ROOM_MANSION ))
         return false;
     
     if (IS_SET( room->area->area_flag, AREA_NOQUEST ))
@@ -134,6 +134,39 @@ void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, VnumList
     if (rooms.empty( ))
         throw QuestCannotStartException( );
 }
+
+RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct area_data *targetArea)
+{
+    RoomList result;
+
+    for (Room * r = room_list; r; r = r->rnext) {
+        if (r->area != targetArea)
+            continue;
+        if (!checkRoomClient( pch, r ))
+            continue;
+
+        result.push_back(r);
+    }
+
+    return result;
+}
+
+AreaList RoomQuestModel::findAreas(PCharacter *pch)
+{
+    AreaList result;
+
+    for (AREA_DATA *area = area_first; area; area = area->next) {
+        if (area->high_range < pch->getRealLevel())
+            continue;
+        if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN|AREA_NOQUEST) )
+            continue;
+
+        result.push_back(area);
+    }
+
+    return result;
+}
+
 
 Room * RoomQuestModel::getDistantRoom( PCharacter *pch, RoomList &rooms, Room *from, int range, int attempts )
 {

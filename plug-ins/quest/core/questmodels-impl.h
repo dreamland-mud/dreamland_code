@@ -70,6 +70,18 @@ inline Object * ItemQuestModel::getItemList( Object *list )
     return NULL;
 }
 
+template<typename T> 
+inline ItemQuestModel::ItemList ItemQuestModel::getItemsList( Object *list )
+{
+    ItemList result;
+
+    for (Object *obj = list; obj; obj = obj->next_content)
+        if (check<T>( obj ))
+            result.push_back(obj);
+
+    return result;
+}
+
 template<typename T>
 inline void ItemQuestModel::destroyItems( )
 {
