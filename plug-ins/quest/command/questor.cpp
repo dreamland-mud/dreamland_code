@@ -78,7 +78,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         return;
     }
    
-    if (!quest->isComplete( )) {
+    if (!quest->isComplete( ) && !quest->hasPartialRewards()) {
         tell_raw( client, ch,  "Задание не выполнено! Но у тебя еще осталось немного времени!");
         return;
     }

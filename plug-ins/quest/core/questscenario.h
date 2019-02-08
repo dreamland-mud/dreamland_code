@@ -25,14 +25,17 @@ public:
 
     virtual ~QuestScenario( );
     virtual bool applicable( PCharacter * ) const = 0;
-    virtual bool applicable( PCharacter *, NPCharacter * ) const ;
+    virtual bool applicable( PCharacter *, NPCharacter * ) const;
+    virtual int getPriority() const;
 };
 
 class QuestScenariosContainer : public virtual XMLVariableContainer {
 public:
     typedef XMLMapBase<XMLPointer<QuestScenario> > Scenarios;
+    typedef vector<QuestScenario> ScenarioList;
     
     const DLString & getRandomScenario( PCharacter * ) const;
+    const DLString & getWeightedRandomScenario( PCharacter * ) const;
     QuestScenario::Pointer getScenario( const DLString & ) const;
 
     template<typename S> inline ::Pointer<S> getMyScenario( const DLString & ) const;
@@ -90,6 +93,8 @@ public:
     void dress( Object * );
 };
 
+typedef XMLVectorBase<QuestItemAppearence> QuestItemAppearanceList;
+
 class QuestMobileAppearence : public XMLVariableContainer {
 XML_OBJECT
 public:
@@ -105,6 +110,9 @@ public:
     
     void dress( NPCharacter * );
 };
+
+typedef XMLVectorBase<QuestMobileAppearence> QuestMobileAppearanceList;
+
 
 struct VnumList : public XMLReverseVector<XMLInteger> {
     int randomVnum( );

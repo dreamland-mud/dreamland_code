@@ -27,6 +27,7 @@ class Room;
 
 enum {
     QSTAT_INIT,
+    QSTAT_STARTED,
     /* ... */
     QSTAT_BROKEN_BY_HERO = 42,
     QSTAT_BROKEN_BY_OTHERS,
@@ -48,6 +49,7 @@ public:
 
     virtual void create( PCharacter *, NPCharacter * ) = 0; 
     virtual bool isComplete( ) = 0;
+    virtual bool hasPartialRewards() const;
     virtual void info( std::ostream &, PCharacter * ) = 0;
     virtual void shortInfo( std::ostream &, PCharacter * );
     virtual RewardPointer reward( PCharacter *, NPCharacter * ) = 0;
