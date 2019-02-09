@@ -541,6 +541,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         try {
             QuestManager::getThis( )->generate( client, ch );
             attr->rememberLastQuest("");
+            attr->setStartTime();
             PCharacterManager::save( client );
             
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
@@ -581,6 +582,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             client->getAttributes( ).addAttribute( 
                          (*q)->createQuest(client, ch), "quest" );
             attr->rememberLastQuest((*q)->getName());
+            attr->setStartTime();
             PCharacterManager::save( client );
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
             return;
