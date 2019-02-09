@@ -86,18 +86,13 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
                      ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
     }
 
-    int objsCarried = getItemsList<BandaItem>(ch->carrying).size();
-    if (objsCarried > 0) 
-        tell_fmt("Я вижу, что тебе также удалось собрать %3$d доказательст%3$Iво|ва|в злостных намерений!",
-                  ch, questman, objsCarried);
-
     if (hint > 0) {
         r->gold = number_range(1, 3);
         r->points = mobsKilled; 
     }
     else {
         r->gold = number_range( 8, 12 );
-        r->points = number_range( 8, 10 ) +  mobsKilled * number_range(2, 3) + objsCarried * number_range(1, 2);
+        r->points = number_range( 8, 10 ) +  mobsKilled * number_range(2, 3);
         r->wordChance = 10;
         r->scrollChance = 10;
         if (chance(5))
@@ -154,7 +149,7 @@ void BigQuest::mobKilled(PCMemoryInterface *hero, Character *killer)
     }
 
     if (hero->isOnline())
-        hero->getPlayer()->printf("{YОсталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
+        hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
 }
 
 void BigQuest::mobDestroyed(PCMemoryInterface *hero)

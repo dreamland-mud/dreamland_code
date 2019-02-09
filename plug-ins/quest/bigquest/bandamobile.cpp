@@ -30,7 +30,12 @@ bool BandaMobile::death(Character *killer)
     killer = quest->getActor( killer );
 
     if (ourHero( killer )) {
-        killer->pecho("{YТы уничтожил%1$Gо||а очередную жертву, браво.{x", killer);
+        if (chance(33)) 
+            killer->pecho("{YТы уничтожил%1$Gо||а очередную жертву, браво.{x", killer);
+        else if (chance(50))
+            killer->pecho("{YМолодец, тебе удалось избавить мир от очередной напасти.{x", killer);
+        else
+            killer->pecho("{YПротив тебя у %2$P4 не было никаких шансов!{x", killer, ch);
         quest->mobKilled(pcm, killer);
         return false;
     }
@@ -42,7 +47,7 @@ bool BandaMobile::death(Character *killer)
         return false;
     }
 
-    pcm->getPlayer()->println("{YС кем-то из банды что-то случилось без твоего участия.{x");
+    pcm->getPlayer()->println("{YС кем-то из них что-то случилось без твоего участия.{x");
     quest->mobDestroyed(pcm);
     return false;
 }
