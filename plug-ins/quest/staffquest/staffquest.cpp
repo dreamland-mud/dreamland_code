@@ -139,9 +139,9 @@ bool StaffQuest::checkRoomClient( PCharacter *pch, Room *room )
     return true;
 }
 
-StaffScenario & StaffQuest::getScenario( )
+const StaffScenario & StaffQuest::getScenario( ) const
 {
-    return *(StaffQuestRegistrator::getThis( )->getScenario( scenName ).getStaticPointer<StaffScenario>( ));
+    return *(StaffQuestRegistrator::getThis( )->getMyScenario<StaffScenario>( scenName ));
 }
 
 Object * StaffQuest::createStaff( Room *room )

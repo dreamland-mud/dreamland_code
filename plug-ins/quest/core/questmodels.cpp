@@ -122,11 +122,11 @@ void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms )
         throw QuestCannotStartException( );
 }
 
-void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, VnumList &vnums )
+void RoomQuestModel::findClientRooms( PCharacter *pch, RoomList &rooms, const VnumList &vnums )
 {
     Room *r;
     
-    for (VnumList::iterator v = vnums.begin( ); v != vnums.end( ); v++)
+    for (VnumList::const_iterator v = vnums.begin( ); v != vnums.end( ); v++)
         if (( r = get_room_index( *v ) ))
             if (checkRoomClient( pch, r ))
                 rooms.push_back( r );

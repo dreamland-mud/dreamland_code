@@ -35,7 +35,7 @@ public:
     virtual Reward::Pointer reward( PCharacter *, NPCharacter * );
     virtual void destroy( );
 
-    LocateScenario & getScenario( );
+    const LocateScenario & getScenario( ) const;
 
     XML_VARIABLE XMLString scenName;
     XML_VARIABLE XMLString itemName;

@@ -37,7 +37,7 @@ protected:
 private:
     Object *createStaff( Room * );
 
-    StaffScenario & getScenario( );
+    const StaffScenario & getScenario( ) const;
 };
 
 class StaffScenario : public QuestItemAppearence, public QuestScenario {

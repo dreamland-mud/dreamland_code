@@ -49,7 +49,7 @@ public:
     
 protected:
    
-    BigQuestScenario &getScenario();
+    const BigQuestScenario &getScenario() const;
     void notifyNoMore(PCMemoryInterface *hero);
 };
 
@@ -58,9 +58,9 @@ XML_OBJECT
 public:
     virtual bool applicable( PCharacter * ) const;
     virtual int getPriority() const;
-    QuestMobileAppearence &getRandomMobile();
-    void onQuestStart(PCharacter *, NPCharacter *, struct area_data *, int);
-    void onQuestInfo(PCharacter *, int, ostream&);
+    const QuestMobileAppearence &getRandomMobile() const;
+    void onQuestStart(PCharacter *, NPCharacter *, struct area_data *, int) const;
+    void onQuestInfo(PCharacter *, int, ostream&) const;
 
 protected:
     XML_VARIABLE XMLInteger priority;

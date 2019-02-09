@@ -16,19 +16,18 @@
 #include "save.h"
 #include "def.h"
 
+/*----------------------------------------------------------------------------
+ * BigQuest
+ *--------------------------------------------------------------------------*/
 BigQuest::BigQuest( )
 {
 }
 
 void BigQuest::create( PCharacter *pch, NPCharacter *questman ) 
 {
-    Room *pRoom;
-    int time;
-    MobileList victims;
-    
     charName.setValue( pch->getName( ) );
     scenName = BigQuestRegistrator::getThis()->getWeightedRandomScenario(pch);
-    BigQuestScenario &scenario = getScenario();
+    const BigQuestScenario &scenario = getScenario();
 
     AreaList areas = findAreas(pch);
     if (areas.empty())
@@ -58,19 +57,9 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     setTime( pch, 60 );
 }
 
-BigQuestScenario & BigQuest::getScenario( )
+const BigQuestScenario & BigQuest::getScenario( ) const
 {
-    static BigQuestScenario zero;
-    QuestScenario::Pointer scenario = BigQuestRegistrator::getThis()->getScenario( scenName );
-
-    if (!scenario) 
-        return zero;
-
-    BigQuestScenario *bqs = scenario.getStaticPointer<BigQuestScenario>( );
-    if (!bqs)
-        return zero;
-
-    return *bqs;
+    return *BigQuestRegistrator::getThis()->getMyScenario<BigQuestScenario>( scenName );
 }
 
 void BigQuest::destroy( ) 
@@ -183,13 +172,16 @@ bool BigQuest::hasPartialRewards() const
     return mobsKilled >= (mobsTotal / 3);
 }
 
+/*----------------------------------------------------------------------------
+ * BigQuestScenario
+ *--------------------------------------------------------------------------*/
 bool BigQuestScenario::applicable( PCharacter *ch ) const
 {
     bool rc = criteria.allow(ch);
     return rc;
 }
 
-QuestMobileAppearence & BigQuestScenario::getRandomMobile()
+const QuestMobileAppearence & BigQuestScenario::getRandomMobile() const
 {
     if (mobiles.empty())
         throw QuestCannotStartException();
@@ -197,7 +189,7 @@ QuestMobileAppearence & BigQuestScenario::getRandomMobile()
     return mobiles[number_range(0, mobiles.size() - 1)];    
 }
 
-void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct area_data *targetArea, int mobsTotal)
+void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct area_data *targetArea, int mobsTotal) const
 {
     XMLStringVector::const_iterator s;
 
@@ -205,7 +197,7 @@ void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, stru
         tell_fmt(s->c_str(), pch, questman, targetArea->name, mobsTotal);            
 }
 
-void BigQuestScenario::onQuestInfo(PCharacter *pch, int mobsTotal, ostream &buf)
+void BigQuestScenario::onQuestInfo(PCharacter *pch, int mobsTotal, ostream &buf) const
 {
     buf << fmt(0, msgInfo.c_str(), pch, 0, mobsTotal) << endl;
 }
@@ -215,6 +207,9 @@ int BigQuestScenario::getPriority() const
     return priority;
 }
 
+/*----------------------------------------------------------------------------
+ * BigQuestRegistrator
+ *--------------------------------------------------------------------------*/
 BigQuestRegistrator * BigQuestRegistrator::thisClass = 0;
 
 BigQuestRegistrator::BigQuestRegistrator( )

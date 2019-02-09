@@ -181,9 +181,9 @@ void LocateQuest::destroy( )
 /*-----------------------------------------------------------------------------
  * LocateQuest: local methods
  *----------------------------------------------------------------------------*/
-LocateScenario & LocateQuest::getScenario( )
+const LocateScenario & LocateQuest::getScenario( ) const
 {
-    return *(LocateQuestRegistrator::getThis( )->getScenario( scenName ).getStaticPointer<LocateScenario>( ));
+    return *(LocateQuestRegistrator::getThis( )->getMyScenario<LocateScenario>( scenName ));
 }
 
 bool LocateQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
@@ -206,8 +206,7 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
     OBJ_INDEX_DATA *pObjIndex;
     unsigned int i, count;
     LocateAlgo::Rooms rooms;
-    LSItemData *itemScen;
-    LocateScenario &scen = getScenario( );
+    const LocateScenario &scen = getScenario( );
 
     if (scen.items.empty( ))
         throw QuestCannotStartException( );
@@ -218,16 +217,16 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
     if (!count || count > rooms.size( ))
         throw QuestCannotStartException( );
     
-    itemScen = &scen.items[number_range( 0, scen.items.size( ) - 1 )];
-    itemName = itemScen->shortDesc;
-    itemMltName = itemScen->shortMlt;
+    const LSItemData &itemScen = scen.items[number_range( 0, scen.items.size( ) - 1 )];
+    itemName = itemScen.shortDesc;
+    itemMltName = itemScen.shortMlt;
 
     pObjIndex = get_obj_index( LocateQuestRegistrator::getThis( )->itemVnum );
         
     while (!rooms.empty( ) && total < (int)count) {
         i = number_range( 0, rooms.size( ) - 1 );
         obj = createItem<LocateItem>( pObjIndex );
-        itemScen->dress( obj );
+        itemScen.dress( obj );
         obj_to_room( obj, rooms[i] );
         total++;
         rooms.erase( rooms.begin( ) + i );

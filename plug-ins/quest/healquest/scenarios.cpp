@@ -5,6 +5,7 @@
 #include "scenarios.h"
 
 #include "clanreference.h"
+#include "skill_utils.h"
 #include "affecthandler.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -45,26 +46,28 @@ bool HealScenario::applicable( PCharacter *pch ) const
 }
 
 
-bool HealScenario::healedBy( int sn ) 
+bool HealScenario::healedBy( int sn ) const
 {
     if (remedies.hasElement( skillManager->find( sn )->getName( ) ))
         return true;
-    
-    if (!malady->getAffect( ))
+   
+    Skill *skill = skillref_to_pointer(malady);
+    if (!skill->getAffect( ))
         return false;
 
-    if (sn == gsn_cancellation && malady->getAffect( )->isCancelled( ))
+    if (sn == gsn_cancellation && skill->getAffect( )->isCancelled( ))
         return true;
 
-    if (sn == gsn_dispel_affects && malady->getAffect( )->isDispelled( ))
+    if (sn == gsn_dispel_affects && skill->getAffect( )->isDispelled( ))
         return true;
 
     return false;
 }
 
-bool HealScenario::isInfected( NPCharacter *mob ) 
+bool HealScenario::isInfected( NPCharacter *mob ) const
 {
-    return mob->isAffected( malady );
+    Skill *skill = skillref_to_pointer(malady);
+    return mob->isAffected( skill->getIndex() );
 }
 
 bool HealScenario::applicable( PCharacter *pch, NPCharacter *mob ) const
