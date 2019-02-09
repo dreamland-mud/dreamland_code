@@ -105,6 +105,20 @@ void BandaItem::getByOther( Character *ch )
 
 void BandaItem::getByHero( PCharacter *ch ) 
 {
+    BigQuest::Pointer quest = getMyQuest<BigQuest>(ch);
+    if (!quest)
+        return;
+
+    int carries = count_obj_list(obj->pIndexData, ch->carrying);
+
+    if (carries == quest->objsTotal) {
+        obj->getRoom()->echo(POS_RESTING, quest->getScenario().msgJoin.c_str());
+        ch->pecho("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта.");
+        ch->gainExp(1000);
+        quest->destroyItems<BandaItem>();
+        return;
+    }
+
     act( "Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );
 }
 

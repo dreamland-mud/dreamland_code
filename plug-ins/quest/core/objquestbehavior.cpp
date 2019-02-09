@@ -6,7 +6,6 @@
 #include "objquestbehavior.h"
 #include "quest.h"
 #include "loadsave.h"
-
 /*--------------------------------------------------------------------
  * MandatoryItem
  *--------------------------------------------------------------------*/
@@ -23,12 +22,15 @@ bool MandatoryItem::extract( bool count )
  *--------------------------------------------------------------------*/
 void PersonalItem::get( Character *ch ) 
 {
+    if (ourHero( ch )) {
+        getByHero( ch->getPC( ) );
+        return;
+    }
+
     if (ch->is_immortal( ))
         return;
 
-    if (ourHero( ch )) 
-        getByHero( ch->getPC( ) );
-    else if (!ourMobile( ch->getNPC( ) )) {
+    if (!ourMobile( ch->getNPC( ) )) {
         obj_from_char( obj );
         obj_to_room( obj, ch->in_room );
         getByOther( ch );

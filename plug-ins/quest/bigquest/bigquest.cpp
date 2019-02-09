@@ -42,15 +42,21 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     mobsTotal = number_range(10, 15);
     mobsKilled = 0;
     mobsDestroyed = 0;
-    objsTotal = 0;
+    objsTotal = 10;
     areaName = targetArea->name;
 
-    for (int i = 0; i < mobsTotal; i++) {
+    for (int m = 0, o = 0; m < mobsTotal; m++, o++) {
         Room *targetRoom = getRandomRoom(rooms);
         
         NPCharacter *mob= createMobile<BandaMobile>(28012);
         scenario.getRandomMobile().dress(mob);
         char_to_room(mob, targetRoom);
+
+        if (o < objsTotal) {
+            Object *obj = createItem<BandaItem>(28003);
+            scenario.item.dress(obj);
+            obj_to_char(obj, mob);
+        }
     }
    
     scenario.onQuestStart(pch, questman, targetArea, mobsTotal); 
@@ -148,8 +154,13 @@ void BigQuest::mobKilled(PCMemoryInterface *hero, Character *killer)
         return;
     }
 
-    if (hero->isOnline())
-        hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
+    if (hero->isOnline()) {
+        if (hasPartialRewards()) 
+            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d, или же вернуться за частичным вознаграждением.{x\r\n", 
+                                       mobsLeft, mobsTotal.getValue());
+        else
+            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
+    }
 }
 
 void BigQuest::mobDestroyed(PCMemoryInterface *hero)
