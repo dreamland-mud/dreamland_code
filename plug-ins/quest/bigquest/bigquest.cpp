@@ -44,23 +44,34 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     mobsDestroyed = 0;
     objsTotal = 10;
     areaName = targetArea->name;
+    
+    try {
+        for (int m = 0, o = 0; m < mobsTotal; m++, o++) {
+            Room *targetRoom = getRandomRoom(rooms);
+            
+            NPCharacter *mob= createMobile<BandaMobile>(28012);
+            scenario.getRandomMobile().dress(mob);
+            char_to_room(mob, targetRoom);
 
-    for (int m = 0, o = 0; m < mobsTotal; m++, o++) {
-        Room *targetRoom = getRandomRoom(rooms);
-        
-        NPCharacter *mob= createMobile<BandaMobile>(28012);
-        scenario.getRandomMobile().dress(mob);
-        char_to_room(mob, targetRoom);
-
-        if (o < objsTotal) {
-            Object *obj = createItem<BandaItem>(28003);
-            scenario.item.dress(obj);
-            obj_to_char(obj, mob);
+            if (o < objsTotal) {
+                Object *obj = createItem<BandaItem>(28003);
+                scenario.item.dress(obj);
+                obj_to_char(obj, mob);
+            }
         }
+       
+        scenario.onQuestStart(pch, questman, targetArea, mobsTotal); 
+    } catch (const QuestCannotStartException &e) {
+        destroy();
+        throw e;
     }
-   
-    scenario.onQuestStart(pch, questman, targetArea, mobsTotal); 
+
     setTime( pch, 60 );
+
+    wiznet( "", "%s, %d victims in area %s",
+                 scenName.c_str(),
+                 mobsTotal,
+                 targetArea->name);
 }
 
 const BigQuestScenario & BigQuest::getScenario( ) const
