@@ -1,5 +1,6 @@
 #include "bandamobile.h"
 #include "bigquest.h"
+#include "selfrate.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "act.h"
@@ -56,15 +57,20 @@ void BandaMobile::config(PCharacter *hero)
 {
     if (configured)
         return;
-    
+   
     int level = hero->getModifyLevel();
     level += level / 10;
 
     ch->setLevel( level );
     ch->hitroll = level * 2;
     ch->damroll = (short) ( level * 3 / 2 ); 
+    ch->damage[DICE_NUMBER]= level / 5;
+    ch->damage[DICE_TYPE]  = level / 10;
     ch->max_mana = ch->mana = level * 10;
     ch->max_move = ch->move = 1000;
+
+    for (int i = 0; i < stat_table.size; i ++)
+        ch->perm_stat[i] = min(25, 11 + level / 5);
 
     if (level < 30)
         ch->max_hit = level * 20 + 2 * number_fuzzy(level);
@@ -83,6 +89,31 @@ void BandaMobile::config(PCharacter *hero)
         ch->alignment = number_range(-750, -350);
     else
         ch->alignment = -hero->alignment;
+
+    if (!rated_as_newbie(hero)) {
+        // Here we go...
+        if (chance(50))
+            SET_BIT(ch->off_flags, ASSIST_VNUM);
+
+        switch (number_range(1, 10)) {
+        case 0:
+            SET_BIT(ch->act, ACT_CLERIC);
+            break;
+        case 1:
+        case 2:
+            SET_BIT(ch->act, ACT_WARRIOR);
+            SET_BIT(ch->off_flags, OFF_KICK_DIRT);
+            break;
+
+        case 4:
+            SET_BIT(ch->off_flags, OFF_FAST|OFF_KICK_DIRT);
+            break;
+
+        case 5:
+            SET_BIT(ch->off_flags, OFF_FAST|OFF_KICK|OFF_TRIP);
+            break;
+        }
+    }
 
     configured = true;
 }
