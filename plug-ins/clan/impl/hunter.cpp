@@ -266,6 +266,11 @@ bool HunterEquip::canEquip( Character *ch )
     }
 }
 
+bool HunterEquip::mayFloat( ) 
+{
+    return true;
+}
+
 /*---------------------------------------------------------------------------
  * Hunter's Armor 
  *-------------------------------------------------------------------------*/
@@ -322,11 +327,6 @@ void HunterArmor::delete_( Character *ch )
 {
     if (obj->hasOwner( ch ))
         extract_obj( obj );
-}
-
-bool HunterArmor::mayFloat( ) 
-{
-    return true;
 }
 
 /*---------------------------------------------------------------------------
