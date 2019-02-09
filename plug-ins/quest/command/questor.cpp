@@ -224,7 +224,13 @@ void Questor::doFind( PCharacter *client )
         quest->wiznet( "find", "failure, guru mode" );
         return;
     }
-    
+
+    if (quest->hint >= 3) {
+        tell_fmt( "Извини, %1$C1, но теперь тебе придется искать путь самостоятельно.", client, ch );
+        quest->wiznet( "find", "failure, too many hints" );
+        return;
+    }
+
     quest->helpMessage( buf );
     
     if (!makeSpeedwalk( ch->in_room, quest->helpLocation( ), buf )) 

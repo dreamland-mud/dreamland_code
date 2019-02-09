@@ -77,26 +77,32 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     Reward::Pointer r( NEW );
     
-    if (mobsKilled == mobsTotal)
-        tell_fmt("Ты доблестно уничтожил%1$Gо||а всех преступников.", ch, questman);
-    else 
-        tell_fmt("Ты доблестно уничтожил%1$Gо||а %3$d преступник%3$Iа|ов|ов из %4$d.", 
-                 ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
-    if (mobsDestroyed > 0)
-        tell_fmt("Еще %3$d умерли неизвестной смертью.", ch, questman, mobsDestroyed.getValue());
+    if (mobsKilled != mobsTotal) {
+        if (hint > 0)
+            tell_fmt("К тому же, ты уничтожил%1$Gо||а только %3$d преступник%3$Iа|ов|ов из %4$d.", 
+                     ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
+        else     
+            tell_fmt("Тебе удалось уничтожить только %3$d преступник%3$Iа|ов|ов из %4$d, но все равно это заслуживает поощрения.", 
+                     ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
+    }
 
     int objsCarried = getItemsList<BandaItem>(ch->carrying).size();
     if (objsCarried > 0) 
         tell_fmt("Я вижу, что тебе также удалось собрать %3$d доказательст%3$Iво|ва|в злостных намерений!",
                   ch, questman, objsCarried);
 
-    
-    r->gold = number_range( 8, 12 );
-    r->points = number_range( 8, 10 ) + mobsKilled * number_range(2, 3) + objsCarried * number_range(1, 2);
-    r->wordChance = 10;
-    r->scrollChance = 10;
-    if (chance(5))
-        r->prac = number_range(1, 2);
+    if (hint > 0) {
+        r->gold = number_range(1, 3);
+        r->points = mobsKilled; 
+    }
+    else {
+        r->gold = number_range( 8, 12 );
+        r->points = number_range( 8, 10 ) +  mobsKilled * number_range(2, 3) + objsCarried * number_range(1, 2);
+        r->wordChance = 10;
+        r->scrollChance = 10;
+        if (chance(5))
+            r->prac = number_range(1, 2);
+    }
 
     if (ch->getClan( )->isDispersed( )) 
         r->points *= 2;
