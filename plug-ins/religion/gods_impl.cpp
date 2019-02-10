@@ -489,7 +489,8 @@ void RavenQueenGod::tattooFight( Object *obj, Character *ch ) const
     // Cast random spell out of available ones. 
     ch->println("{rТатуировка на твоем плече загорается красным светом.{x");
     int random_spell = spells[number_range(0, spells.size() - 1)];
-    spell(random_spell, ch->getModifyLevel(), ch, victim);
+    int level_bonus = season_winter() ? 10 : 0;
+    spell(random_spell, ch->getModifyLevel() + level_bonus, ch, victim);
 }
 
 class TricksterGodOneHit: public WeaponOneHit, public SkillDamage {
