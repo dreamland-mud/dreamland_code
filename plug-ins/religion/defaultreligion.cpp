@@ -82,6 +82,7 @@ DefaultReligion::DefaultReligion( )
                 : align( 0, &align_table ),
                   ethos( 0, &ethos_table ),
                   races( raceManager ),
+                  classes( professionManager ),
                   sex( SEX_MALE, &sex_table )
 
 {
@@ -111,10 +112,10 @@ bool DefaultReligion::isAllowed( Character *ch ) const
     if (!align.isSetBitNumber( ALIGNMENT(ch) ))
         return false;
 
-    if (!races.empty( ) && !races.isSet( ch->getRace( ) ))
-        return false;
+    bool raceOK = races.empty() || races.isSet(ch->getRace());
+    bool classOK = classes.empty() || classes.isSet(ch->getProfession());
 
-    return true;
+    return raceOK || classOK;
 }
 
 const DLString &DefaultReligion::getRussianName( ) const
@@ -192,10 +193,39 @@ bool DefaultReligion::likesBook(Object *obj) const
     return likes.books;
 }
 
+/**
+ * Return true if an item should be ignored totally and not included
+ * in any sacrifice cost calculations. Currently supports deities that
+ * only prefer stolen items: items that can in theory be stolen need
+ * to be marked as such.
+ */
+bool DefaultReligion::ignoresItem(Object *obj) const
+{
+    if (!likes.stolen)
+        return false;
+
+    switch (obj->item_type) {
+    case ITEM_MONEY:
+    case ITEM_CORPSE_PC:
+    case ITEM_CORPSE_NPC:
+        return false;
+    }    
+
+    return !likesStolen(obj);
+}
+
+bool DefaultReligion::likesStolen(Object *obj) const
+{
+    if (!likes.stolen)
+        return false;
+
+    return obj->properties.count("stolen") != 0;
+}
+
 GodLikes::GodLikes()
             : skills(skillManager), skillGroups(skillGroupManager),
               items(0, &item_table), liquids(liquidManager),
-              liquidFlags(0, &liquid_flags)
+              liquidFlags(0, &liquid_flags), books(false), stolen(false)
 {
 }
 

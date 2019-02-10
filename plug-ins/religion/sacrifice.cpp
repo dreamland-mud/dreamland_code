@@ -79,57 +79,59 @@ protected:
             return;
         }
 
-        // TODO: body parts, flowers.
+        if (religion->ignoresItem(obj))
+            return;
 
         switch (obj->item_type) {
         case ITEM_MONEY:    
             money(obj); 
-            return;
+            break;
 
         case ITEM_LIGHT:
             light(obj);
-            return;
+            break;
 
         case ITEM_WARP_STONE:
         case ITEM_GEM:      
             gem(obj); 
-            return;
+            break;
 
         case ITEM_JEWELRY:
         case ITEM_TREASURE: 
             treasure(obj); 
-            return;
+            break;
 
         case ITEM_ARMOR:    
         case ITEM_CLOTHING: 
             armor(obj);    
-            return;    
+            break;    
 
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
             potion(obj); 
-            return;
+            break;
 
         case ITEM_WAND:
         case ITEM_STAFF:
             wand(obj);
-            return;
+            break;
         
-        case ITEM_FOOD:       food(obj); return;
-        case ITEM_DRINK_CON:  drink(obj); return;
-        case ITEM_WEAPON:     weapon(obj); return;
-        case ITEM_CORPSE_PC:  corpse_pc(obj); return;
-        case ITEM_CORPSE_NPC: corpse_npc(obj); return;
+        case ITEM_FOOD:       food(obj); break;
+        case ITEM_DRINK_CON:  drink(obj); break;
+        case ITEM_WEAPON:     weapon(obj); break;
+        case ITEM_CORPSE_PC:  corpse_pc(obj); break;
+        case ITEM_CORPSE_NPC: corpse_npc(obj); break;
 
         case ITEM_PARCHMENT:
         case ITEM_SPELLBOOK:
         case ITEM_TEXTBOOK:
             book(obj);
-            return;
+            break;
         } 
     
-        // Item we don't care about, no cost added.
+        if (religion->likesStolen(obj))         
+            cost["stolen"] += 100;
     }
     
     void light(Object *obj) {
