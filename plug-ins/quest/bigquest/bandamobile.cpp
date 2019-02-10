@@ -147,6 +147,7 @@ void BandaItem::getByHero( PCharacter *ch )
         ch->pecho("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта.");
         ch->gainExp(1000);
         quest->destroyItems<BandaItem>();
+        quest->wiznet("", "easter egg");
         return;
     }
 
