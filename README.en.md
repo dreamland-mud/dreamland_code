@@ -9,6 +9,8 @@
 
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPL-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![Build Status](https://travis-ci.org/dreamland-mud/dreamland_code.svg?branch=master)](https://travis-ci.org/dreamland-mud/dreamland_code)
+[![Discord chat](https://img.shields.io/discord/308323056592486420.svg)](https://discordapp.com/channels/464761427710705664/470155529310961665)
 
 
 Tested on clean Ubuntu 16.04, Ubuntu 14.04. You can either follow these instructions and create a local build environment,
