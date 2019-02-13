@@ -10,7 +10,7 @@
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Build Status](https://travis-ci.org/dreamland-mud/dreamland_code.svg?branch=master)](https://travis-ci.org/dreamland-mud/dreamland_code)
-[![Discord chat](https://img.shields.io/badge/Discord%20chat-join%20us-brightgreen.svg)](https://discord.gg/RPaz6ut)
+[![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 Есть несколько способов познакомиться с кодом проекта и начать под него разработку:
 * Собрать у себя локально, например, на виртуальной машине с Ubuntu, пользуясь инструкцией ниже.
