@@ -52,6 +52,7 @@ public:
     
 protected:
    
+    virtual bool checkRoomClient( PCharacter *, Room * );
     void notifyNoMore(PCMemoryInterface *hero);
 };
 

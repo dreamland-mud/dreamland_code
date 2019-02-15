@@ -195,6 +195,17 @@ bool BigQuest::hasPartialRewards() const
     return mobsKilled >= (mobsTotal / 3);
 }
 
+bool BigQuest::checkRoomClient( PCharacter *pch, Room *room )
+{
+    if (IS_WATER(room) || room->sector_type == SECT_AIR)
+        return false;
+
+    if (!VictimQuestModel::checkRoomClient( pch, room ))
+        return false;
+
+    return true;
+}
+
 /*----------------------------------------------------------------------------
  * BigQuestScenario
  *--------------------------------------------------------------------------*/

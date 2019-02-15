@@ -16,12 +16,23 @@
 #include "merc.h"
 #include "def.h"
 #include "roomtraverse.h"
+#include "directions.h"
 
 GSN(detect_hide);
 GSN(detect_invis);
 GSN(truesight);
 GSN(acute_vision);
 GSN(improved_detect);
+
+// Check if room has at least one normal exit leading somewhere.
+static bool room_has_exits(Room *room)
+{
+    for (int door = 0; door < DIR_SOMEWHERE; door++)
+        if (direction_target(room, door) != NULL)
+            return true;
+
+    return false;
+}
 
 /*--------------------------------------------------------------------
  * RoomQuestModel 
@@ -51,6 +62,9 @@ bool RoomQuestModel::checkRoom( PCharacter *ch, Room *room )
         return false;
     
     if (!room->isCommon( ))
+        return false;
+
+    if (!room_has_exits(room)) 
         return false;
 
     return true;
@@ -156,7 +170,7 @@ AreaList RoomQuestModel::findAreas(PCharacter *pch)
     AreaList result;
 
     for (AREA_DATA *area = area_first; area; area = area->next) {
-        if (area->high_range < pch->getRealLevel())
+        if (area->low_range > pch->getRealLevel())
             continue;
         if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN|AREA_NOQUEST) )
             continue;
