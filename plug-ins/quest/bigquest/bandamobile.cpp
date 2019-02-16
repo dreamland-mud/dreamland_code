@@ -145,6 +145,7 @@ void BandaItem::getByHero( PCharacter *ch )
     if (carries == quest->objsTotal) {
         obj->getRoom()->echo(POS_RESTING, quest->getScenario().msgJoin.c_str());
         ch->pecho("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта.");
+        ch->recho("Он ярко вспыхивает и исчезает.");
         ch->gainExp(1000);
         quest->destroyItems<BandaItem>();
         quest->wiznet("", "easter egg");

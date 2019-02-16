@@ -1146,6 +1146,17 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         page_to_char( buf.str( ).c_str( ), ch );
         return;
     }
+
+    if (arg == "rot") {
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+           if (IS_SET(pObj->extra_flags, ITEM_ROT_DEATH))
+                buf << dlprintf("[%20s] [%6d] %s",
+                    pObj->area->name, pObj->vnum, pObj->short_descr) << endl;
+        }
+        page_to_char( buf.str( ).c_str( ), ch );
+        return;
+    }
 }
 
 

@@ -248,8 +248,8 @@ REDIT(olist)
             {
                 found = true;
                 buf1 << fmt( 0, "[%5d] ", pObjIndex->vnum);
-                buf1 << fmt( 0, "%-17.17s{x ", russian_case(pObjIndex->short_descr, '1').c_str( ));
-                if (++col % 3 == 0)
+                buf1 << fmt( 0, "%-30.30s{x ", russian_case(pObjIndex->short_descr, '1').c_str( ));
+                if (++col % 2 == 0)
                     buf1 << endl;
             }
         }
