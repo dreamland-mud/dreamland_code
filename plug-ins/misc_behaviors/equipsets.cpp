@@ -54,10 +54,6 @@ void EquipSet::remove( Character *victim )
     removeAffect(victim);
 }
 
-void EquipSet::fight( Character *ch )
-{
-}
-
 bool EquipSet::isComplete(Character *ch) const
 {
     GlobalArray slots(wearlocationManager);
@@ -199,5 +195,16 @@ void TravellersJoySet::removeAffect(Character *ch) const
 {
     ch->pecho("Свет, окружавший комплект одежд путешественника, мерцает и гаснет.");
     affect_strip(ch, sn);
+}
+
+void TravellersJoySet::fight( Character *ch )
+{
+    if (!ch->isAffected(sn))
+        return;
+
+    if (chance(4) && HEALTH(ch) < 75) {
+        ch->pecho("{CКомплект одежд путешественника на мгновение вспыхивает ярким голубым светом.{x");
+        spell( gsn_cure_critical, ch->getModifyLevel(), ch, ch );
+    }
 }
 

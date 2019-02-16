@@ -11,7 +11,6 @@ public:
         EquipSet(int);    
         virtual void equip( Character *victim );                           
         virtual void remove( Character *victim );
-        virtual void fight( Character *ch );
 
 protected:
         bool isComplete(Character *) const;
@@ -42,6 +41,7 @@ public:
         typedef ::Pointer<TravellersJoySet> Pointer;
         TravellersJoySet();
 
+        virtual void fight( Character *ch );
 protected:
         virtual bool hasAffect(Character *) const;
         virtual void addAffect(Character *) const;
