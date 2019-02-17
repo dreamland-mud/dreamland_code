@@ -8,7 +8,7 @@ XML_OBJECT
 public:
         typedef ::Pointer<EquipSet> Pointer;
         
-        EquipSet(int);    
+        EquipSet(int, bool, bool);    
         virtual void equip( Character *victim );                           
         virtual void remove( Character *victim );
 
@@ -19,6 +19,8 @@ protected:
         virtual void removeAffect(Character *) const = 0;
 
         int totalSetSize;
+        bool noDoubleNeck;
+        bool noDoubleWrist;
 };
 
 class SidheArmorSet : public EquipSet {
@@ -49,4 +51,33 @@ protected:
         
         int sn;
 };
+
+class NorivaMyrvaleSet: public EquipSet {
+XML_OBJECT
+public:
+        typedef ::Pointer<NorivaMyrvaleSet> Pointer;
+        NorivaMyrvaleSet();
+
+protected:
+        virtual bool hasAffect(Character *) const;
+        virtual void addAffect(Character *) const;
+        virtual void removeAffect(Character *) const;
+        
+        int sn;
+};
+
+class ReykarisShevaleSet: public EquipSet {
+XML_OBJECT
+public:
+        typedef ::Pointer<ReykarisShevaleSet> Pointer;
+        ReykarisShevaleSet();
+
+protected:
+        virtual bool hasAffect(Character *) const;
+        virtual void addAffect(Character *) const;
+        virtual void removeAffect(Character *) const;
+        
+        int sn;
+};
+
 #endif

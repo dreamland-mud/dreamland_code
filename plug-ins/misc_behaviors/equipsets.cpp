@@ -21,8 +21,16 @@
    
 GSN(sidhe_armor);
 GSN(travellers_joy);
+GSN(myrvale_noriva);
+GSN(shevale_reykaris);
+PROF(cleric);
+PROF(necromancer);
 
-EquipSet::EquipSet(int size) : totalSetSize(size)
+/*--------------------------------------------------------------------------
+ * EquipSet
+ *-------------------------------------------------------------------------*/
+EquipSet::EquipSet(int size, bool noDoubleNeck_, bool noDoubleWrist_) 
+                      : totalSetSize(size), noDoubleNeck(noDoubleNeck_), noDoubleWrist(noDoubleWrist_)
 {
 }
  
@@ -77,15 +85,19 @@ bool EquipSet::isComplete(Character *ch) const
         wornSetSize++;
     }
 
-    int neck1 = slots[wear_neck_1];
-    int neck2 = slots[wear_neck_2];
-    if (neck1 != 0 && neck1 == neck2)
-        wornSetSize--;
+    if (noDoubleNeck) {
+        int neck1 = slots[wear_neck_1];
+        int neck2 = slots[wear_neck_2];
+        if (neck1 != 0 && neck1 == neck2)
+            wornSetSize--;
+    }
 
-    int wrist1 = slots[wear_wrist_l];
-    int wrist2 = slots[wear_wrist_r];
-    if (wrist1 != 0 && wrist1 == wrist2)
-        wornSetSize--;
+    if (noDoubleWrist) {
+        int wrist1 = slots[wear_wrist_l];
+        int wrist2 = slots[wear_wrist_r];
+        if (wrist1 != 0 && wrist1 == wrist2)
+            wornSetSize--;
+    }
     
     if (ch->is_immortal())
         ch->pecho("Окончательный результат %d предмета из %d.", wornSetSize, totalSetSize);
@@ -93,8 +105,11 @@ bool EquipSet::isComplete(Character *ch) const
     return wornSetSize >= totalSetSize;
 }
 
+/*--------------------------------------------------------------------------
+ * SidheArmorSet
+ *-------------------------------------------------------------------------*/
 SidheArmorSet::SidheArmorSet()
-                : EquipSet(5), sn(gsn_sidhe_armor)
+                : EquipSet(5, true, true), sn(gsn_sidhe_armor)
 {
 }
 
@@ -144,8 +159,11 @@ void SidheArmorSet::removeAffect(Character *ch) const
     affect_strip(ch, sn);
 }
 
+/*--------------------------------------------------------------------------
+ * TravellersJoySet 
+ *-------------------------------------------------------------------------*/
 TravellersJoySet::TravellersJoySet()
-                : EquipSet(4), sn(gsn_travellers_joy)
+                : EquipSet(4, true, true), sn(gsn_travellers_joy)
 {
 }
 
@@ -206,5 +224,85 @@ void TravellersJoySet::fight( Character *ch )
         ch->pecho("{CКомплект одежд путешественника на мгновение вспыхивает ярким голубым светом.{x");
         spell( gsn_cure_critical, ch->getModifyLevel(), ch, ch );
     }
+}
+
+/*--------------------------------------------------------------------------
+ * NorivaMyrvaleSet 
+ *-------------------------------------------------------------------------*/
+NorivaMyrvaleSet::NorivaMyrvaleSet()
+                : EquipSet(11, false, false), sn(gsn_myrvale_noriva)
+{
+}
+
+bool NorivaMyrvaleSet::hasAffect(Character *ch) const
+{
+    return ch->isAffected(sn);
+}
+
+void NorivaMyrvaleSet::addAffect(Character *ch) const
+{
+    if (ch->getProfession() != prof_cleric) {
+        ch->pecho("Твое обмундирование на мгновение вспыхивает, но тут же гаснет.");
+        return;
+    }
+
+    Affect af;
+
+    af.type      = sn;
+    af.level     = ch->getModifyLevel();
+    af.duration  = -2;
+    af.where     = TO_RESIST;
+    af.bitvector = RES_WEAPON | RES_SPELL;
+    af.modifier  = 3;
+    af.location  = APPLY_LEVEL;
+    affect_to_char(ch, &af);
+    ch->pecho("{gПеред твоими глазами на мгновение возникает изображение ладони над пылающим кольцом.{x");
+    ch->pecho("{gСила мир'вейл Норива пронизывает тебя.{x");
+}
+
+void NorivaMyrvaleSet::removeAffect(Character *ch) const
+{
+    ch->pecho("{gСила дома Норива ускользает от тебя.{x");
+    affect_strip(ch, sn);
+}
+
+/*--------------------------------------------------------------------------
+ * ReykarisShevaleSet 
+ *-------------------------------------------------------------------------*/
+ReykarisShevaleSet::ReykarisShevaleSet()
+                : EquipSet(12, false, false), sn(gsn_shevale_reykaris)
+{
+}
+
+bool ReykarisShevaleSet::hasAffect(Character *ch) const
+{
+    return ch->isAffected(sn);
+}
+
+void ReykarisShevaleSet::addAffect(Character *ch) const
+{
+    if (ch->getProfession() != prof_necromancer) {
+        ch->pecho("Зловещая аура на мгновение окружает твое обмундирование.");
+        return;
+    }
+
+    Affect af;
+
+    af.type      = sn;
+    af.level     = ch->getModifyLevel();
+    af.duration  = -2;
+    af.where     = TO_RESIST;
+    af.bitvector = RES_WEAPON | RES_SPELL;
+    af.modifier  = 3;
+    af.location  = APPLY_LEVEL;
+    affect_to_char(ch, &af);
+    ch->pecho("{DПеред тобой возникает ухмыляющийся череп. В его пустых глазницах пылает жуткое {rкрасноватое{D пламя.{x");
+    ch->pecho("{DСила ши'вейл Рейкарис пронизывает тебя.{x");
+}
+
+void ReykarisShevaleSet::removeAffect(Character *ch) const
+{
+    ch->pecho("{DСила дома Рейкарис ускользает от тебя.{x");
+    affect_strip(ch, sn);
 }
 

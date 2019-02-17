@@ -82,6 +82,8 @@ extern "C"
         Plugin::registerPlugin<MobileBehaviorRegistrator<PetQuestor> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<SidheArmorSet> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<TravellersJoySet> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<NorivaMyrvaleSet> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ReykarisShevaleSet> >( ppl );
         
         Plugin::registerPlugin<MobileBehaviorRegistrator<Masquer> >( ppl );
         Plugin::registerPlugin<AreaBehaviorRegistrator<Masquerade> >( ppl );
