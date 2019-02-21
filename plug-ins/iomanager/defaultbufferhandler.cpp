@@ -255,7 +255,7 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
     /*
     * Expand the buffer as needed.
     */
-    while ( d->outtop + length * (1 + 5*(!to)) >= d->outsize ) {
+    while ( d->outtop + size * (1 + 5*(!to)) >= d->outsize ) {
         char *outbuf;
 
         if (d->outsize >= 6*32000) {
