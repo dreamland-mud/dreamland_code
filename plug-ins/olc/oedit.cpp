@@ -278,7 +278,7 @@ OEDIT(show)
     sprintf(buf, "Vnum:        [%7d]\n\r", pObj->vnum);
     stc(buf, ch);
 
-    sprintf(buf, "Type:        [%s]\n\r",
+    sprintf(buf, "Type:        [%s] {D(таблица item_table){x\n\r",
               item_table.name(pObj->item_type).c_str());
     stc(buf, ch);
 
@@ -288,15 +288,15 @@ OEDIT(show)
     sprintf(buf, "Limit:       [%5d]\n\r", pObj->limit);
     stc(buf, ch);
 
-    sprintf(buf, "Wear flags:  [%s]\n\r",
+    sprintf(buf, "Wear flags:  [%s] {D(таблица wear_flags){x\n\r",
               wear_flags.names(pObj->wear_flags).c_str());
     stc(buf, ch);
 
-    sprintf(buf, "Extra flags: [%s]\n\r",
+    sprintf(buf, "Extra flags: [%s] {D(таблица extra_flags){x\n\r",
               extra_flags.names(pObj->extra_flags).c_str());
     stc(buf, ch);
 
-    ptc(ch, "Material:    [%s]\n\r", pObj->material);
+    ptc(ch, "Material:    [%s] {D(olchelp material){x\n\r", pObj->material);
 
     if (!pObj->smell.empty( ))
         ptc(ch, "Smell:\n\r     %s\n\r", pObj->smell.c_str( ));
@@ -344,34 +344,43 @@ OEDIT(show)
         sprintf(buf, "[%4d] %-8d %-8.8s", cnt,
                   paf->modifier,
                   apply_flags.name(paf->location).c_str());
-        
-        sprintf(buf+strlen(buf), " %-10.10s ",
-                  affwhere_flags.name(paf->where).c_str());
+       
+        if (paf->bitvector) { 
+            sprintf(buf+strlen(buf), " %-10.10s ",
+                      affwhere_flags.name(paf->where).c_str());
 
-        switch(paf->where) {
-            case TO_DETECTS:
-                strcat(buf, detect_flags.names(paf->bitvector).c_str());
-                break;
-            case TO_AFFECTS:
-                strcat(buf, affect_flags.names(paf->bitvector).c_str());
-                break;
-            case TO_IMMUNE:
-                strcat(buf, imm_flags.names(paf->bitvector).c_str());
-                break;
-            case TO_RESIST:
-                strcat(buf, res_flags.names(paf->bitvector).c_str());
-                break;
-            case TO_VULN:
-                strcat(buf, vuln_flags.names(paf->bitvector).c_str());
-                break;
-            default:
-                sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
-                break;
+            switch(paf->where) {
+                case TO_DETECTS:
+                    strcat(buf, detect_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(detect_flags){x");
+                    break;
+                case TO_AFFECTS:
+                    strcat(buf, affect_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(affect_flags){x");
+                    break;
+                case TO_IMMUNE:
+                    strcat(buf, imm_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(imm_flags){x");
+                    break;
+                case TO_RESIST:
+                    strcat(buf, res_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(res_flags){x");
+                    break;
+                case TO_VULN:
+                    strcat(buf, vuln_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(vuln_flags){x");
+                    break;
+                default:
+                    sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
+                    break;
+            }
         }
         strcat(buf, "\n\r");
         stc(buf, ch);
         cnt++;
     }
+    if (pObj->affected)
+        stc("{DТаблицы:    apply_flags  affwhere_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
 
@@ -696,37 +705,52 @@ bool OLCStateObject::oedit_values(Character * ch, char *argument, int value)
 
 OEDIT(value0)
 {
-    if (oedit_values(ch, argument, 0))
-        return true;
-    return false;
+    return oedit_values(ch, argument, 0);
+}
+
+OEDIT(v0)
+{
+    return oedit_values(ch, argument, 0);
 }
 
 OEDIT(value1)
 {
-    if (oedit_values(ch, argument, 1))
-        return true;
-    return false;
+    return oedit_values(ch, argument, 1);
+}
+
+OEDIT(v1)
+{
+    return oedit_values(ch, argument, 1);
 }
 
 OEDIT(value2)
 {
-    if (oedit_values(ch, argument, 2))
-        return true;
-    return false;
+    return oedit_values(ch, argument, 2);
+}
+
+OEDIT(v2)
+{
+    return oedit_values(ch, argument, 2);
 }
 
 OEDIT(value3)
 {
-    if (oedit_values(ch, argument, 3))
-        return true;
-    return false;
+    return oedit_values(ch, argument, 3);
+}
+
+OEDIT(v3)
+{
+    return oedit_values(ch, argument, 3);
 }
 
 OEDIT(value4)
 {
-    if (oedit_values(ch, argument, 4))
-        return true;
-    return false;
+    return oedit_values(ch, argument, 4);
+}
+
+OEDIT(v4)
+{
+    return oedit_values(ch, argument, 4);
 }
 
 OEDIT(weight)
