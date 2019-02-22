@@ -86,6 +86,10 @@ NMI_GET( AreaWrapper, name, "имя зоны (как видно по 'where')" )
     return Scripting::Register( find_area( filename )->name );
 }
 
+NMI_GET( AreaWrapper, area_flag, "флаги зоны (таблица area_flags)" ) 
+{
+    return Scripting::Register((int)(find_area( filename )->area_flag));
+}
 
 /*----------------------------------------------------------------------
  * Hometown
