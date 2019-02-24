@@ -764,10 +764,7 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     char arg1[MAX_INPUT_LENGTH];
     AREA_DATA *pArea;
-    FILE *fp;
     int value;
-
-    fp = NULL;
 
     if (!ch) {
         save_area_list();

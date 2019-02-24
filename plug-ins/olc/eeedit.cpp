@@ -215,20 +215,16 @@ EEEDIT(show)
 
 EEEDIT(desc)
 {
-    if(!sedit(description))
-        return false;
-
-    stc("description set\r\n", ch);
-    return true;
+    char command[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, command);
+    return editor(command, description);
 }
 
 EEEDIT(rdesc)
 {
-    if(!sedit(room_description))
-        return false;
-
-    stc("room description set\r\n", ch);
-    return true;
+    char command[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, command);
+    return editor(command, room_description);
 }
 
 EEEDIT(name)

@@ -41,7 +41,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch, "[v0] Total pages       : [%d]\n\r", obj->value[0]);
         ptc(ch, "[v1] Used pages        : [%d]\n\r", obj->value[1]);
         ptc(ch, "[v2] Max spell quality : [%d]\n\r", obj->value[2]);
-        ptc(ch, "[v3] Spell to learn    : %s {D(olchelp spell, функция .Skill()){x\n\r", get_skill_name( obj->value[3] ));
+        ptc(ch, "[v3] Spell to learn    : %s {D(? spells){x\n\r", get_skill_name( obj->value[3] ));
         ptc(ch, "[v4] Spell to learn    : %s\n\r", get_skill_name( obj->value[4] ));
         break;
 
@@ -49,12 +49,12 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch, "[v0] Total pages       : [%d]\n\r", obj->value[0]);
         ptc(ch, "[v1] Used pages        : [%d]\n\r", obj->value[1]);
         ptc(ch, "[v2] Max skill quality : [%d]\n\r", obj->value[2]);
-        ptc(ch, "[v3] Skill to learn    : %s {D(olchelp spell, функция .Skill()){x\n\r", get_skill_name( obj->value[3] ));
+        ptc(ch, "[v3] Skill to learn    : %s {D(? spells){x\n\r", get_skill_name( obj->value[3] ));
         ptc(ch, "[v4] Skill to learn    : %s\n\r", get_skill_name( obj->value[4] ));
         break;
 
     case ITEM_RECIPE:
-        ptc(ch, "[v0] Recipe flags      : %s {D(таблица recipe_flags){x\r\n", recipe_flags.names(obj->value[0]).c_str());
+        ptc(ch, "[v0] Recipe flags      : %s {D(? recipe_flags){x\r\n", recipe_flags.names(obj->value[0]).c_str());
         ptc(ch, "[v2] Complexity        : [%d]\r\n", obj->value[2]);
         break;
 
@@ -93,7 +93,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
                   "[v0] Level:          [%u]\n\r"
                   "[v1] Charges Total:  [%u]\n\r"
                   "[v2] Charges Left:   [%u]\n\r"
-                  "[v3] Spell:          %s {D(olchelp spell, функция .Skill()){x\n\r",
+                  "[v3] Spell:          %s {D(? spells){x\n\r",
                   obj->value[0],
                   obj->value[1],
                   obj->value[2],
@@ -104,8 +104,8 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_PORTAL:
         sprintf(buf,
                   "[v0] Charges:        [%u]\n\r"
-                  "[v1] Exit Flags:     %s {D(таблица exit_flags){x\n\r"
-                  "[v2] Portal Flags:   %s {D(таблица portal_flags){x\n\r"
+                  "[v1] Exit Flags:     %s {D(? exit_flags){x\n\r"
+                  "[v2] Portal Flags:   %s {D(? portal_flags){x\n\r"
                   "[v3] Goes to (vnum): [%u]\n\r"
                   "[v4] Has key(vnum):  [%d]\n\r",
                   obj->value[0],
@@ -119,7 +119,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         sprintf(buf,
                   "[v0] Max people:      [%u]\n\r"
                   "[v1] Max weight:      [%u]\n\r"
-                  "[v2] Furniture Flags: %s {D(таблица furniture_flags){x\n\r"
+                  "[v2] Furniture Flags: %s {D(? furniture_flags){x\n\r"
                   "[v3] Heal bonus:      [%u]\n\r"
                   "[v4] Mana bonus:      [%u]\n\r",
                   obj->value[0],
@@ -135,7 +135,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_PILL:
         sprintf(buf,
                   "[v0] Level:  [%u]\n\r"
-                  "[v1] Spell:  %s {D(olchelp spell, функция .Skill()){x\n\r"
+                  "[v1] Spell:  %s {D(? spells){x\n\r"
                   "[v2] Spell:  %s\n\r"
                   "[v3] Spell:  %s\n\r"
                   "[v4] Spell:  %s\n\r",
@@ -161,15 +161,15 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         break;
 
     case ITEM_WEAPON:
-        ptc(ch, "[v0] Вид оружия:   %s {D(таблица weapon_class){x\n\r",
+        ptc(ch, "[v0] Вид оружия:   %s {D(? weapon_class){x\n\r",
             weapon_class.name(obj->value[0]).c_str());
         ave = (obj->value[2] + 1) * obj->value[1] / 2;
         ptc(ch, "[v1] Число бросков кубика: [%u]\n\r", obj->value[1]);
         ptc(ch, "[v2] Число граней кубика : [%u] {D(повреждения %ud%u, среднее %u = (v2+1)*v1/2){x\r\n", 
                        obj->value[2], obj->value[1], obj->value[2], ave);
-        ptc(ch, "[v3] Тип удара:    %s {D(таблица weapon_flags){x\n\r",
+        ptc(ch, "[v3] Тип удара:    %s {D(? weapon_flags){x\n\r",
             weapon_flags.name(obj->value[3]).c_str());
-        ptc(ch, "[v4] Флаги оружия: %s {D(таблица weapon_type2){x\n\r",
+        ptc(ch, "[v4] Флаги оружия: %s {D(? weapon_type2){x\n\r",
             weapon_type2.names(obj->value[4]).c_str());
         break;
 
@@ -178,7 +178,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_CONTAINER:
         ptc(ch,
             "[v0] Вместимость:[%u кг]\n\r"
-            "[v1] Флаги:      [%s] {D(таблица container_flags){x\n\r"
+            "[v1] Флаги:      [%s] {D(? container_flags){x\n\r"
             "[v2] Ключ:        %s [%u]\n\r"
             "[v3] Макс. вес:  [%u]\n\r"
             "[v4] Коэф. снижения веса: [%u]\n\r",
@@ -196,8 +196,8 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch,
             "[v0] Всего жидкости:  [%u]\n\r"
             "[v1] Налито жидкости: [%u]\n\r"
-            "[v2] Тип жидкости:     %s (%s) {D(olchelp liquid, функция .Liquid()){x\n\r"
-            "[v3] Флаги:            %s {D(таблица drink_flags){x\n\r"
+            "[v2] Тип жидкости:     %s (%s) {D(? liquid){x\n\r"
+            "[v3] Флаги:            %s {D(? drink_flags){x\n\r"
             "[v4] Пробка:           %u\n\r",
             obj->value[0],
             obj->value[1],
@@ -211,7 +211,7 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch, 
             "[v0] Liquid Total: [%u]\n\r"
             "[v1] Liquid Left:  [%u]\n\r"
-            "[v2] Liquid:       %s (%s) {D(olchelp liquid, функция .Liquid()){x\n\r",
+            "[v2] Liquid:       %s (%s) {D(? liquid){x\n\r",
             obj->value[0],
             obj->value[1],
             liquidManager->find( obj->value[2] )->getName( ).c_str( ),

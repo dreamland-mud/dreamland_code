@@ -278,7 +278,7 @@ OEDIT(show)
     sprintf(buf, "Vnum:        [%7d]\n\r", pObj->vnum);
     stc(buf, ch);
 
-    sprintf(buf, "Type:        [%s] {D(таблица item_table){x\n\r",
+    sprintf(buf, "Type:        [%s] {D(? item_table){x\n\r",
               item_table.name(pObj->item_type).c_str());
     stc(buf, ch);
 
@@ -288,21 +288,19 @@ OEDIT(show)
     sprintf(buf, "Limit:       [%5d]\n\r", pObj->limit);
     stc(buf, ch);
 
-    sprintf(buf, "Wear flags:  [%s] {D(таблица wear_flags){x\n\r",
+    sprintf(buf, "Wear flags:  [%s] {D(? wear_flags){x\n\r",
               wear_flags.names(pObj->wear_flags).c_str());
     stc(buf, ch);
 
-    sprintf(buf, "Extra flags: [%s] {D(таблица extra_flags){x\n\r",
+    sprintf(buf, "Extra flags: [%s] {D(? extra_flags){x\n\r",
               extra_flags.names(pObj->extra_flags).c_str());
     stc(buf, ch);
 
-    ptc(ch, "Material:    [%s] {D(olchelp material){x\n\r", pObj->material);
+    ptc(ch, "Material:    [%s] {D(? material){x\n\r", pObj->material);
 
-    if (!pObj->smell.empty( ))
-        ptc(ch, "Smell:\n\r     %s\n\r", pObj->smell.c_str( ));
+    ptc(ch, "Smell: [%s]\n\r", pObj->smell.c_str( ));
 
-    if (!pObj->sound.empty( ))
-        ptc(ch, "Sound:\n\r     %s\n\r", pObj->sound.c_str( ));
+    ptc(ch, "Sound: [%s]\n\r", pObj->sound.c_str( ));
 
     if (!pObj->properties.empty( )) {
         ptc(ch, "Properties:\n\r");
@@ -352,23 +350,23 @@ OEDIT(show)
             switch(paf->where) {
                 case TO_DETECTS:
                     strcat(buf, detect_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(detect_flags){x");
+                    strcat(buf, " {D(? detect_flags){x");
                     break;
                 case TO_AFFECTS:
                     strcat(buf, affect_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(affect_flags){x");
+                    strcat(buf, " {D(? affect_flags){x");
                     break;
                 case TO_IMMUNE:
                     strcat(buf, imm_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(imm_flags){x");
+                    strcat(buf, " {D(? imm_flags){x");
                     break;
                 case TO_RESIST:
                     strcat(buf, res_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(res_flags){x");
+                    strcat(buf, " {D(? res_flags){x");
                     break;
                 case TO_VULN:
                     strcat(buf, vuln_flags.names(paf->bitvector).c_str());
-                    strcat(buf, " {D(vuln_flags){x");
+                    strcat(buf, " {D(? vuln_flags){x");
                     break;
                 default:
                     sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
@@ -380,7 +378,7 @@ OEDIT(show)
         cnt++;
     }
     if (pObj->affected)
-        stc("{DТаблицы:    apply_flags  affwhere_flags{x\r\n", ch);
+        stc("{D          ? apply_flags  ? affwhere_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
 
@@ -759,15 +757,7 @@ OEDIT(weight)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  weight [number]\n\r", ch);
-        return false;
-    }
-
-    pObj->weight = atoi(argument);
-
-    stc("Weight set.\n\r", ch);
-    return true;
+    return numberEdit(0, 10000, pObj->weight);
 }
 
 OEDIT(cost)
@@ -776,15 +766,7 @@ OEDIT(cost)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  cost [number]\n\r", ch);
-        return false;
-    }
-
-    pObj->cost = atoi(argument);
-
-    stc("Cost set.\n\r", ch);
-    return true;
+    return numberEdit(0, 1000000, pObj->cost);
 }
 
 OEDIT(create)
@@ -825,147 +807,45 @@ OEDIT(create)
 OEDIT(ed)
 {
     OBJ_INDEX_DATA *pObj;
-    EXTRA_DESCR_DATA *ed;
-    char command[MAX_INPUT_LENGTH];
-    char *keyword;
 
     EDIT_OBJ(ch, pObj);
 
-    keyword = one_argument(argument, command);
-
-    if (!*command || !*keyword) {
-        stc("Syntax:  ed set [keyword]\n\r", ch);
-        stc("         ed delete [keyword]\n\r", ch);
-        return false;
-    }
-
-    if (is_name(command, "set")) {
-        for (ed = pObj->extra_descr; ed; ed = ed->next) {
-            if (is_name(keyword, ed->keyword))
-                break;
-        }
-
-        char *desc = str_empty;
-
-        if(ed)
-            desc = ed->description;
-
-        if(!sedit(desc))
-            return false;
-
-        if (!ed) {
-            ed = new_extra_descr();
-            ed->keyword = str_dup(keyword);
-            ed->next = pObj->extra_descr;
-            pObj->extra_descr = ed;
-        }
-        
-        ed->description = desc;
-        
-        stc("Extra description set.\n\r", ch);
-        return true;
-    }
-
-    if (is_name(command, "delete")) {
-        EXTRA_DESCR_DATA *ped = NULL;
-
-        for (ed = pObj->extra_descr; ed; ed = ed->next) {
-            if (is_name(keyword, ed->keyword))
-                break;
-            ped = ed;
-        }
-
-        if (!ed) {
-            stc("OEdit:  Extra description keyword not found.\n\r", ch);
-            return false;
-        }
-
-        if (!ped)
-            pObj->extra_descr = ed->next;
-        else
-            ped->next = ed->next;
-
-        free_extra_descr(ed);
-
-        stc("Extra description deleted.\n\r", ch);
-        return true;
-    }
-
-    findCommand(ch, "ed")->run(ch, "");
-    return false;
+    return extraDescrEdit(pObj->extra_descr);
 }
 
 OEDIT(extra)
 {
     OBJ_INDEX_DATA *pObj;
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        EDIT_OBJ(ch, pObj);
-
-        if ((value = extra_flags.bitstring( argument )) != NO_FLAG) {
-            TOGGLE_BIT(pObj->extra_flags, value);
-
-            stc("Extra flag toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax:  extra [flag]\n\r"
-        "Type '? extra' for a list of flags.\n\r", ch);
-    return false;
+    EDIT_OBJ(ch, pObj);
+    return flagBitsEdit(extra_flags, pObj->extra_flags);
 }
 
 
 OEDIT(wear)
 {
     OBJ_INDEX_DATA *pObj;
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        EDIT_OBJ(ch, pObj);
-
-        if ((value = wear_flags.bitstring( argument )) != NO_FLAG) {
-            TOGGLE_BIT(pObj->wear_flags, value);
-
-            stc("Wear flag toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax:  wear [flag]\n\r"
-        "Type '? wear' for a list of flags.\n\r", ch);
-    return false;
+    EDIT_OBJ(ch, pObj);
+    return flagBitsEdit(wear_flags, pObj->wear_flags);
 }
 
 OEDIT(type)
 {
     OBJ_INDEX_DATA *pObj;
-    int value;
+    EDIT_OBJ(ch, pObj);
 
-    if (argument[0] != '\0') {
-        EDIT_OBJ(ch, pObj);
+    if (flagValueEdit(item_table, pObj->item_type)) {
+        /*
+         * Clear the values.
+         */
+        pObj->value[0] = 0;
+        pObj->value[1] = 0;
+        pObj->value[2] = 0;
+        pObj->value[3] = 0;
+        pObj->value[4] = 0;
 
-        if ((value = item_table.value( argument )) != NO_FLAG) {
-            pObj->item_type = (int) value;
-
-            stc("Type set.\n\r", ch);
-
-            /*
-             * Clear the values.
-             */
-            pObj->value[0] = 0;
-            pObj->value[1] = 0;
-            pObj->value[2] = 0;
-            pObj->value[3] = 0;
-            pObj->value[4] = 0;
-
-            return true;
-        }
+        return true;
     }
-
-    stc("Syntax:  type [flag]\n\r"
-        "Type '? type' for a list of flags.\n\r", ch);
+    
     return false;
 }
 
@@ -994,15 +874,7 @@ OEDIT(level)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  level [number]\n\r", ch);
-        return false;
-    }
-
-    pObj->level = atoi(argument);
-
-    stc("Level set.\n\r", ch);
-    return true;
+    return numberEdit(0, 120, pObj->level);
 }
 
 OEDIT(limit)
@@ -1011,15 +883,7 @@ OEDIT(limit)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  limit [number]\n\r", ch);
-        return false;
-    }
-
-    pObj->limit = atoi(argument);
-
-    stc("Limit set.\n\r", ch);
-    return true;
+    return numberEdit(-1, 100, pObj->limit);
 }
 
 OEDIT(gender)
@@ -1042,22 +906,8 @@ OEDIT(gender)
 OEDIT(condition)
 {
     OBJ_INDEX_DATA *pObj;
-    int value;
-
-    if (argument[0] != '\0'
-        && (value = atoi(argument)) >= 0
-        && (value <= 100)) {
-        EDIT_OBJ(ch, pObj);
-
-        pObj->condition = value;
-        stc("Condition set.\n\r", ch);
-
-        return true;
-    }
-    stc("Syntax:  condition [number]\n\r"
-        "Where number can range from 0 (ruined) to 100 (perfect).\n\r",
-        ch);
-    return false;
+    EDIT_OBJ(ch, pObj);
+    return numberEdit(0, 100, pObj->condition); 
 }
 
 /*

@@ -364,3 +364,295 @@ bool OLCState::mapEdit( Properties &map, DLString &args )
     stc("Property set.\n\r", ch);
     return false;
 }
+
+bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ptc(ch, "Использование:\r\n{W%s{x флаги - установить или снять указанные флаги\r\n{W? %s{x - показать таблицу флагов\r\n",
+            cmd, cmd);
+        return false;
+    }
+
+    bitstring_t value = table.bitstring(args);
+    if (value == NO_FLAG) {
+        ptc(ch, "Не найдено ни одного флага по строке '%s'. Используй '? %s' для таблицы всех флагов.\r\n",
+             args.c_str(), cmd); 
+        return false;
+    }
+
+    field ^= value;
+    ptc(ch, "Новое значение поля {g%s{x:\r\n%s\r\n", cmd, table.names(field).c_str());
+    return true;
+}
+
+bool OLCState::flagValueEdit(const FlagTable &table, int &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ptc(ch, "Использование:\r\n{W%s{x значение - установить значение\r\n{W? %s{x - показать таблицу возможных значений\r\n",
+            cmd, cmd);
+        return false;
+    }
+
+    int value = table.value(args);
+    if (value == NO_FLAG) {
+        ptc(ch, "Значение '%s' не найдено. Используй '? %s' для таблицы возможных значений.\r\n",
+           cmd, cmd);
+        return false;
+    }
+
+    field = value;
+    ptc(ch, "Новое значение поля {g%s{x: %d\r\n", cmd, field);
+    return true;
+}
+
+bool OLCState::numberEdit(int minValue, int maxValue, int &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ptc(ch, "Использование:\r\n{W%s{x число - установить значение в диапазоне от %d до %d\r\n",
+            cmd, minValue, maxValue);
+        return false;
+    }
+    
+    int value = atoi(args.getOneArgument().c_str());
+    if (value < minValue || value > maxValue) {
+        ptc(ch, "Значение должно лежать в диапазоне от %d до %d.\r\n", minValue, maxValue);
+        return false;
+    }
+
+    field = value;
+    ptc(ch, "Новое значение поля {g%s{x: %d\r\n", cmd, field);
+    return true;
+}
+
+bool OLCState::numberEdit(long minValue, long maxValue, long &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ptc(ch, "Использование:\r\n{W%s{x число - установить значение в диапазоне от %ld до %ld\r\n",
+            cmd, minValue, maxValue);
+        return false;
+    }
+    
+    long value = atol(args.getOneArgument().c_str());
+    if (value < minValue || value > maxValue) {
+        ptc(ch, "Значение должно лежать в диапазоне от %ld до %ld.\r\n", minValue, maxValue);
+        return false;
+    }
+
+    field = value;
+    ptc(ch, "Новое значение поля {g%s{x: %ld\r\n", cmd, field);
+    return true;
+}
+
+bool OLCState::diceEdit(int *field)
+{
+    static char syntax[] = "Использование:\r\n{W%s{w число_бросков {Wd{w число_граней {W+{w бонус\r\n";
+    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
+    
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ptc(ch, syntax, cmd);
+        return false;
+    }
+
+    strcpy(buf, args.c_str());
+    num = cp = buf;
+
+    while (isdigit(*cp))
+        ++cp;
+    while (*cp != '\0' && !isdigit(*cp))
+        *(cp++) = '\0';
+
+    type = cp;
+
+    while (isdigit(*cp))
+        ++cp;
+    while (*cp != '\0' && !isdigit(*cp))
+        *(cp++) = '\0';
+
+    bonus = cp;
+
+    while (isdigit(*cp))
+        ++cp;
+    if (*cp != '\0')
+        *cp = '\0';
+
+    if ((!is_number(num) || atoi(num) < 1)
+        || (!is_number(type) || atoi(type) < 1)
+        || (!is_number(bonus) || atoi(bonus) < 0)) {
+        ptc(ch, syntax, cmd);
+        return false;
+    }
+
+    field[DICE_NUMBER] = atoi(num);
+    field[DICE_TYPE] = atoi(type);
+    field[DICE_BONUS] = atoi(bonus);
+    int ave = field[DICE_BONUS] + (field[DICE_TYPE]+1)*field[DICE_NUMBER]/2;
+
+    ptc(ch, "Полю {g%{x установлено значение {W%dd%d+%d{x, среднее {W%d{x.\r\n", 
+        cmd, field[DICE_NUMBER], field[DICE_TYPE], field[DICE_BONUS], ave);
+    return true;
+}
+
+bool OLCState::editorCopy(const DLString &original)
+{
+    PCharacter *ch = owner->character->getPC();
+    ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(original);
+    ptc(ch, "Описание скопировано в буфер.\r\n");
+    return false;
+}
+
+bool OLCState::editorPaste(DLString &original)
+{
+    PCharacter *ch = owner->character->getPC();
+    original = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
+    ptc(ch, "Описание вставлено из буфера.\r\n");
+    return true;
+}
+
+bool OLCState::editorPaste(char *&field)
+{
+    DLString original = field;
+    editorPaste(original);
+    free_string(field);
+    field = str_dup(original.c_str());
+    return true;
+}
+
+bool OLCState::editor(const char *command, char *&field)
+{
+    DLString original = field;
+    
+    if (!editor(command, original))
+        return false;
+    
+    free_string(field);
+    field = str_dup(original.c_str());
+    return true;
+}
+
+bool OLCState::editor(const char *command, DLString &original)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+
+    if (command[0] == '\0') {
+        if (!sedit(original)) 
+            return false;
+        stc("Описание установлено.\n\r", ch);
+        return true;
+    }
+
+    if (is_name(command, "copy")) 
+        return editorCopy(original);
+
+    if (is_name(command, "paste")) 
+        return editorPaste(original);
+
+    stc("Команды редактора:\n\r", ch);
+    ptc(ch, "%s       : войти во встроенный редактор описаний\n\r", cmd);
+    ptc(ch, "%s copy  : скопировать описание в буфер\n\r", cmd);
+    ptc(ch, "%s paste : заменить описание на то, что в буфере\n\r", cmd);
+    return false;
+}
+
+bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
+{
+    char buf[MAX_STRING_LENGTH];
+    EXTRA_DESCR_DATA *ed;
+    EXTRA_DESCR_DATA *ped = NULL;
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    char command[MAX_INPUT_LENGTH];
+    char *keyword;
+
+    strcpy(buf, lastArgs.c_str());
+    keyword = one_argument(buf, command);
+
+    if (!*command || !*keyword) {
+        ptc(ch, "Синтаксис:\r\n%s set [keyword]    - войти во встроенный редактор экстра-описания\n\r", cmd);
+        ptc(ch, "%s copy [keyword]   - скопировать экстра-описание в буфер\n\r", cmd);
+        ptc(ch, "%s paste [keyword]  - установить экстра-описание из буфера\n\r", cmd);
+        ptc(ch, "%s delete [keyword] - удалить экстра-описание\n\r", cmd);
+        return false;
+    }
+
+    for (ed = list; ed; ed = ed->next) {
+        if (is_name(keyword, ed->keyword))
+            break;
+        ped = ed;
+    }
+    
+    if (is_name(command, "copy")) {
+        char *desc = ed ? ed->description : str_empty;
+        return editorCopy(desc);
+    }
+
+    if (is_name(command, "paste")) {
+        if (!ed) {
+            ed = new_extra_descr();
+            ed->keyword = str_dup(keyword);
+            ed->next = list;
+            list = ed;
+        }
+
+        editorPaste(ed->description);
+        return true;
+    }
+
+    if (is_name(command, "set")) {
+        char *desc = ed ? ed->description : str_empty;
+        if(!sedit(desc))
+            return false;
+
+        if (!ed) {
+            ed = new_extra_descr();
+            ed->keyword = str_dup(keyword);
+            ed->next = list;
+            list = ed;
+        }
+        
+        ed->description = desc;
+        
+        stc("Экстра-описание установлено.\n\r", ch);
+        return true;
+    }
+
+    if (is_name(command, "delete")) {
+        if (!ed) {
+            stc("Экстра-описание с таким ключом не найдено.\n\r", ch);
+            return false;
+        }
+
+        if (!ped)
+            list = ed->next;
+        else
+            ped->next = ed->next;
+
+        free_extra_descr(ed);
+
+        stc("Экстра-описание удалено.\n\r", ch);
+        return true;
+    }
+
+    findCommand(ch, cmd)->run(ch, "");
+    return false;
+}

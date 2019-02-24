@@ -34,7 +34,6 @@
 #include "mercdb.h"
 
 #include "redit.h"
-#include "tedit.h"
 #include "eeedit.h"
 #include "olc.h"
 #include "security.h"
@@ -97,47 +96,22 @@ OLCStateRoom::changed( PCharacter *ch )
  *-------------------------------------------------------------------------*/
 REDIT(flag)
 {
-    bitstring_t value;
     Room *pRoom;
-
     EDIT_ROOM(ch, pRoom);
-    
-    if(!*argument) {
-        stc("Usage flag <room_flag>\n\r", ch);
-        return false;
-    }
-    
-    if ((value = room_flags.bitstring( argument )) != NO_FLAG) {
-        TOGGLE_BIT(pRoom->room_flags, value);
-        stc("Room flag toggled.\n\r", ch);
-        return true;
-    }
-
-    stc("No such room flag. See `olchelp room' for possible values.\n\r", ch);
-    return false;
+    return flagBitsEdit(room_flags, pRoom->room_flags);
 }
 
 REDIT(sector)
 {
-    int value;
     Room *pRoom;
-    
     EDIT_ROOM(ch, pRoom);
-    
-    if(!*argument) {
-        stc("Usage: sector <sector_type>\n\r", ch);
-        return false;
-    }
-    
-    if ((value = sector_table.value( argument )) != NO_FLAG) {
-        pRoom->sector_type = value;
-        stc("Sector type set.\n\r", ch);
+
+    if (flagValueEdit(sector_table, pRoom->sector_type)) {
         if (IS_WATER(pRoom) && pRoom->liquid == liq_none)
             pRoom->liquid = liq_water;
         return true;
     }
 
-    stc("No such sector type. See `olchelp sector' for possible values.\n\r", ch);
     return false;
 }
 
@@ -279,16 +253,13 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     ptc(ch, "Name:       [{W%s{x]\n\rArea:       [{W%5d{x] %s\n\r",
               pRoom->name, pRoom->area->vnum, pRoom->area->name);
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
-    if(pRoom->clan != clan_none)
-        ptc(ch, "Clan:       [{W%s{x]\n\r", pRoom->clan->getName( ).c_str( ));
-    if (!pRoom->guilds.empty()) 
-        ptc(ch, "Guilds:     [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
-    if(pRoom->liquid != liq_none)
-        ptc(ch, "Liquid: [{W%s{x]\n\r", pRoom->liquid->getName( ).c_str( ));
-    ptc(ch, "Sector:     [{W%s{x]\n\r",
+    ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
+    ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
+    ptc(ch, "Sector:     [{W%s{x] {D(? sector_table){x ",
               sector_table.name(pRoom->sector_type).c_str());
+    ptc(ch, "Liquid: [{W%s{x] {D(? liquids){x\n\r", pRoom->liquid->getName( ).c_str( ));
         
-    ptc(ch, "Room flags: [{W%s{x]\n\r",
+    ptc(ch, "Room flags: [{W%s{x] {D(? room_flags){x\n\r",
               room_flags.names(pRoom->room_flags).c_str());
     ptc(ch, "Health recovery:[{W%d{x]\n\rMana recovery  :[{W%d{x]\n\r",
               pRoom->heal_rate_default, pRoom->mana_rate_default);
@@ -302,28 +273,22 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     if (pRoom->extra_descr) {
         EXTRA_DESCR_DATA *ed;
 
-        stc("Desc Kwds:  [{W", ch);
+        stc("Desc Kwds:  {W", ch);
         for (ed = pRoom->extra_descr; ed; ed = ed->next) {
-            stc(ed->keyword, ch);
-            if (ed->next)
-                stc(" ", ch);
+            ptc(ch, "[%s] ", ed->keyword);
         }
-        stc("{x]\n\r", ch);
+        stc("{x\n\r", ch);
     }
 
     if (pRoom->extra_exit) {
         EXTRA_EXIT_DATA *eed;
 
-        stc("Extra exits:[{W", ch);
+        stc("Extra exits: {W", ch);
         for(eed = pRoom->extra_exit; eed; eed = eed->next) {
-            stc(eed->keyword, ch);
-            if(eed->next)
-                stc(" ", ch);
+            ptc(ch, "[%s] ", eed->keyword);
         }
-        stc("{x]\n\r", ch);
+        stc("{x\n\r", ch);
     }
-    
-    /* XXX onDive */
     
     stc("Characters: [{W", ch);
     fcnt = false;
@@ -361,7 +326,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
             if(pexit->key > 0)
                 ptc(ch, "        Key: [{W%7u{x]\n\r", pexit->key);
             
-            ptc(ch, "        Exit flags: [{W%s{x]\n\r",
+            ptc(ch, "        Exit flags: [{W%s{x] {D(? exit_flags){x\n\r",
                       exit_flags.names(pexit->exit_info).c_str());
 
             ptc(ch, "        Default exit flags: [{W%s{x]\n\r", 
@@ -673,74 +638,10 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
 REDIT(ed)
 {
     Room *pRoom;
-    EXTRA_DESCR_DATA *ed;
-    char command[MAX_INPUT_LENGTH];
 
     EDIT_ROOM(ch, pRoom);
 
-    argument = one_argument(argument, command);
-
-    if (command[0] == '\0' || argument[0] == '\0') {
-        stc("Syntax:  ed set [keyword]\n\r", ch);
-        stc("         ed delete [keyword]\n\r", ch);
-        return false;
-    }
-
-    if (is_name(command, "set")) {
-        for (ed = pRoom->extra_descr; ed; ed = ed->next) {
-            if (is_name(argument, ed->keyword))
-                break;
-        }
-
-        char *desc = str_empty;
-
-        if(ed)
-            desc = ed->description;
-
-        if(!sedit(desc))
-            return false;
-
-        if (!ed) {
-            ed = new_extra_descr();
-            ed->keyword = str_dup(argument);
-            ed->next = pRoom->extra_descr;
-            pRoom->extra_descr = ed;
-        }
-        
-        ed->description = desc;
-        
-        stc("Extra description set.\n\r", ch);
-        return true;
-    }
-
-
-    if (is_name(command, "delete")) {
-        EXTRA_DESCR_DATA *ped = NULL;
-
-        for (ed = pRoom->extra_descr; ed; ed = ed->next) {
-            if (is_name(argument, ed->keyword))
-                break;
-            ped = ed;
-        }
-
-        if (!ed) {
-            stc("REdit:  Extra description keyword not found.\n\r", ch);
-            return false;
-        }
-
-        if (!ped)
-            pRoom->extra_descr = ed->next;
-        else
-            ped->next = ed->next;
-
-        free_extra_descr(ed);
-
-        stc("Extra description deleted.\n\r", ch);
-        return true;
-    }
-
-    findCommand(ch, "ed")->run(ch, "");
-    return false;
+    return extraDescrEdit(pRoom->extra_descr);
 }
 
 Room *
@@ -971,22 +872,6 @@ REDIT(eexit)
     return false;
 }
 
-REDIT(trap)
-{
-    Room *pRoom;
-    
-    EDIT_ROOM(ch, pRoom);
-    
-    if (!*argument || !is_number(argument)) {
-        stc("Syntax:  trap <index>\n\r", ch);
-        return false;
-    }
-
-    OLCStateTrap::Pointer tedp(NEW, pRoom, atoi(argument));
-    tedp->attach(ch);
-    return false;
-}
-
 REDIT(desc)
 {
     Room *pRoom;
@@ -995,34 +880,7 @@ REDIT(desc)
     EDIT_ROOM(ch, pRoom);
 
     argument = one_argument(argument, command);
-
-    if (command[0] == '\0') {
-        if(!sedit(pRoom->description))
-            return false;
-        stc("Description set\n\r", ch);
-        return true;
-    }
-
-    if (is_name(command, "copy")) {
-        DLString str = pRoom->description;
-        ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(str);
-        ptc(ch, "Описание скопировано в буфер.\r\n");
-        return true;
-    }
-
-    if (is_name(command, "paste")) {
-        DLString str = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
-        free_string(pRoom->description);
-        pRoom->description = str_dup(str.c_str( ));
-        ptc(ch, "Описание вставлено из буфера.\r\n");
-        return true;
-    }
-
-    stc("Syntax:\n\r", ch);
-    stc("    desc      : войти в редактор описаний\n\r", ch);
-    stc("    desc copy : скопировать описание в буфер\n\r", ch);
-    stc("    desc paste: заменить описание на то, что в буфере\n\r", ch);
-    return false;
+    return editor(command, pRoom->description);
 }
 
 REDIT(heal)

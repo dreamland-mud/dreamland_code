@@ -81,6 +81,17 @@ protected:
     void seditDone( );
 
     bool mapEdit( Properties &map, DLString &args );
+    bool flagBitsEdit(const FlagTable &table, int &field);
+    bool flagValueEdit(const FlagTable &table, int &field);
+    bool numberEdit(int minValue, int maxValue, int &field);
+    bool numberEdit(long minValue, long maxValue, long &field);
+    bool diceEdit(int *field);
+    bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
+    bool editorCopy(const DLString &original);
+    bool editorPaste(DLString &original);
+    bool editorPaste(char *&field);
+    bool editor(const char *command, DLString &original);
+    bool editor(const char *command, char *&field);
 
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;
@@ -104,7 +115,7 @@ public:
         }
 
     private:
-            virtual void run( PCharacter *pch, char *args )
+        virtual void run( PCharacter *pch, char *args )
         {
             state->lastCmd.setValue( getName( ) );
             state->lastArgs.setValue( args );

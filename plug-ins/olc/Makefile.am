@@ -15,7 +15,6 @@ sedit.cpp \
 aedit.cpp \
 medit.cpp \
 oedit.cpp \
-tedit.cpp \
 eeedit.cpp \
 mem.cpp \
 olc_act.cpp \
@@ -35,7 +34,6 @@ aedit.h \
 medit.h \
 sedit.h \
 oedit.h \
-tedit.h \
 eeedit.h \
 security.h \
 olcstate.h 
