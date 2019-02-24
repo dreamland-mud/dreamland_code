@@ -230,7 +230,7 @@ void TravellersJoySet::fight( Character *ch )
  * NorivaMyrvaleSet 
  *-------------------------------------------------------------------------*/
 NorivaMyrvaleSet::NorivaMyrvaleSet()
-                : EquipSet(11, false, false), sn(gsn_myrvale_noriva)
+                : EquipSet(12, false, false), sn(gsn_myrvale_noriva)
 {
 }
 
