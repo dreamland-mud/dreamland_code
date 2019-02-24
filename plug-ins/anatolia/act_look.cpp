@@ -145,6 +145,45 @@ static bool is_empty_descr( const char *arg )
 }
 
 /*
+ * Show long description for objects and mobiles, with 
+ * English names in brackets removed for screenreaders.
+ */
+DLString format_longdescr_to_char(const char *descr, Character *ch)
+{
+    if (ch->is_npc())
+        return descr;
+    
+    if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER))
+        return descr;
+
+    // Remove (keywords) and 1 preceding space.
+    ostringstream buf;
+    bool skipChar = false;
+    for (const char *d = descr; *d; d++) {
+        // Ignore extra space just before the ( bracket.
+        if (*d == ' ' && *(d+1) == '(') 
+            continue;
+        // Start ignoring everything after a ( bracket.
+        if (*d == '(' && isalpha(*(d+1))) {
+            skipChar = true;
+            continue;
+        }
+        // Stop ignoring once bracket is closed.
+        if (*d == ')' && skipChar) {
+            skipChar = false;
+            continue;
+        }
+        // Skip everything while inside the brackets.
+        if (skipChar)
+            continue;
+        // Normal output outside of brackets. 
+        buf << *d;
+    }
+
+    return buf.str();
+}
+
+/*
  * Show object on the floor or in inventory/equipment/container...
  */
 DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
@@ -227,7 +266,8 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             buf << fmt( ch, msg.c_str( ), obj, liq.c_str( ) );
         }
         else {
-            buf << "{" << CLR_OBJROOM(ch) << obj->getDescription( ) << "{x";
+            DLString longd = format_longdescr_to_char(obj->getDescription(), ch);
+            buf << "{" << CLR_OBJROOM(ch) << longd << "{x";
         }
     }
 
@@ -587,8 +627,9 @@ void show_char_to_char_0( Character *victim, Character *ch )
             && nVict->getLongDescr( ) 
             && nVict->getLongDescr( )[0])
         {
+            DLString longd = format_longdescr_to_char(nVict->getLongDescr(), ch);
             buf << "{" << CLR_MOB(ch);
-            webManipManager->decorateCharacter(buf, nVict->getLongDescr( ), victim, ch);
+            webManipManager->decorateCharacter(buf, longd, victim, ch);
             buf << "{x";
             show_char_blindness( ch, victim, buf );
             ch->send_to( buf);

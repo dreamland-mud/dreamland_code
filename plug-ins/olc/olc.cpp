@@ -54,6 +54,7 @@
 #include "def.h"
 
 
+DLString format_longdescr_to_char(const char *descr, Character *ch);
 GSN(enchant_weapon);
 GSN(enchant_armor);
 GSN(none);
@@ -1047,6 +1048,27 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         ch->println("Done marking limits.");
         return;
     }
+
+    if (arg == "screenreader") {
+        ostringstream buf;
+
+        SET_BIT(ch->config, CONFIG_SCREENREADER);
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+            buf << format_longdescr_to_char(pObj->description, ch) << "{x" << endl;
+        }
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            buf << pMob->long_descr << format_longdescr_to_char(pMob->long_descr, ch) << "{x" << endl;            
+        }
+
+        REMOVE_BIT(ch->config, CONFIG_SCREENREADER);
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
 
     if (arg == "mobname") {
         int cnt = 0, hcnt = 0, rcnt = 0;
