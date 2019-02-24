@@ -258,6 +258,6 @@ BigQuestRegistrator::~BigQuestRegistrator( )
 
 bool BigQuestRegistrator::applicable( PCharacter *ch, bool fAuto ) const
 {
-    return ch->is_immortal() || ch->getAttributes( ).isAvailable( "tester" );
+    return true;
 }
 
