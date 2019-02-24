@@ -88,7 +88,7 @@ protected:
     
 public:    
     int                group;
-    long        off_flags;
+    int        off_flags;
     int                damage[3];
     int                start_pos;
     int                default_pos;

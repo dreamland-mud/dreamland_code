@@ -89,8 +89,8 @@ public:
     char *        description;
     char *        owner;
     int                vnum;
-    long        room_flags;
-    long        room_flags_default;
+    int        room_flags;
+    int        room_flags_default;
     int                light;
     int                sector_type;
     int                heal_rate;
@@ -101,7 +101,7 @@ public:
     GlobalBitvector guilds;
     RoomHistory history;
     Affect        *affected;
-    long        affected_by;
+    int        affected_by;
     LiquidReference liquid;
     Properties properties;
 
