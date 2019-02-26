@@ -12,7 +12,7 @@
 
 using namespace Scripting;
 
-NMI_GET(IdContainer, fieldKeys, "") 
+NMI_GET(IdContainer, fieldKeys, "список полей структуры") 
 {
     RegList::Pointer rc(NEW);
 
@@ -27,12 +27,12 @@ NMI_GET(IdContainer, fieldKeys, "")
     return Register( obj );
 }
 
-NMI_INVOKE(IdContainer, size, "") 
+NMI_INVOKE(IdContainer, size, "(): размер структуры") 
 {
     return Register( (int)idmap.size( ) );
 }
 
-NMI_INVOKE(IdContainer, api, "") 
+NMI_INVOKE(IdContainer, api, "(): печатает этот api") 
 {
     Idmap::const_iterator i;
     ostringstream buf;

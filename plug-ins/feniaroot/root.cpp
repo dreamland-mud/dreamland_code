@@ -104,7 +104,7 @@ NMI_GET( Root, current_time, "текущее время в секундах")
     return Register((int)dreamland->getCurrentTime( ));
 }
 
-NMI_INVOKE( Root, getCurrentTime , "текущее время в секундах") 
+NMI_INVOKE( Root, getCurrentTime , "(): текущее время в секундах") 
 {
     return Register((int)dreamland->getCurrentTime( ));
 }
@@ -562,7 +562,7 @@ NMI_INVOKE(Root, wiznet, "(msg): выдать сообщение msg по wiznet
     return Register( );
 }
 
-NMI_INVOKE(Root, sync, "test for objects sync (системное)")
+NMI_INVOKE(Root, sync, "(): test for objects sync (системное)")
 {
     while(!Scripting::Object::manager->sync(0))
         ;
@@ -797,7 +797,7 @@ NMI_GET( Root, professions, "список всех профессий, дост�
     return Register( listObj );
 }
 
-NMI_INVOKE( Root, Profession, "(name): конструктор для профессии по имени" )
+NMI_INVOKE( Root, Profession, "(name): конструктор для профессии (класса) по имени" )
 {
     DLString name;
 

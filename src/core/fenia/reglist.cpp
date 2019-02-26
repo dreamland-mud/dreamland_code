@@ -72,7 +72,7 @@ XMLRegisterList::nodeFromXML( const XMLNode::Pointer& child)
 
 /* methods */
 
-NMI_INVOKE( RegList, forEach , "")
+NMI_INVOKE( RegList, forEach , "(func[,args]): выполняет для каждого элемента списка функцию с аргументами")
 {
     RegisterList::const_iterator ai = args.begin();
     
@@ -103,7 +103,7 @@ NMI_INVOKE( RegList, forEach , "")
 
 /* fields */
 
-NMI_GET( RegList, call , "")
+NMI_GET( RegList, call , "(): вызовет следующий после этого метод для каждого элемента списка")
 {
     RegListCall::Pointer rlc(NEW);
     

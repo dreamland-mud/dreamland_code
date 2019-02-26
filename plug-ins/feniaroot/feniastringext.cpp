@@ -18,26 +18,26 @@
 
 namespace Scripting {
 
-NMI_INVOKE(FeniaString, size, "")
+NMI_INVOKE(FeniaString, size, "(): длина строки")
 {
     return (int)size();
 }
 
-NMI_INVOKE(FeniaString, capitalize, "")
+NMI_INVOKE(FeniaString, capitalize, "(): перевести 1й символ в верхний регистр, остальные в нижний")
 {
     DLString str = *this;
     str.capitalize();
     return Register( str );
 }
 
-NMI_INVOKE(FeniaString, trim, "")
+NMI_INVOKE(FeniaString, trim, "(): обрезать лишние пробелы по бокам")
 {
     DLString str = *this;
     str.stripWhiteSpace();
     return Register( str );
 }
 
-NMI_INVOKE(FeniaString, strPrefix, "")
+NMI_INVOKE(FeniaString, strPrefix, "(str): true если эта строка - префикс str")
 {
     if (args.empty( ))
        throw Scripting::NotEnoughArgumentsException( );
@@ -47,7 +47,7 @@ NMI_INVOKE(FeniaString, strPrefix, "")
     return strPrefix( args.front( ).toString( ) );
 }
 
-NMI_INVOKE(FeniaString, ruscase, "")
+NMI_INVOKE(FeniaString, ruscase, "(case): строка в указанном падеже")
 {
     int cse = 1;
     
@@ -57,27 +57,27 @@ NMI_INVOKE(FeniaString, ruscase, "")
     return Register( ruscase( cse + '0' ) );
 }
 
-NMI_INVOKE(FeniaString, getOneArgument, "возвращает первое слово или первую фразу в кавычках")
+NMI_INVOKE(FeniaString, getOneArgument, "(): возвращает первое слово или первую фразу в кавычках")
 {
     DLString str = *this;
     return str.getOneArgument( );
 }
 
-NMI_INVOKE(FeniaString, cutOneArgument, "возвращает строку без первого слова (или без первой фразы в кавычках)")
+NMI_INVOKE(FeniaString, cutOneArgument, "(): возвращает строку без первого слова (или без первой фразы в кавычках)")
 {
     DLString str = *this;
     str.getOneArgument( );
     return str;
 }
 
-NMI_INVOKE(FeniaString, upperFirstChar, "Возвращает ту же  строку, но с большой буквы")
+NMI_INVOKE(FeniaString, upperFirstChar, "(): возвращает ту же строку, но с большой буквы")
 {
     DLString str = *this;
     str.upperFirstCharacter();
     return Register( str );
 }
 
-NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) заменяет в данной строке все вхождения $1..$9 на соответствующие совпадения") 
+NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str): заменяет в данной строке все вхождения $1..$9 на соответствующие совпадения") 
 {
     if (args.size() != 2)
         throw NotEnoughArgumentsException();
@@ -107,7 +107,7 @@ NMI_INVOKE(FeniaString, matchAndReplace, "(pattern, str) заменяет в д�
     return result;
 }
 
-NMI_INVOKE(FeniaString, matchGroups, "(pattern) возвращает все группы шаблона") 
+NMI_INVOKE(FeniaString, matchGroups, "(pattern): возвращает список (List) из всех групп шаблона") 
 {
     if (args.size() != 1)
         throw NotEnoughArgumentsException();
@@ -134,7 +134,7 @@ NMI_INVOKE(FeniaString, matchGroups, "(pattern) возвращает все гр
     return Register(sobj);
 }
 
-NMI_INVOKE(FeniaString, match, "")
+NMI_INVOKE(FeniaString, match, "(regex): true если строка соответствует этому регулярному выражению")
 {
     if (args.empty())
         throw NotEnoughArgumentsException();
@@ -148,7 +148,7 @@ NMI_INVOKE(FeniaString, match, "")
     }
 }
 
-NMI_INVOKE(FeniaString, matchCase, "")
+NMI_INVOKE(FeniaString, matchCase, "(regex): true если строка соответствует этому регулярному выражению с учетом регистра")
 {
     if (args.empty())
         throw NotEnoughArgumentsException();
@@ -162,7 +162,7 @@ NMI_INVOKE(FeniaString, matchCase, "")
     }
 }
 
-NMI_INVOKE(FeniaString, isName, "")
+NMI_INVOKE(FeniaString, isName, "(arg): является ли слова из arg одними из полных слов в строке")
 {
     if (args.empty())
         throw NotEnoughArgumentsException();
@@ -170,7 +170,7 @@ NMI_INVOKE(FeniaString, isName, "")
     return isName( args.front().toString().c_str() );
 }
 
-NMI_INVOKE(FeniaString, is_name, "")
+NMI_INVOKE(FeniaString, is_name, "(arg): являются ли слова из arg подсловами в строке")
 {
     if (args.empty())
         throw NotEnoughArgumentsException();
@@ -187,7 +187,7 @@ NMI_INVOKE(FeniaString, is_name, "")
     return is_name( l, r );
 }
 
-NMI_INVOKE(FeniaString, substr, "возвращает подстроку, первый аргумент - смещение относительно начала, второй - длина подстроки, по умолчанию - до конца")
+NMI_INVOKE(FeniaString, substr, "(offset[,length]): возвращает подстроку начинающуюся с offset длины length или до конца")
 {
     if (args.empty())
         throw NotEnoughArgumentsException();
@@ -208,7 +208,7 @@ NMI_INVOKE(FeniaString, substr, "возвращает подстроку, пер
     }
 }
 
-NMI_INVOKE(FeniaString, stripColour, "")
+NMI_INVOKE(FeniaString, stripColour, "(): удаляет все символы цвета")
 {
     DLString rc;
     
@@ -226,7 +226,7 @@ NMI_INVOKE(FeniaString, stripColour, "")
 }
 
 
-NMI_INVOKE(FeniaString, contains, "")
+NMI_INVOKE(FeniaString, contains, "(words): true если эта строка содержит одно из слов из строки words")
 {
     char strbuf[size( )];
     char *p_strbuf = strbuf;
@@ -248,7 +248,7 @@ NMI_INVOKE(FeniaString, contains, "")
     return false;
 }
 
-NMI_INVOKE(FeniaString, split, "параметр - разделитель. возвращает List из подстрок")
+NMI_INVOKE(FeniaString, split, "(sep): возвращает List из подстрок, разбитых по разделителю sep")
 {
     char delim;
     size_type pos1, pos2;
@@ -279,7 +279,7 @@ NMI_INVOKE(FeniaString, split, "параметр - разделитель. во�
     return Register(obj);
 }
 
-NMI_INVOKE(FeniaString, api, "")
+NMI_INVOKE(FeniaString, api, "(): печатает этот api")
 {
     ostringstream buf;
     
@@ -287,7 +287,7 @@ NMI_INVOKE(FeniaString, api, "")
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(FeniaString, format, "превращает строку в абзац заданной ширины")
+NMI_INVOKE(FeniaString, format, "(width): превращает строку в абзац заданной ширины")
 {
     int width;
     ostringstream os;
@@ -304,7 +304,7 @@ NMI_INVOKE(FeniaString, format, "превращает строку в абзац
 }
 
 
-NMI_INVOKE(FeniaString, replace, "заменяет все вхождения первой подстроки на вторую")
+NMI_INVOKE(FeniaString, replace, "(s1,s2): заменяет все вхождения первой подстроки на вторую")
 {
     DLString aStr, bStr;
     RegisterList::const_iterator iter;
@@ -321,7 +321,7 @@ NMI_INVOKE(FeniaString, replace, "заменяет все вхождения п�
     return r;
 }
 
-NMI_INVOKE(FeniaString, isRussian, "возвращает true если строка не пуста и содержит только русские буквы")
+NMI_INVOKE(FeniaString, isRussian, "(): возвращает true если строка не пуста и содержит только русские буквы")
 {
     if (empty( ))
         return false;
@@ -332,7 +332,7 @@ NMI_INVOKE(FeniaString, isRussian, "возвращает true если стро�
 
     return true;
 }
-NMI_INVOKE(FeniaString, toLower, "")
+NMI_INVOKE(FeniaString, toLower, "(): переводит всю строку в нижний регистр")
 {
     DLString s = *this;
     for( DLString::size_type pos = 0; pos < s.length( ); pos++ )
