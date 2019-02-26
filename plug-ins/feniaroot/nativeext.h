@@ -30,11 +30,7 @@ void traitsAPIAux( ostringstream &buf )
     for ( ; list; list = list->getNext()) {
         const string &name = list->getKey().name;
         const string &help = list->getVal().help;
-
-        if (help.size() > 0 && help.at(0) == '(')
-            buf << "{g" << name << "{w" << help << endl;
-        else
-            buf << "{g" << name << "{w: " << help << endl;
+        buf << "{g" << setiosflags(ios::left) << setw(20) << name << "{w" << resetiosflags(ios::left) << help << endl;
     }
 }
 
