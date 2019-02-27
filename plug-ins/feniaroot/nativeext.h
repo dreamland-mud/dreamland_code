@@ -8,7 +8,10 @@
 #include <sstream>
 #include <iomanip>
 
+#include "logstream.h"
 #include "native.h"
+#include "dlfilestream.h"
+#include "dreamland.h"
 
 using namespace std;
 
@@ -68,6 +71,52 @@ void traitsAPI( ostringstream &buf )
 
     buf << endl << "{WМетоды: {x" << endl;
     traitsAPIAux<typename Traits::Invoke>( buf );
+}
+
+/** 
+ * Save API output for this wrapper to one or two files, in the form of HTML table rows.
+ * TODO HTML-escaping
+ */
+template <typename T>
+void traitsAPIDump(const DLString &prefix, bool showFieldStatus, bool methodsSeparately)
+{
+    typedef NativeTraits<T> Traits;
+    ostringstream fbuf, mbuf;
+    DLDirectory dir(dreamland->getMiscDir(), "api");
+
+    {
+        API api;
+
+        traitsAPIAux<typename Traits::Get>( api, true );
+        traitsAPIAux<typename Traits::Set>( api, false );
+        for (API::const_iterator a = api.begin(); a != api.end(); a++) {
+            fbuf << "<tr><td>"; 
+            if (showFieldStatus)
+                fbuf << (a->second.readOnly ? "ro":"rw") << "</td><td>";
+            fbuf << a->first << "</td><td>" << a->second.help << "</td></tr>";
+        }
+    }
+    {
+        API api;
+
+        traitsAPIAux<typename Traits::Invoke>( api, false );
+        for (API::const_iterator a = api.begin(); a != api.end(); a++)
+            mbuf << "<tr><td>" << a->first << "</td><td>" << a->second.help << "</td></tr>";
+    }
+    
+    try {
+        if (methodsSeparately) {
+            DLFileStream(dir, prefix + "_methods").fromString(mbuf.str());
+            DLFileStream(dir, prefix + "_fields").fromString(fbuf.str());
+        } else {
+            fbuf << mbuf.str();
+            DLFileStream(dir, prefix + "_fields").fromString(fbuf.str());
+        }
+
+    } catch (const ExceptionDBIO &ex) {
+        LogStream::sendError() << "Error writing API: " << ex.what() << endl;
+        return;
+    }
 }
 
 }
