@@ -222,6 +222,9 @@ bool oprog_get( Object *obj, Character *ch )
     FENIA_CALL( obj, "Get", "C", ch );
     FENIA_NDX_CALL( obj, "Get", "OC", obj, ch );
     BEHAVIOR_VOID_CALL( obj, get, ch );
+    
+    if (obj->extracted)
+        return true;
 
     switch (obj->item_type) {
     case ITEM_MONEY:

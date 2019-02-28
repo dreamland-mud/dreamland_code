@@ -18,9 +18,12 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "affect.h"
+#include "skillcommand.h"
 
 #include "handler.h"
 #include "act.h"
+#include "onehit_weapon.h"
+#include "damage_impl.h"
 #include "fight.h"
 #include "magic.h"
 #include "gsn_plugin.h"
@@ -486,6 +489,71 @@ void RavenQueenGod::tattooFight( Object *obj, Character *ch ) const
     // Cast random spell out of available ones. 
     ch->println("{rТатуировка на твоем плече загорается красным светом.{x");
     int random_spell = spells[number_range(0, spells.size() - 1)];
-    spell(random_spell, ch->getModifyLevel(), ch, victim);
+    int level_bonus = season_winter() ? 10 : 0;
+    spell(random_spell, ch->getModifyLevel() + level_bonus, ch, victim);
+}
+
+class TricksterGodOneHit: public WeaponOneHit, public SkillDamage {
+public:
+    TricksterGodOneHit( Character *ch, Character *victim );
+    
+    virtual void calcDamage( );
+};
+
+TricksterGodOneHit::TricksterGodOneHit( Character *ch, Character *victim )
+            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
+              SkillDamage( ch, victim, gsn_knife, 0, 0, DAMF_WEAPON )
+{
+}
+
+void TricksterGodOneHit::calcDamage( )
+{
+    damBase( );
+    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyPosition( );
+    dam = (ch->getModifyLevel( ) / 30 + 1) * dam + ch->getModifyLevel( );
+    damApplyDamroll( );
+    damApplyCounter( );
+
+    WeaponOneHit::calcDamage( );
+}
+
+void ErevanGod::tattooFight( Object *obj, Character *ch ) const 
+{
+    Character *victim = ch->fighting;
+    if (!victim)
+        return;
+   
+    // Chance 1 in 8 of getting a heal. 
+    if (ch->hit < ch->max_hit && chance(12)) {
+        ch->println("{CТатуировка на твоем плече загорается голубым светом.{x");
+        spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch);
+        return; 
+    }
+
+    if (!IS_AFFECTED(ch, AFF_HASTE) && chance(50)) {
+        spell(gsn_haste, ch->getModifyLevel(), ch, ch );
+        ch->println("{WТы внезапно ощущаешь повышенную активность!{x");
+        return;
+    }
+
+    // Chance 1 in 10-12 of casting a spell (disregard haste).
+    if (chance(10)) {
+        spell(gsn_colour_spray, ch->getModifyLevel(), ch, victim);
+        return;
+    }
+
+    // Chance 1 in 25 of additional hit.
+    if (chance(15)) {
+        try {
+            TricksterGodOneHit thit(ch, victim);
+            act("{CЭреван Илесир внезапно вселяется в тебя.{x", ch, 0, 0, TO_CHAR);
+            act("{CЭреван Илесир внезапно вселяется в $c4.{x", ch, 0, 0, TO_ROOM);
+            thit.hit();
+            do_yell(victim, "Помогите! Эреван Илесир пыряет меня ножом!");
+        }
+        catch (const VictimDeathException &e) {
+        }
+    }
 }
 

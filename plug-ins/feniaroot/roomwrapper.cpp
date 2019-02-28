@@ -82,23 +82,22 @@ Room * RoomWrapper::getTarget( ) const
 }
 
 
-#define GETWRAP(x) NMI_GET(RoomWrapper, x, "") { \
+#define GETWRAP(x, h) NMI_GET(RoomWrapper, x, h) { \
     checkTarget(); \
     return WrapperManager::getThis( )->getWrapper(target->x); \
 }
 
-GETWRAP( next )
-GETWRAP( rnext )
-GETWRAP( contents )
-GETWRAP( people )
+GETWRAP( rnext, "указывает на след. комнату в глобальном списке .room_list" )
+GETWRAP( contents, "указывает на первый предмет на полу комнаты" )
+GETWRAP( people, "указывает на первого чара в комнате" )
 
-NMI_GET( RoomWrapper, vnum , "")
+NMI_GET( RoomWrapper, vnum , "номер комнаты в арии")
 {
     checkTarget( );
     return Register( target->vnum );
 }
 
-NMI_GET( RoomWrapper, name , "")
+NMI_GET( RoomWrapper, name , "название комнаты")
 {
     checkTarget( );
     return Register( target->name );
@@ -146,55 +145,55 @@ NMI_GET( RoomWrapper, items, "список (List) всех предметов н
     return Register( sobj );
 }
 
-NMI_GET( RoomWrapper, sector_type , "")
+NMI_GET( RoomWrapper, sector_type , "значение типа местности (таблица .sector_table)")
 {
     checkTarget( );
     return Register( target->sector_type );
 }
 
-NMI_GET( RoomWrapper, affected_by, "" )
+NMI_GET( RoomWrapper, affected_by, "биты аффектов на комнате (таблица .tables.affect_flags)" )
 {
     checkTarget( );
     return (int)target->affected_by;
 }
 
-NMI_SET( RoomWrapper, affected_by, "" )
+NMI_SET( RoomWrapper, affected_by, "биты аффектов на комнате (таблица .tables.affect_flags)" )
 {
     checkTarget( );
     target->affected_by = arg.toNumber();
 }
 
-NMI_GET( RoomWrapper, room_flags, "" )
+NMI_GET( RoomWrapper, room_flags, "флаги комнаты (таблица .tables.room_flags)" )
 {
     checkTarget( );
     return (int)target->room_flags;
 }
 
-NMI_SET( RoomWrapper, room_flags, "" )
+NMI_SET( RoomWrapper, room_flags, "флаги комнаты (таблица .tables.room_flags)" )
 {
     checkTarget( );
     target->room_flags = arg.toNumber();
 }
 
-NMI_GET( RoomWrapper, light, "" )
+NMI_GET( RoomWrapper, light, "количество источников света в комнате" )
 {
     checkTarget( );
     return (int)target->light;
 }
 
-NMI_GET( RoomWrapper, description, "" )
+NMI_GET( RoomWrapper, description, "описание комнаты" )
 {
     checkTarget( );
     return Register( target->description );
 }
 
-NMI_SET( RoomWrapper, light, "" )
+NMI_SET( RoomWrapper, light, "количество источников света в комнате" )
 {
     checkTarget( );
     target->light = arg.toNumber();
 }
 
-NMI_GET( RoomWrapper, clan, "какому клану принадлежит комната" )
+NMI_GET( RoomWrapper, clan, "имя клана, которому принадлежит комната" )
 {
     checkTarget();
     return Register( target->clan->getShortName( ) );
@@ -261,7 +260,7 @@ NMI_GET( RoomWrapper, down, "комната вниз отсюда или null")
  * METHODS
  */
 
-NMI_INVOKE( RoomWrapper, exits, "(ch) список номеров всех выходов для этого персонажа")
+NMI_INVOKE( RoomWrapper, exits, "(ch): список номеров всех доступных выходов для персонажа ch")
 {
     RegList::Pointer list(NEW);
     
@@ -285,7 +284,7 @@ NMI_INVOKE( RoomWrapper, exits, "(ch) список номеров всех вы�
     return Register( listObj );
 }
 
-NMI_INVOKE(RoomWrapper, doorTo, "(room) вернет номер двери, ведущей из этой комнаты в указанную" )
+NMI_INVOKE(RoomWrapper, doorTo, "(room): номер двери, ведущей из этой комнаты в room" )
 {
     Room *room;
     
@@ -302,7 +301,7 @@ NMI_INVOKE(RoomWrapper, doorTo, "(room) вернет номер двери, ве
     return -1;
 }
 
-NMI_INVOKE( RoomWrapper, getRoom, "(имя или номер выхода) вернет комнату по этому направлению" )
+NMI_INVOKE( RoomWrapper, getRoom, "(имя или номер выхода): комната по этому направлению" )
 {
     int door;
     
@@ -311,31 +310,31 @@ NMI_INVOKE( RoomWrapper, getRoom, "(имя или номер выхода) ве�
     return get_direction( target, door );
 }
 
-NMI_INVOKE( RoomWrapper, getRevDoor, "" )
+NMI_INVOKE( RoomWrapper, getRevDoor, "(имя или номер выхода): вернет номер противоположного направления" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].rev;
 }
 
-NMI_INVOKE( RoomWrapper, doorNumber, "" )
+NMI_INVOKE( RoomWrapper, doorNumber, "(имя выхода): вернет номер выхода" )
 {
     checkTarget( );
     return get_door_argument( args );
 }
 
-NMI_INVOKE( RoomWrapper, dirMsgLeave, "" )
+NMI_INVOKE( RoomWrapper, dirMsgLeave, "(имя или номер выхода): сообщение при уходе через этот выход (на север, на восток)" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].leave;
 }
 
-NMI_INVOKE( RoomWrapper, dirMsgEnter, "" )
+NMI_INVOKE( RoomWrapper, dirMsgEnter, "(имя или номер выхода): сообщение при заходе через этот выход (с юга, с запада)" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].enter;
 }
 
-NMI_INVOKE( RoomWrapper, getExitFlags, "" )
+NMI_INVOKE( RoomWrapper, getExitFlags, "(имя или номер выхода): флаги этого выхода (таблица .tables.exit_flags)" )
 {
     EXIT_DATA *pExit;
     
@@ -360,28 +359,28 @@ static void update_door_flags( Room *room, const RegisterList &args, int flags, 
     }
 }
 
-NMI_INVOKE(RoomWrapper, close, "закрыть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, close, "(имя или номер выхода): закрыть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, open, "открыть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, open, "(имя или номер выхода): открыть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, false ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, lock, "запереть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, lock, "(имя или номер выхода): запереть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, unlock, "отпереть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, unlock, "(имя или номер выхода): отпереть дверь по указанному направлению")
 {
     checkTarget( );
     update_door_flags( target, args, EX_LOCKED, false ); 
@@ -389,19 +388,19 @@ NMI_INVOKE(RoomWrapper, unlock, "отпереть дверь по указанн
 }
 
 
-NMI_INVOKE(RoomWrapper, isDark, "" )
+NMI_INVOKE(RoomWrapper, isDark, "(): true если в комнате темно" )
 {
     checkTarget( );
     return Register( target->isDark( ) );
 }
 
-NMI_INVOKE(RoomWrapper, isCommon, "" )
+NMI_INVOKE(RoomWrapper, isCommon, "(): true если комната доступна всем (т.е. не приватная/клановая/newbie-only/...)" )
 {
     checkTarget( );
     return Register( target->isCommon( ) );
 }
 
-NMI_INVOKE(RoomWrapper, zecho, "сообщение для всех в этой арии" )
+NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg для всех в этой арии" )
 {
     Character *wch;
     const char *msg;
@@ -420,7 +419,7 @@ NMI_INVOKE(RoomWrapper, zecho, "сообщение для всех в этой �
     return Register( );
 }
 
-NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum) поиск объекта в комнате по его внуму" )
+NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum): поиск первого объекта в комнате по его внуму" )
 {
     int vnum;
     ::Object *obj;
@@ -439,7 +438,7 @@ NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum) поиск объекта в ко�
     return Register( );
 }
 
-NMI_INVOKE(RoomWrapper, get_obj_type, "(type) поиск объекта в комнате по его типу, item type" )
+NMI_INVOKE(RoomWrapper, get_obj_type, "(type): поиск первого объекта в комнате по его типу (таблица .tables.item_table)" )
 {
     checkTarget( );
 
@@ -450,7 +449,7 @@ NMI_INVOKE(RoomWrapper, get_obj_type, "(type) поиск объекта в ко�
     return WrapperManager::getThis( )->getWrapper(obj); 
 }
 
-NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объектов в комнате по внуму" )
+NMI_INVOKE( RoomWrapper, list_obj_vnum, "(vnum): поиск списка объектов в комнате по внуму" )
 {
     checkTarget( );
     RegList::Pointer rc(NEW);
@@ -467,7 +466,7 @@ NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объекто�
     return Register( sobj );
 }
 
-NMI_INVOKE(RoomWrapper, get_mob_vnum, "поиск моба в комнате по его внуму" )
+NMI_INVOKE(RoomWrapper, get_mob_vnum, "(vnum): поиск первого моба в комнате по его внуму" )
 {
     int vnum;
     Character *rch;
@@ -486,7 +485,7 @@ NMI_INVOKE(RoomWrapper, get_mob_vnum, "поиск моба в комнате п�
     return Register( );
 }
 
-NMI_INVOKE( RoomWrapper, list_mob_vnum, "поиск списка мобов в комнате по внуму" )
+NMI_INVOKE( RoomWrapper, list_mob_vnum, "(vnum): поиск списка мобов в комнате по внуму" )
 {
     checkTarget( );
     RegList::Pointer rc(NEW);
@@ -598,7 +597,7 @@ struct PathToTargetComplete {
     RegList::Pointer rooms;
 };
 
-NMI_INVOKE( RoomWrapper, traverse, "depth, walker, sectorsAllow, sectorsDeny" )
+NMI_INVOKE( RoomWrapper, traverse, "(depth, walker, sectorsAllow, sectorsDeny): построит путь (список комнат) для чара walker глубины depth, с разрешенными-запрещенными типами местности в виде битовых масок" )
 {
     bitstring_t sectorsAllow, sectorsDeny;
     int depth;
@@ -628,7 +627,7 @@ NMI_INVOKE( RoomWrapper, traverse, "depth, walker, sectorsAllow, sectorsDeny" )
     return Scripting::Register( obj );
 }
 
-NMI_INVOKE( RoomWrapper, traverseTo, "target, walker, sectorsAllow, sectorsDeny" )
+NMI_INVOKE( RoomWrapper, traverseTo, "(target, walker, sectorsAllow, sectorsDeny): построит путь до цели target для чара walker, с разрешенными-запрещенными типами местности в виде битовых масок" )
 {
     bitstring_t sectorsAllow, sectorsDeny;
     Room *targetRoom;
@@ -675,21 +674,21 @@ NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, ко�
     return Register( obj );
 }    
 
-NMI_INVOKE( RoomWrapper, api, "печатает этот API" )
+NMI_INVOKE( RoomWrapper, api, "(): печатает этот API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<RoomWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( RoomWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( RoomWrapper, rtapi, "(): печатает все поля и методы, установленные в runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( RoomWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( RoomWrapper, clear, "(): очистка всех runtime полей" )
 {
     guts.clear( );
     self->changed();

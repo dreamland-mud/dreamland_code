@@ -226,20 +226,20 @@ void KidnapQuest::destroyBandits( )
     destroyMobiles<KidnapBandit>( );
 }
 
-KidnapQuestRegistrator * KidnapQuest::getReg( )
+KidnapQuestRegistrator * KidnapQuest::getReg( ) const
 {
     return KidnapQuestRegistrator::getThis( );                         
 }
 
-KidnapScenario & KidnapQuest::getScenario( )
+const KidnapScenario & KidnapQuest::getScenario( ) const
 {
-    return *(getReg( )->getScenario( scenName ).getStaticPointer<KidnapScenario>( ));
+    return *(getReg()->getMyScenario<KidnapScenario>(scenName));
 }
 
 Room * KidnapQuest::findRefuge( PCharacter *hero, NPCharacter *king ) 
 {
     RoomList rooms;
-    KidnapScenario &scenario = getScenario( );
+    const KidnapScenario &scenario = getScenario( );
     
     if (!scenario.refuges.empty( )) 
         findClientRooms( hero, rooms, scenario.refuges );

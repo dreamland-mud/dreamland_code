@@ -57,114 +57,83 @@ int skill_table;
 int wearloc_table;
 int liq_table;
 int mat_table;
+int group_table;
+int race_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
 {
-    {"area", &area_flags, "Аттрибуты арий."},
-    {"room", &room_flags, "Аттрибуты комнат."},
-    {"sector", &sector_table, "Типы земель, секторов."},
-    {"exit", &exit_flags, "Флаги выходов и экстравыходов."},
-    {"type", &item_table, "Типы предметов."},
-    {"extra", &extra_flags, "Аттрибуты предметов."},
-    {"trap", &trap_flags, "Флаги ловушек."},
-    {"detecion", &detect_flags, "Детекты."},
-    {"wear", &wear_flags, "Куда одевать предмет."},
-    {"spec", &spec_table, "Доступные спец. программы."},
-    {"sex", &sex_table, "Пол."},
-    {"act", &act_flags, "Аттрибуты монстров."},
-    {"affect", &affect_flags, "Влияния на монстрах."},
-    {"wear-loc", &wearloc_table, "Куда монстры одевают предметы."},
-    {"spells", &skill_table, "Имена текущих заклинаний."},
-    {"weapon", &weapon_flags, "Типы оружия."},
-    {"container", &container_flags, "Статус контейнеров."},
+    {"{YАрии{x", NULL, NULL },
+    {"area_flags", &area_flags, "Флаги арий (поле area_flag)"},
 
-    {"armor", &ac_type, "Защита от разных атак."},
-    {"apply", &apply_flags, "Apply флаги"},
-    {"affwhere", &affwhere_flags, "where флаги (TO_XXX)"},
-    {"form", &form_flags, "Формы тела монстров."},
-    {"part", &part_flags, "Части тела монстров."},
-    {"imm", &imm_flags, "Иммунитеты монстров."},
-    {"res", &res_flags, "Сопротивляемость монстров."},
-    {"vuln", &vuln_flags, "Уязвимость монстров."},
-    {"off", &off_flags, "Типы поведения монстров."},
-    {"size", &size_table, "Размеры монстров."},
-    {"position", &position_table, "Позиции монстров."},
-    {"material", &mat_table, "Материалы." },
-    {"wclass", &weapon_class, "Класс оружия."},
-    {"wtype", &weapon_type2, "Специальные типы оружия."},
-    {"portal", &portal_flags, "Типы порталов."},
-    {"furniture", &furniture_flags, "Типы диванов и лежаков."},
-    {"liquid", &liq_table, "Жидкости"},
-    {"drink", &drink_flags, "Емкости для жидкостей"},
-    {"recipe", &recipe_flags, "Рецепты."},
+    {"{YКомнаты{x", NULL, NULL},
+    {"room_flags", &room_flags, "Флаги комнат (поле room_flags)."},
+    {"sector_table", &sector_table, "Тип местности в комнате (поле sector_type)."},
+    {"exit_flags", &exit_flags, "Флаги выходов и экстравыходов (поле exit_info)."},
+
+    {"{YПредметы{x", NULL, NULL},
+    {"item_table", &item_table, "Типы предметов (поле item_type)."},
+    {"wear_flags", &wear_flags, "Куда одевать предмет (поле wear_flags)."},
+    {"extra_flags", &extra_flags, "Флаги предметов (поле extra_flags)."},
+    {"weapon_class", &weapon_class, "Вид оружия (поле value0 у оружия)."},
+    {"weapon_flags", &weapon_flags, "Типы ударов (поле value3 у оружия, поле dam_type у моба)."},
+    {"weapon_type2", &weapon_type2, "Флаги оружия (поле value4 у оружия)."},
+    {"container_flags", &container_flags, "Флаги контейнеров (поле value1 у контейнера)."},
+    {"portal_flags", &portal_flags, "Флаги порталов (поле value2 у порталов)."},
+    {"furniture_flags", &furniture_flags, "Флаги мебели (поле value2 у мебели)."},
+    {"drink_flags", &drink_flags, "Флаги емкости для жидкостей (поле value3)."},
+    {"recipe_flags", &recipe_flags, "Флаги рецептов (поле value0 у рецепта)"},
+    {"liquid", &liq_table, "Жидкости (поле value2 у емкостей и фонтанов)."},
+    {"material", &mat_table, "Материалы предметов и мобов (поле material)." },
+
+    {"{YМобы{x", NULL, NULL},
+    {"races", &race_table, "Список всех рас мобов."},
+    {"sex_table", &sex_table, "Пол моба (поле sex)."},
+    {"position_table", &position_table, "Позиции мобов (поля start_pos, default_pos, position)."},
+    {"size_table", &size_table, "Размеры мобов (поле size)."},
+    {"ac_type", &ac_type, "Класс брони на мобах и аффектах."},
+    {"act_flags", &act_flags, "Аттрибуты мобов (поле act)."},
+    {"affect_flags", &affect_flags, "Влияния на мобах (поле affected_by)."},
+    {"detect_flags", &detect_flags, "Детекты моба (поле detection)."},
+    {"imm_flags", &imm_flags, "Иммунитеты мобов (поле imm_flags)."},
+    {"res_flags", &res_flags, "Сопротивляемость мобов (поле res_flags)."},
+    {"vuln_flags", &vuln_flags, "Уязвимость мобов (поле vuln_flags)."},
+    {"off_flags", &off_flags, "Типы поведения мобов (поле off_flags)."},
+    {"form_flags", &form_flags, "Формы тела мобов (поле form)."},
+    {"part_flags", &part_flags, "Части тела мобов (поле parts)."},
+    {"spec", &spec_table, "Доступные спец. программы моба."},
+
+    {"{YАффекты{x", NULL, NULL},
+    {"apply_flags", &apply_flags, "Поле location у аффекта (на что влияет его modifier)"},
+    {"affwhere_flags", &affwhere_flags, "Поле where у аффекта (на что влияет его bitvector)"},
+    {"wearloc", &wearloc_table, "Куда мобы одевают предметы."},
+
+    {"{YУмения и заклинания{x", NULL, NULL}, 
+    {"spells", &skill_table, "Имена всех заклинаний."},
+    {"groups", &group_table, "Все группы умений (для поля practicer)."},
     {NULL, NULL, NULL}
 };
 
-/*****************************************************************************
- Name:          show_flag_cmds
- Purpose:       Displays settable flags and stats.
- Called by:     show_help(olc_act.c).
- ****************************************************************************/
-void show_flag_cmds(Character * ch, const FlagTable *flag_table)
+void show_flag_cmds(Character * ch, const FlagTable *table)
 {
-    char buf[MAX_STRING_LENGTH];
-    char buf1[MAX_STRING_LENGTH];
-    int flag;
-    int col;
+    ostringstream buf;
+    const DLString &tableName = FlagTableRegistry::getName(table);
+    
+    buf << "Таблица " << (table->enumerated ? "значений" : "флагов")
+        << " {Y" << tableName << "{x" << endl
+        << "Значение        : Пояснение" << endl;
+   
+    const FlagTable::Field * f = table->fields; 
+    for (int i = 0; i < table->size; i++)
+        buf << dlprintf("{g%-15s{x: %s", 
+                        f[i].name, 
+                       (f[i].message ? russian_case(f[i].message, '1').c_str() : ""))
+            << endl;
 
-    buf1[0] = '\0';
-    col = 0;
-    for (flag = 0; flag < flag_table->size; flag++) {
-        sprintf(buf, "%-19s", flag_table->fields[flag].name);
-        strcat(buf1, buf);
-        if (++col % 4 == 0)
-            strcat(buf1, "\n\r");
-    }
-    if (col % 4 != 0)
-        strcat(buf1, "\n\r");
-    stc(buf1, ch);
+    ch->send_to(buf);
 }
 
-/*****************************************************************************
- Name:          show_skill_cmds
- Purpose:       Displays all skill functions.
-                Does remove those damn immortal commands from the list.
-                Could be improved by:
-                (1) Adding a check for a particular class.
-                (2) Adding a check for a level range.
- Called by:     show_help(olc_act.c).
- ****************************************************************************/
-void show_skill_cmds(Character * ch, int tar)
-{
-    char buf[MAX_STRING_LENGTH];
-    char buf1[MAX_STRING_LENGTH * 2];
-    int sn;
-    int col;
-
-    buf1[0] = '\0';
-    col = 0;
-    for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-        Skill *skill = SkillManager::getThis( )->find( sn );
-        Spell::Pointer spell = skill->getSpell( );
-
-        if (!spell)
-            continue;
-        
-        if (tar == -1 || IS_SET( spell->getTarget( ), tar )) {
-            sprintf(buf, "%-19s", skill->getName( ).c_str( ));
-            strcat(buf1, buf);
-            if (++col % 4 == 0)
-                strcat(buf1, "\n\r");
-        }
-    }
-
-    if (col % 4 != 0)
-        strcat(buf1, "\n\r");
-    stc(buf1, ch);
-}
-
-void show_skill_affects(Character *ch)
+void show_skills(Character *ch, int target)
 {
     ostringstream buf;
     int sn;
@@ -176,6 +145,10 @@ void show_skill_affects(Character *ch)
         AffectHandler::Pointer aff = skill->getAffect( );
 
         if (!spell || !aff)
+            continue;
+        if (target != -1 && !spell)
+            continue;
+        if (target != -1 && !IS_SET(spell->getTarget(), target))
             continue;
 
         buf << fmt( 0, "{g%-20s{x: %-20s %-10s %s\n\r",
@@ -190,11 +163,6 @@ void show_skill_affects(Character *ch)
 
 
 
-/*****************************************************************************
- Name:          show_spec_cmds
- Purpose:       Displays settable special functions.
- Called by:     show_help(olc_act.c).
- ****************************************************************************/
 void show_spec_cmds(Character * ch)
 {
     char buf[MAX_STRING_LENGTH];
@@ -257,14 +225,8 @@ void show_liq_cmds(Character * ch)
     page_to_char(buf.str( ).c_str( ), ch);
 }
 
-/*****************************************************************************
- Name:          show_help
- Purpose:       Displays help for many tables used in OLC.
- Called by:     olc interpreters.
- ****************************************************************************/
 bool show_help(Character * ch, const char *cargument)
 {
-    char buf[MAX_STRING_LENGTH];
     char argumentBuf[MAX_STRING_LENGTH];
     char *argument = argumentBuf;
     char arg[MAX_INPUT_LENGTH];
@@ -277,14 +239,16 @@ bool show_help(Character * ch, const char *cargument)
 
     /* Display syntax. */
     if (arg[0] == '\0') {
-        stc("Синтаксис: ? [комманда]\n\r\n\r", ch);
-        stc("[комманда]  [описание]\n\r", ch);
+        ostringstream buf;
+        buf << "Таблица             : Пояснение" << endl;
         for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
-            sprintf(buf, "%-10s -%s\n\r",
-                      DLString(help_table[cnt].command).capitalize( ).c_str( ),
-                      help_table[cnt].desc);
-            stc(buf, ch);
+            if (help_table[cnt].desc)
+                buf << dlprintf("{g%-19s{x: %s", help_table[cnt].command, help_table[cnt].desc) << endl;
+            else
+                buf << help_table[cnt].command << endl;
         }
+        buf << endl << "Используй '{Wolchelp таблица{x' или '{W? таблица{x' изнутри редактора." << endl;
+        ch->send_to(buf);
         return false;
     }
 
@@ -305,12 +269,39 @@ bool show_help(Character * ch, const char *cargument)
                 return false;
             }
             else if (help_table[cnt].structure == &wearloc_table) {
-                int cnt = 0;
                 for (int i = 0; i < wearlocationManager->size( ); i++) {
-                    ch->printf( "%10s", wearlocationManager->find( i )->getName( ).c_str( ) );
-                    if (++cnt%5 == 0)
-                        ch->send_to( "\r\n" );
+                    Wearlocation *w = wearlocationManager->find( i );
+                    ch->printf( "{g%-14s{x: %s\r\n", 
+                                w->getName().c_str(), w->getPurpose().c_str() );
                 }
+                return false;
+            }
+            else if (help_table[cnt].structure == &group_table) {
+                ostringstream buf;
+                for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
+                    SkillGroup *group = skillGroupManager->find( gn );
+                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                                group->getName( ).c_str( ),
+                                group->getRussianName( ).c_str( ) );
+                    if (gn % 2)
+                        buf << endl;
+                }
+                buf << endl;
+                ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &race_table) {
+                ostringstream buf;
+                for (int i = 0; i < raceManager->size( ); i++) {
+                    Race *race = raceManager->find( i );
+                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                                race->getName().c_str(),
+                                race->getMaleName().ruscase('1').c_str() );
+                    if (i % 2)
+                        buf << endl;
+                }
+                buf << endl;
+                ch->send_to(buf);
                 return false;
             }
             else if (help_table[cnt].structure == &skill_table) {
@@ -321,19 +312,17 @@ bool show_help(Character * ch, const char *cargument)
                 }
 
                 if (!str_prefix(spell, "all"))
-                    show_skill_cmds(ch, -1);
+                    show_skills(ch, -1);
                 else if (!str_prefix(spell, "ignore"))
-                    show_skill_cmds(ch, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB);
+                    show_skills(ch, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB);
                 else if (!str_prefix(spell, "room"))
-                    show_skill_cmds(ch, TAR_ROOM|TAR_PEOPLE);
+                    show_skills(ch, TAR_ROOM|TAR_PEOPLE);
                 else if (!str_prefix(spell, "char"))
-                    show_skill_cmds(ch, TAR_CHAR_ROOM|TAR_CHAR_WORLD);
+                    show_skills(ch, TAR_CHAR_ROOM|TAR_CHAR_WORLD);
                 else if (!str_prefix(spell, "self"))
-                    show_skill_cmds(ch, TAR_CHAR_SELF);
+                    show_skills(ch, TAR_CHAR_SELF);
                 else if (!str_prefix(spell, "object"))
-                    show_skill_cmds(ch, TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_OBJ_WORLD);
-                else if (!str_prefix(spell, "affect"))
-                    show_skill_affects(ch);
+                    show_skills(ch, TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_OBJ_WORLD);
                 else
                     stc("Синтаксис:  ? spells "
                         "[ignore/affect/self/object/all]\n\r", ch);

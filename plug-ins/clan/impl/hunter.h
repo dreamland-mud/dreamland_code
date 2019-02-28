@@ -67,6 +67,7 @@ public:
 
         virtual void get( Character * );
         virtual bool canEquip( Character * );
+        virtual bool mayFloat( ); 
 
 protected:
         void config( PCharacter * );
@@ -95,7 +96,6 @@ public:
         virtual void wear( Character * );
         virtual bool canLock( Character * );
         virtual void delete_( Character * ); 
-        virtual bool mayFloat( ); 
 
 protected:
         void addAffect( Character *, Affect * );

@@ -42,13 +42,13 @@ NMI_GET(RegContainer, values, "список значений")
     return Register( obj );
 }
 
-NMI_INVOKE(RegContainer, size, "") 
+NMI_INVOKE(RegContainer, size, "(): размер массива") 
 {
     return Register( (int)map.size( ) );
 }
 
 
-NMI_INVOKE( RegContainer, clone , "")
+NMI_INVOKE( RegContainer, clone , "(): создать дубликат массива")
 {
     ::Pointer<RegContainer> rc(NEW);
     Map::const_iterator i;
@@ -62,7 +62,7 @@ NMI_INVOKE( RegContainer, clone , "")
     return Register( obj );
 }
 
-NMI_INVOKE( RegContainer, api, "печатает этот API" )
+NMI_INVOKE( RegContainer, api, "(): печатает этот api" )
 {
     ostringstream buf;
     Scripting::traitsAPI<RegContainer>( buf );
@@ -70,7 +70,7 @@ NMI_INVOKE( RegContainer, api, "печатает этот API" )
 }
 
 
-NMI_INVOKE( RegContainer, clear, "очистка всех runtime полей" )
+NMI_INVOKE( RegContainer, clear, "(): очистка всех runtime полей" )
 {
     map.clear( );
     self->changed();

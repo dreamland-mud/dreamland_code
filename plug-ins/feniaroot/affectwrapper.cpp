@@ -90,7 +90,7 @@ void AffectWrapper::fromAffect( const Affect & af )
     }
 }
 
-NMI_GET( AffectWrapper, type, "название скила, которым этот аффект вешается, или none" ) 
+NMI_GET( AffectWrapper, type, "название умения, которым этот аффект вешается, или none" ) 
 { 
     int sn = type;
 
@@ -100,7 +100,7 @@ NMI_GET( AffectWrapper, type, "название скила, которым эт�
         return Register( type->getName( ) ); 
 } 
 
-NMI_SET( AffectWrapper, type, "название скила, которым этот аффект вешается, или none" ) 
+NMI_SET( AffectWrapper, type, "название умения, которым этот аффект вешается, или none" ) 
 { 
     const DLString & name = arg.toString( );
 
@@ -127,14 +127,14 @@ NMI_SET( AffectWrapper, x, api ) \
     x.setValue( arg.toNumber( ) ); \
 }
 
-GS(where, "поле, у которого аффект изменяет биты (таблица .tables.affwhere_flags.)")
+GS(where, "поле, у которого аффект изменяет биты (таблица .tables.affwhere_flags)")
 GS(bitvector, "какие биты добавятся полю, указанному в where")
 GS(location, "поле, на которое аффект воздействует численно (таблица .tables.apply_flags)")
 GS(modifier, "на сколько изменится поле, указанное в location")
 GS(duration, "длительность, -1 для вечных аффектов")
 GS(level, "уровень аффекта")
 
-NMI_SET( AffectWrapper, global, "" ) 
+NMI_SET( AffectWrapper, global, "список значений для where=locations (слоты экипировки) и where=liquids (жидкости)" ) 
 {
     if (where == TO_LOCATIONS) {
         global.setRegistry( wearlocationManager );
@@ -145,7 +145,7 @@ NMI_SET( AffectWrapper, global, "" )
     }
 }
 
-NMI_GET( AffectWrapper, global, "" ) 
+NMI_GET( AffectWrapper, global, "список значений для where=locations (слоты экипировки) и where=liquids (жидкости)" ) 
 {
     return global.toString( );
 }
@@ -162,7 +162,7 @@ Scripting::Register AffectWrapper::wrap( const Affect &af )
     return Scripting::Register( sobj );
 }
 
-NMI_INVOKE( AffectWrapper, api, "" )
+NMI_INVOKE( AffectWrapper, api, "(): печатает этот api" )
 {
     ostringstream buf;
     

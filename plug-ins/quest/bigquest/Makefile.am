@@ -18,13 +18,11 @@ $(LIBADD_AI)
 libquest_big_la_SOURCES = \
 impl_bigquest.cpp \
 bigquest.cpp \
-bigvictimbehavior.cpp \
 bandamobile.cpp
 
 
 libquest_big_la_MOC = \
 bigquest.h \
-bigvictimbehavior.h \
 bandamobile.h
 
 

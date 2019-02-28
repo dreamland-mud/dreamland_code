@@ -464,7 +464,7 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     chance = level - obj->level + ch->getSkill( sn );
     chance -= number_percent( );
 
-    if (chance < -10) {
+    if (chance < -10 && !IS_OBJ_STAT(obj, ITEM_NOPURGE)) {
         act_p("Ты прогнева$gло|л|ла своего Бога и он уничтожил оружие.", ch, 0, 0, TO_CHAR, POS_RESTING);
         extract_obj( obj );
         return;

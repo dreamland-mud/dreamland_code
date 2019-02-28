@@ -1,5 +1,6 @@
 #include "bandamobile.h"
 #include "bigquest.h"
+#include "selfrate.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "act.h"
@@ -30,7 +31,12 @@ bool BandaMobile::death(Character *killer)
     killer = quest->getActor( killer );
 
     if (ourHero( killer )) {
-        killer->pecho("{YТы уничтожил%1$Gо||а очередную жертву, браво.{x", killer);
+        if (chance(33)) 
+            killer->pecho("{YТы уничтожил%1$Gо||а очередную жертву, браво.{x", killer);
+        else if (chance(50))
+            killer->pecho("{YМолодец, тебе удалось избавить мир от очередной напасти.{x", killer);
+        else
+            killer->pecho("{YПротив тебя у %2$P4 не было никаких шансов!{x", killer, ch);
         quest->mobKilled(pcm, killer);
         return false;
     }
@@ -42,7 +48,7 @@ bool BandaMobile::death(Character *killer)
         return false;
     }
 
-    pcm->getPlayer()->println("{YС кем-то из банды что-то случилось без твоего участия.{x");
+    pcm->getPlayer()->println("{YС кем-то из них что-то случилось без твоего участия.{x");
     quest->mobDestroyed(pcm);
     return false;
 }
@@ -51,15 +57,20 @@ void BandaMobile::config(PCharacter *hero)
 {
     if (configured)
         return;
-    
+   
     int level = hero->getModifyLevel();
     level += level / 10;
 
     ch->setLevel( level );
     ch->hitroll = level * 2;
     ch->damroll = (short) ( level * 3 / 2 ); 
+    ch->damage[DICE_NUMBER]= level / 5;
+    ch->damage[DICE_TYPE]  = level / 10;
     ch->max_mana = ch->mana = level * 10;
     ch->max_move = ch->move = 1000;
+
+    for (int i = 0; i < stat_table.size; i ++)
+        ch->perm_stat[i] = min(25, 11 + level / 5);
 
     if (level < 30)
         ch->max_hit = level * 20 + 2 * number_fuzzy(level);
@@ -74,10 +85,35 @@ void BandaMobile::config(PCharacter *hero)
     ch->armor[2] = -number_fuzzy(level) * 6; 
     ch->armor[3] = -number_fuzzy(level) * 6; 
     ch->saving_throw = -level / 2;
-    if (IS_NEUTRAL(ch))
-        ch->alignment = number_range(-750, -250);
+    if (IS_NEUTRAL(hero))
+        ch->alignment = number_range(-750, -350);
     else
         ch->alignment = -hero->alignment;
+
+    if (!rated_as_newbie(hero)) {
+        // Here we go...
+        if (chance(50))
+            SET_BIT(ch->off_flags, ASSIST_VNUM);
+
+        switch (number_range(1, 10)) {
+        case 0:
+            SET_BIT(ch->act, ACT_CLERIC);
+            break;
+        case 1:
+        case 2:
+            SET_BIT(ch->act, ACT_WARRIOR);
+            SET_BIT(ch->off_flags, OFF_KICK_DIRT);
+            break;
+
+        case 4:
+            SET_BIT(ch->off_flags, OFF_FAST|OFF_KICK_DIRT);
+            break;
+
+        case 5:
+            SET_BIT(ch->off_flags, OFF_FAST|OFF_KICK|OFF_TRIP);
+            break;
+        }
+    }
 
     configured = true;
 }
@@ -100,6 +136,22 @@ void BandaItem::getByOther( Character *ch )
 
 void BandaItem::getByHero( PCharacter *ch ) 
 {
+    BigQuest::Pointer quest = getMyQuest<BigQuest>(ch);
+    if (!quest)
+        return;
+
+    int carries = count_obj_list(obj->pIndexData, ch->carrying);
+
+    if (carries == quest->objsTotal) {
+        obj->getRoom()->echo(POS_RESTING, quest->getScenario().msgJoin.c_str());
+        ch->pecho("Он вспыхивает и исчезает, оставив на своем месте {C1000{x очков опыта.");
+        ch->recho("Он ярко вспыхивает и исчезает.");
+        ch->gainExp(1000);
+        quest->destroyItems<BandaItem>();
+        quest->wiznet("", "easter egg");
+        return;
+    }
+
     act( "Мерцающая аура окружает $o4.", ch, obj, 0, TO_CHAR );
 }
 

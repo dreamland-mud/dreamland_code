@@ -68,7 +68,7 @@ struct attack_type        attack_table        []                =
     { "blast",                "порыв",                DAM_BASH,        MultiGender::MASCULINE },
     { "pound",                "тяжелый удар",                DAM_BASH,        MultiGender::MASCULINE },
     { "crush",                "дробящий удар",        DAM_BASH,        MultiGender::MASCULINE },
-    { "grep",                "греп",                 DAM_SLASH,        MultiGender::MASCULINE },
+    { "grep",                "захват",                 DAM_SLASH,        MultiGender::MASCULINE },
     { "bite",                "укус",                        DAM_PIERCE,        MultiGender::MASCULINE },  /* 10 */
     { "pierce",                "глубокий выпад",        DAM_PIERCE,        MultiGender::MASCULINE },
     { "suction",        "засасывающий удар",    DAM_BASH,        MultiGender::MASCULINE },

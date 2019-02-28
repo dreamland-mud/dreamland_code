@@ -10,7 +10,7 @@
 
 using namespace Scripting;
 
-NMI_INVOKE(FeniaProcess, api, "")
+NMI_INVOKE(FeniaProcess, api, "(): печатает этот api")
 {
     ostringstream buf;
     
@@ -18,7 +18,7 @@ NMI_INVOKE(FeniaProcess, api, "")
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(SchedulerWrapper, api, "")
+NMI_INVOKE(SchedulerWrapper, api, "(): печатает этот api")
 {
     ostringstream buf;
     

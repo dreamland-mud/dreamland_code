@@ -30,7 +30,7 @@ protected:
     virtual bool checkRoomClient( PCharacter *, Room * );
     bool checkRoomForTraverse(PCharacter *, Room *);
     void findClientRooms( PCharacter *, RoomList & );
-    void findClientRooms( PCharacter *, RoomList &, VnumList & );
+    void findClientRooms( PCharacter *, RoomList &, const VnumList & );
     Room * getDistantRoom( PCharacter *, RoomList &, Room *, int, int );
     Room * getRandomRoomClient( PCharacter * );
     bool mobileCanAggress(PCharacter *, NPCharacter *);

@@ -20,6 +20,8 @@ struct area_data;
 
 class BigQuest : public VictimQuestModel,
                  public ItemQuestModel {
+friend class BandaItem;
+friend class BandaMobile;
 XML_OBJECT
 public:
     typedef ::Pointer<BigQuest> Pointer;
@@ -35,6 +37,7 @@ public:
     virtual void shortInfo( std::ostream &, PCharacter * );
     virtual void destroy( );
 
+    const BigQuestScenario &getScenario() const;
     void mobKilled(PCMemoryInterface *hero, Character *killer);
     void mobDestroyed(PCMemoryInterface *hero);
 
@@ -49,7 +52,7 @@ public:
     
 protected:
    
-    BigQuestScenario &getScenario();
+    virtual bool checkRoomClient( PCharacter *, Room * );
     void notifyNoMore(PCMemoryInterface *hero);
 };
 
@@ -58,17 +61,17 @@ XML_OBJECT
 public:
     virtual bool applicable( PCharacter * ) const;
     virtual int getPriority() const;
-    QuestMobileAppearence &getRandomMobile();
-    void onQuestStart(PCharacter *, NPCharacter *, struct area_data *, int);
-    void onQuestInfo(PCharacter *, int, ostream&);
+    const QuestMobileAppearence &getRandomMobile() const;
+    void onQuestStart(PCharacter *, NPCharacter *, struct area_data *, int) const;
+    void onQuestInfo(PCharacter *, int, ostream&) const;
 
-protected:
     XML_VARIABLE XMLInteger priority;
     XML_VARIABLE XMLLimits criteria;
     XML_VARIABLE QuestMobileAppearanceList mobiles;
-    XML_VARIABLE XMLInteger item;
+    XML_VARIABLE QuestItemAppearence item;
     XML_VARIABLE XMLStringVector msgStart;
     XML_VARIABLE XMLString msgInfo;
+    XML_VARIABLE XMLString msgJoin;
 };
 
 class BigQuestRegistrator : public QuestRegistrator<BigQuest>,
@@ -83,6 +86,9 @@ public:
     static inline BigQuestRegistrator * getThis( ) {
         return thisClass;
     }
+
+    XML_VARIABLE XMLInteger itemVnum;
+    XML_VARIABLE XMLInteger mobileVnum;
 
 private:
     static BigQuestRegistrator *thisClass;

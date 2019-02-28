@@ -15,7 +15,7 @@
 
 using namespace Scripting;
 
-NMI_INVOKE( RegList, random, "возвращает рандомный элемент списка")
+NMI_INVOKE( RegList, random, "(): возвращает случайный элемент списка")
 {
     size_t n;
     const_iterator i;
@@ -30,12 +30,12 @@ NMI_INVOKE( RegList, random, "возвращает рандомный элеме
     return *i;
 }
 
-NMI_INVOKE( RegList, front , "возвращает первый элемент списка")
+NMI_INVOKE( RegList, front , "(): возвращает первый элемент списка")
 {
     return front();
 }
 
-NMI_INVOKE( RegList, pop_front, "удаляет первый элемент списка" )
+NMI_INVOKE( RegList, pop_front, "(): удаляет первый элемент списка" )
 {
     if (empty( ))
         throw Scripting::Exception("list is already empty");
@@ -46,12 +46,12 @@ NMI_INVOKE( RegList, pop_front, "удаляет первый элемент сп
     return Register( );
 }
 
-NMI_INVOKE( RegList, back , "возвращает последний элемент списка")
+NMI_INVOKE( RegList, back , "(): возвращает последний элемент списка")
 {
     return back();
 }
 
-NMI_INVOKE( RegList, pop_back, "удаляет последний элемент списка" )
+NMI_INVOKE( RegList, pop_back, "(): удаляет последний элемент списка" )
 {
     if (empty( ))
         throw Scripting::Exception("list is already empty");
@@ -63,7 +63,7 @@ NMI_INVOKE( RegList, pop_back, "удаляет последний элемент
 }
 
 
-NMI_INVOKE( RegList, add , "добавляет в конец списка все элементы из списка в параметрах")
+NMI_INVOKE( RegList, add , "(args...): добавляет в конец списка все элементы, перечисленные в параметрах")
 {
     insert(end( ), args.begin(), args.end());
 
@@ -72,7 +72,7 @@ NMI_INVOKE( RegList, add , "добавляет в конец списка все
     return Register( self );
 }
 
-NMI_INVOKE( RegList, push_front, "добавляет элемент в начало списка" )
+NMI_INVOKE( RegList, push_front, "(elem): добавляет элемент в начало списка" )
 {
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
@@ -83,7 +83,7 @@ NMI_INVOKE( RegList, push_front, "добавляет элемент в нача�
     return Register( );
 }
 
-NMI_INVOKE( RegList, push_back, "добавляет элемент в конец списка" )
+NMI_INVOKE( RegList, push_back, "(elem): добавляет элемент в конец списка" )
 {
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
@@ -104,7 +104,7 @@ struct RemIfEq {
     const Register &reg;
 };
 
-NMI_INVOKE( RegList, join, "(разделитель) соединяет все элементы списка в строку через указанный разделитель")
+NMI_INVOKE( RegList, join, "(разделитель): соединяет все элементы списка в строку через указанный разделитель")
 {
     ostringstream buf;
     DLString sep = args2string(args);
@@ -118,7 +118,7 @@ NMI_INVOKE( RegList, join, "(разделитель) соединяет все �
     return buf.str();
 }
 
-NMI_INVOKE( RegList, sub , "удаляет из списка все вхождения элементов из списка в параметрах")
+NMI_INVOKE( RegList, sub , "(args...): удаляет из списка все вхождения элементов, перечисленных в параметрах")
 {
     for(RegisterList::const_iterator i = args.begin(); i != args.end(); i++)
         remove_if( RemIfEq(*i) );
@@ -128,7 +128,7 @@ NMI_INVOKE( RegList, sub , "удаляет из списка все вхожде
     return Register( self );
 }
 
-NMI_INVOKE( RegList, has, "true если указанный элемент содержится в списке")
+NMI_INVOKE( RegList, has, "(elem): true если указанный элемент содержится в списке")
 {
     if (args.empty( ))
         throw Scripting::NotEnoughArgumentsException( );
@@ -142,7 +142,7 @@ NMI_INVOKE( RegList, has, "true если указанный элемент со�
     return false;
 }
 
-NMI_INVOKE( RegList, size , "размер списка")
+NMI_INVOKE( RegList, size , "(): размер списка")
 {
     return (int)size( );
 }
@@ -153,7 +153,7 @@ struct RegisterWeakOrder {
     }
 };
 
-NMI_INVOKE( RegList, sort , "сортирует список по возрастанию")
+NMI_INVOKE( RegList, sort , "(): сортирует список по возрастанию")
 {
     sort( RegisterWeakOrder( ) );
     self->changed();
@@ -167,7 +167,7 @@ struct RegisterBinPred {
     }
 };
 
-NMI_INVOKE( RegList, unique , "удаляет дублирующиеся элементы")
+NMI_INVOKE( RegList, unique , "(): удаляет идущие подряд дублирующиеся элементы")
 {
     unique( RegisterBinPred( ) );
     self->changed();
@@ -175,7 +175,7 @@ NMI_INVOKE( RegList, unique , "удаляет дублирующиеся эле�
     return Register( self );
 }
 
-NMI_INVOKE( RegList, clone , "создает новый список, аналог этого")
+NMI_INVOKE( RegList, clone , "(): создает новый список, аналог этого")
 {
     RegList::Pointer rl(NEW);
 
@@ -187,7 +187,7 @@ NMI_INVOKE( RegList, clone , "создает новый список, анало
     return Register( obj );
 }
 
-NMI_INVOKE( RegList, api, "печатает эту справку")
+NMI_INVOKE( RegList, api, "(): печатает этот api")
 {
     ostringstream buf;
     

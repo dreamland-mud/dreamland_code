@@ -54,6 +54,7 @@ public:
     XML_VARIABLE XMLGlobalBitvector liquids;
     XML_VARIABLE XMLFlags           liquidFlags;
     XML_VARIABLE XMLBooleanNoFalse  books;
+    XML_VARIABLE XMLBooleanNoFalse  stolen;
 };
 
 class DefaultReligion : public Religion, public XMLTableElement, public XMLVariableContainer {
@@ -83,6 +84,8 @@ public:
     virtual bool likesDrink(const Liquid *) const;
     virtual bool likesItem(Object *) const;
     virtual bool likesBook(Object *) const;
+    virtual bool likesStolen(Object *) const;
+    virtual bool ignoresItem(Object *) const;
 
 protected:
     XML_VARIABLE XMLString  shortDescr;
@@ -90,6 +93,7 @@ protected:
     XML_VARIABLE XMLString  description;
     XML_VARIABLE XMLFlags   align, ethos;
     XML_VARIABLE XMLGlobalBitvector  races;
+    XML_VARIABLE XMLGlobalBitvector  classes;
     XML_VARIABLE XMLPointerNoEmpty<ReligionHelp> help;
     XML_VARIABLE XMLEnumeration sex;
     XML_VARIABLE GodLikes likes;

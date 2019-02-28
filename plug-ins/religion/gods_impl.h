@@ -140,4 +140,11 @@ public:
         virtual void tattooFight( Object *, Character * ) const;
 };
 
+class ErevanGod : public DefaultReligion {
+XML_OBJECT
+public:
+        typedef ::Pointer<ErevanGod> Pointer;
+        virtual void tattooFight( Object *, Character * ) const;
+};
+
 #endif

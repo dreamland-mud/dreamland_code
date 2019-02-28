@@ -19,8 +19,8 @@ public:
 
     virtual bool applicable( PCharacter * ) const;
     virtual bool applicable( PCharacter *, NPCharacter * ) const;
-    virtual bool healedBy( int );
-    virtual bool isInfected( NPCharacter * );
+    virtual bool healedBy( int ) const;
+    virtual bool isInfected( NPCharacter * ) const;
     virtual void infect( NPCharacter *, int time, int level ) const;
 
     XML_VARIABLE XMLSkillReference malady;

@@ -8,6 +8,7 @@
 #include "root.h"
 #include "idcontainer.h"
 #include "guts.h"
+#include "nativeext.h"
 #include "mobindexwrapper.h"
 #include "objindexwrapper.h"
 #include "objectwrapper.h"
@@ -90,6 +91,25 @@ WrappersPlugin::initialization( )
     DLScheduler::getThis()->putTaskNOW( ValidateTask::Pointer(NEW) );
 
     linkTargets();
+
+    // Dump API to disk on every plugin load.
+    traitsAPIDump<CharacterWrapper>("char", true, true);     
+    traitsAPIDump<ObjectWrapper>("obj", true, true);     
+    traitsAPIDump<RoomWrapper>("room", true, true);     
+    traitsAPIDump<MobIndexWrapper>("mob_index", false, false);     
+    traitsAPIDump<ObjIndexWrapper>("obj_index", false, false);     
+    traitsAPIDump<Root>("root", true, true);     
+    traitsAPIDump<AffectWrapper>("affect", false, false);     
+    traitsAPIDump<CommandWrapper>("command", false, false);     
+    traitsAPIDump<AreaWrapper>("area", false, false);     
+    traitsAPIDump<HometownWrapper>("hometown", false, false);     
+    traitsAPIDump<ProfessionWrapper>("profession", false, false);     
+    traitsAPIDump<RaceWrapper>("race", false, false);     
+    traitsAPIDump<ClanWrapper>("clan", false, false);     
+    traitsAPIDump<CraftProfessionWrapper>("craftprofession", false, false);     
+    traitsAPIDump<LiquidWrapper>("liquid", false, false);     
+    traitsAPIDump<SkillWrapper>("skill", false, false);     
+    traitsAPIDump<FeniaString>("string", false, false);     
 }
 
 void WrappersPlugin::destruction( ) {

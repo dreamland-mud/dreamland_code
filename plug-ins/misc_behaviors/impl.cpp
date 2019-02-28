@@ -20,6 +20,7 @@
 #include "anatolia_limits.h"
 #include "moneychanger.h"
 #include "petquestor.h"
+#include "equipsets.h"
 
 extern struct spec_type local_spec_table[];
 
@@ -79,6 +80,10 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<PocketWatch> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<MoneyChanger> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<PetQuestor> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<SidheArmorSet> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<TravellersJoySet> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<NorivaMyrvaleSet> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ReykarisShevaleSet> >( ppl );
         
         Plugin::registerPlugin<MobileBehaviorRegistrator<Masquer> >( ppl );
         Plugin::registerPlugin<AreaBehaviorRegistrator<Masquerade> >( ppl );

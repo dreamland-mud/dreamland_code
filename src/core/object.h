@@ -70,8 +70,8 @@ public:
     bool                enchanted;
     
     int              item_type;
-    int                  extra_flags;
-    int                  wear_flags;
+    int             extra_flags;
+    int             wear_flags;
     WearlocationReference wear_loc;
     int              weight;
     int                  cost;

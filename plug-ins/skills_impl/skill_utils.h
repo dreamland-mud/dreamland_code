@@ -6,6 +6,7 @@
 class Skill;
 class Character;
 class PCSkillData;
+class XMLSkillReference;
 
 /**
  * Return true if this skill is a temporary one for the character
@@ -22,5 +23,7 @@ bool temporary_skill_active( const PCSkillData & );
  * Return 'magical' phrase for a spell.
  */
 DLString spell_utterance(Skill *skill);
+
+Skill * skillref_to_pointer(const XMLSkillReference &);
 
 #endif

@@ -64,12 +64,12 @@ protected:
     virtual bool checkMobileClient( PCharacter *, NPCharacter * );
 
     void destroyBandits( );
-    KidnapScenario &getScenario( );
+    const KidnapScenario &getScenario( ) const ;
     NPCharacter * createBandit( );
     Object * createMark( );
 
 private:    
-    KidnapQuestRegistrator * getReg( );
+    KidnapQuestRegistrator * getReg( ) const;
     
     NPCharacter * createKing( PCharacter * );
     NPCharacter * createPrince( NPCharacter *, Room * );

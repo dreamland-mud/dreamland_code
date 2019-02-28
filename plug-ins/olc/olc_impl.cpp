@@ -12,7 +12,6 @@
 #include "medit.h"
 #include "oedit.h"
 #include "sedit.h"
-#include "tedit.h"
 #include "eeedit.h"
 #include "olcstate.h"
 #include "onlinecreation.h"
@@ -41,7 +40,6 @@ extern "C"
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateMobile> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateObject> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateExtraExit> >( ppl );
-        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateTrap> >( ppl );
 
         return ppl;
     }

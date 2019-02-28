@@ -5,7 +5,11 @@
 #include "xmlattributequestdata.h"
 #include "quest.h"
 
+#include "date.h"
 #include "pcharacter.h"
+#include "pcharactermanager.h"
+#include "dreamland.h"
+#include "wiznet.h"
 #include "mercdb.h"
 #include "merc.h"
 
@@ -19,6 +23,27 @@ bool XMLAttributeQuestData::handle( const DeathArguments &args )
         setTime( quest->getDeathTime( args.pch ) );
     }
 
+    return false;
+}
+
+bool XMLAttributeQuestData::pull( PCMemoryInterface *pcm ) 
+{
+    if (pcm->isOnline())
+        return false;
+
+    if (!takesTooLong())
+        return false;
+
+    XMLAttributes *attributes = &pcm->getAttributes( );
+    Quest::Pointer quest = attributes->findAttr<Quest>( "quest" );
+    if (!quest)
+        return false;
+
+    quest->wiznet( "expired", "started at %lld", startTime.getValue());
+
+    attributes->eraseAttribute( "quest" );
+    setTime(1);
+    PCharacterManager::saveMemory(pcm);
     return false;
 }
 
@@ -57,6 +82,7 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
         pch->send_to( "Теперь ты снова можешь взять задание.\r\n" );
     }
         
+    PCharacterManager::save(pch);
     return false;
 }
 
@@ -103,5 +129,19 @@ int XMLAttributeQuestData::getLastQuestCount(const DLString &questType) const
         return 0;
 
     return lastQuestCount;
+}
+
+void XMLAttributeQuestData::setStartTime()
+{
+    startTime = dreamland->getCurrentTime();
+}
+
+bool XMLAttributeQuestData::takesTooLong() const
+{
+    if (startTime.getValue() <= 0)
+        return false;
+
+    long long interval = dreamland->getCurrentTime() - startTime.getValue();
+    return interval >= Date::SECOND_IN_WEEK;
 }
 

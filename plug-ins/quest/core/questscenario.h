@@ -38,7 +38,7 @@ public:
     const DLString & getWeightedRandomScenario( PCharacter * ) const;
     QuestScenario::Pointer getScenario( const DLString & ) const;
 
-    template<typename S> inline ::Pointer<S> getMyScenario( const DLString & ) const;
+    template<typename S> inline const S * getMyScenario( const DLString & ) const;
     template<typename S> inline void getMyScenarios( PCharacter *, vector< ::Pointer<S> > & ) const;
     template<typename S> inline void getMyScenarios( PCharacter *, NPCharacter *, vector< ::Pointer<S> > & ) const;
 
@@ -47,9 +47,9 @@ protected:
 };
 
 template<typename S> 
-inline ::Pointer<S> QuestScenariosContainer::getMyScenario( const DLString &name ) const
+inline const S * QuestScenariosContainer::getMyScenario( const DLString &name ) const
 {
-    return static_cast<const S*>(getScenario( name ).getPointer( ));
+    return getScenario(name).getConstPointer<S>( );
 }
 
 template<typename S> 
@@ -90,7 +90,7 @@ public:
     XML_VARIABLE XMLFlagsNoEmpty wear;
     XML_VARIABLE XMLFlagsNoEmpty extra;
 
-    void dress( Object * );
+    void dress( Object * ) const;
 };
 
 typedef XMLVectorBase<QuestItemAppearence> QuestItemAppearanceList;
@@ -108,7 +108,7 @@ public:
     XML_VARIABLE XMLEnumerationNoEmpty align;
     XML_VARIABLE XMLRaceReference race;
     
-    void dress( NPCharacter * );
+    void dress( NPCharacter * ) const;
 };
 
 typedef XMLVectorBase<QuestMobileAppearence> QuestMobileAppearanceList;

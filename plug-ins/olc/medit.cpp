@@ -316,7 +316,7 @@ MEDIT(show)
         !mob.area ? -1 : mob.area->vnum,
         !mob.area ? "No Area" : mob.area->name);
 
-    ptc(ch, "Race [{G%s{x]   Sex: [{G%s{x]   Number: [{G%s{x]\n\r",
+    ptc(ch, "Race [{G%s{x] {D(? race){x Sex: [{G%s{x] {D(? sex_table){x Number: [{G%s{x]\n\r",
         mob.race, 
         sex_table.name( mob.sex ).c_str( ),
         mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular");
@@ -339,40 +339,37 @@ MEDIT(show)
     ptc(ch, "Wealth:[%10d]   Align:  [%5d]\n\r",
         mob.wealth, mob.alignment);
 
-    ptc(ch, "Damage:[%10s]   Hitroll:[%5d]\n\r",
-        weapon_flags.name(mob.dam_type).c_str( ), mob.hitroll);
+    ptc(ch, "Hitroll:[%5d] Damage:[%10s] {D(? weapon_flags){x\n\r",
+        mob.hitroll, weapon_flags.name(mob.dam_type).c_str( ));
 
-    ptc(ch, "Armor: [pierce: %d  bash: %d  slash: %d  magic: %d]\n\r",
+    ptc(ch, "Armor: [pierce: %d  bash: %d  slash: %d  magic: %d] {D(? ac_type){x\n\r",
         mob.ac[AC_PIERCE], mob.ac[AC_BASH],
         mob.ac[AC_SLASH], mob.ac[AC_EXOTIC]);
 
-    ptc(ch, "Act: [{R%s{x]\n\r", act_flags.names(mob.act).c_str());
+    ptc(ch, "Act: [{R%s{x] {D(? act_flags){x\n\r", act_flags.names(mob.act).c_str());
 
-    ptc(ch, "Aff: [{C%s{x]\n\r", affect_flags.names(mob.affected_by).c_str());
-    ptc(ch, "Det: [{M%s{x]\n\r", detect_flags.names(mob.detection).c_str());
+    ptc(ch, "Aff: [{C%s{x] {D(? affect_flags){x\n\r", affect_flags.names(mob.affected_by).c_str());
+    ptc(ch, "Det: [{M%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
 
-    ptc(ch, "Pos   : starting [{Y%s{x]  default [{Y%s{x]\n\r",
+    ptc(ch, "Pos   : starting [{Y%s{x]  default [{Y%s{x] {D(? position_table){x\n\r",
         position_table.name(mob.start_pos).c_str(),
         position_table.name(mob.default_pos).c_str());
 
-    ptc(ch, "Imm:  [{W%s{x]\n\r", imm_flags.names(mob.imm_flags).c_str());
-    ptc(ch, "Res:  [{Y%s{x]\n\r", res_flags.names(mob.res_flags).c_str());
-    ptc(ch, "Vuln: [{y%s{x]\n\r", vuln_flags.names(mob.vuln_flags).c_str());
-    ptc(ch, "Off:  [{M%s{x]\n\r", off_flags.names(mob.off_flags).c_str());
-    ptc(ch, "Size: [{G%s{x]\n\r", size_table.name(mob.size).c_str());
+    ptc(ch, "Imm:  [{W%s{x] {D(? imm_flags){x\n\r", imm_flags.names(mob.imm_flags).c_str());
+    ptc(ch, "Res:  [{Y%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
+    ptc(ch, "Vuln: [{y%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
+    ptc(ch, "Off:  [{M%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
+    ptc(ch, "Size: [{G%s{x] {D(? size_table){x\n\r", size_table.name(mob.size).c_str());
 
-    ptc(ch, "Material: [%s]\n\r", mob.material);
-    ptc(ch, "Form:     [%s]\n\r", form_flags.names(mob.form).c_str());
-    ptc(ch, "Parts:    [%s]\n\r", part_flags.names(mob.parts).c_str());
+    ptc(ch, "Material: [%s] {D(? material){x\n\r", mob.material);
+    ptc(ch, "Form:     [%s] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
+    ptc(ch, "Parts:    [%s] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
 
     if (!mob.spec_fun.name.empty())
-        ptc(ch, "Spec fun: [%s]\n\r", mob.spec_fun.name.c_str());
+        ptc(ch, "Spec fun: [%s] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
     ptc(ch, "Group:    [%d]\n\r", mob.group);
-
-    ptc(ch, "Practicer:[%s]\n\r", mob.practicer.toString( ).c_str( ));
-
-    if (!mob.smell.empty( ))
-        ptc(ch, "Smell:\n\r     %s\n\r", mob.smell.c_str( ));
+    ptc(ch, "Practicer:[%s] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
 
     if (!mob.properties.empty( )) {
         ptc(ch, "Properties:\n\r");
@@ -593,94 +590,25 @@ MEDIT(spec)
 
 MEDIT(damtype)
 {
-    int value = NO_FLAG;
-
-    if (argument[0] == '\0') {
-        stc("Syntax:  damtype [damage message]\n\r", ch);
-        stc("Para ver una lista de tipos de mensajes, pon '? weapon'.\n\r", ch);
-        return false;
-    }
-
-    if ((value = weapon_flags.value( argument )) != NO_FLAG) {
-        mob.dam_type = (int) value;
-        stc("Damage type set.\n\r", ch);
-        return true;
-    }
-
-    stc("OLCStateMobile: No such damage type.\n\r", ch);
-    return false;
+    return flagValueEdit(weapon_flags, mob.dam_type);
 }
 
 
 MEDIT(align)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  alignment [number]\n\r", ch);
-        return false;
-    }
-
-    mob.alignment = atoi(argument);
-
-    stc("Alignment set.\n\r", ch);
-    return true;
+    return numberEdit(-1000, 1000, mob.alignment);
 }
 
 MEDIT(level)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  level [number]\n\r", ch);
-        return false;
-    }
-
-    mob.level = atoi(argument);
-
-    stc("Level set.\n\r", ch);
-    return true;
+    return numberEdit(1, 120, mob.level);
 }
 
 MEDIT(desc)
 {
     char command[MAX_INPUT_LENGTH];
-    DLString origArg;
-
-    origArg = argument;
     argument = one_argument(argument, command);
-
-    if (command[0] == '\0') {
-        if(!sedit(mob.description)) 
-            return false;
-        stc("Описание установлено.\n\r", ch);
-        return true;
-    }
-
-    if (is_name(command, "copy")) {
-        DLString str = mob.description;
-        ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(str);
-        ptc(ch, "Описание скопировано в буфер.\r\n");
-        return true;
-    }
-
-    if (is_name(command, "paste")) {
-        DLString str = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
-        free_string(mob.description);
-        mob.description = str_dup(str.c_str());
-        ptc(ch, "Описание вставлено из буфера.\r\n");
-        return true;
-    }
-
-    if (is_name(command, "help") || is_name(command, "?")) {
-        stc("Syntax:\n\r", ch);
-        stc("    desc        : войти в редактор описаний\n\r", ch);
-        stc("    desc строка : заменить описание на указанную строку\n\r", ch);
-        stc("    desc copy   : скопировать описание в буфер\n\r", ch);
-        stc("    desc paste  : заменить описание на то, что в буфере\n\r", ch);
-        return false;
-    }
-
-    free_string(mob.description);
-    mob.description = str_dup(origArg.c_str( ));
-    stc("Описание заменено на новую строку.\n\r", ch);
-    return false;
+    return editor(command, mob.description);
 }
 
 MEDIT(smell)
@@ -806,20 +734,7 @@ MEDIT(name)
 
 MEDIT(sex)
 {
-    int value;
-
-    if (argument[0] != '\0') {
-        if ((value = sex_table.value( argument )) != NO_FLAG) {
-            mob.sex = (int) value;
-
-            stc("Sex set.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: sex [sex]\n\r"
-        "Type '? sex' for a list of flags.\n\r", ch);
-    return false;
+    return flagValueEdit(sex_table, mob.sex);
 }
 
 MEDIT(number)
@@ -835,59 +750,24 @@ MEDIT(number)
     return true;
 }
 
-MEDIT(act)                // Moved out of medit() due to naming conflicts -- Hugin
- {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = act_flags.bitstring( argument )) != NO_FLAG) {
-            mob.act ^= value;
-            SET_BIT(mob.act, ACT_IS_NPC);
-
-            stc("Act flag toggled.\n\r", ch);
-            return true;
-        }
+MEDIT(act)                
+{
+    if (flagBitsEdit(act_flags, mob.act)) {
+        SET_BIT(mob.act, ACT_IS_NPC);
+        return true;
     }
-
-    stc("Syntax: act [flag]\n\r"
-        "Type '? act' for a list of flags.\n\r", ch);
     return false;
 }
 
 MEDIT(affect)
-{                                /* Moved out of medit() due to naming conflicts -- Hugin */
-    bitstring_t value;
+{                                
 
-    if (argument[0] != '\0') {
-        if ((value = affect_flags.bitstring( argument )) != NO_FLAG) {
-            mob.affected_by ^= value;
-
-            stc("Affect flag toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: affect [flag]\n\r"
-        "Type '? affect' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(affect_flags, mob.affected_by);
 }
 
 MEDIT(detection)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = detect_flags.bitstring( argument )) != NO_FLAG) {
-            mob.detection ^= value;
-
-            stc("Detecion flag toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: detection [flag]\n\r"
-        "Type '? detection' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(detect_flags, mob.detection);
 }
 
 MEDIT(ac)
@@ -946,89 +826,30 @@ MEDIT(ac)
     return false;
 }
 
+
 MEDIT(form)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = form_flags.bitstring( argument )) != NO_FLAG) {
-            mob.form ^= value;
-            stc("Form toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: form [flags]\n\r"
-        "Type '? form' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(form_flags, mob.form);
 }
 
 MEDIT(part)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = part_flags.bitstring( argument )) != NO_FLAG) {
-            mob.parts ^= value;
-            stc("Parts toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: part [flags]\n\r"
-        "Type '? part' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(part_flags, mob.parts);
 }
 
 MEDIT(imm)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = imm_flags.bitstring( argument )) != NO_FLAG) {
-            mob.imm_flags ^= value;
-            stc("Immunity toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: imm [flags]\n\r"
-        "Type '? imm' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(imm_flags, mob.imm_flags);
 }
 
 MEDIT(res)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = res_flags.bitstring( argument )) != NO_FLAG) {
-            mob.res_flags ^= value;
-            stc("Resistance toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: res [flags]\n\r"
-        "Type '? res' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(res_flags, mob.res_flags);
 }
 
 MEDIT(vuln)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = vuln_flags.bitstring( argument )) != NO_FLAG) {
-            mob.vuln_flags ^= value;
-            stc("Vulnerability toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: vuln [flags]\n\r"
-        "Type '? vuln' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(vuln_flags, mob.vuln_flags);
 }
 
 MEDIT(material)
@@ -1047,186 +868,27 @@ MEDIT(material)
 
 MEDIT(off)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-        if ((value = off_flags.bitstring( argument )) != NO_FLAG) {
-            mob.off_flags ^= value;
-            stc("Offensive behaviour toggled.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: off [flags]\n\r"
-        "Type '? off' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(off_flags, mob.off_flags);
 }
 
 MEDIT(size)
 {
-    int value;
-
-    if (argument[0] != '\0') {
-        if ((value = size_table.value( argument )) != NO_FLAG) {
-            mob.size = (int) value;
-            stc("Size set.\n\r", ch);
-            return true;
-        }
-    }
-
-    stc("Syntax: size [size]\n\rType '? size' for a list of sizes.\n\r", ch);
-    return false;
+    return flagValueEdit(size_table, mob.size);
 }
 
 MEDIT(hitdice)
 {
-    static char syntax[] = "Syntax:  hitdice <number> d <type> + <bonus>\n\r";
-    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
-    
-    if (argument[0] == '\0') {
-        stc(syntax, ch);
-        return false;
-    }
-
-    strcpy(buf, argument);
-    num = cp = buf;
-
-    while (isdigit(*cp))
-        ++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-        *(cp++) = '\0';
-
-    type = cp;
-
-    while (isdigit(*cp))
-        ++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-        *(cp++) = '\0';
-
-    bonus = cp;
-
-    while (isdigit(*cp))
-        ++cp;
-    if (*cp != '\0')
-        *cp = '\0';
-
-    if ((!is_number(num) || atoi(num) < 1)
-        || (!is_number(type) || atoi(type) < 1)
-        || (!is_number(bonus) || atoi(bonus) < 0)) {
-        stc(syntax, ch);
-        return false;
-    }
-
-    mob.hit[DICE_NUMBER] = atoi(num);
-    mob.hit[DICE_TYPE] = atoi(type);
-    mob.hit[DICE_BONUS] = atoi(bonus);
-
-    stc("Hitdice set.\n\r", ch);
-    return true;
+    return diceEdit(mob.hit);
 }
 
 MEDIT(manadice)
 {
-    static char syntax[] = "Syntax:  manadice <number> d <type> + <bonus>\n\r";
-    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
-
-    if (argument[0] == '\0') {
-        stc(syntax, ch);
-        return false;
-    }
-
-    strcpy(buf, argument);
-    num = cp = buf;
-
-    while (isdigit(*cp))
-        ++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-        *(cp++) = '\0';
-
-    type = cp;
-
-    while (isdigit(*cp))
-        ++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-        *(cp++) = '\0';
-
-    bonus = cp;
-
-    while (isdigit(*cp))
-        ++cp;
-    if (*cp != '\0')
-        *cp = '\0';
-
-    if (!(is_number(num) && is_number(type) && is_number(bonus))) {
-        stc(syntax, ch);
-        return false;
-    }
-
-    if ((!is_number(num) || atoi(num) < 1)
-        || (!is_number(type) || atoi(type) < 1)
-        || (!is_number(bonus) || atoi(bonus) < 0)) {
-        stc(syntax, ch);
-        return false;
-    }
-
-    mob.mana[DICE_NUMBER] = atoi(num);
-    mob.mana[DICE_TYPE] = atoi(type);
-    mob.mana[DICE_BONUS] = atoi(bonus);
-
-    stc("Manadice set.\n\r", ch);
-    return true;
+    return diceEdit(mob.mana);
 }
 
 MEDIT(damdice)
 {
-    static char syntax[] = "Syntax:  damdice <number> d <type> + <bonus>\n\r";
-    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
-
-    if (argument[0] == '\0') {
-        stc(syntax, ch);
-        return false;
-    }
-
-    strcpy(buf, argument);
-    num = cp = buf;
-
-    while (isdigit(*cp))
-        ++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-        *(cp++) = '\0';
-
-    type = cp;
-
-    while (isdigit(*cp))
-        ++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-        *(cp++) = '\0';
-
-    bonus = cp;
-
-    while (isdigit(*cp))
-        ++cp;
-    if (*cp != '\0')
-        *cp = '\0';
-
-    if (!(is_number(num) && is_number(type) && is_number(bonus))) {
-        stc(syntax, ch);
-        return false;
-    }
-
-    if ((!is_number(num) || atoi(num) < 1)
-        || (!is_number(type) || atoi(type) < 1)
-        || (!is_number(bonus) || atoi(bonus) < 0)) {
-        stc(syntax, ch);
-        return false;
-    }
-
-    mob.damage[DICE_NUMBER] = atoi(num);
-    mob.damage[DICE_TYPE] = atoi(type);
-    mob.damage[DICE_BONUS] = atoi(bonus);
-
-    stc("Damdice set.\n\r", ch);
-    return true;
+    return diceEdit(mob.damage);
 }
 
 MEDIT(race)
@@ -1317,28 +979,12 @@ MEDIT(position)
 
 MEDIT(wealth)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  wealth [number]\n\r", ch);
-        return false;
-    }
-
-    mob.wealth = atoi(argument);
-
-    stc("Wealth set.\n\r", ch);
-    return true;
+    return numberEdit(0, 1000000, mob.wealth);
 }
 
 MEDIT(group)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  group [number]\n\r", ch);
-        return false;
-    }
-
-    mob.group = atoi(argument);
-
-    stc("Group set.\n\r", ch);
-    return true;
+    return numberEdit(0, 100000, mob.group);
 }
 
 MEDIT(practicer)
@@ -1359,12 +1005,7 @@ MEDIT(practicer)
     g = skillGroupManager->findExisting( argument );
 
     if (!g) {
-        ostringstream out;
-        
-        skillGroupManager->outputAll( out, 19, 4 );
-        stc("Wrong group name.\n\rValid group names:\n\r", ch);
-        stc(out.str( ).c_str( ), ch);
-
+        stc("Группа не найдена. Используй {W? groups{x для полного списка.\r\n", ch);
         return false;
     }
     
@@ -1376,13 +1017,7 @@ MEDIT(practicer)
 
 MEDIT(hitroll)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-        stc("Syntax:  hitroll [number]\n\r", ch);
-        return false;
-    }
-    mob.hitroll = atoi(argument);
-    stc("Hitroll set.\n\r", ch);
-    return true;
+    return numberEdit(0, 10000, mob.hitroll);
 }
 
 MEDIT(list)

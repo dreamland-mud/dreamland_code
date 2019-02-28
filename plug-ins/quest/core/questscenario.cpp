@@ -89,7 +89,7 @@ QuestItemAppearence::QuestItemAppearence( )
 {
 }
 
-void QuestItemAppearence::dress( Object *obj )
+void QuestItemAppearence::dress( Object *obj ) const
 {
     if (!name.empty( ))
         obj->setName( (name + " " + obj->pIndexData->name).c_str( ) );
@@ -114,7 +114,7 @@ QuestMobileAppearence::QuestMobileAppearence( )
     race.assign( race_none );
 }
 
-void QuestMobileAppearence::dress( NPCharacter *mob ) 
+void QuestMobileAppearence::dress( NPCharacter *mob ) const
 {
     mob->setName( name + " " + mob->pIndexData->player_name );
     mob->setShortDescr( shortDesc );
@@ -122,7 +122,7 @@ void QuestMobileAppearence::dress( NPCharacter *mob )
     mob->setDescription( desc + "\r\n" );
     mob->setSex( sex.getValue( ) ); 
 
-    if (race != race_none)
+    if (race.getName() != "none")
         mob->setRace( race.getName( ) );
     
     switch (align.getValue( )) {

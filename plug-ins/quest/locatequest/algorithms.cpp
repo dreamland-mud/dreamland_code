@@ -131,18 +131,18 @@ struct RoomsNearComplete {
  * "middle-point" scatter algorithm 
  *----------------------------------------------------------------------------*/
 
-bool LocateMiddlePointAlgo::needsEndPoint( )
+bool LocateMiddlePointAlgo::needsEndPoint( ) const
 {
     return true;
 }
 
-int LocateMiddlePointAlgo::getRadius( )
+int LocateMiddlePointAlgo::getRadius( ) const
 {
     return number_range( 4, 10 );
 }
 
 void LocateMiddlePointAlgo::findRooms( 
-        PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms )
+        PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms ) const
 {
     int i;
     DoorFunc df( pch ); ExtraExitFunc eef; PortalFunc pf;
@@ -170,18 +170,18 @@ void LocateMiddlePointAlgo::findRooms(
 /*-----------------------------------------------------------------------------
  * "radial" scatter algorithm 
  *----------------------------------------------------------------------------*/
-bool LocateRadialAlgo::needsEndPoint( )
+bool LocateRadialAlgo::needsEndPoint( ) const
 {
     return false;
 }
 
-int LocateRadialAlgo::getRadius( )
+int LocateRadialAlgo::getRadius( ) const
 {
     return number_range( 6, 16 );
 }
 
 void LocateRadialAlgo::findRooms( 
-        PCharacter *pch, Room *src, Room *, LocateAlgo::Rooms &rooms )
+        PCharacter *pch, Room *src, Room *, LocateAlgo::Rooms &rooms ) const
 {
     DoorFunc df( pch ); ExtraExitFunc eef; PortalFunc pf;
     MyHookIterator iter( df, eef, pf, 5 );
@@ -197,13 +197,13 @@ void LocateRadialAlgo::findRooms(
 /*-----------------------------------------------------------------------------
  * "uniform" scatter algorithm 
  *----------------------------------------------------------------------------*/
-bool LocateUniformAlgo::needsEndPoint( )
+bool LocateUniformAlgo::needsEndPoint( ) const
 {
     return true;
 }
 
 void LocateUniformAlgo::findRooms( 
-        PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms )
+        PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms ) const
 {
     DoorFunc df( pch ); ExtraExitFunc eef; PortalFunc pf;
     MyHookIterator iter( df, eef, pf, 5 );

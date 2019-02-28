@@ -18,7 +18,7 @@ RACE(none);
 /*
  * KSPrinceData
  */
-void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king ) 
+void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king ) const 
 {
     QuestMobileAppearence::dress( mob );
 
@@ -30,7 +30,7 @@ void KSPrinceData::dress( NPCharacter *mob, NPCharacter *king )
 /*
  * KidnapScenario
  */
-void KidnapScenario::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *king )
+void KidnapScenario::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *king ) const
 {
     tell_raw( hero, questman, 
               "У {W%s{G случилось несчастье. Срочно требуется твоя помощь.",

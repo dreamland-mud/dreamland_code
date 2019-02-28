@@ -3,6 +3,7 @@
  * ruffina, 2005
  */
 
+#include "profiler.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcharactermanager.h"
@@ -224,7 +225,13 @@ void Questor::doFind( PCharacter *client )
         quest->wiznet( "find", "failure, guru mode" );
         return;
     }
-    
+
+    if (quest->hint >= 3) {
+        tell_fmt( "Извини, %1$C1, но теперь тебе придется искать путь самостоятельно.", client, ch );
+        quest->wiznet( "find", "failure, too many hints" );
+        return;
+    }
+
     quest->helpMessage( buf );
     
     if (!makeSpeedwalk( ch->in_room, quest->helpLocation( ), buf )) 
@@ -450,6 +457,7 @@ static void delay_noquest(XMLAttributeQuestData::Pointer &attr, PCharacter *clie
 
 void Questor::doRequest(PCharacter *client, const DLString &arg)  
 {
+    ProfilerBlock pb("quest request");
     XMLAttributeQuestData::Pointer attr;
     DLString descr;
     int cha;
@@ -533,6 +541,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         try {
             QuestManager::getThis( )->generate( client, ch );
             attr->rememberLastQuest("");
+            attr->setStartTime();
             PCharacterManager::save( client );
             
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
@@ -567,16 +576,21 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         tell_raw(client, ch, "Но попробуй свои силы в чем-то еще.");
         return;
     }
+    
+    for (int i = 0; i < 3; i++) {
+        try {
+            client->getAttributes( ).addAttribute( 
+                         (*q)->createQuest(client, ch), "quest" );
+            attr->rememberLastQuest((*q)->getName());
+            attr->setStartTime();
+            PCharacterManager::save( client );
+            tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
+            return;
+        } 
+        catch (const QuestCannotStartException &e) {
+        } 
+    }
 
-    try {
-        client->getAttributes( ).addAttribute( 
-                     (*q)->createQuest(client, ch), "quest" );
-        attr->rememberLastQuest((*q)->getName());
-        PCharacterManager::save( client );
-        tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
-    } 
-    catch (const QuestCannotStartException &e) {
-        tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
-        tell_raw(client, ch, "Приходи позже или выбери что-то другое.");
-    } 
+    tell_fmt("Извини, оказывается у меня нет подходящих для тебя заданий на '%3$s'.", client, ch, (*q)->getShortDescr().c_str());
+    tell_raw(client, ch, "Приходи позже или выбери что-то другое.");
 }

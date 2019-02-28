@@ -1,4 +1,5 @@
 #include "skill_utils.h"
+#include "skillreference.h"
 #include "pcharacter.h"
 #include "calendar_utils.h"
 #include "skill.h"
@@ -92,3 +93,10 @@ DLString spell_utterance(Skill *skill)
 
     return buf;
 }
+
+Skill * skillref_to_pointer(const XMLSkillReference &ref)
+{
+    Skill *skill = const_cast<Skill *>(const_cast<XMLSkillReference *>(&ref)->operator ->());
+    return skill;
+}
+

@@ -1,5 +1,4 @@
 #include "bigquest.h"
-#include "bigvictimbehavior.h"
 #include "bandamobile.h"
 #include "questexceptions.h"
 #include "profflags.h"
@@ -17,19 +16,18 @@
 #include "save.h"
 #include "def.h"
 
+/*----------------------------------------------------------------------------
+ * BigQuest
+ *--------------------------------------------------------------------------*/
 BigQuest::BigQuest( )
 {
 }
 
 void BigQuest::create( PCharacter *pch, NPCharacter *questman ) 
 {
-    Room *pRoom;
-    int time;
-    MobileList victims;
-    
     charName.setValue( pch->getName( ) );
     scenName = BigQuestRegistrator::getThis()->getWeightedRandomScenario(pch);
-    BigQuestScenario &scenario = getScenario();
+    const BigQuestScenario &scenario = getScenario();
 
     AreaList areas = findAreas(pch);
     if (areas.empty())
@@ -44,34 +42,41 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
     mobsTotal = number_range(10, 15);
     mobsKilled = 0;
     mobsDestroyed = 0;
-    objsTotal = 0;
+    objsTotal = 10;
     areaName = targetArea->name;
+    
+    try {
+        for (int m = 0, o = 0; m < mobsTotal; m++, o++) {
+            Room *targetRoom = getRandomRoom(rooms);
+            
+            NPCharacter *mob= createMobile<BandaMobile>(28012);
+            scenario.getRandomMobile().dress(mob);
+            char_to_room(mob, targetRoom);
 
-    for (int i = 0; i < mobsTotal; i++) {
-        Room *targetRoom = getRandomRoom(rooms);
-        
-        NPCharacter *mob= createMobile<BandaMobile>(28012);
-        scenario.getRandomMobile().dress(mob);
-        char_to_room(mob, targetRoom);
+            if (o < objsTotal) {
+                Object *obj = createItem<BandaItem>(28003);
+                scenario.item.dress(obj);
+                obj_to_char(obj, mob);
+            }
+        }
+       
+        scenario.onQuestStart(pch, questman, targetArea, mobsTotal); 
+    } catch (const QuestCannotStartException &e) {
+        destroy();
+        throw e;
     }
-   
-    scenario.onQuestStart(pch, questman, targetArea, mobsTotal); 
+
     setTime( pch, 60 );
+
+    wiznet( "", "%s, %d victims in area %s",
+                 scenName.c_str(),
+                 mobsTotal,
+                 targetArea->name);
 }
 
-BigQuestScenario & BigQuest::getScenario( )
+const BigQuestScenario & BigQuest::getScenario( ) const
 {
-    static BigQuestScenario zero;
-    QuestScenario::Pointer scenario = BigQuestRegistrator::getThis()->getScenario( scenName );
-
-    if (!scenario) 
-        return zero;
-
-    BigQuestScenario *bqs = scenario.getStaticPointer<BigQuestScenario>( );
-    if (!bqs)
-        return zero;
-
-    return *bqs;
+    return *BigQuestRegistrator::getThis()->getMyScenario<BigQuestScenario>( scenName );
 }
 
 void BigQuest::destroy( ) 
@@ -89,26 +94,27 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
 {
     Reward::Pointer r( NEW );
     
-    if (mobsKilled == mobsTotal)
-        tell_fmt("Ты доблестно уничтожи%1$Gо||а всех преступников.", ch, questman);
-    else 
-        tell_fmt("Ты доблестно уничтожил%1$Gо||а %3$d преступник%3$Iа|ов|ов из %4$d.", 
-                 ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
-    if (mobsDestroyed > 0)
-        tell_fmt("Еще %3$d умерли неизвестной смертью.", ch, questman, mobsDestroyed.getValue());
+    if (mobsKilled != mobsTotal) {
+        if (hint > 0)
+            tell_fmt("К тому же, ты уничтожил%1$Gо||а только %3$d преступник%3$Iа|ов|ов из %4$d.", 
+                     ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
+        else     
+            tell_fmt("Тебе удалось уничтожить только %3$d преступник%3$Iа|ов|ов из %4$d, но все равно это заслуживает поощрения.", 
+                     ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
+    }
 
-    int objsCarried = getItemsList<BandaItem>(ch->carrying).size();
-    if (objsCarried > 0) 
-        tell_fmt("Я вижу, что тебе также удалось собрать %3$d доказательст%3$Iво|ва|в злостных намерений!",
-                  ch, questman, objsCarried);
-
-    
-    r->gold = number_range( 8, 12 );
-    r->points = number_range( 8, 10 ) + mobsKilled * number_range(2, 3) + objsCarried * number_range(1, 2);
-    r->wordChance = 10;
-    r->scrollChance = 10;
-    if (chance(5))
-        r->prac = number_range(1, 2);
+    if (hint > 0) {
+        r->gold = number_range(1, 3);
+        r->points = mobsKilled; 
+    }
+    else {
+        r->gold = number_range( 8, 12 );
+        r->points = number_range( 8, 10 ) +  mobsKilled * number_range(2, 3);
+        r->wordChance = 10;
+        r->scrollChance = 10;
+        if (chance(5))
+            r->prac = number_range(1, 2);
+    }
 
     if (ch->getClan( )->isDispersed( )) 
         r->points *= 2;
@@ -159,8 +165,13 @@ void BigQuest::mobKilled(PCMemoryInterface *hero, Character *killer)
         return;
     }
 
-    if (hero->isOnline())
-        hero->getPlayer()->printf("{YОсталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
+    if (hero->isOnline()) {
+        if (hasPartialRewards()) 
+            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d, или же вернуться за частичным вознаграждением.{x\r\n", 
+                                       mobsLeft, mobsTotal.getValue());
+        else
+            hero->getPlayer()->printf("{YТебе осталось уничтожить %d из %d.{x\r\n", mobsLeft, mobsTotal.getValue());
+    }
 }
 
 void BigQuest::mobDestroyed(PCMemoryInterface *hero)
@@ -184,13 +195,27 @@ bool BigQuest::hasPartialRewards() const
     return mobsKilled >= (mobsTotal / 3);
 }
 
+bool BigQuest::checkRoomClient( PCharacter *pch, Room *room )
+{
+    if (IS_WATER(room) || room->sector_type == SECT_AIR)
+        return false;
+
+    if (!VictimQuestModel::checkRoomClient( pch, room ))
+        return false;
+
+    return true;
+}
+
+/*----------------------------------------------------------------------------
+ * BigQuestScenario
+ *--------------------------------------------------------------------------*/
 bool BigQuestScenario::applicable( PCharacter *ch ) const
 {
     bool rc = criteria.allow(ch);
     return rc;
 }
 
-QuestMobileAppearence & BigQuestScenario::getRandomMobile()
+const QuestMobileAppearence & BigQuestScenario::getRandomMobile() const
 {
     if (mobiles.empty())
         throw QuestCannotStartException();
@@ -198,7 +223,7 @@ QuestMobileAppearence & BigQuestScenario::getRandomMobile()
     return mobiles[number_range(0, mobiles.size() - 1)];    
 }
 
-void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct area_data *targetArea, int mobsTotal)
+void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, struct area_data *targetArea, int mobsTotal) const
 {
     XMLStringVector::const_iterator s;
 
@@ -206,7 +231,7 @@ void BigQuestScenario::onQuestStart(PCharacter *pch, NPCharacter *questman, stru
         tell_fmt(s->c_str(), pch, questman, targetArea->name, mobsTotal);            
 }
 
-void BigQuestScenario::onQuestInfo(PCharacter *pch, int mobsTotal, ostream &buf)
+void BigQuestScenario::onQuestInfo(PCharacter *pch, int mobsTotal, ostream &buf) const
 {
     buf << fmt(0, msgInfo.c_str(), pch, 0, mobsTotal) << endl;
 }
@@ -216,6 +241,9 @@ int BigQuestScenario::getPriority() const
     return priority;
 }
 
+/*----------------------------------------------------------------------------
+ * BigQuestRegistrator
+ *--------------------------------------------------------------------------*/
 BigQuestRegistrator * BigQuestRegistrator::thisClass = 0;
 
 BigQuestRegistrator::BigQuestRegistrator( )
@@ -230,6 +258,6 @@ BigQuestRegistrator::~BigQuestRegistrator( )
 
 bool BigQuestRegistrator::applicable( PCharacter *ch, bool fAuto ) const
 {
-    return ch->is_immortal() || ch->getAttributes( ).isAvailable( "tester" );
+    return true;
 }
 

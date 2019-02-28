@@ -41,6 +41,9 @@ CMDRUN( run )
     unsigned int i;
 
     pch = ch->getPC( );
+    if (!pch)
+        return;
+
     walk = constArguments;
     walk.stripWhiteSpace( );
 

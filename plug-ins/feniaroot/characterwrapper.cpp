@@ -130,17 +130,17 @@ Character * CharacterWrapper::getTarget( ) const
 /*
  * FIELDS
  */
-NMI_GET( CharacterWrapper, id, "уникальный номер персонажа" )
+NMI_GET( CharacterWrapper, id, "уникальный идентификатор персонажа" )
 {
     return Register( DLString(id) );
 }
 
-NMI_GET( CharacterWrapper, online, "переменная true, если персонаж в мире" )
+NMI_GET( CharacterWrapper, online, "true, если персонаж в мире" )
 {
     return Register( target != NULL );
 }
 
-NMI_GET( CharacterWrapper, dead, "переменная true, если персонаж полностью уничтожен (suicide для pc, смерть для npc)" )
+NMI_GET( CharacterWrapper, dead, "true, если персонаж полностью уничтожен (suicide/remort для pc, смерть для npc)" )
 {
     return Register( zombie.getValue() );
 }
@@ -177,19 +177,17 @@ GETWRAP( leader, "лидер группы или тот, кто очаровал
 GETWRAP( fighting, "тот, с кем сражаемся" )
 GETWRAP( last_fought, "чар, с которым сражались последний раз" )
 GET_PC_WRAP( pet, "моб, домашнее животное" )
-GET_PC_WRAP( switchedTo, "" )
+GET_PC_WRAP( switchedTo, "в какого моба вселились" )
 GETWRAP( doppel, "игрок, которому подражаем с помощью doppelganger. "
                  "для зеркал - игрок, который их создал" )
 GET_PC_WRAP( guarding, "игрок, которого охраняем с помощью умения guard" )
 GET_PC_WRAP( guarded_by, "игрок, который нас охраняет" )
 
-GETWRAP( carrying, "объект, первый в списке барахла у чара (inventory и equipment). "
-                   "до следующих элементов списка можно достучаться через поле объекта next_content")
+GETWRAP( carrying, "первый объект в списке инвентаря/экипировки")
 GETWRAP( on, "объект, мебель, на которой сидим" )
 
 GETWRAP( in_room, "комната, в которой сейчас находимся" ) 
-GETWRAP( was_in_room, "комната, в которой находились перед попаданием в Лимбо(для ньюбов), \r\n"
-                      "либо перед закапыванием в могилу (для вампиров)")
+GETWRAP( was_in_room, "комната, в которой находились перед закапыванием в могилу")
 GETWRAP( mount, "на ком мы верхом или кто верхом на нас" )
     
 NMI_SET( CharacterWrapper, leader, "лидер группы или тот, кто очаровал" )
@@ -213,12 +211,12 @@ NMI_SET( CharacterWrapper, last_fought, "чар, с которым сражал�
 
 
 #define ARMOR(x) \
-NMI_GET( CharacterWrapper, armor##x, "армор-класс" ) \
+NMI_GET( CharacterWrapper, armor##x, "класс брони" ) \
 { \
     checkTarget(); \
     return target->armor[x]; \
 } \
-NMI_SET( CharacterWrapper, armor##x, "армор-класс" ) \
+NMI_SET( CharacterWrapper, armor##x, "класс брони" ) \
 { \
     checkTarget(); \
     target->armor[x] = arg.toNumber(); \
@@ -230,19 +228,19 @@ ARMOR(2)
 ARMOR(3)
 #undef ARMOR
 
-NMI_GET( CharacterWrapper, pc, "" )
+NMI_GET( CharacterWrapper, pc, "экземпляр игрока" )
 {
     checkTarget( );
     return wrap(target->getPC( ));
 }
 
-NMI_GET( CharacterWrapper, logon, "" )
+NMI_GET( CharacterWrapper, logon, "время последнего захода в мир" )
 {
     checkTarget( );
     CHK_NPC
     return (int)target->getPC( )->age.getLogon( ).getTime( );
 }
-NMI_SET( CharacterWrapper, logon, "" )
+NMI_SET( CharacterWrapper, logon, "время последнего захода в мир" )
 {
     checkTarget( );
     CHK_NPC
@@ -257,32 +255,32 @@ NMI_GET( CharacterWrapper, terminal_type, "тип терминала у mud-кл
     return ttype_name( target->desc->telnet.ttype );
 }
 
-NMI_SET( CharacterWrapper, damage_number, "" )
+NMI_SET( CharacterWrapper, damage_number, "повреждения моба: сколько раз кидать кубик" )
 {
     checkTarget( );
     CHK_PC
     target->getNPC( )->damage[DICE_NUMBER] = arg.toNumber();        
 }
-NMI_SET( CharacterWrapper, damage_type, "" )
+NMI_SET( CharacterWrapper, damage_type, "повреждения моба: кол-во граней кубика" )
 {
     checkTarget( );
     CHK_PC
     target->getNPC( )->damage[DICE_TYPE] = arg.toNumber();        
 }
-NMI_GET( CharacterWrapper, damage_number, "" )
+NMI_GET( CharacterWrapper, damage_number, "повреждения моба: сколько раз кидать кубик" )
 {
     checkTarget( );
     CHK_PC
     return target->getNPC( )->damage[DICE_NUMBER];
 }
-NMI_GET( CharacterWrapper, damage_type, "" )
+NMI_GET( CharacterWrapper, damage_type, "повреждения моба: кол-во граней кубика" )
 {
     checkTarget( );
     CHK_PC
     return target->getNPC( )->damage[DICE_TYPE];
 }
 
-NMI_INVOKE( CharacterWrapper, setLevel, "установить уровень мобу" )
+NMI_INVOKE( CharacterWrapper, setLevel, "(level): установить уровень мобу" )
 {
     checkTarget();
     CHK_PC
@@ -334,7 +332,7 @@ NMI_SET( CharacterWrapper, description, "то что видно по look mob" )
     target->setDescription( arg.toString( ) );
 }
 
-NMI_GET( CharacterWrapper, trust, "" )
+NMI_GET( CharacterWrapper, trust, "уровень привилегий" )
 {
     PCMemoryInterface *pci;
     
@@ -405,7 +403,7 @@ NMI_GET( CharacterWrapper, remort_count, "кол-во ремортов" )
     return Register( (int)target->getPC( )->getRemorts( ).size( ) );
 }
 
-NMI_GET( CharacterWrapper, altar, "vnum комнаты-алтаря в хометауне чара" )
+NMI_GET( CharacterWrapper, altar, "vnum комнаты-алтаря в родном городе персонажа" )
 {
     checkTarget( );
     CHK_NPC
@@ -413,7 +411,7 @@ NMI_GET( CharacterWrapper, altar, "vnum комнаты-алтаря в хоме�
 }
 
 
-NMI_GET( CharacterWrapper, craftProfessions, "map из названия->уровень мастерства для крафтовых профессий" )
+NMI_GET( CharacterWrapper, craftProfessions, "map из названия->уровень мастерства для дополнительных профессий" )
 {
     ::Pointer<RegContainer> rc(NEW);
     checkTarget( );
@@ -452,19 +450,19 @@ CONDITION(drunk,     "опьянение");
 #undef CONDITION
 
 
-NMI_SET( CharacterWrapper, sex, "")
+NMI_SET( CharacterWrapper, sex, "пол (таблица .tables.sex_table)")
 {
     checkTarget( );
     target->setSex( arg.toNumber( ) );
 }
 
-NMI_GET( CharacterWrapper, sex, "")
+NMI_GET( CharacterWrapper, sex, "пол (таблица .tables.sex_table)")
 {
     checkTarget( );
     return target->getSex( );
 }
 
-NMI_GET( CharacterWrapper, wait, "")
+NMI_GET( CharacterWrapper, wait, "wait state (в пульсах, 1 пульс = четверть секунды)")
 {
     checkTarget( );
     return target->wait;
@@ -498,21 +496,21 @@ NMI_GET( CharacterWrapper, flying, "true если мы GHOST, летаем ил�
     return false;
 }
 
-NMI_GET( CharacterWrapper, alignMin, "" )
+NMI_GET( CharacterWrapper, alignMin, "название самого злого характера для расы и класса персонажа" )
 {
     checkTarget( );
     CHK_NPC
     return align_min( target->getPC( ) );
 }
 
-NMI_GET( CharacterWrapper, alignMax, "" )
+NMI_GET( CharacterWrapper, alignMax, "название самого доброго характера для расы и класса персонажа" )
 {
     checkTarget( );
     CHK_NPC
     return align_max( target->getPC( ) );
 }
 
-NMI_GET( CharacterWrapper, alignName, "" )
+NMI_GET( CharacterWrapper, alignName, "название характера" )
 {
     checkTarget( );
     return align_name( target );
@@ -591,7 +589,7 @@ NMI_SET( CharacterWrapper, x, help) \
 
 INT_FIELD(ethos, "добропорядочность")
 INT_FIELD(timer, "сколько секунд прошло с последней команды")
-INT_FIELD(daze, "dase state (в пульсах, 1 пульс = четверть секунды)")
+INT_FIELD(daze, "daze state (в пульсах, 1 пульс = четверть секунды)")
 INT_FIELD(hit, "текущее здоровье (hit points)")
 INT_FIELD(max_hit, "максимальное здоровье")
 INT_FIELD(mana, "текущая mana")
@@ -604,29 +602,29 @@ INT_FIELD(exp, "суммарный опыт")
 INT_FIELD(invis_level, "уровень для wisinvis")
 INT_FIELD(incog_level, "уровень для incognito")
 INT_FIELD(lines, "кол-во строк в буфере вывода")
-INT_FIELD(act, "act флаги для мобов и plr для игроков")
-INT_FIELD(comm, "comm флаги")
-INT_FIELD(add_comm, "расширение поля comm")
-INT_FIELD(imm_flags, "флаги иммунитета")
-INT_FIELD(res_flags, "флаги сопротивляемости")
-INT_FIELD(vuln_flags, "флаги уязвимости")
-INT_FIELD(affected_by, "флаги аффектов")
-INT_FIELD(add_affected_by, "расширение флагов аффектов")
-INT_FIELD(detection, "флаги детектов")
-INT_FIELD(position, "позиция")
+INT_FIELD(act, "act флаги для мобов и plr для игроков (таблицы .tables.act_flags и plr_flags)")
+INT_FIELD(comm, "comm флаги (таблица .tables.comm_flags)")
+INT_FIELD(add_comm, "расширение поля comm (таблица .tables.add_comm_flags)")
+INT_FIELD(imm_flags, "флаги иммунитета (таблица .tables.imm_flags)")
+INT_FIELD(res_flags, "флаги сопротивляемости (таблица .tables.res_flags)")
+INT_FIELD(vuln_flags, "флаги уязвимости (таблица .tables.res_flags)")
+INT_FIELD(affected_by, "флаги аффектов (таблица .tables.affect_flags)")
+INT_FIELD(add_affected_by, "расширение флагов аффектов (таблица .tables.affect_flags)")
+INT_FIELD(detection, "флаги детектов (таблица .tables.detect_flags)")
+INT_FIELD(position, "позиция (таблица .tables.position_table)")
 INT_FIELD(carry_weight, "вес который несет чар")
 INT_FIELD(carry_number, "количество вещей которое несет чар")
 INT_FIELD(saving_throw, "савесы")
-INT_FIELD(alignment, "характер")
-INT_FIELD(hitroll, "hr")
-INT_FIELD(damroll, "dr")
+INT_FIELD(alignment, "характер, от -1000 до 1000")
+INT_FIELD(hitroll, "точность")
+INT_FIELD(damroll, "урон")
 INT_FIELD(wimpy, "трусость. при скольки hp чар будет убегать автоматически")
-INT_FIELD(dam_type, "тип повреждения")
-INT_FIELD(form, "форма")
-INT_FIELD(parts, "части тела")
-INT_FIELD(size, "размер")
+INT_FIELD(dam_type, "тип повреждения (таблица .tables.weapon_flags)")
+INT_FIELD(form, "форма тела (таблица .tables.form_flags)")
+INT_FIELD(parts, "части тела (таблица .tables.part_flags)")
+INT_FIELD(size, "размер (таблица .tables.size_table)")
 INT_FIELD(death_ground_delay, "счетчик ловушки")
-FLAG_FIELD(trap, "флаги ловушки")
+FLAG_FIELD(trap, "флаги ловушки (таблица .tables.trap_flags)")
 INT_FIELD(riding, "если mount!=null: true - мы верхом, false - мы оседланы")
 
 #undef INT_FIELD
@@ -666,9 +664,9 @@ INT_FIELD(bless, "благословение богов")
 INT_FIELD(bank_s, "серебра в банке")
 INT_FIELD(bank_g, "золота в банке")
 INT_FIELD(questpoints, "qp")
-INT_FIELD(config, "настройки чара")
+INT_FIELD(config, "настройки чара (таблица .tables.config_flags)")
 INT_FIELD(shadow, "сколько висеть тени (shadowlife) в секундах")
-INT_FIELD(start_room, "")
+INT_FIELD(start_room, "в какой комнате вошли в мир")
     
 #undef INT_FIELD
 
@@ -685,30 +683,30 @@ NMI_SET( CharacterWrapper, x, help) \
     checkTarget( ); \
     target->getNPC()->x = arg.toNumber(); \
 }
-INT_FIELD(off_flags, "")
+INT_FIELD(off_flags, "флаги поведения моба (таблица .tables.off_flags)")
 
-NMI_SET( CharacterWrapper, wearloc, "установить список слотов экипировки из строки")
+NMI_SET( CharacterWrapper, wearloc, "список слотов экипировки")
 {
     checkTarget( );
     CHK_NPC
     target->getPC( )->wearloc.fromString( arg.toString( ) );
 }
 
-NMI_GET( CharacterWrapper, wearloc, "строка со всеми названиями слотов экипировки (wearlocations)")
+NMI_GET( CharacterWrapper, wearloc, "список слотов экипировки")
 {
     checkTarget( );
     CHK_NPC
     return target->getPC( )->wearloc.toString();
 }
 
-NMI_GET( CharacterWrapper, expToLevel, "")
+NMI_GET( CharacterWrapper, expToLevel, "сколько опыта осталось набрать до след уровня")
 {
     checkTarget( );
     CHK_NPC
     return target->getPC( )->getExpToLevel( );
 }
 
-NMI_GET( CharacterWrapper, hostname, "")
+NMI_GET( CharacterWrapper, hostname, "IP-адрес соединения")
 {
     checkTarget( );
 
@@ -730,21 +728,21 @@ NMI_SET( CharacterWrapper, level, "настоящий уровень" )
     return target->setLevel( arg.toNumber( ) );
 }
 
-NMI_GET( CharacterWrapper, lastAccessTime, "" )
+NMI_GET( CharacterWrapper, lastAccessTime, "время последнего захода в мир" )
 {
     checkTarget( );
     CHK_NPC
     return target->getPC( )->getLastAccessTime( ).getTimeAsString( );
 }
 
-NMI_GET( CharacterWrapper, profession, "" )
+NMI_GET( CharacterWrapper, profession, "класс (структура .Profession)" )
 {
     checkTarget( );
     CHK_NPC
     return ProfessionWrapper::wrap( target->getPC( )->getProfession( )->getName( ) );
 }
 
-NMI_SET( CharacterWrapper, profession, "" )
+NMI_SET( CharacterWrapper, profession, "класс (структура .Profession)" )
 {
     checkTarget( );
     CHK_NPC
@@ -754,14 +752,14 @@ NMI_SET( CharacterWrapper, profession, "" )
         target->getPC( )->setProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
-NMI_GET( CharacterWrapper, uniclass, "под-профессия универсала" )
+NMI_GET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
 {
     checkTarget( );
     CHK_NPC
     return ProfessionWrapper::wrap( target->getPC( )->getSubProfession( )->getName( ) );
 }
 
-NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала" )
+NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
 {
     checkTarget( );
     CHK_NPC
@@ -771,14 +769,14 @@ NMI_SET( CharacterWrapper, uniclass, "под-профессия универса
         target->getPC( )->setSubProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
-NMI_GET( CharacterWrapper, hometown, "" )
+NMI_GET( CharacterWrapper, hometown, "родной город (структура .Hometown)" )
 {
     checkTarget( );
     CHK_NPC
     return HometownWrapper::wrap( target->getPC( )->getHometown( )->getName( ) );
 }
 
-NMI_SET( CharacterWrapper, hometown, "" )
+NMI_SET( CharacterWrapper, hometown, "родной город (структура .Hometown)" )
 {
     checkTarget( );
     CHK_NPC
@@ -788,6 +786,13 @@ NMI_SET( CharacterWrapper, hometown, "" )
         target->getPC( )->setHometown( wrapper_cast<HometownWrapper>(arg)->name );
 }
 
+NMI_GET( CharacterWrapper, clan, "клан (структура .Clan)" )
+{
+    checkTarget( );
+    CHK_NPC
+    return ClanWrapper::wrap( target->getPC( )->getClan( )->getName( ) );
+}
+
 NMI_SET(CharacterWrapper, on, "объект, мебель, на которой сидим")
 {
     checkTarget( );
@@ -795,39 +800,39 @@ NMI_SET(CharacterWrapper, on, "объект, мебель, на которой �
     target->on = obj;
 }
 
-NMI_SET( CharacterWrapper, russianName, "" )
+NMI_SET( CharacterWrapper, russianName, "русские имена с падежами" )
 {
     checkTarget( );
     CHK_NPC
     target->getPC( )->setRussianName( arg.toString( ) );
 }
 
-NMI_GET( CharacterWrapper, russianName, "" )
+NMI_GET( CharacterWrapper, russianName, "русские имена с падежами" )
 {
     checkTarget( );
     CHK_NPC
     return target->getPC( )->getRussianName( ).getFullForm( );
 }
 
-NMI_SET( CharacterWrapper, name, "" )
+NMI_SET( CharacterWrapper, name, "имя" )
 {
     checkTarget( );
     target->setName( arg.toString( ) );
 }
 
-NMI_GET( CharacterWrapper, name, "" )
+NMI_GET( CharacterWrapper, name, "имя" )
 {
     checkTarget( );
     return target->getName( );
 }
 
-NMI_GET( CharacterWrapper, race, "" )
+NMI_GET( CharacterWrapper, race, "раса (структура .Race)" )
 {
     checkTarget( );
     return RaceWrapper::wrap( target->getRace( )->getName( ) );
 }
 
-NMI_SET( CharacterWrapper, race, "" )
+NMI_SET( CharacterWrapper, race, "раса (структура .Race)" )
 {
     checkTarget( );
     if (arg.type == Register::NONE)
@@ -836,7 +841,7 @@ NMI_SET( CharacterWrapper, race, "" )
         target->setRace( wrapper_cast<RaceWrapper>(arg)->name );
 }
 
-NMI_GET( CharacterWrapper, connected, "" )
+NMI_GET( CharacterWrapper, connected, "true если есть связь" )
 {
     Character *ch;
     
@@ -861,7 +866,7 @@ NMI_GET( CharacterWrapper, isInInterpret, "true если игрок в сост�
  * METHODS
  */
 
-NMI_INVOKE( CharacterWrapper, ptc, "print to char, печатает строку" )
+NMI_INVOKE( CharacterWrapper, ptc, "(msg): print to char, печатает строку msg" )
 {
     checkTarget( );
     DLString d = args.front().toString();
@@ -869,7 +874,7 @@ NMI_INVOKE( CharacterWrapper, ptc, "print to char, печатает строку
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, interpret, "интерпретирует строку, как будто чар ее набрал сам" )
+NMI_INVOKE( CharacterWrapper, interpret, "(msg): интерпретирует строку msg, как будто чар ее набрал сам" )
 {
     checkTarget( );
 
@@ -880,7 +885,7 @@ NMI_INVOKE( CharacterWrapper, interpret, "интерпретирует стро�
     return ::interpret( target, d.c_str() );
 }
 
-NMI_INVOKE( CharacterWrapper, interpret_raw, "выполняет команду с аргументами от имени чара, без предварительных проверок" )
+NMI_INVOKE( CharacterWrapper, interpret_raw, "(cmd, arg): выполняет команду с аргументами от имени чара, без предварительных проверок" )
 {
     DLString cmdName, cmdArgs;
     RegisterList::const_iterator i;
@@ -899,7 +904,7 @@ NMI_INVOKE( CharacterWrapper, interpret_raw, "выполняет команду 
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, interpret_cmd, "выполняет команду с аргументами от имени чара" )
+NMI_INVOKE( CharacterWrapper, interpret_cmd, "(cmd, args): выполняет команду с аргументами от имени чара" )
 {
     DLString cmdName, cmdArgs;
     RegisterList::const_iterator i;
@@ -918,7 +923,7 @@ NMI_INVOKE( CharacterWrapper, interpret_cmd, "выполняет команду 
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, say, "(формат, аргументы...) произносит вслух реплику, отформатированную как в методе act" )
+NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вслух реплику, отформатированную как в методе act" )
 {
     checkTarget( );
         
@@ -927,25 +932,25 @@ NMI_INVOKE( CharacterWrapper, say, "(формат, аргументы...) про
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_world, "параметры: строка с именем чара. вернет видимого для нас чара с таким именем" )
+NMI_INVOKE( CharacterWrapper, get_char_world, "(name): видимый для нас чар с именем name в мире" )
 {
     checkTarget( );
     return wrap( ::get_char_world( target, args2string( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_obj_here, "параметры: строка с именем объекта. вернет видимый нам объект в комнате, инвентаре или equipment" )
+NMI_INVOKE( CharacterWrapper, get_obj_here, "(name): видимый нам объект в комнате, инвентаре или equipment" )
 {
     checkTarget( );
     return wrap( ::get_obj_here( target, args2string( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_obj_carry_type, "(.tables.item_table.*) вернет видимый нам объект в инвентаре или equipment с этим типом" )
+NMI_INVOKE( CharacterWrapper, get_obj_carry_type, "(type): видимый нам объект в инвентаре или equipment с этим типом (таблица .tables.item_table)" )
 {
     checkTarget( );
     return wrap( ::get_obj_carry_type( target, args2number( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(имя жидкости) вернет емкость в инвентаре с заданной жидкостью" )
+NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(liqname): вернет емкость в инвентаре с заданной жидкостью" )
 {
     checkTarget( );
 
@@ -962,7 +967,7 @@ NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(имя жидкости) ве�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(.tables.recipe_flags.*) вернет рецепт в инвентаре с заданным флагом" )
+NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(flag): вернет рецепт в инвентаре с заданным флагом (таблица .tables.recipe_flags)" )
 {
     checkTarget( );
 
@@ -974,19 +979,19 @@ NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(.tables.recipe_flags.*) вер
 
     return Register();
 }
-NMI_INVOKE( CharacterWrapper, get_obj_room, "параметры: строка с именем объекта. вернет видимый нам объект в комнате" )
+NMI_INVOKE( CharacterWrapper, get_obj_room, "(name): поиск по имени видимого объекта в комнате" )
 {
     checkTarget( );
     return wrap( ::get_obj_room( target, args2string( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_obj_wear, "параметры: строка с именем объекта. вернет видимый чару объект в екипировке" )
+NMI_INVOKE( CharacterWrapper, get_obj_wear, "(name): поиск по имени видимого объекта в экипировке" )
 {
     checkTarget( );
     return wrap( ::get_obj_wear( target, args2string( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "" )
+NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "(vnum): поиск объекта в экипировке по внуму" )
 {
     checkTarget( );
 
@@ -999,7 +1004,7 @@ NMI_INVOKE( CharacterWrapper, get_obj_wear_vnum, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, get_char_room, "параметры: строка с именем чара. вернет видимого нам чара в этой комнате" )
+NMI_INVOKE( CharacterWrapper, get_char_room, "(name): поиск по имени видимого персонажа в той же комнате" )
 {
     checkTarget( );
     
@@ -1014,14 +1019,14 @@ NMI_INVOKE( CharacterWrapper, get_char_room, "параметры: строка �
     return wrap( ::get_char_room( target, room, name ) );
 }
 
-NMI_INVOKE( CharacterWrapper, get_obj_carry, "параметры: строка с именем объекта. вернет видимый нам объект из inventory или equipment" )
+NMI_INVOKE( CharacterWrapper, get_obj_carry, "(name): поиск по имени видимого объекта в экипировке или инвентаре" )
 {
     checkTarget( );
     return wrap( ::get_obj_carry( target, args2string( args ) ) );
 }
 
 
-NMI_INVOKE( CharacterWrapper, transfer, "" )
+NMI_INVOKE( CharacterWrapper, transfer, "(room,actor,msgRoomLeave,msgSelfLeave,msgRoomEnter,msgSelfEnter): actor переносит нас в комнату room" )
 {
     Room *room;
     Character *actor;
@@ -1044,7 +1049,7 @@ NMI_INVOKE( CharacterWrapper, transfer, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, char_to_room, "параметр: комната. переместит чара в эту комнату" )
+NMI_INVOKE( CharacterWrapper, char_to_room, "(room): поместить в комнату room")
 {
     checkTarget( );
     Room *room = arg2room( get_unique_arg( args ) ); 
@@ -1059,19 +1064,19 @@ NMI_INVOKE( CharacterWrapper, char_to_room, "параметр: комната. �
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, is_npc, "возвращает true, если это моб" )
+NMI_INVOKE( CharacterWrapper, is_npc, "(): true для мобов, false для игроков" )
 {
     checkTarget( );
     return Register( (int)target->is_npc( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, getName, "возвращает имя игрока или список имен моба" )
+NMI_INVOKE( CharacterWrapper, getName, "(): имя игрока или список имен моба" )
 {
     checkTarget( );
     return Register( target->getName() );
 }
 
-NMI_INVOKE( CharacterWrapper, setName, "устанавливает имена моба" )
+NMI_INVOKE( CharacterWrapper, setName, "(name): устанавливает имена моба" )
 {
     checkTarget( );
     CHK_PC
@@ -1079,10 +1084,7 @@ NMI_INVOKE( CharacterWrapper, setName, "устанавливает имена м
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, seeName, 
-        "параметры: чар ch, номер падежа (по умолчанию именительный)."
-        "вернет то, как this видит имя и претитул (короткое описание) чара ch. "
-        "считается, что ch видимый для this." )
+NMI_INVOKE( CharacterWrapper, seeName, "(ch[, case]): как мы видим имя и претитул ch в падеже case") 
 {
     checkTarget( );
     int cse = 1;
@@ -1102,25 +1104,25 @@ NMI_INVOKE( CharacterWrapper, seeName,
     return Register( target->seeName(ch, '0' + cse ) );
 }
 
-NMI_INVOKE( CharacterWrapper, can_see_mob, "параметры: чар. вернет true, если this может его видеть " )
+NMI_INVOKE( CharacterWrapper, can_see_mob, "(ch): видим ли персонажа ch" )
 {
     checkTarget( );
     return target->can_see( arg2character( get_unique_arg( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, can_see_obj, "параметры: объект. вернет true, если объект видимый для this" )
+NMI_INVOKE( CharacterWrapper, can_see_obj, "(obj): видим ли предмет obj" )
 {
     checkTarget( );
     return target->can_see( arg2item( get_unique_arg( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, can_see_room, "параметры: комната. вернет true, если комната видима для this" )
+NMI_INVOKE( CharacterWrapper, can_see_room, "(room): видим ли комнату room" )
 {
     checkTarget( );
     return target->can_see( arg2room( get_unique_arg( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, can_see_exit, "" )
+NMI_INVOKE( CharacterWrapper, can_see_exit, "(door): видим ли выход под номером door" )
 {
     int door;
     EXIT_DATA *pExit;
@@ -1136,14 +1138,14 @@ NMI_INVOKE( CharacterWrapper, can_see_exit, "" )
     return target->can_see( pExit );
 }
 
-NMI_INVOKE( CharacterWrapper, print, "параметры: строка-формат, аргументы. возвращает отформатированную строку (аналог sprintf)" )
+NMI_INVOKE( CharacterWrapper, print, "(fmt, args): возвращает отформатированную строку (см. статью вики про ф-ии вывода)" )
 {
     checkTarget();
     
     return Register( regfmt(target, args) );
 }
 
-NMI_INVOKE( CharacterWrapper, act, "параметры: строка-формат, аргументы. печатает нам отформатированную строку (с символом конца строки). " )
+NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отформатированную строку (с символом конца строки). " )
 {
     checkTarget();
     
@@ -1152,14 +1154,14 @@ NMI_INVOKE( CharacterWrapper, act, "параметры: строка-форма�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, recho, "параметры: cтрока-формат, аргументы. выводит отформатированную строку всем в комнате, кроме нас" )
+NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформатированную строку всем в комнате, кроме нас" )
 {
     checkTarget( );
     target->recho( regfmt( target, args ).c_str( ) );
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...) выводит отформатированную строку всем в комнате, кроме нас и vict" )
+NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит отформатированную строку всем в комнате, кроме нас и vict" )
 {
     checkTarget( );
     RegisterList myArgs(args);
@@ -1171,35 +1173,35 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...) выводит от�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, getModifyLevel, "вернет уровень, с учетом плюшек от ремортов" )
+NMI_INVOKE( CharacterWrapper, getModifyLevel, "(): уровень, с учетом плюшек от ремортов" )
 {
     checkTarget();
     
     return target->getModifyLevel();
 }
 
-NMI_INVOKE( CharacterWrapper, getRealLevel, "вернет настоящий уровень" )
+NMI_INVOKE( CharacterWrapper, getRealLevel, "(): настоящий уровень" )
 {
     checkTarget();
     
     return target->getRealLevel();
 }
 
-NMI_INVOKE( CharacterWrapper, getSex, "вернет номер пола (0 neutral, 1 male, 2 female, 3 random - только у прототипов)" )
+NMI_INVOKE( CharacterWrapper, getSex, "(): номер пола (0 neutral, 1 male, 2 female, 3 random - только у прототипов)" )
 {
     checkTarget();
     
     return target->getSex();
 }
 
-NMI_INVOKE( CharacterWrapper, is_immortal, "вернет true, если this бессмертный или кодер" )
+NMI_INVOKE( CharacterWrapper, is_immortal, "(): true, если this бессмертный или кодер" )
 {
     checkTarget();
     
     return target->is_immortal();
 }
 
-NMI_INVOKE( CharacterWrapper, edit, "переводит this в режим редактирования" )
+NMI_INVOKE( CharacterWrapper, edit, "(): переводит this в режим редактирования" )
 {
     checkTarget();
     
@@ -1222,7 +1224,7 @@ NMI_INVOKE( CharacterWrapper, edit, "переводит this в режим ре�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, edReg, "([ndx[, txt]]) -- возвращает/устанавливает содержимое регистров редактора" )
+NMI_INVOKE( CharacterWrapper, edReg, "([ndx[, txt]]): возвращает/устанавливает содержимое регистров редактора" )
 {
     RegisterList::const_iterator i = args.begin( );
 
@@ -1254,7 +1256,7 @@ NMI_INVOKE( CharacterWrapper, edReg, "([ndx[, txt]]) -- возвращает/у�
 }
 
 
-NMI_INVOKE( CharacterWrapper, gainExp, "параметр: число. добавляет указанное количество очков опыта" )
+NMI_INVOKE( CharacterWrapper, gainExp, "(exp): добавляет exp очков опыта" )
 {
     checkTarget( );
     RegisterList::const_iterator i = args.begin( );
@@ -1268,17 +1270,17 @@ NMI_INVOKE( CharacterWrapper, gainExp, "параметр: число. добав
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, getClass, "возвращает строку с названием профессии" )
+NMI_INVOKE( CharacterWrapper, getClass, "(): строка с названием профессии" )
 {
     checkTarget();
     return Register( target->getProfession( )->getName( ).c_str( ) );
 }
-NMI_INVOKE( CharacterWrapper, getClan, "возвращает строку с названием клана" )
+NMI_INVOKE( CharacterWrapper, getClan, "(): строка с названием клана" )
 {
     checkTarget();
     return Register( target->getClan( )->getShortName( ) );
 }
-NMI_INVOKE( CharacterWrapper, setClan, "устанавливает клан по строке с именем" )
+NMI_INVOKE( CharacterWrapper, setClan, "(name): устанавливает клан по строке с именем" )
 {
     Clan *clan;
     
@@ -1296,19 +1298,19 @@ NMI_INVOKE( CharacterWrapper, setClan, "устанавливает клан по
     
     return Register( );
 }
-NMI_INVOKE( CharacterWrapper, getClanLevel, "возвращает клановый уровень: число от 0 до 8" )
+NMI_INVOKE( CharacterWrapper, getClanLevel, "(): клановый уровень, число от 0 до 8" )
 {
     checkTarget();
     CHK_NPC
     return Register( target->getPC()->getClanLevel() );
 }
-NMI_INVOKE( CharacterWrapper, getRace, "возвращает строку с названием расы" )
+NMI_INVOKE( CharacterWrapper, getRace, "(): строка с названием расы" )
 {
     checkTarget();
     return Register( target->getRace( )->getName( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, extract, "" )
+NMI_INVOKE( CharacterWrapper, extract, "(bool): уничтожить полностью (suicide/remort игрока или смерть моба) или не полностью как при выходе из мира" )
 {
     checkTarget( );
     RegisterList::const_iterator i = args.begin( );
@@ -1320,21 +1322,21 @@ NMI_INVOKE( CharacterWrapper, extract, "" )
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, add_follower, "Параметр: master, делает этого чара последователем master-а." )
+NMI_INVOKE( CharacterWrapper, add_follower, "(master): делает нас последователем master-а" )
 {
     checkTarget( );
     target->add_follower( arg2character( get_unique_arg( args ) ) );
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, stop_follower, "Прекращает следование, снимает с чара очарование." )
+NMI_INVOKE( CharacterWrapper, stop_follower, "(): прекращает следование, снимает очарование" )
 {
     checkTarget( );
     target->stop_follower();
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, clearBehavior, "" )
+NMI_INVOKE( CharacterWrapper, clearBehavior, "(): сбросить поведение моба до обычного" )
 {
     checkTarget( );
     CHK_PC
@@ -1343,7 +1345,7 @@ NMI_INVOKE( CharacterWrapper, clearBehavior, "" )
 }
 
 
-NMI_INVOKE( CharacterWrapper, get_random_room, "рандомная рума, куда может попасть этот чар" )
+NMI_INVOKE( CharacterWrapper, get_random_room, "(): случайная комната, куда можно зайти" )
 {
     checkTarget( );
     
@@ -1362,14 +1364,14 @@ NMI_INVOKE( CharacterWrapper, get_random_room, "рандомная рума, к�
     }
 }
 
-NMI_INVOKE( CharacterWrapper, is_safe, "" )
+NMI_INVOKE( CharacterWrapper, is_safe, "(vict): защищают ли боги vict от нас" )
 {
     checkTarget( );
     return ::is_safe_nomessage( target, 
                                 arg2character( get_unique_arg( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, rawdamage, "параметры: victim, размер повреждений, тип повреждений из damage_table" )
+NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vict повреждения в размере dam с типом damtype (таблица .tables.damage_table)" )
 {
     RegisterList::const_iterator i;
     Character *victim;
@@ -1397,7 +1399,7 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "параметры: victim, разме
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, damage, "параметры: victim, размер повреждений, название скила наносящего повреждения, тип повреждений из damage_table" )
+NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
     RegisterList::const_iterator i;
     Character *victim;
@@ -1433,7 +1435,7 @@ NMI_INVOKE( CharacterWrapper, damage, "параметры: victim, размер 
 }
 
 
-NMI_INVOKE( CharacterWrapper, spell, "скастовать заклинание ( название, уровень, жертва, спелбанить? )")
+NMI_INVOKE( CharacterWrapper, spell, "(skillName,level,vict,spellbane): скастовать на vict заклинание skillName уровне level, с возможным spellbane")
 {
     RegisterList::const_iterator i;
     Skill *skill;
@@ -1466,14 +1468,14 @@ NMI_INVOKE( CharacterWrapper, spell, "скастовать заклинание 
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, multi_hit, "" )
+NMI_INVOKE( CharacterWrapper, multi_hit, "(vict): нанести один раунд повреждений жертве" )
 {
     checkTarget( );
     ::multi_hit( target, arg2character( get_unique_arg( args ) ) );
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, raw_kill, "убить. необязательные аргументы: номер части тела (-1 рандомная) и убийца" )
+NMI_INVOKE( CharacterWrapper, raw_kill, "([bodypart[,killer]]): убить. часть тела из таблицы .tables.part_flags или -1" )
 {
     RegisterList::const_iterator i;
     Character *killer = NULL;
@@ -1494,7 +1496,7 @@ NMI_INVOKE( CharacterWrapper, raw_kill, "убить. необязательны�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, affectAdd, "" )
+NMI_INVOKE( CharacterWrapper, affectAdd, "(.Affect): повесить новый аффект" )
 {
     checkTarget( );
     AffectWrapper *aw;
@@ -1510,7 +1512,7 @@ NMI_INVOKE( CharacterWrapper, affectAdd, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, affectJoin, "" )
+NMI_INVOKE( CharacterWrapper, affectJoin, "(.Affect): повесить новый аффект или усилить существующий" )
 {
     checkTarget( );
     AffectWrapper *aw;
@@ -1526,7 +1528,7 @@ NMI_INVOKE( CharacterWrapper, affectJoin, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, affectBitStrip, "снять с чара все аффекты, устанавливающие некий бит. первый аргумент - значение из таблицы affwhere_flags, второй - бит")
+NMI_INVOKE( CharacterWrapper, affectBitStrip, "(where,bit): снять все аффекты, устанавливающие в поле where (.tables.affwhere_flags) значение bit")
 {
     int where, bits;
     
@@ -1541,7 +1543,7 @@ NMI_INVOKE( CharacterWrapper, affectBitStrip, "снять с чара все а�
     return Register( ); 
 }
 
-NMI_INVOKE( CharacterWrapper, isAffected, "находится ли чар под воздействием аффекта с данным именем" )
+NMI_INVOKE( CharacterWrapper, isAffected, "(skillName): находится ли под воздействием аффекта с именем skillName" )
 {
     Skill *skill;
     
@@ -1558,7 +1560,7 @@ NMI_INVOKE( CharacterWrapper, isAffected, "находится ли чар под
         return false;
 }
 
-NMI_INVOKE( CharacterWrapper, affectStrip, "" )
+NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аффекты с именем skillName" )
 {
     checkTarget( );
     Skill *skill;
@@ -1576,14 +1578,14 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "" )
 }
 
 
-NMI_INVOKE( CharacterWrapper, stop_fighting, "" )
+NMI_INVOKE( CharacterWrapper, stop_fighting, "(): прекратить битву" )
 {
     checkTarget( );
     stop_fighting(target, get_unique_arg( args ).toBoolean( ));
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, move_char, "переместит чара, первый аргумент - номер двери, второй необязательный аргумент - тип перемещения ('running', 'normal', 'crawl' и тп). Вернет true если перемещение совершилось")
+NMI_INVOKE( CharacterWrapper, move_char, "(door[,movetype]): переместить персонажа в дверь door, с типом движения movetype('running','crawl'). Вернет true если переместили.")
 {
     int door, rc;
     DLString movetypeName;
@@ -1609,7 +1611,7 @@ NMI_INVOKE( CharacterWrapper, move_char, "переместит чара, пер�
     return Register( rc == RC_MOVE_OK );
 }
 
-NMI_INVOKE( CharacterWrapper, addDarkShroud, "")
+NMI_INVOKE( CharacterWrapper, addDarkShroud, "(): повесить темную ауру")
 {
     Affect af;
     
@@ -1624,7 +1626,7 @@ NMI_INVOKE( CharacterWrapper, addDarkShroud, "")
     return Register( );
 }    
 
-NMI_INVOKE( CharacterWrapper, isLawProtected, "охраняется ли моб законом" )
+NMI_INVOKE( CharacterWrapper, isLawProtected, "(): охраняется ли моб законом" )
 {
     NPCharacter *mob;
     
@@ -1638,7 +1640,7 @@ NMI_INVOKE( CharacterWrapper, isLawProtected, "охраняется ли моб 
     return false;
 }
 
-NMI_INVOKE( CharacterWrapper, can_get_obj, "может ли поднять предмет" )
+NMI_INVOKE( CharacterWrapper, can_get_obj, "(obj): может ли поднять предмет obj с земли" )
 {
     checkTarget( );
 
@@ -1660,7 +1662,7 @@ NMI_INVOKE( CharacterWrapper, can_get_obj, "может ли поднять пр�
 
 
 
-NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "поиск объекта в inv или eq по его внуму" )
+NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "(vnum): поиск по внуму предмета в инвентаре или экипировке" )
 {
     checkTarget( );
 
@@ -1673,14 +1675,14 @@ NMI_INVOKE(CharacterWrapper, get_obj_carry_vnum, "поиск объекта в i
     return Register( );
 }
 
-NMI_INVOKE(CharacterWrapper, can_drop_obj, "может ли чар избавиться от предмета в инвентаре" )
+NMI_INVOKE(CharacterWrapper, can_drop_obj, "(obj): может ли избавиться от предмета obj в инвентаре" )
 {
     checkTarget( );
     ::Object *obj = arg2item( get_unique_arg( args ) );
     return ::can_drop_obj(target, obj, false);
 }
 
-NMI_INVOKE( CharacterWrapper, mortality, "" )
+NMI_INVOKE( CharacterWrapper, mortality, "(): включает-выключает бессмертие для кодеров" )
 {
     checkTarget( );
 
@@ -1701,7 +1703,7 @@ NMI_INVOKE( CharacterWrapper, mortality, "" )
     }
 }
 
-NMI_INVOKE( CharacterWrapper, echoOn, "" )
+NMI_INVOKE( CharacterWrapper, echoOn, "(): включает отображение введенного текста в терминале" )
 {
     checkTarget( );
     
@@ -1711,7 +1713,7 @@ NMI_INVOKE( CharacterWrapper, echoOn, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, echoOff, "" )
+NMI_INVOKE( CharacterWrapper, echoOff, "(): выключает отображение введенного текста в терминале" )
 {
     checkTarget( );
     
@@ -1721,7 +1723,7 @@ NMI_INVOKE( CharacterWrapper, echoOff, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, save, "" )
+NMI_INVOKE( CharacterWrapper, save, "(): сохранить профайл на диск" )
 {
     checkTarget( );
     CHK_NPC
@@ -1729,7 +1731,7 @@ NMI_INVOKE( CharacterWrapper, save, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, updateSkills, "" )
+NMI_INVOKE( CharacterWrapper, updateSkills, "(): освежить разученность умений (при входе в мир)" )
 {
     checkTarget( );
     CHK_NPC
@@ -1737,14 +1739,14 @@ NMI_INVOKE( CharacterWrapper, updateSkills, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, hasAttribute, "" )
+NMI_INVOKE( CharacterWrapper, hasAttribute, "(attr): true если установлен аттрибут с именем attr" )
 {
     checkTarget( );
     CHK_NPC
     return target->getPC( )->getAttributes( ).isAvailable( args2string( args ) );
 }
 
-NMI_INVOKE( CharacterWrapper, eraseAttribute, "" )
+NMI_INVOKE( CharacterWrapper, eraseAttribute, "(attr): удаляет аттрибут с именем attr" )
 {
     checkTarget( );
     CHK_NPC
@@ -1752,7 +1754,7 @@ NMI_INVOKE( CharacterWrapper, eraseAttribute, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, canRecall, "" )
+NMI_INVOKE( CharacterWrapper, canRecall, "(): может ли прямо сейчас воспользоваться возвратом" )
 {
     checkTarget( );
 
@@ -1770,13 +1772,13 @@ NMI_INVOKE( CharacterWrapper, canRecall, "" )
     return true;
 }
 
-NMI_INVOKE( CharacterWrapper, get_eq_char, "" )
+NMI_INVOKE( CharacterWrapper, get_eq_char, "(wearloc): предмет экипировки, надетый на эту локацию" )
 {
     checkTarget( );
     return wrap( arg2wearloc( get_unique_arg( args ) )->find( target ) );
 }
 
-NMI_INVOKE( CharacterWrapper, hasWearloc, "(wearloc name) обладает ли персонаж данным слотом в экипировке")
+NMI_INVOKE( CharacterWrapper, hasWearloc, "(wearloc): обладает ли данным слотом в экипировке")
 {
     checkTarget( );
     CHK_NPC
@@ -1784,7 +1786,7 @@ NMI_INVOKE( CharacterWrapper, hasWearloc, "(wearloc name) обладает ли 
                  arg2wearloc( get_unique_arg( args ) ) );
 }
 
-NMI_INVOKE( CharacterWrapper, add_charmed, "" )
+NMI_INVOKE( CharacterWrapper, add_charmed, "(victim,time): очаровать victim на время time и добавить нам в последователи" )
 {
     Character *victim;
     int duration;
@@ -1815,7 +1817,7 @@ NMI_INVOKE( CharacterWrapper, add_charmed, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, add_pet, "" )
+NMI_INVOKE( CharacterWrapper, add_pet, "(pet): добавить пета нам в последователи" )
 {
     Character *pet;
 
@@ -1843,14 +1845,14 @@ NMI_INVOKE( CharacterWrapper, add_pet, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, look_auto, "" )
+NMI_INVOKE( CharacterWrapper, look_auto, "(room): вывести описание комнаты room, будто там набрали look" )
 {
     checkTarget( );
     do_look_auto( target, arg2room( get_unique_arg( args ) ) );
     return Register( );
 }
 
-NMI_GET( CharacterWrapper, affected, "" )
+NMI_GET( CharacterWrapper, affected, "список всех аффектов (List из структур Affect)" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
@@ -1865,7 +1867,7 @@ NMI_GET( CharacterWrapper, affected, "" )
     return Register( sobj );
 }
 
-NMI_GET( CharacterWrapper, hasDestiny, "" )
+NMI_GET( CharacterWrapper, hasDestiny, "моб имеет предназначение (квестовые и спец-мобы)" )
 {
     checkTarget( );
     CHK_PC
@@ -1876,14 +1878,7 @@ NMI_GET( CharacterWrapper, hasDestiny, "" )
         return Register( false );
 }
 
-NMI_GET( CharacterWrapper, clan, "" )
-{
-    checkTarget( );
-    CHK_NPC
-    return ClanWrapper::wrap( target->getPC( )->getClan( )->getName( ) );
-}
-
-NMI_INVOKE( CharacterWrapper, hasOccupation, "" )
+NMI_INVOKE( CharacterWrapper, hasOccupation, "(): моб имеет занятие (продавец,ремонтник,квестор)" )
 {
     checkTarget( );
     CHK_PC
@@ -1892,7 +1887,7 @@ NMI_INVOKE( CharacterWrapper, hasOccupation, "" )
     return mob_has_occupation( target->getNPC( ), occName.c_str( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, switchTo, "" )
+NMI_INVOKE( CharacterWrapper, switchTo, "(mob): вселиться в тело моба" )
 {
     Character *victim;
         
@@ -1924,7 +1919,7 @@ NMI_INVOKE( CharacterWrapper, switchTo, "" )
 }
 
 
-NMI_INVOKE( CharacterWrapper, switchFrom, "" )
+NMI_INVOKE( CharacterWrapper, switchFrom, "(): выселиться из моба обратно" )
 {
     checkTarget( );
     CHK_PC
@@ -1945,7 +1940,7 @@ NMI_INVOKE( CharacterWrapper, switchFrom, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, setDead, "" )
+NMI_INVOKE( CharacterWrapper, setDead, "(): пометить моба как умершего" )
 {
     checkTarget( );
     CHK_PC
@@ -1953,14 +1948,14 @@ NMI_INVOKE( CharacterWrapper, setDead, "" )
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, isDead, "" )
+NMI_INVOKE( CharacterWrapper, isDead, "(): умер ли моб" )
 {
     checkTarget( );
     CHK_PC
     return target->isDead( );
 }
 
-NMI_INVOKE( CharacterWrapper, writeWSCommand, "" )
+NMI_INVOKE( CharacterWrapper, writeWSCommand, "(cmd,args...): отправить в веб-клиент команду с аргументами" )
 {
     checkTarget( );
     CHK_NPC
@@ -1989,7 +1984,7 @@ NMI_INVOKE( CharacterWrapper, writeWSCommand, "" )
     return target->desc->writeWSCommand(val);
 }
 
-NMI_INVOKE( CharacterWrapper, eat, "(item) заполнить желудок так, будто item был съеден" )
+NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок так, будто obj был съеден" )
 {
     checkTarget( );
     ::Object *obj = arg2item( args.front( ) );
@@ -2002,7 +1997,7 @@ NMI_INVOKE( CharacterWrapper, eat, "(item) заполнить желудок т�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, drink, "(item, amount) заполнить желудок так, будто от item отхлебнули amount глотков" )
+NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желудок так, будто от obj отхлебнули amount глотков" )
 {
     checkTarget( );
     ::Object *obj;
@@ -2025,7 +2020,7 @@ NMI_INVOKE( CharacterWrapper, drink, "(item, amount) заполнить желу
     return Register( );
 }
 
-NMI_INVOKE(CharacterWrapper, restring, "(skill, key, names, short, long) установить аттрибут для рестринга результатов заклинаний")
+NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long): установить аттрибут для рестринга результатов заклинаний")
 {
     checkTarget( );
     CHK_NPC
@@ -2059,21 +2054,21 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill, key, names, short, long) уст�
     return Register( );
 }
  
-NMI_INVOKE( CharacterWrapper, api, "печатает этот API" )
+NMI_INVOKE( CharacterWrapper, api, "(): печатает этот api" )
 {
     ostringstream buf;
     Scripting::traitsAPI<CharacterWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( CharacterWrapper, rtapi, "(): печатает все поля и методы, установленные в runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( CharacterWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( CharacterWrapper, clear, "(): очистка всех runtime полей" )
 {
     guts.clear( );
     self->changed();
