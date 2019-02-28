@@ -100,6 +100,7 @@
 #include "act_lock.h"
 #include "handler.h"
 #include "stats_apply.h"
+#include "arg_utils.h"
 #include "vnum.h"
 #include "mercdb.h"
 
@@ -1545,6 +1546,170 @@ CMDRUNP( demand )
     ch->println("Твое могущество повергает всех в трепет.");
 }
 
+/**
+ * Output each score piece separately, as requested by the argument.
+ */
+static void do_score_args(Character *ch, const DLString &arg)
+{
+    PCharacter *pch = ch->getPC();
+    if (!pch)
+        return;
+
+    int stat = -1;
+    for (int i = 0; i < stat_table.size; i++)
+        if (arg.strPrefix( stat_table.fields[i].name )
+            || arg.strPrefix( russian_case(stat_table.fields[i].message, '1') )
+            || arg.strPrefix( russian_case(stat_table.fields[i].message, '4') ))
+        {
+            stat = i;
+            break;
+        }
+    
+    if (arg == "ум")
+        stat = STAT_INT;
+
+    if (stat >=0) {
+        ch->pecho("%^N1 %d (%d), максимум %d.", 
+            stat_table.fields[stat].message, ch->perm_stat[stat], 
+            ch->getCurrStat(stat), pch->getMaxStat(stat));
+        return;
+    }
+   
+    if (arg_oneof(arg, "hitpoint", "здоровье", "hp")) {
+        ch->pecho("Здоровье %d из %d.", ch->hit, ch->max_hit);
+        return;
+    } 
+	if (arg_oneof(arg, "mana", "мана", "энергия")) {
+        ch->pecho("Мана %d из %d.", ch->mana, ch->max_mana);
+        return;
+    } 
+	if (arg_oneof(arg, "moves", "движение", "шаги")) {
+        ch->pecho("Шагов %d из %d.", ch->move, ch->max_move);
+        return;
+    } 
+	if (arg_oneof(arg, "level", "уровень")) {
+        ch->pecho("Уровень %d.", ch->getRealLevel());
+        return;
+    } 
+	if (arg_oneof(arg, "race", "раса")) {
+        if (ch->getRace()->isPC()) {
+            PCRace::Pointer pcRace = ch->getRace()->getPC(); 
+            ch->pecho("Ты %N1.", GET_SEX(ch,
+                            pcRace->getMaleName().c_str(),
+                            pcRace->getMaleName().c_str(),
+                            pcRace->getFemaleName().c_str()));
+        }
+        return;
+    } 
+    if (arg_oneof(arg, "sex", "gender", "пол")) {   
+        ch->pecho("Пол %s.", GET_SEX(ch, "потерян", "мужской", "женский"));
+        return;
+    }
+	if (arg_oneof(arg, "class", "класс", "profession", "профессия")) {
+        ch->pecho("Ты %N1.", ch->getProfession()->getRusName().c_str());
+        return;
+    } 
+	if (arg_oneof(arg, "alignment", "характер", "натура")) {
+        ch->pecho("У тебя %s характер.", align_name_short(ch, Grammar::MultiGender::MASCULINE));
+        return;
+    } 
+	if (arg_oneof(arg, "ethos", "этос", "мировоззрение")) {
+        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos).c_str());
+        return;
+    } 
+	if (arg_oneof(arg, "hometown", "дом")) {
+        Room *room = get_room_index(pch->getHometown()->getAltar());
+        ch->pecho("Твой дом - %s.", room ? room->area->name : "потерян");
+        return;
+    } 
+	if (arg_oneof(arg, "religion", "религия")) {
+        if (ch->getReligion() == god_none)
+            ch->pecho("Ты атеист.");
+        else
+            ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
+        return;
+    } 
+	if (arg_oneof(arg, "practice", "практики")) {
+        ch->pecho("Практик %d.", pch->practice);
+        return;
+    } 
+	if (arg_oneof(arg, "train", "тренировки")) {
+        ch->pecho("Тренировки %d.", pch->train);
+        return;
+    } 
+	if (str_prefix("quest", arg.c_str()) || str_prefix("квест", arg.c_str())) {
+        ch->pecho("Используй команды 'квест время' и 'квест очки'.");
+        return;
+    } 
+	if (arg_oneof(arg, "wimpy", "трусость")) {
+        ch->pecho("Трусость %d.", ch->wimpy);
+        return;
+    } 
+	if (arg_oneof(arg, "death", "смертей", "смерть")) {
+        ch->pecho("Смертей %d.", pch->death);
+        return;
+    } 
+	if (arg_oneof(arg, "position", "положение", "позиция")) {
+        ch->println(msgtable_lookup(msg_positions, ch->position));
+        return;
+    }
+	if (arg_oneof(arg, "gold", "золото")) {
+        ch->pecho("Золота %d.", ch->gold);
+        return;
+    } 
+	if (arg_oneof(arg, "silver", "серебро")) {
+        ch->pecho("Серебра %d.", ch->silver);
+        return;
+    } 
+	if (arg_oneof(arg, "weight", "вес")) {
+        ch->pecho("Вес %d из %d.", ch->getCarryWeight()/10, ch->canCarryWeight()/10);
+        return;
+    } 
+	if (arg_oneof(arg, "items", "вещи")) {
+        ch->pecho("Вещи %d из %d.", ch->carry_number, ch->canCarryNumber());
+        return;
+    } 
+	if (arg_oneof(arg, "experience", "опыт")) {
+        ch->pecho("Опыта до уровня %d.", pch->getExpToLevel());
+        return;
+    }
+	if (arg_oneof(arg, "age", "возраст")) {
+        ch->pecho("Возраст %d.", pch->age.getYears());
+        return;
+    }
+
+    if (ch->getRealLevel() >= 20) {
+        if (arg_oneof(arg, "hitroll", "точность")) {
+            ch->pecho("Точность %d.", ch->hitroll);
+            return;
+        } 
+        if (arg_oneof(arg, "damroll", "урон")) {
+            ch->pecho("Урон %d.", ch->damroll);
+            return;
+        } 
+        if (arg_oneof(arg, "armor class", "класс брони", "защита")) {
+            ch->pecho("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d.", 
+                      GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
+                      GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));
+            return;
+        }
+        if (arg_oneof(arg, "saves", "спассбросок", "защита от заклинаний")) {
+            ch->pecho("Защита от заклинаний %d.", ch->saving_throw);
+            return;
+        }
+    } else {
+        if (arg_oneof(arg, "armor class", "класс брони", "защита")) {
+            ch->pecho("Защита от уколов %s, ударов %s, разрезов %s, экзотики %s.", 
+                      msgtable_lookup(msg_armor, GET_AC(ch, AC_PIERCE)), 
+                      msgtable_lookup(msg_armor, GET_AC(ch, AC_BASH)), 
+                      msgtable_lookup(msg_armor, GET_AC(ch, AC_SLASH)), 
+                      msgtable_lookup(msg_armor, GET_AC(ch, AC_EXOTIC)));
+            return;
+        }
+    }
+   
+    ch->println("Такого параметра не существует или он скрыт от тебя, попробуй что-то еще."); 
+}
 
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
@@ -1578,6 +1743,13 @@ CMDRUNP( score )
     DLString title = pch->getParsedTitle( );
     name << ch->seeName( ch, '1' ) << "{x ";
     vistags_convert( title.c_str( ), name, ch );
+
+    // Output one piece of the score if there is an argument provided.
+    DLString arg = argument;
+    if (!arg.empty()) {
+        do_score_args(ch, arg);
+        return;
+    }
 
     ch->printf( 
 "%s\n\r"
@@ -1647,8 +1819,7 @@ CMDRUNP( score )
             CLR_FRAME,
     
             CLR_CAPT,
-            fRus ? (IS_GOOD(ch) ? "добрая" : IS_EVIL(ch) ? "злая" : "нейтральная")
-                 : align_table.name( ALIGNMENT(ch) ).c_str( ),
+            align_name_short(ch, Grammar::MultiGender::FEMININE),
             CLR_BAR,
             CLR_CAPT,
             ch->perm_stat[STAT_CON], ch->getCurrStat(STAT_CON), pch->getMaxStat(STAT_CON),

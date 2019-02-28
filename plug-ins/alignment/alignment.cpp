@@ -6,6 +6,7 @@
 #include "pcharacter.h"
 #include "pcrace.h"
 #include "mercdb.h"
+#include "grammar_entities_impl.h"
 #include "act.h"
 
 
@@ -158,5 +159,24 @@ DLString align_max( PCharacter *ch )
     int a_min, a_max;
     align_get_ranges( ch, a_min, a_max );
     return align_name( a_max );
+}
+
+static const char * evil [] = {
+    "злое", "злой", "злая", "злые"
+};
+static const char * good [] = {
+    "доброе", "добрый", "добрая", "добрые"
+};
+static const char * neutral [] = {
+    "нейтральное", "нейтральный", "нейтральная", "нейтральные"
+};
+const char *align_name_short(Character *ch, const Grammar::MultiGender &mg)
+{
+    int a = ch->alignment;
+    if (ALIGN_IS_EVIL(a))
+        return evil[mg];
+    if (ALIGN_IS_GOOD(a))
+        return good[mg];
+    return neutral[mg];    
 }
 
