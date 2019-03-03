@@ -500,6 +500,12 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
         if (pet->damroll != pet->pIndexData->damage[DICE_BONUS])
                 fprintf(fp, "Dam  %d\n", pet->damroll.getValue( ));
 
+        if (pet->damage[DICE_NUMBER] != pet->pIndexData->damage[DICE_NUMBER])
+                fprintf(fp, "DamN  %d\n", pet->damage[DICE_NUMBER]);
+
+        if (pet->damage[DICE_TYPE] != pet->pIndexData->damage[DICE_TYPE])
+                fprintf(fp, "DamT  %d\n", pet->damage[DICE_TYPE]);
+
         fprintf(fp, "ACs  %d %d %d %d\n",
                 pet->armor[0],pet->armor[1],pet->armor[2],pet->armor[3]);
 
@@ -609,6 +615,12 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         if (mob->damroll != mob->pIndexData->damage[DICE_BONUS])
                 fprintf(fp, "Dam  %d\n", mob->damroll.getValue( ));
+
+        if (mob->damage[DICE_NUMBER] != mob->pIndexData->damage[DICE_NUMBER])
+                fprintf(fp, "DamN  %d\n", mob->damage[DICE_NUMBER]);
+
+        if (mob->damage[DICE_TYPE] != mob->pIndexData->damage[DICE_TYPE])
+                fprintf(fp, "DamT  %d\n", mob->damage[DICE_TYPE]);
 
         fprintf(fp, "ACs  %d %d %d %d\n",
                 mob->armor[0],mob->armor[1],mob->armor[2],mob->armor[3]);
@@ -1324,15 +1336,17 @@ void fread_pet( PCharacter *ch, FILE *fp )
             
              case 'D':
                  KEY( "Dam",        pet->damroll,                fread_number(fp));
-             KEY( "Detect",        pet->detection,                fread_flag(fp));
+                 KEY( "DamT",       pet->damage[DICE_TYPE],      fread_number(fp));
+                 KEY( "DamN",       pet->damage[DICE_NUMBER],    fread_number(fp));
+                 KEY( "Detect",        pet->detection,                fread_flag(fp));
 
-            if (!str_cmp( word, "Desc" )) {
-                char *word = fread_string( fp );
-                pet->setDescription( word );
-                free_string( word );
-                fMatch = true;
-                break;
-            }
+                if (!str_cmp( word, "Desc" )) {
+                    char *word = fread_string( fp );
+                    pet->setDescription( word );
+                    free_string( word );
+                    fMatch = true;
+                    break;
+                }
                  break;
             
              case 'E':
@@ -1584,6 +1598,8 @@ NPCharacter * fread_mob( FILE *fp )
     
             case 'D':
                     KEY( "Dam",        mob->damroll,                fread_number(fp));
+                    KEY( "DamT",       mob->damage[DICE_TYPE],      fread_number(fp));
+                    KEY( "DamN",       mob->damage[DICE_NUMBER],    fread_number(fp));
                     KEY( "Detect",        mob->detection,                fread_flag(fp));
                     
                     if (!str_cmp( word, "Desc" )) {
