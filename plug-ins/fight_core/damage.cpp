@@ -120,11 +120,28 @@ bool Damage::canDamage( )
 
 void Damage::adjustPosition( )
 {
-    if (ch != victim && victim->position > POS_STUNNED) {
-        if (victim->timer <= 4 && ch->in_room == victim->in_room)
-            victim->position = POS_FIGHTING;
+    if (ch == victim)
+        return;
+
+    if (ch->in_room != victim->in_room)
+        return;
+
+    if (victim->wait <= 1 && victim->position > POS_STUNNED) {
+        if (victim->position == POS_SITTING || victim->position == POS_RESTING) {
+             act( "$c1 встает на ноги под шквалом ударов.", victim, 0, 0, TO_ROOM ); 
+             act( "Ты встаешь на ноги под шквалом ударов.", victim, 0, 0, TO_CHAR );
+        }
+        victim->position = POS_FIGHTING;
+    }
+    if (ch->wait <= 1 && ch->position > POS_STUNNED) {
+        if (ch->position == POS_SITTING || ch->position == POS_RESTING) {
+             act( "$c1 встает на ноги под шквалом ударов.", ch, 0, 0, TO_ROOM ); 
+             act( "Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
+        }
+        ch->position = POS_FIGHTING;
     }
 }
+
 
 static bool mprog_attack( Character *rch, Character *ch, Character *victim )
 {
