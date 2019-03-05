@@ -12,8 +12,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-char * realip( char *ip );
-
 void WrapperHandler::init( Descriptor *d ) 
 {
     d->send("Waiting for hostname\n\r");
@@ -40,12 +38,12 @@ WrapperHandler::handle(Descriptor *d, char *arg)
     if (d->realip)
         free_string(d->realip);
     
-    d->realip = realip( ip );
+    d->realip = str_dup( ip );
     
     if (d->host)
         free_string(d->host);
     
-    d->host = realip( ip  );
+    d->host = str_dup( ip  );
 
     d->send("Got wrapper response.\n\r");
     
