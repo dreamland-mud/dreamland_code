@@ -178,7 +178,7 @@ void WeaponOneHit::damApplyCounter( )
     if (chance <= gsn_counter->getEffective( victim ))
     {
         gsn_counter->improve( victim, true, ch );
-        act_p("$C1 направляет твой удар против тебя самого!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$C1 направляет твой удар против тебя само$gго|го|й!",ch,0,victim,TO_CHAR,POS_RESTING);
         act_p("Ты направляешь удар $c2 против $x!",ch,0,victim,TO_VICT,POS_RESTING);
         act_p("$C1 возвращает удар $c2 обратно!",ch,0,victim,TO_NOTVICT,POS_RESTING);
 
