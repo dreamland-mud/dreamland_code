@@ -16,8 +16,8 @@ RUN yes | unminimize \
         software-properties-common \
         sudo \
         vim \
-    && apt-get install -yq git g++ gcc make automake libtool bison flex telnet vim bzip2
-    && apt-get install -yq libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
+    && apt-get install -yq git g++ gcc make automake libtool bison flex telnet vim bzip2 \
+    && apt-get install -yq libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev \
     && locale-gen en_US.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 ENV LANG=en_US.UTF-8
