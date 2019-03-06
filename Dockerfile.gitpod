@@ -2,5 +2,6 @@ FROM gitpod/workspace-full:latest
 
 USER root
 
-RUN apt-get install -yq git g++ gcc make automake libtool bison flex telnet vim bzip2 \
+RUN apt-get update \
+    && apt-get install -yq git g++ gcc make automake libtool bison flex telnet vim bzip2 \
     && apt-get install -yq libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev 
