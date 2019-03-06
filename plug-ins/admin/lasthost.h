@@ -16,6 +16,7 @@ class XMLAttributeLastHost : public RemortAttribute, public XMLVariableContainer
 XML_OBJECT;
 public:
         typedef ::Pointer<XMLAttributeLastHost> Pointer;
+        typedef XMLMapBase<XMLInteger> Hosts;
 
         void addHost(const DLString &host);
         bool hasHost(const DLString &host) const;
@@ -23,7 +24,7 @@ public:
 
 private:
         /** Map between IP address and how many times it was used. */
-        XML_VARIABLE XMLMapBase<XMLInteger> hosts;        
+        XML_VARIABLE Hosts hosts;        
 
 };        
 

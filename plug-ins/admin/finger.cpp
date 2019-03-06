@@ -59,7 +59,7 @@ CMDADM(finger)
         return;
     }
 
-    // If argument starts with digit, assume it's an IP address and find everyone 
+    // If the argument starts with a digit, assume it's an IP address and find everyone 
     // who ever used the same IP.
     if (isdigit(constArguments.at(0))) {
         const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );

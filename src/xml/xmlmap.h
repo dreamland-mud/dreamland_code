@@ -7,6 +7,7 @@
 #define XMLMAP_H
 
 #include <map>
+#include <list>
 
 #include "dlstring.h"
 #include "exceptionskipvariable.h"
@@ -26,6 +27,9 @@ public:
     using Map::begin;
     using Map::find;
     using Map::empty;
+    using Map::value_type;
+    typedef typename std::map<DLString, T>::value_type ValueType;
+    typedef list<ValueType> ValueList;
     
     XMLMapBase( bool flag = true ) : saveEmpty( flag )
     {
@@ -68,6 +72,24 @@ public:
     bool isAvailable( const DLString &key ) const
     {
         return find( key ) != end( );
+    }
+
+    ValueList toList() const 
+    {
+        ValueList result(begin(), end());
+        return result;
+    }
+
+    static bool compare_values(const ValueType &a, const ValueType &b)
+    {
+        return a.second >= b.second;
+    }
+    
+    ValueList toSortedList() const
+    {
+        ValueList result(begin(), end());
+        result.sort(compare_values);
+        return result;
     }
 
 protected:
