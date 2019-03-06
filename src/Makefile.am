@@ -13,7 +13,7 @@
 if WITH_MINGW
 DUMMY_LIBS = libdummycpp.la
 MY_CXXLD = $(CC)
-LD_DLLGLUE = -Wl,--enable-runtime-pseudo-reloc -Wl,--script,$(top_srcdir)/admin/i386pe.x-no-rdata -Wl,-S
+LD_DLLGLUE = -Wl,--enable-runtime-pseudo-reloc -Wl,--script,$(top_srcdir)/win/i386pe.x-no-rdata -Wl,-S
 CC_DLLGLUE = -fdata-sections
 #LIBSTDCXX=/root/mingw/i586-pc-mingw32/lib/libstdc++.a
 LIBSTDCXX=/usr/local/mingw/mingw32/lib/libstdc++.a
