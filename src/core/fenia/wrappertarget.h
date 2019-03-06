@@ -13,11 +13,11 @@ class WrapperTarget {
 public:
 
     WrapperTarget( );
-    
+
     WrapperBase * getWrapper( );
-    
+
     void extractWrapper(bool forever);
-    
+
     Scripting::Object *wrapper;
 };
 
@@ -33,10 +33,10 @@ public:
 #define BASE_BOOL_CALL( base, id, fmt...) \
         if (base) { \
             bool rc; \
-            static Scripting::IdRef onId( "on"id ); \
+            static Scripting::IdRef onId( "on" id ); \
             rc = base->call( onId, fmt ); \
             \
-            static Scripting::IdRef postId( "post"id ); \
+            static Scripting::IdRef postId( "post" id ); \
             base->postpone( postId, fmt ); \
             \
             if (rc) return rc; \
@@ -45,10 +45,10 @@ public:
 #define BASE_STR_CALL( base, id, fmt...) \
         if (base) { \
             DLString rc; \
-            static Scripting::IdRef onId( "on"id ); \
+            static Scripting::IdRef onId( "on" id ); \
             rc = base->stringCall( onId, fmt ); \
             \
-            static Scripting::IdRef postId( "post"id ); \
+            static Scripting::IdRef postId( "post" id ); \
             base->postpone( postId, fmt ); \
             \
             if (!rc.empty()) return rc; \
@@ -59,7 +59,7 @@ public:
             WrapperBase *base = var->getWrapper( ); \
             BASE_BOOL_CALL(base, id, fmt); \
         }
-        
+
 #define FENIA_NDX_CALL( var, id, fmt...) \
         if (var && var->pIndexData) { \
             WrapperBase *base = get_wrapper( var->pIndexData->wrapper ); \
@@ -95,7 +95,7 @@ public:
             WrapperBase *base = get_wrapper( var->pIndexData->wrapper ); \
             bool rc = base ? base->hasTrigger(id) : false; \
             if (rc) return rc; \
-        } 
+        }
 
 #define FENIA_HAS_TRIGGER( var, id ) \
         if (var) { \
@@ -103,5 +103,5 @@ public:
             bool rc = base ? base->hasTrigger(id) : false; \
             if (rc) return rc; \
         }
-            
+
 #endif

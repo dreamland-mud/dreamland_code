@@ -1,5 +1,5 @@
 /* $Id: class_thief.cpp,v 1.1.2.27.6.25 2010-09-01 21:20:44 rufina Exp $
- * 
+ *
  * ruffina, 2004
  */
 /***************************************************************************
@@ -80,12 +80,12 @@ static bool mprog_steal_money( Character *victim, Character *thief, int gold, in
 }
 
 /*----------------------------------------------------------------------------
- * Backstab 
+ * Backstab
  *---------------------------------------------------------------------------*/
 class BackstabOneHit: public WeaponOneHit, public SkillDamage {
 public:
     BackstabOneHit( Character *ch, Character *victim );
-    
+
     virtual void calcTHAC0( );
     virtual void calcDamage( );
 };
@@ -105,7 +105,7 @@ void BackstabOneHit::calcDamage( )
         dam = ( ch->getModifyLevel( ) < 50)
             ? ( ch->getModifyLevel( ) / 10 + 1) * dam + ch->getModifyLevel( )
             : ( ch->getModifyLevel( ) / 10 ) * dam + ch->getModifyLevel( );
-            
+
     damApplyDamroll( );
 
     WeaponOneHit::calcDamage( );
@@ -120,12 +120,12 @@ void BackstabOneHit::calcTHAC0( )
 }
 
 /*----------------------------------------------------------------------------
- * Dual backstab 
+ * Dual backstab
  *---------------------------------------------------------------------------*/
 class DualBackstabOneHit: public WeaponOneHit, public SkillDamage {
 public:
     DualBackstabOneHit( Character *ch, Character *victim );
-    
+
     virtual void calcTHAC0( );
     virtual void calcDamage( );
 };
@@ -145,7 +145,7 @@ void DualBackstabOneHit::calcDamage( )
         dam = ( ch->getModifyLevel( ) < 56)
             ? ( ch->getModifyLevel( ) / 14 + 1) * dam + ch->getModifyLevel( )
             : ( ch->getModifyLevel( ) / 14 ) * dam + ch->getModifyLevel( );
-            
+
     damApplyDamroll( );
 
     WeaponOneHit::calcDamage( );
@@ -159,12 +159,12 @@ void DualBackstabOneHit::calcTHAC0( )
     thac0 -= 10 * (100 - gsn_dual_backstab->getEffective( ch ));
 }
 /*----------------------------------------------------------------------------
- * Circle 
+ * Circle
  *---------------------------------------------------------------------------*/
 class CircleOneHit: public WeaponOneHit, public SkillDamage {
 public:
     CircleOneHit( Character *ch, Character *victim );
-    
+
     virtual void calcDamage( );
 };
 
@@ -186,12 +186,12 @@ void CircleOneHit::calcDamage( )
 }
 
 /*----------------------------------------------------------------------------
- * Knife 
+ * Knife
  *---------------------------------------------------------------------------*/
 class KnifeOneHit: public WeaponOneHit, public SkillDamage {
 public:
     KnifeOneHit( Character *ch, Character *victim );
-    
+
     virtual void calcDamage( );
 };
 
@@ -305,18 +305,18 @@ VOID_AFFECT(Settraps)::entry( Room *room, Character *ch, Affect *paf )
 {
     if (!is_safe_rspell(paf->level,ch)) {
         ch->send_to("Установленная кем-то ловушка препятствует тебе.\n\r");
-        
+
         try {
-            SettrapsDamage( ch, dice(paf->level,5)+12 ).hit( true ); 
-        }            
+            SettrapsDamage( ch, dice(paf->level,5)+12 ).hit( true );
+        }
         catch (const VictimDeathException &) {
         }
-        
+
         room->affectRemove( paf);
     }
 }
 
-VOID_AFFECT(Settraps)::toStream( ostringstream &buf, Affect *paf ) 
+VOID_AFFECT(Settraps)::toStream( ostringstream &buf, Affect *paf )
 {
     buf << fmt( 0, "Здесь на {W%1$d{x ча%1$Iс|са|сов установлена воровская ловушка.",
                    paf->duration )
@@ -335,7 +335,7 @@ SKILL_RUNP( envenom )
     int percent,skill;
 
     /* find out what */
-    if (argument == '\0')
+    if (argument[0] == '\0')
     {
         ch->send_to("Отравить ядом что?\n\r");
         return;
@@ -523,12 +523,12 @@ SKILL_RUNP( steal )
                 ch->send_to("Не стоит - еще ударят больно в пылу битвы.\n\r");
                 return;
         }
-    
+
         tmp_ch = ch->getDoppel( );
 
         ch->getPC( )->check_hit_newbie( victim );
         ch->setWait( gsn_steal->getBeats( )  );
-        
+
 /*        percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -50 );
         percent += victim->can_see( ch ) ? -10 : 0;*/
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
@@ -602,7 +602,7 @@ SKILL_RUNP( steal )
                 int amount_g = 0;
                 if (arg_is_silver( arg1 ))
                         amount_s = victim->silver * number_range(1, 20) / 100;
-                else 
+                else
                         amount_g = victim->gold * number_range(1, 7) / 100;
 
                 if ( amount_s <= 0 && amount_g <= 0 )
@@ -615,7 +615,7 @@ SKILL_RUNP( steal )
                 victim->gold -= amount_g;
                 ch->silver     += amount_s;
                 victim->silver -= amount_s;
-                    
+
                 ch->pecho("Bingo! Тебе удалось стащить %s.", describe_money( amount_g, amount_s, 4 ).c_str( ));
                 gsn_steal->improve( ch, true, victim );
 
@@ -699,7 +699,7 @@ SKILL_RUNP( pick )
         ch->println( "Ты пытаешься засунуть отмычку в скважину, но промахиваешься!" );
         return;
     }
-    
+
     if (MOUNTED(ch)) {
         ch->println( "Ты не можешь взломать что-либо, пока ты в седле." );
         return;
@@ -717,13 +717,13 @@ SKILL_RUNP( pick )
         ch->println( "Взломать чем?" );
         return;
     }
-    
+
     if (!( keyhole = Keyhole::create( ch, arg1 ) )) {
         ch->println( "Ты не видишь здесь такого замка." );
         return;
     }
 
-    keyhole->doPick( arg2 );    
+    keyhole->doPick( arg2 );
 }
 
 /*
@@ -745,7 +745,7 @@ protected:
     virtual bool findTargetRoom( )
     {
         door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
-        
+
         if (door < 0) {
             actor->pecho( "Ты не видишь выхода в этом направлении." );
             return false;
@@ -762,20 +762,20 @@ protected:
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     virtual bool canMove( Character *wch )
     {
         if (wch == ch->mount)
             return true;
-            
-        if (!(checkActor( ) 
+
+        if (!(checkActor( )
                && checkVictim( )
                && checkWeb( )))
             return false;
-            
+
         if (!ExitsMovement::canMove( wch )) {
             actor->pecho( "Ты не сможешь протолкнуть %1$C4 в этом направлении.", ch );
             return false;
@@ -783,7 +783,7 @@ protected:
 
         return true;
     }
-    
+
     virtual bool tryMove( Character *wch )
     {
         if (wch != ch)
@@ -800,15 +800,15 @@ protected:
 
         return applySkill( );
     }
-    
+
     bool applySkill( )
     {
         bool fSuccess;
         int percent;
-        
+
         percent  = number_percent( ) + (IS_AWAKE(ch) ? 30 : -30);
         percent += ch->can_see( actor ) ? 20 : 0;
-        
+
         if (percent > gsn_push->getEffective( actor )) {
             fSuccess = false;
             actor->pecho( "Упс.." );
@@ -876,7 +876,7 @@ protected:
             actor->pecho( "Ты не можешь толкнуть кого-то, сидя в седле." );
             return false;
         }
-        
+
         if (RIDDEN(actor)) {
             actor->pecho( "Ты не можешь толкнуть кого-то, пока ты оседла%1$Gно|н|на.", actor );
             return false;
@@ -884,7 +884,7 @@ protected:
 
         return true;
     }
-    
+
     bool checkVictim( )
     {
         if (!ch->is_npc( ) && ch->desc == 0) {
@@ -896,7 +896,7 @@ protected:
             actor->pecho( "Это бесполезно." );
             return false;
         }
-        
+
         if (is_safe(actor, ch))
             return false;
 
@@ -980,7 +980,7 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    
+
     if ( victim == ch )
     {
             ch->send_to("Как ты можешь ударить сзади себя?\n\r");
@@ -1036,10 +1036,10 @@ SKILL_RUNP( backstab )
 
     if (gsn_rear_kick->getCommand( )->run( ch, victim ))
         return;
-    
+
     BackstabOneHit bs( ch, victim );
     bool fBonus = false;
-    
+
     if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
@@ -1062,10 +1062,10 @@ SKILL_RUNP( backstab )
                 dual_chance = 100;
             else
                 dual_chance =  dual_percent * 8 / 10;
-            
+
             if (number_percent( ) < dual_chance) {
                 gsn_dual_backstab->improve( ch, true, victim );
-                
+
                 if (ch->fighting == victim)
                     DualBackstabOneHit( ch, victim ).hit( );
             }
@@ -1091,7 +1091,7 @@ SKILL_RUNP( backstab )
             gsn_backstab->improve( ch, false, victim );
             bs.miss( );
         }
-        
+
         yell_panic( ch, victim,
                     "Помогите! Кто-то ударил меня сзади!",
                     "Помогите! %1$^C1 удари%1$Gло|л|ла меня в спину!" );
@@ -1148,10 +1148,10 @@ SKILL_RUNP( circle )
                     return;
             }
     }
-    
+
     CircleOneHit circ( ch, victim );
     bool fBonus = false;
-    
+
     if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
@@ -1159,7 +1159,7 @@ SKILL_RUNP( circle )
         fBonus = true;
     }
 
-    
+
     try {
         if (ch->is_npc() || fBonus || number_percent( ) < gsn_circle->getEffective( ch ))
         {
@@ -1167,12 +1167,12 @@ SKILL_RUNP( circle )
                 gsn_circle->improve( ch, true, victim );
         }
         else
-        {   
+        {
                 circ.miss( );
                 gsn_circle->improve( ch, false, victim );
         }
     }
-    catch (const VictimDeathException& e) {                                     
+    catch (const VictimDeathException& e) {
     }
 }
 
@@ -1232,7 +1232,7 @@ SKILL_RUNP( blackjack )
         {
                 return;
         }
-        
+
         if (gsn_rear_kick->getCommand( )->run( ch, victim ))
             return;
 
@@ -1251,16 +1251,16 @@ SKILL_RUNP( blackjack )
         chance = ( int ) ( 0.5 * gsn_blackjack->getEffective( ch ) );
         chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
         chance += victim->can_see(ch) ? 0 : 5;
-        if (victim->is_npc( ) 
+        if (victim->is_npc( )
             && victim->getNPC( )->behavior
             && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
                 chance -= 40;
 
-        if (victim->isAffected(gsn_backguard)) 
+        if (victim->isAffected(gsn_backguard))
             chance /= 2;
 
         bool fBonus = false;
-        
+
         if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
@@ -1277,7 +1277,7 @@ SKILL_RUNP( blackjack )
                 act_p("$c1 бьет $C4 сзади по голове тяжелым мешочком! *OUCH*",
                ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_blackjack->improve( ch, true, victim );
-        
+
                 af.type = gsn_blackjack;
                 af.where = TO_AFFECTS;
                 af.level = ch->getModifyLevel();
@@ -1286,7 +1286,7 @@ SKILL_RUNP( blackjack )
                 af.modifier = 0;
                 af.bitvector = AFF_SLEEP;
                 affect_join ( victim,&af );
-                
+
                 set_backguard( victim );
                 set_violent( ch, victim, true );
                 if ( IS_AWAKE(victim) )
@@ -1313,7 +1313,7 @@ SKILL_RUNP( knife )
     Character *victim;
     Object *knife;
     int chance;
-    
+
     if (!gsn_knife->usable( ch )) {
         ch->send_to("Аккуратней, смотри не порежься.\r\n");
         return;
@@ -1353,13 +1353,13 @@ SKILL_RUNP( knife )
 
     if (is_safe(ch, victim))
         return;
-    
+
     chance = gsn_knife->getEffective( ch );
     ch->setWait( gsn_knife->getBeats( ) );
 
     try {
         KnifeOneHit khit( ch, victim );
-        
+
         if (number_percent( ) < chance) {
             khit.hit( );
             gsn_knife->improve( ch, true, victim );
@@ -1386,7 +1386,7 @@ SKILL_RUNP( forge )
     DLString args = argument, arg;
     Keyhole::Pointer keyhole;
     Object *key, *blank;
-    
+
     if (!gsn_key_forgery->usable( ch )) {
         ch->println( "Эти трюки не для тебя." );
         return;
@@ -1396,12 +1396,12 @@ SKILL_RUNP( forge )
         ch->println( "Подделать что?" );
         return;
     }
-    
+
     for (blank = get_obj_carry_type( ch, ITEM_LOCKPICK );
          blank && blank->value[0] != Keyhole::LOCK_VALUE_BLANK;
          blank = get_obj_list_type( ch, ITEM_LOCKPICK, blank->next_content ))
         ;
-    
+
     if (!blank) {
         ch->println( "Тебе понадобится заготовка, чтобы создать дубликат или отмычку." );
         return;
@@ -1425,17 +1425,17 @@ SKILL_RUNP( forge )
             ch->println( "Непонятно, что же открывает этот ключ." );
             return;
         }
-        
+
         if (!keyhole->isLockable( )) {
             ch->println( "Это ключ от сломанного замка." );
             return;
         }
-        
+
         if (keyhole->isPickProof( )) {
             ch->println( "Это ключ от замка, который невозможно взломать. Увы.." );
             return;
         }
-        
+
         ch->setWait( gsn_key_forgery->getBeats( ) );
         ch->mana -= gsn_key_forgery->getMana( );
 
@@ -1444,7 +1444,7 @@ SKILL_RUNP( forge )
             gsn_key_forgery->improve( ch, false );
             return;
         }
-                
+
         dup = create_object( key->pIndexData, 0 );
         dup->fmtName( DUP_NAMES, key->getName( ) );
         dup->fmtShortDescr( DUP_SHORT, key->getShortDescr( '2' ).c_str( ) );
@@ -1457,7 +1457,7 @@ SKILL_RUNP( forge )
         dup->value[0] = 1;
         dup->value[1] = 1;
         obj_to_char( dup, ch );
-        
+
         act( "Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
         act( "$c1 изготавливает $o4.", ch, key, 0, TO_ROOM );
 
@@ -1484,7 +1484,7 @@ SKILL_RUNP( forge )
             ch->println( "Этот замок защищен от взлома." );
             return;
         }
-        
+
         ch->setWait( gsn_key_forgery->getBeats( ) );
         ch->mana -= gsn_key_forgery->getMana( );
 
@@ -1493,10 +1493,10 @@ SKILL_RUNP( forge )
             gsn_key_forgery->improve( ch, false );
             return;
         }
-        
+
         act( "$o1 в твоих умелых руках постепенно превращается в отмычку для $N2.", ch, blank, keyhole->getDescription( ).c_str( ), TO_CHAR );
         act( "$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
-        
+
         blank->setOwner( ch->getName( ).c_str( ) );
         blank->setName( LOCK_NAMES );
         blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ).c_str( ) );
