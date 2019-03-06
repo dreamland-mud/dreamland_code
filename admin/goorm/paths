@@ -1,0 +1,7 @@
+ROOT=/workspace
+SRCDIR=$ROOT/dreamland_code
+RUNTIME=$ROOT/runtime
+OBJS=$ROOT/objs
+SHARE=$RUNTIME/share
+
+

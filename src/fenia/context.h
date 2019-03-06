@@ -35,12 +35,12 @@ public:
 
 struct NodeTrace {
     NodeTrace(Node *n) : node(n) {
-	NodeTrace *&top = Context::current->nodeTrace;
-	parent = top;
-	top = this;
+        NodeTrace *&top = Context::current->nodeTrace;
+        parent = top;
+        top = this;
     }
     ~NodeTrace() {
-	Context::current->nodeTrace = parent;
+        Context::current->nodeTrace = parent;
     }
     
     Node *node;
@@ -79,12 +79,12 @@ struct BTPushNative : public BackTrace {
 
 struct BTPushNode : public BackTrace {
     BTPushNode() {
-	NodeTrace *nt = Context::current->nodeTrace;
+        NodeTrace *nt = Context::current->nodeTrace;
 
-	if(nt)
-	    node = nt->node;
-	else
-	    node = 0;
+        if(nt)
+            node = nt->node;
+        else
+            node = 0;
     }
     
     virtual void print(ostream &os) const;

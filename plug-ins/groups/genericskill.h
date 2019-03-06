@@ -54,14 +54,16 @@ public:
 
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, ostream & buf ) const;
-    virtual bool canTeach( NPCharacter *, PCharacter * );
+    virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
     virtual void show( PCharacter *, ostream & buf );
 
     virtual const DLString & getCategory( ) const
     {
-	return CATEGORY;
+        return CATEGORY;
     }
+
+    bool isProfessional() const;
 
 protected:
     static const DLString CATEGORY;                                             

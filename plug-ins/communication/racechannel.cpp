@@ -19,11 +19,11 @@ RaceChannel::RaceChannel( )
 bool RaceChannel::isGlobalListener( Character *ch, Character *victim ) const
 {
     if (victim->is_npc( ))
-	return false;
+        return false;
 
     if (!victim->is_immortal( ))
-	if (victim->getRace( ) != ch->getRace( ))
-	    return false;
+        if (victim->getRace( ) != ch->getRace( ))
+            return false;
 
     return WorldChannel::isGlobalListener( ch, victim );
 }
@@ -55,10 +55,10 @@ void RaceChannel::postOutput( Character *outputTo, const DLString &message ) con
 bool RaceChannel::canTalkGlobally( Character *ch ) const
 {
     if (!GlobalChannel::canTalkGlobally( ch ))
-	return false;
+        return false;
 
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     return true;
 }

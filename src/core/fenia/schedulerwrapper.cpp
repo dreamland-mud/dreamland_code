@@ -18,7 +18,7 @@ int PlugLock::cnt = 0;
 using namespace Scripting;
 using namespace std;
 
-NMI_INIT(FeniaProcess, "�����")
+NMI_INIT(FeniaProcess, "поток")
 
 FeniaProcess::FeniaProcess() : running(false)
 {
@@ -156,38 +156,38 @@ FeniaProcess::currentProcess()
 }
 
 /* ---------------------------------------------------------- */
-NMI_GET(FeniaProcess, running, "")
+NMI_GET(FeniaProcess, running, "true если поток запущен")
 {
     return running;
 }
 
-NMI_GET(FeniaProcess, thiz, "")
+NMI_GET(FeniaProcess, thiz, "указатель на this")
 {
     return thiz;
 }
 
-NMI_SET(FeniaProcess, thiz, "")
+NMI_SET(FeniaProcess, thiz, "указатель на this")
 {
     thiz = arg;
 }
 
-NMI_GET(FeniaProcess, name, "")
+NMI_GET(FeniaProcess, name, "название потока")
 {
     return Register( name );
 }
 
-NMI_SET(FeniaProcess, name, "")
+NMI_SET(FeniaProcess, name, "название потока")
 {
     name = arg.toString( );
 }
 
-NMI_INVOKE(FeniaProcess, start, "")
+NMI_INVOKE(FeniaProcess, start, "(): запустить поток")
 {
     start();
     return Register( );
 }
 
-NMI_INVOKE(FeniaProcess, stop, "")
+NMI_INVOKE(FeniaProcess, stop, "([msg]): остановить поток с сообщением msg")
 {
     if(args.empty())
         stop("cancelled");
@@ -201,9 +201,9 @@ NMI_INVOKE(FeniaProcess, stop, "")
 
 template class Scripting::NativeImpl<SchedulerWrapper>;
 
-NMI_INIT(SchedulerWrapper, "����������� ��� �������")
+NMI_INIT(SchedulerWrapper, "планировщик для потоков")
 
-NMI_INVOKE(SchedulerWrapper, Thread, "") {
+NMI_INVOKE(SchedulerWrapper, Thread, "(func[,args]): конструктор потока с телом функции func и аргументами") {
     if(args.empty( ))
         throw NotEnoughArgumentsException();
     
@@ -218,7 +218,7 @@ NMI_INVOKE(SchedulerWrapper, Thread, "") {
     return Register( obj );
 }
 
-NMI_INVOKE(SchedulerWrapper, yield, "") {
+NMI_INVOKE(SchedulerWrapper, yield, "(): уступить выполнение следующему потоку, до начала следующего пульса") {
     if(args.empty( ))
         yield("<default>");
     else
@@ -239,7 +239,7 @@ void SchedulerWrapper::yield(const DLString &msg) {
     pw->yield(msg);
 }
 
-NMI_INVOKE(SchedulerWrapper, sleep, "") {
+NMI_INVOKE(SchedulerWrapper, sleep, "(pulses): заснуть на указанное число пульсов") {
     if(args.size( ) != 1)
         throw NotEnoughArgumentsException();
 
@@ -257,7 +257,7 @@ NMI_INVOKE(SchedulerWrapper, sleep, "") {
     return Register();
 }
 
-NMI_INVOKE(SchedulerWrapper, report, "") {
+NMI_INVOKE(SchedulerWrapper, report, "(): вывести инфу обо всех потоках") {
     ProcessManager *pm = ProcessManager::getThis( );
     ProcessManager::RoundRobinElement *i;
     ostringstream os;

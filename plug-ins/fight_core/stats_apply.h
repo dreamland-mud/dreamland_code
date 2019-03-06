@@ -10,37 +10,37 @@ class Character;
 /*
  * Attribute bonus structures.
  */
-struct	str_app_type
+struct        str_app_type
 {
-    int	hit;
-    int	missile;
-    int	carry;
-    int	wield;
+    int        hit;
+    int        missile;
+    int        carry;
+    int        wield;
     int web;
     int damage;
 };
 
-struct	int_app_type
+struct        int_app_type
 {
-    int	learn;
+    int        learn;
     int slevel;
 };
 
-struct	wis_app_type
+struct        wis_app_type
 {
-    int	practice;
+    int        practice;
     int learn;
 };
 
-struct	dex_app_type
+struct        dex_app_type
 {
-    int	defensive;
+    int        defensive;
 };
 
-struct	con_app_type
+struct        con_app_type
 {
-//    int	hitp;
-    int	shock;
+//    int        hitp;
+    int        shock;
 };
 
 /*
@@ -52,7 +52,7 @@ const struct wis_app_type & get_wis_app( Character * );
 const struct dex_app_type & get_dex_app( Character * );
 
 #define GET_AC(ch,type)                             \
-           ((ch)->armor[type]			    \
-	    + (IS_AWAKE(ch) ? get_dex_app(ch).defensive : 0))
+           ((ch)->armor[type]                            \
+            + (IS_AWAKE(ch) ? get_dex_app(ch).defensive : 0))
 
 #endif

@@ -16,6 +16,7 @@ transportspell.cpp \
 sleepaffecthandler.cpp \
 skillhelp.cpp \
 skillgrouphelp.cpp \
+skill_utils.cpp \
 xmlattributerestring.cpp 
 
 libskills_impl_la_MOC = \

@@ -12,12 +12,12 @@
 class ClanGuardChaos: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardChaos> Pointer;
+        typedef ::Pointer<ClanGuardChaos> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual int getCast( Character * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual int getCast( Character * );
 };
 
 class ChaosBlade : public ObjectBehavior {

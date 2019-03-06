@@ -33,91 +33,92 @@ WEARLOC(none);
 const DLString Object::TYPE = "Object";
 
 Object::Object( ) :
-		ID( 0 ),
-		name( 0 ), owner( 0 ), 
-		short_descr( 0 ), description( 0 ), material( 0 ), 
-	        next( 0 ), prev( 0 ),
-		next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
-		carried_by( 0 ), extra_descr( 0 ), affected( 0 ), pIndexData( 0 ),
-		in_room( 0 ), enchanted( 0 ),
-		item_type( 0 ),
-		extra_flags( 0 ), wear_flags( 0 ), 
-		wear_loc( wear_none ),
-		weight( 0 ), cost( 0 ), level( 0 ), condition( 0 ),
-		timer( 0 ), timestamp( -1 ),
-		from( &str_empty[0] ),
-		extracted( 0 ), water_float( 0 ),
-		killer( &str_empty[0] ), count( 0 ),
-		behavior( ObjectBehavior::NODE_NAME )
+                ID( 0 ),
+                name( 0 ), owner( 0 ), 
+                short_descr( 0 ), description( 0 ), material( 0 ), 
+                next( 0 ), prev( 0 ),
+                next_content( 0 ), contains( 0 ), in_obj( 0 ), on( 0 ),
+                carried_by( 0 ), extra_descr( 0 ), affected( 0 ), pIndexData( 0 ),
+                in_room( 0 ), enchanted( 0 ),
+                item_type( 0 ),
+                extra_flags( 0 ), wear_flags( 0 ), 
+                wear_loc( wear_none ),
+                weight( 0 ), cost( 0 ), level( 0 ), condition( 0 ),
+                timer( 0 ), timestamp( -1 ),
+                from( &str_empty[0] ),
+                extracted( 0 ), water_float( 0 ),
+                killer( &str_empty[0] ), count( 0 ),
+                behavior( ObjectBehavior::NODE_NAME )
 {
-	for( int i = 0; i < 5; i++ ) value[i] = 0;
+        for( int i = 0; i < 5; i++ ) value[i] = 0;
 }
 
 void Object::extract( )
 {
-	Affect* paf_next;
-	EXTRA_DESCR_DATA* ed_next;
-	
-	for( Affect* paf = affected; paf != 0; paf = paf_next )
-	{
-		paf_next = paf->next;
-		ddeallocate( paf );
-	}
+        Affect* paf_next;
+        EXTRA_DESCR_DATA* ed_next;
+        
+        for( Affect* paf = affected; paf != 0; paf = paf_next )
+        {
+                paf_next = paf->next;
+                ddeallocate( paf );
+        }
 
-	for( EXTRA_DESCR_DATA* ed = extra_descr; ed != 0; ed = ed_next )
-	{
-		ed_next = ed->next;
-		free_extra_descr(ed);
-	}
-	
-	free_string( material );
-	free_string( name );
-	free_string( description );
-	free_string( short_descr );
-	free_string( owner );
-	free_string( killer );
-	free_string( from );
-	
-	next = 0;
-	prev = 0;
-	next_content = 0;
-	contains = 0;
-	in_obj = 0;
-	on = 0;
-	carried_by = 0;
-	extra_descr = 0;
-	affected = 0;
-	pIndexData = 0;
-	in_room = 0;
-	enchanted = 0;
-	pocket = "";
-	owner = 0;
-	name = 0;
-	short_descr = 0;
-	description = 0;
-	cachedNoun.clear( );
-	item_type = 0;
-	extra_flags = 0;
-	wear_flags = 0;
-	wear_loc.assign( wear_none );
-	weight = 0;
-	cost = 0;
-	level = 0;
-	condition = 0;
-	material = 0;
-	timer = 0;
-	timestamp = -1;
-	from = &str_empty[0];
-	extracted = 0;
-	water_float = 0;
-	killer = &str_empty[0];
-	count = 0;
+        for( EXTRA_DESCR_DATA* ed = extra_descr; ed != 0; ed = ed_next )
+        {
+                ed_next = ed->next;
+                free_extra_descr(ed);
+        }
+        
+        free_string( material );
+        free_string( name );
+        free_string( description );
+        free_string( short_descr );
+        free_string( owner );
+        free_string( killer );
+        free_string( from );
+        
+        next = 0;
+        prev = 0;
+        next_content = 0;
+        contains = 0;
+        in_obj = 0;
+        on = 0;
+        carried_by = 0;
+        extra_descr = 0;
+        affected = 0;
+        pIndexData = 0;
+        in_room = 0;
+        enchanted = 0;
+        pocket = "";
+        owner = 0;
+        name = 0;
+        short_descr = 0;
+        description = 0;
+        cachedNoun.clear( );
+        item_type = 0;
+        extra_flags = 0;
+        wear_flags = 0;
+        wear_loc.assign( wear_none );
+        weight = 0;
+        cost = 0;
+        level = 0;
+        condition = 0;
+        material = 0;
+        timer = 0;
+        timestamp = -1;
+        from = &str_empty[0];
+        extracted = 0;
+        water_float = 0;
+        killer = &str_empty[0];
+        count = 0;
+        properties.clear();
 
-	wrapper = 0;
-	behavior.clear( );
-	ID = 0;
-	
-	for( int i = 0; i < 5; i++ ) value[i] = 0;
+        wrapper = 0;
+        behavior.clear( );
+        ID = 0;
+        
+        for( int i = 0; i < 5; i++ ) value[i] = 0;
 }
 
 Object::~Object( )
@@ -125,17 +126,17 @@ Object::~Object( )
     Affect *paf, *paf_next;
     EXTRA_DESCR_DATA *ed, *ed_next;
 
-	for (paf = affected; paf != 0; paf = paf_next)
-	{
-		paf_next = paf->next;
-		ddeallocate( paf );
-	}
+        for (paf = affected; paf != 0; paf = paf_next)
+        {
+                paf_next = paf->next;
+                ddeallocate( paf );
+        }
 
-	for (ed = extra_descr; ed != 0; ed = ed_next )
-	{
-		ed_next = ed->next;
-		free_extra_descr(ed);
-	}
+        for (ed = extra_descr; ed != 0; ed = ed_next )
+        {
+                ed_next = ed->next;
+                free_extra_descr(ed);
+        }
     
     free_string( material );
     free_string( name );
@@ -149,23 +150,23 @@ Object::~Object( )
 
 Character * Object::getCarrier( ) {
     if (!carried_by)
-	if (in_obj)
-	    return in_obj->getCarrier( );
-	else
-	    return NULL;
+        if (in_obj)
+            return in_obj->getCarrier( );
+        else
+            return NULL;
     else
-	return carried_by;
+        return carried_by;
 }
 
 Room * Object::getRoom( ) {
     if (carried_by)
-	return carried_by->in_room;
+        return carried_by->in_room;
     else if (in_room)
-	return in_room;
+        return in_room;
     else if (in_obj)
-	return in_obj->getRoom( );
+        return in_obj->getRoom( );
     else
-	return NULL;
+        return NULL;
 }
 
 /* object condition aliases */
@@ -173,12 +174,12 @@ const char *Object::get_cond_alias( void )
 {
  const char *stat;
 
- if      ( condition >  99 ) stat = "{CÏÔÌ.{x";
- else if ( condition >= 80 ) stat = "{cÈÏÒ.{x";
- else if ( condition >= 60 ) stat = "{YÎÏÒÍ.{x";
- else if ( condition >= 40 ) stat = "{yÓÒ.{x";
- else if ( condition >= 20 ) stat = "{RÐÌ.{x";
- else                        stat = "{rÕÖ.{x";
+ if      ( condition >  99 ) stat = "{CÐ¾Ñ‚Ð».{x";
+ else if ( condition >= 80 ) stat = "{cÑ…Ð¾Ñ€.{x";
+ else if ( condition >= 60 ) stat = "{YÐ½Ð¾Ñ€Ð¼.{x";
+ else if ( condition >= 40 ) stat = "{yÑÑ€.{x";
+ else if ( condition >= 20 ) stat = "{RÐ¿Ð».{x";
+ else                        stat = "{rÑƒÐ¶.{x";
 
  return stat;
 }
@@ -214,16 +215,16 @@ int Object::floating_time( )
 bool Object::may_float(void)
 {
     if (behavior)
-	if (behavior->mayFloat( ))
-	    return true;
+        if (behavior->mayFloat( ))
+            return true;
     
     switch (item_type) {
     case ITEM_BOAT: 
     case ITEM_PORTAL:
-	return true;
-	
+        return true;
+        
     default:
-	return false;
+        return false;
     }
 }
 
@@ -232,17 +233,17 @@ void Object::addExtraDescr( const DLString &keys, const DLString &value )
     EXTRA_DESCR_DATA *ed = 0;
     
     for (ed = extra_descr; ed; ed = ed->next)
-	if (keys == ed->keyword)
-	    break;
+        if (keys == ed->keyword)
+            break;
 
     if (ed) {
-	free_string( ed->description );
+        free_string( ed->description );
     }
     else {
-	ed = new_extra_descr( );
-	ed->keyword = str_dup( keys.c_str( ) );
-	ed->next = extra_descr;
-	extra_descr = ed;
+        ed = new_extra_descr( );
+        ed->keyword = str_dup( keys.c_str( ) );
+        ed->next = extra_descr;
+        extra_descr = ed;
     }
 
     ed->description = str_dup( value.c_str( ) );
@@ -255,14 +256,14 @@ void Object::addExtraDescr( const DLString &keys, const DLString &value )
 void Object::setName( const char *s )
 {
     if (name)
-	free_string( name );
+        free_string( name );
 
     name = str_dup( s );
 }
 void Object::setShortDescr( const char *s )
 {
     if (short_descr)
-	free_string( short_descr );
+        free_string( short_descr );
 
     short_descr = str_dup( s );
     updateCachedNoun( );
@@ -270,21 +271,21 @@ void Object::setShortDescr( const char *s )
 void Object::setDescription( const char *s )
 {
     if (description)
-	free_string( description );
+        free_string( description );
 
     description = str_dup( s );
 }
 void Object::setMaterial( const char *s )
 {
     if (material)
-	free_string( material );
+        free_string( material );
 
     material = str_dup( s );
 }
 void Object::setOwner( const char *s )
 {
     if (owner)
-	free_string( owner );
+        free_string( owner );
 
     owner = str_dup( s );
 }
@@ -345,13 +346,13 @@ DLString Object::getShortDescr( char gram_case )
 static bool is_anti_align( Character *ch, int flags )
 {
     if (IS_SET(flags, ITEM_ANTI_EVIL) && IS_EVIL( ch ))
-	return true;
+        return true;
 
     if (IS_SET(flags, ITEM_ANTI_GOOD) && IS_GOOD( ch ))
-	return true;
+        return true;
 
     if (IS_SET(flags, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL( ch ))
-	return true;
+        return true;
     
     return false;
 }
@@ -374,7 +375,7 @@ int Object::getNumber( ) const
     int number;
 
     if (item_type == ITEM_MONEY)
-	number = 0;
+        number = 0;
     else
         number = 1;
 
@@ -392,7 +393,7 @@ int Object::getWeight( ) const
     sum = weight;
 
     for (tobj = contains; tobj != 0; tobj = tobj->next_content)
-	sum += tobj->getWeight( ) * getWeightMultiplier( ) / 100;
+        sum += tobj->getWeight( ) * getWeightMultiplier( ) / 100;
 
     return sum;
 }
@@ -408,7 +409,7 @@ int Object::getTrueWeight( ) const
     sum = weight;
 
     for (tobj = contains; tobj != 0; tobj = tobj->next_content)
-	sum += tobj->getWeight( );
+        sum += tobj->getWeight( );
 
     return sum;
 }
@@ -419,8 +420,8 @@ bool Object::isAffected( int sn ) const
     Affect *paf;
 
     for (paf = affected; paf != 0; paf = paf->next) 
-	if (paf->type == sn)
-	    return true;
+        if (paf->type == sn)
+            return true;
 
     return false;
 }
@@ -428,10 +429,10 @@ bool Object::isAffected( int sn ) const
 bool Object::hasOwner( const Character *ch ) const
 {
     if (!getOwner( ))
-	return false;
+        return false;
 
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     return !str_cmp( getOwner( ), ch->getNameP( ) );
 }
@@ -443,8 +444,8 @@ Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const
     const Character *wch = dynamic_cast<const Character *>(forWhom);
     
     if (IS_SET(flags, FMT_INVIS)) {
-	if (wch && !wch->can_see( this )) 
-	    return something;
+        if (wch && !wch->can_see( this )) 
+            return something;
     }
     
     return cachedNoun;
@@ -453,13 +454,13 @@ Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const
 void Object::updateCachedNoun( )
 {
     if (!cachedNoun) { 
-	cachedNoun = RussianString::Pointer( NEW, 
-	                                     getShortDescr( ), 
-					     pIndexData->gram_gender );
+        cachedNoun = RussianString::Pointer( NEW, 
+                                             getShortDescr( ), 
+                                             pIndexData->gram_gender );
     }
     else {
-	cachedNoun->setFullForm( getShortDescr( ) );
-	cachedNoun->setGender( pIndexData->gram_gender );
+        cachedNoun->setFullForm( getShortDescr( ) );
+        cachedNoun->setGender( pIndexData->gram_gender );
     }
 }
 

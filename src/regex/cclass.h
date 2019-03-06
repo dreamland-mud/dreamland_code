@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 1992, 1993, 1994 Henry Spencer.
  * Copyright (c) 1992, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+ *        The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Henry Spencer.
@@ -16,8 +16,8 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
+ *        This product includes software developed by the University of
+ *        California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -34,30 +34,30 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)cclass.h	8.3 (Berkeley) 3/20/94
+ *        @(#)cclass.h        8.3 (Berkeley) 3/20/94
  * $FreeBSD: src/lib/libc/regex/cclass.h,v 1.4 2002/03/22 23:41:56 obrien Exp $
  */
 
 
 typedef enum {CALNUM, CALPHA, CBLANK, CCNTRL, CDIGIT, CGRAPH,
-	      CLOWER, CPRINT, CPUNCT, CSPACE, CUPPER, CXDIGIT} citype;
+              CLOWER, CPRINT, CPUNCT, CSPACE, CUPPER, CXDIGIT} citype;
 
 /* character-class table */
 static struct cclass {
-	char *name;
-	citype fidx;
+        char *name;
+        citype fidx;
 } cclasses[] = {
-	{"alnum",       CALNUM},
-	{"alpha",       CALPHA},
-	{"blank",       CBLANK},
-	{"cntrl",       CCNTRL},
-	{"digit",       CDIGIT},
-	{"graph",       CGRAPH},
-	{"lower",       CLOWER},
-	{"print",       CPRINT},
-	{"punct",       CPUNCT},
-	{"space",       CSPACE},
-	{"upper",       CUPPER},
-	{"xdigit",      CXDIGIT},
-	{NULL,          }
+        {"alnum",       CALNUM},
+        {"alpha",       CALPHA},
+        {"blank",       CBLANK},
+        {"cntrl",       CCNTRL},
+        {"digit",       CDIGIT},
+        {"graph",       CGRAPH},
+        {"lower",       CLOWER},
+        {"print",       CPRINT},
+        {"punct",       CPUNCT},
+        {"space",       CSPACE},
+        {"upper",       CUPPER},
+        {"xdigit",      CXDIGIT},
+        {NULL,          }
 };

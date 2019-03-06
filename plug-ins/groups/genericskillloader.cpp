@@ -26,30 +26,30 @@ void GenericSkillLoader::destruction( )
 void GenericSkillLoader::resolveAll( )
 {
     for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
-	GenericSkill *skill = e->getStaticPointer<GenericSkill>( );
+        GenericSkill *skill = e->getStaticPointer<GenericSkill>( );
 
-	skill->resolve( );
+        skill->resolve( );
     }
 }
 
 void GenericSkillLoader::unresolveAll( )
 {
     for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
-	GenericSkill *skill = e->getStaticPointer<GenericSkill>( );
+        GenericSkill *skill = e->getStaticPointer<GenericSkill>( );
 
-	skill->unresolve( );
+        skill->unresolve( );
     }
 }
 
 extern "C"
 {
-	SO::PluginList initialize_genericskill_loader( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<GenericSkillLoader>( ppl );
-		
-		return ppl;
-	}
-	
+        SO::PluginList initialize_genericskill_loader( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<GenericSkillLoader>( ppl );
+                
+                return ppl;
+        }
+        
 }

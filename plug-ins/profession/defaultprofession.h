@@ -20,8 +20,7 @@
 /*
  * ProfessionHelp
  */
-class ProfessionHelp : public virtual XMLHelpArticle,
-                       public virtual MarkupHelpArticle {
+class ProfessionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<ProfessionHelp> Pointer;
 
@@ -91,7 +90,7 @@ public:
 
     virtual const DLString & getType( ) const
     {
-	return TYPE;
+        return TYPE;
     }
 
     static const DLString TYPE;
@@ -102,8 +101,8 @@ public:
  * DefaultProfession
  */
 class DefaultProfession : public Profession, 
-			  public XMLTableElement,
-			  public XMLVariableContainer 
+                          public XMLTableElement,
+                          public XMLVariableContainer 
 {
 XML_OBJECT
 public:

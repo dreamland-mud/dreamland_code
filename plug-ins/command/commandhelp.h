@@ -9,13 +9,12 @@
 #include "command.h"
 #include "helpformatter.h"
 
-class CommandHelp : public virtual XMLHelpArticle, public virtual MarkupHelpArticle {
+class CommandHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<CommandHelp> Pointer;
     typedef ::Pointer<Command> CommandPointer;
 
     virtual bool visible( Character * ) const;
-
     virtual void setCommand( CommandPointer );
     virtual void unsetCommand( );
     

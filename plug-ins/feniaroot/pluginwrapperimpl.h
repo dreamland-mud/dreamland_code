@@ -36,19 +36,19 @@ public:
     }
 
     virtual void croak(const Register &key, const ::Exception &e) const {
-	Register prog;
+        Register prog;
 
-	if (triggerFunction(key, prog)) {
-	    const DLString &author = prog.toFunction( )->getFunction()->source.source->author;
-	    PCMemoryInterface *pcm = PCharacterManager::find( author );
+        if (triggerFunction(key, prog)) {
+            const DLString &author = prog.toFunction( )->getFunction()->source.source->author;
+            PCMemoryInterface *pcm = PCharacterManager::find( author );
 
-	    if (pcm && pcm->isOnline( ))
-		pcm->getPlayer( )->printf(
-			"{CÙ…»…  «œÃœ” …⁄ »“’”‘¡ÃÿŒœ«œ €¡“¡ ∆≈Œ≈“¡: {WÈ”ÀÃ¿ﬁ≈Œ…≈ –“… ◊Ÿ⁄œ◊≈ %s:{x\n%s\n",
-			key.toString( ).c_str( ),
-			e.what( ) );
+            if (pcm && pcm->isOnline( ))
+                pcm->getPlayer( )->printf(
+                        "{C–¢–∏—Ö–∏–π –≥–æ–ª–æ—Å –∏–∑ —Ö—Ä—É—Å—Ç–∞–ª—å–Ω–æ–≥–æ —à–∞—Ä–∞ —Ñ–µ–Ω–µ—Ä–∞: {W–ò—Å–∫–ª—é—á–µ–Ω–∏–µ –ø—Ä–∏ –≤—ã–∑–æ–≤–µ %s:{x\n%s\n",
+                        key.toString( ).c_str( ),
+                        e.what( ) );
                         
-	}
+        }
 
         WrapperBase::croak(key, e);
     }

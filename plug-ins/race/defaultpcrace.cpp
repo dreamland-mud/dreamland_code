@@ -12,8 +12,8 @@
  * DefaultPCRace
  *------------------------------------------------------------------*/
 DefaultPCRace::DefaultPCRace( ) :
-	  classes( professionManager ),
-	  stats( &stat_table ),
+          classes( professionManager ),
+          stats( &stat_table ),
           align( 0, &align_table )
 {
 }
@@ -65,10 +65,10 @@ int DefaultPCRace::getMaxAlign( ) const
 DLString DefaultPCRace::getWhoNameFor( Character *looker, Character *owner ) const
 {
     if (!looker || !looker->getConfig( )->rucommands) 
-	return nameWho;
+        return nameWho;
 
     if (!owner || owner->getSex( ) == SEX_MALE)
-	return nameWhoRus;
+        return nameWhoRus;
 
     return nameWhoFemale;
 }

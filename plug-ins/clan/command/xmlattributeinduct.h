@@ -29,28 +29,28 @@ public:
 };
 
 class XMLAttributeInduct : public XMLAttribute, 
-			   public XMLVectorBase<XMLInductEntry>
+                           public XMLVectorBase<XMLInductEntry>
 {
 public:
-	typedef ::Pointer<XMLAttributeInduct> Pointer;
+        typedef ::Pointer<XMLAttributeInduct> Pointer;
 
         virtual const DLString &getType( ) const 
-	{
+        {
             return TYPE;
         }
 
-	static const DLString TYPE;                                             
-	
-	void run( PCharacter * );
-	void addEntry( DLString );
+        static const DLString TYPE;                                             
+        
+        void run( PCharacter * );
+        void addEntry( DLString );
 };
 
 class XMLAttributeInductListenerPlugin : public DescriptorStateListener {
 public:
-	typedef ::Pointer<XMLAttributeInductListenerPlugin> Pointer;
+        typedef ::Pointer<XMLAttributeInductListenerPlugin> Pointer;
 
 
-	virtual void run( int, int, Descriptor * );
+        virtual void run( int, int, Descriptor * );
 };
 
 #endif

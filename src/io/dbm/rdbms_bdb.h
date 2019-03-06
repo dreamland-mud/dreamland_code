@@ -68,19 +68,19 @@ public:
 
     template <typename H>
     void forEach( key_t k, H h ) {
-	Dbt key(key2dbt(k)), val;
-	Dbc *cur = 0;
-	int ret;
+        Dbt key(key2dbt(k)), val;
+        Dbc *cur = 0;
+        int ret;
 
-	db->cursor( getCurrentTxn( ), &cur, 0 );
-	
-	ret = cur->get(&key, &val, DB_SET);
-	while(ret != DB_NOTFOUND) {
-	    h(val.get_data( ), val.get_size( ));
-	    ret = cur->get(&key, &val, DB_NEXT_DUP);
-	}
+        db->cursor( getCurrentTxn( ), &cur, 0 );
+        
+        ret = cur->get(&key, &val, DB_SET);
+        while(ret != DB_NOTFOUND) {
+            h(val.get_data( ), val.get_size( ));
+            ret = cur->get(&key, &val, DB_NEXT_DUP);
+        }
 
-	cur->close( );
+        cur->close( );
     }
 
 private:

@@ -13,11 +13,11 @@ extern "C"
 {
     SO::PluginList initialize_services_shop( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Repairman> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<ShopTrader> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Repairman> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<ShopTrader> >( ppl );
+        
+        return ppl;
     }
 }

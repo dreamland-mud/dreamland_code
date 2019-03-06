@@ -3,24 +3,24 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT		           *	
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *
- *	 Ibrahim Canpunar  {Mandrake}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *	
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT                           *        
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *
+ *         Ibrahim Canpunar  {Mandrake}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 
 /***************************************************************************
@@ -41,13 +41,13 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1995 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@pacinfo.com)				   *
-*	    Gabrielle Taylor (gtaylor@pacinfo.com)			   *
-*	    Brian Moore (rom@rom.efn.org)				   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*        ROM 2.4 is copyright 1993-1995 Russ Taylor                           *
+*        ROM has been brought to you by the ROM consortium                   *
+*            Russ Taylor (rtaylor@pacinfo.com)                                   *
+*            Gabrielle Taylor (gtaylor@pacinfo.com)                           *
+*            Brian Moore (rom@rom.efn.org)                                   *
+*        By using this code, you have agreed to follow the terms of the           *
+*        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
 #include <unistd.h>
@@ -105,12 +105,12 @@ CLAN(battlerager);
 CLAN(hunter);
 PROF(vampire);
 
-#define PULSE_SAVING	          ( 6 * dreamland->getPulsePerSecond( ))
-#define PULSE_WATER_FLOAT	  ( 4 * dreamland->getPulsePerSecond( ))
-#define PULSE_MUSIC		  ( 6 * dreamland->getPulsePerSecond( ))
-#define PULSE_RAFFECT		  ( 3 * PULSE_MOBILE)
-#define PULSE_AREA		  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
-#define PULSE_TRACK		  ( 6 * dreamland->getPulsePerSecond( ))
+#define PULSE_SAVING                  ( 6 * dreamland->getPulsePerSecond( ))
+#define PULSE_WATER_FLOAT          ( 4 * dreamland->getPulsePerSecond( ))
+#define PULSE_MUSIC                  ( 6 * dreamland->getPulsePerSecond( ))
+#define PULSE_RAFFECT                  ( 3 * PULSE_MOBILE)
+#define PULSE_AREA                  (110 * dreamland->getPulsePerSecond( )) /* 97 saniye */
+#define PULSE_TRACK                  ( 6 * dreamland->getPulsePerSecond( ))
 
 /*
  * Local functions.
@@ -155,7 +155,7 @@ void room_to_save( Room * room )
 void room_to_save( Character *ch )
 {
     if (ch->is_npc( ) && !IS_AFFECTED(ch, AFF_CHARM))
-	room_to_save( ch->in_room );
+        room_to_save( ch->in_room );
 }
 
 void room_to_save( Object *obj )
@@ -164,9 +164,9 @@ void room_to_save( Object *obj )
     Room *room = obj->getRoom( );
 
     if (carrier)
-	room_to_save( carrier );
+        room_to_save( carrier );
     else
-	room_to_save( room );
+        room_to_save( room );
 }
 
 
@@ -226,9 +226,9 @@ static bool mprog_special( Character *ch )
     BEHAVIOR_CALL( ch->getNPC( ), spec );
     
     if (ch->is_npc( ) && !IS_AFFECTED(ch, AFF_CHARM)) {
-	if (*(ch->getNPC( )->spec_fun) != 0 
-	    && (*(ch->getNPC( )->spec_fun))( ch->getNPC( ) ))
-	    return true;
+        if (*(ch->getNPC( )->spec_fun) != 0 
+            && (*(ch->getNPC( )->spec_fun))( ch->getNPC( ) ))
+            return true;
     }
 
     return false;
@@ -242,18 +242,18 @@ void mobile_update( )
     Character *ch, *ch_next;
 
     for (ch = char_list; ch; ch = ch_next) {
-	ch_next = ch->next;
+        ch_next = ch->next;
 
-	wield_update( ch );
+        wield_update( ch );
 
-	if (!ch->is_npc( )) {
-	    // workaround, waiting for current
-	    if (IS_SET(ch->act, PLR_NO_EXP)) 
-		ch->getPC( )->age.setTruePlayed( 
-		    ch->getPC( )->age.getTrueTime( ) - 4 );
-	} 
-	
-	mprog_special( ch );
+        if (!ch->is_npc( )) {
+            // workaround, waiting for current
+            if (IS_SET(ch->act, PLR_NO_EXP)) 
+                ch->getPC( )->age.setTruePlayed( 
+                    ch->getPC( )->age.getTrueTime( ) - 4 );
+        } 
+        
+        mprog_special( ch );
     }
 }
 
@@ -283,14 +283,14 @@ void char_update( )
     {
         ch_next = ch->next;
 
-	if (ch->in_room == 0)
-	    continue;
+        if (ch->in_room == 0)
+            continue;
 
-	if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
-	    act_p("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM,POS_RESTING);
-	    extract_char( ch );
-	    continue;
-	}
+        if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
+            act_p("$c1 я─п╟п╥п╠п╦п╡п╟п╣я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.",ch,0,0,TO_ROOM,POS_RESTING);
+            extract_char( ch );
+            continue;
+        }
 
         // reset hunters path find
         if (!ch->is_npc() && ch->getClan( ) == clan_hunter)
@@ -310,111 +310,111 @@ void char_update( )
         if ( ch->isAffected(gsn_caltraps)
                 && !ch->fighting )
         {
-	    room_to_save( ch );
+            room_to_save( ch );
             affect_strip(ch,gsn_caltraps);
         }
-	
-	if (ch->is_vampire( )) {
-	    if (weather_info.sunlight != SUN_DARK
-		&& !IS_SET(ch->in_room->room_flags, ROOM_DARK)
-		&& IS_OUTSIDE(ch))
-	    {
-		interpret( ch, "human" );
-	    }
-	}
-	
+        
+        if (ch->is_vampire( )) {
+            if (weather_info.sunlight != SUN_DARK
+                && !IS_SET(ch->in_room->room_flags, ROOM_DARK)
+                && IS_OUTSIDE(ch))
+            {
+                interpret( ch, "human" );
+            }
+        }
+        
         // Reset sneak for vampire
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && IS_VAMPIRE(ch) && !MOUNTED(ch))
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
+            ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╢п╡п╦пЁп╟я┌я▄я│я▐ п╫п╣п╥п╟п╪п╣я┌п╫п╬.\n\r");
             SET_BIT(ch->affected_by ,AFF_SNEAK);
-	    room_to_save( ch );
+            room_to_save( ch );
         }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && (ch->getRace( )->getAff( ).isSet( AFF_SNEAK )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
-	    room_to_save( ch );
+            ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╢п╡п╦пЁп╟я┌я▄я│я▐ п╫п╣п╥п╟п╪п╣я┌п╫п╬.\n\r");
+            room_to_save( ch );
         }
 
         if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_HIDE)
                 && (ch->getRace( )->getAff( ).isSet( AFF_HIDE )) && !MOUNTED(ch) )
         {
-            ch->send_to("Ты прячешься обратно в тень.\n\r");
-	    room_to_save( ch );
+            ch->send_to("п╒я▀ п©я─я▐я┤п╣я┬я▄я│я▐ п╬п╠я─п╟я┌п╫п╬ п╡ я┌п╣п╫я▄.\n\r");
+            room_to_save( ch );
         }
 
         SET_BIT(ch->affected_by, ch->getRace( )->getAff( ) );
 
         if (ch->position == POS_STUNNED) {
             update_pos( ch );
-	    room_to_save( ch );
+            room_to_save( ch );
         }
-	
+        
         // remove effects from extracted arrows (workaround, waiting for current)
         if (get_eq_char(ch, wear_stuck_in) == 0) {
-	    room_to_save( ch );
+            room_to_save( ch );
             if (ch->isAffected(gsn_arrow))
                 affect_strip(ch, gsn_arrow);
             if (ch->isAffected(gsn_spear))
                 affect_strip(ch, gsn_spear);
         }
 
-	if (!ch->is_npc( ))
-	    lantern_update( ch );
+        if (!ch->is_npc( ))
+            lantern_update( ch );
 
-	if (!ch->is_npc( ) && !dreamland->hasOption( DL_BUILDPLOT ))
-	    try {
-		for (int i = 0; i < desireManager->size( ); i++)
-		    desireManager->find( i )->update( ch->getPC( ) );
-	    } catch (const VictimDeathException &) {
-		continue;
-	    }
-	
-	if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo) {
-	    if (++ch->timer == 12)
-		idle_update( ch->getPC( ) );
-	    
-	    if (ch->timer > 20)
-		ch_quit = ch;
-	}
+        if (!ch->is_npc( ) && !dreamland->hasOption( DL_BUILDPLOT ))
+            try {
+                for (int i = 0; i < desireManager->size( ); i++)
+                    desireManager->find( i )->update( ch->getPC( ) );
+            } catch (const VictimDeathException &) {
+                continue;
+            }
+        
+        if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo) {
+            if (++ch->timer == 12)
+                idle_update( ch->getPC( ) );
+            
+            if (ch->timer > 20)
+                ch_quit = ch;
+        }
 
-	if (ch->is_npc( ) && ch->timer > 0) {
-	    if (--ch->timer == 0) {
-		if (IS_SET(ch->act, ACT_UNDEAD))
-		    act("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
-		else
-		    act("$c1 уме$gрло|р|рла.", ch, 0, 0, TO_ROOM);
-		extract_char( ch );
-		continue;
-	    }
-	}
+        if (ch->is_npc( ) && ch->timer > 0) {
+            if (--ch->timer == 0) {
+                if (IS_SET(ch->act, ACT_UNDEAD))
+                    act("$c1 я─п╟п╥п╡п╟п╩п╦п╩$gп╬я│я▄|я│я▐|п╟я│я▄ п╫п╟ п╨я┐я│п╨п╦.", ch, 0, 0, TO_ROOM);
+                else
+                    act("$c1 я┐п╪п╣$gя─п╩п╬|я─|я─п╩п╟.", ch, 0, 0, TO_ROOM);
+                extract_char( ch );
+                continue;
+            }
+        }
 
-	char_update_affects( ch );
+        char_update_affects( ch );
 
         if (!ch->is_npc( )
                 && ch->getClan( ) == clan_battlerager
                 && !ch->isAffected( gsn_spellbane ))
         {
-	    interpret_raw( ch, "spellbane" );
+            interpret_raw( ch, "spellbane" );
         }
 
-	if ((ch->position == POS_INCAP && number_range(0, 1) == 0)
-	    || ch->position == POS_MORTAL)
-	{
-	    room_to_save( ch );
-	    rawdamage( ch, ch, DAM_NONE, 1, false );
-	}
+        if ((ch->position == POS_INCAP && number_range(0, 1) == 0)
+            || ch->position == POS_MORTAL)
+        {
+            room_to_save( ch );
+            rawdamage( ch, ch, DAM_NONE, 1, false );
+        }
 
-	if (ch->position <= POS_STUNNED && ch->hit > 0) {
-	    room_to_save( ch );
-	    update_pos( ch );
-	}
+        if (ch->position <= POS_STUNNED && ch->hit > 0) {
+            room_to_save( ch );
+            update_pos( ch );
+        }
 
-	if (mprog_area( ch ))
-	    continue;
+        if (mprog_area( ch ))
+            continue;
     }
 
     /*
@@ -442,10 +442,10 @@ void char_update( )
 void diving_update( )
 {
     for(int i=0;i<MAX_KEY_HASH;i++)
-	for(Room *r = room_index_hash[i]; r; r = r->next) {
-	    FENIA_VOID_CALL(r, "DiveUpdate", "");
-	    FENIA_VOID_CALL(r, "Spec", "");
-	}
+        for(Room *r = room_index_hash[i]; r; r = r->next) {
+            FENIA_VOID_CALL(r, "DiveUpdate", "");
+            FENIA_VOID_CALL(r, "Spec", "");
+        }
 }
 
 static bool oprog_spec( Object *obj )
@@ -459,53 +459,53 @@ void water_float_update( )
 {
     Object *obj_next;
     Object *obj;
-    Character *ch;
 
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
 
-	if (oprog_spec( obj ))
-	    continue;
-
-	if (!obj->in_room)
+        if (oprog_spec( obj ))
             continue;
-	
-        if (!IS_WATER( obj->in_room ))
-	    continue;
+
+        if (!obj->in_room)
+            continue;
         
-	ch = obj->in_room->people;
-	
-	if (obj->water_float == -2) {
-	    if (obj->may_float( ) || material_swims( obj ) == SWIM_ALWAYS)
-		obj->water_float = -1;
-	    else
-		obj->water_float = obj->floating_time( );
-	}
-	
-	if (obj->item_type == ITEM_DRINK_CON && !IS_SET(obj->value[4], DRINK_CLOSED)) {
-	    obj->in_room->echo( POS_RESTING, "%1$^O1 дела%1$nет|ют пузыри на поверхности %2$N2.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+        if (!IS_WATER( obj->in_room ))
+            continue;
 
-	    obj->value[1] = URANGE( 1, obj->value[1] + 8, obj->value[0] );
-	    obj->water_float = obj->value[0] - obj->value[1];
-	    obj->value[2] = obj->in_room->liquid;
-	    room_to_save( obj );
-	}
+        if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))
+            continue;
+        
+        if (obj->water_float == -2) {
+            if (obj->may_float( ) || material_swims( obj ) == SWIM_ALWAYS)
+                obj->water_float = -1;
+            else
+                obj->water_float = obj->floating_time( );
+        }
+        
+        if (obj->item_type == ITEM_DRINK_CON && !IS_SET(obj->value[4], DRINK_CLOSED)) {
+            obj->in_room->echo( POS_RESTING, "%1$^O1 п╢п╣п╩п╟%1$nп╣я┌|я▌я┌ п©я┐п╥я▀я─п╦ п╫п╟ п©п╬п╡п╣я─я┘п╫п╬я│я┌п╦ %2$N2.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
 
-	if (obj->water_float > 0)
-	    obj->water_float--;
+            obj->value[1] = URANGE( 1, obj->value[1] + 8, obj->value[0] );
+            obj->water_float = obj->value[0] - obj->value[1];
+            obj->value[2] = obj->in_room->liquid;
+            room_to_save( obj );
+        }
 
-	if (obj->water_float == 0) {
-	    if (obj->item_type == ITEM_CORPSE_NPC
-		    || obj->item_type == ITEM_CORPSE_PC
-		    || obj->item_type == ITEM_CONTAINER)
-	    {
-		obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6, оставляя лишь несколько пузырьков.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
-	    }
-	    else
-		obj->in_room->echo( POS_RESTING, "%1$^O1 тон%1$nет|ут в %2$N6.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+        if (obj->water_float > 0)
+            obj->water_float--;
 
-	    extract_obj( obj );
-	}
+        if (obj->water_float == 0) {
+            if (obj->item_type == ITEM_CORPSE_NPC
+                    || obj->item_type == ITEM_CORPSE_PC
+                    || obj->item_type == ITEM_CONTAINER)
+            {
+                obj->in_room->echo( POS_RESTING, "%1$^O1 я┌п╬п╫%1$nп╣я┌|я┐я┌ п╡ %2$N6, п╬я│я┌п╟п╡п╩я▐я▐ п╩п╦я┬я▄ п╫п╣я│п╨п╬п╩я▄п╨п╬ п©я┐п╥я▀я─я▄п╨п╬п╡.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+            }
+            else
+                obj->in_room->echo( POS_RESTING, "%1$^O1 я┌п╬п╫%1$nп╣я┌|я┐я┌ п╡ %2$N6.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
+
+            extract_obj( obj );
+        }
     }
 }
 
@@ -521,32 +521,32 @@ static bool reset_check_obj( Object *obj )
     NPCharacter *mob;
 
     if (obj->carried_by && obj->carried_by->is_npc( ))
-	mob = obj->carried_by->getNPC( );
+        mob = obj->carried_by->getNPC( );
     else
-	mob = NULL;
+        mob = NULL;
     
     for (r = room->reset_first; r; r = r->next)
-	switch (r->command) {
-	case 'O':
-	    if (r->arg1 == v && obj->in_room) 
-		return true;
-	    break;
-	case 'P':
-	    if (r->arg1 == v && obj->in_obj && r->arg3 == obj->in_obj->pIndexData->vnum) 
-		return true;
-	    break;
-	case 'M':
-	    mobVnum = r->arg1;
-	    break;
-	case 'E':
-	case 'G':
-	    if (mob && mob->pIndexData->vnum == mobVnum) 
-		return true;
-	    break;
-	}
+        switch (r->command) {
+        case 'O':
+            if (r->arg1 == v && obj->in_room) 
+                return true;
+            break;
+        case 'P':
+            if (r->arg1 == v && obj->in_obj && r->arg3 == obj->in_obj->pIndexData->vnum) 
+                return true;
+            break;
+        case 'M':
+            mobVnum = r->arg1;
+            break;
+        case 'E':
+        case 'G':
+            if (mob && mob->pIndexData->vnum == mobVnum) 
+                return true;
+            break;
+        }
     
     if (mob && mob->pIndexData->area == obj->pIndexData->area)
-	return true;
+        return true;
 
     return false;
 }
@@ -557,7 +557,7 @@ static Object * obj_get_container( Object *obj )
     Object *o;
 
     for (o = obj->in_obj; o; o = o->in_obj)
-	;
+        ;
 
     return o;
 }
@@ -573,65 +573,65 @@ static bool oprog_update_key( Object *obj )
     
     /* ground */
     if (carrier == 0) {
-	if (obj->value[1] == 0) { // 0: never rot
-	    obj->timer = 0;
-	    return true;
-	}
-	
-	// always allow keys in the mansions
-	if (IS_SET(obj->getRoom( )->room_flags, ROOM_MANSION)) 
-	    return false;
+        if (obj->value[1] == 0) { // 0: never rot
+            obj->timer = 0;
+            return true;
+        }
+        
+        // always allow keys in the mansions
+        if (IS_SET(obj->getRoom( )->room_flags, ROOM_MANSION)) 
+            return false;
 
-	// don't touch keys in the pits or corpses
-	if (container && IS_PIT(container))
-	    return false;
-	if (container 
-		&& (container->item_type == ITEM_CORPSE_PC
-		    || container->item_type == ITEM_CORPSE_NPC))
-	    return false;
+        // don't touch keys in the pits or corpses
+        if (container && IS_PIT(container))
+            return false;
+        if (container 
+                && (container->item_type == ITEM_CORPSE_PC
+                    || container->item_type == ITEM_CORPSE_NPC))
+            return false;
 
-	if (reset_check_obj( obj )) { // object is in reset place
-	    obj->timer = 0;
-	    return true;
-	}
-	
-	if (!obj->timer) {
-	    obj->timer = 60;      // disappear in 60 ticks
-	    return true;
-	}
+        if (reset_check_obj( obj )) { // object is in reset place
+            obj->timer = 0;
+            return true;
+        }
+        
+        if (!obj->timer) {
+            obj->timer = 60;      // disappear in 60 ticks
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     /* inventory or bags */
-    if (obj->value[0] == 1) { // 1: never rot	
-	obj->timer = 0;
-	return true;
+    if (obj->value[0] == 1) { // 1: never rot        
+        obj->timer = 0;
+        return true;
     }
     
     if (obj->value[0] > 1) {// > 1: means TTL
-	if (reset_check_obj( obj )) {
-	    obj->timer = 0;
-	    return true;
-	}
-	
-	if (!obj->timer) {
-	    obj->timer = obj->value[0];
-	    return true;
-	}
-	    
-	return false;
+        if (reset_check_obj( obj )) {
+            obj->timer = 0;
+            return true;
+        }
+        
+        if (!obj->timer) {
+            obj->timer = obj->value[0];
+            return true;
+        }
+            
+        return false;
     }
     
     // 0: means rot on save, automatic for pc, checked for mobs
 
     if (carrier->is_npc( ) && !reset_check_obj( obj )) { // rot in wrong hands
-	if (!obj->timer) {
-	    obj->timer = 10;
-	    return true;
-	}
-	
-	return false;
+        if (!obj->timer) {
+            obj->timer = 10;
+            return true;
+        }
+        
+        return false;
     }
 
     return false;
@@ -663,31 +663,31 @@ void obj_update( void )
         const char *message;
 
 #warning XXX
-	if(!obj->pIndexData) {
-	    LogStream::sendError() << "obj_update aborted" << endl;
-	    return;
-	}
-	    
+        if(!obj->pIndexData) {
+            LogStream::sendError() << "obj_update aborted" << endl;
+            return;
+        }
+            
         obj_next = obj->next;
-	room = obj->getRoom( );
-	carrier = obj->getCarrier( );
-	
-	if (!room)
-	    continue;
+        room = obj->getRoom( );
+        carrier = obj->getCarrier( );
+        
+        if (!room)
+            continue;
 
         if (obj->item_type == ITEM_KEY)
-	    if (oprog_update_key( obj ))
-		room_to_save( obj );
+            if (oprog_update_key( obj ))
+                room_to_save( obj );
 
-	/* no limits on the floor inside 'mansions' */
-	if (carrier == 0 && room && IS_SET(room->room_flags, ROOM_MANSION)
-	    && obj->pIndexData->limit != -1) 
-	{
+        /* no limits on the floor inside 'mansions' */
+        if (carrier == 0 && room && IS_SET(room->room_flags, ROOM_MANSION)
+            && obj->pIndexData->limit != -1) 
+        {
 
-	    room->echo( POS_RESTING, "Внезапно появляется злобная домоуправительница и подметает %1$O4 на совок!", obj );
-	    extract_obj( obj );
-	    continue;
-	}
+            room->echo( POS_RESTING, "п▓п╫п╣п╥п╟п©п╫п╬ п©п╬я▐п╡п╩я▐п╣я┌я│я▐ п╥п╩п╬п╠п╫п╟я▐ п╢п╬п╪п╬я┐п©я─п╟п╡п╦я┌п╣п╩я▄п╫п╦я├п╟ п╦ п©п╬п╢п╪п╣я┌п╟п╣я┌ %1$O4 п╫п╟ я│п╬п╡п╬п╨!", obj );
+            extract_obj( obj );
+            continue;
+        }
 
         /* go through affects and decrement */
         for ( paf = obj->affected; paf != 0; paf = paf_next )
@@ -698,71 +698,76 @@ void obj_update( void )
                 paf->duration--;
                 if (number_range(0,4) == 0 && paf->level > 0)
                     paf->level--;  /* spell strength fades with time */
-		room_to_save( obj );
+
+                // Issue periodic message or action.
+                if (paf->type->getAffect( )) 
+                    paf->type->getAffect( )->update( obj, paf );
+
+                room_to_save( obj );
             }
             else if ( paf->duration < 0 )
                 ;
             else
             {
-		AffectHandler::Pointer ah;
+                AffectHandler::Pointer ah;
 
                 if ( paf_next == 0 
-			|| paf_next->type != paf->type
+                        || paf_next->type != paf->type
                         || paf_next->duration > 0 )
                 {
-		    ah = paf->type->getAffect( );
+                    ah = paf->type->getAffect( );
                 }
 
-		room_to_save( obj );
+                room_to_save( obj );
                 affect_remove_obj( obj, paf );
 
-		if (ah)
-		    ah->remove( obj );
+                if (ah)
+                    ah->remove( obj );
             }
         }
 
         if (oprog_area( obj ))
-	    continue;
-	
-	if (!obj->in_obj 
-	    && room->sector_type == SECT_DESERT
-	    && material_is_flagged( obj, MAT_MELTING ))
-	{
-	    if (carrier) {
-		if (chance( 40 )) {
-		    carrier->pecho( "%1$^O1 та%1$nет|ют от жара.", obj );
-		    extract_obj( obj );
-		    continue;
-		}
-	    }
-	    else {
-		if (chance( 50 )) {
-		    room->echo( POS_RESTING, "%1$^O1 та%1$nет|ют от жара.", obj );
-		    extract_obj( obj );
-		    continue;
-		}
-	    }
-	}
-	
-	if (obj->item_type == ITEM_POTION
-	    && !obj->in_obj
-	    && room->sector_type == SECT_DESERT
-	    && material_is_flagged( obj, MAT_FRAGILE ))
+            continue;
+        
+        if (!obj->in_obj 
+            && room->sector_type == SECT_DESERT
+            && material_is_flagged( obj, MAT_MELTING ))
         {
-	    if (carrier) {
-		if (!carrier->is_npc( ) && chance( 20 )) {
-		    carrier->pecho( "%1$^O1 разбива%1$nется|ются.", obj );
-		    extract_obj( obj );
-		    continue;
-		}
+            if (carrier) {
+                if (chance( 40 )) {
+                    carrier->pecho( "%1$^O1 я┌п╟%1$nп╣я┌|я▌я┌ п╬я┌ п╤п╟я─п╟.", obj );
+                    extract_obj( obj );
+                    continue;
+                }
             }
             else {
-		if (chance( 30 )) {
-		    room->echo( POS_RESTING, "%1$^O1 разбива%1$nется|ются на мелкие осколки.", obj );
-		    extract_obj( obj );
-		    continue;
-		}
-	    }
+                if (chance( 50 )) {
+                    room->echo( POS_RESTING, "%1$^O1 я┌п╟%1$nп╣я┌|я▌я┌ п╬я┌ п╤п╟я─п╟.", obj );
+                    extract_obj( obj );
+                    continue;
+                }
+            }
+        }
+        
+        if (obj->item_type == ITEM_POTION
+            && !obj->in_obj
+            && room->sector_type == SECT_DESERT
+            && material_is_flagged( obj, MAT_FRAGILE ))
+        {
+            if (carrier) {
+                if (!carrier->is_npc( ) && chance( 20 )) {
+                    carrier->pecho( "%1$^O1 я─п╟п╥п╠п╦п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐.", obj );
+                    extract_obj( obj );
+                    continue;
+                }
+            }
+            else {
+                if (chance( 30 )) {
+                    room->echo( POS_RESTING, "%1$^O1 я─п╟п╥п╠п╦п╡п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╫п╟ п╪п╣п╩п╨п╦п╣ п╬я│п╨п╬п╩п╨п╦.", obj );
+                    extract_obj( obj );
+                    continue;
+                }
+            }
         }
 
         if ( obj->condition > -1
@@ -770,7 +775,7 @@ void obj_update( void )
                      || --obj->timer > 0 ) )
         {
             if (obj->timer > 0) {
-		room_to_save( obj );
+                room_to_save( obj );
             }
 
             continue;
@@ -779,55 +784,56 @@ void obj_update( void )
         switch ( obj->item_type )
         {
         default:
-            message = "%1$^O1 превраща%1$nется|ются в пыль.";
+            message = "%1$^O1 п©я─п╣п╡я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я▀п╩я▄.";
             break;
         case ITEM_FOUNTAIN:
-            message = "%1$^O1 высыха%1$nет|ют.";
+            message = "%1$^O1 п╡я▀я│я▀я┘п╟%1$nп╣я┌|я▌я┌.";
             break;
         case ITEM_CORPSE_NPC:
-            message = "%1$^O1 обраща%1$nется|ются в прах.";
+            message = "%1$^O1 п╬п╠я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я─п╟я┘.";
             break;
         case ITEM_CORPSE_PC:
-            message = "%1$^O1 обраща%1$nется|ются в прах.";
+            message = "%1$^O1 п╬п╠я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я─п╟я┘.";
             break;
         case ITEM_FOOD:
-            message = "%1$^O1 разлага%1$nется|ются.";
+            message = "%1$^O1 я─п╟п╥п╩п╟пЁп╟%1$nп╣я┌я│я▐|я▌я┌я│я▐.";
             break;
         case ITEM_POTION:
-            message = "%1$^O1 испаря%1$nется|ются.";
+            message = "%1$^O1 п╦я│п©п╟я─я▐%1$nп╣я┌я│я▐|я▌я┌я│я▐.";
             break;
         case ITEM_PORTAL:
-            message = "%1$^O1 исчеза%1$nет|ют в дымке.";
+            message = "%1$^O1 п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌ п╡ п╢я▀п╪п╨п╣.";
             break;
         case ITEM_FURNITURE:
-            message = "%1$^O1 исчеза%1$nет|ют.";
+        case ITEM_TATTOO:
+            message = "%1$^O1 п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌.";
             break;
         case ITEM_CONTAINER:
             if (obj->can_wear(ITEM_WEAR_FLOAT))
                 if (obj->contains)
-                    message = "%1$^O1 вспыхива%1$nет|ют и исчеза%1$nет|ют, рассыпая все содержимое по земле.";
+                    message = "%1$^O1 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ п╦ п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌, я─п╟я│я│я▀п©п╟я▐ п╡я│п╣ я│п╬п╢п╣я─п╤п╦п╪п╬п╣ п©п╬ п╥п╣п╪п╩п╣.";
                 else
-                    message = "%1$^O1 вспыхива%1$nет|ют и исчеза%1$nет|ют.";
+                    message = "%1$^O1 п╡я│п©я▀я┘п╦п╡п╟%1$nп╣я┌|я▌я┌ п╦ п╦я│я┤п╣п╥п╟%1$nп╣я┌|я▌я┌.";
             else
-                message = "%1$^O1 обраща%1$nется|ются в прах.";
+                message = "%1$^O1 п╬п╠я─п╟я┴п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╡ п©я─п╟я┘.";
             break;
         }
 
         if (obj->carried_by != 0) {
-	    obj->carried_by->pecho( message, obj );
+            obj->carried_by->pecho( message, obj );
 
-	    if (obj->wear_loc == wear_float)
-		obj->carried_by->recho( message, obj );
+            if (obj->wear_loc == wear_float)
+                obj->carried_by->recho( message, obj );
         }
         else if (obj->in_room != 0) {
             if (!(obj->in_obj && IS_PIT(obj->in_obj)))
-		obj->in_room->echo( POS_RESTING, message, obj );
+                obj->in_room->echo( POS_RESTING, message, obj );
         }
 
 
         if ((obj->item_type == ITEM_CORPSE_PC 
-		|| (obj->item_type == ITEM_CONTAINER && obj->getCarrier( )))
-	    && obj->contains)
+                || (obj->item_type == ITEM_CONTAINER && obj->getCarrier( )))
+            && obj->contains)
 
         {   /* save the contents */
             Object *t_obj, *next_obj;
@@ -852,7 +858,7 @@ void obj_update( void )
                         extract_obj(t_obj);
                     else /* to the pit */
                     {
-			Object *pit = 0;
+                        Object *pit = 0;
 
                         if(obj->item_type == ITEM_CORPSE_PC) {
                             Room *pitRoom = get_room_index( obj->value[3] );
@@ -888,9 +894,9 @@ void update_handler( void )
     static  int     pulse_mobile;
     static  int     pulse_violence;
     static  int     pulse_point;
-    static  int	    pulse_music;
-    static  int	    pulse_water_float;
-    static  int	    pulse_raffect;
+    static  int            pulse_music;
+    static  int            pulse_water_float;
+    static  int            pulse_raffect;
     static  int     pulse_saving;
     static  int     pulse_track;
 
@@ -914,24 +920,24 @@ void update_handler( void )
     if ( --pulse_area     <= 0 )
     {
         wiznet( WIZ_TICKS, 0, 0, "AREA & ROOM TICK!" );
-        pulse_area	= PULSE_AREA;
+        pulse_area        = PULSE_AREA;
 
         LastLogStream::send( ) <<  "Area update"  << endl;
-        area_update	( );
+        area_update        ( );
 
         LastLogStream::send( ) <<  "Room update"  << endl;
-        room_update	( );
+        room_update        ( );
     }
 
-    if ( --pulse_music	  <= 0 )
+    if ( --pulse_music          <= 0 )
     {
-        pulse_music	= PULSE_MUSIC;
-        /*	song_update(); */
+        pulse_music        = PULSE_MUSIC;
+        /*        song_update(); */
     }
 
     if ( --pulse_mobile   <= 0 )
     {
-        pulse_mobile	= PULSE_MOBILE;
+        pulse_mobile        = PULSE_MOBILE;
 
         LastLogStream::send( ) <<  "Player update"  << endl;
         player_update( );
@@ -940,15 +946,15 @@ void update_handler( void )
         mobile_update( );
 
         LastLogStream::send( ) <<  "Diving update"  << endl;
-	diving_update( );	
+        diving_update( );        
     }
 
     if ( --pulse_violence <= 0 )
     {
-        pulse_violence	= dreamland->getPulseViolence( );
+        pulse_violence        = dreamland->getPulseViolence( );
 
         LastLogStream::send( ) <<  "Violence update"  << endl;
-        violence_update	( );
+        violence_update        ( );
     }
 
     if ( --pulse_water_float <= 0 )
@@ -969,23 +975,23 @@ void update_handler( void )
 
     if ( --pulse_point    <= 0 )
     {
-	LastLogStream::clear( );
+        LastLogStream::clear( );
 
         wiznet( WIZ_TICKS, 0, 0, "CHAR TICK!" );
         pulse_point     = PULSE_TICK;
 
         LastLogStream::send( ) <<  "Weather/Sunlight update"  << endl;
         weather_update( );
-	sunlight_update( );
+        sunlight_update( );
 
         LastLogStream::send( ) <<  "Char update"  << endl;
-	char_update	( );
+        char_update        ( );
 
         LastLogStream::send( ) <<  "Objects update"  << endl;
-        obj_update	( );
+        obj_update        ( );
 
         LastLogStream::send( ) <<  "Reboot update"  << endl;
-        check_reboot	( );
+        check_reboot        ( );
 
         /* room counting */
         {
@@ -1000,10 +1006,10 @@ void update_handler( void )
     
     if (--pulse_track <= 0) 
     {
-	pulse_track = PULSE_TRACK;
+        pulse_track = PULSE_TRACK;
 
-	LastLogStream::send( ) <<  "Track update"  << endl;
-	track_update( );
+        LastLogStream::send( ) <<  "Track update"  << endl;
+        track_update( );
     }
     
     LastLogStream::send( ) <<  "Aggressive update"  << endl;
@@ -1032,27 +1038,27 @@ void aggr_update( )
     for (ch = char_list; ch; ch = ch_next) {
         ch_next = ch->next;
 
-	if (ch->in_room == 0)
-	    continue;
-	
-	if (ch->is_npc( ) || ch->desc == 0)
-	    if (ch->wait > 0)
-		ch->wait--;
+        if (ch->in_room == 0)
+            continue;
+        
+        if (ch->is_npc( ) || ch->desc == 0)
+            if (ch->wait > 0)
+                ch->wait--;
 
-	check_bloodthirst( ch );
-	gsn_ambush->getCommand( )->run( ch );
-	gsn_bonedagger->getCommand( )->run( ch );
-	
-	if (ch->in_room->area->empty)
-	    continue;
+        check_bloodthirst( ch );
+        gsn_ambush->getCommand( )->run( ch );
+        gsn_bonedagger->getCommand( )->run( ch );
+        
+        if (ch->in_room->area->empty)
+            continue;
 
-	if (!ch->is_npc( ))
-	    continue;
-	    
-	mob = ch->getNPC( );
-	
-	if (mob->behavior)
-	    mob->behavior->aggress( );
+        if (!ch->is_npc( ))
+            continue;
+            
+        mob = ch->getNPC( );
+        
+        if (mob->behavior)
+            mob->behavior->aggress( );
     }
 }
 
@@ -1062,76 +1068,76 @@ struct LightVampireDamage : public Damage {
     }
     
     virtual void calcDamage( ) {
-	int n;
+        int n;
 
-	switch (weather_info.sunlight) {
-	case SUN_LIGHT: n = 15; break;
-	case SUN_RISE:  n = 5;  break;
-	case SUN_SET:   n = 3;  break;
-	default:        n = 0;  break;
-	}
-	
-	switch (weather_info.sky) {
-	case SKY_CLOUDLESS: 
-	    n *= 2;
-	    break;
-	case SKY_CLOUDY:
-	    n += n / 3;
-	    break;
-	}
-	
-	dam = max( 1, (ch->max_hit * n) / 500 );
+        switch (weather_info.sunlight) {
+        case SUN_LIGHT: n = 15; break;
+        case SUN_RISE:  n = 5;  break;
+        case SUN_SET:   n = 3;  break;
+        default:        n = 0;  break;
+        }
+        
+        switch (weather_info.sky) {
+        case SKY_CLOUDLESS: 
+            n *= 2;
+            break;
+        case SKY_CLOUDY:
+            n += n / 3;
+            break;
+        }
+        
+        dam = max( 1, (ch->max_hit * n) / 500 );
 
-	protectRazer( );
+        protectRazer( );
     }
      
     virtual bool canDamage( ) {
-	if (ch->is_immortal( ))
-	    return false;
-	
-	if (!ch->is_vampire( ))
-	    return false;
-	
-	if (weather_info.sunlight == SUN_DARK)
-	    return false;
-	
-	if (IS_SET(ch->in_room->room_flags, ROOM_DARK))
-	    return false;
+        if (ch->is_immortal( ))
+            return false;
+        
+        if (!ch->is_vampire( ))
+            return false;
+        
+        if (weather_info.sunlight == SUN_DARK)
+            return false;
+        
+        if (IS_SET(ch->in_room->room_flags, ROOM_DARK))
+            return false;
 
-	if (!IS_OUTSIDE(ch))
-	    return false;
-	
-	if (ch->isAffected(gsn_dark_shroud)) 
-	    return false;
+        if (!IS_OUTSIDE(ch))
+            return false;
+        
+        if (ch->isAffected(gsn_dark_shroud)) 
+            return false;
 
-	return Damage::canDamage( );
+        return Damage::canDamage( );
     }
-	
+        
     virtual void message( ) {
-	DLString msg;
-	
-	if (weather_info.sunlight == SUN_LIGHT) 
-	    msg = "Солнечный свет тревожит тебя.";
-	else if (weather_info.sunlight == SUN_RISE) 
-	    msg = "Лучи восходящего солнца тревожат тебя." ;
-	else if (weather_info.sunlight == SUN_SET) 
-	    msg = "Закатные лучи тревожат тебя." ;
+        DLString msg;
+        
+        if (weather_info.sunlight == SUN_LIGHT) 
+            msg = "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌ я┌я─п╣п╡п╬п╤п╦я┌ я┌п╣п╠я▐.";
+        else if (weather_info.sunlight == SUN_RISE) 
+            msg = "п⌡я┐я┤п╦ п╡п╬я│я┘п╬п╢я▐я┴п╣пЁп╬ я│п╬п╩п╫я├п╟ я┌я─п╣п╡п╬п╤п╟я┌ я┌п╣п╠я▐." ;
+        else if (weather_info.sunlight == SUN_SET) 
+            msg = "п≈п╟п╨п╟я┌п╫я▀п╣ п╩я┐я┤п╦ я┌я─п╣п╡п╬п╤п╟я┌ я┌п╣п╠я▐." ;
     
-	act( msg.c_str( ), ch, 0, 0, TO_CHAR );
+        act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
-	if (dam == 0)
-	    msgRoom( "Солнечный свет\6%C2", ch);
-	else
-	    msgRoom( "Солнечный свет\6%C4", ch);
-	    
-	msgChar( "Солнечный свет\6тебя" );
+        if (dam == 0)
+            msgRoom( "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌\6%C2", ch);
+        else
+            msgRoom( "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌\6%C4", ch);
+            
+        msgChar( "п║п╬п╩п╫п╣я┤п╫я▀п╧ я│п╡п╣я┌\6я┌п╣п╠я▐" );
     }
 };
 
 void light_update( PCharacter *ch )
 {
     try {
-	LightVampireDamage( ch ).hit( true );
+        LightVampireDamage( ch ).hit( true );
     }
     catch (const VictimDeathException &) {
     }
@@ -1152,7 +1158,7 @@ void room_update( void )
 
         for ( paf = room->affected; paf != 0; paf = paf_next )
         {
-            paf_next	= paf->next;
+            paf_next        = paf->next;
             if ( paf->duration > 0 )
             {
                 paf->duration--;
@@ -1165,8 +1171,8 @@ void room_update( void )
                         ||   paf_next->type != paf->type
                         ||   paf_next->duration > 0 )
                 {
-		    if (paf->type->getAffect( ))
-			paf->type->getAffect( )->remove( room );
+                    if (paf->type->getAffect( ))
+                        paf->type->getAffect( )->remove( room );
                 }
 
                 room->affectRemove( paf );
@@ -1184,19 +1190,19 @@ void room_affect_update( )
 
     for (room = top_affected_room; room; room = room_next) {
         room_next = room->aff_next;
-	
-	if (!room->people)
-	    continue;
-	
-	for (paf = room->affected; paf; paf = paf->next) {
-	    if (!paf->type->getAffect( )) 
-		continue;
+        
+        if (!room->people)
+            continue;
+        
+        for (paf = room->affected; paf; paf = paf->next) {
+            if (!paf->type->getAffect( )) 
+                continue;
 
-	    if (paf->level == 1)
-		paf->level = 2;
+            if (paf->level == 1)
+                paf->level = 2;
 
-	    paf->type->getAffect( )->update( room, paf );
-	}
+            paf->type->getAffect( )->update( room, paf );
+        }
     }
 }
 
@@ -1210,12 +1216,12 @@ void track_update( )
         ch_next = ch->next;
 
         if (!ch->is_npc( ))
-	    continue;
+            continue;
 
-	mob = ch->getNPC( );
+        mob = ch->getNPC( );
 
-	if (mob->behavior)
-	    mob->behavior->track( );
+        if (mob->behavior)
+            mob->behavior->track( );
     }
 }
 
@@ -1239,14 +1245,14 @@ void check_reboot( void )
     case 5:
     case 10:
     case 15:
-	msg = fmt( NULL, "%1$^s громко кричит '{RВнимание! Перезагрузка через %2$d мину%2$Iту|ты|т!{x'",
-	           (chance( 50 ) ? "Хассан" : "Валькирия"), 
-		   dreamland->getRebootCounter( ) );
+        msg = fmt( NULL, "%1$^s пЁя─п╬п╪п╨п╬ п╨я─п╦я┤п╦я┌ '{Rп▓п╫п╦п╪п╟п╫п╦п╣! п÷п╣я─п╣п╥п╟пЁя─я┐п╥п╨п╟ я┤п╣я─п╣п╥ %2$d п╪п╦п╫я┐%2$Iя┌я┐|я┌я▀|я┌!{x'",
+                   (chance( 50 ) ? "п╔п╟я│я│п╟п╫" : "п▓п╟п╩я▄п╨п╦я─п╦я▐"), 
+                   dreamland->getRebootCounter( ) );
         for (d = descriptor_list; d != 0; d = d->next)
-	    if (d->connected == CON_PLAYING && d->character)
-		d->character->println( msg );
+            if (d->connected == CON_PLAYING && d->character)
+                d->character->println( msg );
     default:
-	dreamland->setRebootCounter( dreamland->getRebootCounter( ) - 1 );
+        dreamland->setRebootCounter( dreamland->getRebootCounter( ) - 1 );
         break;
     }
 }
@@ -1265,17 +1271,17 @@ void player_update( )
 
         if (HAS_SHADOW(ch)) 
             if (--ch->shadow < 0)
-                act("Твоя вторая тень исчезает.",ch,0,0,TO_CHAR);
-	
+                act("п╒п╡п╬я▐ п╡я┌п╬я─п╟я▐ я┌п╣п╫я▄ п╦я│я┤п╣п╥п╟п╣я┌.",ch,0,0,TO_CHAR);
+        
         if (ch->move <= 0 && ch->position != POS_SLEEPING)
-            ch->send_to("Тебе нужно отдохнуть!\n\r") ;
+            ch->send_to("п╒п╣п╠п╣ п╫я┐п╤п╫п╬ п╬я┌п╢п╬я┘п╫я┐я┌я▄!\n\r") ;
 
         if ( IS_DEATH_TIME( ch ) ) {
             ch->last_death_time--;
             if (!IS_DEATH_TIME(ch)) {
-                act_p("Ты полностью возвращаешься в мир живых.", ch, 0, 0, TO_CHAR, POS_RESTING);
-                act_p("$c1 полностью возвращается в мир живых.", ch, 0, 0, TO_NOTVICT, POS_RESTING);
-		UNSET_DEATH_TIME(ch);
+                act_p("п╒я▀ п©п╬п╩п╫п╬я│я┌я▄я▌ п╡п╬п╥п╡я─п╟я┴п╟п╣я┬я▄я│я▐ п╡ п╪п╦я─ п╤п╦п╡я▀я┘.", ch, 0, 0, TO_CHAR, POS_RESTING);
+                act_p("$c1 п©п╬п╩п╫п╬я│я┌я▄я▌ п╡п╬п╥п╡я─п╟я┴п╟п╣я┌я│я▐ п╡ п╪п╦я─ п╤п╦п╡я▀я┘.", ch, 0, 0, TO_NOTVICT, POS_RESTING);
+                UNSET_DEATH_TIME(ch);
             }
         }
 
@@ -1283,9 +1289,9 @@ void player_update( )
             ch->PK_time_v--;
         else if( !ch->PK_time_v && IS_VIOLENT( ch ) )
         {
-            act_p( "Лихорадочный блеск в глазах $c2 пропадает.",
+            act_p( "п⌡п╦я┘п╬я─п╟п╢п╬я┤п╫я▀п╧ п╠п╩п╣я│п╨ п╡ пЁп╩п╟п╥п╟я┘ $c2 п©я─п╬п©п╟п╢п╟п╣я┌.",
                    ch, 0, 0, TO_ROOM,POS_RESTING );
-            act_p( "Ты успокаиваешься.",
+            act_p( "п╒я▀ я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┬я▄я│я▐.",
                    ch, 0, 0, TO_CHAR,POS_RESTING );
             REMOVE_VIOLENT( ch );
         }
@@ -1294,9 +1300,9 @@ void player_update( )
             ch->ghost_time--;
         else if( !ch->ghost_time && IS_GHOST( ch ) )
         {
-            act_p( "В комнате начинает сгущаться божественная энергия и $c1 обретает плоть.\n\rНо похоже $c1 еще в мире мертвых.",
+            act_p( "п▓ п╨п╬п╪п╫п╟я┌п╣ п╫п╟я┤п╦п╫п╟п╣я┌ я│пЁя┐я┴п╟я┌я▄я│я▐ п╠п╬п╤п╣я│я┌п╡п╣п╫п╫п╟я▐ я█п╫п╣я─пЁп╦я▐ п╦ $c1 п╬п╠я─п╣я┌п╟п╣я┌ п©п╩п╬я┌я▄.\n\rп²п╬ п©п╬я┘п╬п╤п╣ $c1 п╣я┴п╣ п╡ п╪п╦я─п╣ п╪п╣я─я┌п╡я▀я┘.",
                    ch, 0, 0, TO_ROOM,POS_RESTING);
-            act_p( "Ты слышишь далекий колокольный звон.\n\rНа тебя накатывается волна ужасной боли...\n\rТы рождаешься заново, обретая плоть.\n\rНо ты пока еще между живыми и мертвыми.",
+            act_p( "п╒я▀ я│п╩я▀я┬п╦я┬я▄ п╢п╟п╩п╣п╨п╦п╧ п╨п╬п╩п╬п╨п╬п╩я▄п╫я▀п╧ п╥п╡п╬п╫.\n\rп²п╟ я┌п╣п╠я▐ п╫п╟п╨п╟я┌я▀п╡п╟п╣я┌я│я▐ п╡п╬п╩п╫п╟ я┐п╤п╟я│п╫п╬п╧ п╠п╬п╩п╦...\n\rп╒я▀ я─п╬п╤п╢п╟п╣я┬я▄я│я▐ п╥п╟п╫п╬п╡п╬, п╬п╠я─п╣я┌п╟я▐ п©п╩п╬я┌я▄.\n\rп²п╬ я┌я▀ п©п╬п╨п╟ п╣я┴п╣ п╪п╣п╤п╢я┐ п╤п╦п╡я▀п╪п╦ п╦ п╪п╣я─я┌п╡я▀п╪п╦.",
                    ch, 0, 0, TO_CHAR,POS_RESTING);
             REMOVE_GHOST( ch );
         }
@@ -1307,17 +1313,17 @@ void player_update( )
         {
             if( IS_KILLER( ch ) )
             {
-                act_p("Аура проклятия вокруг $c2 исчезает.",
+                act_p("п░я┐я─п╟ п©я─п╬п╨п╩я▐я┌п╦я▐ п╡п╬п╨я─я┐пЁ $c2 п╦я│я┤п╣п╥п╟п╣я┌.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-                act_p("Боги забывают убийство, совершенное тобой.",
+                act_p("п▒п╬пЁп╦ п╥п╟п╠я▀п╡п╟я▌я┌ я┐п╠п╦п╧я│я┌п╡п╬, я│п╬п╡п╣я─я┬п╣п╫п╫п╬п╣ я┌п╬п╠п╬п╧.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
                 REMOVE_KILLER( ch );
             }
             else if( IS_SLAIN( ch ) )
             {
-                act_p("Все забывается... и даже записи жрецов Страны Грез превращаются в прах.",
+                act_p("п▓я│п╣ п╥п╟п╠я▀п╡п╟п╣я┌я│я▐... п╦ п╢п╟п╤п╣ п╥п╟п©п╦я│п╦ п╤я─п╣я├п╬п╡ п║я┌я─п╟п╫я▀ п⌠я─п╣п╥ п©я─п╣п╡я─п╟я┴п╟я▌я┌я│я▐ п╡ п©я─п╟я┘.",
                       ch, 0, 0, TO_ROOM,POS_RESTING);
-                act_p("Правда о твоем поражении забывается.",
+                act_p("п÷я─п╟п╡п╢п╟ п╬ я┌п╡п╬п╣п╪ п©п╬я─п╟п╤п╣п╫п╦п╦ п╥п╟п╠я▀п╡п╟п╣я┌я│я▐.",
                       ch, 0, 0, TO_CHAR,POS_RESTING);
                 REMOVE_SLAIN( ch );
             }
@@ -1329,13 +1335,13 @@ void player_update( )
         {
             if( IS_THIEF( ch ) )
             {
-                act_p("Ты вздыхаешь с облегчением, ведь все забывают о твоей неспособности\n\rхоть что-то украсть.",
+                act_p("п╒я▀ п╡п╥п╢я▀я┘п╟п╣я┬я▄ я│ п╬п╠п╩п╣пЁя┤п╣п╫п╦п╣п╪, п╡п╣п╢я▄ п╡я│п╣ п╥п╟п╠я▀п╡п╟я▌я┌ п╬ я┌п╡п╬п╣п╧ п╫п╣я│п©п╬я│п╬п╠п╫п╬я│я┌п╦\n\rя┘п╬я┌я▄ я┤я┌п╬-я┌п╬ я┐п╨я─п╟я│я┌я▄.",
                       ch, 0, 0, TO_CHAR,POS_RESTING );
                 REMOVE_THIEF( ch );
             }
         }
 
-	light_update( ch );
+        light_update( ch );
     }
 }
 
@@ -1344,18 +1350,18 @@ void lantern_update( Character *ch )
     Object *obj;
 
     if ( ( obj = get_eq_char( ch, wear_light ) ) != 0
-	    && obj->item_type == ITEM_LIGHT
-	    && obj->value[2] > 0 )
+            && obj->item_type == ITEM_LIGHT
+            && obj->value[2] > 0 )
     {
-	if ( --obj->value[2] == 0 && ch->in_room != 0 )
-	{
+        if ( --obj->value[2] == 0 && ch->in_room != 0 )
+        {
 //  (decreased in unequip)    --ch->in_room->light; 
-	    ch->pecho("%1$^O1 мигну%1$Gло|л|ла|ли и поту%1$Gхло|х|хла|хли.", obj );
-	    ch->recho("%1$^O1 поту%1$Gхло|х|хла|хли.", obj );
-	    extract_obj( obj );
-	}
-	else if ( obj->value[2] <= 5 && ch->in_room != 0)
-	    ch->pecho("%1$^O1 мига%1$nет|ют.", obj );
+            ch->pecho("%1$^O1 п╪п╦пЁп╫я┐%1$Gп╩п╬|п╩|п╩п╟|п╩п╦ п╦ п©п╬я┌я┐%1$Gя┘п╩п╬|я┘|я┘п╩п╟|я┘п╩п╦.", obj );
+            ch->recho("%1$^O1 п©п╬я┌я┐%1$Gя┘п╩п╬|я┘|я┘п╩п╟|я┘п╩п╦.", obj );
+            extract_obj( obj );
+        }
+        else if ( obj->value[2] <= 5 && ch->in_room != 0)
+            ch->pecho("%1$^O1 п╪п╦пЁп╟%1$nп╣я┌|я▌я┌.", obj );
     }
 }
 
@@ -1363,17 +1369,17 @@ void idle_update( PCharacter *ch )
 {
     if (IS_VIOLENT( ch ))
     {
-	act( "Лихорадочный блеск в глазах $c2, пропадает.", ch, 0, 0, TO_ROOM );
-	act( "Ты успокаиваешься.", ch, 0, 0, TO_CHAR );
-	REMOVE_VIOLENT( ch );
-	ch->PK_time_v = 0;
+        act( "п⌡п╦я┘п╬я─п╟п╢п╬я┤п╫я▀п╧ п╠п╩п╣я│п╨ п╡ пЁп╩п╟п╥п╟я┘ $c2, п©я─п╬п©п╟п╢п╟п╣я┌.", ch, 0, 0, TO_ROOM );
+        act( "п╒я▀ я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┬я▄я│я▐.", ch, 0, 0, TO_CHAR );
+        REMOVE_VIOLENT( ch );
+        ch->PK_time_v = 0;
     }
 
-    act( "$c1 растворяется в воздухе.",ch, 0, 0, TO_ROOM );
-    act( "Ты растворяешься в воздухе.", ch, 0, 0, TO_CHAR );
+    act( "$c1 я─п╟я│я┌п╡п╬я─я▐п╣я┌я│я▐ п╡ п╡п╬п╥п╢я┐я┘п╣.",ch, 0, 0, TO_ROOM );
+    act( "п╒я▀ я─п╟я│я┌п╡п╬я─я▐п╣я┬я▄я│я▐ п╡ п╡п╬п╥п╢я┐я┘п╣.", ch, 0, 0, TO_CHAR );
 
     if (IS_SET(ch->config, CONFIG_AUTOAFK) && !IS_SET(ch->comm, COMM_AFK))
-	interpret_raw( ch, "afk" );
+        interpret_raw( ch, "afk" );
 }
 
 void char_update_affects( Character *ch )
@@ -1383,43 +1389,43 @@ void char_update_affects( Character *ch )
     list<Affect *>::iterator paf_iter, paf_next;
     
     for (paf = ch->affected; paf != 0; paf = paf->next)
-	affects.push_back( paf );
+        affects.push_back( paf );
     
     try {    
-	for (paf_iter = affects.begin( ); paf_iter != affects.end( ); paf_iter++) {
-	    paf = *paf_iter;
+        for (paf_iter = affects.begin( ); paf_iter != affects.end( ); paf_iter++) {
+            paf = *paf_iter;
 
-	    if ( paf->duration > 0 )
-	    {
-		room_to_save( ch );
-		paf->duration--;
+            if ( paf->duration > 0 )
+            {
+                room_to_save( ch );
+                paf->duration--;
 
-		// spell strength fades with time
-		if (number_range(0,4) == 0 && paf->level > 0)
-		    paf->level--;
-		
-		if (paf->type->getAffect( )) 
-		    paf->type->getAffect( )->update( ch, paf );
-	    }
-	    else if ( paf->duration < 0 )
-		;
-	    else
-	    {
-		room_to_save( ch );
-		paf_next = paf_iter;
-		paf_next++;
+                // spell strength fades with time
+                if (number_range(0,4) == 0 && paf->level > 0)
+                    paf->level--;
+                
+                if (paf->type->getAffect( )) 
+                    paf->type->getAffect( )->update( ch, paf );
+            }
+            else if ( paf->duration < 0 )
+                ;
+            else
+            {
+                room_to_save( ch );
+                paf_next = paf_iter;
+                paf_next++;
 
-		if (paf_next == affects.end( ) 
-		    || (*paf_next)->type != paf->type 
-		    || (*paf_next)->duration > 0)
-		{
-		    if (paf->type->getAffect( )) 
-			paf->type->getAffect( )->remove( ch );
-		}
+                if (paf_next == affects.end( ) 
+                    || (*paf_next)->type != paf->type 
+                    || (*paf_next)->duration > 0)
+                {
+                    if (paf->type->getAffect( )) 
+                        paf->type->getAffect( )->remove( ch );
+                }
 
-		affect_remove( ch, paf );
-	    }
-	}
+                affect_remove( ch, paf );
+            }
+        }
     }
     catch (const VictimDeathException &) {
     }
@@ -1433,14 +1439,14 @@ static bool check_native_weapon( Character *ch, Object *obj )
     Affect *paf;
 
     if (!ch->is_npc( )
-	|| ch->getNPC( )->pIndexData->area != obj->pIndexData->area)
+        || ch->getNPC( )->pIndexData->area != obj->pIndexData->area)
     {
-	return false;
+        return false;
     }
 
     for (paf = ch->affected; paf; paf = paf->next)
-	if (paf->location == APPLY_STR && paf->modifier < 0)
-	    return false;
+        if (paf->location == APPLY_STR && paf->modifier < 0)
+            return false;
     
     return true;
 }
@@ -1452,35 +1458,35 @@ void wield_update( Character *ch )
     second = get_eq_char( ch, wear_second_wield );
     
     if (second 
-	    && wear_second_wield->canRemove( ch, second, 0 )
-	    && second->getWeight( ) > (get_str_app(ch).wield * 5)
-	    && !check_native_weapon( ch, second ))
+            && wear_second_wield->canRemove( ch, second, 0 )
+            && second->getWeight( ) > (get_str_app(ch).wield * 5)
+            && !check_native_weapon( ch, second ))
     {
-	act("Ты не в силах удержать $o4 в левой руке.", ch, second, 0, TO_CHAR);
-	act("$c1 не в силах удержать $o4.", ch, second, 0, TO_ROOM);
-	unequip_char( ch, second );
+        act("п╒я▀ п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4 п╡ п╩п╣п╡п╬п╧ я─я┐п╨п╣.", ch, second, 0, TO_CHAR);
+        act("$c1 п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4.", ch, second, 0, TO_ROOM);
+        unequip_char( ch, second );
     }
     
     wield = get_eq_char( ch, wear_wield );
     
     if (wield 
-	    && wear_wield->canRemove( ch, wield, 0 )
-	    && wield->getWeight( ) > (get_str_app(ch).wield * 10)
-	    && !check_native_weapon( ch, wield ))
+            && wear_wield->canRemove( ch, wield, 0 )
+            && wield->getWeight( ) > (get_str_app(ch).wield * 10)
+            && !check_native_weapon( ch, wield ))
     {
-	act("Ты не в силах удержать $o4 в правой руке.", ch, wield, 0, TO_CHAR);
-	act("$c1 не в силах удержать $o4.", ch, wield, 0, TO_ROOM);
-	unequip_char( ch, wield );
+        act("п╒я▀ п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4 п╡ п©я─п╟п╡п╬п╧ я─я┐п╨п╣.", ch, wield, 0, TO_CHAR);
+        act("$c1 п╫п╣ п╡ я│п╦п╩п╟я┘ я┐п╢п╣я─п╤п╟я┌я▄ $o4.", ch, wield, 0, TO_ROOM);
+        unequip_char( ch, wield );
     }
     
     if (IS_AWAKE(ch) 
-	    && (second && second->wear_loc == wear_second_wield) 
-	    && (!wield || wield->wear_loc == wear_none)) 
+            && (second && second->wear_loc == wear_second_wield) 
+            && (!wield || wield->wear_loc == wear_none)) 
     {
-	act("Ты вооружаешься вторичным оружием, как основным!", ch, 0,0,TO_CHAR);
-	act("$c1 вооружается вторичным оружием, как основным!", ch, 0,0,TO_ROOM);
-	unequip_char( ch, second );
-	equip_char( ch, second, wear_wield );
+        act("п╒я▀ п╡п╬п╬я─я┐п╤п╟п╣я┬я▄я│я▐ п╡я┌п╬я─п╦я┤п╫я▀п╪ п╬я─я┐п╤п╦п╣п╪, п╨п╟п╨ п╬я│п╫п╬п╡п╫я▀п╪!", ch, 0,0,TO_CHAR);
+        act("$c1 п╡п╬п╬я─я┐п╤п╟п╣я┌я│я▐ п╡я┌п╬я─п╦я┤п╫я▀п╪ п╬я─я┐п╤п╦п╣п╪, п╨п╟п╨ п╬я│п╫п╬п╡п╫я▀п╪!", ch, 0,0,TO_ROOM);
+        unequip_char( ch, second );
+        equip_char( ch, second, wear_wield );
     }
 }
 

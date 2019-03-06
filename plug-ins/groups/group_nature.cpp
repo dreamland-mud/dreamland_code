@@ -51,118 +51,118 @@ SKILL_RUNP( tame )
 
     if ( ch->is_npc() || !gsn_tame->usable( ch ) )
     {
-	ch->send_to("Это ж надо уметь!\n\r");
-	return;
+        ch->send_to("п╜я┌п╬ п╤ п╫п╟п╢п╬ я┐п╪п╣я┌я▄!\n\r");
+        return;
     }
 
     if (arg[0] == '\0')
     {
-	ch->send_to("Ты не поддаешься дрессировке.\n\r");
-	act_p("$c1 пытается приручить са$gмо|м|ма себя, но эта попытка с треском проваливается.",
-		ch,0,0,TO_ROOM,POS_RESTING);
-	return;
+        ch->send_to("п╒я▀ п╫п╣ п©п╬п╢п╢п╟п╣я┬я▄я│я▐ п╢я─п╣я│я│п╦я─п╬п╡п╨п╣.\n\r");
+        act_p("$c1 п©я▀я┌п╟п╣я┌я│я▐ п©я─п╦я─я┐я┤п╦я┌я▄ я│п╟$gп╪п╬|п╪|п╪п╟ я│п╣п╠я▐, п╫п╬ я█я┌п╟ п©п╬п©я▀я┌п╨п╟ я│ я┌я─п╣я│п╨п╬п╪ п©я─п╬п╡п╟п╩п╦п╡п╟п╣я┌я│я▐.",
+                ch,0,0,TO_ROOM,POS_RESTING);
+        return;
     }
 
     if ( (victim = get_char_room(ch,arg)) == 0)
     {
-	ch->send_to("Этого нет здесь.\n\r");
-	return;
+        ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
+        return;
     }
 
     if (!victim->is_npc())
     {
-	ch->pecho("%1$^C1 не подда%1$nется|ются дрессировке.", victim);
-	return;
+        ch->pecho("%1$^C1 п╫п╣ п©п╬п╢п╢п╟%1$nп╣я┌я│я▐|я▌я┌я│я▐ п╢я─п╣я│я│п╦я─п╬п╡п╨п╣.", victim);
+        return;
     }
     
     /*
      * druidic tame: control animal attracted by magic bite
      */
     if (ch->getTrueProfession( ) == prof_druid) {
-#if 0	
-	DruidSummonedAnimal::Pointer animal;
-	int chance;
+#if 0        
+        DruidSummonedAnimal::Pointer animal;
+        int chance;
 
-	if (!ch->getNPC( )->behavior 
-	    || !(animal = ch->getNPC( )->behavior.getDynamicPointer<DruidSummonedAnimal>( ))
-	    || !animal->myHero( ch ))
-	{
-	    ch->println("Это существо не поддастся твоему контролю.");
-	    return;
-	}
+        if (!ch->getNPC( )->behavior 
+            || !(animal = ch->getNPC( )->behavior.getDynamicPointer<DruidSummonedAnimal>( ))
+            || !animal->myHero( ch ))
+        {
+            ch->println("п╜я┌п╬ я│я┐я┴п╣я│я┌п╡п╬ п╫п╣ п©п╬п╢п╢п╟я│я┌я│я▐ я┌п╡п╬п╣п╪я┐ п╨п╬п╫я┌я─п╬п╩я▌.");
+            return;
+        }
 
-	if (is_safe(ch, victim)) 
-	    return;
-	    
-	if (overcharmed( ch ))
-	    return;
+        if (is_safe(ch, victim)) 
+            return;
+            
+        if (overcharmed( ch ))
+            return;
 
-	ch->setWait( gsn_tame->getBeats( )  );
+        ch->setWait( gsn_tame->getBeats( )  );
 
-	chance = gsn_tame->getEffective( ch );
-	chance += 3 * (ch->getModifyLevel( ) - victim->getModifyLevel( ));
-	chance += (ch->getCurrStat(STAT_CHA) - 20) * 2;
-	chance = (chance * animal->biteQuality) / 100;
-	
-	if (number_percent( ) > chance) {
-	    act("$c1 раздраженно рычит и атакует!", victim, 0, 0, TO_ROOM);
-	    gsn_tame->improve( ch, false, victim );
-	    interpret_raw(victim, "murder", ch->getNameP( ));
-	    return;
-	}
-	
-	ch->add_follower( victim );
-	victim->leader = ch;
+        chance = gsn_tame->getEffective( ch );
+        chance += 3 * (ch->getModifyLevel( ) - victim->getModifyLevel( ));
+        chance += (ch->getCurrStat(STAT_CHA) - 20) * 2;
+        chance = (chance * animal->biteQuality) / 100;
+        
+        if (number_percent( ) > chance) {
+            act("$c1 я─п╟п╥п╢я─п╟п╤п╣п╫п╫п╬ я─я▀я┤п╦я┌ п╦ п╟я┌п╟п╨я┐п╣я┌!", victim, 0, 0, TO_ROOM);
+            gsn_tame->improve( ch, false, victim );
+            interpret_raw(victim, "murder", ch->getNameP( ));
+            return;
+        }
+        
+        ch->add_follower( victim );
+        victim->leader = ch;
 
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_tame;
-	af.level     = ch->getModifyLevel( );
-	af.duration  = -1;
-	af.bitvector = AFF_CHARM;
-	affect_to_char( victim, &af );
-	
-	act("$C1 теперь полностью подчиняется твоей воле.", ch, 0, victim, TO_CHAR);
-	act("$C1 преданно смотрит в глаза $c3.", ch, 0, victim, TO_NOTVICT);
-	act("Ты преданно смотришь в глаза $c3.", ch, 0, victim, TO_VICT);
-	gsn_tame->improve( ch, true, victim );
-#endif	
-	return;
+        af.where     = TO_AFFECTS;
+        af.type      = gsn_tame;
+        af.level     = ch->getModifyLevel( );
+        af.duration  = -1;
+        af.bitvector = AFF_CHARM;
+        affect_to_char( victim, &af );
+        
+        act("$C1 я┌п╣п©п╣я─я▄ п©п╬п╩п╫п╬я│я┌я▄я▌ п©п╬п╢я┤п╦п╫я▐п╣я┌я│я▐ я┌п╡п╬п╣п╧ п╡п╬п╩п╣.", ch, 0, victim, TO_CHAR);
+        act("$C1 п©я─п╣п╢п╟п╫п╫п╬ я│п╪п╬я┌я─п╦я┌ п╡ пЁп╩п╟п╥п╟ $c3.", ch, 0, victim, TO_NOTVICT);
+        act("п╒я▀ п©я─п╣п╢п╟п╫п╫п╬ я│п╪п╬я┌я─п╦я┬я▄ п╡ пЁп╩п╟п╥п╟ $c3.", ch, 0, victim, TO_VICT);
+        gsn_tame->improve( ch, true, victim );
+#endif        
+        return;
     }
     
     /* 
      * ranger tame: remove aggression
      */
     if (ch->getTrueProfession( ) == prof_ranger) {
-	if (!IS_SET(victim->act,ACT_AGGRESSIVE))
-	{
-	    ch->pecho("%1$^C1 обычно не аггресив%1$Gно|ен|на|ны.", victim);
-	    return;
-	}
+        if (!IS_SET(victim->act,ACT_AGGRESSIVE))
+        {
+            ch->pecho("%1$^C1 п╬п╠я▀я┤п╫п╬ п╫п╣ п╟пЁпЁя─п╣я│п╦п╡%1$Gп╫п╬|п╣п╫|п╫п╟|п╫я▀.", victim);
+            return;
+        }
 
-	ch->setWait( gsn_tame->getBeats( )  );
+        ch->setWait( gsn_tame->getBeats( )  );
 
-	if (number_percent() < gsn_tame->getEffective( ch ) + 15
-		+ 4 * ( ch->getModifyLevel() - victim->getModifyLevel() ) )
-	{
-	    REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
-	    SET_BIT(victim->affected_by,AFF_CALM);
-	    victim->println("Ты успокаиваешься.");
-	    act("Ты успокаиваешь $C4.",ch,0,victim,TO_CHAR);
-	    act("$c1 успокаивает $C4.",ch,0,victim,TO_NOTVICT);
-	    stop_fighting(victim,true);
-	    gsn_tame->improve( ch, true, victim );
-	}
-	else
-	{
-	    ch->println("Попытка не удалась.");
-	    act("$c1 пытается успокоить $C4, но попытка безуспешна.",
-		    ch,0,victim,TO_NOTVICT);
-	    act("$c1 пытается успокоить тебя, но попытка безуспешна.",
-		    ch,0,victim,TO_VICT);
-	    gsn_tame->improve( ch, false, victim );
-	}
+        if (number_percent() < gsn_tame->getEffective( ch ) + 15
+                + 4 * ( ch->getModifyLevel() - victim->getModifyLevel() ) )
+        {
+            REMOVE_BIT(victim->act,ACT_AGGRESSIVE);
+            SET_BIT(victim->affected_by,AFF_CALM);
+            victim->println("п╒я▀ я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┬я▄я│я▐.");
+            act("п╒я▀ я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┬я▄ $C4.",ch,0,victim,TO_CHAR);
+            act("$c1 я┐я│п©п╬п╨п╟п╦п╡п╟п╣я┌ $C4.",ch,0,victim,TO_NOTVICT);
+            stop_fighting(victim,true);
+            gsn_tame->improve( ch, true, victim );
+        }
+        else
+        {
+            ch->println("п÷п╬п©я▀я┌п╨п╟ п╫п╣ я┐п╢п╟п╩п╟я│я▄.");
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ я┐я│п©п╬п╨п╬п╦я┌я▄ $C4, п╫п╬ п©п╬п©я▀я┌п╨п╟ п╠п╣п╥я┐я│п©п╣я┬п╫п╟.",
+                    ch,0,victim,TO_NOTVICT);
+            act("$c1 п©я▀я┌п╟п╣я┌я│я▐ я┐я│п©п╬п╨п╬п╦я┌я▄ я┌п╣п╠я▐, п╫п╬ п©п╬п©я▀я┌п╨п╟ п╠п╣п╥я┐я│п©п╣я┬п╫п╟.",
+                    ch,0,victim,TO_VICT);
+            gsn_tame->improve( ch, false, victim );
+        }
 
-	return;
+        return;
     }
 }
 
@@ -189,13 +189,13 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
     int dam;
 
     if (!has_water_around( ch )) {
-	 ch->send_to("Здесь недостаточно водных молекул.\n\r");
-	 ch->wait = 0;
-	 return;
+         ch->send_to("п≈п╢п╣я│я▄ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п╡п╬п╢п╫я▀я┘ п╪п╬п╩п╣п╨я┐п╩.\n\r");
+         ch->wait = 0;
+         return;
     }
     
-    act("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
-    act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
+    act("п°п╬п╩п╣п╨я┐п╩я▀ п╡п╬п╢я▀ п╡п╬п╨я─я┐пЁ $c2 я│п╬п╠п╦я─п╟я▌я┌я│я▐ п╡п╪п╣я│я┌п╣, п╬п╠я─п╟п╥я┐я▐ п╨я┐п╩п╟п╨.", ch, 0, 0, TO_ROOM);
+    act("п°п╬п╩п╣п╨я┐п╩я▀ п╡п╬п╢я▀ п╡п╬п╨я─я┐пЁ я┌п╣п╠я▐ я│п╬п╠п╦я─п╟я▌я┌я│я▐ п╡п╪п╣я│я┌п╣, п╬п╠я─п╟п╥я┐я▐ п╨я┐п╩п╟п╨.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
     damage(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL);
 }
@@ -210,42 +210,42 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     PCharacter *victim;
 
     if (ch->in_room->sector_type == SECT_INSIDE ||
-	ch->in_room->sector_type == SECT_CITY ||
-	ch->in_room->sector_type == SECT_DESERT ||
-	ch->in_room->sector_type == SECT_WATER_NOSWIM ||
-	ch->in_room->sector_type == SECT_AIR)
+        ch->in_room->sector_type == SECT_CITY ||
+        ch->in_room->sector_type == SECT_DESERT ||
+        ch->in_room->sector_type == SECT_WATER_NOSWIM ||
+        ch->in_room->sector_type == SECT_AIR)
     {
-	ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
-	return;
+        ch->send_to("п²п╦ п╬п╢п╫п╬ я─п╟я│я┌п╣п╫п╦п╣ п╫п╣ я│п╪п╬п╤п╣я┌ п╥п╢п╣я│я▄ я─п╟я│я┌п╦.\n\r");
+        return;
     }
 
     if (grave->pIndexData->vnum != OBJ_VNUM_GRAVE) {
-	ch->send_to("Нет никакого смысла опутывать это терновником.\r\n");
-	return;
+        ch->send_to("п²п╣я┌ п╫п╦п╨п╟п╨п╬пЁп╬ я│п╪я▀я│п╩п╟ п╬п©я┐я┌я▀п╡п╟я┌я▄ я█я┌п╬ я┌п╣я─п╫п╬п╡п╫п╦п╨п╬п╪.\r\n");
+        return;
     }
 
     victim = PCharacterManager::findPlayer( grave->getOwner( ) );
 
     if (!victim || !DIGGED(victim)) {
-	ch->send_to("Опс.. а могила-то ничейная..\r\n");
-	LogStream::sendError( ) << "Unexistent grave owner: " << grave->getOwner( ) << endl;
-	return;
+        ch->send_to("п·п©я│.. п╟ п╪п╬пЁп╦п╩п╟-я┌п╬ п╫п╦я┤п╣п╧п╫п╟я▐..\r\n");
+        LogStream::sendError( ) << "Unexistent grave owner: " << grave->getOwner( ) << endl;
+        return;
     }
 
     if (number_percent( ) > ch->getSkill( sn ) || is_safe_nomessage( ch, victim)) {
-	act_p("Могила покрывается цветочками и вьющимся барвинком.", ch, 0, 0, TO_ALL, POS_RESTING);
-	return;
+        act_p("п°п╬пЁп╦п╩п╟ п©п╬п╨я─я▀п╡п╟п╣я┌я│я▐ я├п╡п╣я┌п╬я┤п╨п╟п╪п╦ п╦ п╡я▄я▌я┴п╦п╪я│я▐ п╠п╟я─п╡п╦п╫п╨п╬п╪.", ch, 0, 0, TO_ALL, POS_RESTING);
+        return;
     }
 
-    act_p("Корни терновника проникают в могилу, тревожа твой покой.", victim, 0, 0, TO_CHAR, POS_RESTING);
-    act_p("Колючий терновник опутывает могилу, проникая корнями глубоко под землю!", ch, 0, 0, TO_ALL, POS_RESTING);
-    act_p("Из-под земли раздается недовольное ворчание.", ch, 0, 0, TO_ALL, POS_RESTING);
+    act_p("п п╬я─п╫п╦ я┌п╣я─п╫п╬п╡п╫п╦п╨п╟ п©я─п╬п╫п╦п╨п╟я▌я┌ п╡ п╪п╬пЁп╦п╩я┐, я┌я─п╣п╡п╬п╤п╟ я┌п╡п╬п╧ п©п╬п╨п╬п╧.", victim, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("п п╬п╩я▌я┤п╦п╧ я┌п╣я─п╫п╬п╡п╫п╦п╨ п╬п©я┐я┌я▀п╡п╟п╣я┌ п╪п╬пЁп╦п╩я┐, п©я─п╬п╫п╦п╨п╟я▐ п╨п╬я─п╫я▐п╪п╦ пЁп╩я┐п╠п╬п╨п╬ п©п╬п╢ п╥п╣п╪п╩я▌!", ch, 0, 0, TO_ALL, POS_RESTING);
+    act_p("п≤п╥-п©п╬п╢ п╥п╣п╪п╩п╦ я─п╟п╥п╢п╟п╣я┌я│я▐ п╫п╣п╢п╬п╡п╬п╩я▄п╫п╬п╣ п╡п╬я─я┤п╟п╫п╦п╣.", ch, 0, 0, TO_ALL, POS_RESTING);
 
     undig( victim );
 
     dam = number_range(level, 4 * level);
     if ( saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL ) )
-	dam /= 2;
+        dam /= 2;
 
     damage(ch,victim, ch->getModifyLevel(),gsn_entangle,DAM_PIERCE, true, DAMF_SPELL);
 }
@@ -256,23 +256,23 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     Affect todex;
 
     if (ch->in_room->sector_type == SECT_INSIDE ||
-	ch->in_room->sector_type == SECT_CITY ||
-	ch->in_room->sector_type == SECT_DESERT ||
-	ch->in_room->sector_type == SECT_WATER_NOSWIM ||
-	ch->in_room->sector_type == SECT_AIR)
+        ch->in_room->sector_type == SECT_CITY ||
+        ch->in_room->sector_type == SECT_DESERT ||
+        ch->in_room->sector_type == SECT_WATER_NOSWIM ||
+        ch->in_room->sector_type == SECT_AIR)
     {
-	ch->send_to("Ни одно растение не сможет здесь расти.\n\r");
-	return;
+        ch->send_to("п²п╦ п╬п╢п╫п╬ я─п╟я│я┌п╣п╫п╦п╣ п╫п╣ я│п╪п╬п╤п╣я┌ п╥п╢п╣я│я▄ я─п╟я│я┌п╦.\n\r");
+        return;
     }
 
-    act("Колючий терновник прорастает сквозь землю, обвивая ноги $c2!",
+    act("п п╬п╩я▌я┤п╦п╧ я┌п╣я─п╫п╬п╡п╫п╦п╨ п©я─п╬я─п╟я│я┌п╟п╣я┌ я│п╨п╡п╬п╥я▄ п╥п╣п╪п╩я▌, п╬п╠п╡п╦п╡п╟я▐ п╫п╬пЁп╦ $c2!",
         victim, 0, 0, TO_ROOM);
-    act("Колючий терновник прорастает сквозь землю, обвивая твои ноги!",
+    act("п п╬п╩я▌я┤п╦п╧ я┌п╣я─п╫п╬п╡п╫п╦п╨ п©я─п╬я─п╟я│я┌п╟п╣я┌ я│п╨п╡п╬п╥я▄ п╥п╣п╪п╩я▌, п╬п╠п╡п╦п╡п╟я▐ я┌п╡п╬п╦ п╫п╬пЁп╦!",
         victim, 0, 0, TO_CHAR);
-	
+        
     dam = number_range(level, 4 * level);
     if (saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL ))
-	dam /= 2;
+        dam /= 2;
 
     victim->move -= victim->max_move / 3;
     victim->move = max( 0, (int)victim->move );

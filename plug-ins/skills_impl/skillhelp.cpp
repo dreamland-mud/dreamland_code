@@ -19,14 +19,14 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     bool rus = ch->getConfig( )->ruskills;
 
-    in << (skill->getSpell( ) && skill->getSpell( )->isCasted( ) ? "˙¡ÀÃ…Œ¡Œ…≈" : "ıÕ≈Œ…≈");
+    in << (skill->getSpell( ) && skill->getSpell( )->isCasted( ) ? "–ó–∞–∫–ª–∏–Ω–∞–Ω–∏–µ" : "–£–º–µ–Ω–∏–µ");
     if (rus)
-        in << " '{c" << skill->getRussianName( ) << "{x' …Ã…" << " '{c" << skill->getName( ) << "{x'";
+        in << " '{c" << skill->getRussianName( ) << "{x' –∏–ª–∏" << " '{c" << skill->getName( ) << "{x'";
     else
-        in << " '{c" << skill->getName( ) << "{x' …Ã…" << " '{c" << skill->getRussianName( ) << "{x'";
+        in << " '{c" << skill->getName( ) << "{x' –∏–ª–∏" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    in << ", ◊»œƒ…‘ ◊ «“’––’ '{c" 
+    in << ", –≤—Ö–æ–¥–∏—Ç –≤ –≥—Ä—É–ø–ø—É '{hg{c" 
        << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
        << endl << endl
        << *this;
@@ -56,10 +56,10 @@ void SkillHelpFormatter::reset( )
 void SkillHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-	PlayerConfig::Pointer cfg = ch->getConfig( );
+        PlayerConfig::Pointer cfg = ch->getConfig( );
 
-	fRusCmd = cfg->rucommands;
-	fRusSkill = cfg->ruskills;
+        fRusCmd = cfg->rucommands;
+        fRusSkill = cfg->ruskills;
     }
     
     HelpFormatter::setup( ch );
@@ -67,25 +67,33 @@ void SkillHelpFormatter::setup( Character *ch )
 
 
 /*
- * CMD      ->  {lEeng_name{lR“’””Àœ≈_…Õ—{lx
- * SKILL    ->  {lEeng_name{lR“’””Àœ≈_…Õ—{lx
+ * CMD      ->  {lEeng_name{lR—Ä—É—Å—Å–∫–æ–µ_–∏–º—è{lx
+ * SKILL    ->  {lEeng_name{lR—Ä—É—Å—Å–∫–æ–µ_–∏–º—è{lx
+ * SPELL    ->  {lEc 'spell name'{lR–∫ '–Ω–∞–∑–≤–∞–Ω–∏–µ –∑–∞–∫–ª–∏–Ω–∞–Ω–∏—è'{lx
  */
 bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (HelpFormatter::handleKeyword( kw, out ))
-	return true;
+        return true;
     
     if (kw == "CMD" && cmd) {
-	out << (fRusCmd && !cmd->getRussianName( ).empty( )
-	                ? cmd->getRussianName( )
-	                : cmd->getName( ));
-	return true;
+        out << (fRusCmd && !cmd->getRussianName( ).empty( )
+                        ? cmd->getRussianName( )
+                        : cmd->getName( ));
+        return true;
     }
 
     if (kw == "SKILL") {
-	out << (fRusSkill ? skill->getRussianName( ).quote( )
-	                  : skill->getName( ).quote( ));
-	return true;
+        out << (fRusSkill ? skill->getRussianName( ).quote( )
+                          : skill->getName( ).quote( ));
+        return true;
+    }
+
+    if (kw == "SPELL") {
+        out << (fRusCmd ? "–∫" : "c") << " "
+            << (fRusSkill ? skill->getRussianName( ).quote( )
+                          : skill->getName( ).quote( ));
+        return true;
     }
     
     return false;
@@ -96,33 +104,30 @@ void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream 
 {
     SkillHelpFormatter( in.str( ).c_str( ), 
                         skill 
-		      ).run( ch, out );
+                      ).run( ch, out );
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )
 {
-    StringSet kwd;
-
     this->skill = skill;
     
-    kwd.insert( skill->getName( ) );    
-    kwd.insert( skill->getRussianName( ) );    
+    keywords.insert( skill->getName( ) );    
+    keywords.insert( skill->getRussianName( ) );    
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
     
     if (skill->getCommand( )) {
-	Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
-	
-	if (cmd) {
-	    kwd.insert( cmd->getName( ) );
-	    cmd->getAliases( ).toSet( kwd );
-	    cmd->getRussianAliases( ).toSet( kwd );
-	}
+        Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
+        
+        if (cmd) {
+            keywords.insert( cmd->getName( ) );
+            cmd->getAliases( ).toSet( keywords );
+            cmd->getRussianAliases( ).toSet( keywords );
+        }
     }
     
-    fullKeyword = kwd.toString( );
-    fullKeyword.toUpper( );
+    fullKeyword = keywords.toString().toUpper();
     helpManager->registrate( Pointer( this ) );
 }
 
@@ -130,6 +135,8 @@ void SkillHelp::unsetSkill( )
 {
     helpManager->unregistrate( Pointer( this ) );
     skill.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
+
 

@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 #include "weather.h"
 
@@ -26,16 +26,20 @@
 #include "descriptor.h"
 #include "mercdb.h"
 #include "handler.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
 PROF(vampire);
+BONUS(experience);
+BONUS(mana);
+BONUS(learning);
 
 const char * sunlight_ru [4] = {
-    "‘≈ÕŒœ",
-    "”◊≈‘¡≈‘",
-    "”◊≈‘Ãœ",
-    "”’Õ≈“À…"
+    "—Ç–µ–º–Ω–æ",
+    "—Å–≤–µ—Ç–∞–µ—Ç",
+    "—Å–≤–µ—Ç–ª–æ",
+    "—Å—É–º–µ—Ä–∫–∏"
 };    
 const char * sunlight_en [4] = {
     "dark",
@@ -44,31 +48,61 @@ const char * sunlight_en [4] = {
     "sunset"
 };    
 
+enum{
+    SEASON_WINTER = 0,
+    SEASON_SPRING,
+    SEASON_SUMMER,
+    SEASON_AUTUMN
+};
+struct season_info {
+    int number;
+    const char *name;
+    const char *short_descr;
+    const char *adjective;
+    char color;
+};
+
+const struct season_info season_table [4] = {
+    { SEASON_WINTER, "–∑–∏–º–∞",  "–∑–∏–º|–∞|—ã|–µ|—É|–æ–π|–µ",  "–∑–∏–º–Ω–µ–≥–æ",   'C' },
+    { SEASON_SPRING, "–≤–µ—Å–Ω–∞", "–≤–µ—Å–Ω|–∞|—ã|–µ|—É|–æ–π|–µ", "–≤–µ—Å–µ–Ω–Ω–µ–≥–æ", 'g' },
+    { SEASON_SUMMER, "–ª–µ—Ç–æ",  "–ª–µ—Ç|–æ|–∞|—É|–æ|–æ–º|–µ",  "–ª–µ—Ç–Ω–µ–≥–æ",   'Y' },
+    { SEASON_AUTUMN, "–æ—Å–µ–Ω—å", "–æ—Å–µ–Ω|—å|–∏|–∏|—å|—å—é|–∏", "–æ—Å–µ–Ω–Ω–µ–≥–æ",  'y' },
+};
+
 struct month_info {
     const char *name;
     int pressure;
     int sunrise;
     int sunset;
+    int season;
 };
 
 const struct month_info month_table [17] = {
-  { "˙…ÕŸ",		   -12,    7, 17 },
-  { "˙…ÕŒ≈«œ ˜œÃÀ¡",	   -14,    7, 18 },
-  { "ËœÃœƒŒœ«œ Á…«¡Œ‘¡",   -14,    7, 18 },
-  { "‰“≈◊Œ…» ˜œ…Œ”‘◊",	   -12,    7, 19 },   /* ◊≈”Œ¡ */
-  { "˜≈Ã…À…» ‚…‘◊",	   -8,     6, 19 },
-  { "˜≈”ŒŸ",		   -4,     5, 19 }, 
-  { "“…“œƒŸ",		   0,      5, 21 },
-  { "Ù›≈‘Œœ”‘…",	   4,      5, 22 },   /* Ã≈‘œ */
-  { "‰“¡ÀœŒ¡",		   8,      4, 22 },
-  { "ÛœÃŒ√¡",		   12,     4, 22 },
-  { "ˆ¡“Ÿ",		   16,     5, 21 },    
-  { "‚…‘◊Ÿ",		   12,     5, 20 },   /* œ”≈Œÿ */
-  { "Ù≈ÕŒœ‘Ÿ",		   8,      6, 20 },
-  { "Ù≈Œ…",		   4,      6, 19 },
-  { "‰Ã…ŒŒŸ» Ù≈Œ≈ ",	   0,      7, 18 },         
-  { "·¬”œÃ¿‘Œœ  Ù≈ÕŒœ‘Ÿ",  -4,     8, 17 },   /* ⁄…Õ¡ */
-  { "˜≈Ã…Àœ«œ ˙Ã¡",	   -8,     8, 17 },
+  { "–ó–∏–º—ã",                   -12,    7, 17, SEASON_WINTER },
+  { "–ó–∏–º–Ω–µ–≥–æ –í–æ–ª–∫–∞",          -14,    7, 18, SEASON_WINTER },
+  { "–•–æ–ª–æ–¥–Ω–æ–≥–æ –ì–∏–≥–∞–Ω—Ç–∞",      -14,    7, 18, SEASON_WINTER },
+  { "–î—Ä–µ–≤–Ω–∏—Ö –í–æ–∏–Ω—Å—Ç–≤",        -12,    7, 19, SEASON_WINTER },   
+  { "–í–µ–ª–∏–∫–∏—Ö –ë–∏—Ç–≤",            -8,    6, 19, SEASON_SPRING },
+  { "–í–µ—Å–Ω—ã",                   -4,    5, 19, SEASON_SPRING }, 
+  { "–ü—Ä–∏—Ä–æ–¥—ã",                  0,    5, 21, SEASON_SPRING },
+  { "–¢—â–µ—Ç–Ω–æ—Å—Ç–∏",                4,    5, 22, SEASON_SPRING },  
+  { "–î—Ä–∞–∫–æ–Ω–∞",                  8,    4, 22, SEASON_SUMMER },
+  { "–°–æ–ª–Ω—Ü–∞",                  12,    4, 22, SEASON_SUMMER },
+  { "–ñ–∞—Ä—ã",                    16,    5, 21, SEASON_SUMMER },    
+  { "–ë–∏—Ç–≤—ã",                   12,    5, 20, SEASON_SUMMER },   
+  { "–¢–µ–º–Ω–æ—Ç—ã",                  8,    6, 20, SEASON_AUTUMN },
+  { "–¢–µ–Ω–∏",                     4,    6, 19, SEASON_AUTUMN },
+  { "–î–ª–∏–Ω–Ω—ã—Ö –¢–µ–Ω–µ–π",            0,    7, 18, SEASON_AUTUMN },         
+  { "–ê–±—Å–æ–ª—é—Ç–Ω–æ–π –¢–µ–º–Ω–æ—Ç—ã",      -4,    8, 17, SEASON_AUTUMN },   
+  { "–í–µ–ª–∏–∫–æ–≥–æ –ó–ª–∞",            -8,    8, 17, SEASON_WINTER },
+};
+
+const int month_table_size = sizeof(month_table) / sizeof(month_info);
+
+const char *        const        day_name        [] =
+{
+    "–õ—É–Ω—ã", "–ë—ã–∫–∞", "–õ–∂–∏", "–ì—Ä–æ–º–∞", "–°–≤–æ–±–æ–¥—ã",
+    "–í–µ–ª–∏–∫–∏—Ö –ë–æ–≥–æ–≤", "–°–æ–ª–Ω—Ü–∞"
 };
 
 void mmhg_update()
@@ -76,8 +110,8 @@ void mmhg_update()
     int diff, d;
     
     if (number_range( 0, 10 * 24 ) == 0) {
-	weather_info.avg_mmhg = 1000 + month_table[time_info.month].pressure;
-	weather_info.avg_mmhg += dice(1, 5) - dice(1, 5);
+        weather_info.avg_mmhg = 1000 + month_table[time_info.month].pressure;
+        weather_info.avg_mmhg += dice(1, 5) - dice(1, 5);
     }
     
     diff = weather_info.mmhg > weather_info.avg_mmhg ? -2 : 2;
@@ -86,11 +120,11 @@ void mmhg_update()
     weather_info.change = URANGE( -12, weather_info.change, 12 );
 
     if(weather_info.change > 0) {
-	if(weather_info.change >= number_range(0, 12*2))
-	    weather_info.mmhg++;
+        if(weather_info.change >= number_range(0, 12*2))
+            weather_info.mmhg++;
     } else {
-	if(weather_info.change <= -number_range(0, 12*2))
-	    weather_info.mmhg--;
+        if(weather_info.change <= -number_range(0, 12*2))
+            weather_info.mmhg--;
     }
 
     d = dice(10, 5) - dice(10, 5);
@@ -109,73 +143,94 @@ void mmhg_update()
  */
 void sunlight_update( )
 {
-    ostringstream buf;
+    ostringstream buf, tbuf;
+    int this_season = month_table[time_info.month].season;
+    int this_day = time_info.day;
+    int this_month = time_info.month;
+    int this_year = time_info.year;
 
     dreamland->setWorldTime( dreamland->getWorldTime( ) + 1 );
     ++time_info.hour;
 
     if (time_info.hour == month_table[time_info.month].sunrise) {
         weather_info.sunlight = SUN_RISE;
-	buf << "≈“◊Ÿ≈ Ã’ﬁ… ”œÃŒ√¡ –“œ¬…◊¡¿‘”— ” ◊œ”‘œÀ¡." << endl;
+        buf << "–ü–µ—Ä–≤—ã–µ –ª—É—á–∏ —Å–æ–ª–Ω—Ü–∞ –ø—Ä–æ–±–∏–≤–∞—é—Ç—Å—è —Å –≤–æ—Å—Ç–æ–∫–∞." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunrise + 1) {
         weather_info.sunlight = SUN_LIGHT;
-        buf << "Ó¡ﬁ¡Ã”— Œœ◊Ÿ  ƒ≈Œÿ." << endl;
+        buf << "–ù–∞—á–∞–ª—Å—è –Ω–æ–≤—ã–π –¥–µ–Ω—å." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset) {
         weather_info.sunlight = SUN_SET;
-	buf << "ÛœÃŒ√≈ Õ≈ƒÃ≈ŒŒœ –“—ﬁ≈‘”— ⁄¡ «œ“…⁄œŒ‘œÕ." << endl;
+        buf << "–°–æ–ª–Ω—Ü–µ –º–µ–¥–ª–µ–Ω–Ω–æ –ø—Ä—è—á–µ—Ç—Å—è –∑–∞ –≥–æ—Ä–∏–∑–æ–Ω—Ç–æ–º." << endl;
     }
     else if (time_info.hour == month_table[time_info.month].sunset + 1) {
         weather_info.sunlight = SUN_DARK;
-	buf << "Ó¡ﬁ…Œ¡≈‘”— Œœﬁÿ." << endl;
+        buf << "–ù–∞—á–∏–Ω–∞–µ—Ç—Å—è –Ω–æ—á—å." << endl;
     }
-    
+
     if (time_info.hour == 24) {
         time_info.hour = 0;
         time_info.day++;
     }
-
+    
     if (time_info.day >= 35) {
         time_info.day = 0;
         time_info.month++;
-    }
+    } 
 
     if (time_info.month >= 17) {
         time_info.month = 0;
         time_info.year++;
     }
+    
+    if (this_day != time_info.day)
+        tbuf << "–ü–æ–ª–Ω–æ—á—å. –ù–∞—á–∏–Ω–∞–µ—Ç—Å—è –¥–µ–Ω—å " << day_name[time_info.day % 7] << "." << endl;
+    
+    if (this_month != time_info.month) {
+        const struct month_info &month = month_table[time_info.month];
+        const struct season_info &season = season_table[month.season];
+        tbuf << "–°–µ–≥–æ–¥–Ω—è –ø–µ—Ä–≤—ã–π –¥–µ–Ω—å –º–µ—Å—è—Ü–∞ " << month.name;
+        if (this_season != month.season) 
+            tbuf << " –∏ –ø–µ—Ä–≤—ã–π –¥–µ–Ω—å {" << season.color << russian_case(season.short_descr, '2') << "{x!" << endl;
+        else if (this_year != time_info.year)
+            tbuf << " –∏ {C–Ω–æ–≤—ã–π –≥–æ–¥{x!" << endl;
+        else
+            tbuf << "." << endl;
+    }
+    
+    string buf_str = buf.str();
+    string tbuf_str = tbuf.str();
 
-    if (!buf.str( ).empty( )) {
-	Descriptor *d;
-	Character *ch;
-	
-        for (d = descriptor_list; d != 0; d = d->next) {
+    if (!buf_str.empty() || !tbuf_str.empty()) {
+        for (Descriptor *d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
-		continue;
+                continue;
 
-	    ch = d->character;
+            Character *ch = d->character;
 
-	    if (ch
-		&& IS_OUTSIDE(ch) 
-		&& IS_AWAKE(ch) 
-		&& !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
-	    {
-		ch->send_to( buf );
-	    }
+            if (ch
+                && IS_AWAKE(ch) 
+                && !IS_SET(ch->in_room->room_flags, ROOM_NO_TIME))
+            {
+                if (IS_OUTSIDE(ch) && !buf_str.empty())
+                    ch->send_to(buf_str);
+                if (!tbuf_str.empty())
+                    ch->send_to(tbuf_str);
+            }
         }
     }
 
     DLString newTime;
-    if (!buf.str( ).empty( )) {
+    if (!buf_str.empty()) {
         if (weather_info.sunlight >= SUN_DARK && weather_info.sunlight <= SUN_SET)
             newTime = sunlight_en[weather_info.sunlight];
     }
 
     for(int i=0;i<MAX_KEY_HASH;i++)
-	for(Room *r = room_index_hash[i]; r; r = r->next) {
-	    FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
-	}
+        for(Room *r = room_index_hash[i]; r; r = r->next) {
+            FENIA_VOID_CALL(r, "Time", "s", newTime.c_str( ));
+        }
 }
 
 DLString sunlight( )
@@ -206,7 +261,7 @@ void weather_update( )
         if ( weather_info.mmhg <  990
                 || ( weather_info.mmhg < 1010 && number_bits( 2 ) == 0 ) )
         {
-	    buf << "Ó≈¬œ ⁄¡‘—«…◊¡≈‘”— ‘’ﬁ¡Õ…." << endl;
+            buf << "–ù–µ–±–æ –∑–∞—Ç—è–≥–∏–≤–∞–µ—Ç—Å—è —Ç—É—á–∞–º–∏." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -215,13 +270,13 @@ void weather_update( )
         if ( weather_info.mmhg <  970
                 || ( weather_info.mmhg <  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "Ó¡ﬁ…Œ¡≈‘”— ƒœ÷ƒÿ." << endl;
+            buf << "–ù–∞—á–∏–Ω–∞–µ—Ç—Å—è –¥–æ–∂–¥—å." << endl;
             weather_info.sky = SKY_RAINING;
         }
 
         if ( weather_info.mmhg > 1030 && number_bits( 2 ) == 0 )
         {
-            buf << "Ù’ﬁ… “¡””≈…◊¡¿‘”—." << endl;
+            buf << "–¢—É—á–∏ —Ä–∞—Å—Å–µ–∏–≤–∞—é—Ç—Å—è." << endl;
             weather_info.sky = SKY_CLOUDLESS;
         }
         break;
@@ -229,14 +284,14 @@ void weather_update( )
     case SKY_RAINING:
         if ( weather_info.mmhg <  970 && number_bits( 2 ) == 0 )
         {
-            buf << "ÌœÃŒ…… ”◊≈“À¡¿‘ Œ¡ Œ≈¬≈." << endl;
+            buf << "–ú–æ–ª–Ω–∏–∏ —Å–≤–µ—Ä–∫–∞—é—Ç –Ω–∞ –Ω–µ–±–µ." << endl;
             weather_info.sky = SKY_LIGHTNING;
         }
 
         if ( weather_info.mmhg > 1030
                 || ( weather_info.mmhg > 1010 && number_bits( 2 ) == 0 ) )
         {
-            buf << "‰œ÷ƒÿ –“≈À“¡›¡≈‘”—." << endl;
+            buf << "–î–æ–∂–¥—å –ø—Ä–µ–∫—Ä–∞—â–∞–µ—Ç—Å—è." << endl;
             weather_info.sky = SKY_CLOUDY;
         }
         break;
@@ -245,7 +300,7 @@ void weather_update( )
         if ( weather_info.mmhg > 1010
                 || ( weather_info.mmhg >  990 && number_bits( 2 ) == 0 ) )
         {
-            buf << "ÌœÃŒ…  ¬œÃÿ€≈ Œ≈‘." << endl;
+            buf << "–ú–æ–ª–Ω–∏–π –±–æ–ª—å—à–µ –Ω–µ—Ç." << endl;
             weather_info.sky = SKY_RAINING;
             break;
         }
@@ -253,61 +308,37 @@ void weather_update( )
     }
 
     if (!buf.str( ).empty( )) {
-	Descriptor *d;
-	Character *ch;
-	
+        Descriptor *d;
+        Character *ch;
+        
         for (d = descriptor_list; d != 0; d = d->next) {
             if (d->connected != CON_PLAYING)
-		continue;
+                continue;
 
-	    ch = d->character;
+            ch = d->character;
 
-	    if (ch
-		&& IS_OUTSIDE(ch) 
-		&& IS_AWAKE(ch) 
-		&& !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
-	    {
-		ch->send_to( buf );
-	    }
+            if (ch
+                && IS_OUTSIDE(ch) 
+                && IS_AWAKE(ch) 
+                && !IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER))
+            {
+                ch->send_to( buf );
+            }
         }
     }
 }
 
 
-const char *	const	day_name	[] =
-{
-    "Ï’ŒŸ", "‚ŸÀ¡", "Ï÷…", "Á“œÕ¡", "Û◊œ¬œƒŸ",
-    "˜≈Ã…À…» ‚œ«œ◊", "ÛœÃŒ√¡"
-};
-
-static const char * adjective_ext(int d) 
-{
-    static const char * EXT_ONE = "Ÿ ";
-    static const char * EXT_TWO = "œ ";
-    static const char * EXT_THREE = "… ";
-    
-    switch (d % 10) {
-    case 0: 
-	return d == 0 ? EXT_TWO : EXT_ONE;
-    case 1: case 4: case 5: case 9:
-	return EXT_ONE;
-    case 3:
-	return EXT_THREE;
-    default:
-	return EXT_TWO;
-    }
-}
-
 DLString time_of_day( )
 {
     if ((time_info.hour > 16) && (time_info.hour < 24)) 
-        return "◊≈ﬁ≈“¡";
+        return "–≤–µ—á–µ—Ä–∞";
     if (time_info.hour < 4) 
-        return "Œœﬁ…";
+        return "–Ω–æ—á–∏";
     if ((time_info.hour > 3) && (time_info.hour < 12)) 
-        return "’‘“¡";
+        return "—É—Ç—Ä–∞";
     if ((time_info.hour > 11) && (time_info.hour < 17)) 
-        return "ƒŒ—";
+        return "–¥–Ω—è";
     return DLString::emptyString;
 }
 
@@ -324,12 +355,11 @@ DLString calendar_month( )
 void make_date( ostringstream &buf )
 {
     int day = time_info.day + 1;
-    const char * suf = adjective_ext( day );
     
     buf << hour_of_day( ) << " " << time_of_day( ) << ", " 
-	<< "‰≈Œÿ: " << day_name[day % 7] << ", " << day << "-" << suf << "  "
-	<< "Ì≈”—√ " << calendar_month( ) << ", "
-	<< "Áœƒ " << time_info.year << "." << endl;
+        << "–î–µ–Ω—å: " << day_name[day % 7] << ", " << day << "–π, "
+        << "–ú–µ—Å—è—Ü " << calendar_month( ) << ", "
+        << "–ì–æ–¥ " << time_info.year << "." << endl;
 }
 
 CMDRUN( time )
@@ -337,53 +367,99 @@ CMDRUN( time )
     ostringstream buf;
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_TIME)) {
-	ch->println( "œ»œ÷≈, ◊ ‹‘œÕ Õ≈”‘≈ ◊“≈Õ— œ”‘¡Œœ◊…Ãœ ”◊œ  »œƒ." );
-	return;
+        ch->println( "–ü–æ—Ö–æ–∂–µ, –≤ —ç—Ç–æ–º –º–µ—Å—Ç–µ –≤—Ä–µ–º—è –æ—Å—Ç–∞–Ω–æ–≤–∏–ª–æ —Å–≤–æ–π —Ö–æ–¥." );
+        return;
     }
 
-    buf << "Û≈ ﬁ¡”: ";
-    make_date( buf );
+    // Output time of day and sunlight.
+    buf << "–°–µ–π—á–∞—Å " << hour_of_day() << " " << time_of_day();
+    if (IS_OUTSIDE(ch))
+        buf << ", " << sunlight();
+    buf << ". ";
+
+    // Output day of the week, day, season, month, year.
+    int day = time_info.day + 1;
+    const month_info &month = month_table[time_info.month];
+    const season_info &season = season_table[month.season];
+
+    buf << "–°–µ–≥–æ–¥–Ω—è –¥–µ–Ω—å " << day_name[day % 7] << ", "
+        << day << "–π –¥–µ–Ω—å "
+        << season.adjective << " –º–µ—Å—è—Ü–∞ " << month.name << ", "
+        << "–≥–æ–¥–∞ " << time_info.year << "." << endl;
+
+    if (ch->is_npc())
+        return;
+
+    PCharacter *pch = ch->getPC();
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
-    {
-	buf <<  "˜“≈Õ— {r’¬…◊¡‘ÿ{x, {D”œ⁄ƒ¡Œ…≈ Œœﬁ…{x!" << endl;
-    }
+        buf <<  "–í—Ä–µ–º—è {r—É–±–∏–≤–∞—Ç—å{x, {D—Å–æ–∑–¥–∞–Ω–∏–µ –Ω–æ—á–∏{x!" << endl;
 
+#if 0   
+    if (!ch->is_npc()) {
+        ch->getPC()->getBonuses().handleEvent(TimeArguments(ch->getPC(), buf));
+    }
+#endif 
+  
+    for (int bn = 0; bn < bonusManager->size(); bn++) {
+        Bonus *bonus = bonusManager->find(bn);
+        if (bonus->isActive(pch, time_info))
+            bonus->reportTime(pch, buf);
+    }
     ch->send_to(buf);
 
     if (ch->is_immortal( )) 
-	ch->printf( "Dream Land ⁄¡«“’÷≈Œ %s\r\nÛ…”‘≈ÕŒœ≈ ◊“≈Õ—: %s\r\n",
-	            Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
-	            Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
+        ch->printf( "Dream Land –∑–∞–≥—Ä—É–∂–µ–Ω %s\r\n–°–∏—Å—Ç–µ–º–Ω–æ–µ –≤—Ä–µ–º—è: %s\r\n",
+                    Date::getTimeAsString( dreamland->getBootTime( ) ).c_str( ),
+                    Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ) );
 }
 
 CMDRUN( weather )
 {
     static const char * const sky_look[4] =
     {
-	"—”Œœ≈",
-	"œ¬Ã¡ﬁŒœ≈",
-	"ƒœ÷ƒÃ…◊œ≈",
-	"◊œ ◊”–Ÿ€À¡» ÕœÃŒ… "
+        "—è—Å–Ω–æ–µ",
+        "–æ–±–ª–∞—á–Ω–æ–µ",
+        "–¥–æ–∂–¥–ª–∏–≤–æ–µ",
+        "–≤–æ –≤—Å–ø—ã—à–∫–∞—Ö –º–æ–ª–Ω–∏–π"
     };
     
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_WEATHER)) {
-	ch->println( "œ»œ÷≈, ◊ ‹‘œÕ Õ≈”‘≈ –œ«œƒ¡ ◊”≈«ƒ¡ œƒ…Œ¡Àœ◊¡—." );
-	return;
+        ch->println( "–ü–æ—Ö–æ–∂–µ, –≤ —ç—Ç–æ–º –º–µ—Å—Ç–µ –ø–æ–≥–æ–¥–∞ –≤—Å–µ–≥–¥–∞ –æ–¥–∏–Ω–∞–∫–æ–≤–∞—è." );
+        return;
     }
     
     if ( !IS_OUTSIDE(ch) )
     {
-	ch->send_to( "ÙŸ Œ≈ Õœ÷≈€ÿ ◊…ƒ≈‘ÿ –œ«œƒ’ ◊ –œÕ≈›≈Œ…….\n\r");
-	return;
+        ch->send_to( "–¢—ã –Ω–µ –º–æ–∂–µ—à—å –≤–∏–¥–µ—Ç—å –ø–æ–≥–æ–¥—É –≤ –ø–æ–º–µ—â–µ–Ω–∏–∏.\n\r");
+        return;
+    }
+    
+    const char *wind;
+    int season = month_table[time_info.month].season;
+    if (weather_info.change >= 0) {
+        if (season == SEASON_SUMMER)
+            wind = "—Ç–µ–ø–ª—ã–π –ª–µ—Ç–Ω–∏–π";
+        else if (season == SEASON_SPRING)
+            wind = "—Ç–µ–ø–ª—ã–π –≤–µ—Å–µ–Ω–Ω–∏–π";
+        else
+            wind = "—Ç–µ–ø–ª—ã–π —é–∂–Ω—ã–π";
+    }
+    else {
+        if (season == SEASON_WINTER)
+            wind = "—Ö–æ–ª–æ–¥–Ω—ã–π –∑–∏–º–Ω–∏–π";
+        else if (season == SEASON_AUTUMN)
+            wind = "–ø—Ä–æ–Ω–∏–∑—ã–≤–∞—é—â–∏–π –æ—Å–µ–Ω–Ω–∏–π";
+        else if (season == SEASON_SPRING)
+            wind = "–ø—Ä–æ—Ö–ª–∞–¥–Ω—ã–π –≤–µ—Å–µ–Ω–Ω–∏–π";
+        else
+            wind = "–ø—Ä–æ—Ö–ª–∞–¥–Ω—ã–π —Å–µ–≤–µ—Ä–Ω—ã–π";
     }
 
-    ch->printf( "Ó≈¬œ %s … %s.\n\r",
-	sky_look[weather_info.sky],
-	weather_info.change >= 0
-	? "ƒ’≈‘ ‘≈–ÃŸ  ¿÷ŒŸ  ◊≈‘≈“"
-	: "ƒ’≈‘ »œÃœƒŒŸ  ”≈◊≈“ŒŸ  ◊≈‘≈“"
-	);
+    ch->printf( "–ù–µ–±–æ %s –∏ –¥—É–µ—Ç %s –≤–µ—Ç–µ—Ä.\n\r",
+        sky_look[weather_info.sky],
+        wind
+    );
 }
 
 
@@ -394,25 +470,25 @@ void weather_init( )
 {
     long lhour, lday, lmonth;
 
-    lhour		= dreamland->getWorldTime( );
+    lhour                = dreamland->getWorldTime( );
 
     if ( lhour == 0 )
     {
-	    lhour = ( dreamland->getCurrentTime( ) - 650336715)
-		    / (PULSE_TICK / dreamland->getPulsePerSecond( ));
+            lhour = ( dreamland->getCurrentTime( ) - 650336715)
+                    / (PULSE_TICK / dreamland->getPulsePerSecond( ));
 
-	    dreamland->setWorldTime( lhour );
+            dreamland->setWorldTime( lhour );
     }
 
-    time_info.hour	= lhour  % 24;
+    time_info.hour        = lhour  % 24;
 
-    lday		= lhour  / 24;
-    time_info.day	= lday   % 35;
+    lday                = lhour  / 24;
+    time_info.day        = lday   % 35;
 
-    lmonth		= lday   / 35;
-    time_info.month	= lmonth % 17;
+    lmonth                = lday   / 35;
+    time_info.month        = lmonth % 17;
 
-    time_info.year	= lmonth / 17;
+    time_info.year        = lmonth / 17;
 
     if (time_info.hour < month_table[time_info.month].sunrise) 
         weather_info.sunlight = SUN_DARK;
@@ -425,18 +501,137 @@ void weather_init( )
     else
         weather_info.sunlight = SUN_DARK;
 
-    weather_info.change	  = 0;
+    weather_info.change          = 0;
     weather_info.change_  = 0;
-    weather_info.mmhg	  = 960;
+    weather_info.mmhg          = 960;
     weather_info.avg_mmhg = 1000;
 
     if ( time_info.month >= 7 && time_info.month <=12 )
-	weather_info.mmhg += number_range( 1, 50 );
+        weather_info.mmhg += number_range( 1, 50 );
     else
-	weather_info.mmhg += number_range( 1, 80 );
+        weather_info.mmhg += number_range( 1, 80 );
 
-	 if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
+         if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
     else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
     else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
     else                                  weather_info.sky = SKY_CLOUDLESS;
 }
+
+/*--------------------------------------------------------------------------
+ * Calendar and bonuses.
+ *-------------------------------------------------------------------------*/
+struct Calendar {
+    Calendar(PCharacter *ch) {
+        this->ch = ch;
+    }
+
+    void draw(ostringstream &out) {
+        buf.str().clear();
+
+        for (int season = 0; season < 4; season++) {
+            draw_divider();
+
+            for (int month = season*4; month < season*4 + 4; month++) 
+                draw_month_name(month);
+            
+            for (int week = 0; week < 5; week++) {
+                for (int month = 0; month < 4; month++) 
+                    draw_week(week, season*4 + month);
+                
+                buf << endl;
+            }
+        }
+
+        draw_divider();
+        draw_month_name(month_table_size-1);
+        for (int week = 0; week < 5; week++) 
+            draw_week(week, month_table_size-1);
+        
+        buf << "{D--------------------+{x" << endl;
+        out << buf.str();
+    }
+
+protected:
+    PCharacter *ch;
+    ostringstream buf;
+
+    void draw_divider()
+    {
+        buf << "{D--------------------+--------------------+--------------------+--------------------" << endl;
+    }
+
+    char day_color(int day, int month)
+    {
+        struct time_info_data ti;
+        ti.day = day;
+        ti.month = month;
+        ti.year = time_info.year;
+
+        if (day == time_info.day && month == time_info.month)
+            return 'R';
+        
+        for (int bn = 0; bn < bonusManager->size(); bn++) {
+            Bonus *bonus = bonusManager->find(bn);
+            if (bonus->isActive(ch, ti))
+                return bonus->getColor();
+        }
+        return 'x';
+    }
+
+    void draw_day(int day, int month)
+    {
+        char color = day_color(day, month);
+        if (color != 'x')
+            buf << "{" << color;
+
+        buf << dlprintf("%2d", day+1);
+
+        if (color != 'x')
+            buf << "{x";
+
+        if (day%7 != 6)
+            buf << " ";
+    }
+
+    void draw_week(int week, int month)
+    {
+        for (int day = 0; day < 7; day++) 
+            draw_day((week*7+day), month);
+
+        if ((month+1)%4 != 0)
+            buf << "{D|{x";
+
+        if (month == month_table_size - 1)
+            buf << endl;
+    }
+
+    void draw_month_name(int m)
+    {
+        const month_info &month = month_table[m];
+        buf << " {" << season_table[month.season].color << dlprintf("%-18s", month.name);
+
+        if ((m+1)%4 != 0)
+            buf << "{D|{x";
+        else
+            buf << "{x" << endl;
+
+        if (m == month_table_size - 1)
+            buf << endl;
+    }
+};
+
+CMDRUN( calendar )
+{
+    if (ch->is_npc())
+        return;
+ 
+    ostringstream buf;
+    Calendar calendar(ch->getPC()); 
+
+    calendar.draw(buf);
+    buf << "{W–õ–µ–≥–µ–Ω–¥–∞{x: {RX{x - —Å–µ–≥–æ–¥–Ω—è, {cX{x - –±–æ–ª—å—à–µ –æ–ø—ã—Ç–∞ –∑–∞ —É–±–∏–π—Å—Ç–≤–∞, {bX{x - –º–µ–Ω—å—à–µ —Ä–∞—Å—Ö–æ–¥ –º–∞–Ω—ã," << endl
+        << "         {GX{x - –±—ã—Å—Ç—Ä–µ–µ —É—á–∞—Ç—Å—è —É–º–µ–Ω–∏—è, {DX{x - –¥–µ—à–µ–≤—ã–µ —Ü–µ–Ω—ã, {MX{x - —É—Å–ø–µ—à–Ω—ã–µ –≤–æ—Ä–æ–≤—Å–∫–∏–µ —É–º–µ–Ω–∏—è," << endl
+        << "         {gX{x - –ø–∏—Ç–æ–º—Ü—ã –±—ã—Å—Ç—Ä–µ–µ —É–ª—É—á—à–∞—é—Ç –ø–∞—Ä–∞–º–µ—Ç—Ä—ã" << endl;
+    ch->send_to(buf);
+}
+

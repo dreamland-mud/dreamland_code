@@ -16,9 +16,20 @@
 class Character;
 class PCharacter;
 
+struct ScoreArguments {
+    ScoreArguments(PCharacter *ch, list<DLString> &l)
+            : pch(ch), lines(l)
+    {
+    }
+
+        
+    PCharacter *pch;
+    list<DLString> &lines;
+};
+
 struct DeathArguments {
     DeathArguments( PCharacter *ch, Character *k )
-	    : pch( ch ), killer( k )
+            : pch( ch ), killer( k )
     {
     }
     
@@ -28,7 +39,7 @@ struct DeathArguments {
 
 struct RemortArguments {
     RemortArguments( PCharacter *ch, XMLAttributes *n )
-	    : pch( ch ), newAttributes( n )
+            : pch( ch ), newAttributes( n )
     {
     }
     
@@ -44,7 +55,7 @@ public:
 
 struct PromptArguments {
     PromptArguments( PCharacter *ch, char c, ostringstream &buf )
-                        : pch( pch ), letter( c ), buffer( buf )
+                        : pch( ch ), letter( c ), buffer( buf )
     {
     }
 
@@ -54,15 +65,26 @@ struct PromptArguments {
 };  
                 
 struct WhoisArguments {
-    WhoisArguments( PCharacter *ch, list<DLString> &l )
-           : pch( ch ), lines( l )
+    WhoisArguments( PCharacter *ch, PCharacter *lch, list<DLString> &l )
+           : pch( ch ), looker( lch ), lines( l )
     {
     }
 
     PCharacter *pch;
+    PCharacter *looker;
     list<DLString> &lines;
 };
+#if 0
+struct TimeArguments {
+    TimeArguments(PCharacter *ch, ostringstream &b)
+           : pch(ch), buf(b)
+    {
+    }
 
+    PCharacter *pch;
+    ostringstream &buf;
+};
+#endif
 extern template class EventHandler<RemortArguments>;
 extern template class EventHandler<DeathArguments>;
 extern template class EventHandler<PromptArguments>;

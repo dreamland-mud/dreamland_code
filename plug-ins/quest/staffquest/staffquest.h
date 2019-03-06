@@ -37,15 +37,15 @@ protected:
 private:
     Object *createStaff( Room * );
 
-    StaffScenario & getScenario( );
+    const StaffScenario & getScenario( ) const;
 };
 
 class StaffScenario : public QuestItemAppearence, public QuestScenario {
 XML_OBJECT
 public:
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter * ) const;
 
-    void onQuestStart( PCharacter *, NPCharacter * );
+    void onQuestStart( PCharacter *, NPCharacter * ) const;
 
     XML_VARIABLE XMLString msg;
 };
@@ -58,10 +58,10 @@ public:
     StaffQuestRegistrator( );
     virtual ~StaffQuestRegistrator( );
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter *, bool ) const;
 
     static inline StaffQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
     XML_VARIABLE XMLInteger objVnum;

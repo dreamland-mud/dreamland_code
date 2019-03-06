@@ -35,7 +35,7 @@ public:
     virtual Reward::Pointer reward( PCharacter *, NPCharacter * );
     virtual void destroy( );
 
-    LocateScenario & getScenario( );
+    const LocateScenario & getScenario( ) const;
 
     XML_VARIABLE XMLString scenName;
     XML_VARIABLE XMLString itemName;
@@ -63,10 +63,10 @@ public:
     LocateQuestRegistrator( );
     virtual ~LocateQuestRegistrator( );
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter *, bool ) const;
 
     static inline LocateQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
     XML_VARIABLE XMLInteger itemVnum;

@@ -11,31 +11,46 @@ XMLAttributeLanguage::XMLAttributeLanguage( )
 {
 }
 
+void XMLAttributeLanguage::removeWord( const Word &word, PCharacter *ch )
+{
+    ch->pecho( "{wÐ¡Ð»Ð¾Ð²Ð¾ {w%s{w ÑƒÑÐºÐ¾Ð»ÑŒÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ.{x", word.dictum.getValue( ).c_str( ) );
+    
+    Words::iterator w = words.find( word.dictum );
+    words.erase(w);
+    
+    XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).findAttr<XMLAttributeLanguageHints>( "languageHints" );
+    if (attrHints)
+        attrHints->removeWord( word );
+}
+
 void XMLAttributeLanguage::wordUsed( const Word &word, PCharacter *ch )
 {
     Words::iterator w = words.find( word.dictum );
     
     if (--w->second.count > 0)
-	return;
-
-    ch->pecho( "{wóÌÏ×Ï {w%s{w ÕÓËÏÌØÚÁÅÔ ÏÔ ÔÅÂÑ.{x", 
-               w->second.dictum.getValue( ).c_str( ) );
+        return;
     
-    words.erase( w );
-    
-    XMLAttributeLanguageHints::Pointer attrHints = ch->getAttributes( ).findAttr<XMLAttributeLanguageHints>( "languageHints" );
-    if (attrHints)
-        attrHints->hints.erase( word.dictum );
+    removeWord(w->second, ch);
 }   
 
 XMLAttributeLanguageHints::~XMLAttributeLanguageHints( )
 {
 }
         
+void XMLAttributeLanguageHints::removeWord( const Word &word )
+{
+    hints.erase(word.dictum);
+}
+
+void XMLAttributeLanguageHints::removeWord( const DLString &dictum )
+{
+    hints.erase(dictum);
+}
+
 void XMLAttributeLanguageHints::addWord( const Word &word, bool hint )
 {
     if (word.empty( ))
-	return;
+        return;
 
     hints[word.dictum] = hint;
 }    
@@ -44,5 +59,10 @@ bool XMLAttributeLanguageHints::hasHint( const Word &word ) const
 {
     Hints::const_iterator h = hints.find( word.dictum );
     return h != hints.end( ) && h->second;
+}
+
+bool XMLAttributeLanguageHints::hasWord(const DLString &arg) const
+{
+    return hints.find(arg) != hints.end();
 }
 

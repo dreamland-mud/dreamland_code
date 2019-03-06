@@ -19,19 +19,19 @@ extern "C"
 {
     SO::PluginList initialize_clan_behavior( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<AreaBehaviorRegistrator<ClanArea> >( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<AreaBehaviorRegistrator<ClanArea> >( ppl );
 
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanItem> >( ppl );
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanAltar> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanItem> >( ppl );
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<ClanAltar> >( ppl );
 
-	Plugin::registerPlugin<RoomBehaviorRegistrator<ClanPetShopStorage> >( ppl );
+        Plugin::registerPlugin<RoomBehaviorRegistrator<ClanPetShopStorage> >( ppl );
 
-	Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuard> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<ClanHealer> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<ClanSummonedCreature> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuard> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanHealer> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<ClanSummonedCreature> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

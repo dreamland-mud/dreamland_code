@@ -9,7 +9,7 @@
 #include "act.h"
 #include "descriptor.h"
 
-#define OBJ_VNUM_PAGER			102 
+#define OBJ_VNUM_PAGER                        102 
 
 /*
  * Info channel
@@ -19,8 +19,8 @@ Object * get_pager( Character *ch )
     Object *obj;
 
     for (obj = ch->carrying; obj; obj = obj->next_content) 
-	if (obj->pIndexData->vnum == OBJ_VNUM_PAGER)
-	    return obj;
+        if (obj->pIndexData->vnum == OBJ_VNUM_PAGER)
+            return obj;
     
     return NULL;
 }
@@ -33,17 +33,17 @@ void infonet( const char *string, Character *ch, int min_level )
   for ( d = descriptor_list; d != 0; d = d->next )
   {
       if (!d->character || d->connected != CON_PLAYING)
-	  continue;
+          continue;
 
       if (ch && ch->is_immortal( ))
-	  continue;
+          continue;
 
       if (d->character->get_trust() < min_level)
-	  continue;
+          continue;
       
       if (d->character == ch)
-	  continue;
-	
+          continue;
+        
       if (( obj = get_pager( d->character ) ))
            act_p( string, d->character, obj, ch, TO_CHAR, POS_DEAD);
   }

@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -43,27 +43,27 @@ GSN(dispel_affects);
 static inline bool has_sanctuary_msg( Character *ch, Character *victim )
 {
     if (IS_AFFECTED(victim, AFF_SANCTUARY)) {
-	if (victim == ch)
-	    act("ÙŸ ’÷≈ –œƒ ⁄¡›…‘œ  ”◊—‘…Ã…›¡.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 ’÷≈ –œƒ ⁄¡›…‘œ  ”◊—‘…Ã…›¡.", ch, 0, victim, TO_CHAR);
-	return true;
+        if (victim == ch)
+            act("–¢—ã —É–∂–µ –ø–æ–¥ –∑–∞—â–∏—Ç–æ–π —Å–≤—è—Ç–∏–ª–∏—â–∞.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 —É–∂–µ –ø–æ–¥ –∑–∞—â–∏—Ç–æ–π —Å–≤—è—Ç–∏–ª–∏—â–∞.", ch, 0, victim, TO_CHAR);
+        return true;
     }
 
     if (victim->isAffected(gsn_dark_shroud)) {
-	if (victim == ch)
-	    act("ÙŸ ’÷≈ –œƒ ⁄¡›…‘œ  ‘≈ÕŒŸ» ¬œ«œ◊.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 ’÷≈ –œƒ ⁄¡›…‘œ  ‘≈ÕŒŸ» ¬œ«œ◊.", ch, 0, victim, TO_CHAR);
-	return true;
+        if (victim == ch)
+            act("–¢—ã —É–∂–µ –ø–æ–¥ –∑–∞—â–∏—Ç–æ–π —Ç–µ–º–Ω—ã—Ö –±–æ–≥–æ–≤.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 —É–∂–µ –ø–æ–¥ –∑–∞—â–∏—Ç–æ–π —Ç–µ–º–Ω—ã—Ö –±–æ–≥–æ–≤.", ch, 0, victim, TO_CHAR);
+        return true;
     }
 
     if (victim->isAffected(gsn_stardust)) {
-	if (victim == ch)
-	    act("˙◊≈⁄ƒŒ¡— –ŸÃÿ ’÷≈ À“’÷…‘”— ◊œÀ“’« ‘≈¬—.", ch, 0, 0, TO_CHAR);
-	else
-	    act("˙◊≈⁄ƒŒ¡— –ŸÃÿ ’÷≈ À“’÷…‘”— ◊œÀ“’« $C2.", ch, 0, victim, TO_CHAR);
-	return true;
+        if (victim == ch)
+            act("–ó–≤–µ–∑–¥–Ω–∞—è –ø—ã–ª—å —É–∂–µ –∫—Ä—É–∂–∏—Ç—Å—è –≤–æ–∫—Ä—É–≥ —Ç–µ–±—è.", ch, 0, 0, TO_CHAR);
+        else
+            act("–ó–≤–µ–∑–¥–Ω–∞—è –ø—ã–ª—å —É–∂–µ –∫—Ä—É–∂–∏—Ç—Å—è –≤–æ–∫—Ä—É–≥ $C2.", ch, 0, victim, TO_CHAR);
+        return true;
     }
 
     return false;
@@ -75,29 +75,29 @@ VOID_SPELL(Armor)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (victim->isAffected(sn)) {
-	if (victim == ch)
-	    act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ ⁄¡ÀÃ…Œ¡Œ…≈Õ ¬“œŒ….", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ ⁄¡ÀÃ…Œ¡Œ…≈Õ ¬“œŒ….", ch, 0, victim, TO_CHAR);
-	return;
+        if (victim == ch)
+            act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –∑–∞–∫–ª–∏–Ω–∞–Ω–∏–µ–º –±—Ä–æ–Ω–∏.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –∑–∞–∫–ª–∏–Ω–∞–Ω–∏–µ–º –±—Ä–æ–Ω–∏.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 7 + level / 6;
     af.modifier  = -1 * max(20,10 + level / 4); /* af.modifier  = -20;*/
     af.location  = APPLY_AC;
     affect_to_char( victim, &af );
     
     if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-	act("Û◊—›≈ŒŒ¡— ¬“œŒ— œÀ“’÷¡≈‘ ‘≈¬—.", victim, 0, 0, TO_CHAR);
-	if (ch != victim)
-	    act("Û◊—›≈ŒŒ¡— ¬“œŒ— œÀ“’÷¡≈‘ $C4.", ch, 0, victim, TO_CHAR);
+        act("–°–≤—è—â–µ–Ω–Ω–∞—è –±—Ä–æ–Ω—è –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.", victim, 0, 0, TO_CHAR);
+        if (ch != victim)
+            act("–°–≤—è—â–µ–Ω–Ω–∞—è –±—Ä–æ–Ω—è –æ–∫—Ä—É–∂–∞–µ—Ç $C4.", ch, 0, victim, TO_CHAR);
     } else {
-	act("˜œÃ€≈¬Œ¡— ¬“œŒ— œÀ“’÷¡≈‘ ‘≈¬—.", victim, 0, 0, TO_CHAR);
-	if (ch != victim)
-	    act("˜œÃ€≈¬Œ¡— ¬“œŒ— œÀ“’÷¡≈‘ $C4.", ch, 0, victim, TO_CHAR);
+        act("–í–æ–ª—à–µ–±–Ω–∞—è –±—Ä–æ–Ω—è –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.", victim, 0, 0, TO_CHAR);
+        if (ch != victim)
+            act("–í–æ–ª—à–µ–±–Ω–∞—è –±—Ä–æ–Ω—è –æ–∫—Ä—É–∂–∞–µ—Ç $C4.", ch, 0, victim, TO_CHAR);
     }
 }
 
@@ -110,14 +110,14 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
 
     if ( ch->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Ù◊œ— Àœ÷¡ Œ≈ Õœ÷≈‘ ”‘¡‘ÿ ≈›≈ –“œﬁŒ≈≈.\n\r");
-	else
-	  act_p("Îœ÷¡ $C2 Œ≈ Õœ÷≈‘ ”‘¡‘ÿ ≈›≈ –“œﬁŒ≈≈.",
+        if (victim == ch)
+          ch->send_to("–¢–≤–æ—è –∫–æ–∂–∞ –Ω–µ –º–æ–∂–µ—Ç —Å—Ç–∞—Ç—å –µ—â–µ –ø—Ä–æ—á–Ω–µ–µ.\n\r");
+        else
+          act_p("–ö–æ–∂–∞ $C2 –Ω–µ –º–æ–∂–µ—Ç —Å—Ç–∞—Ç—å –µ—â–µ –ø—Ä–æ—á–Ω–µ–µ.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        return;
     }
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
     af.level     = level;
     af.duration  = level;
@@ -125,9 +125,9 @@ VOID_SPELL(BarkSkin)::run( Character *ch, Character *victim, int sn, int level )
     af.modifier  = -( int )(level * 1.5);
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    act_p( "Îœ÷¡ $c2 –œÀ“Ÿ◊¡≈‘”— Àœ“œ .",
+    act_p( "–ö–æ–∂–∞ $c2 –ø–æ–∫—Ä—ã–≤–∞–µ—Ç—Å—è –∫–æ—Ä–æ–π.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-    victim->println("“œﬁŒ¡— ⁄¡›…‘Œ¡— Àœ“¡ –œÀ“Ÿ◊¡≈‘ ‘◊œ¿ Àœ÷’.");
+    victim->println("–ü—Ä–æ—á–Ω–∞—è –∑–∞—â–∏—Ç–Ω–∞—è –∫–æ—Ä–∞ –ø–æ–∫—Ä—ã–≤–∞–µ—Ç —Ç–≤–æ—é –∫–æ–∂—É.");
     return;
 
 }
@@ -140,38 +140,38 @@ enum {
 static int can_cancel( Character *ch, Character *victim )
 {
     if (ch->is_npc( ) && victim->is_npc( )) {
-	if (!is_same_group( ch, victim ))
-	    return CANCEL_DISPEL;
-	
-	return CANCEL_ALWAYS;
+        if (!is_same_group( ch, victim ))
+            return CANCEL_DISPEL;
+        
+        return CANCEL_ALWAYS;
     }
 
     if (!ch->is_npc( ) && !victim->is_npc( )) {
-	if (ch == victim)
-	    return CANCEL_ALWAYS;
+        if (ch == victim)
+            return CANCEL_ALWAYS;
 
-	if (ch->is_immortal( ))
-	    return CANCEL_ALWAYS;
+        if (ch->is_immortal( ))
+            return CANCEL_ALWAYS;
 
-	if (!IS_SET(victim->add_comm, PLR_NOCANCEL))
-	    return CANCEL_ALWAYS;
+        if (!IS_SET(victim->add_comm, PLR_NOCANCEL))
+            return CANCEL_ALWAYS;
 
-	if (ch->getClan( ) != victim->getClan( ))
-	    return CANCEL_DISPEL;
+        if (ch->getClan( ) != victim->getClan( ))
+            return CANCEL_DISPEL;
 
-	if (ch->getClan( )->isDispersed( ))
-	    return CANCEL_DISPEL;
+        if (ch->getClan( )->isDispersed( ))
+            return CANCEL_DISPEL;
 
-	return CANCEL_ALWAYS;
+        return CANCEL_ALWAYS;
     }
 
     if (ch->is_npc( ) && !victim->is_npc( )) {
-	return CANCEL_NEVER;
+        return CANCEL_NEVER;
     }
 
     if (victim->getNPC( )->behavior
-	&& !victim->getNPC( )->behavior->canCancel( ch ))
-	return CANCEL_NEVER;
+        && !victim->getNPC( )->behavior->canCancel( ch ))
+        return CANCEL_NEVER;
 
     return CANCEL_ALWAYS;
 }
@@ -185,14 +185,14 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
 
     switch (can_cancel( ch, victim )) {
     case CANCEL_ALWAYS:
-	    break;
+            break;
     case CANCEL_NEVER:
-	    ch->println("Ù◊œ— –œ–Ÿ‘À¡ ⁄¡ÀœŒﬁ…Ã¡”ÿ Œ≈’ƒ¡ﬁ≈ , –œ–“œ¬’  dispel affects.");
-	    return;
+            ch->println("–¢–≤–æ—è –ø–æ–ø—ã—Ç–∫–∞ –∑–∞–∫–æ–Ω—á–∏–ª–∞—Å—å –Ω–µ—É–¥–∞—á–µ–π, –ø–æ–ø—Ä–æ–±—É–π dispel affects.");
+            return;
     case CANCEL_DISPEL:
-	    if (!is_safe_spell( ch, victim, false ))	
-		spell(gsn_dispel_affects, level, ch, victim);
-	    return;
+            if (!is_safe_spell( ch, victim, false ))        
+                spell(gsn_dispel_affects, level, ch, victim);
+            return;
     }
 
     level += 2;
@@ -200,17 +200,17 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
     /* unlike dispel affects, the victim gets NO save */
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
-	affect = skillManager->find( sn )->getAffect( );
+        affect = skillManager->find( sn )->getAffect( );
 
-	if (affect && affect->isCancelled( ))
-	    if (checkDispel( level, victim, sn )) 
-		found = true;
+        if (affect && affect->isCancelled( ))
+            if (checkDispel( level, victim, sn )) 
+                found = true;
     }
 
     if (found)
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
     else
-	ch->send_to("Ù◊œ— –œ–Ÿ‘À¡ ⁄¡ÀœŒﬁ…Ã¡”ÿ Œ≈’ƒ¡ﬁ≈ .\n\r");
+        ch->send_to("–¢–≤–æ—è –ø–æ–ø—ã—Ç–∫–∞ –∑–∞–∫–æ–Ω—á–∏–ª–∞—Å—å –Ω–µ—É–¥–∞—á–µ–π.\n\r");
 }
 
 
@@ -220,15 +220,15 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
     
     if (has_sanctuary_msg( ch, victim ))
-	return;
+        return;
 
     if (IS_GOOD(victim)) // Not for good !!!
     {
        if (victim == ch)
-	  act("Ù≈ÕŒŸ≈ ¬œ«… Œ≈ ¬’ƒ’‘ ⁄¡›…›¡‘ÿ ‘≈¬—!!!", ch, 0, 0, TO_CHAR);
+          act("–¢–µ–º–Ω—ã–µ –±–æ–≥–∏ –Ω–µ –±—É–¥—É—Ç –∑–∞—â–∏—â–∞—Ç—å —Ç–µ–±—è!!!", ch, 0, 0, TO_CHAR);
        else
-       	  act("Ù≈ÕŒŸ≈ ¬œ«… Œ≈ ¬’ƒ’‘ ⁄¡›…›¡‘ÿ $C4!!!", ch, 0, victim, TO_CHAR);
-	return;
+                 act("–¢–µ–º–Ω—ã–µ –±–æ–≥–∏ –Ω–µ –±—É–¥—É—Ç –∑–∞—â–∏—â–∞—Ç—å $C4!!!", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -236,8 +236,8 @@ VOID_SPELL(DarkShroud)::run( Character *ch, Character *victim, int sn, int level
     af.level     = level;
     af.duration  = level / 6;
     affect_to_char( victim, &af );
-    act("{DÙ≈ÕŒ¡— ¡’“¡{x œÀ“’÷¡≈‘ $c4.", victim, 0, 0, TO_ROOM);
-    act("{DÙ≈ÕŒ¡— ¡’“¡{x œÀ“’÷¡≈‘ ‘≈¬—.", victim, 0, 0, TO_CHAR);
+    act("{D–¢–µ–º–Ω–∞—è –∞—É—Ä–∞{x –æ–∫—Ä—É–∂–∞–µ—Ç $c4.", victim, 0, 0, TO_ROOM);
+    act("{D–¢–µ–º–Ω–∞—è –∞—É—Ä–∞{x –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.", victim, 0, 0, TO_CHAR);
 }
 
 
@@ -248,26 +248,26 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
     bool found = false;
     
     if (IS_AFFECTED(ch, AFF_CHARM))
-	return;
+        return;
 
     if (saves_spell(level, victim,DAM_OTHER, ch, DAMF_SPELL)) {
-	victim->send_to("ÙŸ ﬁ’◊”‘◊’≈€ÿ Ã≈«À…  ⁄◊œŒ ◊ ’€¡».\n\r");
-	ch->send_to("Ù◊œ— –œ–Ÿ‘À¡ ⁄¡ÀœŒﬁ…Ã¡”ÿ Œ≈’ƒ¡ﬁ≈ .\n\r");
-	return;
+        victim->send_to("–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –ª–µ–≥–∫–∏–π –∑–≤–æ–Ω –≤ —É—à–∞—Ö.\n\r");
+        ch->send_to("–¢–≤–æ—è –ø–æ–ø—ã—Ç–∫–∞ –∑–∞–∫–æ–Ω—á–∏–ª–∞—Å—å –Ω–µ—É–¥–∞—á–µ–π.\n\r");
+        return;
     }
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
-	affect = skillManager->find( sn )->getAffect( );
+        affect = skillManager->find( sn )->getAffect( );
 
-	if (affect && affect->isDispelled( ))
-	    if (checkDispel( level, victim, sn )) 
-		found = true;
+        if (affect && affect->isDispelled( ))
+            if (checkDispel( level, victim, sn )) 
+                found = true;
     }
 
     if (found)
-	ch->send_to("Ok.\n\r");
+        ch->send_to("Ok.\n\r");
     else
-	ch->send_to("Ù◊œ— –œ–Ÿ‘À¡ ⁄¡ÀœŒﬁ…Ã¡”ÿ Œ≈’ƒ¡ﬁ≈ .\n\r");
+        ch->send_to("–¢–≤–æ—è –ø–æ–ø—ã—Ç–∫–∞ –∑–∞–∫–æ–Ω—á–∏–ª–∞—Å—å –Ω–µ—É–¥–∞—á–µ–π.\n\r");
 }
 
 
@@ -280,13 +280,13 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
   if ( victim->isAffected(sn ) )
     {
       if (victim == ch)
-       	ch->send_to("Ù◊œ— Àœ÷¡ ’÷≈ ‘◊≈“ƒ¡, À¡À ƒ“¡ÀœŒÿ—.\n\r");
+               ch->send_to("–¢–≤–æ—è –∫–æ–∂–∞ —É–∂–µ —Ç–≤–µ—Ä–¥–∞, –∫–∞–∫ –¥—Ä–∞–∫–æ–Ω—å—è.\n\r");
       else
-       	act_p("Îœ÷¡ $C2 ’÷≈ ‘◊≈“ƒ¡, À¡À ƒ“¡ÀœŒÿ—.",
+               act_p("–ö–æ–∂–∞ $C2 —É–∂–µ —Ç–≤–µ—Ä–¥–∞, –∫–∞–∫ –¥—Ä–∞–∫–æ–Ω—å—è.",
                ch,0,victim,TO_CHAR,POS_RESTING);
       return;
     }
-  af.where	= TO_AFFECTS;
+  af.where        = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = level;
@@ -294,9 +294,9 @@ VOID_SPELL(DragonSkin)::run( Character *ch, Character *victim, int sn, int level
   af.modifier  = - (2 * level);
   af.bitvector = 0;
   affect_to_char( victim, &af );
-  act_p( "Îœ÷¡ $c2 ”‘¡Œœ◊…‘”— ‘◊≈“÷≈ ƒ“¡ÀœŒÿ≈ .",
+  act_p( "–ö–æ–∂–∞ $c2 —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è —Ç–≤–µ—Ä–∂–µ –¥—Ä–∞–∫–æ–Ω—å–µ–π.",
           victim,0,0,TO_ROOM,POS_RESTING );
-  victim->send_to("Ù◊œ— Àœ÷¡ ”‘¡Œœ◊…‘”— ‘◊≈“÷≈ ƒ“¡ÀœŒÿ≈ .\n\r");
+  victim->send_to("–¢–≤–æ—è –∫–æ–∂–∞ —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è —Ç–≤–µ—Ä–∂–µ –¥—Ä–∞–∫–æ–Ω—å–µ–π.\n\r");
   return;
 
 }
@@ -309,23 +309,23 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
 
     if ( victim->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Û…Ãœ◊œ≈ –œÃ≈ ’÷≈ ⁄¡›…›¡≈‘ ‘≈¬—.\n\r");
-	else
-	  act_p("Û…Ãœ◊œ≈ –œÃ≈ ’÷≈ œÀ“’÷¡≈‘ $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        if (victim == ch)
+          ch->send_to("–°–∏–ª–æ–≤–æ–µ –ø–æ–ª–µ —É–∂–µ –∑–∞—â–∏—â–∞–µ—Ç —Ç–µ–±—è.\n\r");
+        else
+          act_p("–°–∏–ª–æ–≤–æ–µ –ø–æ–ª–µ —É–∂–µ –æ–∫—Ä—É–∂–∞–µ—Ç $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
-    af.where	 = TO_AFFECTS;
+    af.where         = TO_AFFECTS;
     af.type      = sn;
-    af.level	 = level;
+    af.level         = level;
     af.duration  = 24;
     af.modifier  = -60;
     af.location  = APPLY_AC;
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    victim->send_to("Û…Ãœ◊¡— ⁄¡›…‘¡ œÀ“’÷¡≈‘ ‘≈¬—.\n\r");
+    victim->send_to("–°–∏–ª–æ–≤–∞—è –∑–∞—â–∏—Ç–∞ –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.\n\r");
     if ( ch != victim )
-	act_p("Û…Ãœ◊¡— ⁄¡›…‘¡ œÀ“’÷¡≈‘ $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("–°–∏–ª–æ–≤–∞—è –∑–∞—â–∏—Ç–∞ –æ–∫—Ä—É–∂–∞–µ—Ç $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
 }
@@ -336,8 +336,8 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (ch->isAffected(sn )) {
-	act_p("ÙŸ ’÷≈ «œ‘œ$g◊œ|◊|◊¡ À ”»◊¡‘À≈ ”œ ⁄ÃœÕ.", ch, 0, 0, TO_CHAR, POS_RESTING);
-	return;
+        act_p("–¢—ã —É–∂–µ –≥–æ—Ç–æ$g–≤–æ|–≤|–≤–∞ –∫ —Å—Ö–≤–∞—Ç–∫–µ —Å–æ –∑–ª–æ–º.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        return;
     }
 
     af.where = TO_RESIST;
@@ -349,7 +349,7 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     af.modifier = 0;
     affect_to_char(ch, &af);
     
-    act_p("‚œ«… ƒ¡“’¿‘ ‘≈¬≈ ”œ–“œ‘…◊Ã—≈Õœ”‘ÿ À ⁄Ã’.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("–ë–æ–≥–∏ –¥–∞—Ä—É—é—Ç —Ç–µ–±–µ —Å–æ–ø—Ä–æ—Ç–∏–≤–ª—è–µ–º–æ—Å—Ç—å –∫ –∑–ª—É.", ch, 0, 0, TO_CHAR, POS_RESTING);
 
 }
 
@@ -358,24 +358,24 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
 SPELL_DECL(SpellResistance);
 VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	Affect af;
+        Affect af;
 
-	if (!ch->isAffected(sn))
-	{
-		ch->send_to("Ù≈–≈“ÿ ⁄¡ÀÃ…Œ¡Œ…— –“…ﬁ…Œ—¿‘ ‘≈¬≈ Õ≈Œÿ€…  ◊“≈ƒ.\n\r");
+        if (!ch->isAffected(sn))
+        {
+                ch->send_to("–¢–µ–ø–µ—Ä—å –∑–∞–∫–ª–∏–Ω–∞–Ω–∏—è –ø—Ä–∏—á–∏–Ω—è—é—Ç —Ç–µ–±–µ –º–µ–Ω—å—à–∏–π –≤—Ä–µ–¥.\n\r");
 
-		af.where = TO_RESIST;
-		af.type = sn;
-		af.duration = level / 10;
-		af.level = ch->getModifyLevel();
-		af.bitvector = RES_SPELL;
-		af.location = 0;
-		af.modifier = 0;
-		affect_to_char(ch, &af);
-	}
-	else
-		ch->send_to("ÙŸ ’÷≈ …Õ≈≈€ÿ ‹‘’ ⁄¡›…‘’.\n\r");
-	return;
+                af.where = TO_RESIST;
+                af.type = sn;
+                af.duration = level / 10;
+                af.level = ch->getModifyLevel();
+                af.bitvector = RES_SPELL;
+                af.location = 0;
+                af.modifier = 0;
+                affect_to_char(ch, &af);
+        }
+        else
+                ch->send_to("–¢—ã —É–∂–µ –∏–º–µ–µ—à—å —ç—Ç—É –∑–∞—â–∏—Ç—É.\n\r");
+        return;
 
 }
 
@@ -389,25 +389,25 @@ VOID_SPELL(MassSanctuary)::run( Character *ch, Room *room, int sn, int level )
 
     for( gch=room->people; gch != 0; gch=gch->next_in_room)
     {
-	if (!is_same_group( gch, ch ))
-	    continue;
+        if (!is_same_group( gch, ch ))
+            continue;
 
-	if (spellbane( ch, gch ))
-	    continue;
-	
-	if (has_sanctuary_msg( ch, gch ))
-	    continue;
+        if (spellbane( ch, gch ))
+            continue;
+        
+        if (has_sanctuary_msg( ch, gch ))
+            continue;
 
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_sanctuary;
-	af.level     = level;
-	af.duration  = number_fuzzy( level/6 );
-	af.bitvector = AFF_SANCTUARY;
-	affect_to_char( gch, &af );
+        af.where     = TO_AFFECTS;
+        af.type      = gsn_sanctuary;
+        af.level     = level;
+        af.duration  = number_fuzzy( level/6 );
+        af.bitvector = AFF_SANCTUARY;
+        affect_to_char( gch, &af );
 
-	act("{W‚≈Ã¡— ¡’“¡{x œÀ“’÷¡≈‘ ‘≈¬—.", gch, 0, 0, TO_CHAR);
-	if (ch != gch)
-	    act("{W‚≈Ã¡— ¡’“¡{x œÀ“’÷¡≈‘ $C4.", ch, 0, gch, TO_CHAR);
+        act("{W–ë–µ–ª–∞—è –∞—É—Ä–∞{x –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.", gch, 0, 0, TO_CHAR);
+        if (ch != gch)
+            act("{W–ë–µ–ª–∞—è –∞—É—Ä–∞{x –æ–∫—Ä—É–∂–∞–µ—Ç $C4.", ch, 0, gch, TO_CHAR);
     }
 }
 
@@ -420,29 +420,29 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
 
     if ( victim->isAffected(gsn_protection_cold) )
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ œ‘ »œÃœƒ¡.", ch,0, 0,TO_CHAR);
-	else
-          act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ œ‘ »œÃœƒ¡.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –æ—Ç —Ö–æ–ª–æ–¥–∞.", ch,0, 0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –æ—Ç —Ö–æ–ª–æ–¥–∞.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     if ( victim->isAffected(gsn_protection_heat) )
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ œ‘ œ«Œ—.", ch,0, 0,TO_CHAR);
-	else
-          act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ œ‘ œ«Œ—.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –æ—Ç –æ–≥–Ω—è.", ch,0, 0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –æ—Ç –æ–≥–Ω—è.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     if ( victim->isAffected(gsn_make_shield) )
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ Ã≈ƒ—ŒŸÕ ›…‘œÕ.", ch,0,0,TO_CHAR);
-	else
-          act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ Ã≈ƒ—ŒŸÕ ›…‘œÕ.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –ª–µ–¥—è–Ω—ã–º —â–∏—Ç–æ–º.", ch,0,0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –ª–µ–¥—è–Ω—ã–º —â–∏—Ç–æ–º.", ch,0,victim,TO_CHAR);
+        return;
     }
     af.where     = TO_AFFECTS;
     af.type      = gsn_protection_cold;
@@ -452,9 +452,9 @@ VOID_SPELL(ProtectionCold)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    victim->send_to("Ù◊œ— ⁄¡›…›≈ŒŒœ”‘ÿ œ‘ ◊œ⁄ƒ≈ ”‘◊…— Œ…⁄À…» ‘≈Õ–≈“¡‘’“ –œ◊Ÿ€¡≈‘”—.\n\r");
+    victim->send_to("–¢–≤–æ—è –∑–∞—â–∏—â–µ–Ω–Ω–æ—Å—Ç—å –æ—Ç –≤–æ–∑–¥–µ–π—Å—Ç–≤–∏—è –Ω–∏–∑–∫–∏—Ö —Ç–µ–º–ø–µ—Ä–∞—Ç—É—Ä –ø–æ–≤—ã—à–∞–µ—Ç—Å—è.\n\r");
     if ( ch != victim )
-	act_p("˙¡›…›≈ŒŒœ”‘ÿ $C2 œ‘ ◊œ⁄ƒ≈ ”‘◊…— Œ…⁄À…» ‘≈Õ–≈“¡‘’“ –œ◊Ÿ€¡≈‘”—.",
+        act_p("–ó–∞—â–∏—â–µ–Ω–Ω–æ—Å—Ç—å $C2 –æ—Ç –≤–æ–∑–¥–µ–π—Å—Ç–≤–∏—è –Ω–∏–∑–∫–∏—Ö —Ç–µ–º–ø–µ—Ä–∞—Ç—É—Ä –ø–æ–≤—ã—à–∞–µ—Ç—Å—è.",
               ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -469,11 +469,11 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     if ( IS_AFFECTED(victim, AFF_PROTECT_EVIL)
     ||   IS_AFFECTED(victim, AFF_PROTECT_GOOD))
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡.", ch,0, 0,TO_CHAR);
-	else
-	  act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞.", ch,0, 0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -484,9 +484,9 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector = AFF_PROTECT_EVIL;
     affect_to_char( victim, &af );
-    victim->send_to("ÙŸ ﬁ’◊”‘◊’≈€ÿ ⁄¡›…‘’ ”◊≈‘ÃŸ» ”…Ã.\n\r");
+    victim->send_to("–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –∑–∞—â–∏—Ç—É —Å–≤–µ—Ç–ª—ã—Ö —Å–∏–ª.\n\r");
     if ( ch != victim )
-	act_p("$C1 œ¬“≈‘¡≈‘ ⁄¡›…‘’ ”◊≈‘ÃŸ» ”…Ã.",
+        act_p("$C1 –æ–±—Ä–µ—Ç–∞–µ—Ç –∑–∞—â–∏—Ç—É —Å–≤–µ—Ç–ª—ã—Ö —Å–∏–ª.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -501,11 +501,11 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     if ( IS_AFFECTED(victim, AFF_PROTECT_GOOD)
     ||   IS_AFFECTED(victim, AFF_PROTECT_EVIL))
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡.", ch,0, 0,TO_CHAR);
-	else
-	  act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞.", ch,0, 0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -516,9 +516,9 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector = AFF_PROTECT_GOOD;
     affect_to_char( victim, &af );
-    victim->send_to("ÙŸ ﬁ’◊”‘◊’≈€ÿ ⁄¡›…‘’ ‘≈ÕŒŸ» ”…Ã.\n\r");
+    victim->send_to("–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –∑–∞—â–∏—Ç—É —Ç–µ–º–Ω—ã—Ö —Å–∏–ª.\n\r");
     if ( ch != victim )
-	act_p("$C1 œ¬“≈‘¡≈‘ ⁄¡›…‘’ ‘≈ÕŒŸ» ”…Ã.",
+        act_p("$C1 –æ–±—Ä–µ—Ç–∞–µ—Ç –∑–∞—â–∏—Ç—É —Ç–µ–º–Ω—ã—Ö —Å–∏–ª.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -532,29 +532,29 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
 
     if ( victim->isAffected(gsn_protection_heat) )
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ œ‘ œ«Œ—.", ch,0, 0,TO_CHAR);
-	else
-          act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ œ‘ œ«Œ—.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –æ—Ç –æ–≥–Ω—è.", ch,0, 0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –æ—Ç –æ–≥–Ω—è.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     if ( victim->isAffected(gsn_protection_cold) )
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ œ‘ »œÃœƒ¡.", ch,0, 0,TO_CHAR);
-	else
-          act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ œ‘ »œÃœƒ¡.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –æ—Ç —Ö–æ–ª–æ–¥–∞.", ch,0, 0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –æ—Ç —Ö–æ–ª–æ–¥–∞.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     if ( victim->isAffected(gsn_make_shield) )
     {
-	if (victim == ch)
-          act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ œ«Œ≈ŒŒŸÕ ›…‘œÕ.", ch,0,0,TO_CHAR);
-	else
-          act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ œ«Œ≈ŒŒŸÕ ›…‘œÕ.", ch,0,victim,TO_CHAR);
-	return;
+        if (victim == ch)
+          act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –æ–≥–Ω–µ–Ω–Ω—ã–º —â–∏—Ç–æ–º.", ch,0,0,TO_CHAR);
+        else
+          act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –æ–≥–Ω–µ–Ω–Ω—ã–º —â–∏—Ç–æ–º.", ch,0,victim,TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -565,9 +565,9 @@ VOID_SPELL(ProtectionHeat)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    victim->send_to("Ù◊œ— ⁄¡›…›≈ŒŒœ”‘ÿ œ‘ ◊œ⁄ƒ≈ ”‘◊…— ◊Ÿ”œÀ…» ‘≈Õ–≈“¡‘’“ –œ◊Ÿ€¡≈‘”—.\n\r");
+    victim->send_to("–¢–≤–æ—è –∑–∞—â–∏—â–µ–Ω–Ω–æ—Å—Ç—å –æ—Ç –≤–æ–∑–¥–µ–π—Å—Ç–≤–∏—è –≤—ã—Å–æ–∫–∏—Ö —Ç–µ–º–ø–µ—Ä–∞—Ç—É—Ä –ø–æ–≤—ã—à–∞–µ—Ç—Å—è.\n\r");
     if ( ch != victim )
-	act_p("˙¡›…›≈ŒŒœ”‘ÿ $C2 œ‘ ◊œ⁄ƒ≈ ”‘◊…— ◊Ÿ”œÀ…» ‘≈Õ–≈“¡‘’“ –œ◊Ÿ€¡≈‘”—.",
+        act_p("–ó–∞—â–∏—â–µ–Ω–Ω–æ—Å—Ç—å $C2 –æ—Ç –≤–æ–∑–¥–µ–π—Å—Ç–≤–∏—è –≤—ã—Å–æ–∫–∏—Ö —Ç–µ–º–ø–µ—Ä–∞—Ç—É—Ä –ø–æ–≤—ã—à–∞–µ—Ç—Å—è.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -580,7 +580,7 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("ÙŸ –“…œ¬“≈‘¡≈€ÿ …ÕÕ’Œ…‘≈‘ À Œ≈«¡‘…◊ŒŸÕ ¡‘¡À¡Õ.\n\r");
+      ch->send_to("–¢—ã –ø—Ä–∏–æ–±—Ä–µ—Ç–∞–µ—à—å –∏–º–º—É–Ω–∏—Ç–µ—Ç –∫ –Ω–µ–≥–∞—Ç–∏–≤–Ω—ã–º –∞—Ç–∞–∫–∞–º.\n\r");
 
       af.where = TO_IMMUNE;
       af.type = sn;
@@ -592,7 +592,7 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
       affect_to_char(ch, &af);
     }
   else
-      ch->send_to("ı ‘≈¬— ’÷≈ ≈”‘ÿ …ÕÕ’Œ…‘≈‘ À Œ≈«¡‘…◊ŒŸÕ ¡‘¡À¡Õ.\n\r");
+      ch->send_to("–£ —Ç–µ–±—è —É–∂–µ –µ—Å—Ç—å –∏–º–º—É–Ω–∏—Ç–µ—Ç –∫ –Ω–µ–≥–∞—Ç–∏–≤–Ω—ã–º –∞—Ç–∞–∫–∞–º.\n\r");
  return;
 
 }
@@ -606,13 +606,13 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
 
   if (victim->isAffected(sn)) {
       if (victim == ch)
-       	ch->send_to("Ô»“¡ŒŒŸ  ›…‘ ’÷≈ œÀ“’÷¡≈‘ ‘≈¬—.\n\r");
+               ch->send_to("–û—Ö—Ä–∞–Ω–Ω—ã–π —â–∏—Ç —É–∂–µ –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.\n\r");
       else
-       	act_p("Ô»“¡ŒŒŸ  ›…‘ ’÷≈ œÀ“’÷¡≈‘ $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+               act_p("–û—Ö—Ä–∞–Ω–Ω—ã–π —â–∏—Ç —É–∂–µ –æ–∫—Ä—É–∂–∞–µ—Ç $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
       return;
   }
 
-  af.where	= TO_AFFECTS;
+  af.where        = TO_AFFECTS;
   af.type      = sn;
   af.level     = level;
   af.duration  = number_fuzzy( level / 30 ) + 3;
@@ -621,11 +621,11 @@ VOID_SPELL(ProtectiveShield)::run( Character *ch, Character *victim, int sn, int
   af.bitvector = 0;
   affect_to_char( victim, &af );
   if (chance(1)) {
-      act_p( "“≈ƒœ»“¡Œ…‘≈ÃÿŒŸ  ›…‘ œÀ“’÷¡≈‘ $c4.",victim,0,0,TO_ROOM,POS_RESTING);
-      victim->send_to("“≈ƒœ»“¡Œ…‘≈ÃÿŒŸ  ›…‘ œÀ“’÷¡≈‘ ‘≈¬—.\n\r");
+      act_p( "–ü—Ä–µ–¥–æ—Ö—Ä–∞–Ω–∏—Ç–µ–ª—å–Ω—ã–π —â–∏—Ç –æ–∫—Ä—É–∂–∞–µ—Ç $c4.",victim,0,0,TO_ROOM,POS_RESTING);
+      victim->send_to("–ü—Ä–µ–¥–æ—Ö—Ä–∞–Ω–∏—Ç–µ–ª—å–Ω—ã–π —â–∏—Ç –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.\n\r");
   } else {
-      act_p( "Ô»“¡ŒŒŸ  ›…‘ œÀ“’÷¡≈‘ $c4.",victim,0,0,TO_ROOM,POS_RESTING);
-      victim->send_to("Ô»“¡ŒŒŸ  ›…‘ œÀ“’÷¡≈‘ ‘≈¬—.\n\r");
+      act_p( "–û—Ö—Ä–∞–Ω–Ω—ã–π —â–∏—Ç –æ–∫—Ä—É–∂–∞–µ—Ç $c4.",victim,0,0,TO_ROOM,POS_RESTING);
+      victim->send_to("–û—Ö—Ä–∞–Ω–Ω—ã–π —â–∏—Ç –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.\n\r");
   }
 }
 
@@ -636,7 +636,7 @@ VOID_SPELL(Resilience)::run( Character *ch, Character *victim, int sn, int level
     Affect af;
 
     if (!ch->isAffected(sn)) {
-      ch->println("ÙŸ –“…œ¬“≈‘¡≈€ÿ ’”‘œ ﬁ…◊œ”‘ÿ À ‹Œ≈“«≈‘…ﬁ≈”À…Õ ¡‘¡À¡Õ.");
+      ch->println("–¢—ã –ø—Ä–∏–æ–±—Ä–µ—Ç–∞–µ—à—å —É—Å—Ç–æ–π—á–∏–≤–æ—Å—Ç—å –∫ —ç–Ω–µ—Ä–≥–µ—Ç–∏—á–µ—Å–∫–∏–º –∞—Ç–∞–∫–∞–º.");
 
       af.where = TO_RESIST;
       af.type = sn;
@@ -648,7 +648,7 @@ VOID_SPELL(Resilience)::run( Character *ch, Character *victim, int sn, int level
       affect_to_char(ch, &af);
     }
   else
-      ch->println("ı ‘≈¬— ’÷≈ ≈”‘ÿ ’”‘œ ﬁ…◊œ”‘ÿ À ‹Œ≈“«≈‘…ﬁ≈”À…Õ ¡‘¡À¡Õ.");
+      ch->println("–£ —Ç–µ–±—è —É–∂–µ –µ—Å—Ç—å —É—Å—Ç–æ–π—á–∏–≤–æ—Å—Ç—å –∫ —ç–Ω–µ—Ä–≥–µ—Ç–∏—á–µ—Å–∫–∏–º –∞—Ç–∞–∫–∞–º.");
 
 }
 
@@ -658,7 +658,7 @@ VOID_SPELL(Sanctuary)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (has_sanctuary_msg( ch, victim ))
-	return;
+        return;
 
     af.where     = TO_AFFECTS;
     af.type      = sn;
@@ -666,8 +666,8 @@ VOID_SPELL(Sanctuary)::run( Character *ch, Character *victim, int sn, int level 
     af.duration  = level / 6;
     af.bitvector = AFF_SANCTUARY;
     affect_to_char( victim, &af );
-    act("{W‚≈Ã¡— ¡’“¡{x œÀ“’÷¡≈‘ $c4.", victim, 0, 0, TO_ROOM);
-    act("{W‚≈Ã¡— ¡’“¡{x œÀ“’÷¡≈‘ ‘≈¬—.", victim, 0, 0, TO_CHAR);
+    act("{W–ë–µ–ª–∞—è –∞—É—Ä–∞{x –æ–∫—Ä—É–∂–∞–µ—Ç $c4.", victim, 0, 0, TO_ROOM);
+    act("{W–ë–µ–ª–∞—è –∞—É—Ä–∞{x –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.", victim, 0, 0, TO_CHAR);
 }
 
 SPELL_DECL(Stardust);
@@ -676,15 +676,15 @@ VOID_SPELL(Stardust)::run( Character *ch, Character *victim, int sn, int level )
     Affect af;
 
     if (has_sanctuary_msg( ch, victim ))
-	return;
+        return;
 
     af.where     = TO_AFFECTS;
     af.type      = sn;
     af.level     = level;
     af.duration  = level / 6;
     affect_to_char( victim, &af );
-    act("Ì≈“√¡¿›¡— {W⁄{w◊≈{W⁄ƒ{wŒ¡— {W–{wŸÃÿ ⁄¡À“’÷…Ã¡”ÿ ◊œÀ“’« $c2.", victim, 0, 0, TO_ROOM);
-    act("Ì≈“√¡¿›¡— {W⁄{w◊≈{W⁄ƒ{wŒ¡— {W–{wŸÃÿ ⁄¡À“’÷…Ã¡”ÿ ◊œÀ“’« ‘≈¬—.", victim, 0, 0, TO_CHAR);
+    act("–ú–µ—Ä—Ü–∞—é—â–∞—è {W–∑{w–≤–µ{W–∑–¥{w–Ω–∞—è {W–ø{w—ã–ª—å –∑–∞–∫—Ä—É–∂–∏–ª–∞—Å—å –≤–æ–∫—Ä—É–≥ $c2.", victim, 0, 0, TO_ROOM);
+    act("–ú–µ—Ä—Ü–∞—é—â–∞—è {W–∑{w–≤–µ{W–∑–¥{w–Ω–∞—è {W–ø{w—ã–ª—å –∑–∞–∫—Ä—É–∂–∏–ª–∞—Å—å –≤–æ–∫—Ä—É–≥ —Ç–µ–±—è.", victim, 0, 0, TO_CHAR);
 }
 
 SPELL_DECL(Shield);
@@ -694,11 +694,11 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
 
     if ( victim->isAffected(sn ) )
     {
-	if (victim == ch)
-	    act("ÙŸ ’÷≈ ⁄¡›…›≈$gŒœ|Œ|Œ¡ ⁄¡ÀÃ…Œ¡Œ…≈Õ ›…‘¡.", ch, 0, 0, TO_CHAR);
-	else
-	    act("$C1 ’÷≈ ⁄¡›…›≈$GŒœ|Œ|Œ¡ ⁄¡ÀÃ…Œ¡Œ…≈Õ ›…‘¡.", ch, 0, victim, TO_CHAR);
-	return;
+        if (victim == ch)
+            act("–¢—ã —É–∂–µ –∑–∞—â–∏—â–µ$g–Ω–æ|–Ω|–Ω–∞ –∑–∞–∫–ª–∏–Ω–∞–Ω–∏–µ–º —â–∏—Ç–∞.", ch, 0, 0, TO_CHAR);
+        else
+            act("$C1 —É–∂–µ –∑–∞—â–∏—â–µ$G–Ω–æ|–Ω|–Ω–∞ –∑–∞–∫–ª–∏–Ω–∞–Ω–∏–µ–º —â–∏—Ç–∞.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -711,11 +711,11 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
     affect_to_char( victim, &af );
 
     if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
-	act("‚œ÷≈”‘◊≈ŒŒ¡— ‹Œ≈“«…— œÀ“’÷¡≈‘ ‘≈¬— ›…‘œÕ.", victim, 0, 0, TO_CHAR);
-	act("‚œ÷≈”‘◊≈ŒŒ¡— ‹Œ≈“«…— œÀ“’÷¡≈‘ $c4 ›…‘œÕ.", victim, 0, 0, TO_ROOM);
+        act("–ë–æ–∂–µ—Å—Ç–≤–µ–Ω–Ω–∞—è —ç–Ω–µ—Ä–≥–∏—è –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è —â–∏—Ç–æ–º.", victim, 0, 0, TO_CHAR);
+        act("–ë–æ–∂–µ—Å—Ç–≤–µ–Ω–Ω–∞—è —ç–Ω–µ—Ä–≥–∏—è –æ–∫—Ä—É–∂–∞–µ—Ç $c4 —â–∏—Ç–æ–º.", victim, 0, 0, TO_ROOM);
     } else {
-	act("˜œÃ€≈¬ŒŸ  ›…‘ œÀ“’÷¡≈‘ ‘≈¬—.", victim, 0, 0, TO_CHAR);
-	act("˜œÃ€≈¬ŒŸ  ›…‘ œÀ“’÷¡≈‘ $c4.", victim, 0, 0, TO_ROOM);
+        act("–í–æ–ª—à–µ–±–Ω—ã–π —â–∏—Ç –æ–∫—Ä—É–∂–∞–µ—Ç —Ç–µ–±—è.", victim, 0, 0, TO_CHAR);
+        act("–í–æ–ª—à–µ–±–Ω—ã–π —â–∏—Ç –æ–∫—Ä—É–∂–∞–µ—Ç $c4.", victim, 0, 0, TO_ROOM);
     }
 }
 
@@ -728,12 +728,12 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
 
     if ( ch->isAffected(sn ) )
     {
-	if (victim == ch)
-	  ch->send_to("Ù◊œ— Àœ÷¡ ’÷≈ ‘◊≈“ƒ¡ À¡À À¡Õ≈Œÿ.\n\r");
-	else
-	  act_p("Îœ÷¡ $C2 ’÷≈ ‘◊≈“ƒ¡ À¡À À¡Õ≈Œÿ.",
+        if (victim == ch)
+          ch->send_to("–¢–≤–æ—è –∫–æ–∂–∞ —É–∂–µ —Ç–≤–µ—Ä–¥–∞ –∫–∞–∫ –∫–∞–º–µ–Ω—å.\n\r");
+        else
+          act_p("–ö–æ–∂–∞ $C2 —É–∂–µ —Ç–≤–µ—Ä–¥–∞ –∫–∞–∫ –∫–∞–º–µ–Ω—å.",
                  ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        return;
     }
 
     af.where     = TO_AFFECTS;
@@ -744,7 +744,7 @@ VOID_SPELL(StoneSkin)::run( Character *ch, Character *victim, int sn, int level 
     af.modifier  = -1 * max(40,20 + level / 2);  /*af.modifier=-40;*/
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    act_p( "Îœ÷¡ $c2 ”‘¡Œœ◊…‘”— ‘◊≈“÷≈ À¡ÕŒ—.",
+    act_p( "–ö–æ–∂–∞ $c2 —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è —Ç–≤–µ—Ä–∂–µ –∫–∞–º–Ω—è.",
             victim, 0, 0, TO_ROOM,POS_RESTING);
-    victim->send_to("Ù◊œ— Àœ÷¡ ”‘¡Œœ◊…‘”— ‘◊≈“÷≈ À¡ÕŒ—.\n\r");
+    victim->send_to("–¢–≤–æ—è –∫–æ–∂–∞ —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è —Ç–≤–µ—Ä–∂–µ –∫–∞–º–Ω—è.\n\r");
 }

@@ -25,7 +25,7 @@ friend class InvasionMob;
 friend class InvasionHelper;
 friend class InvasionInstrument;
 public:
-    typedef ::Pointer<InvasionGQuest>	Pointer;
+    typedef ::Pointer<InvasionGQuest>        Pointer;
     
     InvasionGQuest( );
     InvasionGQuest( const DLString& );

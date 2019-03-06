@@ -26,27 +26,27 @@ COMMAND(Lover, "lover")
     DLString cmd = arguments.getOneArgument( );
     
     if (ch->is_npc()) {
-	ch->send_to("Тебе нельзя.\n\r");
-	return;
+        ch->send_to("п╒п╣п╠п╣ п╫п╣п╩я▄п╥я▐.\n\r");
+        return;
     }
 
     if (IS_AFFECTED(ch,AFF_CHARM)) {
-	act_p("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR, POS_RESTING);  
-	act_p("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT, POS_RESTING);
-	return;
+        act_p("... п╫п╬ я│п╣я─п╢я├я┐ п╫п╣ п©я─п╦п╨п╟п╤п╣я┬я▄.", ch, 0, 0, TO_CHAR, POS_RESTING);  
+        act_p("$c1 я┐я┘п╪я▀п╩я▐п╣я┌я│я▐ - я│п╣я─п╢я├я┐ п╫п╣ п©я─п╦п╨п╟п╤п╣я┬я▄.", ch, 0, ch->master, TO_VICT, POS_RESTING);
+        return;
     }
     
     if (cmd.empty( ))
-	usage( ch );
+        usage( ch );
     else if (arg_is_list( cmd ))
-	list( ch, arguments );
-    else if (arg_oneof( cmd, "add", "добавить" ))
-	add( ch, arguments );
-    else if (arg_oneof( cmd, "del", "удалить" ))
-	del( ch, arguments );
+        list( ch, arguments );
+    else if (arg_oneof( cmd, "add", "п╢п╬п╠п╟п╡п╦я┌я▄" ))
+        add( ch, arguments );
+    else if (arg_oneof( cmd, "del", "я┐п╢п╟п╩п╦я┌я▄" ))
+        del( ch, arguments );
     else 
-	usage( ch );
-	
+        usage( ch );
+        
 }
 
 void Lover::list( Character* ch, DLString arguments) 
@@ -57,23 +57,23 @@ void Lover::list( Character* ch, DLString arguments)
 
     attributes = &ch->getPC( )->getAttributes( );
     XMLAttributes::iterator ipos = attributes->find( "lovers" );
-	
+        
     if (ipos == attributes->end( ) ||
-	(pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( )) 
+        (pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( )) 
     {
-	str << "Ты никого не любишь." << endl;
+        str << "п╒я▀ п╫п╦п╨п╬пЁп╬ п╫п╣ п╩я▌п╠п╦я┬я▄." << endl;
     }
     else {
-	str << "{W- {RЛюбовники{W -" << endl;
-	
-	for (XMLLovers::iterator loverpos = pointer->lovers.begin( );
-	     loverpos != pointer->lovers.end( );
-	     loverpos++) 
-	{
-	    str << loverpos->first << endl;
-	}
-	
-	str << "{x";
+        str << "{W- {Rп⌡я▌п╠п╬п╡п╫п╦п╨п╦{W -" << endl;
+        
+        for (XMLLovers::iterator loverpos = pointer->lovers.begin( );
+             loverpos != pointer->lovers.end( );
+             loverpos++) 
+        {
+            str << loverpos->first << endl;
+        }
+        
+        str << "{x";
    }
     
     ch->send_to( str );
@@ -85,13 +85,13 @@ void Lover::add( Character* ch, DLString arguments)
     std::basic_ostringstream<char> str;
 
     if (PCMemoryInterface* pci = PCharacterManager::find( name )) {
-	ch->getPC( )->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->
-			    lovers.put( pci->getName( ) );
+        ch->getPC( )->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->
+                            lovers.put( pci->getName( ) );
 
-	str << "Ты отдаешь свое сердце "<<  pci->getName( ) << "." << endl;
+        str << "п╒я▀ п╬я┌п╢п╟п╣я┬я▄ я│п╡п╬п╣ я│п╣я─п╢я├п╣ "<<  pci->getName( ) << "." << endl;
     }
     else {
-	str << "Таких нет." << endl;
+        str << "п╒п╟п╨п╦я┘ п╫п╣я┌." << endl;
     }
 
     ch->send_to( str );
@@ -106,29 +106,29 @@ void Lover::del( Character* ch, DLString arguments)
 
     attributes = &ch->getPC( )->getAttributes( );
     XMLAttributes::iterator ipos = attributes->find( "lovers" );
-	
+        
     if (ipos == attributes->end( ) ||
-	(pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( )) 
-    {	
-	str << "Но твой список любовников и так пуст!" << endl;
+        (pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( )) 
+    {        
+        str << "п²п╬ я┌п╡п╬п╧ я│п©п╦я│п╬п╨ п╩я▌п╠п╬п╡п╫п╦п╨п╬п╡ п╦ я┌п╟п╨ п©я┐я│я┌!" << endl;
     }
     else {
-	name.toLower( ).upperFirstCharacter( );
+        name.toLower( ).upperFirstCharacter( );
 
-	if (pointer->lovers.isPresent( name )) {
-	    XMLAttributeMarriage::Pointer mattr;
-	    
-	    mattr = attributes->findAttr<XMLAttributeMarriage>( "marriage" );
+        if (pointer->lovers.isPresent( name )) {
+            XMLAttributeMarriage::Pointer mattr;
+            
+            mattr = attributes->findAttr<XMLAttributeMarriage>( "marriage" );
 
-	    if (mattr && mattr->spouse.getValue( ) == name) {
-		str << "Только развод поможет тебе." << endl;
-	    } else {
-		pointer->lovers.erase( name );
-		str << "Твое сердце больше не трепещет при виде " << name << "." << endl;
-	    }
-	}
-	else 
-	    str << "Ты и так не пылаешь страстью к " << name << ". " << endl;	
+            if (mattr && mattr->spouse.getValue( ) == name) {
+                str << "п╒п╬п╩я▄п╨п╬ я─п╟п╥п╡п╬п╢ п©п╬п╪п╬п╤п╣я┌ я┌п╣п╠п╣." << endl;
+            } else {
+                pointer->lovers.erase( name );
+                str << "п╒п╡п╬п╣ я│п╣я─п╢я├п╣ п╠п╬п╩я▄я┬п╣ п╫п╣ я┌я─п╣п©п╣я┴п╣я┌ п©я─п╦ п╡п╦п╢п╣ " << name << "." << endl;
+            }
+        }
+        else 
+            str << "п╒я▀ п╦ я┌п╟п╨ п╫п╣ п©я▀п╩п╟п╣я┬я▄ я│я┌я─п╟я│я┌я▄я▌ п╨ " << name << ". " << endl;        
     }
     
     ch->send_to( str );
@@ -138,10 +138,22 @@ void Lover::usage( Character* ch )
 {
     std::basic_ostringstream<char> str;
     
-    str << "{lRлюбовники список{lElover list{lx - просмотр списка любовников" << endl
-        << "{lRлюбовники добавить{lElover add{lx <жертва> - отдать свое сердце кому-то" << endl
-	<< "{lRлюбовники удалить{lElover del{lx <жертва> - удалить кого-то из списка любовников" << endl;
+    str << "{lRп╩я▌п╠п╬п╡п╫п╦п╨п╦ я│п©п╦я│п╬п╨{lElover list{lx - п©я─п╬я│п╪п╬я┌я─ я│п©п╦я│п╨п╟ п╩я▌п╠п╬п╡п╫п╦п╨п╬п╡" << endl
+        << "{lRп╩я▌п╠п╬п╡п╫п╦п╨п╦ п╢п╬п╠п╟п╡п╦я┌я▄{lElover add{lx <п╤п╣я─я┌п╡п╟> - п╬я┌п╢п╟я┌я▄ я│п╡п╬п╣ я│п╣я─п╢я├п╣ п╨п╬п╪я┐-я┌п╬" << endl
+        << "{lRп╩я▌п╠п╬п╡п╫п╦п╨п╦ я┐п╢п╟п╩п╦я┌я▄{lElover del{lx <п╤п╣я─я┌п╡п╟> - я┐п╢п╟п╩п╦я┌я▄ п╨п╬пЁп╬-я┌п╬ п╦п╥ я│п©п╦я│п╨п╟ п╩я▌п╠п╬п╡п╫п╦п╨п╬п╡" << endl;
 
     ch->send_to( str );
+}
+
+bool mlove_accepts(Character *ch, Character *victim)
+{
+    if (victim->is_npc() || ch->is_npc())
+        return false;
+
+
+    XMLAttributeLovers::Pointer attr =
+        victim->getPC()->getAttributes().findAttr<XMLAttributeLovers>("lovers");
+    
+    return attr && attr->lovers.isPresent(ch->getName()); 
 }
 

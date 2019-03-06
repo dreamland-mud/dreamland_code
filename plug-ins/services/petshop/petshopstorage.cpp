@@ -41,12 +41,12 @@ bool PetShopStorage::canServeClient( Character *client )
 
 void PetShopStorage::msgListEmpty( Character *client )
 {
-    client->println( "éÚ×ÉÎÉ, ×ÓÅ ÖÉ×ÏÔÎÙÅ ÄÁ×ÎÏ ÒÁÚÂÅÖÁÌÉÓØ." );
+    client->println( "Ð˜Ð·Ð²Ð¸Ð½Ð¸, Ð²ÑÐµ Ð¶Ð¸Ð²Ð¾Ñ‚Ð½Ñ‹Ðµ Ð´Ð°Ð²Ð½Ð¾ Ñ€Ð°Ð·Ð±ÐµÐ¶Ð°Ð»Ð¸ÑÑŒ." );
 }
 
 void PetShopStorage::msgListBefore( Character *client )
 {
-    client->println( "öÉ×ÏÔÎÙÅ ÄÌÑ ÐÒÏÄÁÖÉ:" );
+    client->println( "Ð–Ð¸Ð²Ð¾Ñ‚Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ð¸:" );
 }
 
 void PetShopStorage::msgListAfter( Character *client )
@@ -63,13 +63,13 @@ void PetShopStorage::msgBuyRequest( Character * )
 
 struct PetSortItem {
     PetSortItem(Character *client, Pet::Pointer &pet)
-	: pet(pet)
+        : pet(pet)
     {
-	level = pet->getLevel( client );
+        level = pet->getLevel( client );
     }
     static bool compare( PetSortItem &a, PetSortItem &b )
     {
-	return a.level <= b.level;
+        return a.level <= b.level;
     }
     int level;
     Pet::Pointer pet;
@@ -83,28 +83,28 @@ void PetShopStorage::toStream( Character *client, ostringstream &buf )
     PetSortList::const_iterator p;
 
     for (rch = room->people; rch; rch = rch->next_in_room) {
-	Pet::Pointer pet = getPetBehavior( rch );
-	
-	if (pet)
-	    pets.push_back( PetSortItem( client, pet ) );
+        Pet::Pointer pet = getPetBehavior( rch );
+        
+        if (pet)
+            pets.push_back( PetSortItem( client, pet ) );
     }
     
     pets.sort( PetSortItem::compare );
 
     for (p = pets.begin( ); p != pets.end( ); p++) {
-	p->pet->toStream( client, buf );
-	buf << endl;
+        p->pet->toStream( client, buf );
+        buf << endl;
     }
 }
 
 void PetShopStorage::msgArticleNotFound( Character *client )
 {
-    client->println( "éÚ×ÉÎÉ, ÔÙ ÎÅ ÍÏÖÅÛØ ËÕÐÉÔØ ÜÔÏÇÏ ÚÄÅÓØ." );
+    client->println( "Ð˜Ð·Ð²Ð¸Ð½Ð¸, Ñ‚Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÐºÑƒÐ¿Ð¸Ñ‚ÑŒ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð´ÐµÑÑŒ." );
 }
 
 void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    client->println( "ôÙ ÍÏÖÅÛØ ËÕÐÉÔØ ÔÏÌØËÏ ÏÄÎÏ ÖÉ×ÏÔÎÏÅ." );
+    client->println( "Ð¢Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÐºÑƒÐ¿Ð¸Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¾Ð´Ð½Ð¾ Ð¶Ð¸Ð²Ð¾Ñ‚Ð½Ð¾Ðµ." );
 }
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )
@@ -117,17 +117,17 @@ Pet::Pointer PetShopStorage::getPetBehavior( Character *pet ) const
     Pet::Pointer null;
     
     if (!pet)
-	return null;
+        return null;
 
     if (!pet->is_npc( ))
-	return null;
+        return null;
 
     if (IS_AFFECTED( pet, AFF_CHARM ) || pet->master)
-	return null;
+        return null;
 
     if (!pet->getNPC( )->behavior)
-	return null;
-	
+        return null;
+        
     return pet->getNPC( )->behavior.getDynamicPointer<Pet>( );
 }
 

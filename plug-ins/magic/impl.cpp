@@ -10,10 +10,10 @@ extern "C"
 {
     SO::PluginList initialize_magic( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<ObjectBehaviorRegistrator<SpellBook> >( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<ObjectBehaviorRegistrator<SpellBook> >( ppl );
+        
+        return ppl;
     }
 }

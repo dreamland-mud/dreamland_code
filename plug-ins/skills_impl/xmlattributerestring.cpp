@@ -15,17 +15,17 @@ const DLString XMLAttributeRestring::TYPE = "XMLAttributeRestring";
 void XMLItemRestring::dress( Object *obj, PCharacter *ch ) const
 {
     if (!name.empty( ))
-	obj->setName( name.c_str( ) );
+        obj->setName( name.c_str( ) );
 
     if (!shortDescr.empty( ))
-	obj->setShortDescr( fmt( 0, shortDescr.c_str( ), ch ).c_str( ) );
+        obj->setShortDescr( fmt( 0, shortDescr.c_str( ), ch ).c_str( ) );
 
     if (!longDescr.empty( ))
-	obj->setDescription( fmt( 0, longDescr.c_str( ), ch ).c_str( ) );
+        obj->setDescription( fmt( 0, longDescr.c_str( ), ch ).c_str( ) );
 
     if (!description.empty( ))
-	obj->addExtraDescr( obj->getName( ), 
-	                    fmt( 0, description.c_str( ), ch ) );
+        obj->addExtraDescr( obj->getName( ), 
+                            fmt( 0, description.c_str( ), ch ) );
 }
 
 void XMLAttributeRestring::dress( Object *obj, PCharacter *ch, const DLString &keyword ) const
@@ -33,7 +33,7 @@ void XMLAttributeRestring::dress( Object *obj, PCharacter *ch, const DLString &k
     const_iterator i = find( keyword.empty( ) ? DEFAULT_KEYWORD : keyword );
 
     if (i == end( ))
-	return;
+        return;
 
     i->second.dress( obj, ch );
 }
@@ -41,14 +41,14 @@ void XMLAttributeRestring::dress( Object *obj, PCharacter *ch, const DLString &k
 void dress_created_item( int sn, Object *obj, Character *ch, const DLString &keyword )
 {
     if (ch->is_npc( ))
-	return;
-	
+        return;
+        
     const DLString &attrName = skillManager->find( sn )->getName( );
     XMLAttributeRestring::Pointer attr = 
-	    ch->getPC( )->getAttributes( ).findAttr<XMLAttributeRestring>( attrName );
+            ch->getPC( )->getAttributes( ).findAttr<XMLAttributeRestring>( attrName );
 
     if (!attr)
-	return;
+        return;
 
     attr->dress( obj, ch->getPC( ), keyword );
 }

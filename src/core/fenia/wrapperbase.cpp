@@ -20,7 +20,7 @@ void WrapperBase::setSelf( Scripting::Object *self )
     this->self = self;
 
     if (self) {
-        if (!zombie) /* ’Õ≈“Ã¡ ‘¡À ’Õ≈“Ã¡ */
+        if (!zombie) /* —É–º–µ—Ä–ª–∞ —Ç–∞–∫ —É–º–µ—Ä–ª–∞ */
             WrapperManagerBase::map[id] = self;
     }
     else {

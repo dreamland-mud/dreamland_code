@@ -18,19 +18,19 @@ TABLE_LOADER(RaceLanguageLoader, "race-languages", "RaceLanguage");
 
 extern "C"
 {
-	SO::PluginList initialize_race( )
-	{
-	    SO::PluginList ppl;
+        SO::PluginList initialize_race( )
+        {
+            SO::PluginList ppl;
 
-	    Plugin::registerPlugin<XMLVariableRegistrator<RaceHelp> >( ppl );
-	    Plugin::registerPlugin<MocRegistrator<DefaultRace> >( ppl );
-	    Plugin::registerPlugin<MocRegistrator<DefaultPCRace> >( ppl );
-	    Plugin::registerPlugin<RaceLoader>( ppl );
-	    Plugin::registerPlugin<MocRegistrator<DefaultRaceLanguage> >( ppl );
-	    Plugin::registerPlugin<RaceLanguageLoader>( ppl );
+            Plugin::registerPlugin<XMLVariableRegistrator<RaceHelp> >( ppl );
+            Plugin::registerPlugin<MocRegistrator<DefaultRace> >( ppl );
+            Plugin::registerPlugin<MocRegistrator<DefaultPCRace> >( ppl );
+            Plugin::registerPlugin<RaceLoader>( ppl );
+            Plugin::registerPlugin<MocRegistrator<DefaultRaceLanguage> >( ppl );
+            Plugin::registerPlugin<RaceLanguageLoader>( ppl );
 
-	    return ppl;
-	}
-	
+            return ppl;
+        }
+        
 }
 

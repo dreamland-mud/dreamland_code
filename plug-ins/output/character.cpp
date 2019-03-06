@@ -28,10 +28,10 @@ static bool mprog_act( Character *ch, const char *msg )
 void Character::println( const DLString &txt )
 {
     if (!txt.empty( )) {
-	ostringstream buf;
-	
-	buf << txt << endl;
-	send_to( buf );
+        ostringstream buf;
+        
+        buf << txt << endl;
+        send_to( buf );
     }
 }
 
@@ -53,7 +53,7 @@ void Character::send_to( const char *txt )
     ostringstream out;
 
     if (!txt || !desc)
-	return;
+        return;
 
     mudtags_convert( txt, out, this );
     desc->send( out.str( ).c_str( ) );
@@ -76,8 +76,8 @@ void Character::vpecho( const char *f, va_list av)
     DLString r;
     
     if (( r = vfmt(this, f, av) ).empty( ))
-	return;
-   	
+        return;
+           
     r += "\r\n";
     send_to( r );
     mprog_act( this, r.c_str( ) );
@@ -95,11 +95,11 @@ void Character::pecho( const char *f, ... )
 void Character::pecho( int pos, const char *f, ... )
 {
     if (position >= pos) {
-	va_list av;
+        va_list av;
 
-	va_start(av, f);
-	vpecho(f, av);
-	va_end(av);
+        va_start(av, f);
+        vpecho(f, av);
+        va_end(av);
     }
 }
 
@@ -147,50 +147,50 @@ void Character::vecho( int pos, int type, Character *vch, const char *f, va_list
     DLString r;
 
     if(in_room == NULL)
-	return;
+        return;
     
     if (type == TO_NOBODY)
-	return;
+        return;
     
     to = in_room->people;
     
     if (type == TO_VICT) {
-	if (!vch || !vch->in_room)
-	    return;
+        if (!vch || !vch->in_room)
+            return;
 
-	to = vch->in_room->people;
+        to = vch->in_room->people;
     }
     
     for ( ; to; to = to->next_in_room) {
-	if (to->position < pos)
-	    continue;
+        if (to->position < pos)
+            continue;
 
-	if (type == TO_CHAR && to != this)
-	    continue;
+        if (type == TO_CHAR && to != this)
+            continue;
 
-	if (type == TO_VICT && (to != vch || to == this))
-	    continue;
+        if (type == TO_VICT && (to != vch || to == this))
+            continue;
 
-	if (type == TO_ROOM && to == this)
-	    continue;
+        if (type == TO_ROOM && to == this)
+            continue;
 
-	if (type == TO_NOTVICT && (to == vch || to == this))
-	    continue;
+        if (type == TO_NOTVICT && (to == vch || to == this))
+            continue;
 
-	if (type != TO_VICT && type != TO_CHAR)
-	    if (!to->can_sense( this ) || (vch && !to->can_sense( vch )))
-		continue;
-	
-	if (( r = vfmt(to, f, av) ).empty( ))
-	    continue;
-	
-	r << "\r\n";
-	targets[to] = r;
-	to->send_to( r );
+        if (type != TO_VICT && type != TO_CHAR)
+            if (!to->can_sense( this ) || (vch && !to->can_sense( vch )))
+                continue;
+        
+        if (( r = vfmt(to, f, av) ).empty( ))
+            continue;
+        
+        r << "\r\n";
+        targets[to] = r;
+        to->send_to( r );
     }
-	
+        
     for (Targets::iterator t = targets.begin( ); t != targets.end( ); t++)
-	mprog_act( t->first, t->second.c_str( ) );
+        mprog_act( t->first, t->second.c_str( ) );
 }
 
 

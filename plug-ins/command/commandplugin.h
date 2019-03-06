@@ -3,18 +3,18 @@
  * ruffina, 2004
  */
 
-#ifndef	COMMANDPLUGIN_H
-#define	COMMANDPLUGIN_H
+#ifndef        COMMANDPLUGIN_H
+#define        COMMANDPLUGIN_H
 
 #include "plugin.h"
 #include "command.h"
 
 class CommandPlugin : public virtual XMLCommand, public virtual Plugin {
 public:
-	typedef ::Pointer<CommandPlugin> Pointer;
+        typedef ::Pointer<CommandPlugin> Pointer;
 
-	virtual void initialization( );
-	virtual void destruction( );
+        virtual void initialization( );
+        virtual void destruction( );
 };
 
 #define COMMAND(C, cmdname)              \

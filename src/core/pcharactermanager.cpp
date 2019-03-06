@@ -34,17 +34,17 @@ PCharacterMemoryList PCharacterManager::allList;
 
 PCharacterManager::PCharacterManager( )
 {
-	checkDuplicate( thisClass );
-	thisClass = this;
+        checkDuplicate( thisClass );
+        thisClass = this;
 }
 
 PCharacterManager::~PCharacterManager( )
 {
-	extractList.clear_delete( );
+        extractList.clear_delete( );
 
-	allList.clear( );		
-	
-	thisClass = 0;
+        allList.clear( );                
+        
+        thisClass = 0;
 }
 
 DLString PCharacterManager::getTableName( ) const
@@ -62,20 +62,20 @@ PCMemoryInterface* PCharacterManager::find( const DLString& name )
     PCharacterMemoryList::iterator ipos;
     
     if (name.empty( ))
-	return NULL;
+        return NULL;
 
     if (name.isRussian( )) {
-	for (ipos = allList.begin( ); ipos != allList.end( ); ipos++)
-	    if (ipos->second->getRussianName( ).decline('7').isName( name ))
-		break;
+        for (ipos = allList.begin( ); ipos != allList.end( ); ipos++)
+            if (ipos->second->getRussianName( ).decline('7').isName( name ))
+                break;
     } else {
-	ipos = allList.find( name );
+        ipos = allList.find( name );
     }
 
     if (ipos != allList.end( ))
-	return ipos->second;
+        return ipos->second;
     else
-	return NULL;
+        return NULL;
 }
 
 PCharacter * PCharacterManager::findPlayer( const DLString &name )
@@ -90,34 +90,34 @@ void PCharacterManager::quit( PCharacter *ch )
     PCharacterMemoryList::iterator ipos = allList.find( ch->getName( ) );
     if( ipos != allList.end( ) )
     {
-	if( PCharacter* pc = dynamic_cast<PCharacter*>( ipos->second ) )
-	{
-	    if(pc != ch) {
-		LogStream::sendWarning( ) << "quit::PCharacter ignoring fake quit for '" << ch->getName() << "'" << endl;
-	    } else {
-		allList[ch->getName()] = pc->getMemory( );
-	    }
-	}
+        if( PCharacter* pc = dynamic_cast<PCharacter*>( ipos->second ) )
+        {
+            if(pc != ch) {
+                LogStream::sendWarning( ) << "quit::PCharacter ignoring fake quit for '" << ch->getName() << "'" << endl;
+            } else {
+                allList[ch->getName()] = pc->getMemory( );
+            }
+        }
     }
     else
     {
-	LogStream::sendWarning( ) << "quit::PCharacter '" << ch->getName() << "' not found" << endl;
+        LogStream::sendWarning( ) << "quit::PCharacter '" << ch->getName() << "' not found" << endl;
     }
 }
 
 void PCharacterManager::update( PCharacter* pc )
 {
-	PCharacterMemoryList::iterator ipos = allList.find( pc->getName( ) );
-	if( ipos != allList.end( ) )
-	{
-		if( PCharacterMemory* pcm = dynamic_cast<PCharacterMemory*>( ipos->second ) )
-		{
-			pc->setMemory( pcm );
-			ddeallocate( pcm );
-		}
-	}
+        PCharacterMemoryList::iterator ipos = allList.find( pc->getName( ) );
+        if( ipos != allList.end( ) )
+        {
+                if( PCharacterMemory* pcm = dynamic_cast<PCharacterMemory*>( ipos->second ) )
+                {
+                        pc->setMemory( pcm );
+                        ddeallocate( pcm );
+                }
+        }
 
-	allList[pc->getName( )] = pc;
+        allList[pc->getName( )] = pc;
 }
 
 
@@ -127,12 +127,12 @@ PCharacter* PCharacterManager::getPCharacter( )
 
     if( !extractList.empty( ) )
     {
-	pch = *extractList.begin( );
-	extractList.erase( extractList.begin( ) );
+        pch = *extractList.begin( );
+        extractList.erase( extractList.begin( ) );
     }
     else
     {
-	pch = dallocate( PCharacter );
+        pch = dallocate( PCharacter );
     }
 
     pch->setID( dreamland->genID( ) );

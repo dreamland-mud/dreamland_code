@@ -24,13 +24,13 @@ bool has_nochannel(Character *ch)
     static const DLString nochannel( "nochannel" );
     
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     if (ch->getPC( )->getAttributes( ).isAvailable( nochannel ))
-	return true;
+        return true;
     
     if (ch->desc && banManager->check( ch->desc, BAN_COMMUNICATE )) 
-	return true;
+        return true;
 
     return false;
 }   
@@ -39,9 +39,9 @@ bool has_nochannel(Character *ch)
  * GlobalChannel
  *-----------------------------------------------------------------------*/
 GlobalChannel::GlobalChannel( )
-	   : soap( false ), translate( false ), nochannel( false ), 
-	     deafenOther( false ), quiet( false ), 
-	     nomob( false ), confirmed( false ), dig( false )
+           : soap( false ), translate( false ), nochannel( false ), 
+             deafenOther( false ), quiet( false ), 
+             nomob( false ), confirmed( false ), dig( false )
 {
 }
 
@@ -50,66 +50,66 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
     Listeners listeners;
     
     if (!msgDisable.empty( )) {
-	ch->println( msgDisable );
-	return;
+        ch->println( msgDisable );
+        return;
     }
     
     if (arg.empty( ) && msgOtherNoarg.empty( )) {
-	if (off == 0 && !msgSelfNoarg.empty( )) {
-	    ch->println( msgSelfNoarg );
-	    return;
-	}
-	
-	TOGGLE_BIT(ch->comm, off);
+        if (off == 0 && !msgSelfNoarg.empty( )) {
+            ch->println( msgSelfNoarg );
+            return;
+        }
+        
+        TOGGLE_BIT(ch->comm, off);
 
-	if (!IS_SET(ch->comm, off)) {
-	    if (msgOn.empty( ))
-		ch->printf( "ëÁÎÁÌ %s ÔÅÐÅÒØ ×ËÌÀÞÅÎ.\r\n", getName( ).c_str( ) );
-	    else
-		ch->println( msgOn );
-	}
-	else {
-	    if (msgOff.empty( ))
-		ch->printf( "ëÁÎÁÌ %s ÔÅÐÅÒØ ×ÙËÌÀÞÅÎ.\r\n", getName( ).c_str( ) );
-	    else
-		ch->println( msgOff );
-	}
+        if (!IS_SET(ch->comm, off)) {
+            if (msgOn.empty( ))
+                ch->printf( "ÐšÐ°Ð½Ð°Ð» %s Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½.\r\n", getName( ).c_str( ) );
+            else
+                ch->println( msgOn );
+        }
+        else {
+            if (msgOff.empty( ))
+                ch->printf( "ÐšÐ°Ð½Ð°Ð» %s Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð²Ñ‹ÐºÐ»ÑŽÑ‡ÐµÐ½.\r\n", getName( ).c_str( ) );
+            else
+                ch->println( msgOff );
+        }
 
-	return;
+        return;
     }
     
     if (!canTalkGlobally( ch ))
-	return;
+        return;
 
     REMOVE_BIT(ch->comm, off);
 
     findListeners( ch, listeners );
     
     if (needOutputSelf( ch )) {
-	bool fMild = (IS_SET(ch->comm, COMM_MILDCOLOR) && !msgSelfMild.empty( ));
-	bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
-	const DLString &fmtSelf = fEmpty ? msgListEmpty : fMild ? msgSelfMild : msgSelf;
+        bool fMild = (IS_SET(ch->comm, COMM_MILDCOLOR) && !msgSelfMild.empty( ));
+        bool fEmpty = (!msgListEmpty.empty( ) && listeners.size( ) == 0);
+        const DLString &fmtSelf = fEmpty ? msgListEmpty : fMild ? msgSelfMild : msgSelf;
 
-	DLString outSelf = arg;
-	applyGarble( ch, outSelf, ch );
+        DLString outSelf = arg;
+        applyGarble( ch, outSelf, ch );
 
-	outputSelf( ch, fmtSelf, outSelf );
+        outputSelf( ch, fmtSelf, outSelf );
     }
     
     if (needOutputOther( ch )) {
-	Listeners::iterator i;
+        Listeners::iterator i;
 
-	for (i = listeners.begin( ); i != listeners.end( ); i++) {
-	    bool fNoarg = (arg.empty( ) && !msgOtherNoarg.empty( ));
-	    bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
-	    const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
-	    
-	    DLString outVict = arg;
-	    applyGarble( ch, outVict, *i );
-	    applyTranslation( ch, outVict, *i );
+        for (i = listeners.begin( ); i != listeners.end( ); i++) {
+            bool fNoarg = (arg.empty( ) && !msgOtherNoarg.empty( ));
+            bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
+            const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
+            
+            DLString outVict = arg;
+            applyGarble( ch, outVict, *i );
+            applyTranslation( ch, outVict, *i );
 
-	    outputVict( ch, *i, fmtVict, outVict );
-	}
+            outputVict( ch, *i, fmtVict, outVict );
+        }
     }
 
     triggers( ch, arg );
@@ -118,38 +118,38 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
 bool GlobalChannel::canTalkGlobally( Character *ch ) const
 {
     if (nomob && ch->is_npc( )) {
-	ch->println( "üÔÏÔ ËÁÎÁÌ ÎÅ ÄÌÑ ÔÅÂÑ, ÐÒÏÓÔÉ." );
-	return false;
+        ch->println( "Ð­Ñ‚Ð¾Ñ‚ ÐºÐ°Ð½Ð°Ð» Ð½Ðµ Ð´Ð»Ñ Ñ‚ÐµÐ±Ñ, Ð¿Ñ€Ð¾ÑÑ‚Ð¸." );
+        return false;
     }
     
     if (ch->get_trust( ) < trustSpeak) {
-	ch->println( "÷ ÜÔÏÍ ËÁÎÁÌÅ ÔÙ ÍÏÖÅÛØ ÔÏÌØËÏ ÓÌÕÛÁÔØ, ÐÒÏÓÔÉ." );
-	return false;
+        ch->println( "Ð’ ÑÑ‚Ð¾Ð¼ ÐºÐ°Ð½Ð°Ð»Ðµ Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÑÐ»ÑƒÑˆÐ°Ñ‚ÑŒ, Ð¿Ñ€Ð¾ÑÑ‚Ð¸." );
+        return false;
     }
     
     if (quiet && IS_SET(ch->comm, COMM_QUIET)) {
-	ch->println( "óÎÁÞÁÌÁ ÎÅÏÂÈÏÄÉÍÏ ÐÏ×ÙÎÉÍÁÔØ ×ÁÔÕ ÉÚ ÕÛÅÊ.");
-	return false;
+        ch->println( "Ð¡Ð½Ð°Ñ‡Ð°Ð»Ð° Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð¿Ð¾Ð²Ñ‹Ð½Ð¸Ð¼Ð°Ñ‚ÑŒ Ð²Ð°Ñ‚Ñƒ Ð¸Ð· ÑƒÑˆÐµÐ¹.");
+        return false;
     }
 
     if (checkNoChannel( ch ))
-	return false;
+        return false;
 
     if (checkConfirmed( ch ))
-	return false;
+        return false;
 
     if (checkSoap( ch ))
-	return false;
+        return false;
 
     if (!ch->is_immortal( )) {
-	int cost = ch->max_mana * manaPercent / 100;
+        int cost = ch->max_mana * manaPercent / 100;
 
-	if (ch->mana < cost) {
-	    ch->println( "õ ÔÅÂÑ ÎÅÄÏÓÔÁÔÏÞÎÏ ÓÉÌ, ÞÔÏÂÙ ÏÒÁÔØ ÎÁ ×ÅÓØ ÍÉÒ." );
-	    return false;
-	}
+        if (ch->mana < cost) {
+            ch->println( "Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ ÑÐ¸Ð», Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¾Ñ€Ð°Ñ‚ÑŒ Ð½Ð° Ð²ÐµÑÑŒ Ð¼Ð¸Ñ€." );
+            return false;
+        }
 
-	ch->mana -= cost;
+        ch->mana -= cost;
     }
 
     return true;
@@ -158,31 +158,31 @@ bool GlobalChannel::canTalkGlobally( Character *ch ) const
 bool GlobalChannel::isGlobalListener( Character *ch, Character *victim ) const
 {
     if (victim == ch)
-	return false;
+        return false;
     
     if (!canHear( victim ))
-	return false;
+        return false;
     
     if (!victim->can_sense( ch ))
-	return false;
+        return false;
 
     if (IS_SET(victim->comm, off))
-	return false;
+        return false;
     
     if (quiet && IS_SET(victim->comm, COMM_QUIET))
-	return false;
+        return false;
     
     if (victim->position < positionOther)
-	return false;
+        return false;
     
     if (deafenOther && victim->isAffected(gsn_deafen ))
-	return false;
+        return false;
 
     if (checkIgnore( ch, victim ))
-	return false;
+        return false;
     
     if (checkIsolator( ch, victim ))
-	return false;
+        return false;
 
     return true;
 }
@@ -190,14 +190,14 @@ bool GlobalChannel::isGlobalListener( Character *ch, Character *victim ) const
 bool GlobalChannel::checkConfirmed( Character *ch ) const
 {
     if (!confirmed)
-	return false;
+        return false;
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
         return checkConfirmed( ch->master );
 
     if (!ch->is_npc( ) && !IS_SET(ch->act, PLR_CONFIRMED))
     {
-        ch->println("ôÏÌØËÏ ÐÏÄÔ×ÅÒÖÄÅÎÎÙÅ ÂÏÇÁÍÉ ÐÅÒÓÏÎÁÖÉ ÍÏÇÕÔ ÏÂÝÁÔØÓÑ × ÜÔÏÍ ËÁÎÁÌÅ." );
+        ch->println("Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ð¾Ð´Ñ‚Ð²ÐµÑ€Ð¶Ð´ÐµÐ½Ð½Ñ‹Ðµ Ð±Ð¾Ð³Ð°Ð¼Ð¸ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð¸ Ð¼Ð¾Ð³ÑƒÑ‚ Ð¾Ð±Ñ‰Ð°Ñ‚ÑŒÑÑ Ð² ÑÑ‚Ð¾Ð¼ ÐºÐ°Ð½Ð°Ð»Ðµ." );
         return true;
     }
 
@@ -207,20 +207,20 @@ bool GlobalChannel::checkConfirmed( Character *ch ) const
 bool GlobalChannel::checkNoChannel( Character *ch ) const
 {
     if (!nochannel)
-	return false;
+        return false;
     
     if (has_nochannel( ch )) {
-	if (!msgNochan.empty( ))
-	    ch->println( msgNochan );
-	else
-	    ch->println( "âÏÇÉ ÌÉÛÉÌÉ ÔÅÂÑ ×ÏÚÍÏÖÎÏÓÔÉ ÏÂÝÁÔØÓÑ." );
-	
-	return true;
+        if (!msgNochan.empty( ))
+            ch->println( msgNochan );
+        else
+            ch->println( "Ð‘Ð¾Ð³Ð¸ Ð»Ð¸ÑˆÐ¸Ð»Ð¸ Ñ‚ÐµÐ±Ñ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸ Ð¾Ð±Ñ‰Ð°Ñ‚ÑŒÑÑ." );
+        
+        return true;
     }
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master && has_nochannel( ch->master )) {
-	act("$c1 ÓÄÁ×ÌÅÎÎÏ ÈÒÉÐÉÔ, ÎÅ × ÓÉÌÁÈ ×ÙÍÏÌ×ÉÔØ ÎÉ ÓÌÏ×Á.", ch, 0, 0, TO_ROOM);	
-	return true;
+        act("$c1 ÑÐ´Ð°Ð²Ð»ÐµÐ½Ð½Ð¾ Ñ…Ñ€Ð¸Ð¿Ð¸Ñ‚, Ð½Ðµ Ð² ÑÐ¸Ð»Ð°Ñ… Ð²Ñ‹Ð¼Ð¾Ð»Ð²Ð¸Ñ‚ÑŒ Ð½Ð¸ ÑÐ»Ð¾Ð²Ð°.", ch, 0, 0, TO_ROOM);        
+        return true;
     }
 
     return false;
@@ -231,46 +231,46 @@ bool GlobalChannel::checkSoap( Character *ch ) const
     static const DLString attrName( "soap" );
     
     if (!soap)
-	return false;
+        return false;
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
-	return checkSoap( ch->master );
+        return checkSoap( ch->master );
     
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     if (!ch->getPC( )->getAttributes( ).isAvailable( attrName )) 
-	return false;
+        return false;
     
-    act("$c1 ÐÕÓËÁÅÔ ÉÚÏ ÒÔÁ {RÒ{YÁ{GÚ{CÎ{MÏ{RÃ{G×{YÅ{CÔ{MÎ{YÙ{CÅ{x ÍÙÌØÎÙÅ ÐÕÚÙÒÉ.", ch, 0, 0, TO_ROOM);
-    act("ôÙ ÐÕÓËÁÅÛØ ÉÚÏ ÒÔÁ {RÒ{YÁ{GÚ{CÎ{MÏ{RÃ{G×{YÅ{CÔ{MÎ{YÙ{CÅ{x ÍÙÌØÎÙÅ ÐÕÚÙÒÉ.", ch, 0, 0, TO_CHAR);
+    act("$c1 Ð¿ÑƒÑÐºÐ°ÐµÑ‚ Ð¸Ð·Ð¾ Ñ€Ñ‚Ð° {RÑ€{YÐ°{GÐ·{CÐ½{MÐ¾{RÑ†{GÐ²{YÐµ{CÑ‚{MÐ½{YÑ‹{CÐµ{x Ð¼Ñ‹Ð»ÑŒÐ½Ñ‹Ðµ Ð¿ÑƒÐ·Ñ‹Ñ€Ð¸.", ch, 0, 0, TO_ROOM);
+    act("Ð¢Ñ‹ Ð¿ÑƒÑÐºÐ°ÐµÑˆÑŒ Ð¸Ð·Ð¾ Ñ€Ñ‚Ð° {RÑ€{YÐ°{GÐ·{CÐ½{MÐ¾{RÑ†{GÐ²{YÐµ{CÑ‚{MÐ½{YÑ‹{CÐµ{x Ð¼Ñ‹Ð»ÑŒÐ½Ñ‹Ðµ Ð¿ÑƒÐ·Ñ‹Ñ€Ð¸.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
 void GlobalChannel::applyTranslation( Character *ch, DLString &msg, Character *victim ) const
 {
     if (!translate)
-	return;
+        return;
 
     msg = ch->language->translate( msg, ch, victim );
 
     if (ch->language != lang_common)
-	msg = DLString( "[" ) + ch->language->getName( ) + "] " + msg;
+        msg = DLString( "[" ) + ch->language->getName( ) + "] " + msg;
 }
 
 void GlobalChannel::triggers( Character *ch, const DLString &msg ) const
 {
     if (dreamland->hasOption( DL_LOG_COMM ) && getLog( ) != LOG_NEVER)
-	LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getName( ) << ": " << msg << endl;
+        LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getName( ) << ": " << msg << endl;
 }
 
 bool GlobalChannel::needOutputSelf( Character *ch ) const
 {
     if (deafen && ch->isAffected( gsn_deafen ))
-	return false;
+        return false;
     
     if (ch->desc && !ch->desc->echo)
-	return false;
+        return false;
 
     return true;
 }
@@ -278,12 +278,12 @@ bool GlobalChannel::needOutputSelf( Character *ch ) const
 bool GlobalChannel::needOutputOther( Character *ch ) const
 {
     if (dig && DIGGED(ch)) {
-	ch->println( "óÔÅÎÙ ÍÏÇÉÌÙ ÐÏÇÌÏÝÁÀÔ Ú×ÕËÉ." );
-	return false;
+        ch->println( "Ð¡Ñ‚ÐµÐ½Ñ‹ Ð¼Ð¾Ð³Ð¸Ð»Ñ‹ Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÑŽÑ‚ Ð·Ð²ÑƒÐºÐ¸." );
+        return false;
     }
     
     if (ch->desc && !ch->desc->echo)
-	return false;
+        return false;
 
     return true;
 }

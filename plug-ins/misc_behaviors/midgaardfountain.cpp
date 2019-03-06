@@ -24,30 +24,30 @@ bool MidgaardFountain::area( ) {
     int count = 0;
     
     for (o = object_list; o; o = o->next)
-	if (o->pIndexData->vnum == OBJ_VNUM_MONUMENT 
-	    && o->in_room
-	    && o->in_room->area == obj->in_room->area)
-	{
-	    count++;
-	}
+        if (o->pIndexData->vnum == OBJ_VNUM_MONUMENT 
+            && o->in_room
+            && o->in_room->area == obj->in_room->area)
+        {
+            count++;
+        }
 
     wch = obj->in_room->people; 
 
     if (count < 3) {
-	if (obj->value[2] != obj->pIndexData->value[2] && obj->value[2] == liq_blood) {
-	    obj->value[2] = obj->pIndexData->value[2];
+        if (obj->value[2] != obj->pIndexData->value[2] && obj->value[2] == liq_blood) {
+            obj->value[2] = obj->pIndexData->value[2];
 
-	    if (wch)
-		act_p("Кровь в $o6 снова превращается в воду..", wch, obj, 0, TO_ALL, POS_RESTING);
-	}   
-	return false;
+            if (wch)
+                act_p("п я─п╬п╡я▄ п╡ $o6 я│п╫п╬п╡п╟ п©я─п╣п╡я─п╟я┴п╟п╣я┌я│я▐ п╡ п╡п╬п╢я┐..", wch, obj, 0, TO_ALL, POS_RESTING);
+        }   
+        return false;
     }
 
     if (obj->value[2] == obj->pIndexData->value[2]) {
-	obj->value[2] = liq_blood;
-	
-	if (wch) 
-	    act_p("Вода в $o6 медленно окрашивается {rкрасным{x.", wch, obj, 0, TO_ALL, POS_RESTING);
+        obj->value[2] = liq_blood;
+        
+        if (wch) 
+            act_p("п▓п╬п╢п╟ п╡ $o6 п╪п╣п╢п╩п╣п╫п╫п╬ п╬п╨я─п╟я┬п╦п╡п╟п╣я┌я│я▐ {rп╨я─п╟я│п╫я▀п╪{x.", wch, obj, 0, TO_ALL, POS_RESTING);
     }
 
     return false;

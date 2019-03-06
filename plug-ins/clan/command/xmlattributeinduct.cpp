@@ -18,7 +18,7 @@ const DLString XMLAttributeInduct::TYPE = "XMLAttributeInduct";
 void XMLAttributeInduct::run( PCharacter *ch )
 {   
     for (iterator entry = begin( ); entry != end( ); entry++) {
-	act_p( entry->message.getValue( ).c_str( ), ch, 0, 0, TO_CHAR, POS_DEAD );
+        act_p( entry->message.getValue( ).c_str( ), ch, 0, 0, TO_CHAR, POS_DEAD );
     }
     
     ch->getAttributes( ).eraseAttribute( "induct" );
@@ -41,27 +41,27 @@ XMLAttributeInductListenerPlugin::run( int oldState, int newState, Descriptor *d
     XMLAttributeInduct::Pointer attr;
     
     if (newState != CON_PLAYING)
-	return;
+        return;
     if (!d->character)
-	return;
+        return;
     if (!( ch = d->character->getPC( ) ))
-	return;
+        return;
     
     attr = ch->getAttributes( ).findAttr<XMLAttributeInduct>( "induct" );
     if (attr)
-	attr->run( ch );
+        attr->run( ch );
 
     if (ch->getClan( )->isRecruiter( ch )) {
-	PCharacterMemoryList::const_iterator pos;
-	const PCharacterMemoryList& list = PCharacterManager::getPCM( );
-	int cnt = 0;
+        PCharacterMemoryList::const_iterator pos;
+        const PCharacterMemoryList& list = PCharacterManager::getPCM( );
+        int cnt = 0;
 
-	for (pos = list.begin( ); pos != list.end( ); pos++) 
-	    if (pos->second->getPetition( ) == ch->getClan( ))
-		cnt++;
-	
-	if (cnt > 0)
-	    ch->pecho( "%1$d петиц%1$Iия|ии|ии ожида%1$Iет|ют|ют твоего рассмотрения.\n", cnt );
+        for (pos = list.begin( ); pos != list.end( ); pos++) 
+            if (pos->second->getPetition( ) == ch->getClan( ))
+                cnt++;
+        
+        if (cnt > 0)
+            ch->pecho( "%1$d п©п╣я┌п╦я├%1$Iп╦я▐|п╦п╦|п╦п╦ п╬п╤п╦п╢п╟%1$Iп╣я┌|я▌я┌|я▌я┌ я┌п╡п╬п╣пЁп╬ я─п╟я│я│п╪п╬я┌я─п╣п╫п╦я▐.\n", cnt );
     }
 }
 

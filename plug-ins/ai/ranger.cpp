@@ -30,17 +30,17 @@ bool BasicMobileBehavior::canAggressDistanceRanger( )
     Object *wield;
     
     if (!IS_SET(ch->act, ACT_RANGER))
-	return false;
+        return false;
 
     if (gsn_bow->usable( ch )
-	&& ( wield = get_eq_char( ch, wear_wield ) )
-	&& wield->item_type == ITEM_WEAPON
-	&& wield->value[0] == WEAPON_BOW)
+        && ( wield = get_eq_char( ch, wear_wield ) )
+        && wield->item_type == ITEM_WEAPON
+        && wield->value[0] == WEAPON_BOW)
     {
-	return true;
+        return true;
     }
     else
-	return false;
+        return false;
 }
 
 bool BasicMobileBehavior::aggressRanger( )
@@ -49,33 +49,33 @@ bool BasicMobileBehavior::aggressRanger( )
     int victDoor, victRange;
     
     if (!canAggressDistanceRanger( )) 
-	return false;
+        return false;
     
     victim = findRangeVictim( ch->getModifyLevel( ) / 10 + 1, victDoor, victRange );
 
     if (!victim) 
-	return false;
+        return false;
     
-    act("$c1 ĞÒÉÓÔÁÌØÎÏ ÓÍÏÔÒÉÔ $T É ÎÁÔÑÇÉ×ÁÅÔ ÔÅÔÉ×Õ $o2.",
-	 ch, get_eq_char( ch, wear_wield ), dirs[victDoor].leave, TO_ROOM);
+    act("$c1 Ğ¿Ñ€Ğ¸ÑÑ‚Ğ°Ğ»ÑŒĞ½Ğ¾ ÑĞ¼Ğ¾Ñ‚Ñ€Ğ¸Ñ‚ $T Ğ¸ Ğ½Ğ°Ñ‚ÑĞ³Ğ¸Ğ²Ğ°ĞµÑ‚ Ñ‚ĞµÑ‚Ğ¸Ğ²Ñƒ $o2.",
+         ch, get_eq_char( ch, wear_wield ), dirs[victDoor].leave, TO_ROOM);
 
     interpret_raw( ch, "shoot", "%s %s", 
-	           dirs[victDoor].name, victim->getNameP( ) );    
+                   dirs[victDoor].name, victim->getNameP( ) );    
     return true;
 }
 
 bool BasicMobileBehavior::healRanger( Character *patient )
 {
     if (ch->isAffected(gsn_herbs))
-	return false;
+        return false;
 
     if (patient->isAffected( gsn_poison )
-	|| patient->isAffected( gsn_plague )
-	|| number_percent( ) > HEALTH(patient))
+        || patient->isAffected( gsn_plague )
+        || number_percent( ) > HEALTH(patient))
     {
-	interpret_raw( ch, "herbs", 
-		       get_char_name_list( patient, ch->in_room->people, ch ).c_str( ) );
-	return true;
+        interpret_raw( ch, "herbs", 
+                       get_char_name_list( patient, ch->in_room->people, ch ).c_str( ) );
+        return true;
     }
 
     return false;

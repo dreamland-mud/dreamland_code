@@ -10,8 +10,8 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Возникает при попытке присвоить XML переменной значение
- * с недопустимым типом
+ * @short п▓п╬п╥п╫п╦п╨п╟п╣я┌ п©я─п╦ п©п╬п©я▀я┌п╨п╣ п©я─п╦я│п╡п╬п╦я┌я▄ XML п©п╣я─п╣п╪п╣п╫п╫п╬п╧ п╥п╫п╟я┤п╣п╫п╦п╣
+ * я│ п╫п╣п╢п╬п©я┐я│я┌п╦п╪я▀п╪ я┌п╦п©п╬п╪
  * @see XMLObject XMLVariable
  */
 class ExceptionBadType : public Exception
@@ -23,7 +23,7 @@ public:
     }
     
     inline ExceptionBadType( string parentType, string nodeType ) throw( )
-	    : Exception( "Unparsed node <" + parentType + "> <" + nodeType +">" )
+            : Exception( "Unparsed node <" + parentType + "> <" + nodeType +">" )
     {
     }
 

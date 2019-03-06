@@ -50,10 +50,10 @@ OLCStateExtraExit::OLCStateExtraExit( Room *pRoom, const DLString &name )
             break;
 
     if(!eexit)
-	return;
+        return;
 
     if(eexit->u1.to_room)
-	to_room.setValue( eexit->u1.to_room->vnum );
+        to_room.setValue( eexit->u1.to_room->vnum );
     
     info.setValue( eexit->exit_info_default );
     key.setValue( eexit->key );
@@ -64,15 +64,15 @@ OLCStateExtraExit::OLCStateExtraExit( Room *pRoom, const DLString &name )
     max_size_pass.setValue( eexit->max_size_pass );
     
     if(eexit->keyword)
-	keyword.setValue( eexit->keyword );
+        keyword.setValue( eexit->keyword );
     if(eexit->short_desc_from)
-	short_desc_from.setValue( eexit->short_desc_from );
+        short_desc_from.setValue( eexit->short_desc_from );
     if(eexit->short_desc_to)
-	short_desc_to.setValue( eexit->short_desc_to );
+        short_desc_to.setValue( eexit->short_desc_to );
     if(eexit->description)
-	description.setValue( eexit->description );
+        description.setValue( eexit->description );
     if(eexit->room_description)
-	room_description.setValue( eexit->room_description );
+        room_description.setValue( eexit->room_description );
 }
 
 OLCStateExtraExit::~OLCStateExtraExit( )
@@ -85,7 +85,7 @@ OLCStateExtraExit::commit( )
     Room *pRoom = get_room_index(room.getValue( ));
     
     if(!pRoom)
-	return;
+        return;
 
     SET_BIT(pRoom->area->area_flag, AREA_CHANGED);
 
@@ -97,9 +97,9 @@ OLCStateExtraExit::commit( )
             break;
     
     if(!eexit) {
-	eexit = new_extra_exit( );
-	eexit->next = pRoom->extra_exit;
-	pRoom->extra_exit = eexit;
+        eexit = new_extra_exit( );
+        eexit->next = pRoom->extra_exit;
+        pRoom->extra_exit = eexit;
     }
 
     eexit->u1.to_room = get_room_index( to_room.getValue( ) );
@@ -145,9 +145,9 @@ EEEDIT(flags)
     value = exit_flags.value( argument);
 
     if (value != NO_FLAG) {
-	info.setValue( info.getValue( ) ^ value );
-	stc("Extra exit flag toggled.\r\n", ch);
-	return true;
+        info.setValue( info.getValue( ) ^ value );
+        stc("Extra exit flag toggled.\r\n", ch);
+        return true;
     }
 
     stc("unknow extra exit flag\r\n", ch);
@@ -161,9 +161,9 @@ EEEDIT(size)
     value = size_table.value( argument);
 
     if (value != NO_FLAG) {
-	max_size_pass.setValue( value );
-	stc("Size set.\n\r", ch);
-	return true;
+        max_size_pass.setValue( value );
+        stc("Size set.\n\r", ch);
+        return true;
     }
 
     stc("unknow size\r\n", ch);
@@ -183,31 +183,31 @@ EEEDIT(show)
     ptc(ch, "{CRoom desc:{x\n%s\n", room_description.getValue( ).c_str( ));
     ptc(ch, "Keyword:   [{W%s{x]\n", keyword.getValue( ).c_str( ));
     ptc(ch, "Exit info: [{W%s{x]\n", 
-	    exit_flags.names(info.getValue( )).c_str());
+            exit_flags.names(info.getValue( )).c_str());
     
     if(key.getValue( ) > 0 && (obj = get_obj_index(key.getValue( ))))
-	ptc(ch, "Key:       [{W%d{x] ({G%s{x)\n", 
-		key.getValue( ), 
-		russian_case(obj->short_descr, '1').c_str( ));
+        ptc(ch, "Key:       [{W%d{x] ({G%s{x)\n", 
+                key.getValue( ), 
+                russian_case(obj->short_descr, '1').c_str( ));
 
     r = get_room_index(to_room.getValue( ));
     if (r)
-	ptc(ch, "To room:   [{W%d{x] ({G%s{x)\n", 
-		r->vnum, r->name);
+        ptc(ch, "To room:   [{W%d{x] ({G%s{x)\n", 
+                r->vnum, r->name);
     
     ptc(ch, "Max size:  [{W%s{x]\n", 
-	    size_table.name(max_size_pass.getValue( )).c_str());
+            size_table.name(max_size_pass.getValue( )).c_str());
 
     ptc(ch, "Move from:  [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x)\n", 
-	    moving_from.getValue( ), extra_move_ru[moving_from.getValue( )],
-	    moving_mode_from.getValue( ), extra_move_rt[moving_mode_from.getValue( )]
-	    );
+            moving_from.getValue( ), extra_move_ru[moving_from.getValue( )],
+            moving_mode_from.getValue( ), extra_move_rt[moving_mode_from.getValue( )]
+            );
     ptc(ch, "Short from: {W%s{x\n", short_desc_from.getValue( ).c_str( ));
     
     ptc(ch, "Move to:    [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x)\n", 
-	    moving_to.getValue( ), extra_move_rp[moving_to.getValue( )],
-	    moving_mode_to.getValue( ), extra_move_rt[moving_mode_to.getValue( )]
-	    );
+            moving_to.getValue( ), extra_move_rp[moving_to.getValue( )],
+            moving_mode_to.getValue( ), extra_move_rt[moving_mode_to.getValue( )]
+            );
     ptc(ch, "Short to:   {W%s{x\n", short_desc_to.getValue( ).c_str( ));
 
     return false;
@@ -215,20 +215,16 @@ EEEDIT(show)
 
 EEEDIT(desc)
 {
-    if(!sedit(description))
-	return false;
-
-    stc("description set\r\n", ch);
-    return true;
+    char command[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, command);
+    return editor(command, description);
 }
 
 EEEDIT(rdesc)
 {
-    if(!sedit(room_description))
-	return false;
-
-    stc("room description set\r\n", ch);
-    return true;
+    char command[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, command);
+    return editor(command, room_description);
 }
 
 EEEDIT(name)
@@ -243,9 +239,9 @@ EEEDIT(key)
     OBJ_INDEX_DATA *k;
 
     if(!*argument || !is_number(argument) || 
-	    !(k = get_obj_index(atoi(argument)))) {
-	stc("Usage: key <key_vnum>\n\r", ch);
-	return false;
+            !(k = get_obj_index(atoi(argument)))) {
+        stc("Usage: key <key_vnum>\n\r", ch);
+        return false;
     }
     
     key = k->vnum;
@@ -259,9 +255,9 @@ EEEDIT(target)
     Room *r;
     
     if(!*argument || !is_number(argument) || 
-	    !(r = get_room_index(atoi(argument)))) {
-	stc("Usage: target <room_vnum>\n\r", ch);
-	return false;
+            !(r = get_room_index(atoi(argument)))) {
+        stc("Usage: target <room_vnum>\n\r", ch);
+        return false;
     }
     
     to_room = r->vnum;
@@ -283,30 +279,30 @@ EEEDIT(from)
     int type, mode;
 
     if(!*argument)
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
 
     argument = one_argument(argument, buf);
     if(!*buf || !is_number(buf)) 
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
     type = atoi(buf);
     
     argument = one_argument(argument, buf);
     if(!*buf || !is_number(buf)) 
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
     
     mode = atoi(buf);
 
     if(!*argument)
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
     
     if(type < 0 || type > 11) {
-	stc("Type must be in range 0..11\n\r", ch);
-	return eeedit_dir_usage(ch);
+        stc("Type must be in range 0..11\n\r", ch);
+        return eeedit_dir_usage(ch);
     }
     
     if(mode < 0 || mode > 11) {
-	stc("Mode must be in range 0..11\n\r", ch);
-	return eeedit_dir_usage(ch);
+        stc("Mode must be in range 0..11\n\r", ch);
+        return eeedit_dir_usage(ch);
     }
     
     moving_from = type;
@@ -324,30 +320,30 @@ EEEDIT(to)
     int type, mode;
 
     if(!*argument)
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
 
     argument = one_argument(argument, buf);
     if(!*buf || !is_number(buf)) 
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
     type = atoi(buf);
     
     argument = one_argument(argument, buf);
     if(!*buf || !is_number(buf)) 
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
     
     mode = atoi(buf);
 
     if(!*argument)
-	return eeedit_dir_usage(ch);
+        return eeedit_dir_usage(ch);
     
     if(type < 0 || type > 11) {
-	stc("Type must be in range 0..11\n\r", ch);
-	return eeedit_dir_usage(ch);
+        stc("Type must be in range 0..11\n\r", ch);
+        return eeedit_dir_usage(ch);
     }
     
     if(mode < 0 || mode > 11) {
-	stc("Mode must be in range 0..11\n\r", ch);
-	return eeedit_dir_usage(ch);
+        stc("Mode must be in range 0..11\n\r", ch);
+        return eeedit_dir_usage(ch);
     }
     
     moving_to = type;

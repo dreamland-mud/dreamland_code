@@ -11,9 +11,9 @@ extern "C"
 {
     SO::PluginList initialize_follow_command( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
     
-	Plugin::registerPlugin<GroupChannel>( ppl );
-	return ppl;
+        Plugin::registerPlugin<GroupChannel>( ppl );
+        return ppl;
     }
 }

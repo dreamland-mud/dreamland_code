@@ -9,9 +9,9 @@ extern "C" {
     
     SO::PluginList initialize_anatoliacore( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	return ppl;
+        return ppl;
     }
 }
 

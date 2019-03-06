@@ -106,9 +106,9 @@ public:
     
     ForStmt();
     ForStmt(ExpNodeList::Pointer i, 
-	    ExpNode::Pointer c, 
-	    ExpNodeList::Pointer n, 
-	    StmtNode::Pointer b);
+            ExpNode::Pointer c, 
+            ExpNodeList::Pointer n, 
+            StmtNode::Pointer b);
     virtual ~ForStmt();
 
     virtual FlowCtl evalAux();

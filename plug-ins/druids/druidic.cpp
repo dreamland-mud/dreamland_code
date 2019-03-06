@@ -49,21 +49,21 @@ DLString DruidicLanguage::createDictum( ) const
     DLString pre, end, root;
     
     if (endings.empty( ) && prefixes.empty( ) && roots.empty( ))
-	throw LanguageException( *this, "totally empty" );
+        throw LanguageException( *this, "totally empty" );
     
     if (!roots.empty( )) {
-	n = number_range( 0, roots.size( ) - 1 );
-	root = roots[n].getValue( );
+        n = number_range( 0, roots.size( ) - 1 );
+        root = roots[n].getValue( );
     } 
     
     if (!prefixes.empty( ) && chance( 70 )) {
-	n = number_range( 0, prefixes.size( ) - 1 );
-	pre = prefixes[n].getValue( );
+        n = number_range( 0, prefixes.size( ) - 1 );
+        pre = prefixes[n].getValue( );
     }
 
     if (!endings.empty( )) {
-	n = number_range( 0, endings.size( ) - 1 );
-	end = endings[n].getValue( );
+        n = number_range( 0, endings.size( ) - 1 );
+        end = endings[n].getValue( );
     }
     
     dictum = pre + root + end;
@@ -72,7 +72,7 @@ DLString DruidicLanguage::createDictum( ) const
 
 void DruidicLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "В шорохе листьев древних дубов тебе слышится слово {c%s.{x\r\n",
+    ch->printf( "п▓ я┬п╬я─п╬я┘п╣ п╩п╦я│я┌я▄п╣п╡ п╢я─п╣п╡п╫п╦я┘ п╢я┐п╠п╬п╡ я┌п╣п╠п╣ я│п╩я▀я┬п╦я┌я│я▐ я│п╩п╬п╡п╬ {c%s.{x\r\n",
                 word.toStr( ) ); 
 }
 

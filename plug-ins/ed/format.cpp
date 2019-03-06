@@ -22,14 +22,14 @@ bool
 Formatter::is_separator(char c)
 {
     switch(c) {
-	case ' ':
-	    return true;
-	case '\r':
-	case '\n':
-	case '\t':
-	    return true;
-	default:
-	    return false;
+        case ' ':
+            return true;
+        case '\r':
+        case '\n':
+        case '\t':
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -40,18 +40,18 @@ Formatter::getword(DLString &word)
     int c;
 
     for(;;) {
-	c = is.get( );
-	
-	if(c < 0)
-	    return false;
+        c = is.get( );
+        
+        if(c < 0)
+            return false;
 
-	if(is_separator(c))
-	    break;	
-	
-	if(c < ' ')
-	    continue;
-	
-	word += (char) c;
+        if(is_separator(c))
+            break;        
+        
+        if(c < ' ')
+            continue;
+        
+        word += (char) c;
     }
 
     is.unget( );
@@ -65,13 +65,13 @@ Formatter::skipspaces( )
     int c;
 
     for(;;) {
-	c = is.get( );
-	
-	if(c < 0)
-	    return false;
+        c = is.get( );
+        
+        if(c < 0)
+            return false;
 
-	if(!is_separator(c))
-	    break;
+        if(!is_separator(c))
+            break;
     }
 
     is.unget( );
@@ -88,22 +88,22 @@ Formatter::printline(unsigned int tab, unsigned int width)
     int spaces = width - tab;
     
     if(wc == 0)
-	return;
+        return;
 
     if(tab)
-	os << setw(tab) << "";
+        os << setw(tab) << "";
     
     for(i = words.begin( ); i != words.end( ); i++) 
-	spaces -= i->colorLength( );
+        spaces -= i->colorLength( );
 
     for(i = words.begin( ); i != words.end( ); i++) {
-	if(i != words.begin( )) {
-	    int pad = ( spaces + wc/2 )/wc;
-	    os << setw( pad ) << " ";
-	    spaces -= pad;
-	}
-	os << *i;
-	wc--;
+        if(i != words.begin( )) {
+            int pad = ( spaces + wc/2 )/wc;
+            os << setw( pad ) << " ";
+            spaces -= pad;
+        }
+        os << *i;
+        wc--;
     }
     os << endl;
 }
@@ -114,25 +114,25 @@ Formatter::format(unsigned int tab, unsigned int width)
     unsigned int len;
 
     for(len = tab; !is.eof( ); len++) {
-	DLString word;
+        DLString word;
 
-	skipspaces( ) && getword(word);
+        skipspaces( ) && getword(word);
 
-	if(len + word.colorLength( ) > width) {
-	    if(!word.empty( ) && words.empty( )) {
-		words.push_back(word);
-		word.clear( );
-	    }
+        if(len + word.colorLength( ) > width) {
+            if(!word.empty( ) && words.empty( )) {
+                words.push_back(word);
+                word.clear( );
+            }
 
-	    printline(tab, width);
-	    words.clear( );
-	    len = tab = 0;
-	}
-	
-	if(!word.empty( )) {
-	    len += word.colorLength( );
-	    words.push_back( word );
-	}
+            printline(tab, width);
+            words.clear( );
+            len = tab = 0;
+        }
+        
+        if(!word.empty( )) {
+            len += word.colorLength( );
+            words.push_back( word );
+        }
     }
 
     printline(tab, 0);

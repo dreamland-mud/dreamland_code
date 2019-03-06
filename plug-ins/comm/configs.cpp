@@ -33,43 +33,43 @@ const DLString & ConfigElement::getRussianName( ) const
 void ConfigElement::init( )
 {
     if (autocmd) {
-	commandManager->registrate( Pointer( this ) );
+        commandManager->registrate( Pointer( this ) );
     }
 }
 
 void ConfigElement::destroy( )
 {
     if (autocmd) {
-	commandManager->unregistrate( Pointer( this ) );
+        commandManager->unregistrate( Pointer( this ) );
     }
 }
 
 void ConfigElement::run( Character *ch, const DLString & )
 {
     if (!ch->is_npc( ))
-	handleArgument( ch->getPC( ), "toggle" );
+        handleArgument( ch->getPC( ), "toggle" );
 }
 
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
 {
     if (arg.empty( )) {
-	printLine( ch );
-	return true;
+        printLine( ch );
+        return true;
     }
     
     Flags &field = getField( ch );
 
-    if (arg == "yes" || arg == "ƒ¡")
-	field.setBit( bit.getValue( ) );
-    else if (arg == "no" || arg == "Œ≈‘")
-	field.removeBit( bit.getValue( ) );
-    else if (arg.strPrefix( "toggle" ) || arg.strPrefix( "–≈“≈ÀÃ¿ﬁ…‘ÿ" ))
-	field.toggleBit( bit.getValue( ) );
+    if (arg == "yes" || arg == "–¥–∞")
+        field.setBit( bit.getValue( ) );
+    else if (arg == "no" || arg == "–Ω–µ—Ç")
+        field.removeBit( bit.getValue( ) );
+    else if (arg.strPrefix( "toggle" ) || arg.strPrefix( "–ø–µ—Ä–µ–∫–ª—é—á–∏—Ç—å" ))
+        field.toggleBit( bit.getValue( ) );
     else 
-	return false;
+        return false;
     
     if (!printText( ch ))
-	printLine( ch );
+        printLine( ch );
 
     return true;
 }
@@ -84,8 +84,8 @@ bool ConfigElement::printText( PCharacter *ch ) const
     const DLString &msg = (isSetBit( ch ) ? msgOn.getValue( ) : msgOff.getValue( ) );
 
     if (!msg.empty( )) {
-	ch->println( msg );
-	return true;
+        ch->println( msg );
+        return true;
     }
 
     return false;
@@ -97,10 +97,10 @@ void ConfigElement::printRow( PCharacter *ch ) const
     bool rus = ch->getConfig( )->rucommands;
 
     ch->printf( "| {%s%-14s {x|  {%s%-7s {x|\r\n", 
-		      CLR_NAME(ch), 
-		      rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
-		      yes ? CLR_YES(ch) : CLR_NO(ch),
-		      yes ? "˜ÎÏ." : "˜˘ÎÏ." );
+                      CLR_NAME(ch), 
+                      rus ? rname.getValue( ).c_str( ) : name.getValue( ).c_str( ), 
+                      yes ? CLR_YES(ch) : CLR_NO(ch),
+                      yes ? "–í–ö–õ." : "–í–´–ö–õ." );
 }
 
 void ConfigElement::printLine( PCharacter *ch ) const
@@ -108,19 +108,19 @@ void ConfigElement::printLine( PCharacter *ch ) const
     bool yes = isSetBit( ch );
 
     if (ch->getConfig( )->rucommands)
-	ch->printf( "  {%s%-12s {%s%5s {x%s\n",
-			CLR_NAME(ch),
-			rname.getValue( ).c_str( ),
-			yes ? CLR_YES(ch) : CLR_NO(ch),
-			yes ? "‰·" : "ÓÂÙ",
-			hint.c_str( ) );
+        ch->printf( "  {%s%-12s {%s%5s {x%s\n",
+                        CLR_NAME(ch),
+                        rname.getValue( ).c_str( ),
+                        yes ? CLR_YES(ch) : CLR_NO(ch),
+                        yes ? "–î–ê" : "–ù–ï–¢",
+                        hint.c_str( ) );
     else
-	ch->printf( "  {%s%-12s {%s%5s {x%s\n",
-			CLR_NAME(ch),
-			name.getValue( ).c_str( ),
-			yes ? CLR_YES(ch) : CLR_NO(ch),
-			yes ? "YES" : "NO",
-			hint.c_str( ) );
+        ch->printf( "  {%s%-12s {%s%5s {x%s\n",
+                        CLR_NAME(ch),
+                        name.getValue( ).c_str( ),
+                        yes ? CLR_YES(ch) : CLR_NO(ch),
+                        yes ? "YES" : "NO",
+                        hint.c_str( ) );
 }
 
 Flags & ConfigElement::getField( PCharacter *ch ) const
@@ -129,16 +129,16 @@ Flags & ConfigElement::getField( PCharacter *ch ) const
     const FlagTable *table = bit.getTable( );
 
     if (table == &config_flags)
-	return ch->config;
+        return ch->config;
     
     if (table == &comm_flags)
-	return ch->comm;
+        return ch->comm;
     
     if (table == &plr_flags)
-	return ch->act;
+        return ch->act;
 
     if (table == &add_comm_flags)
-	return ch->add_comm;
+        return ch->add_comm;
     
     return zero;
 }
@@ -149,8 +149,8 @@ Flags & ConfigElement::getField( PCharacter *ch ) const
 void ConfigGroup::printHeader( PCharacter *ch ) const
 {
     ch->printf( "\r\n{%s%s{x\r\n", 
-		    CLR_HEADER(ch),
-		    name.getValue( ).c_str( ) );
+                    CLR_HEADER(ch),
+                    name.getValue( ).c_str( ) );
 }
 
 /*-------------------------------------------------------------------------
@@ -169,10 +169,10 @@ void ConfigCommand::initialization( )
     CommandPlugin::initialization( );
 
     for (g = groups.begin( ); g != groups.end( ); g++) {
-	ConfigGroup::iterator c;
+        ConfigGroup::iterator c;
 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    (*c)->init( );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            (*c)->init( );
     }
 }
 
@@ -181,10 +181,10 @@ void ConfigCommand::destruction( )
     Groups::iterator g;
     
     for (g = groups.begin( ); g != groups.end( ); g++) {
-	ConfigGroup::iterator c;
+        ConfigGroup::iterator c;
 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    (*c)->destroy( );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            (*c)->destroy( );
     }
 
     CommandPlugin::destruction( );
@@ -200,10 +200,10 @@ void ConfigCommand::printAllRows( PCharacter *pch ) const
     ConfigGroup::const_iterator c;
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ))
-		if ((*c)->autolist.getValue( ) && !(*c)->autotext.getValue( )) 
-		    (*c)->printRow( pch );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            if ((*c)->available( pch ))
+                if ((*c)->autolist.getValue( ) && !(*c)->autotext.getValue( )) 
+                    (*c)->printRow( pch );
 }
 
 void ConfigCommand::printAllTexts( PCharacter *pch ) const
@@ -212,10 +212,10 @@ void ConfigCommand::printAllTexts( PCharacter *pch ) const
     ConfigGroup::const_iterator c;
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ))
-		if ((*c)->autolist.getValue( ) && (*c)->autotext.getValue( )) 
-		    (*c)->printText( pch );
+        for (c = g->begin( ); c != g->end( ); c++) 
+            if ((*c)->available( pch ))
+                if ((*c)->autolist.getValue( ) && (*c)->autotext.getValue( )) 
+                    (*c)->printText( pch );
 }
 
 COMMAND(ConfigCommand, "config")
@@ -226,7 +226,7 @@ COMMAND(ConfigCommand, "config")
     ConfigGroup::iterator c;
 
     if (ch->is_npc( ))
-	return;
+        return;
     
     pch = ch->getPC( );
 
@@ -235,30 +235,30 @@ COMMAND(ConfigCommand, "config")
     arg2 = arguments.getOneArgument( );
 
     if (arg1.empty( )) {
-	for (g = groups.begin( ); g != groups.end( ); g++) {
-	    g->printHeader( pch );
-	    
-	    for (c = g->begin( ); c != g->end( ); c++) 
-		if ((*c)->available( pch ))
-		    (*c)->printLine( pch );
-	}
+        for (g = groups.begin( ); g != groups.end( ); g++) {
+            g->printHeader( pch );
+            
+            for (c = g->begin( ); c != g->end( ); c++) 
+                if ((*c)->available( pch ))
+                    (*c)->printLine( pch );
+        }
 
-	return;
+        return;
     }
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
-	for (c = g->begin( ); c != g->end( ); c++) 
-	    if ((*c)->available( pch ) 
+        for (c = g->begin( ); c != g->end( ); c++) 
+            if ((*c)->available( pch ) 
                     && ((*c)->matches( arg1 ) || (*c)->matchesAlias( arg1 ))) 
             {
-		if (!(*c)->handleArgument( pch, arg2 ))
-		    pch->println("Ó≈–“¡◊…ÃÿŒŸ  –≈“≈ÀÃ¿ﬁ¡‘≈Ãÿ. ÛÕ. {W? {lR“≈÷…Õ{lEconfig{x.");
+                if (!(*c)->handleArgument( pch, arg2 ))
+                    pch->println("–ù–µ–ø—Ä–∞–≤–∏–ª—å–Ω—ã–π –ø–µ—Ä–µ–∫–ª—é—á–∞—Ç–µ–ª—å. –°–º. {W? {lR—Ä–µ–∂–∏–º{lEconfig{x.");
 
-		return;
-	    }
+                return;
+            }
 
     
-    pch->println("Ô–√…— Œ≈ Œ¡ ƒ≈Œ¡. È”–œÃÿ⁄’ ‘≈ '{y{lR“≈÷…Õ{lEconfig{lx{w' ƒÃ— ”–…”À¡.");
+    pch->println("–û–ø—Ü–∏—è –Ω–µ –Ω–∞–π–¥–µ–Ω–∞. –ò—Å–ø–æ–ª—å–∑—É–π—Ç–µ '{y{lR—Ä–µ–∂–∏–º{lEconfig{lx{w' –¥–ª—è —Å–ø–∏—Å–∫–∞.");
 }
 
 /*-------------------------------------------------------------------------
@@ -271,22 +271,22 @@ CMDRUN( autolist )
     PCharacter *pch;
     
     if (ch->is_npc( ))
-	return;
+        return;
 
     pch = ch->getPC( );
     
     pch->send_to( line );
-    pch->printf( "|  {%sÓ¡…Õ≈Œœ◊¡Œ…≈   Ûœ”‘œ—Œ…≈{x |\r\n", CLR_HEADER(ch) );
+    pch->printf( "|  {%s–ù–∞–∏–º–µ–Ω–æ–≤–∞–Ω–∏–µ   –°–æ—Å—Ç–æ—è–Ω–∏–µ{x |\r\n", CLR_HEADER(ch) );
     pch->send_to( line );
 
     ConfigCommand::getThis( )->printAllRows( pch );
     pch->send_to( line );
 
     if (pch->lines != PAGELEN) {
-	if (pch->lines)
-	    pch->printf( "Ù≈¬≈ ◊Ÿ◊œƒ…‘”— Œ≈–“≈“Ÿ◊Œœ %d Ã…Œ…  ‘≈À”‘¡.\r\n", pch->lines.getValue( ) + 2 );
-	else
-	    pch->send_to( "‚’∆≈“ –“œÀ“’‘À… ◊ŸÀÃ¿ﬁ≈Œ.\r\n" );
+        if (pch->lines)
+            pch->printf( "–¢–µ–±–µ –≤—ã–≤–æ–¥–∏—Ç—Å—è –Ω–µ–ø—Ä–µ—Ä—ã–≤–Ω–æ %d –ª–∏–Ω–∏–π —Ç–µ–∫—Å—Ç–∞.\r\n", pch->lines.getValue( ) + 2 );
+        else
+            pch->send_to( "–ë—É—Ñ–µ—Ä –ø—Ä–æ–∫—Ä—É—Ç–∫–∏ –≤—ã–∫–ª—é—á–µ–Ω.\r\n" );
     }
 
     ConfigCommand::getThis( )->printAllTexts( pch );
@@ -307,42 +307,42 @@ CMDRUN( scroll )
 
     if (arg.empty( ))
     {
-	if (ch->lines == 0)
-	    ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ –œÃ’ﬁ¡‘ÿ ƒÃ…ŒŒŸ≈ ”œœ¬›≈Œ…—.\n\r");
-	else
-	    ch->printf( "Ù≈¬≈ Œ≈–“≈“Ÿ◊Œœ ◊Ÿ◊œƒ…‘”— %d Ã…Œ%s ‘≈À”‘¡.\n\r",
-		        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "…—","……","… ") );
+        if (ch->lines == 0)
+            ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –ø–æ–ª—É—á–∞—Ç—å –¥–ª–∏–Ω–Ω—ã–µ —Å–æ–æ–±—â–µ–Ω–∏—è.\n\r");
+        else
+            ch->printf( "–¢–µ–±–µ –Ω–µ–ø—Ä–µ—Ä—ã–≤–Ω–æ –≤—ã–≤–æ–¥–∏—Ç—Å—è %d –ª–∏–Ω%s —Ç–µ–∫—Å—Ç–∞.\n\r",
+                        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "–∏—è","–∏–∏","–∏–π") );
 
-	return;
+        return;
     }
 
     if (!arg.isNumber( )) {
-	ch->send_to("ÙŸ ƒœÃ÷≈Œ ◊◊≈”‘… ÀœÃ…ﬁ≈”‘◊œ Ã…Œ… .\n\r");
-	return;
+        ch->send_to("–¢—ã –¥–æ–ª–∂–µ–Ω –≤–≤–µ—Å—Ç–∏ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ –ª–∏–Ω–∏–π.\n\r");
+        return;
     }
 
     try {
         lines = arg.toInt( );
     }
     catch (const ExceptionBadType& ) {
-        ch->send_to("Ó≈–“¡◊…ÃÿŒœ≈ ﬁ…”Ãœ.\r\n");
+        ch->send_to("–ù–µ–ø—Ä–∞–≤–∏–ª—å–Ω–æ–µ —á–∏—Å–ª–æ.\r\n");
         return;
     }
 
     if (lines == 0)
     {
-        ch->send_to("˜Ÿ◊œƒ œ‘ÀÃ¿ﬁ≈Œ.\n\r");
+        ch->send_to("–í—ã–≤–æ–¥ –æ—Ç–∫–ª—é—á–µ–Ω.\n\r");
         ch->lines = 0;
         return;
     }
 
     if (lines < 10 || lines > 100)
     {
-	ch->send_to("ÙŸ ƒœÃ÷≈Œ ◊◊≈”‘… ƒœ–’”‘…Õœ≈ ÀœÃ…ﬁ≈”‘◊œ Ã…Œ… .\n\r");
-	return;
+        ch->send_to("–¢—ã –¥–æ–ª–∂–µ–Ω –≤–≤–µ—Å—Ç–∏ –¥–æ–ø—É—Å—Ç–∏–º–æ–µ –∫–æ–ª–∏—á–µ—Å—Ç–≤–æ –ª–∏–Ω–∏–π.\n\r");
+        return;
     }
 
     ch->lines = lines - 2;
-    ch->printf( "˜Ÿ◊œƒ ’”‘¡Œœ◊Ã≈Œ Œ¡ %d Ã…Œ%s.\n\r", lines,
-		GET_COUNT(lines, "…¿","……","… ") );
+    ch->printf( "–í—ã–≤–æ–¥ —É—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω –Ω–∞ %d –ª–∏–Ω%s.\n\r", lines,
+                GET_COUNT(lines, "–∏—é","–∏–∏","–∏–π") );
 }

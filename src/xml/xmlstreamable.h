@@ -25,22 +25,22 @@ public:
 
     void fromStream( std::istream& istr )
     {
-	XMLDocument::Pointer root( NEW );
+        XMLDocument::Pointer root( NEW );
 
-	root->load( istr );
-	fromXML( root->getFirstNode( ) );
+        root->load( istr );
+        fromXML( root->getFirstNode( ) );
     }
     
     void toStream( std::ostream& ostr ) const
     {
-	XMLNode::Pointer node( NEW );
-	XMLDocument::Pointer root( NEW );
+        XMLNode::Pointer node( NEW );
+        XMLDocument::Pointer root( NEW );
 
-	if (toXML( node )) {
+        if (toXML( node )) {
             node->setName( nodeName );
-	    root->appendChild( node );
-	    root->save( ostr );
-	}
+            root->appendChild( node );
+            root->save( ostr );
+        }
     }
 
     using Ptr::toXML;

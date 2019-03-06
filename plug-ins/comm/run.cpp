@@ -21,13 +21,13 @@
 static bool isBigLetter( char c )
 {
     return c == 'N' || c == 'S' || c == 'D' || c == 'U' || c == 'E' || c == 'W' ||
-	   c == 'Û' || c == '‡' || c == 'Ô' || c == '' || c == '˜' || c == '˙';
+           c == '–°' || c == '–Æ' || c == '–û' || c == '–ü' || c == '–í' || c == '–ó';
 }
 
 static bool isSmallLetter( char c )
 {
     return c == 'n' || c == 's' || c == 'd' || c == 'u' || c == 'e' || c == 'w' ||
-           c == '”' || c == '¿' || c == 'œ' || c == '–' || c == '◊' || c == '⁄';
+           c == '—Å' || c == '—é' || c == '–æ' || c == '–ø' || c == '–≤' || c == '–∑';
 }
 
 /*-----------------------------------------------------------------------------
@@ -41,56 +41,59 @@ CMDRUN( run )
     unsigned int i;
 
     pch = ch->getPC( );
+    if (!pch)
+        return;
+
     walk = constArguments;
     walk.stripWhiteSpace( );
 
     if (pch->fighting) {
-	pch->println("Óœ ‘Ÿ ÷≈ ”“¡÷¡≈€ÿ”—! È”–œÃÿ⁄’  ÀœÕ¡Œƒ’ {y{lR”¬≈÷¡‘ÿ{lEflee{x ƒÃ— –œ¬≈«¡ …⁄ ¬œ—.");
-	return;
+        pch->println("–ù–æ —Ç—ã –∂–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è! –ò—Å–ø–æ–ª—å–∑—É–π –∫–æ–º–∞–Ω–¥—É {y{lR—Å–±–µ–∂–∞—Ç—å{lEflee{x –¥–ª—è –ø–æ–±–µ–≥–∞ –∏–∑ –±–æ—è.");
+        return;
     }
 
     if (!pch || walk.empty( )) {
-	ch->send_to( "œ À¡ÀœÕ’ Õ¡“€“’‘’ ‘Ÿ »œﬁ≈€ÿ ¬≈÷¡‘ÿ?\r\n" );
-	return;
+        ch->send_to( "–ü–æ –∫–∞–∫–æ–º—É –º–∞—Ä—à—Ä—É—Ç—É —Ç—ã —Ö–æ—á–µ—à—å –±–µ–∂–∞—Ç—å?\r\n" );
+        return;
     }
 
     if (pch->position < POS_STANDING) {
-	pch->send_to("È”»œƒŒœ≈ –œÃœ÷≈Œ…≈ ƒÃ— ¬≈«¡ - ”‘œ—!\n\r");
-	return;
+        pch->send_to("–ò—Å—Ö–æ–¥–Ω–æ–µ –ø–æ–ª–æ–∂–µ–Ω–∏–µ –¥–ª—è –±–µ–≥–∞ - —Å—Ç–æ—è!\n\r");
+        return;
     }
     
     for (i = 0; i < walk.length( ); i++) {
-	int cnt = 0;
-	
-	while (isdigit( walk[i] )) {
-	    cnt = cnt * 10 + walk[i++] - '0';
+        int cnt = 0;
+        
+        while (isdigit( walk[i] )) {
+            cnt = cnt * 10 + walk[i++] - '0';
 
-	    if (i >= walk.length( )) {
-		pch->send_to( "Ì¡“€“’‘ Œ≈ Õœ÷≈‘ œÀ¡Œﬁ…◊¡‘ÿ”— Œ¡ √…∆“’.\r\n" );
-		return;
-	    }
-	}
-	
-	if (isBigLetter( walk[i] )) {
-	    if (cnt > 0) {
-		pch->send_to( "Ó≈Ãÿ⁄— –œ¬≈÷¡‘ÿ 'Œ≈”ÀœÃÿÀœ “¡⁄ ƒœ ’–œ“¡'.\r\n" );
-		return;
-	    }
-	}
-	else if (!isSmallLetter( walk[i] )) {
-	    pch->printf( "Ó≈–œŒ—‘Œœ≈ Œ¡–“¡◊Ã≈Œ…≈ ƒÃ— ¬≈«¡: '%c'.\r\n", walk[i] );
-	    return;
-	}
-	
-	cnt = max( cnt, 1 );
+            if (i >= walk.length( )) {
+                pch->send_to( "–ú–∞—Ä—à—Ä—É—Ç –Ω–µ –º–æ–∂–µ—Ç –æ–∫–∞–Ω—á–∏–≤–∞—Ç—å—Å—è –Ω–∞ —Ü–∏—Ñ—Ä—É.\r\n" );
+                return;
+            }
+        }
+        
+        if (isBigLetter( walk[i] )) {
+            if (cnt > 0) {
+                pch->send_to( "–ù–µ–ª—å–∑—è –ø–æ–±–µ–∂–∞—Ç—å '–Ω–µ—Å–∫–æ–ª—å–∫–æ —Ä–∞–∑ –¥–æ —É–ø–æ—Ä–∞'.\r\n" );
+                return;
+            }
+        }
+        else if (!isSmallLetter( walk[i] )) {
+            pch->printf( "–ù–µ–ø–æ–Ω—è—Ç–Ω–æ–µ –Ω–∞–ø—Ä–∞–≤–ª–µ–Ω–∏–µ –¥–ª—è –±–µ–≥–∞: '%c'.\r\n", walk[i] );
+            return;
+        }
+        
+        cnt = max( cnt, 1 );
 
-	while (cnt-- > 0)
-	    buf << walk[i];
+        while (cnt-- > 0)
+            buf << walk[i];
     }
     
     if (buf.str( ).length( ) > 100) {
-	pch->send_to( "ÛÃ…€ÀœÕ ƒ¡Ã≈Àœ ¬≈÷¡‘ÿ.\r\n" );
-	return;
+        pch->send_to( "–°–ª–∏—à–∫–æ–º –¥–∞–ª–µ–∫–æ –±–µ–∂–∞—Ç—å.\r\n" );
+        return;
     }
     
     pch->getAttributes( ).getAttr<XMLAttributeSpeedWalk>( "speedwalk" )->setValue( buf.str( ) );
@@ -104,7 +107,7 @@ public:
     RunMovement( PCharacter *ch, XMLAttributeSpeedWalk::Pointer walk )
                      : ExitsMovement( ch, MOVETYPE_RUNNING )
     {
-	this->walk = walk;
+        this->walk = walk;
     }
 
     virtual ~RunMovement( )
@@ -113,87 +116,87 @@ public:
     
     virtual int move( )
     {
-	if (walk->getSteps( ) > 100) {
-	    msgSelfRoom( ch, 
-	                 "ÙŸ Œ¡ﬁ…Œ¡≈€ÿ ⁄¡ƒŸ»¡‘ÿ”— … œ”‘¡Œ¡◊Ã…◊¡≈€ÿ”—.",
-	                 "%1$^C1 Œ¡ﬁ…Œ¡≈‘ ⁄¡ƒŸ»¡‘ÿ”— … œ”‘¡Œ¡◊Ã…◊¡≈‘”—." );
-	    return RC_MOVE_FAIL;
-	}
+        if (walk->getSteps( ) > 100) {
+            msgSelfRoom( ch, 
+                         "–¢—ã –Ω–∞—á–∏–Ω–∞–µ—à—å –∑–∞–¥—ã—Ö–∞—Ç—å—Å—è –∏ –æ—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞–µ—à—å—Å—è.",
+                         "%1$^C1 –Ω–∞—á–∏–Ω–∞–µ—Ç –∑–∞–¥—ã—Ö–∞—Ç—å—Å—è –∏ –æ—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞–µ—Ç—Å—è." );
+            return RC_MOVE_FAIL;
+        }
 
-	init( );
+        init( );
 
-	if (isSmallLetter( walk->getFirstCommand( ) )) {
-	    if (moveRecursive( )) {
-		walk->clearFirstCommand( );
-		return RC_MOVE_OK;
-	    }
-	    else
-		return RC_MOVE_FAIL;
-	}
+        if (isSmallLetter( walk->getFirstCommand( ) )) {
+            if (moveRecursive( )) {
+                walk->clearFirstCommand( );
+                return RC_MOVE_OK;
+            }
+            else
+                return RC_MOVE_FAIL;
+        }
 
-	if (!checkContinuousWay( )) {
-	    ostringstream buf;
-	    
-	    walk->clearFirstCommand( );
-	    walk->clearSteps( );
-	    
-	    buf << "ÙŸ Œ¡‘ŸÀ¡≈€ÿ”— Œ¡ –“≈–—‘”‘◊…≈ … ";
-	    
-	    if (walk->isEmpty( ))
-		buf << "œ”‘¡Œ¡◊Ã…◊¡≈€ÿ”—";
-	    else {
-		int d0 = walk->getFirstDoor( );
-		
-		buf << "–“œƒœÃ÷¡≈€ÿ ”◊œ  –’‘ÿ ";
+        if (!checkContinuousWay( )) {
+            ostringstream buf;
+            
+            walk->clearFirstCommand( );
+            walk->clearSteps( );
+            
+            buf << "–¢—ã –Ω–∞—Ç—ã–∫–∞–µ—à—å—Å—è –Ω–∞ –ø—Ä–µ–ø—è—Ç—Å—Ç–≤–∏–µ –∏ ";
+            
+            if (walk->isEmpty( ))
+                buf << "–æ—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞–µ—à—å—Å—è";
+            else {
+                int d0 = walk->getFirstDoor( );
+                
+                buf << "–ø—Ä–æ–¥–æ–ª–∂–∞–µ—à—å —Å–≤–æ–π –ø—É—Ç—å ";
 
-		if (d0 >= 0 && d0 < DIR_SOMEWHERE) 
-		    buf << dirs[d0].leave;
-		else 
-		    buf << "Œ≈…⁄◊≈”‘Œœ À’ƒ¡..";
-	    }
+                if (d0 >= 0 && d0 < DIR_SOMEWHERE) 
+                    buf << dirs[d0].leave;
+                else 
+                    buf << "–Ω–µ–∏–∑–≤–µ—Å—Ç–Ω–æ –∫—É–¥–∞..";
+            }
 
-	    buf << "." << endl;
-	    msgSelf( ch, buf.str( ).c_str( ) );
-	    return RC_MOVE_OK;
-	}
+            buf << "." << endl;
+            msgSelf( ch, buf.str( ).c_str( ) );
+            return RC_MOVE_OK;
+        }
 
-	if (moveRecursive( )) {
-	    walk->incSteps( );
-	    return RC_MOVE_OK;
-	}
+        if (moveRecursive( )) {
+            walk->incSteps( );
+            return RC_MOVE_OK;
+        }
 
-	return RC_MOVE_FAIL;
+        return RC_MOVE_FAIL;
     }
 
 protected:
     void init( )
     {
-	door = walk->getFirstDoor( );
+        door = walk->getFirstDoor( );
 
-	if (door < 0) 
-	    return;
+        if (door < 0) 
+            return;
 
-	if (!( pexit = from_room->exit[door] ))
-	    return;
+        if (!( pexit = from_room->exit[door] ))
+            return;
 
-	if (!ch->can_see( pexit ))
-	    return;
-	
-	to_room = pexit->u1.to_room;
-	exit_info = pexit->exit_info;
+        if (!ch->can_see( pexit ))
+            return;
+        
+        to_room = pexit->u1.to_room;
+        exit_info = pexit->exit_info;
     }
 
     bool checkContinuousWay( )
     {
-	bool fOpenWay;
-	
-	if (!pexit || !to_room)
-	    return false;
-	    
-	silence = true;
-	fOpenWay = checkVisibility( ch ) && checkClosedDoor( ch );
-	silence = false;
-	return fOpenWay;
+        bool fOpenWay;
+        
+        if (!pexit || !to_room)
+            return false;
+            
+        silence = true;
+        fOpenWay = checkVisibility( ch ) && checkClosedDoor( ch );
+        silence = false;
+        return fOpenWay;
     }
     
     XMLAttributeSpeedWalk::Pointer walk;
@@ -210,23 +213,23 @@ void SpeedWalkUpdateTask::run( PCharacter *ch )
     walk = attributes.findAttr<XMLAttributeSpeedWalk>( "speedwalk" );
     
     if (!walk)
-	return;
+        return;
 
     if (walk->isEmpty( )) {
-	attributes.eraseAttribute( "speedwalk" );
-	return;
+        attributes.eraseAttribute( "speedwalk" );
+        return;
     }
 
     if (ch->fighting || ch->position < POS_STANDING) {
-	attributes.eraseAttribute( "speedwalk" );
-	return;
+        attributes.eraseAttribute( "speedwalk" );
+        return;
     }
     
     if (ch->wait > 0)
-	return;
+        return;
 
     if (RunMovement( ch, walk ).move( ) != RC_MOVE_OK || walk->isEmpty( )) 
-	attributes.eraseAttribute( "speedwalk" );
+        attributes.eraseAttribute( "speedwalk" );
 }
 
 void SpeedWalkUpdateTask::after( )
@@ -240,22 +243,22 @@ void SpeedWalkUpdateTask::after( )
 char XMLAttributeSpeedWalk::getFirstCommand( ) const
 {
     if (path.getValue( ).empty( ))
-	return '\0';
+        return '\0';
     else
-	return path.getValue( ).at( 0 );
+        return path.getValue( ).at( 0 );
 }
 
 void XMLAttributeSpeedWalk::clearFirstCommand( )
 {
     if (!isEmpty( )) {
-	DLString str = path.getValue( );
+        DLString str = path.getValue( );
 
-	str.erase( 0, 1 );
-	path.setValue( str );
+        str.erase( 0, 1 );
+        path.setValue( str );
     }
 
     if (isEmpty( ))
-	steps = 0;
+        steps = 0;
 }
 
 int XMLAttributeSpeedWalk::getFirstDoor( ) const

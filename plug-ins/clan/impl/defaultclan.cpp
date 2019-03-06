@@ -21,8 +21,8 @@
  * DefaultClan 
  *----------------------------------------------------------------*/
 DefaultClan::DefaultClan( )
-	    : channel( false ), dispersed( true ), diplomacy( false ),
-	      hidden( false )
+            : channel( false ), dispersed( true ), diplomacy( false ),
+              hidden( false )
 {
 }
 
@@ -55,17 +55,17 @@ const ClanOrgs * DefaultClan::getOrgs( ) const
 const DLString & DefaultClan::getTitle( PCMemoryInterface *pcm ) const
 {
     if (orgs) {
-	ClanOrder::Pointer ord = orgs->findOrder( pcm );
-	
-	if (ord) {
-	    const DLString &title = ord->getTitle( pcm );
-	    if (title.size( ) != 0)
-		return title;
-	}
+        ClanOrder::Pointer ord = orgs->findOrder( pcm );
+        
+        if (ord) {
+            const DLString &title = ord->getTitle( pcm );
+            if (title.size( ) != 0)
+                return title;
+        }
     }
     
     if (titles) {
-	return titles->build( pcm );
+        return titles->build( pcm );
     }
 
     return DLString::emptyString;
@@ -74,16 +74,16 @@ const DLString & DefaultClan::getTitle( PCMemoryInterface *pcm ) const
 bool DefaultClan::isLeader( PCMemoryInterface *pcm ) const
 {
     if (leader.getValue( ) < 0)
-	return false;
-	
+        return false;
+        
     return pcm->getClanLevel( ) >= leader.getValue( );
 }
 
 bool DefaultClan::isRecruiter( PCMemoryInterface *pcm ) const
 {
     if (recruiter.getValue( ) < 0)
-	return false;
-	
+        return false;
+        
     return pcm->getClanLevel( ) >= recruiter.getValue( );
 }
 
@@ -97,22 +97,22 @@ void DefaultClan::makeMonument( Character *ch, Character *killer ) const
     Object *obj;
 
     if (!killer || ch == killer)
-	return;
+        return;
 
     if (ch->is_npc( ) || killer->is_npc( ))
-	return;
+        return;
     
     obj = create_object( get_obj_index( OBJ_VNUM_MONUMENT ), 0 );
     obj->timer = 24 * 24 * 2; // 48 real life hour
     
     obj->setDescription( 
-	    fmt( NULL, monument.getValue( ).c_str( ), ch, killer ).c_str( ) );
+            fmt( NULL, monument.getValue( ).c_str( ), ch, killer ).c_str( ) );
 
     obj->fmtName( 
-	    obj->getName( ), ch->getNameP( ), killer->getNameP( ) );
+            obj->getName( ), ch->getNameP( ), killer->getNameP( ) );
 
     obj->fmtShortDescr( 
-	    obj->getShortDescr( ), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
+            obj->getShortDescr( ), ch->getNameP( '3' ).c_str( ), killer->getNameP( '2').c_str( ) );
 
     obj_to_room( obj, ch->in_room );
 }
@@ -122,8 +122,8 @@ bool DefaultClan::isEnemy( const Clan &clan )
     XMLVectorBase<XMLClanReference>::iterator i;
 
     for (i = enemies.begin( ); i != enemies.end( ); i++) {
-	if (*i == clan)
-	    return true;
+        if (*i == clan)
+            return true;
     }
     
     return false;
@@ -132,11 +132,11 @@ bool DefaultClan::isEnemy( const Clan &clan )
 void DefaultClan::handleVictory( PCharacter *ch, PCharacter *victim )
 {
     if (ch == victim || ch->is_immortal( ) || victim->is_immortal( ))
-	return;
+        return;
 
     if (!data)
-	return;
-	
+        return;
+        
     data->victory[ch->getRealLevel( ) / 20]++;
     data->save( );
 }
@@ -144,10 +144,10 @@ void DefaultClan::handleVictory( PCharacter *ch, PCharacter *victim )
 void DefaultClan::handleDefeat( PCharacter *ch, PCharacter *killer )
 {
     if (ch == killer || ch->is_immortal( ) || killer->is_immortal( ))
-	return;
+        return;
 
     if (!data)
-	return;
+        return;
 
     data->defeat[ch->getRealLevel( ) / 20]++;
     data->save( );

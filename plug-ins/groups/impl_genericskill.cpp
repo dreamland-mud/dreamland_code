@@ -5,17 +5,21 @@
 
 #include "so.h"
 #include "mocregistrator.h"
+#include "xmlattributeplugin.h"
 #include "genericskill.h"
+#include "dreamskill.h"
 
 extern "C"
 {
-	SO::PluginList initialize_genericskill( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<MocRegistrator<GenericSkill> >( ppl );
-		
-		return ppl;
-	}
-	
+        SO::PluginList initialize_genericskill( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<MocRegistrator<GenericSkill> >( ppl );
+                Plugin::registerPlugin<DreamSkillManager>( ppl );
+                
+                return ppl;
+        }
+        
 }
+            

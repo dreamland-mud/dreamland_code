@@ -25,11 +25,11 @@ XMLReward::~XMLReward( )
 bool XMLReward::isEmpty( ) const
 {
     return !(gold.getValue( ) > 0 
-	    || qpoints.getValue( ) > 0
-	    || practice.getValue( ) > 0
-	    || restring.getValue( ) > 0
-	    || experience.getValue( ) > 0
-	    );
+            || qpoints.getValue( ) > 0
+            || practice.getValue( ) > 0
+            || restring.getValue( ) > 0
+            || experience.getValue( ) > 0
+            );
 }
 
 void XMLAttributeReward::addReward( const XMLReward &r ) 
@@ -45,46 +45,46 @@ void XMLAttributeReward::reward( PCharacter *ch )
     int c;
 
     for (r = rewards.begin( ); r!= rewards.end( ); ) {
-	if (r->isEmpty( )) {
-	    rewards.erase( r );
-	    continue;
-	}
+        if (r->isEmpty( )) {
+            rewards.erase( r );
+            continue;
+        }
 
-	sprintf( buf, "%s\r\n", r->reason.c_str( ) );
-	    
-	c = r->gold;
-	if (c > 0) {
-	    ch->gold += c;
-	    sprintf( buf + strlen(buf), "%s%s%4d %sÚÏÌÏÔ%s\r\n",
-		     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		     GET_COUNT(c, "ÕÀ ÍÏÎÅÔÕ", "ÙÅ ÍÏÎÅÔÙ", "ÙÈ ÍÏÎÅÔ") );
-	}
+        sprintf( buf, "%s\r\n", r->reason.c_str( ) );
+            
+        c = r->gold;
+        if (c > 0) {
+            ch->gold += c;
+            sprintf( buf + strlen(buf), "%s%s%4d %sÐ·Ð¾Ð»Ð¾Ñ‚%s\r\n",
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
+                     GET_COUNT(c, "ÑƒÑŽ Ð¼Ð¾Ð½ÐµÑ‚Ñƒ", "Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹", "Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚") );
+        }
 
-	c = r->qpoints;
-	if (c > 0) {
-	    ch->questpoints += c;
-	    sprintf( buf + strlen(buf), "%s%s%4d %sË×ÅÓÔÏ×%s\r\n",
-		     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		     GET_COUNT(c, "ÕÀ ÅÄÉÎÉÃÕ", "ÙÅ ÅÄÉÎÉÃÙ", "ÙÈ ÅÄÉÎÉÃ") );
-	}
+        c = r->qpoints;
+        if (c > 0) {
+            ch->questpoints += c;
+            sprintf( buf + strlen(buf), "%s%s%4d %sÐºÐ²ÐµÑÑ‚Ð¾Ð²%s\r\n",
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
+                     GET_COUNT(c, "ÑƒÑŽ ÐµÐ´Ð¸Ð½Ð¸Ñ†Ñƒ", "Ñ‹Ðµ ÐµÐ´Ð¸Ð½Ð¸Ñ†Ñ‹", "Ñ‹Ñ… ÐµÐ´Ð¸Ð½Ð¸Ñ†") );
+        }
 
-	c = r->practice;
-	if (c > 0) {
-	    ch->practice += c;
-	    sprintf( buf + strlen(buf), "%s%s%4d %sÐÒÁËÔÉË%s\r\n",
-		      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		      GET_COUNT(c, "Õ", "É", "") );
-	}
-	
-	c = r->experience;
-	if (c > 0) {
-	    ch->gainExp( c );
-	    sprintf( buf + strlen(buf), "%s%s%4d %sÏÞË%s ÏÐÙÔÁ\r\n",
-		     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
-		     GET_COUNT(c, "Ï", "Á", "Ï×"));
-	}
-	
-	GQChannel::pecho( ch, buf );
+        c = r->practice;
+        if (c > 0) {
+            ch->practice += c;
+            sprintf( buf + strlen(buf), "%s%s%4d %sÐ¿Ñ€Ð°ÐºÑ‚Ð¸Ðº%s\r\n",
+                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
+                      GET_COUNT(c, "Ñƒ", "Ð¸", "") );
+        }
+        
+        c = r->experience;
+        if (c > 0) {
+            ch->gainExp( c );
+            sprintf( buf + strlen(buf), "%s%s%4d %sÐ¾Ñ‡Ðº%s Ð¾Ð¿Ñ‹Ñ‚Ð°\r\n",
+                     offset, GQChannel::BOLD, c, GQChannel::NORMAL,
+                     GET_COUNT(c, "Ð¾", "Ð°", "Ð¾Ð²"));
+        }
+        
+        GQChannel::pecho( ch, buf );
         rewards.erase( r );
     }
 }
@@ -96,15 +96,15 @@ void XMLAttributeRewardListenerPlugin::run( int oldState, int newState, Descript
     Character *ch = d->character;
 
     if (!ch)
-	return;
+        return;
     
     if (newState != CON_PLAYING) 
-	return;
+        return;
     
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeReward>( "reward" );
     
     if (!attr)
-	return;
+        return;
 
     attr->reward( ch->getPC( ) );
 }

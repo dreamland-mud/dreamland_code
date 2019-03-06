@@ -9,14 +9,14 @@
 
 extern "C"
 {
-	SO::PluginList initialize_quest_core( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<QuestManager>( ppl );
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeQuestData> >( ppl );
-		
-		return ppl;
-	}
-	
+        SO::PluginList initialize_quest_core( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<QuestManager>( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeQuestData> >( ppl );
+                
+                return ppl;
+        }
+        
 }

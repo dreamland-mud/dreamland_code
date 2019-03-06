@@ -22,7 +22,7 @@ SCDP_IOREAD  = 4000
 
 SCDP_AUTO    = 5000
     +0 AnatoliaUpdate
-    +1 CPlugin "Мир неуловимо изменился"
+    +1 CPlugin "п°п╦я─ п╫п╣я┐п╩п╬п╡п╦п╪п╬ п╦п╥п╪п╣п╫п╦п╩я│я▐"
   +100 GQuestShutdownTask (if destroy occured btw SCDP_IOREAD and SCDP_AUTO)
   
 SCDP_ROUND   = 6500

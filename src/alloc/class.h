@@ -23,58 +23,58 @@ class Class {
 public:
     class ClassRegistrator : public virtual DLObject {
     public:
-	typedef ::Pointer<ClassRegistrator> Pointer;
+        typedef ::Pointer<ClassRegistrator> Pointer;
 
-	virtual ~ClassRegistrator( );
+        virtual ~ClassRegistrator( );
 
-	virtual AllocateClass::Pointer clone( ) const = 0;
-	virtual AllocateClass * cloneRaw( ) const {
-	    return NULL;
-	}
+        virtual AllocateClass::Pointer clone( ) const = 0;
+        virtual AllocateClass * cloneRaw( ) const {
+            return NULL;
+        }
     };
 
     template<typename C>
     class RegisterManyAllocateClass : public ClassRegistrator {
     public:
-	typedef ::Pointer< RegisterManyAllocateClass<C> > Pointer;
+        typedef ::Pointer< RegisterManyAllocateClass<C> > Pointer;
 
-	inline virtual AllocateClass::Pointer clone( ) const {
-	    return ::Pointer<C> ( NEW );
-	}
+        inline virtual AllocateClass::Pointer clone( ) const {
+            return ::Pointer<C> ( NEW );
+        }
     };
 
     template<typename C>
     class RegisterOneAllocateClass : public ClassRegistrator {
     public:
-	typedef ::Pointer< RegisterOneAllocateClass<C> > Pointer;
+        typedef ::Pointer< RegisterOneAllocateClass<C> > Pointer;
 
-	inline virtual AllocateClass::Pointer clone( ) const {
-	    return ::Pointer<C> ( C::getThis( ) );
-	}
+        inline virtual AllocateClass::Pointer clone( ) const {
+            return ::Pointer<C> ( C::getThis( ) );
+        }
     };
-	
+        
 public:
     template <typename T> static void regMocOne( ) {
-	regClass( T::MOC_TYPE, 
-		typename RegisterOneAllocateClass<T>::Pointer( NEW ) );
+        regClass( T::MOC_TYPE, 
+                typename RegisterOneAllocateClass<T>::Pointer( NEW ) );
     }
 
     template <typename T> static void regMoc( ) {
-	regClass( T::MOC_TYPE, 
-		typename RegisterManyAllocateClass<T>::Pointer( NEW ) );
+        regClass( T::MOC_TYPE, 
+                typename RegisterManyAllocateClass<T>::Pointer( NEW ) );
     }
     
     template <typename T> static void unregMoc( ) {
-	unRegClass( T::MOC_TYPE );
+        unRegClass( T::MOC_TYPE );
     }
     
     template <typename T> static void regXMLVar( ) {
-	regClass( T::TYPE, 
-		typename RegisterManyAllocateClass<T>::Pointer( NEW ) );
+        regClass( T::TYPE, 
+                typename RegisterManyAllocateClass<T>::Pointer( NEW ) );
     }
     
     template <typename T> static void unregXMLVar( ) {
-	unRegClass( T::TYPE );
+        unRegClass( T::TYPE );
     }
     
     static void regClass( const DLString& name, ClassRegistrator::Pointer classPointer );

@@ -48,24 +48,24 @@ struct MagicItemUsage {
 bool MagicItemUsage::check( Object *obj, int spellSN, Character *user, Character *target ) const
 {
     if (obj->item_type != item_type)
-	return false;
+        return false;
 
     if (sn != gsn_none && !skillManager->find( sn )->usable( user )) 
-	return false;
+        return false;
 
     if (fSelfOnly && target != user && target != user->fighting) 
-	return false;
+        return false;
     
     if (obj->wear_loc != wearloc)
-	if (wearlocationManager->find( wearloc )->canWear( user, obj, F_WEAR_REPLACE ) != RC_WEAR_OK) 
-	    return false;
+        if (wearlocationManager->find( wearloc )->canWear( user, obj, F_WEAR_REPLACE ) != RC_WEAR_OK) 
+            return false;
     
     if (chargesValue >= 0 && obj->value[chargesValue] <= 0) 
-	return false;
+        return false;
 
     for (int i = minValue; i <= maxValue; i++)
-	if (obj->value[i] == spellSN)
-	    return true;
+        if (obj->value[i] == spellSN)
+            return true;
 
     return false;
 }
@@ -75,11 +75,11 @@ bool MagicItemUsage::use( Object *obj, Character *user, Character *target ) cons
     DLString args, objName, targetName;
     
     if (!cmd)
-	return false;
+        return false;
 
     if (obj->wear_loc != wearloc) 
-	if (wearlocationManager->find( wearloc )->wear( obj, F_WEAR_REPLACE|F_WEAR_VERBOSE ) != RC_WEAR_OK) 
-	    return false;
+        if (wearlocationManager->find( wearloc )->wear( obj, F_WEAR_REPLACE|F_WEAR_VERBOSE ) != RC_WEAR_OK) 
+            return false;
 
     objName = get_obj_name_list( obj, user->carrying, user );
     targetName = get_char_name_list( target, user->in_room->people, user );
@@ -124,17 +124,17 @@ const MagicItemUsage MagicItemTable::usages [] = {
 Object * MagicItemTable::find( Object *list, int sn, Character *user, Character *target )
 {
     for (Object *obj = list; obj; obj = obj->next_content) {
-	int i;
+        int i;
 
-	if (!user->can_see( obj ))
-	    continue;
-	    
-	if (user->getRealLevel( ) < obj->level)
-	    continue;
-	
-	if (( i = findIndex( obj ) ) >= 0)
-	    if (usages[i].check( obj, sn, user, target ))
-		return obj;
+        if (!user->can_see( obj ))
+            continue;
+            
+        if (user->getRealLevel( ) < obj->level)
+            continue;
+        
+        if (( i = findIndex( obj ) ) >= 0)
+            if (usages[i].check( obj, sn, user, target ))
+                return obj;
     }
 
     return NULL;
@@ -143,8 +143,8 @@ Object * MagicItemTable::find( Object *list, int sn, Character *user, Character 
 int MagicItemTable::findIndex( Object *obj )
 {
     for (int i = 0; usages[i].item_type >= 0; i++) 
-	if (usages[i].item_type == obj->item_type)
-	    return i;
+        if (usages[i].item_type == obj->item_type)
+            return i;
 
     return -1;
 }
@@ -154,8 +154,8 @@ bool MagicItemTable::use( Object *obj, Character *user, Character *target )
     int i = findIndex( obj );
 
     if (i < 0)
-	return false;
-	
+        return false;
+        
     return usages[i].use( obj, user, target );
 }
 
@@ -170,7 +170,7 @@ bool BasicMobileBehavior::useItemWithSpell( int sn, Character *target )
     obj = MagicItemTable::find( ch->carrying, sn, ch, target );
 
     if (!obj)
-	return false;
+        return false;
     
     return MagicItemTable::use( obj, ch, target );
 }

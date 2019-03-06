@@ -13,12 +13,12 @@ extern "C"
 {
     SO::PluginList initialize_gquest_core( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGlobalQuest> >( ppl );
-	Plugin::registerPlugin<GlobalQuestManager>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeReward> >( ppl );
-	Plugin::registerPlugin<XMLAttributeRewardListenerPlugin>( ppl );
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGlobalQuest> >( ppl );
+        Plugin::registerPlugin<GlobalQuestManager>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeReward> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRewardListenerPlugin>( ppl );
+        return ppl;
     }
 }

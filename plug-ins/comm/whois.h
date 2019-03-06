@@ -16,21 +16,21 @@ using std::endl;
 class Whois : public CommandPlugin, public DefaultCommand {
 XML_OBJECT
 public:
-	class LinesList : public std::vector<DLString> {
-	public:
-	    void add( std::basic_ostringstream<char> &, bool = true );
-	    void addNoCR( std::basic_ostringstream<char> & );
-	};
-	
-	typedef ::Pointer<Whois> Pointer;
+        class LinesList : public std::vector<DLString> {
+        public:
+            void add( std::basic_ostringstream<char> &, bool = true );
+            void addNoCR( std::basic_ostringstream<char> & );
+        };
+        
+        typedef ::Pointer<Whois> Pointer;
     
-	Whois( );
+        Whois( );
 
-	virtual void run( Character*, const DLString& constArguments );
-	
+        virtual void run( Character*, const DLString& constArguments );
+        
 private:
-	static const DLString COMMAND_NAME;
-		
+        static const DLString COMMAND_NAME;
+                
 };
 
 #endif

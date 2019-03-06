@@ -11,9 +11,9 @@ extern "C"
 {
     SO::PluginList initialize_fight_core( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<DeathManager>( ppl );
-	return ppl;
+        Plugin::registerPlugin<DeathManager>( ppl );
+        return ppl;
     }
 }

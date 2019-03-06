@@ -10,27 +10,35 @@
 void VictimBehavior::deadFromHunter( PCMemoryInterface *pcm )
 {
     pcm->getPlayer( )->println(
-	"ô×ÏÅ ÚÁÄÁÎÉÅ {Y÷ùðïìîåîï{x!\n"
-	"÷ÅÒÎÉÓØ ÚÁ ×ÏÚÎÁÇÒÁÖÄÅÎÉÅÍ Ë ÄÁ×ÛÅÍÕ ÔÅÂÅ ÚÁÄÁÎÉÅ ÄÏ ÔÏÇÏ, ËÁË ÉÓÔÅÞÅÔ ×ÒÅÍÑ!" );
+        "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ {YÐ’Ð«ÐŸÐžÐ›ÐÐ•ÐÐž{x!\n"
+        "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ð·Ð° Ð²Ð¾Ð·Ð½Ð°Ð³Ñ€Ð°Ð¶Ð´ÐµÐ½Ð¸ÐµÐ¼ Ðº Ð´Ð°Ð²ÑˆÐµÐ¼Ñƒ Ñ‚ÐµÐ±Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ Ð´Ð¾ Ñ‚Ð¾Ð³Ð¾, ÐºÐ°Ðº Ð¸ÑÑ‚ÐµÑ‡ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ!" );
 }
 
 void VictimBehavior::deadFromSuicide( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( ))
-	pcm->getPlayer( )->println( "{YöÅÒÔ×Á ÕÍÅÒÌÁ Ó×ÏÅÊ ÓÍÅÒÔØÀ.{x" );
+        pcm->getPlayer( )->println( "{YÐ–ÐµÑ€Ñ‚Ð²Ð° ÑƒÐ¼ÐµÑ€Ð»Ð° ÑÐ²Ð¾ÐµÐ¹ ÑÐ¼ÐµÑ€Ñ‚ÑŒÑŽ.{x" );
 }
 
 void VictimBehavior::deadFromOther( PCMemoryInterface *pcm, Character *killer )
 {
-    killer->println("{YðÏÚÄÒÁ×ÌÑÀ! îÏ ÕÂÉÔØ åÇÏ ÂÙÌÏ ÐÏÒÕÞÅÎÏ ÄÒÕÇÏÍÕ.{x");
+    killer->println("{YÐŸÐ¾Ð·Ð´Ñ€Ð°Ð²Ð»ÑÑŽ! ÐÐ¾ ÑÑ‚Ð¾ ÑƒÐ±Ð¸Ð¹ÑÑ‚Ð²Ð¾ Ð±Ñ‹Ð»Ð¾ Ð¿Ð¾Ñ€ÑƒÑ‡ÐµÐ½Ð¾ Ð´Ñ€ÑƒÐ³Ð¾Ð¼Ñƒ.{x");
 
     if (pcm->isOnline( ))
-	pcm->getPlayer( )->println( "{YëÔÏ-ÔÏ ÄÒÕÇÏÊ ×ÙÐÏÌÎÉÌ ÐÏÒÕÞÅÎÎÏÅ ÔÅÂÅ ÚÁÄÁÎÉÅ.{x" );
+        pcm->getPlayer( )->println( "{YÐšÑ‚Ð¾-Ñ‚Ð¾ Ð´Ñ€ÑƒÐ³Ð¾Ð¹ Ð²Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ð» Ð¿Ð¾Ñ€ÑƒÑ‡ÐµÐ½Ð½Ð¾Ðµ Ñ‚ÐµÐ±Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ.{x" );
+}
+
+void VictimBehavior::deadFromGroupMember( PCMemoryInterface *pcm, Character *killer )
+{
+    killer->pecho("{YÐŸÐ¾Ð·Ð´Ñ€Ð°Ð²Ð»ÑÑŽ! Ð¢Ñ‹ Ð²Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ð»%GÐ¾||Ð° Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ ÑÐ²Ð¾ÐµÐ³Ð¾ ÑÐ¾Ð³Ñ€ÑƒÐ¿Ð¿Ð½Ð¸ÐºÐ°.", killer);
+
+    if (pcm->isOnline( ))
+        pcm->getPlayer( )->pecho("{Y%1$^C1 Ð²Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ð»%1$GÐ¾||Ð° Ñ‚Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ.{x", killer);
 }
 
 void VictimBehavior::show( Character *victim, std::basic_ostringstream<char> &buf ) 
 {
     if (ourHero( victim ))
-	buf << "{R[ãåìø] {x";
+        buf << "{R[Ð¦Ð•Ð›Ð¬] {x";
 }
 

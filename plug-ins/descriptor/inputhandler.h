@@ -45,19 +45,19 @@ struct InputHandlerRegistrator : public InputHandlerPlugin {
 
     virtual void initialization() 
     {
-	Class::regMoc<T>();
-	InputHandlerPlugin::initialization( );
+        Class::regMoc<T>();
+        InputHandlerPlugin::initialization( );
     }
     
     virtual void destruction() 
     {
-	InputHandlerPlugin::destruction( );
-	Class::unregMoc<T>();
+        InputHandlerPlugin::destruction( );
+        Class::unregMoc<T>();
     }
 
     virtual const DLString &getType( ) const
     {
-	return T::MOC_TYPE;
+        return T::MOC_TYPE;
     }
 };
 

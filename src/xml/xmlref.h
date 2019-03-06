@@ -62,39 +62,39 @@ public:
     
     bool toXML( XMLNode::Pointer& parent ) const
     {
-	parent->setType( XMLNode::XML_LEAF );
-	if(!isEmpty())
-	    parent->insertAttribute( ATTRIBUTE_REFID, 
-		    getPointer( )->getReferenceId( ) );
-	return true;
+        parent->setType( XMLNode::XML_LEAF );
+        if(!isEmpty())
+            parent->insertAttribute( ATTRIBUTE_REFID, 
+                    getPointer( )->getReferenceId( ) );
+        return true;
     }
     void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
     {
-	const DLString &sid = parent->getAttribute( ATTRIBUTE_REFID );
+        const DLString &sid = parent->getAttribute( ATTRIBUTE_REFID );
 
-	if(sid.empty( )) {
-	    clear();
-	    return;
-	}
+        if(sid.empty( )) {
+            clear();
+            return;
+        }
 
-	refmap_t::iterator it;
-	it = refmap.find(sid.toLongLong( ));
+        refmap_t::iterator it;
+        it = refmap.find(sid.toLongLong( ));
 
-	if(it == refmap.end( ))
-	    throw ExceptionBadType("id not assigned yet", sid);
+        if(it == refmap.end( ))
+            throw ExceptionBadType("id not assigned yet", sid);
 
-	setPointer( dynamic_cast<T *>(it->second) );
+        setPointer( dynamic_cast<T *>(it->second) );
     }
 
     template <typename V>
     const XMLReference &operator = (V &v) {
-	setPointer( v.getPointer( ) );
-	return *this;
+        setPointer( v.getPointer( ) );
+        return *this;
     }
     template <typename V>
     const XMLReference &operator = (V *v) {
-	setPointer( v );
-	return *this;
+        setPointer( v );
+        return *this;
     }
 };
 
@@ -114,29 +114,29 @@ public:
 
     bool toXML( XMLNode::Pointer& parent ) const
     {
-	if (Ptr::toXML(parent)) {
-	    if(!isEmpty())
-		parent->insertAttribute( ATTRIBUTE_REFID, 
-			getPointer( )->getReferenceId( ) );
-	    return true;
-	}
-	else
-	    return false;
+        if (Ptr::toXML(parent)) {
+            if(!isEmpty())
+                parent->insertAttribute( ATTRIBUTE_REFID, 
+                        getPointer( )->getReferenceId( ) );
+            return true;
+        }
+        else
+            return false;
     }
     
     void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
     {
-	Ptr::fromXML(parent);
+        Ptr::fromXML(parent);
 
-	if(isEmpty( ))
-	    return;
-	
-	const DLString &sid = parent->getAttribute( ATTRIBUTE_REFID );
-	
-	if(sid.empty( ))
-	    return;
-	
-	getPointer( )->setReferenceId(sid.toLongLong( ));
+        if(isEmpty( ))
+            return;
+        
+        const DLString &sid = parent->getAttribute( ATTRIBUTE_REFID );
+        
+        if(sid.empty( ))
+            return;
+        
+        getPointer( )->setReferenceId(sid.toLongLong( ));
     }
 };
 

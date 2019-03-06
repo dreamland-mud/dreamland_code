@@ -8,7 +8,7 @@
 const DLString XMLLimits::TYPE = "XMLLimits";
 
 XMLLimits::XMLLimits( )
-	     : XMLClausesList( false )
+             : XMLClausesList( false )
 {
 }
 
@@ -19,8 +19,8 @@ XMLLimits::~XMLLimits( )
 bool XMLLimits::allow( DLObject * arg ) const 
 {
     for (const_iterator i = begin( ); i != end( ); i++) 
-	if (i->match( arg )) 
-	    return i->allow;
+        if (i->match( arg )) 
+            return i->allow;
     
     return true;
 }

@@ -15,19 +15,20 @@ class Skill;
 
 class CPractice : public CommandPlugin, public DefaultCommand {
 public:
-	typedef ::Pointer<CPractice> Pointer;
+        typedef ::Pointer<CPractice> Pointer;
     
-	CPractice( );
+        CPractice( );
 
-	virtual void run( Character *, const DLString & );
+        virtual void run( Character *, const DLString & );
 
 private:
-	static const DLString COMMAND_NAME;
-		
-	void pracShow( PCharacter *, bool, bool );
-	void pracLearn( PCharacter *, DLString & );
-	PCharacter * findTeacher( PCharacter *, Skill * );
-	NPCharacter * findPracticer( PCharacter *, Skill * );
+        static const DLString COMMAND_NAME;
+                
+        void pracShow( PCharacter *, bool, bool );
+        void pracLearn( PCharacter *, DLString & );
+        void pracHere( PCharacter * );
+        PCharacter * findTeacher( PCharacter *, Skill * = NULL );
+        NPCharacter * findPracticer( PCharacter *, Skill * = NULL );
 };
 
 #endif

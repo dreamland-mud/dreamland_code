@@ -37,13 +37,13 @@ class XMLAttributeNoChannel : public XMLAttributeOnlineTicker, public RemortAttr
 {
 XML_OBJECT;
 public:
-	typedef ::Pointer<XMLAttributeNoChannel> Pointer;
+        typedef ::Pointer<XMLAttributeNoChannel> Pointer;
 
-	XMLAttributeNoChannel( );
-	virtual ~XMLAttributeNoChannel( );
-	
-	virtual void start( PCMemoryInterface * ) const;
-	virtual void end( PCMemoryInterface * ) const;
+        XMLAttributeNoChannel( );
+        virtual ~XMLAttributeNoChannel( );
+        
+        virtual void start( PCMemoryInterface * ) const;
+        virtual void end( PCMemoryInterface * ) const;
 };
 
 

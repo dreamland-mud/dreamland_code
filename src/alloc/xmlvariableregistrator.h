@@ -15,11 +15,11 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regXMLVar<C>( );
+        Class::regXMLVar<C>( );
     }
     virtual void destruction( ) 
     {
-	Class::unregXMLVar<C>( );
+        Class::unregXMLVar<C>( );
     }
 };
 

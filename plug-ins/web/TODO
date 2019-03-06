@@ -8,13 +8,6 @@
 Манипуляции с предметами:
 <m c='drop $,wear $,look $,use $,lore $,fill 29802834 $,take $ 23423:books' i='23849234'>странный меч</m>
 
-Англ варианты?
-    config ruskill=no rucomm=no
-    входит в группу <m c='glist' a='benediction'><c fg=2'>benediction</c></m>
-
-    config ruskill=yes rucomm=no
-    входит в группу <m c='glist' a='благословления'><c fg=2'>благославления</c></m>
-    ...
 
 =================================================
 (звездочкой помечено сделанное)
@@ -82,21 +75,43 @@ Bugs:
 
 
 =================================================
+Персонаж, команды контекстного меню:
 
-Персонаж, наброски:
+PC рядом в комнате:
+* look
+* smell 
+* mount if centaur
+* mlove if lover
+* murder, consider if pk
+* follow if doesn't follow
+* group if follows and can group
+* nuke if same group
+* all global commands
+? social and mysocial in submenu https://www.codeply.com/go/1Iz3DxS60l
 
-команды:
-pc: tell, whois, look, consider, smell if set, mount if centaur,
-page if orb, mlove if lover, twit add|remove
-pc pk: murder
-npc: look, consider, kill (not on pets), tell if prog, listen if prog, smell if set
-occupations: list, train, prac here, smith, mount if horse
-SET AS TARGET 
-groups: follow, nuke, group
+PC глобально (who, webclient who, scan, where):
+- tell name: должно только копировать команду в строку ввода
+* grats Name
+* whois
+? page if both have orbs
+? twit add|remove
 
-не делать меню на глобалквестовых мобов (гангстеров)
-зеркала и доппель: look like original pc
-pc просто по имени
+* зеркала и доппель: look like original pc
+* pc просто по имени
+
+=================================================
+Моб, команды контекстного меню:
+
+* look, consider, kill (not on pets), smell
+- tell if prog, listen if prog
+* list, train, prac here, smith
+* mount if horse
+- SET AS TARGET 
+* follow, nuke
+? copy name to buffer 
+
+- не делать меню на глобалквестовых мобов (гангстеров)
+? ранги на мобов видных по скану
 
 =================================================
 Меню которое возникает если просто кликнуть на окно?
@@ -120,11 +135,9 @@ pc просто по имени
 - выводить видимые экстра-екзитс рядом с обычными
 
 =================================================
-Строка статуса
-Bootstrap collapse
-Bootstrap progress bar
+Строка статуса или общее меню
 
-- прогресс бар: здоровье, мана, шаги (исчезают по очереди на мелких экранах), здоровья противника (вместо шагов?)
+* прогресс бар: здоровье, мана, шаги (исчезают по очереди на мелких экранах), здоровья противника (вместо шагов?)
 - ссылка на сайт, мб с подменю - карты, вещи, справка
 - меню команд:
      * информационные

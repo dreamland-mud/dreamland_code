@@ -14,10 +14,10 @@
 class ExceptionDBIOEOF : public Exception  
 {
 public:
-	inline ExceptionDBIOEOF( )
-		: Exception( "EOF" )
-	{
-	}
+        inline ExceptionDBIOEOF( )
+                : Exception( "EOF" )
+        {
+        }
 
 };
 

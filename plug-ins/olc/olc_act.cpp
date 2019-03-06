@@ -37,6 +37,7 @@
 #include "olc.h"
 #include "loadsave.h"
 #include "damageflags.h"
+#include "recipeflags.h"
 #include "material.h"
 #include "def.h"
 
@@ -56,131 +57,105 @@ int skill_table;
 int wearloc_table;
 int liq_table;
 int mat_table;
+int group_table;
+int race_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
 {
-    {"area", &area_flags, "Аттрибуты арий."},
-    {"room", &room_flags, "Аттрибуты комнат."},
-    {"sector", &sector_table, "Типы земель, секторов."},
-    {"exit", &exit_flags, "Флаги выходов и экстравыходов."},
-    {"type", &item_table, "Типы предметов."},
-    {"extra", &extra_flags, "Аттрибуты предметов."},
-    {"trap", &trap_flags, "Флаги ловушек."},
-    {"detecion", &detect_flags, "Детекты."},
-    {"wear", &wear_flags, "Куда одевать предмет."},
-    {"spec", &spec_table, "Доступные спец. программы."},
-    {"sex", &sex_table, "Пол."},
-    {"act", &act_flags, "Аттрибуты монстров."},
-    {"affect", &affect_flags, "Влияния на монстрах."},
-    {"wear-loc", &wearloc_table, "Куда монстры одевают предметы."},
-    {"spells", &skill_table, "Имена текущих заклинаний."},
-    {"weapon", &weapon_flags, "Типы оружия."},
-    {"container", &container_flags, "Статус контейнеров."},
+    {"{Yп░я─п╦п╦{x", NULL, NULL },
+    {"area_flags", &area_flags, "п╓п╩п╟пЁп╦ п╟я─п╦п╧ (п©п╬п╩п╣ area_flag)"},
 
-    {"armor", &ac_type, "Защита от разных атак."},
-    {"apply", &apply_flags, "Apply флаги"},
-    {"affwhere", &affwhere_flags, "where флаги (TO_XXX)"},
-    {"form", &form_flags, "Формы тела монстров."},
-    {"part", &part_flags, "Части тела монстров."},
-    {"imm", &imm_flags, "Иммунитеты монстров."},
-    {"res", &res_flags, "Сопротивляемость монстров."},
-    {"vuln", &vuln_flags, "Уязвимость монстров."},
-    {"off", &off_flags, "Типы поведения монстров."},
-    {"size", &size_table, "Размеры монстров."},
-    {"position", &position_table, "Позиции монстров."},
-    {"material", &mat_table, "Материалы." },
-    {"wclass", &weapon_class, "Класс оружия."},
-    {"wtype", &weapon_type2, "Специальные типы оружия."},
-    {"portal", &portal_flags, "Типы порталов."},
-    {"furniture", &furniture_flags, "Типы диванов и лежаков."},
-    {"liquid", &liq_table, "Жидкости"},
-    {"drink", &drink_flags, "Емкости для жидкостей"},
+    {"{Yп п╬п╪п╫п╟я┌я▀{x", NULL, NULL},
+    {"room_flags", &room_flags, "п╓п╩п╟пЁп╦ п╨п╬п╪п╫п╟я┌ (п©п╬п╩п╣ room_flags)."},
+    {"sector_table", &sector_table, "п╒п╦п© п╪п╣я│я┌п╫п╬я│я┌п╦ п╡ п╨п╬п╪п╫п╟я┌п╣ (п©п╬п╩п╣ sector_type)."},
+    {"exit_flags", &exit_flags, "п╓п╩п╟пЁп╦ п╡я▀я┘п╬п╢п╬п╡ п╦ я█п╨я│я┌я─п╟п╡я▀я┘п╬п╢п╬п╡ (п©п╬п╩п╣ exit_info)."},
+
+    {"{Yп÷я─п╣п╢п╪п╣я┌я▀{x", NULL, NULL},
+    {"item_table", &item_table, "п╒п╦п©я▀ п©я─п╣п╢п╪п╣я┌п╬п╡ (п©п╬п╩п╣ item_type)."},
+    {"wear_flags", &wear_flags, "п я┐п╢п╟ п╬п╢п╣п╡п╟я┌я▄ п©я─п╣п╢п╪п╣я┌ (п©п╬п╩п╣ wear_flags)."},
+    {"extra_flags", &extra_flags, "п╓п╩п╟пЁп╦ п©я─п╣п╢п╪п╣я┌п╬п╡ (п©п╬п╩п╣ extra_flags)."},
+    {"weapon_class", &weapon_class, "п▓п╦п╢ п╬я─я┐п╤п╦я▐ (п©п╬п╩п╣ value0 я┐ п╬я─я┐п╤п╦я▐)."},
+    {"weapon_flags", &weapon_flags, "п╒п╦п©я▀ я┐п╢п╟я─п╬п╡ (п©п╬п╩п╣ value3 я┐ п╬я─я┐п╤п╦я▐, п©п╬п╩п╣ dam_type я┐ п╪п╬п╠п╟)."},
+    {"weapon_type2", &weapon_type2, "п╓п╩п╟пЁп╦ п╬я─я┐п╤п╦я▐ (п©п╬п╩п╣ value4 я┐ п╬я─я┐п╤п╦я▐)."},
+    {"container_flags", &container_flags, "п╓п╩п╟пЁп╦ п╨п╬п╫я┌п╣п╧п╫п╣я─п╬п╡ (п©п╬п╩п╣ value1 я┐ п╨п╬п╫я┌п╣п╧п╫п╣я─п╟)."},
+    {"portal_flags", &portal_flags, "п╓п╩п╟пЁп╦ п©п╬я─я┌п╟п╩п╬п╡ (п©п╬п╩п╣ value2 я┐ п©п╬я─я┌п╟п╩п╬п╡)."},
+    {"furniture_flags", &furniture_flags, "п╓п╩п╟пЁп╦ п╪п╣п╠п╣п╩п╦ (п©п╬п╩п╣ value2 я┐ п╪п╣п╠п╣п╩п╦)."},
+    {"drink_flags", &drink_flags, "п╓п╩п╟пЁп╦ п╣п╪п╨п╬я│я┌п╦ п╢п╩я▐ п╤п╦п╢п╨п╬я│я┌п╣п╧ (п©п╬п╩п╣ value3)."},
+    {"recipe_flags", &recipe_flags, "п╓п╩п╟пЁп╦ я─п╣я├п╣п©я┌п╬п╡ (п©п╬п╩п╣ value0 я┐ я─п╣я├п╣п©я┌п╟)"},
+    {"liquid", &liq_table, "п√п╦п╢п╨п╬я│я┌п╦ (п©п╬п╩п╣ value2 я┐ п╣п╪п╨п╬я│я┌п╣п╧ п╦ я└п╬п╫я┌п╟п╫п╬п╡)."},
+    {"material", &mat_table, "п°п╟я┌п╣я─п╦п╟п╩я▀ п©я─п╣п╢п╪п╣я┌п╬п╡ п╦ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ material)." },
+
+    {"{Yп°п╬п╠я▀{x", NULL, NULL},
+    {"races", &race_table, "п║п©п╦я│п╬п╨ п╡я│п╣я┘ я─п╟я│ п╪п╬п╠п╬п╡."},
+    {"sex_table", &sex_table, "п÷п╬п╩ п╪п╬п╠п╟ (п©п╬п╩п╣ sex)."},
+    {"position_table", &position_table, "п÷п╬п╥п╦я├п╦п╦ п╪п╬п╠п╬п╡ (п©п╬п╩я▐ start_pos, default_pos, position)."},
+    {"size_table", &size_table, "п═п╟п╥п╪п╣я─я▀ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ size)."},
+    {"ac_type", &ac_type, "п п╩п╟я│я│ п╠я─п╬п╫п╦ п╫п╟ п╪п╬п╠п╟я┘ п╦ п╟я└я└п╣п╨я┌п╟я┘."},
+    {"act_flags", &act_flags, "п░я┌я┌я─п╦п╠я┐я┌я▀ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ act)."},
+    {"affect_flags", &affect_flags, "п▓п╩п╦я▐п╫п╦я▐ п╫п╟ п╪п╬п╠п╟я┘ (п©п╬п╩п╣ affected_by)."},
+    {"detect_flags", &detect_flags, "п■п╣я┌п╣п╨я┌я▀ п╪п╬п╠п╟ (п©п╬п╩п╣ detection)."},
+    {"imm_flags", &imm_flags, "п≤п╪п╪я┐п╫п╦я┌п╣я┌я▀ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ imm_flags)."},
+    {"res_flags", &res_flags, "п║п╬п©я─п╬я┌п╦п╡п╩я▐п╣п╪п╬я│я┌я▄ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ res_flags)."},
+    {"vuln_flags", &vuln_flags, "пёя▐п╥п╡п╦п╪п╬я│я┌я▄ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ vuln_flags)."},
+    {"off_flags", &off_flags, "п╒п╦п©я▀ п©п╬п╡п╣п╢п╣п╫п╦я▐ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ off_flags)."},
+    {"form_flags", &form_flags, "п╓п╬я─п╪я▀ я┌п╣п╩п╟ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ form)."},
+    {"part_flags", &part_flags, "п╖п╟я│я┌п╦ я┌п╣п╩п╟ п╪п╬п╠п╬п╡ (п©п╬п╩п╣ parts)."},
+    {"spec", &spec_table, "п■п╬я│я┌я┐п©п╫я▀п╣ я│п©п╣я├. п©я─п╬пЁя─п╟п╪п╪я▀ п╪п╬п╠п╟."},
+
+    {"{Yп░я└я└п╣п╨я┌я▀{x", NULL, NULL},
+    {"apply_flags", &apply_flags, "п÷п╬п╩п╣ location я┐ п╟я└я└п╣п╨я┌п╟ (п╫п╟ я┤я┌п╬ п╡п╩п╦я▐п╣я┌ п╣пЁп╬ modifier)"},
+    {"affwhere_flags", &affwhere_flags, "п÷п╬п╩п╣ where я┐ п╟я└я└п╣п╨я┌п╟ (п╫п╟ я┤я┌п╬ п╡п╩п╦я▐п╣я┌ п╣пЁп╬ bitvector)"},
+    {"wearloc", &wearloc_table, "п я┐п╢п╟ п╪п╬п╠я▀ п╬п╢п╣п╡п╟я▌я┌ п©я─п╣п╢п╪п╣я┌я▀."},
+
+    {"{Yпёп╪п╣п╫п╦я▐ п╦ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐{x", NULL, NULL}, 
+    {"spells", &skill_table, "п≤п╪п╣п╫п╟ п╡я│п╣я┘ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧."},
+    {"groups", &group_table, "п▓я│п╣ пЁя─я┐п©п©я▀ я┐п╪п╣п╫п╦п╧ (п╢п╩я▐ п©п╬п╩я▐ practicer)."},
     {NULL, NULL, NULL}
 };
 
-/*****************************************************************************
- Name:          show_flag_cmds
- Purpose:       Displays settable flags and stats.
- Called by:     show_help(olc_act.c).
- ****************************************************************************/
-void show_flag_cmds(Character * ch, const FlagTable *flag_table)
+void show_flag_cmds(Character * ch, const FlagTable *table)
 {
-    char buf[MAX_STRING_LENGTH];
-    char buf1[MAX_STRING_LENGTH];
-    int flag;
-    int col;
+    ostringstream buf;
+    const DLString &tableName = FlagTableRegistry::getName(table);
+    
+    buf << "п╒п╟п╠п╩п╦я├п╟ " << (table->enumerated ? "п╥п╫п╟я┤п╣п╫п╦п╧" : "я└п╩п╟пЁп╬п╡")
+        << " {Y" << tableName << "{x" << endl
+        << "п≈п╫п╟я┤п╣п╫п╦п╣        : п÷п╬я▐я│п╫п╣п╫п╦п╣" << endl;
+   
+    const FlagTable::Field * f = table->fields; 
+    for (int i = 0; i < table->size; i++)
+        buf << dlprintf("{g%-15s{x: %s", 
+                        f[i].name, 
+                       (f[i].message ? russian_case(f[i].message, '1').c_str() : ""))
+            << endl;
 
-    buf1[0] = '\0';
-    col = 0;
-    for (flag = 0; flag < flag_table->size; flag++) {
-	sprintf(buf, "%-19s", flag_table->fields[flag].name);
-	strcat(buf1, buf);
-	if (++col % 4 == 0)
-	    strcat(buf1, "\n\r");
-    }
-    if (col % 4 != 0)
-	strcat(buf1, "\n\r");
-    stc(buf1, ch);
+    ch->send_to(buf);
 }
 
-/*****************************************************************************
- Name:          show_skill_cmds
- Purpose:       Displays all skill functions.
-                Does remove those damn immortal commands from the list.
-                Could be improved by:
-                (1) Adding a check for a particular class.
-                (2) Adding a check for a level range.
- Called by:     show_help(olc_act.c).
- ****************************************************************************/
-void show_skill_cmds(Character * ch, int tar)
-{
-    char buf[MAX_STRING_LENGTH];
-    char buf1[MAX_STRING_LENGTH * 2];
-    int sn;
-    int col;
-
-    buf1[0] = '\0';
-    col = 0;
-    for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	Spell::Pointer spell = skill->getSpell( );
-
-	if (!spell)
-	    continue;
-	
-	if (tar == -1 || IS_SET( spell->getTarget( ), tar )) {
-	    sprintf(buf, "%-19s", skill->getName( ).c_str( ));
-	    strcat(buf1, buf);
-	    if (++col % 4 == 0)
-		strcat(buf1, "\n\r");
-	}
-    }
-
-    if (col % 4 != 0)
-	strcat(buf1, "\n\r");
-    stc(buf1, ch);
-}
-
-void show_skill_affects(Character *ch)
+void show_skills(Character *ch, int target)
 {
     ostringstream buf;
     int sn;
 
-    buf << fmt(0, "{Y%-20s  %-20s %-10s %s\n\r", "Заклинание", "Группа", "Тип", "Цель");
+    buf << fmt(0, "{Y%-20s  %-20s %-10s %s\n\r", "п≈п╟п╨п╩п╦п╫п╟п╫п╦п╣", "п⌠я─я┐п©п©п╟", "п╒п╦п©", "п╕п╣п╩я▄");
     for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	Spell::Pointer spell = skill->getSpell( );
-	AffectHandler::Pointer aff = skill->getAffect( );
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        Spell::Pointer spell = skill->getSpell( );
+        AffectHandler::Pointer aff = skill->getAffect( );
 
-	if (!spell || !aff)
-	    continue;
+        if (!spell || !aff)
+            continue;
+        if (target != -1 && !spell)
+            continue;
+        if (target != -1 && !IS_SET(spell->getTarget(), target))
+            continue;
 
-	buf << fmt( 0, "{g%-20s{x: %-20s %-10s %s\n\r",
-		       skill->getName( ).c_str( ),
-		       skill->getGroup( )->getName( ).c_str( ),
-		       spell_types.name( spell->getSpellType( ) ).c_str( ),
-		       target_table.names( spell->getTarget( ) ).c_str( ) );
+        buf << fmt( 0, "{g%-20s{x: %-20s %-10s %s\n\r",
+                       skill->getName( ).c_str( ),
+                       skill->getGroup( )->getName( ).c_str( ),
+                       spell_types.name( spell->getSpellType( ) ).c_str( ),
+                       target_table.names( spell->getTarget( ) ).c_str( ) );
     }
 
     page_to_char( buf.str( ).c_str( ), ch );
@@ -188,11 +163,6 @@ void show_skill_affects(Character *ch)
 
 
 
-/*****************************************************************************
- Name:          show_spec_cmds
- Purpose:       Displays settable special functions.
- Called by:     show_help(olc_act.c).
- ****************************************************************************/
 void show_spec_cmds(Character * ch)
 {
     char buf[MAX_STRING_LENGTH];
@@ -202,16 +172,16 @@ void show_spec_cmds(Character * ch)
 
     buf1[0] = '\0';
     col = 0;
-    stc("Все специальные функции начинаются с 'spec_'\n\r\n\r", ch);
+    stc("п▓я│п╣ я│п©п╣я├п╦п╟п╩я▄п╫я▀п╣ я└я┐п╫п╨я├п╦п╦ п╫п╟я┤п╦п╫п╟я▌я┌я│я▐ я│ 'spec_'\n\r\n\r", ch);
     for (spec = 0; spec_table[spec].function != NULL; spec++) {
-	sprintf(buf, "%-19s", &spec_table[spec].name[5]);
-	strcat(buf1, buf);
-	if (++col % 4 == 0)
-	    strcat(buf1, "\n\r");
+        sprintf(buf, "%-19s", &spec_table[spec].name[5]);
+        strcat(buf1, buf);
+        if (++col % 4 == 0)
+            strcat(buf1, "\n\r");
     }
 
     if (col % 4 != 0)
-	strcat(buf1, "\n\r");
+        strcat(buf1, "\n\r");
 
     stc(buf1, ch);
 }
@@ -221,12 +191,12 @@ void show_mat_cmds( Character *ch )
     ostringstream buf;
     const material_t *mat;
     
-    buf << "{gНазвание        Описание               Горючесть{x" << endl;
+    buf << "{gп²п╟п╥п╡п╟п╫п╦п╣        п·п©п╦я│п╟п╫п╦п╣               п⌠п╬я─я▌я┤п╣я│я┌я▄{x" << endl;
     for (mat = &material_table[0]; mat->name; mat++)
-	buf << fmt( 0, "%-15s %-22N1 %-3d\n\r", 
-		       mat->name, 
-		       mat->rname ? mat->rname : "",
-		       mat->burns );
+        buf << fmt( 0, "%-15s %-22N1 %-3d\n\r", 
+                       mat->name, 
+                       mat->rname ? mat->rname : "",
+                       mat->burns );
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -239,30 +209,24 @@ void show_liq_cmds(Character * ch)
     buf << "Name                ShowName            Color       Proof Full Thirst Food Size" << endl;
 
     for (int l = 0; l < liquidManager->size( ); l++) {
-	liq = liquidManager->find( l );
-	
-	buf << dlprintf( "%-18s %-18s %-14s ",
-		  liq->getName( ).c_str( ),
-		  liq->getShortDescr( ).ruscase( '1' ).c_str( ),
-		  liq->getColor( ).ruscase( '1' ).c_str( ) );
+        liq = liquidManager->find( l );
+        
+        buf << dlprintf( "%-18s %-18s %-14s ",
+                  liq->getName( ).c_str( ),
+                  liq->getShortDescr( ).ruscase( '1' ).c_str( ),
+                  liq->getColor( ).ruscase( '1' ).c_str( ) );
 
-	for (int i = 0; i < desireManager->size( ); i++)
-	    buf << dlprintf("%3d ", liq->getDesires( )[i] );
-	                    
-	buf << dlprintf( "%3d\r\n", liq->getSipSize( ) );
+        for (int i = 0; i < desireManager->size( ); i++)
+            buf << dlprintf("%3d ", liq->getDesires( )[i] );
+                            
+        buf << dlprintf( "%3d\r\n", liq->getSipSize( ) );
     }
 
     page_to_char(buf.str( ).c_str( ), ch);
 }
 
-/*****************************************************************************
- Name:          show_help
- Purpose:       Displays help for many tables used in OLC.
- Called by:     olc interpreters.
- ****************************************************************************/
 bool show_help(Character * ch, const char *cargument)
 {
-    char buf[MAX_STRING_LENGTH];
     char argumentBuf[MAX_STRING_LENGTH];
     char *argument = argumentBuf;
     char arg[MAX_INPUT_LENGTH];
@@ -275,80 +239,107 @@ bool show_help(Character * ch, const char *cargument)
 
     /* Display syntax. */
     if (arg[0] == '\0') {
-	stc("Синтаксис: ? [комманда]\n\r\n\r", ch);
-	stc("[комманда]  [описание]\n\r", ch);
-	for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
-	    sprintf(buf, "%-10s -%s\n\r",
-		      DLString(help_table[cnt].command).capitalize( ).c_str( ),
-		      help_table[cnt].desc);
-	    stc(buf, ch);
-	}
-	return false;
+        ostringstream buf;
+        buf << "п╒п╟п╠п╩п╦я├п╟             : п÷п╬я▐я│п╫п╣п╫п╦п╣" << endl;
+        for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
+            if (help_table[cnt].desc)
+                buf << dlprintf("{g%-19s{x: %s", help_table[cnt].command, help_table[cnt].desc) << endl;
+            else
+                buf << help_table[cnt].command << endl;
+        }
+        buf << endl << "п≤я│п©п╬п╩я▄п╥я┐п╧ '{Wolchelp я┌п╟п╠п╩п╦я├п╟{x' п╦п╩п╦ '{W? я┌п╟п╠п╩п╦я├п╟{x' п╦п╥п╫я┐я┌я─п╦ я─п╣п╢п╟п╨я┌п╬я─п╟." << endl;
+        ch->send_to(buf);
+        return false;
     }
 
     // Find the command, show changeable data.
     for (cnt = 0; help_table[cnt].command != NULL; cnt++) {
-	if (arg[0] == help_table[cnt].command[0]
-	    && !str_prefix(arg, help_table[cnt].command)) {
-	    if (help_table[cnt].structure == &spec_table) {
-		show_spec_cmds(ch);
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &liq_table) {
-		show_liq_cmds(ch);
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &mat_table) {
-		show_mat_cmds(ch);
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &wearloc_table) {
-		int cnt = 0;
-		for (int i = 0; i < wearlocationManager->size( ); i++) {
-		    ch->printf( "%10s", wearlocationManager->find( i )->getName( ).c_str( ) );
-		    if (++cnt%5 == 0)
-			ch->send_to( "\r\n" );
-		}
-		return false;
-	    }
-	    else if (help_table[cnt].structure == &skill_table) {
-		if (spell[0] == '\0') {
-		    stc("Синтаксис:  ? spells "
-			"[ignore/room/char/self/object/all]\n\r", ch);
-		    return false;
-		}
+        if (arg[0] == help_table[cnt].command[0]
+            && !str_prefix(arg, help_table[cnt].command)) {
+            if (help_table[cnt].structure == &spec_table) {
+                show_spec_cmds(ch);
+                return false;
+            }
+            else if (help_table[cnt].structure == &liq_table) {
+                show_liq_cmds(ch);
+                return false;
+            }
+            else if (help_table[cnt].structure == &mat_table) {
+                show_mat_cmds(ch);
+                return false;
+            }
+            else if (help_table[cnt].structure == &wearloc_table) {
+                for (int i = 0; i < wearlocationManager->size( ); i++) {
+                    Wearlocation *w = wearlocationManager->find( i );
+                    ch->printf( "{g%-14s{x: %s\r\n", 
+                                w->getName().c_str(), w->getPurpose().c_str() );
+                }
+                return false;
+            }
+            else if (help_table[cnt].structure == &group_table) {
+                ostringstream buf;
+                for (int gn = 0; gn < skillGroupManager->size( ); gn++) {
+                    SkillGroup *group = skillGroupManager->find( gn );
+                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                                group->getName( ).c_str( ),
+                                group->getRussianName( ).c_str( ) );
+                    if (gn % 2)
+                        buf << endl;
+                }
+                buf << endl;
+                ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &race_table) {
+                ostringstream buf;
+                for (int i = 0; i < raceManager->size( ); i++) {
+                    Race *race = raceManager->find( i );
+                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                                race->getName().c_str(),
+                                race->getMaleName().ruscase('1').c_str() );
+                    if (i % 2)
+                        buf << endl;
+                }
+                buf << endl;
+                ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &skill_table) {
+                if (spell[0] == '\0') {
+                    stc("п║п╦п╫я┌п╟п╨я│п╦я│:  ? spells "
+                        "[ignore/room/char/self/object/all]\n\r", ch);
+                    return false;
+                }
 
-		if (!str_prefix(spell, "all"))
-		    show_skill_cmds(ch, -1);
-		else if (!str_prefix(spell, "ignore"))
-		    show_skill_cmds(ch, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB);
-		else if (!str_prefix(spell, "room"))
-		    show_skill_cmds(ch, TAR_ROOM|TAR_PEOPLE);
-		else if (!str_prefix(spell, "char"))
-		    show_skill_cmds(ch, TAR_CHAR_ROOM|TAR_CHAR_WORLD);
-		else if (!str_prefix(spell, "self"))
-		    show_skill_cmds(ch, TAR_CHAR_SELF);
-		else if (!str_prefix(spell, "object"))
-		    show_skill_cmds(ch, TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_OBJ_WORLD);
-		else if (!str_prefix(spell, "affect"))
-		    show_skill_affects(ch);
-		else
-		    stc("Синтаксис:  ? spells "
-			"[ignore/affect/self/object/all]\n\r", ch);
-		return false;
-	    } 
-	    else {
-		show_flag_cmds(ch, (const FlagTable*)help_table[cnt].structure);
-		return false;
-	    }
-	}
+                if (!str_prefix(spell, "all"))
+                    show_skills(ch, -1);
+                else if (!str_prefix(spell, "ignore"))
+                    show_skills(ch, TAR_IGNORE|TAR_CREATE_OBJ|TAR_CREATE_MOB);
+                else if (!str_prefix(spell, "room"))
+                    show_skills(ch, TAR_ROOM|TAR_PEOPLE);
+                else if (!str_prefix(spell, "char"))
+                    show_skills(ch, TAR_CHAR_ROOM|TAR_CHAR_WORLD);
+                else if (!str_prefix(spell, "self"))
+                    show_skills(ch, TAR_CHAR_SELF);
+                else if (!str_prefix(spell, "object"))
+                    show_skills(ch, TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_OBJ_WORLD);
+                else
+                    stc("п║п╦п╫я┌п╟п╨я│п╦я│:  ? spells "
+                        "[ignore/affect/self/object/all]\n\r", ch);
+                return false;
+            } 
+            else {
+                show_flag_cmds(ch, (const FlagTable*)help_table[cnt].structure);
+                return false;
+            }
+        }
     }
     show_help(ch, "");
     return false;
 }
 
 CMD(olchelp, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
-	"Online editor help command.")
+        "Online editor help command.")
 {
     show_help(ch, argument);
 }

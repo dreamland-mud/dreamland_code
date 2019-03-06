@@ -17,21 +17,21 @@ const int MAX_HISTORY_SIZE = 50;
 const int DEFAULT_REPLAY_SIZE = 10;
 
 /**
- * говорит тебе 'сто'
- * говорит тебе 'девяносто девять'
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'я│я┌п╬'
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'п╢п╣п╡я▐п╫п╬я│я┌п╬ п╢п╣п╡я▐я┌я▄'
  * ...
- * говорит тебе 'девяносто один'         <------- DEFAULT_REPLAY_SIZE cuf off
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'п╢п╣п╡я▐п╫п╬я│я┌п╬ п╬п╢п╦п╫'         <------- DEFAULT_REPLAY_SIZE cuf off
  * ...
- * говорит тебе 'три'
- * говорит тебе 'два'
- * говорит тебе 'раз'                    <------- MAX_HISTORY_SIZE cut off
- * говорит тебе 'начинаю считать'
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'я┌я─п╦'
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'п╢п╡п╟'
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'я─п╟п╥'                    <------- MAX_HISTORY_SIZE cut off
+ * пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ 'п╫п╟я┤п╦п╫п╟я▌ я│я┤п╦я┌п╟я┌я▄'
  * 
  */
 static bool replay_messages( ostringstream &buf, PCharacter *ch, const DLString &attrName, int limit )
 {
     XMLStringListAttribute::Pointer attr  
-		= ch->getAttributes( ).findAttr<XMLStringListAttribute>( attrName );
+                = ch->getAttributes( ).findAttr<XMLStringListAttribute>( attrName );
     if (!attr)
         return false;
 
@@ -75,7 +75,7 @@ bool replay_history_near( ostringstream &buf, PCharacter *ch, int limit = DEFAUL
 static void remember_one_message( PCharacter *ch, const DLString &msg, const DLString &attrName )
 {
     XMLStringListAttribute::Pointer attr  
-		= ch->getAttributes( ).getAttr<XMLStringListAttribute>( attrName );
+                = ch->getAttributes( ).getAttr<XMLStringListAttribute>( attrName );
 
     attr->push_front( msg );
     if (attr->size( ) > MAX_HISTORY_SIZE)

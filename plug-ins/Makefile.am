@@ -13,6 +13,7 @@ ed \
 profession \
 race \
 hometown \
+bonus \
 occupations \
 communication \
 follow \
@@ -36,7 +37,6 @@ skills_impl \
 olc \
 liquid \
 clan \
-feniaroot \
 selfrate \
 gquest \
 languages \
@@ -52,6 +52,9 @@ misc_behaviors \
 race_aptitude \
 cards \
 religion \
+riding \
 web \
-riding
+gmcp \
+craft \
+feniaroot 
 

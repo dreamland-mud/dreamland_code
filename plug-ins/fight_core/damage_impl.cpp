@@ -40,21 +40,21 @@ RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam )
 void RawDamage::message( )
 {
     if( ch == victim ) {
-	msgRoom( "%^C1\6ÓÅÂÑ", ch );
-	msgChar( "ôÙ\5ÓÅÂÑ" );
-	return;
+        msgRoom( "%^C1\6ÑĞµĞ±Ñ", ch );
+        msgChar( "Ğ¢Ñ‹\5ÑĞµĞ±Ñ" );
+        return;
     } 
 
     if ( dam == 0 ) {
        msgRoom( "%^C1\6%C2", ch, victim);
-       msgChar( "ôÙ\5%C2", victim);
+       msgChar( "Ğ¢Ñ‹\5%C2", victim);
     }
     else {
        msgRoom( "%^C1\6%C4", ch, victim );
-       msgChar( "ôÙ\5%C4", victim );
+       msgChar( "Ğ¢Ñ‹\5%C4", victim );
     }
 
-    msgVict( "%^C1\6ÔÅÂÑ", ch );
+    msgVict( "%^C1\6Ñ‚ĞµĞ±Ñ", ch );
 }
 
 bool RawDamage::canDamage( )
@@ -66,8 +66,8 @@ bool RawDamage::canDamage( )
  * SkillDamage 
  *----------------------------------------------------------------------------*/
 SkillDamage::SkillDamage( Character *ch, Character *victim, 
-		          int sn, int dam_type, int dam, bitstring_t dam_flag )
-	    : Damage( ch, victim, dam_type, dam, dam_flag )
+                          int sn, int dam_type, int dam, bitstring_t dam_flag )
+            : Damage( ch, victim, dam_type, dam, dam_flag )
 {
     this->sn = sn;
 }
@@ -82,33 +82,33 @@ void SkillDamage::message( )
     const RussianString &attack = skillManager->find(sn)->getDammsg( );
 
     if (immune) {
-	if (ch == victim) {
-	    msgRoom("%1$^O1 %2$C2 ÂÅÓÓÉÌ%1$GØÎÏ|ÅÎ|ØÎÁ ĞÒÏÔÉ× %2$P4 ÓÁÍ%2$GÏÇÏ|ÏÇÏ|ÏÊ|ÉÈ", &attack, ch);
-	    msgChar("ôÅÂÅ ĞÏ×ÅÚÌÏ, Õ ÔÅÂÑ ÉÍÍÕÎÉÔÅÔ Ë ÜÔÏÍÕ");
-	}
-	else {
-	    msgRoom("%1$^O1 %2$C2 ÂÅÓÓÉÌ%1$GØÎÏ|ÅÎ|ØÎÁ ĞÒÏÔÉ× %3$C2", &attack, ch, victim);
-	    msgChar("%1$^T1 %1$O1 ÂÅÓÓÉÌ%1$GØÎÏ|ÅÎ|ØÎÁ ĞÒÏÔÉ× %2$C2", &attack, victim);
-	    msgVict("ğÒÏÔÉ× ÔÅÂÑ %2$O1 %1$C2 ÂÅÓÓÉÌ%2$GØÎÏ|ÅÎ|ØÎÁ", ch, &attack);
-	}
+        if (ch == victim) {
+            msgRoom("%1$^O1 %2$C2 Ğ±ĞµÑÑĞ¸Ğ»%1$GÑŒĞ½Ğ¾|ĞµĞ½|ÑŒĞ½Ğ° Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ² %2$P4 ÑĞ°Ğ¼%2$GĞ¾Ğ³Ğ¾|Ğ¾Ğ³Ğ¾|Ğ¾Ğ¹|Ğ¸Ñ…", &attack, ch);
+            msgChar("Ğ¢ĞµĞ±Ğµ Ğ¿Ğ¾Ğ²ĞµĞ·Ğ»Ğ¾, Ñƒ Ñ‚ĞµĞ±Ñ Ğ¸Ğ¼Ğ¼ÑƒĞ½Ğ¸Ñ‚ĞµÑ‚ Ğº ÑÑ‚Ğ¾Ğ¼Ñƒ");
+        }
+        else {
+            msgRoom("%1$^O1 %2$C2 Ğ±ĞµÑÑĞ¸Ğ»%1$GÑŒĞ½Ğ¾|ĞµĞ½|ÑŒĞ½Ğ° Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ² %3$C2", &attack, ch, victim);
+            msgChar("%1$^T1 %1$O1 Ğ±ĞµÑÑĞ¸Ğ»%1$GÑŒĞ½Ğ¾|ĞµĞ½|ÑŒĞ½Ğ° Ğ¿Ñ€Ğ¾Ñ‚Ğ¸Ğ² %2$C2", &attack, victim);
+            msgVict("ĞŸÑ€Ğ¾Ñ‚Ğ¸Ğ² Ñ‚ĞµĞ±Ñ %2$O1 %1$C2 Ğ±ĞµÑÑĞ¸Ğ»%2$GÑŒĞ½Ğ¾|ĞµĞ½|ÑŒĞ½Ğ°", ch, &attack);
+        }
     }
     else {
-	if (ch == victim) {
-	    msgRoom( "%1$^O1 %2$C2\6ÓÅÂÑ", &attack, ch );
-	    msgChar( "%1$^T1 %1$O1\6ÔÅÂÑ", &attack );
-	}
-	else {
-	    if ( dam == 0 )
-	    {
-		msgRoom( "%1$^O1 %2$C2\6%3$C2", &attack, ch, victim );
-		msgChar( "%1$^T1 %1$O1\6%2$C2", &attack, victim );
-	    }
-	    else {
-		msgRoom( "%1$^O1 %2$C2\6%3$C4", &attack, ch, victim );
-		msgChar( "%1$^T1 %1$O1\6%2$C4", &attack, victim );
-	    }
-	    msgVict( "%1$^O1 %2$C2\6ÔÅÂÑ", &attack, ch );
-	}
+        if (ch == victim) {
+            msgRoom( "%1$^O1 %2$C2\6ÑĞµĞ±Ñ", &attack, ch );
+            msgChar( "%1$^T1 %1$O1\6Ñ‚ĞµĞ±Ñ", &attack );
+        }
+        else {
+            if ( dam == 0 )
+            {
+                msgRoom( "%1$^O1 %2$C2\6%3$C2", &attack, ch, victim );
+                msgChar( "%1$^T1 %1$O1\6%2$C2", &attack, victim );
+            }
+            else {
+                msgRoom( "%1$^O1 %2$C2\6%3$C4", &attack, ch, victim );
+                msgChar( "%1$^T1 %1$O1\6%2$C4", &attack, victim );
+            }
+            msgVict( "%1$^O1 %2$C2\6Ñ‚ĞµĞ±Ñ", &attack, ch );
+        }
     }
 }
 
@@ -119,27 +119,27 @@ void SkillDamage::message( )
 void SkillDamage::protectResistance( )
 {
     if (!victim->isAffected(gsn_resistance))
-	return;
+        return;
 
     if (sn == gsn_mental_knife) {
-	dam -= victim->applyCurse( dam * 2 / 5 );
-	return;
+        dam -= victim->applyCurse( dam * 2 / 5 );
+        return;
     }
 
     if (sn == gsn_dragons_breath) {
-	return;
+        return;
     }
 
     Skill *skill = skillManager->find( sn );
     Spell::Pointer spell = skill->getSpell( );
 
     if (!spell 
-	    || !spell->isCasted( ) 
-	    || spell->isPrayer( ch )
-	    || skill->getGroup( ) == group_draconian)
+            || !spell->isCasted( ) 
+            || spell->isPrayer( ch )
+            || skill->getGroup( ) == group_draconian)
     {
-	dam -= victim->applyCurse( dam / 2 );
-	return;
+        dam -= victim->applyCurse( dam / 2 );
+        return;
     }
 }
 

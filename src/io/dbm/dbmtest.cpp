@@ -24,24 +24,24 @@ main(int argc, char **argv)
     DBMIO db;
 
     if(argc < 2) {
-	cout << "Usage: dbmtest <file.db>" << endl;
-	return 1;
+        cout << "Usage: dbmtest <file.db>" << endl;
+        return 1;
     }
 
     db.open(argv[1], O_RDWR);
 
     try {
-	db.seq(key, val, R_FIRST);
-	while(1) {
-	    cout << "[" << key << "] " << endl
-		 << val << endl;
+        db.seq(key, val, R_FIRST);
+        while(1) {
+            cout << "[" << key << "] " << endl
+                 << val << endl;
     
-	    db.seq(key, val, R_NEXT);
-	}
+            db.seq(key, val, R_NEXT);
+        }
     } catch(const DBMIO::EOFException &ex) {
-	/*nothing*/
+        /*nothing*/
     } catch(const DBMIO::Exception &ex) {
-	cout << ex.what() << endl;
+        cout << ex.what() << endl;
     }
 
     db.close();

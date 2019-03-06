@@ -25,13 +25,13 @@ void RegExp::prepare( const char *r, bool fCase )
     flags = REG_EXTENDED /* | REG_NOSUB */;
 
     if (!fCase)
-	flags |= REG_ICASE;
+        flags |= REG_ICASE;
 
     errcode = regcomp(&preg, r, flags);
     
     if (errcode) {
-	regerror(errcode, &preg, errbuf, sizeof(errbuf));
-	throw Exception(errbuf);
+        regerror(errcode, &preg, errbuf, sizeof(errbuf));
+        throw Exception(errbuf);
     }
 }
 
@@ -62,18 +62,18 @@ RegExp::MatchVector RegExp::subexpr( const char *str ) const
     errcode = regexec (&preg, str, nmatch, pmatch, 0);
     
     if (!errcode) {
-	for (size_t i = 1; i < nmatch; i++) {
-	    char buf[256];
-	    regoff_t j;
-	    
-	    if (pmatch[i].rm_so != -1 && pmatch[i].rm_eo != -1) {
-		for (j = 0; j < pmatch[i].rm_eo - pmatch[i].rm_so; j++)
-		    buf[j] = str[pmatch[i].rm_so + j];
+        for (size_t i = 1; i < nmatch; i++) {
+            char buf[256];
+            regoff_t j;
+            
+            if (pmatch[i].rm_so != -1 && pmatch[i].rm_eo != -1) {
+                for (j = 0; j < pmatch[i].rm_eo - pmatch[i].rm_so; j++)
+                    buf[j] = str[pmatch[i].rm_so + j];
 
-		buf[j] = 0;
-		result.push_back( buf );
-	    }  
-	}
+                buf[j] = 0;
+                result.push_back( buf );
+            }  
+        }
     }
 
     return result;

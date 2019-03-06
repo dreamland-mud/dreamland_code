@@ -20,43 +20,43 @@ struct ClassMap : public map<DLString, Class::ClassRegistrator::Pointer>
 {
     void reg( const DLString& name, Class::ClassRegistrator::Pointer classPointer )
     {
-	(*this)[name] = classPointer;
+        (*this)[name] = classPointer;
     }
 
     void unreg( const DLString& name )
     {
-	iterator pos = find( name );
+        iterator pos = find( name );
 
-	if (pos != end( ))
-	    erase( pos );
+        if (pos != end( ))
+            erase( pos );
     }
 
     AllocateClass::Pointer allocate( const DLString& name ) throw( ExceptionClassNotFound )
     {
-	if (name.empty( ))
-	    throw Exception( "Attempt to allocate a class with empty name!" );
+        if (name.empty( ))
+            throw Exception( "Attempt to allocate a class with empty name!" );
 
-	iterator pos = find( name );
+        iterator pos = find( name );
 
-	if (pos != end( ))
-	    return pos->second->clone( );
-	
-	LogStream::sendError( ) << name << " not found for allocate!" << endl;
-	throw ExceptionClassNotFound( name );
+        if (pos != end( ))
+            return pos->second->clone( );
+        
+        LogStream::sendError( ) << name << " not found for allocate!" << endl;
+        throw ExceptionClassNotFound( name );
     }
 
     AllocateClass * allocateRaw( const DLString& name ) throw( ExceptionClassNotFound )
     {
-	if (name.empty( ))
-	    throw Exception( "Attempt to allocate a class with empty name!" );
+        if (name.empty( ))
+            throw Exception( "Attempt to allocate a class with empty name!" );
 
-	iterator pos = find( name );
+        iterator pos = find( name );
 
-	if (pos != end( ))
-	    return pos->second->cloneRaw( );
-	
-	LogStream::sendError( ) << name << " not found for 'raw' allocate!" << endl;
-	throw ExceptionClassNotFound( name );
+        if (pos != end( ))
+            return pos->second->cloneRaw( );
+        
+        LogStream::sendError( ) << name << " not found for 'raw' allocate!" << endl;
+        throw ExceptionClassNotFound( name );
     }
 
 };

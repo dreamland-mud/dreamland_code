@@ -36,67 +36,77 @@ CMDRUN( selfrate )
     PCharacter *pch = ch->getPC( );
     
     if (!pch) {
-	ch->send_to( "ôÙ ÏÂÙÞÎÏÅ ÖÉ×ÏÔÎÏÅ.\r\n" );
-	return;
+        ch->send_to( "Ð¢Ñ‹ Ð¾Ð±Ñ‹Ñ‡Ð½Ð¾Ðµ Ð¶Ð¸Ð²Ð¾Ñ‚Ð½Ð¾Ðµ.\r\n" );
+        return;
     }
 
     if (IS_AFFECTED(pch, AFF_CHARM)) {
-	pch->send_to( "îÉÞÅÇÏ ÎÅ ÐÒÏÉÚÏÛÌÏ.\r\n" );
-	return;
+        pch->send_to( "ÐÐ¸Ñ‡ÐµÐ³Ð¾ Ð½Ðµ Ð¿Ñ€Ð¾Ð¸Ð·Ð¾ÑˆÐ»Ð¾.\r\n" );
+        return;
     }
-	
+        
     attr = pch->getAttributes( ).getAttr<XMLAttributeSelfRate>( "selfrate" );
 
     if (arg.empty( )) {
-	pch->printf( "ô×ÏÊ ÕÒÏ×ÅÎØ ÏÐÙÔÎÏÓÔÉ: {W%s{x.\r\n", attr->getRateAlias( ).c_str( ) );
-	return;
+        pch->printf( "Ð¢Ð²Ð¾Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ Ð¾Ð¿Ñ‹Ñ‚Ð½Ð¾ÑÑ‚Ð¸: {W%s{x.\r\n", attr->getRateAlias( ).c_str( ) );
+        return;
     }
 
     if (arg == "newbie" ) 
-	rate = 0;
+        rate = 0;
     else if (arg == "expert" || arg == "experienced" )
-	rate = 1;
+        rate = 1;
     else if (arg == "guru" )
-	rate = 2;
+        rate = 2;
     else {
-	pch->printf( "÷ÙÂÅÒÉ, ËÔÏ ÔÙ: newbie, expert ÉÌÉ guru.\r\n" );
-	return;
+        pch->printf( "Ð’Ñ‹Ð±ÐµÑ€Ð¸, ÐºÑ‚Ð¾ Ñ‚Ñ‹: newbie, expert Ð¸Ð»Ð¸ guru.\r\n" );
+        return;
     }
 
     if (rate == attr->rate) 
-	pch->printf( "îÏ ÔÙ É ÔÁË %s!\r\n", attr->getRateAlias( ).c_str( ));
+        pch->printf( "ÐÐ¾ Ñ‚Ñ‹ Ð¸ Ñ‚Ð°Ðº %s!\r\n", attr->getRateAlias( ).c_str( ));
     else if (rate < attr->rate) 
-	pch->send_to( "ôÙ ÎÅ ÍÏÖÅÛØ ÐÏÎÉÚÉÔØ ÏÃÅÎËÕ Ó×ÏÅÇÏ ÕÒÏ×ÎÑ ÏÐÙÔÎÏÓÔÉ.\r\n" );
+        pch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾Ð½Ð¸Ð·Ð¸Ñ‚ÑŒ Ð¾Ñ†ÐµÐ½ÐºÑƒ ÑÐ²Ð¾ÐµÐ³Ð¾ ÑƒÑ€Ð¾Ð²Ð½Ñ Ð¾Ð¿Ñ‹Ñ‚Ð½Ð¾ÑÑ‚Ð¸.\r\n" );
     else {
-	char buf[256];
-	
-	attr->rate = rate;
-	pch->printf( "ðÏÚÄÒÁ×ÌÑÅÍ! ôÅÐÅÒØ ÔÙ {W%s{x.\r\n", attr->getRateAlias( ).c_str( ));
-	sprintf( buf, "{CôÏÒÖÅÓÔ×ÅÎÎÙÊ ÇÏÌÏÓ ÉÚ $o2: {W$C1 ÔÅÐÅÒØ %s!{x", attr->getRateAlias( ).c_str( ) );
-	infonet( buf, pch, 0 );
+        char buf[256];
+        
+        attr->rate = rate;
+        pch->printf( "ÐŸÐ¾Ð·Ð´Ñ€Ð°Ð²Ð»ÑÐµÐ¼! Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ {W%s{x.\r\n", attr->getRateAlias( ).c_str( ));
+        sprintf( buf, "{CÐ¢Ð¾Ñ€Ð¶ÐµÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹ Ð³Ð¾Ð»Ð¾Ñ Ð¸Ð· $o2: {W$C1 Ñ‚ÐµÐ¿ÐµÑ€ÑŒ %s!{x", attr->getRateAlias( ).c_str( ) );
+        infonet( buf, pch, 0 );
     }
 }
 
+static const char *rate_alias [] = { "newbie", "expert", "guru" };
+static const char *rate_alias_ru [] = { "Ð½ÑŒÑŽÐ±Ð¸", "ÑÐºÑÐ¿ÐµÑ€Ñ‚", "Ð³ÑƒÑ€Ñƒ" };
 
 XMLAttributeSelfRate::XMLAttributeSelfRate( ) 
 {
 }
 
-DLString XMLAttributeSelfRate::getRateAlias( ) const
+DLString XMLAttributeSelfRate::getRateAlias( PCharacter *looker ) const
 {
-    switch (rate.getValue( )) {
-    case 0: return "newbie";
-    case 1: return "expert";
-    case 2: return "guru";
-    default: return "unknown!";
+    short r = rate.getValue();
+
+    if (r > 2 || r < 0)
+        return "unknown!";
+    
+    ostringstream buf;
+
+    if (looker) {
+             buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
+    } else {
+        buf << "{lE" << rate_alias[r] << "{lR" << rate_alias_ru[r] << "{lx";
     }
+
+    return buf.str();
 }
 
 bool XMLAttributeSelfRate::handle( const WhoisArguments &args )
 {
     DLString l;
     
-    l << "ÓÞÉÔÁÅÔ ÓÅÂÑ {W" << getRateAlias( ) << "{x";
+    l << "ÑÐ°Ð¼Ð¾ÑƒÐ²ÐµÑ€ÐµÐ½Ð½Ð¾ÑÑ‚ÑŒ ÑƒÑ€Ð¾Ð²Ð½Ñ {W" << getRateAlias(args.looker) << "{x";
     args.lines.push_back( l );
     return true;
 }
@@ -104,11 +114,11 @@ bool XMLAttributeSelfRate::handle( const WhoisArguments &args )
 extern "C"
 {
     SO::PluginList initialize_selfrate( ) {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSelfRate> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSelfRate> >( ppl );
+        
+        return ppl;
     }
 }
 

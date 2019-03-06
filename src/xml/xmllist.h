@@ -29,40 +29,40 @@ public:
 
     virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
     {
-	clear( );
-	XMLContainer::fromXML( node );
+        clear( );
+        XMLContainer::fromXML( node );
     }
     
     virtual bool nodeFromXML( const XMLNode::Pointer& child ) 
     {
-	if (child->getName( ) == XMLNode::ATTRIBUTE_NODE) {
-	    insert( end( ), T( ) );		
-	    back( ).fromXML( child );
-	    return true;
-	}
+        if (child->getName( ) == XMLNode::ATTRIBUTE_NODE) {
+            insert( end( ), T( ) );                
+            back( ).fromXML( child );
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     virtual bool toXML( XMLNode::Pointer& parent ) const
     {
-	if (empty( ) && !saveEmpty)
-	    return false;
+        if (empty( ) && !saveEmpty)
+            return false;
 
         for (typename XMLListBase::const_iterator ipos = begin( ); ipos != end( ); ipos++) {
-	    try {
-		XMLNode::Pointer child( NEW );
-		
-		if (ipos->toXML( child )) {
+            try {
+                XMLNode::Pointer child( NEW );
+                
+                if (ipos->toXML( child )) {
                     child->setName( XMLNode::ATTRIBUTE_NODE );
-		    parent->appendChild( child );
+                    parent->appendChild( child );
                 }
-	    }
-	    catch (const ExceptionSkipVariable &) {
-	    }
+            }
+            catch (const ExceptionSkipVariable &) {
+            }
         }
 
-	return true;
+        return true;
     }
 
 protected:
@@ -77,16 +77,16 @@ class XMLListContainer : public XMLListBase<T>,
 public:
     virtual bool nodeFromXML( const XMLNode::Pointer& child )
     {
-	return XMLListBase<T>::nodeFromXML( child )
-		|| XMLVariableContainer::nodeFromXML( child );
+        return XMLListBase<T>::nodeFromXML( child )
+                || XMLVariableContainer::nodeFromXML( child );
     }
     virtual bool toXML( XMLNode::Pointer& parent ) const
     {
-	bool ret1, ret2;
+        bool ret1, ret2;
 
-	ret1 = XMLListBase<T>::toXML( parent );
-	ret2 = XMLVariableContainer::toXML( parent );
-	return ret1 || ret2;
+        ret1 = XMLListBase<T>::toXML( parent );
+        ret2 = XMLVariableContainer::toXML( parent );
+        return ret1 || ret2;
     }
 };
 

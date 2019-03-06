@@ -16,19 +16,19 @@
 
 void SchedulerTaskRoundPlugin::initialization( )
 {
-	DLScheduler::getThis( )->putTaskNOW( SchedulerTaskRoundPlugin::Pointer( this ) );
+        DLScheduler::getThis( )->putTaskNOW( SchedulerTaskRoundPlugin::Pointer( this ) );
 }
 
 void SchedulerTaskRoundPlugin::destruction( )
 {
-	DLScheduler::getThis( )->slay( SchedulerTaskRoundPlugin::Pointer( this ) );
+        DLScheduler::getThis( )->slay( SchedulerTaskRoundPlugin::Pointer( this ) );
 }
 
 extern "C"
 {
-	SO::PluginList initialize_scheduler_task_round( )
-	{
-		SO::PluginList ppl;
-		return ppl;
-	}
+        SO::PluginList initialize_scheduler_task_round( )
+        {
+                SO::PluginList ppl;
+                return ppl;
+        }
 }

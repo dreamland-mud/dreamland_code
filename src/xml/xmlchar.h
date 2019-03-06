@@ -14,40 +14,40 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная char
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ char
  */
 class XMLChar : public Char
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLChar( ) : Char( )
-	{
-	}
-	
-	inline XMLChar( char value ) : Char( value )
-	{
-	}
-	
-	inline XMLChar( const DLString& value ) throw( ExceptionBadType )
-		: Char( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ \0 */
+        inline XMLChar( ) : Char( )
+        {
+        }
+        
+        inline XMLChar( char value ) : Char( value )
+        {
+        }
+        
+        inline XMLChar( const DLString& value ) throw( ExceptionBadType )
+                : Char( value )
+        {
+        }
+        
+        /** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
 
 
 
-/** Вывод в ostream типа XMLChar */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLChar */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLChar& xmlChar )
 {
-	ostr << xmlChar.getValue( );
-	return ostr;
+        ostr << xmlChar.getValue( );
+        return ostr;
 }
 
 #endif

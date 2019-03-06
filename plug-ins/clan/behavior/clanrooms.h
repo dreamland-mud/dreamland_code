@@ -11,19 +11,19 @@
 class ClanRoom : public virtual RoomBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanRoom> Pointer;
+        typedef ::Pointer<ClanRoom> Pointer;
 
-protected:	
-	ClanArea::Pointer getClanArea( );
+protected:        
+        ClanArea::Pointer getClanArea( );
 };
 
 class ClanPetShopStorage : public ClanRoom, public PetShopStorage {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanPetShopStorage> Pointer;
-	
+        typedef ::Pointer<ClanPetShopStorage> Pointer;
+        
 protected:
-	virtual bool canServeClient( Character * );
+        virtual bool canServeClient( Character * );
 };
 
 #endif

@@ -75,13 +75,13 @@ public:
     virtual int getAdept( PCharacter * ) const;
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
-    virtual bool canTeach( NPCharacter *, PCharacter * );
+    virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void practice( PCharacter * ) const;
     virtual void show( PCharacter *, std::ostream & ); 
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual const DLString & getCategory( ) const
     {
-	return CATEGORY;
+        return CATEGORY;
     }
     
     WordEffectPointer findEffect( const DLString & ) const;
@@ -96,7 +96,8 @@ protected:
     bool showDreams( PCharacter * ) const;
     bool showRewards( PCharacter * ) const;
     void doIdent( PCharacter *, DLString & ) const;
-    void doForget( PCharacter * ) const;
+    void doForget( PCharacter *, const DLString & ) const;
+    void doRemember( PCharacter *, const DLString & ) const;
 
 protected:
     Word createGlobalWord( ) const;
@@ -138,10 +139,10 @@ public:
     bool available ( ) const;
 
     inline int getLevel( ) const {
-	return level.getValue( );
+        return level.getValue( );
     }
     inline int getMaximum( ) const {
-	return maximum.getValue( );
+        return maximum.getValue( );
     }
     
     XML_VARIABLE XMLInteger maximum;

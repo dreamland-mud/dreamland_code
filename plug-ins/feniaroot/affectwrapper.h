@@ -32,7 +32,7 @@ public:
 
     AffectWrapper() { }
     AffectWrapper(const RegisterList &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     void fromAffect( const Affect & );

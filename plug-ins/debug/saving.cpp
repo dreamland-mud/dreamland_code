@@ -10,8 +10,8 @@ void debug_save_world( )
     Room *r;
 
     for (r = room_list; r; r = r->rnext) {
-	save_room_objects( r );
-	save_room_mobiles( r );
+        save_room_objects( r );
+        save_room_mobiles( r );
     }
 }
 

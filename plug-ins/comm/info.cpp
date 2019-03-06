@@ -19,22 +19,22 @@
 
 static void desc_show( Character *ch )
 {
-	if (ch->desc) {
-	    ch->send_to( "Ù◊œ≈ œ–…”¡Œ…≈:\n\r");
-	    ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Ô‘”’‘”‘◊’≈‘).\n\r");
-	}
+        if (ch->desc) {
+            ch->send_to( "–¢–≤–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ:\n\r");
+            ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(–û—Ç—Å—É—Ç—Å—Ç–≤—É–µ—Ç).\n\r");
+        }
 }
 
 static void desc_usage( Character *ch )
 {
     ostringstream buf;
 
-    buf << "Êœ“Õ¡‘: " << endl
-        << "    {W{lRœ–…”¡Œ…≈ –œÀ¡⁄¡‘ÿ{lEdescription show{x: –œÀ¡⁄¡‘ÿ œ–…”¡Œ…≈ ◊ '”Ÿ“œÕ' ◊…ƒ≈ ” ‘≈«¡Õ… √◊≈‘œ◊" << endl
-        << "    {W{lRœ–…”¡Œ…≈ +{lEdescription +{x: ƒœ¬¡◊…‘ÿ ”‘“œÀ’ À œ–…”¡Œ…¿" << endl
-        << "    {W{lRœ–…”¡Œ…≈ -{lEdescription -{x: ’ƒ¡Ã…‘ÿ –œ”Ã≈ƒŒ¿¿ ”‘“œÀ’" << endl
-        << "    {W{lRœ–…”¡Œ…≈ Àœ–…“œ◊¡‘ÿ{lEdescription copy{x: ”Àœ–…“œ◊¡‘ÿ œ–…”¡Œ…≈ ◊ ¬’∆≈“ “≈ƒ¡À‘œ“¡ (‘œÃÿÀœ ◊ ◊≈¬-ÀÃ…≈Œ‘≈)" << endl
-        << "    {W{lRœ–…”¡Œ…≈ ◊”‘¡◊…‘ÿ{lEdescription paste{x: ⁄¡Õ≈Œ…‘ÿ œ–…”¡Œ…≈ Œ¡ ”œƒ≈“÷…Õœ«œ ¬’∆≈“¡ “≈ƒ¡À‘œ“¡ (‘œÃÿÀœ ◊ ◊≈¬-ÀÃ…≈Œ‘≈)" << endl;
+    buf << "–§–æ—Ä–º–∞—Ç: " << endl
+        << "    {W{lR–æ–ø–∏—Å–∞–Ω–∏–µ –ø–æ–∫–∞–∑–∞—Ç—å{lEdescription show{x: –ø–æ–∫–∞–∑–∞—Ç—å –æ–ø–∏—Å–∞–Ω–∏–µ –≤ '—Å—ã—Ä–æ–º' –≤–∏–¥–µ —Å —Ç–µ–≥–∞–º–∏ —Ü–≤–µ—Ç–æ–≤" << endl
+        << "    {W{lR–æ–ø–∏—Å–∞–Ω–∏–µ +{lEdescription +{x: –¥–æ–±–∞–≤–∏—Ç—å —Å—Ç—Ä–æ–∫—É –∫ –æ–ø–∏—Å–∞–Ω–∏—é" << endl
+        << "    {W{lR–æ–ø–∏—Å–∞–Ω–∏–µ -{lEdescription -{x: —É–¥–∞–ª–∏—Ç—å –ø–æ—Å–ª–µ–¥–Ω—é—é —Å—Ç—Ä–æ–∫—É" << endl
+        << "    {W{lR–æ–ø–∏—Å–∞–Ω–∏–µ –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å{lEdescription copy{x: —Å–∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å –æ–ø–∏—Å–∞–Ω–∏–µ –≤ –±—É—Ñ–µ—Ä —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞ (—Ç–æ–ª—å–∫–æ –≤ –≤–µ–±-–∫–ª–∏–µ–Ω—Ç–µ)" << endl
+        << "    {W{lR–æ–ø–∏—Å–∞–Ω–∏–µ –≤—Å—Ç–∞–≤–∏—Ç—å{lEdescription paste{x: –∑–∞–º–µ–Ω–∏—Ç—å –æ–ø–∏—Å–∞–Ω–∏–µ –Ω–∞ —Å–æ–¥–µ—Ä–∂–∏–º–æ–≥–æ –±—É—Ñ–µ—Ä–∞ —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞ (—Ç–æ–ª—å–∫–æ –≤ –≤–µ–±-–∫–ª–∏–µ–Ω—Ç–µ)" << endl;
 
     ch->send_to( buf );
 }
@@ -45,72 +45,72 @@ CMDRUNP( description )
     DLString arg = args.getOneArgument();
     char buf[MAX_STRING_LENGTH];
 
-    if (arg_oneof( arg, "show", "–œÀ¡⁄¡‘ÿ" )) {
-	desc_show( ch );
-	return;
-    }
-
-    if (arg_oneof( arg, "copy", "Àœ–…“œ◊¡‘ÿ" )) {
-        if (!ch->getPC( )) 
-            return;
-
-	if (!ch->getDescription( ) || !ch->getDescription( )[0]) {
-		ch->println("Ù◊œ≈ œ–…”¡Œ…≈ –’”‘œ, Àœ–…“œ◊¡‘ÿ ◊ ¬’∆≈“ Œ≈ﬁ≈«œ.");
-		return;
-	}	
-
-	ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate") 
-	    ->regs[0].split(ch->getDescription( )); 
-
-	if (ch->desc->websock.state != WS_ESTABLISHED) {
-		ch->println("Ô–…”¡Œ…≈ ”Àœ–…“œ◊¡Œœ ◊ ¬’∆≈“ “≈ƒ¡À‘œ“¡, œƒŒ¡Àœ –œÃÿ⁄œ◊¡‘ÿ”— “≈ƒ¡À‘œ“œÕ Õœ÷Œœ ‘œÃÿÀœ …⁄Œ’‘“… ◊≈¬-ÀÃ…≈Œ‘¡.");
-	} else {
-		ch->println("Ô–…”¡Œ…≈ ”Àœ–…“œ◊¡Œœ ◊ ¬’∆≈“ “≈ƒ¡À‘œ“¡, …”–œÃÿ⁄’  ÀœÕ¡Œƒ’ {lR◊≈¬“≈ƒ¡À‘œ“{lEwebedit{x ƒÃ— “≈ƒ¡À‘…“œ◊¡Œ…—.");
-	}
+    if (arg_oneof( arg, "show", "–ø–æ–∫–∞–∑–∞—Ç—å" )) {
+        desc_show( ch );
         return;
     }
 
-    if (arg_oneof( arg, "paste", "◊”‘¡◊…‘ÿ" )) {
+    if (arg_oneof( arg, "copy", "–∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å" )) {
         if (!ch->getPC( )) 
             return;
 
-	DLString str = ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
-	if (str.empty( )) {
-	    ch->println( "‚’∆≈“ “≈ƒ¡À‘œ“¡ –’”‘!" );
-	    return;
-	}
-	if (str.size( ) >= MAX_STRING_LENGTH) {
-	    ch->println("ÛÃ…€ÀœÕ ƒÃ…Œœ≈ œ–…”¡Œ…≈.");
-	    return;
-	}
+        if (!ch->getDescription( ) || !ch->getDescription( )[0]) {
+                ch->println("–¢–≤–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ –ø—É—Å—Ç–æ, –∫–æ–ø–∏—Ä–æ–≤–∞—Ç—å –≤ –±—É—Ñ–µ—Ä –Ω–µ—á–µ–≥–æ.");
+                return;
+        }        
 
-	ch->setDescription( str.c_str( ));
-	ch->println( "Óœ◊œ≈ œ–…”¡Œ…≈ ◊”‘¡◊Ã≈Œœ …⁄ ¬’∆≈“¡ “≈ƒ¡À‘œ“¡." );
-	desc_show( ch );
+        ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate") 
+            ->regs[0].split(ch->getDescription( )); 
+
+        if (ch->desc->websock.state != WS_ESTABLISHED) {
+                ch->println("–û–ø–∏—Å–∞–Ω–∏–µ —Å–∫–æ–ø–∏—Ä–æ–≤–∞–Ω–æ –≤ –±—É—Ñ–µ—Ä —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞, –æ–¥–Ω–∞–∫–æ –ø–æ–ª—å–∑–æ–≤–∞—Ç—å—Å—è —Ä–µ–¥–∞–∫—Ç–æ—Ä–æ–º –º–æ–∂–Ω–æ —Ç–æ–ª—å–∫–æ –∏–∑–Ω—É—Ç—Ä–∏ –≤–µ–±-–∫–ª–∏–µ–Ω—Ç–∞.");
+        } else {
+                ch->println("–û–ø–∏—Å–∞–Ω–∏–µ —Å–∫–æ–ø–∏—Ä–æ–≤–∞–Ω–æ –≤ –±—É—Ñ–µ—Ä —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞, –∏—Å–ø–æ–ª—å–∑—É–π –∫–æ–º–∞–Ω–¥—É {lR–≤–µ–±—Ä–µ–¥–∞–∫—Ç–æ—Ä{lEwebedit{x –¥–ª—è —Ä–µ–¥–∞–∫—Ç–∏—Ä–æ–≤–∞–Ω–∏—è.");
+        }
+        return;
+    }
+
+    if (arg_oneof( arg, "paste", "–≤—Å—Ç–∞–≤–∏—Ç—å" )) {
+        if (!ch->getPC( )) 
+            return;
+
+        DLString str = ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
+        if (str.empty( )) {
+            ch->println( "–ë—É—Ñ–µ—Ä —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞ –ø—É—Å—Ç!" );
+            return;
+        }
+        if (str.size( ) >= MAX_STRING_LENGTH) {
+            ch->println("–°–ª–∏—à–∫–æ–º –¥–ª–∏–Ω–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ.");
+            return;
+        }
+
+        ch->setDescription( str.c_str( ));
+        ch->println( "–ù–æ–≤–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ –≤—Å—Ç–∞–≤–ª–µ–Ω–æ –∏–∑ –±—É—Ñ–µ—Ä–∞ —Ä–µ–¥–∞–∫—Ç–æ—Ä–∞." );
+        desc_show( ch );
         return;
     }
 
     if (argument[0] == '\0') {
         desc_show( ch );
-        ch->println("\r\nœƒ“œ¬Œœ”‘… ﬁ…‘¡  ◊ {W? {lRœ–…”¡Œ…≈{lEdescription{x.");
+        ch->println("\r\n–ü–æ–¥—Ä–æ–±–Ω–æ—Å—Ç–∏ —á–∏—Ç–∞–π –≤ {W? {lR–æ–ø–∏—Å–∞–Ω–∏–µ{lEdescription{x.");
         return;
     }
 
     {
-	buf[0] = '\0';
+        buf[0] = '\0';
 
-    	if (argument[0] == '-')
-    	{
+            if (argument[0] == '-')
+            {
             int len;
             bool found = false;
-	    
-	    if (!ch->getDescription( ) || !ch->getDescription( )[0])
+            
+            if (!ch->getDescription( ) || !ch->getDescription( )[0])
             {
-                ch->send_to("Ó≈‘ Œ…ﬁ≈«œ ƒÃ— ’ƒ¡Ã≈Œ…—.\n\r");
+                ch->send_to("–ù–µ—Ç –Ω–∏—á–µ–≥–æ –¥–ª—è —É–¥–∞–ª–µ–Ω–∏—è.\n\r");
                 return;
             }
-	
-  	    strcpy(buf,ch->getDescription( ));
+        
+              strcpy(buf,ch->getDescription( ));
 
             for (len = strlen(buf); len > 0; len--)
             {
@@ -125,42 +125,42 @@ CMDRUNP( description )
                     else /* found the second one */
                     {
                         buf[len + 1] = '\0';
-			ch->setDescription( buf );
+                        ch->setDescription( buf );
 
-			if (ch->desc) {
-			    ch->send_to( "Ù◊œ≈ œ–…”¡Œ…≈:\n\r");
-			    ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(Ô‘”’‘”‘◊’≈‘).\n\r");
-			}
+                        if (ch->desc) {
+                            ch->send_to( "–¢–≤–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ:\n\r");
+                            ch->desc->send(ch->getDescription( ) ? ch->getDescription( ) : "(–û—Ç—Å—É—Ç—Å—Ç–≤—É–µ—Ç).\n\r");
+                        }
                         return;
                     }
                 }
             }
             buf[0] = '\0';
-	    ch->setDescription( buf );
-	    ch->send_to("Ô–…”¡Œ…≈ ’ƒ¡Ã≈Œœ.\n\r");
-	    return;
+            ch->setDescription( buf );
+            ch->send_to("–û–ø–∏—Å–∞–Ω–∏–µ —É–¥–∞–ª–µ–Ω–æ.\n\r");
+            return;
         }
-	else if ( argument[0] == '+' )
-	{
-	    if (ch->getDescription( ))
-		strcat( buf, ch->getDescription( ) );
-	    argument++;
-	    while ( dl_isspace(*argument) )
-		argument++;
-	} else {
+        else if ( argument[0] == '+' )
+        {
+            if (ch->getDescription( ))
+                strcat( buf, ch->getDescription( ) );
+            argument++;
+            while ( dl_isspace(*argument) )
+                argument++;
+        } else {
             desc_usage( ch );
             return;
         }
 
-	if ( strlen(buf) + strlen(argument) >= MAX_STRING_LENGTH - 2 )
-	{
-	    ch->send_to( "ÛÃ…€ÀœÕ ƒÃ…ŒŒœ≈ œ–…”¡Œ…≈.\n\r");
-	    return;
-	}
+        if ( strlen(buf) + strlen(argument) >= MAX_STRING_LENGTH - 2 )
+        {
+            ch->send_to( "–°–ª–∏—à–∫–æ–º –¥–ª–∏–Ω–Ω–æ–µ –æ–ø–∏—Å–∞–Ω–∏–µ.\n\r");
+            return;
+        }
 
-	strcat( buf, argument );
-	strcat( buf, "\n\r" );
-	ch->setDescription( buf );
+        strcat( buf, argument );
+        strcat( buf, "\n\r" );
+        ch->setDescription( buf );
     }
    
     desc_show( ch ); 

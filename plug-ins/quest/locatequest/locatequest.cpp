@@ -16,6 +16,7 @@
 #include "npcharacter.h"
 #include "object.h"
 #include "room.h"
+#include "selfrate.h"
 
 #include "handler.h"
 #include "act.h"
@@ -45,42 +46,46 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
     state = QSTAT_INIT;
 
     try {
-	scenName = LocateQuestRegistrator::getThis( )->getRandomScenario( pch );
-	customer = getRandomClient( pch );
-	customerName = customer->getShortDescr( );
-	customerRoom = customer->in_room->name;
-	customerArea = customer->in_room->area->name;
+        scenName = LocateQuestRegistrator::getThis( )->getRandomScenario( pch );
+        customer = getRandomClient( pch );
+        customerName = customer->getShortDescr( );
+        customerRoom = customer->in_room->name;
+        customerArea = customer->in_room->area->name;
 
-	if (getScenario( ).needsEndPoint( )) {
-	    endPoint = getRandomRoomClient( pch );
-	    targetArea = endPoint->area->name;
-	}
+        if (getScenario( ).needsEndPoint( )) {
+            endPoint = getRandomRoomClient( pch );
+            targetArea = endPoint->area->name;
+        }
 
-	scatterItems( pch, endPoint, customer );
-	ClientQuestModel::assign<LocateCustomer>( customer );
-	save_mobs( customer->in_room );
+        scatterItems( pch, endPoint, customer );
+        ClientQuestModel::assign<LocateCustomer>( customer );
+        save_mobs( customer->in_room );
     } 
     catch (const QuestCannotStartException &e) {
-	destroy( );
-	throw e;
+        destroy( );
+        throw e;
     }
 
     time = number_range( 5, 10 ); 
+
+    if (rated_as_newbie( pch ))
+        time *= 2;
+
     setTime( pch, time );
 
-    tell_fmt( "{W%3$#^C1{G ÈÏÞÅÔ ÏÔÙÓËÁÔØ ÎÅËÏÔÏÒÙÅ ÐÒÉÎÁÄÌÅÖÁÝÉÅ %3$P3 ×ÅÝÉ.",  
+    tell_fmt( "{W%3$#^C1{G Ñ…Ð¾Ñ‡ÐµÑ‚ Ð¾Ñ‚Ñ‹ÑÐºÐ°Ñ‚ÑŒ Ð½ÐµÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð¿Ñ€Ð¸Ð½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‰Ð¸Ðµ %3$P3 Ð²ÐµÑ‰Ð¸.",  
               pch, questman, customer );
-    tell_fmt( "%3$#^P1 ÖÄÅÔ ÔÅÂÑ × ÒÁÊÏÎÅ {W%4$s{G ({W%5$s{G).", 
-	       pch, questman, customer, customer->in_room->name, customer->in_room->area->name );
-    tell_fmt( "õ ÔÅÂÑ ÅÓÔØ {Y%3$d{G ÍÉÎÕ%3$IÔÁ|ÔÙ|Ô, ÞÔÏÂÙ ÄÏÂÒÁÔØÓÑ ÔÕÄÁ É ÕÚÎÁÔØ ÐÏÄÒÏÂÎÏÓÔÉ.",  
+    tell_fmt( "%3$#^P1 Ð¶Ð´ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ {W%4$s{G ({W%5$s{G).", 
+               pch, questman, customer, customer->in_room->name, customer->in_room->area->name );
+    tell_fmt( "Ð£ Ñ‚ÐµÐ±Ñ ÐµÑÑ‚ÑŒ {Y%3$d{G Ð¼Ð¸Ð½Ñƒ%3$IÑ‚Ð°|Ñ‚Ñ‹|Ñ‚, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ñ‚ÑƒÐ´Ð° Ð¸ ÑƒÐ·Ð½Ð°Ñ‚ÑŒ Ð¿Ð¾Ð´Ñ€Ð¾Ð±Ð½Ð¾ÑÑ‚Ð¸.",  
                pch, questman, time );
     
     wiznet( scenName.getValue( ).c_str( ), 
             "customer [%s], item [%s], count %d, path from [%d] to [%d]",
-	    customer->getNameP( '1' ).c_str( ), 
-	    itemName.ruscase( '1' ).c_str( ),
-	    total.getValue( ),
-	    customer->in_room->vnum, (endPoint ? endPoint->vnum : 0) );
+            customer->getNameP( '1' ).c_str( ), 
+            itemName.ruscase( '1' ).c_str( ),
+            total.getValue( ),
+            customer->in_room->vnum, (endPoint ? endPoint->vnum : 0) );
 }
 
 bool LocateQuest::isComplete( ) 
@@ -92,26 +97,26 @@ void LocateQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << customerName.ruscase( '1' ) <<  " ÈÏÞÅÔ ÏÔÙÓËÁÔØ ËÏÅ-ËÁËÉÅ Ó×ÏÉ ×ÅÝÉ." << endl
-	    << "ôÅÂÑ Ó ÎÅÔÅÒÐÅÎÉÅÍ ÖÄÕÔ × ÒÁÊÏÎÅ " << customerRoom << "." << endl
-	    << "üÔÏ ÎÁÈÏÄÉÔÓÑ × ÍÅÓÔÎÏÓÔÉ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << customerArea << "." << endl;
-	break;
+        buf << customerName.ruscase( '1' ) <<  " Ñ…Ð¾Ñ‡ÐµÑ‚ Ð¾Ñ‚Ñ‹ÑÐºÐ°Ñ‚ÑŒ ÐºÐ¾Ðµ-ÐºÐ°ÐºÐ¸Ðµ ÑÐ²Ð¾Ð¸ Ð²ÐµÑ‰Ð¸." << endl
+            << "Ð¢ÐµÐ±Ñ Ñ Ð½ÐµÑ‚ÐµÑ€Ð¿ÐµÐ½Ð¸ÐµÐ¼ Ð¶Ð´ÑƒÑ‚ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ " << customerRoom << "." << endl
+            << "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << customerArea << "." << endl;
+        break;
     case QSTAT_SEARCH:
-	getScenario( ).getLegend( ch, this, buf );
+        getScenario( ).getLegend( ch, this, buf );
 
-	if (delivered > 0)
-	    buf << "ôÏÂÏÊ ÕÖÅ ÄÏÓÔÁ×ÌÅÎÏ {Y" << delivered << "{x ÉÚ ÎÉÈ." << endl;
-	
-	buf << "úÁËÁÚÞÉË ÖÄÅÔ ÔÅÂÑ × ÒÁÊÏÎÅ " << customerRoom << "." << endl
-	    << "üÔÏ ÎÁÈÏÄÉÔÓÑ × ÍÅÓÔÎÏÓÔÉ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << customerArea << "." << endl;
+        if (delivered > 0)
+            buf << "Ð¢Ð¾Ð±Ð¾Ð¹ ÑƒÐ¶Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²Ð»ÐµÐ½Ð¾ {Y" << delivered << "{x Ð¸Ð· Ð½Ð¸Ñ…." << endl;
+        
+        buf << "Ð—Ð°ÐºÐ°Ð·Ñ‡Ð¸Ðº Ð¶Ð´ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ " << customerRoom << "." << endl
+            << "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << customerArea << "." << endl;
 
-	break;
+        break;
     case QSTAT_FINISHED:
-	buf << "ô×ÏÅ ÚÁÄÁÎÉÅ {Y÷ùðïìîåîï{x!" << endl
-	    << "÷ÅÒÎÉÓØ ÚÁ ×ÏÚÎÁÇÒÁÖÄÅÎÉÅÍ, ÄÏ ÔÏÇÏ ËÁË ×ÙÊÄÅÔ ×ÒÅÍÑ!" << endl;
-	break;
+        buf << "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ {YÐ’Ð«ÐŸÐžÐ›ÐÐ•ÐÐž{x!" << endl
+            << "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ð·Ð° Ð²Ð¾Ð·Ð½Ð°Ð³Ñ€Ð°Ð¶Ð´ÐµÐ½Ð¸ÐµÐ¼, Ð´Ð¾ Ñ‚Ð¾Ð³Ð¾ ÐºÐ°Ðº Ð²Ñ‹Ð¹Ð´ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ!" << endl;
+        break;
     default:
-	break;
+        break;
     }
 }
 
@@ -119,20 +124,20 @@ void LocateQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "ðÏÍÏÞØ " << customerName.ruscase( '3' ) << " ÉÚ " << customerRoom
-            << " (" << customerArea << ") ÏÔÙÓËÁÔØ Ó×ÏÉ ×ÅÝÉ.";
-	break;
+        buf << "ÐŸÐ¾Ð¼Ð¾Ñ‡ÑŒ " << customerName.ruscase( '3' ) << " Ð¸Ð· " << customerRoom
+            << " (" << customerArea << ") Ð¾Ñ‚Ñ‹ÑÐºÐ°Ñ‚ÑŒ ÑÐ²Ð¾Ð¸ Ð²ÐµÑ‰Ð¸.";
+        break;
     case QSTAT_SEARCH:
-        buf << "îÁÊÔÉ " << total << " ÛÔÕË" << GET_COUNT(total, "Õ", "É", "") << " "
-            << russian_case( itemMltName.getValue( ), '2' ) << " ÄÌÑ "
-            << russian_case( customerName.getValue( ), '2' ) << " ÉÚ " << customerRoom 
+        buf << "ÐÐ°Ð¹Ñ‚Ð¸ " << total << " ÑˆÑ‚ÑƒÐº" << GET_COUNT(total, "Ñƒ", "Ð¸", "") << " "
+            << russian_case( itemMltName.getValue( ), '2' ) << " Ð´Ð»Ñ "
+            << russian_case( customerName.getValue( ), '2' ) << " Ð¸Ð· " << customerRoom 
             << " (" << customerArea << ").";
-	break;
+        break;
     case QSTAT_FINISHED:
-	buf << "÷ÅÒÎÕÔØÓÑ Ë Ë×ÅÓÔÏÒÕ ÚÁ ÎÁÇÒÁÄÏÊ.";
-	break;
+        buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒÑÑ Ðº ÐºÐ²ÐµÑÑ‚Ð¾Ñ€Ñƒ Ð·Ð° Ð½Ð°Ð³Ñ€Ð°Ð´Ð¾Ð¹.";
+        break;
     default:
-	break;
+        break;
     }
 }
 
@@ -141,26 +146,26 @@ Quest::Reward::Pointer LocateQuest::reward( PCharacter *ch, NPCharacter *questma
     Reward::Pointer r( NEW );
     
     if (hint) {
-	r->points = number_range( 3, 9 );
-	r->gold = number_fuzzy( r->points );
+        r->points = number_range( 3, 9 );
+        r->gold = number_fuzzy( r->points );
     } else {
-	if (total <= 5)
-	    r->points = 10;
-	else
-	    r->points = 20;
+        if (total <= 5)
+            r->points = 10;
+        else
+            r->points = 20;
 
-	r->points += number_range( 3 * total, 4 * total );
-	r->gold = number_fuzzy( r->points );
-	r->wordChance = 3 * total;
-	r->scrollChance = number_fuzzy( total );
+        r->points += number_range( 3 * total, 4 * total );
+        r->gold = number_fuzzy( r->points );
+        r->wordChance = 3 * total;
+        r->scrollChance = number_fuzzy( total );
 
-	if (chance( total ))
-	    r->prac = number_range( 1, 3 );
+        if (chance( total ))
+            r->prac = number_range( 1, 3 );
     
-	if (!ch->getClan( )->isDispersed( )) {
-	    r->points /= 2;
-	    r->clanpoints = r->points;
-	}
+        if (!ch->getClan( )->isDispersed( )) {
+            r->points /= 2;
+            r->clanpoints = r->points;
+        }
     }
 
     r->exp = (r->points + r->clanpoints) * 10;
@@ -176,9 +181,9 @@ void LocateQuest::destroy( )
 /*-----------------------------------------------------------------------------
  * LocateQuest: local methods
  *----------------------------------------------------------------------------*/
-LocateScenario & LocateQuest::getScenario( )
+const LocateScenario & LocateQuest::getScenario( ) const
 {
-    return *(LocateQuestRegistrator::getThis( )->getScenario( scenName ).getStaticPointer<LocateScenario>( ));
+    return *(LocateQuestRegistrator::getThis( )->getMyScenario<LocateScenario>( scenName ));
 }
 
 bool LocateQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
@@ -190,7 +195,7 @@ bool LocateQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 bool LocateQuest::checkRoomClient( PCharacter *pch, Room *room )
 {
     if (!customerArea.empty( ) && customerArea == room->area->name)
-	return false;
+        return false;
 
     return ClientQuestModel::checkRoomClient( pch, room );
 }
@@ -201,35 +206,34 @@ void LocateQuest::scatterItems( PCharacter *pch, Room *endPoint, NPCharacter *cu
     OBJ_INDEX_DATA *pObjIndex;
     unsigned int i, count;
     LocateAlgo::Rooms rooms;
-    LSItemData *itemScen;
-    LocateScenario &scen = getScenario( );
+    const LocateScenario &scen = getScenario( );
 
     if (scen.items.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
     
     scen.findRooms( pch, customer->in_room, endPoint, rooms );
     count = scen.getCount( pch );
 
     if (!count || count > rooms.size( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
     
-    itemScen = &scen.items[number_range( 0, scen.items.size( ) - 1 )];
-    itemName = itemScen->shortDesc;
-    itemMltName = itemScen->shortMlt;
+    const LSItemData &itemScen = scen.items[number_range( 0, scen.items.size( ) - 1 )];
+    itemName = itemScen.shortDesc;
+    itemMltName = itemScen.shortMlt;
 
     pObjIndex = get_obj_index( LocateQuestRegistrator::getThis( )->itemVnum );
         
     while (!rooms.empty( ) && total < (int)count) {
-	i = number_range( 0, rooms.size( ) - 1 );
-	obj = createItem<LocateItem>( pObjIndex );
-	itemScen->dress( obj );
-	obj_to_room( obj, rooms[i] );
-	total++;
-	rooms.erase( rooms.begin( ) + i );
+        i = number_range( 0, rooms.size( ) - 1 );
+        obj = createItem<LocateItem>( pObjIndex );
+        itemScen.dress( obj );
+        obj_to_room( obj, rooms[i] );
+        total++;
+        rooms.erase( rooms.begin( ) + i );
     }
 
     if (!total)
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }
 
 /*-----------------------------------------------------------------------------
@@ -247,12 +251,14 @@ LocateQuestRegistrator::~LocateQuestRegistrator( )
     thisClass = NULL;
 }
 
-bool LocateQuestRegistrator::applicable( PCharacter *pch ) 
+bool LocateQuestRegistrator::applicable( PCharacter *pch, bool fAuto ) const
 {
+    if (!QuestRegistratorBase::applicable(pch, fAuto))
+        return false;
     if (pch->getClan( ) == clan_battlerager)
-	return false;
+        return false;
 
     return gsn_locate_object->getEffective( pch ) >= 50
-	    || gsn_find_object->getEffective( pch ) >= 50;
+            || gsn_find_object->getEffective( pch ) >= 50;
 }
 

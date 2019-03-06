@@ -1,5 +1,5 @@
 /***************************************************************************
-                          parsedate.l++  -  разбор строки времени
+                          parsedate.l++  -  я─п╟п╥п╠п╬я─ я│я┌я─п╬п╨п╦ п╡я─п╣п╪п╣п╫п╦
                              -------------------                                         
     begin                : Thu Sep 27 2001                                           
     copyright            : (C) 2001 by nofate                         
@@ -35,12 +35,12 @@ static const char* IS_NOT_IN_ORDER = "isn't in order";
 
 %}
 
-MONTH				"mon"|"мес"|"month"|"месяц"
-WEEK				"w"|"н"|"week"|"неделя"
-DAY					"d"|"д"|"day"|"день"
-HOUR				"h"|"ч"|"hour"|"час"
-MINUTE			"min"|"мин"|"minute"|"митута"
-SECOND			"s"|"с"|"second"|"секунда"
+MONTH				"mon"|"п╪п╣я│"|"month"|"п╪п╣я│я▐я├"
+WEEK				"w"|"п╫"|"week"|"п╫п╣п╢п╣п╩я▐"
+DAY					"d"|"п╢"|"day"|"п╢п╣п╫я▄"
+HOUR				"h"|"я┤"|"hour"|"я┤п╟я│"
+MINUTE			"min"|"п╪п╦п╫"|"minute"|"п╪п╦я┌я┐я┌п╟"
+SECOND			"s"|"я│"|"second"|"я│п╣п╨я┐п╫п╢п╟"
 
 
 %%
@@ -134,10 +134,10 @@ SECOND			"s"|"с"|"second"|"секунда"
 %%
 
 
-DateParser::DateParser( const DLString& date )
-	: yyFlexLexer( &istr, &cout ), tokenStatus( MONTH ), date( date ),
+DateParser::DateParser( const DLString& date, istream *istr )
+	: yyFlexLexer( &*istr, &cout ), tokenStatus( MONTH ), date( date ),
 		second( 0 ), modifier( 1 ), position( 1 ),
-		lastNumber( 0 ), istr( date.c_str( ) )
+		lastNumber( 0 )
 {
 }
 

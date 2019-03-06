@@ -12,6 +12,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
+#include "clanreference.h"
 
 #include "mercdb.h"
 #include "act.h"
@@ -19,6 +20,7 @@
 #include "descriptor.h"
 #include "def.h"
 
+CLAN(none);
 
 /*--------------------------------------------------------------------------
  * Invasion Scenario 
@@ -30,6 +32,12 @@ bool InvasionScenario::canStart( )
 
 bool InvasionScenario::checkRoom( Room *room )
 {
+    if (room->clan != clan_none)
+        return false;
+
+    if (!room->guilds.empty( ))
+        return false;
+
     return !IS_SET(room->room_flags, ROOM_NO_QUEST|ROOM_MANSION|ROOM_NO_MOB|ROOM_NO_DAMAGE|ROOM_SAFE|ROOM_SOLITARY)
         && !IS_SET(room->room_flags, ROOM_NEWBIES_ONLY|ROOM_GODS_ONLY|ROOM_NOWHERE);
 }
@@ -37,10 +45,10 @@ bool InvasionScenario::checkRoom( Room *room )
 bool InvasionScenario::checkArea( AREA_DATA *area )
 {
     if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_NOQUEST|AREA_HIDDEN))
-	return false;
-	
+        return false;
+        
     if (area->low_range > 20)
-	return false;
+        return false;
 
     return true;
 }
@@ -54,13 +62,13 @@ void InvasionSparseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
     Room *room;
     
     for (room = room_list; room; room = room->rnext) {
-	if (!checkArea( room->area ))
-	    continue;
-	
-	if (!checkRoom( room ))
-	    continue;
-	
-	rooms.push_back( room );
+        if (!checkArea( room->area ))
+            continue;
+        
+        if (!checkRoom( room ))
+            continue;
+        
+        rooms.push_back( room );
     }
 }   
 
@@ -75,33 +83,33 @@ void InvasionDenseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
     int areaCnt;
     
     for (room = room_list; room; room = room->rnext) {
-	if (!checkArea( room->area )) 
-	    continue;
-	    
-	if (!checkRoom( room ))
-	    continue;
-	
-	goodRooms[room->area].push_back( room );
+        if (!checkArea( room->area )) 
+            continue;
+            
+        if (!checkRoom( room ))
+            continue;
+        
+        goodRooms[room->area].push_back( room );
     }
 
     areaCnt = std::max( 3, number_range( mobCnt / 20, mobCnt / 7 ) );
     
     while (!goodRooms.empty( ) && areaCnt > 0) {
-	unsigned int j;
-	RoomsByArea::iterator it;
-	int i = number_range( 0, goodRooms.size( ) - 1 );
-	
-	for (it = goodRooms.begin( ); i > 0 && it != goodRooms.end( ); it++, i--) 
-	    ;
-	
-	if ((int)it->second.size( ) >= mobCnt / areaCnt) {
-	    for (j = 0; j < it->second.size( ); j++)
-		rooms.push_back( it->second[j] );
+        unsigned int j;
+        RoomsByArea::iterator it;
+        int i = number_range( 0, goodRooms.size( ) - 1 );
+        
+        for (it = goodRooms.begin( ); i > 0 && it != goodRooms.end( ); it++, i--) 
+            ;
+        
+        if ((int)it->second.size( ) >= mobCnt / areaCnt) {
+            for (j = 0; j < it->second.size( ); j++)
+                rooms.push_back( it->second[j] );
 
-	    areaCnt--;
-	}
-	
-	goodRooms.erase( it );
+            areaCnt--;
+        }
+        
+        goodRooms.erase( it );
     }
 }
 
@@ -111,13 +119,13 @@ void InvasionDenseScenario::collectRooms( vector<Room *>& rooms, int mobCnt )
 bool InvasionLocustScenario::checkRoom( Room *room )
 {
     if (IS_SET(room->room_flags, ROOM_INDOORS))
-	return false;
-	
+        return false;
+        
     switch (room->sector_type) {
     case SECT_FIELD: case SECT_FOREST: case SECT_HILLS: case SECT_MOUNTAIN:
-	return InvasionScenario::checkRoom( room );
+        return InvasionScenario::checkRoom( room );
     default:
-	return false;
+        return false;
     }
 }
 
@@ -133,15 +141,15 @@ void InvasionBubblesMob::actDeath( Character *killer )
     s = ch->getNPC( )->getShortDescr( );
     
     if (s.length( ) >= 2 && s.at( 0 ) == '{')
-	sprintf(buf, "{%c", s.at( 1 ));
+        sprintf(buf, "{%c", s.at( 1 ));
     else
-	sprintf(buf, "{x");
+        sprintf(buf, "{x");
    
-    strcat(buf+strlen(buf), "(*)!(*)!(*) ώπολ !!! (*)!(*)!(*){x\r\n");
+    strcat(buf+strlen(buf), "(*)!(*)!(*) Π§ΠΠΠ !!! (*)!(*)!(*){x\r\n");
     
     for (d = descriptor_list; d != 0; d = d->next) 
-	if (d->connected == CON_PLAYING && d->character)
-	    d->character->send_to(buf);
+        if (d->connected == CON_PLAYING && d->character)
+            d->character->send_to(buf);
 }
 
 /*--------------------------------------------------------------------------
@@ -150,13 +158,13 @@ void InvasionBubblesMob::actDeath( Character *killer )
 bool InvasionFootballScenario::checkRoom( Room *room )
 {
     if (IS_SET(room->room_flags, ROOM_INDOORS))
-	return false;
-	
+        return false;
+        
     switch (room->sector_type) {
     case SECT_FIELD: case SECT_HILLS: case SECT_MOUNTAIN: 
-	return InvasionScenario::checkRoom( room );
+        return InvasionScenario::checkRoom( room );
     default:
-	return false;
+        return false;
     }
 }
 

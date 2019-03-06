@@ -25,20 +25,20 @@ Poliglot::Poliglot( )
 bool Poliglot::specIdle( ) 
 {
     if (number_range( 0, 900 ) == 0) {
-	Room *room = get_random_room( ch );
+        Room *room = get_random_room( ch );
 
-	if (!room)
-	    return false;
-	
-	transfer_char( ch, ch, room );
-	return true;
+        if (!room)
+            return false;
+        
+        transfer_char( ch, ch, room );
+        return true;
     }
     
     if (number_range( 0, 15 ))
-	return false;
+        return false;
     
     if (path.empty( ))
-	pathWithDepth( ch->in_room, 20, 5000 );
+        pathWithDepth( ch->in_room, 20, 5000 );
 
     makeOneStep( );
     return true;
@@ -58,12 +58,12 @@ bool Poliglot::handleMoveResult( Road &road, int rc )
     switch (rc) {
     case RC_MOVE_WATER:
     case RC_MOVE_AIR:
-	::spell( gsn_fly, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE );
-	return false;
+        ::spell( gsn_fly, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE );
+        return false;
     
     case RC_MOVE_PASS_NEEDED:
-	::spell( gsn_pass_door, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE );
-	return false;
+        ::spell( gsn_pass_door, ch->getModifyLevel( ), ch, ch, FSPELL_VERBOSE );
+        return false;
     }
 
     return Wanderer::handleMoveResult( road, rc );

@@ -23,6 +23,6 @@ OneAllocate::~OneAllocate( )
 void OneAllocate::checkDuplicate( DLObject* object )
 {
     if( object != 0 )
-	throw Exception( DLString( "Duplicate static class " )
-			 + typeid( *object ).name( ) );
+        throw Exception( DLString( "Duplicate static class " )
+                         + typeid( *object ).name( ) );
 }

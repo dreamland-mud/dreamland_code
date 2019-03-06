@@ -39,20 +39,20 @@ OLCStateMobile::OLCStateMobile( MOB_INDEX_DATA *original )
     const char *c = 0;
     
     if(original->spec_fun.func)
-	c = spec_name(original->spec_fun.func);
-	
+        c = spec_name(original->spec_fun.func);
+        
     if(!c)
-	c = original->spec_fun.name.c_str( );
+        c = original->spec_fun.name.c_str( );
     
     if(c && *c)
-	mob.spec_fun.name = c;
+        mob.spec_fun.name = c;
     else
-	mob.spec_fun.name = "";
+        mob.spec_fun.name = "";
 
     if(original->behavior)
-	mob.behavior         = XMLDocument::Pointer( NEW, **original->behavior );
+        mob.behavior         = XMLDocument::Pointer( NEW, **original->behavior );
     else
-	mob.behavior         = 0;
+        mob.behavior         = 0;
 
     mob.vnum             = original->vnum;
     mob.new_format       = original->new_format;
@@ -126,108 +126,108 @@ void OLCStateMobile::commit()
     original = get_mob_index(mob.vnum);
 
     if(!original) {
-	int iHash;
-	
-	original = new_mob_index();
+        int iHash;
+        
+        original = new_mob_index();
 
-	original->vnum = mob.vnum;
-	original->area = mob.area;
+        original->vnum = mob.vnum;
+        original->area = mob.area;
 
-	if (mob.vnum > top_vnum_mob)
-	    top_vnum_mob = mob.vnum;
+        if (mob.vnum > top_vnum_mob)
+            top_vnum_mob = mob.vnum;
 
-	mob.act |= ACT_IS_NPC;
-	iHash = (int) mob.vnum % MAX_KEY_HASH;
-	original->next = mob_index_hash[iHash];
-	mob_index_hash[iHash] = original;
-	top_mob_index++;
+        mob.act |= ACT_IS_NPC;
+        iHash = (int) mob.vnum % MAX_KEY_HASH;
+        original->next = mob_index_hash[iHash];
+        mob_index_hash[iHash] = original;
+        top_mob_index++;
     }
 
 
     for(wch = char_list; wch; wch = wch->next) {
-	NPCharacter *victim = wch->getNPC();
+        NPCharacter *victim = wch->getNPC();
 
-	if (!victim)
-	    continue;
+        if (!victim)
+            continue;
 
-	if(victim->pIndexData == original) {
-	    if(victim->spec_fun.func == original->spec_fun.func) {
-		victim->spec_fun.name = mob.spec_fun.name;
-		victim->spec_fun.func = spec_lookup( mob.spec_fun.name.c_str() );
-	    }
-	    
-	    if(victim->group == original->group)
-		victim->group = mob.group;
+        if(victim->pIndexData == original) {
+            if(victim->spec_fun.func == original->spec_fun.func) {
+                victim->spec_fun.name = mob.spec_fun.name;
+                victim->spec_fun.func = spec_lookup( mob.spec_fun.name.c_str() );
+            }
+            
+            if(victim->group == original->group)
+                victim->group = mob.group;
 
-	    if(!strcmp(victim->getNameP(), original->player_name))
-		victim->setName(DLString(mob.player_name));
+            if(!strcmp(victim->getNameP(), original->player_name))
+                victim->setName(DLString(mob.player_name));
 
-	    if(victim->act == original->act)
-		victim->act = mob.act;
-	    
-	    if(victim->affected_by == original->affected_by)
-		victim->affected_by = mob.affected_by;
-	    
-	    if(victim->add_affected_by == original->add_affected_by)
-		victim->add_affected_by = mob.add_affected_by;
-	    
-	    if(victim->detection == original->detection)
-		victim->detection = mob.detection;
-	    
-	    if(victim->alignment == original->alignment)
-		victim->alignment = mob.alignment;
-	    
-	    if(victim->getRealLevel() == original->level)
-		victim->setLevel(mob.level);
+            if(victim->act == original->act)
+                victim->act = mob.act;
+            
+            if(victim->affected_by == original->affected_by)
+                victim->affected_by = mob.affected_by;
+            
+            if(victim->add_affected_by == original->add_affected_by)
+                victim->add_affected_by = mob.add_affected_by;
+            
+            if(victim->detection == original->detection)
+                victim->detection = mob.detection;
+            
+            if(victim->alignment == original->alignment)
+                victim->alignment = mob.alignment;
+            
+            if(victim->getRealLevel() == original->level)
+                victim->setLevel(mob.level);
 
-	    if(victim->hitroll == original->hitroll)
-		victim->hitroll = mob.hitroll;
-	    
-	    if(victim->material == original->material)
-		victim->material = mob.material;
+            if(victim->hitroll == original->hitroll)
+                victim->hitroll = mob.hitroll;
+            
+            if(victim->material == original->material)
+                victim->material = mob.material;
 
 /* - rt values. not to be fixed
-	    victim->hit              = mob.hit;
-	    victim->mana             = mob.mana;
-	    victim->damage           = mob.damage;
-	    victim->ac               = mob.ac;
+            victim->hit              = mob.hit;
+            victim->mana             = mob.mana;
+            victim->damage           = mob.damage;
+            victim->ac               = mob.ac;
 */
-	    if(victim->dam_type == original->dam_type)
-		victim->dam_type = mob.dam_type;
-	    
-	    if(victim->off_flags == original->off_flags)
-		victim->off_flags = mob.off_flags;
+            if(victim->dam_type == original->dam_type)
+                victim->dam_type = mob.dam_type;
+            
+            if(victim->off_flags == original->off_flags)
+                victim->off_flags = mob.off_flags;
 
-	    if(victim->imm_flags == original->imm_flags)
-		victim->imm_flags = mob.imm_flags;
-	    
-	    if(victim->res_flags == original->res_flags)
-		victim->res_flags = mob.res_flags;
-	    
-	    if(victim->vuln_flags == original->vuln_flags)
-		victim->vuln_flags = mob.vuln_flags;
-	    
-	    if(victim->start_pos == original->start_pos)
-		victim->start_pos = mob.start_pos;
-	    
-	    if(victim->default_pos == original->default_pos)
-		victim->default_pos = mob.default_pos;
-	    
-	    if(victim->getSex() == original->sex)
-		victim->setSex( mob.sex );
-	    
-	    if(victim->getRace()->getName( ) == original->race)
-		victim->setRace( mob.race );
+            if(victim->imm_flags == original->imm_flags)
+                victim->imm_flags = mob.imm_flags;
+            
+            if(victim->res_flags == original->res_flags)
+                victim->res_flags = mob.res_flags;
+            
+            if(victim->vuln_flags == original->vuln_flags)
+                victim->vuln_flags = mob.vuln_flags;
+            
+            if(victim->start_pos == original->start_pos)
+                victim->start_pos = mob.start_pos;
+            
+            if(victim->default_pos == original->default_pos)
+                victim->default_pos = mob.default_pos;
+            
+            if(victim->getSex() == original->sex)
+                victim->setSex( mob.sex );
+            
+            if(victim->getRace()->getName( ) == original->race)
+                victim->setRace( mob.race );
 
-	    if(victim->form == original->form)
-		victim->form             = mob.form;
-	    
-	    if(victim->parts == original->parts)
-		victim->parts = mob.parts;
+            if(victim->form == original->form)
+                victim->form             = mob.form;
+            
+            if(victim->parts == original->parts)
+                victim->parts = mob.parts;
 
-	    if(victim->size == original->size)
-		victim->size             = mob.size;
-	}
+            if(victim->size == original->size)
+                victim->size             = mob.size;
+        }
     }
 
     free_string(original->player_name);
@@ -285,10 +285,10 @@ void OLCStateMobile::commit()
     original->practicer.set( mob.practicer );
 
     for(wch = char_list; wch; wch = wch->next) {
-	NPCharacter *victim = wch->getNPC();
+        NPCharacter *victim = wch->getNPC();
 
-	if (victim && victim->pIndexData == original) 
-	    victim->updateCachedNoun( );
+        if (victim && victim->pIndexData == original) 
+            victim->updateCachedNoun( );
     }
 
 
@@ -309,70 +309,67 @@ MEDIT(show)
     ptc(ch, "{GName: [{x%s{G]\n\r", mob.player_name);
 
     ptc(ch, "{GShort desc: {x%s\n\r{GLong descr:{x\n\r%s",
-	mob.short_descr, mob.long_descr);	
+        mob.short_descr, mob.long_descr);        
     
     ptc(ch, "{CLevel {Y%3d  {CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
-	mob.level, mob.vnum,
-	!mob.area ? -1 : mob.area->vnum,
-	!mob.area ? "No Area" : mob.area->name);
+        mob.level, mob.vnum,
+        !mob.area ? -1 : mob.area->vnum,
+        !mob.area ? "No Area" : mob.area->name);
 
-    ptc(ch, "Race [{G%s{x]   Sex: [{G%s{x]   Number: [{G%s{x]\n\r",
-	mob.race, 
-	sex_table.name( mob.sex ).c_str( ),
-	mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular");
+    ptc(ch, "Race [{G%s{x] {D(? race){x Sex: [{G%s{x] {D(? sex_table){x Number: [{G%s{x]\n\r",
+        mob.race, 
+        sex_table.name( mob.sex ).c_str( ),
+        mob.gram_number == Grammar::Number::PLURAL ? "plural" : "singular");
 
     ptc(ch, "{GHit dice:{x    [%6dd%-5d+%6d]\n\r",
-	mob.hit[DICE_NUMBER],
-	mob.hit[DICE_TYPE],
-	mob.hit[DICE_BONUS]);
+        mob.hit[DICE_NUMBER],
+        mob.hit[DICE_TYPE],
+        mob.hit[DICE_BONUS]);
 
     ptc(ch, "{RDamage dice:{x [%6dd%-5d+%6d]\n\r",
-	mob.damage[DICE_NUMBER],
-	mob.damage[DICE_TYPE],
-	mob.damage[DICE_BONUS]);
+        mob.damage[DICE_NUMBER],
+        mob.damage[DICE_TYPE],
+        mob.damage[DICE_BONUS]);
 
     ptc(ch, "{CMana dice:{x   [%6dd%-5d+%6d]\n\r",
-	mob.mana[DICE_NUMBER],
-	mob.mana[DICE_TYPE],
-	mob.mana[DICE_BONUS]);
+        mob.mana[DICE_NUMBER],
+        mob.mana[DICE_TYPE],
+        mob.mana[DICE_BONUS]);
 
     ptc(ch, "Wealth:[%10d]   Align:  [%5d]\n\r",
-	mob.wealth, mob.alignment);
+        mob.wealth, mob.alignment);
 
-    ptc(ch, "Damage:[%10s]   Hitroll:[%5d]\n\r",
-	weapon_flags.name(mob.dam_type).c_str( ), mob.hitroll);
+    ptc(ch, "Hitroll:[%5d] Damage:[%10s] {D(? weapon_flags){x\n\r",
+        mob.hitroll, weapon_flags.name(mob.dam_type).c_str( ));
 
-    ptc(ch, "Armor: [pierce: %d  bash: %d  slash: %d  magic: %d]\n\r",
-	mob.ac[AC_PIERCE], mob.ac[AC_BASH],
-	mob.ac[AC_SLASH], mob.ac[AC_EXOTIC]);
+    ptc(ch, "Armor: [pierce: %d  bash: %d  slash: %d  magic: %d] {D(? ac_type){x\n\r",
+        mob.ac[AC_PIERCE], mob.ac[AC_BASH],
+        mob.ac[AC_SLASH], mob.ac[AC_EXOTIC]);
 
-    ptc(ch, "Act: [{R%s{x]\n\r", act_flags.names(mob.act).c_str());
+    ptc(ch, "Act: [{R%s{x] {D(? act_flags){x\n\r", act_flags.names(mob.act).c_str());
 
-    ptc(ch, "Aff: [{C%s{x]\n\r", affect_flags.names(mob.affected_by).c_str());
-    ptc(ch, "Det: [{M%s{x]\n\r", detect_flags.names(mob.detection).c_str());
+    ptc(ch, "Aff: [{C%s{x] {D(? affect_flags){x\n\r", affect_flags.names(mob.affected_by).c_str());
+    ptc(ch, "Det: [{M%s{x] {D(? detect_flags){x\n\r", detect_flags.names(mob.detection).c_str());
 
-    ptc(ch, "Pos   : starting [{Y%s{x]  default [{Y%s{x]\n\r",
-	position_table.name(mob.start_pos).c_str(),
-	position_table.name(mob.default_pos).c_str());
+    ptc(ch, "Pos   : starting [{Y%s{x]  default [{Y%s{x] {D(? position_table){x\n\r",
+        position_table.name(mob.start_pos).c_str(),
+        position_table.name(mob.default_pos).c_str());
 
-    ptc(ch, "Imm:  [{W%s{x]\n\r", imm_flags.names(mob.imm_flags).c_str());
-    ptc(ch, "Res:  [{Y%s{x]\n\r", res_flags.names(mob.res_flags).c_str());
-    ptc(ch, "Vuln: [{y%s{x]\n\r", vuln_flags.names(mob.vuln_flags).c_str());
-    ptc(ch, "Off:  [{M%s{x]\n\r", off_flags.names(mob.off_flags).c_str());
-    ptc(ch, "Size: [{G%s{x]\n\r", size_table.name(mob.size).c_str());
+    ptc(ch, "Imm:  [{W%s{x] {D(? imm_flags){x\n\r", imm_flags.names(mob.imm_flags).c_str());
+    ptc(ch, "Res:  [{Y%s{x] {D(? res_flags){x\n\r", res_flags.names(mob.res_flags).c_str());
+    ptc(ch, "Vuln: [{y%s{x] {D(? vuln_flags){x\n\r", vuln_flags.names(mob.vuln_flags).c_str());
+    ptc(ch, "Off:  [{M%s{x] {D(? off_flags){x\n\r", off_flags.names(mob.off_flags).c_str());
+    ptc(ch, "Size: [{G%s{x] {D(? size_table){x\n\r", size_table.name(mob.size).c_str());
 
-    ptc(ch, "Material: [%s]\n\r", mob.material);
-    ptc(ch, "Form:     [%s]\n\r", form_flags.names(mob.form).c_str());
-    ptc(ch, "Parts:    [%s]\n\r", part_flags.names(mob.parts).c_str());
+    ptc(ch, "Material: [%s] {D(? material){x\n\r", mob.material);
+    ptc(ch, "Form:     [%s] {D(? form_flags){x\n\r", form_flags.names(mob.form).c_str());
+    ptc(ch, "Parts:    [%s] {D(? part_flags){x\n\r", part_flags.names(mob.parts).c_str());
 
     if (!mob.spec_fun.name.empty())
-	ptc(ch, "Spec fun: [%s]\n\r", mob.spec_fun.name.c_str());
+        ptc(ch, "Spec fun: [%s] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
     ptc(ch, "Group:    [%d]\n\r", mob.group);
-
-    ptc(ch, "Practicer:[%s]\n\r", mob.practicer.toString( ).c_str( ));
-
-    if (!mob.smell.empty( ))
-        ptc(ch, "Smell:\n\r     %s\n\r", mob.smell.c_str( ));
+    ptc(ch, "Practicer:[%s] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
 
     if (!mob.properties.empty( )) {
         ptc(ch, "Properties:\n\r");
@@ -383,14 +380,14 @@ MEDIT(show)
     ptc(ch, "Description:\n\r%s", mob.description);
 
     if (mob.behavior) {
-	try {
-	    std::basic_ostringstream<char> ostr;
-	    mob.behavior->save( ostr );
-	    ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
-	    
-	} catch (ExceptionXMLError e) {
-	    ptc(ch, "Behavior is BUGGY.\r\n");
-	}
+        try {
+            std::basic_ostringstream<char> ostr;
+            mob.behavior->save( ostr );
+            ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
+            
+        } catch (ExceptionXMLError e) {
+            ptc(ch, "Behavior is BUGGY.\r\n");
+        }
     }
 
     return false;
@@ -403,25 +400,25 @@ MEDIT(create)
 
     value = atoi(argument);
     if (argument[0] == '\0' || value == 0) {
-	stc("Syntax:  medit create [vnum]\n\r", ch);
-	return false;
+        stc("Syntax:  medit create [vnum]\n\r", ch);
+        return false;
     }
 
     pArea = get_vnum_area(value);
 
     if (!pArea) {
-	stc("OLCStateMobile:  That vnum is not assigned an area.\n\r", ch);
-	return false;
+        stc("OLCStateMobile:  That vnum is not assigned an area.\n\r", ch);
+        return false;
     }
 
     if (!can_edit( ch, value )) {
-	stc("OLCStateMobile:  Vnum in an area you cannot build in.\n\r", ch);
-	return false;
+        stc("OLCStateMobile:  Vnum in an area you cannot build in.\n\r", ch);
+        return false;
     }
 
     if (get_mob_index(value)) {
-	stc("OLCStateMobile:  Mobile vnum already exists.\n\r", ch);
-	return false;
+        stc("OLCStateMobile:  Mobile vnum already exists.\n\r", ch);
+        return false;
     }
 
 
@@ -437,32 +434,32 @@ static void xml_node_set( Character *ch, XMLNode::Pointer root, const DLString &
     XMLNode::Pointer node;
     
     if (!root) {
-	stc("Корневой элемент документа пуст!\n\r", ch);
-	return;
+        stc("п п╬я─п╫п╣п╡п╬п╧ я█п╩п╣п╪п╣п╫я┌ п╢п╬п╨я┐п╪п╣п╫я┌п╟ п©я┐я│я┌!\n\r", ch);
+        return;
     }
 
     node = root->selectSingleNode( nodeName );
     if (node) {
-	if (node->getFirstNode( )) {
-	    node->getFirstNode( )->setType( XMLNode::XML_TEXT );
-	    node->getFirstNode( )->setName( nodeValue );
-	} else {
-	    stc("Ошибка: неправильный элемент.\n\r", ch);
-	    return;
-	}
+        if (node->getFirstNode( )) {
+            node->getFirstNode( )->setType( XMLNode::XML_TEXT );
+            node->getFirstNode( )->setName( nodeValue );
+        } else {
+            stc("п·я┬п╦п╠п╨п╟: п╫п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ я█п╩п╣п╪п╣п╫я┌.\n\r", ch);
+            return;
+        }
     }
     else {
-	node.construct( );
-	node->setName( nodeName );
-	root->appendChild( node );
+        node.construct( );
+        node->setName( nodeName );
+        root->appendChild( node );
 
-	XMLNode::Pointer child( NEW );
-	child->setType( XMLNode::XML_TEXT );
-	child->setCData( nodeValue );
-	node->appendChild( child );
+        XMLNode::Pointer child( NEW );
+        child->setType( XMLNode::XML_TEXT );
+        child->setCData( nodeValue );
+        node->appendChild( child );
     }
 
-    ptc(ch, "Полю {W%s{x присвоено значение {G%s{x.\n\r", nodeName.c_str( ), nodeValue.c_str( ));
+    ptc(ch, "п÷п╬п╩я▌ {W%s{x п©я─п╦я│п╡п╬п╣п╫п╬ п╥п╫п╟я┤п╣п╫п╦п╣ {G%s{x.\n\r", nodeName.c_str( ), nodeValue.c_str( ));
 }
 
 MEDIT(shop)
@@ -475,88 +472,88 @@ MEDIT(shop)
     argument = one_argument( argument, cmd );
     
     if (!cmd[0]) {
-	stc("Используйте 'shop help' для справки.\r\n", ch);
-	return false;
+        stc("п≤я│п©п╬п╩я▄п╥я┐п╧я┌п╣ 'shop help' п╢п╩я▐ я│п©я─п╟п╡п╨п╦.\r\n", ch);
+        return false;
     }
 
     if (!mob.behavior) {
-	stc("Поведение продавца не задано, используйте 'behavior shopper'.\r\n", ch);
-	return false;
+        stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ п©я─п╬п╢п╟п╡я├п╟ п╫п╣ п╥п╟п╢п╟п╫п╬, п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ 'behavior shopper'.\r\n", ch);
+        return false;
     }
 
     if (is_number( argument )) {
-	value = atoi( argument );
-	nodeValue = value;
+        value = atoi( argument );
+        nodeValue = value;
     }
     else {
-	itypes = item_table.bitstring( argument, false );
-	nodeValue = item_table.names( itypes );
+        itypes = item_table.bitstring( argument, false );
+        nodeValue = item_table.names( itypes );
     }
     
     XMLNode::Pointer root = mob.behavior->getDocumentElement( );
 
     if (!str_prefix( cmd, "sellprofit" )) {
-	if (value != -1) {
-	    xml_node_set( ch, root, "profitSell", nodeValue );
-	    return true;
-	}
+        if (value != -1) {
+            xml_node_set( ch, root, "profitSell", nodeValue );
+            return true;
+        }
     }
     else if (!str_prefix( cmd, "buyprofit" )) {
-	if (value != -1) {
-	    xml_node_set( ch, root, "profitBuy", nodeValue );
-	    return true;
-	}
+        if (value != -1) {
+            xml_node_set( ch, root, "profitBuy", nodeValue );
+            return true;
+        }
     }
     else if (!str_prefix( cmd, "openhour" )) {
-	if (value >= 0 && value < 24) {
-	    xml_node_set( ch, root, "openHour", nodeValue );
-	    return true;
-	}
+        if (value >= 0 && value < 24) {
+            xml_node_set( ch, root, "openHour", nodeValue );
+            return true;
+        }
     }
     else if (!str_prefix( cmd, "closehour" )) {
-	if (value >= 0 && value < 24) {
-	    xml_node_set( ch, root, "closeHour", nodeValue );
-	    return true;
-	}
+        if (value >= 0 && value < 24) {
+            xml_node_set( ch, root, "closeHour", nodeValue );
+            return true;
+        }
     }
     else if (!str_prefix( cmd, "buys" )) {
-	if (itypes != NO_FLAG) {
-	    xml_node_set( ch, root, "buys", nodeValue );
-	    return true;
-	}
+        if (itypes != NO_FLAG) {
+            xml_node_set( ch, root, "buys", nodeValue );
+            return true;
+        }
     }
     else if (!str_prefix( cmd, "repairs" )) {
-	if (itypes != NO_FLAG) {
-	    xml_node_set( ch, root, "repairs", nodeValue );
-	    return true;
-	}
+        if (itypes != NO_FLAG) {
+            xml_node_set( ch, root, "repairs", nodeValue );
+            return true;
+        }
     }
 
-    stc("shop sellprofit <number>  - наценка от продажи, в процентах\r\n"
-	"shop buyprofit  <number>  - наценка от покупки, в процентах\r\n"
-	"shop openhour   <number>  - в котором часу открывается (0..23)\r\n"
-	"shop closehour  <number>  - в котором часу закрывается (0..23)\r\n"
-	"shop buys <item types>    - какие типы предметов покупает \r\n"
-	"shop repairs <item types> - какие типы предметов ремонтирует \r\n",
-	ch);
+    stc("shop sellprofit <number>  - п╫п╟я├п╣п╫п╨п╟ п╬я┌ п©я─п╬п╢п╟п╤п╦, п╡ п©я─п╬я├п╣п╫я┌п╟я┘\r\n"
+        "shop buyprofit  <number>  - п╫п╟я├п╣п╫п╨п╟ п╬я┌ п©п╬п╨я┐п©п╨п╦, п╡ п©я─п╬я├п╣п╫я┌п╟я┘\r\n"
+        "shop openhour   <number>  - п╡ п╨п╬я┌п╬я─п╬п╪ я┤п╟я│я┐ п╬я┌п╨я─я▀п╡п╟п╣я┌я│я▐ (0..23)\r\n"
+        "shop closehour  <number>  - п╡ п╨п╬я┌п╬я─п╬п╪ я┤п╟я│я┐ п╥п╟п╨я─я▀п╡п╟п╣я┌я│я▐ (0..23)\r\n"
+        "shop buys <item types>    - п╨п╟п╨п╦п╣ я┌п╦п©я▀ п©я─п╣п╢п╪п╣я┌п╬п╡ п©п╬п╨я┐п©п╟п╣я┌ \r\n"
+        "shop repairs <item types> - п╨п╟п╨п╦п╣ я┌п╦п©я▀ п©я─п╣п╢п╪п╣я┌п╬п╡ я─п╣п╪п╬п╫я┌п╦я─я┐п╣я┌ \r\n",
+        ch);
     return false;
 }
 
 MEDIT(where)
 {
-    ptc(ch, "%s находится в:\r\n", DLString( mob.short_descr ).ruscase('1').c_str( ));
+    ptc(ch, "%s п╫п╟я┘п╬п╢п╦я┌я│я▐ п╡:\r\n", DLString( mob.short_descr ).ruscase('1').c_str( ));
 
     for (Character *wch = char_list; wch; wch = wch->next) {
-	if (!wch->is_npc( ))
-	    continue;
+        if (!wch->is_npc( ))
+            continue;
 
-	if (wch->getNPC( )->pIndexData->vnum != mob.vnum)
-	    continue;
+        if (wch->getNPC( )->pIndexData->vnum != mob.vnum)
+            continue;
 
-	ptc(ch, "[%5d]    %-30s (%s)\r\n", 
-		wch->in_room->vnum,
-		wch->in_room->name, 
-		wch->in_room->area->name);
+        ptc(ch, "[%5d]    %-30s (%s)\r\n", 
+                wch->in_room->vnum,
+                wch->in_room->name, 
+                wch->in_room->area->name);
     }
 
     return true;
@@ -565,26 +562,26 @@ MEDIT(where)
 MEDIT(spec)
 {
     if (argument[0] == '\0') {
-	stc("Syntax:  spec [special function]\n\r", ch);
-	return false;
+        stc("Syntax:  spec [special function]\n\r", ch);
+        return false;
     }
 
 
     if (!str_cmp(argument, "none")) {
-	mob.spec_fun.name = "";
+        mob.spec_fun.name = "";
 
-	stc("Spec removed.\n\r", ch);
-	return true;
+        stc("Spec removed.\n\r", ch);
+        return true;
     }
 
     SPEC_FUN *sp = spec_lookup(argument);
     if (sp) {
-	const char *c = spec_name(sp);
-	if(c) {
-	    mob.spec_fun.name = c;
-	    stc("Spec set.\n\r", ch);
-	    return true;
-	}
+        const char *c = spec_name(sp);
+        if(c) {
+            mob.spec_fun.name = c;
+            stc("Spec set.\n\r", ch);
+            return true;
+        }
     }
 
     stc("OLCStateMobile: No such special function.\n\r", ch);
@@ -593,104 +590,35 @@ MEDIT(spec)
 
 MEDIT(damtype)
 {
-    int value = NO_FLAG;
-
-    if (argument[0] == '\0') {
-	stc("Syntax:  damtype [damage message]\n\r", ch);
-	stc("Para ver una lista de tipos de mensajes, pon '? weapon'.\n\r", ch);
-	return false;
-    }
-
-    if ((value = weapon_flags.value( argument )) != NO_FLAG) {
-	mob.dam_type = (int) value;
-	stc("Damage type set.\n\r", ch);
-	return true;
-    }
-
-    stc("OLCStateMobile: No such damage type.\n\r", ch);
-    return false;
+    return flagValueEdit(weapon_flags, mob.dam_type);
 }
 
 
 MEDIT(align)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  alignment [number]\n\r", ch);
-	return false;
-    }
-
-    mob.alignment = atoi(argument);
-
-    stc("Alignment set.\n\r", ch);
-    return true;
+    return numberEdit(-1000, 1000, mob.alignment);
 }
 
 MEDIT(level)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  level [number]\n\r", ch);
-	return false;
-    }
-
-    mob.level = atoi(argument);
-
-    stc("Level set.\n\r", ch);
-    return true;
+    return numberEdit(1, 120, mob.level);
 }
 
 MEDIT(desc)
 {
     char command[MAX_INPUT_LENGTH];
-    DLString origArg;
-
-    origArg = argument;
     argument = one_argument(argument, command);
-
-    if (command[0] == '\0') {
-	if(!sedit(mob.description)) 
-	    return false;
-	stc("Описание установлено.\n\r", ch);
-	return true;
-    }
-
-    if (is_name(command, "copy")) {
-        DLString str = mob.description;
-        ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(str);
-        ptc(ch, "Описание скопировано в буфер.\r\n");
-        return true;
-    }
-
-    if (is_name(command, "paste")) {
-        DLString str = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
-        free_string(mob.description);
-        mob.description = str_dup(str.c_str());
-        ptc(ch, "Описание вставлено из буфера.\r\n");
-        return true;
-    }
-
-    if (is_name(command, "help") || is_name(command, "?")) {
-        stc("Syntax:\n\r", ch);
-        stc("    desc        : войти в редактор описаний\n\r", ch);
-        stc("    desc строка : заменить описание на указанную строку\n\r", ch);
-        stc("    desc copy   : скопировать описание в буфер\n\r", ch);
-        stc("    desc paste  : заменить описание на то, что в буфере\n\r", ch);
-        return false;
-    }
-
-    free_string(mob.description);
-    mob.description = str_dup(origArg.c_str( ));
-    stc("Описание заменено на новую строку.\n\r", ch);
-    return false;
+    return editor(command, mob.description);
 }
 
 MEDIT(smell)
 {
     if (!*argument) {
-	if(sedit(mob.smell)) {
-	    stc("Smell set\n\r", ch);
-	    return true;
-	} else
-	    return false;
+        if(sedit(mob.smell)) {
+            stc("Smell set\n\r", ch);
+            return true;
+        } else
+            return false;
     }
 
     mob.smell = argument;
@@ -709,39 +637,39 @@ MEDIT(behavior)
     DLString type;
 
     if (!*argument) {
-	if(!xmledit(mob.behavior))
-	    return false;
+        if(!xmledit(mob.behavior))
+            return false;
 
-	stc("Поведение установлено.\r\n", ch);
-	return true;
+        stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╬.\r\n", ch);
+        return true;
     }
 
     if (mob.behavior) {
-	if (!str_cmp( argument, "clear" )) {
-	    mob.behavior.clear( );
-	    stc("Поведение очищено.\r\n", ch);
-	    return true;
-	}
+        if (!str_cmp( argument, "clear" )) {
+            mob.behavior.clear( );
+            stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ п╬я┤п╦я┴п╣п╫п╬.\r\n", ch);
+            return true;
+        }
 
-	stc("Поведение уже задано, используйте 'behavior' для редактирования или 'behavior clear' для очистки.\r\n", ch);
-	return false;
+        stc("п÷п╬п╡п╣п╢п╣п╫п╦п╣ я┐п╤п╣ п╥п╟п╢п╟п╫п╬, п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ 'behavior' п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╦п╩п╦ 'behavior clear' п╢п╩я▐ п╬я┤п╦я│я┌п╨п╦.\r\n", ch);
+        return false;
     }
 
     if (!str_cmp( argument, "shopper" )) {
-	static const DLString shopperType( "ShopTrader" );
-	type = shopperType;
+        static const DLString shopperType( "ShopTrader" );
+        type = shopperType;
     }
     else if (!str_cmp( argument, "pet" )) {
-	static const DLString petType( "Pet" );
-	type = petType;
+        static const DLString petType( "Pet" );
+        type = petType;
     }
     else if (!str_cmp( argument, "trainer" )) {
-	static const DLString trainerType( "Trainer" );
-	type = trainerType;
+        static const DLString trainerType( "Trainer" );
+        type = trainerType;
     }
     else { 
-	stc("Допустимые значения поведения: shopper, pet, trainer.\r\n", ch);
-	return false;
+        stc("п■п╬п©я┐я│я┌п╦п╪я▀п╣ п╥п╫п╟я┤п╣п╫п╦я▐ п©п╬п╡п╣п╢п╣п╫п╦я▐: shopper, pet, trainer.\r\n", ch);
+        return false;
     }
 
     mob.behavior = XMLDocument::Pointer( NEW );
@@ -751,16 +679,17 @@ MEDIT(behavior)
     node->setName( "behavior" );
     mob.behavior->appendChild( node );
 
-    ptc(ch, "Поведение {G%s{x установлено.\r\n", type.c_str( ));
+    ptc(ch, "п÷п╬п╡п╣п╢п╣п╫п╦п╣ {G%s{x я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╬.\r\n", type.c_str( ));
     return true;
 }
+
 MEDIT(long)
 {
     char buf[MAX_STRING_LENGTH];
 
     if (argument[0] == '\0') {
-	stc("Syntax:  long [string]\n\r", ch);
-	return false;
+        stc("Syntax:  long [string]\n\r", ch);
+        return false;
     }
 
     strcpy(buf, argument);
@@ -777,8 +706,8 @@ MEDIT(long)
 MEDIT(short)
 {
     if (argument[0] == '\0') {
-	stc("Syntax:  short [string]\n\r", ch);
-	return false;
+        stc("Syntax:  short [string]\n\r", ch);
+        return false;
     }
 
     free_string(mob.short_descr);
@@ -791,8 +720,8 @@ MEDIT(short)
 MEDIT(name)
 {
     if (argument[0] == '\0') {
-	stc("Syntax:  name [string]\n\r", ch);
-	return false;
+        stc("Syntax:  name [string]\n\r", ch);
+        return false;
     }
 
     free_string(mob.player_name);
@@ -805,27 +734,14 @@ MEDIT(name)
 
 MEDIT(sex)
 {
-    int value;
-
-    if (argument[0] != '\0') {
-	if ((value = sex_table.value( argument )) != NO_FLAG) {
-	    mob.sex = (int) value;
-
-	    stc("Sex set.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: sex [sex]\n\r"
-	"Type '? sex' for a list of flags.\n\r", ch);
-    return false;
+    return flagValueEdit(sex_table, mob.sex);
 }
 
 MEDIT(number)
 {
     if (argument[0] == '\0') {
-	stc("Syntax:  number s|p\n\r", ch);
-	return false;
+        stc("Syntax:  number s|p\n\r", ch);
+        return false;
     }
 
     mob.gram_number = Grammar::Number(argument);
@@ -834,59 +750,24 @@ MEDIT(number)
     return true;
 }
 
-MEDIT(act)		// Moved out of medit() due to naming conflicts -- Hugin
- {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = act_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.act ^= value;
-	    SET_BIT(mob.act, ACT_IS_NPC);
-
-	    stc("Act flag toggled.\n\r", ch);
-	    return true;
-	}
+MEDIT(act)                
+{
+    if (flagBitsEdit(act_flags, mob.act)) {
+        SET_BIT(mob.act, ACT_IS_NPC);
+        return true;
     }
-
-    stc("Syntax: act [flag]\n\r"
-	"Type '? act' for a list of flags.\n\r", ch);
     return false;
 }
 
 MEDIT(affect)
-{				/* Moved out of medit() due to naming conflicts -- Hugin */
-    bitstring_t value;
+{                                
 
-    if (argument[0] != '\0') {
-	if ((value = affect_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.affected_by ^= value;
-
-	    stc("Affect flag toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: affect [flag]\n\r"
-	"Type '? affect' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(affect_flags, mob.affected_by);
 }
 
 MEDIT(detection)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = detect_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.detection ^= value;
-
-	    stc("Detecion flag toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: detection [flag]\n\r"
-	"Type '? detection' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(detect_flags, mob.detection);
 }
 
 MEDIT(ac)
@@ -894,147 +775,88 @@ MEDIT(ac)
     char arg[MAX_INPUT_LENGTH];
     int pierce, bash, slash, exotic;
 
-    do {			/* So that I can use break and send the syntax in one place */
-	if (argument[0] == '\0')
-	    break;
+    do {                        /* So that I can use break and send the syntax in one place */
+        if (argument[0] == '\0')
+            break;
 
-	argument = one_argument(argument, arg);
+        argument = one_argument(argument, arg);
 
-	if (!is_number(arg))
-	    break;
-	pierce = atoi(arg);
-	argument = one_argument(argument, arg);
+        if (!is_number(arg))
+            break;
+        pierce = atoi(arg);
+        argument = one_argument(argument, arg);
 
-	if (arg[0] != '\0') {
-	    if (!is_number(arg))
-		break;
-	    bash = atoi(arg);
-	    argument = one_argument(argument, arg);
-	}
-	else
-	    bash = mob.ac[AC_BASH];
+        if (arg[0] != '\0') {
+            if (!is_number(arg))
+                break;
+            bash = atoi(arg);
+            argument = one_argument(argument, arg);
+        }
+        else
+            bash = mob.ac[AC_BASH];
 
-	if (arg[0] != '\0') {
-	    if (!is_number(arg))
-		break;
-	    slash = atoi(arg);
-	    argument = one_argument(argument, arg);
-	}
-	else
-	    slash = mob.ac[AC_SLASH];
+        if (arg[0] != '\0') {
+            if (!is_number(arg))
+                break;
+            slash = atoi(arg);
+            argument = one_argument(argument, arg);
+        }
+        else
+            slash = mob.ac[AC_SLASH];
 
-	if (arg[0] != '\0') {
-	    if (!is_number(arg))
-		break;
-	    exotic = atoi(arg);
-	}
-	else
-	    exotic = mob.ac[AC_EXOTIC];
+        if (arg[0] != '\0') {
+            if (!is_number(arg))
+                break;
+            exotic = atoi(arg);
+        }
+        else
+            exotic = mob.ac[AC_EXOTIC];
 
-	mob.ac[AC_PIERCE] = pierce;
-	mob.ac[AC_BASH] = bash;
-	mob.ac[AC_SLASH] = slash;
-	mob.ac[AC_EXOTIC] = exotic;
+        mob.ac[AC_PIERCE] = pierce;
+        mob.ac[AC_BASH] = bash;
+        mob.ac[AC_SLASH] = slash;
+        mob.ac[AC_EXOTIC] = exotic;
 
-	stc("Ac set.\n\r", ch);
-	return true;
-    } while (false);		/* Just do it once.. */
+        stc("Ac set.\n\r", ch);
+        return true;
+    } while (false);                /* Just do it once.. */
 
     stc("Syntax:  ac [ac-pierce [ac-bash [ac-slash [ac-exotic]]]]\n\r"
-	"help MOB_AC  gives a list of reasonable ac-values.\n\r", ch);
+        "help MOB_AC  gives a list of reasonable ac-values.\n\r", ch);
     return false;
 }
 
+
 MEDIT(form)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = form_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.form ^= value;
-	    stc("Form toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: form [flags]\n\r"
-	"Type '? form' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(form_flags, mob.form);
 }
 
 MEDIT(part)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = part_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.parts ^= value;
-	    stc("Parts toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: part [flags]\n\r"
-	"Type '? part' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(part_flags, mob.parts);
 }
 
 MEDIT(imm)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = imm_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.imm_flags ^= value;
-	    stc("Immunity toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: imm [flags]\n\r"
-	"Type '? imm' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(imm_flags, mob.imm_flags);
 }
 
 MEDIT(res)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = res_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.res_flags ^= value;
-	    stc("Resistance toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: res [flags]\n\r"
-	"Type '? res' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(res_flags, mob.res_flags);
 }
 
 MEDIT(vuln)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = vuln_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.vuln_flags ^= value;
-	    stc("Vulnerability toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: vuln [flags]\n\r"
-	"Type '? vuln' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(vuln_flags, mob.vuln_flags);
 }
 
 MEDIT(material)
 {
     if (argument[0] == '\0') {
-	stc("Syntax:  material [string]\n\r", ch);
-	return false;
+        stc("Syntax:  material [string]\n\r", ch);
+        return false;
     }
 
     free_string(mob.material);
@@ -1046,186 +868,27 @@ MEDIT(material)
 
 MEDIT(off)
 {
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	if ((value = off_flags.bitstring( argument )) != NO_FLAG) {
-	    mob.off_flags ^= value;
-	    stc("Offensive behaviour toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: off [flags]\n\r"
-	"Type '? off' for a list of flags.\n\r", ch);
-    return false;
+    return flagBitsEdit(off_flags, mob.off_flags);
 }
 
 MEDIT(size)
 {
-    int value;
-
-    if (argument[0] != '\0') {
-	if ((value = size_table.value( argument )) != NO_FLAG) {
-	    mob.size = (int) value;
-	    stc("Size set.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax: size [size]\n\rType '? size' for a list of sizes.\n\r", ch);
-    return false;
+    return flagValueEdit(size_table, mob.size);
 }
 
 MEDIT(hitdice)
 {
-    static char syntax[] = "Syntax:  hitdice <number> d <type> + <bonus>\n\r";
-    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
-    
-    if (argument[0] == '\0') {
-	stc(syntax, ch);
-	return false;
-    }
-
-    strcpy(buf, argument);
-    num = cp = buf;
-
-    while (isdigit(*cp))
-	++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-	*(cp++) = '\0';
-
-    type = cp;
-
-    while (isdigit(*cp))
-	++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-	*(cp++) = '\0';
-
-    bonus = cp;
-
-    while (isdigit(*cp))
-	++cp;
-    if (*cp != '\0')
-	*cp = '\0';
-
-    if ((!is_number(num) || atoi(num) < 1)
-	|| (!is_number(type) || atoi(type) < 1)
-	|| (!is_number(bonus) || atoi(bonus) < 0)) {
-	stc(syntax, ch);
-	return false;
-    }
-
-    mob.hit[DICE_NUMBER] = atoi(num);
-    mob.hit[DICE_TYPE] = atoi(type);
-    mob.hit[DICE_BONUS] = atoi(bonus);
-
-    stc("Hitdice set.\n\r", ch);
-    return true;
+    return diceEdit(mob.hit);
 }
 
 MEDIT(manadice)
 {
-    static char syntax[] = "Syntax:  manadice <number> d <type> + <bonus>\n\r";
-    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
-
-    if (argument[0] == '\0') {
-	stc(syntax, ch);
-	return false;
-    }
-
-    strcpy(buf, argument);
-    num = cp = buf;
-
-    while (isdigit(*cp))
-	++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-	*(cp++) = '\0';
-
-    type = cp;
-
-    while (isdigit(*cp))
-	++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-	*(cp++) = '\0';
-
-    bonus = cp;
-
-    while (isdigit(*cp))
-	++cp;
-    if (*cp != '\0')
-	*cp = '\0';
-
-    if (!(is_number(num) && is_number(type) && is_number(bonus))) {
-	stc(syntax, ch);
-	return false;
-    }
-
-    if ((!is_number(num) || atoi(num) < 1)
-	|| (!is_number(type) || atoi(type) < 1)
-	|| (!is_number(bonus) || atoi(bonus) < 0)) {
-	stc(syntax, ch);
-	return false;
-    }
-
-    mob.mana[DICE_NUMBER] = atoi(num);
-    mob.mana[DICE_TYPE] = atoi(type);
-    mob.mana[DICE_BONUS] = atoi(bonus);
-
-    stc("Manadice set.\n\r", ch);
-    return true;
+    return diceEdit(mob.mana);
 }
 
 MEDIT(damdice)
 {
-    static char syntax[] = "Syntax:  damdice <number> d <type> + <bonus>\n\r";
-    char buf[MAX_STRING_LENGTH], *num, *type, *bonus, *cp;
-
-    if (argument[0] == '\0') {
-	stc(syntax, ch);
-	return false;
-    }
-
-    strcpy(buf, argument);
-    num = cp = buf;
-
-    while (isdigit(*cp))
-	++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-	*(cp++) = '\0';
-
-    type = cp;
-
-    while (isdigit(*cp))
-	++cp;
-    while (*cp != '\0' && !isdigit(*cp))
-	*(cp++) = '\0';
-
-    bonus = cp;
-
-    while (isdigit(*cp))
-	++cp;
-    if (*cp != '\0')
-	*cp = '\0';
-
-    if (!(is_number(num) && is_number(type) && is_number(bonus))) {
-	stc(syntax, ch);
-	return false;
-    }
-
-    if ((!is_number(num) || atoi(num) < 1)
-	|| (!is_number(type) || atoi(type) < 1)
-	|| (!is_number(bonus) || atoi(bonus) < 0)) {
-	stc(syntax, ch);
-	return false;
-    }
-
-    mob.damage[DICE_NUMBER] = atoi(num);
-    mob.damage[DICE_TYPE] = atoi(type);
-    mob.damage[DICE_BONUS] = atoi(bonus);
-
-    stc("Damdice set.\n\r", ch);
-    return true;
+    return diceEdit(mob.damage);
 }
 
 MEDIT(race)
@@ -1233,35 +896,35 @@ MEDIT(race)
     Race *race;
 
     if (*argument) {
-	race = raceManager->findUnstrict(argument);
+        race = raceManager->findUnstrict(argument);
 
-	if(race) {
-/*	    
-	    Race *old_race = raceManager->find( mob.race );
-	    mob.off_flags &= ~old_race->getOff( );
-	    mob.imm_flags &= ~old_race->getImm( );
-	    mob.res_flags &= ~old_race->getRes( );
-	    mob.vuln_flags &= ~old_race->getVuln( );
-	    mob.form &= ~old_race->getForm( );
-	    mob.parts &= ~old_race->getParts( );
-*/	    
+        if(race) {
+/*            
+            Race *old_race = raceManager->find( mob.race );
+            mob.off_flags &= ~old_race->getOff( );
+            mob.imm_flags &= ~old_race->getImm( );
+            mob.res_flags &= ~old_race->getRes( );
+            mob.vuln_flags &= ~old_race->getVuln( );
+            mob.form &= ~old_race->getForm( );
+            mob.parts &= ~old_race->getParts( );
+*/            
 
-	    free_string( mob.race );
-	    mob.race = str_dup( race->getName( ).c_str( ) );
+            free_string( mob.race );
+            mob.race = str_dup( race->getName( ).c_str( ) );
 
 /*
-	    mob.off_flags |= race->getOff( );
-	    mob.imm_flags |= race->getImm( );
-	    mob.res_flags |= race->getRes( );
-	    mob.vuln_flags |= race->getVuln( );
-	    mob.form |= race->getForm( );
-	    mob.parts |= race->getParts( );
-*/	    
-	    stc("Race set.\n\r", ch);
-	    return true;
-	} else {
-	    stc("Wrong race name.\n\t", ch);
-	}
+            mob.off_flags |= race->getOff( );
+            mob.imm_flags |= race->getImm( );
+            mob.res_flags |= race->getRes( );
+            mob.vuln_flags |= race->getVuln( );
+            mob.form |= race->getForm( );
+            mob.parts |= race->getParts( );
+*/            
+            stc("Race set.\n\r", ch);
+            return true;
+        } else {
+            stc("Wrong race name.\n\t", ch);
+        }
     }
     
     stc("Available races are:", ch);
@@ -1282,62 +945,46 @@ MEDIT(position)
 
     switch (arg[0]) {
     default:
-	break;
+        break;
 
     case 'S':
     case 's':
-	if (str_prefix(arg, "start"))
-	    break;
+        if (str_prefix(arg, "start"))
+            break;
 
-	if ((value = position_table.value( argument )) == NO_FLAG)
-	    break;
+        if ((value = position_table.value( argument )) == NO_FLAG)
+            break;
 
-	mob.start_pos = (int) value;
-	stc("Start position set.\n\r", ch);
-	return true;
+        mob.start_pos = (int) value;
+        stc("Start position set.\n\r", ch);
+        return true;
 
     case 'D':
     case 'd':
-	if (str_prefix(arg, "default"))
-	    break;
+        if (str_prefix(arg, "default"))
+            break;
 
-	if ((value = position_table.value( argument )) == NO_FLAG)
-	    break;
+        if ((value = position_table.value( argument )) == NO_FLAG)
+            break;
 
-	mob.default_pos = (int) value;
-	stc("Default position set.\n\r", ch);
-	return true;
+        mob.default_pos = (int) value;
+        stc("Default position set.\n\r", ch);
+        return true;
     }
 
     stc("Syntax:  position [start/default] [position]\n\r"
-	"Type '? position' for a list of positions.\n\r", ch);
+        "Type '? position' for a list of positions.\n\r", ch);
     return false;
 }
 
 MEDIT(wealth)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  wealth [number]\n\r", ch);
-	return false;
-    }
-
-    mob.wealth = atoi(argument);
-
-    stc("Wealth set.\n\r", ch);
-    return true;
+    return numberEdit(0, 1000000, mob.wealth);
 }
 
 MEDIT(group)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  group [number]\n\r", ch);
-	return false;
-    }
-
-    mob.group = atoi(argument);
-
-    stc("Group set.\n\r", ch);
-    return true;
+    return numberEdit(0, 100000, mob.group);
 }
 
 MEDIT(practicer)
@@ -1345,26 +992,21 @@ MEDIT(practicer)
     SkillGroup *g;
 
     if (!*argument) {
-	stc("Syntax:  practicer <groupname>|clear\n\r", ch);
-	return false;
+        stc("Syntax:  practicer <groupname>|clear\n\r", ch);
+        return false;
     }
 
     if (!str_cmp(argument, "clear")) {
-	mob.practicer.clear( );
-	stc("Practicer cleared\n\r", ch);
-	return true;
+        mob.practicer.clear( );
+        stc("Practicer cleared\n\r", ch);
+        return true;
     }
     
     g = skillGroupManager->findExisting( argument );
 
     if (!g) {
-	ostringstream out;
-	
-	skillGroupManager->outputAll( out, 19, 4 );
-	stc("Wrong group name.\n\rValid group names:\n\r", ch);
-	stc(out.str( ).c_str( ), ch);
-
-	return false;
+        stc("п⌠я─я┐п©п©п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟. п≤я│п©п╬п╩я▄п╥я┐п╧ {W? groups{x п╢п╩я▐ п©п╬п╩п╫п╬пЁп╬ я│п©п╦я│п╨п╟.\r\n", ch);
+        return false;
     }
     
     mob.practicer.set( *g );
@@ -1375,13 +1017,7 @@ MEDIT(practicer)
 
 MEDIT(hitroll)
 {
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  hitroll [number]\n\r", ch);
-	return false;
-    }
-    mob.hitroll = atoi(argument);
-    stc("Hitroll set.\n\r", ch);
-    return true;
+    return numberEdit(0, 10000, mob.hitroll);
 }
 
 MEDIT(list)
@@ -1393,23 +1029,23 @@ MEDIT(list)
     ostringstream buffer;
     
     snprintf(buf, sizeof(buf), "Resets for mobile [{W%d{x] ({g%s{x):\n\r",
-	    mob.vnum, 
-	    russian_case(mob.short_descr, '1').c_str( ));
+            mob.vnum, 
+            russian_case(mob.short_descr, '1').c_str( ));
     buffer << buf;
     
     cnt = 0;
     for(i=0;i<MAX_KEY_HASH;i++)
-	for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
-	    for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
-		switch(pReset->command) {
-		    case 'M':
-			if(pReset->arg1 == mob.vnum) {
-			    snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-				    pReset->command, pRoom->vnum, pRoom->name);
-			    buffer << buf;
-			    cnt++;
-			}
-		}
+        for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
+            for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
+                switch(pReset->command) {
+                    case 'M':
+                        if(pReset->arg1 == mob.vnum) {
+                            snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                                    pReset->command, pRoom->vnum, pRoom->name);
+                            buffer << buf;
+                            cnt++;
+                        }
+                }
 
     snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
     buffer << buf;
@@ -1462,49 +1098,49 @@ MEDIT(copy)
     DLString arg1 = args.getOneArgument();
     DLString arg2 = args.getOneArgument();
     enum {
-	COPY_DESC,
-	COPY_PARAM,
-	COPY_ERROR
+        COPY_DESC,
+        COPY_PARAM,
+        COPY_ERROR
     } mode;
     
     if (arg1.strPrefix("desc"))
-	mode = COPY_DESC;
+        mode = COPY_DESC;
     else if (arg1.strPrefix("param"))
-	mode = COPY_PARAM;
+        mode = COPY_PARAM;
     else 
-	mode = COPY_ERROR;
-	    
+        mode = COPY_ERROR;
+            
     if (mode == COPY_ERROR || !arg2.isNumber()) {
-	ch->println("Syntax: \r\n"
-		    "  copy param <vnum> -- copy race, hit, damage and other parameters from <vnum> mob index.\r\n"
-		    "  copy desc <vnum>  -- copy name, description, short and long description from <vnum> mob index.\r\n" );
-	return false;
+        ch->println("Syntax: \r\n"
+                    "  copy param <vnum> -- copy race, hit, damage and other parameters from <vnum> mob index.\r\n"
+                    "  copy desc <vnum>  -- copy name, description, short and long description from <vnum> mob index.\r\n" );
+        return false;
     }
     
     original = get_mob_index( arg2.toInt() );
 
     if (original == NULL) {
-	ch->println("Mobile not found.\r\n");
-	return false;
+        ch->println("Mobile not found.\r\n");
+        return false;
     }
     
     switch (mode) {
     case COPY_PARAM:
-	copyParameters( original );
-	report = "parameters";
-	break;
+        copyParameters( original );
+        report = "parameters";
+        break;
     case COPY_DESC:
-	copyDescriptions( original );
-	report = "descriptions";
-	break;
+        copyDescriptions( original );
+        report = "descriptions";
+        break;
     default:
-	return false;
+        return false;
     }
     
     ch->printf("All %s copied from vnum %d (%s).\r\n",
-	        report.c_str( ),
-		original->vnum, 
-		russian_case( original->short_descr, '1' ).c_str( ) );
+                report.c_str( ),
+                original->vnum, 
+                russian_case( original->short_descr, '1' ).c_str( ) );
     return true;
 }
 
@@ -1520,8 +1156,8 @@ MEDIT(average)
     int total;
     
     if (mob.level == 0) {
-	ch->println("Please set non-zero mob level.");
-	return false;
+        ch->println("Please set non-zero mob level.");
+        return false;
     }
     
     delta = mob.level / 20;
@@ -1530,84 +1166,84 @@ MEDIT(average)
     total = 0;
 
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
-	for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next) {
-	    if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN))
-		continue;
-	    if (pMob->vnum == 3174) // old jew
-		continue;
-	    if (pMob->level > maxLevel || pMob->level < minLevel)
-		continue;
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next) {
+            if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN))
+                continue;
+            if (pMob->vnum == 3174) // old jew
+                continue;
+            if (pMob->level > maxLevel || pMob->level < minLevel)
+                continue;
 
-	    total++;
+            total++;
 
-	    hitBonus += pMob->hit[DICE_BONUS];
-	    hitType += pMob->hit[DICE_TYPE];
-	    hitNumber += pMob->hit[DICE_NUMBER];
-	    manaBonus += pMob->mana[DICE_BONUS];
-	    manaType += pMob->mana[DICE_TYPE];
-	    manaNumber += pMob->mana[DICE_NUMBER];
-	    hitroll += pMob->hitroll;
-	    damBonus += pMob->damage[DICE_BONUS];
-	    damType += pMob->damage[DICE_TYPE];
-	    damNumber += pMob->damage[DICE_NUMBER];
-	    ac0 += pMob->ac[0];
-	    ac1 += pMob->ac[1];
-	    ac2 += pMob->ac[2];
-	    ac3 += pMob->ac[3];
-	}
+            hitBonus += pMob->hit[DICE_BONUS];
+            hitType += pMob->hit[DICE_TYPE];
+            hitNumber += pMob->hit[DICE_NUMBER];
+            manaBonus += pMob->mana[DICE_BONUS];
+            manaType += pMob->mana[DICE_TYPE];
+            manaNumber += pMob->mana[DICE_NUMBER];
+            hitroll += pMob->hitroll;
+            damBonus += pMob->damage[DICE_BONUS];
+            damType += pMob->damage[DICE_TYPE];
+            damNumber += pMob->damage[DICE_NUMBER];
+            ac0 += pMob->ac[0];
+            ac1 += pMob->ac[1];
+            ac2 += pMob->ac[2];
+            ac3 += pMob->ac[3];
+        }
     
     if (total == 0) {
-	ch->printf("No mobiles found in level range %d-%d.\r\n", minLevel, maxLevel);
-	return false;
+        ch->printf("No mobiles found in level range %d-%d.\r\n", minLevel, maxLevel);
+        return false;
     }
      
     fAll = (arg.empty() || arg == "all");
     fDone = false;
 
     if (fAll || arg == "hit" || arg == "hp") {
-	mob.hit[DICE_BONUS] = hitBonus / total;
-	mob.hit[DICE_TYPE] = hitType / total;
-	mob.hit[DICE_NUMBER] = hitNumber / total;
-	fDone = true;
+        mob.hit[DICE_BONUS] = hitBonus / total;
+        mob.hit[DICE_TYPE] = hitType / total;
+        mob.hit[DICE_NUMBER] = hitNumber / total;
+        fDone = true;
     }
     if (fAll || arg.strPrefix("mana")) {
-	mob.mana[DICE_BONUS] = manaBonus / total;
-	mob.mana[DICE_TYPE] = manaType / total;
-	mob.mana[DICE_NUMBER] = manaNumber / total;
-	fDone = true;
+        mob.mana[DICE_BONUS] = manaBonus / total;
+        mob.mana[DICE_TYPE] = manaType / total;
+        mob.mana[DICE_NUMBER] = manaNumber / total;
+        fDone = true;
     }
     if (fAll || (arg.strPrefix("hitroll") && arg.size() > 3)) {
-	mob.hitroll = hitroll / total;
-	fDone = true;
+        mob.hitroll = hitroll / total;
+        fDone = true;
     }
     if (fAll || arg.strPrefix("damage")) {
-	mob.damage[DICE_BONUS] = damBonus / total;
-	mob.damage[DICE_TYPE] = damType / total;
-	mob.damage[DICE_NUMBER] = damNumber / total;
-	fDone = true;
+        mob.damage[DICE_BONUS] = damBonus / total;
+        mob.damage[DICE_TYPE] = damType / total;
+        mob.damage[DICE_NUMBER] = damNumber / total;
+        fDone = true;
     }
     if (fAll || arg.strPrefix("armor") || arg == "ac") {
-	mob.ac[0] = ac0 / total;
-	mob.ac[1] = ac1 / total;
-	mob.ac[2] = ac2 / total;
-	mob.ac[3] = ac3 / total;
-	fDone = true;
+        mob.ac[0] = ac0 / total;
+        mob.ac[1] = ac1 / total;
+        mob.ac[2] = ac2 / total;
+        mob.ac[3] = ac3 / total;
+        fDone = true;
     }
     
     if (fDone) {
-	ch->println("Average values assigned.\r\n");
-	return true;
+        ch->println("Average values assigned.\r\n");
+        return true;
     }
     else {
-	ch->send_to("Syntax: \r\n"
-		    "   average hp|mana|hitroll|damage|ac -- setup one param\r\n"
-		    "   average [all] -- setup all parameters\r\n");
-	return false;
+        ch->send_to("Syntax: \r\n"
+                    "   average hp|mana|hitroll|damage|ac -- setup one param\r\n"
+                    "   average [all] -- setup all parameters\r\n");
+        return false;
     }
 }
 
 CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS, 
-	"Online mob editor.")
+        "Online mob editor.")
 {
     NPCharacter *mob;
     MOB_INDEX_DATA *pMob;
@@ -1618,98 +1254,98 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     argument = one_argument(argument, arg1);
 
     if (is_number(arg1)) {
-	value = atoi(arg1);
-	if (!(pMob = get_mob_index(value))) {
-	    stc("OLCStateMobile:  That vnum does not exist.\n\r", ch);
-	    return;
-	}
+        value = atoi(arg1);
+        if (!(pMob = get_mob_index(value))) {
+            stc("OLCStateMobile:  That vnum does not exist.\n\r", ch);
+            return;
+        }
 
-	if(!pMob->area) {
-	    stc("this mobile has no area!!!!!\n\r", ch);
-	    return;
-	}
+        if(!pMob->area) {
+            stc("this mobile has no area!!!!!\n\r", ch);
+            return;
+        }
 
-	if (!OLCState::can_edit( ch, pMob->vnum )) {
-	    stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
-	    return;
-	}
+        if (!OLCState::can_edit( ch, pMob->vnum )) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╪п╬п╫я│я┌я─п╬п╡.\n\r", ch);
+            return;
+        }
 
-	OLCStateMobile::Pointer me(NEW, pMob);
-	me->attach(ch);
-	return;
+        OLCStateMobile::Pointer me(NEW, pMob);
+        me->attach(ch);
+        return;
     }
     else if (!str_cmp(arg1, "create")) {
-	if (!str_cmp(argument, "next")) 
-	    value = next_mob_index(ch, ch->in_room);
-	else
-	    value = atoi(argument);
+        if (!str_cmp(argument, "next")) 
+            value = next_mob_index(ch, ch->in_room);
+        else
+            value = atoi(argument);
 
-	if (arg1[0] == '\0' || value <= 0) {
-	    stc("Syntax:  edit mobile create <vnum>|next\n\r", ch);
-	    return;
-	}
+        if (arg1[0] == '\0' || value <= 0) {
+            stc("Syntax:  edit mobile create <vnum>|next\n\r", ch);
+            return;
+        }
 
-	pArea = OLCState::get_vnum_area(value);
+        pArea = OLCState::get_vnum_area(value);
 
-	if (!pArea) {
-	    stc("MEdit:  That vnum is not assigned an area.\n\r", ch);
-	    return;
-	}
+        if (!pArea) {
+            stc("MEdit:  That vnum is not assigned an area.\n\r", ch);
+            return;
+        }
 
-	if (!OLCState::can_edit( ch, value )) {
-	    stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
-	    return;
-	}
-	
-	if (get_mob_index(value)) {
-	    stc("OLCStateMobile:  Mobile vnum already exists.\n\r", ch);
-	    return;
-	}
+        if (!OLCState::can_edit( ch, value )) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╪п╬п╫я│я┌я─п╬п╡.\n\r", ch);
+            return;
+        }
+        
+        if (get_mob_index(value)) {
+            stc("OLCStateMobile:  Mobile vnum already exists.\n\r", ch);
+            return;
+        }
 
-	OLCStateMobile::Pointer me(NEW, value);
-	me->attach(ch);
-	return;
+        OLCStateMobile::Pointer me(NEW, value);
+        me->attach(ch);
+        return;
     } else if(!str_cmp(arg1, "show")) {
-	if(!*argument || !is_number(argument)) {
-	    stc("Syntax: medit show <vnum>\n\r", ch);
-	    return;
-	}
-	pMob = get_mob_index(atoi(argument));
-	if(!pMob) {
-	    stc("Нет такого моба.\n\r", ch);
-	    return;
-	}
-	
-	if (!OLCState::can_edit(ch, pMob->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования монстров.\n\r", ch);
-	    return;
-	}
+        if(!*argument || !is_number(argument)) {
+            stc("Syntax: medit show <vnum>\n\r", ch);
+            return;
+        }
+        pMob = get_mob_index(atoi(argument));
+        if(!pMob) {
+            stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╪п╬п╠п╟.\n\r", ch);
+            return;
+        }
+        
+        if (!OLCState::can_edit(ch, pMob->vnum)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╪п╬п╫я│я┌я─п╬п╡.\n\r", ch);
+            return;
+        }
 
-	OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "");
-	return;
+        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "");
+        return;
     } else if (!str_cmp(arg1, "load")) {
-	if(!*argument || !is_number(argument)) {
-	    stc("Syntax: medit load <vnum>\n\r", ch);
-	    return;
-	}
-	pMob = get_mob_index(atoi(argument));
-	if(!pMob) {
-	    stc("Нет такого моба.\n\r", ch);
-	    return;
-	}
-	
-	if (!OLCState::can_edit(ch, pMob->vnum)) {
-	    stc("У тебя недостаточно прав для создания этого монстра.\n\r", ch);
-	    return;
-	}
-	
-	mob = create_mobile( pMob );
-	if (mob->in_room == 0)
-	    char_to_room( mob, ch->in_room );
-	
-	act_p( "$c1 создает $C4!", ch, 0, mob, TO_ROOM,POS_RESTING );
-	act_p( "Ты создаешь $C4!", ch, 0, mob, TO_CHAR,POS_RESTING );
-	return;
+        if(!*argument || !is_number(argument)) {
+            stc("Syntax: medit load <vnum>\n\r", ch);
+            return;
+        }
+        pMob = get_mob_index(atoi(argument));
+        if(!pMob) {
+            stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╪п╬п╠п╟.\n\r", ch);
+            return;
+        }
+        
+        if (!OLCState::can_edit(ch, pMob->vnum)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я│п╬п╥п╢п╟п╫п╦я▐ я█я┌п╬пЁп╬ п╪п╬п╫я│я┌я─п╟.\n\r", ch);
+            return;
+        }
+        
+        mob = create_mobile( pMob );
+        if (mob->in_room == 0)
+            char_to_room( mob, ch->in_room );
+        
+        act_p( "$c1 я│п╬п╥п╢п╟п╣я┌ $C4!", ch, 0, mob, TO_ROOM,POS_RESTING );
+        act_p( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $C4!", ch, 0, mob, TO_CHAR,POS_RESTING );
+        return;
     }
     
     stc("OLCStateMobile:  There is no default mobile to edit.\n\r", ch);
@@ -1718,6 +1354,6 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 void OLCStateMobile::changed( PCharacter *ch )
 {
     if(mob.area)
-	SET_BIT(mob.area->area_flag, AREA_CHANGED);
+        SET_BIT(mob.area->area_flag, AREA_CHANGED);
 }
 

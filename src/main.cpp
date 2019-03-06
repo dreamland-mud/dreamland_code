@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include <iostream>
@@ -19,28 +19,32 @@
 #include "exception.h"
 #include "dreamland.h"
 
+static const DLString DEFAULT_CONFIG_PATH = "etc/dreamland.xml";
+
 int main( int argc, char* argv[] )
 {
     try
     {
-	DreamLand dl;
+        DreamLand dl;
 
-	if (argc > 1)
-	    dl.setConfigFilePath( argv[1] );
-	
-	dl.load( );
+        if (argc > 1)
+            dl.setConfigFilePath( argv[1] );
+        else
+                dl.setConfigFilePath(DEFAULT_CONFIG_PATH);
+        
+        dl.load( );
 
-	try {
-	    dl.run( );
-	} catch (const Exception &e1) {
-	    e1.printStackTrace( LogStream::sendFatal( ) );
-	}
+        try {
+            dl.run( );
+        } catch (const Exception &e1) {
+            e1.printStackTrace( LogStream::sendFatal( ) );
+        }
 
-	dl.save( );
-	
+        dl.save( );
+        
     } catch (const Exception &e1) {
-	e1.printStackTrace( LogStream::sendFatal( ) );
-	return 1;
+        e1.printStackTrace( LogStream::sendFatal( ) );
+        return 1;
     }
 
     return 0;

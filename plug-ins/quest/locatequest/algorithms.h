@@ -16,30 +16,30 @@ class LocateAlgo : public virtual DLObject {
 public:
     typedef std::vector<Room *> Rooms;
 
-    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & ) = 0;
-    virtual bool needsEndPoint( ) = 0;
+    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & ) const = 0;
+    virtual bool needsEndPoint( ) const = 0;
 };
 
 class LocateMiddlePointAlgo : public virtual LocateAlgo {
 public:
-    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & );
-    virtual bool needsEndPoint( );
-    virtual int getRadius( );
+    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & ) const;
+    virtual bool needsEndPoint( ) const;
+    virtual int getRadius( ) const;
 };
 
 class LocateRadialAlgo : public virtual LocateAlgo {
 public:
 
-    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & );
-    virtual bool needsEndPoint( );
-    virtual int getRadius( );
+    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & ) const;
+    virtual bool needsEndPoint( ) const;
+    virtual int getRadius( ) const;
 };
 
 class LocateUniformAlgo: public virtual LocateAlgo {
 public:
 
-    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & );
-    virtual bool needsEndPoint( );
+    virtual void findRooms( PCharacter *, Room *, Room *, Rooms & ) const;
+    virtual bool needsEndPoint( ) const;
 };
 
 #endif

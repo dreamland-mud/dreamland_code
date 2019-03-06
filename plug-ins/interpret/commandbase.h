@@ -3,8 +3,8 @@
  * ruffina, 2004
  */
 
-#ifndef	COMMANDBASE_H
-#define	COMMANDBASE_H
+#ifndef        COMMANDBASE_H
+#define        COMMANDBASE_H
 
 #include "interpretlayer.h"
 
@@ -17,16 +17,16 @@ enum {
 
 class CommandBase: public virtual DLObject {
 public:
-	typedef ::Pointer<CommandBase> Pointer;
+        typedef ::Pointer<CommandBase> Pointer;
 
-	virtual const DLString& getName( ) const = 0;
-	virtual short getLog( ) const = 0;
+        virtual const DLString& getName( ) const = 0;
+        virtual short getLog( ) const = 0;
 
-	virtual bool matches( const DLString & ) const = 0;
-	virtual bool properOrder( Character * ) = 0;
-	virtual bool dispatch( const InterpretArguments & ) = 0;
-	virtual bool dispatchOrder( const InterpretArguments & ) = 0;
-	virtual void run( Character *, const DLString & ) = 0;
+        virtual bool matches( const DLString & ) const = 0;
+        virtual bool properOrder( Character * ) = 0;
+        virtual bool dispatch( const InterpretArguments & ) = 0;
+        virtual bool dispatchOrder( const InterpretArguments & ) = 0;
+        virtual void run( Character *, const DLString & ) = 0;
 };
 
 

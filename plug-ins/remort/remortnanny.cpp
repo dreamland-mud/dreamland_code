@@ -32,35 +32,35 @@ void RemortNanny::run( int oldState, int newState, Descriptor *d )
     Room *izba;
     
     if (newState != CON_PLAYING)
-	return;
+        return;
     
     if (!d->character || !( ch = d->character->getPC( ) ))
-	return;
+        return;
     
     if (ch->getRemorts( ).size( ) == 0)
-	return;
+        return;
     
     if (ch->getRemorts( ).points == 0)
-	return;
+        return;
 
     if (!( izba = get_room_index( ROOM_VNUM_REMORT ) )) {
-	LogStream::sendError( ) << "Zero remort room!" << endl;
-	return;
+        LogStream::sendError( ) << "Zero remort room!" << endl;
+        return;
     }
     
     ch->position = std::max( POS_RESTING, (int)ch->position );
 
     if (ch->in_room != izba)
-	transfer_char( ch, 0, izba,
-			"÷ÅÔÅÒ ÐÅÒÅÍÅÎ ÐÏÄÈ×ÁÔÙ×ÁÅÔ %1$C4 É ÕÎÏÓÉÔ ËÕÄÁ-ÔÏ.. ", 
-			"÷ÅÔÅÒ ÐÅÒÅÍÅÎ ÐÅÒÅÎÏÓÉÔ ÔÅÂÑ × ÄÒÕÇÏÅ ÍÅÓÔÏ..", 
-			"%1$C1 ×ÌÅÔÁÅÔ × ÉÚÂÕ ÞÅÒÅÚ ÏËÏÛËÏ.",
-			"÷ÌÅÔÅ× × ÉÚÂÕ ÞÅÒÅÚ ÏËÏÛËÏ, ÔÙ ÛÌÅÐÁÅÛØÓÑ ÎÁ ÐÏÌ." );
+        transfer_char( ch, 0, izba,
+                        "Ð’ÐµÑ‚ÐµÑ€ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½ Ð¿Ð¾Ð´Ñ…Ð²Ð°Ñ‚Ñ‹Ð²Ð°ÐµÑ‚ %1$C4 Ð¸ ÑƒÐ½Ð¾ÑÐ¸Ñ‚ ÐºÑƒÐ´Ð°-Ñ‚Ð¾.. ", 
+                        "Ð’ÐµÑ‚ÐµÑ€ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½ Ð¿ÐµÑ€ÐµÐ½Ð¾ÑÐ¸Ñ‚ Ñ‚ÐµÐ±Ñ Ð² Ð´Ñ€ÑƒÐ³Ð¾Ðµ Ð¼ÐµÑÑ‚Ð¾..", 
+                        "%1$C1 Ð²Ð»ÐµÑ‚Ð°ÐµÑ‚ Ð² Ð¸Ð·Ð±Ñƒ Ñ‡ÐµÑ€ÐµÐ· Ð¾ÐºÐ¾ÑˆÐºÐ¾.",
+                        "Ð’Ð»ÐµÑ‚ÐµÐ² Ð² Ð¸Ð·Ð±Ñƒ Ñ‡ÐµÑ€ÐµÐ· Ð¾ÐºÐ¾ÑˆÐºÐ¾, Ñ‚Ñ‹ ÑˆÐ»ÐµÐ¿Ð°ÐµÑˆÑŒÑÑ Ð½Ð° Ð¿Ð¾Ð»." );
     
     if (ch->pet && ch->pet->in_room != izba) {
-	ch->pet->position = std::max( POS_RESTING, (int)ch->pet->position );
-	transfer_char( ch->pet, 0, izba,
-	                NULL, NULL, "%1$C1 ×ÌÅÔÁÅÔ × ÉÚÂÕ ÞÅÒÅÚ ÏËÏÛËÏ." );
+        ch->pet->position = std::max( POS_RESTING, (int)ch->pet->position );
+        transfer_char( ch->pet, 0, izba,
+                        NULL, NULL, "%1$C1 Ð²Ð»ÐµÑ‚Ð°ÐµÑ‚ Ð² Ð¸Ð·Ð±Ñƒ Ñ‡ÐµÑ€ÐµÐ· Ð¾ÐºÐ¾ÑˆÐºÐ¾." );
     }
 }
 
@@ -76,14 +76,14 @@ void RemortWitch::greet( Character *victim )
     PCharacter *pch;
 
     if (!( pch = victim->getPC( ) ))
-	return;
+        return;
 
     if (pch->getRemorts( ).points == 0)
-	return;
+        return;
     
-    act( "$c1, ËÒÑÈÔÑ, ÐÏ×ÏÒÁÞÉ×ÁÅÔÓÑ Ë ÔÅÂÅ.", ch, 0, pch, TO_VICT );
-    act( "$c1, ËÒÑÈÔÑ, ÐÏ×ÏÒÁÞÉ×ÁÅÔÓÑ Ë $C3.", ch, 0, pch, TO_NOTVICT );
-    act( "$c1 ÇÏ×ÏÒÉÔ ÔÅÂÅ '{G$C1, ÚÄÒÁ×ÓÔ×ÕÊ, ÒÏÄÎÅÎØË$GÏÅ|ÉÊ|ÁÑ..{x'", ch, 0, pch, TO_VICT );
+    act( "$c1, ÐºÑ€ÑÑ…Ñ‚Ñ, Ð¿Ð¾Ð²Ð¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ðº Ñ‚ÐµÐ±Ðµ.", ch, 0, pch, TO_VICT );
+    act( "$c1, ÐºÑ€ÑÑ…Ñ‚Ñ, Ð¿Ð¾Ð²Ð¾Ñ€Ð°Ñ‡Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ðº $C3.", ch, 0, pch, TO_NOTVICT );
+    act( "$c1 Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ñ‚ÐµÐ±Ðµ '{G$C1, Ð·Ð´Ñ€Ð°Ð²ÑÑ‚Ð²ÑƒÐ¹, Ñ€Ð¾Ð´Ð½ÐµÐ½ÑŒÐº$GÐ¾Ðµ|Ð¸Ð¹|Ð°Ñ..{x'", ch, 0, pch, TO_VICT );
 }
 
 void RemortWitch::speech( Character *victim, const char *msg ) 
@@ -98,22 +98,22 @@ bool RemortWitch::canServeClient( Character * )
 
 void RemortWitch::msgArticleNotFound( Character *client ) 
 {
-    tell_raw( client, ch, "óÌÙÈÏÍ Ï ÔÁËÏÍ ÎÅ ÓÌÙÈÉ×ÁÌÁ." );
+    tell_raw( client, ch, "Ð¡Ð»Ñ‹Ñ…Ð¾Ð¼ Ð¾ Ñ‚Ð°ÐºÐ¾Ð¼ Ð½Ðµ ÑÐ»Ñ‹Ñ…Ð¸Ð²Ð°Ð»Ð°." );
 }
 
 void RemortWitch::msgProposalNotFound( Character *client )
 {
-    tell_raw( client, ch, "îÅÔÕ Õ ÔÅÂÑ ÔÁËÏÇÏ, ÎÅ ÏÂÍÁÎÙ×ÁÊ ÂÁÂÕÛËÕ." );
+    tell_raw( client, ch, "ÐÐµÑ‚Ñƒ Ñƒ Ñ‚ÐµÐ±Ñ Ñ‚Ð°ÐºÐ¾Ð³Ð¾, Ð½Ðµ Ð¾Ð±Ð¼Ð°Ð½Ñ‹Ð²Ð°Ð¹ Ð±Ð°Ð±ÑƒÑˆÐºÑƒ." );
 }
 
 void RemortWitch::msgListBefore( Character *client )
 {
-    client->pecho( "\nõ %C2 ÉÍÅÅÔÓÑ: ", ch );
+    client->pecho( "\nÐ£ %C2 Ð¸Ð¼ÐµÐµÑ‚ÑÑ: ", ch );
 }
 
 void RemortWitch::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    tell_raw( client, ch, "îÅÈÏÒÏÛÏ ÖÁÄÎÉÞÁÔØ!" );
+    tell_raw( client, ch, "ÐÐµÑ…Ð¾Ñ€Ð¾ÑˆÐ¾ Ð¶Ð°Ð´Ð½Ð¸Ñ‡Ð°Ñ‚ÑŒ!" );
 }
 
 void RemortWitch::tell( Character *victim, const char *msg ) 
@@ -122,68 +122,68 @@ void RemortWitch::tell( Character *victim, const char *msg )
     DLString argument = msg;
     DLString cmd = argument.getOneArgument( );
 
-    if (is_name( cmd.c_str( ), "i Ñ" ))
-	cmd = argument.getOneArgument( );
+    if (is_name( cmd.c_str( ), "i Ñ" ))
+        cmd = argument.getOneArgument( );
 
     if (!( client = victim->getPC( ) ) || cmd.empty( ))
-	return;
+        return;
     
     /*
      * buy
      */
-    if (is_name( cmd.c_str( ), "ÄÁÊ ÏÔÄÁÊ ÈÏÞÕ ËÕÐÌÀ ÐÏËÕÐÁÀ buy want ÂÅÒÕ" )) {
-	if (argument.empty( )) {
-	    tell_act( client, ch, "é ÞÔÏ ÖÅ ÔÅÂÅ ÄÁÔØ, ÒÏÄÎÅÎØË$gÏÅ|ÉÊ|ÁÑ?" );
-	    return;
-	}
+    if (is_name( cmd.c_str( ), "Ð´Ð°Ð¹ Ð¾Ñ‚Ð´Ð°Ð¹ Ñ…Ð¾Ñ‡Ñƒ ÐºÑƒÐ¿Ð»ÑŽ Ð¿Ð¾ÐºÑƒÐ¿Ð°ÑŽ buy want Ð±ÐµÑ€Ñƒ" )) {
+        if (argument.empty( )) {
+            tell_act( client, ch, "Ð˜ Ñ‡Ñ‚Ð¾ Ð¶Ðµ Ñ‚ÐµÐ±Ðµ Ð´Ð°Ñ‚ÑŒ, Ñ€Ð¾Ð´Ð½ÐµÐ½ÑŒÐº$gÐ¾Ðµ|Ð¸Ð¹|Ð°Ñ?" );
+            return;
+        }
 
-	doBuy( client, argument.quote( ) );
-	return;
+        doBuy( client, argument.quote( ) );
+        return;
     }
     
     /*
      * sell
      */
-    if (is_name( cmd.c_str( ), "ÐÒÏÄÁÀ ÚÁÂÅÒÉ take ÐÒÏÄÁÍ sell ×ÏÚ×ÒÁÝÁÀ" )) {
-	if (argument.empty( )) {
-	    tell_act( client, ch, "é ÞÔÏ ÖÅ ÔÙ ÈÏÞÅÛØ ÍÎÅ ×ÅÒÎÕÔØ, ÒÏÄÎÅÎØË$gÏÅ|ÉÊ|ÁÑ?" );
-	    return;
-	}
-	
-	doSell( client, argument );
-	return;
+    if (is_name( cmd.c_str( ), "Ð¿Ñ€Ð¾Ð´Ð°ÑŽ Ð·Ð°Ð±ÐµÑ€Ð¸ take Ð¿Ñ€Ð¾Ð´Ð°Ð¼ sell Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÑŽ" )) {
+        if (argument.empty( )) {
+            tell_act( client, ch, "Ð˜ Ñ‡Ñ‚Ð¾ Ð¶Ðµ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð¼Ð½Ðµ Ð²ÐµÑ€Ð½ÑƒÑ‚ÑŒ, Ñ€Ð¾Ð´Ð½ÐµÐ½ÑŒÐº$gÐ¾Ðµ|Ð¸Ð¹|Ð°Ñ?" );
+            return;
+        }
+        
+        doSell( client, argument );
+        return;
     }
     
     /*
      * done
      */
-    if (is_name( cmd.c_str( ), "ÂÁÓÔÁ È×ÁÔÉÔ enough basta" )) {
-	if (client->getRemorts( ).points > 0) {
-	    tell_raw( client, ch, "îÅÔ ÕÖ, ÍÙ Ó ÔÏÂÏÊ ÅÝÅ ÎÅ ÚÁËÏÎÞÉÌÉ." );
-	    tell_raw( client, ch, "ôÙ ÎÅ ÓÍÏÖÅÛØ ÏÔÓÀÄÁ ×ÙÂÒÁÔØÓÑ, ÐÏËÁ ÎÅ ÚÁÂÅÒÅÛØ Õ ÍÅÎÑ ×ÓÅ, ÞÔÏ ÔÅÂÅ ÐÒÉÞÉÔÁÅÔÓÑ." );
-	    return;
-	}
+    if (is_name( cmd.c_str( ), "Ð±Ð°ÑÑ‚Ð° Ñ…Ð²Ð°Ñ‚Ð¸Ñ‚ enough basta" )) {
+        if (client->getRemorts( ).points > 0) {
+            tell_raw( client, ch, "ÐÐµÑ‚ ÑƒÐ¶, Ð¼Ñ‹ Ñ Ñ‚Ð¾Ð±Ð¾Ð¹ ÐµÑ‰Ðµ Ð½Ðµ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð¸." );
+            tell_raw( client, ch, "Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð¾Ñ‚ÑÑŽÐ´Ð° Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒÑÑ, Ð¿Ð¾ÐºÐ° Ð½Ðµ Ð·Ð°Ð±ÐµÑ€ÐµÑˆÑŒ Ñƒ Ð¼ÐµÐ½Ñ Ð²ÑÐµ, Ñ‡Ñ‚Ð¾ Ñ‚ÐµÐ±Ðµ Ð¿Ñ€Ð¸Ñ‡Ð¸Ñ‚Ð°ÐµÑ‚ÑÑ." );
+            return;
+        }
 
-	transfer_char( client, 0, 
-		       get_room_index( client->getRealLevel( ) == 1 ? ROOM_VNUM_HARBOUR : ROOM_VNUM_TEMPLE ),
-		       "%1$^C1 ×ÙÌÅÔÁÅÔ × ÐÅÞÎÕÀ ÔÒÕÂÕ.", 
-		       "ôÙ ×ÙÌÅÔÁÅÛØ × ÐÅÞÎÕÀ ÔÒÕÂÕ ÐÒÏÞØ!", 
-		       "%1$^C1 ÐÁÄÁÅÔ Ó ÎÅÂÁ." );
-	if (client->pet)
-	    transfer_char( client->pet, 0, client->in_room );
-	
-	client->save( );
-	return;
+        transfer_char( client, 0, 
+                       get_room_index( client->getRealLevel( ) == 1 ? ROOM_VNUM_HARBOUR : ROOM_VNUM_TEMPLE ),
+                       "%1$^C1 Ð²Ñ‹Ð»ÐµÑ‚Ð°ÐµÑ‚ Ð² Ð¿ÐµÑ‡Ð½ÑƒÑŽ Ñ‚Ñ€ÑƒÐ±Ñƒ.", 
+                       "Ð¢Ñ‹ Ð²Ñ‹Ð»ÐµÑ‚Ð°ÐµÑˆÑŒ Ð² Ð¿ÐµÑ‡Ð½ÑƒÑŽ Ñ‚Ñ€ÑƒÐ±Ñƒ Ð¿Ñ€Ð¾Ñ‡ÑŒ!", 
+                       "%1$^C1 Ð¿Ð°Ð´Ð°ÐµÑ‚ Ñ Ð½ÐµÐ±Ð°." );
+        if (client->pet)
+            transfer_char( client->pet, 0, client->in_room );
+        
+        client->save( );
+        return;
     }
     
-    tell_raw( client, ch, "áÓØ?" );
+    tell_raw( client, ch, "ÐÑÑŒ?" );
 }
 
 bool RemortWitch::look_inv( Character *looker ) 
 {
     if (looker->is_npc( ))
-	return false;
-	
+        return false;
+        
     doList( looker );
     return true;
 }

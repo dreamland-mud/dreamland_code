@@ -3,20 +3,21 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
- *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
- *    Koval Nazar	    {Nazar, Redrum}                 		   *
- *    Doropey Vladimir	    {Reorx}		                           *
- *    Kulgeyko Denis	    {Burzum}		                           *
- *    Andreyanov Aleksandr  {Manwe}		                           *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD	                   *
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
+ *    Igor S. Petrenko            {NoFate, Demogorgon}                           *
+ *    Koval Nazar            {Nazar, Redrum}                                    *
+ *    Doropey Vladimir            {Reorx}                                           *
+ *    Kulgeyko Denis            {Burzum}                                           *
+ *    Andreyanov Aleksandr  {Manwe}                                           *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                           *
  ***************************************************************************/
 
 #include "skill.h"
 #include "affect.h"
 #include "room.h"
 #include "pcharacter.h"
+#include "dreamland.h"
 #include "npcharacter.h"
 #include "object.h"
 #include "race.h"
@@ -37,34 +38,34 @@ bool check_stun( Character *ch, Character *victim )
 {
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
     {
-	act_p("{WôÙ ÏÇÌÕÛÅ$gÎÏ|Î|ÎÁ É ÎÅ ÍÏÖÅÛØ ÒÅÁÇÉÒÏ×ÁÔØ ÎÁ ÁÔÁËÉ $C2.{x",
-	    ch,0,victim,TO_CHAR,POS_FIGHTING);
-	act_p("{W$c1 ÏÇÌÕÛÅ$gÎÏ|Î|ÎÁ É ÎÅ ÍÏÖÅÔ ÒÅÁÇÉÒÏ×ÁÔØ ÎÁ Ô×ÏÉ ÁÔÁËÉ.{x",
-	    ch,0,victim,TO_VICT,POS_FIGHTING);
-	act_p("{W$c1 ÏÇÌÕÛÅ$gÎÏ|Î|ÎÁ É ÎÅ ÍÏÖÅÔ ÒÅÁÇÉÒÏ×ÁÔØ ÎÁ ÁÔÁËÉ.{x",
-	    ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+        act_p("{WÐ¢Ñ‹ Ð¾Ð³Ð»ÑƒÑˆÐµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ñ€ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ð°Ñ‚Ð°ÐºÐ¸ $C2.{x",
+            ch,0,victim,TO_CHAR,POS_FIGHTING);
+        act_p("{W$c1 Ð¾Ð³Ð»ÑƒÑˆÐµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ñ€ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ñ‚Ð²Ð¾Ð¸ Ð°Ñ‚Ð°ÐºÐ¸.{x",
+            ch,0,victim,TO_VICT,POS_FIGHTING);
+        act_p("{W$c1 Ð¾Ð³Ð»ÑƒÑˆÐµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ñ€ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ð°Ñ‚Ð°ÐºÐ¸.{x",
+            ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
-	REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
-	
-	set_violent( ch, victim, false );
-	return true;
+        REMOVE_BIT(ch->affected_by,AFF_WEAK_STUN);
+        
+        set_violent( ch, victim, false );
+        return true;
     }
 
     if ( IS_AFFECTED(ch,AFF_STUN) )
     {
-	act_p("{WôÙ ÏÇÌÕÛÅ$gÎÏ|Î|ÎÁ É ÎÅ ÍÏÖÅÛØ ÒÅÁÇÉÒÏ×ÁÔØ ÎÁ ÁÔÁËÉ $C2.{x",
-	    ch,0,victim,TO_CHAR,POS_FIGHTING);
-	act_p("{W$c1 ÏÇÌÕÛÅ$gÎÏ|Î|ÎÁ É ÎÅ ÍÏÖÅÔ ÒÅÁÇÉÒÏ×ÁÔØ ÎÁ Ô×ÏÉ ÁÔÁËÉ.{x",
-	    ch,0,victim,TO_VICT,POS_FIGHTING);
-	act_p("{W$c1 ÏÇÌÕÛÅ$gÎÏ|Î|ÎÁ É ÎÅ ÍÏÖÅÔ ÒÅÁÇÉÒÏ×ÁÔØ ÎÁ ÁÔÁËÉ.{x",
-	    ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+        act_p("{WÐ¢Ñ‹ Ð¾Ð³Ð»ÑƒÑˆÐµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ñ€ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ð°Ñ‚Ð°ÐºÐ¸ $C2.{x",
+            ch,0,victim,TO_CHAR,POS_FIGHTING);
+        act_p("{W$c1 Ð¾Ð³Ð»ÑƒÑˆÐµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ñ€ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ñ‚Ð²Ð¾Ð¸ Ð°Ñ‚Ð°ÐºÐ¸.{x",
+            ch,0,victim,TO_VICT,POS_FIGHTING);
+        act_p("{W$c1 Ð¾Ð³Ð»ÑƒÑˆÐµ$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ñ€ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ð°Ñ‚Ð°ÐºÐ¸.{x",
+            ch,0,victim,TO_NOTVICT,POS_FIGHTING);
 
-	affect_strip(ch,gsn_power_word_stun);
+        affect_strip(ch,gsn_power_word_stun);
 
-	SET_BIT(ch->affected_by,AFF_WEAK_STUN);
+        SET_BIT(ch->affected_by,AFF_WEAK_STUN);
 
-	set_violent( ch, victim, false );
-	return true;
+        set_violent( ch, victim, false );
+        return true;
     }
 
     return false;
@@ -75,36 +76,36 @@ void check_assist(Character *ch, Character *victim)
     Character *rch, *rch_next;
 
     for (rch = ch->in_room->people; rch != 0; rch = rch_next) {
-	rch_next = rch->next_in_room;
-	
-	if (!IS_AWAKE(rch) || rch->fighting || rch == ch || rch == victim)
-	    continue;
-	
-	/* mobile assistance */
-	if (rch->is_npc( )) {
-	    if (rch->getNPC( )->behavior)
-		rch->getNPC( )->behavior->assist( ch, victim );
-
-	    continue;
-	}
+        rch_next = rch->next_in_room;
         
-	/* PC-master assist his charmices */
-	if (ch->is_npc( )
-	    && IS_AFFECTED(ch, AFF_CHARM)
-	    && ch->master == rch)
-	{
-	    one_hit( rch, victim );
-	    continue;
-	}
-	
-	/* PC assist characters from his group */
-	if (IS_SET(rch->act, PLR_AUTOASSIST)
-	    && is_same_group( ch, rch ))
-	{
-	    act("ôÙ ×ÓÔÕÐÁÅÛØ × ÂÉÔ×Õ ÎÁ ÓÔÏÒÏÎÅ $C2.", rch, 0, ch, TO_CHAR);
-	    one_hit( rch, victim );
-	    continue;
-	}
+        if (!IS_AWAKE(rch) || rch->fighting || rch == ch || rch == victim)
+            continue;
+        
+        /* mobile assistance */
+        if (rch->is_npc( )) {
+            if (rch->getNPC( )->behavior)
+                rch->getNPC( )->behavior->assist( ch, victim );
+
+            continue;
+        }
+        
+        /* PC-master assist his charmices */
+        if (ch->is_npc( )
+            && IS_AFFECTED(ch, AFF_CHARM)
+            && ch->master == rch)
+        {
+            one_hit( rch, victim );
+            continue;
+        }
+        
+        /* PC assist characters from his group */
+        if (IS_SET(rch->act, PLR_AUTOASSIST)
+            && is_same_group( ch, rch ))
+        {
+            act("Ð¢Ñ‹ Ð²ÑÑ‚ÑƒÐ¿Ð°ÐµÑˆÑŒ Ð² Ð±Ð¸Ñ‚Ð²Ñƒ Ð½Ð° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ $C2.", rch, 0, ch, TO_CHAR);
+            one_hit( rch, victim );
+            continue;
+        }
     }
 }
 
@@ -114,11 +115,11 @@ bool check_bare_hands( Character *ch )
     Object *obj;
 
     for (obj = ch->carrying; obj; obj = obj->next_content)
-	if (obj->wear_loc == wear_wield
-	    || obj->wear_loc == wear_second_wield
-	    || obj->wear_loc == wear_shield
-	    || obj->wear_loc == wear_hold)
-	    return false;
+        if (obj->wear_loc == wear_wield
+            || obj->wear_loc == wear_second_wield
+            || obj->wear_loc == wear_shield
+            || obj->wear_loc == wear_hold)
+            return false;
     
     return true;
 }
@@ -127,34 +128,36 @@ void check_bloodthirst( Character *ch )
 {
     Character *vch, *vch_next;
 
+    if (dreamland->hasOption( DL_BUILDPLOT ))
+        return;
     if (!IS_AFFECTED(ch, AFF_BLOODTHIRST))
-	return;
+        return;
     if (!IS_AWAKE(ch))
-	return;
+        return;
     if (ch->fighting)
-	return;
+        return;
     
     for (vch = ch->in_room->people; vch && !ch->fighting; vch = vch_next)
     {
-	vch_next = vch->next_in_room;
+        vch_next = vch->next_in_room;
 
-	if (ch != vch && ch->can_see(vch) && !is_safe_nomessage(ch, vch))
-	{
-	    ch->println( "{Râïìøûå ëòï÷é! âïìøûå ëòï÷é! âïìøûå ëòï÷é!!!{x" );
-	    REMOVE_BIT(ch->affected_by, AFF_CHARM);
+        if (ch != vch && ch->can_see(vch) && !is_safe_nomessage(ch, vch))
+        {
+            ch->println( "{RÐ‘ÐžÐ›Ð¬Ð¨Ð• ÐšÐ ÐžÐ’Ð˜! Ð‘ÐžÐ›Ð¬Ð¨Ð• ÐšÐ ÐžÐ’Ð˜! Ð‘ÐžÐ›Ð¬Ð¨Ð• ÐšÐ ÐžÐ’Ð˜!!!{x" );
+            REMOVE_BIT(ch->affected_by, AFF_CHARM);
 
-	    if (ch->is_npc( ) && ch->in_room) 
-		save_mobs( ch->in_room );
+            if (ch->is_npc( ) && ch->in_room) 
+                save_mobs( ch->in_room );
 
-	    interpret_raw( ch, "murder",  vch->getDoppel( ch )->getNameP( ) );
-	}
+            interpret_raw( ch, "murder",  vch->getDoppel( ch )->getNameP( ) );
+        }
     }
 }
 
 #else
-void	check_assist(Character *ch,Character *victim) { }
-bool	check_stun( Character *ch, Character *victim ) { return false; } 
-bool	check_bare_hands( Character *ch ) { return false; }
-void	check_bloodthirst( Character *ch ) { }
+void        check_assist(Character *ch,Character *victim) { }
+bool        check_stun( Character *ch, Character *victim ) { return false; } 
+bool        check_bare_hands( Character *ch ) { return false; }
+void        check_bloodthirst( Character *ch ) { }
 #endif
 

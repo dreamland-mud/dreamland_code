@@ -33,8 +33,8 @@ static const char * occ_names [] =
 static int occ_name2type( const char *name )
 {
     for (int i = 0; occ_names[i]; i++)
-	if (!str_cmp( name, occ_names[i] ))
-	    return i;
+        if (!str_cmp( name, occ_names[i] ))
+            return i;
 
     return -1;
 }
@@ -45,7 +45,7 @@ bool mob_has_occupation( NPCharacter *mob, const char *occName )
     int occType = occ_name2type( occName );
 
     if (occType <= 0)
-	return false;
+        return false;
 
     return mob_has_occupation( mob, occType );
 }
@@ -53,7 +53,7 @@ bool mob_has_occupation( NPCharacter *mob, const char *occName )
 bool mob_has_occupation( NPCharacter *mob, int occType )
 {
     return mob->behavior 
-	   && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
+           && IS_SET(mob->behavior->getOccupation( ), (1 << occType) );
 }
 
 bool obj_has_trigger( Object *obj, const DLString& trigger )

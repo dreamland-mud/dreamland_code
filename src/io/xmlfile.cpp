@@ -26,8 +26,8 @@ XMLFile::XMLFile( const DLString &f, const DLString &n, XMLVariable *v )
 
 XMLFile::XMLFile( const DLFile &file, const DLString &n, XMLVariable *v )
                   : filename( file.getPath( ) ),
-		    nodename( n ),
-		    variable( v )
+                    nodename( n ),
+                    variable( v )
 {
 }
 
@@ -40,22 +40,22 @@ bool XMLFile::load( )
     ifstream istr( filename.c_str( ) );
 
     if (!istr) 
-	return false;
+        return false;
 
     try {
-	XMLDocument::Pointer root( NEW );
-	root->load( istr );
+        XMLDocument::Pointer root( NEW );
+        root->load( istr );
 
-	XMLNode::Pointer node = root->getFirstNode( );
+        XMLNode::Pointer node = root->getFirstNode( );
 
-	if (!node.isEmpty( ))
-	    variable->fromXML( node );
+        if (!node.isEmpty( ))
+            variable->fromXML( node );
     }
     catch( const Exception& ex )
     {
-	LogStream::sendError( ) << "Error while loading " << filename << ": " 
-	                        << ex << endl;
-	return false;
+        LogStream::sendError( ) << "Error while loading " << filename << ": " 
+                                << ex << endl;
+        return false;
     }
 
     return true;
@@ -66,26 +66,26 @@ bool XMLFile::save( ) const
     ofstream ostr( filename.c_str( ) );
 
     if (!ostr) 
-	return false;
+        return false;
 
     try
     {
-	XMLDocument::Pointer root( NEW );
-	XMLNode::Pointer node( NEW, nodename );
+        XMLDocument::Pointer root( NEW );
+        XMLNode::Pointer node( NEW, nodename );
 
-	if (variable->toXML( node )) {
-	    root->appendChild( node );
-	    root->save( ostr );
-	}
+        if (variable->toXML( node )) {
+            root->appendChild( node );
+            root->save( ostr );
+        }
     }
     catch (const ExceptionSkipVariable &) {
-	return true;
+        return true;
     }
     catch (const Exception& ex)
     {
         LogStream::sendError( ) 
-	    << "Error while saving " << filename << ": " << ex << endl;
-	return false;
+            << "Error while saving " << filename << ": " << ex << endl;
+        return false;
     }
 
     return true;

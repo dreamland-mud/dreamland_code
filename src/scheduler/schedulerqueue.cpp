@@ -21,13 +21,13 @@ void SchedulerQueue::put( long time, SchedulerTaskPointer& task )
     
     if (pos == end( ))
     {
-	SchedulerPriorityMapPointer pv( NEW );
-	task->putInto( pv );
-	( *this )[time] = pv;
+        SchedulerPriorityMapPointer pv( NEW );
+        task->putInto( pv );
+        ( *this )[time] = pv;
     }
     else
     {
-	task->putInto( pos->second );
+        task->putInto( pos->second );
     }
 }
 
@@ -36,9 +36,9 @@ SchedulerPriorityMap::Pointer SchedulerQueue::get( long time )
     iterator pos = find( time );
     
     if (pos != end( )) {
-	SchedulerPriorityMap::Pointer pv = pos->second;
-	erase( pos );
-	return pv;
+        SchedulerPriorityMap::Pointer pv = pos->second;
+        erase( pos );
+        return pv;
     }
     
     return SchedulerPriorityMap::Pointer( );
@@ -47,11 +47,11 @@ SchedulerPriorityMap::Pointer SchedulerQueue::get( long time )
 void SchedulerQueue::slay( SchedulerTask::Pointer& task )
 {
     for (iterator ipos = begin( ); ipos != end( ); ipos++)
-	    ipos->second->slay( task );
+            ipos->second->slay( task );
 }
 
 void SchedulerQueue::slayInstance( SchedulerTask::Pointer& task )
 {
     for (iterator ipos = begin( ); ipos != end( ); ipos++)
-	    ipos->second->slayInstance( task );
+            ipos->second->slayInstance( task );
 }

@@ -40,7 +40,7 @@ int number_fuzzy( int number )
 int number_range( int from, int to )
 {
     if ( from >= to )
-	return from;
+        return from;
 
     return from + number_mm( ) % (to - from + 1);
 }
@@ -74,7 +74,7 @@ int number_percent( void )
     int percent;
 
     while ( (percent = number_mm() & (128-1) ) > 99 )
-	;
+        ;
 
     return 1 + percent;
 }
@@ -89,7 +89,7 @@ int number_door( void )
     int door;
 
     while ( ( door = number_mm() & (8-1) ) >= 6)
-	;
+        ;
 
     return door;
 }
@@ -188,7 +188,7 @@ int dice( int number, int size )
     }
 
     for ( idice = 0, sum = 0; idice < number; idice++ )
-	sum += number_range( 1, size );
+        sum += number_range( 1, size );
 
     return sum;
 }

@@ -6,11 +6,13 @@ include $(top_srcdir)/src/Makefile.inc
 INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/selfrate \
+-I$(top_srcdir)/plug-ins/skills_impl \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
 libquest_heal_la_LIBADD = \
 ../../selfrate/libselfrate.la \
+../../skills_impl/libskills_impl.la \
 ../core/libquest_core.la \
 $(LIBADD_AI)
 

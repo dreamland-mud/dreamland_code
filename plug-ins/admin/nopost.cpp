@@ -37,78 +37,78 @@ CMDADM( nopost )
 {
     
     try {
-	XMLAttributes* attributes;
-	XMLAttributeNoPost::Pointer attr;
-	PCMemoryInterface* pci;
-	int level;
-	DLString arguments = constArguments;
-	DLString name = arguments.getOneArgument( );
+        XMLAttributes* attributes;
+        XMLAttributeNoPost::Pointer attr;
+        PCMemoryInterface* pci;
+        int level;
+        DLString arguments = constArguments;
+        DLString name = arguments.getOneArgument( );
 
-	if( name.empty( ) ) {
-	    ch->send_to( "Nopost whom?\n\r" );
-	    return;
-	}
+        if( name.empty( ) ) {
+            ch->send_to( "Nopost whom?\n\r" );
+            return;
+        }
 
-	pci = PCharacterManager::find( name );
-	
-	if (!pci) {
-	    ch->send_to( "ˆ≈“‘◊¡ Œ≈ Œ¡ ƒ≈Œ¡. ıÀ¡÷…‘≈ …Õ— –“¡◊…ÃÿŒœ … –œÃŒœ”‘ÿ¿.\n\r" );
-	    return;
-	}
+        pci = PCharacterManager::find( name );
+        
+        if (!pci) {
+            ch->send_to( "–ñ–µ—Ä—Ç–≤–∞ –Ω–µ –Ω–∞–π–¥–µ–Ω–∞. –£–∫–∞–∂–∏—Ç–µ –∏–º—è –ø—Ä–∞–≤–∏–ª—å–Ω–æ –∏ –ø–æ–ª–Ω–æ—Å—Ç—å—é.\n\r" );
+            return;
+        }
 
-	name = pci->getName( );
-	level = pci->get_trust( );
-	attributes = &pci->getAttributes( );
-		    
-	arguments.stripWhiteSpace( );
-	    
-	if( arguments == "off" ) {
-	    std::basic_ostringstream<char> ostr;
+        name = pci->getName( );
+        level = pci->get_trust( );
+        attributes = &pci->getAttributes( );
+                    
+        arguments.stripWhiteSpace( );
+            
+        if( arguments == "off" ) {
+            std::basic_ostringstream<char> ostr;
 
-	    attr = attributes->findAttr<XMLAttributeNoPost>( "nopost" );
-	    
-	    if (attr) {
-		attr->end( pci );
-		attributes->eraseAttribute( "nopost" );
-		PCharacterManager::saveMemory( pci );
+            attr = attributes->findAttr<XMLAttributeNoPost>( "nopost" );
+            
+            if (attr) {
+                attr->end( pci );
+                attributes->eraseAttribute( "nopost" );
+                PCharacterManager::saveMemory( pci );
 
-		ch->send_to( "NOPOST ”Œ—‘.\n\r" );
-		wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
-		        "%^C1 restores notes to %s.", ch, pci->getName( ).c_str( ) );
-	    }
-	    else {
-		ch->send_to( "Ó≈ –œÃ’ﬁ…Ãœ”ÿ.\n\r" );
-	    }
-	}
-	else if( arguments.empty( ) )
-	{
-	    attr = attributes->findAttr<XMLAttributeNoPost>( "nopost" );
+                ch->send_to( "NOPOST —Å–Ω—è—Ç.\n\r" );
+                wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
+                        "%^C1 restores notes to %s.", ch, pci->getName( ).c_str( ) );
+            }
+            else {
+                ch->send_to( "–ù–µ –ø–æ–ª—É—á–∏–ª–æ—Å—å.\n\r" );
+            }
+        }
+        else if( arguments.empty( ) )
+        {
+            attr = attributes->findAttr<XMLAttributeNoPost>( "nopost" );
 
-	    if (attr) 
-		ch->printf( "%s\r\n", attr->getUntilString( false ).c_str( ) );
-	    else
-		ch->send_to( "none\n\r" );
-	}
-	else
-	{
-	    std::basic_ostringstream<char> ostr;
-	    const DLString forever = "forever";
-	    int second = ( arguments == forever ) ? -1 : Date::getSecondFromString( arguments );
-	    
-	    attr = attributes->getAttr<XMLAttributeNoPost>( "nopost" );
-	    attr->setTime( second );
-	    attr->start( pci );
-	    PCharacterManager::saveMemory(pci);
+            if (attr) 
+                ch->printf( "%s\r\n", attr->getUntilString( false ).c_str( ) );
+            else
+                ch->send_to( "none\n\r" );
+        }
+        else
+        {
+            std::basic_ostringstream<char> ostr;
+            const DLString forever = "forever";
+            int second = ( arguments == forever ) ? -1 : Date::getSecondFromString( arguments );
+            
+            attr = attributes->getAttr<XMLAttributeNoPost>( "nopost" );
+            attr->setTime( second );
+            attr->start( pci );
+            PCharacterManager::saveMemory(pci);
 
-	    ch->send_to( "NOPOST ’”‘¡Œœ◊Ã≈Œ.\n\r" );
-	    
-	    wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
-	            "%^C1 revokes %s's notes.", ch, pci->getName( ).c_str( ) );
-	}
+            ch->send_to( "NOPOST —É—Å—Ç–∞–Ω–æ–≤–ª–µ–Ω.\n\r" );
+            
+            wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
+                    "%^C1 revokes %s's notes.", ch, pci->getName( ).c_str( ) );
+        }
     }
     catch( const ExceptionBadDateString& ex )
     {
-	ch->printf( "%s\r\n", ex.what( ) );
+        ch->printf( "%s\r\n", ex.what( ) );
     }
 }
 
@@ -124,10 +124,10 @@ void XMLAttributeNoPost::start( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) {
-	std::basic_ostringstream<char> ostr;
-	
-	ostr << "‚œ«… œ‘Œ—Ã… ’ ‘≈¬— –“…◊…Ã≈«…¿ –…”¡‘ÿ –…”ÿÕ¡ " << getUntilString( true ) << "." << std::endl;
-	pch->send_to( ostr );
+        std::basic_ostringstream<char> ostr;
+        
+        ostr << "–ë–æ–≥–∏ –æ—Ç–Ω—è–ª–∏ —É —Ç–µ–±—è –ø—Ä–∏–≤–∏–ª–µ–≥–∏—é –ø–∏—Å–∞—Ç—å –ø–∏—Å—å–º–∞ " << getUntilString( true ) << "." << std::endl;
+        pch->send_to( ostr );
     }
 }
 
@@ -136,6 +136,6 @@ void XMLAttributeNoPost::end( PCMemoryInterface *pcm ) const
     PCharacter *pch;
 
     if ((pch = dynamic_cast<PCharacter *>( pcm ))) 
-	pch->send_to( "‚œ«… ◊≈“Œ’Ã… ‘≈¬≈ –“…◊…Ã≈«…¿ –…”¡‘ÿ –…”ÿÕ¡.\n\r" );
+        pch->send_to( "–ë–æ–≥–∏ –≤–µ—Ä–Ω—É–ª–∏ —Ç–µ–±–µ –ø—Ä–∏–≤–∏–ª–µ–≥–∏—é –ø–∏—Å–∞—Ç—å –ø–∏—Å—å–º–∞.\n\r" );
 }
 

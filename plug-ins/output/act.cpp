@@ -33,80 +33,80 @@
 static const char * actChar_to_fmtChar(char c)
 {
     switch (c) {
-    case 'C':	return "%3$C";
-    case 'G':	return "%3$G";
-    case 'O':	return "%3$O";
+    case 'C':        return "%3$C";
+    case 'G':        return "%3$G";
+    case 'O':        return "%3$O";
 
-    case 'E':	return "%3$P1";
-    case 'S':	return "%3$P2";
-    case 'M':	return "%3$P3";
-    case 'X':	return "%3$P4";
-    case 'Y':	return "%3$P5";
-    case 'Z':	return "%3$P6";
-    case 'U':	return "%3$P7";
+    case 'E':        return "%3$P1";
+    case 'S':        return "%3$P2";
+    case 'M':        return "%3$P3";
+    case 'X':        return "%3$P4";
+    case 'Y':        return "%3$P5";
+    case 'Z':        return "%3$P6";
+    case 'U':        return "%3$P7";
 
-    case 'c':	return "%1$C";
-    case 'g':	return "%1$G";
-    case 'o':	return "%2$O";
+    case 'c':        return "%1$C";
+    case 'g':        return "%1$G";
+    case 'o':        return "%2$O";
 
-    case 'e':	return "%1$P1";
-    case 's':	return "%1$P2";
-    case 'm':	return "%1$P3";
-    case 'x':	return "%1$P4";
-    case 'y':	return "%1$P5";
-    case 'z':	return "%1$P6";
-    case 'u':	return "%1$P7";
+    case 'e':        return "%1$P1";
+    case 's':        return "%1$P2";
+    case 'm':        return "%1$P3";
+    case 'x':        return "%1$P4";
+    case 'y':        return "%1$P5";
+    case 'z':        return "%1$P6";
+    case 'u':        return "%1$P7";
 
-    case 'T':	return "%3$s";
-    case 'N':	return "%3$N";
-    case 'd':	return "%3$S";
-    case 't':	return "%2$s";
-    case 'n':	return "%2$N";
+    case 'T':        return "%3$s";
+    case 'N':        return "%3$N";
+    case 'd':        return "%3$S";
+    case 't':        return "%2$s";
+    case 'n':        return "%2$N";
 
-    default:	return "";
+    default:        return "";
     }
 }
 
-static DLString act_to_fmt(const char *s)
+DLString act_to_fmt(const char *s)
 {
     ostringstream buf;
 
     while (*s != '\0') {
-	if (*s != '$') {
-	    buf << *s++;
-	    continue;
-	}
+        if (*s != '$') {
+            buf << *s++;
+            continue;
+        }
 
-	++s;
-	buf << actChar_to_fmtChar(*s);
-	++s;
+        ++s;
+        buf << actChar_to_fmtChar(*s);
+        ++s;
     }
     
-    // слово 'люди' пишется с большой буквы
+    // я│п╩п╬п╡п╬ 'п╩я▌п╢п╦' п©п╦я┬п╣я┌я│я▐ я│ п╠п╬п╩я▄я┬п╬п╧ п╠я┐п╨п╡я▀
     DLString rc = buf.str();
     DLString r = rc.colourStrip();
     if (r.length() > 2 && r.at(0) == '%' && isdigit(r.at(1)) && r.at(2) == '$') {
-	DLString::size_type i = rc.find_first_of('$');
-	rc = rc.substr(0, i+1) + "^" + rc.substr(i+1);
+        DLString::size_type i = rc.find_first_of('$');
+        rc = rc.substr(0, i+1) + "^" + rc.substr(i+1);
     }
-	
+        
     return rc;
 }
 
 void act( const char *format, Character *ch, const void *arg1,
-	  const void *arg2, int type )
+          const void *arg2, int type )
 {
     act_p( format, ch, arg1, arg2, type, POS_RESTING );
 }
 
 void act_p( const char *format, Character *ch, const void *arg1,
-	    const void *arg2, int type, int min_pos )
+            const void *arg2, int type, int min_pos )
 {
     if (!ch)
-	return;
+        return;
 
     if (format == 0 || !format[0]) 
-	return;
+        return;
     
     Character *vch = (Character *)arg2;
     DLString fmt = act_to_fmt(format);
@@ -124,12 +124,12 @@ struct VarArgFormatter : public MsgFormatter {
     VarArgFormatter(Character *to) : MsgFormatter(to) {
     }
     DLString vfmt(const char *format, va_list av) {
-	this->format = format;
+        this->format = format;
         va_copy(this->av, av);
-	argcnt = 0;
-	
-	if (to && !to->getPC())
-	    return DLString::emptyString;
+        argcnt = 0;
+        
+        if (to && !to->getPC())
+            return DLString::emptyString;
 
         DLString s = run();
         va_end(av);
@@ -137,42 +137,42 @@ struct VarArgFormatter : public MsgFormatter {
     }
 protected:    
     virtual void nextArg() {
-	d = args[argcnt++] = va_arg(av, arg_t);
+        d = args[argcnt++] = va_arg(av, arg_t);
     }
     virtual void shiftArg(int i) {
-	while(argcnt < i)
-	    args[argcnt++] = va_arg(av, arg_t);
+        while(argcnt < i)
+            args[argcnt++] = va_arg(av, arg_t);
 
-	d = args[i-1];
+        d = args[i-1];
     }
     virtual char argChar() {
-	return d.c;
+        return d.c;
     }
     virtual int argInt() {
-	return d.number;
+        return d.number;
     }
     virtual unsigned int argUInt() {
-	return d.unumber;
+        return d.unumber;
     }
     virtual float argFloat() {
-	return d.fnumber;
+        return d.fnumber;
     }
     virtual DLString argStr() {
-	return DLString(d.string);
+        return DLString(d.string);
     }
     virtual Grammar::Noun::Pointer argNoun(int nounFlags) {
-	return dynamic_cast<const Grammar::NounHolder *>(d.obj)->toNoun(to, nounFlags);
+        return dynamic_cast<const Grammar::NounHolder *>(d.obj)->toNoun(to, nounFlags);
     }
 private:
     typedef union {
         char c;
         int number;
         unsigned int unumber;
-	float fnumber;
+        float fnumber;
         char *string;
         Character *ch;
         Object *obj;
-	RussianString *rstr;
+        RussianString *rstr;
     } arg_t;
     arg_t args[MAXARGS], d;
     int argcnt;
@@ -231,150 +231,150 @@ void player_fmt( const DLString &format, PCMemoryInterface *pc, ostringstream &b
     PCharacter *pch = pc->getPlayer( );
     
     if (format.empty( ))
-	return;
+        return;
     
     str = format.c_str( );
 
     while (*str != '\0') {
-	DLString word;
-	bool left = false;
-	int width = 0;
+        DLString word;
+        bool left = false;
+        int width = 0;
 
-	if (*str != '%') {
-	    buf << *str++;
-	    continue;
-	}
+        if (*str != '%') {
+            buf << *str++;
+            continue;
+        }
 
-	++str;
+        ++str;
 
-	if (*str == '%') {
-	    buf << *str++;
-	    continue;
-	}
+        if (*str == '%') {
+            buf << *str++;
+            continue;
+        }
 
-	if (*str == '-') {
-	    left = true;
-	    ++str;
-	} 	
+        if (*str == '-') {
+            left = true;
+            ++str;
+        }         
 
-	while (isdigit( *str )) {
-	    width += width * 10 + *str - '0';
-	    str++;
-	}
+        while (isdigit( *str )) {
+            width += width * 10 + *str - '0';
+            str++;
+        }
        
-	switch (*str) {
-	default:  
-	    break;
-	    
-	case 'n':
-	    word = pc->getName( );
-	    break;
+        switch (*str) {
+        default:  
+            break;
+            
+        case 'n':
+            word = pc->getName( );
+            break;
 
-	case 'N':
-	    if (pch && to)
-		word = to->seeName( pch );
-	    break;
-	    
-	case 'c':
-	    if (!pc->getClan( )->isHidden( ))
-		word = pc->getClan( )->getShortName( ).at( 0 );
-	    break;
+        case 'N':
+            if (pch && to)
+                word = to->seeName( pch );
+            break;
+            
+        case 'c':
+            if (!pc->getClan( )->isHidden( ))
+                word = pc->getClan( )->getShortName( ).at( 0 );
+            break;
 
-	case 'C':
-	    word = pc->getClan( )->getColor( );
-	    break;
-	
-	case 'k':
-	    if (!pc->getClan( )->isHidden( ))
-		word += "{x[{" 
-		         + pc->getClan( )->getColor( )
-		         + pc->getClan( )->getShortName( ).at( 0 )
-		         + "{x]";
-	    break;
+        case 'C':
+            word = pc->getClan( )->getColor( );
+            break;
+        
+        case 'k':
+            if (!pc->getClan( )->isHidden( ))
+                word += "{x[{" 
+                         + pc->getClan( )->getColor( )
+                         + pc->getClan( )->getShortName( ).at( 0 )
+                         + "{x]";
+            break;
 
-	case 'K':
-	    if (!pc->getClan( )->isHidden( ))
-		word += pc->getClan( )->getColor( )
-		        + pc->getClan( )->getShortName( )
-		        + "{x";
-	    break;
-	    
-	case 'l':
-	    word = pc->getLevel( );
-	    break;
+        case 'K':
+            if (!pc->getClan( )->isHidden( ))
+                word += pc->getClan( )->getColor( )
+                        + pc->getClan( )->getShortName( )
+                        + "{x";
+            break;
+            
+        case 'l':
+            word = pc->getLevel( );
+            break;
 
-	case 'L':
-	    word = pc->getClanLevel( );
-	    break;
+        case 'L':
+            word = pc->getClanLevel( );
+            break;
 
-	case 'r':
-	    word = pc->getRace( )->getPC( )->getWhoNameFor( to );
-	    
-	    if (word.size( ) < 4)
-		word = dlprintf( "  %-4s", word.c_str( ) );
-	    else
-		word = dlprintf( " %-5s", word.c_str( ) );
-	    break;
+        case 'r':
+            word = pc->getRace( )->getPC( )->getWhoNameFor( to );
+            
+            if (word.size( ) < 4)
+                word = dlprintf( "  %-4s", word.c_str( ) );
+            else
+                word = dlprintf( " %-5s", word.c_str( ) );
+            break;
 
-	case 'R':
-	    word = pc->getRace( )->getName( );
-	    break;
+        case 'R':
+            word = pc->getRace( )->getName( );
+            break;
 
-	case 'P':
-	    word = pc->getProfession( )->getNameFor( to );
-	    break;
+        case 'P':
+            word = pc->getProfession( )->getNameFor( to );
+            break;
 
-	case 't':
-	    word = pc->getClan( )->getTitle( pc );
-	    break;
+        case 't':
+            word = pc->getClan( )->getTitle( pc );
+            break;
 
-	case 'T':
-	    if (!pc->getClan( )->isHidden( ))
-		word += "{x[{" 
-		       + pc->getClan( )->getColor( ) 
-		       + pc->getClan( )->getTitle( pc )
-		       + "{x]";
-	    break;
+        case 'T':
+            if (!pc->getClan( )->isHidden( ))
+                word += "{x[{" 
+                       + pc->getClan( )->getColor( ) 
+                       + pc->getClan( )->getTitle( pc )
+                       + "{x]";
+            break;
 
-	case 'p':
-	    if (pch)
-		word = pch->getParsedTitle( );
-	    break;
-	
-	case 'b':
-	    if (pc->getRemorts( ).size( ) > 0)
-		word += "(" + DLString(pc->getRemorts( ).size( )) + ")";
-	    else
-		word = "   ";
-	    break;
-	
-	case 'B':
-	    if (pc->getRemorts( ).size( ) > 0)
-		word += "{W({M" + DLString(pc->getRemorts( ).size( )) + "{W){x";
-	    else
-		word = "   ";
-	    break;
-	    
-	case 'a':
-	    word = pc->getLastAccessTime( ).getTimeAsString( "%d/%m/%y %H:%M" );
-	    break;
+        case 'p':
+            if (pch)
+                word = pch->getParsedTitle( );
+            break;
+        
+        case 'b':
+            if (pc->getRemorts( ).size( ) > 0)
+                word += "(" + DLString(pc->getRemorts( ).size( )) + ")";
+            else
+                word = "   ";
+            break;
+        
+        case 'B':
+            if (pc->getRemorts( ).size( ) > 0)
+                word += "{W({M" + DLString(pc->getRemorts( ).size( )) + "{W){x";
+            else
+                word = "   ";
+            break;
+            
+        case 'a':
+            word = pc->getLastAccessTime( ).getTimeAsString( "%d/%m/%y %H:%M" );
+            break;
 
-	case 'A':
-	    word = pc->getLastAccessTime( ).getTimeAsString( );
-	    break;
-	}
+        case 'A':
+            word = pc->getLastAccessTime( ).getTimeAsString( );
+            break;
+        }
 
-	if (left)
-	    buf << word;
+        if (left)
+            buf << word;
     
-	for (int i = 0; i < width - (int) word.colorLength( ); i++)
-	    buf << " ";
+        for (int i = 0; i < width - (int) word.colorLength( ); i++)
+            buf << " ";
 
-	if (!left)
-	    buf << word;
-	
-	if (*str)
-	    ++str;
+        if (!left)
+            buf << word;
+        
+        if (*str)
+            ++str;
     }
 }
 
@@ -390,58 +390,58 @@ DLString dlprintf( const char *fmt, ... )
     va_start(arglist, fmt);
     
     while (*p) {
-	DLString word;
-	bool left = false;
-	int width = 0;
+        DLString word;
+        bool left = false;
+        int width = 0;
 
-	if (*p != '%') {
-	    result += *p++;
-	    continue;
-	}
-	
-	++p;
-	
-	if (*p == '%') {
-	    result += '%';
-	    p++;
-	    continue;
-	}
+        if (*p != '%') {
+            result += *p++;
+            continue;
+        }
+        
+        ++p;
+        
+        if (*p == '%') {
+            result += '%';
+            p++;
+            continue;
+        }
 
-	if (*p == '-') {
-	    left = true;
-	    ++p;
-	} 	
+        if (*p == '-') {
+            left = true;
+            ++p;
+        }         
 
-	while (isdigit( *p )) {
-	    width += width * 10 + *p - '0';
-	    p++;
-	}
+        while (isdigit( *p )) {
+            width += width * 10 + *p - '0';
+            p++;
+        }
        
-	switch( *p ) {
-	case 's':
-	    word += va_arg( arglist, char * );
-	    break;
-	case 'd':
-	case 'i':
-	case 'l':
-	    word += (int) va_arg( arglist, int ); /* XXX */
-	    break;
-	default:
-	    word += va_arg( arglist, int );
-	    break;
-	}
+        switch( *p ) {
+        case 's':
+            word += va_arg( arglist, char * );
+            break;
+        case 'd':
+        case 'i':
+        case 'l':
+            word += (int) va_arg( arglist, int ); /* XXX */
+            break;
+        default:
+            word += va_arg( arglist, int );
+            break;
+        }
 
-	if (left)
-	    result += word;
+        if (left)
+            result += word;
     
-	for (int i = 0; i < width - (int) word.colorLength( ); i++)
-	    result += ' ';
+        for (int i = 0; i < width - (int) word.colorLength( ); i++)
+            result += ' ';
 
-	if (!left)
-	    result += word;
-	
-	if (*p)
-	    p++;
+        if (!left)
+            result += word;
+        
+        if (*p)
+            p++;
     }
 
     va_end( arglist );
@@ -459,7 +459,7 @@ void tell_fmt( const char *msg, ... )
     typedef union { Character *ch; } arg_t;
     arg_t listener;
     
-    buf << "%2$^C1 говорит тебе '{G" << msg << "{x'";
+    buf << "%2$^C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{G" << msg << "{x'";
     va_start( ap, msg );
     va_copy( ap0, ap );
     listener = va_arg(ap, arg_t);
@@ -475,7 +475,7 @@ void say_fmt( const char *msg, ... )
     typedef union { Character *ch; } arg_t;
     arg_t teller;
     
-    buf << "%1$^C1 произносит '{g" << msg << "{x'";
+    buf << "%1$^C1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g" << msg << "{x'";
     va_start( ap, msg );
     va_copy( ap0, ap );
     teller = va_arg(ap, arg_t);
@@ -489,7 +489,7 @@ void tell_raw( Character *ch, NPCharacter *talker, const char *format, ... )
     char buf[MAX_STRING_LENGTH], buf0[MAX_STRING_LENGTH];
     va_list ap;
     
-    sprintf( buf0, "%s говорит тебе '{G%s{x'\n\r", ch->seeFullNameD( talker, '1' ).c_str( ), format );
+    sprintf( buf0, "%s пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{G%s{x'\n\r", ch->seeFullNameD( talker, '1' ).c_str( ), format );
     
     va_start( ap, format );
     vsprintf( buf,  buf0, ap );
@@ -504,7 +504,7 @@ void say_act( Character *listener, Character *teller,
 {
     ostringstream buf;
 
-    buf << "$C1 произносит '{g" << msg << "{x'";
+    buf << "$C1 п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{g" << msg << "{x'";
     act( buf.str( ).c_str( ), listener, arg, teller, TO_ALL );
 }
 
@@ -513,7 +513,7 @@ void tell_act( Character *listener, Character *teller,
 {
     ostringstream buf;
 
-    buf << "$C1 говорит тебе '{G" << msg << "{x'";
+    buf << "$C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{G" << msg << "{x'";
     act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
@@ -522,7 +522,7 @@ void tell_dim( Character *listener, Character *teller,
 {
     ostringstream buf;
 
-    buf << "$C1 говорит тебе '{g" << msg << "{x'";
+    buf << "$C1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{g" << msg << "{x'";
     act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 

@@ -2,59 +2,145 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "areahelp.h"
+#include "so.h"
+#include "plugininitializer.h"
+#include "mocregistrator.h"
+#include "merc.h"
+#include "mercdb.h"
+#include "dl_strings.h"
 
-AreaHelpArticle::AreaHelpArticle( const HelpArticle &art )
-{
-    level = art.getLevel( );
-    fullKeyword = art.getKeyword( );
-    assign( art.c_str( ) );
-    areafile = art.areafile;
-}
-
-AreaHelpArticle::AreaHelpArticle( )
-{
-}
-
-AreaHelpArticle::~AreaHelpArticle( )
+/*-------------------------------------------------------------------
+ * XMLAreaHelp
+ *------------------------------------------------------------------*/
+XMLAreaHelp::XMLAreaHelp()
+                : level(-1)
 {
 }
 
-const DLString XMLAreaHelpArticle::TYPE = "XMLAreaHelpArticle";
-
-XMLAreaHelpArticle::XMLAreaHelpArticle( )
+bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
 {
-}
+    XMLString::toXML(parent);
 
-XMLAreaHelpArticle::XMLAreaHelpArticle( const HelpArticle &art )
-                      : AreaHelpArticle( art )
-{
-}
-
-XMLAreaHelpArticle::~XMLAreaHelpArticle( )
-{
-}
-
-
-bool XMLAreaHelpArticle::toXML( XMLNode::Pointer &parent ) const
-{
-    XMLStringNoEmpty xmlString( *this );
-
-    if (!xmlString.toXML( parent ))
-        return false;
-    
-    if (!getKeyword( ).empty( ))
-	parent->insertAttribute( ATTRIBUTE_KEYWORD, getKeyword( ) );
+    if (!keyword.empty( ))
+        parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keyword );
 
     if (level >= -1)
-	parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
-    
-    if (!ref.empty( ))
-	parent->insertAttribute( ATTRIBUTE_REF, ref.toString( ) );
+        parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
 
-    if (!refby.empty( ))
-	parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
-
-    return true;
+    return true;    
 }
+
+void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadType )
+{
+    XMLString::fromXML(parent);
+    keyword = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
+
+    if (parent->hasAttribute( HelpArticle::ATTRIBUTE_LEVEL ))
+        level = parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL ).toInt( );
+}
+
+/*-------------------------------------------------------------------
+ * AreaHelp 
+ *------------------------------------------------------------------*/
+const DLString AreaHelp::TYPE = "AreaHelp";
+
+void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
+{
+    AREA_DATA *area = areafile->area;
+    
+    if (!selfHelp) {
+        in << *this;
+        return;
+    }
+
+    in << "Зона {Y" << area->name << "{x, " 
+       << "уровни {Y" << area->low_range << "-" << area->high_range << "{x, "
+       << "автор {y" << area->authors << "{x";
+    if (str_cmp(area->translator, ""))
+        in << ", перевод {y" << area->translator << "{x";
+    in << endl
+       << endl;
+
+    if (!empty())
+       in << *this << endl;
+    
+    if (str_cmp(area->speedwalk, ""))
+        in << "{yКак добраться{x: " << area->speedwalk << endl;
+}
+
+class AreaHelpLifetimePlugin : public Plugin {
+public:
+    typedef ::Pointer<AreaHelpLifetimePlugin> Pointer;
+
+    virtual void initialization( )
+    {
+        struct area_data *area;
+
+        for (area = area_first; area; area = area->next) {
+            HelpArticles::iterator a;
+            HelpArticles &articles = area->helps;
+
+            for (a = articles.begin( ); a != articles.end( ); a++) {
+                a->recover();
+                AreaHelp *help = a->getDynamicPointer<AreaHelp>();
+                help->areafile = area->area_file;
+                if (help->getKeywordAttribute().empty()) {
+                    help->persistent = false;
+                    help->selfHelp = true;
+                    help->addKeyword(DLString(area->name).colourStrip().quote());
+                    help->addKeyword(DLString(area->credits).colourStrip().quote());
+                }
+                else {
+                    help->persistent = true;
+                    help->selfHelp = is_name(area->name, (*a)->getKeyword().c_str());
+                }
+                helpManager->registrate( *a );
+            }
+        }
+    }
+
+    virtual void destruction( )
+    {
+        struct area_data *area;
+
+        for (area = area_first; area; area = area->next) {
+            HelpArticles::iterator a;
+            HelpArticles &articles = area->helps;
+
+            for (a = articles.begin( ); a != articles.end( ); a++) {
+                helpManager->unregistrate(*a);
+                a->backup();
+            }
+        }
+
+    }
+
+    // Used for debugging
+    static void toStream(XMLPersistent<HelpArticle> &a) 
+    {
+        XMLNode::Pointer node( NEW );
+        XMLDocument::Pointer root( NEW );
+
+        if (a.toXML( node )) {
+            node->setName( "helps" );
+            root->appendChild( node );
+            root->save( LogStream::sendNotice() );
+        }
+    }
+};
+
+extern "C" {
+
+    SO::PluginList initialize_areas( ) 
+    {
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MocRegistrator<AreaHelp> >( ppl );
+        Plugin::registerPlugin<AreaHelpLifetimePlugin>( ppl );
+        return ppl;
+    }
+}
+
 

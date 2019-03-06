@@ -32,7 +32,7 @@
 using namespace std;
 using namespace Scripting;
 
-NMI_INIT(RoomWrapper, "комната")
+NMI_INIT(RoomWrapper, "п╨п╬п╪п╫п╟я┌п╟")
 
 RoomWrapper::RoomWrapper( ) : target( NULL )
 {
@@ -69,10 +69,10 @@ void RoomWrapper::setTarget( ::Room *r )
 void RoomWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "Room is dead" );
-	
+        throw Scripting::Exception( "Room is dead" );
+        
     if (target == NULL)
-	throw Scripting::Exception( "Room is offline" );
+        throw Scripting::Exception( "Room is offline" );
 }
 
 Room * RoomWrapper::getTarget( ) const
@@ -82,41 +82,40 @@ Room * RoomWrapper::getTarget( ) const
 }
 
 
-#define GETWRAP(x) NMI_GET(RoomWrapper, x, "") { \
+#define GETWRAP(x, h) NMI_GET(RoomWrapper, x, h) { \
     checkTarget(); \
     return WrapperManager::getThis( )->getWrapper(target->x); \
 }
 
-GETWRAP( next )
-GETWRAP( rnext )
-GETWRAP( contents )
-GETWRAP( people )
+GETWRAP( rnext, "я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╫п╟ я│п╩п╣п╢. п╨п╬п╪п╫п╟я┌я┐ п╡ пЁп╩п╬п╠п╟п╩я▄п╫п╬п╪ я│п©п╦я│п╨п╣ .room_list" )
+GETWRAP( contents, "я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╫п╟ п©п╣я─п╡я▀п╧ п©я─п╣п╢п╪п╣я┌ п╫п╟ п©п╬п╩я┐ п╨п╬п╪п╫п╟я┌я▀" )
+GETWRAP( people, "я┐п╨п╟п╥я▀п╡п╟п╣я┌ п╫п╟ п©п╣я─п╡п╬пЁп╬ я┤п╟я─п╟ п╡ п╨п╬п╪п╫п╟я┌п╣" )
 
-NMI_GET( RoomWrapper, vnum , "")
+NMI_GET( RoomWrapper, vnum , "п╫п╬п╪п╣я─ п╨п╬п╪п╫п╟я┌я▀ п╡ п╟я─п╦п╦")
 {
     checkTarget( );
     return Register( target->vnum );
 }
 
-NMI_GET( RoomWrapper, name , "")
+NMI_GET( RoomWrapper, name , "п╫п╟п╥п╡п╟п╫п╦п╣ п╨п╬п╪п╫п╟я┌я▀")
 {
     checkTarget( );
     return Register( target->name );
 }
 
-NMI_GET( RoomWrapper, areaname , "имя арии")
+NMI_GET( RoomWrapper, areaname , "п╦п╪я▐ п╟я─п╦п╦")
 {
     checkTarget( );
     return Register( target->area->name );
 }
 
-NMI_GET( RoomWrapper, area, "экземпляр Area для этой комнаты")
+NMI_GET( RoomWrapper, area, "я█п╨п╥п╣п╪п©п╩я▐я─ Area п╢п╩я▐ я█я┌п╬п╧ п╨п╬п╪п╫п╟я┌я▀")
 {
     checkTarget( );
     return AreaWrapper::wrap( target->area->area_file->file_name );
 }
 
-NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комнате")
+NMI_GET(RoomWrapper, ppl, "я│п©п╦я│п╬п╨ (List) п╡я│п╣я┘ я┤п╟я─п╬п╡ п╡ п╨п╬п╪п╫п╟я┌п╣")
 {
     checkTarget();
     RegList::Pointer rc(NEW);
@@ -124,7 +123,7 @@ NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комнате")
     Character *rch;
     
     for(rch = target->people; rch; rch = rch->next_in_room)
-	rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+        rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -132,13 +131,13 @@ NMI_GET(RoomWrapper, ppl, "список (List) всех чаров в комнате")
     return Register( obj );
 }
 
-NMI_GET( RoomWrapper, items, "список (List) всех предметов на полу" )
+NMI_GET( RoomWrapper, items, "я│п©п╦я│п╬п╨ (List) п╡я│п╣я┘ п©я─п╣п╢п╪п╣я┌п╬п╡ п╫п╟ п©п╬п╩я┐" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
 
     for (::Object *obj = target->contents; obj; obj = obj->next_content)
-	rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
     
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -146,55 +145,55 @@ NMI_GET( RoomWrapper, items, "список (List) всех предметов на полу" )
     return Register( sobj );
 }
 
-NMI_GET( RoomWrapper, sector_type , "")
+NMI_GET( RoomWrapper, sector_type , "п╥п╫п╟я┤п╣п╫п╦п╣ я┌п╦п©п╟ п╪п╣я│я┌п╫п╬я│я┌п╦ (я┌п╟п╠п╩п╦я├п╟ .sector_table)")
 {
     checkTarget( );
     return Register( target->sector_type );
 }
 
-NMI_GET( RoomWrapper, affected_by, "" )
+NMI_GET( RoomWrapper, affected_by, "п╠п╦я┌я▀ п╟я└я└п╣п╨я┌п╬п╡ п╫п╟ п╨п╬п╪п╫п╟я┌п╣ (я┌п╟п╠п╩п╦я├п╟ .tables.affect_flags)" )
 {
     checkTarget( );
     return (int)target->affected_by;
 }
 
-NMI_SET( RoomWrapper, affected_by, "" )
+NMI_SET( RoomWrapper, affected_by, "п╠п╦я┌я▀ п╟я└я└п╣п╨я┌п╬п╡ п╫п╟ п╨п╬п╪п╫п╟я┌п╣ (я┌п╟п╠п╩п╦я├п╟ .tables.affect_flags)" )
 {
     checkTarget( );
     target->affected_by = arg.toNumber();
 }
 
-NMI_GET( RoomWrapper, room_flags, "" )
+NMI_GET( RoomWrapper, room_flags, "я└п╩п╟пЁп╦ п╨п╬п╪п╫п╟я┌я▀ (я┌п╟п╠п╩п╦я├п╟ .tables.room_flags)" )
 {
     checkTarget( );
     return (int)target->room_flags;
 }
 
-NMI_SET( RoomWrapper, room_flags, "" )
+NMI_SET( RoomWrapper, room_flags, "я└п╩п╟пЁп╦ п╨п╬п╪п╫п╟я┌я▀ (я┌п╟п╠п╩п╦я├п╟ .tables.room_flags)" )
 {
     checkTarget( );
     target->room_flags = arg.toNumber();
 }
 
-NMI_GET( RoomWrapper, light, "" )
+NMI_GET( RoomWrapper, light, "п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╦я│я┌п╬я┤п╫п╦п╨п╬п╡ я│п╡п╣я┌п╟ п╡ п╨п╬п╪п╫п╟я┌п╣" )
 {
     checkTarget( );
     return (int)target->light;
 }
 
-NMI_GET( RoomWrapper, description, "" )
+NMI_GET( RoomWrapper, description, "п╬п©п╦я│п╟п╫п╦п╣ п╨п╬п╪п╫п╟я┌я▀" )
 {
     checkTarget( );
     return Register( target->description );
 }
 
-NMI_SET( RoomWrapper, light, "" )
+NMI_SET( RoomWrapper, light, "п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╦я│я┌п╬я┤п╫п╦п╨п╬п╡ я│п╡п╣я┌п╟ п╡ п╨п╬п╪п╫п╟я┌п╣" )
 {
     checkTarget( );
     target->light = arg.toNumber();
 }
 
-NMI_GET( RoomWrapper, clan, "какому клану принадлежит комната" )
+NMI_GET( RoomWrapper, clan, "п╦п╪я▐ п╨п╩п╟п╫п╟, п╨п╬я┌п╬я─п╬п╪я┐ п©я─п╦п╫п╟п╢п╩п╣п╤п╦я┌ п╨п╬п╪п╫п╟я┌п╟" )
 {
     checkTarget();
     return Register( target->clan->getShortName( ) );
@@ -203,9 +202,9 @@ NMI_GET( RoomWrapper, clan, "какому клану принадлежит комната" )
 static Scripting::Register get_direction( Room *r, int dir )
 {
     if (r->exit[dir])
-	return WrapperManager::getThis( )->getWrapper(r->exit[dir]->u1.to_room);
+        return WrapperManager::getThis( )->getWrapper(r->exit[dir]->u1.to_room);
     else 
-	return Scripting::Register( );
+        return Scripting::Register( );
 }
 
 static int get_door_argument( const RegisterList &args )
@@ -214,44 +213,44 @@ static int get_door_argument( const RegisterList &args )
     DLString doorName;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     doorName = args.front( ).toString( );
     if (( door = direction_lookup( doorName.c_str( ) ) ) == -1)
-	door = args.front( ).toNumber( );
+        door = args.front( ).toNumber( );
 
     if (door < 0 || door >= DIR_SOMEWHERE)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
 
     return door;
 }
 
-NMI_GET( RoomWrapper, north, "")
+NMI_GET( RoomWrapper, north, "п╨п╬п╪п╫п╟я┌п╟ п╫п╟ я│п╣п╡п╣я─ п╬я┌я│я▌п╢п╟ п╦п╩п╦ null")
 {
     checkTarget( );
     return get_direction( target, DIR_NORTH );
 }
-NMI_GET( RoomWrapper, south, "")
+NMI_GET( RoomWrapper, south, "п╨п╬п╪п╫п╟я┌п╟ п╫п╟ я▌пЁ п╬я┌я│я▌п╢п╟ п╦п╩п╦ null")
 {
     checkTarget( );
     return get_direction( target, DIR_SOUTH );
 }
-NMI_GET( RoomWrapper, east, "")
+NMI_GET( RoomWrapper, east, "п╨п╬п╪п╫п╟я┌п╟ п╫п╟ п╡п╬я│я┌п╬п╨ п╬я┌я│я▌п╢п╟ п╦п╩п╦ null")
 {
     checkTarget( );
     return get_direction( target, DIR_EAST );
 }
-NMI_GET( RoomWrapper, west, "")
+NMI_GET( RoomWrapper, west, "п╨п╬п╪п╫п╟я┌п╟ п╫п╟ п╥п╟п©п╟п╢ п╬я┌я│я▌п╢п╟ п╦п╩п╦ null")
 {
     checkTarget( );
     return get_direction( target, DIR_WEST );
 }
-NMI_GET( RoomWrapper, up, "")
+NMI_GET( RoomWrapper, up, "п╨п╬п╪п╫п╟я┌п╟ п╡п╡п╣я─я┘ п╬я┌я│я▌п╢п╟ п╦п╩п╦ null")
 {
     checkTarget( );
     return get_direction( target, DIR_UP );
 }
-NMI_GET( RoomWrapper, down, "")
+NMI_GET( RoomWrapper, down, "п╨п╬п╪п╫п╟я┌п╟ п╡п╫п╦п╥ п╬я┌я│я▌п╢п╟ п╦п╩п╦ null")
 {
     checkTarget( );
     return get_direction( target, DIR_DOWN );
@@ -261,24 +260,48 @@ NMI_GET( RoomWrapper, down, "")
  * METHODS
  */
 
-NMI_INVOKE(RoomWrapper, doorTo, "вернет номер двери, ведущей из этой комнаты в указанную" )
+NMI_INVOKE( RoomWrapper, exits, "(ch): я│п©п╦я│п╬п╨ п╫п╬п╪п╣я─п╬п╡ п╡я│п╣я┘ п╢п╬я│я┌я┐п©п╫я▀я┘ п╡я▀я┘п╬п╢п╬п╡ п╢п╩я▐ п©п╣я─я│п╬п╫п╟п╤п╟ ch")
+{
+    RegList::Pointer list(NEW);
+    
+    checkTarget( );
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    Character *ch = args2character(args);
+
+    for (int door = 0; door < DIR_SOMEWHERE; door++) {
+        EXIT_DATA *pexit;
+        Room *room;
+        if (!( pexit = target->exit[door] ))
+            continue;
+        if (!( room = pexit->u1.to_room ))
+            continue;
+        if (!ch->can_see( room ))
+            continue;
+        list->push_back(Register(door));
+    }
+
+    return Register( listObj );
+}
+
+NMI_INVOKE(RoomWrapper, doorTo, "(room): п╫п╬п╪п╣я─ п╢п╡п╣я─п╦, п╡п╣п╢я┐я┴п╣п╧ п╦п╥ я█я┌п╬п╧ п╨п╬п╪п╫п╟я┌я▀ п╡ room" )
 {
     Room *room;
     
     checkTarget( );
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     room = wrapper_cast<RoomWrapper>( args.front( ) )->getTarget( );
 
     for (int d = 0; d < DIR_SOMEWHERE; d++)
-	if (target->exit[d] && target->exit[d]->u1.to_room == room)
-	    return d;
+        if (target->exit[d] && target->exit[d]->u1.to_room == room)
+            return d;
 
     return -1;
 }
 
-NMI_INVOKE( RoomWrapper, getRoom, "" )
+NMI_INVOKE( RoomWrapper, getRoom, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): п╨п╬п╪п╫п╟я┌п╟ п©п╬ я█я┌п╬п╪я┐ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▌" )
 {
     int door;
     
@@ -287,31 +310,31 @@ NMI_INVOKE( RoomWrapper, getRoom, "" )
     return get_direction( target, door );
 }
 
-NMI_INVOKE( RoomWrapper, getRevDoor, "" )
+NMI_INVOKE( RoomWrapper, getRevDoor, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): п╡п╣я─п╫п╣я┌ п╫п╬п╪п╣я─ п©я─п╬я┌п╦п╡п╬п©п╬п╩п╬п╤п╫п╬пЁп╬ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▐" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].rev;
 }
 
-NMI_INVOKE( RoomWrapper, doorNumber, "" )
+NMI_INVOKE( RoomWrapper, doorNumber, "(п╦п╪я▐ п╡я▀я┘п╬п╢п╟): п╡п╣я─п╫п╣я┌ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟" )
 {
     checkTarget( );
     return get_door_argument( args );
 }
 
-NMI_INVOKE( RoomWrapper, dirMsgLeave, "" )
+NMI_INVOKE( RoomWrapper, dirMsgLeave, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): я│п╬п╬п╠я┴п╣п╫п╦п╣ п©я─п╦ я┐я┘п╬п╢п╣ я┤п╣я─п╣п╥ я█я┌п╬я┌ п╡я▀я┘п╬п╢ (п╫п╟ я│п╣п╡п╣я─, п╫п╟ п╡п╬я│я┌п╬п╨)" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].leave;
 }
 
-NMI_INVOKE( RoomWrapper, dirMsgEnter, "" )
+NMI_INVOKE( RoomWrapper, dirMsgEnter, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): я│п╬п╬п╠я┴п╣п╫п╦п╣ п©я─п╦ п╥п╟я┘п╬п╢п╣ я┤п╣я─п╣п╥ я█я┌п╬я┌ п╡я▀я┘п╬п╢ (я│ я▌пЁп╟, я│ п╥п╟п©п╟п╢п╟)" )
 {
     checkTarget( );
     return dirs[get_door_argument( args )].enter;
 }
 
-NMI_INVOKE( RoomWrapper, getExitFlags, "" )
+NMI_INVOKE( RoomWrapper, getExitFlags, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): я└п╩п╟пЁп╦ я█я┌п╬пЁп╬ п╡я▀я┘п╬п╢п╟ (я┌п╟п╠п╩п╦я├п╟ .tables.exit_flags)" )
 {
     EXIT_DATA *pExit;
     
@@ -319,9 +342,9 @@ NMI_INVOKE( RoomWrapper, getExitFlags, "" )
 
     pExit = target->exit[get_door_argument( args )];
     if (pExit)
-	return Register( pExit->exit_info );
+        return Register( pExit->exit_info );
     else
-	return Register( 0 );
+        return Register( 0 );
 }
 
 static void update_door_flags( Room *room, const RegisterList &args, int flags, bool fSet )
@@ -329,35 +352,35 @@ static void update_door_flags( Room *room, const RegisterList &args, int flags, 
     EXIT_DATA *pExit = room->exit[get_door_argument( args )];
 
     if (pExit) {
-	if (fSet)
-	    SET_BIT(pExit->exit_info, flags );
-	else
-	    REMOVE_BIT(pExit->exit_info, flags );
+        if (fSet)
+            SET_BIT(pExit->exit_info, flags );
+        else
+            REMOVE_BIT(pExit->exit_info, flags );
     }
 }
 
-NMI_INVOKE(RoomWrapper, close, "закрыть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, close, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): п╥п╟п╨я─я▀я┌я▄ п╢п╡п╣я─я▄ п©п╬ я┐п╨п╟п╥п╟п╫п╫п╬п╪я┐ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▌")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, open, "открыть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, open, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): п╬я┌п╨я─я▀я┌я▄ п╢п╡п╣я─я▄ п©п╬ я┐п╨п╟п╥п╟п╫п╫п╬п╪я┐ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▌")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, false ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, lock, "запереть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, lock, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): п╥п╟п©п╣я─п╣я┌я▄ п╢п╡п╣я─я▄ п©п╬ я┐п╨п╟п╥п╟п╫п╫п╬п╪я┐ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▌")
 {
     checkTarget( );
     update_door_flags( target, args, EX_CLOSED|EX_LOCKED, true ); 
     return Register( ); 
 }
 
-NMI_INVOKE(RoomWrapper, unlock, "отпереть дверь по указанному направлению (0..5)")
+NMI_INVOKE(RoomWrapper, unlock, "(п╦п╪я▐ п╦п╩п╦ п╫п╬п╪п╣я─ п╡я▀я┘п╬п╢п╟): п╬я┌п©п╣я─п╣я┌я▄ п╢п╡п╣я─я▄ п©п╬ я┐п╨п╟п╥п╟п╫п╫п╬п╪я┐ п╫п╟п©я─п╟п╡п╩п╣п╫п╦я▌")
 {
     checkTarget( );
     update_door_flags( target, args, EX_LOCKED, false ); 
@@ -365,19 +388,19 @@ NMI_INVOKE(RoomWrapper, unlock, "отпереть дверь по указанному направлению (0..5)
 }
 
 
-NMI_INVOKE(RoomWrapper, isDark, "" )
+NMI_INVOKE(RoomWrapper, isDark, "(): true п╣я│п╩п╦ п╡ п╨п╬п╪п╫п╟я┌п╣ я┌п╣п╪п╫п╬" )
 {
     checkTarget( );
     return Register( target->isDark( ) );
 }
 
-NMI_INVOKE(RoomWrapper, isCommon, "" )
+NMI_INVOKE(RoomWrapper, isCommon, "(): true п╣я│п╩п╦ п╨п╬п╪п╫п╟я┌п╟ п╢п╬я│я┌я┐п©п╫п╟ п╡я│п╣п╪ (я┌.п╣. п╫п╣ п©я─п╦п╡п╟я┌п╫п╟я▐/п╨п╩п╟п╫п╬п╡п╟я▐/newbie-only/...)" )
 {
     checkTarget( );
     return Register( target->isCommon( ) );
 }
 
-NMI_INVOKE(RoomWrapper, zecho, "сообщение для всех в этой арии" )
+NMI_INVOKE(RoomWrapper, zecho, "(msg): п╡я▀п╡п╣п╢п╣я┌ я│п╬п╬п╠я┴п╣п╫п╦п╣ msg п╢п╩я▐ п╡я│п╣я┘ п╡ я█я┌п╬п╧ п╟я─п╦п╦" )
 {
     Character *wch;
     const char *msg;
@@ -385,18 +408,18 @@ NMI_INVOKE(RoomWrapper, zecho, "сообщение для всех в этой арии" )
     checkTarget( );
 
     if (args.size( ) != 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     msg = args.front( ).toString( ).c_str( );
     
     for (wch = char_list; wch; wch = wch->next) 
-	if (wch->in_room->area == target->area) 
-	    wch->println( msg );
+        if (wch->in_room->area == target->area) 
+            wch->println( msg );
 
     return Register( );
 }
 
-NMI_INVOKE(RoomWrapper, get_obj_vnum, "поиск объекта в комнате по его внуму" )
+NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum): п©п╬п╦я│п╨ п©п╣я─п╡п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟ п╡ п╨п╬п╪п╫п╟я┌п╣ п©п╬ п╣пЁп╬ п╡п╫я┐п╪я┐" )
 {
     int vnum;
     ::Object *obj;
@@ -404,18 +427,29 @@ NMI_INVOKE(RoomWrapper, get_obj_vnum, "поиск объекта в комнате по его внуму" )
     checkTarget( );
 
     if (args.size( ) != 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     vnum = args.front( ).toNumber( );
 
     for (obj = target->contents; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    return WrapperManager::getThis( )->getWrapper(obj); 
+        if (obj->pIndexData->vnum == vnum)
+            return WrapperManager::getThis( )->getWrapper(obj); 
 
     return Register( );
 }
 
-NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объектов в комнате по внуму" )
+NMI_INVOKE(RoomWrapper, get_obj_type, "(type): п©п╬п╦я│п╨ п©п╣я─п╡п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟ п╡ п╨п╬п╪п╫п╟я┌п╣ п©п╬ п╣пЁп╬ я┌п╦п©я┐ (я┌п╟п╠п╩п╦я├п╟ .tables.item_table)" )
+{
+    checkTarget( );
+
+    int itemType = args2number(args);
+    ::Object *obj = get_obj_room_type(target, itemType);
+    if (!obj)
+        return Register();
+    return WrapperManager::getThis( )->getWrapper(obj); 
+}
+
+NMI_INVOKE( RoomWrapper, list_obj_vnum, "(vnum): п©п╬п╦я│п╨ я│п©п╦я│п╨п╟ п╬п╠я┼п╣п╨я┌п╬п╡ п╡ п╨п╬п╪п╫п╟я┌п╣ п©п╬ п╡п╫я┐п╪я┐" )
 {
     checkTarget( );
     RegList::Pointer rc(NEW);
@@ -423,8 +457,8 @@ NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объектов в комнате по внум
     int vnum = args2number( args );
 
     for (::Object *obj = target->contents; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        if (obj->pIndexData->vnum == vnum)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -432,7 +466,7 @@ NMI_INVOKE( RoomWrapper, list_obj_vnum, "поиск списка объектов в комнате по внум
     return Register( sobj );
 }
 
-NMI_INVOKE(RoomWrapper, get_mob_vnum, "поиск моба в комнате по его внуму" )
+NMI_INVOKE(RoomWrapper, get_mob_vnum, "(vnum): п©п╬п╦я│п╨ п©п╣я─п╡п╬пЁп╬ п╪п╬п╠п╟ п╡ п╨п╬п╪п╫п╟я┌п╣ п©п╬ п╣пЁп╬ п╡п╫я┐п╪я┐" )
 {
     int vnum;
     Character *rch;
@@ -440,18 +474,18 @@ NMI_INVOKE(RoomWrapper, get_mob_vnum, "поиск моба в комнате по его внуму" )
     checkTarget( );
 
     if (args.size( ) != 1)
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     vnum = args.front( ).toNumber( );
 
     for (rch = target->people; rch; rch = rch->next_in_room)
-	if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
-	    return WrapperManager::getThis( )->getWrapper( rch ); 
+        if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
+            return WrapperManager::getThis( )->getWrapper( rch ); 
 
     return Register( );
 }
 
-NMI_INVOKE( RoomWrapper, list_mob_vnum, "поиск списка мобов в комнате по внуму" )
+NMI_INVOKE( RoomWrapper, list_mob_vnum, "(vnum): п©п╬п╦я│п╨ я│п©п╦я│п╨п╟ п╪п╬п╠п╬п╡ п╡ п╨п╬п╪п╫п╟я┌п╣ п©п╬ п╡п╫я┐п╪я┐" )
 {
     checkTarget( );
     RegList::Pointer rc(NEW);
@@ -459,8 +493,8 @@ NMI_INVOKE( RoomWrapper, list_mob_vnum, "поиск списка мобов в комнате по внуму" 
     int vnum = args2number( args );
 
     for (Character *rch = target->people; rch; rch = rch->next_in_room)
-	if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
+        if (rch->is_npc( ) && rch->getNPC( )->pIndexData->vnum == vnum)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( rch ) );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -478,25 +512,25 @@ struct FeniaDoorFunc {
     }
     bool operator () ( Room *const room, EXIT_DATA *exit ) const
     {
-	if (IS_SET(exit->exit_info, EX_LOCKED))
-	    return false;
-	
-	Room *toRoom = exit->u1.to_room;
-	bitstring_t mysector = (1 << toRoom->sector_type);
+        if (IS_SET(exit->exit_info, EX_LOCKED))
+            return false;
+        
+        Room *toRoom = exit->u1.to_room;
+        bitstring_t mysector = (1 << toRoom->sector_type);
 
-	if (sectorsAllow != 0 && !IS_SET(sectorsAllow, mysector))
-	    return false;
+        if (sectorsAllow != 0 && !IS_SET(sectorsAllow, mysector))
+            return false;
 
-	if (sectorsDeny != 0 && IS_SET(sectorsDeny, mysector))
-	    return false;
+        if (sectorsDeny != 0 && IS_SET(sectorsDeny, mysector))
+            return false;
 
-	if (!toRoom->isCommon( ))
-	    return false;
-	    
-	if (walker && !walker->canEnter( toRoom ))
-	    return false;
-	
-	return true;
+        if (!toRoom->isCommon( ))
+            return false;
+            
+        if (walker && !walker->canEnter( toRoom ))
+            return false;
+        
+        return true;
     }
      
     Character *walker;
@@ -506,14 +540,14 @@ struct FeniaDoorFunc {
 struct FeniaExtraExitFunc {
     bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
     {
-	return false;
+        return false;
     }
 };
 
 struct FeniaPortalFunc {
     bool operator () ( Room *const room, ::Object *portal ) const
     {
-	return false;
+        return false;
     }
 };
 
@@ -528,13 +562,13 @@ struct PathWithDepthComplete {
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->generation < depth && !last)
-	    return false;
+        if (head->generation < depth && !last)
+            return false;
 
-	for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
-	    rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
+            rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
 
-	return true;
+        return true;
     }
 
     int depth;
@@ -550,20 +584,20 @@ struct PathToTargetComplete {
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->node != target)
-	    return false;
-	
-	for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
-	    rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
+        if (head->node != target)
+            return false;
+        
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
+            rooms->push_front( WrapperManager::getThis( )->getWrapper( i->node ) );
 
-	return true;
+        return true;
     }
     
     Room *target;
     RegList::Pointer rooms;
 };
 
-NMI_INVOKE( RoomWrapper, traverse, "depth, walker, sectorsAllow, sectorsDeny" )
+NMI_INVOKE( RoomWrapper, traverse, "(depth, walker, sectorsAllow, sectorsDeny): п©п╬я│я┌я─п╬п╦я┌ п©я┐я┌я▄ (я│п©п╦я│п╬п╨ п╨п╬п╪п╫п╟я┌) п╢п╩я▐ я┤п╟я─п╟ walker пЁп╩я┐п╠п╦п╫я▀ depth, я│ я─п╟п╥я─п╣я┬п╣п╫п╫я▀п╪п╦-п╥п╟п©я─п╣я┴п╣п╫п╫я▀п╪п╦ я┌п╦п©п╟п╪п╦ п╪п╣я│я┌п╫п╬я│я┌п╦ п╡ п╡п╦п╢п╣ п╠п╦я┌п╬п╡я▀я┘ п╪п╟я│п╬п╨" )
 {
     bitstring_t sectorsAllow, sectorsDeny;
     int depth;
@@ -593,7 +627,7 @@ NMI_INVOKE( RoomWrapper, traverse, "depth, walker, sectorsAllow, sectorsDeny" )
     return Scripting::Register( obj );
 }
 
-NMI_INVOKE( RoomWrapper, traverseTo, "target, walker, sectorsAllow, sectorsDeny" )
+NMI_INVOKE( RoomWrapper, traverseTo, "(target, walker, sectorsAllow, sectorsDeny): п©п╬я│я┌я─п╬п╦я┌ п©я┐я┌я▄ п╢п╬ я├п╣п╩п╦ target п╢п╩я▐ я┤п╟я─п╟ walker, я│ я─п╟п╥я─п╣я┬п╣п╫п╫я▀п╪п╦-п╥п╟п©я─п╣я┴п╣п╫п╫я▀п╪п╦ я┌п╦п©п╟п╪п╦ п╪п╣я│я┌п╫п╬я│я┌п╦ п╡ п╡п╦п╢п╣ п╠п╦я┌п╬п╡я▀я┘ п╪п╟я│п╬п╨" )
 {
     bitstring_t sectorsAllow, sectorsDeny;
     Room *targetRoom;
@@ -623,7 +657,7 @@ NMI_INVOKE( RoomWrapper, traverseTo, "target, walker, sectorsAllow, sectorsDeny"
     return Scripting::Register( obj );
 }
 
-NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в этой комнате") 
+NMI_GET( RoomWrapper, resetMobiles, "я│п©п╦я│п╬п╨ п╡п╫я┐п╪п╬п╡ п╪п╬п╠п╬п╡, п╨п╬я┌п╬я─я▀п╣ я─п╣я│п╣я┌я▐я┌я│я▐ п╡ я█я┌п╬п╧ п╨п╬п╪п╫п╟я┌п╣") 
 {
     RESET_DATA *pReset;
     RegList::Pointer rc(NEW);
@@ -631,8 +665,8 @@ NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в эт
     checkTarget( );
     
     for (pReset = target->reset_first; pReset; pReset = pReset->next)
-	if (pReset->command == 'M')
-	    rc->push_back( Register( pReset->arg1 ) );
+        if (pReset->command == 'M')
+            rc->push_back( Register( pReset->arg1 ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate( );
     obj->setHandler( rc );
@@ -640,21 +674,21 @@ NMI_GET( RoomWrapper, resetMobiles, "список внумов мобов, которые ресетятся в эт
     return Register( obj );
 }    
 
-NMI_INVOKE( RoomWrapper, api, "печатает этот API" )
+NMI_INVOKE( RoomWrapper, api, "(): п©п╣я┤п╟я┌п╟п╣я┌ я█я┌п╬я┌ API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<RoomWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( RoomWrapper, rtapi, "печатает все поля и методы, установленные в runtime" )
+NMI_INVOKE( RoomWrapper, rtapi, "(): п©п╣я┤п╟я┌п╟п╣я┌ п╡я│п╣ п©п╬п╩я▐ п╦ п╪п╣я┌п╬п╢я▀, я┐я│я┌п╟п╫п╬п╡п╩п╣п╫п╫я▀п╣ п╡ runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( RoomWrapper, clear, "очистка всех runtime полей" )
+NMI_INVOKE( RoomWrapper, clear, "(): п╬я┤п╦я│я┌п╨п╟ п╡я│п╣я┘ runtime п©п╬п╩п╣п╧" )
 {
     guts.clear( );
     self->changed();

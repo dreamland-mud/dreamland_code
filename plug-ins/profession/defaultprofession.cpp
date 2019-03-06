@@ -22,17 +22,15 @@ const DLString ProfessionHelp::TYPE = "ProfessionHelp";
 
 void ProfessionHelp::setProfession( Profession::Pointer prof )
 {
-    StringSet kwd;
-
     this->prof = prof;
     
     if (!keyword.empty( ))
-	kwd.fromString( keyword );
+        keywords.fromString( keyword.toLower() );
 
-    kwd.insert( prof->getName( ) );
-    kwd.insert( prof->getRusName( ).ruscase( '1' ) );
-    kwd.insert( prof->getMltName( ).ruscase( '1' ) );
-    fullKeyword = kwd.toString( ).toUpper( );
+    keywords.insert( prof->getName( ) );
+    keywords.insert( prof->getRusName( ).ruscase( '1' ) );
+    keywords.insert( prof->getMltName( ).ruscase( '1' ) );
+    fullKeyword = keywords.toString( ).toUpper( );
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -41,47 +39,48 @@ void ProfessionHelp::unsetProfession( )
 {
     helpManager->unregistrate( Pointer( this ) );
     prof.clear( );
+    keywords.clear();
     fullKeyword = "";
 }
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "ðÒÏÆÅÓÓÉÑ {C" << prof->getRusName( ).ruscase( '1' ) << "{x ÉÌÉ {C"
+    in << "ÐŸÑ€Ð¾Ñ„ÐµÑÑÐ¸Ñ {C" << prof->getRusName( ).ruscase( '1' ) << "{x Ð¸Ð»Ð¸ {C"
        << prof->getName( ) << "{x" << endl << endl;
         
     in << *this << endl;
 
-    in << "{cèÁÒÁËÔÅÒ{x  : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
+    in << "{cÐ¥Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€{x  : " << align_name_for_range( prof->getMinAlign( ), prof->getMaxAlign( ) ) << endl;
 
     if (prof->getEthos( ).equalsToBitNumber( ETHOS_LAWFUL ))
-        in << "{cüÔÏÓ{x      : " << "ÚÁËÏÎÏÐÏÓÌÕÛÎÙÊ" << endl;
+        in << "{cÐ­Ñ‚Ð¾Ñ{x      : " << "Ð·Ð°ÐºÐ¾Ð½Ð¾Ð¿Ð¾ÑÐ»ÑƒÑˆÐ½Ñ‹Ð¹" << endl;
 
     if (prof->getSex( ).equalsToBitNumber( SEX_FEMALE ))
-        in << "{cðÏÌ{x       : " << "ÖÅÎÓËÉÊ" << endl;
+        in << "{cÐŸÐ¾Ð»{x       : " << "Ð¶ÐµÐ½ÑÐºÐ¸Ð¹" << endl;
     else if (prof->getSex( ).equalsToBitNumber( SEX_MALE ))
-        in << "{cðÏÌ{x       : " << "ÍÕÖÓËÏÊ" << endl;
+        in << "{cÐŸÐ¾Ð»{x       : " << "Ð¼ÑƒÐ¶ÑÐºÐ¾Ð¹" << endl;
 
     bool found = false;
 
-    in << "{cðÁÒÁÍÅÔÒÙ{x : ";
+    in << "{cÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹{x : ";
     for (int i = 0; i < stat_table.size - 1; i++) {
         int stat = prof->getStat( i );
         if (stat != 0) {
             if (found) 
                 in << ", ";
-            in << (stat > 0 ? "+" : "") << stat << " Ë " << stat_table.message( i, '3' );
+            in << (stat > 0 ? "+" : "") << stat << " Ðº " << stat_table.message( i, '3' );
             found = true;
         }
     }
     if (!found)
-        in << "ÂÅÚ ÉÚÍÅÎÅÎÉÊ";
+        in << "Ð±ÐµÐ· Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ð¹";
     in << endl;
 
-    in << "{cäÏÐ. ÏÐÙÔ{x : " << prof->getPoints( ) << endl;
+    in << "{cÐ”Ð¾Ð¿. Ð¾Ð¿Ñ‹Ñ‚{x : " << prof->getPoints( ) << endl;
         
-    in << endl << "{câÏÎÕÓ Ë ÕÒÏ×ÎÀ ×ÅÝÅÊ{x: ";
+    in << endl << "{cÐ‘Ð¾Ð½ÑƒÑ Ðº ÑƒÑ€Ð¾Ð²Ð½ÑŽ Ð²ÐµÑ‰ÐµÐ¹{x: ";
     if (prof->getIndex( ) == prof_universal) {
-        in << " (ÚÁ×ÉÓÉÔ ÏÔ ×ÙÂÒÁÎÎÏÊ ÐÒÏÆÅÓÓÉÉ)";
+        in << " (Ð·Ð°Ð²Ð¸ÑÐ¸Ñ‚ Ð¾Ñ‚ Ð²Ñ‹Ð±Ñ€Ð°Ð½Ð½Ð¾Ð¹ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸)";
     } else {
         found = false;
         for (int i = 0; i < item_table.size; i++) {
@@ -89,14 +88,14 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
             if (m != 0) {
                 if (found)
                     in << ", ";
-                in << (m > 0 ? "+" : "") << m << " Ë " << item_table.message( i, '3' );
+                in << (m > 0 ? "+" : "") << m << " Ðº " << item_table.message( i, '3' );
                 found = true;
             }
         }
     }
 
     in << endl;
-    in << endl << "ðÏÄÒÏÂÎÅÅ ÏÂÏ ×ÓÅÈ ÐÁÒÁÍÅÔÒÁÈ ÞÉÔÁÊ × %H% [(class stats,ÐÒÏÆÅÓÓÉÑ ÈÁÒÁËÔÅÒÉÓÔÉËÉ)]" << endl;
+    in << endl << "ÐŸÐ¾Ð´Ñ€Ð¾Ð±Ð½ÐµÐµ Ð¾Ð±Ð¾ Ð²ÑÐµÑ… Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°Ñ… Ñ‡Ð¸Ñ‚Ð°Ð¹ Ð² %H% [(class stats,Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ñ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸)]" << endl;
 }
 
 /*-------------------------------------------------------------------
@@ -109,12 +108,12 @@ const DLString & ProfessionTitlesByLevel::build( const PCMemoryInterface *pcm ) 
     unsigned int level = pcm->getLevel( );
 
     if (level >= size( ))
-	return DLString::emptyString;
-	
+        return DLString::emptyString;
+        
     const ProfessionTitlePair &pair = (*this)[level]; 
 
     return (pcm->getSex( ) == SEX_FEMALE 
-		? pair.female.getValue( ) : pair.male.getValue( ));
+                ? pair.female.getValue( ) : pair.male.getValue( ));
 }
 
 const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm ) const
@@ -126,12 +125,12 @@ const DLString & ProfessionTitlesByConstant::build( const PCMemoryInterface *pcm
  * DefaultProfession
  *------------------------------------------------------------------*/
 DefaultProfession::DefaultProfession( )
-		: stats( &stat_table ),
-		  wearModifiers( &item_table ),
-		  flags( 0, &prof_flags ),
-		  align( 0, &align_table ),
-		  ethos( 0, &ethos_table ),
-		  sex( 0, &sex_table )
+                : stats( &stat_table ),
+                  wearModifiers( &item_table ),
+                  flags( 0, &prof_flags ),
+                  align( 0, &align_table ),
+                  ethos( 0, &ethos_table ),
+                  sex( 0, &sex_table )
 {
 }
 
@@ -141,13 +140,13 @@ void DefaultProfession::loaded( )
     professionManager->registrate( Pointer( this ) );
 
     if (help)
-	help->setProfession( Pointer( this ) );
+        help->setProfession( Pointer( this ) );
 }
 
 void DefaultProfession::unloaded( )
 {
     if (help)
-	help->unsetProfession( );
+        help->unsetProfession( );
 
     professionManager->unregistrate( Pointer( this ) );
 }
@@ -248,16 +247,16 @@ GlobalBitvector DefaultProfession::toVector( Character * ) const
 DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
     if (ch && ch->getConfig( )->rucommands)
-	return getRusName( ).ruscase( c );
+        return getRusName( ).ruscase( c );
     else
-	return getName( );
+        return getName( );
 }
 
 DLString DefaultProfession::getWhoNameFor( Character *ch ) const
 {
     if (ch && ch->getConfig( )->rucommands)
-	return whoNameRus;
+        return whoNameRus;
     else
-	return whoName;
+        return whoName;
 }
 

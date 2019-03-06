@@ -31,35 +31,35 @@ public:
 class ClanItemKnight : public ClanItem {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanItemKnight> Pointer;
+        typedef ::Pointer<ClanItemKnight> Pointer;
     
-	virtual void actDisappear( );
+        virtual void actDisappear( );
 };
 
 class ClanAltarKnight : public ClanAltar {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanAltarKnight> Pointer;
+        typedef ::Pointer<ClanAltarKnight> Pointer;
 
-	virtual void actAppear( );
-	virtual void actDisappear( );
-	virtual void actNotify( Character * );
+        virtual void actAppear( );
+        virtual void actDisappear( );
+        virtual void actNotify( Character * );
 };
 
 class ClanGuardKnight: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardKnight> Pointer;
+        typedef ::Pointer<ClanGuardKnight> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual void actInvited( PCharacter *, Object * );
-	virtual void actIntruder( PCharacter * );
-	virtual void actGhost( PCharacter * );
-	virtual void actGiveInvitation( PCharacter *, Object * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual void actInvited( PCharacter *, Object * );
+        virtual void actIntruder( PCharacter * );
+        virtual void actGhost( PCharacter * );
+        virtual void actGiveInvitation( PCharacter *, Object * );
 
-	virtual int getCast( Character * );
+        virtual int getCast( Character * );
 };
 
 class KnightWeapon : public ObjectBehavior {

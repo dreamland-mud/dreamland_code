@@ -13,15 +13,15 @@ class PCharacter;
 
 class Marry : public CommandPlugin, public DefaultCommand {
 public:
-	typedef ::Pointer<Marry> Pointer;
+        typedef ::Pointer<Marry> Pointer;
     
-	Marry( );
+        Marry( );
 
-	virtual void run( Character*, const DLString& constArguments );
+        virtual void run( Character*, const DLString& constArguments );
 private:
-	PCharacter *checkBride( Character *, DLString );
+        PCharacter *checkBride( Character *, DLString );
 
-	static const DLString COMMAND_NAME;
+        static const DLString COMMAND_NAME;
 };
 
 #endif

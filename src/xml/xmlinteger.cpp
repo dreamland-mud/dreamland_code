@@ -17,7 +17,7 @@ void XMLInteger::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadTy
     XMLNode::Pointer node = parent->getFirstNode( );
     
     if (!node.isEmpty( ))
-	    fromString( node->getCData( ) );
+            fromString( node->getCData( ) );
 }
 
 bool XMLInteger::toXML( XMLNode::Pointer& parent ) const
@@ -33,9 +33,9 @@ bool XMLInteger::toXML( XMLNode::Pointer& parent ) const
 bool XMLIntegerNoEmpty::toXML( XMLNode::Pointer& parent ) const
 {
     if (getValue( ) == 0)
-	return false;
+        return false;
     else 
-	return XMLInteger::toXML( parent );
+        return XMLInteger::toXML( parent );
 }
 
 void XMLIntegerVariable::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )

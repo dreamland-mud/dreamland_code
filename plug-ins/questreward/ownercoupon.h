@@ -11,9 +11,9 @@
 class OwnerCoupon : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<OwnerCoupon> Pointer;
+        typedef ::Pointer<OwnerCoupon> Pointer;
     
-	virtual bool use( Character *, const char *);
+        virtual bool use( Character *, const char *);
         virtual bool hasTrigger( const DLString &  );
 };
 

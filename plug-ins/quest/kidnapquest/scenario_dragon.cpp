@@ -19,7 +19,7 @@
 
 CLAN(knight);
 
-bool KS::applicable( PCharacter *hero )
+bool KS::applicable( PCharacter *hero ) const
 {
     return !clan_knight->canInduct( hero );
 }
@@ -27,136 +27,136 @@ bool KS::applicable( PCharacter *hero )
 /*
  * hero messages
  */
-void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) 
+void KS::msgRemoteReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const
 {
-    act("$c1 бросается на шею $C3. Семейная сцена, сопли/слюни.", kid, 0, king, TO_ROOM);
-    hero->printf( "%s и %s уже встретились.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
-    act("Приди к $C3 за благодарностью!", hero, 0, king, TO_CHAR);
+    act("$c1 п╠я─п╬я│п╟п╣я┌я│я▐ п╫п╟ я┬п╣я▌ $C3. п║п╣п╪п╣п╧п╫п╟я▐ я│я├п╣п╫п╟, я│п╬п©п╩п╦/я│п╩я▌п╫п╦.", kid, 0, king, TO_ROOM);
+    hero->printf( "%s п╦ %s я┐п╤п╣ п╡я│я┌я─п╣я┌п╦п╩п╦я│я▄.\r\n", king->getNameP( '1' ).c_str( ), kid->getNameP( '1' ).c_str( ) );
+    act("п÷я─п╦п╢п╦ п╨ $C3 п╥п╟ п╠п╩п╟пЁп╬п╢п╟я─п╫п╬я│я┌я▄я▌!", hero, 0, king, TO_CHAR);
 }
-void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) 
+void KS::msgKingDeath( NPCharacter *king, Character *killer, PCharacter *hero ) const
 {
     if(hero == killer) {
-	act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кто нуждался в твоей помощи.{x", killer, 0, 0, TO_CHAR);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{Yп≤п╢п╦п╬$gя┌|я┌|я┌п╨п╟.... п╒я▀ я┐п╠п╦$gп╩п╬|п╩|п╩п╟ я┌п╬пЁп╬, п╨я┌п╬ п╫я┐п╤п╢п╟п╩я│я▐ п╡ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦.{x", killer, 0, 0, TO_CHAR);
+        hero->send_to("{Yп≈п╟п╢п╟п╫п╦п╣ п╬я┌п╪п╣п╫я▐п╣я┌я│я▐.{x\r\n");
     } else {
-	act("{Y$c1 подло убил того, кто нуждался в твоей помощи.{x", killer, 0, hero, TO_VICT);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{Y$c1 п©п╬п╢п╩п╬ я┐п╠п╦п╩ я┌п╬пЁп╬, п╨я┌п╬ п╫я┐п╤п╢п╟п╩я│я▐ п╡ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦.{x", killer, 0, hero, TO_VICT);
+        hero->send_to("{Yп≈п╟п╢п╟п╫п╦п╣ п╬я┌п╪п╣п╫я▐п╣я┌я│я▐.{x\r\n");
     }
 }
-void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) 
+void KS::msgKidDeath( NPCharacter *kid, Character *killer, PCharacter *hero ) const
 {
     if(hero == killer) {
-	act("{YИдио$gт|т|тка.... Ты уби$gло|л|ла того, кого долж$gно|ен|на бы$gло|л|ла спасти.{x", killer, 0, 0, TO_CHAR);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{Yп≤п╢п╦п╬$gя┌|я┌|я┌п╨п╟.... п╒я▀ я┐п╠п╦$gп╩п╬|п╩|п╩п╟ я┌п╬пЁп╬, п╨п╬пЁп╬ п╢п╬п╩п╤$gп╫п╬|п╣п╫|п╫п╟ п╠я▀$gп╩п╬|п╩|п╩п╟ я│п©п╟я│я┌п╦.{x", killer, 0, 0, TO_CHAR);
+        hero->send_to("{Yп≈п╟п╢п╟п╫п╦п╣ п╬я┌п╪п╣п╫я▐п╣я┌я│я▐.{x\r\n");
     } else {
-	act("{Y$c1 подло уби$gло|л|ла того, кого тебе было поручено спасти.{x", killer, 0, hero, TO_VICT);
-	hero->send_to("{YЗадание отменяется.{x\r\n");
+        act("{Y$c1 п©п╬п╢п╩п╬ я┐п╠п╦$gп╩п╬|п╩|п╩п╟ я┌п╬пЁп╬, п╨п╬пЁп╬ я┌п╣п╠п╣ п╠я▀п╩п╬ п©п╬я─я┐я┤п╣п╫п╬ я│п©п╟я│я┌п╦.{x", killer, 0, hero, TO_VICT);
+        hero->send_to("{Yп≈п╟п╢п╟п╫п╦п╣ п╬я┌п╪п╣п╫я▐п╣я┌я│я▐.{x\r\n");
     }
 }
 
 /*
  * bandit actions
  */
-void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) 
+void KS::actAttackHero( NPCharacter *bandit, PCharacter *hero ) const
 {
     if (!hero->fighting) {
-	act("$c1 сквозь зубы произносит: '{gДракону помогаешь? Может ты и са$Gмо|м|ма дракон?{x'.", bandit, 0, hero, TO_ROOM);
-	act("$c1 сквозь зубы произносит: '{gСейчас посмотрим, какого цвета у тебя кровь...{x'.", bandit, 0, 0, TO_ROOM);
+        act("$c1 я│п╨п╡п╬п╥я▄ п╥я┐п╠я▀ п©я─п╬п╦п╥п╫п╬я│п╦я┌: '{gп■я─п╟п╨п╬п╫я┐ п©п╬п╪п╬пЁп╟п╣я┬я▄? п°п╬п╤п╣я┌ я┌я▀ п╦ я│п╟$Gп╪п╬|п╪|п╪п╟ п╢я─п╟п╨п╬п╫?{x'.", bandit, 0, hero, TO_ROOM);
+        act("$c1 я│п╨п╡п╬п╥я▄ п╥я┐п╠я▀ п©я─п╬п╦п╥п╫п╬я│п╦я┌: '{gп║п╣п╧я┤п╟я│ п©п╬я│п╪п╬я┌я─п╦п╪, п╨п╟п╨п╬пЁп╬ я├п╡п╣я┌п╟ я┐ я┌п╣п╠я▐ п╨я─п╬п╡я▄...{x'.", bandit, 0, 0, TO_ROOM);
     }
 }
-void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) 
+void KS::actBeginKidnap( NPCharacter *bandit, NPCharacter *kid ) const 
 {
-    act("$c1 одевает на $C2 ошейник и тащит за собой.", bandit, 0, kid, TO_ROOM);
+    act("$c1 п╬п╢п╣п╡п╟п╣я┌ п╫п╟ $C2 п╬я┬п╣п╧п╫п╦п╨ п╦ я┌п╟я┴п╦я┌ п╥п╟ я│п╬п╠п╬п╧.", bandit, 0, kid, TO_ROOM);
 }
-void KS::actHuntStep( NPCharacter *bandit ) 
+void KS::actHuntStep( NPCharacter *bandit ) const 
 {
     if(number_percent() < 10)
-	act("$c1 задумчиво всматривается вдаль.", bandit, 0, 0, TO_ROOM);
+        act("$c1 п╥п╟п╢я┐п╪я┤п╦п╡п╬ п╡я│п╪п╟я┌я─п╦п╡п╟п╣я┌я│я▐ п╡п╢п╟п╩я▄.", bandit, 0, 0, TO_ROOM);
 }
-void KS::actKidnapStep( NPCharacter *bandit, NPCharacter *kid ) 
+void KS::actKidnapStep( NPCharacter *bandit, NPCharacter *kid ) const 
 {
     if(number_percent() < 10)
-	act("$c1 злобно дергает драконенка за поводок.", bandit, 0, 0, TO_ROOM);
+        act("$c1 п╥п╩п╬п╠п╫п╬ п╢п╣я─пЁп╟п╣я┌ п╢я─п╟п╨п╬п╫п╣п╫п╨п╟ п╥п╟ п©п╬п╡п╬п╢п╬п╨.", bandit, 0, 0, TO_ROOM);
 }
-void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) 
+void KS::actEmptyPath( NPCharacter *bandit, NPCharacter *kid ) const 
 {
     if(number_percent() < 10)
-	act("$c1 озадаченно оглядывается по сторонам.", bandit, 0, 0, TO_ROOM);
+        act("$c1 п╬п╥п╟п╢п╟я┤п╣п╫п╫п╬ п╬пЁп╩я▐п╢я▀п╡п╟п╣я┌я│я▐ п©п╬ я│я┌п╬я─п╬п╫п╟п╪.", bandit, 0, 0, TO_ROOM);
 }
 
 /*
  * king actions
  */
-void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer quest ) 
+void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer quest ) const 
 {
-    act("$c1 говорит тебе '{GУ меня недавно встал на крыло дракончик.. не по годам рано.{x'", king, 0, hero, TO_VICT);
-    act("$c1 говорит тебе '{GОт радости он улетел так далеко, что, похоже, не может найти дороги обратно.{x'", king, 0, hero, TO_VICT);
-    act("$c1 говорит тебе '{GНайди его и верни, пока до него не добрались охотники за драконами.{x'", king, 0, hero, TO_VICT);
-    act("$c1 говорит тебе '{GСкорее всего ты встретишь его в местности $t.{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gпё п╪п╣п╫я▐ п╫п╣п╢п╟п╡п╫п╬ п╡я│я┌п╟п╩ п╫п╟ п╨я─я▀п╩п╬ п╢я─п╟п╨п╬п╫я┤п╦п╨.. п╫п╣ п©п╬ пЁп╬п╢п╟п╪ я─п╟п╫п╬.{x'", king, 0, hero, TO_VICT);
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп·я┌ я─п╟п╢п╬я│я┌п╦ п╬п╫ я┐п╩п╣я┌п╣п╩ я┌п╟п╨ п╢п╟п╩п╣п╨п╬, я┤я┌п╬, п©п╬я┘п╬п╤п╣, п╫п╣ п╪п╬п╤п╣я┌ п╫п╟п╧я┌п╦ п╢п╬я─п╬пЁп╦ п╬п╠я─п╟я┌п╫п╬.{x'", king, 0, hero, TO_VICT);
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп²п╟п╧п╢п╦ п╣пЁп╬ п╦ п╡п╣я─п╫п╦, п©п╬п╨п╟ п╢п╬ п╫п╣пЁп╬ п╫п╣ п╢п╬п╠я─п╟п╩п╦я│я▄ п╬я┘п╬я┌п╫п╦п╨п╦ п╥п╟ п╢я─п╟п╨п╬п╫п╟п╪п╦.{x'", king, 0, hero, TO_VICT);
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп║п╨п╬я─п╣п╣ п╡я│п╣пЁп╬ я┌я▀ п╡я│я┌я─п╣я┌п╦я┬я▄ п╣пЁп╬ п╡ п╪п╣я│я┌п╫п╬я│я┌п╦ $t.{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
 }
-void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) 
+void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {
     char buf[MAX_STRING_LENGTH];
     
-    act("$c1 вручает тебе $o4.", king, mark, hero, TO_VICT);
-    act("$c1 вручает $C3 $o4.", king, mark, hero, TO_NOTVICT);
+    act("$c1 п╡я─я┐я┤п╟п╣я┌ я┌п╣п╠п╣ $o4.", king, mark, hero, TO_VICT);
+    act("$c1 п╡я─я┐я┤п╟п╣я┌ $C3 $o4.", king, mark, hero, TO_NOTVICT);
 
-    act("$c1 говорит тебе '{GПередай эту игрушку моему малышу, чтобы он знал, что тебе можно доверять.{x'", king, 0, hero, TO_VICT);
-    sprintf( buf, "$c1 говорит тебе '{GПоторопись! У тебя будет всего {Y%d{G минут%s, чтобы вернуть его в целости и сохранности.{x'",
-             time, GET_COUNT(time, "а", "ы", "") );
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп÷п╣я─п╣п╢п╟п╧ я█я┌я┐ п╦пЁя─я┐я┬п╨я┐ п╪п╬п╣п╪я┐ п╪п╟п╩я▀я┬я┐, я┤я┌п╬п╠я▀ п╬п╫ п╥п╫п╟п╩, я┤я┌п╬ я┌п╣п╠п╣ п╪п╬п╤п╫п╬ п╢п╬п╡п╣я─я▐я┌я▄.{x'", king, 0, hero, TO_VICT);
+    sprintf( buf, "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп÷п╬я┌п╬я─п╬п©п╦я│я▄! пё я┌п╣п╠я▐ п╠я┐п╢п╣я┌ п╡я│п╣пЁп╬ {Y%d{G п╪п╦п╫я┐я┌%s, я┤я┌п╬п╠я▀ п╡п╣я─п╫я┐я┌я▄ п╣пЁп╬ п╡ я├п╣п╩п╬я│я┌п╦ п╦ я│п╬я┘я─п╟п╫п╫п╬я│я┌п╦.{x'",
+             time, GET_COUNT(time, "п╟", "я▀", "") );
     act(buf, king, 0, hero, TO_VICT);
 }
-void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) 
+void KS::actMarkLost( NPCharacter *king, PCharacter *hero, Object * mark ) const 
 {
-    act("$c1 дает тебе $o4.", king, mark, hero, TO_VICT);
-    act("$c1 дает $C3 $o4.", king, mark, hero, TO_NOTVICT);
-    act("$c1 вздыхает в присутствии Еще Одного Идиота.", king, 0, 0, TO_ROOM);
-    act("$c1 говорит тебе '{GВ следующий раз будь повнимательнее.{x'", king, 0, hero, TO_VICT);
+    act("$c1 п╢п╟п╣я┌ я┌п╣п╠п╣ $o4.", king, mark, hero, TO_VICT);
+    act("$c1 п╢п╟п╣я┌ $C3 $o4.", king, mark, hero, TO_NOTVICT);
+    act("$c1 п╡п╥п╢я▀я┘п╟п╣я┌ п╡ п©я─п╦я│я┐я┌я│я┌п╡п╦п╦ п∙я┴п╣ п·п╢п╫п╬пЁп╬ п≤п╢п╦п╬я┌п╟.", king, 0, 0, TO_ROOM);
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп▓ я│п╩п╣п╢я┐я▌я┴п╦п╧ я─п╟п╥ п╠я┐п╢я▄ п©п╬п╡п╫п╦п╪п╟я┌п╣п╩я▄п╫п╣п╣.{x'", king, 0, hero, TO_VICT);
 }
-void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) 
+void KS::actAckWaitComplete( NPCharacter *king, PCharacter *hero ) const 
 {
-    act("$c1 сердечно благодарит тебя.", king, 0, hero, TO_VICT);
-    act("$c1 сердечно благодарит $C4.", king, 0, hero, TO_NOTVICT);
-    act("$c1 говорит тебе: '{GДостой$Gное|ный|ная! Ступай за славой к тому, кто дал тебе задание!{x'.", king, 0, hero, TO_VICT);
+    act("$c1 я│п╣я─п╢п╣я┤п╫п╬ п╠п╩п╟пЁп╬п╢п╟я─п╦я┌ я┌п╣п╠я▐.", king, 0, hero, TO_VICT);
+    act("$c1 я│п╣я─п╢п╣я┤п╫п╬ п╠п╩п╟пЁп╬п╢п╟я─п╦я┌ $C4.", king, 0, hero, TO_NOTVICT);
+    act("$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣: '{Gп■п╬я│я┌п╬п╧$Gп╫п╬п╣|п╫я▀п╧|п╫п╟я▐! п║я┌я┐п©п╟п╧ п╥п╟ я│п╩п╟п╡п╬п╧ п╨ я┌п╬п╪я┐, п╨я┌п╬ п╢п╟п╩ я┌п╣п╠п╣ п╥п╟п╢п╟п╫п╦п╣!{x'.", king, 0, hero, TO_VICT);
 }
 
 /*
  * kid actions
  */
-void KS::actHeroWait( NPCharacter *kid ) 
+void KS::actHeroWait( NPCharacter *kid ) const 
 {
     if(number_percent( ) < 10)
-	act("$c1 оглядывается по сторонам в поисках хоть чего-нибудь знакомого.", kid, 0, 0, TO_ROOM);
+        act("$c1 п╬пЁп╩я▐п╢я▀п╡п╟п╣я┌я│я▐ п©п╬ я│я┌п╬я─п╬п╫п╟п╪ п╡ п©п╬п╦я│п╨п╟я┘ я┘п╬я┌я▄ я┤п╣пЁп╬-п╫п╦п╠я┐п╢я▄ п╥п╫п╟п╨п╬п╪п╬пЁп╬.", kid, 0, 0, TO_ROOM);
 }
-void KS::actNoHero( NPCharacter *kid, PCharacter *hero ) 
+void KS::actNoHero( NPCharacter *kid, PCharacter *hero ) const 
 {
     if (number_percent( ) < 10 && hero && hero->in_room != kid->in_room)
-	act("$c1 потерянно озирается в поисках $C2.", kid, 0, hero, TO_ROOM);
+        act("$c1 п©п╬я┌п╣я─я▐п╫п╫п╬ п╬п╥п╦я─п╟п╣я┌я│я▐ п╡ п©п╬п╦я│п╨п╟я┘ $C2.", kid, 0, hero, TO_ROOM);
 }
-void KS::actHeroDetach( NPCharacter *kid, PCharacter *hero ) 
+void KS::actHeroDetach( NPCharacter *kid, PCharacter *hero ) const 
 {
-    interpret( kid, "yell Я потерялся!!!" );
+    interpret( kid, "yell п╞ п©п╬я┌п╣я─я▐п╩я│я▐!!!" );
 }
-void KS::actWrongGiver( NPCharacter *kid, Character *victim, Object *obj ) 
+void KS::actWrongGiver( NPCharacter *kid, Character *victim, Object *obj ) const 
 {
-    act("$c1 безо всякого интереса смотрит на $o4.", kid, obj, 0, TO_ROOM);
+    act("$c1 п╠п╣п╥п╬ п╡я│я▐п╨п╬пЁп╬ п╦п╫я┌п╣я─п╣я│п╟ я│п╪п╬я┌я─п╦я┌ п╫п╟ $o4.", kid, obj, 0, TO_ROOM);
 }
-void KS::actWrongMark( NPCharacter *kid, Character *victim, Object *obj ) 
+void KS::actWrongMark( NPCharacter *kid, Character *victim, Object *obj ) const 
 {
-    act("$c1 пытается пшикнуть себе в пасть из $o2.", kid, obj, 0, TO_ROOM);
-    act("$c1 разочарованно сопит.", kid, 0, 0, TO_ROOM);
+    act("$c1 п©я▀я┌п╟п╣я┌я│я▐ п©я┬п╦п╨п╫я┐я┌я▄ я│п╣п╠п╣ п╡ п©п╟я│я┌я▄ п╦п╥ $o2.", kid, obj, 0, TO_ROOM);
+    act("$c1 я─п╟п╥п╬я┤п╟я─п╬п╡п╟п╫п╫п╬ я│п╬п©п╦я┌.", kid, 0, 0, TO_ROOM);
 }
-void KS::actGoodMark( NPCharacter *kid, Character *victim, Object *obj ) 
+void KS::actGoodMark( NPCharacter *kid, Character *victim, Object *obj ) const 
 {
-    act("$c1 пшикает себе в пасть $o5. Из носа валит пар. \r\nРебенок счастлив.", kid, obj, 0, TO_ROOM);
+    act("$c1 п©я┬п╦п╨п╟п╣я┌ я│п╣п╠п╣ п╡ п©п╟я│я┌я▄ $o5. п≤п╥ п╫п╬я│п╟ п╡п╟п╩п╦я┌ п©п╟я─. \r\nп═п╣п╠п╣п╫п╬п╨ я│я┤п╟я│я┌п╩п╦п╡.", kid, obj, 0, TO_ROOM);
 }
-void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) 
+void KS::actReunion( NPCharacter *kid, NPCharacter *king, PCharacter *hero ) const 
 {
-    act("$c1 бросается на шею $C3. Семейная сцена, сопли/слюни.", kid, 0, king, TO_ROOM);
+    act("$c1 п╠я─п╬я│п╟п╣я┌я│я▐ п╫п╟ я┬п╣я▌ $C3. п║п╣п╪п╣п╧п╫п╟я▐ я│я├п╣п╫п╟, я│п╬п©п╩п╦/я│п╩я▌п╫п╦.", kid, 0, king, TO_ROOM);
     actAckWaitComplete(king, hero);
 }
-void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) 
+void KS::actBanditsUnleash( NPCharacter *kid, PCharacter *hero, NPCharacter *bandit ) const 
 {
-    act("{YВнезапно из засады выпрыгивает банда рыцарей-драконоборцев!{x", kid, 0, 0, TO_ROOM);
-    act("В их глазах можно прочесть смешанные чувства: жадность, праведность, коварность и ненависть.", kid, 0, 0, TO_ROOM);
+    act("{Yп▓п╫п╣п╥п╟п©п╫п╬ п╦п╥ п╥п╟я│п╟п╢я▀ п╡я▀п©я─я▀пЁп╦п╡п╟п╣я┌ п╠п╟п╫п╢п╟ я─я▀я├п╟я─п╣п╧-п╢я─п╟п╨п╬п╫п╬п╠п╬я─я├п╣п╡!{x", kid, 0, 0, TO_ROOM);
+    act("п▓ п╦я┘ пЁп╩п╟п╥п╟я┘ п╪п╬п╤п╫п╬ п©я─п╬я┤п╣я│я┌я▄ я│п╪п╣я┬п╟п╫п╫я▀п╣ я┤я┐п╡я│я┌п╡п╟: п╤п╟п╢п╫п╬я│я┌я▄, п©я─п╟п╡п╣п╢п╫п╬я│я┌я▄, п╨п╬п╡п╟я─п╫п╬я│я┌я▄ п╦ п╫п╣п╫п╟п╡п╦я│я┌я▄.", kid, 0, 0, TO_ROOM);
 }

@@ -19,35 +19,35 @@ bool XMLAttributeMarriage::handle( const WhoisArguments &args )
     DLString buf;
 
     if (!spouse.empty( )) {
-	PCMemoryInterface *spousePCM = PCharacterManager::find( spouse );
+        PCMemoryInterface *spousePCM = PCharacterManager::find( spouse );
 
-	if (spousePCM) {
-	    if (wife)
-		buf << "ÚÁÍÕÖÅÍ ÚÁ ";
-	    else 
-		buf << "ÖÅÎÁÔ" << GET_SEX( args.pch, "", "Ï", "Á" ) << " ÎÁ ";
-	} else {
-	    if (wife)
-		buf << "×ÄÏ×Á ";
-	    else
-		buf << "×ÄÏ×ÅÃ ";
-	}
+        if (spousePCM) {
+            if (wife)
+                buf << "Ð·Ð°Ð¼ÑƒÐ¶ÐµÐ¼ Ð·Ð° ";
+            else 
+                buf << "Ð¶ÐµÐ½Ð°Ñ‚" << GET_SEX( args.pch, "", "Ð¾", "Ð°" ) << " Ð½Ð° ";
+        } else {
+            if (wife)
+                buf << "Ð²Ð´Ð¾Ð²Ð° ";
+            else
+                buf << "Ð²Ð´Ð¾Ð²ÐµÑ† ";
+        }
 
-	buf << "{W" << spouse << "{w";
+        buf << "{W" << spouse << "{w";
     } 
 
     if (!history.empty( )) {
-	if (!spouse.empty( ))
-	    buf << ", ";
+        if (!spouse.empty( ))
+            buf << ", ";
 
-	buf << "ÂÙÌ" << GET_SEX( args.pch, " ÖÅÎÁÔ(ÚÁÍÕÖÅÍ)", "Ï", "Á ÚÁÍÕÖÅÍ(ÖÅÎÁÔÁ)" ) 
-	    << " {W" << history.size( ) 
-	    << "{w ÒÁÚ" << GET_COUNT( history.size( ), "", "Á", "" );
+        buf << "Ð±Ñ‹Ð»" << GET_SEX( args.pch, " Ð¶ÐµÐ½Ð°Ñ‚(Ð·Ð°Ð¼ÑƒÐ¶ÐµÐ¼)", "Ð¾", "Ð° Ð·Ð°Ð¼ÑƒÐ¶ÐµÐ¼(Ð¶ÐµÐ½Ð°Ñ‚Ð°)" ) 
+            << " {W" << history.size( ) 
+            << "{w Ñ€Ð°Ð·" << GET_COUNT( history.size( ), "", "Ð°", "" );
     }
 
     if (!buf.empty( )) {
-	args.lines.push_back( buf );
-	return true;
+        args.lines.push_back( buf );
+        return true;
     }
 
     return false;

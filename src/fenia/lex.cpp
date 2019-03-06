@@ -31,7 +31,7 @@ Lex::resolve(const DLString &s)
     std::map<DLString, id_t>::iterator i = str2id.find(s);
     
     if(i != str2id.end())
-	return i->second;
+        return i->second;
     
     str2id[s] = lastid;
     id2str[lastid] = s;
@@ -43,12 +43,12 @@ Lex *
 Lex::getThis()
 {
     if(!self) {
-	new Lex();
-	/*XXX - ?*/
-	self->id2str[ID_THIS] = "this";
-	self->str2id["this"] = ID_THIS;
-	self->id2str[ID_ORIGIN] = "origin";
-	self->str2id["origin"] = ID_ORIGIN;
+        new Lex();
+        /*XXX - ?*/
+        self->id2str[ID_THIS] = "this";
+        self->str2id["this"] = ID_THIS;
+        self->id2str[ID_ORIGIN] = "origin";
+        self->str2id["origin"] = ID_ORIGIN;
     }
     
     return self;
@@ -57,7 +57,7 @@ Lex::getThis()
 IdRef::operator Register ()
 {
     if(id == ID_UNDEF)
-	id = Lex::getThis()->resolve(name);
+        id = Lex::getThis()->resolve(name);
 
     return Register(id);
 }
@@ -68,9 +68,9 @@ XMLIdentifier::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType
     XMLNode::Pointer node = parent->getFirstNode( );
 
     if( node && (node->getType( ) == XMLNode::XML_CDATA || 
-		 node->getType( ) == XMLNode::XML_TEXT) )
+                 node->getType( ) == XMLNode::XML_TEXT) )
     {
-	value = Lex::getThis()->resolve(node->getCData( ));
+        value = Lex::getThis()->resolve(node->getCData( ));
     }
 }
 

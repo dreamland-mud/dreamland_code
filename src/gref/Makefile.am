@@ -9,6 +9,7 @@ INCLUDES = \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../util \
 -I$(srcdir)/../xml \
+-I$(srcdir)/../alloc \
 -I$(srcdir)/../l10n
 
 AM_CPPFLAGS =  -Wall
@@ -21,5 +22,6 @@ globalregistryelement.cpp \
 globalreference.cpp \
 xmlglobalarray.cpp \
 xmlglobalbitvector.cpp \
-xmlglobalreference.cpp 
+xmlglobalreference.cpp \
+globalprofilearray.cpp
 

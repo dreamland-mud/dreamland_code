@@ -18,12 +18,12 @@ extern "C"
 {
     SO::PluginList initialize_social( )
     {
-	SO::PluginList ppl;
-	Plugin::registerPlugin<SocialManager>( ppl );
-	Plugin::registerPlugin<CustomSocialManager>( ppl );
-	Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeCustomSocials> >( ppl );
-	Plugin::registerPlugin<MySocial>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        Plugin::registerPlugin<SocialManager>( ppl );
+        Plugin::registerPlugin<CustomSocialManager>( ppl );
+        Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeCustomSocials> >( ppl );
+        Plugin::registerPlugin<MySocial>( ppl );
+        
+        return ppl;
     }
 }

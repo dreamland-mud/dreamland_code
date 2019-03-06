@@ -45,18 +45,18 @@ Descriptor::Descriptor()
 Descriptor::~Descriptor()
 {
     if(host)
-	free_string( host );
+        free_string( host );
     if(realip)
-	free_string( realip );
+        free_string( realip );
     if(outbuf)
-	free(outbuf);
+        free(outbuf);
 }
 
 void 
 Descriptor::send(const char *buf)
 {
     if(buffer_handler)
-	buffer_handler->write(this, buf);
+        buffer_handler->write(this, buf);
 }
 
 void Descriptor::printf( const char *format, ... ) 
@@ -77,14 +77,14 @@ Descriptor::close( )
     Descriptor *d;
 
     if (snoop_by)
-	snoop_by->send("Your victim has left the game.\n\r");
+        snoop_by->send("Your victim has left the game.\n\r");
 
     for (d = descriptor_list; d; d = d->next)
-	if (d->snoop_by == this)
-	    d->snoop_by = 0;
+        if (d->snoop_by == this)
+            d->snoop_by = 0;
     
     for (handle_input_t::iterator h = handle_input.begin( ); h != handle_input.end( ); h++)
-	(*h)->close( this );
+        (*h)->close( this );
 
     if(character)
         character->desc = NULL;
@@ -107,18 +107,18 @@ Descriptor::slay( )
 #endif
 
     if ( descriptor_list == this )
-	descriptor_list = next;
+        descriptor_list = next;
     else {
-	Descriptor *d;
+        Descriptor *d;
 
-	for ( d = descriptor_list; d ; d = d->next )
-	    if(d->next == this) {
-		d->next = next;
-		break;
-	    }
+        for ( d = descriptor_list; d ; d = d->next )
+            if(d->next == this) {
+                d->next = next;
+                break;
+            }
 
-	if (!d)
-	    throw Exception( "Close_socket: dclose not found." );
+        if (!d)
+            throw Exception( "Close_socket: dclose not found." );
     }
 
     delete this;
@@ -238,13 +238,13 @@ Descriptor::writeFd(const unsigned char *txt, int length)
     int nWrite = 0;
 
     for ( iStart = 0; iStart < length; iStart += nWrite ) {
-	int nBlock = min( length - iStart, 4096 );
-	nWrite = ::send( descriptor, (const char*)txt + iStart, nBlock, 0 );
+        int nBlock = min( length - iStart, 4096 );
+        nWrite = ::send( descriptor, (const char*)txt + iStart, nBlock, 0 );
 
-	if ( nWrite < 0 ) {
-	    LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "):" << strerror( errno ) << endl;
-	    return -1;
-	}
+        if ( nWrite < 0 ) {
+            LogStream::sendWarning( ) << "Descriptor::writeFd(" << descriptor << "):" << strerror( errno ) << endl;
+            return -1;
+        }
     }
 
     return iStart;
@@ -257,20 +257,20 @@ Descriptor::processMccp( )
     int len = out_compress->next_out - out_compress_buf;
 
     if (len > 0) {
-	int written = writeSock(out_compress_buf, len);
+        int written = writeSock(out_compress_buf, len);
 
-	if(written < 0)
-	    return written;
+        if(written < 0)
+            return written;
 
-	if (!written)
-	    return 0;
+        if (!written)
+            return 0;
 
-	if (written < len)
-	    memmove(out_compress_buf, out_compress_buf + written, len - written);
+        if (written < len)
+            memmove(out_compress_buf, out_compress_buf + written, len - written);
 
-	out_compress->next_out = out_compress_buf + len - written;
-	
-	return written;
+        out_compress->next_out = out_compress_buf + len - written;
+        
+        return written;
     }
     return 0;
 }
@@ -279,29 +279,29 @@ int
 Descriptor::writeMccp(const unsigned char *txt, int length)
 {
     if(!out_compress)
-	return writeSock(txt, length);
+        return writeSock(txt, length);
 
     out_compress->next_in = (unsigned char *)txt;
     out_compress->avail_in = length;
 
     while (out_compress->avail_in) {
-	do {
-	    out_compress->avail_out = COMPRESS_BUF_SIZE - 
-			     (out_compress->next_out - out_compress_buf);
+        do {
+            out_compress->avail_out = COMPRESS_BUF_SIZE - 
+                             (out_compress->next_out - out_compress_buf);
 
-	    if (out_compress->avail_out) {
-		int status = deflate(out_compress, Z_SYNC_FLUSH);
+            if (out_compress->avail_out) {
+                int status = deflate(out_compress, Z_SYNC_FLUSH);
 
-		if (status != Z_OK)
-		    return -1;
-	    }
+                if (status != Z_OK)
+                    return -1;
+            }
 
-	    int rc = processMccp( );
-	    if (rc < 0)
-		return -1;
-	    else if (rc == 0)
-		break;
-	} while(out_compress->avail_out == 0);
+            int rc = processMccp( );
+            if (rc < 0)
+                return -1;
+            else if (rc == 0)
+                break;
+        } while(out_compress->avail_out == 0);
     }
 
     return length - out_compress->avail_in;
@@ -311,15 +311,15 @@ bool
 Descriptor::startMccp(unsigned char telopt)
 {
     static const unsigned char enable_compress[] = 
-	{ IAC, SB, TELOPT_COMPRESS, WILL, SE };
+        { IAC, SB, TELOPT_COMPRESS, WILL, SE };
     static const unsigned char enable_compress2[] = 
-	{ IAC, SB, TELOPT_COMPRESS2, IAC, SE };
+        { IAC, SB, TELOPT_COMPRESS2, IAC, SE };
 
     if (out_compress)
         return true;
 
     LogStream::sendNotice( ) << "Starting compression for descriptor "
-	                    << descriptor << endl;
+                            << descriptor << endl;
 
     z_stream *s;
 
@@ -364,7 +364,7 @@ Descriptor::stopMccp( )
         return true;
 
     LogStream::sendNotice( ) << "Stopping compression for descriptor " 
-	                     << descriptor << endl;
+                             << descriptor << endl;
 
     out_compress->avail_in = 0;
     out_compress->next_in = dummy;
@@ -401,9 +401,9 @@ Descriptor::writeRaw(const unsigned char *txt, int length)
 const char * Descriptor::getRealHost( ) const
 {
     if (via.empty( ))
-	return host;
+        return host;
     else
-	return via.back( ).second.c_str( );
+        return via.back( ).second.c_str( );
 }
 
 

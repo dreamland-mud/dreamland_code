@@ -34,13 +34,13 @@ public:
     
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
-    virtual bool canTeach( NPCharacter *, PCharacter * );
+    virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
     virtual void show( PCharacter *, std::ostream & ); 
 
     virtual const DLString & getCategory( ) const
     {
-	return CATEGORY;
+        return CATEGORY;
     }
     
 protected:

@@ -50,6 +50,7 @@ protected:
     static void printLine( Character *, Price::Pointer, const DLString &, const DLString &, ostringstream & );
 
     XML_VARIABLE XMLString name;
+    XML_VARIABLE XMLString rname;
     XML_VARIABLE XMLString descr;
     XML_VARIABLE XMLPointer<Price> price;
 };

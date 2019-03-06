@@ -12,7 +12,7 @@
 #include "def.h"
 
 WordEffect::WordEffect( )
-               : object( false )
+               : object( false ), offensive(false)
 {
 }
 
@@ -34,6 +34,11 @@ bool WordEffect::isGlobal( ) const
 bool WordEffect::isObject( ) const
 {
     return object.getValue( );
+}
+
+bool WordEffect::isOffensive( ) const
+{
+    return offensive.getValue( );
 }
 
 bool WordEffect::run( PCharacter *, Character * ) const

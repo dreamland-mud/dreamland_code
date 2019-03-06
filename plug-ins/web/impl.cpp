@@ -4,7 +4,6 @@
  */
 #include "webprompt.h"
 #include "webpromptattribute.h"
-#include "webitemmanip.h"
 #include "logstream.h"
 #include "xmlattributeticker.h"
 #include "xmlattributeplugin.h"
@@ -146,30 +145,30 @@ Json::Value WhoWebPromptListener::jsonWho( Character *ch )
 
     // Find all visible players.
     for (Descriptor *d = descriptor_list; d; d = d->next) {
-	PCharacter *victim;
-	
-	if (d->connected != CON_PLAYING || !d->character)
-	    continue;
+        PCharacter *victim;
+        
+        if (d->connected != CON_PLAYING || !d->character)
+            continue;
 
-	victim = d->character->getPC( );
+        victim = d->character->getPC( );
 
-	if (!ch->can_see( victim ))
-	    continue;
+        if (!ch->can_see( victim ))
+            continue;
 
-	XMLAttributes *attrs = &victim->getAttributes( );
-	if (attrs->isAvailable("nowho"))
-	    continue;
-	
-	if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
-	    continue;
-	
-	players.push_back( victim );
+        XMLAttributes *attrs = &victim->getAttributes( );
+        if (attrs->isAvailable("nowho"))
+            continue;
+        
+        if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
+            continue;
+        
+        players.push_back( victim );
     }
 
     // Populate player list.
     int pc = 0;
     for (p = players.begin( ); p != players.end( ); p++) {
-	who["p"][pc++] = jsonPlayer( ch, *p );
+        who["p"][pc++] = jsonPlayer( ch, *p );
     }
     // Visible player count.
     who["v"] = DLString(players.size()); 
@@ -223,7 +222,7 @@ Json::Value GroupWebPromptListener::jsonGroupMember( Character *ch, Character *g
     json["level"] = gch->getRealLevel( );
 
     if (gch->is_npc( ))
-	json["tnl"] = "";
+        json["tnl"] = "";
     else
         json["tnl"] = gch->getPC( )->getExpToLevel( );
 
@@ -242,20 +241,20 @@ Json::Value GroupWebPromptListener::jsonGroup( Character *ch )
 
     for (Character *gch = char_list; gch != 0; gch = gch->next )
         if (is_same_group( gch, ch )) {
-		if (gch->is_npc( ))
-		    mobs.push_back( gch );
+                if (gch->is_npc( ))
+                    mobs.push_back( gch );
                 else if (gch != leader)
                     players.push_back( gch );
-	}
+        }
 
     int pc = 0;
     int npc = 0;
     for (p = players.begin( ); p != players.end( ); p++) {
-	group["pc"][pc++] = jsonGroupMember( ch, *p );
+        group["pc"][pc++] = jsonGroupMember( ch, *p );
     }
-	
+        
     for (m = mobs.begin( ); m != mobs.end( ); m++) {
-	group["npc"][npc++] = jsonGroupMember( ch, *m );
+        group["npc"][npc++] = jsonGroupMember( ch, *m );
     }
 
     group["leader"] = jsonGroupMember( ch, leader );
@@ -327,18 +326,18 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
         EXIT_DATA *pexit;
         Room *room;
 
-	if (!( pexit = ch->in_room->exit[door] ))
-	    continue;
-	if (!( room = pexit->u1.to_room ))
-	    continue;
-	if (!ch->can_see( room ))
-	    continue;
+        if (!( pexit = ch->in_room->exit[door] ))
+            continue;
+        if (!( room = pexit->u1.to_room ))
+            continue;
+        if (!ch->can_see( room ))
+            continue;
 
-	if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
+        if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
             visible << dirs[door].name[0];
-	} else if (number_percent() < gsn_perception->getEffective( ch )) {
+        } else if (number_percent() < gsn_perception->getEffective( ch )) {
             hidden << dirs[door].name[0];
-	}
+        }
     }
 
     Json::Value exits;
@@ -390,40 +389,40 @@ Json::Value CalendarWebPromptListener::jsonWeather( Descriptor *d, Character *ch
     if (!canSeeWeather( ch ))
         return Json::Value( );
 
-    // Небо (ясное|облачное|дождливое|во вспышках молний)
-    // ->     ясно   облачно  дождь    гроза
-    // и дует (теплый южный | холодный северный) ветер
-    // ->      теплый        холодный          ветер
+    // п²п╣п╠п╬ (я▐я│п╫п╬п╣|п╬п╠п╩п╟я┤п╫п╬п╣|п╢п╬п╤п╢п╩п╦п╡п╬п╣|п╡п╬ п╡я│п©я▀я┬п╨п╟я┘ п╪п╬п╩п╫п╦п╧)
+    // ->     я▐я│п╫п╬   п╬п╠п╩п╟я┤п╫п╬  п╢п╬п╤п╢я▄    пЁя─п╬п╥п╟
+    // п╦ п╢я┐п╣я┌ (я┌п╣п©п╩я▀п╧ я▌п╤п╫я▀п╧ | я┘п╬п╩п╬п╢п╫я▀п╧ я│п╣п╡п╣я─п╫я▀п╧) п╡п╣я┌п╣я─
+    // ->      я┌п╣п©п╩я▀п╧        я┘п╬п╩п╬п╢п╫я▀п╧          п╡п╣я┌п╣я─
     switch (weather_info.sky) {
         case SKY_CLOUDY:    
-            msg = "облачно";
+            msg = "п╬п╠п╩п╟я┤п╫п╬";
             icon_day = "day-cloudy";
             icon_night = "night-alt-cloudy";
             break;
         case SKY_CLOUDLESS:
-            msg = "ясно";
+            msg = "я▐я│п╫п╬";
             icon_day = "day-sunny";
             icon_night = "night-clear";
             break;
         case SKY_RAINING:
-            msg = "дождь";
+            msg = "п╢п╬п╤п╢я▄";
             icon_day = "day-showers";
             icon_night = "night-alt-showers";
             break;
         case SKY_LIGHTNING:
-            msg = "гроза";
+            msg = "пЁя─п╬п╥п╟";
             icon_day = "day-lightning";
             icon_night = "night-alt-lightning";
             break;
     }
     
     if (weather_info.change >= 0)
-        msg += ", теплый ветер";
+        msg += ", я┌п╣п©п╩я▀п╧ п╡п╣я┌п╣я─";
     else
-        msg += ", холодный ветер";
+        msg += ", я┘п╬п╩п╬п╢п╫я▀п╧ п╡п╣я┌п╣я─";
 
     DLString sl = sunlight( );
-    if (sl == "светло" || sl == "светает") 
+    if (sl == "я│п╡п╣я┌п╩п╬" || sl == "я│п╡п╣я┌п╟п╣я┌") 
         icon = icon_day;
     else 
         icon = icon_night;
@@ -941,14 +940,14 @@ public:
 void WebPromptDescriptorStateListener::run( int oldState, int newState, Descriptor *d )
 {
     if (newState != CON_PLAYING)
-	return;
+        return;
 
     if (!d->character || !d->character->getPC( ))
-	return;
+        return;
 
     WebPromptAttribute::Pointer attr = d->character->getPC( )->getAttributes( ).findAttr<WebPromptAttribute>( "webprompt" );
     if (attr)
-    	attr->clear( );
+            attr->clear( );
 }
 
 /*-------------------------------------------------------------------------
@@ -958,19 +957,18 @@ extern "C"
 {
     SO::PluginList initialize_web( )
     {
-	SO::PluginList ppl;
-	Plugin::registerPlugin<WebItemManip>( ppl );
-	Plugin::registerPlugin<WhoWebPromptListener>( ppl );
-	Plugin::registerPlugin<GroupWebPromptListener>( ppl );
-	Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
-	Plugin::registerPlugin<LocationWebPromptListener>( ppl );
-	Plugin::registerPlugin<AffectsWebPromptListener>( ppl );
-	Plugin::registerPlugin<ParamsWebPromptListener>( ppl );
-	Plugin::registerPlugin<QuestorWebPromptListener>( ppl );
-	Plugin::registerPlugin<WebPromptDescriptorStateListener>( ppl );
-	Plugin::registerPlugin<XMLAttributeRegistrator<WebPromptAttribute> >( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        Plugin::registerPlugin<WhoWebPromptListener>( ppl );
+        Plugin::registerPlugin<GroupWebPromptListener>( ppl );
+        Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
+        Plugin::registerPlugin<LocationWebPromptListener>( ppl );
+        Plugin::registerPlugin<AffectsWebPromptListener>( ppl );
+        Plugin::registerPlugin<ParamsWebPromptListener>( ppl );
+        Plugin::registerPlugin<QuestorWebPromptListener>( ppl );
+        Plugin::registerPlugin<WebPromptDescriptorStateListener>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<WebPromptAttribute> >( ppl );
+        
+        return ppl;
     }
 }
 

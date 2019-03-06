@@ -22,8 +22,7 @@
 /*
  * RaceHelp
  */
-class RaceHelp : public virtual XMLHelpArticle,
-                 public virtual MarkupHelpArticle {
+class RaceHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<RaceHelp> Pointer;
 
@@ -51,7 +50,7 @@ class DefaultRace : public virtual Race,
                     public XMLVariableContainer 
 {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<DefaultRace> Pointer;
 
     DefaultRace( );

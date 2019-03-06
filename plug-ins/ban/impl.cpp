@@ -10,11 +10,11 @@ extern "C" {
     
     SO::PluginList initialize_ban( ) 
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<BanManager>( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<BanManager>( ppl );
+        
+        return ppl;
     }
 }
 

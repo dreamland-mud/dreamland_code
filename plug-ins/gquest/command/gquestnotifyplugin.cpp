@@ -9,6 +9,7 @@
 #include "globalquest.h"
 #include "globalquestinfo.h"
 #include "gqchannel.h"
+#include "cgquest.h"
 
 #include "pcharacter.h"
 #include "merc.h"
@@ -18,16 +19,16 @@
 void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d ) 
 {
     if (newState != CON_PLAYING)
-	return;
+        return;
     
     if (!d->character)
-	return;
+        return;
 
     std::basic_ostringstream<char> buf;
     Character *ch = d->character;
 
     if (ch->is_npc( ))
-	return;
+        return;
     
     GlobalQuest::Pointer gq;
     GlobalQuestInfo::Pointer gqi;
@@ -36,31 +37,33 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
     GlobalQuestManager::RunList &rl = manager->getRunning( );
 
     for (i = rl.begin( ); i != rl.end( ); i++) {
-	gq = i->second;
-	gqi = manager->findGlobalQuestInfo( i->first );
-	
-	if (!gqi->canParticipate( ch->getPC( ) ))
-	    continue;
+        gq = i->second;
+        gqi = manager->findGlobalQuestInfo( i->first );
+        
+        if (!gqi->canParticipate( ch->getPC( ) ))
+            continue;
 
-	if (!gq->isLevelOK( ch ))
-	    continue;
-	    
-	buf << "         ë×ÅÓÔ " 
-	    << GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
-	    << GQChannel::NORMAL << " (ÄÌÑ ";
-	    
-	if (gq->hasLevels( ))
-	    buf << GQChannel::BOLD << gq->getMinLevel( ) 
-		<< "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
-	else
-	    buf << "×ÓÅÈ";
-	
-	buf << " ÕÒÏ×ÎÅÊ)" << endl;
+        if (!gq->isLevelOK( ch ))
+            continue;
+            
+        buf << "         ÐšÐ²ÐµÑÑ‚ " 
+            << GQChannel::BOLD << "\""<< gqi->getQuestName( ) << "\""
+            << GQChannel::NORMAL << " (Ð´Ð»Ñ ";
+            
+        if (gq->hasLevels( ))
+            buf << GQChannel::BOLD << gq->getMinLevel( ) 
+                << "-" << gq->getMaxLevel( ) << GQChannel::NORMAL;
+        else
+            buf << "Ð²ÑÐµÑ…";
+        
+        buf << " ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹)" << endl;
     }
 
     if (!buf.str( ).empty( )) {
-	GQChannel::pecho( ch, "\r\nçÌÏÂÁÌØÎÙÅ Ë×ÅÓÔÙ, × ËÏÔÏÒÙÈ ÔÙ ÍÏÖÅÛØ ÐÒÉÎÑÔØ ÕÞÁÓÔÉÅ: ");
-	GQChannel::pecho( ch, buf );
+        GQChannel::pecho( ch, "\r\nÐ“Ð»Ð¾Ð±Ð°Ð»ÑŒÐ½Ñ‹Ðµ ÐºÐ²ÐµÑÑ‚Ñ‹, Ð² ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ñ… Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ñ€Ð¸Ð½ÑÑ‚ÑŒ ÑƒÑ‡Ð°ÑÑ‚Ð¸Ðµ: ");
+        GQChannel::pecho( ch, buf );
     }
+
+    CGQuest::gqprog_notify(ch->getPC());
 }
     

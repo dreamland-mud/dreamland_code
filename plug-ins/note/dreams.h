@@ -50,8 +50,8 @@ protected:
 };
 
 class DreamManager : public virtual SchedulerTaskRoundPlugin,
-	             public virtual SchedulerTaskRoundPCharacter,
-		     public OneAllocate 
+                     public virtual SchedulerTaskRoundPCharacter,
+                     public OneAllocate 
 {
 public:
     typedef ::Pointer<DreamManager> Pointer;

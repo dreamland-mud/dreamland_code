@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -37,22 +37,22 @@
 SPELL_DECL(Amnesia);
 VOID_SPELL(Amnesia)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-	if (victim->is_npc())
-		return;
+        if (victim->is_npc())
+                return;
 
-	for (int i = 0; i < SkillManager::getThis( )->size(); i++) {
-	    PCSkillData &data = victim->getPC( )->getSkillData( i );
+        for (int i = 0; i < SkillManager::getThis( )->size(); i++) {
+            PCSkillData &data = victim->getPC( )->getSkillData( i );
 
-	    if (data.learned.getValue( ) > 0) {
-		data.learned /= 2;
-		data.learned++;
-	    }
-	}
+            if (data.learned.getValue( ) > 0) {
+                data.learned /= 2;
+                data.learned++;
+            }
+        }
 
-	act_p("Ты чувствуешь как память ускользает от тебя.",
-		victim,0,0,TO_CHAR,POS_RESTING);
-	act_p("Взгляд $c2 становится бессмысленным.",
-		victim,0,0,TO_ROOM,POS_RESTING);
+        act_p("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╨п╟п╨ п©п╟п╪я▐я┌я▄ я┐я│п╨п╬п╩я▄п╥п╟п╣я┌ п╬я┌ я┌п╣п╠я▐.",
+                victim,0,0,TO_CHAR,POS_RESTING);
+        act_p("п▓п╥пЁп╩я▐п╢ $c2 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╠п╣я│я│п╪я▀я│п╩п╣п╫п╫я▀п╪.",
+                victim,0,0,TO_ROOM,POS_RESTING);
 
 }
 

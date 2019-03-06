@@ -11,13 +11,13 @@
 class ClanGuardGhost: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardGhost> Pointer;
+        typedef ::Pointer<ClanGuardGhost> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual bool spec_cast( Character * );
-	virtual int getCast( Character * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual bool spec_cast( Character * );
+        virtual int getCast( Character * );
 };
 
 #endif

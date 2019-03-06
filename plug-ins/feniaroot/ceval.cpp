@@ -25,22 +25,22 @@ using Scripting::CodeSource;
 bool has_fenia_security( PCharacter *pch )
 {
     if (pch->get_trust( ) >= 110)
-	return true;
+        return true;
     
     if (dreamland->hasOption( DL_BUILDPLOT )) {
-	XMLIntegerAttribute::Pointer secAttr
-		= pch->getAttributes( ).findAttr<XMLIntegerAttribute>( "feniasecurity" );
-	
-	if (secAttr && secAttr->getValue( ) >= 110)
-	    return true;
+        XMLIntegerAttribute::Pointer secAttr
+                = pch->getAttributes( ).findAttr<XMLIntegerAttribute>( "feniasecurity" );
+        
+        if (secAttr && secAttr->getValue( ) >= 110)
+            return true;
     }
 
     try {
-	static Scripting::IdRef FENIA_SECURITY_ID("feniaSecurity");
-	Register thiz = WrapperManager::getThis( )->getWrapper( pch );
-	
-	if ((*thiz[FENIA_SECURITY_ID]).toNumber() >= 110)
-	    return true;
+        static Scripting::IdRef FENIA_SECURITY_ID("feniaSecurity");
+        Register thiz = WrapperManager::getThis( )->getWrapper( pch );
+        
+        if ((*thiz[FENIA_SECURITY_ID]).toNumber() >= 110)
+            return true;
     } catch (::Exception e) {
     }
 
@@ -52,31 +52,31 @@ CMDADM( eval )
     PCharacter *pch = ch->getPC( );
 
     if (!pch) 
-	return;
+        return;
     
     if (!has_fenia_security( pch )) {
-	ch->println("Ты не ботаешь по фене.");
-	return;
+        ch->println("п╒я▀ п╫п╣ п╠п╬я┌п╟п╣я┬я▄ п©п╬ я└п╣п╫п╣.");
+        return;
     }
 
     if (constArguments.empty( )) {
-	ch->println("Синтаксис: {Weval {x<expression>");
-	return;
+        ch->println("п║п╦п╫я┌п╟п╨я│п╦я│: {Weval {x<expression>");
+        return;
     }
 
     Register thiz = WrapperManager::getThis( )->getWrapper( ch );
     
     try {
-	CodeSource &cs = CodeSource::manager->allocate();
-	
-	cs.author = pch->getName( );
-	cs.name = "<eval command>";
+        CodeSource &cs = CodeSource::manager->allocate();
+        
+        cs.author = pch->getName( );
+        cs.name = "<eval command>";
 
-	cs.content = constArguments;
-	cs.eval(thiz);
+        cs.content = constArguments;
+        cs.eval(thiz);
     
     } catch (const ::Exception &e) {
-	ch->send_to( e.what( ) );
+        ch->send_to( e.what( ) );
     }
 }
 
@@ -100,7 +100,7 @@ RPCRUN(cs_eval)
                 << "----------------------------" << endl;
 
         if (!has_fenia_security( pch )) {
-            ch->println("Ты не ботаешь по фене.");
+            ch->println("п╒я▀ п╫п╣ п╠п╬я┌п╟п╣я┬я▄ п©п╬ я└п╣п╫п╣.");
             return;
         }
 

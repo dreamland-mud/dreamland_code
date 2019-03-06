@@ -23,7 +23,7 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Реализация потоков
+ * @short п═п╣п╟п╩п╦п╥п╟я├п╦я▐ п©п╬я┌п╬п╨п╬п╡
  */
 class Thread : public virtual DLObject
 {

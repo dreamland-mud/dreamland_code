@@ -32,11 +32,11 @@ struct SpellTarget : public virtual DLObject {
     Room *room;
 
     enum {
-	UNDEF,
-	NONE,
-	CHAR,
-	OBJECT,
-	ROOM
+        UNDEF,
+        NONE,
+        CHAR,
+        OBJECT,
+        ROOM
     } type;
 
     bool castFar;

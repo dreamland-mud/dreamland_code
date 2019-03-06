@@ -13,10 +13,10 @@
 class XMLAttributeTeacher : public XMLAttribute, public XMLVariableContainer {
 XML_OBJECT    
 public:
-	typedef ::Pointer<XMLAttributeTeacher> Pointer;
+        typedef ::Pointer<XMLAttributeTeacher> Pointer;
 
-	XMLAttributeTeacher( );
-	virtual ~XMLAttributeTeacher( );
+        XMLAttributeTeacher( );
+        virtual ~XMLAttributeTeacher( );
 };
 
 #endif

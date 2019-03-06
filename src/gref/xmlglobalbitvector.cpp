@@ -27,7 +27,7 @@ bool XMLGlobalBitvector::toXML( XMLNode::Pointer& parent ) const
     DLString str = toString( );
 
     if (str.empty( ))
-	return false;
+        return false;
     else
-	return XMLString( str ).toXML( parent );
+        return XMLString( str ).toXML( parent );
 }

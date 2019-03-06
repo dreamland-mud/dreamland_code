@@ -13,15 +13,15 @@ class KidnapQuest;
 class KidnapMobile : public DedicatedMobile<KidnapQuest> {
 XML_OBJECT
 public:
-	typedef ::Pointer<KidnapMobile> Pointer;
-	
+        typedef ::Pointer<KidnapMobile> Pointer;
+        
 protected:
-	bool ourKing( Character * );
-	NPCharacter * getKingRoom( );
-	NPCharacter * getKingRoom( Room * );
-	Character * getAggrRoom( Room * );
+        bool ourKing( Character * );
+        NPCharacter * getKingRoom( );
+        NPCharacter * getKingRoom( Room * );
+        Character * getAggrRoom( Room * );
 
-	void debug( const DLString & );
+        void debug( const DLString & );
 };
 
 

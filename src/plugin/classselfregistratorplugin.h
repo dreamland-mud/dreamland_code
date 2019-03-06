@@ -23,7 +23,7 @@ public:
         return Pointer(this);
     }
     virtual const DLString & getType( ) const {
-	return typeName;
+        return typeName;
     }
 protected:
     virtual void initialization( ) 

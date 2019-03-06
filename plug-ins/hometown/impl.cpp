@@ -15,12 +15,12 @@ TABLE_LOADER(HometownLoader, "hometowns", "Hometown");
 extern "C"
 {
     SO::PluginList initialize_hometown( ) {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MocRegistrator<DefaultHometown> >( ppl );
-	Plugin::registerPlugin<HometownLoader>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MocRegistrator<DefaultHometown> >( ppl );
+        Plugin::registerPlugin<HometownLoader>( ppl );
+        
+        return ppl;
     }
 }
 

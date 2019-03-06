@@ -52,17 +52,17 @@ public:
     typedef uint32_t size_t;
 
     struct Data {
-	Data( ) : ptr(0), size(0) { }
-	Data( void *p, size_t s ) : ptr(p), size(s) { }
-	
-	void set(void *p, size_t s) { ptr = p; size = s; }
-	
-	void *get_data( ) { return ptr; }
-	size_t get_size( ) { return size; }
+        Data( ) : ptr(0), size(0) { }
+        Data( void *p, size_t s ) : ptr(p), size(s) { }
+        
+        void set(void *p, size_t s) { ptr = p; size = s; }
+        
+        void *get_data( ) { return ptr; }
+        size_t get_size( ) { return size; }
 
     private:
-	void *ptr;
-	size_t size;
+        void *ptr;
+        size_t size;
     };
     
     DbContext( );

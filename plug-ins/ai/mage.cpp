@@ -93,14 +93,14 @@ bool BasicMobileBehavior::specFightMage( )
     SpellChance * spellTable;
     
     if (!( victim = findCastVictim( ) ))
-	return false;
+        return false;
     
     if (HEALTH(victim) < 25 || HEALTH(ch) < 25) 
-	spellTable = mageSnPanicAttack;
+        spellTable = mageSnPanicAttack;
     else if (HEALTH(ch) <= 70 && HEALTH(ch) >= 25) 
-	spellTable = mageSnAttack;
+        spellTable = mageSnAttack;
     else 
-	spellTable = mageSnPassiveDefence;
+        spellTable = mageSnPassiveDefence;
     
     return SpellChanceTable( spellTable, ch, victim ).castSpell( );
 }

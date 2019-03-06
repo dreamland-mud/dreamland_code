@@ -8,7 +8,7 @@
 #include "so.h"                                                                 
 
 XMLAttributeInvasion::XMLAttributeInvasion( )
-			: punished( false )
+                        : punished( false )
 {
 }
 

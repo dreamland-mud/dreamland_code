@@ -66,6 +66,7 @@ protected:
     virtual void deadFromHunter( PCMemoryInterface * );
     virtual void deadFromSuicide( PCMemoryInterface * );
     virtual void deadFromOther( PCMemoryInterface *, Character * );
+    virtual void deadFromGroupMember( PCMemoryInterface *, Character * );
 };
 
 class ProtectedClient : public virtual MobQuestBehavior {
@@ -84,7 +85,7 @@ class DedicatedMobile : public virtual MobQuestBehavior {
 protected:
     inline bool getQuest( )
     {
-	return quest || (quest = getMyQuest<Q>( ));
+        return quest || (quest = getMyQuest<Q>( ));
     }
 
     ::Pointer<Q> quest;

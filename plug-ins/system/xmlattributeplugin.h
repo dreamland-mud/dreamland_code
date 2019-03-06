@@ -11,11 +11,11 @@
 
 class XMLAttributePlugin : public Plugin {
 public:
-	typedef ::Pointer<XMLAttributePlugin> Pointer;
-	
-	virtual void initialization( );
-	virtual void destruction( );
-	virtual const DLString& getName( ) const = 0;
+        typedef ::Pointer<XMLAttributePlugin> Pointer;
+        
+        virtual void initialization( );
+        virtual void destruction( );
+        virtual const DLString& getName( ) const = 0;
 };
 
 template<typename C>
@@ -25,17 +25,17 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regMoc<C>( );
-	XMLAttributePlugin::initialization( );
+        Class::regMoc<C>( );
+        XMLAttributePlugin::initialization( );
     }
     virtual void destruction( ) 
     {
-	XMLAttributePlugin::destruction( );
-	Class::unregMoc<C>( );
+        XMLAttributePlugin::destruction( );
+        Class::unregMoc<C>( );
     }
     virtual const DLString& getName( ) const 
     {
-	return C::MOC_TYPE;
+        return C::MOC_TYPE;
     }
 };
 
@@ -46,17 +46,17 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regXMLVar<C>( );
-	XMLAttributePlugin::initialization( );
+        Class::regXMLVar<C>( );
+        XMLAttributePlugin::initialization( );
     }
     virtual void destruction( ) 
     {
-	XMLAttributePlugin::destruction( );
-	Class::unregXMLVar<C>( );
+        XMLAttributePlugin::destruction( );
+        Class::unregXMLVar<C>( );
     }
     virtual const DLString& getName( ) const 
     {
-	return C::TYPE;
+        return C::TYPE;
     }
 };
 

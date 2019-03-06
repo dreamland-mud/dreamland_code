@@ -1,0 +1,6 @@
+language: generic
+dist: xenial
+script: bash ./admin/travis/verify_build.sh
+branches:
+  only:
+  - master

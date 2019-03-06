@@ -31,10 +31,10 @@ Exception::info(string s)
         << "    in ";
     
     if(nt) {
-	buf << nt->node->source << ": ";
-	nt->node->reverse(buf, buf.str());
+        buf << nt->node->source << ": ";
+        nt->node->reverse(buf, buf.str());
     } else
-	buf << "native code";
+        buf << "native code";
 
     buf << endl;
     BackTrace::report(buf);

@@ -13,7 +13,7 @@
 /*
  * Attribute bonus tables.
  */
-const struct	str_app_type	str_app		[]		=
+const struct        str_app_type        str_app                []                =
 {
 /*   hit% missile% carry wield web damage% */
     { -35,  -40,     0,    0,   5,  -40     },  /* 0  */
@@ -46,64 +46,64 @@ const struct	str_app_type	str_app		[]		=
 };           
 
 
-const struct	int_app_type	int_app		[]		=
+const struct        int_app_type        int_app                []                =
 {
 /* prac    slevel */
-    {  3,   -5 },	/*  0 */
-    {  5,   -5 },	/*  1 */
-    {  7,   -5 },
-    {  8,   -4 },	/*  3 */
-    {  9,   -4 },
-    { 10,   -4 },	/*  5 */
-    { 11,   -4 },
-    { 12,   -4 },
-    { 13,   -3 },
-    { 15,   -3 },
-    { 17,   -3 },	/* 10 */
-    { 19,   -3 },
-    { 22,   -3 },
-    { 25,   -2 },
-    { 28,   -2 },
-    { 31,   -2 },	/* 15 */
-    { 34,   -2 },
-    { 37,   -1 },
-    { 40,   -1 },	/* 18 */
-    { 44,   -1 },
-    { 49,    0 },	/* 20 */
+    {  3,    0 },        /*  0 */
+    {  5,    0 },        /*  1 */
+    {  7,    0 },
+    {  8,    0 },        /*  3 */
+    {  9,    0 },
+    { 10,    0 },        /*  5 */
+    { 11,    0 },
+    { 12,    0 },
+    { 13,    0 },
+    { 15,    0 },
+    { 17,    0 },        /* 10 */
+    { 19,    0 },
+    { 22,    0 },
+    { 25,    0 },
+    { 28,    0 },
+    { 31,    0 },        /* 15 */
+    { 34,    0 },
+    { 37,    0 },
+    { 40,    0 },        /* 18 */
+    { 44,    0 },
+    { 49,    0 },        /* 20 */
     { 55,    0 },
     { 60,    1 },
     { 70,    2 },
     { 80,    3 },
-    { 85,    4 },	/* 25  */
-    { 90,    5 }	/* 25+ */
+    { 85,    4 },        /* 25  */
+    { 90,    5 }        /* 25+ */
 };
 
 
 
-const struct	wis_app_type	wis_app		[]		=
+const struct        wis_app_type        wis_app                []                =
 {
 /* prac learn */
-    { 0, 0, },	/*  0 */
-    { 0, 0, },	/*  1 */
+    { 0, 0, },        /*  0 */
+    { 0, 0, },        /*  1 */
     { 0, 0, },
-    { 0, 0, },	/*  3 */
+    { 0, 0, },        /*  3 */
     { 0, 0, },
-    { 1, 0, },	/*  5 */
+    { 1, 0, },        /*  5 */
     { 1, 0, },
     { 1, 0, },
     { 1, 0, },
     { 1, 0, },
-    { 1, 0, },	/* 10 */
+    { 1, 0, },        /* 10 */
     { 1, 0, },
     { 1, 0, },
     { 1, 1, },
     { 1, 1, },
-    { 2, 1, },	/* 15 */
+    { 2, 1, },        /* 15 */
     { 2, 1, },
     { 2, 1, },
-    { 3, 1, },	/* 18 */
+    { 3, 1, },        /* 18 */
     { 3, 1, },
-    { 3, 2, },	/* 20 */
+    { 3, 2, },        /* 20 */
     { 3, 2, },
     { 4, 2, },
     { 4, 3, },
@@ -113,7 +113,7 @@ const struct	wis_app_type	wis_app		[]		=
 
 
 
-const struct	dex_app_type	dex_app		[]		=
+const struct        dex_app_type        dex_app                []                =
 {
     {   60 },   /* 0 */
     {   50 },   /* 1 */
@@ -144,12 +144,12 @@ const struct	dex_app_type	dex_app		[]		=
 };
 
 
-const struct	con_app_type	con_app		[]		=
+const struct        con_app_type        con_app                []                =
 {
     { 20 },   /*  0 */
     { 25 },   /*  1 */
     { 30 },
-    { 35 },	  /*  3 */
+    { 35 },          /*  3 */
     { 40 },
     { 45 },   /*  5 */
     { 50 },
@@ -184,10 +184,10 @@ static int get_curr_stat_extra( Character *ch, int stat )
     value = ch->getCurrStat( stat );
 
     if (value == MAX_STAT 
-	&& !ch->is_npc( )
-	&& ch->getTrueProfession( )->getStat( stat ) > 0
-	&& ch->getRace( )->getPC( )->getStats( )[stat] >= MAX_STAT - BASE_STAT)
-	value++;
+        && !ch->is_npc( )
+        && ch->getTrueProfession( )->getStat( stat ) > 0
+        && ch->getRace( )->getPC( )->getStats( )[stat] >= MAX_STAT - BASE_STAT)
+        value++;
 
     return value;
 }
@@ -214,8 +214,8 @@ const struct dex_app_type & get_dex_app( Character *ch )
 
 #else
 static const struct str_app_type zero_str_app = { 4, 50, 250, 35,  20,    0     }; /* 20  */
-static const struct int_app_type zero_int_app = { 49, 0 };	/* 20 */
-static const struct wis_app_type zero_wis_app = { 3, 2, };	/* 20 */
+static const struct int_app_type zero_int_app = { 49, 0 };        /* 20 */
+static const struct wis_app_type zero_wis_app = { 3, 2, };        /* 20 */
 static const struct dex_app_type zero_dex_app = { - 50 };   /* 20 */
 const struct str_app_type & get_str_app( Character * ) { return zero_str_app; }
 const struct int_app_type & get_int_app( Character * ) { return zero_int_app; }

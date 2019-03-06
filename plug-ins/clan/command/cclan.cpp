@@ -37,7 +37,7 @@ CLAN(outsider);
 
 using namespace std;
 
-#define OBJ_VNUM_DIAMOND	  3377
+#define OBJ_VNUM_DIAMOND          3377
 
 enum {
     CB_MODE_DEPOSIT  = 1,
@@ -60,14 +60,14 @@ struct clan_diplomacy_names {
 
 struct clan_diplomacy_names clan_diplomacy_names_table[] =
 {
-  {"aliance",	    "аль.", "{W",    "альянс"	    },
-  {"peace",	    "мир ", "{G",    "мир"	    },
-  {"truce",	    "пер.", "{Y",    "перемирие"    },
-  {"distrust",	    "нед.", "{B",    "недоверие"    },
-  {"aggresive",	    "агр.", "{r",    "агрессия"	    },
-  {"war",	    "вой.", "{R",    "война"	    },
-  {"subordination", "под.", "{Y",    "подчинение"   },
-  {"oppress",	    "угн.", "{Y",    "угнетение"    },
+  {"aliance",            "п╟п╩я▄.", "{W",    "п╟п╩я▄я▐п╫я│"            },
+  {"peace",            "п╪п╦я─ ", "{G",    "п╪п╦я─"            },
+  {"truce",            "п©п╣я─.", "{Y",    "п©п╣я─п╣п╪п╦я─п╦п╣"    },
+  {"distrust",            "п╫п╣п╢.", "{B",    "п╫п╣п╢п╬п╡п╣я─п╦п╣"    },
+  {"aggresive",            "п╟пЁя─.", "{r",    "п╟пЁя─п╣я│я│п╦я▐"            },
+  {"war",            "п╡п╬п╧.", "{R",    "п╡п╬п╧п╫п╟"            },
+  {"subordination", "п©п╬п╢.", "{Y",    "п©п╬п╢я┤п╦п╫п╣п╫п╦п╣"   },
+  {"oppress",            "я┐пЁп╫.", "{Y",    "я┐пЁп╫п╣я┌п╣п╫п╦п╣"    },
 };
 
 const int clan_diplomacy_max = 5;
@@ -77,74 +77,74 @@ COMMAND(CClan, "clan")
     PCharacter *pc = ch->getPC( );
 
     if (!pc)
-	return;
+        return;
     
     if (IS_AFFECTED( pc, AFF_CHARM )) {
-	if (pc->master)
-	    pc->master->send_to( "Ничего не выйдет.\r\n" );
+        if (pc->master)
+            pc->master->send_to( "п²п╦я┤п╣пЁп╬ п╫п╣ п╡я▀п╧п╢п╣я┌.\r\n" );
 
-	pc->send_to( "..но ничего не происходит.\r\n" );
-	return;
+        pc->send_to( "..п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п©я─п╬п╦я│я┘п╬п╢п╦я┌.\r\n" );
+        return;
     }
 
     if (constArguments.length( ) == 0) {
-	clanList( pc );
+        clanList( pc );
     }
     else {
-	DLString argument = constArguments;
-	DLString argumentOne = argument.getOneArgument( );
-	
-	if (arg_is_list( argumentOne ) || arg_oneof( argumentOne, "info", "инфо" ))
-	    clanList( pc );
-	else if (arg_oneof( argumentOne, "count", "счет", "количество" )) 
-	    clanCount( pc );
-	else if( arg_oneof( argumentOne, "bank", "банк" ) )
-	    clanBank( pc, argument );
-	else if( arg_oneof( argumentOne, "remove", "выгнать", "уйти" ) )
-	    clanRemove( pc, argument );
-	else if( arg_oneof( argumentOne, "level", "уровень" ) )
-	    clanLevel( pc, argument );
-	else if( arg_oneof( argumentOne, "member", "члены", "состав" ) )
-	    clanMember( pc, argument );
-	else if( arg_oneof( argumentOne, "petition", "петиция", "прошение" ) )
-	    clanPetition( pc, argument );
-	else if( arg_oneof( argumentOne, "diplomacy", "дипломатия" ) )
-	    clanDiplomacy( pc, argument );
-	else if (pc->is_immortal( )) {
-	    if (arg_oneof( argumentOne, "rating", "рейтинг" ))
-		clanRating( pc );
-	    else if(arg_oneof( argumentOne, "status", "статус" ))
-		clanStatus( pc );
-	    else if (arg_oneof( argumentOne, "scan", "осмотр" ))
-		clanScan( pc );
-	    else if (arg_oneof( argumentOne, "induct", "принять" ))
-		clanInduct( pc, argument );
-	    else
-		usage( pc );
-	}
-	else
-	    usage( pc );
-    }	
+        DLString argument = constArguments;
+        DLString argumentOne = argument.getOneArgument( );
+        
+        if (arg_is_list( argumentOne ) || arg_oneof( argumentOne, "info", "п╦п╫я└п╬" ))
+            clanList( pc );
+        else if (arg_oneof( argumentOne, "count", "я│я┤п╣я┌", "п╨п╬п╩п╦я┤п╣я│я┌п╡п╬" )) 
+            clanCount( pc );
+        else if( arg_oneof( argumentOne, "bank", "п╠п╟п╫п╨" ) )
+            clanBank( pc, argument );
+        else if( arg_oneof( argumentOne, "remove", "п╡я▀пЁп╫п╟я┌я▄", "я┐п╧я┌п╦" ) )
+            clanRemove( pc, argument );
+        else if( arg_oneof( argumentOne, "level", "я┐я─п╬п╡п╣п╫я▄" ) )
+            clanLevel( pc, argument );
+        else if( arg_oneof( argumentOne, "member", "я┤п╩п╣п╫я▀", "я│п╬я│я┌п╟п╡" ) )
+            clanMember( pc, argument );
+        else if( arg_oneof( argumentOne, "petition", "п©п╣я┌п╦я├п╦я▐", "п©я─п╬я┬п╣п╫п╦п╣" ) )
+            clanPetition( pc, argument );
+        else if( arg_oneof( argumentOne, "diplomacy", "п╢п╦п©п╩п╬п╪п╟я┌п╦я▐" ) )
+            clanDiplomacy( pc, argument );
+        else if (pc->is_immortal( )) {
+            if (arg_oneof( argumentOne, "rating", "я─п╣п╧я┌п╦п╫пЁ" ))
+                clanRating( pc );
+            else if(arg_oneof( argumentOne, "status", "я│я┌п╟я┌я┐я│" ))
+                clanStatus( pc );
+            else if (arg_oneof( argumentOne, "scan", "п╬я│п╪п╬я┌я─" ))
+                clanScan( pc );
+            else if (arg_oneof( argumentOne, "induct", "п©я─п╦п╫я▐я┌я▄" ))
+                clanInduct( pc, argument );
+            else
+                usage( pc );
+        }
+        else
+            usage( pc );
+    }        
 }
 
 void CClan::usage( PCharacter *pc )
 {    
     basic_ostringstream<char> buf;
 
-    buf << "{W{lRклан список{lEclan list  {lx{x     показать список всех кланов" << endl
-        << "{W{lRклан счет {lEclan count{lx{x      показать количество игроков в кланах" << endl
-	<< "{W{lRклан банк{lEclan bank{lx{x       операции с клановым банком (подробее см. {W{lRклан банк помощь{lEclan bank help{lx{x)" << endl
-        << "{W{lRклан выгнать{lEclan remove {lx{x    выйти (выгнать кого-либо) из клана (см. {W{lRклан выгнать помощь{lEclan remove help{lx{x)" << endl
-	<< "{W{lRклан уровень{lEclan level  {lx{x    посмотреть/установить клановый уровень (cм. {W{lRклан уровень помощь{lEclan level help{lx{x)" << endl
-	<< "{W{lRклан состав{lEclan member{lx{x     показывает лидеру список членов клана (см. {W{lRклан состав помощь{lEclan member help{lx{x)" << endl
-	<< "{W{lRклан петиция {lEclan petition{lx{x   написать/принять/отклонить петицию на вступление в клан" << endl
-	<< "                (см. {W{lRклан петиция помощь{lEclan petition help{lx{x)" << endl           
-	<< "{W{lRклан дипломатия{lEclan diplomacy {lx{x посмотреть/установить клановую дипломатию (см. {W{lRклан дипломатия помощь{lEclan dipl help{lx{x)" << endl;	
+    buf << "{W{lRп╨п╩п╟п╫ я│п©п╦я│п╬п╨{lEclan list  {lx{x     п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ п╡я│п╣я┘ п╨п╩п╟п╫п╬п╡" << endl
+        << "{W{lRп╨п╩п╟п╫ я│я┤п╣я┌ {lEclan count{lx{x      п©п╬п╨п╟п╥п╟я┌я▄ п╨п╬п╩п╦я┤п╣я│я┌п╡п╬ п╦пЁя─п╬п╨п╬п╡ п╡ п╨п╩п╟п╫п╟я┘" << endl
+        << "{W{lRп╨п╩п╟п╫ п╠п╟п╫п╨{lEclan bank{lx{x       п╬п©п╣я─п╟я├п╦п╦ я│ п╨п╩п╟п╫п╬п╡я▀п╪ п╠п╟п╫п╨п╬п╪ (п©п╬п╢я─п╬п╠п╣п╣ я│п╪. {W{lRп╨п╩п╟п╫ п╠п╟п╫п╨ п©п╬п╪п╬я┴я▄{lEclan bank help{lx{x)" << endl
+        << "{W{lRп╨п╩п╟п╫ п╡я▀пЁп╫п╟я┌я▄{lEclan remove {lx{x    п╡я▀п╧я┌п╦ (п╡я▀пЁп╫п╟я┌я▄ п╨п╬пЁп╬-п╩п╦п╠п╬) п╦п╥ п╨п╩п╟п╫п╟ (я│п╪. {W{lRп╨п╩п╟п╫ п╡я▀пЁп╫п╟я┌я▄ п©п╬п╪п╬я┴я▄{lEclan remove help{lx{x)" << endl
+        << "{W{lRп╨п╩п╟п╫ я┐я─п╬п╡п╣п╫я▄{lEclan level  {lx{x    п©п╬я│п╪п╬я┌я─п╣я┌я▄/я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╨п╩п╟п╫п╬п╡я▀п╧ я┐я─п╬п╡п╣п╫я▄ (cп╪. {W{lRп╨п╩п╟п╫ я┐я─п╬п╡п╣п╫я▄ п©п╬п╪п╬я┴я▄{lEclan level help{lx{x)" << endl
+        << "{W{lRп╨п╩п╟п╫ я│п╬я│я┌п╟п╡{lEclan member{lx{x     п©п╬п╨п╟п╥я▀п╡п╟п╣я┌ п╩п╦п╢п╣я─я┐ я│п©п╦я│п╬п╨ я┤п╩п╣п╫п╬п╡ п╨п╩п╟п╫п╟ (я│п╪. {W{lRп╨п╩п╟п╫ я│п╬я│я┌п╟п╡ п©п╬п╪п╬я┴я▄{lEclan member help{lx{x)" << endl
+        << "{W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐ {lEclan petition{lx{x   п╫п╟п©п╦я│п╟я┌я▄/п©я─п╦п╫я▐я┌я▄/п╬я┌п╨п╩п╬п╫п╦я┌я▄ п©п╣я┌п╦я├п╦я▌ п╫п╟ п╡я│я┌я┐п©п╩п╣п╫п╦п╣ п╡ п╨п╩п╟п╫" << endl
+        << "                (я│п╪. {W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐ п©п╬п╪п╬я┴я▄{lEclan petition help{lx{x)" << endl           
+        << "{W{lRп╨п╩п╟п╫ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐{lEclan diplomacy {lx{x п©п╬я│п╪п╬я┌я─п╣я┌я▄/я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╨п╩п╟п╫п╬п╡я┐я▌ п╢п╦п©п╩п╬п╪п╟я┌п╦я▌ (я│п╪. {W{lRп╨п╩п╟п╫ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐ п©п╬п╪п╬я┴я▄{lEclan dipl help{lx{x)" << endl;        
 
     if (pc->is_immortal( ))
-	buf << "{W{lRклан принять{lEclan induct {lx{x    принять кого-то в клан" << endl
-	    << "{W{lRклан статус{lEclan status{lx{x     показать статистику побед/поражений по уровням" << endl
-	    << "{W{lRклан рейтинг{lEclan rating {lx{x    рейтинг клана согласно статистике побед/поражений" << endl;
+        buf << "{W{lRп╨п╩п╟п╫ п©я─п╦п╫я▐я┌я▄{lEclan induct {lx{x    п©я─п╦п╫я▐я┌я▄ п╨п╬пЁп╬-я┌п╬ п╡ п╨п╩п╟п╫" << endl
+            << "{W{lRп╨п╩п╟п╫ я│я┌п╟я┌я┐я│{lEclan status{lx{x     п©п╬п╨п╟п╥п╟я┌я▄ я│я┌п╟я┌п╦я│я┌п╦п╨я┐ п©п╬п╠п╣п╢/п©п╬я─п╟п╤п╣п╫п╦п╧ п©п╬ я┐я─п╬п╡п╫я▐п╪" << endl
+            << "{W{lRп╨п╩п╟п╫ я─п╣п╧я┌п╦п╫пЁ{lEclan rating {lx{x    я─п╣п╧я┌п╦п╫пЁ п╨п╩п╟п╫п╟ я│п╬пЁп╩п╟я│п╫п╬ я│я┌п╟я┌п╦я│я┌п╦п╨п╣ п©п╬п╠п╣п╢/п©п╬я─п╟п╤п╣п╫п╦п╧" << endl;
     
     pc->send_to( buf );
 }
@@ -155,21 +155,21 @@ void CClan::usage( PCharacter *pc )
  */
 void CClan::clanList( PCharacter* pc )
 {
-    pc->send_to( "В мире есть такие кланы:\n\r" );                              
-	
+    pc->send_to( "п▓ п╪п╦я─п╣ п╣я│я┌я▄ я┌п╟п╨п╦п╣ п╨п╩п╟п╫я▀:\n\r" );                              
+        
     for (int i = 0; i < ClanManager::getThis( )->size( ); i++) {
-	Clan *clan = ClanManager::getThis( )->find( i );
-	
-	if (!clan->isHidden( )) {
-	    basic_ostringstream<char> buf;                                          
-	    buf << setw( 33 ) << clan->getLongName( ) << " [{"
-		<< clan->getColor( ) << clan->getPaddedName( ) 
-		<< "{x]" << endl;
-	    pc->send_to( buf );
-	}
+        Clan *clan = ClanManager::getThis( )->find( i );
+        
+        if (!clan->isHidden( )) {
+            basic_ostringstream<char> buf;                                          
+            buf << setw( 33 ) << clan->getLongName( ) << " [{"
+                << clan->getColor( ) << clan->getPaddedName( ) 
+                << "{x]" << endl;
+            pc->send_to( buf );
+        }
     }
 
-    pc->send_to( "\n\rПодробнее смотри команду {lRклан ?{lEclan ?{lx{x.\n\r" );                              
+    pc->send_to( "\n\rп÷п╬п╢я─п╬п╠п╫п╣п╣ я│п╪п╬я┌я─п╦ п╨п╬п╪п╟п╫п╢я┐ {lRп╨п╩п╟п╫ ?{lEclan ?{lx{x.\n\r" );                              
 }
 
 /*
@@ -185,27 +185,27 @@ void CClan::clanCount( PCharacter* pc )
     counts.resize( cm->size( ) );
     
     for (int i = 0; i < cm->size( ); i++)
-	counts[i] = 0;
+        counts[i] = 0;
 
     for (pos = list.begin( ); pos != list.end( ); pos++) {
-	PCMemoryInterface *pcm = pos->second;
-	
-	if (pcm->getLevel( ) < 102 && !pcm->getClan( )->isHidden( ))
-	    counts[pcm->getClan( )]++;
+        PCMemoryInterface *pcm = pos->second;
+        
+        if (pcm->getLevel( ) < 102 && !pcm->getClan( )->isHidden( ))
+            counts[pcm->getClan( )]++;
     }
     
-    pc->send_to( "      Клан         кол.\n\r" );                               
+    pc->send_to( "      п п╩п╟п╫         п╨п╬п╩.\n\r" );                               
 
     for (int i = 0; i < cm->size( ); i++) {
-	Clan *clan = cm->find( i );
-	
-	if (!clan->isHidden( )) {
-	    basic_ostringstream<char> buf;
-	    buf << "  [{" << clan->getColor( )
-		<< clan->getPaddedName( ) << "{x] "
-		<< setw( 5 ) << counts[i] << endl;
-	    pc->send_to( buf );
-	}
+        Clan *clan = cm->find( i );
+        
+        if (!clan->isHidden( )) {
+            basic_ostringstream<char> buf;
+            buf << "  [{" << clan->getColor( )
+                << clan->getPaddedName( ) << "{x] "
+                << setw( 5 ) << counts[i] << endl;
+            pc->send_to( buf );
+        }
     }
 }
 
@@ -216,17 +216,17 @@ void CClan::clanRating( PCharacter* pc )
 {
     ClanManager *cm = ClanManager::getThis( );
 
-    pc->send_to( "Клан      Рейтинг\n\r" );                                     
+    pc->send_to( "п п╩п╟п╫      п═п╣п╧я┌п╦п╫пЁ\n\r" );                                     
     
     for (int i = 0; i < cm->size( ); i++) {
-	Clan *clan = cm->find( i );
-	
-	if (!clan->isHidden( ) && clan->getData( )) {
-	    basic_ostringstream<char> buf;                                          
-	    buf << "  [{" << clan->getColor( ) << clan->getPaddedName( ) 
-		<< "{x] " << setw( 5 ) << clan->getData( )->rating << endl;
-	    pc->send_to( buf );
-	}
+        Clan *clan = cm->find( i );
+        
+        if (!clan->isHidden( ) && clan->getData( )) {
+            basic_ostringstream<char> buf;                                          
+            buf << "  [{" << clan->getColor( ) << clan->getPaddedName( ) 
+                << "{x] " << setw( 5 ) << clan->getData( )->rating << endl;
+            pc->send_to( buf );
+        }
     }
 }
 
@@ -237,25 +237,25 @@ void CClan::clanStatus( PCharacter* pc )
 {
     ClanManager *cm = ClanManager::getThis( );
 
-    pc->send_to( "      {BКлан        ...20        21-40       41-60       61-80       81...{x\r\n" );
+    pc->send_to( "      {Bп п╩п╟п╫        ...20        21-40       41-60       61-80       81...{x\r\n" );
 
     for (int i = 0; i < cm->size( ); i++) {
-	basic_ostringstream<char> buf;                                          
-	Clan *clan = cm->find( i );
-	ClanData * cd = clan->getData( );
-	    
-	if (clan->isHidden( ) || !cd)
-	    continue;
-	
-	buf << "  [{" << clan->getColor( ) << clan->getPaddedName( ) << "{x]{C";
-	
-	for (int j = 0; j < 5; j++)
-	    buf << " " << setw( 5 ) << cd->victory[j] 
-		<< "{W/{C" << setiosflags( ios::left ) << setw( 5 ) 
-		<< cd->defeat[j] << resetiosflags( ios::left );
+        basic_ostringstream<char> buf;                                          
+        Clan *clan = cm->find( i );
+        ClanData * cd = clan->getData( );
+            
+        if (clan->isHidden( ) || !cd)
+            continue;
+        
+        buf << "  [{" << clan->getColor( ) << clan->getPaddedName( ) << "{x]{C";
+        
+        for (int j = 0; j < 5; j++)
+            buf << " " << setw( 5 ) << cd->victory[j] 
+                << "{W/{C" << setiosflags( ios::left ) << setw( 5 ) 
+                << cd->defeat[j] << resetiosflags( ios::left );
 
-	buf << "{x" << endl;
-	pc->send_to( buf );
+        buf << "{x" << endl;
+        pc->send_to( buf );
     }
 }
 
@@ -276,216 +276,216 @@ void CClan::clanBank( PCharacter* pc, DLString& argument )
     DLString argumentOne = argument.getOneArgument( );
     
     if (arg_is_help( argumentOne )) {
-	clanBankHelp( pc );
-	return;
+        clanBankHelp( pc );
+        return;
     }
     
     if ((!pc->getClan( )->getData( ) || !pc->getClan( )->getData( )->getBank( ))
-	&& !pc->is_immortal( )) 
+        && !pc->is_immortal( )) 
     {
-	pc->send_to ("У тебя нет кланового банка!\n\r");
-	return;
+        pc->send_to ("пё я┌п╣п╠я▐ п╫п╣я┌ п╨п╩п╟п╫п╬п╡п╬пЁп╬ п╠п╟п╫п╨п╟!\n\r");
+        return;
     }
 
     if (argumentOne.empty( )) // Checking status
     {
-	bool fAll = pc->is_immortal( );
+        bool fAll = pc->is_immortal( );
 
-	pc->send_to( "{g\t\t  Состояние банка твоего клана{x.\n\r\n\r" );
-	pc->send_to( "Клан            |{BКвестовых единиц{x|{YЗолотых монет{x|{WСеребряных монет{x|{CБриллиантов{x|\n\r" );
+        pc->send_to( "{g\t\t  п║п╬я│я┌п╬я▐п╫п╦п╣ п╠п╟п╫п╨п╟ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟{x.\n\r\n\r" );
+        pc->send_to( "п п╩п╟п╫            |{Bп п╡п╣я│я┌п╬п╡я▀я┘ п╣п╢п╦п╫п╦я├{x|{Yп≈п╬п╩п╬я┌я▀я┘ п╪п╬п╫п╣я┌{x|{Wп║п╣я─п╣п╠я─я▐п╫я▀я┘ п╪п╬п╫п╣я┌{x|{Cп▒я─п╦п╩п╩п╦п╟п╫я┌п╬п╡{x|\n\r" );
 
-	for (int i = 0; i < cm->size( ); i++) {
-	    clan = cm->find( i );
-	    
-	    if (!clan->isValid( ) || !clan->getData( ))
-		continue;
+        for (int i = 0; i < cm->size( ); i++) {
+            clan = cm->find( i );
+            
+            if (!clan->isValid( ) || !clan->getData( ))
+                continue;
 
-	    ClanBank::Pointer bank = clan->getData( )->getBank( );
-	    
-	    if (!bank || (pc->getClan( ) != clan && !fAll))
-		continue;
+            ClanBank::Pointer bank = clan->getData( )->getBank( );
+            
+            if (!bank || (pc->getClan( ) != clan && !fAll))
+                continue;
 
-	    pc->printf( "{%s%-16s{x|%16ld|%13ld|",
-		    clan->getColor( ).c_str( ), clan->getShortName( ).c_str( ),
-		    bank->questpoints.getValue( ),
-		    bank->gold.getValue( ));
-	    pc->printf( "%16ld|%11ld|\n",
-		    bank->silver.getValue( ),
-		    bank->diamonds.getValue( ) );
-	}
+            pc->printf( "{%s%-16s{x|%16ld|%13ld|",
+                    clan->getColor( ).c_str( ), clan->getShortName( ).c_str( ),
+                    bank->questpoints.getValue( ),
+                    bank->gold.getValue( ));
+            pc->printf( "%16ld|%11ld|\n",
+                    bank->silver.getValue( ),
+                    bank->diamonds.getValue( ) );
+        }
 
-	return;
+        return;
     }
 
     if (pc->is_immortal( )) {
-	clan = cm->findUnstrict( argumentOne );
-	
-	if (!clan) {
-	    pc->send_to("Такого клана НЕ СУЩЕСТВУЕТ!\n\r");
-	    return;
-	}
-	
-	if (!clan->getData( ) || !clan->getData( )->getBank( )) {
-	    pc->send_to( "У этого клана нет банка!\r\n" );
-	    return;
-	}
-	
-	argumentOne = argument.getOneArgument( );
+        clan = cm->findUnstrict( argumentOne );
+        
+        if (!clan) {
+            pc->send_to("п╒п╟п╨п╬пЁп╬ п╨п╩п╟п╫п╟ п²п∙ п║пёп╘п∙п║п╒п▓пёп∙п╒!\n\r");
+            return;
+        }
+        
+        if (!clan->getData( ) || !clan->getData( )->getBank( )) {
+            pc->send_to( "пё я█я┌п╬пЁп╬ п╨п╩п╟п╫п╟ п╫п╣я┌ п╠п╟п╫п╨п╟!\r\n" );
+            return;
+        }
+        
+        argumentOne = argument.getOneArgument( );
 
-	if (argumentOne.empty( )) {
-	    clanBankHelp( pc );
-	    return;
-	}
+        if (argumentOne.empty( )) {
+            clanBankHelp( pc );
+            return;
+        }
     }
     else
-	clan = &*pc->getClan( );
+        clan = &*pc->getClan( );
 
-    if (arg_oneof( argumentOne, "deposit", "насчет", "положить" ))    
-	mode = CB_MODE_DEPOSIT;
-    else if (arg_oneof( argumentOne, "withdraw", "сосчета", "снять" )) 
-	mode = CB_MODE_WITHDRAW;
+    if (arg_oneof( argumentOne, "deposit", "п╫п╟я│я┤п╣я┌", "п©п╬п╩п╬п╤п╦я┌я▄" ))    
+        mode = CB_MODE_DEPOSIT;
+    else if (arg_oneof( argumentOne, "withdraw", "я│п╬я│я┤п╣я┌п╟", "я│п╫я▐я┌я▄" )) 
+        mode = CB_MODE_WITHDRAW;
     else {
-	pc->send_to( "Можно задать только режим {lR'положить'{lEdeposit{lx или {lR'снять'{lEwithdraw{lx.\n\r" );
-	return;
+        pc->send_to( "п°п╬п╤п╫п╬ п╥п╟п╢п╟я┌я▄ я┌п╬п╩я▄п╨п╬ я─п╣п╤п╦п╪ {lR'п©п╬п╩п╬п╤п╦я┌я▄'{lEdeposit{lx п╦п╩п╦ {lR'я│п╫я▐я┌я▄'{lEwithdraw{lx.\n\r" );
+        return;
     }
 
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( ) || !argumentOne.isNumber( )) {
-	pc->send_to( "Укажите сумму перевода.\r\n" );
-	return;
+        pc->send_to( "пёп╨п╟п╤п╦я┌п╣ я│я┐п╪п╪я┐ п©п╣я─п╣п╡п╬п╢п╟.\r\n" );
+        return;
     }
     
     try {
-	amount = argumentOne.toInt( );
+        amount = argumentOne.toInt( );
     } catch (const ExceptionBadType& e) {
-	pc->send_to("Сумма перевода задана неправильно!\n\r");
-	return;
+        pc->send_to("п║я┐п╪п╪п╟ п©п╣я─п╣п╡п╬п╢п╟ п╥п╟п╢п╟п╫п╟ п╫п╣п©я─п╟п╡п╦п╩я▄п╫п╬!\n\r");
+        return;
     }
 
     if (amount <= 0) {
-	pc->send_to("Сумма должна быть больше нуля.\n\r");
-	return;
+        pc->send_to("п║я┐п╪п╪п╟ п╢п╬п╩п╤п╫п╟ п╠я▀я┌я▄ п╠п╬п╩я▄я┬п╣ п╫я┐п╩я▐.\n\r");
+        return;
     }
 
     argumentOne = argument.getOneArgument( );
     
     if (argumentOne.empty( )) {
-	pc->send_to( "Укажите валютную единицу ({lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx).\r\n" );
-	return;
+        pc->send_to( "пёп╨п╟п╤п╦я┌п╣ п╡п╟п╩я▌я┌п╫я┐я▌ п╣п╢п╦п╫п╦я├я┐ ({lRп╨п©, п╥п╬п╩п╬я┌п╬, я│п╣я─п╣п╠я─п╬, п╠я─п╦п╩п╩п╦п╟п╫я┌я▀{lEqp, gold, silver, diamond{lx).\r\n" );
+        return;
     }
     
-    if (arg_oneof( argumentOne, "qp", "кп" ))    
-	currency = CB_CURR_QP;
-    else if (arg_oneof( argumentOne, "gold", "золото" )) 
-	currency = CB_CURR_GOLD;
-    else if (arg_oneof( argumentOne, "silver", "серебро" )) 
-	currency = CB_CURR_SILVER;
-    else if (arg_oneof( argumentOne, "diamond", "бриллианты" )) 
-	currency = CB_CURR_DIAMOND;
+    if (arg_oneof( argumentOne, "qp", "п╨п©" ))    
+        currency = CB_CURR_QP;
+    else if (arg_oneof( argumentOne, "gold", "п╥п╬п╩п╬я┌п╬" )) 
+        currency = CB_CURR_GOLD;
+    else if (arg_oneof( argumentOne, "silver", "я│п╣я─п╣п╠я─п╬" )) 
+        currency = CB_CURR_SILVER;
+    else if (arg_oneof( argumentOne, "diamond", "п╠я─п╦п╩п╩п╦п╟п╫я┌я▀" )) 
+        currency = CB_CURR_DIAMOND;
     else
     {
-	pc->send_to( "Кланбанк оперирует только с {lRкп, золото, серебро, бриллианты{lEqp, gold, silver, diamond{lx.\n\r" );
-	return;
+        pc->send_to( "п п╩п╟п╫п╠п╟п╫п╨ п╬п©п╣я─п╦я─я┐п╣я┌ я┌п╬п╩я▄п╨п╬ я│ {lRп╨п©, п╥п╬п╩п╬я┌п╬, я│п╣я─п╣п╠я─п╬, п╠я─п╦п╩п╩п╦п╟п╫я┌я▀{lEqp, gold, silver, diamond{lx.\n\r" );
+        return;
     }
 
     if (mode == CB_MODE_DEPOSIT) {
-	if (!clanBankDeposit( pc, clan, currency, amount, buf )) 
-	    pc->println( "Это больше, чем ты имеешь." );
-	else {
-	    pc->send_to( buf );
-	    clan->getData( )->save( );
-	    pc->save( );
-	}
+        if (!clanBankDeposit( pc, clan, currency, amount, buf )) 
+            pc->println( "п╜я┌п╬ п╠п╬п╩я▄я┬п╣, я┤п╣п╪ я┌я▀ п╦п╪п╣п╣я┬я▄." );
+        else {
+            pc->send_to( buf );
+            clan->getData( )->save( );
+            pc->save( );
+        }
 
-	return;
+        return;
     }
 
     if (!pc->is_immortal() && !clan->isRecruiter( pc ))
     {
-	pc->send_to( "Ты не можешь сделать этого - дорасти сначала до Рекруитера.\n\r" );
-	return;
+        pc->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬ - п╢п╬я─п╟я│я┌п╦ я│п╫п╟я┤п╟п╩п╟ п╢п╬ п═п╣п╨я─я┐п╦я┌п╣я─п╟.\n\r" );
+        return;
     }
 
     argumentOne = argument.getOneArgument( );
 
     if (!argumentOne.empty( )) // Has a destination
     {
-	if (arg_oneof( argumentOne, "clan", "клану" )) {
-	    argumentOne = argument.getOneArgument( );
-	    acc_clan = cm->findUnstrict( argumentOne );
+        if (arg_oneof( argumentOne, "clan", "п╨п╩п╟п╫я┐" )) {
+            argumentOne = argument.getOneArgument( );
+            acc_clan = cm->findUnstrict( argumentOne );
 
-	    if (!acc_clan) {
-		pc->send_to("Клана-получателя НЕ СУЩЕСТВУЕТ !\n\r");
-		return;
-	    }
-	    
-	    if (!acc_clan->getData( ) || !acc_clan->getData( )->getBank( )) {
-		pc->send_to("У клана-получателя НЕТ БАНКА!\n\r");
-		return;
-	    }
-	}
-	else if (arg_oneof( argumentOne, "character", "персонажу" )) {
-	    argumentOne = argument.getOneArgument( );
-	    vch = get_char_world( pc, argumentOne.c_str( ) );
+            if (!acc_clan) {
+                pc->send_to("п п╩п╟п╫п╟-п©п╬п╩я┐я┤п╟я┌п╣п╩я▐ п²п∙ п║пёп╘п∙п║п╒п▓пёп∙п╒ !\n\r");
+                return;
+            }
+            
+            if (!acc_clan->getData( ) || !acc_clan->getData( )->getBank( )) {
+                pc->send_to("пё п╨п╩п╟п╫п╟-п©п╬п╩я┐я┤п╟я┌п╣п╩я▐ п²п∙п╒ п▒п░п²п п░!\n\r");
+                return;
+            }
+        }
+        else if (arg_oneof( argumentOne, "character", "п©п╣я─я│п╬п╫п╟п╤я┐" )) {
+            argumentOne = argument.getOneArgument( );
+            vch = get_char_world( pc, argumentOne.c_str( ) );
 
-	    if (!vch || !(victim = vch->getPC( ))) {
-		pc->send_to( "Игрока-получателя нет в мире.\n\r" );
-		return;
-	    }
-	}
-	else
-	{
-	    pc->send_to( "Непонятно, чего ты хочешь?\n\r" );
-	    return;
-	}
+            if (!vch || !(victim = vch->getPC( ))) {
+                pc->send_to( "п≤пЁя─п╬п╨п╟-п©п╬п╩я┐я┤п╟я┌п╣п╩я▐ п╫п╣я┌ п╡ п╪п╦я─п╣.\n\r" );
+                return;
+            }
+        }
+        else
+        {
+            pc->send_to( "п²п╣п©п╬п╫я▐я┌п╫п╬, я┤п╣пЁп╬ я┌я▀ я┘п╬я┤п╣я┬я▄?\n\r" );
+            return;
+        }
     }
 
     if (!acc_clan)
-	acc_clan = clan;
+        acc_clan = clan;
 
     if (!victim)
-	victim = pc;
+        victim = pc;
 
     if (currency != CB_CURR_QP && (clan != acc_clan || pc != victim )) {
-	pc->send_to( "Взаиморасчеты между кланами (или игроками) осуществляются в QP\n\r" );
-	return;
+        pc->send_to( "п▓п╥п╟п╦п╪п╬я─п╟я│я┤п╣я┌я▀ п╪п╣п╤п╢я┐ п╨п╩п╟п╫п╟п╪п╦ (п╦п╩п╦ п╦пЁя─п╬п╨п╟п╪п╦) п╬я│я┐я┴п╣я│я┌п╡п╩я▐я▌я┌я│я▐ п╡ QP\n\r" );
+        return;
     }
-		
+                
     if (currency == CB_CURR_QP && victim && pc->getClan() != victim->getClan())
     {
-	pc->send_to ("Ты можешь отдать QP или какому-либо клану, или своему соклановику.\n\r");
-	return;
+        pc->send_to ("п╒я▀ п╪п╬п╤п╣я┬я▄ п╬я┌п╢п╟я┌я▄ QP п╦п╩п╦ п╨п╟п╨п╬п╪я┐-п╩п╦п╠п╬ п╨п╩п╟п╫я┐, п╦п╩п╦ я│п╡п╬п╣п╪я┐ я│п╬п╨п╩п╟п╫п╬п╡п╦п╨я┐.\n\r");
+        return;
     }
     
     if (!clanBankWithdraw( pc, victim, clan, acc_clan, currency, amount, buf )) {
-	pc->send_to( "В банке твоего клана столько не будет..\n\r" );
-	return;
+        pc->send_to( "п▓ п╠п╟п╫п╨п╣ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟ я│я┌п╬п╩я▄п╨п╬ п╫п╣ п╠я┐п╢п╣я┌..\n\r" );
+        return;
     }
 
     pc->send_to( buf );
     clan->getData( )->save( );
 
     if (clan != acc_clan)
-	acc_clan->getData( )->save( );
+        acc_clan->getData( )->save( );
 
     pc->save( );
 
     if (pc != victim)
-	victim->save( );
+        victim->save( );
 }
 
 static bool obj_is_diamond( Object *obj )
 {
     if (obj->pIndexData->vnum == OBJ_VNUM_DIAMOND
-	&& obj->wear_loc == wear_none
-	&& obj->getRealName( ) == 0
-	&& obj->getRealShortDescr( ) == 0
-	&& obj->getRealDescription( ) == 0)
-	
-	return true;
+        && obj->wear_loc == wear_none
+        && obj->getRealName( ) == 0
+        && obj->getRealShortDescr( ) == 0
+        && obj->getRealDescription( ) == 0)
+        
+        return true;
     else
-	return false;
+        return false;
 }
 
 /*
@@ -496,90 +496,90 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
 {
     switch (currency) {
     case CB_CURR_QP:
-	if (!pc->is_immortal( )) {
-	    if (pc->questpoints < amount)
-		return false;
+        if (!pc->is_immortal( )) {
+            if (pc->questpoints < amount)
+                return false;
 
-	    pc->questpoints -= amount;
-	}
+            pc->questpoints -= amount;
+        }
 
-	buf << "На банковский счет клана {" 
-	    << acc_clan->getColor( ) << acc_clan->getShortName( ) 
-	    << "{x переведено: " << amount << " квестов"
-	    << GET_COUNT(amount,"ая единица","ые единицы","ых единиц")
-	    << "." << endl;
-	
-	acc_clan->getData( )->getBank( )->questpoints += amount;
-	return true;
+        buf << "п²п╟ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ п╨п╩п╟п╫п╟ {" 
+            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+            << "{x п©п╣я─п╣п╡п╣п╢п╣п╫п╬: " << amount << " п╨п╡п╣я│я┌п╬п╡"
+            << GET_COUNT(amount,"п╟я▐ п╣п╢п╦п╫п╦я├п╟","я▀п╣ п╣п╢п╦п╫п╦я├я▀","я▀я┘ п╣п╢п╦п╫п╦я├")
+            << "." << endl;
+        
+        acc_clan->getData( )->getBank( )->questpoints += amount;
+        return true;
 
     case CB_CURR_GOLD:
-	if (!pc->is_immortal( )) {
-	    if (pc->gold < amount)
-		return false;
+        if (!pc->is_immortal( )) {
+            if (pc->gold < amount)
+                return false;
 
-	    pc->gold -= amount;
-	}
-	
-	buf << "На банковский счет клана {" 
-	    << acc_clan->getColor( ) << acc_clan->getShortName( ) 
-	    << "{x переведено: " << amount << " золот"
-	    << GET_COUNT(amount,"ая монета","ые монеты","ых монеты")
-	    << "." << endl;
-	
-	acc_clan->getData( )->getBank( )->gold += amount;
-	return true;
+            pc->gold -= amount;
+        }
+        
+        buf << "п²п╟ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ п╨п╩п╟п╫п╟ {" 
+            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+            << "{x п©п╣я─п╣п╡п╣п╢п╣п╫п╬: " << amount << " п╥п╬п╩п╬я┌"
+            << GET_COUNT(amount,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌я▀")
+            << "." << endl;
+        
+        acc_clan->getData( )->getBank( )->gold += amount;
+        return true;
 
     case CB_CURR_SILVER:
-	if (!pc->is_immortal( )) {
-	    if (pc->silver < amount)
-		return false;
+        if (!pc->is_immortal( )) {
+            if (pc->silver < amount)
+                return false;
 
-	    pc->silver -= amount;
-	}
+            pc->silver -= amount;
+        }
 
-	buf << "На банковский счет клана {" 
-	    << acc_clan->getColor( ) << acc_clan->getShortName( ) 
-	    << "{x переведено: " << amount << " серебрян"
-	    << GET_COUNT(amount,"ая монета","ые монеты","ых монеты")
-	    << "." << endl;
-	
-	acc_clan->getData( )->getBank( )->silver += amount;
-	return true;
+        buf << "п²п╟ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ п╨п╩п╟п╫п╟ {" 
+            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+            << "{x п©п╣я─п╣п╡п╣п╢п╣п╫п╬: " << amount << " я│п╣я─п╣п╠я─я▐п╫"
+            << GET_COUNT(amount,"п╟я▐ п╪п╬п╫п╣я┌п╟","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌я▀")
+            << "." << endl;
+        
+        acc_clan->getData( )->getBank( )->silver += amount;
+        return true;
 
     case CB_CURR_DIAMOND:
-	if (!pc->is_immortal( )) {
-	    Object *obj, *obj_next;
-	    int count = 0;
+        if (!pc->is_immortal( )) {
+            Object *obj, *obj_next;
+            int count = 0;
 
-	    for (obj = pc->carrying; obj; obj = obj->next_content)
-		if (obj_is_diamond( obj ))
-		    count++;
+            for (obj = pc->carrying; obj; obj = obj->next_content)
+                if (obj_is_diamond( obj ))
+                    count++;
 
-	    if (count < amount)
-		return false;
-	    
-	    for (obj = pc->carrying; obj && count > 0; obj = obj_next) {
-		obj_next = obj->next_content;
-		
-		if (obj_is_diamond( obj )) {
-		    extract_obj( obj );
-		    count--;
-		}
-	    }
+            if (count < amount)
+                return false;
+            
+            for (obj = pc->carrying; obj && count > 0; obj = obj_next) {
+                obj_next = obj->next_content;
+                
+                if (obj_is_diamond( obj )) {
+                    extract_obj( obj );
+                    count--;
+                }
+            }
 
-	}
+        }
 
-	buf << "На банковский счет клана {" 
-	    << acc_clan->getColor( ) << acc_clan->getShortName( ) 
-	    << "{x переведено: " << amount << " бриллиант"
-	    << GET_COUNT(amount,"","а","ов")
-	    << "." << endl;
-	
-	acc_clan->getData( )->getBank( )->diamonds += amount;
-	return true;
+        buf << "п²п╟ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ п╨п╩п╟п╫п╟ {" 
+            << acc_clan->getColor( ) << acc_clan->getShortName( ) 
+            << "{x п©п╣я─п╣п╡п╣п╢п╣п╫п╬: " << amount << " п╠я─п╦п╩п╩п╦п╟п╫я┌"
+            << GET_COUNT(amount,"","п╟","п╬п╡")
+            << "." << endl;
+        
+        acc_clan->getData( )->getBank( )->diamonds += amount;
+        return true;
 
     default:
-	return false;
+        return false;
     }
 }
 
@@ -588,97 +588,97 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
  */
 bool CClan::clanBankWithdraw( PCharacter *pc, PCharacter *victim,
                               Clan *clan, Clan *acc_clan,
-			      int currency, int amount, ostringstream &buf )
+                              int currency, int amount, ostringstream &buf )
 {
     ClanBank::Pointer bank = clan->getData( )->getBank( ), 
                       acc_bank = acc_clan->getData( )->getBank( );
 
     switch (currency) {
     case CB_CURR_QP:
-	if (bank->questpoints < amount)
-	    return false;
-	
-	bank->questpoints -= amount;
+        if (bank->questpoints < amount)
+            return false;
+        
+        bank->questpoints -= amount;
 
-	if (acc_clan && acc_clan != clan) {
-	    buf << "На банковский счет клана {"
-	        << acc_clan->getColor( ) << acc_clan->getShortName( ) <<"{x "
-		<< "переведено: " << amount << " квестов"
-		<< GET_COUNT(amount,"ая единица","ые единицы","ых единиц")
-		<< " со счета твоего клана." << endl;
-	    
-	    acc_bank->questpoints += amount;
-	}
-	else if (victim && pc != victim)
-	{
-	    buf << fmt( pc, "Для %1$#^C2 переведено: %2$d квестов%2$Iая|ые|ых едини%2$Iца|цы|ц со счета твоего клана.",
-	                victim, amount )
-	        << endl;
+        if (acc_clan && acc_clan != clan) {
+            buf << "п²п╟ п╠п╟п╫п╨п╬п╡я│п╨п╦п╧ я│я┤п╣я┌ п╨п╩п╟п╫п╟ {"
+                << acc_clan->getColor( ) << acc_clan->getShortName( ) <<"{x "
+                << "п©п╣я─п╣п╡п╣п╢п╣п╫п╬: " << amount << " п╨п╡п╣я│я┌п╬п╡"
+                << GET_COUNT(amount,"п╟я▐ п╣п╢п╦п╫п╦я├п╟","я▀п╣ п╣п╢п╦п╫п╦я├я▀","я▀я┘ п╣п╢п╦п╫п╦я├")
+                << " я│п╬ я│я┤п╣я┌п╟ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟." << endl;
+            
+            acc_bank->questpoints += amount;
+        }
+        else if (victim && pc != victim)
+        {
+            buf << fmt( pc, "п■п╩я▐ %1$#^C2 п©п╣я─п╣п╡п╣п╢п╣п╫п╬: %2$d п╨п╡п╣я│я┌п╬п╡%2$Iп╟я▐|я▀п╣|я▀я┘ п╣п╢п╦п╫п╦%2$Iя├п╟|я├я▀|я├ я│п╬ я│я┤п╣я┌п╟ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟.",
+                        victim, amount )
+                << endl;
 
-	    if (!victim->is_immortal( ))
-		victim->questpoints += amount;
-	}
-	else
-	{
-	    buf << "Ты снимаешь " << amount << " квестов"
-		<< GET_COUNT(amount,"ую единицу","ые единицы","ых единиц")
-	        << " со счета клана." << endl;
+            if (!victim->is_immortal( ))
+                victim->questpoints += amount;
+        }
+        else
+        {
+            buf << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ " << amount << " п╨п╡п╣я│я┌п╬п╡"
+                << GET_COUNT(amount,"я┐я▌ п╣п╢п╦п╫п╦я├я┐","я▀п╣ п╣п╢п╦п╫п╦я├я▀","я▀я┘ п╣п╢п╦п╫п╦я├")
+                << " я│п╬ я│я┤п╣я┌п╟ п╨п╩п╟п╫п╟." << endl;
 
-	    if (!victim->is_immortal( ))
-		victim->questpoints += amount;
-	}
+            if (!victim->is_immortal( ))
+                victim->questpoints += amount;
+        }
 
-	return true;
+        return true;
 
     case CB_CURR_GOLD:
-	if (bank->gold < amount)
-	    return false;
+        if (bank->gold < amount)
+            return false;
 
-	bank->gold -= amount;
-	
-	buf << "Ты снимаешь " << amount << " золот"
-	    << GET_COUNT(amount,"ую монету","ые монеты","ых монет")
-	    << " со счета клана." << endl;
+        bank->gold -= amount;
+        
+        buf << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ " << amount << " п╥п╬п╩п╬я┌"
+            << GET_COUNT(amount,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌")
+            << " я│п╬ я│я┤п╣я┌п╟ п╨п╩п╟п╫п╟." << endl;
 
-	if (!pc->is_immortal( ))
-	    pc->gold += amount;
+        if (!pc->is_immortal( ))
+            pc->gold += amount;
 
-	return true;
+        return true;
 
     case CB_CURR_SILVER:
-	if (bank->silver < amount)
-	    return false;
+        if (bank->silver < amount)
+            return false;
 
-	bank->silver -= amount;
+        bank->silver -= amount;
 
-	buf << "Ты снимаешь " << amount << " серебрян"
-	    << GET_COUNT(amount,"ую монету","ые монеты","ых монет")
-	    << " со счета клана." << endl;
+        buf << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ " << amount << " я│п╣я─п╣п╠я─я▐п╫"
+            << GET_COUNT(amount,"я┐я▌ п╪п╬п╫п╣я┌я┐","я▀п╣ п╪п╬п╫п╣я┌я▀","я▀я┘ п╪п╬п╫п╣я┌")
+            << " я│п╬ я│я┤п╣я┌п╟ п╨п╩п╟п╫п╟." << endl;
 
-	if (!pc->is_immortal( ))
-	    pc->silver += amount;
+        if (!pc->is_immortal( ))
+            pc->silver += amount;
 
-	return true;
-	
+        return true;
+        
     case CB_CURR_DIAMOND:
-	if (bank->diamonds < amount)
-	    return false;
+        if (bank->diamonds < amount)
+            return false;
 
-	bank->diamonds -= amount;
+        bank->diamonds -= amount;
 
-	buf << "Ты снимаешь " << amount << " бриллиан"
-	    << GET_COUNT(amount,"т","та","тов")
-	    << " со счета клана." << endl;
+        buf << "п╒я▀ я│п╫п╦п╪п╟п╣я┬я▄ " << amount << " п╠я─п╦п╩п╩п╦п╟п╫"
+            << GET_COUNT(amount,"я┌","я┌п╟","я┌п╬п╡")
+            << " я│п╬ я│я┤п╣я┌п╟ п╨п╩п╟п╫п╟." << endl;
 
-	if (!pc->is_immortal( )) 
-	    for (int i = 0; i < amount; i++)
-		obj_to_char( create_object( get_obj_index(OBJ_VNUM_DIAMOND), 0 ),
-		             pc );
-	
-	return true;
+        if (!pc->is_immortal( )) 
+            for (int i = 0; i < amount; i++)
+                obj_to_char( create_object( get_obj_index(OBJ_VNUM_DIAMOND), 0 ),
+                             pc );
+        
+        return true;
 
     default:
-	return false;
+        return false;
     }
 }
 
@@ -689,21 +689,21 @@ void CClan::clanBankHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf << "{W{lRклан банк положить{lEclan bank deposit{lx{x <кол-во> {W{lRкп{lEqp{lx{x|{W{lRзолото{lEgold{lx{x|{W{lRсеребро{lEsilver{lx{x|{W{lRбриллианты{lEdiamonds{lx{x" << endl
-	<< "          - положить деньги(qp, бриллианты..) в свой кланбанк" << endl
-	<< endl
-        << "Для лидеров:" << endl
-	<< "{W{lRклан банк снять{lEclan bank withdraw{lx {x<кол-во> {W{lRкп{lEqp{lx{x|{W{lRзолото{lEgold{lx{x|{W{lRсеребро{lEsilver{lx{x|{W{lRбриллианты{lEdiamonds{lx{x" << endl
-	<< "          - снять деньги(qp) со счета своего кланбанка" << endl
-        << "{W{lRклан банк снять{lEclan bank withdraw{lx {x<кол-во> {W{lRкп{lEqp{lx {lRклану{lEclan{lx {x<клан>" << endl
-        << "          - перевести qp на кланбанк другого клана" << endl
-        << "{W{lRклан банк снять{lEclan bank withdraw{lx {x<кол-во> {W{lRкп{lEqp{lx {lRперсонажу{lEchar{lx {x<имя>" << endl
-        << "          - отдать qp с кланбанка соклановику" << endl;
+    buf << "{W{lRп╨п╩п╟п╫ п╠п╟п╫п╨ п©п╬п╩п╬п╤п╦я┌я▄{lEclan bank deposit{lx{x <п╨п╬п╩-п╡п╬> {W{lRп╨п©{lEqp{lx{x|{W{lRп╥п╬п╩п╬я┌п╬{lEgold{lx{x|{W{lRя│п╣я─п╣п╠я─п╬{lEsilver{lx{x|{W{lRп╠я─п╦п╩п╩п╦п╟п╫я┌я▀{lEdiamonds{lx{x" << endl
+        << "          - п©п╬п╩п╬п╤п╦я┌я▄ п╢п╣п╫я▄пЁп╦(qp, п╠я─п╦п╩п╩п╦п╟п╫я┌я▀..) п╡ я│п╡п╬п╧ п╨п╩п╟п╫п╠п╟п╫п╨" << endl
+        << endl
+        << "п■п╩я▐ п╩п╦п╢п╣я─п╬п╡:" << endl
+        << "{W{lRп╨п╩п╟п╫ п╠п╟п╫п╨ я│п╫я▐я┌я▄{lEclan bank withdraw{lx {x<п╨п╬п╩-п╡п╬> {W{lRп╨п©{lEqp{lx{x|{W{lRп╥п╬п╩п╬я┌п╬{lEgold{lx{x|{W{lRя│п╣я─п╣п╠я─п╬{lEsilver{lx{x|{W{lRп╠я─п╦п╩п╩п╦п╟п╫я┌я▀{lEdiamonds{lx{x" << endl
+        << "          - я│п╫я▐я┌я▄ п╢п╣п╫я▄пЁп╦(qp) я│п╬ я│я┤п╣я┌п╟ я│п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╠п╟п╫п╨п╟" << endl
+        << "{W{lRп╨п╩п╟п╫ п╠п╟п╫п╨ я│п╫я▐я┌я▄{lEclan bank withdraw{lx {x<п╨п╬п╩-п╡п╬> {W{lRп╨п©{lEqp{lx {lRп╨п╩п╟п╫я┐{lEclan{lx {x<п╨п╩п╟п╫>" << endl
+        << "          - п©п╣я─п╣п╡п╣я│я┌п╦ qp п╫п╟ п╨п╩п╟п╫п╠п╟п╫п╨ п╢я─я┐пЁп╬пЁп╬ п╨п╩п╟п╫п╟" << endl
+        << "{W{lRп╨п╩п╟п╫ п╠п╟п╫п╨ я│п╫я▐я┌я▄{lEclan bank withdraw{lx {x<п╨п╬п╩-п╡п╬> {W{lRп╨п©{lEqp{lx {lRп©п╣я─я│п╬п╫п╟п╤я┐{lEchar{lx {x<п╦п╪я▐>" << endl
+        << "          - п╬я┌п╢п╟я┌я▄ qp я│ п╨п╩п╟п╫п╠п╟п╫п╨п╟ я│п╬п╨п╩п╟п╫п╬п╡п╦п╨я┐" << endl;
     
     if (pc->is_immortal( ))
-	buf << endl
-	    << "Для Бессмертных: обязательно указывать имя клана, т.е." << endl
-	    << "{W{lRклан банк{lEclan bank{lx {x<клан> {W{lRположить{lEdeposit{lx{x|{W{lRснять{lEwithdraw{lx{x ..." << endl;
+        buf << endl
+            << "п■п╩я▐ п▒п╣я│я│п╪п╣я─я┌п╫я▀я┘: п╬п╠я▐п╥п╟я┌п╣п╩я▄п╫п╬ я┐п╨п╟п╥я▀п╡п╟я┌я▄ п╦п╪я▐ п╨п╩п╟п╫п╟, я┌.п╣." << endl
+            << "{W{lRп╨п╩п╟п╫ п╠п╟п╫п╨{lEclan bank{lx {x<п╨п╩п╟п╫> {W{lRп©п╬п╩п╬п╤п╦я┌я▄{lEdeposit{lx{x|{W{lRя│п╫я▐я┌я▄{lEwithdraw{lx{x ..." << endl;
 
     pc->send_to( buf );
 }
@@ -720,66 +720,66 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
     DLString argumentOne = argument.getOneArgument( );
     
     if (arg_is_help( argumentOne )) {
-	clanRemoveHelp( pc );
-	return;
+        clanRemoveHelp( pc );
+        return;
     }
     
     if (arg_is_self( argumentOne )) 
-	argumentOne = pc->getName( );
+        argumentOne = pc->getName( );
 
     victim = PCharacterManager::find( argumentOne );
     if (!victim) {
-	pc->send_to( "Игрок с таким именем не найден.\r\n" );
-	return;
+        pc->send_to( "п≤пЁя─п╬п╨ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫.\r\n" );
+        return;
     }
     
     Clan &clan = *victim->getClan( );
     member = clan.getMembership( );
 
     if (pc == victim) {
-	if (!member) {
-	    pc->send_to( "А откуда еще тебе хотелось бы уйти?\n\r" );
-	    return;
-	}
-	
-	if (!pc->is_immortal( )) 
-	    if (!member->removable) {
-		pc->println( "Из твоего клана невозможно уйти по собственной воле." );
-		return;
-	    }
+        if (!member) {
+            pc->send_to( "п░ п╬я┌п╨я┐п╢п╟ п╣я┴п╣ я┌п╣п╠п╣ я┘п╬я┌п╣п╩п╬я│я▄ п╠я▀ я┐п╧я┌п╦?\n\r" );
+            return;
+        }
+        
+        if (!pc->is_immortal( )) 
+            if (!member->removable) {
+                pc->println( "п≤п╥ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я┐п╧я┌п╦ п©п╬ я│п╬п╠я│я┌п╡п╣п╫п╫п╬п╧ п╡п╬п╩п╣." );
+                return;
+            }
 
-	buf << "Ты уходишь из клана [{" 
-	    << clan.getColor( ) << clan.getShortName( ) << "{x].";
-		
-	pc->setClan( member->removeSelf );
+        buf << "п╒я▀ я┐я┘п╬п╢п╦я┬я▄ п╦п╥ п╨п╩п╟п╫п╟ [{" 
+            << clan.getColor( ) << clan.getShortName( ) << "{x].";
+                
+        pc->setClan( member->removeSelf );
 
     } else {
-	if (!pc->is_immortal() && !clan.isRecruiter( pc )) {
-	    pc->send_to( "Ты не лидер.\n\r" );
-	    return;
-	}
+        if (!pc->is_immortal() && !clan.isRecruiter( pc )) {
+            pc->send_to( "п╒я▀ п╫п╣ п╩п╦п╢п╣я─.\n\r" );
+            return;
+        }
 
-	if (victim->getClan( ) != pc->getClan( )) {
-	    pc->printf( "%s не в твоем клане.\r\n", victim->getName( ).c_str( ) );
-	    return;
-	}
+        if (victim->getClan( ) != pc->getClan( )) {
+            pc->printf( "%s п╫п╣ п╡ я┌п╡п╬п╣п╪ п╨п╩п╟п╫п╣.\r\n", victim->getName( ).c_str( ) );
+            return;
+        }
 
-	if (member && !member->removable) {
-	    pc->println( "Из твоего клана невозможно никого выгнать." );
-	    return;
-	}
-	
-    	if (pc->get_trust( ) < CREATOR 
-	    && clan.isRecruiter( victim ) 
-	    && !dynamic_cast<PCharacter *>( victim )) 
-	{
-	    pc->send_to( "Ты не можешь выгнать из клана рекрутера(лидера), когда его нет в мире.\r\n" );
-	    return;
-	}
+        if (member && !member->removable) {
+            pc->println( "п≤п╥ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟ п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╫п╦п╨п╬пЁп╬ п╡я▀пЁп╫п╟я┌я▄." );
+            return;
+        }
+        
+            if (pc->get_trust( ) < CREATOR 
+            && clan.isRecruiter( victim ) 
+            && !dynamic_cast<PCharacter *>( victim )) 
+        {
+            pc->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡я▀пЁп╫п╟я┌я▄ п╦п╥ п╨п╩п╟п╫п╟ я─п╣п╨я─я┐я┌п╣я─п╟(п╩п╦п╢п╣я─п╟), п╨п╬пЁп╢п╟ п╣пЁп╬ п╫п╣я┌ п╡ п╪п╦я─п╣.\r\n" );
+            return;
+        }
 
-	buf << "Тебя выгнали из клана [{" << clan.getColor( ) << clan.getShortName( ) << "{x].";
-	victim->setClan( member->removeBy );
-    }	
+        buf << "п╒п╣п╠я▐ п╡я▀пЁп╫п╟п╩п╦ п╦п╥ п╨п╩п╟п╫п╟ [{" << clan.getColor( ) << clan.getShortName( ) << "{x].";
+        victim->setClan( member->removeBy );
+    }        
 
     pc->send_to( "Ok.\n\r" );
 
@@ -790,9 +790,9 @@ void CClan::clanRemove( PCharacter* pc, DLString& argument )
     attr->addEntry( buf.str( ) );
 
     if (PCharacter *pcVictim = dynamic_cast<PCharacter *>( victim )) 
-	attr->run( pcVictim );
+        attr->run( pcVictim );
     else
-	PCharacterManager::saveMemory( victim );
+        PCharacterManager::saveMemory( victim );
 }
 
 /*
@@ -802,10 +802,10 @@ void CClan::clanRemoveHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf   << "{W{lRклан выгнать себя{lEclan remove self{lx{x - уйти из клана" << endl
+    buf   << "{W{lRп╨п╩п╟п╫ п╡я▀пЁп╫п╟я┌я▄ я│п╣п╠я▐{lEclan remove self{lx{x - я┐п╧я┌п╦ п╦п╥ п╨п╩п╟п╫п╟" << endl
           << endl
-	  << "Для лидеров:" << endl
-	  << "{W{lRклан выгнать{lEclan remove{lx{x <имя> - выгнать кого-то из клана" << endl;
+          << "п■п╩я▐ п╩п╦п╢п╣я─п╬п╡:" << endl
+          << "{W{lRп╨п╩п╟п╫ п╡я▀пЁп╫п╟я┌я▄{lEclan remove{lx{x <п╦п╪я▐> - п╡я▀пЁп╫п╟я┌я▄ п╨п╬пЁп╬-я┌п╬ п╦п╥ п╨п╩п╟п╫п╟" << endl;
 
     pc->send_to( buf );
 }
@@ -814,7 +814,7 @@ void CClan::clanRemoveHelp( PCharacter *pc )
  * clan level [list|<victim> [<number>]]
  */ 
 void CClan::clanLevel( PCharacter *pc, DLString& argument )
-{	
+{        
     basic_ostringstream<char> buf;
     PCMemoryInterface *victim;
 
@@ -822,29 +822,29 @@ void CClan::clanLevel( PCharacter *pc, DLString& argument )
     DLString argumentTwo = argument.getOneArgument( );
 
     if (arg_is_help( argumentOne )) {
-	clanLevelHelp( pc );
-	return;
+        clanLevelHelp( pc );
+        return;
     }
     else if (arg_is_list( argumentOne )) {
-	clanLevelList( pc );
-	return;
+        clanLevelList( pc );
+        return;
     }
     else if (argumentOne.empty( ) || arg_is_self( argumentOne )) {
-	victim = pc;
+        victim = pc;
     }
     else {
-	victim = PCharacterManager::find( argumentOne );
+        victim = PCharacterManager::find( argumentOne );
 
-	if (!victim) {
-	    pc->send_to( "Игрок с таким именем не найден.\r\n" );
-	    return;
-	}		
+        if (!victim) {
+            pc->send_to( "п≤пЁя─п╬п╨ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫.\r\n" );
+            return;
+        }                
     }
     
     if (argumentTwo.empty( )) 
-	clanLevelShow( pc, victim );
+        clanLevelShow( pc, victim );
     else 
-	clanLevelSet( pc, victim, argumentTwo );
+        clanLevelSet( pc, victim, argumentTwo );
 }
 
 /*
@@ -858,8 +858,8 @@ void CClan::clanLevelList( PCharacter *pc )
     titles = pc->getClan( )->getTitles( );
 
     if (!titles) {
-	pc->send_to( "Клановых званий в твоем клане не обнаружено.\r\n" );
-	return;
+        pc->send_to( "п п╩п╟п╫п╬п╡я▀я┘ п╥п╡п╟п╫п╦п╧ п╡ я┌п╡п╬п╣п╪ п╨п╩п╟п╫п╣ п╫п╣ п╬п╠п╫п╟я─я┐п╤п╣п╫п╬.\r\n" );
+        return;
     }
     
     titles->toStream( buf );
@@ -874,21 +874,21 @@ void CClan::clanLevelShow( PCharacter *pc, PCMemoryInterface *victim )
     Clan *clan = &*victim->getClan( );
 
     if (!clan->getTitles( )) {
-	if (victim == pc)
-	    pc->send_to( "Клановых званий в твоем клане не обнаружено.\r\n" );
-	else
-	    pc->send_to( "В его/ее клане нет клановых званий.\r\n" );
+        if (victim == pc)
+            pc->send_to( "п п╩п╟п╫п╬п╡я▀я┘ п╥п╡п╟п╫п╦п╧ п╡ я┌п╡п╬п╣п╪ п╨п╩п╟п╫п╣ п╫п╣ п╬п╠п╫п╟я─я┐п╤п╣п╫п╬.\r\n" );
+        else
+            pc->send_to( "п▓ п╣пЁп╬/п╣п╣ п╨п╩п╟п╫п╣ п╫п╣я┌ п╨п╩п╟п╫п╬п╡я▀я┘ п╥п╡п╟п╫п╦п╧.\r\n" );
     }
     else {
-	if (victim == pc)
-	    pc->printf( "Твое звание [{%s%s{x].\r\n", 
-			clan->getColor( ).c_str( ), 
-			clan->getTitle( pc ).c_str( ) );
-	else
-	    pc->printf( "%s имеет звание [{%s%s{x].\r\n", 
-			victim->getName( ).c_str( ),
-			clan->getColor( ).c_str( ), 
-			clan->getTitle( victim ).c_str( ) );
+        if (victim == pc)
+            pc->printf( "п╒п╡п╬п╣ п╥п╡п╟п╫п╦п╣ [{%s%s{x].\r\n", 
+                        clan->getColor( ).c_str( ), 
+                        clan->getTitle( pc ).c_str( ) );
+        else
+            pc->printf( "%s п╦п╪п╣п╣я┌ п╥п╡п╟п╫п╦п╣ [{%s%s{x].\r\n", 
+                        victim->getName( ).c_str( ),
+                        clan->getColor( ).c_str( ), 
+                        clan->getTitle( victim ).c_str( ) );
     }
     
 }
@@ -904,71 +904,71 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     const Clan &clan = *victim->getClan( );
     
     try {
-	i = arg.toInt( );
+        i = arg.toInt( );
     } catch (const ExceptionBadType &e) {
-        pc->send_to( "Неверный клановый уровень.\n\r" );
+        pc->send_to( "п²п╣п╡п╣я─п╫я▀п╧ п╨п╩п╟п╫п╬п╡я▀п╧ я┐я─п╬п╡п╣п╫я▄.\n\r" );
         return;
     }
     
     if (pc->get_trust( ) < CREATOR) {
-	if (!pc->getClan( )->isRecruiter( pc )) {
-	    pc->send_to( "Ты не являешься лидером клана.\n\r" );
-	    return;
-	}
-	
-	if (pc->getClan( ) != clan) {
-	    pc->send_to( "Не лезь в чужой клан.\n\r" );
-	    return;
-	}
+        if (!pc->getClan( )->isRecruiter( pc )) {
+            pc->send_to( "п╒я▀ п╫п╣ я▐п╡п╩я▐п╣я┬я▄я│я▐ п╩п╦п╢п╣я─п╬п╪ п╨п╩п╟п╫п╟.\n\r" );
+            return;
+        }
+        
+        if (pc->getClan( ) != clan) {
+            pc->send_to( "п²п╣ п╩п╣п╥я▄ п╡ я┤я┐п╤п╬п╧ п╨п╩п╟п╫.\n\r" );
+            return;
+        }
     }
     
     if (clan.getTitles( ))
-	size = clan.getTitles( )->size( );
+        size = clan.getTitles( )->size( );
     else
-	size = 0;
+        size = 0;
 
     if (size == 0) {
-	pc->send_to( "В этом клане нет клановых уровней.\r\n" );
-	return;
+        pc->send_to( "п▓ я█я┌п╬п╪ п╨п╩п╟п╫п╣ п╫п╣я┌ п╨п╩п╟п╫п╬п╡я▀я┘ я┐я─п╬п╡п╫п╣п╧.\r\n" );
+        return;
     }
 
     if (i < 0 || i >= size) {
-	pc->printf( "Можно использовать только 0..%d\r\n", size - 1 );
-	return;
+        pc->printf( "п°п╬п╤п╫п╬ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ я┌п╬п╩я▄п╨п╬ 0..%d\r\n", size - 1 );
+        return;
     }
 
     if (pc->get_trust( ) < CREATOR) {
-	if (pc == victim && pc->getClanLevel( ) < i) {
-	    pc->send_to( "И кто же тебе это позволит?\n\r" );
-	    return;
-	}
+        if (pc == victim && pc->getClanLevel( ) < i) {
+            pc->send_to( "п≤ п╨я┌п╬ п╤п╣ я┌п╣п╠п╣ я█я┌п╬ п©п╬п╥п╡п╬п╩п╦я┌?\n\r" );
+            return;
+        }
 
-	if (victim->getClanLevel( ) > i) {
-	    if (clan.isRecruiter( victim ) && !dynamic_cast<PCharacter *>( victim )) {
-		pc->send_to( "Ты не можешь сместить с поста лидера или рекрутера, когда их нет в мире.\r\n" );
-		return;
-	    }
-	}
+        if (victim->getClanLevel( ) > i) {
+            if (clan.isRecruiter( victim ) && !dynamic_cast<PCharacter *>( victim )) {
+                pc->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╪п╣я│я┌п╦я┌я▄ я│ п©п╬я│я┌п╟ п╩п╦п╢п╣я─п╟ п╦п╩п╦ я─п╣п╨я─я┐я┌п╣я─п╟, п╨п╬пЁп╢п╟ п╦я┘ п╫п╣я┌ п╡ п╪п╦я─п╣.\r\n" );
+                return;
+            }
+        }
     }
 
     if (victim->getClanLevel( ) == i) {
-        pc->send_to( "Тихий голосок в сознании шепчет:\n\rЕсть и более глупые, чем ты...\r\nНо много ли таких?\n\r" );
+        pc->send_to( "п╒п╦я┘п╦п╧ пЁп╬п╩п╬я│п╬п╨ п╡ я│п╬п╥п╫п╟п╫п╦п╦ я┬п╣п©я┤п╣я┌:\n\rп∙я│я┌я▄ п╦ п╠п╬п╩п╣п╣ пЁп╩я┐п©я▀п╣, я┤п╣п╪ я┌я▀...\r\nп²п╬ п╪п╫п╬пЁп╬ п╩п╦ я┌п╟п╨п╦я┘?\n\r" );
         return;
     }
     
     victim->setClanLevel( i );
     pc->send_to( "Ok.\n\r" );
 
-    buf << "Ты получаешь клановый уровень, [{"
-	<< clan.getColor( ) << clan.getTitle( victim ) << "{x].";
+    buf << "п╒я▀ п©п╬п╩я┐я┤п╟п╣я┬я▄ п╨п╩п╟п╫п╬п╡я▀п╧ я┐я─п╬п╡п╣п╫я▄, [{"
+        << clan.getColor( ) << clan.getTitle( victim ) << "{x].";
 
     attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
     attr->addEntry( buf.str( ) );
 
     if (PCharacter *pcVictim = dynamic_cast<PCharacter *>( victim ))
-	attr->run( pcVictim );
+        attr->run( pcVictim );
     else
-	PCharacterManager::saveMemory( victim );
+        PCharacterManager::saveMemory( victim );
 }
 
 /*
@@ -978,12 +978,12 @@ void CClan::clanLevelHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf << "{W{lRклан уровень{lEclan level  {lx{x                  - показывает твое клановое звание" << endl
-	<< "{W{lRклан уровень список{lEclan level list    {lx{x           - показывает список званий для твоего клана" << endl
-	<< "{W{lRклан уровень {lEclan level{lx {x<имя|{W{lRя{lEself{lx{x>         - показывает клановое звание соклановика" << endl
-	<< endl
-	<< "Для лидеров:" << endl
-	<< "{W{lRклан уровень{lEclan level{lx {x<имя|{W{lRсебе{lEself{lx{x> <число> - устанавливает новый клановый уровень" << endl;
+    buf << "{W{lRп╨п╩п╟п╫ я┐я─п╬п╡п╣п╫я▄{lEclan level  {lx{x                  - п©п╬п╨п╟п╥я▀п╡п╟п╣я┌ я┌п╡п╬п╣ п╨п╩п╟п╫п╬п╡п╬п╣ п╥п╡п╟п╫п╦п╣" << endl
+        << "{W{lRп╨п╩п╟п╫ я┐я─п╬п╡п╣п╫я▄ я│п©п╦я│п╬п╨{lEclan level list    {lx{x           - п©п╬п╨п╟п╥я▀п╡п╟п╣я┌ я│п©п╦я│п╬п╨ п╥п╡п╟п╫п╦п╧ п╢п╩я▐ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟" << endl
+        << "{W{lRп╨п╩п╟п╫ я┐я─п╬п╡п╣п╫я▄ {lEclan level{lx {x<п╦п╪я▐|{W{lRя▐{lEself{lx{x>         - п©п╬п╨п╟п╥я▀п╡п╟п╣я┌ п╨п╩п╟п╫п╬п╡п╬п╣ п╥п╡п╟п╫п╦п╣ я│п╬п╨п╩п╟п╫п╬п╡п╦п╨п╟" << endl
+        << endl
+        << "п■п╩я▐ п╩п╦п╢п╣я─п╬п╡:" << endl
+        << "{W{lRп╨п╩п╟п╫ я┐я─п╬п╡п╣п╫я▄{lEclan level{lx {x<п╦п╪я▐|{W{lRя│п╣п╠п╣{lEself{lx{x> <я┤п╦я│п╩п╬> - я┐я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌ п╫п╬п╡я▀п╧ п╨п╩п╟п╫п╬п╡я▀п╧ я┐я─п╬п╡п╣п╫я▄" << endl;
 
     pc->send_to( buf );
 }
@@ -1005,7 +1005,7 @@ static bool __member_cmp_clanlevel__( PCMemoryInterface *a, PCMemoryInterface *b
 }    
 
 void CClan::clanMember( PCharacter *pc, DLString& argument )
-{	
+{        
     basic_ostringstream<char> buf;
     PCharacterMemoryList::const_iterator pos;
     typedef std::list<PCMemoryInterface *> MemberList;
@@ -1014,46 +1014,46 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
     DLString argumentOne = argument.getOneArgument( );
 
     if (arg_is_help( argumentOne )) {
-	clanMemberHelp( pc );
-	return;
+        clanMemberHelp( pc );
+        return;
     }
 
     if (!pc->getClan( )->isRecruiter( pc ) && !pc->is_immortal( )) {
-	pc->send_to( "У тебя недостаточно полномочий для этого.\r\n" );
-	return;
-    }	
+        pc->send_to( "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©п╬п╩п╫п╬п╪п╬я┤п╦п╧ п╢п╩я▐ я█я┌п╬пЁп╬.\r\n" );
+        return;
+    }        
 
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
 
     for (pos = list.begin( ); pos != list.end( ); pos++) {
-	PCMemoryInterface *pcm = pos->second;
+        PCMemoryInterface *pcm = pos->second;
 
-	if (pcm->getClan( ) != pc->getClan( ) || pcm->getLevel( ) >= 102)
-	    continue;
-	
-	members.push_back( pcm );
+        if (pcm->getClan( ) != pc->getClan( ) || pcm->getLevel( ) >= 102)
+            continue;
+        
+        members.push_back( pcm );
     }
     
     if (!argumentOne.empty( )) {
-	
-	if (arg_oneof( argumentOne, "date", "дата", "время" ))
-	    members.sort( __member_cmp_date__ );
-	else if (arg_oneof( argumentOne, "name", "имя" )) 
-	    ;
-        else if (arg_oneof( argumentOne, "level", "уровень" ))
-	    members.sort( __member_cmp_level__ );
-	else if (arg_oneof( argumentOne, "clanlevel", "клануровень" ))
-	    members.sort( __member_cmp_clanlevel__ );
-	else {
-	    clanMemberHelp( pc );
-	    return;
-	}	    
+        
+        if (arg_oneof( argumentOne, "date", "п╢п╟я┌п╟", "п╡я─п╣п╪я▐" ))
+            members.sort( __member_cmp_date__ );
+        else if (arg_oneof( argumentOne, "name", "п╦п╪я▐" )) 
+            ;
+        else if (arg_oneof( argumentOne, "level", "я┐я─п╬п╡п╣п╫я▄" ))
+            members.sort( __member_cmp_level__ );
+        else if (arg_oneof( argumentOne, "clanlevel", "п╨п╩п╟п╫я┐я─п╬п╡п╣п╫я▄" ))
+            members.sort( __member_cmp_clanlevel__ );
+        else {
+            clanMemberHelp( pc );
+            return;
+        }            
     }   
     
     for (MemberList::iterator i = members.begin( ); i != members.end( ); i++) 
-	player_fmt( "%-10n %-10R %-12P %b %-3l %-15t %-a\r\n", *i, buf, pc );
+        player_fmt( "%-10n %-10R %-12P %b %-3l %-15t %-a\r\n", *i, buf, pc );
 
-    pc->send_to( "\n\r{BИмя         раса        класс         уровень звание           last time{x\n\r" );
+    pc->send_to( "\n\r{Bп≤п╪я▐         я─п╟я│п╟        п╨п╩п╟я│я│         я┐я─п╬п╡п╣п╫я▄ п╥п╡п╟п╫п╦п╣           last time{x\n\r" );
     pc->send_to( buf );
 }
 
@@ -1064,11 +1064,11 @@ void CClan::clanMemberHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf   << "Для лидеров:" << endl
-	  << "{W{lRклан состав{lEclan member{lx{x           - показывает список всех членов клана, в алфавитном порядке" << endl
-	  << "{W{lRклан состав дата{lEclan member date{lx{x      - сортирует список по дате последнего захода в мир" << endl
-	  << "{W{lRклан состав уровень{lEclan member level{lx{x     - сортирует список по уровню" << endl
-	  << "{W{lRклан состав клануровень{lEclan member clanlevel{lx{x - сортирует список по клановому уровню" << endl;
+    buf   << "п■п╩я▐ п╩п╦п╢п╣я─п╬п╡:" << endl
+          << "{W{lRп╨п╩п╟п╫ я│п╬я│я┌п╟п╡{lEclan member{lx{x           - п©п╬п╨п╟п╥я▀п╡п╟п╣я┌ я│п©п╦я│п╬п╨ п╡я│п╣я┘ я┤п╩п╣п╫п╬п╡ п╨п╩п╟п╫п╟, п╡ п╟п╩я└п╟п╡п╦я┌п╫п╬п╪ п©п╬я─я▐п╢п╨п╣" << endl
+          << "{W{lRп╨п╩п╟п╫ я│п╬я│я┌п╟п╡ п╢п╟я┌п╟{lEclan member date{lx{x      - я│п╬я─я┌п╦я─я┐п╣я┌ я│п©п╦я│п╬п╨ п©п╬ п╢п╟я┌п╣ п©п╬я│п╩п╣п╢п╫п╣пЁп╬ п╥п╟я┘п╬п╢п╟ п╡ п╪п╦я─" << endl
+          << "{W{lRп╨п╩п╟п╫ я│п╬я│я┌п╟п╡ я┐я─п╬п╡п╣п╫я▄{lEclan member level{lx{x     - я│п╬я─я┌п╦я─я┐п╣я┌ я│п©п╦я│п╬п╨ п©п╬ я┐я─п╬п╡п╫я▌" << endl
+          << "{W{lRп╨п╩п╟п╫ я│п╬я│я┌п╟п╡ п╨п╩п╟п╫я┐я─п╬п╡п╣п╫я▄{lEclan member clanlevel{lx{x - я│п╬я─я┌п╦я─я┐п╣я┌ я│п©п╦я│п╬п╨ п©п╬ п╨п╩п╟п╫п╬п╡п╬п╪я┐ я┐я─п╬п╡п╫я▌" << endl;
 
     pc->send_to( buf );
 }
@@ -1085,131 +1085,131 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
     DLString argumentTwo = argument.getOneArgument( );
 
     if (arg_is_help( argumentOne )) {
-	clanPetitionHelp( pc );
-	return;
+        clanPetitionHelp( pc );
+        return;
     }
 
     if (argumentOne.empty( )) {
-	if (pc->getPetition( ) == clan_none) {
-	    pc->send_to( "Укажи название клана.\r\n" );
-	    return;
-	}
-	
-	if (!pc->getPetition( )->isValid( )) {
-	    pc->send_to( "Клан, в который ты желаешь вступить, временно недоступен.\r\n" );
-	    return;
-	}
-	
-	buf << "Ты желаешь вступить в клан [{"
-	    << pc->getPetition( )->getColor( )
-	    << pc->getPetition( )->getShortName( )
-	    << "{x]" << endl;
-		
-	pc->send_to( buf );
-	return;
+        if (pc->getPetition( ) == clan_none) {
+            pc->send_to( "пёп╨п╟п╤п╦ п╫п╟п╥п╡п╟п╫п╦п╣ п╨п╩п╟п╫п╟.\r\n" );
+            return;
+        }
+        
+        if (!pc->getPetition( )->isValid( )) {
+            pc->send_to( "п п╩п╟п╫, п╡ п╨п╬я┌п╬я─я▀п╧ я┌я▀ п╤п╣п╩п╟п╣я┬я▄ п╡я│я┌я┐п©п╦я┌я▄, п╡я─п╣п╪п╣п╫п╫п╬ п╫п╣п╢п╬я│я┌я┐п©п╣п╫.\r\n" );
+            return;
+        }
+        
+        buf << "п╒я▀ п╤п╣п╩п╟п╣я┬я▄ п╡я│я┌я┐п©п╦я┌я▄ п╡ п╨п╩п╟п╫ [{"
+            << pc->getPetition( )->getColor( )
+            << pc->getPetition( )->getShortName( )
+            << "{x]" << endl;
+                
+        pc->send_to( buf );
+        return;
     }
 
     if (pc->getClan( )->isRecruiter( pc ) || pc->is_immortal( )) {
-	if (arg_is_list( argumentOne )) {
-	    clanPetitionList( pc );
-	    return; 
-	} else if (arg_oneof( argumentOne, "accept", "принять" )) {
-	    clanPetitionAccept( pc, argumentTwo );
-	    return;
-	} else if (arg_oneof( argumentOne, "reject", "отклонить" )) {
-	    clanPetitionReject( pc, argumentTwo );
-	    return;
-	}
+        if (arg_is_list( argumentOne )) {
+            clanPetitionList( pc );
+            return; 
+        } else if (arg_oneof( argumentOne, "accept", "п©я─п╦п╫я▐я┌я▄" )) {
+            clanPetitionAccept( pc, argumentTwo );
+            return;
+        } else if (arg_oneof( argumentOne, "reject", "п╬я┌п╨п╩п╬п╫п╦я┌я▄" )) {
+            clanPetitionReject( pc, argumentTwo );
+            return;
+        }
     }
 
     
     /*
-     * Пишем петицию на вступление в клан
+     * п÷п╦я┬п╣п╪ п©п╣я┌п╦я├п╦я▌ п╫п╟ п╡я│я┌я┐п©п╩п╣п╫п╦п╣ п╡ п╨п╩п╟п╫
      */
     
     if (!IS_SET(pc->act, PLR_CONFIRMED)) {
-	pc->println( "Твой персонаж еще не подтвержден Богами." );
-	return;
+        pc->println( "п╒п╡п╬п╧ п©п╣я─я│п╬п╫п╟п╤ п╣я┴п╣ п╫п╣ п©п╬п╢я┌п╡п╣я─п╤п╢п╣п╫ п▒п╬пЁп╟п╪п╦." );
+        return;
     }
     
     clan = ClanManager::getThis( )->findUnstrict( argumentOne );
 
     if (!clan) {
-	pc->send_to( "Такого клана не существует.\r\n" );
-	return;
+        pc->send_to( "п╒п╟п╨п╬пЁп╬ п╨п╩п╟п╫п╟ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌.\r\n" );
+        return;
     }
     
     if (pc->getClan( ) == clan) {
-	pc->send_to ("И не лень тебе в свой клан пытаться еще раз вступить?\n\r");
-	return;
+        pc->send_to ("п≤ п╫п╣ п╩п╣п╫я▄ я┌п╣п╠п╣ п╡ я│п╡п╬п╧ п╨п╩п╟п╫ п©я▀я┌п╟я┌я▄я│я▐ п╣я┴п╣ я─п╟п╥ п╡я│я┌я┐п©п╦я┌я▄?\n\r");
+        return;
     }
     
     mymember = pc->getClan( )->getMembership( );
     member = clan->getMembership( );
     
     if (mymember) {
-	if (!mymember->removable && mymember->mode.getValue( ) != PETITION_ALWAYS) {
-	    pc->send_to("Это насовсем...\r\n");
-	    return;
-	}
+        if (!mymember->removable && mymember->mode.getValue( ) != PETITION_ALWAYS) {
+            pc->send_to("п╜я┌п╬ п╫п╟я│п╬п╡я│п╣п╪...\r\n");
+            return;
+        }
 
-	if (mymember->removeSelf == clan) {
-	    pc->send_to ("Если ты очень хочешь, то просто покинь свой клан!\n\r");
-	    return;
-	}
-	
-	if (mymember->removeBy == clan) {
-	    pc->send_to ("Если ты очень хочешь, то заставь лидера выгнать тебя из клана!\n\r");
-	    return;
-	}
+        if (mymember->removeSelf == clan) {
+            pc->send_to ("п∙я│п╩п╦ я┌я▀ п╬я┤п╣п╫я▄ я┘п╬я┤п╣я┬я▄, я┌п╬ п©я─п╬я│я┌п╬ п©п╬п╨п╦п╫я▄ я│п╡п╬п╧ п╨п╩п╟п╫!\n\r");
+            return;
+        }
+        
+        if (mymember->removeBy == clan) {
+            pc->send_to ("п∙я│п╩п╦ я┌я▀ п╬я┤п╣п╫я▄ я┘п╬я┤п╣я┬я▄, я┌п╬ п╥п╟я│я┌п╟п╡я▄ п╩п╦п╢п╣я─п╟ п╡я▀пЁп╫п╟я┌я▄ я┌п╣п╠я▐ п╦п╥ п╨п╩п╟п╫п╟!\n\r");
+            return;
+        }
     }
 
     if (!member || !clan->canInduct( pc )) {
-	pc->send_to( "Ты не можешь вступить в этот клан.\n\r" );
-	return;
+        pc->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╡я│я┌я┐п©п╦я┌я▄ п╡ я█я┌п╬я┌ п╨п╩п╟п╫.\n\r" );
+        return;
     }
 
     if (pc->getRealLevel( ) < member->minLevel) {
-	pc->printf( "В этот клан можно вступить только с %d-го уровня.\r\n",
-	            member->minLevel.getValue( ) );
-	return;
+        pc->printf( "п▓ я█я┌п╬я┌ п╨п╩п╟п╫ п╪п╬п╤п╫п╬ п╡я│я┌я┐п©п╦я┌я▄ я┌п╬п╩я▄п╨п╬ я│ %d-пЁп╬ я┐я─п╬п╡п╫я▐.\r\n",
+                    member->minLevel.getValue( ) );
+        return;
     }
 
     if (member->mode.getValue( ) == PETITION_NEVER) {
-	pc->send_to( "В этот клан нельзя попасть, написав петицию.\r\n" );
-	return;
+        pc->send_to( "п▓ я█я┌п╬я┌ п╨п╩п╟п╫ п╫п╣п╩я▄п╥я▐ п©п╬п©п╟я│я┌я▄, п╫п╟п©п╦я│п╟п╡ п©п╣я┌п╦я├п╦я▌.\r\n" );
+        return;
     }
     
     if (member->mode.getValue( ) == PETITION_ALWAYS) {
-	doInduct( pc, *clan );
-	return;
+        doInduct( pc, *clan );
+        return;
     }
 
     if (member->mode.getValue( ) == PETITION_VERIFY) {
-	Descriptor *d;
-	int found = false;
+        Descriptor *d;
+        int found = false;
 
-	pc->setPetition( clan->getName( ) );
-	pc->send_to( "Петиция на вступление в клан подана.\r\n" );
-		
-	// Если есть лидеры, сообщить им
-	for (d = descriptor_list; d; d = d->next) {
-	    Character* victim = d->character;
+        pc->setPetition( clan->getName( ) );
+        pc->send_to( "п÷п╣я┌п╦я├п╦я▐ п╫п╟ п╡я│я┌я┐п©п╩п╣п╫п╦п╣ п╡ п╨п╩п╟п╫ п©п╬п╢п╟п╫п╟.\r\n" );
+                
+        // п∙я│п╩п╦ п╣я│я┌я▄ п╩п╦п╢п╣я─я▀, я│п╬п╬п╠я┴п╦я┌я▄ п╦п╪
+        for (d = descriptor_list; d; d = d->next) {
+            Character* victim = d->character;
 
-	    if (d->connected == CON_PLAYING 
-		&& victim
-		&& !victim->is_npc( )
-		&& victim->getClan( ) == pc->getPetition( )
-		&& victim->getClan( )->isRecruiter( victim->getPC( ) ))
-	    {
-		victim->send_to("Есть желающие в клан.\n\r");
-		run( victim, "petition list" );
-		found = true;
-	    }
-	}
-	
-	if (!found)
-	    pc->send_to("(сейчас в мире нет ни одного рекрутера этого клана)\n\r");
+            if (d->connected == CON_PLAYING 
+                && victim
+                && !victim->is_npc( )
+                && victim->getClan( ) == pc->getPetition( )
+                && victim->getClan( )->isRecruiter( victim->getPC( ) ))
+            {
+                victim->send_to("п∙я│я┌я▄ п╤п╣п╩п╟я▌я┴п╦п╣ п╡ п╨п╩п╟п╫.\n\r");
+                run( victim, "petition list" );
+                found = true;
+            }
+        }
+        
+        if (!found)
+            pc->send_to("(я│п╣п╧я┤п╟я│ п╡ п╪п╦я─п╣ п╫п╣я┌ п╫п╦ п╬п╢п╫п╬пЁп╬ я─п╣п╨я─я┐я┌п╣я─п╟ я█я┌п╬пЁп╬ п╨п╩п╟п╫п╟)\n\r");
     }
 }
 
@@ -1224,18 +1224,18 @@ void CClan::clanPetitionList( PCharacter *pc )
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
 
     for (pos = list.begin( ); pos != list.end( ); pos++) {
-	PCMemoryInterface *pcm = pos->second;
+        PCMemoryInterface *pcm = pos->second;
 
-	if (pcm->getPetition( ) == pc->getClan( ))
-	    player_fmt( "%-10n %-10R %-12P %b %-3l\r\n", pcm, buf, pc );
+        if (pcm->getPetition( ) == pc->getClan( ))
+            player_fmt( "%-10n %-10R %-12P %b %-3l\r\n", pcm, buf, pc );
     }
 
     if (buf.str( ).empty( ))
-	pc->send_to( "\n\rНет ни одной заявки.\n\r" );
+        pc->send_to( "\n\rп²п╣я┌ п╫п╦ п╬п╢п╫п╬п╧ п╥п╟я▐п╡п╨п╦.\n\r" );
     else {
-	pc->send_to( "\n\r{BИмя         раса        класс         уровень{x\n\r" );
-	pc->send_to( buf );
-    }		
+        pc->send_to( "\n\r{Bп≤п╪я▐         я─п╟я│п╟        п╨п╩п╟я│я│         я┐я─п╬п╡п╣п╫я▄{x\n\r" );
+        pc->send_to( buf );
+    }                
 }
 
 /* 
@@ -1246,19 +1246,19 @@ void CClan::clanPetitionAccept( PCharacter *pc, DLString& argument )
     PCMemoryInterface *victim = PCharacterManager::find( argument );
 
     if (!victim) {
-	pc->send_to( "Игрок с таким именем не найден.\r\n" );
-	return;
+        pc->send_to( "п≤пЁя─п╬п╨ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫.\r\n" );
+        return;
     }
     
     if (victim->getPetition( ) != pc->getClan( )) {
-	pc->printf("%s не собирается вступать в твой клан.\r\n", victim->getName( ).c_str( ) ); 
-	return;
+        pc->printf("%s п╫п╣ я│п╬п╠п╦я─п╟п╣я┌я│я▐ п╡я│я┌я┐п©п╟я┌я▄ п╡ я┌п╡п╬п╧ п╨п╩п╟п╫.\r\n", victim->getName( ).c_str( ) ); 
+        return;
     }
 
     if (victim->getClan( ) == victim->getPetition( )) {
-	pc->printf("Но %s и так состоит в твоем клане.\r\n", victim->getName( ).c_str( ) ); 
-	victim->setPetition( clan_none );
-	return;
+        pc->printf("п²п╬ %s п╦ я┌п╟п╨ я│п╬я│я┌п╬п╦я┌ п╡ я┌п╡п╬п╣п╪ п╨п╩п╟п╫п╣.\r\n", victim->getName( ).c_str( ) ); 
+        victim->setPetition( clan_none );
+        return;
     }
 
     pc->println( "Ok." );
@@ -1274,18 +1274,18 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
     victim->setPetition( clan_none );
     victim->setClanLevel( 0 );
 
-    buf << "Ты приня$gто|т|та в клан [{" 
+    buf << "п╒я▀ п©я─п╦п╫я▐$gя┌п╬|я┌|я┌п╟ п╡ п╨п╩п╟п╫ [{" 
         << clan.getColor( ) 
-	<< clan.getShortName( ) 
-	<< "{x].";
+        << clan.getShortName( ) 
+        << "{x].";
     
     XMLAttributeInduct::Pointer attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
     attr->addEntry( buf.str( ) );
     
     if (victim->isOnline( ))
-	attr->run( victim->getPlayer( ) );
+        attr->run( victim->getPlayer( ) );
     else
-	PCharacterManager::saveMemory( victim );
+        PCharacterManager::saveMemory( victim );
 }
 
 /* 
@@ -1297,36 +1297,36 @@ void CClan::clanPetitionReject( PCharacter *pc, DLString& argument )
     PCMemoryInterface *victim = PCharacterManager::find( argument );
 
     if (!victim) {
-	pc->send_to( "Игрок с таким именем не найден.\r\n" );
-	return;
+        pc->send_to( "п≤пЁя─п╬п╨ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫.\r\n" );
+        return;
     }
 
     if (victim->getPetition( ) != pc->getClan( )) {
-	pc->printf("%s не собирается вступать в твой клан.\r\n", victim->getName( ).c_str( ) ); 
-	return;
+        pc->printf("%s п╫п╣ я│п╬п╠п╦я─п╟п╣я┌я│я▐ п╡я│я┌я┐п©п╟я┌я▄ п╡ я┌п╡п╬п╧ п╨п╩п╟п╫.\r\n", victim->getName( ).c_str( ) ); 
+        return;
     }
 
     pc->send_to( "Ok.\n\r" );
     
     if (victim->getClan( ) == clan_none) {
-	victim->setClan( clan_outsider );
-	victim->setClanLevel( 0 );
+        victim->setClan( clan_outsider );
+        victim->setClanLevel( 0 );
     }
 
     victim->setPetition( clan_none );
 
-    buf << "Твоя заявка на вступление в клан [{"
+    buf << "п╒п╡п╬я▐ п╥п╟я▐п╡п╨п╟ п╫п╟ п╡я│я┌я┐п©п╩п╣п╫п╦п╣ п╡ п╨п╩п╟п╫ [{"
         << pc->getClan( )->getColor( ) 
-	<< pc->getClan( )->getShortName( ) 
-	<< "{x] отклонена." << endl;
+        << pc->getClan( )->getShortName( ) 
+        << "{x] п╬я┌п╨п╩п╬п╫п╣п╫п╟." << endl;
 
     XMLAttributeInduct::Pointer attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
     attr->addEntry( buf.str( ) );
 
     if (PCharacter *pcVictim = dynamic_cast<PCharacter *>( victim )) 
-	attr->run( pcVictim );
+        attr->run( pcVictim );
     else
-	PCharacterManager::saveMemory( victim );
+        PCharacterManager::saveMemory( victim );
 }
 
 /*
@@ -1336,13 +1336,13 @@ void CClan::clanPetitionHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
    
-   buf    << "{W{lRклан петиция{lEclan petition{lx{x              - показать, в какой клан была написана петиция на вступление" << endl
-          << "{W{lRклан петиция{lEclan petition{lx{x <клан>       - подать петицию на вступление в клан" << endl
-	  << endl
-	  << "Для руководителей клана:" << endl
-	  << "{W{lRклан петиция список  {lEclan petition list{lx{x         - показать список всех заявок на поступление" << endl
-	  << "{W{lRклан петиция принять {lEclan petition accept{lx {x<имя> - принять персонажа, написавшего петицию, в свой клан" << endl
-	  << "{W{lRклан петиция отклонить{lEclan petition reject{lx {x<имя> - отклонить прошение на прием в клан" << endl;
+   buf    << "{W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐{lEclan petition{lx{x              - п©п╬п╨п╟п╥п╟я┌я▄, п╡ п╨п╟п╨п╬п╧ п╨п╩п╟п╫ п╠я▀п╩п╟ п╫п╟п©п╦я│п╟п╫п╟ п©п╣я┌п╦я├п╦я▐ п╫п╟ п╡я│я┌я┐п©п╩п╣п╫п╦п╣" << endl
+          << "{W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐{lEclan petition{lx{x <п╨п╩п╟п╫>       - п©п╬п╢п╟я┌я▄ п©п╣я┌п╦я├п╦я▌ п╫п╟ п╡я│я┌я┐п©п╩п╣п╫п╦п╣ п╡ п╨п╩п╟п╫" << endl
+          << endl
+          << "п■п╩я▐ я─я┐п╨п╬п╡п╬п╢п╦я┌п╣п╩п╣п╧ п╨п╩п╟п╫п╟:" << endl
+          << "{W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐ я│п©п╦я│п╬п╨  {lEclan petition list{lx{x         - п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ п╡я│п╣я┘ п╥п╟я▐п╡п╬п╨ п╫п╟ п©п╬я│я┌я┐п©п╩п╣п╫п╦п╣" << endl
+          << "{W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐ п©я─п╦п╫я▐я┌я▄ {lEclan petition accept{lx {x<п╦п╪я▐> - п©я─п╦п╫я▐я┌я▄ п©п╣я─я│п╬п╫п╟п╤п╟, п╫п╟п©п╦я│п╟п╡я┬п╣пЁп╬ п©п╣я┌п╦я├п╦я▌, п╡ я│п╡п╬п╧ п╨п╩п╟п╫" << endl
+          << "{W{lRп╨п╩п╟п╫ п©п╣я┌п╦я├п╦я▐ п╬я┌п╨п╩п╬п╫п╦я┌я▄{lEclan petition reject{lx {x<п╦п╪я▐> - п╬я┌п╨п╩п╬п╫п╦я┌я▄ п©я─п╬я┬п╣п╫п╦п╣ п╫п╟ п©я─п╦п╣п╪ п╡ п╨п╩п╟п╫" << endl;
 
     pc->send_to( buf );
 }
@@ -1355,15 +1355,15 @@ void CClan::clanDiplomacy( PCharacter *pc, DLString& argument )
     DLString argumentOne = argument.getOneArgument( );
 
     if (argumentOne.empty( )) 
-	clanDiplomacyShow( pc );	
-    else if (arg_oneof( argumentOne, "prop", "предложения" ))
-	clanDiplomacyProp( pc );
-    else if (arg_oneof( argumentOne, "set", "установить" ))
-	clanDiplomacySet( pc, argument );
+        clanDiplomacyShow( pc );        
+    else if (arg_oneof( argumentOne, "prop", "п©я─п╣п╢п╩п╬п╤п╣п╫п╦я▐" ))
+        clanDiplomacyProp( pc );
+    else if (arg_oneof( argumentOne, "set", "я┐я│я┌п╟п╫п╬п╡п╦я┌я▄" ))
+        clanDiplomacySet( pc, argument );
     else if (arg_is_list( argumentOne ))
-	clanDiplomacyList( pc );
+        clanDiplomacyList( pc );
     else
-	clanDiplomacyHelp( pc );
+        clanDiplomacyHelp( pc );
 }
 
 /* 
@@ -1376,58 +1376,58 @@ void CClan::clanDiplomacyShow( PCharacter *pc )
     ClanData *data;
     ClanManager *cm = ClanManager::getThis( );
 
-    pc->send_to( "Клановая дипломатия :\n\r" );
+    pc->send_to( "п п╩п╟п╫п╬п╡п╟я▐ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐ :\n\r" );
     buf << "********** ";
     
     for (int i = 0; i < cm->size( ); i++) {
-	clan = cm->find( i );
+        clan = cm->find( i );
 
-	if (clan->getData( ) && clan->hasDiplomacy( )) {
-	    DLString abbr = clan->getShortName( );
-	    
-	    abbr.toLower( );
-	    abbr.upperFirstCharacter( );
-		    
-	    buf << ' ' << setw( 5 ) << abbr.substr( 0, 3 );
-	}
+        if (clan->getData( ) && clan->hasDiplomacy( )) {
+            DLString abbr = clan->getShortName( );
+            
+            abbr.toLower( );
+            abbr.upperFirstCharacter( );
+                    
+            buf << ' ' << setw( 5 ) << abbr.substr( 0, 3 );
+        }
     }
     
     buf << endl;
 
     for (int i = 0; i < cm->size( ); i++) {
-	clan = cm->find( i );
-	data = clan->getData( );
-	
-	if (data && clan->hasDiplomacy( )) {
-	    buf << clan->getPaddedName( ) << ' ';
-	    
-	    for (int j = 0; j < cm->size( ); j++) {
-		Clan *c = cm->find( j );
+        clan = cm->find( i );
+        data = clan->getData( );
+        
+        if (data && clan->hasDiplomacy( )) {
+            buf << clan->getPaddedName( ) << ' ';
+            
+            for (int j = 0; j < cm->size( ); j++) {
+                Clan *c = cm->find( j );
 
-		if (c->getData( ) && c->hasDiplomacy( ))
-		    buf << ' ' 
-			<< clan_diplomacy_names_table[data->getDiplomacy( c )].color
-			<< setw( 5 ) 
-			<< clan_diplomacy_names_table[data->getDiplomacy( c )].abbr
-			<< "{x";
-	    }
-	    
-	    buf << endl;
-	}
+                if (c->getData( ) && c->hasDiplomacy( ))
+                    buf << ' ' 
+                        << clan_diplomacy_names_table[data->getDiplomacy( c )].color
+                        << setw( 5 ) 
+                        << clan_diplomacy_names_table[data->getDiplomacy( c )].abbr
+                        << "{x";
+            }
+            
+            buf << endl;
+        }
     }
 
     buf << endl;
 
     for (int i = 0; i <= clan_diplomacy_max; i++) 
-	buf << clan_diplomacy_names_table[i].color 
-	    << clan_diplomacy_names_table[i].abbr 
-	    << "{x - " 
-	    << clan_diplomacy_names_table[i].long_name 
-	    << (i < clan_diplomacy_max ? ", " : " ");
+        buf << clan_diplomacy_names_table[i].color 
+            << clan_diplomacy_names_table[i].abbr 
+            << "{x - " 
+            << clan_diplomacy_names_table[i].long_name 
+            << (i < clan_diplomacy_max ? ", " : " ");
 
     buf << endl;
     pc->send_to( buf );
-}	    
+}            
 
 /* 
  * clan diplomacy prop
@@ -1439,27 +1439,27 @@ void CClan::clanDiplomacyProp( PCharacter *pc )
     ClanData *mydata = myclan->getData( );
 
     if (!mydata || !myclan->hasDiplomacy( )) {
-	pc->send_to( "Для твоего клана не существует понятия дипломатии.\r\n" );
-	return;
+        pc->send_to( "п■п╩я▐ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п©п╬п╫я▐я┌п╦я▐ п╢п╦п©п╩п╬п╪п╟я┌п╦п╦.\r\n" );
+        return;
     }
 
-    buf << "Просмотр пропозиций для " << myclan->getShortName( ) << ":" << endl;
+    buf << "п÷я─п╬я│п╪п╬я┌я─ п©я─п╬п©п╬п╥п╦я├п╦п╧ п╢п╩я▐ " << myclan->getShortName( ) << ":" << endl;
     
     for (int i = 0; i < ClanManager::getThis( )->size( ); i++) {
-	Clan *clan = ClanManager::getThis( )->find( i );
-	ClanData *data = clan->getData( );
+        Clan *clan = ClanManager::getThis( )->find( i );
+        ClanData *data = clan->getData( );
 
-	if (clan == myclan || !clan->isValid( ) || !data || !clan->hasDiplomacy( ))
-	    continue;
-	    
-	if (mydata->getDiplomacy( clan ) == mydata->getProposition( clan )) 
-	    continue;
-	
-	buf << '[' << clan->getShortName( ) << "] " 
-	    << clan_diplomacy_names_table[mydata->getDiplomacy( clan )].long_name
-	    << " - " 
-	    << clan_diplomacy_names_table[mydata->getProposition( clan )].long_name
-	    << endl;
+        if (clan == myclan || !clan->isValid( ) || !data || !clan->hasDiplomacy( ))
+            continue;
+            
+        if (mydata->getDiplomacy( clan ) == mydata->getProposition( clan )) 
+            continue;
+        
+        buf << '[' << clan->getShortName( ) << "] " 
+            << clan_diplomacy_names_table[mydata->getDiplomacy( clan )].long_name
+            << " - " 
+            << clan_diplomacy_names_table[mydata->getProposition( clan )].long_name
+            << endl;
     }
 
     pc->send_to( buf );    
@@ -1480,119 +1480,119 @@ void CClan::clanDiplomacySet( PCharacter *pc, DLString& argument )
     mydata = myclan->getData( );
 
     if (!mydata || !myclan->hasDiplomacy( )) {
-	pc->send_to( "Для твоего клана не существует понятия дипломатии.\r\n" );
-	return;
+        pc->send_to( "п■п╩я▐ я┌п╡п╬п╣пЁп╬ п╨п╩п╟п╫п╟ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п©п╬п╫я▐я┌п╦я▐ п╢п╦п©п╩п╬п╪п╟я┌п╦п╦.\r\n" );
+        return;
     }
     
     if (!myclan->isRecruiter( pc ) && !pc->is_immortal( )) {
-	pc->send_to( "Ты не можешь менять политику\n\r" );
-	return; 
-    }	
+        pc->send_to( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╪п╣п╫я▐я┌я▄ п©п╬п╩п╦я┌п╦п╨я┐\n\r" );
+        return; 
+    }        
 
-    pc->send_to( "Установка политики\n\r" );
+    pc->send_to( "пёя│я┌п╟п╫п╬п╡п╨п╟ п©п╬п╩п╦я┌п╦п╨п╦\n\r" );
 
     clan = ClanManager::getThis( )->findUnstrict( argumentOne );
 
     if (!clan) {
-	pc->send_to( "Такого клана не существует.\r\n" );
-	return;
+        pc->send_to( "п╒п╟п╨п╬пЁп╬ п╨п╩п╟п╫п╟ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌.\r\n" );
+        return;
     }
     
     data = clan->getData( );
 
     if (!data || !clan->hasDiplomacy( )) {
-	pc->send_to( "Для этого клана не существует понятия дипломатии.\r\n" );
-	return;
+        pc->send_to( "п■п╩я▐ я█я┌п╬пЁп╬ п╨п╩п╟п╫п╟ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п©п╬п╫я▐я┌п╦я▐ п╢п╦п©п╩п╬п╪п╟я┌п╦п╦.\r\n" );
+        return;
     }
     
     if (myclan == clan) {
-	pc->send_to( "Твой клан развалится и без твоей помощи\n\r" );
-	mydata->setDiplomacy( myclan, 0 );
-	mydata->save( );
-	return;
+        pc->send_to( "п╒п╡п╬п╧ п╨п╩п╟п╫ я─п╟п╥п╡п╟п╩п╦я┌я│я▐ п╦ п╠п╣п╥ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦\n\r" );
+        mydata->setDiplomacy( myclan, 0 );
+        mydata->save( );
+        return;
     }
 
     argument = argument.getOneArgument( );
     
     try {
-	dip = argument.toInt( );
+        dip = argument.toInt( );
     } catch (const ExceptionBadType &e) {
-        pc->send_to( "Неверная политика.\n\r" );
+        pc->send_to( "п²п╣п╡п╣я─п╫п╟я▐ п©п╬п╩п╦я┌п╦п╨п╟.\n\r" );
         return;
     }
     
     if (dip < 0 || dip > clan_diplomacy_max) {
-	pc->send_to( "Неверная политика (см. clan diplomacy list).\r\n" );
-	return;
+        pc->send_to( "п²п╣п╡п╣я─п╫п╟я▐ п©п╬п╩п╦я┌п╦п╨п╟ (я│п╪. clan diplomacy list).\r\n" );
+        return;
     }
     
     if (mydata->getDiplomacy( clan ) == dip) {
-	pc->send_to( "Это ничего не меняет.\n\r" );
-	return;
+        pc->send_to( "п╜я┌п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п╪п╣п╫я▐п╣я┌.\n\r" );
+        return;
     }
     
     if (clan->isDispersed( )) {
-	mydata->setDiplomacy( clan, dip );
-	mydata->save( );
-	data->setDiplomacy( myclan, dip );
-	data->save( );
-	
-	buf << "Установка политики для "
-	    << clan->getShortName( ) << " : "
-	    << clan_diplomacy_names_table[dip].long_name
-	    << endl;
-	pc->send_to( buf );
-	return;
+        mydata->setDiplomacy( clan, dip );
+        mydata->save( );
+        data->setDiplomacy( myclan, dip );
+        data->save( );
+        
+        buf << "пёя│я┌п╟п╫п╬п╡п╨п╟ п©п╬п╩п╦я┌п╦п╨п╦ п╢п╩я▐ "
+            << clan->getShortName( ) << " : "
+            << clan_diplomacy_names_table[dip].long_name
+            << endl;
+        pc->send_to( buf );
+        return;
     }
     
     if (mydata->getDiplomacy( clan ) > dip) {
-	pc->send_to( "улучшение\n\r" );
-	
-	if (mydata->getProposition( clan) <= dip) {
-	    // Не лучше предложеного
-	    mydata->setDiplomacy( clan, dip );
-	    mydata->setProposition( clan, dip );
-	    mydata->save( );
+        pc->send_to( "я┐п╩я┐я┤я┬п╣п╫п╦п╣\n\r" );
+        
+        if (mydata->getProposition( clan) <= dip) {
+            // п²п╣ п╩я┐я┤я┬п╣ п©я─п╣п╢п╩п╬п╤п╣п╫п╬пЁп╬
+            mydata->setDiplomacy( clan, dip );
+            mydata->setProposition( clan, dip );
+            mydata->save( );
 
-	    data->setDiplomacy( myclan, dip );
-	    data->setProposition( myclan, dip );
-	    data->save( );
+            data->setDiplomacy( myclan, dip );
+            data->setProposition( myclan, dip );
+            data->save( );
 
-	    buf << "Установка политики для "
-		<< clan->getShortName( ) << " : "
-		<< clan_diplomacy_names_table[dip].long_name
-		<< endl;
-	    pc->send_to( buf );
-	}
-	else
-	{
-	    buf << "Ты предлагаешь "
-		<< clan->getShortName( ) 
-		<< " отношение типа "
-		<< clan_diplomacy_names_table[dip].long_name
-		<< endl;
-	    pc->send_to( buf );
+            buf << "пёя│я┌п╟п╫п╬п╡п╨п╟ п©п╬п╩п╦я┌п╦п╨п╦ п╢п╩я▐ "
+                << clan->getShortName( ) << " : "
+                << clan_diplomacy_names_table[dip].long_name
+                << endl;
+            pc->send_to( buf );
+        }
+        else
+        {
+            buf << "п╒я▀ п©я─п╣п╢п╩п╟пЁп╟п╣я┬я▄ "
+                << clan->getShortName( ) 
+                << " п╬я┌п╫п╬я┬п╣п╫п╦п╣ я┌п╦п©п╟ "
+                << clan_diplomacy_names_table[dip].long_name
+                << endl;
+            pc->send_to( buf );
 
-	    data->setProposition( myclan, dip );
-	}
+            data->setProposition( myclan, dip );
+        }
     }
     else
     {
-	pc->send_to( "УХУДШЕНИЕ\n\r" );
-	
-	mydata->setDiplomacy( clan, dip );
-	mydata->setProposition( clan, dip );
-	mydata->save( );
+        pc->send_to( "пёп╔пёп■п╗п∙п²п≤п∙\n\r" );
+        
+        mydata->setDiplomacy( clan, dip );
+        mydata->setProposition( clan, dip );
+        mydata->save( );
 
-	data->setDiplomacy( myclan, dip );
-	data->setProposition( myclan, dip );
-	data->save( );
+        data->setDiplomacy( myclan, dip );
+        data->setProposition( myclan, dip );
+        data->save( );
 
-	buf << "Установка политики для "
-	    << clan->getShortName( ) 
-	    << " : " << clan_diplomacy_names_table[dip].long_name
-	    << endl;
-	pc->send_to( buf );
+        buf << "пёя│я┌п╟п╫п╬п╡п╨п╟ п©п╬п╩п╦я┌п╦п╨п╦ п╢п╩я▐ "
+            << clan->getShortName( ) 
+            << " : " << clan_diplomacy_names_table[dip].long_name
+            << endl;
+        pc->send_to( buf );
     }
 }
 
@@ -1603,13 +1603,13 @@ void CClan::clanDiplomacyList( PCharacter *pc )
 {    
     ostringstream buf;
 
-    buf << "Доступные дипломатии:" << endl;
+    buf << "п■п╬я│я┌я┐п©п╫я▀п╣ п╢п╦п©п╩п╬п╪п╟я┌п╦п╦:" << endl;
 
     for (int i = 0; i <= clan_diplomacy_max; i++)
-	buf << i << " - " << clan_diplomacy_names_table[i].color
-	    << clan_diplomacy_names_table[i].long_name
-	    << "{x (" << clan_diplomacy_names_table[i].eng_name
-	    << ')' << endl;
+        buf << i << " - " << clan_diplomacy_names_table[i].color
+            << clan_diplomacy_names_table[i].long_name
+            << "{x (" << clan_diplomacy_names_table[i].eng_name
+            << ')' << endl;
     
     buf << endl;
     pc->send_to( buf );
@@ -1622,13 +1622,13 @@ void CClan::clanDiplomacyHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
    
-    buf << "{W{lRклан дипломатия{lEclan diplomacy{lx{x             - показать клановую дипломатию" << endl
-	<< "{W{lRклан дипломатия предложения{lEclan diplomacy prop       {lx{x - показать предложения по изменению дипломатии" << endl
-	<< "{W{lRклан дипломатия список{lEclan diplomacy list  {lx{x      - список всех возможных дипломатий" << endl
-	<< endl
-	<< "Для лидеров:" << endl
-	<< "{W{lRклан дипломатия установить{lEclan diplomacy set{lx {x<клан> <номер>" << endl
-	<< "   - изменить политику по отношению к какому-либо клану" << endl;
+    buf << "{W{lRп╨п╩п╟п╫ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐{lEclan diplomacy{lx{x             - п©п╬п╨п╟п╥п╟я┌я▄ п╨п╩п╟п╫п╬п╡я┐я▌ п╢п╦п©п╩п╬п╪п╟я┌п╦я▌" << endl
+        << "{W{lRп╨п╩п╟п╫ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐ п©я─п╣п╢п╩п╬п╤п╣п╫п╦я▐{lEclan diplomacy prop       {lx{x - п©п╬п╨п╟п╥п╟я┌я▄ п©я─п╣п╢п╩п╬п╤п╣п╫п╦я▐ п©п╬ п╦п╥п╪п╣п╫п╣п╫п╦я▌ п╢п╦п©п╩п╬п╪п╟я┌п╦п╦" << endl
+        << "{W{lRп╨п╩п╟п╫ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐ я│п©п╦я│п╬п╨{lEclan diplomacy list  {lx{x      - я│п©п╦я│п╬п╨ п╡я│п╣я┘ п╡п╬п╥п╪п╬п╤п╫я▀я┘ п╢п╦п©п╩п╬п╪п╟я┌п╦п╧" << endl
+        << endl
+        << "п■п╩я▐ п╩п╦п╢п╣я─п╬п╡:" << endl
+        << "{W{lRп╨п╩п╟п╫ п╢п╦п©п╩п╬п╪п╟я┌п╦я▐ я┐я│я┌п╟п╫п╬п╡п╦я┌я▄{lEclan diplomacy set{lx {x<п╨п╩п╟п╫> <п╫п╬п╪п╣я─>" << endl
+        << "   - п╦п╥п╪п╣п╫п╦я┌я▄ п©п╬п╩п╦я┌п╦п╨я┐ п©п╬ п╬я┌п╫п╬я┬п╣п╫п╦я▌ п╨ п╨п╟п╨п╬п╪я┐-п╩п╦п╠п╬ п╨п╩п╟п╫я┐" << endl;
 
     pc->send_to( buf );
 }
@@ -1642,21 +1642,21 @@ void CClan::clanScan( PCharacter *pc )
     ClanManager *cm = ClanManager::getThis( );
     
     for (int j = 0; j < cm->size( ); j++) {
-	Clan::Pointer c = cm->find( j );
-	
-	buf << "[" << j << "] "
-	    << c->getName( ) << ", " << c->getShortName( ) << " " 
-	    << (c->isValid( ) ? "valid" : "non-valid") << " "
-	    << (c->isHidden( ) ? "hidden" : "non-hidden") << " ";
+        Clan::Pointer c = cm->find( j );
+        
+        buf << "[" << j << "] "
+            << c->getName( ) << ", " << c->getShortName( ) << " " 
+            << (c->isValid( ) ? "valid" : "non-valid") << " "
+            << (c->isHidden( ) ? "hidden" : "non-hidden") << " ";
 
-	if (c->getData( )) {
-	    if (c->getData( )->getBank( ))
-		buf << "bank ";
-	    if (c->getData( )->hasItem( ))
-		buf << "item ";
-	}
+        if (c->getData( )) {
+            if (c->getData( )->getBank( ))
+                buf << "bank ";
+            if (c->getData( )->hasItem( ))
+                buf << "item ";
+        }
 
-	buf << endl;
+        buf << endl;
     }
 
     pc->send_to( buf );
@@ -1673,35 +1673,35 @@ void CClan::clanInduct( PCharacter *pc, DLString &argument )
 
     argumentOne = argument.getOneArgument( );
     
-    if (pc->get_trust( ) < DEITY) {
-	pc->println("У тебя нет таких полномочий.");
-	return;
+    if (pc->get_trust( ) < GOD) {
+        pc->println("пё я┌п╣п╠я▐ п╫п╣я┌ я┌п╟п╨п╦я┘ п©п╬п╩п╫п╬п╪п╬я┤п╦п╧.");
+        return;
     }
 
     if (arg_is_help( argumentOne ) || argumentOne.empty( ) || argument.empty( )) {
-	pc->println( "{Wclan induct {x<player> <clan> - принять кого-либо в указанный клан" );
-	return;
+        pc->println( "{Wclan induct {x<player> <clan> - п©я─п╦п╫я▐я┌я▄ п╨п╬пЁп╬-п╩п╦п╠п╬ п╡ я┐п╨п╟п╥п╟п╫п╫я▀п╧ п╨п╩п╟п╫" );
+        return;
     }
     
     if (arg_is_self( argumentOne ))
-	argumentOne = pc->getName( );
+        argumentOne = pc->getName( );
 
     victim = PCharacterManager::find( argumentOne );
     if (!victim) {
-	pc->println( "Игрок с таким именем не найден." );
-	return;
+        pc->println( "п≤пЁя─п╬п╨ я│ я┌п╟п╨п╦п╪ п╦п╪п╣п╫п╣п╪ п╫п╣ п╫п╟п╧п╢п╣п╫." );
+        return;
     }
 
     new_clan = ClanManager::getThis( )->findUnstrict( argument );
 
     if (!new_clan) {
-	pc->send_to("О таком клане ничего не известно.\n\r");
-	return;
+        pc->send_to("п· я┌п╟п╨п╬п╪ п╨п╩п╟п╫п╣ п╫п╦я┤п╣пЁп╬ п╫п╣ п╦п╥п╡п╣я│я┌п╫п╬.\n\r");
+        return;
     }
 /*    
     if (!new_clan->canInduct( victim )) {
-	pc->send_to("Даже ты, при всем своем могуществе, не можешь сделать этого.\n\r");
-	return;
+        pc->send_to("п■п╟п╤п╣ я┌я▀, п©я─п╦ п╡я│п╣п╪ я│п╡п╬п╣п╪ п╪п╬пЁя┐я┴п╣я│я┌п╡п╣, п╫п╣ п╪п╬п╤п╣я┬я▄ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬пЁп╬.\n\r");
+        return;
     }
 */    
     pc->println( "Ok." );

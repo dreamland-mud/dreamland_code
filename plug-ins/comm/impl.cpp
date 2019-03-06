@@ -30,32 +30,32 @@
 
 extern "C"
 {
-	SO::PluginList initialize_comm( )
-	{
-		SO::PluginList ppl;
-	    
+        SO::PluginList initialize_comm( )
+        {
+                SO::PluginList ppl;
+            
                 Plugin::registerPlugin<RoomBehaviorRegistrator<BankRoom> >( ppl );
                 Plugin::registerPlugin<ObjectBehaviorRegistrator<CreditCard> >( ppl );
-		ppl.push_back( WrongCommand::Pointer( NEW, "balance" ) );
-		ppl.push_back( WrongCommand::Pointer( NEW, "deposit" ) );
-		ppl.push_back( WrongCommand::Pointer( NEW, "withdraw" ) );
-		Plugin::registerPlugin<TaxesListener>( ppl );
+                ppl.push_back( WrongCommand::Pointer( NEW, "balance" ) );
+                ppl.push_back( WrongCommand::Pointer( NEW, "deposit" ) );
+                ppl.push_back( WrongCommand::Pointer( NEW, "withdraw" ) );
+                Plugin::registerPlugin<TaxesListener>( ppl );
 
                 Plugin::registerPlugin<ConfigCommand>( ppl );
 
-		Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
-		Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
+                Plugin::registerPlugin<SpeedWalkUpdateTask>( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
 
-		Plugin::registerPlugin<COrder>( ppl );
-		Plugin::registerPlugin<CWizlist>( ppl );
-		Plugin::registerPlugin<Whois>( ppl );
-		Plugin::registerPlugin<Who>( ppl );
-		Plugin::registerPlugin<CWrite>( ppl );
-		
-//		Plugin::registerPlugin<PCDeleteIdle>( ppl );
+                Plugin::registerPlugin<COrder>( ppl );
+                Plugin::registerPlugin<CWizlist>( ppl );
+                Plugin::registerPlugin<Whois>( ppl );
+                Plugin::registerPlugin<Who>( ppl );
+                Plugin::registerPlugin<CWrite>( ppl );
+                
+//                Plugin::registerPlugin<PCDeleteIdle>( ppl );
 
-		Plugin::registerPlugin<CEat>( ppl );
+                Plugin::registerPlugin<CEat>( ppl );
 
-		return ppl;
-	}
+                return ppl;
+        }
 }

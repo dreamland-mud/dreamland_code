@@ -42,17 +42,17 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     }
     
     if (rated_as_guru( pch )) 
-	mode = 3;
+        mode = 3;
     else if (rated_as_newbie( pch ) && mode > 1)
-	mode = 0;
+        mode = 0;
 
     victim = getRandomVictim( pch );
     
     if (victim->getProfession( )->getFlags( victim ).isSet(PROF_CASTER))
-	mode++;
+        mode++;
     
     if (!isMobileVisible( victim, pch ))
-	mode++;
+        mode++;
 
     assign<VictimBehavior>( victim );
     save_mobs( victim->in_room );
@@ -65,28 +65,29 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     areaName.setValue( pRoom->area->name );
     mobName.setValue( victim->getShortDescr( ) );
 
-    wiznet( "", "%s Lev %d, Qmode %d",
-		 victim->getNameP('1').c_str( ),
-		 victim->getRealLevel( ), 
-		 mode.getValue( ) );
+    wiznet( "", "%s [%d] Lev %d, Qmode %d",
+                 victim->getNameP('1').c_str( ),
+                 victim->in_room->vnum,
+                 victim->getRealLevel( ), 
+                 mode.getValue( ) );
 
-    tell_raw( pch, questman, "õ ÍÅÎÑ ÅÓÔØ ÄÌÑ ÔÅÂÑ ÓÒÏÞÎÏÅ ÐÏÒÕÞÅÎÉÅ!" );
+    tell_raw( pch, questman, "Ð£ Ð¼ÐµÐ½Ñ ÐµÑÑ‚ÑŒ Ð´Ð»Ñ Ñ‚ÐµÐ±Ñ ÑÑ€Ð¾Ñ‡Ð½Ð¾Ðµ Ð¿Ð¾Ñ€ÑƒÑ‡ÐµÐ½Ð¸Ðµ!" );
 
-    if (IS_GOOD( pch ))	{	
-	tell_raw( pch, questman, "óÐÏËÏÊÓÔ×ÉÅ ÎÁÛÅÇÏ íÉÒÁ ÂÙÌÏ ÎÁÒÕÛÅÎÏ!" );
-	tell_fmt( "ñ ÐÏÒÕÞÁÀ ÔÅÂÅ ÎÁËÁÚÁÔØ {W%3$#C4{G, ÓÏ×ÅÒÛÉ×Û%3$GÅÅ|ÅÇÏ|ÕÀ ÍÎÏÖÅÓÔ×Ï ÚÌÏÄÅÑÎÉÊ.", pch, questman, victim );
+    if (IS_GOOD( pch ))        {        
+        tell_raw( pch, questman, "Ð¡Ð¿Ð¾ÐºÐ¾Ð¹ÑÑ‚Ð²Ð¸Ðµ Ð½Ð°ÑˆÐµÐ³Ð¾ ÐœÐ¸Ñ€Ð° Ð±Ñ‹Ð»Ð¾ Ð½Ð°Ñ€ÑƒÑˆÐµÐ½Ð¾!" );
+        tell_fmt( "Ð¯ Ð¿Ð¾Ñ€ÑƒÑ‡Ð°ÑŽ Ñ‚ÐµÐ±Ðµ Ð½Ð°ÐºÐ°Ð·Ð°Ñ‚ÑŒ {W%3$#C4{G, ÑÐ¾Ð²ÐµÑ€ÑˆÐ¸Ð²Ñˆ%3$GÐµÐµ|ÐµÐ³Ð¾|ÑƒÑŽ Ð¼Ð½Ð¾Ð¶ÐµÑÑ‚Ð²Ð¾ Ð·Ð»Ð¾Ð´ÐµÑÐ½Ð¸Ð¹.", pch, questman, victim );
     }
     else if (IS_EVIL( pch )) {
-	tell_fmt( "ôÅÍÎÙÅ ÓÉÌÙ ÎÁÛÅÇÏ íÉÒÁ ÏÓÌÁÂÌÅÎÙ ÄÅÊÓÔ×ÉÑÍÉ {W%3$#C2{G.", pch, questman,victim );
-	tell_fmt( "ôÅÂÅ ÐÏÒÕÞÁÅÔÓÑ ÕÂÉÔØ %3$P2!",  pch, questman, victim );
+        tell_fmt( "Ð¢ÐµÐ¼Ð½Ñ‹Ðµ ÑÐ¸Ð»Ñ‹ Ð½Ð°ÑˆÐµÐ³Ð¾ ÐœÐ¸Ñ€Ð° Ð¾ÑÐ»Ð°Ð±Ð»ÐµÐ½Ñ‹ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸ÑÐ¼Ð¸ {W%3$#C2{G.", pch, questman,victim );
+        tell_fmt( "Ð¢ÐµÐ±Ðµ Ð¿Ð¾Ñ€ÑƒÑ‡Ð°ÐµÑ‚ÑÑ ÑƒÐ±Ð¸Ñ‚ÑŒ %3$P2!",  pch, questman, victim );
     } else {
-	tell_raw( pch, questman, "òÁ×ÎÏ×ÅÓÉÅ ÎÁÛÅÇÏ íÉÒÁ ÂÙÌÏ ÎÁÒÕÛÅÎÏ!");
-	tell_fmt( "÷ ÜÔÏÍ ×ÉÎÏ×%3$GÎÏ|ÅÎ|ÎÁ {W%3$#C1{G, Ñ ÐÏÒÕÞÁÀ ÔÅÂÅ ÎÁËÁÚÁÔØ %3$P2.",  pch, questman, victim );
+        tell_raw( pch, questman, "Ð Ð°Ð²Ð½Ð¾Ð²ÐµÑÐ¸Ðµ Ð½Ð°ÑˆÐµÐ³Ð¾ ÐœÐ¸Ñ€Ð° Ð±Ñ‹Ð»Ð¾ Ð½Ð°Ñ€ÑƒÑˆÐµÐ½Ð¾!");
+        tell_fmt( "Ð’ ÑÑ‚Ð¾Ð¼ Ð²Ð¸Ð½Ð¾Ð²%3$GÐ½Ð¾|ÐµÐ½|Ð½Ð° {W%3$#C1{G, Ñ Ð¿Ð¾Ñ€ÑƒÑ‡Ð°ÑŽ Ñ‚ÐµÐ±Ðµ Ð½Ð°ÐºÐ°Ð·Ð°Ñ‚ÑŒ %3$P2.",  pch, questman, victim );
     }
 
-    tell_fmt( "íÅÓÔÏ, ÇÄÅ %3$P2 ×ÉÄÅÌÉ × ÐÏÓÌÅÄÎÉÊ ÒÁÚ - {W%4$s{G!",  pch, questman, victim, pRoom->name );
-    tell_fmt( "üÔÏ ÎÁÈÏÄÉÔÓÑ × ÒÁÊÏÎÅ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ {W%3$s{G.",  pch, questman, pRoom->area->name );
-    tell_fmt( "õ ÔÅÂÑ ÅÓÔØ {Y%3$d{G ÍÉÎÕ%3$IÔÁ|ÔÙ|Ô ÎÁ ×ÙÐÏÌÎÅÎÉÅ ÚÁÄÁÎÉÑ.",  pch, questman, time );
+    tell_fmt( "ÐœÐµÑÑ‚Ð¾, Ð³Ð´Ðµ %3$P2 Ð²Ð¸Ð´ÐµÐ»Ð¸ Ð² Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€Ð°Ð· - {W%4$s{G!",  pch, questman, victim, pRoom->name );
+    tell_fmt( "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ {W%3$s{G.",  pch, questman, pRoom->area->name );
+    tell_fmt( "Ð£ Ñ‚ÐµÐ±Ñ ÐµÑÑ‚ÑŒ {Y%3$d{G Ð¼Ð¸Ð½Ñƒ%3$IÑ‚Ð°|Ñ‚Ñ‹|Ñ‚ Ð½Ð° Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ñ.",  pch, questman, time );
 }
 
 void KillQuest::destroy( ) 
@@ -104,49 +105,49 @@ Quest::Reward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman 
     Reward::Pointer r( NEW );
     
     if (hint.getValue( ) > 0) {
-	r->gold = number_range( 1, 2 );
-	r->points = number_range( 1, 4 );
-	r->prac = 0;
-	
+        r->gold = number_range( 1, 2 );
+        r->points = number_range( 1, 4 );
+        r->prac = 0;
+        
     } else {
-	switch (mode.getValue( )) {
-	case 0:
-		r->gold = number_range( 5, 8 );
-		r->points = number_range( 5, 8 );
-		r->wordChance = 10;
-		r->scrollChance = 7;
-		break;
-	case 1: 
-		r->gold = number_range( 8, 12 );
-		r->points = number_range( 8, 12 );
-		r->wordChance = 15;
-		r->scrollChance = 10;
-		if ( chance(5) )
-		    r->prac = number_range(1, 2);
-		break;
-	case 2:
-		r->gold = number_range( 12, 16 );
-		r->points = number_range( 12, 16 );
-		r->wordChance = 25;
-		r->scrollChance = 12;
-		if ( chance(7) )
-		    r->prac = number_range(1, 3);
-		break;
-	default:
-		r->gold = number_range( 16, 24 );
-		r->points = number_range( 16, 24 );
-		r->wordChance = 30;
-		r->scrollChance = 15;
-		if ( chance(10) )
-		    r->prac = number_range(1, 4);
-		break;
-	};
+        switch (mode.getValue( )) {
+        case 0:
+                r->gold = number_range( 5, 8 );
+                r->points = number_range( 5, 8 );
+                r->wordChance = 10;
+                r->scrollChance = 7;
+                break;
+        case 1: 
+                r->gold = number_range( 8, 12 );
+                r->points = number_range( 8, 12 );
+                r->wordChance = 15;
+                r->scrollChance = 10;
+                if ( chance(5) )
+                    r->prac = number_range(1, 2);
+                break;
+        case 2:
+                r->gold = number_range( 12, 16 );
+                r->points = number_range( 12, 16 );
+                r->wordChance = 25;
+                r->scrollChance = 12;
+                if ( chance(7) )
+                    r->prac = number_range(1, 3);
+                break;
+        default:
+                r->gold = number_range( 16, 24 );
+                r->points = number_range( 16, 24 );
+                r->wordChance = 30;
+                r->scrollChance = 15;
+                if ( chance(10) )
+                    r->prac = number_range(1, 4);
+                break;
+        };
     }
 
     if (ch->getClan( )->isDispersed( )) 
-	r->points *= 2;
+        r->points *= 2;
     else
-	r->clanpoints = r->points;
+        r->clanpoints = r->points;
 
     r->exp = (r->points + r->clanpoints) * 10;
     return Reward::Pointer( r );
@@ -155,20 +156,20 @@ Quest::Reward::Pointer KillQuest::reward( PCharacter *ch, NPCharacter *questman 
 void KillQuest::info( std::ostream &buf, PCharacter *ch ) 
 {
     if (isComplete( ))
-	buf << "ô×ÏÅ ÚÁÄÁÎÉÅ {Y÷ùðïìîåîï{x!" << endl
-	    << "÷ÅÒÎÉÓØ ÚÁ ×ÏÚÎÁÇÒÁÖÄÅÎÉÅÍ, ÄÏ ÔÏÇÏ ËÁË ×ÙÊÄÅÔ ×ÒÅÍÑ!" << endl;
+        buf << "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ {YÐ’Ð«ÐŸÐžÐ›ÐÐ•ÐÐž{x!" << endl
+            << "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ð·Ð° Ð²Ð¾Ð·Ð½Ð°Ð³Ñ€Ð°Ð¶Ð´ÐµÐ½Ð¸ÐµÐ¼, Ð´Ð¾ Ñ‚Ð¾Ð³Ð¾ ÐºÐ°Ðº Ð²Ñ‹Ð¹Ð´ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ!" << endl;
     else 
-	buf << "õ ÔÅÂÑ ÚÁÄÁÎÉÅ - ÕÎÉÞÔÏÖÉÔØ " << russian_case( mobName, '4' ) << "!" << endl
-	    << "íÅÓÔÏ, ÇÄÅ ÖÅÒÔ×Õ ×ÉÄÅÌÉ × ÐÏÓÌÅÄÎÉÊ ÒÁÚ - " << roomName << endl
-	    << "üÔÏ ÎÁÈÏÄÉÔÓÑ × ÒÁÊÏÎÅ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << areaName << "." << endl;
+        buf << "Ð£ Ñ‚ÐµÐ±Ñ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ - ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð¸Ñ‚ÑŒ " << russian_case( mobName, '4' ) << "!" << endl
+            << "ÐœÐµÑÑ‚Ð¾, Ð³Ð´Ðµ Ð¶ÐµÑ€Ñ‚Ð²Ñƒ Ð²Ð¸Ð´ÐµÐ»Ð¸ Ð² Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€Ð°Ð· - " << roomName << endl
+            << "Ð­Ñ‚Ð¾ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << areaName << "." << endl;
 }
 
 void KillQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     if (isComplete( ))
-	buf << "÷ÅÒÎÕÔØÓÑ Ë Ë×ÅÓÔÏÒÕ ÚÁ ÎÁÇÒÁÄÏÊ.";
+        buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒÑÑ Ðº ÐºÐ²ÐµÑÑ‚Ð¾Ñ€Ñƒ Ð·Ð° Ð½Ð°Ð³Ñ€Ð°Ð´Ð¾Ð¹.";
     else 
-        buf << "õÎÉÞÔÏÖÉÔØ " << russian_case( mobName, '4' ) << " ÉÚ "
+        buf << "Ð£Ð½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð¸Ñ‚ÑŒ " << russian_case( mobName, '4' ) << " Ð¸Ð· "
             << roomName << " (" << areaName << ").";
 }
 
@@ -182,16 +183,16 @@ bool KillQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     int level_diff; 
     
     if (!VictimQuestModel::checkMobileVictim( pch, mob ))
-	return false;
+        return false;
 
     level_diff = mob->getRealLevel( ) - pch->getModifyLevel( );
      
     if (( mode == 0 && ( level_diff < -3 || level_diff > 0  ) )
-	|| ( mode == 1 && ( level_diff <  0 || level_diff > 5  ) )
-	|| ( mode == 2 && ( level_diff <  5 || level_diff > 10 ) )
-	|| ( mode == 3 && ( ( level_diff < 10 || level_diff > 15 ) 
-			     || mob->getProfession( )->getFlags( mob ).isSet(PROF_CASTER)) ))
-	return false;
+        || ( mode == 1 && ( level_diff <  0 || level_diff > 5  ) )
+        || ( mode == 2 && ( level_diff <  5 || level_diff > 10 ) )
+        || ( mode == 3 && ( ( level_diff < 10 || level_diff > 15 ) 
+                             || mob->getProfession( )->getFlags( mob ).isSet(PROF_CASTER)) ))
+        return false;
 
     return true;
 }

@@ -54,9 +54,9 @@ void Exception::printStackTrace( std::ostream &os ) const
     os << "Exception: " << message << std::endl;
 
     for(it = callstack.begin( ); it != callstack.end( ); it++) {
-	void *ip = *it;
+        void *ip = *it;
 
-	os << "  at " << ip << std::endl;
+        os << "  at " << ip << std::endl;
     }
 }
 
@@ -69,7 +69,7 @@ FileFormatException::FileFormatException( const char * fmt, ... ) throw( )
     vsnprintf( buf, sizeof( buf ), fmt, ap );
     va_end( ap );
 
-    setStr( string( buf ) );	    
+    setStr( string( buf ) );            
 }
 
 FileFormatException::~FileFormatException( ) throw( )

@@ -41,12 +41,12 @@ RESET_DATA *new_reset_data(void)
     RESET_DATA *pReset;
 
     if (!reset_free) {
-	pReset = (RESET_DATA*)alloc_perm(sizeof(*pReset));
-	top_reset++;
+        pReset = (RESET_DATA*)alloc_perm(sizeof(*pReset));
+        top_reset++;
     }
     else {
-	pReset = reset_free;
-	reset_free = reset_free->next;
+        pReset = reset_free;
+        reset_free = reset_free->next;
     }
     pReset->next = NULL;
     pReset->command = 'X';
@@ -111,12 +111,12 @@ EXIT_DATA *new_exit(void)
     EXIT_DATA *pExit;
 
     if (!exit_free) {
-	pExit = (EXIT_DATA*)alloc_perm(sizeof(*pExit));
-	top_exit++;
+        pExit = (EXIT_DATA*)alloc_perm(sizeof(*pExit));
+        top_exit++;
     }
     else {
-	pExit = exit_free;
-	exit_free = exit_free->next;
+        pExit = exit_free;
+        exit_free = exit_free->next;
     }
 
     pExit->u1.to_room = NULL;
@@ -124,6 +124,7 @@ EXIT_DATA *new_exit(void)
     pExit->exit_info = 0;
     pExit->key = 0;
     pExit->keyword = &str_empty[0];
+    pExit->short_descr = &str_empty[0];
     pExit->description = &str_empty[0];
     pExit->exit_info_default = 0;
     pExit->level = 0;
@@ -133,6 +134,7 @@ EXIT_DATA *new_exit(void)
 void free_exit(EXIT_DATA * pExit)
 {
     free_string(pExit->keyword);
+    free_string(pExit->short_descr);
     free_string(pExit->description);
 
     pExit->next = exit_free;
@@ -156,15 +158,15 @@ void
 free_extra_exit(EXTRA_EXIT_DATA *eexit)
 {
     if(eexit->keyword)
-	free_string(eexit->keyword);
+        free_string(eexit->keyword);
     if(eexit->short_desc_from)
-	free_string(eexit->short_desc_from);
+        free_string(eexit->short_desc_from);
     if(eexit->short_desc_to)
-	free_string(eexit->short_desc_to);
+        free_string(eexit->short_desc_to);
     if(eexit->description)
-	free_string(eexit->description);
+        free_string(eexit->description);
     if(eexit->room_description)
-	free_string(eexit->room_description);
+        free_string(eexit->room_description);
 
     free_mem(eexit, sizeof(*eexit));
 }
@@ -187,7 +189,7 @@ Room *new_room_index(void)
     pRoom->extra_exit = NULL;
 
     for (door = 0; door < DIR_SOMEWHERE; door++)
-	pRoom->exit[door] = NULL;
+        pRoom->exit[door] = NULL;
 
     pRoom->name = &str_empty[0];
     pRoom->description = &str_empty[0];
@@ -216,23 +218,23 @@ void free_room_index(Room * pRoom)
     free_string(pRoom->owner);
 
     for (door = 0; door < DIR_SOMEWHERE; door++) {
-	if (pRoom->exit[door])
-	    free_exit(pRoom->exit[door]);
+        if (pRoom->exit[door])
+            free_exit(pRoom->exit[door]);
     }
 
-    for (pExtra = pRoom->extra_descr; pExtra; pExtra = pExtra->next) {
-	pExtra_next = pExtra->next;
-	free_extra_descr(pExtra);
+    for (pExtra = pRoom->extra_descr; pExtra; pExtra = pExtra_next) {
+        pExtra_next = pExtra->next;
+        free_extra_descr(pExtra);
     }
 
     for (pEExit = pRoom->extra_exit; pEExit; pEExit = pEExit_next) {
-	pEExit_next = pEExit->next;
-	free_extra_exit(pEExit); 
+        pEExit_next = pEExit->next;
+        free_extra_exit(pEExit); 
     }
 
     for (pReset = pRoom->reset_first; pReset; pReset = pReset_next) {
-	pReset_next = pReset->next;
-	free_reset_data(pReset);
+        pReset_next = pReset->next;
+        free_reset_data(pReset);
     }
 
     delete pRoom;
@@ -265,7 +267,7 @@ OBJ_INDEX_DATA *new_obj_index(void)
     pObj->material = str_dup("none");
     pObj->condition = 100;
     for (value = 0; value < 5; value++)
-	pObj->value[value] = 0;
+        pObj->value[value] = 0;
     pObj->new_format = true;
     pObj->behavior = 0; 
     pObj->limit = -1;
@@ -283,12 +285,12 @@ void free_obj_index(OBJ_INDEX_DATA * pObj)
     free_string(pObj->description);
 
     for (pAf = pObj->affected; pAf; pAf = pAfNext) {
-	pAfNext = pAf->next;
-	ddeallocate(pAf);
+        pAfNext = pAf->next;
+        ddeallocate(pAf);
     }
 
     for (pExtra = pObj->extra_descr; pExtra; pExtra = pExtra->next) {
-	free_extra_descr(pExtra);
+        free_extra_descr(pExtra);
     }
     
     delete pObj;
@@ -299,7 +301,7 @@ MOB_INDEX_DATA *new_mob_index(void)
     MOB_INDEX_DATA *pMob;
 
     pMob = new MOB_INDEX_DATA;
-//	top_mob_index++;
+//        top_mob_index++;
 
     pMob->next = NULL;
     pMob->spec_fun = NULL;

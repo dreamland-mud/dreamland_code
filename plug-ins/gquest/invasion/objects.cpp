@@ -38,8 +38,8 @@ InvasionInstrument::InvasionInstrument( ) : charges( 5 )
 
 void InvasionInstrument::wear( Character *ch ) 
 { 
-    act("ôÙ ÐÏËÒÅÐÞÅ ÓÖÉÍÁÅÛØ $o4, ÇÏÔÏ×ÑÓØ Ë ÇÒÑÄÕÝÉÍ ÐÏÄ×ÉÇÁÍ.", ch, obj, 0, TO_CHAR);
-    act("$c1 Ó ÓÅÒØÅÚÎÙÍ ×ÉÄÏÍ ÓÖÉÍÁÅÔ $o4.", ch, obj, 0, TO_ROOM);
+    act("Ð¢Ñ‹ Ð¿Ð¾ÐºÑ€ÐµÐ¿Ñ‡Ðµ ÑÐ¶Ð¸Ð¼Ð°ÐµÑˆÑŒ $o4, Ð³Ð¾Ñ‚Ð¾Ð²ÑÑÑŒ Ðº Ð³Ñ€ÑÐ´ÑƒÑ‰Ð¸Ð¼ Ð¿Ð¾Ð´Ð²Ð¸Ð³Ð°Ð¼.", ch, obj, 0, TO_CHAR);
+    act("$c1 Ñ ÑÐµÑ€ÑŒÐµÐ·Ð½Ñ‹Ð¼ Ð²Ð¸Ð´Ð¾Ð¼ ÑÐ¶Ð¸Ð¼Ð°ÐµÑ‚ $o4.", ch, obj, 0, TO_ROOM);
 }
 
 bool InvasionInstrument::use( Character *ch, const char *args ) 
@@ -48,22 +48,22 @@ bool InvasionInstrument::use( Character *ch, const char *args )
     InvasionGQuest *gquest = InvasionGQuest::getThis( );
     
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     if (obj->wear_loc != wear_hold) {
-	act("ðÏËÒÅÐÞÅ ÚÁÖÍÉ $o4 × ÒÕËÁÈ - ÇÌÑÄÉÛØ, ÐÏÍÏÖÅÔ..", ch, obj, 0, TO_CHAR);
-	return true;
+        act("ÐŸÐ¾ÐºÑ€ÐµÐ¿Ñ‡Ðµ Ð·Ð°Ð¶Ð¼Ð¸ $o4 Ð² Ñ€ÑƒÐºÐ°Ñ… - Ð³Ð»ÑÐ´Ð¸ÑˆÑŒ, Ð¿Ð¾Ð¼Ð¾Ð¶ÐµÑ‚..", ch, obj, 0, TO_CHAR);
+        return true;
     }
     
     if (!( trgt = get_obj_room( ch, args ) )) {
-	ch->send_to("ãÅÌØ ÎÅ ÎÁÊÄÅÎÁ.\r\n");
-	act("$c1 ÕÇÒÏÖÁÀÝÅ ÒÁÚÍÁÈÉ×ÁÅÔ $o5 - ÂÅÒÅÇÉÓØ!", ch, obj, 0, TO_ROOM);
-	return true;
+        ch->send_to("Ð¦ÐµÐ»ÑŒ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°.\r\n");
+        act("$c1 ÑƒÐ³Ñ€Ð¾Ð¶Ð°ÑŽÑ‰Ðµ Ñ€Ð°Ð·Ð¼Ð°Ñ…Ð¸Ð²Ð°ÐµÑ‚ $o5 - Ð±ÐµÑ€ÐµÐ³Ð¸ÑÑŒ!", ch, obj, 0, TO_ROOM);
+        return true;
     }
     
     if (!trgt->behavior || !trgt->behavior.getDynamicPointer<InvasionObj>( )) {
-	ch->send_to("ôÏ, ÎÁ ÞÔÏ ÔÙ ÚÁÍÁÈÉ×ÁÅÛØÓÑ, ÎÅ ÓÄÅÌÁÌÏ ÔÅÂÅ ÎÉÞÅÇÏ ÐÌÏÈÏÇÏ.\r\n");
-	return true;
+        ch->send_to("Ð¢Ð¾, Ð½Ð° Ñ‡Ñ‚Ð¾ Ñ‚Ñ‹ Ð·Ð°Ð¼Ð°Ñ…Ð¸Ð²Ð°ÐµÑˆÑŒÑÑ, Ð½Ðµ ÑÐ´ÐµÐ»Ð°Ð»Ð¾ Ñ‚ÐµÐ±Ðµ Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð¿Ð»Ð¾Ñ…Ð¾Ð³Ð¾.\r\n");
+        return true;
     }
 
     actUse( ch, trgt );
@@ -74,8 +74,8 @@ bool InvasionInstrument::use( Character *ch, const char *args )
     gquest->rewardKiller( ch->getPC( ) );
     
     if (--charges <= 0) {
-	actDestroy( ch );
-	extract_obj( obj );
+        actDestroy( ch );
+        extract_obj( obj );
     }
 
     return true; 

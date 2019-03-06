@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "objthrow.h"
 
@@ -48,52 +48,68 @@ PROF(ninja);
 
 static void arrow_damage( Object *arrow, Character *ch, Character *victim, int damroll, int door );
 
+static bool check_rock_catching( Character *victim, Object *obj )
+{
+    if (obj->item_type != ITEM_WEAPON)
+        return false;
+    if (obj->value[0] != WEAPON_STONE)
+        return false;
+    if (victim->size < SIZE_HUGE) 
+        return false;
+    return true;
+}
+
 bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
 {
     int chance;
 
     if ( !IS_AWAKE(victim) || MOUNTED(victim) )
-	return false;
+        return false;
 
     if ( victim->is_npc() )
-	chance  = min( static_cast<short>( 30 ), victim->getModifyLevel() );
+        chance  = min( static_cast<short>( 30 ), victim->getModifyLevel() );
     else
     {
-	int prof = victim->getTrueProfession( );
+        int prof = victim->getTrueProfession( );
 
-	chance  = gsn_dodge->getEffective( victim ) / 2;
-	chance += victim->getCurrStat(STAT_DEX) - 20;
+        chance  = gsn_dodge->getEffective( victim ) / 2;
+        chance += victim->getCurrStat(STAT_DEX) - 20;
 
-	if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
-	    chance += chance / 5;
-	else if (prof == prof_thief || prof == prof_ninja)
-	    chance += chance / 10;
+        if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
+            chance += chance / 5;
+        else if (prof == prof_thief || prof == prof_ninja)
+            chance += chance / 10;
     }
 
     chance -= (bonus - 90);
-    if ( !victim->is_npc() && victim->getClan( ) != clan_battlerager)
-	chance /= 2;
-	
-    if ( number_percent( ) >= chance )
-//	&& (victim->is_npc() || victim->getClan( ) != clan_battlerager))
-	return false;
 
-    if (!victim->is_npc()
-	&& victim->getClan( ) == clan_battlerager 
-	&& victim->getClan( )->isRecruiter( victim->getPC( ) ))
-    {
-	act_p("Ты ловишь руками $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
-	act_p("$C1 ловит руками $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 ловит руками $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
-	obj_to_char(obj,victim);
-	return true;
+    bool canCatchMissile = (!victim->is_npc() && victim->getClan( ) == clan_battlerager);
+    bool canCatchRock = check_rock_catching(victim, obj);
+
+    if (!canCatchMissile && !canCatchRock)
+        chance /= 2;
+        
+    if (number_percent( ) >= chance)
+        return false;
+
+    if (canCatchRock) {
+        act_p("п╒я▀ п╩п╬п╡п╦я┬я▄ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
+        act_p("$C1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+        obj_to_char(obj,victim);
     }
-
-    act_p("Ты уклоняешься от $o2.",ch,obj,victim,TO_VICT,POS_RESTING);
-    act_p("$C1 уклоняется от $o2.",ch,obj,victim,TO_CHAR,POS_RESTING);
-    act_p("$c1 уклоняется от $o2.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
-    obj_to_room(obj,victim->in_room);
-    gsn_dodge->improve( victim, true, ch );
+    else if (canCatchMissile) {
+        act_p("п╒я▀ п╩п╬п╡п╦я┬я▄ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_VICT,POS_RESTING);
+        act_p("$C1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",ch,obj,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 п╩п╬п╡п╦я┌ я─я┐п╨п╟п╪п╦ $o4.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+        obj_to_char(obj,victim);
+    } else {
+        act_p("п╒я▀ я┐п╨п╩п╬п╫я▐п╣я┬я▄я│я▐ п╬я┌ $o2.",ch,obj,victim,TO_VICT,POS_RESTING);
+        act_p("$C1 я┐п╨п╩п╬п╫я▐п╣я┌я│я▐ п╬я┌ $o2.",ch,obj,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 я┐п╨п╩п╬п╫я▐п╣я┌я│я▐ п╬я┌ $o2.",victim,obj,ch,TO_NOTVICT,POS_RESTING);
+        obj_to_room(obj,victim->in_room);
+        gsn_dodge->improve( victim, true, ch );
+    }
 
     return true;
 }
@@ -107,10 +123,10 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
     
     for ( paf = arrow->affected; paf != 0; paf = paf->next )
     {
-	    if ( paf->location == APPLY_DAMROLL )
-		    damroll += paf->modifier;
-	    if ( paf->location == APPLY_HITROLL )
-		    hitroll += paf->modifier;
+            if ( paf->location == APPLY_DAMROLL )
+                    damroll += paf->modifier;
+            if ( paf->location == APPLY_HITROLL )
+                    hitroll += paf->modifier;
     }
 
     dest_room = ch->in_room;
@@ -120,63 +136,63 @@ int send_arrow( Character *ch, Character *victim, Object *arrow, int door, int c
 
     while (1)
     {
-	chance -= 10;
+        chance -= 10;
 
-	if (victim->in_room == dest_room)
-	{/* снайперским выстрелом попали в комнату с мишенью :-) */
-	    if (number_percent() < chance)
-	    {
-		if ( check_obj_dodge(ch,victim,arrow,chance))
-			return 0;
-			
-		act_p("$o1 поражает тебя!", victim, arrow, 0, TO_CHAR,POS_RESTING);
-		act_p("$o1 поражает $C4!", ch, arrow, victim, TO_CHAR,POS_RESTING);
+        if (victim->in_room == dest_room)
+        {/* я│п╫п╟п╧п©п╣я─я│п╨п╦п╪ п╡я▀я│я┌я─п╣п╩п╬п╪ п©п╬п©п╟п╩п╦ п╡ п╨п╬п╪п╫п╟я┌я┐ я│ п╪п╦я┬п╣п╫я▄я▌ :-) */
+            if (number_percent() < chance)
+            {
+                if ( check_obj_dodge(ch,victim,arrow,chance))
+                        return 0;
+                        
+                act_p("$o1 п©п╬я─п╟п╤п╟п╣я┌ я┌п╣п╠я▐!", victim, arrow, 0, TO_CHAR,POS_RESTING);
+                act_p("$o1 п©п╬я─п╟п╤п╟п╣я┌ $C4!", ch, arrow, victim, TO_CHAR,POS_RESTING);
 
-		if (ch->in_room == victim->in_room)
-		    act_p("$o1 $c2 поражает $C4!", ch, arrow, victim, TO_NOTVICT,POS_RESTING);
-		else
-		{
-		    act_p("$o1 $c2 поражает $C4!", ch, arrow, victim, TO_ROOM,POS_RESTING);
-		    act_p("$o1 поражает $c4!", victim, arrow, 0, TO_ROOM,POS_RESTING);
-		}
+                if (ch->in_room == victim->in_room)
+                    act_p("$o1 $c2 п©п╬я─п╟п╤п╟п╣я┌ $C4!", ch, arrow, victim, TO_NOTVICT,POS_RESTING);
+                else
+                {
+                    act_p("$o1 $c2 п©п╬я─п╟п╤п╟п╣я┌ $C4!", ch, arrow, victim, TO_ROOM,POS_RESTING);
+                    act_p("$o1 п©п╬я─п╟п╤п╟п╣я┌ $c4!", victim, arrow, 0, TO_ROOM,POS_RESTING);
+                }
 
-		if ( is_safe(ch,victim)
-			|| ( victim->is_npc() && IS_SET(victim->act,ACT_NOTRACK)) )
-		{
-		    act_p("$o1 отскакивает от $c2, не причиняя вреда...",victim,arrow,0,TO_ALL,POS_RESTING);
-		    act_p("$o1 отскакивает от $c2, не причиняя вреда...",victim,arrow,0,TO_CHAR,POS_RESTING);
-		    obj_to_room(arrow,victim->in_room);
-		}
-		else
-		{
-		    arrow_damage( arrow, ch, victim, damroll, door );
-		}
+                if ( is_safe(ch,victim)
+                        || ( victim->is_npc() && IS_SET(victim->act,ACT_NOTRACK)) )
+                {
+                    act_p("$o1 п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ $c2, п╫п╣ п©я─п╦я┤п╦п╫я▐я▐ п╡я─п╣п╢п╟...",victim,arrow,0,TO_ALL,POS_RESTING);
+                    act_p("$o1 п╬я┌я│п╨п╟п╨п╦п╡п╟п╣я┌ п╬я┌ $c2, п╫п╣ п©я─п╦я┤п╦п╫я▐я▐ п╡я─п╣п╢п╟...",victim,arrow,0,TO_CHAR,POS_RESTING);
+                    obj_to_room(arrow,victim->in_room);
+                }
+                else
+                {
+                    arrow_damage( arrow, ch, victim, damroll, door );
+                }
 
-		return 1;
-	    }
-	    else
-	    {
-		obj_to_room(arrow,victim->in_room);
-		act_p("$o1 падает на землю у твоих ног!",victim,arrow,0, TO_ALL,POS_RESTING);
-		return 0;
-	    }
-	}
+                return 1;
+            }
+            else
+            {
+                obj_to_room(arrow,victim->in_room);
+                act_p("$o1 п©п╟п╢п╟п╣я┌ п╫п╟ п╥п╣п╪п╩я▌ я┐ я┌п╡п╬п╦я┘ п╫п╬пЁ!",victim,arrow,0, TO_ALL,POS_RESTING);
+                return 0;
+            }
+        }
 
-	pExit = dest_room->exit[ door ];
-	
-	if ( !pExit )
-	    break;
-	else
-	{
-	    dest_room = pExit->u1.to_room;
-	    act("$o1 прилетает $T!", dest_room->people, arrow, 
-	                             dirs[dirs[door].rev].enter, TO_ALL);
-	}
+        pExit = dest_room->exit[ door ];
+        
+        if ( !pExit )
+            break;
+        else
+        {
+            dest_room = pExit->u1.to_room;
+            act("$o1 п©я─п╦п╩п╣я┌п╟п╣я┌ $T!", dest_room->people, arrow, 
+                                     dirs[dirs[door].rev].enter, TO_ALL);
+        }
     }
 
     return 0;
 }
-	
+        
 
 static void arrow_damage( Object *arrow, Character *ch, Character *victim,
                           int damroll, int door )
@@ -184,97 +200,97 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     int dam, sn, dam_type;
 
     if (arrow->item_type == ITEM_WEAPON)
-	dam_type = attack_table[arrow->value[3]].damage;
+        dam_type = attack_table[arrow->value[3]].damage;
     else
-	dam_type = DAM_BASH;
+        dam_type = DAM_BASH;
 
     sn = get_weapon_skill( arrow )->getIndex( );
     dam = dice( arrow->value[1], arrow->value[2] );
 
     if (ch->isAffected( gsn_accuracy ))
-	dam *= 2;
+        dam *= 2;
 
     dam = number_range( dam, 2 * dam );
     dam += damroll + (get_str_app(ch).missile);
 
     if (IS_WEAPON_STAT(arrow,WEAPON_POISON))
     {
-	short level;
-	Affect *poison, af;
+        short level;
+        Affect *poison, af;
 
-	if ((poison = arrow->affected->affect_find(gsn_poison)) == 0)
-	    level = arrow->level;
-	else
-	    level = poison->level;
+        if ((poison = arrow->affected->affect_find(gsn_poison)) == 0)
+            level = arrow->level;
+        else
+            level = poison->level;
 
-	if (!saves_spell(level,victim,DAM_POISON))
-	{
-	    victim->send_to("Ты чувствуешь как яд растекается по твоим венам.");
-	    act_p("$c1 отравле$gно|н|на ядом от $o2.", victim,arrow,0,TO_ROOM,POS_RESTING);
+        if (!saves_spell(level,victim,DAM_POISON))
+        {
+            victim->send_to("п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╨п╟п╨ я▐п╢ я─п╟я│я┌п╣п╨п╟п╣я┌я│я▐ п©п╬ я┌п╡п╬п╦п╪ п╡п╣п╫п╟п╪.");
+            act_p("$c1 п╬я┌я─п╟п╡п╩п╣$gп╫п╬|п╫|п╫п╟ я▐п╢п╬п╪ п╬я┌ $o2.", victim,arrow,0,TO_ROOM,POS_RESTING);
 
-	    af.where     = TO_AFFECTS;
-	    af.type      = gsn_poison;
-	    af.level     = level * 3/4;
-	    af.duration  = level / 2;
-	    af.location  = APPLY_STR;
-	    af.modifier  = -1;
-	    af.bitvector = AFF_POISON;
-	    affect_join( victim, &af );
-	}
+            af.where     = TO_AFFECTS;
+            af.type      = gsn_poison;
+            af.level     = level * 3/4;
+            af.duration  = level / 2;
+            af.location  = APPLY_STR;
+            af.modifier  = -1;
+            af.bitvector = AFF_POISON;
+            affect_join( victim, &af );
+        }
 
     }
 
     if (IS_WEAPON_STAT(arrow,WEAPON_FLAMING))
     {
-	act_p("$o1 обжигает $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
-	act_p("$o1 обжигает тебя.",victim,arrow,0,TO_CHAR,POS_RESTING);
-	fire_effect( (void *) victim,arrow->level,dam,TARGET_CHAR);
+        act_p("$o1 п╬п╠п╤п╦пЁп╟п╣я┌ $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
+        act_p("$o1 п╬п╠п╤п╦пЁп╟п╣я┌ я┌п╣п╠я▐.",victim,arrow,0,TO_CHAR,POS_RESTING);
+        fire_effect( (void *) victim,arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_FROST))
     {
-	act_p("$o1 обмораживает $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
-	act_p("$o1 обмораживает тебя.",victim,arrow,0,TO_CHAR,POS_RESTING);
-	cold_effect(victim,arrow->level,dam,TARGET_CHAR);
+        act_p("$o1 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ $c4.",victim,arrow,0,TO_ROOM,POS_RESTING);
+        act_p("$o1 п╬п╠п╪п╬я─п╟п╤п╦п╡п╟п╣я┌ я┌п╣п╠я▐.",victim,arrow,0,TO_CHAR,POS_RESTING);
+        cold_effect(victim,arrow->level,dam,TARGET_CHAR);
     }
     
     if (IS_WEAPON_STAT(arrow,WEAPON_SHOCKING))
     {
-	act_p("$o1 парализует $c4 разрядом молнии.",victim,arrow,0,TO_ROOM,POS_RESTING);
-	act_p("$o1 парализует тебя разрядом молнии.",victim,arrow,0,TO_CHAR,POS_RESTING);
-	shock_effect(victim,arrow->level,dam,TARGET_CHAR);
+        act_p("$o1 п©п╟я─п╟п╩п╦п╥я┐п╣я┌ $c4 я─п╟п╥я─я▐п╢п╬п╪ п╪п╬п╩п╫п╦п╦.",victim,arrow,0,TO_ROOM,POS_RESTING);
+        act_p("$o1 п©п╟я─п╟п╩п╦п╥я┐п╣я┌ я┌п╣п╠я▐ я─п╟п╥я─я▐п╢п╬п╪ п╪п╬п╩п╫п╦п╦.",victim,arrow,0,TO_CHAR,POS_RESTING);
+        shock_effect(victim,arrow->level,dam,TARGET_CHAR);
     }
 
     if ( dam_type == DAM_PIERCE
-	    && dam > victim->max_hit / 10
-	    && number_percent() < 50 )
+            && dam > victim->max_hit / 10
+            && number_percent() < 50 )
     {
-	Affect af;
+        Affect af;
 
-	af.where     = TO_AFFECTS;
-	af.type      = sn;
-	af.level     = ch->getModifyLevel();
-	af.duration  = -1;
-	af.location  = APPLY_HITROLL;
-	af.modifier  = - (dam / 20);
+        af.where     = TO_AFFECTS;
+        af.type      = sn;
+        af.level     = ch->getModifyLevel();
+        af.duration  = -1;
+        af.location  = APPLY_HITROLL;
+        af.modifier  = - (dam / 20);
 
-	if (victim->is_npc())
-	    af.bitvector = 0;
-	else
-	    af.bitvector = AFF_CORRUPTION;
+        if (victim->is_npc())
+            af.bitvector = 0;
+        else
+            af.bitvector = AFF_CORRUPTION;
 
-	affect_join( victim, &af );
+        affect_join( victim, &af );
 
-	obj_to_char(arrow,victim);
-	equip_char(victim,arrow,wear_stuck_in);
+        obj_to_char(arrow,victim);
+        equip_char(victim,arrow,wear_stuck_in);
     }
     else
-	obj_to_room(arrow,victim->in_room);
+        obj_to_room(arrow,victim->in_room);
 
     damage_nocatch( ch, victim, dam, sn, dam_type, true, DAMF_WEAPON );
     ch->setLastFightTime( );
     victim->setLastFightTime( );
 
     if (victim->is_npc( ) && victim->getNPC( )->behavior)
-	victim->getNPC( )->behavior->shooted( ch, door );
+        victim->getNPC( )->behavior->shooted( ch, door );
 }

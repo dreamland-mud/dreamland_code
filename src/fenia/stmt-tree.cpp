@@ -53,10 +53,10 @@ CompoundStmt::evalAux()
     CppScopeClobber scope;
 
     for(StmtNodeList::iterator i = nodelist->begin();i != nodelist->end(); i++) {
-	FlowCtl fc = (*i)->eval();
+        FlowCtl fc = (*i)->eval();
 
-	if(fc.type != FlowCtl::NEXT)
-	    return fc;
+        if(fc.type != FlowCtl::NEXT)
+            return fc;
     }
     return FlowCtl(FlowCtl::NEXT);
 }
@@ -67,10 +67,10 @@ CompoundStmt::reverse(ostream &os, const DLString &nextline) const
     os << "{{";
 
     for(StmtNodeList::const_iterator i = nodelist->begin();i != nodelist->end(); i++)
-	(*i)->reverse(os, nextline);
+        (*i)->reverse(os, nextline);
     
     if(nextline.length() > 4)
-	os << string(nextline.c_str( ), nextline.length() - 4);
+        os << string(nextline.c_str( ), nextline.length() - 4);
     
     os << "} ";
 }
@@ -131,7 +131,7 @@ ExpStmt::ExpStmt(ExpNode::Pointer e) : exp(e)
 FlowCtl
 ExpStmt::evalAux() 
 {
-    exp->eval();			    /*ignore return value*/
+    exp->eval();                            /*ignore return value*/
     return FlowCtl(FlowCtl::NEXT);
 }
 
@@ -152,9 +152,9 @@ ForStmt::~ForStmt( )
 }
 
 ForStmt::ForStmt(ExpNodeList::Pointer i, 
-	ExpNode::Pointer c, 
-	ExpNodeList::Pointer n,
-	StmtNode::Pointer b) : init(i), next(n), cond(c), body(b) 
+        ExpNode::Pointer c, 
+        ExpNodeList::Pointer n,
+        StmtNode::Pointer b) : init(i), next(n), cond(c), body(b) 
 { 
 }
 
@@ -162,10 +162,10 @@ void
 ForStmt::evalInit()
 {
     if(init) {
-	ExpNodeList::iterator i;
+        ExpNodeList::iterator i;
 
-	for(i = init->begin();i != init->end(); i++)
-	    (*i)->eval(); // ignore return values
+        for(i = init->begin();i != init->end(); i++)
+            (*i)->eval(); // ignore return values
     }
 }
 
@@ -173,7 +173,7 @@ bool
 ForStmt::evalCond()
 {
     if(cond && !cond->eval().toBoolean())
-	return false;
+        return false;
 
     return true;
 }
@@ -182,10 +182,10 @@ void
 ForStmt::evalNext()
 {
     if(next) {
-	ExpNodeList::iterator i;
+        ExpNodeList::iterator i;
 
-	for(i = next->begin();i != next->end(); i++)
-	    (*i)->eval(); // ignore return values
+        for(i = next->begin();i != next->end(); i++)
+            (*i)->eval(); // ignore return values
     }
 }
 
@@ -195,15 +195,15 @@ ForStmt::evalAux()
     CppScopeClobber scope;
     
     for(evalInit();evalCond();evalNext()) {
-	FlowCtl fc = body->eval();
-	
-	if(fc.type == FlowCtl::RETURN)
-	    return fc;
+        FlowCtl fc = body->eval();
+        
+        if(fc.type == FlowCtl::RETURN)
+            return fc;
 
-	if(fc.type == FlowCtl::BREAK)
-	    break;
-	
-	/* next & continue flow controll is ok */
+        if(fc.type == FlowCtl::BREAK)
+            break;
+        
+        /* next & continue flow controll is ok */
     }
 
     return FlowCtl(FlowCtl::NEXT);
@@ -213,13 +213,13 @@ void
 ForStmt::reverseInit(ostream &os, const DLString &nextline) const
 {
     if(init) {
-	ExpNodeList::const_iterator i;
+        ExpNodeList::const_iterator i;
 
-	for(i = init->begin();i != init->end(); i++) {
-	    if(i != init->begin())
-		os << ", ";
-	    (*i)->reverse(os, nextline);
-	}
+        for(i = init->begin();i != init->end(); i++) {
+            if(i != init->begin())
+                os << ", ";
+            (*i)->reverse(os, nextline);
+        }
     }
 }
 
@@ -227,21 +227,21 @@ void
 ForStmt::reverseCond(ostream &os, const DLString &nextline) const
 {
     if(cond)
-	cond->reverse(os, nextline);
+        cond->reverse(os, nextline);
 }
 
 void 
 ForStmt::reverseNext(ostream &os, const DLString &nextline) const
 {
     if(next) {
-	ExpNodeList::const_iterator i;
+        ExpNodeList::const_iterator i;
 
-	for(i = next->begin();i != next->end(); i++) {
-	    if(i != next->begin())
-		os << ", ";
-		
-	    (*i)->reverse(os, nextline);
-	}
+        for(i = next->begin();i != next->end(); i++) {
+            if(i != next->begin())
+                os << ", ";
+                
+            (*i)->reverse(os, nextline);
+        }
     }
 }
 
@@ -284,11 +284,11 @@ IfStmt::evalAux()
     CppScopeClobber scope;
     
     if(cond->eval().toBoolean())
-	return then->eval();
+        return then->eval();
     else if(elze)
-	return elze->eval();
+        return elze->eval();
     else
-	return FlowCtl(FlowCtl(FlowCtl::NEXT));
+        return FlowCtl(FlowCtl(FlowCtl::NEXT));
 }
 
 void 
@@ -300,8 +300,8 @@ IfStmt::reverse(ostream &os, const DLString &nextline) const
     then->reverse(os, nextline + "    ");
     
     if(elze) {
-	os << nextline << "{Yelse{x ";
-	elze->reverse(os, nextline + "    ");
+        os << nextline << "{Yelse{x ";
+        elze->reverse(os, nextline + "    ");
     }
 }
 
@@ -354,11 +354,11 @@ void
 ReturnStmt::reverse(ostream &os, const DLString &nextline) const
 {
     if(exp) {
-	os << nextline << "{Yreturn{x ";
-	exp->reverse(os, nextline);
-	os << ";";
+        os << nextline << "{Yreturn{x ";
+        exp->reverse(os, nextline);
+        os << ";";
     } else
-	os << nextline << "{Yreturn{x;";
+        os << nextline << "{Yreturn{x;";
 }
 
 VarStmt::VarStmt()
@@ -379,7 +379,7 @@ VarStmt::evalAux()
     ArgNames::const_iterator i;
     
     for(i = vars->begin();i != vars->end(); i++)
-	Context::current->scope->addVar(*i);
+        Context::current->scope->addVar(*i);
 
     return FlowCtl(FlowCtl::NEXT);
 }
@@ -391,10 +391,10 @@ VarStmt::reverse(ostream &os, const DLString &nextline) const
     os << nextline << "{Gvar{x ";
     
     for(i = vars->begin();i != vars->end(); i++) {
-	if(i != vars->begin())
-	    os << ", ";
+        if(i != vars->begin())
+            os << ", ";
 
-	os << Lex::getThis()->getName(*i);
+        os << Lex::getThis()->getName(*i);
     }
 
     os << ';' << nextline;
@@ -410,7 +410,7 @@ TryCatchStmt::~TryCatchStmt( )
 }
 
 TryCatchStmt::TryCatchStmt( StmtNode::Pointer b, Lex::id_t v, StmtNode::Pointer h )
-		: body(b), var(v), handle(h)
+                : body(b), var(v), handle(h)
 {
 }
 
@@ -418,22 +418,22 @@ FlowCtl
 TryCatchStmt::evalAux( )
 {    
     try {
-	return body->eval( );
+        return body->eval( );
 
     } catch(CustomException ce) {
-	CppScopeClobber scope;
-	
-	scope.addVar(var);
-	scope.setVar(var,  Register( ce.message ) );
+        CppScopeClobber scope;
+        
+        scope.addVar(var);
+        scope.setVar(var,  Register( ce.message ) );
 
-	return handle->eval( );
+        return handle->eval( );
     } catch(::Exception e) {
-	CppScopeClobber scope;
-	
-	scope.addVar(var);
-	scope.setVar(var,  Register( e.what( ) ) );
+        CppScopeClobber scope;
+        
+        scope.addVar(var);
+        scope.setVar(var,  Register( e.what( ) ) );
 
-	return handle->eval( );
+        return handle->eval( );
     }
 }
 

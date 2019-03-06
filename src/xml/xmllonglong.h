@@ -14,50 +14,50 @@
 
 /**
  * @author Igor S. Petrenko
- * @short XML переменная long long
+ * @short XML п©п╣я─п╣п╪п╣п╫п╫п╟я▐ long long
  */
 class XMLLongLong : public LongLong
 {
 public:
-	/** По умолчанию значение \0 */
-	inline XMLLongLong( ) : LongLong( )
-	{
-	}
-	
-	inline XMLLongLong( long long value ) : LongLong( value )
-	{
-	}
-	
-	inline XMLLongLong( const DLString& value ) throw( ExceptionBadType )
-		: LongLong( value )
-	{
-	}
-	
-	/** Возвращает xml представление переменной */
-	bool toXML( XMLNode::Pointer& node ) const;
-	/** Инициализация класса из xml данных */
-	void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        /** п÷п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ п╥п╫п╟я┤п╣п╫п╦п╣ \0 */
+        inline XMLLongLong( ) : LongLong( )
+        {
+        }
+        
+        inline XMLLongLong( long long value ) : LongLong( value )
+        {
+        }
+        
+        inline XMLLongLong( const DLString& value ) throw( ExceptionBadType )
+                : LongLong( value )
+        {
+        }
+        
+        /** п▓п╬п╥п╡я─п╟я┴п╟п╣я┌ xml п©я─п╣п╢я│я┌п╟п╡п╩п╣п╫п╦п╣ п©п╣я─п╣п╪п╣п╫п╫п╬п╧ */
+        bool toXML( XMLNode::Pointer& node ) const;
+        /** п≤п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦я▐ п╨п╩п╟я│я│п╟ п╦п╥ xml п╢п╟п╫п╫я▀я┘ */
+        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
 };
 
 
-/** Вывод в ostream типа XMLLongLong */
+/** п▓я▀п╡п╬п╢ п╡ ostream я┌п╦п©п╟ XMLLongLong */
 inline std::ostream& operator << ( std::ostream& ostr, const XMLLongLong& xmlLongLong )
 {
-	ostr << xmlLongLong.getValue( );
-	return ostr;
+        ostr << xmlLongLong.getValue( );
+        return ostr;
 }
 
 class XMLLongLongNoEmpty : public XMLLongLong {
 public:
-	inline XMLLongLongNoEmpty( )
-	{
-	}
-	
-	inline XMLLongLongNoEmpty( int value ) : XMLLongLong( value )
-	{
-	}
+        inline XMLLongLongNoEmpty( )
+        {
+        }
+        
+        inline XMLLongLongNoEmpty( int value ) : XMLLongLong( value )
+        {
+        }
 
-	bool toXML( XMLNode::Pointer& node ) const;
+        bool toXML( XMLNode::Pointer& node ) const;
 };
 
 #endif

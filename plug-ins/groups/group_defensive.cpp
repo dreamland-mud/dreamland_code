@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ĞÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ĞÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ĞÏÍÏİØ × ÎÁĞÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ĞÏÍÏÇÁÌÉ:*
+ * Ğ’ÑĞµ Ğ¿Ñ€Ğ°Ğ²Ğ° Ğ½Ğ° ÑÑ‚Ğ¾Ñ‚ ĞºĞ¾Ğ´ 'Dream Land' Ğ¿Ñ€ĞµĞ½Ğ°Ğ´Ğ»ĞµĞ¶Ğ°Ñ‚ Igor {Leo} Ğ¸ Olga {Varda}*
+ * ĞĞµĞºĞ¾Ñ‚Ğ¾Ñ€ÑƒÑ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰ÑŒ Ğ² Ğ½Ğ°Ğ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğ¸ ÑÑ‚Ğ¾Ğ³Ğ¾ ĞºĞ¾Ğ´Ğ°, Ğ° Ñ‚Ğ°ĞºĞ¶Ğµ ÑĞ²Ğ¾Ğ¸Ğ¼Ğ¸ Ğ¸Ğ´ĞµÑĞ¼Ğ¸ Ğ¿Ğ¾Ğ¼Ğ¾Ğ³Ğ°Ğ»Ğ¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ğ¸ Ğ²ÑĞµ Ğ¾ÑÑ‚Ğ°Ğ»ÑŒĞ½Ñ‹Ğµ, ĞºÑ‚Ğ¾ ÑĞ¾Ğ²ĞµÑ‚Ğ¾Ğ²Ğ°Ğ» Ğ¸ Ğ¸Ğ³Ñ€Ğ°Ğ» Ğ² ÑÑ‚Ğ¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "skill.h"
@@ -42,88 +42,88 @@
 
 SKILL_RUNP( rescue )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *victim;
-	Character *fch;
+        char arg[MAX_INPUT_LENGTH];
+        Character *victim;
+        Character *fch;
 
-	one_argument( argument, arg );
+        one_argument( argument, arg );
 
-	if ( arg[0] == '\0' )
-	{
-		ch->send_to("óĞÁÓÔÉ ËÏÇÏ?\n\r");
-		return;
-	}
+        if ( arg[0] == '\0' )
+        {
+                ch->send_to("Ğ¡Ğ¿Ğ°ÑÑ‚Ğ¸ ĞºĞ¾Ğ³Ğ¾?\n\r");
+                return;
+        }
 
-	if ( ( victim = get_char_room( ch, arg ) ) == 0 )
-	{
-		ch->send_to("üÔÏÇÏ ÎÅÔ ÚÄÅÓØ.\n\r");
-		return;
-	}
+        if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+        {
+                ch->send_to("Ğ­Ñ‚Ğ¾Ğ³Ğ¾ Ğ½ĞµÑ‚ Ğ·Ğ´ĞµÑÑŒ.\n\r");
+                return;
+        }
 
-	if ( victim == ch )
-	{
-		ch->send_to("óÅÂÑ?\n\r");
-		return;
-	}
+        if ( victim == ch )
+        {
+                ch->send_to("Ğ¡ĞµĞ±Ñ?\n\r");
+                return;
+        }
 
-	if ( !ch->is_npc() && victim->is_npc() )
-	{
-		ch->send_to("ô×ÏÑ ĞÏÍÏİØ ÎÅ ÎÕÖÎÁ!\n\r");
-		return;
-	}
+        if ( !ch->is_npc() && victim->is_npc() )
+        {
+                ch->send_to("Ğ¢Ğ²Ğ¾Ñ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰ÑŒ Ğ½Ğµ Ğ½ÑƒĞ¶Ğ½Ğ°!\n\r");
+                return;
+        }
 
-	if ( ch->fighting == victim )
-	{
-		ch->send_to("óÌÉÛËÏÍ ĞÏÚÄÎÏ...\n\r");
-		return;
-	}
+        if ( ch->fighting == victim )
+        {
+                ch->send_to("Ğ¡Ğ»Ğ¸ÑˆĞºĞ¾Ğ¼ Ğ¿Ğ¾Ğ·Ğ´Ğ½Ğ¾...\n\r");
+                return;
+        }
 
-	if ( ( ( fch = victim->fighting ) == 0 )
-		&& ( victim->death_ground_delay == 0 ) )
-	{
-		ch->send_to("îÏ ÎÉËÔÏ ÎÅ ÎÕÖÄÁÅÔÓÑ × ĞÏÍÏİÉ..\n\r");
-		return;
-	}
+        if ( ( ( fch = victim->fighting ) == 0 )
+                && ( victim->death_ground_delay == 0 ) )
+        {
+                ch->send_to("ĞĞ¾ Ğ½Ğ¸ĞºÑ‚Ğ¾ Ğ½Ğµ Ğ½ÑƒĞ¶Ğ´Ğ°ĞµÑ‚ÑÑ Ğ² Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰Ğ¸..\n\r");
+                return;
+        }
 
-	if ( ch->is_npc() && ch->master != 0 && victim->is_npc() )
-		return;
-	
-	if ((fch && is_safe(ch, fch)) || is_safe( ch, victim ))
-	    return;
+        if ( ch->is_npc() && ch->master != 0 && victim->is_npc() )
+                return;
+        
+        if ((fch && is_safe(ch, fch)) || is_safe( ch, victim ))
+            return;
 
-	if (ch->is_npc( ) && ch->master != 0)
-	    if ((fch && is_safe(ch->master, fch)) || is_safe( ch->master, victim ))
-		return;
+        if (ch->is_npc( ) && ch->master != 0)
+            if ((fch && is_safe(ch->master, fch)) || is_safe( ch->master, victim ))
+                return;
 
-	ch->setWait( gsn_rescue->getBeats( )  );
+        ch->setWait( gsn_rescue->getBeats( )  );
 
-	if ( ( number_percent( ) > gsn_rescue->getEffective( ch ) )
-		|| ( victim->getModifyLevel() > ( ch->getModifyLevel() + 30) )
-		|| ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
-	{
-		ch->send_to("ô×ÏÑ ĞÏĞÙÔËÁ ÓĞÁÓÔÉ ÎÅ ÕÄÁÌÁÓØ.\n\r");
-		gsn_rescue->improve( ch, false, victim );
-		return;
-	}
+        if ( ( number_percent( ) > gsn_rescue->getEffective( ch ) )
+                || ( victim->getModifyLevel() > ( ch->getModifyLevel() + 30) )
+                || ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
+        {
+                ch->send_to("Ğ¢Ğ²Ğ¾Ñ Ğ¿Ğ¾Ğ¿Ñ‹Ñ‚ĞºĞ° ÑĞ¿Ğ°ÑÑ‚Ğ¸ Ğ½Ğµ ÑƒĞ´Ğ°Ğ»Ğ°ÑÑŒ.\n\r");
+                gsn_rescue->improve( ch, false, victim );
+                return;
+        }
 
-	act_p( "ôÙ ÓĞÁÓÁÅÛØ $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING);
-	act_p( "$c1 ÓĞÁÓÁÅÔ ÔÅÂÑ!", ch, 0, victim, TO_VICT,POS_RESTING);
-	act_p( "$c1 ÓĞÁÓÁÅÔ $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
-	gsn_rescue->improve( ch, true, victim );
+        act_p( "Ğ¢Ñ‹ ÑĞ¿Ğ°ÑĞ°ĞµÑˆÑŒ $C4!",  ch, 0, victim, TO_CHAR,POS_RESTING);
+        act_p( "$c1 ÑĞ¿Ğ°ÑĞ°ĞµÑ‚ Ñ‚ĞµĞ±Ñ!", ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( "$c1 ÑĞ¿Ğ°ÑĞ°ĞµÑ‚ $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING);
+        gsn_rescue->improve( ch, true, victim );
 
-	if ( fch )
-	{
-		stop_fighting( fch, false );
-//		stop_fighting( victim, false );
+        if ( fch )
+        {
+                stop_fighting( fch, false );
+//                stop_fighting( victim, false );
 
-		set_fighting( ch, fch );
-		set_fighting( fch, ch );
-	}
-	else
-	{
-		victim->death_ground_delay = 0;
-		victim->trap.clear( );
-	}
-	return;
+                set_fighting( ch, fch );
+                set_fighting( fch, ch );
+        }
+        else
+        {
+                victim->death_ground_delay = 0;
+                victim->trap.clear( );
+        }
+        return;
 }
 

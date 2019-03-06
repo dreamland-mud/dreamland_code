@@ -44,9 +44,9 @@ LogStream::send( char level )
 
     if (level == LSP_SYSTEM) {
 #ifndef __MINGW32__
-	if (error > 0) {
-	    stream << "(" << strerror( error ) << ") ";
-	}
+        if (error > 0) {
+            stream << "(" << strerror( error ) << ") ";
+        }
 #else
         if(dw) { 
             LPVOID lpMsgBuf = 0;
@@ -87,9 +87,9 @@ ostream &
 ConsoleLogStream::getStream(int level)
 {
     if(level == LSP_NOTICE) {
-	return std::cout;
+        return std::cout;
     } else {
-	return std::cerr;
+        return std::cerr;
     }
 }
 

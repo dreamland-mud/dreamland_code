@@ -43,53 +43,52 @@ private:
     void replace( int, GlobalRegistryElement::Pointer );
 };
 
-
 template <typename Elem>
 class GlobalRegistry : public GlobalRegistryBase {
 public:
     
     Elem * find( int ndx )
     {
-	if (!goodIndex( ndx ))
-	    return NULL;
+        if (!goodIndex( ndx ))
+            return NULL;
 
-	return (Elem *)*table[ndx];
+        return (Elem *)*table[ndx];
     }
 
     Elem * find( const DLString &name )
     {
-	return find( lookup( name ) );
+        return find( lookup( name ) );
     }
 
     Elem * findExisting( const DLString &name )
     {
-	unsigned int i;
-	
-	if (name.empty( ))
-	    return NULL;
-	    
-	for (i = 0; i < table.size( ); i++) 
-	    if (table[i]->matchesStrict( name ))
-		return (Elem *)*table[i];
+        unsigned int i;
+        
+        if (name.empty( ))
+            return NULL;
+            
+        for (i = 0; i < table.size( ); i++) 
+            if (table[i]->matchesStrict( name ))
+                return (Elem *)*table[i];
 
-	return NULL;
+        return NULL;
     }
 
     Elem * findUnstrict( const DLString &name )
     {
-	unsigned int i;
-	
-	if (name.empty( ))
-	    return NULL;
-	    
-	for (i = 0; i < table.size( ); i++) {
-	    if (table[i]->isValid( )) {
-		if (table[i]->matchesUnstrict( name ))
-		    return (Elem *)*table[i];
-	    }
-	}
+        unsigned int i;
+        
+        if (name.empty( ))
+            return NULL;
+            
+        for (i = 0; i < table.size( ); i++) {
+            if (table[i]->isValid( )) {
+                if (table[i]->matchesUnstrict( name ))
+                    return (Elem *)*table[i];
+            }
+        }
 
-	return NULL;
+        return NULL;
     }
 };
 

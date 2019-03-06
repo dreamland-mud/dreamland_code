@@ -40,7 +40,7 @@ ClanArea::Pointer ClanMobile::getClanArea( )
     area = getChar( )->pIndexData->area;
 
     if (area->behavior) 
-	clanArea = area->behavior.getDynamicPointer<ClanArea>( );
+        clanArea = area->behavior.getDynamicPointer<ClanArea>( );
 
     return clanArea;
 }
@@ -71,59 +71,59 @@ bool ClanHealer::specIdle( )
     int sn;
     
     if (Healer::specIdle( ))
-	return true;
+        return true;
 
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
-	if (rch == ch)
-	    continue;
-	if (!ch->can_see( rch ))
-	    continue;
-	if (rch->is_npc( ) && !IS_AFFECTED(rch, AFF_CHARM))
-	    continue;
+        if (rch == ch)
+            continue;
+        if (!ch->can_see( rch ))
+            continue;
+        if (rch->is_npc( ) && !IS_AFFECTED(rch, AFF_CHARM))
+            continue;
 
-	if (!rch->is_npc( )) {
-	    if (rch->getClan( ) != clan)
-		continue;
-	} else {
-	    if (!healPets)
-		continue;
-	    if (!rch->master || rch->master->is_npc( ))
-		continue;
-	    if (rch->master->getClan( ) != clan)
-		continue;
-	}
-	
-	if (number_range( 0, count++ ) == 0) 
-	    victim = rch;
+        if (!rch->is_npc( )) {
+            if (rch->getClan( ) != clan)
+                continue;
+        } else {
+            if (!healPets)
+                continue;
+            if (!rch->master || rch->master->is_npc( ))
+                continue;
+            if (rch->master->getClan( ) != clan)
+                continue;
+        }
+        
+        if (number_range( 0, count++ ) == 0) 
+            victim = rch;
     }
 
     if (victim == 0)
-	return false;
+        return false;
     
-    sn = -1;	
+    sn = -1;        
     if (victim->isAffected(gsn_plague ))
-	sn = gsn_cure_disease;
+        sn = gsn_cure_disease;
     else if (IS_AFFECTED( victim, AFF_BLIND ))
-	sn = gsn_cure_blindness;
+        sn = gsn_cure_blindness;
     else if (victim->isAffected(gsn_poison ))
-	sn = gsn_cure_poison;
+        sn = gsn_cure_poison;
     else if (IS_AFFECTED( victim, AFF_CURSE ))
-	sn = gsn_remove_curse;
+        sn = gsn_remove_curse;
     else if (!victim->isAffected(gsn_armor ))
-	sn = gsn_armor;
+        sn = gsn_armor;
     else if (!victim->isAffected(gsn_bless ) && !victim->isAffected(gsn_warcry ))
-	sn = gsn_bless;
+        sn = gsn_bless;
     else if ((victim->hit < victim->max_hit) && (victim->move < victim->max_move))
     {
-	if (number_percent( ) < 50)
-	    sn = gsn_heal;
-	else
-	    sn = gsn_refresh; 
+        if (number_percent( ) < 50)
+            sn = gsn_heal;
+        else
+            sn = gsn_refresh; 
     } 
     else if (victim->hit < victim->max_hit)
-	sn = gsn_heal;
+        sn = gsn_heal;
     else if (victim->move < victim->max_move)
-	sn = gsn_refresh; 
+        sn = gsn_refresh; 
     
     return ::spell( sn, ch->getModifyLevel( ), ch, victim, FSPELL_VERBOSE|FSPELL_BANE );
 }
@@ -131,15 +131,15 @@ bool ClanHealer::specIdle( )
 bool ClanHealer::canServeClient( Character *client )
 {
     if (!Healer::canServeClient( client ))
-	return false;
+        return false;
     
     if ((!client->is_npc( ) && client->getClan( ) != clan)
-	|| (client->is_npc( ) && (!client->master 
-		                  || client->master->is_npc( )
-				  || client->master->getClan( ) != clan)))
+        || (client->is_npc( ) && (!client->master 
+                                  || client->master->is_npc( )
+                                  || client->master->getClan( ) != clan)))
     {
-	say_act( client, ch, "ñ ÎÅ ÂÕÄÕ ÐÏÍÏÇÁÔØ ÔÅÂÅ." );
-	return false;
+        say_act( client, ch, "Ð¯ Ð½Ðµ Ð±ÑƒÐ´Ñƒ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ñ‚ÑŒ Ñ‚ÐµÐ±Ðµ." );
+        return false;
     }
     
     return true;
@@ -168,33 +168,33 @@ bool ClanGuard::aggress( )
     clanArea = getClanArea( );
 
     if (!clanArea)
-	return false;
-	
+        return false;
+        
     for (rch = ch->in_room->people; rch; rch = rch_next) {
-	PCharacter *pch = rch->getPC( );
-	
-	rch_next = rch->next_in_room;
+        PCharacter *pch = rch->getPC( );
+        
+        rch_next = rch->next_in_room;
 
-	if (rch->is_npc( ))
-	    continue;
-	if (rch->is_immortal( ))
-	    continue;
-	if (rch->getClan( ) == clan)
-	    continue;
-	if (rch->fighting)
-	    continue;
-	if (clanArea->findInvitation( pch ))
-	    continue;
-	if (checkPush( pch ) || checkGhost( pch ))
-	    continue;
-	
-	actIntruder( pch );
-	doPetitionOutsider( pch );
+        if (rch->is_npc( ))
+            continue;
+        if (rch->is_immortal( ))
+            continue;
+        if (rch->getClan( ) == clan)
+            continue;
+        if (rch->fighting)
+            continue;
+        if (clanArea->findInvitation( pch ))
+            continue;
+        if (checkPush( pch ) || checkGhost( pch ))
+            continue;
+        
+        actIntruder( pch );
+        doPetitionOutsider( pch );
 
-	try {
-	    doAttack( pch );
-	} catch (const VictimDeathException &) {
-	}
+        try {
+            doAttack( pch );
+        } catch (const VictimDeathException &) {
+        }
     }
 
     return true;
@@ -210,31 +210,31 @@ void ClanGuard::greet( Character *wch )
     ClanArea::Pointer clanArea;
 
     if (wch->is_npc( ) || wch->is_immortal( ))
-	return;
-	
+        return;
+        
     clanArea = getClanArea( );
 
     if (!clanArea)
-	return;
+        return;
 
     pch = wch->getPC( );
 
     if (pch->getClan( ) == clan) {
-	actGreet( pch );
-	return;
+        actGreet( pch );
+        return;
     }
     
     if (( obj = clanArea->findInvitation( pch ) )) {
-	actInvited( pch, obj );
-//	extract_obj(obj);
-	return;
+        actInvited( pch, obj );
+//        extract_obj(obj);
+        return;
     }
     
     if (checkPush( pch ))
-	return;
+        return;
     
     if (checkGhost( pch ))
-	return;
+        return;
     
     actIntruder( pch );
     doPetitionOutsider( pch );
@@ -246,18 +246,18 @@ bool ClanGuard::checkPush( PCharacter* wch )
     Room * location;
 
     if (!IS_SET(wch->act, PLR_CONFIRMED)
-	|| (wch->getClan( ) == clan_none && wch->getRealLevel( ) <= 30)
-	|| (wch->getClan( ) != clan_none && wch->getClan( ) != ch->getClan( ) && wch->getRealLevel( ) <= 15)
-	|| (wch->getClan( ) != ch->getClan( ) && !dreamland->hasOption( DL_PK )))
+        || (wch->getClan( ) == clan_none && wch->getRealLevel( ) <= 30)
+        || (wch->getClan( ) != clan_none && wch->getClan( ) != ch->getClan( ) && wch->getRealLevel( ) <= 15)
+        || (wch->getClan( ) != ch->getClan( ) && !dreamland->hasOption( DL_PK )))
     {
-	actPush( wch );
+        actPush( wch );
 
-	if (!( location = get_room_index( wch->getHometown( )->getRecall( ) ) )) 
-	    location = get_room_index( 1 ); // ÷ limbo ÐÏÔ×ÏÒ
-	
-	transfer_char( wch, ch, location,
-		       NULL, NULL, "%1$^C1 ×ÎÅÚÁÐÎÏ ÐÏÑ×ÌÑÅÔÓÑ." );
-	return true;
+        if (!( location = get_room_index( wch->getHometown( )->getRecall( ) ) )) 
+            location = get_room_index( 1 ); // Ð’ limbo Ð¿Ð¾Ñ‚Ð²Ð¾Ñ€
+        
+        transfer_char( wch, ch, location,
+                       NULL, NULL, "%1$^C1 Ð²Ð½ÐµÐ·Ð°Ð¿Ð½Ð¾ Ð¿Ð¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ." );
+        return true;
     }
 
     return false;
@@ -266,12 +266,12 @@ bool ClanGuard::checkPush( PCharacter* wch )
 bool ClanGuard::checkGhost( PCharacter *wch ) 
 {
     if (IS_SLAIN( wch ) || IS_DEATH_TIME( wch )) {
-	actGhost( wch );
-	act( "You slay $C4 in cold blood!", ch, 0, wch, TO_CHAR );
-	act( "$c1 slays you in cold blood!", ch, 0, wch, TO_VICT );
-	act( "$c1 slays $C4 in cold blood!", ch, 0, wch, TO_NOTVICT );
-	raw_kill( wch, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
-	return true;
+        actGhost( wch );
+        act( "You slay $C4 in cold blood!", ch, 0, wch, TO_CHAR );
+        act( "$c1 slays you in cold blood!", ch, 0, wch, TO_VICT );
+        act( "$c1 slays $C4 in cold blood!", ch, 0, wch, TO_NOTVICT );
+        raw_kill( wch, -1, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+        return true;
     }
 
     return false;
@@ -279,41 +279,41 @@ bool ClanGuard::checkGhost( PCharacter *wch )
 
 void ClanGuard::actGhost( PCharacter *wch )
 {
-    do_say( ch, "ðÒÉÚÒÁËÉ ÎÅ ÉÍÅÀÔ ÐÒÁ×Á ×ÈÏÄÉÔØ ÓÀÄÁ." );
+    do_say( ch, "ÐŸÑ€Ð¸Ð·Ñ€Ð°ÐºÐ¸ Ð½Ðµ Ð¸Ð¼ÐµÑŽÑ‚ Ð¿Ñ€Ð°Ð²Ð° Ð²Ñ…Ð¾Ð´Ð¸Ñ‚ÑŒ ÑÑŽÐ´Ð°." );
 }
 
 void ClanGuard::actIntruder( PCharacter *wch )
 {
-    interpret_raw( ch, "cb", "ðÏÓÔÏÒÏÎÎÉÅ... ðÏÓÔÏÒÏÎÎÉÍ ×ÈÏÄ ÚÁÐÒÅÝÅÎ!" );
+    interpret_raw( ch, "cb", "ÐŸÐ¾ÑÑ‚Ð¾Ñ€Ð¾Ð½Ð½Ð¸Ðµ... ÐŸÐ¾ÑÑ‚Ð¾Ñ€Ð¾Ð½Ð½Ð¸Ð¼ Ð²Ñ…Ð¾Ð´ Ð·Ð°Ð¿Ñ€ÐµÑ‰ÐµÐ½!" );
 }
 
 void ClanGuard::doPetitionOutsider( PCharacter *wch )
 {
     if (wch->getClan( ) == clan_none)
-	interpret( wch, "clan petition outsider" );
+        interpret( wch, "clan petition outsider" );
 }
 
 void ClanGuard::doAttack( PCharacter *wch )
 {
     if (wch->is_immortal( ))
-	return;
+        return;
 
     switch (ch->position.getValue( )) {
     case POS_FIGHTING:
-	SET_BIT( ch->off_flags, OFF_AREA_ATTACK );
-	one_hit_nocatch( ch, wch );
-	break;
+        SET_BIT( ch->off_flags, OFF_AREA_ATTACK );
+        one_hit_nocatch( ch, wch );
+        break;
     default:
-	multi_hit_nocatch( ch, wch );
-	break;
+        multi_hit_nocatch( ch, wch );
+        break;
     }
 }
 
 void ClanGuard::actInvited( PCharacter *wch, Object *obj )
 {
-    do_say( ch, "ôÅÂÑ ÐÒÉÇÌÁÓÉÌÉ - ÔÏÌØËÏ ÜÔÏ ÏÐÒÁ×ÄÙ×ÁÅÔ Ô×ÏÅ ÐÒÉÓÕÔÓÔ×ÉÅ ÚÄÅÓØ!" );
-//    act( "$C1 ÚÁÂÉÒÁÅÔ $o4 Õ $c2.", wch, obj, ch, TO_ROOM );
-//    act( "$C1 ÚÁÂÉÒÁÅÔ Õ ÔÅÂÑ $o4.", wch, obj, ch, TO_CHAR );
+    do_say( ch, "Ð¢ÐµÐ±Ñ Ð¿Ñ€Ð¸Ð³Ð»Ð°ÑÐ¸Ð»Ð¸ - Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÑÑ‚Ð¾ Ð¾Ð¿Ñ€Ð°Ð²Ð´Ñ‹Ð²Ð°ÐµÑ‚ Ñ‚Ð²Ð¾Ðµ Ð¿Ñ€Ð¸ÑÑƒÑ‚ÑÑ‚Ð²Ð¸Ðµ Ð·Ð´ÐµÑÑŒ!" );
+//    act( "$C1 Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÑ‚ $o4 Ñƒ $c2.", wch, obj, ch, TO_ROOM );
+//    act( "$C1 Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÑ‚ Ñƒ Ñ‚ÐµÐ±Ñ $o4.", wch, obj, ch, TO_CHAR );
 }
 
 void ClanGuard::actPush( PCharacter *wch )
@@ -333,65 +333,65 @@ void ClanGuard::speech( Character *wch, const char *speech )
     ClanArea::Pointer clanArea = getClanArea( );
     
     if (!clanArea)
-	return;
+        return;
 
     if (wch->is_npc( ))
-	return;
-	    
+        return;
+            
     obj = NULL;
 
     if (!str_cmp( speech, "I need key" )) {
-	if (clanArea->keyVnum > 0) {
-	    if (wch->getClan( ) != ch->getClan( )) {
-		do_say(ch, "üôïçï ÔÙ ÎÅ ÐÏÌÕÞÉÛØ!");
-		return;
-	    }
-
-	    obj = create_object(get_obj_index(clanArea->keyVnum), 0);
-	    obj->timer = 120;
-	    act( "$c1 ÓÎÉÍÁÅÔ Ó ÛÅÉ $o4.", ch, obj, 0, TO_ROOM );
-	    act( "ôÙ ÓÎÉÍÁÅÛØ Ó ÛÅÉ $o4.", ch, obj, 0, TO_CHAR );
-	}
-    }
-    else if (!str_cmp( speech, "I need invitation" )) {
-	if (clanArea->invitationVnum > 0) {
-	    if (wch->getClan( ) != ch->getClan( )) {
-		do_say(ch, "ñ ÎÅ ÏÂÑÚÁÎ ÐÒÉÇÌÁÛÁÔØ ÔÅÂÑ × Ó×ÏÊ ËÌÁÎ!");
-		return;
-	    }
-
-	    obj = create_object(get_obj_index( clanArea->invitationVnum ), 0);
-	    obj->timer = 15;
-	    actGiveInvitation( wch->getPC( ), obj );	    
-	}
-    }
-    else if (!str_cmp( speech, "I need book" )) {
-	if (clanArea->bookVnum > 0) {
-	    if (wch->getClan( ) != ch->getClan( )) {
-		do_say(ch, "üÔÁ ËÎÉÇÁ ÎÅ ÄÌÑ Ô×ÏÉÈ ÇÌÁÚ!");
-		return;
-	    }
-	    
-	    if (!wch->getClan( )->isRecruiter( wch->getPC( ) )) {
-                do_say(ch, "üÔÕ ËÎÉÇÕ Ñ ÏÔÄÁÍ ÔÏÌØËÏ ÒÕËÏ×ÏÄÉÔÅÌÑÍ ËÌÁÎÁ!");
+        if (clanArea->keyVnum > 0) {
+            if (wch->getClan( ) != ch->getClan( )) {
+                do_say(ch, "Ð­Ð¢ÐžÐ“Ðž Ñ‚Ñ‹ Ð½Ðµ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸ÑˆÑŒ!");
                 return;
             }
 
-	    obj = create_object(get_obj_index( clanArea->bookVnum ), 0);
-	}
+            obj = create_object(get_obj_index(clanArea->keyVnum), 0);
+            obj->timer = 120;
+            act( "$c1 ÑÐ½Ð¸Ð¼Ð°ÐµÑ‚ Ñ ÑˆÐµÐ¸ $o4.", ch, obj, 0, TO_ROOM );
+            act( "Ð¢Ñ‹ ÑÐ½Ð¸Ð¼Ð°ÐµÑˆÑŒ Ñ ÑˆÐµÐ¸ $o4.", ch, obj, 0, TO_CHAR );
+        }
+    }
+    else if (!str_cmp( speech, "I need invitation" )) {
+        if (clanArea->invitationVnum > 0) {
+            if (wch->getClan( ) != ch->getClan( )) {
+                do_say(ch, "Ð¯ Ð½Ðµ Ð¾Ð±ÑÐ·Ð°Ð½ Ð¿Ñ€Ð¸Ð³Ð»Ð°ÑˆÐ°Ñ‚ÑŒ Ñ‚ÐµÐ±Ñ Ð² ÑÐ²Ð¾Ð¹ ÐºÐ»Ð°Ð½!");
+                return;
+            }
+
+            obj = create_object(get_obj_index( clanArea->invitationVnum ), 0);
+            obj->timer = 15;
+            actGiveInvitation( wch->getPC( ), obj );            
+        }
+    }
+    else if (!str_cmp( speech, "I need book" )) {
+        if (clanArea->bookVnum > 0) {
+            if (wch->getClan( ) != ch->getClan( )) {
+                do_say(ch, "Ð­Ñ‚Ð° ÐºÐ½Ð¸Ð³Ð° Ð½Ðµ Ð´Ð»Ñ Ñ‚Ð²Ð¾Ð¸Ñ… Ð³Ð»Ð°Ð·!");
+                return;
+            }
+            
+            if (!wch->getClan( )->isRecruiter( wch->getPC( ) )) {
+                do_say(ch, "Ð­Ñ‚Ñƒ ÐºÐ½Ð¸Ð³Ñƒ Ñ Ð¾Ñ‚Ð´Ð°Ð¼ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ñ€ÑƒÐºÐ¾Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑÐ¼ ÐºÐ»Ð°Ð½Ð°!");
+                return;
+            }
+
+            obj = create_object(get_obj_index( clanArea->bookVnum ), 0);
+        }
     }
 
     if (obj) {
-	act( "$C1 ÄÁÅÔ $o4 $c3.", wch, obj, ch, TO_ROOM );
-	act( "$C1 ÄÁÅÔ ÔÅÂÅ $o4.", wch, obj, ch, TO_CHAR );
-	obj_to_char(obj, wch);
+        act( "$C1 Ð´Ð°ÐµÑ‚ $o4 $c3.", wch, obj, ch, TO_ROOM );
+        act( "$C1 Ð´Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ $o4.", wch, obj, ch, TO_CHAR );
+        obj_to_char(obj, wch);
     }
 }
 
 void ClanGuard::actGiveInvitation( PCharacter *wch, Object *obj )
 {
-    act( "$c1 ÐÉÛÅÔ ÎÁ $o6.", ch, obj, 0, TO_ROOM );
-    act( "ôÙ ÐÉÛÅÛØ ÎÁ $o6.", ch, obj, 0, TO_CHAR );
+    act( "$c1 Ð¿Ð¸ÑˆÐµÑ‚ Ð½Ð° $o6.", ch, obj, 0, TO_ROOM );
+    act( "Ð¢Ñ‹ Ð¿Ð¸ÑˆÐµÑˆÑŒ Ð½Ð° $o6.", ch, obj, 0, TO_CHAR );
 }
 
 /*--------------------------------------------------------------------------
@@ -402,7 +402,7 @@ bool ClanGuard::specFight( )
     Character *victim;
 
     if (!( victim = getVictim( ) ))
-	return true;
+        return true;
     
     spec_cast( victim );
     return true;
@@ -411,10 +411,10 @@ bool ClanGuard::specFight( )
 bool ClanGuard::spec_cast( Character *victim )
 {
     return ::spell( getCast( victim ), 
-	            ch->getRealLevel( ), 
-		    ch, 
-		    victim, 
-		    FSPELL_VERBOSE );
+                    ch->getRealLevel( ), 
+                    ch, 
+                    victim, 
+                    FSPELL_VERBOSE );
 }
 
 int ClanGuard::getCast( Character * )
@@ -427,10 +427,10 @@ Character * ClanGuard::getVictim( )
     Character *victim, *v_next;
 
     for (victim = ch->in_room->people; victim; victim = v_next) {
-	v_next = victim->next_in_room;
+        v_next = victim->next_in_room;
 
-	if (victim->fighting == ch && number_bits( 1 ) == 0)
-	    return victim;
+        if (victim->fighting == ch && number_bits( 1 ) == 0)
+            return victim;
     }
 
     return NULL;
@@ -444,8 +444,8 @@ bool ClanGuard::specAdrenaline( )
 int ClanGuard::getOccupation( )
 {
     return BasicMobileDestiny::getOccupation( ) 
-	    | (1 << OCC_PRACTICER)
-	    | (1 << OCC_CLANGUARD);
+            | (1 << OCC_PRACTICER)
+            | (1 << OCC_CLANGUARD);
 }
 
 /*--------------------------------------------------------------------------

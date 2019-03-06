@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "wrap_utils.h"
+#include "logstream.h"
 
 #include "affect.h"
 #include "pcharacter.h"
@@ -11,6 +12,8 @@
 #include "race.h"
 #include "object.h"
 #include "room.h"
+#include "skill.h" 
+#include "skillmanager.h" 
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -63,13 +66,26 @@ DLString args2string( const RegisterList &args )
     return get_unique_arg( args ).toString( );
 }
 
+Character * args2character( const RegisterList &args )
+{
+    return wrapper_cast<CharacterWrapper>( get_unique_arg(args) )->getTarget( );
+}
+
+PCharacter * args2player( const RegisterList &args )
+{
+    Character *ch = args2character(args); 
+    if (ch->is_npc())
+        throw Scripting::CustomException("Mobile found when PC expected.");
+    return ch->getPC();
+}
+
 Wearlocation * arg2wearloc( const Register &reg )
 {
     DLString locName = reg.toString( );
     Wearlocation *loc = wearlocationManager->findExisting( locName );
 
     if (!loc)
-	throw Scripting::CustomException( DLString("Invalid wearlocation name '") + locName + "'" );
+        throw Scripting::CustomException( DLString("Invalid wearlocation name '") + locName + "'" );
 
     return loc;
 }
@@ -89,9 +105,57 @@ Character * arg2character( const Register &reg )
     return wrapper_cast<CharacterWrapper>( reg )->getTarget( );
 }
 
+PCharacter * arg2player( const Register &reg )
+{
+    Character *ch = arg2character(reg);
+    if (ch->is_npc())
+        throw Scripting::CustomException("Mobile found when PC expected.");
+    return ch->getPC();
+}
+
 void args2buf(const RegisterList &args, char *buf, size_t bufsize)
 {
     strncpy(buf, args2string(args).c_str(), bufsize);
     buf[bufsize - 1] = 0;
+}
+
+static const Register & argnum(const RegisterList &args, int num)
+{
+    if (args.size() < (unsigned int)num)
+        throw Scripting::NotEnoughArgumentsException();
+    
+    RegisterList::const_iterator a;
+    int i;
+    for (a = args.begin(), i = 1; i <= num - 1 && a != args.end(); i++, a++) 
+        ; 
+    return *a;
+}
+
+
+Character *argnum2character(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    return wrapper_cast<CharacterWrapper>(reg)->getTarget();
+}
+
+PCharacter *argnum2player(const RegisterList &args, int num)
+{
+    Character *ch = argnum2character(args, num);
+    if (ch->is_npc())
+        throw Scripting::CustomException("Mobile found when PC expected.");
+    return ch->getPC();
+}
+
+int argnum2number(const RegisterList &args, int num)
+{
+    return argnum(args, num).toNumber();
+}
+
+Skill * args2skill( const RegisterList &args )
+{
+    if (args.size( ) != 1)
+        throw Scripting::NotEnoughArgumentsException( );
+
+    return skillManager->findExisting( args.front( ).toString( ) );
 }
 

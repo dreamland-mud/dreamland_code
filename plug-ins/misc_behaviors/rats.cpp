@@ -26,16 +26,16 @@
 static Character * get_actor( Character *victim ) 
 {
     if (victim->is_mirror( ) && victim->doppel)
-	return get_actor( victim->doppel );
+        return get_actor( victim->doppel );
     
     if (!victim->is_npc( ) && !IS_AFFECTED( victim, AFF_CHARM ))
-	return victim;
+        return victim;
     
     if (victim->leader && victim->leader != victim)
-	return get_actor( victim->leader );
+        return get_actor( victim->leader );
     
     if (victim->master && victim->master != victim)
-	return get_actor( victim->master );
+        return get_actor( victim->master );
     
     return victim;
 }
@@ -51,12 +51,12 @@ Rat::Rat( )
 bool Rat::death( Character *killer ) {
    
     if (!killer || killer == ch)
-	return false;
+        return false;
 
     killer = get_actor( killer );
 
     if (killer->is_npc( ))
-	return false;
+        return false;
 
     killer->getPC( )->getAttributes( ).getAttr<XMLAttributeRats>( "rats" )->nongrata.setValue( true );
     return false;
@@ -68,29 +68,29 @@ bool Rat::area( )
     Character *master = ch->master;
     
     if (LevelAdaptivePet::area( ))
-	return true;
+        return true;
 
     if (master && !master->is_npc( )) {
-	XMLAttributeRats::Pointer attr = master->getPC( )->getAttributes( ).findAttr<XMLAttributeRats>( "rats" );
-	
-	if (attr && attr->nongrata == true) {
-	    act_p( "$c1 говорит тебе '{GЯ не желаю служить тебе..{x'", ch, 0, master, TO_VICT, POS_DEAD );
-	    extract_char( ch );
-	    return true;
-	}
+        XMLAttributeRats::Pointer attr = master->getPC( )->getAttributes( ).findAttr<XMLAttributeRats>( "rats" );
+        
+        if (attr && attr->nongrata == true) {
+            act_p( "$c1 пЁп╬п╡п╬я─п╦я┌ я┌п╣п╠п╣ '{Gп╞ п╫п╣ п╤п╣п╩п╟я▌ я│п╩я┐п╤п╦я┌я▄ я┌п╣п╠п╣..{x'", ch, 0, master, TO_VICT, POS_DEAD );
+            extract_char( ch );
+            return true;
+        }
     } else if (ch->in_room && ch->in_room->vnum != 778) { /* not in paradise */
-	stopfol( NULL );
+        stopfol( NULL );
     }
     
     if (time == -1)
-	return false;
+        return false;
 
     if (time > 1) {
-	timer.setValue( time - 1);
-	return false;
+        timer.setValue( time - 1);
+        return false;
     }
 
-    act_p("$c1 отправляется в крысиный рай.", ch, 0, 0, TO_ROOM, POS_RESTING);
+    act_p("$c1 п╬я┌п©я─п╟п╡п╩я▐п╣я┌я│я▐ п╡ п╨я─я▀я│п╦п╫я▀п╧ я─п╟п╧.", ch, 0, 0, TO_ROOM, POS_RESTING);
     extract_char( ch );
     return true;
 }
@@ -99,8 +99,8 @@ void Rat::stopfol( Character *master ) {
     LevelAdaptivePet::stopfol( master );
 
     if (timer.getValue( ) == -1) {
-	timer.setValue( 5 ); 
-	save_mobs( ch->in_room );
+        timer.setValue( 5 ); 
+        save_mobs( ch->in_room );
     }
 }
 
@@ -114,25 +114,25 @@ void RatGod::greet( Character *mob ) {
     race = mob->getRace( )->getName( );
     
     if (race == "felar" || race == "lion" || race == "cat") {
-	exorcism( mob, "{DС котами нельзя!{x" );
-	return;
+        exorcism( mob, "{Dп║ п╨п╬я┌п╟п╪п╦ п╫п╣п╩я▄п╥я▐!{x" );
+        return;
     }
     
     mob = get_actor( mob );
     if (mob->is_npc( ))
-	return;
+        return;
 
     attr = mob->getPC( )->getAttributes( ).findAttr<XMLAttributeRats>( "rats" );
 
     if (attr) {
-	if (attr->nongrata.getValue( ) == true) {
-	    exorcism( mob, "{rКрысоубийце{D не место здесь.{x" );
-	    return;
-	}
-	if (attr->desecrator) {
-	    exorcism( mob, "Тебя здесь не желают видеть." );
-	    return;
-	}
+        if (attr->nongrata.getValue( ) == true) {
+            exorcism( mob, "{rп я─я▀я│п╬я┐п╠п╦п╧я├п╣{D п╫п╣ п╪п╣я│я┌п╬ п╥п╢п╣я│я▄.{x" );
+            return;
+        }
+        if (attr->desecrator) {
+            exorcism( mob, "п╒п╣п╠я▐ п╥п╢п╣я│я▄ п╫п╣ п╤п╣п╩п╟я▌я┌ п╡п╦п╢п╣я┌я▄." );
+            return;
+        }
     }
 }
 
@@ -143,14 +143,14 @@ void RatGod::exorcism( Character *victim, const char *msg ) {
     pexit = ch->in_room->exit[DIR_UP];
 
     if (pexit && pexit->u1.to_room)
-	to_room = pexit->u1.to_room;
+        to_room = pexit->u1.to_room;
     else
-	to_room = get_room_index( ROOM_VNUM_TEMPLE );
+        to_room = get_room_index( ROOM_VNUM_TEMPLE );
     
     transfer_char( victim, ch, to_room,
-                   "%1$^C1 улетучивается.",
-		   msg,
-                   "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+                   "%1$^C1 я┐п╩п╣я┌я┐я┤п╦п╡п╟п╣я┌я│я▐.",
+                   msg,
+                   "%1$^C1 п©п╬я▐п╡п╦п╩%1$Gп╬я│я▄|я│я▐|п╟я│я▄ п╡ п╨п╬п╪п╫п╟я┌п╣." );
 }
 
 

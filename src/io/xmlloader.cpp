@@ -29,9 +29,9 @@ bool XMLLoader::loadXML( XMLVariable *var, const DLString &name, bool fIgnoreNot
         if (fIgnoreNotFound && !dbio.getEntryAsFile( name ).exist( )) 
             return false;
 
-	DBIO::DBNode dbNode = dbio.select( name );
-	basic_istringstream<char> xmlStream( dbNode.getXML( ) );
-	
+        DBIO::DBNode dbNode = dbio.select( name );
+        basic_istringstream<char> xmlStream( dbNode.getXML( ) );
+        
         XMLDocument::Pointer root( NEW );
         root->load( xmlStream );
 
@@ -41,8 +41,8 @@ bool XMLLoader::loadXML( XMLVariable *var, const DLString &name, bool fIgnoreNot
     }
     catch (const Exception& ex) {
         LogStream::sendError( ) 
-	    << "Error while loading " << name << ".xml: " << ex << endl;
-	return false;
+            << "Error while loading " << name << ".xml: " << ex << endl;
+        return false;
     }
 
     return true;
@@ -55,22 +55,22 @@ bool XMLLoader::saveXML( const XMLVariable *var, const DLString &name, bool fSaf
         XMLNode::Pointer node( NEW, getNodeName( ) );
 
         if (var->toXML( node )) {
-	    XMLDocument::Pointer root( NEW );
-	    root->appendChild( node );
+            XMLDocument::Pointer root( NEW );
+            root->appendChild( node );
 
-	    basic_ostringstream<char> ostr;
-	    root->save( ostr );
-	    
-	    if (fSafe)
-		dbio.safeInsert( name, ostr.str( ) );
-	    else
-		dbio.insert( name, ostr.str( ) );
-	}
+            basic_ostringstream<char> ostr;
+            root->save( ostr );
+            
+            if (fSafe)
+                dbio.safeInsert( name, ostr.str( ) );
+            else
+                dbio.insert( name, ostr.str( ) );
+        }
     }
     catch (const Exception& ex) {
         LogStream::sendError( ) 
-	    << "Error while saving " << name << ".xml: " << ex << endl;
-	return false;
+            << "Error while saving " << name << ".xml: " << ex << endl;
+        return false;
     }
     
     return true;

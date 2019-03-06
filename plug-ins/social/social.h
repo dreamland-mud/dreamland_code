@@ -16,25 +16,28 @@
 #include "xmltableelement.h"
 #include "socialbase.h"
 #include "xmlloader.h"
+#include "markuphelparticle.h"
+
+class SocialHelp;
 
 class Social : public SocialBase, public XMLVariableContainer, 
                public XMLTableElement 
 {
 XML_OBJECT
-public:	
+public:        
     typedef ::Pointer<Social> Pointer;
 
     Social( );
     virtual ~Social( );
     
+    virtual void loaded( );
+    virtual void unloaded( );
     virtual bool matches( const DLString & ) const;
     inline virtual const DLString &getName( ) const;
     inline virtual void setName( const DLString & );
     inline virtual const DLString &getRussianName( ) const;
     inline const DLString &getShortDesc( ) const;
 
-protected:
-    virtual void reaction( Character *, Character *, const DLString & );
     inline virtual int getPosition( ) const;
     inline virtual const DLString & getNoargOther( ) const;
     inline virtual const DLString & getNoargMe( ) const;
@@ -47,6 +50,14 @@ protected:
     inline virtual const DLString & getArgMe2( ) const;
     inline virtual const DLString & getArgVictim2( ) const;
     inline virtual const DLString & getErrorMsg( ) const;
+    inline virtual const DLString & getObjVictim() const;
+    inline virtual const DLString & getObjChar() const;
+    inline virtual const DLString & getObjOthers() const;
+    inline virtual const DLString & getObjNoVictimSelf() const;
+    inline virtual const DLString & getObjNoVictimOthers() const;
+
+protected:
+    virtual bool reaction( Character *, Character *, const DLString & );
 
 private:
     bool mprog( Character *, Character * );
@@ -62,12 +73,22 @@ private:
     XML_VARIABLE XMLString  msgCharNotFound;
     XML_VARIABLE XMLString  msgCharAuto;
     XML_VARIABLE XMLString  msgOthersAuto;
-    XML_VARIABLE XMLString  msgCharFound2;
-    XML_VARIABLE XMLString  msgOthersFound2;
-    XML_VARIABLE XMLString  msgVictimFound2;
+
+    XML_VARIABLE XMLStringNoEmpty  msgCharFound2;
+    XML_VARIABLE XMLStringNoEmpty  msgOthersFound2;
+    XML_VARIABLE XMLStringNoEmpty  msgVictimFound2;
+
+    XML_VARIABLE XMLStringNoEmpty  msgVictimObj;
+    XML_VARIABLE XMLStringNoEmpty  msgCharVictimObj;
+    XML_VARIABLE XMLStringNoEmpty  msgOthersVictimObj;
+    XML_VARIABLE XMLStringNoEmpty  msgCharObj;
+    XML_VARIABLE XMLStringNoEmpty  msgOthersObj;
+
     XML_VARIABLE XMLStringList aliases;
 
     XML_VARIABLE XMLEnumeration position;
+
+    ::Pointer<SocialHelp> help;
 };
 
 inline const DLString& Social::getName( ) const 
@@ -134,6 +155,39 @@ inline const DLString & Social::getErrorMsg( ) const
 {
     return msgCharNotFound.getValue( );
 }
+
+inline const DLString & Social::getObjVictim() const
+{
+    return msgVictimObj.getValue();
+}
+inline const DLString & Social::getObjChar() const
+{
+    return msgCharVictimObj.getValue();
+}
+inline const DLString & Social::getObjOthers() const
+{
+    return msgOthersVictimObj.getValue();
+}
+inline const DLString & Social::getObjNoVictimSelf() const
+{
+    return msgCharObj.getValue();
+}
+inline const DLString & Social::getObjNoVictimOthers() const
+{
+    return msgOthersObj.getValue();
+}
+
+class SocialHelp : public MarkupHelpArticle {
+public:
+    typedef ::Pointer<SocialHelp> Pointer;
+    
+    SocialHelp(Social::Pointer social);
+    virtual ~SocialHelp();
+
+protected:
+    virtual void getRawText( Character *, ostringstream & ) const;
+    Social::Pointer social;
+};
 
 #endif
 

@@ -14,14 +14,14 @@ TABLE_LOADER(RaceAptitudeLoader, "race-aptitudes", "skill");
 
 extern "C"
 {
-	SO::PluginList initialize_race_aptitude( )
-	{
-		SO::PluginList ppl;
-		
-		Plugin::registerPlugin<MocRegistrator<RaceAptitude> >( ppl );
-		Plugin::registerPlugin<RaceAptitudeLoader>( ppl );
-		
-		return ppl;
-	}
-	
+        SO::PluginList initialize_race_aptitude( )
+        {
+                SO::PluginList ppl;
+                
+                Plugin::registerPlugin<MocRegistrator<RaceAptitude> >( ppl );
+                Plugin::registerPlugin<RaceAptitudeLoader>( ppl );
+                
+                return ppl;
+        }
+        
 }

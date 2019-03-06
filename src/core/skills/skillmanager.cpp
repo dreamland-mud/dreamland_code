@@ -5,6 +5,7 @@
 
 #include "skillmanager.h"
 #include "skill.h"
+#include "stringlist.h"
 
 #include "pcharacter.h"
 
@@ -21,38 +22,41 @@ SkillManager::~SkillManager( )
     skillManager = 0;
 }
 
-int SkillManager::unstrictLookup( const DLString &name, Character *ch ) const
+int SkillManager::unstrictLookup( const DLString &constName, Character *ch ) const
 {
     unsigned int i;
     Indexes::const_iterator iter;
     const Skill *skill;
+    DLString name = constName.quote().getOneArgument();
 
     if (name.empty( ))
-	return -1;
+        return -1;
     
     // strict lookup
     iter = indexes.find( name );
     
     if (iter != indexes.end( )) {
-	i = iter->second;
-	skill = (Skill *)*table[i];
+        i = iter->second;
+        skill = (Skill *)*table[i];
 
-	if (!ch || skill->available( ch ))
-	    return i;
+        if (!ch || skill->available( ch ))
+            return i;
     }
     
-    // unstrict lookup, with russian name
+    // unstrict lookup by partial name , e.g. 'cur po' for 'cure poison'
+    StringList argList(name);
+
     for (i = 0; i < table.size( ); i++) {
-	skill = (Skill *)*table[i];
-	
-	if (name.strPrefix( skill->getName( ) )
-	    || name.strPrefix( skill->getRussianName( ) ))
-	{
-	    if (!ch || skill->available( ch ))
-		return i;
-	}
+        skill = (Skill *)*table[i];
+
+        if (StringList(skill->getName()).superListOf(argList)
+             || StringList(skill->getRussianName()).superListOf(argList))
+        {
+            if (!ch || skill->available( ch ))
+                return i;
+        }
     }
-    
+
     return -1;
 }
 

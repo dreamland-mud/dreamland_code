@@ -28,12 +28,14 @@ public:
     DLString getMeaning( ) const;
     bool isGlobal( ) const;
     bool isObject( ) const;
+    bool isOffensive( ) const;
 
 protected:
     XML_VARIABLE XMLInteger frequency;
     XML_VARIABLE XMLString  meaning;
     XML_VARIABLE XMLBoolean global;
     XML_VARIABLE XMLBoolean object;
+    XML_VARIABLE XMLBoolean offensive;
 };
 
 #endif

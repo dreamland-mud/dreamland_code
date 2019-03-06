@@ -18,66 +18,66 @@
 
 /**
  * @author Igor S. Petrenko
- * @short ÎÃ¡”” ƒÃ— “¡¬œ‘Ÿ ” À¡‘¡Ãœ«¡Õ…
+ * @short –ö–ª–∞—Å—Å –¥–ª—è —Ä–∞–±–æ—Ç—ã —Å –∫–∞—Ç–∞–ª–æ–≥–∞–º–∏
  */
 class DBIO : public virtual DLObject
 {
 public:
-	/**
-	 * @author Igor S. Petrenko
-	 */
-	class DBNode
-	{
-	public:
-		inline DBNode( )
-		{
-		}
+        /**
+         * @author Igor S. Petrenko
+         */
+        class DBNode
+        {
+        public:
+                inline DBNode( )
+                {
+                }
 
-		inline DBNode( const DLString& key, const DLString& xml )
-			: key( key ), xml( xml )
-		{
-		}
+                inline DBNode( const DLString& key, const DLString& xml )
+                        : key( key ), xml( xml )
+                {
+                }
 
-		inline const DLString& getKey( ) const
-		{
-			return key;
-		}
+                inline const DLString& getKey( ) const
+                {
+                        return key;
+                }
 
-		inline const DLString& getXML( ) const
-		{
-			return xml;
-		}
+                inline const DLString& getXML( ) const
+                {
+                        return xml;
+                }
 
-	private:
-		DLString key;
-		DLString xml;
-	};
+        private:
+                DLString key;
+                DLString xml;
+        };
 
 public:
-	
-	static const DLString EXT_XML;
-	
-	DBIO( const DLString & tableName );
-	DBIO( const DLString & tablePath, const DLString & tableName );
-	DBIO( const DLDirectory &tableDir, const DLString & tableName );
-	virtual ~DBIO( );
+        
+        static const DLString EXT_XML;
+        
+        DBIO( const DLString & tableName );
+        DBIO( const DLString & tablePath, const DLString & tableName );
+        DBIO( const DLDirectory &tableDir, const DLString & tableName );
+        virtual ~DBIO( );
 
-	void open( ) throw( ExceptionDBIO );
-	void open( const DLString &tableName ) throw( ExceptionDBIO );
+        void open( ) throw( ExceptionDBIO );
+        void open( const DLString &tableName ) throw( ExceptionDBIO );
 
-	DBNode nextXML( ) throw( ExceptionDBIO, ExceptionDBIOEOF );
+        DBNode nextXML( ) throw( ExceptionDBIO, ExceptionDBIOEOF );
 
-	void insert( const DBNode & ) throw( ExceptionDBIO );
-	void insert( const DLString&, const DLString& ) throw( ExceptionDBIO );
-	void safeInsert( const DBNode & ) throw( ExceptionDBIO );
-	void safeInsert( const DLString&, const DLString& ) throw( ExceptionDBIO );
-	DBNode select( const DLString& ) throw( ExceptionDBIO );
-	void remove( const DLString& ) throw( ExceptionDBIO );
-	void renameID( const DLString& oldKey, const DLString& newKey ) throw( ExceptionDBIO );
+        void insert( const DBNode & ) throw( ExceptionDBIO );
+        void insert( const DLString&, const DLString& ) throw( ExceptionDBIO );
+        void safeInsert( const DBNode & ) throw( ExceptionDBIO );
+        void safeInsert( const DLString&, const DLString& ) throw( ExceptionDBIO );
+        DBNode select( const DLString& ) throw( ExceptionDBIO );
+        void remove( const DLString& ) throw( ExceptionDBIO );
+        void renameID( const DLString& oldKey, const DLString& newKey ) throw( ExceptionDBIO );
         DLFile getEntryAsFile( const DLString &key );
 
 private:
-	DLDirectory table;
+        DLDirectory table;
 };
 
 

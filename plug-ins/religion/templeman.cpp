@@ -13,6 +13,8 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
+#include "arg_utils.h"
+#include "act.h"
 #include "def.h"
 
 RELIG(none);
@@ -24,57 +26,68 @@ Templeman::Templeman( )
 {
 }
 
+void Templeman::tell( Character *victim, const char *msg )
+{
+    speech(victim, msg);
+}
+
 void Templeman::speech( Character *victim, const char *speech )
 {
-    Religion *chosen;
-    PCharacter *pvict;
-    
     if (!IS_AWAKE(ch))
-	return;
+        return;
 
     if (victim->is_npc()) {
-	do_say(ch, "éÚÙÄÉ, ÇÌÕÐÏÅ ÖÉ×ÏÔÎÏÅ.");
-	return;
+        do_say(ch, "Ð˜Ð·Ñ‹Ð´Ð¸, Ð³Ð»ÑƒÐ¿Ð¾Ðµ Ð¶Ð¸Ð²Ð¾Ñ‚Ð½Ð¾Ðµ.");
+        return;
     }
     
-    pvict = victim->getPC();
+    PCharacter *pvict = victim->getPC();
 
-    if (!str_cmp( speech, "religion" )) {
-	do_say(ch, "ôÙ ÄÅÊÓÔ×ÉÔÅÌØÎÏ ÉÎÔÅÒÅÓÕÅÛØÓÑ ÒÅÌÉÇÉÅÊ?");
-	do_say(ch, "þÔÏÂ ÕÚÎÁÔØ ÂÏÌØÛÅ ÉÓÐÏÌØÚÕÊ 'help religion'.");
-	do_say(ch, "îÅ ÚÁÂÕÄØ, ÞÔÏ ÒÅÌÉÇÉÀ ÓÍÏÖÅÛØ ×ÙÂÒÁÔØ ÔÏÌØËÏ ÏÄÉÎ ÒÁÚ.");
-	do_say(ch, "åÓÌÉ ÔÙ ÏÛÉÂÅÛØÓÑ, Ñ ÎÅ ÓÍÏÇÕ ÜÔÏ ÉÓÐÒÁ×ÉÔØ!");
-	return;
+    if (arg_oneof(speech, "religion", "Ñ€ÐµÐ»Ð¸Ð³Ð¸Ñ")) {
+        do_say(ch, "Ð¢Ñ‹ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð¸Ð½Ñ‚ÐµÑ€ÐµÑÑƒÐµÑˆÑŒÑÑ Ñ€ÐµÐ»Ð¸Ð³Ð¸ÐµÐ¹?");
+        do_say(ch, "ÐŸÐ¾Ð´Ñ€Ð¾Ð±Ð½Ð¾ÑÑ‚Ð¸ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾Ñ‡Ð¸Ñ‚Ð°Ñ‚ÑŒ Ð² 'ÑÐ¿Ñ€Ð°Ð²ÐºÐ° Ñ€ÐµÐ»Ð¸Ð³Ð¸Ñ'.");
+        do_say(ch, "ÐÐµ Ð·Ð°Ð±ÑƒÐ´ÑŒ, Ñ‡Ñ‚Ð¾ Ñ‚Ñ‹ Ñ€ÐµÐ»Ð¸Ð³Ð¸ÑŽ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¾Ð´Ð¸Ð½ Ñ€Ð°Ð·.");
+        do_say(ch, "Ð•ÑÐ»Ð¸ Ñ‚Ñ‹ Ð¾ÑˆÐ¸Ð±ÐµÑˆÑŒÑÑ, Ñ Ð½Ðµ ÑÐ¼Ð¾Ð³Ñƒ ÑÑ‚Ð¾ Ð¸ÑÐ¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ!");
+        return;
     }
+    
+    DLString speechStr = DLString(speech).toLower();
+    Religion *chosen = religionManager->findExisting(speechStr);
 
-    chosen = religionManager->findExisting( DLString( speech ).toLower( ) );
-
-    if (!chosen)
-	return;
+    if (!chosen) {
+        if (religionManager->findUnstrict(speechStr)) 
+            say_fmt("ÐÐ°Ð·Ð¾Ð²Ð¸ Ð¼Ð½Ðµ Ñ†ÐµÐ»Ð¸ÐºÐ¾Ð¼ Ð¸Ð¼Ñ Ð±Ð¾Ð³Ð°, ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¼Ñƒ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ ÑÐ»ÑƒÐ¶Ð¸Ñ‚ÑŒ.", ch);
+        
+        return;
+    }
     
     if (pvict->getReligion( ) != god_none) {
-	interpret_raw( ch, "say", "ôÙ ÕÖÅ ×ÙÂÒÁÌ Ó×ÏÊ ÐÕÔØ! ô×ÏÑ ÒÅÌÉÇÉÑ - %s",
-		       pvict->getReligion( )->getShortDescr( ).c_str( ) );
-	return;
+        if (chosen->getName() == pvict->getReligion()->getName())
+            say_fmt("Ð¢Ñ‹ Ð¸ Ñ‚Ð°Ðº Ð¿Ð¾ÐºÐ»Ð¾Ð½ÑÐµÑˆÑŒÑÑ %2$N3.",
+                    ch, pvict->getReligion( )->getRussianName( ).c_str( ) );
+        else
+            say_fmt("Ð¢Ñ‹ ÑƒÐ¶Ðµ Ð²Ñ‹Ð±Ñ€Ð°%2$GÐ»Ð¾|Ð»|Ð»Ð° ÑÐ²Ð¾Ð¹ Ð¿ÑƒÑ‚ÑŒ! Ð¢Ð²Ð¾Ñ Ñ€ÐµÐ»Ð¸Ð³Ð¸Ñ - %3$N1.",
+                    ch, pvict, pvict->getReligion( )->getRussianName( ).c_str( ) );
+        return;
     }
     
     if (!chosen->isAllowed( pvict )) {
-	do_say(ch, "üÔÁ ÒÅÌÉÇÉÑ ÎÅ ÓÏÏÔ×ÅÔÓÔ×ÕÅÔ Ô×ÏÅÍÕ ÁÌÉÇÍÅÎÔÕ É ÜÔÏÓÕ.");
-	return;
+        do_say(ch, "Ð­Ñ‚Ð° Ñ€ÐµÐ»Ð¸Ð³Ð¸Ñ Ð½Ðµ ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ñ‚Ð²Ð¾ÐµÐ¼Ñƒ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ñƒ Ð¸Ð»Ð¸ Ñ€Ð°ÑÐµ.");
+        return;
     }
 
     pvict->setReligion( chosen->getName( ) );
-    interpret_raw( ch, "say", "ó ÜÔÏÊ ÍÉÎÕÔÙ ÔÙ ÎÁ×ÓÅÇÄÁ ÉÚÂÉÒÁÅÛØ Ó×ÏÅÊ ÒÅÌÉÇÉÅÊ %s",
-		   pvict->getReligion( )->getShortDescr( ).c_str( ) );
+    say_fmt("Ð¡ ÑÑ‚Ð¾Ð¹ Ð¼Ð¸Ð½ÑƒÑ‚Ñ‹ Ñ‚Ñ‹ Ð½Ð°Ð²ÑÐµÐ³Ð´Ð° Ð¸Ð·Ð±Ð¸Ñ€Ð°ÐµÑˆÑŒ ÑÐ²Ð¾ÐµÐ¹ Ñ€ÐµÐ»Ð¸Ð³Ð¸ÐµÐ¹ %2$N4.",
+            ch, pvict->getReligion( )->getRussianName( ).c_str( ) );
 }
 
 void Templeman::greet( Character *victim )
 {
     if (!IS_AWAKE(ch))
-	return;
+        return;
 
     if (!ch->can_see(victim) || victim->is_npc() || victim->is_immortal())
-	return;
+        return;
 
     interpret_fmt( ch, "smile %s", victim->getNameP( ) );
 }

@@ -10,15 +10,15 @@
 #include "xmlindexdata.h"
 
 class OLCStateObject :  public OLCStateTemplate<OLCStateObject>, 
-			public virtual OLCState
+                        public virtual OLCState
 {
 XML_OBJECT
 public:
     typedef ::Pointer<OLCStateObject> Pointer;
 
-    OLCStateObject( );			/*moc constructor*/
-    OLCStateObject( OBJ_INDEX_DATA * );	/*edit original mobile*/
-    OLCStateObject( int );		/*create new*/
+    OLCStateObject( );                        /*moc constructor*/
+    OLCStateObject( OBJ_INDEX_DATA * );        /*edit original mobile*/
+    OLCStateObject( int );                /*create new*/
     virtual ~OLCStateObject( );
 
     virtual void commit( );

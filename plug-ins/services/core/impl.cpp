@@ -15,16 +15,16 @@ public:
 
     virtual void initialization( )
     {
-	Class::regMoc<CoinPrice>( );
-	Class::regMoc<LevelPrice>( );
-	Class::regMoc<QuestPointPrice>( );
+        Class::regMoc<CoinPrice>( );
+        Class::regMoc<LevelPrice>( );
+        Class::regMoc<QuestPointPrice>( );
     }
 
     virtual void destruction( )
     {
-	Class::unregMoc<CoinPrice>( );
-	Class::unregMoc<LevelPrice>( );
-	Class::unregMoc<QuestPointPrice>( );
+        Class::unregMoc<CoinPrice>( );
+        Class::unregMoc<LevelPrice>( );
+        Class::unregMoc<QuestPointPrice>( );
     }
 };
 
@@ -32,10 +32,10 @@ extern "C"
 {
     SO::PluginList initialize_services_core( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<RegMocPlugin>( ppl );
-	    
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<RegMocPlugin>( ppl );
+            
+        return ppl;
     }
 }

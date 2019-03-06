@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "spelltemplate.h"
@@ -57,94 +57,100 @@ CLAN(battlerager);
 SPELL_DECL(Knock);
 VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level ) 
 { 
-	char arg[MAX_INPUT_LENGTH];
-	int chance=0;
-	int door;
+        char arg[MAX_INPUT_LENGTH];
+        int chance=0;
+        int door;
+        Room *room = ch->in_room;
+        EXTRA_EXIT_DATA *peexit = 0;
 
-	target_name = one_argument( target_name, arg );
+        target_name = one_argument( target_name, arg );
 
-	if (arg[0] == '\0')
-	{
-		ch->send_to("œ”‘’ﬁ¡‘ÿ ◊ À¡À’¿ ƒ◊≈“ÿ …Ã… ◊ À¡ÀœÕ Œ¡–“¡◊Ã≈Œ…….\n\r");
-		return;
-	}
+        if (arg[0] == '\0')
+        {
+                ch->send_to("–ü–æ—Å—Ç—É—á–∞—Ç—å –≤ –∫–∞–∫—É—é –¥–≤–µ—Ä—å –∏–ª–∏ –≤ –∫–∞–∫–æ–º –Ω–∞–ø—Ä–∞–≤–ª–µ–Ω–∏–∏.\n\r");
+                return;
+        }
 
-	if (ch->fighting)
-	{	
-		ch->send_to("œƒœ÷ƒ… –œÀ¡ ⁄¡ÀœŒﬁ…‘”— ”“¡÷≈Œ…≈.\n\r");
-		return;
-	}
-	
-	if (( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY) ) >= 0) 
-	{
-		Room *to_room;
-		EXIT_DATA *pexit;
-		EXIT_DATA *pexit_rev = 0;
+        if (ch->fighting)
+        {        
+                ch->send_to("–ü–æ–¥–æ–∂–¥–∏ –ø–æ–∫–∞ –∑–∞–∫–æ–Ω—á–∏—Ç—Å—è —Å—Ä–∞–∂–µ–Ω–∏–µ.\n\r");
+                return;
+        }
+        
+        if ( ((peexit = get_extra_exit( arg, room->extra_exit )) && ch->can_see(peexit)) ||
+             (door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY)) >= 0) 
+        {
+                EXIT_DATA *pexit;
+                EXIT_DATA *pexit_rev = 0;
+                int exit_info;
 
-		pexit = ch->in_room->exit[door];
-		if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
-		{
-			ch->send_to("˙ƒ≈”ÿ ’÷≈ œ‘À“Ÿ‘œ.\n\r");
-			return;
-		}
-		if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
-		{
-			ch->send_to("œ–“œ¬’  –“œ”‘œ œ‘À“Ÿ‘ÿ...\n\r");
-			return;
-		}
-		if ( IS_SET(pexit->exit_info, EX_NOPASS) )
-		{
-			ch->send_to("Ù¡…Œ”‘◊≈ŒŒ¡— ”…Ã¡ ¬ÃœÀ…“’≈‘ –“œ»œƒ.\n\r");
-			return;
-		}
-		chance = ch->getModifyLevel() / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
+                if ( peexit != 0 )
+                {
+                        door = DIR_SOMEWHERE;
+                        exit_info = peexit->exit_info;
+                }
+                else
+                {
+                        pexit = room->exit[door];
+                        exit_info = pexit->exit_info;
+                }
 
-		act_p("ıƒ¡“œÕ Ì¡«…ﬁ≈”Àœ  Û…ÃŸ ‘Ÿ –Ÿ‘¡≈€ÿ”— œ‘À“Ÿ‘ÿ $d!",
-			ch,0,pexit->keyword,TO_CHAR,POS_RESTING);
+                if ( !IS_SET(exit_info, EX_CLOSED) )
+                {
+                        ch->send_to("–ó–¥–µ—Å—å —É–∂–µ –æ—Ç–∫—Ä—ã—Ç–æ.\n\r");
+                        return;
+                }
+                if ( !IS_SET(exit_info, EX_LOCKED) )
+                {
+                        ch->send_to("–ü–æ–ø—Ä–æ–±—É–π –ø—Ä–æ—Å—Ç–æ –æ—Ç–∫—Ä—ã—Ç—å...\n\r");
+                        return;
+                }
+                if ( IS_SET(exit_info, EX_NOPASS) )
+                {
+                        ch->send_to("–¢–∞–∏–Ω—Å—Ç–≤–µ–Ω–Ω–∞—è —Å–∏–ª–∞ –±–ª–æ–∫–∏—Ä—É–µ—Ç –ø—Ä–æ—Ö–æ–¥.\n\r");
+                        return;
+                }
+                chance = ch->getModifyLevel() / 5 + ch->getCurrStat(STAT_INT) + ch->getSkill( sn ) / 5;
 
-		act_p("ıƒ¡“œÕ Ì¡«…ﬁ≈”Àœ  Û…ÃŸ $c1 –Ÿ‘¡≈‘”— œ‘À“Ÿ‘ÿ $d!",
-			ch,0,pexit->keyword,TO_ROOM,POS_RESTING);
+                const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
+                act("–£–¥–∞—Ä–æ–º –ú–∞–≥–∏—á–µ—Å–∫–æ–π –°–∏–ª—ã —Ç—ã –ø—ã—Ç–∞–µ—à—å—Å—è –æ—Ç–∫—Ä—ã—Ç—å $N4!", ch, 0, doorname, TO_CHAR);
+                act("–£–¥–∞—Ä–æ–º –ú–∞–≥–∏—á–µ—Å–∫–æ–π –°–∏–ª—ã $c1 –ø—ã—Ç–∞–µ—Ç—Å—è –æ—Ç–∫—Ä—ã—Ç—å $N4!", ch, 0, doorname,TO_ROOM);
 
-		if (ch->in_room->isDark())
-			chance /= 2;
+                if (room->isDark())
+                        chance /= 2;
 
-		// now the attack
-		if (number_percent() < chance )
-		{
-			REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-			REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-			act_p( "$c1 ” «“œ»œ‘œÕ “¡”–¡»…◊¡≈‘ $d!",
-				ch, 0,pexit->keyword, TO_ROOM,POS_RESTING);
-			act_p( "$d ” «“œ»œ‘œÕ “¡”–¡»…◊¡≈‘”—.",
-				ch, 0, pexit->keyword, TO_CHAR,POS_RESTING);
+                // now the attack
+                if (number_percent() < chance )
+                {
+                    if ( peexit != 0 )
+                    {
+                        REMOVE_BIT(peexit->exit_info, EX_LOCKED);
+                        REMOVE_BIT(peexit->exit_info, EX_CLOSED);
+                        act( "$N1 —Å –≥—Ä–æ—Ö–æ—Ç–æ–º —Ä–∞—Å–ø–∞—Ö–∏–≤–∞–µ—Ç—Å—è.", ch, 0, doorname, TO_ALL);
 
-			// open the other side
-			if ( ( to_room   = pexit->u1.to_room            ) != 0
-				&& ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-				&& pexit_rev->u1.to_room == ch->in_room )
-			{
-				Character *rch;
+                    } else {
+                        REMOVE_BIT(pexit->exit_info, EX_LOCKED);
+                        REMOVE_BIT(pexit->exit_info, EX_CLOSED);
+                        act( "$N1 —Å –≥—Ä–æ—Ö–æ—Ç–æ–º —Ä–∞—Å–ø–∞—Ö–∏–≤–∞–µ—Ç—Å—è.", ch, 0, doorname, TO_ALL);
 
-				REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
-				REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-				for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-					act_p( "˜Œ≈⁄¡–Œœ ” «“œ»œ‘œÕ “¡”–¡»…◊¡≈‘”— $d.",
-						rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING);
-			}
-		}
-		else
-		{
-			act_p("Ù◊œ  ’ƒ¡“ ”œ‘“—”¡≈‘ ◊”≈ ◊œÀ“’«, Œœ $d œ”‘¡≈‘”— ⁄¡À“Ÿ‘œ .",
-				ch,0,pexit->keyword,TO_CHAR,POS_RESTING);
-			act_p("ıƒ¡“ $c2 ”œ‘“—”¡≈‘ ◊”≈ ◊œÀ“’«, Œœ $d œ”‘¡≈‘”— ⁄¡À“Ÿ‘œ .",
-				ch,0,pexit->keyword,TO_ROOM,POS_RESTING);
-		}
-		return;
-	}
+                        // open the other side
+                        if ((pexit_rev = direction_reverse(room, door)))
+                        {
+                                REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
+                                REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
+                                direction_target(room, door)->echo(POS_RESTING, "–í–Ω–µ–∑–∞–ø–Ω–æ —Å –≥—Ä–æ—Ö–æ—Ç–æ–º —Ä–∞—Å–ø–∞—Ö–∏–≤–∞–µ—Ç—Å—è %N1.", doorname);
+                        }
+                    }
+                }
+                else
+                {
+                        act("–¢–≤–æ–π —É–¥–∞—Ä —Å–æ—Ç—Ä—è—Å–∞–µ—Ç –≤—Å–µ –≤–æ–∫—Ä—É–≥, –Ω–æ $N1 –Ω–µ –ø–æ–¥–¥–∞–µ—Ç—Å—è.", ch,0, doorname,TO_CHAR);
+                        act("–£–¥–∞—Ä $c2 —Å–æ—Ç—Ä—è—Å–∞–µ—Ç –≤—Å–µ –≤–æ–∫—Ä—É–≥, –Ω–æ $N1 –Ω–µ –ø–æ–¥–¥–∞–µ—Ç—Å—è.", ch,0, doorname,TO_ROOM);
+                }
+                return;
+        }
 
-	ch->send_to("Ù’‘ Œ≈‘ ‘¡Àœ  ƒ◊≈“….\n\r");
-	return;
-
+        ch->send_to("–¢—É—Ç –Ω–µ—Ç —Ç–∞–∫–æ–π –¥–≤–µ—Ä–∏.\n\r");
 }
 
 
@@ -158,33 +164,33 @@ SKILL_RUNP( sneak )
 
     if (MOUNTED(ch))
     {
-        ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ƒ◊…«¡‘ÿ”— ¬≈”€’ÕŒœ, Àœ«ƒ¡ ‘Ÿ ◊ ”≈ƒÃ≈.\n\r");
+        ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –¥–≤–∏–≥–∞—Ç—å—Å—è –±–µ—Å—à—É–º–Ω–æ, –∫–æ–≥–¥–∞ —Ç—ã –≤ —Å–µ–¥–ª–µ.\n\r");
         return;
     }
 
-//    ch->send_to("ÙŸ –Ÿ‘¡≈€ÿ”— ƒ◊…«¡‘ÿ”— ¬œÃ≈≈ ¬≈”€’ÕŒœ.\n\r");
+//    ch->send_to("–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è –¥–≤–∏–≥–∞—Ç—å—Å—è –±–æ–ª–µ–µ –±–µ—Å—à—É–º–Ω–æ.\n\r");
     affect_strip( ch, gsn_sneak );
 
     if( IS_AFFECTED(ch,AFF_SNEAK)) {
-      ch->send_to("ÙŸ … ‘¡À ƒ◊…«¡≈€ÿ”— ¬≈”€’ÕŒœ.\n\r");
+      ch->send_to("–¢—ã –∏ —Ç–∞–∫ –¥–≤–∏–≥–∞–µ—à—å—Å—è –±–µ—Å—à—É–º–Ω–æ.\n\r");
       return;
     }
 
     if ( number_percent( ) < gsn_sneak->getEffective( ch ))
     {
-	gsn_sneak->improve( ch, true );
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_sneak;
-	af.level     = ch->getModifyLevel();
-	af.duration  = ch->getModifyLevel();
-	af.location  = APPLY_NONE;
-	af.modifier  = 0;
-	af.bitvector = AFF_SNEAK;
-	affect_to_char( ch, &af );
-	ch->send_to("ÙŸ Œ¡ﬁ…Œ¡≈€ÿ ”À“Ÿ‘Œœ –≈“≈ƒ◊…«¡‘ÿ”—.\n\r");
+        gsn_sneak->improve( ch, true );
+        af.where     = TO_AFFECTS;
+        af.type      = gsn_sneak;
+        af.level     = ch->getModifyLevel();
+        af.duration  = ch->getModifyLevel();
+        af.location  = APPLY_NONE;
+        af.modifier  = 0;
+        af.bitvector = AFF_SNEAK;
+        affect_to_char( ch, &af );
+        ch->send_to("–¢—ã –Ω–∞—á–∏–Ω–∞–µ—à—å —Å–∫—Ä—ã—Ç–Ω–æ –ø–µ—Ä–µ–¥–≤–∏–≥–∞—Ç—å—Å—è.\n\r");
     } else {
       gsn_sneak->improve( ch, false );
-      ch->send_to("Ù≈¬≈ Œ≈ ’ƒ¡≈‘”— ”À“Ÿ‘Œœ –≈“≈ƒ◊…«¡‘ÿ”—.\n\r");
+      ch->send_to("–¢–µ–±–µ –Ω–µ —É–¥–∞–µ—Ç—Å—è —Å–∫—Ä—ã—Ç–Ω–æ –ø–µ—Ä–µ–¥–≤–∏–≥–∞—Ç—å—Å—è.\n\r");
     }
 
     ch->setWait( gsn_sneak->getBeats( ) );
@@ -196,49 +202,49 @@ SKILL_RUNP( sneak )
 
 SKILL_RUNP( hide )
 {
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”À“Ÿ‘ÿ”—, Àœ«ƒ¡ ‘Ÿ ◊ ”≈ƒÃ≈.\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–∫—Ä—ã—Ç—å—Å—è, –∫–æ–≥–¥–∞ —Ç—ã –≤ —Å–µ–¥–ª–µ.\n\r");
+                return;
+        }
 
-	if ( RIDDEN(ch) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”À“Ÿ‘ÿ”—, Àœ«ƒ¡ ‘Ÿ œ”≈ƒÃ¡Œ.\n\r");
-		return;
-	}
+        if ( RIDDEN(ch) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–∫—Ä—ã—Ç—å—Å—è, –∫–æ–≥–¥–∞ —Ç—ã –æ—Å–µ–¥–ª–∞–Ω.\n\r");
+                return;
+        }
 
-	if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”À“Ÿ‘ÿ”—, Àœ«ƒ¡ ”◊≈‘…€ÿ”—.\n\r");
-		return;
-	}
+        if ( IS_AFFECTED( ch, AFF_FAERIE_FIRE ) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–∫—Ä—ã—Ç—å—Å—è, –∫–æ–≥–¥–∞ —Å–≤–µ—Ç–∏—à—å—Å—è.\n\r");
+                return;
+        }
 
-	int forest = ch->in_room->sector_type == SECT_FOREST ? 60 : 0;
-	forest += ch->in_room->sector_type == SECT_FIELD ? 60 : 0;
+        int forest = ch->in_room->sector_type == SECT_FOREST ? 60 : 0;
+        forest += ch->in_room->sector_type == SECT_FIELD ? 60 : 0;
 
-	ch->send_to("ÙŸ –Ÿ‘¡≈€ÿ”— ”À“Ÿ‘ÿ”—.\n\r");
+        ch->send_to("–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è —Å–∫—Ä—ã—Ç—å—Å—è.\n\r");
 
-	int k = ch->getLastFightDelay( );
+        int k = ch->getLastFightDelay( );
 
-	if ( k >= 0 && k < FIGHT_DELAY_TIME )
-		k = k * 100 /	FIGHT_DELAY_TIME;
-	else
-		k = 100;
-		
-	if ( number_percent( ) < (gsn_hide->getEffective( ch ) - forest) * k / 100 )
-	{
-		SET_BIT(ch->affected_by, AFF_HIDE);
-		gsn_hide->improve( ch, true );
-	}
-	else
-	{
-		if ( IS_AFFECTED(ch, AFF_HIDE) )
-			REMOVE_BIT(ch->affected_by, AFF_HIDE);
-		gsn_hide->improve( ch, false );
-	}
+        if ( k >= 0 && k < FIGHT_DELAY_TIME )
+                k = k * 100 /        FIGHT_DELAY_TIME;
+        else
+                k = 100;
+                
+        if ( number_percent( ) < (gsn_hide->getEffective( ch ) - forest) * k / 100 )
+        {
+                SET_BIT(ch->affected_by, AFF_HIDE);
+                gsn_hide->improve( ch, true );
+        }
+        else
+        {
+                if ( IS_AFFECTED(ch, AFF_HIDE) )
+                        REMOVE_BIT(ch->affected_by, AFF_HIDE);
+                gsn_hide->improve( ch, false );
+        }
 
-	ch->setWait( gsn_hide->getBeats( ) );
+        ch->setWait( gsn_hide->getBeats( ) );
 }
 
 
@@ -259,89 +265,89 @@ public:
 protected:
     virtual void msgOnMove( Character *wch, bool fLeaving )
     {
-	if (fLeaving)
-	    msgRoomNoParty( wch, 
-		            "%1$^C1 “¡”‘◊œ“…Ã%1$Gœ”ÿ|”—|¡”ÿ ◊ ◊œ⁄ƒ’»≈.",
-		            "%1$^C1 … %2$C1 “¡”‘◊œ“—¿‘”— ◊ ◊œ⁄ƒ’»≈." );
-	else
-	    msgRoomNoParty( wch, 
-	                    "%1$^C1 –œ—◊…Ã%1$Gœ”ÿ|”—|¡”ÿ ◊ ÀœÕŒ¡‘≈.",
-			    "%1$^C1 … %2$C1 –œ—◊Ã—¿‘”— ◊ ÀœÕŒ¡‘≈." );
+        if (fLeaving)
+            msgRoomNoParty( wch, 
+                            "%1$^C1 —Ä–∞—Å—Ç–≤–æ—Ä–∏–ª%1$G–æ—Å—å|—Å—è|–∞—Å—å –≤ –≤–æ–∑–¥—É—Ö–µ.",
+                            "%1$^C1 –∏ %2$C1 —Ä–∞—Å—Ç–≤–æ—Ä—è—é—Ç—Å—è –≤ –≤–æ–∑–¥—É—Ö–µ." );
+        else
+            msgRoomNoParty( wch, 
+                            "%1$^C1 –ø–æ—è–≤–∏–ª%1$G–æ—Å—å|—Å—è|–∞—Å—å –≤ –∫–æ–º–Ω–∞—Ç–µ.",
+                            "%1$^C1 –∏ %2$C1 –ø–æ—è–≤–ª—è—é—Ç—Å—è –≤ –∫–æ–º–Ω–∞—Ç–µ." );
     }
     virtual void msgOnStart( )
     {
-	msgRoomNoParty( ch, 
-	                "%1$^C1 –“œ”…‘ œ ◊œ⁄◊“¡›≈Œ……!",
-			"%1$^C1 … %2$C1 –“œ”—‘ œ ◊œ⁄◊“¡›≈Œ……!" );
+        msgRoomNoParty( ch, 
+                        "%1$^C1 –ø—Ä–æ—Å–∏—Ç –æ –≤–æ–∑–≤—Ä–∞—â–µ–Ω–∏–∏!",
+                        "%1$^C1 –∏ %2$C1 –ø—Ä–æ—Å—è—Ç –æ –≤–æ–∑–≤—Ä–∞—â–µ–Ω–∏–∏!" );
     }
     virtual void movePet( NPCharacter *pet )
     {
-	TempleRecallMovement( pet, actor, to_room ).moveRecursive( );
+        TempleRecallMovement( pet, actor, to_room ).moveRecursive( );
     }
     virtual bool findTargetRoom( )
     {
-	int point;
-	
-	if (to_room)
-	    return true;
+        int point;
+        
+        if (to_room)
+            return true;
 
-	if (!ch->getPC( )
-	    && (!ch->leader || ch->leader->is_npc( ) || ch->leader->getPC( )->pet != ch))
-	{
-	    ch->pecho( "Ù≈¬≈ Œ≈À’ƒ¡ ◊œ⁄◊“¡›¡‘ÿ”—." );
-	    return false;
-	}
+        if (!ch->getPC( )
+            && (!ch->leader || ch->leader->is_npc( ) || ch->leader->getPC( )->pet != ch))
+        {
+            ch->pecho( "–¢–µ–±–µ –Ω–µ–∫—É–¥–∞ –≤–æ–∑–≤—Ä–∞—â–∞—Ç—å—Å—è." );
+            return false;
+        }
 
-	if (ch->getPC( ))
-	    point = ch->getPC( )->getHometown( )->getRecall( );
-	else
-	    point = ch->leader->getPC( )->getHometown( )->getRecall( );
+        if (ch->getPC( ))
+            point = ch->getPC( )->getHometown( )->getRecall( );
+        else
+            point = ch->leader->getPC( )->getHometown( )->getRecall( );
 
-	if (!( to_room = get_room_index( point ) )) {
-	    ch->pecho( "ÙŸ œÀœŒﬁ¡‘≈ÃÿŒœ ⁄¡¬Ã’ƒ…Ã%1$Gœ”ÿ|”—|¡”ÿ.", ch );
-	    return false;
-	}
-	
-	return true;			     
+        if (!( to_room = get_room_index( point ) )) {
+            ch->pecho( "–¢—ã –æ–∫–æ–Ω—á–∞—Ç–µ–ª—å–Ω–æ –∑–∞–±–ª—É–¥–∏–ª%1$G–æ—Å—å|—Å—è|–∞—Å—å.", ch );
+            return false;
+        }
+        
+        return true;                             
     }
     bool checkSelfrate( )
     {
-	if (ch->is_npc( ))
-	    return true;
+        if (ch->is_npc( ))
+            return true;
 
-	if (!ch->desc)
-	    return true;
+        if (!ch->desc)
+            return true;
 
-	if (rated_as_expert( ch->getPC( ) ))
-	    return checkPumped( );
-	
-	if (rated_as_guru( ch->getPC( ) )) {
-	    ch->pecho( "ÙŸ ◊≈ƒÿ Œ≈ …›≈€ÿ Ã≈«À…» –’‘≈ , Œ≈ ‘¡À Ã…?" );
-	    return false;
-	}
+        if (rated_as_expert( ch->getPC( ) ))
+            return checkPumped( );
+        
+        if (rated_as_guru( ch->getPC( ) )) {
+            ch->pecho( "–¢—ã –≤–µ–¥—å –Ω–µ –∏—â–µ—à—å –ª–µ–≥–∫–∏—Ö –ø—É—Ç–µ–π, –Ω–µ —Ç–∞–∫ –ª–∏?" );
+            return false;
+        }
 
-	return true;
+        return true;
     }
     virtual bool canMove( Character *wch )
     {
-	if (ch != actor)
-	    return checkForsaken( wch );
-	else
-	    return checkMount( )
-		   && checkShadow( )
-		   && checkBloody( wch )
-		   && checkSelfrate( )
-		   && checkSameRoom( )
-		   && checkForsaken( wch );
+        if (ch != actor)
+            return checkForsaken( wch );
+        else
+            return checkMount( )
+                   && checkShadow( )
+                   && checkBloody( wch )
+                   && checkSelfrate( )
+                   && checkSameRoom( )
+                   && checkForsaken( wch );
     }
     virtual bool tryMove( Character *wch )
     {
-	if (ch != actor)
-	    return applyInvis( wch );
-	else
-	    return applyInvis( wch )
-		   && applyFightingSkill( wch, gsn_recall )
-		   && applyMovepoints( );
+        if (ch != actor)
+            return applyInvis( wch );
+        else
+            return applyInvis( wch )
+                   && applyFightingSkill( wch, gsn_recall )
+                   && applyMovepoints( );
     }
 };
 
@@ -362,89 +368,89 @@ public:
     EscapeMovement( Character *ch, const char *arg )
                : FleeMovement( ch )
     {
-	this->arg = arg;
+        this->arg = arg;
     }
 
 protected:
     virtual bool findTargetRoom( )
     {
-	peexit = get_extra_exit( arg, from_room->extra_exit );
-	door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
+        peexit = get_extra_exit( arg, from_room->extra_exit );
+        door = find_exit( ch, arg, FEX_NO_EMPTY|FEX_NO_INVIS );
 
-	if ((!peexit || !ch->can_see( peexit )) && door < 0) {
-	    ch->pecho( "È À’ƒ¡ ‹‘œ ÕŸ Œ¡ÕŸÃ…Ã…”ÿ?" );
-	    return false;
-	}
+        if ((!peexit || !ch->can_see( peexit )) && door < 0) {
+            ch->pecho( "–ò –∫—É–¥–∞ —ç—Ç–æ –º—ã –Ω–∞–º—ã–ª–∏–ª–∏—Å—å?" );
+            return false;
+        }
 
-	if (peexit) {
-	    door = DIR_SOMEWHERE;
-	    exit_info = peexit->exit_info;
-	    to_room = peexit->u1.to_room;
-	}
-	else {
-	    pexit = from_room->exit[door];
-	    exit_info = pexit->exit_info;
-	    to_room = pexit->u1.to_room;
-	}
+        if (peexit) {
+            door = DIR_SOMEWHERE;
+            exit_info = peexit->exit_info;
+            to_room = peexit->u1.to_room;
+        }
+        else {
+            pexit = from_room->exit[door];
+            exit_info = pexit->exit_info;
+            to_room = pexit->u1.to_room;
+        }
 
-	return true;
+        return true;
     }
     virtual bool canMove( Character *wch )
     {
-	if (!checkMovepoints( wch ))
-	    return false;
+        if (!checkMovepoints( wch ))
+            return false;
 
-	if (!canFlee( wch )) {
-	    ch->pecho( "˛‘œ-‘œ Œ≈ ƒ¡≈‘ ‘≈¬≈ ”¬≈÷¡‘ÿ ◊ ‹‘œÕ Œ¡–“¡◊Ã≈Œ……." );
-	    return false;
-	}
-	else
-	    return true;
+        if (!canFlee( wch )) {
+            ch->pecho( "–ß—Ç–æ-—Ç–æ –Ω–µ –¥–∞–µ—Ç —Ç–µ–±–µ —Å–±–µ–∂–∞—Ç—å –≤ —ç—Ç–æ–º –Ω–∞–ø—Ä–∞–≤–ª–µ–Ω–∏–∏." );
+            return false;
+        }
+        else
+            return true;
     }
     virtual bool tryMove( Character *wch )
     {
-	if (!FleeMovement::tryMove( wch ))
-	    return false;
+        if (!FleeMovement::tryMove( wch ))
+            return false;
 
-	if (wch != ch)
-	    return true;
-	
-	return applySkill( gsn_escape );
+        if (wch != ch)
+            return true;
+        
+        return applySkill( gsn_escape );
     }
     virtual int getMoveCost( Character *wch )
     {
-	return 1;
+        return 1;
     }
     virtual bool checkCyclicRooms( Character *wch ) 
     {
-	if (from_room == to_room) {
-	    ch->pecho( "ÙŸ Œ≈ Õœ÷≈€ÿ ”¬≈÷¡‘ÿ ‘’ƒ¡, –œ–“œ¬’  ƒ“’«œ≈ Õ≈”‘œ." );
-	    return false;
-	}
+        if (from_room == to_room) {
+            ch->pecho( "–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–±–µ–∂–∞—Ç—å —Ç—É–¥–∞, –ø–æ–ø—Ä–æ–±—É–π –¥—Ä—É–≥–æ–µ –º–µ—Å—Ç–æ." );
+            return false;
+        }
 
-	return true;
+        return true;
     }
     virtual bool checkPositionHorse( )
     {
-	ch->pecho( "ÛŒ¡ﬁ¡Ã¡ ”Ã≈⁄ÿ, ¡ –œ‘œÕ ’÷≈ ’¬≈«¡ ." );
-	return false;
+        ch->pecho( "–°–Ω–∞—á–∞–ª–∞ —Å–ª–µ–∑—å, –∞ –ø–æ—Ç–æ–º —É–∂–µ —É–±–µ–≥–∞–π." );
+        return false;
     }
     virtual bool checkPositionRider( )
     {
-	ch->pecho( "Ó¡ ‘≈¬≈ ”◊≈“»’ À‘œ-‘œ ”…ƒ…‘ … Œ≈ ƒ¡≈‘ ”¬≈÷¡‘ÿ." );
-	return false;
+        ch->pecho( "–ù–∞ —Ç–µ–±–µ —Å–≤–µ—Ä—Ö—É –∫—Ç–æ-—Ç–æ —Å–∏–¥–∏—Ç –∏ –Ω–µ –¥–∞–µ—Ç —Å–±–µ–∂–∞—Ç—å." );
+        return false;
     }
     virtual bool checkPositionWalkman( )
     {
-	if (ch->fighting == 0) {
-	    if (ch->position == POS_FIGHTING)
-		ch->position = POS_STANDING;
+        if (ch->fighting == 0) {
+            if (ch->position == POS_FIGHTING)
+                ch->position = POS_STANDING;
 
-	    ch->pecho( "ÙŸ ”≈ ﬁ¡” Œ… ” À≈Õ Œ≈ ƒ≈“≈€ÿ”—." );
-	    return false;
-	}
+            ch->pecho( "–¢—ã —Å–µ–π—á–∞—Å –Ω–∏ —Å –∫–µ–º –Ω–µ –¥–µ—Ä–µ—à—å—Å—è." );
+            return false;
+        }
 
-	return true;
+        return true;
     }
 
     const char *arg;
@@ -461,13 +467,13 @@ SKILL_RUNP( escape )
     argument = one_argument( argument, arg );
 
     if (!gsn_escape->usable( ch )) {
-	ch->println( "œ–“œ¬’  flee. Ìœ÷≈‘, ‹‘œ ‘≈¬— ”–¡”≈‘?" );
-	return;
+        ch->println( "–ü–æ–ø—Ä–æ–±—É–π flee. –ú–æ–∂–µ—Ç, —ç—Ç–æ —Ç–µ–±—è —Å–ø–∞—Å–µ—Ç?" );
+        return;
     }
 
     if (arg[0] == '\0') {
-	ch->println( "ıÀ¡÷… Œ¡–“¡◊Ã≈Œ…≈." );
-	return;
+        ch->println( "–£–∫–∞–∂–∏ –Ω–∞–ø—Ä–∞–≤–ª–µ–Ω–∏–µ." );
+        return;
     }
 
     EscapeMovement( ch, arg ).move( );

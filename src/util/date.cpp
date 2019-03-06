@@ -65,60 +65,61 @@ Date Date::newInstance( )
 
 int Date::getSecondFromString( const DLString& date ) throw( ExceptionBadDateString )
 {
-	DateParser parser( date );
-	return	parser.getSecond( );
+        istringstream istr(date.c_str());
+        DateParser parser( date, &istr );
+        return        parser.getSecond( );
 }
 
 DLString Date::getStringFromSecond( int time )
 {
-	int sign = 1;
-	if( time < 0 )
-	{
-		sign = -1;
-		time = -time;
-	}
-	int month = time / SECOND_IN_MONTH; time -= month * SECOND_IN_MONTH;
-	int day = time / SECOND_IN_DAY; time -= day * SECOND_IN_DAY;
-	int hour = time / SECOND_IN_HOUR; time -= hour * SECOND_IN_HOUR;
-	int minute = time / SECOND_IN_MINUTE; time -= minute * SECOND_IN_MINUTE;
-	
-	bool available = false;
-	std::basic_ostringstream<char> buf;
-	if( sign == -1 )
-	{
-		if( available ) buf << ' ';
-		else available = true;
-		buf << '-';
-	}
-	if( month > 0 )
-	{
-		if( available ) buf << ' ';
-		else available = true;
-		buf << month << "month(s)";
-	}
-	if( day > 0 )
-	{
-		if( available ) buf << ' ';
-		else available = true;
-		buf << day << "day(s)";
-	}
-	if( hour > 0 )
-	{
-		if( available ) buf << ' ';
-		else available = true;
-		buf << hour << "hour(s)";
-	}
-	if( minute > 0 )
-	{
-		if( available ) buf << ' ';
-		else available = true;
-		buf << minute << "minute(s)";
-	}
-	if( time > 0 )
-	{
-		if( available ) buf << ' ';
-		else available = true;
-		buf << time << "second(s)";
-	}
-	return buf.str( );
+        int sign = 1;
+        if( time < 0 )
+        {
+                sign = -1;
+                time = -time;
+        }
+        int month = time / SECOND_IN_MONTH; time -= month * SECOND_IN_MONTH;
+        int day = time / SECOND_IN_DAY; time -= day * SECOND_IN_DAY;
+        int hour = time / SECOND_IN_HOUR; time -= hour * SECOND_IN_HOUR;
+        int minute = time / SECOND_IN_MINUTE; time -= minute * SECOND_IN_MINUTE;
+        
+        bool available = false;
+        std::basic_ostringstream<char> buf;
+        if( sign == -1 )
+        {
+                if( available ) buf << ' ';
+                else available = true;
+                buf << '-';
+        }
+        if( month > 0 )
+        {
+                if( available ) buf << ' ';
+                else available = true;
+                buf << month << "month(s)";
+        }
+        if( day > 0 )
+        {
+                if( available ) buf << ' ';
+                else available = true;
+                buf << day << "day(s)";
+        }
+        if( hour > 0 )
+        {
+                if( available ) buf << ' ';
+                else available = true;
+                buf << hour << "hour(s)";
+        }
+        if( minute > 0 )
+        {
+                if( available ) buf << ' ';
+                else available = true;
+                buf << minute << "minute(s)";
+        }
+        if( time > 0 )
+        {
+                if( available ) buf << ' ';
+                else available = true;
+                buf << time << "second(s)";
+        }
+        return buf.str( );
 }

@@ -39,7 +39,7 @@ ListExp::evalAux()
     Register rc;
 
     for(ExpNodeList::iterator i = nodelist->begin();i != nodelist->end(); i++)
-	rc = (*i)->eval();
+        rc = (*i)->eval();
 
     return rc;
 }
@@ -50,10 +50,10 @@ ListExp::reverse(ostream &os, const DLString &nextline) const
     os << "(";
     
     for(ExpNodeList::const_iterator i = nodelist->begin();i != nodelist->end(); i++) {
-	if(i != nodelist->begin())
-	    os << ", ";
+        if(i != nodelist->begin())
+            os << ", ";
 
-	(*i)->reverse(os, nextline + "    ");
+        (*i)->reverse(os, nextline + "    ");
     }
 
     os << ")";
@@ -113,26 +113,26 @@ ConstantExp::reverse(ostream &os, const DLString &nextline) const
     
     switch (object.type) {
     case Register::NONE:
-	os << "null";
-	break;
+        os << "null";
+        break;
     case Register::NUMBER:
-	os << object.value.number;
-	break;
+        os << object.value.number;
+        break;
     case Register::STRING:
-	os << '"' 
-	   << (*object.strPtr( ))
-		    .substitute('{', "{{")
-		    .substitute('"', "{R\\\"{M")
-		    .substitute('\n', "{R\\n{M")
-		    .substitute('\r', "{R\\r{M")
-		    .substitute('\t', "{R\\t{M")
-	   << '"';
-	break;
+        os << '"' 
+           << (*object.strPtr( ))
+                    .substitute('{', "{{")
+                    .substitute('"', "{R\\\"{M")
+                    .substitute('\n', "{R\\n{M")
+                    .substitute('\r', "{R\\r{M")
+                    .substitute('\t', "{R\\t{M")
+           << '"';
+        break;
     case Register::FUNCTION:
-	object.value.function->reverse(os, nextline);
-	break;
+        object.value.function->reverse(os, nextline);
+        break;
     default:
-	os << object.toString( );
+        os << object.toString( );
     }
 
     os << "{x";    
@@ -195,7 +195,7 @@ CallExp::evalAux()
     RegisterList rl;
 
     for(ExpNodeList::iterator i = args->begin();i != args->end(); i++)
-	rl.push_back( (*i)->eval() );
+        rl.push_back( (*i)->eval() );
     
     return ref->eval()(rl);
 }
@@ -208,10 +208,10 @@ CallExp::reverse(ostream &os, const DLString &nextline) const
     os << "(";
     
     for(ExpNodeList::const_iterator i = args->begin();i != args->end(); i++) {
-	if(i != args->begin())
-	    os << ", ";
-	
-	(*i)->reverse(os, nextline);
+        if(i != args->begin())
+            os << ", ";
+        
+        (*i)->reverse(os, nextline);
     }
 
     os << ")";
@@ -249,18 +249,18 @@ Register
 OpExp::evalAux() 
 {
     if(left)
-	return ( (left->eval()) .* (op.bin) ) (right->eval()) ;
+        return ( (left->eval()) .* (op.bin) ) (right->eval()) ;
     else
-	return ( (right->eval()) .* (op.un) ) ();
+        return ( (right->eval()) .* (op.un) ) ();
 }
 
 void 
 OpExp::reverse(ostream &os, const DLString &nextline) const
 {
     if(left) {
-	left->reverse(os, nextline);
+        left->reverse(os, nextline);
     
-	os << " ";
+        os << " ";
     }
     
     os << "{C" << name << "{x ";
@@ -273,26 +273,26 @@ OpExp::lookup()
 {
     if(left) {
 #define DEFOP(x) if(name == #x) { op.bin = &Register::operator x; return; }
-	if(name == "-") { op.bin = &Register::binminus; return; }
-	DEFOP(+)
-	DEFOP(*)
-	DEFOP(/)
-	DEFOP(&)
-	DEFOP(|)
-	DEFOP(%)
-	DEFOP(^)
-	DEFOP(==)
-	DEFOP(!=)
-	DEFOP(>)
-	DEFOP(>=)
-	DEFOP(<)
-	DEFOP(<=)
+        if(name == "-") { op.bin = &Register::binminus; return; }
+        DEFOP(+)
+        DEFOP(*)
+        DEFOP(/)
+        DEFOP(&)
+        DEFOP(|)
+        DEFOP(%)
+        DEFOP(^)
+        DEFOP(==)
+        DEFOP(!=)
+        DEFOP(>)
+        DEFOP(>=)
+        DEFOP(<)
+        DEFOP(<=)
 #undef DEFOP
     } else {
 #define DEFOP(x) if(name == #x) { op.un = &Register::operator x; return; }
-	if(name == "-") { op.un = &Register::unminus; return; }
-	DEFOP(!)
-	DEFOP(~)
+        if(name == "-") { op.un = &Register::unminus; return; }
+        DEFOP(!)
+        DEFOP(~)
 #undef DEFOP
     }
 }
@@ -364,7 +364,7 @@ AssignExp::~AssignExp()
 
 /* <reference> = <exp> */
 AssignExp::AssignExp(ReferenceNode::Pointer l, ExpNode::Pointer r) 
-	: left(l), right(r) 
+        : left(l), right(r) 
 {
 }
 

@@ -13,7 +13,7 @@ After repository clone or update:
 
 Errors:
 -------
-edparse.c++:145:18: error: declaration of ¿int Editor::parse()¿ outside of class is not definition [-fpermissive]
+edparse.c++:145:18: error: declaration of Â©int Editor::parse()Â© outside of class is not definition [-fpermissive]
  int yyparse (void);
 
 Edit objs/plug-ins/ed/lib/edparse.c++ and remove this line.

@@ -37,7 +37,7 @@ bool Quest::help( PCharacter *ch, NPCharacter *questman )
 
 void Quest::helpMessage( ostringstream &buf )
 {
-    buf << "ôÅÂÅ ÎÅÏÂÈÏÄÉÍÏ ÓÌÅÄÏ×ÁÔØ ÐÏ ÓÌÅÄÕÀÝÅÍÕ ÐÕÔÉ: ";
+    buf << "Ð¢ÐµÐ±Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð¿Ð¾ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ¼Ñƒ Ð¿ÑƒÑ‚Ð¸: ";
 }
 
 Room * Quest::helpLocation( )
@@ -57,13 +57,13 @@ void Quest::wiznet( const char *status, const char *format, ... )
     buf << getName( ) << " " << status << ": " << charName;
     
     if (format) {
-	va_list ap;
+        va_list ap;
     
-	va_start( ap, format );
-	vsprintf( buf0, format, ap );
-	va_end( ap );
+        va_start( ap, format );
+        vsprintf( buf0, format, ap );
+        va_end( ap );
 
-	buf << ": " << buf0;
+        buf << ": " << buf0;
     }
 
     strcpy( buf0, buf.str( ).c_str( ) );
@@ -74,47 +74,47 @@ void Quest::wiznet( const char *status, const char *format, ... )
 int Quest::getAccidentTime( PCMemoryInterface *pci )
 {
     if (rated_as_guru( pci ))
-	return number_range( 2, 5 );
+        return number_range( 2, 5 );
     else
-	return number_range( 5, 10 );
+        return number_range( 5, 10 );
 }
 
 int Quest::getPunishTime( PCMemoryInterface *pci )
 {
     if (rated_as_newbie( pci ))
-	return number_range( 15, 20 );
+        return number_range( 15, 20 );
     else if (rated_as_guru( pci ))
-	return number_range( 60, 65 );
+        return number_range( 60, 65 );
     else
-	return number_range( 20, 30 );
+        return number_range( 20, 30 );
 }
-	
+        
 int Quest::getDeathTime( PCMemoryInterface *pci )
 {
     if (rated_as_newbie( pci ))
-	return number_range( 15, 20 );
+        return number_range( 15, 20 );
     else if (rated_as_guru( pci ))
-	return number_range( 40, 60 );
+        return number_range( 40, 60 );
     else
-	return number_range( 20, 30 );
-}	    
+        return number_range( 20, 30 );
+}            
 
 int Quest::getFailTime( PCMemoryInterface *pci )
 {
     if (rated_as_newbie( pci ))
-	return number_range( 15, 20 );
+        return number_range( 15, 20 );
     else if (rated_as_guru( pci ))
-	return number_range( 55, 65 );
+        return number_range( 55, 65 );
     else
-	return number_range( 25, 35 );
+        return number_range( 25, 35 );
 }
 
 int Quest::getNextTime( PCMemoryInterface *pci )
 {
     if (rated_as_guru( pci ))
-	return 1;
+        return 1;
     else
-	return number_range( 5, 10 );
+        return number_range( 5, 10 );
 }
 
 int Quest::getCancelTime( PCMemoryInterface *pci )
@@ -142,14 +142,14 @@ public:
     }
     virtual void run( )
     {
-	PCMemoryInterface *pci = PCharacterManager::find( charName );
-	
-	if (pci) 
-	    pci->getAttributes( ).eraseAttribute( "quest" );
+        PCMemoryInterface *pci = PCharacterManager::find( charName );
+        
+        if (pci) 
+            pci->getAttributes( ).eraseAttribute( "quest" );
     }
     virtual int getPriority( ) const
     {
-	return SCDP_FINAL;
+        return SCDP_FINAL;
     }
 
 private:
@@ -159,25 +159,25 @@ private:
 void Quest::scheduleDestroy( )
 {
     DLScheduler::getThis( )->putTaskNOW( 
-	    QuestDestroyTask::Pointer( NEW, charName ) );
+            QuestDestroyTask::Pointer( NEW, charName ) );
 }
 
 Character * Quest::getActor( Character *ch ) 
 {
     if (!ch)
-	return ch;
+        return ch;
 
     if (ch->is_mirror( ) && ch->doppel)
-	return getActor( ch->doppel );
+        return getActor( ch->doppel );
     
     if (!ch->is_npc( ) && !IS_AFFECTED( ch, AFF_CHARM ))
-	return ch;
+        return ch;
     
     if (ch->leader && ch->leader != ch)
-	return getActor( ch->leader );
+        return getActor( ch->leader );
     
     if (ch->master && ch->master != ch)
-	return getActor( ch->master );
+        return getActor( ch->master );
     
     return ch;
 }
@@ -189,7 +189,7 @@ PCharacter * Quest::getHeroWorld( )
     if (!pci)
         return NULL;
     else
-	return pci->getPlayer( );
+        return pci->getPlayer( );
 }
 
 PCMemoryInterface * Quest::getHeroMemory( )
@@ -197,3 +197,7 @@ PCMemoryInterface * Quest::getHeroMemory( )
     return PCharacterManager::find( charName );
 }
 
+bool Quest::hasPartialRewards() const
+{
+    return false;
+}

@@ -22,7 +22,7 @@ class SchedulerPriorityMap;
 class SchedulerTask;
 
 /**
- * @short Сортированная очередь событий по времени
+ * @short п║п╬я─я┌п╦я─п╬п╡п╟п╫п╫п╟я▐ п╬я┤п╣я─п╣п╢я▄ я│п╬п╠я▀я┌п╦п╧ п©п╬ п╡я─п╣п╪п╣п╫п╦
  * @author Igor S. Petrenko
  */
 
@@ -30,19 +30,19 @@ typedef Pointer<SchedulerPriorityMap> SchedulerPriorityMapPointer;
 
 class SchedulerQueue : public std::map<long, SchedulerPriorityMapPointer>, public virtual DLObject
 {
-public:	
-	typedef ::Pointer<SchedulerQueue> Pointer;
-	typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
-	
-public:	
-	/** Положить задачу с определенным временем срабатывания */
-	void put( long time, SchedulerTaskPointer& task );
-	/** Взять список задач для определенного времени срабатывания */
-	SchedulerPriorityMapPointer get( long time );
-	/** Насильно убить все задачи заданного типа */
-	void slay( SchedulerTaskPointer& task );
-	/** Насильно убить все задачи с этим указателем */
-	void slayInstance( SchedulerTaskPointer& task );
+public:        
+        typedef ::Pointer<SchedulerQueue> Pointer;
+        typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
+        
+public:        
+        /** п÷п╬п╩п╬п╤п╦я┌я▄ п╥п╟п╢п╟я┤я┐ я│ п╬п©я─п╣п╢п╣п╩п╣п╫п╫я▀п╪ п╡я─п╣п╪п╣п╫п╣п╪ я│я─п╟п╠п╟я┌я▀п╡п╟п╫п╦я▐ */
+        void put( long time, SchedulerTaskPointer& task );
+        /** п▓п╥я▐я┌я▄ я│п©п╦я│п╬п╨ п╥п╟п╢п╟я┤ п╢п╩я▐ п╬п©я─п╣п╢п╣п╩п╣п╫п╫п╬пЁп╬ п╡я─п╣п╪п╣п╫п╦ я│я─п╟п╠п╟я┌я▀п╡п╟п╫п╦я▐ */
+        SchedulerPriorityMapPointer get( long time );
+        /** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ п╥п╟п╢п╟п╫п╫п╬пЁп╬ я┌п╦п©п╟ */
+        void slay( SchedulerTaskPointer& task );
+        /** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ я│ я█я┌п╦п╪ я┐п╨п╟п╥п╟я┌п╣п╩п╣п╪ */
+        void slayInstance( SchedulerTaskPointer& task );
 };
 
 #endif

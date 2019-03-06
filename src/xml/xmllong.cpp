@@ -15,7 +15,7 @@
 void XMLLong::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
 {
         XMLNode::Pointer node = parent->getFirstNode( );
-	
+        
         if (!node.isEmpty( ))
                 fromString( node->getCData( ) );
 }
@@ -27,6 +27,13 @@ bool XMLLong::toXML( XMLNode::Pointer& parent ) const
         node->setType( XMLNode::XML_TEXT );
         node->setCData( toString( ) );
         parent->appendChild( node );
-	return true;
+        return true;
 }
 
+bool XMLLongNoEmpty::toXML( XMLNode::Pointer& parent ) const
+{
+    if (getValue( ) == 0)
+        return false;
+    else 
+        return XMLLong::toXML( parent );
+}

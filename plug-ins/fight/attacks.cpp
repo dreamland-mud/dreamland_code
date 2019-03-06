@@ -3,24 +3,24 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *	
- *     ANATOLIA has been brought to you by ANATOLIA consortium		   *
- *	 Serdar BULUT {Chronos}		bulut@rorqual.cc.metu.edu.tr       *
- *	 Ibrahim Canpunar  {Asena}	canpunar@rorqual.cc.metu.edu.tr    *	
- *	 Murat BICER  {KIO}		mbicer@rorqual.cc.metu.edu.tr	   *	
- *	 D.Baris ACAR {Powerman}	dbacar@rorqual.cc.metu.edu.tr	   *	
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *        
+ *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
+ *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *
+ *         Ibrahim Canpunar  {Asena}        canpunar@rorqual.cc.metu.edu.tr    *        
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *	
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
  ***************************************************************************/
 /***************************************************************************
  *  Original Diku Mud copyright (C) 1990, 1991 by Sebastian Hammer,        *
@@ -40,13 +40,13 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1995 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@pacinfo.com)				   *
-*	    Gabrielle Taylor (gtaylor@pacinfo.com)			   *
-*	    Brian Moore (rom@rom.efn.org)				   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*        ROM 2.4 is copyright 1993-1995 Russ Taylor                           *
+*        ROM has been brought to you by the ROM consortium                   *
+*            Russ Taylor (rtaylor@pacinfo.com)                                   *
+*            Gabrielle Taylor (gtaylor@pacinfo.com)                           *
+*            Brian Moore (rom@rom.efn.org)                                   *
+*        By using this code, you have agreed to follow the terms of the           *
+*        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 #include "attacks.h"
 #include "damageflags.h"
@@ -57,53 +57,53 @@
 using namespace Grammar;
 
 /* attack table */
-struct attack_type	attack_table	[]		=
+struct attack_type        attack_table        []                =
 {
-    { "none",		"удар",			-1,		MultiGender::MASCULINE },  /*  0 */
-    { "slice",		"разрезающий удар",	DAM_SLASH,	MultiGender::MASCULINE },	
-    { "stab",		"выпад",		DAM_PIERCE,	MultiGender::MASCULINE },
-    { "slash",		"рубящий удар",	        DAM_SLASH,	MultiGender::MASCULINE },
-    { "whip",		"хлесткий удар",	DAM_SLASH,	MultiGender::MASCULINE },
-    { "claw",		"удар когтями",		DAM_SLASH,	MultiGender::MASCULINE },  /*  5 */
-    { "blast",		"порыв",		DAM_BASH,	MultiGender::MASCULINE },
-    { "pound",		"тяжелый удар",		DAM_BASH,	MultiGender::MASCULINE },
-    { "crush",		"дробящий удар",	DAM_BASH,	MultiGender::MASCULINE },
-    { "grep",		"греп", 		DAM_SLASH,	MultiGender::MASCULINE },
-    { "bite",		"укус",			DAM_PIERCE,	MultiGender::MASCULINE },  /* 10 */
-    { "pierce",		"глубокий выпад",	DAM_PIERCE,	MultiGender::MASCULINE },
-    { "suction",	"засасывающий удар",    DAM_BASH,	MultiGender::MASCULINE },
-    { "beating",	"прямой удар",		DAM_BASH,	MultiGender::MASCULINE },
-    { "digestion",	"переваривание",        DAM_ACID,	MultiGender::MASCULINE },
-    { "charge",		"атака",		DAM_BASH,	MultiGender::FEMININE},  /* 15 */
-    { "slap",		"шлепок",		DAM_BASH,	MultiGender::MASCULINE },
-    { "punch",		"удар кулаком",		DAM_BASH,	MultiGender::MASCULINE },
-    { "wrath",		"гнев",  		DAM_ENERGY,	MultiGender::MASCULINE },
-    { "magic",		"магический удар",	DAM_ENERGY,	MultiGender::MASCULINE },
-    { "divine",		"божественная энергия",	DAM_HOLY,	MultiGender::FEMININE},  /* 20 */
-    { "cleave",		"раскалывающий удар",	DAM_SLASH,	MultiGender::MASCULINE },
-    { "scratch",	"царапающий удар",	DAM_PIERCE,	MultiGender::MASCULINE },
-    { "peck",		"удар клювом",		DAM_PIERCE,	MultiGender::MASCULINE },
-    { "peckb",		"удар клювом",		DAM_BASH,	MultiGender::MASCULINE },
-    { "chop",		"рубящий удар",		DAM_SLASH,	MultiGender::MASCULINE },  /* 25 */
-    { "sting",		"жалящий удар",		DAM_PIERCE,	MultiGender::MASCULINE },
-    { "smash",		"разбивающий удар",	DAM_BASH,	MultiGender::MASCULINE },
-    { "shbite",		"шокирующий укус",      DAM_LIGHTNING,	MultiGender::MASCULINE },
-    { "flbite",		"обжигающий укус",	DAM_FIRE,	MultiGender::MASCULINE },
-    { "frbite",		"леденящий укус",       DAM_COLD,	MultiGender::MASCULINE },  /* 30 */
-    { "acbite",		"окисляющий укус",      DAM_ACID,	MultiGender::MASCULINE },
-    { "chomp",		"мощный удар",		DAM_PIERCE,	MultiGender::MASCULINE },
-    { "drain",		"отбирающий жизнь удар",DAM_NEGATIVE,	MultiGender::MASCULINE },
-    { "thrust",		"выпад",		DAM_PIERCE,	MultiGender::MASCULINE },
-    { "slime",		"плевок слизью",	DAM_ACID,	MultiGender::MASCULINE },
-    { "shock",		"толчок",		DAM_LIGHTNING,	MultiGender::MASCULINE },
-    { "thwack",		"удар с размаху",	DAM_BASH,	MultiGender::MASCULINE },
-    { "flame",		"пламя",		DAM_FIRE,	MultiGender::NEUTER},
-    { "chill",		"холод",		DAM_COLD,	MultiGender::MASCULINE },
-    { "cuff",		"подзатыльник",		DAM_BASH,	MultiGender::MASCULINE },
-    { "hooves",		"удар копытами",	DAM_BASH,	MultiGender::MASCULINE },
-    { "horns",		"удар рогами",		DAM_BASH,	MultiGender::MASCULINE },
-    { "spines",         "удар иголками",      	DAM_PIERCE, 	MultiGender::MASCULINE }, 
-    { "cacophony",      "какофония",      	DAM_SOUND,      MultiGender::FEMININE}, 
-    { 0,		0,			0		}
+    { "none",                "я┐п╢п╟я─",                        -1,                MultiGender::MASCULINE },  /*  0 */
+    { "slice",                "я─п╟п╥я─п╣п╥п╟я▌я┴п╦п╧ я┐п╢п╟я─",        DAM_SLASH,        MultiGender::MASCULINE },        
+    { "stab",                "п╡я▀п©п╟п╢",                DAM_PIERCE,        MultiGender::MASCULINE },
+    { "slash",                "я─я┐п╠я▐я┴п╦п╧ я┐п╢п╟я─",                DAM_SLASH,        MultiGender::MASCULINE },
+    { "whip",                "я┘п╩п╣я│я┌п╨п╦п╧ я┐п╢п╟я─",        DAM_SLASH,        MultiGender::MASCULINE },
+    { "claw",                "я┐п╢п╟я─ п╨п╬пЁя┌я▐п╪п╦",                DAM_SLASH,        MultiGender::MASCULINE },  /*  5 */
+    { "blast",                "п©п╬я─я▀п╡",                DAM_BASH,        MultiGender::MASCULINE },
+    { "pound",                "я┌я▐п╤п╣п╩я▀п╧ я┐п╢п╟я─",                DAM_BASH,        MultiGender::MASCULINE },
+    { "crush",                "п╢я─п╬п╠я▐я┴п╦п╧ я┐п╢п╟я─",        DAM_BASH,        MultiGender::MASCULINE },
+    { "grep",                "п╥п╟я┘п╡п╟я┌",                 DAM_SLASH,        MultiGender::MASCULINE },
+    { "bite",                "я┐п╨я┐я│",                        DAM_PIERCE,        MultiGender::MASCULINE },  /* 10 */
+    { "pierce",                "пЁп╩я┐п╠п╬п╨п╦п╧ п╡я▀п©п╟п╢",        DAM_PIERCE,        MultiGender::MASCULINE },
+    { "suction",        "п╥п╟я│п╟я│я▀п╡п╟я▌я┴п╦п╧ я┐п╢п╟я─",    DAM_BASH,        MultiGender::MASCULINE },
+    { "beating",        "п©я─я▐п╪п╬п╧ я┐п╢п╟я─",                DAM_BASH,        MultiGender::MASCULINE },
+    { "digestion",        "п©п╣я─п╣п╡п╟я─п╦п╡п╟п╫п╦п╣",        DAM_ACID,        MultiGender::MASCULINE },
+    { "charge",                "п╟я┌п╟п╨п╟",                DAM_BASH,        MultiGender::FEMININE},  /* 15 */
+    { "slap",                "я┬п╩п╣п©п╬п╨",                DAM_BASH,        MultiGender::MASCULINE },
+    { "punch",                "я┐п╢п╟я─ п╨я┐п╩п╟п╨п╬п╪",                DAM_BASH,        MultiGender::MASCULINE },
+    { "wrath",                "пЁп╫п╣п╡",                  DAM_ENERGY,        MultiGender::MASCULINE },
+    { "magic",                "п╪п╟пЁп╦я┤п╣я│п╨п╦п╧ я┐п╢п╟я─",        DAM_ENERGY,        MultiGender::MASCULINE },
+    { "divine",                "п╠п╬п╤п╣я│я┌п╡п╣п╫п╫п╟я▐ я█п╫п╣я─пЁп╦я▐",        DAM_HOLY,        MultiGender::FEMININE},  /* 20 */
+    { "cleave",                "я─п╟я│п╨п╟п╩я▀п╡п╟я▌я┴п╦п╧ я┐п╢п╟я─",        DAM_SLASH,        MultiGender::MASCULINE },
+    { "scratch",        "я├п╟я─п╟п©п╟я▌я┴п╦п╧ я┐п╢п╟я─",        DAM_PIERCE,        MultiGender::MASCULINE },
+    { "peck",                "я┐п╢п╟я─ п╨п╩я▌п╡п╬п╪",                DAM_PIERCE,        MultiGender::MASCULINE },
+    { "peckb",                "я┐п╢п╟я─ п╨п╩я▌п╡п╬п╪",                DAM_BASH,        MultiGender::MASCULINE },
+    { "chop",                "я─я┐п╠я▐я┴п╦п╧ я┐п╢п╟я─",                DAM_SLASH,        MultiGender::MASCULINE },  /* 25 */
+    { "sting",                "п╤п╟п╩я▐я┴п╦п╧ я┐п╢п╟я─",                DAM_PIERCE,        MultiGender::MASCULINE },
+    { "smash",                "я─п╟п╥п╠п╦п╡п╟я▌я┴п╦п╧ я┐п╢п╟я─",        DAM_BASH,        MultiGender::MASCULINE },
+    { "shbite",                "я┬п╬п╨п╦я─я┐я▌я┴п╦п╧ я┐п╨я┐я│",      DAM_LIGHTNING,        MultiGender::MASCULINE },
+    { "flbite",                "п╬п╠п╤п╦пЁп╟я▌я┴п╦п╧ я┐п╨я┐я│",        DAM_FIRE,        MultiGender::MASCULINE },
+    { "frbite",                "п╩п╣п╢п╣п╫я▐я┴п╦п╧ я┐п╨я┐я│",       DAM_COLD,        MultiGender::MASCULINE },  /* 30 */
+    { "acbite",                "п╬п╨п╦я│п╩я▐я▌я┴п╦п╧ я┐п╨я┐я│",      DAM_ACID,        MultiGender::MASCULINE },
+    { "chomp",                "п╪п╬я┴п╫я▀п╧ я┐п╢п╟я─",                DAM_PIERCE,        MultiGender::MASCULINE },
+    { "drain",                "п╬я┌п╠п╦я─п╟я▌я┴п╦п╧ п╤п╦п╥п╫я▄ я┐п╢п╟я─",DAM_NEGATIVE,        MultiGender::MASCULINE },
+    { "thrust",                "п╡я▀п©п╟п╢",                DAM_PIERCE,        MultiGender::MASCULINE },
+    { "slime",                "п©п╩п╣п╡п╬п╨ я│п╩п╦п╥я▄я▌",        DAM_ACID,        MultiGender::MASCULINE },
+    { "shock",                "я┌п╬п╩я┤п╬п╨",                DAM_LIGHTNING,        MultiGender::MASCULINE },
+    { "thwack",                "я┐п╢п╟я─ я│ я─п╟п╥п╪п╟я┘я┐",        DAM_BASH,        MultiGender::MASCULINE },
+    { "flame",                "п©п╩п╟п╪я▐",                DAM_FIRE,        MultiGender::NEUTER},
+    { "chill",                "я┘п╬п╩п╬п╢",                DAM_COLD,        MultiGender::MASCULINE },
+    { "cuff",                "п©п╬п╢п╥п╟я┌я▀п╩я▄п╫п╦п╨",                DAM_BASH,        MultiGender::MASCULINE },
+    { "hooves",                "я┐п╢п╟я─ п╨п╬п©я▀я┌п╟п╪п╦",        DAM_BASH,        MultiGender::MASCULINE },
+    { "horns",                "я┐п╢п╟я─ я─п╬пЁп╟п╪п╦",                DAM_BASH,        MultiGender::MASCULINE },
+    { "spines",         "я┐п╢п╟я─ п╦пЁп╬п╩п╨п╟п╪п╦",              DAM_PIERCE,         MultiGender::MASCULINE }, 
+    { "cacophony",      "п╨п╟п╨п╬я└п╬п╫п╦я▐",              DAM_SOUND,      MultiGender::FEMININE}, 
+    { 0,                0,                        0                }
 };
 

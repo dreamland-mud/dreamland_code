@@ -6,15 +6,14 @@
 #include "objquestbehavior.h"
 #include "quest.h"
 #include "loadsave.h"
-
 /*--------------------------------------------------------------------
  * MandatoryItem
  *--------------------------------------------------------------------*/
 bool MandatoryItem::extract( bool count )
 {
     if (count)
-	mandatoryExtract( );
-	
+        mandatoryExtract( );
+        
     return ObjQuestBehavior::extract( count );
 }
 
@@ -23,15 +22,18 @@ bool MandatoryItem::extract( bool count )
  *--------------------------------------------------------------------*/
 void PersonalItem::get( Character *ch ) 
 {
-    if (ch->is_immortal( ))
-	return;
+    if (ourHero( ch )) {
+        getByHero( ch->getPC( ) );
+        return;
+    }
 
-    if (ourHero( ch )) 
-	getByHero( ch->getPC( ) );
-    else if (!ourMobile( ch->getNPC( ) )) {
-	obj_from_char( obj );
-	obj_to_room( obj, ch->in_room );
-	getByOther( ch );
+    if (ch->is_immortal( ))
+        return;
+
+    if (!ourMobile( ch->getNPC( ) )) {
+        obj_from_char( obj );
+        obj_to_room( obj, ch->in_room );
+        getByOther( ch );
     }
 }
 

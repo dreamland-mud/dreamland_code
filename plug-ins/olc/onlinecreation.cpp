@@ -19,18 +19,18 @@ using std::endl;
 OnlineCreation *OnlineCreation::ocList =  0;
 
 OnlineCreation::OnlineCreation(struct cmd_info *ci)
-			 : ocName(ci->name), go(ci->go)
+                         : ocName(ci->name), go(ci->go)
 {
-	next = ocList;
-	ocList = this;
-	
-	if (ci->shortName && ci->shortName[0])
-	    aliases.push_back(ci->shortName);
+        next = ocList;
+        ocList = this;
+        
+        if (ci->shortName && ci->shortName[0])
+            aliases.push_back(ci->shortName);
 
-	position.setValue(ci->position);
-	level.setValue(0/*ci->level*/);
-	log.setValue(ci->log);
-	extra.setValue(ci->extra);
+        position.setValue(ci->position);
+        level.setValue(0/*ci->level*/);
+        log.setValue(ci->log);
+        extra.setValue(ci->extra);
 }
 
 OnlineCreation::~OnlineCreation( )
@@ -40,11 +40,11 @@ OnlineCreation::~OnlineCreation( )
 void OnlineCreation::run( Character* ch, const DLString& args )
 {
     if(!ch->desc)
-	return;
+        return;
 
     if(!available( ch )) {
-	ch->send_to("üÔÏ ÎÅ ÄÌÑ ÔÅÂÑ.\n\r");
-	return;
+        ch->send_to("Ð­Ñ‚Ð¾ Ð½Ðµ Ð´Ð»Ñ Ñ‚ÐµÐ±Ñ.\n\r");
+        return;
     }
     
     (*go)(ch->getPC( ), (char*)args.c_str());

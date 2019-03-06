@@ -20,12 +20,12 @@ public:
 
 #define TABLE_LOADER(className, tableName, nodeName)                          \
     struct className : public XMLTableLoaderPlugin, public DLXMLTableLoader { \
-	virtual DLString getTableName( ) const {                              \
-	    return tableName;                                                 \
-	}                                                                     \
-	virtual DLString getNodeName( ) const {                               \
-	    return nodeName;                                                  \
-	}                                                                     \
+        virtual DLString getTableName( ) const {                              \
+            return tableName;                                                 \
+        }                                                                     \
+        virtual DLString getNodeName( ) const {                               \
+            return nodeName;                                                  \
+        }                                                                     \
     }
 
 #endif

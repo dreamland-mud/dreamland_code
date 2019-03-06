@@ -16,59 +16,59 @@ CMDRUN( speak )
     DLString arg = constArguments;
     
     if (ch->is_npc( ))
-	return;
+        return;
     
     arg = arg.getOneArgument( );
 
     if (arg.empty( )) {
-	ostringstream buf, mybuf;
-	int mylangs = 0;
-	
-	buf << "óÅÊÞÁÓ ÔÙ ÒÁÚÇÏ×ÁÒÉ×ÁÅÛØ ÎÁ "
-	    << ch->language->getShortDescr( ).ruscase( '6' ) << " ÑÚÙËÅ "
-	    << "(" << ch->language->getName( ) << ")." << endl;
-	
-	for (int i = 0; i < raceLanguageManager->size( ); i++) {
-	    lang = raceLanguageManager->find( i );
+        ostringstream buf, mybuf;
+        int mylangs = 0;
+        
+        buf << "Ð¡ÐµÐ¹Ñ‡Ð°Ñ Ñ‚Ñ‹ Ñ€Ð°Ð·Ð³Ð¾Ð²Ð°Ñ€Ð¸Ð²Ð°ÐµÑˆÑŒ Ð½Ð° "
+            << ch->language->getShortDescr( ).ruscase( '6' ) << " ÑÐ·Ñ‹ÐºÐµ "
+            << "(" << ch->language->getName( ) << ")." << endl;
+        
+        for (int i = 0; i < raceLanguageManager->size( ); i++) {
+            lang = raceLanguageManager->find( i );
 
-	    if (!lang->available( ch ))
-		continue;
-	    
-	    if (!mybuf.str( ).empty( ))
-		mybuf << ", ";
+            if (!lang->available( ch ))
+                continue;
+            
+            if (!mybuf.str( ).empty( ))
+                mybuf << ", ";
 
-	    mybuf << lang->getShortDescr( ).ruscase( '1' ) << " (" << lang->getName( ) << ")";
-	    mylangs++;
-	}
-	
-	if (mylangs == 0) {
-	}
-	else if (mylangs == 1) {
-	    buf <<  "ôÙ ÚÎÁÅÛØ ÔÏÌØËÏ " << mybuf.str( ) << " ÑÚÙË." << endl;
-	}
-	else {
-	    buf << "ôÙ ÚÎÁÅÛØ ÔÁËÉÅ ÑÚÙËÉ: " << mybuf.str( ) << endl;
-	}
+            mybuf << lang->getShortDescr( ).ruscase( '1' ) << " (" << lang->getName( ) << ")";
+            mylangs++;
+        }
+        
+        if (mylangs == 0) {
+        }
+        else if (mylangs == 1) {
+            buf <<  "Ð¢Ñ‹ Ð·Ð½Ð°ÐµÑˆÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ " << mybuf.str( ) << " ÑÐ·Ñ‹Ðº." << endl;
+        }
+        else {
+            buf << "Ð¢Ñ‹ Ð·Ð½Ð°ÐµÑˆÑŒ Ñ‚Ð°ÐºÐ¸Ðµ ÑÐ·Ñ‹ÐºÐ¸: " << mybuf.str( ) << endl;
+        }
     
-	ch->send_to( buf );
-	return;
+        ch->send_to( buf );
+        return;
     }
     
     lang = raceLanguageManager->findUnstrict( arg );
 
     if (!lang) {
-	ch->pecho( "ôÙ ÎÉËÏÇÄÁ ÎÅ ÓÌÙÛÁ%1$GÌÏ|Ì|ÌÁ ÏÂ ÜÔÏÍ ÑÚÙËÅ.", ch );
-	return;
+        ch->pecho( "Ð¢Ñ‹ Ð½Ð¸ÐºÐ¾Ð³Ð´Ð° Ð½Ðµ ÑÐ»Ñ‹ÑˆÐ°%1$GÐ»Ð¾|Ð»|Ð»Ð° Ð¾Ð± ÑÑ‚Ð¾Ð¼ ÑÐ·Ñ‹ÐºÐµ.", ch );
+        return;
     }
 
     if (!lang->available( ch )) {
-	ch->printf( "ôÙ ÎÅ ÕÍÅÅÛØ ÒÁÚÇÏ×ÁÒÉ×ÁÔØ ÎÁ %s ÑÚÙËÅ.\r\n",
-		     lang->getShortDescr( ).ruscase( '6' ).c_str( ) );
-	return;
+        ch->printf( "Ð¢Ñ‹ Ð½Ðµ ÑƒÐ¼ÐµÐµÑˆÑŒ Ñ€Ð°Ð·Ð³Ð¾Ð²Ð°Ñ€Ð¸Ð²Ð°Ñ‚ÑŒ Ð½Ð° %s ÑÐ·Ñ‹ÐºÐµ.\r\n",
+                     lang->getShortDescr( ).ruscase( '6' ).c_str( ) );
+        return;
     }
     
-    ch->printf( "ôÅÐÅÒØ ÔÙ ÒÁÚÇÏ×ÁÒÉ×ÁÅÛØ ÎÁ %s ÑÚÙËÅ.\r\n",
-		 lang->getShortDescr( ).ruscase( '6' ).c_str( ) );
+    ch->printf( "Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ Ñ€Ð°Ð·Ð³Ð¾Ð²Ð°Ñ€Ð¸Ð²Ð°ÐµÑˆÑŒ Ð½Ð° %s ÑÐ·Ñ‹ÐºÐµ.\r\n",
+                 lang->getShortDescr( ).ruscase( '6' ).c_str( ) );
     ch->language.assign( lang );
 }
 

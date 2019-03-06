@@ -26,7 +26,7 @@ Reference::Reference(Lex::id_t k) : id(k)
 }
 
 Reference::Reference(const Register &c, const Register &k) 
-	: id(0), container(c), key(k) 
+        : id(0), container(c), key(k) 
 { 
 }
 

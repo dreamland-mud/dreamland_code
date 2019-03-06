@@ -19,23 +19,23 @@
 
 const XMLAttributeCards::CardLevelFace XMLAttributeCards::levelFaces [] =
 {
-    { "ÛÅÓÔÅÒË|Á|É|Å|Õ|ÏÊ|Å",        SEX_FEMALE },
-    { "ÓÅÍÅÒË|Á|É|Å|Õ|ÏÊ|Å",         SEX_FEMALE },
-    { "×ÏÓØÍÅÒË|Á|É|Å|Õ|ÏÊ|Å",       SEX_FEMALE },
-    { "ÄÅ×ÑÔË|Á|É|Å|Õ|ÏÊ|Å",         SEX_FEMALE },
-    { "ÄÅÓÑÔË|Á|É|Å|Õ|ÏÊ|Å",         SEX_FEMALE },
-    { "×ÁÌ|ÅÔ|ØÔÁ|ØÔÕ|ØÔÁ|ØÔÏÍ|ØÔÅ", SEX_MALE   },
-    { "ÄÁÍ|Á|Ù|Å|Õ|ÏÊ|Å",            SEX_FEMALE },
-    { "ËÏÒÏÌ|Ø|Ñ|À|Ñ|ÅÍ|Å",          SEX_MALE   },
-    { "ÔÕÚ||Á|Õ|Á|ÏÍ|Å",             SEX_MALE   },
+    { "ÑˆÐµÑÑ‚ÐµÑ€Ðº|Ð°|Ð¸|Ðµ|Ñƒ|Ð¾Ð¹|Ðµ",        SEX_FEMALE },
+    { "ÑÐµÐ¼ÐµÑ€Ðº|Ð°|Ð¸|Ðµ|Ñƒ|Ð¾Ð¹|Ðµ",         SEX_FEMALE },
+    { "Ð²Ð¾ÑÑŒÐ¼ÐµÑ€Ðº|Ð°|Ð¸|Ðµ|Ñƒ|Ð¾Ð¹|Ðµ",       SEX_FEMALE },
+    { "Ð´ÐµÐ²ÑÑ‚Ðº|Ð°|Ð¸|Ðµ|Ñƒ|Ð¾Ð¹|Ðµ",         SEX_FEMALE },
+    { "Ð´ÐµÑÑÑ‚Ðº|Ð°|Ð¸|Ðµ|Ñƒ|Ð¾Ð¹|Ðµ",         SEX_FEMALE },
+    { "Ð²Ð°Ð»|ÐµÑ‚|ÑŒÑ‚Ð°|ÑŒÑ‚Ñƒ|ÑŒÑ‚Ð°|ÑŒÑ‚Ð¾Ð¼|ÑŒÑ‚Ðµ", SEX_MALE   },
+    { "Ð´Ð°Ð¼|Ð°|Ñ‹|Ðµ|Ñƒ|Ð¾Ð¹|Ðµ",            SEX_FEMALE },
+    { "ÐºÐ¾Ñ€Ð¾Ð»|ÑŒ|Ñ|ÑŽ|Ñ|ÐµÐ¼|Ðµ",          SEX_MALE   },
+    { "Ñ‚ÑƒÐ·||Ð°|Ñƒ|Ð°|Ð¾Ð¼|Ðµ",             SEX_MALE   },
 };
 
 const XMLAttributeCards::CardSuitFace XMLAttributeCards::suitFaces [] =
 {
-    { "ÞÅÒ×|Á|ÅÊ|ÅÊ|ÅÊ|ÅÊ|ÅÊ", "ÞÅÒ×Ï×|ÙÊ|ÏÇÏ|ÏÍÕ|ÏÇÏ|ÙÍ|ÏÍ", "ÞÅÒ×Ï×|ÁÑ|ÏÊ|ÏÊ|ÕÀ|ÏÊ|ÏÊ" },
-    { "ÐÉË|Á|||||",    "ÐÉËÏ×|ÙÊ|ÏÇÏ|ÏÍÕ|ÏÇÏ|ÙÍ|ÏÍ",  "ÐÉËÏ×|ÁÑ|ÏÊ|ÏÊ|ÕÀ|ÏÊ|ÏÊ"  },
-    { "ÔÒÅÆ|Á|||||",   "ÔÒÅÆÏ×|ÙÊ|ÏÇÏ|ÏÍÕ|ÏÇÏ|ÙÍ|ÏÍ", "ÔÒÅÆÏ×|ÁÑ|ÏÊ|ÏÊ|ÕÀ|ÏÊ|ÏÊ" },
-    { "ÂÕÂÅÎ",  "ÂÕÂÎÏ×|ÙÊ|ÏÇÏ|ÏÍÕ|ÏÇÏ|ÙÍ|ÏÍ", "ÂÕÂÎÏ×|ÁÑ|ÏÊ|ÏÊ|ÕÀ|ÏÊ|ÏÊ" },
+    { "Ñ‡ÐµÑ€Ð²|Ð°|ÐµÐ¹|ÐµÐ¹|ÐµÐ¹|ÐµÐ¹|ÐµÐ¹", "Ñ‡ÐµÑ€Ð²Ð¾Ð²|Ñ‹Ð¹|Ð¾Ð³Ð¾|Ð¾Ð¼Ñƒ|Ð¾Ð³Ð¾|Ñ‹Ð¼|Ð¾Ð¼", "Ñ‡ÐµÑ€Ð²Ð¾Ð²|Ð°Ñ|Ð¾Ð¹|Ð¾Ð¹|ÑƒÑŽ|Ð¾Ð¹|Ð¾Ð¹" },
+    { "Ð¿Ð¸Ðº|Ð°|||||",    "Ð¿Ð¸ÐºÐ¾Ð²|Ñ‹Ð¹|Ð¾Ð³Ð¾|Ð¾Ð¼Ñƒ|Ð¾Ð³Ð¾|Ñ‹Ð¼|Ð¾Ð¼",  "Ð¿Ð¸ÐºÐ¾Ð²|Ð°Ñ|Ð¾Ð¹|Ð¾Ð¹|ÑƒÑŽ|Ð¾Ð¹|Ð¾Ð¹"  },
+    { "Ñ‚Ñ€ÐµÑ„|Ð°|||||",   "Ñ‚Ñ€ÐµÑ„Ð¾Ð²|Ñ‹Ð¹|Ð¾Ð³Ð¾|Ð¾Ð¼Ñƒ|Ð¾Ð³Ð¾|Ñ‹Ð¼|Ð¾Ð¼", "Ñ‚Ñ€ÐµÑ„Ð¾Ð²|Ð°Ñ|Ð¾Ð¹|Ð¾Ð¹|ÑƒÑŽ|Ð¾Ð¹|Ð¾Ð¹" },
+    { "Ð±ÑƒÐ±ÐµÐ½",  "Ð±ÑƒÐ±Ð½Ð¾Ð²|Ñ‹Ð¹|Ð¾Ð³Ð¾|Ð¾Ð¼Ñƒ|Ð¾Ð³Ð¾|Ñ‹Ð¼|Ð¾Ð¼", "Ð±ÑƒÐ±Ð½Ð¾Ð²|Ð°Ñ|Ð¾Ð¹|Ð¾Ð¹|ÑƒÑŽ|Ð¾Ð¹|Ð¾Ð¹" },
 };
 
 int XMLAttributeCards::getMaxLevel( )
@@ -66,9 +66,9 @@ DLString XMLAttributeCards::getFace( char needcase ) const
     DLString face, suit;
     
     if (getLevelFace( ).gender == SEX_MALE)
-	suit = russian_case( getSuitFace( ).male, needcase );
+        suit = russian_case( getSuitFace( ).male, needcase );
     else
-	suit = russian_case( getSuitFace( ).female, needcase );
+        suit = russian_case( getSuitFace( ).female, needcase );
     
     face = suit + " " + russian_case( getLevelFace( ).name, needcase );
     return face;
@@ -80,32 +80,32 @@ bool XMLAttributeCards::handle( const DeathArguments &args )
     Pointer card;
     
     if (!args.killer || args.killer->is_npc( ) || args.killer == args.pch)
-	return false;
+        return false;
 
     pkiller = args.killer->getPC( );
 
     card = pkiller->getAttributes( ).getAttr<XMLAttributeCards>( "cards" );
     
     if (card->level < level || isTrump( )) {
-	if (card->level < getMaxLevel( )) {
-	    card->level++;
+        if (card->level < getMaxLevel( )) {
+            card->level++;
 
-	    if (card->suit < 0)
-		card->suit = getRandomSuit( );
+            if (card->suit < 0)
+                card->suit = getRandomSuit( );
 
-	    act( "{côÙ ÕÂÉ$gÌÏ|Ì|ÌÁ $t ÉÚ ëÏÌÏÄÙ.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
-	    act( "{côÅÐÅÒØ ÔÙ $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
-	}
+            act( "{cÐ¢Ñ‹ ÑƒÐ±Ð¸$gÐ»Ð¾|Ð»|Ð»Ð° $t Ð¸Ð· ÐšÐ¾Ð»Ð¾Ð´Ñ‹.{x", pkiller, getFace( '4' ).c_str( ), 0, TO_CHAR );
+            act( "{cÐ¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ $t!{x", pkiller, card->getFace( '1' ).c_str( ), 0, TO_CHAR );
+        }
     
-	level--;
+        level--;
 
-	if (level >= 0)
-	    args.pch->printf( "{côÙ ÓÔÁÎÏ×ÉÛØÓÑ %s.{x\r\n", getFace( '5' ).c_str( ) );
-	else {
-	    args.pch->send_to( "{côÙ ×ÙÂÙ×ÁÅÛØ ÉÚ ËÏÌÏÄÙ!{x\r\n" );
-	    args.pch->getAttributes( ).eraseAttribute( "cards" );
-	    return false;
-	}
+        if (level >= 0)
+            args.pch->printf( "{cÐ¢Ñ‹ ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸ÑˆÑŒÑÑ %s.{x\r\n", getFace( '5' ).c_str( ) );
+        else {
+            args.pch->send_to( "{cÐ¢Ñ‹ Ð²Ñ‹Ð±Ñ‹Ð²Ð°ÐµÑˆÑŒ Ð¸Ð· ÐºÐ¾Ð»Ð¾Ð´Ñ‹!{x\r\n" );
+            args.pch->getAttributes( ).eraseAttribute( "cards" );
+            return false;
+        }
     }
 
     return false;

@@ -19,7 +19,7 @@
 void SteakCustomer::greet( Character *victim ) 
 {
     if (ourHero( victim ))
-	act( "$c1 выжидающе смотрит на тебя.", ch, 0, victim, TO_VICT );
+        act( "$c1 п╡я▀п╤п╦п╢п╟я▌я┴п╣ я│п╪п╬я┌я─п╦я┌ п╫п╟ я┌п╣п╠я▐.", ch, 0, victim, TO_VICT );
 }
 
 bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
@@ -27,30 +27,30 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
     MOB_INDEX_DATA *orig;
     
     if (!getQuest( ))
-	return false;
+        return false;
 
     if (obj->pIndexData->vnum != OBJ_VNUM_STEAK) {
-	tell_fmt( "Что ты мне приволок%1$Gло|л|ла! Это даже не мясо!", hero, ch );
-	return false;
+        tell_fmt( "п╖я┌п╬ я┌я▀ п╪п╫п╣ п©я─п╦п╡п╬п╩п╬п╨%1$Gп╩п╬|п╩|п╩п╟! п╜я┌п╬ п╢п╟п╤п╣ п╫п╣ п╪я▐я│п╬!", hero, ch );
+        return false;
     }
 
     if (!( orig = get_mob_index( obj->value[2] ) )) {
-	tell_fmt( "Ужас, с кого ты это среза%1$Gло|л|ла?!", hero, ch );
-	return false;
+        tell_fmt( "пёп╤п╟я│, я│ п╨п╬пЁп╬ я┌я▀ я█я┌п╬ я│я─п╣п╥п╟%1$Gп╩п╬|п╩|п╩п╟?!", hero, ch );
+        return false;
     }
 
     if (quest->raceName != orig->race) {
-	tell_fmt( "Хороший кусок, но я заказывал%2$Gло|л|ла мясо %3$s.",
-		  hero, ch, quest->raceRusName.c_str( ) );
-	return false;	
-	
+        tell_fmt( "п╔п╬я─п╬я┬п╦п╧ п╨я┐я│п╬п╨, п╫п╬ я▐ п╥п╟п╨п╟п╥я▀п╡п╟п╩%2$Gп╩п╬|п╩|п╩п╟ п╪я▐я│п╬ %3$s.",
+                  hero, ch, quest->raceRusName.c_str( ) );
+        return false;        
+        
     } 
     
     if (quest->areaName != orig->area->name) {
-	tell_raw( hero, ch, 
-		"Эти звери водятся в %s, а не в %s.",
-		orig->area->name, quest->areaName.c_str( ) );
-	return false;
+        tell_raw( hero, ch, 
+                "п╜я┌п╦ п╥п╡п╣я─п╦ п╡п╬п╢я▐я┌я│я▐ п╡ %s, п╟ п╫п╣ п╡ %s.",
+                orig->area->name, quest->areaName.c_str( ) );
+        return false;
     }
 
     return true;
@@ -58,8 +58,8 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
 
 void SteakCustomer::givenBad( PCharacter *hero, Object *obj )
 {
-    act("$c1 возвращает тебе $o4.", ch, obj, hero, TO_VICT);
-    act("$c1 возвращает $C5 $o4.", ch, obj, hero, TO_NOTVICT);
+    act("$c1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ я┌п╣п╠п╣ $o4.", ch, obj, hero, TO_VICT);
+    act("$c1 п╡п╬п╥п╡я─п╟я┴п╟п╣я┌ $C5 $o4.", ch, obj, hero, TO_NOTVICT);
 }
 
 void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
@@ -67,20 +67,20 @@ void SteakCustomer::givenGood( PCharacter *hero, Object *obj )
     quest->delivered++;
     
     if (quest->delivered == quest->ordered) 
-	tell_raw(hero, ch, "Спасибо за помощь! Вернись к квестору за наградой.");
+        tell_raw(hero, ch, "п║п©п╟я│п╦п╠п╬ п╥п╟ п©п╬п╪п╬я┴я▄! п▓п╣я─п╫п╦я│я▄ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ п╫п╟пЁя─п╟п╢п╬п╧.");
     else if (quest->delivered > quest->ordered) 
-	tell_fmt("Хватит, родн%1$Gое|ой|ая.", hero, ch);
+        tell_fmt("п╔п╡п╟я┌п╦я┌, я─п╬п╢п╫%1$Gп╬п╣|п╬п╧|п╟я▐.", hero, ch);
     else 
-	tell_raw(hero, ch, "Маловато будет...");
+        tell_raw(hero, ch, "п°п╟п╩п╬п╡п╟я┌п╬ п╠я┐п╢п╣я┌...");
     
-    act("$c1 куда-то прячет $o4.", ch, obj, 0, TO_ROOM);
+    act("$c1 п╨я┐п╢п╟-я┌п╬ п©я─я▐я┤п╣я┌ $o4.", ch, obj, 0, TO_ROOM);
     extract_obj( obj );
 }
 
 void SteakCustomer::deadAction( Quest::Pointer quest, PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-	pcm->getPlayer( )->println( "{YЗаказ отменен в связи с кончиной заказчика.{x" );
+        pcm->getPlayer( )->println( "{Yп≈п╟п╨п╟п╥ п╬я┌п╪п╣п╫п╣п╫ п╡ я│п╡я▐п╥п╦ я│ п╨п╬п╫я┤п╦п╫п╬п╧ п╥п╟п╨п╟п╥я┤п╦п╨п╟.{x" );
 
     ProtectedClient::deadAction( quest, pcm, killer );
 }

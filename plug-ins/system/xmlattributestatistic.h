@@ -23,33 +23,33 @@ class XMLAttributeStatistic :
 {
 XML_OBJECT
 public: 
-	typedef pair<DLString, int> StatRecord;
-	typedef list<StatRecord> StatRecordList;
-	typedef map<DLString, StatRecordList > Statistic;
+        typedef pair<DLString, int> StatRecord;
+        typedef list<StatRecord> StatRecordList;
+        typedef map<DLString, StatRecordList > Statistic;
 
         typedef ::Pointer<XMLAttributeStatistic> Pointer;
-	typedef XMLMapBase<XMLInteger> Victories;
+        typedef XMLMapBase<XMLInteger> Victories;
 
-	XMLAttributeStatistic( );
-	virtual ~XMLAttributeStatistic( );
+        XMLAttributeStatistic( );
+        virtual ~XMLAttributeStatistic( );
 
-	virtual bool handle( const RemortArguments & ); 
+        virtual bool handle( const RemortArguments & ); 
 
-	void rememberVictory( const DLString& );
-	int getVictories( const DLString& ) const;
-	const Victories & getVictories( ) const;
-	void setVictories( const DLString&, int );
-	int getAllVictoriesCount( ) const;
-	int getVasted( ) const;
-	void setVasted( int );
+        void rememberVictory( const DLString& );
+        int getVictories( const DLString& ) const;
+        const Victories & getVictories( ) const;
+        void setVictories( const DLString&, int );
+        int getAllVictoriesCount( ) const;
+        int getVasted( ) const;
+        void setVasted( int );
     
-	void gather( PCMemoryInterface *, Statistic & ) const;
-	static Statistic gatherAll( const DLString& );
+        void gather( PCMemoryInterface *, Statistic & ) const;
+        static Statistic gatherAll( const DLString& );
 
 protected:
-	XML_VARIABLE Victories victories;
-	XML_VARIABLE XMLBoolean shy;
-	XML_VARIABLE XMLIntegerNoEmpty vasted;
+        XML_VARIABLE Victories victories;
+        XML_VARIABLE XMLBoolean shy;
+        XML_VARIABLE XMLIntegerNoEmpty vasted;
 };
 
 #endif

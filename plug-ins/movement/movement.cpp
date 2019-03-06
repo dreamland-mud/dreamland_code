@@ -45,9 +45,9 @@ int Movement::move( )
     rc = RC_MOVE_UNDEF;
     
     if (moveRecursive( ))
-	rc = RC_MOVE_OK;
+        rc = RC_MOVE_OK;
     else if (rc == RC_MOVE_UNDEF)
-	rc = RC_MOVE_FAIL;
+        rc = RC_MOVE_FAIL;
 
     return rc;
 }
@@ -55,21 +55,21 @@ int Movement::move( )
 bool Movement::moveRecursive( )
 {
     if (!canLeave( ch ) || (ch->mount && !canLeave( ch->mount )))
-	return false;
+        return false;
 
     if (!findTargetRoom( ))
-	return false;
+        return false;
 
     if (!moveAtomic( )) 
-	return false;
+        return false;
 
     try {
-	callProgs( ch );
-	callProgs( ch->mount );
-	moveFollowers( ch );
-	moveFollowers( ch->mount );
-	callProgsFinish( ch );
-	callProgsFinish( ch->mount );
+        callProgs( ch );
+        callProgs( ch->mount );
+        moveFollowers( ch );
+        moveFollowers( ch->mount );
+        callProgsFinish( ch );
+        callProgsFinish( ch->mount );
     } 
     catch (const VictimDeathException &) {
     }
@@ -88,7 +88,7 @@ void Movement::place( Character *wch )
     msgOnMove( wch, true );
     
     if (wch->fighting)
-	stop_fighting( wch, true );
+        stop_fighting( wch, true );
 
     char_from_room( wch );
     char_to_room( wch, to_room );
@@ -98,7 +98,7 @@ void Movement::place( Character *wch )
             && !eyes_blinded( wch )
             && !eyes_darkened( wch ))
     {
-        wch->printf("Ты попадаешь в местность '{c%s{x'.\r\n\r\n", to_room->area->name);
+        wch->printf("п╒я▀ п©п╬п©п╟п╢п╟п╣я┬я▄ п╡ п╪п╣я│я┌п╫п╬я│я┌я▄ '{c%s{x'.\r\n\r\n", to_room->area->name);
     }
  
     interpret_raw( wch, "look", "move" );
@@ -106,7 +106,7 @@ void Movement::place( Character *wch )
     msgOnMove( wch, false );
 #if 0
     if (!wch->is_npc( ))
-	worldKnowledge->visit( wch->getPC( ) );
+        worldKnowledge->visit( wch->getPC( ) );
 #endif    
 }
 
@@ -115,9 +115,9 @@ static void rafprog_leave( Room *room, Character *ch )
     Affect *paf, *paf_next;
 
     for (paf = room->affected; paf; paf = paf_next) {
-	paf_next = paf->next;
-	if (paf->type->getAffect( ))
-	    paf->type->getAffect( )->leave( room, ch, paf );
+        paf_next = paf->next;
+        if (paf->type->getAffect( ))
+            paf->type->getAffect( )->leave( room, ch, paf );
     }
 }
 
@@ -126,9 +126,9 @@ static void rafprog_entry( Room *room, Character *ch )
     Affect *paf, *paf_next;
 
     for (paf = room->affected; paf; paf = paf_next) {
-	paf_next = paf->next;
-	if (paf->type->getAffect( ))
-	    paf->type->getAffect( )->entry( room, ch, paf );
+        paf_next = paf->next;
+        if (paf->type->getAffect( ))
+            paf->type->getAffect( )->entry( room, ch, paf );
     }
 }
 
@@ -162,24 +162,24 @@ void Movement::callProgs( Character *wch )
     Object *obj;
 
     if (!wch)
-	return;
+        return;
     
     rafprog_leave( from_room, wch );
-	
+        
     for (fch = to_room->people; fch!=0; fch = fch_next) {
-	fch_next = fch->next_in_room;
+        fch_next = fch->next_in_room;
 
-	/* greet progs for items carried by people in room */
-	for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
-		oprog_greet( obj, wch );
+        /* greet progs for items carried by people in room */
+        for ( obj = fch->carrying; obj != 0; obj = obj->next_content )
+                oprog_greet( obj, wch );
 
-	/* greet programs for people */
-	mprog_greet( fch, wch );
+        /* greet programs for people */
+        mprog_greet( fch, wch );
     }
 
     /* entry programs for items */
     for (obj = wch->carrying; obj; obj=obj->next_content)
-	    oprog_entry( obj );
+            oprog_entry( obj );
 }
 
 static void rprog_greet( Room *to_room, Character *ch, Room *from_room, const char *movetype )
@@ -190,8 +190,8 @@ static void rprog_greet( Room *to_room, Character *ch, Room *from_room, const ch
 static void mprog_leave( Character *ch, Room *from_room, const char *movetype )
 {
     for (Character *rch = from_room->people; rch; rch = rch->next_in_room) {
-	FENIA_VOID_CALL( rch, "Leave", "CRs", ch, from_room, movetype );
-	FENIA_NDX_VOID_CALL( rch->getNPC( ), "Leave", "CCRs", rch, ch, from_room, movetype );
+        FENIA_VOID_CALL( rch, "Leave", "CRs", ch, from_room, movetype );
+        FENIA_NDX_VOID_CALL( rch->getNPC( ), "Leave", "CCRs", rch, ch, from_room, movetype );
     }
 }
 
@@ -200,10 +200,10 @@ static void afprog_entry( Character *ch )
     Affect *paf, *paf_next;
 
     for (paf = ch->affected; paf; paf = paf_next) {
-	paf_next = paf->next;
+        paf_next = paf->next;
 
-	if (paf->type->getAffect( ))
-	    paf->type->getAffect( )->entry( ch, paf );
+        if (paf->type->getAffect( ))
+            paf->type->getAffect( )->entry( ch, paf );
     }
 }
 
@@ -226,13 +226,13 @@ void Movement::callProgsFinish( Character *wch )
     Object *obj, *obj_next;
     
     if (!wch)
-	return;
+        return;
 
     mprog_leave( wch, from_room, movetypes[movetype].name );
 
     for (obj = to_room->contents; obj; obj = obj_next) {
-	obj_next = obj->next_content;
-	oprog_greet( obj, wch );
+        obj_next = obj->next_content;
+        oprog_greet( obj, wch );
     }
 
     mprog_entry( wch );
@@ -247,7 +247,7 @@ void Movement::msgSelfParty( Character *wch, const char *msgSelf, const char *ms
     msgEcho( wch, wch, msgSelf );
     
     if (wch->mount == ch)
-	msgEcho( wch->mount, wch->mount, msgParty );
+        msgEcho( wch->mount, wch->mount, msgParty );
 }
 
 void Movement::msgSelfRoom( Character *wch, const char *msgSelf, const char *msgOther )
@@ -259,28 +259,28 @@ void Movement::msgSelfRoom( Character *wch, const char *msgSelf, const char *msg
 void Movement::msgRoomNoParty( Character *wch, const char *msgRoom )
 {
     for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
-	if (rch != wch && rch != wch->mount)
-	    msgEcho( rch, wch, msgRoom );
+        if (rch != wch && rch != wch->mount)
+            msgEcho( rch, wch, msgRoom );
 }
 
 void Movement::msgRoomNoParty( Character *wch, const char *msgRoomSingle, const char *msgRoomMounted )
 {
     for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
-	if (rch != wch && rch != wch->mount) {
-	    if (ch->mount) {
-		if (ch->mount == wch)
-		    msgEcho( rch, wch, msgRoomMounted );
-	    }
-	    else
-		msgEcho( rch, wch, msgRoomSingle );
-	}
+        if (rch != wch && rch != wch->mount) {
+            if (ch->mount) {
+                if (ch->mount == wch)
+                    msgEcho( rch, wch, msgRoomMounted );
+            }
+            else
+                msgEcho( rch, wch, msgRoomSingle );
+        }
 }
 
 void Movement::msgRoom( Character *wch, const char *msg )
 {
     for (Character *rch = wch->in_room->people; rch; rch = rch->next_in_room)
-	if (rch != wch)
-	    msgEcho( rch, wch, msg );
+        if (rch != wch)
+            msgEcho( rch, wch, msg );
 }
 
 void Movement::msgSelfMaster( Character *wch, const char *msgSelf, const char *msgMaster )
@@ -288,7 +288,7 @@ void Movement::msgSelfMaster( Character *wch, const char *msgSelf, const char *m
     msgEcho( wch, wch, msgSelf );
     
     if (IS_AFFECTED( wch, AFF_CHARM ) && wch->master)
-	msgEcho( wch->master, wch, msgMaster );
+        msgEcho( wch->master, wch, msgMaster );
 }
 
 void Movement::msgSelf( Character *wch, const char *msgSelf )
@@ -299,7 +299,7 @@ void Movement::msgSelf( Character *wch, const char *msgSelf )
 bool Movement::canHear( Character *victim, Character *wch )
 {
     if (!IS_AWAKE(victim))
-	return false;
+        return false;
 
     return victim->can_sense( wch );
 }
@@ -307,17 +307,17 @@ bool Movement::canHear( Character *victim, Character *wch )
 void Movement::msgEcho( Character *victim, Character *wch, const char *msg )
 {
     if (canHear( victim, wch ))
-	victim->pecho( msg, 
-	               (RIDDEN(wch) ? wch->mount : wch),
-	               (MOUNTED(wch) ? wch->mount : wch),
-		       wch );
+        victim->pecho( msg, 
+                       (RIDDEN(wch) ? wch->mount : wch),
+                       (MOUNTED(wch) ? wch->mount : wch),
+                       wch );
 }
 
 bool Movement::canOrderHorse( )
 {
     if (IS_AFFECTED(horse, AFF_CHARM)) 
-	return !horse->master || horse->master == ch;
+        return !horse->master || horse->master == ch;
     else
-	return horse->is_npc( );
+        return horse->is_npc( );
 }
 

@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 
 #include "skill.h"
@@ -48,14 +48,14 @@ SKILL_RUNP( smithing )
 
     if ( ch->is_npc() || !gsn_smithing->usable( ch ))
     {
-	ch->send_to("Чего?\n\r");
-	return;
+        ch->send_to("п╖п╣пЁп╬?\n\r");
+        return;
     }
 
 
     if ( ch->fighting )
     {
-        ch->send_to( "Подожди пока сражение закончится.\n\r");
+        ch->send_to( "п÷п╬п╢п╬п╤п╢п╦ п©п╬п╨п╟ я│я─п╟п╤п╣п╫п╦п╣ п╥п╟п╨п╬п╫я┤п╦я┌я│я▐.\n\r");
         return;
     }
 
@@ -63,58 +63,58 @@ SKILL_RUNP( smithing )
 
     if (arg[0] == '\0')
     {
-	ch->send_to("Какую вещь ты хочешь восстановить?\n\r");
-	return;
+        ch->send_to("п п╟п╨я┐я▌ п╡п╣я┴я▄ я┌я▀ я┘п╬я┤п╣я┬я▄ п╡п╬я│я│я┌п╟п╫п╬п╡п╦я┌я▄?\n\r");
+        return;
     }
 
     if (( obj = get_obj_carry(ch, arg)) == 0)
     {
-	ch->send_to("У тебя нет этого.\n\r");
-	return;
+        ch->send_to("пё я┌п╣п╠я▐ п╫п╣я┌ я█я┌п╬пЁп╬.\n\r");
+        return;
     }
 
    if (obj->condition >= 100)
     {
-	ch->send_to("Но это не повреждено.\n\r");
-	return;
+        ch->send_to("п²п╬ я█я┌п╬ п╫п╣ п©п╬п╡я─п╣п╤п╢п╣п╫п╬.\n\r");
+        return;
     }
 
     if (( hammer = get_eq_char(ch, wear_hold)) == 0)
     {
-	ch->send_to("Но у тебя нет боевого молота.\n\r");
-	return;
+        ch->send_to("п²п╬ я┐ я┌п╣п╠я▐ п╫п╣я┌ п╠п╬п╣п╡п╬пЁп╬ п╪п╬п╩п╬я┌п╟.\n\r");
+        return;
     }
 
     if ( hammer->pIndexData->vnum != OBJ_VNUM_HAMMER )
     {
-	ch->send_to("Но это не молот.\n\r");
-	return;
+        ch->send_to("п²п╬ я█я┌п╬ п╫п╣ п╪п╬п╩п╬я┌.\n\r");
+        return;
     }
 
     ch->setWaitViolence( 2 );
 
     if (ch->isAffected( gsn_inspiration )) {
-	ch->pecho( "%1$^O1 по%1$nет|ют под твоими руками, обретая первозданный вид.", obj );
-	ch->recho( "%1$^O1 по%1$nет|ют под руками %2$C2, обретая первозданный вид.", obj, ch );
-	obj->condition = 100;
+        ch->pecho( "%1$^O1 п©п╬%1$nп╣я┌|я▌я┌ п©п╬п╢ я┌п╡п╬п╦п╪п╦ я─я┐п╨п╟п╪п╦, п╬п╠я─п╣я┌п╟я▐ п©п╣я─п╡п╬п╥п╢п╟п╫п╫я▀п╧ п╡п╦п╢.", obj );
+        ch->recho( "%1$^O1 п©п╬%1$nп╣я┌|я▌я┌ п©п╬п╢ я─я┐п╨п╟п╪п╦ %2$C2, п╬п╠я─п╣я┌п╟я▐ п©п╣я─п╡п╬п╥п╢п╟п╫п╫я▀п╧ п╡п╦п╢.", obj, ch );
+        obj->condition = 100;
     }
     else if ( number_percent() > gsn_smithing->getEffective( ch ) ) {
-	gsn_smithing->improve( ch, false );
-	act_p("$c1 пробует восстановить $o4, но у него не получается.",ch,obj,0,TO_ROOM,POS_RESTING);
-	act_p("У тебя не получилось восстановить $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
-	hammer->condition -= 25;
+        gsn_smithing->improve( ch, false );
+        act_p("$c1 п©я─п╬п╠я┐п╣я┌ п╡п╬я│я│я┌п╟п╫п╬п╡п╦я┌я▄ $o4, п╫п╬ я┐ п╫п╣пЁп╬ п╫п╣ п©п╬п╩я┐я┤п╟п╣я┌я│я▐.",ch,obj,0,TO_ROOM,POS_RESTING);
+        act_p("пё я┌п╣п╠я▐ п╫п╣ п©п╬п╩я┐я┤п╦п╩п╬я│я▄ п╡п╬я│я│я┌п╟п╫п╬п╡п╦я┌я▄ $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
+        hammer->condition -= 25;
     }
     else {
-	gsn_smithing->improve( ch, true );
-	act_p("$c1 восстанавливает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
-	act_p("Ты восстанавливаешь $o4.\n\r",ch,obj,0,TO_CHAR,POS_RESTING);
+        gsn_smithing->improve( ch, true );
+        act_p("$c1 п╡п╬я│я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┌ $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
+        act_p("п╒я▀ п╡п╬я│я│я┌п╟п╫п╟п╡п╩п╦п╡п╟п╣я┬я▄ $o4.\n\r",ch,obj,0,TO_CHAR,POS_RESTING);
 
-	obj->condition += gsn_smithing->getEffective( ch ) / 2;
-	obj->condition = max( 100, obj->condition );
-	hammer->condition -= 25;
+        obj->condition += gsn_smithing->getEffective( ch ) / 2;
+        obj->condition = max( 100, obj->condition );
+        hammer->condition -= 25;
     }
     
     if (hammer->condition < 1)  
-	extract_obj( hammer );
+        extract_obj( hammer );
 }
 

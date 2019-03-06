@@ -50,7 +50,7 @@ VARIABLE	("@"{NAME})|("'"[[:graph:]]*"'")
 	position++;
 }
 
-<INITIAL>{NAME}	{ // È›≈Õ –œ …Õ≈Œ…
+<INITIAL>{NAME}	{ // –ò—â–µ–º –ø–æ –∏–º–µ–Ω–∏
 	DLString name = YYText( );
 	position += name.length( );
 	list = lookupName( name, list );

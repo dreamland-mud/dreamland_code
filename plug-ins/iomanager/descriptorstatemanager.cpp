@@ -36,15 +36,15 @@ void DescriptorStateManager::registrate( DescriptorStateListener::Pointer dsl )
 void DescriptorStateManager::unregistrate( DescriptorStateListener::Pointer dsl ) 
 {
     for (Listeners::iterator i = listeners.begin( ); i != listeners.end( ); i++)
-	if (*i == dsl) {
-	    listeners.erase( i );
-	    break;
-	}
+        if (*i == dsl) {
+            listeners.erase( i );
+            break;
+        }
 }
 
 void DescriptorStateManager::handle( int oldState, int newState, Descriptor *d ) 
 {
     for (Listeners::iterator i = listeners.begin( ); i != listeners.end( ); i++)
-	(*i)->run( oldState, newState, d );
+        (*i)->run( oldState, newState, d );
 }
 

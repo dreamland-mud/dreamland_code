@@ -39,16 +39,16 @@ DLString XMLPCStringPredicate::getString( DLObject *arg ) const
     DLString *str = dynamic_cast<DLString *>( arg );
     
     if (str)
-	return *str;
+        return *str;
     else {
-	PCharacter *pch = dynamic_cast<PCharacter *>( arg );
+        PCharacter *pch = dynamic_cast<PCharacter *>( arg );
 
-	if (!pch) {
-	    LogStream::sendError( ) << getType( ) << ": passed argument of invalid type " << typeid( arg ).name( ) << endl;
-	    return DLString::emptyString;
-	}
-	
-	return getString( pch );
+        if (!pch) {
+            LogStream::sendError( ) << getType( ) << ": passed argument of invalid type " << typeid( arg ).name( ) << endl;
+            return DLString::emptyString;
+        }
+        
+        return getString( pch );
     }
 }
 

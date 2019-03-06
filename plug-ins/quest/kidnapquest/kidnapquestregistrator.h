@@ -18,8 +18,10 @@ public:
     KidnapQuestRegistrator( ); 
     virtual ~KidnapQuestRegistrator( );
     
+    virtual bool applicable( PCharacter *, bool ) const;
+
     static inline KidnapQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
 
     XML_VARIABLE XMLInteger markVnum;

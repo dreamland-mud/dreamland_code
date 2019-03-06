@@ -16,6 +16,6 @@ public:
     FileFormatException( const char * fmt, ... ) throw( );
     virtual ~FileFormatException( ) throw( );
 };
-			
+                        
 
 #endif

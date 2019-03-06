@@ -59,7 +59,7 @@ public:
     
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
-    virtual bool canTeach( NPCharacter *, PCharacter * );
+    virtual bool canTeach( NPCharacter *, PCharacter *, bool verbose = true );
     virtual void practice( PCharacter * ) const;
     
     virtual void show( PCharacter *, std::ostream & );

@@ -42,14 +42,14 @@ public:
 
 class XMLAttributeOLCPlugin : public XMLAttributePlugin {
 public:
-	typedef ::Pointer<XMLAttributeOLCPlugin> Pointer;
+        typedef ::Pointer<XMLAttributeOLCPlugin> Pointer;
 
-	virtual void initialization( );
-	virtual void destruction( );
+        virtual void initialization( );
+        virtual void destruction( );
 
-	virtual const DLString& getName( ) const {
-	    return XMLAttributeOLC::MOC_TYPE;
-	}
+        virtual const DLString& getName( ) const {
+            return XMLAttributeOLC::MOC_TYPE;
+        }
 };
 
 #endif

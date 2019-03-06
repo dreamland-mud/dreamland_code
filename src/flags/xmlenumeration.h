@@ -19,8 +19,8 @@ public:
     void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
 
     inline XMLEnumeration & operator = ( int value ) { 
-	setValue( value );
-	return *this;
+        setValue( value );
+        return *this;
     }
 };
 

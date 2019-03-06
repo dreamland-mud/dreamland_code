@@ -11,12 +11,12 @@
 class ClanGuardFlowers: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardFlowers> Pointer;
+        typedef ::Pointer<ClanGuardFlowers> Pointer;
     
-protected:	
-	virtual bool checkPush( PCharacter * );
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
+protected:        
+        virtual bool checkPush( PCharacter * );
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
 };
 
 #endif

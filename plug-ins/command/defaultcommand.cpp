@@ -25,15 +25,15 @@ DefaultCommand::~DefaultCommand( )
 const DLString & DefaultCommand::getRussianName( ) const
 {
     if (russian.empty( ))
-	return DLString::emptyString;
+        return DLString::emptyString;
     else 
-	return russian.front( );
+        return russian.front( );
 }
 
 bool DefaultCommand::matchesExactly( const DLString &cmdName ) const
 {
     if (Command::matchesExactly( cmdName ))
-	return true;
+        return true;
 
     if (dl_isrusalpha( cmdName.at( 0 ) )) {
         for (XMLStringList::const_iterator i = russian.begin( ); i != russian.end( ); i++) 
@@ -51,20 +51,20 @@ bool DefaultCommand::matchesExactly( const DLString &cmdName ) const
 bool DefaultCommand::matchesAlias( const DLString& command ) const
 {
     if (Command::matchesAlias( command ))
-	return true;
+        return true;
 
     if (command.empty( ))
-	return false;
+        return false;
     
     if (dl_isrusalpha( command.at( 0 ) )) {
-	for (XMLStringList::const_iterator r = russian.begin( ); r != russian.end( ); r++) 
-	    if (command.strPrefix( *r )) 
-		return true;
+        for (XMLStringList::const_iterator r = russian.begin( ); r != russian.end( ); r++) 
+            if (command.strPrefix( *r )) 
+                return true;
     }
     else {
-	for (XMLStringList::const_iterator a = aliases.begin( ); a != aliases.end( ); a++) 
-	    if (command.strPrefix( *a )) 
-		return true;
+        for (XMLStringList::const_iterator a = aliases.begin( ); a != aliases.end( ); a++) 
+            if (command.strPrefix( *a )) 
+                return true;
     }
 
     return false;

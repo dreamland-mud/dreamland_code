@@ -13,12 +13,12 @@
 class ClanGuardInvader: public ClanGuard {
 XML_OBJECT
 public:
-	typedef ::Pointer<ClanGuardInvader> Pointer;
+        typedef ::Pointer<ClanGuardInvader> Pointer;
     
-protected:	
-	virtual void actPush( PCharacter * );
-	virtual void actGreet( PCharacter * );
-	virtual int getCast( Character * );
+protected:        
+        virtual void actPush( PCharacter * );
+        virtual void actGreet( PCharacter * );
+        virtual int getCast( Character * );
 };
 
 class CDarkLeague : public CommandPlugin, public DefaultCommand {

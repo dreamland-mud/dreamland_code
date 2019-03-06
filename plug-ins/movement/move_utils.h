@@ -17,8 +17,8 @@ int  move_char( Character *ch, struct extra_exit_data *peexit, const char *argum
 int  move_char( Character *ch, Object *portal );
 
 void transfer_char( Character *ch, Character *actor, Room *to_room, 
-		    const char *msgRoomLeave = NULL, const char *msgSelfLeave = NULL, 
-		    const char *msgRoomEnter = NULL, const char *msgSelfEnter = NULL );
+                    const char *msgRoomLeave = NULL, const char *msgSelfLeave = NULL, 
+                    const char *msgRoomEnter = NULL, const char *msgSelfEnter = NULL );
 
 
 void strip_camouflage( Character *ch );

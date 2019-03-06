@@ -14,7 +14,7 @@ class DescriptorStateListener;
 class Descriptor;
 
 class DescriptorStateManager : public Plugin, public OneAllocate {
-public:	
+public:        
     typedef ::Pointer<DescriptorStateManager> Pointer;
     typedef ::Pointer<DescriptorStateListener> DescriptorStateListenerPointer;
     typedef std::list<DescriptorStateListenerPointer> Listeners;

@@ -12,14 +12,14 @@
 
 using namespace Scripting;
 
-NMI_GET(IdContainer, fieldKeys, "") 
+NMI_GET(IdContainer, fieldKeys, "список полей структуры") 
 {
     RegList::Pointer rc(NEW);
 
     Idmap::const_iterator i;
     
     for(i = idmap.begin(); i != idmap.end(); i++)
-	rc->push_back( Register( i->first ) );
+        rc->push_back( Register( i->first ) );
     
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -27,12 +27,12 @@ NMI_GET(IdContainer, fieldKeys, "")
     return Register( obj );
 }
 
-NMI_INVOKE(IdContainer, size, "") 
+NMI_INVOKE(IdContainer, size, "(): размер структуры") 
 {
     return Register( (int)idmap.size( ) );
 }
 
-NMI_INVOKE(IdContainer, api, "") 
+NMI_INVOKE(IdContainer, api, "(): печатает этот api") 
 {
     Idmap::const_iterator i;
     ostringstream buf;
@@ -41,7 +41,7 @@ NMI_INVOKE(IdContainer, api, "")
 
     buf << endl << endl << "{WRuntime fields:{x" << endl;
     for(i = idmap.begin(); i != idmap.end(); i++)
-	buf << "{x" << Lex::getThis( )->getName( i->first ) << "{x" << endl;
+        buf << "{x" << Lex::getThis( )->getName( i->first ) << "{x" << endl;
      
     return Register( buf.str( ) );
 }

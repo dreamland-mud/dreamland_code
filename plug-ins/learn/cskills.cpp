@@ -25,8 +25,8 @@ CMDRUN( skills )
     slist.rcmd = getRussianName( );
 
     if (!slist.parse( argument, buf, ch )) {
-	ch->send_to( buf );
-	return;
+        ch->send_to( buf );
+        return;
     }
     
     slist.make( ch );
@@ -53,8 +53,8 @@ CMDRUN( spells )
     slist.rcmd = getRussianName( );
 
     if (!slist.parse( argument, buf, ch )) {
-	ch->send_to( buf );
-	return;
+        ch->send_to( buf );
+        return;
     }
     
     slist.make( ch );

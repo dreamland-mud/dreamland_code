@@ -36,7 +36,7 @@ public:
     XML_VARIABLE XMLShort  delivered;
 
 protected:
-    virtual bool checkRoomVictim( PCharacter *, Room * );
+    virtual bool checkRoomVictim( PCharacter *, Room *, NPCharacter * );
     virtual bool checkMobileClient( PCharacter *, NPCharacter * );
     virtual bool checkMobileVictim( PCharacter *, NPCharacter * );
 };
@@ -47,10 +47,10 @@ public:
     ButcherQuestRegistrator( );
     virtual ~ButcherQuestRegistrator( );
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter *, bool ) const;
 
     static inline ButcherQuestRegistrator * getThis( ) {
-	return thisClass;
+        return thisClass;
     }
     
     XML_VARIABLE XMLReverseVector<XMLString> races;

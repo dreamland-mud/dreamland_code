@@ -6,6 +6,7 @@
 #include "save.h"
 
 #include "affect.h"
+#include "outofband.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -27,61 +28,63 @@ void limit_timestamp( Object *obj, Character *ch );
  */
 void char_from_room( Character *ch )
 {
-	Object *obj;
+        Object *obj;
 
-	if ( ch->in_room == 0 )
-	{
-		bug( "Char_from_room: 0.", 0 );
-		return;
-	}
+        if ( ch->in_room == 0 )
+        {
+                bug( "Char_from_room: 0.", 0 );
+                return;
+        }
 
-	if ( !ch->is_npc() )
-	{
-		--ch->in_room->area->nplayer;
+        if ( !ch->is_npc() )
+        {
+                --ch->in_room->area->nplayer;
+        }
 
-		if ( ch->death_ground_delay > 0 )
-		{
-			ch->death_ground_delay = 0;
-			ch->trap.clear( );
-		}
-	}
+        if ( ch->death_ground_delay > 0 )
+        {
+                ch->death_ground_delay = 0;
+                ch->trap.clear( );
+        }
 
-	if ( ( obj = wear_light->find( ch ) ) != 0
-		&& obj->item_type == ITEM_LIGHT
-		&& obj->value[2] != 0
-		&& ch->in_room->light > 0 )
-		--ch->in_room->light;
+        if ( ( obj = wear_light->find( ch ) ) != 0
+                && obj->item_type == ITEM_LIGHT
+                && obj->value[2] != 0
+                && ch->in_room->light > 0 )
+                --ch->in_room->light;
 
-	if ( ch == ch->in_room->people )
-	{
-		ch->in_room->people = ch->next_in_room;
-	}
-	else
-	{
-		Character *prev;
+        if ( ch == ch->in_room->people )
+        {
+                ch->in_room->people = ch->next_in_room;
+        }
+        else
+        {
+                Character *prev;
 
-		for ( prev = ch->in_room->people; prev; prev = prev->next_in_room )
-		{
-			if ( prev->next_in_room == ch )
-			{
-				prev->next_in_room = ch->next_in_room;
-				break;
-			}
-		}
+                for ( prev = ch->in_room->people; prev; prev = prev->next_in_room )
+                {
+                        if ( prev->next_in_room == ch )
+                        {
+                                prev->next_in_room = ch->next_in_room;
+                                break;
+                        }
+                }
 
-		if ( prev == 0 )
-			bug( "Char_from_room: ch not found.", 0 );
-	}
+                if ( prev == 0 )
+                        bug( "Char_from_room: ch not found.", 0 );
+        }
 
-	if ( ch->is_npc( )
-		&& !IS_AFFECTED(ch,AFF_CHARM) )
-	{
-		save_mobs( ch->in_room );
-	}
+        if ( ch->is_npc( )
+                && !IS_AFFECTED(ch,AFF_CHARM) )
+        {
+                save_mobs( ch->in_room );
+        }
 
-	ch->in_room      = 0;
-	ch->next_in_room = 0;
-	ch->on 	     = 0;  /* sanity check! */
+//      outOfBandManager->run("mobListUpdate", MobListUpdateArgs(ch->desc));
+
+        ch->in_room      = 0;
+        ch->next_in_room = 0;
+        ch->on              = 0;  /* sanity check! */
 }
 
 
@@ -91,70 +94,71 @@ void char_from_room( Character *ch )
  */
 void char_to_room( Character *ch, Room *pRoomIndex )
 {
-	Object *obj;
-	Character *pop;
-	int cnt = 0;
+        Object *obj;
+        Character *pop;
+        int cnt = 0;
 
-	if ( pRoomIndex == 0 )
-	{
-		Room *room;
+        if ( pRoomIndex == 0 )
+        {
+                Room *room;
 
-		bug( "Char_to_room: 0.", 0 );
-	
-		if ((room = get_room_index(ROOM_VNUM_TEMPLE)) != 0)
-			char_to_room(ch,room);
-	
-		return;
-	}
+                bug( "Char_to_room: 0.", 0 );
+        
+                if ((room = get_room_index(ROOM_VNUM_TEMPLE)) != 0)
+                        char_to_room(ch,room);
+        
+                return;
+        }
 
-	for(pop = pRoomIndex->people;
-			pop;
-			pop = pop->next_in_room, cnt++ );
-	
-	if( cnt > 0 )
-		cnt = number_range(0, cnt);
+        for(pop = pRoomIndex->people;
+                        pop;
+                        pop = pop->next_in_room, cnt++ );
+        
+        if( cnt > 0 )
+                cnt = number_range(0, cnt);
 
-	ch->in_room					= pRoomIndex;
+        ch->in_room                                        = pRoomIndex;
 
-	if( cnt > 0 )
-	{
-		pop = pRoomIndex->people;
+        if( cnt > 0 )
+        {
+                pop = pRoomIndex->people;
 
-		while( --cnt )
-			pop = pop->next_in_room;
+                while( --cnt )
+                        pop = pop->next_in_room;
 
-		ch->next_in_room = pop->next_in_room;
-		pop->next_in_room = ch;
-	}
-	else
-	{
-		ch->next_in_room		= pRoomIndex->people;
-		pRoomIndex->people	= ch;
-	}
+                ch->next_in_room = pop->next_in_room;
+                pop->next_in_room = ch;
+        }
+        else
+        {
+                ch->next_in_room                = pRoomIndex->people;
+                pRoomIndex->people        = ch;
+        }
 
-	if ( !ch->is_npc() )
-	{
-		if (ch->in_room->area->empty)
-		{
-			ch->in_room->area->empty = false;
-			ch->in_room->area->age = 0;
-		}
-		++ch->in_room->area->nplayer;
-	}
+        if ( !ch->is_npc() )
+        {
+                if (ch->in_room->area->empty)
+                {
+                        ch->in_room->area->empty = false;
+                        ch->in_room->area->age = 0;
+                }
+                ++ch->in_room->area->nplayer;
+        }
 
-	if ( ( obj = wear_light->find( ch ) ) != 0
-		&& obj->item_type == ITEM_LIGHT
+        if ( ( obj = wear_light->find( ch ) ) != 0
+                && obj->item_type == ITEM_LIGHT
                 && obj->value[2] != 0 )
-		++ch->in_room->light;
-	
+                ++ch->in_room->light;
+        
 
-	if ( ch->is_npc( )
-		&& !IS_AFFECTED(ch,AFF_CHARM)  )
-	{
-		save_mobs( pRoomIndex );
-	}
+        if ( ch->is_npc( )
+                && !IS_AFFECTED(ch,AFF_CHARM)  )
+        {
+                save_mobs( pRoomIndex );
+        }
 
-	return;
+        outOfBandManager->run("charToRoom", CharToRoomArgs(ch->desc));
+//      outOfBandManager->run("mobListUpdate", MobListUpdateArgs(ch->desc));
 }
 
 
@@ -163,20 +167,20 @@ void char_to_room( Character *ch, Room *pRoomIndex )
  */
 void obj_to_char( Object *obj, Character *ch )
 {
-	obj->next_content	 = ch->carrying;
-	ch->carrying	 = obj;
-	obj->carried_by	 = ch;
-	obj->in_room	 = 0;
-	obj->in_obj		 = 0;
-	ch->carry_number	+= obj->getNumber( );
-	ch->carry_weight	+= obj->getWeight( );
+        obj->next_content         = ch->carrying;
+        ch->carrying         = obj;
+        obj->carried_by         = ch;
+        obj->in_room         = 0;
+        obj->in_obj                 = 0;
+        ch->carry_number        += obj->getNumber( );
+        ch->carry_weight        += obj->getWeight( );
 
-	if ( ch->is_npc( )
-		&& !IS_AFFECTED( ch, AFF_CHARM )
-		&& ch->in_room != 0 )
-	{
-		save_mobs( ch->in_room );
-	}
+        if ( ch->is_npc( )
+                && !IS_AFFECTED( ch, AFF_CHARM )
+                && ch->in_room != 0 )
+        {
+                save_mobs( ch->in_room );
+        }
 
         limit_timestamp( obj, ch );
 }
@@ -186,52 +190,52 @@ void obj_to_char( Object *obj, Character *ch )
  */
 void obj_from_char( Object *obj )
 {
-	Character *ch;
+        Character *ch;
 
-	if ( ( ch = obj->carried_by ) == 0 )
-	{
-		bug( "Obj_from_char: null ch.", 0 );
-		return;
-	}
-	
-	obj->wear_loc->unequip( obj );
+        if ( ( ch = obj->carried_by ) == 0 )
+        {
+                bug( "Obj_from_char: null ch.", 0 );
+                return;
+        }
+        
+        obj->wear_loc->unequip( obj );
 
-	if ( ch->carrying == obj )
-	{
-		ch->carrying = obj->next_content;
-	}
-	else
-	{
-		Object *prev;
+        if ( ch->carrying == obj )
+        {
+                ch->carrying = obj->next_content;
+        }
+        else
+        {
+                Object *prev;
 
-		for ( prev = ch->carrying; prev != 0; prev = prev->next_content )
-		{
-			if ( prev->next_content == obj )
-			{
-				prev->next_content = obj->next_content;
-				break;
-			}
-		}
+                for ( prev = ch->carrying; prev != 0; prev = prev->next_content )
+                {
+                        if ( prev->next_content == obj )
+                        {
+                                prev->next_content = obj->next_content;
+                                break;
+                        }
+                }
 
-		if ( prev == 0 )
-			bug( "Obj_from_char: obj not in list.", 0 );
-	}
+                if ( prev == 0 )
+                        bug( "Obj_from_char: obj not in list.", 0 );
+        }
 
-	obj->carried_by		= 0;
-	obj->wear_loc			= wear_none;
-	obj->next_content	= 0;
-	ch->carry_number	-= obj->getNumber( );
-	ch->carry_weight	-= obj->getWeight( );
+        obj->carried_by                = 0;
+        obj->wear_loc                        = wear_none;
+        obj->next_content        = 0;
+        ch->carry_number        -= obj->getNumber( );
+        ch->carry_weight        -= obj->getWeight( );
 
-	if ( ch->is_npc( )
-		&& !IS_AFFECTED( ch, AFF_CHARM )
-		&& ch->in_room != 0 )
-	{
-		save_mobs( ch->in_room );
-	}
+        if ( ch->is_npc( )
+                && !IS_AFFECTED( ch, AFF_CHARM )
+                && ch->in_room != 0 )
+        {
+                save_mobs( ch->in_room );
+        }
 
 
-	return;
+        return;
 }
 
 
@@ -240,51 +244,51 @@ void obj_from_char( Object *obj )
  */
 void obj_from_room( Object *obj )
 {
-	Room *in_room;
-	Character *ch;
+        Room *in_room;
+        Character *ch;
 
-	if ( ( in_room = obj->in_room ) == 0 )
-	{
-		bug( "obj_from_room: 0.", 0 );
-		return;
-	}
+        if ( ( in_room = obj->in_room ) == 0 )
+        {
+                bug( "obj_from_room: 0.", 0 );
+                return;
+        }
 
-	for (ch = in_room->people; ch != 0; ch = ch->next_in_room)
-		if (ch->on == obj)
-			ch->on = 0;
+        for (ch = in_room->people; ch != 0; ch = ch->next_in_room)
+                if (ch->on == obj)
+                        ch->on = 0;
 
-	if ( obj == in_room->contents )
-	{
-		in_room->contents = obj->next_content;
-	}
-	else
-	{
-		Object *prev;
+        if ( obj == in_room->contents )
+        {
+                in_room->contents = obj->next_content;
+        }
+        else
+        {
+                Object *prev;
 
-		for ( prev = in_room->contents; prev; prev = prev->next_content )
-		{
-			if ( prev->next_content == obj )
-			{
-				prev->next_content = obj->next_content;
-				break;
-			}
-		}
+                for ( prev = in_room->contents; prev; prev = prev->next_content )
+                {
+                        if ( prev->next_content == obj )
+                        {
+                                prev->next_content = obj->next_content;
+                                break;
+                        }
+                }
 
-		if ( prev == 0 )
-		{
-			bug( "Obj_from_room: obj not found.", 0 );
-			return;
-		}
-	}
+                if ( prev == 0 )
+                {
+                        bug( "Obj_from_room: obj not found.", 0 );
+                        return;
+                }
+        }
 
-	Room * pRoomIndex = obj->in_room;
+        Room * pRoomIndex = obj->in_room;
 
-	obj->in_room      = 0;
-	obj->next_content = 0;
+        obj->in_room      = 0;
+        obj->next_content = 0;
 
-	save_items( pRoomIndex );
+        save_items( pRoomIndex );
 
-	return;
+        return;
 }
 
 /*
@@ -292,15 +296,15 @@ void obj_from_room( Object *obj )
  */
 void obj_to_room( Object *obj, Room *pRoomIndex )
 {
-	obj->next_content = pRoomIndex->contents;
-	pRoomIndex->contents = obj;
-	obj->in_room = pRoomIndex;
-	obj->carried_by = 0;
-	obj->in_obj = 0;
-	obj->wear_loc = wear_none;
-	obj->water_float = -2;
+        obj->next_content = pRoomIndex->contents;
+        pRoomIndex->contents = obj;
+        obj->in_room = pRoomIndex;
+        obj->carried_by = 0;
+        obj->in_obj = 0;
+        obj->wear_loc = wear_none;
+        obj->water_float = -2;
 
-	save_items( pRoomIndex );
+        save_items( pRoomIndex );
 }
 
 
@@ -310,28 +314,28 @@ void obj_to_room( Object *obj, Room *pRoomIndex )
  */
 void obj_to_obj( Object *obj, Object *obj_to )
 {
-	obj->next_content		= obj_to->contains;
-	obj_to->contains		= obj;
-	obj->in_obj			= obj_to;
-	obj->in_room		= 0;
-	obj->carried_by		= 0;
+        obj->next_content                = obj_to->contains;
+        obj_to->contains                = obj;
+        obj->in_obj                        = obj_to;
+        obj->in_room                = 0;
+        obj->carried_by                = 0;
 
-	if (IS_PIT(obj_to))
-		obj->cost = 0;
+        if (IS_PIT(obj_to))
+                obj->cost = 0;
 
-	for ( ; obj_to != 0; obj_to = obj_to->in_obj )
-	{
-		if ( obj_to->carried_by != 0 )
-		{
-			// obj_to->carried_by->carry_number += obj->getNumber( );
-			obj_to->carried_by->carry_weight += obj->getWeight( )
-						* obj_to->getWeightMultiplier() / 100;
-		}
-	}
+        for ( ; obj_to != 0; obj_to = obj_to->in_obj )
+        {
+                if ( obj_to->carried_by != 0 )
+                {
+                        // obj_to->carried_by->carry_number += obj->getNumber( );
+                        obj_to->carried_by->carry_weight += obj->getWeight( )
+                                                * obj_to->getWeightMultiplier() / 100;
+                }
+        }
 
-	save_items_at_holder( obj );
+        save_items_at_holder( obj );
 
-	return;
+        return;
 }
 
 void obj_to_obj_random( Object *item, Object *obj_to )
@@ -340,73 +344,73 @@ void obj_to_obj_random( Object *item, Object *obj_to )
     int n = number_range( 2, 13 );
     
     for (obj = obj_to->contains; obj && --n; obj = obj->next_content)
-	obj_prev = obj;
+        obj_prev = obj;
     
     if (obj) {
-	obj_prev->next_content = item;
-	item->next_content = obj;
-	item->in_obj = obj_to;
+        obj_prev->next_content = item;
+        item->next_content = obj;
+        item->in_obj = obj_to;
     }
     else
-	obj_to_obj( item, obj_to );
-}	    
-	
+        obj_to_obj( item, obj_to );
+}            
+        
 /*
  * Move an object out of an object.
  */
 void obj_from_obj( Object *obj )
 {
-	Object *obj_from;
+        Object *obj_from;
 
-	if ( ( obj_from = obj->in_obj ) == 0 )
-	{
-		bug( "Obj_from_obj: null obj_from.", 0 );
-		return;
-	}
+        if ( ( obj_from = obj->in_obj ) == 0 )
+        {
+                bug( "Obj_from_obj: null obj_from.", 0 );
+                return;
+        }
 
-	Object *u_obj = obj_from;
+        Object *u_obj = obj_from;
 
-	if ( obj == obj_from->contains )
-	{
-		obj_from->contains = obj->next_content;
-	}
-	else
-	{
-		Object *prev;
+        if ( obj == obj_from->contains )
+        {
+                obj_from->contains = obj->next_content;
+        }
+        else
+        {
+                Object *prev;
 
-		for ( prev = obj_from->contains; prev; prev = prev->next_content )
-		{
-			if ( prev->next_content == obj )
-			{
-				prev->next_content = obj->next_content;
-				break;
-			}
-		}
+                for ( prev = obj_from->contains; prev; prev = prev->next_content )
+                {
+                        if ( prev->next_content == obj )
+                        {
+                                prev->next_content = obj->next_content;
+                                break;
+                        }
+                }
 
-		if ( prev == 0 )
-		{
-			bug( "Obj_from_obj: obj not found.", 0 );
-			return;
-		}
-	}
+                if ( prev == 0 )
+                {
+                        bug( "Obj_from_obj: obj not found.", 0 );
+                        return;
+                }
+        }
 
-	obj->next_content = 0;
-	obj->in_obj       = 0;
-	obj->pocket = "";
+        obj->next_content = 0;
+        obj->in_obj       = 0;
+        obj->pocket = "";
 
-	for ( ; obj_from != 0; obj_from = obj_from->in_obj )
-	{
-		if ( obj_from->carried_by != 0 )
-		{
-			// obj_from->carried_by->carry_number -= obj->getNumber( );
-			obj_from->carried_by->carry_weight -= obj->getWeight( )
-					* obj_from->getWeightMultiplier() / 100;
-		}
-	}
+        for ( ; obj_from != 0; obj_from = obj_from->in_obj )
+        {
+                if ( obj_from->carried_by != 0 )
+                {
+                        // obj_from->carried_by->carry_number -= obj->getNumber( );
+                        obj_from->carried_by->carry_weight -= obj->getWeight( )
+                                        * obj_from->getWeightMultiplier() / 100;
+                }
+        }
 
-	save_items_at_holder( u_obj );
+        save_items_at_holder( u_obj );
 
-	return;
+        return;
 }
 
 
@@ -418,13 +422,13 @@ void extract_grave( Character *ch )
     Object *grave = get_obj_world_unique( OBJ_VNUM_GRAVE, ch );
 
     if (grave)
-	extract_obj( grave );
+        extract_obj( grave );
 }
 
 void undig( Character *ch ) 
 {
     if (!DIGGED(ch)) 
-	return;
+        return;
     
     REMOVE_BIT(ch->act, PLR_DIGGED);
     char_from_room( ch ); 
@@ -432,19 +436,19 @@ void undig( Character *ch )
     ch->was_in_room = 0; 
 
     if (ch->ambushing && ch->ambushing[0]) {
-	free_string( ch->ambushing );
-	ch->ambushing = &str_empty[0]; 
+        free_string( ch->ambushing );
+        ch->ambushing = &str_empty[0]; 
     }
 
-    act_p("ôÙ ×ÙËÁÐÙ×ÁÅÛØÓÑ ÉÚ ÚÅÍÌÉ.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    act_p("úÅÍÌÑ ÛÅ×ÅÌÉÔÓÑ, É $c1 ×ÙËÁÐÙ×ÁÅÔÓÑ ÉÚ Ó×ÏÅÊ ÍÏÇÉÌÙ.", ch, 0, 0, TO_ROOM, POS_RESTING ); 
+    act_p("Ð¢Ñ‹ Ð²Ñ‹ÐºÐ°Ð¿Ñ‹Ð²Ð°ÐµÑˆÑŒÑÑ Ð¸Ð· Ð·ÐµÐ¼Ð»Ð¸.", ch, 0, 0, TO_CHAR, POS_DEAD); 
+    act_p("Ð—ÐµÐ¼Ð»Ñ ÑˆÐµÐ²ÐµÐ»Ð¸Ñ‚ÑÑ, Ð¸ $c1 Ð²Ñ‹ÐºÐ°Ð¿Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ð¸Ð· ÑÐ²Ð¾ÐµÐ¹ Ð¼Ð¾Ð³Ð¸Ð»Ñ‹.", ch, 0, 0, TO_ROOM, POS_RESTING ); 
     extract_grave( ch );
 }
 
 void undig_earthquake( Character *ch ) 
 {
     if (!DIGGED(ch)) 
-	return;
+        return;
     
     REMOVE_BIT(ch->act, PLR_DIGGED);
     char_from_room( ch ); 
@@ -452,12 +456,12 @@ void undig_earthquake( Character *ch )
     ch->was_in_room = 0; 
 
     if (ch->ambushing && ch->ambushing[0]) {
-	free_string( ch->ambushing );
-	ch->ambushing = &str_empty[0]; 
+        free_string( ch->ambushing );
+        ch->ambushing = &str_empty[0]; 
     }
 
-    act_p("úÅÍÌÑÔÒÑÓÅÎÉÅ ÚÁÓÔÁ×ÌÑÅÔ ÔÅÂÑ ×ÙÂÒÁÔØÓÑ ÉÚ ÍÏÇÉÌÙ.", ch, 0, 0, TO_CHAR, POS_DEAD); 
-    act_p("úÅÍÌÑ ÒÁÓËÁÌÙ×ÁÅÔÓÑ, ÏÂÎÁÒÕÖÉ×ÁÑ ÌÅÖÁ×Û$gÏÅ|ÅÇÏ|ÕÀ × ÎÅÊ $c2!", ch, 0, 0, TO_ROOM, POS_RESTING); 
+    act_p("Ð—ÐµÐ¼Ð»ÑÑ‚Ñ€ÑÑÐµÐ½Ð¸Ðµ Ð·Ð°ÑÑ‚Ð°Ð²Ð»ÑÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ð¸Ð· Ð¼Ð¾Ð³Ð¸Ð»Ñ‹.", ch, 0, 0, TO_CHAR, POS_DEAD); 
+    act_p("Ð—ÐµÐ¼Ð»Ñ Ñ€Ð°ÑÐºÐ°Ð»Ñ‹Ð²Ð°ÐµÑ‚ÑÑ, Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶Ð¸Ð²Ð°Ñ Ð»ÐµÐ¶Ð°Ð²Ñˆ$gÐ¾Ðµ|ÐµÐ³Ð¾|ÑƒÑŽ Ð² Ð½ÐµÐ¹ $c2!", ch, 0, 0, TO_ROOM, POS_RESTING); 
     extract_grave( ch );
 }
 
@@ -467,13 +471,13 @@ void undig_earthquake( Character *ch )
 void obj_from_list( Object *obj )
 {
     if (obj->prev) {
-	obj->prev->next = obj->next;
+        obj->prev->next = obj->next;
     } else {
-	object_list = obj->next;
+        object_list = obj->next;
     }
     
     if (obj->next) {
-	obj->next->prev = obj->prev;
+        obj->next->prev = obj->prev;
     }
 
     obj->next = 0;
@@ -483,12 +487,12 @@ void obj_from_list( Object *obj )
 void obj_to_list( Object *obj )
 {
     if (object_list) {
-	object_list->prev = obj;
+        object_list->prev = obj;
     }
 
-    obj->next		= object_list;
-    object_list		= obj;
-    obj->prev		= 0;
+    obj->next                = object_list;
+    object_list                = obj;
+    obj->prev                = 0;
 }
 
 /*
@@ -497,7 +501,7 @@ void obj_to_list( Object *obj )
 void char_to_list( Character *ch, Character **list )
 {
     if (*list) {
-	(*list)->prev = ch;
+        (*list)->prev = ch;
     }
 
     ch->next = *list;
@@ -508,13 +512,13 @@ void char_to_list( Character *ch, Character **list )
 void char_from_list( Character *ch, Character **list )
 {
     if (ch->prev) {
-	ch->prev->next = ch->next;
+        ch->prev->next = ch->next;
     } else {
-	*list = ch->next;
+        *list = ch->next;
     }
     
     if (ch->next) {
-	ch->next->prev = ch->prev;
+        ch->next->prev = ch->prev;
     }
 
     ch->next = 0;

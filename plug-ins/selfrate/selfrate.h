@@ -13,6 +13,7 @@
 #include "xmlvariablecontainer.h"
 
 class PCMemoryInterface;
+class PCharacter;
 
 bool rated_as_newbie( PCMemoryInterface* );
 bool rated_as_expert( PCMemoryInterface* );
@@ -22,14 +23,14 @@ class XMLAttributeSelfRate : public EventHandler<WhoisArguments>,
                              public XMLVariableContainer {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeSelfRate> Pointer;
+        typedef ::Pointer<XMLAttributeSelfRate> Pointer;
 
-	XMLAttributeSelfRate( );
-	
-	virtual bool handle( const WhoisArguments & );
+        XMLAttributeSelfRate( );
+        
+        virtual bool handle( const WhoisArguments & );
 
-	DLString getRateAlias( ) const;
-	XML_VARIABLE XMLShort rate;
+        DLString getRateAlias( PCharacter *looker = NULL ) const;
+        XML_VARIABLE XMLShort rate;
 };
 
 #endif

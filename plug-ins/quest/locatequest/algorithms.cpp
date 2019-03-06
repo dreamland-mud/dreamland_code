@@ -24,27 +24,27 @@ struct DoorFunc {
 
     bool operator () ( Room *const, EXIT_DATA *exit ) const
     {
-	Room *room = exit->u1.to_room;
-	
-	if (!room || !ch)
-	    return false;
+        Room *room = exit->u1.to_room;
+        
+        if (!room || !ch)
+            return false;
 
-	if (IS_SET(room->room_flags, ROOM_SOLITARY|ROOM_PRIVATE ))
-	    return false;
+        if (IS_SET(room->room_flags, ROOM_SOLITARY|ROOM_PRIVATE ))
+            return false;
 
-	if (IS_WATER(room))
-	    return false;
+        if (IS_WATER(room))
+            return false;
 
-	if (IS_SET( room->area->area_flag, AREA_NOQUEST ))
-	    return false;
+        if (IS_SET( room->area->area_flag, AREA_NOQUEST ))
+            return false;
 
-	if (room->area->low_range > ch->getModifyLevel( ))
-	    return false;
+        if (room->area->low_range > ch->getModifyLevel( ))
+            return false;
 
-	if (!ch->canEnter( room ))
-	    return false;
-	
-	return true;
+        if (!ch->canEnter( room ))
+            return false;
+        
+        return true;
     }
     
     Character *ch;
@@ -54,7 +54,7 @@ struct ExtraExitFunc {
 
     bool operator () ( Room *const room, EXTRA_EXIT_DATA *eexit ) const
     {
-	return false;
+        return false;
     }
 };
 struct PortalFunc {
@@ -62,7 +62,7 @@ struct PortalFunc {
 
     bool operator () ( Room *const room, Object *portal ) const
     {
-	return false;
+        return false;
     }
 };
 
@@ -75,19 +75,19 @@ struct FindPathComplete {
     typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
     
     FindPathComplete( Room *t, std::vector<Room *> &r ) 
-	    : target( t ), result( r )
+            : target( t ), result( r )
     { 
     }
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->node != target)
-	    return false;
-	
-	for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
-	    result.push_back( i->node );
+        if (head->node != target)
+            return false;
+        
+        for (const MyNodesEntry *i = head; i->prev; i = i->prev) 
+            result.push_back( i->node );
 
-	return true;
+        return true;
     }
     
     Room *target;
@@ -101,25 +101,25 @@ struct RoomsNearComplete {
     typedef NodesEntry<RoomTraverseTraits> MyNodesEntry;
     
     RoomsNearComplete( Room *s, int rd, std::vector<Room *> &r ) 
-	    : src( s ), radius( rd ), rooms( r )
+            : src( s ), radius( rd ), rooms( r )
     { 
     }
 
     inline bool operator () ( const MyNodesEntry *const head, bool last ) 
     {
-	if (head->generation < radius && !last)
-	    return false;
-	
-	const MyNodesEntry *i;
+        if (head->generation < radius && !last)
+            return false;
+        
+        const MyNodesEntry *i;
 
-	for (i = head; i->prev; i = i->prev) 
-	    ;
-	
-	for ( ; i != head; i++)
-	    if (i->node != src)
-		rooms.push_back( i->node );
+        for (i = head; i->prev; i = i->prev) 
+            ;
+        
+        for ( ; i != head; i++)
+            if (i->node != src)
+                rooms.push_back( i->node );
 
-	return true;
+        return true;
     }
     
     Room *src;
@@ -131,18 +131,18 @@ struct RoomsNearComplete {
  * "middle-point" scatter algorithm 
  *----------------------------------------------------------------------------*/
 
-bool LocateMiddlePointAlgo::needsEndPoint( )
+bool LocateMiddlePointAlgo::needsEndPoint( ) const
 {
     return true;
 }
 
-int LocateMiddlePointAlgo::getRadius( )
+int LocateMiddlePointAlgo::getRadius( ) const
 {
     return number_range( 4, 10 );
 }
 
 void LocateMiddlePointAlgo::findRooms( 
-	PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms )
+        PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms ) const
 {
     int i;
     DoorFunc df( pch ); ExtraExitFunc eef; PortalFunc pf;
@@ -150,10 +150,10 @@ void LocateMiddlePointAlgo::findRooms(
 
     FindPathComplete fpComplete( target, rooms );
     room_traverse<MyHookIterator, FindPathComplete>( 
-	    src, iter, fpComplete, 10000 );
+            src, iter, fpComplete, 10000 );
 
     if (rooms.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
     
     i = URANGE( 0, number_fuzzy( rooms.size( ) / 2 ), (int)rooms.size( ) - 1 );
     src = rooms[i];
@@ -161,57 +161,57 @@ void LocateMiddlePointAlgo::findRooms(
 
     RoomsNearComplete rnComplete( src, getRadius( ), rooms );
     room_traverse<MyHookIterator, RoomsNearComplete>( 
-	    src, iter, rnComplete, 10000 );
+            src, iter, rnComplete, 10000 );
     
     if (rooms.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }
     
 /*-----------------------------------------------------------------------------
  * "radial" scatter algorithm 
  *----------------------------------------------------------------------------*/
-bool LocateRadialAlgo::needsEndPoint( )
+bool LocateRadialAlgo::needsEndPoint( ) const
 {
     return false;
 }
 
-int LocateRadialAlgo::getRadius( )
+int LocateRadialAlgo::getRadius( ) const
 {
     return number_range( 6, 16 );
 }
 
 void LocateRadialAlgo::findRooms( 
-	PCharacter *pch, Room *src, Room *, LocateAlgo::Rooms &rooms )
+        PCharacter *pch, Room *src, Room *, LocateAlgo::Rooms &rooms ) const
 {
     DoorFunc df( pch ); ExtraExitFunc eef; PortalFunc pf;
     MyHookIterator iter( df, eef, pf, 5 );
 
     RoomsNearComplete rnComplete( src, getRadius( ), rooms );
     room_traverse<MyHookIterator, RoomsNearComplete>( 
-	    src, iter, rnComplete, 10000 );
+            src, iter, rnComplete, 10000 );
    
     if (rooms.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }
 
 /*-----------------------------------------------------------------------------
  * "uniform" scatter algorithm 
  *----------------------------------------------------------------------------*/
-bool LocateUniformAlgo::needsEndPoint( )
+bool LocateUniformAlgo::needsEndPoint( ) const
 {
     return true;
 }
 
 void LocateUniformAlgo::findRooms( 
-	PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms )
+        PCharacter *pch, Room *src, Room *target, LocateAlgo::Rooms &rooms ) const
 {
     DoorFunc df( pch ); ExtraExitFunc eef; PortalFunc pf;
     MyHookIterator iter( df, eef, pf, 5 );
 
     FindPathComplete fpComplete( target, rooms );
     room_traverse<MyHookIterator, FindPathComplete>( 
-	    src, iter, fpComplete, 10000 );
+            src, iter, fpComplete, 10000 );
 
     if (rooms.empty( ))
-	throw QuestCannotStartException( );
+        throw QuestCannotStartException( );
 }

@@ -14,16 +14,16 @@ class PCharacter;
 class FixRemortListener : public DescriptorStateListener {
 public:
         typedef ::Pointer<FixRemortListener> Pointer;
-	
+        
         virtual void run( int, int, Descriptor * );
-	
+        
 private:
-	void fixNewRemort( PCharacter * );
-	void fixOldRemort( PCharacter * );
-	Object * makeCorpse( PCharacter * );
-	void adjustObjects( PCharacter *, Object *, Object * );
-	void adjustExp( PCharacter * );
-	void adjustBonuses( PCharacter * );
+        void fixNewRemort( PCharacter * );
+        void fixOldRemort( PCharacter * );
+        Object * makeCorpse( PCharacter * );
+        void adjustObjects( PCharacter *, Object *, Object * );
+        void adjustExp( PCharacter * );
+        void adjustBonuses( PCharacter * );
 };
 
 #endif

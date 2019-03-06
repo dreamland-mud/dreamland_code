@@ -4,11 +4,11 @@
  * rewritten... twice
  */
 /***************************************************************************
-	      generate.cpp  -  description
-		 -------------------
-    begin	: Wed Nov 22 2000
-    copyright	: (C) 2000 by Igor S. Petrenko
-    email	: nofate@europe.com
+              generate.cpp  -  description
+                 -------------------
+    begin        : Wed Nov 22 2000
+    copyright        : (C) 2000 by Igor S. Petrenko
+    email        : nofate@europe.com
  ***************************************************************************/
 
 #include <fstream>
@@ -26,13 +26,13 @@
 
 using namespace std;
 
-ofstream	fmoc;
+ofstream        fmoc;
 
-extern    char**	environ;
+extern    char**        environ;
 
 static void 
 appendNodes( System::ClassType::MapNodeType::value_type value, 
-	     System::ClassType::MapNodeType* nodes )
+             System::ClassType::MapNodeType* nodes )
 {
     System::NodeType& v = value.second;
     ( *nodes )[value.first] = v;
@@ -42,17 +42,17 @@ void error(const string &text);
 
 static void 
 ancestors( System::ListStringType::value_type value, 
-	   System::ClassType::MapNodeType* nodes )
+           System::ClassType::MapNodeType* nodes )
 {
     System::MapClassType::iterator ca = System::getClassMap( ).find( value );
     if( ca != System::getClassMap( ).end( ) )
     {
-	System::findAllNodes( ca->second, nodes );
+        System::findAllNodes( ca->second, nodes );
     }
     else
     {
-	printf(">>>>>> unknown ancestor class %s!\n", value.c_str());
-//	error("unknown ancestor class " + value);
+        printf(">>>>>> unknown ancestor class %s!\n", value.c_str());
+//        error("unknown ancestor class " + value);
     }
 }
 
@@ -72,36 +72,36 @@ void System::generateMoc( )
     fmoc.open( outputFile.c_str( ) ); // create output file
     if( !fmoc )
     {
-	cerr << "moc: Cannot create " << outputFile << endl;
-	exit( 1 );
+        cerr << "moc: Cannot create " << outputFile << endl;
+        exit( 1 );
     }
 
-    fmoc	
-	<< "/**" << endl
-	<< " * " << outputFile << " generated automatically by moc." << endl
-	<< " */" << endl << endl
-	<< "#include <map>" << endl
-	<< "#include \"moc.h\"" << endl
-	<< "#include \"exceptionskipvariable.h\"" << endl
-	<< "#include \"xmlnode.h\"" << endl;
+    fmoc        
+        << "/**" << endl
+        << " * " << outputFile << " generated automatically by moc." << endl
+        << " */" << endl << endl
+        << "#include <map>" << endl
+        << "#include \"moc.h\"" << endl
+        << "#include \"exceptionskipvariable.h\"" << endl
+        << "#include \"xmlnode.h\"" << endl;
 
     for( ListClassType::iterator mc = System::getMocClassList( ).begin( );
-	mc != System::getMocClassList( ).end( );
-	mc++ )
+        mc != System::getMocClassList( ).end( );
+        mc++ )
     {
-	if( System::getInputFile( ).find( mc->getFile( ) ) != string::npos )
-	    if( mc->isXML_OBJECT( ) )
-		generateClass( output , *mc, ifiles );
+        if( System::getInputFile( ).find( mc->getFile( ) ) != string::npos )
+            if( mc->isXML_OBJECT( ) )
+                generateClass( output , *mc, ifiles );
     }
 
     for( vector<string>::size_type i = 0; i < ifiles.size( ); i++ )
     {
-	fmoc << "#include \"" << ifiles[i] << "\"" << endl;
+        fmoc << "#include \"" << ifiles[i] << "\"" << endl;
     }
   
     fmoc
-	<< endl << endl
-	<< output.str( );
+        << endl << endl
+        << output.str( );
     fmoc.close( );
 }
 
@@ -116,49 +116,49 @@ void System::generateClass( ostream& output, const ClassType& mc, VectorStringTy
     vector<string>::iterator pfile = find( ifiles.begin( ), ifiles.end( ), fname );
     if( pfile == ifiles.end( ) )
     {
-	ifiles.push_back( fname );
+        ifiles.push_back( fname );
     }
 
     findAllNodes( mc, &nodes );
 
     for (pos = nodes.begin( ); pos != nodes.end( ); pos++) {
-	string nodeName = pos->first;
-	NodeType& node = pos->second;
-	
-	out_map << "        MOC_NODES_INIT_VAR( " << nodeName << ")" << endl;
-	out_nodes << "    MOC_VARIABLE(" << nodeName << ")" << endl;
+        string nodeName = pos->first;
+        NodeType& node = pos->second;
+        
+        out_map << "        MOC_NODES_INIT_VAR( " << nodeName << ")" << endl;
+        out_nodes << "    MOC_VARIABLE(" << nodeName << ")" << endl;
 
-	if (node.hasVariable( )) 
-	    generateHeader( ifiles, node.variable );
+        if (node.hasVariable( )) 
+            generateHeader( ifiles, node.variable );
     }
 
     string cname = mc.getName( );
    
-    /* ÐÒÏÇÒÁÍÍÁ ÄÏÌÖÎÁ ÉÍÅÔØ ÆÏÒÍÕ ËÉÒÐÉÞÁ: >8) */
+    /* Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ð° Ð´Ð¾Ð»Ð¶Ð½Ð° Ð¸Ð¼ÐµÑ‚ÑŒ Ñ„Ð¾Ñ€Ð¼Ñƒ ÐºÐ¸Ñ€Ð¿Ð¸Ñ‡Ð°: >8) */
     output 
-	<< "//------------------- " << cname << " ------------------" << endl << endl
-	<< "class " << cname << "::__MetaInfo__  {            " << endl
-	<< "public:                                           " << endl
+        << "//------------------- " << cname << " ------------------" << endl << endl
+        << "class " << cname << "::__MetaInfo__  {            " << endl
+        << "public:                                           " << endl
         << "    typedef " << cname << " ContainerType;        " << endl 
-	<< "                                                  " << endl
-	<< "    MOC_CLASS_DECLS                               " << endl
-	<< "                                                  " << endl
-	<< "    __MetaInfo__( )                               " << endl
-	<< "    {                                             " << endl
-	<<           out_map.str( )                             
-	<< "    }                                             " << endl
-	<< "                                                  " << endl
-	<<      out_nodes.str( )                                << endl
-	<< "                                                  " << endl
-	<< "    static __MetaInfo__ instance;                 " << endl
-	<< "};                                                " << endl
-	<<                                                         endl
-	<< cname << "::__MetaInfo__ " << cname << "::__MetaInfo__::instance;" << endl
-	<< "MOC_NODE_FROM_XML(" << cname << ")                " << endl
-	<< "MOC_TO_XML(" << cname << ")                       " << endl
-	<< "MOC_GET_TYPE(" << cname << ")                     " << endl
-	<< "const DLString " << cname << "::MOC_TYPE = \"" << cname << "\";" << endl
-	<< endl << endl;
+        << "                                                  " << endl
+        << "    MOC_CLASS_DECLS                               " << endl
+        << "                                                  " << endl
+        << "    __MetaInfo__( )                               " << endl
+        << "    {                                             " << endl
+        <<           out_map.str( )                             
+        << "    }                                             " << endl
+        << "                                                  " << endl
+        <<      out_nodes.str( )                                << endl
+        << "                                                  " << endl
+        << "    static __MetaInfo__ instance;                 " << endl
+        << "};                                                " << endl
+        <<                                                         endl
+        << cname << "::__MetaInfo__ " << cname << "::__MetaInfo__::instance;" << endl
+        << "MOC_NODE_FROM_XML(" << cname << ")                " << endl
+        << "MOC_TO_XML(" << cname << ")                       " << endl
+        << "MOC_GET_TYPE(" << cname << ")                     " << endl
+        << "const DLString " << cname << "::MOC_TYPE = \"" << cname << "\";" << endl
+        << endl << endl;
 }
 
 void System::generateHeader( VectorStringType& ifiles, VariableXMLType & var )
@@ -167,18 +167,18 @@ void System::generateHeader( VectorStringType& ifiles, VariableXMLType & var )
     string type = var.getType( );
     while( type[type.length( ) - 1] == '*' )
     {
-	type.erase( type.length( ) - 1 );
+        type.erase( type.length( ) - 1 );
     }
 
     MapClassType::iterator hpos = System::getClassMap( ).find( type );
     if( hpos != System::getClassMap( ).end( ) )
     {
-	string file = hpos->second.getFile( );
-	if( !file.empty( ) )
-	{
-	    vector<string>::iterator vpos = find( ifiles.begin( ), ifiles.end( ), file );
-	    if( vpos == ifiles.end( ) ) 
-		ifiles.push_back( file );
-	}
+        string file = hpos->second.getFile( );
+        if( !file.empty( ) )
+        {
+            vector<string>::iterator vpos = find( ifiles.begin( ), ifiles.end( ), file );
+            if( vpos == ifiles.end( ) ) 
+                ifiles.push_back( file );
+        }
     }
 }

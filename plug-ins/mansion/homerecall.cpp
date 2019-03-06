@@ -15,9 +15,13 @@
 #include "dreamland.h"
 #include "recallmovement.h"
 #include "act.h"
+#include "hometown.h"
 #include "merc.h"
+#include "arg_utils.h"
 #include "mercdb.h"
 #include "def.h"
+
+HOMETOWN(frigate);
 
 /*----------------------------------------------------------------------------
  * 'homerecall' command 
@@ -29,119 +33,138 @@ COMMAND(HomeRecall, "homerecall")
     PCharacter *pch = ch->getPC( );
 
     if (ch->is_npc( )) {
-	ch->println( "В лес!" );
-	return;
+        ch->println( "п▓ п╩п╣я│!" );
+        return;
     }
     
     if (arguments.empty( )) {
-	doRecall( pch );
-	return;
-    }
-    
-    if (!pch->is_immortal( )) {
-	pch->println( "Эта команда не требует аргументов." );
-	return;
+        doRecall( pch, DLString::emptyString );
+        return;
     }
     
     cmd = arguments.getOneArgument( );
+
+    if (!pch->is_immortal( )) {
+        if (arg_is_list( cmd )) 
+            doListMortal( pch );
+        else if (arg_is_help( cmd )) 
+            doUsage( pch ); 
+        else
+            doRecall( pch, cmd );
+        return;
+    }
    
-    if (cmd.strPrefix( "list" ))
-	doList( pch );
-    else if (arguments.empty( ))
-	doUsage( pch );
+    if (arg_is_list( cmd ))
+        doList( pch );
     else if (cmd.strPrefix( "set" ))
-	doSet( pch, arguments );
-    else if (cmd.strPrefix( "show" ))
-	doShow( pch, arguments );
+        doSet( pch, arguments );
+    else if (arg_is_show( cmd ))
+        doShow( pch, arguments );
     else if (cmd.strPrefix( "remove" ))
-	doRemove( pch, arguments );
-    else
-	doUsage( pch ); 
+        doRemove( pch, arguments );
+    else if (arg_is_help( cmd )) 
+        doUsage( pch ); 
+    else 
+        doRecall( pch, cmd );
 }
 
 class HomeRecallMovement : public RecallMovement {
 public:
-    HomeRecallMovement( Character *ch )
+    HomeRecallMovement( Character *ch, const DLString &label )
                : RecallMovement( ch )
     {
+        this->label = label;
     }
     HomeRecallMovement( Character *ch, Character *actor, Room *to_room )
                : RecallMovement( ch )
     {
-	this->actor = actor;
-	this->to_room = to_room;
+        this->actor = actor;
+        this->to_room = to_room;
     }
     
 protected:
+    DLString label;
+
     virtual bool findTargetRoom( )
     {
-	XMLAttributeHomeRecall::Pointer attr;
-	
-	if (to_room)
-	    return true;
+        XMLAttributeHomeRecall::Pointer attr;
+        
+        if (to_room)
+            return true;
 
-	if (ch->is_npc( )) {
-	    msgSelf( ch, "В лес!" );
-	    return false;
-	}
+        if (ch->is_npc( )) {
+            msgSelf( ch, "п▓ п╩п╣я│!" );
+            return false;
+        }
 
-	attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" );
-	if (!attr) {
-	    msgSelf( ch, "У тебя нет своего дома." );
-	    return false;
-	}
-	
-	if (!( to_room = get_room_index( attr->getPoint( ) ) )) {
-	    msgSelf( ch, "Ты заблудил%1Gось|ся|ась." );
-	    return false;
-	}
+        if (ch->getPC( )->getHometown( ) == home_frigate) {
+            msgSelf( ch, "п║п╫п╟я┤п╟п╩п╟ я│п©я┐я│я┌п╦я│я▄ я│ я└я─п╣пЁп╟я┌п╟." );
+            return false;
+        }
 
-	return true;
+        attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" );
+        if (!attr) {
+            msgSelf( ch, "пё я┌п╣п╠я▐ п╫п╣я┌ я│п╡п╬п╣пЁп╬ п╢п╬п╪п╟." );
+            return false;
+        }
+
+        int vnum = attr->getLabeledPoint( label );
+        if (vnum <= 0 && !label.empty( )) {
+            msgSelf( ch, "пё я┌п╣п╠я▐ п╫п╣я┌я┐ п╢п╬п╪п╟, п©п╬п╪п╣я┤п╣п╫п╫п╬пЁп╬ я┌п╟п╨п╬п╧ п╪п╣я┌п╨п╬п╧." );
+            return false;
+        }
+
+        if (!( to_room = get_room_index( vnum ) )) {
+            msgSelf( ch, "п╒я▀ п╥п╟п╠п╩я┐п╢п╦п╩%1Gп╬я│я▄|я│я▐|п╟я│я▄." );
+            return false;
+        }
+
+        return true;
     }
     virtual bool canMove( Character *wch )
     {
-	if (ch != actor)
-	    return true;
-	else
-	    return checkMount( )
-		   && checkShadow( )
-		   && checkBloody( wch )
-		   && checkPumped( )
-		   && checkSameRoom( )
-		   && checkForsaken( wch );
+        if (ch != actor)
+            return true;
+        else
+            return checkMount( )
+                   && checkShadow( )
+                   && checkBloody( wch )
+                   && checkPumped( )
+                   && checkSameRoom( )
+                   && checkForsaken( wch );
     }
     virtual bool tryMove( Character *wch )
     {
-	if (ch != actor)
-	    return applyInvis( wch );
-	else
-	    return applyInvis( wch )
-		   && applyMovepoints( )
-		   && applyWaitstate( );
+        if (ch != actor)
+            return applyInvis( wch );
+        else
+            return applyInvis( wch )
+                   && applyMovepoints( )
+                   && applyWaitstate( );
     }
     virtual void msgOnMove( Character *wch, bool fLeaving )
     {
-	if (fLeaving)
-	    msgRoomNoParty( wch, 
-		            "%1$^C1 растворил%1$Gось|ся|ась в воздухе.",
-		            "%1$^C1 и %2$C1 растворяются в воздухе." );
-	else
-	    msgRoomNoParty( wch, "%1$^C1 появляется рядом с тобой." );
+        if (fLeaving)
+            msgRoomNoParty( wch, 
+                            "%1$^C1 я─п╟я│я┌п╡п╬я─п╦п╩%1$Gп╬я│я▄|я│я▐|п╟я│я▄ п╡ п╡п╬п╥п╢я┐я┘п╣.",
+                            "%1$^C1 п╦ %2$C1 я─п╟я│я┌п╡п╬я─я▐я▌я┌я│я▐ п╡ п╡п╬п╥п╢я┐я┘п╣." );
+        else
+            msgRoomNoParty( wch, "%1$^C1 п©п╬я▐п╡п╩я▐п╣я┌я│я▐ я─я▐п╢п╬п╪ я│ я┌п╬п╠п╬п╧." );
     }
     virtual void msgOnStart( )
     {
-	msgRoom( ch, "%1$^C1 просит Богов перенести %1$P2 в родной дом." );
-	msgSelf( ch, "Ты просишь Богов перенести тебя в родной дом." );
+        msgRoom( ch, "%1$^C1 п©я─п╬я│п╦я┌ п▒п╬пЁп╬п╡ п©п╣я─п╣п╫п╣я│я┌п╦ %1$P2 п╡ я─п╬п╢п╫п╬п╧ п╢п╬п╪." );
+        msgSelf( ch, "п╒я▀ п©я─п╬я│п╦я┬я▄ п▒п╬пЁп╬п╡ п©п╣я─п╣п╫п╣я│я┌п╦ я┌п╣п╠я▐ п╡ я─п╬п╢п╫п╬п╧ п╢п╬п╪." );
     }
     virtual void movePet( NPCharacter *pet )
     {
-	HomeRecallMovement( pet, actor, to_room ).moveRecursive( );
+        HomeRecallMovement( pet, actor, to_room ).moveRecursive( );
     }
 };
 
-void HomeRecall::doRecall( PCharacter * ch )
+void HomeRecall::doRecall( PCharacter * ch, const DLString& label )
 {
-    HomeRecallMovement( ch ).move( );
+    HomeRecallMovement( ch, label ).move( );
 }
 
 void HomeRecall::doSet( PCharacter * ch, DLString &arg )
@@ -149,63 +172,77 @@ void HomeRecall::doSet( PCharacter * ch, DLString &arg )
     int vnum;
     PCMemoryInterface *pci;
     DLString name = arg.getOneArgument( );
-    
-    arg = arg.getOneArgument( );
+    DLString vnumArg = arg.getOneArgument( );
+    DLString label = arg; 
+
     try {
-	vnum = arg.toInt( );
+        vnum = vnumArg.toInt( );
     } catch (const ExceptionBadType& e) {
-	ch->println( "<room vnum> должно быть числом." );
-	return;
+        ch->println( "<room vnum> п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ я┤п╦я│п╩п╬п╪." );
+        return;
     }
     
     pci = PCharacterManager::find( name );
     if (!pci) {
-	ch->println( "Жертва не найдена." );
-	return;
+        ch->println( "п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟." );
+        return;
     }
-    
-    if (get_room_index( vnum ) == 0) {
-	ch->println( "Комнаты с таким номером не существует." );
-	return;
+   
+    Room *target =  get_room_index( vnum );
+    if (!target) {
+        ch->println( "п п╬п╪п╫п╟я┌я▀ я│ я┌п╟п╨п╦п╪ п╫п╬п╪п╣я─п╬п╪ п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌." );
+        return;
     }
 
-    pci->getAttributes( ).getAttr<XMLAttributeHomeRecall>( "homerecall" )->setPoint( vnum );
+    pci->getAttributes( ).getAttr<XMLAttributeHomeRecall>( "homerecall" )->setPoint( vnum, label );
     PCharacterManager::saveMemory( pci );
 
-    ch->println( "Done." );
+    if (label.empty( ))
+        ch->printf( "п÷п╣я─я│п╬п╫п╟п╤я┐ %s я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ п╬я│п╫п╬п╡п╫п╬п╧ п╢п╬п╪ п╡ п╨п╬п╪п╫п╟я┌п╣ [%d] %s.\r\n", 
+                pci->getName( ).c_str( ), vnum, target->name  );
+    else
+        ch->printf( "п÷п╣я─я│п╬п╫п╟п╤я┐ %s я┐я│я┌п╟п╫п╬п╡п╩п╣п╫ п╢п╬п╪ я│ п╪п╣я┌п╨п╬п╧ %s п╡ п╨п╬п╪п╫п╟я┌п╣ [%d] %s.\r\n", 
+                pci->getName( ).c_str( ), label.c_str( ), vnum, target->name  );
+}
+
+static void print_room( int vnum, ostringstream &buf )
+{
+    Room *room = get_room_index( vnum );
+    if (!room) {
+        buf << "[" << vnum << "] п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌!" << endl;
+        return;
+    }
+
+    buf << "[" << vnum << "] " << room->name << " (" << room->area->name << ")" << endl;
 }
 
 void HomeRecall::doShow( PCharacter * ch, DLString &arg )
 {
     XMLAttributeHomeRecall::Pointer attr;
     PCMemoryInterface *pci;
-    int point;
-    Room *room;
     DLString name = arg.getOneArgument( );
     
     pci = PCharacterManager::find( name );
     if (!pci) {
-	ch->println( "Жертва не найдена." );
-	return;
+        ch->println( "п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟." );
+        return;
     }
     
     attr = pci->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
     if (!attr) {
-	ch->printf( "%s бездомное..\r\n", pci->getName( ).c_str( ) );
-	return;
+        ch->printf( "%s п╠п╣п╥п╢п╬п╪п╫п╬п╣..\r\n", pci->getName( ).c_str( ) );
+        return;
     }
     
-    point = attr->getPoint( );
-    room = get_room_index( point );
+    ostringstream buf;
+    buf << "п·я│п╫п╬п╡п╫п╬п╧ п╢п╬п╪: ";
+    print_room( attr->getPoint( ), buf );
 
-    if (!room) {
-	ch->printf( "%s имеет homerecall в несуществующую комнату #%d!", 
-		    pci->getName( ).c_str( ), point );
-	return;
+    for (XMLAttributeHomeRecall::LabeledPoints::const_iterator l = attr->getLabeled( ).begin( ); l != attr->getLabeled( ).end( ); l++) {
+        buf << "п■п╬п╪ я│ п╪п╣я┌п╨п╬п╧ '" << l->first << "': ";
+        print_room( l->second, buf );
     }
-    
-    ch->printf( "Homerecall для %s расположен в [%d] %s (%s).\r\n",
-		pci->getName( ).c_str( ), room->vnum, room->name, room->area->name );
+    ch->send_to( buf );
 }
 
 void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
@@ -216,14 +253,14 @@ void HomeRecall::doRemove( PCharacter * ch, DLString &arg )
     
     pci = PCharacterManager::find( name );
     if (!pci) {
-	ch->println( "Жертва не найдена." );
-	return;
+        ch->println( "п√п╣я─я┌п╡п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟." );
+        return;
     }
     
     attr = pci->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
     if (!attr) {
-	ch->printf( "%s бездомное..\r\n", pci->getName( ).c_str( ) );
-	return;
+        ch->printf( "%s п╠п╣п╥п╢п╬п╪п╫п╬п╣..\r\n", pci->getName( ).c_str( ) );
+        return;
     }
 
     pci->getAttributes( ).eraseAttribute( "homerecall" );
@@ -241,37 +278,74 @@ void HomeRecall::doList( PCharacter *ch )
     XMLAttributeHomeRecall::Pointer attr;
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
    
-    ch->println( "Список всех персонажей, имеющих homerecalls: \r\n");
+    ch->println( "п║п©п╦я│п╬п╨ п╡я│п╣я┘ п©п╣я─я│п╬п╫п╟п╤п╣п╧, п╦п╪п╣я▌я┴п╦я┘ homerecalls: \r\n");
      
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	attr = i->second->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
+        attr = i->second->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
 
-	if (!attr)
-	    continue;
-	
-	point = attr->getPoint( );
-	room = get_room_index( point );
-	
-	sprintf( buf, "%-15s [%-5d] %-25.25s (%s)\r\n", 
-		 i->second->getName( ).c_str( ), point, 
-		 (room ? room->name : "{Rnull!{x"),
-		 (room ? room->area->name : "") );
+        if (!attr)
+            continue;
+        
+        point = attr->getPoint( );
+        room = get_room_index( point );
+        
+        sprintf( buf, "%-15s [%-5d] %-25.25s (%s)\r\n", 
+                 i->second->getName( ).c_str( ), point, 
+                 (room ? room->name : "{Rnull!{x"),
+                 (room ? room->area->name : "") );
 
-	ch->send_to( buf );
+        ch->send_to( buf );
     }
+}
+
+static void print_room_mortal( int vnum, ostringstream &buf )
+{
+    Room *room = get_room_index( vnum );
+    if (!room) {
+        buf << "п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌!" << endl;
+        return;
+    }
+
+    buf << room->name << " (" << room->area->name << ")" << endl;
+}
+
+void HomeRecall::doListMortal( PCharacter * ch )
+{
+    XMLAttributeHomeRecall::Pointer attr = ch->getAttributes( ).findAttr<XMLAttributeHomeRecall>( "homerecall" ); 
+    if (!attr) {
+        ch->println( "пё я┌п╣п╠я▐ п╫п╣я┌ я│п╡п╬п╣пЁп╬ п╢п╬п╪п╟." );
+        return;
+    }
+    
+    ostringstream buf;
+    buf << "п·я│п╫п╬п╡п╫п╬п╧ п╢п╬п╪: ";
+    print_room_mortal( attr->getPoint( ), buf );
+
+    for (XMLAttributeHomeRecall::LabeledPoints::const_iterator l = attr->getLabeled( ).begin( ); l != attr->getLabeled( ).end( ); l++) {
+        buf << "п■п╬п╪ я│ п╪п╣я┌п╨п╬п╧ '" << l->first << "': ";
+        print_room_mortal( l->second, buf );
+    }
+    ch->send_to( buf );
 }
 
 void HomeRecall::doUsage( PCharacter * ch )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "Синтаксис: " << endl
-        << "{Whomerecall{x                          - переносит в родной дом" << endl
-	<< "{Whomerecall set{x <name> <room vnum>   - установить игроку комнату для homerecall" << endl
-	<< "в идеале это комната снаружи дома, от которого он может купить ключ" << endl
-	<< "{Whomerecall show{x <name>              - посмотреть чей-то homerecall" << endl
-	<< "{Whomerecall remove{x <name>            - отобрать возможность рекаллиться домой" << endl
-	<< "{Whomerecall list{x                     - список всех игроков, имеющих homerecall" << endl;
+    buf << "п║п╦п╫я┌п╟п╨я│п╦я│: " << endl
+        << "{W{lEhomerecall{lRп╢п╬п╪п╬п╧     {x             - п©п╣я─п╣п╫п╬я│п╦я┌ п╡ п╢п╬п╪" << endl
+        << "{W{lEhomerecall п╪п╣я┌п╨п╟{lRп╢п╬п╪п╬п╧ п╪п╣я┌п╨п╟     {x       - п©п╣я─п╣п╫п╬я│п╦я┌ п╡ п╢п╬п╪ я│ я┐п╨п╟п╥п╟п╫п╫п╬п╧ п╪п╣я┌п╨п╬п╧" << endl;
+    if (ch->is_immortal( ))
+        buf << "{Whomerecall set{x <name> <room vnum>   - я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ п╦пЁя─п╬п╨я┐ п╨п╬п╪п╫п╟я┌я┐ п╢п╩я▐ homerecall" << endl
+            << "п╡ п╦п╢п╣п╟п╩п╣ я█я┌п╬ п╨п╬п╪п╫п╟я┌п╟ я│п╫п╟я─я┐п╤п╦ п╢п╬п╪п╟, п╬я┌ п╨п╬я┌п╬я─п╬пЁп╬ п╬п╫ п╪п╬п╤п╣я┌ п╨я┐п©п╦я┌я▄ п╨п╩я▌я┤" << endl
+            << "{Whomerecall set{x <name> <room vnum> <label>  " << endl
+            << "                                    - я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ homerecall я│ я┐п╨п╟п╥п╟п╫п╫п╬п╧ п╪п╣я┌п╨п╬п╧" << endl
+            << "{Whomerecall show{x <name>              - п©п╬я│п╪п╬я┌я─п╣я┌я▄ я┤п╣п╧-я┌п╬ homerecall" << endl
+            << "{Whomerecall remove{x <name>            - п╬я┌п╬п╠я─п╟я┌я▄ п╡п╬п╥п╪п╬п╤п╫п╬я│я┌я▄ я─п╣п╨п╟п╩п╩п╦я┌я▄я│я▐ п╢п╬п╪п╬п╧" << endl
+            << "{Whomerecall list{x                     - я│п©п╦я│п╬п╨ п╡я│п╣я┘ п╦пЁя─п╬п╨п╬п╡, п╦п╪п╣я▌я┴п╦я┘ homerecall" << endl;
+    else 
+        buf << "{W{lEhomerecall list{lRп╢п╬п╪п╬п╧ я│п©п╦я│п╬п╨   {x        - п©п╬п╨п╟п╥п╟я┌я▄ я│п©п╦я│п╬п╨ я┌п╡п╬п╦я┘ п╢п╬п╪п╬п╡ п╦ п╪п╣я┌п╬п╨" << endl;
+
     
     ch->send_to( buf );
 }
@@ -289,12 +363,33 @@ XMLAttributeHomeRecall::~XMLAttributeHomeRecall( )
 
 int XMLAttributeHomeRecall::getPoint( ) const
 {
-    return point.getValue( );
+    return point;
 }
 
-void XMLAttributeHomeRecall::setPoint( int point ) 
+int XMLAttributeHomeRecall::getLabeledPoint( const DLString &label ) const
 {
-    this->point = point;
+    if (label.empty( ))
+        return point.getValue( );
+    else {
+        LabeledPoints::const_iterator l = labeled.find( label );
+        if (l == labeled.end( ))
+            return 0;
+        else
+            return l->second;
+    }
+        
+}
+
+void XMLAttributeHomeRecall::setPoint( int point, const DLString &label ) 
+{
+    if (label.empty( ))
+        this->point = point;
+    else
+        labeled[label] = point;
 }
     
+const XMLAttributeHomeRecall::LabeledPoints & XMLAttributeHomeRecall::getLabeled( ) const
+{
+    return labeled;
+}
 

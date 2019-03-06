@@ -25,3 +25,8 @@ BufferHandler::write(Descriptor *d, const char *txt)
 }
 
 
+DLString BufferHandler::convert(const char *txt)
+{
+    return txt;
+}
+

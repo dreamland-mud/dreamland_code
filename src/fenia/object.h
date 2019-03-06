@@ -33,17 +33,17 @@ class Object : public XMLVariable {
 public:
     typedef uint32_t id_t;
     struct selectId : public unary_function<Object, id_t> {
-	const id_t &operator () (const Object &o) {
-	    return o.getId();
-	}
+        const id_t &operator () (const Object &o) {
+            return o.getId();
+        }
     };
     typedef rb_tree<id_t, Object, selectId, less<id_t> > Map;
     class Manager;
 
     struct NotRecoveredException : public Exception {
-	NotRecoveredException() : Exception("Object not recovered") { }
+        NotRecoveredException() : Exception("Object not recovered") { }
 
-	virtual ~NotRecoveredException( ) throw( );
+        virtual ~NotRecoveredException( ) throw( );
     };
 
     Object();
@@ -52,22 +52,22 @@ public:
     void changed();
     
     void setHandler(Handler::Pointer h) {
-	handler = h;
-	if(handler)
-	    handler->setSelf(this);
+        handler = h;
+        if(handler)
+            handler->setSelf(this);
     }
     Handler::Pointer getHandler() {
-	if(handler)
-	    return handler.getPointer();
+        if(handler)
+            return handler.getPointer();
 
-	throw NotRecoveredException();
+        throw NotRecoveredException();
     }
     bool hasHandler() {
-	return !!handler;
+        return !!handler;
     }
     
     const id_t &getId() const {
-	return id;
+        return id;
     }
 
     virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
@@ -82,16 +82,16 @@ public:
     int refcnt;
     
     void link() {
-	refcnt++;
+        refcnt++;
     }
     void unlink() {
-	refcnt--;
+        refcnt--;
 
         if(DereferenceListener::instance)
             DereferenceListener::instance->notify(this);
-	
-	if(refcnt <= 0 && handler && Scripting::gc) 
-	    finalize();
+        
+        if(refcnt <= 0 && handler && Scripting::gc) 
+            finalize();
     }
 
     void finalize();

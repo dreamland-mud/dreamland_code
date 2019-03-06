@@ -9,17 +9,17 @@
 class Object;
 
 /**
- * @short Задача для планировщика, которой на вход подаются обьекты
+ * @short п≈п╟п╢п╟я┤п╟ п╢п╩я▐ п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨п╟, п╨п╬я┌п╬я─п╬п╧ п╫п╟ п╡я┘п╬п╢ п©п╬п╢п╟я▌я┌я│я▐ п╬п╠я▄п╣п╨я┌я▀
  * @author Igor S. Petrenko
  * @see Scheduler
  * @see SchedulerTask
  */
 struct SchedulerTaskRoundObject : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundObject> Pointer;
-	
-	virtual void run( );
-	/** Обработать обьект */
-	virtual void run( Object* object ) = 0;
-	virtual int getPriority( ) const;
+        typedef ::Pointer<SchedulerTaskRoundObject> Pointer;
+        
+        virtual void run( );
+        /** п·п╠я─п╟п╠п╬я┌п╟я┌я▄ п╬п╠я▄п╣п╨я┌ */
+        virtual void run( Object* object ) = 0;
+        virtual int getPriority( ) const;
 };

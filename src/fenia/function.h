@@ -44,9 +44,9 @@ public:
     typedef uint32_t id_t;
 
     struct selectId : public unary_function<Function, id_t> {
-	const id_t &operator () (const Function &f) {
-	    return f.getId();
-	}
+        const id_t &operator () (const Function &f) {
+            return f.getId();
+        }
     };
     typedef rb_tree<id_t, Function, selectId, less<id_t> > Map;
     
@@ -54,7 +54,7 @@ public:
     virtual ~Function( );
 
     const id_t &getId() const {
-	return id;
+        return id;
     }
 
     Register invoke(Scope &scope, Register thiz, const RegisterList &args);
@@ -70,17 +70,17 @@ public:
     int refcnt;
     
     void link() {
-	refcnt++;
+        refcnt++;
     }
     void unlink() {
-	refcnt--;
+        refcnt--;
 
         if(DereferenceListener::instance)
             DereferenceListener::instance->notify(this);
 
-	if(refcnt <= 0 && Scripting::gc) {
-	    finalize();
-	}
+        if(refcnt <= 0 && Scripting::gc) {
+            finalize();
+        }
     }
 
     void finalize();

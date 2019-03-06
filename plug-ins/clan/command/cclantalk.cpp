@@ -3,14 +3,14 @@
  * ruffina, 2005
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 
@@ -40,18 +40,18 @@ static void garble( const char *src, char *dst )
 
     for (; *src; src++, dst++)
     {
-	    char ch = *src;
+            char ch = *src;
 
-	    if( ch >= 'a' && ch <= 'z' )
-		    *dst= 'a' + number_range( 0, 25 );
-	    else if( ch >= 'A' && ch <= 'Z' )
-		    *dst = 'A' + number_range( 0, 25 );
-	    else if( ch >= 'à' && ch <= 'þ' )
-		    *dst = 'à' + number_range( 0, 'þ' - 'à' );
-	    else if( ch >= 'À' && ch <= 'ß' )
-		    *dst = 'À' + number_range( 0, 'ß' - 'À' );
-	    else
-		    *dst = ch;
+            if( ch >= 'a' && ch <= 'z' )
+                    *dst= 'a' + number_range( 0, 25 );
+            else if( ch >= 'A' && ch <= 'Z' )
+                    *dst = 'A' + number_range( 0, 25 );
+            else if( ch >= 'Ð®' && ch <= 'Ð§' )
+                    *dst = 'Ð®' + number_range( 0, 'Ð§' - 'Ð®' );
+            else if( ch >= 'ÑŽ' && ch <= 'ÑŠ' )
+                    *dst = 'ÑŽ' + number_range( 0, 'ÑŠ' - 'ÑŽ' );
+            else
+                    *dst = ch;
     }
 
     *dst = 0;
@@ -63,16 +63,16 @@ static bool check_soap( Character *ch )
     static const DLString soap( "soap" );
     
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
-	return check_soap(ch->master);
+        return check_soap(ch->master);
     
     if (ch->is_npc( ))
-	return false;
+        return false;
     
     if (!ch->getPC( )->getAttributes( ).isAvailable( soap )) 
-	return false;
+        return false;
     
-    act("$c1 ÐÕÓËÁÅÔ ÉÚÏ ÒÔÁ {RÒ{YÁ{GÚ{CÎ{MÏ{RÃ{G×{YÅ{CÔ{MÎ{YÙ{CÅ{x ÍÙÌØÎÙÅ ÐÕÚÙÒÉ.", ch, 0, 0, TO_ROOM);
-    act("ôÙ ÐÕÓËÁÅÛØ ÉÚÏ ÒÔÁ {RÒ{YÁ{GÚ{CÎ{MÏ{RÃ{G×{YÅ{CÔ{MÎ{YÙ{CÅ{x ÍÙÌØÎÙÅ ÐÕÚÙÒÉ.", ch, 0, 0, TO_CHAR);
+    act("$c1 Ð¿ÑƒÑÐºÐ°ÐµÑ‚ Ð¸Ð·Ð¾ Ñ€Ñ‚Ð° {RÑ€{YÐ°{GÐ·{CÐ½{MÐ¾{RÑ†{GÐ²{YÐµ{CÑ‚{MÐ½{YÑ‹{CÐµ{x Ð¼Ñ‹Ð»ÑŒÐ½Ñ‹Ðµ Ð¿ÑƒÐ·Ñ‹Ñ€Ð¸.", ch, 0, 0, TO_ROOM);
+    act("Ð¢Ñ‹ Ð¿ÑƒÑÐºÐ°ÐµÑˆÑŒ Ð¸Ð·Ð¾ Ñ€Ñ‚Ð° {RÑ€{YÐ°{GÐ·{CÐ½{MÐ¾{RÑ†{GÐ²{YÐµ{CÑ‚{MÐ½{YÑ‹{CÐµ{x Ð¼Ñ‹Ð»ÑŒÐ½Ñ‹Ðµ Ð¿ÑƒÐ·Ñ‹Ñ€Ð¸.", ch, 0, 0, TO_CHAR);
     return true;
 }
 
@@ -85,29 +85,29 @@ CMDRUN( cb )
     DLString act_str;
 
     if (ch->getClan( ) == clan_none) {
-	ch->send_to("ôÙ ÎÅ ÐÒÉÎÁÄÌÅÖÉÛØ ÎÉ Ë ÏÄÎÏÍÕ ëÌÁÎÕ.\n\r");
-	return;
+        ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¿Ñ€Ð¸Ð½Ð°Ð´Ð»ÐµÐ¶Ð¸ÑˆÑŒ Ð½Ð¸ Ðº Ð¾Ð´Ð½Ð¾Ð¼Ñƒ ÐšÐ»Ð°Ð½Ñƒ.\n\r");
+        return;
     }
 
     if (!ch->getClan( )->hasChannel( )) {
-	ch->send_to("äÏ ÔÅÂÑ ÎÉËÏÍÕ ÎÅÔ ÄÅÌÁ.\n\r");
-	return;
+        ch->send_to("Ð”Ð¾ Ñ‚ÐµÐ±Ñ Ð½Ð¸ÐºÐ¾Ð¼Ñƒ Ð½ÐµÑ‚ Ð´ÐµÐ»Ð°.\n\r");
+        return;
     }
     
     if (argument.empty( )) {
-	TOGGLE_BIT(ch->comm, COMM_NOCB);
+        TOGGLE_BIT(ch->comm, COMM_NOCB);
 
-	if (IS_SET(ch->comm, COMM_NOCB))
-	    ch->println("ó ÜÔÏÇÏ ÍÏÍÅÎÔÁ ÔÙ ÎÅ ÓÌÙÛÉÛØ ËÌÁÎÏ×ÙÅ ÒÁÚÇÏ×ÏÒÙ.");
-	else
-	    ch->println("ôÙ ÓÎÏ×Á ÓÌÙÛÉÛØ ËÌÁÎÏ×ÙÅ ÒÁÚÇÏ×ÏÒÙ.");
-	return;
+        if (IS_SET(ch->comm, COMM_NOCB))
+            ch->println("Ð¡ ÑÑ‚Ð¾Ð³Ð¾ Ð¼Ð¾Ð¼ÐµÐ½Ñ‚Ð° Ñ‚Ñ‹ Ð½Ðµ ÑÐ»Ñ‹ÑˆÐ¸ÑˆÑŒ ÐºÐ»Ð°Ð½Ð¾Ð²Ñ‹Ðµ Ñ€Ð°Ð·Ð³Ð¾Ð²Ð¾Ñ€Ñ‹.");
+        else
+            ch->println("Ð¢Ñ‹ ÑÐ½Ð¾Ð²Ð° ÑÐ»Ñ‹ÑˆÐ¸ÑˆÑŒ ÐºÐ»Ð°Ð½Ð¾Ð²Ñ‹Ðµ Ñ€Ð°Ð·Ð³Ð¾Ð²Ð¾Ñ€Ñ‹.");
+        return;
     }
     
     REMOVE_BIT(ch->comm, COMM_NOCB);
 
     if (check_soap(ch))
-	return;
+        return;
 
 
     act_buf << "{" << ch->getClan( )->getColor( ) << "["
@@ -116,9 +116,9 @@ CMDRUN( cb )
     act_str = act_buf.str( );
     
     if (dreamland->hasOption( DL_LOG_COMM ))
-	LogStream::sendNotice( ) 
-	    << "[" << ch->getClan( )->getShortName( ) << "] " 
-	    << ch->getName( ) << ": " << argument << endl;
+        LogStream::sendNotice( ) 
+            << "[" << ch->getClan( )->getShortName( ) << "] " 
+            << ch->getName( ) << ": " << argument << endl;
 
     if (!ch->isAffected(gsn_deafen)) {
         DLString message = fmt( ch, act_str.c_str( ), ch, argument.c_str( ) );
@@ -129,29 +129,29 @@ CMDRUN( cb )
     }
 
     for (d = descriptor_list; d != 0; d = d->next) 
-	if (d->connected == CON_PLAYING
-	        && d->character
+        if (d->connected == CON_PLAYING
+                && d->character
                 && d->character != ch
-		&& (d->character->getClan( ) == ch->getClan( ))
-		&& !IS_SET(d->character->comm, COMM_NOCB)
-		&& !d->character->isAffected(gsn_deafen))
-	{
-	    char msg_str[MAX_INPUT_LENGTH];
+                && (d->character->getClan( ) == ch->getClan( ))
+                && !IS_SET(d->character->comm, COMM_NOCB)
+                && !d->character->isAffected(gsn_deafen))
+        {
+            char msg_str[MAX_INPUT_LENGTH];
 
-	    if (ch->isAffected(gsn_garble)) {
-		ostringstream out;
-		mudtags_convert_nocolor( argument.c_str( ), out, d->character );
-		garble( out.str( ).c_str( ), msg_str );
-	    }
-	    else
-		strcpy( msg_str, argument.c_str( ) );
+            if (ch->isAffected(gsn_garble)) {
+                ostringstream out;
+                mudtags_convert_nocolor( argument.c_str( ), out, d->character );
+                garble( out.str( ).c_str( ), msg_str );
+            }
+            else
+                strcpy( msg_str, argument.c_str( ) );
 
             DLString message = fmt( d->character, act_str.c_str( ), ch, msg_str ); 
             d->character->pecho( message.c_str( ) );
 
             if (d->character->getPC( ))
                 remember_history_public( d->character->getPC( ), message );
-	}
+        }
 }
 
 void clantalk( Clan &clan, const char *format, ... )
@@ -165,17 +165,17 @@ void clantalk( Clan &clan, const char *format, ... )
     va_end( ap );
 
     buf << "{" << clan.getColor( ) 
-	<< "[" << clan.getShortName( ) << "] : "
-	<< msg << "{x" << endl;
+        << "[" << clan.getShortName( ) << "] : "
+        << msg << "{x" << endl;
 
     for (Descriptor *d = descriptor_list; d != 0; d = d->next) 
-	if (d->connected == CON_PLAYING
-		&& d->character
-		&& (d->character->getClan( ) == clan)
-		&& !IS_SET(d->character->comm, COMM_NOCB)
-		&& !d->character->isAffected(gsn_deafen))
-	{
-	    d->character->send_to( buf );
-	}
+        if (d->connected == CON_PLAYING
+                && d->character
+                && (d->character->getClan( ) == clan)
+                && !IS_SET(d->character->comm, COMM_NOCB)
+                && !d->character->isAffected(gsn_deafen))
+        {
+            d->character->send_to( buf );
+        }
 }
 

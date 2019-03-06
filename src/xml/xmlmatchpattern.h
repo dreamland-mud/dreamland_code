@@ -10,8 +10,8 @@
     email                : nofate@europe.com
  ***************************************************************************/
 
-#ifndef	XMLMATCHPATTERN_H
-#define	XMLMATCHPATTERN_H
+#ifndef        XMLMATCHPATTERN_H
+#define        XMLMATCHPATTERN_H
 
 #include <sstream>
 
@@ -19,51 +19,51 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Поиск по xml документу
+ * @short п÷п╬п╦я│п╨ п©п╬ xml п╢п╬п╨я┐п╪п╣п╫я┌я┐
  */
 class XMLMatchPattern : public yyFlexLexer
 {
 public:
-	typedef XMLNode::NodeList NodeList;
-	typedef XMLNode::NodeList::Pointer NodeListPointer;
+        typedef XMLNode::NodeList NodeList;
+        typedef XMLNode::NodeList::Pointer NodeListPointer;
 
 public:
-	XMLMatchPattern( const XMLNode::Pointer node, const DLString& pattern );
-	virtual ~XMLMatchPattern( );
-	
-	virtual int yylex( ) throw( ExceptionXSL );
-	
-	inline NodeListPointer getList( )
-	{
-		return list;
-	}
+        XMLMatchPattern( const XMLNode::Pointer node, const DLString& pattern );
+        virtual ~XMLMatchPattern( );
+        
+        virtual int yylex( ) throw( ExceptionXSL );
+        
+        inline NodeListPointer getList( )
+        {
+                return list;
+        }
 
 private:
-	static const char EQUAL = 1;
-	static const char NOT_EQUAL = 2;
-	static const char LESS = 3;
-	static const char LESS_OR_EQUAL = 4;
-	static const char MORE = 5;
-	static const char MORE_OR_EQUAL = 6;
+        static const char EQUAL = 1;
+        static const char NOT_EQUAL = 2;
+        static const char LESS = 3;
+        static const char LESS_OR_EQUAL = 4;
+        static const char MORE = 5;
+        static const char MORE_OR_EQUAL = 6;
 
 private:
-	XMLNode::Pointer root;
-	DLString pattern;
-	NodeList::Pointer list;
-	std::basic_ostringstream<char> ostr;
-	std::basic_istringstream<char> istr;
-	
-	DLString firstVariable;
-	DLString secondVariable;
-	char operation;
-	
-	int position;
+        XMLNode::Pointer root;
+        DLString pattern;
+        NodeList::Pointer list;
+        std::basic_ostringstream<char> ostr;
+        std::basic_istringstream<char> istr;
+        
+        DLString firstVariable;
+        DLString secondVariable;
+        char operation;
+        
+        int position;
 
 private:
-	NodeListPointer lookupArgument( const NodeListPointer list );
-	NodeListPointer lookupName( const DLString& name, const NodeListPointer list );
-	void listDown( );
-		
+        NodeListPointer lookupArgument( const NodeListPointer list );
+        NodeListPointer lookupName( const DLString& name, const NodeListPointer list );
+        void listDown( );
+                
 };
 
 

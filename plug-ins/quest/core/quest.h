@@ -27,6 +27,7 @@ class Room;
 
 enum {
     QSTAT_INIT,
+    QSTAT_STARTED,
     /* ... */
     QSTAT_BROKEN_BY_HERO = 42,
     QSTAT_BROKEN_BY_OTHERS,
@@ -36,7 +37,7 @@ enum {
 /*
  * Quest
  */
-class Quest :	public XMLAttribute, public XMLVariableContainer 
+class Quest :        public XMLAttribute, public XMLVariableContainer 
 {
 XML_OBJECT
 public:
@@ -48,6 +49,7 @@ public:
 
     virtual void create( PCharacter *, NPCharacter * ) = 0; 
     virtual bool isComplete( ) = 0;
+    virtual bool hasPartialRewards() const;
     virtual void info( std::ostream &, PCharacter * ) = 0;
     virtual void shortInfo( std::ostream &, PCharacter * );
     virtual RewardPointer reward( PCharacter *, NPCharacter * ) = 0;
@@ -71,7 +73,7 @@ public:
     int getTime( PCMemoryInterface * );
 
     XML_VARIABLE XMLInteger     hint;
-    XML_VARIABLE XMLString	charName;
+    XML_VARIABLE XMLString        charName;
     XML_VARIABLE XMLInteger     state;
 
 protected:
@@ -89,7 +91,7 @@ struct Quest::Reward : public virtual DLObject {
     typedef ::Pointer<Reward> Pointer;
     
     Reward( ) : points( 0 ), exp( 0 ), gold( 0 ), prac( 0 ), clanpoints( 0 ),
-		wordChance( 0 ), scrollChance( 0 )
+                wordChance( 0 ), scrollChance( 0 )
     {
     }
 

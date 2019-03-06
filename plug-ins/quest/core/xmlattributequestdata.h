@@ -6,6 +6,8 @@
 #define XMLATTRIBUTEQUESTDATA_H
 
 #include "xmlinteger.h"
+#include "xmlstring.h"
+#include "xmllonglong.h"
 
 #include "xmlattributeticker.h"
 #include "playerattributes.h"
@@ -14,10 +16,12 @@
 #include "xmlattributeplugin.h"
 
 class PCharacter;
+class PCMemoryInterface;
 
 class XMLAttributeQuestData : 
     public XMLAttributeTimer, 
     public ScheduledXMLAttribute, 
+    public ScheduledPCMemoryXMLAttribute,
     public EventHandler<DeathArguments>,
     public EventHandler<PromptArguments>,
     public XMLAttributeStatistic
@@ -31,12 +35,20 @@ public:
     virtual bool handle( const PromptArguments & ); 
 
     virtual bool pull( PCharacter * );
+    virtual bool pull( PCMemoryInterface * );
 
     virtual int getTime( ) const;
     virtual void setTime( int );
+    void rememberLastQuest(const DLString &);
+    int getLastQuestCount(const DLString &) const;
+    void setStartTime();
+    bool takesTooLong() const;
 
 protected:
     XML_VARIABLE XMLInteger countdown;
+    XML_VARIABLE XMLString lastQuestType;
+    XML_VARIABLE XMLInteger lastQuestCount;
+    XML_VARIABLE XMLLongLongNoEmpty startTime;
 };
 
 #endif

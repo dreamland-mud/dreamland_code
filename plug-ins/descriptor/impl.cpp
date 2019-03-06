@@ -3,6 +3,7 @@
  * ruffina, 2004
  */
 #include "descriptor.h"
+#include "outofband.h"
 #include "so.h"
 
 /*-------------------------------------------------------------------
@@ -26,8 +27,8 @@ void
 DescriptorPlugin::destruction()
 {
     while(descriptor_list) {
-	descriptor_list->close( );
-	descriptor_list->slay( );
+        descriptor_list->close( );
+        descriptor_list->slay( );
     }
     Class::unregMoc<InputHandler>();
     Class::unregMoc<BufferHandler>();
@@ -37,11 +38,12 @@ extern "C" {
     
     SO::PluginList initialize_descriptor( ) 
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<DescriptorPlugin>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<DescriptorPlugin>( ppl );
+        Plugin::registerPlugin<OutOfBandManager>( ppl );
+        
+        return ppl;
     }
 }
 

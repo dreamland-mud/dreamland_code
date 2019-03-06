@@ -14,9 +14,9 @@ void GlobalRegistryBase::registrate( GlobalRegistryElement::Pointer elem )
     Indexes::iterator iter = indexes.find( elem->getName( ) );
 
     if (iter == indexes.end( )) 
-	add( elem );
+        add( elem );
     else 
-	replace( iter->second, elem );
+        replace( iter->second, elem );
 }
 
 void GlobalRegistryBase::unregistrate( GlobalRegistryElement::Pointer elem )
@@ -29,22 +29,22 @@ int GlobalRegistryBase::lookup( const DLString &name )
     Indexes::iterator i;
     
     if (name.empty( ))
-	return -1;
+        return -1;
 
     i = indexes.find( name );
     
     if (i == indexes.end( )) 
-	return add( getDumbElement( name ) );
+        return add( getDumbElement( name ) );
     else 
-	return i->second;
+        return i->second;
 }
 
 const DLString & GlobalRegistryBase::getName( int ndx ) const
 {
     if (goodIndex( ndx ))
-	return table[ndx]->getName( );
+        return table[ndx]->getName( );
     else
-	return DLString::emptyString;
+        return DLString::emptyString;
 }
 
 
@@ -74,14 +74,14 @@ void GlobalRegistryBase::outputAll( ostringstream &out, int width, int columns )
     pattern << "%-" << width << "s";
 
     for (unsigned int i = 0; i < table.size( ); i++) {
-	sprintf( buf, pattern.c_str( ), table[i]->getName( ).c_str( ) );
-	out << buf;
+        sprintf( buf, pattern.c_str( ), table[i]->getName( ).c_str( ) );
+        out << buf;
 
-	if (++col % columns == 0)
-	    out << endl;
+        if (++col % columns == 0)
+            out << endl;
     }
 
     if (col % columns != 0)
-	out << endl;
+        out << endl;
 }
 

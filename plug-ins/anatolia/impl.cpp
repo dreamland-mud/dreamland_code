@@ -14,10 +14,10 @@ extern "C"
 {
     SO::PluginList initialize_anatolia( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
 
-	return ppl;
+        return ppl;
     }
 }
 

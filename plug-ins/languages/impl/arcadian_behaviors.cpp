@@ -35,7 +35,7 @@ void ArcadianDrinkBehavior::setEffectName( const WordEffect::Pointer effect )
     Language::Pointer lang;
 
     if (!( lang = languageManager->findLanguage( gsn_arcadian->getName( ) ) ))
-	return;
+        return;
 
     effectName = lang->getEffectName( effect );
 }
@@ -52,10 +52,10 @@ DrinkContainerWEBase::Pointer ArcadianDrinkBehavior::findDrinkEffect( ) const
     DrinkContainerWEBase::Pointer drinkEffect;
 
     if (!( lang = languageManager->findLanguage( gsn_arcadian->getName( ) ) ))
-	return drinkEffect;
+        return drinkEffect;
 
     if (!( effect = lang->findEffect( effectName.getValue( ) ) ))
-	return drinkEffect;
+        return drinkEffect;
 
     drinkEffect = effect.getDynamicPointer<DrinkContainerWEBase>( );
     return drinkEffect;
@@ -66,9 +66,9 @@ bool ArcadianDrinkBehavior::hasSameEffect( Object *source )
     ArcadianDrinkBehavior::Pointer bhv;
     
     if (source->behavior)
-	if (( bhv = source->behavior.getDynamicPointer<ArcadianDrinkBehavior>( ) ))
-	    if (bhv->effectName.getValue( ) == effectName.getValue( ))
-		return true;
+        if (( bhv = source->behavior.getDynamicPointer<ArcadianDrinkBehavior>( ) ))
+            if (bhv->effectName.getValue( ) == effectName.getValue( ))
+                return true;
 
     return false;
 }
@@ -78,7 +78,7 @@ void ArcadianDrinkBehavior::pourOut( Character *ch, int amount )
     DrinkContainerWEBase::Pointer drinkEffect = findDrinkEffect( );
     
     if (!drinkEffect || !isActive( )) 
-	return;
+        return;
     
     drinkEffect->onPourOut( this, ch, amount );
     cleanup( );
@@ -87,13 +87,13 @@ void ArcadianDrinkBehavior::pourOut( Character *ch, int amount )
 void ArcadianDrinkBehavior::pour( Character *ch, Object *destination, int amount )
 {
     if (obj->value[1] == 0)
-	cleanup( );
+        cleanup( );
 }
 
 void ArcadianDrinkBehavior::fill( Character *ch, Object *source, int amount )
 {
     if (!hasSameEffect( source ))
-	cleanup( );
+        cleanup( );
 }
 
 void ArcadianDrinkBehavior::pourOut( Character *ch, Character *victim, int amount )
@@ -101,7 +101,7 @@ void ArcadianDrinkBehavior::pourOut( Character *ch, Character *victim, int amoun
     DrinkContainerWEBase::Pointer drinkEffect = findDrinkEffect( );
     
     if (!drinkEffect || !isActive( )) 
-	return;
+        return;
     
     drinkEffect->onPourOut( this, ch, victim, amount );
     cleanup( );
@@ -112,12 +112,12 @@ void ArcadianDrinkBehavior::drink( Character *ch, int amount )
     DrinkContainerWEBase::Pointer drinkEffect = findDrinkEffect( );
     
     if (!drinkEffect || !isActive( ))
-	return;
+        return;
     
     drinkEffect->onDrink( this, ch, amount );
 
     if (obj->value[1] == 0)
-	cleanup( );
+        cleanup( );
 }
 
 void ArcadianDrinkBehavior::cleanup( )
@@ -137,20 +137,20 @@ bool BeerElementalBehavior::specFight( )
     Character *victim = ch->fighting;
     
     if (number_bits( 3 ))
-	return BasicMobileDestiny::specFight( );
+        return BasicMobileDestiny::specFight( );
     
     level = ch->getRealLevel( );
     dam = max( 16, (int)ch->hit );
     dam = number_range( dam / 15 + 1, dam / 8 );
     dam = max( dam      + dice( level, 12 ) / 10, 
-	       dam / 10 + dice( level, 12 ) );
+               dam / 10 + dice( level, 12 ) );
     
-    act( "$c1 дышит на тебя перегаром!", ch, 0, victim, TO_VICT);
-    act( "$c1 дышит перегаром на $C4!", ch, 0, victim, TO_NOTVICT);
+    act( "$c1 п╢я▀я┬п╦я┌ п╫п╟ я┌п╣п╠я▐ п©п╣я─п╣пЁп╟я─п╬п╪!", ch, 0, victim, TO_VICT);
+    act( "$c1 п╢я▀я┬п╦я┌ п©п╣я─п╣пЁп╟я─п╬п╪ п╫п╟ $C4!", ch, 0, victim, TO_NOTVICT);
     
     try {
-	damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true);
-	poison_effect( victim, level, dam, TARGET_CHAR );
+        damage_nocatch( ch, victim, dam, gsn_gas_breath, DAM_POISON, true);
+        poison_effect( victim, level, dam, TARGET_CHAR );
     } catch (const VictimDeathException &) {
     }
 
@@ -162,9 +162,9 @@ bool BeerElementalBehavior::area( )
     ch->max_hit -= ch->max_hit / 10;
 
     if (ch->max_hit < ch->getModifyLevel( )) {
-	act( "$c1 окончательно усыхает и исчезает.", ch, 0, 0, TO_ROOM );
-	extract_char( ch, true );
-	return true;
+        act( "$c1 п╬п╨п╬п╫я┤п╟я┌п╣п╩я▄п╫п╬ я┐я│я▀я┘п╟п╣я┌ п╦ п╦я│я┤п╣п╥п╟п╣я┌.", ch, 0, 0, TO_ROOM );
+        extract_char( ch, true );
+        return true;
     }
 
     return BasicMobileDestiny::area( );

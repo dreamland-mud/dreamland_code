@@ -9,6 +9,7 @@
 
 #include "socialbase.h"
 
+#include "russianstring.h"
 #include "skillreference.h"
 #include "character.h"
 #include "room.h"
@@ -36,13 +37,13 @@ short SocialBase::getLog( ) const
 bool SocialBase::matches( const DLString& argument ) const
 {
     if (argument.empty( )) 
-	return false;
+        return false;
 
     if (argument.strPrefix( getName( ) )) 
-	return true;
+        return true;
     
     if (argument.strPrefix( getRussianName( ) )) 
-	return true;
+        return true;
 
     return false;
 }
@@ -62,126 +63,230 @@ bool SocialBase::dispatch( const InterpretArguments &iargs )
     Character *ch = iargs.ch;
 
     if (!ch->is_npc( )) {
-	if (IS_SET(ch->act, PLR_FREEZE)) {
-	    ch->pecho("Ты полностью замороже%Gно|н|на!", ch);
-	    return false;
-	}
+        if (IS_SET(ch->act, PLR_FREEZE)) {
+            ch->pecho("п╒я▀ п©п╬п╩п╫п╬я│я┌я▄я▌ п╥п╟п╪п╬я─п╬п╤п╣%Gп╫п╬|п╫|п╫п╟!", ch);
+            return false;
+        }
 
-	if (IS_SET( ch->comm, COMM_NOEMOTE )) {
-	    ch->pecho("Ты анти-социал%Gьно|ен|ьна!", ch);
-	    return false;
-	}
+        if (IS_SET( ch->comm, COMM_NOEMOTE )) {
+            ch->pecho("п╒я▀ п╟п╫я┌п╦-я│п╬я├п╦п╟п╩%Gя▄п╫п╬|п╣п╫|я▄п╫п╟!", ch);
+            return false;
+        }
 
-	if (IS_SET( ch->comm, COMM_AFK )) {
-	    ch->send_to( "Выйди сначала из {WAFK{x\n\r" );
-	    return false;
-	}
+        if (IS_SET( ch->comm, COMM_AFK )) {
+            ch->send_to( "п▓я▀п╧п╢п╦ я│п╫п╟я┤п╟п╩п╟ п╦п╥ {WAFK{x\n\r" );
+            return false;
+        }
     }
     
     if (!checkPosition( ch )) 
-	return false;
+        return false;
     
     visualize( ch );
     return true;
 }
 
+static const void *victimOrSelf(Character *ch, Character *victim)
+{
+    static RussianString self("я│||п╣п╠я▐||п╣п╠я▐||п╣п╠п╣||п╣п╠я▐||п╬п╠п╬п╧||п╣п╠п╣");
+    if (ch == victim)
+        return &self;
+    else
+        return victim;
+}
+
+enum {
+    RC_NOARG,
+    RC_VICT,
+    RC_SELF,
+    RC_OBJ,
+    RC_VICT_NOT_FOUND,
+    RC_VICT_VICT,
+    RC_VICT_OBJ,
+    RC_VICT2_NOT_FOUND
+};
+
+static int parseArguments(Character *ch, const DLString &arg1, const DLString &arg2, 
+                                Character *&victim, Character *&victim2, Object *&obj)
+{
+    victim = 0;
+    victim2 = 0;
+    obj = 0;
+
+    // No arguments specified: RC_NOARG.
+    if (arg1.empty())
+        return RC_NOARG;
+
+    // Only one argument. Allowed syntax:
+    // <social> <char1|self>      : RC_VICT, RC_SELF
+    // <social> <char not found>  : RC_VICT_NOT_FOUND
+    // <social> <obj>             : RC_OBJ
+    if (arg2.empty()) {
+        victim = get_char_room(ch, arg1);
+        if (!victim)
+            obj = get_obj_here(ch, arg1);
+
+        if (victim == ch)
+            return RC_SELF;
+        else if (victim)
+            return RC_VICT;
+        else if (obj)
+            return RC_OBJ;
+        else
+            return RC_VICT_NOT_FOUND;
+    }
+
+    // Two arguments. Allowed syntax:
+    // <social> <char1|self> <char2|self>    : RC_VICT_VICT, RC_SELF, RC_VICT
+    // <social> <char|self> <obj>            : RC_VICT_OBJ
+    // <social> <char|not found> <not found> : RC_VICT_NOT_FOUND, RC_VICT2_NOT_FOUND
+    victim = get_char_room(ch, arg1);
+    victim2 = get_char_room(ch, arg2);
+    if (!victim2)
+        obj = get_obj_here(ch, arg2);
+
+    if (!victim)
+        return RC_VICT_NOT_FOUND;
+    else if (obj)
+        return RC_VICT_OBJ;
+    else if (victim2 == ch && victim == ch)
+        return RC_SELF;
+    else if (victim2 == victim)
+        return RC_VICT;
+    else if (victim2)
+        return RC_VICT_VICT;
+    else
+        return RC_VICT2_NOT_FOUND;
+}
+
+/**
+ * Parse arguments and execute the social. Accepted combination of arguments:
+ *
+ * <none>                    : msgCharNoArgument, msgOthersNoArgument
+ * <char1>                   : msgCharFound, msgVictimFound, msgOthersFound
+ * <char not found>          : msgCharNotFound
+ * <self>                    : msgCharAuto, msgOthersAuto
+ * <char1|self> <char2|self> : msgCharFound2, msgVictimFound2, msgOthersFound2
+ *                             hard-coded msg for not found
+ * <obj>                     : msgCharObj, msgOthersObj
+ * <char|self> <obj>         : msgCharVictimObj, msgVictimObj, msgOthersVictimObj
+ */
 void SocialBase::run( Character *ch, const DLString &constArguments )
 {
-    Character *victim;
-    int pos;
+    Character *victim, *victim2;
+    const void *arg1, *arg2;
+    Object *obj;
     DLString argument = constArguments;
-
     DLString firstArgument =  argument.getOneArgument( );
     DLString secondArgument = argument.getOneArgument( );
-    pos = getPosition( );
-    victim = 0;
+    int rc = parseArguments(ch, firstArgument, secondArgument, victim, victim2, obj);
+    int pos = getPosition( );
 
-    if (firstArgument.empty( ))
-    {
-	act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-	act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR,pos );
-    }
-    else if (( victim = get_char_room( ch, firstArgument ) ) == 0)
-    {
-/*	
-	if (!getErrorMsg( ).empty( ))
-	    act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, pos );
-	else
-	    ch->send_to("Нет этого здесь.\n\r");
-*/	    
-    }
-    else if (victim == ch)
-    {
-	act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
-	act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
-    }
-    else
-    {
-        Character *victim2 = victim;
+    switch (rc) {
+        case RC_NOARG:  // п╡я▀п╥п╬п╡ п╠п╣п╥ п©п╟я─п╟п╪п╣я┌я─п╬п╡
+            act( getNoargOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+            act_p( getNoargMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            break;
+    
+        case RC_SELF: // п©я─п╦п╪п╣п╫п╣п╫п╦п╣ я│п╬я├п╦п╟п╩п╟ п╫п╟ я│п╣п╠я▐, п╡ я┌.я┤. п╣я│п╩п╦ п╬п╠п╟ п╟я─пЁя┐п╪п╣п╫я┌п╟ - я┌п╬п╤п╣ я▐
+            act( getAutoOther( ).c_str( ), ch, 0, victim, TO_ROOM );
+            act_p( getAutoMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
+            break;
 
-        // See if 2-victim syntax is supported by this social. Find second victim.
-        if (!getArgMe2( ).empty( ) && !secondArgument.empty( )) {
-            victim2 = get_char_room( ch, secondArgument );
-            if (!victim2) {
-                ch->pecho( "Ты видишь только %1$C4 здесь, кто такой %2s?", victim, secondArgument.c_str( ));
-                return;
-            }
-        }
-        
-        if (victim2 == victim) {
+        case RC_VICT: // п©я─п╦п╪п╣п╫п╣п╫п╦п╣ я│п╬я├п╦п╟п╩п╟ п╫п╟ п╤п╣я─я┌п╡я┐, п╡ я┌.я┤. п╣я│п╩п╦ п╬п╠п╟ п╟я─пЁя┐п╪п╣п╫я┌п╟ - п╬п╢п╫п╟ п╦ я┌п╟ п╤п╣ п╤п╣я─я┌п╡п╟
             act( getArgOther( ).c_str( ), ch, 0, victim, TO_NOTVICT );
             act_p( getArgMe( ).c_str( ), ch, 0, victim, TO_CHAR, pos );
             act( getArgVictim( ).c_str( ), ch, 0, victim, TO_VICT );
-        } else {
-            // Output to actor and both victims.
-            ch->pecho( getArgMe2( ).c_str( ), ch, victim, victim2 );
-            victim->pecho( getArgVictim2( ).c_str( ), ch, victim, victim2 );
-            victim2->pecho( getArgVictim2( ).c_str( ), ch, victim2, victim );
+            break;
+
+        case RC_VICT_NOT_FOUND: // п╫п╣ п╫п╟п╧п╢п╣я┌ п©п╣я─я│п╬п╫п╟п╤ п╦п╩п╦ п©я─п╣п╢п╪п╣я┌ п©п╬ п©п╣я─п╡п╬п╪я┐ п╟я─пЁя┐п╪п╣п╫я┌я┐
+            // Handled after mobprogs had a chance to run.
+            break;
+
+        case RC_VICT2_NOT_FOUND: // п╫п╣ п╫п╟п╧п╢п╣п╫ п©п╣я─я│п╬п╫п╟п╤ п╦п╩п╦ п©я─п╣п╢п╪п╣я┌ п©п╬ п╡я┌п╬я─п╬п╪я┐ п╟я─пЁя┐п╪п╣п╫я┌я┐
+            if (victim == ch)
+                ch->pecho( "п╒я▀ п╡п╦п╢п╦я┬я▄ я┌п╬п╩я▄п╨п╬ я│п╣п╠я▐ п╥п╢п╣я│я▄, п╨я┌п╬ я┌п╟п╨п╬п╧ %s?", secondArgument.c_str( ));
+            else
+                ch->pecho( "п╒я▀ п╡п╦п╢п╦я┬я▄ я┌п╬п╩я▄п╨п╬ %1$C4 п╥п╢п╣я│я▄, п╨я┌п╬ я┌п╟п╨п╬п╧ %s?", victim, secondArgument.c_str( ));
+            break;
+
+
+        case RC_VICT_VICT:
+            // Output to actor and both victims. Substitute actor name with "self" if it matches victim.
+            arg1 = victimOrSelf(ch, victim);
+            arg2 = victimOrSelf(ch, victim2);
+
+            ch->pecho( getArgMe2( ).c_str( ), ch, arg1, arg2 );
+            if (victim != ch ) victim->pecho( getArgVictim2( ).c_str( ), ch, arg1, arg2 );
+            if (victim2 != ch ) victim2->pecho( getArgVictim2( ).c_str( ), ch, arg2, arg1 );
 
             // Output to everyone else in the room.
             for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room)
                 if (rch != ch && rch != victim && rch != victim2)
-                    rch->pecho( getArgOther2( ).c_str( ), ch, victim, victim2 );
-        }
+                    rch->pecho( getArgOther2( ).c_str( ), ch, arg1, arg2 );
+            break;
+
+        case RC_VICT_OBJ:
+            arg1 = victimOrSelf(ch, victim);
+            ch->pecho(getObjChar().c_str(), ch, arg1, obj);
+            if (victim != ch)
+                victim->pecho(getObjVictim().c_str(), ch, arg1, obj);
+            ch->recho(victim, getObjOthers().c_str(), ch, arg1, obj);
+            break;
+
+        case RC_OBJ:
+            ch->pecho(getObjNoVictimSelf().c_str(), ch, obj);
+            ch->recho(getObjNoVictimOthers().c_str(), ch, obj);
+            break;
     }
     
-    reaction( ch, victim, firstArgument );
+    bool reacted = reaction( ch, victim, firstArgument );
+    if (!reacted && rc == RC_VICT_NOT_FOUND) {
+        if (!getErrorMsg( ).empty( ))
+            act_p( getErrorMsg( ).c_str( ), ch, 0, 0, TO_CHAR, getPosition( ) );
+        else
+            ch->println("п²п╣я┌ я█я┌п╬пЁп╬ п╥п╢п╣я│я▄.");
+        return;
+    }
+
+    if (victim2 && victim2 != victim)
+        reaction( ch, victim2, secondArgument );
 }
 
 bool SocialBase::checkPosition( Character *ch )
 {
     if (ch->position >= getPosition( ))
-	return true;
+        return true;
 
     switch (ch->position.getValue( )) {
     case POS_DEAD:
-	ch->send_to("Лежи смирно! Ты {RТРУП{x.\n\r");
-	break;
+        ch->send_to("п⌡п╣п╤п╦ я│п╪п╦я─п╫п╬! п╒я▀ {Rп╒п═пёп÷{x.\n\r");
+        break;
 
     case POS_INCAP:
     case POS_MORTAL:
-	ch->send_to("Даже не думай об этом! Ты в ужасном состоянии.\n\r");
-	break;
+        ch->send_to("п■п╟п╤п╣ п╫п╣ п╢я┐п╪п╟п╧ п╬п╠ я█я┌п╬п╪! п╒я▀ п╡ я┐п╤п╟я│п╫п╬п╪ я│п╬я│я┌п╬я▐п╫п╦п╦.\n\r");
+        break;
 
     case POS_STUNNED:
-	ch->send_to("Ты не в состоянии сделать это.\n\r");
-	break;
+        ch->send_to("п╒я▀ п╫п╣ п╡ я│п╬я│я┌п╬я▐п╫п╦п╦ я│п╢п╣п╩п╟я┌я▄ я█я┌п╬.\n\r");
+        break;
 
     case POS_SLEEPING:
-	ch->send_to("Во сне? Или может сначала проснешься...\n\r");
-	break;
+        ch->send_to("п▓п╬ я│п╫п╣? п≤п╩п╦ п╪п╬п╤п╣я┌ я│п╫п╟я┤п╟п╩п╟ п©я─п╬я│п╫п╣я┬я▄я│я▐...\n\r");
+        break;
 
     case POS_RESTING:
-	ch->send_to( "Уфф... Но ведь ты отдыхаешь...\n\r" );
-	break;
+        ch->send_to( "пёя└я└... п²п╬ п╡п╣п╢я▄ я┌я▀ п╬я┌п╢я▀я┘п╟п╣я┬я▄...\n\r" );
+        break;
 
     case POS_SITTING:
-	ch->send_to( "Сидя? Или может сначала встанешь...\n\r" );
-	break;
+        ch->send_to( "п║п╦п╢я▐? п≤п╩п╦ п╪п╬п╤п╣я┌ я│п╫п╟я┤п╟п╩п╟ п╡я│я┌п╟п╫п╣я┬я▄...\n\r" );
+        break;
 
     case POS_FIGHTING:
-	act_p( "Тебе не до того, ты же сражаешься!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
-	break;
+        act_p( "п╒п╣п╠п╣ п╫п╣ п╢п╬ я┌п╬пЁп╬, я┌я▀ п╤п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!", ch, 0, 0, TO_CHAR, POS_FIGHTING );
+        break;
     }
 
     return false;
@@ -190,14 +295,14 @@ bool SocialBase::checkPosition( Character *ch )
 void SocialBase::visualize( Character *ch )                                        
 {
     if (IS_AFFECTED( ch, AFF_HIDE|AFF_FADE ))  {
-	REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
-	ch->send_to("Ты выходишь из тени.\n\r");
-	act_p( "$c1 выходит из тени.", ch, 0, 0, TO_ROOM,POS_RESTING);
+        REMOVE_BIT( ch->affected_by, AFF_HIDE|AFF_FADE );
+        ch->send_to("п╒я▀ п╡я▀я┘п╬п╢п╦я┬я▄ п╦п╥ я┌п╣п╫п╦.\n\r");
+        act_p( "$c1 п╡я▀я┘п╬п╢п╦я┌ п╦п╥ я┌п╣п╫п╦.", ch, 0, 0, TO_ROOM,POS_RESTING);
     }
 
     if (IS_AFFECTED(ch, AFF_IMP_INVIS)) {
-	affect_strip(ch,gsn_improved_invis);
-	act("Ты становишься видим$gо|ым|ой для окружающих.", ch, 0, 0, TO_CHAR);
-	act("$c1 становится видим$gо|ым|ой для окружающих.\n\r", ch,0,0,TO_ROOM);
+        affect_strip(ch,gsn_improved_invis);
+        act("п╒я▀ я│я┌п╟п╫п╬п╡п╦я┬я▄я│я▐ п╡п╦п╢п╦п╪$gп╬|я▀п╪|п╬п╧ п╢п╩я▐ п╬п╨я─я┐п╤п╟я▌я┴п╦я┘.", ch, 0, 0, TO_CHAR);
+        act("$c1 я│я┌п╟п╫п╬п╡п╦я┌я│я▐ п╡п╦п╢п╦п╪$gп╬|я▀п╪|п╬п╧ п╢п╩я▐ п╬п╨я─я┐п╤п╟я▌я┴п╦я┘.\n\r", ch,0,0,TO_ROOM);
     }
 }

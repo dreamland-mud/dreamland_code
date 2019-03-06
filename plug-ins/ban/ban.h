@@ -39,7 +39,7 @@ public:
 
 class BanManager : public XMLVectorBase<Ban>, 
                    public SchedulerTaskRoundPlugin,
-		   public OneAllocate
+                   public OneAllocate
 {
 public:
     typedef ::Pointer<BanManager> Pointer;
@@ -50,7 +50,7 @@ public:
     virtual void run( );
     virtual void after( );
     virtual int getPriority( ) const;
-	
+        
     virtual void initialization( );
     virtual void destruction( );
     

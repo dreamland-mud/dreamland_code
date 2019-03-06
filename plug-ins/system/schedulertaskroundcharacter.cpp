@@ -2,7 +2,7 @@
  *
  * ruffina, 2003
  *
- * переписано заново, добавлены приоритеты
+ * п©п╣я─п╣п©п╦я│п╟п╫п╬ п╥п╟п╫п╬п╡п╬, п╢п╬п╠п╟п╡п╩п╣п╫я▀ п©я─п╦п╬я─п╦я┌п╣я┌я▀
  */
 /***************************************************************************
                           schedulertask.cpp  -  description
@@ -30,8 +30,8 @@ void SchedulerTaskRoundCharacter::run( )
     Character *ch, *ch_next;
     
     for (ch = char_list; ch != 0 ; ch = ch_next) {
-	ch_next = ch->next;
-	run( ch );
+        ch_next = ch->next;
+        run( ch );
     }
 }
 

@@ -19,7 +19,7 @@ const unsigned int RoomHistory::MAX_SIZE = 10;
 void RoomHistory::record( Character *ch, int door )
 {
     if (ch->is_npc( ) || door >= DIR_SOMEWHERE)
-	return;
+        return;
 
     erase( );
     push_front( RoomHistoryEntry( ch->getName( ), door ) );
@@ -28,29 +28,29 @@ void RoomHistory::record( Character *ch, int door )
 void RoomHistory::erase( )
 {
     if (size( ) > MAX_SIZE)
-	pop_back( );
+        pop_back( );
 }
 
 int RoomHistory::went( Character *ch ) const
 {
     if (ch->is_npc( ))
-	return -1;
+        return -1;
     else {
-	DLString arg( ch->getName( ) );
+        DLString arg( ch->getName( ) );
 
-	return went( arg, true );
+        return went( arg, true );
     }
 }
 
 int RoomHistory::went( DLString &arg, bool fStrict ) const
 {
     for (const_iterator h = begin( ); h != end( ); h++)
-	if ((fStrict && h->name == arg)
-	    || is_name( arg.c_str( ), h->name.c_str( ) ))
-	{
-	    arg = h->name;
-	    return h->went;
-	}
+        if ((fStrict && h->name == arg)
+            || is_name( arg.c_str( ), h->name.c_str( ) ))
+        {
+            arg = h->name;
+            return h->went;
+        }
 
     return -1;
 }
@@ -58,7 +58,7 @@ int RoomHistory::went( DLString &arg, bool fStrict ) const
 void RoomHistory::toStream( ostringstream &buf ) const
 {
     for (const_iterator h = begin( ); h != end( ); h++)
-	buf << h->name << " went " << dirs[h->went].name << "." << endl;
+        buf << h->name << " went " << dirs[h->went].name << "." << endl;
 }
 
 bool RoomHistory::traverse( Room *start, Character *ch ) const
@@ -67,18 +67,18 @@ bool RoomHistory::traverse( Room *start, Character *ch ) const
     Room *room;
 
     if (ch->is_npc( ))
-	return false;
+        return false;
 
     for (room = start, h = room->history.begin( ); 
- 	 h != room->history.end( ) && room && ch->in_room != room; 
-	 h++)
+          h != room->history.end( ) && room && ch->in_room != room; 
+         h++)
     {
-	if (h->name == ch->getName( )) {
-	    if (room->exit[h->went]) 
-		room = room->exit[h->went]->u1.to_room;
-	    else
-		room = 0;
-	}
+        if (h->name == ch->getName( )) {
+            if (room->exit[h->went]) 
+                room = room->exit[h->went]->u1.to_room;
+            else
+                room = 0;
+        }
     }
 
     return room && ch->in_room == room;

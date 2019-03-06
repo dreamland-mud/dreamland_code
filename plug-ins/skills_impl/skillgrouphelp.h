@@ -8,7 +8,7 @@
 #include "markuphelparticle.h"
 #include "skillgroup.h"
 
-class SkillGroupHelp : public MarkupHelpArticle, public XMLHelpArticle, public SkillGroupAction {
+class SkillGroupHelp : public MarkupHelpArticle, public SkillGroupAction {
 public:
     typedef ::Pointer<SkillGroupHelp> Pointer;
 

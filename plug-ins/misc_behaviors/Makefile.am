@@ -29,6 +29,7 @@ rats.cpp \
 special.cpp \
 moneychanger.cpp \
 petquestor.cpp \
+equipsets.cpp \
 impl.cpp 
 
 libmisc_behaviors_la_MOC = \
@@ -40,6 +41,7 @@ ofcolguards.h \
 rats.h \
 moneychanger.h \
 petquestor.h \
+equipsets.h \
 hierophant.h 
 
 

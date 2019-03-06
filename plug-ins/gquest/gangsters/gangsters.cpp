@@ -54,79 +54,79 @@ void Gangsters::create( const Config& ) throw ( GQCannotStartException )
     AreaList areaList;
     
     for (area = area_first; area; area = area->next) {
-	if (area->low_range <= minLevel 
-	    && !IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN
-	                                |AREA_NOQUEST|AREA_NOGATE) ) 
-	{
-	    areaList.push_back(area);
-	} 
+        if (area->low_range <= minLevel 
+            && !IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN
+                                        |AREA_NOQUEST|AREA_NOGATE) ) 
+        {
+            areaList.push_back(area);
+        } 
     }
     
     while (!areaList.empty( )) {
-	Room *room;
-	int msize;
-	int areaIndex;
-	MobileList people;
-	RoomList mobRooms, portalRooms;
+        Room *room;
+        int msize;
+        int areaIndex;
+        MobileList people;
+        RoomList mobRooms, portalRooms;
 
-	areaIndex = number_range(0, areaList.size( ) - 1);
-	area = areaList[ areaIndex ];
-	areaList.erase( areaList.begin( ) + areaIndex );
-	
-	mobRoomVnums.clear( );
-	portalRoomVnums.clear( );
-	
-	for (room = room_list; room; room = room->rnext) {
-	    if (room->area != area) 
-		continue;
-		
-	    if (checkRoom( room )) {
-		mobRooms.push_back( room );
-		mobRoomVnums.push_back( room->vnum );
+        areaIndex = number_range(0, areaList.size( ) - 1);
+        area = areaList[ areaIndex ];
+        areaList.erase( areaList.begin( ) + areaIndex );
+        
+        mobRoomVnums.clear( );
+        portalRoomVnums.clear( );
+        
+        for (room = room_list; room; room = room->rnext) {
+            if (room->area != area) 
+                continue;
+                
+            if (checkRoom( room )) {
+                mobRooms.push_back( room );
+                mobRoomVnums.push_back( room->vnum );
 
-		for (Character *ch = room->people; ch; ch = ch->next_in_room) {
-		    if (!getActor( ch )->is_npc( ))
-			continue;
+                for (Character *ch = room->people; ch; ch = ch->next_in_room) {
+                    if (!getActor( ch )->is_npc( ))
+                        continue;
 
-		    if (ch->getNPC( )->pIndexData->area != area)
-			continue;
+                    if (ch->getNPC( )->pIndexData->area != area)
+                        continue;
 
-		    if (ch->getRace( )->isPC( ))
-			people.push_back( ch->getNPC( ) );
-		}
-	    }
+                    if (ch->getRace( )->isPC( ))
+                        people.push_back( ch->getNPC( ) );
+                }
+            }
 
-	    if (GangPortal::canDrop( room ))
-		portalRooms.push_back( room );
-	}
-	
-	try {
-	    msize = mobRooms.size( );
-	    
-	    if (!people.empty( ) && !portalRooms.empty( ) && msize > 10) {
-		int numPortal, number;
+            if (GangPortal::canDrop( room ))
+                portalRooms.push_back( room );
+        }
+        
+        try {
+            msize = mobRooms.size( );
+            
+            if (!people.empty( ) && !portalRooms.empty( ) && msize > 10) {
+                int numPortal, number;
 
-		numPortal = number = (msize > 100 ? 3 : (msize > 40 ? 2 : 1));
-		    
-		while (!portalRooms.empty( ) && number > 0) 
-		    if (createPortal( portalRooms ))
-			number--;
+                numPortal = number = (msize > 100 ? 3 : (msize > 40 ? 2 : 1));
+                    
+                while (!portalRooms.empty( ) && number > 0) 
+                    if (createPortal( portalRooms ))
+                        number--;
 
-		if (number == 0) {
-		    log("good area: " << area->name);
-		    populateArea( area, mobRooms, numPortal );
-		    createFirstHint( people );
-		    populateLair( );
-		    return;
-		}
-	    }	
-	}
-	catch (const Exception& e) {
-	    cleanup( false );
-	    throw e;
-	}
-	
-	cleanup( false );
+                if (number == 0) {
+                    log("good area: " << area->name);
+                    populateArea( area, mobRooms, numPortal );
+                    createFirstHint( people );
+                    populateLair( );
+                    return;
+                }
+            }        
+        }
+        catch (const Exception& e) {
+            cleanup( false );
+            throw e;
+        }
+        
+        cleanup( false );
 
     } 
     
@@ -140,41 +140,41 @@ void Gangsters::cleanup( bool performance )
     Object *obj, *obj_next;
     
     for (obj = object_list; obj; obj = obj_next) {
-	obj_next = obj->next;
+        obj_next = obj->next;
 
-	if (!obj->behavior)
-	    continue;
-	
-	if (obj->behavior.getDynamicPointer<GangPortal>( ))
-	    extract_obj( obj );
-	else {
-	    GangKey::Pointer behavior = obj->behavior.getDynamicPointer<GangKey>( );
+        if (!obj->behavior)
+            continue;
+        
+        if (obj->behavior.getDynamicPointer<GangPortal>( ))
+            extract_obj( obj );
+        else {
+            GangKey::Pointer behavior = obj->behavior.getDynamicPointer<GangKey>( );
 
-	    if (behavior) {
-		behavior->needsReset = false;
-		extract_obj( obj );
-	    }
-	}
+            if (behavior) {
+                behavior->needsReset = false;
+                extract_obj( obj );
+            }
+        }
     }
     
     if (!mobRoomVnums.empty( ))
-	REMOVE_BIT(get_room_index( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
+        REMOVE_BIT(get_room_index( mobRoomVnums.front( ) )->area->area_flag, AREA_NOGATE);
     
     for (ch = char_list; ch; ch = ch_next) {
-	ch_next = ch->next;
-	
-	if (!ch->is_npc() || !ch->getNPC()->behavior || !ch->getNPC()->behavior.getDynamicPointer<GangMob>( ))
-	    continue;
-	    
-	if (performance) {
-	    if (ch->position >= POS_RESTING) 
-		act_p("$c1 ÐÒÏÉÚÎÏÓÉÔ '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
-	    
-	    if (ch->position >= POS_MORTAL)	
-		act_p("$c1 ÉÓÞÅÚÁÅÔ × ËÌÕÂÅ ÄÙÍÁ.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	}
-	
-	extract_char( ch );
+        ch_next = ch->next;
+        
+        if (!ch->is_npc() || !ch->getNPC()->behavior || !ch->getNPC()->behavior.getDynamicPointer<GangMob>( ))
+            continue;
+            
+        if (performance) {
+            if (ch->position >= POS_RESTING) 
+                act_p("$c1 Ð¿Ñ€Ð¾Ð¸Ð·Ð½Ð¾ÑÐ¸Ñ‚ '{gHasta la vista, baby!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
+            
+            if (ch->position >= POS_MORTAL)        
+                act_p("$c1 Ð¸ÑÑ‡ÐµÐ·Ð°ÐµÑ‚ Ð² ÐºÐ»ÑƒÐ±Ðµ Ð´Ñ‹Ð¼Ð°.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        }
+        
+        extract_char( ch );
     }
     
     wipeRoom( get_room_index( GangstersInfo::getThis( )->vnumLair ) );
@@ -186,14 +186,14 @@ void Gangsters::destroy( )
     
     switch (state.getValue( )) {
     case ST_CHEF_KILLED:
-	rewardChefKiller( );
-	break;
+        rewardChefKiller( );
+        break;
     case ST_BROKEN:
-	rewardNobody( );
-	break;
+        rewardNobody( );
+        break;
     default:
-	rewardLeader( );
-	break;
+        rewardLeader( );
+        break;
     }
 }
 
@@ -206,14 +206,14 @@ public:
     }
     virtual void run( )
     {
-	gquest->resetKeys( );
+        gquest->resetKeys( );
     }
     virtual int getPriority( ) const
     {
-	int prio = DLScheduler::getThis( )->getPriority( );
+        int prio = DLScheduler::getThis( )->getPriority( );
 
-	prio = max( prio, (int)SCDP_INITIAL ) + 100;
-	return prio;
+        prio = max( prio, (int)SCDP_INITIAL ) + 100;
+        return prio;
     }
 
 private:
@@ -225,36 +225,36 @@ void Gangsters::resume( )
     int rtime = getTaskTime( );
     
     if (rtime <= 0) 
-	scheduleDestroy( );
+        scheduleDestroy( );
     else {
-	DLScheduler::getThis( )->putTaskInSecond( rtime * 60, Gangsters::Pointer( this ) );
-	GlobalQuestManager::getThis( )->activate( this );
-	DLScheduler::getThis( )->putTaskNOW( GangKeysResetTask::Pointer( NEW, this ) );
+        DLScheduler::getThis( )->putTaskInSecond( rtime * 60, Gangsters::Pointer( this ) );
+        GlobalQuestManager::getThis( )->activate( this );
+        DLScheduler::getThis( )->putTaskNOW( GangKeysResetTask::Pointer( NEW, this ) );
     }
 }
 
 void Gangsters::after( )
 {
     if (state != ST_NONE && state != ST_NO_MORE_HINTS)
-	return;
+        return;
 
     switch (hintCount++) {
     case 0:
-	if (state == ST_NONE)
-	    if (!createSecondHint( ))
-		createThirdHint( );
-	
-	break;
-	
+        if (state == ST_NONE)
+            if (!createSecondHint( ))
+                createThirdHint( );
+        
+        break;
+        
     case 1:
-	if (state == ST_NONE)
-	    createThirdHint( );
-	
-	break;
+        if (state == ST_NONE)
+            createThirdHint( );
+        
+        break;
 
     default:
-	scheduleDestroy( );
-	return;
+        scheduleDestroy( );
+        return;
     }
     
     GlobalQuest::after( );
@@ -270,17 +270,17 @@ int Gangsters::getTaskTime( ) const
 void Gangsters::report( std::ostringstream &buf, PCharacter *ch ) const
 {
     if (isLevelOK( ch )) {
-	XMLAttributeGangsters::Pointer attr;
-	
-	attr = ch->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
-	
-	if (attr && attr->getKilled( ) > 0)
-	    buf << "þÉÓÌÏ ÕÂÉÔÙÈ ÔÏÂÏÊ ÐÒÅÓÔÕÐÎÉËÏ×: " 
-		<< GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
-	
-	buf << "äÏ ËÏÎÃÁ ÏÈÏÔÙ ÏÓÔÁÅÔÓÑ ";
-	printRemainedTime( buf );
-	buf << "." << endl;
+        XMLAttributeGangsters::Pointer attr;
+        
+        attr = ch->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
+        
+        if (attr && attr->getKilled( ) > 0)
+            buf << "Ð§Ð¸ÑÐ»Ð¾ ÑƒÐ±Ð¸Ñ‚Ñ‹Ñ… Ñ‚Ð¾Ð±Ð¾Ð¹ Ð¿Ñ€ÐµÑÑ‚ÑƒÐ¿Ð½Ð¸ÐºÐ¾Ð²: " 
+                << GQChannel::BOLD <<  attr->getKilled( ) << GQChannel::NORMAL << endl;
+        
+        buf << "Ð”Ð¾ ÐºÐ¾Ð½Ñ†Ð° Ð¾Ñ…Ð¾Ñ‚Ñ‹ Ð¾ÑÑ‚Ð°ÐµÑ‚ÑÑ ";
+        printRemainedTime( buf );
+        buf << "." << endl;
     }
 }
 
@@ -290,32 +290,32 @@ void Gangsters::progress( std::ostringstream &buf ) const
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM( );
 
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	XMLAttributeGangsters::Pointer attr; 
-	
-	attr = i->second->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
-	
-	if (!attr || attr->getKilled( ) <= 0)
-	    continue;
-	
-	buf << GQChannel::NORMAL
-	    << dlprintf( "%-15s", i->second->getName( ).c_str( ) ) << " "
-	    << GQChannel::BOLD << dlprintf( "%-4d", attr->getKilled( ) )
-	    << GQChannel::NORMAL << endl;
+        XMLAttributeGangsters::Pointer attr; 
+        
+        attr = i->second->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
+        
+        if (!attr || attr->getKilled( ) <= 0)
+            continue;
+        
+        buf << GQChannel::NORMAL
+            << dlprintf( "%-15s", i->second->getName( ).c_str( ) ) << " "
+            << GQChannel::BOLD << dlprintf( "%-4d", attr->getKilled( ) )
+            << GQChannel::NORMAL << endl;
     }
 }
 
 void Gangsters::getQuestDescription( std::ostringstream &buf ) const
 {
     getQuestStartMessage( buf );
-    buf << endl	<< getHint( ) << endl;
+    buf << endl        << getHint( ) << endl;
 }
 
 void Gangsters::getQuestStartMessage( std::ostringstream &buf ) const
 {
-    buf << "ûÁÊËÁ ÐÒÅÓÔÕÐÎÉËÏ× ÁÔÁËÏ×ÁÌÁ ÍÉÒÎÙÈ ÖÉÔÅÌÅÊ. "
-	<< "éÝÕÔÓÑ ÈÒÁÂÒÅÃÙ " 
-	<< GQChannel::BOLD << minLevel << "-" << maxLevel << GQChannel::NORMAL
-	<< " ÕÒÏ×ÎÅÊ ÄÌÑ ÕÎÉÞÔÏÖÅÎÉÑ ÂÁÎÄÉÔÏ× É ÉÈ ÇÌÁ×ÁÒÑ.";
+    buf << "Ð¨Ð°Ð¹ÐºÐ° Ð¿Ñ€ÐµÑÑ‚ÑƒÐ¿Ð½Ð¸ÐºÐ¾Ð² Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð»Ð° Ð¼Ð¸Ñ€Ð½Ñ‹Ñ… Ð¶Ð¸Ñ‚ÐµÐ»ÐµÐ¹. "
+        << "Ð˜Ñ‰ÑƒÑ‚ÑÑ Ñ…Ñ€Ð°Ð±Ñ€ÐµÑ†Ñ‹ " 
+        << GQChannel::BOLD << minLevel << "-" << maxLevel << GQChannel::NORMAL
+        << " ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹ Ð´Ð»Ñ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð¸Ñ Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ð¸ Ð¸Ñ… Ð³Ð»Ð°Ð²Ð°Ñ€Ñ.";
 }
 
 /*****************************************************************************/
@@ -333,55 +333,55 @@ void Gangsters::rewardLeader( )
     int max = 0, killed;
 
     for (i = pcm.begin( ); i != pcm.end( ); i++) {
-	XMLAttributeGangsters::Pointer attr;
-	
-	attr = i->second->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
-	
-	if (!attr) 
-	    continue;
+        XMLAttributeGangsters::Pointer attr;
+        
+        attr = i->second->getAttributes( ).findAttr<XMLAttributeGangsters>( getQuestID( ) );
+        
+        if (!attr) 
+            continue;
 
-	killed = attr->getKilled( );
-	if (killed && killed > max) {
-	    max = killed;
-	    leaders.clear( );
-	    leaders.push_back( i->second );
-	} else if (killed && killed == max)
-	    leaders.push_back( i->second );
+        killed = attr->getKilled( );
+        if (killed && killed > max) {
+            max = killed;
+            leaders.clear( );
+            leaders.push_back( i->second );
+        } else if (killed && killed == max)
+            leaders.push_back( i->second );
     }
     
-    buf << "çÌÁ×ÁÒÑ ÛÁÊËÉ ÔÁË ÎÉËÔÏ É ÎÅ ÕÂÉÌ.";
+    buf << "Ð“Ð»Ð°Ð²Ð°Ñ€Ñ ÑˆÐ°Ð¹ÐºÐ¸ Ñ‚Ð°Ðº Ð½Ð¸ÐºÑ‚Ð¾ Ð¸ Ð½Ðµ ÑƒÐ±Ð¸Ð».";
     GQChannel::gecho( this, buf );
 
     if (leaders.empty( )) {
-	buf << "âÏÌÅÅ ÔÏÇÏ, ÎÉ ÏÄÉÎ ÂÁÎÄÉÔ ÎÅ ÐÏÓÔÒÁÄÁÌ."  << endl;
+        buf << "Ð‘Ð¾Ð»ÐµÐµ Ñ‚Ð¾Ð³Ð¾, Ð½Ð¸ Ð¾Ð´Ð¸Ð½ Ð±Ð°Ð½Ð´Ð¸Ñ‚ Ð½Ðµ Ð¿Ð¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð»."  << endl;
     }
     else { 
-	XMLReward reward;
-	
-	reward.qpoints = max * number_range( 10, 15 ) + number_fuzzy( 10 );
-	reward.gold = max * number_range( 10, 15 );
-	reward.experience = max * number_fuzzy( 50 );
-	reward.reason = DLString( "úÁ ÕÂÉÊÓÔ×Ï ÓÁÍÏÇÏ ÂÏÌØÛÏÇÏ ËÏÌÉÞÅÓÔ×Á ÂÁÎÄÉÔÏ× ÔÙ ÐÏÌÕÞÁÅÛØ: " );
-	reward.id = getQuestID( );
-	
-	if (leaders.size( ) == 1)
-	    buf << "óÁÍÙÊ ÌÕÞÛÉÊ ÏÈÏÔÎÉË ÚÁ ÂÁÎÄÉÔÁÍÉ:" << GQChannel::BOLD;
-	else
-	    buf << "óÁÍÙÅ ÕÓÐÅÛÎÙÅ ÏÈÏÔÎÉËÉ ÚÁ ÂÁÎÄÉÔÁÍÉ:" << GQChannel::BOLD;
-	
-	while (!leaders.empty( )) {
-	    PCMemoryInterface * pci;
+        XMLReward reward;
+        
+        reward.qpoints = max * number_range( 10, 15 ) + number_fuzzy( 10 );
+        reward.gold = max * number_range( 10, 15 );
+        reward.experience = max * number_fuzzy( 50 );
+        reward.reason = DLString( "Ð—Ð° ÑƒÐ±Ð¸Ð¹ÑÑ‚Ð²Ð¾ ÑÐ°Ð¼Ð¾Ð³Ð¾ Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð³Ð¾ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð° Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ñ‚Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ: " );
+        reward.id = getQuestID( );
+        
+        if (leaders.size( ) == 1)
+            buf << "Ð¡Ð°Ð¼Ñ‹Ð¹ Ð»ÑƒÑ‡ÑˆÐ¸Ð¹ Ð¾Ñ…Ð¾Ñ‚Ð½Ð¸Ðº Ð·Ð° Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð°Ð¼Ð¸:" << GQChannel::BOLD;
+        else
+            buf << "Ð¡Ð°Ð¼Ñ‹Ðµ ÑƒÑÐ¿ÐµÑˆÐ½Ñ‹Ðµ Ð¾Ñ…Ð¾Ñ‚Ð½Ð¸ÐºÐ¸ Ð·Ð° Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð°Ð¼Ð¸:" << GQChannel::BOLD;
+        
+        while (!leaders.empty( )) {
+            PCMemoryInterface * pci;
 
-	    pci = leaders.back( );
-	    leaders.pop_back( );
+            pci = leaders.back( );
+            leaders.pop_back( );
 
-	    buf << " " << pci->getName( );
-	    if (!leaders.empty( ))
-		buf << ",";
+            buf << " " << pci->getName( );
+            if (!leaders.empty( ))
+                buf << ",";
 
-	    log("reward leader " << pci->getName( ));
-	    GlobalQuestManager::getThis( )->rewardChar( pci, reward );
-	}
+            log("reward leader " << pci->getName( ));
+            GlobalQuestManager::getThis( )->rewardChar( pci, reward );
+        }
     }
 
     GQChannel::gecho( this, buf );
@@ -397,23 +397,23 @@ void Gangsters::rewardChefKiller( )
     r.qpoints = number_range( 200, 250 );
     r.experience = number_range( 300, 500 );
     r.practice = number_range( -6, 3 );
-    r.reason = DLString( "ðÏÚÄÒÁ×ÌÑÅÍ! ûÅÆ ÕÂÉÔ É ×ÓÅ ÂÁÎÄÉÔÙ ÒÁÚÂÅÖÁÌÉÓØ. ÷ ÎÁÇÒÁÄÕ ÔÙ ÐÏÌÕÞÁÅÛØ: " );
+    r.reason = DLString( "ÐŸÐ¾Ð·Ð´Ñ€Ð°Ð²Ð»ÑÐµÐ¼! Ð¨ÐµÑ„ ÑƒÐ±Ð¸Ñ‚ Ð¸ Ð²ÑÐµ Ð±Ð°Ð½Ð´Ð¸Ñ‚Ñ‹ Ñ€Ð°Ð·Ð±ÐµÐ¶Ð°Ð»Ð¸ÑÑŒ. Ð’ Ð½Ð°Ð³Ñ€Ð°Ð´Ñƒ Ñ‚Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ: " );
     r.id = getQuestID( );
 
     GlobalQuestManager::getThis( )->rewardChar( pci, r );
 
     buf << GQChannel::BOLD << pci->getName( ) << GQChannel::NORMAL 
-	<< " ÕÎÉÞÔÏÖÉÌ" << GET_SEX(pci, "", "Ï", "Á") <<" ÇÌÁ×ÁÒÑ ÛÁÊËÉ!";
+        << " ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð¸Ð»" << GET_SEX(pci, "", "Ð¾", "Ð°") <<" Ð³Ð»Ð°Ð²Ð°Ñ€Ñ ÑˆÐ°Ð¹ÐºÐ¸!";
 
     GQChannel::gecho( this, buf );
     
     pci->getAttributes( ).getAttr<XMLAttributeGlobalQuest>( "gquest" )
-		    ->rememberVictory( getQuestID( ) );
+                    ->rememberVictory( getQuestID( ) );
 }
 
 void Gangsters::rewardNobody( ) 
 {
-    GQChannel::gecho( this, "ûÅÆÁ ÂÁÎÄÙ ÕÂÉÌÁ ÐÒÏÔÉ×ÏÂÏÒÓÔ×ÕÀÝÁÑ ÇÒÕÐÐÉÒÏ×ËÁ.");
+    GQChannel::gecho( this, "Ð¨ÐµÑ„Ð° Ð±Ð°Ð½Ð´Ñ‹ ÑƒÐ±Ð¸Ð»Ð° Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð¾Ð±Ð¾Ñ€ÑÑ‚Ð²ÑƒÑŽÑ‰Ð°Ñ Ð³Ñ€ÑƒÐ¿Ð¿Ð¸Ñ€Ð¾Ð²ÐºÐ°.");
 }
 
 void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
@@ -424,15 +424,15 @@ void Gangsters::rewardMobKiller( PCharacter *killer, Character *mob )
     r.experience = number_range( 10, 30 );
     r.qpoints = number_range( diff, 8 );
     r.gold = number_range( diff, 8 );
-    r.reason = "ô×ÏÑ ÎÁÇÒÁÄÁ ÚÁ ÕÎÉÞÔÏÖÅÎÉÅ ÐÒÅÓÔÕÐÎÉËÁ ÓÏÓÔÁ×ÌÑÅÔ: ";
+    r.reason = "Ð¢Ð²Ð¾Ñ Ð½Ð°Ð³Ñ€Ð°Ð´Ð° Ð·Ð° ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¿Ñ€ÐµÑÑ‚ÑƒÐ¿Ð½Ð¸ÐºÐ° ÑÐ¾ÑÑ‚Ð°Ð²Ð»ÑÐµÑ‚: ";
     r.id = getQuestID( );
-    GlobalQuestManager::getThis( )->rewardChar( killer, r );	
+    GlobalQuestManager::getThis( )->rewardChar( killer, r );        
 
     XMLAttributeGangsters::Pointer attr = killer->getAttributes( ).getAttr<XMLAttributeGangsters>( getQuestID( ) );
     attr->setKilled( attr->getKilled( ) + 1 );
     
     if (state == ST_NONE)
-	state = ST_NO_MORE_HINTS;
+        state = ST_NO_MORE_HINTS;
 }
 
 /*****************************************************************************/
@@ -455,58 +455,58 @@ void Gangsters::createFirstHint( MobileList &people )
     informerName = name;
     informerRoom = informer->in_room->name;
 
-    buf << name	<< " ÓÏÏÂÝÉÌ" << GET_SEX( informer, "", "Ï", "Á" );
+    buf << name        << " ÑÐ¾Ð¾Ð±Ñ‰Ð¸Ð»" << GET_SEX( informer, "", "Ð¾", "Ð°" );
     
     switch (number_range(1, 4)) {
-    case 1: case 2: buf << " èÁÓÓÁÎÕ"; break;
-    case 3: case 4: buf << " ÷ÁÌØËÉÒÉÉ"; break;
+    case 1: case 2: buf << " Ð¥Ð°ÑÑÐ°Ð½Ñƒ"; break;
+    case 3: case 4: buf << " Ð’Ð°Ð»ÑŒÐºÐ¸Ñ€Ð¸Ð¸"; break;
     }
     
-    buf << ", ÞÔÏ ×ÉÄÅÌ" << GET_SEX( informer, "", "Ï", "Á" )
-	<< " ÂÁÎÄÉÔÏ× ×ÏÚÌÅ ÍÅÓÔÎÏÓÔÉ ÐÏÄ ÎÁÚ×ÁÎÉÅÍ " << informer->in_room->name << ". ";
+    buf << ", Ñ‡Ñ‚Ð¾ Ð²Ð¸Ð´ÐµÐ»" << GET_SEX( informer, "", "Ð¾", "Ð°" )
+        << " Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ð²Ð¾Ð·Ð»Ðµ Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð´ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ " << informer->in_room->name << ". ";
     setHint( buf.str( ) );
-}	    
+}            
 
 Room * Gangsters::findHintRoom( std::ostringstream &buf )
 {
     Room *room = NULL;
 
     for (unsigned int i = 0; i < mobRoomVnums.size( ); i++) {
-	room = get_room_index( mobRoomVnums[i] );
-	
-	if (informerRoom.getValue( ) == room->name)
-	    continue;
+        room = get_room_index( mobRoomVnums[i] );
+        
+        if (informerRoom.getValue( ) == room->name)
+            continue;
 
-	for (Character *ch = room->people; ch; ch = ch->next_in_room) {
-	    DLString name;
+        for (Character *ch = room->people; ch; ch = ch->next_in_room) {
+            DLString name;
 
-	    if (!getActor( ch )->is_npc( ))
-		continue;
+            if (!getActor( ch )->is_npc( ))
+                continue;
 
-	    if (ch->getNPC()->pIndexData->area != room->area) 
-		continue;
-	    
-	    if (!ch->getRace( )->isPC( ))
-		continue;
-	    
-	    name = ch->getNameP('1');
-	    if (name == informerName.getValue( ))
-		continue;
+            if (ch->getNPC()->pIndexData->area != room->area) 
+                continue;
+            
+            if (!ch->getRace( )->isPC( ))
+                continue;
+            
+            name = ch->getNameP('1');
+            if (name == informerName.getValue( ))
+                continue;
 
-	    /* from the same area but not informer */
-	    
-	    name.upperFirstCharacter( );
-	    buf	<< name << " ÓÔÏÌËÎÕÌ" << GET_SEX( ch, "ÓÑ", "ÏÓØ", "ÁÓØ" )
-		<< " Ó ÇÁÎÇÓÔÅÒÁÍÉ ×ÏÚÌÅ " << room->name << ".";
+            /* from the same area but not informer */
+            
+            name.upperFirstCharacter( );
+            buf        << name << " ÑÑ‚Ð¾Ð»ÐºÐ½ÑƒÐ»" << GET_SEX( ch, "ÑÑ", "Ð¾ÑÑŒ", "Ð°ÑÑŒ" )
+                << " Ñ Ð³Ð°Ð½Ð³ÑÑ‚ÐµÑ€Ð°Ð¼Ð¸ Ð²Ð¾Ð·Ð»Ðµ " << room->name << ".";
 
-	    return room;
-	}
+            return room;
+        }
     }
     
     /* cannot find mob, give hint only about a room they're in */
     if (room) 
-	buf << "çÁÎÇÓÔÅÒÙ ÂÙÌÉ ÔÁËÖÅ ÚÁÍÅÞÅÎÙ ÎÅÐÏÄÁÌÅËÕ ÏÔ " 
-	    << room->name << ".";
+        buf << "Ð“Ð°Ð½Ð³ÑÑ‚ÐµÑ€Ñ‹ Ð±Ñ‹Ð»Ð¸ Ñ‚Ð°ÐºÐ¶Ðµ Ð·Ð°Ð¼ÐµÑ‡ÐµÐ½Ñ‹ Ð½ÐµÐ¿Ð¾Ð´Ð°Ð»ÐµÐºÑƒ Ð¾Ñ‚ " 
+            << room->name << ".";
     
     return room;
 }
@@ -517,10 +517,10 @@ bool Gangsters::createSecondHint( )
     Room *room = findHintRoom( buf );
 
     if (room) {
-	GQChannel::gecho( this, buf );
-	
-	setHint( getHint( ) + " " + buf.str( ) );
-	char_to_room( createMob( ), room );
+        GQChannel::gecho( this, buf );
+        
+        setHint( getHint( ) + " " + buf.str( ) );
+        char_to_room( createMob( ), room );
     }
     
     return (room != NULL);
@@ -530,7 +530,7 @@ void Gangsters::createThirdHint( )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "âÏÌØÛÅ ×ÓÅÇÏ ÏÔ ÒÕËÉ ÂÁÎÄÉÔÏ× ÐÏÓÔÒÁÄÁÌÁ ÍÅÓÔÎÏÓÔØ " << areaName << ".";
+    buf << "Ð‘Ð¾Ð»ÑŒÑˆÐµ Ð²ÑÐµÐ³Ð¾ Ð¾Ñ‚ Ñ€ÑƒÐºÐ¸ Ð±Ð°Ð½Ð´Ð¸Ñ‚Ð¾Ð² Ð¿Ð¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð»Ð° Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚ÑŒ " << areaName << ".";
     setHint( buf.str( ) );
     GQChannel::gecho( this, buf );
 
@@ -548,8 +548,8 @@ NPCharacter * Gangsters::createMob( )
     int vnum = GangstersInfo::getThis( )->vnumMob;
     
     if (!(pMobIndex = get_mob_index( vnum )))
-	throw MobileNotFoundException( vnum );
-	
+        throw MobileNotFoundException( vnum );
+        
     ch = create_mobile( pMobIndex );
     behavior->setChar( ch );
     behavior->config( number_range( minLevel, maxLevel ) );
@@ -566,8 +566,8 @@ NPCharacter * Gangsters::createChef( )
     int vnum = GangstersInfo::getThis( )->vnumChef;
     
     if (!(pMobIndex = get_mob_index( vnum )))
-	throw MobileNotFoundException( vnum );
-	
+        throw MobileNotFoundException( vnum );
+        
     ch = create_mobile( pMobIndex );
     behavior->setChar( ch );
     behavior->config( maxLevel );
@@ -584,8 +584,8 @@ Object * Gangsters::createKey( )
     int vnum = GangstersInfo::getThis( )->vnumKey;
     
     if (!(pObjIndex = get_obj_index( vnum )))
-	throw ObjectNotFoundException( vnum );
-	
+        throw ObjectNotFoundException( vnum );
+        
     key = create_object( pObjIndex, 0 );
     behavior->setObj( key );
     key->behavior.setPointer( *behavior );
@@ -602,51 +602,51 @@ void Gangsters::resetKeys( )
     int keyCnt = 0;
    
     if (!keyCount)
-	return;
+        return;
 
     for (obj = object_list; obj; obj = obj->next) 
-	if (obj->behavior && obj->behavior.getDynamicPointer<GangKey>( ))
-	    keyCnt++;
+        if (obj->behavior && obj->behavior.getDynamicPointer<GangKey>( ))
+            keyCnt++;
     
     if (keyCnt >= keyCount)
-	return;
+        return;
 
     for (ch = char_list; ch; ch = ch->next) {
-	if (!ch->is_npc( ))
-	    continue;
+        if (!ch->is_npc( ))
+            continue;
 
-	mob = ch->getNPC( );
-	
-	if (mob->in_room->vnum == GangstersInfo::getThis( )->vnumLair)
-	    continue;
+        mob = ch->getNPC( );
+        
+        if (mob->in_room->vnum == GangstersInfo::getThis( )->vnumLair)
+            continue;
 
-	if (!mob->behavior || !mob->behavior.getDynamicPointer<GangMob>( ))
-	    continue;
-	    
-	for (obj = mob->carrying; obj; obj = obj->next_content) 
-	    if (obj->pIndexData->vnum == GangstersInfo::getThis( )->vnumKey)
-		break;
+        if (!mob->behavior || !mob->behavior.getDynamicPointer<GangMob>( ))
+            continue;
+            
+        for (obj = mob->carrying; obj; obj = obj->next_content) 
+            if (obj->pIndexData->vnum == GangstersInfo::getThis( )->vnumKey)
+                break;
 
-	if (obj)
-	    continue;
-	
-	mobiles.push_back( mob );
+        if (obj)
+            continue;
+        
+        mobiles.push_back( mob );
     }
     
     while (keyCnt++ < keyCount) {
-	if (mobiles.empty( )) {
-	    mob = createMob( );
-	    char_to_room( mob, pickRandomRoom( ) );
-	}
-	else {
-	    int i = number_range( 0, mobiles.size( ) - 1 );
-	    
-	    mob = mobiles[i];
-	    mobiles.erase( mobiles.begin( ) + i );
-	}
-	
-	obj_to_char( createKey( ), mob );
-	log("new key to mob in room " << mob->in_room->name ); 
+        if (mobiles.empty( )) {
+            mob = createMob( );
+            char_to_room( mob, pickRandomRoom( ) );
+        }
+        else {
+            int i = number_range( 0, mobiles.size( ) - 1 );
+            
+            mob = mobiles[i];
+            mobiles.erase( mobiles.begin( ) + i );
+        }
+        
+        obj_to_char( createKey( ), mob );
+        log("new key to mob in room " << mob->in_room->name ); 
     }
 }
 
@@ -666,17 +666,17 @@ Object * Gangsters::createPortal( RoomList &portalRooms )
     case SECT_DESERT:
     case SECT_HILLS:
     case SECT_MOUNTAIN:
-	portal = create_object( get_obj_index( GangstersInfo::getThis( )->vnumPortalForest ), 0 );
-	break;
+        portal = create_object( get_obj_index( GangstersInfo::getThis( )->vnumPortalForest ), 0 );
+        break;
     case SECT_CITY:
     case SECT_UNUSED:
     default:
-	portal = create_object( get_obj_index( GangstersInfo::getThis( )->vnumPortalCity ), 0 );
-	break;
+        portal = create_object( get_obj_index( GangstersInfo::getThis( )->vnumPortalCity ), 0 );
+        break;
     }
     
     if (!portal->behavior)
-	throw BadObjectBehaviorException( portal->pIndexData->vnum );
+        throw BadObjectBehaviorException( portal->pIndexData->vnum );
 
     SET_BIT( portal->value[1], EX_ISDOOR|EX_CLOSED|EX_LOCKED|EX_NOPASS|EX_PICKPROOF );
     portal->value[4] = GangstersInfo::getThis( )->vnumKey;
@@ -695,41 +695,41 @@ Room * Gangsters::recursiveWalk( Room *room, int depth, int maxDepth )
     Room * targets [DIR_SOMEWHERE];
 
     if (depth >= maxDepth) 
-	return room;
+        return room;
     
     for (i = 0, j = 0; i < DIR_SOMEWHERE; i++) {
-	EXIT_DATA *door;
-	if (!room->exit[i])
-	    continue;
-	
-	pRoom = room->exit[i]->u1.to_room;
-	if (!pRoom)
-	    continue;
+        EXIT_DATA *door;
+        if (!room->exit[i])
+            continue;
+        
+        pRoom = room->exit[i]->u1.to_room;
+        if (!pRoom)
+            continue;
 
-	if (IS_SET(pRoom->room_flags, ROOM_MARKER))
-	    continue;
-	
-	door = pRoom->exit[dirs[i].rev];
-	if (!door || door->u1.to_room != room)
-	    continue;
+        if (IS_SET(pRoom->room_flags, ROOM_MARKER))
+            continue;
+        
+        door = pRoom->exit[dirs[i].rev];
+        if (!door || door->u1.to_room != room)
+            continue;
 
-	targets[j++] = pRoom;
+        targets[j++] = pRoom;
     }
 
     for (i = 0; i < j; i++) {
-	int i0 = number_mm( ) % j;
-	pRoom = targets[i];
-	targets[i] = targets[i0];
-	targets[i0] = pRoom;
+        int i0 = number_mm( ) % j;
+        pRoom = targets[i];
+        targets[i] = targets[i0];
+        targets[i0] = pRoom;
     }
-	
+        
     SET_BIT(room->room_flags, ROOM_MARKER);
     pRoom = NULL;
     
     for (i = 0; i < j; i++) {
-	pRoom = recursiveWalk( targets[i], depth + 1, maxDepth );
-	if (pRoom) 
-	    break;	    
+        pRoom = recursiveWalk( targets[i], depth + 1, maxDepth );
+        if (pRoom) 
+            break;            
     }
     
     REMOVE_BIT(room->room_flags, ROOM_MARKER);
@@ -745,12 +745,12 @@ Room * Gangsters::pickRandomRoom( )
 DLString Gangsters::lairHint( ) 
 {
     if (!portalRoomVnums.empty( )) {
-	int i = number_range(0, portalRoomVnums.size( ) - 1);
-	int vnum = portalRoomVnums[i];
-	Room *room = get_room_index( vnum );
+        int i = number_range(0, portalRoomVnums.size( ) - 1);
+        int vnum = portalRoomVnums[i];
+        Room *room = get_room_index( vnum );
 
-	if (room && (room = recursiveWalk( room, 0, number_range( 1, 2 ) )))
-	    return room->name;
+        if (room && (room = recursiveWalk( room, 0, number_range( 1, 2 ) )))
+            return room->name;
     }
     
     return "";
@@ -766,18 +766,18 @@ void Gangsters::populateArea( AREA_DATA *area, RoomList &mobRooms, int numPortal
     number = number_fuzzy( mobRooms.size( ) / 5 );
 
     for (int j = 0; j <= number; j++) {
-	Object *key;
-	Character *mob;
-	
-	mob = createMob( );
-	char_to_room( mob, mobRooms[number_range( 0, mobRooms.size( ) - 1 )] );
-	
-	if (numPortal-- > 0) {
-	    key = createKey( );
-	    keyCount++;
-	    obj_to_char( key, mob );
-	    log("key to mob in room " << mob->in_room->name ); 
-	}
+        Object *key;
+        Character *mob;
+        
+        mob = createMob( );
+        char_to_room( mob, mobRooms[number_range( 0, mobRooms.size( ) - 1 )] );
+        
+        if (numPortal-- > 0) {
+            key = createKey( );
+            keyCount++;
+            obj_to_char( key, mob );
+            log("key to mob in room " << mob->in_room->name ); 
+        }
     }
 }
 
@@ -793,7 +793,7 @@ void Gangsters::populateLair( )
     number = number_range( 2, 3 );
 
     while (number-- > 0) 
-	char_to_room( createMob( ), lair );
+        char_to_room( createMob( ), lair );
 }
     
 bool Gangsters::isPoliceman( Character *ch ) 
@@ -802,23 +802,23 @@ bool Gangsters::isPoliceman( Character *ch )
     char *name;
     
     if (!ch->is_npc( ))
-	return false;
+        return false;
     
     mob = ch->getNPC();
 
     if (IS_SET( mob->off_flags, ASSIST_GUARD ) ||
-	 mob->spec_fun.name == "spec_guard" || 
-	 mob->spec_fun.name == "spec_patrolman")
-	return true;
+         mob->spec_fun.name == "spec_guard" || 
+         mob->spec_fun.name == "spec_patrolman")
+        return true;
     
     name = mob->pIndexData->player_name;
 
     if (is_name("guard", name) || is_name("guardian", name) ||
-	is_name("shiriff", name) || is_name("bodyguard", name) ||
-	is_name("cityguard", name) || is_name("ÓÔÒÁÖÎÉË", name)  ||
-	is_name("ÛÅÒÉÆ", name)  || is_name("ÏÈÒÁÎÎÉË", name)  ||
-	is_name("ÔÅÌÏÈÒÁÎÉÔÅÌØ", name))
-	return true;
+        is_name("shiriff", name) || is_name("bodyguard", name) ||
+        is_name("cityguard", name) || is_name("ÑÑ‚Ñ€Ð°Ð¶Ð½Ð¸Ðº", name)  ||
+        is_name("ÑˆÐµÑ€Ð¸Ñ„", name)  || is_name("Ð¾Ñ…Ñ€Ð°Ð½Ð½Ð¸Ðº", name)  ||
+        is_name("Ñ‚ÐµÐ»Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÐµÐ»ÑŒ", name))
+        return true;
 
     return false;
 }
@@ -826,13 +826,13 @@ bool Gangsters::isPoliceman( Character *ch )
 bool Gangsters::checkRoom( Room *const pRoomIndex )
 {
     if (pRoomIndex->sector_type == SECT_AIR || IS_WATER(pRoomIndex))
-	return false;
+        return false;
     
     if (IS_SET(pRoomIndex->room_flags, ROOM_SAFE|ROOM_NO_QUEST|ROOM_NO_MOB))
-	return false;
-	
+        return false;
+        
     if (!pRoomIndex->isCommon( ))
-	return false;
+        return false;
 
     return true;
 }

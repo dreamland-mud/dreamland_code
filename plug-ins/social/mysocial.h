@@ -29,7 +29,7 @@ private:
     void doDelete( Character *, XMLAttributeCustomSocials::Pointer, const DLString & );
     void doShow( Character *, XMLAttributeCustomSocials::Pointer, const DLString & );
     void usage( Character * );
-		
+                
 };
 
 #endif

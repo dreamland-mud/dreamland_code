@@ -12,9 +12,9 @@
 void PatientBehavior::deadFromIdiot( PCMemoryInterface *pcm )
 {
     if (!getQuest( ) || !quest->isComplete( ))
-	pcm->getPlayer( )->pecho( "{YТы вылечи%Gло|л|ла пациента сразу от всех болезней >8){x",  pcm->getPlayer( ) );
+        pcm->getPlayer( )->pecho( "{Yп╒я▀ п╡я▀п╩п╣я┤п╦%Gп╩п╬|п╩|п╩п╟ п©п╟я├п╦п╣п╫я┌п╟ я│я─п╟п╥я┐ п╬я┌ п╡я│п╣я┘ п╠п╬п╩п╣п╥п╫п╣п╧ >8){x",  pcm->getPlayer( ) );
     else
-	pcm->getPlayer( )->println("{YСперва лечим, затем калечим?{x");
+        pcm->getPlayer( )->println("{Yп║п©п╣я─п╡п╟ п╩п╣я┤п╦п╪, п╥п╟я┌п╣п╪ п╨п╟п╩п╣я┤п╦п╪?{x");
 }
 
 void PatientBehavior::deadFromSuicide( PCMemoryInterface *pcm )
@@ -25,37 +25,37 @@ void PatientBehavior::deadFromSuicide( PCMemoryInterface *pcm )
 void PatientBehavior::deadFromKill( PCMemoryInterface *pcm, Character *killer )
 {
     if (pcm->isOnline( )) 
-	pcm->getPlayer( )->println( "{YПациент отправился на тот свет без твоей помощи.{x" );
+        pcm->getPlayer( )->println( "{Yп÷п╟я├п╦п╣п╫я┌ п╬я┌п©я─п╟п╡п╦п╩я│я▐ п╫п╟ я┌п╬я┌ я│п╡п╣я┌ п╠п╣п╥ я┌п╡п╬п╣п╧ п©п╬п╪п╬я┴п╦.{x" );
 }
 
 bool PatientBehavior::spell( Character *caster, int sn, bool before ) 
 {
     if (!getQuest( ) || quest->isComplete( ))
-	return false;
+        return false;
 
     if (before) {
-	if (quest->maladies.hasKey( sn ) && ourHero( caster ))
-	    healInfect( caster->getPC( ) );
-	
-	quest->maladies.setAttempts( sn );
+        if (quest->maladies.hasKey( sn ) && ourHero( caster ))
+            healInfect( caster->getPC( ) );
+        
+        quest->maladies.setAttempts( sn );
     }
     else {
-	if (ourHero( caster )) {
-	    if (quest->maladies.checkSuccess( sn, ch )) {
-		if (quest->isComplete( )) 
-		    healComplete( caster->getPC( ) );
-		else
-		    healSuccess( caster->getPC( ) );
-	    }
-	}
-	else {
-	    if (quest->maladies.checkSuccessOther( sn, ch )) {
-		if (quest->isComplete( ))
-		    healOtherComplete( getHeroMemory( ) );	
-		else
-		    healOtherSuccess( getHeroMemory( ) );
-	    }
-	}
+        if (ourHero( caster )) {
+            if (quest->maladies.checkSuccess( sn, ch )) {
+                if (quest->isComplete( )) 
+                    healComplete( caster->getPC( ) );
+                else
+                    healSuccess( caster->getPC( ) );
+            }
+        }
+        else {
+            if (quest->maladies.checkSuccessOther( sn, ch )) {
+                if (quest->isComplete( ))
+                    healOtherComplete( getHeroMemory( ) );        
+                else
+                    healOtherSuccess( getHeroMemory( ) );
+            }
+        }
     }
 
     return false;
@@ -63,33 +63,33 @@ bool PatientBehavior::spell( Character *caster, int sn, bool before )
 
 void PatientBehavior::healInfect( PCharacter *pch )
 {
-    pch->println( "{YЧто ж ты творишь! Тебя лечить позвали.{x" );
+    pch->println( "{Yп╖я┌п╬ п╤ я┌я▀ я┌п╡п╬я─п╦я┬я▄! п╒п╣п╠я▐ п╩п╣я┤п╦я┌я▄ п©п╬п╥п╡п╟п╩п╦.{x" );
 }
 
 void PatientBehavior::healSuccess( PCharacter *pch )
 {
-    pch->pecho( "{YТы излечи%Gло|л|ла пациента от одного из недугов.{x", pch );
+    pch->pecho( "{Yп╒я▀ п╦п╥п╩п╣я┤п╦%Gп╩п╬|п╩|п╩п╟ п©п╟я├п╦п╣п╫я┌п╟ п╬я┌ п╬п╢п╫п╬пЁп╬ п╦п╥ п╫п╣п╢я┐пЁп╬п╡.{x", pch );
 }
 
 void PatientBehavior::healComplete( PCharacter *pch )
 {
-    pch->println("Твое задание {YВЫПОЛНЕНО{x!");
-    pch->println("Вернись за вознаграждением к давшему тебе задание до того, как истечет время!");
+    pch->println("п╒п╡п╬п╣ п╥п╟п╢п╟п╫п╦п╣ {Yп▓п╚п÷п·п⌡п²п∙п²п·{x!");
+    pch->println("п▓п╣я─п╫п╦я│я▄ п╥п╟ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦п╣п╪ п╨ п╢п╟п╡я┬п╣п╪я┐ я┌п╣п╠п╣ п╥п╟п╢п╟п╫п╦п╣ п╢п╬ я┌п╬пЁп╬, п╨п╟п╨ п╦я│я┌п╣я┤п╣я┌ п╡я─п╣п╪я▐!");
 }
 
 void PatientBehavior::healOtherSuccess( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) {
-	pcm->getPlayer( )->println( "{YКому-то удалось избавить твоего пациента от одного из недугов.{x" );
-	pcm->getPlayer( )->println( "Это отрицательно скажется на общем размере вознаграждения." );
+        pcm->getPlayer( )->println( "{Yп п╬п╪я┐-я┌п╬ я┐п╢п╟п╩п╬я│я▄ п╦п╥п╠п╟п╡п╦я┌я▄ я┌п╡п╬п╣пЁп╬ п©п╟я├п╦п╣п╫я┌п╟ п╬я┌ п╬п╢п╫п╬пЁп╬ п╦п╥ п╫п╣п╢я┐пЁп╬п╡.{x" );
+        pcm->getPlayer( )->println( "п╜я┌п╬ п╬я┌я─п╦я├п╟я┌п╣п╩я▄п╫п╬ я│п╨п╟п╤п╣я┌я│я▐ п╫п╟ п╬п╠я┴п╣п╪ я─п╟п╥п╪п╣я─п╣ п╡п╬п╥п╫п╟пЁя─п╟п╤п╢п╣п╫п╦я▐." );
     }
 }
 
 void PatientBehavior::healOtherComplete( PCMemoryInterface *pcm )
 {
     if (pcm->isOnline( )) {
-	pcm->getPlayer( )->println( "{YКто-то другой полностью излечил твоего пациента.{x" );
-	pcm->getPlayer( )->println( "Вернись к квестору за утешительным призом." );
+        pcm->getPlayer( )->println( "{Yп я┌п╬-я┌п╬ п╢я─я┐пЁп╬п╧ п©п╬п╩п╫п╬я│я┌я▄я▌ п╦п╥п╩п╣я┤п╦п╩ я┌п╡п╬п╣пЁп╬ п©п╟я├п╦п╣п╫я┌п╟.{x" );
+        pcm->getPlayer( )->println( "п▓п╣я─п╫п╦я│я▄ п╨ п╨п╡п╣я│я┌п╬я─я┐ п╥п╟ я┐я┌п╣я┬п╦я┌п╣п╩я▄п╫я▀п╪ п©я─п╦п╥п╬п╪." );
     }
 }
 

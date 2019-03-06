@@ -19,20 +19,20 @@
 class Character;
 
 /**
- * @short Задача для планировщика, которой на вход подаются мобы
+ * @short п≈п╟п╢п╟я┤п╟ п╢п╩я▐ п©п╩п╟п╫п╦я─п╬п╡я┴п╦п╨п╟, п╨п╬я┌п╬я─п╬п╧ п╫п╟ п╡я┘п╬п╢ п©п╬п╢п╟я▌я┌я│я▐ п╪п╬п╠я▀
  * @author Igor S. Petrenko
  * @see Scheduler
  * @see SchedulerTask
  */
 struct SchedulerTaskRoundCharacter : public virtual SchedulerTask
 {
-	typedef ::Pointer<SchedulerTaskRoundCharacter> Pointer;
-	
-	virtual void run( );
-	/** Обработать моба */
-	virtual void run( Character* ch ) = 0;
-	virtual int getPriority( ) const;
-	    
+        typedef ::Pointer<SchedulerTaskRoundCharacter> Pointer;
+        
+        virtual void run( );
+        /** п·п╠я─п╟п╠п╬я┌п╟я┌я▄ п╪п╬п╠п╟ */
+        virtual void run( Character* ch ) = 0;
+        virtual int getPriority( ) const;
+            
 };
 
 #endif

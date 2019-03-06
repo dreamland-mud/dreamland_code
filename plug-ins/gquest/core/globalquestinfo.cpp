@@ -15,11 +15,13 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "descriptor.h"
+#include "hometown.h"
 #include "vnum.h"
 #include "merc.h"
 #include "def.h"
 
 GSN(jail);
+HOMETOWN(frigate);
 
 /*---------------------------------------------------------------------------
  * GlobalQuestInfo
@@ -29,15 +31,15 @@ void GlobalQuestInfo::initialization( )
     GlobalQuestManager *manager = GlobalQuestManager::getThis( );
 
     try {
-	manager->load( this );
-	manager->registrate( this );	
-	
-	GlobalQuest::Pointer gq = manager->loadRT( this );
+        manager->load( this );
+        manager->registrate( this );        
+        
+        GlobalQuest::Pointer gq = manager->loadRT( this );
 
-	if (gq) {
-	    gq->resume( );
+        if (gq) {
+            gq->resume( );
         }
-	
+        
     } catch( const Exception& ex ) {
         LogStream::sendError( ) << ex << endl;
     }
@@ -50,15 +52,15 @@ void GlobalQuestInfo::destruction( )
     manager->unregistrate( this );
 
     try {
-	manager->save( this );
-		
-	GlobalQuest::Pointer gq = manager->findGlobalQuest( getQuestID( ) );
+        manager->save( this );
+                
+        GlobalQuest::Pointer gq = manager->findGlobalQuest( getQuestID( ) );
 
-	if (gq) {
-	    gq->suspend( );
-	    manager->saveRT( *gq );
-	}
-	
+        if (gq) {
+            gq->suspend( );
+            manager->saveRT( *gq );
+        }
+        
     } catch( const Exception& ex ) {
         LogStream::sendError( ) << ex << endl;
     }
@@ -71,8 +73,8 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
     GlobalQuestManager *manager = GlobalQuestManager::getThis( );
     
     if (manager->findGlobalQuest( getQuestID( ) ))
-	throw GQAlreadyRunningException( getQuestID( ) );
-	
+        throw GQAlreadyRunningException( getQuestID( ) );
+        
     gq = getQuestInstance( );
     gq->setTotalTime( config.time );
     gq->setStartTime( );
@@ -84,7 +86,7 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
     gq->getQuestStartMessage( buf );
 
     if (!buf.str( ).empty( ))
-	GQChannel::gecho( this, buf.str( ) );
+        GQChannel::gecho( this, buf.str( ) );
 
     gq->resume( );
     manager->saveRT( *gq );
@@ -95,18 +97,21 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
 bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
 {
     if (ch->is_immortal( ))
-	return false;
-	
+        return false;
+        
     if (ch->in_room->vnum == ROOM_VNUM_JAIL 
             || ch->in_room->vnum == 10 
-	    || ch->isAffected( gsn_jail ))
-	return false;
+            || ch->isAffected( gsn_jail ))
+        return false;
 
     if (ch->getAttributes( ).isAvailable( "nogq" ))
-	return false;
+        return false;
     
+    if (ch->getPC( )->getHometown( ) == home_frigate)
+        return false;
+
     if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY))
-	return false;
+        return false;
 
     return true;
 }
@@ -114,24 +119,24 @@ bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
 void GlobalQuestInfo::findParticipants( GlobalQuestInfo::PlayerList &players ) const
 {
     for (Descriptor *d = descriptor_list; d; d = d->next) {
-	Character *ch = d->character;
-	
-	if (!ch || d->connected != CON_PLAYING)
-	    continue;
+        Character *ch = d->character;
+        
+        if (!ch || d->connected != CON_PLAYING)
+            continue;
 
-	if (ch->is_npc( ))
-	    continue;
+        if (ch->is_npc( ))
+            continue;
 
-	if (canParticipate( ch->getPC( ) ))	
-	    players.push_back( ch->getPC( ) );
-    }	
+        if (canParticipate( ch->getPC( ) ))        
+            players.push_back( ch->getPC( ) );
+    }        
 }
 
 /*---------------------------------------------------------------------------
  * GQuestInfoEveryone 
  *---------------------------------------------------------------------------*/
 bool GQuestInfoEveryone::parseArguments( 
-	const DLString &cArguments, Config &config, ostringstream &buf ) const
+        const DLString &cArguments, Config &config, ostringstream &buf ) const
 {
     DLString arguments = cArguments;
 
@@ -148,7 +153,7 @@ bool GQuestInfoEveryone::parseArguments(
 bool GQuestInfoEveryone::canAutoStart( const PlayerList &players, Config &config ) const
 {
     if ((int)players.size( ) < minPlayers.getValue( ))
-	return false;
+        return false;
 
     config.minLevel = config.maxLevel = 0;
     config.time = getDefaultTime( );
@@ -160,7 +165,7 @@ bool GQuestInfoEveryone::canAutoStart( const PlayerList &players, Config &config
  * GQuestInfoLevels
  *---------------------------------------------------------------------------*/
 bool GQuestInfoLevels::parseArguments( 
-	const DLString &cArguments, Config &config, ostringstream &buf ) const
+        const DLString &cArguments, Config &config, ostringstream &buf ) const
 {
     DLString arguments = cArguments;
         
@@ -180,17 +185,17 @@ bool GQuestInfoLevels::parseArguments(
 bool GlobalQuestInfo::Config::parseLevels( DLString &arguments, ostringstream &buf )
 {
     try {
-	minLevel = arguments.getOneArgument( ).toInt( );
-	maxLevel = arguments.getOneArgument( ).toInt( );
-	
-	if (minLevel > maxLevel) {
-	    buf << "Уровни не в том порядке." << endl;
-	    return false;
-	}
+        minLevel = arguments.getOneArgument( ).toInt( );
+        maxLevel = arguments.getOneArgument( ).toInt( );
+        
+        if (minLevel > maxLevel) {
+            buf << "пёя─п╬п╡п╫п╦ п╫п╣ п╡ я┌п╬п╪ п©п╬я─я▐п╢п╨п╣." << endl;
+            return false;
+        }
     
     } catch (const ExceptionBadType &e) {
-	buf << "Неправильный диапазон уровней." << endl;
-	return false;
+        buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╢п╦п╟п©п╟п╥п╬п╫ я┐я─п╬п╡п╫п╣п╧." << endl;
+        return false;
     }
     return true;
 }
@@ -202,22 +207,22 @@ bool GlobalQuestInfo::Config::parsePlayerCount( DLString &arguments, int default
         else 
             playerCnt = defaultValue;
     } catch (const ExceptionBadType &e) {
-	buf << "Неправильное кол-во игроков." << endl;
-	return false;
+        buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╨п╬п╩-п╡п╬ п╦пЁя─п╬п╨п╬п╡." << endl;
+        return false;
     }
     return true;
 }
 bool GlobalQuestInfo::Config::parseTime( DLString &arguments, int defaultValue, ostringstream &buf )
 {
     try {
-	if (!arguments.empty( ))
-	    time = arguments.getOneArgument( ).toInt( );
-	else
-	    time = defaultValue; 
-	
+        if (!arguments.empty( ))
+            time = arguments.getOneArgument( ).toInt( );
+        else
+            time = defaultValue; 
+        
     } catch (const ExceptionBadType &e) {
-	buf << "Неправильное время." << endl;
-	return false;
+        buf << "п²п╣п©я─п╟п╡п╦п╩я▄п╫п╬п╣ п╡я─п╣п╪я▐." << endl;
+        return false;
     }
     return true;
 }    

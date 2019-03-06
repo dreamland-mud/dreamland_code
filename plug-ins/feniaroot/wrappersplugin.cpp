@@ -8,6 +8,7 @@
 #include "root.h"
 #include "idcontainer.h"
 #include "guts.h"
+#include "nativeext.h"
 #include "mobindexwrapper.h"
 #include "objindexwrapper.h"
 #include "objectwrapper.h"
@@ -37,30 +38,30 @@ void
 WrappersPlugin::linkTargets()
 {
     for (Character *ch = char_list; ch; ch = ch->next) 
-	if (ch->wrapper) 
-	    wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
+        if (ch->wrapper) 
+            wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
 
     for (Character *ch = newbie_list; ch; ch = ch->next) 
-	if (ch->wrapper)  
-	    wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
+        if (ch->wrapper)  
+            wrapper_cast<CharacterWrapper>(ch->wrapper)->setTarget( ch );
     
     for (::Object *obj = object_list; obj; obj = obj->next) 
-	if (obj->wrapper)
-	    wrapper_cast<ObjectWrapper>(obj->wrapper)->setTarget( obj );
+        if (obj->wrapper)
+            wrapper_cast<ObjectWrapper>(obj->wrapper)->setTarget( obj );
         
     for (Room *room = room_list; room; room = room->rnext)
-	if (room->wrapper)
-	    wrapper_cast<RoomWrapper>(room->wrapper)->setTarget( room );
+        if (room->wrapper)
+            wrapper_cast<RoomWrapper>(room->wrapper)->setTarget( room );
 
     for (int i = 0; i < MAX_KEY_HASH; i++)
-	for(MOB_INDEX_DATA *mndx = mob_index_hash[i]; mndx; mndx = mndx->next)
-	    if(mndx->wrapper)
-		wrapper_cast<MobIndexWrapper>(mndx->wrapper)->setTarget( mndx );
-	    
+        for(MOB_INDEX_DATA *mndx = mob_index_hash[i]; mndx; mndx = mndx->next)
+            if(mndx->wrapper)
+                wrapper_cast<MobIndexWrapper>(mndx->wrapper)->setTarget( mndx );
+            
     for (int i = 0; i < MAX_KEY_HASH; i++)
-	for(OBJ_INDEX_DATA *ondx = obj_index_hash[i]; ondx; ondx = ondx->next)
-	    if(ondx->wrapper)
-		wrapper_cast<ObjIndexWrapper>(ondx->wrapper)->setTarget( ondx );
+        for(OBJ_INDEX_DATA *ondx = obj_index_hash[i]; ondx; ondx = ondx->next)
+            if(ondx->wrapper)
+                wrapper_cast<ObjIndexWrapper>(ondx->wrapper)->setTarget( ondx );
 }
 
 void
@@ -78,14 +79,37 @@ WrappersPlugin::initialization( )
     Class::regMoc<TableWrapper>( );
     Class::regMoc<HometownWrapper>( );
     Class::regMoc<AreaWrapper>( );
+    Class::regMoc<ClanWrapper>( );
     Class::regMoc<ProfessionWrapper>( );
+    Class::regMoc<CraftProfessionWrapper>( );
     Class::regMoc<RaceWrapper>( );
+    Class::regMoc<LiquidWrapper>( );
+    Class::regMoc<SkillWrapper>( );
     
     FeniaManager::getThis( )->recover( );
     
     DLScheduler::getThis()->putTaskNOW( ValidateTask::Pointer(NEW) );
 
     linkTargets();
+
+    // Dump API to disk on every plugin load.
+    traitsAPIDump<CharacterWrapper>("char", true, true);     
+    traitsAPIDump<ObjectWrapper>("obj", true, true);     
+    traitsAPIDump<RoomWrapper>("room", true, true);     
+    traitsAPIDump<MobIndexWrapper>("mob_index", false, false);     
+    traitsAPIDump<ObjIndexWrapper>("obj_index", false, false);     
+    traitsAPIDump<Root>("root", true, true);     
+    traitsAPIDump<AffectWrapper>("affect", false, false);     
+    traitsAPIDump<CommandWrapper>("command", false, false);     
+    traitsAPIDump<AreaWrapper>("area", false, false);     
+    traitsAPIDump<HometownWrapper>("hometown", false, false);     
+    traitsAPIDump<ProfessionWrapper>("profession", false, false);     
+    traitsAPIDump<RaceWrapper>("race", false, false);     
+    traitsAPIDump<ClanWrapper>("clan", false, false);     
+    traitsAPIDump<CraftProfessionWrapper>("craftprofession", false, false);     
+    traitsAPIDump<LiquidWrapper>("liquid", false, false);     
+    traitsAPIDump<SkillWrapper>("skill", false, false);     
+    traitsAPIDump<FeniaString>("string", false, false);     
 }
 
 void WrappersPlugin::destruction( ) {
@@ -94,8 +118,12 @@ void WrappersPlugin::destruction( ) {
     Scripting::gc = false;
     FeniaManager::getThis( )->backup( );
 
+    Class::unregMoc<LiquidWrapper>( );
+    Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );
     Class::unregMoc<AreaWrapper>( );
+    Class::unregMoc<ClanWrapper>( );
+    Class::unregMoc<CraftProfessionWrapper>( );
     Class::unregMoc<ProfessionWrapper>( );
     Class::unregMoc<RaceWrapper>( );
     Class::unregMoc<TablesWrapper>( );

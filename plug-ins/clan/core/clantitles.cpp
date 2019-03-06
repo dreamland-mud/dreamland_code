@@ -29,11 +29,11 @@ ClanLevelNames::~ClanLevelNames( )
 void ClanLevelNames::toStream( ostringstream &buf ) const
 {
     buf << dlprintf( "%24s (%24s)  ", 
-	    male.getValue( ).c_str( ), 
-	    female.getValue( ).c_str( ) );
+            male.getValue( ).c_str( ), 
+            female.getValue( ).c_str( ) );
 
     if (!abbr.getValue( ).empty( ))
-	buf << dlprintf( "[%2s]  ", abbr.getValue( ).c_str( ) );
+        buf << dlprintf( "[%2s]  ", abbr.getValue( ).c_str( ) );
     
     buf << english;
 }
@@ -48,13 +48,13 @@ const DLString & ClanTitlesByClass::build( PCMemoryInterface *pcm ) const
     const_iterator i = find( pcm->getProfession( )->getName( ) );
     
     if (i == end( )) {
-	static DLString allName( "all" );
-	i = find( allName );
+        static DLString allName( "all" );
+        i = find( allName );
     }
 
     const ClanLevelNames &names = i->second[pcm->getClanLevel( )]; 
     return (pcm->getSex( ) == SEX_FEMALE 
-		? names.female.getValue( ) : names.male.getValue( ));
+                ? names.female.getValue( ) : names.male.getValue( ));
 }
 
 void ClanTitlesByClass::toStream( ostringstream &buf ) const
@@ -62,18 +62,18 @@ void ClanTitlesByClass::toStream( ostringstream &buf ) const
     const_iterator i;
 
     for (i = begin( ); i != end( ); i++) {
-	if (i->first == "all")
-	    buf << "{WäÌÑ ×ÓÅÈ ÐÒÏÆÅÓÓÉÊ:{x" << endl;
-	else
-	    buf << "{WäÌÑ ÐÒÏÆÅÓÓÉÉ " << i->first << ":{x" << endl;
-	
-	for (int j = 0; j < (int) i->second.size( ); j++) {
-	    buf << dlprintf( "%-3d", j );
-	    i->second[j].toStream( buf );
-	    buf << endl;
-	}
+        if (i->first == "all")
+            buf << "{WÐ”Ð»Ñ Ð²ÑÐµÑ… Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¹:{x" << endl;
+        else
+            buf << "{WÐ”Ð»Ñ Ð¿Ñ€Ð¾Ñ„ÐµÑÑÐ¸Ð¸ " << i->first << ":{x" << endl;
+        
+        for (int j = 0; j < (int) i->second.size( ); j++) {
+            buf << dlprintf( "%-3d", j );
+            i->second[j].toStream( buf );
+            buf << endl;
+        }
 
-	buf << endl;
+        buf << endl;
     }
 }
 
@@ -82,7 +82,7 @@ int ClanTitlesByClass::size( ) const
     const_iterator i = begin( );
 
     if (i == end( ))
-	return 0;
+        return 0;
 
     return i->second.size( );
 }
@@ -97,20 +97,20 @@ const DLString & ClanTitlesByLevel::build( PCMemoryInterface *pcm ) const
     int cl = pcm->getClanLevel( );
 
     if (cl >= size( ))
-	return DLString::emptyString;
-	
+        return DLString::emptyString;
+        
     const ClanLevelNames &names = (*this)[cl]; 
 
     return (pcm->getSex( ) == SEX_FEMALE 
-		? names.female.getValue( ) : names.male.getValue( ));
+                ? names.female.getValue( ) : names.male.getValue( ));
 }
 
 void ClanTitlesByLevel::toStream( ostringstream &buf ) const
 {
     for (int j = 0; j < (int) size( ); j++) {
-	buf << dlprintf( "%-3d", j );
-	(*this)[j].toStream( buf );
-	buf << endl;
+        buf << dlprintf( "%-3d", j );
+        (*this)[j].toStream( buf );
+        buf << endl;
     }
 }
 

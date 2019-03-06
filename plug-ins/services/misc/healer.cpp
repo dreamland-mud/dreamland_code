@@ -10,13 +10,14 @@
 #include "occupations.h"
 #include "commandtemplate.h"
 #include "hometown.h"
-
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "clanreference.h"
 
 #include "merc.h"
 #include "handler.h"
+#include "arg_utils.h"
+#include "gsn_plugin.h"
 #include "magic.h"
 #include "act.h"
 #include "mercdb.h"
@@ -40,25 +41,25 @@ int Healer::getOccupation( )
 bool Healer::canServeClient( Character *client )
 {
     if (client->is_npc( ) && !healPets) {
-	say_act( client, ch, "Я не лечу домашних животных." );
-	return false;
+        say_act( client, ch, "п╞ п╫п╣ п╩п╣я┤я┐ п╢п╬п╪п╟я┬п╫п╦я┘ п╤п╦п╡п╬я┌п╫я▀я┘." );
+        return false;
     }
 
     if (IS_GHOST( client )) {
-	say_act( client, getKeeper( ), "Я исцеляю тела, а не души, $c1. Обрети плоть - тогда и поговорим." );
-	return false;
+        say_act( client, getKeeper( ), "п╞ п╦я│я├п╣п╩я▐я▌ я┌п╣п╩п╟, п╟ п╫п╣ п╢я┐я┬п╦, $c1. п·п╠я─п╣я┌п╦ п©п╩п╬я┌я▄ - я┌п╬пЁп╢п╟ п╦ п©п╬пЁп╬п╡п╬я─п╦п╪." );
+        return false;
     }
 
     if (getKeeper( )->fighting) {
-	say_act( client, getKeeper( ), "Подожди немного, $c1, мне сейчас не до тебя." );
-	return false;
+        say_act( client, getKeeper( ), "п÷п╬п╢п╬п╤п╢п╦ п╫п╣п╪п╫п╬пЁп╬, $c1, п╪п╫п╣ я│п╣п╧я┤п╟я│ п╫п╣ п╢п╬ я┌п╣п╠я▐." );
+        return false;
     }
     
     if ((!client->is_npc( ) && client->getClan( ) == clan_battlerager)
-	|| (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
+        || (client->is_npc( ) && client->master && client->master->getClan( ) == clan_battlerager)) 
     {
-	act( "$C1 выразительно крутит пальцем у виска, глядя на $c4.", client, 0, getKeeper( ), TO_NOTVICT );
-        client->send_to("Напоминаем: ты BattleRager, а не презренный МАГ!\n\r");
+        act( "$C1 п╡я▀я─п╟п╥п╦я┌п╣п╩я▄п╫п╬ п╨я─я┐я┌п╦я┌ п©п╟п╩я▄я├п╣п╪ я┐ п╡п╦я│п╨п╟, пЁп╩я▐п╢я▐ п╫п╟ $c4.", client, 0, getKeeper( ), TO_NOTVICT );
+        client->send_to("п²п╟п©п╬п╪п╦п╫п╟п╣п╪: я┌я▀ BattleRager, п╟ п╫п╣ п©я─п╣п╥я─п╣п╫п╫я▀п╧ п°п░п⌠!\n\r");
         return false;
     }
 
@@ -67,40 +68,40 @@ bool Healer::canServeClient( Character *client )
 
 void Healer::msgListEmpty( Character *client )
 {
-    say_act( client, getKeeper( ), "Извини, $c1, я ничем не смогу тебе помочь." );
+    say_act( client, getKeeper( ), "п≤п╥п╡п╦п╫п╦, $c1, я▐ п╫п╦я┤п╣п╪ п╫п╣ я│п╪п╬пЁя┐ я┌п╣п╠п╣ п©п╬п╪п╬я┤я▄." );
 }
 
 void Healer::msgListRequest( Character *client ) 
 {
-    act( "$c1 просит $C4 рассказать, какие болезни $E может вылечить.", client, 0, getKeeper( ), TO_NOTVICT );
-    act( "Ты просишь $C4 рассказать, какие болезни $E может вылечить.", client, 0, getKeeper( ), TO_CHAR );
+    act( "$c1 п©я─п╬я│п╦я┌ $C4 я─п╟я│я│п╨п╟п╥п╟я┌я▄, п╨п╟п╨п╦п╣ п╠п╬п╩п╣п╥п╫п╦ $E п╪п╬п╤п╣я┌ п╡я▀п╩п╣я┤п╦я┌я▄.", client, 0, getKeeper( ), TO_NOTVICT );
+    act( "п╒я▀ п©я─п╬я│п╦я┬я▄ $C4 я─п╟я│я│п╨п╟п╥п╟я┌я▄, п╨п╟п╨п╦п╣ п╠п╬п╩п╣п╥п╫п╦ $E п╪п╬п╤п╣я┌ п╡я▀п╩п╣я┤п╦я┌я▄.", client, 0, getKeeper( ), TO_CHAR );
 }
 
 void Healer::msgListBefore( Character *client ) 
 {
-    tell_dim( client, getKeeper( ), "Я предлагаю следующие заклинания: " );
+    tell_dim( client, getKeeper( ), "п╞ п©я─п╣п╢п╩п╟пЁп╟я▌ я│п╩п╣п╢я┐я▌я┴п╦п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐: " );
 }
 
 void Healer::msgListAfter( Character *client )
 {
-    tell_dim( client, getKeeper( ), "Используй 'heal <тип заклинания>', и я вылечу тебя за указанную цену." );
+    tell_dim( client, getKeeper( ), "п≤я│п©п╬п╩я▄п╥я┐п╧ '{lEheal{lRп╩п╣я┤п╦я┌я▄{lx <я┌п╦п© п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐>', п╦ я▐ п╡я▀п╩п╣я┤я┐ я┌п╣п╠я▐ п╥п╟ я┐п╨п╟п╥п╟п╫п╫я┐я▌ я├п╣п╫я┐." );
 }
 
 void Healer::msgArticleNotFound( Character *client ) 
 {
-    say_act( client, getKeeper( ), "Я не знаю такого заклинания, $c1." );
-    tell_act( client, getKeeper( ), "Используй 'heal', чтобы увидеть список известных мне заклинаний." );
+    say_act( client, getKeeper( ), "п╞ п╫п╣ п╥п╫п╟я▌ я┌п╟п╨п╬пЁп╬ п╥п╟п╨п╩п╦п╫п╟п╫п╦я▐, $c1." );
+    tell_act( client, getKeeper( ), "п≤я│п©п╬п╩я▄п╥я┐п╧ '{lEheal{lRп╩п╣я┤п╦я┌я▄{lx', я┤я┌п╬п╠я▀ я┐п╡п╦п╢п╣я┌я▄ я│п©п╦я│п╬п╨ п╦п╥п╡п╣я│я┌п╫я▀я┘ п╪п╫п╣ п╥п╟п╨п╩п╦п╫п╟п╫п╦п╧." );
 }
 
 void Healer::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    say_act( client, getKeeper( ), "Я могу вылечить только одну болезнь за один раз." );    
+    say_act( client, getKeeper( ), "п╞ п╪п╬пЁя┐ п╡я▀п╩п╣я┤п╦я┌я▄ я┌п╬п╩я▄п╨п╬ п╬п╢п╫я┐ п╠п╬п╩п╣п╥п╫я▄ п╥п╟ п╬п╢п╦п╫ я─п╟п╥." );    
 }
 
 void Healer::msgBuyRequest( Character *client )
 {
-    act( "Ты просишь $C4 о помощи.", client, 0, getKeeper( ), TO_CHAR );
-    act( "$c1 просит $C4 о помощи.", client, 0, getKeeper( ), TO_NOTVICT );
+    act( "п╒я▀ п©я─п╬я│п╦я┬я▄ $C4 п╬ п©п╬п╪п╬я┴п╦.", client, 0, getKeeper( ), TO_CHAR );
+    act( "$c1 п©я─п╬я│п╦я┌ $C4 п╬ п©п╬п╪п╬я┴п╦.", client, 0, getKeeper( ), TO_NOTVICT );
 }
 
 /*------------------------------------------------------------------------
@@ -108,12 +109,10 @@ void Healer::msgBuyRequest( Character *client )
  *-----------------------------------------------------------------------*/
 void HealService::toStream( Character *client, ostringstream &buf ) const
 {
-    buf << "  {c" << setiosflags( ios::left ) << setw( 11 ) << name << "{x: "
-	<< setw( 30 ) << descr << "   " << setiosflags( ios::right ) << setw( 8 );
-	
-    price->toStream( client, buf );
-
-    buf << resetiosflags( ios::right ) << endl;
+    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    DLString myprice = price->toString(client);
+    buf << dlprintf("  {c%-11s{x: %-30s  %17s\r\n",
+           myname.c_str(), descr.c_str(), myprice.c_str());
 }
 
 bool HealService::visible( Character * ) const
@@ -128,7 +127,10 @@ bool HealService::available( Character *, NPCharacter * ) const
 
 bool HealService::matches( const DLString &argument ) const
 {
-    return !argument.empty( ) && argument.strPrefix( name.getValue( ) );
+    if (argument.empty())
+        return false;
+    
+    return arg_oneof(argument, name.c_str(), rname.c_str());
 }
 
 int HealService::getQuantity( ) const
@@ -143,11 +145,11 @@ void HealService::purchase( Character *client, NPCharacter *healer, const DLStri
     payer = client->is_npc( ) && client->master ? client->master : client;
 
     if (!price->canAfford( payer )) {
-	if (payer == client)
-	    say_act( client, healer, "У тебя не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
-	else
-	    say_act( client, healer, "У твоего хозяина не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
-	return;
+        if (payer == client)
+            say_act( client, healer, "пё я┌п╣п╠я▐ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ $n2 п╬п©п╩п╟я┌п╦я┌я▄ п╪п╬п╦ я┐я│п╩я┐пЁп╦.", price->toCurrency( ).c_str( ) );
+        else
+            say_act( client, healer, "пё я┌п╡п╬п╣пЁп╬ я┘п╬п╥я▐п╦п╫п╟ п╫п╣ я┘п╡п╟я┌п╟п╣я┌ $n2 п╬п©п╩п╟я┌п╦я┌я▄ п╪п╬п╦ я┐я│п╩я┐пЁп╦.", price->toCurrency( ).c_str( ) );
+        return;
     }
     
     price->deduct( payer );
@@ -163,23 +165,57 @@ void SpellHealService::heal( Character *client, NPCharacter *healer )
     ::spell( spell, healer->getModifyLevel( ), healer, client, FSPELL_VERBOSE );
 }
 
+bool SpellHealService::available( Character *client, NPCharacter *healer ) const
+{
+    int sn = skillManager->find(spell.getName())->getIndex();
+
+    if (sn == gsn_master_healing && client->hit >= client->max_hit) {
+        say_fmt("п╒я▀ п╫п╣ п╫я┐п╤п╢п╟п╣я┬я▄я│я▐ п╡ я┐я│п╩я┐пЁп╣ п╩п╣я┤п╣п╫п╦я▐, %2$C1: я┌я▀ п╥п╢п╬я─п╬п╡%2$Gп╬||п╟, п╨п╟п╨ %2$Gп╤п╣я─п╣п╠п╣я├|п╤п╣я─п╣п╠п╣я├|п╨п╬п╠я▀п╩п╟!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_refresh && client->move >= client->max_move) {
+        say_fmt("п╒я▀ п╫п╣ п╫я┐п╤п╢п╟п╣я┬я▄я│я▐ я█я┌п╬п╧ я┐я│п╩я┐пЁп╣, %2$C1: я┌я▀ п╦ я┌п╟п╨ п©п╬п╩%2$Gп╬п╫|п╫п╬|п╫п╟ я│п╦п╩!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_cure_poison && !IS_AFFECTED(client, AFF_POISON)) {
+        say_fmt("п╒я▀ п╫п╣ п╫я┐п╤п╢п╟п╣я┬я▄я│я▐ я█я┌п╬п╧ я┐я│п╩я┐пЁп╣, %2$C1: я┌я▀ п╫п╣ п╬я┌я─п╟п╡п╩п╣п╫%2$G|п╬|п╟!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_cure_disease && !IS_AFFECTED(client, AFF_PLAGUE)) {
+        say_fmt("п╒я▀ п╫п╣ п╫я┐п╤п╢п╟п╣я┬я▄я│я▐ я█я┌п╬п╧ я┐я│п╩я┐пЁп╣, %2$C1: я┌я▀ п╫п╣ п╥п╟я─п╟п╤п╣п╫%2$G|п╬|п╟ я┤я┐п╪п╬п╧!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_cure_blindness && !IS_AFFECTED(client, AFF_BLIND)) {
+        say_fmt("п╒я▀ п╫п╣ п╫я┐п╤п╢п╟п╣я┬я▄я│я▐ я█я┌п╬п╧ я┐я│п╩я┐пЁп╣, %2$C1: я┌п╡п╬п╣ п╥я─п╣п╫п╦п╣ п╡ п©п╬я─я▐п╢п╨п╣!", healer, client);
+        return false;
+    }
+    else if (sn == gsn_bless && client->isAffected(sn)) {
+        say_fmt("п╞ п╫п╣ п╪п╬пЁя┐ п╠п╩п╟пЁп╬я│п╩п╬п╡п╦я┌я▄ я┌п╣п╠я▐ п╣я┴п╣ п╠п╬п╩я▄я┬п╣, %2$C1.", healer, client);
+        return false;
+    }
+
+    return true;
+}
+
 /*------------------------------------------------------------------------
  * ManaHealService 
  *-----------------------------------------------------------------------*/
 void ManaHealService::heal( Character *client, NPCharacter *healer )
 {
-    act( "$c1 бормочет '$T'.", healer, 0, words.getValue( ).c_str( ), TO_ROOM );
+    act( "$c1 п╠п╬я─п╪п╬я┤п╣я┌ '$T'.", healer, 0, words.getValue( ).c_str( ), TO_ROOM );
 
-    if (enhanced) {
-	client->mana += 300;
-	client->send_to( "Приятное тепло наполняет твое тело.\n\r" );
-    }
-    else {
-	client->mana += dice( 2, 8 ) + healer->getModifyLevel( ) / 3;
-	client->send_to( "Ты ощущаешь приятное тепло.\n\r" );
-    }
-
+    client->mana += healer->getModifyLevel() * 5 + number_range(50, 100);
     client->mana = std::min( client->mana, client->max_mana );
+    client->send_to( "п÷я─п╦я▐я┌п╫п╬п╣ я┌п╣п©п╩п╬ п╫п╟п©п╬п╩п╫я▐п╣я┌ я┌п╡п╬п╣ я┌п╣п╩п╬.\n\r" );
+}
+
+bool ManaHealService::available( Character *client, NPCharacter *healer ) const
+{
+    if (client->mana >= client->max_mana) {
+        say_act(client, healer, "п╒п╡п╬я▐ п╪п╟п╫п╟ п╦ я┌п╟п╨ п╫п╟ п╪п╟п╨я│п╦п╪я┐п╪п╣, $c1.");
+        return false;
+    }
+    return true;
 }
 
 /*------------------------------------------------------------------------
@@ -193,23 +229,56 @@ CMDRUN( heal )
     healer = find_attracted_mob_behavior<Healer>( ch, OCC_HEALER );
 
     if (!healer) {
-	ch->send_to( "Здесь некому тебя вылечить за деньги.\r\n" );
-        if (ch->getModifyLevel() < 11) {
+        ch->send_to( "п≈п╢п╣я│я▄ п╫п╣п╨п╬п╪я┐ я┌п╣п╠я▐ п╡я▀п╩п╣я┤п╦я┌я▄ п╥п╟ п╢п╣п╫я▄пЁп╦.\r\n" );
+        if (ch->getModifyLevel() < 20) {
             if (!ch->is_npc( ) && ch->getPC( )->getHometown( ) == home_frigate)
-                ch->println("Доктор в лазарете вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
+                ch->println("п■п╬п╨я┌п╬я─ п╡ п╩п╟п╥п╟я─п╣я┌п╣ п╡я▀п╩п╣я┤п╦я┌ я┌п╣п╠я▐ п╠п╣я│п©п╩п╟я┌п╫п╬, п╣я│п╩п╦ п╥п╟п╪п╣я┌п╦я┌, я┤я┌п╬ я┌п╣п╠п╣ п╫я┐п╤п╫п╟ п©п╬п╪п╬я┴я▄.");
             else
-                ch->println("Лекарь в любом храме вылечит тебя бесплатно, если заметит, что тебе нужна помощь.");
+                ch->println("п⌡п╣п╨п╟я─я▄ п╡ п╩я▌п╠п╬п╪ я┘я─п╟п╪п╣ п╡я▀п╩п╣я┤п╦я┌ я┌п╣п╠я▐ п╠п╣я│п©п╩п╟я┌п╫п╬, п╣я│п╩п╦ п╥п╟п╪п╣я┌п╦я┌, я┤я┌п╬ я┌п╣п╠п╣ п╫я┐п╤п╫п╟ п©п╬п╪п╬я┴я▄.");
         }
-	return;
+        return;
     }
 
     if (ch->is_npc( ) && !ch->master) {
-	ch->send_to( "Извини, тебя никто обслуживать не будет.\r\n" );
-	return;
+        ch->send_to( "п≤п╥п╡п╦п╫п╦, я┌п╣п╠я▐ п╫п╦п╨я┌п╬ п╬п╠я│п╩я┐п╤п╦п╡п╟я┌я▄ п╫п╣ п╠я┐п╢п╣я┌.\r\n" );
+        return;
     }
 
     if (argument.empty( )) 
-	healer->doList( ch );
+        healer->doList( ch );
     else
-	healer->doBuy( ch, argument );
+        healer->doBuy( ch, argument );
 }
+
+/*------------------------------------------------------------------------
+ * CustomHealPrice 
+ *-----------------------------------------------------------------------*/
+CustomHealPrice::CustomHealPrice()
+{
+}
+
+int CustomHealPrice::toSilver( Character *ch ) const
+{
+    int gold = 0;
+    int lev = ch->getModifyLevel();
+    
+    if (lev <= 5) gold = 5;
+    else if (lev < 10) gold = 10;
+    else if (lev < 15) gold = 15;
+    else if (lev < 20) gold = 20;
+    else if (lev < 25) gold = 30;
+    else if (lev < 30) gold = 40;
+    else if (lev < 35) gold = 50;
+    else if (lev < 40) gold = 80;
+    else if (lev < 45) gold = 100;
+    else if (lev < 50) gold = 120;
+    else if (lev < 55) gold = 150;
+    else if (lev < 60) gold = 200;
+    else if (lev < 70) gold = 220;
+    else if (lev < 80) gold = 250;
+    else if (lev < 90) gold = 270;
+    else gold = 300;
+
+    return gold * 100;
+}
+

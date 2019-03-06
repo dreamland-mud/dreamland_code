@@ -13,9 +13,9 @@
 class QuestBag : public PersonalQuestReward {
 XML_OBJECT
 public:
-	typedef ::Pointer<QuestBag> Pointer;
-	
-	virtual bool canLock( Character * );
+        typedef ::Pointer<QuestBag> Pointer;
+        
+        virtual bool canLock( Character * );
 };
 
 #endif

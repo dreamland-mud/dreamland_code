@@ -19,13 +19,13 @@ XML_OBJECT
 public: 
         typedef ::Pointer<XMLAttributeAttract> Pointer;
 
-	XMLAttributeAttract( );
-	virtual ~XMLAttributeAttract( );
+        XMLAttributeAttract( );
+        virtual ~XMLAttributeAttract( );
 
-	void addTarget( NPCharacter *, int );
-	NPCharacter * findTarget( PCharacter *, int );
+        void addTarget( NPCharacter *, int );
+        NPCharacter * findTarget( PCharacter *, int );
 
-	XML_VARIABLE XMLVectorBase<XMLLongLong> targets;
+        XML_VARIABLE XMLVectorBase<XMLLongLong> targets;
 };
 
 /*

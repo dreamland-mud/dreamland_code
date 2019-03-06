@@ -12,8 +12,8 @@ DLString StringSet::toString( ) const
     DLString result;
 
     for (s = begin( ); s != end( ); s++) 
-	result << s->quote( ) << " ";
-	
+        result << s->quote( ) << " ";
+        
     result.stripWhiteSpace( );
     return result;
 }
@@ -24,7 +24,7 @@ StringSet & StringSet::fromString( const DLString &constStr )
     DLString str = constStr;
     
     while (!( arg = str.getOneArgument( ) ).empty( ))
-	insert( arg );
+        insert( arg );
 
     return *this;
 }

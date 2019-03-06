@@ -7,9 +7,9 @@
 
 class Character;
 
-bool	interpret	( Character *ch, const char *line );
-void	interpret_fmt	( Character *ch, const char *format, ... );
-void	interpret_raw	( Character *ch, const char *cmd, const char *format = "", ... );
-bool    interpret_cmd	( Character *ch, const char *cmd, const char *argsFormat, ... );
+bool        interpret        ( Character *ch, const char *line );
+void        interpret_fmt        ( Character *ch, const char *format, ... );
+void        interpret_raw        ( Character *ch, const char *cmd, const char *format = "", ... );
+bool    interpret_cmd        ( Character *ch, const char *cmd, const char *argsFormat, ... );
 
 #endif

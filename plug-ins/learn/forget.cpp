@@ -27,71 +27,71 @@ CMDRUN( forget )
     SkillManager *manager = SkillManager::getThis( );
     
     if (!pch) {
-	ch->send_to( "· ’ ‘≈¬— ◊ Õœ⁄«¡» ≈”‘ÿ ﬁ≈«œ ⁄¡¬Ÿ◊¡‘ÿ??\r\n" );
-	return;
+        ch->send_to( "–ê —É —Ç–µ–±—è –≤ –º–æ–∑–≥–∞—Ö –µ—Å—Ç—å —á–µ–≥–æ –∑–∞–±—ã–≤–∞—Ç—å??\r\n" );
+        return;
     }
     
     if (ch->getProfession( ) != prof_universal) {
-	ch->send_to( "ÙŸ Œ…ﬁ≈«œ Œ≈ Õœ÷≈€ÿ ⁄¡¬Ÿ‘ÿ.\r\n" );
-	return;
+        ch->send_to( "–¢—ã –Ω–∏—á–µ–≥–æ –Ω–µ –º–æ–∂–µ—à—å –∑–∞–±—ã—Ç—å.\r\n" );
+        return;
     }
     
     if (argument.empty( )) {
-	ch->println( "˛‘œ …Õ≈ŒŒœ ‘Ÿ »œﬁ≈€ÿ ⁄¡¬Ÿ‘ÿ?" );
-	return;
+        ch->println( "–ß—Ç–æ –∏–º–µ–Ω–Ω–æ —Ç—ã —Ö–æ—á–µ—à—å –∑–∞–±—ã—Ç—å?" );
+        return;
     }
     
     if (arg_is_all( argument )) {
-	ostringstream buf;
+        ostringstream buf;
 
-	for (sn = 0; sn < manager->size( ); sn++) {
-	    bool &forgetting = pch->getSkillData( sn ).forgetting;
-	    skill = manager->find( sn );
+        for (sn = 0; sn < manager->size( ); sn++) {
+            bool &forgetting = pch->getSkillData( sn ).forgetting;
+            skill = manager->find( sn );
 
-	    if (!skill->canForget( pch ))
-		continue;
-	    
-	    if (forgetting)
-		continue;
-		
-	    forgetting = true;
+            if (!skill->canForget( pch ))
+                continue;
+            
+            if (forgetting)
+                continue;
+                
+            forgetting = true;
 
-	    if (!buf.str( ).empty( ))
-		buf << ", ";
+            if (!buf.str( ).empty( ))
+                buf << ", ";
 
-	    buf << skill->getNameFor( ch );
-	}
+            buf << skill->getNameFor( ch );
+        }
 
-	if (buf.str( ).empty( ))
-	    ch->send_to( "ı ‘≈¬— œ‘Ã…ﬁŒ¡— –¡Õ—‘ÿ: ‘Ÿ Œ…ﬁ≈«œ Œ≈ Õœ÷≈€ÿ ⁄¡¬Ÿ‘ÿ\r\n" );
-	else 
-	    ch->printf( "Ù≈–≈“ÿ ‘Ÿ ¬’ƒ≈€ÿ ⁄¡¬Ÿ◊¡‘ÿ '%s'.\r\n", buf.str( ).c_str( ) );
-	
-	return;
+        if (buf.str( ).empty( ))
+            ch->send_to( "–£ —Ç–µ–±—è –æ—Ç–ª–∏—á–Ω–∞—è –ø–∞–º—è—Ç—å: —Ç—ã –Ω–∏—á–µ–≥–æ –Ω–µ –º–æ–∂–µ—à—å –∑–∞–±—ã—Ç—å\r\n" );
+        else 
+            ch->printf( "–¢–µ–ø–µ—Ä—å —Ç—ã –±—É–¥–µ—à—å –∑–∞–±—ã–≤–∞—Ç—å '%s'.\r\n", buf.str( ).c_str( ) );
+        
+        return;
     }
 
     sn = manager->unstrictLookup( argument, ch );
     skill = manager->find( sn );
     
     if (!skill) {
-	ch->send_to( "Û“≈ƒ… ƒœ”‘’–ŒŸ» ‘≈¬≈ ’Õ≈Œ…  Œ≈‘ Œ…ﬁ≈«œ –œ»œ÷≈«œ.\r\n" );
-	return;
+        ch->send_to( "–°—Ä–µ–¥–∏ –¥–æ—Å—Ç—É–ø–Ω—ã—Ö —Ç–µ–±–µ —É–º–µ–Ω–∏–π –Ω–µ—Ç –Ω–∏—á–µ–≥–æ –ø–æ—Ö–æ–∂–µ–≥–æ.\r\n" );
+        return;
     }
 
     if (!skill->canForget( pch )) {
-	ch->printf( "ÙŸ Œ≈ Õœ÷≈€ÿ ⁄¡¬Ÿ‘ÿ …””À’”‘◊œ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
-	return;
+        ch->printf( "–¢—ã –Ω–µ –º–æ–∂–µ—à—å –∑–∞–±—ã—Ç—å –∏—Å—Å–∫—É—Å—Ç–≤–æ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+        return;
     }
 
     bool &forgetting = pch->getSkillData( sn ).forgetting;
 
     if (forgetting) {
-	ch->printf( "ÙŸ … ‘¡À ‘œÃÿÀœ … ƒ≈Ã¡≈€ÿ, ﬁ‘œ ⁄¡¬Ÿ◊¡≈€ÿ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
-	return;
+        ch->printf( "–¢—ã –∏ —Ç–∞–∫ —Ç–æ–ª—å–∫–æ –∏ –¥–µ–ª–∞–µ—à—å, —á—Ç–æ –∑–∞–±—ã–≤–∞–µ—à—å '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+        return;
     }
 
     forgetting = true;
-    ch->printf( "Ù≈–≈“ÿ ‘Ÿ ¬’ƒ≈€ÿ ⁄¡¬Ÿ◊¡‘ÿ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+    ch->printf( "–¢–µ–ø–µ—Ä—å —Ç—ã –±—É–¥–µ—à—å –∑–∞–±—ã–≤–∞—Ç—å '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 }
 
 CMDRUN( remember )
@@ -101,64 +101,64 @@ CMDRUN( remember )
     DLString argument = constArguments;
 
     if (ch->is_npc( )) {
-	ch->send_to("Ù≈¬≈ ‘—÷≈Ãœ ◊”–œÕŒ…‘ÿ ƒ¡÷≈ –¡–’ … Õ¡Õ’..\n\r");
-	return;
+        ch->send_to("–¢–µ–±–µ —Ç—è–∂–µ–ª–æ –≤—Å–ø–æ–º–Ω–∏—Ç—å –¥–∞–∂–µ –ø–∞–ø—É –∏ –º–∞–º—É..\n\r");
+        return;
     }
 
     if (argument.empty( )) {
-	ch->println( "˛‘œ …Õ≈ŒŒœ ‘Ÿ »œﬁ≈€ÿ ◊”–œÕŒ…‘ÿ?" );
-	return;
+        ch->println( "–ß—Ç–æ –∏–º–µ–Ω–Ω–æ —Ç—ã —Ö–æ—á–µ—à—å –≤—Å–ø–æ–º–Ω–∏—Ç—å?" );
+        return;
     }
     
     if (arg_is_all( argument )) {
-	DLString buf;
+        DLString buf;
 
-	for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	    PCSkillData &data = ch->getPC( )->getSkillData( sn );
-	    skill = SkillManager::getThis( )->find( sn );
-	    
-	    if (!data.forgetting || data.learned <= 1) 
-		continue;
-	    
-	    data.forgetting = false;
+        for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
+            PCSkillData &data = ch->getPC( )->getSkillData( sn );
+            skill = SkillManager::getThis( )->find( sn );
+            
+            if (!data.forgetting || data.learned <= 1) 
+                continue;
+            
+            data.forgetting = false;
 
-	    if (!buf.empty( ))
-		buf += ", ";
+            if (!buf.empty( ))
+                buf += ", ";
 
-	    buf += skill->getNameFor( ch );
-	}
+            buf += skill->getNameFor( ch );
+        }
 
-	if (buf.empty( ))
-	    ch->send_to( "Ù≈¬≈ Œ≈ﬁ≈«œ ◊”–œÕ…Œ¡‘ÿ.\r\n" );
-	else 
-	    ch->printf( "ÙŸ ◊”–œÕ…Œ¡≈€ÿ '%s'.\r\n", buf.c_str( ) );
+        if (buf.empty( ))
+            ch->send_to( "–¢–µ–±–µ –Ω–µ—á–µ–≥–æ –≤—Å–ø–æ–º–∏–Ω–∞—Ç—å.\r\n" );
+        else 
+            ch->printf( "–¢—ã –≤—Å–ø–æ–º–∏–Ω–∞–µ—à—å '%s'.\r\n", buf.c_str( ) );
 
-	return;
+        return;
     }
 
     sn = SkillManager::getThis( )->unstrictLookup( argument, ch );
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill) {
-	ch->send_to( "Ú¡⁄◊≈ Õœ÷Œœ ◊”–œÕŒ…‘ÿ ‘œ, ﬁ≈«œ Œ≈ ⁄Œ¡≈€ÿ?\n\r");
-	return;
+        ch->send_to( "–†–∞–∑–≤–µ –º–æ–∂–Ω–æ –≤—Å–ø–æ–º–Ω–∏—Ç—å —Ç–æ, —á–µ–≥–æ –Ω–µ –∑–Ω–∞–µ—à—å?\n\r");
+        return;
     }
     
     PCSkillData &data = ch->getPC( )->getSkillData( sn );
 
     if (!data.forgetting) {
-	act_p( "ÙŸ … Œ≈ –Ÿ‘¡Ã$gœ”ÿ|”—|¡”ÿ ⁄¡¬Ÿ‘ÿ $t.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR, POS_DEAD );
-	return;
+        act_p( "–¢—ã –∏ –Ω–µ –ø—ã—Ç–∞–ª$g–æ—Å—å|—Å—è|–∞—Å—å –∑–∞–±—ã—Ç—å $t.", ch, skill->getNameFor( ch ).c_str( ), 0, TO_CHAR, POS_DEAD );
+        return;
     }
     
     if (data.learned <= 1) {
-	ch->send_to( "Èƒ… ”Œ¡ﬁ¡Ã¡ –œ–“¡À‘…À’ ”—.\n\r");
-	return;
+        ch->send_to( "–ò–¥–∏ —Å–Ω–∞—á–∞–ª–∞ –ø–æ–ø—Ä–∞–∫—Ç–∏–∫—É–π—Å—è.\n\r");
+        return;
     }
 
     data.forgetting = false;
 
-    ch->printf( "ÙŸ ◊”–œÕ…Œ¡≈€ÿ '%s'.\n\r", skill->getNameFor( ch ).c_str( ) );
+    ch->printf( "–¢—ã –≤—Å–ø–æ–º–∏–Ω–∞–µ—à—å '%s'.\n\r", skill->getNameFor( ch ).c_str( ) );
 }
 
 void SkillTimerUpdate::run( PCharacter *ch ) 
@@ -167,44 +167,44 @@ void SkillTimerUpdate::run( PCharacter *ch )
     int sn_max_forget = 0, timer_max_forget = 0;
 
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-	Skill *skill = SkillManager::getThis( )->find( sn );
-	PCSkillData &data = ch->getSkillData( sn );
-	
-	if (!skill->canForget( ch ) || ch->getProfession( ) != prof_universal) {
-	    if (data.forgetting) {
-		ch->printf( "ÙŸ –“≈À“¡›¡≈€ÿ ⁄¡¬Ÿ◊¡‘ÿ '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
-		data.forgetting = false;
-	    }
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        PCSkillData &data = ch->getSkillData( sn );
+        
+        if (!skill->canForget( ch ) || ch->getProfession( ) != prof_universal) {
+            if (data.forgetting) {
+                ch->printf( "–¢—ã –ø—Ä–µ–∫—Ä–∞—â–∞–µ—à—å –∑–∞–±—ã–≤–∞—Ç—å '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
+                data.forgetting = false;
+            }
 
-	    continue;
-	}
-	
-	if (data.timer.getValue( ) < 10000) {
-	    if (data.forgetting)
-		data.timer += 10;
-	    else
-		data.timer++;
+            continue;
         }
-	
-	if (timer_max < data.timer.getValue( )) {
-	    sn_max = sn;
-	    timer_max = data.timer;
-	}
+        
+        if (data.timer.getValue( ) < 10000) {
+            if (data.forgetting)
+                data.timer += 10;
+            else
+                data.timer++;
+        }
+        
+        if (timer_max < data.timer.getValue( )) {
+            sn_max = sn;
+            timer_max = data.timer;
+        }
 
-	if (timer_max_forget < data.timer.getValue( ) && data.forgetting) {
-	    sn_max_forget = sn;
-	    timer_max_forget = data.timer;
-	}
+        if (timer_max_forget < data.timer.getValue( ) && data.forgetting) {
+            sn_max_forget = sn;
+            timer_max_forget = data.timer;
+        }
 
-	if (data.forgetting && number_percent( ) < 10)
-	    forget( ch, sn );
+        if (data.forgetting && number_percent( ) < 10)
+            forget( ch, sn );
     }
 
     if (ch->skill_points( ) > ch->max_skill_points) {
-	if (sn_max_forget)
-	    forget( ch, sn_max_forget );
-	else
-	    forget( ch, sn_max );
+        if (sn_max_forget)
+            forget( ch, sn_max_forget );
+        else
+            forget( ch, sn_max );
     }
 }
 
@@ -220,12 +220,12 @@ void SkillTimerUpdate::forget( PCharacter *ch, int sn )
     data.learned -= 5;
     
     if (data.forgetting)
-	data.timer--;
+        data.timer--;
     else
-	data.timer -= 5;
-	
+        data.timer -= 5;
+        
     data.learned = std::max(1, data.learned.getValue( ));
 
-    ch->printf( "{gÙŸ ⁄¡¬Ÿ◊¡≈€ÿ …”À’””‘◊œ '%s'.{x\n\r", 
+    ch->printf( "{g–¢—ã –∑–∞–±—ã–≤–∞–µ—à—å –∏—Å–∫—É—Å—Å—Ç–≤–æ '%s'.{x\n\r", 
                 SkillManager::getThis( )->find( sn )->getNameFor( ch ).c_str( ) ); 
 }

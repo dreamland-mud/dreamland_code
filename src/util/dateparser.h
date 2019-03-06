@@ -21,28 +21,28 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Чтение времени с помощью flex
+ * @short п╖я┌п╣п╫п╦п╣ п╡я─п╣п╪п╣п╫п╦ я│ п©п╬п╪п╬я┴я▄я▌ flex
  */
 class DateParser : public yyFlexLexer, public virtual DLObject
 {
 public: 
-	DateParser( const DLString& date );
-	int dateLex( ) throw( ExceptionBadDateString );
-	inline int getSecond( ) throw( ExceptionBadDateString )
-	{
-		dateLex( );
-		return second * modifier;
-	}
-	
+        DateParser( const DLString& date, istream * );
+        int dateLex( ) throw( ExceptionBadDateString );
+        inline int getSecond( ) throw( ExceptionBadDateString )
+        {
+                dateLex( );
+                return second * modifier;
+        }
+        
 private:
-	char tokenStatus;
-	DLString date;
-	int second;
-	int modifier;
-	int position;
-	int lastNumber;
-	std::basic_ostringstream<char> ostr;
-	std::basic_istringstream<char> istr;
+        char tokenStatus;
+        DLString date;
+        int second;
+        int modifier;
+        int position;
+        int lastNumber;
+        std::basic_ostringstream<char> ostr;
+        std::basic_istringstream<char> istr;
 };
 
 

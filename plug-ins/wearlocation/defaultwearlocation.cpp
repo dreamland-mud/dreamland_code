@@ -35,8 +35,8 @@ short get_wear_level( Character *ch, Object *obj );
  *------------------------------------------------------------------*/
 DefaultWearlocation::DefaultWearlocation( ) 
                       : itemType( 0, &item_table ),
-		        itemWear( 0, &wear_flags ),
-			needRib( true )
+                        itemWear( 0, &wear_flags ),
+                        needRib( true )
 
 {
 }
@@ -72,10 +72,10 @@ void DefaultWearlocation::unloaded( )
 void DefaultWearlocation::saveDrops( Character *ch )
 {
     if (ch->is_npc( )
-	    && !IS_AFFECTED( ch, AFF_CHARM)
-	    && ch->in_room != 0)
+            && !IS_AFFECTED( ch, AFF_CHARM)
+            && ch->in_room != 0)
     {
-	save_mobs( ch->in_room );
+        save_mobs( ch->in_room );
     }
 }
 
@@ -90,10 +90,10 @@ bool DefaultWearlocation::matches( Character *ch )
 bool DefaultWearlocation::matches( Object *obj )
 {
     if (obj->item_type == itemType.getValue( ))
-	return true;
-	
+        return true;
+        
     if (obj->can_wear( itemWear.getValue( ) ))
-	return true;
+        return true;
 
     return false;
 }
@@ -118,8 +118,8 @@ Object * DefaultWearlocation::find( Character *ch )
     Object *obj;
 
     for (obj = ch->carrying; obj != 0; obj = obj->next_content)
-	if (obj->wear_loc == this)
-	    return obj;
+        if (obj->wear_loc == this)
+            return obj;
 
     return 0;
 }
@@ -132,10 +132,10 @@ bool DefaultWearlocation::equip( Object *obj )
     Character *ch = obj->carried_by;
 
     if (!canEquip( ch, obj ))
-	return false;
+        return false;
     
     if (find( ch ))
-	LogStream::sendError( ) << "Equip_char: " << ch->getNameP() << " already equipped (" << getName( ) << ")." << endl;
+        LogStream::sendError( ) << "Equip_char: " << ch->getNameP() << " already equipped (" << getName( ) << ")." << endl;
     
     obj->wear_loc.assign( this );
     
@@ -153,11 +153,11 @@ void DefaultWearlocation::affectsOnEquip( Character *ch, Object *obj )
     Affect *paf;
     
     if (!obj->enchanted)
-	for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
-	    affect_modify( ch, paf, true );
+        for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
+            affect_modify( ch, paf, true );
 
     for (paf = obj->affected; paf != 0; paf = paf->next)
-	affect_modify( ch, paf, true );
+        affect_modify( ch, paf, true );
 }
 
 static bool oprog_cant_equip( Object *obj, Character *ch )
@@ -194,38 +194,33 @@ static bool oprog_remove( Object *obj, Character *ch )
 bool DefaultWearlocation::canEquip( Character *ch, Object *obj )
 {
     if (obj->isAntiAligned( ch )) {
-	if (IS_OBJ_STAT(obj, ITEM_NODROP)) {
-	    act( "You are zapped by $o1.", ch, obj, 0, TO_CHAR );
-	    act( "$c1 is zapped by $o1.", ch, obj, 0, TO_ROOM );
-	} else {
-	    act( "You are zapped by $o1 and drop it.", ch, obj, 0, TO_CHAR );
-	    act( "$c1 is zapped by $o1 and drops it.", ch, obj, 0, TO_ROOM );
-	    obj_from_char( obj );
-	    obj_to_room( obj, ch->in_room );
-	}
-	return false;
+        act( "Ð¢Ð²Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€ Ð½Ðµ Ð¿Ð¾Ð·Ð²Ð¾Ð»ÑÐµÑ‚ Ñ‚ÐµÐ±Ðµ Ð½Ð¾ÑÐ¸Ñ‚ÑŒ $o4.", ch, obj, 0, TO_CHAR);
+        act( "$o1 ÑÐ¾ÑÐºÐ°Ð»ÑŒÐ·Ñ‹Ð²Ð°ÐµÑ‚ Ñ $c2.", ch, obj, 0, TO_ROOM );
+        act( "$o1 ÑÐ¾ÑÐºÐ°Ð»ÑŒÐ·Ñ‹Ð²Ð°ÐµÑ‚ Ñ Ñ‚ÐµÐ±Ñ.", ch, obj, 0, TO_CHAR );
+        return false;
     }
     
     if (!obj->getRealShortDescr( ) && obj->wasAntiAligned( ch )) {
-	act( "$o1 ÓÏÓËÁÌØÚÙ×ÁÅÔ Ó $c2.", ch, obj, 0, TO_ROOM );
-	act( "$o1 ÓÏÓËÁÌØÚÙ×ÁÅÔ Ó ÔÅÂÑ.", ch, obj, 0, TO_CHAR );
-	return false;
+        act("Ð¢Ð²Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€ Ð²ÑÐµ ÐµÑ‰Ðµ Ð½Ðµ Ð¿Ð¾Ð·Ð²Ð¾Ð»ÑÐµÑ‚ Ñ‚ÐµÐ±Ðµ Ð½Ð¾ÑÐ¸Ñ‚ÑŒ $o4.", ch, obj, 0, TO_CHAR);
+        act( "$o1 ÑÐ¾ÑÐºÐ°Ð»ÑŒÐ·Ñ‹Ð²Ð°ÐµÑ‚ Ñ $c2.", ch, obj, 0, TO_ROOM );
+        act( "$o1 ÑÐ¾ÑÐºÐ°Ð»ÑŒÐ·Ñ‹Ð²Ð°ÐµÑ‚ Ñ Ñ‚ÐµÐ±Ñ.", ch, obj, 0, TO_CHAR );
+        return false;
     }
 
     if (IS_SET( obj->extra_flags, ITEM_MAGIC ) && ch->isAffected( gsn_spellbane )) {
-	int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
-	act("íÁÇÉÑ $o2 ÁÎÎÉÇÉÌÉÒÕÅÔ Ó Ô×ÏÉÍ spellbane!", ch, obj, 0, TO_CHAR);
-	act("íÁÇÉÑ $o2 ÁÎÎÉÇÉÌÉÒÕÅÔ ÓÏ spellbane $c2!", ch, obj, 0, TO_ROOM);
-	SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_SPELL ).hit( false );
-	interpret_raw( ch, "cb", "íÅÎÑ ÕÄÁÒÉÌÏ ÍÁÇÉÞÅÓËÏÊ ×ÅÝØÀ!" );
-	return false;
+        int dam = URANGE( 0, ch->hit - 1, ch->max_hit / 5 );
+        act("ÐœÐ°Ð³Ð¸Ñ $o2 Ð°Ð½Ð½Ð¸Ð³Ð¸Ð»Ð¸Ñ€ÑƒÐµÑ‚ Ñ Ñ‚Ð²Ð¾Ð¸Ð¼ spellbane!", ch, obj, 0, TO_CHAR);
+        act("ÐœÐ°Ð³Ð¸Ñ $o2 Ð°Ð½Ð½Ð¸Ð³Ð¸Ð»Ð¸Ñ€ÑƒÐµÑ‚ ÑÐ¾ spellbane $c2!", ch, obj, 0, TO_ROOM);
+        SkillDamage( ch, ch, gsn_spellbane, DAM_NEGATIVE, dam, DAMF_SPELL ).hit( false );
+        interpret_raw( ch, "cb", "ÐœÐµÐ½Ñ ÑƒÐ´Ð°Ñ€Ð¸Ð»Ð¾ Ð¼Ð°Ð³Ð¸Ñ‡ÐµÑÐºÐ¾Ð¹ Ð²ÐµÑ‰ÑŒÑŽ!" );
+        return false;
     }
 
     if (obj->behavior && !obj->behavior->canEquip( ch ))
-	return false;
+        return false;
     
     if (oprog_cant_equip( obj, ch ))
-	return false;
+        return false;
 
     return true;
 }
@@ -236,14 +231,14 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 
     switch (obj->item_type) {
     case ITEM_LIGHT:
-	if (obj->value[2] != 0 && ch->in_room != 0)
-	    ++ch->in_room->light;
-	break;
+        if (obj->value[2] != 0 && ch->in_room != 0)
+            ++ch->in_room->light;
+        break;
 
     case ITEM_ARMOR:
-	for (int i = 0; i < 4; i++)
-	    ch->armor[i] -= armorCoef * obj->value[i];
-	break;
+        for (int i = 0; i < 4; i++)
+            ch->armor[i] -= armorCoef * obj->value[i];
+        break;
     }
 }
 
@@ -268,14 +263,14 @@ void DefaultWearlocation::affectsOnUnequip( Character *ch, Object *obj )
     Affect *paf;
 
     if (!obj->enchanted)
-	for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next ) {
-	    affect_modify( ch, paf, false );
-	    affect_check(ch,paf->where,paf->bitvector);
-	}
+        for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next ) {
+            affect_modify( ch, paf, false );
+            affect_check(ch,paf->where,paf->bitvector);
+        }
 
     for ( paf = obj->affected; paf != 0; paf = paf->next ) {
-	affect_modify( ch, paf, false );
-	affect_check(ch,paf->where,paf->bitvector);	
+        affect_modify( ch, paf, false );
+        affect_check(ch,paf->where,paf->bitvector);        
     }
 }
 
@@ -285,14 +280,14 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
 
     switch (obj->item_type) {
     case ITEM_LIGHT:
-	if (obj->value[2] != 0 && ch->in_room != 0 && ch->in_room->light > 0)
-	    --ch->in_room->light;
-	break;
+        if (obj->value[2] != 0 && ch->in_room != 0 && ch->in_room->light > 0)
+            --ch->in_room->light;
+        break;
 
     case ITEM_ARMOR:
-	for (int i = 0; i < 4; i++)
-	    ch->armor[i] += armorCoef * obj->value[i];
-	break;
+        for (int i = 0; i < 4; i++)
+            ch->armor[i] += armorCoef * obj->value[i];
+        break;
     }
 }
 
@@ -301,22 +296,22 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
  *------------------------------------------------------------------*/
 bool DefaultWearlocation::remove( Object *obj, int flags )
 {
-    static const char *MSG_SELF = "ôÙ ÓÎÉÍÁÅÛØ %2$O4.";
-    static const char *MSG_ROOM = "%1$^C1 ÓÎÉÍÁÅÔ %2$O4.";
+    static const char *MSG_SELF = "Ð¢Ñ‹ ÑÐ½Ð¸Ð¼Ð°ÐµÑˆÑŒ %2$O4.";
+    static const char *MSG_ROOM = "%1$^C1 ÑÐ½Ð¸Ð¼Ð°ÐµÑ‚ %2$O4.";
     Character *ch = obj->carried_by;
     
     if (!canRemove( ch, obj, flags ))
-	return false;
+        return false;
     
     if (IS_SET(flags, F_WEAR_VERBOSE)) {
-	ch->recho( msgRoomRemove.empty( ) ? MSG_ROOM : msgRoomRemove.c_str( ), ch, obj );
-	ch->pecho( msgSelfRemove.empty( ) ? MSG_SELF : msgSelfRemove.c_str( ), ch, obj );
+        ch->recho( msgRoomRemove.empty( ) ? MSG_ROOM : msgRoomRemove.c_str( ), ch, obj );
+        ch->pecho( msgSelfRemove.empty( ) ? MSG_SELF : msgSelfRemove.c_str( ), ch, obj );
     }
     
     unequip( obj );
 
     if (waitstateRemove > 0)
-	ch->setWait( waitstateRemove );
+        ch->setWait( waitstateRemove );
 
     return true;
 }
@@ -326,14 +321,14 @@ bool DefaultWearlocation::remove( Character *ch, int flags )
     Object *obj;
     
     if (IS_SET(flags, F_WEAR_REPLACE))
-	if (pair->canWear( ch, flags ))
-	    return true;
+        if (pair->canWear( ch, flags ))
+            return true;
     
     if (!matches( ch ))
-	return false;
+        return false;
 
     if (!( obj = find( ch ) ))
-	return true;
+        return true;
     
     return remove( obj, flags );
 }
@@ -341,9 +336,9 @@ bool DefaultWearlocation::remove( Character *ch, int flags )
 bool DefaultWearlocation::canRemove( Character *ch, Object *obj, int flags )
 {
     if (IS_SET(obj->extra_flags, ITEM_NOREMOVE)) {
-	if (IS_SET(flags, F_WEAR_VERBOSE)) 
-	    act( "ôÙ ÎÅ ÍÏÖÅÛØ ÓÎÑÔØ $o4.", ch, obj, 0, TO_CHAR);
-	return false;
+        if (IS_SET(flags, F_WEAR_VERBOSE)) 
+            act( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ½ÑÑ‚ÑŒ $o4.", ch, obj, 0, TO_CHAR);
+        return false;
     }
     
     return true;
@@ -354,10 +349,10 @@ bool DefaultWearlocation::canRemove( Character *ch, int flags )
     Object *obj;
 
     if (!matches( ch ))
-	return false;
+        return false;
 
     if (!( obj = find( ch ) ))
-	return true;
+        return true;
 
     return canRemove( ch, obj, flags );
 }
@@ -371,15 +366,15 @@ int DefaultWearlocation::wear( Object *obj, int flags )
     Character *ch = obj->carried_by;
     
     if (( rc = canWear( ch, obj, flags ) ) != RC_WEAR_OK)
-	return rc;
+        return rc;
     
     if (IS_SET(flags, F_WEAR_REPLACE)
-	&& !remove( ch, flags )
-	&& !pair->remove( ch, flags & ~F_WEAR_REPLACE ))
-	return RC_WEAR_NOREPLACE;
+        && !remove( ch, flags )
+        && !pair->remove( ch, flags & ~F_WEAR_REPLACE ))
+        return RC_WEAR_NOREPLACE;
 
     if (wearAtomic( ch, obj, flags ) || pair->wearAtomic( ch, obj, flags ))
-	return RC_WEAR_OK;
+        return RC_WEAR_OK;
 
     return RC_WEAR_NOREPLACE;
 }
@@ -387,14 +382,14 @@ int DefaultWearlocation::wear( Object *obj, int flags )
 bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     if (canWear( ch, flags )) {
-	if (IS_SET(flags, F_WEAR_VERBOSE)) {
-	    ch->pecho( msgSelfWear.c_str( ), ch, obj );
-	    ch->recho( msgRoomWear.c_str( ), ch, obj );
-	}
+        if (IS_SET(flags, F_WEAR_VERBOSE)) {
+            ch->pecho( msgSelfWear.c_str( ), ch, obj );
+            ch->recho( msgRoomWear.c_str( ), ch, obj );
+        }
 
-	oprog_wear( obj, ch );
-	equip( obj );
-	return true;
+        oprog_wear( obj, ch );
+        equip( obj );
+        return true;
     }
 
     return false;
@@ -410,31 +405,31 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
     int wear_level = get_wear_level( ch, obj );
 
     if (wear_level > ch->getRealLevel( )) {
-	if (IS_SET(flags, F_WEAR_VERBOSE)) {
-	    ch->pecho( "þÔÏÂÙ ÉÓÐÏÌØÚÏ×ÁÔØ ÜÔÏ, ÔÅÂÅ ÎÅÏÂÈÏÄÉÍÏ ÄÏÓÔÉÞØ %d ÕÒÏ×ÎÑ.", wear_level );
-	    ch->recho( "%1$^C3 ÎÅ È×ÁÔÁÅÔ ÏÐÙÔÁ, ÞÔÏÂÙ ÉÓÐÏÌØÚÏ×ÁÔØ %2$O4.", ch, obj );
-	}
-	return RC_WEAR_YOUNG;
+        if (IS_SET(flags, F_WEAR_VERBOSE)) {
+            ch->pecho( "Ð¢ÐµÐ±Ðµ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð´Ð¾ÑÑ‚Ð¸Ñ‡ÑŒ %d ÑƒÑ€Ð¾Ð²Ð½Ñ, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ %O4.", wear_level, obj );
+            ch->recho( "%1$^C3 Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð¾Ð¿Ñ‹Ñ‚Ð°, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒ %2$O4.", ch, obj );
+        }
+        return RC_WEAR_YOUNG;
     }
 
     if (!matches( ch ) && !pair->matches( ch )) {
-	if (IS_SET(flags, F_WEAR_VERBOSE)) {
-	    ch->recho( msgRoomNoRib.c_str( ), ch, obj );
-	    ch->pecho( msgSelfNoRib.c_str( ), ch, obj );
-	}
-	return RC_WEAR_NORIB;
+        if (IS_SET(flags, F_WEAR_VERBOSE)) {
+            ch->recho( msgRoomNoRib.c_str( ), ch, obj );
+            ch->pecho( msgSelfNoRib.c_str( ), ch, obj );
+        }
+        return RC_WEAR_NORIB;
     }
 
     if (conflict->find( ch )) {
-	if (IS_SET(flags, F_WEAR_VERBOSE)) 
-	    ch->pecho( msgSelfConflict.c_str( ), ch, obj );
-	return RC_WEAR_CONFLICT;
+        if (IS_SET(flags, F_WEAR_VERBOSE)) 
+            ch->pecho( msgSelfConflict.c_str( ), ch, obj );
+        return RC_WEAR_CONFLICT;
     }
     
     if (IS_SET(flags, F_WEAR_REPLACE) 
-	&& !canRemove( ch, flags )
-	&& !pair->canRemove( ch, flags ))
-	return RC_WEAR_NOREPLACE;
+        && !canRemove( ch, flags )
+        && !pair->canRemove( ch, flags ))
+        return RC_WEAR_NOREPLACE;
 
     return RC_WEAR_OK;
 }
@@ -447,12 +442,12 @@ void DefaultWearlocation::display( Character *ch, Wearlocation::DisplayList &eq 
     bool found = false;
 
     for (Object *obj = ch->carrying; obj != 0; obj = obj->next_content)
-	if (obj->wear_loc == this) {
-	    eq.push_back( make_pair( msgDisplay, obj ) ); 
-	    found = true;
-	}
+        if (obj->wear_loc == this) {
+            eq.push_back( make_pair( msgDisplay, obj ) ); 
+            found = true;
+        }
 
     if (!found && displayAlways && matches( ch ))
-	eq.push_back( make_pair( msgDisplay, (Object *)NULL ) );
+        eq.push_back( make_pair( msgDisplay, (Object *)NULL ) );
 }
 

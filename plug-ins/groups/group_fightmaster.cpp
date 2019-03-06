@@ -4,14 +4,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD                    *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                    *
  ***************************************************************************/
 
 #include "logstream.h"
@@ -56,187 +56,163 @@ PROF(warrior);
 
 SKILL_RUNP( bashdoor )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *gch;
-	int chance=0;
-	EXTRA_EXIT_DATA *peexit = 0;
-	int damage_bash,door=0;
+        char arg[MAX_INPUT_LENGTH];
+        Character *gch;
+        int chance=0;
+        EXTRA_EXIT_DATA *peexit = 0;
+        int damage_bash,door=0;
+        Room *room = ch->in_room;
 
-	one_argument( argument, arg );
+        one_argument( argument, arg );
 
-	if (!gsn_bash_door->getEffective( ch ))
-	{
-		ch->send_to("˜Ÿ¬…‘ÿ ƒ◊≈“ÿ? Î¡À ‹‘œ?\n\r");
-		return;
-	}
+        if (!gsn_bash_door->getEffective( ch ))
+        {
+                ch->send_to("–í—ã–±–∏—Ç—å –¥–≤–µ—Ä—å? –ö–∞–∫ —ç—Ç–æ?\n\r");
+                return;
+        }
 
-	if (MOUNTED(ch))
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ◊Ÿ¬…‘ÿ ƒ◊≈“ÿ, Àœ«ƒ¡ ‘Ÿ ◊ ”≈ƒÃ≈.\n\r");
-		return;
-	}
+        if (MOUNTED(ch))
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –≤—ã–±–∏—Ç—å –¥–≤–µ—Ä—å, –∫–æ–≥–¥–∞ —Ç—ã –≤ —Å–µ–¥–ª–µ.\n\r");
+                return;
+        }
 
-	if (RIDDEN(ch))
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ◊Ÿ¬…‘ÿ ƒ◊≈“ÿ, Àœ«ƒ¡ œ”≈ƒÃ¡Œ.\n\r");
-		return;
-	}
+        if (RIDDEN(ch))
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –≤—ã–±–∏—Ç—å –¥–≤–µ—Ä—å, –∫–æ–≥–¥–∞ –æ—Å–µ–¥–ª–∞–Ω.\n\r");
+                return;
+        }
 
-	if (arg[0] == '\0')
-	{
-		ch->send_to("˜Ÿ¬…‘ÿ ƒ◊≈“ÿ ◊ À¡ÀœÕ Œ¡–“¡◊Ã≈Œ……?\n\r");
-		return;
-	}
+        if (arg[0] == '\0')
+        {
+                ch->send_to("–í—ã–±–∏—Ç—å –¥–≤–µ—Ä—å –≤ –∫–∞–∫–æ–º –Ω–∞–ø—Ä–∞–≤–ª–µ–Ω–∏–∏?\n\r");
+                return;
+        }
 
-	if (ch->fighting)
-	{	
-		ch->send_to("ÛŒ¡ﬁ¡Ã¡ ⁄¡ÀœŒﬁ… ”“¡÷≈Œ…≈.\n\r");
-		return;
-	}
-        if ( ( ( peexit = get_extra_exit( arg, ch->in_room->extra_exit ) ) == 0
-	                                    || !ch->can_see( peexit ) )
-	     && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
-	{
-		ch->send_to("Óœ ‘’‘ Œ≈ﬁ≈«œ ◊Ÿ¬…◊¡‘ÿ!\n\r");
-		return;
-	}
+        if (ch->fighting)
+        {        
+                ch->send_to("–°–Ω–∞—á–∞–ª–∞ –∑–∞–∫–æ–Ω—á–∏ —Å—Ä–∞–∂–µ–Ω–∏–µ.\n\r");
+                return;
+        }
+        if ( ( ( peexit = get_extra_exit( arg, room->extra_exit ) ) == 0 || !ch->can_see( peexit ) )
+             && ( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) < 0)
+        {
+                ch->send_to("–ù–æ —Ç—É—Ç –Ω–µ—á–µ–≥–æ –≤—ã–±–∏–≤–∞—Ç—å!\n\r");
+                return;
+        }
 
-	/* look for guards */
-	for ( gch = ch->in_room->people; gch; gch = gch->next_in_room )
-	{
-		if ( gch->is_npc() && IS_AWAKE(gch) && ch->getModifyLevel() + 5 < gch->getModifyLevel() )
-		{
-			act_p( "$C1 ”‘œ…‘ ”Ã…€ÀœÕ ¬Ã…⁄Àœ À ƒ◊≈“….",
-				ch, 0, gch, TO_CHAR,POS_RESTING);
-			return;
-		}
-	}
+        /* look for guards */
+        for ( gch = room->people; gch; gch = gch->next_in_room )
+        {
+                if ( gch->is_npc() && IS_AWAKE(gch) && ch->getModifyLevel() + 5 < gch->getModifyLevel() )
+                {
+                        act_p( "$C1 —Å—Ç–æ–∏—Ç —Å–ª–∏—à–∫–æ–º –±–ª–∏–∑–∫–æ –∫ –¥–≤–µ—Ä–∏.", ch, 0, gch, TO_CHAR,POS_RESTING);
+                        return;
+                }
+        }
 
-	// 'bash door'
-	Room *to_room;
-	EXIT_DATA *pexit = 0;
-	EXIT_DATA *pexit_rev = 0;
-	int	exit_info;
+        // 'bash door'
+        EXIT_DATA *pexit = 0;
+        EXIT_DATA *pexit_rev = 0;
+        int        exit_info;
 
-	if ( peexit != 0 )
-	{
-		door = DIR_SOMEWHERE;
-		exit_info = peexit->exit_info;
-	}
-	else
-	{
-		pexit = ch->in_room->exit[door];
-		exit_info = pexit->exit_info;
-	}
+        if ( peexit != 0 )
+        {
+                door = DIR_SOMEWHERE;
+                exit_info = peexit->exit_info;
+        }
+        else
+        {
+                pexit = room->exit[door];
+                exit_info = pexit->exit_info;
+        }
 
-	if ( !IS_SET(exit_info, EX_CLOSED) )
-	{
-		ch->send_to("˙ƒ≈”ÿ ’÷≈ œ‘À“Ÿ‘œ.\n\r");
-		return;
-	}
+        if ( !IS_SET(exit_info, EX_CLOSED) )
+        {
+                ch->send_to("–ó–¥–µ—Å—å —É–∂–µ –æ—Ç–∫—Ä—ã—Ç–æ.\n\r");
+                return;
+        }
 
-	if ( !IS_SET(exit_info, EX_LOCKED) )
-	{
-		ch->send_to("“œ”‘œ –œ“œ¬’  œ‘À“Ÿ‘ÿ.\n\r");
-		return;
-	}
+        if ( !IS_SET(exit_info, EX_LOCKED) )
+        {
+                ch->send_to("–ü—Ä–æ—Å—Ç–æ –ø–æ—Ä–æ–±—É–π –æ—Ç–∫—Ä—ã—Ç—å.\n\r");
+                return;
+        }
 
-	if ( IS_SET(exit_info, EX_NOPASS) && !IS_SET(exit_info, EX_BASH_ONLY))
-	{
-		ch->println("¸‘’ ƒ◊≈“ÿ Œ≈◊œ⁄Õœ÷Œœ ◊Ÿ€…¬…‘ÿ.");
-		return;
-	}
+        if ( IS_SET(exit_info, EX_NOPASS) && !IS_SET(exit_info, EX_BASH_ONLY))
+        {
+                ch->println("–≠—Ç—É –¥–≤–µ—Ä—å –Ω–µ–≤–æ–∑–º–æ–∂–Ω–æ –≤—ã—à–∏–±–∏—Ç—å.");
+                return;
+        }
 
-	/* modifiers */
+        /* modifiers */
 
-	/* size  and weight */
-	chance += ch->getCarryWeight( ) / 100;
+        /* size  and weight */
+        chance += ch->getCarryWeight( ) / 100;
 
-	chance += (ch->size - 2) * 20;
+        chance += (ch->size - 2) * 20;
 
-	/* stats */
-	chance += ch->getCurrStat(STAT_STR);
+        /* stats */
+        chance += ch->getCurrStat(STAT_STR);
 
-	if (is_flying( ch ))
-		chance -= 10;
+        if (is_flying( ch ))
+                chance -= 10;
 
-	/* level
-	chance += ch->getModifyLevel() / 10;
-	*/
+        /* level
+        chance += ch->getModifyLevel() / 10;
+        */
 
-	chance += ( gsn_bash_door->getEffective( ch ) - 90 );
+        chance += ( gsn_bash_door->getEffective( ch ) - 90 );
+        const char *doorname = peexit ? peexit->short_desc_from : direction_doorname(pexit);
+        act("–¢—ã –±—å–µ—à—å –≤ $N4, –ø—ã—Ç–∞—è—Å—å –≤—ã–±–∏—Ç—å!", ch,0, doorname,TO_CHAR);
+        act("$c1 –±—å–µ—Ç –≤ $N4, –ø—ã—Ç–∞—è—Å—å –≤—ã–±–∏—Ç—å!", ch,0, doorname,TO_ROOM);
 
-	if ( peexit != 0 )
-	{
-		act_p("ÙŸ ¬ÿ≈€ÿ ◊ $N4, … –Ÿ‘¡≈€ÿ”— ◊Ÿ¬…‘ÿ ≈≈!",
-			ch,0,peexit->short_desc_from,TO_CHAR,POS_RESTING);
-		act_p("$c1 ¬ÿ≈‘ ◊ $N4, … –Ÿ‘¡≈‘”— ◊Ÿ¬…‘ÿ ≈≈!",
-			ch,0,peexit->short_desc_from,TO_ROOM,POS_RESTING);
-	}
-	else
-	{
-		act_p("ÙŸ ¬ÿ≈€ÿ ◊ $d, … –Ÿ‘¡≈€ÿ”— ◊Ÿ¬…‘ÿ ≈≈!",
-			ch,0,pexit->keyword,TO_CHAR,POS_RESTING);
-		act_p("$c1 ¬ÿ≈‘ ◊ $d, … –Ÿ‘¡≈‘”— ◊Ÿ¬…‘ÿ ≈≈!",
-			ch,0,pexit->keyword,TO_ROOM,POS_RESTING);
-	}
+        if (room->isDark( ))
+                chance /= 2;
 
-	if (ch->in_room->isDark( ))
-		chance /= 2;
+        /* now the attack */
+        if (number_percent() < chance )
+        {
+                gsn_bash_door->improve( ch, true );
 
-	/* now the attack */
-	if (number_percent() < chance )
-	{
-		gsn_bash_door->improve( ch, true );
+                if ( peexit != 0 )
+                {
+                        REMOVE_BIT(peexit->exit_info, EX_LOCKED);
+                        REMOVE_BIT(peexit->exit_info, EX_CLOSED);
+                        act("$c1 –≤—ã–±–∏–≤–∞–µ—Ç –¥–≤–µ—Ä—å.", ch, 0, 0, TO_ROOM);
+                        act("–¢—ã –≤—ã–±–∏–≤–∞–µ—à—å –¥–≤–µ—Ä—å!", ch, 0, 0, TO_CHAR);
+                }
+                else
+                {
+                        REMOVE_BIT(pexit->exit_info, EX_LOCKED);
+                        REMOVE_BIT(pexit->exit_info, EX_CLOSED);
+                        act("$c1 –≤—ã–±–∏–≤–∞–µ—Ç –¥–≤–µ—Ä—å.", ch, 0, 0, TO_ROOM);
+                        act("–¢—ã –≤—ã–±–∏–≤–∞–µ—à—å –¥–≤–µ—Ä—å!", ch, 0, 0, TO_CHAR);
 
-		if ( peexit != 0 )
-		{
-			REMOVE_BIT(peexit->exit_info, EX_LOCKED);
-			REMOVE_BIT(peexit->exit_info, EX_CLOSED);
-			act_p( "$c1 ¬ÿ≈‘ ◊ $N4 … ◊Ÿ¬…◊¡≈‘ ≈≈.", ch, 0,
-				peexit->short_desc_from, TO_ROOM,POS_RESTING);
-			act_p( "ÙŸ ¬ÿ≈€ÿ ◊ $N4 … ◊Ÿ¬…◊¡≈€ÿ ≈≈.", ch, 0,
-				peexit->short_desc_from, TO_CHAR,POS_RESTING);
-		}
-		else
-		{
-			REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-			REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-			act_p( "$c1 ¬ÿ≈‘ ◊ $d … ◊Ÿ¬…◊¡≈‘ ≈≈.", ch, 0,
-				pexit->keyword, TO_ROOM,POS_RESTING);
-			ch->send_to("ÙŸ ◊Ÿ¬…◊¡≈€ÿ ƒ◊≈“ÿ!\n\r");
-
-			/* open the other side */
-			if ( ( to_room   = pexit->u1.to_room ) != 0
-				&& ( pexit_rev = to_room->exit[dirs[door].rev] ) != 0
-				&& pexit_rev->u1.to_room == ch->in_room )
-			{
-				Character *rch;
-
-				REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
-				REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
-				for ( rch = to_room->people; rch != 0; rch = rch->next_in_room )
-					act_p( "$d ” «“œ»œ‘œÕ ◊ŸÃ≈‘¡≈‘.", rch, 0, pexit_rev->keyword, TO_CHAR,POS_RESTING);
-			}
-		}
+                        /* open the other side */
+                        if ((pexit_rev = direction_reverse(room, door)))
+                        {
+                                REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
+                                REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
+                                direction_target(room, door)->echo(POS_RESTING, "%^N1 —Å –≥—Ä–æ—Ö–æ—Ç–æ–º –≤—ã–ª–µ—Ç–∞–µ—Ç.", doorname);
+                        }
+                }
 
 
-		ch->setWait( gsn_bash_door->getBeats( )  );
-	}
-	else
-	{
-		act_p("Ô¬≈””…Ã≈◊, ‘Ÿ –¡ƒ¡≈€ÿ Ã…√œÕ ◊Œ…⁄!",
-			ch,0,0,TO_CHAR,POS_RESTING);
-		act_p("Ô¬≈””…Ã≈◊, $c1 ’–¡$gÃœ|Ã|Ã¡ Ã…√œÕ ◊Œ…⁄.",
-			ch,0,0,TO_ROOM,POS_RESTING);
-		gsn_bash_door->improve( ch, false );
-		ch->position = POS_RESTING;
-		ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );
-		damage_bash = ch->damroll + number_range(4,4 + 4* ch->size + chance/5);
-		damage(ch,ch,damage_bash,gsn_bash_door, DAM_BASH, true, DAMF_WEAPON);
-	}
+                ch->setWait( gsn_bash_door->getBeats( )  );
+        }
+        else
+        {
+                act("–û–±–µ—Å—Å–∏–ª–µ–≤, —Ç—ã –ø–∞–¥–∞–µ—à—å –ª–∏—Ü–æ–º –≤–Ω–∏–∑!", ch,0,0,TO_CHAR);
+                act("–û–±–µ—Å—Å–∏–ª–µ–≤, $c1 —É–ø–∞$g–ª–æ|–ª|–ª–∞ –ª–∏—Ü–æ–º –≤–Ω–∏–∑.", ch,0,0,TO_ROOM);
+                gsn_bash_door->improve( ch, false );
+                ch->position = POS_RESTING;
+                ch->setWait( gsn_bash_door->getBeats( ) * 3 / 2  );
+                damage_bash = ch->damroll + number_range(4,4 + 4* ch->size + chance/5);
+                damage(ch,ch,damage_bash,gsn_bash_door, DAM_BASH, true, DAMF_WEAPON);
+        }
 
-	return;
+        return;
 }
 
 
@@ -246,228 +222,228 @@ SKILL_RUNP( bashdoor )
 
 SKILL_RUNP( bash )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *victim;
-	int chance, wait;
-	bool FightingCheck;
-	int damage_bash;
+        char arg[MAX_INPUT_LENGTH];
+        Character *victim;
+        int chance, wait;
+        bool FightingCheck;
+        int damage_bash;
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”¬…‘ÿ ” Œœ«, ≈”Ã… ‘Ÿ ◊≈“»œÕ!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–±–∏—Ç—å —Å –Ω–æ–≥, –µ—Å–ª–∏ —Ç—ã –≤–µ—Ä—Ö–æ–º!\n\r");
+                return;
+        }
 
-	if ( ch->fighting != 0 )
-		FightingCheck = true;
-	else
-		FightingCheck = false;
+        if ( ch->fighting != 0 )
+                FightingCheck = true;
+        else
+                FightingCheck = false;
 
-	argument = one_argument(argument,arg);
+        argument = one_argument(argument,arg);
 
-	if ( arg[0] != '\0' && !str_cmp(arg,"door") )
-	{
-		interpret_fmt( ch, "bashdoor %s", argument );
-		return;
-	}
+        if ( arg[0] != '\0' && !str_cmp(arg,"door") )
+        {
+                interpret_fmt( ch, "bashdoor %s", argument );
+                return;
+        }
 
-	if ( (chance = gsn_bash->getEffective( ch )) <= 1)
-	{	
-		ch->send_to("ıƒ¡“…‘ÿ ›…‘œÕ? Óœ À¡À ‹‘œ ”ƒ≈Ã¡‘ÿ?\n\r");
-		return;
-	}
+        if ( (chance = gsn_bash->getEffective( ch )) <= 1)
+        {        
+                ch->send_to("–£–¥–∞—Ä–∏—Ç—å —â–∏—Ç–æ–º? –ù–æ –∫–∞–∫ —ç—Ç–æ —Å–¥–µ–ª–∞—Ç—å?\n\r");
+                return;
+        }
 
-	chance = chance * 4 / 5;
+        chance = chance * 4 / 5;
 
-	if ( arg[0] == '\0' )
-	{
-		victim = ch->fighting;
-		if ( victim == 0 )
-		{
-			ch->send_to("Û≈ ﬁ¡” ‘Ÿ Œ≈ ”“¡÷¡≈€ÿ”—!\n\r");
-			return;
-		}
-	}
-	else if ( (victim = get_char_room(ch,arg)) == 0 )
-	{
-		ch->send_to("¸‘œ«œ Œ≈‘ ⁄ƒ≈”ÿ.\n\r");
-		return;
-	}
+        if ( arg[0] == '\0' )
+        {
+                victim = ch->fighting;
+                if ( victim == 0 )
+                {
+                        ch->send_to("–°–µ–π—á–∞—Å —Ç—ã –Ω–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è!\n\r");
+                        return;
+                }
+        }
+        else if ( (victim = get_char_room(ch,arg)) == 0 )
+        {
+                ch->send_to("–≠—Ç–æ–≥–æ –Ω–µ—Ç –∑–¥–µ—Å—å.\n\r");
+                return;
+        }
 
-	if ( victim->position < POS_FIGHTING )
-	{
-		act_p("œƒœ÷ƒ… –œÀ¡ $E ◊”‘¡Œ≈‘.",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if ( victim->position < POS_FIGHTING )
+        {
+                act_p("–ü–æ–¥–æ–∂–¥–∏ –ø–æ–∫–∞ $E –≤—Å—Ç–∞–Ω–µ—Ç.",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if ( victim == ch )
-	{
-		ch->send_to("ıƒ¡“…‘ÿ ›…‘œÕ ”≈¬—?\n\r");
-		return;
-	}
+        if ( victim == ch )
+        {
+                ch->send_to("–£–¥–∞—Ä–∏—Ç—å —â–∏—Ç–æ–º —Å–µ–±—è?\n\r");
+                return;
+        }
 
-	if ( get_eq_char( ch, wear_shield ) == 0 )
-	{
-		ch->send_to("Ù≈¬≈ Œ’÷≈Œ ›…‘ ﬁ‘œ¬Ÿ ”ƒ≈Ã¡‘ÿ ‹‘œ!\n\r");
-		return;
-	}
-	
-	if ( is_flying( ch ) )
-	{
-		ch->send_to("˜ –œÃ≈‘≈? È À¡À ‘Ÿ ”≈¬≈ ‹‘œ –“≈ƒ”‘¡◊Ã—≈€ÿ?\n\r");
-		return;
-	}
+        if ( get_eq_char( ch, wear_shield ) == 0 )
+        {
+                ch->send_to("–¢–µ–±–µ –Ω—É–∂–µ–Ω —â–∏—Ç —á—Ç–æ–±—ã —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ!\n\r");
+                return;
+        }
+        
+        if ( is_flying( ch ) )
+        {
+                ch->send_to("–í –ø–æ–ª–µ—Ç–µ? –ò –∫–∞–∫ —Ç—ã —Å–µ–±–µ —ç—Ç–æ –ø—Ä–µ–¥—Å—Ç–∞–≤–ª—è–µ—à—å?\n\r");
+                return;
+        }
 
-	if ( is_safe(ch,victim) )
-		return;
+        if ( is_safe(ch,victim) )
+                return;
 
-	if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
-	{
-		act_p("Óœ $C1 ‘◊œ  ƒ“’«!!!",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
+        {
+                act_p("–ù–æ $C1 —Ç–≤–æ–π –¥—Ä—É–≥!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if (SHADOW(ch))
-	{
-		ch->send_to("ÙŸ ¬≈⁄’”–≈€Œœ –Ÿ‘¡≈€ÿ”— ¬œ“œ‘ÿ”— ”œ ”◊œ≈  ‘≈Œÿ¿.\n\r");
-		act_p("$c1 ¬ÿ≈‘ ›…‘œÕ ”◊œ¿ ‘≈Œÿ.",ch,0,0,TO_ROOM,POS_RESTING);
-		return;
-	}
+        if (SHADOW(ch))
+        {
+                ch->send_to("–¢—ã –±–µ–∑—É—Å–ø–µ—à–Ω–æ –ø—ã—Ç–∞–µ—à—å—Å—è –±–æ—Ä–æ—Ç—å—Å—è —Å–æ —Å–≤–æ–µ–π —Ç–µ–Ω—å—é.\n\r");
+                act_p("$c1 –±—å–µ—Ç —â–∏—Ç–æ–º —Å–≤–æ—é —Ç–µ–Ω—å.",ch,0,0,TO_ROOM,POS_RESTING);
+                return;
+        }
 
-	if ( !ch->is_npc() && !ch->move )
-	{
-		ch->pecho("ÙŸ ”Ã…€ÀœÕ ’”‘¡%GÃœ|Ã|Ã¡ ƒÃ— ‹‘œ«œ.", ch);
-		return;
-	}
+        if ( !ch->is_npc() && !ch->move )
+        {
+                ch->pecho("–¢—ã —Å–ª–∏—à–∫–æ–º —É—Å—Ç–∞%G–ª–æ|–ª|–ª–∞ –¥–ª—è —ç—Ç–æ–≥–æ.", ch);
+                return;
+        }
 
-	if ( MOUNTED(victim) )
-	{
-	    if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”¬…‘ÿ ” Œœ« ‘œ«œ, À‘œ ◊≈“»œÕ!\n\r");
-		return;
-	    }
-	    
-	    interpret_raw( victim, "dismount" );
-	}
-	
-	ch->move -= move_dec( ch );
+        if ( MOUNTED(victim) )
+        {
+            if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–±–∏—Ç—å —Å –Ω–æ–≥ —Ç–æ–≥–æ, –∫—Ç–æ –≤–µ—Ä—Ö–æ–º!\n\r");
+                return;
+            }
+            
+            interpret_raw( victim, "dismount" );
+        }
+        
+        ch->move -= move_dec( ch );
 
-	if ( victim->isAffected(gsn_protective_shield) )
-	{
-		act_p("{YÙŸ –Ÿ‘¡≈€ÿ”— ”¬…‘ÿ ” Œœ« $C4, Œœ ﬁ‘œ-‘œ ‘≈¬≈ Õ≈€¡≈‘ ”ƒ≈Ã¡‘ÿ ‹‘œ.{x",
-			ch, 0, victim,TO_CHAR,POS_FIGHTING);
-		act_p("{Y$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ‘≈¬— ” Œœ«, Œœ ‘◊œ— ⁄¡›…‘¡ Õ≈€¡≈‘ ”ƒ≈Ã¡‘ÿ ‹‘œ.{x",
-			ch, 0,victim,TO_VICT,POS_FIGHTING);
-		act_p("{Y$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ” Œœ« $C4, Œœ ﬁ‘œ-‘œ Õ≈€¡≈‘ ”ƒ≈Ã¡‘ÿ ‹‘œ.{x",
-			ch,0,victim,TO_NOTVICT,POS_FIGHTING);
-		return;
-	}
+        if ( victim->isAffected(gsn_protective_shield) )
+        {
+                act_p("{Y–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è —Å–±–∏—Ç—å —Å –Ω–æ–≥ $C4, –Ω–æ —á—Ç–æ-—Ç–æ —Ç–µ–±–µ –º–µ—à–∞–µ—Ç —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ.{x",
+                        ch, 0, victim,TO_CHAR,POS_FIGHTING);
+                act_p("{Y$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Ç–µ–±—è —Å –Ω–æ–≥, –Ω–æ —Ç–≤–æ—è –∑–∞—â–∏—Ç–∞ –º–µ—à–∞–µ—Ç —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ.{x",
+                        ch, 0,victim,TO_VICT,POS_FIGHTING);
+                act_p("{Y$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Å –Ω–æ–≥ $C4, –Ω–æ —á—Ç–æ-—Ç–æ –º–µ—à–∞–µ—Ç —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ.{x",
+                        ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+                return;
+        }
 
-	/* modifiers */
+        /* modifiers */
 
-	/* size  and weight */
-	chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
-	chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 20;
+        /* size  and weight */
+        chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
+        chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 20;
 
-	if ( ch->size < victim->size )
-		chance += (ch->size - victim->size) * 25;
-	else
-		chance += (ch->size - victim->size) * 10;
+        if ( ch->size < victim->size )
+                chance += (ch->size - victim->size) * 25;
+        else
+                chance += (ch->size - victim->size) * 10;
 
-	/* stats */
-	chance += ch->getCurrStat(STAT_STR);
-	chance -= victim->getCurrStat(STAT_DEX) * 4/3;
+        /* stats */
+        chance += ch->getCurrStat(STAT_STR);
+        chance -= victim->getCurrStat(STAT_DEX) * 4/3;
 
-	/* speed */
+        /* speed */
         if (IS_QUICK(ch))
-		chance += 10;
+                chance += 10;
         if (IS_QUICK(victim))
-		chance -= 20;
+                chance -= 20;
 
-	/* level */
-	chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        /* level */
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
 
-	if ( is_flying( victim ) )
-		chance -= 10;
-	
-	if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
-	    chance /= 2;
+        if ( is_flying( victim ) )
+                chance -= 10;
+        
+        if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
+            chance /= 2;
 
-	/* now the attack */
+        /* now the attack */
 
-	if ( number_percent() < chance )
-	{
-		if ( number_percent() < 50 )
-		{
-			act_p("Û…ÃÿŒ≈ €…Õ ’ƒ¡“œÕ ›…‘¡ $c1 ”¬…◊¡≈‘ ‘≈¬— ” Œœ« … ‘Ÿ –¡ƒ¡≈€ÿ!",
-				ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("ÙŸ ”¬…◊¡≈€ÿ $C4 ” Œœ« ’ƒ¡“œÕ ›…‘¡!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 ”…ÃÿŒ≈ €…Õ ’ƒ¡“œÕ ›…‘¡ ”¬…◊¡≈‘ $C4 ” Œœ«.",
-				ch,0,victim,TO_NOTVICT,POS_RESTING);
+        if ( number_percent() < chance )
+        {
+                if ( number_percent() < 50 )
+                {
+                        act_p("–°–∏–ª—å–Ω–µ–π—à–∏–º —É–¥–∞—Ä–æ–º —â–∏—Ç–∞ $c1 —Å–±–∏–≤–∞–µ—Ç —Ç–µ–±—è —Å –Ω–æ–≥ –∏ —Ç—ã –ø–∞–¥–∞–µ—à—å!",
+                                ch,0,victim,TO_VICT,POS_RESTING);
+                        act_p("–¢—ã —Å–±–∏–≤–∞–µ—à—å $C4 —Å –Ω–æ–≥ —É–¥–∞—Ä–æ–º —â–∏—Ç–∞!",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act_p("$c1 —Å–∏–ª—å–Ω–µ–π—à–∏–º —É–¥–∞—Ä–æ–º —â–∏—Ç–∞ —Å–±–∏–≤–∞–µ—Ç $C4 —Å –Ω–æ–≥.",
+                                ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-			wait = 3;
+                        wait = 3;
 
-			switch(number_bits(2))
-			{
-			case 0:
-				wait = 1;
-				break;
-			case 1:
-				wait = 2;
-				break;
-			case 2:
-				wait = 4;
-				break;
-			case 3:
-				wait = 3;
-				break;
-			}
+                        switch(number_bits(2))
+                        {
+                        case 0:
+                                wait = 1;
+                                break;
+                        case 1:
+                                wait = 2;
+                                break;
+                        case 2:
+                                wait = 4;
+                                break;
+                        case 3:
+                                wait = 3;
+                                break;
+                        }
 
-			victim->setWaitViolence( wait );
-			victim->position = POS_RESTING;
-		}
-		else
-		{
-			act_p("$c1 Œ¡Œœ”…‘ ‘≈¬≈ ’ƒ¡“ ›…‘œÕ!",ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("ÙŸ Œ¡Œœ”…€ÿ ’ƒ¡“ ›…‘œÕ $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 Œ¡Œœ”…‘ ’ƒ¡“ ›…‘œÕ $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-		}	
-		gsn_bash->improve( ch, true, victim );
-		ch->setWait( gsn_bash->getBeats( ) );
-		damage_bash = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
-		gsn_enhanced_damage->getCommand( )->run( ch, victim, damage_bash );;
-		if ( is_flying( victim ) ) damage_bash += damage_bash/3;
-		damage(ch,victim,damage_bash,gsn_bash, DAM_BASH, true, DAMF_WEAPON);
-	}
-	else
-	{
-		if (number_percent() < 50)
-		{
-			act_p("ÙŸ –“œÕ¡»…◊¡≈€ÿ”— … –¡ƒ¡≈€ÿ!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 –“œÕ¡»…◊¡≈‘”— … –¡ƒ¡≈‘.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-			act_p("$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ‘≈¬— ” Œœ«, Œœ –“œÕ¡»…◊¡≈‘”— … –¡ƒ¡≈‘.",
-				ch,0,victim,TO_VICT,POS_RESTING);
-			ch->position = POS_RESTING;
-			ch->setWait( gsn_bash->getBeats( ) * 3/2 );
-		}
-		else
-		{
-			act_p("ÙŸ –“œÕ¡»…◊¡≈€ÿ”— … ≈ƒ◊¡ Œ≈ –¡ƒ¡≈€ÿ!",
-				ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 –“œÕ¡»…◊¡≈‘”— … ≈ƒ◊¡ Œ≈ –¡ƒ¡≈‘.",
-				ch,0,victim,TO_NOTVICT,POS_RESTING);
-			act_p("$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ‘≈¬— ” Œœ«, Œœ –“œÕ¡»…◊¡≈‘”— … ≈ƒ◊¡ Œ≈ –¡ƒ¡≈‘.",
-				ch,0,victim,TO_VICT,POS_RESTING);
-		}	
-		damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
-		gsn_bash->improve( ch, false, victim );
-		ch->setWait( gsn_bash->getBeats( ) * 1/2 );
-	}
-	
+                        victim->setWaitViolence( wait );
+                        victim->position = POS_RESTING;
+                }
+                else
+                {
+                        act_p("$c1 –Ω–∞–Ω–æ—Å–∏—Ç —Ç–µ–±–µ —É–¥–∞—Ä —â–∏—Ç–æ–º!",ch,0,victim,TO_VICT,POS_RESTING);
+                        act_p("–¢—ã –Ω–∞–Ω–æ—Å–∏—à—å —É–¥–∞—Ä —â–∏—Ç–æ–º $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act_p("$c1 –Ω–∞–Ω–æ—Å–∏—Ç —É–¥–∞—Ä —â–∏—Ç–æ–º $C3.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                }        
+                gsn_bash->improve( ch, true, victim );
+                ch->setWait( gsn_bash->getBeats( ) );
+                damage_bash = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
+                gsn_enhanced_damage->getCommand( )->run( ch, victim, damage_bash );;
+                if ( is_flying( victim ) ) damage_bash += damage_bash/3;
+                damage(ch,victim,damage_bash,gsn_bash, DAM_BASH, true, DAMF_WEAPON);
+        }
+        else
+        {
+                if (number_percent() < 50)
+                {
+                        act_p("–¢—ã –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—à—å—Å—è –∏ –ø–∞–¥–∞–µ—à—å!",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act_p("$c1 –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—Ç—Å—è –∏ –ø–∞–¥–∞–µ—Ç.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Ç–µ–±—è —Å –Ω–æ–≥, –Ω–æ –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—Ç—Å—è –∏ –ø–∞–¥–∞–µ—Ç.",
+                                ch,0,victim,TO_VICT,POS_RESTING);
+                        ch->position = POS_RESTING;
+                        ch->setWait( gsn_bash->getBeats( ) * 3/2 );
+                }
+                else
+                {
+                        act_p("–¢—ã –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—à—å—Å—è –∏ –µ–¥–≤–∞ –Ω–µ –ø–∞–¥–∞–µ—à—å!",
+                                ch,0,victim,TO_CHAR,POS_RESTING);
+                        act_p("$c1 –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—Ç—Å—è –∏ –µ–¥–≤–∞ –Ω–µ –ø–∞–¥–∞–µ—Ç.",
+                                ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Ç–µ–±—è —Å –Ω–æ–≥, –Ω–æ –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—Ç—Å—è –∏ –µ–¥–≤–∞ –Ω–µ –ø–∞–¥–∞–µ—Ç.",
+                                ch,0,victim,TO_VICT,POS_RESTING);
+                }        
+                damage(ch,victim,0,gsn_bash,DAM_BASH, true, DAMF_WEAPON);
+                gsn_bash->improve( ch, false, victim );
+                ch->setWait( gsn_bash->getBeats( ) * 1/2 );
+        }
+        
     if (!FightingCheck)
-	yell_panic( ch, victim,
-		    "œÕœ«…‘≈! Î‘œ-‘œ ¬ÿ≈‘ Õ≈Œ— ›…‘œÕ!",
-		    "œÕœ«…‘≈! %1$^C1 ¬ÿ≈‘ Õ≈Œ— ›…‘œÕ!" );
+        yell_panic( ch, victim,
+                    "–ü–æ–º–æ–≥–∏—Ç–µ! –ö—Ç–æ-—Ç–æ –±—å–µ—Ç –º–µ–Ω—è —â–∏—Ç–æ–º!",
+                    "–ü–æ–º–æ–≥–∏—Ç–µ! %1$^C1 –±—å–µ—Ç –º–µ–Ω—è —â–∏—Ç–æ–º!" );
 }
 
 
@@ -477,162 +453,162 @@ SKILL_RUNP( bash )
 
 SKILL_RUNP( trip )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *victim;
-	int chance;
-	bool FightingCheck;
+        char arg[MAX_INPUT_LENGTH];
+        Character *victim;
+        int chance;
+        bool FightingCheck;
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ –œƒ”≈ﬁÿ –“œ‘…◊Œ…À¡, Œ¡»œƒ—”ÿ ◊ ”≈ƒÃ≈!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –ø–æ–¥—Å–µ—á—å –ø—Ä–æ—Ç–∏–≤–Ω–∏–∫–∞, –Ω–∞—Ö–æ–¥—è—Å—å –≤ —Å–µ–¥–ª–µ!\n\r");
+                return;
+        }
 
-	if (ch->fighting != 0)
-		FightingCheck = true;
-	else
-		FightingCheck = false;
+        if (ch->fighting != 0)
+                FightingCheck = true;
+        else
+                FightingCheck = false;
 
-	one_argument(argument,arg);
+        one_argument(argument,arg);
 
-	if ( (chance = gsn_trip->getEffective( ch )) <= 1)
-	{
-		ch->send_to("œƒ”≈ﬁÿ? Î¡À ‹‘œ?\n\r");
-		return;
-	}
+        if ( (chance = gsn_trip->getEffective( ch )) <= 1)
+        {
+                ch->send_to("–ü–æ–¥—Å–µ—á—å? –ö–∞–∫ —ç—Ç–æ?\n\r");
+                return;
+        }
 
-	chance = chance * 4 / 5;
+        chance = chance * 4 / 5;
     
-	if ( arg[0] == '\0' )
-	{
-		victim = ch->fighting;
-		if ( victim == 0 )
-		{
-			ch->send_to("Û≈ ﬁ¡” ‘Ÿ Œ≈ ”“¡÷¡≈€ÿ”—!\n\r");
-			return;
-		}
-	}
-	else if ( (victim = get_char_room(ch,arg)) == 0 )
-	{
-		ch->send_to("¸‘œ«œ Œ≈‘ ⁄ƒ≈”ÿ.\n\r");
-		return;
-	}
+        if ( arg[0] == '\0' )
+        {
+                victim = ch->fighting;
+                if ( victim == 0 )
+                {
+                        ch->send_to("–°–µ–π—á–∞—Å —Ç—ã –Ω–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è!\n\r");
+                        return;
+                }
+        }
+        else if ( (victim = get_char_room(ch,arg)) == 0 )
+        {
+                ch->send_to("–≠—Ç–æ–≥–æ –Ω–µ—Ç –∑–¥–µ—Å—å.\n\r");
+                return;
+        }
 
-	if ( is_safe(ch,victim) )
-		return;
+        if ( is_safe(ch,victim) )
+                return;
 
-	if ( is_flying( victim ) )
-	{
-		act_p("Óœ $S Œœ«… Œ≈ Œ¡ ⁄≈ÕÃ≈.",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if ( is_flying( victim ) )
+        {
+                act_p("–ù–æ $S –Ω–æ–≥–∏ –Ω–µ –Ω–∞ –∑–µ–º–ª–µ.",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if ( is_flying( ch ) )
-	{
-		ch->send_to("˜ –œÃ≈‘≈? È À¡À ‘Ÿ ”≈¬≈ ‹‘œ –“≈ƒ”‘¡◊Ã—≈€ÿ?\n\r");
-		return;
-	}
+        if ( is_flying( ch ) )
+        {
+                ch->send_to("–í –ø–æ–ª–µ—Ç–µ? –ò –∫–∞–∫ —Ç—ã —Å–µ–±–µ —ç—Ç–æ –ø—Ä–µ–¥—Å—Ç–∞–≤–ª—è–µ—à—å?\n\r");
+                return;
+        }
 
-	if ( victim->position < POS_FIGHTING )
-	{
-		act_p("Óœ $C1 ’÷≈ Ã≈÷…‘...",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if ( victim->position < POS_FIGHTING )
+        {
+                act_p("–ù–æ $C1 —É–∂–µ –ª–µ–∂–∏—Ç...",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if ( !ch->is_npc() && !ch->move )
-	{
-		ch->pecho("ÙŸ ”Ã…€ÀœÕ ’”‘¡%GÃœ|Ã|Ã¡ ƒÃ— ‹‘œ«œ.", ch);
-		return;
-	}
+        if ( !ch->is_npc() && !ch->move )
+        {
+                ch->pecho("–¢—ã —Å–ª–∏—à–∫–æ–º —É—Å—Ç–∞%G–ª–æ|–ª|–ª–∞ –¥–ª—è —ç—Ç–æ–≥–æ.", ch);
+                return;
+        }
 
-	if (SHADOW(ch))
-	{
-		ch->send_to("Ù◊œ— Œœ«¡ ◊—⁄Œ≈‘ ◊ ‘◊œ≈  ‘≈Œ…...\n\r");
-		act_p("$c1 ◊Ÿƒ≈ÃŸ◊¡≈‘ ¬¡Ã≈‘ŒŸ≈ –¡ –≈“≈ƒ ”◊œ≈  ‘≈Œÿ¿.",
-			ch, 0, 0, TO_ROOM,POS_RESTING);
-		return;
-	}
+        if (SHADOW(ch))
+        {
+                ch->send_to("–¢–≤–æ—è –Ω–æ–≥–∞ –≤—è–∑–Ω–µ—Ç –≤ —Ç–≤–æ–µ–π —Ç–µ–Ω–∏...\n\r");
+                act_p("$c1 –≤—ã–¥–µ–ª—ã–≤–∞–µ—Ç –±–∞–ª–µ—Ç–Ω—ã–µ –ø–∞ –ø–µ—Ä–µ–¥ —Å–≤–æ–µ–π —Ç–µ–Ω—å—é.",
+                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }
 
-	if ( victim == ch )
-	{
-		ch->send_to("ÙŸ ⁄¡–…Œ¡≈€ÿ”— … –¡ƒ¡≈€ÿ!\n\r");
-		ch->setWait( 2 * gsn_trip->getBeats( ) );
-		act_p("$c1 ”–œ‘ŸÀ¡≈‘”— œ ”◊œ… ”œ¬”‘◊≈ŒŒŸ≈ Œœ«…!",ch,0,0,TO_ROOM,POS_RESTING);
-		return;
-	}
+        if ( victim == ch )
+        {
+                ch->send_to("–¢—ã –∑–∞–ø–∏–Ω–∞–µ—à—å—Å—è –∏ –ø–∞–¥–∞–µ—à—å!\n\r");
+                ch->setWait( 2 * gsn_trip->getBeats( ) );
+                act_p("$c1 —Å–ø–æ—Ç—ã–∫–∞–µ—Ç—Å—è –æ —Å–≤–æ–∏ —Å–æ–±—Å—Ç–≤–µ–Ω–Ω—ã–µ –Ω–æ–≥–∏!",ch,0,0,TO_ROOM,POS_RESTING);
+                return;
+        }
 
-	if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
-	{
-		act_p("Óœ ◊≈ƒÿ $C1 - ‘◊œ  »œ⁄—…Œ.",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
+        {
+                act_p("–ù–æ –≤–µ–¥—å $C1 - —Ç–≤–æ–π —Ö–æ–∑—è–∏–Ω.",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if ( MOUNTED(victim) )
-	{
-	    if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ –œƒ”≈ﬁÿ ‘œ«œ, À‘œ ◊≈“»œÕ!\n\r");
-		return;
-	    }
+        if ( MOUNTED(victim) )
+        {
+            if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –ø–æ–¥—Å–µ—á—å —Ç–æ–≥–æ, –∫—Ç–æ –≤–µ—Ä—Ö–æ–º!\n\r");
+                return;
+            }
 
-	    interpret_raw( victim, "dismount" );
-	}
+            interpret_raw( victim, "dismount" );
+        }
 
-	ch->move -= move_dec( ch );
+        ch->move -= move_dec( ch );
 
-	/* modifiers */
+        /* modifiers */
 
-	/* size */
-	if ( ch->size < victim->size )
-		chance += (ch->size - victim->size) * 10; // bigger = harder to trip
+        /* size */
+        if ( ch->size < victim->size )
+                chance += (ch->size - victim->size) * 10; // bigger = harder to trip
 
-	/* dex */
-	chance += ch->getCurrStat(STAT_DEX);
-	chance -= victim->getCurrStat(STAT_DEX) * 3 / 2;
+        /* dex */
+        chance += ch->getCurrStat(STAT_DEX);
+        chance -= victim->getCurrStat(STAT_DEX) * 3 / 2;
 
-	/* speed */
+        /* speed */
         if (IS_QUICK(ch))
-		chance += 10;
+                chance += 10;
         if (IS_QUICK(victim))
-		chance -= 20;
+                chance -= 20;
 
-	/* level */
-	chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        /* level */
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
 
-	if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
-	    chance /= 2;
+        if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
+            chance /= 2;
 
-	/* now the attack */
-	if ( number_percent() < chance )
-	{
-		if ( number_percent() < 70 )
-		{
-			act_p("$c1 –œƒ”≈À¡≈‘ ‘≈¬— … ‘Ÿ –¡ƒ¡≈€ÿ!",ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("ÙŸ –œƒ”≈À¡≈€ÿ $C4 … $C1 –¡ƒ¡≈‘!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 –œƒ”≈À¡≈‘ $C4, … $C1 –¡ƒ¡≈‘!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-			victim->setWaitViolence( 2 );
-			victim->position = POS_RESTING;
-		}
-		else
-		{
-			act_p("$c1 –Ÿ‘¡≈‘”— –œƒ”≈ﬁÿ ‘≈¬—, Œœ ‘Ÿ ’»…‘“—≈€ÿ”— Œ≈ ’–¡”‘ÿ!",ch,0,victim,TO_VICT,POS_RESTING);
-			act_p("ÙŸ –Ÿ‘¡≈€ÿ”— –œƒ”≈ﬁÿ $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-			act_p("$c1 –Ÿ‘¡≈‘”— –œƒ”≈ﬁÿ $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-		}
-		ch->setWait( gsn_trip->getBeats( ) );
-		gsn_trip->improve( ch, true, victim );
-		damage(ch,victim,number_range(2,2+2*victim->size),gsn_trip,DAM_BASH,true, DAMF_WEAPON);
-	}
-	else
-	{
-		damage(ch,victim,0,gsn_trip,DAM_BASH,true, DAMF_WEAPON);
-		ch->setWait( gsn_trip->getBeats( )*2/3 );
-		gsn_trip->improve( ch, false, victim );
-	}
+        /* now the attack */
+        if ( number_percent() < chance )
+        {
+                if ( number_percent() < 70 )
+                {
+                        act_p("$c1 –ø–æ–¥—Å–µ–∫–∞–µ—Ç —Ç–µ–±—è –∏ —Ç—ã –ø–∞–¥–∞–µ—à—å!",ch,0,victim,TO_VICT,POS_RESTING);
+                        act_p("–¢—ã –ø–æ–¥—Å–µ–∫–∞–µ—à—å $C4 –∏ $C1 –ø–∞–¥–∞–µ—Ç!",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act_p("$c1 –ø–æ–¥—Å–µ–∫–∞–µ—Ç $C4, –∏ $C1 –ø–∞–¥–∞–µ—Ç!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                        victim->setWaitViolence( 2 );
+                        victim->position = POS_RESTING;
+                }
+                else
+                {
+                        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è –ø–æ–¥—Å–µ—á—å —Ç–µ–±—è, –Ω–æ —Ç—ã —É—Ö–∏—Ç—Ä—è–µ—à—å—Å—è –Ω–µ —É–ø–∞—Å—Ç—å!",ch,0,victim,TO_VICT,POS_RESTING);
+                        act_p("–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è –ø–æ–¥—Å–µ—á—å $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
+                        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è –ø–æ–¥—Å–µ—á—å $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                }
+                ch->setWait( gsn_trip->getBeats( ) );
+                gsn_trip->improve( ch, true, victim );
+                damage(ch,victim,number_range(2,2+2*victim->size),gsn_trip,DAM_BASH,true, DAMF_WEAPON);
+        }
+        else
+        {
+                damage(ch,victim,0,gsn_trip,DAM_BASH,true, DAMF_WEAPON);
+                ch->setWait( gsn_trip->getBeats( )*2/3 );
+                gsn_trip->improve( ch, false, victim );
+        }
 
     if (!FightingCheck)
-	yell_panic( ch, victim,
-		    "œÕœ«…‘≈! Î‘œ-‘œ ‘œÃÿÀœ ﬁ‘œ –œƒ”≈À Õ≈Œ—!",
-		    "œÕœ«…‘≈! %1$^C1 ‘œÃÿÀœ ﬁ‘œ –œƒ”≈%1$GÀÃœ|À|ÀÃ¡ Õ≈Œ—!" );
+        yell_panic( ch, victim,
+                    "–ü–æ–º–æ–≥–∏—Ç–µ! –ö—Ç–æ-—Ç–æ —Ç–æ–ª—å–∫–æ —á—Ç–æ –ø–æ–¥—Å–µ–∫ –º–µ–Ω—è!",
+                    "–ü–æ–º–æ–≥–∏—Ç–µ! %1$^C1 —Ç–æ–ª—å–∫–æ —á—Ç–æ –ø–æ–¥—Å–µ%1$G–∫–ª–æ|–∫|–∫–ª–∞ –º–µ–Ω—è!" );
 }
 
 /*
@@ -641,131 +617,131 @@ SKILL_RUNP( trip )
 
 SKILL_RUNP( kick )
 {
-	Character *victim;
-	int kick_dam;
-	Object *on_feet;
-	int chance;
-	char arg[MAX_INPUT_LENGTH];
-	bool FightingCheck;
+        Character *victim;
+        int kick_dam;
+        Object *on_feet;
+        int chance;
+        char arg[MAX_INPUT_LENGTH];
+        bool FightingCheck;
 
-	if (gsn_kick->getEffective( ch ) <= 1)
-	{
-		ch->send_to("ı ‘≈¬— –Ãœ»¡— “¡”‘—÷À¡.\n\r");
-		return;
-	}
+        if (gsn_kick->getEffective( ch ) <= 1)
+        {
+                ch->send_to("–£ —Ç–µ–±—è –ø–ª–æ—Ö–∞—è —Ä–∞—Å—Ç—è–∂–∫–∞.\n\r");
+                return;
+        }
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ’ƒ¡“…‘ÿ Œœ«œ , ≈”Ã… ‘Ÿ ◊≈“»œÕ!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —É–¥–∞—Ä–∏—Ç—å –Ω–æ–≥–æ–π, –µ—Å–ª–∏ —Ç—ã –≤–µ—Ä—Ö–æ–º!\n\r");
+                return;
+        }
 
-	if (ch->fighting != 0)
-		FightingCheck = true;
-	else
-		FightingCheck = false;
+        if (ch->fighting != 0)
+                FightingCheck = true;
+        else
+                FightingCheck = false;
 
-	argument = one_argument(argument,arg);
+        argument = one_argument(argument,arg);
 
-	if (arg[0] == '\0')
-	{
-		victim = ch->fighting;
-		if (victim == 0)
-		{
-			ch->send_to("Û≈ ﬁ¡” ‘Ÿ Œ≈ ”“¡÷¡≈€ÿ”—!\n\r");
-			return;
-		}
-	}
-	else if ((victim = get_char_room(ch,arg)) == 0)
-	{
-		ch->send_to("¸‘œ«œ Œ≈‘ ⁄ƒ≈”ÿ.\n\r");
-		return;
-	}
+        if (arg[0] == '\0')
+        {
+                victim = ch->fighting;
+                if (victim == 0)
+                {
+                        ch->send_to("–°–µ–π—á–∞—Å —Ç—ã –Ω–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è!\n\r");
+                        return;
+                }
+        }
+        else if ((victim = get_char_room(ch,arg)) == 0)
+        {
+                ch->send_to("–≠—Ç–æ–≥–æ –Ω–µ—Ç –∑–¥–µ—Å—å.\n\r");
+                return;
+        }
 
-	if (victim == ch)
-	{
-		ch->send_to("ıƒ¡“…‘ÿ ”≈¬— Œœ«œ ? ‰œ◊œÃÿŒœ ‘—÷≈Ãœ...\n\r");
-		return;
-	}
+        if (victim == ch)
+        {
+                ch->send_to("–£–¥–∞—Ä–∏—Ç—å —Å–µ–±—è –Ω–æ–≥–æ–π? –î–æ–≤–æ–ª—å–Ω–æ —Ç—è–∂–µ–ª–æ...\n\r");
+                return;
+        }
 
-	if (is_safe(ch,victim))
-	{
-		return;
-	}
+        if (is_safe(ch,victim))
+        {
+                return;
+        }
 
-	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
-	{
-		act_p("Óœ $C1 ‘◊œ  ƒ“’«!!!",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        {
+                act_p("–ù–æ $C1 —Ç–≤–æ–π –¥—Ä—É–≥!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if( !ch->is_npc() && !ch->move )
-	{
-		ch->pecho("ÙŸ ”Ã…€ÀœÕ ’”‘¡%GÃœ|Ã|Ã¡ ƒÃ— ‹‘œ«œ.", ch);
-		return;
-	}
-	else
-		ch->move -= move_dec( ch );
+        if( !ch->is_npc() && !ch->move )
+        {
+                ch->pecho("–¢—ã —Å–ª–∏—à–∫–æ–º —É—Å—Ç–∞%G–ª–æ|–ª|–ª–∞ –¥–ª—è —ç—Ç–æ–≥–æ.", ch);
+                return;
+        }
+        else
+                ch->move -= move_dec( ch );
 
-	if(SHADOW(ch))
-	{
-		ch->send_to("Ù◊œ— Œœ«¡ ◊—⁄Œ≈‘ ◊ ‘◊œ≈  ‘≈Œ…...\n\r");
-		act_p("$c1 ◊Ÿƒ≈ÃŸ◊¡≈‘ ¬¡Ã≈‘ŒŸ≈ –¡ –≈“≈ƒ ”◊œ≈  ‘≈Œÿ¿.",
-					ch, 0, 0, TO_ROOM,POS_RESTING);
-		return;
-	}
+        if(SHADOW(ch))
+        {
+                ch->send_to("–¢–≤–æ—è –Ω–æ–≥–∞ –≤—è–∑–Ω–µ—Ç –≤ —Ç–≤–æ–µ–π —Ç–µ–Ω–∏...\n\r");
+                act_p("$c1 –≤—ã–¥–µ–ª—ã–≤–∞–µ—Ç –±–∞–ª–µ—Ç–Ω—ã–µ –ø–∞ –ø–µ—Ä–µ–¥ —Å–≤–æ–µ–π —Ç–µ–Ω—å—é.",
+                                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }
 
-	chance = number_percent( );
-	
-	if ( is_flying( ch ) )
-		chance = ( int )( chance * 1.1 );
-	
-	ch->setWait( gsn_kick->getBeats( )  );
-	
-	if (chance < gsn_kick->getEffective( ch ))
-	{
-		kick_dam = number_range( 1, ch->getModifyLevel() );
-		
-		if ( (ch->getTrueProfession( ) == prof_samurai)
-			&& ((on_feet=get_eq_char(ch,wear_feet)) == 0
-			|| (on_feet!=0 && !material_is_typed( on_feet, MAT_METAL ) ) ) )
-		{
-			kick_dam *= 2;
-		}
-		
-		kick_dam += ch->damroll / 2;
-		gsn_enhanced_damage->getCommand( )->run( ch, victim, kick_dam );;
+        chance = number_percent( );
+        
+        if ( is_flying( ch ) )
+                chance = ( int )( chance * 1.1 );
+        
+        ch->setWait( gsn_kick->getBeats( )  );
+        
+        if (chance < gsn_kick->getEffective( ch ))
+        {
+                kick_dam = number_range( 1, ch->getModifyLevel() );
+                
+                if ( (ch->getTrueProfession( ) == prof_samurai)
+                        && ((on_feet=get_eq_char(ch,wear_feet)) == 0
+                        || (on_feet!=0 && !material_is_typed( on_feet, MAT_METAL ) ) ) )
+                {
+                        kick_dam *= 2;
+                }
+                
+                kick_dam += ch->damroll / 2;
+                gsn_enhanced_damage->getCommand( )->run( ch, victim, kick_dam );;
 
-		if (IS_SET( ch->parts, PART_TWO_HOOVES ))
-		    kick_dam = 3 * kick_dam / 2;
-		else if (IS_SET( ch->parts, PART_FOUR_HOOVES ))
-		    kick_dam *= 2;
+                if (IS_SET( ch->parts, PART_TWO_HOOVES ))
+                    kick_dam = 3 * kick_dam / 2;
+                else if (IS_SET( ch->parts, PART_FOUR_HOOVES ))
+                    kick_dam *= 2;
 
-		damage( ch,victim,kick_dam,gsn_kick,DAM_BASH, true, DAMF_WEAPON );
-		gsn_kick->improve( ch, true, victim );
-		
-		if (victim->in_room == ch->in_room)
-		    if (number_percent( ) < (gsn_double_kick->getEffective( ch ) * 8) / 10)
-		    {
-			    gsn_double_kick->improve( ch, true, victim );
-			    damage( ch,victim,kick_dam,gsn_double_kick,DAM_BASH, true, DAMF_WEAPON );
-		    }
-	}
-	else
-	{
-		damage( ch, victim, 0, gsn_kick,DAM_BASH, true, DAMF_WEAPON );
-		gsn_kick->improve( ch, false, victim );
-	}
-	
+                damage( ch,victim,kick_dam,gsn_kick,DAM_BASH, true, DAMF_WEAPON );
+                gsn_kick->improve( ch, true, victim );
+                
+                if (victim->in_room == ch->in_room)
+                    if (number_percent( ) < (gsn_double_kick->getEffective( ch ) * 8) / 10)
+                    {
+                            gsn_double_kick->improve( ch, true, victim );
+                            damage( ch,victim,kick_dam,gsn_double_kick,DAM_BASH, true, DAMF_WEAPON );
+                    }
+        }
+        else
+        {
+                damage( ch, victim, 0, gsn_kick,DAM_BASH, true, DAMF_WEAPON );
+                gsn_kick->improve( ch, false, victim );
+        }
+        
     if (!FightingCheck) {
-	if (IS_SET(ch->parts, PART_TWO_HOOVES|PART_FOUR_HOOVES))
-	    yell_panic( ch, victim,
-			"œÕœ«…‘≈! Î‘œ-‘œ ’ƒ¡“…Ã Õ≈Œ— Àœ–Ÿ‘œÕ!",
-			"œÕœ«…‘≈! %1$^C1 ’ƒ¡“…%1$GÃœ|Ã|Ã¡ Õ≈Œ— Àœ–Ÿ‘œÕ!" );
-	else
-	    yell_panic( ch, victim,
-			"œÕœ«…‘≈! Î‘œ-‘œ ’ƒ¡“…Ã Õ≈Œ— Œœ«œ !",
-			"œÕœ«…‘≈! %1$^C1 ’ƒ¡“…%1$GÃœ|Ã|Ã¡ Õ≈Œ— Œœ«œ !" );
+        if (IS_SET(ch->parts, PART_TWO_HOOVES|PART_FOUR_HOOVES))
+            yell_panic( ch, victim,
+                        "–ü–æ–º–æ–≥–∏—Ç–µ! –ö—Ç–æ-—Ç–æ —É–¥–∞—Ä–∏–ª –º–µ–Ω—è –∫–æ–ø—ã—Ç–æ–º!",
+                        "–ü–æ–º–æ–≥–∏—Ç–µ! %1$^C1 —É–¥–∞—Ä–∏%1$G–ª–æ|–ª|–ª–∞ –º–µ–Ω—è –∫–æ–ø—ã—Ç–æ–º!" );
+        else
+            yell_panic( ch, victim,
+                        "–ü–æ–º–æ–≥–∏—Ç–µ! –ö—Ç–æ-—Ç–æ —É–¥–∞—Ä–∏–ª –º–µ–Ω—è –Ω–æ–≥–æ–π!",
+                        "–ü–æ–º–æ–≥–∏—Ç–µ! %1$^C1 —É–¥–∞—Ä–∏%1$G–ª–æ|–ª|–ª–∞ –º–µ–Ω—è –Ω–æ–≥–æ–π!" );
     }
 }
 
@@ -780,39 +756,39 @@ SKILL_RUNP( concentrate )
 
     if ( MOUNTED(ch) )
     {
-        ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”ÀœŒ√≈Œ‘“…“œ◊¡‘ÿ”—, ≈”Ã… ‘Ÿ ◊≈“»œÕ!\n\r");
+        ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞—Ç—å—Å—è, –µ—Å–ª–∏ —Ç—ã –≤–µ—Ä—Ö–æ–º!\n\r");
         return;
     }
 
     if ((chance = gsn_concentrate->getEffective( ch )) == 0)
     {
-	ch->send_to("ÙŸ –Ÿ‘¡≈€ÿ”— ”ÀœŒ√≈Œ‘“…“œ◊¡‘ÿ”—, Œœ Œ≈ ◊Ÿ»œƒ…‘.\n\r");
-	return;
+        ch->send_to("–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞—Ç—å—Å—è, –Ω–æ –Ω–µ –≤—ã—Ö–æ–¥–∏—Ç.\n\r");
+        return;
     }
 
     if (ch->isAffected(gsn_concentrate))
     {
-	act( "ÙŸ ’÷≈ ”ÀœŒ√≈Œ‘“…“œ◊¡Ã$gœ”ÿ|”—|¡”ÿ ƒÃ— ”“¡÷≈Œ…—.", ch, 0, 0, TO_CHAR );
-	return;
+        act( "–¢—ã —É–∂–µ —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞–ª$g–æ—Å—å|—Å—è|–∞—Å—å –¥–ª—è —Å—Ä–∞–∂–µ–Ω–∏—è.", ch, 0, 0, TO_CHAR );
+        return;
     }
-	
+        
     if (ch->mana < gsn_concentrate->getMana( ))
     {
-	ch->send_to("ı ‘≈¬— Œ≈ »◊¡‘¡≈‘ ‹Œ≈“«…… ƒÃ— ‹‘œ«œ.\n\r");
-	return;
+        ch->send_to("–£ —Ç–µ–±—è –Ω–µ —Ö–≤–∞—Ç–∞–µ—Ç —ç–Ω–µ—Ä–≥–∏–∏ –¥–ª—è —ç—Ç–æ–≥–æ.\n\r");
+        return;
     }
 
     /* fighting */
     if (ch->fighting)
     {
-	ch->send_to("ÎœŒ√≈Œ‘“…“’≈‘”— ƒÃ— ”“¡÷≈Œ…—!\n\r");
-	return;
+        ch->send_to("–ö–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä—É–µ—Ç—Å—è –¥–ª—è —Å—Ä–∞–∂–µ–Ω–∏—è!\n\r");
+        return;
     }
 
 
     if(SHADOW(ch)) {
-      ch->send_to("¸‘¡ ”‘“¡ŒŒ¡— ‘≈Œÿ Œ≈ ƒ¡≈‘ ‘≈¬≈ ”ÀœŒ√≈Œ‘“…“œ◊¡‘ÿ”—.\n\r");
-      act_p("$c1 –Ÿ÷…‘”—, Œœ Œ…À¡À Œ≈ ”ÀœŒ√≈Œ‘“…“’≈‘”—.\n...«Ã—ƒ…, ¡ ‘œ Ãœ–Œ≈‘.",
+      ch->send_to("–≠—Ç–∞ —Å—Ç—Ä–∞–Ω–Ω–∞—è —Ç–µ–Ω—å –Ω–µ –¥–∞–µ—Ç —Ç–µ–±–µ —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞—Ç—å—Å—è.\n\r");
+      act_p("$c1 –ø—ã–∂–∏—Ç—Å—è, –Ω–æ –Ω–∏–∫–∞–∫ –Ω–µ —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä—É–µ—Ç—Å—è.\n...–≥–ª—è–¥–∏, –∞ —Ç–æ –ª–æ–ø–Ω–µ—Ç.",
              ch, 0, 0, TO_ROOM,POS_RESTING);
       return;
     }
@@ -821,38 +797,38 @@ SKILL_RUNP( concentrate )
 
     if (number_percent() < chance)
     {
-	Affect af;
+        Affect af;
 
-	ch->mana -= gsn_concentrate->getMana( );
+        ch->mana -= gsn_concentrate->getMana( );
 
-	interpret_raw( ch, "sit" );
-	ch->send_to("ÙŸ œ‘ƒŸ»¡≈€ÿ, ÀœŒ√≈Œ‘“…“’—”ÿ ƒÃ— ”Ã≈ƒ’¿›≈«œ ”“¡÷≈Œ…—!\n\r");
-	act_p("$c1 ÀœŒ√≈Œ‘“…“’≈‘”— ƒÃ— ”Ã≈ƒ’¿›≈«œ ”“¡÷≈Œ…—.",
+        interpret_raw( ch, "sit" );
+        ch->send_to("–¢—ã –æ—Ç–¥—ã—Ö–∞–µ—à—å, –∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä—É—è—Å—å –¥–ª—è —Å–ª–µ–¥—É—é—â–µ–≥–æ —Å—Ä–∞–∂–µ–Ω–∏—è!\n\r");
+        act_p("$c1 –∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä—É–µ—Ç—Å—è –¥–ª—è —Å–ª–µ–¥—É—é—â–µ–≥–æ —Å—Ä–∞–∂–µ–Ω–∏—è.",
                ch,0,0,TO_ROOM,POS_FIGHTING);
-	gsn_concentrate->improve( ch, true );
+        gsn_concentrate->improve( ch, true );
 
-	af.where	= TO_AFFECTS;
-	af.type		= gsn_concentrate;
-	af.level	= ch->getModifyLevel();
-	af.duration	= number_fuzzy( ch->getModifyLevel() / 8);
-	af.modifier	= max( 1, ch->getModifyLevel() / 8 );
-	af.bitvector 	= 0;
+        af.where        = TO_AFFECTS;
+        af.type                = gsn_concentrate;
+        af.level        = ch->getModifyLevel();
+        af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
+        af.modifier        = max( 1, ch->getModifyLevel() / 8 );
+        af.bitvector         = 0;
 
-	af.location	= APPLY_HITROLL;
-	affect_to_char(ch,&af);
+        af.location        = APPLY_HITROLL;
+        affect_to_char(ch,&af);
 
-	af.location	= APPLY_DAMROLL;
-	affect_to_char(ch,&af);
+        af.location        = APPLY_DAMROLL;
+        affect_to_char(ch,&af);
 
-	af.modifier	= max( 1, ch->getModifyLevel() / 10 );
-	af.location	= APPLY_AC;
-	affect_to_char(ch,&af);
+        af.modifier        = max( 1, ch->getModifyLevel() / 10 );
+        af.location        = APPLY_AC;
+        affect_to_char(ch,&af);
     }
 
     else
     {
-	ch->send_to("ÙŸ –Ÿ‘¡≈€ÿ”— ”ÀœŒ√≈Œ‘“…“œ◊¡‘ÿ”— ƒÃ— ”Ã≈ƒ’¿›≈«œ ”“¡÷≈Œ…—, Œœ Œ≈ ◊Ÿ»œƒ…‘.\n\r");
-	gsn_concentrate->improve( ch, false );
+        ch->send_to("–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞—Ç—å—Å—è –¥–ª—è —Å–ª–µ–¥—É—é—â–µ–≥–æ —Å—Ä–∞–∂–µ–Ω–∏—è, –Ω–æ –Ω–µ –≤—ã—Ö–æ–¥–∏—Ç.\n\r");
+        gsn_concentrate->improve( ch, false );
     }
 }
 
@@ -863,106 +839,106 @@ SKILL_RUNP( concentrate )
 
 SKILL_RUNP( crush )
 {
-	Character *victim;
-	int chance = 100, wait = 0;
-	int damage_crush;
+        Character *victim;
+        int chance = 100, wait = 0;
+        int damage_crush;
 
-	if ( MOUNTED(ch) )
-		return;
-	
-	if (!gsn_crush->usable( ch ))
-	    return;
+        if ( MOUNTED(ch) )
+                return;
+        
+        if (!gsn_crush->usable( ch ))
+            return;
 
-	if ( (victim = ch->fighting) == 0 )
-		return;
+        if ( (victim = ch->fighting) == 0 )
+                return;
 
-	if ( victim->position < POS_FIGHTING )
-		return;
+        if ( victim->position < POS_FIGHTING )
+                return;
 
-	if ( is_safe(ch,victim) )
-		return;
+        if ( is_safe(ch,victim) )
+                return;
 
-	if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
-		return;
+        if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
+                return;
 
-	if (SHADOW(ch))
-	{
-		return;
-	}
+        if (SHADOW(ch))
+        {
+                return;
+        }
 
-	if ( victim->isAffected(gsn_protective_shield) )
-	{
-		act("{YÙ◊œ  Õœ›ŒŸ  ’ƒ¡“ À¡À ¬’ƒ‘œ ”œ”À¡Ãÿ⁄Ÿ◊¡≈‘ c $C2, Œ≈ –“…ﬁ…Œ—— ◊“≈ƒ¡.",
-			ch,0,victim,TO_CHAR);
-		act("{Y$Ìœ›ŒŸ  ’ƒ¡“ $c2 ”ÀœÃÿ⁄…‘ –œ –œ◊≈“»Œœ”‘… ‘◊œ≈«œ œ»“¡ŒŒœ«œ ›…‘¡.{x",
-			ch,0,victim,TO_VICT);
-		act("{Y$Ìœ›ŒŸ  ’ƒ¡“ $c2 À¡À ¬’ƒ‘œ ”œ”À¡Ãÿ⁄Ÿ◊¡≈‘ ” $C2.{x",
-			ch,0,victim,TO_NOTVICT);
-		return;
-	}
+        if ( victim->isAffected(gsn_protective_shield) )
+        {
+                act("{Y–¢–≤–æ–π –º–æ—â–Ω—ã–π —É–¥–∞—Ä –∫–∞–∫ –±—É–¥—Ç–æ —Å–æ—Å–∫–∞–ª—å–∑—ã–≤–∞–µ—Ç c $C2, –Ω–µ –ø—Ä–∏—á–∏–Ω—è—è –≤—Ä–µ–¥–∞.",
+                        ch,0,victim,TO_CHAR);
+                act("{Y–ú–æ—â–Ω—ã–π —É–¥–∞—Ä $c2 —Å–∫–æ–ª—å–∑–∏—Ç –ø–æ –ø–æ–≤–µ—Ä—Ö–Ω–æ—Å—Ç–∏ —Ç–≤–æ–µ–≥–æ –æ—Ö—Ä–∞–Ω–Ω–æ–≥–æ —â–∏—Ç–∞.{x",
+                        ch,0,victim,TO_VICT);
+                act("{Y–ú–æ—â–Ω—ã–π —É–¥–∞—Ä $c2 –∫–∞–∫ –±—É–¥—Ç–æ —Å–æ—Å–∫–∞–ª—å–∑—ã–≤–∞–µ—Ç —Å $C2.{x",
+                        ch,0,victim,TO_NOTVICT);
+                return;
+        }
 
-	/* modifiers */
+        /* modifiers */
 
-	/* size  and weight */
-	chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
-	chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 20;
+        /* size  and weight */
+        chance += min(ch->canCarryWeight( ), ch->carry_weight) / 25;
+        chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 20;
 
-	if ( ch->size < victim->size )
-		chance += (ch->size - victim->size) * 25;
-	else
-		chance += (ch->size - victim->size) * 10;
+        if ( ch->size < victim->size )
+                chance += (ch->size - victim->size) * 25;
+        else
+                chance += (ch->size - victim->size) * 10;
 
-	/* stats */
-	chance += ch->getCurrStat(STAT_STR);
-	chance -= victim->getCurrStat(STAT_DEX) * 4/3;
+        /* stats */
+        chance += ch->getCurrStat(STAT_STR);
+        chance -= victim->getCurrStat(STAT_DEX) * 4/3;
 
-	if ( is_flying( ch ) )
-		chance -= 10;
+        if ( is_flying( ch ) )
+                chance -= 10;
 
-	/* speed */
+        /* speed */
         if (IS_QUICK(ch))
-		chance += 10;
+                chance += 10;
         if (IS_QUICK(victim))
-		chance -= 20;
+                chance -= 20;
 
-	/* level */
-	chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        /* level */
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
 
-	/* now the attack */
-	if ( number_percent() < chance )
-	{
-		act_p("$c1 ”¬…◊¡≈‘ ‘≈¬— ” Œœ« Õœ›Œ≈ €…Õ ’ƒ¡“œÕ!",
-			ch,0,victim,TO_VICT,POS_RESTING);
-		act_p("ÙŸ ¬“œ”¡≈€ÿ”— Œ¡ $C4, … ”¬…◊¡≈€ÿ $S ” Œœ«!",ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 ”¬…◊¡≈‘ $C4 ” Œœ« Õœ›Œ≈ €…Õ ’ƒ¡“œÕ.",
-			ch,0,victim,TO_NOTVICT,POS_RESTING);
+        /* now the attack */
+        if ( number_percent() < chance )
+        {
+                act_p("$c1 —Å–±–∏–≤–∞–µ—Ç —Ç–µ–±—è —Å –Ω–æ–≥ –º–æ—â–Ω–µ–π—à–∏–º —É–¥–∞—Ä–æ–º!",
+                        ch,0,victim,TO_VICT,POS_RESTING);
+                act_p("–¢—ã –±—Ä–æ—Å–∞–µ—à—å—Å—è –Ω–∞ $C4, –∏ —Å–±–∏–≤–∞–µ—à—å $S —Å –Ω–æ–≥!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("$c1 —Å–±–∏–≤–∞–µ—Ç $C4 —Å –Ω–æ–≥ –º–æ—â–Ω–µ–π—à–∏–º —É–¥–∞—Ä–æ–º.",
+                        ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-		wait = 3;
+                wait = 3;
 
-		switch(number_bits(2))
-		{
-		case 0: wait = 1; break;
-		case 1: wait = 2; break;
-		case 2: wait = 4; break;
-		case 3: wait = 3; break;
-		}
+                switch(number_bits(2))
+                {
+                case 0: wait = 1; break;
+                case 1: wait = 2; break;
+                case 2: wait = 4; break;
+                case 3: wait = 3; break;
+                }
 
-		victim->setWaitViolence( wait );
-		ch->setWait( gsn_crush->getBeats( ) );
-		victim->position = POS_RESTING;
-		damage_crush = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
-		damage(ch,victim,damage_crush,gsn_crush, DAM_BASH, true, DAMF_WEAPON);
-	}
-	else
-	{
-		damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
-		act_p("ÙŸ –“œÕ¡»…◊¡≈€ÿ”— … –¡ƒ¡≈€ÿ!",ch,0,victim,TO_CHAR,POS_RESTING);
-		act_p("$c1 ƒ≈Ã¡≈‘ “≈⁄Àœ≈ ƒ◊…÷≈Œ…≈ … –¡ƒ¡≈‘.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-		act_p("$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ‘≈¬— ” Œœ«, Œœ ‘Ÿ ƒ≈Ã¡≈€ÿ €¡« ◊ ”‘œ“œŒ’, … $e –¡ƒ¡≈‘!",
-			ch,0,victim,TO_VICT,POS_RESTING);
-		ch->position = POS_RESTING;
-		ch->setWait( gsn_crush->getBeats( ) * 3/2 );
-	}
+                victim->setWaitViolence( wait );
+                ch->setWait( gsn_crush->getBeats( ) );
+                victim->position = POS_RESTING;
+                damage_crush = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
+                damage(ch,victim,damage_crush,gsn_crush, DAM_BASH, true, DAMF_WEAPON);
+        }
+        else
+        {
+                damage(ch,victim,0,gsn_crush,DAM_BASH, true, DAMF_WEAPON);
+                act_p("–¢—ã –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—à—å—Å—è –∏ –ø–∞–¥–∞–µ—à—å!",ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("$c1 –¥–µ–ª–∞–µ—Ç —Ä–µ–∑–∫–æ–µ –¥–≤–∏–∂–µ–Ω–∏–µ –∏ –ø–∞–¥–∞–µ—Ç.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+                act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Ç–µ–±—è —Å –Ω–æ–≥, –Ω–æ —Ç—ã –¥–µ–ª–∞–µ—à—å —à–∞–≥ –≤ —Å—Ç–æ—Ä–æ–Ω—É, –∏ $e –ø–∞–¥–∞–µ—Ç!",
+                        ch,0,victim,TO_VICT,POS_RESTING);
+                ch->position = POS_RESTING;
+                ch->setWait( gsn_crush->getBeats( ) * 3/2 );
+        }
 }
 
 
@@ -972,88 +948,88 @@ SKILL_RUNP( crush )
 
 SKILL_RUNP( berserk )
 {
-	int chance, hp_percent, mana;
+        int chance, hp_percent, mana;
 
-	if ( (chance = gsn_berserk->getEffective( ch )) <= 1)
-	{
-		ch->send_to("ÙŸ À“¡”Œ≈≈€ÿ œ‘ Œ¡–“—÷≈Œ…—, Œœ Œ…ﬁ≈«œ Œ≈ –œÃ’ﬁ¡≈‘”—.\n\r");
-		return;
-	}
+        if ( (chance = gsn_berserk->getEffective( ch )) <= 1)
+        {
+                ch->send_to("–¢—ã –∫—Ä–∞—Å–Ω–µ–µ—à—å –æ—Ç –Ω–∞–ø—Ä—è–∂–µ–Ω–∏—è, –Ω–æ –Ω–∏—á–µ–≥–æ –Ω–µ –ø–æ–ª—É—á–∞–µ—Ç—Å—è.\n\r");
+                return;
+        }
 
-	if ( IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk)
-		|| ch->isAffected(gsn_frenzy) )
-	{
-		act("ÙŸ ”‘¡Œœ◊…€ÿ”— Œ≈ÕŒœ«œ ƒ…À$g…Õ|…Õ|œ .", ch, 0, 0, TO_CHAR);
-		return;
-	}
+        if ( IS_AFFECTED(ch,AFF_BERSERK) || ch->isAffected(gsn_berserk)
+                || ch->isAffected(gsn_frenzy) )
+        {
+                act("–¢—ã —Å—Ç–∞–Ω–æ–≤–∏—à—å—Å—è –Ω–µ–º–Ω–æ–≥–æ –¥–∏–∫$g–∏–º|–∏–º|–æ–π.", ch, 0, 0, TO_CHAR);
+                return;
+        }
 
-	if ( IS_AFFECTED(ch,AFF_CALM) )
-	{
-		act("ÙŸ ”Ã…€ÀœÕ Õ…“œÃ¿¬…$g◊œ|◊|◊¡ ƒÃ— ‹‘œ«œ.", ch, 0, 0, TO_CHAR);
-		return;
-	}
-	
-	mana = gsn_berserk->getMana( );
-	
-	if ( ch->mana < mana )
-	{
-		ch->send_to("ı ‘≈¬— Œ≈ƒœ”‘¡‘œﬁŒœ ‹Œ≈“«…… ƒÃ— ‹‘œ«œ.\n\r");
-		return;
-	}
+        if ( IS_AFFECTED(ch,AFF_CALM) )
+        {
+                act("–¢—ã —Å–ª–∏—à–∫–æ–º –º–∏—Ä–æ–ª—é–±–∏$g–≤–æ|–≤|–≤–∞ –¥–ª—è —ç—Ç–æ–≥–æ.", ch, 0, 0, TO_CHAR);
+                return;
+        }
+        
+        mana = gsn_berserk->getMana( );
+        
+        if ( ch->mana < mana )
+        {
+                ch->send_to("–£ —Ç–µ–±—è –Ω–µ–¥–æ—Å—Ç–∞—Ç–æ—á–Ω–æ —ç–Ω–µ—Ä–≥–∏–∏ –¥–ª—è —ç—Ç–æ–≥–æ.\n\r");
+                return;
+        }
 
-	/* modifiers */
+        /* modifiers */
 
-	/* fighting */
-	if ( ch->position == POS_FIGHTING )
-		chance += 10;
+        /* fighting */
+        if ( ch->position == POS_FIGHTING )
+                chance += 10;
 
-	/* damage -- below 50% of hp helps, above hurts */
+        /* damage -- below 50% of hp helps, above hurts */
 
-	hp_percent = HEALTH(ch);
-	chance += 25 - hp_percent / 2;
+        hp_percent = HEALTH(ch);
+        chance += 25 - hp_percent / 2;
 
-	if ( number_percent() < chance )
-	{
-		Affect af;
+        if ( number_percent() < chance )
+        {
+                Affect af;
 
-		ch->setWaitViolence( 1 );
-		ch->mana -= mana;
+                ch->setWaitViolence( 1 );
+                ch->mana -= mana;
 
-		/* heal a little damage */
+                /* heal a little damage */
 
-		ch->hit += ch->getModifyLevel() * 2;
-		ch->hit = min(ch->hit,ch->max_hit);
+                ch->hit += ch->getModifyLevel() * 2;
+                ch->hit = min(ch->hit,ch->max_hit);
 
-		ch->send_to("Ù◊œ  –’Ãÿ” ’ﬁ¡›¡≈‘”—, Àœ«ƒ¡ ‘Ÿ ◊»œƒ…€ÿ ◊ —“œ”‘ÿ!\n\r");
-		act_p("ÁÃ¡⁄¡ $c2 ⁄¡«œ“¡¿‘”— {rƒ…À…Õ œ«Œ≈Õ{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
-		gsn_berserk->improve( ch, true );
+                ch->send_to("–¢–≤–æ–π –ø—É–ª—å—Å —É—á–∞—â–∞–µ—Ç—Å—è, –∫–æ–≥–¥–∞ —Ç—ã –≤—Ö–æ–¥–∏—à—å –≤ —è—Ä–æ—Å—Ç—å!\n\r");
+                act_p("–ì–ª–∞–∑–∞ $c2 –∑–∞–≥–æ—Ä–∞—é—Ç—Å—è {r–¥–∏–∫–∏–º –æ–≥–Ω–µ–º{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
+                gsn_berserk->improve( ch, true );
 
-		af.where	= TO_AFFECTS;
-		af.type		= gsn_berserk;
-		af.level	= ch->getModifyLevel();
-		af.duration	= number_fuzzy( ch->getModifyLevel() / 8);
+                af.where        = TO_AFFECTS;
+                af.type                = gsn_berserk;
+                af.level        = ch->getModifyLevel();
+                af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
 
-		af.modifier	= max( 1, ch->getModifyLevel() / 5 );
-		af.location	= APPLY_HITROLL;
-		affect_to_char(ch,&af);
+                af.modifier        = max( 1, ch->getModifyLevel() / 5 );
+                af.location        = APPLY_HITROLL;
+                affect_to_char(ch,&af);
 
-		af.location	= APPLY_DAMROLL;
-		af.bitvector 	= AFF_BERSERK;
-		affect_to_char(ch,&af);
+                af.location        = APPLY_DAMROLL;
+                af.bitvector         = AFF_BERSERK;
+                affect_to_char(ch,&af);
 
-		af.modifier	= max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
-		af.location	= APPLY_AC;
-		af.bitvector 	= 0;
-		affect_to_char(ch,&af);
-	}
-	else
-	{
-		ch->setWaitViolence( 2 );
-		ch->mana -= mana / 2;
+                af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
+                af.location        = APPLY_AC;
+                af.bitvector         = 0;
+                affect_to_char(ch,&af);
+        }
+        else
+        {
+                ch->setWaitViolence( 2 );
+                ch->mana -= mana / 2;
 
-		ch->send_to("Ù◊œ  –’Ãÿ” ’”Àœ“—≈‘”—, Œœ Œ…ﬁ≈«œ Œ≈ –“œ…”»œƒ…‘.\n\r");
-		gsn_berserk->improve( ch, false );
-	}
+                ch->send_to("–¢–≤–æ–π –ø—É–ª—å—Å —É—Å–∫–æ—Ä—è–µ—Ç—Å—è, –Ω–æ –Ω–∏—á–µ–≥–æ –Ω–µ –ø—Ä–æ–∏—Å—Ö–æ–¥–∏—Ç.\n\r");
+                gsn_berserk->improve( ch, false );
+        }
 
 }
 
@@ -1063,178 +1039,178 @@ SKILL_RUNP( berserk )
 
 SKILL_RUNP( dirt )
 {
-	char arg[MAX_INPUT_LENGTH];
-	Character *victim;
-	int chance;
-	bool FightingCheck;
+        char arg[MAX_INPUT_LENGTH];
+        Character *victim;
+        int chance;
+        bool FightingCheck;
 
-	if ( MOUNTED(ch) )
-	{
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ œ”Ã≈–…‘ÿ –ŸÃÿ¿, ≈”Ã… ‘Ÿ ◊≈“»œÕ!\n\r");
-		return;
-	}
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –æ—Å–ª–µ–ø–∏—Ç—å –ø—ã–ª—å—é, –µ—Å–ª–∏ —Ç—ã –≤–µ—Ä—Ö–æ–º!\n\r");
+                return;
+        }
 
-	if (ch->fighting != 0)
-		FightingCheck = true;
-	else
-		FightingCheck = false;
+        if (ch->fighting != 0)
+                FightingCheck = true;
+        else
+                FightingCheck = false;
 
-	one_argument(argument,arg);
+        one_argument(argument,arg);
 
-	if ( ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
-	{
-		ch->send_to("ÙŸ Ã…€ÿ –¡ﬁÀ¡≈€ÿ ”◊œ… Œœ«… ◊ –ŸÃ….\n\r");
-		return;
-	}
+        if ( ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
+        {
+                ch->send_to("–¢—ã –ª–∏—à—å –ø–∞—á–∫–∞–µ—à—å —Å–≤–æ–∏ –Ω–æ–≥–∏ –≤ –ø—ã–ª–∏.\n\r");
+                return;
+        }
 
-	if (arg[0] == '\0')
-	{
-		victim = ch->fighting;
-		if (victim == 0)
-		{
-			ch->send_to("Û≈ ﬁ¡” ‘Ÿ Œ≈ ”“¡÷¡≈€ÿ”—!\n\r");
-			return;
-		}
-	}
-	else if ((victim = get_char_room(ch,arg)) == 0)
-	{
-		ch->send_to("¸‘œ«œ Œ≈‘ ⁄ƒ≈”ÿ.\n\r");
-		return;
-	}
+        if (arg[0] == '\0')
+        {
+                victim = ch->fighting;
+                if (victim == 0)
+                {
+                        ch->send_to("–°–µ–π—á–∞—Å —Ç—ã –Ω–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è!\n\r");
+                        return;
+                }
+        }
+        else if ((victim = get_char_room(ch,arg)) == 0)
+        {
+                ch->send_to("–≠—Ç–æ–≥–æ –Ω–µ—Ç –∑–¥–µ—Å—å.\n\r");
+                return;
+        }
 
-	if (is_flying( ch ) )
-	{
-		ch->send_to("Îœ«ƒ¡ Ã≈‘¡≈€ÿ?\n\r");
-		return;
-	}
+        if (is_flying( ch ) )
+        {
+                ch->send_to("–ö–æ–≥–¥–∞ –ª–µ—Ç–∞–µ—à—å?\n\r");
+                return;
+        }
 
-	if (IS_AFFECTED(victim,AFF_BLIND))
-	{
-		act_p("Óœ $E ’÷≈ Œ…ﬁ≈«œ Œ≈ ◊…ƒ…‘.",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if (IS_AFFECTED(victim,AFF_BLIND))
+        {
+                act_p("–ù–æ $E —É–∂–µ –Ω–∏—á–µ–≥–æ –Ω–µ –≤–∏–¥–∏—Ç.",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if (victim == ch)
-	{
-		ch->send_to("‰œ◊œÃÿŒœ «Ã’–¡— ÕŸ”Ãÿ.\n\r");
-		return;
-	}
+        if (victim == ch)
+        {
+                ch->send_to("–î–æ–≤–æ–ª—å–Ω–æ –≥–ª—É–ø–∞—è –º—ã—Å–ª—å.\n\r");
+                return;
+        }
 
-	if (is_safe(ch,victim))
-		return;
+        if (is_safe(ch,victim))
+                return;
 
-	if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
-	{
-		act_p("Óœ $C1 ‘◊œ  Ã’ﬁ€…  ƒ“’«!",ch,0,victim,TO_CHAR,POS_RESTING);
-		return;
-	}
+        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        {
+                act_p("–ù–æ $C1 —Ç–≤–æ–π –ª—É—á—à–∏–π –¥—Ä—É–≥!",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
-	if( !ch->is_npc() && !ch->move )
-	{
-		ch->pecho("ÙŸ ”Ã…€ÀœÕ ’”‘¡%GÃœ|Ã|Ã¡ ƒÃ— ‹‘œ«œ.", ch);
-		return;
-	} 
+        if( !ch->is_npc() && !ch->move )
+        {
+                ch->pecho("–¢—ã —Å–ª–∏—à–∫–æ–º —É—Å—Ç–∞%G–ª–æ|–ª|–ª–∞ –¥–ª—è —ç—Ç–æ–≥–æ.", ch);
+                return;
+        } 
 
-	if(SHADOW(ch))
-	{
-		ch->send_to("Ù◊œ— ¬≈⁄ƒœŒŒ¡— ‘≈Œÿ –œ«Ãœ›¡≈‘ –ŸÃÿ.\n\r");
-		act_p("$c1 ¬“œ”¡≈‘ ◊ ”◊œ¿ ‘≈Œÿ –ŸÃÿ.",ch, 0, 0, TO_ROOM,POS_RESTING);
-		return;
-	}
+        if(SHADOW(ch))
+        {
+                ch->send_to("–¢–≤–æ—è –±–µ–∑–¥–æ–Ω–Ω–∞—è —Ç–µ–Ω—å –ø–æ–≥–ª–æ—â–∞–µ—Ç –ø—ã–ª—å.\n\r");
+                act_p("$c1 –±—Ä–æ—Å–∞–µ—Ç –≤ —Å–≤–æ—é —Ç–µ–Ω—å –ø—ã–ª—å.",ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }
 
-	if ( MOUNTED(victim) )
-	{
-	    if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-		ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ œ”Ã≈–…‘ÿ –ŸÃÿ¿ ‘œ«œ, À‘œ ◊≈“»œÕ!\n\r");
-		return;
-	    }
+        if ( MOUNTED(victim) )
+        {
+            if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+                ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å –æ—Å–ª–µ–ø–∏—Ç—å –ø—ã–ª—å—é —Ç–æ–≥–æ, –∫—Ç–æ –≤–µ—Ä—Ö–æ–º!\n\r");
+                return;
+            }
 
-	    interpret_raw( victim, "dismount" );
-	}
+            interpret_raw( victim, "dismount" );
+        }
 
-	ch->move -= move_dec( ch );
+        ch->move -= move_dec( ch );
 
-	/* modifiers */
+        /* modifiers */
 
-	/* dexterity */
-	chance += ch->getCurrStat(STAT_DEX);
-	chance -= 2 * victim->getCurrStat(STAT_DEX);
+        /* dexterity */
+        chance += ch->getCurrStat(STAT_DEX);
+        chance -= 2 * victim->getCurrStat(STAT_DEX);
 
-	/* speed  */
+        /* speed  */
         if (IS_QUICK(ch))
-		chance += 10;
+                chance += 10;
         if (IS_QUICK(victim))
-		chance -= 25;
+                chance -= 25;
 
-	/* level */
-	chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        /* level */
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
 
-	if (chance % 5 == 0)
-		chance += 1;
+        if (chance % 5 == 0)
+                chance += 1;
 
-	/* terrain */
+        /* terrain */
 
-	switch(ch->in_room->sector_type)
-	{
-	case(SECT_INSIDE):		chance -= 20;	break;
-	case(SECT_CITY):		chance -= 10;	break;
-	case(SECT_FIELD):		chance +=  5;	break;
-	case(SECT_FOREST):				break;
-	case(SECT_HILLS):				break;
-	case(SECT_MOUNTAIN):		chance -= 10;	break;
-	case(SECT_WATER_SWIM):		chance  =  0;	break;
-	case(SECT_WATER_NOSWIM):	chance  =  0;	break;
-	case(SECT_AIR):			chance  =  0;  	break;
-	case(SECT_DESERT):		chance += 10;   break;
-	}
+        switch(ch->in_room->sector_type)
+        {
+        case(SECT_INSIDE):                chance -= 20;        break;
+        case(SECT_CITY):                chance -= 10;        break;
+        case(SECT_FIELD):                chance +=  5;        break;
+        case(SECT_FOREST):                                break;
+        case(SECT_HILLS):                                break;
+        case(SECT_MOUNTAIN):                chance -= 10;        break;
+        case(SECT_WATER_SWIM):                chance  =  0;        break;
+        case(SECT_WATER_NOSWIM):        chance  =  0;        break;
+        case(SECT_AIR):                        chance  =  0;          break;
+        case(SECT_DESERT):                chance += 10;   break;
+        }
 
-	if (chance == 0)
-	{
-		ch->send_to("˙ƒ≈”ÿ Œ≈‘ –ŸÃ…..\n\r");
-		return;
-	}
+        if (chance == 0)
+        {
+                ch->send_to("–ó–¥–µ—Å—å –Ω–µ—Ç –ø—ã–ª–∏..\n\r");
+                return;
+        }
 
-	if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
-	    chance /= 2;
+        if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
+            chance /= 2;
 
-	/* now the attack */
-	if (number_percent() < chance)
-	{
-		Affect af;
-		act_p("$c1 œ”Ã≈–Ã≈$gŒœ|Œ|Œ¡ –ŸÃÿ¿, –œ–¡◊€≈  $m ◊ «Ã¡⁄¡!",
-			victim,0,0,TO_ROOM,POS_RESTING);
+        /* now the attack */
+        if (number_percent() < chance)
+        {
+                Affect af;
+                act_p("$c1 –æ—Å–ª–µ–ø–ª–µ$g–Ω–æ|–Ω|–Ω–∞ –ø—ã–ª—å—é, –ø–æ–ø–∞–≤—à–µ–π $m –≤ –≥–ª–∞–∑–∞!",
+                        victim,0,0,TO_ROOM,POS_RESTING);
 
-		ch->setWait( gsn_dirt_kicking->getBeats( ) );
+                ch->setWait( gsn_dirt_kicking->getBeats( ) );
 
-		try {
-		    damage_nocatch(ch,victim,number_range(2,5),gsn_dirt_kicking,DAM_NONE, true);
-		    victim->send_to("ÙŸ Œ…ﬁ≈«œ Œ≈ ◊…ƒ…€ÿ!\n\r");
-		    gsn_dirt_kicking->improve( ch, true, victim );
+                try {
+                    damage_nocatch(ch,victim,number_range(2,5),gsn_dirt_kicking,DAM_NONE, true);
+                    victim->send_to("–¢—ã –Ω–∏—á–µ–≥–æ –Ω–µ –≤–∏–¥–∏—à—å!\n\r");
+                    gsn_dirt_kicking->improve( ch, true, victim );
 
-		    af.where	= TO_AFFECTS;
-		    af.type 	= gsn_dirt_kicking;
-		    af.level 	= ch->getModifyLevel();
-		    af.duration	= 0;
-		    af.location	= APPLY_HITROLL;
-		    af.modifier	= -4;
-		    af.bitvector 	= AFF_BLIND;
+                    af.where        = TO_AFFECTS;
+                    af.type         = gsn_dirt_kicking;
+                    af.level         = ch->getModifyLevel();
+                    af.duration        = 0;
+                    af.location        = APPLY_HITROLL;
+                    af.modifier        = -4;
+                    af.bitvector         = AFF_BLIND;
 
-		    affect_to_char(victim,&af);
-		} catch (const VictimDeathException &) {
-		    return;
-		}
-	}
-	else
-	{
-		damage(ch,victim,0,gsn_dirt_kicking,DAM_NONE, true);
-		gsn_dirt_kicking->improve( ch, false, victim );
-		ch->setWait( gsn_dirt_kicking->getBeats( ) );
-	}
+                    affect_to_char(victim,&af);
+                } catch (const VictimDeathException &) {
+                    return;
+                }
+        }
+        else
+        {
+                damage(ch,victim,0,gsn_dirt_kicking,DAM_NONE, true);
+                gsn_dirt_kicking->improve( ch, false, victim );
+                ch->setWait( gsn_dirt_kicking->getBeats( ) );
+        }
 
     if (!FightingCheck)
-	yell_panic( ch, victim,
-		    "Î‘œ-‘œ ‘œÃÿÀœ ﬁ‘œ œ”Ã≈–…Ã Õ≈Œ— –ŸÃÿ¿, Àœ‘œ“¡— –œ–¡Ã¡ ◊ «Ã¡⁄¡!",
-		    "ıÕ“…, %1$C1, «“—⁄Œœ≈ ÷…◊œ‘Œœ≈!" );	
+        yell_panic( ch, victim,
+                    "–ö—Ç–æ-—Ç–æ —Ç–æ–ª—å–∫–æ —á—Ç–æ –æ—Å–ª–µ–ø–∏–ª –º–µ–Ω—è –ø—ã–ª—å—é, –∫–æ—Ç–æ—Ä–∞—è –ø–æ–ø–∞–ª–∞ –≤ –≥–ª–∞–∑–∞!",
+                    "–£–º—Ä–∏, %1$C1, –≥—Ä—è–∑–Ω–æ–µ –∂–∏–≤–æ—Ç–Ω–æ–µ!" );        
 }
 
 /*
@@ -1248,45 +1224,45 @@ SKILL_RUNP( warcry )
 
   if (!gsn_warcry->usable( ch ) )
     {
-      ch->send_to("˛‘œ?\n\r");
+      ch->send_to("–ß—Ç–æ?\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_bless) || ch->isAffected(gsn_warcry))
     {
-      ch->send_to("‚œ≈◊œ  ÀÃ…ﬁ Œ≈ Õœ÷≈‘ –œÕœﬁÿ ‘≈¬≈ ≈›≈ ¬œÃÿ€≈.\n\r");
+      ch->send_to("–ë–æ–µ–≤–æ–π –∫–ª–∏—á –Ω–µ –º–æ–∂–µ—Ç –ø–æ–º–æ—á—å —Ç–µ–±–µ –µ—â–µ –±–æ–ª—å—à–µ.\n\r");
       return;
     }
 
   if (ch->mana < gsn_warcry->getMana( ))
     {
-      ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”ÀœŒ√≈Œ‘“…“œ◊¡‘ÿ”—.\n\r");
+      ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–∫–æ–Ω—Ü–µ–Ω—Ç—Ä–∏—Ä–æ–≤–∞—Ç—å—Å—è.\n\r");
       return;
     }
 
   ch->setWait( gsn_warcry->getBeats( )  );
 
     if (number_percent() > gsn_warcry->getEffective( ch )) {
-	switch (number_range( 1, 2 )) {
-	case 1: 
-	    act("ÙŸ ‘…»œŒÿÀœ »“¿À¡≈€ÿ.", ch, 0, 0, TO_CHAR);
-	    act("$c1 ‘…»œŒÿÀœ »“¿À¡≈‘.", ch, 0, 0, TO_ROOM);
-	    break;
-	case 2:
-	    act("ÙŸ ”ƒ¡◊Ã≈ŒŒœ ”‘œŒ≈€ÿ.", ch, 0, 0, TO_CHAR);
-	    act("$c1 …⁄ƒ¡≈‘ ”ƒ¡◊Ã≈ŒŒŸ≈ ”‘œŒŸ.", ch, 0, 0, TO_ROOM);
-	    break;
-	}
-	
-	gsn_warcry->improve( ch, false );
-	return;
+        switch (number_range( 1, 2 )) {
+        case 1: 
+            act("–¢—ã —Ç–∏—Ö–æ–Ω—å–∫–æ —Ö—Ä—é–∫–∞–µ—à—å.", ch, 0, 0, TO_CHAR);
+            act("$c1 —Ç–∏—Ö–æ–Ω—å–∫–æ —Ö—Ä—é–∫–∞–µ—Ç.", ch, 0, 0, TO_ROOM);
+            break;
+        case 2:
+            act("–¢—ã —Å–¥–∞–≤–ª–µ–Ω–Ω–æ —Å—Ç–æ–Ω–µ—à—å.", ch, 0, 0, TO_CHAR);
+            act("$c1 –∏–∑–¥–∞–µ—Ç —Å–¥–∞–≤–ª–µ–Ω–Ω—ã–µ —Å—Ç–æ–Ω—ã.", ch, 0, 0, TO_ROOM);
+            break;
+        }
+        
+        gsn_warcry->improve( ch, false );
+        return;
     }
 
     ch->mana -= gsn_warcry->getMana( );
 
-    af.where	= TO_AFFECTS;
+    af.where        = TO_AFFECTS;
     af.type      = gsn_warcry;
-    af.level	 = ch->getModifyLevel();
+    af.level         = ch->getModifyLevel();
     af.duration  = 6 + ch->getModifyLevel( ) / 2;
     af.location  = APPLY_HITROLL;
     af.modifier  = ch->getModifyLevel() / 8;
@@ -1298,14 +1274,14 @@ SKILL_RUNP( warcry )
     affect_to_char( ch, &af );
 
     if (!ch->is_npc( )) 
-	attr = ch->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( "warcry" );
+        attr = ch->getPC( )->getAttributes( ).findAttr<XMLStringAttribute>( "warcry" );
 
     if (attr) {
-	interpret_raw( ch, "yell", attr->getValue( ).c_str( ) );
+        interpret_raw( ch, "yell", attr->getValue( ).c_str( ) );
     }
     else {
-	act("ÙŸ …⁄ƒ¡≈€ÿ ¬œ≈◊œ  ÀÃ…ﬁ … ﬁ’◊”‘◊’≈€ÿ, ﬁ‘œ ‘≈–≈“ÿ ‘≈¬≈ ◊”≈ –œ –Ã≈ﬁ’!", ch, 0, 0, TO_CHAR);
-	act("$c1 …⁄ƒ¡≈‘ ¬œ≈◊œ  ÀÃ…ﬁ!", ch, 0, 0, TO_ROOM);
+        act("–¢—ã –∏–∑–¥–∞–µ—à—å –±–æ–µ–≤–æ–π –∫–ª–∏—á –∏ —á—É–≤—Å—Ç–≤—É–µ—à—å, —á—Ç–æ —Ç–µ–ø–µ—Ä—å —Ç–µ–±–µ –≤—Å–µ –ø–æ –ø–ª–µ—á—É!", ch, 0, 0, TO_CHAR);
+        act("$c1 –∏–∑–¥–∞–µ—Ç –±–æ–µ–≤–æ–π –∫–ª–∏—á!", ch, 0, 0, TO_ROOM);
     }
 
     gsn_warcry->improve( ch, true );
@@ -1325,82 +1301,82 @@ SKILL_RUNP( smash )
 
     if ( MOUNTED(ch) ) 
     {
-        ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”¬…‘ÿ ” Œœ«, ≈”Ã… ‘Ÿ ◊≈“»œÕ!\n\r");
+        ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–±–∏—Ç—å —Å –Ω–æ–≥, –µ—Å–ª–∏ —Ç—ã –≤–µ—Ä—Ö–æ–º!\n\r");
         return;
     }
 
     if (ch->fighting != NULL)
-	FightingCheck = true;
+        FightingCheck = true;
     else
-	FightingCheck = false;
+        FightingCheck = false;
 
     argument = one_argument(argument,arg);
 
-    if ((chance = gsn_smash->getEffective( ch )) <= 1) {	
-	ch->send_to("Û¬…‘ÿ ” Œœ«? Óœ À¡À ‹‘œ ”ƒ≈Ã¡‘ÿ?\n\r");
-	return;
+    if ((chance = gsn_smash->getEffective( ch )) <= 1) {        
+        ch->send_to("–°–±–∏—Ç—å —Å –Ω–æ–≥? –ù–æ –∫–∞–∫ —ç—Ç–æ —Å–¥–µ–ª–∞—Ç—å?\n\r");
+        return;
     }
 
     if (arg[0] == '\0') {
-	victim = ch->fighting;
-	if (victim == NULL) {
-	    ch->send_to("Û≈ ﬁ¡” ‘Ÿ Œ≈ ”“¡÷¡≈€ÿ”—!\n\r");
-	    return;
-	}
+        victim = ch->fighting;
+        if (victim == NULL) {
+            ch->send_to("–°–µ–π—á–∞—Å —Ç—ã –Ω–µ —Å—Ä–∞–∂–∞–µ—à—å—Å—è!\n\r");
+            return;
+        }
     }
     else if ((victim = get_char_room(ch,arg)) == NULL) {
-	ch->send_to("¸‘œ«œ Œ≈‘ ⁄ƒ≈”ÿ.\n\r");
-	return;
+        ch->send_to("–≠—Ç–æ–≥–æ –Ω–µ—Ç –∑–¥–µ—Å—å.\n\r");
+        return;
     }
 
     if (victim->position < POS_FIGHTING) {
-	act_p("œƒœ÷ƒ… –œÀ¡ $E ◊”‘¡Œ≈‘.", ch,NULL,victim,TO_CHAR,POS_RESTING);
-	return;
+        act_p("–ü–æ–¥–æ–∂–¥–∏ –ø–æ–∫–∞ $E –≤—Å—Ç–∞–Ω–µ—Ç.", ch,NULL,victim,TO_CHAR,POS_RESTING);
+        return;
     } 
 
     if (victim == ch) {
-	ch->send_to("Û¬…‘ÿ ” Œœ« ”≈¬—??? Ó≈ –œÃ’ﬁ…‘”—...\n\r");
-	return;
+        ch->send_to("–°–±–∏—Ç—å —Å –Ω–æ–≥ —Å–µ–±—è??? –ù–µ –ø–æ–ª—É—á–∏—Ç—Å—è...\n\r");
+        return;
     }
 
     if (is_safe(ch,victim))
-	return;
+        return;
 
     if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim) {
-	act_p("Óœ $C1 ‘◊œ  ƒ“’«!!!",ch,NULL,victim,TO_CHAR,POS_RESTING);
-	return;
+        act_p("–ù–æ $C1 —Ç–≤–æ–π –¥—Ä—É–≥!!!",ch,NULL,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if( !ch->is_npc() && !ch->move ) {
-	  act("ÙŸ ”Ã…€ÀœÕ ’”‘¡$gÃœ|Ã|Ã¡ ƒÃ— ‹‘œ«œ.", ch, 0, 0, TO_CHAR);
-	  return;
+          act("–¢—ã —Å–ª–∏—à–∫–æ–º —É—Å—Ç–∞$g–ª–æ|–ª|–ª–∞ –¥–ª—è —ç—Ç–æ–≥–æ.", ch, 0, 0, TO_CHAR);
+          return;
     } 
 
     if(SHADOW(ch)) {
-      ch->send_to("ÙŸ ¬≈⁄’”–≈€Œœ –Ÿ‘¡≈€ÿ”— ¬œ“œ‘ÿ”— ”œ ”◊œ≈  ‘≈Œÿ¿.\n\r");
-      act_p("$c1 œ¬Œ…Õ¡≈‘”— ”œ ”◊œ≈  ‘≈Œÿ¿.", ch, NULL, NULL, TO_ROOM,POS_RESTING);
+      ch->send_to("–¢—ã –±–µ–∑—É—Å–ø–µ—à–Ω–æ –ø—ã—Ç–∞–µ—à—å—Å—è –±–æ—Ä–æ—Ç—å—Å—è —Å–æ —Å–≤–æ–µ–π —Ç–µ–Ω—å—é.\n\r");
+      act_p("$c1 –æ–±–Ω–∏–º–∞–µ—Ç—Å—è —Å–æ —Å–≤–æ–µ–π —Ç–µ–Ω—å—é.", ch, NULL, NULL, TO_ROOM,POS_RESTING);
       return;
     }
    
     if ( MOUNTED(victim) ) {
-	if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
-	    ch->send_to("ÙŸ Œ≈ Õœ÷≈€ÿ ”¬…‘ÿ ” Œœ« ‘œ«œ, À‘œ ◊≈“»œÕ!\n\r");
-	    return;
-	}
+        if (victim->mount->is_npc( ) && gsn_riding->available( victim )) {
+            ch->send_to("–¢—ã –Ω–µ –º–æ–∂–µ—à—å —Å–±–∏—Ç—å —Å –Ω–æ–≥ —Ç–æ–≥–æ, –∫—Ç–æ –≤–µ—Ä—Ö–æ–º!\n\r");
+            return;
+        }
 
-	interpret_raw( victim, "dismount" );
+        interpret_raw( victim, "dismount" );
     }
 
     ch->move -= move_dec( ch );
 
     if (victim->isAffected(gsn_protective_shield)) {
-	act_p("{YÙŸ –Ÿ‘¡≈€ÿ”— ”¬…‘ÿ ” Œœ« $C4, Œœ ﬁ‘œ-‘œ ‘≈¬≈ Õ≈€¡≈‘ ”ƒ≈Ã¡‘ÿ ‹‘œ.{x",
-		ch, NULL, victim,TO_CHAR,POS_FIGHTING);
-	act_p("{Y$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ‘≈¬— ” Œœ«, Œœ ‘◊œ— ⁄¡›…‘¡ Õ≈€¡≈‘ ”ƒ≈Ã¡‘ÿ ‹‘œ.{x",
-		ch, NULL,victim,TO_VICT,POS_FIGHTING);
-	act_p("{Y$c1 –Ÿ‘¡≈‘”— ”¬…‘ÿ ” Œœ« $C4, Œœ ﬁ‘œ-‘œ Õ≈€¡≈‘ ”ƒ≈Ã¡‘ÿ ‹‘œ.{x",
-		ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
-	return;
+        act_p("{Y–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è —Å–±–∏—Ç—å —Å –Ω–æ–≥ $C4, –Ω–æ —á—Ç–æ-—Ç–æ —Ç–µ–±–µ –º–µ—à–∞–µ—Ç —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ.{x",
+                ch, NULL, victim,TO_CHAR,POS_FIGHTING);
+        act_p("{Y$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Ç–µ–±—è —Å –Ω–æ–≥, –Ω–æ —Ç–≤–æ—è –∑–∞—â–∏—Ç–∞ –º–µ—à–∞–µ—Ç —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ.{x",
+                ch, NULL,victim,TO_VICT,POS_FIGHTING);
+        act_p("{Y$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —Å–±–∏—Ç—å —Å –Ω–æ–≥ $C4, –Ω–æ —á—Ç–æ-—Ç–æ –º–µ—à–∞–µ—Ç —Å–¥–µ–ª–∞—Ç—å —ç—Ç–æ.{x",
+                ch,NULL,victim,TO_NOTVICT,POS_FIGHTING);
+        return;
      }
    
     /* modifiers */
@@ -1411,94 +1387,94 @@ SKILL_RUNP( smash )
     chance -= min(victim->canCarryWeight( ), victim->carry_weight) / 20;
 
     if (ch->size < victim->size)
-	chance += (ch->size - victim->size) * 25;
+        chance += (ch->size - victim->size) * 25;
     else
-	chance += (ch->size - victim->size) * 10; 
+        chance += (ch->size - victim->size) * 10; 
 
     /* stats */
     chance += ch->getCurrStat(STAT_STR);
     chance -= victim->getCurrStat(STAT_DEX) * 4/3;
 
     if (is_flying( ch ))
-	chance -= 10;
+        chance -= 10;
 
     /* speed */
     if (IS_QUICK(ch))
-	chance += 10;
+        chance += 10;
     if (IS_QUICK(victim))
-	chance -= 20;
+        chance -= 20;
 
     /* level */
     chance += ch->getModifyLevel() - victim->getModifyLevel();
 
     if (!ch->is_npc() && !victim->is_npc())
-	LogStream::sendNotice() 
-	    << "smash: " 
-	    << ch->getName() << " " << ch->size << ":" << min(ch->canCarryWeight( ), ch->carry_weight) << ":" << ch->getCurrStat(STAT_STR) << ":" << ch->getModifyLevel() << ", "
-	    << victim->getName() << " " << victim->size << ":" << min(victim->canCarryWeight( ), victim->carry_weight) << ":" << victim->getCurrStat(STAT_DEX) << ":" << victim->getModifyLevel() << ", "
-	    << " chance " << chance << endl;
+        LogStream::sendNotice() 
+            << "smash: " 
+            << ch->getName() << " " << ch->size << ":" << min(ch->canCarryWeight( ), ch->carry_weight) << ":" << ch->getCurrStat(STAT_STR) << ":" << ch->getModifyLevel() << ", "
+            << victim->getName() << " " << victim->size << ":" << min(victim->canCarryWeight( ), victim->carry_weight) << ":" << victim->getCurrStat(STAT_DEX) << ":" << victim->getModifyLevel() << ", "
+            << " chance " << chance << endl;
 
     /* now the attack */
 
     if (number_percent() < chance) {
-	act_p("Û…ÃÿŒ≈ €…Õ ’ƒ¡“œÕ $c1 ”¬…◊¡≈‘ ‘≈¬— ” Œœ« … ‘Ÿ –¡ƒ¡≈€ÿ Œ¡ ⁄≈ÕÃ¿!",
-	       ch,NULL,victim,TO_VICT,POS_RESTING);
-	act_p("ÙŸ ”¬…◊¡≈€ÿ $C4 ” Œœ«, –œ”ŸÃ¡— $S Œ¡ ⁄≈ÕÃ¿!",
+        act_p("–°–∏–ª—å–Ω–µ–π—à–∏–º —É–¥–∞—Ä–æ–º $c1 —Å–±–∏–≤–∞–µ—Ç —Ç–µ–±—è —Å –Ω–æ–≥ –∏ —Ç—ã –ø–∞–¥–∞–µ—à—å –Ω–∞ –∑–µ–º–ª—é!",
+               ch,NULL,victim,TO_VICT,POS_RESTING);
+        act_p("–¢—ã —Å–±–∏–≤–∞–µ—à—å $C4 —Å –Ω–æ–≥, –ø–æ—Å—ã–ª–∞—è $S –Ω–∞ –∑–µ–º–ª—é!",
                ch,NULL,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 ”…ÃÿŒ≈ €…Õ ’ƒ¡“œÕ ”¬…◊¡≈‘ $C4 ” Œœ«.",
-	       ch,NULL,victim,TO_NOTVICT,POS_RESTING);
-	gsn_smash->improve( ch, true, victim );
+        act_p("$c1 —Å–∏–ª—å–Ω–µ–π—à–∏–º —É–¥–∞—Ä–æ–º —Å–±–∏–≤–∞–µ—Ç $C4 —Å –Ω–æ–≥.",
+               ch,NULL,victim,TO_NOTVICT,POS_RESTING);
+        gsn_smash->improve( ch, true, victim );
 
-	wait = 3;
+        wait = 3;
 
-	switch(number_bits(2)) {
-	case 0: wait = 1; break;
-	case 1: wait = 2; break;
-	case 2: wait = 4; break;
-	case 3: wait = 3; break;
-	}
-	
-	victim->setWaitViolence( wait );
-	ch->setWait( gsn_smash->getBeats( ) );
-	dam= (ch->damroll / 2) + number_range(4, 4 + 5 * ch->size + chance/10);
-	gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+        switch(number_bits(2)) {
+        case 0: wait = 1; break;
+        case 1: wait = 2; break;
+        case 2: wait = 4; break;
+        case 3: wait = 3; break;
+        }
+        
+        victim->setWaitViolence( wait );
+        ch->setWait( gsn_smash->getBeats( ) );
+        dam= (ch->damroll / 2) + number_range(4, 4 + 5 * ch->size + chance/10);
+        gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
 
-	try {
-	    damage_nocatch(ch,victim,dam,gsn_smash, DAM_BASH, true, DAMF_WEAPON);
-	    
-	    if (number_percent() < gsn_smash->getEffective( ch ) - 40)
-	    {
-		 if ( number_percent() > 30 ) 
-		    victim->position=POS_SITTING;
-		 else
-		    victim->position=POS_RESTING;
-	    }        
-	} catch (const VictimDeathException &) {
-	    return;
-	}
+        try {
+            damage_nocatch(ch,victim,dam,gsn_smash, DAM_BASH, true, DAMF_WEAPON);
+            
+            if (number_percent() < gsn_smash->getEffective( ch ) - 40)
+            {
+                 if ( number_percent() > 30 ) 
+                    victim->position=POS_SITTING;
+                 else
+                    victim->position=POS_RESTING;
+            }        
+        } catch (const VictimDeathException &) {
+            return;
+        }
     }
     else
     {
-	damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
-	act_p("ÙŸ –“œÕ¡»…◊¡≈€ÿ”— … –¡ƒ¡≈€ÿ Ã…√œÕ Œ¡ –œÃ!",
+        damage(ch,victim,0,gsn_smash,DAM_BASH, true, DAMF_WEAPON);
+        act_p("–¢—ã –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—à—å—Å—è –∏ –ø–∞–¥–∞–µ—à—å –ª–∏—Ü–æ–º –Ω–∞ –ø–æ–ª!",
                ch,NULL,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 –“œÕ¡»…◊¡≈‘”— … –¡ƒ¡≈‘ Ã…√œÕ Œ¡ –œÃ.", 
+        act_p("$c1 –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—Ç—Å—è –∏ –ø–∞–¥–∞–µ—Ç –ª–∏—Ü–æ–º –Ω–∞ –ø–æ–ª.", 
                ch,NULL,victim,TO_NOTVICT,POS_RESTING);
-	act_p("$c1 –Ÿ‘¡≈‘”— ’ƒ¡“…‘ÿ ‘≈¬—, Œœ –“œÕ¡»…◊¡≈‘”— … –¡ƒ¡≈‘ Œ¡ –œÃ.",
+        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è —É–¥–∞—Ä–∏—Ç—å —Ç–µ–±—è, –Ω–æ –ø—Ä–æ–º–∞—Ö–∏–≤–∞–µ—Ç—Å—è –∏ –ø–∞–¥–∞–µ—Ç –Ω–∞ –ø–æ–ª.",
                ch,NULL,victim,TO_VICT,POS_RESTING);
-	gsn_smash->improve( ch, false, victim );
+        gsn_smash->improve( ch, false, victim );
 
         if ( number_percent() > 5 )         
             ch->position=POS_SITTING;       
         else                                 
             ch->position=POS_RESTING;        
-	ch->setWait( gsn_smash->getBeats( ) * 3/2 ); 
+        ch->setWait( gsn_smash->getBeats( ) * 3/2 ); 
     }
 
     if (!FightingCheck)
-	yell_panic( ch, victim,
-	            "œÕœ«…‘≈! Î‘œ-‘œ ”¬…Ã Õ≈Œ— ” Œœ«!",
-		    "œÕœ«…‘≈! %1$^C1 ”¬…◊¡≈‘ Õ≈Œ— ” Œœ«!" );
+        yell_panic( ch, victim,
+                    "–ü–æ–º–æ–≥–∏—Ç–µ! –ö—Ç–æ-—Ç–æ —Å–±–∏–ª –º–µ–Ω—è —Å –Ω–æ–≥!",
+                    "–ü–æ–º–æ–≥–∏—Ç–µ! %1$^C1 —Å–±–∏–≤–∞–µ—Ç –º–µ–Ω—è —Å –Ω–æ–≥!" );
 }
 
 /*
@@ -1511,29 +1487,29 @@ BOOL_SKILL( areaattack )::run( Character *ch, Character *victim )
     Character *vch, *vch_next;
     
     if (number_percent() >= gsn_area_attack->getEffective( ch ))
-	return false;
+        return false;
     
     gsn_area_attack->improve( ch, true, victim );
 
     if ( ch->getModifyLevel() < 70)
-	max_count = 1;
+        max_count = 1;
     else if ( ch->getModifyLevel() < 80)
-	max_count = 2;
+        max_count = 2;
     else if ( ch->getModifyLevel() < 90)
-	max_count = 3;
+        max_count = 3;
     else
-	max_count = 4;
+        max_count = 4;
 
     for ( vch = ch->in_room->people; vch != 0; vch = vch_next )
     {
-	vch_next = vch->next_in_room;
-	if (vch != victim && vch->fighting == ch)
-	{
-	    one_hit_nocatch( ch, vch );
-	    count++;
-	}
-	if ( count == max_count )
-	    break;
+        vch_next = vch->next_in_room;
+        if (vch != victim && vch->fighting == ch)
+        {
+            one_hit_nocatch( ch, vch );
+            count++;
+        }
+        if ( count == max_count )
+            break;
     }
 
     return true;
@@ -1548,24 +1524,24 @@ VOID_SKILL( enhanceddamage )::run( Character *ch, Character *victim, int &dam )
     int diceroll;
 
     if (gsn_enhanced_damage->getEffective( ch ) < 1)
-	return;
+        return;
 
     diceroll = number_percent();
     
     if ( diceroll <= gsn_enhanced_damage->getEffective( ch ) )
     {
-	int div;
-	
-	gsn_enhanced_damage->improve( ch, true, victim );
-	
-	if (ch->getTrueProfession( ) == prof_warrior || ch->getTrueProfession( ) == prof_samurai)
-	    div = 100;
-	else if (ch->getTrueProfession( ) == prof_cleric)
-	    div = 130;
-	else
-	    div = 114;
+        int div;
+        
+        gsn_enhanced_damage->improve( ch, true, victim );
+        
+        if (ch->getTrueProfession( ) == prof_warrior || ch->getTrueProfession( ) == prof_samurai)
+            div = 100;
+        else if (ch->getTrueProfession( ) == prof_cleric)
+            div = 130;
+        else
+            div = 114;
 
-	dam += dam * diceroll/div;
+        dam += dam * diceroll/div;
     }
 }
 

@@ -15,14 +15,14 @@ struct Entity {
 
 struct Case : public Entity {
     enum {
-	NONE,
-	NOMINATIVE = NONE,
-	GENITIVE,
-	DATIVE,
-	ACCUSATIVE,
-	INSTRUMENTAL,
-	PREPOSITIONAL,
-	MAX,
+        NONE,
+        NOMINATIVE = NONE,
+        GENITIVE,
+        DATIVE,
+        ACCUSATIVE,
+        INSTRUMENTAL,
+        PREPOSITIONAL,
+        MAX,
     };
 
     inline Case(int v = NONE);
@@ -31,10 +31,10 @@ struct Case : public Entity {
 
 struct Animacy : public Entity {
     enum {
-	NONE,
-	PERSON = NONE,
-	ITEM,
-	MAX
+        NONE,
+        PERSON = NONE,
+        ITEM,
+        MAX
     };
 
     inline Animacy(int v = NONE);
@@ -42,11 +42,11 @@ struct Animacy : public Entity {
 
 struct Gender : public Entity {
     enum {
-	NONE,
-	NEUTER = NONE,
-	MASCULINE,
-	FEMININE,
-	MAX,
+        NONE,
+        NEUTER = NONE,
+        MASCULINE,
+        FEMININE,
+        MAX,
     };
     
     inline Gender(int v = MASCULINE);
@@ -54,10 +54,10 @@ struct Gender : public Entity {
 
 struct Number : public Entity {
     enum {
-	NONE,
-	SINGULAR = NONE,
-	PLURAL,
-	MAX,
+        NONE,
+        SINGULAR = NONE,
+        PLURAL,
+        MAX,
     };
     
     inline Number(int v = NONE);
@@ -68,12 +68,12 @@ struct Number : public Entity {
 
 struct MultiGender : public Entity {
     enum {
-	NONE,
-	NEUTER = NONE,
-	MASCULINE,
-	FEMININE,
-	PLURAL,
-	MAX
+        NONE,
+        NEUTER = NONE,
+        MASCULINE,
+        FEMININE,
+        PLURAL,
+        MAX
     };
      
     inline MultiGender(int v = MASCULINE);
@@ -89,19 +89,19 @@ struct MultiGender : public Entity {
 
 struct Person : public Entity {
     enum {
-	FIRST,
-	FIRST_SINGULAR = FIRST,
-	SECOND,
-	SECOND_SINGULAR = SECOND,
-	THIRD,
-	THIRD_SINGULAR = THIRD,
-	THIRD_MASCULINE = THIRD,
-	THIRD_FEMININE,
-	THIRD_NEUTER,
-	FIRST_PLURAL,
-	SECOND_PLURAL,
-	THIRD_PLURAL,
-	MAX,
+        FIRST,
+        FIRST_SINGULAR = FIRST,
+        SECOND,
+        SECOND_SINGULAR = SECOND,
+        THIRD,
+        THIRD_SINGULAR = THIRD,
+        THIRD_MASCULINE = THIRD,
+        THIRD_FEMININE,
+        THIRD_NEUTER,
+        FIRST_PLURAL,
+        SECOND_PLURAL,
+        THIRD_PLURAL,
+        MAX,
     };
     
     inline Person(int v);

@@ -22,17 +22,17 @@ inline Flags::Flags( bitstring_t v, const FlagTable *t )
 inline DLString Flags::names( ) const
 {
     if (table)
-	return table->names( getValue( ) );
+        return table->names( getValue( ) );
     else
-	return DLString::emptyString;
+        return DLString::emptyString;
 }
 
 inline DLString Flags::messages( bool comma, char gcase ) const
 {
     if (table)
-	return table->messages( getValue( ), comma, gcase );
+        return table->messages( getValue( ), comma, gcase );
     else
-	return DLString::emptyString;
+        return DLString::emptyString;
 }
 
 /*----------------------------------------------------------------------

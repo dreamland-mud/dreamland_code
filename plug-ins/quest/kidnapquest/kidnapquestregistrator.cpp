@@ -17,3 +17,8 @@ KidnapQuestRegistrator::~KidnapQuestRegistrator( )
     thisClass = NULL;
 }
 
+bool KidnapQuestRegistrator::applicable( PCharacter *pch, bool fAuto ) const
+{
+	return QuestRegistratorBase::applicable(pch, fAuto);
+}
+

@@ -22,44 +22,44 @@ class NPCharacter;
 class CardPackBehavior : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<CardPackBehavior> Pointer;
+        typedef ::Pointer<CardPackBehavior> Pointer;
     
-	CardPackBehavior( );
+        CardPackBehavior( );
 
-	virtual bool use( Character *, const char * );
-	virtual bool examine( Character * );
+        virtual bool use( Character *, const char * );
+        virtual bool examine( Character * );
         virtual bool hasTrigger( const DLString &  );
-	
+        
 private:
-	XML_VARIABLE XMLInteger throws;	
+        XML_VARIABLE XMLInteger throws;        
 };
 
 class CardBehavior : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<CardBehavior> Pointer;
+        typedef ::Pointer<CardBehavior> Pointer;
     
-	CardBehavior( );
+        CardBehavior( );
 
-	virtual bool use( Character *, const char *);
-	virtual bool examine( Character * );
-	virtual bool command( Character *, const DLString &, const DLString & );
-	virtual DLString extraDescription( Character *ch, const DLString & );
+        virtual bool use( Character *, const char *);
+        virtual bool examine( Character * );
+        virtual bool command( Character *, const DLString &, const DLString & );
+        virtual DLString extraDescription( Character *ch, const DLString & );
         virtual bool hasTrigger( const DLString &  );
-	
-	inline const DLString & getPlayerName( ) const;
-	inline void setPlayerName( const DLString & );
-	inline int  getQuality( ) const;
-	inline void setQuality( int );
+        
+        inline const DLString & getPlayerName( ) const;
+        inline void setPlayerName( const DLString & );
+        inline int  getQuality( ) const;
+        inline void setQuality( int );
 
 private:
-	CardBehavior::Pointer findMyCard( PCharacter *, PCharacter * );
-	DLString spoilDescription( PCharacter *, const char *, int );
-	NPCharacter * findHorribleVictim( PCharacter * );
-	Room * findHorribleRoom( PCharacter * );
-	
-	XML_VARIABLE XMLString playerName;
-	XML_VARIABLE XMLInteger quality;
+        CardBehavior::Pointer findMyCard( PCharacter *, PCharacter * );
+        DLString spoilDescription( PCharacter *, const char *, int );
+        NPCharacter * findHorribleVictim( PCharacter * );
+        Room * findHorribleRoom( PCharacter * );
+        
+        XML_VARIABLE XMLString playerName;
+        XML_VARIABLE XMLInteger quality;
 };
 
 inline const DLString & CardBehavior::getPlayerName( ) const
@@ -82,12 +82,12 @@ inline void CardBehavior::setQuality( int q )
 class CardSleevesBehavior : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<CardSleevesBehavior> Pointer;
+        typedef ::Pointer<CardSleevesBehavior> Pointer;
     
-	CardSleevesBehavior( );
+        CardSleevesBehavior( );
 
-	virtual void fight( Character * );
-	virtual bool canEquip( Character * );
+        virtual void fight( Character * );
+        virtual bool canEquip( Character * );
 };
 
 #endif

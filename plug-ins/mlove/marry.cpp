@@ -22,43 +22,43 @@ COMMAND(Marry, "marry")
     DLString brideName1, brideName2;
     
     if (!ch->is_immortal( )) {
-	ch->send_to( "üÔÏ ÎÅ ÄÌÑ ÔÅÂÑ.\r\n" );
-	return;
+        ch->send_to( "Ð­Ñ‚Ð¾ Ð½Ðµ Ð´Ð»Ñ Ñ‚ÐµÐ±Ñ.\r\n" );
+        return;
     }
 
     if (arguments.empty( )) {
-	ch->send_to( "é ËÏÇÏ ÖÅÎÉÔØ ÂÕÄÅÍ?\r\n" );
-	return;
+        ch->send_to( "Ð˜ ÐºÐ¾Ð³Ð¾ Ð¶ÐµÐ½Ð¸Ñ‚ÑŒ Ð±ÑƒÐ´ÐµÐ¼?\r\n" );
+        return;
     }
     
     brideName1 = arguments.getOneArgument( );
     brideName1.upperFirstCharacter( );
     
     if (arguments.empty( )) {
-	ch->send_to( "äÌÑ ÜÔÏ ÃÅÒÅÍÏÎÉÉ ÎÅ È×ÁÔÁÅÔ ÏÄÎÏÇÏ ËÏÍÐÏÎÅÎÔÁ.\r\n" );
-	return;
+        ch->send_to( "Ð”Ð»Ñ ÑÑ‚Ð¾ Ñ†ÐµÑ€ÐµÐ¼Ð¾Ð½Ð¸Ð¸ Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð¾Ð´Ð½Ð¾Ð³Ð¾ ÐºÐ¾Ð¼Ð¿Ð¾Ð½ÐµÐ½Ñ‚Ð°.\r\n" );
+        return;
     }
 
     brideName2 = arguments.getOneArgument( );
     brideName2.upperFirstCharacter( );
 
     if (brideName2 == brideName1) {
-	ch->send_to( "üÔÏ ÅÝÅ ËÁË?\r\n" );
-	return;
+        ch->send_to( "Ð­Ñ‚Ð¾ ÐµÑ‰Ðµ ÐºÐ°Ðº?\r\n" );
+        return;
     }
 
     if (ch->getName( ) == brideName1 || ch->getName( ) == brideName2) {
-	ch->send_to( "ðÏÐÒÏÓÉ ËÏÇÏ-ÔÏ ÐÏÍÏÞØ ÔÅÂÅ.\r\n" );
-	return;
+        ch->send_to( "ÐŸÐ¾Ð¿Ñ€Ð¾ÑÐ¸ ÐºÐ¾Ð³Ð¾-Ñ‚Ð¾ Ð¿Ð¾Ð¼Ð¾Ñ‡ÑŒ Ñ‚ÐµÐ±Ðµ.\r\n" );
+        return;
     }
     
     try {
-	bride1 = checkBride( ch, brideName1 );
-	bride2 = checkBride( ch, brideName2 );
-	
+        bride1 = checkBride( ch, brideName1 );
+        bride2 = checkBride( ch, brideName2 );
+        
     } catch (MarriageException e) {
-	ch->send_to( e.what( ) );
-	return;
+        ch->send_to( e.what( ) );
+        return;
     }
 
     bride1->getAttributes( ).getAttr<XMLAttributeMarriage>( "marriage" )->spouse.setValue( brideName2 );
@@ -66,28 +66,28 @@ COMMAND(Marry, "marry")
     bride2->getAttributes( ).getAttr<XMLAttributeMarriage>( "marriage" )->spouse.setValue( brideName1 );
     bride2->getAttributes( ).getAttr<XMLAttributeMarriage>( "marriage" )->wife.setValue( true );
 
-    buf << "ôÙ ÏÂßÑ×ÌÑÅÛØ " << brideName1 << " É " << brideName2 << " ÍÕÖÅÍ É ÖÅÎÏÊ!" << endl;
+    buf << "Ð¢Ñ‹ Ð¾Ð±ÑŠÑÐ²Ð»ÑÐµÑˆÑŒ " << brideName1 << " Ð¸ " << brideName2 << " Ð¼ÑƒÐ¶ÐµÐ¼ Ð¸ Ð¶ÐµÐ½Ð¾Ð¹!" << endl;
     ch->send_to( buf );
 
     buf.str( "" );
-    buf << ch->getName( ) << " ÏÂßÑ×ÌÑÅÔ ×ÁÓ ÍÕÖÅÍ É ÖÅÎÏÊ!" << endl;
+    buf << ch->getName( ) << " Ð¾Ð±ÑŠÑÐ²Ð»ÑÐµÑ‚ Ð²Ð°Ñ Ð¼ÑƒÐ¶ÐµÐ¼ Ð¸ Ð¶ÐµÐ½Ð¾Ð¹!" << endl;
     bride1->send_to( buf );
     bride2->send_to( buf );
 
     buf.str( "" );
-    buf << ch->getName( ) << " ÏÂßÑ×ÌÑÅÔ " << brideName1 << " É " << brideName2 << " ÍÕÖÅÍ É ÖÅÎÏÊ!" << endl;
+    buf << ch->getName( ) << " Ð¾Ð±ÑŠÑÐ²Ð»ÑÐµÑ‚ " << brideName1 << " Ð¸ " << brideName2 << " Ð¼ÑƒÐ¶ÐµÐ¼ Ð¸ Ð¶ÐµÐ½Ð¾Ð¹!" << endl;
     
     for (Character *wch = ch->in_room->people; wch; wch = wch->next_in_room) {
-	if (!wch->is_npc( ) && wch != ch && wch != bride1 && wch != bride2)
-	    wch->send_to( buf );
+        if (!wch->is_npc( ) && wch != ch && wch != bride1 && wch != bride2)
+            wch->send_to( buf );
     }
 
     bride1->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->lovers.put( brideName2 );
     bride2->getAttributes( ).getAttr<XMLAttributeLovers>( "lovers" )->lovers.put( brideName1 );
 
     buf.str( "" );
-    buf << "{C÷ÅÓÅÌÙÊ ÇÏÌÏÓ ÉÚ $o2: {Y" 
-	<< brideName1 << "{W É {Y" << brideName2 << "{W ÔÅÐÅÒØ ÍÕÖ É ÖÅÎÁ!!!{x";
+    buf << "{CÐ’ÐµÑÐµÐ»Ñ‹Ð¹ Ð³Ð¾Ð»Ð¾Ñ Ð¸Ð· $o2: {Y" 
+        << brideName1 << "{W Ð¸ {Y" << brideName2 << "{W Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð¼ÑƒÐ¶ Ð¸ Ð¶ÐµÐ½Ð°!!!{x";
     infonet( buf.str( ).c_str( ), 0, 0 );
 }
 
@@ -100,27 +100,27 @@ PCharacter * Marry::checkBride( Character *ch, DLString name ) {
     pcm = PCharacterManager::find( name ); 
     
     if (!pcm) {
-	buf << "éÇÒÏË " << name << " ÎÅ ÎÁÊÄÅÎ." << endl;
-	throw MarriageException( buf.str( ) );
+        buf << "Ð˜Ð³Ñ€Ð¾Ðº " << name << " Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½." << endl;
+        throw MarriageException( buf.str( ) );
     }
 
     pch = dynamic_cast<PCharacter *>( pcm );
 
     if (!pch) {
-	buf << name << " ÎÅ ÐÒÉÓÕÔÓÔ×ÕÅÔ × ÍÉÒÅ." << endl;
-	throw MarriageException( buf.str( ) );
+        buf << name << " Ð½Ðµ Ð¿Ñ€Ð¸ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² Ð¼Ð¸Ñ€Ðµ." << endl;
+        throw MarriageException( buf.str( ) );
     }
 
     attr = pch->getAttributes( ).findAttr<XMLAttributeMarriage>( "marriage" );
 
     if (attr && !attr->spouse.getValue( ).empty( )) {
-	buf << "îÏ " << name << " ÕÖÅ Ó×ÑÚÁÎ(Á) ÂÒÁÞÎÙÍÉ ÐÕÔÁÍÉ!" << endl;
-	throw MarriageException( buf.str( ) );
+        buf << "ÐÐ¾ " << name << " ÑƒÐ¶Ðµ ÑÐ²ÑÐ·Ð°Ð½(Ð°) Ð±Ñ€Ð°Ñ‡Ð½Ñ‹Ð¼Ð¸ Ð¿ÑƒÑ‚Ð°Ð¼Ð¸!" << endl;
+        throw MarriageException( buf.str( ) );
     }
     
     if (ch->in_room != pch->in_room) {
-	buf << "öÅÒÔ×Á " << name << " ÎÁÈÏÄÉÔÓÑ ÓÌÉÛËÏÍ ÄÁÌÅËÏ ÏÔ ÔÅÂÑ." << endl;
-	throw MarriageException( buf.str( ) );
+        buf << "Ð–ÐµÑ€Ñ‚Ð²Ð° " << name << " Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð´Ð°Ð»ÐµÐºÐ¾ Ð¾Ñ‚ Ñ‚ÐµÐ±Ñ." << endl;
+        throw MarriageException( buf.str( ) );
     }
     
     return pch;

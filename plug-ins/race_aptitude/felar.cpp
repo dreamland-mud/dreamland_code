@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * Все права на этот код 'Dream Land' пренадлежат Igor {Leo} и Olga {Varda}*
- * Некоторую помощь в написании этого кода, а также своими идеями помогали:*
+ * п▓я│п╣ п©я─п╟п╡п╟ п╫п╟ я█я┌п╬я┌ п╨п╬п╢ 'Dream Land' п©я─п╣п╫п╟п╢п╩п╣п╤п╟я┌ Igor {Leo} п╦ Olga {Varda}*
+ * п²п╣п╨п╬я┌п╬я─я┐я▌ п©п╬п╪п╬я┴я▄ п╡ п╫п╟п©п╦я│п╟п╫п╦п╦ я█я┌п╬пЁп╬ п╨п╬п╢п╟, п╟ я┌п╟п╨п╤п╣ я│п╡п╬п╦п╪п╦ п╦п╢п╣я▐п╪п╦ п©п╬п╪п╬пЁп╟п╩п╦:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    и все остальные, кто советовал и играл в этот MUD                    *
+ *    п╦ п╡я│п╣ п╬я│я┌п╟п╩я▄п╫я▀п╣, п╨я┌п╬ я│п╬п╡п╣я┌п╬п╡п╟п╩ п╦ п╦пЁя─п╟п╩ п╡ я█я┌п╬я┌ MUD                    *
  ***************************************************************************/
 #include "skill.h"
 #include "skillcommandtemplate.h"
@@ -44,55 +44,55 @@ SKILL_RUNP( tail )
     one_argument( argument, arg );
     
     if (MOUNTED( ch )) {
-	ch->send_to("Только не верхом!\n\r");
-	return;
+        ch->send_to("п╒п╬п╩я▄п╨п╬ п╫п╣ п╡п╣я─я┘п╬п╪!\n\r");
+        return;
     }
 
     fightingCheck = ch->fighting;
 
     chance = gsn_tail->getEffective( ch );
     
-    if (chance <= 1) {	
-	ch->send_to("Крылья, ноги.. Главное - хвост!\n\r");
-	return;
+    if (chance <= 1) {        
+        ch->send_to("п я─я▀п╩я▄я▐, п╫п╬пЁп╦.. п⌠п╩п╟п╡п╫п╬п╣ - я┘п╡п╬я│я┌!\n\r");
+        return;
     }
 
     if (arg[0] == '\0') {
-	victim = ch->fighting;
-	if (victim == 0) {
-	    ch->send_to("Сейчас ты не сражаешься!\n\r");
-	    return;
-	}
+        victim = ch->fighting;
+        if (victim == 0) {
+            ch->send_to("п║п╣п╧я┤п╟я│ я┌я▀ п╫п╣ я│я─п╟п╤п╟п╣я┬я▄я│я▐!\n\r");
+            return;
+        }
     }
     else if ((victim = get_char_room(ch, arg)) == 0) {
-	ch->send_to("Этого нет здесь.\n\r");
-	return;
+        ch->send_to("п╜я┌п╬пЁп╬ п╫п╣я┌ п╥п╢п╣я│я▄.\n\r");
+        return;
     }
 
     if (victim->position < POS_FIGHTING) {
-	act_p("Тебе нужно подождать, пока $E повернется к тебе.",
-		ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        act_p("п╒п╣п╠п╣ п╫я┐п╤п╫п╬ п©п╬п╢п╬п╤п╢п╟я┌я▄, п©п╬п╨п╟ $E п©п╬п╡п╣я─п╫п╣я┌я│я▐ п╨ я┌п╣п╠п╣.",
+                ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (victim == ch) {
-	ch->send_to("Ты пытаешься огреть себя хвостом, но ничего не выходит.\n\r");
-	return;
+        ch->send_to("п╒я▀ п©я▀я┌п╟п╣я┬я▄я│я▐ п╬пЁя─п╣я┌я▄ я│п╣п╠я▐ я┘п╡п╬я│я┌п╬п╪, п╫п╬ п╫п╦я┤п╣пЁп╬ п╫п╣ п╡я▀я┘п╬п╢п╦я┌.\n\r");
+        return;
     }
 
     if (is_safe(ch,victim))
-	return;
+        return;
 
     if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim) {
-	act_p("Но $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
-	return;
+        act_p("п²п╬ $C1 я┌п╡п╬п╧ п╢я─я┐пЁ!",ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
     }
 
     if (victim->isAffected(gsn_protective_shield)) {
-	act_p("{YТвой хвост не достает $C4 из-за защитного поля.{x", ch, 0, victim, TO_CHAR,POS_FIGHTING);
-	act_p("{YХвост $c2 не достает тебя из-за защитного поля.{x", ch, 0, victim,TO_VICT,POS_FIGHTING);
-	act_p("{YХвост $c2 не достает $C4.{x", ch,0,victim,TO_NOTVICT,POS_FIGHTING);
-	return;
+        act_p("{Yп╒п╡п╬п╧ я┘п╡п╬я│я┌ п╫п╣ п╢п╬я│я┌п╟п╣я┌ $C4 п╦п╥-п╥п╟ п╥п╟я┴п╦я┌п╫п╬пЁп╬ п©п╬п╩я▐.{x", ch, 0, victim, TO_CHAR,POS_FIGHTING);
+        act_p("{Yп╔п╡п╬я│я┌ $c2 п╫п╣ п╢п╬я│я┌п╟п╣я┌ я┌п╣п╠я▐ п╦п╥-п╥п╟ п╥п╟я┴п╦я┌п╫п╬пЁп╬ п©п╬п╩я▐.{x", ch, 0, victim,TO_VICT,POS_FIGHTING);
+        act_p("{Yп╔п╡п╬я│я┌ $c2 п╫п╣ п╢п╬я│я┌п╟п╣я┌ $C4.{x", ch,0,victim,TO_NOTVICT,POS_FIGHTING);
+        return;
     }
 
     /* modifiers */
@@ -104,9 +104,9 @@ SKILL_RUNP( tail )
 
 
     if (ch->size < victim->size)
-	chance += (ch->size - victim->size) * 25;
+        chance += (ch->size - victim->size) * 25;
     else
-	chance += (ch->size - victim->size) * 10;
+        chance += (ch->size - victim->size) * 10;
 
 
     /* stats */
@@ -114,14 +114,14 @@ SKILL_RUNP( tail )
     chance -= victim->getCurrStat(STAT_DEX) * 2;
 
     if (is_flying( ch ))
-	chance -= 10;
+        chance -= 10;
 
 
     /* speed */
     if (IS_QUICK(ch))
-	chance += 20;
+        chance += 20;
     if (IS_QUICK(victim))
-	chance -= 30;
+        chance -= 30;
 
     /* level */
 
@@ -130,39 +130,39 @@ SKILL_RUNP( tail )
     /* now the attack */
     if (number_percent() < chance / 2)
     {
-	act_p("$c1 наносит тебе удар хвостом!",ch,0,victim,TO_VICT,POS_RESTING);
-	act_p("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-	gsn_tail->improve( ch, true, victim );
+        act_p("$c1 п╫п╟п╫п╬я│п╦я┌ я┌п╣п╠п╣ я┐п╢п╟я─ я┘п╡п╬я│я┌п╬п╪!",ch,0,victim,TO_VICT,POS_RESTING);
+        act_p("п╒я▀ п╫п╟п╫п╬я│п╦я┬я▄ $C3 я┐п╢п╟я─ я┘п╡п╬я│я┌п╬п╪!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 п╫п╟п╫п╬я│п╦я┌ $C3 я┐п╢п╟я─ я┘п╡п╬я│я┌п╬п╪.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        gsn_tail->improve( ch, true, victim );
 
-	wait = number_bits( 2 ) + 1;
-	
-	victim->setWaitViolence( number_bits( 2 ) + 1 );
-	ch->setWait( gsn_tail->getBeats( ) );
+        wait = number_bits( 2 ) + 1;
+        
+        victim->setWaitViolence( number_bits( 2 ) + 1 );
+        ch->setWait( gsn_tail->getBeats( ) );
 
-	victim->position = POS_RESTING;
-	damage_tail = ch->damroll +
-		( 2 * number_range(4, 4 + 10 * ch->size + chance/10) );
+        victim->position = POS_RESTING;
+        damage_tail = ch->damroll +
+                ( 2 * number_range(4, 4 + 10 * ch->size + chance/10) );
 
-	damage(ch,victim,damage_tail,gsn_tail, DAM_BASH, true, DAMF_WEAPON);
+        damage(ch,victim,damage_tail,gsn_tail, DAM_BASH, true, DAMF_WEAPON);
     }
     else
     {
-	damage(ch,victim,0,gsn_tail,DAM_BASH, true, DAMF_WEAPON);
-	
-	act_p("Ты теряешь равновесие и падаешь!",ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("$c1 теряет равновесие и падает!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-	act_p("Ты уклоняешься от хвоста $c2, и $e падает.",ch,0,victim,TO_VICT,POS_RESTING);
-	
-	gsn_tail->improve( ch, false, victim );
-	ch->position = POS_RESTING;
-	ch->setWait( gsn_tail->getBeats( ) * 3 / 2 );
+        damage(ch,victim,0,gsn_tail,DAM_BASH, true, DAMF_WEAPON);
+        
+        act_p("п╒я▀ я┌п╣я─я▐п╣я┬я▄ я─п╟п╡п╫п╬п╡п╣я│п╦п╣ п╦ п©п╟п╢п╟п╣я┬я▄!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 я┌п╣я─я▐п╣я┌ я─п╟п╡п╫п╬п╡п╣я│п╦п╣ п╦ п©п╟п╢п╟п╣я┌!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act_p("п╒я▀ я┐п╨п╩п╬п╫я▐п╣я┬я▄я│я▐ п╬я┌ я┘п╡п╬я│я┌п╟ $c2, п╦ $e п©п╟п╢п╟п╣я┌.",ch,0,victim,TO_VICT,POS_RESTING);
+        
+        gsn_tail->improve( ch, false, victim );
+        ch->position = POS_RESTING;
+        ch->setWait( gsn_tail->getBeats( ) * 3 / 2 );
     }
     
     if (!fightingCheck)
-	yell_panic( ch, victim,
-	            "Помогите! Кто-то бьет меня хвостом!",
-	            "Помогите! %1$^C1 пытается ударить меня хвостом!" );
+        yell_panic( ch, victim,
+                    "п÷п╬п╪п╬пЁп╦я┌п╣! п я┌п╬-я┌п╬ п╠я▄п╣я┌ п╪п╣п╫я▐ я┘п╡п╬я│я┌п╬п╪!",
+                    "п÷п╬п╪п╬пЁп╦я┌п╣! %1$^C1 п©я▀я┌п╟п╣я┌я│я▐ я┐п╢п╟я─п╦я┌я▄ п╪п╣п╫я▐ я┘п╡п╬я│я┌п╬п╪!" );
 }
 
 

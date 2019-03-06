@@ -29,7 +29,7 @@ class Character;
  */
 class Object : public Grammar::NounHolder,
                public XMLVariableContainer, 
-	       public WrapperTarget 
+               public WrapperTarget 
 {
 XML_OBJECT
 public:  
@@ -70,8 +70,8 @@ public:
     bool                enchanted;
     
     int              item_type;
-    int                  extra_flags;
-    int                  wear_flags;
+    int             extra_flags;
+    int             wear_flags;
     WearlocationReference wear_loc;
     int              weight;
     int                  cost;
@@ -86,7 +86,7 @@ public:
 
     char              *  killer;  // for corpse
     int                  count;
-
+    Properties           properties;
     XMLPersistentStreamable<ObjectBehavior> behavior;
 
 
@@ -94,17 +94,17 @@ public:
 
     inline bool is_obj_stat(int stat)
     {
-	return IS_SET(extra_flags, stat);
+        return IS_SET(extra_flags, stat);
     }
 
     inline bool can_wear(int part)
     {
-	return IS_SET(wear_flags,part);
+        return IS_SET(wear_flags,part);
     }
 
     inline int getWeightMultiplier( ) const
     {
-	return item_type == ITEM_CONTAINER ? value[4] : 100;
+        return item_type == ITEM_CONTAINER ? value[4] : 100;
     }
 
     const char *get_cond_alias(void);

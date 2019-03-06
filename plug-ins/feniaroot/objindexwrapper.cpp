@@ -14,12 +14,13 @@
 #include "reglist.h"
 #include "register-impl.h"
 #include "nativeext.h"
+#include "wrap_utils.h"
 
 #include "def.h"
 
 using Scripting::NativeTraits;
 
-NMI_INIT(ObjIndexWrapper, "�������� ��� ��������� (obj index data)")
+NMI_INIT(ObjIndexWrapper, "прототип для предметов (obj index data)")
 
 ObjIndexWrapper::ObjIndexWrapper( ) : target( NULL )
 {
@@ -59,10 +60,10 @@ void
 ObjIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );
+        throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );
 
     if (!target)
-	throw Scripting::Exception( "OBJ_INDEX_DATA is offline?!");
+        throw Scripting::Exception( "OBJ_INDEX_DATA is offline?!");
 }
 
 OBJ_INDEX_DATA *
@@ -72,73 +73,73 @@ ObjIndexWrapper::getTarget( ) const
     return target;
 }
 
-NMI_GET( ObjIndexWrapper, material, "") 
+NMI_GET( ObjIndexWrapper, material, "название материала, из которого сделан предмет") 
 { 
     checkTarget( ); 
     return Register( target->material );
 }
 
-NMI_GET( ObjIndexWrapper, description, "") 
+NMI_GET( ObjIndexWrapper, description, "описание, видимое на земле") 
 { 
     checkTarget( ); 
     return Register( target->description );
 }
 
-NMI_GET( ObjIndexWrapper, name, "") 
+NMI_GET( ObjIndexWrapper, name, "имена предмета, на которые он откликается") 
 { 
     checkTarget( ); 
     return Register( target->name);
 }
 
-NMI_GET( ObjIndexWrapper, short_descr, "") 
+NMI_GET( ObjIndexWrapper, short_descr, "описание, видимое в инвентаре и при манипуляциях") 
 { 
     checkTarget( ); 
     return Register( target->short_descr);
 }
 
-NMI_GET( ObjIndexWrapper, limit , "") 
+NMI_GET( ObjIndexWrapper, limit , "максимальное кол-во экземпляров существующих одновременно или -1") 
 { 
     checkTarget( ); 
     return target->limit;
 }
 
-NMI_GET( ObjIndexWrapper, vnum , "") 
+NMI_GET( ObjIndexWrapper, vnum , "внум, уникальный номер прототипа") 
 { 
     checkTarget( ); 
     return target->vnum;
 }
 
-NMI_GET( ObjIndexWrapper, reset_num, "") 
+NMI_GET( ObjIndexWrapper, reset_num, "сколько раз этот прототип встречается в ресетах") 
 { 
     checkTarget( ); 
     return target->reset_num;
 }
 
-NMI_GET( ObjIndexWrapper, count, "") 
+NMI_GET( ObjIndexWrapper, count, "кол-во экземпляров предметов этого прототипа") 
 { 
     checkTarget( ); 
     return target->count;
 }
 
-NMI_GET( ObjIndexWrapper, cost , "") 
+NMI_GET( ObjIndexWrapper, cost , "цена в серебре") 
 { 
     checkTarget( ); 
     return target->cost;
 }
 
 #define GETVALUE(x) \
-    NMI_GET( ObjIndexWrapper, value##x, "") { \
-	checkTarget( ); \
-	return Register( target->value[x]); \
+    NMI_GET( ObjIndexWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
+        checkTarget( ); \
+        return Register( target->value[x]); \
     } 
-	
+        
 GETVALUE(0)
 GETVALUE(1)
 GETVALUE(2)
 GETVALUE(3)
 GETVALUE(4)
 
-NMI_INVOKE(ObjIndexWrapper, create, "")
+NMI_INVOKE(ObjIndexWrapper, create, "(): создать экземпляр предмета")
 {
     Object *obj;
 
@@ -148,20 +149,20 @@ NMI_INVOKE(ObjIndexWrapper, create, "")
     return WrapperManager::getThis( )->getWrapper( obj );
 }
 
-NMI_GET( ObjIndexWrapper, item_type, "")
+NMI_GET( ObjIndexWrapper, item_type, "тип предмета (таблица .tables.item_table)")
 {
     checkTarget( );
     return Register( target->item_type);
 }
 
-NMI_GET( ObjIndexWrapper, instances, "������ ���� ��������� � ���� pIndexData" )
+NMI_GET( ObjIndexWrapper, instances, "список (List) всех предметов с этим прототипом" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
 
     for (Object *o = object_list; o; o = o->next)
-	if (o->pIndexData == target)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
+        if (o->pIndexData == target)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -169,21 +170,34 @@ NMI_GET( ObjIndexWrapper, instances, "������ ���� ��������� � ���� pIndexData" )
     return Register( obj );
 }
 
-NMI_INVOKE( ObjIndexWrapper, api, "�������� ���� API" )
+NMI_INVOKE( ObjIndexWrapper, property, "(name, defaultValue): свойство прототипа с именем name или значение по умолчанию" )
+{
+    checkTarget();
+    DLString name = args2string(args);
+    Register defaultValue = args.size() > 1 ? args.back() : Register();
+
+    Properties::const_iterator p = target->properties.find(name);
+    if (p == target->properties.end())
+        return defaultValue;
+    else
+        return Register(p->second);
+}
+
+NMI_INVOKE( ObjIndexWrapper, api, "(): печатает этот API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<ObjIndexWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjIndexWrapper, rtapi, "�������� ��� ���� � ������, ������������� � runtime" )
+NMI_INVOKE( ObjIndexWrapper, rtapi, "(): печатает все поля и методы, установленные в runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjIndexWrapper, clear, "������� ���� runtime �����" )
+NMI_INVOKE( ObjIndexWrapper, clear, "(): очистка всех runtime полей" )
 {
     guts.clear( );
     self->changed();

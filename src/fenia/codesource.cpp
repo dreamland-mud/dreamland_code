@@ -42,7 +42,7 @@ void
 CodeSource::finalize( )
 {
     if(evaled)
-	manager->del( id );
+        manager->del( id );
 
     manager->erase( id );
 }
@@ -86,20 +86,20 @@ CodeSource::Manager::seq(id_t id, Data &val)
     p = begin;
     
     for(i=0; i < sizeof(arr)/sizeof(*arr); i++) {
-	arr[i] = p;
-	
-	for(; p < end && *p; p++)
-	    ;
-	
-	if(*p)
-	    throw ::Exception( "Object::Manager::seq: record too small" );
-	
-	len[i] = p - arr[i];
-	p++;
+        arr[i] = p;
+        
+        for(; p < end && *p; p++)
+            ;
+        
+        if(*p)
+            throw ::Exception( "Object::Manager::seq: record too small" );
+        
+        len[i] = p - arr[i];
+        p++;
     }
     
     if(p != end)
-	throw ::Exception( "Object::Manager::seq: record too long" );
+        throw ::Exception( "Object::Manager::seq: record too long" );
 
     CodeSource &cs = at( id );
     cs.name.assign(arr[0], len[0]);
@@ -112,7 +112,7 @@ CodeSource::Manager::seq(id_t id, Data &val)
     FeniaParser(is, cs).compile( );
 
     if(id > lastId)
-	lastId = id;
+        lastId = id;
 }
 
 void
@@ -141,10 +141,10 @@ operator << (ostream &os, const CodeSourceRef &csr)
     CodeSource::Pointer cs = csr.source;
     
     if(cs)
-	os 
-	   << "cs #" << cs->getId() << " (" << cs->name << ")";
+        os 
+           << "cs #" << cs->getId() << " (" << cs->name << ")";
     else
-	os << "<unknown>";
+        os << "<unknown>";
 
     os << " line " << csr.line;
     return os;

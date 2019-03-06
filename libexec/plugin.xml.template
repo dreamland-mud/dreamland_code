@@ -37,6 +37,7 @@
 	<node>quest_kidnap</node>
 	<node>quest_steal</node>
 	<node>quest_locate</node>
+	<node>quest_big</node>
 	<node>gquest_command</node>
 	<node>gquest_gangsters</node>
 	<node>gquest_invasion</node>
@@ -53,4 +54,7 @@
 	<node>riding</node>
 	<node>follow_command</node>
 	<node>web</node>
+	<node>craft</node>
+	<node>gmcp</node>
+	<node>bonus</node>
 </PluginManager>

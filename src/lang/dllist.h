@@ -6,16 +6,16 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef	DLLIST_H
+#ifndef        DLLIST_H
 #define DLLIST_H
 
 #include <list>
 
 /**
  * @author Igor S. Petrenko
- * @short Расширенный класс list
- * Добавлены методы для удаления элементов, для которых нужно
- * вызвать delete
+ * @short п═п╟я│я┬п╦я─п╣п╫п╫я▀п╧ п╨п╩п╟я│я│ list
+ * п■п╬п╠п╟п╡п╩п╣п╫я▀ п╪п╣я┌п╬п╢я▀ п╢п╩я▐ я┐п╢п╟п╩п╣п╫п╦я▐ я█п╩п╣п╪п╣п╫я┌п╬п╡, п╢п╩я▐ п╨п╬я┌п╬я─я▀я┘ п╫я┐п╤п╫п╬
+ * п╡я▀п╥п╡п╟я┌я▄ delete
  */
 
 template<typename T>
@@ -44,24 +44,24 @@ public:
 template<typename T>
 typename DLList<T>::iterator DLList<T>::erase_delete( iterator begin, iterator end )
 {
-	for( iterator pos = begin; pos != end; ++pos )
-	{
-		delete( *pos );
-	}
-	return erase( begin, end );
+        for( iterator pos = begin; pos != end; ++pos )
+        {
+                delete( *pos );
+        }
+        return erase( begin, end );
 }
 
 template<typename T>
 void DLList<T>::pop_back_delete( )
 {
-	delete( *back( ) );
-	pop_back( );
+        delete( *back( ) );
+        pop_back( );
 }
 
 template<typename T>
 void DLList<T>::clear_delete( )
 {
-	erase_delete( begin( ), end( ) );
+        erase_delete( begin( ), end( ) );
 }
 
 #endif

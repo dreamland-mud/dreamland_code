@@ -17,11 +17,11 @@
  * TransferMovement
  */
 TransferMovement::TransferMovement( Character *ch, Character *actor, Room *to_room,
-		const char *mrl, const char *msl, const char *mre, const char *mse )
-	    : JumpMovement( ch, actor, to_room ),
-	      msgRoomLeave( mrl ), msgSelfLeave( msl ),
-	      msgRoomEnter( mre ), msgSelfEnter( mse )
-	    
+                const char *mrl, const char *msl, const char *mre, const char *mse )
+            : JumpMovement( ch, actor, to_room ),
+              msgRoomLeave( mrl ), msgSelfLeave( msl ),
+              msgRoomEnter( mre ), msgSelfEnter( mse )
+            
 {
 }
 
@@ -35,20 +35,20 @@ bool TransferMovement::tryMove( Character *wch )
 void TransferMovement::msgEcho( Character *listener, Character *wch, const char *msg )
 {
     if (msg && msg[0] && canHear( listener, wch ))
-	listener->pecho( msg, wch, actor );
+        listener->pecho( msg, wch, actor );
 }
 
 void TransferMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (wch) {
-	if (fLeaving) {
-	    msgSelf( wch, msgSelfLeave );
-	    msgRoomNoParty( wch, msgRoomLeave );
-	}
-	else {
-	    msgSelf( wch, msgSelfEnter );
-	    msgRoomNoParty( wch, msgRoomEnter );
-	}
+        if (fLeaving) {
+            msgSelf( wch, msgSelfLeave );
+            msgRoomNoParty( wch, msgRoomLeave );
+        }
+        else {
+            msgSelf( wch, msgSelfEnter );
+            msgRoomNoParty( wch, msgRoomEnter );
+        }
     }
 }
 

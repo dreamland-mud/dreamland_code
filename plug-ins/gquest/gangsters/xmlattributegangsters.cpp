@@ -6,7 +6,7 @@
 #include "xmlattributegangsters.h"
 
 XMLAttributeGangsters::XMLAttributeGangsters( ) 
-	    : XMLAttributeGlobalQuest( ), joined( false ) 
+            : XMLAttributeGlobalQuest( ), joined( false ) 
 {
 }
 

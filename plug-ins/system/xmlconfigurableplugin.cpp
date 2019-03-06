@@ -30,8 +30,8 @@ XMLFile XMLConfigurablePlugin::getConfigFile( )
     XMLFile configFile;
     
     configFile.setFile( DLFile( dreamland->getTableDir( ),
-	                        getType( ).toLower( ),
-		                ".xml" ) );
+                                getType( ).toLower( ),
+                                ".xml" ) );
     configFile.setNodeName( getType( ) );
     configFile.setVariable( this );
     

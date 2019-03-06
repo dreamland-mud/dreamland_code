@@ -41,6 +41,7 @@ xmlmisc.h \
 xmlarea.h \
 xmlroom.h \
 xmlobjectfactory.h \
-xmlmobilefactory.h
+xmlmobilefactory.h \
+areahelp.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc

@@ -46,15 +46,15 @@ DLString KhuzdulLanguage::createDictum( ) const
     DLString dictum;
     
     if (radicals.empty( ))
-	throw LanguageException( *this, "empty radicals" );
+        throw LanguageException( *this, "empty radicals" );
 
     if (patterns.empty( ))
-	throw LanguageException( *this, "empty patterns" );
+        throw LanguageException( *this, "empty patterns" );
 
     dictum = radicalToDictum( );
 
     if (dictum.size( ) < 6 || chance( 50 ))
-	dictum += "-" + radicalToDictum( );
+        dictum += "-" + radicalToDictum( );
 
     return dictum;
 }
@@ -68,21 +68,21 @@ DLString KhuzdulLanguage::radicalToDictum( ) const
     pattern = patterns[ number_range( 0, patterns.size( ) - 1 ) ].getValue( );
 
     for (i = 0; i < pattern.size( ); i++) {
-	char c = pattern.at( i );
-	
-	if (c >= '1' && c <= '9')
-	    try {
-		c = radical.at( c - '1' );
-	    } catch (const std::exception &) {
-		continue;
-	    }
-	
-	if (isupper( c )) {
-	    dictum.append( (char)tolower( c ) );
-	    dictum.append( 'h' );
-	}
-	else
-	    dictum.append( c );
+        char c = pattern.at( i );
+        
+        if (c >= '1' && c <= '9')
+            try {
+                c = radical.at( c - '1' );
+            } catch (const std::exception &) {
+                continue;
+            }
+        
+        if (isupper( c )) {
+            dictum.append( (char)tolower( c ) );
+            dictum.append( 'h' );
+        }
+        else
+            dictum.append( c );
     }
     
     return dictum;
@@ -91,6 +91,6 @@ DLString KhuzdulLanguage::radicalToDictum( ) const
 
 void KhuzdulLanguage::dream( const Word &word, PCharacter *ch ) const
 {
-    ch->printf( "Ô‘⁄◊’ÀœÕ ƒ“≈◊Œ…» ¬…‘◊ –“…»œƒ…‘ ◊ ‘◊œ… ”ŒŸ ”Ãœ◊œ {c%s{x.\r\n", word.toStr( ) ); 
+    ch->printf( "–û—Ç–∑–≤—É–∫–æ–º –¥—Ä–µ–≤–Ω–∏—Ö –±–∏—Ç–≤ –ø—Ä–∏—Ö–æ–¥–∏—Ç –≤ —Ç–≤–æ–∏ —Å–Ω—ã —Å–ª–æ–≤–æ {c%s{x.\r\n", word.toStr( ) ); 
 }
 

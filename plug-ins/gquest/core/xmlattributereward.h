@@ -24,37 +24,37 @@ public:
         typedef ::Pointer<XMLReward> Pointer;
         
         XMLReward( );
-	virtual ~XMLReward( );
+        virtual ~XMLReward( );
 
-	bool isEmpty( ) const;
-	    
-	XML_VARIABLE XMLInteger gold;
-	XML_VARIABLE XMLInteger qpoints;
-	XML_VARIABLE XMLInteger practice;
-	XML_VARIABLE XMLInteger restring;
-	XML_VARIABLE XMLInteger experience;
-	XML_VARIABLE XMLString  reason;
-	XML_VARIABLE XMLString  id;
+        bool isEmpty( ) const;
+            
+        XML_VARIABLE XMLInteger gold;
+        XML_VARIABLE XMLInteger qpoints;
+        XML_VARIABLE XMLInteger practice;
+        XML_VARIABLE XMLInteger restring;
+        XML_VARIABLE XMLInteger experience;
+        XML_VARIABLE XMLString  reason;
+        XML_VARIABLE XMLString  id;
 };
 
 class XMLAttributeReward : public XMLAttribute, public XMLVariableContainer {
 XML_OBJECT;
 public:
-	typedef ::Pointer<XMLAttributeReward> Pointer;
+        typedef ::Pointer<XMLAttributeReward> Pointer;
 
-	void addReward( const XMLReward & );
-	void reward( PCharacter * );
+        void addReward( const XMLReward & );
+        void reward( PCharacter * );
 
-private:	
-	XML_VARIABLE XMLVectorBase<XMLReward> rewards;
+private:        
+        XML_VARIABLE XMLVectorBase<XMLReward> rewards;
 };
 
 
 class XMLAttributeRewardListenerPlugin : public DescriptorStateListener {
 public:
-	typedef ::Pointer<XMLAttributeRewardListenerPlugin> Pointer;
+        typedef ::Pointer<XMLAttributeRewardListenerPlugin> Pointer;
 
-	virtual void run( int, int, Descriptor * );	
+        virtual void run( int, int, Descriptor * );        
 };
 
 #endif

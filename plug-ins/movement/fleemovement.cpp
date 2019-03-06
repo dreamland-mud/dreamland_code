@@ -24,15 +24,15 @@ FleeMovement::FleeMovement( Character *ch )
 bool FleeMovement::canFlee( Character *wch )
 {
     if (!ExitsMovement::canMove( wch ))
-	return false;
+        return false;
     
     if (IS_SET(exit_info, EX_NOFLEE))
-	return false;
+        return false;
 
     if (wch->is_npc( ) 
-	    && !RIDDEN(wch) 
-	    && IS_SET(to_room->room_flags, ROOM_NO_MOB))
-	return false;
+            && !RIDDEN(wch) 
+            && IS_SET(to_room->room_flags, ROOM_NO_MOB))
+        return false;
 
     return true;
 }
@@ -49,59 +49,59 @@ bool FleeMovement::findTargetRoom( )
     peexit = NULL;
 
     for (door = 0; door < DIR_SOMEWHERE; door++) {
-	if (!( pexit = from_room->exit[door] ))
-	    continue;
+        if (!( pexit = from_room->exit[door] ))
+            continue;
 
-	to_room = pexit->u1.to_room;
-	exit_info = pexit->exit_info;
-	
-	if (!canFlee( ch ) || (ch->mount && !canFlee( ch->mount )))
-	    continue;
-		
-	if (number_range( 0, count++ ) == 0) {
-	    targetExit = pexit;
-	    targetDoor = door;
-	}
+        to_room = pexit->u1.to_room;
+        exit_info = pexit->exit_info;
+        
+        if (!canFlee( ch ) || (ch->mount && !canFlee( ch->mount )))
+            continue;
+                
+        if (number_range( 0, count++ ) == 0) {
+            targetExit = pexit;
+            targetDoor = door;
+        }
     }
     
     door = DIR_SOMEWHERE;
     pexit = NULL;
 
     for (peexit = from_room->extra_exit; peexit; peexit = peexit->next) {
-	to_room = peexit->u1.to_room;
-	exit_info = peexit->exit_info;
+        to_room = peexit->u1.to_room;
+        exit_info = peexit->exit_info;
 
-	if (!canFlee( ch ) || (ch->mount && !canFlee( ch->mount )))
-	    continue;
+        if (!canFlee( ch ) || (ch->mount && !canFlee( ch->mount )))
+            continue;
 
-	if (number_range( 0, count++ ) == 0) {
-	    targetExtraExit = peexit;
-	    targetDoor = door;
-	}
+        if (number_range( 0, count++ ) == 0) {
+            targetExtraExit = peexit;
+            targetDoor = door;
+        }
     }
 
     silence = false;
 
     switch (targetDoor) {
     case -1:
-	msgSelf( ch, "{Rðáîéëá!{x ôÙ ÎÅ ÎÁÈÏÄÉÛØ ×ÙÈÏÄÁ!" );
-	return false;
+        msgSelf( ch, "{RÐŸÐÐÐ˜ÐšÐ!{x Ð¢Ñ‹ Ð½Ðµ Ð½Ð°Ñ…Ð¾Ð´Ð¸ÑˆÑŒ Ð²Ñ‹Ñ…Ð¾Ð´Ð°!" );
+        return false;
 
     case DIR_SOMEWHERE:
-	pexit = NULL;
-	peexit = targetExtraExit;
-	to_room = peexit->u1.to_room;
-	door = DIR_SOMEWHERE;
-	exit_info = peexit->exit_info;
-	return true;
+        pexit = NULL;
+        peexit = targetExtraExit;
+        to_room = peexit->u1.to_room;
+        door = DIR_SOMEWHERE;
+        exit_info = peexit->exit_info;
+        return true;
 
     default:
-	peexit = NULL;
-	pexit = targetExit;
-	to_room = pexit->u1.to_room;
-	door = targetDoor;
-	exit_info = pexit->exit_info;
-	return true;
+        peexit = NULL;
+        pexit = targetExit;
+        to_room = pexit->u1.to_room;
+        door = targetDoor;
+        exit_info = pexit->exit_info;
+        return true;
     }
 }
 
@@ -113,8 +113,8 @@ bool FleeMovement::canMove( Character * )
 bool FleeMovement::checkPositionHorse( )
 {
     if (horse->position <= POS_RESTING) {
-	msgSelf( ch, "%2$^C1 ÄÏÌÖ%2$GÎÏ|ÅÎ|ÎÁ ÓÎÁÞÁÌÁ ×ÓÔÁÔØ." );
-	return false;
+        msgSelf( ch, "%2$^C1 Ð´Ð¾Ð»Ð¶%2$GÐ½Ð¾|ÐµÐ½|Ð½Ð° ÑÐ½Ð°Ñ‡Ð°Ð»Ð° Ð²ÑÑ‚Ð°Ñ‚ÑŒ." );
+        return false;
     }
 
     return true;
@@ -133,7 +133,7 @@ bool FleeMovement::checkPositionWalkman( )
 void FleeMovement::callProgs( Character *wch )
 {
     if (wch && wch->is_npc( ) && wch->getNPC( )->behavior)
-	wch->getNPC( )->behavior->flee( );
+        wch->getNPC( )->behavior->flee( );
 
     ExitsMovement::callProgs( wch );
 }
@@ -141,20 +141,20 @@ void FleeMovement::callProgs( Character *wch )
 void FleeMovement::msgOnMove( Character *wch, bool fLeaving )
 {
     if (fLeaving) {
-	if (wch == rider)
-	    msgSelf( wch, "%2$^C1 ×ÙÎÏÓÉÔ ÔÅÂÑ Ó ÐÏÌÑ ÂÉÔ×Ù!" );
-	else if (wch == horse) 
-	    msgSelf( wch, "%1$^C1 ÐÏËÉÄÁÅÔ ÐÏÌÅ ÂÉÔ×Ù ×ÅÒÈÏÍ ÎÁ ÔÅÂÅ!" );
-	else
-	    msgSelf( wch, "ôÙ ÕÂÅÇÁÅÛØ Ó ÐÏÌÑ ÂÉÔ×Ù!" );
+        if (wch == rider)
+            msgSelf( wch, "%2$^C1 Ð²Ñ‹Ð½Ð¾ÑÐ¸Ñ‚ Ñ‚ÐµÐ±Ñ Ñ Ð¿Ð¾Ð»Ñ Ð±Ð¸Ñ‚Ð²Ñ‹!" );
+        else if (wch == horse) 
+            msgSelf( wch, "%1$^C1 Ð¿Ð¾ÐºÐ¸Ð´Ð°ÐµÑ‚ Ð¿Ð¾Ð»Ðµ Ð±Ð¸Ñ‚Ð²Ñ‹ Ð²ÐµÑ€Ñ…Ð¾Ð¼ Ð½Ð° Ñ‚ÐµÐ±Ðµ!" );
+        else
+            msgSelf( wch, "Ð¢Ñ‹ ÑƒÐ±ÐµÐ³Ð°ÐµÑˆÑŒ Ñ Ð¿Ð¾Ð»Ñ Ð±Ð¸Ñ‚Ð²Ñ‹!" );
     }
     
     ExitsMovement::msgOnMove( wch, fLeaving );
 
     if (fLeaving) 
-	msgRoomNoParty( wch, 
-			"%1$^C1 ÕÂÅÇÁÅÔ!",
-			"%1$^C1 É %2$C1 ÕÂÅÇÁÀÔ!" );
+        msgRoomNoParty( wch, 
+                        "%1$^C1 ÑƒÐ±ÐµÐ³Ð°ÐµÑ‚!",
+                        "%1$^C1 Ð¸ %2$C1 ÑƒÐ±ÐµÐ³Ð°ÑŽÑ‚!" );
 }
 
 bool FleeMovement::applySkill( SkillReference &skill ) 
@@ -162,10 +162,10 @@ bool FleeMovement::applySkill( SkillReference &skill )
     bool fSuccess = true;;
     
     if (number_percent() > skill->getEffective( ch )) {
-	msgSelf( ch, "õ ÔÅÂÑ ÎÅ ÐÏÌÕÞÁÅÔÓÑ ÓÂÅÖÁÔØ." );
-	fSuccess = false;
+        msgSelf( ch, "Ð£ Ñ‚ÐµÐ±Ñ Ð½Ðµ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑ‚ÑÑ ÑÐ±ÐµÐ¶Ð°Ñ‚ÑŒ." );
+        fSuccess = false;
     }
 
-    skill->improve( ch, fSuccess );	
+    skill->improve( ch, fSuccess );        
     return fSuccess;
 }

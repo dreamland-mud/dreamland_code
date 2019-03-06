@@ -22,7 +22,7 @@ char fread_letter( FILE *fp )
 
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( dl_isspace(c) );
 
@@ -42,7 +42,7 @@ int fread_number( FILE *fp )
 
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( dl_isspace(c) );
 
@@ -51,33 +51,33 @@ int fread_number( FILE *fp )
     sign   = false;
     if ( c == '+' )
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     else if ( c == '-' )
     {
-	sign = true;
-	c = getc( fp );
+        sign = true;
+        c = getc( fp );
     }
 
     if ( !isdigit(c) )
     {
-	bug("no number", 0);
-	throw FileFormatException( "Fread_number: bad format (%c no number).", c );
+        bug("no number", 0);
+        throw FileFormatException( "Fread_number: bad format (%c no number).", c );
     }
 
     while ( isdigit(c) )
     {
-	number = number * 10 + c - '0';
-	c      = getc( fp );
+        number = number * 10 + c - '0';
+        c      = getc( fp );
     }
 
     if ( sign )
-	number = 0 - number;
+        number = 0 - number;
 
     if ( c == '|' )
-	number += fread_number( fp );
+        number += fread_number( fp );
     else if ( c != ' ' )
-	ungetc( c, fp );
+        ungetc( c, fp );
 
     return number;
 }
@@ -93,7 +93,7 @@ long long fread_number64( FILE *fp )
 
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( dl_isspace(c) );
 
@@ -102,33 +102,33 @@ long long fread_number64( FILE *fp )
     sign   = false;
     if ( c == '+' )
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     else if ( c == '-' )
     {
-	sign = true;
-	c = getc( fp );
+        sign = true;
+        c = getc( fp );
     }
 
     if ( !isdigit(c) )
     {
-	bug("no number", 0);
-	throw FileFormatException( "Fread_number64: bad format (%c no number).", c );
+        bug("no number", 0);
+        throw FileFormatException( "Fread_number64: bad format (%c no number).", c );
     }
 
     while ( isdigit(c) )
     {
-	number = number * 10 + c - '0';
-	c      = getc( fp );
+        number = number * 10 + c - '0';
+        c      = getc( fp );
     }
 
     if ( sign )
-	number = 0 - number;
+        number = 0 - number;
 
     if ( c == '|' )
-	number += fread_number64( fp );
+        number += fread_number64( fp );
     else if ( c != ' ' )
-	ungetc( c, fp );
+        ungetc( c, fp );
 
     return number;
 }
@@ -136,48 +136,48 @@ long long fread_number64( FILE *fp )
 
 long fread_flag( FILE *fp)
 {
-	int number;
-	char c;
-	bool negative = false;
+        int number;
+        char c;
+        bool negative = false;
 
-	do
-	{
-		c = getc(fp);
-	}
-	while ( dl_isspace(c));
+        do
+        {
+                c = getc(fp);
+        }
+        while ( dl_isspace(c));
 
-	if (c == '-')
-	{
-		negative = true;
-		c = getc(fp);
-	}
+        if (c == '-')
+        {
+                negative = true;
+                c = getc(fp);
+        }
 
-	number = 0;
+        number = 0;
 
-	if (!isdigit(c))
-	{
-		while (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'))
-		{
-			number += flag_convert(c);
-			c = getc(fp);
-		}
-	}
+        if (!isdigit(c))
+        {
+                while (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'))
+                {
+                        number += flag_convert(c);
+                        c = getc(fp);
+                }
+        }
 
-	while (isdigit(c))
-	{
-		number = number * 10 + c - '0';
-		c = getc(fp);
-	}
+        while (isdigit(c))
+        {
+                number = number * 10 + c - '0';
+                c = getc(fp);
+        }
 
-	if (c == '|')
-		number += fread_flag(fp);
-	else if  ( c != ' ')
-		ungetc(c,fp);
+        if (c == '|')
+                number += fread_flag(fp);
+        else if  ( c != ' ')
+                ungetc(c,fp);
 
-	if (negative)
-		return -1 * number;
+        if (negative)
+                return -1 * number;
 
-	return number;
+        return number;
 }
 
 long flag_convert(char letter )
@@ -187,15 +187,15 @@ long flag_convert(char letter )
 
     if ('A' <= letter && letter <= 'Z')
     {
-	bitsum = 1;
-	for (i = letter; i > 'A'; i--)
-	    bitsum *= 2;
+        bitsum = 1;
+        for (i = letter; i > 'A'; i--)
+            bitsum *= 2;
     }
     else if ('a' <= letter && letter <= 'z')
     {
-	bitsum = 67108864; /* 2^26 */
-	for (i = letter; i > 'a'; i --)
-	    bitsum *= 2;
+        bitsum = 67108864; /* 2^26 */
+        for (i = letter; i > 'a'; i --)
+            bitsum *= 2;
     }
 
     return bitsum;
@@ -221,35 +221,35 @@ char *fread_string( FILE *fp )
      */
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( dl_isspace(c) );
 
     if(c == '~')
-	return str_empty;
+        return str_empty;
 
     buf.put(c);
 
     for ( ;; )
     {
         int i = getc(fp);
-	switch (i)
-	{
+        switch (i)
+        {
         default:
             buf.put(i);
             break;
 
 //        case EOF:
-	/* temp fix */
+        /* temp fix */
 
-// угу, энтот фикс не дает вставать миру если где-то в загрузочных файлах
-// (бало обнаружено на нотах) есть "Ъ" == FF, равно как и EOF == FF
-// в результате теряется кипа памяти
-// ИМХО оно тут вобще не нужно.
+// я┐пЁя┐, я█п╫я┌п╬я┌ я└п╦п╨я│ п╫п╣ п╢п╟п╣я┌ п╡я│я┌п╟п╡п╟я┌я▄ п╪п╦я─я┐ п╣я│п╩п╦ пЁп╢п╣-я┌п╬ п╡ п╥п╟пЁя─я┐п╥п╬я┤п╫я▀я┘ я└п╟п╧п╩п╟я┘
+// (п╠п╟п╩п╬ п╬п╠п╫п╟я─я┐п╤п╣п╫п╬ п╫п╟ п╫п╬я┌п╟я┘) п╣я│я┌я▄ "п╙" == FF, я─п╟п╡п╫п╬ п╨п╟п╨ п╦ EOF == FF
+// п╡ я─п╣п╥я┐п╩я▄я┌п╟я┌п╣ я┌п╣я─я▐п╣я┌я│я▐ п╨п╦п©п╟ п©п╟п╪я▐я┌п╦
+// п≤п°п╔п· п╬п╫п╬ я┌я┐я┌ п╡п╬п╠я┴п╣ п╫п╣ п╫я┐п╤п╫п╬.
 //
-//      Корвин.
+//      п п╬я─п╡п╦п╫.
 //            bug( "Fread_string: EOF", 0 );
-//	    return 0;
+//            return 0;
             /* exit( 1 ); */
 //            break;
 
@@ -263,7 +263,7 @@ char *fread_string( FILE *fp )
 
         case '~':
             return str_dup(buf.str( ).c_str( ));
-	}
+        }
     }
 }
 
@@ -326,13 +326,13 @@ void fread_to_eol( FILE *fp )
 
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( c != '\n' && c != '\r' );
 
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( c == '\n' || c == '\r' );
 
@@ -349,31 +349,31 @@ DLString fread_dlstring( FILE *fp )
     c[1] = 0;
 
     do
-	c[0] = getc( fp );
+        c[0] = getc( fp );
     while ( dl_isspace(c[0]) );
 
     for ( ;; )
     {
-	if (feof( fp ))
-	    break;
+        if (feof( fp ))
+            break;
 
-	switch (c[0]) {
+        switch (c[0]) {
         default:
-	    buf << c;
+            buf << c;
             break;
 
         case '\n':
-	    buf << endl;
+            buf << endl;
             break;
 
         case '\r':
             break;
 
         case '~':
-	    return buf.str( );
-	}
+            return buf.str( );
+        }
 
-	c[0] = getc( fp );
+        c[0] = getc( fp );
     }
     
     return buf.str( );
@@ -386,14 +386,14 @@ DLString fread_dlstring_to_eol( FILE *fp )
 
     do
     {
-	c = getc( fp );
-	s.append( c );
+        c = getc( fp );
+        s.append( c );
     }
     while ( c != '\n' && c != '\r' );
 
     do
     {
-	c = getc( fp );
+        c = getc( fp );
     }
     while ( c == '\n' || c == '\r' );
 
@@ -406,41 +406,41 @@ DLString fread_dlstring_to_eol( FILE *fp )
  */
 char *fread_word( FILE *fp )
 {
-	static char word[MAX_INPUT_LENGTH];
-	char *pword;
-	char cEnd;
+        static char word[MAX_INPUT_LENGTH];
+        char *pword;
+        char cEnd;
 
-	do
-	{
-		cEnd = getc( fp );
-	}
-	while ( dl_isspace( cEnd ) );
+        do
+        {
+                cEnd = getc( fp );
+        }
+        while ( dl_isspace( cEnd ) );
 
-	if ( cEnd == '\'' || cEnd == '"' )
-	{
-		pword   = word;
-	}
-	else
-	{
-		word[0] = cEnd;
-		pword   = word+1;
-		cEnd    = ' ';
-	}
+        if ( cEnd == '\'' || cEnd == '"' )
+        {
+                pword   = word;
+        }
+        else
+        {
+                word[0] = cEnd;
+                pword   = word+1;
+                cEnd    = ' ';
+        }
 
-	for ( ; pword < word + MAX_INPUT_LENGTH; pword++ )
-	{
-		*pword = getc( fp );
-		if ( cEnd == ' ' ? dl_isspace(*pword) : *pword == cEnd )
-		{
-			if ( cEnd == ' ' )
-				ungetc( *pword, fp );
-			*pword = '\0';
-			return word;
-		}
-	}
-	word[MAX_INPUT_LENGTH - 1] = 0;
+        for ( ; pword < word + MAX_INPUT_LENGTH; pword++ )
+        {
+                *pword = getc( fp );
+                if ( cEnd == ' ' ? dl_isspace(*pword) : *pword == cEnd )
+                {
+                        if ( cEnd == ' ' )
+                                ungetc( *pword, fp );
+                        *pword = '\0';
+                        return word;
+                }
+        }
+        word[MAX_INPUT_LENGTH - 1] = 0;
 
-	throw FileFormatException( "Fread_word: word too long: %s", word );
+        throw FileFormatException( "Fread_word: word too long: %s", word );
 }
 
 

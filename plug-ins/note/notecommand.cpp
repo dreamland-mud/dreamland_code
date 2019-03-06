@@ -58,134 +58,134 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
     DLString cmd = arguments.getOneArgument( );
     
     if (cch->is_npc( ))
-	return;
+        return;
 
     ch = cch->getPC( );
 
     if (cmd.empty( )) {
-	if (canRead( ch ))
-	    cmd = "read";
-	else {
-	    ch->pecho( "Ты не можешь читать {W%N4{x.", rusNameMlt.c_str( ) );
-	    return;
-	}
+        if (canRead( ch ))
+            cmd = "read";
+        else {
+            ch->pecho( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┤п╦я┌п╟я┌я▄ {W%N4{x.", rusNameMlt.c_str( ) );
+            return;
+        }
     }
     
     if (cmd.strPrefix( "dump" ) && ch->isCoder( )) {
-	dump( );
-	ch->println( "Ok." );
-	return;
+        dump( );
+        ch->println( "Ok." );
+        return;
     }
 
     if (cmd.strPrefix( "webdump" ) && ch->isCoder( )) {
-	doWebDump( ch );
-	return;
+        doWebDump( ch );
+        return;
     }
 
     if (cmd.strPrefix( "hooksdump" ) && ch->isCoder( )) {
-	doHooksDump( ch, arguments );
-	return;
+        doHooksDump( ch, arguments );
+        return;
     }
 
     if (canRead( ch )) {
-	if (arg_oneof( cmd, "read", "читать" )) {
-	    doRead( ch, arguments );
-	    return;
-	}
-	else if (arg_oneof( cmd, "copy", "копировать" ) && !arg_oneof_strict( cmd, "к" )) {
-	    doCopy( ch, arguments );
-	    return;
-	}
-	else if (arg_is_list( cmd )) {
-	    doList( ch, arguments );
-	    return;
-	}
-	else if (arg_oneof( cmd, "catchup", "прочитаны" )) {
-	    doCatchup( ch );
-	    return;
-	}
-	else if (arg_oneof( cmd, "uncatchup", "непрочитаны" )) {
-	    doUncatchup( ch, arguments );
-	    return;
-	}
+        if (arg_oneof( cmd, "read", "я┤п╦я┌п╟я┌я▄" )) {
+            doRead( ch, arguments );
+            return;
+        }
+        else if (arg_oneof( cmd, "copy", "п╨п╬п©п╦я─п╬п╡п╟я┌я▄" ) && !arg_oneof_strict( cmd, "п╨" )) {
+            doCopy( ch, arguments );
+            return;
+        }
+        else if (arg_is_list( cmd )) {
+            doList( ch, arguments );
+            return;
+        }
+        else if (arg_oneof( cmd, "catchup", "п©я─п╬я┤п╦я┌п╟п╫я▀" )) {
+            doCatchup( ch );
+            return;
+        }
+        else if (arg_oneof( cmd, "uncatchup", "п╫п╣п©я─п╬я┤п╦я┌п╟п╫я▀" )) {
+            doUncatchup( ch, arguments );
+            return;
+        }
     }
 
     if (!canWrite( ch )) {
-	ch->pecho( "У тебя недостаточно привилегий для написания {W%N2{x.", rusNameMlt.c_str( ) );
-	return;
+        ch->pecho( "пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╦п╡п╦п╩п╣пЁп╦п╧ п╢п╩я▐ п╫п╟п©п╦я│п╟п╫п╦я▐ {W%N2{x.", rusNameMlt.c_str( ) );
+        return;
     }
 
     if (!IS_SET(ch->act, PLR_CONFIRMED) && ch->getRemorts( ).size( ) == 0) {
-	ch->println("Ты не можешь ничего написать, пока тебя не подтвердили Боги." );
-	return;
+        ch->println("п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ п╫п╦я┤п╣пЁп╬ п╫п╟п©п╦я│п╟я┌я▄, п©п╬п╨п╟ я┌п╣п╠я▐ п╫п╣ п©п╬п╢я┌п╡п╣я─п╢п╦п╩п╦ п▒п╬пЁп╦." );
+        return;
     }
 
     if (ch->getRealLevel( ) < 3 && ch->getRemorts( ).size( ) == 0) {
-	ch->println("Тебе нужно достичь 3 уровня, чтобы отправлять письма.");
-	return;
+        ch->println("п╒п╣п╠п╣ п╫я┐п╤п╫п╬ п╢п╬я│я┌п╦я┤я▄ 3 я┐я─п╬п╡п╫я▐, я┤я┌п╬п╠я▀ п╬я┌п©я─п╟п╡п╩я▐я┌я▄ п©п╦я│я▄п╪п╟.");
+        return;
     }
 
     if (canRead( ch )) {
-	if (arg_oneof( cmd, "remove", "delete", "удалить" )) {
-	    doRemove( ch, arguments );
-	    return;
-	}
+        if (arg_oneof( cmd, "remove", "delete", "я┐п╢п╟п╩п╦я┌я▄" )) {
+            doRemove( ch, arguments );
+            return;
+        }
     }
 
     static const DLString nopost( "nopost" );
     if (ch->getAttributes( ).isAvailable( nopost ) || banManager->check( ch->desc, BAN_COMMUNICATE )) {
-	ch->println( "Боги лишили тебя возможности писать сообщения." );
-	return;
+        ch->println( "п▒п╬пЁп╦ п╩п╦я┬п╦п╩п╦ я┌п╣п╠я▐ п╡п╬п╥п╪п╬п╤п╫п╬я│я┌п╦ п©п╦я│п╟я┌я▄ я│п╬п╬п╠я┴п╣п╫п╦я▐." );
+        return;
     }
 
     attr = ch->getAttributes( ).getAttr<XMLAttributeNoteData>( "notedata" );
     
-    if (canRead( ch ) && arg_oneof( cmd, "forward", "перенаправить" )) {
-	doForward( ch, attr, arguments );
-	return;
+    if (canRead( ch ) && arg_oneof( cmd, "forward", "п©п╣я─п╣п╫п╟п©я─п╟п╡п╦я┌я▄" )) {
+        doForward( ch, attr, arguments );
+        return;
     }
     else if (cmd == "+") {
-	doLinePlus( ch, attr, arguments );
-	return;
+        doLinePlus( ch, attr, arguments );
+        return;
     }
-    else if (arg_oneof( cmd, "paste", "вставить" )) {
-	doPaste( ch, attr );
-	return;
+    else if (arg_oneof( cmd, "paste", "п╡я│я┌п╟п╡п╦я┌я▄" )) {
+        doPaste( ch, attr );
+        return;
     }
     else if (cmd == "-") {
-	doLineMinus( ch, attr );
-	return;
+        doLineMinus( ch, attr );
+        return;
     }
-    else if (arg_oneof( cmd, "subject", "тема" )) {
-	doSubject( ch, attr, arguments );
-	return;
+    else if (arg_oneof( cmd, "subject", "я┌п╣п╪п╟" )) {
+        doSubject( ch, attr, arguments );
+        return;
     }
-    else if (arg_oneof_strict( cmd, "to", "к" ) || arg_oneof( cmd, "кому" )) {
-	doTo( ch, attr, arguments );
-	return;
+    else if (arg_oneof_strict( cmd, "to", "п╨" ) || arg_oneof( cmd, "п╨п╬п╪я┐" )) {
+        doTo( ch, attr, arguments );
+        return;
     }
-    else if (arg_oneof_strict( cmd, "from", "от" )) {
-	if (doFrom( ch, attr, arguments ))
-	    return;
+    else if (arg_oneof_strict( cmd, "from", "п╬я┌" )) {
+        if (doFrom( ch, attr, arguments ))
+            return;
     }
-    else if (arg_oneof( cmd, "clear", "cancel", "очистить", "отменить" )) {
-	if (doClear( ch, attr ))
-	    return;
+    else if (arg_oneof( cmd, "clear", "cancel", "п╬я┤п╦я│я┌п╦я┌я▄", "п╬я┌п╪п╣п╫п╦я┌я▄" )) {
+        if (doClear( ch, attr ))
+            return;
     }
-    else if (arg_oneof( cmd, "show", "показать" )) {
-	if (doShow( ch, attr ))
-	    return;
+    else if (arg_oneof( cmd, "show", "п©п╬п╨п╟п╥п╟я┌я▄" )) {
+        if (doShow( ch, attr ))
+            return;
     }
-    else if (arg_oneof( cmd, "post", "send", "послать", "отправить" )) {
-	if (doPost( ch, attr ))
-	    return;
+    else if (arg_oneof( cmd, "post", "send", "п©п╬я│п╩п╟я┌я▄", "п╬я┌п©я─п╟п╡п╦я┌я▄" )) {
+        if (doPost( ch, attr ))
+            return;
     }
     else {
-	ch->println("Неверная команда, смотри {W? {lRписьмо синтаксис{lEnote syntax{x.");
-	return;
+        ch->println("п²п╣п╡п╣я─п╫п╟я▐ п╨п╬п╪п╟п╫п╢п╟, я│п╪п╬я┌я─п╦ {W? {lRп©п╦я│я▄п╪п╬ я│п╦п╫я┌п╟п╨я│п╦я│{lEnote syntax{x.");
+        return;
     }
     
-    echo( ch, msgNoCurrent, "Ты не пишешь никакого письма." );
+    echo( ch, msgNoCurrent, "п╒я▀ п╫п╣ п©п╦я┬п╣я┬я▄ п╫п╦п╨п╟п╨п╬пЁп╬ п©п╦я│я▄п╪п╟." );
 }
 
 void NoteThread::doWebDump( PCharacter *ch ) const
@@ -196,7 +196,7 @@ void NoteThread::doWebDump( PCharacter *ch ) const
     if (name == "news" || name == "change") {
         NoteList::const_iterator i;
         XMLListBase<WebNote> webNotes( true );
-	NoteThread::Pointer thread = NoteManager::getThis( )->findThread( "news" );
+        NoteThread::Pointer thread = NoteManager::getThis( )->findThread( "news" );
         for (i = thread->getNoteList( ).begin( ); i != thread->getNoteList( ).end( ); i++) {
             const Note *note = *i;
             if (note->isNoteToAll( )) {
@@ -210,7 +210,7 @@ void NoteThread::doWebDump( PCharacter *ch ) const
             }
         }
 
-	thread = NoteManager::getThis( )->findThread( "change" );
+        thread = NoteManager::getThis( )->findThread( "change" );
         for (i = thread->getNoteList( ).begin( ); i != thread->getNoteList( ).end( ); i++) {
             const Note *note = *i;
             if (note->isNoteToAll( )) {
@@ -249,10 +249,10 @@ bool NoteThread::doShow( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) co
     XMLNoteData *note;
 
     if (( note = attr->findNote( this ) )) {
-	ostringstream buf;
-	note->toStream( buf );
-	page_to_char( buf.str( ).c_str( ), ch );
-	return true;
+        ostringstream buf;
+        note->toStream( buf );
+        page_to_char( buf.str( ).c_str( ), ch );
+        return true;
     }
 
     return false;
@@ -263,9 +263,9 @@ bool NoteThread::doClear( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) c
     XMLNoteData *note;
 
     if (( note = attr->findNote( this ) )) {
-	attr->clearNote( this );
-	ch->println( "Ok." );
-	return true;
+        attr->clearNote( this );
+        ch->println( "Ok." );
+        return true;
     }
 
     return false;
@@ -286,9 +286,9 @@ void NoteThread::doTo( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const
     note->setRecipient( arguments );
     
     if (!Note::parseRecipient( ch, arguments, buf ))
-	echo( ch, msgToError, "{RТвое сообщение никто не получит!{x" );
+        echo( ch, msgToError, "{Rп╒п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣ п╫п╦п╨я┌п╬ п╫п╣ п©п╬п╩я┐я┤п╦я┌!{x" );
     else
-	echo( ch, msgToOk, "Твое сообщение получат:\r\n", buf.str( ) );
+        echo( ch, msgToOk, "п╒п╡п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣ п©п╬п╩я┐я┤п╟я┌:\r\n", buf.str( ) );
 }
 
 void NoteThread::doLinePlus( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
@@ -296,10 +296,10 @@ void NoteThread::doLinePlus( PCharacter *ch, XMLAttributeNoteData::Pointer attr,
     XMLNoteData *note = attr->makeNote( ch, this );
 
     if (!ch->isCoder( ) && note->getBodySize( ) > 4096) 
-	echo( ch, msgTooLong, "Слишком длинное сообщение." );
+        echo( ch, msgTooLong, "п║п╩п╦я┬п╨п╬п╪ п╢п╩п╦п╫п╫п╬п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣." );
     else {
-	note->addLine( arguments );
-	ch->println( "Ok." );
+        note->addLine( arguments );
+        ch->println( "Ok." );
     }
 }
 
@@ -308,10 +308,10 @@ void NoteThread::doLineMinus( PCharacter *ch, XMLAttributeNoteData::Pointer attr
     XMLNoteData *note = attr->makeNote( ch, this );
 
     if (note->isBodyEmpty( )) 
-	ch->println( "Больше нечего удалять." );
+        ch->println( "п▒п╬п╩я▄я┬п╣ п╫п╣я┤п╣пЁп╬ я┐п╢п╟п╩я▐я┌я▄." );
     else {
-	note->delLine( );
-	ch->println( "Ok." );
+        note->delLine( );
+        ch->println( "Ok." );
     }
 }
 
@@ -320,12 +320,12 @@ void NoteThread::doPaste( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) c
     XMLNoteData *note = attr->makeNote( ch, this );
 
     const Editor::reg_t &reg = ch->getAttributes()
-	.getAttr<XMLAttributeEditorState>("edstate")->regs[0];
+        .getAttr<XMLAttributeEditorState>("edstate")->regs[0];
 
     note->clearBody( );
     
     for(Editor::reg_t::const_iterator i = reg.begin(); i != reg.end(); i++)
-	note->addLine( *i );
+        note->addLine( *i );
 
     ch->println( "Ok." );
 }
@@ -344,38 +344,38 @@ void NoteThread::doCopy( PCharacter *ch, DLString &arguments ) const
     if (arg.empty( )) {
         XMLAttributeNoteData::Pointer attr = ch->getAttributes( ).getAttr<XMLAttributeNoteData>( "notedata" );
         XMLNoteData *note = attr->findNote( this );
-    	if (!note) {
-		ch->println("Ты не редактируешь сообщение, копировать нечего.");
-		return;
-	}
+            if (!note) {
+                ch->println("п╒я▀ п╫п╣ я─п╣п╢п╟п╨я┌п╦я─я┐п╣я┬я▄ я│п╬п╬п╠я┴п╣п╫п╦п╣, п╨п╬п©п╦я─п╬п╡п╟я┌я▄ п╫п╣я┤п╣пЁп╬.");
+                return;
+        }
 
         ostringstream buf;
-	note->linesToStream( buf );
-	ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
-	    ->regs[0].split(buf.str( ));
-	ch->println( "Текущее сообщение скопировано в буфер." );
-	return;
+        note->linesToStream( buf );
+        ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
+            ->regs[0].split(buf.str( ));
+        ch->println( "п╒п╣п╨я┐я┴п╣п╣ я│п╬п╬п╠я┴п╣п╫п╦п╣ я│п╨п╬п©п╦я─п╬п╡п╟п╫п╬ п╡ п╠я┐я└п╣я─." );
+        return;
     }
  
     if (arg.isNumber( )) {
-	try {
-	    note = getNoteAtPosition( ch, arg.toInt( ) );
+        try {
+            note = getNoteAtPosition( ch, arg.toInt( ) );
 
-	    if (note) {
-		ostringstream ostr;
-		note->toStream(arg.toInt( ), ostr);
-		ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
-		    ->regs[0].split(ostr.str( ));
-		ch->println( "Ok." );
-	    } else
-		ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
-		
-	} catch (const ExceptionBadType& e) {
-	    ch->println( "Неправильный номер письма." );
-	}
+            if (note) {
+                ostringstream ostr;
+                note->toStream(arg.toInt( ), ostr);
+                ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
+                    ->regs[0].split(ostr.str( ));
+                ch->println( "Ok." );
+            } else
+                ch->pecho( "п╒п╟п╨ п╪п╫п╬пЁп╬ %N2 п╣я┴п╣ п╫п╣ п╫п╟п©п╦я│п╟п╩п╦.", rusNameMlt.c_str( ) );
+                
+        } catch (const ExceptionBadType& e) {
+            ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╫п╬п╪п╣я─ п©п╦я│я▄п╪п╟." );
+        }
     }
     else {
-	ch->println( "Скопировать какой номер?" );
+        ch->println( "п║п╨п╬п©п╦я─п╬п╡п╟я┌я▄ п╨п╟п╨п╬п╧ п╫п╬п╪п╣я─?" );
     }
 }
 
@@ -384,29 +384,29 @@ void NoteThread::doRead( PCharacter *ch, DLString &arguments ) const
     const Note *note;
     DLString arg = arguments.getOneArgument( );
     
-    if (arg.empty( ) || arg_oneof( arg, "next", "следующий", "дальше" )) {
-	note = getNextUnreadNote( ch );
-	
-	if (note) 
-	    showNoteToChar( ch, note );
-	else
-	    ch->pecho( "У тебя нет непрочитанных %N2.", rusNameMlt.c_str( ) );
+    if (arg.empty( ) || arg_oneof( arg, "next", "я│п╩п╣п╢я┐я▌я┴п╦п╧", "п╢п╟п╩я▄я┬п╣" )) {
+        note = getNextUnreadNote( ch );
+        
+        if (note) 
+            showNoteToChar( ch, note );
+        else
+            ch->pecho( "пё я┌п╣п╠я▐ п╫п╣я┌ п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╫я▀я┘ %N2.", rusNameMlt.c_str( ) );
     }
     else if (arg.isNumber( )) {
-	try {
-	    note = getNoteAtPosition( ch, arg.toInt( ) );
+        try {
+            note = getNoteAtPosition( ch, arg.toInt( ) );
 
-	    if (note)
-		showNoteToChar( ch, note );
-	    else
-		ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
-		
-	} catch (const ExceptionBadType& e) {
-	    ch->println( "Неправильный номер письма." );
-	}
+            if (note)
+                showNoteToChar( ch, note );
+            else
+                ch->pecho( "п╒п╟п╨ п╪п╫п╬пЁп╬ %N2 п╣я┴п╣ п╫п╣ п╫п╟п©п╦я│п╟п╩п╦.", rusNameMlt.c_str( ) );
+                
+        } catch (const ExceptionBadType& e) {
+            ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╫п╬п╪п╣я─ п©п╦я│я▄п╪п╟." );
+        }
     }
     else {
-	ch->println( "Прочесть какой номер?" );
+        ch->println( "п÷я─п╬я┤п╣я│я┌я▄ п╨п╟п╨п╬п╧ п╫п╬п╪п╣я─?" );
     }
 }
 
@@ -424,7 +424,7 @@ void NoteThread::doHooksDump( PCharacter *ch, DLString &arguments ) const
         note = getNoteAtPosition( ch, arg.toInt( ) );
 
         if (!note) {
-            ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+            ch->pecho( "п╒п╟п╨ п╪п╫п╬пЁп╬ %N2 п╣я┴п╣ п╫п╣ п╫п╟п©п╦я│п╟п╩п╦.", rusNameMlt.c_str( ) );
             return;
         }
 
@@ -432,7 +432,7 @@ void NoteThread::doHooksDump( PCharacter *ch, DLString &arguments ) const
         ch->println( "Ok." );
             
     } catch (const ExceptionBadType& e) {
-        ch->println( "Неправильный номер письма." );
+        ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╫п╬п╪п╣я─ п©п╦я│я▄п╪п╟." );
     }
 }
 
@@ -444,31 +444,31 @@ void NoteThread::doList( PCharacter *ch, DLString &argument ) const
     time_t stamp = getStamp( ch );
     
     for (i = xnotes.begin( ); i != xnotes.end( ); i++)
-	if ((*i)->isNoteTo( ch ) || (*i)->isNoteFrom( ch ))
-	    mynotes.push_back( *i );
+        if ((*i)->isNoteTo( ch ) || (*i)->isNoteFrom( ch ))
+            mynotes.push_back( *i );
 
     try {
-	int cnt, last = mynotes.size( ) - 1;
-	
-	for (cnt = 0, i = mynotes.begin( ); i != mynotes.end( ); i++, cnt++) {
-	    bool hidden = isNoteHidden( *i, ch, stamp );
+        int cnt, last = mynotes.size( ) - 1;
+        
+        for (cnt = 0, i = mynotes.begin( ); i != mynotes.end( ); i++, cnt++) {
+            bool hidden = isNoteHidden( *i, ch, stamp );
 
-	    if (listfilter_parse( ch, cnt, last, *i, hidden, argument.c_str( ) ))
-		buf << "[" << cnt 
-		    << (hidden ? " " : "N") << "] " 
-		    << (*i)->getFrom( ) << ": " << (*i)->getSubject( ) << "{x" 
-		    << endl;
-	}
+            if (listfilter_parse( ch, cnt, last, *i, hidden, argument.c_str( ) ))
+                buf << "[" << cnt 
+                    << (hidden ? " " : "N") << "] " 
+                    << (*i)->getFrom( ) << ": " << (*i)->getSubject( ) << "{x" 
+                    << endl;
+        }
     }
     catch (const Exception &e) {
-	ch->println( DLString( e.what( ) ) + "" );
-	return;
+        ch->println( DLString( e.what( ) ) + "" );
+        return;
     }
     
     if (buf.str( ).empty( ))
-	ch->println( "Не найдено ни одного сообщения." );
+        ch->println( "п²п╣ п╫п╟п╧п╢п╣п╫п╬ п╫п╦ п╬п╢п╫п╬пЁп╬ я│п╬п╬п╠я┴п╣п╫п╦я▐." );
     else
-	page_to_char( buf.str( ).c_str( ), ch );
+        page_to_char( buf.str( ).c_str( ), ch );
 }
 
 void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
@@ -477,29 +477,29 @@ void NoteThread::doRemove( PCharacter *ch, DLString &arguments )
     DLString arg = arguments.getOneArgument( );
     
     if (!arg.isNumber( )) {
-	ch->println( "Удалить какой номер?" );
-	return;
+        ch->println( "пёп╢п╟п╩п╦я┌я▄ п╨п╟п╨п╬п╧ п╫п╬п╪п╣я─?" );
+        return;
     }
 
     try {
-	note = getNoteAtPosition( ch, arg.toInt( ) );
+        note = getNoteAtPosition( ch, arg.toInt( ) );
 
-	if (note) {
-	    if (ch->get_trust( ) < CREATOR && note->getAuthor( ) != ch->getName( ))
-		ch->println( "Ты не можешь удалить это сообщение, т.к. не являешься его автором." );
-	    else {
-		LogStream::sendNotice( ) 
-		    << getName( ) << " remove: " 
-		    << ch->getName( ) << ", id " << note->getID( ) << endl;
-		remove( note );
-		ch->println( "Ok." );
-	    }
-	}
-	else
-	    ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+        if (note) {
+            if (ch->get_trust( ) < CREATOR && note->getAuthor( ) != ch->getName( ))
+                ch->println( "п╒я▀ п╫п╣ п╪п╬п╤п╣я┬я▄ я┐п╢п╟п╩п╦я┌я▄ я█я┌п╬ я│п╬п╬п╠я┴п╣п╫п╦п╣, я┌.п╨. п╫п╣ я▐п╡п╩я▐п╣я┬я▄я│я▐ п╣пЁп╬ п╟п╡я┌п╬я─п╬п╪." );
+            else {
+                LogStream::sendNotice( ) 
+                    << getName( ) << " remove: " 
+                    << ch->getName( ) << ", id " << note->getID( ) << endl;
+                remove( note );
+                ch->println( "Ok." );
+            }
+        }
+        else
+            ch->pecho( "п╒п╟п╨ п╪п╫п╬пЁп╬ %N2 п╣я┴п╣ п╫п╣ п╫п╟п©п╦я│п╟п╩п╦.", rusNameMlt.c_str( ) );
     } 
     catch (const ExceptionBadType& e) {
-	ch->println( "Неправильный номер письма." );
+        ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╫п╬п╪п╣я─ п©п╦я│я▄п╪п╟." );
     }
 }
 
@@ -511,25 +511,25 @@ void NoteThread::doUncatchup( PCharacter *ch, DLString &arguments ) const
     attr = ch->getAttributes( ).getAttr<XMLAttributeLastRead>( "lastread" );
 
     if (!arg.isNumber( )) {
-	attr->setStamp( this, 0 );
-	ch->printf( "Все %s помечены как непрочитанные.\r\n", nameMlt.getValue( ).c_str( ) );
-	return;
+        attr->setStamp( this, 0 );
+        ch->printf( "п▓я│п╣ %s п©п╬п╪п╣я┤п╣п╫я▀ п╨п╟п╨ п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╫я▀п╣.\r\n", nameMlt.getValue( ).c_str( ) );
+        return;
     }
 
     try {
-	int vnum = arg.toInt( );
-	const Note *note = getNoteAtPosition( ch, vnum );
-	
-	if (note) {
-	    attr->setStamp( this, note->getID( ) );
-	    ch->printf( "Все %s, начиная с номера %d, помечены как непрочитанные.\r\n", 
-			nameMlt.getValue( ).c_str( ), vnum );
-	}
-	else
-	    ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+        int vnum = arg.toInt( );
+        const Note *note = getNoteAtPosition( ch, vnum );
+        
+        if (note) {
+            attr->setStamp( this, note->getID( ) );
+            ch->printf( "п▓я│п╣ %s, п╫п╟я┤п╦п╫п╟я▐ я│ п╫п╬п╪п╣я─п╟ %d, п©п╬п╪п╣я┤п╣п╫я▀ п╨п╟п╨ п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╫я▀п╣.\r\n", 
+                        nameMlt.getValue( ).c_str( ), vnum );
+        }
+        else
+            ch->pecho( "п╒п╟п╨ п╪п╫п╬пЁп╬ %N2 п╣я┴п╣ п╫п╣ п╫п╟п©п╦я│п╟п╩п╦.", rusNameMlt.c_str( ) );
     }
     catch (const ExceptionBadType& e) {
-	ch->println( "Неправильный номер письма." );
+        ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╫п╬п╪п╣я─ п©п╦я│я▄п╪п╟." );
     }
 }
 
@@ -538,11 +538,11 @@ bool NoteThread::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
     XMLNoteData *notedata;
 
     if (!( notedata = attr->findNote( this ) ))
-	return false;
+        return false;
 
     if (notedata->getRecipient( ).empty( )) {
-	echo( ch, msgNoRecepient, "Укажите адресата письма." );
-	return false;
+        echo( ch, msgNoRecepient, "пёп╨п╟п╤п╦я┌п╣ п╟п╢я─п╣я│п╟я┌п╟ п©п╦я│я▄п╪п╟." );
+        return false;
     }
 
     Note note;
@@ -550,11 +550,11 @@ bool NoteThread::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
     note.godsSeeAlways = godsSeeAlways;
     attach( &note );
 
-    echo( ch, msgSent, "Письмо отправлено." );
+    echo( ch, msgSent, "п÷п╦я│я▄п╪п╬ п╬я┌п©я─п╟п╡п╩п╣п╫п╬." );
     notify( ch, note );
     LogStream::sendNotice( ) 
-	<< getName( ) << " post: " 
-	<< ch->getName( ) << ", id " << note.getID( ) << endl;
+        << getName( ) << " post: " 
+        << ch->getName( ) << ", id " << note.getID( ) << endl;
 
     noteHooks->processNoteMessage( *this, note );
     attr->clearNote( this );
@@ -564,21 +564,21 @@ bool NoteThread::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
 bool NoteThread::doFrom( PCharacter *ch, XMLAttributeNoteData::Pointer attr, const DLString &arguments ) const
 {
     if (ch->get_trust( ) >= GOD) {
-	XMLNoteData *note = attr->makeNote( ch, this );
-	DLString arg = arguments;
-	
-	arg = arg.getOneArgument( );
-	arg.colourstrip( );
+        XMLNoteData *note = attr->makeNote( ch, this );
+        DLString arg = arguments;
+        
+        arg = arg.getOneArgument( );
+        arg.colourstrip( );
 
-	if (PCharacterManager::find( arg )) {
-	    ch->println( "Подделка документов запрещена!" );
-	}
-	else {
-	    note->setFrom( arguments );
-	    ch->println( "Ok." );
-	}
+        if (PCharacterManager::find( arg )) {
+            ch->println( "п÷п╬п╢п╢п╣п╩п╨п╟ п╢п╬п╨я┐п╪п╣п╫я┌п╬п╡ п╥п╟п©я─п╣я┴п╣п╫п╟!" );
+        }
+        else {
+            note->setFrom( arguments );
+            ch->println( "Ok." );
+        }
 
-	return true;
+        return true;
     }
 
     return false;
@@ -592,21 +592,21 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
     DLString arg = arguments.getOneArgument( );
     
     if (!arg.isNumber( )) {
-	ch->println( "Перенаправить какой номер?" );
-	return;
+        ch->println( "п÷п╣я─п╣п╫п╟п©я─п╟п╡п╦я┌я▄ п╨п╟п╨п╬п╧ п╫п╬п╪п╣я─?" );
+        return;
     }
 
     try {
-	orig = getNoteAtPosition( ch, arg.toInt( ) );
+        orig = getNoteAtPosition( ch, arg.toInt( ) );
     } 
     catch (const ExceptionBadType& e) {
-	ch->println( "Неправильный номер письма." );
-	return;
+        ch->println( "п²п╣п©я─п╟п╡п╦п╩я▄п╫я▀п╧ п╫п╬п╪п╣я─ п©п╦я│я▄п╪п╟." );
+        return;
     }
 
     if (!orig) {
-	ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
-	return;
+        ch->pecho( "п╒п╟п╨ п╪п╫п╬пЁп╬ %N2 п╣я┴п╣ п╫п╣ п╫п╟п©п╦я│п╟п╩п╦.", rusNameMlt.c_str( ) );
+        return;
     }
 
     note = attr->makeNote( ch, this );
@@ -622,57 +622,57 @@ void NoteThread::notify( PCharacter *ch, const Note &note ) const
     NoteManager::Threads &threads = NoteManager::getThis( )->getThreads( );
 
     for (d = descriptor_list; d; d = d->next) {
-	Object *pager;
-	std::basic_ostringstream<char> buf0;
-	PCharacter *victim;
-	bool fFirst = true;
-	
-	if (d->connected != CON_PLAYING || !d->character)
-	    continue;
+        Object *pager;
+        std::basic_ostringstream<char> buf0;
+        PCharacter *victim;
+        bool fFirst = true;
+        
+        if (d->connected != CON_PLAYING || !d->character)
+            continue;
 
-	victim = d->character->getPC( );
-	
-	if (victim == ch)
-	    continue;
-	
-	if (!canRead( victim ))
-	    continue;
+        victim = d->character->getPC( );
+        
+        if (victim == ch)
+            continue;
+        
+        if (!canRead( victim ))
+            continue;
 
-	if (!note.isNoteTo( victim ))
-	    continue;
-	 
-	if (!( pager = get_pager( victim ) ))
-	    continue;
+        if (!note.isNoteTo( victim ))
+            continue;
+         
+        if (!( pager = get_pager( victim ) ))
+            continue;
 
-	buf0 << "{CТихий голос из $o2: {WУ тебя:";
-	
-	for (i = threads.begin( ); i != threads.end( ); i++) {
-	    const char *c1, *c2, *c5;
-	    const NoteThread &th = **i->second;
-	    int count = th.countSpool( victim );
-	    int gender = th.gender.getValue( );
-	    
-	    if (count > 0) {
-		c1 = (gender == SEX_FEMALE ? "ая" : gender == SEX_MALE ? "ый" : "ое");
-		c2 = (gender == SEX_FEMALE ? "ые" : "ых");
-		c5 = "ых";
-		
-		if (fFirst) 
-		    fFirst = false;
-		else
-		    buf0 << "                                       ";
+        buf0 << "{Cп╒п╦я┘п╦п╧ пЁп╬п╩п╬я│ п╦п╥ $o2: {Wпё я┌п╣п╠я▐:";
+        
+        for (i = threads.begin( ); i != threads.end( ); i++) {
+            const char *c1, *c2, *c5;
+            const NoteThread &th = **i->second;
+            int count = th.countSpool( victim );
+            int gender = th.gender.getValue( );
+            
+            if (count > 0) {
+                c1 = (gender == SEX_FEMALE ? "п╟я▐" : gender == SEX_MALE ? "я▀п╧" : "п╬п╣");
+                c2 = (gender == SEX_FEMALE ? "я▀п╣" : "я▀я┘");
+                c5 = "я▀я┘";
+                
+                if (fFirst) 
+                    fFirst = false;
+                else
+                    buf0 << "                                       ";
 
-		buf0 << " {Y" << count << "{W непрочитанн"
-		     << GET_COUNT(count, c1, c2, c5) << " " 
-		     << GET_COUNT(count, 
-				    russian_case( th.rusName.getValue( ), '1' ),
-				    russian_case( th.rusName.getValue( ), '2' ),
-				    russian_case( th.rusNameMlt.getValue( ), '2' ) )
-		     << " (" << th.name << ").{x" << endl;
-	    }
-	}
-	
-	act_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
+                buf0 << " {Y" << count << "{W п╫п╣п©я─п╬я┤п╦я┌п╟п╫п╫"
+                     << GET_COUNT(count, c1, c2, c5) << " " 
+                     << GET_COUNT(count, 
+                                    russian_case( th.rusName.getValue( ), '1' ),
+                                    russian_case( th.rusName.getValue( ), '2' ),
+                                    russian_case( th.rusNameMlt.getValue( ), '2' ) )
+                     << " (" << th.name << ").{x" << endl;
+            }
+        }
+        
+        act_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
     }
 }
 

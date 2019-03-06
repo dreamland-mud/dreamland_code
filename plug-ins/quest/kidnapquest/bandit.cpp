@@ -31,34 +31,34 @@ bool KidnapBandit::spec_hunt_prince( )
     PCharacter *hero;
 
     if (!IS_AWAKE( ch )) {
-	state = BSTAT_SLEEP;
-	return false;
+        state = BSTAT_SLEEP;
+        return false;
     }
 
     if (ch->fighting) {
-	state = BSTAT_FIGHT;
-	return false;
+        state = BSTAT_FIGHT;
+        return false;
     }
     
     clearLastFought( );
     memoryFought.clear( );
     
     if (!getPrince( ))
-	return true;
+        return true;
     
     if (princeHere( )) {
-	princeAttach( );
-	return false;
+        princeAttach( );
+        return false;
     }
 
     if ((hero = getHeroRoom( )) && IS_AWAKE( hero )) {
-	quest->getScenario( ).actAttackHero( ch, hero );
+        quest->getScenario( ).actAttackHero( ch, hero );
 
-	if (heroAttack( hero )) 
-	    return false;
+        if (heroAttack( hero )) 
+            return false;
     }
    
-    debug( "Буду охотиться на принца." );
+    debug( "п▒я┐п╢я┐ п╬я┘п╬я┌п╦я┌я▄я│я▐ п╫п╟ п©я─п╦п╫я├п╟." );
     princeHunt( );
 
     return true;
@@ -68,24 +68,24 @@ bool KidnapBandit::spec_kidnap( )
 {
 
     if (!IS_AWAKE( ch )) {
-	princeDetach( );
-	state = BSTAT_SLEEP;
-	return false;
+        princeDetach( );
+        state = BSTAT_SLEEP;
+        return false;
     }
 
     if (ch->fighting) {
-	princeDetach( );
-	state = BSTAT_FIGHT;
-	return false;
+        princeDetach( );
+        state = BSTAT_FIGHT;
+        return false;
     }
     
     clearLastFought( );
     memoryFought.clear( );
     
     if (!princeHere( )) {
-	princeDetach( );
-	state = BSTAT_HUNT_PRINCE;
-	return false;
+        princeDetach( );
+        state = BSTAT_HUNT_PRINCE;
+        return false;
     }
     
     princeKidnap( );
@@ -95,13 +95,13 @@ bool KidnapBandit::spec_kidnap( )
 bool KidnapBandit::spec_fight( ) 
 {
     if (!IS_AWAKE( ch )) {
-	state = BSTAT_SLEEP;
-	return false;
+        state = BSTAT_SLEEP;
+        return false;
     }
 
     if (!ch->fighting) {
-	state = BSTAT_HUNT_PRINCE;
-	return false;
+        state = BSTAT_HUNT_PRINCE;
+        return false;
     }
 
     return true;
@@ -110,12 +110,12 @@ bool KidnapBandit::spec_fight( )
 bool KidnapBandit::spec_sleep( ) 
 {
     if (IS_AWAKE( ch )) {
-	if (ch->fighting)
-	    state = BSTAT_FIGHT;
-	else
-	    state = BSTAT_HUNT_PRINCE;
+        if (ch->fighting)
+            state = BSTAT_FIGHT;
+        else
+            state = BSTAT_HUNT_PRINCE;
 
-	return false;
+        return false;
     }
 
     return true;
@@ -124,31 +124,31 @@ bool KidnapBandit::spec_sleep( )
 bool KidnapBandit::spec( ) 
 {
     if (!getQuest( ))
-	return false;
+        return false;
 
     while (true)
-	switch (state.getValue( )) {
-	case BSTAT_HUNT_PRINCE: 
-	    if (spec_hunt_prince( ))
-		return true;
-	    
-	    break;
-	case BSTAT_KIDNAP:      
-	    if (spec_kidnap( ))
-		return true;
-	    
-	    break;
-	case BSTAT_SLEEP:       
-	    if (spec_sleep( ))
-		return true;
-	    
-	    break;
-	case BSTAT_FIGHT:	
-	    if (spec_fight( ))
-		return true;
+        switch (state.getValue( )) {
+        case BSTAT_HUNT_PRINCE: 
+            if (spec_hunt_prince( ))
+                return true;
+            
+            break;
+        case BSTAT_KIDNAP:      
+            if (spec_kidnap( ))
+                return true;
+            
+            break;
+        case BSTAT_SLEEP:       
+            if (spec_sleep( ))
+                return true;
+            
+            break;
+        case BSTAT_FIGHT:        
+            if (spec_fight( ))
+                return true;
 
-	    break;
-	}
+            break;
+        }
 
     return true;
 }
@@ -158,10 +158,10 @@ bool KidnapBandit::spec( )
  */
 void KidnapBandit::fight( Character *victim ) 
 {
-    debug( "Я сражаюсь." );
+    debug( "п╞ я│я─п╟п╤п╟я▌я│я▄." );
 
     if (state == BSTAT_KIDNAP)
-	princeDetach( );
+        princeDetach( );
 
     state = BSTAT_FIGHT;
 
@@ -172,19 +172,19 @@ void KidnapBandit::greet( Character *victim )
 {
     switch (state.getValue( )) {
     case BSTAT_HUNT_PRINCE: 
-	if (ourHero( victim ) && number_percent( ) < 50) /* little surprise */
-	    interpret_fmt( ch, "blackjack %s", victim->getNameP( ) );
-	
-	break;
+        if (ourHero( victim ) && number_percent( ) < 50) /* little surprise */
+            interpret_fmt( ch, "blackjack %s", victim->getNameP( ) );
+        
+        break;
     default:
-	break;
+        break;
     }
 }
 
 bool KidnapBandit::extractNotify( Character *ch, bool fTotal, bool fCount )
 {
     if (ch == prince)
-	prince = NULL;
+        prince = NULL;
 
     return KidnapMobile::extractNotify( ch, fTotal, fCount );
 }
@@ -200,7 +200,7 @@ bool KidnapBandit::ourPrince( Character *mob )
 NPCharacter * KidnapBandit::getPrince( )
 {
     if (!prince) 
-	prince = getPrinceWorld( );
+        prince = getPrinceWorld( );
     
     return prince;
 }
@@ -208,9 +208,9 @@ NPCharacter * KidnapBandit::getPrince( )
 NPCharacter * KidnapBandit::getPrinceWorld( )
 {
     if (getQuest( ))
-	return quest->getMobileWorld<KidnapPrince>( );
+        return quest->getMobileWorld<KidnapPrince>( );
     else
-	return NULL;
+        return NULL;
 }
 
 bool KidnapBandit::princeHere( )
@@ -226,14 +226,14 @@ void KidnapBandit::princeAttach( )
     behavior->state = STAT_KIDNAPPED;
 
     if (prince->master)
-	prince->stop_follower( );
+        prince->stop_follower( );
 
     prince->add_follower( ch );
 
     state = BSTAT_KIDNAP;
     
     if (getQuest( ))
-	quest->getScenario( ).actBeginKidnap( ch, prince );
+        quest->getScenario( ).actBeginKidnap( ch, prince );
 }
 
 void KidnapBandit::princeDetach( ) 
@@ -241,13 +241,13 @@ void KidnapBandit::princeDetach( )
     KidnapPrince::Pointer behavior;
     
     if (!getPrince( ))
-	return;
+        return;
     
     behavior = prince->behavior.getDynamicPointer<KidnapPrince>( );
     behavior->state = STAT_LOST;
 
     if (prince->master)
-	prince->stop_follower( );
+        prince->stop_follower( );
 }
 
 /*
@@ -282,19 +282,19 @@ void KidnapBandit::config( PCharacter *hero )
 bool KidnapBandit::heroAttack( PCharacter *hero )
 {
     if (!hero) {
-	if (!( hero = getHeroRoom( ) ))
-	    return false;
+        if (!( hero = getHeroRoom( ) ))
+            return false;
 
-	if (!IS_AWAKE( hero ))
-	    return false;
+        if (!IS_AWAKE( hero ))
+            return false;
     }
     
-    debug( "Я вижу неспящего героя - ща как дам в дыню!" );
+    debug( "п╞ п╡п╦п╤я┐ п╫п╣я│п©я▐я┴п╣пЁп╬ пЁп╣я─п╬я▐ - я┴п╟ п╨п╟п╨ п╢п╟п╪ п╡ п╢я▀п╫я▌!" );
     multi_hit( ch, hero );
     
     if (!ch->fighting) {
-	debug( "Все это очень хорошо, но сражение не началось!" );
-	return false;
+        debug( "п▓я│п╣ я█я┌п╬ п╬я┤п╣п╫я▄ я┘п╬я─п╬я┬п╬, п╫п╬ я│я─п╟п╤п╣п╫п╦п╣ п╫п╣ п╫п╟я┤п╟п╩п╬я│я▄!" );
+        return false;
     }
     
     state = BSTAT_FIGHT;

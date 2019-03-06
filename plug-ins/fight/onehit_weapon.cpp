@@ -27,8 +27,8 @@
 #include "def.h"
 
 WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary )
-		: Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
-		  OneHit( ch, victim )
+                : Damage( ch, victim, 0, 0, DAMF_WEAPON ), 
+                  OneHit( ch, victim )
 {
     this->secondary = secondary;
     
@@ -43,7 +43,7 @@ void WeaponOneHit::init( )
     wield = get_wield( ch, secondary );
 
     if (wield && wield->item_type != ITEM_WEAPON)
-	wield = NULL;
+        wield = NULL;
 
     weapon_sn = get_weapon_sn( wield );
     weaponSkill = skillManager->find( weapon_sn );
@@ -57,7 +57,7 @@ void WeaponOneHit::init( )
     dam_type = attack_table[attack].damage;
     
     if (dam_type == -1)
-	dam_type = DAM_BASH;
+        dam_type = DAM_BASH;
 }
 
 void WeaponOneHit::calcDamage( )
@@ -65,7 +65,7 @@ void WeaponOneHit::calcDamage( )
     OneHit::calcDamage( );
 
     if (wield)
-	protectMaterial( wield );
+        protectMaterial( wield );
 }
 
 /*-----------------------------------------------------------------------------
@@ -74,23 +74,23 @@ void WeaponOneHit::calcDamage( )
 void WeaponOneHit::damBase( )
 {
     if (weaponSkill)
-	weaponSkill->improve( ch, true, victim, dam_type, dam_flag );
+        weaponSkill->improve( ch, true, victim, dam_type, dam_flag );
 
     if (wield) {
-	dam = dice(wield->value[1], wield->value[2]) * skill / 100;
+        dam = dice(wield->value[1], wield->value[2]) * skill / 100;
 
-	damApplyShield( );
-	damApplySharp( );
+        damApplyShield( );
+        damApplySharp( );
     }
     else if (ch->is_npc( )) {
-	NPCharacter *nch = ch->getNPC();
+        NPCharacter *nch = ch->getNPC();
 
-	dam = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
+        dam = dice(nch->damage[DICE_NUMBER], nch->damage[DICE_TYPE]);
     }
     else
     {
-	dam = number_range( 1 + 4 * skill/100, 
-		            2 * ch->getModifyLevel( ) / 3 * skill/100 );
+        dam = number_range( 1 + 4 * skill/100, 
+                            2 * ch->getModifyLevel( ) / 3 * skill/100 );
     }
 
     damApplyHoly( );
@@ -100,7 +100,7 @@ void WeaponOneHit::damBase( )
 void WeaponOneHit::damApplyShield( )
 {
     if (get_eq_char(ch,wear_shield) == 0) 
-	dam = dam * 21/20;
+        dam = dam * 21/20;
 }
 
 // sharpness!
@@ -108,9 +108,9 @@ void WeaponOneHit::damApplySharp( )
 {
     if (wield && IS_WEAPON_STAT(wield, WEAPON_SHARP))
     {
-	int percent = number_percent();
-	if ( percent <= skill / 8 )
-	    dam = 2 * dam + (dam * 2 * percent / 100);
+        int percent = number_percent();
+        if ( percent <= skill / 8 )
+            dam = 2 * dam + (dam * 2 * percent / 100);
     }
 }
 
@@ -118,31 +118,31 @@ void WeaponOneHit::damApplySharp( )
 void WeaponOneHit::damApplyHoly( )
 {
     if (!IS_GOOD(ch) || !IS_EVIL(victim))
-	return;
+        return;
 
     if (wield && IS_WEAPON_STAT(wield,WEAPON_HOLY) && number_percent( ) < 30) 
     {
-	msgWeaponVict( "{Yó×ÑÝÅÎÎÁÑ ÁÕÒÁ %3$O2 ÐÏÒÁÖÁÅÔ ÔÅÂÑ.{x" );
-	msgWeaponRoom( "{Yó×ÑÝÅÎÎÁÑ ÁÕÒÁ %3$O2 ÐÏÒÁÖÁÅÔ %2$C2.{x" );
-	msgWeaponChar( "{Yó×ÑÝÅÎÎÁÑ ÁÕÒÁ %3$O2 ÐÏÒÁÖÁÅÔ %2$C2.{x" );
-	dam += dam * 120 / 100;
-	return;
+        msgWeaponVict( "{YÐ¡Ð²ÑÑ‰ÐµÐ½Ð½Ð°Ñ Ð°ÑƒÑ€Ð° %3$O2 Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.{x" );
+        msgWeaponRoom( "{YÐ¡Ð²ÑÑ‰ÐµÐ½Ð½Ð°Ñ Ð°ÑƒÑ€Ð° %3$O2 Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ %2$C2.{x" );
+        msgWeaponChar( "{YÐ¡Ð²ÑÑ‰ÐµÐ½Ð½Ð°Ñ Ð°ÑƒÑ€Ð° %3$O2 Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ %2$C2.{x" );
+        dam += dam * 120 / 100;
+        return;
     }
     
     if (number_percent( ) >= gsn_holy_attack->getEffective( ch )) 
-	return;
+        return;
     
     if (wield) {
-	msgWeaponChar( "%3$^O4 × Ô×ÏÉÈ ÒÕËÁÈ ÎÁ ÍÇÎÏ×ÅÎÉÅ ÏËÕÔÙ×ÁÅÔ Ó×ÑÝÅÎÎÁÑ ÁÕÒÁ." );
-	msgWeaponRoom( "%3$^O4 %1$C2 ÎÁ ÍÇÎÏ×ÅÎÉÅ ÏËÕÔÙ×ÁÅÔ Ó×ÑÝÅÎÎÁÑ ÁÕÒÁ." );
-	msgWeaponVict( "%3$^O4 %1$C2 ÎÁ ÍÇÎÏ×ÅÎÉÅ ÏËÕÔÙ×ÁÅÔ Ó×ÑÝÅÎÎÁÑ ÁÕÒÁ." );
+        msgWeaponChar( "%3$^O4 Ð² Ñ‚Ð²Ð¾Ð¸Ñ… Ñ€ÑƒÐºÐ°Ñ… Ð½Ð° Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð¸Ðµ Ð¾ÐºÑƒÑ‚Ñ‹Ð²Ð°ÐµÑ‚ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ð°Ñ Ð°ÑƒÑ€Ð°." );
+        msgWeaponRoom( "%3$^O4 %1$C2 Ð½Ð° Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð¸Ðµ Ð¾ÐºÑƒÑ‚Ñ‹Ð²Ð°ÐµÑ‚ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ð°Ñ Ð°ÑƒÑ€Ð°." );
+        msgWeaponVict( "%3$^O4 %1$C2 Ð½Ð° Ð¼Ð³Ð½Ð¾Ð²ÐµÐ½Ð¸Ðµ Ð¾ÐºÑƒÑ‚Ñ‹Ð²Ð°ÐµÑ‚ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ð°Ñ Ð°ÑƒÑ€Ð°." );
     }
     else {
-	msgWeaponChar( "ô×ÏÉ ÒÕËÉ ÎÁÐÏÌÎÑÀÔÓÑ Ó×ÑÝÅÎÎÏÊ ÓÉÌÏÊ." );
-	msgWeaponRoom( "òÕËÉ %1$C2 ÎÁÐÏÌÎÑÀÔÓÑ Ó×ÑÝÅÎÎÏÊ ÓÉÌÏÊ." );
-	msgWeaponVict( "òÕËÉ %1$C2 ÎÁÐÏÌÎÑÀÔÓÑ Ó×ÑÝÅÎÎÏÊ ÓÉÌÏÊ." );
+        msgWeaponChar( "Ð¢Ð²Ð¾Ð¸ Ñ€ÑƒÐºÐ¸ Ð½Ð°Ð¿Ð¾Ð»Ð½ÑÑŽÑ‚ÑÑ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ð¾Ð¹ ÑÐ¸Ð»Ð¾Ð¹." );
+        msgWeaponRoom( "Ð ÑƒÐºÐ¸ %1$C2 Ð½Ð°Ð¿Ð¾Ð»Ð½ÑÑŽÑ‚ÑÑ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ð¾Ð¹ ÑÐ¸Ð»Ð¾Ð¹." );
+        msgWeaponVict( "Ð ÑƒÐºÐ¸ %1$C2 Ð½Ð°Ð¿Ð¾Ð»Ð½ÑÑŽÑ‚ÑÑ ÑÐ²ÑÑ‰ÐµÐ½Ð½Ð¾Ð¹ ÑÐ¸Ð»Ð¾Ð¹." );
     }
-	
+        
     gsn_holy_attack->improve( ch, true );
     dam += dam / 2;
 }
@@ -152,48 +152,48 @@ void WeaponOneHit::damApplyCounter( )
     int chance;
 
     if (victim->fighting)
-	return;
+        return;
     
     if (IS_AFFECTED(victim, AFF_CHARM))
-	return;
+        return;
     
     if (victim->is_npc( ) 
-	&& victim->getNPC( )->behavior 
-	&& IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
-	return;
+        && victim->getNPC( )->behavior 
+        && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_CLANGUARD)))
+        return;
 
     if (is_safe_nomessage(victim, ch) || is_safe_nomessage(ch,victim))
-	return;
-	
+        return;
+        
     if (victim->position != POS_SITTING && victim->position != POS_STANDING)
-	return;
+        return;
 
     chance = number_percent();
 
     if (ch->is_adrenalined())
-	chance += 25;
+        chance += 25;
     
     chance *= 2;
 
     if (chance <= gsn_counter->getEffective( victim ))
     {
-	gsn_counter->improve( victim, true, ch );
-	act_p("$C1 ÎÁÐÒÁ×ÌÑÅÔ Ô×ÏÊ ÕÄÁÒ ÐÒÏÔÉ× ÔÅÂÑ ÓÁÍÏÇÏ!",ch,0,victim,TO_CHAR,POS_RESTING);
-	act_p("ôÙ ÎÁÐÒÁ×ÌÑÅÛØ ÕÄÁÒ $c2 ÐÒÏÔÉ× $x!",ch,0,victim,TO_VICT,POS_RESTING);
-	act_p("$C1 ×ÏÚ×ÒÁÝÁÅÔ ÕÄÁÒ $c2 ÏÂÒÁÔÎÏ!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        gsn_counter->improve( victim, true, ch );
+        act_p("$C1 Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÑÐµÑ‚ Ñ‚Ð²Ð¾Ð¹ ÑƒÐ´Ð°Ñ€ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð² Ñ‚ÐµÐ±Ñ ÑÐ°Ð¼Ð¾$gÐ³Ð¾|Ð³Ð¾|Ð¹!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("Ð¢Ñ‹ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÑÐµÑˆÑŒ ÑƒÐ´Ð°Ñ€ $c2 Ð¿Ñ€Ð¾Ñ‚Ð¸Ð² $x!",ch,0,victim,TO_VICT,POS_RESTING);
+        act_p("$C1 Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ ÑƒÐ´Ð°Ñ€ $c2 Ð¾Ð±Ñ€Ð°Ñ‚Ð½Ð¾!",ch,0,victim,TO_NOTVICT,POS_RESTING);
 
-	// set fighting state
-	if (ch->fighting == NULL)
-	    ch->fighting = victim ;
-	if (victim->fighting == NULL)
-	    victim->fighting = ch ;
+        // set fighting state
+        if (ch->fighting == NULL)
+            ch->fighting = victim ;
+        if (victim->fighting == NULL)
+            victim->fighting = ch ;
 
-	dam *= 2;
-	killer = victim;
-	victim = ch;
+        dam *= 2;
+        killer = victim;
+        victim = ch;
     }
     else 
-	gsn_counter->improve( victim, false, ch );
+        gsn_counter->improve( victim, false, ch );
 }
 
 /*----------------------------------------------------------------------------
@@ -205,7 +205,7 @@ void WeaponOneHit::priorDamageEffects( )
 
 void WeaponOneHit::postDamageEffects( )
 {
-    damEffectFunkyWeapon( );	
+    damEffectFunkyWeapon( );        
     damEffectFeeble( );
 }
 
@@ -214,100 +214,100 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     int dam;
     
     if (!wield)
-	return;
-	
+        return;
+        
     if (ch->fighting != victim)
-	return;
+        return;
 
     if (IS_WEAPON_STAT(wield,WEAPON_POISON))
     {
-	short level;
-	Affect *poison, af;
+        short level;
+        Affect *poison, af;
 
-	if ( (poison = wield->affected->affect_find(gsn_poison)) == 0 )
-	    level = wield->level;
-	else
-	    level = poison->level;
-	if ( !saves_spell(level / 2,victim,DAM_POISON) )
-	{
-	    msgWeaponVict("ôÙ ÞÕ×ÓÔ×ÕÅÛØ, ËÁË ÑÄ ÒÁÓÐÒÏÓÔÒÁÎÑÅÔÓÑ ÐÏ Ô×ÏÉÍ ×ÅÎÁÍ.");
-	    msgWeaponRoom("%2$^C1 ÏÔÒÁ×ÌÅ%2$GÎÏ|Î|ÎÁ ÑÄÏÍ ÏÔ %3$O2 %1$C2.");
-	    msgWeaponChar("%2$^C1 ÏÔÒÁ×ÌÅ%2$GÎÏ|Î|ÎÁ ÑÄÏÍ ÏÔ %3$O2.");
+        if ( (poison = wield->affected->affect_find(gsn_poison)) == 0 )
+            level = wield->level;
+        else
+            level = poison->level;
+        if ( !saves_spell(level / 2,victim,DAM_POISON) )
+        {
+            msgWeaponVict("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ, ÐºÐ°Ðº ÑÐ´ Ñ€Ð°ÑÐ¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÐµÑ‚ÑÑ Ð¿Ð¾ Ñ‚Ð²Ð¾Ð¸Ð¼ Ð²ÐµÐ½Ð°Ð¼.");
+            msgWeaponRoom("%2$^C1 Ð¾Ñ‚Ñ€Ð°Ð²Ð»Ðµ%2$GÐ½Ð¾|Ð½|Ð½Ð° ÑÐ´Ð¾Ð¼ Ð¾Ñ‚ %3$O2 %1$C2.");
+            msgWeaponChar("%2$^C1 Ð¾Ñ‚Ñ€Ð°Ð²Ð»Ðµ%2$GÐ½Ð¾|Ð½|Ð½Ð° ÑÐ´Ð¾Ð¼ Ð¾Ñ‚ %3$O2.");
 
-	    af.where     = TO_AFFECTS;
-	    af.type      = gsn_poison;
-	    af.level     = level * 3/4;
-	    af.duration  = level / 2;
-	    af.location  = APPLY_STR;
-	    af.modifier  = -1;
-	    af.bitvector = AFF_POISON;
-	    affect_join( victim, &af );
-	}
+            af.where     = TO_AFFECTS;
+            af.type      = gsn_poison;
+            af.level     = level * 3/4;
+            af.duration  = level / 2;
+            af.location  = APPLY_STR;
+            af.modifier  = -1;
+            af.bitvector = AFF_POISON;
+            affect_join( victim, &af );
+        }
 
-	// weaken the poison if it's temporary
-	if ( poison != 0 )
-	{
-	    poison->level = max(0,poison->level - 2);
-	    poison->duration = max(0,poison->duration - 1);
-	    if ( poison->level == 0 || poison->duration == 0 )
-		act_p("ñÄ Ó $o2 ÐÒÏÈÏÄÉÔ.",ch,wield,0,TO_CHAR,POS_RESTING);
-	}
+        // weaken the poison if it's temporary
+        if ( poison != 0 )
+        {
+            poison->level = max(0,poison->level - 2);
+            poison->duration = max(0,poison->duration - 1);
+            if ( poison->level == 0 || poison->duration == 0 )
+                act_p("Ð¯Ð´ Ñ $o2 Ð¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ñ‚.",ch,wield,0,TO_CHAR,POS_RESTING);
+        }
     }
 
     if (IS_WEAPON_STAT(wield,WEAPON_VAMPIRIC))
     {
-	msgWeaponVict("ôÙ ÞÕ×ÓÔ×ÕÅÛØ ËÁË %3$O1 ×ÙÔÑÇÉ×ÁÅÔ ÉÚ ÔÅÂÑ ÖÉÚÎØ.");
-	msgWeaponRoom("%3$^O1 %1$C2 ×ÙÔÑÇÉ×ÁÅÔ ÖÉÚÎØ ÉÚ %2$C2.");
-	msgWeaponChar("%3$^O1 ×ÙÔÑÇÉ×ÁÅÔ ÖÉÚÎØ ÉÚ %2$C2.");
+        msgWeaponVict("Ð¢Ñ‹ Ñ‡ÑƒÐ²ÑÑ‚Ð²ÑƒÐµÑˆÑŒ ÐºÐ°Ðº %3$O1 Ð²Ñ‹Ñ‚ÑÐ³Ð¸Ð²Ð°ÐµÑ‚ Ð¸Ð· Ñ‚ÐµÐ±Ñ Ð¶Ð¸Ð·Ð½ÑŒ.");
+        msgWeaponRoom("%3$^O1 %1$C2 Ð²Ñ‹Ñ‚ÑÐ³Ð¸Ð²Ð°ÐµÑ‚ Ð¶Ð¸Ð·Ð½ÑŒ Ð¸Ð· %2$C2.");
+        msgWeaponChar("%3$^O1 Ð²Ñ‹Ñ‚ÑÐ³Ð¸Ð²Ð°ÐµÑ‚ Ð¶Ð¸Ð·Ð½ÑŒ Ð¸Ð· %2$C2.");
 
-	dam = number_range(1, wield->level / 5 + 1);
-	damage_nocatch(ch,victim,dam,0,DAM_NEGATIVE,false);
-	ch->hit += dam/2;
+        dam = number_range(1, wield->level / 5 + 1);
+        damage_nocatch(ch,victim,dam,0,DAM_NEGATIVE,false);
+        ch->hit += dam/2;
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
     {
-	msgWeaponVict("%3$^O1 ÏÂÖÉÇÁÅÔ ÔÅÂÑ.");
-	msgWeaponRoom("%3$^O1 %1$C2 ÏÂÖÉÇÁÅÔ %2$C4.");
-	msgWeaponChar("%3$^O1 ÏÂÖÉÇÁÅÔ %2$C4.");
+        msgWeaponVict("%3$^O1 Ð¾Ð±Ð¶Ð¸Ð³Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ.");
+        msgWeaponRoom("%3$^O1 %1$C2 Ð¾Ð±Ð¶Ð¸Ð³Ð°ÐµÑ‚ %2$C4.");
+        msgWeaponChar("%3$^O1 Ð¾Ð±Ð¶Ð¸Ð³Ð°ÐµÑ‚ %2$C4.");
 
-	dam = number_range(1,wield->level / 4 + 1);
-	fire_effect( (void *) victim,wield->level/2,dam,TARGET_CHAR);
-	damage_nocatch(ch,victim,dam,0,DAM_FIRE,false);
+        dam = number_range(1,wield->level / 4 + 1);
+        fire_effect( (void *) victim,wield->level/2,dam,TARGET_CHAR);
+        damage_nocatch(ch,victim,dam,0,DAM_FIRE,false);
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FROST) )
     {
-	msgWeaponVict("ìÅÄÑÎÏÅ ÐÒÉËÏÓÎÏ×ÅÎÉÅ %3$O2 ÏÂÍÏÒÁÖÉ×ÁÅÔ ÔÅÂÑ, ÐÏËÒÙ×ÁÑ ÌØÄÏÍ.");
-	msgWeaponRoom("%3$^O1 %1$C2 ÏÂÍÏÒÁÖÉ×ÁÅÔ %2$C4.");
-	msgWeaponChar("%3$^O1 ÏÂÍÏÒÁÖÉ×ÁÅÔ %2$C4.");
+        msgWeaponVict("Ð›ÐµÐ´ÑÐ½Ð¾Ðµ Ð¿Ñ€Ð¸ÐºÐ¾ÑÐ½Ð¾Ð²ÐµÐ½Ð¸Ðµ %3$O2 Ð¾Ð±Ð¼Ð¾Ñ€Ð°Ð¶Ð¸Ð²Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ, Ð¿Ð¾ÐºÑ€Ñ‹Ð²Ð°Ñ Ð»ÑŒÐ´Ð¾Ð¼.");
+        msgWeaponRoom("%3$^O1 %1$C2 Ð¾Ð±Ð¼Ð¾Ñ€Ð°Ð¶Ð¸Ð²Ð°ÐµÑ‚ %2$C4.");
+        msgWeaponChar("%3$^O1 Ð¾Ð±Ð¼Ð¾Ñ€Ð°Ð¶Ð¸Ð²Ð°ÐµÑ‚ %2$C4.");
 
-	dam = number_range(1,wield->level / 6 + 2);
-	cold_effect(victim,wield->level/2,dam,TARGET_CHAR);
-	damage_nocatch(ch,victim,dam,0,DAM_COLD,false);
+        dam = number_range(1,wield->level / 6 + 2);
+        cold_effect(victim,wield->level/2,dam,TARGET_CHAR);
+        damage_nocatch(ch,victim,dam,0,DAM_COLD,false);
     }
     if (IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
     {
-	msgWeaponVict("ôÙ ÐÏÒÁÖÅ%2$GÎÏ|Î|ÎÁ ÒÁÚÒÑÄÏÍ %3$O2.");
-	msgWeaponRoom("%2$^C1 ÐÏÒÁÖÅ%2$GÎÏ|Î|ÎÁ ÒÁÚÒÑÄÏÍ %3$O2 %1$C2.");
-	msgWeaponChar("%2$^C1 ÐÏÒÁÖÅ%2$GÎÏ|Î|ÎÁ ÒÁÚÒÑÄÏÍ %3$O2.");
+        msgWeaponVict("Ð¢Ñ‹ Ð¿Ð¾Ñ€Ð°Ð¶Ðµ%2$GÐ½Ð¾|Ð½|Ð½Ð° Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ %3$O2.");
+        msgWeaponRoom("%2$^C1 Ð¿Ð¾Ñ€Ð°Ð¶Ðµ%2$GÐ½Ð¾|Ð½|Ð½Ð° Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ %3$O2 %1$C2.");
+        msgWeaponChar("%2$^C1 Ð¿Ð¾Ñ€Ð°Ð¶Ðµ%2$GÐ½Ð¾|Ð½|Ð½Ð° Ñ€Ð°Ð·Ñ€ÑÐ´Ð¾Ð¼ %3$O2.");
 
-	dam = number_range(1,wield->level/5 + 2);
-	shock_effect(victim,wield->level/2,dam,TARGET_CHAR);
-	damage_nocatch(ch,victim,dam,0,DAM_LIGHTNING,false);
+        dam = number_range(1,wield->level/5 + 2);
+        shock_effect(victim,wield->level/2,dam,TARGET_CHAR);
+        damage_nocatch(ch,victim,dam,0,DAM_LIGHTNING,false);
     }
     
     if (IS_WEAPON_STAT(wield, WEAPON_SPELL)) {
-	Affect *waf;
-	int lvl;
+        Affect *waf;
+        int lvl;
 
-	for (waf = wield->affected; waf; waf = waf->next) 
-	    if (IS_SET( waf->bitvector, WEAPON_SPELL ) 
-		&& waf->where == TO_WEAPON
-		&& number_range( 1, waf->modifier ) == 1) 
-	    {
-		act_p("$o1 ÑÒËÏ ×ÓÐÙÈÉ×ÁÅÔ!", ch, wield, 0, TO_ALL, POS_RESTING);
-		lvl = std::min(ch->getModifyLevel(), waf->level);
-		spell( waf->type, lvl, ch, victim );
-	    }
+        for (waf = wield->affected; waf; waf = waf->next) 
+            if (IS_SET( waf->bitvector, WEAPON_SPELL ) 
+                && waf->where == TO_WEAPON
+                && number_range( 1, waf->modifier ) == 1) 
+            {
+                act_p("$o1 ÑÑ€ÐºÐ¾ Ð²ÑÐ¿Ñ‹Ñ…Ð¸Ð²Ð°ÐµÑ‚!", ch, wield, 0, TO_ALL, POS_RESTING);
+                lvl = std::min(ch->getModifyLevel(), waf->level);
+                spell( waf->type, lvl, ch, victim );
+            }
     }
 }
 
@@ -316,28 +316,28 @@ void WeaponOneHit::damEffectFeeble( )
     int d;
     
     if (!victim->isAffected(gsn_black_feeble ))
-	return;
+        return;
     
     d = number_percent( );
     if (d >= gsn_black_feeble->getEffective( victim ))
-	return;
+        return;
     
     if (d >= (IS_GOOD(ch) ? 15 : 7))
-	return;
+        return;
    
     SET_BIT( ch->affected_by, AFF_WEAK_STUN );
-    act("{DþÅÒÎÁÑ ÎÅÍÏÝØ{x ÐÏÒÁÖÁÅÔ Ô×ÏÀ ÒÕËÕ!", ch, 0, 0, TO_CHAR);
-    act("{DþÅÒÎÁÑ ÎÅÍÏÝØ{x ÐÏÒÁÖÁÅÔ ÒÕËÕ $c2!", ch, 0, 0, TO_ROOM);
+    act("{DÐ§ÐµÑ€Ð½Ð°Ñ Ð½ÐµÐ¼Ð¾Ñ‰ÑŒ{x Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ Ñ‚Ð²Ð¾ÑŽ Ñ€ÑƒÐºÑƒ!", ch, 0, 0, TO_CHAR);
+    act("{DÐ§ÐµÑ€Ð½Ð°Ñ Ð½ÐµÐ¼Ð¾Ñ‰ÑŒ{x Ð¿Ð¾Ñ€Ð°Ð¶Ð°ÐµÑ‚ Ñ€ÑƒÐºÑƒ $c2!", ch, 0, 0, TO_ROOM);
 
     if (wield && !IS_OBJ_STAT(wield, ITEM_NOREMOVE)) {
-	act("ôÙ ÐÁÒÁÌÉÚÏ×Á$gÎÏ|Î|ÎÁ É ÒÏÎÑÅÛØ ÏÒÕÖÉÅ!", ch, 0, 0, TO_CHAR);
-	
-	obj_from_char( wield );
+        act("Ð¢Ñ‹ Ð¿Ð°Ñ€Ð°Ð»Ð¸Ð·Ð¾Ð²Ð°$gÐ½Ð¾|Ð½|Ð½Ð° Ð¸ Ñ€Ð¾Ð½ÑÐµÑˆÑŒ Ð¾Ñ€ÑƒÐ¶Ð¸Ðµ!", ch, 0, 0, TO_CHAR);
+        
+        obj_from_char( wield );
 
-	if (IS_OBJ_STAT(wield, ITEM_NODROP) || IS_OBJ_STAT(wield, ITEM_INVENTORY))
-	    obj_to_char( wield, ch );
-	else
-	    obj_to_room( wield, ch->in_room );
+        if (IS_OBJ_STAT(wield, ITEM_NODROP) || IS_OBJ_STAT(wield, ITEM_INVENTORY))
+            obj_to_char( wield, ch );
+        else
+            obj_to_room( wield, ch->in_room );
     }
     
     ch->setWaitViolence( 1 );

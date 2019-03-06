@@ -15,18 +15,19 @@ extern "C"
 {
     SO::PluginList initialize_services_misc( )
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MocRegistrator<HorseshoeSmithService> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<AlignSmithService> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<BurnproofSmithService> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<SharpSmithService> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Smithman> >( ppl );
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MocRegistrator<HorseshoeSmithService> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<AlignSmithService> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<BurnproofSmithService> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<SharpSmithService> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Smithman> >( ppl );
 
-	Plugin::registerPlugin<MocRegistrator<SpellHealService> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ManaHealService> >( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<Healer> >( ppl );
-	
-	return ppl;
+        Plugin::registerPlugin<MocRegistrator<SpellHealService> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ManaHealService> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<CustomHealPrice> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<Healer> >( ppl );
+        
+        return ppl;
     }
 }

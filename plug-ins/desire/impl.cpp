@@ -16,16 +16,16 @@ extern "C"
 {
     SO::PluginList initialize_desire( ) 
     {
-	SO::PluginList ppl;
-	
-	Plugin::registerPlugin<MocRegistrator<BloodlustDesire> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<ThirstDesire> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<HungerDesire> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<FullDesire> >( ppl );
-	Plugin::registerPlugin<MocRegistrator<DrunkDesire> >( ppl );
-	Plugin::registerPlugin<DesireLoader>( ppl );
-	
-	return ppl;
+        SO::PluginList ppl;
+        
+        Plugin::registerPlugin<MocRegistrator<BloodlustDesire> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<ThirstDesire> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<HungerDesire> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<FullDesire> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<DrunkDesire> >( ppl );
+        Plugin::registerPlugin<DesireLoader>( ppl );
+        
+        return ppl;
     }
 }
 

@@ -42,46 +42,46 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     mode = number_range( -1, 3 );
 
     if (rated_as_newbie( pch ))
-	mode = std::min( mode.getValue( ), 1 );
+        mode = std::min( mode.getValue( ), 1 );
     else if (rated_as_guru( pch ))
-	mode = std::max( mode.getValue( ), 1 );
+        mode = std::max( mode.getValue( ), 1 );
 
     try {
-	item = getRandomItem( pch );
-	victim = item->carried_by->getNPC( );
-	thief = getRandomVictim( pch );
+        item = getRandomItem( pch );
+        victim = item->carried_by->getNPC( );
+        thief = getRandomVictim( pch );
     
-	if (rated_as_newbie( pch )
-	    || (rated_as_expert( pch ) && chance( 50 ))
-	    || (rated_as_guru( pch ) && chance( 20 )))
-	{
-	    key = chest = NULL;
-	    hideaway = NULL;
-	}
-	else {
-	    chest = createItem<HiddenChest>( reg->chests.randomVnum( ) );
-	    fillChest( pch, chest );
-	    key = createItem<LockPick>( chest->value[2] );
-	    hideaway = findHideaway( pch, thief );
-	}
-	
-	if (!isMobileVisible( thief, pch ) || !isMobileVisible( victim, pch ))
-	    mode++;
-	    
-	if (!isItemVisible( item, pch ))
-	    mode++;
-	
-	if ((rated_as_guru( pch ) && mode < 2) 
+        if (rated_as_newbie( pch )
+            || (rated_as_expert( pch ) && chance( 50 ))
+            || (rated_as_guru( pch ) && chance( 20 )))
+        {
+            key = chest = NULL;
+            hideaway = NULL;
+        }
+        else {
+            chest = createItem<HiddenChest>( reg->chests.randomVnum( ) );
+            fillChest( pch, chest );
+            key = createItem<LockPick>( chest->value[2] );
+            hideaway = findHideaway( pch, thief );
+        }
+        
+        if (!isMobileVisible( thief, pch ) || !isMobileVisible( victim, pch ))
+            mode++;
+            
+        if (!isItemVisible( item, pch ))
+            mode++;
+        
+        if ((rated_as_guru( pch ) && mode < 2) 
                 || (rated_as_newbie( pch ) && mode > 1))
-	    throw QuestCannotStartException( );
+            throw QuestCannotStartException( );
 
-	MobileQuestModel::assign<Robber>( thief );
-	MobileQuestModel::assign<RobbedVictim>( victim ); 
-	ItemQuestModel::assign<RobbedItem>( item );
+        MobileQuestModel::assign<Robber>( thief );
+        MobileQuestModel::assign<RobbedVictim>( victim ); 
+        ItemQuestModel::assign<RobbedItem>( item );
 
     } catch (const QuestCannotStartException &e) {
-	destroy( );
-	throw e;
+        destroy( );
+        throw e;
     }
 
     name = victim->getShortDescr( );
@@ -104,42 +104,42 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
     obj_from_char( item );
 
     if (chest) {
-	obj_to_obj_random( item, chest );
-	obj_to_room( chest, hideaway );
-	obj_to_char( key, thief );
+        obj_to_obj_random( item, chest );
+        obj_to_room( chest, hideaway );
+        obj_to_char( key, thief );
     }
     else 
-	obj_to_char( item, thief );
+        obj_to_char( item, thief );
     
 
     time = number_fuzzy( 10 );
     setTime( pch, time );
     
-    tell_raw( pch, questman, "õ ÍÅÎÑ ÅÓÔØ ÄÌÑ ÔÅÂÑ ÓÒÏÞÎÏÅ ÐÏÒÕÞÅÎÉÅ!" );
+    tell_raw( pch, questman, "Ð£ Ð¼ÐµÐ½Ñ ÐµÑÑ‚ÑŒ Ð´Ð»Ñ Ñ‚ÐµÐ±Ñ ÑÑ€Ð¾Ñ‡Ð½Ð¾Ðµ Ð¿Ð¾Ñ€ÑƒÑ‡ÐµÐ½Ð¸Ðµ!" );
     
     switch (number_range( 1, 3 )) {
-    case 1:  tell_fmt( "{W%3$#^C4{G ÏÂ×ÏÒÏ×ÁÌÉ, %3$P1 ÐÒÏÓÉÔ ÐÏÍÏÞØ × ÐÏÉÍËÅ ÎÅÇÏÄÑÅ×.", 
+    case 1:  tell_fmt( "{W%3$#^C4{G Ð¾Ð±Ð²Ð¾Ñ€Ð¾Ð²Ð°Ð»Ð¸, %3$P1 Ð¿Ñ€Ð¾ÑÐ¸Ñ‚ Ð¿Ð¾Ð¼Ð¾Ñ‡ÑŒ Ð² Ð¿Ð¾Ð¸Ð¼ÐºÐµ Ð½ÐµÐ³Ð¾Ð´ÑÐµÐ².", 
                         pch, questman, victim );
-	     break;
-    case 2:  tell_fmt( "{W%3$#^C1{G ÓÔÁ%3$GÌÏ|Ì|ÌÁ ÖÅÒÔ×ÏÊ ÇÒÁÂÉÔÅÌÅÊ É ÐÒÏÓÉÔ ×ÅÒÎÕÔØ ÕËÒÁÄÅÎÎÕÀ ×ÅÝØ.", 
+             break;
+    case 2:  tell_fmt( "{W%3$#^C1{G ÑÑ‚Ð°%3$GÐ»Ð¾|Ð»|Ð»Ð° Ð¶ÐµÑ€Ñ‚Ð²Ð¾Ð¹ Ð³Ñ€Ð°Ð±Ð¸Ñ‚ÐµÐ»ÐµÐ¹ Ð¸ Ð¿Ñ€Ð¾ÑÐ¸Ñ‚ Ð²ÐµÑ€Ð½ÑƒÑ‚ÑŒ ÑƒÐºÑ€Ð°Ð´ÐµÐ½Ð½ÑƒÑŽ Ð²ÐµÑ‰ÑŒ.", 
                         pch, questman, victim );
-	     break;
-    case 3:  tell_fmt( "÷ÏÒÙ ÏÇÒÁÂÉÌÉ {W%3$#C4{G, É ÔÅÐÅÒØ %3$P1 ÎÕÖÄÁÅÔÓÑ × Ô×ÏÅÊ ÐÏÍÏÝÉ.", 
+             break;
+    case 3:  tell_fmt( "Ð’Ð¾Ñ€Ñ‹ Ð¾Ð³Ñ€Ð°Ð±Ð¸Ð»Ð¸ {W%3$#C4{G, Ð¸ Ñ‚ÐµÐ¿ÐµÑ€ÑŒ %3$P1 Ð½ÑƒÐ¶Ð´Ð°ÐµÑ‚ÑÑ Ð² Ñ‚Ð²Ð¾ÐµÐ¹ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸.", 
                         pch, questman, victim );
-	     break;
+             break;
     }
 
-    tell_raw( pch, questman, "ðÏÓÔÒÁÄÁ×ÛÅÇÏ ÉÝÉ × ÒÁÊÏÎÅ {W%s{G ({W%s{G).", 
+    tell_raw( pch, questman, "ÐŸÐ¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð²ÑˆÐµÐ³Ð¾ Ð¸Ñ‰Ð¸ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ {W%s{G ({W%s{G).", 
                   victim->in_room->name, victim->in_room->area->name );
-    tell_fmt("õ ÔÅÂÑ ÅÓÔØ {Y%3$d{G ÍÉÎÕ%3$IÔÁ|ÔÙ|Ô, ÞÔÏÂÙ ÄÏÂÒÁÔØÓÑ ÔÕÄÁ É ÕÚÎÁÔØ ÐÏÄÒÏÂÎÏÓÔÉ.", 
+    tell_fmt("Ð£ Ñ‚ÐµÐ±Ñ ÐµÑÑ‚ÑŒ {Y%3$d{G Ð¼Ð¸Ð½Ñƒ%3$IÑ‚Ð°|Ñ‚Ñ‹|Ñ‚, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ñ‚ÑƒÐ´Ð° Ð¸ ÑƒÐ·Ð½Ð°Ñ‚ÑŒ Ð¿Ð¾Ð´Ñ€Ð¾Ð±Ð½Ð¾ÑÑ‚Ð¸.", 
               pch, questman, time );
     
     wiznet( "", "thief [%s] [%d], obj [%s], victim [%s] [%d], chest [%d], mode %d",
-		thief->getNameP( '1' ).c_str(), thief->in_room->vnum,
-		item->getShortDescr( '1' ).c_str( ),
-		victim->getNameP( '1' ).c_str(), victim->in_room->vnum,
-		(hideaway ? hideaway->vnum : 0),
-		mode.getValue( ) );
+                thief->getNameP( '1' ).c_str(), thief->in_room->vnum,
+                item->getShortDescr( '1' ).c_str( ),
+                victim->getNameP( '1' ).c_str(), victim->in_room->vnum,
+                (hideaway ? hideaway->vnum : 0),
+                mode.getValue( ) );
 }
 
 void StealQuest::clear( Object *obj )
@@ -147,14 +147,14 @@ void StealQuest::clear( Object *obj )
     ItemQuestModel::clear( obj );
     
     if (obj) {
-	if (obj->carried_by 
-	    && obj->carried_by->is_npc( )
-	    && victimName ^ obj->carried_by->getNPC( )->getShortDescr( ))
-	{
-	    save_mobs( obj->carried_by->in_room );
-	}
-	else
-	    extract_obj( obj );
+        if (obj->carried_by 
+            && obj->carried_by->is_npc( )
+            && victimName ^ obj->carried_by->getNPC( )->getShortDescr( ))
+        {
+            save_mobs( obj->carried_by->in_room );
+        }
+        else
+            extract_obj( obj );
     }
 }
 
@@ -181,22 +181,22 @@ Quest::Reward::Pointer StealQuest::reward( PCharacter *ch, NPCharacter *questman
     }
     
     if (!chestRoom.getValue( ).empty( ))
-	r->points += number_fuzzy( 10 );
+        r->points += number_fuzzy( 10 );
     else    
-	r->points += number_fuzzy( 3 );
-	
+        r->points += number_fuzzy( 3 );
+        
     r->points -= hint * 5;
     r->gold = number_fuzzy( r->points );
     r->wordChance = r->points;
     r->scrollChance = number_range( 5, mode * 4 );
 
     if (chance( mode ))
-	r->prac = number_range( 1, 3 );
+        r->prac = number_range( 1, 3 );
     
     if (ch->getClan( )->isDispersed( )) 
-	r->points *= 2;
+        r->points *= 2;
     else
-	r->clanpoints = r->points;
+        r->clanpoints = r->points;
     
     r->points = std::max( 5, r->points );
     r->clanpoints = std::max( 0, r->clanpoints );
@@ -209,30 +209,30 @@ void StealQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << "õ " << russian_case( victimName, '2' ) << " ËÁËÉÅ-ÔÏ ÎÅÐÒÉÑÔÎÏÓÔÉ." << endl
-	    << "ðÏÓÔÒÁÄÁ×ÛÉÊ ÖÄÅÔ ÔÅÂÑ × ÒÁÊÏÎÅ '" 
-	    << victimRoom << "' (" << victimArea << ")." << endl;
-	break;
+        buf << "Ð£ " << russian_case( victimName, '2' ) << " ÐºÐ°ÐºÐ¸Ðµ-Ñ‚Ð¾ Ð½ÐµÐ¿Ñ€Ð¸ÑÑ‚Ð½Ð¾ÑÑ‚Ð¸." << endl
+            << "ÐŸÐ¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð²ÑˆÐ¸Ð¹ Ð¶Ð´ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ '" 
+            << victimRoom << "' (" << victimArea << ")." << endl;
+        break;
 
     case QSTAT_HUNT_ROBBER:
-	buf << "ôÅÂÅ ÓÔÁÌÏ ÉÚ×ÅÓÔÎÏ, ÞÔÏ Õ " << russian_case( victimName, '2' ) 
-	    << " ÕËÒÁÌÉ " << russian_case( itemName, '4' ) << ". " << endl
-	    << "÷ÏÒ - " << russian_case( thiefName, '1' ) 
-	    << ", ÓËÏÒÅÅ ×ÓÅÇÏ ÓËÒÙ×ÁÅÔÓÑ × ÒÁÊÏÎÅ '" << thiefRoom << "' (" << thiefArea << ")." << endl;
+        buf << "Ð¢ÐµÐ±Ðµ ÑÑ‚Ð°Ð»Ð¾ Ð¸Ð·Ð²ÐµÑÑ‚Ð½Ð¾, Ñ‡Ñ‚Ð¾ Ñƒ " << russian_case( victimName, '2' ) 
+            << " ÑƒÐºÑ€Ð°Ð»Ð¸ " << russian_case( itemName, '4' ) << ". " << endl
+            << "Ð’Ð¾Ñ€ - " << russian_case( thiefName, '1' ) 
+            << ", ÑÐºÐ¾Ñ€ÐµÐµ Ð²ÑÐµÐ³Ð¾ ÑÐºÑ€Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ð² Ñ€Ð°Ð¹Ð¾Ð½Ðµ '" << thiefRoom << "' (" << thiefArea << ")." << endl;
 
-	    if (!chestRoom.getValue( ).empty( ))
-		buf << "ðÏ ÓÌÕÈÁÍ, ÎÁÇÒÁÂÌÅÎÎÏÅ ÄÏÂÒÏ ÓÐÒÑÔÁÎÏ ÇÄÅ-ÔÏ ÏËÏÌÏ '" << chestRoom << "'" 
-		    << ", ËÌÀÞ ÏÔ ÎÙÞËÉ ÉÝÉ Õ ×ÏÒÁ." << endl;
+            if (!chestRoom.getValue( ).empty( ))
+                buf << "ÐŸÐ¾ ÑÐ»ÑƒÑ…Ð°Ð¼, Ð½Ð°Ð³Ñ€Ð°Ð±Ð»ÐµÐ½Ð½Ð¾Ðµ Ð´Ð¾Ð±Ñ€Ð¾ ÑÐ¿Ñ€ÑÑ‚Ð°Ð½Ð¾ Ð³Ð´Ðµ-Ñ‚Ð¾ Ð¾ÐºÐ¾Ð»Ð¾ '" << chestRoom << "'" 
+                    << ", ÐºÐ»ÑŽÑ‡ Ð¾Ñ‚ Ð½Ñ‹Ñ‡ÐºÐ¸ Ð¸Ñ‰Ð¸ Ñƒ Ð²Ð¾Ñ€Ð°." << endl;
 
-	    buf << "ðÏÓÔÒÁÄÁ×ÛÉÊ ÖÄÅÔ ÔÅÂÑ ÏËÏÌÏ '" 
-	        << victimRoom << "' (" << victimArea << ")." << endl;
+            buf << "ÐŸÐ¾ÑÑ‚Ñ€Ð°Ð´Ð°Ð²ÑˆÐ¸Ð¹ Ð¶Ð´ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð¾ÐºÐ¾Ð»Ð¾ '" 
+                << victimRoom << "' (" << victimArea << ")." << endl;
 
-	break;
+        break;
 
     case QSTAT_FINISHED:
-	buf << "ô×ÏÅ ÚÁÄÁÎÉÅ ×ÙÐÏÌÎÅÎÏ!" << endl
-	    << "÷ÅÒÎÉÓØ ÚÁ ×ÏÚÎÁÇÒÁÖÄÅÎÉÅÍ ÄÏ ÔÏÇÏ, ËÁË ×ÙÊÄÅÔ ×ÒÅÍÑ." << endl;
-	break;
+        buf << "Ð¢Ð²Ð¾Ðµ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¾!" << endl
+            << "Ð’ÐµÑ€Ð½Ð¸ÑÑŒ Ð·Ð° Ð²Ð¾Ð·Ð½Ð°Ð³Ñ€Ð°Ð¶Ð´ÐµÐ½Ð¸ÐµÐ¼ Ð´Ð¾ Ñ‚Ð¾Ð³Ð¾, ÐºÐ°Ðº Ð²Ñ‹Ð¹Ð´ÐµÑ‚ Ð²Ñ€ÐµÐ¼Ñ." << endl;
+        break;
     }
 }
 
@@ -240,24 +240,24 @@ void StealQuest::shortInfo( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "õÚÎÁÔØ, ÞÔÏ ÓÌÕÞÉÌÏÓØ Õ " << russian_case( victimName, '2') << " × "
+        buf << "Ð£Ð·Ð½Ð°Ñ‚ÑŒ, Ñ‡Ñ‚Ð¾ ÑÐ»ÑƒÑ‡Ð¸Ð»Ð¾ÑÑŒ Ñƒ " << russian_case( victimName, '2') << " Ð² "
             << victimRoom << " (" << victimArea << ").";
-	break;
+        break;
 
     case QSTAT_HUNT_ROBBER:
-        buf << "÷ÅÒÎÕÔØ " << russian_case( itemName, '4' ) << " " << russian_case( victimName, '3' ) << ". "
-            << "÷ÏÒ, " << russian_case( thiefName, '1' ) << ", ÓËÒÙ×ÁÅÔÓÑ × " 
+        buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒ " << russian_case( itemName, '4' ) << " " << russian_case( victimName, '3' ) << ". "
+            << "Ð’Ð¾Ñ€, " << russian_case( thiefName, '1' ) << ", ÑÐºÑ€Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ð² " 
             << thiefRoom << " (" << thiefArea << ")";
 
-	    if (!chestRoom.getValue( ).empty( ))
-                buf << ", ÎÁÇÒÁÂÌÅÎÎÏÅ ÐÒÑÞÅÔ ÏËÏÌÏ " << chestRoom << ".";
+            if (!chestRoom.getValue( ).empty( ))
+                buf << ", Ð½Ð°Ð³Ñ€Ð°Ð±Ð»ÐµÐ½Ð½Ð¾Ðµ Ð¿Ñ€ÑÑ‡ÐµÑ‚ Ð¾ÐºÐ¾Ð»Ð¾ " << chestRoom << ".";
             else 
                 buf << ".";
-	break;
+        break;
 
     case QSTAT_FINISHED:
-	buf << "÷ÅÒÎÕÔØÓÑ Ë Ë×ÅÓÔÏÒÕ ÚÁ ÎÁÇÒÁÄÏÊ.";
-	break;
+        buf << "Ð’ÐµÑ€Ð½ÑƒÑ‚ÑŒÑÑ Ðº ÐºÐ²ÐµÑÑ‚Ð¾Ñ€Ñƒ Ð·Ð° Ð½Ð°Ð³Ñ€Ð°Ð´Ð¾Ð¹.";
+        break;
     }
 }
 
@@ -270,14 +270,14 @@ void StealQuest::helpMessage( ostringstream &buf )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	buf << "äÏ " << russian_case( victimName, '2' )
-	    << " ÔÙ ÍÏÖÅÛØ ÄÏÂÒÁÔØÓÑ, ÓÌÅÄÕÑ ÐÏ ÔÁËÏÍÕ ÐÕÔÉ: ";
-	break;
+        buf << "Ð”Ð¾ " << russian_case( victimName, '2' )
+            << " Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ, ÑÐ»ÐµÐ´ÑƒÑ Ð¿Ð¾ Ñ‚Ð°ÐºÐ¾Ð¼Ñƒ Ð¿ÑƒÑ‚Ð¸: ";
+        break;
 
     case QSTAT_HUNT_ROBBER:
-	buf << "ôÙ ÍÏÖÅÛØ ÏÔÙÓËÁÔØ " << russian_case( thiefName, '4' )
-	    << ", ÓÌÅÄÕÑ ÐÏ ÔÁËÏÍÕ ÐÕÔÉ: ";
-	break;
+        buf << "Ð¢Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¾Ñ‚Ñ‹ÑÐºÐ°Ñ‚ÑŒ " << russian_case( thiefName, '4' )
+            << ", ÑÐ»ÐµÐ´ÑƒÑ Ð¿Ð¾ Ñ‚Ð°ÐºÐ¾Ð¼Ñƒ Ð¿ÑƒÑ‚Ð¸: ";
+        break;
     }
 }
 
@@ -285,10 +285,10 @@ Room * StealQuest::helpLocation( )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-	return findMobileRoom<RobbedVictim>( );
-	
+        return findMobileRoom<RobbedVictim>( );
+        
     case QSTAT_HUNT_ROBBER:
-	return findMobileRoom<Robber>( );
+        return findMobileRoom<Robber>( );
     }
 
     return NULL;
@@ -299,15 +299,15 @@ bool StealQuest::checkItem( PCharacter *pch, Object *obj )
     NPCharacter *victim;
 
     if (!obj->carried_by || !obj->carried_by->is_npc( ))
-	return false;
+        return false;
     
     victim = obj->carried_by->getNPC( );
     
     if (!checkMobileClient( pch, victim ))
-	return false;
+        return false;
     
     if (!victim->can_see( obj ))
-	return false;
+        return false;
 
     return ItemQuestModel::checkItem( pch, obj );
 }
@@ -317,22 +317,22 @@ bool StealQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
     int level_diff, min_diff;
 
     if (!VictimQuestModel::checkMobileVictim( pch, mob )) 
-	return false;
+        return false;
 
     if (mob->in_room->area == item->carried_by->in_room->area)
-	return false;;
+        return false;;
 
     level_diff = mob->getRealLevel( ) - pch->getModifyLevel( );
     min_diff = (mob->getRealLevel( ) < 50 ? -10 : -20);
     
     if (level_diff > 15 || level_diff < min_diff) 
-	return false;
+        return false;
     
     if ((mode == -1 && level_diff > -10) || level_diff >= 5 * mode)
-	return false;
+        return false;
 
     if (!isThief( mob ))
-	return false;
+        return false;
     
     return true;
 }
@@ -340,16 +340,16 @@ bool StealQuest::checkMobileVictim( PCharacter *pch, NPCharacter *mob )
 bool StealQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 {
     if (!ClientQuestModel::checkMobileClient( pch, mob )) 
-	return false;
+        return false;
 
     if (isThief( mob ))
-	return false;
-	
+        return false;
+        
     if (mob->carry_number > mob->canCarryNumber( ))
-	return false;
+        return false;
 
     if (mob->getCarryWeight( ) > mob->canCarryWeight( ))
-	return false;
+        return false;
 
     return true;
 }
@@ -357,14 +357,14 @@ bool StealQuest::checkMobileClient( PCharacter *pch, NPCharacter *mob )
 bool StealQuest::isThief( NPCharacter *mob )
 {
     if (IS_SET( mob->act, ACT_THIEF ))
-	return true;
+        return true;
 
     if (mob->spec_fun.name == "spec_thief")
-	return true;
+        return true;
   
     if (StealQuestRegistrator::getThis( )->thiefs.hasName( mob ))
-	return true;
-	
+        return true;
+        
     return false;
 }
 
@@ -374,40 +374,40 @@ void StealQuest::fillChest( PCharacter *pch, Object *chest )
     Object *obj;
     VnumList objects;
     
-    /* ÂÁÒÁÈÌÏ */
+    /* Ð±Ð°Ñ€Ð°Ñ…Ð»Ð¾ */
     for (obj = object_list; obj; obj = obj->next) {
-	if (IS_SET( obj->pIndexData->area->area_flag, AREA_NOQUEST ))
-	    continue;
-	if (obj->pIndexData->reset_num <= 0)
-	    continue;
-	if (obj->pIndexData->cost >= 10000) 
-	    continue;
-	if (!IS_SET( obj->wear_flags, ITEM_TAKE ))
-	    continue;
+        if (IS_SET( obj->pIndexData->area->area_flag, AREA_NOQUEST ))
+            continue;
+        if (obj->pIndexData->reset_num <= 0)
+            continue;
+        if (obj->pIndexData->cost >= 10000) 
+            continue;
+        if (!IS_SET( obj->wear_flags, ITEM_TAKE ))
+            continue;
 
-	if (isBonus( obj->pIndexData, pch ) 
-	    && number_range( 1, obj->pIndexData->count ) == 1)
-	{
-	    objects.push_back( obj->pIndexData->vnum );
-	}
+        if (isBonus( obj->pIndexData, pch ) 
+            && number_range( 1, obj->pIndexData->count ) == 1)
+        {
+            objects.push_back( obj->pIndexData->vnum );
+        }
     }
     
     if (!objects.empty( )) {
-	int count = number_range( 0, 15 );
+        int count = number_range( 0, 15 );
 
-	for ( ; count; count--) 
-	    if (( obj = objects.randomItem( ) ))
-		obj_to_obj( obj, chest );
+        for ( ; count; count--) 
+            if (( obj = objects.randomItem( ) ))
+                obj_to_obj( obj, chest );
     }
     
-    /* ÎÉÛÔÑËÉ */
+    /* Ð½Ð¸ÑˆÑ‚ÑÐºÐ¸ */
     if (chance( 1 )) 
-	if (( obj = StealQuestRegistrator::getThis( )->bonuses.randomItem( ) ))
-	    obj_to_obj( obj, chest );
+        if (( obj = StealQuestRegistrator::getThis( )->bonuses.randomItem( ) ))
+            obj_to_obj( obj, chest );
 
     obj_to_obj( create_money( 
-		    number_range( 0, pch->getModifyLevel( ) ), 
-		    number_range( 0, 1000 ) ), chest );
+                    number_range( 0, pch->getModifyLevel( ) ), 
+                    number_range( 0, 1000 ) ), chest );
 }
 
 bool StealQuest::isBonus( OBJ_INDEX_DATA *pObjIndex, PCharacter *pch )
@@ -416,10 +416,10 @@ bool StealQuest::isBonus( OBJ_INDEX_DATA *pObjIndex, PCharacter *pch )
     int mlevel = pch->getModifyLevel( );
 
     if (olevel > mlevel + mlevel / 10 || olevel < mlevel - mlevel / 5) 
-	return false;
+        return false;
 
     if (pObjIndex->limit != -1 || olevel > ANGEL) 
-	return false;
+        return false;
     
     return true;
 }
@@ -431,38 +431,38 @@ Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
     std::vector<Room *>::iterator r;
 
     for (room = room_list; room; room = room->rnext) {
-	if (room->area != thief->in_room->area)
-	    continue;
-	
-	if (!checkRoom( pch, room ))
-	    continue;
-	
-	places.push_back( room );
+        if (room->area != thief->in_room->area)
+            continue;
+        
+        if (!checkRoom( pch, room ))
+            continue;
+        
+        places.push_back( room );
     }
     
     for (r = places.begin( ); r != places.end( ); r++) {
-	EXIT_DATA *e;
-	int cnt = 0;
+        EXIT_DATA *e;
+        int cnt = 0;
 
-	for (int d = 0; d < DIR_SOMEWHERE; d++) {
-	    e = (*r)->exit[d];
+        for (int d = 0; d < DIR_SOMEWHERE; d++) {
+            e = (*r)->exit[d];
 
-	    if (e && e->u1.to_room)
-		cnt++;
-	}
-	
-	if (cnt == 1)
-	    places1.push_back( *r );
-	if (cnt == 2)
-	    places2.push_back( *r );
+            if (e && e->u1.to_room)
+                cnt++;
+        }
+        
+        if (cnt == 1)
+            places1.push_back( *r );
+        if (cnt == 2)
+            places2.push_back( *r );
     }
     
     if (!places1.empty( ))
-	return places1[number_range( 0, places1.size( ) - 1 )];
+        return places1[number_range( 0, places1.size( ) - 1 )];
     if (!places2.empty( ))
-	return places2[number_range( 0, places2.size( ) - 1 )];
+        return places2[number_range( 0, places2.size( ) - 1 )];
     if (!places.empty( ))
-	return places[number_range( 0, places.size( ) - 1 )];
+        return places[number_range( 0, places.size( ) - 1 )];
     
     throw QuestCannotStartException( );
 }
@@ -470,26 +470,26 @@ Room * StealQuest::findHideaway( PCharacter *pch, NPCharacter *thief )
 DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
 {
     if (!room)
-	return "";
+        return "";
 
     if (depth >= 2) 
-	return room->name;
+        return room->name;
 
     for (int d = 0; d < DIR_SOMEWHERE; d++) {
-	Room *r;
+        Room *r;
 
-	if (!room->exit[d])
-	    continue;
-	
-	if (!( r = room->exit[d]->u1.to_room ))
-	    continue;
-	
-	if (r == from)
-	    continue;
-	
-	for (int i = 0; i < DIR_SOMEWHERE; i++)
-	    if (r->exit[i] && r->exit[i]->u1.to_room == room)
-		return getRoomHint( r, room, depth + 1 );
+        if (!room->exit[d])
+            continue;
+        
+        if (!( r = room->exit[d]->u1.to_room ))
+            continue;
+        
+        if (r == from)
+            continue;
+        
+        for (int i = 0; i < DIR_SOMEWHERE; i++)
+            if (r->exit[i] && r->exit[i]->u1.to_room == room)
+                return getRoomHint( r, room, depth + 1 );
     }
 
     return room->name;

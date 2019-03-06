@@ -3,10 +3,15 @@
  * ruffina, 2004
  */
 #include "questregistrator.h"
+#include "questexceptions.h"
+#include "pcharacter.h"
 
 
-bool QuestRegistratorBase::applicable( PCharacter * )
+bool QuestRegistratorBase::applicable( PCharacter *pch, bool fAuto ) const
 {
+    if (fAuto && pch->getRemorts().size() == 0 && pch->getRealLevel() < minAutoLevel)
+        return false;
+
     return true;
 }
 
@@ -23,5 +28,10 @@ int QuestRegistratorBase::getPriority( ) const
 const DLString& QuestRegistratorBase::getShortDescr( ) const
 {
     return shortDesc;
+}
+
+const DLString& QuestRegistratorBase::getDifficulty( ) const
+{
+    return difficulty;
 }
 

@@ -18,7 +18,7 @@
 #include "act.h"
 #include "def.h"
 
-const DLString CardSkill::CATEGORY = "õÍÅÎÉÑ ëÏÌÏÄÙ";
+const DLString CardSkill::CATEGORY = "Ð£Ð¼ÐµÐ½Ð¸Ñ ÐšÐ¾Ð»Ð¾Ð´Ñ‹";
 GROUP(card_pack);
 
 CardSkill::CardSkill( )
@@ -53,7 +53,7 @@ int CardSkill::getLevel( Character *ch ) const
 int CardSkill::getLearned( Character *ch ) const
 {
     if (!usable( ch, false ))
-	return 0;
+        return 0;
 
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
@@ -73,15 +73,17 @@ bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
     return available( ch );
 }
 
-bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch ) 
+bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose ) 
 {
     if (mob && mob->behavior && mob->behavior.getDynamicPointer<CardSellerBehavior>( ))
-	return true;
-    
-    if (mob)
-	ch->pecho( "%^C1 ÎÅ ÒÁÚÂÉÒÁÅÔÓÑ × ËÁÒÔÁÈ.", mob );
-    else
-	ch->println( "ðÏÉÝÉ ËÏÇÏ-ÔÏ, ËÔÏ ÒÁÚÂÉÒÁÅÔÓÑ × ËÁÒÔÁÈ." );
+        return true;
+
+    if (verbose) {    
+        if (mob)
+            ch->pecho( "%^C1 Ð½Ðµ Ñ€Ð°Ð·Ð±Ð¸Ñ€Ð°ÐµÑ‚ÑÑ Ð² ÐºÐ°Ñ€Ñ‚Ð°Ñ….", mob );
+        else
+            ch->println( "ÐŸÐ¾Ð¸Ñ‰Ð¸ ÐºÐ¾Ð³Ð¾-Ñ‚Ð¾, ÐºÑ‚Ð¾ Ñ€Ð°Ð·Ð±Ð¸Ñ€Ð°ÐµÑ‚ÑÑ Ð² ÐºÐ°Ñ€Ñ‚Ð°Ñ…." );
+    }
 
     return false;
 }
@@ -90,23 +92,23 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf )
 {
     bool rus = ch->getConfig( )->ruskills;
 
-    buf << (spell ? "úÁËÌÉÎÁÎÉÅ" : "õÍÅÎÉÅ") 
-	<< " ëÏÌÏÄÙ '{W" << getName( ) << "{x' ÉÌÉ '{W" << getRussianName( ) << "{x', "
-        << "×ÈÏÄÉÔ × ÇÒÕÐÐÕ '{W"  
-	<< (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+    buf << (spell ? "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ" : "Ð£Ð¼ÐµÐ½Ð¸Ðµ") 
+        << " ÐšÐ¾Ð»Ð¾Ð´Ñ‹ '{W" << getName( ) << "{x' Ð¸Ð»Ð¸ '{W" << getRussianName( ) << "{x', "
+        << "Ð²Ñ…Ð¾Ð´Ð¸Ñ‚ Ð² Ð³Ñ€ÑƒÐ¿Ð¿Ñƒ '{hg{W"  
+        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
         << "{x'" << endl;
     
-    buf << "ðÏÑ×ÌÑÅÔÓÑ Õ ËÁÒÔ, ÎÁÞÉÎÁÑ Ó {W" 
-	<< russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
-	<< "{x"; 
+    buf << "ÐŸÐ¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ñƒ ÐºÐ°Ñ€Ñ‚, Ð½Ð°Ñ‡Ð¸Ð½Ð°Ñ Ñ {W" 
+        << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
+        << "{x"; 
 
     if (visible( ch )) {
         int learned = getLearned( ch );
         if (learned > 0)
-	    buf << ", ÉÚÕÞÅÎÏ ÎÁ {W" << learned << "%{x";
+            buf << ", Ð¸Ð·ÑƒÑ‡ÐµÐ½Ð¾ Ð½Ð° {W" << learned << "%{x";
 
-	if (!usable( ch ))
-	    buf << " (ÓÅÊÞÁÓ ÔÅÂÅ ÎÅÄÏÓÔÕÐÎÏ)";
+        if (!usable( ch ))
+            buf << " (ÑÐµÐ¹Ñ‡Ð°Ñ Ñ‚ÐµÐ±Ðµ Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾)";
     }
     
     buf << endl; 
@@ -121,15 +123,15 @@ int CardSkill::findCardLevel( Character *ch )
     XMLAttributeCards::Pointer attr;
     
     if (ch->is_npc( ))
-	return -1;
+        return -1;
     
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeCards>( "cards" );
 
     if (!attr)
-	return -1;
+        return -1;
 
     if (attr->isTrump( ))
-	return XMLAttributeCards::getMaxLevel( );
+        return XMLAttributeCards::getMaxLevel( );
 
     return attr->getLevel( );
 }

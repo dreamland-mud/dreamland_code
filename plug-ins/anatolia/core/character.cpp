@@ -16,10 +16,10 @@
 int Character::canCarryNumber( ) 
 {
     if (is_immortal( ) && getRealLevel( ) >= LEVEL_HERO)
-	return 1000;
+        return 1000;
     
     if (master && !master->is_npc( ) && master->getPC( )->pet == this)
-	return 0;
+        return 0;
 
     return wearlocationManager->size( ) + getCurrStat(STAT_DEX) - 10 + size;
 }
@@ -27,10 +27,10 @@ int Character::canCarryNumber( )
 int Character::canCarryWeight( ) 
 {
     if (is_immortal( ) && getRealLevel( ) >= LEVEL_HERO)
-	return 10000000;
+        return 10000000;
 
     if (master && !master->is_npc( ) && master->getPC( )->pet == this)
-	return 0;
+        return 0;
 
     return get_str_app(this).carry * 10 + getRealLevel( ) * 25;
 }

@@ -23,17 +23,17 @@ bool DLFileOp::open( )
     static const char * METHOD = "DLFileOp::open";
     
     if (fp)
-	return true;
+        return true;
 
     if (path.empty( )) {
-	LogStream::sendError( ) << METHOD << " empty path" << endl;
-	return false;
+        LogStream::sendError( ) << METHOD << " empty path" << endl;
+        return false;
     }
 
     fp = fopen( path.c_str( ), getOpenMode( ) );
     if (!fp) {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        return false;
     }
 
     return true;
@@ -45,11 +45,11 @@ bool DLFileOp::close( )
     bool rc = true;
 
     if (!fp)
-	return rc;
+        return rc;
     
     if (fclose( fp ) != 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
-	rc = false;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        rc = false;
     }
 
     fp = 0;
@@ -80,11 +80,11 @@ bool DLFileWriteable::flush( )
     static const char * METHOD = "DLFileWriteable::flush";
     
     if (!fp)
-	return true;
+        return true;
 
     if (fflush( fp ) != 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << endl;
+        return false;
     }
     
     return true;
@@ -107,11 +107,11 @@ bool DLFileWriteable::vprintf( const char *fmt, va_list ap )
     static const char * METHOD = "DLFileWriteable::vprintf";
 
     if (!open( ))
-	return false;
+        return false;
     
     if (vfprintf( fp, fmt, ap ) < 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << " " << fmt << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << " " << fmt << endl;
+        return false;
     }
 
     return true;
@@ -122,11 +122,11 @@ bool DLFileWriteable::write( const char *str )
     static const char * METHOD = "DLFileWriteable::write";
 
     if (!open( ))
-	return false;
+        return false;
 
     if (fputs( str, fp ) < 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << " " << str << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << " " << str << endl;
+        return false;
     }
 
     return true;
@@ -252,11 +252,11 @@ bool DLFileRead::vscanf( const char *fmt, va_list ap )
     static const char * METHOD = "DLFileWriteable::vscanf";
 
     if (!open( ))
-	return false;
+        return false;
     
     if (vfscanf( fp, fmt, ap ) < 0) {
-	LogStream::sendSystem( ) << METHOD << " " << path << " " << fmt << endl;
-	return false;
+        LogStream::sendSystem( ) << METHOD << " " << path << " " << fmt << endl;
+        return false;
     }
 
     return true;

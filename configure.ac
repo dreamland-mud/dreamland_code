@@ -10,7 +10,6 @@ AM_INIT_AUTOMAKE
 
 dnl Check for additional compiler/linker options
 AC_CHECK_OPTIMIZATION
-
    
 AM_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
@@ -62,6 +61,7 @@ AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_THREADS
 AC_CHECK_MCCP
 AC_CHECK_GC
+AC_CONVERT_CHARSET
 #AM_ICONV_LINK
 
 dnl Additional options
@@ -69,6 +69,7 @@ AC_CHECK_FIGHT_STUB
 AC_CHECK_AI_STUB
 
 dnl Creating installation tree
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
 AC_CREATE_DIR(bin)
 AC_CREATE_DIR(lib)
 AC_CREATE_DIR(libexec)
@@ -115,6 +116,11 @@ AC_CREATE_FILE(etc/dreamland.xml)
 AC_CREATE_FILE(libexec/plugin.xml)
 AC_PLAYER_COPY(kadm)
 cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
+
+if ! test -d "$prefix/var/db" 
+then
+    cat "$srcdir/admin/fenia/fenia.tbz2" | (cd "$prefix/var/db" && tar xvjf -)
+fi
 
 AC_CONFIG_COMMANDS([src/moc/moc], [
     AC_MSG_NOTICE([Configuring meta object compiller...])
@@ -179,6 +185,7 @@ plug-ins/quest/healquest/Makefile \
 plug-ins/quest/kidnapquest/Makefile \
 plug-ins/quest/stealquest/Makefile \
 plug-ins/quest/locatequest/Makefile \
+plug-ins/quest/bigquest/Makefile \
 plug-ins/questreward/Makefile \
 plug-ins/misc_behaviors/Makefile \
 plug-ins/magic/Makefile \
@@ -238,6 +245,9 @@ plug-ins/follow/command/Makefile \
 plug-ins/debug/Makefile \
 plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
+plug-ins/craft/Makefile \
+plug-ins/gmcp/Makefile \
+plug-ins/bonus/Makefile \
 )
 
 echo ""

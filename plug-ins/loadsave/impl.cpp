@@ -25,13 +25,13 @@ public:
 
     virtual void run( )
     {
-	if (DLScheduler::getThis()->getCurrentTick( ) == 0) 
-	    PCharacterManager::loadPlayers( );
+        if (DLScheduler::getThis()->getCurrentTick( ) == 0) 
+            PCharacterManager::loadPlayers( );
     }
     
     virtual int getPriority( ) const
     {
-	return SCDP_BOOT + 10;
+        return SCDP_BOOT + 10;
     }
 };
 
@@ -41,16 +41,16 @@ public:
 
     virtual void run( )
     {
-	if (DLScheduler::getThis()->getCurrentTick( ) == 0) {
-	    load_drops( );
-	    load_dropped_mobs( );
-	    load_creatures( );
-	}
+        if (DLScheduler::getThis()->getCurrentTick( ) == 0) {
+            load_drops( );
+            load_dropped_mobs( );
+            load_creatures( );
+        }
     }
 
     virtual int getPriority( ) const
     {
-	return SCDP_BOOT + 20;
+        return SCDP_BOOT + 20;
     }
 };
 
@@ -64,11 +64,11 @@ public:
     }
     virtual void after( )
     {
-	DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_DAY, Pointer( this ) );    
+        DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_HOUR, Pointer( this ) );    
     }
     virtual int getPriority( ) const
     {
-	return SCDP_ROUND + 90;
+        return SCDP_ROUND + 90;
     }
 };
 
@@ -76,14 +76,15 @@ extern "C" {
     
     SO::PluginList initialize_loadsave( )
     {
-	SO::PluginList ppl;
+        SO::PluginList ppl;
 
-	Plugin::registerPlugin<PlayerLoadTask>( ppl );
-	Plugin::registerPlugin<DropsLoadTask>( ppl );
-	Plugin::registerPlugin<MobileBehaviorRegistrator<SavedCreature> >( ppl );
-//	Plugin::registerPlugin<WorldKnowledge>( ppl );
+        Plugin::registerPlugin<PlayerLoadTask>( ppl );
+        Plugin::registerPlugin<DropsLoadTask>( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<SavedCreature> >( ppl );
+//        Plugin::registerPlugin<WorldKnowledge>( ppl );
+        Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
 
-	return ppl;
+        return ppl;
     }
 }
 

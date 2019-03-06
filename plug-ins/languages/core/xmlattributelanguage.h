@@ -20,14 +20,15 @@ class XMLAttributeLanguage : public XMLAttribute, public WordContainer
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeLanguage> Pointer;
+        typedef ::Pointer<XMLAttributeLanguage> Pointer;
 
-	XMLAttributeLanguage( );
+        XMLAttributeLanguage( );
     
-	virtual void wordUsed( const Word &, PCharacter * );
+        virtual void wordUsed( const Word &, PCharacter * );
+        void removeWord( const Word &, PCharacter * );
 
-	XML_VARIABLE XMLLong lastDreamTime;
-	XML_VARIABLE XMLLong sleepTime;
+        XML_VARIABLE XMLLong lastDreamTime;
+        XML_VARIABLE XMLLong sleepTime;
 };
 
 /*
@@ -39,15 +40,18 @@ class XMLAttributeLanguageHints : public XMLAttribute, public XMLVariableContain
 {
 XML_OBJECT
 public:
-	typedef ::Pointer<XMLAttributeLanguageHints> Pointer;
+        typedef ::Pointer<XMLAttributeLanguageHints> Pointer;
         typedef XMLMapBase<XMLBoolean> Hints;
 
-	virtual ~XMLAttributeLanguageHints( );
+        virtual ~XMLAttributeLanguageHints( );
         
         void addWord( const Word &, bool );
         bool hasHint( const Word & ) const;
+        bool hasWord( const DLString & ) const;
+        void removeWord(const DLString &);
+        void removeWord(const Word &);
 
-	XML_VARIABLE Hints hints;
+        XML_VARIABLE Hints hints;
 };
 
 #endif

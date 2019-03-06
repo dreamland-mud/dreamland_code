@@ -32,7 +32,7 @@ template<typename T>
 inline Object * ItemQuestModel::createItem( int vnum )
 {
     if (vnum <= 0)
-	throw QuestCannotStartException( "createItem: Invalid vnum " + DLString( vnum ) );
+        throw QuestCannotStartException( "createItem: Invalid vnum " + DLString( vnum ) );
     
     return createItem<T>( get_obj_index( vnum ) );
 }
@@ -43,7 +43,7 @@ inline Object * ItemQuestModel::createItem( OBJ_INDEX_DATA *pObjIndex )
     Object *obj;
 
     if (!pObjIndex)
-	throw QuestCannotStartException( "createItem: zero obj index data" );
+        throw QuestCannotStartException( "createItem: zero obj index data" );
     
     obj = create_object( pObjIndex, 0 );
     assign<T>( obj );
@@ -54,8 +54,8 @@ template<typename T>
 inline Object * ItemQuestModel::getItemWorld( )
 {
     for (Object *obj = object_list; obj; obj = obj->next)
-	if (check<T>( obj ))
-	    return obj;
+        if (check<T>( obj ))
+            return obj;
 
     return NULL;
 }
@@ -64,10 +64,22 @@ template<typename T>
 inline Object * ItemQuestModel::getItemList( Object *list )
 {
     for (Object *obj = list; obj; obj = obj->next_content)
-	if (check<T>( obj ))
-	    return obj;
+        if (check<T>( obj ))
+            return obj;
 
     return NULL;
+}
+
+template<typename T> 
+inline ItemQuestModel::ItemList ItemQuestModel::getItemsList( Object *list )
+{
+    ItemList result;
+
+    for (Object *obj = list; obj; obj = obj->next_content)
+        if (check<T>( obj ))
+            result.push_back(obj);
+
+    return result;
 }
 
 template<typename T>
@@ -76,10 +88,10 @@ inline void ItemQuestModel::destroyItems( )
     Object *obj, *obj_next;
 
     for (obj = object_list; obj; obj = obj_next) {
-	obj_next = obj->next;
-	
-	if (check<T>( obj )) 
-	    destroy( obj );
+        obj_next = obj->next;
+        
+        if (check<T>( obj )) 
+            destroy( obj );
     }
 }
 
@@ -89,10 +101,10 @@ inline void ItemQuestModel::clearItems( )
     Object *obj, *obj_next;
 
     for (obj = object_list; obj; obj = obj_next) {
-	obj_next = obj->next;
-	
-	if (check<T>( obj )) 
-	    destroy( obj );
+        obj_next = obj->next;
+        
+        if (check<T>( obj )) 
+            destroy( obj );
     }
 }
 
@@ -115,8 +127,8 @@ template<typename T>
 inline void MobileQuestModel::clearMobiles( )
 {
     for (Character * wch = char_list; wch; wch = wch->next) 
-	if (check<T>( wch )) 
-	    clear( wch->getNPC( ) );
+        if (check<T>( wch )) 
+            clear( wch->getNPC( ) );
 }
 
 template<typename T>
@@ -131,10 +143,10 @@ inline void MobileQuestModel::destroyMobiles( )
     Character *wch, *wch_next;
     
     for (wch = char_list; wch; wch = wch_next) {
-	wch_next = wch->next;
+        wch_next = wch->next;
 
-	if (check<T>( wch )) 
-	    destroy( wch->getNPC( ) );
+        if (check<T>( wch )) 
+            destroy( wch->getNPC( ) );
     }
 }
 
@@ -148,8 +160,8 @@ template<typename T>
 inline NPCharacter * MobileQuestModel::getMobileWorld( )
 {
     for (Character *wch = char_list; wch; wch = wch->next) 
-	if (check<T>( wch ))        
-	    return wch->getNPC( );
+        if (check<T>( wch ))        
+            return wch->getNPC( );
 
     return NULL;
 }
@@ -158,8 +170,8 @@ template<typename T>
 inline NPCharacter * MobileQuestModel::getMobileRoom( Room *room )
 {
     for (Character *rch = room->people; rch; rch = rch->next_in_room)
-	if (check<T>( rch ))        
-	    return rch->getNPC( );
+        if (check<T>( rch ))        
+            return rch->getNPC( );
 
     return NULL;
 }
@@ -176,7 +188,7 @@ template<typename T>
 inline NPCharacter * MobileQuestModel::createMobile( int vnum )
 {
     if (vnum <= 0)
-	throw QuestCannotStartException( "createMobile: Invalid vnum " + DLString( vnum ) );
+        throw QuestCannotStartException( "createMobile: Invalid vnum " + DLString( vnum ) );
     
     return createMobile<T>( get_mob_index( vnum ) );
 }
@@ -187,7 +199,7 @@ inline NPCharacter * MobileQuestModel::createMobile( mob_index_data *pMobIndex )
     NPCharacter *mob;
 
     if (!pMobIndex)
-	throw QuestCannotStartException( "createMobile: zero mob index data" );
+        throw QuestCannotStartException( "createMobile: zero mob index data" );
     
     mob = create_mobile( pMobIndex );
     assign<T>( mob );

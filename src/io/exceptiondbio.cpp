@@ -9,10 +9,10 @@
 ExceptionDBIO::ExceptionDBIO( const DLString &str ) throw( )
 {
     if (errno > 0) {
-	setStr( str + " (" + strerror( errno ) + ")" );
+        setStr( str + " (" + strerror( errno ) + ")" );
     }
     else {
-	setStr( str );
+        setStr( str );
     }
 }
 

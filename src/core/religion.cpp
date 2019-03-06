@@ -34,6 +34,11 @@ bool Religion::isValid( ) const
     return false;
 }
 
+int Religion::getSex() const
+{
+    return 0;
+}
+
 bool Religion::isAllowed( Character * ) const
 {
     return false;

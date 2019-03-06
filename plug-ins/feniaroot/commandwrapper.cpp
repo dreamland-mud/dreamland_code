@@ -20,7 +20,7 @@
 
 using namespace std;
 
-NMI_INIT(CommandWrapper, "�������");
+NMI_INIT(CommandWrapper, "команда");
 
 void 
 CommandWrapper::setSelf(Scripting::Object *obj)
@@ -50,7 +50,7 @@ CommandWrapper::run( Character * ch, const DLString &arg )
     try {
         func.toFunction()->invoke(wrap(ch), args);
     } catch (::Exception e) {
-	ch->send_to( e.what( ) );
+        ch->send_to( e.what( ) );
     }
 }
 
@@ -66,30 +66,30 @@ XMLStringNoEmpty hint;
 XMLPointerNoEmpty<CommandHelp> help;
 */
 
-NMI_GET( CommandWrapper, func, "command function" ) 
+NMI_GET( CommandWrapper, func, "функция команды" ) 
 {
     return func;
 }
 
-NMI_SET( CommandWrapper, func, "command function" ) 
+NMI_SET( CommandWrapper, func, "функция команды" ) 
 {
     func = arg;
     self->changed();
 }
 
-NMI_GET( CommandWrapper, name, "command name" ) 
+NMI_GET( CommandWrapper, name, "название команды" ) 
 { 
     return Register( name.getValue( ) ); 
 } 
 
-NMI_SET( CommandWrapper, name, "command name" ) 
+NMI_SET( CommandWrapper, name, "название команды" ) 
 { 
     name.setValue( arg.toString( ) );
     self->changed();
 }
 
 
-NMI_INVOKE( CommandWrapper, api, "" )
+NMI_INVOKE( CommandWrapper, api, "(): печатает этот api" )
 {
     ostringstream buf;
     

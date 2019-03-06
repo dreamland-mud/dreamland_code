@@ -12,7 +12,6 @@
 #include "medit.h"
 #include "oedit.h"
 #include "sedit.h"
-#include "tedit.h"
 #include "eeedit.h"
 #include "olcstate.h"
 #include "onlinecreation.h"
@@ -31,18 +30,17 @@ extern "C"
 {
     SO::PluginList initialize_olc( )
     {
-	SO::PluginList ppl;
-	
-	OnlineCreation::registerPlugin(ppl);
-	Plugin::registerPlugin<XMLAttributeOLCPlugin>( ppl );
-	Plugin::registerPlugin<OLCInterpretLayer>( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<OLCStateRoom> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<OLCStateArea> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<OLCStateMobile> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<OLCStateObject> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<OLCStateExtraExit> >( ppl );
-	Plugin::registerPlugin<InputHandlerRegistrator<OLCStateTrap> >( ppl );
+        SO::PluginList ppl;
+        
+        OnlineCreation::registerPlugin(ppl);
+        Plugin::registerPlugin<XMLAttributeOLCPlugin>( ppl );
+        Plugin::registerPlugin<OLCInterpretLayer>( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateRoom> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateArea> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateMobile> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateObject> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateExtraExit> >( ppl );
 
-	return ppl;
+        return ppl;
     }
 }

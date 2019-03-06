@@ -10,6 +10,7 @@ libdescriptor_la_SOURCES = \
 descriptor.cpp \
 bufferhandler.cpp \
 inputhandler.cpp \
+outofband.cpp \
 impl.cpp
 
 libdescriptor_la_MOC = \

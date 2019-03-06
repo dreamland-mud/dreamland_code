@@ -14,14 +14,14 @@
 void ValentinePrise::wear( Character *ch ) 
 {
     if (msgChar.getValue( ).empty( ))
-	act("{CАура {Rлюбви{C окружает тебя.{x", ch, obj, 0, TO_CHAR);
+        act("{Cп░я┐я─п╟ {Rп╩я▌п╠п╡п╦{C п╬п╨я─я┐п╤п╟п╣я┌ я┌п╣п╠я▐.{x", ch, obj, 0, TO_CHAR);
     else
-	act(msgChar.getValue( ).c_str( ), ch, obj, 0, TO_CHAR);
+        act(msgChar.getValue( ).c_str( ), ch, obj, 0, TO_CHAR);
 
     if (msgRoom.getValue( ).empty( ))
-	act("{CАура {Rлюбви{C окружает $c4.{x", ch, obj, 0, TO_ROOM);
+        act("{Cп░я┐я─п╟ {Rп╩я▌п╠п╡п╦{C п╬п╨я─я┐п╤п╟п╣я┌ $c4.{x", ch, obj, 0, TO_ROOM);
     else
-	act(msgRoom.getValue( ).c_str( ), ch, obj, 0, TO_ROOM);
+        act(msgRoom.getValue( ).c_str( ), ch, obj, 0, TO_ROOM);
 
 
 }
@@ -51,18 +51,18 @@ void ValentinePrise::equip( Character *ch )
     locs.push_back( APPLY_SAVES );
 
     for (unsigned int i = 0; i < locs.size( ); i++) {
-	for( paf = obj->affected; paf; paf = paf->next ) {
-	    if (paf->location == locs[i]) {
-		addAffect( paf, level );
-		break;
-	    }
-	}
+        for( paf = obj->affected; paf; paf = paf->next ) {
+            if (paf->location == locs[i]) {
+                addAffect( paf, level );
+                break;
+            }
+        }
 
-	if (!paf) {
-	    af.location = locs[i];
-	    addAffect( &af, level );
-	    affect_to_obj( obj, &af );
-	}
+        if (!paf) {
+            af.location = locs[i];
+            addAffect( &af, level );
+            affect_to_obj( obj, &af );
+        }
     }
 }
 
@@ -71,29 +71,29 @@ void ValentinePrise::addAffect( Affect *af, int level ) {
     
     switch (af->location) {
     case APPLY_CHA:
-	af->modifier = 2;
-	break;
+        af->modifier = 2;
+        break;
     case APPLY_AC:
-	af->modifier = -level;
-	break;
+        af->modifier = -level;
+        break;
     case APPLY_HIT:
-	af->modifier = level;
-	break;
+        af->modifier = level;
+        break;
     case APPLY_MANA:
-	af->modifier = level;
-	break;
+        af->modifier = level;
+        break;
     case APPLY_MOVE:
-	af->modifier = level;
-	break;
+        af->modifier = level;
+        break;
     case APPLY_HITROLL:
-	af->modifier = std::max( 1, level / 10 ); 
-	break;
+        af->modifier = std::max( 1, level / 10 ); 
+        break;
     case APPLY_DAMROLL:
-	af->modifier = std::max( 1, level / 10 ); 
-	break;
+        af->modifier = std::max( 1, level / 10 ); 
+        break;
     case APPLY_SAVES:
-	af->modifier = - std::max( 1, level / 10 );
-	break;
+        af->modifier = - std::max( 1, level / 10 );
+        break;
     }
 }
 

@@ -13,7 +13,7 @@
  *------------------------------------------------------------------*/
 DefaultRaceLanguage::DefaultRaceLanguage( )
                 : races( raceManager ),
-		  common( false )
+                  common( false )
 {
 }
 
@@ -36,13 +36,13 @@ const DLString & DefaultRaceLanguage::getShortDescr( ) const
 bool DefaultRaceLanguage::available( Character *ch ) const
 {
     if (common.getValue( ))
-	return true;
+        return true;
     
     if (ch->is_immortal( ))
-	return true;
+        return true;
 
     if (races.isSet( ch->getRace( ) ))
-	return true;
+        return true;
 
     return false;
 }
@@ -70,22 +70,22 @@ const struct translation_type translation_table [] =
   {'w',     "x"}, {'W',     "X"}, {'x',     "z"}, {'X',     "Z"},
   {'y',     "a"}, {'Y',     "A"}, {'z',     "b"}, {'Z',     "B"},
 
-  {'¡',     "≈"}, {'·',     "Â"}, {'¬',     "◊"}, {'‚',     "˜"},
-  {'◊',     "«"}, {'˜',     "Á"}, {'«',     "ƒ"}, {'Á',     "‰"},
-  {'ƒ',     "÷"}, {'‰',     "ˆ"}, {'≈',     "…"}, {'Â',     "È"},
-  {'÷',     "⁄"}, {'ˆ',     "˙"}, {'⁄',     " "}, {'˙',     "Í"},
-  {'…',     "œ"}, {'È',     "Ô"}, {' ',     "À"}, {'Í',     "Î"},
-  {'À',     "Ã"}, {'Î',     "Ï"}, {'Ã',     "Õ"}, {'Ï',     "Ì"},
-  {'Õ',     "Œ"}, {'Ì',     "Ó"}, {'Œ',     "–"}, {'Ó',     ""},
-  {'œ',     "’"}, {'Ô',     "ı"}, {'–',     "“"}, {'',     "Ú"},
-  {'“',     "”"}, {'Ú',     "Û"}, {'”',     "‘"}, {'Û',     "Ù"},
-  {'‘',     "∆"}, {'Ù',     "Ê"}, {'’',     "‹"}, {'ı',     "¸"},
-  {'∆',     "»"}, {'Ê',     "Ë"}, {'»',     "√"}, {'Ë',     "„"},
-  {'√',     "ﬁ"}, {'„',     "˛"}, {'ﬁ',     "€"}, {'˛',     "˚"},
-  {'€',     "›"}, {'˚',     "˝"}, {'›',     "ﬂ"}, {'˝',     "ˇ"},
-  {'ﬂ',     "¬"}, {'ˇ',     "‚"}, {'‹',     "¿"}, {'¸',     "‡"},
-  {'¿',     "—"}, {'‡',     "Ò"}, {'—',     "¡"}, {'Ò',     "·"},
-  { 0, 	0 } 
+  {'–∞',     "–µ"}, {'–ê',     "–ï"}, {'–±',     "–≤"}, {'–ë',     "–í"},
+  {'–≤',     "–≥"}, {'–í',     "–ì"}, {'–≥',     "–¥"}, {'–ì',     "–î"},
+  {'–¥',     "–∂"}, {'–î',     "–ñ"}, {'–µ',     "–∏"}, {'–ï',     "–ò"},
+  {'–∂',     "–∑"}, {'–ñ',     "–ó"}, {'–∑',     "–π"}, {'–ó',     "–ô"},
+  {'–∏',     "–æ"}, {'–ò',     "–û"}, {'–π',     "–∫"}, {'–ô',     "–ö"},
+  {'–∫',     "–ª"}, {'–ö',     "–õ"}, {'–ª',     "–º"}, {'–õ',     "–ú"},
+  {'–º',     "–Ω"}, {'–ú',     "–ù"}, {'–Ω',     "–ø"}, {'–ù',     "–ü"},
+  {'–æ',     "—É"}, {'–û',     "–£"}, {'–ø',     "—Ä"}, {'–ü',     "–†"},
+  {'—Ä',     "—Å"}, {'–†',     "–°"}, {'—Å',     "—Ç"}, {'–°',     "–¢"},
+  {'—Ç',     "—Ñ"}, {'–¢',     "–§"}, {'—É',     "—ç"}, {'–£',     "–≠"},
+  {'—Ñ',     "—Ö"}, {'–§',     "–•"}, {'—Ö',     "—Ü"}, {'–•',     "–¶"},
+  {'—Ü',     "—á"}, {'–¶',     "–ß"}, {'—á',     "—à"}, {'–ß',     "–®"},
+  {'—à',     "—â"}, {'–®',     "–©"}, {'—â',     "—ä"}, {'–©',     "–™"},
+  {'—ä',     "–±"}, {'–™',     "–ë"}, {'—ç',     "—é"}, {'–≠',     "–Æ"},
+  {'—é',     "—è"}, {'–Æ',     "–Ø"}, {'—è',     "–∞"}, {'–Ø',     "–ê"},
+  { 0,         0 } 
 };
 
 DLString DefaultRaceLanguage::translate( const DLString &arg, Character *ch, Character *victim ) const
@@ -93,16 +93,16 @@ DLString DefaultRaceLanguage::translate( const DLString &arg, Character *ch, Cha
     ostringstream buf;
 
     if (victim && available( victim ))
-	return arg;
+        return arg;
     
     for (unsigned int i = 0; i < arg.size( ); i++) {
-	char c = arg.at( i );
+        char c = arg.at( i );
 
-	for (int j = 0; translation_table[j].common != '\0'; j++)
-	    if (translation_table[j].common == c) {
-		buf << translation_table[j].language;
-		break;
-	    }
+        for (int j = 0; translation_table[j].common != '\0'; j++)
+            if (translation_table[j].common == c) {
+                buf << translation_table[j].language;
+                break;
+            }
     }
     
     return buf.str( );

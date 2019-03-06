@@ -23,16 +23,19 @@ XML_OBJECT
 public:
     typedef ::Pointer<QuestRegistratorBase> Pointer;
 
-    virtual Quest::Pointer createQuest( PCharacter *, NPCharacter * ) = 0;
+    virtual Quest::Pointer createQuest( PCharacter *, NPCharacter * ) const = 0;
     virtual const DLString& getName( ) const = 0;
 
-    virtual bool applicable( PCharacter * );
+    virtual bool applicable( PCharacter *, bool fAuto ) const;
     virtual int getPriority( ) const;
-    virtual const DLString& getShortDescr( ) const;
+    const DLString& getShortDescr( ) const;
+    const DLString& getDifficulty( ) const;
     
 protected:
     XML_VARIABLE XMLString shortDesc;
+    XML_VARIABLE XMLString difficulty;
     XML_VARIABLE XMLInteger priority;
+    XML_VARIABLE XMLIntegerNoEmpty minAutoLevel;
 };
 
 template<typename C>
@@ -42,29 +45,28 @@ public:
 
     virtual void initialization( ) 
     {
-	Class::regMoc<C>( );
-	QuestManager::getThis( )->load( this );
-	XMLAttributePlugin::initialization( );
+        Class::regMoc<C>( );
+        QuestManager::getThis( )->load( this );
+        XMLAttributePlugin::initialization( );
     }
     
     virtual void destruction( ) 
     {
-	XMLAttributePlugin::destruction( );
-	QuestManager::getThis( )->unLoad( this );
-	Class::unregMoc<C>( );
+        XMLAttributePlugin::destruction( );
+        QuestManager::getThis( )->unLoad( this );
+        Class::unregMoc<C>( );
     }
 
-    virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) 
+    virtual Quest::Pointer createQuest( PCharacter *pch, NPCharacter *questor ) const
     {
-	::Pointer<C> quest( NEW );
-
-	quest->create( pch, questor );
-	return quest;
+        ::Pointer<C> quest( NEW );
+        quest->create( pch, questor );
+        return quest;
     }
 
     virtual const DLString& getName( ) const 
     {
-	return C::MOC_TYPE;
+        return C::MOC_TYPE;
     }
 };
 

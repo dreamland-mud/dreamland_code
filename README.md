@@ -9,6 +9,14 @@
 
 ![DreamLand MUD version](https://img.shields.io/badge/DreamLand%20MUD-v4.0-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![Build Status](https://travis-ci.org/dreamland-mud/dreamland_code.svg?branch=master)](https://travis-ci.org/dreamland-mud/dreamland_code)
+[![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
+
+Есть несколько способов познакомиться с кодом проекта и начать под него разработку:
+* Собрать у себя локально, например, на виртуальной машине с Ubuntu, пользуясь инструкцией ниже.
+* Собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
+* Воспользоваться Goorm Online IDE согласно [инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE), что даст возможность изучать и изменять код, запускать свой сервер и играть на нем, не покидая окна браузера.
+
 
 **Содержание**
 * [Запуск локальной версии](#local)
@@ -22,9 +30,11 @@
    * [Fork репозитория](#fork)
    * [Внесение изменений](#push)
    * [Pull requests](#pull)
+   * [Синхронизация с родительским репозиторием](#uptodate)
 * [Разработка](#dev)
    * [Пересборка 'ядра'](#core)
    * [Пересборка плагинов](#plugin)
+* [Wiki проекта](https://github.com/dreamland-mud/dreamland_code/wiki)
 
 ## <a name="local">Запуск локальной версии</a>
 
@@ -37,20 +47,19 @@
 
 Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
 
-Вы можете либо воспользоваться инструкцией и создать локальное окружение с нуля, либо собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
-
 ### <a name="env">Подготовка окружения</a>
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
 ```
 
 ### <a name="build">Сборка из исходников</a>
 Склонируйте к себе либо главный репозиторий, либо свою собственную копию (fork) - о создании fork читайте ниже.
-
+Предположим, что исходники будут лежать в `/home/dreamland/dreamland_code`, тогда:
 ```bash
+mkdir /home/dreamland && cd /home/dreamland
 git clone https://github.com/dreamland-mud/dreamland_code.git
 ```
 В каталоге с исходниками проинициализируйте конфигурационный скрипт и сборочные файлы, запустив
@@ -61,17 +70,28 @@ make -f Makefile.git
 В дальнейшем эту команду запускать не нужно, разве что если изменится configure.ac.
 Приступаем к конфигурации и сборке. Для удобства все объектники будут в отдельном каталоге, чтобы не засорять исходники лишними файлами.
 Инсталяция дримленд также будет в отдельном каталоге runtime, где на этапе конфигурации будет создано дерево каталогов и скопированы нужные файлы. 
+В этом руководстве предполагается, что объектники лежат в `/home/dreamland/objs`, а инсталляция - в `/home/dreamland/runtime`. Измените пути в примерах согласно своей конфигурации.
+
 ```bash
-mkdir ../objs && cd ../objs
-../dreamland_code/configure --path=/path/to/runtime
-make -j 8 && make install
+mkdir /home/dreamland/objs && cd /home/dreamland/objs
+/home/dreamland/dreamland_code/configure --prefix=/home/dreamland/runtime
 ```
+Для сборки и установки запустите команду:
+```bash
+make && make install
+```
+Если у вас несколько процессоров, будет выгодно распараллелить сборку, указав количество параллельных потоков, например:
+```bash
+make -j 4 && make install
+```
+
 ### <a name="areas">Установка dreamland_world</a>
 Склонируйте репозиторий dreamland_world, который содержит все конфигурационные файлы и некоторые зоны. 
 Создайте на него ссылку из каталога runtime.
 ```bash
+cd /home/dreamland
 git clone https://github.com/dreamland-mud/dreamland_world.git
-ln -s /path/to/dreamland_world /path/to/runtime/share/DL
+ln -s /home/dreamland/dreamland_world /home/dreamland/runtime/share/DL
 ```
 
 Вот и всё, мир готов к запуску.
@@ -79,12 +99,12 @@ ln -s /path/to/dreamland_world /path/to/runtime/share/DL
 ### <a name="run">Запуск сервера</a>
 
 ```bash
-cd /path/to/runtime
+cd  /home/dreamland/runtime
 ./bin/dreamland etc/dreamland.xml &
 ```
 ### <a name="logs">Просмотр логов</a>
 
-Логи попадают в подкаталог var/log в каталоге runtime. Формат файла логов задается в etc/dreamland.xml, по умолчанию имя файла - это дата и время запуска. 
+Логи попадают в подкаталог `var/log` в каталоге runtime. Формат файла логов задается в `etc/dreamland.xml`, по умолчанию имя файла - это дата и время запуска. 
 ```xml
 <logPattern>var/log/%Y%m%d-%H%M%S.log</logPattern>
 ```
@@ -92,12 +112,13 @@ cd /path/to/runtime
 
 ### <a name="telnet">Вход в мир</a>
 
-Мир доступен локально на порту 9127, например:
-```bash
-telnet localhost 9127
-```
-Там есть только один персонаж, наделенный всеми полномочиями: Kadm, пароль KadmKadm. 
-При входе через порт 9127 укажите кодировку, логин и пароль, например: 0 Kadm KadmKadm
+Изначально в мире есть только один персонаж, наделенный всеми полномочиями: Kadm, пароль KadmKadm. Остальных персонажей можно создать по мере необходимости. Мир доступен локально на нескольких портах:
+
+* 9001 - "задняя дверь" для быстрого доступа, минуя архивариуса. При входе через этот порт укажите в одной строке кодировку, логин и пароль, например: 0 Kadm KadmKadm.
+* 9000 - обычный вход, тут же можно создать нового персонажа.
+* 1234 - порт web-socket. Можете скачать клиент [mudjs](https://github.com/dreamland-mud/mudjs), установить его согласно инструкции и играть из браузера.
+
+Например: ```telnet localhost 9000``` или ```#connect localhost 9000``` в муд-клиенте. Вместо localhost может понадобиться указать IP-адрес виртуальной машины, на которой установлен и запущен муд-сервер.
 
 ---
 ## <a name="git">Работа с репозиторием</a>
@@ -135,7 +156,7 @@ git add .
 ```
 Добавить файлы выборочно:
 ```bash
-git add /path/to/file
+git add path/to/file
 ```
 3. Создать commit и описать изменение. Описания рекомендуется делать понятные для тех, кто будет читать их через полгода.
 ```bash
@@ -158,6 +179,22 @@ git push
 Нажав на нее, можно будет просмотреть отличия между двумя ветками. Если между вашей и родительской версией нету конфликтов, вы увидите "Able to merge". Можно создавать pull request, нажав на кнопку Create:
 ![pull example](https://dreamland.rocks/img/git05.png)
 
+### <a name="uptodate">Синхронизация с родительским репозиторием</a>
+Периодически приходится затаскивать изменения из главного репозитория в свой, чтобы всегда работать с последней версией.
+Один из способов это сделать такой:
+
+В самом начале, как только склонировали репозиторий, добавьте себе еще один remote под названием upstream, который указывает на главный репозиторий:
+```bash
+git remote add upstream https://github.com/dreamland-mud/dreamland_code.git 
+```
+Теперь каждый раз, когда хочется обновиться из главного репозитория, можно легко стянуть изменения из главного и наложить их на свою ветку master:
+```bash
+git fetch upstream
+git checkout master
+git merge upstream/master
+git push
+```
+
 ---
 
 ## <a name="dev">Разработка</a>
@@ -168,12 +205,12 @@ git push
 Если вы внесли изменения в каталог src:
 * если поменялась только реализация (файлы с расширением .cpp), достаточно пересобрать только каталог src:
 ```bash
-cd /path/to/objs/src
+cd /home/dreamland/objs/src
 make -j 4 && make install
 ```
 * если ваше изменение также повлияет и на плагины (например, поменялся заголовочный файл) - то нужно пересобрать вообще всё.  
 ```bash
-cd /path/to/objs
+cd /home/dreamland/objs
 make -j 4 && make install
 ```
 Затем надо перезапустить dreamland (см. выше про запуск).
@@ -181,7 +218,7 @@ make -j 4 && make install
 ### <a name="plugin">Пересборка плагинов</a>
 Пересоберите все измененные плагины:
 ```bash
-cd /path/to/objs/plug-ins/yourplugin
+cd /home/dreamland/objs/plug-ins/yourplugin
 make -j 4 && make install
 ```
 Перегрузите все измененные плагины изнутри мира, набрав:

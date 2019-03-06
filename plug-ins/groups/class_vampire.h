@@ -11,9 +11,9 @@
 class VampireGuildmaster : public BasicMobileDestiny {
 XML_OBJECT
 public:
-	typedef ::Pointer<VampireGuildmaster> Pointer;
-	
-	virtual bool social( Character *, Character *, const DLString & );
+        typedef ::Pointer<VampireGuildmaster> Pointer;
+        
+        virtual bool social( Character *, Character *, const DLString & );
 };
 
 #endif

@@ -36,18 +36,18 @@ bool FireproofWE::run( PCharacter *ch, Character *victim ) const
     af.bitvector = ITEM_BURN_PROOF;
 
     for (obj = victim->carrying; obj; obj = obj->next_content) {
-	if (obj->wear_loc == wear_none)
-	    continue;
-	    
-	if (IS_OBJ_STAT(obj, ITEM_BURN_PROOF))
-	    continue;
+        if (obj->wear_loc == wear_none)
+            continue;
+            
+        if (IS_OBJ_STAT(obj, ITEM_BURN_PROOF))
+            continue;
 
-	af.duration  = number_range( af.level, 200 );
-	affect_to_obj( obj, &af);
+        af.duration  = number_range( af.level, 200 );
+        affect_to_obj( obj, &af);
     }
 
-    act( "{CОбмундирование на $c6 вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_ROOM );
-    act( "{CТвое обмундирование вспыхивает ослепительным блеском.{x", victim, 0, 0, TO_CHAR );
+    act( "{Cп·п╠п╪я┐п╫п╢п╦я─п╬п╡п╟п╫п╦п╣ п╫п╟ $c6 п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╬я│п╩п╣п©п╦я┌п╣п╩я▄п╫я▀п╪ п╠п╩п╣я│п╨п╬п╪.{x", victim, 0, 0, TO_ROOM );
+    act( "{Cп╒п╡п╬п╣ п╬п╠п╪я┐п╫п╢п╦я─п╬п╡п╟п╫п╦п╣ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╬я│п╩п╣п©п╦я┌п╣п╩я▄п╫я▀п╪ п╠п╩п╣я│п╨п╬п╪.{x", victim, 0, 0, TO_CHAR );
     return true;
 }
 
@@ -59,15 +59,15 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     obj = get_eq_char( victim, wear_wield );
 
     if (!obj) {
-	if (ch != victim) {
-	    victim->println( "Ты чувствуешь легкое покалывание ладони." );
-	    act( "Слово не достигло цели - $C1 ничем не вооруж$Gено|ен|ена.", ch, 0, victim, TO_CHAR );
-	}
-	else {
-	    act( "Слово не достигло цели - ты ничем не вооруж$gено|ен|ена.", ch, 0, 0, TO_CHAR );
-	}
+        if (ch != victim) {
+            victim->println( "п╒я▀ я┤я┐п╡я│я┌п╡я┐п╣я┬я▄ п╩п╣пЁп╨п╬п╣ п©п╬п╨п╟п╩я▀п╡п╟п╫п╦п╣ п╩п╟п╢п╬п╫п╦." );
+            act( "п║п╩п╬п╡п╬ п╫п╣ п╢п╬я│я┌п╦пЁп╩п╬ я├п╣п╩п╦ - $C1 п╫п╦я┤п╣п╪ п╫п╣ п╡п╬п╬я─я┐п╤$Gп╣п╫п╬|п╣п╫|п╣п╫п╟.", ch, 0, victim, TO_CHAR );
+        }
+        else {
+            act( "п║п╩п╬п╡п╬ п╫п╣ п╢п╬я│я┌п╦пЁп╩п╬ я├п╣п╩п╦ - я┌я▀ п╫п╦я┤п╣п╪ п╫п╣ п╡п╬п╬я─я┐п╤$gп╣п╫п╬|п╣п╫|п╣п╫п╟.", ch, 0, 0, TO_CHAR );
+        }
 
-	return false;
+        return false;
     }
     
     affect_enchant( obj );
@@ -89,7 +89,7 @@ bool EnchantWeaponWE::run( PCharacter *ch, Character *victim ) const
     victim->hitroll += af.modifier;
     victim->damroll += af.modifier;
 
-    act( "{CСекреты кузнецов древности преображают $o4!{x", ch, obj, 0, TO_ALL );
+    act( "{Cп║п╣п╨я─п╣я┌я▀ п╨я┐п╥п╫п╣я├п╬п╡ п╢я─п╣п╡п╫п╬я│я┌п╦ п©я─п╣п╬п╠я─п╟п╤п╟я▌я┌ $o4!{x", ch, obj, 0, TO_ALL );
     return true;
 }
 
@@ -97,22 +97,22 @@ bool BerserkWE::run( PCharacter *ch, Character *victim ) const
 {
     Affect af;
     
-    af.where	 = TO_AFFECTS;
-    af.type	 = gsn_ancient_rage;
-    af.level	 = ch->getModifyLevel( );
-    af.duration	 = number_fuzzy( af.level / 8 );
-    af.location	 = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
+    af.where         = TO_AFFECTS;
+    af.type         = gsn_ancient_rage;
+    af.level         = ch->getModifyLevel( );
+    af.duration         = number_fuzzy( af.level / 8 );
+    af.location         = (number_bits( 1 ) ? APPLY_HITROLL : APPLY_DAMROLL);
 
     if (victim->isAffected( gsn_ancient_rage )) {
-	act( "{CПламя древней ярости разгорается в тебе с новой силой!{x", victim, 0, 0, TO_CHAR );
-	af.modifier = 0;
+        act( "{Cп÷п╩п╟п╪я▐ п╢я─п╣п╡п╫п╣п╧ я▐я─п╬я│я┌п╦ я─п╟п╥пЁп╬я─п╟п╣я┌я│я▐ п╡ я┌п╣п╠п╣ я│ п╫п╬п╡п╬п╧ я│п╦п╩п╬п╧!{x", victim, 0, 0, TO_CHAR );
+        af.modifier = 0;
     }
     else {
-	act( "{CПламя древней ярости вспыхивает в тебе!{x", victim, 0, 0, TO_CHAR );
-	af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
+        act( "{Cп÷п╩п╟п╪я▐ п╢я─п╣п╡п╫п╣п╧ я▐я─п╬я│я┌п╦ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╡ я┌п╣п╠п╣!{x", victim, 0, 0, TO_CHAR );
+        af.modifier = max( 1, number_range( af.level / 6, af.level / 5 ) );
     }
 
-    act( "{CПламя древней ярости вспыхивает в $c6!{x", victim, 0, 0, TO_ROOM );
+    act( "{Cп÷п╩п╟п╪я▐ п╢я─п╣п╡п╫п╣п╧ я▐я─п╬я│я┌п╦ п╡я│п©я▀я┘п╦п╡п╟п╣я┌ п╡ $c6!{x", victim, 0, 0, TO_ROOM );
     affect_join( victim, &af );
     return true;
 }
@@ -122,15 +122,15 @@ bool MendingWE::run( PCharacter *ch, Character *victim ) const
     Object *obj;
 
     for (obj = victim->carrying; obj; obj = obj->next_content) {
-	if (obj->wear_loc == wear_none)
-	    continue;
+        if (obj->wear_loc == wear_none)
+            continue;
 
-	obj->condition += number_range( 30, 50 );
-	obj->condition = min( 100, obj->condition );
+        obj->condition += number_range( 30, 50 );
+        obj->condition = min( 100, obj->condition );
     }
 
-    act( "{CСекреты древних кузнецов улучшают облик твоего обмундирования.{x", victim, 0, 0, TO_CHAR );
-    act( "{CСекреты древних кузнецов улучшают облик обмундирования $c2.{x", victim, 0, 0, TO_ROOM );
+    act( "{Cп║п╣п╨я─п╣я┌я▀ п╢я─п╣п╡п╫п╦я┘ п╨я┐п╥п╫п╣я├п╬п╡ я┐п╩я┐я┤я┬п╟я▌я┌ п╬п╠п╩п╦п╨ я┌п╡п╬п╣пЁп╬ п╬п╠п╪я┐п╫п╢п╦я─п╬п╡п╟п╫п╦я▐.{x", victim, 0, 0, TO_CHAR );
+    act( "{Cп║п╣п╨я─п╣я┌я▀ п╢я─п╣п╡п╫п╦я┘ п╨я┐п╥п╫п╣я├п╬п╡ я┐п╩я┐я┤я┬п╟я▌я┌ п╬п╠п╩п╦п╨ п╬п╠п╪я┐п╫п╢п╦я─п╬п╡п╟п╫п╦я▐ $c2.{x", victim, 0, 0, TO_ROOM );
     return true;
 }
 

@@ -11,15 +11,15 @@
 
 class QuestCannotStartException : public Exception {
 public:
-	QuestCannotStartException( );
-	QuestCannotStartException( const DLString & );
-	virtual ~QuestCannotStartException( ) throw( );
+        QuestCannotStartException( );
+        QuestCannotStartException( const DLString & );
+        virtual ~QuestCannotStartException( ) throw( );
 };
 
 class QuestRuntimeException : public Exception {
 public:
-	QuestRuntimeException( const DLString & );
-	virtual ~QuestRuntimeException( ) throw( );
+        QuestRuntimeException( const DLString & );
+        virtual ~QuestRuntimeException( ) throw( );
 };
 
 #endif

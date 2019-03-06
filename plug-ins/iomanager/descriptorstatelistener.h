@@ -12,12 +12,12 @@ class Descriptor;
 
 class DescriptorStateListener : public virtual Plugin {
 public:
-	typedef ::Pointer<DescriptorStateListener> Pointer;
+        typedef ::Pointer<DescriptorStateListener> Pointer;
 
-	virtual void initialization( );
-	virtual void destruction( );
-	
-	virtual void run ( int oldState, int newState, Descriptor *d ) = 0;
+        virtual void initialization( );
+        virtual void destruction( );
+        
+        virtual void run ( int oldState, int newState, Descriptor *d ) = 0;
 };
 
 #endif

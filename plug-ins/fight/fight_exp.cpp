@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ˜”≈ –“¡◊¡ Œ¡ ‹‘œ‘ Àœƒ 'Dream Land' –“≈Œ¡ƒÃ≈÷¡‘ Igor {Leo} … Olga {Varda}*
- * Ó≈Àœ‘œ“’¿ –œÕœ›ÿ ◊ Œ¡–…”¡Œ…… ‹‘œ«œ Àœƒ¡, ¡ ‘¡À÷≈ ”◊œ…Õ… …ƒ≈—Õ… –œÕœ«¡Ã…:*
- *    Igor S. Petrenko	    {NoFate, Demogorgon}                           *
- *    Koval Nazar	    {Nazar, Redrum}                 		   *
- *    Doropey Vladimir	    {Reorx}		                           *
- *    Kulgeyko Denis	    {Burzum}		                           *
- *    Andreyanov Aleksandr  {Manwe}		                           *
- *    … ◊”≈ œ”‘¡ÃÿŒŸ≈, À‘œ ”œ◊≈‘œ◊¡Ã … …«“¡Ã ◊ ‹‘œ‘ MUD	                   *
+ * –í—Å–µ –ø—Ä–∞–≤–∞ –Ω–∞ —ç—Ç–æ—Ç –∫–æ–¥ 'Dream Land' –ø—Ä–µ–Ω–∞–¥–ª–µ–∂–∞—Ç Igor {Leo} –∏ Olga {Varda}*
+ * –ù–µ–∫–æ—Ç–æ—Ä—É—é –ø–æ–º–æ—â—å –≤ –Ω–∞–ø–∏—Å–∞–Ω–∏–∏ —ç—Ç–æ–≥–æ –∫–æ–¥–∞, –∞ —Ç–∞–∫–∂–µ —Å–≤–æ–∏–º–∏ –∏–¥–µ—è–º–∏ –ø–æ–º–æ–≥–∞–ª–∏:*
+ *    Igor S. Petrenko            {NoFate, Demogorgon}                           *
+ *    Koval Nazar            {Nazar, Redrum}                                    *
+ *    Doropey Vladimir            {Reorx}                                           *
+ *    Kulgeyko Denis            {Burzum}                                           *
+ *    Andreyanov Aleksandr  {Manwe}                                           *
+ *    –∏ –≤—Å–µ –æ—Å—Ç–∞–ª—å–Ω—ã–µ, –∫—Ç–æ —Å–æ–≤–µ—Ç–æ–≤–∞–ª –∏ –∏–≥—Ä–∞–ª –≤ —ç—Ç–æ—Ç MUD                           *
  ***************************************************************************/
 
 #include "skill.h"
@@ -18,39 +18,46 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "object.h"
+#include "bonus.h"
 #include "gsn_plugin.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
+#include "bonus.h"
 #include "fight.h"
 #include "act.h"
 #include "def.h"
 
 PROF(samurai);
+BONUS(experience);
+BONUS(pet_day);
 
-int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
+int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
 
 #ifndef FIGHT_STUB
 void gain_exp_mob( NPCharacter *ch, Character *victim )
 {
     int modifier = 100;
     int diff = victim->getRealLevel() - ch->getRealLevel();
-    
-    if ( diff > 15 )
-	modifier = 150;
+    bool fBonus = bonus_pet_day->isActive(NULL, time_info);
+   
+    if (fBonus)
+        modifier = 150;
+    else if (diff > 15)
+        modifier = 150;
     else if ( diff > 5 )
-	modifier = 125;
+        modifier = 125;
     else if ( diff > 0 )
-	modifier = 110;
+        modifier = 110;
     else if ( diff > -5 )
-	modifier = 105;
-	
+        modifier = 105;
+     
     if ( number_percent() * modifier / 100 > 110 )
     {
-	if (victim->getRealLevel() > ch->getRealLevel()) {
-	    ch->setLevel( ch->getRealLevel() + 1 );
-	    ch->send_to("ÙŸ –œÃ’ﬁ¡≈€ÿ ’“œ◊≈Œÿ!\n\r");
-	    act_p("$c1 ◊Ÿ«Ã—ƒ…‘ ¬œÃ≈≈ œ–Ÿ‘Œ$gŸÕ|ŸÕ|œ !\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        if (victim->getRealLevel() > ch->getRealLevel()) {
+            ch->setLevel( ch->getRealLevel() + 1 );
+            ch->send_to("–¢—ã –ø–æ–ª—É—á–∞–µ—à—å —É—Ä–æ–≤–µ–Ω—å!\n\r");
+            act_p("$c1 –≤—ã–≥–ª—è–¥–∏—Ç –±–æ–ª–µ–µ –æ–ø—ã—Ç–Ω$g—ã–º|—ã–º|–æ–π!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
 
             // Restore act bits that are removed for low-level adaptive pets.
             if (ch->getRealLevel( ) > 20) {
@@ -59,114 +66,114 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
                 if (IS_SET(ch->pIndexData->act, ACT_MAGE))
                     SET_BIT(ch->act, ACT_MAGE);
             }
-	}
+        }
     }
     if ( number_percent() * modifier / 100 > 90 )
     {
-	if (victim->hitroll > ch->hitroll) {
-	    ch->hitroll++;
-	    ch->send_to("Ù≈–≈“ÿ ‘Ÿ ¬’ƒ≈€ÿ –œ–¡ƒ¡‘ÿ ¬œÃ≈≈ Õ≈‘Àœ!\n\r");
-	    act_p("$c1 ”‘¡Œœ◊…‘”— ¬œÃ≈≈ Õ≈‘À$g…Õ|…Õ|œ !\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	}
+        if (fBonus || victim->hitroll > ch->hitroll) {
+            ch->hitroll++;
+            ch->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã –±—É–¥–µ—à—å –ø–æ–ø–∞–¥–∞—Ç—å –±–æ–ª–µ–µ –º–µ—Ç–∫–æ!\n\r");
+            act_p("$c1 —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è –±–æ–ª–µ–µ –º–µ—Ç–∫$g–∏–º|–∏–º|–æ–π!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        }
     }
     if ( number_percent() * modifier / 100 > 110 )
     {
-	if (victim->damroll > ch->damroll) {
-	    ch->damroll++;
-	    ch->send_to("Ù≈–≈“ÿ ‘Ÿ ¬’ƒ≈€ÿ ¬œÃÿŒ≈≈ ¬…‘ÿ!\n\r");
-	    act_p("$c1 ‘≈–≈“ÿ ¬’ƒ≈‘ ¬œÃÿŒ≈≈ ¬…‘ÿ!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	}
+        if (fBonus || victim->damroll > ch->damroll) {
+            ch->damroll++;
+            ch->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã –±—É–¥–µ—à—å –±–æ–ª—å–Ω–µ–µ –±–∏—Ç—å!\n\r");
+            act_p("$c1 —Ç–µ–ø–µ—Ä—å –±—É–¥–µ—Ç –±–æ–ª—å–Ω–µ–µ –±–∏—Ç—å!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        }
     }
     if ( number_percent() * modifier / 100 > 100 )
     {
-	int gain;
-	
-	gain = max( 0, victim->max_hit - ch->max_hit );
-	gain = gain * number_percent() * 20 / 10000;
+        int gain;
+        
+        gain = max( 0, victim->max_hit - ch->max_hit );
+        gain = gain * number_percent() * 20 / 10000;
 
-	if (gain > 0) {
-	    ch->max_hit += gain;
-	    ch->send_to("ÙŸ ⁄ƒœ“œ◊≈≈€ÿ!\n\r");
-	    act_p("˙ƒœ“œ◊ÿ≈ $c2 “¡”‘≈‘!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	}
+        if (fBonus || gain > 0) {
+            ch->max_hit += gain;
+            ch->send_to("–¢—ã –∑–¥–æ—Ä–æ–≤–µ–µ—à—å!\n\r");
+            act_p("–ó–¥–æ—Ä–æ–≤—å–µ $c2 —Ä–∞—Å—Ç–µ—Ç!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        }
     }
     if ( number_percent() * modifier / 100 > 100 )
     {
-	int gain;
-	
-	gain = max( 0, victim->max_mana - ch->max_mana );
-	gain = gain * number_percent() * 20 / 10000;
+        int gain;
+        
+        gain = max( 0, victim->max_mana - ch->max_mana );
+        gain = gain * number_percent() * 20 / 10000;
 
-	if (gain > 0) {
-	    ch->max_mana += gain;
-	    ch->send_to("ÙŸ ﬁ’◊”‘◊’≈€ÿ –“…Ã…◊ ‹Œ≈“«……!\n\r");
-	    act_p("$c1 Œ¡–œÃŒ—≈‘”— ‹Œ≈“«…≈ !\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	}
+        if (fBonus || gain > 0) {
+            ch->max_mana += gain;
+            ch->send_to("–¢—ã —á—É–≤—Å—Ç–≤—É–µ—à—å –ø—Ä–∏–ª–∏–≤ —ç–Ω–µ—Ä–≥–∏–∏!\n\r");
+            act_p("$c1 –Ω–∞–ø–æ–ª–Ω—è–µ—Ç—Å—è —ç–Ω–µ—Ä–≥–∏–µ–π!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        }
     }
 
     if (victim->is_npc( )) {
-	NPCharacter *vch = victim->getNPC( );
+        NPCharacter *vch = victim->getNPC( );
 
-	if ( number_percent() * modifier / 100 > 110 )
-	{
-	    if (vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER]) {
-		ch->damage[DICE_NUMBER]++;
-		ch->send_to("Ù≈–≈“ÿ ‘Ÿ ¬’ƒ≈€ÿ Œ¡Œœ”…‘ÿ ¬œÃÿ€≈ –œ◊“≈÷ƒ≈Œ… !\n\r");
-		act_p("$c1 ”‘¡Œœ◊…‘”— ¬œÃ≈≈ œ–¡”Œ$gŸÕ|ŸÕ|œ !\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	    }
-	}
-	if ( number_percent() * modifier / 100 > 110 )
-	{
-	    if (vch->damage[DICE_TYPE] > vch->damage[DICE_TYPE]) {
-		ch->damage[DICE_TYPE]++;
-		ch->send_to("Ù≈–≈“ÿ ‘Ÿ ¬’ƒ≈€ÿ Œ¡Œœ”…‘ÿ ¬œÃÿ€≈ –œ◊“≈÷ƒ≈Œ… !\n\r");
-		act_p("$c1 ”‘¡Œœ◊…‘”— ¬œÃ≈≈ œ–¡”Œ$gŸÕ|ŸÕ|œ !\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	    }
-	}
+        if ( number_percent() * modifier / 100 > 110 )
+        {
+            if (fBonus || vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER]) {
+                ch->damage[DICE_NUMBER]++;
+                ch->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã –±—É–¥–µ—à—å –Ω–∞–Ω–æ—Å–∏—Ç—å –±–æ–ª—å—à–µ –ø–æ–≤—Ä–µ–∂–¥–µ–Ω–∏–π!\n\r");
+                act_p("$c1 —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è –±–æ–ª–µ–µ –æ–ø–∞—Å–Ω$g—ã–º|—ã–º|–æ–π!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            }
+        }
+        if ( number_percent() * modifier / 100 > 110 )
+        {
+            if (fBonus || vch->damage[DICE_TYPE] > vch->damage[DICE_TYPE]) {
+                ch->damage[DICE_TYPE]++;
+                ch->send_to("–¢–µ–ø–µ—Ä—å —Ç—ã –±—É–¥–µ—à—å –Ω–∞–Ω–æ—Å–∏—Ç—å –±–æ–ª—å—à–µ –ø–æ–≤—Ä–µ–∂–¥–µ–Ω–∏–π!\n\r");
+                act_p("$c1 —Å—Ç–∞–Ω–æ–≤–∏—Ç—Å—è –±–æ–ª–µ–µ –æ–ø–∞—Å–Ω$g—ã–º|—ã–º|–æ–π!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            }
+        }
     }
 
     Object *wield;
     int dam_type = 0;
     wield = get_eq_char( victim, wear_wield );
     if ( wield && wield->item_type == ITEM_WEAPON )
-	dam_type = attack_table[wield->value[3]].damage;
+        dam_type = attack_table[wield->value[3]].damage;
     else
-	dam_type = attack_table[victim->dam_type].damage;
+        dam_type = attack_table[victim->dam_type].damage;
     if ( dam_type == -1 )
-	dam_type = DAM_BASH;
+        dam_type = DAM_BASH;
     switch (dam_type)
     {
     case DAM_BASH:
     case DAM_PIERCE:
     case DAM_SLASH:
-	break;
+        break;
     default:
-	dam_type = 0;
-	break;
+        dam_type = 0;
+        break;
     }
     if ( number_percent() * modifier / 100 > 100 )
     {
-	int gain;
+        int gain;
 
-	gain = min( 0, victim->armor[dam_type] - ch->armor[dam_type]);
-	gain = gain * number_percent() * 5 / 10000;
-	
-	if (gain < 0) {
-	    ch->armor[dam_type] += gain;
-	    ch->send_to("Ù◊œ— ⁄¡›…‘¡ ’Ã’ﬁ€¡≈‘”—!\n\r");
-	    act_p("˙¡›…‘¡ $c2 ’Ã’ﬁ€¡≈‘”—!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	}
+        gain = min( 0, victim->armor[dam_type] - ch->armor[dam_type]);
+        gain = gain * number_percent() * 5 / 10000;
+        
+        if (fBonus || gain < 0) {
+            ch->armor[dam_type] += gain;
+            ch->send_to("–¢–≤–æ—è –∑–∞—â–∏—Ç–∞ —É–ª—É—á—à–∞–µ—Ç—Å—è!\n\r");
+            act_p("–ó–∞—â–∏—Ç–∞ $c2 —É–ª—É—á—à–∞–µ—Ç—Å—è!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        }
     }
     
     for (int i = 0; i < stat_table.size; i ++)
     {
-	if ( number_bits(4) == 0
-	    && number_percent() * modifier / 100 > 110 )
-	{
-	    ch->perm_stat[i] = min(25,ch->perm_stat[i] + 1);
-	    ch->send_to("Ù◊œ… –¡“¡Õ≈‘“Ÿ ’Ã’ﬁ€¡¿‘”—!\n\r");
-	    act_p("$c1 ’Ã’ﬁ€¡≈‘ ”◊œ… –¡“¡Õ≈‘“Ÿ!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
-	}
+        if ( number_bits(4) == 0
+            && number_percent() * modifier / 100 > 110 )
+        {
+            ch->perm_stat[i] = min(25,ch->perm_stat[i] + 1);
+            ch->send_to("–¢–≤–æ–∏ –ø–∞—Ä–∞–º–µ—Ç—Ä—ã —É–ª—É—á—à–∞—é—Ç—Å—è!\n\r");
+            act_p("$c1 —É–ª—É—á—à–∞–µ—Ç —Å–≤–æ–∏ –ø–∞—Ä–∞–º–µ—Ç—Ä—ã!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+        }
     }
 }
 
@@ -177,34 +184,34 @@ static void apply_align_changes( PCharacter *ch )
 
     for ( obj = ch->carrying; obj != 0; obj = obj_next )
     {
-	obj_next = obj->next_content;
-	if ( obj->wear_loc == wear_none )
-		continue;
+        obj_next = obj->next_content;
+        if ( obj->wear_loc == wear_none )
+                continue;
 
-	if (obj->isAntiAligned( ch )) {
-	    act_p( "ÙŸ –Ÿ‘¡≈€ÿ”— …”–œÃÿ⁄œ◊¡‘ÿ $o4, Œœ ‹‘œ Œ≈ ƒÃ— ‘≈¬—.",
-		ch, obj, 0, TO_CHAR,POS_RESTING );
-	    act_p( "$c1 –Ÿ‘¡≈‘”— …”–œÃÿ⁄œ◊¡‘ÿ $o4, Œœ œŒœ $m Œ≈ –œƒ»œƒ…‘.",
-		ch, obj, 0, TO_ROOM,POS_RESTING );
-	    obj_from_char( obj );
-	    obj_to_room( obj, ch->in_room );
-	}
+        if (obj->isAntiAligned( ch )) {
+            act_p( "–¢—ã –ø—ã—Ç–∞–µ—à—å—Å—è –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å $o4, –Ω–æ —ç—Ç–æ –Ω–µ –¥–ª—è —Ç–µ–±—è.",
+                ch, obj, 0, TO_CHAR,POS_RESTING );
+            act_p( "$c1 –ø—ã—Ç–∞–µ—Ç—Å—è –∏—Å–ø–æ–ª—å–∑–æ–≤–∞—Ç—å $o4, –Ω–æ –æ–Ω–æ $m –Ω–µ –ø–æ–¥—Ö–æ–¥–∏—Ç.",
+                ch, obj, 0, TO_ROOM,POS_RESTING );
+            obj_from_char( obj );
+            obj_to_room( obj, ch->in_room );
+        }
     }
 }
 
 static bool can_influence_exp( PCharacter *gch, Character *leader )
 {
     if (IS_GHOST( gch ))
-	return false;
+        return false;
 
     if (gch->getModifyLevel( ) - leader->getModifyLevel( ) > 8 ) {
-	gch->send_to("ÙŸ ”Ã…€ÀœÕ ◊Ÿ”œÀœ«œ ’“œ◊Œ— ƒÃ— ‹‘œ  «“’––Ÿ.\n\r");
-	return false;
+        gch->send_to("–¢—ã —Å–ª–∏—à–∫–æ–º –≤—ã—Å–æ–∫–æ–≥–æ —É—Ä–æ–≤–Ω—è –¥–ª—è —ç—Ç–æ–π –≥—Ä—É–ø–ø—ã.\n\r");
+        return false;
     }
 
     if (gch->getModifyLevel( ) - leader->getModifyLevel( ) < -8 ) {
-	gch->send_to("ÙŸ ”Ã…€ÀœÕ Œ…⁄Àœ«œ ’“œ◊Œ— ƒÃ— ‹‘œ  «“’––Ÿ.\n\r");
-	return false;
+        gch->send_to("–¢—ã —Å–ª–∏—à–∫–æ–º –Ω–∏–∑–∫–æ–≥–æ —É—Ä–æ–≤–Ω—è –¥–ª—è —ç—Ç–æ–π –≥—Ä—É–ø–ø—ã.\n\r");
+        return false;
     }
 
     return true;
@@ -219,59 +226,105 @@ void group_gain( Character *ch, Character *victim )
     std::list<PCharacter *>::iterator i;
 
     if ( victim == ch
-	|| ( victim->is_npc() && victim->getNPC()->pIndexData->vnum < 100 ) )
-	return;
+        || ( victim->is_npc() && victim->getNPC()->pIndexData->vnum < 100 ) )
+        return;
 
     if (ch->is_npc( )) 
-	gain_exp_mob( ch->getNPC( ), victim );
+        gain_exp_mob( ch->getNPC( ), victim );
 
     if (!victim->is_npc( ))
-	return;
+        return;
 
     if ( victim->is_npc()
-	&& ( victim->master != 0 || victim->leader != 0 ) )
-	return;
+        && ( victim->master != 0 || victim->leader != 0 ) )
+        return;
 
     mobcount = 0;
     leader = (ch->leader != 0) ? ch->leader : ch;
 
     for (gch = ch->in_room->people; gch != 0; gch = gch->next_in_room) {
-	if (is_same_group( gch, ch )) {
-	    if (gch->is_npc( ))
-		mobcount++;
-	    else if (can_influence_exp( gch->getPC( ), leader ))
-		players.push_back( gch->getPC( ) );
-	}
+        if (is_same_group( gch, ch )) {
+            if (gch->is_npc( ))
+                mobcount++;
+            else if (can_influence_exp( gch->getPC( ), leader ))
+                players.push_back( gch->getPC( ) );
+        }
     }
 
     if (players.empty( ))
-	return;
+        return;
     
     base_exp_bonus = victim->getNPC( )->behavior ? victim->getNPC( )->behavior->getExpBonus( leader ) : 0;
 
     for (i = players.begin( ); i != players.end( ); i++) {
-	PCharacter *gch = *i;
-	
-	xp = xp_compute( gch, victim, mobcount, players.size( ), leader, base_exp_bonus );
-	gch->printf( "ÙŸ –œÃ’ﬁ¡≈€ÿ %d œﬁÀœ◊ œ–Ÿ‘¡.\n\r", xp );
-	gch->gainExp( xp );
-	
-	apply_align_changes( gch );
+        PCharacter *gch = *i;
+        
+        xp = xp_compute( gch, victim, mobcount, players.size( ), leader, base_exp_bonus );
+        gch->printf( "–¢—ã –ø–æ–ª—É—á–∞–µ—à—å %d –æ—á–∫–æ–≤ –æ–ø—ã—Ç–∞.\n\r", xp );
+        gch->gainExp( xp );
+        
+        apply_align_changes( gch );
     }
 }
 
 
+/*
+ * Calculate align-based coefficients applied to base exp.
+ * Return 'true' if it looks like a good kill, deserving further bonuses.
+ */
+bool xp_align_coeff(Character *gch, Character *victim, int &align_mult, int &align_div)
+{
+    align_mult = 1;
+    align_div = 1;
+
+    // No change for 'no-align' mobs.
+    if (IS_SET(victim->act,ACT_NOALIGN)) {
+        return false;
+    }
+    
+    // Opposite align - big bonus.
+    if ((IS_EVIL(gch) && IS_GOOD(victim)) || (IS_EVIL(victim) && IS_GOOD(gch))) {
+        align_mult = 8;
+        align_div = 5;
+        return true;
+    }
+    
+    // Good vs good: penalize.
+    if (IS_GOOD(gch) && IS_GOOD(victim)) {
+        align_mult = 1;
+        align_div = 5;
+        return false;
+    }
+    
+    // Neutral vs neutral: boring. 
+    if (IS_NEUTRAL(gch) && IS_NEUTRAL(victim)) {
+        align_mult = 3;
+        align_div = 5;
+        return false;
+    }
+    
+    // Good vs neutral: penalize slightly.
+    if (IS_GOOD(gch) && IS_NEUTRAL(victim)) {
+        align_mult = 4;
+        align_div = 5;
+        return false;
+    }
+
+    return true;
+}
 
 /*
  * Compute xp for a kill.
  */
-int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus )
+int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus )
 {
   char buf[MAX_STRING_LENGTH];
   int xp;
   int base_exp;
   short level_range;
   int neg_cha=0, pos_cha=0;
+    int align_mult, align_div;
+    bool align_bonus;
 
   level_range = victim->getModifyLevel() - gch->getModifyLevel();
 
@@ -298,30 +351,15 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
     
   base_exp += base_exp_bonus;
 
- // calculate exp multiplier 
-  if (IS_SET(victim->act,ACT_NOALIGN))
-    xp = base_exp;
 
-  // alignment 
-  else 
-    if ( (IS_EVIL(gch) && IS_GOOD(victim)) 
-    || (IS_EVIL(victim) && IS_GOOD(gch)))
-    xp = ( int )( ( base_exp * 8 ) / 5 );
-
-  else if ( IS_GOOD(gch) && IS_GOOD(victim) )
-    xp = ( int ) base_exp / 5;
-
-  else if ( IS_NEUTRAL(gch) && IS_NEUTRAL(victim) )
-    xp = ( int ) base_exp * 3 / 5;
-
-  else if ( IS_GOOD(gch) && IS_NEUTRAL(victim) )
-    xp = ( int )( base_exp * 4 / 5 );
-
-  else xp = base_exp;
+    // calculate and apply exp multiplier 
+    align_bonus = xp_align_coeff(gch, victim, align_mult, align_div);
+    xp = (int)((base_exp * align_mult) / align_div);
+   
 
     // more exp at the low levels 
     if ( gch->getModifyLevel() < 6)
-	xp += 50 / gch->getModifyLevel();
+        xp += 50 / gch->getModifyLevel();
 
     //limit 
     xp = std::min( xp, 200 );
@@ -338,23 +376,34 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
 
     xp = std::max( xp, 0 );
 
+    // Leadership skill.
     if (leader && !leader->is_npc( ) 
-	&& leader->in_room == gch->in_room
-	&& xp > 10 
-	&& pccount > 1) 
+        && leader->in_room == gch->in_room
+        && xp > 10 
+        && pccount > 1) 
     {
-	int skill = gsn_leadership->getEffective( leader );
-	
-	 if (number_percent( ) < skill / 2) {
-	    xp += (xp * skill / 2) / 100;
-	    act_p( "{c‚Ã¡«œƒ¡“— ’Õ≈ÃœÕ’ “’Àœ◊œƒ”‘◊’ $C2 ‘Ÿ –œÃ’ﬁ¡≈€ÿ ¬œÃÿ€≈ œ–Ÿ‘¡.{x",
-			gch, 0, leader, TO_CHAR, POS_RESTING );
-	    gsn_leadership->improve( leader, true );	
-	}
-	else 
-	    gsn_leadership->improve( leader, false );
+        int skill = gsn_leadership->getEffective( leader );
+        
+         if (number_percent( ) < skill / 2) {
+            xp += (xp * skill / 2) / 100;
+            act_p( "{c–ë–ª–∞–≥–æ–¥–∞—Ä—è —É–º–µ–ª–æ–º—É —Ä—É–∫–æ–≤–æ–¥—Å—Ç–≤—É $C2 —Ç—ã –ø–æ–ª—É—á–∞–µ—à—å –±–æ–ª—å—à–µ –æ–ø—ã—Ç–∞.{x",
+                        gch, 0, leader, TO_CHAR, POS_RESTING );
+            gsn_leadership->improve( leader, true );        
+        }
+        else 
+            gsn_leadership->improve( leader, false );
     }
-    
+
+    // Calendar bonuses: for now simply increase exp on 13th of each month.
+    if (align_bonus && xp > 10 && bonus_experience->isActive(gch, time_info)) {
+        ostringstream ostr;
+        xp = number_range(xp + xp / 2, xp * 2);
+        bonus_experience->reportAction(gch, ostr);
+        gch->send_to(ostr);
+    }
+   
+
+    // Kill counters and charisma update. 
     if (IS_GOOD(gch))
     {
      if (IS_GOOD(victim)) { gch->getPC( )->anti_killed++; neg_cha = 1; }
@@ -386,15 +435,15 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
   {
     if ( (gch->getPC( )->anti_killed % 100) == 99 )
     {
-     sprintf(buf,"Ó¡ ‘◊œ≈Õ ”ﬁ≈‘’ %d ÙÚıÔ˜ %s.\n\r",
-	    gch->getPC( )->anti_killed.getValue( ),
-	IS_GOOD(gch) ? "goods" :
-	IS_NEUTRAL(gch) ? "neutrals" :
-	IS_EVIL(gch) ? "evils" : "nones" );
+     sprintf(buf,"–ù–∞ —Ç–≤–æ–µ–º —Å—á–µ—Ç—É %d –¢–†–£–ü–û–í %s.\n\r",
+            gch->getPC( )->anti_killed.getValue( ),
+        IS_GOOD(gch) ? "goods" :
+        IS_NEUTRAL(gch) ? "neutrals" :
+        IS_EVIL(gch) ? "evils" : "nones" );
      gch->send_to(buf);
      if (gch->perm_stat[STAT_CHA] > 3 && IS_GOOD(gch) )
      {
-      gch->send_to("Ù◊œ≈ œ¬¡—Œ…≈ (charisma) –œŒ…⁄…Ãœ”ÿ Œ¡ ≈ƒ…Œ…√’.\n\r");
+      gch->send_to("–¢–≤–æ–µ –æ–±–∞—è–Ω–∏–µ (charisma) –ø–æ–Ω–∏–∑–∏–ª–æ—Å—å –Ω–∞ –µ–¥–∏–Ω–∏—Ü—É.\n\r");
       gch->perm_stat[STAT_CHA] -= 1;
      }
     }
@@ -403,33 +452,33 @@ int xp_compute( Character *gch, Character *victim, int npccount, int pccount, Ch
    {
     if ( (gch->getPC( )->has_killed % 200) == 199 )
     {
-     sprintf(buf,"Ó¡ ‘◊œ≈Õ ”ﬁ≈‘’ %d ÙÚıÔ˜ %s.\n\r",
-	    gch->getPC( )->has_killed.getValue( ),
-	IS_GOOD(gch) ? "anti-goods" :
-	IS_NEUTRAL(gch) ? "anti-neutrals" :
-	IS_EVIL(gch) ? "anti-evils" : "nones" );
+     sprintf(buf,"–ù–∞ —Ç–≤–æ–µ–º —Å—á–µ—Ç—É %d –¢–†–£–ü–û–í %s.\n\r",
+            gch->getPC( )->has_killed.getValue( ),
+        IS_GOOD(gch) ? "anti-goods" :
+        IS_NEUTRAL(gch) ? "anti-neutrals" :
+        IS_EVIL(gch) ? "anti-evils" : "nones" );
       gch->send_to(buf);
       if (gch->perm_stat[STAT_CHA] < gch->getPC( )->getMaxTrain( STAT_CHA )
-	&& IS_GOOD(gch) )
+        && IS_GOOD(gch) )
       {
-       gch->send_to("Ù◊œ≈ œ¬¡—Œ…≈ (charisma) –œ◊Ÿ”…Ãœ”ÿ Œ¡ ≈ƒ…Œ…√’.\n\r");
+       gch->send_to("–¢–≤–æ–µ –æ–±–∞—è–Ω–∏–µ (charisma) –ø–æ–≤—ã—Å–∏–ª–æ—Å—å –Ω–∞ –µ–¥–∏–Ω–∏—Ü—É.\n\r");
        gch->perm_stat[STAT_CHA] += 1;
       }
      }
    }
 
     if (gch->getProfession( ) == prof_samurai && gch == leader 
-	&& gch->perm_stat[STAT_CHA] < gch->getPC( )->getMaxTrain( STAT_CHA )
-	&& victim->getModifyLevel( ) - gch->getModifyLevel( ) >= 20 
-	&& chance( 10 ))
+        && gch->perm_stat[STAT_CHA] < gch->getPC( )->getMaxTrain( STAT_CHA )
+        && victim->getModifyLevel( ) - gch->getModifyLevel( ) >= 20 
+        && chance( 10 ))
     {
-	act("ÙŸ ’¬…$gÃœ|Ã|Ã¡ ƒœ”‘œ Œœ«œ –“œ‘…◊Œ…À¡, … ‘◊œ≈ œ¬¡—Œ…≈ (charisma) –œ◊Ÿ”…Ãœ”ÿ Œ¡ ≈ƒ…Œ…√’.", gch, 0, 0, TO_CHAR);
-	gch->perm_stat[STAT_CHA] += 1;
+        act("–¢—ã —É–±–∏$g–ª–æ|–ª|–ª–∞ –¥–æ—Å—Ç–æ–π–Ω–æ–≥–æ –ø—Ä–æ—Ç–∏–≤–Ω–∏–∫–∞, –∏ —Ç–≤–æ–µ –æ–±–∞—è–Ω–∏–µ (charisma) –ø–æ–≤—ã—Å–∏–ª–æ—Å—å –Ω–∞ –µ–¥–∏–Ω–∏—Ü—É.", gch, 0, 0, TO_CHAR);
+        gch->perm_stat[STAT_CHA] += 1;
     }
     
     return xp;
 }
 
 #else
-void	group_gain( Character *ch, Character *victim ) { }
+void        group_gain( Character *ch, Character *victim ) { }
 #endif

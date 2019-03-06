@@ -16,28 +16,28 @@
 void Koschey::greet( Character *victim )
 {
     if (victim->is_npc( ))
-	return;
+        return;
 
 }
 
 bool Koschey::command( Character *victim, const DLString &cmdName, const DLString &cmdArgs )
 {
     if (victim->is_npc( ))
-	return false;
+        return false;
 
     if (cmdName == "buy") {
-	doBuy( victim, cmdArgs.quote( ) );
-	return true;
+        doBuy( victim, cmdArgs.quote( ) );
+        return true;
     }
 
     if (cmdName == "list") {
-	doList( victim );
-	return true;
+        doList( victim );
+        return true;
     }
 
     if (cmdName == "sell" || cmdName == "value") {
-	tell_dim( victim, ch, "Мне твое жалкое добро ни к чему." );
-	return true;
+        tell_dim( victim, ch, "п°п╫п╣ я┌п╡п╬п╣ п╤п╟п╩п╨п╬п╣ п╢п╬п╠я─п╬ п╫п╦ п╨ я┤п╣п╪я┐." );
+        return true;
     }
     
     return false;
@@ -50,42 +50,42 @@ bool Koschey::canServeClient( Character * )
 
 void Koschey::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    say_act( client, ch, "А будешь жадничать - отгрызу руку." );
+    say_act( client, ch, "п░ п╠я┐п╢п╣я┬я▄ п╤п╟п╢п╫п╦я┤п╟я┌я▄ - п╬я┌пЁя─я▀п╥я┐ я─я┐п╨я┐." );
 }
 
 void Koschey::msgListEmpty( Character *client )
 {
-    say_act( client, ch, "Ступай отсюда, $c1, подобру-поздорову." );
+    say_act( client, ch, "п║я┌я┐п©п╟п╧ п╬я┌я│я▌п╢п╟, $c1, п©п╬п╢п╬п╠я─я┐-п©п╬п╥п╢п╬я─п╬п╡я┐." );
 }
 
 void Koschey::msgListAfter( Character *client )
 {
-    tell_dim( client, ch, "Это все. Бери то, за чем приш$gло|ел|ла, и чтоб духу твоего здесь не было!" );
-    act( "$C1 что-то монотонно цедит сквозь зубы, обращаясь к $c4.", client, 0, ch, TO_NOTVICT );
+    tell_dim( client, ch, "п╜я┌п╬ п╡я│п╣. п▒п╣я─п╦ я┌п╬, п╥п╟ я┤п╣п╪ п©я─п╦я┬$gп╩п╬|п╣п╩|п╩п╟, п╦ я┤я┌п╬п╠ п╢я┐я┘я┐ я┌п╡п╬п╣пЁп╬ п╥п╢п╣я│я▄ п╫п╣ п╠я▀п╩п╬!" );
+    act( "$C1 я┤я┌п╬-я┌п╬ п╪п╬п╫п╬я┌п╬п╫п╫п╬ я├п╣п╢п╦я┌ я│п╨п╡п╬п╥я▄ п╥я┐п╠я▀, п╬п╠я─п╟я┴п╟я▐я│я▄ п╨ $c4.", client, 0, ch, TO_NOTVICT );
 }
 
 void Koschey::msgListBefore( Character *client )
 {
-    act( "$C1 поднимает на тебя раздраженный взгляд.", client, 0, ch, TO_CHAR );
-    act( "$C1 поднимает на $c4 раздраженный взгляд.", client, 0, ch, TO_ROOM );
-    act( "$C1 скрипучим голосом произносит '{gВот какое счастье тебе привалило:{x'", client, 0, ch, TO_CHAR );
+    act( "$C1 п©п╬п╢п╫п╦п╪п╟п╣я┌ п╫п╟ я┌п╣п╠я▐ я─п╟п╥п╢я─п╟п╤п╣п╫п╫я▀п╧ п╡п╥пЁп╩я▐п╢.", client, 0, ch, TO_CHAR );
+    act( "$C1 п©п╬п╢п╫п╦п╪п╟п╣я┌ п╫п╟ $c4 я─п╟п╥п╢я─п╟п╤п╣п╫п╫я▀п╧ п╡п╥пЁп╩я▐п╢.", client, 0, ch, TO_ROOM );
+    act( "$C1 я│п╨я─п╦п©я┐я┤п╦п╪ пЁп╬п╩п╬я│п╬п╪ п©я─п╬п╦п╥п╫п╬я│п╦я┌ '{gп▓п╬я┌ п╨п╟п╨п╬п╣ я│я┤п╟я│я┌я▄п╣ я┌п╣п╠п╣ п©я─п╦п╡п╟п╩п╦п╩п╬:{x'", client, 0, ch, TO_CHAR );
 }
 
 void Koschey::msgBuyRequest( Character *client )
 {
-    act( "$c1 торгуется с $C5.", client, 0, ch, TO_NOTVICT );
+    act( "$c1 я┌п╬я─пЁя┐п╣я┌я│я▐ я│ $C5.", client, 0, ch, TO_NOTVICT );
 }
 
 void Koschey::msgArticleNotFound( Character *client )
 {
-    act( "$C1 в ярости восклицает '{g$c1, ты сюда шутки приш$gло|ел|ла шутить?!{x'", client, 0, ch, TO_ALL );
+    act( "$C1 п╡ я▐я─п╬я│я┌п╦ п╡п╬я│п╨п╩п╦я├п╟п╣я┌ '{g$c1, я┌я▀ я│я▌п╢п╟ я┬я┐я┌п╨п╦ п©я─п╦я┬$gп╩п╬|п╣п╩|п╩п╟ я┬я┐я┌п╦я┌я▄?!{x'", client, 0, ch, TO_ALL );
 }
 
 /*
  * VictoryPrice
  */
 const int VictoryPrice::COUNT_PER_LIFE = 500;
-const DLString VictoryPrice::CURRENCY_NAME = "побед|ы||ам|ы|ами|ах";
+const DLString VictoryPrice::CURRENCY_NAME = "п©п╬п╠п╣п╢|я▀||п╟п╪|я▀|п╟п╪п╦|п╟я┘";
 
 DLString VictoryPrice::toCurrency( ) const
 {
@@ -96,7 +96,7 @@ DLString VictoryPrice::toString( Character * ) const
 {
     DLString str;
 
-    str << count << " " << GET_COUNT( count, "победа", "победы", "побед" );
+    str << count << " " << GET_COUNT( count, "п©п╬п╠п╣п╢п╟", "п©п╬п╠п╣п╢я▀", "п©п╬п╠п╣п╢" );
     return str;
 }
 
@@ -106,15 +106,15 @@ bool VictoryPrice::canAfford( Character *ch ) const
     int avail;
     
     if (ch->is_npc( ))
-	return false;
-	
+        return false;
+        
     attr = ch->getPC( )->getAttributes( ).findAttr<XMLAttributeStatistic>( "questdata" );
     if (!attr)
-	return false;
+        return false;
 
     avail = min( (int)(Remorts::MAX_BONUS_LIFES
                            - ch->getPC( )->getRemorts( ).size( )) * COUNT_PER_LIFE,
-	         attr->getAllVictoriesCount( ) );
+                 attr->getAllVictoriesCount( ) );
 
     return avail - attr->getVasted( ) >= count.getValue( );
 }
@@ -122,10 +122,10 @@ bool VictoryPrice::canAfford( Character *ch ) const
 void VictoryPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( )) {
-	XMLAttributeStatistic::Pointer attr;
-	
-	attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeStatistic>( "questdata" );
-	attr->setVasted( attr->getVasted( ) + count.getValue( ) );
+        XMLAttributeStatistic::Pointer attr;
+        
+        attr = ch->getPC( )->getAttributes( ).getAttr<XMLAttributeStatistic>( "questdata" );
+        attr->setVasted( attr->getVasted( ) + count.getValue( ) );
     }
 }
 

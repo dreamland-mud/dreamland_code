@@ -7,15 +7,15 @@ bool Rideable::canMount( Character *rider )
     Skill *skill = getRidingSkill( );
 
     if (!skill->usable( rider )) {
-	rider->println("Ты не умеешь кататься на таких существах.");
-	return false;
+        rider->println("п╒я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╨п╟я┌п╟я┌я▄я│я▐ п╫п╟ я┌п╟п╨п╦я┘ я│я┐я┴п╣я│я┌п╡п╟я┘.");
+        return false;
     }
 
     if (ch->leader && ch->leader != rider) {
-	if (!gsn_steal_mount->usable( rider )) {
-	    rider->pecho("%^C1 - чужая собственность, а ты не умеешь воровать.", ch);
-	    return false;
-	}
+        if (!gsn_steal_mount->usable( rider )) {
+            rider->pecho("%^C1 - я┤я┐п╤п╟я▐ я│п╬п╠я│я┌п╡п╣п╫п╫п╬я│я┌я▄, п╟ я┌я▀ п╫п╣ я┐п╪п╣п╣я┬я▄ п╡п╬я─п╬п╡п╟я┌я▄.", ch);
+            return false;
+        }
     }
 }
 

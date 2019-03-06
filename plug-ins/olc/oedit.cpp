@@ -56,9 +56,9 @@ OLCStateObject::OLCStateObject( OBJ_INDEX_DATA *original )
     obj.area         = original->area;
 
     if(original->behavior)
-	obj.behavior         = XMLDocument::Pointer( NEW, **original->behavior );
+        obj.behavior         = XMLDocument::Pointer( NEW, **original->behavior );
     else
-	obj.behavior         = 0;
+        obj.behavior         = 0;
 
     copyParameters( original );
     copyDescriptions( original );
@@ -80,21 +80,21 @@ void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
     Affect *af, **my_af = &obj.affected;
     list<Affect *> afflist;
     for(af = original->affected; af; af = af->next)
-	afflist.push_back(af);
+        afflist.push_back(af);
 
     while(!afflist.empty()) {
-	af = afflist.back();
-	afflist.pop_back();
-	
-	*my_af = dallocate( Affect );
-	(*my_af)->where    =af->where; 
-	(*my_af)->type     =af->type; 
-	(*my_af)->level    =af->level;
-	(*my_af)->duration =af->duration;
-	(*my_af)->location =af->location;
-	(*my_af)->modifier =af->modifier;
-	(*my_af)->bitvector=af->bitvector;
-	my_af = &(*my_af)->next;
+        af = afflist.back();
+        afflist.pop_back();
+        
+        *my_af = dallocate( Affect );
+        (*my_af)->where    =af->where; 
+        (*my_af)->type     =af->type; 
+        (*my_af)->level    =af->level;
+        (*my_af)->duration =af->duration;
+        (*my_af)->location =af->location;
+        (*my_af)->modifier =af->modifier;
+        (*my_af)->bitvector=af->bitvector;
+        my_af = &(*my_af)->next;
     }
     *my_af = 0;
     
@@ -115,15 +115,15 @@ void OLCStateObject::copyDescriptions( OBJ_INDEX_DATA *original )
     list<EXTRA_DESCR_DATA *> edlist;
 
     for(ed = original->extra_descr; ed; ed = ed->next)
-	edlist.push_back(ed);
+        edlist.push_back(ed);
    
     while(!edlist.empty()) {
-	ed = edlist.back();
-	edlist.pop_back();
-	*my_ed = new_extra_descr();
-	(*my_ed)->keyword = str_dup(ed->keyword);
-	(*my_ed)->description = str_dup(ed->description);
-	my_ed = &(*my_ed)->next;
+        ed = edlist.back();
+        edlist.pop_back();
+        *my_ed = new_extra_descr();
+        (*my_ed)->keyword = str_dup(ed->keyword);
+        (*my_ed)->description = str_dup(ed->description);
+        my_ed = &(*my_ed)->next;
     }
     *my_ed = 0;
 
@@ -148,68 +148,68 @@ void OLCStateObject::commit()
     original = get_obj_index(obj.vnum);
 
     if(!original) {
-	int iHash;
-	
-	original = new_obj_index();
+        int iHash;
+        
+        original = new_obj_index();
 
-	original->vnum = obj.vnum;
-	original->area = obj.area;
+        original->vnum = obj.vnum;
+        original->area = obj.area;
 
-	if (obj.vnum > top_vnum_obj)
-	    top_vnum_obj = obj.vnum;
+        if (obj.vnum > top_vnum_obj)
+            top_vnum_obj = obj.vnum;
 
-	iHash = (int) obj.vnum % MAX_KEY_HASH;
-	original->next = obj_index_hash[iHash];
-	obj_index_hash[iHash] = original;
-	top_obj_index++;
+        iHash = (int) obj.vnum % MAX_KEY_HASH;
+        original->next = obj_index_hash[iHash];
+        obj_index_hash[iHash] = original;
+        top_obj_index++;
     }
     
     EXTRA_DESCR_DATA *ed, *ed_next;
     for(ed = original->extra_descr; ed; ed = ed_next) {
-	ed_next = ed->next;
-	free_extra_descr(ed);
+        ed_next = ed->next;
+        free_extra_descr(ed);
     }
     original->extra_descr = obj.extra_descr;
     obj.extra_descr = 0;
     
     Affect *af, *af_next;
     for(af = original->affected; af; af = af_next) {
-	af_next = af->next;
-	ddeallocate( af );
+        af_next = af->next;
+        ddeallocate( af );
     }
     original->affected = obj.affected;
     obj.affected = 0;
     
     for(o = object_list; o; o = o->next)
-	if(o->pIndexData == original) {
-	    /*object instance hase separate extra descr*/
-	    
-	    /*XXX - add/strip affects?*/
-	    
-	    if(o->item_type == original->item_type)
-		o->item_type = obj.item_type;
-	    
-	    if(o->extra_flags == original->extra_flags)
-		o->extra_flags = obj.extra_flags;
+        if(o->pIndexData == original) {
+            /*object instance hase separate extra descr*/
+            
+            /*XXX - add/strip affects?*/
+            
+            if(o->item_type == original->item_type)
+                o->item_type = obj.item_type;
+            
+            if(o->extra_flags == original->extra_flags)
+                o->extra_flags = obj.extra_flags;
 
-	    if(o->wear_flags == original->wear_flags)
-		o->wear_flags   = obj.wear_flags;
+            if(o->wear_flags == original->wear_flags)
+                o->wear_flags   = obj.wear_flags;
 
-	    if(o->level == original->level)
-		o->level = obj.level;
-	    
-	    if(o->condition == original->condition)
-		o->condition = obj.condition;
-	    
-	    if(o->weight == original->weight)
-		o->weight = obj.weight;
+            if(o->level == original->level)
+                o->level = obj.level;
+            
+            if(o->condition == original->condition)
+                o->condition = obj.condition;
+            
+            if(o->weight == original->weight)
+                o->weight = obj.weight;
 
-	    if(o->cost == original->cost)
-		o->cost = obj.cost;
-	    
-	    if(!memcmp(o->value, original->value, sizeof(o->value)))
-		memcpy(o->value, obj.value, sizeof(o->value));
-	}
+            if(o->cost == original->cost)
+                o->cost = obj.cost;
+            
+            if(!memcmp(o->value, original->value, sizeof(o->value)))
+                memcpy(o->value, obj.value, sizeof(o->value));
+        }
     
     original->new_format   = obj.new_format;
     free_string(original->name);
@@ -245,8 +245,8 @@ void OLCStateObject::commit()
     original->limit        = obj.limit;
 
     for(o = object_list; o; o = o->next)
-	if(o->pIndexData == original) 
-	    o->updateCachedNoun( );
+        if(o->pIndexData == original) 
+            o->updateCachedNoun( );
     
     original->properties.clear( );
     for (Properties::const_iterator p = obj.properties.begin( ); p != obj.properties.end( ); p++)
@@ -269,17 +269,17 @@ OEDIT(show)
     EDIT_OBJ(ch, pObj);
 
     sprintf(buf, "Name:        [%s]\n\rArea:        [%5d] %s\n\r",
-	      pObj->name,
-	      !pObj->area ? -1 : pObj->area->vnum,
-	      !pObj->area ? "No Area" : pObj->area->name);
+              pObj->name,
+              !pObj->area ? -1 : pObj->area->vnum,
+              !pObj->area ? "No Area" : pObj->area->name);
     stc(buf, ch);
 
 
     sprintf(buf, "Vnum:        [%7d]\n\r", pObj->vnum);
     stc(buf, ch);
 
-    sprintf(buf, "Type:        [%s]\n\r",
-	      item_table.name(pObj->item_type).c_str());
+    sprintf(buf, "Type:        [%s] {D(? item_table){x\n\r",
+              item_table.name(pObj->item_type).c_str());
     stc(buf, ch);
 
     sprintf(buf, "Level:       [%5d]\n\r", pObj->level);
@@ -288,21 +288,19 @@ OEDIT(show)
     sprintf(buf, "Limit:       [%5d]\n\r", pObj->limit);
     stc(buf, ch);
 
-    sprintf(buf, "Wear flags:  [%s]\n\r",
-	      wear_flags.names(pObj->wear_flags).c_str());
+    sprintf(buf, "Wear flags:  [%s] {D(? wear_flags){x\n\r",
+              wear_flags.names(pObj->wear_flags).c_str());
     stc(buf, ch);
 
-    sprintf(buf, "Extra flags: [%s]\n\r",
-	      extra_flags.names(pObj->extra_flags).c_str());
+    sprintf(buf, "Extra flags: [%s] {D(? extra_flags){x\n\r",
+              extra_flags.names(pObj->extra_flags).c_str());
     stc(buf, ch);
 
-    ptc(ch, "Material:    [%s]\n\r", pObj->material);
+    ptc(ch, "Material:    [%s] {D(? material){x\n\r", pObj->material);
 
-    if (!pObj->smell.empty( ))
-	ptc(ch, "Smell:\n\r     %s\n\r", pObj->smell.c_str( ));
+    ptc(ch, "Smell: [%s]\n\r", pObj->smell.c_str( ));
 
-    if (!pObj->sound.empty( ))
-	ptc(ch, "Sound:\n\r     %s\n\r", pObj->sound.c_str( ));
+    ptc(ch, "Sound: [%s]\n\r", pObj->sound.c_str( ));
 
     if (!pObj->properties.empty( )) {
         ptc(ch, "Properties:\n\r");
@@ -315,110 +313,119 @@ OEDIT(show)
     ptc(ch, "Gender:      [%1s]\n\r", pObj->gram_gender.toString());
 
     sprintf(buf, "Weight:      [%5d]\n\rCost:        [%5d]\n\r",
-	      pObj->weight, pObj->cost);
+              pObj->weight, pObj->cost);
     stc(buf, ch);
 
     if (pObj->extra_descr) {
-	EXTRA_DESCR_DATA *ed;
+        EXTRA_DESCR_DATA *ed;
 
-	stc("Ex desc kwd: ", ch);
+        stc("Ex desc kwd: ", ch);
 
-	for (ed = pObj->extra_descr; ed; ed = ed->next) {
-	    stc("[", ch);
-	    stc(ed->keyword, ch);
-	    stc("]", ch);
-	}
+        for (ed = pObj->extra_descr; ed; ed = ed->next) {
+            stc("[", ch);
+            stc(ed->keyword, ch);
+            stc("]", ch);
+        }
 
-	stc("\n\r", ch);
+        stc("\n\r", ch);
     }
 
     sprintf(buf, "Short desc:  %s\n\rLong desc:\n\r     %s\n\r",
-	      pObj->short_descr, pObj->description);
+              pObj->short_descr, pObj->description);
     stc(buf, ch);
 
     for (cnt = 0, paf = pObj->affected; paf; paf = paf->next) {
-	if (cnt == 0) {
-	    stc("Number Modifier Location Where      What\n\r", ch);
-	    stc("------ -------- -------- ---------- ---------------------------\n\r", ch);
-	}
-	sprintf(buf, "[%4d] %-8d %-8.8s", cnt,
-		  paf->modifier,
-		  apply_flags.name(paf->location).c_str());
-	
-	sprintf(buf+strlen(buf), " %-10.10s ",
-		  affwhere_flags.name(paf->where).c_str());
+        if (cnt == 0) {
+            stc("Number Modifier Location Where      What\n\r", ch);
+            stc("------ -------- -------- ---------- ---------------------------\n\r", ch);
+        }
+        sprintf(buf, "[%4d] %-8d %-8.8s", cnt,
+                  paf->modifier,
+                  apply_flags.name(paf->location).c_str());
+       
+        if (paf->bitvector) { 
+            sprintf(buf+strlen(buf), " %-10.10s ",
+                      affwhere_flags.name(paf->where).c_str());
 
-	switch(paf->where) {
-	    case TO_DETECTS:
-		strcat(buf, detect_flags.names(paf->bitvector).c_str());
-		break;
-	    case TO_AFFECTS:
-		strcat(buf, affect_flags.names(paf->bitvector).c_str());
-		break;
-	    case TO_IMMUNE:
-		strcat(buf, imm_flags.names(paf->bitvector).c_str());
-		break;
-	    case TO_RESIST:
-		strcat(buf, res_flags.names(paf->bitvector).c_str());
-		break;
-	    case TO_VULN:
-		strcat(buf, vuln_flags.names(paf->bitvector).c_str());
-		break;
-	    default:
-		sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
-		break;
-	}
-	strcat(buf, "\n\r");
-	stc(buf, ch);
-	cnt++;
+            switch(paf->where) {
+                case TO_DETECTS:
+                    strcat(buf, detect_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(? detect_flags){x");
+                    break;
+                case TO_AFFECTS:
+                    strcat(buf, affect_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(? affect_flags){x");
+                    break;
+                case TO_IMMUNE:
+                    strcat(buf, imm_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(? imm_flags){x");
+                    break;
+                case TO_RESIST:
+                    strcat(buf, res_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(? res_flags){x");
+                    break;
+                case TO_VULN:
+                    strcat(buf, vuln_flags.names(paf->bitvector).c_str());
+                    strcat(buf, " {D(? vuln_flags){x");
+                    break;
+                default:
+                    sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
+                    break;
+            }
+        }
+        strcat(buf, "\n\r");
+        stc(buf, ch);
+        cnt++;
     }
+    if (pObj->affected)
+        stc("{D          ? apply_flags  ? affwhere_flags{x\r\n", ch);
 
     show_obj_values(ch, pObj);
 
     if (pObj->behavior) {
-	try {
-	    std::basic_ostringstream<char> ostr;
-	    pObj->behavior->save( ostr );
-	    ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
-	    
-	} catch (ExceptionXMLError e) {
-	    ptc(ch, "Behavior is BUGGY.\r\n");
-	}
+        try {
+            std::basic_ostringstream<char> ostr;
+            pObj->behavior->save( ostr );
+            ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
+            
+        } catch (ExceptionXMLError e) {
+            ptc(ch, "Behavior is BUGGY.\r\n");
+        }
     }
     return false;
 }
 
 OEDIT(where)
 {
-    ptc(ch, "%s находится:\r\n", DLString( obj.short_descr ).ruscase('1').c_str( ));
+    ptc(ch, "%s п╫п╟я┘п╬п╢п╦я┌я│я▐:\r\n", DLString( obj.short_descr ).ruscase('1').c_str( ));
     
     for (Object *o = object_list; o; o = o->next) {
-	Character *wch;
-	Room *room;
+        Character *wch;
+        Room *room;
 
-	if (o->pIndexData->vnum != obj.vnum)
-	    continue;
-	
-	room = o->getRoom( );
-	wch = o->getCarrier( );
+        if (o->pIndexData->vnum != obj.vnum)
+            continue;
+        
+        room = o->getRoom( );
+        wch = o->getCarrier( );
 
-	if (wch)
-	    ptc(ch, "[%5d]   у %s в %s (%s)\r\n", 
-		    room->vnum,
-		    wch->getNameP('2').c_str( ), 
-		    room->name, 
-		    room->area->name);
-	else if (o->in_room)
-	    ptc(ch, "[%5d]   на полу в %s (%s)\r\n", 
-		    room->vnum,
-		    room->name, 
-		    room->area->name);
-	else if (o->in_obj)
-	    ptc(ch, "[%5d]   внутри %s в %s (%s)\r\n", 
-		    room->vnum,
-		    o->in_obj->getShortDescr('2').c_str( ),
-		    room->name,
-		    room->area->name);
+        if (wch)
+            ptc(ch, "[%5d]   я┐ %s п╡ %s (%s)\r\n", 
+                    room->vnum,
+                    wch->getNameP('2').c_str( ), 
+                    room->name, 
+                    room->area->name);
+        else if (o->in_room)
+            ptc(ch, "[%5d]   п╫п╟ п©п╬п╩я┐ п╡ %s (%s)\r\n", 
+                    room->vnum,
+                    room->name, 
+                    room->area->name);
+        else if (o->in_obj)
+            ptc(ch, "[%5d]   п╡п╫я┐я┌я─п╦ %s п╡ %s (%s)\r\n", 
+                    room->vnum,
+                    o->in_obj->getShortDescr('2').c_str( ),
+                    room->name,
+                    room->area->name);
     }
 
     return true;
@@ -437,76 +444,76 @@ OEDIT(addaffect)
     argument = one_argument(argument, buf);
 
     if (!*buf) {
-	stc("Syntax:  addaffect [location] [#mod] [where] [bit]\n\r", ch);
-	return false;
+        stc("Syntax:  addaffect [location] [#mod] [where] [bit]\n\r", ch);
+        return false;
     }
 
-    if ((loc = apply_flags.value( buf )) == NO_FLAG) {	/* Hugin */
-	stc("Valid locations are:\n\r", ch);
-	show_help(ch, "apply");
-	return false;
+    if ((loc = apply_flags.value( buf )) == NO_FLAG) {        /* Hugin */
+        stc("Valid locations are:\n\r", ch);
+        show_help(ch, "apply");
+        return false;
     }
     
     argument = one_argument(argument, buf);
     if(!*buf || !is_number(buf)) {
-	stc("Number expected after location identifier\n\r", ch);
-	return false;
+        stc("Number expected after location identifier\n\r", ch);
+        return false;
     }
     mod = atoi(buf);
 
     argument = one_argument(argument, buf);
     if(*buf) {
-	if ((where = affwhere_flags.value( buf )) == NO_FLAG) {
-	    stc("Valid where fields are:\n\r", ch);
-	    show_help(ch, "affwhere");
-	    return false;
-	}
-	switch(where) {
-	    case TO_DETECTS:
-		bit = detect_flags.bitstring( argument );
-		if(bit == NO_FLAG) {
-		    stc("Valid detects are:\n\r", ch);
-		    show_help(ch, "detect" );
-		    return false;
-		}
-		break;
-	    case TO_AFFECTS:
-		bit = affect_flags.bitstring( argument );
-		if(bit == NO_FLAG) {
-		    stc("Valid affects are:\n\r", ch);
-		    show_help(ch, "affect" );
-		    return false;
-		}
-		break;
-	    case TO_IMMUNE:
-		bit = imm_flags.bitstring( argument );
-		if(bit == NO_FLAG) {
-		    stc("Valid immun bits are:\n\r", ch);
-		    show_help(ch, "imm" );
-		    return false;
-		}
-		break;
-	    case TO_RESIST:
-		bit = res_flags.bitstring( argument );
-		if(bit == NO_FLAG) {
-		    stc("Valid resist bits are:\n\r", ch);
-		    show_help(ch, "res" );
-		    return false;
-		}
-		break;
-	    case TO_VULN:
-		bit = vuln_flags.bitstring( argument );
-		if(bit == NO_FLAG) {
-		    stc("Valid vulnerable bits are:\n\r", ch);
-		    show_help(ch, "vuln" );
-		    return false;
-		}
-		break;
-	    default:
-		stc("This affect location is  not supported now.\n\r", ch);
-		return false;
-		break;
-	}
+        if ((where = affwhere_flags.value( buf )) == NO_FLAG) {
+            stc("Valid where fields are:\n\r", ch);
+            show_help(ch, "affwhere");
+            return false;
+        }
+        switch(where) {
+            case TO_DETECTS:
+                bit = detect_flags.bitstring( argument );
+                if(bit == NO_FLAG) {
+                    stc("Valid detects are:\n\r", ch);
+                    show_help(ch, "detect" );
+                    return false;
+                }
+                break;
+            case TO_AFFECTS:
+                bit = affect_flags.bitstring( argument );
+                if(bit == NO_FLAG) {
+                    stc("Valid affects are:\n\r", ch);
+                    show_help(ch, "affect" );
+                    return false;
+                }
+                break;
+            case TO_IMMUNE:
+                bit = imm_flags.bitstring( argument );
+                if(bit == NO_FLAG) {
+                    stc("Valid immun bits are:\n\r", ch);
+                    show_help(ch, "imm" );
+                    return false;
+                }
+                break;
+            case TO_RESIST:
+                bit = res_flags.bitstring( argument );
+                if(bit == NO_FLAG) {
+                    stc("Valid resist bits are:\n\r", ch);
+                    show_help(ch, "res" );
+                    return false;
+                }
+                break;
+            case TO_VULN:
+                bit = vuln_flags.bitstring( argument );
+                if(bit == NO_FLAG) {
+                    stc("Valid vulnerable bits are:\n\r", ch);
+                    show_help(ch, "vuln" );
+                    return false;
+                }
+                break;
+            default:
+                stc("This affect location is  not supported now.\n\r", ch);
+                return false;
+                break;
+        }
     }
 
     pAf = new_affect();
@@ -539,39 +546,39 @@ OEDIT(delaffect)
     one_argument(argument, affect);
 
     if (!is_number(affect) || affect[0] == '\0') {
-	stc("Syntax:  delaffect [#xaffect]\n\r", ch);
-	return false;
+        stc("Syntax:  delaffect [#xaffect]\n\r", ch);
+        return false;
     }
 
     value = atoi(affect);
 
     if (value < 0) {
-	stc("Only non-negative affect-numbers allowed.\n\r", ch);
-	return false;
+        stc("Only non-negative affect-numbers allowed.\n\r", ch);
+        return false;
     }
 
     if (!(pAf = pObj->affected)) {
-	stc("OEdit:  Non-existant affect.\n\r", ch);
-	return false;
+        stc("OEdit:  Non-existant affect.\n\r", ch);
+        return false;
     }
 
-    if (value == 0) {		/* First case: Remove first affect */
-	pAf = pObj->affected;
-	pObj->affected = pAf->next;
-	free_affect(pAf);
+    if (value == 0) {                /* First case: Remove first affect */
+        pAf = pObj->affected;
+        pObj->affected = pAf->next;
+        free_affect(pAf);
     }
-    else {			/* Affect to remove is not the first */
-	while ((pAf_next = pAf->next) && (++cnt < value))
-	    pAf = pAf_next;
+    else {                        /* Affect to remove is not the first */
+        while ((pAf_next = pAf->next) && (++cnt < value))
+            pAf = pAf_next;
 
-	if (pAf_next) {		/* See if it's the next affect */
-	    pAf->next = pAf_next->next;
-	    free_affect(pAf_next);
-	}
-	else {			/* Doesn't exist */
-	    stc("No such affect.\n\r", ch);
-	    return false;
-	}
+        if (pAf_next) {                /* See if it's the next affect */
+            pAf->next = pAf_next->next;
+            free_affect(pAf_next);
+        }
+        else {                        /* Doesn't exist */
+            stc("No such affect.\n\r", ch);
+            return false;
+        }
     }
 
     stc("Affect removed.\n\r", ch);
@@ -585,8 +592,8 @@ OEDIT(name)
     EDIT_OBJ(ch, pObj);
 
     if (argument[0] == '\0') {
-	stc("Syntax:  name [string]\n\r", ch);
-	return false;
+        stc("Syntax:  name [string]\n\r", ch);
+        return false;
     }
 
     free_string(pObj->name);
@@ -603,8 +610,8 @@ OEDIT(short)
     EDIT_OBJ(ch, pObj);
 
     if (argument[0] == '\0') {
-	stc("Syntax:  short [string]\n\r", ch);
-	return false;
+        stc("Syntax:  short [string]\n\r", ch);
+        return false;
     }
 
     free_string(pObj->short_descr);
@@ -617,11 +624,11 @@ OEDIT(short)
 OEDIT(long)
 {
     if (!*argument) {
-	if(sedit(obj.description)) {
-	    stc("Description set\n\r", ch);
-	    return true;
-	} else
-	    return false;
+        if(sedit(obj.description)) {
+            stc("Description set\n\r", ch);
+            return true;
+        } else
+            return false;
     }
 
     free_string(obj.description );
@@ -635,11 +642,11 @@ OEDIT(long)
 OEDIT(sound)
 {
     if (!*argument) {
-	if(sedit(obj.sound)) {
-	    stc("Sound set\n\r", ch);
-	    return true;
-	} else
-	    return false;
+        if(sedit(obj.sound)) {
+            stc("Sound set\n\r", ch);
+            return true;
+        } else
+            return false;
     }
     
     obj.sound = argument;
@@ -650,11 +657,11 @@ OEDIT(sound)
 OEDIT(smell)
 {
     if (!*argument) {
-	if(sedit(obj.smell)) {
-	    stc("Smell set\n\r", ch);
-	    return true;
-	} else
-	    return false;
+        if(sedit(obj.smell)) {
+            stc("Smell set\n\r", ch);
+            return true;
+        } else
+            return false;
     }
     
     obj.smell = argument;
@@ -671,12 +678,12 @@ OEDIT(property)
 bool set_value(Character * ch, OBJ_INDEX_DATA * pObj, char *argument, int value)
 {
     if (argument[0] == '\0') {
-	set_obj_values(ch, pObj, -1, "");	/* '\0' changed to "" -- Hugin */
-	return false;
+        set_obj_values(ch, pObj, -1, "");        /* '\0' changed to "" -- Hugin */
+        return false;
     }
 
     if (set_obj_values(ch, pObj, value, argument))
-	return true;
+        return true;
     return false;
 }
 
@@ -688,7 +695,7 @@ bool set_value(Character * ch, OBJ_INDEX_DATA * pObj, char *argument, int value)
 bool OLCStateObject::oedit_values(Character * ch, char *argument, int value)
 {
     if (set_value(ch, &obj, argument, value))
-	return true;
+        return true;
 
     return false;
 }
@@ -696,37 +703,52 @@ bool OLCStateObject::oedit_values(Character * ch, char *argument, int value)
 
 OEDIT(value0)
 {
-    if (oedit_values(ch, argument, 0))
-	return true;
-    return false;
+    return oedit_values(ch, argument, 0);
+}
+
+OEDIT(v0)
+{
+    return oedit_values(ch, argument, 0);
 }
 
 OEDIT(value1)
 {
-    if (oedit_values(ch, argument, 1))
-	return true;
-    return false;
+    return oedit_values(ch, argument, 1);
+}
+
+OEDIT(v1)
+{
+    return oedit_values(ch, argument, 1);
 }
 
 OEDIT(value2)
 {
-    if (oedit_values(ch, argument, 2))
-	return true;
-    return false;
+    return oedit_values(ch, argument, 2);
+}
+
+OEDIT(v2)
+{
+    return oedit_values(ch, argument, 2);
 }
 
 OEDIT(value3)
 {
-    if (oedit_values(ch, argument, 3))
-	return true;
-    return false;
+    return oedit_values(ch, argument, 3);
+}
+
+OEDIT(v3)
+{
+    return oedit_values(ch, argument, 3);
 }
 
 OEDIT(value4)
 {
-    if (oedit_values(ch, argument, 4))
-	return true;
-    return false;
+    return oedit_values(ch, argument, 4);
+}
+
+OEDIT(v4)
+{
+    return oedit_values(ch, argument, 4);
 }
 
 OEDIT(weight)
@@ -735,15 +757,7 @@ OEDIT(weight)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  weight [number]\n\r", ch);
-	return false;
-    }
-
-    pObj->weight = atoi(argument);
-
-    stc("Weight set.\n\r", ch);
-    return true;
+    return numberEdit(0, 10000, pObj->weight);
 }
 
 OEDIT(cost)
@@ -752,15 +766,7 @@ OEDIT(cost)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  cost [number]\n\r", ch);
-	return false;
-    }
-
-    pObj->cost = atoi(argument);
-
-    stc("Cost set.\n\r", ch);
-    return true;
+    return numberEdit(0, 1000000, pObj->cost);
 }
 
 OEDIT(create)
@@ -770,24 +776,24 @@ OEDIT(create)
 
     value = atoi(argument);
     if (argument[0] == '\0' || value == 0) {
-	stc("Syntax:  oedit create [vnum]\n\r", ch);
-	return false;
+        stc("Syntax:  oedit create [vnum]\n\r", ch);
+        return false;
     }
 
     pArea = get_vnum_area(value);
     if (!pArea) {
-	stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
-	return false;
+        stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
+        return false;
     }
 
     if (!can_edit(ch, value)) {
-	stc("OEdit:  Vnum in an area you cannot build in.\n\r", ch);
-	return false;
+        stc("OEdit:  Vnum in an area you cannot build in.\n\r", ch);
+        return false;
     }
 
     if (get_obj_index(value)) {
-	stc("OEdit:  Object vnum already exists.\n\r", ch);
-	return false;
+        stc("OEdit:  Object vnum already exists.\n\r", ch);
+        return false;
     }
 
 
@@ -801,147 +807,45 @@ OEDIT(create)
 OEDIT(ed)
 {
     OBJ_INDEX_DATA *pObj;
-    EXTRA_DESCR_DATA *ed;
-    char command[MAX_INPUT_LENGTH];
-    char *keyword;
 
     EDIT_OBJ(ch, pObj);
 
-    keyword = one_argument(argument, command);
-
-    if (!*command || !*keyword) {
-	stc("Syntax:  ed set [keyword]\n\r", ch);
-	stc("         ed delete [keyword]\n\r", ch);
-	return false;
-    }
-
-    if (is_name(command, "set")) {
-	for (ed = pObj->extra_descr; ed; ed = ed->next) {
-	    if (is_name(keyword, ed->keyword))
-		break;
-	}
-
-	char *desc = str_empty;
-
-	if(ed)
-	    desc = ed->description;
-
-	if(!sedit(desc))
-	    return false;
-
-	if (!ed) {
-	    ed = new_extra_descr();
-	    ed->keyword = str_dup(keyword);
-	    ed->next = pObj->extra_descr;
-	    pObj->extra_descr = ed;
-	}
-	
-	ed->description = desc;
-	
-	stc("Extra description set.\n\r", ch);
-	return true;
-    }
-
-    if (is_name(command, "delete")) {
-	EXTRA_DESCR_DATA *ped = NULL;
-
-	for (ed = pObj->extra_descr; ed; ed = ed->next) {
-	    if (is_name(keyword, ed->keyword))
-		break;
-	    ped = ed;
-	}
-
-	if (!ed) {
-	    stc("OEdit:  Extra description keyword not found.\n\r", ch);
-	    return false;
-	}
-
-	if (!ped)
-	    pObj->extra_descr = ed->next;
-	else
-	    ped->next = ed->next;
-
-	free_extra_descr(ed);
-
-	stc("Extra description deleted.\n\r", ch);
-	return true;
-    }
-
-    findCommand(ch, "ed")->run(ch, "");
-    return false;
+    return extraDescrEdit(pObj->extra_descr);
 }
 
 OEDIT(extra)
 {
     OBJ_INDEX_DATA *pObj;
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	EDIT_OBJ(ch, pObj);
-
-	if ((value = extra_flags.bitstring( argument )) != NO_FLAG) {
-	    TOGGLE_BIT(pObj->extra_flags, value);
-
-	    stc("Extra flag toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax:  extra [flag]\n\r"
-	"Type '? extra' for a list of flags.\n\r", ch);
-    return false;
+    EDIT_OBJ(ch, pObj);
+    return flagBitsEdit(extra_flags, pObj->extra_flags);
 }
 
 
 OEDIT(wear)
 {
     OBJ_INDEX_DATA *pObj;
-    bitstring_t value;
-
-    if (argument[0] != '\0') {
-	EDIT_OBJ(ch, pObj);
-
-	if ((value = wear_flags.bitstring( argument )) != NO_FLAG) {
-	    TOGGLE_BIT(pObj->wear_flags, value);
-
-	    stc("Wear flag toggled.\n\r", ch);
-	    return true;
-	}
-    }
-
-    stc("Syntax:  wear [flag]\n\r"
-	"Type '? wear' for a list of flags.\n\r", ch);
-    return false;
+    EDIT_OBJ(ch, pObj);
+    return flagBitsEdit(wear_flags, pObj->wear_flags);
 }
 
 OEDIT(type)
 {
     OBJ_INDEX_DATA *pObj;
-    int value;
+    EDIT_OBJ(ch, pObj);
 
-    if (argument[0] != '\0') {
-	EDIT_OBJ(ch, pObj);
+    if (flagValueEdit(item_table, pObj->item_type)) {
+        /*
+         * Clear the values.
+         */
+        pObj->value[0] = 0;
+        pObj->value[1] = 0;
+        pObj->value[2] = 0;
+        pObj->value[3] = 0;
+        pObj->value[4] = 0;
 
-	if ((value = item_table.value( argument )) != NO_FLAG) {
-	    pObj->item_type = (int) value;
-
-	    stc("Type set.\n\r", ch);
-
-	    /*
-	     * Clear the values.
-	     */
-	    pObj->value[0] = 0;
-	    pObj->value[1] = 0;
-	    pObj->value[2] = 0;
-	    pObj->value[3] = 0;
-	    pObj->value[4] = 0;
-
-	    return true;
-	}
+        return true;
     }
-
-    stc("Syntax:  type [flag]\n\r"
-	"Type '? type' for a list of flags.\n\r", ch);
+    
     return false;
 }
 
@@ -952,13 +856,13 @@ OEDIT(material)
     EDIT_OBJ(ch, pObj);
 
     if (argument[0] == '\0') {
-	stc("Syntax:  material [string]\n\r", ch);
-	return false;
+        stc("Syntax:  material [string]\n\r", ch);
+        return false;
     }
 
     free_string(pObj->material);
     pObj->material = str_dup(argument);
-#warning нет material_lookup
+#warning п╫п╣я┌ material_lookup
 
     stc("Material set.\n\r", ch);
     return true;
@@ -970,15 +874,7 @@ OEDIT(level)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  level [number]\n\r", ch);
-	return false;
-    }
-
-    pObj->level = atoi(argument);
-
-    stc("Level set.\n\r", ch);
-    return true;
+    return numberEdit(0, 120, pObj->level);
 }
 
 OEDIT(limit)
@@ -987,15 +883,7 @@ OEDIT(limit)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0' || !is_number(argument)) {
-	stc("Syntax:  limit [number]\n\r", ch);
-	return false;
-    }
-
-    pObj->limit = atoi(argument);
-
-    stc("Limit set.\n\r", ch);
-    return true;
+    return numberEdit(-1, 100, pObj->limit);
 }
 
 OEDIT(gender)
@@ -1005,8 +893,8 @@ OEDIT(gender)
     EDIT_OBJ(ch, pObj);
 
     if (argument[0] == '\0') {
-	stc("Syntax:  gender m|f|n|p\n\r", ch);
-	return false;
+        stc("Syntax:  gender m|f|n|p\n\r", ch);
+        return false;
     }
 
     pObj->gram_gender = Grammar::MultiGender(argument);
@@ -1018,22 +906,8 @@ OEDIT(gender)
 OEDIT(condition)
 {
     OBJ_INDEX_DATA *pObj;
-    int value;
-
-    if (argument[0] != '\0'
-	&& (value = atoi(argument)) >= 0
-	&& (value <= 100)) {
-	EDIT_OBJ(ch, pObj);
-
-	pObj->condition = value;
-	stc("Condition set.\n\r", ch);
-
-	return true;
-    }
-    stc("Syntax:  condition [number]\n\r"
-	"Where number can range from 0 (ruined) to 100 (perfect).\n\r",
-	ch);
-    return false;
+    EDIT_OBJ(ch, pObj);
+    return numberEdit(0, 100, pObj->condition); 
 }
 
 /*
@@ -1048,49 +922,49 @@ OEDIT(copy)
     DLString arg1 = args.getOneArgument();
     DLString arg2 = args.getOneArgument();
     enum {
-	COPY_DESC,
-	COPY_PARAM,
-	COPY_ERROR
+        COPY_DESC,
+        COPY_PARAM,
+        COPY_ERROR
     } mode;
     
     if (arg1.strPrefix("desc"))
-	mode = COPY_DESC;
+        mode = COPY_DESC;
     else if (arg1.strPrefix("param"))
-	mode = COPY_PARAM;
+        mode = COPY_PARAM;
     else 
-	mode = COPY_ERROR;
-	    
+        mode = COPY_ERROR;
+            
     if (mode == COPY_ERROR || !arg2.isNumber()) {
-	ch->println("Syntax: \r\n"
-		    "  copy param <vnum> -- copy affects, level, flags and other parameters from <vnum> obj index.\r\n"
-		    "  copy desc <vnum>  -- copy name, short, long and extra descriptions from <vnum> obj index.\r\n" );
-	return false;
+        ch->println("Syntax: \r\n"
+                    "  copy param <vnum> -- copy affects, level, flags and other parameters from <vnum> obj index.\r\n"
+                    "  copy desc <vnum>  -- copy name, short, long and extra descriptions from <vnum> obj index.\r\n" );
+        return false;
     }
     
     original = get_obj_index( arg2.toInt() );
 
     if (original == NULL) {
-	ch->println("Object not found.\r\n");
-	return false;
+        ch->println("Object not found.\r\n");
+        return false;
     }
     
     switch (mode) {
     case COPY_PARAM:
-	copyParameters( original );
-	report = "parameters";
-	break;
+        copyParameters( original );
+        report = "parameters";
+        break;
     case COPY_DESC:
-	copyDescriptions( original );
-	report = "descriptions";
-	break;
+        copyDescriptions( original );
+        report = "descriptions";
+        break;
     default:
-	return false;
+        return false;
     }
     
     ch->printf("All %s copied from vnum %d (%s).\r\n",
-	        report.c_str( ),
-		original->vnum, 
-		russian_case( original->short_descr, '1' ).c_str( ) );
+                report.c_str( ),
+                original->vnum, 
+                russian_case( original->short_descr, '1' ).c_str( ) );
     return true;
 }
 
@@ -1106,26 +980,26 @@ OEDIT(list)
     EDIT_OBJ(ch, pObj);
     
     snprintf(buf, sizeof(buf), "Resets for object [{W%d{x] ({g%s{x):\n\r",
-	    pObj->vnum, 
-	    russian_case(pObj->short_descr, '1').c_str( ));
+            pObj->vnum, 
+            russian_case(pObj->short_descr, '1').c_str( ));
     buffer << buf;
     
     cnt = 0;
     for(i=0;i<MAX_KEY_HASH;i++)
-	for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
-	    for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
-		switch(pReset->command) {
-		    case 'G':
-		    case 'E':
-		    case 'O':
-		    case 'P':
-			if(pReset->arg1 == pObj->vnum) {
-			    snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
-				    pReset->command, pRoom->vnum, pRoom->name);
-			    buffer << buf;
-			    cnt++;
-			}
-		}
+        for(pRoom = room_index_hash[i];pRoom;pRoom = pRoom->next) 
+            for(pReset = pRoom->reset_first;pReset;pReset = pReset->next)
+                switch(pReset->command) {
+                    case 'G':
+                    case 'E':
+                    case 'O':
+                    case 'P':
+                        if(pReset->arg1 == pObj->vnum) {
+                            snprintf(buf, sizeof(buf), "{G%c{x in room [{W%d{x] ({g%s{x)\n\r",
+                                    pReset->command, pRoom->vnum, pRoom->name);
+                            buffer << buf;
+                            cnt++;
+                        }
+                }
 
     snprintf(buf, sizeof(buf), "Total {W%d{x resets found.\n\r", cnt);
     buffer << buf;
@@ -1137,11 +1011,11 @@ OEDIT(list)
 OEDIT(behavior)
 {
     if (argument[0] == '\0') {
-	if(!xmledit(obj.behavior))
-	    return false;
+        if(!xmledit(obj.behavior))
+            return false;
 
-	stc("Behavior set.\r\n", ch);
-	return true;
+        stc("Behavior set.\r\n", ch);
+        return true;
     }
 
     stc("Syntax:  behavior    - line edit\n\r", ch);
@@ -1181,7 +1055,7 @@ OEDIT(dump)
 
 
 CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
-	"Online object editor.")
+        "Online object editor.")
 {
     Object *obj;
     OBJ_INDEX_DATA *pObj;
@@ -1192,131 +1066,131 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     argument = one_argument(argument, arg1);
 
     if (is_number(arg1)) {
-	value = atoi(arg1);
-	if (!(pObj = get_obj_index(value))) {
-	    stc("OEdit:  That vnum does not exist.\n\r", ch);
-	    return;
-	}
+        value = atoi(arg1);
+        if (!(pObj = get_obj_index(value))) {
+            stc("OEdit:  That vnum does not exist.\n\r", ch);
+            return;
+        }
 
-	if(!pObj->area) {
-	    stc("this object has no area!!!!!\n\r", ch);
-	    return;
-	}
+        if(!pObj->area) {
+            stc("this object has no area!!!!!\n\r", ch);
+            return;
+        }
 
-	if (!OLCState::can_edit(ch, pObj->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
-	    return;
-	}
+        if (!OLCState::can_edit(ch, pObj->vnum)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п©я─п╣п╢п╪п╣я┌п╬п╡.\n\r", ch);
+            return;
+        }
 
-	OLCStateObject::Pointer oe(NEW, pObj);
-	oe->attach(ch);
-	return;
+        OLCStateObject::Pointer oe(NEW, pObj);
+        oe->attach(ch);
+        return;
     } else if (!str_cmp(arg1, "create")) {
-	if (!str_cmp(argument, "next")) 
-	    value = next_obj_index(ch, ch->in_room);
-	else
-	    value = atoi(argument);
+        if (!str_cmp(argument, "next")) 
+            value = next_obj_index(ch, ch->in_room);
+        else
+            value = atoi(argument);
 
-	if (argument[0] == '\0' || value <= 0) {
-	    stc("Syntax:  edit object create <vnum>|next\n\r", ch);
-	    return;
-	}
+        if (argument[0] == '\0' || value <= 0) {
+            stc("Syntax:  edit object create <vnum>|next\n\r", ch);
+            return;
+        }
 
-	pArea = OLCState::get_vnum_area(value);
+        pArea = OLCState::get_vnum_area(value);
 
-	if (!pArea) {
-	    stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
-	    return;
-	}
+        if (!pArea) {
+            stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
+            return;
+        }
 
-	if (!OLCState::can_edit(ch, value)) {
-	    stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
-	    return;
-	}
+        if (!OLCState::can_edit(ch, value)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п©я─п╣п╢п╪п╣я┌п╬п╡.\n\r", ch);
+            return;
+        }
 
-	if (get_obj_index(value)) {
-	    stc("OEdit:  Object vnum already exists.\n\r", ch);
-	    return;
-	}
+        if (get_obj_index(value)) {
+            stc("OEdit:  Object vnum already exists.\n\r", ch);
+            return;
+        }
 
-	OLCStateObject::Pointer oe(NEW, value);
-	oe->attach(ch);
-	return;
+        OLCStateObject::Pointer oe(NEW, value);
+        oe->attach(ch);
+        return;
     } else if (!str_cmp(arg1, "delete")) {
-	OBJ_INDEX_DATA *obji = NULL;
+        OBJ_INDEX_DATA *obji = NULL;
 
-	value = atoi(argument);
-	if (argument[0] == '\0' || value == 0) {
-	    stc("Syntax:  edit object delete [vnum]\n\r", ch);
-	    return;
-	}
+        value = atoi(argument);
+        if (argument[0] == '\0' || value == 0) {
+            stc("Syntax:  edit object delete [vnum]\n\r", ch);
+            return;
+        }
 
-	pArea = OLCState::get_vnum_area(value);
+        pArea = OLCState::get_vnum_area(value);
 
-	if (!pArea) {
-	    stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
-	    return;
-	}
+        if (!pArea) {
+            stc("OEdit:  That vnum is not assigned an area.\n\r", ch);
+            return;
+        }
 
-	if (!OLCState::can_edit(ch, value)) {
-	    stc("У тебя недостаточно прав для редактирования предметов.\n\r", ch);
-	    return;
-	}
+        if (!OLCState::can_edit(ch, value)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п©я─п╣п╢п╪п╣я┌п╬п╡.\n\r", ch);
+            return;
+        }
 
-	obji = get_obj_index(value);
+        obji = get_obj_index(value);
 
-	if (obji) {
-	    SET_BIT(pArea->area_flag, AREA_CHANGED);
-	    SET_BIT(obji->extra_flags, ITEM_DELETED);
-	    ptc(ch, "[%u] (%s) marked as deleted.\n\r", obji->vnum, obji->name);
-	}
-	else
-	    stc("Item is not exist.\n\r", ch);
-	return;
+        if (obji) {
+            SET_BIT(pArea->area_flag, AREA_CHANGED);
+            SET_BIT(obji->extra_flags, ITEM_DELETED);
+            ptc(ch, "[%u] (%s) marked as deleted.\n\r", obji->vnum, obji->name);
+        }
+        else
+            stc("Item is not exist.\n\r", ch);
+        return;
     } else if(!str_cmp(arg1, "show")) {
-	if(!*argument || !is_number(argument)) {
-	    stc("Syntax: oedit show <vnum>\n\r", ch);
-	    return;
-	}
-	pObj = get_obj_index(atoi(argument));
-	if(!pObj) {
-	    stc("Нет такого объекта.\n\r", ch);
-	    return;
-	}
-	
-	if (!OLCState::can_edit(ch, pObj->vnum)) {
-	    stc("У тебя недостаточно прав для редактирования объектов.\n\r", ch);
-	    return;
-	}
+        if(!*argument || !is_number(argument)) {
+            stc("Syntax: oedit show <vnum>\n\r", ch);
+            return;
+        }
+        pObj = get_obj_index(atoi(argument));
+        if(!pObj) {
+            stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟.\n\r", ch);
+            return;
+        }
+        
+        if (!OLCState::can_edit(ch, pObj->vnum)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я─п╣п╢п╟п╨я┌п╦я─п╬п╡п╟п╫п╦я▐ п╬п╠я┼п╣п╨я┌п╬п╡.\n\r", ch);
+            return;
+        }
 
-	OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->run(ch, "");
-	return;
+        OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->run(ch, "");
+        return;
     } else if (!str_cmp(arg1, "load")) {
-	if(!*argument || !is_number(argument)) {
-	    stc("Syntax: oedit load <vnum>\n\r", ch);
-	    return;
-	}
-	pObj = get_obj_index(atoi(argument));
-	if(!pObj) {
-	    stc("Нет такого объекта.\n\r", ch);
-	    return;
-	}
-	
-	if (!OLCState::can_edit(ch, pObj->vnum)) {
-	    stc("У тебя недостаточно прав для создания этого предмета.\n\r", ch);
-	    return;
-	}
-	
-	obj = create_object( pObj, ch->get_trust( ) );
-	
-	if ( obj->can_wear( ITEM_TAKE) )
-	    obj_to_char( obj, ch );
-	else
-	    obj_to_room( obj, ch->in_room );
+        if(!*argument || !is_number(argument)) {
+            stc("Syntax: oedit load <vnum>\n\r", ch);
+            return;
+        }
+        pObj = get_obj_index(atoi(argument));
+        if(!pObj) {
+            stc("п²п╣я┌ я┌п╟п╨п╬пЁп╬ п╬п╠я┼п╣п╨я┌п╟.\n\r", ch);
+            return;
+        }
+        
+        if (!OLCState::can_edit(ch, pObj->vnum)) {
+            stc("пё я┌п╣п╠я▐ п╫п╣п╢п╬я│я┌п╟я┌п╬я┤п╫п╬ п©я─п╟п╡ п╢п╩я▐ я│п╬п╥п╢п╟п╫п╦я▐ я█я┌п╬пЁп╬ п©я─п╣п╢п╪п╣я┌п╟.\n\r", ch);
+            return;
+        }
+        
+        obj = create_object( pObj, ch->get_trust( ) );
+        
+        if ( obj->can_wear( ITEM_TAKE) )
+            obj_to_char( obj, ch );
+        else
+            obj_to_room( obj, ch->in_room );
 
-	act_p( "$c1 создает $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
-	act_p( "Ты создаешь $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
-	return;
+        act_p( "$c1 я│п╬п╥п╢п╟п╣я┌ $o4!", ch, obj, 0, TO_ROOM,POS_RESTING );
+        act_p( "п╒я▀ я│п╬п╥п╢п╟п╣я┬я▄ $o4!", ch, obj, 0, TO_CHAR,POS_RESTING );
+        return;
     }
     stc("OEdit:  There is no default object to edit.\n\r", ch);
 }
@@ -1324,6 +1198,6 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 void OLCStateObject::changed( PCharacter *ch )
 {
     if(obj.area)
-	SET_BIT(obj.area->area_flag, AREA_CHANGED);
+        SET_BIT(obj.area->area_flag, AREA_CHANGED);
 }
 

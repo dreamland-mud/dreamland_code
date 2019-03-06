@@ -11,23 +11,23 @@
 class PetQuestor : public Questor, public Pet {
 XML_OBJECT
 public:
-	typedef ::Pointer<PetQuestor> Pointer;
-	
-	PetQuestor( );
+        typedef ::Pointer<PetQuestor> Pointer;
+        
+        PetQuestor( );
 
-	virtual int getOccupation( );
+        virtual int getOccupation( );
 
-	virtual void stopfol( Character *master );
-	virtual bool area( );
+        virtual void stopfol( Character *master );
+        virtual bool area( );
 
 protected:
-	virtual bool specIdle( );
+        virtual bool specIdle( );
 
-	XML_VARIABLE XMLStringNoEmpty msgIdleMaster;
-	XML_VARIABLE XMLStringNoEmpty msgIdleOther;
-	XML_VARIABLE XMLStringNoEmpty msgIdleRoom;
-	XML_VARIABLE XMLStringNoEmpty msgDisappear;
-	XML_VARIABLE XMLInteger timer;
+        XML_VARIABLE XMLStringNoEmpty msgIdleMaster;
+        XML_VARIABLE XMLStringNoEmpty msgIdleOther;
+        XML_VARIABLE XMLStringNoEmpty msgIdleRoom;
+        XML_VARIABLE XMLStringNoEmpty msgDisappear;
+        XML_VARIABLE XMLInteger timer;
 };
 
 #endif

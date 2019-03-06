@@ -37,13 +37,13 @@ public:
     
     virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
-    virtual bool canTeach( NPCharacter *, PCharacter * );
+    virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
     virtual void show( PCharacter *, std::ostream & ); 
 
     virtual const DLString & getCategory( ) const
     {
-	return CATEGORY;
+        return CATEGORY;
     }
 
 protected:
@@ -67,7 +67,7 @@ public:
     XML_VARIABLE XMLInteger maximum;
     XML_VARIABLE XMLInteger rating;
     XML_VARIABLE XMLIntegerNoEmpty clanLevel;
-    XML_VARIABLE XMLBooleanNoFalse needItem;
+    XML_VARIABLE XMLBoolean needItem;
     XML_VARIABLE XMLBooleanNoFalse needPractice;
     XML_VARIABLE XMLInteger maxLevel;
 };

@@ -26,25 +26,25 @@ class Affect : public XMLVariableContainer
 {
 XML_OBJECT;
 public:
-	typedef ::Pointer<Affect> Pointer;
+        typedef ::Pointer<Affect> Pointer;
 
 public:
-	Affect* next;
-	short where;
-	XMLSkillReference type;
-	short level;
-	short duration;
-	short location;
-	short modifier;
-	int bitvector;
-	XMLGlobalBitvector global;
-	DLString ownerName;
-	
-	Affect( );
-	virtual ~Affect( );
-	
-	Affect* affect_find( int );
-	Character *getOwner( ) const;
+        Affect* next;
+        short where;
+        XMLSkillReference type;
+        short level;
+        short duration;
+        short location;
+        short modifier;
+        int bitvector;
+        XMLGlobalBitvector global;
+        DLString ownerName;
+        
+        Affect( );
+        virtual ~Affect( );
+        
+        Affect* affect_find( int );
+        Character *getOwner( ) const;
 };
 
 #endif

@@ -45,3 +45,6 @@ damageflags.cpp: damageflags.h
 CLEANFILES = damageflags.cpp $(top_builddir)/src/damageflags.h 
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+
+
+

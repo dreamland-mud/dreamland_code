@@ -21,9 +21,9 @@ extern const struct movetype_t movetypes [];
 
 enum {
     MOVETYPE_MORESAFE = 0,
-    MOVETYPE_SAFE,	
-    MOVETYPE_NORMAL,			
-    MOVETYPE_DANGEROUS,			
+    MOVETYPE_SAFE,        
+    MOVETYPE_NORMAL,                        
+    MOVETYPE_DANGEROUS,                        
     MOVETYPE_DEATH,
 };
 

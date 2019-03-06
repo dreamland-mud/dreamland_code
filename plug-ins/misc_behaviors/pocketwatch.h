@@ -14,13 +14,13 @@
 class PocketWatch : public ObjectBehavior {
 XML_OBJECT
 public:
-	typedef ::Pointer<PocketWatch> Pointer;
+        typedef ::Pointer<PocketWatch> Pointer;
     
-	PocketWatch( );
-	virtual bool prompt( Character *ch, char letter, ostringstream &buf );
-	
-	XML_VARIABLE XMLBoolean broken;
-	XML_VARIABLE XMLInteger prevHour;
+        PocketWatch( );
+        virtual bool prompt( Character *ch, char letter, ostringstream &buf );
+        
+        XML_VARIABLE XMLBoolean broken;
+        XML_VARIABLE XMLInteger prevHour;
 };
 
 #endif

@@ -40,10 +40,10 @@ IconvMap::operator() (const std::string &src)
             throw new Exception("Failed to convert characters");
         }
 
-	if(out == buf) {
-	    LogStream::sendError() << "Incomplete UTF sequence?" << src << endl;
-	    break;
-	}
+        if(out == buf) {
+            LogStream::sendError() << "Incomplete UTF sequence?" << src << endl;
+            break;
+        }
         os.write(buf, out-buf);
     }
 

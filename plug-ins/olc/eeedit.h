@@ -11,7 +11,7 @@
 #include "xmlstring.h"
 
 class OLCStateExtraExit : public OLCStateTemplate<OLCStateExtraExit>,
-			  public virtual OLCState
+                          public virtual OLCState
 {
 XML_OBJECT
 public:

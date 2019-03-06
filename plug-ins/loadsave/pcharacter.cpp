@@ -34,37 +34,33 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 PROF(universal);
 
-static void limit_update_on_player_load( PCharacter *ch )
-{
-}
-
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
     int &learn1 = ch->getSkillData( skill1 ).learned;
     int &learn2 = ch->getSkillData( skill2 ).learned;
     
     if (learn1 > 1 && !skill1->visible( ch ) && skill2->visible( ch )) {
-	learn2 = learn1;
-	learn1 = 1;
+        learn2 = learn1;
+        learn1 = 1;
     }
 }
 
 static void update_skill_points( PCharacter *ch )
 {
     if (ch->getProfession( ) == prof_universal) {
-	int deserves_sp = 1000;
+        int deserves_sp = 1000;
 
-	for (int l = 1; l <= ch->getLevel( ); l++)
- 	   deserves_sp += 200 
-		+ ch->getRace( )->getPC( )->getSpBonus( )
-		+ ch->getRemorts( ).getSkillPointsPerLevel( l );
+        for (int l = 1; l <= ch->getLevel( ); l++)
+            deserves_sp += 200 
+                + ch->getRace( )->getPC( )->getSpBonus( )
+                + ch->getRemorts( ).getSkillPointsPerLevel( l );
 
-	if (ch->max_skill_points < deserves_sp) {
-	    notice("Fixing skill points for %s: from %d to %d.",
+        if (ch->max_skill_points < deserves_sp) {
+            notice("Fixing skill points for %s: from %d to %d.",
                 ch->getName( ).c_str( ), ch->max_skill_points, deserves_sp);
 
-	    ch->max_skill_points = deserves_sp; 	
-	}
+            ch->max_skill_points = deserves_sp;         
+        }
     }
 }
 
@@ -91,69 +87,69 @@ void PCharacter::load( )
     
     DLFileRead profile( dreamland->getPlayerDir( ), 
                         getName( ).toLower( ), 
-			PCharacterManager::ext );
+                        PCharacterManager::ext );
 
     if (!profile.open( )) {
-	LogStream::sendError( ) << METHOD << " bad profile for " << getName( ) << endl;
-	return;
+        LogStream::sendError( ) << METHOD << " bad profile for " << getName( ) << endl;
+        return;
     }
 
     FILE *fp = profile.getFP( );
     
     for (int iNest = 0; iNest < MAX_NEST; iNest++ )
-	rgObjNest[iNest] = 0;
+        rgObjNest[iNest] = 0;
 
     for ( ; ; ) {
-	char letter;
-	char *word;
+        char letter;
+        char *word;
 
-	letter = fread_letter( fp );
-	if ( letter == '*' ) {
-	    fread_to_eol( fp );
-	    continue;
-	}
+        letter = fread_letter( fp );
+        if ( letter == '*' ) {
+            fread_to_eol( fp );
+            continue;
+        }
 
-	if ( letter != '#' ) {
-	    LogStream::sendError( ) 
-		<< METHOD <<  ": found [" << letter << "], not #" << endl;
-	    break;
-	}
+        if ( letter != '#' ) {
+            LogStream::sendError( ) 
+                << METHOD <<  ": found [" << letter << "], not #" << endl;
+            break;
+        }
 
-	word = fread_word( fp );
-	if ( !str_cmp( word, "PLAYER" ) ) {
-	    PCharacterManager::load( this );
-	    fread_char( this, fp );
-	}
-	else if ( !str_cmp( word, "OBJECT" ) ) fread_obj  ( this, NULL, fp );
-	else if ( !str_cmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
-	else if ( !str_cmp( word, "PET"    ) ) fread_pet  ( this, fp );
-	else if ( !str_cmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
-	else if ( !str_cmp( word, "End"    ) ) break;
-	else
-	{
-	    LogStream::sendError( ) 
-		<< METHOD << ": bad section " << word << endl;
-	    break;
-	}
+        word = fread_word( fp );
+        if ( !str_cmp( word, "PLAYER" ) ) {
+            PCharacterManager::load( this );
+            fread_char( this, fp );
+        }
+        else if ( !str_cmp( word, "OBJECT" ) ) fread_obj  ( this, NULL, fp );
+        else if ( !str_cmp( word, "O"      ) ) fread_obj  ( this, NULL, fp );
+        else if ( !str_cmp( word, "PET"    ) ) fread_pet  ( this, fp );
+        else if ( !str_cmp( word, "MLT"    ) ) fread_mlt  ( this, fp );
+        else if ( !str_cmp( word, "End"    ) ) break;
+        else
+        {
+            LogStream::sendError( ) 
+                << METHOD << ": bad section " << word << endl;
+            break;
+        }
     }
     
     if (!get_room_index( start_room )) {
-	if (is_immortal( ))
-	    start_room = ROOM_VNUM_CHAT;
-	else
-	    start_room = ROOM_VNUM_TEMPLE;
+        if (is_immortal( ))
+            start_room = ROOM_VNUM_CHAT;
+        else
+            start_room = ROOM_VNUM_TEMPLE;
     }
-		
+                
     /* now restore the character to his/her true condition */
     mod_stat.clear( );
-    max_hit 	= perm_hit;
-    max_mana	= perm_mana;
-    max_move	= perm_move;
+    max_hit         = perm_hit;
+    max_mana        = perm_mana;
+    max_move        = perm_move;
     armor.clear( );
     armor.fill( 100 );
-    hitroll		= 0;
-    damroll		= 0;
-    saving_throw	= 0;
+    hitroll                = 0;
+    damroll                = 0;
+    saving_throw        = 0;
 
     size        = getRace( )->getSize( );
     detection   = getRace( )->getDet( );
@@ -163,14 +159,15 @@ void PCharacter::load( )
     vuln_flags  = getRace( )->getVuln( );
     form        = getRace( )->getForm() ;
     parts       = getRace( )->getParts( );
+    wearloc.set(getRace()->getWearloc());
 
     /* now start adding back the effects */
     for (Object *obj = carrying; obj != 0; obj = obj->next_content) 
-	obj->wear_loc->reset( obj );
+        obj->wear_loc->reset( obj );
 
     /* now add back spell effects */
     for (Affect *af = affected; af != 0; af = af->next)
-	affect_modify( this, af, true );
+        affect_modify( this, af, true );
 
     LogStream::sendNotice( ) << getName( ) << " has race " << getRace( )->getName( ) << " and level " << getLevel( ) << endl;
     
@@ -180,7 +177,6 @@ void PCharacter::load( )
     updateSkills( );
     update_exp( this );
     update_skill_points( this );
-    limit_update_on_player_load( this );
 
     /* fix renamed skills */
     skill_exchange( this, gsn_sanctuary, gsn_stardust );
@@ -196,8 +192,8 @@ void PCharacter::save( )
     DLFileWrite tmpfile( dreamland->getBasePath( ), dreamland->getTempFile( ) );
 
     if (!tmpfile.open( )) {
-	LogStream::sendError( ) << METHOD << " bad tmp for " << getName( ) << endl;
-	return;
+        LogStream::sendError( ) << METHOD << " bad tmp for " << getName( ) << endl;
+        return;
     }
 
     FILE *fp = tmpfile.getFP( );
@@ -207,32 +203,32 @@ void PCharacter::save( )
     fwrite_obj( this, carrying, fp, 0 );
 
     if (pet)
-	fwrite_pet( pet, fp );
+        fwrite_pet( pet, fp );
 
     fprintf( fp, "#END\n" );
 
     if (!tmpfile.close( ))
-	return;
+        return;
     
     DLFile profile( dreamland->getPlayerDir( ), 
                     getName( ).toLower( ), 
-	            PCharacterManager::ext );
+                    PCharacterManager::ext );
 
     if (!tmpfile.rename( profile )) 
-	return;
+        return;
 
 
     if (!in_room || IS_SET(in_room->room_flags, ROOM_NOQUIT)) 
-	start_room = ROOM_VNUM_TEMPLE;
+        start_room = ROOM_VNUM_TEMPLE;
     else
-	start_room = in_room->vnum;
+        start_room = in_room->vnum;
 
     setLastAccessTime( );
     PCharacterManager::save( this );
 
     for (Character *ch = char_list; ch; ch = ch->next)
-	if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == this && ch->is_npc( ))
-	    if (ch->getNPC( )->behavior)
-		ch->getNPC( )->behavior->save( );
+        if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == this && ch->is_npc( ))
+            if (ch->getNPC( )->behavior)
+                ch->getNPC( )->behavior->save( );
 }
 

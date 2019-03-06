@@ -15,10 +15,10 @@
 
 /**
  * @author Igor S. Petrenko
- * @short Базовый класс для всех обьектов DL
- * Так, как все классы будут в предках иметь один и тот-же класс,
- * то можно будет избежать типа void* + всегда корректно производить
- * преобразования, использую dynamic_cast
+ * @short п▒п╟п╥п╬п╡я▀п╧ п╨п╩п╟я│я│ п╢п╩я▐ п╡я│п╣я┘ п╬п╠я▄п╣п╨я┌п╬п╡ DL
+ * п╒п╟п╨, п╨п╟п╨ п╡я│п╣ п╨п╩п╟я│я│я▀ п╠я┐п╢я┐я┌ п╡ п©я─п╣п╢п╨п╟я┘ п╦п╪п╣я┌я▄ п╬п╢п╦п╫ п╦ я┌п╬я┌-п╤п╣ п╨п╩п╟я│я│,
+ * я┌п╬ п╪п╬п╤п╫п╬ п╠я┐п╢п╣я┌ п╦п╥п╠п╣п╤п╟я┌я▄ я┌п╦п©п╟ void* + п╡я│п╣пЁп╢п╟ п╨п╬я─я─п╣п╨я┌п╫п╬ п©я─п╬п╦п╥п╡п╬п╢п╦я┌я▄
+ * п©я─п╣п╬п╠я─п╟п╥п╬п╡п╟п╫п╦я▐, п╦я│п©п╬п╩я▄п╥я┐я▌ dynamic_cast
  */
 
 #define dallocate( type, args... )      new type ( args )
@@ -26,47 +26,47 @@
 
 class DLObject  {
 public:
-	typedef ::Pointer<DLObject> Pointer;
+        typedef ::Pointer<DLObject> Pointer;
 
 public:
-	inline DLObject( ) : linkCount( 0 )
-	{
-	}
+        inline DLObject( ) : linkCount( 0 )
+        {
+        }
 
-	/** В идеале private */
-	virtual ~DLObject( );
-	
-	inline void link( ) const
-	{
-		linkCount++;
-	}
+        /** п▓ п╦п╢п╣п╟п╩п╣ private */
+        virtual ~DLObject( );
+        
+        inline void link( ) const
+        {
+                linkCount++;
+        }
 
-	inline void unlink( ) const
-	{
-		if( linkCount <= 1 )
-		{
-			delete this;
-		}
-		else
-		{
-			linkCount--;
-		}
-	}
-	
+        inline void unlink( ) const
+        {
+                if( linkCount <= 1 )
+                {
+                        delete this;
+                }
+                else
+                {
+                        linkCount--;
+                }
+        }
+        
 public:
-	inline int getLinkCount( ) const
-	{
-		return linkCount;
-	}
+        inline int getLinkCount( ) const
+        {
+                return linkCount;
+        }
 
-	// Только для Pointer!!!
-	inline void setLinkCount( int linkCount )
-	{
-		this->linkCount = linkCount;
-	}
+        // п╒п╬п╩я▄п╨п╬ п╢п╩я▐ Pointer!!!
+        inline void setLinkCount( int linkCount )
+        {
+                this->linkCount = linkCount;
+        }
 
 private:
-	mutable int linkCount;
+        mutable int linkCount;
 };
 
 

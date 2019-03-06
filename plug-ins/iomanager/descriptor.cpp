@@ -32,6 +32,7 @@
 #include "pagerhandler.h"
 #include "codepage.h"
 #include "comm.h"
+#include "outofband.h"
 
 #include "char.h"
 #include "dreamland.h"
@@ -62,23 +63,48 @@ static IconvMap utf2koi("utf-8", "koi8-r");
 static const char *MSG_FLUSH_BUF = "Buffer flushed.\r\n";
 const char *lid = "\n\r*** PUT A LID ON IT!!! ***\n\r";
 
+/*
+ * Negotiated client terminal type.
+ */
+enum {
+    TTYPE_NONE = 0,
+    TTYPE_MUDLET,
+    TTYPE_MAX
+};
+const char *TTYPE_NAMES[TTYPE_MAX] = { "none", "Mudlet" };
+int ttype_lookup( const char *received )
+{
+    for (int i = 0; i < TTYPE_MAX; i++) {
+        const char *ttype = TTYPE_NAMES[i]; 
+        if (strncmp(received, ttype, strlen(ttype)) == 0) {
+            LogStream::sendNotice() << "telnet: received " << ttype << " terminal type" << endl;
+            return i;
+        }
+    }
+    return TTYPE_NONE;
+}
+const char *ttype_name( int ttype )
+{
+    return TTYPE_NAMES[URANGE(TTYPE_NONE, ttype, TTYPE_MAX-1)];
+}
+
 bool Descriptor::checkStopSymbol( )
 {
     if (!character)
-	return false;
+        return false;
 
     if (!character->is_npc() 
-	&& character->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
-	return false;
+        && character->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
+        return false;
     
     if(inptr > 0)
-	switch(inbuf[inptr-1]) {
-	    case '\r':
-	    case '\n':
-		break;
-	    default:
-		return false;
-	}
+        switch(inbuf[inptr-1]) {
+            case '\r':
+            case '\n':
+                break;
+            default:
+                return false;
+        }
     
     inptr = 0;
     *incomm = 0;
@@ -90,11 +116,11 @@ bool Descriptor::checkStopSymbol( )
 int Descriptor::inputChar( unsigned char i )
 {
     if(i == '\\' && checkStopSymbol( ))
-	return i;
+        return i;
     
     if(inptr < sizeof(inbuf)) {
-	inbuf[inptr++] = i;
-	return i;
+        inbuf[inptr++] = i;
+        return i;
     } 
 
     inbuf[sizeof(inbuf) - 1] = 0;
@@ -103,131 +129,157 @@ int Descriptor::inputChar( unsigned char i )
     return -1;
 }
 
+
 int Descriptor::inputTelnet( unsigned char i )
 {
     switch(telnet.state) {
-	case TNS_NORMAL:
-	    switch(i) {
-		case IAC:
-		    telnet.state = IAC;
-		    break;
-		default:
-		    if(inputChar( i ) < 0)
-			return -1;
-	    }
-	    break;
+        case TNS_NORMAL:
+            switch(i) {
+                case IAC:
+                    telnet.state = IAC;
+                    break;
+                default:
+                    if(inputChar( i ) < 0)
+                        return -1;
+            }
+            break;
 
-	case IAC:
-	    switch(i) {
-		case DO:
-		case DONT:
-		case WILL:
-		case WONT:
-		    telnet.state = i;
-		    break;
-		    
-		case SB:
-		    telnet.sn_ptr = 0;
-		    telnet.state = TNS_SUBNEG;
-		    break;
-		    
-		case IAC:
-		    if(inputChar( i ) < 0)
-			return -1;
-		    
-		    /* FALL THROUGH */
-		default:
-		    telnet.state = TNS_NORMAL;
-	    }
-	    break;
+        case IAC:
+            switch(i) {
+                case DO:
+                case DONT:
+                case WILL:
+                case WONT:
+                    telnet.state = i;
+                    break;
+                    
+                case SB:
+                    telnet.sn_ptr = 0;
+                    telnet.state = TNS_SUBNEG;
+                    break;
+                    
+                case IAC:
+                    if(inputChar( i ) < 0)
+                        return -1;
+                    
+                    /* FALL THROUGH */
+                default:
+                    telnet.state = TNS_NORMAL;
+            }
+            break;
 
-	case TNS_SUBNEG:
-	    switch(i) {
-		case IAC:
-		    telnet.state = TNS_SUBNEG_IAC;
-		    break;
-		    
-		default:
-		    telnet.subneg[telnet.sn_ptr++] = i;
-		    
-		    if(telnet.sn_ptr > sizeof(telnet.subneg) - 5) {
-			LogStream::sendError() << "telnet: subneg overflow" << endl;
-			telnet.sn_ptr = 0;
-			telnet.state = TNS_NORMAL;
-		    }
-		    break;
-	    }
-	    break;
-	    
-	case TNS_SUBNEG_IAC:
-	    switch(i) {
-		case IAC:
-		    telnet.subneg[telnet.sn_ptr++] = IAC;
-		    
-		    if(telnet.sn_ptr > sizeof(telnet.subneg) - 5) {
-			LogStream::sendError() << "telnet: subneg overflow" << endl;
-			telnet.sn_ptr = 0;
-			telnet.state = TNS_NORMAL;
-		    } else
-			telnet.state = TNS_SUBNEG;
-		    break;
-		    
-		case SE:
-		    if(telnet.sn_ptr >= 5 && 
-			    telnet.subneg[0] == TELOPT_VIA)
-		    {
-			telnet.subneg[telnet.sn_ptr] = 0;
-			
-			ViaRecord v;
-			
-			v.first = *(in_addr*)(telnet.subneg + 1);
-			v.second = (char*)telnet.subneg + 1 + sizeof(in_addr);
-			
-			via.push_back(v);
-			
-			LogStream::sendError() 
-			    << "got via: " 
-			    << v.second << "(" << inet_ntoa(v.first) << ")" 
-			    << endl;
-			
-			if (banManager->checkVerbose( this, BAN_ALL )) 
-			    return -1;
-		    }
-		    telnet.state = TNS_NORMAL;
-		    break;
-	    }
-	    break;
-	    
-	case DO:
-	case DONT:
-	case WILL:
-	case WONT:
+        case TNS_SUBNEG:
+            switch(i) {
+                case IAC:
+                    telnet.state = TNS_SUBNEG_IAC;
+                    break;
+                    
+                default:
+                    telnet.subneg[telnet.sn_ptr++] = i;
+                    
+                    if(telnet.sn_ptr > sizeof(telnet.subneg) - 5) {
+                        LogStream::sendError() << "telnet: subneg overflow" << endl;
+                        telnet.sn_ptr = 0;
+                        telnet.state = TNS_NORMAL;
+                    }
+                    break;
+            }
+            break;
+            
+        case TNS_SUBNEG_IAC:
+            switch(i) {
+                case IAC:
+                    telnet.subneg[telnet.sn_ptr++] = IAC;
+                    
+                    if(telnet.sn_ptr > sizeof(telnet.subneg) - 5) {
+                        LogStream::sendError() << "telnet: subneg overflow" << endl;
+                        telnet.sn_ptr = 0;
+                        telnet.state = TNS_NORMAL;
+                    } else
+                        telnet.state = TNS_SUBNEG;
+                    break;
+                    
+                case SE:
+                    if(telnet.sn_ptr >= 5 && 
+                            telnet.subneg[0] == TELOPT_VIA)
+                    {
+                        telnet.subneg[telnet.sn_ptr] = 0;
+                        
+                        ViaRecord v;
+                        
+                        v.first = *(in_addr*)(telnet.subneg + 1);
+                        v.second = (char*)telnet.subneg + 1 + sizeof(in_addr);
+                        
+                        via.push_back(v);
+                        
+                        LogStream::sendError() 
+                            << "got via: " 
+                            << v.second << "(" << inet_ntoa(v.first) << ")" 
+                            << endl;
+                        
+                        if (banManager->checkVerbose( this, BAN_ALL )) 
+                            return -1;
+                    }
+
+                    if (telnet.sn_ptr >= 3 
+                            && telnet.subneg[0] == TELOPT_TTYPE
+                            && telnet.subneg[1] == TELQUAL_IS)
+                    {
+                        telnet.subneg[telnet.sn_ptr] = 0;
+                        telnet.ttype = ttype_lookup((const char *)telnet.subneg + 2);
+                    }
+                    telnet.state = TNS_NORMAL;
+                    break;
+            }
+            break;
+            
+        case DO:
+            switch (i) {
 #ifdef MCCP
-	    if(i == TELOPT_COMPRESS || i == TELOPT_COMPRESS2) {
-		switch( telnet.state ) {
-		    case DO:
-			startMccp(i);
-			break;
-		    case DONT:
-			stopMccp();
-			break;
-			
-		    case WILL:
-		    case WONT:
-			break;
-		}
-	    }
+                case TELOPT_COMPRESS:
+                case TELOPT_COMPRESS2:
+                    startMccp(i);
+                    break;
 #endif
-	    telnet.state = TNS_NORMAL;
-	    break;
+                case GMCP:
+                    outOfBandManager->run("protoInit", ProtoInitArgs(this, "GMCP"));
+                    break;
+            }
+            telnet.state = TNS_NORMAL;
+            break;
 
-	default:
-	    LogStream::sendError() << "telnet: unknown state" << endl;
-	    telnet.state = TNS_NORMAL;
+        case WILL:
+            switch (i) {
+                case TELOPT_TTYPE:
+                    static const unsigned char ttype_qry_str[] = { 
+                        IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE };
+                    writeRaw(ttype_qry_str, sizeof(ttype_qry_str));
+                    break;
+            }
+            telnet.state = TNS_NORMAL;
+            break;
+
+        case DONT:
+            switch (i) {
+#ifdef MCCP
+                case TELOPT_COMPRESS:
+                case TELOPT_COMPRESS2:
+                    if (compressing == i)
+                        stopMccp();
+                    break;
+#endif
+            }
+            telnet.state = TNS_NORMAL;
+            break;
+
+        default:
+            LogStream::sendError() << "telnet: unknown state " << i << endl;
+            telnet.state = TNS_NORMAL;
     }
 
     return i;
 }
+
 
 #ifdef __MINGW32__
 static int
@@ -382,25 +434,25 @@ Descriptor::wsHandleFrame(unsigned char *buf, int rc)
                     string str(websock.payload.begin(), websock.payload.end());
                     std::vector<unsigned char>().swap(websock.payload);
 
-		    Json::Value val;
-		    Json::Reader reader;
-		    
+                    Json::Value val;
+                    Json::Reader reader;
+                    
                     if(!reader.parse(str, val)) {
                         LogStream::sendError() << "Failed to parse WebSocket payload: " << reader.getFormattedErrorMessages() << endl 
-						<< str << endl;
+                                                << str << endl;
                         return false;
                     }
 
-		    if(!val.isObject()) {
-			LogStream::sendError() << "WebSocket RPC: expected object:" << endl
-						 << str << endl;
-			return false;
-		    }
+                    if(!val.isObject()) {
+                        LogStream::sendError() << "WebSocket RPC: expected object:" << endl
+                                                 << str << endl;
+                        return false;
+                    }
 
-		    translate(val);
+                    translate(val);
 
-		    if(!wsHandlePayload(val))
-		        return false;
+                    if(!wsHandlePayload(val))
+                        return false;
                 }
                 break;
             case 8: // close
@@ -427,7 +479,7 @@ sendVersion(Descriptor *d)
 {
     Json::Value val;
     val["command"] = "version";
-    val["args"][0] = "DreamLand Web Client/1.5";
+    val["args"][0] = "DreamLand Web Client/1.7";
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);
 }
@@ -492,8 +544,8 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                         
                         via.push_back(v);
 
-			if (banManager->checkVerbose( this, BAN_ALL )) 
-			    return -1;
+                        if (banManager->checkVerbose( this, BAN_ALL )) 
+                            return -1;
                     }
 
                     LogStream::sendError( ) << "WebSock: Success!" << endl;
@@ -520,18 +572,18 @@ bool Descriptor::readInput( )
     unsigned char buf[256];
 
     for(;;) {
-	int rc;
+        int rc;
 
 #ifdef __MINGW32__
         if(hasmore(descriptor) == 0)
             break;
         
-	rc = ::recv(descriptor, (char *)buf, sizeof(buf), 0);
+        rc = ::recv(descriptor, (char *)buf, sizeof(buf), 0);
 #else
         rc = read(descriptor, (char *)buf, sizeof(buf));
 #endif
 
-	if ( rc > 0 ) {
+        if ( rc > 0 ) {
             switch(websock.state) {
                 case WS_NEGOTIATING:
                     if(!wsHandleNeg(buf, rc))
@@ -549,16 +601,16 @@ bool Descriptor::readInput( )
                     LogStream::sendWarning( ) << "Unknown WebSock state." << endl;
                     return false;
             }
-	    
-	} else if ( rc == 0 ) {
-	    LogStream::sendWarning( ) << "EOF encountered on read." << endl;
-	    return false;
-	} else if ( errno == EWOULDBLOCK ) {
-	    break;
-	} else {
-	    LogStream::sendError( ) << "Read_from_descriptor::" << strerror( errno ) << endl;
-	    return false;
-	}
+            
+        } else if ( rc == 0 ) {
+            LogStream::sendWarning( ) << "EOF encountered on read." << endl;
+            return false;
+        } else if ( errno == EWOULDBLOCK ) {
+            break;
+        } else {
+            LogStream::sendError( ) << "Read_from_descriptor::" << strerror( errno ) << endl;
+            return false;
+        }
     }
     
     return true;
@@ -574,7 +626,7 @@ bool Descriptor::noIAC( )
 bool Descriptor::noTelnet( )
 {
     return connected == CON_PLAYING 
-	    && character 
-	    && IS_SET(character->add_comm, COMM_NOTELNET);
+            && character 
+            && IS_SET(character->add_comm, COMM_NOTELNET);
 }
 

@@ -11,8 +11,7 @@
 #include "skillcommand.h"
 #include "skill.h"
 
-class SkillHelp : public virtual XMLHelpArticle, 
-                  public virtual MarkupHelpArticle,
+class SkillHelp : public MarkupHelpArticle,
                   public SkillAction 
 {
 public:

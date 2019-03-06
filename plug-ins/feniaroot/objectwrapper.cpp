@@ -30,7 +30,7 @@
 using namespace std;
 using namespace Scripting;
 
-NMI_INIT(ObjectWrapper, "�������")
+NMI_INIT(ObjectWrapper, "предмет")
 
 
 ObjectWrapper::ObjectWrapper( ) : target( NULL )
@@ -51,10 +51,10 @@ void ObjectWrapper::setSelf( Scripting::Object *s )
 void ObjectWrapper::extract( bool count )
 {
     if (target) {
-	target->wrapper = 0;
-	target = 0;
+        target->wrapper = 0;
+        target = 0;
     } else {
-	LogStream::sendError() << "Object wrapper: extract without target" << endl;
+        LogStream::sendError() << "Object wrapper: extract without target" << endl;
     }
 
     GutsContainer::extract( count );
@@ -76,45 +76,40 @@ ObjectWrapper::getTarget() const
 void ObjectWrapper::checkTarget( ) const throw( Scripting::Exception )
 {
     if (zombie.getValue())
-	throw Scripting::Exception( "Non existent object referenced" );
+        throw Scripting::Exception( "Non existent object referenced" );
 
     if (target == NULL) 
-	throw Scripting::Exception( "Object is offline" );
+        throw Scripting::Exception( "Object is offline" );
 }
 
-NMI_GET( ObjectWrapper, online, "" )
+NMI_GET( ObjectWrapper, online, "предмет сейчас в мире (а не в профайлах)" )
 {
     return Register( target != NULL );
 }
 
-NMI_GET( ObjectWrapper, dead, "" )
+NMI_GET( ObjectWrapper, dead, "true если предмет уничтожен" )
 {
     return Register( zombie.getValue() );
 }
 
-#define GETWRAP(x) NMI_GET(ObjectWrapper, x, "") { \
-    checkTarget(); \
-    return WrapperManager::getThis( )->getWrapper(target->x); \
-}
-
-NMI_GET( ObjectWrapper, id , "")
+NMI_GET( ObjectWrapper, id , "уникальный идентификатор предмета")
 {
     return DLString(id.getValue( ));
 }
 
-NMI_GET( ObjectWrapper, vnum , "") 
+NMI_GET( ObjectWrapper, vnum , "номер прототипа предмета из арии") 
 { 
     checkTarget( ); 
     return target->pIndexData->vnum;
 }
 
-NMI_GET( ObjectWrapper, short_descr , "")
+NMI_GET( ObjectWrapper, short_descr , "описание, видимое в инвентаре и при манипуляциях")
 {
     checkTarget( );
     return Register( target->getShortDescr( ) );
 }
 
-NMI_SET( ObjectWrapper, short_descr , "")
+NMI_SET( ObjectWrapper, short_descr , "описание, видимое в инвентаре и при манипуляциях")
 {
     DLString d = arg.toString( );
     
@@ -122,31 +117,31 @@ NMI_SET( ObjectWrapper, short_descr , "")
     target->setShortDescr( d.c_str( ) );
 }
 
-NMI_GET( ObjectWrapper, real_short_descr , "")
+NMI_GET( ObjectWrapper, real_short_descr , "описание без учета restring-а")
 {
     checkTarget( );
     return Register( target->getRealShortDescr( ) );
 }
 
-NMI_GET( ObjectWrapper, enchanted, "")
+NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства")
 {
     checkTarget( );
     return Register( target->enchanted );
 }
 
-NMI_SET( ObjectWrapper, enchanted , "")
+NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аффекты, меняющие его свойства")
 {
     checkTarget( );
     target->enchanted = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, description , "")
+NMI_GET( ObjectWrapper, description , "описание, видимое на земле")
 {
     checkTarget( );
     return Register( target->getDescription( ) );
 }
 
-NMI_SET( ObjectWrapper, description , "")
+NMI_SET( ObjectWrapper, description , "описание, видимое на земле")
 {
     DLString d = arg.toString( );
 
@@ -154,13 +149,13 @@ NMI_SET( ObjectWrapper, description , "")
     target->setDescription( d.c_str( ) );
 }
 
-NMI_GET( ObjectWrapper, material, "")
+NMI_GET( ObjectWrapper, material, "название материала, из которого сделан предмет")
 {
     checkTarget( );
     return Register( target->getMaterial( ) );
 }
 
-NMI_SET( ObjectWrapper, material, "")
+NMI_SET( ObjectWrapper, material, "название материала, из которого сделан предмет")
 {
     DLString d = arg.toString( );
 
@@ -168,13 +163,13 @@ NMI_SET( ObjectWrapper, material, "")
     target->setMaterial( d.c_str( ) );
 }
 
-NMI_GET( ObjectWrapper, name , "")
+NMI_GET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
     checkTarget( );
     return Register( target->getName( ) );
 }
 
-NMI_SET( ObjectWrapper, name , "")
+NMI_SET( ObjectWrapper, name , "имена предмета, на которые он откликается")
 {
     DLString d = arg.toString( );
 
@@ -182,250 +177,255 @@ NMI_SET( ObjectWrapper, name , "")
     target->setName( d.c_str() );
 }
 
-NMI_GET( ObjectWrapper, pocket, "")
+NMI_GET( ObjectWrapper, pocket, "название кармана, в котором лежит предмет, или пустая строка")
 {
     checkTarget( );
     return Register( target->pocket );
 }
 
-NMI_SET( ObjectWrapper, pocket, "")
+NMI_SET( ObjectWrapper, pocket, "название кармана, в котором лежит предмет, или пустая строка")
 {
     checkTarget( );
     target->pocket = arg.toString( );
 }
 
-NMI_GET( ObjectWrapper, level , "")
+NMI_GET( ObjectWrapper, level , "уровень предмета")
 {
     checkTarget( );
     return Register( target->level );
 }
 
-NMI_SET( ObjectWrapper, level , "")
+NMI_SET( ObjectWrapper, level , "уровень предмета")
 {
     checkTarget( );
     target->level = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, condition , "")
+NMI_GET( ObjectWrapper, condition , "состояние, от 0 [уж.] до 100")
 {
     checkTarget( );
     return Register( target->condition );
 }
 
-NMI_SET( ObjectWrapper, condition , "")
+NMI_SET( ObjectWrapper, condition , "состояние, от 0 [уж.] до 100")
 {
     checkTarget( );
     target->condition = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, cost , "")
+NMI_GET( ObjectWrapper, cost , "цена в серебре")
 {
     checkTarget( );
     return Register( target->cost );
 }
 
-NMI_SET( ObjectWrapper, cost , "")
+NMI_SET( ObjectWrapper, cost , "цена в серебре")
 {
     checkTarget( );
     target->cost = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, extra_flags, "")
+NMI_GET( ObjectWrapper, extra_flags, "дополнительные флаги (таблица .tables.extra_flags)")
 {
     checkTarget( );
     return Register( target->extra_flags );
 }
 
-NMI_SET( ObjectWrapper, extra_flags, "")
+NMI_SET( ObjectWrapper, extra_flags, "дополнительные флаги (таблица .tables.extra_flags)")
 {
     checkTarget( );
     target->extra_flags = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, wear_flags, "")
+NMI_GET( ObjectWrapper, wear_flags, "куда можно надеть предмет (таблица .tables.wear_flags)")
 {
     checkTarget( );
     return Register( target->wear_flags);
 }
 
-NMI_SET( ObjectWrapper, wear_flags, "")
+NMI_SET( ObjectWrapper, wear_flags, "куда можно надеть предмет (таблица .tables.wear_flags)")
 {
     checkTarget( );
     target->wear_flags = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, timer, "")
+NMI_GET( ObjectWrapper, timer, "через сколько тиков исчезнет или -1")
 {
     checkTarget( );
     return Register( target->timer );
 }
 
-NMI_SET( ObjectWrapper, timer, "")
+NMI_SET( ObjectWrapper, timer, "через сколько тиков исчезнет или -1")
 {
     checkTarget( );
     target->timer = arg.toNumber( );
 }
 
-NMI_GET( ObjectWrapper, owner , "")
+NMI_GET( ObjectWrapper, owner , "имя персонажа-владельца (для трупов и личных вещей)")
 {
     checkTarget( );
     const char *o = target->getOwner( );
 
     if (o == NULL)
-	return Register( "" );
+        return Register( "" );
     else
-	return Register( o );
+        return Register( o );
 }
 
-NMI_SET( ObjectWrapper, owner , "")
+NMI_SET( ObjectWrapper, owner , "имя персонажа-владельца (для трупов и личных вещей)")
 {
     DLString d = arg.toString( );
     checkTarget( );
     target->setOwner( d.c_str() );
 }
 
-NMI_GET( ObjectWrapper, item_type, "")
+NMI_GET( ObjectWrapper, item_type, "тип предмета (таблица .tables.item_table)")
 {
     checkTarget( );
     return Register( target->item_type);
 }
-NMI_GET( ObjectWrapper, wear_loc, "")
+NMI_GET( ObjectWrapper, wear_loc, "имя локации, куда надет сейчас, или none")
 {
     checkTarget( );
     return Register( target->wear_loc->getName( ) );
 }
 
-NMI_GET( ObjectWrapper, weightTotal, "��� �������� � ������ �����������")
+NMI_GET( ObjectWrapper, weightTotal, "вес предмета с учетом содержимого")
 {
     checkTarget( );
     return Register( target->getWeight( ) );
 }
 
-NMI_GET( ObjectWrapper, weight, "��� ��������")
+NMI_GET( ObjectWrapper, weight, "вес предмета")
 {
     checkTarget( );
     return Register( target->weight );
 }
 
 #define SETGETVALUE(x) \
-    NMI_GET( ObjectWrapper, value##x, "") { \
-	checkTarget( ); \
-	return Register( target->value[x]); \
+    NMI_GET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
+        checkTarget( ); \
+        return Register( target->value[x]); \
     } \
-    NMI_SET( ObjectWrapper, value##x, "") { \
-	checkTarget( ); \
-	target->value[x] = arg.toNumber(); \
+    NMI_SET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
+        checkTarget( ); \
+        target->value[x] = arg.toNumber(); \
     }
-	
+        
 SETGETVALUE(0)
 SETGETVALUE(1)
 SETGETVALUE(2)
 SETGETVALUE(3)
 SETGETVALUE(4)
 
-GETWRAP( pIndexData )
-GETWRAP( next )
-GETWRAP( next_content )
-GETWRAP( contains )
-GETWRAP( in_obj )
-GETWRAP( carried_by )
-GETWRAP( in_room )
+#define GETWRAP(x, h) NMI_GET(ObjectWrapper, x, h) { \
+    checkTarget(); \
+    return WrapperManager::getThis( )->getWrapper(target->x); \
+}
+
+GETWRAP( pIndexData, "прототип предмета" )
+GETWRAP( next, "указывает на следующий предмет в глобальном списке .object_list" )
+GETWRAP( next_content, "указывает на следующий предмет в том же контейнере или инвентаре" )
+GETWRAP( contains, "указывает на первый предмет, содержащийся внутри этого" )
+GETWRAP( in_obj, "внутри какого предмета находится этот, или null" )
+GETWRAP( carried_by, "персонаж, несущий предмет в инвентаре-экипировке, или null" )
+GETWRAP( in_room, "комната, на полу которой лежит предмет, или null" )
 
 /*
  * Methods
  */
-NMI_INVOKE( ObjectWrapper, getCarrier, "")
+NMI_INVOKE( ObjectWrapper, getCarrier, "(): персонаж, который несет предмет с учетом вложенности, или null")
 {
     checkTarget();
     Character *ch = target->getCarrier();
 
     if (ch)
-	return WrapperManager::getThis( )->getWrapper(ch); 
+        return WrapperManager::getThis( )->getWrapper(ch); 
     else
-	return Register();
+        return Register();
 }
-NMI_INVOKE( ObjectWrapper, getRoom, "")
+NMI_INVOKE( ObjectWrapper, getRoom, "(): комната, в которой находится предмет с учетом вложенности, или null")
 {
     checkTarget();
     Room *r = target->getRoom();
 
     if (r) 
-	return WrapperManager::getThis( )->getWrapper(r); 
+        return WrapperManager::getThis( )->getWrapper(r); 
     else
-	return Register();
+        return Register();
 }
 
 static void obj_from_anywhere( ::Object *obj )
 {
     if (obj->in_room)
-	obj_from_room( obj );
+        obj_from_room( obj );
     else if (obj->carried_by)
-	obj_from_char( obj );
+        obj_from_char( obj );
     else if (obj->in_obj)
-	obj_from_obj( obj );
+        obj_from_obj( obj );
 }
 
-NMI_INVOKE( ObjectWrapper, obj_from_char , "deprecated")
+NMI_INVOKE( ObjectWrapper, obj_from_char , "(): deprecated")
 {
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, obj_to_char , "")
+NMI_INVOKE( ObjectWrapper, obj_to_char , "(ch): дать предмет в руки персонажу ch")
 {
     CharacterWrapper *chWrap;
     
     checkTarget();
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     chWrap = wrapper_cast<CharacterWrapper>(args.front( ));
     
     obj_from_anywhere( target );
     ::obj_to_char( target, chWrap->getTarget( ) );
-    return Register( );
+    return wrap(target);
 }
 
-NMI_INVOKE( ObjectWrapper, obj_from_room , "deprecated")
+NMI_INVOKE( ObjectWrapper, obj_from_room , "(): deprecated")
 {
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, obj_to_room , "")
+NMI_INVOKE( ObjectWrapper, obj_to_room , "(room): положить предмет на пол в комнате room")
 {
     RoomWrapper *roomWrap;
     
     checkTarget();
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     roomWrap = wrapper_cast<RoomWrapper>(args.front( ));
     
     obj_from_anywhere( target );
     ::obj_to_room( target, roomWrap->getTarget( ) );
-    return Register( );
+    return wrap(target);
 }
 
-NMI_INVOKE( ObjectWrapper, obj_from_obj , "deprecated")
+NMI_INVOKE( ObjectWrapper, obj_from_obj , "(): deprecated")
 {
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, obj_to_obj , "")
+NMI_INVOKE( ObjectWrapper, obj_to_obj , "(obj): положить предмет внутрь другого предмета obj")
 {
     ObjectWrapper *objWrap;
     
     checkTarget();
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     objWrap = wrapper_cast<ObjectWrapper>(args.front( ));
     
     obj_from_anywhere( target );
     ::obj_to_obj( target, objWrap->getTarget( ) );
-    return Register( );
+    return wrap(target);
 }
 
-NMI_INVOKE( ObjectWrapper, extract , "")
+NMI_INVOKE( ObjectWrapper, extract , "(): полностью уничтожить предмет")
 {
     Register thiz( self );
     bool count = true;
@@ -433,61 +433,61 @@ NMI_INVOKE( ObjectWrapper, extract , "")
     checkTarget();
     
     if (!args.empty())
-	count = args.front().toNumber();
+        count = args.front().toNumber();
     
     ::extract_obj_1( target, count );
     return Register();
 }
 
-NMI_INVOKE( ObjectWrapper, get_extra_descr , "")
+NMI_INVOKE( ObjectWrapper, get_extra_descr , "(key): найти экстра-описание с ключевым словом key")
 {
     char *desc;
     
     checkTarget();
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
 
     DLString d = args.front().toString( );
     desc = ::get_extra_descr(d.c_str( ), target->pIndexData->extra_descr);
     if (desc != 0)
-	return desc;
+        return desc;
 
     return ::get_extra_descr(d.c_str( ), target->extra_descr);
 }
 
-NMI_INVOKE( ObjectWrapper, set_extra_descr , "")
+NMI_INVOKE( ObjectWrapper, set_extra_descr , "(key, text): установить экстра-описание text по ключевому слову key")
 {
     checkTarget();
 
     RegisterList::const_iterator i = args.begin();
 
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     DLString name = i->toString();
 
     i++;
     
     if(i == args.end())
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     DLString text;
     
     if(i->type == Register::STRING)
-	text = i->toString();
+        text = i->toString();
 
     EXTRA_DESCR_DATA **ed, *ned;
     
     for(ed = &target->extra_descr; *ed; )
-	if(!str_cmp((*ed)->keyword, name.c_str())) {
-	    EXTRA_DESCR_DATA *n = (*ed)->next;
-	    
-	    free_extra_descr(*ed);
-	    *ed = n;
-	} else
-	    ed = &(*ed)->next;
+        if(!str_cmp((*ed)->keyword, name.c_str())) {
+            EXTRA_DESCR_DATA *n = (*ed)->next;
+            
+            free_extra_descr(*ed);
+            *ed = n;
+        } else
+            ed = &(*ed)->next;
     
     ned = new_extra_descr();
     ned->next = target->extra_descr;
@@ -499,31 +499,31 @@ NMI_INVOKE( ObjectWrapper, set_extra_descr , "")
 }
 
 
-NMI_INVOKE( ObjectWrapper, equip, "�������� � ��������� ����� ���� ��� ��� �����" )
+NMI_INVOKE( ObjectWrapper, equip, "(wearloc): надеть в указанную локацию тому, кто несет предмет" )
 {
     Wearlocation *loc;
     
     checkTarget( );
     
     if(args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     if (!target->carried_by)
-	throw Scripting::Exception("object not in inventory");
+        throw Scripting::Exception("object not in inventory");
     if (target->wear_loc != wear_none)
-	throw Scripting::Exception("object already equipped");
+        throw Scripting::Exception("object already equipped");
     if (!( loc = wearlocationManager->findExisting( args.front( ).toString( ) ) ))
-	throw Scripting::Exception("unknown wearlocation");
+        throw Scripting::Exception("unknown wearlocation");
 
     loc->equip( target );
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, unequip, "������� ������ � ������ � ���������" )
+NMI_INVOKE( ObjectWrapper, unequip, "(): снимает предмет и кладет в инвентарь тому, кто несет" )
 {
     checkTarget( );
     
     if (target->wear_loc == wear_none || target->carried_by == NULL)
-	throw Scripting::Exception("object already un-equipped");
+        throw Scripting::Exception("object already un-equipped");
     
     target->wear_loc->unequip( target );
     return Register( );
@@ -532,34 +532,45 @@ NMI_INVOKE( ObjectWrapper, unequip, "������� ������ � ������ � ���������" )
 
 /*-----------------------------------------------------------------------*/
 
+NMI_INVOKE( ObjectWrapper, isAffected, "(skill): находится ли предмет под воздействием аффекта с данным именем" )
+{
+    Skill *skill = args2skill(args);
+    
+    checkTarget( );
 
-NMI_GET( ObjectWrapper, affected, "" )
+    if (skill)
+        return target->isAffected( skill->getIndex( ) );
+    else
+        return false;
+}
+
+NMI_GET( ObjectWrapper, affected, "список (List) всех аффектов на предмете (структура .Affect)" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
     Affect *paf;
 
     if (!target->enchanted)
-	for (paf = target->pIndexData->affected; paf != 0; paf = paf->next) 
-	    rc->push_back( AffectWrapper::wrap( *paf ) );
+        for (paf = target->pIndexData->affected; paf != 0; paf = paf->next) 
+            rc->push_back( AffectWrapper::wrap( *paf ) );
     
     for (paf = target->affected; paf != 0; paf = paf->next) 
-	rc->push_back( AffectWrapper::wrap( *paf ) );
-	
+        rc->push_back( AffectWrapper::wrap( *paf ) );
+        
     Scripting::Object *sobj = &Scripting::Object::manager->allocate();
     sobj->setHandler(rc);
 
     return Register( sobj );
 }
 
-NMI_INVOKE( ObjectWrapper, affectAdd, "" )
+NMI_INVOKE( ObjectWrapper, affectAdd, "(aff): повесить на предмет указанный аффект (.Affect)" )
 {
     checkTarget( );
     AffectWrapper *aw;
     Affect af;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
     
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
     aw->toAffect( af );
@@ -568,7 +579,7 @@ NMI_INVOKE( ObjectWrapper, affectAdd, "" )
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, affectStrip, "" )
+NMI_INVOKE( ObjectWrapper, affectStrip, "(skill): снять с предмета все аффекты от умения по имени skill" )
 {
     checkTarget( );
     Skill *skill;
@@ -576,36 +587,36 @@ NMI_INVOKE( ObjectWrapper, affectStrip, "" )
     Affect *paf, *paf_next;
     
     if (args.empty( ))
-	throw Scripting::NotEnoughArgumentsException( );
+        throw Scripting::NotEnoughArgumentsException( );
 
     skill = skillManager->findExisting( args.front( ).toString( ) );
     
     if (!skill)
-	throw Scripting::IllegalArgumentException( );
+        throw Scripting::IllegalArgumentException( );
     
     sn = skill->getIndex( );
 
     for (paf = target->affected; paf; paf = paf_next) {
-	paf_next = paf->next;
+        paf_next = paf->next;
 
-	if (paf->type == sn)
-	    affect_remove_obj( target, paf );
+        if (paf->type == sn)
+            affect_remove_obj( target, paf );
     }
     
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, affectStripAll, "" )
+NMI_INVOKE( ObjectWrapper, affectStripAll, "(): снять все аффекты" )
 {
     checkTarget( );
     
     while (target->affected)
-	affect_remove_obj( target, target->affected );
+        affect_remove_obj( target, target->affected );
 
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, random_obj_list, "��������� ������ �� ������, ������������� � ����� �������. ����� ����� � ��������� item type")
+NMI_INVOKE( ObjectWrapper, random_obj_list, "([item_type]): случайный объект из списка, начинающегося с этого объекта. поиск ограничивается типом item_type, если задан")
 {
     int itype = -1;
     ::Object *result = NULL;
@@ -614,49 +625,49 @@ NMI_INVOKE( ObjectWrapper, random_obj_list, "��������� ������ �� ������, �������
     checkTarget( );
 
     if (!args.empty( )) 
-	if (( itype = item_table.value( args2string( args ).c_str( ), true ) ) == NO_FLAG)
-	    throw Scripting::IllegalArgumentException( );
+        if (( itype = item_table.value( args2string( args ).c_str( ), true ) ) == NO_FLAG)
+            throw Scripting::IllegalArgumentException( );
 
     for (::Object *obj = target; obj; obj = obj->next_content) 
-	if (itype == -1 || obj->pIndexData->item_type == itype)
-	    if (number_range( 0, cnt++ ) == 0)
-		result = obj;
+        if (itype == -1 || obj->pIndexData->item_type == itype)
+            if (number_range( 0, cnt++ ) == 0)
+                result = obj;
 
     return wrap( result );
 }
 
-NMI_INVOKE( ObjectWrapper, madeOfWood, "������� ������ �� ������" )
+NMI_INVOKE( ObjectWrapper, madeOfWood, "(): предмет сделан из дерева" )
 {
     checkTarget( );
     return Register( material_is_typed( target, MAT_WOOD ) );
 }
 
-NMI_INVOKE( ObjectWrapper, madeOfMetal, "������� ������ �� �������" )
+NMI_INVOKE( ObjectWrapper, madeOfMetal, "(): предмет сделан из металла" )
 {
     checkTarget( );
     return Register( material_is_typed( target, MAT_METAL ) );
 }
 
-NMI_INVOKE( ObjectWrapper, materialBurns, "������� ����� ����� (-1 ���� ����� �����)" )
+NMI_INVOKE( ObjectWrapper, materialBurns, "(): сколько тиков горит (-1 если тушит огонь)" )
 {
     checkTarget( );
     return Register( material_burns( target ) );
 }
 
-NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "����� ������� ������ ����� �� �����" )
+NMI_INVOKE( ObjectWrapper, get_obj_content_vnum, "(vnum): поиск объекта внутри этого по внуму" )
 {
     checkTarget( );
 
     int vnum = args2number( args );
 
     for (::Object *obj = target->contains; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    return wrap( obj );
+        if (obj->pIndexData->vnum == vnum)
+            return wrap( obj );
 
     return Register( );
 }
 
-NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "����� ������ �������� ������ ����� �� �����" )
+NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "(vnum): поиск списка (List) объектов внутри этого по внуму" )
 {
     checkTarget( );
     RegList::Pointer rc(NEW);
@@ -664,8 +675,8 @@ NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "����� ������ �������� ������ 
     int vnum = args2number( args );
 
     for (::Object *obj = target->contains; obj; obj = obj->next_content)
-	if (obj->pIndexData->vnum == vnum)
-	    rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        if (obj->pIndexData->vnum == vnum)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -673,13 +684,13 @@ NMI_INVOKE( ObjectWrapper, list_obj_content_vnum, "����� ������ �������� ������ 
     return Register( sobj );
 }
 
-NMI_GET( ObjectWrapper, items, "������ (List) ���� ��������� ������ �����" )
+NMI_GET( ObjectWrapper, items, "список (List) всех предметов внутри этого" )
 {
     checkTarget();
     RegList::Pointer rc(NEW);
 
     for (::Object *obj = target->contains; obj; obj = obj->next_content)
-	rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+        rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
     
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( rc );
@@ -687,21 +698,21 @@ NMI_GET( ObjectWrapper, items, "������ (List) ���� ��������� ������ �����" )
     return Register( sobj );
 }
 
-NMI_INVOKE( ObjectWrapper, api, "�������� ���� API" )
+NMI_INVOKE( ObjectWrapper, api, "(): печатает этот API" )
 {
     ostringstream buf;
     Scripting::traitsAPI<ObjectWrapper>( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjectWrapper, rtapi, "�������� ��� ���� � ������, ������������� � runtime" )
+NMI_INVOKE( ObjectWrapper, rtapi, "(): печатает все поля и методы, установленные в runtime" )
 {
     ostringstream buf;
     traitsAPI( buf );
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE( ObjectWrapper, clear, "������� ���� runtime �����" )
+NMI_INVOKE( ObjectWrapper, clear, "(): очистка всех runtime полей" )
 {
     guts.clear( );
     self->changed();

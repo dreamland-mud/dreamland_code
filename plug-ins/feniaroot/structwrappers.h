@@ -34,7 +34,7 @@ public:
 
     AreaWrapper() { }
     AreaWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -58,7 +58,7 @@ public:
 
     HometownWrapper() { }
     HometownWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -82,12 +82,39 @@ public:
 
     ProfessionWrapper() { }
     ProfessionWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
+};
+
+/*----------------------------------------------------------------------
+ * CraftProfession
+ *----------------------------------------------------------------------*/
+class CraftProfession;
+
+class CraftProfessionWrapper : public PluginNativeImpl<CraftProfessionWrapper>, 
+                          public NativeHandler,
+                          public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<CraftProfessionWrapper> Pointer;
+
+    CraftProfessionWrapper() { }
+    CraftProfessionWrapper(const DLString &);
+            
+    virtual void setSelf(Scripting::Object *) { }
+    
+    static Scripting::Register wrap( const DLString & );
+
+    XML_VARIABLE XMLString name;
+
+protected:
+    CraftProfession * getTarget() const;
 };
 
 /*----------------------------------------------------------------------
@@ -106,7 +133,7 @@ public:
 
     RaceWrapper() { }
     RaceWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -130,7 +157,7 @@ public:
 
     LiquidWrapper() { }
     LiquidWrapper(const DLString &);
-	    
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );
@@ -154,7 +181,31 @@ public:
 
     ClanWrapper() { }
     ClanWrapper(const DLString &);
-	    
+            
+    virtual void setSelf(Scripting::Object *) { }
+    
+    static Scripting::Register wrap( const DLString & );
+
+    XML_VARIABLE XMLString name;
+};
+
+/*----------------------------------------------------------------------
+ * Skill
+ *----------------------------------------------------------------------*/
+class Skill;
+
+class SkillWrapper : public PluginNativeImpl<SkillWrapper>, 
+                      public NativeHandler,
+                      public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<SkillWrapper> Pointer;
+
+    SkillWrapper() { }
+    SkillWrapper(const DLString &);
+            
     virtual void setSelf(Scripting::Object *) { }
     
     static Scripting::Register wrap( const DLString & );

@@ -7,6 +7,7 @@
 #include "commandtemplate.h"
 
 #include "xmllovers.h"
+#include "lover.h"
 #include "xmlattributelovers.h"
 
 #include "wrapperbase.h"
@@ -22,7 +23,7 @@
 #include "merc.h"
 #include "def.h"
 
-#define MLOVE_DAZE(ch)	(ch)->wait = std::max((ch)->wait, 25);
+#define MLOVE_DAZE(ch)        (ch)->wait = std::max((ch)->wait, 25);
 
 static bool mprog_makelove( Character *ch, Character *victim )
 {
@@ -33,106 +34,95 @@ static bool mprog_makelove( Character *ch, Character *victim )
 
 CMDRUN( mlove )
 {
-	DLString arguments = constArguments;
-	DLString arg;
-	std::basic_ostringstream<char> str;
-	Character *victim;
+        DLString arguments = constArguments;
+        DLString arg;
+        std::basic_ostringstream<char> str;
+        Character *victim;
 
-	if (IS_AFFECTED(ch,AFF_CHARM)) {
-	    act_p("... Œœ ”≈“ƒ√’ Œ≈ –“…À¡÷≈€ÿ.", ch, 0, 0, TO_CHAR, POS_RESTING);  
-	    act_p("$c1 ’»ÕŸÃ—≈‘”— - ”≈“ƒ√’ Œ≈ –“…À¡÷≈€ÿ.", ch, 0, ch->master, TO_VICT, POS_RESTING);
-	    return;
-	}
+        if (IS_AFFECTED(ch,AFF_CHARM)) {
+            act_p("... –Ω–æ —Å–µ—Ä–¥—Ü—É –Ω–µ –ø—Ä–∏–∫–∞–∂–µ—à—å.", ch, 0, 0, TO_CHAR, POS_RESTING);  
+            act_p("$c1 —É—Ö–º—ã–ª—è–µ—Ç—Å—è - —Å–µ—Ä–¥—Ü—É –Ω–µ –ø—Ä–∏–∫–∞–∂–µ—à—å.", ch, 0, ch->master, TO_VICT, POS_RESTING);
+            return;
+        }
 
-	if (arguments.empty( )) {
-	    if (ch->getSex( ) == SEX_MALE)
-		act_p("ÙŸ Œ…À¡À Œ≈ Õœ÷≈€ÿ œ–“≈ƒ≈Ã…‘ÿ”—: À’ƒ¡ ”œ◊¡‘ÿ ÷≈‘œŒ?", ch, 0, 0, TO_CHAR, POS_RESTING);
-	    else 
-		act_p("Î’ƒ¡ –œ ‘…, À’ƒ¡ –œƒ¡‘ÿ”—.. Àœ«œ Œ¡ ‘…, ÀœÕ’ œ‘ƒ¡‘ÿ”—?", ch, 0, 0, TO_CHAR, POS_RESTING);
+        if (arguments.empty( )) {
+            if (ch->getSex( ) == SEX_MALE)
+                act_p("–¢—ã –Ω–∏–∫–∞–∫ –Ω–µ –º–æ–∂–µ—à—å –æ–ø—Ä–µ–¥–µ–ª–∏—Ç—å—Å—è: –∫—É–¥–∞ —Å–æ–≤–∞—Ç—å –∂–µ—Ç–æ–Ω?", ch, 0, 0, TO_CHAR, POS_RESTING);
+            else 
+                act_p("–ö—É–¥–∞ –ø–æ–π—Ç–∏, –∫—É–¥–∞ –ø–æ–¥–∞—Ç—å—Å—è.. –∫–æ–≥–æ –Ω–∞–π—Ç–∏, –∫–æ–º—É –æ—Ç–¥–∞—Ç—å—Å—è?", ch, 0, 0, TO_CHAR, POS_RESTING);
 
-	    act_p("$c1 «œŒ—≈‘”— ” –œ»œ‘Ã…◊ŸÕ ◊…ƒœÕ ⁄¡ ◊”≈Õ… ◊ ÀœÕŒ¡‘≈..¬≈“≈«…”ÿ!", ch, 0, 0, TO_ROOM, POS_RESTING);
-	    return;
-	}
-	
-	arg = arguments.getOneArgument( );
+            act_p("$c1 –≥–æ–Ω—è–µ—Ç—Å—è —Å –ø–æ—Ö–æ—Ç–ª–∏–≤—ã–º –≤–∏–¥–æ–º –∑–∞ –≤—Å–µ–º–∏ –≤ –∫–æ–º–Ω–∞—Ç–µ..–±–µ—Ä–µ–≥–∏—Å—å!", ch, 0, 0, TO_ROOM, POS_RESTING);
+            return;
+        }
+        
+        arg = arguments.getOneArgument( );
 
-	if ( (victim = get_char_room(ch, arg.c_str())) == 0 ) {
-	    ch->send_to("Ô¬ﬂ≈À‘ ‘◊œ≈  ”‘“¡”‘… À’ƒ¡-‘œ –œƒ≈◊¡Ã”—.\n\r");
-	    return;
-	}
+        if ( (victim = get_char_room(ch, arg.c_str())) == 0 ) {
+            ch->send_to("–û–±—ä–µ–∫—Ç —Ç–≤–æ–µ–π —Å—Ç—Ä–∞—Å—Ç–∏ –∫—É–¥–∞-—Ç–æ –ø–æ–¥–µ–≤–∞–ª—Å—è.\n\r");
+            return;
+        }
 
-	if (ch == victim) {
-	    ch->move -= ch->move / 4;
-	    ch->mana -= ch->mana / 4;
+        if (ch == victim) {
+            ch->move -= ch->move / 4;
+            ch->mana -= ch->mana / 4;
 
-	    ch->send_to("‰¡! ÙŸ Ã¿¬…€ÿ ”≈¬—! Â›≈, ≈›≈..!\n\r");
-	    act_p("Û‘“¡”‘ÿ $c1 À ”¡Õœ$gÕ’|Õ’|  ”≈¬≈ –œÃÿ⁄’≈‘”— –œÃŒœ  ◊⁄¡…ÕŒœ”‘ÿ¿.", ch, 0, 0, TO_ROOM, POS_RESTING);
-	    MLOVE_DAZE(ch);
-	    return;
-	}
+            ch->send_to("–î–∞! –¢—ã –ª—é–±–∏—à—å —Å–µ–±—è! –ï—â–µ, –µ—â–µ..!\n\r");
+            act_p("–°—Ç—Ä–∞—Å—Ç—å $c1 –∫ —Å–∞–º–æ$g–º—É|–º—É|–π —Å–µ–±–µ –ø–æ–ª—å–∑—É–µ—Ç—Å—è –ø–æ–ª–Ω–æ–π –≤–∑–∞–∏–º–Ω–æ—Å—Ç—å—é.", ch, 0, 0, TO_ROOM, POS_RESTING);
+            MLOVE_DAZE(ch);
+            return;
+        }
 
-	if (ch->position == POS_FIGHTING) {
-	    if (ch->getSex( ) == SEX_MALE)
-		act_p("‚Ÿ”‘“œ ”–“—ﬁÿ, –œÀ¡ Œ≈ œ‘“≈⁄¡Ã…!", ch, 0, 0, TO_CHAR, POS_RESTING);
-	    else 
-		act_p("¸ , Œ≈ œ‘◊Ã≈À¡ ”—!", ch, 0, 0, TO_CHAR, POS_RESTING);
-	    
-	    act_p("$c1 ‘œ“÷≈”‘◊≈ŒŒœ –“œ…⁄Œœ”…‘: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
-	    return;
-	}
+        if (ch->position == POS_FIGHTING) {
+            if (ch->getSex( ) == SEX_MALE)
+                act_p("–ë—ã—Å—Ç—Ä–æ —Å–ø—Ä—è—á—å, –ø–æ–∫–∞ –Ω–µ –æ—Ç—Ä–µ–∑–∞–ª–∏!", ch, 0, 0, TO_CHAR, POS_RESTING);
+            else 
+                act_p("–≠–π, –Ω–µ –æ—Ç–≤–ª–µ–∫–∞–π—Å—è!", ch, 0, 0, TO_CHAR, POS_RESTING);
+            
+            act_p("$c1 —Ç–æ—Ä–∂–µ—Å—Ç–≤–µ–Ω–Ω–æ –ø—Ä–æ–∏–∑–Ω–æ—Å–∏—Ç: '{gMake love, not war!{x'", ch, 0, 0, TO_ROOM, POS_RESTING);
+            return;
+        }
 
-	if (victim->position <= POS_STUNNED) {
-	    act_p("$M ”≈ ﬁ¡” 'À¡À-‘œ ‘¡À'.. …⁄◊…Œ….", ch, 0, victim, TO_CHAR, POS_RESTING);
-	    return;
-	}
-	else if (victim->position == POS_SLEEPING) {
-	    act_p("Ìœ÷≈‘, ”‘œ…‘ $S ƒÃ— Œ¡ﬁ¡Ã¡ “¡⁄¬’ƒ…‘ÿ?", ch, 0, victim, TO_CHAR, POS_RESTING);
-	    act_p("$c1 ◊≈“‘…‘”— ◊œÀ“’« $C2 … ‘¡À, … ‹ƒ¡À, Œœ ﬁ‘œ-‘œ $s ”Õ’›¡≈‘. Ó¡◊≈“Œœ≈, $S »“¡–?", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-	    return;
-	}
-	else if (victim->position == POS_FIGHTING) {
-	    act_p("$M ”≈ ﬁ¡” ”œ◊”≈Õ Œ≈ ƒœ ‘≈¬—.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	    return;
-	}
-	
-	if (mprog_makelove( ch, victim ))
-	    return;
+        if (victim->position <= POS_STUNNED) {
+            act_p("$M —Å–µ–π—á–∞—Å '–∫–∞–∫-—Ç–æ —Ç–∞–∫'.. –∏–∑–≤–∏–Ω–∏.", ch, 0, victim, TO_CHAR, POS_RESTING);
+            return;
+        }
+        else if (victim->position == POS_SLEEPING) {
+            act_p("–ú–æ–∂–µ—Ç, —Å—Ç–æ–∏—Ç $S –¥–ª—è –Ω–∞—á–∞–ª–∞ —Ä–∞–∑–±—É–¥–∏—Ç—å?", ch, 0, victim, TO_CHAR, POS_RESTING);
+            act_p("$c1 –≤–µ—Ä—Ç–∏—Ç—Å—è –≤–æ–∫—Ä—É–≥ $C2 –∏ —Ç–∞–∫, –∏ —ç–¥–∞–∫, –Ω–æ —á—Ç–æ-—Ç–æ $s —Å–º—É—â–∞–µ—Ç. –ù–∞–≤–µ—Ä–Ω–æ–µ, $S —Ö—Ä–∞–ø?", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            return;
+        }
+        else if (victim->position == POS_FIGHTING) {
+            act_p("$M —Å–µ–π—á–∞—Å —Å–æ–≤—Å–µ–º –Ω–µ –¥–æ —Ç–µ–±—è.", ch, 0, victim, TO_CHAR, POS_RESTING);
+            return;
+        }
+        
+        if (mprog_makelove( ch, victim ))
+            return;
 
-	if (ch->is_npc()) {
-	    ch->send_to("Ù≈¬≈ Œ≈Ãÿ⁄—.\n\r");
-	    return;
-	}
-	
-	if (!victim->is_npc()) {
-	    XMLAttributeLovers::Pointer pointer;
-	    
-	    XMLAttributes* attributes = &victim->getPC( )->getAttributes( );
-	    XMLAttributes::iterator ipos = attributes->find( "lovers" );	
-	
-	    if (ipos != attributes->end( ) &&
-		!(pointer = ipos->second.getDynamicPointer<XMLAttributeLovers>( ))->lovers.empty( ))
-	    {
-		if (pointer->lovers.isPresent( ch->getName() ) ) {
-		    ch->mana -= ch->mana / 4;
-		    victim->mana -= victim->mana / 4;
-		    ch->move -= ch->move / 4;
-		    victim->move -= victim->move / 4;
- 
-		    act_p("ÙŸ ”“Ÿ◊¡≈€ÿ ” $C2 œƒ≈÷ƒ’ … ”‘“¡”‘Œœ ⁄¡Œ…Õ¡≈€ÿ”— ” $Y Ã¿¬œ◊ÿ¿.", ch, 0, victim, TO_CHAR, POS_RESTING);
-		    act_p("$c1 ”“Ÿ◊¡≈‘ ” ‘≈¬— œƒ≈÷ƒ’ … ”‘“¡”‘Œœ ⁄¡Œ…Õ¡≈‘”— ” ‘œ¬œ  Ã¿¬œ◊ÿ¿. ·», ƒ¡! Â›≈, ≈›≈!", ch, 0, victim, TO_VICT, POS_RESTING);
-		    act_p("$c1 ”“Ÿ◊¡≈‘ ” $C2 œƒ≈÷ƒ’ … ”‘“¡”‘Œœ ⁄¡Œ…Õ¡≈‘”— ” $Y Ã¿¬œ◊ÿ¿.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
-		    
-		    MLOVE_DAZE(victim);
-		    MLOVE_DAZE(ch);
-		    
-		    return;
-		}
-	    }
-	}
-	
-	act_p("Ô$GŒœ|Œ|Œ¡ ‘≈¬— Œ≈ »œﬁ≈‘.", ch, 0, victim, TO_CHAR, POS_RESTING);
-	act_p("$c1 –Ÿ‘¡≈‘”— ƒœ¬…‘ÿ”— œ‘ ‘≈¬— ◊⁄¡…ÕŒœ”‘…, Œœ ‘Ÿ œ‘◊≈“«¡≈€ÿ $s.", ch, 0, victim, TO_VICT, POS_RESTING);
-	act_p("$c1 –Ÿ‘¡≈‘”— ƒœ¬…‘ÿ”— œ‘ $C2 ◊⁄¡…ÕŒœ”‘…, Œœ $C1 œ‘◊≈“«¡≈‘ $s.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+        if (ch->is_npc()) {
+            ch->send_to("–¢–µ–±–µ –Ω–µ–ª—å–∑—è.\n\r");
+            return;
+        }
+
+        if (mlove_accepts(ch, victim)) {        
+            ch->mana -= ch->mana / 4;
+            victim->mana -= victim->mana / 4;
+            ch->move -= ch->move / 4;
+            victim->move -= victim->move / 4;
+
+            act_p("–¢—ã —Å—Ä—ã–≤–∞–µ—à—å —Å $C2 –æ–¥–µ–∂–¥—É –∏ —Å—Ç—Ä–∞—Å—Ç–Ω–æ –∑–∞–Ω–∏–º–∞–µ—à—å—Å—è —Å $Y –ª—é–±–æ–≤—å—é.", ch, 0, victim, TO_CHAR, POS_RESTING);
+            act_p("$c1 —Å—Ä—ã–≤–∞–µ—Ç —Å —Ç–µ–±—è –æ–¥–µ–∂–¥—É –∏ —Å—Ç—Ä–∞—Å—Ç–Ω–æ –∑–∞–Ω–∏–º–∞–µ—Ç—Å—è —Å —Ç–æ–±–æ–π –ª—é–±–æ–≤—å—é. –ê—Ö, –¥–∞! –ï—â–µ, –µ—â–µ!", ch, 0, victim, TO_VICT, POS_RESTING);
+            act_p("$c1 —Å—Ä—ã–≤–∞–µ—Ç —Å $C2 –æ–¥–µ–∂–¥—É –∏ —Å—Ç—Ä–∞—Å—Ç–Ω–æ –∑–∞–Ω–∏–º–∞–µ—Ç—Å—è —Å $Y –ª—é–±–æ–≤—å—é.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
+            
+            MLOVE_DAZE(victim);
+            MLOVE_DAZE(ch);
+            
+            return;
+        }
+        
+        act_p("–û$G–Ω–æ|–Ω|–Ω–∞ —Ç–µ–±—è –Ω–µ —Ö–æ—á–µ—Ç.", ch, 0, victim, TO_CHAR, POS_RESTING);
+        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è –¥–æ–±–∏—Ç—å—Å—è –æ—Ç —Ç–µ–±—è –≤–∑–∞–∏–º–Ω–æ—Å—Ç–∏, –Ω–æ —Ç—ã –æ—Ç–≤–µ—Ä–≥–∞–µ—à—å $s.", ch, 0, victim, TO_VICT, POS_RESTING);
+        act_p("$c1 –ø—ã—Ç–∞–µ—Ç—Å—è –¥–æ–±–∏—Ç—å—Å—è –æ—Ç $C2 –≤–∑–∞–∏–º–Ω–æ—Å—Ç–∏, –Ω–æ $C1 –æ—Ç–≤–µ—Ä–≥–∞–µ—Ç $s.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
 }
 
 

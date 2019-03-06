@@ -197,18 +197,18 @@ inline void DreamLand::removeOption( int opt )
 inline void DreamLand::resetOption( int opt )
 {
     if (options.isSet( opt ))
-	workingOptions.setBit( opt );
+        workingOptions.setBit( opt );
     else
-	workingOptions.removeBit( opt );
+        workingOptions.removeBit( opt );
 }
 
 inline bool DreamLand::getFromMerchantBank( long gold )
 {
     if (gold > merchantBank)
-	return false;
+        return false;
     else {
-	merchantBank -= gold;
-	return true;
+        merchantBank -= gold;
+        return true;
     }
 }
 

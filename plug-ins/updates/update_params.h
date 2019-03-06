@@ -10,26 +10,26 @@
 #include "schedulertaskroundplugin.h"
 
 /**
-  * Регенерация хитпоинтов
-  * Регенерация маны
-  * Регенерация мувесов
+  * п═п╣пЁп╣п╫п╣я─п╟я├п╦я▐ я┘п╦я┌п©п╬п╦п╫я┌п╬п╡
+  * п═п╣пЁп╣п╫п╣я─п╟я├п╦я▐ п╪п╟п╫я▀
+  * п═п╣пЁп╣п╫п╣я─п╟я├п╦я▐ п╪я┐п╡п╣я│п╬п╡
   *@author Sergey L. Tereschenko
   */
 
 class CharacterParamsUpdateTask : public SchedulerTaskRoundCharacter,
-			          public SchedulerTaskRoundPlugin
+                                  public SchedulerTaskRoundPlugin
 {
 public:
-	typedef ::Pointer<CharacterParamsUpdateTask> Pointer;
+        typedef ::Pointer<CharacterParamsUpdateTask> Pointer;
 
-	virtual void run( Character * );
-	virtual void before( );
-	virtual void after( );
+        virtual void run( Character * );
+        virtual void before( );
+        virtual void after( );
 
 protected:
-	void gainHitPoint( Character * );
-	void gainMana( Character * );
-	void gainMove( Character * );
+        void gainHitPoint( Character * );
+        void gainMana( Character * );
+        void gainMove( Character * );
 };
 
 

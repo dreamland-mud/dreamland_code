@@ -14,39 +14,39 @@ class SchedulerTask;
 class SchedulerPriorityMap;
 
 /**
- * @short Планировщик задач
+ * @short п÷п╩п╟п╫п╦я─п╬п╡я┴п╦п╨ п╥п╟п╢п╟я┤
  */
 class Scheduler : public virtual DLObject { 
-public:	
-	typedef ::Pointer<Scheduler> Pointer;
-	typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
+public:        
+        typedef ::Pointer<Scheduler> Pointer;
+        typedef ::Pointer<SchedulerTask> SchedulerTaskPointer;
 
 public:
-	Scheduler( );
-	virtual ~Scheduler( );
-	
-	void putTask( long time, SchedulerTaskPointer task );
-	/** Выполнить задачу немедленно */
-	void putTaskNOW( SchedulerTaskPointer task );
-	/** Выполнить задачу при инициализации */
-	void putTaskInitiate( SchedulerTaskPointer task );
-	
-	/** Насильно убить все задачи заданного типа */
-	void slay( SchedulerTaskPointer task );
-	/** Насильно убить все задачи с этим указателем */
-	void slayInstance( SchedulerTaskPointer task );
-	
-	/** Системный тик */
-	void tick( );
+        Scheduler( );
+        virtual ~Scheduler( );
+        
+        void putTask( long time, SchedulerTaskPointer task );
+        /** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ п╫п╣п╪п╣п╢п╩п╣п╫п╫п╬ */
+        void putTaskNOW( SchedulerTaskPointer task );
+        /** п▓я▀п©п╬п╩п╫п╦я┌я▄ п╥п╟п╢п╟я┤я┐ п©я─п╦ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦п╦ */
+        void putTaskInitiate( SchedulerTaskPointer task );
+        
+        /** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ п╥п╟п╢п╟п╫п╫п╬пЁп╬ я┌п╦п©п╟ */
+        void slay( SchedulerTaskPointer task );
+        /** п²п╟я│п╦п╩я▄п╫п╬ я┐п╠п╦я┌я▄ п╡я│п╣ п╥п╟п╢п╟я┤п╦ я│ я█я┌п╦п╪ я┐п╨п╟п╥п╟я┌п╣п╩п╣п╪ */
+        void slayInstance( SchedulerTaskPointer task );
+        
+        /** п║п╦я│я┌п╣п╪п╫я▀п╧ я┌п╦п╨ */
+        void tick( );
 
-	/** Текущий приоритет в обрабатываемом мэпе */
-	int getPriority( ) const;
-	long getCurrentTick( ) const;
-	
+        /** п╒п╣п╨я┐я┴п╦п╧ п©я─п╦п╬я─п╦я┌п╣я┌ п╡ п╬п╠я─п╟п╠п╟я┌я▀п╡п╟п╣п╪п╬п╪ п╪я█п©п╣ */
+        int getPriority( ) const;
+        long getCurrentTick( ) const;
+        
 protected:
-	SchedulerQueue queue;
-	long time;
-	::Pointer<SchedulerPriorityMap> working;
+        SchedulerQueue queue;
+        long time;
+        ::Pointer<SchedulerPriorityMap> working;
 };
 
 #endif

@@ -3,14 +3,14 @@
  * ruffina, 2004
  */
 /***************************************************************************
- * ÷ÓÅ ÐÒÁ×Á ÎÁ ÜÔÏÔ ËÏÄ 'Dream Land' ÐÒÅÎÁÄÌÅÖÁÔ Igor {Leo} É Olga {Varda}*
- * îÅËÏÔÏÒÕÀ ÐÏÍÏÝØ × ÎÁÐÉÓÁÎÉÉ ÜÔÏÇÏ ËÏÄÁ, Á ÔÁËÖÅ Ó×ÏÉÍÉ ÉÄÅÑÍÉ ÐÏÍÏÇÁÌÉ:*
+ * Ð’ÑÐµ Ð¿Ñ€Ð°Ð²Ð° Ð½Ð° ÑÑ‚Ð¾Ñ‚ ÐºÐ¾Ð´ 'Dream Land' Ð¿Ñ€ÐµÐ½Ð°Ð´Ð»ÐµÐ¶Ð°Ñ‚ Igor {Leo} Ð¸ Olga {Varda}*
+ * ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ Ð² Ð½Ð°Ð¿Ð¸ÑÐ°Ð½Ð¸Ð¸ ÑÑ‚Ð¾Ð³Ð¾ ÐºÐ¾Ð´Ð°, Ð° Ñ‚Ð°ÐºÐ¶Ðµ ÑÐ²Ð¾Ð¸Ð¼Ð¸ Ð¸Ð´ÐµÑÐ¼Ð¸ Ð¿Ð¾Ð¼Ð¾Ð³Ð°Ð»Ð¸:*
  *    Igor S. Petrenko     {NoFate, Demogorgon}                            *
  *    Koval Nazar          {Nazar, Redrum}                                 *
  *    Doropey Vladimir     {Reorx}                                         *
  *    Kulgeyko Denis       {Burzum}                                        *
  *    Andreyanov Aleksandr {Manwe}                                         *
- *    É ×ÓÅ ÏÓÔÁÌØÎÙÅ, ËÔÏ ÓÏ×ÅÔÏ×ÁÌ É ÉÇÒÁÌ × ÜÔÏÔ MUD                    *
+ *    Ð¸ Ð²ÑÐµ Ð¾ÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ, ÐºÑ‚Ð¾ ÑÐ¾Ð²ÐµÑ‚Ð¾Ð²Ð°Ð» Ð¸ Ð¸Ð³Ñ€Ð°Ð» Ð² ÑÑ‚Ð¾Ñ‚ MUD                    *
  ***************************************************************************/
 
 #include "commandtemplate.h"
@@ -33,23 +33,23 @@ Character * follower_find_nosee( Character *ch, const char *cargument );
 static bool check_mutual_induct( Character *ch, Character *victim, ClanReference &clan )
 {
     if (ch->is_npc( ))
-	return true;
+        return true;
     
     bool isClanMember = (ch->getClan( ) == clan);
     bool isNotAllowed = (!isClanMember && !clan->canInduct( ch->getPC( ) ));
 
     for (Character *gch = char_list; gch; gch = gch->next) {
-	if (gch->is_npc( ))
-	    continue;
+        if (gch->is_npc( ))
+            continue;
 
-	if (!is_same_group( gch, victim ))
-	    continue;
+        if (!is_same_group( gch, victim ))
+            continue;
 
-	if (isClanMember && !clan->canInduct( gch->getPC( ) ))
-	    return false;
+        if (isClanMember && !clan->canInduct( gch->getPC( ) ))
+            return false;
 
-	if (isNotAllowed && gch->getClan( ) == clan)
-	    return false;
+        if (isNotAllowed && gch->getClan( ) == clan)
+            return false;
     }
 
     return true;
@@ -65,41 +65,41 @@ CMDRUN( follow )
     arg = arguments.getOneArgument( );
 
     if (arg.empty( )) {
-	ch->send_to( "óÌÅÄÏ×ÁÔØ ÚÁ ËÅÍ?\n\r");
-	return;
+        ch->send_to( "Ð¡Ð»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð° ÐºÐµÐ¼?\n\r");
+        return;
     }
 
     if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 ) {
-	ch->send_to( "ôÙ ÎÅ ÎÁÈÏÄÉÛØ ÜÔÏÇÏ ÚÄÅÓØ.\n\r");
-	return;
+        ch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð½Ð°Ñ…Ð¾Ð´Ð¸ÑˆÑŒ ÑÑ‚Ð¾Ð³Ð¾ Ð·Ð´ÐµÑÑŒ.\n\r");
+        return;
     }
 
     if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master != 0 ) {
-	act_p( "îÏ ÔÅÂÅ ÈÏÞÅÔÓÑ ÓÌÅÄÏ×ÁÔØ ÚÁ $C5!", ch, 0, ch->master, TO_CHAR,POS_RESTING );
-	return;
+        act_p( "ÐÐ¾ Ñ‚ÐµÐ±Ðµ Ñ…Ð¾Ñ‡ÐµÑ‚ÑÑ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð° $C5!", ch, 0, ch->master, TO_CHAR,POS_RESTING );
+        return;
     }
 
     if (victim == ch)
     {
-	if ( ch->master == 0 )
-	{
-	    ch->send_to( "ôÙ ÕÖÅ ÓÌÅÄÕÅÛØ ÚÁ ÓÏÂÏÊ.\n\r");
-	    return;
-	}
-	ch->stop_follower();
-	return;
+        if ( ch->master == 0 )
+        {
+            ch->send_to( "Ð¢Ñ‹ ÑƒÐ¶Ðµ ÑÐ»ÐµÐ´ÑƒÐµÑˆÑŒ Ð·Ð° ÑÐ¾Ð±Ð¾Ð¹.\n\r");
+            return;
+        }
+        ch->stop_follower();
+        return;
     }
     
     if (!check_mutual_induct( ch, victim, clan_battlerager )) {
-	act("ôÙ ÎÅ ÓÍÏÖÅÛØ ÓÌÅÄÏ×ÁÔØ ÚÁ $C5.", ch, 0, victim, TO_CHAR);
-	return;
+        act("Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð° $C5.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     if( !victim->is_npc() &&
         IS_SET( victim->act, PLR_NOFOLLOW ) &&
         !ch->is_immortal() ) 
     {
-	act_p("$C1 ÎÅ ÖÅÌÁÅÔ ÈÏÄÉÔØ Ó ËÅÍ-ÌÉÂÏ.\n\r",
+        act_p("$C1 Ð½Ðµ Ð¶ÐµÐ»Ð°ÐµÑ‚ Ñ…Ð¾Ð´Ð¸Ñ‚ÑŒ Ñ ÐºÐµÐ¼-Ð»Ð¸Ð±Ð¾.\n\r",
              ch,0,victim, TO_CHAR,POS_RESTING);
         return;
     }
@@ -107,7 +107,7 @@ CMDRUN( follow )
     REMOVE_BIT(ch->act,PLR_NOFOLLOW);
 
     if (ch->master != 0)
-	ch->stop_follower();
+        ch->stop_follower();
 
     ch->add_follower( victim );
 }
@@ -120,135 +120,135 @@ CMDRUN( group )
 
     if (arg.empty( ))
     {
-	Character *leader;
+        Character *leader;
 
-	leader = (ch->leader != 0) ? ch->leader : ch;
-	ch->printf( "çÒÕÐÐÁ %s:\n\r", ch->sees(leader,'2').c_str( ) );
+        leader = (ch->leader != 0) ? ch->leader : ch;
+        ch->printf( "Ð“Ñ€ÑƒÐ¿Ð¿Ð° %s:\n\r", ch->sees(leader,'2').c_str( ) );
 
-	for (Character *gch = char_list; gch != 0; gch = gch->next )
-	    if (is_same_group( gch, ch )) {
-		if (gch->is_npc( ))
-		    ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv",
-			gch->getRealLevel( ),
-			ch->sees( gch, '1' ).c_str( ),
-			gch->hit.getValue( ), gch->max_hit.getValue( ), 
-			gch->mana.getValue( ), gch->max_mana.getValue( ),
-			gch->move.getValue( ), gch->max_move.getValue( ) );
-		else
-		    ch->pecho( "[%3d %3s] %-16.16s %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv %5d xp",
-			gch->getRealLevel( ), 
-			gch->getProfession( )->getWhoNameFor( ch ).c_str( ),
-			ch->sees( gch, '1' ).c_str( ),
-			gch->hit.getValue( ), gch->max_hit.getValue( ), 
-			gch->mana.getValue( ), gch->max_mana.getValue( ),
-			gch->move.getValue( ), gch->max_move.getValue( ),
-			gch->getPC( )->getExpToLevel( ) );
+        for (Character *gch = char_list; gch != 0; gch = gch->next )
+            if (is_same_group( gch, ch )) {
+                if (gch->is_npc( ))
+                    ch->pecho( "[%3d    ] %-16.16s{x %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv",
+                        gch->getRealLevel( ),
+                        ch->sees( gch, '1' ).c_str( ),
+                        gch->hit.getValue( ), gch->max_hit.getValue( ), 
+                        gch->mana.getValue( ), gch->max_mana.getValue( ),
+                        gch->move.getValue( ), gch->max_move.getValue( ) );
+                else
+                    ch->pecho( "[%3d %3s] %-16.16s %5d/%-5d hp %5d/%-5d mana %4d/%-4d mv %5d xp",
+                        gch->getRealLevel( ), 
+                        gch->getProfession( )->getWhoNameFor( ch ).c_str( ),
+                        ch->sees( gch, '1' ).c_str( ),
+                        gch->hit.getValue( ), gch->max_hit.getValue( ), 
+                        gch->mana.getValue( ), gch->max_mana.getValue( ),
+                        gch->move.getValue( ), gch->max_move.getValue( ),
+                        gch->getPC( )->getExpToLevel( ) );
             }
 
-	return;
+        return;
     }
 
     if ( ( victim = get_char_room( ch, arg.c_str( ) ) ) == 0 )
     {
-	ch->send_to( "üÔÏÇÏ ÎÅÔ ÚÄÅÓØ.\n\r");
-	return;
+        ch->send_to( "Ð­Ñ‚Ð¾Ð³Ð¾ Ð½ÐµÑ‚ Ð·Ð´ÐµÑÑŒ.\n\r");
+        return;
     }
 
     if (victim == ch) {
-	ch->println( "á ÓÍÙÓÌ?" );
-	return;
+        ch->println( "Ð ÑÐ¼Ñ‹ÑÐ»?" );
+        return;
     }
 
     if ( ch->master != 0 || ( ch->leader != 0 && ch->leader != ch ) )
     {
-	ch->send_to( "îÏ ÔÙ ÓÌÅÄÕÅÛØ ÚÁ ËÅÍ-ÔÏ ÅÝÅ!\n\r");
-	return;
+        ch->send_to( "ÐÐ¾ Ñ‚Ñ‹ ÑÐ»ÐµÐ´ÑƒÐµÑˆÑŒ Ð·Ð° ÐºÐµÐ¼-Ñ‚Ð¾ ÐµÑ‰Ðµ!\n\r");
+        return;
     }
 
     if (victim->master != ch) {
-	act_p( "$C1 ÎÅ ÓÌÅÄÕÅÔ ÚÁ ÔÏÂÏÊ.", ch, 0, victim, TO_CHAR,POS_RESTING );
-	return;
+        act_p( "$C1 Ð½Ðµ ÑÐ»ÐµÐ´ÑƒÐµÑ‚ Ð·Ð° Ñ‚Ð¾Ð±Ð¾Ð¹.", ch, 0, victim, TO_CHAR,POS_RESTING );
+        return;
     }
 
     if (IS_AFFECTED(victim,AFF_CHARM)) {
-	ch->send_to("ôÙ ÎÅ ÍÏÖÅÛØ ÉÓËÌÀÞÉÔØ ÏÞÁÒÏ×ÁÎÎÙÈ ÍÏÎÓÔÒÏ× ÉÚ Ó×ÏÅÊ ÇÒÕÐÐÙ.\n\r");
-	return;
+        ch->send_to("Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¸ÑÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ Ð¾Ñ‡Ð°Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ñ… Ð¼Ð¾Ð½ÑÑ‚Ñ€Ð¾Ð² Ð¸Ð· ÑÐ²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹.\n\r");
+        return;
     }
 
     if (IS_AFFECTED(ch,AFF_CHARM)) {
-	act_p("ôÙ ÌÀÂÉÛØ Ó×ÏÅÇÏ ÍÁÓÔÅÒÁ ÔÁË ÓÉÌØÎÏ, ÞÔÏ ÎÅ ÍÏÖÅÛØ ÐÏËÉÎÕÔØ $s!",ch,0,victim,TO_VICT,POS_RESTING);
-	return;
+        act_p("Ð¢Ñ‹ Ð»ÑŽÐ±Ð¸ÑˆÑŒ ÑÐ²Ð¾ÐµÐ³Ð¾ Ð¼Ð°ÑÑ‚ÐµÑ€Ð° Ñ‚Ð°Ðº ÑÐ¸Ð»ÑŒÐ½Ð¾, Ñ‡Ñ‚Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ $s!",ch,0,victim,TO_VICT,POS_RESTING);
+        return;
     }
 
 
-    if (is_same_group( victim, ch )) {	
-	guarding_nuke( ch, victim );
+    if (is_same_group( victim, ch )) {        
+        guarding_nuke( ch, victim );
 
-	victim->leader = 0;
-	act_p( "$c1 ÉÓËÌÀÞÁÅÔ $C4 ÉÚ $s ÇÒÕÐÐÙ.",ch,0,victim,TO_NOTVICT,POS_RESTING);
-	act_p( "$c1 ÉÓËÌÀÞÁÅÔ ÔÅÂÑ ÉÚ $s ÇÒÕÐÐÙ.",ch,0,victim,TO_VICT,POS_SLEEPING);
-	act_p( "ôÙ ÉÓËÌÀÞÁÅÛØ $C4 ÉÚ Ó×ÏÅÊ ÇÒÕÐÐÙ.",ch,0,victim,TO_CHAR,POS_SLEEPING);
-	
-	guarding_assert( victim );
-	return;
+        victim->leader = 0;
+        act_p( "$c1 Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ $C4 Ð¸Ð· $s Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹.",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act_p( "$c1 Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð¸Ð· $s Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹.",ch,0,victim,TO_VICT,POS_SLEEPING);
+        act_p( "Ð¢Ñ‹ Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÑˆÑŒ $C4 Ð¸Ð· ÑÐ²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹.",ch,0,victim,TO_CHAR,POS_SLEEPING);
+        
+        guarding_assert( victim );
+        return;
     }
 
     if ( abs(ch->getModifyLevel() - victim->getModifyLevel()) > 8)
     {
-	act_p( "$C1 ÎÅ ÍÏÖÅÔ ÐÒÉÓÏÅÄÉÎÉÔØÓÑ Ë ÇÒÕÐÐÅ $c2.",
-		ch,0,victim,TO_NOTVICT,POS_RESTING );
-	act_p( "ôÙ ÎÅ ÍÏÖÅÛØ ÐÒÉÓÏÅÄÉÎÉÔØÓÑ Ë ÇÒÕÐÐÅ $c2.",
-		ch,0,victim,TO_VICT,POS_SLEEPING );
-	act_p( "$C1 ÎÅ ÍÏÖÅÔ ÐÒÉÓÏÅÄÉÎÉÔØÓÑ Ë Ô×ÏÅÊ ÇÒÕÐÐÅ.",
-		ch,0,victim,TO_CHAR,POS_SLEEPING );
-	return;
+        act_p( "$C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ñ‚ÑŒÑÑ Ðº Ð³Ñ€ÑƒÐ¿Ð¿Ðµ $c2.",
+                ch,0,victim,TO_NOTVICT,POS_RESTING );
+        act_p( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ñ‚ÑŒÑÑ Ðº Ð³Ñ€ÑƒÐ¿Ð¿Ðµ $c2.",
+                ch,0,victim,TO_VICT,POS_SLEEPING );
+        act_p( "$C1 Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ñ‚ÑŒÑÑ Ðº Ñ‚Ð²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ðµ.",
+                ch,0,victim,TO_CHAR,POS_SLEEPING );
+        return;
     }
 
     if (IS_GOOD(ch)
-	&& IS_EVIL(victim)
-	&& ( ch->getClan() != victim->getClan()
-	     || ch->getClan( )->isDispersed( ) ))
+        && IS_EVIL(victim)
+        && ( ch->getClan() != victim->getClan()
+             || ch->getClan( )->isDispersed( ) ))
     {
-	act_p("ôÙ ÓÌÉÛËÏÍ ÐÌÏ$GÈÏÅ|ÈÏÊ|ÈÁÑ ÄÌÑ ÇÒÕÐÐÙ $c2.", ch, 0, victim,
-		TO_VICT,POS_SLEEPING);
-	act_p("$C1 ÓÌÉÛËÏÍ ÐÌÏ$GÈÏÅ|ÈÏÊ|ÈÁÑ ÄÌÑ Ô×ÏÅÊ ÇÒÕÐÐÙ!", ch, 0, victim,
-		TO_CHAR,POS_SLEEPING);
-	return;
+        act_p("Ð¢Ñ‹ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð¿Ð»Ð¾$GÑ…Ð¾Ðµ|Ñ…Ð¾Ð¹|Ñ…Ð°Ñ Ð´Ð»Ñ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ $c2.", ch, 0, victim,
+                TO_VICT,POS_SLEEPING);
+        act_p("$C1 ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð¿Ð»Ð¾$GÑ…Ð¾Ðµ|Ñ…Ð¾Ð¹|Ñ…Ð°Ñ Ð´Ð»Ñ Ñ‚Ð²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹!", ch, 0, victim,
+                TO_CHAR,POS_SLEEPING);
+        return;
     }
 
     if ( IS_GOOD(victim)
-	    && IS_EVIL(ch)
-	    && ( ch->getClan() != victim->getClan()
-		    || ch->getClan()->isDispersed( ) ) )
+            && IS_EVIL(ch)
+            && ( ch->getClan() != victim->getClan()
+                    || ch->getClan()->isDispersed( ) ) )
     {
-	act_p("ôÙ ÓÌÉÛËÏÍ ÈÏÒÏ$GÛÅÅ|ÛÉÊ|ÛÁÑ ÄÌÑ ÇÒÕÐÐÙ $c2!", ch, 0, victim,
-		TO_VICT,POS_SLEEPING);
-	act_p("$C1 ÓÌÉÛËÏÍ ÈÏÒÏ$GÛÅÅ|ÛÉÊ|ÛÁÑ ÄÌÑ Ô×ÏÅÊ ÇÒÕÐÐÙ!", ch, 0, victim,
-		TO_CHAR,POS_SLEEPING);
-	return;
+        act_p("Ð¢Ñ‹ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ñ…Ð¾Ñ€Ð¾$GÑˆÐµÐµ|ÑˆÐ¸Ð¹|ÑˆÐ°Ñ Ð´Ð»Ñ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ $c2!", ch, 0, victim,
+                TO_VICT,POS_SLEEPING);
+        act_p("$C1 ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ñ…Ð¾Ñ€Ð¾$GÑˆÐµÐµ|ÑˆÐ¸Ð¹|ÑˆÐ°Ñ Ð´Ð»Ñ Ñ‚Ð²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹!", ch, 0, victim,
+                TO_CHAR,POS_SLEEPING);
+        return;
     }
 
     if (!victim->is_npc( ) 
-	&& (ch->getClan( )->isEnemy( *victim->getClan( ) )
-	    || victim->getClan( )->isEnemy( *ch->getClan( ) )))
+        && (ch->getClan( )->isEnemy( *victim->getClan( ) )
+            || victim->getClan( )->isEnemy( *ch->getClan( ) )))
     {
-	act_p("ôÙ ÖÅ ÎÅÎÁ×ÉÄÉÛØ ËÌÁÎ $c2, ËÁË ÔÙ ÍÏÖÅÛØ ÐÒÉÓÏÅÄÉÎÉÔØÓÑ Ë $s ÇÒÕÐÐÅ?!", ch,
-		0, victim,TO_VICT,POS_SLEEPING);
-	act_p("ôÙ ÖÅ ÎÅÎÁ×ÉÄÉÛØ ËÌÁÎ $C2, ËÁË ÔÙ ÍÏÖÅÛØ ÐÒÅÄÌÁÇÁÔØ $M ÐÒÉÓÏÅÄÉÎÉÔØÓÑ Ë Ô×ÏÅÊ ÇÒÕÐÐÅ?!",
-		ch, 0, victim, TO_CHAR,POS_SLEEPING);
-	return;
+        act_p("Ð¢Ñ‹ Ð¶Ðµ Ð½ÐµÐ½Ð°Ð²Ð¸Ð´Ð¸ÑˆÑŒ ÐºÐ»Ð°Ð½ $c2, ÐºÐ°Ðº Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ñ‚ÑŒÑÑ Ðº $s Ð³Ñ€ÑƒÐ¿Ð¿Ðµ?!", ch,
+                0, victim,TO_VICT,POS_SLEEPING);
+        act_p("Ð¢Ñ‹ Ð¶Ðµ Ð½ÐµÐ½Ð°Ð²Ð¸Ð´Ð¸ÑˆÑŒ ÐºÐ»Ð°Ð½ $C2, ÐºÐ°Ðº Ñ‚Ñ‹ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ñ€ÐµÐ´Ð»Ð°Ð³Ð°Ñ‚ÑŒ $M Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ñ‚ÑŒÑÑ Ðº Ñ‚Ð²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ðµ?!",
+                ch, 0, victim, TO_CHAR,POS_SLEEPING);
+        return;
     }
 
     if (!check_mutual_induct( ch, victim, clan_battlerager )) {
-	act_p("ôÙ ÎÅ ÓÍÏÖÅÛØ ×ÓÔÕÐÉÔØ × ÇÒÕÐÐÕ $C2.", ch, 0, victim, TO_VICT, POS_SLEEPING);
-	act("$C1 ÎÅ ÓÍÏÖÅÔ ×ÓÔÕÐÉÔØ × Ô×ÏÀ ÇÒÕÐÐÕ.", ch, 0, victim, TO_CHAR);
-	return;
+        act_p("Ð¢Ñ‹ Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑˆÑŒ Ð²ÑÑ‚ÑƒÐ¿Ð¸Ñ‚ÑŒ Ð² Ð³Ñ€ÑƒÐ¿Ð¿Ñƒ $C2.", ch, 0, victim, TO_VICT, POS_SLEEPING);
+        act("$C1 Ð½Ðµ ÑÐ¼Ð¾Ð¶ÐµÑ‚ Ð²ÑÑ‚ÑƒÐ¿Ð¸Ñ‚ÑŒ Ð² Ñ‚Ð²Ð¾ÑŽ Ð³Ñ€ÑƒÐ¿Ð¿Ñƒ.", ch, 0, victim, TO_CHAR);
+        return;
     }
 
     victim->leader = ch;
-    act_p( "$C1 ÐÒÉÓÏÅÄÉÎÉÌ$GÏÓØ|ÓÑ|ÁÓØ Ë ÇÒÕÐÐÅ $c2.", ch, 0, victim,TO_NOTVICT, POS_RESTING);
-    act_p( "ôÙ ÐÒÉÓÏÅÄÉÎÉÌ$GÏÓØ|ÓÑ|ÁÓØ Ë ÇÒÕÐÐÅ $c2.", ch, 0, victim,TO_VICT, POS_SLEEPING);
-    act_p( "$C1 ÐÒÉÓÏÅÄÉÎÉÌ$GÏÓØ|ÓÑ|ÁÓØ Ë Ô×ÏÅÊ ÇÒÕÐÐÅ.", ch, 0, victim, TO_CHAR, POS_SLEEPING);
+    act_p( "$C1 Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ð»$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ Ðº Ð³Ñ€ÑƒÐ¿Ð¿Ðµ $c2.", ch, 0, victim,TO_NOTVICT, POS_RESTING);
+    act_p( "Ð¢Ñ‹ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ð»$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ Ðº Ð³Ñ€ÑƒÐ¿Ð¿Ðµ $c2.", ch, 0, victim,TO_VICT, POS_SLEEPING);
+    act_p( "$C1 Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð¸Ð»$GÐ¾ÑÑŒ|ÑÑ|Ð°ÑÑŒ Ðº Ñ‚Ð²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ðµ.", ch, 0, victim, TO_CHAR, POS_SLEEPING);
 }
 
 
@@ -259,29 +259,29 @@ CMDRUN( nuke )
     DLString arg = argument.getOneArgument( );
 
     if (arg.empty( )) {
-	ch->println( "þØÅ ÓÌÅÄÏ×ÁÎÉÅ ÚÁ ÔÏÂÏÊ ÔÙ ÈÏÞÅÛØ ÐÒÅËÒÁÔÉÔØ?" );
-	return;
+        ch->println( "Ð§ÑŒÐµ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð·Ð° Ñ‚Ð¾Ð±Ð¾Ð¹ Ñ‚Ñ‹ Ñ…Ð¾Ñ‡ÐµÑˆÑŒ Ð¿Ñ€ÐµÐºÑ€Ð°Ñ‚Ð¸Ñ‚ÑŒ?" );
+        return;
     }
     
     if ( !( victim = follower_find_nosee( ch, arg.c_str( ) ) )) {
-	ch->println( "óÒÅÄÉ Ô×ÏÉÈ ÐÏÓÌÅÄÏ×ÁÔÅÌÅÊ ÎÅÔ ÎÉËÏÇÏ Ó ÔÁËÉÍ ÉÍÅÎÅÍ." );
-	return;
+        ch->println( "Ð¡Ñ€ÐµÐ´Ð¸ Ñ‚Ð²Ð¾Ð¸Ñ… Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹ Ð½ÐµÑ‚ Ð½Ð¸ÐºÐ¾Ð³Ð¾ Ñ Ñ‚Ð°ÐºÐ¸Ð¼ Ð¸Ð¼ÐµÐ½ÐµÐ¼." );
+        return;
     }
 
     if (ch == victim) {
-	ch->println( "ïÔ ÓÅÂÑ ÎÅ ÕÂÅÖÉÛØ." );
-	return;
+        ch->println( "ÐžÑ‚ ÑÐµÐ±Ñ Ð½Ðµ ÑƒÐ±ÐµÐ¶Ð¸ÑˆÑŒ." );
+        return;
     }
     
     if (is_same_group( victim, ch )) {
-	guarding_nuke( ch, victim );
-	victim->leader = 0;
-	guarding_assert( victim );
+        guarding_nuke( ch, victim );
+        victim->leader = 0;
+        guarding_assert( victim );
     }
     
-    act( "$c1 ÉÓËÌÀÞÁÅÔ $C4 ÉÚ ÞÉÓÌÁ $s ÐÏÓÌÅÄÏ×ÁÔÅÌÅÊ.",ch,0,victim,TO_NOTVICT);
-    act_p( "$c1 ÉÓËÌÀÞÁÅÔ ÔÅÂÑ ÉÚ ÞÉÓÌÁ $s ÐÏÓÌÅÄÏ×ÁÔÅÌÅÊ.",ch,0,victim,TO_VICT,POS_SLEEPING);
-    act_p( "ôÙ ÉÓËÌÀÞÁÅÛØ $C4 ÉÚ ÞÉÓÌÁ Ô×ÏÉÈ ÐÏÓÌÅÄÏ×ÁÔÅÌÅÊ.",ch,0,victim,TO_CHAR,POS_SLEEPING);
+    act( "$c1 Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ $C4 Ð¸Ð· Ñ‡Ð¸ÑÐ»Ð° $s Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹.",ch,0,victim,TO_NOTVICT);
+    act_p( "$c1 Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ñ Ð¸Ð· Ñ‡Ð¸ÑÐ»Ð° $s Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹.",ch,0,victim,TO_VICT,POS_SLEEPING);
+    act_p( "Ð¢Ñ‹ Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÑˆÑŒ $C4 Ð¸Ð· Ñ‡Ð¸ÑÐ»Ð° Ñ‚Ð²Ð¾Ð¸Ñ… Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹.",ch,0,victim,TO_CHAR,POS_SLEEPING);
     victim->stop_follower( );
 }
 
@@ -305,46 +305,46 @@ CMDRUN( split )
 
     if (arg1.empty( ))
     {
-	ch->send_to( "òÁÚÄÅÌÉÔØ? óËÏÌØËÏ?\n\r");
-	return;
+        ch->send_to( "Ð Ð°Ð·Ð´ÐµÐ»Ð¸Ñ‚ÑŒ? Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾?\n\r");
+        return;
     }
 
     amount_silver = atoi( arg1.c_str() );
 
     if (!arg2.empty())
-	amount_gold = atoi(arg2.c_str());
+        amount_gold = atoi(arg2.c_str());
 
     if ( amount_gold < 0 || amount_silver < 0)
     {
-	ch->send_to( "ô×ÏÅÊ ÇÒÕÐÐÅ ÜÔÏ ÎÅ ÐÏÎÒÁ×ÉÔÓÑ.\n\r");
-	return;
+        ch->send_to( "Ð¢Ð²Ð¾ÐµÐ¹ Ð³Ñ€ÑƒÐ¿Ð¿Ðµ ÑÑ‚Ð¾ Ð½Ðµ Ð¿Ð¾Ð½Ñ€Ð°Ð²Ð¸Ñ‚ÑÑ.\n\r");
+        return;
     }
 
     if ( amount_gold == 0 && amount_silver == 0 )
     {
-	ch->send_to( "ôÙ ÎÅ ×ÚÑÌ ÎÉ ÏÄÎÏÊ ÍÏÎÅÔÙ, ÎÏ ÎÉËÏÍÕ ÏÂ ÜÔÏÍ ÎÅ ÓËÁÚÁÌ.\n\r");
-	return;
+        ch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð²Ð·ÑÐ» Ð½Ð¸ Ð¾Ð´Ð½Ð¾Ð¹ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹, Ð½Ð¾ Ð½Ð¸ÐºÐ¾Ð¼Ñƒ Ð¾Ð± ÑÑ‚Ð¾Ð¼ Ð½Ðµ ÑÐºÐ°Ð·Ð°Ð».\n\r");
+        return;
     }
 
     if ( ch->gold <  amount_gold || ch->silver < amount_silver)
     {
-	ch->send_to( "õ ÔÅÂÑ ÎÅÔ ÓÔÏÌØËÏ, ÞÔÏÂ ÐÏÄÅÌÉÔØÓÑ.\n\r");
-	return;
+        ch->send_to( "Ð£ Ñ‚ÐµÐ±Ñ Ð½ÐµÑ‚ ÑÑ‚Ð¾Ð»ÑŒÐºÐ¾, Ñ‡Ñ‚Ð¾Ð± Ð¿Ð¾Ð´ÐµÐ»Ð¸Ñ‚ÑŒÑÑ.\n\r");
+        return;
     }
 
     members = 0;
     for ( gch = ch->in_room->people; gch != 0; gch = gch->next_in_room )
     {
-	if ( is_same_group( gch, ch ) && !IS_AFFECTED(gch,AFF_CHARM))
-	    members++;
+        if ( is_same_group( gch, ch ) && !IS_AFFECTED(gch,AFF_CHARM))
+            members++;
     }
 
     if ( members < 2 )
     {
-	ch->send_to( "íÏÖÅÛØ ÚÁÂÒÁÔØ ÓÅÂÅ ×ÓÅ.\n\r");
-	return;
+        ch->send_to( "ÐœÐ¾Ð¶ÐµÑˆÑŒ Ð·Ð°Ð±Ñ€Ð°Ñ‚ÑŒ ÑÐµÐ±Ðµ Ð²ÑÐµ.\n\r");
+        return;
     }
-	
+        
     share_silver = amount_silver / members;
     extra_silver = amount_silver % members;
 
@@ -353,59 +353,59 @@ CMDRUN( split )
 
     if ( share_gold == 0 && share_silver == 0 )
     {
- 	ch->send_to( "ïÞÅÎØ ÍÕÄÒÏ.\n\r");
-	return;
+         ch->send_to( "ÐžÑ‡ÐµÐ½ÑŒ Ð¼ÑƒÐ´Ñ€Ð¾.\n\r");
+        return;
     }
 
-    ch->silver	-= amount_silver;
-    ch->silver	+= share_silver + extra_silver;
-    ch->gold 	-= amount_gold;
-    ch->gold 	+= share_gold + extra_gold;
+    ch->silver        -= amount_silver;
+    ch->silver        += share_silver + extra_silver;
+    ch->gold         -= amount_gold;
+    ch->gold         += share_gold + extra_gold;
 
     if (share_silver > 0)
     {
-	sprintf(buf,
-	    "ôÙ ÄÅÌÉÛØ %d ÓÅÒÅÂÒÑÎÎ%s. ôÙ ÐÏÌÕÞÁÅÛØ %d ÓÅÒÅÂÒÁ.\n\r",
- 	    amount_silver,GET_COUNT(amount_silver,"ÕÀ ÍÏÎÅÔÕ","ÙÅ ÍÏÎÅÔÙ","ÙÈ ÍÏÎÅÔ"),
+        sprintf(buf,
+            "Ð¢Ñ‹ Ð´ÐµÐ»Ð¸ÑˆÑŒ %d ÑÐµÑ€ÐµÐ±Ñ€ÑÐ½Ð½%s. Ð¢Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ %d ÑÐµÑ€ÐµÐ±Ñ€Ð°.\n\r",
+             amount_silver,GET_COUNT(amount_silver,"ÑƒÑŽ Ð¼Ð¾Ð½ÐµÑ‚Ñƒ","Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹","Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚"),
             share_silver + extra_silver);
-	ch->send_to(buf);
+        ch->send_to(buf);
     }
 
     if (share_gold > 0)
     {
-	sprintf(buf,
-	    "ôÙ ÄÅÌÉÛØ %d ÚÏÌÏÔ%s. ôÙ ÐÏÌÕÞÁÅÛØ %d ÚÏÌÏÔÁ.\n\r",
-	     amount_gold,GET_COUNT(amount_silver,"ÕÀ ÍÏÎÅÔÕ","ÙÅ ÍÏÎÅÔÙ","ÙÈ ÍÏÎÅÔ"),
+        sprintf(buf,
+            "Ð¢Ñ‹ Ð´ÐµÐ»Ð¸ÑˆÑŒ %d Ð·Ð¾Ð»Ð¾Ñ‚%s. Ð¢Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ %d Ð·Ð¾Ð»Ð¾Ñ‚Ð°.\n\r",
+             amount_gold,GET_COUNT(amount_silver,"ÑƒÑŽ Ð¼Ð¾Ð½ÐµÑ‚Ñƒ","Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹","Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚"),
              share_gold + extra_gold);
-	ch->send_to(buf);
+        ch->send_to(buf);
     }
 
     if (share_gold == 0)
     {
-	sprintf(buf,"$c1 ÄÅÌÉÔ %d ÓÅÒÅÂÒÑÎÎ%s. ôÙ ÐÏÌÕÞÁÅÛØ %d ÓÅÒÅÂÒÁ.",
-		amount_silver,GET_COUNT(amount_silver,"ÕÀ ÍÏÎÅÔÕ","ÙÅ ÍÏÎÅÔÙ","ÙÈ ÍÏÎÅÔ"),
+        sprintf(buf,"$c1 Ð´ÐµÐ»Ð¸Ñ‚ %d ÑÐµÑ€ÐµÐ±Ñ€ÑÐ½Ð½%s. Ð¢Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ %d ÑÐµÑ€ÐµÐ±Ñ€Ð°.",
+                amount_silver,GET_COUNT(amount_silver,"ÑƒÑŽ Ð¼Ð¾Ð½ÐµÑ‚Ñƒ","Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹","Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚"),
                 share_silver);
     }
     else if (share_silver == 0)
     {
-	sprintf(buf,"$c1 ÄÅÌÉÔ %d ÚÏÌÏÔ%s. ôÙ ÐÏÌÕÞÁÅÛØ %d ÚÏÌÏÔÁ.",
-		amount_gold,GET_COUNT(amount_silver,"ÕÀ ÍÏÎÅÔÕ","ÙÅ ÍÏÎÅÔÙ","ÙÈ ÍÏÎÅÔ"),
+        sprintf(buf,"$c1 Ð´ÐµÐ»Ð¸Ñ‚ %d Ð·Ð¾Ð»Ð¾Ñ‚%s. Ð¢Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑˆÑŒ %d Ð·Ð¾Ð»Ð¾Ñ‚Ð°.",
+                amount_gold,GET_COUNT(amount_silver,"ÑƒÑŽ Ð¼Ð¾Ð½ÐµÑ‚Ñƒ","Ñ‹Ðµ Ð¼Ð¾Ð½ÐµÑ‚Ñ‹","Ñ‹Ñ… Ð¼Ð¾Ð½ÐµÑ‚"),
                 share_gold);
     }
     else
     {
-	sprintf(buf,"$c1 ÄÅÌÉÔ %d ÓÅÒÅÂÒÁ É %d ÚÏÌÏÔÁ, ÄÁÅÔ ÔÅÂÅ %d ÓÅÒÅÂÒÁ É %d ÚÏÌÏÔÁ.\n\r",
-	 amount_silver,amount_gold,share_silver,share_gold);
+        sprintf(buf,"$c1 Ð´ÐµÐ»Ð¸Ñ‚ %d ÑÐµÑ€ÐµÐ±Ñ€Ð° Ð¸ %d Ð·Ð¾Ð»Ð¾Ñ‚Ð°, Ð´Ð°ÐµÑ‚ Ñ‚ÐµÐ±Ðµ %d ÑÐµÑ€ÐµÐ±Ñ€Ð° Ð¸ %d Ð·Ð¾Ð»Ð¾Ñ‚Ð°.\n\r",
+         amount_silver,amount_gold,share_silver,share_gold);
     }
 
     for ( gch = ch->in_room->people; gch != 0; gch = gch->next_in_room )
     {
-	if ( gch != ch && is_same_group(gch,ch) && !IS_AFFECTED(gch,AFF_CHARM))
-	{
-	    act_p( buf, ch, 0, gch, TO_VICT,POS_RESTING );
-	    gch->gold += share_gold;
-	    gch->silver += share_silver;
-	}
+        if ( gch != ch && is_same_group(gch,ch) && !IS_AFFECTED(gch,AFF_CHARM))
+        {
+            act_p( buf, ch, 0, gch, TO_VICT,POS_RESTING );
+            gch->gold += share_gold;
+            gch->silver += share_silver;
+        }
     }
 
 }
@@ -413,21 +413,21 @@ CMDRUN( split )
 CMDRUN( nofollow )
 {
     if (ch->is_npc())
-	return;
+        return;
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )  {
-	ch->send_to( "ôÙ ÎÅ ÍÏÖÅÛØ ÐÏËÉÎÕÔØ Ó×ÏÅÇÏ ÐÏ×ÅÌÉÔÅÌÑ.\n\r");
-	return;
+        ch->send_to( "Ð¢Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑˆÑŒ Ð¿Ð¾ÐºÐ¸Ð½ÑƒÑ‚ÑŒ ÑÐ²Ð¾ÐµÐ³Ð¾ Ð¿Ð¾Ð²ÐµÐ»Ð¸Ñ‚ÐµÐ»Ñ.\n\r");
+        return;
     }
 
     if (IS_SET(ch->act,PLR_NOFOLLOW))
     {
-      ch->send_to("ôÅÐÅÒØ ÔÙ ÒÁÚÒÅÛÁÅÛØ ÓÌÅÄÏ×ÁÔØ ÚÁ ÓÏÂÏÊ.\n\r");
+      ch->send_to("Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ Ñ€Ð°Ð·Ñ€ÐµÑˆÐ°ÐµÑˆÑŒ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð° ÑÐ¾Ð±Ð¾Ð¹.\n\r");
       REMOVE_BIT(ch->act,PLR_NOFOLLOW);
     }
     else
     {
-      ch->send_to("ôÅÐÅÒØ ÔÙ ÎÅ ÒÁÚÒÅÛÁÅÛØ ÓÌÅÄÏ×ÁÔØ ÚÁ ÓÏÂÏÊ.\n\r");
+      ch->send_to("Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ñ‚Ñ‹ Ð½Ðµ Ñ€Ð°Ð·Ñ€ÐµÑˆÐ°ÐµÑˆÑŒ ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÑŒ Ð·Ð° ÑÐ¾Ð±Ð¾Ð¹.\n\r");
       SET_BIT(ch->act,PLR_NOFOLLOW);
       ch->die_follower( );
     }
