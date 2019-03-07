@@ -43,8 +43,9 @@ BONUS(mana);
 
 static bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before )
 {
-    FENIA_CALL( victim, "Spell", "Csi", caster, skill->getName(), before );
-    FENIA_NDX_CALL( victim->getNPC( ), "Spell", "CCsi", victim, caster, skill->getName(), before );
+    const char *sname = skill->getName().c_str();
+    FENIA_CALL( victim, "Spell", "Csi", caster, sname, before );
+    FENIA_NDX_CALL( victim->getNPC( ), "Spell", "CCsi", victim, caster, sname, before );
     BEHAVIOR_CALL( victim->getNPC( ), spell, caster, skill->getIndex(), before );
     return false;
 }
