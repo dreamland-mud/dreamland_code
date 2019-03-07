@@ -41,39 +41,17 @@ GSN(deafen);
 BONUS(mana);
 
 
-static bool mprog_spell( Character *victim, Character *caster, int sn, bool before )
+static bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before )
 {
-    FENIA_CALL( victim, "Spell", "Cii", caster, sn, before );
-    FENIA_NDX_CALL( victim->getNPC( ), "Spell", "CCii", victim, caster, sn, before );
-    BEHAVIOR_CALL( victim->getNPC( ), spell, caster, sn, before );
+    FENIA_CALL( victim, "Spell", "Csi", caster, skill->getName(), before );
+    FENIA_NDX_CALL( victim->getNPC( ), "Spell", "CCsi", victim, caster, skill->getName(), before );
+    BEHAVIOR_CALL( victim->getNPC( ), spell, caster, skill->getIndex(), before );
     return false;
 }
 
-static bool mprog_cast( Character *caster, SpellTarget::Pointer target, int sn, bool before )
+static bool mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before )
 {
-    /* XXX will it work at all? */
-    switch (target->type) {
-    case SpellTarget::NONE:
-        FENIA_CALL( caster, "Cast", "sii", target->arg, sn, before );
-        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "Csii", caster, target->arg, sn, before );
-        break;
-    case SpellTarget::OBJECT:
-        FENIA_CALL( caster, "Cast", "Oii", target->obj, sn, before );
-        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "COii", caster, target->obj, sn, before );
-        break;
-    case SpellTarget::CHAR:
-        FENIA_CALL( caster, "Cast", "Cii", target->victim, sn, before );
-        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "CCii", caster, target->victim, sn, before );
-        break;
-    case SpellTarget::ROOM:
-        FENIA_CALL( caster, "Cast", "Rii", target->room, sn, before );
-        FENIA_NDX_CALL( caster->getNPC( ), "Cast", "CRii", caster, target->room, sn, before );
-        break;
-    default:
-        break;
-    }
-    
-    BEHAVIOR_VOID_CALL( caster->getNPC( ), cast, target, sn, before );
+    BEHAVIOR_VOID_CALL( caster->getNPC( ), cast, target, skill->getIndex(), before );
 
     return false;
 }
@@ -82,7 +60,7 @@ CMDRUN( cast )
 {
     std::basic_ostringstream<char> buf;
     Character *victim;
-    int mana, slevel, sn;
+    int mana, slevel;
     bool offensive;
     Skill::Pointer skill;
     Spell::Pointer spell;
@@ -157,7 +135,6 @@ CMDRUN( cast )
     }
     
     skill = spell->getSkill( );
-    sn = skill->getIndex( );
     
     if (!spell->checkPosition( ch ))
         return;
@@ -228,23 +205,27 @@ CMDRUN( cast )
     }
     else {
         bool fForbidCasting = false;
+        bool fForbidReaction = false;
 
         ch->mana -= mana;
         slevel = spell->getSpellLevel( ch, target->range );
         
         if (victim)
-            fForbidCasting = mprog_spell( victim, ch, sn, true );
+            fForbidCasting = mprog_spell( victim, ch, skill, true );
         
-        mprog_cast( ch, target, sn, true );
+        mprog_cast( ch, target, skill, true );
 
         if (!fForbidCasting)
             spell->run( ch, target, slevel );
 
         if (victim)
-            mprog_spell( victim, ch, sn, false );
+            fForbidReaction = mprog_spell( victim, ch, skill, false );
 
-        mprog_cast( ch, target, sn, false );
+        mprog_cast( ch, target, skill, false );
         skill->improve( ch, true, victim );
+
+        if (fForbidReaction)
+            return;
     }
     
     if (offensive && victim) {
