@@ -57,26 +57,6 @@ const unsigned char via_qry_str[]  = { IAC, WILL, TELOPT_VIA };
 const unsigned char ttype_do_str[] = { IAC, DO, TELOPT_TTYPE };
 const unsigned char gmcp_on_str[] = { IAC, WILL, GMCP };
 
-/*
- * Strip out last octet of an ip address and return
- * a newly allocated string containing results.
- */
-char * realip( char *ip )
-{
-    if (!ip)
-        return str_dup( "неизвестно" );
-
-    DLString ipStr = DLString( ip );
-
-    DLString::size_type pos = ipStr.find_last_of( '.' );
-    if (pos == DLString::npos || pos >= ipStr.size( ))
-        return str_dup( ip );
-
-    ipStr = ipStr.substr( 0, pos ) + ".*";
-    return str_dup( ipStr.c_str( ) );
-}
-
-
 bool process_output( Descriptor *d, bool fPrompt )
 {
     /*
@@ -165,8 +145,9 @@ void init_descriptor( int control )
     dnew->telnet.ttype = 0;
     dnew->oob_proto = 0;
 
-    dnew->realip        = realip( inet_ntoa( sock.sin_addr ) );
-    dnew->host          = realip( inet_ntoa( sock.sin_addr ) );
+    const char *realip = inet_ntoa(sock.sin_addr);
+    dnew->realip        = str_dup(realip); 
+    dnew->host          = str_dup(realip); 
     LogStream::sendNotice( ) << "New descriptor " << dnew->realip << endl;
 
     if (banManager->checkVerbose( dnew, BAN_ALL )) {

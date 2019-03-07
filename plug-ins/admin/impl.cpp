@@ -18,6 +18,7 @@
 #include "deny.h"
 #include "cban.h"
 #include "reward.h"
+#include "lasthost.h"
 #include "so.h"
 
 extern "C"
@@ -42,6 +43,8 @@ extern "C"
                 
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeGodReward> >( ppl );
                 Plugin::registerPlugin<XMLAttributeGodRewardListenerPlugin>( ppl );
+                Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLastHost> >(ppl);
+                Plugin::registerPlugin<XMLAttributeLastHostListenerPlugin>( ppl );
                 
                 return ppl;
         }

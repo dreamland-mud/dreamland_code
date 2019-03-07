@@ -45,6 +45,7 @@ nochannel.cpp \
 nopost.cpp \
 socket.cpp \
 reward.cpp \
+lasthost.cpp \
 confirm.cpp 
 
 libplugin_command_la_LIBADD = \
@@ -63,6 +64,7 @@ cban.h \
 nochannel.h \
 nopost.h \
 reward.h \
+lasthost.h \
 confirm.h 
 
 libplugin_command_la_MOC = cplugin.h
