@@ -332,6 +332,31 @@ NMI_SET( CharacterWrapper, description, "то что видно по look mob" )
     target->setDescription( arg.toString( ) );
 }
 
+NMI_GET( CharacterWrapper, spec_fun, "спец-процедура") 
+{
+    checkTarget( ); 
+    CHK_PC
+    if (target->getNPC()->spec_fun.func)
+        return Register( spec_name(target->getNPC()->spec_fun.func) );
+    else
+        return Register( );
+}
+
+NMI_SET( CharacterWrapper, spec_fun, "спец-процедура") 
+{
+    checkTarget( ); 
+    CHK_PC
+
+    SPEC_FUN *spec;
+
+    if (arg.type == Register::NONE)
+        target->getNPC()->spec_fun.clear();
+    else if ((spec = spec_lookup(arg.toString().c_str())) == 0)
+        throw Scripting::Exception("Unknown spec function name");
+    else
+        target->getNPC()->spec_fun = spec;
+}
+
 NMI_GET( CharacterWrapper, trust, "уровень привилегий" )
 {
     PCMemoryInterface *pci;
