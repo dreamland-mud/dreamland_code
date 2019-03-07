@@ -32,7 +32,7 @@
 #include "def.h"
 
 GSN(perception);
-const        char         go_ahead_str        [] = { IAC, GA, '\0' };
+const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
 const char *dir_name[] = {"N","E","S","W","U","D"};
 const char *dir_name_small[] = {"n","e","s","w","u","d"};
@@ -42,7 +42,7 @@ const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
     FENIA_CALL(room, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
-    BEHAVIOR_CALL(room, command, actor, cmdName, cmdArgs); 
+    BEHAVIOR_CALL(room, command, actor, cmdName, cmdArgs);
     return false;
 }
 
@@ -58,16 +58,16 @@ static bool oprog_command( Object *obj, Character *actor, const DLString &cmdNam
 {
     FENIA_CALL(obj, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
     FENIA_NDX_CALL(obj, "Command", "OCss", obj, actor, cmdName.c_str( ), cmdArgs.c_str( ));
-    BEHAVIOR_CALL(obj, command, actor, cmdName, cmdArgs); 
+    BEHAVIOR_CALL(obj, command, actor, cmdName, cmdArgs);
     return false;
 }
 
 static bool omprog_command( Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
-    for (Object *obj = actor->in_room->contents; obj; obj = obj->next_content) 
+    for (Object *obj = actor->in_room->contents; obj; obj = obj->next_content)
         if (oprog_command( obj, actor, cmdName, cmdArgs ))
             return true;
- 
+
     for (Character *ch = actor->in_room->people; ch; ch = ch->next_in_room) {
         if (mprog_command( ch, actor, cmdName, cmdArgs ))
             return true;
@@ -80,8 +80,8 @@ static bool omprog_command( Character *actor, const DLString &cmdName, const DLS
     return false;
 }
 
-int 
-InterpretHandler::handle(Descriptor *d, char *arg) 
+int
+InterpretHandler::handle(Descriptor *d, char *arg)
 {
     InterpretArguments iargs;
     static int phases[] = {
@@ -93,14 +93,14 @@ InterpretHandler::handle(Descriptor *d, char *arg)
         CMDP_LOG_CMD,
         0
     };
-   
+
     iargs.d = d;
     iargs.ch = d->character;
     iargs.line = arg;
     iargs.phases = phases;
 
     CommandInterpreter::getThis( )->run( iargs );
-    
+
     if (!iargs.pCommand) {
         if (!iargs.cmdName.empty( ))
             iargs.ch->send_to( "Что?\r\n" );
@@ -108,9 +108,9 @@ InterpretHandler::handle(Descriptor *d, char *arg)
         return 0;
     }
 
-    if (!iargs.pCommand->dispatch( iargs )) 
+    if (!iargs.pCommand->dispatch( iargs ))
         return 0;
-    
+
     iargs.cmdName = iargs.pCommand->getName( );
 
     if (rprog_command( iargs.ch->in_room, iargs.ch, iargs.cmdName, iargs.cmdArgs ))
@@ -140,7 +140,7 @@ void InterpretHandler::normalPrompt( Character *ch )
         str = ch->batle_prompt.c_str( );
 
     if ( !str || !*str ) {
-        ch->printf( "<%dhp %dm %dmv> %s", 
+        ch->printf( "<%dhp %dm %dmv> %s",
                 ch->hit.getValue( ), ch->mana.getValue( ), ch->move.getValue( ), ch->prefix );
         return;
     }
@@ -163,11 +163,11 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         if (*++str == '\0')
             break;
-        
+
         /*
          * prompt-handling player attributes
          */
-        if (!ch->is_npc( ) 
+        if (!ch->is_npc( )
             && pch->getAttributes( ).handleEvent( PromptArguments( pch, *str, out ) ))
         {
             handled = true;
@@ -177,12 +177,12 @@ void InterpretHandler::normalPrompt( Character *ch )
          * prompt-handling object behaviors
          */
         if (!handled)
-            for (Object *obj = ch->carrying; obj; obj = obj->next_content) 
+            for (Object *obj = ch->carrying; obj; obj = obj->next_content)
                 if (obj->behavior && obj->behavior->prompt( ch, *str, out )) {
                     handled = true;
                     break;
                 }
-        
+
         if (handled) {
             ++str;
             continue;
@@ -191,16 +191,16 @@ void InterpretHandler::normalPrompt( Character *ch )
         switch( *str )
         {
         default :
-            out << " "; 
+            out << " ";
             break;
-        
+
         case 'd':
         case 'e':
             ruexits = ch->getPC( ) && ch->getPC( )->getConfig( )->ruexits;
 
             for (int door = 0; door < DIR_SOMEWHERE; door++) {
                 EXIT_DATA *pexit = ch->in_room->exit[door];
-                
+
                 if (!pexit || !ch->can_see( pexit ))
                     continue;
 
@@ -218,7 +218,7 @@ void InterpretHandler::normalPrompt( Character *ch )
             break;
 
         case 'c' :
-            out << endl; 
+            out << endl;
             break;
 
         case 'n' :
@@ -263,7 +263,7 @@ void InterpretHandler::normalPrompt( Character *ch )
         case 'M' :
             out << ch->max_mana;
             break;
-                
+
         case 'v' :
             out << ch->move;
             break;
@@ -286,7 +286,7 @@ void InterpretHandler::normalPrompt( Character *ch )
         case 'l':
             out << ch->getRealLevel( );
             break;
-                
+
         case 'g' :
             out << ch->gold;
             break;
@@ -301,10 +301,10 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'r' :
             if (ch->in_room != 0)
-                if (ch->getConfig( )->holy 
-                    || ch->is_vampire( ) 
-                    || IS_GHOST(ch) || IS_DEATH_TIME(ch) 
-                    || (!ch->in_room->isDark( ) && !IS_AFFECTED(ch, AFF_BLIND))) 
+                if (ch->getConfig( )->holy
+                    || ch->is_vampire( )
+                    || IS_GHOST(ch) || IS_DEATH_TIME(ch)
+                    || (!ch->in_room->isDark( ) && !IS_AFFECTED(ch, AFF_BLIND)))
                 {
                     out << ch->in_room->name;
                 }
@@ -329,13 +329,13 @@ void InterpretHandler::normalPrompt( Character *ch )
             break;
 
         case '%' :
-            out << "%%"; 
+            out << "%%";
             break;
         }
 
         ++str;
     }
-    
+
     if (ch->prefix[0] != '\0')
         out << ch->prefix;
 
@@ -359,7 +359,7 @@ InterpretHandler::webPrompt(Descriptor *d, Character *ch)
             ch->in_room && ch->in_room->area && ch->in_room->area->area_file && ch->in_room->area->area_file->file_name ?
                     ch->in_room->area->area_file->file_name : "");
 
-    // Call various web prompt handlers to write out complex stuff defined in other plugins, 
+    // Call various web prompt handlers to write out complex stuff defined in other plugins,
     // such as group information, weather, time etc.
     WebPromptManager::getThis( )->handle( d, ch, prompt );
 
@@ -393,8 +393,8 @@ InterpretHandler::prompt(Descriptor *d)
         d->send(go_ahead_str);
 }
 
-/* 
- * battle prompt 
+/*
+ * battle prompt
  */
 void InterpretHandler::battlePrompt( Character *ch )
 {
@@ -403,17 +403,17 @@ void InterpretHandler::battlePrompt( Character *ch )
     ostringstream buf;
 
     victim = ch->fighting;
-    
-    if (!victim || !ch->can_see( victim )) 
+
+    if (!victim || !ch->can_see( victim ))
         return;
 
     if( victim->max_hit > 0 )
         percent = HEALTH(victim);
     else
         percent = -1;
-    
+
     buf << "%1$^C1 ";
-    
+
     if( percent >= 100 )
         buf << "{Cв прекрасном состоянии.{x";
     else if( percent >= 90 )
@@ -430,8 +430,8 @@ void InterpretHandler::battlePrompt( Character *ch )
         buf << "{Rв ужасном состоянии.{x";
     else
         buf << "{Rистекает кровью.{x";
-    
-    ch->pecho( buf.str( ).c_str( ), victim ); 
+
+    ch->pecho( buf.str( ).c_str( ), victim );
 }
 
 void InterpretHandler::close( Descriptor *d )
@@ -440,7 +440,7 @@ void InterpretHandler::close( Descriptor *d )
 
     if (!ch)
         return;
-        
+
     act( "$c1 потеря$gло|л|ла связь с этим миром.", ch, 0, 0, TO_ROOM );
     wiznet( WIZ_LINKS, 0, ch->get_trust( ), "Net death has claimed %C1.", ch );
     ch->desc = 0;
