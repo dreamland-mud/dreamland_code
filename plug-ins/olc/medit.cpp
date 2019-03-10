@@ -390,6 +390,9 @@ MEDIT(show)
         }
     }
 
+    MOB_INDEX_DATA *original = get_mob_index(mob.vnum);
+    if (original)
+        show_fenia_triggers(ch, original->wrapper);
     return false;
 }
 

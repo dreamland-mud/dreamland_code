@@ -21,6 +21,8 @@
 #include "dlfilestream.h"
 #include "regexp.h"
 #include <xmldocument.h>
+#include "stringset.h"
+#include "wrapperbase.h"
 
 #include <skill.h>
 #include <spell.h>
@@ -141,6 +143,21 @@ ptc(Character *ch, const char *fmt, ...)
     stc(rc.c_str( ), ch);
 
     va_end(av);
+}
+
+void show_fenia_triggers(Character *ch, Scripting::Object *wrapper)
+{
+    WrapperBase *base = get_wrapper(wrapper);
+    if (base) {
+        StringSet triggers, misc;
+
+        base->collectTriggers(triggers, misc);
+        if (!triggers.empty()) 
+            ptc(ch, "{gFenia triggers{x:           %s\r\n", triggers.toString().c_str());
+        
+        if (!misc.empty()) 
+            ptc(ch, "{gFenia fields and methods{x: %s\r\n", misc.toString().c_str());
+    }
 }
 
 AREA_DATA *get_area_data(int vnum)

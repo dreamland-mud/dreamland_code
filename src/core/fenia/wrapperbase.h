@@ -14,6 +14,8 @@
 #include "xmlboolean.h"
 #include "guts.h"
 
+class StringSet;
+
 namespace Scripting {
 class Object;
 };
@@ -40,6 +42,7 @@ public:
     void postpone( Register id, const char *fmt, ... );
     DLString stringCall( Register id, const char *fmt, ... );
     bool hasTrigger( const DLString &name ) const;
+    void collectTriggers(StringSet &triggers, StringSet &misc) const;
 
     inline bool isAlive() const;
     inline bool isZombie() const;

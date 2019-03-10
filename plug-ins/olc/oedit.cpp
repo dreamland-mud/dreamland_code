@@ -392,6 +392,11 @@ OEDIT(show)
             ptc(ch, "Behavior is BUGGY.\r\n");
         }
     }
+
+    OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
+    if (original)
+        show_fenia_triggers(ch, original->wrapper);
+
     return false;
 }
 

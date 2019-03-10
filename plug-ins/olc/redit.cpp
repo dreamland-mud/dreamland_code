@@ -356,6 +356,8 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
             ptc(ch, "Behavior is BUGGY.\r\n");
         }
     }
+
+    show_fenia_triggers(ch, pRoom->wrapper);
 }
 
 REDIT(show)

@@ -5,11 +5,15 @@
 #include "wrapperbase.h"
 #include "logstream.h"
 
+#include "stringset.h"
 #include "fenia/object.h"
 #include "fenia/register-impl.h"
 #include "fenia/context.h"
 #include "feniamanager.h"
 #include "schedulerwrapper.h"
+
+static DLString ON_ID = "on";
+static DLString POST_ID = "post";
 
 WrapperBase::WrapperBase( ) : alive(false), zombie( false )
 {
@@ -137,7 +141,7 @@ void WrapperBase::triggerArgs( RegisterList &regList, const char *fmt, va_list a
 
 bool WrapperBase::hasTrigger(const DLString &name ) const
 {
-    Scripting::IdRef onId( DLString("on")+name ); 
+    Scripting::IdRef onId( ON_ID+name ); 
     Register prog;
     return triggerFunction(onId, prog);
 }
@@ -274,3 +278,16 @@ Register WrapperBase::callMethod(const Register &key, const RegisterList &args )
     return i->second.target.toFunction()->invoke(i->second.backref, args);
 }
 
+void WrapperBase::collectTriggers(StringSet &triggers, StringSet &misc) const
+{
+    Guts::const_iterator g;
+    for (g = guts.begin(); g != guts.end(); g++) {
+        Lex::id_t id = g->first;
+        const DLString &idName = Lex::getThis()->getName(id);
+
+        if (ON_ID.strPrefix(idName) || POST_ID.strPrefix(idName))
+            triggers.insert(idName);
+        else
+            misc.insert(idName);
+    }        
+}

@@ -20,6 +20,9 @@
                 "     (Port a ROM 2.4 - Nov 2, 1996)\n\r"
 #define OLC_CREDITS "     Original by Surreality(cxw197psu.edu) and Locke(lockelm.com)"
 
+namespace Scripting {
+    class Object;
+}
 
 void string_show(Character * ch, char *strch);
 
@@ -30,7 +33,7 @@ AREA_DATA *get_area_data(int vnum);
 void add_reset(Room * room, RESET_DATA * pReset, int index);
 
 bool show_help(Character * ch, const char *argument);
-
+void show_fenia_triggers(Character *, Scripting::Object *wrapper);
 
 // Macros
 
