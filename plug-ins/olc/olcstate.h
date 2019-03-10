@@ -103,7 +103,14 @@ template <typename T>
 class OLCStateTemplate : public virtual OLCState {
 public:    
     typedef bool (T::*Method)( PCharacter *, char * );
-    typedef StaticList<DLString, Method> Chain;
+    struct SubCommandInfo {
+        SubCommandInfo(Method m, const char *r, const char *h) 
+                 : method(m), rname(r), help(h) {}
+        Method method;
+        DLString rname;
+        DLString help;
+    };
+    typedef StaticList<DLString, SubCommandInfo> Chain;
 
     class Command : public OLCCommand {
     public:        
@@ -132,7 +139,7 @@ public:
         Chain *cmd;
         ostringstream os;
         int i;
-
+// TODO draw a table with name / rname / help 
         for (cmd = Chain::begin( ), i = 0; cmd; cmd = cmd->getNext( ), i++) {
             if(i && i % 4 == 0)
                 os << endl;
@@ -152,7 +159,7 @@ public:
                 return typename Command::Pointer( NEW, 
                                          (T *)this, 
                                          cmd->getKey( ), 
-                                         cmd->getVal( ) );
+                                         cmd->getVal( ).method );
         
         return CommandBase::Pointer( );
     }
@@ -162,10 +169,10 @@ public:
 template <> \
 OLCStateTemplate<State>::Chain *OLCStateTemplate<State>::Chain::first = 0
 
-#define OLC_CMD( State, Cmd ) \
+#define OLC_CMD( State, Cmd, rname, help ) \
 namespace olc { struct Cmd##_type; } \
 template <> bool State::cmd<olc::Cmd##_type>( PCharacter *ch, char *argument ); \
-OLCStateTemplate<State>::Chain olc_##State##_##Cmd##_registrator( #Cmd, &State::cmd<olc::Cmd##_type>); \
+OLCStateTemplate<State>::Chain olc_##State##_##Cmd##_registrator( #Cmd, OLCStateTemplate<State>::SubCommandInfo(&State::cmd<olc::Cmd##_type>, rname, help)); \
 template <> bool State::cmd<olc::Cmd##_type>( PCharacter *ch, char *argument )
 
 

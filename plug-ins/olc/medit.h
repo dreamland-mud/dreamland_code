@@ -35,6 +35,6 @@ private:
     void copyDescriptions( MOB_INDEX_DATA * );
 };
 
-#define MEDIT(Cmd) OLC_CMD(OLCStateMobile, Cmd)
+#define MEDIT(Cmd) OLC_CMD(OLCStateMobile, Cmd, "", "")
 
 #endif

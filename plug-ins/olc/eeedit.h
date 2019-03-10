@@ -36,6 +36,6 @@ private:
     virtual void statePrompt( Descriptor * );
 };
 
-#define EEEDIT(Cmd) OLC_CMD(OLCStateExtraExit, Cmd)
+#define EEEDIT(Cmd) OLC_CMD(OLCStateExtraExit, Cmd, "", "")
 
 #endif

@@ -35,6 +35,6 @@ private:
     virtual void statePrompt( Descriptor * );
 };
 
-#define REDIT(Cmd) OLC_CMD(OLCStateRoom, Cmd)
+#define REDIT(Cmd) OLC_CMD(OLCStateRoom, Cmd, "", "")
 
 #endif
