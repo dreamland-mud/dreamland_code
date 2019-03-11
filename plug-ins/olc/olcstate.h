@@ -134,22 +134,22 @@ public:
         ::Pointer<T> state;
         Method method;
     };
-    
+   
+// MOC_SKIP_BEGIN 
     void do_commands(PCharacter *ch) {
         Chain *cmd;
         ostringstream os;
-        int i;
-// TODO draw a table with name / rname / help 
-        for (cmd = Chain::begin( ), i = 0; cmd; cmd = cmd->getNext( ), i++) {
-            if(i && i % 4 == 0)
-                os << endl;
-            os << std::setw(19) << std::setiosflags(ios::left) << cmd->getKey( );
-        }
-        os << endl;
+
+        os << "{YСписок встроенных команд{x" << endl;
+
+        for (cmd = Chain::begin( ); cmd; cmd = cmd->getNext( )) 
+            os << "{g" << setiosflags(ios::left) << setw(20) << cmd->getKey() 
+               << "{w" << resetiosflags(ios::left) << cmd->getVal().help << endl;
 
         ch->send_to( os.str() );
     }
-    
+// MOC_SKIP_END   
+ 
     virtual CommandBase::Pointer findCommand( PCharacter *pch, const DLString &name )
     {
         Chain *cmd;

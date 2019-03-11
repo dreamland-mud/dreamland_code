@@ -40,6 +40,6 @@ private:
     virtual void statePrompt( Descriptor * );
 };
 
-#define AEDIT(C) OLC_CMD(OLCStateArea, C, "", "")
+#define AEDIT(C, rname, help) OLC_CMD(OLCStateArea, C, rname, help)
 
 #endif

@@ -191,21 +191,21 @@ void OLCStateArea::changed( PCharacter *ch )
 }
 
 // Area Editor Functions.
-AEDIT(show)
+AEDIT(show, "показать", "показать все поля")
 {
-    ptc(ch, "Name:    [%5d] %s\n\r", vnum.getValue( ), name.getValue( ).c_str( ));
-    ptc(ch, "File:    [%s]\n\r", file_name.getValue( ).c_str( ));
-    ptc(ch, "Vnums:   [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
-    ptc(ch, "Levels:  [%u-%u]\n\r", low_range.getValue( ), high_range.getValue( ));
-    ptc(ch, "Age:     [%d]\n\r", age.getValue( ));
-    ptc(ch, "Players: [%d]\n\r", nplayer.getValue( ));
-    ptc(ch, "Security:[%d]\n\r", security.getValue( ));
-    ptc(ch, "Authors :[%s]\n\r", authors.getValue( ).c_str( ));
-    ptc(ch, "Credits :[%s]\n\r", credits.getValue( ).c_str( ));
-    ptc(ch, "Translator:[%s]\n\r", translator.getValue( ).c_str( ));
-    ptc(ch, "Speedwalk:[%s]\n\r", speedwalk.getValue( ).c_str( ));
-    ptc(ch, "Resetmsg:[%s]\n\r", resetmsg.getValue( ).c_str( ));
-    ptc(ch, "Flags:   [%s]\n\r", area_flags.names(area_flag).c_str());
+    ptc(ch, "Name:       [%5d] %s\n\r", vnum.getValue( ), name.getValue( ).c_str( ));
+    ptc(ch, "File:       [%s]\n\r", file_name.getValue( ).c_str( ));
+    ptc(ch, "Vnums:      [%u-%u]\n\r", min_vnum.getValue( ), max_vnum.getValue( ));
+    ptc(ch, "Levels:     [%u-%u]\n\r", low_range.getValue( ), high_range.getValue( ));
+    ptc(ch, "Age:        [%d]\n\r", age.getValue( ));
+    ptc(ch, "Players:    [%d]\n\r", nplayer.getValue( ));
+    ptc(ch, "Security:   [%d]\n\r", security.getValue( ));
+    ptc(ch, "Authors:    [%s]\n\r", authors.getValue( ).c_str( ));
+    ptc(ch, "Credits:    [%s]\n\r", credits.getValue( ).c_str( ));
+    ptc(ch, "Translator: [%s]\n\r", translator.getValue( ).c_str( ));
+    ptc(ch, "Speedwalk:  [%s]\n\r", speedwalk.getValue( ).c_str( ));
+    ptc(ch, "Message:    [%s]\n\r", resetmsg.getValue( ).c_str( ));
+    ptc(ch, "Flags:      [%s] {D(? area_flags}{w\n\r", area_flags.names(area_flag).c_str());
 
     if (!behavior.empty( ))
         ptc(ch, "Behavior:\r\n%s", behavior.c_str( ));
@@ -213,7 +213,7 @@ AEDIT(show)
     return false;
 }
 
-AEDIT(reset)
+AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
     AREA_DATA *original;
 
@@ -228,7 +228,7 @@ AEDIT(reset)
     return false;
 }
 
-AEDIT(create)
+AEDIT(create, "создать", "создать новую арию")
 {
     OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
     ae->attach(ch);
@@ -237,7 +237,7 @@ AEDIT(create)
     return false;
 }
 
-AEDIT(name)
+AEDIT(name, "имя", "установить имя (то, что видно по команде 'зоны' и 'где')")
 {
     if (!*argument) {
         stc("Синтаксис:   name [$имя]\n\r", ch);
@@ -251,7 +251,7 @@ AEDIT(name)
 }
 
 
-AEDIT(credits)
+AEDIT(credits, "копирайт", "установить исходное имя (для переведенных зон)")
 {
     if (!*argument) {
         stc("Синтаксис:   credits [$credits]\n\r", ch);
@@ -264,7 +264,7 @@ AEDIT(credits)
     return true;
 }
 
-AEDIT(message)
+AEDIT(message, "сообщение", "установить сообщение, видимое при сбросе арии (мелодичный перезвон колокольчиков)")
 {        
     if (!*argument) {
         stc("Синтаксис:   message [resetmsg]\n\r", ch);
@@ -277,7 +277,7 @@ AEDIT(message)
     return true;
 }
 
-AEDIT(flags)
+AEDIT(flags, "флаги", "установить флаги арии (? area_flags)")
 {
     bitstring_t value;
 
@@ -299,7 +299,7 @@ AEDIT(flags)
     return true;
 }
 
-AEDIT(file)
+AEDIT(file, "файл", "установить имя файла, в который сохраняется ария")
 {
     char file[MAX_STRING_LENGTH];
     int i, length;
@@ -342,7 +342,7 @@ AEDIT(file)
     return true;
 }
 
-AEDIT(age)
+AEDIT(age, "возраст", "установить текущий возраст арии (как скоро наступит автосброс)")
 {
     char age[MAX_STRING_LENGTH];
 
@@ -360,7 +360,7 @@ AEDIT(age)
 }
 
 
-AEDIT(security)
+AEDIT(security, "права", "установить уровень доступа к арии, 0..9")
 {
     char sec[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
@@ -391,7 +391,7 @@ AEDIT(security)
     return true;
 }
 
-AEDIT(authors)
+AEDIT(authors, "авторы", "установить имена создателей арии или none")
 {
     if (!*argument) {
         stc("Syntax:  authors names\n\r", ch);
@@ -407,7 +407,7 @@ AEDIT(authors)
     return true;
 }
 
-AEDIT(translator)
+AEDIT(translator, "переводчик", "установить имена переводчиков или none")
 {
     if (!*argument) {
         stc("Syntax:  translator names\n\r", ch);
@@ -423,7 +423,7 @@ AEDIT(translator)
     return true;
 }
 
-AEDIT(speedwalk)
+AEDIT(speedwalk, "маршрут", "установить маршрут, как добраться от Рыночной Площади")
 {
     if (!*argument) {
         stc("Syntax:  speedwalk <run from MSM>\n\r", ch);
@@ -438,7 +438,8 @@ AEDIT(speedwalk)
 
     return true;
 }
-AEDIT(vnum)
+
+AEDIT(vnums, "внумы", "устаноить диапазон внумов (нижний верхний)")
 {
     char lower[MAX_STRING_LENGTH];
     char upper[MAX_STRING_LENGTH];
@@ -477,7 +478,7 @@ AEDIT(vnum)
     return true;
 }
 
-AEDIT(lvnum)
+AEDIT(lvnum, "нвнум", "установить нижнюю границу диапазона внумов")
 {
     char lower[MAX_STRING_LENGTH];
     int ilower;
@@ -513,7 +514,7 @@ AEDIT(lvnum)
     return true;
 }
 
-AEDIT(uvnum)
+AEDIT(uvnum, "ввнум", "установить верхнюю границу диапазона внумов")
 {
     char upper[MAX_STRING_LENGTH];
     int ilower;
@@ -549,7 +550,7 @@ AEDIT(uvnum)
     return true;
 }
 
-AEDIT(levels)
+AEDIT(levels, "уровни", "установить рекомендуемые уровни арии (нижний верхний)")
 {
     char lower[MAX_STRING_LENGTH];
     char upper[MAX_STRING_LENGTH];
@@ -578,7 +579,7 @@ AEDIT(levels)
     return true;
 }
 
-AEDIT(behavior)
+AEDIT(behavior, "поведение", "запустить строковый редактор для установки поведения (XML)")
 {
     if (argument[0] == '\0') {
         if(!sedit(behavior))
@@ -592,26 +593,26 @@ AEDIT(behavior)
     return false;
 }
 
-AEDIT(commands)
+AEDIT(commands, "команды", "показать список встроенных команд edit")
 {
     do_commands(ch);
     return false;
 }
 
-AEDIT(done) 
+AEDIT(done, "готово", "выйти из редактора (не забывайте про asave changed)") 
 {
     commit();
     detach(ch);
     return true;
 }
 
-AEDIT(cancel)
+AEDIT(cancel, "отменить", "отменить все изменения и выйти из редактора")
 {
     detach(ch);
     return false;
 }
 
-AEDIT(dump)
+AEDIT(dump, "вывод", "(отладка) вывести внутреннее состояние редактора")
 {
     ostringstream os;
     XMLStreamable<OLCState> xs( "OLCState" );
