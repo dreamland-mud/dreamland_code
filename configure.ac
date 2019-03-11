@@ -84,6 +84,7 @@ AC_CREATE_DIR(var/misc/bugs)
 AC_CREATE_DIR(var/misc/ideas)
 AC_CREATE_DIR(var/misc/nohelp)
 AC_CREATE_DIR(var/misc/discord)
+AC_CREATE_DIR(var/misc/api)
 
 AC_CREATE_DIR(var/db/fenia)
 AC_CREATE_DIR(var/db/clan-data)
@@ -117,7 +118,7 @@ AC_CREATE_FILE(libexec/plugin.xml)
 AC_PLAYER_COPY(kadm)
 cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
 
-if ! test -d "$prefix/var/db" 
+if ! test -f "$prefix/var/db/fenia/fenia" 
 then
     cat "$srcdir/admin/fenia/fenia.tbz2" | (cd "$prefix/var/db" && tar xvjf -)
 fi
