@@ -54,6 +54,14 @@ using namespace Scripting;
 
 NMI_INIT(Root, "корневой объект");
 
+static int check_range(const Register &arg, int min, int max)
+{
+    int n = arg.toNumber();
+    if (n < min || n > max)
+        throw Scripting::IllegalArgumentException();
+    return n;
+}
+
 /*
  * METHODS
  */
@@ -343,7 +351,7 @@ NMI_INVOKE( Root, chanceOneOf, "(x): true если .number_range(1, x) == 1")
     return Register( ::number_range( 1, args.front( ).toNumber( ) ) == 1);
 }
 
-NMI_INVOKE( Root, set_bit, "(mask, b): вернет mask с установленными битом b (логическое 'или')") 
+NMI_INVOKE( Root, set_bit, "(mask, b): вернет логическое 'или' между mask и b") 
 {
     RegisterList::const_iterator i;
     int a, bit;
@@ -359,7 +367,15 @@ NMI_INVOKE( Root, set_bit, "(mask, b): вернет mask с установлен
     return a | bit;
 }
 
-NMI_INVOKE( Root, unset_bit, "(mask, b): вернет mask со сброшенным битом b") 
+NMI_INVOKE( Root, set_bit_number, "(mask, n): вернет mask с установленными битом под номером n (т.е. mask | 1<<n)") 
+{
+    int mask = argnum2number(args, 1);
+    int n = argnum2number(args, 2);
+    check_range(n, 0, 31);
+    return mask | (1<<n);
+}
+
+NMI_INVOKE( Root, unset_bit, "(mask, b): вернет mask со сброшенными битами из b") 
 {
     RegisterList::const_iterator i;
     int a, bit;
@@ -375,7 +391,7 @@ NMI_INVOKE( Root, unset_bit, "(mask, b): вернет mask со сброшенн
     return a & ~bit;
 }
 
-NMI_INVOKE( Root, isset_bit, "(mask, b): true если бит b установлен в mask (логическое 'и')") 
+NMI_INVOKE( Root, isset_bit, "(mask, b): вернет логическое 'и' между mask и b") 
 {
     RegisterList::const_iterator i;
     int a, bit;
@@ -623,14 +639,6 @@ NMI_GET( Root, room_list , "список всех комнат, поле ком�
 NMI_GET( Root, char_list , "список всех чаров, поле чара next указывает на следующего") 
 {
     return WrapperManager::getThis( )->getWrapper(char_list); 
-}
-
-static int check_range(const Register &arg, int min, int max)
-{
-    int n = arg.toNumber();
-    if (n < min || n > max)
-        throw Scripting::IllegalArgumentException();
-    return n;
 }
 
 NMI_SET( Root, hour , "текущий час суток, 0..23") 
