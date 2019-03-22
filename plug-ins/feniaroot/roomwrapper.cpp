@@ -347,6 +347,32 @@ NMI_INVOKE( RoomWrapper, getExitFlags, "(имя или номер выхода):
         return Register( 0 );
 }
 
+NMI_INVOKE( RoomWrapper, exitKeyword, "(имя или номер выхода): ключевые слова, на которые откликается эта дверь или выход" )
+{
+    EXIT_DATA *pExit;
+    
+    checkTarget( );
+
+    pExit = target->exit[get_door_argument( args )];
+    if (pExit)
+        return Register(pExit->keyword);
+    else
+        return Register("");
+}
+
+NMI_INVOKE( RoomWrapper, exitShortDescr, "(имя или номер выхода): название выхода с падежами" )
+{
+    EXIT_DATA *pExit;
+    
+    checkTarget( );
+
+    pExit = target->exit[get_door_argument( args )];
+    if (pExit)
+        return Register(pExit->short_descr);
+    else
+        return Register("");
+}
+
 static void update_door_flags( Room *room, const RegisterList &args, int flags, bool fSet )
 {
     EXIT_DATA *pExit = room->exit[get_door_argument( args )];
