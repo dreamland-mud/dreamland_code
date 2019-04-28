@@ -11,6 +11,7 @@ class Character;
 
 void mudtags_convert( const char *text, ostringstream &out, Character *ch = NULL );
 void mudtags_convert_nocolor( const char *text, ostringstream &out, Character *ch = NULL );
+void mudtags_convert_web( const char *text, ostringstream &out, Character *ch );
 void mudtags_raw( const char *text, ostringstream &out );
 void vistags_convert( const char *text, ostringstream &out, Character *ch = NULL );
 

@@ -38,12 +38,20 @@ public:
     const DLString &getKeywordAttribute() const;
     void setKeywordAttribute(const DLString &);
 
+    const StringSet &getLabels() const;
+    void addLabel(const DLString &);
+    void setLabelAttribute(const DLString &);
+    void setID(int);
+    int getID() const;
+    virtual DLString getTitle(const DLString &label) const;
+
     struct area_file * areafile;
 
     static const DLString ATTRIBUTE_KEYWORD;
     static const DLString ATTRIBUTE_LEVEL;
     static const DLString ATTRIBUTE_REF;
     static const DLString ATTRIBUTE_REFBY;
+    static const DLString ATTRIBUTE_LABELS;
    
 protected:
     /** (Extra) keyword specified as an XML attribute for this help article. */
@@ -65,6 +73,11 @@ protected:
     /** A set of all configured keywords, single- and multi-word. Their current
         concatenation is kept inside fullKeyword field. */
     StringSet keywords;
+
+    StringSet labels;
+    DLString labelAttribute;
+
+    int id;
 };
 
 

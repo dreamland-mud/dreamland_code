@@ -29,6 +29,9 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
     if (level >= -1)
         parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
 
+    if (!labels.empty())
+        parent->insertAttribute(HelpArticle::ATTRIBUTE_LABELS, labels);
+
     return true;    
 }
 
@@ -36,6 +39,7 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadTy
 {
     XMLString::fromXML(parent);
     keyword = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
+    labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
 
     if (parent->hasAttribute( HelpArticle::ATTRIBUTE_LEVEL ))
         level = parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL ).toInt( );
@@ -96,6 +100,9 @@ public:
                     help->persistent = true;
                     help->selfHelp = is_name(area->name, (*a)->getKeyword().c_str());
                 }
+                if (help->selfHelp) 
+                    help->addLabel("area");
+                
                 helpManager->registrate( *a );
             }
         }

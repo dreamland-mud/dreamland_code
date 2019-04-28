@@ -22,6 +22,7 @@ public:
 
     DLString keyword;
     int level;
+    DLString labels;
 };
 
 class AreaHelp : public MarkupHelpArticle {

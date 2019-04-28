@@ -18,6 +18,8 @@
 #include "merc.h"
 #include "def.h"
 
+static const DLString LABEL_RELIGION = "religion";
+
 /*-------------------------------------------------------------------
  * ReligionHelp 
  *------------------------------------------------------------------*/
@@ -33,6 +35,7 @@ void ReligionHelp::setReligion( Religion::Pointer religion )
     keywords.insert( religion->getName( ) );
     keywords.insert( religion->getRussianName( ).ruscase( '1' ) );
     fullKeyword = keywords.toString( ).toUpper( );
+    addLabel(LABEL_RELIGION);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -45,32 +48,25 @@ void ReligionHelp::unsetReligion( )
     fullKeyword = "";
 }
 
-struct CommaSet : public set<string> {
-    void print( ostream &buf ) const {
-        bool found = false;
-        for (const_iterator i = begin( ); i != end( ); i++) {
-            if (found)
-                buf << ", ";
-            buf << *i;
-            found = true;
-        }
-    }
-};
-inline ostream& operator << ( ostream& ostr, const CommaSet& cset )
+DLString ReligionHelp::getTitle(const DLString &label) const
 {
-    cset.print( ostr );
-    return ostr;
+    if (religion)
+        return religion->getRussianName().ruscase('1') + ", " + religion->getName();
+    return HelpArticle::getTitle(label);
 }
 
 void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << "Религия {C" << religion->getRussianName().ruscase('1') << "{x ({C"
-       << religion->getShortDescr() << "{x), ";
+       << religion->getShortDescr() << "{x)";
+    
+    if (ch && ch->desc) {
+        if (religion->isAllowed(ch))
+            in << ", доступна для тебя.";
+        else
+            in << ", недоступна тебе.";
+    }
 
-    if (religion->isAllowed(ch))
-        in << "доступна для тебя.";
-    else
-        in << "недоступна тебе.";
     in << endl << endl
        << *this;
 }

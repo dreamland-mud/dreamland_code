@@ -32,7 +32,7 @@ public:
         virtual short getLevel( ) const;
         virtual const Enumeration & getPosition( ) const;
         virtual const Flags & getOrder( ) const;
-        virtual const Enumeration & getCommandCategory( ) const;
+        virtual const Flags & getCommandCategory( ) const;
 
         virtual bool matches( const DLString & ) const;
         virtual bool matchesAlias( const DLString & ) const;
@@ -51,7 +51,7 @@ protected:
         static const Flags defaultOrder;
         static const Enumeration defaultPosition;
         static const Flags defaultExtra;
-        static const Enumeration defaultCategory;
+        static const Flags defaultCategory;
 };
 
 class XMLCommand : public virtual Command, public virtual XMLPolymorphVariable {

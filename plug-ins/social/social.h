@@ -183,6 +183,7 @@ public:
     
     SocialHelp(Social::Pointer social);
     virtual ~SocialHelp();
+    virtual DLString getTitle(const DLString &label) const;
 
 protected:
     virtual void getRawText( Character *, ostringstream & ) const;

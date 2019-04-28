@@ -30,11 +30,12 @@ LanguageException::LanguageException( const Language &lang, const DLString &msg 
 {
 }
 
-Language::Language( )
+Language::Language( ) : cat(defaultCategory.getValue(), defaultCategory.getTable())
 {
 }
 
-Language::Language( const DLString &n ) : Skill( n )
+Language::Language( const DLString &n ) : Skill( n ),
+        cat(defaultCategory.getValue(), defaultCategory.getTable())
 {
 }
 
@@ -56,6 +57,7 @@ void Language::destruction( )
 
 CommandHelp::Pointer Language::getHelp( ) const
 {
+
     return description;
 }
 

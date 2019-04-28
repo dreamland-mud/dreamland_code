@@ -32,7 +32,6 @@ public:
 
 protected:
     SkillPointer skill;
-    XML_VARIABLE XMLBooleanNoTrue interp; 
 };
 
 #endif

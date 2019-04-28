@@ -190,10 +190,12 @@ XMLArea::load_helps(AREA_DATA *a)
         help->setKeywordAttribute(h->keyword);
         help->setLevel(h->level);
         help->setText(h->getValue());
+        help->setLabelAttribute(h->labels);
         helpManager->registrate(help);
-        if (help->selfHelp)
+        if (help->selfHelp) {
             selfHelpExists = true;
-
+            help->addLabel("area");
+        }
         XMLPersistent<HelpArticle> phelp(help.getPointer());
         a->helps.push_back(phelp);
     }
@@ -206,6 +208,7 @@ XMLArea::load_helps(AREA_DATA *a)
         help->addKeyword(DLString(a->name).colourStrip().quote());
         help->addKeyword(DLString(a->credits).colourStrip().quote());
         help->setText("     ");
+        help->addLabel("area");
         helpManager->registrate(help);
         
         XMLPersistent<HelpArticle> phelp(help.getPointer());

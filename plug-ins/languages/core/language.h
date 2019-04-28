@@ -55,6 +55,7 @@ public:
     
     virtual const DLString & getName( ) const;
     virtual const Enumeration & getPosition( ) const;
+    virtual const Flags & getCommandCategory( ) const;
     virtual const DLString & getRussianName( ) const;
     virtual const DLString & getHint( ) const;
     virtual void run( Character *, const DLString & );
@@ -120,7 +121,7 @@ protected:
     XML_VARIABLE Races    races;
     XML_VARIABLE Classes  classes;
     XML_VARIABLE Effects  effects;
-
+    XML_VARIABLE XMLFlags cat;
 
     static const int SKILL_ADEPT;
     static const int SKILL_SENSE;

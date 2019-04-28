@@ -29,7 +29,7 @@ GSN(improved_invis);
 const Flags Command::defaultOrder( 0, &order_flags );
 const Flags Command::defaultExtra( 0, &command_flags );
 const Enumeration Command::defaultPosition( POS_DEAD, &position_table );
-const Enumeration Command::defaultCategory( CMD_CAT_OTHER, &command_category_table );
+const Flags Command::defaultCategory( 0, &command_category_flags );
 
 Command::Command( ) 
 {
@@ -97,7 +97,7 @@ const Flags & Command::getOrder( ) const
     return defaultOrder;
 }
 
-const Enumeration & Command::getCommandCategory( ) const
+const Flags & Command::getCommandCategory( ) const
 {
     return defaultCategory;
 }

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <set>
 
+#include "logstream.h"
 #include "skillhelp.h"    
 #include "skill.h"
 #include "spell.h"
@@ -12,6 +13,8 @@
 #include "skillcommand.h"
 #include "skillgroup.h"
 #include "character.h"
+#include "commandflags.h"
+#include "def.h"
 
 const DLString SkillHelp::TYPE = "SkillHelp";
 
@@ -107,6 +110,22 @@ void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream 
                       ).run( ch, out );
 }
 
+/**
+ * Return different help article title for web, depending on whether
+ * we're displaying a list of skills or a list of commands.
+ */
+DLString SkillHelp::getTitle(const DLString &label) const
+{
+    if (!skill)
+        return HelpArticle::getTitle(label);
+
+    if (label != "cmd" || !skill->getCommand()) 
+        return skill->getName() + ", " + skill->getRussianName();
+    
+    return skill->getCommand()->getName() + ", "
+            + skill->getCommand()->getRussianName();
+}
+
 void SkillHelp::setSkill( Skill::Pointer skill )
 {
     this->skill = skill;
@@ -124,9 +143,23 @@ void SkillHelp::setSkill( Skill::Pointer skill )
             keywords.insert( cmd->getName( ) );
             cmd->getAliases( ).toSet( keywords );
             cmd->getRussianAliases( ).toSet( keywords );
+            if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
+                labels.fromString(
+                    cmd->getCommandCategory().names());
+                labels.insert("cmd");
+            }
         }
     }
     
+    if (skill->getSpell())
+        addLabel("spell");
+    else
+        addLabel("skill");
+        
+    XMLVariableContainer *skillWithType = skill.getDynamicPointer<XMLVariableContainer>();
+    if (skillWithType)
+        addLabel(skillWithType->getType().toLower());
+
     fullKeyword = keywords.toString().toUpper();
     helpManager->registrate( Pointer( this ) );
 }

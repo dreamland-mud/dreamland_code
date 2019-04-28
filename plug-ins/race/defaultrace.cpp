@@ -27,6 +27,7 @@ using namespace std;
 /*-------------------------------------------------------------------
  * RaceHelp 
  *------------------------------------------------------------------*/
+static const DLString LABEL_RACE = "race";
 const DLString RaceHelp::TYPE = "RaceHelp";
 GROUP(ancient_languages);
 
@@ -42,6 +43,7 @@ void RaceHelp::setRace( Race::Pointer race )
     keywords.insert( race->getFemaleName( ).ruscase( '1' ) );
     keywords.insert( race->getMltName( ).ruscase( '1' ) );
     fullKeyword = keywords.toString( ).toUpper( );
+    addLabel(LABEL_RACE);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -52,6 +54,13 @@ void RaceHelp::unsetRace( )
     race.clear( );
     keywords.clear();
     fullKeyword = "";
+}
+
+DLString RaceHelp::getTitle(const DLString &label) const
+{
+    if (race)
+        return race->getMltName().ruscase('1') + ", " + race->getName();
+    return HelpArticle::getTitle(label);
 }
 
 struct CommaSet : public set<string> {

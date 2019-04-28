@@ -29,6 +29,7 @@ struct ColorTags {
     void run( ostringstream & );
     void setRaw( bool );
     void setColor( bool );
+    void setWeb( bool );
 
 protected:    
     void reset( );
@@ -62,6 +63,11 @@ ColorTags::ColorTags( const char *text, Character *ch )
     raw = false;
 
     reset( );
+}
+
+void ColorTags::setWeb( bool web )
+{
+    my_ansi = !web;
 }
 
 void ColorTags::setColor( bool color )
@@ -272,9 +278,12 @@ struct VisibilityTags {
     VisibilityTags( const char *, Character * = NULL );
     
     void run( ostringstream & );
+    void setWeb( bool );
 
 protected:    
     void reset( );
+
+    bool my_web;
 
     void rlang_tag_parse( );
     bool rlang_tag_work( );
@@ -358,6 +367,8 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
 
     my_invis = INVIS_NONE;
 
+    my_web = is_websock(ch);
+
     if (ch) {
         if (ch->is_immortal( ))
             SET_BIT(my_invis, INVIS_IMMORTAL);
@@ -367,11 +378,20 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
             SET_BIT(my_invis, INVIS_RECRUITER);
         if (!ch->is_npc( ) && ch->getClan( )->isLeader( ch->getPC( ) ))
             SET_BIT(my_invis, INVIS_LEADER);
-        if (is_websock(ch))
+        if (my_web)
             SET_BIT(my_invis, INVIS_WEB);
     }
    
     reset( );
+}
+
+void VisibilityTags::setWeb(bool web) 
+{
+    my_web = web;
+    if (my_web)
+        SET_BIT(my_invis, INVIS_WEB);
+    else
+        REMOVE_BIT(my_invis, INVIS_WEB);
 }
 
 void VisibilityTags::reset( )
@@ -392,7 +412,7 @@ void VisibilityTags::reset( )
 bool VisibilityTags::need_escape( )
 {
     // Don't escape for telnet clients.
-    if (!is_websock(ch)) {
+    if (!my_web) {
         return false;
     }
     // Don't escape strings inside "{Iw" tags.
@@ -756,4 +776,17 @@ void mudtags_raw( const char *text, ostringstream &out )
 void vistags_convert( const char *text, ostringstream &out, Character *ch )
 {
     VisibilityTags( text, ch ).run( out );
+}
+
+void mudtags_convert_web( const char *text, ostringstream &out, Character *ch )
+{
+     ostringstream vbuf;
+     VisibilityTags vtags( text, ch );
+     vtags.setWeb(true);
+     vtags.run( vbuf );
+
+     DLString vbufStr = vbuf.str( );
+     ColorTags ctags( vbufStr.c_str( ), ch );
+     ctags.setWeb(true);
+     ctags.run( out );
 }

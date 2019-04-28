@@ -13,12 +13,20 @@
 #include "dl_strings.h"
 #include "def.h"
 
+static const DLString LABEL_CRAFT = "craft";
 
 /*-------------------------------------------------------------------
  * CraftProfessionHelp 
  *------------------------------------------------------------------*/
 const DLString CraftProfessionHelp::TYPE = "CraftProfessionHelp";
 
+DLString CraftProfessionHelp::getTitle(const DLString &label) const
+{
+    if (prof)
+        return prof->getRusName().ruscase('1') + ", " + prof->getName();
+    return HelpArticle::getTitle(label);
+}
+    
 void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
 {
     this->prof = prof;
@@ -30,6 +38,7 @@ void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
     keywords.insert( prof->getRusName( ).ruscase( '1' ) );
     keywords.insert( prof->getMltName( ).ruscase( '1' ) );
     fullKeyword = keywords.toString( ).toUpper( );
+    addLabel(LABEL_CRAFT);
 
     helpManager->registrate( Pointer( this ) );
 }

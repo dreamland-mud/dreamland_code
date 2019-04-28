@@ -20,6 +20,7 @@ public:
     virtual void setSkill( SkillPointer );
     virtual void unsetSkill( );
     inline virtual SkillPointer getSkill( ) const;
+    virtual DLString getTitle(const DLString &label) const;
 
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;

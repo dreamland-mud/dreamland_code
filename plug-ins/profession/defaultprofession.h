@@ -27,6 +27,7 @@ public:
     virtual void setProfession( Profession::Pointer );
     virtual void unsetProfession( );
 
+    virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;

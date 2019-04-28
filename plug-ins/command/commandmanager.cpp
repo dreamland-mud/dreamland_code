@@ -242,17 +242,8 @@ CommandManager::CategoryMap CommandManager::getCategorizedCommands( ) const
     CategoryMap cats;
 
     list<Command::Pointer>::const_iterator cmd;
-    for (cmd = commands.getCommands( ).begin( ); cmd != commands.getCommands( ).end( ); cmd++) {
-        CategoryMap::iterator c = cats.find( (*cmd)->getCommandCategory( ) );
-
-        if (c == cats.end( )) {
-            CategoryCommands list;
-            list.push_back(*cmd);
-            cats[(*cmd)->getCommandCategory()] = list;
-        } else {
-            c->second.push_back(*cmd);
-        }
-    }
+    for (cmd = commands.getCommands( ).begin( ); cmd != commands.getCommands( ).end( ); cmd++) 
+        cats[(*cmd)->getCommandCategory()].push_back(*cmd);
 
     return cats;
 }

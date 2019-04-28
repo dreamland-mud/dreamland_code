@@ -32,6 +32,11 @@ const DLString & Language::getRussianName( ) const
         return nameRus;
 }
 
+const Flags & Language::getCommandCategory( ) const
+{
+    return cat;
+}
+
 void Language::run( Character *ach, const DLString &constArguments )
 {
     DLString arguments( constArguments );

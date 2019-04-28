@@ -3,11 +3,13 @@
  * ruffina, 2004
  */
 #include "commandhelp.h"
+#include "logstream.h"
 #include "command.h"
 #include "commandmanager.h"
 #include "character.h"
 
 const DLString CommandHelp::TYPE = "CommandHelp";
+static const DLString LABEL_COMMAND = "cmd";
 
 bool CommandHelp::visible( Character *ch ) const
 {
@@ -30,7 +32,11 @@ void CommandHelp::setCommand( Command::Pointer command )
     keywords.insert( command->getRussianName( ) );    
     command->getAliases( ).toSet( keywords );
     command->getRussianAliases( ).toSet( keywords );
-    
+
+    labels.fromString(
+        command->getCommandCategory().names());
+    labels.insert(LABEL_COMMAND);
+
     if (!keyword.empty( ))
         keywords.fromString( keyword.toLower() );
 
@@ -49,7 +55,8 @@ void CommandHelp::setCommand( Command::Pointer command )
         if (cmd && cmd->getHelp( ))
             cmd->getHelp( )->addKeyword( fullKeyword );
     }
-    
+   
+    LogStream::sendNotice() << command->getName() << ":" << labels.toString() << endl; 
     if (!empty( ))
         helpManager->registrate( Pointer( this ) );
 }

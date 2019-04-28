@@ -13,7 +13,8 @@
 DefaultCommand::DefaultCommand( ) 
     : extra( defaultExtra.getValue( ), defaultExtra.getTable( ) ), 
       position( defaultPosition.getValue( ), defaultPosition.getTable( ) ),
-      order( defaultOrder.getValue( ), defaultOrder.getTable( ) )
+      order( defaultOrder.getValue( ), defaultOrder.getTable( ) ),
+      cat(defaultCategory.getValue(), defaultCategory.getTable())
 {
     
 }

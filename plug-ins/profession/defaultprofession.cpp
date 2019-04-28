@@ -15,6 +15,8 @@
 
 PROF(universal);
 
+static const DLString LABEL_CLASS = "class";
+
 /*-------------------------------------------------------------------
  * ProfessionHelp 
  *------------------------------------------------------------------*/
@@ -31,6 +33,7 @@ void ProfessionHelp::setProfession( Profession::Pointer prof )
     keywords.insert( prof->getRusName( ).ruscase( '1' ) );
     keywords.insert( prof->getMltName( ).ruscase( '1' ) );
     fullKeyword = keywords.toString( ).toUpper( );
+    addLabel(LABEL_CLASS);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -41,6 +44,13 @@ void ProfessionHelp::unsetProfession( )
     prof.clear( );
     keywords.clear();
     fullKeyword = "";
+}
+
+DLString ProfessionHelp::getTitle(const DLString &label) const
+{
+    if (prof)
+        return prof->getRusName().ruscase('1') + ", " + prof->getName();
+    return HelpArticle::getTitle(label);
 }
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const

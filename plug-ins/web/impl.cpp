@@ -5,6 +5,8 @@
 #include "webprompt.h"
 #include "webpromptattribute.h"
 #include "logstream.h"
+#include "schedulertaskroundplugin.h"
+#include "dlscheduler.h"
 #include "xmlattributeticker.h"
 #include "xmlattributeplugin.h"
 #include "json/json.h"
@@ -12,6 +14,9 @@
 #include "descriptorstatelistener.h"
 #include "quest.h"
 
+#include "dlfilestream.h"
+#include "dldirectory.h"
+#include "dreamland.h"
 #include "bitstring.h"
 #include "clanreference.h"
 #include "affect.h"
@@ -25,6 +30,7 @@
 #include "stats_apply.h"
 #include "dl_math.h"
 #include "dl_ctype.h"
+#include "mudtags.h"
 #include "merc.h"
 #include "autoflags.h"
 #include "so.h"
@@ -953,11 +959,156 @@ void WebPromptDescriptorStateListener::run( int oldState, int newState, Descript
 /*-------------------------------------------------------------------------
  * initialize_web
  *------------------------------------------------------------------------*/
+/**
+ * Help dumper task: save help HTML to disk each time this plugin is loaded.
+ * It's prioritized to run after all area initialization has completed.
+ */
+class HelpDumpPlugin : public SchedulerTaskRoundPlugin {
+public:
+    typedef ::Pointer<HelpDumpPlugin> Pointer;
+
+    virtual int getPriority( ) const
+    {
+        return SCDP_BOOT + 25;
+    }
+
+    /**
+     * Output help categories and list of unique links to disk, all formated for
+     * a 1st level player with Russian language settings.
+     */
+    virtual void run( )
+    {
+        PCharacter dummy;
+
+        dummy.setName("Kadm");
+        dummy.setRussianName("Кадм||а|у|а|ом|е");
+        dummy.setLevel(1);
+        dummy.config.setBit(CONFIG_RUSKILLS);
+        dummy.config.setBit(CONFIG_RUCOMMANDS);
+        dummy.config.setBit(CONFIG_RUOTHER);
+        SET_BIT(dummy.act, PLR_COLOR);
+
+        saveAllLinks(&dummy);
+        saveHelpCategory("race", "Расы", &dummy);
+        saveHelpCategory("class", "Классы", &dummy);
+        saveHelpCategory("religion", "Религии", &dummy);
+        saveHelpCategory("clan", "Кланы", &dummy);
+        saveHelpCategory("skill", "Умения", &dummy);
+        saveHelpCategory("spell", "Заклинания", &dummy);
+        saveHelpCategory("area", "Зоны", &dummy);
+        saveHelpCategory("social", "Социалы", &dummy);
+        saveHelpCategory("cmd", "Все команды", &dummy);
+        saveHelpCategory("quest", "Квесты", &dummy);
+        saveHelpCategory("char", "Персонаж", &dummy);
+        saveHelpCategory("info", "Информация", &dummy);
+        saveHelpCategory("shop", "Торговля и услуги", &dummy);
+        saveHelpCategory("learn", "Обучение", &dummy);
+        saveHelpCategory("item", "Предметы", &dummy);
+        saveHelpCategory("move", "Перемещение", &dummy);
+        saveHelpCategory("fight", "Битвы", &dummy);
+        saveHelpCategory("magic", "Магия", &dummy);
+        saveHelpCategory("note", "Переписка", &dummy);
+        saveHelpCategory("comm", "Общение", &dummy);
+        saveHelpCategory("genericskill", "Профессиональные навыки", &dummy);
+        saveHelpCategory("raceaptitude", "Расовые навыки", &dummy);
+        saveHelpCategory("clanskill", "Клановые навыки", &dummy);
+        saveHelpCategory("craftskill", "Крафт", &dummy);
+        saveHelpCategory("craft", "Крафт", &dummy);
+        saveHelpCategory("cardskill", "Навыки картежника", &dummy);
+        saveHelpCategory("language", "Языки", &dummy);
+    }
+
+
+protected:
+    /**
+     * Save a JSON file that contains mapping of each help keyword to its unique ID
+     * (and list of labels). This file is used to generate unique HTML links to the articles.
+     */
+    void saveAllLinks(PCharacter *dummy) {
+        Json::Value helps, typeahead;
+        HelpArticles::const_iterator a;
+
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if ((*a)->visible(dummy) && (*a)->getLabels().size() > 0) {
+                // Collect data for generating hyper links between the articles.
+                for (StringSet::const_iterator k = (*a)->getKeywords().begin(); k != (*a)->getKeywords().end(); k++) {
+                    DLString key = k->toLower();
+                    helps[key]["id"] = (*a)->getID();
+                    helps[key]["labels"].clear();
+                    for (StringSet::const_iterator label = (*a)->getLabels().begin(); label != (*a)->getLabels().end(); label++) {
+                        helps[key]["labels"].append(*label);
+                    }
+                }
+
+                // Collect data for autodropdown JS suggestions.
+                Json::Value b;
+                b["n"] = (*a)->getKeyword();
+                const DLString &label = *((*a)->getLabels().begin());
+                b["l"] = label + ".html#h" + DLString((*a)->getID());
+                typeahead.append(b);
+            }
+        }
+
+        DLFileStream(dreamland->getMiscDir(), "allhelp", ".json").fromString(
+            json_to_string(helps)
+        );
+
+        DLFileStream(dreamland->getMiscDir(), "typeahead-help", ".json").fromString(
+            json_to_string(typeahead)
+        );
+    }
+
+    /**
+     * Collect all articles with a given label and save to disk. 
+     * First output a list of topics under help_menu div, followed by all articles,
+     * each wrapped in a help_content div.
+     */
+    void saveHelpCategory(const DLString &label, const DLString &title, PCharacter *dummy) {
+        DLDirectory dir(dreamland->getMiscDir(), "help");
+        HelpArticles helps;
+        HelpArticles::const_iterator a;
+        ostringstream buf;
+
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if ((*a)->visible(dummy) && (*a)->getLabels().count(label) > 0)
+                helps.push_back(*a);
+        }
+
+        buf << "<div class=\"help_menu\"><h2>" << title << "</h2>" << endl
+            << "<ul>" << endl;
+        
+        for (a = helps.begin(); a != helps.end(); a++) {
+            buf << "<li><a href=\"#h" << (*a)->getID() << "\">" << (*a)->getTitle(label).toUpper() << "</a></li>" << endl; 
+        }
+        buf << "</ul></div>" << endl 
+             << "<div class=\"help_content\">";
+
+        for (a = helps.begin(); a != helps.end(); a++) {
+            ostringstream textStream;
+            DLString text = (*a)->getText(dummy);
+            mudtags_convert_web(text.c_str(), textStream, dummy);
+
+            buf << "<div class=\"help_panel\">"
+                << "<a class=\"help_title\" name=\"h" << (*a)->getID() << "\"></a><span class=\"help_title\">"
+                << (*a)->getKeyword().toUpper()
+                << "</span><div class=\"help_article\">" 
+                << textStream.str()
+                << "</div></div>" << endl;
+        }
+
+        buf << "</div>" << endl;
+
+        DLFileStream(dir, label, ".html").fromString(buf.str());
+    }
+
+};    
+
 extern "C"
 {
     SO::PluginList initialize_web( )
     {
         SO::PluginList ppl;
+        Plugin::registerPlugin<HelpDumpPlugin>( ppl );
         Plugin::registerPlugin<WhoWebPromptListener>( ppl );
         Plugin::registerPlugin<GroupWebPromptListener>( ppl );
         Plugin::registerPlugin<CalendarWebPromptListener>( ppl );

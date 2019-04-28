@@ -29,6 +29,7 @@ public:
     virtual void setRace( Race::Pointer );
     virtual void unsetRace( );
 
+    virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;

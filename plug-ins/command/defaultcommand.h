@@ -37,6 +37,7 @@ public:
         virtual short getLevel( ) const;
         virtual const Enumeration & getPosition( ) const;
         virtual const Flags & getOrder( ) const;
+        virtual const Flags & getCommandCategory( ) const;
 
         virtual bool matchesAlias( const DLString & ) const;
         virtual bool matchesExactly( const DLString & ) const;
@@ -54,6 +55,7 @@ protected:
         XML_VARIABLE XMLFlagsNoEmpty order; 
         XML_VARIABLE XMLStringNoEmpty hint;
         XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
+        XML_VARIABLE XMLFlags cat;
 };
 
 
@@ -76,6 +78,10 @@ inline short DefaultCommand::getLog( ) const
 inline const Enumeration & DefaultCommand::getPosition( ) const
 {
     return position;
+}
+inline const Flags & DefaultCommand::getCommandCategory( ) const
+{
+    return cat;
 }
 inline const Flags & DefaultCommand::getOrder( ) const
 {

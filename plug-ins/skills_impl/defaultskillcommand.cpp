@@ -4,10 +4,11 @@
  */
 #include "skill.h"
 #include "defaultskillcommand.h"
+#include "commandflags.h"
 #include "commandmanager.h"
+#include "def.h"
 
 DefaultSkillCommand::DefaultSkillCommand( )
-                        : interp( true )
 {
 }
 
@@ -15,13 +16,13 @@ void DefaultSkillCommand::setSkill( SkillPointer skill )
 {
     this->skill = skill;
 
-    if (interp)
+    if (!extra.isSet(CMD_NO_INTERPRET))
         commandManager->registrate( Pointer( this ) );
 }
 
 void DefaultSkillCommand::unsetSkill( )
 {
-    if (interp)
+    if (!extra.isSet(CMD_NO_INTERPRET))
         commandManager->unregistrate( Pointer( this ) );
 
     skill.clear( );

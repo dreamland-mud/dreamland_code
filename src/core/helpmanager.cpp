@@ -4,6 +4,7 @@
  */
 #include "helpmanager.h"
 #include "character.h"
+#include "logstream.h"
 
 template class XMLStub<HelpArticle>;
 
@@ -11,6 +12,9 @@ const DLString HelpArticle::ATTRIBUTE_KEYWORD = "keyword";
 const DLString HelpArticle::ATTRIBUTE_LEVEL = "level";
 const DLString HelpArticle::ATTRIBUTE_REF = "ref";
 const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
+const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
+
+long lastID = 0;
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
@@ -43,6 +47,22 @@ void HelpArticle::setLevel( int level )
     this->level = level;
 }
 
+void HelpArticle::setID(int id) 
+{
+    this->id = id;
+}
+
+int HelpArticle::getID() const
+{
+    return id;
+}
+
+DLString HelpArticle::getTitle(const DLString &label) const 
+{
+    return getKeyword();
+}
+
+
 void HelpArticle::setText( const DLString &text )
 {
     assign( text );
@@ -65,6 +85,24 @@ void HelpArticle::setKeywordAttribute(const DLString &keyword)
 {
     this->keyword = keyword;
     addKeyword( keyword );
+}
+
+const StringSet & HelpArticle::getLabels() const
+{
+    return labels;
+}
+
+void HelpArticle::addLabel(const DLString &label) 
+{
+    labels.insert(label);
+}
+
+void HelpArticle::setLabelAttribute(const DLString &attribute)
+{
+    this->labelAttribute = attribute;
+    StringSet newLabels;
+    newLabels.fromString(labelAttribute);
+    labels.insert(newLabels.begin(), newLabels.end());
 }
 
 bool HelpArticle::visible( Character *ch ) const
@@ -92,6 +130,9 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!refby.empty( ))
         parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
+    if (!labelAttribute.empty())
+        parent->insertAttribute(ATTRIBUTE_LABELS, labelAttribute);
+
     return true;
 }
 
@@ -110,7 +151,8 @@ void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadT
 
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
-
+    labelAttribute = parent->getAttribute(ATTRIBUTE_LABELS);
+    labels.fromString(labelAttribute);
 }
 
 /*-----------------------------------------------------------------------
@@ -133,11 +175,14 @@ HelpManager::~HelpManager( )
 void HelpManager::registrate( HelpArticle::Pointer art )
 {
     articles.push_back( art );
+    art->setID(++lastID);
+    LogStream::sendNotice() << art->getID() << ":" << art->getKeyword() << endl;
 }
 
 void HelpManager::unregistrate( HelpArticle::Pointer art )
 {
     articles.remove( art );
+    art->setID(-1);
 }
 
 

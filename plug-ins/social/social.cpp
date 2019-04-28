@@ -43,6 +43,13 @@ SocialHelp::~SocialHelp()
 {
 }
 
+DLString SocialHelp::getTitle(const DLString &label) const
+{
+    if (social)
+        return social->getName() + ", " + social->getRussianName();
+    return HelpArticle::getTitle(label);
+}
+
 static const RussianString & object_name()
 {
     static RussianString obj("кинжал||а|у||ом|е");
@@ -161,6 +168,7 @@ void Social::loaded()
     help = SocialHelp::Pointer(NEW, Pointer(this));
     help->addKeyword(getName());
     help->addKeyword(getRussianName());
+    help->addLabel("social");
     
     helpManager->registrate(help);
 }
