@@ -94,14 +94,14 @@ OLCStateRoom::changed( PCharacter *ch )
 /*-------------------------------------------------------------------------
  * state level commands
  *-------------------------------------------------------------------------*/
-REDIT(flag)
+REDIT(flags, "флаги", "установить или сбросить флаги комнаты (? room_flags)")
 {
     Room *pRoom;
     EDIT_ROOM(ch, pRoom);
     return flagBitsEdit(room_flags, pRoom->room_flags);
 }
 
-REDIT(sector)
+REDIT(sector, "местность", "установить тип местности (? sector_table)")
 {
     Room *pRoom;
     EDIT_ROOM(ch, pRoom);
@@ -115,7 +115,7 @@ REDIT(sector)
     return false;
 }
 
-REDIT(rlist)
+REDIT(rlist, "ксписок", "список всех комнат в данной арии")
 {
     Room *pRoomIndex;
     AREA_DATA *pArea;
@@ -150,7 +150,7 @@ REDIT(rlist)
     return false;
 }
 
-REDIT(mlist)
+REDIT(mlist, "мсписок", "список всех мобов в данной арии, по имени или all")
 {
     MOB_INDEX_DATA *pMobIndex;
     AREA_DATA *pArea;
@@ -194,7 +194,7 @@ REDIT(mlist)
     return false;
 }
 
-REDIT(olist)
+REDIT(olist, "псписок", "список всех предметов в данной арии, по имени, типу или all")
 {
     OBJ_INDEX_DATA *pObjIndex;
     AREA_DATA *pArea;
@@ -257,15 +257,15 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
     ptc(ch, "Sector:     [{W%s{x] {D(? sector_table){x ",
               sector_table.name(pRoom->sector_type).c_str());
-    ptc(ch, "Liquid: [{W%s{x] {D(? liquids){x\n\r", pRoom->liquid->getName( ).c_str( ));
+    ptc(ch, "Liquid: [{W%s{x] {D(? liquid){x\n\r", pRoom->liquid->getName( ).c_str( ));
         
-    ptc(ch, "Room flags: [{W%s{x] {D(? room_flags){x\n\r",
+    ptc(ch, "Flags:      [{W%s{x] {D(? room_flags){x\n\r",
               room_flags.names(pRoom->room_flags).c_str());
-    ptc(ch, "Health recovery:[{W%d{x]\n\rMana recovery  :[{W%d{x]\n\r",
+    ptc(ch, "Health:     [{W%d{x]%%\n\rMana:       [{W%d{x]%%\n\r",
               pRoom->heal_rate_default, pRoom->mana_rate_default);
     
     if (!pRoom->properties.empty( )) {
-        ptc(ch, "Properties:\n\r");
+        ptc(ch, "Properties: {D(property){x\n\r");
         for (Properties::const_iterator p = pRoom->properties.begin( ); p != pRoom->properties.end( ); p++)
             ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
@@ -273,17 +273,17 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     if (pRoom->extra_descr) {
         EXTRA_DESCR_DATA *ed;
 
-        stc("Desc Kwds:  {W", ch);
+        stc("Extra desc: ", ch);
         for (ed = pRoom->extra_descr; ed; ed = ed->next) {
             ptc(ch, "[%s] ", ed->keyword);
         }
-        stc("{x\n\r", ch);
+        stc("{D(ed help){x\n\r", ch);
     }
 
     if (pRoom->extra_exit) {
         EXTRA_EXIT_DATA *eed;
 
-        stc("Extra exits: {W", ch);
+        stc("Extra exits: {D(eexit help){x\r\n            ", ch);
         for(eed = pRoom->extra_exit; eed; eed = eed->next) {
             ptc(ch, "[%s] ", eed->keyword);
         }
@@ -315,29 +315,32 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     else
         stc("none{x]\n\r", ch);
 
+    stc("Exits:      {D(north help){x\r\n", ch);
+
     for (door = 0; door < DIR_SOMEWHERE; door++) {
         EXIT_DATA *pexit;
 
         if ((pexit = pRoom->exit[door])) {
-            ptc(ch, "-{G%-5s{x -> [{W%7u{x]:\n\r",
+            ptc(ch, "-{G%-5s{x ->   [{W%5u{x] %s\n\r",
                       DLString(dirs[door].name).capitalize( ).c_str( ),
-                      pexit->u1.to_room ? pexit->u1.to_room->vnum : 0);
+                      pexit->u1.to_room ? pexit->u1.to_room->vnum : 0,
+                      pexit->u1.to_room ? pexit->u1.to_room->name : "");
 
             if(pexit->key > 0)
-                ptc(ch, "        Key: [{W%7u{x]\n\r", pexit->key);
+                ptc(ch, "            Key: [{W%7u{x]\n\r", pexit->key);
             
-            ptc(ch, "        Exit flags: [{W%s{x] {D(? exit_flags){x\n\r",
+            ptc(ch, "            Exit flags:    [{W%s{x] {D(? exit_flags){x\n\r",
                       exit_flags.names(pexit->exit_info).c_str());
 
-            ptc(ch, "        Default exit flags: [{W%s{x]\n\r", 
+            ptc(ch, "            Default flags: [{W%s{x]\n\r", 
                       exit_flags.names(pexit->exit_info_default).c_str());
 
             if (pexit->keyword && pexit->keyword[0] != '\0') {
-                ptc(ch, "        Kwds: [{W%s{x]\n\r", pexit->keyword);
+                ptc(ch, "            Keywords:      [{W%s{x]\n\r", pexit->keyword);
             }
 
             if (pexit->short_descr && pexit->short_descr[0] != '\0') {
-                ptc(ch, "  Short desc: [{W%s{x]\n\r", pexit->short_descr);
+                ptc(ch, "            Short desc:    [{W%s{x]\n\r", pexit->short_descr);
             }
 
             if (pexit->description && pexit->description[0] != '\0') {
@@ -350,7 +353,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
         try {
             std::basic_ostringstream<char> ostr;
             pRoom->behavior.toStream( ostr );
-            ptc(ch, "Behavior:\r\n%s\r\n", ostr.str( ).c_str( ));
+            ptc(ch, "Behavior:\r\n{W%s{x\r\n", ostr.str( ).c_str( ));
             
         } catch (const ExceptionXMLError &e) {
             ptc(ch, "Behavior is BUGGY.\r\n");
@@ -360,7 +363,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     show_fenia_triggers(ch, pRoom->wrapper);
 }
 
-REDIT(show)
+REDIT(show, "показать", "показать все поля")
 {
     Room *pRoom;
     EDIT_ROOM(ch, pRoom);
@@ -420,8 +423,18 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
         return false;
     }
 
-    if (command[0] == '?') {
-//        do_help(ch, "EXIT");
+    if (arg_is_help(command)) {
+        const char *name = dirs[door].name;
+        ptc(ch, "Syntax:\r\n%s delete         - удалить выход с обеих сторон\r\n", name);
+        ptc(ch, "%s unlink         - удалить выход только с этой стороны\r\n", name);
+        ptc(ch, "%s link <vnum>    - создать двусторонний выход в указанную комнату\r\n", name);
+        ptc(ch, "%s room <vnum>    - создать односторонний выход в указанную комнату\r\n", name);
+        ptc(ch, "%s dig <vnum>     - вырыть новую комнату %s, с внумом vnum\r\n", name, dirs[door].leave);
+        ptc(ch, "%s dig next       - вырыть новую комнату %s, со следующим свободным внумом\r\n", name, dirs[door].leave);
+        ptc(ch, "%s key <vnum>     - установить ключ для двери\r\n", name);
+        ptc(ch, "%s name <string>  - задать ключевые слова для двери\r\n", name);        
+        ptc(ch, "%s short <string> - задать название для двери с падежами\r\n", name);        
+        ptc(ch, "%s desc           - войти в редактор описания того, что видно по look <dir>\r\n", name);        
         return false;
     }
 
@@ -637,7 +650,7 @@ OLCStateRoom::change_exit(PCharacter * ch, char *argument, int door)
     return false;
 }
 
-REDIT(ed)
+REDIT(ed, "экстра", "редактор экстра-описаний (ed help)")
 {
     Room *pRoom;
 
@@ -661,7 +674,8 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
         value = atoi(argument);
 
     if (argument[0] == '\0' || value <= 0) {
-        stc("Syntax:  create [vnum > 0]\n\r", ch);
+        stc("Syntax:  create <vnum>\n\r", ch);
+        stc("         create next\n\r", ch);
         return 0;
     }
 
@@ -703,7 +717,7 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
     return pRoom;
 }
 
-REDIT(create)
+REDIT(create, "создать", "создать комнату с указанным внумом или next")
 {
     Room *pRoom;
     
@@ -718,7 +732,7 @@ REDIT(create)
     return true;
 }
 
-REDIT(name)
+REDIT(name, "имя", "установить название комнаты")
 {
     Room *pRoom;
 
@@ -736,7 +750,7 @@ REDIT(name)
     return true;
 }
 
-REDIT(clan)
+REDIT(clan, "клан", "установить клановую принадлежность или clear")
 {
     Room *pRoom;
     Clan *clan;
@@ -767,7 +781,7 @@ REDIT(clan)
     return true;
 }
 
-REDIT(guild)
+REDIT(guilds, "гильдии", "установить гильдию для профессий или clear")
 {
     Room *pRoom;
     Profession *prof;
@@ -797,7 +811,7 @@ REDIT(guild)
     return true;
 }
 
-REDIT(waterliquid)
+REDIT(liquid, "жидкость", "установить жидкость для рек (? liquid)")
 {
     Room *pRoom;
     Liquid *liq;
@@ -805,7 +819,7 @@ REDIT(waterliquid)
     EDIT_ROOM(ch, pRoom);
 
     if (argument[0] == '\0') {
-        stc("Syntax:  waterliquid [name]\n\r", ch);
+        stc("Syntax:  liquid [name]\n\r", ch);
         return false;
     }
     
@@ -820,7 +834,7 @@ REDIT(waterliquid)
     return true;
 }
 
-REDIT(eexit)
+REDIT(eexit, "экстравыход", "редактор экстра-выходов (eexit help)")
 {
     Room *pRoom;
     EXTRA_EXIT_DATA *eed;
@@ -874,7 +888,7 @@ REDIT(eexit)
     return false;
 }
 
-REDIT(desc)
+REDIT(desc, "описание", "войти в редактор описания комнаты (desc help)")
 {
     Room *pRoom;
     char command[MAX_INPUT_LENGTH];
@@ -885,7 +899,7 @@ REDIT(desc)
     return editor(command, pRoom->description);
 }
 
-REDIT(heal)
+REDIT(heal, "здоровье", "установить скорость восстановления здоровья в комнате (100-400)")
 {
     Room *pRoom;
 
@@ -903,7 +917,7 @@ REDIT(heal)
     return false;
 }
 
-REDIT(mana)
+REDIT(mana, "мана", "установить скорость восстановления маны в комнате (100-400)")
 {
     Room *pRoom;
 
@@ -921,7 +935,7 @@ REDIT(mana)
     return false;
 }
 
-REDIT(property)
+REDIT(property, "свойства", "редактор свойств комнаты")
 {
     Room *pRoom;
 
@@ -933,7 +947,7 @@ REDIT(property)
 static bool redit_purge_obj(PCharacter *ch, Object *obj) 
 {
     if (!OLCState::can_edit(ch, obj->pIndexData->vnum)) {
-        ptc(ch, "У тебя недостаточно прав для редактирования %s.\n\r", obj->getShortDescr('2').c_str());
+        ptc(ch, "У тебя недостаточно прав для уничтожения %s.\n\r", obj->getShortDescr('2').c_str());
         return false;
     }
     
@@ -952,7 +966,7 @@ static bool redit_purge_mob(PCharacter *ch, Character *vch)
     
     mob = vch->getNPC();
     if (!OLCState::can_edit(ch, mob->pIndexData->vnum)) {
-        ptc(ch, "У тебя недостаточно прав для редактирования %s.\n\r", mob->getNameP('2').c_str());
+        ptc(ch, "У тебя недостаточно прав для уничтожения %s.\n\r", mob->getNameP('2').c_str());
         return false;
     }
 
@@ -970,7 +984,7 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
     Object *obj;
 
     one_argument(argument, arg);
-    if (!arg[0]) {
+    if (!arg[0] || arg_is_help(arg)) {
         stc("Syntax: \n\rpurge all - destroy all objects and mobiles in the room\n\r"
             "purge mobs - destroy all mobiles in the room\n\r"
             "purge objs - destroy all objects in the room\n\r"
@@ -1019,27 +1033,29 @@ static bool redit_purge(Room *pRoom, PCharacter *ch, char *argument)
     return true;
 }
 
-REDIT(commands)
+REDIT(purge, "уничтожить", "очистить комнату, уничтожив сущности (purge help)")
+{
+    Room *pRoom;
+
+    EDIT_ROOM(ch, pRoom);
+    redit_purge(pRoom, ch, argument);
+    return false;
+}
+
+REDIT(commands, "команды", "показать список встроенных команд redit")
 {
     do_commands(ch);
     return false;
 }
 
-REDIT(done)
+REDIT(done, "готово", "выйти из редактора (не забывайте про asave changed)")
 {
     commit();
     detach(ch);
     return true;
 }
 
-REDIT(cancel)
-{
-    stc("Rollback not supported by room editor\n\r", ch);
-    detach(ch);
-    return false;
-}
-
-REDIT(behavior)
+REDIT(behavior, "поведение", "войти в редактор поведения или clear (behavior help)")
 {
     Room *pRoom;
 
@@ -1084,42 +1100,42 @@ REDIT(behavior)
 /*-------------------------------------------------------------------------
  * movements. last declared - first priority
  *-------------------------------------------------------------------------*/
-REDIT(north)
+REDIT(north, "север", "редактор дверей (north help)")
 {
     if (change_exit(ch, argument, DIR_NORTH))
         return true;
     return false;
 }
 
-REDIT(south)
+REDIT(south, "юг", "редактор дверей")
 {
     if (change_exit(ch, argument, DIR_SOUTH))
         return true;
     return false;
 }
 
-REDIT(east)
+REDIT(east, "восток", "редактор дверей")
 {
     if (change_exit(ch, argument, DIR_EAST))
         return true;
     return false;
 }
 
-REDIT(west)
+REDIT(west, "запад", "редактор дверей")
 {
     if (change_exit(ch, argument, DIR_WEST))
         return true;
     return false;
 }
 
-REDIT(up)
+REDIT(up, "вверх", "редактор дверей")
 {
     if (change_exit(ch, argument, DIR_UP))
         return true;
     return false;
 }
 
-REDIT(down)
+REDIT(down, "вниз", "редактор дверей")
 {
     if (change_exit(ch, argument, DIR_DOWN))
         return true;
@@ -1158,6 +1174,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
         
     } else if (!str_cmp(arg1, "reset")) {
+// TODO call single method from inside and outside of redit. But conflicts with "reset" command
         if (!OLCState::can_edit(ch, pRoom->vnum)) {
             stc("У тебя недостаточно прав для редактирования комнат.\n\r", ch);
             return;
@@ -1168,6 +1185,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
         
     } else if (!str_cmp(arg1, "goto")) {
+// TODO call single method from inside and outside of redit
         if (!is_number(argument)) {
             stc("Syntax: redit goto <vnum>\n\r", ch);
             return;
@@ -1199,8 +1217,10 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
 
     } else if (!str_cmp(arg1, "create")) {
+// TODO call single method from inside and outside of redit
         if (argument[0] == '\0') {
-            stc("Syntax:  edit room create (<vnum> | next)\n\r", ch);
+            stc("Syntax: redit create <vnum>\n\r", ch);
+            stc("        redit create next\n\r", ch);
             return;
         }
 
@@ -1220,12 +1240,12 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     } else if(!*arg1) {
         /*nothing*/
     } else {
-        stc("Usage: edit room show [vnum]\r\n", ch);
-        stc("       edit room reset\r\n", ch);
-        stc("       edit room purge mobs|objs|all\r\n", ch);
-        stc("       edit room create next|<vnum>\r\n", ch);
-        stc("       edit room [vnum]\r\n", ch);
-        stc("       edit room goto <vnum>\r\n", ch);
+        stc("Usage: redit show [vnum]\r\n", ch);
+        stc("       redit reset\r\n", ch);
+        stc("       redit purge mobs|objs|all\r\n", ch);
+        stc("       redit create next|<vnum>\r\n", ch);
+        stc("       redit [vnum]\r\n", ch);
+        stc("       redit goto <vnum>\r\n", ch);
         return;
     }
     
