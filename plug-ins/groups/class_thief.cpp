@@ -536,7 +536,7 @@ SKILL_RUNP( steal )
 
         if (ch->isCoder())
             percent = 1;
-        if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+        if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
             ch->send_to(ostr);
@@ -1040,7 +1040,7 @@ SKILL_RUNP( backstab )
     BackstabOneHit bs( ch, victim );
     bool fBonus = false;
 
-    if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+    if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
         ch->send_to(ostr);
@@ -1152,7 +1152,7 @@ SKILL_RUNP( circle )
     CircleOneHit circ( ch, victim );
     bool fBonus = false;
 
-    if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+    if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
         ostringstream ostr;
         bonus_thief_skills->reportAction(ch->getPC(), ostr);
         ch->send_to(ostr);
@@ -1261,7 +1261,7 @@ SKILL_RUNP( blackjack )
 
         bool fBonus = false;
 
-        if (bonus_thief_skills->isActive(ch->getPC(), time_info)) {
+        if (!ch->is_npc() && bonus_thief_skills->isActive(ch->getPC(), time_info)) {
             ostringstream ostr;
             bonus_thief_skills->reportAction(ch->getPC(), ostr);
             ch->send_to(ostr);
