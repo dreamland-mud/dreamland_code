@@ -32,6 +32,8 @@
 using namespace std;
 using namespace Scripting;
 
+DLString regfmt(Character *to, const RegisterList &argv);
+
 NMI_INIT(RoomWrapper, "комната")
 
 RoomWrapper::RoomWrapper( ) : target( NULL )
@@ -424,6 +426,13 @@ NMI_INVOKE(RoomWrapper, isCommon, "(): true если комната доступ
 {
     checkTarget( );
     return Register( target->isCommon( ) );
+}
+
+NMI_INVOKE( RoomWrapper, echo, "(fmt, args): выводит отформатированную строку всем неспящим в комнате" )
+{
+    checkTarget( );
+    target->echo( POS_RESTING, regfmt( NULL, args ).c_str( ) );
+    return Register( );
 }
 
 NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg для всех в этой арии" )
