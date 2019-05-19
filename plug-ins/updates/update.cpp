@@ -386,7 +386,7 @@ void char_update( )
                 if (IS_SET(ch->act, ACT_UNDEAD))
                     act("$c1 развалил$gось|ся|ась на куски.", ch, 0, 0, TO_ROOM);
                 else
-                    act("$c1 уме$gрло|р|рла.", ch, 0, 0, TO_ROOM);
+                    act("$c1 исчезает.", ch, 0, 0, TO_ROOM);
                 extract_char( ch );
                 continue;
             }
