@@ -32,6 +32,8 @@ NMI_INVOKE( RegList, random, "(): возвращает случайный эле
 
 NMI_INVOKE( RegList, front , "(): возвращает первый элемент списка")
 {
+    if (size() == 0)
+        return Register();
     return front();
 }
 
@@ -48,6 +50,8 @@ NMI_INVOKE( RegList, pop_front, "(): удаляет первый элемент 
 
 NMI_INVOKE( RegList, back , "(): возвращает последний элемент списка")
 {
+    if (size() == 0)
+        return Register();
     return back();
 }
 
@@ -193,4 +197,31 @@ NMI_INVOKE( RegList, api, "(): печатает этот api")
     
     traitsAPI<RegList>( buf );
     return Register( buf.str( ) );
+}
+
+NMI_INVOKE( RegList, filter, "(func[,args]): возвращает новый список из элементов, для которых функция func вернула true")
+{
+    RegisterList::const_iterator ai = args.begin();
+    if(ai == args.end())
+        throw Scripting::NotEnoughArgumentsException( );
+
+    Register rfun = *ai++;
+    Closure *fun = rfun.toFunction( );
+    
+    RegisterList av;
+    av.assign(ai, args.end( ));
+    
+    RegList::Pointer rc( NEW );
+
+    for(iterator i = begin(); i != end(); i++) {
+        Register reg = fun->invoke(*i, av);
+
+        if (reg.type == Register::NUMBER && reg.toNumber() != 0)
+            rc->push_back( reg );
+    }
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(rc); 
+
+    return Register( obj );
 }
