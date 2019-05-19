@@ -85,6 +85,7 @@ AC_CREATE_DIR(var/misc/ideas)
 AC_CREATE_DIR(var/misc/nohelp)
 AC_CREATE_DIR(var/misc/discord)
 AC_CREATE_DIR(var/misc/api)
+AC_CREATE_DIR(var/misc/help)
 
 AC_CREATE_DIR(var/db/fenia)
 AC_CREATE_DIR(var/db/clan-data)
