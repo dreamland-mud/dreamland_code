@@ -174,7 +174,8 @@ void Movement::callProgs( Character *wch )
                 oprog_greet( obj, wch );
 
         /* greet programs for people */
-        mprog_greet( fch, wch );
+	if (IS_AWAKE(fch))
+            mprog_greet( fch, wch );
     }
 
     /* entry programs for items */
