@@ -970,6 +970,18 @@ NMI_INVOKE( CharacterWrapper, say, "(format, args...): произносит вс
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, psay, "(ch, format, args...): произносит вслух реплику, отформатированную как в методе act и видимую только для ch" )
+{
+    checkTarget( );
+    RegisterList myArgs(args);
+    Character *ch= args2character(args);
+    myArgs.pop_front();
+
+    DLString msg = regfmt(target, myArgs).c_str();
+    ch->pecho("%^C1 произносит '{g%s{x'", target, msg.c_str());
+    return Register();
+}
+
 NMI_INVOKE( CharacterWrapper, get_char_world, "(name): видимый для нас чар с именем name в мире" )
 {
     checkTarget( );

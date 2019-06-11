@@ -192,9 +192,11 @@ static void rprog_speech( Room *room, Character *ch, const char *msg )
 
 static bool mprog_speech( Character *rch, Character *talker, const char *msg )
 {
-    FENIA_CALL( rch, "Speech", "Cs", talker, msg );
-    FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
-    BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
+    if (IS_AWAKE(rch)) {
+        FENIA_CALL( rch, "Speech", "Cs", talker, msg );
+	FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
+	BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
+    }
     return false;
 }
 

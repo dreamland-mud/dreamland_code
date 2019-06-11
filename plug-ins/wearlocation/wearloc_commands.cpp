@@ -5,6 +5,11 @@
 #include "wearloc_utils.h"
 #include "commandtemplate.h"
 
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
+
+#include "behavior_utils.h"
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -19,6 +24,21 @@
 
 WEARLOC(hair);
 WEARLOC(tail);
+
+static bool oprog_can_dress(Object *obj, Character *ch, Character *victim)
+{
+    FENIA_CALL( obj, "CanDress", "CC", ch, victim )
+    FENIA_NDX_CALL( obj, "CanDress", "OCC", obj, ch, victim )
+    BEHAVIOR_CALL(obj, canDress, ch, victim)
+    return false;
+}
+
+static void oprog_dress(Object *obj, Character *ch, Character *victim)
+{
+    FENIA_VOID_CALL( obj, "Dress", "CC", ch, victim )
+    FENIA_NDX_VOID_CALL( obj, "Dress", "OCC", obj, ch, victim )
+}
+
 
 /*
  * 'wear' command
@@ -111,7 +131,7 @@ CMDRUNP( wear )
         return;
     }
     
-    if (!obj->behavior || !obj->behavior->canDress( ch, victim )) {
+    if (!oprog_can_dress(obj, ch, victim)) {
         act("Ты не сможешь надеть $o4 на $C4.", ch, obj, victim, TO_CHAR);
         return;
     }
@@ -133,6 +153,7 @@ CMDRUNP( wear )
     act("Ты надеваешь $o4 на $C4.", ch, obj, victim, TO_CHAR);
     act("$c1 надевает на тебя $o4.", ch, obj, victim, TO_VICT);
     act("$c1 надевает на $C4 $o4.", ch, obj, victim, TO_NOTVICT);
+    oprog_dress(obj, ch, victim);	
 }
 
 

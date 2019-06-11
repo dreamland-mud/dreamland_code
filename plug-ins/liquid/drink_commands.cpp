@@ -117,6 +117,13 @@ CMDRUN( fill )
 /*
  * 'pour' command
  */
+static bool oprog_empty( Object *obj, Character *ch, const char *liqname, int amount )
+{
+    FENIA_CALL( obj, "Empty", "Csi", ch, liqname, amount );
+    FENIA_NDX_CALL( obj, "Empty", "OCsi", obj, ch, liqname, amount );
+    return false;
+}
+
 void CPour::createPool( Character *ch, Object *out, int amount ) 
 {
     Object *pool;
@@ -168,7 +175,6 @@ void CPour::createPool( Character *ch, Object *out, int amount )
 void CPour::pourOut( Character *ch, Object * out )
 {
     int amount;
-    DLString liqShort;
     Room *room = ch->in_room;
 
     if (out->value[1] == 0) {
@@ -180,8 +186,13 @@ void CPour::pourOut( Character *ch, Object * out )
     amount = out->value[1];
     out->value[1] = 0;
     out->value[3] = 0;
-    
-    liqShort = liquidManager->find( out->value[2] )->getShortDescr( );
+   
+    Liquid *liq =  liquidManager->find( out->value[2] );
+    const char *liqname = liq->getName( ).c_str( );
+    DLString liqShort = liq->getShortDescr( );
+
+    if (oprog_empty(out, ch, liqname, amount))
+	return;
 
     if (IS_WATER( room )) {
         ch->pecho( "Ты переворачиваешь %O4, выливая %N4 в %N4.", out, liqShort.c_str( ), room->liquid->getShortDescr( ).c_str( ) );

@@ -423,6 +423,14 @@ NMI_INVOKE( Root, eval , "(expr): выполнить феневое выраже
     return cs.eval(Register( ));
 }
 
+NMI_INVOKE(Root, create_money, "(gold, silver): создает объект-деньги указанной стоимости")
+{
+    int gold = argnum2number(args, 1);
+    int silver = argnum2number(args, 2);	
+    return wrap(
+		create_money(gold, silver));
+}
+
 inline bool 
 delim(char c)
 {

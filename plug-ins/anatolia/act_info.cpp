@@ -1637,7 +1637,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         ch->pecho("Тренировки %d.", pch->train);
         return;
     } 
-	if (str_prefix("quest", arg.c_str()) || str_prefix("квест", arg.c_str())) {
+	if (!str_prefix("quest", arg.c_str()) || !str_prefix("квест", arg.c_str())) {
         ch->pecho("Используй команды 'квест время' и 'квест очки'.");
         return;
     } 

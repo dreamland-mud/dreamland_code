@@ -237,7 +237,7 @@ SKILL_RUNP( dig )
     chance = gsn_digging->getEffective( ch );
 
     if (chance < 2) {
-        ch->send_to("Ты не умеешь копать!\r\n");
+	ch->println("Для того, чтобы копать, найди и используй лопату.");
         return;
     }
 
