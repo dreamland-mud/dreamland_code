@@ -1,3 +1,5 @@
+*.ipch
+*.bin
 *.in
 !/admin/*.in
 *.diff
