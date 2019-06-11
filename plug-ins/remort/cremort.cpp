@@ -103,9 +103,9 @@ CMDRUN( remort )
     new_ch->act = PLR_COLOR;
 
     if (pch->getClan( ) != clan_flowers) {
-        new_ch->questpoints = pch->questpoints +
+        new_ch->setQuestPoints(pch->getQuestPoints() +
                               pch->practice * CONVERT_PRACTICE_QP +
-                              pch->train * CONVERT_PRACTICE_QP * 10;
+                              pch->train * CONVERT_PRACTICE_QP * 10);
         new_ch->bank_s = pch->bank_s;
         new_ch->bank_g = pch->bank_g;
     }

@@ -86,7 +86,17 @@ int PCharacterMemory::getSecurity( ) const throw( )
 
 void PCharacterMemory::setSecurity( int security ) throw( )
 {
-        this->security = security;;
+        this->security = security;
+}
+
+int PCharacterMemory::getQuestPoints( ) const throw( )
+{
+        return questpoints;
+}
+
+void PCharacterMemory::setQuestPoints( int questpoints ) throw( )
+{
+        this->questpoints = questpoints;
 }
 
 ClanReference &PCharacterMemory::getPetition( ) throw( )

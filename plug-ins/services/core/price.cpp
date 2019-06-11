@@ -157,19 +157,19 @@ bool QuestPointPrice::canAfford( Character *ch ) const
     if (ch->is_npc( ))
         return false;
     else
-        return ch->getPC( )->questpoints >= questpoint.getValue( );
+        return ch->getPC( )->getQuestPoints() >= questpoint.getValue( );
 }
 
 void QuestPointPrice::induct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-        ch->getPC( )->questpoints += questpoint.getValue( );
+        ch->getPC( )->addQuestPoints(questpoint);
 }
 
 void QuestPointPrice::deduct( Character *ch ) const
 {
     if (!ch->is_npc( ))
-        ch->getPC( )->questpoints -= questpoint.getValue( );
+        ch->getPC( )->addQuestPoints(-questpoint);
 }
 
 void QuestPointPrice::toStream( Character *ch, ostringstream &buf ) const

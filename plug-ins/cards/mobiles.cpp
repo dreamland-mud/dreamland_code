@@ -77,7 +77,7 @@ void CardSellerBehavior::speech( Character *victim, const char *speech )
     if (!hello.match( speech )) 
         return;
     
-    if (victim->getPC( )->questpoints < 50) {
+    if (victim->getPC( )->getQuestPoints() < 50) {
         act("$c1 ухмыляется.", ch, 0, 0, TO_ROOM);
         act("$c1 произносит '{gУ тебя недостаточно дурной славы (qp), чтобы пользоваться моими картами.{x'", ch, 0, victim, TO_ROOM);
         return;
@@ -94,7 +94,7 @@ void CardSellerBehavior::speech( Character *victim, const char *speech )
     pack->behavior.setPointer( *bhv );
     obj_to_char( pack, victim );
 
-    victim->getPC( )->questpoints -= 50;
+    victim->getPC( )->addQuestPoints(-50);
 
     act("$c1 вручает тебе $o4.", ch, pack, victim, TO_VICT);
     act("$c1 вручает $C3 $o4.", ch, pack, victim, TO_NOTVICT);

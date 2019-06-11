@@ -156,7 +156,7 @@ void UniclassAdept::speech( Character *vict, const char * speech )
     if (victim->getSubProfession( ) == prof_none)
         cost = 0;
 
-    if (victim->questpoints < cost) {
+    if (victim->getQuestPoints() < cost) {
         act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
         return;
     }
@@ -175,7 +175,7 @@ void UniclassAdept::speech( Character *vict, const char * speech )
 
     attr->lastTime = dreamland->getCurrentTime( );
     attr->history[className]++;
-    victim->questpoints -= cost;
+    victim->addQuestPoints(-cost);
     victim->setSubProfession( prof->getName( ) );
     victim->updateSkills( );
     victim->save( );
@@ -252,14 +252,14 @@ void DwarkinAdept::speech( Character *victim, const char * speech )
         return;
     }
 
-    if (pch->questpoints < cost) {
+    if (pch->getQuestPoints() < cost) {
         act( "$c1 произносит '{gИзвини, $C1, но у тебя не хватает квестовых единиц.{x'", ch, 0, victim, TO_ALL );
         return;
     }
     
     attr = pch->getAttributes( ).getAttr<XMLAttributeEnlight>( "enlight" );
     attr->age = age;
-    pch->questpoints -= cost;
+    pch->addQuestPoints(-cost);
     pch->save( );
 
     act( "$c1 дотрагивается до твоего лба.", ch, 0, victim, TO_VICT );

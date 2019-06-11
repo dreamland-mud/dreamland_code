@@ -1403,7 +1403,7 @@ static bool has_nopost(Character *ch)
     if (pc)
         buf << "Bank Gold: " << pc->bank_g << "  "
             << "Bank Silver: " << pc->bank_s << "  "
-            << "QuestPoints: " << pc->questpoints 
+            << "QuestPoints: " << pc->getQuestPoints() 
             << endl
             << "Exp: " << pc->exp << "  "
             << "Exp to level: " << pc->getExpToLevel( ) << "  "

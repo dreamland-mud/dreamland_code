@@ -593,12 +593,12 @@ bool SamuraiGuildmaster::checkPrice( Character *victim, int qp )
     if (victim->is_npc( ))
         return false;
     
-    if (victim->getPC( )->questpoints < qp) {
+    if (victim->getPC( )->getQuestPoints() < qp) {
         say_act( victim, ch, "У тебя еще недостаточно славы для этого." );
         return false;
     }
 
-    victim->getPC( )->questpoints -= qp;
+    victim->getPC( )->addQuestPoints(-qp);
     return true;
 }
 

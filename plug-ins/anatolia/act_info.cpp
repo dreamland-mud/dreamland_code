@@ -479,7 +479,7 @@ CMDRUNP( oscore )
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
         buf << fmt( 0, "У тебя %1$d квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
-                       pch->questpoints.getValue( ) );
+                       pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
         else
@@ -1815,7 +1815,7 @@ CMDRUNP( score )
             ch->perm_stat[STAT_DEX], ch->getCurrStat(STAT_DEX), pch->getMaxStat(STAT_DEX),
             CLR_BAR,
             CLR_CAPT,
-            pch->questpoints.getValue( ),
+            pch->getQuestPoints(),
             CLR_FRAME,
     
             CLR_CAPT,

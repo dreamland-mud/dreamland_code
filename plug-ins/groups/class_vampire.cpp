@@ -1077,12 +1077,12 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
         return true;
     }
     
-    if (pActor->questpoints < 50) {
+    if (pActor->getQuestPoints() < 50) {
         say_act( actor, ch, "Я потребую с тебя 50 qp, но я вижу, что ты не можешь заплатить такую цену." );
         return true;
     }
 
-    pActor->questpoints -= 50;
+    pActor->addQuestPoints(-50);
     data.learned = 100;
 
     act( "$C1 делится секретом бессмертия с $c5.", actor, 0, ch, TO_ROOM );

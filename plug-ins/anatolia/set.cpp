@@ -690,7 +690,7 @@ void chg_mob_questp( Character* ch, char* argument ) {
       value = atoi( argument );
 
       if( argument[0] == '-' || argument[0] == '+' ) {
-        adv_value = victim->getPC( )->questpoints + value;
+        adv_value = victim->getPC( )->addQuestPoints(value);
       } else {
         adv_value = value;
       }
@@ -699,7 +699,7 @@ void chg_mob_questp( Character* ch, char* argument ) {
         ch->send_to(buf);
         return;
       }
-      victim->getPC( )->questpoints = adv_value;
+      victim->getPC( )->setQuestPoints(adv_value);
       sprintf( buf, "%s %d.\n\r", "Текущее значение:",
                                   adv_value );
       ch->send_to(buf);

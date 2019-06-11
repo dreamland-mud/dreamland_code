@@ -48,7 +48,7 @@ void XMLAttributeGodReward::reward( PCharacter *ch )
     ch->send_to(buf);
 
     for (r = rewards.begin( ); r!= rewards.end( ); r++) {
-        ch->questpoints += r->qp;
+        ch->addQuestPoints(r->qp);
     }
 
     rewards.clear();

@@ -365,6 +365,7 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setLevel( getLevel( ) );
         mem->setTrust( getTrust( ) );
         mem->setSecurity( getSecurity( ) );
+        mem->setQuestPoints(getQuestPoints());
         mem->setClan( getClan( ) );
         mem->setPetition( getPetition( ) );
         mem->setProfession( getProfession( ) );
@@ -389,6 +390,7 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setLevel( pcm->getLevel( ) );
         setTrust( pcm->getTrust( ) );
         setSecurity( pcm->getSecurity( ) );
+        setQuestPoints(pcm->getQuestPoints());
         setClan( pcm->getClan( ) );
         setPetition( pcm->getPetition( ) );
         setProfession( pcm->getProfession( ) );
@@ -478,6 +480,19 @@ int PCharacter::getSecurity( ) const throw( )
 void PCharacter::setSecurity( int security ) throw( )
 {
     this->security = security;
+}
+int PCharacter::getQuestPoints( ) const throw( )
+{
+        return questpoints;
+}
+void PCharacter::setQuestPoints( int questpoints ) throw( )
+{
+        this->questpoints = questpoints;
+}
+int PCharacter::addQuestPoints(int delta)
+{
+    this->questpoints += delta;
+    return this->questpoints;
 }
 ClanReference &PCharacter::getPetition( ) throw( )
 {

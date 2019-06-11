@@ -497,10 +497,10 @@ bool CClan::clanBankDeposit( PCharacter *pc, Clan *acc_clan,
     switch (currency) {
     case CB_CURR_QP:
         if (!pc->is_immortal( )) {
-            if (pc->questpoints < amount)
+            if (pc->getQuestPoints() < amount)
                 return false;
 
-            pc->questpoints -= amount;
+            pc->addQuestPoints(-amount);
         }
 
         buf << "На банковский счет клана {" 
@@ -616,7 +616,7 @@ bool CClan::clanBankWithdraw( PCharacter *pc, PCharacter *victim,
                 << endl;
 
             if (!victim->is_immortal( ))
-                victim->questpoints += amount;
+                victim->addQuestPoints(amount);
         }
         else
         {
@@ -625,7 +625,7 @@ bool CClan::clanBankWithdraw( PCharacter *pc, PCharacter *victim,
                 << " со счета клана." << endl;
 
             if (!victim->is_immortal( ))
-                victim->questpoints += amount;
+                victim->addQuestPoints(amount);
         }
 
         return true;

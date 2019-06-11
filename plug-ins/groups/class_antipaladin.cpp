@@ -592,11 +592,11 @@ void AntipaladinGuildmaster::give( Character *victim, Object *obj )
              || IS_SET(obj->wear_flags, ITEM_NO_SAC)) {
         say_act( victim, ch, "Над этим клинком уже совершили защитный ритуал." );
     }
-    else if (victim->is_npc( ) || victim->getPC( )->questpoints < price) {
+    else if (victim->is_npc( ) || victim->getPC( )->getQuestPoints() < price) {
         say_act( victim, ch, "У тебя не хватит qp для оплаты ритуала." );
     }
     else {
-        victim->getPC( )->questpoints -= price;
+        victim->getPC( )->addQuestPoints(-price);
         SET_BIT(obj->extra_flags, ITEM_NOSAC|ITEM_NOPURGE);
         SET_BIT(obj->wear_flags, ITEM_NO_SAC);
         act("$c1 прикасается к лезвию клинка и произносит странное заклинание.", ch, 0, 0, TO_ROOM);

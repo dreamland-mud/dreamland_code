@@ -62,7 +62,7 @@ void XMLAttributeReward::reward( PCharacter *ch )
 
         c = r->qpoints;
         if (c > 0) {
-            ch->questpoints += c;
+            ch->addQuestPoints(c);
             sprintf( buf + strlen(buf), "%s%s%4d %sквестов%s\r\n",
                      offset, GQChannel::BOLD, c, GQChannel::NORMAL,
                      GET_COUNT(c, "ую единицу", "ые единицы", "ых единиц") );

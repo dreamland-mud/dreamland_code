@@ -240,7 +240,7 @@ void CQuest::doInfo( PCharacter *ch )
 void CQuest::doPoints( PCharacter *ch )  
 {
     char buf [MAX_STRING_LENGTH];
-    int points = ch->questpoints;
+    int points = ch->getQuestPoints();
 
     sprintf( buf, "У тебя {Y%d{x квестов%s единиц%s.\n\r", 
              points, GET_COUNT(points, "ая", "ых", "ых"), GET_COUNT(points, "а", "ы", ""));

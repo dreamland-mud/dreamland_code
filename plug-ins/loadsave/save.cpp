@@ -419,7 +419,7 @@ void fwrite_char( PCharacter *ch, FILE *fp )
                 ch->perm_hit.getValue( ),
                 ch->perm_mana.getValue( ),
                 ch->perm_move.getValue( ));
-        fprintf( fp, "QuestPnts %d\n", ch->questpoints.getValue( ) );
+        fprintf( fp, "QuestPnts %d\n", ch->getQuestPoints() );
         fprintf( fp ,"Haskilled %d\n",        ch->has_killed.getValue( )        );
         fprintf( fp ,"Antkilled %d\n",        ch->anti_killed.getValue( )        );
         fprintf( fp ,"MaxSkillPoints %d\n",        ch->max_skill_points.getValue( ) );
@@ -1120,8 +1120,11 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             }
             break;
         case 'Q':
-
-            KEY( "QuestPnts", ch->questpoints, fread_number( fp ) );
+            if (!str_cmp(word, "QuestPnts")) {
+                ch->setQuestPoints(fread_number(fp));
+                fMatch = true;
+                break;
+            }
             break;
 
         case 'R':

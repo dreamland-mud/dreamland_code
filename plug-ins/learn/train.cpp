@@ -174,7 +174,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
             return;
         }
 
-        if (costQP > client->questpoints) {
+        if (costQP > client->getQuestPoints()) {
             tell_raw( client, ch, "У тебя недостаточно квестовых единиц." );
             return;
         }
@@ -184,7 +184,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     }
     
     if (fQP)
-        client->questpoints -= costQP;
+        client->addQuestPoints(-costQP);
     else
         client->train -= cost;
 

@@ -71,6 +71,9 @@ public:
     virtual int getTrust( ) const throw( ) = 0;
     virtual void setTrust( int ) throw( ) = 0;
 
+    virtual int getQuestPoints( ) const throw( ) = 0;
+    virtual void setQuestPoints( int ) throw( ) = 0;
+
     virtual int getSecurity( ) const throw( ) = 0;
     virtual void setSecurity( int ) throw( ) = 0;
    

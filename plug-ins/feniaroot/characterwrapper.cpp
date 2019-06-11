@@ -370,6 +370,18 @@ NMI_SET( CharacterWrapper, spec_fun, "спец-процедура")
         target->getNPC()->spec_fun = spec;
 }
 
+NMI_GET(CharacterWrapper, questpoints, "qp")
+{
+    checkTarget();
+    CHK_NPC
+    return target->getPC()->getQuestPoints();
+}
+NMI_SET(CharacterWrapper, questpoints, "qp")
+{
+    checkTarget();
+    CHK_NPC
+    target->getPC()->setQuestPoints(arg.toNumber());
+}
 NMI_GET( CharacterWrapper, trust, "уровень привилегий" )
 {
     PCMemoryInterface *pci;
@@ -701,7 +713,6 @@ INT_FIELD(curse, "проклятье богов")
 INT_FIELD(bless, "благословение богов")
 INT_FIELD(bank_s, "серебра в банке")
 INT_FIELD(bank_g, "золота в банке")
-INT_FIELD(questpoints, "qp")
 INT_FIELD(config, "настройки чара (таблица .tables.config_flags)")
 INT_FIELD(shadow, "сколько висеть тени (shadowlife) в секундах")
 INT_FIELD(start_room, "в какой комнате вошли в мир")

@@ -78,6 +78,9 @@ public:
     virtual int getTrust( ) const throw( );
     virtual void setTrust( int trust ) throw( );
 
+    virtual int getQuestPoints( ) const throw( );
+    virtual void setQuestPoints( int ) throw( );
+
     virtual int getSecurity( ) const throw( );
     virtual void setSecurity( int ) throw( );
 
@@ -122,6 +125,7 @@ private:
     XML_VARIABLE XMLRaceReference race;
     XML_VARIABLE Remorts remorts;
     XML_VARIABLE XMLInteger trust;
+    XML_VARIABLE XMLInteger questpoints;
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLRussianString russianName;
 };

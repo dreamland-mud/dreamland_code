@@ -160,6 +160,10 @@ public:
     virtual int getSecurity( ) const throw( );
     virtual void setSecurity( int ) throw( );
 
+    virtual int getQuestPoints( ) const throw( );
+    virtual void setQuestPoints( int ) throw( );
+    int addQuestPoints(int);
+
     virtual short getSex( ) const throw( );
 
     virtual XMLAttributes& getAttributes( ) throw( );
@@ -260,7 +264,8 @@ private:
     XML_VARIABLE PCBonuses bonuses;
     XML_VARIABLE XMLInteger security;
     XML_VARIABLE XMLIntegerNoEmpty newbie_hit_counter; 
-    
+    XML_VARIABLE XMLIntegerNoEmpty     questpoints;        
+
     CachedNoun cachedNoun;
 
 public:
@@ -303,9 +308,6 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty        bank_s;
     XML_VARIABLE XMLIntegerNoEmpty        bank_g;
     
-    // quest
-    XML_VARIABLE XMLIntegerNoEmpty     questpoints;        
-
     NPCharacter *        pet;
 
     // fields used by skills

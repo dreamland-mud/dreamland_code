@@ -110,7 +110,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
         client->gainExp( r->exp );
     }
     else {
-        client->questpoints += r->points;
+        client->addQuestPoints(r->points);
 
         if (r->clanpoints > 0) {
             ClanData *cd = client->getClan( )->getData( );
@@ -180,7 +180,7 @@ void Questor::doCancel( PCharacter *client )
         return;
     }
     
-    if ( client->questpoints < 3 )  {
+    if ( client->getQuestPoints() < 3 )  {
         tell_raw( client, ch,  "У тебя недостаточно квестовых единиц для отмены задания.");
         return;
     }
@@ -190,7 +190,7 @@ void Questor::doCancel( PCharacter *client )
     time = quest->getCancelTime( client );
     quest->setTime( client, time );
     attributes->eraseAttribute( "quest" );
-    client->questpoints -= 3;
+    client->addQuestPoints(-3);
     PCharacterManager::save( client );
 
     tell_raw( client, ch,  "Ты теряешь {Y3{G квестовые единицы.");
