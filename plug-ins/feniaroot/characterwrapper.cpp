@@ -184,6 +184,19 @@ GET_PC_WRAP( guarding, "игрок, которого охраняем с пом�
 GET_PC_WRAP( guarded_by, "игрок, который нас охраняет" )
 
 GETWRAP( carrying, "первый объект в списке инвентаря/экипировки")
+NMI_GET( CharacterWrapper, inventory, "список всех предметов в инвентаре" )
+{
+    RegList::Pointer rc( NEW );
+    checkTarget( );
+    
+    for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
+        rc->push_back(wrap(obj));
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(rc);
+    return Register( obj );
+}
+
 GETWRAP( on, "объект, мебель, на которой сидим" )
 
 GETWRAP( in_room, "комната, в которой сейчас находимся" ) 
