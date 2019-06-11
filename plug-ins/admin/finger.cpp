@@ -38,21 +38,31 @@ CMDADM(finger)
 
     // 'finger name' - display player stats and access details.
     if (PCMemoryInterface *pci = PCharacterManager::find(constArguments)) {
-        str << "Name: " << pci->getName() << std::endl
-            << "Level: " << pci->getLevel() << "  "
-            << "Race: " << pci->getRace()->getName() << "  "
-            << "Class: " << pci->getProfession()->getName().c_str() << std::endl;
+        str << "{gName:{x " << pci->getName() << "  "
+            << "{gRussian name:{x " << pci->getRussianName().getFullForm()
+            <<  endl;
 
-        if (pci->getClan() != clan_none)
-            str << "Clan: " << pci->getClan()->getShortName() << "  "
-                << "ClanLevel: " << pci->getClanLevel() << endl;
+        str << "{gLevel:{x " << pci->getLevel() << "  "
+            << "{gRace:{x " << pci->getRace()->getName() << "  "
+            << "{gClass:{x " << pci->getProfession()->getName() << "  "
+            << "{gHome:{x " << pci->getHometown()->getName() << "  "
+            << endl;
 
-        str << "Last time: " << pci->getLastAccessTime().getTimeAsString() << std::endl
-            << "Last host: " << pci->getLastAccessHost() << endl;
+        str << "{gRemorts:{x " << pci->getRemorts().size() << "  "
+            << "{gQuest points:{x " << pci->getQuestPoints() << std::endl;
+
+        if (pci->getClan() != clan_none || pci->getPetition() != clan_none)
+            str << "{gClan:{x " << pci->getClan()->getShortName() << "  "
+                << "{gClanLevel:{x " << pci->getClanLevel() << "  "
+                << "{gPetition:{x " << pci->getPetition()->getShortName()
+                << endl;
+
+        str << "{gLast time:{x " << pci->getLastAccessTime().getTimeAsString() << std::endl
+            << "{gLast host:{x " << pci->getLastAccessHost() << endl;
 
         XMLAttributeLastHost::Pointer attr = pci->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
         if (attr) {
-            str << "All hosts:" << endl;
+            str << "{gAll hosts:{x" << endl;
             attr->showHosts(str);
         }
         ch->send_to(str);
