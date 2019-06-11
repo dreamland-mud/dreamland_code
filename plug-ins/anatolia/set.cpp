@@ -117,6 +117,7 @@ void chg_mob_vuln( Character*, char* );
 void chg_mob_class( Character*, char* );
 void chg_mob_uniclass( Character*, char* );
 void chg_mob_attr( Character*, char* );
+void chg_mob_qp( Character*, char* );
 
 T_SET_MOB tab_set_mob[] = {
   { "strength",        chg_mob_str,        true,  S_V,                "Сила(str)"                        },
@@ -131,7 +132,7 @@ T_SET_MOB tab_set_mob[] = {
   { "align",        chg_mob_align,        true,  S_V,                "Злой/нейтральный/добрый"        },
   { "religion",        chg_mob_relig,        false, S_V + S_S,        "Религия"                        },
   { "ethos",        chg_mob_ethos,        false, S_V + S_S,        "Законопослушность"                },
-  { "questp",        chg_mob_questp,        true,  S_V,                "Кол-во quest points"                },
+  { "questp",        chg_mob_qp,        true,  S_V,                "Кол-во quest points"                },
   { "questt",        chg_mob_questt,        true,  S_V,                "Квестовое время"                   },
   { "level",        chg_mob_level,        true,  S_V,                "Уровень моба"                        },
   { "train",        chg_mob_train,        true,  S_V,                "Количество тренировок"                },
@@ -1182,6 +1183,51 @@ void chg_mob_uniclass( Character* ch, char* argument )
 
 
 }
+
+
+void chg_mob_qp( Character* ch, char* argument ) 
+{
+    PCMemoryInterface *pcm;
+    DLString arguments = argument;
+    DLString playerName = arguments.getOneArgument( );
+    DLString qpArg = arguments.getOneArgument();
+
+    if (playerName.empty() || qpArg.empty()) {
+        ch->println("Укажите имя персонажа и кол-во qp.");
+        return;
+    }
+
+    pcm = PCharacterManager::find( playerName );
+    if (!pcm) {
+        ch->send_to( "Персонаж не найден, укажите имя полностью.\r\n" );
+        return;
+    }
+
+    int qpNow = pcm->getQuestPoints();
+    
+    if (qpArg.at(0) == '-' || qpArg.at(0) == '+') {
+      Integer qpDelta;
+      if (Integer::tryParse(qpDelta, qpArg)) {
+          pcm->setQuestPoints(qpNow + qpDelta);
+          PCharacterManager::saveMemory( pcm );
+          ch->printf("Персонажу %s изменено кол-во квестовых единиц с %d на %d, разница %d.\r\n",
+                     pcm->getName().c_str(), qpNow, pcm->getQuestPoints(), qpDelta);
+          return;
+      }
+    } else {
+      Integer qpValue;
+      if (Integer::tryParse(qpValue, qpArg)) {
+          pcm->setQuestPoints(qpValue);
+          PCharacterManager::saveMemory( pcm );
+          ch->printf("Персонажу %s изменено кол-во квестовых единиц с %d на %d.\r\n",
+                      pcm->getName().c_str(), qpNow, pcm->getQuestPoints());
+          return;
+      }
+    }
+
+    ch->println("Использование: set char questp имя_персонажа [+|-]число");
+}
+
 void chg_mob_attr( Character* ch, char* argument ) 
 {
     XMLAttributes *attrs;
