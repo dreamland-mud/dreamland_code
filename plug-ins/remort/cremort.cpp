@@ -56,11 +56,6 @@ CMDRUN( remort )
     /*
      * can remort?
      */
-    if (pch->age.getTrueYears( ) < 25) {
-        pch->pecho("Ты слишком моло%1$Gдо|д|да, чтобы умирать.", pch);
-        return;
-    }
-    
     if (IS_SET(pch->comm, COMM_NOTELL|COMM_NOEMOTE) 
         || pch->in_room->vnum == ROOM_VNUM_JAIL 
         || pch->in_room->vnum == 10 
