@@ -217,7 +217,7 @@ NMI_INVOKE( RegList, filter, "(func[,args]): возвращает новый с�
         Register reg = fun->invoke(*i, av);
 
         if (reg.type == Register::NUMBER && reg.toNumber() != 0)
-            rc->push_back( reg );
+            rc->push_back( *i );
     }
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
