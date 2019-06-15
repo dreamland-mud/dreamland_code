@@ -136,6 +136,10 @@ void check_bloodthirst( Character *ch )
         return;
     if (ch->fighting)
         return;
+
+    // Prevent bloodfirsty and stunned mobs from spam-attacking.
+    if (ch->is_npc() && ch->wait > 0)
+        return;
     
     for (vch = ch->in_room->people; vch && !ch->fighting; vch = vch_next)
     {
