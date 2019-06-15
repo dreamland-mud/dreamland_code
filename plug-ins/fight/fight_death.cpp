@@ -845,8 +845,10 @@ protected:
     bool penaltyCharisma( )
     {
         if (pch->getProfession( ) == prof_samurai) {
-            if ((pch->death % 3) == 2)
+            if ((pch->death % 3) == 2) {
                 pch->perm_stat[STAT_CHA]--;
+                pch->println("Ты чувствуешь, как твоя харизма уменьшилась после этой смерти.");
+            }
         }
 
         return false;
