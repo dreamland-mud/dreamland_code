@@ -97,15 +97,17 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *
         return false;
 
     // No additional aggrs in victim room for newbie.    
-    bool hasOtherAggrs = false;
-    for (Character *rch = room->people; rch; rch = rch->next_in_room)
-        if (rch != victim && rch->is_npc() && mobileCanAggress(pch, rch->getNPC())) {
-            hasOtherAggrs = true;
-            break;
-        }
-    
-    if (hasOtherAggrs && rated_as_newbie(pch))
-        return false;
+    if (victim) {
+        bool hasOtherAggrs = false;
+        for (Character *rch = room->people; rch; rch = rch->next_in_room)
+            if (rch != victim && rch->is_npc() && mobileCanAggress(pch, rch->getNPC())) {
+                hasOtherAggrs = true;
+                break;
+            }
+        
+        if (hasOtherAggrs && rated_as_newbie(pch))
+            return false;
+    }
  
     return true;
 }
@@ -157,6 +159,22 @@ RoomList RoomQuestModel::findClientRooms(PCharacter *pch, struct area_data *targ
         if (r->area != targetArea)
             continue;
         if (!checkRoomClient( pch, r ))
+            continue;
+
+        result.push_back(r);
+    }
+
+    return result;
+}
+
+RoomList RoomQuestModel::findVictimRooms(PCharacter *pch, struct area_data *targetArea)
+{
+    RoomList result;
+
+    for (Room * r = room_list; r; r = r->rnext) {
+        if (r->area != targetArea)
+            continue;
+        if (!checkRoomVictim( pch, r, NULL ))
             continue;
 
         result.push_back(r);

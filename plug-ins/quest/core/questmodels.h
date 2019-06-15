@@ -38,6 +38,7 @@ protected:
     static Room * getRandomRoom( RoomList & );
     AreaList findAreas(PCharacter *);
     RoomList findClientRooms(PCharacter *pch, struct area_data *targetArea);
+    RoomList findVictimRooms(PCharacter *pch, struct area_data *targetArea);
 };
 
 /*

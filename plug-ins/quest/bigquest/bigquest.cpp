@@ -35,7 +35,7 @@ void BigQuest::create( PCharacter *pch, NPCharacter *questman )
 
     struct area_data *targetArea = areas[number_range(0, areas.size() - 1)];
 
-    RoomList rooms = findClientRooms(pch, targetArea);
+    RoomList rooms = findVictimRooms(pch, targetArea);
     if (rooms.size() < 5)
         throw QuestCannotStartException();
 
