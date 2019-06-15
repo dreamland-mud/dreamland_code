@@ -80,6 +80,8 @@ bool EquipSet::isComplete(Character *ch) const
             continue;
         if (item->behavior->getType() != obj->behavior->getType())
             continue;
+        if (item->getRealShortDescr())
+            continue;
 
         slots[item->wear_loc] = item->pIndexData->vnum;
         wornSetSize++;
