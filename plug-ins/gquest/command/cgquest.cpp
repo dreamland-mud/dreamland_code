@@ -127,6 +127,7 @@ void CGQuest::doInfo( PCharacter *ch )
     GlobalQuestManager::RunList::iterator i;
     GlobalQuestManager *manager = GlobalQuestManager::getThis( );
     GlobalQuestManager::RunList &rl = manager->getRunning( );
+    bool found = false;
     
     for (i = rl.begin( ); i != rl.end( ); i++) {
         ostringstream buf;
@@ -142,9 +143,14 @@ void CGQuest::doInfo( PCharacter *ch )
         buf << GQChannel::NORMAL;
         gq->report( buf, ch );
         GQChannel::pecho( ch, buf );
+        found = true;
     }
 
-    gqprog_info( ch );
+    if (gqprog_info( ch ))
+        found = true;
+    
+    if (!found)
+        ch->println("Сейчас нет ни одного глобального задания.");
 }
 
 void CGQuest::doProgress( PCharacter *ch ) 
