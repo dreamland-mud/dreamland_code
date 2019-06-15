@@ -93,22 +93,27 @@ void GlobalChannel::run( Character *ch, const DLString &arg )
         DLString outSelf = arg;
         applyGarble( ch, outSelf, ch );
 
-        outputSelf( ch, fmtSelf, outSelf );
+        DLString message = outputSelf( ch, fmtSelf, outSelf );
+        ch->println(message);
+        postOutput(ch, message);
     }
     
     if (needOutputOther( ch )) {
         Listeners::iterator i;
 
         for (i = listeners.begin( ); i != listeners.end( ); i++) {
+            Character *victim = *i;
             bool fNoarg = (arg.empty( ) && !msgOtherNoarg.empty( ));
             bool fMild = (IS_SET((*i)->comm, COMM_MILDCOLOR) && !msgOtherMild.empty( ));
             const DLString &fmtVict = fNoarg ? msgOtherNoarg : fMild ? msgOtherMild : msgOther;
             
             DLString outVict = arg;
-            applyGarble( ch, outVict, *i );
-            applyTranslation( ch, outVict, *i );
+            applyGarble( ch, outVict, victim );
+            applyTranslation( ch, outVict, victim );
 
-            outputVict( ch, *i, fmtVict, outVict );
+            DLString message = outputVict( ch, victim, fmtVict, outVict );
+            victim->println(message);
+            postOutput(victim, message);
         }
     }
 

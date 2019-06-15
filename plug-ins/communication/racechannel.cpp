@@ -28,29 +28,24 @@ bool RaceChannel::isGlobalListener( Character *ch, Character *victim ) const
     return WorldChannel::isGlobalListener( ch, victim );
 }
 
-void RaceChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
+DLString RaceChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
 {
     DLString race = ch->getRace( )->getPC( )->getMltName( );
     DLString message = fmt( ch, format.c_str( ), ch, race.c_str( ), msg.c_str( ) );
-    ch->println( message );
-    postOutput( ch, message );
+    return message;
+//    ch->println( message );
+//    postOutput( ch, message );
 }
 
-void RaceChannel::outputVict( Character *ch, Character *victim, 
+DLString RaceChannel::outputVict( Character *ch, Character *victim, 
                               const DLString &format, const DLString &msg ) const
 {
     DLString race = ch->getRace( )->getPC( )->getMltName( );
     DLString message = fmt( victim, format.c_str( ), ch, race.c_str( ), msg.c_str( ) );
-    victim->println( message );
-    postOutput( victim, message );
+    return message;
+//    victim->println( message );
+//    postOutput( victim, message );
 }
-
-void RaceChannel::postOutput( Character *outputTo, const DLString &message ) const
-{
-    if (outputTo->getPC( ))
-        remember_history_public( outputTo->getPC( ), message );
-}
-
 
 bool RaceChannel::canTalkGlobally( Character *ch ) const
 {

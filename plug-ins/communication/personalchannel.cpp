@@ -23,8 +23,7 @@ GSN(deafen);
 /*-----------------------------------------------------------------------
  * PersonalChannel
  *-----------------------------------------------------------------------*/
-PersonalChannel::PersonalChannel( )
-                    : storeAFK( false ), storeFight( false ), storeDisco( false )
+PersonalChannel::PersonalChannel( )                   
 {
 }
 
@@ -38,15 +37,14 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
     return victim;
 }
 
-void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLString &msg ) const
+void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLString &messageChar, const DLString &messageVict ) const
 {
-    if (!victim->is_npc( )) {
-        DLString message = fmt( victim, msgVict.c_str( ), ch, msg.c_str( ), victim );
-
+    if (!victim->is_npc( ))
         victim->getPC( )->getAttributes( ).getAttr<XMLStringListAttribute>( 
-                                    "tells" )->push_back( message );
-        remember_history_private( victim->getPC( ), message );
-    }
+                                    "tells" )->push_back( messageVict );
+
+    postOutput(victim, messageVict);
+    postOutput(ch, messageChar);
     
     victim->reply = ch;
 }
@@ -76,11 +74,7 @@ bool PersonalChannel::checkAFK( Character *ch, Character *victim, const DLString
                                     "afk" )->getValue( ).c_str( ), 
                 victim, TO_CHAR, position );
 
-    if (storeAFK) {
-        act_p( "Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
-        tellToBuffer( ch, victim, msg );
-    }
-
+    act_p( "Сообщение будет прочитано, когда $E вернется.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
@@ -89,18 +83,16 @@ bool PersonalChannel::checkAutoStore( Character *ch, Character *victim, const DL
     if (!victim->fighting)
         return false;
 
+    if (!IS_SET( victim->add_comm, COMM_STORE ))
+        return false;
+
     if (victim->is_npc( )) {
         act_p("$E сейчас сражается и не может получить твое сообщение.",ch,0,victim,TO_CHAR,position);
         return true;
     }
     
-    if (!IS_SET( victim->add_comm, COMM_STORE ) || !storeFight)
-        return false;
-
-    act_p("$E сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
+    act_p("$C1 сейчас сражается, но твое сообщение будет прочитано, когда $E закончит бой.",
             ch,0,victim,TO_CHAR,position);
-    tellToBuffer( ch, victim, msg );
-
     return true;
 }
 
@@ -112,12 +104,8 @@ bool PersonalChannel::checkDisconnect( Character *ch, Character *victim, const D
     if (victim->desc)
         return false;
 
-    act_p("У $C2 нет связи с этим миром... попробуй позже.",
+    act_p("У $C2 нет связи с этим миром, но твое сообщение будет прочитано, когда $E вернется.",
             ch,0,victim,TO_CHAR,position);
-    
-    if (storeDisco)
-        tellToBuffer( ch, victim, msg );
-
     return true;
 }
 
@@ -147,7 +135,6 @@ bool PersonalChannel::checkVictimDeaf( Character *ch, Character *victim ) const
     return false;
 }
 
-
 void PersonalChannel::run( Character *ch, const DLString &constArguments )
 {
     Character *victim;
@@ -161,27 +148,46 @@ void PersonalChannel::run( Character *ch, const DLString &constArguments )
     
     if (!( victim = findListener( ch, name ) ))
         return;
-    
-    if (!isPersonalListener( ch, victim, msg ))
+
+    if (!isPersonalListener(ch, victim, msg))
         return;
+
+    // Format message to the talker.    
+    bool fAuto = (ch == victim && !msgAuto.empty( ));
+    const DLString &fmtChar = fAuto ? msgAuto : msgChar;
+    DLString outChar = msg;
+    applyGarble( ch, outChar, ch );
+    DLString messageChar = outputChar( ch, victim, fmtChar, outChar );
+
+    // Format message to the victim.
+    const DLString &fmtVict = msgVict;
+    DLString outVict = msg;
+    applyGarble( ch, outVict, victim );
+    DLString messageVict = outputVict( ch, victim, fmtVict, outVict );
+
+    if (checkAFK( ch, victim, msg )) {
+        tellToBuffer( ch, victim, messageChar, messageVict );
+        return;
+    }
+    
+    if (checkAutoStore( ch, victim, msg )) {
+        tellToBuffer( ch, victim, messageChar, messageVict );
+        return;
+    }
+    
+    if (checkDisconnect( ch, victim, msg )) {
+        tellToBuffer( ch, victim, messageChar, messageVict );
+        return;
+    }
     
     if (needOutputChar( ch )) {
-        bool fAuto = (ch == victim && !msgAuto.empty( ));
-        const DLString &fmtChar = fAuto ? msgAuto : msgChar;
-        
-        DLString outChar = msg;
-        applyGarble( ch, outChar, ch );
-        
-        outputChar( ch, victim, fmtChar, outChar );
+        ch->println(messageChar);
+        postOutput(ch, messageChar);
     }
 
     if (needOutputVict( ch, victim )) {
-        const DLString &fmtVict = msgVict;
-
-        DLString outVict = msg;
-        applyGarble( ch, outVict, victim );
-
-        outputVict( ch, victim, fmtVict, outVict );
+        victim->println(messageVict);
+        postOutput(victim, messageVict);
     }
 
     triggers( ch, victim, msg );
@@ -207,20 +213,15 @@ bool PersonalChannel::canTalkPersonally( Character *ch ) const
     return true;
 }
 
+/**
+ * Checks if victim can receive a message from ch via private channels.
+ * No side-effects such as storing messages to the buffer (they all occur in the run() method).
+ */
 bool PersonalChannel::isPersonalListener( Character *ch, Character *victim, const DLString &msg ) const
 {
     if (checkIgnore( ch, victim )) 
         return false;
 
-    if (checkAFK( ch, victim, msg ))
-        return false;
-    
-    if (checkAutoStore( ch, victim, msg ))
-        return false;
-    
-    if (checkDisconnect( ch, victim, msg ))
-        return false;
-    
     if (checkPosition( ch, victim ))
         return false;
     

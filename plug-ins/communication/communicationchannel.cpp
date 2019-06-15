@@ -108,27 +108,30 @@ bool CommunicationChannel::checkIsolator( Character *ch, Character *victim ) con
 }
 
 
-void CommunicationChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
+DLString CommunicationChannel::outputSelf( Character *ch, const DLString &format, const DLString &msg ) const
 {
     DLString message = fmt( ch, format.c_str( ), ch, msg.c_str( ) );
-    ch->println( message );
-    postOutput( ch, message );
+    return message;
+//    ch->println( message );
+//    postOutput( ch, message );
 }
 
-void CommunicationChannel::outputVict( Character *ch, Character *victim, 
+DLString CommunicationChannel::outputVict( Character *ch, Character *victim, 
                                 const DLString &format, const DLString &msg ) const
 {
     DLString message = fmt( victim, format.c_str( ), ch, msg.c_str( ), victim );
-    victim->println( message );
-    postOutput( victim, message );
+    return message;
+//    victim->println( message );
+//    postOutput( victim, message );
 }
 
-void CommunicationChannel::outputChar( Character *ch, Character *victim, 
+DLString CommunicationChannel::outputChar( Character *ch, Character *victim, 
                                   const DLString &format, const DLString &msg ) const
 {
     DLString message = fmt( ch, format.c_str( ), ch, msg.c_str( ), victim );
-    ch->println( message );
-    postOutput( ch, message );
+    return message;
+//    ch->println( message );
+//    postOutput( ch, message );
 }
 
 void CommunicationChannel::postOutput( Character *outputTo, const DLString &message ) const

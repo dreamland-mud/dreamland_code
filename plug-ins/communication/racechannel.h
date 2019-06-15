@@ -18,9 +18,8 @@ protected:
     virtual bool isGlobalListener( Character *, Character * ) const;
     virtual bool canTalkGlobally( Character * ) const;
 
-    virtual void outputVict( Character *, Character *, const DLString &, const DLString & ) const;
-    virtual void outputSelf( Character *, const DLString &, const DLString & ) const;
-    virtual void postOutput( Character *outputTo, const DLString &message ) const;
+    virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
+    virtual DLString outputSelf( Character *, const DLString &, const DLString & ) const;
 };
 
 #endif
