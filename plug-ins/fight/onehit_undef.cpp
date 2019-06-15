@@ -46,6 +46,9 @@ PROF(samurai);
 PROF(universal);
 PROF(thief);
 
+WEARLOC(tat_wrist_l);
+WEARLOC(tat_wrist_r);
+
 /*----------------------------------------------------------------------------
  * Hit by weapon or bare hands
  *---------------------------------------------------------------------------*/
@@ -1175,6 +1178,7 @@ void UndefinedOneHit::damEffectSlice( )
     /* undress */
     sliced.push_back( left ? wear_wrist_l : wear_wrist_r );
     sliced.push_back( left ? wear_finger_l : wear_finger_r );
+    sliced.push_back( left ? wear_tat_wrist_l : wear_tat_wrist_r );
     sliced.push_back( wear_second_wield );
 
     if (left) {
@@ -1197,7 +1201,11 @@ void UndefinedOneHit::damEffectSlice( )
         if (obj) {
             loc->unequip( obj );
 
-            if (!IS_SET( obj->extra_flags, ITEM_NODROP )) {
+            if (obj->item_type == ITEM_TATTOO) {
+                act("$o1 медленно исчезает.", victim, obj, 0, TO_CHAR);
+                extract_obj(obj);
+            }
+            else if (!IS_SET( obj->extra_flags, ITEM_NODROP )) {
                 obj_from_char( obj );
                 obj_to_room( obj, victim->in_room );
                 act_p( "$o1 падает на землю.", victim, obj, 0, TO_ALL, POS_RESTING );
