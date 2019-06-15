@@ -141,13 +141,13 @@ SKILL_RUNP( explode )
     if (victim == 0) {
         one_argument(argument, arg);
 
-        if ( arg == 0 ) {
+        if (arg[0] == 0) {
             ch->send_to("Ты играешь со взрывчатыми веществами.\n\r");
             return;
         }
 
         if ((victim = get_char_room(ch,arg)) == 0) {
-            ch->send_to("Этого нет здесь.\n\r");
+            ch->send_to("Ты не находишь, кого подорвать.\n\r");
             return;
         }
     }

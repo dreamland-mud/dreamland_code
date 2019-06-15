@@ -53,13 +53,6 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
     return victim;
 }
 
-void TellChannel::outputVict( Character *ch, Character *victim, 
-                              const DLString &fmt, const DLString &msg ) const
-{
-    PersonalChannel::outputVict( ch, victim, fmt, msg );
-    victim->reply = ch;
-}
-
 static bool mprog_tell( Character *listener, Character *talker, const char *msg )
 {
     FENIA_CALL( listener, "Tell", "Cs", talker, msg );
@@ -70,6 +63,7 @@ static bool mprog_tell( Character *listener, Character *talker, const char *msg 
 
 void TellChannel::triggers( Character *ch, Character *victim, const DLString &msg ) const
 {
+    victim->reply = ch;
     PersonalChannel::triggers( ch, victim, msg );    
     mprog_tell( victim, ch, msg.c_str( ) );
 }
@@ -164,12 +158,11 @@ bool PageChannel::isGlobalListener( Character *ch, Character *victim ) const
     return true;
 }
 
-void PageChannel::outputVict( Character *ch, Character *victim, 
+DLString PageChannel::outputVict( Character *ch, Character *victim, 
                               const DLString &format, const DLString &msg ) const
 {
     DLString message = fmt( victim, format.c_str( ), ch, msg.c_str( ), victim, get_pager( victim ) );
-    victim->println( message );
-    postOutput( victim, message );
+    return message;
 }
 
 void PageChannel::postOutput( Character *outputTo, const DLString &message ) const
@@ -194,8 +187,8 @@ static bool mprog_speech( Character *rch, Character *talker, const char *msg )
 {
     if (IS_AWAKE(rch)) {
         FENIA_CALL( rch, "Speech", "Cs", talker, msg );
-	FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
-	BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
+	    FENIA_NDX_CALL( rch->getNPC( ), "Speech", "CCs", rch, talker, msg );
+	    BEHAVIOR_VOID_CALL( rch->getNPC( ), speech, talker, msg );
     }
     return false;
 }

@@ -106,6 +106,11 @@ NMI_GET( MobIndexWrapper, count, "кол-во экземпляров мобов 
     checkTarget( ); 
     return target->count;
 }
+NMI_SET( MobIndexWrapper, count, "кол-во экземпляров мобов этого прототипа") 
+{ 
+    checkTarget( ); 
+    target->count = arg.toNumber();
+}
 NMI_GET( MobIndexWrapper, vnum , "внум, уникальный номер прототипа") 
 { 
     checkTarget( ); 

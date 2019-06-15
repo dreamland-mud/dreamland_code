@@ -45,7 +45,6 @@ public:
 
 protected:
     virtual Character * findListener( Character *, const DLString & ) const;
-    virtual void outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual void triggers( Character *, Character *, const DLString & ) const;
 };
 
@@ -62,7 +61,7 @@ protected:
     virtual bool isGlobalListener( Character *, Character * ) const;
     virtual bool isPersonalListener( Character *, Character *, const DLString & ) const;
     virtual Character * findListener( Character *, const DLString & ) const;
-    virtual void outputVict( Character *, Character *, const DLString &, const DLString & ) const;
+    virtual DLString outputVict( Character *, Character *, const DLString &, const DLString & ) const;
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
 };
 

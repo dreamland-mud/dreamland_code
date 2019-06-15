@@ -409,7 +409,7 @@ bool OLCState::flagValueEdit(const FlagTable &table, int &field)
     }
 
     field = value;
-    ptc(ch, "Новое значение поля {g%s{x: %d\r\n", cmd, field);
+    ptc(ch, "Новое значение поля {g%s{x: %s (%s)\r\n", cmd, table.name(field).c_str(), table.message(field).c_str());
     return true;
 }
 

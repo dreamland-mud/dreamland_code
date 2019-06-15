@@ -133,11 +133,12 @@ void InterpretHandler::normalPrompt( Character *ch )
     ostringstream out;
     const char *str;
     PCharacter *pch = ch->getPC( );
+    Character *victim = ch->fighting;
 
-    if (ch->position != POS_FIGHTING)
-        str = ch->prompt.c_str( );
+    if (ch->position == POS_FIGHTING || victim != 0)
+        str = ch->batle_prompt.c_str( );        
     else
-        str = ch->batle_prompt.c_str( );
+        str = ch->prompt.c_str( );
 
     if ( !str || !*str ) {
         ch->printf( "<%dhp %dm %dmv> %s",
@@ -152,7 +153,6 @@ void InterpretHandler::normalPrompt( Character *ch )
 
     while( *str ) {
         ostringstream doors;
-        Character *victim;
         bool ruexits = false;
         bool handled = false;
 
@@ -237,7 +237,7 @@ void InterpretHandler::normalPrompt( Character *ch )
             break;
 
         case 'o' :
-            if ((victim = ch->fighting) != 0)
+            if (victim != 0)
             {
                 if (victim->hit >= 0)
                     out << HEALTH(victim) << "%";

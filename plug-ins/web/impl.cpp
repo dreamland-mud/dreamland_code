@@ -650,8 +650,6 @@ Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
            m = 'I';
         else if (paf->type == gsn_hide)
            m = 'h';
-        else if (paf->type == gsn_fade)
-           m = 'F';
         else if (paf->type == gsn_sneak)
            m = 's';
         else if (paf->type == gsn_fly)
@@ -678,6 +676,7 @@ Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
     mark_affect( ch, active, AFF_SNEAK, 's' );
     mark_affect( ch, active, AFF_FLYING, 'f' );
     mark_affect( ch, active, AFF_PASS_DOOR, 'p' );
+    mark_affect( ch, active, AFF_FADE, 'F' );
 
     if (active.empty( ))
         return Json::Value( );
@@ -735,6 +734,12 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
            m = 'R';
         else if (paf->type == gsn_demonic_mantle)
            m = 'M';
+        else if (paf->type == gsn_black_feeble)
+           m = 'F';
+        else if (paf->type == gsn_endure)
+           m = 'E';
+        else if (paf->type == gsn_sebat)
+           m = 'Z';
         else
           continue;
         
@@ -805,6 +810,7 @@ Json::Value AffectsWebPromptListener::jsonEnhance( Descriptor *d, Character *ch 
     }
 
     mark_affect( ch, active, AFF_REGENERATION, 'r' );
+    mark_affect( ch, active, AFF_HASTE,        'h' );
 
     if (active.empty( ))
         return Json::Value( );

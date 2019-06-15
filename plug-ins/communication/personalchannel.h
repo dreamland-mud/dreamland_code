@@ -33,9 +33,8 @@ protected:
     virtual bool needOutputChar( Character * ) const;
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
 
-    void tellToBuffer( Character *, Character *, const DLString & ) const;
+    void tellToBuffer( Character *, Character *, const DLString &, const DLString & ) const;
 
-    XML_VARIABLE XMLBooleanNoFalse storeAFK, storeFight, storeDisco;
     XML_VARIABLE XMLStringNoEmpty msgNoName, msgNoArg;
     XML_VARIABLE XMLStringNoEmpty msgAuto, msgChar, msgVict;
 };

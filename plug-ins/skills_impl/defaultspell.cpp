@@ -380,7 +380,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         
         buf.str( "" );
-        buf << "Твоя попытка закончилась неудачей." << endl;
+        buf << "В Dream Land нет никого с таким именем." << endl;
         return null;
     }
     
