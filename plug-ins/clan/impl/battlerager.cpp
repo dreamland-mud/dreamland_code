@@ -139,7 +139,7 @@ CMDRUNP( chop )
 
     if (!IS_SET(corpse->value[2], part)) {
         ch->pecho( "У этого трупа нету %s.", 
-                   part_flags.messages( part, '2' ).c_str( ) );
+                   part_flags.messages( part, true, '2' ).c_str( ) );
         return;
     }
     
@@ -156,7 +156,7 @@ CMDRUNP( chop )
     REMOVE_BIT(corpse->value[2], part);
     ch->setWait( gsn_trophy->getBeats( ) / 2 );
 
-    DLString what = part_flags.messages( part, '4' );
+    DLString what = part_flags.messages( part, true, '4' );
 
     if (number_percent( ) > 2 * gsn_trophy->getEffective( ch ) / 3) {
         ch->pecho( "Ты лупишь оружием плашмя, превращая %s трупа в кровавое месиво.",
