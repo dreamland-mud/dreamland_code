@@ -49,6 +49,7 @@ static const DLString ENHANCE = "enh";
 static const DLString PROTECT = "pro";
 static const DLString TRAVEL = "trv";
 static const DLString MALAD = "mal";
+static const DLString CLAN = "cln";
 static const DLString WHO = "who";
 static const DLString PARAM1 = "p1";
 static const DLString PARAM2 = "p2";
@@ -65,6 +66,14 @@ GSN(demonic_mantle);
 GSN(magic_jar);
 GSN(anathema);
 GSN(stuck_arrow);
+GSN(detect_trap);
+GSN(evolve_lion);
+GSN(prevent);
+GSN(holy_armor);
+GSN(shadow_shroud);
+GSN(soul_lust);
+GSN(randomizer);
+GSN(ruler_aura);
 CLAN(none);
 
 static string json_to_string( const Json::Value &value )
@@ -546,6 +555,7 @@ protected:
         Json::Value jsonProtect( Descriptor *d, Character *ch );
         Json::Value jsonTravel( Descriptor *d, Character *ch );
         Json::Value jsonMalad( Descriptor *d, Character *ch );
+        Json::Value jsonClan( Descriptor *d, Character *ch );
 };
 
 void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
@@ -558,6 +568,7 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
     json_update_if_new( PROTECT, jsonProtect( d, ch ), attr, prompt ); 
     json_update_if_new( TRAVEL, jsonTravel( d, ch ), attr, prompt ); 
     json_update_if_new( MALAD, jsonMalad( d, ch ), attr, prompt ); 
+    json_update_if_new( CLAN, jsonClan( d, ch ), attr, prompt ); 
 }
 
 static void mark_affect( Character *ch, DLString &output, bitstring_t bit, char marker )
@@ -625,7 +636,8 @@ Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
     mark_affect( ch, active, AFF_WEAKEN, 'w' );
     mark_affect( ch, active, AFF_SLOW, 's' );
     mark_affect( ch, active, AFF_SCREAM, 'S' );
-    mark_affect( ch, active, AFF_BLOODTHIRST, 'B' );
+    if (!ch->isAffected(gsn_bloodthirst))
+        mark_affect( ch, active, AFF_BLOODTHIRST, 'B' );
     mark_affect( ch, active, AFF_STUN|AFF_WEAK_STUN, 'T' );
 
     if (active.empty( ))
@@ -635,6 +647,82 @@ Json::Value AffectsWebPromptListener::jsonMalad( Descriptor *d, Character *ch )
     mal["a"] = active;
     mal["z"] = zero;
     return mal;
+}
+
+Json::Value AffectsWebPromptListener::jsonClan( Descriptor *d, Character *ch )
+{
+    DLString active, zero;
+    
+    for (Affect *paf = ch->affected; paf; paf = paf->next) {
+        char m;
+        
+        if (paf->type == gsn_resistance) 
+           m = 'r';
+        else if (paf->type == gsn_spellbane)
+           m = 's';
+        else if (paf->type == gsn_bloodthirst)
+           m = 'B';
+        else if (paf->type == gsn_bandage)
+           m = 'b';
+        else if (paf->type == gsn_trophy)
+           m = 't';
+        else if (paf->type == gsn_truesight)
+           m = 'T';
+        else if (paf->type == gsn_detect_trap)
+           m = 'd';
+        else if (paf->type == gsn_evolve_lion)
+           m = 'e';
+        else if (paf->type == gsn_prevent)
+           m = 'p';
+        else if (paf->type == gsn_transform)
+           m = 'f';
+        else if (paf->type == gsn_golden_aura)
+           m = 'g';
+        else if (paf->type == gsn_holy_armor)
+           m = 'h';
+        else if (paf->type == gsn_shadow_shroud || paf->type == gsn_soul_lust)
+           m = 'S';
+        else if (paf->type == gsn_doppelganger)
+           m = 'D';
+        else if (paf->type == gsn_mirror)
+           m = 'm';
+        else if (paf->type == gsn_randomizer)
+           m = 'R';
+        else if (paf->type == gsn_disgrace)
+           m = 'i';
+        else if (paf->type == gsn_garble)
+           m = 'G';
+        else if (paf->type == gsn_confuse)
+           m = 'c';
+        else if (paf->type == gsn_manacles)
+           m = 'M';
+        else if (paf->type == gsn_suspect)
+           m = 'u';
+        else if (paf->type == gsn_jail)
+           m = 'j';
+        else if (paf->type == gsn_dismiss)
+           m = 'J';
+        else if (paf->type == gsn_ruler_aura)
+           m = 'A';
+        else
+            continue;
+
+        if (active.find( m ) != DLString::npos)
+            continue;
+
+        active += m;
+
+        if (paf->duration == 0)
+            zero += m;
+    }
+
+    if (active.empty( ))
+        return Json::Value( );
+
+    Json::Value cln;
+    cln["a"] = active;
+    cln["z"] = zero;
+    return cln;
 }
 
 Json::Value AffectsWebPromptListener::jsonTravel( Descriptor *d, Character *ch )
