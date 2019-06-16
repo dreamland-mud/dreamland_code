@@ -317,7 +317,7 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
         body_vnum = ch->is_npc( ) ? ch->getNPC( )->pIndexData->vnum : 0;
     }
     else if (corpse) {
-        body_name = corpse->getShortDescr( '1' ).replaces( "труп (corpse) ", "" );
+        body_name = corpse->getShortDescr( '1' ).replaces( "труп ", "" );
         if (body_name.size( ) == corpse->getShortDescr( '1' ).size( ))
             body_name = "";
         
