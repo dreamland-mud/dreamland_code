@@ -15,6 +15,7 @@
 
 #include "battlerager.h"
 #include "xmlattributerestring.h"
+#include "logstream.h"
 
 #include "commandtemplate.h"
 #include "skill.h"
@@ -335,34 +336,63 @@ SKILL_DECL( mortalstrike );
 BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
 {
     Object *wield;
-    int chance;
+    int chance, learned;
+    int weaponLevelDiff;
 
-    if (gsn_mortal_strike->usable( ch, false )
-        && (chance = gsn_mortal_strike->getEffective( ch )) > 1
-        && (wield = get_eq_char(ch,wear_wield)) != 0
-        && wield->level > ( victim->getModifyLevel() - 5 ))
-    {
-        chance += 1 + chance / 30;
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) / 2;
-        if ( number_percent( ) < chance )
-        {
-            int dam;
-            act_p("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x",
-                ch,0,victim,TO_CHAR,POS_RESTING);
-            act_p("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x",
-                ch,0,victim,TO_NOTVICT,POS_RESTING);
-            act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x",
-                ch,0,victim,TO_VICT,POS_DEAD);
-            dam = ( victim->hit + 1 ) * ch->getPC( )->curse / 100;
-            damage(ch,victim,(victim->hit + 1),gsn_mortal_strike,DAM_NONE, true);
-            gsn_mortal_strike->improve( ch, true, victim );
-            return true;
-        }
-        else
-            gsn_mortal_strike->improve( ch, false, victim );
+    if (!gsn_mortal_strike->usable( ch, false ))
+        return false;
+
+    if ((learned = gsn_mortal_strike->getEffective( ch )) <= 1)
+        return false;
+
+    // Works only for primary weapon.
+    if ((wield = get_eq_char(ch, wear_wield)) == 0)
+        return false;
+
+    // Low-level weapon cannot strike a powerful victim.
+    // However, allow weapon level as low as 80+ for heroes.
+    weaponLevelDiff = max(1, ch->getModifyLevel() / 5); 
+    if (victim->getModifyLevel() - wield->level > weaponLevelDiff) {
+        notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), weapon level %d, diff %d.",
+                ch->getNameP('1').c_str(), ch->getModifyLevel(),
+                victim->getNameP('1').c_str(), victim->getModifyLevel(),
+                wield->level, weaponLevelDiff);
+        return false;
     }
 
-    return false;
+    // Calculate real chance to strike (original Anatolia code, plus clan level bonus).
+    // For hero PK, chances are ranging from: 1+clanLevel to 8+clanLevel, i.e. from 1 to 16.
+    // For players of the same level, chances are ranging from: 2 to 12.
+    chance = 1 + learned / 30; 
+    chance += (ch->getModifyLevel() - victim->getModifyLevel()) / 2;
+    chance += ch->is_npc() ? 0 : ch->getPC()->getClanLevel();
+    chance = max(1, chance);
+    notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), learned %d, chance %d, level diff %d.",
+            ch->getNameP('1').c_str(), ch->getModifyLevel(),
+            victim->getNameP('1').c_str(), victim->getModifyLevel(),
+            learned, chance, (ch->getModifyLevel() - victim->getModifyLevel()) / 2);
+
+    // Dice roll failed, learn on mistake.
+    if (number_percent() > chance) {
+        gsn_mortal_strike->improve( ch, false, victim );
+        return false;
+    }
+
+    // Success, inflict a lot of damage. Anatolia implementation was (victim->hit+1), but the 
+    // resulting damage was always reduced by sanctuary and other protections.
+    int dam;
+    act_p("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("{RМолниеносный удар $c2 в одно мгновение лишает тебя жизни!{x", ch,0,victim,TO_VICT,POS_DEAD);
+    dam = victim->hit * 2; 
+    dam *= ch->getPC( )->curse / 100;
+    notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), damage %d, victim hp %d/%d.",
+            ch->getNameP('1').c_str(), ch->getModifyLevel(),
+            victim->getNameP('1').c_str(), victim->getModifyLevel(),
+            dam, victim->hit, victim->max_hit);
+    damage(ch, victim, dam, gsn_mortal_strike, DAM_NONE, true);
+    gsn_mortal_strike->improve( ch, true, victim );
+    return true;
 }
 
 /*
