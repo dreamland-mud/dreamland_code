@@ -21,6 +21,7 @@ public:
         void addHost(const DLString &host);
         bool hasHost(const DLString &host) const;
         void showHosts(ostringstream &buf) const;
+        const DLString &getMatchingHost(const DLString &hostPrefix) const;
 
 private:
         /** Map between IP address and how many times it was used. */

@@ -14,6 +14,16 @@ bool XMLAttributeLastHost::hasHost(const DLString &host) const
     return hosts.isAvailable(host);
 }
 
+const DLString &XMLAttributeLastHost::getMatchingHost(const DLString &hostPrefix) const
+{
+    Hosts::const_iterator h;
+    for (h = hosts.begin(); h != hosts.end(); h++)    
+        if (hostPrefix.strPrefix(h->first))
+            return h->first;
+
+    return DLString::emptyString;
+}
+
 /**
  *  Outputs host/usage pairs sorted by usage in descending order.
  */
