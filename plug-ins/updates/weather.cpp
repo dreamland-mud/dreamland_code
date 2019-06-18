@@ -150,6 +150,7 @@ void sunlight_update( )
     int this_year = time_info.year;
 
     dreamland->setWorldTime( dreamland->getWorldTime( ) + 1 );
+    dreamland->save(false); // Save configuration XML to disk.
     ++time_info.hour;
 
     if (time_info.hour == month_table[time_info.month].sunrise) {
@@ -478,6 +479,7 @@ void weather_init( )
                     / (PULSE_TICK / dreamland->getPulsePerSecond( ));
 
             dreamland->setWorldTime( lhour );
+            dreamland->save(false);
     }
 
     time_info.hour        = lhour  % 24;
