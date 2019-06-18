@@ -105,6 +105,7 @@ ID	    {L}({L}|[0-9_])*
 
 "null"	    { return T_NULL; }
 "if"	    { return T_IF; }
+"in"	    { return T_IN; }
 "else"	    { return T_ELSE; }
 "for"	    { return T_FOR; }
 "break"	    { return T_BREAK; }

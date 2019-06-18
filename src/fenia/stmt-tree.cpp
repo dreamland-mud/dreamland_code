@@ -143,6 +143,66 @@ ExpStmt::reverse(ostream &os, const DLString &nextline) const
     os << "; ";
 }
 
+/* ============================== Foreach stmt ================================ */
+
+ForeachStmt::ForeachStmt( ) 
+{
+}
+
+ForeachStmt::~ForeachStmt( ) 
+{
+}
+
+ForeachStmt::ForeachStmt(Lex::id_t v,
+            ExpNode::Pointer l,
+            StmtNode::Pointer b) : var(v), list(l), body(b) 
+{ 
+}
+
+FlowCtl
+ForeachStmt::evalAux() 
+{
+    static IdRef ID_ITERATOR("iterator");
+    static IdRef ID_HASNEXT("hasNext");
+    static IdRef ID_NEXT("next");
+    CppScopeClobber scope;
+    
+    Register iterable = list->eval();
+    Register iterator = iterable[ID_ITERATOR](RegisterList());
+
+    scope.addVar(var);
+
+    while(iterator[ID_HASNEXT](RegisterList()).toBoolean()) {
+        scope.setVar(var, iterator[ID_NEXT](RegisterList()));
+
+        FlowCtl fc = body->eval();
+        
+        if(fc.type == FlowCtl::RETURN)
+            return fc;
+
+        if(fc.type == FlowCtl::BREAK)
+            break;
+        
+        /* next & continue flow controll is ok */
+    }
+
+    return FlowCtl(FlowCtl::NEXT);
+}
+
+void 
+ForeachStmt::reverse(ostream &os, const DLString &nextline) const
+{
+    os << nextline << nextline << "{Yfor{x (";
+
+    os << Lex::getThis()->getName(var);
+    os << " in ";
+    list->reverse(os, nextline);
+    os << ") ";
+    body->reverse(os, nextline + "    ");
+}
+
+/* ============================== For stmt ================================ */
+
 ForStmt::ForStmt( ) 
 {
 }
@@ -259,6 +319,7 @@ ForStmt::reverse(ostream &os, const DLString &nextline) const
     body->reverse(os, nextline + "    ");
 }
 
+/* ============================== If stmt ================================ */
 
 IfStmt::IfStmt() 
 {

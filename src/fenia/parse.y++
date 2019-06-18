@@ -107,6 +107,7 @@ csrc()
 %token T_ARROW
 
 %nonassoc T_IF
+%nonassoc T_IN
 %nonassoc T_ELSE
 %nonassoc T_REF
 
@@ -193,6 +194,10 @@ stmt_aux:
 	|   T_FOR '(' explist ';' ';' explist ')' stmt
 	{
 	    $$ = ForStmt::Pointer(NEW, $3, ExpNode::Pointer( ), $6, $8);
+	}
+	|   T_FOR '(' id T_IN exp ')' stmt
+	{
+	    $$ = ForeachStmt::Pointer(NEW, $3, $5, $7);
 	}
 	|   T_BREAK ';'
 	{
