@@ -67,4 +67,30 @@ protected:
     XML_VARIABLE XMLRegister list;
 };
 
+class RegListIterator : public XMLVariableContainer,
+                        public Scripting::NativeHandler,
+                        public Scripting::NativeImpl<RegListIterator>
+{
+    friend class RegList;
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<RegListIterator> Pointer;
+
+    RegListIterator();
+    
+    void restoreIterator();
+
+    virtual void setSelf(Scripting::Object *s);
+
+protected:
+    XML_VARIABLE XMLRegister list;
+    XML_VARIABLE XMLInteger position;
+
+private:
+    RegList::iterator it;
+    RegList *cached;
+    Scripting::Object *self;
+};
+
 #endif

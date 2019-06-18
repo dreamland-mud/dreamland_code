@@ -128,6 +128,24 @@ public:
     StmtNode::Pointer body;
 };
 
+class ForeachStmt : public StmtNode {
+public:
+    typedef ::Pointer<ForeachStmt> Pointer;
+    
+    ForeachStmt();
+    ForeachStmt(Lex::id_t v,
+            ExpNode::Pointer l, 
+            StmtNode::Pointer b);
+    virtual ~ForeachStmt();
+
+    virtual FlowCtl evalAux();
+    virtual void reverse(ostream &os, const DLString &nextline) const;
+
+    Lex::id_t var;
+    ExpNode::Pointer list;
+    StmtNode::Pointer body;
+};
+
 class IfStmt : public StmtNode {
 public:
     typedef ::Pointer<IfStmt> Pointer;

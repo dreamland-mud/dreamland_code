@@ -38,6 +38,7 @@ FeniaManager::FeniaManager()
     Class::regXMLVar<RegContainer>( );
     Class::regXMLVar<RegList>( );
     Class::regMoc<RegListCall>( );
+    Class::regMoc<RegListIterator>( );
 }
 
 
@@ -49,6 +50,7 @@ FeniaManager::~FeniaManager()
     Class::unregXMLVar<RegContainer>( );
     Class::unregXMLVar<RegList>( );
     Class::unregMoc<RegListCall>( );
+    Class::unregMoc<RegListIterator>( );
 
     if(current == this)
         current = NULL;

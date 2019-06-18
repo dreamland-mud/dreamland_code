@@ -72,6 +72,19 @@ XMLRegisterList::nodeFromXML( const XMLNode::Pointer& child)
 
 /* methods */
 
+NMI_INVOKE( RegList, iterator, "")
+{
+    RegListIterator::Pointer it(NEW);
+
+    it->list = Register(self);
+    it->position = 0;
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate( );
+
+    obj->setHandler(it);
+    return Register(obj);
+}
+
 NMI_INVOKE( RegList, forEach , "(func[,args]): выполняет для каждого элемента списка функцию с аргументами")
 {
     RegisterList::const_iterator ai = args.begin();
@@ -162,3 +175,52 @@ RegListCall::callMethod(const Register &key, const RegisterList &args)
 
     return Register( obj );
 }
+
+/* ----------------------- reg list iterator ---------------------- */
+
+NMI_INIT(RegListIterator, "Итератор списка")
+
+RegListIterator::RegListIterator() : cached(NULL)
+{
+}
+
+void RegListIterator::setSelf(Scripting::Object *s)
+{
+    cached = NULL;
+    self = s;
+}
+
+void RegListIterator::restoreIterator()
+{
+    RegList *rl = wrapper_cast<RegList>(list);
+
+    if(rl == cached)
+        return;
+
+    cached = rl;
+    
+    int i = 0;
+
+    for(it=rl->begin();it != rl->end();it++) 
+        if(i++ == position)
+            return;
+}
+
+NMI_INVOKE(RegListIterator, hasNext, "")
+{
+    restoreIterator();   
+    return Register(it != cached->end());
+}
+
+NMI_INVOKE(RegListIterator, next, "")
+{
+    restoreIterator();   
+    
+    if(it != cached->end()) {
+        self->changed();
+        position++;
+        return Register(*it++);
+    } else
+        return Register();
+}
+
