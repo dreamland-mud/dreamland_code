@@ -47,7 +47,9 @@ public:
     private:
         NoteThread *thread;
     };
-    
+
+    static const DLString NODE_NAME;
+
     typedef ::Pointer<NoteThread> Pointer;
     typedef list<Note *> NoteList;
     typedef vector<NoteBucket> NoteHash;
@@ -75,24 +77,26 @@ public:
     virtual bool canRead( const PCharacter * ) const;
     virtual bool isExpired( const Note * ) const;
     virtual void getUnreadMessage( int, ostringstream & ) const { };
+    inline const Enumeration &getGender() const;
     inline const DLString &getRussianThreadName( ) const;
+    inline const DLString &getRussianMltName() const;
 
     int countSpool( PCharacter * ) const;
     const Note * getNextUnreadNote( PCharacter * ) const;
     void showNoteToChar( PCharacter *, const Note * ) const;
-    const Note * findNote( PCharacter *, time_t ) const;
+    const Note * findNote( time_t ) const;
+    Note * findNote( time_t );
     const Note * findNextNote( PCharacter *, time_t ) const;
+    const NoteList & getNoteList( ) const;
 
 protected:
     bool isNoteHidden( const Note *, PCharacter *, time_t ) const;
     const Note * getNoteAtPosition( PCharacter *, int  ) const;
     int getNoteNumber( PCharacter *, const Note * ) const;
     time_t getStamp( PCharacter * ) const;
-    const NoteList & getNoteList( ) const;
 
 protected:
-    void doWebDump( PCharacter * ) const;
-    void doHooksDump( PCharacter *, DLString & ) const;
+    void doFlag(PCharacter *, DLString & );
     bool doShow( PCharacter *, Attribute ) const;
     bool doClear( PCharacter *, Attribute ) const;
     void doSubject( PCharacter *, Attribute, const DLString & ) const;
@@ -110,7 +114,6 @@ protected:
     bool doFrom( PCharacter *, Attribute, const DLString & ) const;
     void doForward( PCharacter *, Attribute, DLString & ) const;
     
-    virtual void notify( PCharacter *, const Note & ) const;
     void echo( PCharacter *, const DLString &, const DLString &, const DLString & = "" ) const;
 
 protected:
@@ -144,7 +147,6 @@ protected:
     NoteList xnotes;
     NoteHash hash;
 
-    static const DLString NODE_NAME;
     static const int HASH_LEN;
 };
 
@@ -163,9 +165,20 @@ inline const DLString &NoteThread::getRussianThreadName( ) const
     return rusName;
 }
 
+inline const DLString &NoteThread::getRussianMltName( ) const
+{
+    return rusNameMlt;
+}
+
+
 inline CommandHelp::Pointer NoteThread::getHelp( ) const
 {
     return help;
+}
+
+inline const Enumeration &NoteThread::getGender() const
+{
+    return gender;
 }
 
 /*

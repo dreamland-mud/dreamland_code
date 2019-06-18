@@ -12,6 +12,7 @@
 #include "xmlstring.h"
 #include "xmllong.h"
 #include "xmlboolean.h"
+#include "xmlflags.h"
 
 #include "dreamland.h"
 
@@ -34,6 +35,7 @@ public:
     inline const DLString & getFrom( ) const;
     inline const DLString & getAuthor( ) const;
     inline const DLString & getText( ) const;
+    inline const Flags & getFlags() const;
     inline time_t getID( ) const;
     inline const Date getDate( ) const;
 
@@ -42,6 +44,7 @@ public:
     inline void setFrom( const DLString & );
     inline void setAuthor( const DLString & );
     inline void setText( const DLString & );
+    inline void setFlags( const bitstring_t & );
     inline void setDate( );
     inline void setDate( int );
     
@@ -67,27 +70,10 @@ private:
     XML_VARIABLE XMLString author;
     XML_VARIABLE XMLString text;
     XML_VARIABLE XMLLong id;
+    XML_VARIABLE XMLFlagsNoEmpty flags;
 public:    
     XML_VARIABLE XMLBooleanNoFalse godsSeeAlways;
 };
-
-// Note representation for the website
-class WebNote : public XMLVariableContainer {
-XML_OBJECT
-public:
-    typedef ::Pointer<WebNote> Pointer;
-    
-    WebNote( );
-    virtual ~WebNote( );
-
-public:
-    XML_VARIABLE XMLString subject;
-    XML_VARIABLE XMLString from;
-    XML_VARIABLE XMLString date;
-    XML_VARIABLE XMLString text;
-    XML_VARIABLE XMLLong id;
-};
-
 
 inline const DLString & Note::getSubject( ) const
 {
@@ -117,6 +103,10 @@ inline const Date Note::getDate( ) const
 {
     return id.getValue( );
 }
+inline const Flags & Note::getFlags() const
+{
+    return flags;
+}
 
 inline void Note::setSubject( const DLString & value )
 {
@@ -137,6 +127,10 @@ inline void Note::setAuthor( const DLString & value )
 inline void Note::setText( const DLString & value )
 {
     text.setValue( value );
+}
+inline void Note::setFlags( const bitstring_t &value )
+{
+    flags.setValue(value);
 }
 inline void Note::setDate( )
 {

@@ -36,6 +36,7 @@ libnotes_la_LIBADD = \
 libnotes_la_SOURCES = \
 impl.cpp \
 note.cpp \
+webnote.cpp \
 noteattrs.cpp \
 notemanager.cpp \
 notethread.cpp \
@@ -43,6 +44,7 @@ notecommand.cpp \
 unread.cpp \
 dreams.cpp \
 notehooks.cpp \
+noteflags.cpp \
 listfilter_parse.y++ \
 listfilter_scan.l++
 
@@ -58,13 +60,21 @@ libgeneric_notes_la_SOURCES =  genericnotes.cpp
 
 libnotes_la_MOC = \
 note.h \
+webnote.h \
 noteattrs.h \
 notemanager.h \
 notethread.h \
 dreams.h \
 unread.h
 
+noteflags.cpp: noteflags.conf noteflags.h
+noteflags.h: noteflags.conf
+libnotes_la_moc_xml.cpp: noteflags.h
 
-CLEANFILES = listfilter_scan.c++ listfilter_parse.c++ listfilter_parse.h++
+CLEANFILES = listfilter_scan.c++ \
+listfilter_parse.c++ \
+listfilter_parse.h++ \
+noteflags.cpp \
+$(top_builddir)/src/noteflags.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc

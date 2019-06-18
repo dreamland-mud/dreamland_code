@@ -123,7 +123,7 @@ void XMLAttributeDream::run( PCharacter *ch )
     /*
      * already dreaming, but dream got invalidated
      */
-    else if (!dreamThread->findNote( ch, currentDreamID )) {
+    else if (!dreamThread->findNote( currentDreamID )) {
         lines.clear( );
         return;
     }

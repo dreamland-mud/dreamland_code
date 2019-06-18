@@ -361,8 +361,8 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
     }
 
     // Calculate real chance to strike (original Anatolia code, plus clan level bonus).
-    // For hero PK, chances are ranging from: 1+clanLevel to 8+clanLevel, i.e. from 1 to 16.
-    // For players of the same level, chances are ranging from: 2 to 12.
+    // For hero PK, chances are ranging from 1+clanLevel to 8+clanLevel, i.e. from 1 to 16.
+    // For players of the same level, chances are ranging from 2 to 12.
     chance = 1 + learned / 30; 
     chance += (ch->getModifyLevel() - victim->getModifyLevel()) / 2;
     chance += ch->is_npc() ? 0 : ch->getPC()->getClanLevel();
@@ -372,14 +372,14 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
             victim->getNameP('1').c_str(), victim->getModifyLevel(),
             learned, chance, (ch->getModifyLevel() - victim->getModifyLevel()) / 2);
 
-    // Dice roll failed, learn on mistake.
+    // Dice roll failed, learn from mistakes.
     if (number_percent() > chance) {
         gsn_mortal_strike->improve( ch, false, victim );
         return false;
     }
 
-    // Success, inflict a lot of damage. Anatolia implementation was (victim->hit+1), but the 
-    // resulting damage was always reduced by sanctuary and other protections.
+    // Success, inflict a lot of damage. Anatolia implementation had (victim->hit+1), but the 
+    // resulting damage always got reduced by sanctuary and other protections.
     int dam;
     act_p("{RТвой молниеносный удар в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_CHAR,POS_RESTING);
     act_p("{RМолниеносный удар $c2 в одно мгновение лишает $C4 жизни!{x", ch,0,victim,TO_NOTVICT,POS_RESTING);

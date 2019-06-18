@@ -1,29 +1,33 @@
 /* $Id$
  *
- * ruffina, 2004
+ * ruffina, 2018
  */
 #ifndef NOTEHOOKS_H
 #define NOTEHOOKS_H
 
-#include "oneallocate.h"
 #include "logstream.h"
-#include "dlstring.h"
-#include "plugin.h"
+#include "commandplugin.h"
+#include "defaultcommand.h"
 #include "notethread.h"
 
-class NoteHooks : public Plugin, public OneAllocate {
+class NoteHooks : public CommandPlugin, public DefaultCommand {
 public:        
     typedef ::Pointer<NoteHooks> Pointer;
     
     NoteHooks( );
-    virtual ~NoteHooks( );
 
-    virtual void initialization( );
-    virtual void destruction( );
+    virtual void run( Character *, const DLString & );
 
-    void processNoteMessage( const NoteThread &thread, const Note &note ) const;
+    static void processNoteMessage( const NoteThread &thread, const Note &note );
+
+private:
+    static const DLString COMMAND_NAME;
+
+    static void notifyOrb(const NoteThread &thread, const Note &note);
+    static void hookDiscord(const NoteThread &thread, const Note &note);    
+    static void webDumpNews();
+    static void webDumpModernStories();
+    static void webDumpOldStories();
 };
-
-extern NoteHooks *noteHooks;
 
 #endif

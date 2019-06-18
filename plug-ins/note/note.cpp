@@ -3,6 +3,7 @@
  * ruffina, 2005
  */
 #include "note.h"
+#include "noteflags.h"
 
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
@@ -14,7 +15,7 @@
 
 CLAN(none);
 
-Note::Note( ) : godsSeeAlways( false )
+Note::Note( ) : flags(0, &note_flags), godsSeeAlways( false )
 {
 }
 
@@ -228,13 +229,5 @@ Race * Note::findRace( const DLString &arg )
             return race;
     
     return NULL;
-}
-
-WebNote::WebNote( ) 
-{
-}
-
-WebNote::~WebNote( )
-{
 }
 

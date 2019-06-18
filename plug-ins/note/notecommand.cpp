@@ -11,12 +11,12 @@
 #include "noteattrs.h"
 #include "listfilter_val.h"    
 #include "notehooks.h"
+#include "noteflags.h"
 
 #include "class.h"
 
 #include "pcharacter.h"
 #include "pcharactermanager.h"
-#include "object.h"
 #include "xmlpcstringeditor.h"
 
 #include "dreamland.h"
@@ -26,7 +26,6 @@
 #include "comm.h"
 #include "ban.h"
 #include "descriptor.h"
-#include "infonet.h"
 #include "act.h"
 #include "def.h"
 
@@ -77,13 +76,14 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
         return;
     }
 
-    if (cmd.strPrefix( "webdump" ) && ch->isCoder( )) {
-        doWebDump( ch );
+    if (arg_oneof_strict(cmd, "flag", "флаг") && ch->isCoder()) {
+        doFlag(ch, arguments);
         return;
     }
 
-    if (cmd.strPrefix( "hooksdump" ) && ch->isCoder( )) {
-        doHooksDump( ch, arguments );
+    if (arg_oneof_strict(cmd, "save", "сохранить") && ch->isCoder()) {
+        saveAllBuckets();
+        ch->println("Ok.");
         return;
     }
 
@@ -188,60 +188,47 @@ void NoteThread::run( Character* cch, const DLString& constArguments )
     echo( ch, msgNoCurrent, "Ты не пишешь никакого письма." );
 }
 
-void NoteThread::doWebDump( PCharacter *ch ) const
+/**
+ * Coder command:
+ * '<note> flag <id> <flags>' - sets specified flag on a note with given number.
+ * Note bucket is not saved, run '<note> save' to do so.
+ */
+void NoteThread::doFlag(PCharacter *ch, DLString &arguments )
 {
-    // TODO remove boilerplate 
-    setlocale(LC_TIME, "ru_RU.KOI8-R");
-
-    if (name == "news" || name == "change") {
-        NoteList::const_iterator i;
-        XMLListBase<WebNote> webNotes( true );
-        NoteThread::Pointer thread = NoteManager::getThis( )->findThread( "news" );
-        for (i = thread->getNoteList( ).begin( ); i != thread->getNoteList( ).end( ); i++) {
-            const Note *note = *i;
-            if (note->isNoteToAll( )) {
-                WebNote webnote;
-                webnote.subject.setValue( note->getSubject( ).colourStrip( ) );
-                webnote.from.setValue( note->getFrom( ).colourStrip( ) );
-                webnote.date.setValue( note->getDate( ).getTimeAsString( "%d %b %Y") );
-                webnote.id.setValue( note->getID( ) );
-                webnote.text.setValue( note->getText( ).colourStrip( ) );
-                webNotes.push_back( webnote );
-            }
-        }
-
-        thread = NoteManager::getThis( )->findThread( "change" );
-        for (i = thread->getNoteList( ).begin( ); i != thread->getNoteList( ).end( ); i++) {
-            const Note *note = *i;
-            if (note->isNoteToAll( )) {
-                WebNote webnote;
-                webnote.subject.setValue( note->getSubject( ).colourStrip( ) );
-                webnote.from.setValue( note->getFrom( ).colourStrip( ) );
-                webnote.date.setValue( note->getDate( ).getTimeAsString( "%d %b %Y") );
-                webnote.id.setValue( note->getID( ) );
-                webnote.text.setValue( note->getText( ).colourStrip( ) );
-                webNotes.push_back( webnote );
-            }
-        }
-
-        saveXML( &webNotes, "all-web" );
-        ch->println( "All news and changes dumped to all-web.xml." );
+    Integer noteId;
+    DLString arg = arguments.getOneArgument( );
+    
+    if (!Integer::tryParse(noteId, arg)) {
+        if (arg.empty())
+            ch->println("Укажите номер письма.");
+        else
+            ch->println("Неправильный номер письма.");
+        ch->printf( "Использование: %s flag <number> <flags to set|none>\r\n", getName( ).c_str( ) );
         return;
     }
 
-    if (name == "story") {
-        NoteList::const_iterator i;
-        XMLListBase<Note> xmlNotes( true );
+    const Note *cnote = getNoteAtPosition( ch, noteId );
+    if (!cnote) {
+        ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
+        return;
+    }
         
-        for (i = xnotes.begin( ); i != xnotes.end( ); i++)
-            xmlNotes.push_back( **i );
-
-        saveXML( &xmlNotes, "all-web" );
-        ch->println( "All stories dumped to all-web.xml." );
+    Note *note = findNote(cnote->getID());
+    if (!note) {
+        ch->println("Что-то пошло не так, письмо не найдено.");
         return;
     }
 
-    ch->println( "The 'webdump' command is not supported for this note thread." );
+    bitstring_t flags = (arguments == "none") ? 0 : note_flags.bitstring(arguments, false); 
+    if (flags == NO_FLAG) {
+        ch->pecho("Флаг не найден.");
+        return;
+    }
+
+    note->setFlags(flags);
+    ch->pecho("%^N3 номер %d установлены флаги %s.", 
+            rusName.c_str(), noteId.getValue(), note->getFlags().names().c_str());
+    ch->pecho("Используйте команду '%s save' для сохранения изменений на диск.", getName().c_str());
 }
 
 bool NoteThread::doShow( PCharacter *ch, XMLAttributeNoteData::Pointer attr ) const
@@ -410,32 +397,6 @@ void NoteThread::doRead( PCharacter *ch, DLString &arguments ) const
     }
 }
 
-void NoteThread::doHooksDump( PCharacter *ch, DLString &arguments ) const
-{
-    const Note *note;
-    DLString arg = arguments.getOneArgument( );
-    
-    if (arg.empty( ) || !arg.isNumber( )) {
-        ch->printf( "Syntax: %s hooksdump <number>\r\n", getName( ).c_str( ) );
-        return;
-    }
-
-    try {
-        note = getNoteAtPosition( ch, arg.toInt( ) );
-
-        if (!note) {
-            ch->pecho( "Так много %N2 еще не написали.", rusNameMlt.c_str( ) );
-            return;
-        }
-
-        noteHooks->processNoteMessage( *this, *note );
-        ch->println( "Ok." );
-            
-    } catch (const ExceptionBadType& e) {
-        ch->println( "Неправильный номер письма." );
-    }
-}
-
 void NoteThread::doList( PCharacter *ch, DLString &argument ) const
 {
     ostringstream buf;
@@ -453,11 +414,14 @@ void NoteThread::doList( PCharacter *ch, DLString &argument ) const
         for (cnt = 0, i = mynotes.begin( ); i != mynotes.end( ); i++, cnt++) {
             bool hidden = isNoteHidden( *i, ch, stamp );
 
-            if (listfilter_parse( ch, cnt, last, *i, hidden, argument.c_str( ) ))
+            if (listfilter_parse( ch, cnt, last, *i, hidden, argument.c_str( ) )) {
                 buf << "[" << cnt 
                     << (hidden ? " " : "N") << "] " 
-                    << (*i)->getFrom( ) << ": " << (*i)->getSubject( ) << "{x" 
-                    << endl;
+                    << (*i)->getFrom( ) << ": " << (*i)->getSubject( ) << "{x";
+                if (ch->isCoder() && (*i)->getFlags().getValue() != 0)
+                    buf << "  {D[" << (*i)->getFlags().names() << "]{x";
+                buf << endl;
+            }
         }
     }
     catch (const Exception &e) {
@@ -551,12 +515,11 @@ bool NoteThread::doPost( PCharacter *ch, XMLAttributeNoteData::Pointer attr )
     attach( &note );
 
     echo( ch, msgSent, "Письмо отправлено." );
-    notify( ch, note );
     LogStream::sendNotice( ) 
         << getName( ) << " post: " 
         << ch->getName( ) << ", id " << note.getID( ) << endl;
 
-    noteHooks->processNoteMessage( *this, note );
+    NoteHooks::processNoteMessage( *this, note );
     attr->clearNote( this );
     return true;
 }
@@ -613,67 +576,6 @@ void NoteThread::doForward( PCharacter *ch, XMLAttributeNoteData::Pointer attr, 
     orig->toForwardStream( buf );
     note->addLine( buf.str( ) );
     ch->println( "Ok." );
-}
-
-void NoteThread::notify( PCharacter *ch, const Note &note ) const
-{
-    Descriptor *d;
-    NoteManager::Threads::const_iterator i;
-    NoteManager::Threads &threads = NoteManager::getThis( )->getThreads( );
-
-    for (d = descriptor_list; d; d = d->next) {
-        Object *pager;
-        std::basic_ostringstream<char> buf0;
-        PCharacter *victim;
-        bool fFirst = true;
-        
-        if (d->connected != CON_PLAYING || !d->character)
-            continue;
-
-        victim = d->character->getPC( );
-        
-        if (victim == ch)
-            continue;
-        
-        if (!canRead( victim ))
-            continue;
-
-        if (!note.isNoteTo( victim ))
-            continue;
-         
-        if (!( pager = get_pager( victim ) ))
-            continue;
-
-        buf0 << "{CТихий голос из $o2: {WУ тебя:";
-        
-        for (i = threads.begin( ); i != threads.end( ); i++) {
-            const char *c1, *c2, *c5;
-            const NoteThread &th = **i->second;
-            int count = th.countSpool( victim );
-            int gender = th.gender.getValue( );
-            
-            if (count > 0) {
-                c1 = (gender == SEX_FEMALE ? "ая" : gender == SEX_MALE ? "ый" : "ое");
-                c2 = (gender == SEX_FEMALE ? "ые" : "ых");
-                c5 = "ых";
-                
-                if (fFirst) 
-                    fFirst = false;
-                else
-                    buf0 << "                                       ";
-
-                buf0 << " {Y" << count << "{W непрочитанн"
-                     << GET_COUNT(count, c1, c2, c5) << " " 
-                     << GET_COUNT(count, 
-                                    russian_case( th.rusName.getValue( ), '1' ),
-                                    russian_case( th.rusName.getValue( ), '2' ),
-                                    russian_case( th.rusNameMlt.getValue( ), '2' ) )
-                     << " (" << th.name << ").{x" << endl;
-            }
-        }
-        
-        act_p( buf0.str( ).c_str( ), victim, pager, 0, TO_CHAR, POS_DEAD );
-    }
 }
 
 void NoteThread::echo( PCharacter *ch, const DLString &msg, const DLString &defaultMsg, const DLString &arg ) const

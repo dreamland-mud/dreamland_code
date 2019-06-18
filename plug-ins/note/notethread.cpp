@@ -6,6 +6,7 @@
 #include "noteattrs.h"
 #include "notemanager.h"
 #include "note.h"
+#include "logstream.h"
 
 #include "commandmanager.h"
 #include "commandflags.h"
@@ -259,12 +260,21 @@ void NoteThread::showNoteToChar( PCharacter *ch, const Note *note ) const
                         "lastread" )->updateStamp( this, note );
 }
 
-const Note * NoteThread::findNote( PCharacter *ch, time_t id ) const
+const Note * NoteThread::findNote( time_t id ) const
 {
     NoteList::const_iterator i;
-
     for (i = xnotes.begin( ); i != xnotes.end( ); i++) 
-        if ((*i)->getID( ) == id && (*i)->isNoteTo( ch ))
+        if ((*i)->getID( ) == id)
+            return *i;
+
+    return NULL;
+}
+
+Note * NoteThread::findNote( time_t id )
+{
+    NoteList::iterator i;
+    for (i = xnotes.begin( ); i != xnotes.end( ); i++) 
+        if ((*i)->getID( ) == id)
             return *i;
 
     return NULL;
