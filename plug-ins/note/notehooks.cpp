@@ -155,8 +155,7 @@ static bool news_include(const Note *note)
 // Dump old stories explicitly marked with "publish" flag (via 'story flags' command).
 static bool story_include_old(const Note *note)
 {
-    return note->isNoteToAll() 
-            && note->getFlags().isSet(NOTE_PUBLISH)
+    return note->getFlags().isSet(NOTE_PUBLISH)
             && note->getID() < STORY_MODERN_START;
 }
 
