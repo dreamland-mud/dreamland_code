@@ -96,7 +96,6 @@ void
 XMLRegister::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadType )
 {
     const DLString &regtype = parent->getAttribute(ATTRIBUTE_REGTYPE);
-
     if(regtype == REGTYPE_NONE) {
         *this = Register();
         return;
@@ -108,6 +107,11 @@ XMLRegister::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadType )
     }
     
     XMLNode::Pointer node = parent->getFirstNode();
+	if (!node) {
+		LogStream::sendError() << "Empty XML node " << parent->getName() << endl;
+		return;
+	}
+
 
     if(node->getType() != XMLNode::XML_TEXT 
             && node->getType() != XMLNode::XML_CDATA)
@@ -127,7 +131,7 @@ XMLRegister::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadType )
     } else if(regtype == REGTYPE_OBJECT) {
         Register::set(&Object::manager->at(cd.toInt()));
     } else {
-        throw ExceptionBadType(parent->getName(), "unknown regtype in XMLRegister element");
+        throw ExceptionBadType(parent->getName(), regtype + ": unknown regtype in XMLRegister element");
     }
 }
 
