@@ -109,6 +109,7 @@ void ColorTags::parse_color_web( ostringstream &out )
 {        
     desired_class = "fgdw";
     actual_class = "";
+    char t;
 
     for (p = text; *p; ++p) {
         // Text output with current colours.
@@ -149,11 +150,36 @@ void ColorTags::parse_color_web( ostringstream &out )
 
         // colors
         default:
-            if (is_valid_color( *p )) {
+            t = *p;
+
+            // Handle {1 (remember color) and {2 (restore color) tags.
+            switch (t) {
+            case CLR_PUSH: case '1':
+                if (color_last) 
+                    color_stack.push_back( color_last );
+                else
+                    color_stack.push_back('x');
+                break;
+
+            case CLR_POP: case '2':
+                if (color_stack.empty( )) {
+                    t = 'x';
+                } else {
+                    t = color_stack.back( );
+                    color_stack.pop_back( );
+                }
+                /* FALLTROUGH */
+            }
+
+            if (is_valid_color( t )) {
                 DLString clr;
-                clr += *p;
+                clr += t;
+
+                // Remember current color for push/pop functionality.
+                color_last = t;
+
                 // Handle bright and dark colour variants.
-                if (dl_isupper( *p )) 
+                if (dl_isupper( t )) 
                     desired_class = "fgb" + clr.toLower( );
                 else
                     desired_class = "fgd" + clr;
@@ -192,7 +218,7 @@ void ColorTags::parse_color_ansi( ostringstream &out )
                 out << "\007";             
             break;
         case '+':
-            if (!raw)
+            if (!raw) 
                 out << C_BLINK;             
             break;
         case '/':        
@@ -235,14 +261,17 @@ const char * ColorTags::color_tag_ansi( )
     case CLR_PUSH: case '1':
         if (color_last) 
             color_stack.push_back( color_last );
+        else
+            color_stack.push_back('x');
         return "";
 
     case CLR_POP: case '2':
-        if (color_stack.empty( )) 
-            return "";
-
-        t = color_stack.back( );
-        color_stack.pop_back( );
+        if (color_stack.empty( )) {
+            t = 'x';
+        } else {
+            t = color_stack.back( );
+            color_stack.pop_back( );
+        }
         /* FALLTROUGH */
 
     default:
