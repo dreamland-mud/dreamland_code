@@ -386,25 +386,37 @@ static bool can_get_obj( Character *ch, Object *obj )
     if (obj->pIndexData->limit != -1)
     {
         if (obj->isAntiAligned( ch )) {
-            ch->pecho("%2$^s не позволяют тебе владеть %1$O5, и ты роняешь %1$P2.",
-                      obj,
-                      IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
-            
-            ch->recho("%1$^C1 обжигается и роняет %2$O4.", ch, obj );
-            return false;
+            if (ch->is_immortal()) 
+                ch->pecho("Осторожно, ты не смог%1$Gло||ла бы владеть этой вещью, будучи смертн%1$Gым|ым|ой.", ch);
+            else {
+                ch->pecho("%2$^s не позволяют тебе владеть %1$O5, и ты роняешь %1$P2.",
+                          obj,
+                          IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
+                
+                ch->recho("%1$^C1 обжигается и роняет %2$O4.", ch, obj );
+                return false;
+            }
         }
     }
 
     if (ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ))
     {
-        act_p( "$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR,POS_RESTING );
-        return false;
+        if (ch->is_immortal())
+            ch->println("Осторожно, ты уже несешь слишком много вещей.");
+        else {
+            act_p( "$d: ты не можешь нести больше вещей.",ch,NULL,obj->getName( ),TO_CHAR,POS_RESTING );
+            return false;
+        }
     }
 
     if (ch->getCarryWeight( ) + obj->getWeight( ) > ch->canCarryWeight( ))
     {
-        act_p( "$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR ,POS_RESTING);
-        return false;
+        if (ch->is_immortal())
+            ch->pecho("Осторожно, ты не смог%1$Gло||ла бы поднять такую тяжесть, будучи смертн%1$Gым|ым|ой.", ch);
+        else {
+            act_p( "$d: ты не можешь поднять такую тяжесть.",ch,NULL,obj->getName( ),TO_CHAR ,POS_RESTING);
+            return false;
+        }
     }
 
     return true;
