@@ -57,7 +57,7 @@ void LocateCustomer::givenGood( PCharacter *hero, Object *obj )
     }
     else {
         quest->getScenario( ).actAnotherItem( ch, hero, quest );
-        quest->wiznet( "", "%s gets item #%d", ch->getNameP( '1' ).c_str( ), quest->delivered.getValue( ) );
+//        quest->wiznet( "", "%s gets item #%d", ch->getNameP( '1' ).c_str( ), quest->delivered.getValue( ) );
     }
 }
 
