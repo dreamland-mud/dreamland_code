@@ -78,6 +78,10 @@ COMMAND(CQuest, "quest")
         doInfo( pch );
         return;
     }
+    else if (arg_oneof(cmd, "newinfo")) {
+        doNewInfo(pch, arguments);
+        return;
+    }
     else if (arg_oneof( cmd, "points", "очки" )) {
         doPoints( pch );
         return;
@@ -211,6 +215,33 @@ bool CQuest::gprog_questinfo( PCharacter *ch )
         LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
         return false;
     }
+}
+
+static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &arg )
+{
+    static Scripting::IdRef ID_TMP( "tmp" ), ID_QUEST( "quest" );
+    Scripting::IdRef ID_CMD( cmd );
+    Scripting::Register tmpQuest;
+    Scripting::RegisterList regList;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    try {
+        tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
+        regList.push_back( FeniaManager::wrapperManager->getWrapper( ch ) );
+        regList.push_back(Scripting::Register(arg));
+        return tmpQuest[ID_CMD]( regList ).toBoolean( );
+    }
+    catch (const Scripting::Exception &e) {
+        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
+        return false;
+    }
+}
+
+void CQuest::doNewInfo( PCharacter *ch, const DLString &arguments ) 
+{
+    gprog_quest(ch, "newinfo", arguments);
 }
 
 void CQuest::doInfo( PCharacter *ch ) 

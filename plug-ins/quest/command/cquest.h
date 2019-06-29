@@ -22,6 +22,7 @@ public:
         
 private:
         void doInfo( PCharacter * );
+        void doNewInfo( PCharacter *, const DLString & );
         void doPoints( PCharacter * );
         void doTime( PCharacter * );
         void doSet( PCharacter *, DLString& );
