@@ -52,6 +52,22 @@ protected:
         int sn;
 };
 
+class MorrisDancerSet: public EquipSet {
+XML_OBJECT
+public:
+        typedef ::Pointer<MorrisDancerSet> Pointer;
+        MorrisDancerSet();
+
+        virtual void fight( Character *ch );
+        virtual bool area( );
+protected:
+        virtual bool hasAffect(Character *) const;
+        virtual void addAffect(Character *) const;
+        virtual void removeAffect(Character *) const;
+        
+        int sn;
+};
+
 class NorivaMyrvaleSet: public EquipSet {
 XML_OBJECT
 public:
