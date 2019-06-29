@@ -50,11 +50,16 @@ static bool mprog_spell( Character *victim, Character *caster, Skill::Pointer sk
     return false;
 }
 
-static bool mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before )
+static void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before )
 {
+    const char *sname = skill->getName().c_str();
+    for (Character *rch = caster->in_room->people; rch; rch = rch->next_in_room) {
+        FENIA_VOID_CALL( rch, "Cast", "Csi", caster, sname, before );
+        FENIA_NDX_VOID_CALL( rch->getNPC( ), "Cast", "CCsi", rch, caster, sname, before );
+    }
+
     BEHAVIOR_VOID_CALL( caster->getNPC( ), cast, target, skill->getIndex(), before );
 
-    return false;
 }
 
 CMDRUN( cast )
