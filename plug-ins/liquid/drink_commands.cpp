@@ -549,7 +549,7 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
     
-    if (IS_SET( obj->value[3], DRINK_POISONED ))
+    if (IS_SET( obj->value[3], DRINK_POISONED ) || obj->isAffected(gsn_poison))
     {
         /* The drink was poisoned ! */
         Affect af;
