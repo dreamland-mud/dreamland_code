@@ -82,6 +82,7 @@ void ShopBuyPrice::taxes( int cost ) const
     cost += keeper->silver;
     /* 'number' процентов от цены и кассы - в банк */
     dreamland->putToMerchantBank( cost * number / 100 );
+    dreamland->save(false);
     /* положить доход в кассу и вычесть то, что ушло в банк */
     keeper->silver = cost * number - ( cost * number / 100 ) * 100;
 }

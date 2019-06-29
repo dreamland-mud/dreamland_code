@@ -86,7 +86,8 @@ void MoneyPrice::deduct( Character *ch ) const
 
 void MoneyPrice::taxes( int cost ) const
 {
-     dreamland->putToMerchantBank( cost / 100 );
+    dreamland->putToMerchantBank( cost / 100 );
+    dreamland->save(false);
 }
 
 void MoneyPrice::toStream( Character *ch, ostringstream &buf ) const

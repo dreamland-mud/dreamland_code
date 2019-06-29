@@ -40,6 +40,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         ch->silver -= silver;
         ch->silver += silver * 5 / 100 ;
         dreamland->putToMerchantBank( ch->silver / 100 );
+        dreamland->save(false);
         ch->silver %= 100;
     }
     else {
@@ -47,6 +48,7 @@ void MoneyChanger::bribe( Character *vch, int gold, int silver )
         ch->gold -= gold;
         
         dreamland->putToMerchantBank( ch->gold );
+        dreamland->save(false);
         ch->gold = 0;
     }
   
