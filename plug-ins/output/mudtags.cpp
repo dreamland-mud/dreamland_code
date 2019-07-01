@@ -374,7 +374,6 @@ protected:
     const char *text;
     const char *p;
     char c;
-    int text_position;
 };
 
 VisibilityTags::VisibilityTags( const char *text, Character *ch )
@@ -382,7 +381,6 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     PlayerConfig::Pointer cfg = ch ? ch->getConfig( ) : PlayerConfig::Pointer( );
     this->text = text;
     this->ch = ch;
-    text_position = 0;
 
     my_clang = (cfg && cfg->rucommands) ? LANG_RUSSIAN : LANG_ENGLISH;
 
@@ -440,14 +438,14 @@ void VisibilityTags::reset( )
 }
 
 
-// Return true if character pointed to by p is followed by 
+// Return true if a character pointed to by p is followed by 
 // all characters from msg.
 static bool is_followed_by(const char *p, const char *msg) {
     if (!p || !msg || !*p)
         return false;
 
     size_t msg_len = strlen(msg);
-    for (int m = 0; m < msg_len; m++) {
+    for (size_t m = 0; m < msg_len; m++) {
         if (*(p + m + 1) != msg[m])
             return false;
     }
@@ -455,15 +453,16 @@ static bool is_followed_by(const char *p, const char *msg) {
     return true;
 }
 
-// Return true if character pointed to by p is preceded by
+// Return true if a character in 'text' (pointed to by p) is preceded by
 // all character from msg. 
-static bool is_preceded_by(const char *p, int text_position, const char *msg)
+static bool is_preceded_by(const char *p, const char *text, const char *msg)
 {
+    size_t text_position = p - text;
     size_t msg_len = strlen(msg);
     if (msg_len >= text_position)
         return false;
 
-    for (int m = 0; m < msg_len; m++) {
+    for (size_t m = 0; m < msg_len; m++) {
         if (*(p - msg_len + m) != msg[m])
             return false;
     }
@@ -490,14 +489,12 @@ bool VisibilityTags::need_escape( )
 
     // Only allow < if it's preceded by {Iw and followed by m|r space or /m|r>.
     if (c == '<') {
-        if (!is_preceded_by(p, text_position, "{Iw"))
-            return true;
-        
+        if (!is_preceded_by(p, text, "{Iw")) 
+            return true;        
         if (is_followed_by(p, "m ") || is_followed_by(p, "r "))
             return false;
         if (is_followed_by(p, "/m>") || is_followed_by(p, "/r>"))
             return false;
-
         return true;
     }
 
@@ -535,7 +532,7 @@ void VisibilityTags::run( ostringstream &out )
 {
     reset( );
 
-    for (p = text; *p; ++p, ++text_position) {
+    for (p = text; *p; ++p) {
         if (*p != '{') {
             c = *p;
 
