@@ -374,6 +374,7 @@ protected:
     const char *text;
     const char *p;
     char c;
+    int text_position;
 };
 
 VisibilityTags::VisibilityTags( const char *text, Character *ch )
@@ -381,6 +382,7 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
     PlayerConfig::Pointer cfg = ch ? ch->getConfig( ) : PlayerConfig::Pointer( );
     this->text = text;
     this->ch = ch;
+    text_position = 0;
 
     my_clang = (cfg && cfg->rucommands) ? LANG_RUSSIAN : LANG_ENGLISH;
 
@@ -437,6 +439,38 @@ void VisibilityTags::reset( )
     my_hyper_tag = 0;
 }
 
+
+// Return true if character pointed to by p is followed by 
+// all characters from msg.
+static bool is_followed_by(const char *p, const char *msg) {
+    if (!p || !msg || !*p)
+        return false;
+
+    size_t msg_len = strlen(msg);
+    for (int m = 0; m < msg_len; m++) {
+        if (*(p + m + 1) != msg[m])
+            return false;
+    }
+
+    return true;
+}
+
+// Return true if character pointed to by p is preceded by
+// all character from msg. 
+static bool is_preceded_by(const char *p, int text_position, const char *msg)
+{
+    size_t msg_len = strlen(msg);
+    if (msg_len >= text_position)
+        return false;
+
+    for (int m = 0; m < msg_len; m++) {
+        if (*(p - msg_len + m) != msg[m])
+            return false;
+    }
+
+    return true;
+}
+
 // See if some characters need to be replaced with HTML entities.
 bool VisibilityTags::need_escape( )
 {
@@ -444,10 +478,37 @@ bool VisibilityTags::need_escape( )
     if (!my_web) {
         return false;
     }
-    // Don't escape strings inside "{Iw" tags.
-    if (IS_SET(st_invis, INVIS_WEB)) {
-        return false;
+
+    // Escape strings outside of "{Iw" tags for web clients.
+    if (!IS_SET(st_invis, INVIS_WEB)) {
+        return true;
     }
+
+    // Don't escape custom tags inside '{Iw' tags.
+    // Examples: {Iw<m ... >{Ix or {Iw</m>{Ix
+    // This awaits better implementation of client-server proto for mudjs.
+
+    // Only allow < if it's preceded by {Iw and followed by m|r space or /m|r>.
+    if (c == '<') {
+        if (!is_preceded_by(p, text_position, "{Iw"))
+            return true;
+        
+        if (is_followed_by(p, "m ") || is_followed_by(p, "r "))
+            return false;
+        if (is_followed_by(p, "/m>") || is_followed_by(p, "/r>"))
+            return false;
+
+        return true;
+    }
+
+    // Only allow > if it's followed by {Ix.
+    if (c == '>') {
+        if (is_followed_by(p, "{Ix"))
+            return false;
+
+        return true;
+    }
+
     return true;
 }
 
@@ -474,7 +535,7 @@ void VisibilityTags::run( ostringstream &out )
 {
     reset( );
 
-    for (p = text; *p; ++p) {
+    for (p = text; *p; ++p, ++text_position) {
         if (*p != '{') {
             c = *p;
 
