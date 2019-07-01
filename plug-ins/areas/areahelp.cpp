@@ -7,6 +7,7 @@
 #include "so.h"
 #include "plugininitializer.h"
 #include "mocregistrator.h"
+#include "regexp.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "dl_strings.h"
@@ -70,8 +71,13 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!empty())
        in << *this << endl;
     
-    if (str_cmp(area->speedwalk, ""))
+    if (str_cmp(area->speedwalk, "")) {
         in << "{yКак добраться{x: " << area->speedwalk << endl;
+
+        RegExp speedwalkRE("[0-9]?[nsewud]+");
+        if (speedwalkRE.match(area->speedwalk))
+           in << "{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x" << endl;
+    }
 }
 
 class AreaHelpLifetimePlugin : public Plugin {
