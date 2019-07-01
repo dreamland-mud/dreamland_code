@@ -94,7 +94,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
     act("$c1 говорит тебе '{GМой сорванец сын сбежал из дома, спасаясь от призыва в клан Войнов.{x'", king, 0, hero, TO_VICT);
     act("$c1 говорит тебе '{GВы ведь знаете, туда в наши дни берут всех подряд.{x'", king, 0, hero, TO_VICT);
     act("$c1 говорит тебе '{GОтыщи его, пока он не попал в беду.{x'", king, 0, hero, TO_VICT);
-    act("$c1 говорит тебе '{GСкорее всего он скрывается где-то в районе $t{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    act("$c1 говорит тебе '{GСкорее всего он скрывается где-то в районе {W{hh$t{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {

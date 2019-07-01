@@ -117,20 +117,20 @@ void KidnapQuest::info( std::ostream &buf, PCharacter *ch )
 {
     switch (state.getValue( )) {
     case QSTAT_INIT:
-        buf << "Тебе нужно попасть в " << kingRoom << " (" << kingArea << "), "
+        buf << "Тебе нужно попасть в " << kingRoom << " ({hh" << kingArea << "{hx), "
             << "найти там " << russian_case( kingName, '4' ) 
             << " и узнать, какая помощь от тебя требуется." << endl;
         break;
 
     case QSTAT_MARK_RCVD:
         buf << "Тебе нужно отыскать " << russian_case( princeName, '4' ) 
-            << " в местности под названием " << princeArea << "." << endl;
+            << " в местности под названием {hh" << princeArea << "{x." << endl;
         break;
     
     case QSTAT_KID_FOUND:
         buf << "Тебе необходимо отвести " << russian_case( princeName, '4' )
             << " к " << russian_case( kingName, '3' ) << "." << endl
-            << "Это находится в " << kingRoom << " (" << kingArea << ")." << endl;
+            << "Это находится в " << kingRoom << " ({hh" << kingArea << "{hx)." << endl;
         break;
         
     case QSTAT_KING_ACK_WAITING:
@@ -212,7 +212,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
              room->name );
     else
         tell_raw( ch, questman, 
-             "Последний раз {W%s{G видели в местности {W%s{G.", 
+             "Последний раз {W%s{G видели в местности {W{hh%s{hx{G.", 
              russian_case( princeName, '4' ).c_str( ),
              room->area->name );
      

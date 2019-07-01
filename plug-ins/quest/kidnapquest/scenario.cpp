@@ -36,7 +36,7 @@ void KidnapScenario::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCh
               "У {W%s{G случилось несчастье. Срочно требуется твоя помощь.",
                    king->getNameP( '2' ).c_str() );
     tell_raw( hero, questman, 
-             "Ищи %s в местности под названием {W%s{G ({W%s{G).",
+             "Ищи %s в местности под названием {W%s{G ({W{hh%s{hx{G).",
                    GET_SEX(king, "его", "его", "ее"), king->in_room->name, king->in_room->area->name );
 }
 

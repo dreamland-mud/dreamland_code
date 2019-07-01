@@ -87,7 +87,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
 {
     act("$c1 говорит тебе '{GМоя дочурка вчера утром ушла за молоком, взяла деньги, но забыла бидончик.{x'", king, 0, hero, TO_VICT);
     act("$c1 говорит тебе '{GВот уже прошли сутки, а ее все нет. Я очень волнуюсь.{x'", king, 0, hero, TO_VICT);
-    act("$c1 говорит тебе '{GСкорее всего, она заблудилась где-то в районе $t{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    act("$c1 говорит тебе '{GСкорее всего, она заблудилась где-то в районе {W{hh$t{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const
 {

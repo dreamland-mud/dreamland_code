@@ -36,7 +36,7 @@ void KS::onQuestStart( PCharacter *hero, NPCharacter *questman, NPCharacter *kin
               "{W%s{G зачем-то понадобилась твоя помощь.",
                    king->getNameP( '3' ).c_str() );
     tell_raw( hero, questman, 
-             "Ищи %s в местности под названием {W%s{G ({W%s{G).",
+             "Ищи %s в местности под названием {W%s{G ({W{hh%s{hx{G).",
                    GET_SEX(king, "его", "его", "ее"), king->in_room->name, king->in_room->area->name );
 }
 
@@ -125,7 +125,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
     act("$c1 оценивающе смотрит на тебя.", king, 0, hero, TO_VICT);
     act("$c1 оценивающе смотрит на $C4.", king, 0, hero, TO_NOTVICT);
     interpret_raw(king, "sigh");
-    act("$c1 говорит тебе '{GПрослыша$gло|л|ла я, что в $t есть один ребенок.{x", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    act("$c1 говорит тебе '{GПрослыша$gло|л|ла я, что в {W{hh$t{hx{G есть один ребенок.{x", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
     act("$c1 говорит тебе '{GЗамечательный экземплярчик...{x'", king, 0, hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 

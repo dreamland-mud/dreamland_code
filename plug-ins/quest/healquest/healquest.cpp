@@ -90,7 +90,7 @@ void HealQuest::create( PCharacter *pch, NPCharacter *questman )
                pch, questman, patient );
     tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{x.",
               pch, questman, patient, patient->in_room->name );
-    tell_fmt( "Это находится в районе под названием {W%3$s{x.", 
+    tell_fmt( "Это находится в районе под названием {W{hh%3$s{x.", 
               pch, questman, patient->in_room->area->name );
     tell_fmt( "Поторопись, пока болезнь не доконала %3$P2!", pch, questman, patient );
     tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания.", pch, questman, time );
@@ -177,7 +177,7 @@ void HealQuest::info( std::ostream &buf, PCharacter *ch )
     else 
         buf << "У тебя задание - вылечить " << russian_case( mobName, '4' ) << "!" << endl
             << "Место, где пациента видели в последний раз - " << roomName << endl
-            << "Это находится в районе под названием " << areaName << "." << endl;
+            << "Это находится в районе под названием {hh" << areaName << "{hx." << endl;
 }
 
 void HealQuest::shortInfo( std::ostream &buf, PCharacter *ch )

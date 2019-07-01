@@ -55,7 +55,7 @@ void ButcherQuest::create( PCharacter *pch, NPCharacter *questman )
 
     tell_raw( pch, questman, "У меня есть для тебя срочное поручение!" );
     tell_raw( pch, questman, 
-        "{W%s{G из местности {W%s{G хочет подать к столу {W%d{G кус%s мяса {W%s{G, обитающих в {W%s{G.", 
+        "{W%s{G из местности {W{hh%s{hx{G хочет подать к столу {W%d{G кус%s мяса {W%s{G, обитающих в {W{hh%s{hx{G.", 
         customerName.c_str( ),
         customerArea.c_str( ),
         ordered.getValue( ),
@@ -85,11 +85,11 @@ void ButcherQuest::info( std::ostream &buf, PCharacter *ch )
         buf << "Твое задание {YВЫПОЛНЕНО{x!" << endl
             << "Вернись за вознаграждением, до того как выйдет время!" << endl;
     else { 
-        buf << customerName << " из " << customerArea
-            << " просит тебя доставить к столу "
+        buf << customerName << " из {hh" << customerArea
+            << "{hx просит тебя доставить к столу "
             << ordered << " кус" << GET_COUNT(ordered.getValue( ), "ок", "ка", "ков")
             << " мяса " << raceRusName.ruscase( '2' ) 
-            << ", oбитающих в местности " << areaName << "." << endl;
+            << ", oбитающих в местности {hh" << areaName << "{hx." << endl;
             
         if (delivered > 0)
             buf << "Доставлено кусков: " << delivered << "." << endl;    

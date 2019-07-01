@@ -86,7 +86,7 @@ void KillQuest::create( PCharacter *pch, NPCharacter *questman )
     }
 
     tell_fmt( "Место, где %3$P2 видели в последний раз - {W%4$s{G!",  pch, questman, victim, pRoom->name );
-    tell_fmt( "Это находится в районе под названием {W%3$s{G.",  pch, questman, pRoom->area->name );
+    tell_fmt( "Это находится в районе под названием {W{hh%3$s{hx{G.",  pch, questman, pRoom->area->name );
     tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т на выполнение задания.",  pch, questman, time );
 }
 
@@ -161,7 +161,7 @@ void KillQuest::info( std::ostream &buf, PCharacter *ch )
     else 
         buf << "У тебя задание - уничтожить " << russian_case( mobName, '4' ) << "!" << endl
             << "Место, где жертву видели в последний раз - " << roomName << endl
-            << "Это находится в районе под названием " << areaName << "." << endl;
+            << "Это находится в районе под названием {hh" << areaName << "{hx." << endl;
 }
 
 void KillQuest::shortInfo( std::ostream &buf, PCharacter *ch )

@@ -54,7 +54,7 @@ void GroupChannel::triggers( Character *ch, const DLString &msg ) const
             NPCharacter *pet = ch->getPC( )->pet;
     
         if (pet)
-            tell_raw( ch, pet, "Хозяин, я нахожусь в %s - %s",
+            tell_raw( ch, pet, "Хозяин, я нахожусь в {hh%s{hx - %s",
                         pet->in_room->area->name, pet->in_room->name );
     }
 }

@@ -94,7 +94,7 @@ void RobbedVictim::talkToHero( PCharacter *hero )
             tell_fmt( "Но мне удалось кое-что выяснить о грабител%3$gе|е|ьнице.",
                       hero, ch,
                       quest->thiefSex.getValue( ) );
-            tell_fmt( "%3$^p1 родом из {1{W%4$s{2, и чаще всего ошивается в районе {1{W%5$s{2.",
+            tell_fmt( "%3$^p1 родом из {1{W{hh%4$s{hx{2, и чаще всего ошивается в районе {1{W%5$s{2.",
                       hero, ch,
                       quest->thiefSex.getValue( ),
                       quest->thiefArea.c_str( ), 

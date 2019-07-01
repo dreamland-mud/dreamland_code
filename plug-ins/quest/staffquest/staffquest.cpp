@@ -49,7 +49,7 @@ void StaffQuest::create( PCharacter *pch, NPCharacter *questman )
     tell_raw( pch, questman, "Придворные волшебники определили, где спрятано украденное сокровище." );
     tell_raw( pch, questman, "Тебе поручается доставить его мне!" );        
     tell_raw( pch, questman, "Место, где оно спрятано, называется {W%s{G", roomName.c_str( ) );
-    tell_raw( pch, questman, "И находится это место в районе под названием - {W%s{G", areaName.c_str( ) );
+    tell_raw( pch, questman, "И находится это место в районе под названием - {W{hh%s{hx{G", areaName.c_str( ) );
     tell_raw( pch, questman, "У тебя есть {Y%d{G минут%s на выполнение задания.",
                   time, GET_COUNT(time,"а","ы","") ); 
     
@@ -82,7 +82,7 @@ void StaffQuest::info( std::ostream &buf, PCharacter *ch )
     else 
         buf << "У тебя задание - вернуть " << russian_case( objName.getValue( ), '4' ) << "." << endl
             << "Место, где он спрятан, называется " << roomName << "." << endl
-            << "И находится это место в районе под названием " << areaName << endl;
+            << "И находится это место в районе под названием {hh" << areaName << "{hx." << endl;
 }
 
 void StaffQuest::shortInfo( std::ostream &buf, PCharacter *ch )

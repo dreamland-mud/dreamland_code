@@ -132,7 +132,7 @@ void BigQuest::info( std::ostream &buf, PCharacter *ch )
             << "Вернись за вознаграждением, до того как выйдет время!" << endl;
     else {
         getScenario().onQuestInfo(ch, mobsTotal, buf);
-        buf << "Последний раз их видели в местности '" << areaName << "'." << endl;
+        buf << "Последний раз их видели в местности '{hh" << areaName << "{hx'." << endl;
         if (mobsKilled > 0)
             buf << "Уже убито " << mobsKilled << ", осталось совсем немного." << endl;
     }

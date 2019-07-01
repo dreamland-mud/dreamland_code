@@ -129,7 +129,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
              break;
     }
 
-    tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W%s{G).", 
+    tell_raw( pch, questman, "Пострадавшего ищи в районе {W%s{G ({W{hh%s{hx{G).", 
                   victim->in_room->name, victim->in_room->area->name );
     tell_fmt("У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.", 
               pch, questman, time );
@@ -211,21 +211,21 @@ void StealQuest::info( std::ostream &buf, PCharacter *ch )
     case QSTAT_INIT:
         buf << "У " << russian_case( victimName, '2' ) << " какие-то неприятности." << endl
             << "Пострадавший ждет тебя в районе '" 
-            << victimRoom << "' (" << victimArea << ")." << endl;
+            << victimRoom << "' ({hh" << victimArea << "{hx)." << endl;
         break;
 
     case QSTAT_HUNT_ROBBER:
         buf << "Тебе стало известно, что у " << russian_case( victimName, '2' ) 
             << " украли " << russian_case( itemName, '4' ) << ". " << endl
             << "Вор - " << russian_case( thiefName, '1' ) 
-            << ", скорее всего скрывается в районе '" << thiefRoom << "' (" << thiefArea << ")." << endl;
+            << ", скорее всего скрывается в районе '" << thiefRoom << "' ({hh" << thiefArea << "{hx)." << endl;
 
             if (!chestRoom.getValue( ).empty( ))
                 buf << "По слухам, награбленное добро спрятано где-то около '" << chestRoom << "'" 
                     << ", ключ от нычки ищи у вора." << endl;
 
             buf << "Пострадавший ждет тебя около '" 
-                << victimRoom << "' (" << victimArea << ")." << endl;
+                << victimRoom << "' ({hh" << victimArea << "{hx)." << endl;
 
         break;
 

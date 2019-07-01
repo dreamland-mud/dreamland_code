@@ -92,7 +92,7 @@ void KS::actLegend( NPCharacter *king, PCharacter *hero, KidnapQuest::Pointer qu
     act("$c1 говорит тебе '{GУ меня недавно встал на крыло дракончик.. не по годам рано.{x'", king, 0, hero, TO_VICT);
     act("$c1 говорит тебе '{GОт радости он улетел так далеко, что, похоже, не может найти дороги обратно.{x'", king, 0, hero, TO_VICT);
     act("$c1 говорит тебе '{GНайди его и верни, пока до него не добрались охотники за драконами.{x'", king, 0, hero, TO_VICT);
-    act("$c1 говорит тебе '{GСкорее всего ты встретишь его в местности $t.{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
+    act("$c1 говорит тебе '{GСкорее всего ты встретишь его в местности {W{hh$t{hx{G.{x'", king, quest->princeArea.getValue( ).c_str( ), hero, TO_VICT);
 }
 void KS::actGiveMark( NPCharacter *king, PCharacter *hero, Object * mark, int time ) const 
 {

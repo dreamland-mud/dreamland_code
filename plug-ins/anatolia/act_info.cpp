@@ -793,7 +793,7 @@ CMDRUNP( where )
 
     if (arg.empty( ) || fPKonly)
     {
-        ch->printf( "Ты находишься в местности {W%s{x. Недалеко от тебя:\r\n",
+        ch->printf( "Ты находишься в местности {W{hh%s{x. Недалеко от тебя:\r\n",
                      ch->in_room->area->name );
         found = false;
 
@@ -2142,7 +2142,7 @@ CMDRUNP( areas )
         if (mcnt % 2)
             buf << endl;
     }
-
+    buf << endl << "Подробнее о каждой зоне смотри в {Wсправка название_зоны{x." << endl;
     page_to_char( buf.str( ).c_str( ), ch );        
 }
 

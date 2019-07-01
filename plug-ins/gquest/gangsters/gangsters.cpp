@@ -530,7 +530,7 @@ void Gangsters::createThirdHint( )
 {
     std::basic_ostringstream<char> buf;
 
-    buf << "Больше всего от руки бандитов пострадала местность " << areaName << ".";
+    buf << "Больше всего от руки бандитов пострадала местность {hh" << areaName << "{hx.";
     setHint( buf.str( ) );
     GQChannel::gecho( this, buf );
 

@@ -75,7 +75,7 @@ void LocateQuest::create( PCharacter *pch, NPCharacter *questman )
 
     tell_fmt( "{W%3$#^C1{G хочет отыскать некоторые принадлежащие %3$P3 вещи.",  
               pch, questman, customer );
-    tell_fmt( "%3$#^P1 ждет тебя в районе {W%4$s{G ({W%5$s{G).", 
+    tell_fmt( "%3$#^P1 ждет тебя в районе {W%4$s{G ({W{hh%5$s{hx{G).", 
                pch, questman, customer, customer->in_room->name, customer->in_room->area->name );
     tell_fmt( "У тебя есть {Y%3$d{G мину%3$Iта|ты|т, чтобы добраться туда и узнать подробности.",  
                pch, questman, time );
@@ -99,7 +99,7 @@ void LocateQuest::info( std::ostream &buf, PCharacter *ch )
     case QSTAT_INIT:
         buf << customerName.ruscase( '1' ) <<  " хочет отыскать кое-какие свои вещи." << endl
             << "Тебя с нетерпением ждут в районе " << customerRoom << "." << endl
-            << "Это находится в местности под названием " << customerArea << "." << endl;
+            << "Это находится в местности под названием {hh" << customerArea << "{hx." << endl;
         break;
     case QSTAT_SEARCH:
         getScenario( ).getLegend( ch, this, buf );
@@ -108,7 +108,7 @@ void LocateQuest::info( std::ostream &buf, PCharacter *ch )
             buf << "Тобой уже доставлено {Y" << delivered << "{x из них." << endl;
         
         buf << "Заказчик ждет тебя в районе " << customerRoom << "." << endl
-            << "Это находится в местности под названием " << customerArea << "." << endl;
+            << "Это находится в местности под названием {hh" << customerArea << "{hx." << endl;
 
         break;
     case QSTAT_FINISHED:
