@@ -1730,7 +1730,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
             found = true;
-            buf << " " << ename;
+            buf << " {hc" << ename << "{hx";
         }
         else if (number_percent() < gsn_perception->getEffective( ch )) {
             found = true;
