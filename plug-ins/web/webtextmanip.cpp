@@ -39,17 +39,6 @@ static const char * consume_keyword(const char *desc, DLString &keyword)
     return desc;
 }
 
-// Wraps extra-description keywords with pseudo-tags:
-// <r i="id">keyword</r>
-// surrounded by web invisibility tags {Iw and {Ix.
-static DLString decorate_keyword(const DLString &keyword, const DLString &id)
-{
-    ostringstream buf;
-    buf << "{Iw<r i=\"" << id << "\">{Ix"
-        << keyword
-        << "{Iw</r>{Ix";
-    return buf.str( );
-}
 
 // Returns all extra description keywords matching given one.
 // In the absense of unique numeric IDs for extra descriptions,
@@ -65,7 +54,8 @@ static DLString unique_keyword_id(EXTRA_DESCR_DATA *ed, const DLString &keyword)
 
 /**
  * Decorates room descriptions, object descriptions and various extra descrs
- * by adding "<r/>" pseudo-tags around extra description keywords, such as "(sign)", "(tablet)" etc.
+ * by replacing (sign) with [read=sign знак,see=sign] pseudo-tag for web-client.
+ * Normal (sign) is still sent to telnet clients and invisible for web.
  * These tags will become clickable links in the web client, resulting in 
  * "read 'sign znak'" command being sent back to the server.
  */
@@ -99,8 +89,9 @@ WEBMANIP_RUN(decorateExtraDescr)
             // False alarm, move along.
             buf << "(" << keyword << ")";
         } else {
-            // Decorate with pseudo-tags.
-            buf << "(" << decorate_keyword(keyword, unique) << ")";
+            // Decorate with pseudo-tags, hide normal output from web.
+            buf << "{Iw[read=" << unique << ",see=" << keyword << "]{Ix";
+            buf << "{IW(" << keyword << "){Ix";
         }
 
         // Advance position to the next bracket.

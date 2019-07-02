@@ -65,6 +65,10 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
        << "автор {y" << area->authors << "{x";
     if (str_cmp(area->translator, ""))
         in << ", перевод {y" << area->translator << "{x";
+
+    // This bit is going to be replaced with a link to the map by the webclient.
+    in << "%PAUSE% {Iw[map=" << areafile->file_name << "]{Ix%RESUME%";
+
     in << endl
        << endl;
 
@@ -74,10 +78,13 @@ void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
     if (str_cmp(area->speedwalk, "")) {
         in << "{yКак добраться{x: " << area->speedwalk << endl;
 
+        // If 'speedwalk' field contains something resembling a run path,
+        // and not just text, explain the starting point.
         RegExp speedwalkRE("[0-9]?[nsewud]+");
         if (speedwalkRE.match(area->speedwalk))
            in << "{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x" << endl;
     }
+
 }
 
 class AreaHelpLifetimePlugin : public Plugin {
