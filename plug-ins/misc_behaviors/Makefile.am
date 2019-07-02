@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libmisc_behaviors.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/quest/core \
 -I$(top_srcdir)/plug-ins/quest/command \
 -I$(top_srcdir)/plug-ins/services/core \
@@ -45,3 +45,4 @@ equipsets.h \
 hierophant.h 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

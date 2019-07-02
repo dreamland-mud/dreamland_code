@@ -1,7 +1,7 @@
 noinst_LTLIBRARIES = libskills.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = $(INCLUDES_SRC)
+src_INCLUDES = $(INCLUDES_SRC)
 
 AM_CPPFLAGS = -Wall
 
@@ -17,3 +17,4 @@ spell.cpp \
 spelltarget.cpp \
 skilleventhandler.cpp
 
+AM_CPPFLAGS += $(src_INCLUDES)

@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libdescriptor.la
 
 libdescriptor_la_LIBADD = -lz -ljsoncpp
 if WITH_MINGW
-libdescriptor_la_LIBADD = -lwsock32
+libdescriptor_la_LIBADD += -lwsock32
 endif
 
 libdescriptor_la_SOURCES = \
@@ -20,5 +20,6 @@ inputhandler.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = $(INCLUDES_SRC) -I/usr/include/jsoncpp
+plugin_INCLUDES = $(INCLUDES_SRC) -I/usr/include/jsoncpp
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

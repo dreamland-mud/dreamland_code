@@ -17,7 +17,7 @@ mixedpetshop.h
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(srcdir)/../shop \
 $(INCLUDES_AI) \
@@ -29,3 +29,4 @@ $(LIBADD_AI) \
 ../shop/libservices_shop.la 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

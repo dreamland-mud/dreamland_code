@@ -3,7 +3,7 @@
 # NoFate, 2002
 noinst_LTLIBRARIES = liblang.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(top_builddir) \
 -I$(srcdir) \
 -I$(srcdir)/../util \
@@ -25,3 +25,4 @@ short.cpp \
 stringset.cpp \
 stringlist.cpp
 
+AM_CPPFLAGS += $(src_INCLUDES)

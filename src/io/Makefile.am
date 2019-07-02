@@ -3,7 +3,7 @@
 # based on: NoFate, 2002
 noinst_LTLIBRARIES = libio.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(srcdir) \
 -I$(top_builddir) \
 -I$(srcdir)/../xml \
@@ -28,3 +28,4 @@ xmlfile.cpp \
 xmlconfigurable.cpp \
 dlfileloader.cpp
 
+AM_CPPFLAGS += $(src_INCLUDES)

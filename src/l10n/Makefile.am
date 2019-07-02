@@ -3,7 +3,7 @@
 #
 noinst_LTLIBRARIES = libl10n.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(top_builddir) \
 -I$(srcdir) \
 -I$(srcdir)/../xml \
@@ -23,3 +23,4 @@ flexer.cpp \
 russianstring.cpp \
 xmlrussianstring.cpp 
 
+AM_CPPFLAGS += $(src_INCLUDES)

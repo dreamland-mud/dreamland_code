@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libquest_command.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/selfrate \
@@ -35,3 +35,4 @@ xmlattributequestreward.h \
 questmaster.h \
 questor.h
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

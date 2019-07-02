@@ -2,7 +2,7 @@ lib_LTLIBRARIES = \
 librace.la 
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/alignment \
@@ -32,3 +32,4 @@ raceflags.h: raceflags.conf
 librace_la_moc_xml.cpp: raceflags.h
 
 CLEANFILES = raceflags.cpp $(top_builddir)/src/raceflags.h 
+AM_CPPFLAGS += $(plugin_INCLUDES)

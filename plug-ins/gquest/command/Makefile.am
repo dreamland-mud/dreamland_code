@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libgquest_command.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 $(INCLUDES_ANATOLIA) \
 $(INCLUDES_SRC)
@@ -18,3 +18,4 @@ cgquest.cpp \
 gquestnotifyplugin.cpp \
 impl.cpp 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

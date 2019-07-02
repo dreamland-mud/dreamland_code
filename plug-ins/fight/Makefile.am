@@ -19,7 +19,7 @@ impl.cpp
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/profession \
 $(INCLUDES_ANATOLIA) \
 $(INCLUDES_SRC) 
@@ -28,3 +28,4 @@ libfight_la_LIBADD = \
 $(LIBADD_ANATOLIA) \
 ../profession/libprofession.la 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

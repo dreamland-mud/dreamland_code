@@ -15,3 +15,4 @@ lex.l++ \
 system.cpp
 
 CLEANFILES = syn.c++ lex.c++
+AM_CPPFLAGS += $(src_INCLUDES)

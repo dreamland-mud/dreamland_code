@@ -11,7 +11,7 @@ attract.h
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -29,3 +29,4 @@ liboccupations_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../help/libhelp.la \
 ../command/libcommand.la
+AM_CPPFLAGS += $(plugin_INCLUDES)

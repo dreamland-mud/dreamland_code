@@ -4,7 +4,7 @@ libreligion.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
@@ -29,3 +29,4 @@ tattoo.h \
 gods_impl.h \
 religionattribute.h
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

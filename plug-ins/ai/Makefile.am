@@ -22,7 +22,7 @@ basicmobilebehavior.h
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/traverse \
 $(INCLUDES_FIGHT) \
 $(INCLUDES_SRC) 
@@ -31,3 +31,4 @@ libai_la_LIBADD = \
 $(LIBADD_FIGHT) \
 ../traverse/libtraverse.la 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

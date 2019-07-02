@@ -1,7 +1,7 @@
 noinst_LTLIBRARIES = libbehavior.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = $(INCLUDES_SRC)
+src_INCLUDES = $(INCLUDES_SRC)
 
 AM_CPPFLAGS = -Wall
 
@@ -18,3 +18,4 @@ mobilebehavior.h \
 objectbehavior.h \
 roombehavior.h
 
+AM_CPPFLAGS += $(src_INCLUDES)

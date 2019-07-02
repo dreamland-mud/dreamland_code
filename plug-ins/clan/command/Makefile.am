@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libclan_command.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/communication \
 $(INCLUDES_ANATOLIA) \
@@ -25,3 +25,4 @@ $(LIBADD_ANATOLIA) \
 ../core/libclan_core.la
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

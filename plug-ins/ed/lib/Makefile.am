@@ -2,7 +2,7 @@
 #bin_PROGRAMS = ed
 lib_LTLIBRARIES = libed.la 
 
-INCLUDES = -I$(srcdir) \
+plugin_INCLUDES = -I$(srcdir) \
 -I$(top_builddir)/src \
 -I$(top_builddir) \
 -I$(top_srcdir) \
@@ -35,3 +35,4 @@ edparse.y++: edscan.c++
 #ed_SOURCES = test.cpp
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

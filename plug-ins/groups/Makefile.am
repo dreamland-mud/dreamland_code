@@ -7,7 +7,7 @@ libgenericskill_loader.la
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/liquid \
 -I$(top_srcdir)/plug-ins/selfrate \
@@ -113,3 +113,4 @@ libclass_skills.la \
 ../druids/libdruids.la
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

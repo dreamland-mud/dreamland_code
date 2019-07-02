@@ -14,8 +14,9 @@ misc_desires.h
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC) 
+plugin_INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC) 
 
 libdesire_la_LIBADD = \
 $(LIBADD_FIGHT)
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

@@ -3,7 +3,7 @@ lib_LTLIBRARIES = liblearn.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
@@ -27,3 +27,4 @@ teach.h \
 train.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

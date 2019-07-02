@@ -7,7 +7,7 @@ endif
 
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
@@ -34,3 +34,4 @@ libban_la_moc_xml.cpp: banflags.h
 
 CLEANFILES = banflags.cpp $(top_builddir)/src/banflags.h 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

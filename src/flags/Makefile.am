@@ -3,7 +3,7 @@
 #
 noinst_LTLIBRARIES = libflags.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(srcdir) \
 -I$(top_builddir) \
 -I$(srcdir)/../lang \
@@ -22,3 +22,4 @@ enumeration.cpp \
 xmlflags.cpp \
 xmlenumeration.cpp 
 
+AM_CPPFLAGS += $(src_INCLUDES)

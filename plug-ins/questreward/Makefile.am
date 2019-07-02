@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libquestreward.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/loadsave \
@@ -39,3 +39,4 @@ valentineprise.h \
 ownercoupon.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

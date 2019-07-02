@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libgquest_invasion.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/gquest/core \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
@@ -30,3 +30,4 @@ objects.h \
 xmlattributeinvasion.h 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

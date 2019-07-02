@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libareas.la
 
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = $(INCLUDES_SRC) \
+plugin_INCLUDES = $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command  \
 -I$(top_srcdir)/plug-ins/help \
@@ -45,3 +45,4 @@ xmlmobilefactory.h \
 areahelp.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

@@ -3,7 +3,7 @@ SUBDIRS = lib
 lib_LTLIBRARIES = libcoreed.la 
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/ed/lib \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -31,3 +31,4 @@ xmlpcstringeditor.h \
 xmleditorinputhandler.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

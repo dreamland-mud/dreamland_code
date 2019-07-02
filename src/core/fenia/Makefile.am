@@ -1,7 +1,7 @@
 noinst_LTLIBRARIES = libcorefenia.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = $(INCLUDES_SRC)
+src_INCLUDES = $(INCLUDES_SRC)
 
 AM_CPPFLAGS = -Wall
 
@@ -22,3 +22,4 @@ reglist.h \
 schedulerwrapper.h \
 wrapperbase.h \
 guts.h
+AM_CPPFLAGS += $(src_INCLUDES)

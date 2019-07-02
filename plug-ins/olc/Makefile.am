@@ -42,7 +42,7 @@ olcstate.h
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_FIGHT) \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/updates \
@@ -66,3 +66,4 @@ libolc_la_moc_xml.cpp: olcflags.h
 
 CLEANFILES = olcflags.cpp $(top_builddir)/src/olcflags.h 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

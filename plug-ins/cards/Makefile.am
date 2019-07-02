@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libcards.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/skills_impl \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
@@ -32,3 +32,4 @@ objects.h \
 xmlattributecards.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

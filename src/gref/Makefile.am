@@ -3,7 +3,7 @@
 #
 noinst_LTLIBRARIES = libgref.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(srcdir) \
 -I$(top_builddir) \
 -I$(srcdir)/../lang \
@@ -25,3 +25,4 @@ xmlglobalbitvector.cpp \
 xmlglobalreference.cpp \
 globalprofilearray.cpp
 
+AM_CPPFLAGS += $(src_INCLUDES)

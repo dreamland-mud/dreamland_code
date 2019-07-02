@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libclan_core.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/system \
@@ -35,3 +35,4 @@ libclan_core_la_moc_xml.cpp: clanflags.h
 
 CLEANFILES = clanflags.cpp $(top_builddir)/src/clanflags.h 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

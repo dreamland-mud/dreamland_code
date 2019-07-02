@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libdruids.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_AI) \
 -I$(top_srcdir)/plug-ins/languages/core \
 -I$(top_srcdir)/plug-ins/skills_impl \
@@ -26,3 +26,4 @@ druidic.h \
 druidic_effects.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

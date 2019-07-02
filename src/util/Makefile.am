@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libutil.la
 
 AM_CPPFLAGS = -Wall
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../regex \
 -I$(srcdir)/../l10n \
@@ -31,3 +31,4 @@ timer.cpp
 
 
 CLEANFILES = parsedate.c++
+AM_CPPFLAGS += $(src_INCLUDES)

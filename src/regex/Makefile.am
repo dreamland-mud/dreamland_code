@@ -5,3 +5,4 @@ noinst_LTLIBRARIES = libregex.la
 
 libregex_la_SOURCES = regcomp.c regerror.c regexec.c regfree.c
 
+AM_CPPFLAGS = $(src_INCLUDES)

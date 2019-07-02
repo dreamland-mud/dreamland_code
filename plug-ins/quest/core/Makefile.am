@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libquest_core.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/selfrate \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
@@ -35,3 +35,4 @@ objquestbehavior.h \
 xmlattributequestdata.h 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

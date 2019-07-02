@@ -3,7 +3,7 @@
 #
 noinst_LTLIBRARIES = liballoc.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(srcdir) \
 -I$(top_builddir) \
 -I$(srcdir)/../lang \
@@ -17,3 +17,4 @@ allocateclass.cpp \
 class.cpp \
 oneallocate.cpp \
 exceptionclassnotfound.cpp
+AM_CPPFLAGS += $(src_INCLUDES)

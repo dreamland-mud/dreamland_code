@@ -45,7 +45,7 @@ eating.h
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/communication \
 $(INCLUDES_FIGHT) \
 $(INCLUDES_SRC) \
@@ -58,3 +58,4 @@ $(LIBADD_FIGHT) \
 ../ed/libcoreed.la \
 ../communication/libcommunication.la 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

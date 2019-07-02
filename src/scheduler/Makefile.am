@@ -3,7 +3,7 @@
 # 
 noinst_LTLIBRARIES = libscheduler.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(top_builddir) \
 -I$(srcdir) \
 -I$(srcdir)/../xml \
@@ -19,3 +19,4 @@ schedulerprioritymap.cpp \
 schedulerqueue.cpp \
 schedulertask.cpp 
 
+AM_CPPFLAGS += $(src_INCLUDES)

@@ -2,7 +2,7 @@ lib_LTLIBRARIES = \
 libbonus.la 
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/output \
@@ -21,3 +21,4 @@ defaultbonus.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

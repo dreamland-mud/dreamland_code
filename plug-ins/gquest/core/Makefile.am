@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libgquest_core.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_ANATOLIA) \
 $(INCLUDES_SRC)
 
@@ -28,3 +28,4 @@ xmlattributereward.h \
 xmlattributeglobalquest.h 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

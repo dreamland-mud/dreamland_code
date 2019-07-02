@@ -3,7 +3,7 @@
 #
 noinst_LTLIBRARIES = libprocess.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(top_builddir) \
 -I$(srcdir) \
 -I$(srcdir)/../lang \
@@ -19,3 +19,4 @@ mutex.cpp \
 process.cpp \
 monitor.cpp 
 
+AM_CPPFLAGS += $(src_INCLUDES)

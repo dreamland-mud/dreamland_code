@@ -3,7 +3,7 @@ lib_LTLIBRARIES = liblanguages_impl.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/liquid \
 $(INCLUDES_AI) \
@@ -41,3 +41,4 @@ khuzdul.h \
 khuzdul_effects.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

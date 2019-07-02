@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libriding.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
@@ -33,3 +33,4 @@ libriding_la_LIBADD = \
 ../command/libcommand.la
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

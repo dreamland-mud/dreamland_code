@@ -2,7 +2,7 @@ lib_LTLIBRARIES = \
 libalignment.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/descriptor
@@ -18,3 +18,4 @@ libalignment_la_LIBADD = \
 ../descriptor/libdescriptor.la
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

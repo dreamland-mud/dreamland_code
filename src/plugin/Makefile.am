@@ -3,7 +3,7 @@
 # based on: NoFate, 2002
 noinst_LTLIBRARIES = libplugin.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(top_builddir) \
 -I$(srcdir) \
 -I$(srcdir)/../xml \
@@ -21,3 +21,4 @@ pluginmanager.cpp
 
 libplugin_la_MOC = \
 sharedobject.h
+AM_CPPFLAGS += $(src_INCLUDES)

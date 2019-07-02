@@ -18,7 +18,7 @@ craftattribute.h \
 craftwearloc.h
 
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
 -I$(top_srcdir)/plug-ins/updates \
@@ -49,3 +49,4 @@ $(LIBADD_AI) \
 ../services/shop/libservices_shop.la \
 ../services/petshop/libservices_petshop.la 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

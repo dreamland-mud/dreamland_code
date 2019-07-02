@@ -19,7 +19,7 @@ set.cpp
 
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_ANATOLIA) \
 $(INCLUDES_SRC) 
 
@@ -32,3 +32,4 @@ $(top_builddir)/plug-ins/occupations/liboccupations.la
 
 libcmd_wizard_la_LIBADD = $(libanatolia_la_LIBADD) libanatolia.la
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

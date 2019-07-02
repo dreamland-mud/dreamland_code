@@ -46,7 +46,7 @@ mobindexwrapper.h \
 characterwrapper.h 
 
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
 -I$(top_srcdir)/plug-ins/updates \
@@ -74,3 +74,4 @@ $(LIBADD_AI) \
 ../services/petshop/libservices_petshop.la \
 -ljsoncpp
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

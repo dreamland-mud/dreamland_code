@@ -36,7 +36,7 @@ xmlattributerestring.h
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC)
+plugin_INCLUDES = $(INCLUDES_FIGHT) $(INCLUDES_SRC)
 libskills_impl_la_LIBADD = $(LIBADD_FIGHT) 
 
 skillsflags.cpp: skillsflags.conf skillsflags.h
@@ -46,3 +46,4 @@ libskills_impl_la_moc_xml.cpp: skillsflags.h
 
 CLEANFILES = skillsflags.cpp $(top_builddir)/src/skillsflags.h 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

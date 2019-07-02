@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libfollow_core.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
@@ -22,3 +22,4 @@ libfollow_core_la_LIBADD = \
 ../../system/libscheduler_task_round.la 
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

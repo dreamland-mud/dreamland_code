@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libmlove.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command  \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -40,3 +40,4 @@ xmllovers.h \
 xmlattributemarriage.h 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

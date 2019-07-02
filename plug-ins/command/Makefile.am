@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libcommand.la
 
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -41,3 +41,4 @@ libcommand_la_moc_xml.cpp: commandflags.h
 
 CLEANFILES = commandflags.cpp $(top_builddir)/src/commandflags.h 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

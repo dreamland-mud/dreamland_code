@@ -3,7 +3,7 @@ lib_LTLIBRARIES = liblanguages_core.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_AI) \
 $(INCLUDES_SRC)
 
@@ -29,3 +29,4 @@ xmlattributelanguage.h \
 poliglot.h 
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

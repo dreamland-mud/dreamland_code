@@ -66,7 +66,7 @@ fenia      \
 core
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = $(INCLUDES_SRC)
+src_INCLUDES = $(INCLUDES_SRC)
 
 #####################################################
 # dreamland shared library
@@ -133,3 +133,4 @@ version.cpp: $(dreamland_OBJECTS) $(srcdir)/newvers.sh
 	sh $(srcdir)/newvers.sh
 
 CLEANFILES = autoflags.cpp autoflags.h version.cpp $(DUMMY_LIBS)
+AM_CPPFLAGS = $(src_INCLUDES)

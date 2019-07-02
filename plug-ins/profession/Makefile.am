@@ -2,7 +2,7 @@ lib_LTLIBRARIES = \
 libprofession.la
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/alignment \
@@ -31,3 +31,4 @@ profflags.h: profflags.conf
 libprofession_la_moc_xml.cpp: profflags.h
 
 CLEANFILES = profflags.cpp $(top_builddir)/src/profflags.h 
+AM_CPPFLAGS += $(plugin_INCLUDES)

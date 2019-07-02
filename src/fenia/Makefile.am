@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libfenia.la
 
 bin_PROGRAMS = fenia
 
-INCLUDES = -I$(srcdir) -I$(top_builddir) \
+src_INCLUDES = -I$(srcdir) -I$(top_builddir) \
 -I$(srcdir)/../xml \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../alloc \
@@ -57,3 +57,4 @@ fenia_LDADD = libfenia.la \
 fenia_SOURCES = main.cpp test.cpp
 
 fenia_MOC = test.h 
+AM_CPPFLAGS += $(src_INCLUDES)

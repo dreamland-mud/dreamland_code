@@ -6,7 +6,7 @@ noinst_LTLIBRARIES = libcore.la
 SUBDIRS = fenia scheduler behavior skills clan
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = $(INCLUDES_SRC)
+src_INCLUDES = $(INCLUDES_SRC)
 
 AM_CPPFLAGS = -Wall
 
@@ -53,3 +53,4 @@ remortdata.h \
 xmlattributes.h \
 bonus.h
 
+AM_CPPFLAGS += $(src_INCLUDES)

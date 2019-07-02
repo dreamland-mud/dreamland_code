@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libnotes.la libgeneric_notes.la 
 
 include $(top_srcdir)/src/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/system \
@@ -78,3 +78,4 @@ noteflags.cpp \
 $(top_builddir)/src/noteflags.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
+AM_CPPFLAGS += $(plugin_INCLUDES)

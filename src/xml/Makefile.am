@@ -5,7 +5,7 @@ bin_PROGRAMS = xmlreftest xmltest
 
 noinst_LTLIBRARIES = libxml.la
 
-INCLUDES = \
+src_INCLUDES = \
 -I$(srcdir) \
 -I$(top_builddir) \
 -I$(srcdir)/../lang \
@@ -52,3 +52,4 @@ xmltest_SOURCES = xmltest.cpp
 xmltest_LDADD = libxml.la ../lang/liblang.la ../util/libutil.la ../l10n/libl10n.la ../alloc/liballoc.la
 
 CLEANFILES = xmlmatchpattern.c++ xmlparser.c++
+AM_CPPFLAGS += $(src_INCLUDES)

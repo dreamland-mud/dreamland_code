@@ -2,7 +2,7 @@ lib_LTLIBRARIES = libloadsave.la
 
 include $(top_srcdir)/src/Makefile.inc
 include $(top_srcdir)/plug-ins/Makefile.inc
-INCLUDES = \
+plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -68,3 +68,4 @@ compatflags.cpp $(top_builddir)/src/compatflags.h \
 recipeflags.cpp $(top_builddir)/src/recipeflags.h \
 itemflags.cpp $(top_builddir)/src/itemflags.h 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

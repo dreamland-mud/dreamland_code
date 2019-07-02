@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libquest_heal.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/selfrate \
 -I$(top_srcdir)/plug-ins/skills_impl \
@@ -28,3 +28,4 @@ scenarios.h \
 patientbehavior.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)

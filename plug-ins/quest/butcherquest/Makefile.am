@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libquest_butcher.la
 include $(top_srcdir)/plug-ins/Makefile.inc
 include $(top_srcdir)/src/Makefile.inc
 
-INCLUDES = \
+plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/selfrate \
 $(INCLUDES_AI) \
@@ -24,3 +24,4 @@ butcherquest.h \
 steakcustomer.h
 
 
+AM_CPPFLAGS += $(plugin_INCLUDES)
