@@ -3,6 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT([dreamland], [0.1])
 AC_CONFIG_SRCDIR(Makefile.am)
 AC_CONFIG_AUX_DIR(admin)
+AC_CONFIG_MACRO_DIRS([admin])
 AC_CANONICAL_SYSTEM
 AM_CONFIG_HEADER(config.h)
 AC_PREFIX_DEFAULT(`pwd`)
