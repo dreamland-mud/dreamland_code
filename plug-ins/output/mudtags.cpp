@@ -357,7 +357,8 @@ protected:
         INVIS_CODER = (B),
         INVIS_RECRUITER = (C),
         INVIS_LEADER = (D),
-        INVIS_WEB = (E)
+        INVIS_WEB = (E),
+        INVIS_TELNET = (F)
     };
     void invis_tag_parse( ostringstream & );
     bool invis_tag_work( );
@@ -409,6 +410,8 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
             SET_BIT(my_invis, INVIS_LEADER);
         if (my_web)
             SET_BIT(my_invis, INVIS_WEB);
+        else
+            SET_BIT(my_invis, INVIS_TELNET);
     }
    
     reset( );
@@ -417,10 +420,13 @@ VisibilityTags::VisibilityTags( const char *text, Character *ch )
 void VisibilityTags::setWeb(bool web) 
 {
     my_web = web;
-    if (my_web)
+    if (my_web) {
         SET_BIT(my_invis, INVIS_WEB);
-    else
+        REMOVE_BIT(my_invis, INVIS_TELNET);
+    } else {
         REMOVE_BIT(my_invis, INVIS_WEB);
+        SET_BIT(my_invis, INVIS_TELNET);
+    }
 }
 
 void VisibilityTags::reset( )
@@ -815,6 +821,7 @@ void VisibilityTags::invis_tag_parse( ostringstream &out )
     case 'c': st_invis = INVIS_CODER; break;
     case 'r': st_invis = INVIS_RECRUITER; break;
     case 'l': st_invis = INVIS_LEADER; break;
+    case 'W': st_invis = INVIS_TELNET; break;
     case 'w': 
               st_invis = INVIS_WEB; 
               if (IS_SET(my_invis, INVIS_WEB)) 
@@ -847,7 +854,7 @@ void mudtags_convert_nocolor( const char *text, ostringstream &out, Character *c
      ostringstream vbuf;
      VisibilityTags( text, ch ).run( vbuf );
 
-     DLString vbufStr = vbuf.str( );
+     DLString vbufStr = vbuf.str( );    
      ColorTags ct( vbufStr.c_str( ), ch );
      ct.setColor( false );
      ct.run( out );
