@@ -47,6 +47,11 @@ admin/depcomp
 admin/install-sh
 admin/missing
 admin/ylwrap
+admin/libtool.m4
+admin/ltoptions.m4
+admin/ltsugar.m4
+admin/ltversion.m4
+admin/lt~obsolete.m4
 config.h
 config.status
 etc/dreamland.xml
