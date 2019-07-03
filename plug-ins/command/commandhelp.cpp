@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include "commandhelp.h"
-#include "logstream.h"
 #include "command.h"
 #include "commandmanager.h"
 #include "character.h"
@@ -56,7 +55,6 @@ void CommandHelp::setCommand( Command::Pointer command )
             cmd->getHelp( )->addKeyword( fullKeyword );
     }
    
-    LogStream::sendNotice() << command->getName() << ":" << labels.toString() << endl; 
     if (!empty( ))
         helpManager->registrate( Pointer( this ) );
 }

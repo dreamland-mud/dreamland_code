@@ -4,7 +4,6 @@
  */
 #include "helpmanager.h"
 #include "character.h"
-#include "logstream.h"
 
 template class XMLStub<HelpArticle>;
 
@@ -176,7 +175,6 @@ void HelpManager::registrate( HelpArticle::Pointer art )
 {
     articles.push_back( art );
     art->setID(++lastID);
-    LogStream::sendNotice() << art->getID() << ":" << art->getKeyword() << endl;
 }
 
 void HelpManager::unregistrate( HelpArticle::Pointer art )
