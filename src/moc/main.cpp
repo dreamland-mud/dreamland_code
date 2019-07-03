@@ -31,7 +31,7 @@ void yydbg(int i);
 int main( int argc, char* argv[] )
 {
 
-        char* error = 0;
+        const char* error = 0;
 
         yydbg(1);
 

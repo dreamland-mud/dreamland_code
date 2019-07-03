@@ -1,4 +1,4 @@
-%pure_parser
+%pure-parser
 
 %{
 
@@ -29,7 +29,7 @@ extern int yylineno;
 
 void error( const string& text );
 
-int yyerror( char* message ) {
+int yyerror( const char* message ) {
   error(message);
   return -1;
 }
