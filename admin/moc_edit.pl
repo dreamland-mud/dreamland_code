@@ -162,7 +162,7 @@ sub modifyMakefile( $ )
 		appendLines (qq{
 		    
 $library\_moc_xml.cpp:	\$(top_builddir)/src/moc/moc $files
-	\$(top_builddir)/src/moc/moc $localDir -o \$\@ -i '$files' -I\$(srcdir) \$(INCLUDES) 
+	\$(top_builddir)/src/moc/moc $localDir -o \$\@ -i '$files' -I\$(srcdir) \$(plugin_INCLUDES) \$(src_INCLUDES)
 
 MOC_CLEANFILES += $library\_moc_xml.cpp
 
