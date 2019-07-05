@@ -1,3 +1,4 @@
+root: ./docs
 structure:
-  readme: README.md
-  summary: docs/Home.md
+  readme: Home.md 
+  summary: _Sidebar.md 
