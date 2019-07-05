@@ -4,37 +4,37 @@
 Добро пожаловать на wiki, посвященную миру [Dream Land](https://dreamland.rocks). Здесь можно найти ресурсы для игроков, кодеров, строителей и бессмертных.
 
 
-#### [[Игра|Game]]
+#### [Игра](Game.md)
 
 * [Войти в мир](https://dreamland.rocks/mudjs)
 * [ЧАВО](https://github.com/dreamland-mud/dreamland_code/wiki/DreamLand-FAQ)
 * [Карты на сайте](https://dreamland.rocks/maps.html)
 * [Поисковик на сайте](https://dreamland.rocks/searcher.html)
 * [Справка на сайте](https://dreamland.rocks/help)
-* [[Клиенты|Game#Клиенты]]
+* [Клиенты](Game.md#Клиенты)
 * [Контакты](https://dreamland.rocks/index.html#contact)
 
-#### [[Участие в проекте|Contribute]]
+#### [Участие в проекте](Contribute.md)
 
-#### [[Разработка|Coding]]
+#### [Разработка](Coding.md)
 * [Trello с задачами](https://trello.com/b/r2gUQ6TY/make-dreamland-great-again)
 * [Инструкция по сборке](https://github.com/dreamland-mud/dreamland_code/blob/master/README.md)
 * [FAQ по локальному тестированию](https://github.com/dreamland-mud/dreamland_code/wiki/Testing-FAQ)
-* [[Прочие руководства|Coding]]
+* [Прочие руководства](Coding.md)
 
-#### [[Строительство|Building]]
+#### [Строительство](Building.md)
 * [Войти на стройплощадку](https://dreamland.rocks/mudjs/build.html)
-* [[Справочник по редактору зон OLC|OLC]]
-* [[Прочие руководства|Building]]
+* [Справочник по редактору зон OLC](OLC.md)
+* [Прочие руководства](Building.md)
 
-#### [[Скриптовый язык|Fenia]]
+#### [Скриптовый язык](Fenia.md)
 * [Феневое API](https://dreamland.rocks/feniaapi.html)
 * [Триггера мобов](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-char-triggers)
 * [Триггера предметов](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-obj-triggers)
 * [Триггера комнат](https://github.com/dreamland-mud/dreamland_code/wiki/Fenia-room-triggers)
-* [[Уроки и примеры|Fenia]]
+* [Уроки и примеры](Fenia.md)
 
-#### [[Администрирование|Admin]]
+#### [Администрирование](Admin.md)
 * [FAQ по локальному тестированию](https://github.com/dreamland-mud/dreamland_code/wiki/Testing-FAQ)
 * [Запуск глобальных квестов](https://github.com/dreamland-mud/dreamland_code/wiki/Global-quest-admin)
 * [Редактирование многострочных описаний](https://github.com/dreamland-mud/dreamland_code/wiki/Description-editing)
