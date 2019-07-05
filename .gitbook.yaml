@@ -1,4 +1,5 @@
-root: ./docs
+root: ./docs/
+
 structure:
   readme: Home.md 
-  summary: _Sidebar.md 
+  summary: SUMMARY.md 
