@@ -546,26 +546,6 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-static void print_percent(int percent, GenericSkill *skill, PCharacter *ch, ostream &buf)
-{
-    if (percent == 1)
-        buf << "{R";
-    else if (percent >= skill->getMaximum( ch ))
-        buf << "{C";
-    else if (percent > skill->getAdept( ch ))
-        buf << "{c";
-    else 
-        buf << "{x";
-    
-    buf << percent << "%{x";
-}
-
-static void print_see_also(GenericSkill *skill, PCharacter *ch, ostream &buf) 
-{
-    // 'См. также справка|help травы|herbs' - с гипер-ссылкой на справку.
-    buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x." << endl;
-}
-    
 /*
  * Печатает разную инфу: группу, цену в s.p., дерево предков, список потомков etc
  * Используется в showskill.
@@ -605,10 +585,9 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
         if (percent < 2) 
             buf << "пока не изучено";
-        else {
-            buf << "изучено на ";
-            print_percent(percent, this, ch, buf);
-        }
+        else 
+            buf << "изучено на {" << skill_learned_colour(this, ch) << percent << "%{x";
+        
         buf << "." << endl;
     }
     
@@ -713,8 +692,7 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
     else 
         buf << "{g";
 
-    buf << getNameFor( ch ) << "{x (";
-    print_percent(percent, this, ch, buf);
+    buf << getNameFor( ch ) << "{x ({" << skill_learned_colour(this, ch) << data.learned << "%{x";
     
 #if 0    
     float sp = (float) getWeight( ch ) / 10;

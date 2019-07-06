@@ -6,6 +6,8 @@
 
 #include "logstream.h"
 
+#include "grammar_entities_impl.h"
+#include "skill_utils.h"
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -98,12 +100,18 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) 
 {
     Races::iterator i;
+    bool rus = ch->getConfig( )->ruskills;
 
     buf << (spell ? "Заклинание" : "Умение") 
-        << " '{W" << getName( ) << "{x'" 
-        << " '{W" << getRussianName( ) << "{x'"
-        << ", особенность ";
+        << " '{c" << getName( ) << "{x' или" 
+        << " '{c" << getRussianName( ) << "{x'"
+        << ", входит в группу '{hg{c" 
+        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << "{x'."
+        << endl
+        << endl;
 
+    buf << "Особенность ";
     switch (races.size( )) {
     case 0:
         buf << "неизвестной расы ";
@@ -117,28 +125,31 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     }
 
     for (i = races.begin( ); i != races.end( ); ) {
-        buf << "{W" << i->first << "{x";
+        Race *race = raceManager->findExisting(i->first);
+        if (race)
+            buf << "{W" << race->getNameFor(ch, ch) << "{x";
 
         if (++i != races.end( ))
             buf << ", ";
     }
     
-    buf << endl
-        << "Входит в группу '{hg{W" << getGroup( )->getName( ) << "{x'";
+    buf << "." << endl;
         
     if (!visible( ch )) {
-        buf << endl;
+        print_see_also(this, ch, buf);
         return;
     }
         
-    buf << ", уровень {W" << getLevel( ch ) << "{x";
+    buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
 
-    if (available( ch ))
-        buf << ", изучено на {W" 
-            << ch->getSkillData( getIndex( ) ).learned 
-            << "%{x";
+    if (available( ch )) {
+        int learned = ch->getSkillData(getIndex()).learned;
+        if (learned > 0)
+            buf << ", изучено на {" << skill_learned_colour(this, ch) << learned << "%{x";
+    }
 
-    buf << endl;
+    buf << "." << endl;
+    print_see_also(this, ch, buf);
 }
 
 const SkillRaceInfo *

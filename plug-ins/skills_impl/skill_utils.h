@@ -5,6 +5,7 @@
 
 class Skill;
 class Character;
+class PCharacter;
 class PCSkillData;
 class XMLSkillReference;
 
@@ -25,5 +26,16 @@ bool temporary_skill_active( const PCSkillData & );
 DLString spell_utterance(Skill *skill);
 
 Skill * skillref_to_pointer(const XMLSkillReference &);
+
+
+/**
+ * Return colour to display for 'learned' percent.
+ */
+char skill_learned_colour(const Skill *, PCharacter *ch);
+
+/**
+ * Print line 'See also help <skill>' to the buffer.
+ */
+void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf);
 
 #endif

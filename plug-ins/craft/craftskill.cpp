@@ -7,6 +7,7 @@
 #include "lex.h"
 
 #include "grammar_entities_impl.h"
+#include "skill_utils.h"
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
 #include "skillreference.h"
@@ -126,12 +127,11 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf )
     bool rus = ch->getConfig( )->ruskills;
 
     buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
-        << " '{W" << getName( ) << "{x'"
-        << " '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{W" 
+        << " '{c" << getName( ) << "{x' или"
+        << " '{c" << getRussianName( ) << "{x', "
+        << "входит в группу '{hg{c" 
         << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-        << "{x'"
-        << endl;
+        << "{x'." << endl << endl;
 
 
     DLString pbuf;
@@ -148,7 +148,9 @@ void CraftSkill::show( PCharacter *ch, std::ostream &buf )
     }
 
     if (!pbuf.empty())
-        buf << "Доступно профессии " << pbuf << endl;
+        buf << "Доступно профессии " << pbuf << "." << endl;
+
+    print_see_also(this, ch, buf);
 } 
 
 static void mprog_skill( Character *ch, Character *actor, const char *skill, bool success, Character *victim )

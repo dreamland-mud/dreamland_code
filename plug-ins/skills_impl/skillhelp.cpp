@@ -16,6 +16,7 @@
 #include "commandflags.h"
 #include "def.h"
 
+GROUP(none);
 const DLString SkillHelp::TYPE = "SkillHelp";
 
 void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
@@ -29,15 +30,16 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    in << ", входит в группу '{hg{c" 
-       << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
-       << endl << endl
+    const DLString &gname = rus ? group->getRussianName( ) : group->getName( );
+    in << ", входит в группу '{hg{c" << gname << "{x'" << endl << endl
        << *this;
     
-    if (skill->visible(ch)) {
-        // См. также умение бросок грязью. См. также slook dirt kicking. - с гипер-ссылкой на команду.
-        in << "См. также команду {W{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x." << endl;
-    }
+    // '... умение|slook herbs|травы'. - с гипер-ссылкой на команду
+    // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
+    in << "См. также команду {W{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
+    if (group != group_none)
+       in << ", {W{hc{lRгруппаум{lEglist{lx " << gname << "{x";
+    in << "." << endl;
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )

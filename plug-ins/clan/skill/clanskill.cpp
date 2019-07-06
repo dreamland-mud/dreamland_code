@@ -6,6 +6,7 @@
 #include "clantypes.h"
 
 #include "skillmanager.h"
+#include "skill_utils.h"
 #include "pcharacter.h"
 #include "room.h"
 #include "object.h"
@@ -149,9 +150,9 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
     Clans::iterator i;
     PCSkillData &data = ch->getSkillData( getIndex( ) );
     
-    buf << "'{W" << getName( ) << "{x' " 
-        << "'{W" << getRussianName( ) << "{x', "
-        << (spell && spell->isCasted( ) ? "заклинание" : "умение") << " ";
+    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение") << " "
+        << "'{c" << getName( ) << "{x' или " 
+        << "'{c" << getRussianName( ) << "{x', навык ";
 
     for (i = clans.begin( ); i != clans.end( ); i++) {
         Clan *clan = ClanManager::getThis( )->find( i->first );
@@ -183,18 +184,22 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
 
         break;
     }
-    
+
+    buf << "." << endl; 
+
     if (!visible( ch )) {
-        buf << endl;
+        print_see_also(this, ch, buf);
         return;
     }
         
-    buf << ", уровень {W" << getLevel( ch ) << "{x";
+    buf << endl << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
 
     if (available( ch ))
-        buf << ", изучено на {W" << data.learned << "%{x";
+        buf << ", изучено на {" << skill_learned_colour(this, ch) << data.learned << "%{x";
     
-    buf << endl;
+    buf << "." << endl
+        << "Практикуется у {gкланового охранника{x." << endl;
+    print_see_also(this, ch, buf);
 }
 
 const SkillClanInfo * 
