@@ -33,7 +33,11 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
        << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
        << endl << endl
        << *this;
-
+    
+    if (skill->visible(ch)) {
+        // См. также умение бросок грязью. См. также slook dirt kicking. - с гипер-ссылкой на команду.
+        in << "См. также команду {W{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x." << endl;
+    }
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )
