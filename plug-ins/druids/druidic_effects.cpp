@@ -133,7 +133,8 @@ void SnakeSpiritComponent::run( PCharacter *ch )
     af.location = APPLY_MANA_GAIN;
 
     if (good) {
-        af.modifier = number_range( 100, 200 ) + getChance( ch );
+        // 10-30%
+        af.modifier = (number_range( 100, 200 ) + getChance( ch )) / 10;
         rc = applyPositiveAffect( ch, &af );
     }
     else {

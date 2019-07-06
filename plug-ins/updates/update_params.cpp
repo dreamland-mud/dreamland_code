@@ -161,8 +161,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
             gain *= 2;
     }
 
-    if (ch->heal_gain > 0)
-        gain = gain * ch->heal_gain / 100;
+    gain += gain * ch->heal_gain / 100;
 
     gain = std::max ( (int)(number_percent( ) < gain * 100 / 24), gain / 24 );
     
@@ -251,8 +250,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     if ( IS_HARA_KIRI(ch) )
         gain *= 3;
 
-    if (ch->mana_gain > 0)
-        gain = gain * ch->mana_gain / 100;
+    gain += gain * ch->mana_gain / 100;
 
     gain = std::max ( (int)(number_percent( ) < gain * 100 / 16), gain / 16 );
     ch->mana = std::min( ch->mana + gain, (int)ch->max_mana );
@@ -313,8 +311,7 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
     if( ch->isAffected(gsn_bandage ) )
         gain += ch->getRealLevel( ) / 20;
 
-    if (ch->heal_gain > 0)
-        gain = gain * ch->heal_gain / 100;
+    gain += gain * ch->heal_gain / 100;
 
     gain = std::max ( (int)(number_percent( ) < gain * 100 / 16), gain / 16 );
     ch->move = std::min( ch->move + gain, (int)ch->max_move );
