@@ -324,6 +324,7 @@ public:
         DLString& toUpper( );
         DLString toUpper( ) const;
         DLString & upperFirstCharacter( );
+        DLString upperFirstCharacter( ) const;
         /** make an initial-capped string */
         DLString& capitalize( );
 
