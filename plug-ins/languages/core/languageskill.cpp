@@ -144,12 +144,11 @@ void Language::show( PCharacter *ch, std::ostream & buf )
     WordList perfect, unperfect;
     WordList::iterator n;
     DLString userName;
-    bool rus = ch->getConfig( )->ruskills;
 
     buf << "Язык '{W" << getName( ) << "{x'"
         << " '{W" << getRussianName( ) << "{x', "
         << "входит в группу '{hg{W" 
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << getGroup()->getNameFor(ch) 
         << "{x'"
         << endl;
     

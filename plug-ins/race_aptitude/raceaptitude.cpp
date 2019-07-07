@@ -6,6 +6,7 @@
 
 #include "logstream.h"
 
+#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "skill_utils.h"
 #include "skillmanager.h"
@@ -100,41 +101,29 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) 
 {
     Races::iterator i;
-    bool rus = ch->getConfig( )->ruskills;
 
-    buf << (spell ? "Заклинание" : "Умение") 
+    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
         << " '{c" << getName( ) << "{x' или" 
         << " '{c" << getRussianName( ) << "{x'"
-        << ", входит в группу '{hg{c" 
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-        << "{x'."
-        << endl
-        << endl;
+        << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'."
+        << endl << endl;
 
-    buf << "Особенность ";
-    switch (races.size( )) {
-    case 0:
-        buf << "неизвестной расы ";
-        break;
-    case 1:
-        buf << "расы ";
-        break;
-    default:
-        buf << "рас ";
-        break;
-    }
 
-    for (i = races.begin( ); i != races.end( ); ) {
+    StringList rnames;
+    for (i = races.begin( ); i != races.end( ); i++) {
         Race *race = raceManager->findExisting(i->first);
         if (race)
-            buf << "{W" << race->getNameFor(ch, ch) << "{x";
-
-        if (++i != races.end( ))
-            buf << ", ";
+            rnames.push_back(race->getNameFor(ch, ch));
     }
+
+    buf << "Особенность ";
+    switch (rnames.size( )) {
+    case 0:  buf << "неизвестной расы"; break;
+    case 1:  buf << "расы "; break;
+    default: buf << "рас "; break;
+    }
+    buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
     
-    buf << "." << endl;
-        
     if (!visible( ch )) {
         print_see_also(this, ch, buf);
         return;

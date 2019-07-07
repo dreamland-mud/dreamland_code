@@ -6,6 +6,7 @@
 #include "genericskillloader.h"
 
 #include "logstream.h"
+#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "skillmanager.h"
 #include "skillreference.h"
@@ -552,15 +553,13 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
  */
 void GenericSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
-    bool rus = ch->getConfig( )->ruskills;
-    const DLString what = (spell && spell->isCasted()) ? "Заклинание" : "Умение";
-    DLString what0 = what.toLower();
+    const DLString what = skill_what(this).ruscase('1'); 
 
-    buf << what
+    buf << what.upperFirstCharacter()
         << " '{c" << getName( ) << "{x' или"
         << " '{c" << getRussianName( ) << "{x', "
         << "входит в группу '{hg{c" 
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
+        << getGroup()->getNameFor(ch) 
         << "{x'."
         << endl
         << endl;
@@ -592,20 +591,17 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     }
     
     if (ch->getProfession( ) == prof_universal) {
-        int csize = classes.size( );
-
-        if (csize > 1) {
-            DLString cl;
-
-            buf << "Доступно професси" << (csize == 2 ? "и" : "ям") << " ";
-            
-            for (Classes::iterator i = classes.begin( ); i != classes.end( ); i++) 
-                if (i->first != prof_universal->getName( )) {
-                    Profession *prof = professionManager->find( i->first );
-                    cl += prof->getNameFor( ch ) + ", ";
-                }
-
-            buf << cl.substr( 0, cl.size( ) - 2 ) << endl;
+        StringList cnames; 
+        
+        for (Classes::iterator i = classes.begin( ); i != classes.end( ); i++) 
+            if (i->first != prof_universal->getName( )) {
+                Profession *prof = professionManager->find( i->first );
+                cnames.push_back(prof->getNameFor(ch));
+            }
+        
+        if (!cnames.empty()) {
+            buf << "Доступно професси" << (cnames.size() == 1 ? "и" : "ям") << " "
+                << cnames.wrap("{W", "{x").join(", ") << endl;
         }
     }
     
@@ -623,21 +619,15 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     SkillClassInfo *ci = getClassInfo( ch );
     
     if (ci) {
+        StringList cnames;
         GenericSkillVector::const_iterator i;
         const GenericSkillVector &v = ci->children.getConstVector( ch );
         
-        if (!v.empty( )) {
-            buf << "Позволяет выучить: ";
-            
-            for (i = v.begin( ); i != v.end( ); ) {
-                buf << "{W" << (*i)->getNameFor( ch ) << "{x";
-
-                if (++i != v.end( ))
-                    buf << ", ";
-            }
-
-            buf << endl;
-        }
+        for (i = v.begin( ); i != v.end( ); i++) 
+            cnames.push_back((*i)->getNameFor(ch));
+        
+        if (!cnames.empty()) 
+            buf << "Позволяет выучить: " << cnames.wrap("{W", "{x").join(", ") << endl;
     }
     
     unmark( ch );
@@ -650,12 +640,12 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
 
     if (getGroup()->getPracticer() == 0) {
         // '...в твоей гильдии (справка|help гильдии|guilds)' - с гипер-ссылкой на справку.
-        buf << "Это " << what0 << " можно выучить в твоей {gгильдии{x ({W{lRсправка {hhгильдии{hx{lEhelp {hhguilds{x)." << endl;
+        buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка {hhгильдии{hx{lEhelp {hhguilds{x)." << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
         MOB_INDEX_DATA *pMob = get_mob_index(getGroup()->getPracticer());
         if (pMob)
-            buf << "Это " << what0 << " можно выучить у "
+            buf << "Это " << what << " можно выучить у "
                 << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
                 << "(зона {g{hh" << pMob->area->name << "{x)." << endl;
     }

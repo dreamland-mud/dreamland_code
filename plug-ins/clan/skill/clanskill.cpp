@@ -5,6 +5,7 @@
 #include "clanskill.h"
 #include "clantypes.h"
 
+#include "stringlist.h"
 #include "skillmanager.h"
 #include "skill_utils.h"
 #include "pcharacter.h"
@@ -146,11 +147,11 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
 
 void ClanSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
-    list<DLString> clanNames;
+    StringList clanNames;
     Clans::iterator i;
     PCSkillData &data = ch->getSkillData( getIndex( ) );
     
-    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение") << " "
+    buf << skill_what(this).ruscase('1').upperFirstCharacter() << " "
         << "'{c" << getName( ) << "{x' или " 
         << "'{c" << getRussianName( ) << "{x', навык ";
 
@@ -173,15 +174,7 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
         buf << "клана " << clanNames.front( );
         break;
     default:
-        buf << "кланов ";
-    
-        for (list<DLString>::iterator i = clanNames.begin( ); i != clanNames.end( ); )        {
-            buf << *i;
-            
-            if (++i != clanNames.end( ))
-                buf << ", ";
-        }
-
+        buf << "кланов " << clanNames.join(", ");
         break;
     }
 

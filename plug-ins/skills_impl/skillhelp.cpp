@@ -6,6 +6,7 @@
 #include <set>
 
 #include "logstream.h"
+#include "skill_utils.h"
 #include "skillhelp.h"    
 #include "skill.h"
 #include "spell.h"
@@ -23,14 +24,14 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     bool rus = ch->getConfig( )->ruskills;
 
-    in << (skill->getSpell( ) && skill->getSpell( )->isCasted( ) ? "Заклинание" : "Умение");
+    in << skill_what(*skill).ruscase('1').upperFirstCharacter();
     if (rus)
         in << " '{c" << skill->getRussianName( ) << "{x' или" << " '{c" << skill->getName( ) << "{x'";
     else
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    const DLString &gname = rus ? group->getRussianName( ) : group->getName( );
+    const DLString &gname = group->getNameFor(ch);
     in << ", входит в группу '{hg{c" << gname << "{x'" << endl << endl
        << *this;
     

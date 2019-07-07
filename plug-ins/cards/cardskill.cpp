@@ -91,13 +91,10 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void CardSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
-    bool rus = ch->getConfig( )->ruskills;
-
-    buf << (spell ? "Заклинание" : "Умение") 
+    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
         << " Колоды '{c" << getName( ) << "{x' или '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c"  
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-        << "{x'" << endl << endl;
+        << "входит в группу '{hg{c"  << getGroup()->getNameFor(ch) << "{x'" 
+        << endl << endl;
     
     buf << "Появляется у карт, начиная с {C" 
         << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
