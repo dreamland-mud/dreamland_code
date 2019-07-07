@@ -460,7 +460,6 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     ProfilerBlock pb("quest request");
     XMLAttributeQuestData::Pointer attr;
     DLString descr;
-    int cha;
     
     if (arg.empty() || arg_is_list(arg)) {
         act("$c1 просит $C4 показать список заданий.",client, 0, ch, TO_ROOM);
@@ -489,22 +488,26 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     }
 
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
+#if 0
         tell_raw( client, ch, "Сначала попроси у богов подтверждения своему персонажу.");
         tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {W{hc{lRсправка подтверждение{lEhelp confirm{x." );
         return;
+#endif
     } else if (descr.empty( )) {
         tell_raw( client, ch, "Я не хочу давать задание такой непримечательной личности, как ты!");
         wiznet( WIZ_CONFIRM, 0, 0, "%C1 is confirmed but has no description!", client );
         return;
     } 
-    
-    cha = client->getCurrStat( STAT_CHA );
-    
-    if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
-        tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
-        tell_raw( client, ch, "Приходи позже.");
-        delay_noquest(attr, client);        
-        return;
+   
+    if (client->getQuestPoints() > 0) { 
+        int cha = client->getCurrStat( STAT_CHA );
+        
+        if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
+            tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
+            tell_raw( client, ch, "Приходи позже.");
+            delay_noquest(attr, client);        
+            return;
+        }
     }
   
     if (arg.empty() || arg_is_list(arg)) {

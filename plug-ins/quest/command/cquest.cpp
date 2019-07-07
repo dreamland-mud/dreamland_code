@@ -48,6 +48,16 @@ enum {
     QCMD_FIND
 };        
 
+static const char * qcmd_names [] = {
+    "", "buy", "list", "trouble", "request", "cancel", "complete", "find"
+};
+
+static void mprog_quest( Character *questor, Character *client, const DLString &cmd, const DLString &args )
+{
+    FENIA_VOID_CALL(questor, "Quest", "Css", client, cmd.c_str(), args.c_str());
+    FENIA_NDX_VOID_CALL(questor->getNPC(), "Quest", "CCss", questor, client, cmd.c_str(), args.c_str());
+}
+
 static void see_also( PCharacter *pch )
 {
     pch->println( "Смотри также {y{lRквест ?{lEquest ?{x для списка всех возможных действий." );
@@ -134,8 +144,11 @@ COMMAND(CQuest, "quest")
             case QCMD_TROUBLE:
                 trader->doTrouble( pch, arguments );
                 break;
+            default:
+                return;
         }
-
+    
+        mprog_quest(trader->getChar(), pch, qcmd_names[qcmd], arguments);
         return;
     }
    
@@ -194,7 +207,11 @@ COMMAND(CQuest, "quest")
         case QCMD_FIND:
             questman->doFind( pch );
             break;
+        default:
+            return;
     }
+
+    mprog_quest(questman->getChar(), pch, qcmd_names[qcmd], arguments);
 }
 
 bool CQuest::gprog_questinfo( PCharacter *ch )
