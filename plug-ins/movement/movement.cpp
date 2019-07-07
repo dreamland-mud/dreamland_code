@@ -132,6 +132,11 @@ static void rafprog_entry( Room *room, Character *ch )
     }
 }
 
+static void rprog_leave(Room *from_room, Character *walker, Room *to_room, const char *movetype)
+{
+    FENIA_VOID_CALL( from_room, "Leave", "CRs", walker, to_room, movetype );
+}
+
 static bool mprog_greet( Character *rch, Character *walker )
 {
     FENIA_CALL( rch, "Greet", "C", walker );
@@ -165,6 +170,7 @@ void Movement::callProgs( Character *wch )
         return;
     
     rafprog_leave( from_room, wch );
+    rprog_leave( from_room, wch, to_room, movetypes[movetype].name );
         
     for (fch = to_room->people; fch!=0; fch = fch_next) {
         fch_next = fch->next_in_room;
@@ -188,11 +194,11 @@ static void rprog_greet( Room *to_room, Character *ch, Room *from_room, const ch
     FENIA_VOID_CALL( to_room, "Greet", "CRs", ch, from_room, movetype );
 }
 
-static void mprog_leave( Character *ch, Room *from_room, const char *movetype )
+static void mprog_leave( Character *ch, Room *from_room, Room *to_room, const char *movetype )
 {
     for (Character *rch = from_room->people; rch; rch = rch->next_in_room) {
-        FENIA_VOID_CALL( rch, "Leave", "CRs", ch, from_room, movetype );
-        FENIA_NDX_VOID_CALL( rch->getNPC( ), "Leave", "CCRs", rch, ch, from_room, movetype );
+        FENIA_VOID_CALL( rch, "Leave", "CRs", ch, to_room, movetype );
+        FENIA_NDX_VOID_CALL( rch->getNPC( ), "Leave", "CCRs", rch, ch, to_room, movetype );
     }
 }
 
@@ -229,7 +235,7 @@ void Movement::callProgsFinish( Character *wch )
     if (!wch)
         return;
 
-    mprog_leave( wch, from_room, movetypes[movetype].name );
+    mprog_leave( wch, from_room, to_room, movetypes[movetype].name );
 
     for (obj = to_room->contents; obj; obj = obj_next) {
         obj_next = obj->next_content;
