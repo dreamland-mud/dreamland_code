@@ -637,6 +637,19 @@ NMI_GET( Root, object_list , "список всех предметов, поле
     return WrapperManager::getThis( )->getWrapper(object_list); 
 }
 
+NMI_GET( Root, obj_index_list, "список (List) всех прототипов предметов") 
+{
+    RegList::Pointer list(NEW);
+    
+    for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[iHash]; pObj; pObj = pObj->next)
+            list->push_back(wrap(pObj)); 
+    
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(list);
+    return Register(listObj);
+}
+
 extern Room *room_list;
 
 NMI_GET( Root, room_list , "список всех комнат, поле комнаты rnext указывает на следующую") 
@@ -647,6 +660,19 @@ NMI_GET( Root, room_list , "список всех комнат, поле ком�
 NMI_GET( Root, char_list , "список всех чаров, поле чара next указывает на следующего") 
 {
     return WrapperManager::getThis( )->getWrapper(char_list); 
+}
+
+NMI_GET( Root, mob_index_list, "список (List) всех прототипов мобов") 
+{
+    RegList::Pointer list(NEW);
+    
+    for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next)
+            list->push_back(wrap(pMob)); 
+    
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(list);
+    return Register(listObj);
 }
 
 NMI_SET( Root, hour , "текущий час суток, 0..23") 

@@ -5,6 +5,7 @@
 
 class Skill;
 class Character;
+class PCharacter;
 class PCSkillData;
 class XMLSkillReference;
 
@@ -26,4 +27,19 @@ DLString spell_utterance(Skill *skill);
 
 Skill * skillref_to_pointer(const XMLSkillReference &);
 
+
+/**
+ * Return colour to display for 'learned' percent.
+ */
+char skill_learned_colour(const Skill *, PCharacter *ch);
+
+/**
+ * Print line 'See also help <skill>' to the buffer.
+ */
+void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf);
+
+bool skill_is_spell(const Skill *skill);
+DLString skill_what(const Skill *skill);
+DLString skill_what_plural(const Skill *skill);
+ 
 #endif

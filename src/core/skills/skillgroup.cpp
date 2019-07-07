@@ -5,6 +5,7 @@
 #include "flags.h"
 #include "globalarray.h"
 #include "skillgroup.h"
+#include "character.h"
 
 /*-------------------------------------------------------------------
  * SkillGroup
@@ -58,6 +59,14 @@ void SkillGroup::show( PCharacter *, ostringstream & ) const
 int SkillGroup::getPracticer( ) const
 {
     return 0;
+}
+
+const DLString& SkillGroup::getNameFor( Character *ch ) const
+{
+    if (ch->getConfig( )->ruskills)
+        return getRussianName( );
+    else
+        return getName( );
 }
 
 /*-------------------------------------------------------------------

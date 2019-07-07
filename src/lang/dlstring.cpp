@@ -692,6 +692,20 @@ DLString & DLString::upperFirstCharacter( )
     return *this;
 }
 
+DLString DLString::upperFirstCharacter( ) const
+{
+    DLString rc;
+
+    if (empty())
+        return rc;
+    
+    rc << dl_toupper(at(0));
+    for(size_type pos = 1; pos < length(); pos++) 
+        rc << at(pos);
+
+    return rc;
+}
+
 bool DLString::equalLess( const DLString &str ) const
 {
     if (length( ) != str.length( ))

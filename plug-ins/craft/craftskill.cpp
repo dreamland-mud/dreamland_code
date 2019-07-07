@@ -7,6 +7,8 @@
 #include "lex.h"
 
 #include "grammar_entities_impl.h"
+#include "stringlist.h"
+#include "skill_utils.h"
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
 #include "skillreference.h"
@@ -123,32 +125,24 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void CraftSkill::show( PCharacter *ch, std::ostream &buf )
 {
-    bool rus = ch->getConfig( )->ruskills;
+    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
+        << " '{c" << getName( ) << "{x' или"
+        << " '{c" << getRussianName( ) << "{x', "
+        << "входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'." 
+        << endl << endl;
 
-    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
-        << " '{W" << getName( ) << "{x'"
-        << " '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{W" 
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-        << "{x'"
-        << endl;
-
-
-    DLString pbuf;
+    StringList pnames; 
     CraftProfessions::const_iterator sp;
-    bool found = false;
     for (sp = subprofessions.begin(); sp != subprofessions.end(); sp++) {
         CraftProfession::Pointer prof = craftProfessionManager->get(sp->first);
-        if (prof) {
-            if (found)
-                pbuf << ", ";        
-            pbuf << prof->getNameFor(ch);
-            found = true;
-       }
+        if (prof) 
+            pnames.push_back(prof->getNameFor(ch));
     }
 
-    if (!pbuf.empty())
-        buf << "Доступно профессии " << pbuf << endl;
+    if (!pnames.empty())
+        buf << "Доступно профессии " << pnames.wrap("{W", "{x").join(", ") << "." << endl;
+
+    print_see_also(this, ch, buf);
 } 
 
 static void mprog_skill( Character *ch, Character *actor, const char *skill, bool success, Character *victim )

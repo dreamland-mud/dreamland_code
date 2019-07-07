@@ -6,6 +6,7 @@
 #include <set>
 
 #include "logstream.h"
+#include "skill_utils.h"
 #include "skillhelp.h"    
 #include "skill.h"
 #include "spell.h"
@@ -16,24 +17,30 @@
 #include "commandflags.h"
 #include "def.h"
 
+GROUP(none);
 const DLString SkillHelp::TYPE = "SkillHelp";
 
 void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     bool rus = ch->getConfig( )->ruskills;
 
-    in << (skill->getSpell( ) && skill->getSpell( )->isCasted( ) ? "Заклинание" : "Умение");
+    in << skill_what(*skill).ruscase('1').upperFirstCharacter();
     if (rus)
         in << " '{c" << skill->getRussianName( ) << "{x' или" << " '{c" << skill->getName( ) << "{x'";
     else
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
     SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
-    in << ", входит в группу '{hg{c" 
-       << (rus ? group->getRussianName( ) : group->getName( )) << "{x'"
-       << endl << endl
+    const DLString &gname = group->getNameFor(ch);
+    in << ", входит в группу '{hg{c" << gname << "{x'" << endl << endl
        << *this;
-
+    
+    // '... умение|slook herbs|травы'. - с гипер-ссылкой на команду
+    // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
+    in << "См. также команду {W{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
+    if (group != group_none)
+       in << ", {W{hc{lRгруппаум{lEglist{lx " << gname << "{x";
+    in << "." << endl;
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )

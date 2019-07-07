@@ -406,7 +406,7 @@ void MorrisDancerSet::fight( Character *ch )
         return;
     }
 
-    switch(number_range(0, 50)) {
+    switch(number_range(0, 200)) {
     case 0:
         do_yell(ch, "Mamma mia, mamma mia, gia' la luna e' in mezzo al mare!");
         break;

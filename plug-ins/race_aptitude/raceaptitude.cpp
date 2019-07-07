@@ -6,6 +6,9 @@
 
 #include "logstream.h"
 
+#include "stringlist.h"
+#include "grammar_entities_impl.h"
+#include "skill_utils.h"
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -99,46 +102,43 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
 {
     Races::iterator i;
 
-    buf << (spell ? "Заклинание" : "Умение") 
-        << " '{W" << getName( ) << "{x'" 
-        << " '{W" << getRussianName( ) << "{x'"
-        << ", особенность ";
+    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
+        << " '{c" << getName( ) << "{x' или" 
+        << " '{c" << getRussianName( ) << "{x'"
+        << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'."
+        << endl << endl;
 
-    switch (races.size( )) {
-    case 0:
-        buf << "неизвестной расы ";
-        break;
-    case 1:
-        buf << "расы ";
-        break;
-    default:
-        buf << "рас ";
-        break;
+
+    StringList rnames;
+    for (i = races.begin( ); i != races.end( ); i++) {
+        Race *race = raceManager->findExisting(i->first);
+        if (race)
+            rnames.push_back(race->getNameFor(ch, ch));
     }
 
-    for (i = races.begin( ); i != races.end( ); ) {
-        buf << "{W" << i->first << "{x";
-
-        if (++i != races.end( ))
-            buf << ", ";
+    buf << "Особенность ";
+    switch (rnames.size( )) {
+    case 0:  buf << "неизвестной расы"; break;
+    case 1:  buf << "расы "; break;
+    default: buf << "рас "; break;
     }
+    buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
     
-    buf << endl
-        << "Входит в группу '{hg{W" << getGroup( )->getName( ) << "{x'";
-        
     if (!visible( ch )) {
-        buf << endl;
+        print_see_also(this, ch, buf);
         return;
     }
         
-    buf << ", уровень {W" << getLevel( ch ) << "{x";
+    buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x";
 
-    if (available( ch ))
-        buf << ", изучено на {W" 
-            << ch->getSkillData( getIndex( ) ).learned 
-            << "%{x";
+    if (available( ch )) {
+        int learned = ch->getSkillData(getIndex()).learned;
+        if (learned > 0)
+            buf << ", изучено на {" << skill_learned_colour(this, ch) << learned << "%{x";
+    }
 
-    buf << endl;
+    buf << "." << endl;
+    print_see_also(this, ch, buf);
 }
 
 const SkillRaceInfo *

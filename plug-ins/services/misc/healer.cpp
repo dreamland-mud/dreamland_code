@@ -4,6 +4,11 @@
  */
 #include <iomanip>
 
+#include "feniamanager.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
+
 #include "healer.h"
 #include "behavior_utils.h"
 #include "attract.h"
@@ -85,6 +90,8 @@ void Healer::msgListBefore( Character *client )
 void Healer::msgListAfter( Character *client )
 {
     tell_dim( client, getKeeper( ), "Используй '{lEheal{lRлечить{lx <тип заклинания>', и я вылечу тебя за указанную цену." );
+    if (client->getModifyLevel() < 20)
+        tell_dim(client, getKeeper(), "А пока ты не достигнешь 20го уровня, я буду лечить тебя бесплатно, если замечу, что тебе нужна помощь.");
 }
 
 void Healer::msgArticleNotFound( Character *client ) 
@@ -221,6 +228,12 @@ bool ManaHealService::available( Character *client, NPCharacter *healer ) const
 /*------------------------------------------------------------------------
  * 'heal' command 
  *-----------------------------------------------------------------------*/
+static void mprog_heal( Character *mob, Character *client, const DLString &args )
+{
+    FENIA_VOID_CALL(mob, "Heal", "Cs", client, args.c_str());
+    FENIA_NDX_VOID_CALL(mob->getNPC(), "Heal", "CCs", mob, client, args.c_str());
+}
+
 CMDRUN( heal )
 {
     DLString argument = constArguments;
@@ -248,6 +261,8 @@ CMDRUN( heal )
         healer->doList( ch );
     else
         healer->doBuy( ch, argument );
+
+    mprog_heal(healer->getChar(), ch, argument);
 }
 
 /*------------------------------------------------------------------------

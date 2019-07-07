@@ -121,7 +121,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
 {
     ostringstream buf;
     DLString sname = skill->getNameFor(ch);
-    bool isSpell = skill->getSpell() && skill->getSpell()->isCasted();
+    bool isSpell = skill_is_spell(skill);
 
     if (skill->getGroup() == group_weaponsmaster) {
         buf << "Тебе снится битва с Лаеркаи Мастером." << endl;
@@ -142,7 +142,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
                 << "завершая битву еще быстрее и эффектнее, чем это было на самом деле." << endl;
     }
     else if (skill->getGroup() == group_vampiric || skill->getGroup() == group_necromancy) {
-        buf << "В леденящем душу замогильном шепоте к тебе приходит тайна " << (isSpell ? "заклинания" : "умения") << " {c" << sname << "{x." << endl;
+        buf << "В леденящем душу замогильном шепоте к тебе приходит тайна " << skill_what(skill).ruscase('2') << " {c" << sname << "{x." << endl;
     }
     else if (skill->getGroup() == group_fightmaster) {
         buf << "Тебе снится, как ловко ты разделываешься с Даркеном Ралом, применив на него умение {c" << sname << "{x." << endl;
@@ -190,7 +190,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
     else if (isSpell && chance(50))
         buf << "Во сне тебе открываются тайны ранее недоступного заклинания {c" << sname << "{x." << endl;
     else if (chance(50))
-        buf << "Тебе снится странный сон, будто бы ты владеешь " << (isSpell ? "заклинанием" : "умением") << " {c" << sname << "{x." << endl;
+        buf << "Тебе снится странный сон, будто бы ты владеешь " << skill_what(skill).ruscase('5') << " {c" << sname << "{x." << endl;
     else
         buf << "Тебя переполняет неизвестно откуда взявшаяся уверенность, что, проснувшись," << endl
             << "ты будешь знать умение {c" << sname << "{x не хуже любого профессионала!" << endl;

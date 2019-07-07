@@ -9,6 +9,7 @@
 
 #include "skillmanager.h"                                                       
 #include "skillgroup.h"                                                       
+#include "skill_utils.h"
 #include "behavior_utils.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -90,28 +91,27 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
 void CardSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
-    bool rus = ch->getConfig( )->ruskills;
-
-    buf << (spell ? "Заклинание" : "Умение") 
-        << " Колоды '{W" << getName( ) << "{x' или '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{W"  
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-        << "{x'" << endl;
+    buf << skill_what(this).ruscase('1').upperFirstCharacter() 
+        << " Колоды '{c" << getName( ) << "{x' или '{c" << getRussianName( ) << "{x', "
+        << "входит в группу '{hg{c"  << getGroup()->getNameFor(ch) << "{x'" 
+        << endl << endl;
     
-    buf << "Появляется у карт, начиная с {W" 
+    buf << "Появляется у карт, начиная с {C" 
         << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 
         << "{x"; 
 
     if (visible( ch )) {
         int learned = getLearned( ch );
         if (learned > 0)
-            buf << ", изучено на {W" << learned << "%{x";
+            buf << ", изучено на {" << skill_learned_colour(this, ch) << learned << "%{x";
 
         if (!usable( ch ))
             buf << " (сейчас тебе недоступно)";
     }
     
-    buf << endl; 
+    buf << "." << endl; 
+
+    print_see_also(this, ch, buf);
 }
 
 

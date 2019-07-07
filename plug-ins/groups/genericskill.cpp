@@ -6,6 +6,7 @@
 #include "genericskillloader.h"
 
 #include "logstream.h"
+#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "skillmanager.h"
 #include "skillreference.h"
@@ -15,6 +16,7 @@
 #include "pcharacter.h"
 #include "room.h"
 #include "npcharacter.h"
+#include "hometown.h"
 
 #include "mercdb.h"
 #include "clan.h"
@@ -24,6 +26,7 @@
 PROF(none);
 PROF(vampire);
 PROF(universal);
+HOMETOWN(frigate);
 
 const DLString GenericSkill::CATEGORY = "Профессиональные умения";
 
@@ -539,7 +542,7 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
 
     if (verbose)
         ch->pecho( "%1$^C1 не может научить тебя искусству '%2$s'.\n"
-               "Для большей информации используй: {y{hc{lRумение %2$s{lEslook %2$s{x, {y{lRгруппаумен {Dгруппа{y{lEglist {Dгруппа{x.",
+               "Для большей информации используй команду {y{hc{lRумение %2$s{lEslook %2$s{x.",
                mob, getNameFor( ch ).c_str( ) );
     return false;
 }
@@ -550,44 +553,63 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
  */
 void GenericSkill::show( PCharacter *ch, std::ostream & buf ) 
 {
-    float sp;
-    int total, max;
-    bool rus = ch->getConfig( )->ruskills;
+    const DLString what = skill_what(this).ruscase('1'); 
 
-    buf << (spell && spell->isCasted( ) ? "Заклинание" : "Умение")
-        << " '{W" << getName( ) << "{x'"
-        << " '{W" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{W" 
-        << (rus ? getGroup( )->getRussianName( ) : getGroup( )->getName( )) 
-        << "{x'"
+    buf << what.upperFirstCharacter()
+        << " '{c" << getName( ) << "{x' или"
+        << " '{c" << getRussianName( ) << "{x', "
+        << "входит в группу '{hg{c" 
+        << getGroup()->getNameFor(ch) 
+        << "{x'."
+        << endl
         << endl;
     
-    if (!visible( ch )) 
+    if (!visible( ch )) {
+        if (!classes.empty())
+            buf << "Недоступно для твоей профессии." << endl;
+        print_see_also(this, ch, buf);
         return;
+    }
+
+    int percent = ch->getSkillData(getIndex()).learned;
+    if (temporary_skill_active(this, ch)) {
+        buf << "Приснилось тебе разученное до {C" << percent << "%{x." << endl;
+        print_see_also(this, ch, buf);
+        return;
+    }
+
+    if (!available(ch)) {
+        buf << "Станет доступно тебе на уровне {C" << getLevel(ch) << "{x." << endl;
+    } else {
+        buf << "Доступно тебе с уровня {C" << getLevel(ch) << "{x, ";
+        if (percent < 2) 
+            buf << "пока не изучено";
+        else 
+            buf << "изучено на {" << skill_learned_colour(this, ch) << percent << "%{x";
+        
+        buf << "." << endl;
+    }
     
     if (ch->getProfession( ) == prof_universal) {
-        int csize = classes.size( );
-
-        if (csize > 1) {
-            DLString cl;
-
-            buf << "Доступно професси" << (csize == 2 ? "и" : "ям") << " ";
-            
-            for (Classes::iterator i = classes.begin( ); i != classes.end( ); i++) 
-                if (i->first != prof_universal->getName( )) {
-                    Profession *prof = professionManager->find( i->first );
-                    cl += prof->getNameFor( ch ) + ", ";
-                }
-
-            buf << cl.substr( 0, cl.size( ) - 2 ) << endl;
+        StringList cnames; 
+        
+        for (Classes::iterator i = classes.begin( ); i != classes.end( ); i++) 
+            if (i->first != prof_universal->getName( )) {
+                Profession *prof = professionManager->find( i->first );
+                cnames.push_back(prof->getNameFor(ch));
+            }
+        
+        if (!cnames.empty()) {
+            buf << "Доступно професси" << (cnames.size() == 1 ? "и" : "ям") << " "
+                << cnames.wrap("{W", "{x").join(", ") << endl;
         }
     }
     
     
-    sp = (float) getWeight( ch ) / 10;
-    total = getTotalWeight( ch );
-    max = getMaxWeight( ch );
 #if 0    
+    float sp = (float) getWeight( ch ) / 10;
+    int total = getTotalWeight( ch );
+    int max = getMaxWeight( ch );
     if (sp || total || max) 
         buf << "Цена {W" << sp << "{x sp, "
             << "на всю ветку потрачено {W" << total << "{x sp, "
@@ -597,28 +619,43 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     SkillClassInfo *ci = getClassInfo( ch );
     
     if (ci) {
+        StringList cnames;
         GenericSkillVector::const_iterator i;
         const GenericSkillVector &v = ci->children.getConstVector( ch );
         
-        if (!v.empty( )) {
-            buf << "Позволяет выучить: ";
-            
-            for (i = v.begin( ); i != v.end( ); ) {
-                buf << "{W" << (*i)->getNameFor( ch ) << "{x";
-
-                if (++i != v.end( ))
-                    buf << ", ";
-            }
-
-            buf << endl;
-        }
+        for (i = v.begin( ); i != v.end( ); i++) 
+            cnames.push_back((*i)->getNameFor(ch));
+        
+        if (!cnames.empty()) 
+            buf << "Позволяет выучить: " << cnames.wrap("{W", "{x").join(", ") << endl;
     }
     
-    buf << endl;
     unmark( ch );
-    showParents( ch, buf, "|" );
+    if (ch->getProfession( ) == prof_universal) {
+        buf << endl;
+        showParents( ch, buf, "|" );
+        buf << endl;
+    }
     unmark( ch );
-    buf << endl;
+
+    if (getGroup()->getPracticer() == 0) {
+        // '...в твоей гильдии (справка|help гильдии|guilds)' - с гипер-ссылкой на справку.
+        buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка {hhгильдии{hx{lEhelp {hhguilds{x)." << endl;
+    } else {
+        // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
+        MOB_INDEX_DATA *pMob = get_mob_index(getGroup()->getPracticer());
+        if (pMob)
+            buf << "Это " << what << " можно выучить у "
+                << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "
+                << "(зона {g{hh" << pMob->area->name << "{x)." << endl;
+    }
+    
+    if (ch->getHometown() == home_frigate)
+        buf << "Пока ты на корабле, обращайся к {gКацману{x (Лазарет) или к {gЭткину{x (Арсенал)." << endl;
+    else if (ch->getModifyLevel() < 20)
+        buf << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
+
+    print_see_also(this, ch, buf);
 }
 
 /* 
@@ -627,7 +664,6 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
 void 
 GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad ) 
 {
-    float sp;
     SkillClassInfo *ci = getClassInfo( ch );
     PCSkillData &data = ch->getSkillData( getIndex( ) );
     int percent = data.learned;
@@ -646,21 +682,10 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
     else 
         buf << "{g";
 
-    buf << getNameFor( ch ) << "{x (";
-
-    if (percent == 1)
-        buf << "{R";
-    else if (percent >= getMaximum( ch ))
-        buf << "{C";
-    else if (percent >= getAdept( ch ))
-        buf << "{c";
-    else 
-        buf << "{x";
+    buf << getNameFor( ch ) << "{x ({" << skill_learned_colour(this, ch) << data.learned << "%{x";
     
-    buf << percent << "%{x";
-    
-    sp = (float) getWeight( ch ) / 10;
 #if 0    
+    float sp = (float) getWeight( ch ) / 10;
     if (sp > 0)
         buf << "*" << sp;
 #endif        

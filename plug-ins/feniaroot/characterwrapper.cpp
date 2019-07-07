@@ -1939,7 +1939,7 @@ NMI_GET( CharacterWrapper, hasDestiny, "моб имеет предназначе
         return Register( false );
 }
 
-NMI_INVOKE( CharacterWrapper, hasOccupation, "(): моб имеет занятие (продавец,ремонтник,квестор)" )
+NMI_INVOKE( CharacterWrapper, hasOccupation, "(): моб имеет занятие (shopper,practicer,repairman,quest_trader,quest_master,healer,smithman,trainer,clanguard)" )
 {
     checkTarget( );
     CHK_PC

@@ -1,3 +1,4 @@
+#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "craftattribute.h"
 #include "subprofession.h"
@@ -21,23 +22,19 @@ bool XMLAttributeCraft::handle( const WhoisArguments &args )
 
     buf << "владеет профессиями: ";
     
+    StringList pnames;
     Proficiency::const_iterator p;
-    bool found = false;
-
     for (p = proficiency.begin(); p != proficiency.end(); p++) {
         CraftProfession::Pointer prof = craftProfessionManager->get(p->first);
-        if (prof) {
-            if (found)
-                buf << ", ";
-            buf << prof->getNameFor(args.looker);
-            found = true;
-        }
+        if (prof)
+            pnames.push_back(prof->getNameFor(args.looker));
     }
+    buf << pnames.join(", ");
     
-    if (found)
+    if (!pnames.empty())
         args.lines.push_back( buf.str() );
 
-    return found;
+    return !pnames.empty();
 }
 
 bool XMLAttributeCraft::handle( const ScoreArguments &args )
