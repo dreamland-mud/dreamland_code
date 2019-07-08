@@ -1258,6 +1258,14 @@ static void afprog_look( Character *ch, Character *victim )
     }
 }
 
+static void mprog_look(Character *looker, Character *victim)
+{
+    FENIA_VOID_CALL( looker, "Look", "CC", looker, victim );
+    FENIA_NDX_VOID_CALL( looker->getNPC(), "Look", "CCC", looker, looker, victim );
+    FENIA_VOID_CALL( victim, "Look", "CC", looker, victim );
+    FENIA_NDX_VOID_CALL( victim->getNPC(), "Look", "CCC", victim, looker, victim );
+}
+
 static void do_look_character( Character *ch, Character *victim )
 {
     if (victim->can_see( ch )) {
@@ -1272,6 +1280,7 @@ static void do_look_character( Character *ch, Character *victim )
 
     show_char_to_char_1( victim, ch, false );
     afprog_look( ch, victim );    
+    mprog_look(ch, victim);
 }
 
 static bool do_look_direction( Character *ch, const char *arg1 )
