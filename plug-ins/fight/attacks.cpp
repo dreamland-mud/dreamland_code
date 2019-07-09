@@ -104,6 +104,8 @@ struct attack_type        attack_table        []                =
     { "horns",                "удар рогами",                DAM_BASH,        MultiGender::MASCULINE },
     { "spines",         "удар иголками",              DAM_PIERCE,         MultiGender::MASCULINE }, 
     { "cacophony",      "какофония",              DAM_SOUND,      MultiGender::FEMININE}, 
+    { "poisonbite",      "отравляющий укус",              DAM_PIERCE,      MultiGender::MASCULINE}, 
+    { "tearbite",      "разрывающий укус",              DAM_SLASH,      MultiGender::MASCULINE}, 
     { 0,                0,                        0                }
 };
 
