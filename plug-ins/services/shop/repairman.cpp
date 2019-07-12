@@ -7,6 +7,11 @@
 #include "attract.h"
 #include "occupations.h"
 
+#include "feniamanager.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
+
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
@@ -18,6 +23,12 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+
+static void mprog_repair( Character *mob, Character *client, Object *obj, int cost )
+{
+    FENIA_VOID_CALL(mob, "Repair", "COi", client, obj, cost);
+    FENIA_NDX_VOID_CALL(mob->getNPC(), "Repair", "CCOi", mob, client, obj, cost);
+}
 
 /*
  * Repairman
@@ -100,6 +111,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
         client->println( "В честь Дня Защиты Животных починка обошлась тебе бесплатно." );
 
     obj->condition = 100;
+    mprog_repair(ch, client, obj, cost);
 }
 
 void Repairman::doEstimate( Character *client, const DLString &cArgs )
