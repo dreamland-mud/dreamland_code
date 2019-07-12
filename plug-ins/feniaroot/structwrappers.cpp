@@ -756,6 +756,12 @@ NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение дл
     return skillManager->find( name )->usable( ch, false );
 }
 
+NMI_INVOKE( SkillWrapper, adept, "(ch): вернуть максимальное значение, до которого можно практиковаться" )
+{
+    PCharacter *ch = args2player(args); 
+    return skillManager->find(name)->getAdept(ch);
+}
+
 NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разученность или установить ее в percent" )
 {
     PCharacter *ch = args2player(args); 
