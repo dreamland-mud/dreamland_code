@@ -1206,9 +1206,12 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
 
     DLString args = argument;
     DLString arg = args.getOneArgument();
-    ostringstream buf;
+    bool fAll = arg_is_all(arg);
+    bool found = fAll;
 
-    if (arg == "pets") {
+    if (fAll || arg_oneof(arg, "pets")) {
+        ostringstream buf;
+
         buf << "vnum,name,level,act,aff,off,area" << endl;
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
@@ -1233,19 +1236,20 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
                 << aname << endl;
         }
 
-        page_to_char(buf.str().c_str(), ch);
         try {
-            DLFileStream( "db_pets.csv" ).fromString( buf.str( ) );
+            DLFileStream( "/tmp/db_pets.csv" ).fromString( buf.str( ) );
         } catch (const ExceptionDBIO &ex) {
             ch->println( ex.what( ) );
             return;
         }
         
-        ch->println("Created db_pets.csv file.");
-        return;
+        ch->println("Created /tmp/db_pets.csv file.");
+        found = true;
     }
 
-    if (arg == "armor") {
+    if (fAll || arg_oneof(arg, "armor")) {
+        ostringstream buf;
+
         buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,armor,str,int,wis,dex,con,cha,size,affects,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
@@ -1372,17 +1376,19 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
         }
 
         try {
-            DLFileStream( "db_armor.csv" ).fromString( buf.str( ) );
+            DLFileStream( "/tmp/db_armor.csv" ).fromString( buf.str( ) );
         } catch (const ExceptionDBIO &ex) {
             ch->println( ex.what( ) );
             return;
         }
         
-        ch->println("Created db_armor.csv file.");
-        return;
+        ch->println("Created /tmp/db_armor.csv file.");
+        found = true;
     }
 
-    if (arg == "magic") {
+    if (fAll || arg_oneof(arg, "magic")) {
+        ostringstream buf;
+
         buf << "vnum,name,level,itemtype,spellLevel,charges,spells,area,where,limit" << endl;
         // Collect distinct list of spells.
         std::set<DLString> allSpells;
@@ -1402,6 +1408,7 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
             int charges = 0;
             DLString spells = "";
             Skill *skill;
+
             // Only dump magic items; collect properties.
             switch (pObj->item_type) {
             case ITEM_SCROLL:
@@ -1483,21 +1490,19 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
         }
 
         try {
-            DLFileStream( "db_magic.csv" ).fromString( buf.str( ) );
+            DLFileStream( "/tmp/db_magic.csv" ).fromString( buf.str( ) );
         } catch (const ExceptionDBIO &ex) {
             ch->println( ex.what( ) );
             return;
         }
         
-        ch->println("Created db_magic.csv file.");
-        for (std::set<DLString>::iterator s = allSpells.begin( ); s != allSpells.end( ); s++)
-            ch->println( *s );
-
-        ch->printf("Found %d unique spells.\r\n", allSpells.size( ));
-        return;
+        ch->println("Created /tmp/db_magic.csv file.");
+        found = true;
     }
     
-    if (arg == "weapon") {
+    if (fAll || arg_oneof(arg, "weapon")) {
+        ostringstream buf;
+
         buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,armor,str,int,wis,dex,con,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
@@ -1590,16 +1595,17 @@ CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher 
         }
 
         try {
-            DLFileStream( "db_weapon.csv" ).fromString( buf.str( ) );
+            DLFileStream( "/tmp/db_weapon.csv" ).fromString( buf.str( ) );
         } catch (const ExceptionDBIO &ex) {
             ch->println( ex.what( ) );
             return;
         }
         
-        ch->println("Created db_weapon.csv file.");
-        return;
+        ch->println("Created /tmp/db_weapon.csv file.");
+        found = true;
     }
-
-    ch->println("Usage: searcher armor|weapon|magic|pets.");
+    
+    if (!found)
+        ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets");
 }
 
