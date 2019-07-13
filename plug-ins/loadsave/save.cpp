@@ -1681,6 +1681,10 @@ NPCharacter * fread_mob( FILE *fp )
                             char *nm = fread_string( fp );
                             DLString name( nm );
                             free_string(nm);
+                            // For non-renamed mobs, update their name from index data,
+                            // as it can be translated or altered at this point.
+                            if (is_name(name.c_str(), mob->pIndexData->player_name))
+                                name = mob->pIndexData->player_name;
                             mob->setName( name );
                             fMatch = true;
                             break;
