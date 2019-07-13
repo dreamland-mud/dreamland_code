@@ -1386,6 +1386,8 @@ static bool has_nopost(Character *ch)
         buf << "Prac: "  << pc->practice << " "
             << "Train: " << pc->train << " ";
     buf << endl;
+    if (victim->heal_gain != 0 || victim->mana_gain != 0)
+        buf << "Extra heal gain: " << victim->heal_gain << "%   Extra mana gain: " << victim->mana_gain << "%" << endl;
     
     if (victim->getReligion( ) == god_none)
         buf << "Не верит в богов." << endl;
