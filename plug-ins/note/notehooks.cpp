@@ -170,25 +170,28 @@ static bool story_include_modern(const Note *note)
 void NoteHooks::webDumpNews()
 {
     WebNoteList webNotes;
+    bool fColor = false;
 
-    webNotes.importThread("news", news_include);
-    webNotes.importThread("change", news_include);
+    webNotes.importThread("news", news_include, fColor);
+    webNotes.importThread("change", news_include, fColor);
     webNotes.saveTo(NEWS_EXPORT_PATH);
 }
 
 void NoteHooks::webDumpModernStories()
 {
     WebNoteList webNotes;
+    bool fColor = true;
 
-    webNotes.importThread("story", story_include_modern);
+    webNotes.importThread("story", story_include_modern, fColor);
     webNotes.saveTo(STORY_MODERN_EXPORT_PATH);
 }
 
 void NoteHooks::webDumpOldStories()
 {
     WebNoteList webNotes;
+    bool fColor = true;
 
-    webNotes.importThread("story", story_include_old);
+    webNotes.importThread("story", story_include_old, fColor);
     webNotes.saveTo(STORY_OLD_EXPORT_PATH);
 }
 

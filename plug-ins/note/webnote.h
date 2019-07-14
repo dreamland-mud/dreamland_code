@@ -16,7 +16,7 @@ public:
     typedef ::Pointer<WebNote> Pointer;
     
     WebNote();
-    WebNote( const Note * );
+    WebNote( const Note *, bool fColor );
     virtual ~WebNote( );
 
 public:
@@ -34,7 +34,7 @@ class WebNoteList : public XMLListBase<WebNote> {
 public:
     WebNoteList();
 
-    void importThread(const DLString &threadName, NoteToInclude func);
+    void importThread(const DLString &threadName, NoteToInclude func, bool fColor);
     void saveTo(const DLString &filePath);
 };
 

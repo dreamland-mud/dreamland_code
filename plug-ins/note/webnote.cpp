@@ -3,6 +3,7 @@
 #include "notethread.h"
 #include "notemanager.h"
 #include "xmlfile.h"
+#include "mudtags.h"
 
 WebNote::WebNote()
 {
@@ -11,16 +12,20 @@ WebNote::WebNote()
 
 /**
  * Construct web representation of a note, with date formatted correctly.
- * TODO: colourStrip doesn't strip "{hl" tags correctly.
  */
-WebNote::WebNote( const Note *note ) 
+WebNote::WebNote( const Note *note, bool fColor ) 
 {
     subject.setValue( note->getSubject( ).colourStrip( ) );
     from.setValue( note->getFrom( ).colourStrip( ) );
     date.setValue( note->getDate( ).getTimeAsString( "%d %b %Y") );
     id.setValue( note->getID( ) );
-    //text.setValue( note->getText( ).colourStrip( ) );
-    text.setValue( note->getText( ) );
+
+    // Strip {hl and so on. Color strip on demand.
+    ostringstream txt;
+    vistags_convert(note->getText().c_str(), txt);
+    text.setValue(txt.str());
+    if (!fColor)
+        text.colourstrip(); 
 }
 
 WebNote::~WebNote( )
@@ -36,7 +41,7 @@ WebNoteList::WebNoteList()
 /**
  * Import all notes of given type, filtered by predicate.
  */
-void WebNoteList::importThread(const DLString &threadName, NoteToInclude predicate)
+void WebNoteList::importThread(const DLString &threadName, NoteToInclude predicate, bool fColor)
 {
     NoteThread::NoteList::const_iterator i;
     NoteThread::Pointer thread = NoteManager::getThis( )->findThread(threadName);
@@ -49,7 +54,7 @@ void WebNoteList::importThread(const DLString &threadName, NoteToInclude predica
 
     for (i = thread->getNoteList( ).begin( ); i != thread->getNoteList( ).end( ); i++) 
         if (predicate(*i))
-            push_back( WebNote(*i) );
+            push_back( WebNote(*i, fColor) );
 }
 
 /**
