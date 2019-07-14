@@ -2,9 +2,11 @@
  *
  * ruffina, 2004
  */
+#include <iomanip>
 #include "interpretlayer.h"
 #include "commandinterpreter.h"
 #include "commandbase.h"
+#include "translit.h"
 
 #include "lastlogstream.h"
 #include "logstream.h"
@@ -114,7 +116,7 @@ public:
     }
 };
 
-class FindCommandInterpretLayer : public InterpretLayer {
+class SayWhatInterpretLayer : public InterpretLayer {
 public:    
     virtual void putInto( )
     {
@@ -123,7 +125,62 @@ public:
     
     virtual bool process( InterpretArguments &iargs )
     {
+        if (iargs.pCommand)
+            return true;
+
+        if (iargs.cmdName.empty( ))
+            return false;
+            
+        ostringstream buf; 
+        int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translit.size();
+
+        if (total_hints == 0) {
+            iargs.ch->send_to( "Что?\r\n" );
+            return false;
+        }
+
+        buf << "Возможно, имелось в виду:" << endl;
+       
+        if (total_hints <= 3) {
+            const DLString &args = iargs.cmdArgs;
+            DLString kuzdnArgs = translit(args);
+            show_hint_and_argument(buf, iargs.translit, kuzdnArgs);
+            show_hint_and_argument(buf, iargs.hints1, args);
+            show_hint_and_argument(buf, iargs.hints2, args);
+        } else {
+            int hint_cnt = 0; 
+            show_hint_columns(hint_cnt, buf, iargs.translit);
+            show_hint_columns(hint_cnt, buf, iargs.hints1);
+            show_hint_columns(hint_cnt, buf, iargs.hints2);
+            if (hint_cnt % 2 != 0)
+                buf << endl;
+        }
+
+        iargs.ch->send_to(buf);
         return false;
+    }
+
+private:
+    void show_hint_and_argument(ostringstream &buf, const StringList &hints, const DLString &args)
+    {
+        for (StringList::const_iterator h = hints.begin(); h != hints.end(); h++) {
+            buf << "    {hc{y" << *h;
+            if (!args.empty())
+                buf  << "{w " << args;
+            buf  << "{x" << endl;
+        }
+    }
+
+    void show_hint_columns(int &hint_cnt, ostringstream &buf, const StringList &hints)
+    {
+        for (StringList::const_iterator h = hints.begin(); h != hints.end(); h++) {
+            DLString str(*h);
+            str << "{x";
+
+            buf << "    {hc{y" << setiosflags(ios::left) << setw(20) << str <<  resetiosflags(ios::left) << "{x";
+            if (++hint_cnt % 2 == 0)
+                buf << endl;
+        }
     }
 };
 
@@ -138,7 +195,7 @@ extern "C"
         Plugin::registerPlugin<FixStringInterpretLayer>( ppl );
         Plugin::registerPlugin<LogInputInterpretLayer>( ppl );
         Plugin::registerPlugin<LogCommandInterpretLayer>( ppl );
-        Plugin::registerPlugin<FindCommandInterpretLayer>( ppl );
+        Plugin::registerPlugin<SayWhatInterpretLayer>( ppl );
 
         return ppl;
     }

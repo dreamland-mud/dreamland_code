@@ -7,6 +7,7 @@
 
 #include "plugin.h"
 #include "dlstring.h"
+#include "stringlist.h"
 
 class Descriptor;
 class Character;
@@ -24,7 +25,7 @@ enum {
     CMDP_LOG_INPUT  = 300,
     CMDP_GRAB_WORD  = 400,
     CMDP_FIND       = 500,
-    CMDP_LOG_CMD    = 600,
+    CMDP_LOG_CMD    = 600
 };
 
 struct InterpretArguments
@@ -41,6 +42,7 @@ struct InterpretArguments
     ::Pointer<CommandBase> pCommand;
     int index;
     int * phases;
+    StringList hints1, hints2, translit;
 };
 
 class InterpretLayer : public virtual Plugin {

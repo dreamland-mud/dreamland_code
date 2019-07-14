@@ -4,6 +4,9 @@
  * based on CommandManager by NoFate
  */
 #include <algorithm>
+#include "levenshtein.h"
+#include "translit.h"
+#include "dl_ctype.h"
 
 #include "commandmanager.h"
 #include "commandinterpreter.h"
@@ -45,6 +48,45 @@ Command::Pointer CommandList::findExact( const DLString& name ) const
     }
 
     return Command::Pointer( );
+}
+
+static void record_distance(const DLString &cmd, const DLString &kuzdn, const DLString &candidate, InterpretArguments &iargs)
+{
+    DLString string2;
+ 
+    if (cmd.size() < candidate.size())
+        string2 = candidate.substr(0, cmd.size());
+    else
+        string2 = candidate;
+
+    int distance = levenshtein(cmd.c_str(), string2.c_str(), 1, 2, 1, 1);
+    if (distance <= 1)
+        iargs.hints1.push_back(candidate);
+    else if (distance == 2)
+        iargs.hints2.push_back(candidate);
+
+    if (kuzdn.strPrefix(candidate))
+        iargs.translit.push_back(candidate);
+}
+
+void CommandList::gatherHints(InterpretArguments &iargs) const
+{
+    list<Command::Pointer>::const_iterator c;
+    XMLStringList::const_iterator a;
+    const DLString &cmd = iargs.cmdName;
+    DLString kuzdn = translit(cmd);
+
+    for (c = commands.begin(); c != commands.end(); c++) {
+        if ((*c)->available(iargs.ch)) {
+            record_distance(cmd, kuzdn, (*c)->getName(), iargs);
+
+            for (a = (*c)->getAliases().begin(); a != (*c)->getAliases().end(); a++) 
+                record_distance(cmd, kuzdn, *a, iargs);
+            
+            for (a = (*c)->getRussianAliases().begin(); a != (*c)->getRussianAliases().end(); a++) 
+                record_distance(cmd, kuzdn, *a, iargs);
+        }
+    }
 }
 
 Command::Pointer CommandList::chooseCommand( Character *ch, const DLString &name ) const
@@ -222,12 +264,15 @@ void CommandManager::putInto( )
     interp->put( this, CMDP_FIND, 10 );        
 }
 
+
 bool CommandManager::process( InterpretArguments &iargs )
 {
     iargs.pCommand = commands.chooseCommand( iargs.ch, iargs.cmdName );
 
-    if (iargs.pCommand)
-        iargs.advance( );
+    if (iargs.pCommand) 
+        iargs.advance();
+    else if (iargs.cmdName.size() >= 3) 
+        commands.gatherHints(iargs);
 
     return true;
 }

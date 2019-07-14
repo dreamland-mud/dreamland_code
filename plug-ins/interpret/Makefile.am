@@ -10,6 +10,7 @@ libinterpret_la_SOURCES = \
 interpretlayer.cpp \
 commandinterpreter.cpp \
 interp.cpp \
+translit.cpp \
 impl.cpp
 
 libinterpret_la_LIBADD = \

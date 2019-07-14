@@ -101,12 +101,8 @@ InterpretHandler::handle(Descriptor *d, char *arg)
 
     CommandInterpreter::getThis( )->run( iargs );
 
-    if (!iargs.pCommand) {
-        if (!iargs.cmdName.empty( ))
-            iargs.ch->send_to( "Что?\r\n" );
-
+    if (!iargs.pCommand) 
         return 0;
-    }
 
     if (!iargs.pCommand->dispatch( iargs ))
         return 0;

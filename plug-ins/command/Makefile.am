@@ -29,6 +29,7 @@ commandplugin.cpp \
 commandhelp.cpp \
 admincommand.cpp \
 wrongcommand.cpp \
+levenshtein.cpp \
 impl.cpp 
 
 libcommand_la_MOC = \

@@ -21,6 +21,7 @@ class CommandList {
 public:
         Command::Pointer findExact( const DLString & ) const;
         Command::Pointer chooseCommand( Character *, const DLString & ) const;
+        void gatherHints(InterpretArguments &iargs) const;
 
         void add( Command::Pointer & );
         void remove( Command::Pointer & );
