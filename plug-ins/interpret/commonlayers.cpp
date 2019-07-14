@@ -130,13 +130,15 @@ public:
 
         if (iargs.cmdName.empty( ))
             return false;
+
+        if (!iargs.ch->desc || iargs.ch->desc->connected != CON_PLAYING)
+            return false;
             
         ostringstream buf; 
         int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translit.size();
 
         if (total_hints == 0) {
-            if (iargs.ch->desc && iargs.ch->desc->connected == CON_PLAYING)
-                iargs.ch->send_to( "Что?\r\n" );
+            iargs.ch->send_to( "Что?\r\n" );
             return false;
         }
 
