@@ -67,9 +67,6 @@ void Hierophant::tell( Character *victim, const char *speech )
         return;
 
     if (fHello) {
-        if (!pet || pet->in_room != victim->in_room)
-            return;
-
         say_act( victim, ch, "Здравствуй, $c1." );
         say_act( victim, ch, "Если спросишь у меня 'что умеет мой питомец?', я расскажу, какими заклинаниями он владеет." );
         interpret_fmt( ch, "smile %s", victim->getNameP( ) );
