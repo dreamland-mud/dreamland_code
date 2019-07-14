@@ -135,7 +135,8 @@ public:
         int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translit.size();
 
         if (total_hints == 0) {
-            iargs.ch->send_to( "Что?\r\n" );
+            if (iargs.ch->desc && iargs.ch->desc->connected == CON_PLAYING)
+                iargs.ch->send_to( "Что?\r\n" );
             return false;
         }
 
