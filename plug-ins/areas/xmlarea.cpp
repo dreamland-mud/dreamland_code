@@ -183,9 +183,11 @@ XMLArea::load_helps(AREA_DATA *a)
 
     for (h = helps.begin( ); h != helps.end( ); h++) {
         AreaHelp::Pointer help(NEW);
+        DLString aname(a->name);
+        aname.colourstrip();
 
         help->areafile = a->area_file;
-        help->selfHelp = is_name(a->name, h->keyword.c_str());
+        help->selfHelp = is_name(aname.c_str(), h->keyword.c_str());
         help->persistent = true;
         help->setKeywordAttribute(h->keyword);
         help->setLevel(h->level);
