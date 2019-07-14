@@ -3,6 +3,9 @@
  * ruffina, 2004
  */
 #include "basicmobilebehavior.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
 #include "npcharacter.h"
 #include "room.h"
@@ -359,6 +362,12 @@ bool BasicMobileBehavior::doScavenge( )
 /*
  * Rearm and weapon pickup
  */
+static bool mprog_cant_scavenge( Character *ch, Object *obj )
+{
+    FENIA_CALL( ch, "CantScavenge", "O", obj );
+    FENIA_NDX_CALL( ch->getNPC(), "CantScavenge", "CO", ch, obj);
+    return false;
+}
 bool BasicMobileBehavior::doPickWeapon( )
 {
     Object *obj, *wield, *shield, *choice;
@@ -371,7 +380,7 @@ bool BasicMobileBehavior::doPickWeapon( )
     shield = get_eq_char( ch, wear_shield );
     choice = 0;
     count = 0;
-    
+   
     for (obj = ch->carrying; obj; obj = obj->next_content) {
         bool isGood = false;
 
@@ -429,17 +438,16 @@ bool BasicMobileBehavior::doPickWeapon( )
     // pickup insteresting things from the ground
     choice = 0;
     count = 0;
-
     for (obj = ch->in_room->contents; obj; obj = obj->next_content)
         if (can_wield_obj( ch, obj ) || can_shield_obj( ch, obj ))
             if (number_range( 0, count++ ) == 0) 
                 choice = obj;
     
-    if (choice) {
+    if (choice && !mprog_cant_scavenge(ch, choice)) {
         do_get_raw( ch, choice );
         return true;
     }
-
+    
     return false;
 }    
 
