@@ -274,7 +274,7 @@ void NorivaMyrvaleSet::removeAffect(Character *ch) const
  * ReykarisShevaleSet 
  *-------------------------------------------------------------------------*/
 ReykarisShevaleSet::ReykarisShevaleSet()
-                : EquipSet(12, false, false), sn(gsn_shevale_reykaris)
+                : EquipSet(9, false, false), sn(gsn_shevale_reykaris)
 {
 }
 
