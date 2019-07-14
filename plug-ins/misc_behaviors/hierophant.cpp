@@ -57,11 +57,11 @@ void Hierophant::tell( Character *victim, const char *speech )
     
     pet = victim->getPC( )->pet;
 
-    if (arg_has_oneof( speech, "hello", "hi", "приветствую", "здравствуй" )) 
+    if (arg_has_oneof( speech, "hello", "hi", "привет", "здравствуй" )) 
         fHello = true;
-    else if ((arg_has_oneof( speech, "pet", "пет", "животное", "любимец" )
+    else if ((arg_contains_someof( speech, "pet питомец животное любимец пет" )
                 || (pet && arg_contains_someof( speech, pet->getName( ).c_str( ) )))
-             && arg_has_oneof( speech, "заклинаниями", "владеет", "колдовать", "умениями" )) 
+             && arg_contains_someof( speech, "заклинаниями владеет колдовать умеет" )) 
         fWhat = true;
     else 
         return;
@@ -71,8 +71,7 @@ void Hierophant::tell( Character *victim, const char *speech )
             return;
 
         say_act( victim, ch, "Здравствуй, $c1." );
-        say_act( victim, ch, "Ты приш$gло|ел|ла спросить меня, какими заклинаниями владеет твое домашнее животное?" );
-        say_act( victim, ch, "Так не стесняйся, спрашивай." );
+        say_act( victim, ch, "Если спросишь у меня 'что умеет мой питомец?', я расскажу, какими заклинаниями он владеет." );
         interpret_fmt( ch, "smile %s", victim->getNameP( ) );
         return;
     }
