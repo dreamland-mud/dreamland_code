@@ -15,6 +15,20 @@
 
 using namespace Scripting;
 
+NMI_INVOKE( RegList, at, "(n): возвращает элемент списка под номером n")
+{
+    size_t n = args2number(args);
+    const_iterator i;
+    
+    if (size() == 0)
+        return Register();
+
+    for (i = begin( ); i != end( ) && n > 0; i++, n--)
+        ;
+    
+    return *i;
+}
+
 NMI_INVOKE( RegList, random, "(): возвращает случайный элемент списка")
 {
     size_t n;

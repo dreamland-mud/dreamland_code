@@ -638,7 +638,7 @@ NMI_SET( CharacterWrapper, x, help) \
 }
 
 INT_FIELD(ethos, "добропорядочность")
-INT_FIELD(timer, "сколько секунд прошло с последней команды")
+INT_FIELD(timer, "сколько минут прошло с последней команды")
 INT_FIELD(daze, "daze state (в пульсах, 1 пульс = четверть секунды)")
 INT_FIELD(hit, "текущее здоровье (hit points)")
 INT_FIELD(max_hit, "максимальное здоровье")
