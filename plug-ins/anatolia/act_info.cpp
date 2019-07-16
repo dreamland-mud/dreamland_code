@@ -2046,7 +2046,7 @@ else {
     ch->printf( 
 "  %s/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/   |\n\r"
 "  \\________________________________________________________________\\__/{x\n\r",
-        CLR_FRAME,);
+        CLR_FRAME);
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
         interpret_raw( ch, "affects", "noempty");
