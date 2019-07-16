@@ -1766,7 +1766,7 @@ CMDRUNP( score )
                 
         
     ch->printf(
-"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
+"     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r" 
 "     | %sУровень:{x  %3d        %s|%s {lRСила:{lE Str:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sРелигия:{x %-14.14s%s|\n\r"
 "     | %sРаса :{x  %-12s %s| %s{lRУм  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
 "     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
@@ -1776,7 +1776,7 @@ CMDRUNP( score )
 "     | %sДом  :{x  %-30s %s| {Y%-22s %s|\n\r"                
 "     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
 
-            CLR_BAR, CLR_FRAME,
+            CLR_FRAME, CLR_BAR, CLR_FRAME,
 
             CLR_CAPT,
             ch->getRealLevel( ),
@@ -1853,7 +1853,8 @@ CMDRUNP( score )
     if (pch->guarding != 0) {
         ekle = 1;
         ch->printf( 
-"     | {wТы охраняешь    :{Y %-10s                                    %s|\n\r",
+"     %s| {wТы охраняешь    :{Y %-10s                                    %s|\n\r",
+            CLR_FRAME,
             ch->seeName( pch->guarding, '4' ).c_str(),
             CLR_FRAME);
     }
@@ -1861,7 +1862,8 @@ CMDRUNP( score )
     if (pch->guarded_by != 0) {
         ekle = 1;
         ch->printf( 
-"     | {wТебя охраняет     :{Y %-10s                                  %s|\n\r",
+"     %s| {wТебя охраняет     :{Y %-10s                                  %s|\n\r",
+        CLR_FRAME,
         ch->seeName( pch->guarded_by, '1' ).c_str(),
         CLR_FRAME);
     }
@@ -1873,7 +1875,8 @@ CMDRUNP( score )
 
         if (!buf.str( ).empty( )) {
             ekle = 1;
-            ch->printf( "     | {w%-64s%s|\r\n", 
+            ch->printf( "     %s| {w%-64s%s|\r\n", 
+                        CLR_FRAME,
                         buf.str( ).c_str( ),
                         CLR_FRAME );
         }
@@ -1882,15 +1885,17 @@ CMDRUNP( score )
     if (ch->is_adrenalined()) {
         ekle = 1;
         ch->printf( 
-"     | {yАдреналин кипит в твоих венах!                                  %s|\n\r",
+"     %s| {yАдреналин кипит в твоих венах!                                  %s|\n\r",
+                 CLR_FRAME,
                  CLR_FRAME );
     }
 
     if (ch->is_immortal()) {
         ekle = 1;
         ch->printf( 
-"     | {w{lRНевидимость:{lEInvisible:  {lx {lRуровня{lElevel{lx %3d   "
+"     %s| {w{lRНевидимость:{lEInvisible:  {lx {lRуровня{lElevel{lx %3d   "
          "{lRИнкогнито{lEIncognito  {lx: {lRуровня{lElevel{lx %3d                 %s|\n\r",
+              CLR_FRAME,
               pch->invis_level.getValue( ),
               pch->incog_level.getValue( ),
               CLR_FRAME);
@@ -1900,7 +1905,8 @@ CMDRUNP( score )
     if (ch->getPC()->getAttributes( ).handleEvent( ScoreArguments( ch->getPC(), attrLines ) )) {
         ekle = 1;
         for (list<DLString>::iterator l = attrLines.begin( ); l != attrLines.end( ); l++) {
-            ch->printf("     | {w%-64s%s|\r\n", 
+            ch->printf("     %s| {w%-64s%s|\r\n", 
+                        CLR_FRAME,
                         l->c_str(),
                         CLR_FRAME);
         }
@@ -1908,20 +1914,22 @@ CMDRUNP( score )
 
     if (ekle) {
         ch->printf( 
-"     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+"     %s|%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
+                CLR_FRAME,
                 CLR_BAR,
                 CLR_FRAME);
     }
 
 
-if ( ch->getRealLevel( ) >= 20 )
+if ( ch->getModifyLevel( ) >= 20 )
 {
     ch->printf( 
-"     | %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
+"     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
 "     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
 "     | %sЗолото        :{Y %-10d          %sЗащита от разрезов:{x %-5d   %s|\n\r"
 "     | %sСеребро       :{W %-10d          %sЗащита от экзотики:{x %-5d   %s|\n\r"
 "     | %sЕдиниц опыта  :{x %-6d              %s{lRЗащита от заклинаний{lESaves vs Spell      {lx:{x %4d  %s|\n\r",
+        CLR_FRAME,
         CLR_CAPT,
         ch->carry_number, ch->canCarryNumber( ),
         CLR_CAPT,
@@ -1955,11 +1963,12 @@ if ( ch->getRealLevel( ) >= 20 )
 else
 {
     ch->printf( 
-"     | %sВещи   :{x %3d/%-4d            %sЗащита от уколов:{x   %-12s   %s|\n\r"
+"     %s| %sВещи   :{x %3d/%-4d            %sЗащита от уколов:{x   %-12s   %s|\n\r"
 "     | %sВес    :{x %6d/%-8d     %sЗащита от ударов:{x   %-12s   %s|\n\r"
 "     | %sЗолото :{Y %-10d          %sЗащита от разрезов:{x %-12s   %s|\n\r"
 "     | %sСеребро:{W %-10d          %sЗащита от экзотики:{x %-12s   %s|\n\r"
 "     | %sЕдиниц опыта:{x   %-6d                                          %s|\n\r",
+        CLR_FRAME,
         CLR_CAPT,
         ch->carry_number, ch->canCarryNumber( ),
         CLR_CAPT,
@@ -1990,8 +1999,9 @@ else
 }
 
     ch->printf( 
-"     | %sОпыта до уровня:{x %-6d                                         %s|\n\r"
+"     %s| %sОпыта до уровня:{x %-6d                                         %s|\n\r"
 "     |                                    %sЖизни:{x %5d / %5d         %s|\n\r",
+        CLR_FRAME,
         CLR_CAPT,
         pch->getExpToLevel( ),
         CLR_FRAME,
@@ -2000,11 +2010,12 @@ else
         ch->hit.getValue( ), ch->max_hit.getValue( ),
         CLR_FRAME);
 
-if ( ch->getRealLevel( ) >= 20 )
+if ( ch->getModifyLevel( ) >= 20 )
 {
     ch->printf( 
-"     | %s{lRТочность{lEHitroll {lx      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
+"     %s| %s{lRТочность{lEHitroll {lx      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
 "     | %s{lRУрон   {lEDamroll{lx       :{x   %-3d           %sДвижения:{x %5d / %5d         %s|\n\r",
+        CLR_FRAME,
         CLR_CAPT,
         ch->hitroll.getValue( ),
         CLR_CAPT,
@@ -2019,8 +2030,9 @@ if ( ch->getRealLevel( ) >= 20 )
 }
 else {
     ch->printf( 
-"     |                                  %sЭнергии:{x %5d / %5d         %s|\n\r"
+"     %s|                                  %sЭнергии:{x %5d / %5d         %s|\n\r"
 "     |                                 %sДвижения:{x %5d / %5d         %s|\n\r",
+        CLR_FRAME,
         CLR_CAPT,
         ch->mana.getValue( ), ch->max_mana.getValue( ),
         CLR_FRAME,
@@ -2032,8 +2044,9 @@ else {
 
 
     ch->printf( 
-"  /~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/   |\n\r"
-"  \\________________________________________________________________\\__/{x\n\r");
+"  %s/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/   |\n\r"
+"  \\________________________________________________________________\\__/{x\n\r",
+        CLR_FRAME,);
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
         interpret_raw( ch, "affects", "noempty");
