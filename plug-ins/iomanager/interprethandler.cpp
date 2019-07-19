@@ -300,6 +300,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                 if (ch->getConfig( )->holy
                     || ch->is_vampire( )
                     || IS_GHOST(ch) || IS_DEATH_TIME(ch)
+                    || (ch->in_room->isDark( ) && IS_AFFECTED(ch, AFF_INFRAVISION))
                     || (!ch->in_room->isDark( ) && !IS_AFFECTED(ch, AFF_BLIND)))
                 {
                     out << ch->in_room->name;

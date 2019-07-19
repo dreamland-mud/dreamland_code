@@ -976,6 +976,7 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount )
         
         if (ch->can_see( rch ))
             show_char_to_char_0( rch, ch );
+// TODO invis & hide checks
         else if (!rch->is_immortal( )) {
             if (rch->in_room->isDark( ) && IS_AFFECTED(rch, AFF_INFRARED ))
                 ch->println( "{WТы видишь взгляд {Rпылающих красных глаз{W, следящих за ТОБОЙ!{x" );
@@ -1795,7 +1796,7 @@ CMDRUNP( exits )
 
             buf << fmt( ch, "%-6^s", ename ) << " - ";
 
-            if (room->isDark( ) && !cfg->holy)
+            if (room->isDark( ) && !cfg->holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
             else
                 buf << room->name;

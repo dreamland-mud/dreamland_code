@@ -116,7 +116,7 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
                 act("Ударом Магической Силы ты пытаешься открыть $N4!", ch, 0, doorname, TO_CHAR);
                 act("Ударом Магической Силы $c1 пытается открыть $N4!", ch, 0, doorname,TO_ROOM);
 
-                if (room->isDark())
+                if (room->isDark() && !IS_AFFECTED(ch, AFF_INFRARED ))
                         chance /= 2;
 
                 // now the attack
