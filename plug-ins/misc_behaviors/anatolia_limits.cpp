@@ -437,7 +437,9 @@ void SwordOfSun::fight( Character *ch )
 
             act_p( "$c1 уже ТРУП!!", victim, 0, 0, TO_ROOM,POS_RESTING);
 
-            raw_kill( victim, 3, 0, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+            group_gain( ch, victim );
+            raw_kill( victim, 3, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+            pk_gain( ch, victim );
             victim->send_to("Тебя УБИЛИ!!\n\r");
             return;
         }
