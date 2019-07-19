@@ -216,7 +216,7 @@ bool eyes_darkened( Character *ch )
     if (ch->getConfig( )->holy)
         return false;
 
-    if (ch->is_vampire())
+    if (ch->is_vampire() || IS_AFFECTED(ch, AFF_INFRARED))
         return false;
         
     if (IS_GHOST(ch) || IS_DEATH_TIME(ch))
