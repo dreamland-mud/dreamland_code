@@ -317,7 +317,7 @@ bool BasicMobileBehavior::spell( Character *caster, int sn, bool before )
 bool BasicMobileBehavior::kill( Character *victim )
 {
     if (memoryFought.memorized( victim )) 
-        interpret_raw( ch, "say", "At last, I took my revenge!");
+        interpret_raw( ch, "say", "Возмездие совершено! Наконец!");
 
     return false;
 }

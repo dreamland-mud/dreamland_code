@@ -167,7 +167,7 @@ SKILL_RUNP( bashdoor )
         act("Ты бьешь в $N4, пытаясь выбить!", ch,0, doorname,TO_CHAR);
         act("$c1 бьет в $N4, пытаясь выбить!", ch,0, doorname,TO_ROOM);
 
-        if (room->isDark( ))
+        if (room->isDark( ) && !IS_AFFECTED(ch, AFF_INFRARED ))
                 chance /= 2;
 
         /* now the attack */
