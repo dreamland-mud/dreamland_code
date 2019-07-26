@@ -135,6 +135,11 @@ CMDRUNP( rules )
     do_help(ch,"worldrules");
 }
 
+CMDRUNP( wizlist )
+{
+    ch->println("Эта команда устарела, просто набери {y{hcсправка боги{x.");
+}
+
 #define MAX_PROMPT_SIZE 75
 
 CMDRUNP( prompt )
@@ -214,12 +219,6 @@ CMDRUNP( battleprompt )
     ch->printf("Новая строка состояния в бою: %s\n\r",ch->batle_prompt.c_str( ) );
 }
 
-CMDRUNP( clear )
-{
-    if (!ch->is_npc( ))
-        ch->send_to("\033[0;0H\033[2J");
-}
-
 static DLString show_money( int g, int s )
 {
     ostringstream buf;
@@ -242,20 +241,6 @@ static DLString show_experience( PCharacter *ch )
                ch->exp.getValue( ),
                ch->getExpToLevel( ),
                ch->getExpPerLevel( ch->getLevel( ) + 1 ) - ch->getExpPerLevel( ) );
-}
-
-CMDRUNP( money )
-{
-    ch->send_to( "У тебя в кошельке " );
-    ch->println( show_money( ch->gold, ch->silver ) );
-}
-
-CMDRUNP( experience )
-{
-    if (ch->is_npc( ))
-        return;
-    
-    ch->println( show_experience( ch->getPC( ) ) );
 }
 
 CMDRUNP( worth )
@@ -608,33 +593,6 @@ CMDRUNP( oscore )
         interpret_raw( ch, "affects", "nocolor noempty" );
 }
 
-CMDRUNP( count )
-{
-    int count, max_on;
-    Descriptor *d;
-    char buf[MAX_STRING_LENGTH];
-
-    count = 0;
-
-    for ( d = descriptor_list; d != 0; d = d->next )
-        if (d->connected == CON_PLAYING 
-            && d->character
-            && ch->can_see( d->character ))
-            count++;
-
-    max_on = Descriptor::getMaxOnline( );
-
-    if (max_on == count)
-        sprintf(buf,"Всего %d %s. Это максимум на сегодня.\n\r",count,
-                count == 1 ? "игрок" : ((count > 1 && count < 5) ? "игрока" : "игроков"));
-    else
-        sprintf(buf,"Всего %d %s. Максимум на сегодня был: %d.\n\r",count,
-                count == 1 ? "игрок" : ((count > 1 && count < 5) ? "игрока" : "игроков"),
-                max_on);
-
-    ch->send_to(buf);
-}
-
 CMDRUNP( compare )
 {
     char arg1[MAX_INPUT_LENGTH];
@@ -736,7 +694,7 @@ CMDRUNP( compare )
 
 CMDRUNP( credits )
 {
-    do_help( ch, "credits" );
+    ch->println("Эта команда устарела, просто набери {y{hcсправка создатели{x.");
     return;
 }
 
@@ -1414,22 +1372,6 @@ CMDRUNP( identify )
     if (gsn_identify->getSpell( ))
         gsn_identify->getSpell( )->run( ch, obj, gsn_identify, 0 );
 }
-
-/* room affects */
-CMDRUNP( raffects )
-{
-    ostringstream buf;
-    
-    for (Affect *paf = ch->in_room->affected; paf != 0; paf = paf->next)
-        if (paf->type->getAffect( ))
-            paf->type->getAffect( )->toStream( buf, paf );
-    
-    if (buf.str( ).empty( )) 
-        buf << "В этом месте нет ничего необычного." << endl;
-
-    ch->send_to( buf );
-}
-
 
 
 
