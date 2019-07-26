@@ -94,6 +94,12 @@ CMDRUN( forget )
     ch->printf( "Теперь ты будешь забывать '%s'.\r\n", skill->getNameFor( ch ).c_str( ) );
 }
 
+template <> 
+bool CMD(forget)::visible( Character* ch ) const
+{
+    return ch->getProfession() == prof_universal;
+}
+
 CMDRUN( remember )
 { 
     int sn;
@@ -159,6 +165,12 @@ CMDRUN( remember )
     data.forgetting = false;
 
     ch->printf( "Ты вспоминаешь '%s'.\n\r", skill->getNameFor( ch ).c_str( ) );
+}
+
+template <> 
+bool CMD(remember)::visible( Character* ch ) const
+{
+    return ch->getProfession() == prof_universal;
 }
 
 void SkillTimerUpdate::run( PCharacter *ch ) 
