@@ -6,6 +6,7 @@
  *
  * sturm, 2003
  */
+#include <iomanip>
 #include "commandflags.h"
 #include "commandtemplate.h"
 #include "commandmanager.h"
@@ -88,6 +89,64 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         page_to_char( buf.str( ).c_str( ), ch );
     else
         ch->printf("Не найдено ни одной команды, начинающейся с '%s'.\r\n", arg.c_str( ));
+}
+
+typedef map<DLString, StringList> Categories;
+
+static Categories group_by_categories(Character *ch, int flags)
+{
+    Categories categories;
+    list<Command::Pointer>::const_iterator c;
+    const CommandList &commands = commandManager->getCommands( );
+    bool fRus = ch->getConfig( )->rucommands;
+
+    categories["info"].push_back("?");
+
+    for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
+        Command::Pointer cmd = *c;
+
+        if (!cmd->visible( ch ))
+            continue;
+        
+        if (cmd->getLevel( ) >= LEVEL_HERO)
+            continue;
+
+        if (IS_SET(flags, FCMD_IMPORTANT) && !cmd->getExtra( ).isSet( CMD_IMPORTANT ))
+            continue;
+        
+        DLString name = fRus ? cmd->getRussianName() : cmd->getName();
+ 
+        if (cmd->getCommandCategory().getValue() == 0) {
+            categories["misc"].push_back(name);
+        } else {
+            StringList myCategories(cmd->getCommandCategory().names());
+            for (StringList::const_iterator s = myCategories.begin(); s != myCategories.end(); s++)
+                categories[*s].push_back(name);
+        }
+    }
+
+    categories["client"].push_back("!");
+    categories["client"].push_back("\\");
+    categories["client"].push_back("|");
+    return categories;
+}
+
+static void show_commands_by_categories( Character *ch, int flags )
+{
+    ostringstream buf;
+    Categories categories = group_by_categories(ch, flags);
+    
+    for (int i = 0; i < command_category_flags.size; i++) {
+        DLString name = command_category_flags.fields[i].name;
+        const StringList &commands = categories[name];
+        DLString msg = command_category_flags.fields[i].message;
+        msg = "{c" + msg.toUpper() + "{x: ";
+
+        if (!commands.empty())
+            buf << setiosflags(ios::right) << setw(21) << msg << resetiosflags(ios::right)
+                << categories[name].join(" ") << endl;
+    }
+    ch->send_to(buf);
 }
 
 static void show_commands( Character *ch, int flags )
@@ -213,6 +272,12 @@ CMDRUN( commands )
     if (arg.empty( ))
         SET_BIT(flags, FCMD_IMPORTANT);
     
+    // TODO rework overall syntax
+    if (arg_is_all(arg)) {
+        show_commands_by_categories(ch, flags);
+        return;
+    }
+ 
     if (arg_oneof( arg, "hints", "подсказки" ))
         SET_BIT(flags, FCMD_HINTS);
 
