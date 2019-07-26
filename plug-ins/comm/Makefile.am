@@ -17,7 +17,6 @@ libcomm_la_SOURCES = \
 banking.cpp \
 configs.cpp \
 corder.cpp \
-cwizlist.cpp \
 impl.cpp \
 pcdeleteidle.cpp \
 run.cpp \
@@ -34,7 +33,6 @@ libcomm_la_MOC = \
 banking.h \
 configs.h \
 corder.h \
-cwizlist.h \
 pcdeleteidle.h \
 run.h \
 whois.h \
