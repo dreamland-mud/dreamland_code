@@ -9,7 +9,6 @@ act_lock.cpp \
 act_look.cpp \
 act_move.cpp \
 act_obj.cpp \
-automap.cpp \
 handler.cpp \
 impl.cpp 
 
