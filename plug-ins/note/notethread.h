@@ -67,6 +67,7 @@ public:
     virtual CommandHelp::Pointer getHelp( ) const;
     virtual short getLevel( ) const;
     virtual const Flags & getExtra( ) const;
+    virtual const Flags & getCommandCategory( ) const;
     virtual void run( Character *, const DLString & );
     virtual bool properOrder( Character * );
 
@@ -133,6 +134,7 @@ protected:
     XML_VARIABLE XMLString hint;
     XML_VARIABLE XMLFlagsNoEmpty extra;
     XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
+    XML_VARIABLE XMLFlags cat;
     XML_VARIABLE XMLEnumeration gender;
     XML_VARIABLE XMLInteger keepDays;
     XML_VARIABLE XMLShort readLevel;
@@ -174,6 +176,11 @@ inline const DLString &NoteThread::getRussianMltName( ) const
 inline CommandHelp::Pointer NoteThread::getHelp( ) const
 {
     return help;
+}
+
+inline const Flags & NoteThread::getCommandCategory( ) const
+{
+    return cat;
 }
 
 inline const Enumeration &NoteThread::getGender() const
