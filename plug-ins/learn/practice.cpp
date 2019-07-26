@@ -90,7 +90,6 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
     PracCategoryMap::iterator cm_iter;
     PracInfo info;
     DLString category;
-    int sp;
     bool fRussian = ch->getConfig( )->ruskills;
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
@@ -171,6 +170,7 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
     buf << dlprintf( "У тебя %d сесси%s практики (practice).\n\r",
                  ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
 #if 0    
+    int sp;
     if ((sp = ch->skill_points( )) > 0)
         buf << "{cУ тебя " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
 #endif
