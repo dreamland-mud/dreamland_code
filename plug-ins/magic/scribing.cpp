@@ -19,6 +19,7 @@
 #include "def.h"
 
 GSN(scribing);
+PROF(universal);
 
 /* 
  * SpellBook behavior 
@@ -202,6 +203,12 @@ CMDRUN( scribe )
     ch->setWaitViolence( 1 );
 }
 
+template <> 
+bool CMD(scribe)::visible( Character* ch ) const
+{
+    return ch->getProfession() == prof_universal;
+}
+
 /*
  * 'memorize' command
  */
@@ -299,3 +306,8 @@ CMDRUN( memorize )
 }
 
 
+template <> 
+bool CMD(memorize)::visible( Character* ch ) const
+{
+    return ch->getProfession() == prof_universal;
+}
