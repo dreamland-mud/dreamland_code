@@ -40,6 +40,10 @@ struct SkillCommandTemplate : public DefaultSkillCommand, public ClassSelfRegist
         DefaultSkillCommand::run( ch, victim, result );
     } 
 
+    virtual bool visible(Character *ch) const {
+        return DefaultSkillCommand::visible(ch);
+    }
+
     virtual const DLString &getType( ) const {
         return ClassSelfRegistratorPlugin<tn>::getType( );
     }
