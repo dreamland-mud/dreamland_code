@@ -19,6 +19,7 @@
 #include "def.h"
 
 GSN(clanrecall);
+CLAN(none);
 
 /*-----------------------------------------------------------------------
  * ClanRecallMovement
@@ -116,9 +117,14 @@ protected:
 /*
  * 'crecall' skill command
  */
-
 SKILL_RUNP( clanrecall )
 {
     ClanRecallMovement( ch ).move( );
+}
+
+template <> 
+bool SKILL(clanrecall)::visible(Character* ch) const
+{
+    return ch->getClan() != clan_none;
 }
 
