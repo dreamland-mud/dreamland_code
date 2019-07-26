@@ -7,8 +7,21 @@
 #define CCLANTALK_H
 
 #include "clan.h"
+#include "commandplugin.h"
+#include "defaultcommand.h"
 
 void clantalk( Clan &, const char *, ... );
+
+class CClanTalk : public CommandPlugin, public DefaultCommand {
+public:
+    typedef ::Pointer<CClanTalk> Pointer;
+
+    CClanTalk( );
+    virtual void run( Character *, const DLString & );
+    virtual bool visible( Character * ) const;
+private:
+    static const DLString COMMAND_NAME;
+};
 
 #endif
 
