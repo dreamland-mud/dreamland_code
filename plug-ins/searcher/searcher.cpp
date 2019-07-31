@@ -530,9 +530,6 @@ PluginInitializer<SearcherDumpTask> initSearcherDumpTask;
 CMDRUNP(searcher)
 //CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher CSV files")
 {
-    if (!ch->isCoder())
-        return;
-
     DLString args = argument;
     DLString arg = args.getOneArgument();
     SearcherDumpTask task;
@@ -622,5 +619,5 @@ CMDRUNP(searcher)
         return;
     }
 
-    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets");
+    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\nsearcher q <query string\nSee 'help searcher' for details.");
 }
