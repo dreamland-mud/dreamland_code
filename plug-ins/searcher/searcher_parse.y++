@@ -1,0 +1,111 @@
+%pure_parser
+%define api.prefix searcher_yy
+
+%{
+/* $Id$
+ *
+ * ruffina, 2019
+ */
+
+#include "dl_match.h"    
+
+#include "searcher_val.h"    
+
+#include "merc.h"
+
+void searcher_yyerror( const char *txt )
+{
+    throw Exception(txt);
+}
+
+SearcherParam p;
+
+bool match( const DLString &str, const DLString &pattern )
+{
+    return dl_match( pattern.colourStrip( ).c_str( ), 
+		    str.colourStrip( ).c_str( ), true);
+}
+
+%}
+
+%token <str> T_STRING
+%token <num> T_INTEGER
+%token T_OR T_AND 
+%token T_VNUM T_NAME T_LVL T_EXTRA T_WEAR T_ITEMTYPE
+%token T_LEQ T_GEQ T_NEQ 
+%token T_HR T_DR T_HP T_MANA T_MOVE T_SAVES T_ARMOR T_STR T_INT T_WIS T_DEX T_CON T_CHA T_SIZE T_AGE
+%token T_AFF T_RES T_IMM T_VULN T_DET T_LIMIT T_HGAIN T_MGAIN
+%token T_WCLASS T_WFLAGS T_AVE
+
+%type <result> cond
+%type <str> str_expr
+%type <num> num_expr
+
+%left T_OR
+%left T_AND
+%left '+' '-'
+
+%%
+
+filter: 
+	/*empty*/		    { p.result = true;	}
+    |	cond			    { p.result = $1;	}
+    ;
+
+cond:	cond T_OR cond		    { $$ = $1 || $3;	    }   
+    |	cond T_AND cond		    { $$ = $1 && $3;	    }
+    |	'(' cond ')'		    { $$ = (  $2  );	    }
+    |   num_expr '=' num_expr	    { $$ = $1 == $3;	    }
+    |   str_expr '=' str_expr	    { $$ = match($1, $3);   }
+    |   num_expr T_NEQ num_expr	    { $$ = $1 != $3;	    }
+    |   str_expr T_NEQ str_expr	    { $$ = !match($1, $3);  }
+    |	num_expr T_LEQ num_expr	    { $$ = $1 <= $3;	    }
+    |	num_expr T_GEQ num_expr	    { $$ = $1 >= $3;	    }
+    |	num_expr '<' num_expr	    { $$ = $1 <  $3;	    }
+    |	num_expr '>' num_expr	    { $$ = $1 >  $3;	    }
+    ;
+
+num_expr:   
+	T_INTEGER
+    |	T_VNUM			    { $$ = p.pObj->vnum;		}
+    |	T_LVL               { $$ = p.pObj->level;		}
+    |	T_LIMIT             { $$ = p.pObj->limit;   }
+    |	T_SIZE              { $$ = p.size;   }
+    |	T_AGE               { $$ = p.age;   }
+    |	T_CHA               { $$ = p.cha;   }
+    |	T_CON               { $$ = p.con;   }
+    |	T_DEX               { $$ = p.dex;   }
+    |	T_WIS               { $$ = p.wis;   }
+    |	T_INT               { $$ = p.inta;   }
+    |	T_STR               { $$ = p.str;   }
+    |	T_ARMOR             { $$ = p.armor;   }
+    |	T_SAVES             { $$ = p.saves;   }
+    |	T_MOVE              { $$ = p.move;   }
+    |	T_MANA              { $$ = p.mana;   }
+    |	T_HP                { $$ = p.hp;   }
+    |	T_DR                { $$ = p.dr;   }
+    |	T_HR                { $$ = p.hr;   }
+    |	T_HGAIN             { $$ = p.heal_gain;   }
+    |	T_MGAIN             { $$ = p.mana_gain;   }
+    |	T_AVE               { $$ = p.ave;   }
+    |	num_expr '+' num_expr	    { $$ = $1 + $3;		}
+    |	num_expr '-' num_expr	    { $$ = $1 - $3;		}
+    ;
+    
+str_expr: 
+	T_STRING
+    |	T_NAME              { $$ = p.name;	}
+    |	T_EXTRA             { $$ = p.extra;	}
+    |	T_WEAR              { $$ = p.wear;	}
+    |	T_ITEMTYPE          { $$ = p.itemtype;}
+    |	T_AFF               { $$ = p.aff;}
+    |	T_RES               { $$ = p.res;}
+    |	T_IMM               { $$ = p.imm;}
+    |	T_VULN              { $$ = p.vuln;}
+    |	T_DET               { $$ = p.det;}
+    |	T_WCLASS            { $$ = p.wclass;}
+    |	T_WFLAGS            { $$ = p.wflags;}
+    ;
+
+%%
+

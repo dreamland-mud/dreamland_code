@@ -251,6 +251,7 @@ plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \
 plug-ins/gmcp/Makefile \
 plug-ins/bonus/Makefile \
+plug-ins/searcher/Makefile \
 )
 
 echo ""

@@ -1,0 +1,626 @@
+/* $Id$
+ *
+ * ruffina, 2019
+ */
+#include "dlfilestream.h"
+#include "dlscheduler.h"
+#include "schedulertaskroundplugin.h"
+#include "plugininitializer.h"
+#include "areabehaviormanager.h"
+#include "commandtemplate.h"
+#include "affect.h"
+#include "object.h"
+#include "pcharacter.h"
+#include "npcharacter.h"
+#include "race.h"
+#include "room.h"
+#include "searcher_val.h"    
+#include "profiler.h"
+
+#include "merc.h"
+#include "act.h"
+#include "comm.h"
+#include "handler.h"
+#include "mercdb.h"
+#include "def.h"
+
+
+GSN(none);
+
+using namespace std;
+
+static void csv_escape( DLString &name ) {
+    name.colourstrip( );
+    name.replaces( "\"", "'");
+//    name.replaces( "\'", "\\\'");
+}
+
+static bool get_obj_resets( int vnum, AREA_DATA *&pArea, DLString &where )
+{
+    // Scan resets for each room.
+    for (Room *room = room_list; room; room = room->rnext) {
+        int mobVnum = -1;
+        for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next)
+            switch(pReset->command) {
+                case 'M':
+                    // Remember potential carrier in the room.
+                    mobVnum = pReset->arg1;
+                    break;
+                case 'G':
+                case 'E':
+                    // Found who carries the object.
+                    if (pReset->arg1 == vnum && mobVnum > 0) {
+                        MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
+                        if (pMob) {
+                            // Return success
+                            pArea = room->area;
+                            where = russian_case(pMob->short_descr, '1');
+                            return true;
+                        }
+                    }
+                    break;
+                case 'O':
+                    if (pReset->arg1 == vnum) { 
+                        // Object is on the floor, return success.
+                        pArea = room->area;
+                        where = room->name;
+                        return true;
+                    }
+                    break; 
+                case 'P':
+                    // Found where the object is placed.
+                    if (pReset->arg1 == vnum) {
+                        OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
+                        if (in) {
+                            // Return success.
+                            pArea = room->area;
+                            where = room->name;
+                            return true;
+                        }
+                    }
+                    break;
+            }
+     }
+
+    // No candidates have been found, return a failure.
+    return false;
+}            
+
+class SearcherDumpTask : public SchedulerTaskRoundPlugin {
+public:
+    typedef ::Pointer<SearcherDumpTask> Pointer;
+ 
+    virtual int getPriority( ) const
+    {
+        return SCDP_ROUND + 30;
+    }
+
+    virtual void after( )
+    {
+        DLScheduler::getThis( )->putTaskInSecond( 4 * Date::SECOND_IN_HOUR, Pointer( this ) );
+    }
+
+    virtual void run( )
+    {   
+        LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
+        dumpArmor();
+        dumpWeapon();
+        dumpMagic();
+        dumpPets();
+    }
+
+    bool dumpPets() 
+    {
+        ostringstream buf;
+
+        buf << "vnum,name,level,act,aff,off,area" << endl;
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
+            if (!pMob->behavior)
+                continue;
+            if (area_is_clan(pMob->area))
+                continue;
+
+            DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
+            if (type.find("Pet") == DLString::npos && type != "Rat")
+                continue;
+
+            DLString aname = pMob->area->name;
+            csv_escape(aname);
+
+            buf << pMob->vnum << "," 
+                << russian_case(pMob->short_descr, '1').colourStrip() << "," 
+                << (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level) << ","
+                << act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_SAGE|ACT_NOWHERE)) << ","
+                << affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED)) << ","
+                << off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE)) << ","
+                << aname << endl;
+        }
+
+        try {
+            DLFileStream( "/tmp/db_pets.csv" ).fromString( buf.str( ) );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    bool dumpArmor()
+    {
+        ostringstream buf;
+
+        buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,armor,str,int,wis,dex,con,cha,size,affects,area,where,limit" << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+            bitstring_t wear = pObj->wear_flags;
+            REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
+            DLString wearloc;
+            
+            // Limit obj level by 100.
+            if (pObj->level > LEVEL_MORTAL)
+                continue;
+
+            // Ignore items you can't even take.
+            if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
+                continue;
+            // Ignore items without wear flags.
+            if (wear == 0 && pObj->item_type != ITEM_LIGHT)
+                continue;
+            // Ignore weapons, they're shown in another table.
+            if (pObj->item_type == ITEM_WEAPON) 
+                continue;
+
+            // Quirk with light wearlocation.
+            if (wear == 0) 
+                wearloc = "light";
+            else
+                wearloc = wear_flags.messages(wear);
+
+            // Format object item type and damage roll.
+            DLString itemtype = item_table.message( pObj->item_type );
+            
+            // Format object name.
+            DLString name = russian_case(pObj->short_descr, '1').toLower( );
+            csv_escape( name );
+        
+            // Find all bonuses.
+            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
+            int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
+            DLString aff,det,imm,res,vuln;
+
+            for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+                int m = paf->modifier;
+
+                switch (paf->location) {
+                case APPLY_STR: str+=m; break;
+                case APPLY_INT: inta+=m; break;
+                case APPLY_WIS: wis+=m; break;
+                case APPLY_DEX: dex+=m; break;
+                case APPLY_CON: con+=m; break;
+                case APPLY_CHA: cha+=m; break;
+                case APPLY_HIT: hp+=m; break;
+                case APPLY_MANA: mana+=m; break;
+                case APPLY_MOVE: move+=m; break;
+                case APPLY_AC: ac+=m; break;
+                case APPLY_HITROLL: hr+=m; break;
+                case APPLY_DAMROLL: dr+=m; break;
+                case APPLY_SIZE: size+=m; break;
+                case APPLY_SAVES:         
+                case APPLY_SAVING_ROD:    
+                case APPLY_SAVING_PETRI:  
+                case APPLY_SAVING_BREATH: 
+                case APPLY_SAVING_SPELL:  svs+=m; break;
+                }
+                
+                if (paf->bitvector) {
+                    bitstring_t b = paf->bitvector;
+
+                    switch(paf->where) {
+                    case TO_DETECTS: det << detect_flags.names(b) << " "; break;
+                    case TO_AFFECTS: aff << affect_flags.names(b) << " "; break;
+                    case TO_IMMUNE:  imm << imm_flags.names(b) << " "; break;
+                    case TO_RESIST:  res << res_flags.names(b) << " "; break;
+                    case TO_VULN:    vuln << vuln_flags.names(b) << " "; break;
+                    }
+                }
+            }
+
+            if (pObj->item_type == ITEM_ARMOR) {
+                ac -= pObj->value[0];
+            }
+
+
+            
+            // Potions, containers etc often can be held but do nothing - ignore them.
+            bool useless = false;
+            if (wear == ITEM_HOLD) {
+                useless = str == 0 && inta == 0 && wis == 0 && dex == 0 && con == 0 && cha == 0
+                    && hp == 0 && mana == 0 && move == 0 && ac == 0 && hr == 0 && dr == 0 && size == 0
+                    && svs == 0;
+                // TODO check affects
+            }
+
+            if (useless)
+                continue;
+
+            // Find item resets and ignore items without resets and from clan areas.
+            DLString where;
+            AREA_DATA *pArea;
+            useless = !get_obj_resets( pObj->vnum, pArea, where );
+            if (useless)
+                continue;
+            if (area_is_clan(pArea))
+                continue;
+            if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+                continue;
+            DLString area = pArea->name;
+            csv_escape( area );
+            csv_escape( where );
+                
+            // TODO show affects
+            buf << pObj->vnum << ","
+                << "\"" << name << "\","
+                << pObj->level << ","
+                << "\"" << wearloc << "\","
+                << "\"" << itemtype << "\","
+                << hr << "," << dr << "," << hp << "," 
+                << mana << "," << move << "," 
+                << svs << "," << ac << ","
+                << str << "," << inta << "," << wis << ","
+                << dex << "," << con << "," << cha << ","
+                << size << "," << "\"\"," 
+                << "\"" << area << "\","  << "\"" << where << "\","  
+                << pObj->limit << endl;
+        }
+
+        try {
+            DLFileStream( "/tmp/db_armor.csv" ).fromString( buf.str( ) );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    bool dumpWeapon()
+    {
+        ostringstream buf;
+
+        buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,armor,str,int,wis,dex,con,area,where,limit" << endl;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+            bitstring_t wear = pObj->wear_flags;
+            REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
+            DLString wearloc;
+            
+            // Limit obj level by 100.
+            if (pObj->level > LEVEL_MORTAL)
+                continue;
+
+            // Ignore items you can't even take.
+            if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
+                continue;
+            // Only dump weapons. An arrow can be 'held' so can't ignore non-wieldable ones.
+            if (wear == 0 || pObj->item_type != ITEM_WEAPON)
+                continue;
+
+            // Format weapon class, special flags and damage.
+            DLString weaponClass = weapon_class.name( pObj->value[0] );
+            DLString special = weapon_type2.messages( pObj->value[4] );
+            int d1 = pObj->value[1];
+            int d2 = pObj->value[2];
+            int ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
+            
+            // Format object name.
+            DLString name = russian_case(pObj->short_descr, '1').toLower( );
+            csv_escape( name );
+        
+            // Find all bonuses.
+            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
+            int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
+
+            for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+                int m = paf->modifier;
+
+                switch (paf->location) {
+                case APPLY_STR: str+=m; break;
+                case APPLY_INT: inta+=m; break;
+                case APPLY_WIS: wis+=m; break;
+                case APPLY_DEX: dex+=m; break;
+                case APPLY_CON: con+=m; break;
+                case APPLY_CHA: cha+=m; break;
+                case APPLY_HIT: hp+=m; break;
+                case APPLY_MANA: mana+=m; break;
+                case APPLY_MOVE: move+=m; break;
+                case APPLY_AC: ac+=m; break;
+                case APPLY_HITROLL: hr+=m; break;
+                case APPLY_DAMROLL: dr+=m; break;
+                case APPLY_SIZE: size+=m; break;
+                case APPLY_SAVES:         
+                case APPLY_SAVING_ROD:    
+                case APPLY_SAVING_PETRI:  
+                case APPLY_SAVING_BREATH: 
+                case APPLY_SAVING_SPELL:  svs+=m; break;
+                }
+            }
+            
+            // Find item resets and ignore items without resets and from clan areas.
+            DLString where;
+            AREA_DATA *pArea;
+            bool useless = !get_obj_resets( pObj->vnum, pArea, where );
+            if (useless)
+                continue;
+            if (area_is_clan(pArea))
+                continue;
+            if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+                continue;
+            DLString area = pArea->name;
+            csv_escape( area );
+            csv_escape( where );
+                
+            // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,ac,str,int,wis,dex,con,area,where"
+            buf << pObj->vnum << ","
+                << "\"" << name << "\","
+                << pObj->level << ","
+                << "\"" << weaponClass << "\","
+                << "\"" << special << "\","
+                << d1 << "," 
+                << d2 << "," 
+                << ave << "," 
+                << hr << "," << dr << "," 
+                << hp << "," << mana << "," 
+                << svs << "," << ac << ","
+                << str << "," << inta << "," << wis << ","
+                << dex << "," << con << "," 
+                << "\"" << area << "\","  << "\"" << where << "\","
+                << pObj->limit << endl;
+        }
+
+        try {
+            DLFileStream( "/tmp/db_weapon.csv" ).fromString( buf.str( ) );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    bool dumpMagic()
+    {
+        ostringstream buf;
+
+        buf << "vnum,name,level,itemtype,spellLevel,charges,spells,area,where,limit" << endl;
+        // Collect distinct list of spells.
+        std::set<DLString> allSpells;
+
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+            // Limit obj level by 100.
+            if (pObj->level > LEVEL_MORTAL)
+                continue;
+
+            // Ignore weird items.
+            if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
+                continue;
+             
+            DLString itemtype = item_table.name( pObj->item_type );
+            int spellLevel = 0;
+            int charges = 0;
+            DLString spells = "";
+            Skill *skill;
+
+            // Only dump magic items; collect properties.
+            switch (pObj->item_type) {
+            case ITEM_SCROLL:
+            case ITEM_POTION:
+            case ITEM_PILL:
+                spellLevel = pObj->value[0];
+                charges = 1;
+
+                for (int i = 1; i <= 4; i++) 
+                    if ((skill = SkillManager::getThis( )->find( pObj->value[i] ) ))
+                        if (skill->getIndex( ) != gsn_none) {
+                            spells += "'" + skill->getName( ) + "' ";
+                            allSpells.insert( skill->getName( ) );
+                        }
+                
+                break;
+
+            case ITEM_WAND:
+            case ITEM_STAFF:
+                spellLevel = pObj->value[0];
+                charges = pObj->value[2];
+                
+                if ((skill = SkillManager::getThis( )->find( pObj->value[3] ) ))
+                    if (skill->getIndex( ) != gsn_none) {
+                        spells = "'" + skill->getName( ) + "'";
+                        allSpells.insert( skill->getName( ) );
+                    }
+
+                break;
+
+            case ITEM_WARP_STONE:
+                // Warpstones don't have any fields (although might consider 
+                // introducing 'charges' field).
+                break;
+
+            case ITEM_SPELLBOOK:
+                // For spellbooks, display max quality as spell level for now.
+                // Show 'total pages' as 'charges' field.
+                spellLevel = pObj->value[2];
+                charges = pObj->value[0];
+                break;
+
+            default:
+                continue;
+            }
+
+            // Ignore useless stuff. Leave it commented for debugging.
+//            if (spells.empty( ) || charges == 0)
+//                continue;
+
+            // Format object name.
+            DLString name = russian_case(pObj->short_descr, '1').toLower( );
+            csv_escape( name );
+
+            // Find item resets and ignore items without resets and from clan areas.
+            DLString where;
+            AREA_DATA *pArea;
+            bool useless = !get_obj_resets( pObj->vnum, pArea, where );
+            if (useless)
+                continue;
+            if (area_is_clan(pArea))
+                continue;
+            if (IS_SET(pArea->area_flag, AREA_WIZLOCK|AREA_HIDDEN))
+                continue;
+            DLString area = pArea->name;
+            csv_escape( area );
+            csv_escape( where );
+                
+            // Header; "vnum,name,level,type,spellLevel,charges,spells,area,where" 
+            buf << pObj->vnum << ","
+                << "\"" << name << "\","
+                << pObj->level << ","
+                << "\"" << itemtype << "\","
+                << spellLevel << "," 
+                << charges << "," 
+                << "\"" << spells << "\","
+                << "\"" << area << "\","  << "\"" << where << "\","
+                << pObj->limit << endl;
+        }
+
+        try {
+            DLFileStream( "/tmp/db_magic.csv" ).fromString( buf.str( ) );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
+            return false;
+        }
+
+        return true;
+    }
+};
+
+PluginInitializer<SearcherDumpTask> initSearcherDumpTask;
+
+/* Example syntax:
+ * searcher armor level > 50 and level < 60 and wearloc='neck' and vuln != ''
+ * searcher armor level > 50 and level < 60 and extra='nodrop'
+ *
+ * Fields:
+ *  level, lvl
+ *  wearloc
+ *  type
+ *  str,int,wis,dex,con,cha
+ *  hr,dr,hp,mana,svs,mov,heal_gain,mana_gain,size,age
+ *  vuln,res,imm,det,aff
+ *  material
+ *  extra
+ *  where : area,room
+ * 
+ *  Operands:
+ *      and or () >= <= == !=
+ *      in like contains
+ */
+CMDRUNP(searcher)
+//CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher CSV files")
+{
+    if (!ch->isCoder())
+        return;
+
+    DLString args = argument;
+    DLString arg = args.getOneArgument();
+    SearcherDumpTask task;
+
+    if (arg_is_all(arg)) {
+        task.run();
+        ch->println("Created 4 CSV files in /tmp, check logs for any errors.");
+        return;
+    }
+
+    if (arg_oneof(arg, "pets")) {
+        if (task.dumpPets())
+            ch->println("Created /tmp/db_pets.csv file.");
+        else
+            ch->println("Error occurred, please check the logs.");
+        
+        return;
+    }
+
+    if (arg_oneof(arg, "armor")) {
+        if (task.dumpArmor()) 
+            ch->println("Created /tmp/db_armor.csv file.");
+        else
+            ch->println("Error occurred, please check the logs.");
+
+        return;
+    }
+
+    if (arg_oneof(arg, "magic")) {
+        if (task.dumpMagic()) 
+            ch->println("Created /tmp/db_magic.csv file.");
+        else
+            ch->println("Error occurred, please check the logs.");
+
+        return;
+    }
+    
+    if (arg_oneof(arg, "weapon")) {
+        if (task.dumpWeapon()) 
+            ch->println("Created /tmp/db_weapon.csv file.");
+        else
+            ch->println("Error occurred, please check the logs.");
+
+        return;
+    }
+
+    if (arg_oneof(arg, "query")) {
+
+        if (args.empty()) {
+            ch->println("Usage: searcher q <query string>\nSee 'help searcher' for details.");
+            return;
+        }
+
+    
+        try {
+            Profiler prof;
+            int cnt = 0;
+            ostringstream buf;
+
+            prof.start();
+            buf << dlprintf("{W[%5s] %3s %-10s %-10s %-35s %s{x\n", "VNUM", "LVL", "ITEM_TYPE", "WEAR_FLAGS", "NAME", "AREA");
+
+            for (int i = 0; i < MAX_KEY_HASH; i++)
+            for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+                if (searcher_parse(pObj, args.c_str())) {
+                    bitstring_t wear = pObj->wear_flags;
+                    REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
+                    buf << dlprintf("[%5d] {C%3d{x {y%-10s{x {y%-10s{x %-35s {D%s{x\n", 
+                                    pObj->vnum,
+                                    pObj->level, 
+                                    item_table.name(pObj->item_type).c_str(),
+                                    wear_flags.names(wear).c_str(),
+                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    pObj->area->name);
+                    cnt++;
+                }
+            } 
+
+            prof.stop();
+            buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+     
+            page_to_char(buf.str().c_str(), ch);
+        } catch (const Exception &ex) {
+            ch->println(ex.what());
+        }
+
+        return;
+    }
+
+    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets");
+}

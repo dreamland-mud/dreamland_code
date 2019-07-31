@@ -1,0 +1,186 @@
+
+%option yylineno
+%option noyywrap
+%option caseless
+
+%{
+/* $Id$
+ *
+ * ruffina, 2019
+ */
+#include "logstream.h"
+#include "searcher_val.h"    
+#include "searcher_parse.h++"
+#include "pcharacter.h"
+#include "affect.h"
+#include "object.h"
+#include "autoflags.h"
+#include "dl_strings.h"
+#include "merc.h"
+#include "loadsave.h"
+#include "def.h"
+
+void searcher_yyerror( const char *txt );
+%}
+
+RL	    [йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ]
+L	    ([A-Za-z]|{RL})
+
+%x QUOTE
+
+%%
+	    DLString buf;
+
+\"	    { BEGIN(QUOTE); buf.clear( ); }
+<QUOTE>{
+\"	    { BEGIN(INITIAL); value->str = buf; return T_STRING; }
+\\n	    { buf += '\n';      }
+\\r	    { buf += '\r';      }
+\\t	    { buf += '\t';      }
+\\.	    { buf += yytext[1]; }
+.	    { buf += yytext[0]; }
+}
+
+[0-9]+	    { value->num = atoi( yytext ); return T_INTEGER; }
+
+"OR"	    return T_OR;
+"AND"       return T_AND;
+"VNUM"      return T_VNUM;
+"NAME"      return T_NAME;
+"LEVEL"     return T_LVL;
+"LVL"       return T_LVL;
+"EXTRA"     return T_EXTRA;
+"WEAR"      return T_WEAR;
+"WEARLOC"   return T_WEAR;
+"TYPE"      return T_ITEMTYPE;
+"ITEM_TYPE" return T_ITEMTYPE;
+"ITEMTYPE"  return T_ITEMTYPE;
+"HR"        return T_HR;
+"DR"        return T_DR;
+"HP"        return T_HP;
+"MANA"      return T_MANA;
+"MOVE"      return T_MOVE;
+"SAVES"     return T_SAVES;
+"SVS"       return T_SAVES;
+"AC"        return T_ARMOR;
+"AGE"       return T_AGE;
+"ARMOR"     return T_ARMOR;
+"STR"       return T_STR;
+"INT"       return T_INT;
+"WIS"       return T_WIS;
+"DEX"       return T_DEX;
+"CON"       return T_CON;
+"CHA"       return T_CHA;
+"SIZE"      return T_SIZE;
+"AFF"       return T_AFF;
+"RES"       return T_RES;
+"IMM"       return T_IMM;
+"VULN"      return T_VULN;
+"DET"       return T_DET;
+"LIMIT"     return T_LIMIT;
+"HGAIN"     return T_HGAIN;
+"HEAL_GAIN" return T_HGAIN;
+"MGAIN"     return T_MGAIN;
+"MANA_GAIN" return T_MGAIN;
+"WCLASS"    return T_WCLASS;
+"WFLAGS"    return T_WFLAGS;
+"AVE"       return T_AVE;
+
+
+"<="	    return T_LEQ;
+">="	    return T_GEQ;
+"!="	    return T_NEQ;
+[()<>=+\-]    return *yytext;
+
+{L}+	    { value->str = yytext; return T_STRING; }
+
+[ \t]	    ;
+
+.	    searcher_yyerror("Unparsed symbol");
+
+%%
+
+bool searcher_parse(struct obj_index_data *pObj, const char *args)
+{
+    YY_BUFFER_STATE yybuf;
+    
+    yybuf = yy_scan_string( args );
+
+    p.pObj = pObj;
+    
+    p.name = russian_case(pObj->short_descr, '7').colourStrip() + " " + pObj->name;
+
+    p.extra = extra_flags.names(pObj->extra_flags);
+
+    bitstring_t wear = pObj->wear_flags;
+    REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
+    p.wear = wear_flags.names(pObj->wear_flags).replaces("wear_", "");
+
+    p.itemtype = item_table.name(pObj->item_type);
+
+    p.hr = p.dr = p.mana = p.move = p.saves = p.armor = p.size = p.age = 0;
+    p.str = p.inta = p.wis = p.dex = p.con = p.cha = 0;
+    p.heal_gain = p.mana_gain = 0;
+    p.det = p.aff = p.imm = p.res = p.vuln = "";
+    p.wclass = p.wflags = "";
+    p.ave = 0;
+
+    for (Affect *paf = pObj->affected; paf; paf = paf->next) {
+        int m = paf->modifier;
+
+        switch (paf->location) {
+        case APPLY_STR: p.str+=m; break;
+        case APPLY_INT: p.inta+=m; break;
+        case APPLY_WIS: p.wis+=m; break;
+        case APPLY_DEX: p.dex+=m; break;
+        case APPLY_CON: p.con+=m; break;
+        case APPLY_CHA: p.cha+=m; break;
+        case APPLY_HIT: p.hp+=m; break;
+        case APPLY_MANA: p.mana+=m; break;
+        case APPLY_MOVE: p.move+=m; break;
+        case APPLY_AC: p.armor+=m; break;
+        case APPLY_AGE: p.age+=m; break;
+        case APPLY_HITROLL: p.hr+=m; break;
+        case APPLY_DAMROLL: p.dr+=m; break;
+        case APPLY_SIZE: p.size+=m; break;
+        case APPLY_SAVES:         
+        case APPLY_SAVING_ROD:    
+        case APPLY_SAVING_PETRI:  
+        case APPLY_SAVING_BREATH: 
+        case APPLY_SAVING_SPELL:  p.saves+=m; break;
+        case APPLY_HEAL_GAIN: p.heal_gain+=m; break;
+        case APPLY_MANA_GAIN: p.mana_gain+=m; break;
+        }
+    
+        if (paf->bitvector > 0) {    
+            bitstring_t b = paf->bitvector;
+
+            switch(paf->where) {
+            case TO_DETECTS: p.det << detect_flags.names(b) << " "; break;
+            case TO_AFFECTS: p.aff << affect_flags.names(b) << " "; break;
+            case TO_IMMUNE:  p.imm << imm_flags.names(b) << " "; break;
+            case TO_RESIST:  p.res << res_flags.names(b) << " "; break;
+            case TO_VULN:    p.vuln << vuln_flags.names(b) << " "; break;
+            }
+        }
+    }
+
+    LogStream::sendNotice() << pObj->vnum << " det " << p.det << ",aff " << p.aff << ",imm " << p.imm << ",res " << p.res << ",vuln " << p.vuln << endl;
+    if (pObj->item_type == ITEM_ARMOR) {
+        p.armor -= pObj->value[0];
+    }
+
+    if (pObj->item_type == ITEM_WEAPON) {
+        p.wclass = weapon_class.name( pObj->value[0] );
+        p.wflags = weapon_type2.names( pObj->value[4] );
+        p.ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
+    }
+
+    if (searcher_yyparse( ) != 0) {
+        yy_delete_buffer( yybuf );
+        throw Exception( "Syntax error." );
+    }
+
+    yy_delete_buffer( yybuf );
+    return p.result;
+}	

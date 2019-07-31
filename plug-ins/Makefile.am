@@ -56,5 +56,6 @@ riding \
 web \
 gmcp \
 craft \
-feniaroot 
+feniaroot \
+searcher
 
