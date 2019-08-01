@@ -114,11 +114,11 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
 
     bitstring_t wear = pObj->wear_flags;
     REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
-    p.wear = wear_flags.names(pObj->wear_flags).replaces("wear_", "");
+    p.wear = wear_flags.names(wear).replaces("wear_", "");
 
     p.itemtype = item_table.name(pObj->item_type);
 
-    p.hr = p.dr = p.mana = p.move = p.saves = p.armor = p.size = p.age = 0;
+    p.hr = p.dr = p.hp = p.mana = p.move = p.saves = p.armor = p.size = p.age = 0;
     p.str = p.inta = p.wis = p.dex = p.con = p.cha = 0;
     p.heal_gain = p.mana_gain = 0;
     p.det = p.aff = p.imm = p.res = p.vuln = "";

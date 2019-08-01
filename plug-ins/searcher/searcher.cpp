@@ -590,19 +590,36 @@ CMDRUNP(searcher)
             ostringstream buf;
 
             prof.start();
-            buf << dlprintf("{W[%5s] %3s %-10s %-10s %-35s %s{x\n", "VNUM", "LVL", "ITEM_TYPE", "WEAR_FLAGS", "NAME", "AREA");
+            buf << dlprintf("{W%5s %3s %-10s %-6s %-20s %-3s %1s %3s %3s %3s %3s %3s %s{x\n", 
+                            "VNUM", "LVL", "TYPE", "WEAR", "NAME", "ALG", "A", "HR", "DR", "HP", "MAN", "SVS", "AREA");
 
             for (int i = 0; i < MAX_KEY_HASH; i++)
             for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
                 if (searcher_parse(pObj, args.c_str())) {
-                    bitstring_t wear = pObj->wear_flags;
-                    REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
-                    buf << dlprintf("[%5d] {C%3d{x {y%-10s{x {y%-10s{x %-35s {D%s{x\n", 
+                    StringList anti;
+                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) anti.push_back("{WG{x");
+                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) anti.push_back("{DE{x");
+                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) anti.push_back("N");
+
+                    DLString aff = " ";
+                    if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty())
+                        aff = "{C*{x";
+
+                    
+                    
+                    buf << dlprintf("%5d {C%3d{x {y%-10s{x {y%-6s{x %-20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
                                     pObj->vnum,
                                     pObj->level, 
-                                    item_table.name(pObj->item_type).c_str(),
-                                    wear_flags.names(wear).c_str(),
-                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    p.itemtype.c_str(),
+                                    p.wear.c_str(),
+                                    russian_case(pObj->short_descr, '1').colourStrip().substr(0, 20).c_str(),
+                                    anti.join("").c_str(),
+                                    aff.c_str(),
+                                    (p.hr != 0 ? "C": "w"), p.hr, 
+                                    (p.dr != 0 ? "C": "w"), p.dr, 
+                                    (p.hp != 0 ? "C": "w"), p.hp, 
+                                    (p.mana != 0 ? "C": "w"), p.mana, 
+                                    (p.saves != 0 ? "C": "w"), p.saves, 
                                     pObj->area->name);
                     cnt++;
                 }
