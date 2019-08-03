@@ -597,9 +597,11 @@ CMDRUNP(searcher)
             for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
                 if (searcher_parse(pObj, args.c_str())) {
                     StringList anti;
-                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) anti.push_back("{WG{x");
-                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) anti.push_back("{DE{x");
-                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) anti.push_back("N");
+                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
+                        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) anti.push_back("{YG{x");
+                        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) anti.push_back("{RE{x");
+                        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) anti.push_back("N");
+                    }
 
                     DLString aff = " ";
                     if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty())
