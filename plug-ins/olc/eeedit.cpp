@@ -215,16 +215,12 @@ EEEDIT(show)
 
 EEEDIT(desc)
 {
-    char command[MAX_INPUT_LENGTH];
-    argument = one_argument(argument, command);
-    return editor(command, description);
+    return editor(argument, description);      
 }
 
 EEEDIT(rdesc)
 {
-    char command[MAX_INPUT_LENGTH];
-    argument = one_argument(argument, command);
-    return editor(command, room_description);
+    return editor(argument, room_description);
 }
 
 EEEDIT(name)

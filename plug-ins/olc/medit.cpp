@@ -609,9 +609,7 @@ MEDIT(level)
 
 MEDIT(desc)
 {
-    char command[MAX_INPUT_LENGTH];
-    argument = one_argument(argument, command);
-    return editor(command, mob.description);
+    return editor(argument, mob.description);
 }
 
 MEDIT(smell)
@@ -688,50 +686,17 @@ MEDIT(behavior)
 
 MEDIT(long)
 {
-    char buf[MAX_STRING_LENGTH];
-
-    if (argument[0] == '\0') {
-        stc("Syntax:  long [string]\n\r", ch);
-        return false;
-    }
-
-    strcpy(buf, argument);
-    strcat(buf, "\n\r");
-
-    free_string(mob.long_descr);
-    mob.long_descr = str_dup(buf);
-    ((char *) mob.long_descr)[0] = Char::upper(mob.long_descr[0]);
-
-    stc("Long description set.\n\r", ch);
-    return true;
+    return editor(argument, mob.long_descr, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_ADD_NEWLINE));
 }
 
 MEDIT(short)
 {
-    if (argument[0] == '\0') {
-        stc("Syntax:  short [string]\n\r", ch);
-        return false;
-    }
-
-    free_string(mob.short_descr);
-    mob.short_descr = str_dup(argument);
-
-    stc("Short description set.\n\r", ch);
-    return true;
+    return editor(argument, mob.short_descr, ED_NO_NEWLINE);
 }
 
 MEDIT(name)
 {
-    if (argument[0] == '\0') {
-        stc("Syntax:  name [string]\n\r", ch);
-        return false;
-    }
-
-    free_string(mob.player_name);
-    mob.player_name = str_dup(argument);
-
-    stc("Name set.\n\r", ch);
-    return true;
+    return editor(argument, mob.player_name, ED_NO_NEWLINE);
 }
 
 

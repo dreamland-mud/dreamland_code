@@ -22,6 +22,13 @@ using namespace std;
 class Descriptor;
 struct area_data;
 
+typedef enum {
+    ED_NO_FLAG=0,
+    ED_UPPER_FIRST_CHAR=1,
+    ED_NO_NEWLINE=2,
+    ED_ADD_NEWLINE=4
+} editor_flags;
+
 class OLCCommand : public CommandBase {
 public:    
     OLCCommand( const DLString & );
@@ -88,10 +95,10 @@ protected:
     bool diceEdit(int *field);
     bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
     bool editorCopy(const DLString &original);
-    bool editorPaste(DLString &original);
-    bool editorPaste(char *&field);
-    bool editor(const char *command, DLString &original);
-    bool editor(const char *command, char *&field);
+    bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);
+    bool editorPaste(char *&field, editor_flags flags = ED_NO_FLAG);
+    bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
+    bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
 
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;
