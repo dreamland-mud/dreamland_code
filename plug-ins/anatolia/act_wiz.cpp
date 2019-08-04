@@ -308,19 +308,16 @@ char arg[MAX_STRING_LENGTH];
 
 CMDWIZP( limited )
 {
-        extern int top_obj_index;
         Object *obj;
-        OBJ_INDEX_DATA *obj_index;
         int        lCount = 0;
         int        ingameCount;
         char  buf[1000];
         int         nMatch;
-        int         vnum;
         ostringstream report;
 
         if ( argument[0] != '\0' )
         {
-                obj_index = get_obj_index( atoi(argument) );
+                OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
                         ch->send_to("Not found.\n\r");
@@ -363,11 +360,10 @@ CMDWIZP( limited )
         }
 
         nMatch = 0;
-        for ( vnum = 0; nMatch < top_obj_index; vnum++ )
-            if ( ( obj_index = get_obj_index( vnum ) ) != 0 )
-            {
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *obj_index = obj_index_hash[i]; obj_index; obj_index = obj_index->next) {
                 nMatch++;
-                if (obj_index->limit > 0 && obj_index->limit < 100 && obj_index->count > 0)
+                if (obj_index->limit > 0 && obj_index->limit < 100)
                 {
                     int inGame = 0;
                     for (Object* obj=object_list; obj != 0; obj=obj->next )
@@ -384,7 +380,7 @@ CMDWIZP( limited )
 
                     report << obj_index->vnum << " ";
                 }
-            }
+        }
         sprintf( buf, "\n\r%d of %d objects are limited.\n\r", lCount, nMatch );
         ch->send_to(buf);
         ch->println(report.str( ));
