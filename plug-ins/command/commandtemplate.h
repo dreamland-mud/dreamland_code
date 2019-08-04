@@ -27,6 +27,9 @@ public:
     virtual void run( Character * ch, char *argument ) { 
         DefaultCommand::run( ch, argument );
     }
+    virtual bool visible(Character *ch) const {
+        return DefaultCommand::visible(ch);
+    }
 
     virtual const DLString &getType( ) const {
         return ClassSelfRegistratorPlugin<tn>::getType( );

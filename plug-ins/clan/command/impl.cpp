@@ -17,6 +17,7 @@ extern "C"
         SO::PluginList ppl;
         
         Plugin::registerPlugin<CClan>( ppl );
+        Plugin::registerPlugin<CClanTalk>( ppl );
         Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeInduct> >( ppl );
         Plugin::registerPlugin<XMLAttributeInductListenerPlugin>( ppl );
 

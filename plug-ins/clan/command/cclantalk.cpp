@@ -77,7 +77,7 @@ static bool check_soap( Character *ch )
 }
 
 
-CMDRUN( cb )
+COMMAND(CClanTalk, "cb")
 {
     Descriptor *d;
     DLString argument = constArguments;
@@ -152,6 +152,11 @@ CMDRUN( cb )
             if (d->character->getPC( ))
                 remember_history_public( d->character->getPC( ), message );
         }
+}
+
+bool CClanTalk::visible( Character *ch ) const
+{
+    return ch->getClan( ) != clan_none;
 }
 
 void clantalk( Clan &clan, const char *format, ... )

@@ -431,6 +431,18 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
     page_to_char(output.str( ).c_str( ), ch);
 }
 
+void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf)
+{
+	ostringstream buf;
+		
+    for (Affect *paf = ch->in_room->affected; paf != 0; paf = paf->next)
+        if (paf->type->getAffect( ))
+            paf->type->getAffect( )->toStream( buf, paf );
+
+	if (!buf.str().empty())
+		mainBuf << endl << buf.str();
+}
+
 /*
  * Display PK-flags
  */
@@ -1199,6 +1211,8 @@ rprog_descr( Room *room, Character *ch, const DLString &descr )
         buf << rprog_descr( room, ch, rbuf.str( ) );
     }
 
+    show_room_affects_to_char(room, ch, buf);
+
     if (ch->getPC( ) && IS_SET(ch->getPC( )->act, PLR_AUTOEXIT))
     {
         buf << endl;
@@ -1207,7 +1221,7 @@ rprog_descr( Room *room, Character *ch, const DLString &descr )
     }
     else
         ch->send_to( buf );
-
+    
     show_list_to_char( room->contents, ch, false, false );
     show_people_to_char( room->people, ch, fShowMount );
 }

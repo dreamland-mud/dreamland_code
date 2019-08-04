@@ -383,9 +383,15 @@ CMDRUNP( zap )
         Character *victim = target->victim;
 
         if (victim && victim->in_room == ch->in_room) {
-            act( "$c1 взмахивает $o5 на тебя!", ch, wand, victim, TO_VICT );
-            act( "$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
-            act( "Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
+            if (ch != victim) {
+                act( "$c1 взмахивает $o5 на тебя!", ch, wand, victim, TO_VICT );
+                act( "$c1 взмахивает $o5 на $C4.", ch, wand, victim, TO_NOTVICT );
+                act( "Ты взмахиваешь $o5 на $C4.", ch, wand, victim, TO_CHAR );
+            }
+            else {
+                act( "$c1 взмахивает $o5 на себя.", ch, wand, 0, TO_ROOM );
+                act( "Ты взмахиваешь $o5 на себя.", ch, wand, 0, TO_CHAR );
+            }
         }
         else if (target->obj && target->obj->getRoom( ) == ch->in_room) {
             act( "$c1 взмахивает $o5 на $O4.", ch, wand, target->obj, TO_ROOM );

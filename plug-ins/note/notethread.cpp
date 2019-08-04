@@ -40,6 +40,7 @@ const int NoteThread::HASH_LEN = 16;
 
 NoteThread::NoteThread( ) 
     : extra( CMD_KEEP_HIDE|CMD_GHOST, defaultExtra.getTable( ) ), 
+      cat(defaultCategory.getValue(), defaultCategory.getTable()),
       gender( 0, &sex_table ), 
       godsSeeAlways( false )
 {
@@ -48,6 +49,7 @@ NoteThread::NoteThread( )
 NoteThread::NoteThread( const DLString &n ) 
     : name( n ),
       extra( CMD_KEEP_HIDE|CMD_GHOST, defaultExtra.getTable( ) ), 
+      cat(defaultCategory.getValue(), defaultCategory.getTable()),
       gender( 0, &sex_table ), 
       godsSeeAlways( false )
 {

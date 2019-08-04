@@ -13,6 +13,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "interp.h"
+#include "arg_utils.h"
 #include "def.h"
 
 #define MILD(ch)     (IS_SET((ch)->comm, COMM_MILDCOLOR))
@@ -21,6 +22,9 @@
 #define CLR_NAME(ch)    (MILD(ch) ? "c" : "C")
 #define CLR_YES(ch)     (MILD(ch) ? "g" : "R")
 #define CLR_NO(ch)      (MILD(ch) ? "G" : "G")
+
+static void config_scroll(Character *ch, const DLString &constArguments);
+static void config_scroll_print(Character *ch);
 
 /*-------------------------------------------------------------------------
  * ConfigElement
@@ -46,24 +50,27 @@ void ConfigElement::destroy( )
 
 void ConfigElement::run( Character *ch, const DLString & )
 {
-    if (!ch->is_npc( ))
-        handleArgument( ch->getPC( ), "toggle" );
+    ch->printf("Эта команда устарела, используй {hc{y{lRрежим %s{lEconfig %s{x.\r\n", 
+               rname.c_str(), name.c_str());
 }
 
 bool ConfigElement::handleArgument( PCharacter *ch, const DLString &arg ) const
 {
     if (arg.empty( )) {
+        bool yes = isSetBit(ch);
         printLine( ch );
+        ch->printf("\nИспользуй команду {hc{y{lRрежим %s %s{lEconfig %s %s{x для изменения.\r\n",
+                      rname.c_str(), yes ? "нет" : "да", name.c_str(), yes ? "no" : "yes");
         return true;
     }
     
     Flags &field = getField( ch );
 
-    if (arg == "yes" || arg == "да")
+    if (arg_is_yes(arg) || arg_is_switch_on(arg))
         field.setBit( bit.getValue( ) );
-    else if (arg == "no" || arg == "нет")
+    else if (arg_is_no(arg) || arg_is_switch_off(arg))
         field.removeBit( bit.getValue( ) );
-    else if (arg.strPrefix( "toggle" ) || arg.strPrefix( "переключить" ))
+    else if (arg_oneof(arg, "toggle", "переключить"))
         field.toggleBit( bit.getValue( ) );
     else 
         return false;
@@ -108,19 +115,19 @@ void ConfigElement::printLine( PCharacter *ch ) const
     bool yes = isSetBit( ch );
 
     if (ch->getConfig( )->rucommands)
-        ch->printf( "  {%s%-12s {%s%5s {x%s\n",
+        ch->printf( "  {%s%-14s {%s%5s {x%s\n",
                         CLR_NAME(ch),
                         rname.getValue( ).c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
                         yes ? "ДА" : "НЕТ",
-                        hint.c_str( ) );
+                        yes ? msgOn.c_str() : msgOff.c_str() );
     else
         ch->printf( "  {%s%-12s {%s%5s {x%s\n",
                         CLR_NAME(ch),
                         name.getValue( ).c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
                         yes ? "YES" : "NO",
-                        hint.c_str( ) );
+                        yes ? msgOn.c_str() : msgOff.c_str() );
 }
 
 Flags & ConfigElement::getField( PCharacter *ch ) const
@@ -243,7 +250,13 @@ COMMAND(ConfigCommand, "config")
                     (*c)->printLine( pch );
         }
 
+        config_scroll_print(ch);
         return;
+    }
+
+    if (arg_oneof(arg1, "scroll", "экран", "буфер")) {
+        config_scroll(pch, arg2);
+        return; 
     }
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
@@ -258,7 +271,7 @@ COMMAND(ConfigCommand, "config")
             }
 
     
-    pch->println("Опция не найдена. Используйте '{y{lRрежим{lEconfig{lx{w' для списка.");
+    pch->println("Опция не найдена. Используй {hc{y{lRрежим{lEconfig{x для списка.");
 }
 
 /*-------------------------------------------------------------------------
@@ -266,31 +279,7 @@ COMMAND(ConfigCommand, "config")
  *------------------------------------------------------------------------*/
 CMDRUN( autolist )
 {
-    static const char *line = "+---------------------------+\r\n";
-
-    PCharacter *pch;
-    
-    if (ch->is_npc( ))
-        return;
-
-    pch = ch->getPC( );
-    
-    pch->send_to( line );
-    pch->printf( "|  {%sНаименование   Состояние{x |\r\n", CLR_HEADER(ch) );
-    pch->send_to( line );
-
-    ConfigCommand::getThis( )->printAllRows( pch );
-    pch->send_to( line );
-
-    if (pch->lines != PAGELEN) {
-        if (pch->lines)
-            pch->printf( "Тебе выводится непрерывно %d линий текста.\r\n", pch->lines.getValue( ) + 2 );
-        else
-            pch->send_to( "Буфер прокрутки выключен.\r\n" );
-    }
-
-    ConfigCommand::getThis( )->printAllTexts( pch );
-    pch->send_to( "\r\n" );
+    ch->println("Эта команда устарела, используй {hc{y{lRрежим{lEconfig{x для списка настроек.");
 }
 
 
@@ -298,6 +287,20 @@ CMDRUN( autolist )
  * 'scroll' command 
  *------------------------------------------------------------------------*/
 CMDRUN( scroll )
+{
+    ch->println("Эта команда устарела, используй {hc{y{lRрежим экран{lEconfig scroll{x.");
+}
+
+static void config_scroll_print(Character *ch)
+{
+    if (ch->lines == 0)
+        ch->send_to("Ты получаешь длинные сообщения без буферизации.\n\r");
+    else
+        ch->printf( "Тебе непрерывно выводится %d лин%s текста.\n\r",
+                    ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "ия","ии","ий") );
+}
+
+static void config_scroll(Character *ch, const DLString &constArguments)
 {
     int lines;
     DLString arg;
@@ -307,12 +310,8 @@ CMDRUN( scroll )
 
     if (arg.empty( ))
     {
-        if (ch->lines == 0)
-            ch->send_to("Ты не можешь получать длинные сообщения.\n\r");
-        else
-            ch->printf( "Тебе непрерывно выводится %d лин%s текста.\n\r",
-                        ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "ия","ии","ий") );
-
+        config_scroll_print(ch);
+        ch->println("Для изменения используй {y{lRрежим буфер{lEconfig scroll{x число.");
         return;
     }
 
@@ -331,14 +330,14 @@ CMDRUN( scroll )
 
     if (lines == 0)
     {
-        ch->send_to("Вывод отключен.\n\r");
+        ch->send_to("Буферизация вывода отключена.\n\r");
         ch->lines = 0;
         return;
     }
 
     if (lines < 10 || lines > 100)
     {
-        ch->send_to("Ты должен ввести допустимое количество линий.\n\r");
+        ch->send_to("Введи значение между 10 и 100.\n\r");
         return;
     }
 

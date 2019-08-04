@@ -1202,7 +1202,7 @@ extern "C"
     SO::PluginList initialize_web( )
     {
         SO::PluginList ppl;
-        Plugin::registerPlugin<HelpDumpPlugin>( ppl );
+//        Plugin::registerPlugin<HelpDumpPlugin>( ppl );
         Plugin::registerPlugin<WhoWebPromptListener>( ppl );
         Plugin::registerPlugin<GroupWebPromptListener>( ppl );
         Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
