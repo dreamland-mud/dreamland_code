@@ -610,9 +610,7 @@ CMDRUNP(searcher)
                     if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty())
                         aff = "{C*{x";
 
-                    
-                    output[pObj->level].push_back( 
-                        dlprintf("%5d {C%3d{x {y%-10s{x {y%-10s{x %-20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
+                    DLString line = dlprintf("%5d {C%3d{x {y%-10s{x {y%-10s{x %-20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
                                     pObj->vnum,
                                     pObj->level, 
                                     p.itemtype.c_str(),
@@ -625,7 +623,14 @@ CMDRUNP(searcher)
                                     (p.hp != 0 ? "C": "w"), p.hp, 
                                     (p.mana != 0 ? "C": "w"), p.mana, 
                                     (p.saves != 0 ? "C": "w"), p.saves, 
-                                    pObj->area->name));
+                                    pObj->area->name);
+
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN)) {
+                        line.colourstrip();
+                        line = "{D" + line + "{x";
+                    }
+
+                    output[pObj->level].push_back(line);
                     cnt++;
                 }
             } 
