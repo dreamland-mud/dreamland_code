@@ -625,7 +625,9 @@ CMDRUNP(searcher)
                                     (p.saves != 0 ? "C": "w"), p.saves, 
                                     pObj->area->name);
 
-                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN)) {
+                    DLString where;
+                    AREA_DATA *pArea;
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj->vnum, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
                     }
