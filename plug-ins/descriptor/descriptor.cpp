@@ -198,8 +198,6 @@ Descriptor::writeWSCommand(const DLString &name, const std::vector<DLString> &ar
     for(i=args.begin(), j=0;i!=args.end();i++, j++)
         val["args"][j] = *i;
 
-    writeWSCommand(val);
-
     return writeWSCommand(val);
 }
 
