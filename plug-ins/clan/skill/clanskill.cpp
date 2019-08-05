@@ -12,6 +12,7 @@
 #include "room.h"
 #include "object.h"
 #include "npcharacter.h"
+#include "dreamland.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -62,8 +63,10 @@ bool ClanSkill::usable( Character * ch, bool message = true ) const
     if (!available( ch ))
         return false;
     
-    ci = getClanInfo( ch );
+    if (dreamland->hasOption( DL_BUILDPLOT ))
+        return true;
 
+    ci = getClanInfo( ch );
     if (ci && !ci->needItem.getValue( ))
         return true;
 
