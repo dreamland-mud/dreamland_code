@@ -16,7 +16,9 @@
 #include "char.h"
 #include "grammar_entities_impl.h"
 #include <skillmanager.h>
-
+#include "wrapperbase.h"
+#include "fenia/register-impl.h"
+#include "fenia/codesource.h"
 #include <character.h>
 #include <pcharacter.h>
 #include <commandmanager.h>
@@ -25,6 +27,7 @@
 #include "room.h"
 
 #include "oedit.h"
+#include "feniatriggers.h"
 #include "ovalues.h"
 #include "comm.h"
 #include "merc.h"
@@ -397,6 +400,59 @@ OEDIT(show)
     if (original)
         show_fenia_triggers(ch, original->wrapper);
 
+    return false;
+}
+
+OEDIT(fenia)
+{
+    OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
+    if (!original) {
+        stc("Cannot add Fenia codesource to a new index data, save first.\r\n", ch);
+        return false;
+    }
+
+    WrapperBase *base = get_wrapper(original->wrapper);
+    if (!base) {
+        stc("Wrapper base not found.\r\n", ch);
+        return false;
+    }
+
+    DLString args = argument;
+    DLString methodName = args.getOneArgument();
+    Scripting::IdRef methodId(methodName);
+    Register retval = base->getField(methodId);
+
+    if (retval.type == Register::NONE) {
+        if (!feniaTriggers->hasTrigger(methodName)) {
+            ptc(ch, "Trigger %s not found.\r\n", methodName.c_str());
+            return false;
+        }
+
+        std::vector<DLString> parms(2);
+        parms[0] = dlprintf("areas/%s/objs/%d", original->area->area_file->file_name, original->vnum);        
+        DLString tmpl = feniaTriggers->getContent(methodName);
+        tmpl.replaces("@vnum@", obj.vnum);
+        tmpl.replaces("@trig@", methodName);
+        parms[1] = tmpl;
+        ch->desc->writeWSCommand("cs_edit", parms);
+
+        ptc(ch, "Opening web editor for new codesource, trigger %s.\r\n", methodName.c_str());
+        return false;
+    }
+
+    if (retval.type != Register::FUNCTION) {
+        stc("This name already exists and it's not a function, try something else.\r\n", ch);
+        return false;
+    }
+
+    Scripting::CodeSourceRef csRef = retval.toFunction()->getFunction()->source;
+
+    std::vector<DLString> parms(3);
+    parms[0] = csRef.source->name;
+    parms[1] = csRef.source->content;
+    parms[2] = csRef.line; // TODO line number at the end of the function
+    ch->desc->writeWSCommand("cs_edit", parms);
+    ptc(ch, "Opening web edit for codesource %s, line %d.\r\n", csRef.source->name.c_str(), csRef.line);
     return false;
 }
 
