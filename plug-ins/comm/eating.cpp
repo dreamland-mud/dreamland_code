@@ -183,8 +183,8 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
             ch->println("Это животное не сделало тебе ничего плохого!");
         }
         else {
-            act("Вообразив себя котом, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_ROOM);
-            act("На миг вообразив себя котом, ты пытаешься изловить и сожрать $C4.. но опыта явно не хватает.", ch, 0, mob, TO_CHAR);
+            act("Вообразив себя ко$gтом|том|шкой, $c1 пытается изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_ROOM);
+            act("На миг вообразив себя ко$gтом|том|шкой, ты пытаешься изловить и сожрать $C4, но опыта явно не хватает.", ch, 0, mob, TO_CHAR);
         }
 
         return;
@@ -207,7 +207,7 @@ void CEat::eatCarnivoro( Character *ch, NPCharacter *mob )
             act("$C1 с ужасом смотрит на тебя.", ch, 0, mob, TO_CHAR);
         }
         else if (mob->master->in_room == mob->in_room) {
-            act("$C1 шустро прячется за спину хозяина!", mob->master, 0, mob, TO_ROOM);
+            act("$C1 шустро прячется за спину хозя$gина|ина|йки!", mob->master, 0, mob, TO_ROOM);
             act("$C1 шустро прячется за твою спину!", mob->master, 0, mob, TO_CHAR);  
         }
         else
