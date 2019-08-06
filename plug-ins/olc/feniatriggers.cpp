@@ -81,7 +81,8 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
         return false;
     }
 
-    obj_index_data *pObj = dynamic_cast<obj_index_data *>(&indexData);
+    // TODO, obviously.
+    obj_index_data *pObj = get_obj_index(indexData.getVnum());
     if (!pObj)
         return false;
 
