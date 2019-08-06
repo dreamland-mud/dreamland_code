@@ -520,6 +520,11 @@ COMMAND(CDarkLeague, "darkleague")
     }
 }
 
+bool CDarkLeague::visible( Character *ch ) const
+{
+    return !ch->is_npc() && ch->getPC()->getClan() == clan_invader;
+}
+
 void CDarkLeague::doUsage( PCharacter *pch )
 {
     ostringstream buf;

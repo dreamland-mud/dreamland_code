@@ -47,6 +47,8 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse );
 
 #define OBJ_VNUM_BATTLE_PONCHO       26
 
+CLAN(battlerager);
+
 /*
  * poncho behavior
  */
@@ -83,15 +85,15 @@ PersonalBattleragerPoncho::~PersonalBattleragerPoncho( )
  * 'chop' skill command
  * 'chop leg|arm|head|рука|нога|голова <corpse>'
  */
-CMDRUNP( chop )
+COMMAND(CChop, "chop")
 {
     Object *corpse, *axe;
     bitstring_t part;
-    DLString args = argument, argPart, argBody;
+    DLString args = constArguments, argPart, argBody;
     int vnum;
 
     if (!gsn_trophy->available( ch )) {
-        ch->println( "Ась?" );
+        ch->println( "Ты не умеешь рассекать трупы." );
         return;
     }
 
@@ -171,6 +173,11 @@ CMDRUNP( chop )
     ch->recho( "%^C1 отсекает %s от %O2.", ch, what.c_str( ), corpse );
     bodypart_create( vnum, 0, corpse );
     gsn_trophy->improve( ch, true );
+}
+
+bool CChop::visible( Character *ch ) const
+{
+    return !ch->is_npc() && ch->getPC()->getClan() == clan_battlerager;
 }
 
 /*

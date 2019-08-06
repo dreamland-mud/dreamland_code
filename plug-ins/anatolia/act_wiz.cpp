@@ -308,19 +308,16 @@ char arg[MAX_STRING_LENGTH];
 
 CMDWIZP( limited )
 {
-        extern int top_obj_index;
         Object *obj;
-        OBJ_INDEX_DATA *obj_index;
         int        lCount = 0;
         int        ingameCount;
         char  buf[1000];
         int         nMatch;
-        int         vnum;
         ostringstream report;
 
         if ( argument[0] != '\0' )
         {
-                obj_index = get_obj_index( atoi(argument) );
+                OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
                         ch->send_to("Not found.\n\r");
@@ -363,11 +360,10 @@ CMDWIZP( limited )
         }
 
         nMatch = 0;
-        for ( vnum = 0; nMatch < top_obj_index; vnum++ )
-            if ( ( obj_index = get_obj_index( vnum ) ) != 0 )
-            {
+        for (int i = 0; i < MAX_KEY_HASH; i++)
+        for (OBJ_INDEX_DATA *obj_index = obj_index_hash[i]; obj_index; obj_index = obj_index->next) {
                 nMatch++;
-                if (obj_index->limit > 0 && obj_index->limit < 100 && obj_index->count > 0)
+                if (obj_index->limit > 0 && obj_index->limit < 100)
                 {
                     int inGame = 0;
                     for (Object* obj=object_list; obj != 0; obj=obj->next )
@@ -384,7 +380,7 @@ CMDWIZP( limited )
 
                     report << obj_index->vnum << " ";
                 }
-            }
+        }
         sprintf( buf, "\n\r%d of %d objects are limited.\n\r", lCount, nMatch );
         ch->send_to(buf);
         ch->println(report.str( ));
@@ -921,9 +917,8 @@ CMDWIZP( stat )
     ch->send_to(buf);
 
     sprintf( buf,
-        "Room flags: %s (%ld).\n\rDescription:\n\r%s",
+        "Room flags: %s.\n\rDescription:\n\r%s",
         room_flags.names(location->room_flags).c_str( ),
-        location->room_flags,
         location->description );
     ch->send_to(buf);
 
@@ -4054,7 +4049,7 @@ CMDWIZP( memory )
     sprintf( buf, "Areas   %5d\n\r", top_area      ); ch->send_to(buf);
     sprintf( buf, "ExDes   %5d\n\r", top_ed        ); ch->send_to(buf);
     sprintf( buf, "Exits   %5d\n\r", top_exit      ); ch->send_to(buf);
-    sprintf( buf, "Helps   %5d\n\r", helpManager->getArticles( ).size( ) ); ch->send_to(buf);
+    sprintf( buf, "Helps   %5ld\n\r", helpManager->getArticles( ).size( ) ); ch->send_to(buf);
 //    sprintf( buf, "Socials %5d\n\r", SocialManager::getThis( )->getSocialCount( ) ); ch->send_to(buf);
     sprintf( buf, "Mobs    %5d(%d new format)\n\r", top_mob_index,newmobs );
     ch->send_to(buf);
@@ -4095,7 +4090,7 @@ CMDWIZP( dump )
     aff_count = 0;
 
     /* mobile prototypes */
-    fprintf(fp,"MobProt        %4d (%8d bytes)\n",
+    fprintf(fp,"MobProt        %4d (%8ld bytes)\n",
         top_mob_index, top_mob_index * (sizeof(*pMobIndex)));
 
     /* mobs */
@@ -4109,7 +4104,7 @@ CMDWIZP( dump )
             aff_count++;
     }
 
-    fprintf(fp,"Mobs        %4d (%8d bytes), %2d free (%d bytes)\n",
+    fprintf(fp,"Mobs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
         count, count * (sizeof(*fch)), count2, count2 * (sizeof(*fch)));
 
     /* descriptors */
@@ -4117,7 +4112,7 @@ CMDWIZP( dump )
     for (d = descriptor_list; d != 0; d = d->next)
         count++;
 
-    fprintf(fp, "Descs        %4d (%8d bytes), %2d free (%d bytes)\n",
+    fprintf(fp, "Descs        %4d (%8ld bytes), %2d free (%ld bytes)\n",
         count, count * (sizeof(*d)), count2, count2 * (sizeof(*d)));
 
     /* object prototypes */
@@ -4129,7 +4124,7 @@ CMDWIZP( dump )
             nMatch++;
         }
 
-    fprintf(fp,"ObjProt        %4d (%8d bytes)\n",
+    fprintf(fp,"ObjProt        %4d (%8ld bytes)\n",
         top_obj_index, top_obj_index * (sizeof(*pObjIndex)));
 
 
@@ -4143,11 +4138,11 @@ CMDWIZP( dump )
     }
 
     /* rooms */
-    fprintf(fp,"Rooms        %4d (%8d bytes)\n",
+    fprintf(fp,"Rooms        %4d (%8ld bytes)\n",
         top_room, top_room * (sizeof(*room)));
 
      /* exits */
-    fprintf(fp,"Exits        %4d (%8d bytes)\n",
+    fprintf(fp,"Exits        %4d (%8ld bytes)\n",
         top_exit, top_exit * (sizeof(*exit)));
 
     fclose(fp);

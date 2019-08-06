@@ -596,16 +596,7 @@ OEDIT(name)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0') {
-        stc("Syntax:  name [string]\n\r", ch);
-        return false;
-    }
-
-    free_string(pObj->name);
-    pObj->name = str_dup(argument);
-
-    stc("Name set.\n\r", ch);
-    return true;
+    return editor(argument, pObj->name, ED_NO_NEWLINE);
 }
 
 OEDIT(short)
@@ -614,34 +605,12 @@ OEDIT(short)
 
     EDIT_OBJ(ch, pObj);
 
-    if (argument[0] == '\0') {
-        stc("Syntax:  short [string]\n\r", ch);
-        return false;
-    }
-
-    free_string(pObj->short_descr);
-    pObj->short_descr = str_dup(argument);
-
-    stc("Short description set.\n\r", ch);
-    return true;
+    return editor(argument, pObj->short_descr, ED_NO_NEWLINE);
 }
 
 OEDIT(long)
 {
-    if (!*argument) {
-        if(sedit(obj.description)) {
-            stc("Description set\n\r", ch);
-            return true;
-        } else
-            return false;
-    }
-
-    free_string(obj.description );
-    obj.description = str_dup(argument);
-    *obj.description = Char::upper(*obj.description);
-
-    stc("Description set\n\r", ch);
-    return false;
+    return editor(argument, obj.description, ED_UPPER_FIRST_CHAR);
 }
 
 OEDIT(sound)

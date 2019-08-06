@@ -195,27 +195,6 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 }
 
 
-CMDRUN( gain )
-{
-    Trainer::Pointer trainer;
-    DLString argument = constArguments;
-
-    if (ch->is_npc( )) {
-        ch->println( "Это бесполезно для тебя." );
-        return;
-    }
-    
-    trainer = find_people_behavior<Trainer>( ch->in_room );
-
-    if (!trainer) {
-        ch->println( "Здесь никто не меняет тренировки на практики." );
-        return;
-    }
-    
-    trainer->doGain( ch->getPC( ), argument );
-}
-
-
 CMDRUN( train )
 {
     Trainer::Pointer trainer;
@@ -230,6 +209,15 @@ CMDRUN( train )
 
     if (!trainer) {
         ch->println( "Здесь некому тренировать тебя." );
+        return;
+    }
+    
+    if (argument.strPrefix("revert") 
+        || (argument.strPrefix("convert") && argument != "con")
+        || argument.strPrefix("продать")
+        || argument.strPrefix("купить"))
+    {
+        trainer->doGain( ch->getPC( ), argument );
         return;
     }
     

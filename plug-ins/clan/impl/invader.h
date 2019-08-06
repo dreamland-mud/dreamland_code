@@ -27,6 +27,7 @@ public:
 
     CDarkLeague( );
     virtual void run( Character *, const DLString & );
+    virtual bool visible( Character * ) const;
 
 private:
     void doUsage( PCharacter * );

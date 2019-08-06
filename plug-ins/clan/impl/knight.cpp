@@ -597,6 +597,11 @@ COMMAND(COrden, "orden")
     }
 }
 
+bool COrden::visible( Character *ch ) const
+{
+    return !ch->is_npc() && ch->getPC()->getClan() == clan_knight;
+}
+
 void COrden::doUsage( PCharacter *pch )
 {
     ostringstream buf;

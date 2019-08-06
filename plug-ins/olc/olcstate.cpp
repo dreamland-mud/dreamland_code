@@ -9,6 +9,7 @@
 #include "sedit.h"
 #include "pcharacter.h"
 #include "security.h"
+#include "arg_utils.h"
 #include "mercdb.h"
 
 /*--------------------------------------------------------------------------
@@ -520,28 +521,47 @@ bool OLCState::editorCopy(const DLString &original)
     return false;
 }
 
-bool OLCState::editorPaste(DLString &original)
+static void apply_flags(DLString &original, editor_flags flags)
+{
+    if (IS_SET(flags, ED_UPPER_FIRST_CHAR)) {
+        original.upperFirstCharacter();
+    }
+
+    if (IS_SET(flags, ED_NO_NEWLINE)) {
+        original.erase( 
+            original.find_last_not_of('\r') + 1);
+        original.erase( 
+            original.find_last_not_of('\n') + 1);
+    }
+
+    if (IS_SET(flags, ED_ADD_NEWLINE)) {
+        original << "\n";
+    }
+}
+
+bool OLCState::editorPaste(DLString &original, editor_flags flags)
 {
     PCharacter *ch = owner->character->getPC();
     original = ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].dump( );
+    apply_flags(original, flags);
     ptc(ch, "Описание вставлено из буфера.\r\n");
     return true;
 }
 
-bool OLCState::editorPaste(char *&field)
+bool OLCState::editorPaste(char *&field, editor_flags flags)
 {
     DLString original = field;
-    editorPaste(original);
+    editorPaste(original, flags);
     free_string(field);
     field = str_dup(original.c_str());
     return true;
 }
 
-bool OLCState::editor(const char *command, char *&field)
+bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
 {
     DLString original = field;
     
-    if (!editor(command, original))
+    if (!editor(argument, original, flags))
         return false;
     
     free_string(field);
@@ -549,29 +569,45 @@ bool OLCState::editor(const char *command, char *&field)
     return true;
 }
 
-bool OLCState::editor(const char *command, DLString &original)
+bool OLCState::editor(const char *argument, DLString &original, editor_flags flags)
 {
     PCharacter *ch = owner->character->getPC();
+    DLString args = argument;
+    DLString command = args.getOneArgument();
     const char *cmd = lastCmd.c_str();
 
-    if (command[0] == '\0') {
+    if (command.empty()) {
+        if (!inSedit)
+            ptc(ch, "{gВход во встроенный редактор. Для выхода используй {yq{g. Для списка подкоманд: {y%s ?{g.{x\r\n", cmd);
+
         if (!sedit(original)) 
             return false;
+        
+        apply_flags(original, flags);
         stc("Описание установлено.\n\r", ch);
         return true;
     }
 
-    if (is_name(command, "copy")) 
+    if (arg_oneof(command, "copy", "копировать")) 
         return editorCopy(original);
 
-    if (is_name(command, "paste")) 
-        return editorPaste(original);
+    if (arg_oneof(command, "paste", "вставить"))  
+        return editorPaste(original, flags);
 
-    stc("Команды редактора:\n\r", ch);
-    ptc(ch, "%s       : войти во встроенный редактор описаний\n\r", cmd);
-    ptc(ch, "%s copy  : скопировать описание в буфер\n\r", cmd);
-    ptc(ch, "%s paste : заменить описание на то, что в буфере\n\r", cmd);
-    return false;
+    if (arg_is_help(command)) {
+        stc("Команды редактора:\n\r", ch);
+        ptc(ch, "%s        : войти во встроенный редактор описаний\n\r", cmd);
+        ptc(ch, "%s copy   : скопировать описание в буфер\n\r", cmd);
+        ptc(ch, "%s paste  : заменить описание на то, что в буфере\n\r", cmd);
+        ptc(ch, "%s строка : заменить описание на строку\r\n", cmd);
+        ptc(ch, "%s ?      : вывести эту подсказку\r\n", cmd);
+        return false;
+    }
+
+    original = argument;
+    apply_flags(original, flags);
+    ptc(ch, "Описание установлено в строку %s\r\n", original.c_str());
+    return true;
 }
 
 bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)

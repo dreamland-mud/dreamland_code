@@ -738,16 +738,7 @@ REDIT(name, "имя", "установить название комнаты")
 
     EDIT_ROOM(ch, pRoom);
 
-    if (argument[0] == '\0') {
-        stc("Syntax:  name [name]\n\r", ch);
-        return false;
-    }
-
-    free_string(pRoom->name);
-    pRoom->name = str_dup(argument);
-
-    stc("Name set.\n\r", ch);
-    return true;
+    return editor(argument, pRoom->name, (editor_flags)(ED_NO_NEWLINE|ED_UPPER_FIRST_CHAR));
 }
 
 REDIT(clan, "клан", "установить клановую принадлежность или clear")
@@ -891,12 +882,10 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
 REDIT(desc, "описание", "войти в редактор описания комнаты (desc help)")
 {
     Room *pRoom;
-    char command[MAX_INPUT_LENGTH];
 
     EDIT_ROOM(ch, pRoom);
 
-    argument = one_argument(argument, command);
-    return editor(command, pRoom->description);
+    return editor(argument, pRoom->description);
 }
 
 REDIT(heal, "здоровье", "установить скорость восстановления здоровья в комнате (100-400)")

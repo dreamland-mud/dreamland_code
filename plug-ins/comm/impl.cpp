@@ -19,7 +19,6 @@
 #include "banking.h"
 #include "corder.h"
 #include "configs.h"
-#include "cwizlist.h"
 #include "pcdeleteidle.h"
 #include "run.h"
 #include "whois.h"
@@ -47,7 +46,6 @@ extern "C"
                 Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeSpeedWalk> >( ppl );
 
                 Plugin::registerPlugin<COrder>( ppl );
-                Plugin::registerPlugin<CWizlist>( ppl );
                 Plugin::registerPlugin<Whois>( ppl );
                 Plugin::registerPlugin<Who>( ppl );
                 Plugin::registerPlugin<CWrite>( ppl );

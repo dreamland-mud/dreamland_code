@@ -238,9 +238,7 @@ bool ClanGuardRulerJailer::specFight( )
     Character *v_next;
     Character *ech;
     const char *crime;
-    int max_evil;
 
-    max_evil = 300;
     ech      = 0;
     crime    = "";
 

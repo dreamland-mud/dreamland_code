@@ -81,6 +81,7 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<PersonalBattleragerPoncho> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanGuardBattlerager> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<ClanHealerBattlerager> >( ppl );
+        Plugin::registerPlugin<CChop>( ppl );
 
         /*
          * chaos

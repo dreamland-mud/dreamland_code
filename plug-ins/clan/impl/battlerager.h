@@ -9,6 +9,8 @@
 #include "xmlattribute.h"
 #include "objectbehavior.h"
 #include "personalquestreward.h"
+#include "commandplugin.h"
+#include "defaultcommand.h"
 #include "clanmobiles.h"
 
 class Object;
@@ -53,6 +55,17 @@ public:
 
 protected:
         XML_VARIABLE XMLBoolean healPets;
+};
+
+class CChop : public CommandPlugin, public DefaultCommand {
+public:
+    typedef ::Pointer<CChop> Pointer;
+
+    CChop( );
+    virtual void run( Character *, const DLString & );
+    virtual bool visible( Character * ) const;
+private:
+    static const DLString COMMAND_NAME;
 };
 
 #endif

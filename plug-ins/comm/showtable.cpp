@@ -6,6 +6,7 @@
  *
  * sturm, 2003
  */
+#include <iomanip>
 #include "commandflags.h"
 #include "commandtemplate.h"
 #include "commandmanager.h"
@@ -21,7 +22,6 @@
  * 'commands'
  */
 enum {
-    FCMD_TABLE = (A),
     FCMD_ALIASES = (B),
     FCMD_HINTS = (C),
     FCMD_WIZARD = (D),
@@ -90,6 +90,65 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         ch->printf("Не найдено ни одной команды, начинающейся с '%s'.\r\n", arg.c_str( ));
 }
 
+typedef map<DLString, StringList> Categories;
+
+static Categories group_by_categories(Character *ch, int flags)
+{
+    Categories categories;
+    list<Command::Pointer>::const_iterator c;
+    const CommandList &commands = commandManager->getCommands( );
+    bool fRus = ch->getConfig( )->rucommands;
+
+    categories["info"].push_back("?");
+
+    for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
+        Command::Pointer cmd = *c;
+
+        if (!cmd->visible( ch ))
+            continue;
+        
+        if (cmd->getLevel( ) >= LEVEL_HERO)
+            continue;
+
+        if (IS_SET(flags, FCMD_IMPORTANT) && !cmd->getExtra( ).isSet( CMD_IMPORTANT ))
+            continue;
+        
+        DLString name = (fRus && !cmd->getRussianName().empty()) ? cmd->getRussianName() : cmd->getName();
+ 
+        if (cmd->getCommandCategory().getValue() == 0) {
+            categories["misc"].push_back(name);
+        } else {
+            StringList myCategories(cmd->getCommandCategory().names());
+            for (StringList::const_iterator s = myCategories.begin(); s != myCategories.end(); s++)
+                categories[*s].push_back(name);
+        }
+    }
+
+    categories["client"].push_back("!");
+    categories["client"].push_back("\\");
+    categories["client"].push_back("|");
+    return categories;
+}
+
+static void show_commands_by_categories( Character *ch, int flags )
+{
+    ostringstream buf;
+    Categories categories = group_by_categories(ch, flags);
+    
+    for (int i = 0; i < command_category_flags.size; i++) {
+        DLString name = command_category_flags.fields[i].name;
+        const StringList &commands = categories[name];
+        DLString msg = command_category_flags.fields[i].message;
+        msg = "{c" + msg.toUpper() + "{x: ";
+
+        if (!commands.empty())
+            buf << setiosflags(ios::right) << setw(21) << msg << resetiosflags(ios::right)
+                << categories[name].join(" ") << endl;
+    }
+    buf << "Также смотри {y{lRкоманды список{lEcommad list{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+    ch->send_to(buf);
+}
+
 static void show_commands( Character *ch, int flags )
 {
     ostringstream buf;
@@ -128,47 +187,10 @@ static void show_commands( Character *ch, int flags )
 
         buf << endl;
         if (IS_SET(flags, FCMD_ALIASES)) 
-            buf << "Также смотри {y{lRкоманды{lEcommand{x, {y{lRкоманды подсказ{lEcommand hints{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+            buf << "Также смотри {y{lRкоманды{lEcommand{x, {y{lRкоманды список{lEcommand list{x и {y{lRкоманды показ{lEcommand show{x." << endl;
         else
             buf << "Также смотри {y{lRкоманды{lEcommad{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
 
-    }
-    else if (IS_SET(flags, FCMD_TABLE|FCMD_IMPORTANT)) {
-        int i = 1;
-        bool fRus = ch->getConfig( )->rucommands;
-        const char *pattern = (fRus ? "%-17s" : "%-13s");
-        const int columns = (fRus ? 4 : 6);
-        
-        if (IS_SET(flags, FCMD_TABLE))
-            buf << "{cВсе команды{x:" << endl;
-        else
-            buf << "{cВажные команды{x:" << endl;
-
-        for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
-            Command::Pointer cmd = *c;
-
-            if (!cmd->visible( ch ))
-                continue;
-            
-            if (cmd->getLevel( ) >= LEVEL_HERO)
-                continue;
-
-            if (IS_SET(flags, FCMD_IMPORTANT) && !cmd->getExtra( ).isSet( CMD_IMPORTANT ))
-                continue;
-
-            buf << fmt( 0, pattern, 
-                           (fRus && !cmd->getRussianName( ).empty( ) ? 
-                                cmd->getRussianName( ).c_str( ) : cmd->getName( ).c_str( ) ));
-            
-            if (i++ % columns == 0)
-                buf << endl;
-        }
-
-        buf << endl;
-        if (IS_SET(flags, FCMD_TABLE))
-            buf << "Также смотри {y{lRкоманды{lEcommand{x для краткого списка, {y{lRкоманды подсказ{lEcommand hints{x и {y{lRкоманды показ{lEcommand show{x." << endl;
-        else
-            buf << "Для полного списка используй {y{lRкоманды таблица{lEcommand table{x, {y{lRкоманды подсказ{lEcommand hints{x." << endl;
     }
     else if (IS_SET(flags, FCMD_WIZARD)) {
         buf << fmt( 0, "%-12s | %-45s | %s", "По-английски", "Справка", "Синонимы" )
@@ -210,21 +232,23 @@ CMDRUN( commands )
         return;
     }
 
-    if (arg.empty( ))
-        SET_BIT(flags, FCMD_IMPORTANT);
-    
-    if (arg_oneof( arg, "hints", "подсказки" ))
+    if (arg.empty( )) {
+        show_commands_by_categories(ch, flags);
+        return;
+    }
+ 
+    if (arg_is_list(arg))
         SET_BIT(flags, FCMD_HINTS);
-
-    if (arg_oneof( arg, "table", "таблица" ))
-        SET_BIT(flags, FCMD_TABLE);
 
     if (arg_oneof( arg, "aliases", "синонимы" ))
         SET_BIT(flags, FCMD_ALIASES);
     
     if (!flags) {
-        ch->println( "Ты можешь задать один из видов таблицы команд: aliases, hints, table,\r\n"
-                     "либо отобразить только несколько команд: commands show <имя команды>." );
+        ch->println("Использование:\n"
+        "{lRкоманды{lEcommands{x - таблица всех команд\n"
+        "{lRкоманды список{lEcommands list{x - список команд с краткой справкой\n"
+        "{lRкоманды синонимы{lEcommands aliases{x - список команд и их синонимов\n"
+        "{lRкоманды показ{lEcommands show{x слово - показать синонимы и справку по команде.\n");
         return;
     }
     

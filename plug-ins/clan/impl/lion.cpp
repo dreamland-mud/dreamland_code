@@ -290,30 +290,23 @@ VOID_SPELL(EyedSword)::run( Character *ch, char *target_name, int sn, int level 
 { 
     char buf[MAX_STRING_LENGTH];
     Object *eyed;
-    int i;
 
-        if (IS_GOOD(ch))
-                i=0;
-        else if (IS_EVIL(ch))
-                i=2;
-        else i = 1;
-        
-        eyed        = create_object(get_obj_index(OBJ_VNUM_EYED_SWORD), 0);
-        eyed->setOwner( ch->getNameP( ) );
-        eyed->from = str_dup(ch->getNameP( ));
-        eyed->level = ch->getRealLevel( );
-        eyed->fmtShortDescr( eyed->getShortDescr( ), ch->getNameP( ) );
-        eyed->fmtDescription( eyed->getDescription( ), ch->getNameP( ) );
+    eyed        = create_object(get_obj_index(OBJ_VNUM_EYED_SWORD), 0);
+    eyed->setOwner( ch->getNameP( ) );
+    eyed->from = str_dup(ch->getNameP( ));
+    eyed->level = ch->getRealLevel( );
+    eyed->fmtShortDescr( eyed->getShortDescr( ), ch->getNameP( ) );
+    eyed->fmtDescription( eyed->getDescription( ), ch->getNameP( ) );
 
-        sprintf( buf, eyed->pIndexData->extra_descr->description, ch->getNameP( ) );
-        eyed->addExtraDescr( eyed->pIndexData->extra_descr->keyword, buf );
+    sprintf( buf, eyed->pIndexData->extra_descr->description, ch->getNameP( ) );
+    eyed->addExtraDescr( eyed->pIndexData->extra_descr->keyword, buf );
 
-          eyed->value[2] = ( ch->getModifyLevel() / 10) + 3;
-          eyed->level = ch->getRealLevel( );
-        eyed->cost = 0;
-        obj_to_char( eyed, ch);
-        ch->send_to("Ты создаешь меч с ТВОИМ именем.\n\r");
-        ch->send_to("Не забудь, что ты больше не сможешь создать это оружие.\n\r");
+    eyed->value[2] = ( ch->getModifyLevel() / 10) + 3;
+    eyed->level = ch->getRealLevel( );
+    eyed->cost = 0;
+    obj_to_char( eyed, ch);
+    ch->send_to("Ты создаешь меч с ТВОИМ именем.\n\r");
+    ch->send_to("Не забудь, что ты больше не сможешь создать это оружие.\n\r");
 }
 
 SPELL_DECL(EyesOfTiger);

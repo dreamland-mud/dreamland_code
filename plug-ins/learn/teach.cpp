@@ -34,11 +34,6 @@ CMDRUN( teach )
     }
 }
 
-CMDRUN( learn )
-{
-    ch->println( "Используй 'prac <skill>', стоя рядом с героем-учителем." );
-}
-
 XMLAttributeTeacher::XMLAttributeTeacher( ) 
 {
 }
