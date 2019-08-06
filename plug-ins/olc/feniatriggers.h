@@ -5,8 +5,11 @@
 #include "plugin.h"
 #include "dlstring.h"
 #include "oneallocate.h"
+#include "xmlindexdata.h"
 
 using namespace std;
+
+class PCharacter;
 
 class FeniaTriggerLoader : public Plugin, public OneAllocate {
 public:
@@ -16,8 +19,9 @@ public:
     virtual ~FeniaTriggerLoader();
     virtual void initialization();
     virtual void destruction();
-    const DLString &getContent(const DLString &name) const;
-    bool hasTrigger(const DLString &name) const;
+
+    bool openEditor(PCharacter *ch, const XMLIndexData &indexData, const DLString &constArguments) const;
+    void showAvailableTriggers(PCharacter *ch) const;
 
 protected:
     TriggerContent triggers;

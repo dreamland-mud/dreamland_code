@@ -384,3 +384,49 @@ XMLObjIndexData::toXML( XMLNode::Pointer& parent ) const
     return true;
 }
 
+int XMLObjIndexData::getVnum() const
+{
+    return vnum;
+}
+
+area_data * XMLObjIndexData::getArea() const
+{
+    return area;
+}
+
+Scripting::Object * XMLObjIndexData::getWrapper() const
+{
+    OBJ_INDEX_DATA *original = get_obj_index(vnum);
+    if (original)
+        return original->wrapper;
+    return NULL;
+}
+
+const char * XMLObjIndexData::getIndexType() const
+{
+    return "obj";
+}
+
+int XMLMobIndexData::getVnum() const
+{
+    return vnum;
+}
+
+area_data * XMLMobIndexData::getArea() const
+{
+    return area;
+}
+
+Scripting::Object * XMLMobIndexData::getWrapper() const
+{
+    MOB_INDEX_DATA *original = get_mob_index(vnum);
+    if (original)
+        return original->wrapper;
+    return NULL;
+}
+
+const char * XMLMobIndexData::getIndexType() const
+{
+    return "mob";
+}
+
