@@ -34,7 +34,6 @@ services \
 remort \
 questreward \
 skills_impl \
-olc \
 liquid \
 clan \
 selfrate \
@@ -57,5 +56,6 @@ web \
 gmcp \
 craft \
 feniaroot \
+olc \
 searcher
 

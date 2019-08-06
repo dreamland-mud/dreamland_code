@@ -48,6 +48,7 @@ $(INCLUDES_FIGHT) \
 -I$(top_srcdir)/plug-ins/skills_impl \
 -I$(top_srcdir)/plug-ins/updates \
 -I$(top_srcdir)/plug-ins/areas \
+-I$(top_srcdir)/plug-ins/feniaroot \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
 $(INCLUDES_SRC) 
@@ -58,6 +59,7 @@ $(LIBADD_FIGHT) \
 ../ed/libcoreed.la \
 ../ed/lib/libed.la \
 ../areas/libareas.la \
+../feniaroot/libfeniaroot.la \
 ../skills_impl/libskills_impl.la \
 ../updates/libupdates.la
 
