@@ -12,12 +12,14 @@
 class IconvMap {
 public:
     IconvMap(const char *from, const char *to);
-    ~IconvMap();
+    virtual ~IconvMap();
 
     std::string operator() (const std::string &src);
 
 private:
     iconv_t icnv_desc;
+    const char *to;
+    const char *from;
 };
 
 #endif

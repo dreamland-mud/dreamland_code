@@ -12,21 +12,24 @@
 
 IconvMap::IconvMap(const char *from, const char *to) 
 {
-    icnv_desc = iconv_open(to, from);
-
-    if (icnv_desc == (iconv_t)(-1)) {
-        throw new Exception("Failed to iconv_open");
-    }
+    this->from = from;
+    this->to = to;
 }
 
 IconvMap::~IconvMap() 
 {
-    iconv_close(icnv_desc);
+    
 }
 
 std::string 
 IconvMap::operator() (const std::string &src)
 {
+    icnv_desc = iconv_open(to, from);
+
+    if (icnv_desc == (iconv_t)(-1)) {
+        throw new Exception("Failed to iconv_open");
+    }
+
     char *in = (char*) src.c_str();
     size_t in_len = src.size();
     char buf[1024];
@@ -47,6 +50,7 @@ IconvMap::operator() (const std::string &src)
         os.write(buf, out-buf);
     }
 
+    iconv_close(icnv_desc);
     return os.str();
 }
 

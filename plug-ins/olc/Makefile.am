@@ -26,7 +26,8 @@ olcstate.cpp \
 onlinecreation.cpp \
 ovalues.cpp \
 security.cpp \
-webedit.cpp
+webedit.cpp \
+feniatriggers.cpp
 
 libolc_la_MOC = \
 redit.h \

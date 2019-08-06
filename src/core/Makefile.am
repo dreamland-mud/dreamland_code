@@ -38,6 +38,7 @@ religion.cpp \
 desire.cpp \
 helpmanager.cpp \
 mobilespecial.cpp \
+dlfileloader.cpp \
 dlpluginmanager.cpp \
 bonus.cpp
 

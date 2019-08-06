@@ -4,21 +4,22 @@
  */
 #include "dlfileloader.h"
 #include "dlfilestream.h"
+#include "dreamland.h"
 #include "logstream.h"
+
+DLFileLoader::DLFileLoader(const DLString &tableDirName, const DLString &fileExt)
+{
+    this->fileExt = fileExt;
+    this->tableDirName = tableDirName;
+}
 
 DLFileLoader::~DLFileLoader()
 {
 }
 
-DLString DLFileLoader::getFileExt() const
-{
-    return DLString::emptyString;
-}
-
 void DLFileLoader::loadAll()
 {
-    DLDirectory table = getTableDir();
-    DLString fileExt = getFileExt();
+    DLDirectory table(dreamland->getTableDir(), tableDirName);
 
     try {
         table.open();
@@ -52,7 +53,7 @@ void DLFileLoader::addEntry(const DLFile &entry)
 void DLFileLoader::load(const DLString &key)
 {
     try {
-        DLFile entry(getTableDir(), key, getFileExt());
+        DLFile entry(tableDirName, key, fileExt);
         addEntry(entry);
     }
     catch (const ExceptionDBIO &ex) {
@@ -70,6 +71,10 @@ const DLString & DLFileLoader::get(const DLString &key) const
     return t->second.content;
 }
 
+const DLFileLoader::Files &DLFileLoader::getAll() const
+{
+    return files;
+}
 time_t DLFileLoader::getModifyTime(const DLString &key) const
 {
     Files::const_iterator t = files.find(key);

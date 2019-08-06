@@ -17,20 +17,21 @@ public:
     };
     typedef map<DLString, FileData> Files;
     
+    DLFileLoader(const DLString &tableDirName, const DLString &fileExt);
     virtual ~DLFileLoader();
 
     void loadAll();
     void load(const DLString &key);
     const DLString & get(const DLString &key) const;
     time_t getModifyTime(const DLString &key) const;
+    const Files &getAll() const;
     
 protected:
-    virtual DLDirectory getTableDir() const = 0;
-    virtual DLString getFileExt() const;
-
     void addEntry(const DLFile &entry);
 
     Files files;
+    DLString tableDirName;
+    DLString fileExt;
 };
 
 class DLFileReaderByIndex {

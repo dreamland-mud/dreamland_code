@@ -25,7 +25,6 @@ xmlloader.cpp \
 xmltableelement.cpp \
 xmltableloader.cpp \
 xmlfile.cpp \
-xmlconfigurable.cpp \
-dlfileloader.cpp
+xmlconfigurable.cpp 
 
 AM_CPPFLAGS += $(src_INCLUDES)
