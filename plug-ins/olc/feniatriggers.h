@@ -20,7 +20,7 @@ public:
     virtual void initialization();
     virtual void destruction();
 
-    bool openEditor(PCharacter *ch, const XMLIndexData &indexData, const DLString &constArguments) const;
+    bool openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const;
     void showAvailableTriggers(PCharacter *ch) const;
 
 protected:

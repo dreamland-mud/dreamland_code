@@ -3,6 +3,7 @@
 #include "fenia/register-impl.h"
 #include "fenia/codesource.h"
 #include "plugininitializer.h"
+#include "wrappermanager.h"
 #include "iconvmap.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
@@ -73,20 +74,24 @@ void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch) const
     ch->send_to(buf);
 }
 
-bool FeniaTriggerLoader::openEditor(PCharacter *ch, const XMLIndexData &indexData, const DLString &constArguments) const
+bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
 {
     if (ch->desc->websock.state != WS_ESTABLISHED) {
         ch->println("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }
 
-    Scripting::Object *wrapper = indexData.getWrapper();
-    if (!wrapper) {
-        ch->println("Не могу повесить триггер на свежесозданный объект, сперва сохранитесь.");
+    obj_index_data *pObj = dynamic_cast<obj_index_data *>(&indexData);
+    if (!pObj)
+        return false;
+
+    Register w = WrapperManager::getThis()->getWrapper(pObj);
+    if (w.type == Register::NONE) {
+        ch->println("Не могу повесить враппер.");
         return false;
     }
 
-    WrapperBase *base = get_wrapper(wrapper);
+    WrapperBase *base = get_wrapper(pObj->wrapper);
     if (!base) {
         ch->println("Не могу найти wrapper base, всё плохо.");
         return false;
