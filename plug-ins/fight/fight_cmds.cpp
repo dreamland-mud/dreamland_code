@@ -80,7 +80,7 @@ CMDRUN( kill )
 
     if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim )
     {
-        act_p( "Но $C1 твоGй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка!", ch, 0, victim, TO_CHAR,POS_RESTING);
+        act_p( "Но $C1 тво$Gй|й|я любим$Gый|ый|ая хозя$Gин|ин|йка!", ch, 0, victim, TO_CHAR,POS_RESTING);
         return;
     }
 

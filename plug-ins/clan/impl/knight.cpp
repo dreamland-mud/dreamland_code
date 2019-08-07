@@ -227,7 +227,7 @@ SKILL_RUNP( guard )
 
     if (IS_AFFECTED(pch,AFF_CHARM))
     {
-        pch->send_to(fmt(0, "Ты любишь сво%1$Gего|его|ю хозя%1$Gина|ина|йку так сильно, что не можешь охранять %2$C4!", pch->master, victim));
+        pch->pecho( "Ты любишь сво%1$Gего|его|ю хозя%1$Gина|ина|йку так сильно, что не можешь охранять %2$C4!", pch->master, victim);
         return;
     }
 
