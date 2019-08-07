@@ -1495,6 +1495,24 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанес�
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, spellRoom, "(skillName,level): скастовать на комнату заклинание skillName уровне level")
+{
+    RegisterList::const_iterator i;
+    Skill *skill;
+    int level;
+    checkTarget( );
+
+    if (args.size() < 2)
+        throw Scripting::NotEnoughArgumentsException();
+
+    i = args.begin( );
+    DLString d = i->toString();
+    skill = SkillManager::getThis( )->findExisting( d.c_str( ) );
+    level = (++i)->toNumber( );
+
+    spell( skill->getIndex( ), level, target, target->in_room );
+    return Register( );
+}
 
 NMI_INVOKE( CharacterWrapper, spell, "(skillName,level,vict,spellbane): скастовать на vict заклинание skillName уровне level, с возможным spellbane")
 {
