@@ -128,7 +128,7 @@ CMDRUN( cast )
     }
 
     if (ch->is_npc( ) && ch->master && ch->master->getClan( ) == clan_battlerager) {
-        do_say(ch,"Хозяин, я уважаю твои убеждения.");
+        say_fmt("Хозя%2$Gин|ин|йка, я уважаю твои убеждения.", ch, ch->master);
         return;
     }
     
@@ -164,7 +164,7 @@ CMDRUN( cast )
 
     if (ch->mana < mana) {
         if (ch->is_npc( ) && ch->master != 0) 
-            do_say(ch,"Хозяин. У меня манна кончилась!");
+            say_fmt("Хозя%2$Gин|ин|йка. У меня мана кончилась!", ch, ch->master);
         else 
             ch->send_to("У тебя не хватает энергии (mana).\n\r");
 
@@ -181,7 +181,7 @@ CMDRUN( cast )
 
     if (offensive && ch->is_npc( ) && ch->master && ch->master != victim) {
         if (victim && !victim->is_npc( ))
-            do_say(ch, "Я его боюсь, хозяин!");
+            say_fmt("Хозя%2$Gин|ин|йка, я %3$Gего|его|её боюсь!", ch, ch->master, victim);
         else
             do_say(ch, "Я не буду делать этого.");
 

@@ -646,7 +646,7 @@ SKILL_RUNP( touch )
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )
     {
-        ch->send_to("Ты же не хочешь высосать своего хозяина?\n\r");
+        ch->pecho("Ты же не хочешь высосать сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
         return;
     }
 

@@ -325,7 +325,7 @@ CMDRUN( dismount )
         return;
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
-        ch->pecho("Но ведь %C1 - твой любимый хозяин!", victim);
+        ch->pecho("Но ведь %C1 - тво%1$Gй|й|я любим%1$Gый|ый|ая хозя%1$Gин|ин|йка!", victim);
         return;
     }
     

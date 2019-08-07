@@ -183,7 +183,7 @@ VOID_SPELL(Confuse)::run( Character *ch, Character *victim, int sn, int level )
 
         if ( saves_spell(level,victim, DAM_MENTAL, ch, DAMF_SPELL) )
         {
-                ch->send_to("Не получилось.");
+                ch->send_to("Не получилось.\n\r");
                 return;
         }
 

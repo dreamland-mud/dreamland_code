@@ -101,7 +101,7 @@ void RobbedVictim::talkToHero( PCharacter *hero )
                       quest->thiefRoom.c_str( ) );
 
             if (!quest->chestRoom.empty( )) {
-                tell_fmt( "А награбленное добро, по слухам, прячет около {1{W%3$s{2, точнее сказать не могу..",
+                tell_fmt( "А награбленное добро, по слухам, прячет около {1{W%3$s{2, точнее сказать не могу.",
                           hero, ch,
                           quest->chestRoom.c_str( ) );
                 tell_fmt( "Скорее всего, именно туда %3$p1 припрята%3$gло|л|ла мои вещички, и теперь не расстается с ключом.",

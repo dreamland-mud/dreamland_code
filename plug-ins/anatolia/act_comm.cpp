@@ -268,7 +268,7 @@ CMDRUNP( quit )
 
     if (IS_AFFECTED( pch, AFF_CHARM )) {
         if (!fForced) {
-            pch->send_to( "Ты не можешь покинуть своего хозяина.\n\r");
+            pch->pecho( "Ты не можешь покинуть сво%1$Gего|его|ю хозя%1$Gина|ина|йку.", pch->master);
             return;
         }
 

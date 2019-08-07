@@ -321,7 +321,7 @@ SKILL_RUNP( assassinate )
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) )
     {
-            ch->send_to( "Ты же не хочешь убить своего любимого хозяина.\n\r");
+            ch->pecho( "Ты же не хочешь убить сво%1$Gего|его|ю любим%1$Gого|ого|ю хозя%1$Gина|ина|йку.", ch->master);
             return;
     }
 
@@ -658,7 +658,7 @@ SKILL_RUNP( strangle )
 
         if ( IS_AFFECTED( ch, AFF_CHARM ) )
         {
-                ch->send_to("Ты же не хочешь придушить своего хозяина?\n\r");
+                ch->pecho("Ты же не хочешь придушить сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
                 return;
         }
 

@@ -193,7 +193,7 @@ bool Command::dispatch( const InterpretArguments &iargs )
     if (IS_AFFECTED(ch, AFF_CHARM) 
         && !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
     {
-        ch->send_to( "Сперва спроси разрешения у любимого хозяина!\n\r" );
+        ch->pecho( "Сперва спроси разрешения у любим%1$Gого|ого|ой хозя%1$Gина|ина|йки!" , ch->master );
         return false;
     }
 

@@ -539,7 +539,7 @@ SKILL_RUNP( trip )
 
         if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
         {
-                act_p("Но ведь $C1 - твой хозяин.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("Но ведь $C1 - тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
         }
 
