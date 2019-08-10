@@ -11,9 +11,13 @@ using namespace std;
 
 class PCharacter;
 
+bool stringIsCapitalized(const DLString &str);
+DLString triggerType(const DLString &name);
+
 class FeniaTriggerLoader : public Plugin, public OneAllocate {
 public:
     typedef map<DLString, DLString> TriggerContent;
+    typedef map<DLString, TriggerContent> IndexTriggers;
 
     FeniaTriggerLoader();
     virtual ~FeniaTriggerLoader();
@@ -21,10 +25,12 @@ public:
     virtual void destruction();
 
     bool openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const;
-    void showAvailableTriggers(PCharacter *ch) const;
+    void showAvailableTriggers(PCharacter *ch, const DLString &indexType) const;
 
 protected:
-    TriggerContent triggers;
+    void loadFolder(const DLString &indexType);
+
+    IndexTriggers indexTriggers;
 };
 
 extern FeniaTriggerLoader *feniaTriggers;

@@ -37,6 +37,7 @@
 #include "eeedit.h"
 #include "olc.h"
 #include "security.h"
+#include "feniatriggers.h"
 
 #include "def.h"
 
@@ -361,6 +362,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     }
 
     show_fenia_triggers(ch, pRoom->wrapper);
+    feniaTriggers->showAvailableTriggers(ch, "room");
 }
 
 REDIT(show, "показать", "показать все поля")
@@ -370,6 +372,16 @@ REDIT(show, "показать", "показать все поля")
 
     show(ch, pRoom);
 
+    return false;
+}
+
+REDIT(fenia, "феня", "редактирование триггеров")
+{
+    Room *pRoom;
+    EDIT_ROOM(ch, pRoom);
+    XMLRoomIndexData room(pRoom);
+
+    feniaTriggers->openEditor(ch, room, argument);
     return false;
 }
 
