@@ -7,12 +7,15 @@
 #include "iconvmap.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
+#include "room.h"
 #include "descriptor.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
 
 static IconvMap utf2koi("utf-8", "koi8-r");
+
+static const DLString EXAMPLE_FOLDER = "fenia.examples";
 
 FeniaTriggerLoader *feniaTriggers = 0;
 
@@ -28,16 +31,9 @@ FeniaTriggerLoader::~FeniaTriggerLoader()
 
 void FeniaTriggerLoader::initialization()
 {
-    // TODO support mobs and rooms.
-    DLFileLoader loader("fenia.examples", "");
-    loader.loadAll();
-
-    DLFileLoader::Files::const_iterator f;
-    DLFileLoader::Files files = loader.getAll();
-    for (f = files.begin(); f != files.end(); f++) {
-        // Assume that the source file is in utf-8.
-        triggers[f->first] = DLString(utf2koi(f->second.content));
-    }
+    loadFolder("obj");
+    loadFolder("mob");
+    loadFolder("room");
 }
 
 void FeniaTriggerLoader::destruction()
@@ -45,7 +41,25 @@ void FeniaTriggerLoader::destruction()
 
 }
 
-static DLString normalizeTriggerName(const DLString &name) 
+void FeniaTriggerLoader::loadFolder(const DLString &indexType)
+{
+    DLFileLoader loader(EXAMPLE_FOLDER + "/" + indexType, "");
+    loader.loadAll();
+
+    DLFileLoader::Files::const_iterator f;
+    DLFileLoader::Files files = loader.getAll();
+
+    TriggerContent triggers;
+    for (f = files.begin(); f != files.end(); f++) {
+        // Assume that the source file is in utf-8.
+        triggers[f->first] = DLString(utf2koi(f->second.content));
+    }
+
+    indexTriggers[indexType] = triggers;
+}
+
+// Return 'Use' for 'onUse' or 'postUse'.
+DLString triggerType(const DLString &name) 
 {
     DLString key = name;
     static const DLString ON("on");
@@ -59,19 +73,45 @@ static DLString normalizeTriggerName(const DLString &name)
     return key;
 }
 
-void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch) const
+// Return true for strings like Aaaaa.
+bool stringIsCapitalized(const DLString &str)
 {
-    ostringstream buf;
+    DLString n1 = str, n2 = str;
+    n1.capitalize();
+    if (n1.empty() || n1 != n2)
+        return false;
+    return true;
+}
 
-    buf << "Доступные триггера on и post: ";
+void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &indexType) const
+{
+    IndexTriggers::const_iterator i = indexTriggers.find(indexType);
+    if (i == indexTriggers.end())
+        return;
+
+    ostringstream buf;
+    buf << "Доступные триггера (команда fenia <trig>): ";
+
+    const TriggerContent &triggers = i->second;
     for (TriggerContent::const_iterator t = triggers.begin(); t != triggers.end(); t++) {
-        DLString key = t->first;
-        key.upperFirstCharacter();
-        buf << key << " ";
+        buf << t->first << " ";
     }
 
     buf << endl;
     ch->send_to(buf);
+}
+
+static Register get_wrapper_for_index_data(int vnum, const DLString &type)
+{
+    Register w;
+    if (type == "obj") {
+        w = WrapperManager::getThis()->getWrapper(get_obj_index(vnum));
+    } else if (type == "room") {
+        w = WrapperManager::getThis()->getWrapper(get_room_index(vnum));
+    } else if (type == "mob") {
+        w = WrapperManager::getThis()->getWrapper(get_mob_index(vnum));
+    }
+    return w;
 }
 
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
@@ -81,18 +121,11 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
         return false;
     }
 
-    // TODO, obviously.
-    obj_index_data *pObj = get_obj_index(indexData.getVnum());
-    if (!pObj)
+    Register w = get_wrapper_for_index_data(indexData.getVnum(), indexData.getIndexType());
+    if (w.type == Register::NONE)
         return false;
-
-    Register w = WrapperManager::getThis()->getWrapper(pObj);
-    if (w.type == Register::NONE) {
-        ch->println("Не могу повесить враппер.");
-        return false;
-    }
-
-    WrapperBase *base = get_wrapper(pObj->wrapper);
+        
+    WrapperBase *base = get_wrapper(w.toObject());
     if (!base) {
         ch->println("Не могу найти wrapper base, всё плохо.");
         return false;
@@ -105,31 +138,36 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
 
     // Fenia field not found, try to open the editor with trigger example.
     if (retval.type == Register::NONE) {
-        DLString methodKey = normalizeTriggerName(methodName);
-        if (methodKey == methodName) {
+        DLString trigType = triggerType(methodName);
+        if (trigType == methodName) {
             ch->println("Название триггера должно начинаться с 'on' или 'post'.");
             return false;
         }
-        
-        DLString savedKey = methodKey;
-        methodKey.capitalize();
-        if (methodKey.empty() || savedKey != methodKey) {
+
+        if (!stringIsCapitalized(trigType)) {
             ch->println("Название триггера должно выглядеть так: onFight, postSpeech, onWear и т.п.");
             return false;
         }
 
-        TriggerContent::const_iterator t = triggers.find(methodKey.toLower());
-        if (t == triggers.end()) {
+        // Look up trigger example for given index type and method name.
+        IndexTriggers::const_iterator i = indexTriggers.find(indexData.getIndexType());
+        if (i == indexTriggers.end()) {
+            ch->println("Нет ни одного триггера, попросите богов принять меры.");
+            return false;
+        }
+        TriggerContent::const_iterator t = i->second.find(methodName);
+        if (t == i->second.end()) {
             ch->printf("Триггер %s не найден, проверьте написание или попросите богов добавить его.\r\n", methodName.c_str());
             return false;
         }
 
         std::vector<DLString> parms(2);
         // Create codesource subject.
-        parms[0] = dlprintf("areas/%s/%s/%d", 
+        parms[0] = dlprintf("areas/%s/%s/%d.%s", 
                         indexData.getArea()->area_file->file_name, 
                         indexData.getIndexType(),
-                        indexData.getVnum());   
+                        indexData.getVnum(),
+                        methodName.c_str());   
 
         // Create codesource body with example code.
         DLString tmpl = t->second;
@@ -163,7 +201,6 @@ bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, con
     ch->printf("Запускаю веб-редактор для сценария %s, строка %d.\r\n", csRef.source->name.c_str(), csRef.line);
     return true;
 }
-
 
 
 PluginInitializer<FeniaTriggerLoader> initFeniaTriggerLoader;

@@ -6,11 +6,16 @@
 #include <sstream>
 #include <errno.h>
 
+#include "wrappermanager.h"
+#include "wrapperbase.h"
+
+#include "logstream.h"
 #include "grammar_entities_impl.h"
 #include "skillgroup.h"
 #include "xmlindexdata.h"
 #include "xmlmobilefactory.h"
 #include "xmlobjectfactory.h"
+#include "room.h"
 #include "olcstate.h"
 #include "olc.h"
 #include "affect.h"
@@ -394,14 +399,6 @@ area_data * XMLObjIndexData::getArea() const
     return area;
 }
 
-Scripting::Object * XMLObjIndexData::getWrapper() const
-{
-    OBJ_INDEX_DATA *original = get_obj_index(vnum);
-    if (original)
-        return original->wrapper;
-    return NULL;
-}
-
 const char * XMLObjIndexData::getIndexType() const
 {
     return "obj";
@@ -417,16 +414,28 @@ area_data * XMLMobIndexData::getArea() const
     return area;
 }
 
-Scripting::Object * XMLMobIndexData::getWrapper() const
-{
-    MOB_INDEX_DATA *original = get_mob_index(vnum);
-    if (original)
-        return original->wrapper;
-    return NULL;
-}
-
 const char * XMLMobIndexData::getIndexType() const
 {
     return "mob";
+}
+
+XMLRoomIndexData::XMLRoomIndexData(Room *room)
+{
+    this->room = room;
+}
+
+int XMLRoomIndexData::getVnum() const
+{
+    return room->vnum;
+}
+
+area_data * XMLRoomIndexData::getArea() const
+{
+    return room->area;
+}
+
+const char * XMLRoomIndexData::getIndexType() const
+{
+    return "room";
 }
 

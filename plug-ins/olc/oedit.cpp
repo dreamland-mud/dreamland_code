@@ -16,9 +16,6 @@
 #include "char.h"
 #include "grammar_entities_impl.h"
 #include <skillmanager.h>
-#include "wrapperbase.h"
-#include "fenia/register-impl.h"
-#include "fenia/codesource.h"
 #include <character.h>
 #include <pcharacter.h>
 #include <commandmanager.h>
@@ -399,7 +396,7 @@ OEDIT(show)
     OBJ_INDEX_DATA *original = get_obj_index(obj.vnum);
     if (original)
         show_fenia_triggers(ch, original->wrapper);
-    feniaTriggers->showAvailableTriggers(ch);
+    feniaTriggers->showAvailableTriggers(ch, "obj");
     return false;
 }
 

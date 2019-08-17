@@ -24,6 +24,7 @@
 
 #include "olc.h"
 #include "security.h"
+#include "feniatriggers.h"
 
 #include "def.h"
 
@@ -393,6 +394,13 @@ MEDIT(show)
     MOB_INDEX_DATA *original = get_mob_index(mob.vnum);
     if (original)
         show_fenia_triggers(ch, original->wrapper);
+    feniaTriggers->showAvailableTriggers(ch, "mob");
+    return false;
+}
+
+MEDIT(fenia)
+{
+    feniaTriggers->openEditor(ch, mob, argument);
     return false;
 }
 
