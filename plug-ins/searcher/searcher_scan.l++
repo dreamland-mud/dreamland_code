@@ -24,7 +24,7 @@ void searcher_yyerror( const char *txt );
 %}
 
 RL	    [йцукенгшщзхъфывапролджэячсмитьбюёЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ]
-L	    ([A-Za-z]|{RL})
+L	    ([A-Za-z_]|{RL})
 
 %x QUOTE
 
