@@ -607,8 +607,12 @@ CMDRUNP(searcher)
                     }
 
                     DLString aff = " ";
-                    if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty())
+                    if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty()) {
                         aff = "{C*{x";
+                        if (!p.fenia.empty())
+                            aff = "{G*{x";
+                    } else if (!p.fenia.empty())
+                        aff = "{g*{x";
 
                     DLString line = dlprintf("%5d {C%3d{x {y%-10s{x {y%-10s{x %-20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
                                     pObj->vnum,

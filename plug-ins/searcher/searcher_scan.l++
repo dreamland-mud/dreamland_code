@@ -9,6 +9,9 @@
  * ruffina, 2019
  */
 #include "logstream.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 #include "searcher_val.h"    
 #include "searcher_parse.h++"
 #include "pcharacter.h"
@@ -85,6 +88,7 @@ L	    ([A-Za-z_]|{RL})
 "WCLASS"    return T_WCLASS;
 "WFLAGS"    return T_WFLAGS;
 "AVE"       return T_AVE;
+"FENIA"     return T_FENIA;
 
 
 "<="	    return T_LEQ;
@@ -174,6 +178,15 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         p.wclass = weapon_class.name( pObj->value[0] );
         p.wflags = weapon_type2.names( pObj->value[4] );
         p.ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
+    }
+
+    WrapperBase *base = get_wrapper(pObj->wrapper);
+    if (base) {
+        StringSet feniaTriggers, feniaMisc;
+        base->collectTriggers(feniaTriggers, feniaMisc);
+        p.fenia = feniaTriggers.toString();
+    } else {
+        p.fenia = "";
     }
 
     if (searcher_yyparse( ) != 0) {

@@ -32,6 +32,7 @@ struct SearcherParam {
     DLString aff, vuln, res, imm, det;
     DLString wclass, wflags;
     int ave;
+    DLString fenia;
     bool result;
 };
 extern SearcherParam p;
