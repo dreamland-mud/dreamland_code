@@ -39,7 +39,8 @@ NPCharacter::NPCharacter( ) :
                 description( 0 ),
                 short_descr( 0 ),
                 long_descr( 0 ),
-                behavior( MobileBehavior::NODE_NAME )
+                behavior( MobileBehavior::NODE_NAME ),
+                reset_room(0)
 {
     init( );
 }
@@ -77,6 +78,7 @@ void NPCharacter::init( )
     profession.assign( prof_none );
     spec_fun.clear( );
     behavior.clear( );
+    reset_room = 0;
     switchedFrom = 0;
 }
 

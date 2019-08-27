@@ -48,7 +48,8 @@ Object::Object( ) :
                 from( &str_empty[0] ),
                 extracted( 0 ), water_float( 0 ),
                 killer( &str_empty[0] ), count( 0 ),
-                behavior( ObjectBehavior::NODE_NAME )
+                behavior( ObjectBehavior::NODE_NAME ),
+                reset_obj(0), reset_mob(0), reset_room(0)
 {
         for( int i = 0; i < 5; i++ ) value[i] = 0;
 }
@@ -116,6 +117,9 @@ void Object::extract( )
 
         wrapper = 0;
         behavior.clear( );
+        reset_obj = 0;
+        reset_mob = 0;
+        reset_room = 0;
         ID = 0;
         
         for( int i = 0; i < 5; i++ ) value[i] = 0;

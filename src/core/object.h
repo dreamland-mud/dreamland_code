@@ -89,6 +89,13 @@ public:
     Properties           properties;
     XMLPersistentStreamable<ObjectBehavior> behavior;
 
+    /** ID of a container where this item was reset. */
+    long long reset_obj;
+    /** ID of a mobile in whose inventory this item was reset. */
+    long long reset_mob;
+    /** Room VNUM where this item was reset on the floor. */
+    int reset_room;
+
 
     // member funcions.
 

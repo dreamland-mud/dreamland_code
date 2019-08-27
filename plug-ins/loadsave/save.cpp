@@ -120,6 +120,13 @@ WEARLOC(none);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool limit_check_on_load( Object *obj );
 
+static DLString id_to_string(long long id)
+{
+    ostringstream os;
+    os << id;
+    return os.str();
+}
+
 static void convert_skill( int &sn )
 {
     if (sn == gsn_dispel_magic)
@@ -440,10 +447,7 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
         if (pet->in_room && pet->master && pet->master->in_room != pet->in_room)
             fprintf(fp,"Room %d\n", pet->in_room->vnum);
             
-        ostringstream os;
-        os << pet->getID( );
-
-        fprintf( fp, "Id   %s\n", os.str( ).c_str( ) );
+        fprintf( fp, "Id   %s\n", id_to_string(pet->getID()).c_str() );
 #if 0        
         fprintf(fp,"LogO "TIME_T_PRINTF"\n", dreamland->getCurrentTime( ) );
 #endif        
@@ -550,15 +554,14 @@ void fwrite_mob( NPCharacter *mob, FILE *fp)
 
         fprintf(fp,"Name %s~\n", mob->getNameP( ) );
 
-        ostringstream os;
-        os << mob->getID( );
-
-        fprintf( fp, "Id   %s\n", os.str( ).c_str( ) );
+        fprintf( fp, "Id   %s\n", id_to_string(mob->getID()).c_str() );
         
         fprintf( fp, "Room %d\n", mob->in_room->vnum );
 
         if ( mob->zone )
                 fprintf( fp, "RZone %s~\n", mob->zone->area_file->file_name );
+        if (mob->reset_room != 0)
+            fprintf(fp, "RRoom %d\n", mob->reset_room); 
 
         if (mob->getRealShortDescr( ))
             fprintf(fp,"ShD  %s~\n", mob->getShortDescr( ));
@@ -730,15 +733,18 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 fprintf( fp, "Vnum %d\n",           obj->pIndexData->vnum                );
                 
                 if (obj->timestamp > 0) {
-                    ostringstream ts;
-                    ts << obj->timestamp;
-                    fprintf( fp, "TS %s\n", ts.str( ).c_str( ) );
+                    fprintf( fp, "TS %s\n", id_to_string(obj->timestamp).c_str() );
                 }
 
-                ostringstream os;
-                os << obj->getID( );
-                fprintf( fp, "Id   %s\n", os.str( ).c_str( ) );
-        
+                fprintf( fp, "Id   %s\n", id_to_string(obj->getID()).c_str() );
+
+                if (obj->reset_room != 0)
+                    fprintf(fp, "RRoom %d\n", obj->reset_room);
+                if (obj->reset_mob != 0)
+                    fprintf(fp, "RMob %s\n", id_to_string(obj->reset_mob).c_str());
+                if (obj->reset_obj != 0)
+                    fprintf(fp, "RObj %s\n", id_to_string(obj->reset_obj).c_str());
+
                 fprintf( fp, "Cond %d\n",                obj->condition                        );
 
                 if (obj->enchanted)
@@ -1727,6 +1733,8 @@ NPCharacter * fread_mob( FILE *fp )
                                             break;
                                     }
                     }
+
+                    KEY("RRoom", mob->reset_room, fread_number(fp));
                     break;
     
             case 'S' :
@@ -2089,6 +2097,12 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             
             case 'Q':
                     KEY( "Quality",        obj->condition,                fread_number( fp ) );
+                    break;
+
+            case 'R':
+                    KEY( "RRoom",         obj->reset_room,        fread_number( fp ) );
+                    KEY( "RMob",          obj->reset_mob,         fread_number64( fp ) );
+                    KEY( "RObj",          obj->reset_obj,         fread_number64( fp ) );
                     break;
 
             case 'S':

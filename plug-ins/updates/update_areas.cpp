@@ -182,6 +182,7 @@ void reset_room(Room *pRoom)
 
             /* set area */
             mob->zone = pRoom->area;
+            mob->reset_room = pRoom->vnum;
 
             char_to_room( mob, pRoom );
             changedMob = true;
@@ -212,6 +213,7 @@ void reset_room(Room *pRoom)
 
             obj = create_object( pObjIndex, min(number_fuzzy(level), LEVEL_HERO - 1) );
             obj->cost = 0;
+            obj->reset_room = pRoom->vnum;
             obj_to_room( obj, pRoom );
             changedObj = true;
             last = true;
@@ -259,6 +261,7 @@ void reset_room(Room *pRoom)
             while (count < pReset->arg4)
             {
                 obj = create_object( pObjIndex, number_fuzzy(obj_to->level) );
+                obj->reset_obj = obj_to->getID();
                 obj_to_obj( obj, obj_to );
                 changedObj = true;
                 count++;
@@ -294,14 +297,16 @@ void reset_room(Room *pRoom)
             if (mob->behavior && IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
             {
                 obj = create_object( pObjIndex, level );
+                obj->reset_mob = mob->getID();
 
                 if (pReset->command == 'G')
                     SET_BIT( obj->extra_flags, ITEM_INVENTORY );
             }
             else if ( ( pObjIndex->limit == -1 )
-                || ( pObjIndex->count < pObjIndex->limit ) )
+                || ( pObjIndex->count < pObjIndex->limit ) ) {
                 obj=create_object(pObjIndex,min(number_fuzzy(level), LEVEL_HERO - 1) );
-            else
+                obj->reset_mob = mob->getID();
+            } else
                 break;
 
 
