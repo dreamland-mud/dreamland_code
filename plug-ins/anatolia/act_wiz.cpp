@@ -306,17 +306,27 @@ char arg[MAX_STRING_LENGTH];
    return;
 }
 
+struct limit_info {
+    DLString description;
+    int level;
+    int vnum;
+    int limit;
+    int count;
+    int inGame;
+};
+static bool limit_compare(const limit_info &a, const limit_info &b)
+{
+    return a.level < b.level;
+}
+
 CMDWIZP( limited )
 {
-        Object *obj;
-        int        lCount = 0;
-        int        ingameCount;
-        char  buf[1000];
-        int         nMatch;
-        ostringstream report;
+        int nMatch;
 
         if ( argument[0] != '\0' )
         {
+                char buf[1000];
+                int ingameCount;
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
@@ -337,7 +347,7 @@ CMDWIZP( limited )
                 buf[0] = Char::upper( buf[0] );
                 ch->send_to(buf);
                 ingameCount = 0;
-                for ( obj=object_list; obj != 0; obj=obj->next )
+                for (Object* obj=object_list; obj != 0; obj=obj->next )
                         if ( obj->pIndexData->vnum == obj_index->vnum )
                         {
                                 ingameCount++;
@@ -359,6 +369,7 @@ CMDWIZP( limited )
                 return;
         }
 
+        list<limit_info> limits;
         nMatch = 0;
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *obj_index = obj_index_hash[i]; obj_index; obj_index = obj_index->next) {
@@ -370,21 +381,28 @@ CMDWIZP( limited )
                             if ( obj->pIndexData->vnum == obj_index->vnum )
                                 inGame++;
 
-                    lCount++;
-                    ch->pecho( "%-36^N1 [%5d]  Limit: %3d  Current: %3d In Game: %3d",
-                            obj_index->short_descr,
-                            obj_index->vnum,
-                            obj_index->limit,
-                            obj_index->count,
-                            inGame );
-
-                    report << obj_index->vnum << " ";
+                    struct limit_info info;
+                    info.description = obj_index->short_descr;
+                    info.level = obj_index->level;
+                    info.vnum = obj_index->vnum;
+                    info.limit = obj_index->limit;
+                    info.count = obj_index->count;
+                    info.inGame = inGame;
+                    limits.push_back(info);
                 }
         }
-        sprintf( buf, "\n\r%d of %d objects are limited.\n\r", lCount, nMatch );
-        ch->send_to(buf);
-        ch->println(report.str( ));
-        return;
+
+        limits.sort(limit_compare);
+        for (list<limit_info>::const_iterator l = limits.begin(); l != limits.end(); l++)
+            ch->pecho( "[%3d] %-33^N1 [%5d]  Limit: %3d  Current: %3d In Game: %3d",
+                    l->level,
+                    l->description.c_str(),
+                    l->vnum,
+                    l->limit,
+                    l->count,
+                    l->inGame );
+        
+        ch->printf( "\n\r%d of %d objects are limited.\n\r", limits.size(), nMatch );
 }
 
 CMDWIZP( wiznet )
