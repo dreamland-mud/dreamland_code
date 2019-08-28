@@ -80,6 +80,128 @@ static Object * get_obj_here_vnum( Room *room, int vnum )
     return NULL;
 }
 
+static RESET_DATA * find_mob_reset(Room *pRoom, NPCharacter *mob)
+{
+    RESET_DATA *pReset;
+    for (pReset = pRoom->reset_first; pReset != 0; pReset = pReset->next)
+        if (pReset->command == 'M' && pReset->arg1 == mob->pIndexData->vnum)
+            return pReset;
+
+    return 0;
+}
+
+/** Create an item for inventory or equipment for a given mob, based on reset data. */
+static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob)
+{
+    Object *obj = NULL;
+
+    // Obj limit reached, do nothing.
+    if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit) 
+        return obj;
+    
+    obj = create_object(pObjIndex, 0);
+    obj->reset_mob = mob->getID();
+
+    // Mark shop items with 'inventory' flag.
+    if (mob->behavior && IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
+    {
+        if (pReset->command == 'G')
+            SET_BIT( obj->extra_flags, ITEM_INVENTORY );
+    }
+
+    // Give and equip, if the slot is empty.
+    obj_to_char( obj, mob );
+
+    if (pReset->command == 'E') {
+        Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
+        if (wloc && wloc->find(mob) == 0)
+            wloc->equip( obj );
+    }
+
+    return obj;
+}
+
+/** Recreate an item on a mob based on reset data, if it doesn't exist yet. */
+static bool reset_mob_item(RESET_DATA *myReset, NPCharacter *mob)
+{
+    OBJ_INDEX_DATA *pObjIndex = get_obj_index(myReset->arg1);
+    if (!pObjIndex)
+        return false;
+
+    Object *self = get_obj_list_vnum(mob->carrying, pObjIndex->vnum);
+    if (self) // TODO handle 'P' resets inside 'E'/'G' resets
+        return false;
+
+    Object *newItem = create_item_for_mob(myReset, pObjIndex, mob);
+    if (newItem) {
+        wiznet(WIZ_RESETS, 0, 0, "Created [%d] %s for mob %s in [%d].", 
+               pObjIndex->vnum, newItem->getShortDescr('1').c_str(), 
+               mob->getNameP('1').c_str(), mob->in_room->vnum);
+        return true;
+    }
+
+    return false;
+}
+
+/** Recreate inventory and equipment for a mob, if an item has been
+  * requested or stolen from it.
+  */
+static bool reset_one_mob(NPCharacter *mob)
+{
+    // Find room where this mob was created and corresponding reset for it.
+    // Reset may not be exact, p.ex. when several guards are reset in the same room with different equipment.
+    // Such situations should be avoided in general, by creating different vnums for guards.
+    Room *home = get_room_index(mob->reset_room);
+    if (!home)
+        return false;
+
+    RESET_DATA *myReset = find_mob_reset(home, mob);
+    if (!myReset)
+        return false;
+   
+    // Update all inventory and equipment on the existing mob. 
+    RESET_DATA *pReset;
+    bool changed = false;
+    for (pReset = myReset->next; pReset; pReset = pReset->next)
+        switch (pReset->command) {
+        case 'E':
+        case 'G':
+            if (reset_mob_item(pReset, mob)) 
+                changed = true;
+            break;
+
+        default:
+            return changed;
+        }
+        
+        
+    return changed; 
+}
+
+/** Recreate inventory and equipment for all NPC in the room. */
+static bool reset_room_mobs(Room *pRoom)
+{
+    bool changed = false;
+
+    for (Character *rch = pRoom->people; rch; rch = rch->next_in_room) {
+        if (!rch->is_npc())
+            continue;
+        if (IS_AFFECTED(rch, AFF_CHARM))
+            continue;
+
+        NPCharacter *mob = rch->getNPC();
+        if (mob->reset_room == 0)
+            continue;
+        if (mob->zone != 0 && mob->in_room->area != mob->zone)
+            continue;
+
+        if (reset_one_mob(mob))
+            changed = true;
+    }
+
+    return changed;
+}
+
 void reset_room(Room *pRoom)
 {
     RESET_DATA *pReset;
@@ -130,6 +252,10 @@ void reset_room(Room *pRoom)
 
     dreamland->removeOption( DL_SAVE_OBJS );
     dreamland->removeOption( DL_SAVE_MOBS );
+
+    // Update existing mobs before creating new ones.
+    if (reset_room_mobs(pRoom))
+        changedMob = true;
 
     for ( pReset = pRoom->reset_first; pReset != 0; pReset = pReset->next )
     {
@@ -294,27 +420,11 @@ void reset_room(Room *pRoom)
                 break;
             }
 
-            if (mob->behavior && IS_SET(mob->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
-            {
-                obj = create_object( pObjIndex, level );
-                obj->reset_mob = mob->getID();
-
-                if (pReset->command == 'G')
-                    SET_BIT( obj->extra_flags, ITEM_INVENTORY );
-            }
-            else if ( ( pObjIndex->limit == -1 )
-                || ( pObjIndex->count < pObjIndex->limit ) ) {
-                obj=create_object(pObjIndex,min(number_fuzzy(level), LEVEL_HERO - 1) );
-                obj->reset_mob = mob->getID();
-            } else
+            obj = create_item_for_mob(pReset, pObjIndex, mob);
+            if (!obj)
                 break;
 
-
-            obj_to_char( obj, mob );
             changedMob = true;
-
-            if ( pReset->command == 'E' )
-                wearlocationManager->find( pReset->arg3 )->equip( obj );
             last = true;
             break;
 
