@@ -276,6 +276,8 @@ static bool can_take_obj( Character *ch, Object *obj )
         return false;
     if (obj->isAntiAligned( ch ))
         return false;
+    if (obj->pIndexData->limit > 0)
+        return false;
     return true;
 }
 
