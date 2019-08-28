@@ -152,6 +152,9 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     if ( IS_AFFECTED(ch,AFF_HASTE) )
         gain /= 2 ;
 
+    if (IS_AFFECTED(ch, AFF_SLOW))
+        gain *= 2 ;
+
     if ( IS_HARA_KIRI(ch) )
         gain *= 3;
     
@@ -238,6 +241,9 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     if ( IS_AFFECTED(ch,AFF_HASTE) )
         gain /= 2 ;
     
+    if (IS_AFFECTED(ch, AFF_SLOW))
+        gain *= 2 ;
+
     if (ch->isAffected( gsn_magic_concentrate ))
         gain /= 2;
 

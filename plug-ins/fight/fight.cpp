@@ -232,6 +232,9 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
 bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
 {
     int chance = skill.getEffective( ch ) / coef;
+
+    if (IS_AFFECTED(ch, AFF_SLOW))
+        chance = chance * 3 / 4;
     
     if (number_percent( ) < chance) {
         one_hit_nocatch( ch, victim );
