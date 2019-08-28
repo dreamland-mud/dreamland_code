@@ -64,7 +64,7 @@ public:
     }
     virtual void after( )
     {
-        DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_HOUR, Pointer( this ) );    
+        DLScheduler::getThis( )->putTaskInSecond( Date::SECOND_IN_MINUTE, Pointer( this ) );    
     }
     virtual int getPriority( ) const
     {

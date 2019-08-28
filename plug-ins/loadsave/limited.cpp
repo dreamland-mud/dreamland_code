@@ -13,6 +13,7 @@
 #include "fread_utils.h"
 #include "dreamland.h"
 #include "act.h"
+#include "save.h"
 #include "loadsave.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -80,6 +81,26 @@ bool limit_check_on_load( Object *obj )
     return true;
 }
 
+// Speed up decay unless carried by PC. Every minute spent on the ground counts as minus 1 day.
+void limit_ground_decay(Object *obj)
+{
+    if (obj->pIndexData->limit < 0)
+        return;
+
+    if (obj->timestamp <= 0) 
+        return;
+
+    if (obj->carried_by && !obj->carried_by->is_npc())
+        return;
+    
+    obj->timestamp -= 60 * 60 * 24;
+
+    if (obj->in_room)
+        obj->in_room->echo(POS_RESTING, "%1$^O1 неумолимо истонча%1$nется|ются.", obj);
+
+    save_items_at_holder(obj);
+}
+
 // Destroy expired limited objects when room or player is saved.
 bool limit_check_on_save( Object *obj )
 {
@@ -96,9 +117,8 @@ bool limit_check_on_save( Object *obj )
         where = "none";
 
     // Limited item but not marked (yet).
-    if (obj->timestamp <= 0) {
+    if (obj->timestamp <= 0) 
         return false;
-    }
 
     // Still has time to live.
     if (obj->timestamp > dreamland->getCurrentTime( ))
@@ -142,7 +162,8 @@ void limit_purge( )
 
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
-        limit_check_on_save( obj );
+        limit_ground_decay(obj);
+        limit_check_on_save(obj);
     }
 }
 
