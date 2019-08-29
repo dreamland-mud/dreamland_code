@@ -81,14 +81,57 @@ bool limit_check_on_load( Object *obj )
     return true;
 }
 
+// Return true if item is in its original reset place. Old items without reset_room etc fields
+// are going to be destroyed, but only once.
+static bool item_is_home(Object *obj)
+{
+    if (obj->in_room)
+        return obj->reset_room == obj->in_room->vnum;
+
+    if (obj->in_obj)
+        return obj->reset_obj == obj->in_obj->getID();
+
+    if (obj->carried_by && obj->carried_by->is_npc())
+        return obj->reset_mob == obj->carried_by->getID();
+
+    return false;
+}
+
+// Set up timestamp when a limited items gets into PC hands for the first time.
+void limit_timestamp( Object *obj, Character *ch )
+{
+    if (obj->pIndexData->limit < 0)
+        return;
+
+    if (obj->timestamp > 0) 
+        return;
+    
+    if (ch && ch->is_npc( ) && !(IS_AFFECTED( ch, AFF_CHARM ) && ch->master))
+        return;
+
+    // Two weeks from now.
+    obj->timestamp = dreamland->getCurrentTime( ) + 2 * Date::SECOND_IN_WEEK; 
+    LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum << " (" << obj->getID( ) << ") "
+                             << "timestamped " << obj->timestamp << endl;
+}
+
 // Speed up decay unless carried by PC. Every minute spent on the ground counts as minus 1 day.
 void limit_ground_decay(Object *obj)
 {
     if (obj->pIndexData->limit < 0)
         return;
 
-    if (obj->timestamp <= 0) 
+    // Check limited items  without a timer.
+    // Example: spec_fido mob destroys a coprse, limited item falls on the ground.
+    // Example: object becomes a limit after OLC changes.
+    if (obj->timestamp <= 0) {
+        if (item_is_home(obj))
+            return;
+
+        limit_timestamp(obj, 0);
+        save_items_at_holder(obj);
         return;
+    }
 
     if (obj->carried_by && !obj->carried_by->is_npc())
         return;
@@ -135,24 +178,6 @@ bool limit_check_on_save( Object *obj )
         << ", " << (fCount ? "count":"nocount") << endl;
     extract_obj_1( obj, fCount );
     return true;
-}
-
-// Set up timestamp when a limited items gets into PC hands for the first time.
-void limit_timestamp( Object *obj, Character *ch )
-{
-    if (obj->pIndexData->limit < 0)
-        return;
-
-    if (obj->timestamp > 0) 
-        return;
-    
-    if (ch->is_npc( ) && !(IS_AFFECTED( ch, AFF_CHARM ) && ch->master))
-        return;
-
-    // Two weeks from now.
-    obj->timestamp = dreamland->getCurrentTime( ) + 2 * Date::SECOND_IN_WEEK; 
-    LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum << " (" << obj->getID( ) << ") "
-                             << "timestamped " << obj->timestamp << " for " << ch->getName( ) << endl;
 }
 
 
