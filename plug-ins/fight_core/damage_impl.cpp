@@ -83,13 +83,13 @@ void SkillDamage::message( )
 
     if (immune) {
         if (ch == victim) {
-            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна против %2$P4 сам%2$Gого|ого|ой|их", &attack, ch);
+            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна|ьны против %2$P4 сам%2$Gого|ого|ой|их", &attack, ch);
             msgChar("Тебе повезло, у тебя иммунитет к этому");
         }
         else {
-            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна против %3$C2", &attack, ch, victim);
-            msgChar("%1$^T1 %1$O1 бессил%1$Gьно|ен|ьна против %2$C2", &attack, victim);
-            msgVict("Против тебя %2$O1 %1$C2 бессил%2$Gьно|ен|ьна", ch, &attack);
+            msgRoom("%1$^O1 %2$C2 бессил%1$Gьно|ен|ьна|ьны против %3$C2", &attack, ch, victim);
+            msgChar("%1$^T1 %1$O1 бессил%1$Gьно|ен|ьна|ьны против %2$C2", &attack, victim);
+            msgVict("Против тебя %2$O1 %1$C2 бессил%2$Gьно|ен|ьна|ьны", ch, &attack);
         }
     }
     else {
