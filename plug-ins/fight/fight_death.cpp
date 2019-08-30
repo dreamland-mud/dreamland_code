@@ -57,11 +57,18 @@ enum {
 
 static void loot_transform( Object *obj, Character *ch )
 {
-    if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH))
-        obj->timer = number_range( 5, 10 );
+    // ROT_DEATH flag is only effective when the second owner dies (i.e. not the original mob that was reset with this item). 
+    if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH)) {
+        if (ch->is_npc() && obj->reset_mob == ch->getID()) {
+            // Do nothing, this was the original owner.
+        } else {
+            // Sic transit
+            obj->timer = number_range( 5, 10 );
+            REMOVE_BIT(obj->extra_flags, ITEM_ROT_DEATH);
+        }
+    }
 
     REMOVE_BIT(obj->extra_flags, ITEM_VIS_DEATH);
-    REMOVE_BIT(obj->extra_flags, ITEM_ROT_DEATH);
 
     switch (obj->item_type) {
     case ITEM_POTION:
