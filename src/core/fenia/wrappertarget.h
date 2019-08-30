@@ -54,6 +54,15 @@ public:
             if (!rc.empty()) return rc; \
         }
 
+#define BASE_NUM_CALL( base, id, result, fmt...) \
+        if (base) { \
+            bool rc; \
+            static Scripting::IdRef onId( "on" id ); \
+            rc = base->numberCall( onId, result, fmt ); \
+            \
+            if (rc) return rc; \
+        }
+
 #define FENIA_CALL( var, id, fmt...) \
         if (var) { \
             WrapperBase *base = var->getWrapper( ); \
@@ -88,6 +97,18 @@ public:
         if (var && var->pIndexData) { \
             WrapperBase *base = get_wrapper( var->pIndexData->wrapper ); \
             BASE_STR_CALL(base, id, fmt); \
+        }
+
+#define FENIA_NUM_CALL( var, id, result, fmt...) \
+        if (var) { \
+            WrapperBase *base = var->getWrapper( ); \
+            BASE_NUM_CALL(base, id, result, fmt); \
+        }
+
+#define FENIA_NDX_NUM_CALL( var, id, result, fmt...) \
+        if (var && var->pIndexData) { \
+            WrapperBase *base = get_wrapper( var->pIndexData->wrapper ); \
+            BASE_NUM_CALL(base, id, result, fmt); \
         }
 
 #define FENIA_NDX_HAS_TRIGGER( var, id ) \

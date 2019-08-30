@@ -36,11 +36,11 @@ GSN(charm_person);
 PROF(none);
 
 NPCharacter::NPCharacter( ) :
+                reset_room(0),
                 description( 0 ),
                 short_descr( 0 ),
                 long_descr( 0 ),
-                behavior( MobileBehavior::NODE_NAME ),
-                reset_room(0)
+                behavior( MobileBehavior::NODE_NAME )
 {
     init( );
 }

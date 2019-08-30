@@ -198,6 +198,25 @@ void WrapperBase::croak(const Register &key, const Exception &e) const
     }
 }
 
+bool WrapperBase::numberCall( Register id, int &result, const char *fmt, ... )
+{
+    Register rc;
+    bool success;
+    va_list ap;
+    
+    va_start(ap, fmt);
+    
+    success = vcall(rc, id, fmt, ap);
+
+    va_end(ap);
+
+    if (!success || rc.type != Register::NUMBER)  
+        return false;
+       
+    result = rc.toNumber(); 
+    return true;
+}
+
 DLString
 WrapperBase::stringCall( Register id, const char *fmt, ... )
 {

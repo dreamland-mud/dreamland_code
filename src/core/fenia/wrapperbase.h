@@ -41,6 +41,7 @@ public:
     bool call( Register id, const char *fmt, ... );
     void postpone( Register id, const char *fmt, ... );
     DLString stringCall( Register id, const char *fmt, ... );
+    bool numberCall( Register id, int &result, const char *fmt, ... );
     bool hasTrigger( const DLString &name ) const;
     void collectTriggers(StringSet &triggers, StringSet &misc) const;
 
