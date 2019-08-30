@@ -88,7 +88,7 @@ bool Walkment::moveAtomic( )
 
 bool Walkment::canLeaveMaster( Character *wch )
 {
-    if (!IS_AFFECTED(wch, AFF_CHARM))
+    if (!IS_CHARMED(wch))
         return true;
     
     if (wch->master == 0)
@@ -449,7 +449,7 @@ bool Walkment::checkLawzone( Character *wch )
     if (!wch->is_npc( ) || !IS_SET(wch->act, ACT_AGGRESSIVE))
         return true;
     
-    if (!(wch->master && IS_AFFECTED( wch, AFF_CHARM )))
+    if (!IS_CHARMED(wch))
         return true;
     
     rc = RC_MOVE_LAWZONE;

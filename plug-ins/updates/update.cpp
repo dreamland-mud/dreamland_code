@@ -154,7 +154,7 @@ void room_to_save( Room * room )
 
 void room_to_save( Character *ch )
 {
-    if (ch->is_npc( ) && !IS_AFFECTED(ch, AFF_CHARM))
+    if (ch->is_npc( ) && !IS_CHARMED(ch))
         room_to_save( ch->in_room );
 }
 
@@ -225,7 +225,7 @@ static bool mprog_special( Character *ch )
     FENIA_NDX_CALL( ch->getNPC( ), "Spec", "C", ch );
     BEHAVIOR_CALL( ch->getNPC( ), spec );
     
-    if (ch->is_npc( ) && !IS_AFFECTED(ch, AFF_CHARM)) {
+    if (ch->is_npc( ) && !IS_CHARMED(ch)) {
         if (*(ch->getNPC( )->spec_fun) != 0 
             && (*(ch->getNPC( )->spec_fun))( ch->getNPC( ) ))
             return true;

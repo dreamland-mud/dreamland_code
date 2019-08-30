@@ -190,7 +190,7 @@ bool Command::dispatch( const InterpretArguments &iargs )
 {
     Character *ch = iargs.ch;
 
-    if (IS_AFFECTED(ch, AFF_CHARM) 
+    if (IS_CHARMED(ch) 
         && !(ch->is_npc( ) && ch->getNPC( )->switchedFrom)) 
     {
         ch->pecho( "Сперва спроси разрешения у любим%1$Gого|ого|ой хозя%1$Gина|ина|йки!" , ch->master );

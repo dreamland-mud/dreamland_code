@@ -207,7 +207,7 @@ void SpeechChannel::triggers( Character *ch, const DLString &msg ) const
     Object *obj, *obj_next;
     const char *cmsg = msg.c_str( );
     
-    if (!ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
+    if (!ch->is_npc( ) || IS_CHARMED(ch))
         RoomChannel::triggers( ch, msg );
 
     for (rch = ch->in_room->people; rch != 0; rch = rch->next_in_room) {
@@ -237,7 +237,7 @@ EmoteChannel::EmoteChannel( )
 
 void EmoteChannel::triggers( Character *ch, const DLString &txt ) const
 {
-    if (!ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
+    if (!ch->is_npc( ) || IS_CHARMED(ch))
         RoomChannel::triggers( ch, txt );
 
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {

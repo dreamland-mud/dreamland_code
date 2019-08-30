@@ -294,7 +294,7 @@ void Movement::msgSelfMaster( Character *wch, const char *msgSelf, const char *m
 {
     msgEcho( wch, wch, msgSelf );
     
-    if (IS_AFFECTED( wch, AFF_CHARM ) && wch->master)
+    if (IS_CHARMED(wch))
         msgEcho( wch->master, wch, msgMaster );
 }
 
@@ -322,7 +322,7 @@ void Movement::msgEcho( Character *victim, Character *wch, const char *msg )
 
 bool Movement::canOrderHorse( )
 {
-    if (IS_AFFECTED(horse, AFF_CHARM)) 
+    if (IS_CHARMED(horse)) 
         return !horse->master || horse->master == ch;
     else
         return horse->is_npc( );

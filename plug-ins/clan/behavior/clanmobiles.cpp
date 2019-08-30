@@ -78,7 +78,7 @@ bool ClanHealer::specIdle( )
             continue;
         if (!ch->can_see( rch ))
             continue;
-        if (rch->is_npc( ) && !IS_AFFECTED(rch, AFF_CHARM))
+        if (rch->is_npc( ) && !IS_CHARMED(rch))
             continue;
 
         if (!rch->is_npc( )) {

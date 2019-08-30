@@ -358,7 +358,7 @@ bool NecroCreature::specIdle( )
     if (SummonedCreature::specIdle( ))
         return true;
     
-    if (!IS_AFFECTED(ch, AFF_CHARM)
+    if (!IS_CHARMED(ch)
         || !ch->master
         || ch->master->getID( ) != masterID
         || !masterRoomVnum)
@@ -390,7 +390,7 @@ VOID_SPELL(CallCorpseRenameMePlease)::run( Character *ch, char *, int sn, int le
     
     for (Character *wch = char_list; wch; wch = wch->next)
         if (wch->is_npc( )
-             && IS_AFFECTED(wch, AFF_CHARM)
+             && IS_CHARMED(wch)
              && wch->master == ch
              && wch->in_room != ch->in_room
              && wch->behavior)

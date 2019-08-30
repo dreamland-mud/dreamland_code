@@ -112,7 +112,7 @@ int BasicMobileBehavior::getOccupation( )
 
 Character * BasicMobileBehavior::getMaster( Character *wch )
 {
-    if (IS_AFFECTED(wch, AFF_CHARM) && wch->master && wch->master != wch)
+    if (IS_CHARMED(wch) && wch->master != wch)
         return getMaster( wch->master );
     else
         return wch;
@@ -182,7 +182,7 @@ bool BasicMobileBehavior::isAdrenalined( ) const
  */
 bool BasicMobileBehavior::isAfterCharm( ) const
 {
-    if (IS_AFFECTED( ch, AFF_CHARM ))
+    if (IS_CHARMED(ch))
         return true;
 
     if (RIDDEN( ch ))
@@ -250,7 +250,7 @@ bool BasicMobileBehavior::isHomesick( )
     if (ch->fighting || hasLastFought( ))
         return false;
     
-    if (IS_AFFECTED(ch, AFF_CHARM) || RIDDEN(ch))
+    if (IS_CHARMED(ch) || RIDDEN(ch))
         return false;
 
     if (ch->getWrapper( ))
@@ -281,11 +281,11 @@ bool BasicMobileBehavior::spell( Character *caster, int sn, bool before )
             return false;
 
         if (before) {
-            beforeSpell = !(IS_AFFECTED(ch, AFF_CHARM));
+            beforeSpell = !(IS_CHARMED(ch));
             return false;
         }
         
-        if (!beforeSpell || !IS_AFFECTED(ch, AFF_CHARM))
+        if (!beforeSpell || !IS_CHARMED(ch))
             return false;
 
         if (number_percent( ) < (4 + ch->getModifyLevel( ) 
@@ -364,7 +364,7 @@ bool BasicMobileBehavior::extractNotify( Character *wch, bool fTotal, bool fCoun
 bool BasicMobileBehavior::canCancel( Character *caster )
 {
     return !caster->is_npc( )
-            && IS_AFFECTED(ch, AFF_CHARM)
+            && IS_CHARMED(ch)
             && ch->master == caster;
 }
 

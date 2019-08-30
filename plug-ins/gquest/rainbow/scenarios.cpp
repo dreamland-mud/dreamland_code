@@ -48,7 +48,7 @@ bool RainbowScenario::checkMobile( NPCharacter *ch ) const
         return false;
     if ((ch->behavior && ch->behavior->hasDestiny( )) || ch->fighting)
         return false;
-    if (IS_AFFECTED(ch, AFF_CHARM)) 
+    if (IS_CHARMED(ch)) 
         return false;
     if (IS_SET(ch->act, ACT_AGGRESSIVE))
         return false;

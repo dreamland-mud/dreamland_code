@@ -10,6 +10,7 @@
 #include "pcharacter.h"
 
 #include "dreamland.h"
+#include "loadsave.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
@@ -37,7 +38,7 @@ bool CustomSocialManager::process( InterpretArguments &iargs )
     XMLAttributeCustomSocials::Pointer mysocials;
 
     if (iargs.ch->is_npc( )) {
-        if (IS_AFFECTED(iargs.ch, AFF_CHARM) && iargs.ch->master) {
+        if (IS_CHARMED(iargs.ch)) {
             Character *orig = iargs.ch;
 
             iargs.ch = iargs.ch->master;

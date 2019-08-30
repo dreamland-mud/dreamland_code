@@ -75,7 +75,7 @@ void char_from_room( Character *ch )
         }
 
         if ( ch->is_npc( )
-                && !IS_AFFECTED(ch,AFF_CHARM) )
+                && !IS_CHARMED(ch) )
         {
                 save_mobs( ch->in_room );
         }
@@ -152,7 +152,7 @@ void char_to_room( Character *ch, Room *pRoomIndex )
         
 
         if ( ch->is_npc( )
-                && !IS_AFFECTED(ch,AFF_CHARM)  )
+                && !IS_CHARMED(ch)  )
         {
                 save_mobs( pRoomIndex );
         }
@@ -176,7 +176,7 @@ void obj_to_char( Object *obj, Character *ch )
         ch->carry_weight        += obj->getWeight( );
 
         if ( ch->is_npc( )
-                && !IS_AFFECTED( ch, AFF_CHARM )
+                && !IS_CHARMED(ch)
                 && ch->in_room != 0 )
         {
                 save_mobs( ch->in_room );
@@ -228,7 +228,7 @@ void obj_from_char( Object *obj )
         ch->carry_weight        -= obj->getWeight( );
 
         if ( ch->is_npc( )
-                && !IS_AFFECTED( ch, AFF_CHARM )
+                && !IS_CHARMED(ch)
                 && ch->in_room != 0 )
         {
                 save_mobs( ch->in_room );

@@ -117,4 +117,5 @@ bool eyes_darkened( Character *ch );
 #define IS_PIT(obj)        (obj->item_type == ITEM_CONTAINER \
                             && IS_SET(obj->value[1], CONT_PIT))
 
+#define IS_CHARMED(ch)  (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL)
 #endif

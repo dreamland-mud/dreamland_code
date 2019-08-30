@@ -28,7 +28,7 @@ static Character * get_actor( Character *victim )
     if (victim->is_mirror( ) && victim->doppel)
         return get_actor( victim->doppel );
     
-    if (!victim->is_npc( ) && !IS_AFFECTED( victim, AFF_CHARM ))
+    if (!victim->is_npc( ) && !IS_CHARMED(victim))
         return victim;
     
     if (victim->leader && victim->leader != victim)

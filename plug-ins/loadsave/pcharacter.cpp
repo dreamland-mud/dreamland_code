@@ -227,7 +227,7 @@ void PCharacter::save( )
     PCharacterManager::save( this );
 
     for (Character *ch = char_list; ch; ch = ch->next)
-        if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == this && ch->is_npc( ))
+        if (IS_CHARMED(ch) && ch->master == this && ch->is_npc( ))
             if (ch->getNPC( )->behavior)
                 ch->getNPC( )->behavior->save( );
 }

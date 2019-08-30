@@ -154,7 +154,7 @@ void WeaponOneHit::damApplyCounter( )
     if (victim->fighting)
         return;
     
-    if (IS_AFFECTED(victim, AFF_CHARM))
+    if (IS_CHARMED(victim))
         return;
     
     if (victim->is_npc( ) 

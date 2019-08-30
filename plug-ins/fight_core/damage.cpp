@@ -231,8 +231,7 @@ bool Damage::adjustMasterAttack( )
 
     if (ch->is_npc( )
         && victim->is_npc( )
-        && IS_AFFECTED(victim, AFF_CHARM)
-        && victim->master != 0
+        && IS_CHARMED(victim)
         && victim->master->in_room == ch->in_room
         && number_bits( 3 ) == 0)
     {

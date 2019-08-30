@@ -586,7 +586,7 @@ void DefaultSpell::baneDamage( Character *ch, Character *vch, int dam ) const
 
 void DefaultSpell::baneAround( Character *ch, int failChance, int dam ) const
 {
-    if (ch->is_npc( ) && !IS_AFFECTED(ch, AFF_CHARM))
+    if (ch->is_npc( ) && !IS_CHARMED(ch))
         return;
 
     for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {

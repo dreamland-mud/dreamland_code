@@ -11,6 +11,7 @@
 
 #include "dreamland.h"
 #include "descriptor.h"
+#include "loadsave.h"
 #include "ban.h"
 #include "act.h"
 #include "merc.h"
@@ -197,7 +198,7 @@ bool GlobalChannel::checkConfirmed( Character *ch ) const
     if (!confirmed)
         return false;
 
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
+    if (IS_CHARMED(ch))
         return checkConfirmed( ch->master );
 
     if (!ch->is_npc( ) && !IS_SET(ch->act, PLR_CONFIRMED))
@@ -223,7 +224,7 @@ bool GlobalChannel::checkNoChannel( Character *ch ) const
         return true;
     }
 
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master && has_nochannel( ch->master )) {
+    if (IS_CHARMED(ch) && has_nochannel( ch->master )) {
         act("$c1 сдавленно хрипит, не в силах вымолвить ни слова.", ch, 0, 0, TO_ROOM);        
         return true;
     }
@@ -238,7 +239,7 @@ bool GlobalChannel::checkSoap( Character *ch ) const
     if (!soap)
         return false;
 
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
+    if (IS_CHARMED(ch))
         return checkSoap( ch->master );
     
     if (ch->is_npc( ))

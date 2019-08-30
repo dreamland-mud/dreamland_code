@@ -72,7 +72,7 @@ void DefaultWearlocation::unloaded( )
 void DefaultWearlocation::saveDrops( Character *ch )
 {
     if (ch->is_npc( )
-            && !IS_AFFECTED( ch, AFF_CHARM)
+            && !IS_CHARMED(ch)
             && ch->in_room != 0)
     {
         save_mobs( ch->in_room );

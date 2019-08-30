@@ -425,7 +425,7 @@ void save_room_mobiles( Room *room )
 
     for ( ch = room->people; ch; ch = ch->next_in_room )
             if ( ch->is_npc( )
-                    && !IS_AFFECTED(ch,AFF_CHARM)
+                    && !IS_CHARMED(ch)
                     && !ch->isAffected(gsn_doppelganger ) )
             {
                     if ( found )
@@ -456,7 +456,7 @@ void save_mobs_at( Character *ch )
     if (!ch->is_npc())
         return;
 
-    if (IS_AFFECTED( ch, AFF_CHARM ))
+    if (IS_CHARMED(ch))
         return;
             
     if (!ch->in_room)

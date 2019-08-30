@@ -405,7 +405,7 @@ void ItemQuestModel::destroy( Object *obj )
  *--------------------------------------------------------------------*/
 bool MobileQuestModel::checkMobile( PCharacter *pch, NPCharacter *mob )
 {
-    if (IS_AFFECTED( mob, AFF_CHARM ))
+    if (IS_CHARMED(mob))
         return false;
 
     if (mob->behavior 

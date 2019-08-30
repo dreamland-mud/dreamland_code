@@ -319,7 +319,7 @@ SKILL_RUNP( assassinate )
             return;
     }
 
-    if ( IS_AFFECTED( ch, AFF_CHARM ) )
+    if ( IS_CHARMED(ch) )
     {
             ch->pecho( "Ты же не хочешь убить сво%1$Gего|его|ю любим%1$Gого|ого|ю хозя%1$Gина|ина|йку.", ch->master);
             return;
@@ -531,7 +531,7 @@ SKILL_RUNP( throwdown )
                 return;
         }
 
-        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        if (IS_CHARMED(ch) && ch->master == victim)
         {
                 act_p("Но $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
@@ -656,7 +656,7 @@ SKILL_RUNP( strangle )
                 return;
         }
 
-        if ( IS_AFFECTED( ch, AFF_CHARM ) )
+        if ( IS_CHARMED(ch) )
         {
                 ch->pecho("Ты же не хочешь придушить сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
                 return;

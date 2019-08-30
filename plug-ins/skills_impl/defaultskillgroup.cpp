@@ -11,6 +11,7 @@
 #include "skillmanager.h"
 #include "pcharacter.h"
 #include "act.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -64,7 +65,7 @@ bool DefaultSkillGroup::visible( Character *ch ) const
 
 bool DefaultSkillGroup::available( Character *ch ) const
 {
-    if (ch->is_npc( ) && IS_AFFECTED(ch, AFF_CHARM))
+    if (ch->is_npc( ) && IS_CHARMED(ch))
         return !nopet;
 
     return true;

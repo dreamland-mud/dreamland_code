@@ -42,7 +42,7 @@ CMDRUN(altar)
         return;
     }
 
-    if (IS_AFFECTED(ch, AFF_CHARM)) {
+    if (IS_CHARMED(ch)) {
         ch->println("Боги вряд ли оценят такое.");
         return;
     }

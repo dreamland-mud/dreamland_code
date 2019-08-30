@@ -21,7 +21,7 @@ int SummonCreatureSpell::countMobiles( Character *ch ) const
 
     for (wch = char_list, count = 0; wch; wch = wch->next)
         if (wch->is_npc( )
-              && IS_AFFECTED( wch, AFF_CHARM )
+              && IS_CHARMED(wch)
               && wch->master == ch
               && wch->getNPC( )->pIndexData->vnum == mobVnum.getValue( ))
             count++;
@@ -135,7 +135,7 @@ void SummonCreatureSpell::run( Character *ch, Character *victim, int sn, int lev
         return;
     }
     
-    if (IS_AFFECTED( victim, AFF_CHARM )) {
+    if (IS_CHARMED(victim)) {
         ch->pecho( "У %C2 уже есть хозяин.", victim );
         return;
     }

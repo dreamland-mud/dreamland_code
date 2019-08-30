@@ -83,8 +83,8 @@ VOID_SPELL(CharmPerson)::run( Character *ch, Character *victim, int sn, int leve
         }
         
 
-        if ( IS_AFFECTED(victim, AFF_CHARM)
-                || IS_AFFECTED(ch, AFF_CHARM)
+        if ( IS_CHARMED(victim)
+                || IS_CHARMED(ch)
                 || ( ch->getSex( ) == SEX_MALE &&  level < victim->getModifyLevel() )
                 || ( ch->getSex( ) == SEX_FEMALE &&  level < ( victim->getModifyLevel()  ) )
                 || IS_SET(victim->imm_flags,IMM_CHARM)

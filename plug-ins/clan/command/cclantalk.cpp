@@ -23,6 +23,7 @@
 #include "clanreference.h"
 
 #include "dreamland.h"
+#include "loadsave.h"
 #include "gsn_plugin.h"
 #include "descriptor.h"
 #include "mudtags.h"
@@ -62,7 +63,7 @@ static bool check_soap( Character *ch )
 {
     static const DLString soap( "soap" );
     
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
+    if (IS_CHARMED(ch) && ch->master)
         return check_soap(ch->master);
     
     if (ch->is_npc( ))

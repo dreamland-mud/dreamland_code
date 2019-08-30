@@ -111,7 +111,7 @@ bool BasicMobileBehavior::canAssistOffense( Character *fch, Character *victim )
  */
 bool BasicMobileBehavior::assistMaster( Character *fch, Character *victim )
 {
-    if (IS_AFFECTED(ch, AFF_CHARM) && is_same_group( fch, ch )) {
+    if (IS_CHARMED(ch) && is_same_group( fch, ch )) {
         attack( victim );
         return true;
     }

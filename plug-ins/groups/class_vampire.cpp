@@ -176,8 +176,8 @@ SKILL_RUNP( control )
   chance +=
    (ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT)) * 5;
 
- if ( IS_AFFECTED(victim, AFF_CHARM)
-    ||   IS_AFFECTED(ch, AFF_CHARM)
+ if ( IS_CHARMED(victim)
+    ||   IS_CHARMED(ch)
     ||         number_percent() > chance
     ||   ch->getModifyLevel() < ( victim->getModifyLevel() + 2 )
     ||   IS_SET(victim->imm_flags,IMM_CHARM)
@@ -644,7 +644,7 @@ SKILL_RUNP( touch )
         return;
     }
 
-    if ( IS_AFFECTED( ch, AFF_CHARM ) )
+    if ( IS_CHARMED(ch) )
     {
         ch->pecho("Ты же не хочешь высосать сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
         return;

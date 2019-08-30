@@ -79,7 +79,7 @@ COMMAND(CClan, "clan")
     if (!pc)
         return;
     
-    if (IS_AFFECTED( pc, AFF_CHARM )) {
+    if (IS_CHARMED(pc)) {
         if (pc->master)
             pc->master->send_to( "Ничего не выйдет.\r\n" );
 

@@ -24,6 +24,7 @@
 
 #include "merc.h"
 #include "descriptor.h"
+#include "loadsave.h"
 #include "comm.h"
 #include "mercdb.h"
 #include "def.h"
@@ -92,7 +93,7 @@ public:
 
     virtual bool properOrder( Character *ch )
     {
-        if (IS_AFFECTED(ch, AFF_CHARM))
+        if (IS_CHARMED(ch))
             return false;
         else
             return true;

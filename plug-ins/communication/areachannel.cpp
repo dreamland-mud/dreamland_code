@@ -13,6 +13,7 @@
 #include "room.h"
 #include "object.h"
 #include "descriptor.h"
+#include "loadsave.h"
 #include "interp.h"
 #include "act.h"
 #include "merc.h"
@@ -54,7 +55,7 @@ void AreaChannel::triggers( Character *ch, const DLString &msg ) const
         }
     }
 
-    if (!ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
+    if (!ch->is_npc( ) || IS_CHARMED(ch))
         WorldChannel::triggers( ch, msg );
 }
 

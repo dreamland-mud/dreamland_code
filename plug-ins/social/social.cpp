@@ -24,6 +24,7 @@
 #include "lex.h"
 
 #include "dreamland.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "act.h"
 #include "interp.h"
@@ -247,7 +248,7 @@ bool Social::reaction( Character *ch, Character *victim, const DLString &arg )
     if (ch->is_npc( ) || !victim->is_npc( ) || victim->desc)
         return false;
         
-    if (IS_AFFECTED(victim, AFF_CHARM) || !IS_AWAKE(victim))
+    if (IS_CHARMED(victim) || !IS_AWAKE(victim))
         return false;
     
     switch (number_bits( 4 )) {

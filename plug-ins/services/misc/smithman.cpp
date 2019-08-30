@@ -59,7 +59,7 @@ bool Smithman::canServeClient( Character *client )
         return false;
     }
 
-    if (IS_AFFECTED( client, AFF_CHARM )) {
+    if (IS_CHARMED(client)) {
         say_act( client, getKeeper( ), "Не буду я тебя обслуживать, $c1, слишком уж странно ты себя ведешь." );
         return false;
     }

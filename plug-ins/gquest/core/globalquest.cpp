@@ -171,7 +171,7 @@ Character * GlobalQuest::getActor( Character *ch ) const
     if (ch->is_mirror( ) && ch->doppel)
         return getActor( ch->doppel );
     
-    if (!ch->is_npc( ) && !IS_AFFECTED( ch, AFF_CHARM ))
+    if (!ch->is_npc( ) && !IS_CHARMED(ch))
         return ch;
     
     if (ch->leader && ch->leader != ch)

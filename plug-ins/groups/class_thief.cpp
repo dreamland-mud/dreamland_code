@@ -1216,7 +1216,7 @@ SKILL_RUNP( blackjack )
                 return;
         }
 
-        if ( IS_AFFECTED( ch, AFF_CHARM ) )
+        if ( IS_CHARMED(ch) )
         {
                 ch->pecho( "Ты же не хочешь ударить по голове сво%1$Gего|его|ю любим%1$Gого|ого|ую хозя%1$Gина|ина|йку?", ch->master);
                 return;

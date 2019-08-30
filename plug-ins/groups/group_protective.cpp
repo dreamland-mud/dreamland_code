@@ -247,7 +247,7 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
     AffectHandler::Pointer affect;
     bool found = false;
     
-    if (IS_AFFECTED(ch, AFF_CHARM))
+    if (IS_CHARMED(ch))
         return;
 
     if (saves_spell(level, victim,DAM_OTHER, ch, DAMF_SPELL)) {

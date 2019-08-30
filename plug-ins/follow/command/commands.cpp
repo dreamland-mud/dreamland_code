@@ -74,7 +74,7 @@ CMDRUN( follow )
         return;
     }
 
-    if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master != 0 ) {
+    if ( IS_CHARMED(ch)) {
         act_p( "Но тебе хочется следовать за $C5!", ch, 0, ch->master, TO_CHAR,POS_RESTING );
         return;
     }
@@ -170,12 +170,12 @@ CMDRUN( group )
         return;
     }
 
-    if (IS_AFFECTED(victim,AFF_CHARM)) {
+    if (IS_CHARMED(victim)) {
         ch->send_to("Ты не можешь исключить очарованных монстров из своей группы.\n\r");
         return;
     }
 
-    if (IS_AFFECTED(ch,AFF_CHARM)) {
+    if (IS_CHARMED(ch)) {
         act_p("Ты любишь своего мастера так сильно, что не можешь покинуть $s!",ch,0,victim,TO_VICT,POS_RESTING);
         return;
     }
@@ -335,7 +335,7 @@ CMDRUN( split )
     members = 0;
     for ( gch = ch->in_room->people; gch != 0; gch = gch->next_in_room )
     {
-        if ( is_same_group( gch, ch ) && !IS_AFFECTED(gch,AFF_CHARM))
+        if ( is_same_group( gch, ch ) && !IS_CHARMED(gch))
             members++;
     }
 
@@ -400,7 +400,7 @@ CMDRUN( split )
 
     for ( gch = ch->in_room->people; gch != 0; gch = gch->next_in_room )
     {
-        if ( gch != ch && is_same_group(gch,ch) && !IS_AFFECTED(gch,AFF_CHARM))
+        if ( gch != ch && is_same_group(gch,ch) && !IS_CHARMED(gch))
         {
             act_p( buf, ch, 0, gch, TO_VICT,POS_RESTING );
             gch->gold += share_gold;
@@ -415,7 +415,7 @@ CMDRUN( nofollow )
     if (ch->is_npc())
         return;
 
-    if ( IS_AFFECTED( ch, AFF_CHARM ) )  {
+    if ( IS_CHARMED(ch) )  {
         ch->send_to( "Ты не можешь покинуть своего повелителя.\n\r");
         return;
     }

@@ -13,6 +13,7 @@
 #include "skillreference.h"
 
 #include "follow_utils.h"
+#include "loadsave.h"
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -36,7 +37,7 @@ COMMAND(COrder, "order")
         return;
     }
 
-    if (IS_AFFECTED( ch, AFF_CHARM )) {
+    if (IS_CHARMED(ch)) {
         ch->println( "Ты можешь только принимать приказы, а не отдавать их." );
         return;
     }
@@ -81,7 +82,7 @@ bool COrder::canOrder( Character *ch, Character *victim )
     if (ch->getClan( ) == clan_ruler && victim->isAffected(gsn_manacles))
         return true;
         
-    if (!IS_AFFECTED(victim, AFF_CHARM))
+    if (!IS_CHARMED(victim))
         return false;
     
     if (victim->master != ch)

@@ -21,6 +21,7 @@
 #include "mercdb.h"
 #include "act.h"
 #include "interp.h"
+#include "loadsave.h"
 #include "clanreference.h"
 #include "race.h"
 #include "npcharacter.h"
@@ -88,7 +89,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
 
     // recurent victim pet to master
     if ( victim->is_npc()
-        && IS_AFFECTED(victim,AFF_CHARM)
+        && IS_CHARMED(victim)
         && victim->master != 0
         && !victim->master->is_npc() )
     {
@@ -97,8 +98,7 @@ bool is_safe_nomessage(Character *ch, Character *victim )
 
     // recurent for attacker pet master
     if ( ch->is_npc()
-        && IS_AFFECTED(ch,AFF_CHARM )
-        && ch->master != 0
+        && IS_CHARMED(ch)
         && !ch->master->is_npc() )
     {
         return is_safe_nomessage(ch->master,victim);

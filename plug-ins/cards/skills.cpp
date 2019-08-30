@@ -92,7 +92,7 @@ SKILL_RUNP( sconce )
         return;
     }
 
-    if (IS_AFFECTED( ch, AFF_CHARM )) {
+    if (IS_CHARMED(ch)) {
         ch->pecho( "Ты же не хочешь ударить по голове сво%1$Gего|его|ю любим%1$Gого|ого|ую хозя%1$Gина|ина|йку?", ch->master);
         return;
     }
@@ -206,7 +206,7 @@ SKILL_RUNP( joker )
         return;
     }
 
-    if (IS_AFFECTED( ch, AFF_CHARM )) {
+    if (IS_CHARMED(ch)) {
         ch->pecho( "Нехорошо шутить над сво%1$Gим|им|ей хозя%1$Gином|ином|йкой.", ch->master);
         return;
     }

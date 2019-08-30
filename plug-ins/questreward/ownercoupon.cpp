@@ -19,7 +19,7 @@ bool OwnerCoupon::use( Character *ch, const char *arg )
 { 
     Object *item;
     
-    if (ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM))
+    if (ch->is_npc( ) || IS_CHARMED(ch))
         return false;
     
     if (!arg[0]) {

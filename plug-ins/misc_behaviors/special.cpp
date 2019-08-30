@@ -104,7 +104,7 @@ bool spec_troll_member( NPCharacter *ch)
     const char *message;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
-    ||  IS_AFFECTED(ch,AFF_CHARM) || ch->fighting != 0)
+    ||  IS_CHARMED(ch) || ch->fighting != 0)
         return false;
 
     /* find an ogre to beat up */
@@ -163,7 +163,7 @@ bool spec_ogre_member( NPCharacter *ch)
     const char *message;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
-    ||  IS_AFFECTED(ch,AFF_CHARM) || ch->fighting != 0)
+    ||  IS_CHARMED(ch) || ch->fighting != 0)
         return false;
 
     /* find an troll to beat up */
@@ -223,7 +223,7 @@ bool spec_patrolman(NPCharacter *ch)
     int count = 0;
 
     if (!IS_AWAKE(ch) || IS_AFFECTED(ch,AFF_CALM) || ch->in_room == 0
-    ||  IS_AFFECTED(ch,AFF_CHARM) || ch->fighting != 0)
+    ||  IS_CHARMED(ch) || ch->fighting != 0)
         return false;
 
     /* look for a fight in the room */

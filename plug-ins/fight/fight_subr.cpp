@@ -91,7 +91,7 @@ void check_assist(Character *ch, Character *victim)
         
         /* PC-master assist his charmices */
         if (ch->is_npc( )
-            && IS_AFFECTED(ch, AFF_CHARM)
+            && IS_CHARMED(ch)
             && ch->master == rch)
         {
             one_hit( rch, victim );

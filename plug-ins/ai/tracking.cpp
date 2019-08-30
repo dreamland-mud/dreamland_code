@@ -11,6 +11,7 @@
 #include "room.h"
 
 #include "act.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "magic.h"
 #include "act_move.h"
@@ -64,7 +65,10 @@ bool BasicMobileBehavior::canTrack( )
     if (IS_SET(ch->act, ACT_NOTRACK))
         return false;
 
-    if (IS_AFFECTED(ch, AFF_CALM|AFF_CHARM|AFF_SCREAM))
+    if (IS_CHARMED(ch))
+        return false;
+
+    if (IS_AFFECTED(ch, AFF_CALM|AFF_SCREAM))
         return false;
     
     if (RIDDEN(ch))

@@ -147,7 +147,7 @@ SKILL_RUNP( claw )
         if (is_safe(ch,victim))
                 return;
 
-        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        if (IS_CHARMED(ch) && ch->master == victim)
         {
                 act_p("Но ведь $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;

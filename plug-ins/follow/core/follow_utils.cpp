@@ -88,7 +88,7 @@ void follower_stop( Character *ch )
     if (master == NULL)
         return;
 
-    if (IS_AFFECTED( ch, AFF_CHARM )) { /* XXX causes double affect_strip */
+    if (IS_CHARMED(ch)) { /* XXX causes double affect_strip */
         REMOVE_BIT( ch->affected_by, AFF_CHARM );
         affect_strip( ch, gsn_charm_person );
     }
@@ -268,7 +268,7 @@ GroupMembers party_members_room( Character *ch, Room *room )
 
     for (Character *gch = room->people; gch != NULL; gch = gch->next_in_room) 
         if (!gch->is_npc( )
-            && !IS_AFFECTED(gch, AFF_CHARM) 
+            && !IS_CHARMED(gch) 
             && is_same_group( gch, ch ))
             members.insert( gch );
 
@@ -281,7 +281,7 @@ GroupMembers party_members_world( Character *ch )
 
     for (Character *gch = char_list; gch != NULL; gch = gch->next) 
         if (!gch->is_npc( )
-            && !IS_AFFECTED(gch, AFF_CHARM) 
+            && !IS_CHARMED(gch) 
             && is_same_group( gch, ch ))
             members.insert( gch );
 

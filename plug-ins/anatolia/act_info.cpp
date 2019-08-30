@@ -2426,7 +2426,7 @@ CMDRUNP( affects )
         o->show_affect( buf, flags );
 
 
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master != 0) {
+    if (IS_CHARMED(ch)) {
         if (buf.str( ).empty( )) 
             act_p( "$C1 не находится под действием каких-либо аффектов.", ch->master, 0, ch, TO_CHAR,POS_RESTING );
         else 

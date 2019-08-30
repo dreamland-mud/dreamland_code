@@ -211,8 +211,7 @@ bool BasicMobileBehavior::mustFlee( )
         return true;
     }
     
-    if (IS_AFFECTED(ch, AFF_CHARM) 
-            && ch->master != 0
+    if (IS_CHARMED(ch) 
             && ch->master->in_room != ch->in_room)
     {
         return true;

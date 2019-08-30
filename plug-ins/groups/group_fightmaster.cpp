@@ -297,7 +297,7 @@ SKILL_RUNP( bash )
         if ( is_safe(ch,victim) )
                 return;
 
-        if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
+        if ( IS_CHARMED(ch) && ch->master == victim )
         {
                 act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
@@ -537,7 +537,7 @@ SKILL_RUNP( trip )
                 return;
         }
 
-        if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
+        if ( IS_CHARMED(ch) && ch->master == victim )
         {
                 act_p("Но ведь $C1 - тво$Gй|й|я хозя$Gин|ин|йка.",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
@@ -669,7 +669,7 @@ SKILL_RUNP( kick )
                 return;
         }
 
-        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        if (IS_CHARMED(ch) && ch->master == victim)
         {
                 act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
@@ -858,7 +858,7 @@ SKILL_RUNP( crush )
         if ( is_safe(ch,victim) )
                 return;
 
-        if ( IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim )
+        if ( IS_CHARMED(ch) && ch->master == victim )
                 return;
 
         if (SHADOW(ch))
@@ -1099,7 +1099,7 @@ SKILL_RUNP( dirt )
         if (is_safe(ch,victim))
                 return;
 
-        if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim)
+        if (IS_CHARMED(ch) && ch->master == victim)
         {
                 act_p("Но $C1 твой лучший друг!",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
@@ -1342,7 +1342,7 @@ SKILL_RUNP( smash )
     if (is_safe(ch,victim))
         return;
 
-    if (IS_AFFECTED(ch,AFF_CHARM) && ch->master == victim) {
+    if (IS_CHARMED(ch) && ch->master == victim) {
         act_p("Но $C1 твой друг!!!",ch,NULL,victim,TO_CHAR,POS_RESTING);
         return;
     }

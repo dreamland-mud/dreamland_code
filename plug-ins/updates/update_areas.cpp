@@ -186,7 +186,7 @@ static bool reset_room_mobs(Room *pRoom)
     for (Character *rch = pRoom->people; rch; rch = rch->next_in_room) {
         if (!rch->is_npc())
             continue;
-        if (IS_AFFECTED(rch, AFF_CHARM))
+        if (IS_CHARMED(rch))
             continue;
 
         NPCharacter *mob = rch->getNPC();

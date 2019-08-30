@@ -122,7 +122,7 @@ Pet::Pointer PetShopStorage::getPetBehavior( Character *pet ) const
     if (!pet->is_npc( ))
         return null;
 
-    if (IS_AFFECTED( pet, AFF_CHARM ) || pet->master)
+    if (IS_CHARMED(pet) || pet->master)
         return null;
 
     if (!pet->getNPC( )->behavior)

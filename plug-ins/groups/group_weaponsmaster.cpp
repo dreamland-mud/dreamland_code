@@ -511,7 +511,7 @@ SKILL_RUNP( lash )
     if (is_safe(ch, victim))
         return;
 
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
+    if (IS_CHARMED(ch) && ch->master == victim) {
         act("Но $C1 твой друг!", ch, NULL, victim, TO_CHAR);
         return;
     }

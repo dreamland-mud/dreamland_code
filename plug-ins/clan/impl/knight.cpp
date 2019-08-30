@@ -225,7 +225,7 @@ SKILL_RUNP( guard )
         return;
     }
 
-    if (IS_AFFECTED(pch,AFF_CHARM))
+    if (IS_CHARMED(pch))
     {
         pch->pecho( "Ты любишь сво%1$Gего|его|ю хозя%1$Gина|ина|йку так сильно, что не можешь охранять %2$C4!", pch->master, victim);
         return;

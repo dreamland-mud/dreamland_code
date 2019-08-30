@@ -32,7 +32,7 @@ CMDRUN( mount )
     if (IS_SET( ch->form, FORM_CENTAUR )) {
         ostringstream buf;
         
-        if (ch->is_npc( ) || IS_AFFECTED(ch, AFF_CHARM)) {
+        if (ch->is_npc( ) || IS_CHARMED(ch)) {
             ch->println( "Да ты и так на коне." );
             return;
         }
@@ -103,7 +103,7 @@ CMDRUN( mount )
         }
     }
     
-    if ((horse->is_npc( ) || IS_AFFECTED(horse, AFF_CHARM))
+    if ((horse->is_npc( ) || IS_CHARMED(horse))
         && horse->master 
         && horse->master != ch) 
     {
@@ -211,7 +211,7 @@ CMDRUN( mount )
         return;
     }
 
-    if ((horse->is_npc( ) || IS_AFFECTED(horse, AFF_CHARM))
+    if ((horse->is_npc( ) || IS_CHARMED(horse))
         && horse->master 
         && horse->master != ch) 
     {
@@ -324,7 +324,7 @@ CMDRUN( dismount )
     if (is_safe( ch, victim ))
         return;
 
-    if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
+    if (IS_CHARMED(ch) && ch->master == victim) {
         ch->pecho("Но ведь %C1 - тво%1$Gй|й|я любим%1$Gый|ый|ая хозя%1$Gин|ин|йка!", victim);
         return;
     }

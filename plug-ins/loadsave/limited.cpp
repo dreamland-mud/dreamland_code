@@ -106,7 +106,7 @@ void limit_timestamp( Object *obj, Character *ch )
     if (obj->timestamp > 0) 
         return;
     
-    if (ch && ch->is_npc( ) && !(IS_AFFECTED( ch, AFF_CHARM ) && ch->master))
+    if (ch && ch->is_npc() && !IS_CHARMED(ch))
         return;
 
     // Two weeks from now.

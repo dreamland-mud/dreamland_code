@@ -10,6 +10,7 @@
 #include "room.h"
 
 #include "dreamland.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "gsn_plugin.h"
 #include "interp.h"
@@ -58,7 +59,10 @@ bool BasicMobileBehavior::canAggress( )
     if (RIDDEN(ch))
         return false;
 
-    if (IS_AFFECTED(ch, AFF_CHARM | AFF_CALM))
+    if (IS_CHARMED(ch))
+        return false;
+
+    if (IS_AFFECTED(ch, AFF_CALM))
         return false;
 
     if (ch->is_mirror( ))

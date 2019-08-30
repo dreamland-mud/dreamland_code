@@ -14,6 +14,7 @@
 #include "pcharactermanager.h"
 
 #include "arg_utils.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "act.h"
 #include "def.h"
@@ -30,7 +31,7 @@ COMMAND(Lover, "lover")
         return;
     }
 
-    if (IS_AFFECTED(ch,AFF_CHARM)) {
+    if (IS_CHARMED(ch)) {
         act_p("... но сердцу не прикажешь.", ch, 0, 0, TO_CHAR, POS_RESTING);  
         act_p("$c1 ухмыляется - сердцу не прикажешь.", ch, 0, ch->master, TO_VICT, POS_RESTING);
         return;

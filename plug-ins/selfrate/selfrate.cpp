@@ -8,6 +8,7 @@
 
 #include "pcharacter.h"
 
+#include "loadsave.h"
 #include "infonet.h"
 #include "merc.h"
 #include "def.h"
@@ -40,7 +41,7 @@ CMDRUN( selfrate )
         return;
     }
 
-    if (IS_AFFECTED(pch, AFF_CHARM)) {
+    if (IS_CHARMED(pch)) {
         pch->send_to( "Ничего не произошло.\r\n" );
         return;
     }

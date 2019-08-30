@@ -10,6 +10,7 @@
 #include "affect.h"
 
 #include "dreamland.h"
+#include "loadsave.h"
 #include "fight.h"
 #include "gsn_plugin.h"
 #include "magic.h"
@@ -335,7 +336,7 @@ bool BasicMobileBehavior::aggressVampire( )
     for (wch = ch->in_room->people; wch; wch = wch->next_in_room) {
         if (wch->fighting || wch->position == POS_FIGHTING) 
             continue;
-        if (wch->is_npc( ) && !IS_AFFECTED(wch, AFF_CHARM))
+        if (wch->is_npc( ) && !IS_CHARMED(wch))
             continue;
 
         vsuck.add( wch );

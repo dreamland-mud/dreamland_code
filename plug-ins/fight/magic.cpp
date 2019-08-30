@@ -357,7 +357,7 @@ bool overcharmed( Character *ch )
     count = 0;
 
     for (gch = char_list; gch != 0; gch = gch->next) {
-        if (IS_AFFECTED(gch,AFF_CHARM) && gch->master == ch)
+        if (IS_CHARMED(gch) && gch->master == ch)
             count++;
     }
 

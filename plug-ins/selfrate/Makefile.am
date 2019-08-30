@@ -8,6 +8,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/iomanager \
+-I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output 
 
@@ -16,6 +17,7 @@ libselfrate_la_LIBADD = \
 ../system/libsystem.la \
 ../descriptor/libdescriptor.la \
 ../interpret/libinterpret.la \
+../loadsave/libloadsave.la \
 ../command/libcommand.la \
 ../help/libhelp.la \
 ../iomanager/libiomanager.la

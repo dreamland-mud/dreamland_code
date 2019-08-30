@@ -72,7 +72,7 @@ bool QuestTrader::canServeClient( Character *client )
         return false;
     }
 
-    if (IS_AFFECTED( client, AFF_CHARM )) {
+    if (IS_CHARMED(client)) {
         say_act( client, getKeeper( ), "Ты не можешь сделать этого, пока ты не владеешь собой!" );
         return false;
     }

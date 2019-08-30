@@ -7,6 +7,7 @@
 #include "npcharacter.h"
 #include "skill.h"
 #include "spell.h"
+#include "loadsave.h"
 #include "merc.h"
 #include "def.h"
 
@@ -26,7 +27,7 @@ MobSkillData::~MobSkillData( )
 
 int MobSkillData::visible( NPCharacter *mob, const Skill * ) const
 {
-    if (IS_AFFECTED(mob, AFF_CHARM) && !ordered.getValue( )) 
+    if (IS_CHARMED(mob) && !ordered.getValue( )) 
         return MPROF_NONE;
     
     if (offense.isSet( mob->off_flags ))
@@ -59,7 +60,7 @@ MobProfSkillData::MobProfSkillData( )
 
 int MobProfSkillData::visible( NPCharacter *mob, const Skill *skill ) const
 {
-    if (IS_AFFECTED(mob, AFF_CHARM) && !ordered.getValue( )) 
+    if (IS_CHARMED(mob) && !ordered.getValue( )) 
         return MPROF_NONE;
     
     if (offense.isSet( mob->off_flags ))

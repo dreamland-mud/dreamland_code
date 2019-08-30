@@ -139,7 +139,7 @@ bool GateMovement::checkVictim( )
         if (IS_SET(victim->imm_flags, IMM_SUMMON))
             return false;
             
-        if (IS_AFFECTED(victim, AFF_CHARM))
+        if (IS_CHARMED(victim))
             return false;
     } 
     else {
@@ -316,7 +316,7 @@ bool SummonMovement::applyLazy( )
 
 bool SummonMovement::checkCaster( )
 {
-    if (caster->is_npc( ) && IS_AFFECTED(caster, AFF_CHARM))
+    if (caster->is_npc( ) && IS_CHARMED(caster))
         return false;
 
     if (IS_VIOLENT( caster ))
