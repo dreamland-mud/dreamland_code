@@ -100,6 +100,7 @@ public:
 
     void fromString( const DLString &source );
     DLString toString( ) const;
+    DLString toRussianString( ) const;
     vector<int> toArray( ) const;
 
 protected:

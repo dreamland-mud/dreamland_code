@@ -40,20 +40,32 @@ void GlobalBitvector::fromString( const DLString &source )
 DLString GlobalBitvector::toString( ) const
 {
     ostringstream result; 
-    unsigned int b;
-    DLString name;
 
     if (!registry)
         return DLString::emptyString;
 
-    for (b = 0; b < bits.size( ); b++)
+    for (unsigned int b = 0; b < bits.size( ); b++)
         if (bits[b]) {
-            name = registry->getName( b );
+            GlobalRegistryElement *e = registry->find(b);
+            if (e)
+                result << e->getName().quote() << " ";
+        }
 
-            if (name.find_first_of( ' ' ) != DLString::npos)
-                name = "\'" + name + "\'";
-            
-            result << name << " ";
+    return result.str( );
+}
+
+DLString GlobalBitvector::toRussianString( ) const
+{
+    ostringstream result; 
+
+    if (!registry)
+        return DLString::emptyString;
+
+    for (unsigned int b = 0; b < bits.size( ); b++)
+        if (bits[b]) {
+            GlobalRegistryElement *e = registry->find(b);
+            if (e)
+                result << e->getRussianName().quote() << " ";
         }
 
     return result.str( );
