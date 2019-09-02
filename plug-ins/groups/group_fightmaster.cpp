@@ -797,39 +797,44 @@ SKILL_RUNP( concentrate )
 
     if (number_percent() < chance)
     {
-        Affect af;
-
         ch->mana -= gsn_concentrate->getMana( );
-
-        interpret_raw( ch, "sit" );
-        ch->send_to("Ты отдыхаешь, концентрируясь для следующего сражения!\n\r");
-        act_p("$c1 концентрируется для следующего сражения.",
-               ch,0,0,TO_ROOM,POS_FIGHTING);
+        gsn_concentrate->getCommand()->run(ch);
         gsn_concentrate->improve( ch, true );
-
-        af.where        = TO_AFFECTS;
-        af.type                = gsn_concentrate;
-        af.level        = ch->getModifyLevel();
-        af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
-        af.modifier        = max( 1, ch->getModifyLevel() / 8 );
-        af.bitvector         = 0;
-
-        af.location        = APPLY_HITROLL;
-        affect_to_char(ch,&af);
-
-        af.location        = APPLY_DAMROLL;
-        affect_to_char(ch,&af);
-
-        af.modifier        = max( 1, ch->getModifyLevel() / 10 );
-        af.location        = APPLY_AC;
-        affect_to_char(ch,&af);
     }
-
     else
     {
         ch->send_to("Ты пытаешься сконцентрироваться для следующего сражения, но не выходит.\n\r");
         gsn_concentrate->improve( ch, false );
     }
+}
+
+BOOL_SKILL( concentrate )::run( Character *ch ) 
+{
+    Affect af;
+
+    af.where        = TO_AFFECTS;
+    af.type         = gsn_concentrate;
+    af.level        = ch->getModifyLevel();
+    af.duration     = number_fuzzy( ch->getModifyLevel() / 8);
+    af.modifier     = max( 1, ch->getModifyLevel() / 8 );
+    af.bitvector    = 0;
+
+    af.location        = APPLY_HITROLL;
+    affect_to_char(ch,&af);
+
+    af.location        = APPLY_DAMROLL;
+    affect_to_char(ch,&af);
+
+    af.modifier        = max( 1, ch->getModifyLevel() / 10 );
+    af.location        = APPLY_AC;
+    affect_to_char(ch,&af);
+
+    if (ch->position > POS_SITTING)
+        interpret_raw(ch, "sit");
+
+    ch->pecho("Ты отдыхаешь, концентрируясь для следующего сражения!");
+    ch->recho("%^C1 концентрируется для следующего сражения.", ch);
+    return true;
 }
 
 
