@@ -47,9 +47,4 @@ DLString skill_what_plural(const Skill *skill);
  */
 int skill_learned_from_affects(const Skill *skill, PCharacter *ch);
 
-/**
- * A sum of skills learned percentage from practicing and from various affects.
- */
-int skill_learned_total(const Skill *skill, PCharacter *ch);
-
 #endif

@@ -161,10 +161,3 @@ int skill_learned_from_affects(const Skill *skill, PCharacter *ch)
     return ch->mod_skills[sn] + ch->mod_skill_groups[gsn];
 }
 
-int skill_learned_total(const Skill *skill, PCharacter *ch)
-{
-    int learned = ch->getSkillData(skill->getIndex()).learned;
-    learned += skill_learned_from_affects(skill, ch);
-    return URANGE(1, learned, 100);
-}
- 
