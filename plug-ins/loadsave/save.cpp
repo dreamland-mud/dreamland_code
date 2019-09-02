@@ -68,6 +68,7 @@
 #include "logstream.h"
 
 #include "skill.h"
+#include "skillgroup.h"
 #include "skillreference.h"
 
 #include "mobilebehavior.h"
@@ -212,7 +213,13 @@ Affect * fread_Affc( FILE *fp )
         } else if (paf->where == TO_LIQUIDS) {
             paf->global.setRegistry( liquidManager );
             paf->global.fromString( globalString );
-        } 
+        } else if (paf->where == TO_SKILLS) {
+            paf->global.setRegistry( skillManager );
+            paf->global.fromString( globalString );
+        } else if (paf->where == TO_SKILL_GROUPS) {
+            paf->global.setRegistry( skillGroupManager );
+            paf->global.fromString( globalString );
+        }
 
     } catch (FileFormatException e) {
         ddeallocate( paf );

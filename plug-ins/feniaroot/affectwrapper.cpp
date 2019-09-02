@@ -6,6 +6,7 @@
 
 #include "affect.h"
 #include "skill.h"
+#include "skillgroup.h"
 #include "skillmanager.h"
 #include "liquid.h"
 #include "wearlocation.h"
@@ -134,7 +135,7 @@ GS(modifier, "на сколько изменится поле, указанно�
 GS(duration, "длительность, -1 для вечных аффектов")
 GS(level, "уровень аффекта")
 
-NMI_SET( AffectWrapper, global, "список значений для where=locations (слоты экипировки) и where=liquids (жидкости)" ) 
+NMI_SET( AffectWrapper, global, "список значений для where=locations (слоты экипировки), liquids (жидкости), skills, skill groups" ) 
 {
     if (where == TO_LOCATIONS) {
         global.setRegistry( wearlocationManager );
@@ -142,10 +143,16 @@ NMI_SET( AffectWrapper, global, "список значений для where=loca
     } else if (where == TO_LIQUIDS) {
         global.setRegistry( liquidManager );
         global.fromString( arg.toString( ) );
+    } else if (where == TO_SKILLS) {
+        global.setRegistry( skillManager );
+        global.fromString( arg.toString( ) );
+    } else if (where == TO_SKILL_GROUPS) {
+        global.setRegistry( skillGroupManager );
+        global.fromString( arg.toString( ) );
     }
 }
 
-NMI_GET( AffectWrapper, global, "список значений для where=locations (слоты экипировки) и where=liquids (жидкости)" ) 
+NMI_GET( AffectWrapper, global, "список значений для where=locations (слоты экипировки), liquids (жидкости), skills, skill groups" ) 
 {
     return global.toString( );
 }

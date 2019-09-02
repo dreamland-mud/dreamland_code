@@ -169,7 +169,6 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         }
     }
 
-    LogStream::sendNotice() << pObj->vnum << " det " << p.det << ",aff " << p.aff << ",imm " << p.imm << ",res " << p.res << ",vuln " << p.vuln << endl;
     if (pObj->item_type == ITEM_ARMOR) {
         p.armor -= pObj->value[0];
     }

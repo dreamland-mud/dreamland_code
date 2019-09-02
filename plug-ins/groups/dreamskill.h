@@ -24,8 +24,8 @@ public:
 protected:
     void describeDream(PCharacter *ch, Skill *skill) const;
     Skill * findRandomProfSkill(PCharacter *ch) const;
-    int findActiveTemporarySkill(PCharacter *ch) const;
-    long findLatestTemporarySkill(PCharacter *ch) const;
+    int findActiveDreamSkill(PCharacter *ch) const;
+    long findLatestDreamSkill(PCharacter *ch) const;
 };
 
 extern DreamSkillManager *dreamSkillManager;

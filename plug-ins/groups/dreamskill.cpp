@@ -48,11 +48,12 @@ DreamSkillManager::~DreamSkillManager()
     dreamSkillManager = 0;
 }
 
-int DreamSkillManager::findActiveTemporarySkill(PCharacter *ch) const
+int DreamSkillManager::findActiveDreamSkill(PCharacter *ch) const
 {
     PCSkills &skills = ch->getSkills();    
     for (PCSkills::size_type sn = 0; sn < skills.size(); sn++) {
         PCSkillData &data = skills.at(sn);
+        // It also means no new skills are dreamt while a skill gained from wearing an item is active.
         if (temporary_skill_active(data)) 
             return sn;
     }
@@ -60,14 +61,14 @@ int DreamSkillManager::findActiveTemporarySkill(PCharacter *ch) const
     return -1;
 }
 
-long DreamSkillManager::findLatestTemporarySkill(PCharacter *ch) const
+long DreamSkillManager::findLatestDreamSkill(PCharacter *ch) const
 {
     PCSkills &skills = ch->getSkills();    
     long latest = -1;
 
     for (PCSkills::size_type sn = 0; sn < skills.size(); sn++) {
         PCSkillData &data = skills.at(sn);
-        if (data.temporary && data.end > latest) {
+        if (data.origin == SKILL_DREAM && data.end > latest) {
             latest = data.end;
         }
     }
@@ -91,7 +92,7 @@ Skill * DreamSkillManager::findRandomProfSkill(PCharacter *ch) const
             continue;
 
         // Dreamed about this skill once already in this life.
-        if (ch->getSkillData(skill->getIndex()).temporary)
+        if (ch->getSkillData(skill->getIndex()).origin == SKILL_DREAM)
             continue;
         
         // Reduce spell probability for Battleragers.
@@ -211,8 +212,8 @@ void DreamSkillManager::run( PCharacter *ch )
     if (ch->getRealLevel() < 20 && ch->getRemorts().size() == 0)
         return;
 
-    // Exclude those with an active dreamt skill.
-    int dreamtSkillNumber = findActiveTemporarySkill(ch);
+    // Exclude those with an active dreamt skill (or a skill gained from equipment, obj prog etc).
+    int dreamtSkillNumber = findActiveDreamSkill(ch);
     if (dreamtSkillNumber >= 0) 
         return;
 
@@ -224,7 +225,7 @@ void DreamSkillManager::run( PCharacter *ch )
     }
 
     // The less time since last dream - the smaller probability to see another one.
-    long latest = findLatestTemporarySkill(ch);
+    long latest = findLatestDreamSkill(ch);
     long today = day_of_epoch(time_info);
     long diff = today - max(latest, 0L);
     if (number_range(0, 200) > diff) 
@@ -232,7 +233,7 @@ void DreamSkillManager::run( PCharacter *ch )
 
     // Set up temporary skill for one "month", learned at 75%.
     PCSkillData &data = ch->getSkillData(skill->getIndex());
-    data.temporary = true;
+    data.origin = SKILL_DREAM;
     data.start = today;
     data.end = today + 35;
     data.learned = ch->getProfession()->getSkillAdept();

@@ -2,9 +2,11 @@
 #include "skillreference.h"
 #include "skillgroup.h"
 #include "spell.h"
+#include "affect.h"
 #include "pcharacter.h"
 #include "calendar_utils.h"
 #include "skill.h"
+#include "affectflags.h"
 #include "merc.h"
 #include "mercdb.h"
 
@@ -21,13 +23,19 @@ bool temporary_skill_active( const Skill *skill, Character *ch )
 
 bool temporary_skill_active( const PCSkillData &data )
 {
-    if (!data.temporary)
+    if (!data.isTemporary())
         return false;
 
     long today = day_of_epoch(time_info);
     long start = data.start.getValue();
+    if (start > today)
+        return false;
+
     long end = data.end.getValue();
-    return (start <= today && today <= end);
+    if (end == PCSkillData::END_NEVER)
+        return true;
+
+    return today <= end;
 }
 
 DLString spell_utterance(Skill *skill)
@@ -143,5 +151,20 @@ DLString skill_what(const Skill *skill)
 DLString skill_what_plural(const Skill *skill)
 {
     return skill_is_spell(skill) ? "заклинания" : "умения";
+}
+ 
+int skill_learned_from_affects(const Skill *skill, PCharacter *ch)
+{    
+    int sn = skill->getIndex();
+    int gsn = const_cast<Skill *>(skill)->getGroup()->getIndex();
+
+    return ch->mod_skills[sn] + ch->mod_skill_groups[gsn];
+}
+
+int skill_learned_total(const Skill *skill, PCharacter *ch)
+{
+    int learned = ch->getSkillData(skill->getIndex()).learned;
+    learned += skill_learned_from_affects(skill, ch);
+    return URANGE(1, learned, 100);
 }
  

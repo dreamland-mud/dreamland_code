@@ -52,6 +52,7 @@
 
 #include <map>
 #include <sstream>
+#include <cmath>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -2127,6 +2128,7 @@ struct AffectOutput {
     DLString name;
     list<DLString> lines;
     bool unitMinutes;
+    bool russian;
 };
 
 struct ShadowAffectOutput : public AffectOutput {
@@ -2144,8 +2146,8 @@ ShadowAffectOutput::ShadowAffectOutput( int shadow, int flags )
 AffectOutput::AffectOutput( Affect *paf, int flags )
 {
     type = paf->type;
-    name = (IS_SET(flags, FSHOW_RUSSIAN) ? 
-             paf->type->getRussianName( ) : paf->type->getName( ));
+    russian = IS_SET(flags, FSHOW_RUSSIAN);
+    name = russian ? paf->type->getRussianName( ) : paf->type->getName( );
     duration = paf->duration;
     unitMinutes = true;
 }
@@ -2270,6 +2272,7 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
 DLString AffectOutput::format_affect_global( Affect *paf )
 {
     DLString buf;
+    DLString what;
 
     if (!paf->global.empty( )) {
         ostringstream s;
@@ -2296,6 +2299,17 @@ DLString AffectOutput::format_affect_global( Affect *paf )
                 buf << "отрезанная левая рука";
             else
                 buf << "отрезанная конечность";
+            break;
+
+        case TO_SKILLS:
+        case TO_SKILL_GROUPS:
+            what = russian ? paf->global.toRussianString() : paf->global.toString();
+            what.stripRightWhiteSpace();
+
+            buf << (paf->modifier >= 0 ? "повышает" : "понижает")
+                << " знание"
+                << (paf->where == TO_SKILL_GROUPS ? " группы" : "")
+                << " {m" << what << "{y на {m" << (int)abs(paf->modifier) << "{y";
             break;
         }
     }

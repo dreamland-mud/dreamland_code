@@ -294,7 +294,7 @@ int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
     if (isRaceAffect( pch ))
         return min;
     else
-        return std::min( percent, min );
+        return URANGE( 1, percent, min );
 }
 
 /*
@@ -485,7 +485,7 @@ bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
         return false;
     }
 
-    if (ch->getSkillData(getIndex()).temporary) {
+    if (ch->getSkillData(getIndex()).isTemporary()) {
         buf << "Ты уже знаешь '" << getNameFor(ch) << "' так хорошо, как только можешь." << endl;
         return false;
     }
@@ -668,7 +668,7 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
     PCSkillData &data = ch->getSkillData( getIndex( ) );
     int percent = data.learned;
     
-    if (!data.temporary && !ci)
+    if (!data.isTemporary() && !ci)
         return;
 
     if (ci && ci->isMarked( ))
@@ -691,7 +691,7 @@ GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad )
 #endif        
     buf << ", уровень {W" << getLevel( ch ) << "{x)" << endl;
     
-    if (data.temporary)
+    if (data.isTemporary())
         return;
  
     ci->mark( );

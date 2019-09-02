@@ -5,10 +5,12 @@ include $(top_srcdir)/src/Makefile.inc
 
 plugin_INCLUDES = \
 $(INCLUDES_AI) \
-$(INCLUDES_SRC)
+$(INCLUDES_SRC) \
+-I$(top_srcdir)/plug-ins/skills_impl 
 
 liblanguages_core_la_LIBADD = \
-$(LIBADD_AI)
+$(LIBADD_AI) \
+../../skills_impl/libskills_impl.la
 
 liblanguages_core_la_SOURCES = \
 impl.cpp \

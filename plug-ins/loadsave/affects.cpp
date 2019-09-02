@@ -212,6 +212,24 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
         mod = 0 - mod;
     }
 
+    if (!ch->is_npc()) {
+        unsigned int sn;
+        vector<int> array;
+
+        switch (paf->where) {
+            case TO_SKILLS:
+                array = paf->global.toArray();
+                for (sn = 0; sn < array.size(); sn++)
+                    ch->getPC()->mod_skills[array[sn]] += mod;
+                break;
+            case TO_SKILL_GROUPS:
+                array = paf->global.toArray();
+                for (sn = 0; sn < array.size(); sn++)
+                    ch->getPC()->mod_skill_groups[sn] += mod;
+                break;
+        }
+    }
+
     switch ( paf->location )
     {
     default:

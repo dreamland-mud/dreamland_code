@@ -22,6 +22,7 @@
 #include <object.h>
 #include <affect.h>
 #include "room.h"
+#include "skillgroup.h"
 
 #include "oedit.h"
 #include "feniatriggers.h"
@@ -94,6 +95,8 @@ void OLCStateObject::copyParameters( OBJ_INDEX_DATA *original )
         (*my_af)->location =af->location;
         (*my_af)->modifier =af->modifier;
         (*my_af)->bitvector=af->bitvector;
+        (*my_af)->global.setRegistry(af->global.getRegistry());
+        (*my_af)->global.set(af->global);
         my_af = &(*my_af)->next;
     }
     *my_af = 0;
@@ -343,7 +346,7 @@ OEDIT(show)
                   paf->modifier,
                   apply_flags.name(paf->location).c_str());
        
-        if (paf->bitvector) { 
+        if (paf->bitvector || !paf->global.empty()) { 
             sprintf(buf+strlen(buf), " %-10.10s ",
                       affwhere_flags.name(paf->where).c_str());
 
@@ -367,6 +370,17 @@ OEDIT(show)
                 case TO_VULN:
                     strcat(buf, vuln_flags.names(paf->bitvector).c_str());
                     strcat(buf, " {D(? vuln_flags){x");
+                    break;
+                case TO_LIQUIDS:
+                    strcat(buf, paf->global.toString().c_str());
+                    strcat(buf, " {D(? liquid){x");
+                    break;
+                case TO_SKILLS:
+                    strcat(buf, paf->global.toString().c_str());
+                    break;
+                case TO_SKILL_GROUPS:
+                    strcat(buf, paf->global.toString().c_str());
+                    strcat(buf, " {D(? group){x");
                     break;
                 default:
                     sprintf(buf + strlen(buf), "<%08x>", paf->bitvector);
@@ -449,6 +463,9 @@ OEDIT(addaffect)
     char buf[MAX_STRING_LENGTH];
     int where = 0, mod = 0, loc;
     bitstring_t bit = 0;
+    Liquid *liq = 0;
+    Skill *skill = 0;
+    SkillGroup *group = 0;
 
     EDIT_OBJ(ch, pObj);
 
@@ -520,10 +537,28 @@ OEDIT(addaffect)
                     return false;
                 }
                 break;
+            // TODO: this doesn't allow to have several values in a single affect.
+            case TO_LIQUIDS:
+                if (!( liq = liquidManager->findExisting( argument ) )) {
+                    stc("Жидкость с таким названием не найдена, см. olchelp liquid.\n", ch);
+                    return false;
+                }
+                break;
+            case TO_SKILLS:
+                if (!(skill = skillManager->findExisting(argument))) {
+                    stc("Умение с таким названием не найдено.\n", ch);
+                    return false;
+                }
+                break;
+            case TO_SKILL_GROUPS:
+                if (!(group = skillGroupManager->findExisting(argument))) {
+                    stc("Группа умений с таким названием не найдена, см. olchelp group.\n", ch);
+                    return false;
+                }
+                break;
             default:
                 stc("This affect location is  not supported now.\n\r", ch);
                 return false;
-                break;
         }
     }
 
@@ -534,6 +569,17 @@ OEDIT(addaffect)
     pAf->duration = -1;
     pAf->where = where;
     pAf->bitvector = bit;
+
+    if (liq) {
+        pAf->global.setRegistry(liquidManager);
+        pAf->global.set(liq->getIndex());
+    } else if (skill) {
+        pAf->global.setRegistry(skillManager);
+        pAf->global.set(skill->getIndex());
+    } else if (group) {
+        pAf->global.setRegistry(skillGroupManager);
+        pAf->global.set(group->getIndex());
+    }
     pAf->next = pObj->affected;
     pObj->affected = pAf;
 

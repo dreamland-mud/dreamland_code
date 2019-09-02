@@ -10,6 +10,8 @@
 #include "affectflags.h"
 #include "logstream.h"
 #include "affect.h"
+#include "skillgroup.h"
+#include "wearlocation.h"
 #include "room.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -221,7 +223,7 @@ XMLApply::XMLApply( ) : where(APPLY_NONE)
 bool
 XMLApply::toXML(XMLNode::Pointer &parent) const
 {
-    if(where == APPLY_NONE)
+    if(where == APPLY_NONE && getValue() == 0)
         return false;
 
     if(!XMLIntegerNoEmpty::toXML(parent))
@@ -260,6 +262,13 @@ XMLAffect::init(Affect *pAf)
     case TO_DETECTS:
         bits.setTable(&detect_flags);
         break;
+    case TO_LOCATIONS:
+    case TO_LIQUIDS:
+    case TO_SKILLS:
+    case TO_SKILL_GROUPS:
+        global.setRegistry(pAf->global.getRegistry());
+        global.set(pAf->global);
+        break;
     default:
         LogStream::sendError() << "incorrect pAf->where in area file" << endl;
     case TO_OBJECT:
@@ -294,11 +303,25 @@ XMLAffect::compat()
     else
         LogStream::sendError() << "incorrect pAf->where in area file" << endl;
 
-    paf->bitvector = bits.getValue( );
-    
+    // TODO: is there a better way to do it?
+    if (global.getRegistry()) {
+        if (global.getRegistry() == liquidManager)
+            paf->where = TO_LIQUIDS;
+        else if (global.getRegistry() == wearlocationManager)
+            paf->where = TO_LOCATIONS;
+        else if (global.getRegistry() == skillManager)
+            paf->where = TO_SKILLS;
+        else if (global.getRegistry() == skillGroupManager)
+            paf->where = TO_SKILL_GROUPS;
+        else
+            LogStream::sendError() << "Incorrect pAf->global.registry in area file: " << global.getRegistry()->getRegistryName() << endl;
+    }
+
+    paf->bitvector = bits.getValue( );    
     paf->location = apply.where;
     paf->modifier = apply.getValue( );
-
+    paf->global.setRegistry(global.getRegistry());
+    paf->global.set(global);
     return paf;
 }
 

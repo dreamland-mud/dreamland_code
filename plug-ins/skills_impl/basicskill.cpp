@@ -14,6 +14,7 @@
 #include "room.h"
 #include "affect.h"
 #include "skillreference.h"
+#include "skill_utils.h"
 #include "desire.h"
 
 #include "fight.h"
@@ -244,6 +245,9 @@ int BasicSkill::getEffective( Character *ch ) const
         for (Affect *paf =ch-> affected; paf; paf=paf->next) 
             if (paf->type == gsn_anathema && paf->location == APPLY_LEVEL) 
                 result = result * 4 / (4 - paf->modifier/3);
+
+    if (!ch->is_npc())
+        result += skill_learned_from_affects(this, ch->getPC());
 
     if (ch->daze > 0) {
         if (getSpell( ))

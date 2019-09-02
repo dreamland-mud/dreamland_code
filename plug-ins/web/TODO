@@ -127,10 +127,10 @@ PC глобально (who, webclient who, scan, where):
 - у спец-мобов: identify, list, smith, quest *, -- хотя мб лучше просто на мобах? В магазинах животных продавец не обязателен, можно и на комнате.
 - raffects
 - exits, scan
-- тыкать на все экстраописания и описания экстра-выходов
+* тыкать на все экстраописания и описания экстра-выходов
 Меню на выходах в скане, autoexit(+perception): scan <dir>, look <dir>, open|close|lock|unlock
 - лучше если будет long click,
-по short click - идешь по направлению
+* по short click - идешь по направлению
 - short click on closed/locked door - пытается открыть или отпереть
 - выводить видимые экстра-екзитс рядом с обычными
 

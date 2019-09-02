@@ -1551,6 +1551,8 @@ static bool has_nopost(Character *ch)
             switch(paf->where) {
             case TO_LIQUIDS:   buf << "smell of " << paf->global.toString( ) << ", "; break;
             case TO_LOCATIONS: buf << "no rib "   << paf->global.toString( ) << ", "; break;
+            case TO_SKILLS:    buf << "skill learned " << paf->global.toString() << " by " << paf->modifier << ", "; break;
+            case TO_SKILL_GROUPS:    buf << "skill group learned " << paf->global.toString() << " by " << paf->modifier << ", "; break;
             }
         }
              

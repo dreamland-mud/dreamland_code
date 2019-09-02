@@ -12,6 +12,7 @@
 #include "xmlinteger.h"
 #include "xmlstring.h"
 #include "xmlvariablecontainer.h"
+#include "xmlglobalbitvector.h"
 
 class XMLOptionalString : public XMLString {
 public:
@@ -89,6 +90,7 @@ public:
 
     XML_VARIABLE XMLFlagsWithTable bits;
     XML_VARIABLE XMLApply apply;
+    XML_VARIABLE XMLGlobalBitvector global;
 };
 
 class XMLExitBase : public XMLVariableContainer {

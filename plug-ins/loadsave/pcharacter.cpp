@@ -142,6 +142,8 @@ void PCharacter::load( )
                 
     /* now restore the character to his/her true condition */
     mod_stat.clear( );
+    mod_skills.clear();
+    mod_skill_groups.clear();
     max_hit         = perm_hit;
     max_mana        = perm_mana;
     max_move        = perm_move;

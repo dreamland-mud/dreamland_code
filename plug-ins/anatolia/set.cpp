@@ -1536,12 +1536,10 @@ void sset( Character *ch, char *argument )
     // Clean up temporary skill.
     if (arg_is_switch_off(arg3)) {
         PCSkillData &data = victim->getPC( )->getSkillData( sn );
-        if (!data.temporary)
+        if (!data.isTemporary())
             ch->println("Это умение не является временным для персонажа.");
         else {
-            data.end = 0;
-            data.learned = 0;
-            data.temporary = false;
+            data.clear();
             victim->getPC()->save();
             ch->println("Временное умение удалено.");
         }

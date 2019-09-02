@@ -24,6 +24,8 @@
 #include "characterwrapper.h"
 #include "wrap_utils.h"
 
+#include "calendar_utils.h"
+#include "skill_utils.h"
 #include "handler.h"
 #include "gsn_plugin.h"
 #include "profflags.h"
@@ -796,3 +798,49 @@ NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться 
     return Register( );
 }
 
+NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвоить временное умение персонажу, разученное на learned % (или на 75%), работающее days дней (или вечно). Вернет true, если присвоено успешно.")
+{
+    PCharacter *ch = argnum2player(args, 1);
+    int learned = args.size() > 1 ? argnum2number(args, 2) : ch->getProfession()->getSkillAdept();
+    long today = day_of_epoch(time_info);
+    long end = args.size() > 2 ? (today + argnum2number(args, 3)) : PCSkillData::END_NEVER;
+
+    if (learned <= 0)
+        throw Scripting::Exception("learned param cannot be negative");
+
+    // Do nothing for already available permanent skills.
+    Skill *skill = skillManager->find(name);
+    if (skill->visible(ch))
+        return Register(false);
+    
+    // Do nothing for already present temporary skills.
+    PCSkillData &data = ch->getSkillData(skill->getIndex());
+    if (temporary_skill_active(data))
+        return Register(false);
+
+    // Create and save temporary skill data.
+    data.origin = SKILL_FENIA;
+    data.start = today;
+    data.end = end;
+    data.learned = learned;
+    ch->save();
+
+    return Register(true);
+}
+
+NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить временное умение у персонажа. Вернет true, если было что очищать.")
+{
+    PCharacter *ch = argnum2player(args, 1);
+    Skill *skill = skillManager->find(name);
+    PCSkillData &data = ch->getSkillData(skill->getIndex());
+
+    if (!data.isTemporary())
+        return Register(false);
+    if (data.origin != SKILL_FENIA)
+        return Register(false);
+
+    data.clear();
+    ch->save();
+
+    return Register(true);
+}
