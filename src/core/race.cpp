@@ -125,10 +125,13 @@ RaceManager::RaceManager( )
 {
     checkDuplicate( raceManager );
     raceManager = this;
+    setRegistryName("race");    
+    saveRegistryName();
 }
 
 RaceManager::~RaceManager( )
 {
+    eraseRegistryName();
     raceManager = 0;
 }
 

@@ -78,10 +78,13 @@ SkillGroupManager::SkillGroupManager( )
 {
     checkDuplicate( skillGroupManager );
     skillGroupManager = this;
+    setRegistryName("skillGroup");
+    saveRegistryName();
 }
 
 SkillGroupManager::~SkillGroupManager( )
 {
+    eraseRegistryName();
     skillGroupManager = 0;
 }
 

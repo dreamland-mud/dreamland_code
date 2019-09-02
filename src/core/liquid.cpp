@@ -67,10 +67,13 @@ LiquidManager::LiquidManager( )
 {
     checkDuplicate( liquidManager );
     liquidManager = this;
+    setRegistryName("liquid");    
+    saveRegistryName();
 }
 
 LiquidManager::~LiquidManager( )
 {
+    eraseRegistryName();
     liquidManager = 0;
 }
 

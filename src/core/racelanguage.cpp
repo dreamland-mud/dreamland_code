@@ -53,10 +53,13 @@ RaceLanguageManager::RaceLanguageManager( )
 {
     checkDuplicate( raceLanguageManager );
     raceLanguageManager = this;
+    setRegistryName("raceLanguage");
+    saveRegistryName();
 }
 
 RaceLanguageManager::~RaceLanguageManager( )
 {
+    eraseRegistryName();
     raceLanguageManager = 0;
 }
 

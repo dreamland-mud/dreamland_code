@@ -70,10 +70,13 @@ ReligionManager::ReligionManager( )
 {
     checkDuplicate( religionManager );
     religionManager = this;
+    setRegistryName("religion");
+    saveRegistryName();
 }
 
 ReligionManager::~ReligionManager( )
 {
+    eraseRegistryName();
     religionManager = 0;
 }
 

@@ -12,6 +12,7 @@
 
 #include "globalregistryelement.h"
 
+
 class GlobalRegistryBase {
 public:
     typedef std::vector<GlobalRegistryElement::Pointer> Table;
@@ -21,12 +22,17 @@ public:
     virtual ~GlobalRegistryBase( );
     void registrate( GlobalRegistryElement::Pointer );
     void unregistrate( GlobalRegistryElement::Pointer );
+
+    const DLString & getRegistryName() const;
+    void saveRegistryName() const;
+    void eraseRegistryName() const;
     
     int lookup( const DLString & );
     const DLString & getName( int ) const;
     inline bool goodIndex( int ) const;
     inline int size( ) const;
     void outputAll( ostringstream &, int, int ) const;
+    GlobalRegistryElement * find( int ndx );
     
     template <typename Comparator>
     inline void sortIndexes( SortedIndexes &, Comparator );
@@ -35,6 +41,9 @@ protected:
     
     Table table;
     Indexes indexes;
+
+    void setRegistryName(const DLString &registryName);
+    DLString registryName;
     
 private:
     virtual GlobalRegistryElement::Pointer getDumbElement( const DLString & ) const = 0;
@@ -42,6 +51,11 @@ private:
     int add( GlobalRegistryElement::Pointer );
     void replace( int, GlobalRegistryElement::Pointer );
 };
+
+typedef map<DLString, const GlobalRegistryBase *> RegistryMap;
+
+/** Keep track of all global registry instances and their symbolic names, to use in XML de-serialization. */
+extern RegistryMap registryMap;
 
 template <typename Elem>
 class GlobalRegistry : public GlobalRegistryBase {

@@ -79,10 +79,13 @@ DesireManager::DesireManager( )
 {
     checkDuplicate( desireManager );
     desireManager = this;
+    setRegistryName("desire");
+    saveRegistryName();
 }
 
 DesireManager::~DesireManager( )
 {
+    eraseRegistryName();
     desireManager = 0;
 }
 

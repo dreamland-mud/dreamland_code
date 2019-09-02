@@ -15,6 +15,9 @@ public:
     
     void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
     bool toXML( XMLNode::Pointer& ) const;
+
+protected:
+    bool registryFromAttribute;
 };
 
 

@@ -5,8 +5,27 @@
 #include <stdio.h>
 #include "globalregistry.h"
 
+RegistryMap registryMap;
+
 GlobalRegistryBase::~GlobalRegistryBase( )
 {
+}
+
+/** Remember this instance in a global map. */
+void GlobalRegistryBase::saveRegistryName() const
+{
+    registryMap[getRegistryName()] = this;
+}
+
+/** Erase from global registry map on destruction. */
+void GlobalRegistryBase::eraseRegistryName() const
+{
+    registryMap.erase(getRegistryName());
+}
+
+void GlobalRegistryBase::setRegistryName(const DLString &registryName)
+{
+    this->registryName = registryName;
 }
 
 void GlobalRegistryBase::registrate( GlobalRegistryElement::Pointer elem )
@@ -22,6 +41,11 @@ void GlobalRegistryBase::registrate( GlobalRegistryElement::Pointer elem )
 void GlobalRegistryBase::unregistrate( GlobalRegistryElement::Pointer elem )
 {
     replace( elem->getIndex( ), getDumbElement( elem->getName( ) ) );
+}
+
+const DLString & GlobalRegistryBase::getRegistryName() const
+{
+    return registryName;
 }
 
 int GlobalRegistryBase::lookup( const DLString &name )
@@ -47,6 +71,13 @@ const DLString & GlobalRegistryBase::getName( int ndx ) const
         return DLString::emptyString;
 }
 
+GlobalRegistryElement * GlobalRegistryBase::find( int ndx )
+{
+    if (goodIndex( ndx ))
+        return *table[ndx];
+        
+    return NULL;
+}
 
 int GlobalRegistryBase::add( GlobalRegistryElement::Pointer elem )
 {

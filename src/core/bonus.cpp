@@ -72,10 +72,13 @@ BonusManager::BonusManager( )
 {
     checkDuplicate( bonusManager );
     bonusManager = this;
+    setRegistryName("bonus");
+    saveRegistryName();
 }
 
 BonusManager::~BonusManager( )
 {
+    eraseRegistryName();
     bonusManager = 0;
 }
 

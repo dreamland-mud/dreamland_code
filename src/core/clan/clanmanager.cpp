@@ -12,10 +12,13 @@ ClanManager::ClanManager( )
 {
     checkDuplicate( clanManager );
     clanManager = this;
+    setRegistryName("clan");
+    saveRegistryName();
 }
 
 ClanManager::~ClanManager( )
 {
+    eraseRegistryName();
     clanManager = 0;
 }
 

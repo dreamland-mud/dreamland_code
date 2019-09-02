@@ -119,10 +119,13 @@ WearlocationManager::WearlocationManager( )
 {
     checkDuplicate( wearlocationManager );
     wearlocationManager = this;
+    setRegistryName("wearlocation");
+    saveRegistryName();
 }
 
 WearlocationManager::~WearlocationManager( )
 {
+    eraseRegistryName();
     wearlocationManager = 0;
 }
 

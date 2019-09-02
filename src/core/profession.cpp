@@ -137,10 +137,13 @@ ProfessionManager::ProfessionManager( )
 {
     checkDuplicate( professionManager );
     professionManager = this;
+    setRegistryName("profession");    
+    saveRegistryName();
 }
 
 ProfessionManager::~ProfessionManager( )
 {
+    eraseRegistryName();
     professionManager = 0;
 }
 

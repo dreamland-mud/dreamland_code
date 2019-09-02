@@ -15,10 +15,13 @@ SkillManager::SkillManager( )
 {
     checkDuplicate( skillManager );
     skillManager = this;
+    setRegistryName("skill");
+    saveRegistryName();
 }
 
 SkillManager::~SkillManager( )
 {
+    eraseRegistryName();
     skillManager = 0;
 }
 

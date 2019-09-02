@@ -64,10 +64,13 @@ HometownManager::HometownManager( )
 {
     checkDuplicate( hometownManager );
     hometownManager = this;
+    setRegistryName("hometown");
+    saveRegistryName();
 }
 
 HometownManager::~HometownManager( )
 {
+    eraseRegistryName();
     hometownManager = 0;
 }
 
