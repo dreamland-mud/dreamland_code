@@ -164,16 +164,7 @@ SKILL_RUNP( nerve )
                 || number_percent() < (gsn_nerve->getEffective( ch ) + ch->getModifyLevel()
                                         + ch->getCurrStat(STAT_DEX))/2 )
         {
-                Affect af;
-                af.where  = TO_AFFECTS;
-                af.type         = gsn_nerve;
-                af.level         = ch->getModifyLevel();
-                af.duration = ch->getModifyLevel() / 20;
-                af.location = APPLY_STR;
-                af.modifier = -3;
-                af.bitvector = 0;
-
-                affect_to_char(victim,&af);
+                gsn_nerve->getCommand()->run(ch, victim);
                 act_p("Ты ослабляешь $C4, пережимая нервные точки.",ch,0,victim,TO_CHAR,POS_RESTING);
                 act_p("$c1 ослабляет тебя, пережимая твои нервные точки.",ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
@@ -196,6 +187,21 @@ SKILL_RUNP( nerve )
         
             multi_hit(victim,ch);
         }
+}
+
+BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
+{
+    Affect af;
+    af.where    = TO_AFFECTS;
+    af.type     = gsn_nerve;
+    af.level    = ch->getModifyLevel();
+    af.duration = ch->getModifyLevel() / 20;
+    af.location = APPLY_STR;
+    af.modifier = -3;
+    af.bitvector = 0;
+
+    affect_to_char(victim,&af);
+    return true;
 }
 
 /*
@@ -452,46 +458,52 @@ SKILL_RUNP( caltraps )
       gsn_caltraps->improve( ch, false, victim );
       return;
     }
-    
-  try {
-      damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
 
-      if (!victim->isAffected(gsn_caltraps))
-        {
-          Affect tohit,todam,todex;
+    gsn_caltraps->getCommand()->run(ch, victim);    
+    gsn_caltraps->improve( ch, true, victim );
+}
 
-          tohit.where     = TO_AFFECTS;
-          tohit.type      = gsn_caltraps;
-          tohit.level     = ch->getModifyLevel();
-          tohit.duration  = -1;
-          tohit.location  = APPLY_HITROLL;
-          tohit.modifier  = -5;
-          tohit.bitvector = 0;
-          affect_to_char( victim, &tohit );
+BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
+{
+    try {
+        damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
 
-          todam.where = TO_AFFECTS;
-          todam.type = gsn_caltraps;
-          todam.level = ch->getModifyLevel();
-          todam.duration = -1;
-          todam.location = APPLY_DAMROLL;
-          todam.modifier = -5;
-          todam.bitvector = 0;
-          affect_to_char( victim, &todam);
+        if (!victim->isAffected(gsn_caltraps)) {
+            Affect tohit,todam,todex;
 
-          todex.type = gsn_caltraps;
-          todex.level = ch->getModifyLevel();
-          todex.duration = -1;
-          todex.location = APPLY_DEX;
-          todex.modifier = -5;
-          todex.bitvector = 0;
-          affect_to_char( victim, &todex);
+            tohit.where     = TO_AFFECTS;
+            tohit.type      = gsn_caltraps;
+            tohit.level     = ch->getModifyLevel();
+            tohit.duration  = -1;
+            tohit.location  = APPLY_HITROLL;
+            tohit.modifier  = -5;
+            tohit.bitvector = 0;
+            affect_to_char( victim, &tohit );
 
-          act_p("$C1 начинает хромать.",ch,0,victim,TO_CHAR,POS_RESTING);
-          act_p("Ты начинаешь хромать.",ch,0,victim,TO_VICT,POS_RESTING);
-          gsn_caltraps->improve( ch, true, victim );
+            todam.where = TO_AFFECTS;
+            todam.type = gsn_caltraps;
+            todam.level = ch->getModifyLevel();
+            todam.duration = -1;
+            todam.location = APPLY_DAMROLL;
+            todam.modifier = -5;
+            todam.bitvector = 0;
+            affect_to_char( victim, &todam);
+
+            todex.type = gsn_caltraps;
+            todex.level = ch->getModifyLevel();
+            todex.duration = -1;
+            todex.location = APPLY_DEX;
+            todex.modifier = -5;
+            todex.bitvector = 0;
+            affect_to_char( victim, &todex);
+
+            act_p("$C1 начинает хромать.",ch,0,victim,TO_CHAR,POS_RESTING);
+            act_p("Ты начинаешь хромать.",ch,0,victim,TO_VICT,POS_RESTING);
         }
     } catch (const VictimDeathException &) {
     }
+
+    return true;
 }
 
 
@@ -813,8 +825,6 @@ SKILL_RUNP( poison )
 
 SKILL_RUNP( blindness )
 {
-        Character *tmp_vict;
-
         if (ch->is_npc())
                 return;
         
@@ -851,22 +861,30 @@ SKILL_RUNP( blindness )
         act_p("Облако пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
 
         gsn_blindness_dust->improve( ch, true );
+    
+        gsn_blindness_dust->getCommand()->run(ch);
+}
 
-        for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
+BOOL_SKILL( blindness )::run( Character *ch ) 
+{
+    Character *tmp_vict;
+
+    for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
+    {
+        if (!is_safe_spell(ch,tmp_vict,true))
         {
-            if (!is_safe_spell(ch,tmp_vict,true))
-            {
-                if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                    yell_panic( ch, tmp_vict,
-                                "Помогите! Кто-то слепит меня пылью!",
-                                "Помогите! %1$^C1 слепит меня пылью!",
-                                FYP_SLEEP );
-                
-                spell( gsn_blindness, ch->getModifyLevel( ), ch, tmp_vict );
+            if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
+                yell_panic( ch, tmp_vict,
+                            "Помогите! Кто-то слепит меня пылью!",
+                            "Помогите! %1$^C1 слепит меня пылью!",
+                            FYP_SLEEP );
+            
+            spell( gsn_blindness, ch->getModifyLevel( ), ch, tmp_vict );
 
-                if (tmp_vict != ch)
-                        multi_hit(tmp_vict,ch);
-            }
+            if (tmp_vict != ch)
+                    multi_hit(tmp_vict,ch);
         }
+    }
+    return true;
 }
 
