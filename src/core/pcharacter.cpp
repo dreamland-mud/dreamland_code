@@ -20,6 +20,7 @@
 #include "skill.h"
 #include "skillmanager.h"
 #include "skillreference.h"
+#include "skillgroup.h"
 #include "clanreference.h"
 
 #include "pcharacter.h"
@@ -32,6 +33,7 @@
 #include "desire.h"
 
 #include "dreamland.h"
+#include "merc.h"
 #include "mercdb.h"
 #include "def.h"
 
@@ -233,7 +235,9 @@ void CachedNoun::update( PCharacter *ch )
 PCharacter::PCharacter( )
         :        wearloc( wearlocationManager ),
                 desires( desireManager ),
-                config( 0, &config_flags )
+                config( 0, &config_flags ),
+                mod_skills(skillManager),
+                mod_skill_groups(skillGroupManager)
 {
     init( );
 }
@@ -304,6 +308,8 @@ void PCharacter::init( )
     loyalty = 0;
     curse = 100;
     bless = 0;
+    mod_skills.clear();
+    mod_skill_groups.clear();
 
     bank_s = 0;
     bank_g = 0;
@@ -774,12 +780,20 @@ void PCharacter::updateSkills( )
 {
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );
-        
+        PCSkillData &data = getSkillData(sn);
+
+        // Ensure skill learned percentage is always within limits.
         if (skill->visible( this )) {
-            int &percent = getSkillData( sn ).learned;
+            int &percent = data.learned;
 
             percent = std::max( 1, percent );
             percent = std::max( skill->getLearned( this ), percent );
+        }
+
+        // For historical 'temporary' skills, set up proper skill origin value.
+        if (data.temporary) {
+            data.temporary = false;
+            data.origin.setValue(SKILL_DREAM);
         }
     }
 }                        

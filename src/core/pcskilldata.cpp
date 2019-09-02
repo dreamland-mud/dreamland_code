@@ -11,17 +11,35 @@
 #include "skill.h"
 
 #include "pcharacter.h"
+#include "autoflags.h"
+#include "def.h"
 
 PCSkillData PCSkillData::empty;
 
+long PCSkillData::END_NEVER = -1;
+
 PCSkillData::PCSkillData( )
-                    : forgetting( false ), temporary( false )
+                    : forgetting( false ), temporary( false ), 
+                      origin( SKILL_PRACTICE, &skill_origin_table )
 {
 }
 
 bool PCSkillData::isValid() const
 {
     return learned > 0;
+}
+
+bool PCSkillData::isTemporary() const
+{
+    return origin.getValue() != SKILL_PRACTICE;
+}
+
+void PCSkillData::clear()
+{
+    origin = 0;
+    start = 0;
+    end = 0;
+    learned = 0;
 }
 
 PCSkills::PCSkills() 

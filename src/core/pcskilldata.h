@@ -12,6 +12,7 @@
 #include "xmlboolean.h"
 #include "xmllong.h"
 #include "xmlmap.h"
+#include "xmlenumeration.h"
 #include "skilleventhandler.h"
 #include "globalprofilearray.h"
 
@@ -25,12 +26,17 @@ public:
         XML_VARIABLE XMLInteger learned;
         XML_VARIABLE XMLIntegerNoEmpty timer;
         XML_VARIABLE XMLBooleanNoFalse forgetting;
-        XML_VARIABLE XMLBooleanNoFalse temporary;
+        XML_VARIABLE XMLBooleanNoFalse temporary; // to be removed once all profiles loaded & converted
+        XML_VARIABLE XMLEnumeration origin;
         XML_VARIABLE XMLLongNoEmpty start;
         XML_VARIABLE XMLLongNoEmpty end;
     
         bool isValid() const;
+        bool isTemporary() const;
+        void clear();
         static PCSkillData empty;
+
+        static long END_NEVER;
 };
 
 class PCSkills : public GlobalProfileArray<PCSkillData> {

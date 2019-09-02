@@ -303,6 +303,8 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic
     XML_VARIABLE XMLInteger                curse;
     XML_VARIABLE XMLInteger                bless;
+    XML_VARIABLE XMLGlobalArray            mod_skills;
+    XML_VARIABLE XMLGlobalArray            mod_skill_groups;
 
     // money
     XML_VARIABLE XMLIntegerNoEmpty        bank_s;
