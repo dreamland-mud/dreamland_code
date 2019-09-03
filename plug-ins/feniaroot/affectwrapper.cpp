@@ -31,9 +31,12 @@ AffectWrapper::AffectWrapper( const RegisterList &args )
 
     i = args.begin( );
     
-    if (i != args.end( ))
-        type.assign( *skillManager->findExisting( i->toString( ).c_str( ) ) );
-    else
+    if (i != args.end( )) {
+        Skill *skill = skillManager->findExisting(i->toString());
+        if (!skill)
+            throw Scripting::Exception("Affect type not found.");
+        type.assign(*skill);
+    } else
         return;
     if (++i != args.end( ))
         level = i->toNumber( );
