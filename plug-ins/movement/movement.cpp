@@ -65,6 +65,9 @@ bool Movement::moveRecursive( )
 
     try {
         callProgs( ch );
+        if (ch->in_room != to_room)
+            return false;
+            
         callProgs( ch->mount );
         moveFollowers( ch );
         moveFollowers( ch->mount );
