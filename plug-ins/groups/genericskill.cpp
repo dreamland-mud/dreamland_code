@@ -571,9 +571,14 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         return;
     }
 
-    int percent = ch->getSkillData(getIndex()).learned;
+    const PCSkillData &data = ch->getSkillData(getIndex());
+    int percent = data.learned;
     if (temporary_skill_active(this, ch)) {
-        buf << "Приснилось тебе разученное до {C" << percent << "%{x." << endl;
+        if (data.origin == SKILL_DREAM)
+            buf << "Приснилось тебе";
+        else
+            buf << "Досталось тебе";
+        buf << " разученное до {C" << percent << "%{x." << endl;
         print_see_also(this, ch, buf);
         return;
     }
