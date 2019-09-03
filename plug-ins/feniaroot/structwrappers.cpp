@@ -6,6 +6,7 @@
 
 #include "hometown.h"
 #include "skill.h"
+#include "skillcommand.h"
 #include "profession.h"
 #include "subprofession.h"
 #include "room.h"
@@ -844,3 +845,16 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить времен�
 
     return Register(true);
 }
+
+NMI_INVOKE(SkillWrapper, run, "(ch[,victim]): выполнить умение без проверок и сообщений")
+{
+    Skill *skill = skillManager->find(name);
+    Character *ch = argnum2character(args, 1);
+    
+    if (args.size() < 2)
+        return Register(skill->getCommand()->run(ch));
+
+    Character *victim = argnum2character(args, 2);
+    return Register(skill->getCommand()->run(ch, victim));
+}
+
