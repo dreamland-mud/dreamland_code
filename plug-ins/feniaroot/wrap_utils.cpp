@@ -119,7 +119,7 @@ void args2buf(const RegisterList &args, char *buf, size_t bufsize)
     buf[bufsize - 1] = 0;
 }
 
-static const Register & argnum(const RegisterList &args, int num)
+const Register & argnum(const RegisterList &args, int num)
 {
     if (args.size() < (unsigned int)num)
         throw Scripting::NotEnoughArgumentsException();

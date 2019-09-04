@@ -13,6 +13,7 @@
 
 #include "skill.h"
 #include "skillmanager.h"
+#include "spelltarget.h"
 #include "clan.h"
 
 #include "affect.h"
@@ -1495,66 +1496,35 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанес�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, spellRoom, "(skillName,level): скастовать на комнату заклинание skillName уровня level")
+NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane]]): скастовать заклинания на vict, на всю комнату или с аргументом")
 {
     checkTarget( );
-
-    if (args.size() < 2)
-        throw Scripting::NotEnoughArgumentsException();
 
     Skill *skill = argnum2skill(args, 1);
     int level = argnum2number(args, 2);
+    if (args.size() == 2) {
+        // Room spell.
+        spell( skill->getIndex( ), level, target, target->in_room );
+        return Register();
+    }
 
-    spell( skill->getIndex( ), level, target, target->in_room );
-    return Register( );
-}
+    Register arg3 = argnum(args, 3);
+    if (arg3.type == Register::STRING) {
+        // String argument spell.
+        const char *arg = arg3.toString().c_str();
+        spell( skill->getIndex( ), level, target, const_cast<char *>(arg) );
+        return Register();
+    } 
 
-NMI_INVOKE( CharacterWrapper, spellArg, "(skillName,level,arg): скастовать заклинание skillName уровня level и строковым параметром arg")
-{
-    checkTarget( );
-
-    if (args.size() < 3)
-        throw Scripting::NotEnoughArgumentsException();
-
-    Skill *skill = argnum2skill(args, 1);
-    int level = argnum2number(args, 2);
-    DLString arg = argnum(args, 3).toString();
-
-    spell( skill->getIndex( ), level, target, arg.c_str() );
-    return Register( );
-}
-
-NMI_INVOKE( CharacterWrapper, spell, "(skillName,level,vict,spellbane): скастовать на vict заклинание skillName уровня level, с возможным spellbane")
-{
-    RegisterList::const_iterator i;
-    Skill *skill;
-    Character *victim;
-    int level;
-    bool fBane;
-    
-    checkTarget( );
-
-    if (args.size() < 4)
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    i = args.begin( );
-    DLString d = i->toString();
-    skill = SkillManager::getThis( )->findExisting( d.c_str( ) );
-    
-    i++;
-    level = i->toNumber( );
-
-    i++;
-    victim = arg2character( *i );
-
-    i++;
-    fBane = i->toNumber( );
-
-    if (!skill || !victim)
+    // Character target spell.    
+    Character *victim = argnum2character(args, 3);
+    if (!victim)
         throw Scripting::IllegalArgumentException( );
+
+    bool fBane = args.size() > 3 ? argnum2number(args, 4) : false;
     
     spell( skill->getIndex( ), level, target, victim, fBane );
-    return Register( );
+    return Register();
 }
 
 NMI_INVOKE( CharacterWrapper, multi_hit, "(vict): нанести один раунд повреждений жертве" )
