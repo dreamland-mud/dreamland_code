@@ -44,5 +44,6 @@ Skill * args2skill( const RegisterList & );
 Character *argnum2character(const RegisterList &args, int num);
 PCharacter *argnum2player(const RegisterList &args, int num);
 int argnum2number(const RegisterList &args, int num);
+Skill * argnum2skill(const RegisterList &args, int num);
 #endif
 

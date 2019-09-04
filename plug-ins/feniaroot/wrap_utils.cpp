@@ -159,3 +159,13 @@ Skill * args2skill( const RegisterList &args )
     return skillManager->findExisting( args.front( ).toString( ) );
 }
 
+Skill * argnum2skill(const RegisterList &args, int num)
+{
+    DLString name = argnum(args, num).toString();
+    Skill *skill = skillManager->findExisting(name);
+    if (!skill)
+        throw Scripting::CustomException(name + ": skill name not found.");
+
+    return skill;
+}
+

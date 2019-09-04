@@ -1495,26 +1495,36 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанес�
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, spellRoom, "(skillName,level): скастовать на комнату заклинание skillName уровне level")
+NMI_INVOKE( CharacterWrapper, spellRoom, "(skillName,level): скастовать на комнату заклинание skillName уровня level")
 {
-    RegisterList::const_iterator i;
-    Skill *skill;
-    int level;
     checkTarget( );
 
     if (args.size() < 2)
         throw Scripting::NotEnoughArgumentsException();
 
-    i = args.begin( );
-    DLString d = i->toString();
-    skill = SkillManager::getThis( )->findExisting( d.c_str( ) );
-    level = (++i)->toNumber( );
+    Skill *skill = argnum2skill(args, 1);
+    int level = argnum2number(args, 2);
 
     spell( skill->getIndex( ), level, target, target->in_room );
     return Register( );
 }
 
-NMI_INVOKE( CharacterWrapper, spell, "(skillName,level,vict,spellbane): скастовать на vict заклинание skillName уровне level, с возможным spellbane")
+NMI_INVOKE( CharacterWrapper, spellArg, "(skillName,level,arg): скастовать заклинание skillName уровня level и строковым параметром arg")
+{
+    checkTarget( );
+
+    if (args.size() < 3)
+        throw Scripting::NotEnoughArgumentsException();
+
+    Skill *skill = argnum2skill(args, 1);
+    int level = argnum2number(args, 2);
+    DLString arg = argnum(args, 3).toString();
+
+    spell( skill->getIndex( ), level, target, arg.c_str() );
+    return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, spell, "(skillName,level,vict,spellbane): скастовать на vict заклинание skillName уровня level, с возможным spellbane")
 {
     RegisterList::const_iterator i;
     Skill *skill;
