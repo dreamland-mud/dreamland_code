@@ -16,7 +16,7 @@
 
 
 #include "spelltemplate.h"
-
+#include "skillcommandtemplate.h"
 
 #include "so.h"
 #include "pcharacter.h"
@@ -39,9 +39,6 @@
 SPELL_DECL(GiantStrength);
 VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    
-    Affect af;
-
     if ( victim->isAffected(sn ) )
     {
         if (victim == ch)
@@ -63,19 +60,26 @@ VOID_SPELL(GiantStrength)::run( Character *ch, Character *victim, int sn, int le
         return;
     }
 
+    gsn_giant_strength->getCommand()->run(victim, level);
+}
+
+SKILL_DECL(giantstrength);
+BOOL_SKILL(giantstrength)::run( Character *victim, int slevel ) 
+{
+    Affect af;
+
     af.where     = TO_AFFECTS;
-    af.type      = sn;
-    af.level         = level;
-    af.duration  = (10 + level / 3);
+    af.type      = gsn_giant_strength;
+    af.level     = slevel;
+    af.duration  = (10 + slevel / 3);
     af.location  = APPLY_STR;
-    af.modifier  = max(2,level / 10);
+    af.modifier  = max(2, slevel / 10);
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    victim->send_to("Ты становишься намного сильнее!\n\r");
-    act_p("$c1 становится намного сильнее.",
-           victim,0,0,TO_ROOM,POS_RESTING);
-    return;
 
+    victim->pecho("Ты становишься намного сильнее!");
+    victim->recho("%^C1 становится намного сильнее.", victim);
+    return true;
 }
 
 SPELL_DECL(Haste);

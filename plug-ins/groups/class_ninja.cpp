@@ -210,8 +210,6 @@ BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
 
 SKILL_RUNP( endure )
 {
-  Affect af;
-
   if (ch->is_npc())
     {
       ch->send_to("Выносливость - не твой удел.\n\r");
@@ -231,22 +229,30 @@ SKILL_RUNP( endure )
     }
 
 
-  ch->setWait( gsn_endure->getBeats( )  );
-
-  af.where         = TO_AFFECTS;
-  af.type         = gsn_endure;
-  af.level         = ch->getModifyLevel();
-  af.duration   = ch->getModifyLevel() / 4;
-  af.location = APPLY_SAVING_SPELL;
-  af.modifier = -1 * (gsn_endure->getEffective( ch ) / 10);
-  af.bitvector = 0;
-
-  affect_to_char(ch,&af);
-
-  act("Ты готовишься к столкновению с магией.", ch, 0, 0, TO_CHAR);
-  act("$c1 мгновенно концентрируется.", ch,0,0,TO_ROOM);
-  gsn_endure->improve( ch, true );
+    ch->setWait( gsn_endure->getBeats( )  );
+    gsn_endure->getCommand()->run(ch);
+    gsn_endure->improve( ch, true );
 }
+
+
+BOOL_SKILL(endure)::run(Character *ch)
+{
+    Affect af;
+
+    af.where         = TO_AFFECTS;
+    af.type         = gsn_endure;
+    af.level         = ch->getModifyLevel();
+    af.duration   = ch->getModifyLevel() / 4;
+    af.location = APPLY_SAVING_SPELL;
+    af.modifier = -1 * (gsn_endure->getEffective( ch ) / 10);
+    af.bitvector = 0;
+
+    affect_to_char(ch,&af);
+
+    act("Ты готовишься к столкновению с магией.", ch, 0, 0, TO_CHAR);
+    act("$c1 мгновенно концентрируется.", ch,0,0,TO_ROOM);
+}
+
 
 /*----------------------------------------------------------------------------
  * Assassinate 

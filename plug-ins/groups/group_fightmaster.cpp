@@ -995,37 +995,13 @@ SKILL_RUNP( berserk )
 
         if ( number_percent() < chance )
         {
-                Affect af;
-
                 ch->setWaitViolence( 1 );
                 ch->mana -= mana;
-
-                /* heal a little damage */
-
-                ch->hit += ch->getModifyLevel() * 2;
-                ch->hit = min(ch->hit,ch->max_hit);
 
                 ch->send_to("Твой пульс учащается, когда ты входишь в ярость!\n\r");
                 act_p("Глаза $c2 загораются {rдиким огнем{x.",ch,0,0,TO_ROOM,POS_FIGHTING);
                 gsn_berserk->improve( ch, true );
-
-                af.where        = TO_AFFECTS;
-                af.type                = gsn_berserk;
-                af.level        = ch->getModifyLevel();
-                af.duration        = number_fuzzy( ch->getModifyLevel() / 8);
-
-                af.modifier        = max( 1, ch->getModifyLevel() / 5 );
-                af.location        = APPLY_HITROLL;
-                affect_to_char(ch,&af);
-
-                af.location        = APPLY_DAMROLL;
-                af.bitvector         = AFF_BERSERK;
-                affect_to_char(ch,&af);
-
-                af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
-                af.location        = APPLY_AC;
-                af.bitvector         = 0;
-                affect_to_char(ch,&af);
+                gsn_berserk->getCommand()->run(ch);
         }
         else
         {
@@ -1036,6 +1012,34 @@ SKILL_RUNP( berserk )
                 gsn_berserk->improve( ch, false );
         }
 
+}
+
+BOOL_SKILL( berserk )::run( Character *ch )
+{
+    Affect af;
+
+    /* heal a little damage */
+    ch->hit += ch->getModifyLevel() * 2;
+    ch->hit = min(ch->hit, ch->max_hit);
+
+    af.where        = TO_AFFECTS;
+    af.type         = gsn_berserk;
+    af.level        = ch->getModifyLevel();
+    af.duration     = number_fuzzy( ch->getModifyLevel() / 8);
+
+    af.modifier        = max( 1, ch->getModifyLevel() / 5 );
+    af.location        = APPLY_HITROLL;
+    affect_to_char(ch,&af);
+
+    af.location        = APPLY_DAMROLL;
+    af.bitvector       = AFF_BERSERK;
+    affect_to_char(ch,&af);
+
+    af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
+    af.location        = APPLY_AC;
+    af.bitvector         = 0;
+    affect_to_char(ch,&af);
+    return true;
 }
 
 /*

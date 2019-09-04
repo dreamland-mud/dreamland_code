@@ -19,6 +19,7 @@
 #include "spelltemplate.h"                                                 
 #include "skill.h"
 #include "skillmanager.h"
+#include "skillcommandtemplate.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -383,8 +384,6 @@ VOID_SPELL(Doppelganger)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(Garble);
 VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-  Affect af;
-
   if( ch == victim ) {
     ch->send_to("Это просто глупо.\n\r");
     return;
@@ -406,19 +405,24 @@ VOID_SPELL(Garble)::run( Character *ch, Character *victim, int sn, int level )
     return;
   }
 
-  af.where        = TO_AFFECTS;
-  af.type      = sn;
-  af.level     = level;
-  af.duration  = 1;
-  af.modifier  = 0;
-  af.location  = 0;
-  af.bitvector = 0;
-  affect_to_char( victim, &af );
+    gsn_garble->getCommand()->run(victim, level);
 
   act_p( "Ты поделил$gось|ся|ась частицей хаоса с языком $C2.",
           ch, 0, victim, TO_CHAR,POS_RESTING);
   victim->send_to("Такое впечатление, что твой язык завязали узлом.\n\r");
 
+}
+
+SKILL_DECL(garble);
+BOOL_SKILL(garble)::run( Character *victim, int slevel ) 
+{
+    Affect af;
+
+    af.type      = gsn_garble;
+    af.level     = slevel;
+    af.duration  = 1;
+    affect_to_char( victim, &af );
+    return true;
 }
 
 
