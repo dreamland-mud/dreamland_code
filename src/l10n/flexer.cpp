@@ -38,9 +38,12 @@ DLString Flexer::flex(const DLString &str, int part_num)
 
 DLString Flexer::flexAux(const DLString &str, int part_num, bool fNeedRoot, bool fNeedEnding) 
 {
+    static const DLString closeColour("{x");
+
     int case_counter, iPhase;
     register char tempchar;
     basic_ostringstream<char> buf;
+    bool hasColour = false;
     
     case_counter = part_num;
     iPhase = PHASE_COPYTOBUF;
@@ -53,6 +56,10 @@ DLString Flexer::flexAux(const DLString &str, int part_num, bool fNeedRoot, bool
 
         if (iPhase != PHASE_FINDNEED)
             case_counter = part_num;
+
+        // Quick (and unprecise) check if the string contains colors.
+        if (tempchar == '{')
+            hasColour = true;
 
         if (isFlexDelimiter(tempchar)) {
             if (iPhase == PHASE_COPYEND)
@@ -74,6 +81,12 @@ DLString Flexer::flexAux(const DLString &str, int part_num, bool fNeedRoot, bool
         }
     }
 
-    return buf.str();
+    DLString result = buf.str();
+
+    // Close colour just in case.
+    if (hasColour && !closeColour.strSuffix(result))
+        result << closeColour;
+
+    return result;
 }
 
