@@ -138,19 +138,19 @@ void SidheArmorSet::addAffect(Character *ch) const
     af.where     = TO_AFFECTS;
     af.bitvector = IS_EVIL(ch) ? AFF_PROTECT_GOOD : AFF_PROTECT_EVIL;
 
-    af.modifier  =  20;
+    af.modifier  =  10;
     af.location  = APPLY_HITROLL;
     affect_to_char(ch, &af);
 
     af.where     = TO_RESIST;
     af.bitvector = ch->getRace()->getVuln().isSet(VULN_IRON) ? RES_IRON : 0;
-    af.modifier  =  30;
+    af.modifier  =  20;
     af.location  = APPLY_DAMROLL;
     affect_to_char(ch, &af);
 
     af.where     = TO_VULN;
     af.bitvector = IS_EVIL(ch) ? VULN_HOLY : VULN_NEGATIVE;
-    af.modifier  =  200;
+    af.modifier  =  150;
     af.location  = APPLY_HIT;
     affect_to_char(ch, &af);
 
