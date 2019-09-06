@@ -804,7 +804,16 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
     PCharacter *ch = argnum2player(args, 1);
     int learned = args.size() > 1 ? argnum2number(args, 2) : ch->getProfession()->getSkillAdept();
     long today = day_of_epoch(time_info);
-    long end = args.size() > 2 ? (today + argnum2number(args, 3)) : PCSkillData::END_NEVER;
+    long end;
+
+    if (args.size() <= 2)
+        end = PCSkillData::END_NEVER;
+    else {
+        end = argnum2number(args, 3);
+        if (end < 0)
+            throw Scripting::Exception("end day cannot be negative");
+        end = today + end;
+    }
 
     if (learned <= 0)
         throw Scripting::Exception("learned param cannot be negative");
@@ -846,7 +855,7 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить времен�
     return Register(true);
 }
 
-NMI_INVOKE(SkillWrapper, run, "(ch[,victim]): выполнить умение без проверок и сообщений")
+NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): выполнить умение без проверок и сообщений")
 {
     Skill *skill = skillManager->find(name);
     Character *ch = argnum2character(args, 1);
@@ -854,7 +863,13 @@ NMI_INVOKE(SkillWrapper, run, "(ch[,victim]): выполнить умение б
     if (args.size() < 2)
         return Register(skill->getCommand()->run(ch));
 
-    Character *victim = argnum2character(args, 2);
+    Register arg2 = argnum(args, 2);
+    if (arg2.type == Register::NUMBER) {
+        int slevel = arg2.toNumber();
+        return Register(skill->getCommand()->run(ch, slevel));
+    }
+
+    Character *victim = arg2character(arg2);
     return Register(skill->getCommand()->run(ch, victim));
 }
 
