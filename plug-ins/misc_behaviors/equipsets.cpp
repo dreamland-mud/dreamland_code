@@ -210,7 +210,7 @@ void TravellersJoySet::addAffect(Character *ch) const
     af.location  = APPLY_CON;
     affect_to_char(ch, &af);
 
-    ch->pecho("{CКомплект одежд путешественника начитает светиться ровным голубоватым светом.{x");
+    ch->pecho("{CКомплект одежд путешественника начинает светиться ровным голубоватым светом.{x");
 }
 
 void TravellersJoySet::removeAffect(Character *ch) const
