@@ -192,7 +192,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     }
     
     if (inspire) {
-        act( "$o1 на мгновение отражает свет далеких звезд..", ch, obj, 0, TO_ALL );
+        act( "$o1 на мгновение отражает свет далеких звезд...", ch, obj, 0, TO_ALL );
         SET_BIT(obj->extra_flags,ITEM_GLOW);
         add_ac = - number_range( 3, 5 );
     }
@@ -433,7 +433,7 @@ VOID_SPELL(Fireproof)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector = ITEM_BURN_PROOF;
     affect_to_obj( obj, &af);
 
-    act("Защитная аура окружает $o4.",ch,obj,0,TO_ALL);
+    act("Огнеупорная аура окружает $o4.",ch,obj,0,TO_ALL);
 }
 
 
@@ -492,8 +492,8 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     af.bitvector = ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL;
     affect_to_obj( obj, &af );
 
-    act_p("Ты взываешь к Богам и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR, POS_RESTING);
-    act_p("$c1 взывает к Богам и $o1 загорается священным огнем!", ch, obj, 0, TO_ROOM, POS_RESTING);
+    act_p("Ты взываешь к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_CHAR, POS_RESTING);
+    act_p("$c1 взывает к Богам, и $o1 загорается священным огнем!", ch, obj, 0, TO_ROOM, POS_RESTING);
 }
 
 
@@ -766,7 +766,7 @@ VOID_SPELL(WintersTouch)::run( Character *ch, Object *obj, int sn, int level )
     }
 
     if (IS_WEAPON_STAT(obj,WEAPON_FROST)) {
-        act_p("$o1 и без того отмороженное.", ch, obj, 0, TO_CHAR, POS_RESTING);
+        act_p("$o1 и без того во власти холода.", ch, obj, 0, TO_CHAR, POS_RESTING);
         return;
     }
 
