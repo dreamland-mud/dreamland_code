@@ -58,8 +58,9 @@ enum {
 static void loot_transform( Object *obj, Character *ch )
 {
     // ROT_DEATH flag is only effective when the second owner dies (i.e. not the original mob that was reset with this item). 
+    // Keys are the only historic exception to this rule and begin to rot immediately after mob's death.
     if (IS_SET(obj->extra_flags, ITEM_ROT_DEATH)) {
-        if (ch->is_npc() && obj->reset_mob == ch->getID()) {
+        if (ch->is_npc() && obj->reset_mob == ch->getID() && obj->item_type != ITEM_KEY) {
             // Do nothing, this was the original owner.
         } else {
             // Sic transit
