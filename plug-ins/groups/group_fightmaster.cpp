@@ -1185,7 +1185,6 @@ SKILL_RUNP( dirt )
         /* now the attack */
         if (number_percent() < chance)
         {
-                Affect af;
                 act_p("$c1 ослепле$gно|н|на пылью, попавшей $m в глаза!",
                         victim,0,0,TO_ROOM,POS_RESTING);
 
@@ -1193,18 +1192,8 @@ SKILL_RUNP( dirt )
 
                 try {
                     damage_nocatch(ch,victim,number_range(2,5),gsn_dirt_kicking,DAM_NONE, true);
-                    victim->send_to("Ты ничего не видишь!\n\r");
+                    gsn_dirt_kicking->getCommand()->run(ch, victim);
                     gsn_dirt_kicking->improve( ch, true, victim );
-
-                    af.where        = TO_AFFECTS;
-                    af.type         = gsn_dirt_kicking;
-                    af.level         = ch->getModifyLevel();
-                    af.duration        = 0;
-                    af.location        = APPLY_HITROLL;
-                    af.modifier        = -4;
-                    af.bitvector         = AFF_BLIND;
-
-                    affect_to_char(victim,&af);
                 } catch (const VictimDeathException &) {
                     return;
                 }
@@ -1220,6 +1209,24 @@ SKILL_RUNP( dirt )
         yell_panic( ch, victim,
                     "Кто-то только что ослепил меня пылью, которая попала в глаза!",
                     "Умри, %1$C1, грязное животное!" );        
+}
+
+BOOL_SKILL( dirt )::run( Character *ch, Character *victim ) 
+{
+    Affect af;
+
+    victim->pecho("Ты ничего не видишь!");
+
+    af.where        = TO_AFFECTS;
+    af.type         = gsn_dirt_kicking;
+    af.level         = ch->getModifyLevel();
+    af.duration        = 0;
+    af.location        = APPLY_HITROLL;
+    af.modifier        = -4;
+    af.bitvector         = AFF_BLIND;
+
+    affect_to_char(victim,&af);
+    return true;
 }
 
 /*
