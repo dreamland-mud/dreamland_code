@@ -319,9 +319,6 @@ void WeaponOneHit::damEffectFeeble( )
         return;
     
     d = number_percent( );
-/*    if (d >= gsn_black_feeble->getEffective( victim ))
-        return;*/
-    
     if (d >= (IS_GOOD(ch) ? 15 : 7))
         return;
    
