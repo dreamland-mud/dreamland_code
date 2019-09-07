@@ -144,6 +144,7 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
         affect_strip ( ich, gsn_invisibility                );
         affect_strip ( ich, gsn_mass_invis                );
         affect_strip ( ich, gsn_improved_invis                );
+        strip_camouflage ( ich );
         REMOVE_BIT   ( ich->affected_by, AFF_HIDE        );
         REMOVE_BIT   ( ich->affected_by, AFF_FADE        );
         REMOVE_BIT   ( ich->affected_by, AFF_INVISIBLE        );
