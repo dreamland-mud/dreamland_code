@@ -51,7 +51,9 @@ DLString GlobalBitvector::toString( ) const
                 result << e->getName().quote() << " ";
         }
 
-    return result.str( );
+    DLString r = result.str( );
+    r.stripRightWhiteSpace();
+    return r;
 }
 
 DLString GlobalBitvector::toRussianString( ) const
@@ -68,7 +70,9 @@ DLString GlobalBitvector::toRussianString( ) const
                 result << e->getRussianName().quote() << " ";
         }
 
-    return result.str( );
+    DLString r = result.str( );
+    r.stripRightWhiteSpace();
+    return r;
 }
 
 vector<int> GlobalBitvector::toArray( ) const

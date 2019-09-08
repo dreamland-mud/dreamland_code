@@ -26,5 +26,6 @@ enum {
 bool mob_has_occupation( NPCharacter *, const char * );
 bool mob_has_occupation( NPCharacter *, int );
 bool obj_has_trigger( Object *, const DLString & );
+bool obj_is_special(Object *obj);
 
 #endif

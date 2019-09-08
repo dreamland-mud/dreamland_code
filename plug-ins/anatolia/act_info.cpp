@@ -2272,7 +2272,6 @@ DLString AffectOutput::format_affect_bitvector( Affect *paf )
 DLString AffectOutput::format_affect_global( Affect *paf )
 {
     DLString buf;
-    DLString what;
 
     if (!paf->global.empty( )) {
         ostringstream s;
@@ -2303,13 +2302,11 @@ DLString AffectOutput::format_affect_global( Affect *paf )
 
         case TO_SKILLS:
         case TO_SKILL_GROUPS:
-            what = russian ? paf->global.toRussianString() : paf->global.toString();
-            what.stripRightWhiteSpace();
-
             buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                << " знание"
-                << (paf->where == TO_SKILL_GROUPS ? " группы" : "")
-                << " {m" << what << "{y на {m" << (int)abs(paf->modifier) << "{y";
+                << " знание "
+                << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка") << " {m" 
+                << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
+                << "{y на {m" << (int)abs(paf->modifier) << "{y";
             break;
         }
     }
@@ -2641,36 +2638,47 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
     int b = paf->bitvector,
         d = paf->duration;
 
-    if (paf->location == APPLY_NONE || paf->modifier == 0)
-        return;
+    if (paf->location != APPLY_NONE && paf->modifier != 0) {
+        buf << "Изменяет " << apply_flags.message(paf->location ) 
+            << " на " << paf->modifier;
 
-    buf << "Изменяет " << apply_flags.message(paf->location ) 
-        << " на " << paf->modifier;
-
-    if (d > -1)
-        buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+        if (d > -1)
+            buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
     
-    buf << endl;
+        buf << endl;
+    }
 
-    if (!b)
-        return;
-    
-    switch(paf->where) {
-        case TO_AFFECTS:
-            buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
-            break;
-        case TO_IMMUNE:
-            buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
-            break;
-        case TO_RESIST:
-            buf << "Добавляет сопротивляемость к " << res_flags.messages(b ) << endl;
-            break;
-        case TO_VULN:
-            buf << "Добавляет уязвимость к " << vuln_flags.messages(b ) << endl;
-            break;
-        case TO_DETECTS:
-            buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
-            break;
+    if (b) {
+        switch(paf->where) {
+            case TO_AFFECTS:
+                buf << "Добавляет аффект " << affect_flags.messages(b ) << endl;
+                break;
+            case TO_IMMUNE:
+                buf << "Добавляет иммунитет к " << imm_flags.messages(b ) << endl;
+                break;
+            case TO_RESIST:
+                buf << "Добавляет сопротивляемость к " << imm_flags.messages(b ) << endl;
+                break;
+            case TO_VULN:
+                buf << "Добавляет уязвимость к " << imm_flags.messages(b ) << endl;
+                break;
+            case TO_DETECTS:
+                buf << "Добавляет обнаружение " << detect_flags.messages(b ) << endl;
+                break;
+        }
+    }
+
+    if (!paf->global.empty()) {
+        switch(paf->where) {
+            case TO_SKILLS:
+            case TO_SKILL_GROUPS:
+                buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                    << " знание "
+                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка")
+                    << " " << paf->global.toRussianString().quote() 
+                    << " на " << (int)abs(paf->modifier) << endl;
+                break;
+        }
     }
 }
 
@@ -2736,6 +2744,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         << "{W" << item_table.message(obj->item_type ) << "{x, "
         << "уровня {W" << obj->level << "{x" << endl;
 
+    if (obj_is_special(obj))
+        buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
+
     if (obj->weight > 10)
         buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
     else
@@ -2759,7 +2770,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << ", материал {W" << mat << "{x";
     
     buf << endl;
-    
+
     bitstring_t extra = obj->extra_flags;
     REMOVE_BIT(extra, ITEM_WATER_STAND|ITEM_INVENTORY|ITEM_HAD_TIMER|ITEM_DELETED);
     if (extra)

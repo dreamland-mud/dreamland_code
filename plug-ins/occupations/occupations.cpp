@@ -7,6 +7,9 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "object.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
 #include "act.h"
 #include "interp.h"
@@ -59,5 +62,18 @@ bool mob_has_occupation( NPCharacter *mob, int occType )
 bool obj_has_trigger( Object *obj, const DLString& trigger )
 {
     return obj->behavior && obj->behavior->hasTrigger( trigger );
+}
+
+bool obj_is_special(Object *obj)
+{
+    FENIA_NDX_HAS_TRIGGER(obj, "Use");
+    FENIA_NDX_HAS_TRIGGER(obj, "Equip");
+    FENIA_NDX_HAS_TRIGGER(obj, "Fight");
+    FENIA_NDX_HAS_TRIGGER(obj, "Spec");
+    
+    return obj_has_trigger(obj, "use")
+        || obj_has_trigger(obj, "fight")
+        || obj_has_trigger(obj, "equip")
+        || obj_has_trigger(obj, "spec");
 }
 

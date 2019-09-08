@@ -73,8 +73,11 @@ static bool is_in_pk_range( int cml, int vml, int non_wanted )
 bool is_safe_nomessage(Character *ch, Character *victim )
 {
     if (!ch || !victim)
-        return false;
+        return true;
 
+    if (!ch->in_room || !victim->in_room)
+        return true;
+        
     if ( victim->fighting == ch
         || ch == victim )
     {
