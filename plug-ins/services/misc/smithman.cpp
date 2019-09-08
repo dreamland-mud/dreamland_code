@@ -321,6 +321,11 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
         say_act( client, smithman, "Оно и так для тебя подходит, $c1." );
         return;
     }
+
+    if (obj_is_special(obj)) {
+        say_act(client, smithman, "Магия этой вещи неподвласна мне.");
+        return;
+    }
     
     if (!obj->getRealShortDescr( )) {
         say_act( client, smithman, "$c1, тебе придется сперва потратить рестринг купон и изменить внешний вид вещи." );
