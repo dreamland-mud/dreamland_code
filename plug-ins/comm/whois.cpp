@@ -31,7 +31,7 @@ COMMAND(Whois, "whois")
     std::basic_ostringstream<char> buf;
     Descriptor *d;
     LinesList lines;
-    PCharacter *pch;
+    PCharacter *pch, *offline_pch;
    
     if (ch->getPC( ) == 0)
         return;
@@ -47,12 +47,6 @@ COMMAND(Whois, "whois")
 
         pch = d->character->getPC( );
 
-        if (!ch->can_see( pch ))
-            continue;
-
-        if (IS_VAMPIRE( pch ) && !ch->is_immortal( ) && ch != pch)
-            continue;
-
         if (!is_name( constArguments.c_str( ), pch->getNameP( '7' ).c_str( ) ))
             continue;
         
@@ -60,6 +54,17 @@ COMMAND(Whois, "whois")
     }
 
     if (!d) {
+        pch = NULL;
+
+        offline_pch = dallocate(PCharacter);
+        offline_pch->setName(constArguments.c_str());
+        if (offline_pch->load( ))
+            pch = offline_pch;
+        else
+            ddeallocate(offline_pch);
+    }
+
+    if (!pch) {
         ch->send_to( "Никого нет с таким именем.\r\n" );
         return;
     }
@@ -193,6 +198,8 @@ COMMAND(Whois, "whois")
         ch->send_to( *j );
     
     ch->send_to( "\\________________________________________________________________________/\r\n" );
+
+    ddeallocate(offline_pch);
 }
 
 void Whois::LinesList::addNoCR( std::basic_ostringstream<char> &buf ) 
