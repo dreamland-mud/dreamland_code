@@ -80,7 +80,7 @@ static void update_exp( PCharacter *ch )
 /*-------------------------------------------------------------------------
  *  work with profiles 
  *------------------------------------------------------------------------*/
-void PCharacter::load( )
+bool PCharacter::load( )
 {
     static const char * METHOD = "PCharacter::load( )";
 //    ProfilerBlock be(METHOD);
@@ -91,7 +91,7 @@ void PCharacter::load( )
 
     if (!profile.open( )) {
         LogStream::sendError( ) << METHOD << " bad profile for " << getName( ) << endl;
-        return;
+        return false;
     }
 
     FILE *fp = profile.getFP( );
@@ -184,6 +184,8 @@ void PCharacter::load( )
     skill_exchange( this, gsn_sanctuary, gsn_stardust );
     skill_exchange( this, gsn_magic_resistance, gsn_spell_resistance );
     skill_exchange( this, gsn_dispel_magic, gsn_dispel_affects );
+
+    return true;
 }
 
 void PCharacter::save( )

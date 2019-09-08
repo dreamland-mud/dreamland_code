@@ -115,7 +115,7 @@ public:
 
     // work with profiles (implemented in anatolia_core)
     void save( );
-    void load( );
+    bool load( );
     
     // xml container
     virtual bool nodeFromXML( const XMLNode::Pointer & );
