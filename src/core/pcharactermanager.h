@@ -61,8 +61,8 @@ public:
         static bool pfRecover( const DLString&, const DLString&, int );
         
         // implemented in loadsave
-        static void save( PCharacter* );
-        static void load( PCharacter* );
+        static bool save( PCharacter* );
+        static bool load( PCharacter* );
         static PCharacter * create( const DLString & );
 
 private:

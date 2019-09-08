@@ -491,20 +491,20 @@ bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &
 }
 
 
-void PCharacterManager::save( PCharacter* pc )
+bool PCharacterManager::save( PCharacter* pc )
 {
     DLString name = pc->getName( );
     
     name.toLower( );
-    thisClass->saveXML( pc, name, true );
+    return thisClass->saveXML( pc, name, true );
 }
 
-void PCharacterManager::load( PCharacter* pc )
+bool PCharacterManager::load( PCharacter* pc )
 {
     DLString name= pc->getName( );
     
     name.toLower( );
-    thisClass->loadXML( pc, name );
+    return thisClass->loadXML( pc, name );
 }
 
 PCharacter * PCharacterManager::create( const DLString &name )

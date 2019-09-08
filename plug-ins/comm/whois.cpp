@@ -31,12 +31,13 @@ COMMAND(Whois, "whois")
     std::basic_ostringstream<char> buf;
     Descriptor *d;
     LinesList lines;
-    PCharacter *pch, *offline_pch;
+    PCharacter *pch, *offline_pch = NULL;
+    DLString args = constArguments;
    
     if (ch->getPC( ) == 0)
         return;
 
-    if (constArguments.empty( )) {
+    if (args.empty( )) {
         ch->send_to( "Имя, сестра, имя!\r\n" );
         return;
     }
@@ -47,7 +48,7 @@ COMMAND(Whois, "whois")
 
         pch = d->character->getPC( );
 
-        if (!is_name( constArguments.c_str( ), pch->getNameP( '7' ).c_str( ) ))
+        if (!is_name( args.c_str( ), pch->getNameP( '7' ).c_str( ) ))
             continue;
         
         break;
@@ -57,8 +58,9 @@ COMMAND(Whois, "whois")
         pch = NULL;
 
         offline_pch = dallocate(PCharacter);
-        offline_pch->setName(constArguments.c_str());
-        if (offline_pch->load( ))
+        args.capitalize();
+        offline_pch->setName(args);
+        if (PCharacterManager::load(offline_pch))
             pch = offline_pch;
         else
             ddeallocate(offline_pch);
@@ -199,7 +201,8 @@ COMMAND(Whois, "whois")
     
     ch->send_to( "\\________________________________________________________________________/\r\n" );
 
-    ddeallocate(offline_pch);
+    if (offline_pch)
+        ddeallocate(offline_pch);
 }
 
 void Whois::LinesList::addNoCR( std::basic_ostringstream<char> &buf ) 
