@@ -11,6 +11,7 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
+#include "occupations.h"
 #include "mercdb.h"
 
 #include "objectwrapper.h"
@@ -133,6 +134,12 @@ NMI_SET( ObjectWrapper, enchanted , "висят ли на предмете аф�
 {
     checkTarget( );
     target->enchanted = arg.toNumber( );
+}
+
+NMI_GET( ObjectWrapper, special, "обладает ли прототип предмета сложным поведением (через феню или код)")
+{
+    checkTarget( );
+    return Register( obj_is_special(target) );
 }
 
 NMI_GET( ObjectWrapper, description , "описание, видимое на земле")
