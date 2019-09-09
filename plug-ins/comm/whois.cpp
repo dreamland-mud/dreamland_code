@@ -48,6 +48,12 @@ COMMAND(Whois, "whois")
 
         pch = d->character->getPC( );
 
+        if (!ch->can_see( pch ))
+            continue;
+
+        if (IS_VAMPIRE( pch ) && !ch->is_immortal( ) && ch != pch)
+            continue;
+
         if (!is_name( args.c_str( ), pch->getNameP( '7' ).c_str( ) ))
             continue;
         
