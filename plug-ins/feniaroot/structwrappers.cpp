@@ -833,7 +833,6 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
     data.start = today;
     data.end = end;
     data.learned = learned;
-    ch->save();
 
     return Register(true);
 }
@@ -850,7 +849,6 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить времен�
         return Register(false);
 
     data.clear();
-    ch->save();
 
     return Register(true);
 }
