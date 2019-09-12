@@ -474,11 +474,15 @@ bool PCharacterManager::pfRecover ( const DLString &playerName, const DLString &
         oldXml = DLFile( DLFile( dreamland->getDbDir( ), BACKUP_TABLE ), name, ".xml" );
     }
                 
-    if (!oldXml.copy( newXml ))
+    if (!oldXml.copy( newXml )) {
+        LogStream::sendError() << "pfRecover: cannot copy " << oldXml.getPath() << " to " << newXml.getPath() << endl;
         return false;
+    }
     
-    if (!oldProfile.copy( newProfile ))
+    if (!oldProfile.copy( newProfile )) {
+        LogStream::sendError() << "pfRecover: cannot copy " << oldProfile.getPath() << " to " << newProfile.getPath() << endl;
         return false;
+    }
     
     pc = getPCharacter();
     pc->setName(name);
