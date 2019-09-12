@@ -766,6 +766,12 @@ NMI_GET( CharacterWrapper, hostname, "IP-адрес соединения")
         return target->desc->getRealHost( );
 }
 
+NMI_GET( CharacterWrapper, modifyLevel, "уровень с учетом бонусов от ремортов" )
+{
+    checkTarget( );
+    return target->getModifyLevel( );
+}
+
 NMI_GET( CharacterWrapper, level, "настоящий уровень" )
 {
     checkTarget( );
@@ -1494,6 +1500,14 @@ NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанес�
     ::damage(target, victim, dam, skill->getIndex( ), dam_type, true);
 
     return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один удар оружием" )
+{
+    checkTarget();
+    Character *victim = args2character(args);
+    ::one_hit(target, victim);
+    return Register();
 }
 
 NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane]]): скастовать заклинания на vict, на всю комнату или с аргументом")

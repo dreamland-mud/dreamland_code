@@ -441,6 +441,13 @@ NMI_INVOKE( RoomWrapper, echo, "(fmt, args): выводит отформатир
     return Register( );
 }
 
+NMI_INVOKE( RoomWrapper, echoAround, "(fmt, args): выводит отформатированную строку всем неспящим в прилегающие комнаты" )
+{
+    checkTarget( );
+    target->echoAround( POS_RESTING, regfmt( NULL, args ).c_str( ) );
+    return Register( );
+}
+
 NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg для всех в этой арии" )
 {
     Character *wch;

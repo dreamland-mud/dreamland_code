@@ -18,6 +18,7 @@
 
 #include "dreamland.h"
 #include "weather.h"
+#include "move_utils.h"
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
@@ -81,7 +82,7 @@ NMI_INVOKE( Root, List , "(): конструктор для списка")
     return Register::handler<RegList>();
 }
 
-NMI_INVOKE( Root, Affect, "([skill]): конструктор для аффекта умения skill или пустого" )
+NMI_INVOKE( Root, Affect, "([skill[,level,duration,location,mod,where,bits]]): конструктор для аффекта умения skill или пустого" )
 {
     if (args.empty( ))
         return Register::handler<AffectWrapper>( );
@@ -514,6 +515,16 @@ NMI_INVOKE(Root, get_random_room, "(): произвольная комната �
         r = rooms[::number_range(0, rooms.size() - 1)];
         return WrapperManager::getThis( )->getWrapper(r); 
     }
+}
+
+NMI_INVOKE(Root, get_random_room_vanish, "(ch): произвольная комната, куда разрешен vanish персонажу ch" )
+{
+    Character *ch = args2character(args);
+    Room *r =  get_random_room_vanish(ch);
+    if (!r)
+        throw Scripting::Exception("No suitable room found for vanish");
+        
+    return WrapperManager::getThis( )->getWrapper(r); 
 }
 
 NMI_INVOKE(Root, date, "(): строка с датой, как ее видно по команде time" )

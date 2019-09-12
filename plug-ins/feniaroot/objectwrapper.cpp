@@ -309,6 +309,14 @@ NMI_GET( ObjectWrapper, weight, "вес предмета")
     return Register( target->weight );
 }
 
+NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия или 0")
+{
+    checkTarget( );
+    if (target->item_type == ITEM_WEAPON)
+        return Register((1 + target->value[2]) * target->value[1] / 2);
+    return Register(0);
+}
+
 #define SETGETVALUE(x) \
     NMI_GET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
         checkTarget( ); \
@@ -641,6 +649,25 @@ NMI_INVOKE( ObjectWrapper, random_obj_list, "([item_type]): случайный �
                 result = obj;
 
     return wrap( result );
+}
+
+NMI_INVOKE(ObjectWrapper, hasWeaponFlag, "(flags): выставлен ли хотя бы один из флагов на оружии (таблица .tables.weapon_type2 или строка)")
+{
+    checkTarget( );
+    if (target->item_type != ITEM_WEAPON)
+        throw Scripting::Exception("Weapon flags queried on non-weapon");
+
+    Register arg = argnum(args, 1);
+    int flags;
+
+    if (arg.type == Register::NUMBER) {
+        flags = args2number(args);
+    } else {
+        DLString flagNames = args2string(args);
+        flags = weapon_type2.bitstring(flagNames, true);
+    }
+    
+    return Register(IS_WEAPON_STAT(target, flags) != 0);
 }
 
 NMI_INVOKE( ObjectWrapper, madeOfWood, "(): предмет сделан из дерева" )

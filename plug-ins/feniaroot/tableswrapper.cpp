@@ -21,6 +21,7 @@ static IdRef ID_VALUE("value");
 static IdRef ID_VALUES("values");
 static IdRef ID_NAME("name");
 static IdRef ID_NAMES("names");
+
     
 TableWrapper::TableWrapper() : table(0)
 {
