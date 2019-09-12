@@ -35,7 +35,10 @@ bool ClanSkill::visible( Character * ch ) const
     
     if (ch->is_npc( ) && mob.visible( ch->getNPC( ), this ) == MPROF_ANY)
         return true;
-    
+
+    if (temporary_skill_active(this, ch))
+        return true;
+
     if (!( ci = getClanInfo( ch ) ))
         return false;
 
@@ -66,6 +69,9 @@ bool ClanSkill::usable( Character * ch, bool message = true ) const
     if (dreamland->hasOption( DL_BUILDPLOT ))
         return true;
 
+    if (temporary_skill_active(this, ch))
+        return true;
+
     ci = getClanInfo( ch );
     if (ci && !ci->needItem.getValue( ))
         return true;
@@ -88,6 +94,9 @@ int ClanSkill::getLevel( Character *ch ) const
     if (ch->is_npc( ) && mob.visible( ch->getNPC( ), this ) == MPROF_ANY)
         return 1;
 
+    if (temporary_skill_active(this, ch))
+        return ch->getRealLevel();
+    
     return getClanInfo( ch )->level.getValue( );
 }
 
@@ -187,11 +196,15 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
         print_see_also(this, ch, buf);
         return;
     }
-        
-    buf << endl << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
 
-    if (available( ch ))
-        buf << ", изучено на {" << skill_learned_colour(this, ch) << data.learned << "%{x";
+    if (temporary_skill_active(this, ch)) {        
+        buf << endl << "Досталось тебе разученное на {" 
+            << skill_learned_colour(this, ch) << data.learned << "%{x";
+    } else {
+        buf << endl << "Доступно тебе с уровня {C" << getLevel( ch ) << "{x";
+        if (available( ch ))
+            buf << ", изучено на {" << skill_learned_colour(this, ch) << data.learned << "%{x";
+    }
     
     buf << "." << endl
         << "Практикуется у {gкланового охранника{x." << endl;
