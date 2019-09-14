@@ -19,12 +19,16 @@ void XMLGlobalArray::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionB
     if (!registry)
         return;
 
-    for (n = parent->getNodeList( ).begin( ); n != parent->getNodeList( ).end( ); n++) {
-        XMLInteger value;
+    for (n = parent->getNodeList( ).begin( ); n != parent->getNodeList( ).end( ); n++) {        
+        DLString name = (*n)->getName();
+        name = name.replaces("_", " ");
+
         size_type ndx;
-        
+        ndx = registry->lookup(name);
+
+        XMLInteger value;
         value.fromXML( *n );
-        ndx = registry->lookup( (*n)->getName( ) );
+        
         (*this)[ndx] = value;
     }
 }
@@ -39,10 +43,14 @@ bool XMLGlobalArray::toXML( XMLNode::Pointer& parent ) const
     for (n = 0; n < size( ); n++) 
         if (at( n ) != 0) {
             XMLNode::Pointer node( NEW );
-            XMLInteger value( at( n ) );
-            
+
+            XMLInteger value( at( n ) );            
             value.toXML( node );
-            node->setName( registry->getName( n ) );
+
+            DLString name = registry->getName(n);
+            name = name.replaces(" ", "_");
+            node->setName(name);
+
             parent->appendChild( node );
         }
 
