@@ -8,6 +8,8 @@
 #include <vector>
 #include "globalregistry.h"
 
+class GlobalBitvector;
+
 class GlobalArray : public vector<int> {
 public:
     static const GlobalArray emptyArray;
@@ -18,6 +20,7 @@ public:
     
     void clear( );
     int & operator [] (size_type);
+    void applyBitvector(const GlobalBitvector &bitvector, int modifier);
 
 protected:
     GlobalRegistryBase *registry;

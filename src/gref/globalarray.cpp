@@ -3,6 +3,9 @@
  * ruffina, Dream Land, 2006
  */
 #include "globalarray.h"
+#include "globalbitvector.h"
+#include "logstream.h"
+
 
 static int zeroValue;
 
@@ -46,5 +49,14 @@ int & GlobalArray::operator [] (size_type ndx)
 const int & GlobalArray::operator [] (size_type ndx) const
 {
     return vector<int>::operator [](ndx);
+}
+
+void GlobalArray::applyBitvector(const GlobalBitvector &bv, int modifier)
+{
+    vector<int> array = bv.toArray();
+
+    for (unsigned int sn = 0; sn < array.size(); sn++) {
+        (*this)[array[sn]] += modifier;
+    }
 }
 
