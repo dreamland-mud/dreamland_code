@@ -140,7 +140,6 @@ void affect_enchant( Object *obj )
     }
 }
 
-
 /*
  * Apply or remove an affect to a character.
  */
@@ -212,31 +211,12 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
         mod = 0 - mod;
     }
 
-    if (!ch->is_npc()) {
-        unsigned int sn;
-        vector<int> array;
-
-        switch (paf->where) {
-            case TO_SKILLS:
-                array = paf->global.toArray();
-                for (sn = 0; sn < array.size(); sn++)
-                    ch->getPC()->mod_skills[array[sn]] += mod;
-                break;
-            case TO_SKILL_GROUPS:
-                array = paf->global.toArray();
-                for (sn = 0; sn < array.size(); sn++)
-                    ch->getPC()->mod_skill_groups[sn] += mod;
-                break;
-        }
-    }
-
     switch ( paf->location )
     {
     default:
         bug( "Affect_modify: unknown location %d.", paf->location );
         return;
 
-    case APPLY_NONE:                                                break;
     case APPLY_STR:           ch->mod_stat[STAT_STR]        += mod;        break;
     case APPLY_DEX:           ch->mod_stat[STAT_DEX]        += mod;        break;
     case APPLY_INT:           ch->mod_stat[STAT_INT]        += mod;        break;
@@ -244,7 +224,6 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_CON:           ch->mod_stat[STAT_CON]        += mod;        break;
     case APPLY_CHA:              ch->mod_stat[STAT_CHA]        += mod; break;
     case APPLY_CLASS:                                                break;
-    case APPLY_LEVEL:                                                break;
     case APPLY_AGE:
         if (!ch->is_npc( ))
             ch->getPC( )->age.modifyYears( mod );
@@ -270,6 +249,36 @@ void affect_modify( Character *ch, Affect *paf, bool fAdd )
     case APPLY_SAVING_SPELL:  ch->saving_throw                += mod;        break;
     case APPLY_MANA_GAIN:     ch->mana_gain             += mod; break;
     case APPLY_HEAL_GAIN:     ch->heal_gain             += mod; break;
+
+    case APPLY_NONE:
+    case APPLY_LEARNED: 
+        if (!ch->is_npc()) {
+            switch (paf->where) {
+                case TO_SKILLS:
+                    ch->getPC()->mod_skills.applyBitvector(paf->global, mod);
+                    break;
+                case TO_SKILL_GROUPS:
+                    ch->getPC()->mod_skill_groups.applyBitvector(paf->global, mod);
+                    break;
+            }
+        }
+        break;
+
+    case APPLY_LEVEL:
+        if (!ch->is_npc()) {
+            switch (paf->where) {
+                case TO_SKILLS:
+                    ch->getPC()->mod_level_groups.applyBitvector(paf->global, mod);
+                    break;
+                case TO_SKILL_GROUPS:
+                    ch->getPC()->mod_level_groups.applyBitvector(paf->global, mod);
+                    break;
+                default:
+                    ch->getPC()->mod_level_all += mod;
+                    break;
+            }
+        }
+        break;
     }
 }
 

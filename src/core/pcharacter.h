@@ -303,11 +303,21 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic
     XML_VARIABLE XMLInteger                curse;
     XML_VARIABLE XMLInteger                bless;
-    XML_VARIABLE XMLGlobalArray            mod_skills;
-    XML_VARIABLE XMLGlobalArray            mod_skill_groups;
 
-    // money
+    /** Bonus to skill knowledge through affects. */
+    GlobalArray            mod_skills;
+    /** Bonus to skill group knowledge through affects. */
+    GlobalArray            mod_skill_groups;
+    /** Bonus to spell/skill level for particular skill. */
+    GlobalArray            mod_level_skills;
+    /** Bonus to spell/skill level for particular skill group. */
+    GlobalArray            mod_level_groups;
+    /** General spell/skil level bonus. */
+    int                    mod_level_all;
+
+    /** Amount of silver in the bank. */
     XML_VARIABLE XMLIntegerNoEmpty        bank_s;
+    /** Amount of gold in the bank. */
     XML_VARIABLE XMLIntegerNoEmpty        bank_g;
     
     NPCharacter *        pet;

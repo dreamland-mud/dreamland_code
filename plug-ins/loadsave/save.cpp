@@ -198,7 +198,8 @@ Affect * fread_Affc( FILE *fp )
         paf->next        = NULL;
         
         globalString    = fread_dlstring_to_eol(fp);
-        globalString.stripWhiteSpace( );
+        globalString.substitute('\r', ' ').substitute('\n', ' ');
+        globalString.stripWhiteSpace( );        
         
         if (!globalString.empty( ) 
             && isalpha(globalString.at(0))

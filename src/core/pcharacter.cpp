@@ -233,11 +233,13 @@ void CachedNoun::update( PCharacter *ch )
  **************************************************************************/
 
 PCharacter::PCharacter( )
-        :        wearloc( wearlocationManager ),
+        :       wearloc( wearlocationManager ),
                 desires( desireManager ),
-                config( 0, &config_flags ),
                 mod_skills(skillManager),
-                mod_skill_groups(skillGroupManager)
+                mod_skill_groups(skillGroupManager),
+                mod_level_skills(skillManager),
+                mod_level_groups(skillGroupManager),
+                config( 0, &config_flags )
 {
     init( );
 }
@@ -310,6 +312,9 @@ void PCharacter::init( )
     bless = 0;
     mod_skills.clear();
     mod_skill_groups.clear();
+    mod_level_all = 0;
+    mod_level_skills.clear();
+    mod_level_groups.clear();
 
     bank_s = 0;
     bank_g = 0;

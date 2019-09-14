@@ -2219,8 +2219,10 @@ DLString AffectOutput::format_affect_location( Affect *paf )
             break;
             
         default:
-            buf << "изменяет {m" << apply_flags.message( paf->location ) << "{y "
-                << "на {m" << paf->modifier << "{y";
+            if (paf->global.empty()) {
+                buf << "изменяет {m" << apply_flags.message( paf->location ) << "{y "
+                    << "на {m" << paf->modifier << "{y";
+            }
             break;
         }
 
@@ -2302,11 +2304,19 @@ DLString AffectOutput::format_affect_global( Affect *paf )
 
         case TO_SKILLS:
         case TO_SKILL_GROUPS:
-            buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                << " знание "
-                << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка") << " {m" 
-                << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
-                << "{y на {m" << (int)abs(paf->modifier) << "{y";
+            if (paf->location == APPLY_LEVEL) {
+                buf << (paf->modifier >= 0 ? "повышает" : "понижает")
+                    << " уровень заклинаний "
+                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "") << " {m" 
+                    << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
+                    << "{y на {m" << (int)abs(paf->modifier) << "{y";
+            } else if (paf->location == APPLY_NONE || paf->location == APPLY_LEARNED) {
+                buf << (paf->modifier >= 0 ? "повышает" : "понижает")
+                    << " знание "
+                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка") << " {m" 
+                    << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
+                    << "{y на {m" << (int)abs(paf->modifier) << "{y";
+            }
             break;
         }
     }
@@ -2638,14 +2648,51 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
     int b = paf->bitvector,
         d = paf->duration;
 
-    if (paf->location != APPLY_NONE && paf->modifier != 0) {
-        buf << "Изменяет " << apply_flags.message(paf->location ) 
-            << " на " << paf->modifier;
+    if (paf->modifier != 0) {
+        switch (paf->location) {
+            case APPLY_NONE:
+            case APPLY_LEARNED:
+                if (!paf->global.empty()) {
+                    switch(paf->where) {
+                        case TO_SKILLS:
+                        case TO_SKILL_GROUPS:
+                            buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                                << " знание "
+                                << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка")
+                                << " " << paf->global.toRussianString().quote() 
+                                << " на " << (int)abs(paf->modifier) << endl;
+                            break;
+                    }
+                }
+                break;
 
-        if (d > -1)
-            buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
-    
-        buf << endl;
+            case APPLY_LEVEL:
+                if (!paf->global.empty()) {
+                    switch(paf->where) {
+                        case TO_SKILLS:
+                        case TO_SKILL_GROUPS:
+                            buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
+                                << " уровень заклинания "
+                                << (paf->where == TO_SKILL_GROUPS ? "группы" : "")
+                                << " " << paf->global.toRussianString().quote() 
+                                << " на " << (int)abs(paf->modifier) << endl;
+                            break;
+                    }
+                    return;
+                }
+
+                /* FALL THROUGH */
+
+            default:
+                buf << "Изменяет " << apply_flags.message(paf->location ) 
+                    << " на " << paf->modifier;
+
+                if (d > -1)
+                    buf << ", в течении " << d << " час" << GET_COUNT(d, "а", "ов", "ов");
+            
+                buf << endl;                
+                break;
+        }
     }
 
     if (b) {
@@ -2668,18 +2715,6 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
         }
     }
 
-    if (!paf->global.empty()) {
-        switch(paf->where) {
-            case TO_SKILLS:
-            case TO_SKILL_GROUPS:
-                buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                    << " знание "
-                    << (paf->where == TO_SKILL_GROUPS ? "группы" : "навыка")
-                    << " " << paf->global.toRussianString().quote() 
-                    << " на " << (int)abs(paf->modifier) << endl;
-                break;
-        }
-    }
 }
 
 void lore_fmt_wear( int type, int wear, ostringstream &buf )

@@ -178,6 +178,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     int slevel;
     int chance;
     int mlevel = ch->getModifyLevel( );
+    bool groupBonus = false;
     
     if (ch->is_npc( ))
         return mlevel;
@@ -203,6 +204,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             gsn_improved_maladiction->improve( ch, true );
+            groupBonus = true;
         }
         else
             gsn_improved_maladiction->improve( ch, false );
@@ -215,6 +217,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             gsn_improved_benediction->improve( ch, true );
+            groupBonus = true;
         }
         else
             gsn_improved_benediction->improve( ch, false );
@@ -231,6 +234,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
             act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
+            groupBonus = true;
         }
     }
     
@@ -257,6 +261,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         f  = A0 / (1 + x / B0);
 
         slevel = (int) (f * slevel);
+        groupBonus = true;
     }
 
     if (gsn_mastering_spell->usable( ch, false )) {
@@ -270,10 +275,15 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 
     slevel = max( 1, slevel + get_int_app(ch).slevel );
 
-    for (Affect *paf = ch->affected; paf; paf = paf->next)
-        if (paf->location == APPLY_LEVEL)
-            slevel += paf->modifier;
-    
+    if (!groupBonus) {
+        int old_level = slevel;
+        slevel += ch->getPC()->mod_level_groups[skill->getGroup()];
+        slevel += ch->getPC()->mod_level_skills[skill->getIndex()];
+        slevel += ch->getPC()->mod_level_all;
+        if (old_level != slevel && ch->isCoder()) 
+            ch->printf(">>> changing spell level from %d to %d.\n", old_level, slevel);
+    }
+
     return slevel;
 }
 

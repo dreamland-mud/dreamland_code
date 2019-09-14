@@ -144,6 +144,9 @@ bool PCharacter::load( )
     mod_stat.clear( );
     mod_skills.clear();
     mod_skill_groups.clear();
+    mod_level_all = 0;
+    mod_level_skills.clear();
+    mod_level_groups.clear();
     max_hit         = perm_hit;
     max_mana        = perm_mana;
     max_move        = perm_move;
