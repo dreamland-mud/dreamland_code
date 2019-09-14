@@ -1469,32 +1469,17 @@ NMI_INVOKE( CharacterWrapper, rawdamage, "(vict,dam,damtype): нанести vic
 
 NMI_INVOKE( CharacterWrapper, damage, "(vict,dam,skillName,damtype): нанести vict повреждения в размере dam умением skillName и типом damtype (таблица .tables.damage_table)" )
 {
-    RegisterList::const_iterator i;
-    Character *victim;
-    int dam;
-    int dam_type = DAM_NONE;
-    Skill *skill; 
-    DLString skillName;
-
     checkTarget( );
 
-    if (args.size() < 3)
-       throw Scripting::NotEnoughArgumentsException( );
-    
-    i = args.begin( );
-    victim = arg2character( *i );
-    dam = (++i)->toNumber( );
+    Character *victim = argnum2character(args, 1);
+    int dam = argnum2number(args, 2);
+    Skill *skill = argnum2skill(args, 3);
+    int dam_type = DAM_NONE;
 
-    skillName = (++i)->toString( );
-    skill = skillManager->findExisting( skillName );
-    if (!skill)
-        throw Scripting::CustomException( skillName + ": invalid skill name");
-    
-    if (args.size() > 2) {
-        DLString d = (++i)->toString();
-        dam_type = damage_table.value( d.c_str(), true );
+    if (args.size() > 3) {
+        dam_type = argnum2flag(args, 4, damage_table);
         if (dam_type == NO_FLAG)
-            throw Scripting::CustomException( "Invalid damage type");
+            throw Scripting::CustomException("Invalid damage type");
     }
 
     ::damage(target, victim, dam, skill->getIndex( ), dam_type, true);

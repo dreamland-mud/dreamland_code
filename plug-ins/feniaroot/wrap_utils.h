@@ -19,6 +19,7 @@ class Wearlocation;
 class Skill;
 struct obj_index_data;
 struct mob_index_data;
+class FlagTable;
 
 Register wrap( Object * );
 Register wrap( struct obj_index_data * );
@@ -46,5 +47,7 @@ Character *argnum2character(const RegisterList &args, int num);
 PCharacter *argnum2player(const RegisterList &args, int num);
 int argnum2number(const RegisterList &args, int num);
 Skill * argnum2skill(const RegisterList &args, int num);
+int argnum2flag(const RegisterList &args, int num, const FlagTable &table);
+
 #endif
 

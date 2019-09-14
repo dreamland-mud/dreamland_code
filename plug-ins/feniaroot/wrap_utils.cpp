@@ -146,6 +146,14 @@ PCharacter *argnum2player(const RegisterList &args, int num)
     return ch->getPC();
 }
 
+int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
+{
+    Register a = argnum(args, num);
+    if (a.type == Register::STRING)
+        return table.value( a.toString().c_str(), true );
+    return a.toNumber();
+}
+
 int argnum2number(const RegisterList &args, int num)
 {
     return argnum(args, num).toNumber();
