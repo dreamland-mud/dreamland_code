@@ -1044,7 +1044,14 @@ OEDIT(behavior)
         return true;
     }
 
-    stc("Syntax:  behavior    - line edit\n\r", ch);
+    if (!str_cmp( argument, "clear" )) {        
+        obj.behavior.clear( );
+        stc("Поведение очищено.\r\n", ch);
+        return true;
+    }
+
+    stc("Syntax:  behavior       - line edit\n\r", ch);
+    stc("Syntax:  behavior clear\n\r", ch);
     return false;
 }
 

@@ -589,7 +589,14 @@ AEDIT(behavior, "поведение", "запустить строковый р�
         return true;
     }
 
+    if (!str_cmp( argument, "clear" )) {
+        behavior.clear( );
+        stc("Поведение очищено.\r\n", ch);
+        return true;
+    }
+
     stc("Syntax:  behavior\n\r", ch);
+    stc("Syntax:  behavior clear\n\r", ch);
     return false;
 }
 
