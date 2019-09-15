@@ -87,7 +87,6 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<ReykarisShevaleSet> >( ppl );
         
         Plugin::registerPlugin<MobileBehaviorRegistrator<Masquer> >( ppl );
-        Plugin::registerPlugin<AreaBehaviorRegistrator<Masquerade> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<RoamingPortal> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<CatsEye> >( ppl );
                 

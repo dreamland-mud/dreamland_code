@@ -31,108 +31,12 @@
 GSN(manacles);
 GSN(jail);
 
-/*----------------------------------------------------------------------------
- * Masquerade area behavior (handles objects resets)
- *----------------------------------------------------------------------------*/
-void Masquerade::setArea( AREA_DATA *area ) {
-    AreaBehavior::setArea( area );
-}
-
-typedef std::vector<NPCharacter *> MobileVector;
-typedef std::map<int, MobileVector> MobileHash;
-
-void Masquerade::update( ) {
-    MobileHash masquers;
-
-    for (Character *wch = char_list; wch; wch = wch->next) {
-        NPCharacter *mob = wch->getNPC();
-
-        if (!mob || mob->pIndexData->area != area)
-            continue;
-        
-        masquers[ mob->pIndexData->vnum ].push_back( mob );
-    }
-
-    for (map<int, Room *>::iterator i = area->rooms.begin( ); i != area->rooms.end( ); i++) {
-        Room *room = i->second;
-
-        for (RESET_DATA *pReset = room->reset_first; pReset; pReset = pReset->next) {
-            RESET_DATA *old_reset;
-            
-            if (pReset->command == 'M') {
-                MobileHash::iterator ipos = masquers.find( pReset->arg1 );
-                
-                if (ipos == masquers.end( )) 
-                    continue;
-
-                old_reset = pReset;
-
-                for (pReset = pReset->next; pReset; pReset = pReset->next) {
-                    if (pReset->command != 'G' && pReset->command != 'E') {
-                        break;
-                    }
-
-                    for (MobileVector::iterator iter = ipos->second.begin( ); iter != ipos->second.end( ); iter++) {
-                        OBJ_INDEX_DATA *pObjIndex;
-                        Object *o;
-                        NPCharacter *mob = *iter;
-                        char cmd = pReset->command;
-                        int loc = pReset->arg3;
-
-                        pObjIndex = get_obj_index( pReset->arg1 );
-
-                        if (!pObjIndex) 
-                            continue;
-
-                        if (pObjIndex->limit != -1 && pObjIndex->count >= pObjIndex->limit)
-                            continue;
-
-                        for (o = mob->carrying; o; o = o->next_content) 
-                                if (o->pIndexData == pObjIndex) 
-                                break;
-
-                        if (o == NULL) {
-                            o = create_object( pObjIndex, 0 );
-                            obj_to_char( o, mob );
-
-                            if (cmd == 'E' && !get_eq_char( mob, loc ))
-                                wearlocationManager->find( loc )->equip( o );
-
-                            continue;
-                        }
-
-                        if (o->wear_loc == wear_none) {
-                            if (cmd == 'E' && !get_eq_char( mob, loc )) {
-                                wearlocationManager->find( loc )->equip( o );
-                            } 
-                        }
-                        else if (o->wear_loc != loc) {
-                            if (cmd == 'E' && !get_eq_char( mob, loc )) {
-                                o->wear_loc->unequip( o );
-                                wearlocationManager->find( loc )->equip( o );
-                            }
-                            if (cmd == 'G') {
-                                o->wear_loc->unequip( o );
-                            }
-                        }
-                    }
-                }
-
-                pReset = old_reset;
-            }
-        }
-    }
-    
-}
 
 /*----------------------------------------------------------------------------
  * Masquer 
  *----------------------------------------------------------------------------*/
 void Masquer::speech( Character *victim, const char *speech ) 
 {
-    Object *obj;
-    char buf [256];
-    char charName[MAX_INPUT_LENGTH], objName[MAX_INPUT_LENGTH];
     DLString str = speech;
 
     // Check mob name is mentioned, for speech prog only.

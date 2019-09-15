@@ -14,16 +14,6 @@
 #include "objectbehavior.h"
 #include "objectbehaviorplugin.h"
 
-class Masquerade : public AreaBehavior {
-XML_OBJECT
-public:
-        typedef ::Pointer<Masquerade> Pointer;
-        
-        virtual void setArea( area_data * );
-
-        virtual void update( );
-};
-
 class Masquer : public MobileBehavior {
 XML_OBJECT
 public:
