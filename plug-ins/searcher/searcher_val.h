@@ -29,10 +29,12 @@ struct SearcherParam {
     int hr, dr, hp, mana, move, saves, armor, size, age;
     int str, inta, wis, dex, con, cha;
     int heal_gain, mana_gain;
+    int slevel;
     DLString aff, vuln, res, imm, det;
     DLString wclass, wflags;
     int ave;
     DLString fenia;
+    DLString learned;
     bool result;
 };
 extern SearcherParam p;

@@ -606,20 +606,25 @@ CMDRUNP(searcher)
                         if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) anti.push_back("N");
                     }
 
-                    DLString aff = " ";
-                    if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty()) {
-                        aff = "{C*{x";
-                        if (!p.fenia.empty())
-                            aff = "{G*{x";
-                    } else if (!p.fenia.empty())
-                        aff = "{g*{x";
+                    bool clr_aff = !p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty();
+                    bool clr_fenia = !p.fenia.empty();
+                    bool clr_skills = !p.learned.empty();
 
-                    DLString line = dlprintf("%5d {C%3d{x {y%-10s{x {y%-10s{x %-20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
+                    DLString aff = " ";
+                    if (clr_skills) {
+                        aff = (clr_aff || clr_fenia) ? "{M*{x" : "{m*{x";
+                    } else if (clr_fenia) {
+                        aff = clr_aff ? "{G*{x" : "{g*{x";
+                    } else if (clr_aff) {
+                        aff = "{C*{x";
+                    }
+
+                    DLString line = fmt(NULL, "%5d {C%3d{x {y%-10s{x {y%-10s{x %-20.20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
                                     pObj->vnum,
                                     pObj->level, 
                                     p.itemtype.c_str(),
                                     p.wear.substr(0, 10).c_str(),
-                                    russian_case(pObj->short_descr, '1').colourStrip().substr(0, 20).c_str(),
+                                    russian_case(pObj->short_descr, '1')./*colourStrip().substr(0, 20).*/c_str(),
                                     anti.join("").c_str(),
                                     aff.c_str(),
                                     (p.hr != 0 ? "C": "w"), p.hr, 
@@ -642,7 +647,7 @@ CMDRUNP(searcher)
             } 
     
             ostringstream buf;
-            buf << dlprintf("{W%5s %3s %-10s %-10s %-20s %-3s %1s %3s %3s %3s %3s %3s %s{x\n", 
+            buf << fmt(0, "{W%5s %3s %-10s %-10s %-20.20s %-3s %1s %3s %3s %3s %3s %3s %s{x\n", 
                             "VNUM", "LVL", "TYPE", "WEAR", "NAME", "ALG", "A", "HR", "DR", "HP", "MAN", "SVS", "AREA");
             for (size_t lvl = 0; lvl < output.size(); lvl++) {
                 const list<DLString> &lines = output[lvl];

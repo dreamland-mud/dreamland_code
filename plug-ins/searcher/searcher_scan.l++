@@ -85,10 +85,12 @@ L	    ([A-Za-z_]|{RL})
 "HEAL_GAIN" return T_HGAIN;
 "MGAIN"     return T_MGAIN;
 "MANA_GAIN" return T_MGAIN;
+"SLEVEL"    return T_SLEVEL;
 "WCLASS"    return T_WCLASS;
 "WFLAGS"    return T_WFLAGS;
 "AVE"       return T_AVE;
 "FENIA"     return T_FENIA;
+"LEARNED"   return T_LEARNED;
 
 
 "<="	    return T_LEQ;
@@ -128,6 +130,8 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.det = p.aff = p.imm = p.res = p.vuln = "";
     p.wclass = p.wflags = "";
     p.ave = 0;
+    p.learned = "";
+    p.slevel = 0;
 
     for (Affect *paf = pObj->affected; paf; paf = paf->next) {
         int m = paf->modifier;
@@ -154,6 +158,14 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
         case APPLY_SAVING_SPELL:  p.saves+=m; break;
         case APPLY_HEAL_GAIN: p.heal_gain+=m; break;
         case APPLY_MANA_GAIN: p.mana_gain+=m; break;
+        case APPLY_LEVEL:     p.slevel+=m; break;
+
+        case APPLY_LEARNED:
+        case APPLY_NONE:
+            if (!paf->global.empty() ){
+                p.learned << paf->global.toString() << " ";
+            }
+            break;
         }
     
         if (paf->bitvector > 0) {    
