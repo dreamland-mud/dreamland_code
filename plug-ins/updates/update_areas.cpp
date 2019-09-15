@@ -23,6 +23,8 @@
 #include "mercdb.h"
 #include "def.h"
 
+WEARLOC(none);
+
 /*
  * Repopulate areas periodically.
  */
@@ -90,6 +92,22 @@ static RESET_DATA * find_mob_reset(Room *pRoom, NPCharacter *mob)
     return 0;
 }
 
+/** Equip an item if required by reset configuration. */
+static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob)
+{
+    if (pReset->command == 'E' && obj->wear_loc == wear_none) {
+        Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
+        if (wloc) {
+            // Remove an odd item that ended up in that slot, i.e. scavenged weapons.
+            Object *other = wloc->find(mob);
+            if (other)
+                wloc->unequip(other);
+            // Equip back.
+            wloc->equip(obj);
+        }
+    }
+}
+
 /** Create an item for inventory or equipment for a given mob, based on reset data. */
 static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob)
 {
@@ -109,14 +127,9 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
             SET_BIT( obj->extra_flags, ITEM_INVENTORY );
     }
 
-    // Give and equip, if the slot is empty.
+    // Give and equip the item.
     obj_to_char( obj, mob );
-
-    if (pReset->command == 'E') {
-        Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
-        if (wloc && wloc->find(mob) == 0)
-            wloc->equip( obj );
-    }
+    reset_obj_location(pReset, obj, mob);
 
     return obj;
 }
@@ -129,8 +142,11 @@ static bool reset_mob_item(RESET_DATA *myReset, NPCharacter *mob)
         return false;
 
     Object *self = get_obj_list_vnum(mob->carrying, pObjIndex->vnum);
-    if (self) // TODO handle 'P' resets inside 'E'/'G' resets
+    // TODO handle 'P' resets inside 'E'/'G' resets
+    if (self) {
+        reset_obj_location(myReset, self, mob);
         return false;
+    }
 
     Object *newItem = create_item_for_mob(myReset, pObjIndex, mob);
     if (newItem) {
