@@ -47,4 +47,9 @@ DLString skill_what_plural(const Skill *skill);
  */
 int skill_learned_from_affects(const Skill *skill, PCharacter *ch);
 
+/**
+ * Display effective skill percent if differs from learned.
+ */
+DLString skill_effective_bonus(const Skill *skill, PCharacter *ch);
+
 #endif

@@ -161,3 +161,15 @@ int skill_learned_from_affects(const Skill *skill, PCharacter *ch)
     return ch->mod_skills[sn] + ch->mod_skill_groups[gsn];
 }
 
+DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
+{
+    int learned = ch->getSkillData(skill->getIndex()).learned;
+    int eff = skill->getEffective(ch);
+
+    if (eff == learned)
+        return DLString::emptyString;
+
+    ostringstream buf;
+    buf << ", работает на {C" << eff << "%{x";
+    return buf.str();
+}

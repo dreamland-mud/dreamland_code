@@ -578,7 +578,8 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
             buf << "Приснилось тебе";
         else
             buf << "Досталось тебе";
-        buf << " разученное до {C" << percent << "%{x." << endl;
+        buf << " разученное до {C" << percent << "%{x"
+            << skill_effective_bonus(this, ch) << "." << endl;
         print_see_also(this, ch, buf);
         return;
     }
@@ -592,7 +593,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         else 
             buf << "изучено на {" << skill_learned_colour(this, ch) << percent << "%{x";
         
-        buf << "." << endl;
+        buf << skill_effective_bonus(this, ch) << "." << endl;
     }
     
     if (ch->getProfession( ) == prof_universal) {
