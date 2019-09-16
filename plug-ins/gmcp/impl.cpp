@@ -27,7 +27,7 @@ static const char C_GMCP  = static_cast<char>(GMCP);
 static const char C_SE = static_cast<char>(SE);
 static const char *PROTO_NAME = "GMCP";
 static const DLString GUI_VERSION = "6";
-static const DLString GUI_URL = "http://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland.zip";
+static const DLString GUI_URL = "https://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland.zip";
 
 static string json_to_string( const Json::Value &value )
 {
