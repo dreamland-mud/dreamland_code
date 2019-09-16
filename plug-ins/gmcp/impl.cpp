@@ -28,6 +28,8 @@ static const char C_SE = static_cast<char>(SE);
 static const char *PROTO_NAME = "GMCP";
 static const DLString GUI_VERSION = "6";
 static const DLString GUI_URL = "https://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland.zip";
+static const DLString MAP_URL = "https://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland-mapping.dat";
+static const DLString ASCII_MAPS = "https://dreamland.rocks/maps/";
 
 static string json_to_string( const Json::Value &value )
 {
@@ -56,7 +58,7 @@ void GMCPCommand::send(Descriptor *d, const string &package, const string &messa
         << C_IAC << C_SE;
 
     string str = buf.str();
-    LogStream::sendNotice() << "Sending GMCP data " << data << endl;
+    LogStream::sendNotice() << "Sending GMCP data " << str << endl;
     d->writeRaw((const unsigned char *)str.c_str(), str.size());
 }
 
@@ -64,8 +66,13 @@ GMCPCOMMAND_RUN(protoInit)
 {
     const ProtoInitArgs &myArgs = static_cast<const ProtoInitArgs &>( args );
     checkSupport(myArgs.d, myArgs.proto.c_str());
-    if (isSupported(myArgs.d))
+    if (isSupported(myArgs.d)) {
         send(myArgs.d, "Client", "GUI", GUI_VERSION + "\n" + GUI_URL);
+
+        Json::Value data;
+        data["url"] = MAP_URL;
+        send(myArgs.d, "Client", "Map", json_to_string(data));
+    }
 }
 
 GMCPCOMMAND_RUN(charToRoom)
@@ -84,7 +91,7 @@ GMCPCOMMAND_RUN(charToRoom)
     data["num"] = ch->in_room->vnum;
     data["name"] = DLString(ch->in_room->name).colourStrip();
     data["area"] = DLString(ch->in_room->area->name).colourStrip();
-    data["map"] = DLString("https://dreamland.rocks/maps/") + ch->in_room->area->area_file->file_name + ".html";
+    data["map"] = ASCII_MAPS + ch->in_room->area->area_file->file_name + ".html";
     
     for (int door = 0; door < DIR_SOMEWHERE; door++) {
         Room *room = direction_target(ch->in_room, door);
