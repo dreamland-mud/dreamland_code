@@ -1008,3 +1008,23 @@ NMI_INVOKE( Root, obj_by_id, "(id): найти феневый объект по 
     return Register(&Scripting::Object::manager->at(args.front().toNumber()));
 }
 
+NMI_INVOKE(Root, codesource, "(func): номер сценария, в котором объявлена данная функция")
+{
+    Register reg = argnum2function(args, 1);
+    Scripting::CodeSourceRef csRef = reg.toFunction()->getFunction()->source;
+    return Register((int)csRef.source->getId());
+}
+
+NMI_INVOKE(Root, apply, "(func, this, args): вызвать func с указанным this и списком аргументов args")
+{    
+    Register func = argnum2function(args, 1);
+    Register thiz = argnum(args, 2);
+    Register params = argnum(args, 3);
+    RegList::Pointer regList = params.toHandler().getDynamicPointer<RegList>();
+    RegisterList registerList;
+
+    for (RegList::const_iterator r = regList->begin(); r != regList->end(); r++)
+        registerList.push_back(*r);
+
+    return func.toFunction()->invoke(thiz, registerList);
+}

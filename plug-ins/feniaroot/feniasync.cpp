@@ -5,9 +5,9 @@
 #include "admincommand.h"
 
 #include "feniamanager.h"
-
+/*
 CMDADM( feniasync )
 {
     FeniaManager::getThis( )->sync( 0 );
 }
-
+*/

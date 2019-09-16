@@ -119,7 +119,7 @@ void args2buf(const RegisterList &args, char *buf, size_t bufsize)
     buf[bufsize - 1] = 0;
 }
 
-const Register & argnum(const RegisterList &args, int num)
+static RegisterList::const_iterator argnum2iterator(const RegisterList &args, int num)
 {
     if (args.size() < (unsigned int)num)
         throw Scripting::NotEnoughArgumentsException();
@@ -128,9 +128,30 @@ const Register & argnum(const RegisterList &args, int num)
     int i;
     for (a = args.begin(), i = 1; i <= num - 1 && a != args.end(); i++, a++) 
         ; 
+    return a;
+}
+
+const Register & argnum(const RegisterList &args, int num)
+{
+    RegisterList::const_iterator a = argnum2iterator(args, num);
     return *a;
 }
 
+const Register & argnum2function(const RegisterList &args, int num)
+{
+    const Register &reg = argnum(args, num);
+    if (reg.type != Register::FUNCTION)
+        throw Scripting::IllegalArgumentException();
+    return reg;
+}
+
+RegisterList argnum2list(const RegisterList &args, int num)
+{
+    RegisterList::const_iterator a = argnum2iterator(args, num);
+    RegisterList result;
+    result.assign(a, args.end());
+    return result;
+}
 
 Character *argnum2character(const RegisterList &args, int num)
 {

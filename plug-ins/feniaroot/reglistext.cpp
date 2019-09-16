@@ -20,12 +20,12 @@ NMI_INVOKE( RegList, at, "(n): возвращает элемент списка 
     size_t n = args2number(args);
     const_iterator i;
     
-    if (size() == 0)
+    if (n < 0 || n >= size())
         return Register();
 
     for (i = begin( ); i != end( ) && n > 0; i++, n--)
         ;
-    
+
     return *i;
 }
 
