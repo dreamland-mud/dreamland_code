@@ -215,6 +215,9 @@ VOID_SPELL(EvolveLion)::run( Character *ch, Character *, int sn, int level )
 { 
   Affect af;
 
+  if (ch->is_npc())
+      return;
+
   if ( ch->isAffected(sn )
                 || ch->hit > ch->max_hit )
         {
