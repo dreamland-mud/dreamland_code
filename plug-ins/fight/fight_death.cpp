@@ -18,6 +18,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "fenia_utils.h"
 
 #include "behavior_utils.h"
 #include "schedulertask.h"
@@ -550,6 +551,8 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
     }
     
     victim->unsetLastFightTime( );
+
+    gprog("onDeath", "CC", victim, ch);
 
     if (mprog_death( victim, ch )) {
         victim->setDead( );
