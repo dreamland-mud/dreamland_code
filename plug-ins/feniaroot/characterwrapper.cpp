@@ -1404,6 +1404,13 @@ NMI_INVOKE( CharacterWrapper, stop_follower, "(): прекращает след�
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, is_same_group, "(gch): вернет true если мы с персонажем gch в одной группе" )
+{
+    checkTarget( );
+    Character *gch = arg2character(get_unique_arg(args));
+    return Register(is_same_group(target, gch));
+}
+
 NMI_INVOKE( CharacterWrapper, clearBehavior, "(): сбросить поведение моба до обычного" )
 {
     checkTarget( );
