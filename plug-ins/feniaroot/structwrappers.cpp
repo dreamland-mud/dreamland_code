@@ -224,7 +224,9 @@ static int weapon_vnum( int wclass )
         case WEAPON_AXE:
             return 40119;
         case WEAPON_MACE:
-            return 40117;
+            return 40100;
+	case WEAPON_SPEAR:
+	    return 40117;
     }
     return -1;
 }
@@ -243,6 +245,8 @@ NMI_INVOKE( ProfessionWrapper, bestWeapon, "(ch): vnum лучшего нович
         return weapon_vnum( WEAPON_SWORD );
     if (ch->getTarget( )->getSkill( gsn_dagger ) == 100)
         return weapon_vnum( WEAPON_DAGGER );
+    if (ch->getTarget( )->getSkill( gsn_mace ) == 100)
+        return weapon_vnum( WEAPON_MACE );
     if (ch->getTarget( )->getSkill( gsn_spear ) == 100)
         return weapon_vnum( WEAPON_SPEAR );
 
