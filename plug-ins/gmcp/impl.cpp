@@ -26,8 +26,8 @@ static const char C_SB = static_cast<char>(SB);
 static const char C_GMCP  = static_cast<char>(GMCP);
 static const char C_SE = static_cast<char>(SE);
 static const char *PROTO_NAME = "GMCP";
-static const DLString GUI_VERSION = "3";
-static const DLString GUI_URL = "https://dreamland.rocks/img/dl.zip";
+static const DLString GUI_VERSION = "6";
+static const DLString GUI_URL = "http://dreamland-mud.github.io/dreamland_mudlet/downloads/Dreamland.zip";
 
 static string json_to_string( const Json::Value &value )
 {
@@ -56,7 +56,7 @@ void GMCPCommand::send(Descriptor *d, const string &package, const string &messa
         << C_IAC << C_SE;
 
     string str = buf.str();
-//    LogStream::sendNotice() << "Sending GMCP data " << data << endl;
+    LogStream::sendNotice() << "Sending GMCP data " << data << endl;
     d->writeRaw((const unsigned char *)str.c_str(), str.size());
 }
 
