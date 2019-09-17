@@ -9,6 +9,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "fenia_utils.h"
 
 #include "behavior_utils.h"
 #include "pcharacter.h"
@@ -226,6 +227,8 @@ void SpeechChannel::triggers( Character *ch, const DLString &msg ) const
     }
 
     rprog_speech( ch->in_room, ch, cmsg );
+
+    gprog("onSpeech", "Cs", ch, cmsg);
 }
 
 /*-----------------------------------------------------------------------
