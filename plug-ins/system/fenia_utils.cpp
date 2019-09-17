@@ -44,8 +44,9 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
         args.push_front(trigName);
         args.push_back(listObj);
 
-        // Invoke trigger handler and return its result.
-        return trigger_handler.toFunction()->invoke(tmp, args).toBoolean();
+        // Invoke trigger handler ignoring its result.
+        trigger_handler.toFunction()->invoke(tmp, args);
+        return true;
     }
     catch (const Scripting::Exception &e) {
         LogStream::sendWarning( ) << "global trigger: " << e.what( ) << endl;

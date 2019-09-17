@@ -12,6 +12,7 @@
 
 #include "mobindexwrapper.h"
 #include "wrappermanager.h"
+#include "structwrappers.h"
 #include "reglist.h"
 #include "nativeext.h"
 #include "register-impl.h"
@@ -145,6 +146,12 @@ NMI_GET( MobIndexWrapper, practicer, "какие группы умений мо�
 {
     checkTarget( );
     return target->practicer.toString( );
+}
+
+NMI_GET( MobIndexWrapper, area, "зона, в которой прописан моб (.Area)") 
+{
+    checkTarget( );
+    return AreaWrapper::wrap(target->area->area_file->file_name);
 }
 
 NMI_GET( MobIndexWrapper, repopPlaces, "список внумов комнат, в которых ресетится моб") 
