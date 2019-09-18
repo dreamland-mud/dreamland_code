@@ -138,7 +138,7 @@ public:
         int total_hints = iargs.hints1.size() + iargs.hints2.size() + iargs.translit.size();
 
         if (total_hints == 0) {
-            iargs.ch->send_to( "Что?\r\n" );
+            iargs.ch->send_to( "Что? Для справки наберите {y{hc{lRкоманды{lEcommands{x или {y{hc{lRсправка{lEhelp{x.\r\n" );
             return false;
         }
 
@@ -159,6 +159,7 @@ public:
                 buf << endl;
         }
 
+        buf << "Для справки наберите {y{hc{lRкоманды{lEcommands{x или {y{hc{lRсправка{lEhelp{x." << endl;
         iargs.ch->send_to(buf);
         return false;
     }
