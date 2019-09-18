@@ -23,13 +23,48 @@
 #include "xmleditorinputhandler.h"
 
 #include "comm.h"
+#include "dl_match.h"    
 #include "dl_ctype.h"
+#include "dl_strings.h"
 #include "def.h"
 
 using namespace Scripting;
 using namespace std;
 
 bool has_fenia_security( PCharacter *pch );
+
+static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
+{
+    CodeSource::Manager::const_iterator i;
+    for (i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
+        if (dl_match(arg.c_str(), i->name.c_str(), true)) {
+            csid = i->getId();
+            return true;
+        }
+    }
+
+    ch->pecho("Сценарий с темой '%s' не найден.", arg.c_str());
+    return false;
+}
+
+static bool cs_by_number(PCharacter *ch, const DLString &arg, id_t &csid)
+{
+    CodeSource::Manager::iterator i;
+    Integer num;
+
+    if (!Integer::tryParse(num, arg)) {
+        return cs_by_subj(ch, arg, csid);
+    }
+
+    i = CodeSource::manager->find(num);
+    if (i == CodeSource::manager->end()) {
+        ch->pecho("Сценарий под номером %d не найден.", num.getValue());
+        return false;
+    }
+
+    csid = i->getId();
+    return true;
+}
 
 CMDADM( codesource )
 {
@@ -60,11 +95,12 @@ CMDADM( codesource )
         
         buf << "Синтаксис команды {Wcodesource{x:" << endl
             << "Чтение:" << endl
-            << "     {Wlist{x         - показать список всех существующих codesources" << endl
-            << "     {Wread{x <номер> - прочитать cs по номеру из списка" << endl
-            << "     {Wcopy{x <номер> - скопировать cs из списка в буфер редактора" << endl
+            << "     {Wlist{x [строка]      - показать список сценариев, всех или со строкой в названии" << endl
+            << "     {Wread{x <номер>|<имя> - прочитать cs из списка по номеру или названию" << endl
+            << "     {Wcopy{x <номер>|<имя> - скопировать cs из списка в буфер редактора" << endl
             << endl
             << "Редактирование:" << endl
+            << "     {Wweb{x [<номер>|<имя>] - редактировать новый или существующий сценарий в веб-редакторе" << endl
             << "     {Wsubj{x <текст> - указать тему cs; удобно тут же указывать версию" << endl
             << "     {Wbin{x <id>     - прочесть текст cs из https://pastebin.com/<id>" << endl
             << "     {Wpaste{x        - вставить текст cs из буфера редактора" << endl
@@ -95,62 +131,48 @@ CMDADM( codesource )
         buf << header;
 
         for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
-            sprintf( header, "[%5u] {g%8s{x: %-36s {D(%lu функц.){x\r\n", 
-                    i->getId( ), 
-                    i->author.c_str( ), 
-                    i->name.c_str( ),
-                    i->functions.size( ));
-            buf << header;
+            if (args.empty() 
+                || is_name(args.c_str(), i->name.c_str())
+                || dl_match(args.c_str(), i->name.c_str(), true)) {
+                sprintf( header, "[%5u] {g%8s{x: %-36s {D(%lu функц.){x\r\n", 
+                        i->getId( ), 
+                        i->author.c_str( ), 
+                        i->name.c_str( ),
+                        i->functions.size( ));
+                buf << header;
+            }
         }
         page_to_char(buf.str().c_str(), ch);
         return;
     }
     
     if(cmd.strPrefix("copy")) {
-        CodeSource::Manager::iterator i;
-        
-        try {
-            i = CodeSource::manager->find( args.toInt( ) );
-        } catch( ... ) {
+        id_t csid;
+        if (!cs_by_number(pch, args, csid))
             return;
-        }
 
-        if(i == CodeSource::manager->end( ) ) {
-            page_to_char( "no such CodeSource\r\n", ch );
-            return;
-        }
-
+        const DLString &content = CodeSource::manager->at(csid).content;
         pch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")
-            ->regs[0].split(i->content);
+            ->regs[0].split(content);
         
-        page_to_char("Codesource copyied to the editor buffer\r\n", ch);
+        ch->pecho("Сценарий %d скопирован в буфер редактора.", csid);
         return;
     }
     
     if(cmd.strPrefix("read")) {
-        CodeSource::Manager::iterator i;
-        
-        try {
-            i = CodeSource::manager->find( args.toInt( ) );
-        } catch( ... ) {
+        id_t csid;
+        if (!cs_by_number(pch, args, csid))
             return;
-        }
 
-        if(i == CodeSource::manager->end( ) ) {
-            page_to_char( "no such CodeSource\r\n", ch );
-            return;
-        }
-        
-        char buf[MAX_STRING_LENGTH];
-        sprintf( buf, "[%u] {g%s{x: %s\r\n", 
-                    i->getId(), 
-                    i->author.c_str( ),
-                    i->name.c_str( ));
-        page_to_char(buf, ch);
+        CodeSource &cs = CodeSource::manager->at(csid);        
+        ch->printf( "[%u] {g%s{x: %s\r\n", 
+                    cs.getId(), 
+                    cs.author.c_str( ),
+                    cs.name.c_str( ));
         
         ostringstream ostr;
         string::const_iterator c;
-        for(c = i->content.begin( ); c != i->content.end( ); c++ ) 
+        for(c = cs.content.begin( ); c != cs.content.end( ); c++ ) 
         {
             if(*c == '{')
                 ostr << '{';
@@ -167,31 +189,16 @@ CMDADM( codesource )
             return;
         }
 
-        CodeSource::Manager::iterator i;
-        
-        try {
-            i = CodeSource::manager->find( args.toInt( ) );
-        } catch( ... ) {
+        id_t csid;
+        if (!cs_by_number(pch, args, csid))
             return;
-        }
 
-        if(i == CodeSource::manager->end( ) ) {
-            page_to_char( "no such CodeSource\r\n", ch );
-            return;
-        }
-
-        ostringstream ostr;
-        string::const_iterator c;
-        for(c = i->content.begin( ); c != i->content.end( ); c++ ) 
-        {
-            ostr << *c;
-        }
-       
-        DLString filecontent = ostr.str();
+        CodeSource &cs = CodeSource::manager->at(csid);               
+        DLString filecontent = cs.content;
         DLDirectory dir( dreamland->getTableDir( ), "fenia.local" );
-        DLFileStream( dir, i->name, ".f++" ).fromString( filecontent );
+        DLFileStream( dir, cs.name, ".f++" ).fromString( filecontent );
         ch->printf("Codesource %d is saved as  %s/%s.f++.\r\n",  
-                     args.toInt(), dir.getAbsolutePath().c_str(), i->name.c_str());
+                     cs.getId(), dir.getAbsolutePath().c_str(), cs.name.c_str());
         return;
     }
 
@@ -200,7 +207,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -249,12 +256,12 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
         
         if(csa->content.empty( )) {
-            ch->send_to( "no more lines left\r\n" );
+            ch->send_to( "No more lines left\r\n" );
             return;
         }
 
@@ -268,7 +275,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -282,7 +289,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -306,13 +313,13 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
         
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
                 
         ifstream ifs(args.c_str( ));
         if(!ifs) {
-            ch->send_to("open error\r\n");
+            ch->send_to("Open error.\r\n");
             return;
         }
         
@@ -360,7 +367,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -398,7 +405,7 @@ CMDADM( codesource )
                         ).findAttr<XMLAttributeCodeSource>( "codesource" );
 
         if(!csa) {
-            page_to_char( "you do not edit any CodeSource\r\n", ch );
+            ch->println("Ты не редактируешь сценарий.");
             return;
         } 
         
@@ -437,23 +444,14 @@ CMDADM( codesource )
         std::vector<DLString> parms;
         
         if(!args.empty()) {
-            CodeSource::Manager::iterator i;
-
-            try {
-                i = CodeSource::manager->find( args.toInt( ) );
-            } catch( ... ) {
-                page_to_char( "no such CodeSource\r\n", ch );
+            id_t csid;
+            if (!cs_by_number(pch, args, csid))
                 return;
-            }
 
-            if(i == CodeSource::manager->end( ) ) {
-                page_to_char( "no such CodeSource\r\n", ch );
-                return;
-            }
-
+            CodeSource &cs = CodeSource::manager->at(csid);        
             parms.resize(2);
-            parms[0] = i->name;
-            parms[1] = i->content;
+            parms[0] = cs.name;
+            parms[1] = cs.content;
         }
 
         ch->desc->writeWSCommand("cs_edit", parms);
