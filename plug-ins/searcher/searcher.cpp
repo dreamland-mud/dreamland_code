@@ -89,7 +89,7 @@ static bool get_obj_resets( int vnum, AREA_DATA *&pArea, DLString &where )
 class SearcherDumpTask : public SchedulerTaskRoundPlugin {
 public:
     typedef ::Pointer<SearcherDumpTask> Pointer;
- 
+
     virtual int getPriority( ) const
     {
         return SCDP_ROUND + 30;
@@ -101,7 +101,7 @@ public:
     }
 
     virtual void run( )
-    {   
+    {
         LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
         dumpArmor();
         dumpWeapon();
@@ -109,7 +109,7 @@ public:
         dumpPets();
     }
 
-    bool dumpPets() 
+    bool dumpPets()
     {
         ostringstream buf;
 
@@ -151,14 +151,14 @@ public:
     {
         ostringstream buf;
 
-        buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,armor,str,int,wis,dex,con,cha,size,affects,area,where,limit" << endl;
+        buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,str,int,wis,dex,con,cha,align,affects,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
             bitstring_t wear = pObj->wear_flags;
             REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
             DLString wearloc;
-            
+
             // Limit obj level by 100.
             if (pObj->level > LEVEL_MORTAL)
                 continue;
@@ -181,15 +181,16 @@ public:
 
             // Format object item type and damage roll.
             DLString itemtype = item_table.message( pObj->item_type );
-            
+
             // Format object name.
             DLString name = russian_case(pObj->short_descr, '1').toLower( );
             csv_escape( name );
-        
+
             // Find all bonuses.
-            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
-            int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
+            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
+            int str=0, inta=0, wis=0, dex=0, con=0, cha=0;
             DLString aff,det,imm,res,vuln;
+            DLString align;
 
             for (Affect *paf = pObj->affected; paf; paf = paf->next) {
                 int m = paf->modifier;
@@ -204,10 +205,8 @@ public:
                 case APPLY_HIT: hp+=m; break;
                 case APPLY_MANA: mana+=m; break;
                 case APPLY_MOVE: move+=m; break;
-                case APPLY_AC: ac+=m; break;
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
-                case APPLY_SIZE: size+=m; break;
                 case APPLY_SAVES:         
                 case APPLY_SAVING_ROD:    
                 case APPLY_SAVING_PETRI:  
@@ -228,17 +227,18 @@ public:
                 }
             }
 
-            if (pObj->item_type == ITEM_ARMOR) {
-                ac -= pObj->value[0];
+            if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) align << "G";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) align << "E";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) align << "N";
             }
-
 
             
             // Potions, containers etc often can be held but do nothing - ignore them.
             bool useless = false;
             if (wear == ITEM_HOLD) {
                 useless = str == 0 && inta == 0 && wis == 0 && dex == 0 && con == 0 && cha == 0
-                    && hp == 0 && mana == 0 && move == 0 && ac == 0 && hr == 0 && dr == 0 && size == 0
+                    && hp == 0 && mana == 0 && move == 0 && hr == 0 && dr == 0
                     && svs == 0;
                 // TODO check affects
             }
@@ -268,11 +268,11 @@ public:
                 << "\"" << itemtype << "\","
                 << hr << "," << dr << "," << hp << "," 
                 << mana << "," << move << "," 
-                << svs << "," << ac << ","
+                << svs << "," 
                 << str << "," << inta << "," << wis << ","
                 << dex << "," << con << "," << cha << ","
-                << size << "," << "\"\"," 
-                << "\"" << area << "\","  << "\"" << where << "\","  
+                << "\"" << align << "\","<< "\"\","
+                << "\"" << area << "\","  << "\"" << where << "\","
                 << pObj->limit << endl;
         }
 
@@ -290,14 +290,14 @@ public:
     {
         ostringstream buf;
 
-        buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,armor,str,int,wis,dex,con,area,where,limit" << endl;
+        buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
             bitstring_t wear = pObj->wear_flags;
             REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
             DLString wearloc;
-            
+
             // Limit obj level by 100.
             if (pObj->level > LEVEL_MORTAL)
                 continue;
@@ -315,14 +315,15 @@ public:
             int d1 = pObj->value[1];
             int d2 = pObj->value[2];
             int ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
-            
+
             // Format object name.
             DLString name = russian_case(pObj->short_descr, '1').toLower( );
             csv_escape( name );
-        
+
             // Find all bonuses.
-            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
+            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
             int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
+            DLString align;
 
             for (Affect *paf = pObj->affected; paf; paf = paf->next) {
                 int m = paf->modifier;
@@ -337,7 +338,6 @@ public:
                 case APPLY_HIT: hp+=m; break;
                 case APPLY_MANA: mana+=m; break;
                 case APPLY_MOVE: move+=m; break;
-                case APPLY_AC: ac+=m; break;
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
                 case APPLY_SIZE: size+=m; break;
@@ -348,7 +348,13 @@ public:
                 case APPLY_SAVING_SPELL:  svs+=m; break;
                 }
             }
-            
+
+            if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) align << "G";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) align << "E";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) align << "N";
+            }
+
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AREA_DATA *pArea;
@@ -362,21 +368,22 @@ public:
             DLString area = pArea->name;
             csv_escape( area );
             csv_escape( where );
-                
-            // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,ac,str,int,wis,dex,con,area,where"
+
+            // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where"
             buf << pObj->vnum << ","
                 << "\"" << name << "\","
                 << pObj->level << ","
                 << "\"" << weaponClass << "\","
                 << "\"" << special << "\","
-                << d1 << "," 
-                << d2 << "," 
-                << ave << "," 
-                << hr << "," << dr << "," 
-                << hp << "," << mana << "," 
-                << svs << "," << ac << ","
+                << d1 << ","
+                << d2 << ","
+                << ave << ","
+                << hr << "," << dr << ","
+                << hp << "," << mana << ","
+                << svs << ","
                 << str << "," << inta << "," << wis << ","
-                << dex << "," << con << "," 
+                << dex << "," << con << ","
+                << "\"" << align << "\","
                 << "\"" << area << "\","  << "\"" << where << "\","
                 << pObj->limit << endl;
         }
@@ -559,7 +566,7 @@ CMDRUNP(searcher)
     }
 
     if (arg_oneof(arg, "magic")) {
-        if (task.dumpMagic()) 
+        if (task.dumpMagic())
             ch->println("Created /tmp/db_magic.csv file.");
         else
             ch->println("Error occurred, please check the logs.");
@@ -568,7 +575,7 @@ CMDRUNP(searcher)
     }
     
     if (arg_oneof(arg, "weapon")) {
-        if (task.dumpWeapon()) 
+        if (task.dumpWeapon())
             ch->println("Created /tmp/db_weapon.csv file.");
         else
             ch->println("Error occurred, please check the logs.");
@@ -607,12 +614,8 @@ CMDRUNP(searcher)
                     }
 
                     DLString aff = " ";
-                    if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty()) {
+                    if (!p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty())
                         aff = "{C*{x";
-                        if (!p.fenia.empty())
-                            aff = "{G*{x";
-                    } else if (!p.fenia.empty())
-                        aff = "{g*{x";
 
                     DLString line = dlprintf("%5d {C%3d{x {y%-10s{x {y%-10s{x %-20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
                                     pObj->vnum,
