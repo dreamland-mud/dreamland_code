@@ -151,7 +151,7 @@ public:
     {
         ostringstream buf;
 
-        buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,armor,str,int,wis,dex,con,cha,size,affects,area,where,limit" << endl;
+        buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,str,int,wis,dex,con,cha,align,affects,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
@@ -187,9 +187,10 @@ public:
             csv_escape( name );
         
             // Find all bonuses.
-            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
-            int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
+            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
+            int str=0, inta=0, wis=0, dex=0, con=0, cha=0;
             DLString aff,det,imm,res,vuln;
+            DLString align;
 
             for (Affect *paf = pObj->affected; paf; paf = paf->next) {
                 int m = paf->modifier;
@@ -204,10 +205,8 @@ public:
                 case APPLY_HIT: hp+=m; break;
                 case APPLY_MANA: mana+=m; break;
                 case APPLY_MOVE: move+=m; break;
-                case APPLY_AC: ac+=m; break;
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
-                case APPLY_SIZE: size+=m; break;
                 case APPLY_SAVES:         
                 case APPLY_SAVING_ROD:    
                 case APPLY_SAVING_PETRI:  
@@ -228,17 +227,18 @@ public:
                 }
             }
 
-            if (pObj->item_type == ITEM_ARMOR) {
-                ac -= pObj->value[0];
+            if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) align << "G";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) align << "E";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) align << "N";
             }
 
 
-            
             // Potions, containers etc often can be held but do nothing - ignore them.
             bool useless = false;
             if (wear == ITEM_HOLD) {
                 useless = str == 0 && inta == 0 && wis == 0 && dex == 0 && con == 0 && cha == 0
-                    && hp == 0 && mana == 0 && move == 0 && ac == 0 && hr == 0 && dr == 0 && size == 0
+                    && hp == 0 && mana == 0 && move == 0 && hr == 0 && dr == 0
                     && svs == 0;
                 // TODO check affects
             }
@@ -268,10 +268,10 @@ public:
                 << "\"" << itemtype << "\","
                 << hr << "," << dr << "," << hp << "," 
                 << mana << "," << move << "," 
-                << svs << "," << ac << ","
+                << svs << "," 
                 << str << "," << inta << "," << wis << ","
                 << dex << "," << con << "," << cha << ","
-                << size << "," << "\"\"," 
+                << "\"" << align << "\","<< "\"\","
                 << "\"" << area << "\","  << "\"" << where << "\","  
                 << pObj->limit << endl;
         }
@@ -290,7 +290,7 @@ public:
     {
         ostringstream buf;
 
-        buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,armor,str,int,wis,dex,con,area,where,limit" << endl;
+        buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
@@ -321,8 +321,9 @@ public:
             csv_escape( name );
         
             // Find all bonuses.
-            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0, ac=0;
+            int hr=0, dr=0, hp=0, svs=0, mana=0, move=0;
             int str=0, inta=0, wis=0, dex=0, con=0, cha=0, size=0;
+            DLString align;
 
             for (Affect *paf = pObj->affected; paf; paf = paf->next) {
                 int m = paf->modifier;
@@ -337,7 +338,6 @@ public:
                 case APPLY_HIT: hp+=m; break;
                 case APPLY_MANA: mana+=m; break;
                 case APPLY_MOVE: move+=m; break;
-                case APPLY_AC: ac+=m; break;
                 case APPLY_HITROLL: hr+=m; break;
                 case APPLY_DAMROLL: dr+=m; break;
                 case APPLY_SIZE: size+=m; break;
@@ -349,6 +349,12 @@ public:
                 }
             }
             
+            if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) align << "G";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) align << "E";
+                if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) align << "N";
+            }
+
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AREA_DATA *pArea;
@@ -363,7 +369,7 @@ public:
             csv_escape( area );
             csv_escape( where );
                 
-            // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,ac,str,int,wis,dex,con,area,where"
+            // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where"
             buf << pObj->vnum << ","
                 << "\"" << name << "\","
                 << pObj->level << ","
@@ -374,9 +380,10 @@ public:
                 << ave << "," 
                 << hr << "," << dr << "," 
                 << hp << "," << mana << "," 
-                << svs << "," << ac << ","
+                << svs << ","
                 << str << "," << inta << "," << wis << ","
                 << dex << "," << con << "," 
+                << "\"" << align << "\","
                 << "\"" << area << "\","  << "\"" << where << "\","
                 << pObj->limit << endl;
         }
