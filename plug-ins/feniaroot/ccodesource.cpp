@@ -23,6 +23,7 @@
 #include "xmleditorinputhandler.h"
 
 #include "comm.h"
+#include "act.h"
 #include "dl_match.h"    
 #include "dl_ctype.h"
 #include "dl_strings.h"
@@ -98,6 +99,7 @@ CMDADM( codesource )
             << "     {Wlist{x [строка]      - показать список сценариев, всех или со строкой в названии" << endl
             << "     {Wread{x <номер>|<имя> - прочитать cs из списка по номеру или названию" << endl
             << "     {Wcopy{x <номер>|<имя> - скопировать cs из списка в буфер редактора" << endl
+            << "     {Wsearch{x <строка>    - найти все сценарии, содержащие строку в коде"  << endl
             << endl
             << "Редактирование:" << endl
             << "     {Wweb{x [<номер>|<имя>] - редактировать новый или существующий сценарий в веб-редакторе" << endl
@@ -140,6 +142,45 @@ CMDADM( codesource )
                         i->name.c_str( ),
                         i->functions.size( ));
                 buf << header;
+            }
+        }
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }
+
+    if(cmd.strPrefix("search")) {
+        ostringstream buf;
+        CodeSource::Manager::iterator i;
+        static DLString highlight("{R");
+
+        if (args.empty()) {
+            ch->println("Синтаксис: cs search <строка>");
+            return;
+        }
+
+        buf << "Сценарии, содержащие '" << args << "':" << endl;
+        
+        for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
+            ostringstream matchBuf;
+            stringstream lines(i->content);
+            DLString line;            
+            int num = 0;
+
+            while (std::getline(lines, line, '\n')) {
+                num++;
+                if (line.find(args) != string::npos) {
+                    line.replaces(args, highlight + args + "{x");
+                    matchBuf << dlprintf("{D%3d{x ", num) << line << "\r\n";
+                }
+            }
+
+            DLString match = matchBuf.str();
+            if (!match.empty()) {
+                buf << dlprintf("[%5u] {g%8s{x: {G%-36s {D(%d функц.){x",
+                                i->getId(), i->author.c_str(), i->name.c_str(), i->functions.size())
+                    << endl
+                    << match
+                    << endl;
             }
         }
         page_to_char(buf.str().c_str(), ch);
