@@ -94,6 +94,15 @@ NMI_GET( AreaWrapper, area_flag, "флаги зоны (таблица .tables.ar
     return Scripting::Register((int)(find_area( filename )->area_flag));
 }
 
+NMI_GET( AreaWrapper, min_vnum, "нижняя граница диапазона vnum-ов зоны" ) 
+{
+    return Scripting::Register((int)(find_area( filename )->min_vnum));
+}
+
+NMI_GET( AreaWrapper, max_vnum, "верхняя граница диапазона vnum-ов зоны" ) 
+{
+    return Scripting::Register((int)(find_area( filename )->max_vnum));
+}
 /*----------------------------------------------------------------------
  * Hometown
  *----------------------------------------------------------------------*/
