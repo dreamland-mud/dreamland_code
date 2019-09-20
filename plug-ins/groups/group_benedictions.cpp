@@ -457,7 +457,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
             spell(curse_num,level,ch, vch);
             vch->send_to("Божественная сила повергает тебя!\n\r");
             dam = dice(level,6);
-            damage(ch,vch,dam,sn,DAM_ENERGY, true, DAMF_SPELL);
+            damage(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
           }
         }
 
@@ -471,7 +471,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
             spell(curse_num,level/2,ch, vch);
             vch->send_to("Божественная сила повергает тебя!\n\r");
             dam = dice(level,4);
-            damage(ch,vch,dam,sn,DAM_ENERGY, true, DAMF_SPELL);
+            damage(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
           }
         }
     }
