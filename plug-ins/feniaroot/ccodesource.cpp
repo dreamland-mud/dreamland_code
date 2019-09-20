@@ -134,6 +134,7 @@ CMDADM( codesource )
 
         for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
             if (args.empty() 
+		|| i->name.find(args) != DLString::npos
                 || is_name(args.c_str(), i->name.c_str())
                 || dl_match(args.c_str(), i->name.c_str(), true)) {
                 sprintf( header, "[%5u] {g%8s{x: %-36s {D(%lu функц.){x\r\n", 
