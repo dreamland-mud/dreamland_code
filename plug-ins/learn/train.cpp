@@ -23,6 +23,8 @@
 #include "act.h"
 #include "def.h"
 
+static const int conPriceQP = 150;
+
 static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
 {
     FENIA_CALL( trainer, "CantTrain", "C", client );
@@ -48,14 +50,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 
     arg = argument.getOneArgument( );
     
-    if (arg.empty( )) {
-        tell_act( client, ch, "Ты можешь обменять {Y10{G практик на {Y1{G тренировочную сессию." );
-        tell_act( client, ch, "Ты можешь обменять {Y1{G тренировочную сессию на {Y10{G практик." );
-        tell_act( client, ch, "Используй для этого '{lRтренировки купить{lEgain convert{lx' или '{lRтренировки продать{lEgain revert{lx'." );
-        return;
-    }
-    
-    if (arg.strPrefix( "revert" ) || arg.strPrefix("продать")) {
+    if (arg_oneof(arg, "revert", "sell", "продать")) {
         if (client->train < 1) {
             tell_act( client, ch, "У тебя нет тренировочных сессий." );
             return;
@@ -69,7 +64,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
         return;
     }
 
-    if (arg.strPrefix( "convert" ) || arg.strPrefix("купить")) {
+    if (arg_oneof(arg, "convert", "buy", "купить")) {
         if (client->practice < 10) {
             tell_act( client, ch, "У тебя нет необходимого количества практик." );
             return;
@@ -83,12 +78,17 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
         return;
     }
 
-    tell_act( client, ch, "Я тебя не могу понять..." );
+    if (arg.empty( )) {
+        tell_act( client, ch, "Ты можешь обменять {Y10{G практик на {Y1{G тренировочную сессию." );
+        tell_act( client, ch, "Ты можешь обменять {Y1{G тренировочную сессию на {Y10{G практик." );
+        tell_act( client, ch, "Используй для этого '{lRтренировки купить{lEgain convert{lx' или '{lRтренировки продать{lEgain revert{lx'." );
+        return;
+    }
 }
 
 void Trainer::doTrain( PCharacter *client, DLString & argument )
 {
-    int cost, costQP; 
+    int cost; 
     DLString argStat, argQP;
     int stat;
     bool fQP;
@@ -98,7 +98,6 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     stat = -1;
     cost = 1;
     fQP = false;
-    costQP = 150;
     
     if (mprog_cant_train( client, ch ))
         return;
@@ -112,50 +111,19 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
             fQP = true;
     }
 
-    if (argStat.empty( )) {
-        tell_raw( client, ch, "У тебя {Y%d{G тренировочн%s.", 
-                  client->train.getValue( ),
-                  GET_COUNT(client->train,"ая сессия","ые сессии","ых сессий") );
-    }
-    else {
-        for (int i = 0; i < stat_table.size; i++)
-            if (argStat.strPrefix( stat_table.fields[i].name )
-                || argStat.strPrefix( russian_case(stat_table.fields[i].message, '1') )
-                || argStat.strPrefix( russian_case(stat_table.fields[i].message, '4') ))
-            {
-                stat = i;
-                break;
-            }
-    }
+    for (int i = 0; i < stat_table.size; i++)
+        if (argStat.strPrefix( stat_table.fields[i].name )
+            || argStat.strPrefix( russian_case(stat_table.fields[i].message, '1') )
+            || argStat.strPrefix( russian_case(stat_table.fields[i].message, '4') ))
+        {
+            stat = i;
+            break;
+        }
     
     if (stat == -1) {
-        ostringstream buf;
-        int cnt = 0;
-
-        for (int i = 0; i < stat_table.size; i++)
-            if (client->perm_stat[stat_table.fields[i].value] 
-                    < client->getMaxTrain( stat_table.fields[i].value))
-            {
-                buf << russian_case( stat_table.fields[i].message, '4' )
-                    << "(" << stat_table.fields[i].name << ") ";
-                cnt++;
-            }
-        
-        if (cnt > 0) {
-            tell_raw( client, ch, 
-                      "Ты можешь тренировать:%s%s", 
-                      (cnt > 2 ? "\r\n" : " " ),
-                      buf.str( ).c_str( ) );
-            if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ))
-                tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: train con qp.", costQP );
-        }            
-        else
-            /*
-             * This message dedicated to Jordan ... you big stud!
-             */
-            tell_raw( client, ch, "Тебе больше нечего тренировать, %s!",
-                      GET_SEX(client, "жеребчик", "дикое животное", "красотка") );
-
+        tell_raw(client, ch, "Я не понимаю, чего ты хочешь.");
+        showTrain(client);
+        showGain(client);
         return;
     }
 
@@ -174,7 +142,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
             return;
         }
 
-        if (costQP > client->getQuestPoints()) {
+        if (conPriceQP > client->getQuestPoints()) {
             tell_raw( client, ch, "У тебя недостаточно квестовых единиц." );
             return;
         }
@@ -184,7 +152,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     }
     
     if (fQP)
-        client->addQuestPoints(-costQP);
+        client->addQuestPoints(-conPriceQP);
     else
         client->train -= cost;
 
@@ -194,6 +162,50 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     act( "$c1 повышает $N4!", client, 0, stat_table.fields[stat].message, TO_ROOM );
 }
 
+
+void Trainer::showTotal(PCharacter *client)
+{
+    tell_raw( client, ch, "У тебя {Y%d{G тренировочн%s.", 
+              client->train.getValue( ),
+              GET_COUNT(client->train,"ая сессия","ые сессии","ых сессий") );
+}
+
+void Trainer::showTrain(PCharacter *client)
+{
+    ostringstream buf;
+    int cnt = 0;
+
+    for (int i = 0; i < stat_table.size; i++)
+        if (client->perm_stat[stat_table.fields[i].value] 
+                < client->getMaxTrain( stat_table.fields[i].value))
+        {
+            buf << russian_case( stat_table.fields[i].message, '4' )
+                << "(" << stat_table.fields[i].name << ") ";
+            cnt++;
+        }
+    
+    if (cnt > 0) {
+        tell_raw( client, ch, 
+                  "Ты можешь тренировать:%s%s", 
+                  (cnt > 3 ? "\r\n" : " " ),
+                  buf.str( ).c_str( ) );
+        if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ))
+            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {lEtrain con qp{lRтренировать сложение кп{lx.", conPriceQP );
+    }            
+    else {
+        /*
+         * This message dedicated to Jordan ... you big stud!
+         */
+        tell_raw( client, ch, "Тебе больше нечего тренировать, %s!",
+                  GET_SEX(client, "жеребчик", "дикое животное", "красотка") );
+    }
+}
+
+void Trainer::showGain(PCharacter *client)
+{
+    tell_act( client, ch, "Ты можешь обменять {Y10{G практик на {Y1{G тренировочную сессию и наоборот." );
+    tell_act( client, ch, "Используй для этого '{lRтренировки купить{lEgain convert{lx' или '{lRтренировки продать{lEgain revert{lx'." );
+}
 
 CMDRUN( train )
 {
@@ -211,11 +223,18 @@ CMDRUN( train )
         ch->println( "Здесь некому тренировать тебя." );
         return;
     }
+
+    if (argument.empty()) {
+        trainer->showTotal(ch->getPC());
+        trainer->showTrain(ch->getPC());
+        trainer->showGain(ch->getPC());
+        return;
+    }
     
-    if (argument.strPrefix("revert") 
-        || (argument.strPrefix("convert") && argument != "con")
-        || argument.strPrefix("продать")
-        || argument.strPrefix("купить"))
+    if (arg_oneof(argument, "revert", "sell", "продать")
+        || arg_oneof(argument, "buy", "купить")
+        || (argument.strPrefix("convert") && argument != "con"))
+
     {
         trainer->doGain( ch->getPC( ), argument );
         return;

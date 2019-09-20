@@ -21,6 +21,9 @@ public:
 
         void doGain( PCharacter *, DLString & );
         void doTrain( PCharacter *, DLString & );
+        void showTotal(PCharacter *);
+        void showTrain(PCharacter *);
+        void showGain(PCharacter *);
 };
 
 #endif
