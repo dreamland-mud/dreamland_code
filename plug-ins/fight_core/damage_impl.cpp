@@ -3,12 +3,18 @@
  * ruffina, 2004
  */
 #include "damage_impl.h"
+#include "damageflags.h"
+
 #include "russianstring.h"
+
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
 #include "skillreference.h"
 #include "spell.h"
 #include "skillgroup.h"
-#include "character.h"
+#include "npcharacter.h"
 #include "merc.h"
 #include "def.h"
 
@@ -110,6 +116,16 @@ void SkillDamage::message( )
             msgVict( "%1$^O1 %2$C2\6тебя", &attack, ch );
         }
     }
+}
+
+
+bool SkillDamage::mprog_immune()
+{
+    DLString damType = damage_table.name(dam_type);
+    DLString sname = skillManager->find(sn)->getName();
+    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str());
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, sname.c_str());
+    return false; 
 }
 
 /*

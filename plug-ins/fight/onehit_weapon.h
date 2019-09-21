@@ -28,6 +28,8 @@ protected:
     void damEffectFeeble( );
     void damEffectFunkyWeapon( );
 
+    virtual bool mprog_immune();
+
     Object *wield;
     bool secondary;
     int weapon_sn;

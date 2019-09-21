@@ -4,8 +4,11 @@
  */
 #include "onehit_missile.h"
 
-#include "skill.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
+#include "skill.h"
 #include "affect.h"
 #include "race.h"
 #include "npcharacter.h"
@@ -420,3 +423,20 @@ void MissileOneHit::msgOutput( Character *wch, const char *msg )
     wch->pecho( msg, ch, victim, missile );
 }
 
+bool MissileOneHit::mprog_immune()
+{
+    DLString damType = damage_table.name(dam_type);
+    DLString sname = missileSkill->getName();
+    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), missile, dam_flag, sname.c_str());
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), missile, dam_flag, sname.c_str());
+    return false; 
+}
+
+bool ThrowerOneHit::mprog_immune()
+{
+    DLString damType = damage_table.name(dam_type);
+    DLString sname = throwerSkill->getName();
+    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), thrower, dam_flag, sname.c_str());
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), thrower, dam_flag, sname.c_str());
+    return false; 
+}

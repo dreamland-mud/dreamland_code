@@ -36,6 +36,8 @@ protected:
     void damEffectFunkyWeapon( );
     void damEffectStucking( );
 
+    virtual bool mprog_immune();
+
     int range;
     Object *missile;
     Skill *missileSkill;
@@ -53,6 +55,7 @@ public:
 
 protected:
     virtual void damBase( );
+    virtual bool mprog_immune();
 
     Object *thrower;
     Skill *throwerSkill;

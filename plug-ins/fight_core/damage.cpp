@@ -315,19 +315,19 @@ void Damage::protectTemperature( )
         dam -= dam / 4;
 }
 
-static bool mprog_immune(Character *victim, Character *attacker, int dam_type, int &dam)
+bool Damage::mprog_immune()
 {
-    FENIA_NUM_CALL(victim, "Immune", dam, "Cii", attacker, dam_type, dam);
-    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCii", victim, attacker, dam_type, dam);
+    DLString damType = damage_table.name(dam_type);
+    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), NULL, dam_flag, "");
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, "");
     return false; 
 }
-
 
 void Damage::protectImmune( )
 {
     int old_dam = dam;
 
-    if (mprog_immune(victim, ch, dam_type, dam)) {
+    if (mprog_immune()) {
         if (old_dam > 0 && dam == 0)
             immune = true;
         return;

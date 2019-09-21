@@ -4,8 +4,11 @@
  */
 #include "onehit_weapon.h"
 
-#include "skill.h"
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
 
+#include "skill.h"
 #include "affect.h"
 #include "race.h"
 #include "npcharacter.h"
@@ -18,6 +21,7 @@
 #include "handler.h"
 #include "gsn_plugin.h"
 #include "effects.h"
+#include "damageflags.h"
 #include "magic.h"
 #include "occupations.h"
 #include "act.h"
@@ -348,3 +352,11 @@ void WeaponOneHit::msgOutput( Character *wch, const char *msg )
     wch->pecho( msg, ch, victim, wield );
 }
 
+bool WeaponOneHit::mprog_immune()
+{
+    DLString damType = damage_table.name(dam_type);
+    DLString sname = weaponSkill->getName();
+    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), wield, dam_flag, sname.c_str());
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), wield, dam_flag, sname.c_str());
+    return false; 
+}

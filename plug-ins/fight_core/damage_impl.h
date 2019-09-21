@@ -30,6 +30,8 @@ struct SkillDamage : public virtual Damage {
     virtual void message( );
     
 protected:
+    virtual bool mprog_immune();
+
     int sn;
 };
 

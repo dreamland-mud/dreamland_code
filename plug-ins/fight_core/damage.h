@@ -56,6 +56,8 @@ protected:
     void msgRoom( const char *fmt, ... );
     void msgChar( const char *fmt, ... );
 
+    virtual bool mprog_immune();
+
 private:
     virtual int msgNoSpamBit( );
 
