@@ -258,7 +258,7 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 /*----------------------------------------------------------------------------
  * Assassinate 
  *---------------------------------------------------------------------------*/
-class AssassinateOneHit: public WeaponOneHit, public SkillDamage {
+class AssassinateOneHit: public SkillWeaponOneHit {
 public:
     AssassinateOneHit( Character *ch, Character *victim );
 
@@ -266,10 +266,10 @@ public:
 };
 
 AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_assassinate, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_assassinate )
 {
 }
+
 void AssassinateOneHit::calcDamage( )
 {
     int chance;

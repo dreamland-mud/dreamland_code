@@ -148,7 +148,7 @@ void UndefinedOneHit::priorDamageEffects( )
     damEffectGroundStrike( );
 }
 
-static bool mprog_hit( Character *ch, Character *victim, int dam, int dam_type, Object *wield )
+bool UndefinedOneHit::mprog_hit()
 {
     DLString damType = damage_table.name( dam_type );
     
@@ -163,9 +163,6 @@ void UndefinedOneHit::postDamageEffects( )
     damEffectFeeble( );
     damEffectFunkyWeapon( );
     damEffectSlice( );
-    
-    if (dreamland->hasOption( DL_BUILDPLOT ))
-        mprog_hit( ch, victim, dam, dam_type, wield );
 }
 
 void UndefinedOneHit::message( )

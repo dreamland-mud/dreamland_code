@@ -46,6 +46,8 @@ protected:
     void destroyShield( );
     int getDestroyChance( Object * );
     bool canDestroy( Object * );
+
+    virtual bool mprog_hit();
 };
 
 #else

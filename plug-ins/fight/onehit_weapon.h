@@ -6,6 +6,7 @@
 #define __ONEHIT_WEAPON_H__
 
 #include "onehit.h"
+#include "damage_impl.h"
 
 #ifndef FIGHT_STUB
 class WeaponOneHit : public OneHit {
@@ -38,6 +39,14 @@ protected:
 
 private:
     virtual void msgOutput( Character *, const char * );
+};
+
+class SkillWeaponOneHit: public WeaponOneHit, public SkillDamage {
+public:
+    SkillWeaponOneHit(Character *ch, Character *victim, int sn);
+
+protected:
+    virtual bool mprog_immune();
 };
 
 #else

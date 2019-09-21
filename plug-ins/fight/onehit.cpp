@@ -79,6 +79,7 @@ void OneHit::hit( )
 
     inflictDamage( );
     postDamageEffects( );
+    mprog_hit();
     handlePosition( );
     checkRetreat( );
 }

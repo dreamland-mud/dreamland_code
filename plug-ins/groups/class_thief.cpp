@@ -82,7 +82,7 @@ static bool mprog_steal_money( Character *victim, Character *thief, int gold, in
 /*----------------------------------------------------------------------------
  * Backstab
  *---------------------------------------------------------------------------*/
-class BackstabOneHit: public WeaponOneHit, public SkillDamage {
+class BackstabOneHit: public SkillWeaponOneHit {
 public:
     BackstabOneHit( Character *ch, Character *victim );
 
@@ -91,10 +91,10 @@ public:
 };
 
 BackstabOneHit::BackstabOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_backstab, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_backstab )
 {
 }
+
 void BackstabOneHit::calcDamage( )
 {
     damBase( );
@@ -122,7 +122,7 @@ void BackstabOneHit::calcTHAC0( )
 /*----------------------------------------------------------------------------
  * Dual backstab
  *---------------------------------------------------------------------------*/
-class DualBackstabOneHit: public WeaponOneHit, public SkillDamage {
+class DualBackstabOneHit: public SkillWeaponOneHit {
 public:
     DualBackstabOneHit( Character *ch, Character *victim );
 
@@ -131,10 +131,10 @@ public:
 };
 
 DualBackstabOneHit::DualBackstabOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_dual_backstab, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_dual_backstab )
 {
 }
+
 void DualBackstabOneHit::calcDamage( )
 {
     damBase( );
@@ -161,7 +161,7 @@ void DualBackstabOneHit::calcTHAC0( )
 /*----------------------------------------------------------------------------
  * Circle
  *---------------------------------------------------------------------------*/
-class CircleOneHit: public WeaponOneHit, public SkillDamage {
+class CircleOneHit: public SkillWeaponOneHit {
 public:
     CircleOneHit( Character *ch, Character *victim );
 
@@ -169,10 +169,10 @@ public:
 };
 
 CircleOneHit::CircleOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_circle, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_circle )
 {
 }
+
 void CircleOneHit::calcDamage( )
 {
     damBase( );
@@ -188,18 +188,19 @@ void CircleOneHit::calcDamage( )
 /*----------------------------------------------------------------------------
  * Knife
  *---------------------------------------------------------------------------*/
-class KnifeOneHit: public WeaponOneHit, public SkillDamage {
+class KnifeOneHit: public SkillWeaponOneHit {
 public:
     KnifeOneHit( Character *ch, Character *victim );
 
     virtual void calcDamage( );
+
 };
 
 KnifeOneHit::KnifeOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_knife, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_knife )
 {
 }
+
 void KnifeOneHit::calcDamage( )
 {
     damBase( );

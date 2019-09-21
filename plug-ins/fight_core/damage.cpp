@@ -81,6 +81,7 @@ bool Damage::hit( bool show )
 
     inflictDamage( );
     postDamageEffects( );
+    mprog_hit();
     handlePosition( );
     checkRetreat( );
     return true;
@@ -88,6 +89,15 @@ bool Damage::hit( bool show )
 
 void Damage::priorDamageEffects( )
 {
+}
+
+bool Damage::mprog_hit()
+{
+    DLString damType = damage_table.name( dam_type );
+    
+    FENIA_CALL( victim, "Hit", "CisO", ch, dam, damType.c_str( ), NULL );
+    FENIA_NDX_CALL( victim->getNPC( ), "Hit", "CCisO", victim, ch, dam, damType.c_str( ), NULL );
+    return false;
 }
 
 void Damage::postDamageEffects( )

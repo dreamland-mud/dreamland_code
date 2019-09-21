@@ -55,12 +55,20 @@ public:
     virtual void calcDamage( );
     void damBase( );
     virtual void postDamageEffects( );
+
+protected:
+    virtual bool mprog_immune();    
 };
 
 VampiricBiteOneHit::VampiricBiteOneHit( Character *ch, Character *victim )
             : Damage( ch, victim, 0, 0 ), OneHit( ch, victim ),
               SkillDamage( ch, victim, gsn_vampiric_bite, 0, 0, DAMF_WEAPON )
 {
+}
+
+bool VampiricBiteOneHit::mprog_immune()
+{
+    return SkillDamage::mprog_immune();
 }
 
 void VampiricBiteOneHit::init( )
@@ -806,7 +814,7 @@ SKILL_RUNP( bloodlet )
 /*----------------------------------------------------------------------------
  * Bonedagger 
  *---------------------------------------------------------------------------*/
-class BonedaggerOneHit: public WeaponOneHit, public SkillDamage {
+class BonedaggerOneHit: public SkillWeaponOneHit {
 public:
     BonedaggerOneHit( Character *ch, Character *victim );
 
@@ -816,8 +824,7 @@ public:
 
 
 BonedaggerOneHit::BonedaggerOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_bonedagger, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_bonedagger )
 {
 }
 void BonedaggerOneHit::calcDamage( ) 

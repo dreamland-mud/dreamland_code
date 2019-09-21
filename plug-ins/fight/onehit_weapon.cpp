@@ -360,3 +360,19 @@ bool WeaponOneHit::mprog_immune()
     FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), wield, dam_flag, sname.c_str());
     return false; 
 }
+
+SkillWeaponOneHit::SkillWeaponOneHit(Character *ch, Character *victim, int sn)
+            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
+              SkillDamage( ch, victim, sn, 0, 0, DAMF_WEAPON )
+{
+
+}              
+
+bool SkillWeaponOneHit::mprog_immune()
+{
+    DLString damType = damage_table.name(dam_type);
+    DLString sname = skillManager->find(sn)->getName();
+    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), wield, dam_flag, sname.c_str());
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), wield, dam_flag, sname.c_str());
+    return false; 
+}

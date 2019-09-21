@@ -493,7 +493,7 @@ void RavenQueenGod::tattooFight( Object *obj, Character *ch ) const
     spell(random_spell, ch->getModifyLevel() + level_bonus, ch, victim);
 }
 
-class TricksterGodOneHit: public WeaponOneHit, public SkillDamage {
+class TricksterGodOneHit: public SkillWeaponOneHit {
 public:
     TricksterGodOneHit( Character *ch, Character *victim );
     
@@ -501,8 +501,7 @@ public:
 };
 
 TricksterGodOneHit::TricksterGodOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_knife, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_knife )
 {
 }
 

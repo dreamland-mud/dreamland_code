@@ -49,7 +49,7 @@ GSN(shadowblade);
 /*----------------------------------------------------------------------------
  * Cleave 
  *---------------------------------------------------------------------------*/
-class CleaveOneHit: public WeaponOneHit, public SkillDamage {
+class CleaveOneHit: public SkillWeaponOneHit {
 public:
     CleaveOneHit( Character *ch, Character *victim );
     
@@ -58,8 +58,7 @@ public:
 };
 
 CleaveOneHit::CleaveOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ), 
-              SkillDamage( ch, victim, gsn_cleave, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_cleave )
 {
 }
 

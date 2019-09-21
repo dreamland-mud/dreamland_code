@@ -57,6 +57,7 @@ protected:
     void msgChar( const char *fmt, ... );
 
     virtual bool mprog_immune();
+    virtual bool mprog_hit();
 
 private:
     virtual int msgNoSpamBit( );

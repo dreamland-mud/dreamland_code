@@ -1198,7 +1198,7 @@ SKILL_RUNP( tiger )
 /*----------------------------------------------------------------------------
  * Ambush 
  *---------------------------------------------------------------------------*/
-class AmbushOneHit: public WeaponOneHit, public SkillDamage {
+class AmbushOneHit: public SkillWeaponOneHit {
 public:
     AmbushOneHit( Character *ch, Character *victim );
 
@@ -1207,8 +1207,7 @@ public:
 };
 
 AmbushOneHit::AmbushOneHit( Character *ch, Character *victim )
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
-              SkillDamage( ch, victim, gsn_ambush, 0, 0, DAMF_WEAPON )
+            : SkillWeaponOneHit( ch, victim, gsn_ambush )
 {
 }
 
