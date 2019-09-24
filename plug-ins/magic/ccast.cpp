@@ -22,6 +22,7 @@
 #include "dreamland.h"
 #include "clanreference.h"
 #include "fight.h"
+#include "fight_exception.h"
 #include "magic.h"
 #include "act.h"
 #include "interp.h"
@@ -213,28 +214,36 @@ CMDRUN( cast )
         target->castFar = false;
     }
     else {
-        bool fForbidCasting = false;
-        bool fForbidReaction = false;
+        try {
+            bool fForbidCasting = false;
+            bool fForbidReaction = false;
 
-        ch->mana -= mana;
-        slevel = spell->getSpellLevel( ch, target->range );
-        
-        if (victim)
-            fForbidCasting = mprog_spell( victim, ch, skill, true );
-        
-        mprog_cast( ch, target, skill, true );
+            ch->mana -= mana;
+            slevel = spell->getSpellLevel( ch, target->range );
+            
+            if (victim)
+                fForbidCasting = mprog_spell( victim, ch, skill, true );
+            
+            mprog_cast( ch, target, skill, true );
 
-        if (!fForbidCasting)
-            spell->run( ch, target, slevel );
+            if (!fForbidCasting)
+                spell->run( ch, target, slevel );
 
-        if (victim)
-            fForbidReaction = mprog_spell( victim, ch, skill, false );
+            if (victim)
+                fForbidReaction = mprog_spell( victim, ch, skill, false );
 
-        mprog_cast( ch, target, skill, false );
-        skill->improve( ch, true, victim );
+            mprog_cast( ch, target, skill, false );
+            skill->improve( ch, true, victim );
 
-        if (fForbidReaction)
-            return;
+            if (fForbidReaction)
+                return;
+
+        } catch (const VictimDeathException &ex) {
+            // In the case when victim dies from the spell, the only thing
+            // left to do is to improve knowledge for the caster. 
+            skill->improve( ch, true, victim );
+            return; 
+        }
     }
     
     if (offensive && victim) {

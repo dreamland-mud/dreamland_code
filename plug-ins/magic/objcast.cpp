@@ -36,6 +36,7 @@
 
 #include "magic.h"
 #include "fight.h"
+#include "fight_exception.h"
 #include "clanreference.h"
 #include "vnum.h"
 #include "merc.h"
@@ -200,10 +201,14 @@ CMDRUNP( recite )
                 continue;
             
             if (!spell->spellbane( ch, t->victim )) {
-                spell->run( ch, t, scroll->value[0] );
+                try {
+                    spell->run( ch, t, scroll->value[0] );
 
-                if (offensive)
-                    attack_caster( ch, t->victim );
+                    if (offensive)
+                        attack_caster( ch, t->victim );
+                } catch (const VictimDeathException &e) {
+                    break;
+                }
             }
         }
         
@@ -276,46 +281,49 @@ CMDRUNP( brandish )
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
             t = spell->getTarget( );
 
-            if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ )) {
-                spell->run( ch, str_empty, sn, level );
-                gsn_staves->improve( ch, true );
-            }
-            else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE )) {
-                spell->run( ch, ch->in_room, sn, level );
-                gsn_staves->improve( ch, true );
-            }
-            else if (IS_SET( t, TAR_CHAR_SELF )) {
-                spell->run( ch, ch, sn, level );
-                gsn_staves->improve( ch, true, ch );
-            }
-            else if (IS_SET( t, TAR_CHAR_ROOM )) {
-                for (vch = ch->in_room->people; vch; vch = vch_next) {
-                    vch_next = vch->next_in_room;
-                    
-                    if (offensive) {
-                        if (is_safe( ch, vch ) || is_same_group( ch, vch ))
-                            continue;
-
-                        if (!spell->spellbane( ch, vch )) {
-                            spell->run( ch, vch, sn, level );
-                            attack_caster( ch, vch );
-                        }
-                        
-                        yell_panic( ch, vch,
-                                    "Помогите! Кто-то размахивает около меня посохом!",
-                                    "Помогите! %1$^C1 пугает меня посохом!" );
-                    }
-                    else {
-                        if (!spell->spellbane( ch, vch ))
-                            spell->run( ch, vch, sn, level );
-                    }
-
-                    gsn_staves->improve( ch, true, vch );
+            try {
+                if (IS_SET( t, TAR_IGNORE|TAR_CREATE_MOB|TAR_CREATE_OBJ )) {
+                    spell->run( ch, str_empty, sn, level );
+                    gsn_staves->improve( ch, true );
                 }
-            }
-            else {
-                bug( "brandish: bad target for sn %d.", sn );
-                return;
+                else if (IS_SET( t, TAR_ROOM|TAR_PEOPLE )) {
+                    spell->run( ch, ch->in_room, sn, level );
+                    gsn_staves->improve( ch, true );
+                }
+                else if (IS_SET( t, TAR_CHAR_SELF )) {
+                    spell->run( ch, ch, sn, level );
+                    gsn_staves->improve( ch, true, ch );
+                }
+                else if (IS_SET( t, TAR_CHAR_ROOM )) {
+                    for (vch = ch->in_room->people; vch; vch = vch_next) {
+                        vch_next = vch->next_in_room;
+                        
+                        if (offensive) {
+                            if (is_safe( ch, vch ) || is_same_group( ch, vch ))
+                                continue;
+
+                            if (!spell->spellbane( ch, vch )) {
+                                spell->run( ch, vch, sn, level );
+                                attack_caster( ch, vch );
+                            }
+                            
+                            yell_panic( ch, vch,
+                                        "Помогите! Кто-то размахивает около меня посохом!",
+                                        "Помогите! %1$^C1 пугает меня посохом!" );
+                        }
+                        else {
+                            if (!spell->spellbane( ch, vch ))
+                                spell->run( ch, vch, sn, level );
+                        }
+
+                        gsn_staves->improve( ch, true, vch );
+                    }
+                }
+                else {
+                    bug( "brandish: bad target for sn %d.", sn );
+                    return;
+                }
+            } catch (const VictimDeathException &e) {
             }
         }
     }
@@ -415,17 +423,22 @@ CMDRUNP( zap )
             if (offensive && victim && is_safe( ch, victim ))
                 return;
 
-            if (!spell->spellbane( ch, victim )) {
-                spell->run( ch, target, wand->value[0] );
+            try {
+                if (!spell->spellbane( ch, victim )) {
+                    spell->run( ch, target, wand->value[0] );
 
+                    if (offensive)
+                        attack_caster( ch, victim );
+                }
+                
                 if (offensive)
-                    attack_caster( ch, victim );
+                    yell_panic( ch, victim,
+                                "Помогите! Кто-то размахивает около меня волшебным жезлом!",
+                                "Помогите! %1$^C1 пугает меня своим жезлом!" );
+
+            } catch (const VictimDeathException &e) {
             }
-            
-            if (offensive)
-                yell_panic( ch, victim,
-                            "Помогите! Кто-то размахивает около меня волшебным жезлом!",
-                            "Помогите! %1$^C1 пугает меня своим жезлом!" );
+
             gsn_wands->improve( ch, true, victim );
         }
     }

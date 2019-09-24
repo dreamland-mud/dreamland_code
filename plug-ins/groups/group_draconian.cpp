@@ -56,12 +56,12 @@ VOID_SPELL(AcidBreath)::run( Character *ch, Character *victim, int sn, int level
     if (saves_spell(level,victim,DAM_ACID, ch, DAMF_SPELL))
     {
         acid_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-        damage(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_SPELL);
     }
     else
     {
         acid_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
-        damage(ch,victim,dam,sn,DAM_ACID,true, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam,sn,DAM_ACID,true, DAMF_SPELL);
     }
 
 }
@@ -78,7 +78,7 @@ VOID_SPELL(DragonBreath)::run( Character *ch, Character *victim, int sn, int lev
     {
       if (saves_spell(level, victim, DAM_FIRE, ch, DAMF_SPELL))
         dam /= 2;
-      damage(ch, victim, dam, sn, DAM_FIRE, true, DAMF_SPELL);
+      damage_nocatch(ch, victim, dam, sn, DAM_FIRE, true, DAMF_SPELL);
     }
 
 }
@@ -127,12 +127,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                 if (saves_spell(level,vch,DAM_FIRE,ch, DAMF_SPELL))
                                 {
                                         fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
                                 }
                                 else
                                 {
                                         fire_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
                                 }
                         }
                         else /* partial damage */
@@ -140,12 +140,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                 if (saves_spell(level - 2,vch,DAM_FIRE,ch, DAMF_SPELL))
                                 {
                                         fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_SPELL);
                                 }
                                 else
                                 {
                                         fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
                                 }
                         }
                 }
@@ -155,12 +155,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 if (saves_spell(level,victim,DAM_ACID,ch, DAMF_SPELL))
                 {
                         acid_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                        damage(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_SPELL);
+                        damage_nocatch(ch,victim,dam/2,sn,DAM_ACID,true, DAMF_SPELL);
                 }
                 else
                 {
                         acid_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
-                        damage(ch,victim,dam,sn,DAM_ACID,true, DAMF_SPELL);
+                        damage_nocatch(ch,victim,dam,sn,DAM_ACID,true, DAMF_SPELL);
                 }
                 break;
 
@@ -184,12 +184,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                 if (saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL))
                                 {
                                         cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
                                 }
                                 else
                                 {
                                         cold_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
                                 }
                         }
                         else
@@ -197,12 +197,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                 if (saves_spell(level - 2,vch,DAM_COLD,ch, DAMF_SPELL))
                                 {
                                         cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_SPELL);
                                 }
                                 else
                                 {
                                         cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                        damage(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
                                 }
                         }
                 }
@@ -229,12 +229,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         if (saves_spell(level,vch,DAM_POISON,ch, DAMF_SPELL))
                         {
                                 poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                                damage(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_SPELL);
+                                damage_nocatch(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_SPELL);
                         }
                         else
                         {
                                 poison_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                                damage(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
+                                damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
                         }
                 }
                 break;
@@ -243,12 +243,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL))
                 {
                         shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                        damage(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+                        damage_nocatch(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_SPELL);
                 }
                 else
                 {
                         shock_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
-                        damage(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+                        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
                 }
                 break;
         }
@@ -294,12 +294,12 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
             if (saves_spell(level,vch,DAM_FIRE, ch, DAMF_SPELL))
             {
                 fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
             }
             else
             {
                 fire_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
             }
         }
         else /* partial damage */
@@ -307,12 +307,12 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
             if (saves_spell(level - 2,vch,DAM_FIRE, ch, DAMF_SPELL))
             {
                 fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam/4,sn,DAM_FIRE,true, DAMF_SPELL);
             }
             else
             {
                 fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
             }
         }
     }
@@ -357,12 +357,12 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
             if (saves_spell(level,vch,DAM_COLD, ch, DAMF_SPELL))
             {
                 cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
             }
             else
             {
                 cold_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
             }
         }
         else
@@ -370,12 +370,12 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
             if (saves_spell(level - 2,vch,DAM_COLD, ch, DAMF_SPELL))
             {
                 cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam/4,sn,DAM_COLD,true, DAMF_SPELL);
             }
             else
             {
                 cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                damage(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
             }
         }
     }
@@ -420,12 +420,12 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
         if (saves_spell(level,vch,DAM_POISON, ch, DAMF_SPELL))
         {
             poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-            damage(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_SPELL);
+            damage_nocatch(ch,vch,dam/2,sn,DAM_POISON,true, DAMF_SPELL);
         }
         else
         {
             poison_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-            damage(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
+            damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
         }
     }
 
@@ -450,12 +450,12 @@ VOID_SPELL(LightningBreath)::run( Character *ch, Character *victim, int sn, int 
     if (saves_spell(level,victim,DAM_LIGHTNING, ch, DAMF_SPELL))
     {
         shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-        damage(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam/2,sn,DAM_LIGHTNING,true, DAMF_SPELL);
     }
     else
     {
         shock_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
-        damage(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
     }
 
 }

@@ -392,10 +392,7 @@ VOID_SPELL(EnergyDrain)::run( Character *ch, Character *victim, int sn, int leve
 
     victim->send_to("Ты чувствуешь, как твоя жизнь уходит!\n\r");
     ch->send_to("Ты безжалостно отбираешь жизнь!\n\r");
-    damage( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
-
-    return;
-
+    damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
 }
 
 
@@ -835,7 +832,7 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
         }
 
         vch->send_to("Дьявольская сила повергает тебя!\n\r");
-        damage( ch, vch, dam, sn, DAM_NEGATIVE, true, DAMF_SPELL );
+        damage_nocatch( ch, vch, dam, sn, DAM_NEGATIVE, true, DAMF_SPELL );
     }
 }
 

@@ -26,6 +26,7 @@
 #include "fight.h"
 #include "act_move.h"
 #include "gsn_plugin.h"
+#include "fight_exception.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -430,49 +431,56 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
     for ( vch = room->people; vch != 0; vch = vch_next )
     {
         vch_next = vch->next_in_room;
-        
+         
         if (vch->is_mirror() && number_percent() < 50) 
             continue;
 
-        if ((IS_GOOD(ch) && IS_GOOD(vch)) ||
-            (IS_EVIL(ch) && IS_EVIL(vch)) ||
-            (IS_NEUTRAL(ch) && IS_NEUTRAL(vch)) )
-        {
-            if (spellbane( ch, vch ))
-                continue;
+        try {
+            if ((IS_GOOD(ch) && IS_GOOD(vch)) ||
+                (IS_EVIL(ch) && IS_EVIL(vch)) ||
+                (IS_NEUTRAL(ch) && IS_NEUTRAL(vch)) )
+            {
+                if (spellbane( ch, vch ))
+                    continue;
 
-          vch->send_to("Ты чувствуешь себя более могущественно.\n\r");
-          spell(frenzy_num,level,ch, vch);
-          spell(bless_num,level,ch, vch);
-        }
+              vch->send_to("Ты чувствуешь себя более могущественно.\n\r");
+              spell(frenzy_num,level,ch, vch);
+              spell(bless_num,level,ch, vch);
+            }
 
-        else if ((IS_GOOD(ch) && IS_EVIL(vch)) ||
-                 (IS_EVIL(ch) && IS_GOOD(vch)) )
-        {
-          if (!is_safe_spell(ch,vch,true))
-          {
-            if (ch->fighting != vch && vch->fighting != ch)
-                yell_panic( ch, vch );
+            else if ((IS_GOOD(ch) && IS_EVIL(vch)) ||
+                     (IS_EVIL(ch) && IS_GOOD(vch)) )
+            {
+              if (!is_safe_spell(ch,vch,true))
+              {
+                if (ch->fighting != vch && vch->fighting != ch)
+                    yell_panic( ch, vch );
 
-            spell(curse_num,level,ch, vch);
-            vch->send_to("Божественная сила повергает тебя!\n\r");
-            dam = dice(level,6);
-            damage(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
-          }
-        }
+                spell(curse_num,level,ch, vch);
+                vch->send_to("Божественная сила повергает тебя!\n\r");
+                dam = dice(level,6);
+                damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
+              }
+            }
 
-        else if (IS_NEUTRAL(ch))
-        {
-          if (!is_safe_spell(ch,vch,true))
-          {
-            if (ch->fighting != vch && vch->fighting != ch)
-                yell_panic( ch, vch );
+            else if (IS_NEUTRAL(ch))
+            {
+              if (!is_safe_spell(ch,vch,true))
+              {
+                if (ch->fighting != vch && vch->fighting != ch)
+                    yell_panic( ch, vch );
 
-            spell(curse_num,level/2,ch, vch);
-            vch->send_to("Божественная сила повергает тебя!\n\r");
-            dam = dice(level,4);
-            damage(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
-          }
+                spell(curse_num,level/2,ch, vch);
+                vch->send_to("Божественная сила повергает тебя!\n\r");
+                dam = dice(level,4);
+                damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
+              }
+            }
+        } catch (const VictimDeathException &ex) {
+            ch->send_to("Ты чувствуешь себя опустошенно.\n\r");
+            ch->move /= (4/3);
+            ch->hit /= (4/3);
+            throw ex;
         }
     }
 
@@ -579,7 +587,7 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
     if (!IS_AFFECTED(victim, AFF_BLIND))
         spell(gsn_blindness, 3 * level / 4, ch, victim);
 
-    damage( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
 }
 
 
@@ -716,5 +724,5 @@ VOID_SPELL(Wrath)::run( Character *ch, Character *victim, int sn, int level )
             act_p("$C1 выглядит отвратительно.",ch,0,victim,TO_CHAR,POS_RESTING);
     }
 
-    damage( ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL );
+    damage_nocatch( ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL );
 }

@@ -58,6 +58,8 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
     ch->send_to("Божественная молния поражает твоих врагов!\n\r");
     act( "$c1 посылает молнию, которая повергает $s врагов!", ch, 0, 0, TO_ROOM );
     
+    area_message( ch, "Молнии сверкают на небе.", false );
+
     for (vch = room->people; vch; vch = vch_next) {
         vch_next = vch->next_in_room;
 
@@ -71,10 +73,8 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
             continue;
         
         vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_SPELL ) ? dam / 2 : dam;
-        damage( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
+        damage_nocatch( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
     }
-    
-    area_message( ch, "Молнии сверкают на небе.", false );
 }
 
 SPELL_DECL(ControlWeather);

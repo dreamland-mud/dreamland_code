@@ -68,7 +68,7 @@ VOID_SPELL(PowerWordKill)::run( Character *ch, Character *victim, int sn, int le
                 || number_percent () > 50 )
         {
                 dam = dice( level , 24 ) ;
-                damage(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_SPELL);
+                damage_nocatch(ch, victim , dam , sn, DAM_MENTAL, true, DAMF_SPELL);
                 return;
         }
 

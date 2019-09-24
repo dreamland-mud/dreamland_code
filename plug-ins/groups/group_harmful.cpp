@@ -31,19 +31,19 @@
 SPELL_DECL(CauseLight);
 VOID_SPELL(CauseLight)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    damage( ch, victim, dice(4, 9) + level / 3, sn,DAM_HARM,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dice(4, 9) + level / 3, sn,DAM_HARM,true, DAMF_SPELL);
 }
 
 SPELL_DECL(CauseSerious);
 VOID_SPELL(CauseSerious)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    damage( ch, victim, dice(5, 9) + level / 2, sn,DAM_HARM,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dice(5, 9) + level / 2, sn,DAM_HARM,true, DAMF_SPELL);
 }
 
 SPELL_DECL(CauseCritical);
 VOID_SPELL(CauseCritical)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    damage( ch, victim, dice(6, 9) + level - 6, sn,DAM_HARM,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dice(6, 9) + level - 6, sn,DAM_HARM,true, DAMF_SPELL);
 }
 
 SPELL_DECL(Harm);
@@ -56,7 +56,7 @@ VOID_SPELL(Harm)::run( Character *ch, Character *victim, int sn, int level )
     if ( saves_spell( level, victim,DAM_HARM,ch, DAMF_SPELL) )
      dam = dam / 2;
     dam = min( 200, dam );
-    damage( ch, victim, dam, sn, DAM_HARM ,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn, DAM_HARM ,true, DAMF_SPELL);
 }
 
 

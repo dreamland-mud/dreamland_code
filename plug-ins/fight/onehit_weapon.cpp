@@ -9,6 +9,7 @@
 #include "lex.h"
 
 #include "skill.h"
+#include "spelltarget.h"
 #include "affect.h"
 #include "race.h"
 #include "npcharacter.h"
@@ -310,7 +311,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             {
                 act_p("$o1 ярко вспыхивает!", ch, wield, 0, TO_ALL, POS_RESTING);
                 lvl = std::min(ch->getModifyLevel(), waf->level);
-                spell( waf->type, lvl, ch, victim );
+                spell_nocatch( waf->type, lvl, ch, victim );
             }
     }
 }

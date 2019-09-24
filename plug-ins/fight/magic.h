@@ -72,9 +72,11 @@ void area_message( Character *ch, const DLString &msg, bool everywhere );
 
 bool spell( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
 bool spell( int sn, int level, Character *ch, Character *victim, int flags = 0 );
+bool spell_nocatch( int sn, int level, Character *ch, Character *victim, int flags = 0 );
 bool spell( int sn, int level, Character *ch, Object *obj );
 bool spell( int sn, int level, Character *ch, Room *room );
 bool spell( int sn, int level, Character *ch, char *arg );
+bool spell_nocatch( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
 
 void spell_by_item( Character *ch, Object *obj );
 

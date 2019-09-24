@@ -74,6 +74,7 @@
 #include "handler.h"
 #include "interp.h"
 #include "vnum.h"
+#include "fight_exception.h"
 #include "immunity.h"
 #include "material.h"
 #include "fight.h"
@@ -163,7 +164,7 @@ void area_message( Character *ch, const DLString &msg, bool everywhere )
 /*
  *
  */
-bool spell( int sn, int level, Character *ch, SpellTarget::Pointer target, int flags )
+bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer target, int flags )
 {
     Spell::Pointer spell; 
     Skill *skill;
@@ -207,15 +208,28 @@ bool spell( int sn, int level, Character *ch, SpellTarget::Pointer target, int f
 
     if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim ))
         return false;
-    
+   
     spell->run( ch, target, level );
     return true;
 }
 
 
+bool spell( int sn, int level, Character *ch, SpellTarget::Pointer target, int flags )
+{
+    try { 
+        return spell_nocatch(sn, level, ch, target, flags);
+    } catch (const VictimDeathException &e) {
+        return true;
+    }
+}
+
 bool spell( int sn, int level, Character *ch, Character *victim, int flags )
 {
     return spell( sn, level, ch, SpellTarget::Pointer( NEW, victim ), flags );
+}
+bool spell_nocatch( int sn, int level, Character *ch, Character *victim, int flags )
+{
+    return spell_nocatch( sn, level, ch, SpellTarget::Pointer( NEW, victim ), flags );
 }
 bool spell( int sn, int level, Character *ch, Object *obj )
 {
@@ -280,8 +294,13 @@ void spell_by_item( Character *ch, Object *obj )
             continue;
         }
         
-        if (!spell->spellbane( ch, result->victim ))
-            spell->run( ch, result, obj->value[0] );
+
+        try {
+            if (!spell->spellbane( ch, result->victim ))
+                spell->run( ch, result, obj->value[0] );
+        } catch (const VictimDeathException &e) {
+            break;
+        }
     }
 }
 

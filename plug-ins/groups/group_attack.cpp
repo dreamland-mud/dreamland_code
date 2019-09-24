@@ -44,51 +44,47 @@ PROF(anti_paladin);
 SPELL_DECL(BladeBarrier);
 VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    try {
-        int dam;
+    int dam;
 
-        act("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
-        act("Вокруг тебя возникает множество острых клинков, поражая $C4.", ch,0,victim,TO_CHAR);
-        act("Множество острых клинков возникает вокруг $c2, поражая тебя!", ch,0,victim,TO_VICT);
-        dam = dice(level,6);
-        if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
-            dam /= 2;
-        damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
-        
-        act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
-        act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
-        dam = dice(level,5);
-        if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
-            dam /= 2;
-        damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    act("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
+    act("Вокруг тебя возникает множество острых клинков, поражая $C4.", ch,0,victim,TO_CHAR);
+    act("Множество острых клинков возникает вокруг $c2, поражая тебя!", ch,0,victim,TO_VICT);
+    dam = dice(level,6);
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+        dam /= 2;
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    
+    act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
+    act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
+    dam = dice(level,5);
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+        dam /= 2;
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
 
-        if (number_percent() <= 55)
-            return;
-        
-        act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
-        act("Острые клинки со звоном ударяют в тебя!",victim,0,0,TO_CHAR);
-        dam = dice(level,7);
-        if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
-            dam /= 2;
-        damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    if (number_percent() <= 55)
+        return;
+    
+    act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
+    act("Острые клинки со звоном ударяют в тебя!",victim,0,0,TO_CHAR);
+    dam = dice(level,7);
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+        dam /= 2;
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
 
-        if (number_percent() <= 50)
-            return;
-                
-        act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
-        act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
-        dam = dice(level,6);
-        if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
-            dam /= 3;
-        damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
+    if (number_percent() <= 50)
+        return;
+            
+    act("Клинки со звоном ударяют в $c4!",victim,0,0,TO_ROOM);
+    act("Острые клинки ударяют в тебя!",victim,0,0,TO_CHAR);
+    dam = dice(level,6);
+    if (saves_spell(level,victim,DAM_PIERCE,ch, DAMF_SPELL))
+        dam /= 3;
+    damage_nocatch(ch,victim,dam,sn,DAM_PIERCE,true, DAMF_SPELL);
 
-        if (victim->fighting != 0) {
-            victim->setWaitViolence( number_bits(2) + 1 );
-            victim->position = POS_RESTING;
-        }        
-    }
-    catch (const VictimDeathException& e) {
-    }
+    if (victim->fighting != 0) {
+        victim->setWaitViolence( number_bits(2) + 1 );
+        victim->position = POS_RESTING;
+    }        
 }
 
 SPELL_DECL(Bluefire);
@@ -117,7 +113,7 @@ VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level )
         if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
                 dam /= 2;
 
-        damage( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);
+        damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);
 
 }
 
@@ -148,14 +144,10 @@ VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level 
         if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
                 dam /= 2;
         
-        try {
-            damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
-        
-            if (!IS_AFFECTED(victim, AFF_CURSE))
-                spell(gsn_curse, 3 * level / 4, ch,  victim);
-        }
-        catch (const VictimDeathException& e) {
-        }
+        damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
+    
+        if (!IS_AFFECTED(victim, AFF_CURSE))
+            spell(gsn_curse, 3 * level / 4, ch,  victim);
 
 }
 
@@ -192,9 +184,8 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
         ch->getTrueProfession( ) == prof_paladin ||
         ch->getTrueProfession( ) == prof_anti_paladin )
       dam *= 2;
-    damage( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
-    return;
 
+    damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
 }
 
 
@@ -230,9 +221,8 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
         ch->getTrueProfession( ) == prof_paladin ||
         ch->getTrueProfession( ) == prof_anti_paladin )
       dam *= 2;
-    damage( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
-    return;
 
+    damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
 }
 
 SPELL_DECL(Earthquake);
@@ -244,6 +234,8 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
 
     ch->send_to("Земля дрожит под твоими ногами!\n\r");
     act( "$c1 вызывает ураган и землетрясение.", ch, 0, 0, TO_ROOM);
+
+    area_message( ch, "Земля слегка дрожит под твоими ногами.", true );
 
     for (vch = room->people; vch != 0; vch = vch_next )
     {
@@ -273,10 +265,8 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
         case SECT_INSIDE:   dam *= 2; break;
         }
 
-        damage( ch, vch, dam, sn, DAM_BASH, true, DAMF_SPELL );
+        damage_nocatch( ch, vch, dam, sn, DAM_BASH, true, DAMF_SPELL );
     }
-
-    area_message( ch, "Земля слегка дрожит под твоими ногами.", true );
 }
 
 
@@ -289,7 +279,7 @@ VOID_SPELL(Hellfire)::run( Character *ch, Character *victim, int sn, int level )
 
   dam = dice(level, 7);
 
-  damage(ch,victim,dam,sn,DAM_FIRE, true, DAMF_SPELL);
+  damage_nocatch(ch,victim,dam,sn,DAM_FIRE, true, DAMF_SPELL);
 
 
 }
@@ -307,7 +297,7 @@ VOID_SPELL(SeverityForce)::run( Character *ch, Character *victim, int sn, int le
             ch, 0, victim, TO_VICT,POS_RESTING);
 
     dam = dice( level , 18 );
-    damage(ch,victim,dam,sn,DAM_NONE,true);
+    damage_nocatch(ch,victim,dam,sn,DAM_NONE,true);
 }
 
 TYPE_SPELL(int, SeverityForce)::getMaxRange( Character * ) const
@@ -487,7 +477,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
     {
         if (saves_spell(level,victim,DAM_FIRE,ch, DAMF_SPELL))
             dam = 2 * dam / 3;
-        damage(ch,victim,dam,sn,DAM_FIRE,true, DAMF_SPELL);
+        damage_nocatch(ch,victim,dam,sn,DAM_FIRE,true, DAMF_SPELL);
     }
 
 }
@@ -531,7 +521,7 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     
     undig( victim );
     dam = dice(level, 20);
-    damage(ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL); 
+    damage_nocatch(ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL); 
 
 }
 

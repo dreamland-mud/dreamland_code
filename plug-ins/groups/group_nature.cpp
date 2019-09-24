@@ -197,7 +197,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
     act("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
     act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
-    damage(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL);
+    damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL);
 }
 
 /*
@@ -247,7 +247,7 @@ VOID_SPELL(Entangle)::run( Character *ch, Object *grave, int sn, int level )
     if ( saves_spell( level, victim, DAM_PIERCE, ch, DAMF_SPELL ) )
         dam /= 2;
 
-    damage(ch,victim, ch->getModifyLevel(),gsn_entangle,DAM_PIERCE, true, DAMF_SPELL);
+    damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_entangle,DAM_PIERCE, true, DAMF_SPELL);
 }
 
 VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -285,6 +285,6 @@ VOID_SPELL(Entangle)::run( Character *ch, Character *victim, int sn, int level )
     todex.bitvector = 0;
     affect_join( victim, &todex);
 
-    damage(ch, victim, ch->getModifyLevel(), gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);
+    damage_nocatch(ch, victim, ch->getModifyLevel(), gsn_entangle, DAM_PIERCE, true, DAMF_SPELL);
 }
 
