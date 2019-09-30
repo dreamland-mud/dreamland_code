@@ -1018,13 +1018,20 @@ NMI_INVOKE(Root, codesource, "(func): номер сценария, в котор
 NMI_INVOKE(Root, apply, "(func, this, args): вызвать func с указанным this и списком аргументов args")
 {    
     Register func = argnum2function(args, 1);
-    Register thiz = argnum(args, 2);
-    Register params = argnum(args, 3);
-    RegList::Pointer regList = params.toHandler().getDynamicPointer<RegList>();
+
+    Register thiz;
+    if (args.size() > 1)
+        thiz = argnum(args, 2);
+
     RegisterList registerList;
 
-    for (RegList::const_iterator r = regList->begin(); r != regList->end(); r++)
-        registerList.push_back(*r);
+    if (args.size() > 2) {
+        Register params = argnum(args, 3);
+        RegList::Pointer regList = params.toHandler().getDynamicPointer<RegList>();
+
+        for (RegList::const_iterator r = regList->begin(); r != regList->end(); r++)
+            registerList.push_back(*r);
+    }
 
     return func.toFunction()->invoke(thiz, registerList);
 }
