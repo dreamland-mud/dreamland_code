@@ -14,8 +14,6 @@ class Object;
 class DLString;
 
 class Damage {
-protected:
-    Damage( );
 public:
     Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag = 0 );
     

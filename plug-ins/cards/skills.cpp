@@ -162,7 +162,7 @@ SKILL_RUNP( sconce )
 class JokerOneHit: public SkillWeaponOneHit {
 public:
     JokerOneHit( Character *ch, Character *victim )
-                : SkillWeaponOneHit( ch, victim, gsn_joker )
+                : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_joker )
     {
     }
 

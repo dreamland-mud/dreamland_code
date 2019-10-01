@@ -824,7 +824,7 @@ public:
 
 
 BonedaggerOneHit::BonedaggerOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_bonedagger )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_bonedagger )
 {
 }
 void BonedaggerOneHit::calcDamage( ) 

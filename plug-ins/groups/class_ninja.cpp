@@ -266,7 +266,7 @@ public:
 };
 
 AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_assassinate )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_assassinate )
 {
 }
 

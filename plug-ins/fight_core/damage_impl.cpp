@@ -5,6 +5,7 @@
 #include "damage_impl.h"
 #include "damageflags.h"
 
+#include "logstream.h"
 #include "russianstring.h"
 
 #include "wrapperbase.h"
@@ -76,6 +77,11 @@ SkillDamage::SkillDamage( Character *ch, Character *victim,
             : Damage( ch, victim, dam_type, dam, dam_flag )
 {
     this->sn = sn;
+
+    notice("SkillDamage ch=%s victim=%s dam=%d sn=%d dam_type=%d dam_flag=%d",
+                  (this->ch ? this->ch->getNameP('1').c_str() : "null"),
+                  (this->victim ? this->victim->getNameP('1').c_str() : "null"),
+                  this->dam, this->sn, this->dam_type, this->dam_flag);
 }
 
 int SkillDamage::msgNoSpamBit( )

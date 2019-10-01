@@ -47,12 +47,14 @@ void do_visible( Character * );
 /*-----------------------------------------------------------------------------
  * Damage 
  *----------------------------------------------------------------------------*/
+/*
 Damage::Damage( )
           : ch( NULL ), victim( NULL ), killer( NULL ),
             dam_type( 0 ), dam( 0 ),  immune( false ), dam_flag( 0 )
 {
+    notice("Damage()");
 }
-
+*/
 Damage::Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag )
 {
     this->ch = ch;
@@ -63,6 +65,11 @@ Damage::Damage( Character *ch, Character *victim, int dam_type, int dam, bitstri
     
     killer = ch;
     immune = false;
+
+    notice("Damage ch=%s victim=%s dam=%d  dam_type=%d dam_flag=%d",
+                  (this->ch ? this->ch->getNameP('1').c_str() : "null"),
+                  (this->victim ? this->victim->getNameP('1').c_str() : "null"),
+                  this->dam, this->dam_type, this->dam_flag);
 }
 
 bool Damage::hit( bool show )

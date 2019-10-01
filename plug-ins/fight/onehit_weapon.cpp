@@ -41,6 +41,11 @@ WeaponOneHit::WeaponOneHit( Character *ch, Character *victiim, bool secondary )
     weaponSkill = NULL;
     wield = NULL;
     attack = 0;
+
+    notice("WeaponOneHit ch=%s victim=%s dam=%d sn=%d dam_type=%d dam_flag=%d",
+                  (this->ch ? this->ch->getNameP('1').c_str() : "null"),
+                  (this->victim ? this->victim->getNameP('1').c_str() : "null"),
+                  this->dam, this->weapon_sn, this->dam_type, this->dam_flag);
 }
 
 void WeaponOneHit::init( )
@@ -363,10 +368,15 @@ bool WeaponOneHit::mprog_immune()
 }
 
 SkillWeaponOneHit::SkillWeaponOneHit(Character *ch, Character *victim, int sn)
-            : Damage( ch, victim, 0, 0 ), WeaponOneHit( ch, victim, false ),
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON),
+              WeaponOneHit( ch, victim, false ),
               SkillDamage( ch, victim, sn, 0, 0, DAMF_WEAPON )
+              
 {
-
+    notice("SkillWeaponOneHit ch=%s victim=%s dam=%d sn=%d dam_type=%d dam_flag=%d",
+                  (this->ch ? this->ch->getNameP('1').c_str() : "null"),
+                  (this->victim ? this->victim->getNameP('1').c_str() : "null"),
+                  this->dam, this->sn, this->dam_type, this->dam_flag);
 }              
 
 bool SkillWeaponOneHit::mprog_immune()

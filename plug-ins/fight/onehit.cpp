@@ -44,6 +44,11 @@ OneHit::OneHit( Character *ch, Character *victim )
     thac0 = 0;
     victim_ac = 0;
     orig_dam = 0;
+
+    notice("OneHit ch=%s victim=%s dam=%d  dam_type=%d dam_flag=%d",
+                  (this->ch ? this->ch->getNameP('1').c_str() : "null"),
+                  (this->victim ? this->victim->getNameP('1').c_str() : "null"),
+                  this->dam, this->dam_type, this->dam_flag);
 }
 
 void OneHit::hit( )

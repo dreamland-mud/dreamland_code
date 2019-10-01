@@ -1207,8 +1207,12 @@ public:
 };
 
 AmbushOneHit::AmbushOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_ambush )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_ambush )
 {
+    notice("AmbushOneHit ch=%s victim=%s dam=%d sn=%d dam_type=%d dam_flag=%d",
+                  (this->ch ? this->ch->getNameP('1').c_str() : "null"),
+                  (this->victim ? this->victim->getNameP('1').c_str() : "null"),
+                  this->dam, this->sn, this->dam_type, this->dam_flag);
 }
 
 void AmbushOneHit::calcDamage( ) 
@@ -1299,15 +1303,18 @@ SKILL_RUNP( ambush )
     AmbushOneHit amb( ch, victim );
     
     try {
+        ch->println("Засада вот прям ща");
         if ( !IS_AWAKE(victim)
                 || ch->is_npc()
                 || number_percent( ) < gsn_ambush->getEffective( ch ) )
         {
+                ch->println("Все получилось");
                 gsn_ambush->improve( ch, true, victim );
                 amb.hit( );
         }
         else
         {
+                ch->println("Нифига не получилось");
                 gsn_ambush->improve( ch, false, victim );
                 amb.miss( );
         }

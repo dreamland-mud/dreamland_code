@@ -91,7 +91,7 @@ public:
 };
 
 BackstabOneHit::BackstabOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_backstab )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_backstab )
 {
 }
 
@@ -131,7 +131,7 @@ public:
 };
 
 DualBackstabOneHit::DualBackstabOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_dual_backstab )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_dual_backstab )
 {
 }
 
@@ -169,7 +169,7 @@ public:
 };
 
 CircleOneHit::CircleOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_circle )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_circle )
 {
 }
 
@@ -197,7 +197,7 @@ public:
 };
 
 KnifeOneHit::KnifeOneHit( Character *ch, Character *victim )
-            : SkillWeaponOneHit( ch, victim, gsn_knife )
+            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_knife )
 {
 }
 
