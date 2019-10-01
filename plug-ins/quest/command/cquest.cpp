@@ -258,7 +258,48 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
 
 void CQuest::doNewInfo( PCharacter *ch, const DLString &arguments ) 
 {
-    gprog_quest(ch, "newinfo", arguments);
+    // Output questor's quest info to buf.	
+    ostringstream buf;
+    int time;
+    Quest::Pointer quest;
+    
+    quest = ch->getAttributes( ).findAttr<Quest>( "quest" );
+    time = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getTime( );
+
+    if (!quest) {
+        if (ch->getAttributes( ).isAvailable( "quest" )) 
+            buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
+    } else {
+        quest->info( buf, ch );
+        buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
+            << " на выполнение задания." << endl;
+    }
+
+    // Output Fenia quest list directly to char.	
+    bool rc = gprog_quest(ch, "newinfo", arguments);
+
+    // Nothing was printed by Fenia quests.
+    if (!rc) {
+	if (!buf.str().empty()) {
+	    ch->println("{YЗадание квестора{x");
+	    ch->send_to(buf);
+	} else {
+	    ch->println("У тебя сейчас нет задания. Подробности читай по команде {y{hc{lEhelp quests{lRсправка квесты{x.");
+	}
+
+	return;
+    }		
+
+    // A list of active quests was printed ('q info' or 'q' command w/o arg).
+    if (arguments.empty()) {
+	if (!buf.str().empty()) {
+	    ch->println("\n{YЗадание квестора{x");
+	    ch->send_to(buf);
+	}
+	return;
+    }
+
+    // 'q info <num>' syntax, do nothing.	
 }
 
 void CQuest::doInfo( PCharacter *ch ) 
