@@ -38,7 +38,9 @@ static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
 {
     CodeSource::Manager::const_iterator i;
     for (i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
-        if (dl_match(arg.c_str(), i->name.c_str(), true)) {
+        if (i->name.find(arg) != DLString::npos
+            || dl_match(arg.c_str(), i->name.c_str(), true)) 
+	{
             csid = i->getId();
             return true;
         }
