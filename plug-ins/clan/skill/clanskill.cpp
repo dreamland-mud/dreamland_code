@@ -138,7 +138,24 @@ bool ClanSkill::canForget( PCharacter * ) const
 
 bool ClanSkill::canPractice( PCharacter * ch, std::ostream & ) const
 {
-    return available( ch );
+    const SkillClanInfo *ci;
+    
+    if (!( ci = getClanInfo( ch ) ))
+        return false;
+
+    if (ci->level >= LEVEL_IMMORTAL)
+        return false;
+
+    if (!ch->is_npc( ) && ci->clanLevel > ch->getPC( )->getClanLevel( ))
+        return false;
+
+    if (ci->maxLevel < ch->getRealLevel( ) && ci->maxLevel < LEVEL_MORTAL)
+        return false;
+
+    if (ci->level > ch->getRealLevel())
+        return false;
+
+    return true;
 }
 
 bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose ) 

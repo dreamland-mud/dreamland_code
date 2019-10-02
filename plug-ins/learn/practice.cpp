@@ -246,8 +246,13 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
     }
 
+    sname = skill->getNameFor(ch).c_str();
+
     if (!skill->canPractice( ch, buf )) {
-        ch->send_to( buf );
+        if (buf.str().empty())
+            ch->pecho("Ты не можешь выучить умение '%s'.", sname);
+        else
+            ch->send_to(buf);
         return;
     }
     
@@ -266,7 +271,6 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     int &learned = ch->getSkillData( skill->getIndex( ) ).learned;
 
     adept = skill->getAdept( ch );
-    sname = skill->getNameFor( ch ).c_str( );
 
     if (learned >= adept) {
         ch->printf( "Ты уже знаешь искусство '%s'.\r\n", sname );
