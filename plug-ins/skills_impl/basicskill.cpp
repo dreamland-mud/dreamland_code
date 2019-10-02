@@ -111,6 +111,9 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     if (data.forgetting)
         return;
 
+    if (data.isTemporary())
+        return;
+
     data.timer = 0;
 
     if (pch->getRealLevel( ) > 19  && !IS_SET( pch->act, PLR_CONFIRMED ))
