@@ -76,6 +76,15 @@ static void update_exp( PCharacter *ch )
     }
 }    
 
+static void clear_fenia_skills( PCharacter *ch )
+{
+    PCSkills skills = ch->getSkills();
+    PCSkills::iterator s;
+    
+    for (s = skills.begin(); s != skills.end(); s++)
+        if (s->origin == SKILL_FENIA)
+            s->clear();
+}
 
 /*-------------------------------------------------------------------------
  *  work with profiles 
@@ -165,6 +174,8 @@ bool PCharacter::load( )
     form        = getRace( )->getForm() ;
     parts       = getRace( )->getParts( );
     wearloc.set(getRace()->getWearloc());
+
+    clear_fenia_skills( this );
 
     /* now start adding back the effects */
     for (Object *obj = carrying; obj != 0; obj = obj->next_content) 
