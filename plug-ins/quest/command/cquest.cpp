@@ -58,6 +58,32 @@ static void mprog_quest( Character *questor, Character *client, const DLString &
     FENIA_NDX_VOID_CALL(questor->getNPC(), "Quest", "CCss", questor, client, cmd.c_str(), args.c_str());
 }
 
+static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &arg )
+{
+    static Scripting::IdRef ID_TMP( "tmp" ), ID_QUEST( "quest" );
+    Scripting::IdRef ID_CMD( cmd );
+    Scripting::Register tmpQuest;
+    Scripting::RegisterList regList;
+
+    if (!FeniaManager::wrapperManager)
+        return false;
+
+    try {
+        tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
+        regList.push_back( FeniaManager::wrapperManager->getWrapper( ch ) );
+        regList.push_back(Scripting::Register(arg));
+        return tmpQuest[ID_CMD]( regList ).toBoolean( );
+    }
+    catch (const Scripting::Exception &e) {
+        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
+        return false;
+    } 
+    catch (const Exception &ex) {
+        LogStream::sendError( ) << "quest: " << ex.what( ) << endl;
+        return false;
+    } 
+}
+
 static void see_also( PCharacter *pch )
 {
     pch->println( "Смотри также {y{lRквест ?{lEquest ?{x для списка всех возможных действий." );
@@ -79,8 +105,7 @@ COMMAND(CQuest, "quest")
     }
 
     // Parse commands that can be done anywhere.
-    if (cmd.empty() || cmd.isNumber()) 
-    {
+    if (cmd.empty() || cmd.isNumber()) {
         // Syntax: 'quest'
         //         'quest <number>'
         doSummary(pch, cmd);        
@@ -98,14 +123,6 @@ COMMAND(CQuest, "quest")
     else if (arg_is_time( cmd )) {
         doTime( pch );
         return;
-    }
-    else if (arg_oneof( cmd, "cancel", "отменить" )) {
-        // Syntax: 'quest cancel <number>
-        //         'quest cancel' handled down below.
-        if (!arguments.empty()) {
-            doCancel(pch, arguments.getOneArgument());
-            return;
-        }
     }
     else if (arg_oneof( cmd, "stat", "статистика" )) {
         doStat( pch );
@@ -174,6 +191,12 @@ COMMAND(CQuest, "quest")
         return;
     }
 
+    // 'quest cancel <number>' is handled separately by Fenia.
+    if (qcmd == QCMD_CANCEL && !arguments.empty()) {
+        gprog_quest(pch, "cancel", arguments.getOneArgument());
+        return;
+    }
+
     questman = find_attracted_mob_behavior<Questor>( pch, OCC_QUEST_MASTER );
     if (!questman) {
         if (pch->getHometown( ) != home_frigate) {
@@ -226,54 +249,6 @@ COMMAND(CQuest, "quest")
     }
 
     mprog_quest(questman->getChar(), pch, qcmd_names[qcmd], arguments);
-}
-
-bool CQuest::gprog_questinfo( PCharacter *ch )
-{
-    static Scripting::IdRef ID_TMP( "tmp" ), ID_QUEST( "quest" ), ID_INFO( "info" );
-    Scripting::Register tmpQuest;
-    Scripting::RegisterList regList;
-
-    if (!FeniaManager::wrapperManager)
-        return false;
-
-    try {
-        tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
-        regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
-        return tmpQuest[ID_INFO]( regList ).toBoolean( );
-    }
-    catch (const Scripting::Exception &e) {
-        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
-        return false;
-    }
-}
-
-static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &arg )
-{
-    static Scripting::IdRef ID_TMP( "tmp" ), ID_QUEST( "quest" );
-    Scripting::IdRef ID_CMD( cmd );
-    Scripting::Register tmpQuest;
-    Scripting::RegisterList regList;
-
-    if (!FeniaManager::wrapperManager)
-        return false;
-
-    try {
-        tmpQuest = *(*Scripting::Context::root[ID_TMP])[ID_QUEST];
-        regList.push_back( FeniaManager::wrapperManager->getWrapper( ch ) );
-        regList.push_back(Scripting::Register(arg));
-        return tmpQuest[ID_CMD]( regList ).toBoolean( );
-    }
-    catch (const Scripting::Exception &e) {
-        LogStream::sendWarning( ) << "quest: " << e.what( ) << endl;
-        return false;
-    }
-}
-
-void CQuest::doCancel( PCharacter *ch, const DLString &arg ) 
-{
-    // Try to cancel Fenia quest. All error handling is done there.
-    gprog_quest(ch, "cancel", arg);
 }
 
 void CQuest::autoQuestInfo(PCharacter *ch, ostringstream &buf)

@@ -23,13 +23,11 @@ public:
 private:
         void doSummary( PCharacter *, const DLString & );
         void doInfo( PCharacter * );
-        void doCancel( PCharacter *, const DLString & );
         void doPoints( PCharacter * );
         void doTime( PCharacter * );
         void doSet( PCharacter *, DLString& );
         void doStat( PCharacter * );
         
-        bool gprog_questinfo( PCharacter * );
         void usage( PCharacter * );
         void autoQuestInfo(PCharacter *, ostringstream &);
 
