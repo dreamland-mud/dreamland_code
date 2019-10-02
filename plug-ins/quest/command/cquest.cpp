@@ -79,17 +79,16 @@ COMMAND(CQuest, "quest")
     }
 
     // Parse commands that can be done anywhere.
-    if (cmd.empty( )) {
-        doInfo( pch );
-        see_also( pch );
+    if (cmd.empty() || cmd.isNumber()) 
+    {
+        // Syntax: 'quest'
+        //         'quest <number>'
+        doSummary(pch, cmd);        
         return;
     }
-    else if (arg_is_info( cmd )) {
-        doInfo( pch );
-        return;
-    }
-    else if (arg_oneof(cmd, "newinfo")) {
-        doNewInfo(pch, arguments);
+    else if (arg_is_info(cmd)) {
+        // Syntax: 'quest info' legacy call
+        doInfo(pch);
         return;
     }
     else if (arg_oneof( cmd, "points", "очки" )) {
@@ -99,6 +98,14 @@ COMMAND(CQuest, "quest")
     else if (arg_is_time( cmd )) {
         doTime( pch );
         return;
+    }
+    else if (arg_oneof( cmd, "cancel", "отменить" )) {
+        // Syntax: 'quest cancel <number>
+        //         'quest cancel' handled down below.
+        if (!arguments.empty()) {
+            doCancel(pch, arguments.getOneArgument());
+            return;
+        }
     }
     else if (arg_oneof( cmd, "stat", "статистика" )) {
         doStat( pch );
@@ -170,7 +177,14 @@ COMMAND(CQuest, "quest")
     questman = find_attracted_mob_behavior<Questor>( pch, OCC_QUEST_MASTER );
     if (!questman) {
         if (pch->getHometown( ) != home_frigate) {
-            pch->println("Здесь нет квестора.");
+            switch (qcmd) {
+                case QCMD_CANCEL:
+                    pch->println("Для отмены задания квестора необходимо стоять рядом с ним.");
+                    break;
+                default:
+                    pch->println("Эту команду можно выполнить только рядом с квестором.");
+                    break;
+            }
             see_also( pch );
             return;
         }
@@ -184,7 +198,7 @@ COMMAND(CQuest, "quest")
             case QCMD_FIND:
             case QCMD_COMPLETE:
                 pch->println("Эта команда недоступна, пока ты на корабле.");
-                pch->println("Список текущих квестов показывает команда {y{lRквест инфо{lEquest info{x.");
+                pch->println("Список текущих квестов показывает команда {y{lRквест{lEquest{x.");
                 break;
         }
         return;
@@ -256,10 +270,15 @@ static bool gprog_quest( PCharacter *ch, const DLString &cmd, const DLString &ar
     }
 }
 
-void CQuest::doNewInfo( PCharacter *ch, const DLString &arguments ) 
+void CQuest::doCancel( PCharacter *ch, const DLString &arg ) 
+{
+    // Try to cancel Fenia quest. All error handling is done there.
+    gprog_quest(ch, "cancel", arg);
+}
+
+void CQuest::autoQuestInfo(PCharacter *ch, ostringstream &buf)
 {
     // Output questor's quest info to buf.	
-    ostringstream buf;
     int time;
     Quest::Pointer quest;
     
@@ -274,56 +293,58 @@ void CQuest::doNewInfo( PCharacter *ch, const DLString &arguments )
         buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
             << " на выполнение задания." << endl;
     }
-
-    // Output Fenia quest list directly to char.	
-    bool rc = gprog_quest(ch, "newinfo", arguments);
-
-    // Nothing was printed by Fenia quests.
-    if (!rc) {
-	if (!buf.str().empty()) {
-	    ch->println("{YЗадание квестора{x");
-	    ch->send_to(buf);
-	} else {
-	    ch->println("У тебя сейчас нет задания. Подробности читай по команде {y{hc{lEhelp quests{lRсправка квесты{x.");
-	}
-
-	return;
-    }		
-
-    // A list of active quests was printed ('q info' or 'q' command w/o arg).
-    if (arguments.empty()) {
-	if (!buf.str().empty()) {
-	    ch->println("\n{YЗадание квестора{x");
-	    ch->send_to(buf);
-	}
-	return;
-    }
-
-    // 'q info <num>' syntax, do nothing.	
 }
 
 void CQuest::doInfo( PCharacter *ch ) 
-{
-    std::basic_ostringstream<char> buf;
-    int time;
-    Quest::Pointer quest;
+{    
+    // Legacy 'quest info' command shows auto-quests:
+    ostringstream buf;
+    autoQuestInfo(ch, buf);
     
-    quest = ch->getAttributes( ).findAttr<Quest>( "quest" );
-    time = ch->getAttributes( ).getAttr<XMLAttributeQuestData>( "questdata" )->getTime( );
+    if (buf.str().empty())
+        ch->println("У тебя сейчас нет задания от квестора. См. также команду {y{hc{lEquest{lRквест{x.");
+    else
+        ch->send_to(buf);
+}
 
-    if (!quest) {
-        if (ch->getAttributes( ).isAvailable( "quest" )) 
-            buf << "Твое задание невозможно ни выполнить, ни отменить." << endl;
-    } else {
-        quest->info( buf, ch );
-        buf << "У тебя {Y" << time << "{x минут" << GET_COUNT(time, "а", "ы", "")
-            << " на выполнение задания." << endl;
+void CQuest::doSummary( PCharacter *ch, const DLString &arguments ) 
+{    
+    // Output questor's quest info to buf.	
+    ostringstream buf;
+    autoQuestInfo(ch, buf);
+    bool autoquest = !buf.str().empty();
+
+    // Output Fenia quest list directly to char.	
+    bool feniaquest = gprog_quest(ch, "newinfo", arguments);
+
+    // 'q <number>' command is fully handled in Fenia.
+    if (!arguments.empty())
+        return;
+
+    // No active Fenia quest or questor's quest. 
+    if (!feniaquest && !autoquest) {
+        ch->println("У тебя сейчас нет задания. Подробности читай по команде {y{hc{lEhelp quests{lRсправка квесты{x.");
+        return;
     }
-    
-    if (!gprog_questinfo( ch ) && buf.str( ).empty( ))
-        buf << "У тебя сейчас нет задания." << endl;
 
-    ch->send_to( buf );
+    // Some space between fenia quest list and its footer:
+    if (feniaquest && !autoquest)
+        ch->send_to("\r\n");
+
+    // Fenia quest list footer:
+    if (feniaquest)
+        ch->println("{WКоманды{x: '{lEquest{lRквест{lx {Dномер{x' для подробностей, '{lEq cancel{lRквест отмен{lx {Dномер{x' для отмены задания.");
+
+    // Space between fenia quests and questor's quest:
+    if (feniaquest && autoquest)
+        ch->send_to("\r\n");
+
+    // Questor's quest and footer:
+    if (autoquest) {
+        ch->println("{YЗадание квестора{x");
+        ch->send_to(buf);
+        ch->println("{WКоманды{x: '{lEq complete{lRквест сдать{lx', '{lEq find{lRквест найти{lx', '{lEq cancel{lRквест отменить{lx'.");
+    }
 }
 
 void CQuest::doPoints( PCharacter *ch )  

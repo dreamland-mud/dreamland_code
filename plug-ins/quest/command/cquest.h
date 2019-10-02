@@ -21,8 +21,9 @@ public:
         virtual void run( Character*, const DLString& constArguments );
         
 private:
+        void doSummary( PCharacter *, const DLString & );
         void doInfo( PCharacter * );
-        void doNewInfo( PCharacter *, const DLString & );
+        void doCancel( PCharacter *, const DLString & );
         void doPoints( PCharacter * );
         void doTime( PCharacter * );
         void doSet( PCharacter *, DLString& );
@@ -30,6 +31,7 @@ private:
         
         bool gprog_questinfo( PCharacter * );
         void usage( PCharacter * );
+        void autoQuestInfo(PCharacter *, ostringstream &);
 
         static const DLString COMMAND_NAME;
 };
