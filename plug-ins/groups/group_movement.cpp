@@ -220,6 +220,11 @@ SKILL_RUNP( hide )
                 return;
         }
 
+        if (!gsn_hide->usable(ch)) {
+            ch->println("Ты не умеешь скрываться.");
+            return;
+        }
+
         int forest = ch->in_room->sector_type == SECT_FOREST ? 60 : 0;
         forest += ch->in_room->sector_type == SECT_FIELD ? 60 : 0;
 

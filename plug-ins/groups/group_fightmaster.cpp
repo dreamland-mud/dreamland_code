@@ -65,7 +65,7 @@ SKILL_RUNP( bashdoor )
 
         one_argument( argument, arg );
 
-        if (!gsn_bash_door->getEffective( ch ))
+        if (!gsn_bash_door->usable( ch ))
         {
                 ch->send_to("Выбить дверь? Как это?\n\r");
                 return;
@@ -247,7 +247,7 @@ SKILL_RUNP( bash )
                 return;
         }
 
-        if ( (chance = gsn_bash->getEffective( ch )) <= 1)
+        if (!gsn_bash->usable(ch) || (chance = gsn_bash->getEffective( ch )) <= 1)
         {        
                 ch->send_to("Ударить щитом? Но как это сделать?\n\r");
                 return;
@@ -471,7 +471,7 @@ SKILL_RUNP( trip )
 
         one_argument(argument,arg);
 
-        if ( (chance = gsn_trip->getEffective( ch )) <= 1)
+        if (!gsn_trip->usable(ch) || (chance = gsn_trip->getEffective( ch )) <= 1)
         {
                 ch->send_to("Подсечь? Как это?\n\r");
                 return;
@@ -624,7 +624,7 @@ SKILL_RUNP( kick )
         char arg[MAX_INPUT_LENGTH];
         bool FightingCheck;
 
-        if (gsn_kick->getEffective( ch ) <= 1)
+        if (!gsn_kick->usable(ch) || gsn_kick->getEffective( ch ) <= 1)
         {
                 ch->send_to("У тебя плохая растяжка.\n\r");
                 return;
@@ -760,7 +760,7 @@ SKILL_RUNP( concentrate )
         return;
     }
 
-    if ((chance = gsn_concentrate->getEffective( ch )) == 0)
+    if (!gsn_concentrate->usable(ch) || (chance = gsn_concentrate->getEffective( ch )) == 0)
     {
         ch->send_to("Ты пытаешься сконцентрироваться, но не выходит.\n\r");
         return;
@@ -955,7 +955,7 @@ SKILL_RUNP( berserk )
 {
         int chance, hp_percent, mana;
 
-        if ( (chance = gsn_berserk->getEffective( ch )) <= 1)
+        if (!gsn_berserk->usable(ch) || (chance = gsn_berserk->getEffective( ch )) <= 1)
         {
                 ch->send_to("Ты краснеешь от напряжения, но ничего не получается.\n\r");
                 return;
@@ -1066,7 +1066,7 @@ SKILL_RUNP( dirt )
 
         one_argument(argument,arg);
 
-        if ( ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
+        if (!gsn_dirt_kicking->usable(ch) || ( chance = gsn_dirt_kicking->getEffective( ch )) <= 1)
         {
                 ch->send_to("Ты лишь пачкаешь свои ноги в пыли.\n\r");
                 return;
@@ -1238,9 +1238,10 @@ SKILL_RUNP( warcry )
   Affect af;
   XMLStringAttribute::Pointer attr;
 
-  if (!gsn_warcry->usable( ch ) )
+  if (!gsn_warcry->usable( ch ))
     {
-      ch->send_to("Что?\n\r");
+        act("Ты воинственно хрюкаешь!", ch, 0, 0, TO_CHAR);
+        act("$c1 воинственно хрюкает!", ch, 0, 0, TO_ROOM);
       return;
     }
 
@@ -1328,7 +1329,7 @@ SKILL_RUNP( smash )
 
     argument = one_argument(argument,arg);
 
-    if ((chance = gsn_smash->getEffective( ch )) <= 1) {        
+    if (!gsn_smash->usable(ch) || (chance = gsn_smash->getEffective( ch )) <= 1) {        
         ch->send_to("Сбить с ног? Но как это сделать?\n\r");
         return;
     }
@@ -1502,6 +1503,8 @@ BOOL_SKILL( areaattack )::run( Character *ch, Character *victim )
     int count=0, max_count;
     Character *vch, *vch_next;
     
+    if (!gsn_area_attack->usable(ch))
+        return false;
     if (number_percent() >= gsn_area_attack->getEffective( ch ))
         return false;
     
@@ -1538,6 +1541,9 @@ SKILL_DECL( enhanceddamage );
 VOID_SKILL( enhanceddamage )::run( Character *ch, Character *victim, int &dam ) 
 {
     int diceroll;
+
+    if (!gsn_enhanced_damage->usable(ch))
+        return;
 
     if (gsn_enhanced_damage->getEffective( ch ) < 1)
         return;
