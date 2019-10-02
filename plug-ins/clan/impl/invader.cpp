@@ -402,7 +402,7 @@ VOID_SPELL(Shadowlife)::run( Character *ch, Character *victim, int sn, int level
   act_p("$c1 дает жизнь тени $C2!",ch,0,victim,TO_NOTVICT,POS_RESTING);
   act_p("$c1 дает жизнь твоей тени!", ch, 0, victim, TO_VICT,POS_RESTING);
 
-  victim->getPC()->shadow        = ch->getModifyLevel() / 10;
+  victim->getPC()->shadow        = 4 * ch->getModifyLevel() / 10;
 
     postaffect_to_char( ch, sn, 24 );
 }
