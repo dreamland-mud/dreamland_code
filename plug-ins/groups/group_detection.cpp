@@ -19,6 +19,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "fenia_utils.h"
 
 #include "char.h"
 #include "so.h"
@@ -665,12 +666,10 @@ SKILL_RUNP( lore )
 #endif
 
 
-/** onLore can return an extra string to display for 'lore' command. */
-static DLString oprog_lore(Object *obj, Character *ch)
+/** onLore can display more info for 'lore' command. */
+static void oprog_lore(Object *obj, Character *ch)
 {   
-    FENIA_STR_CALL( obj, "Lore", "C", ch )
-    FENIA_NDX_STR_CALL( obj, "Lore", "OC", obj, ch )
-    return DLString::emptyString;
+    gprog("onLore", "CO", ch, obj);
 }
 
 /*
@@ -767,7 +766,7 @@ SKILL_RUNP( lore )
           str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
-      ch->send_to(oprog_lore(obj, ch));
+      oprog_lore(obj, ch);
       ch->mana -= mana;
       gsn_lore->improve( ch, true );
       return;
@@ -786,7 +785,8 @@ SKILL_RUNP( lore )
           str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
-      ch->send_to(oprog_lore(obj, ch));
+      oprog_lore(obj, ch);
+      
       ch->mana -= mana;
       gsn_lore->improve( ch, true );
       return;
@@ -1091,7 +1091,7 @@ SKILL_RUNP( lore )
 
   if (learned < 87)
   {
-    ch->send_to(oprog_lore(obj, ch));
+    oprog_lore(obj, ch);
     gsn_lore->improve( ch, true );
     return;
   }
@@ -1130,7 +1130,7 @@ SKILL_RUNP( lore )
          ch->send_to(buf);
     }
 
-  ch->send_to(oprog_lore(obj, ch));
+  oprog_lore(obj, ch);
   gsn_lore->improve( ch, true );
   return;
 }
