@@ -86,6 +86,7 @@ int ShieldWearloc::canWear( Character *ch, Object *obj, int flags )
     
     if (weapon 
         && ch->size < SIZE_LARGE 
+        && !ch->is_npc()
         && IS_WEAPON_STAT(weapon, WEAPON_TWO_HANDS))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE))

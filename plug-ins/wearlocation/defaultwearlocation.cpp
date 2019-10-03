@@ -420,7 +420,7 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
         return RC_WEAR_NORIB;
     }
 
-    if (conflict->find( ch )) {
+    if (!ch->is_npc() && conflict->find( ch )) {
         if (IS_SET(flags, F_WEAR_VERBOSE)) 
             ch->pecho( msgSelfConflict.c_str( ), ch, obj );
         return RC_WEAR_CONFLICT;

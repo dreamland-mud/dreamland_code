@@ -11,6 +11,7 @@
 #include "room.h"
 #include "object.h"
 #include "wearlocation.h"
+#include "wearloc_codes.h"
 
 #include "dreamland.h"
 #include "loadsave.h"
@@ -93,23 +94,22 @@ static RESET_DATA * find_mob_reset(Room *pRoom, NPCharacter *mob)
 }
 
 /** Equip an item if required by reset configuration. */
-static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob)
+static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob, bool verbose)
 {
     if (pReset->command == 'E' && obj->wear_loc == wear_none) {
         Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
         if (wloc) {
-            // Remove an odd item that ended up in that slot, i.e. scavenged weapons.
-            Object *other = wloc->find(mob);
-            if (other)
-                wloc->unequip(other);
-            // Equip back.
-            wloc->equip(obj);
+            // Equip an item back, removing an odd item that ended up in that slot, i.e. scavenged weapons.
+            if (verbose && obj->level <= mob->getRealLevel())
+                wloc->wear(obj, F_WEAR_VERBOSE | F_WEAR_REPLACE);
+            else // New mob and item.
+                wloc->equip(obj);
         }
     }
 }
 
 /** Create an item for inventory or equipment for a given mob, based on reset data. */
-static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob)
+static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjIndex, NPCharacter *mob, bool verbose)
 {
     Object *obj = NULL;
 
@@ -129,7 +129,12 @@ static Object * create_item_for_mob(RESET_DATA *pReset, OBJ_INDEX_DATA *pObjInde
 
     // Give and equip the item.
     obj_to_char( obj, mob );
-    reset_obj_location(pReset, obj, mob);
+        
+    if (obj->pIndexData->limit != -1)
+        if (verbose)
+            mob->recho("Милость богов снисходит на %C2, принося с собой %O4.", mob, obj);
+
+    reset_obj_location(pReset, obj, mob, verbose);
 
     return obj;
 }
@@ -144,11 +149,11 @@ static bool reset_mob_item(RESET_DATA *myReset, NPCharacter *mob)
     Object *self = get_obj_list_vnum(mob->carrying, pObjIndex->vnum);
     // TODO handle 'P' resets inside 'E'/'G' resets
     if (self) {
-        reset_obj_location(myReset, self, mob);
+        reset_obj_location(myReset, self, mob, true);
         return false;
     }
 
-    Object *newItem = create_item_for_mob(myReset, pObjIndex, mob);
+    Object *newItem = create_item_for_mob(myReset, pObjIndex, mob, true);
     if (newItem) {
         wiznet(WIZ_RESETS, 0, 0, "Created [%d] %s for mob %s in [%d].", 
                pObjIndex->vnum, newItem->getShortDescr('1').c_str(), 
@@ -436,7 +441,7 @@ void reset_room(Room *pRoom)
                 break;
             }
 
-            obj = create_item_for_mob(pReset, pObjIndex, mob);
+            obj = create_item_for_mob(pReset, pObjIndex, mob, false);
             if (!obj)
                 break;
 
