@@ -954,12 +954,30 @@ NMI_INVOKE( Root, Liquid, "(name): конструктор для жидкост�
     return LiquidWrapper::wrap( name.empty( ) ? "none" : name );
 }
 
+static bool normalize_skill_name(DLString &arg)
+{
+    arg.toLower().stripWhiteSpace();
+    if (arg.empty())
+        return false;
+
+    for (DLString::size_type s = 0; s < arg.length(); s++)
+        if (!isalpha(arg.at(s)) && arg.at(s) != ' ')
+            return false;
+
+    return true;
+}
+
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {
     DLString name = args2string(args);
-    if (!skillManager->findExisting(name))
-        return Register( );
-    return SkillWrapper::wrap( name.empty( ) ? "none" : name );
+
+    if (skillManager->findExisting(name))
+        return SkillWrapper::wrap( name.empty( ) ? "none" : name );    
+
+    if (!normalize_skill_name(name))
+        throw Scripting::Exception("Skill name can only consist of letters and spaces");
+
+    return FeniaSkill::wrap(name);
 }
 
 NMI_INVOKE( Root, Clan, "(name): конструктор для клана по имени" )

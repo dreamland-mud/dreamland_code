@@ -85,6 +85,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<RaceWrapper>( );
     Class::regMoc<LiquidWrapper>( );
     Class::regMoc<SkillWrapper>( );
+    Class::regMoc<FeniaSkill>( );
     
     FeniaManager::getThis( )->recover( );
     
@@ -109,6 +110,7 @@ WrappersPlugin::initialization( )
     traitsAPIDump<CraftProfessionWrapper>("craftprofession", false, false);     
     traitsAPIDump<LiquidWrapper>("liquid", false, false);     
     traitsAPIDump<SkillWrapper>("skill", false, false);     
+    traitsAPIDump<FeniaSkill>("feniaskill", false, false);     
     traitsAPIDump<FeniaString>("string", false, false);     
 }
 
@@ -119,6 +121,7 @@ void WrappersPlugin::destruction( ) {
     FeniaManager::getThis( )->backup( );
 
     Class::unregMoc<LiquidWrapper>( );
+    Class::unregMoc<FeniaSkill>( );
     Class::unregMoc<SkillWrapper>( );
     Class::unregMoc<HometownWrapper>( );
     Class::unregMoc<AreaWrapper>( );

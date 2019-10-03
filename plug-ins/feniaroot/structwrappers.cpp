@@ -884,3 +884,84 @@ NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): выполнить уме
     return Register(skill->getCommand()->run(ch, victim));
 }
 
+/*----------------------------------------------------------------------
+ * FeniaSkill
+ *----------------------------------------------------------------------*/
+NMI_INIT(FeniaSkill, "феневое умение");
+
+FeniaSkill::FeniaSkill( const DLString &n )
+                    : Skill(n)
+{
+    myname = n;
+}
+
+Scripting::Register FeniaSkill::wrap( const DLString &name )
+{
+    FeniaSkill::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+void FeniaSkill::setSelf(Scripting::Object *obj)
+{
+    if (obj) {
+        if (!myname.empty()) {
+            this->setName(myname);
+            this->loaded();
+        }
+    } else {
+        if (!myname.empty()) {
+            this->setName(myname);
+            if (skillManager->findExisting(name))
+                this->unloaded();
+        }
+    }
+
+    self = obj;
+}
+
+void FeniaSkill::backup()
+{
+    if (!name.empty() && skillManager->findExisting(name))
+        this->unloaded();
+}
+
+NMI_GET( FeniaSkill, name, "название умения" ) 
+{ 
+    return Register(name); 
+} 
+
+NMI_SET(FeniaSkill, nameRus, "русское название умения")
+{
+    nameRus.setValue(arg.toString());
+    self->changed();
+}
+
+NMI_GET(FeniaSkill, nameRus, "русское название умения")
+{
+    return Register(nameRus);
+}
+
+NMI_SET(FeniaSkill, dammsg, "сообщение о повреждении с падежами через |")
+{
+    dammsg.setFullForm(arg.toString());
+    self->changed();
+}
+
+NMI_GET(FeniaSkill, dammsg, "сообщение о повреждении с падежами через |")
+{
+    return Register(dammsg.getFullForm());
+}
+
+NMI_INVOKE(FeniaSkill, api, "(): печатает этот api")
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<FeniaSkill>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+

@@ -15,6 +15,7 @@
 // MOC_SKIP_END
 #include "fenia/handler.h"
 #include "pluginwrapperimpl.h"
+#include "basicskill.h"
 
 using Scripting::NativeHandler;
 
@@ -211,6 +212,26 @@ public:
     static Scripting::Register wrap( const DLString & );
 
     XML_VARIABLE XMLString name;
+};
+
+class FeniaSkill : public PluginNativeImpl<FeniaSkill>, 
+                       public NativeHandler,
+                       public BasicSkill
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<FeniaSkill> Pointer;
+
+    FeniaSkill() { }
+    FeniaSkill(const DLString &);
+
+    virtual void setSelf(Scripting::Object *);
+    static Scripting::Register wrap( const DLString & );
+    virtual void backup();
+private:
+    Scripting::Object *self;
+    XML_VARIABLE XMLString myname;
 };
 
 #endif
