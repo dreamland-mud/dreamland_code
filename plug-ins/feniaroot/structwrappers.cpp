@@ -901,7 +901,6 @@ Scripting::Register FeniaSkill::wrap( const DLString &name )
 
     Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
     sobj->setHandler( hw );
-
     return Scripting::Register( sobj );
 }
 
@@ -911,12 +910,15 @@ void FeniaSkill::setSelf(Scripting::Object *obj)
         if (!myname.empty()) {
             this->setName(myname);
             this->loaded();
+            notice("FeniaSkill loaded: %s.", name.c_str());
         }
     } else {
         if (!myname.empty()) {
             this->setName(myname);
-            if (skillManager->findExisting(name))
+            if (this == skillManager->findExisting(name)) {
                 this->unloaded();
+                notice("FeniaSkill unloaded: %s.", name.c_str());
+            }
         }
     }
 
@@ -925,8 +927,10 @@ void FeniaSkill::setSelf(Scripting::Object *obj)
 
 void FeniaSkill::backup()
 {
-    if (!name.empty() && skillManager->findExisting(name))
+    if (!name.empty() && this == skillManager->findExisting(name)) {
         this->unloaded();
+        notice("FeniaSkill unloaded on backup: %s.", name.c_str());
+    }
 }
 
 NMI_GET( FeniaSkill, name, "название умения" ) 

@@ -187,7 +187,7 @@ DLString argnum2string(const RegisterList &args, int num)
 
 Skill * args2skill( const RegisterList &args )
 {
-    if (args.size( ) != 1)
+    if (args.size( ) < 1)
         throw Scripting::NotEnoughArgumentsException( );
 
     return skillManager->findExisting( args.front( ).toString( ) );

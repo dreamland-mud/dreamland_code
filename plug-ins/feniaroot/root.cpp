@@ -970,11 +970,17 @@ static bool normalize_skill_name(DLString &arg)
 
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {
+    Skill *skill = argnum2skill(args, 1);
+    return SkillWrapper::wrap(skill->getName());    
+}
+
+NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для нового умения" )
+{
     DLString name = args2string(args);
     Skill *skill = skillManager->findExisting(name);
 
     if (skill && skill->isValid())
-        return SkillWrapper::wrap(name);    
+        throw Scripting::CustomException(name + ": skill already exists.");
 
     if (!normalize_skill_name(name))
         throw Scripting::Exception("Skill name can only consist of letters and spaces");
