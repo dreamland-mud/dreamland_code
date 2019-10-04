@@ -15,6 +15,7 @@
 #include "wiznet.h"
 #include "infonet.h"
 #include "commonattributes.h"
+#include "webmanip.h"
 
 #include "dreamland.h"
 #include "weather.h"
@@ -970,9 +971,10 @@ static bool normalize_skill_name(DLString &arg)
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {
     DLString name = args2string(args);
+    Skill *skill = skillManager->findExisting(name);
 
-    if (skillManager->findExisting(name))
-        return SkillWrapper::wrap( name.empty( ) ? "none" : name );    
+    if (skill && skill->isValid())
+        return SkillWrapper::wrap(name);    
 
     if (!normalize_skill_name(name))
         throw Scripting::Exception("Skill name can only consist of letters and spaces");
@@ -1052,4 +1054,13 @@ NMI_INVOKE(Root, apply, "(func, this, args): вызвать func с указан
     }
 
     return func.toFunction()->invoke(thiz, registerList);
+}
+
+NMI_INVOKE(Root, webcmd, "(ch,cmd,label): создать линку для веб-клиента, выглядящую как label и выполняющую по клику команду cmd")
+{
+    Character *ch = argnum2character(args, 1);
+    DLString cmd = argnum2string(args, 2);
+    DLString seeFmt = argnum2string(args, 3);
+
+    return Register(web_cmd(ch, cmd, seeFmt));
 }

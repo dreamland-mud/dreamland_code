@@ -83,6 +83,7 @@ struct WebSockState {
     std::vector<unsigned char> payload;
     DLString cmd;
     std::map<std::string, std::string> headers;
+    DLString nonce;
 };
 
 /*

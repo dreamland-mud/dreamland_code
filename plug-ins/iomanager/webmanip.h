@@ -18,6 +18,9 @@ class NPCharacter;
 struct ManipCommandArgs;
 struct extra_descr_data;
 
+/** Create a secure clickable action link for web-client. */
+DLString web_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt);
+
 class WebManipCommand : public virtual Plugin {
 public:    
         typedef ::Pointer<WebManipCommand> Pointer;

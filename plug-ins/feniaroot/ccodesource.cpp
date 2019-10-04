@@ -24,6 +24,8 @@
 
 #include "comm.h"
 #include "act.h"
+#include "mudtags.h"
+#include "webmanip.h"
 #include "dl_match.h"    
 #include "dl_ctype.h"
 #include "dl_strings.h"
@@ -40,7 +42,7 @@ static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
     for (i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
         if (i->name.find(arg) != DLString::npos
             || dl_match(arg.c_str(), i->name.c_str(), true)) 
-	{
+    {
             csid = i->getId();
             return true;
         }
@@ -127,24 +129,25 @@ CMDADM( codesource )
 
     if(cmd.strPrefix("list")) {
         ostringstream buf;
-        char header[MAX_STRING_LENGTH];
         CodeSource::Manager::iterator i;
 
         buf << "{YСценарии{x (всего " << CodeSource::manager->size() << "):" << endl;
-        sprintf(header, "{W[%5s] %8s  %-36s %s{x\r\n", "Номер", "Автор:", "Название", "Используется функций");
-        buf << header;
+        buf << fmt(0, "{W[%5s] %8s  %-36s %s{x\r\n", "Номер", "Автор:", "Название", "Используется функций");
+
+        // Clicking on codesource ID will launch 'cs web <id>'.
+        DLString lineFormat = "[" + web_cmd(ch, "cs web $1", "%5d") + "] {g%8s{x: %-36s {D(%d функц.){x\r\n";
 
         for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
             if (args.empty() 
-		|| i->name.find(args) != DLString::npos
+                || i->name.find(args) != DLString::npos
                 || is_name(args.c_str(), i->name.c_str())
                 || dl_match(args.c_str(), i->name.c_str(), true)) {
-                sprintf( header, "[%5u] {g%8s{x: %-36s {D(%lu функц.){x\r\n", 
-                        i->getId( ), 
+
+                buf << fmt( 0, lineFormat.c_str(), 
+                        i->getId(),
                         i->author.c_str( ), 
                         i->name.c_str( ),
                         i->functions.size( ));
-                buf << header;
             }
         }
         page_to_char(buf.str().c_str(), ch);

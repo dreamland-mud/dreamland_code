@@ -474,12 +474,28 @@ Descriptor::wsHandleFrame(unsigned char *buf, int rc)
 
 }
 
+/** Generate random alnum string of given length. */
+static string createNonce(int len)
+{
+    ostringstream buf;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    for (int i = 0; i < len; ++i) {
+        buf << alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return buf.str();
+}
+
 static void
 sendVersion(Descriptor *d)
 {
     Json::Value val;
     val["command"] = "version";
-    val["args"][0] = "DreamLand Web Client/1.8";
+    val["args"][0] = "DreamLand Web Client/1.9";
+    val["args"][1] = d->websock.nonce;
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);
 }
@@ -548,8 +564,10 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                             return -1;
                     }
 
-                    LogStream::sendError( ) << "WebSock: Success!" << endl;
+                    // Generate unique client ID, to be used when creating secure clickable action links.
+                    websock.nonce = createNonce(8);
 
+                    LogStream::sendError( ) << "WebSock: Success! ID " << websock.nonce << endl;
                     sendVersion(this);
 
                     NannyHandler::init(this);

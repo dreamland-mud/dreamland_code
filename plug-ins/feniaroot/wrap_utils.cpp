@@ -180,6 +180,11 @@ int argnum2number(const RegisterList &args, int num)
     return argnum(args, num).toNumber();
 }
 
+DLString argnum2string(const RegisterList &args, int num)
+{
+    return argnum(args, num).toString();
+}
+
 Skill * args2skill( const RegisterList &args )
 {
     if (args.size( ) != 1)
