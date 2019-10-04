@@ -4,6 +4,7 @@
  */
 #include "structwrappers.h"
 
+#include "grammar_entities_impl.h"
 #include "hometown.h"
 #include "skill.h"
 #include "skillcommand.h"
@@ -958,6 +959,12 @@ NMI_SET(FeniaSkill, dammsg, "сообщение о повреждении с п�
 NMI_GET(FeniaSkill, dammsg, "сообщение о повреждении с падежами через |")
 {
     return Register(dammsg.getFullForm());
+}
+
+NMI_SET(FeniaSkill, dammsg_gender, "грам.род сообщения о повреждении (m, f, n, p)")
+{
+    dammsg.setGender(Grammar::MultiGender(arg.toString().c_str()));
+    self->changed();
 }
 
 NMI_INVOKE(FeniaSkill, api, "(): печатает этот api")
