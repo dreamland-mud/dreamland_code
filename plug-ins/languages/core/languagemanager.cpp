@@ -45,11 +45,14 @@ void LanguageManager::destruction( )
     SchedulerTaskRoundPlugin::destruction( );
 }
 
+DLDirectory LanguageManager::getWordsDir() const
+{
+    return DLDirectory( dreamland->getDbDir( ), TABLE_NAME );
+}
+
 XMLFile LanguageManager::getWordsFile( ) 
 {
-    DLFile wordsFile( DLDirectory( dreamland->getDbDir( ), TABLE_NAME ),
-                      WORDS_NAME,
-                      ".xml" );
+    DLFile wordsFile( getWordsDir(), WORDS_NAME, ".xml" );
 
     return XMLFile( wordsFile, NODE_NAME, &words );
 }

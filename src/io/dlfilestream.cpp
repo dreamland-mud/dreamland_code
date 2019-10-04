@@ -64,3 +64,15 @@ void DLFileStream::fromString( const DLString &source ) throw( ExceptionDBIO )
 }
 
 
+vector<DLString> DLFileStream::toVector() throw (ExceptionDBIO)
+{
+    vector<DLString> lines;
+    ifstream file(path.c_str());
+    string s;
+
+    while (getline(file, s))
+        lines.push_back(s);
+
+    return lines;
+}
+

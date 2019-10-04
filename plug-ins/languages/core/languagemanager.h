@@ -8,6 +8,7 @@
 #include "xmlmap.h"
 #include "oneallocate.h"
 #include "xmlfile.h"
+#include "dldirectory.h"
 #include "dlxmlloader.h"
 #include "schedulertaskroundplugin.h"
 #include "schedulertaskroundpcharacter.h"
@@ -44,6 +45,7 @@ public:
     
     virtual DLString getTableName( ) const;
     virtual DLString getNodeName( ) const;
+    DLDirectory getWordsDir() const;
     
     virtual void wordUsed( const Word &, PCharacter * );
 

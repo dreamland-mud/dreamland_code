@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include "dlfile.h"
 #include "exceptiondbio.h"
@@ -20,6 +21,7 @@ public:
 
     void toStream( std::ostream & ) throw( ExceptionDBIO );
     void fromString( const DLString & ) throw( ExceptionDBIO );
+    vector<DLString> toVector() throw (ExceptionDBIO);
 
 protected:
     void openInputStream( ) throw( ExceptionDBIO );

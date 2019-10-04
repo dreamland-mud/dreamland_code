@@ -27,8 +27,6 @@ protected:
     XML_VARIABLE WordList verb_ends;
 
 private:
-    void parseSyllabes( const DLString &, vector<DLString> & ) const;
-    DLString mixSyllabes( vector<vector<DLString> > & ) const;
 
     static const DLString LANG_NAME;
 };
