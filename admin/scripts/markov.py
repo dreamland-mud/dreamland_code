@@ -48,15 +48,15 @@ class MName:
             self.mcd.add_key(s[len(l):len(l) + chainlen], "\n")
 
     def normalize(self, name):
-        name = name.replace("`", "'")
+        name = name.replace("`", "").replace("'", "");
 
         if (len(name) >= 1):
-            if (name[-1] == '-' or name[-1] == '\''):
+            if (name[-1] == '-' or name[-1] == 'ъ'):
                 return '';
         if (len(name) >= 2):
-            if (name[-2] == '-' or name[-2] == '\''):
+            if (name[-2] == '-'):
                 return ''
-        if (name.count('\'') > 1 or name.count('-') > 1):
+        if (name.count('-') > 1):
             return '';
 
         return name
@@ -67,7 +67,7 @@ class MName:
         suffix = ""
         while True:
             suffix = self.mcd.get_suffix(prefix)
-            if suffix == "\n" or len(name) > 9:
+            if suffix == "\n" or len(name) > 10:
                 break
             else:
                 name = name + suffix
@@ -78,7 +78,7 @@ class MName:
 NAMES = [] + PLACES
 
 for i in range(5000):
-    name = MName(2).New()
+    name = MName(3).New()
     if name not in NAMES and len(name) > 6:
         print(name)
         NAMES.append(name)
