@@ -216,12 +216,17 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     weapon = get_eq_char(ch, wear_second_wield);
     if (weapon && weapon->item_type == ITEM_WEAPON)
         index = weapon->value[0] + 1;
-   
-    for (int i = 0; second_weapon_table[i].prof != prof_none; i++)
+  
+    int chance_modifier = 18;
+ 
+    for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
         if (ch->getTrueProfession( ) == second_weapon_table[i].prof) {
-            chance = chance * second_weapon_table[i].percents[index] / 100;
+            chance_modifier = second_weapon_table[i].percents[index];
             break;
         }
+    }
+    
+    chance = chance * chance_modifier / 100;
 
     if (number_percent( ) < gsn_second_weapon->getEffective( ch ) * chance / 100) {
         one_hit_nocatch( ch, victim, true );
