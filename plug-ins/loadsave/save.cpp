@@ -105,6 +105,7 @@
 extern AREA_DATA *                area_first;
 extern AREA_DATA *                area_last;
 
+GSN(none);
 GSN(doppelganger);
 GSN(dispel_affects);
 GSN(dispel_magic);
@@ -134,6 +135,12 @@ static void convert_skill( int &sn )
         sn = gsn_dispel_affects;
     else if (sn == gsn_magic_resistance)
         sn = gsn_spell_resistance;
+}
+
+static const DLString &skillname(int index)
+{
+    Skill *skill = SkillManager::getThis( )->find(index);
+    return skill ? skill->getName() : gsn_none->getName();
 }
 
 static void convert_obj_values( Object *obj )
@@ -805,20 +812,20 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 case ITEM_POTION:
                 case ITEM_SCROLL:
                         if ( obj->value[1] > 0 )
-                                fprintf( fp, "Spell 1 '%s'\n",SkillManager::getThis( )->find(obj->value[1])->getName().c_str() );
+                                fprintf( fp, "Spell 1 '%s'\n", skillname(obj->value[1]).c_str() );
                         if ( obj->value[2] > 0 )
-                                fprintf( fp, "Spell 2 '%s'\n",SkillManager::getThis( )->find(obj->value[2])->getName().c_str() );
+                                fprintf( fp, "Spell 2 '%s'\n", skillname(obj->value[2]).c_str() );
                         if ( obj->value[3] > 0 )
-                                fprintf( fp, "Spell 3 '%s'\n",SkillManager::getThis( )->find(obj->value[3])->getName().c_str() );
+                                fprintf( fp, "Spell 3 '%s'\n", skillname(obj->value[3]).c_str() );
                         if ( obj->value[4] > 0 )
-                                fprintf( fp, "Spell 4 '%s'\n",SkillManager::getThis( )->find(obj->value[4])->getName().c_str() );
+                                fprintf( fp, "Spell 4 '%s'\n", skillname(obj->value[4]).c_str() );
                         break;
 
                 case ITEM_PILL:
                 case ITEM_STAFF:
                 case ITEM_WAND:
                         if ( obj->value[3] > 0 )
-                                fprintf( fp, "Spell 3 '%s'\n",SkillManager::getThis( )->find(obj->value[3])->getName().c_str() );
+                                fprintf( fp, "Spell 3 '%s'\n", skillname(obj->value[3]).c_str() );
                         break;
 
                 case ITEM_FOUNTAIN:
