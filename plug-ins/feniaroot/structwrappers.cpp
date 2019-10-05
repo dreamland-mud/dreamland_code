@@ -767,6 +767,12 @@ NMI_GET( SkillWrapper, nameRus, "русское название" )
     return skillManager->find( name )->getRussianName( );
 }
 
+NMI_GET( SkillWrapper, index, "порядковый номер (для value у волшебных предметов)" ) 
+{ 
+    return skillManager->find( name )->getIndex();
+}
+
+
 NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение для использования прямо сейчас персонажу ch" )
 {
     Character *ch = args2character(args);
