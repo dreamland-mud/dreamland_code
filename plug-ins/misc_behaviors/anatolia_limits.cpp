@@ -151,24 +151,15 @@ void HasteBracers::remove( Character *ch )
  */
 void SubissueWeapon::fight( Character *ch )
 {
-    int hp;
-    
+    int hp = HEALTH(ch);
+
     if (obj->wear_loc != wear_wield)
         return;
 
-    if (chance( 70 ))
+    if (hp <= 40 && chance(50)) {
+        ch->println("Твое оружие свистит, {Y'Тебе лучше {hcубежать{hx прочь, подальше отсюда!'{x");
         return;
-    
-    hp = HEALTH(ch);
-    
-    if (hp > 90)
-        ch->send_to("Твое оружие свистит, {Y'Это было великолепно!'{x\n\r");
-    else if (hp > 60)
-        ch->send_to("Твое оружие свистит, {Y'Так держать! Хорошая работа!'{x\n\r");
-    else if (hp > 40)
-        ch->send_to("Твое оружие свистит, {Y'Ты можешь сделать это!'{x\n\r");
-    else
-        ch->send_to("Твое оружие свистит, {Y'Бежим прочь! Подальше отсюда!'{x\n\r");
+    }
 }
 
 /*
