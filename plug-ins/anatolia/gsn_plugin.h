@@ -27,7 +27,7 @@ _GSN_( backstab );
 _GSN_( bandage );
 _GSN_( bash );
 _GSN_( bash_door );
-_GSN_( bat_sworm );
+_GSN_( bat_swarm );
 _GSN_( bats );
 _GSN_( bear_call );
 _GSN_( benediction );

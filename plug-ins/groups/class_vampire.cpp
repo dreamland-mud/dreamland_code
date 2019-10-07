@@ -1023,8 +1023,8 @@ SKILL_RUNP( sense )
 
 }
 
-SPELL_DECL(BatSworm);
-VOID_SPELL(BatSworm)::run( Character *ch, Character *, int sn, int level ) 
+SPELL_DECL(BatSwarm);
+VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level ) 
 { 
     Affect af;
 

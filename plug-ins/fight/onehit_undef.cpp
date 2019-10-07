@@ -75,7 +75,7 @@ bool UndefinedOneHit::canDamage( )
                 
         if (defenseParry( ) 
             || defenseHandBlock( ) 
-            || defenseBatSworm( ) 
+            || defenseBatSwarm( ) 
             || defenseBlink( ) 
             || defenseShieldBlock( ) 
             || defenseCrossBlock( ) 
@@ -205,15 +205,14 @@ void UndefinedOneHit::message( )
 /*----------------------------------------------------------------------------
  * Check victim ability to avoid the attack
  *---------------------------------------------------------------------------*/
-bool UndefinedOneHit::defenseBatSworm( )
+bool UndefinedOneHit::defenseBatSwarm( )
 {
     int chance;
 
-    if (!victim->isAffected(gsn_bat_sworm))
+    if (!victim->isAffected(gsn_bat_swarm))
         return false;
 
-    chance = gsn_bat_sworm->getEffective( victim ) / 2;
-    chance += victim->getModifyLevel( ) - ch->getModifyLevel( );
+    chance = 50 + (victim->getModifyLevel( ) - ch->getModifyLevel( ));
 
     if (number_percent( ) > chance)
         return false;

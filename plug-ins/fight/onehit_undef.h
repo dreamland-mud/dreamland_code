@@ -36,7 +36,7 @@ protected:
 
     bool defenseParry( );
     bool defenseHandBlock( ); 
-    bool defenseBatSworm( ); 
+    bool defenseBatSwarm( ); 
     bool defenseBlink( ); 
     bool defenseShieldBlock( ); 
     bool defenseCrossBlock( ); 

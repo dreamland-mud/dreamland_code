@@ -229,7 +229,7 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
     }
     // attack : chain light., burning hands, colour spray, dispel good
     // malad. : blindness, curse, dispel magic, slow, weaken
-    // defense: bat sworm
+    // defense: bat swarm
     virtual bool hit( Character *wch )
     {
         NPCharacter *ch = vamp->getChar( );
@@ -266,11 +266,11 @@ struct BasicMobileBehavior::KillVictims : public BasicMobileBehavior::VampVictim
         {
             sn = gsn_dispel_affects;
         }
-        else if (gsn_bat_sworm->usable( ch ) 
-                && !ch->isAffected(gsn_bat_sworm )
+        else if (gsn_bat_swarm->usable( ch ) 
+                && !ch->isAffected(gsn_bat_swarm )
                 && number_percent( ) < 80 && myHit < 50)
         {
-            sn = gsn_bat_sworm;
+            sn = gsn_bat_swarm;
         }
         else if (snMalad != -1 && myHit > 50 && number_percent( ) < 30)
         {
