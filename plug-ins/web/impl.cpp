@@ -13,6 +13,7 @@
 #include "descriptor.h"
 #include "descriptorstatelistener.h"
 #include "quest.h"
+#include "commandmanager.h"
 
 #include "dlfilestream.h"
 #include "dldirectory.h"
@@ -816,7 +817,7 @@ Json::Value AffectsWebPromptListener::jsonProtect( Descriptor *d, Character *ch 
            m = 'c';
         else if (paf->type == gsn_protection_heat)
            m = 'h';
-        else if (paf->type == gsn_bat_sworm)
+        else if (paf->type == gsn_bat_swarm)
            m = 'b';
         else if (paf->type == gsn_rainbow_shield)
            m = 'R';
@@ -1053,6 +1054,52 @@ void WebPromptDescriptorStateListener::run( int oldState, int newState, Descript
 /*-------------------------------------------------------------------------
  * initialize_web
  *------------------------------------------------------------------------*/
+class CommandDumpPlugin : public SchedulerTaskRoundPlugin {
+public:
+    typedef ::Pointer<CommandDumpPlugin> Pointer;
+
+    virtual int getPriority( ) const
+    {
+        return SCDP_BOOT + 25;
+    }
+    virtual void run( )
+    {
+        Json::Value json;
+        list<Command::Pointer>::const_iterator c;
+
+        // Use this guy to choose only commands visible to mortals.
+        PCharacter dummy;
+        dummy.setLevel(1);
+
+        // Output English commands sorted according to their priorities.
+        // TODO: aliases
+        list<Command::Pointer> commands = commandManager->getCommands().getCommands();
+        for (c = commands.begin(); c != commands.end(); c++) {
+            if ((*c)->visible(&dummy)) {
+                Json::Value cmd;
+                cmd["name"] = (*c)->getName();
+                cmd["lvl"] = (*c)->getLevel();
+                json.append(cmd);
+            }
+        }
+
+        // Append Russian commands sorted according to their priorities.
+        commands = commandManager->getCommands().getCommandsRU();
+        for (c = commands.begin(); c != commands.end(); c++) {
+            if ((*c)->visible(&dummy)) {
+                Json::Value cmd;
+                cmd["name"] = (*c)->getRussianName();
+                cmd["lvl"] = (*c)->getLevel();
+                json.append(cmd);
+            }
+        }
+
+        DLFileStream(dreamland->getMiscDir(), "commands", ".json").fromString(
+            json_to_string(json)
+        );
+    }
+};    
+
 /**
  * Help dumper task: save help HTML to disk each time this plugin is loaded.
  * It's prioritized to run after all area initialization has completed.
@@ -1203,6 +1250,7 @@ extern "C"
     {
         SO::PluginList ppl;
 //        Plugin::registerPlugin<HelpDumpPlugin>( ppl );
+        Plugin::registerPlugin<CommandDumpPlugin>( ppl );
         Plugin::registerPlugin<WhoWebPromptListener>( ppl );
         Plugin::registerPlugin<GroupWebPromptListener>( ppl );
         Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
