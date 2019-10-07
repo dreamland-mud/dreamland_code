@@ -6,8 +6,9 @@
 #include "dl_ctype.h"
 #include "descriptor.h"
 #include "character.h"
+#include "colour.h"
 
-const char *MSG_HIT_RET       = "\r[Нажмите Return для продолжения]\n\r";
+const char *MSG_HIT_RET       = "\r" C_YELLOW "[Нажмите клавишу Enter для продолжения]" ANSI_COLOR_RESET "\n\r";
 
 PagerHandler::PagerHandler()
 {
