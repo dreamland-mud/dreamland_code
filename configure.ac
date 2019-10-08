@@ -91,7 +91,10 @@ AC_CREATE_DIR(var/misc/help)
 AC_CREATE_DIR(var/db/fenia)
 AC_CREATE_DIR(var/db/clan-data)
 AC_CREATE_DIR(var/db/gquests)
+
 AC_CREATE_DIR(var/db/languages)
+cp "$srcdir/admin/scripts/ahenn.txt"    "$prefix/var/db/languages/ahenn.txt"
+
 AC_CREATE_DIR(var/db/notes/change)
 AC_CREATE_DIR(var/db/notes/crime)
 AC_CREATE_DIR(var/db/notes/dream)

@@ -5,7 +5,7 @@
 #
 import random, sys, re
 
-PLACES = open("ahenn.txt", "r").read().split("\n")
+PLACES = open("ahenn.vocab", "r").read().split("\n")
 
 
 class Mdict:
