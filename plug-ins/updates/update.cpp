@@ -60,6 +60,7 @@
 #include "wrapperbase.h"
 #include "register-impl.h"
 #include "lex.h"
+#include "fenia_utils.h"
 
 #include "commonattributes.h"
 #include "behavior_utils.h"
@@ -230,6 +231,8 @@ static bool mprog_special( Character *ch )
             && (*(ch->getNPC( )->spec_fun))( ch->getNPC( ) ))
             return true;
     }
+
+    gprog("onSpec", "C", ch);
 
     return false;
 }
