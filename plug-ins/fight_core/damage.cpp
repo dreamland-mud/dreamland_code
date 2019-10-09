@@ -47,6 +47,12 @@ void do_visible( Character * );
 /*-----------------------------------------------------------------------------
  * Damage 
  *----------------------------------------------------------------------------*/
+Damage::Damage( )
+          : ch( NULL ), victim( NULL ), killer( NULL ),
+            dam_type( 0 ), dam( 0 ),  immune( false ), dam_flag( 0 )
+{
+}
+
 Damage::Damage( Character *ch, Character *victim, int dam_type, int dam, bitstring_t dam_flag )
 {
     this->ch = ch;
@@ -75,7 +81,6 @@ bool Damage::hit( bool show )
 
     inflictDamage( );
     postDamageEffects( );
-    mprog_hit();
     handlePosition( );
     checkRetreat( );
     return true;
@@ -83,15 +88,6 @@ bool Damage::hit( bool show )
 
 void Damage::priorDamageEffects( )
 {
-}
-
-bool Damage::mprog_hit()
-{
-    DLString damType = damage_table.name( dam_type );
-    
-    FENIA_CALL( victim, "Hit", "CisO", ch, dam, damType.c_str( ), NULL );
-    FENIA_NDX_CALL( victim->getNPC( ), "Hit", "CCisO", victim, ch, dam, damType.c_str( ), NULL );
-    return false;
 }
 
 void Damage::postDamageEffects( )
@@ -130,14 +126,10 @@ void Damage::adjustPosition( )
     if (ch->in_room != victim->in_room)
         return;
 
-    if (victim->wait <= 1 && victim->position > POS_STUNNED) {
-        if (victim->position == POS_SITTING || victim->position == POS_RESTING) {
-             act( "$c1 встает на ноги под шквалом ударов.", victim, 0, 0, TO_ROOM ); 
-             act( "Ты встаешь на ноги под шквалом ударов.", victim, 0, 0, TO_CHAR );
-        }
-        victim->position = POS_FIGHTING;
-    }
-    if (ch->wait <= 1 && ch->position > POS_STUNNED) {
+    if (!ch->is_npc( ))
+        return;
+
+    if (ch->wait < 1 && ch->position > POS_STUNNED) {
         if (ch->position == POS_SITTING || ch->position == POS_RESTING) {
              act( "$c1 встает на ноги под шквалом ударов.", ch, 0, 0, TO_ROOM ); 
              act( "Ты встаешь на ноги под шквалом ударов.", ch, 0, 0, TO_CHAR );
@@ -319,19 +311,19 @@ void Damage::protectTemperature( )
         dam -= dam / 4;
 }
 
-bool Damage::mprog_immune()
+static bool mprog_immune(Character *victim, Character *attacker, int dam_type, int &dam)
 {
-    DLString damType = damage_table.name(dam_type);
-    FENIA_NUM_CALL(victim, "Immune", dam, "CisOis", ch, dam, damType.c_str(), NULL, dam_flag, "");
-    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCisOis", victim, ch, dam, damType.c_str(), NULL, dam_flag, "");
+    FENIA_NUM_CALL(victim, "Immune", dam, "Cii", attacker, dam_type, dam);
+    FENIA_NDX_NUM_CALL(victim->getNPC(), "Immune", dam, "CCii", victim, attacker, dam_type, dam);
     return false; 
 }
+
 
 void Damage::protectImmune( )
 {
     int old_dam = dam;
 
-    if (mprog_immune()) {
+    if (mprog_immune(victim, ch, dam_type, dam)) {
         if (old_dam > 0 && dam == 0)
             immune = true;
         return;
@@ -525,16 +517,16 @@ void Damage::msgNewFormat( bool vs, char *buf )
         const char *art;
     } absTable [] = 
     {
-      {   0,  'r', " "                     },
-      {   4,  'r', " "                     },
-      {   8,  'r', " "                     },
-      {  12,  'r', " "                     },
-      {  16,  'r', " "                     },
-      {  20,  'r', " "                     },
-      {  24,  'r', " "                     },
-      {  28,  'r', " - "                   },
-      {  32,  'r', " -- "                  },
-      {  36,  'r', " --- "                 },
+      {   0,  'w', " "                     },
+      {   4,  'w', " "                     },
+      {   8,  'w', " "                     },
+      {  12,  'w', " "                     },
+      {  16,  'w', " "                     },
+      {  20,  'w', " "                     },
+      {  24,  'w', " "                     },
+      {  28,  'w', " - "                   },
+      {  32,  'w', " -- "                  },
+      {  36,  'w', " --- "                 },
       {  42,  'M', " "                     },
       {  52,  'M', " "                     },
       {  65,  'M', " ^ "                   },
@@ -615,16 +607,16 @@ void Damage::msgOldFormat( bool vs, char *buf )
     } msgTable [] =
     {
      {    0, 'w', " ", "промахиваешься мимо",  "промахивается мимо" },
-     {    1, 'r', " ", "слегка царапаешь",     "слегка царапает" },
-     {    4, 'r', " ", "царапаешь",            "царапает" },
-     {    8, 'r', " ", "задеваешь",            "задевает" },
-     {   12, 'r', " ", "больно задеваешь",     "больно задевает" },
-     {   16, 'r', " ", "немного ранишь",       "немного ранит" },
-     {   20, 'r', " ", "ранишь",               "ранит" },
-     {   24, 'r', " ", "сильно ранишь",        "сильно ранит" },
-     {   28, 'r', " ", "разрушаешь",           "разрушает" },
-     {   32, 'r', " ", "уродуешь",             "уродует" },
-     {   36, 'r', " ", "калечишь",             "калечит" },
+     {    1, 'w', " ", "слегка царапаешь",     "слегка царапает" },
+     {    4, 'w', " ", "царапаешь",            "царапает" },
+     {    8, 'w', " ", "задеваешь",            "задевает" },
+     {   12, 'w', " ", "больно задеваешь",     "больно задевает" },
+     {   16, 'w', " ", "немного ранишь",       "немного ранит" },
+     {   20, 'w', " ", "ранишь",               "ранит" },
+     {   24, 'w', " ", "сильно ранишь",        "сильно ранит" },
+     {   28, 'w', " ", "разрушаешь",           "разрушает" },
+     {   32, 'w', " ", "уродуешь",             "уродует" },
+     {   36, 'w', " ", "калечишь",             "калечит" },
      {   42, 'M', " ", "УРОДУЕШЬ",             "УРОДУЕТ" },
      {   52, 'M', " ", "УНИЧТОЖАЕШЬ",          "УНИЧТОЖАЕТ" },
      {   65, 'M', " ", "РАСЧЛЕНЯЕШЬ",          "РАСЧЛЕНЯЕТ" },
