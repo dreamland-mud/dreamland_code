@@ -148,16 +148,37 @@ NMI_INVOKE( RegList, sub , "(args...): удаляет из списка все �
 
 NMI_INVOKE( RegList, has, "(elem): true если указанный элемент содержится в списке")
 {
-    if (args.empty( ))
-        throw Scripting::NotEnoughArgumentsException( );
-    
-    const Register &arg = args.front( );
+    const Register &arg = get_unique_arg(args);
 
     for (const_iterator i = begin( ); i != end( ); i++)
         if ((arg == *i).toBoolean( ))
             return true;
 
     return false;
+}
+
+NMI_INVOKE( RegList, find, "(elem): номер этого элемента в списке или -1")
+{
+    const Register &arg = get_unique_arg(args);
+    int n = 0;
+    
+    for (const_iterator i = begin( ); i != end( ); i++, n++)
+        if ((arg == *i).toBoolean( ))
+            return Register(n);
+
+    return Register(-1);
+}
+
+NMI_INVOKE( RegList, find_reverse, "(elem): номер этого элемента в списке с конца или -1")
+{
+    const Register &arg = get_unique_arg(args);
+    int n = 0;
+    
+    for (reverse_iterator i = rbegin( ); i != rend( ); i++, n++)
+        if ((arg == *i).toBoolean( ))
+            return Register(n);
+
+    return Register(-1);
 }
 
 NMI_INVOKE( RegList, size , "(): размер списка")
@@ -239,3 +260,4 @@ NMI_INVOKE( RegList, filter, "(func[,args]): возвращает новый с�
 
     return Register( obj );
 }
+
