@@ -129,6 +129,9 @@ void Damage::adjustPosition( )
 
     if (ch->in_room != victim->in_room)
         return;
+    
+    if (victim->timer <= 4 && victim->wait < 1 && victim->position > POS_STUNNED)
+        victim->position = POS_FIGHTING;
 
     if (!ch->is_npc( ))
         return;
