@@ -486,15 +486,32 @@ NMI_INVOKE(RoomWrapper, get_obj_vnum, "(vnum): поиск первого объ�
     return Register( );
 }
 
-NMI_INVOKE(RoomWrapper, get_obj_type, "(type): поиск первого объекта в комнате по его типу (таблица .tables.item_table)" )
+NMI_INVOKE(RoomWrapper, get_obj_type, "(type): поиск первого объекта в комнате по его типу (имя или номер из .tables.item_table)" )
 {
     checkTarget( );
 
-    int itemType = args2number(args);
+    int itemType = argnum2flag(args, 1, item_table);
     ::Object *obj = get_obj_room_type(target, itemType);
     if (!obj)
         return Register();
     return WrapperManager::getThis( )->getWrapper(obj); 
+}
+
+NMI_INVOKE(RoomWrapper, list_obj_type, "(type): поиск списка объектов в комнате по его типу (имя или номер из .tables.item_table)" )
+{
+    checkTarget( );
+
+    int itemType = argnum2flag(args, 1, item_table);
+    RegList::Pointer rc(NEW);
+
+    for (::Object *obj = target->contents; obj; obj = obj->next_content)
+        if (obj->item_type == itemType)
+            rc->push_back( WrapperManager::getThis( )->getWrapper( obj ) );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( rc );
+
+    return Register( sobj );
 }
 
 NMI_INVOKE( RoomWrapper, list_obj_vnum, "(vnum): поиск списка объектов в комнате по внуму" )
