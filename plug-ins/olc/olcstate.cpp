@@ -217,6 +217,8 @@ AREA_DATA *OLCState::get_vnum_area(int vnum)
     return 0;
 }
 
+static const char * SEDIT_SYNTAX = ""
+"{gВход во встроенный редактор. {y{hcq{hx{g - выход, {y{hc%!help{hx{g - справка.\r\n";
 
 bool
 OLCState::sedit(DLString &original)
@@ -232,6 +234,10 @@ OLCState::sedit(DLString &original)
         strEditor.setBuffer( original );
         strEditor.clear_undo( );
         inSedit.setValue( true );
+
+        if (owner && owner->character)
+            owner->character->send_to(SEDIT_SYNTAX);
+
         return false;
     }
 }
@@ -577,9 +583,6 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     const char *cmd = lastCmd.c_str();
 
     if (command.empty()) {
-        if (!inSedit)
-            ptc(ch, "{gВход во встроенный редактор. Для выхода используй {yq{g. Для списка подкоманд: {y%s ?{g.{x\r\n", cmd);
-
         if (!sedit(original)) 
             return false;
         
