@@ -519,12 +519,18 @@ bool OLCState::diceEdit(int *field)
     return true;
 }
 
-bool OLCState::editorCopy(const DLString &original)
+bool OLCState::editorCopy(const char *field)
 {
+    DLString source = field ? field : DLString::emptyString;
     PCharacter *ch = owner->character->getPC();
-    ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(original);
+    ch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(source);
     ptc(ch, "Описание скопировано в буфер.\r\n");
     return false;
+}
+
+bool OLCState::editorCopy(const DLString &original)
+{
+    return editorCopy(original.c_str());
 }
 
 static void apply_flags(DLString &original, editor_flags flags)
@@ -556,9 +562,12 @@ bool OLCState::editorPaste(DLString &original, editor_flags flags)
 
 bool OLCState::editorPaste(char *&field, editor_flags flags)
 {
-    DLString original = field;
+    DLString original = field ? field : DLString::emptyString;
     editorPaste(original, flags);
-    free_string(field);
+
+    if (field)
+        free_string(field);
+
     field = str_dup(original.c_str());
     return true;
 }
@@ -641,16 +650,26 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
     }
     
     if (is_name(command, "copy")) {
-        char *desc = ed ? ed->description : str_empty;
-        return editorCopy(desc);
+        if (!ed) {
+            ed = new_extra_descr();
+            ed->keyword = str_dup(keyword);
+            ed->description = str_empty;
+            ed->next = list;
+            list = ed;
+            ptc(ch, "Создано новое экстра-описание [%s].\r\n", keyword);
+        }
+
+        return editorCopy(ed->description);
     }
 
     if (is_name(command, "paste")) {
         if (!ed) {
             ed = new_extra_descr();
             ed->keyword = str_dup(keyword);
+            ed->description = str_empty;
             ed->next = list;
             list = ed;
+            ptc(ch, "Создано новое экстра-описание [%s].\r\n", keyword);
         }
 
         editorPaste(ed->description);

@@ -95,6 +95,7 @@ protected:
     bool diceEdit(int *field);
     bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
     bool editorCopy(const DLString &original);
+    bool editorCopy(const char *field);
     bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editorPaste(char *&field, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
