@@ -18,6 +18,7 @@ public:
 
     virtual Descriptor *getOwner( );
     virtual void done();
+    virtual void help();
 
     OLCState &olc;
 };

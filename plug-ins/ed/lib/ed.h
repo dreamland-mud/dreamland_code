@@ -291,6 +291,7 @@ public:
     virtual void error(const string &) = 0;
     virtual string shell(const string &, const string &) = 0;
     virtual void done() = 0;
+    virtual void help() = 0;
     virtual reg_t &registerAt(char) = 0;
 };
 

@@ -35,6 +35,8 @@ struct Test : public XMLEditor {
     virtual void done() {
         eof = true;
     }
+    virtual void help() {
+    }
     virtual string shell(const string &cmd, const string &str) {
         cout << "cmd: " << cmd << endl;
 

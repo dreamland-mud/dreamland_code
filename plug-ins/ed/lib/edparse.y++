@@ -181,6 +181,11 @@ quit:		'q'
 	    }
 	    ;
 
+help: 		'h'
+		{
+		help();
+		}		
+
 nop:		/*empty*/
 	    {
 		currentline++;
@@ -382,6 +387,7 @@ cmd:		print
 	    |	join
 	    |	put
 	    |	quit
+		|	help
 	    |	undo
 	    |	shell
 	    ;

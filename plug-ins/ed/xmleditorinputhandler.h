@@ -21,6 +21,7 @@ public:
     virtual Descriptor *getOwner( );
     
     virtual void done();
+    virtual void help() { }
 
     virtual int handle(Descriptor*, char *);
     virtual void prompt( Descriptor *d );
