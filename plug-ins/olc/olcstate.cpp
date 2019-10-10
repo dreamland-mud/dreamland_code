@@ -547,7 +547,8 @@ static void apply_flags(DLString &original, editor_flags flags)
     }
 
     if (IS_SET(flags, ED_ADD_NEWLINE)) {
-        original << "\n";
+        if (original.empty() || original.at(original.size() - 1) != '\n')
+            original << "\n";
     }
 }
 
