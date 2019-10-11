@@ -116,7 +116,7 @@ void QuestGirth::addAffect( Character *ch, Affect *paf )
               
             } else { // caster class
                 if (evil)
-                    mod = level;
+                    mod = 3 * level / 2;
                 else if (neutral)
                     mod = level * 2;
                 else
