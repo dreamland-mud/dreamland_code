@@ -85,14 +85,31 @@ bool limit_check_on_load( Object *obj )
 // are going to be destroyed, but only once.
 static bool item_is_home(Object *obj)
 {
-    if (obj->in_room)
-        return obj->reset_room == obj->in_room->vnum;
+    // Don't touch items no one can touch, e.g. roaming portal.
+    if (!IS_SET(obj->wear_flags, ITEM_TAKE))
+        return true;
 
-    if (obj->in_obj)
-        return obj->reset_obj == obj->in_obj->getID();
+    if (obj->in_room) {
+        if (obj->reset_room == obj->in_room->vnum)
+            return true;
+
+        return false;
+    }
+
+    if (obj->in_obj) {
+        if (obj->reset_obj == obj->in_obj->getID())
+            return true;
+
+        // Deal with the timer once the corpse is decayed or item removed.
+        if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+            return true;
+
+        return false;
+    }
 
     if (obj->carried_by && obj->carried_by->is_npc())
         return obj->reset_mob == obj->carried_by->getID();
+
 
     return false;
 }
