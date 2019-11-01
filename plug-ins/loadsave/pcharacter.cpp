@@ -179,6 +179,9 @@ bool PCharacter::load( )
 
     clear_fenia_skills( this );
 
+    // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
+    char_to_room(this, get_room_index(ROOM_VNUM_LIMBO));
+
     /* now start adding back the effects */
     for (Object *obj = carrying; obj != 0; obj = obj->next_content) 
         obj->wear_loc->reset( obj );
@@ -202,6 +205,8 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_dispel_magic, gsn_dispel_affects );
     skill_exchange( this, gsn_bat_sworm, gsn_bat_swarm );
 
+    // Move player out of the room, to be placed to the start room correctly further down the way.
+    char_from_room(this);
     return true;
 }
 
