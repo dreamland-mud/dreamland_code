@@ -21,7 +21,7 @@ GSN(garble);
  *-----------------------------------------------------------------------*/
 CommunicationChannel::CommunicationChannel( ) 
             :   off( 0, &comm_flags ),
-                ignore( false ), garble( false ), isolate( false ), deafen( false ),
+                ignore( false ), garble( false ), isolate( false ), deafen( false ), hook(false),
                 positionOther( 0, &position_table )
 {
 }
@@ -112,8 +112,6 @@ DLString CommunicationChannel::outputSelf( Character *ch, const DLString &format
 {
     DLString message = fmt( ch, format.c_str( ), ch, msg.c_str( ) );
     return message;
-//    ch->println( message );
-//    postOutput( ch, message );
 }
 
 DLString CommunicationChannel::outputVict( Character *ch, Character *victim, 
@@ -121,8 +119,6 @@ DLString CommunicationChannel::outputVict( Character *ch, Character *victim,
 {
     DLString message = fmt( victim, format.c_str( ), ch, msg.c_str( ), victim );
     return message;
-//    victim->println( message );
-//    postOutput( victim, message );
 }
 
 DLString CommunicationChannel::outputChar( Character *ch, Character *victim, 
@@ -130,8 +126,6 @@ DLString CommunicationChannel::outputChar( Character *ch, Character *victim,
 {
     DLString message = fmt( ch, format.c_str( ), ch, msg.c_str( ), victim );
     return message;
-//    ch->println( message );
-//    postOutput( ch, message );
 }
 
 void CommunicationChannel::postOutput( Character *outputTo, const DLString &message ) const

@@ -3,6 +3,7 @@ lib_LTLIBRARIES = libcommunication.la
 include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
+-I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/command  \
 -I$(top_srcdir)/plug-ins/ban \
@@ -20,7 +21,8 @@ libcommunication_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../ban/libban.la \
 ../help/libhelp.la \
-../command/libcommand.la
+../command/libcommand.la \
+-ljsoncpp
 
 libcommunication_la_SOURCES = \
 languages.cpp \

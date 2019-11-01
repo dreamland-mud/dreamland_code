@@ -32,7 +32,7 @@ protected:
     virtual void postOutput( Character *outputTo, const DLString &message ) const;
 
     XML_VARIABLE XMLFlagsNoEmpty off;
-    XML_VARIABLE XMLBooleanNoFalse ignore, garble, isolate, deafen;
+    XML_VARIABLE XMLBooleanNoFalse ignore, garble, isolate, deafen, hook;
     XML_VARIABLE XMLIntegerNoEmpty trustSpeak, trustHear;
     XML_VARIABLE XMLEnumeration positionOther;
 };
