@@ -3,12 +3,7 @@
  * ruffina, 2004
  * logic based on 'do_cast' from DreamLand 2.0
  */
-#include "wrapperbase.h"
-#include "register-impl.h"
-#include "lex.h"
-
 #include "profflags.h"
-#include "behavior_utils.h"
 #include "commandtemplate.h"
 #include "skillreference.h"
 #include "spellmanager.h"
@@ -42,29 +37,8 @@ GSN(deafen);
 BONUS(mana);
 
 
-static bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before )
-{
-    const char *sname = skill->getName().c_str();
-    FENIA_CALL( victim, "Spell", "Csi", caster, sname, before );
-    FENIA_NDX_CALL( victim->getNPC( ), "Spell", "CCsi", victim, caster, sname, before );
-    BEHAVIOR_CALL( victim->getNPC( ), spell, caster, skill->getIndex(), before );
-    return false;
-}
-
-static void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before )
-{
-    // Call Fenia progs only once.
-    if (before == false) {
-        const char *sname = skill->getName().c_str();
-        for (Character *rch = caster->in_room->people; rch; rch = rch->next_in_room) {
-            FENIA_VOID_CALL( rch, "Cast", "Cs", caster, sname );
-            FENIA_NDX_VOID_CALL( rch->getNPC( ), "Cast", "CCs", rch, caster, sname );
-        }
-    }
-
-    BEHAVIOR_VOID_CALL( caster->getNPC( ), cast, target, skill->getIndex(), before );
-
-}
+bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before );
+void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before );
 
 CMDRUN( cast )
 {

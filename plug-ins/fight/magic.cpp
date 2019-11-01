@@ -49,6 +49,11 @@
 *        ROM license, in the file Rom24/doc/rom.license                           *
 ***************************************************************************/
 
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
+
+#include "behavior_utils.h"
 #include "logstream.h"
 #include "spell.h"
 #include "spelltarget.h"
@@ -161,6 +166,30 @@ void area_message( Character *ch, const DLString &msg, bool everywhere )
     }
 }
 
+bool mprog_spell( Character *victim, Character *caster, Skill::Pointer skill, bool before )
+{
+    const char *sname = skill->getName().c_str();
+    FENIA_CALL( victim, "Spell", "Csi", caster, sname, before );
+    FENIA_NDX_CALL( victim->getNPC( ), "Spell", "CCsi", victim, caster, sname, before );
+    BEHAVIOR_CALL( victim->getNPC( ), spell, caster, skill->getIndex(), before );
+    return false;
+}
+
+void mprog_cast( Character *caster, SpellTarget::Pointer target, Skill::Pointer skill, bool before )
+{
+    // Call Fenia progs only once.
+    if (before == false) {
+        const char *sname = skill->getName().c_str();
+        for (Character *rch = caster->in_room->people; rch; rch = rch->next_in_room) {
+            FENIA_VOID_CALL( rch, "Cast", "Cs", caster, sname );
+            FENIA_NDX_VOID_CALL( rch->getNPC( ), "Cast", "CCs", rch, caster, sname );
+        }
+    }
+
+    BEHAVIOR_VOID_CALL( caster->getNPC( ), cast, target, skill->getIndex(), before );
+
+}
+
 /*
  *
  */
@@ -209,10 +238,22 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
     if (IS_SET(flags, FSPELL_BANE) && spell->spellbane( ch, target->victim ))
         return false;
    
-    spell->run( ch, target, level );
+    bool fForbidCasting = false;
+
+    if (target->type == SpellTarget::CHAR && target->victim)
+        fForbidCasting = mprog_spell( target->victim, ch, skill, true );
+    
+    mprog_cast( ch, target, skill, true );
+
+    if (!fForbidCasting)
+        spell->run( ch, target, level );
+
+    if (target->type == SpellTarget::CHAR && target->victim)
+        mprog_spell( target->victim, ch, skill, false );
+
+    mprog_cast( ch, target, skill, false );
     return true;
 }
-
 
 bool spell( int sn, int level, Character *ch, SpellTarget::Pointer target, int flags )
 {
