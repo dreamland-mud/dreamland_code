@@ -127,10 +127,18 @@ static string json_to_string( const Json::Value &value )
 
 void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
 {
+    ostringstream content;
+
+    content 
+        << "*Автор*: " << note.getFrom() << endl
+        << "*Тема*: " << note.getSubject() << endl
+        << endl
+        << note.getText().colourStrip();
+        
     Json::Value body;
     body["chat_id"] = "@dreamland_rocks";
-    body["text"] = koi2utf(
-        note.getText().colourStrip());
+    body["parse_mode"] = "Markdown";
+    body["text"] = koi2utf(content.str());
     body["disable_notification"] = "true";
 
     DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
