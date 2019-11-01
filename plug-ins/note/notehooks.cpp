@@ -14,16 +14,23 @@
 #include "pcharacter.h"
 #include "dreamland.h"
 #include "infonet.h"
+#include "iconvmap.h"
 #include "descriptor.h"
 #include "arg_utils.h"
 #include "dl_strings.h"
 #include "act.h"
 #include "def.h"
 
+static IconvMap koi2utf("koi8-r", "utf-8");
+
 void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 {
     // Notify via crystal orb for all types of messages.
     notifyOrb(thread, note);
+
+    // Telegram
+    if (note.getRecipient().find("telegram") != DLString::npos)
+        hookTelegram(thread, note);
 
     if (!note.isNoteToAll( ))
         return;
@@ -117,6 +124,20 @@ static string json_to_string( const Json::Value &value )
     Json::FastWriter writer;
     return writer.write( value );
 }    
+
+void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
+{
+    Json::Value body;
+    body["chat_id"] = "@dreamland_rocks";
+    body["text"] = koi2utf(
+        note.getText().colourStrip());
+    body["disable_notification"] = "true";
+
+    DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
+    DLFileStream( dir.tempEntry( ) ).fromString( 
+        json_to_string(body)
+    );
+}
 
 static const DLString DISCORD_USERNAME = "Новости мира DreamLand";
 static const DLString DISCORD_FOLDER = "discord";

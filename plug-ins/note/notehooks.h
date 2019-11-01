@@ -25,6 +25,7 @@ private:
 
     static void notifyOrb(const NoteThread &thread, const Note &note);
     static void hookDiscord(const NoteThread &thread, const Note &note);    
+    static void hookTelegram(const NoteThread &thread, const Note &note);    
     static void webDumpNews();
     static void webDumpModernStories();
     static void webDumpOldStories();
