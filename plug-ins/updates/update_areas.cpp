@@ -98,12 +98,17 @@ static void reset_obj_location(RESET_DATA *pReset, Object *obj, NPCharacter *mob
 {
     if (pReset->command == 'E' && obj->wear_loc == wear_none) {
         Wearlocation *wloc = wearlocationManager->find( pReset->arg3 );
-        if (wloc) {
-            // Equip an item back, removing an odd item that ended up in that slot, i.e. scavenged weapons.
-            if (verbose && obj->level <= mob->getRealLevel())
+        if (!wloc)
+            return;
+
+        // Equip an item back, removing an odd item that ended up in that slot, i.e. scavenged weapons.
+        if (verbose && obj->level <= mob->getRealLevel()) {
+            Object *worn = wloc->find(mob);
+            if (!worn || worn->pIndexData != obj->pIndexData)
                 wloc->wear(obj, F_WEAR_VERBOSE | F_WEAR_REPLACE);
-            else // New mob and item.
-                wloc->equip(obj);
+        }
+        else { // New mob and item.
+            wloc->equip(obj);
         }
     }
 }
