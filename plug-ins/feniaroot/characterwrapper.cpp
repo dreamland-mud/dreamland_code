@@ -1502,7 +1502,7 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
-NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane]]): скастовать заклинания на vict, на всю комнату или с аргументом")
+NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict или с аргументом")
 {
     checkTarget( );
 
@@ -1527,9 +1527,14 @@ NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane
     if (!victim)
         throw Scripting::IllegalArgumentException( );
 
-    bool fBane = args.size() > 3 ? argnum2number(args, 4) : false;
-    
-    spell( skill->getIndex( ), level, target, victim, fBane );
+    // Figure out the flags.
+    int flags = 0;
+    if (args.size() >= 4 && argnum2number(args, 4))
+        SET_BIT(flags, FSPELL_BANE);
+    if (args.size() >= 5 && argnum2number(args, 5))
+        SET_BIT(flags, FSPELL_VERBOSE);
+ 
+    ::spell( skill->getIndex( ), level, target, victim, flags );
     return Register();
 }
 
