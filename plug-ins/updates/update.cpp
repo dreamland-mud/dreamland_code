@@ -232,7 +232,8 @@ static bool mprog_special( Character *ch )
             return true;
     }
 
-    gprog("onSpec", "C", ch);
+    if (!ch->is_npc())
+        gprog("onSpec", "C", ch);
 
     return false;
 }
