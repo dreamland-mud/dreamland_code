@@ -964,9 +964,6 @@ Json::Value ParamsWebPromptListener::jsonParam2( Descriptor *d, Character *ch )
 {
     Json::Value p2;
 
-    if (ch->getRealLevel( ) < 20) 
-        return Json::Value( );
-
     // Hitroll, damroll.
     p2["h"] = DLString(ch->hitroll);
     p2["d"] = DLString(ch->damroll);

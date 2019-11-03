@@ -297,98 +297,6 @@ msgtable_t msg_positions = {
     { -1 }
 };
 
-msgtable_t msg_stat_cha = {        
-    {  0, "Mongol     " },         
-    { 10, "Poor       " },         
-    { 14, "Average    " },         
-    { 18, "Good       " },         
-    { 20, "Familier   " },         
-    { 22, "Charismatic" },         
-    { -1 }                         
-};                                 
-
-msgtable_t msg_stat_con = {        
-    {  0, "Fragile    " },         
-    { 10, "Poor       " },         
-    { 14, "Average    " },         
-    { 18, "Healthy    " },         
-    { 20, "Hearty     " },         
-    { 22, "Iron       " },         
-    { -1 }                         
-};                                 
-
-msgtable_t msg_stat_str = {        
-    {  0, "Weak       " },         
-    { 10, "Poor       " },         
-    { 14, "Average    " },         
-    { 18, "Strong     " },         
-    { 20, "Herculian  " },         
-    { 22, "Titantic   " },         
-    { -1 }                         
-};                                 
-
-msgtable_t msg_stat_dex = {
-    {  0, "Slow       " },
-    { 10, "Clumsy     " },
-    { 14, "Average    " },
-    { 18, "Dextrous   " },
-    { 20, "Quick      " },
-    { 22, "Fast       " },
-    { -1 }
-};
-                            
-msgtable_t msg_stat_int = {
-    {  0, "Hopeless   " },
-    { 10, "Poor       " },
-    { 14, "Average    " },
-    { 18, "Good       " },
-    { 20, "Clever     " },
-    { 22, "Genious    " },
-    { -1 }
-};
-                            
-msgtable_t msg_stat_wis = {
-    {  0, "Fool       " },
-    { 10, "Dim        " },
-    { 14, "Average    " },
-    { 18, "Good       " },
-    { 20, "Wise       " },
-    { 22, "Excellent  " },
-    { -1 }
-};
-
-
-msgtable_t msg_armor_oscore = {
-    { -101, "божественно защищен"   },
-    { -100, "неуязвимо защищен"     },
-    {  -80, "первоклассно защищен"  },
-    {  -60, "отлично защищен"       },
-    {  -40, "очень хорошо защищен"  },
-    {  -20, "хорошо защищен"        },
-    {    0, "защищен"               },
-    {   20, "кое-как защищен"       },
-    {   40, "слабо защищен"         },
-    {   60, "едва защищен"          },
-    {   80, "не защищен"            },
-    {  101, "совершенно не защищен" },
-    { -1 }
-};
-
-msgtable_t msg_armor = {
-    { -101, "божественно"   },
-    { -100, "неуязвимо"     },
-    {  -80, "первоклассно"  },
-    {  -60, "отлично"       },
-    {  -40, "очень хорошо"  },
-    {  -20, "хорошо"        },
-    {    0, "защищен"       },
-    {   20, "хоть как-то"   },
-    {   40, "слегка"        },
-    {   60, "едва"          },
-    {   80, "очень слабо"   },
-    {  101, "не защищен"    },
-    { -1 }
-};
 
 CMDRUNP( oscore )
 {
@@ -513,20 +421,13 @@ CMDRUNP( oscore )
     buf << endl;
 
     /* print AC values */
-    if (ch->getRealLevel( ) >= 20) {        
-        buf << dlprintf( "Защита от укола %d, от удара %d, от разрезания %d, от экзотики %d.\n\r",
-                GET_AC(ch,AC_PIERCE),
-                GET_AC(ch,AC_BASH),
-                GET_AC(ch,AC_SLASH),
-                GET_AC(ch,AC_EXOTIC));
-        buf << dlprintf( "{lRТочность{lEHitroll{lx: %d  {lRУрон{lEDamroll{lx: %d  {lRЗащита от заклинаний{lESaves vs Spell{lx: %d\n\r",
-                    ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
-    }
-    else
-        for (i = 0; i < ac_type.size; i++)
-            buf << dlprintf( "Ты %s от %s.\n\r",
-                        msgtable_lookup( msg_armor_oscore, GET_AC(ch, i) ),
-                        ac_type.message( i, '2' ).c_str( ) );
+    buf << dlprintf( "Защита от укола %d, от удара %d, от разрезания %d, от экзотики %d.\n\r",
+            GET_AC(ch,AC_PIERCE),
+            GET_AC(ch,AC_BASH),
+            GET_AC(ch,AC_SLASH),
+            GET_AC(ch,AC_EXOTIC));
+    buf << dlprintf( "{lRТочность{lEHitroll{lx: %d  {lRУрон{lEDamroll{lx: %d  {lRЗащита от заклинаний{lESaves vs Spell{lx: %d\n\r",
+                ch->hitroll.getValue( ), ch->damroll.getValue( ), ch->saving_throw.getValue( ) );
 
     buf << dlprintf( "У тебя %s характер.  ", align_name( ch ).ruscase( '1' ).c_str( ) );
     
@@ -1621,34 +1522,23 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     }
 
-    if (ch->getRealLevel() >= 20) {
-        if (arg_oneof(arg, "hitroll", "точность")) {
-            ch->pecho("Точность %d.", ch->hitroll);
-            return;
-        } 
-        if (arg_oneof(arg, "damroll", "урон")) {
-            ch->pecho("Урон %d.", ch->damroll);
-            return;
-        } 
-        if (arg_oneof(arg, "armor class", "класс брони", "защита")) {
-            ch->pecho("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d.", 
-                      GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
-                      GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));
-            return;
-        }
-        if (arg_oneof(arg, "saves", "спассбросок", "защита от заклинаний")) {
-            ch->pecho("Защита от заклинаний %d.", ch->saving_throw);
-            return;
-        }
-    } else {
-        if (arg_oneof(arg, "armor class", "класс брони", "защита")) {
-            ch->pecho("Защита от уколов %s, ударов %s, разрезов %s, экзотики %s.", 
-                      msgtable_lookup(msg_armor, GET_AC(ch, AC_PIERCE)), 
-                      msgtable_lookup(msg_armor, GET_AC(ch, AC_BASH)), 
-                      msgtable_lookup(msg_armor, GET_AC(ch, AC_SLASH)), 
-                      msgtable_lookup(msg_armor, GET_AC(ch, AC_EXOTIC)));
-            return;
-        }
+    if (arg_oneof(arg, "hitroll", "точность")) {
+        ch->pecho("Точность %d.", ch->hitroll);
+        return;
+    } 
+    if (arg_oneof(arg, "damroll", "урон")) {
+        ch->pecho("Урон %d.", ch->damroll);
+        return;
+    } 
+    if (arg_oneof(arg, "armor class", "класс брони", "защита")) {
+        ch->pecho("Защита от уколов %d, ударов %d, разрезов %d, экзотики %d.", 
+                    GET_AC(ch, AC_PIERCE), GET_AC(ch, AC_BASH),
+                    GET_AC(ch, AC_SLASH), GET_AC(ch, AC_EXOTIC));
+        return;
+    }
+    if (arg_oneof(arg, "saves", "спассбросок", "защита от заклинаний")) {
+        ch->pecho("Защита от заклинаний %d.", ch->saving_throw);
+        return;
     }
    
     ch->println("Такого параметра не существует или он скрыт от тебя, попробуй что-то еще."); 
@@ -1864,8 +1754,6 @@ CMDRUNP( score )
     }
 
 
-if ( ch->getModifyLevel( ) >= 20 )
-{
     ch->printf( 
 "     %s| %sВещи          :{x     %3d/%-4d        %sЗащита от уколов:{x   %-5d   %s|\n\r"
 "     | %sВес           :{x  %6d/%-8d    %sЗащита от ударов:{x   %-5d   %s|\n\r"
@@ -1902,44 +1790,6 @@ if ( ch->getModifyLevel( ) >= 20 )
         CLR_CAPT,
         ch->saving_throw.getValue( ),
         CLR_FRAME);
-}
-else
-{
-    ch->printf( 
-"     %s| %sВещи   :{x %3d/%-4d            %sЗащита от уколов:{x   %-12s   %s|\n\r"
-"     | %sВес    :{x %6d/%-8d     %sЗащита от ударов:{x   %-12s   %s|\n\r"
-"     | %sЗолото :{Y %-10d          %sЗащита от разрезов:{x %-12s   %s|\n\r"
-"     | %sСеребро:{W %-10d          %sЗащита от экзотики:{x %-12s   %s|\n\r"
-"     | %sЕдиниц опыта:{x   %-6d                                          %s|\n\r",
-        CLR_FRAME,
-        CLR_CAPT,
-        ch->carry_number, ch->canCarryNumber( ),
-        CLR_CAPT,
-        msgtable_lookup( msg_armor, GET_AC(ch, AC_PIERCE) ),
-        CLR_FRAME,
-
-        CLR_CAPT,
-        ch->getCarryWeight( )/10, ch->canCarryWeight( )/10,
-        CLR_CAPT,
-        msgtable_lookup( msg_armor, GET_AC(ch, AC_BASH) ),
-        CLR_FRAME,
-
-        CLR_CAPT,
-        ch->gold.getValue( ),
-        CLR_CAPT,
-        msgtable_lookup( msg_armor, GET_AC(ch, AC_SLASH) ),
-        CLR_FRAME,
-
-        CLR_CAPT,
-        ch->silver.getValue( ),
-        CLR_CAPT,
-        msgtable_lookup( msg_armor, GET_AC(ch, AC_EXOTIC) ),
-        CLR_FRAME,
-
-        CLR_CAPT,
-        ch->exp.getValue( ),
-        CLR_FRAME);
-}
 
     ch->printf( 
 "     %s| %sОпыта до уровня:{x %-6d                                         %s|\n\r"
@@ -1953,8 +1803,6 @@ else
         ch->hit.getValue( ), ch->max_hit.getValue( ),
         CLR_FRAME);
 
-if ( ch->getModifyLevel( ) >= 20 )
-{
     ch->printf( 
 "     %s| %s{lRТочность{lEHitroll {lx      :{x   %-3d            %sЭнергии:{x %5d / %5d         %s|\n\r"
 "     | %s{lRУрон   {lEDamroll{lx       :{x   %-3d           %sДвижения:{x %5d / %5d         %s|\n\r",
@@ -1970,20 +1818,6 @@ if ( ch->getModifyLevel( ) >= 20 )
         CLR_CAPT,
         ch->move.getValue( ), ch->max_move.getValue( ),
         CLR_FRAME);
-}
-else {
-    ch->printf( 
-"     %s|                                  %sЭнергии:{x %5d / %5d         %s|\n\r"
-"     |                                 %sДвижения:{x %5d / %5d         %s|\n\r",
-        CLR_FRAME,
-        CLR_CAPT,
-        ch->mana.getValue( ), ch->max_mana.getValue( ),
-        CLR_FRAME,
-
-        CLR_CAPT,
-        ch->move.getValue( ), ch->max_move.getValue( ),
-        CLR_FRAME);
-}
 
 
     ch->printf( 
@@ -2440,9 +2274,6 @@ CMDRUNP( affects )
     if (arg_has_oneof( argument, "noempty" ))
         REMOVE_BIT(flags, FSHOW_EMPTY);
 
-    if (ch->getLevel( ) < 20)
-        REMOVE_BIT(flags, FSHOW_TIME|FSHOW_LINES);
-    
     for (o = output.begin( ); o != output.end( ); o++) 
         o->show_affect( buf, flags );
 
