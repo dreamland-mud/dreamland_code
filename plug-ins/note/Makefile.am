@@ -3,7 +3,6 @@ lib_LTLIBRARIES = libnotes.la libgeneric_notes.la
 include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
--I/usr/include/jsoncpp \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/descriptor \
@@ -30,8 +29,7 @@ libnotes_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../ban/libban.la \
 ../ed/lib/libed.la \
-../ed/libcoreed.la \
--ljsoncpp
+../ed/libcoreed.la 
 
 libnotes_la_SOURCES = \
 impl.cpp \

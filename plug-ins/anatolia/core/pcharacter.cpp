@@ -11,6 +11,7 @@
 
 #include "wiznet.h"
 #include "infonet.h"
+#include "messengers.h"
 #include "act.h"
 #include "stats_apply.h"
 #include "mercdb.h"
@@ -63,6 +64,8 @@ void PCharacter::gainExp( int gain )
 
         ::wiznet( WIZ_LEVELS, 0, 0, 
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня!", this, getRealLevel( ) );
+
+        send_discord_level(this);
 
         advanceLevel( );
         save( );

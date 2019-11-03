@@ -11,6 +11,7 @@
 #include "character.h"
 #include "room.h"
 #include "dreamland.h"
+#include "messengers.h"
 #include "merc.h"
 #include "descriptor.h"
 
@@ -87,8 +88,9 @@ void GQChannel::gecho( const DLString& name, const DLString& msg, PCharacter *pc
         if (d->connected == CON_PLAYING)
             if (d->character && (!pch || pch != d->character->getPC( ))) 
                 d->character->send_to( buf );
-}
 
+    send_discord_gquest(name, msg);
+}
 
 void GQChannel::gecho( const DLString& msg ) 
 {

@@ -4,8 +4,7 @@
  */
 #include "logstream.h"
 #include "globalchannel.h"
-#include "json/json.h"
-#include "iconvmap.h"
+#include "messengers.h"
 
 #include "skillreference.h"
 #include "npcharacter.h"
@@ -23,8 +22,6 @@
 
 GSN(deafen);
 LANG(common);
-
-static IconvMap koi2utf("koi8-r", "utf-8");
 
 bool has_nochannel(Character *ch)
 {
@@ -275,21 +272,9 @@ void GlobalChannel::triggers( Character *ch, const DLString &msg ) const
     if (dreamland->hasOption( DL_LOG_COMM ) && getLog( ) != LOG_NEVER)
         LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getName( ) << ": " << msg << endl;
 
-    // Quick POC until real solution is ready.
     if (!msg.empty() && hook) {
-        try {
-            DLString message = outputVict( ch, NULL, msgOther, msg );
-            Json::Value body;
-            body["chat_id"] = "@dreamland_rocks";
-            body["text"] = koi2utf(message.colourStrip());
-            DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
-            Json::FastWriter writer;
-            DLFileStream(dir.tempEntry()).fromString( 
-                writer.write(body)
-            );
-        } catch (const Exception &e) {
-            LogStream::sendError() << e.what() << endl;
-        }
+        DLString message = outputVict( ch, NULL, msgOther, msg );
+        send_telegram(message);
     }
 }
 

@@ -2,7 +2,6 @@
  *
  * ruffina, 2018
  */
-#include "json/json.h"
 #include "notehooks.h"
 #include "notemanager.h"
 #include "noteflags.h"
@@ -14,14 +13,12 @@
 #include "pcharacter.h"
 #include "dreamland.h"
 #include "infonet.h"
-#include "iconvmap.h"
+#include "messengers.h"
 #include "descriptor.h"
 #include "arg_utils.h"
 #include "dl_strings.h"
 #include "act.h"
 #include "def.h"
-
-static IconvMap koi2utf("koi8-r", "utf-8");
 
 void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 {
@@ -118,13 +115,6 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
     }
 }
 
-
-static string json_to_string( const Json::Value &value )
-{
-    Json::FastWriter writer;
-    return writer.write( value );
-}    
-
 void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
 {
     ostringstream content;
@@ -133,39 +123,17 @@ void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
         << "*Автор*: " << note.getFrom() << endl
         << "*Тема*: " << note.getSubject() << endl
         << endl
-        << note.getText().colourStrip();
+        << note.getText();
         
-    Json::Value body;
-    body["chat_id"] = "@dreamland_rocks";
-    body["parse_mode"] = "Markdown";
-    body["text"] = koi2utf(content.str());
-    body["disable_notification"] = "true";
-
-    DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
-    DLFileStream( dir.tempEntry( ) ).fromString( 
-        json_to_string(body)
-    );
+    send_telegram(content.str());
 }
-
-static const DLString DISCORD_USERNAME = "Новости мира DreamLand";
-static const DLString DISCORD_FOLDER = "discord";
-static const DLString SEPARATOR = "\n--------------------------------------------------------------------------------\n";
 
 void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
 {    
-    ostringstream content;
-    content << "**Тема: " << note.getSubject( ).colourStrip( ) << "**" << endl 
-            << note.getText( ).colourStrip( ) << SEPARATOR;
-
-    // Compose JSON message for Discord webhook.
-    Json::Value body;
-    body["content"] = content.str( );
-    body["username"] = DISCORD_USERNAME;
-    DLString message = json_to_string( body );
-
-    // Create temporary file in a subfolder, for Discord sync job to pick up.
-    DLDirectory dir( dreamland->getMiscDir( ), DISCORD_FOLDER );
-    DLFileStream( dir.tempEntry( ) ).fromString( message );
+    send_discord_news(
+        note.getFrom(), 
+        note.getSubject(),
+        note.getText());
 }
 
 // Timestamp/ID of the first story written after 2018 DL rebirth.

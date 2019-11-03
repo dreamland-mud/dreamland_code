@@ -27,6 +27,7 @@
 #include "mercdb.h"
 #include "handler.h"
 #include "act.h"
+#include "messengers.h"
 #include "merc.h"
 #include "def.h"
 
@@ -199,7 +200,23 @@ void sunlight_update( )
         else
             tbuf << "." << endl;
     }
-    
+
+    // Output new day's bonus.
+    if (this_day != time_info.day) {
+        ostringstream bonus_buf;
+        for (int bn = 0; bn < bonusManager->size(); bn++) {
+            Bonus *bonus = bonusManager->find(bn);
+            if (bonus->isActive(0, time_info))
+                bonus->reportTime(0, bonus_buf);
+        }
+
+        string bonus_str = bonus_buf.str();
+        if (!bonus_str.empty()) {
+            tbuf << bonus_str;
+            send_discord_bonus(bonus_str);
+        }
+    }
+
     string buf_str = buf.str();
     string tbuf_str = tbuf.str();
 

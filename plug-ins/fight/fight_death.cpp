@@ -33,6 +33,7 @@
 #include "save.h"
 #include "interp.h"
 #include "wiznet.h"
+#include "messengers.h"
 #include "mercdb.h"
 #include "desire.h"
 #include "act.h"
@@ -574,6 +575,9 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
     else
         wiznet( wizflag, 0, victim->get_trust( ),
                 "%1$C1 па%1$Gло|л|ла от неизвестной (божественной) руки.", victim );
+
+    if (!victim->is_npc())
+        send_discord_death(victim->getPC(), ch);
 
     if (ch && mprog_kill( ch, victim ))
         ch = NULL;

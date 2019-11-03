@@ -120,6 +120,9 @@ bool DefaultBonus::activeForAll(const struct time_info_data &ti) const
 
 bool DefaultBonus::activeForPlayer(PCharacter *ch, const struct time_info_data &ti) const
 {
+    if (!ch)
+        return false;
+        
     PCBonusData &data = ch->getBonuses().get(getIndex());
     long today = day_of_epoch(ti);
     return data.start <= today && today <= data.end;    
