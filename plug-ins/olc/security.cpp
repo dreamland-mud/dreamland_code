@@ -92,7 +92,7 @@ CMD(security, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         "Set char security.")
 {
     char buf[MAX_STRING_LENGTH];
-    Character *victim;
+    PCharacter *victim;
     
     if(ch->getPC()->getSecurity() < 100) {
         ch->send_to("Это не для тебя.\n\r");
@@ -104,9 +104,9 @@ CMD(security, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         ch->send_to("Usage: security <player> <#security level>\n\r");
         return;
     }
-    victim = get_char_world(ch, buf);
+    victim = get_player_world(ch->getPC(), buf);
 
-    if(!victim || victim->is_npc()) {
+    if(!victim) {
         ch->send_to("Char not found.\n\r");
         return;
     }
@@ -117,7 +117,7 @@ CMD(security, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
     
-    victim->getPC()->setSecurity(atoi(buf));
+    victim->setSecurity(atoi(buf));
     
     ch->send_to("Security set.\n\r");
 }

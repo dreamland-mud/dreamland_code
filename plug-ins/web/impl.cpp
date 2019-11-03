@@ -134,7 +134,7 @@ Json::Value WhoWebPromptListener::jsonPlayer( Character *ch, PCharacter *wch )
     Json::Value player;
     
     // Player name and sex.
-    DLString name = ch->sees( wch, '1' );
+    DLString name = ch->seeName( wch );    
     name.cutSize( 10 );
     player["n"] = name;
     player["s"] = wch->getSex( ) == SEX_MALE ? "m" : "f";
@@ -168,14 +168,11 @@ Json::Value WhoWebPromptListener::jsonWho( Character *ch )
 
         victim = d->character->getPC( );
 
-        if (!ch->can_see( victim ))
+        if (!can_see_god(ch, victim)) 
             continue;
 
         XMLAttributes *attrs = &victim->getAttributes( );
         if (attrs->isAvailable("nowho"))
-            continue;
-        
-        if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
             continue;
         
         players.push_back( victim );
@@ -186,10 +183,9 @@ Json::Value WhoWebPromptListener::jsonWho( Character *ch )
     for (p = players.begin( ); p != players.end( ); p++) {
         who["p"][pc++] = jsonPlayer( ch, *p );
     }
-    // Visible player count.
-    who["v"] = DLString(players.size()); 
+
     // Total player count.
-    who["t"] = DLString(players.size()); // TODO show true total ?
+    who["t"] = DLString(players.size());
     return who;
 }
 

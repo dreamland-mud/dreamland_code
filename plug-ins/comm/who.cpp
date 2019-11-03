@@ -126,19 +126,11 @@ COMMAND(Who, "who")
             continue;
 
         // Add here explicit checks for wizinvis and incognito,
-        // to avoid showing hidden immortals in total count.        
-        if (ch->get_trust() < victim->invis_level)
-            continue;
-        if (ch->get_trust() < victim->incog_level && ch->in_room != victim->in_room)
+        // to avoid showing hidden immortals in total count.      
+        if (!can_see_god(ch, victim)) 
             continue;
 
         count++;
-
-        if (!ch->can_see( victim ))
-            continue;
-
-        if (IS_VAMPIRE( victim ) && !ch->is_immortal( ) && ch != victim)
-            continue;
         
         if (victim->getRealLevel( ) < minLevel || victim->getRealLevel( ) > maxLevel)
             continue;
@@ -172,7 +164,10 @@ COMMAND(Who, "who")
         ch->send_to( formatChar( ch, *i ).c_str( ) );
 
     buf << endl 
-        << "Всего игроков: " << count << ", видимых: " << victims.size( ) << ". "
+        << "Всего игроков: " << count;
+    if (count != victims.size()) 
+        buf << ", найдено: " << victims.size( );
+    buf << ". "
         << "Максимум на сегодня был: " << Descriptor::getMaxOnline( ) << "." << endl;
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && ch->getPC( )->getRemorts( ).size( ) == 0) 
         buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl

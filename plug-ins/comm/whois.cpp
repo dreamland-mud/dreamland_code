@@ -18,6 +18,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "descriptor.h"
+#include "loadsave.h"
 #include "skillreference.h"
 #include "fight.h"
 #include "def.h"
@@ -42,27 +43,9 @@ COMMAND(Whois, "whois")
         return;
     }
         
-    for ( d = descriptor_list; d != 0; d = d->next ) {
-        if (d->connected != CON_PLAYING || !d->character)
-            continue;
+    pch = get_player_world(ch->getPC(), args.c_str(), false);
 
-        pch = d->character->getPC( );
-
-        if (!ch->can_see( pch ))
-            continue;
-
-        if (IS_VAMPIRE( pch ) && !ch->is_immortal( ) && ch != pch)
-            continue;
-
-        if (!is_name( args.c_str( ), pch->getNameP( '7' ).c_str( ) ))
-            continue;
-        
-        break;
-    }
-
-    if (!d) {
-        pch = NULL;
-
+    if (!pch) {
         offline_pch = dallocate(PCharacter);
         args.capitalize();
         offline_pch->setName(args);
@@ -149,8 +132,12 @@ COMMAND(Whois, "whois")
     std::vector<const char *> flags;
     
     if (IS_SET( pch->comm, COMM_AFK ))  flags.push_back( " {CA{w(afk)" );
-    if (pch->incog_level >= LEVEL_HERO) flags.push_back( " {DI{w(инкогнито)" );
-    if (pch->invis_level >= LEVEL_HERO) flags.push_back( " {DW{w(wizinv)" );
+    if (can_see_god(ch, pch)) {
+        if (pch->incog_level >= LEVEL_HERO) 
+            flags.push_back( " {DI{w(инкогнито)" );
+        if (pch->invis_level >= LEVEL_HERO) 
+            flags.push_back( " {DW{w(wizinv)" );
+    }
     if (IS_KILLER( pch ))               flags.push_back( " {RK{w(убийца)" );
     if (IS_THIEF( pch ))                flags.push_back( " {RT{w(вор)" );
     if (IS_SLAIN( pch ))                flags.push_back( " {DS{w(убит)" );

@@ -79,7 +79,8 @@ Character *        get_char_world        ( Character *ch, const char *argument )
 Character *        get_char_world        ( Character *ch, const DLString & );
 Character *        get_char_area        ( Character *ch, char *argument );
 Character *        get_char_world_doppel( Character *ch, const char *cArgument );
-PCharacter *        get_player_world( PCharacter *ch, const char *arg );
+PCharacter *        get_player_world( PCharacter *ch, const char *arg, bool fSeenOnly = true );
+bool char_has_name(Character *target, const char *arg);
 Object *        get_obj_list        ( Character *ch, const DLString &cArg, Object *list, DLString pocket = "" );
 Object *        get_obj_carry        ( Character *ch, const DLString & );
 Object *        get_obj_carry        ( Character *ch, char *argument );
@@ -107,7 +108,7 @@ Object *        get_obj_list_type( Character *ch, const DLString &cArg, int type
 int                count_obj_in_obj( Object *container );
 int                count_obj_in_obj( Object *container, int itype );
 Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument );
-
+bool can_see_god(Character *ch, Character *god);
 
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );

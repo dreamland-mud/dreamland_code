@@ -750,9 +750,7 @@ Character *get_char_world_doppel( Character *ch, const char *cArgument )
     return 0;
 }
 
-
-
-PCharacter * get_player_world( PCharacter *ch, const char *arg )
+PCharacter * get_player_world( PCharacter *ch, const char *arg, bool fSeenOnly )
 {
     Descriptor *d;
 
@@ -770,7 +768,10 @@ PCharacter * get_player_world( PCharacter *ch, const char *arg )
         if(victim->switchedTo)
             continue;
 
-        if (!ch->can_see( victim ))
+        if (fSeenOnly && !ch->can_see( victim ))
+            continue;
+
+        if (!can_see_god(ch, victim))
             continue;
 
         if (!char_has_name( victim, arg ))
@@ -867,6 +868,18 @@ Object * get_obj_wear_carry( Character *ch, const DLString &cArgument )
         }
 
     return 0;
+}
+
+// Return true if immortal's config allows them to be seen.
+bool can_see_god(Character *ch, Character *god)
+{
+    if (ch->get_trust() < god->invis_level)
+        return false;
+            
+    if (ch->get_trust() < god->incog_level && ch->in_room != god->in_room)
+        return false;
+
+    return true;
 }
 
 // return true if character is allowed to see object name hint in brackets

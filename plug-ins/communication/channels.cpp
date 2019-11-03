@@ -37,16 +37,11 @@ TellChannel::TellChannel( )
 
 Character * TellChannel::findListener( Character *ch, const DLString &name ) const
 {
-    Character *victim;
-    
-    victim = get_char_world( ch, name.c_str( ) );
+    Character *victim = get_char_room(ch, name.c_str());
+    if (!victim) 
+        victim = get_player_world(ch->getPC(), name.c_str(), false);
 
-    /*
-    * Can tell to PC's anywhere, but NPC's only in same room.
-    * -- Furey
-    */
-    if (!victim || (!victim->getPC( ) && victim->in_room != ch->in_room)) 
-    {
+    if (!victim) {
         ch->println( "Ты не находишь этого персонажа.");
         return NULL;
     }
@@ -111,7 +106,7 @@ Character * PageChannel::findListener( Character *ch, const DLString &name ) con
 {
     Character *victim;
     
-    victim = get_char_world( ch, name.c_str( ) );
+    victim = get_player_world( ch->getPC(), name.c_str( ), false );
 
     if (!victim || (victim->is_immortal( ) && !ch->is_immortal( ))) {
         ch->println( "Информационное агенство не может найти данного абонента." );

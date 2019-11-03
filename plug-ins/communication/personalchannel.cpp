@@ -117,7 +117,7 @@ bool PersonalChannel::checkPosition( Character *ch, Character *victim ) const
     if (positionOther <= victim->position)
         return false;
     
-    act_p( "$E не слышит тебя.", ch, 0, victim, TO_CHAR, position );
+    act_p( "$E не слышит тебя, попробуй позже.", ch, 0, victim, TO_CHAR, position );
     return true;
 }
 
