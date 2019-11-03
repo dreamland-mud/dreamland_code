@@ -240,18 +240,23 @@ bool spell_nocatch( int sn, int level, Character *ch, SpellTarget::Pointer targe
    
     bool fForbidCasting = false;
 
-    if (target->type == SpellTarget::CHAR && target->victim)
-        fForbidCasting = mprog_spell( target->victim, ch, skill, true );
-    
-    mprog_cast( ch, target, skill, true );
+    if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
+        if (target->type == SpellTarget::CHAR && target->victim)
+            fForbidCasting = mprog_spell( target->victim, ch, skill, true );
+        
+        mprog_cast( ch, target, skill, true );
+    }
 
     if (!fForbidCasting)
         spell->run( ch, target, level );
 
-    if (target->type == SpellTarget::CHAR && target->victim)
-        mprog_spell( target->victim, ch, skill, false );
+    if (!IS_SET(flags, FSPELL_NOTRIGGER)) {
+        if (target->type == SpellTarget::CHAR && target->victim)
+            mprog_spell( target->victim, ch, skill, false );
 
-    mprog_cast( ch, target, skill, false );
+        mprog_cast( ch, target, skill, false );
+    }
+
     return true;
 }
 

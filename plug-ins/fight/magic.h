@@ -69,6 +69,7 @@ void area_message( Character *ch, const DLString &msg, bool everywhere );
 #define    FSPELL_WAIT      (C)
 #define    FSPELL_OBSTACLES (D)
 #define    FSPELL_MANA      (E)
+#define    FSPELL_NOTRIGGER (F)
 
 bool spell( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags = 0 );
 bool spell( int sn, int level, Character *ch, Character *victim, int flags = 0 );
