@@ -110,7 +110,7 @@ bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
     if (ch->getPC( )->getHometown( ) == home_frigate)
         return false;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY))
+    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY|ROOM_MANSION))
         return false;
 
     return true;

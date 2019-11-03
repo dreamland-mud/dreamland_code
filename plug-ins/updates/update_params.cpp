@@ -60,6 +60,9 @@ void CharacterParamsUpdateTask::run( Character *ch )
     if (ch->isDead( ))
         return;
 
+    if (IS_SET(ch->in_room->room_flags, ROOM_MANSION))
+        return;
+
     try {
         gainHitPoint( ch );
         gainMana( ch );

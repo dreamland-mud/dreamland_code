@@ -5,6 +5,7 @@
 #include "skillmanager.h"
 #include "skillgroup.h"
 #include "pcharacter.h"
+#include "room.h"
 #include "dreamland.h"
 #include "dlscheduler.h"
 #include "genericskill.h"
@@ -201,7 +202,7 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
 
 void DreamSkillManager::run( PCharacter *ch ) 
 {
-    // Exclude awake players, universals and newbies.
+    // Exclude awake players, universals, newbies and player in mansions.
 
     if (ch->position != POS_SLEEPING)
         return;
@@ -212,6 +213,9 @@ void DreamSkillManager::run( PCharacter *ch )
     if (ch->getRealLevel() < 20 && ch->getRemorts().size() == 0)
         return;
 
+    if (IS_SET(ch->in_room->room_flags, ROOM_MANSION))
+        return;
+    
     // Exclude those with an active dreamt skill (or a skill gained from equipment, obj prog etc).
     int dreamtSkillNumber = findActiveDreamSkill(ch);
     if (dreamtSkillNumber >= 0) 

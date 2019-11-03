@@ -268,6 +268,7 @@ static bool mprog_area( Character *ch )
     return false;
 }
 
+
 /*
  * Update all chars, including mobs.
  */
@@ -288,6 +289,9 @@ void char_update( )
 
         if (ch->in_room == 0)
             continue;
+
+        // No timer or affect update will happen in mansion rooms.
+        bool frozen = IS_SET(ch->in_room->room_flags, ROOM_MANSION);
 
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
             act_p("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -310,14 +314,13 @@ void char_update( )
         }
 
         // Remove caltraps effect after fight off
-        if ( ch->isAffected(gsn_caltraps)
-                && !ch->fighting )
+        if ( ch->isAffected(gsn_caltraps) && !ch->fighting)
         {
             room_to_save( ch );
             affect_strip(ch,gsn_caltraps);
         }
         
-        if (ch->is_vampire( )) {
+        if (ch->is_vampire( ) && !frozen) {
             if (weather_info.sunlight != SUN_DARK
                 && !IS_SET(ch->in_room->room_flags, ROOM_DARK)
                 && IS_OUTSIDE(ch))
@@ -327,7 +330,7 @@ void char_update( )
         }
         
         // Reset sneak for vampire
-        if ( !(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
+        if (!(ch->fighting) && !IS_AFFECTED(ch,AFF_SNEAK)
                 && IS_VAMPIRE(ch) && !MOUNTED(ch))
         {
             ch->send_to("Ты пытаешься двигаться незаметно.\n\r");
@@ -365,10 +368,10 @@ void char_update( )
                 affect_strip(ch, gsn_spear);
         }
 
-        if (!ch->is_npc( ))
+        if (!ch->is_npc( ) && !frozen)
             lantern_update( ch );
 
-        if (!ch->is_npc( ) && !dreamland->hasOption( DL_BUILDPLOT ))
+        if (!ch->is_npc( ) && !dreamland->hasOption( DL_BUILDPLOT ) && !frozen)
             try {
                 for (int i = 0; i < desireManager->size( ); i++)
                     desireManager->find( i )->update( ch->getPC( ) );
@@ -376,7 +379,7 @@ void char_update( )
                 continue;
             }
         
-        if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo) {
+        if (!ch->is_npc( ) && !ch->is_immortal( ) && !ch->getPC( )->switchedTo && !frozen) {
             if (++ch->timer == 12)
                 idle_update( ch->getPC( ) );
             
@@ -395,7 +398,8 @@ void char_update( )
             }
         }
 
-        char_update_affects( ch );
+        if (!frozen)
+            char_update_affects( ch );
 
         if (!ch->is_npc( )
                 && ch->getClan( ) == clan_battlerager
@@ -691,6 +695,10 @@ void obj_update( void )
             extract_obj( obj );
             continue;
         }
+
+        // No affect update or item decay in mansion rooms.
+        if (IS_SET(room->room_flags, ROOM_MANSION))
+            continue;
 
         /* go through affects and decrement */
         for ( paf = obj->affected; paf != 0; paf = paf_next )
@@ -1267,10 +1275,14 @@ void player_update( )
 
     for( d = descriptor_list; d; d = d->next )
     {
-        if( d->connected != CON_PLAYING || !d->character )
+        if( d->connected != CON_PLAYING || !d->character || !d->character->in_room)
             continue;
 
         ch = d->character->getPC( );
+
+        // Nothing changes inside mansion rooms.
+        if (IS_SET(ch->in_room->room_flags, ROOM_MANSION))
+            continue;
 
         if (HAS_SHADOW(ch)) 
             if (--ch->shadow < 0)

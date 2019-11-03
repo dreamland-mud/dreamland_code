@@ -10,6 +10,7 @@
 
 #include "dlscheduler.h"
 #include "pcharacter.h"
+#include "room.h"
 
 #include "dreamland.h"
 #include "wiznet.h"
@@ -111,6 +112,9 @@ void LanguageManager::run( PCharacter *ch )
         return;
 
     if (IS_AFFECTED( ch, AFF_SLEEP))
+        return;
+
+    if (IS_SET(ch->in_room->room_flags, ROOM_MANSION))
         return;
 
     if (attr->sleepTime == 0) {
