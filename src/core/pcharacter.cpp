@@ -716,16 +716,16 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
     }
     
     if (IS_SET(flags, FMT_PRETITLE)) {
-        if (wch && cfg->runames)
-            return cachedNoun.pretitleRussian;
-        else
+        if (wch && !cfg->runames)
             return cachedNoun.pretitle;
+        else
+            return cachedNoun.pretitleRussian;
     }
     
-    if (wch && cfg->runames)
-        return cachedNoun.russian;
-    else
+    if (wch && !cfg->runames)
         return cachedNoun.name;
+    else
+        return cachedNoun.russian;
 }
 
 void PCharacter::updateCachedNoun( )
