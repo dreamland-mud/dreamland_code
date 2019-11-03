@@ -83,6 +83,7 @@ protected:
  * home point 
  */
     bool backHome( bool );
+    bool checkLastFoughtHiding();
     virtual bool isHomesick( );
     void remember( Room * );
     XML_VARIABLE XMLIntegerNoEmpty homeVnum;

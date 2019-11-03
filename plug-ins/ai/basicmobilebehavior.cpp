@@ -270,7 +270,44 @@ bool BasicMobileBehavior::area( )
     if (isHomesick( ) && backHome( true ))
         return true;
 
-    return false;
+    return checkLastFoughtHiding();
+}
+
+bool BasicMobileBehavior::checkLastFoughtHiding()
+{
+    PCharacter *pch;
+
+    if (!hasLastFought())
+        return false;
+
+    DLString savedLastFought = lastFought;
+
+    // Check if something else, other than last fought, is preventing them from going home.
+    lastFought.clear();
+    if (!isHomesick()) {
+        lastFought = savedLastFought;
+        return false;
+    }
+
+    lastFought = savedLastFought;
+    if (!(pch = getLastFoughtWorld()))
+        return false;
+    
+    if (!pch->in_room || pch->in_room->area != ch->in_room->area)
+        return false;
+
+    if (!IS_SET(pch->in_room->room_flags, ROOM_LAW) || !IS_SET(pch->in_room->room_flags, ROOM_SAFE))
+        return false;
+
+    // Complain and go home if victim is hiding in a safe law room.
+
+    DLString moan = fmt(NULL, "%1$^C1, подл%1$Gое|ый|ая трус%1$Gло||иха, я еще до тебя доберусь!", pch);
+    interpret_raw(ch, "yell", moan.c_str());
+
+    backHome(true);
+    clearLastFought();
+
+    return true;
 }
 
 bool BasicMobileBehavior::spell( Character *caster, int sn, bool before ) 
