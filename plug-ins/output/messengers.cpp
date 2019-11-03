@@ -48,6 +48,18 @@ static void send_discord(Json::Value &body)
     }
 }
 
+static const DLString ORB_USERNAME = "Хрустальный шар";
+
+void send_discord_orb(const DLString &msg)
+{
+    Json::Value body;
+    body["username"] = koi2utf(ORB_USERNAME);
+    body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
+    body["embeds"][0]["color"] = "14132165";
+
+    send_discord(body);
+}
+
 void send_discord_gquest(const DLString &gqName, const DLString &msg)
 {
     static const DLString USERNAME = "Глобальные квесты";
@@ -60,8 +72,6 @@ void send_discord_gquest(const DLString &gqName, const DLString &msg)
 
     send_discord(body);
 }
-
-static const DLString ORB_USERNAME = "Хрустальный шар";
 
 void send_discord_level(PCharacter *ch)
 {   
@@ -108,6 +118,7 @@ void send_discord_death(PCharacter *ch, Character *killer)
     send_discord(body);
 }
 
+
 void send_discord_news(const DLString &author, const DLString &title, const DLString &description)
 {
     static const DLString USERNAME = "Новости и изменения";
@@ -122,3 +133,4 @@ void send_discord_news(const DLString &author, const DLString &title, const DLSt
 
     send_discord(body);
 }
+

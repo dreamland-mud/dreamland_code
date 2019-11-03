@@ -14,6 +14,7 @@
 #include "descriptor.h"
 #include "wiznet.h"
 #include "infonet.h"
+#include "messengers.h"
 #include "commonattributes.h"
 #include "webmanip.h"
 
@@ -557,6 +558,13 @@ NMI_INVOKE(Root, gecho, "(msg): выдать сообщение msg всем и�
         if (d->connected == CON_PLAYING && d->character)
             d->character->send_to( txt.c_str( ) );
     
+    return Register( );
+}
+
+NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord от имени бота Хрустальный Шар")
+{
+    DLString msg = args2string(args);
+    send_discord_orb(msg);
     return Register( );
 }
 
