@@ -759,16 +759,16 @@ void ClanHealerBattlerager::speech( Character *wch, const char *speech )
     wch->is_npc( ) ? wch->master->setWaitViolence( 1 ) : wch->setWaitViolence( 1 );
 
     if (IS_AFFECTED(wch,AFF_BLIND))
-        ::spell( gsn_cure_blindness, ch->getModifyLevel( ), ch, wch );
+        ::spell( gsn_cure_blindness, ch->getModifyLevel( ), ch, wch, FSPELL_NOTRIGGER );
 
     if (IS_AFFECTED(wch,AFF_PLAGUE))
-        ::spell( gsn_cure_disease, ch->getModifyLevel( ), ch, wch );
+        ::spell( gsn_cure_disease, ch->getModifyLevel( ), ch, wch, FSPELL_NOTRIGGER );
 
     if (IS_AFFECTED(wch,AFF_POISON))
-        ::spell( gsn_cure_poison, ch->getModifyLevel( ), ch, wch );
+        ::spell( gsn_cure_poison, ch->getModifyLevel( ), ch, wch, FSPELL_NOTRIGGER );
 
     if (IS_AFFECTED(wch,AFF_CURSE))
-        ::spell( gsn_remove_curse, ch->getModifyLevel( ), ch, wch );
+        ::spell( gsn_remove_curse, ch->getModifyLevel( ), ch, wch, FSPELL_NOTRIGGER );
 }
 
 /*--------------------------------------------------------------------------
