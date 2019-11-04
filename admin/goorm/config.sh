@@ -6,5 +6,5 @@ mkdir -p $OBJS && \
 cd $SRCDIR && \
 make -f Makefile.git && \
 cd $OBJS && \
-$SRCDIR/configure --prefix=$RUNTIME 
+$SRCDIR/configure --prefix=$RUNTIME --disable-dependency-tracking
 
