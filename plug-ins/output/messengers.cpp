@@ -35,6 +35,16 @@ void send_telegram(const DLString &content)
     }
 }
 
+static DLString discord_string(const DLString &s)
+{
+    DLString utf = koi2utf(s.colourStrip());
+    if (utf.length() > 2000) {
+        utf.cutSize(1995);
+        utf << "\n...";
+    }
+    return utf;
+}
+
 static void send_discord(Json::Value &body)
 {
     try {
@@ -164,7 +174,7 @@ void send_discord_news(const DLString &author, const DLString &title, const DLSt
     Json::Value body;
     body["username"] = koi2utf(USERNAME);
     body["embeds"][0]["title"] = koi2utf(title.colourStrip());
-    body["embeds"][0]["description"] = koi2utf(description.colourStrip());
+    body["embeds"][0]["description"] = discord_string(description);
     body["embeds"][0]["url"] = "https://dreamland.rocks/news.html";
     body["embeds"][0]["color"] = "4514034";
     body["embeds"][0]["author"]["name"] = koi2utf(author.colourStrip());

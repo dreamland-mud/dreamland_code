@@ -6,6 +6,8 @@
 #include "pcharacter.h"
 #include "alignment.h"
 #include "infonet.h"
+#include "messengers.h"
+#include "act.h"
 #include "wiznet.h"
 #include "room.h"
 #include "race.h"
@@ -222,10 +224,11 @@ void CraftProfession::gainExp( PCharacter *ch, int xp ) const
 
         infonet("{CРадостный голос из $o2: {W$C1 дости$Gгло|г|гла новой ступени мастерства.{x", 
                  ch, 0);
-
         wiznet(WIZ_LEVELS, 0, 0, 
                   "%1$^C1 дости%1$Gгло|г|гла %2$d уровня в профессии %3$N2!", 
                   ch, level, getRusName().c_str());
+        send_discord_orb(fmt(0, "%1$#^C1 дости%1$Gгло|г|гла нового уровня мастерства в профессии %2$N2.",
+                            ch, getRusName().c_str()));
     }
 
     ch->updateSkills();

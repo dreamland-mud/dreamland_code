@@ -10,6 +10,8 @@
 
 #include "loadsave.h"
 #include "infonet.h"
+#include "messengers.h"
+#include "act.h"
 #include "merc.h"
 #include "def.h"
 
@@ -72,9 +74,12 @@ CMDRUN( selfrate )
         char buf[256];
         
         attr->rate = rate;
-        pch->printf( "Поздравляем! Теперь ты {W%s{x.\r\n", attr->getRateAlias( ).c_str( ));
-        sprintf( buf, "{CТоржественный голос из $o2: {W$C1 теперь %s!{x", attr->getRateAlias( ).c_str( ) );
+        DLString alias = attr->getRateAlias();
+        pch->printf( "Поздравляем! Теперь ты {W%s{x.\r\n", alias.c_str( ));
+        sprintf( buf, "{CТоржественный голос из $o2: {W$C1 теперь %s!{x", alias.c_str( ) );
         infonet( buf, pch, 0 );
+
+        send_discord_orb(fmt(0, "%#^C1 теперь %s!", pch, attr->getRateAlias(pch).c_str()));
     }
 }
 
@@ -95,7 +100,7 @@ DLString XMLAttributeSelfRate::getRateAlias( PCharacter *looker ) const
     ostringstream buf;
 
     if (looker) {
-             buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
+        buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
     } else {
         buf << "{lE" << rate_alias[r] << "{lR" << rate_alias_ru[r] << "{lx";
     }

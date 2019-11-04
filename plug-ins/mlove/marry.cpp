@@ -11,6 +11,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "infonet.h"
+#include "messengers.h"
 #include "room.h"
 #include "class.h"
 
@@ -89,6 +90,8 @@ COMMAND(Marry, "marry")
     buf << "{CВеселый голос из $o2: {Y" 
         << brideName1 << "{W и {Y" << brideName2 << "{W теперь муж и жена!!!{x";
     infonet( buf.str( ).c_str( ), 0, 0 );
+
+    send_discord_orb(brideName1 + " и " + brideName2 + " теперь муж и жена.");
 }
 
 PCharacter * Marry::checkBride( Character *ch, DLString name ) {

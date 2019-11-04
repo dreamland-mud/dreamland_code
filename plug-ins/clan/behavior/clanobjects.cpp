@@ -17,6 +17,8 @@
 #include "mercdb.h"
 #include "interp.h"
 #include "handler.h"
+#include "infonet.h"
+#include "messengers.h"
 #include "act.h"
 #include "act_move.h"
 #include "def.h"
@@ -160,6 +162,11 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     if (clan->getData( ))
         clan->getData( )->unsetItem( item );
 
+    ostringstream buf;
+    buf << "{CЕхидный голос из $o2: {WКлан " << clanArea->getClan()->getShortName() << " утратил свою святыню.{x";
+    infonet(buf.str().c_str(), 0, 0);
+    send_discord_orb(fmt(0, "Клан %s утратил свою святыню.", clanArea->getClan()->getShortName().c_str()));
+    
     extract_obj(obj);
     return true;
 }
