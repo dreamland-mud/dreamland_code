@@ -1372,6 +1372,13 @@ NMI_INVOKE( CharacterWrapper, getClanLevel, "(): клановый уровень
     CHK_NPC
     return Register( target->getPC()->getClanLevel() );
 }
+NMI_INVOKE( CharacterWrapper, setClanLevel, "(уровень): клановый уровень, число от 0 до 8" )
+{
+    checkTarget();
+    CHK_NPC
+    target->getPC()->setClanLevel(args2number(args));
+    return Register();
+}
 NMI_INVOKE( CharacterWrapper, getRace, "(): строка с названием расы" )
 {
     checkTarget();
