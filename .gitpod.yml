@@ -1,0 +1,7 @@
+image:
+  file: "Dockerfile.gitpod"
+ports:
+- port: 9001
+- port: 9000
+- port: 1234
+
