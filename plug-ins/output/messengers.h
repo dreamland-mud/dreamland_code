@@ -12,6 +12,8 @@ void send_discord_orb(const DLString &msg);
 void send_discord_death(PCharacter *ch, Character *killer);
 void send_discord_gquest(const DLString &gqName, const DLString &msg);
 void send_discord_bonus(const DLString &msg);
+void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg);
+void send_discord_ic(Character *ch, const DLString &format, const DLString &msg);
 
 void send_telegram(const DLString &content);
 

@@ -273,8 +273,10 @@ void GlobalChannel::triggers( Character *ch, const DLString &msg ) const
         LogStream::sendNotice( ) << "channel [" << getName( ) << "] " << ch->getName( ) << ": " << msg << endl;
 
     if (!msg.empty() && hook) {
-        DLString message = outputVict( ch, NULL, msgOther, msg );
-        send_telegram(message);
+        if (ooc)
+            send_discord_ooc(ch, msgOther, msg);
+        else
+            send_discord_ic(ch, msgOther, msg);
     }
 }
 

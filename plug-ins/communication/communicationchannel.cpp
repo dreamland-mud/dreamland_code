@@ -21,7 +21,7 @@ GSN(garble);
  *-----------------------------------------------------------------------*/
 CommunicationChannel::CommunicationChannel( ) 
             :   off( 0, &comm_flags ),
-                ignore( false ), garble( false ), isolate( false ), deafen( false ), hook(false),
+                ignore( false ), garble( false ), isolate( false ), deafen( false ), hook(false), ooc(false),
                 positionOther( 0, &position_table )
 {
 }

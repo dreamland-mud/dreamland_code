@@ -6,9 +6,12 @@
 #include "dlfilestream.h"
 #include "dldirectory.h"
 #include "pcharacter.h"
+#include "npcharacter.h"
 #include "dreamland.h"
 #include "act.h"
 #include "merc.h"
+#include "mercdb.h"
+#include "def.h"
 
 static IconvMap koi2utf("koi8-r", "utf-8");
 
@@ -47,6 +50,41 @@ static void send_discord(Json::Value &body)
         LogStream::sendError() << "Send to discord: " << e.what() << endl;
     }
 }
+
+/**
+ * Send out-of-character channel messages with real usernames.
+ */
+void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg)
+{
+    DLString description = fmt(0, format.c_str(), ch, msg.c_str(), 0);
+
+    Json::Value body;
+    body["username"] = koi2utf("Каналы");
+    body["content"] = koi2utf(description.colourStrip());
+
+    send_discord(body);
+}
+
+/** 
+ * Send in-char channel message, with speaker name seen from p.o.v. of someone
+ * w/o any detects. 
+ */
+void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
+{
+    // Create a pseudo-player, with just enough parameters in order not to crash.
+    PCharacter vict;
+    vict.in_room = get_room_index(2);
+    vict.config.setBit(CONFIG_RUNAMES);
+
+    DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
+
+    Json::Value body;
+    body["username"] = koi2utf("Каналы");
+    body["content"] = koi2utf(description.colourStrip());
+
+    send_discord(body);
+}
+
 
 static const DLString ORB_USERNAME = "Хрустальный шар";
 
@@ -105,10 +143,10 @@ void send_discord_bonus(const DLString &msg)
 void send_discord_death(PCharacter *ch, Character *killer)
 {
     DLString msg;
-    if (killer)
-        msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
-    else
+    if (!killer || killer == ch)
         msg = fmt(0, "%1$C1 погиб%1$Gло||ла своей смертью.", ch);
+    else
+        msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
 
     Json::Value body;
     body["username"] = koi2utf(ORB_USERNAME);
