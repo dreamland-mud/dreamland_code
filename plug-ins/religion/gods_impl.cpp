@@ -43,13 +43,13 @@ void AtumRaGod::tattooFight( Object *obj, Character *ch ) const
     case 1:
       act_p("{CТатуировка на твоем плече вспыхивает голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 2:
       act_p("{rТатуировка на твоем плече вспыхивает красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
       do_yell( ch, "Потанцуй со {WСветом!{x");
-      spell( gsn_wrath, ch->getModifyLevel( ), ch, ch->fighting );
+      spell( gsn_wrath, ch->getModifyLevel( ), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -63,15 +63,15 @@ void ZeusGod::tattooFight( Object *obj, Character *ch ) const
     case 2:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 3:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
       if (IS_AFFECTED(ch,AFF_PLAGUE))        
-        spell( gsn_cure_disease, 100, ch, ch );
+        spell( gsn_cure_disease, 100, ch, ch, FSPELL_NOTRIGGER );
       if (IS_AFFECTED(ch,AFF_POISON))        
-        spell( gsn_cure_poison, 100, ch, ch );
+        spell( gsn_cure_poison, 100, ch, ch, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -82,12 +82,12 @@ void SiebeleGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch,ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch,ch, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-        spell( gsn_bluefire, ch->getModifyLevel( ), ch, ch->fighting );
+        spell( gsn_bluefire, ch->getModifyLevel( ), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -98,17 +98,17 @@ void AhuramazdaGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_light, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_light, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 2:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell( gsn_dispel_evil, ch->getModifyLevel( ), ch, ch->fighting );
+      spell( gsn_dispel_evil, ch->getModifyLevel( ), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -120,7 +120,7 @@ void ShamashGod::tattooFight( Object *obj, Character *ch ) const
     case 1:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 2:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
@@ -137,12 +137,12 @@ void EhrumenGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{BТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_demonfire, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_demonfire, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -155,17 +155,17 @@ void VenusGod::tattooFight( Object *obj, Character *ch ) const
     case 2:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_light, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_light, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 3:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_plague, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_plague, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     case 4:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_bless, ch->getModifyLevel(), ch, ch );
+      spell(gsn_bless, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -176,12 +176,12 @@ void SethGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_dragon_strength, ch->getModifyLevel(), ch, ch );
+      spell(gsn_dragon_strength, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell( gsn_dragon_breath, ch->getModifyLevel( ), ch, ch->fighting );
+      spell( gsn_dragon_breath, ch->getModifyLevel( ), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -193,12 +193,12 @@ void OdinGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_faerie_fire, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_faerie_fire, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -209,12 +209,12 @@ void PhobosGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_colour_spray, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_colour_spray, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -223,19 +223,19 @@ void TeshubGod::tattooFight( Object *obj, Character *ch ) const
 {
     switch(number_bits(5)) {
     case 0:
-      spell(gsn_blindness, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_blindness, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       ch->send_to("{rТы насылаешь завесу замешательства.{x\n\r");
       break;
     case 1:
-      spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       ch->send_to("{gНемного твоего безумия переходит на твоего противника.{x\n\r");
       break;
     case 2:
-      spell(gsn_haste, ch->getModifyLevel(), ch, ch );
+      spell(gsn_haste, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       ch->send_to("{WТы внезапно ощущаешь повышенную активность!{x\n\r");
       break;
     case 3:
-      spell(gsn_shield, ch->getModifyLevel(), ch, ch );
+      spell(gsn_shield, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       ch->send_to("{WТы чувствуешь себя еще большим параноиком!{x\n\r");
       break;
     }
@@ -311,22 +311,22 @@ void HeraGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_plague, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_plague, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     case 1:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_poison, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     case 2:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_weaken, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     case 3:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_slow, ch->getModifyLevel(), ch, ch->fighting );
+      spell(gsn_slow, ch->getModifyLevel(), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -339,12 +339,12 @@ void DeimosGod::tattooFight( Object *obj, Character *ch ) const
     case 1:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 2:
       act_p("{rТатуировка на твоем плече загорается красным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell( gsn_web, ch->getModifyLevel( ), ch, ch->fighting );
+      spell( gsn_web, ch->getModifyLevel( ), ch, ch->fighting, FSPELL_NOTRIGGER );
       break;
     }
 }
@@ -359,13 +359,13 @@ void ErosGod::tattooFight( Object *obj, Character *ch ) const
       {
         act_p("{CТатуировка на твоем плече загорается ослепительным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-        spell( gsn_heal, ch->getModifyLevel(), ch, ch );
+        spell( gsn_heal, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       }        
       else
       {
         act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-        spell( gsn_cure_serious, ch->getModifyLevel(), ch, ch );
+        spell( gsn_cure_serious, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       }        
       break;
     case 2:
@@ -374,13 +374,13 @@ void ErosGod::tattooFight( Object *obj, Character *ch ) const
       {
         act_p("{CТатуировка на твоем плече загорается ослепительным светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-        spell( gsn_heal, ch->getModifyLevel(), ch, ch );
+        spell( gsn_heal, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       }        
       else
       {
         act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-        spell( gsn_cure_critical, ch->getModifyLevel(), ch, ch );
+        spell( gsn_cure_critical, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       }        
       break;
     }
@@ -393,7 +393,7 @@ void EnkiGod::tattooFight( Object *obj, Character *ch ) const
     case 0:
       act_p("{CТатуировка на твоем плече загорается голубым светом.{x",
                    ch,0,0,TO_CHAR,POS_DEAD);
-      spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch );
+      spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       break;
     case 1:
     case 2:
@@ -401,11 +401,11 @@ void EnkiGod::tattooFight( Object *obj, Character *ch ) const
                    ch,0,0,TO_CHAR,POS_DEAD);
       
       if (IS_EVIL(ch->fighting) && !IS_EVIL(ch))
-        spell( gsn_dispel_evil, ( int )( 1.2* ch->getModifyLevel() ), ch, ch->fighting );
+        spell( gsn_dispel_evil, ( int )( 1.2* ch->getModifyLevel() ), ch, ch->fighting, FSPELL_NOTRIGGER );
       else if (IS_GOOD(ch->fighting) && !IS_GOOD(ch))
-        spell( gsn_dispel_good, ( int )( 1.2* ch->getModifyLevel() ), ch, ch->fighting );
+        spell( gsn_dispel_good, ( int )( 1.2* ch->getModifyLevel() ), ch, ch->fighting, FSPELL_NOTRIGGER );
       else
-        spell( gsn_lightning_bolt, ( int )( 1.2* ch->getModifyLevel() ), ch, ch->fighting );
+        spell( gsn_lightning_bolt, ( int )( 1.2* ch->getModifyLevel() ), ch, ch->fighting, FSPELL_NOTRIGGER );
 
       break;
     }
@@ -434,7 +434,7 @@ void BastGod::tattooFight( Object *obj, Character *ch ) const
         ch->println( "{cТатуировка слегка светится.{x");
       else {
         ch->println("{BТатуировка на твоем плече на мгновение складывается в символ щита.{x");
-        spell(gsn_protection_heat, ch->getModifyLevel(), ch, ch );
+        spell(gsn_protection_heat, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
       }
       break;
     case 1:
@@ -442,7 +442,7 @@ void BastGod::tattooFight( Object *obj, Character *ch ) const
       if (ch->isAffected(gsn_haste))
         ch->println( "{cТатуировка слегка светится.{x");
       else {
-          spell(gsn_haste, ch->getModifyLevel(), ch, ch );
+          spell(gsn_haste, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
           ch->send_to("{WТы внезапно ощущаешь повышенную активность!{x\n\r");
       }
       break;
@@ -490,7 +490,7 @@ void RavenQueenGod::tattooFight( Object *obj, Character *ch ) const
     ch->println("{rТатуировка на твоем плече загорается красным светом.{x");
     int random_spell = spells[number_range(0, spells.size() - 1)];
     int level_bonus = season_winter() ? 10 : 0;
-    spell(random_spell, ch->getModifyLevel() + level_bonus, ch, victim);
+    spell(random_spell, ch->getModifyLevel() + level_bonus, ch, victim, FSPELL_NOTRIGGER);
 }
 
 class TricksterGodOneHit: public SkillWeaponOneHit {
@@ -526,19 +526,19 @@ void ErevanGod::tattooFight( Object *obj, Character *ch ) const
     // Chance 1 in 8 of getting a heal. 
     if (ch->hit < ch->max_hit && chance(12)) {
         ch->println("{CТатуировка на твоем плече загорается голубым светом.{x");
-        spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch);
+        spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER);
         return; 
     }
 
     if (!IS_AFFECTED(ch, AFF_HASTE) && chance(50)) {
-        spell(gsn_haste, ch->getModifyLevel(), ch, ch );
+        spell(gsn_haste, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER );
         ch->println("{WТы внезапно ощущаешь повышенную активность!{x");
         return;
     }
 
     // Chance 1 in 10-12 of casting a spell (disregard haste).
     if (chance(10)) {
-        spell(gsn_colour_spray, ch->getModifyLevel(), ch, victim);
+        spell(gsn_colour_spray, ch->getModifyLevel(), ch, victim, FSPELL_NOTRIGGER);
         return;
     }
 

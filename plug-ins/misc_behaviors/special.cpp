@@ -316,7 +316,7 @@ bool dragon( Character *ch, const char *spell_name )
         return false;
     
     return spell( SkillManager::getThis( )->lookup( spell_name ), 
-                  ch->getModifyLevel( ), ch, victim );
+                  ch->getModifyLevel( ), ch, victim, FSPELL_NOTRIGGER );
 }
 
 
@@ -458,7 +458,7 @@ bool spec_cast_judge( NPCharacter *ch )
         return false;
 
     return spell( SkillManager::getThis( )->lookup( "high explosive" ), 
-                           ch->getModifyLevel( ), ch, victim, true );
+                           ch->getModifyLevel( ), ch, victim, FSPELL_BANE );
 }
 
 
@@ -746,7 +746,7 @@ bool spec_poison( NPCharacter *ch )
     act_p( "$c1 кусает $C4!",  ch, 0, victim, TO_NOTVICT,POS_RESTING );
     act_p( "$c1 кусает тебя!", ch, 0, victim, TO_VICT,POS_RESTING    );
 
-    spell( gsn_poison, ch->getModifyLevel( ), ch, victim ); 
+    spell( gsn_poison, ch->getModifyLevel( ), ch, victim, FSPELL_NOTRIGGER ); 
     return true;
 }
 
