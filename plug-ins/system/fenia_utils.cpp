@@ -24,6 +24,9 @@ bool gprog(const DLString &trigName, const char *fmt, ...)
         Scripting::Register tmp = *Scripting::Context::root[ID_TMP];
         Scripting::Register trigger_handler = *tmp[ID_TRIG_HNDL];
 
+        if (trigger_handler.type != Register::FUNCTION)
+            return false;
+
         // Collect *trigger* arguments into registerList, based on the argument
         // format string "CC", "CO" and so on.        
         va_start(ap, fmt);
