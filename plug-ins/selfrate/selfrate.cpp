@@ -71,15 +71,13 @@ CMDRUN( selfrate )
     else if (rate < attr->rate) 
         pch->send_to( "Ты не можешь понизить оценку своего уровня опытности.\r\n" );
     else {
-        char buf[256];
-        
         attr->rate = rate;
         DLString alias = attr->getRateAlias();
         pch->printf( "Поздравляем! Теперь ты {W%s{x.\r\n", alias.c_str( ));
-        sprintf( buf, "{CТоржественный голос из $o2: {W$C1 теперь %s!{x", alias.c_str( ) );
-        infonet( buf, pch, 0 );
 
-        send_discord_orb(fmt(0, "%#^C1 теперь %s!", pch, attr->getRateAlias(pch).c_str()));
+        DLString what = fmt(0, "%#^C1 теперь %s!", pch, attr->getRateAlias(pch).c_str());
+        infonet(0, 0, "{CТоржественный голос из $o2: ", what.c_str());
+        send_discord_orb(what);
     }
 }
 

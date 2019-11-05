@@ -21,6 +21,8 @@
 #include "clanreference.h"
 #include "gsn_plugin.h"
 #include "handler.h"
+#include "infonet.h"
+#include "messengers.h"
 #include "act.h"
 #include "mercdb.h"
 
@@ -956,6 +958,7 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
         return;
     }
     
+    int oldLevel = victim->getClanLevel();
     victim->setClanLevel( i );
     pc->send_to( "Ok.\n\r" );
 
@@ -965,10 +968,22 @@ void CClan::clanLevelSet( PCharacter *pc, PCMemoryInterface *victim, const DLStr
     attr = victim->getAttributes( ).getAttr<XMLAttributeInduct>( "induct" );
     attr->addEntry( buf.str( ) );
 
-    if (PCharacter *pcVictim = dynamic_cast<PCharacter *>( victim ))
+    PCharacter *pcVictim = victim->getPlayer();
+    if (pcVictim)
         attr->run( pcVictim );
     else
         PCharacterManager::saveMemory( victim );
+
+    // Notify about level upgrades otherwise noticeable in 'who'.
+    if (oldLevel < i && clan.isRecruiter(victim)) {
+        DLString what = fmt(0, "{W%s становится %s клана %s.{x", 
+            victim->getName().c_str(), 
+            (clan.isLeader(victim) ? "лидером" : "рекрутером"),
+            clan.getShortName().c_str());
+
+        infonet(pcVictim, 0, "{CТихий голос из $o2: ", what.c_str());
+        send_discord_clan(what);
+    }
 }
 
 /*
@@ -1210,6 +1225,10 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         
         if (!found)
             pc->send_to("(сейчас в мире нет ни одного рекрутера этого клана)\n\r");
+
+        DLString what = fmt(0, "{W%1$^C1 подал%1$Gо||а петицию в клан %s.{x", pc, clan->getShortName().c_str());
+        infonet(pc, 0, "{CТихий голос из $o2: ", what.c_str());
+        send_discord_clan(what);
     }
 }
 
@@ -1286,6 +1305,10 @@ void CClan::doInduct( PCMemoryInterface *victim, const Clan &clan )
         attr->run( victim->getPlayer( ) );
     else
         PCharacterManager::saveMemory( victim );
+
+    DLString what = fmt(0, "{W%s вступает в клан %s.{x", victim->getName().c_str(), clan.getShortName().c_str());
+    infonet(victim->getPlayer(), 0, "{CТихий голос из $o2: ", what.c_str());
+    send_discord_clan(what);
 }
 
 /* 

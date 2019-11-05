@@ -119,6 +119,33 @@ protected:
 };
 
 /*----------------------------------------------------------------------
+ * Bonus
+ *----------------------------------------------------------------------*/
+class Bonus;
+
+class BonusWrapper : public PluginNativeImpl<BonusWrapper>, 
+                          public NativeHandler,
+                          public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<BonusWrapper> Pointer;
+
+    BonusWrapper() { }
+    BonusWrapper(const DLString &);
+            
+    virtual void setSelf(Scripting::Object *) { }
+    
+    static Scripting::Register wrap( const DLString & );
+
+    XML_VARIABLE XMLString name;
+
+protected:
+    Bonus * getTarget() const;
+};
+
+/*----------------------------------------------------------------------
  * Race
  *----------------------------------------------------------------------*/
 class Race;

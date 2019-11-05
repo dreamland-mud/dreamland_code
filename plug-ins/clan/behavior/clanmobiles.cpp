@@ -16,6 +16,8 @@
 #include "fight.h"
 #include "magic.h"
 #include "damage.h"
+#include "infonet.h"
+#include "messengers.h"
 #include "merc.h"
 #include "handler.h"
 #include "gsn_plugin.h"
@@ -155,6 +157,22 @@ int ClanHealer::getOccupation( )
  *-------------------------------------------------------------------------*/
 ClanGuard::ClanGuard( )
 {
+}
+
+bool ClanGuard::death( Character *killer )
+{
+    if (!killer || killer->is_immortal())
+        return false;
+
+    ClanArea::Pointer clanArea = getClanArea( );
+    if (!clanArea)
+        return false;
+
+    DLString what = fmt(0, "{WКлан %s не смог удержать оборону.{x", clanArea->getClan()->getShortName().c_str());
+    infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
+    send_discord_clan(what);
+
+    return false;
 }
 
 /*--------------------------------------------------------------------------

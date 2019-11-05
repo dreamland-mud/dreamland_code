@@ -162,11 +162,10 @@ bool ClanAltar::fetch( Character *ch, Object *item )
     if (clan->getData( ))
         clan->getData( )->unsetItem( item );
 
-    ostringstream buf;
-    buf << "{CЕхидный голос из $o2: {WКлан " << clanArea->getClan()->getShortName() << " утратил свою святыню.{x";
-    infonet(buf.str().c_str(), 0, 0);
-    send_discord_orb(fmt(0, "Клан %s утратил свою святыню.", clanArea->getClan()->getShortName().c_str()));
-    
+    DLString what = fmt(0, "{WКлан %s утратил свою святыню.{x", clanArea->getClan()->getShortName().c_str());
+    infonet(0, 0, "{CЕхидный голос из $o2: ", what.c_str());
+    send_discord_clan(what);
+
     extract_obj(obj);
     return true;
 }

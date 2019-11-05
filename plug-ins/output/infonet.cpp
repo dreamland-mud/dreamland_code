@@ -25,6 +25,22 @@ Object * get_pager( Character *ch )
     return NULL;
 }
 
+/**
+ * Send a infonet message with a bit more flexible formatting.
+ * 'prefix' normally contains '{CТихий голос из $o2{x' part but can be anything.
+ */
+void infonet( Character *ch, int min_level, const DLString &prefix, const char *fmt, ...)
+{
+    va_list args;
+    DLString msg;
+
+    va_start( args, fmt );
+    msg = prefix + vfmt( NULL, fmt, args );
+    va_end( args );
+
+    infonet(msg.c_str(), ch, min_level);
+}
+
 void infonet( const char *string, Character *ch, int min_level )
 {
   Descriptor *d;

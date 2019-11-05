@@ -95,6 +95,12 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     send_discord(body);
 }
 
+static const DLString COLOR_PINK = "14132165";
+static const DLString COLOR_CYAN = "2088924";
+static const DLString COLOR_GOLDEN = "16640598";
+static const DLString COLOR_GREEN = "4485139";
+static const DLString COLOR_CRIMSON = "14824462";
+static const DLString COLOR_BLUE = "4514034";
 
 static const DLString ORB_USERNAME = "Хрустальный шар";
 
@@ -103,7 +109,19 @@ void send_discord_orb(const DLString &msg)
     Json::Value body;
     body["username"] = koi2utf(ORB_USERNAME);
     body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = "14132165";
+    body["embeds"][0]["color"] = COLOR_PINK;
+
+    send_discord(body);
+}
+
+void send_discord_clan(const DLString &msg)
+{
+    static const DLString USERNAME = "Кланы";
+
+    Json::Value body;
+    body["username"] = koi2utf(USERNAME);
+    body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
+    body["embeds"][0]["color"] = COLOR_CYAN;
 
     send_discord(body);
 }
@@ -115,12 +133,13 @@ void send_discord_gquest(const DLString &gqName, const DLString &msg)
     Json::Value body;
     body["username"] = koi2utf(USERNAME);
     body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = "16640598";
+    body["embeds"][0]["color"] = COLOR_GOLDEN;
     body["embeds"][0]["author"]["name"] = koi2utf(gqName);
 
     send_discord(body);
 }
 
+// TODO 
 void send_discord_level(PCharacter *ch)
 {   
     Json::Value body;
@@ -133,7 +152,7 @@ void send_discord_level(PCharacter *ch)
 
     body["username"] = koi2utf(ORB_USERNAME);
     body["embeds"][0]["description"] = koi2utf(msg);
-    body["embeds"][0]["color"] = "14132165";
+    body["embeds"][0]["color"] = COLOR_PINK;
 
     send_discord(body);
 }
@@ -145,7 +164,7 @@ void send_discord_bonus(const DLString &msg)
     Json::Value body;
     body["username"] = koi2utf(USERNAME);
     body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = "4485139";
+    body["embeds"][0]["color"] = COLOR_GREEN;
 
     send_discord(body);
 }
@@ -161,7 +180,7 @@ void send_discord_death(PCharacter *ch, Character *killer)
     Json::Value body;
     body["username"] = koi2utf(ORB_USERNAME);
     body["embeds"][0]["description"] = koi2utf(msg);
-    body["embeds"][0]["color"] = "14824462";
+    body["embeds"][0]["color"] = COLOR_CRIMSON;
 
     send_discord(body);
 }
@@ -176,7 +195,7 @@ void send_discord_news(const DLString &author, const DLString &title, const DLSt
     body["embeds"][0]["title"] = koi2utf(title.colourStrip());
     body["embeds"][0]["description"] = discord_string(description);
     body["embeds"][0]["url"] = "https://dreamland.rocks/news.html";
-    body["embeds"][0]["color"] = "4514034";
+    body["embeds"][0]["color"] = COLOR_BLUE;
     body["embeds"][0]["author"]["name"] = koi2utf(author.colourStrip());
 
     send_discord(body);

@@ -48,6 +48,7 @@ public:
         
         virtual void greet( Character * );
         virtual void speech( Character *, const char * );
+        virtual bool death( Character *killer );
         virtual bool aggress( );
         virtual int  getOccupation( );
 
