@@ -888,6 +888,15 @@ NMI_INVOKE( Root, CraftProfession, "(name): конструктор для доп
     return CraftProfessionWrapper::wrap( name );
 }
 
+NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов по имени" )
+{
+    DLString name = args2string(args);
+    if (!bonusManager->findExisting(name))
+        throw Scripting::Exception("Bonus not found");
+    return BonusWrapper::wrap( name );
+}
+
+
 NMI_GET( Root, races, "список всех рас") 
 {
     RegList::Pointer list(NEW);

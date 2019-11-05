@@ -82,6 +82,7 @@ WrappersPlugin::initialization( )
     Class::regMoc<ClanWrapper>( );
     Class::regMoc<ProfessionWrapper>( );
     Class::regMoc<CraftProfessionWrapper>( );
+    Class::regMoc<BonusWrapper>( );
     Class::regMoc<RaceWrapper>( );
     Class::regMoc<LiquidWrapper>( );
     Class::regMoc<SkillWrapper>( );
@@ -108,6 +109,7 @@ WrappersPlugin::initialization( )
     traitsAPIDump<RaceWrapper>("race", false, false);     
     traitsAPIDump<ClanWrapper>("clan", false, false);     
     traitsAPIDump<CraftProfessionWrapper>("craftprofession", false, false);     
+    traitsAPIDump<BonusWrapper>("bonus", false, false);     
     traitsAPIDump<LiquidWrapper>("liquid", false, false);     
     traitsAPIDump<SkillWrapper>("skill", false, false);     
     traitsAPIDump<FeniaSkill>("feniaskill", false, false);     
@@ -127,6 +129,7 @@ void WrappersPlugin::destruction( ) {
     Class::unregMoc<AreaWrapper>( );
     Class::unregMoc<ClanWrapper>( );
     Class::unregMoc<CraftProfessionWrapper>( );
+    Class::unregMoc<BonusWrapper>( );
     Class::unregMoc<ProfessionWrapper>( );
     Class::unregMoc<RaceWrapper>( );
     Class::unregMoc<TablesWrapper>( );

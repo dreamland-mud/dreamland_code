@@ -729,6 +729,92 @@ NMI_INVOKE( CraftProfessionWrapper, gainExp, "(ch, exp): заработать о
 }
 
 /*----------------------------------------------------------------------
+ * Bonus
+ *----------------------------------------------------------------------*/
+NMI_INIT(BonusWrapper, "bonus, календарный или религиозный бонус");
+
+BonusWrapper::BonusWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register BonusWrapper::wrap( const DLString &name )
+{
+    BonusWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+Bonus * BonusWrapper::getTarget() const
+{
+    Bonus::Pointer prof = bonusManager->findExisting(name);
+    if (!prof)
+        throw Scripting::Exception("Bonus not found");
+    return *prof;
+}
+
+NMI_INVOKE( BonusWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<BonusWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( BonusWrapper, name, "английское название" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( BonusWrapper, nameRus, "русское название" ) 
+{
+    return getTarget()->getRussianName( );
+}
+
+NMI_GET( BonusWrapper, color, "буква цвета в календаре" ) 
+{
+    return getTarget()->getColor();
+}
+
+NMI_INVOKE( BonusWrapper, give, "(ch,days): дать бонус на days дней. Вернет true, если присвоено успешно.")
+{
+    PCharacter *ch = argnum2player(args, 1);
+    long today = day_of_epoch(time_info);
+    long end = today + argnum2number(args, 2);
+
+    if (end < today)
+        throw Scripting::Exception("end day cannot be negative");
+
+    PCBonusData &data = ch->getBonuses().get(getTarget()->getIndex());
+    // Do nothing for active bonuses.
+    if (data.start <= today && today <= data.end)
+        return Register(false);
+
+    data.start = today;
+    data.end = end;
+    return Register(true);
+}
+
+
+NMI_INVOKE( BonusWrapper, remove, "(ch): очистить бонус у персонажа. Вернет true, если было что очищать.")
+{
+    PCharacter *ch = argnum2player(args, 1);
+    PCBonusData &data = ch->getBonuses().get(getTarget()->getIndex());
+
+    if (data.isValid()) {
+        data.start = -1;
+        data.end = -1;
+        return Register(true);
+    }
+
+    return Register(false);
+}
+
+
+/*----------------------------------------------------------------------
  * Skill
  *----------------------------------------------------------------------*/
 NMI_INIT(SkillWrapper, "skill, умение или заклинание");
