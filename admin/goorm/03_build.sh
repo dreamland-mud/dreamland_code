@@ -3,5 +3,5 @@
 . $(dirname $(readlink -f $0))/paths
 
 cd $OBJS && \
-make -j 2 && make install && \
+make -j `nproc` && make install && \
 cd $SRCDIR
