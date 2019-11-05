@@ -5,3 +5,6 @@ ports:
 - port: 9000
 - port: 1234
 
+vscode:
+  extensions:
+    - ms-vscode.cpptools@0.26.1:aQ9S+jczbX1UtORJvY/4Ug==
