@@ -34,13 +34,16 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
     if (!note.isNoteToAll( ))
         return;
     
-    // Publish news and quest notes to Discord channel.
+    // Publish news and quest notes to Discord channel. TODO: mark thread as published.
     if (thread.getName() == "news"
         || thread.getName() == "change"
         || thread.getName() == "qnote")
     {
         hookDiscord(thread, note);
-    }
+    } else
+    {
+        send_discord_note(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject());
+    }    
 
     // Publish news and changes to the website.
     if (thread.getName() == "news"

@@ -15,7 +15,6 @@
 
 static IconvMap koi2utf("koi8-r", "utf-8");
 
-
 void send_telegram(const DLString &content)
 {
     try {
@@ -69,9 +68,7 @@ void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg
     DLString description = fmt(0, format.c_str(), ch, msg.c_str(), 0);
 
     Json::Value body;
-    body["username"] = koi2utf("Каналы");
-    body["content"] = koi2utf(description.colourStrip());
-
+    body["content"] = discord_string(":speech_left: " + description);
     send_discord(body);
 }
 
@@ -89,60 +86,41 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
 
     Json::Value body;
-    body["username"] = koi2utf("Каналы");
-    body["content"] = koi2utf(description.colourStrip());
-
+    body["content"] = discord_string(":speech_left: " + description);
     send_discord(body);
 }
 
-static const DLString COLOR_PINK = "14132165";
-static const DLString COLOR_CYAN = "2088924";
-static const DLString COLOR_GOLDEN = "16640598";
-static const DLString COLOR_GREEN = "4485139";
-static const DLString COLOR_CRIMSON = "14824462";
-static const DLString COLOR_BLUE = "4514034";
-
-static const DLString ORB_USERNAME = "Хрустальный шар";
+void send_discord_note(const DLString &thread, const DLString &from, const DLString &subj)
+{
+    Json::Value body;
+    body["content"] = discord_string(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
+    send_discord(body);
+}
 
 void send_discord_orb(const DLString &msg)
 {
     Json::Value body;
-    body["username"] = koi2utf(ORB_USERNAME);
-    body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = COLOR_PINK;
-
+    body["content"] = discord_string(":arrow_right: " + msg);
     send_discord(body);
 }
 
 void send_discord_clan(const DLString &msg)
 {
-    static const DLString USERNAME = "Кланы";
-
     Json::Value body;
-    body["username"] = koi2utf(USERNAME);
-    body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = COLOR_CYAN;
-
+    body["content"] = discord_string(":crossed_swords: " + msg);
     send_discord(body);
 }
 
 void send_discord_gquest(const DLString &gqName, const DLString &msg)
 {
-    static const DLString USERNAME = "Глобальные квесты";
-
     Json::Value body;
-    body["username"] = koi2utf(USERNAME);
-    body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = COLOR_GOLDEN;
-    body["embeds"][0]["author"]["name"] = koi2utf(gqName);
-
+    body["content"] = discord_string(":gem: **" + gqName + "** " + msg);
     send_discord(body);
 }
 
-// TODO 
+// TODO use it for sub-prof
 void send_discord_level(PCharacter *ch)
 {   
-    Json::Value body;
     DLString msg;
 
     if (ch->getLevel() == LEVEL_MORTAL)
@@ -150,22 +128,15 @@ void send_discord_level(PCharacter *ch)
     else
         msg = fmt(0, "%1$^C1 достиг%1$Gло||ла следующей ступени мастерства.", ch);
 
-    body["username"] = koi2utf(ORB_USERNAME);
-    body["embeds"][0]["description"] = koi2utf(msg);
-    body["embeds"][0]["color"] = COLOR_PINK;
-
+    Json::Value body;
+    body["content"] = discord_string(":zap: " + msg);
     send_discord(body);
 }
 
 void send_discord_bonus(const DLString &msg)
 {
-    static const DLString USERNAME = "Календарь";
-
     Json::Value body;
-    body["username"] = koi2utf(USERNAME);
-    body["embeds"][0]["description"] = koi2utf(msg.colourStrip());
-    body["embeds"][0]["color"] = COLOR_GREEN;
-
+    body["content"] = discord_string(":calendar_spiral: " + msg);
     send_discord(body);
 }
 
@@ -178,13 +149,16 @@ void send_discord_death(PCharacter *ch, Character *killer)
         msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
 
     Json::Value body;
-    body["username"] = koi2utf(ORB_USERNAME);
-    body["embeds"][0]["description"] = koi2utf(msg);
-    body["embeds"][0]["color"] = COLOR_CRIMSON;
-
+    body["content"] = discord_string(":grave: " + msg);
     send_discord(body);
 }
 
+static const DLString COLOR_PINK = "14132165";
+static const DLString COLOR_CYAN = "2088924";
+static const DLString COLOR_GOLDEN = "16640598";
+static const DLString COLOR_GREEN = "4485139";
+static const DLString COLOR_CRIMSON = "14824462";
+static const DLString COLOR_BLUE = "4514034";
 
 void send_discord_news(const DLString &author, const DLString &title, const DLString &description)
 {
