@@ -7,11 +7,13 @@
 
 #include "date.h"
 #include "pcharacter.h"
+#include "room.h"
 #include "pcharactermanager.h"
 #include "dreamland.h"
 #include "wiznet.h"
 #include "mercdb.h"
 #include "merc.h"
+#include "def.h"
 
 bool XMLAttributeQuestData::handle( const DeathArguments &args ) 
 {
@@ -54,6 +56,8 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
     Quest::Pointer quest = attributes->findAttr<Quest>( "quest" );
     int time = getTime( );
     
+    if (IS_SET(pch->in_room->room_flags, ROOM_MANSION))
+        return false;
     if (time == 0)
         return false;
     if (!quest && attributes->isAvailable( "quest" ))
