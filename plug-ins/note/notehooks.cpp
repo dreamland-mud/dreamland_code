@@ -25,13 +25,15 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
     // Notify via crystal orb for all types of messages.
     notifyOrb(thread, note);
 
-    // Telegram
+    // Telegram: post full message if addressed to 'telegram', notify about new public messages
     if (note.getRecipient().find("telegram") != DLString::npos)
         hookTelegram(thread, note);
+    else if (note.isNoteToAll())
+        hookTelegramUnread(thread, note);
 
     if (!note.isNoteToAll( ))
         return;
-
+    
     // Publish news and quest notes to Discord channel.
     if (thread.getName() == "news"
         || thread.getName() == "change"
@@ -125,6 +127,17 @@ void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
         << endl
         << note.getText();
         
+    send_telegram(content.str());
+}
+
+void NoteHooks::hookTelegramUnread(const NoteThread &thread, const Note &note)
+{
+    ostringstream content;
+
+    content << thread.getRussianName().ruscase('1').upperFirstCharacter() 
+            << " от *" << note.getFrom() << "*, на тему *" << note.getSubject() << "*" 
+            << endl;
+    
     send_telegram(content.str());
 }
 
