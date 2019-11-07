@@ -72,6 +72,8 @@ protected:
         void doNotify();
         void doAttack( PCharacter * );
         void doPetitionOutsider( PCharacter * );
+
+        XML_VARIABLE XMLLongLongNoEmpty lastNotified;
 };
 
 class ClanSummonedCreature : public SummonedCreature, 

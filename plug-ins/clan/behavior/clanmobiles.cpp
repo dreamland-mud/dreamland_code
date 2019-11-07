@@ -172,7 +172,7 @@ bool ClanGuard::death( Character *killer )
     infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
     send_discord_clan(what);
     send_telegram(what);
-    
+
     return false;
 }
 
@@ -264,10 +264,15 @@ void ClanGuard::greet( Character *wch )
 
 void ClanGuard::doNotify()
 {
+    time_t now = dreamland->getCurrentTime();
+    if (lastNotified > now - Date::SECOND_IN_MINUTE)
+        return;
+
     ClanArea::Pointer clanArea = getClanArea();
     DLString msg = "Клан " + clanArea->getClan()->getShortName() + " атакован!";
     send_discord_clan(msg);
     send_telegram(msg);
+    lastNotified = now;
 }
 
 bool ClanGuard::checkPush( PCharacter* wch ) 
