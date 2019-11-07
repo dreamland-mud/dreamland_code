@@ -15,6 +15,7 @@
 #include "quest.h"
 #include "commandmanager.h"
 
+#include "grammar_entities_impl.h"
 #include "dlfilestream.h"
 #include "dldirectory.h"
 #include "dreamland.h"
@@ -134,9 +135,7 @@ Json::Value WhoWebPromptListener::jsonPlayer( Character *ch, PCharacter *wch )
     Json::Value player;
     
     // Player name and sex.
-    DLString name = ch->seeName( wch );    
-    name.cutSize( 10 );
-    player["n"] = name;
+    player["n"] = wch->toNoun()->decline('1').cutSize(10);
     player["s"] = wch->getSex( ) == SEX_MALE ? "m" : "f";
 
     // First 2 letters of player race.
