@@ -69,6 +69,7 @@ protected:
         virtual int getCast( Character * );
 
         Character * getVictim( );
+        void doNotify();
         void doAttack( PCharacter * );
         void doPetitionOutsider( PCharacter * );
 };

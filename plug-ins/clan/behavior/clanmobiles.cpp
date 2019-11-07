@@ -207,6 +207,7 @@ bool ClanGuard::aggress( )
             continue;
         
         actIntruder( pch );
+        doNotify();
         doPetitionOutsider( pch );
 
         try {
@@ -255,8 +256,17 @@ void ClanGuard::greet( Character *wch )
         return;
     
     actIntruder( pch );
+    doNotify();
     doPetitionOutsider( pch );
     doAttack( pch );
+}
+
+void ClanGuard::doNotify()
+{
+    ClanArea::Pointer clanArea = getClanArea();
+    DLString msg = "Клан " + clanArea->getClan()->getShortName() + " атакован!";
+    send_discord_clan(msg);
+    send_telegram(msg);
 }
 
 bool ClanGuard::checkPush( PCharacter* wch ) 
