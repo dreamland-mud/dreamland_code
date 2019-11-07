@@ -9,6 +9,7 @@
 #include "npcharacter.h"
 #include "dreamland.h"
 #include "act.h"
+#include "mudtags.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -34,9 +35,14 @@ void send_telegram(const DLString &content)
     }
 }
 
-static DLString discord_string(const DLString &s)
+static DLString discord_string(const DLString &source)
 {
-    DLString utf = koi2utf(s.colourStrip());
+    ostringstream outBuf;
+    
+    vistags_convert(source.c_str(), outBuf, 0);
+    DLString colored = outBuf.str();
+    DLString utf = koi2utf(colored.colourStrip());
+
     if (utf.length() > 2000) {
         utf.cutSize(1995);
         utf << "\n...";
