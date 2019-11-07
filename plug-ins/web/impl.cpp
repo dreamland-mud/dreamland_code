@@ -135,7 +135,7 @@ Json::Value WhoWebPromptListener::jsonPlayer( Character *ch, PCharacter *wch )
     Json::Value player;
     
     // Player name and sex.
-    player["n"] = wch->toNoun()->decline('1').cutSize(10);
+    player["n"] = wch->toNoun(ch)->decline('1').cutSize(10);
     player["s"] = wch->getSex( ) == SEX_MALE ? "m" : "f";
 
     // First 2 letters of player race.
