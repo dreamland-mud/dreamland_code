@@ -1229,6 +1229,7 @@ void CClan::clanPetition( PCharacter *pc, DLString& argument )
         DLString what = fmt(0, "{W%1$^C1 подал%1$Gо||а петицию в клан %s.{x", pc, clan->getShortName().c_str());
         infonet(pc, 0, "{CТихий голос из $o2: ", what.c_str());
         send_discord_clan(what);
+        send_telegram(what);
     }
 }
 

@@ -171,7 +171,8 @@ bool ClanGuard::death( Character *killer )
     DLString what = fmt(0, "{WКлан %s не смог удержать оборону.{x", clanArea->getClan()->getShortName().c_str());
     infonet(0, 0, "{CТихий голос из $o2: ", what.c_str());
     send_discord_clan(what);
-
+    send_telegram(what);
+    
     return false;
 }
 
