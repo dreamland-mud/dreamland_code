@@ -56,6 +56,7 @@ public:
     bool isNoteTo( PCMemoryInterface * ) const;
     bool isNoteFrom( PCMemoryInterface * ) const;
     bool isNoteToAll( ) const;
+    bool isNoteTo(const DLString &recipient) const;
     static bool parseRecipient( PCharacter *, const DLString &, ostringstream & );
     
 private:

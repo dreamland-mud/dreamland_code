@@ -85,6 +85,11 @@ bool Note::isNoteFrom( PCMemoryInterface *pcm ) const
     return false;
 }
 
+bool Note::isNoteTo(const DLString &recipient) const
+{
+    return getRecipient().toLower().find(recipient.toLower()) != DLString::npos;
+}
+
 bool Note::isNoteTo( PCMemoryInterface *pcm ) const
 {
     ostringstream buf; 
@@ -171,8 +176,13 @@ bool Note::findRecipient( PCMemoryInterface *pcm, DLString &arg, ostringstream &
         return true;
     }
     
-    if (arg == "telegram") {
+    if (arg.toLower() == "telegram") {
         buf << "Telegram";
+        return true;
+    }
+
+    if (arg.toLower() == "discord") {
+        buf << "Discord";
         return true;
     }
 

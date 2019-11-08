@@ -38,7 +38,7 @@ void send_telegram(const DLString &content)
 static DLString discord_string(const DLString &source)
 {
     ostringstream outBuf;
-    
+
     vistags_convert(source.c_str(), outBuf, 0);
     DLString colored = outBuf.str();
     DLString utf = koi2utf(colored.colourStrip());
@@ -66,16 +66,20 @@ static void send_discord(Json::Value &body)
     }
 }
 
+void send_discord(const DLString &content)
+{
+    Json::Value body;
+    body["content"] = discord_string(content);
+    send_discord(body);
+}
+
 /**
  * Send out-of-character channel messages with real usernames.
  */
 void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg)
 {
     DLString description = fmt(0, format.c_str(), ch, msg.c_str(), 0);
-
-    Json::Value body;
-    body["content"] = discord_string(":speech_left: " + description);
-    send_discord(body);
+    send_discord(":speech_left: " + description);
 }
 
 /** 
@@ -90,38 +94,27 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     vict.config.setBit(CONFIG_RUNAMES);
 
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
-
-    Json::Value body;
-    body["content"] = discord_string(":speech_left: " + description);
-    send_discord(body);
+    send_discord(":speech_left: " + description);
 }
 
-void send_discord_note(const DLString &thread, const DLString &from, const DLString &subj)
+void send_discord_note_notify(const DLString &thread, const DLString &from, const DLString &subj)
 {
-    Json::Value body;
-    body["content"] = discord_string(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
-    send_discord(body);
+    send_discord(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
 }
 
 void send_discord_orb(const DLString &msg)
 {
-    Json::Value body;
-    body["content"] = discord_string(":arrow_right: " + msg);
-    send_discord(body);
+    send_discord(":arrow_right: " + msg);
 }
 
 void send_discord_clan(const DLString &msg)
 {
-    Json::Value body;
-    body["content"] = discord_string(":crossed_swords: " + msg);
-    send_discord(body);
+    send_discord(":crossed_swords: " + msg);
 }
 
 void send_discord_gquest(const DLString &gqName, const DLString &msg)
 {
-    Json::Value body;
-    body["content"] = discord_string(":gem: **" + gqName + "** " + msg);
-    send_discord(body);
+    send_discord(":gem: **" + gqName + "** " + msg);
 }
 
 // TODO use it for sub-prof
@@ -134,16 +127,12 @@ void send_discord_level(PCharacter *ch)
     else
         msg = fmt(0, "%1$^C1 достиг%1$Gло||ла следующей ступени мастерства.", ch);
 
-    Json::Value body;
-    body["content"] = discord_string(":zap: " + msg);
-    send_discord(body);
+    send_discord(":zap: " + msg);
 }
 
 void send_discord_bonus(const DLString &msg)
 {
-    Json::Value body;
-    body["content"] = discord_string(":calendar_spiral: " + msg);
-    send_discord(body);
+    send_discord(":calendar_spiral: " + msg);
 }
 
 void send_discord_death(PCharacter *ch, Character *killer)
@@ -154,9 +143,7 @@ void send_discord_death(PCharacter *ch, Character *killer)
     else
         msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
 
-    Json::Value body;
-    body["content"] = discord_string(":grave: " + msg);
-    send_discord(body);
+    send_discord(":grave: " + msg);
 }
 
 static const DLString COLOR_PINK = "14132165";
@@ -166,17 +153,27 @@ static const DLString COLOR_GREEN = "4485139";
 static const DLString COLOR_CRIMSON = "14824462";
 static const DLString COLOR_BLUE = "4514034";
 
-void send_discord_news(const DLString &author, const DLString &title, const DLString &description)
+void send_discord_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
 {
-    static const DLString USERNAME = "Новости и изменения";
-
     Json::Value body;
-    body["username"] = koi2utf(USERNAME);
-    body["embeds"][0]["title"] = koi2utf(title.colourStrip());
+    body["username"] = koi2utf(thread.upperFirstCharacter());
+    body["embeds"][0]["title"] = discord_string(title);
+    body["embeds"][0]["description"] = discord_string(description);
+    body["embeds"][0]["color"] = COLOR_GREEN;
+    body["embeds"][0]["author"]["name"] = discord_string(author);
+
+    send_discord(body);
+}
+
+void send_discord_news(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
+{
+    Json::Value body;
+    body["username"] = koi2utf(thread.upperFirstCharacter());
+    body["embeds"][0]["title"] = discord_string(title);
     body["embeds"][0]["description"] = discord_string(description);
     body["embeds"][0]["url"] = "https://dreamland.rocks/news.html";
     body["embeds"][0]["color"] = COLOR_BLUE;
-    body["embeds"][0]["author"]["name"] = koi2utf(author.colourStrip());
+    body["embeds"][0]["author"]["name"] = discord_string(author);
 
     send_discord(body);
 }

@@ -24,7 +24,6 @@ private:
     static const DLString COMMAND_NAME;
 
     static void notifyOrb(const NoteThread &thread, const Note &note);
-    static void hookDiscord(const NoteThread &thread, const Note &note);    
     static void hookTelegram(const NoteThread &thread, const Note &note);    
     static void hookTelegramUnread(const NoteThread &thread, const Note &note);    
     static void webDumpNews();
