@@ -79,7 +79,7 @@ void send_discord(const DLString &content)
 void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg)
 {
     DLString description = fmt(0, format.c_str(), ch, msg.c_str(), 0);
-    send_discord(":speech_left: " + description);
+    send_discord(":speech_left: `" + description + "`");
 }
 
 /** 
@@ -94,7 +94,7 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     vict.config.setBit(CONFIG_RUNAMES);
 
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
-    send_discord(":speech_left: " + description);
+    send_discord(":speech_left: `" + description + "`");
 }
 
 void send_discord_note_notify(const DLString &thread, const DLString &from, const DLString &subj)
@@ -143,7 +143,7 @@ void send_discord_death(PCharacter *ch, Character *killer)
     else
         msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
 
-    send_discord(":grave: " + msg);
+    send_discord(":skull_crossbones: " + msg);
 }
 
 static const DLString COLOR_PINK = "14132165";
