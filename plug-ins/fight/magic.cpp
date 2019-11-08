@@ -342,8 +342,22 @@ void spell_by_item( Character *ch, Object *obj )
         
 
         try {
-            if (!spell->spellbane( ch, result->victim ))
-                spell->run( ch, result, obj->value[0] );
+            if (!spell->spellbane( ch, result->victim )) {
+                bool fForbidCasting = false;
+
+                if (result->type == SpellTarget::CHAR && result->victim)
+                    fForbidCasting = mprog_spell( result->victim, ch, skill, true );
+        
+                mprog_cast( ch, result, skill, true );
+
+                if (!fForbidCasting)
+                    spell->run( ch, result, obj->value[0] );
+
+                if (result->type == SpellTarget::CHAR && result->victim)
+                    mprog_spell( result->victim, ch, skill, false );
+
+                mprog_cast( ch, result, skill, false );
+            }
         } catch (const VictimDeathException &e) {
             break;
         }
