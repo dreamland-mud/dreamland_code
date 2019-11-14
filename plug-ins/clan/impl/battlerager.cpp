@@ -671,7 +671,7 @@ SKILL_RUNP( bandage )
                 return;
         }
 
-        if ( IS_AFFECTED(ch,AFF_REGENERATION) || ch->isAffected(gsn_bandage) )
+        if (ch->isAffected(gsn_bandage))
         {
                 act_p("Ты уже перевяза$gло|л|ла свои раны!",ch,0,0,TO_CHAR,POS_RESTING);
                 return;
