@@ -49,9 +49,9 @@ bool GangstersInfo::canAutoStart( const PlayerList &players, Config &config ) co
     return true;
 }
 
-bool GangstersInfo::canParticipate( PCharacter *ch ) const
+bool GangstersInfo::canHear( PCharacter *ch ) const
 {
-    if (!GlobalQuestInfo::canParticipate( ch ))
+    if (!GlobalQuestInfo::canHear( ch ))
         return false;
 
     if (ch->getAttributes( ).isAvailable( "nogangsters" ))

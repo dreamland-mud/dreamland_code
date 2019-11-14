@@ -40,7 +40,7 @@ void GQuestNotifyPlugin::run( int oldState, int newState, Descriptor *d )
         gq = i->second;
         gqi = manager->findGlobalQuestInfo( i->first );
         
-        if (!gqi->canParticipate( ch->getPC( ) ))
+        if (!gqi->canHear( ch->getPC( ) ))
             continue;
 
         if (!gq->isLevelOK( ch ))

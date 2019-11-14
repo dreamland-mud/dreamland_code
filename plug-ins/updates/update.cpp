@@ -291,8 +291,8 @@ void char_update( )
         if (ch->in_room == 0)
             continue;
 
-        // No timer or affect update will happen in mansion rooms.
-        bool frozen = IS_SET(ch->in_room->room_flags, ROOM_MANSION);
+        // No timer or affect update will happen in chat rooms.
+        bool frozen = IS_SET(ch->in_room->room_flags, ROOM_CHAT);
 
         if (ch->is_mirror() && !ch->isAffected(gsn_doppelganger )) {
             act_p("$c1 разбивается на мелкие осколки.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -697,8 +697,8 @@ void obj_update( void )
             continue;
         }
 
-        // No affect update or item decay in mansion rooms.
-        if (IS_SET(room->room_flags, ROOM_MANSION))
+        // No affect update or item decay in chat rooms.
+        if (IS_SET(room->room_flags, ROOM_CHAT))
             continue;
 
         /* go through affects and decrement */
@@ -1281,8 +1281,8 @@ void player_update( )
 
         ch = d->character->getPC( );
 
-        // Nothing changes inside mansion rooms.
-        if (IS_SET(ch->in_room->room_flags, ROOM_MANSION))
+        // Nothing changes inside chat rooms.
+        if (IS_SET(ch->in_room->room_flags, ROOM_CHAT))
             continue;
 
         if (HAS_SHADOW(ch)) 

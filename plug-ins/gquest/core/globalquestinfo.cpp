@@ -94,8 +94,15 @@ void GlobalQuestInfo::tryStart( const GlobalQuestInfo::Config &config )
     manager->save( this );
 }
 
+/**
+ * Defines who can hear about the quest but cannot join or
+ * get the quest auto-generated for them.
+ */
 bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
 {
+    if (!canHear(ch))
+        return false;
+
     if (ch->is_immortal( ))
         return false;
         
@@ -104,13 +111,21 @@ bool GlobalQuestInfo::canParticipate( PCharacter *ch ) const
             || ch->isAffected( gsn_jail ))
         return false;
 
-    if (ch->getAttributes( ).isAvailable( "nogq" ))
+    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY|ROOM_CHAT))
         return false;
-    
+
+    return true;
+}
+
+/**
+ *  Newbies still on the ship don't get spammed with gq messages.
+ */
+bool GlobalQuestInfo::canHear( PCharacter *ch ) const
+{
     if (ch->getPC( )->getHometown( ) == home_frigate)
         return false;
 
-    if (IS_SET(ch->in_room->room_flags, ROOM_NEWBIES_ONLY|ROOM_MANSION))
+    if (ch->getAttributes( ).isAvailable( "nogq" ))
         return false;
 
     return true;

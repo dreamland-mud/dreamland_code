@@ -56,7 +56,7 @@ bool XMLAttributeQuestData::pull( PCharacter *pch )
     Quest::Pointer quest = attributes->findAttr<Quest>( "quest" );
     int time = getTime( );
     
-    if (IS_SET(pch->in_room->room_flags, ROOM_MANSION))
+    if (IS_SET(pch->in_room->room_flags, ROOM_CHAT))
         return false;
     if (time == 0)
         return false;

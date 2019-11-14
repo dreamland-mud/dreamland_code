@@ -46,6 +46,7 @@ public:
     virtual bool parseArguments( const DLString &, Config &, ostringstream & ) const = 0;
     void findParticipants( PlayerList & ) const;
     virtual bool canParticipate( PCharacter * ) const;
+    virtual bool canHear( PCharacter * ) const;
     virtual bool canAutoStart( const PlayerList &, Config & ) const = 0;
     virtual void tryStart( const Config & );
     virtual GlobalQuestPointer getQuestInstance( ) const = 0;

@@ -22,7 +22,7 @@ public:
     virtual ~GangstersInfo( );
 
     virtual bool canAutoStart( const PlayerList &, Config & ) const;
-    virtual bool canParticipate( PCharacter * ) const;
+    virtual bool canHear( PCharacter * ) const;
     virtual GlobalQuestPointer getQuestInstance( ) const;
     virtual int getDefaultTime( ) const;
 
