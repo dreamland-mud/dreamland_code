@@ -311,6 +311,10 @@ void InterpretHandler::normalPrompt( Character *ch )
                 out << " ";
             break;
 
+        case 'W' :
+            out << ch->wait << "W" << ch->daze << "D";
+            break;
+
         case 'R' :
             if ( ch->is_immortal() && ch->in_room != 0 )
                 out << ch->in_room->vnum;
