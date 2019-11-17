@@ -9,6 +9,7 @@
 #include "skill.h"
 #include "skillcommand.h"
 #include "profession.h"
+#include "religion.h"
 #include "subprofession.h"
 #include "room.h"
 #include "pcharacter.h"
@@ -813,6 +814,72 @@ NMI_INVOKE( BonusWrapper, remove, "(ch): очистить бонус у перс
     return Register(false);
 }
 
+/*----------------------------------------------------------------------
+ * Religion
+ *----------------------------------------------------------------------*/
+NMI_INIT(ReligionWrapper, "reglion, религия");
+
+ReligionWrapper::ReligionWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Scripting::Register ReligionWrapper::wrap( const DLString &name )
+{
+    ReligionWrapper::Pointer hw( NEW, name );
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
+    sobj->setHandler( hw );
+
+    return Scripting::Register( sobj );
+}
+
+Religion * ReligionWrapper::getTarget() const
+{
+    Religion::Pointer relig = religionManager->findExisting(name);
+    if (!relig)
+        throw Scripting::Exception("Religion not found");
+    return *relig;
+}
+
+NMI_INVOKE( ReligionWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<ReligionWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( ReligionWrapper, name, "английское название с маленькой буквы" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( ReligionWrapper, nameRus, "русское название с падежами" ) 
+{
+    return getTarget()->getRussianName( );
+}
+
+NMI_GET( ReligionWrapper, shortDescr, "английское название с большой буквы" ) 
+{
+    return getTarget()->getShortDescr( );
+}
+
+NMI_GET( ReligionWrapper, description, "описание (бог чего именно)" ) 
+{
+    return getTarget()->getDescription( );
+}
+
+NMI_GET( ReligionWrapper, sex, "пол божества (таблица .tables.sex_table)" ) 
+{
+    return Register((int)getTarget()->getSex());
+}
+
+NMI_INVOKE( ReligionWrapper, isAllowed, "(ch): доступна ли религия персонажу")
+{
+    Character *ch = args2character(args);
+    return getTarget()->isAllowed(ch);
+}
 
 /*----------------------------------------------------------------------
  * Skill

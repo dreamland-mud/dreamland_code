@@ -218,6 +218,33 @@ public:
 };
 
 /*----------------------------------------------------------------------
+ * Religion
+ *----------------------------------------------------------------------*/
+class Religion;
+
+class ReligionWrapper : public PluginNativeImpl<ReligionWrapper>, 
+                    public NativeHandler,
+                    public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<ReligionWrapper> Pointer;
+
+    ReligionWrapper() { }
+    ReligionWrapper(const DLString &);
+            
+    virtual void setSelf(Scripting::Object *) { }
+    
+    static Scripting::Register wrap( const DLString & );
+
+    XML_VARIABLE XMLString name;
+
+protected:
+    Religion * getTarget() const;
+};
+
+/*----------------------------------------------------------------------
  * Skill
  *----------------------------------------------------------------------*/
 class Skill;

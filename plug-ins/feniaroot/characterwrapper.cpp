@@ -808,6 +808,23 @@ NMI_SET( CharacterWrapper, profession, "класс (структура .Professi
         target->getPC( )->setProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
+NMI_GET( CharacterWrapper, religion, "класс (структура .Religion)" )
+{
+    checkTarget( );
+    CHK_NPC
+    return ReligionWrapper::wrap( target->getPC( )->getReligion( )->getName( ) );
+}
+
+NMI_SET( CharacterWrapper, religion, "класс (структура .Religion)" )
+{
+    checkTarget( );
+    CHK_NPC
+    if (arg.type == Register::NONE)
+        target->getPC( )->setReligion( "none" );
+    else
+        target->getPC( )->setReligion( wrapper_cast<ReligionWrapper>(arg)->name );
+}
+
 NMI_GET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
 {
     checkTarget( );
