@@ -808,14 +808,14 @@ NMI_SET( CharacterWrapper, profession, "класс (структура .Professi
         target->getPC( )->setProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
-NMI_GET( CharacterWrapper, religion, "класс (структура .Religion)" )
+NMI_GET( CharacterWrapper, religion, "религия (структура .Religion)" )
 {
     checkTarget( );
     CHK_NPC
     return ReligionWrapper::wrap( target->getPC( )->getReligion( )->getName( ) );
 }
 
-NMI_SET( CharacterWrapper, religion, "класс (структура .Religion)" )
+NMI_SET( CharacterWrapper, religion, "религия (структура .Religion)" )
 {
     checkTarget( );
     CHK_NPC

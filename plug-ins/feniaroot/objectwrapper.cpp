@@ -286,6 +286,36 @@ NMI_SET( ObjectWrapper, owner , "имя персонажа-владельца (�
     target->setOwner( d.c_str() );
 }
 
+NMI_SET( ObjectWrapper, personal, "сделать вещь личной для персонажа по англ имени или null")
+{
+    checkTarget();
+
+    if (arg.type == Register::NONE) {
+        target->setOwner(str_empty);
+        target->behavior.clear();
+        return;
+    }
+
+    PCMemoryInterface *pci = PCharacterManager::findPlayer(arg.toString());
+    if (!pci)
+        throw Scripting::Exception("Player with this name not found");
+
+    target->setOwner(pci->getName().c_str());
+    SET_BIT(target->extra_flags, ITEM_NOPURGE|ITEM_NOSAC|ITEM_BURN_PROOF|ITEM_NOSELL);
+    target->setMaterial( "platinum" );
+
+    try {
+        AllocateClass::Pointer p = Class::allocateClass( "PersonalQuestReward" );
+        if (p) {
+            target->behavior.setPointer( p.getDynamicPointer<ObjectBehavior>( ) );
+            target->behavior->setObj(target);
+        }
+    } catch (const ExceptionClassNotFound &e) {
+        LogStream::sendError( ) << e.what( ) << endl;
+        throw Scripting::Exception(e.what());
+    }
+}
+
 NMI_GET( ObjectWrapper, item_type, "тип предмета (таблица .tables.item_table)")
 {
     checkTarget( );
