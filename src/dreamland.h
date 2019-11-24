@@ -54,6 +54,7 @@ class DesireManager;
 class HelpManager;
 class SkillGroupManager;
 class BonusManager;
+class SocketManager;
 
 extern DreamLand * dreamland;
 
@@ -119,10 +120,10 @@ public:
         inline void setOption( int );
         inline void removeOption( int );
         inline void resetOption( int );
+        void setCurrentTime( );
 
 private:
         void setBootTime( );
-        void setCurrentTime( );
         void pulseStart( );
         void pulseEnd( );
 
@@ -195,6 +196,7 @@ private:
         ::Pointer<HelpManager> helpManager;
         ::Pointer<SkillGroupManager> skillGroupManager;
         ::Pointer<BonusManager> bonusManager;
+        ::Pointer<SocketManager> bonusManager;
 
         DbEnvContext *dbEnv;
 };

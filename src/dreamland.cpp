@@ -94,6 +94,7 @@ DreamLand::DreamLand( )
         helpManager.construct( );
         skillGroupManager.construct( );
         bonusManager.construct( );
+        socketManager.construct( );
 
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
@@ -123,6 +124,7 @@ DreamLand::~DreamLand( )
         helpManager.clear( );
         skillGroupManager.clear( );
         bonusManager.clear( );
+        socketManager.clear( );
 
         getDbEnv( )->close( );
         
@@ -179,12 +181,8 @@ void DreamLand::pulseEnd( )
         return;
     }
     sleepTime = pulseEnd - nowTime;
-    
-#ifndef __MINGW32__
-    usleep(1000000*sleepTime/CLOCKS_PER_SEC);
-#else
-    Sleep(1000*sleepTime/CLOCKS_PER_SEC);
-#endif
+
+    socketManager->run(sleepTime);
 }
 
 

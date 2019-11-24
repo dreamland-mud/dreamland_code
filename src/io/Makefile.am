@@ -21,6 +21,7 @@ dlfile.cpp \
 dlfileop.cpp \
 dlfilestream.cpp \
 exceptiondbio.cpp \
+socketmanager.cpp \
 xmlloader.cpp \
 xmltableelement.cpp \
 xmltableloader.cpp \
