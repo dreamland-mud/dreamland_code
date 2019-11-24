@@ -143,12 +143,6 @@ void DreamLand::run( )
         LastLogStream::send( ) <<  "Scheduler run"  << endl;
         scheduler->tick( );
         
-        LastLogStream::send( ) <<  "Processes pulse"  << endl;
-        processManager->yield( );
-
-        LastLogStream::send( ) <<  "Plugins reload"  << endl;
-        pluginManager->checkReloadRequest( );
-
         LastLogStream::send( ) <<  "Time goes..."  << endl;
         pulseEnd( );
 

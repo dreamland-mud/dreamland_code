@@ -102,10 +102,13 @@ ProcessManager::ProcessManager( )
 {
     running.mux.lock( );
     thisClass = this;
+    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
 }
 
 ProcessManager::~ProcessManager( )
 {
+    DLScheduler::getThis( )->slayInstance(Pointer(this));
+
     if(running.next != &running)
         LogStream::sendError( ) << "not all threads finished!" << endl;
 
@@ -118,5 +121,24 @@ ProcessManager::yield()
 {
     if(running.next != &running) 
         running.yield( );
+}
+
+void 
+ProcessManager::run( )
+{
+    LastLogStream::send( ) <<  "Processes pulse"  << endl;
+    thisClass->yield( );
+}
+
+void 
+ProcessManager::after( )
+{
+    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
+}
+
+int 
+ProcessManager::getPriority( )
+{
+    return SCDP_PROCESS;
 }
 

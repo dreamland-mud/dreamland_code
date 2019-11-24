@@ -11,14 +11,18 @@
 #include "exception.h"
 #include "oneallocate.h"
 #include "xmlloader.h"
+#include "schedulertask.h"
 
 #include "sharedobject.h"
 
 class PluginReloadRequest;
 
+#define SCDP_RELOAD_PLUGIN       12000
+
 class PluginManager : public map<DLString, XMLSharedObject>,
                       public OneAllocate, 
-                      public virtual XMLLoader
+                      public virtual XMLLoader,
+                      public SchedulerTask
 {
 friend class XMLSharedObject;
 public:
@@ -47,6 +51,10 @@ public:
     
     XMLSharedObject &load( const DLString &name );
     void unload( const DLString &name );
+
+    virtual void run( );
+    virtual void after( );
+    virtual int getPriority( );
 
 private:
     ::Pointer<PluginReloadRequest> request;

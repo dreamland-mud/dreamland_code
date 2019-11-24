@@ -31,10 +31,12 @@ PluginManager::PluginManager( )
 {
     checkDuplicate( thisClass );
     thisClass = this;
+    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
 }
 
 PluginManager::~PluginManager( )
 {
+    DLScheduler::getThis( )->slayInstance(Pointer(this));
     unloadAll( );
     thisClass = 0;
 }
@@ -193,5 +195,24 @@ DLString PluginManager::getTableName( ) const
 DLString PluginManager::getNodeName( ) const
 {
     return NODE_NAME;
+}
+
+void 
+PluginManager::run( )
+{
+    LastLogStream::send( ) <<  "Plugins reload"  << endl;
+    checkReloadRequest( );
+}
+
+void 
+PluginManager::after( )
+{
+    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
+}
+
+int 
+PluginManager::getPriority( )
+{
+    return SCDP_RELOAD_PLUGIN;
 }
 
