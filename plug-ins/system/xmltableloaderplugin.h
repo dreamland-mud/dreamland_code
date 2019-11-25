@@ -7,6 +7,8 @@
 
 #include "plugin.h"
 #include "xmltableloader.h"
+#include "oneallocate.h"
+#include "dlxmlloader.h"
 
 /*
  * XMLTableLoaderPlugin
@@ -27,5 +29,24 @@ public:
             return nodeName;                                                  \
         }                                                                     \
     }
+
+#define TABLE_LOADER_DECL(className) \
+    struct className : public XMLTableLoaderPlugin, public DLXMLTableLoader,  \
+                       public OneAllocate  {                                  \
+                                                                              \
+        className();                                                          \
+        virtual ~className();                                                 \
+        virtual DLString getTableName( ) const;                               \
+        virtual DLString getNodeName( ) const;                                \
+    };                                                                        \
+    extern className *the ## className;                          
+
+#define TABLE_LOADER_IMPL(className, tableName, nodeName)                     \
+className *the ## className = 0;                                              \
+className::className() { checkDuplicate(the ## className); the ## className = this; } \
+className::~className() { the ## className = 0; }                             \
+DLString className::getTableName() const { return tableName; }                \
+DLString className::getNodeName() const { return nodeName; }                  
+
 
 #endif

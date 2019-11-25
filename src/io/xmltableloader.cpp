@@ -94,3 +94,23 @@ void XMLTableLoader::readAll( bool fVerbose )
 }
 
 
+void XMLTableLoader::saveElement(XMLTableElement::Pointer element)
+{
+    DBIO dir( getTablePath( ), getTableName( ) );    
+    LogStream::sendNotice( ) << "Saving " << getTableName( ) << "/" << element->getName() << "..." << endl;
+
+    try {
+        ostringstream ostr;
+        XMLStreamable<XMLTableElement> ptrElement( getNodeName( ) );
+
+        ptrElement.setPointer( element.getPointer( ) );
+        ptrElement.toStream( ostr );
+
+        dir.insert( element->getName( ), ostr.str( ) );
+    }
+    catch (const Exception& ex) {
+        LogStream::sendError( ) 
+            << "Error while saving " << element->getName( ) << ": " << ex << endl;
+    }
+}
+
