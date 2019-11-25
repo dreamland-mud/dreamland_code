@@ -340,6 +340,7 @@ struct editor_table_entry {
     {"room",   "redit"},
     {"object", "oedit"},
     {"mobile", "medit"},
+    {"help",   "hmedit"},
     {NULL, 0,}
 };
 

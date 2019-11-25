@@ -25,6 +25,8 @@ public:
     virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
     virtual DLString getText( Character * = NULL ) const;
     virtual bool visible( Character * ) const;
+    /** Persist an XML file containing this article to disk. */
+    virtual void save() const;
 
     /** Register new keyword for this article. */
     void addKeyword( const DLString & );

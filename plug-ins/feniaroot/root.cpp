@@ -16,7 +16,7 @@
 #include "infonet.h"
 #include "messengers.h"
 #include "commonattributes.h"
-#include "webmanip.h"
+#include "websocketrpc.h"
 
 #include "dreamland.h"
 #include "weather.h"

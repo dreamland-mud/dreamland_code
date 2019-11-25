@@ -13,6 +13,7 @@ xmlindexdata.cpp \
 redit.cpp \
 sedit.cpp \
 aedit.cpp \
+hedit.cpp \
 medit.cpp \
 oedit.cpp \
 eeedit.cpp \
@@ -32,6 +33,7 @@ feniatriggers.cpp
 libolc_la_MOC = \
 redit.h \
 aedit.h \
+hedit.h \
 medit.h \
 sedit.h \
 oedit.h \

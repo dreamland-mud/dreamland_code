@@ -6,6 +6,7 @@
 #include "dl_ctype.h"
 #include "logstream.h"
 #include "descriptor.h"
+#include "websocketrpc.h"
 #include "pcharacter.h"
 #include "race.h"
 #include "merc.h"
@@ -14,11 +15,6 @@
 LANG(common);   LANG(human);   LANG(dwarvish);
 LANG(elvish);   LANG(gnomish); LANG(giant);
 LANG(trollish); LANG(cat);
-
-static bool is_websock( Character *ch )
-{
-    return ch && ch->desc && ch->desc->websock.state == WS_ESTABLISHED;
-}
 
 /*------------------------------------------------------------------------------------
  * ColorTags

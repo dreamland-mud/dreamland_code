@@ -11,6 +11,7 @@ descriptor.cpp \
 bufferhandler.cpp \
 inputhandler.cpp \
 outofband.cpp \
+websocketrpc.cpp \
 impl.cpp
 
 libdescriptor_la_MOC = \

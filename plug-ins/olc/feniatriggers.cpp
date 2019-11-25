@@ -5,6 +5,7 @@
 #include "plugininitializer.h"
 #include "wrappermanager.h"
 #include "iconvmap.h"
+#include "websocketrpc.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -116,7 +117,7 @@ static Register get_wrapper_for_index_data(int vnum, const DLString &type)
 
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
 {
-    if (ch->desc->websock.state != WS_ESTABLISHED) {
+    if (!is_websock(ch)) {
         ch->println("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }

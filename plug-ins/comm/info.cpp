@@ -10,7 +10,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "xmlpcstringeditor.h"
-
+#include "websocketrpc.h"
 #include "gsn_plugin.h"
 #include "handler.h"
 #include "vnum.h"
@@ -62,7 +62,7 @@ CMDRUNP( description )
         ch->getPC( )->getAttributes().getAttr<XMLAttributeEditorState>("edstate") 
             ->regs[0].split(ch->getDescription( )); 
 
-        if (ch->desc->websock.state != WS_ESTABLISHED) {
+        if (!is_websock(ch)) {
                 ch->println("Описание скопировано в буфер редактора, однако пользоваться редактором можно только изнутри веб-клиента.");
         } else {
                 ch->println("Описание скопировано в буфер редактора, используй команду {lRвебредактор{lEwebedit{x для редактирования.");

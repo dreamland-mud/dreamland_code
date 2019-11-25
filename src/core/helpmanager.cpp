@@ -67,6 +67,12 @@ void HelpArticle::setText( const DLString &text )
     assign( text );
 }
 
+void HelpArticle::save() const
+{
+    // Empty default impelemntation.
+}
+
+
 void HelpArticle::addKeyword( const DLString &add )
 {
     // 'add' can contain a list of keywords, parse them into keywords set.

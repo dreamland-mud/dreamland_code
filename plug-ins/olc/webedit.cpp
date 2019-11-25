@@ -8,6 +8,7 @@
 #include "xmlpcstringeditor.h"
 
 #include "descriptorstatemanager.h"
+#include "websocketrpc.h"
 #include "pcharacter.h"
 #include "merc.h"
 #include "descriptor.h"
@@ -23,7 +24,7 @@ CMDRUNP( webedit )
         return;
     }
     
-    if (ch->desc->websock.state != WS_ESTABLISHED) {
+    if (!is_websock(ch)) {
         ch->println("Этой командой можно пользоваться только изнутри веб-клиента.");
         return;
     }

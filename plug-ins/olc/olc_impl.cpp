@@ -8,6 +8,7 @@
 
 #include "olc.h"
 #include "aedit.h"
+#include "hedit.h"
 #include "redit.h"
 #include "medit.h"
 #include "oedit.h"
@@ -37,6 +38,7 @@ extern "C"
         Plugin::registerPlugin<OLCInterpretLayer>( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateRoom> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateArea> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateHelp> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateMobile> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateObject> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateExtraExit> >( ppl );

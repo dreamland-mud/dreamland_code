@@ -14,10 +14,13 @@
 #include "xmlenumeration.h"
 #include "xmlflags.h"
 #include "xmlglobalbitvector.h"
+#include "xmltableloaderplugin.h"
 
 #include "helpmanager.h"
 #include "markuphelparticle.h"
 #include "race.h"
+
+TABLE_LOADER_DECL(RaceLoader);
 
 /*
  * RaceHelp
@@ -28,6 +31,7 @@ public:
 
     virtual void setRace( Race::Pointer );
     virtual void unsetRace( );
+    virtual void save() const;
 
     virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;

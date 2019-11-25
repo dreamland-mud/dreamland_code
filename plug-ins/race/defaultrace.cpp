@@ -18,12 +18,16 @@
 #include "wearlocation.h"
 #include "alignment.h"
 #include "logstream.h"
+#include "websocketrpc.h"
 
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
 
 using namespace std;
+
+TABLE_LOADER_IMPL(RaceLoader, "races", "Race");
+
 /*-------------------------------------------------------------------
  * RaceHelp 
  *------------------------------------------------------------------*/
@@ -54,6 +58,15 @@ void RaceHelp::unsetRace( )
     race.clear( );
     keywords.clear();
     fullKeyword = "";
+}
+
+void RaceHelp::save() const
+{
+    if (!race)
+        return;
+    
+    DefaultRace::Pointer element(dynamic_cast<const DefaultRace *>(*race));
+    theRaceLoader->saveElement(element);
 }
 
 DLString RaceHelp::getTitle(const DLString &label) const
@@ -88,9 +101,10 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "Раса {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " или {C" << race->getName( ) << "{x" << endl << endl;
-
-    in << *this << endl;
+    in << " или {C" << race->getName( ) << "{x" 
+       << "%PAUSE% " << web_edit_button(ch, "hedit", getID()) << "%RESUME%" << endl;
+    
+    in << endl << *this << endl;
 
     const PCRace *r = (const_cast<Race *>(race.getPointer( )))->getPC( );
     if (r) {

@@ -123,24 +123,3 @@ void WebManipManager::destruction( )
 {
 }
 
-
-/**
- * Create command tag in the form of [cmd=...,see=...,nonce=...],
- * which is going to become a clickable action link in webcilent.
- * The client will compare nonce with the one communicated to it in
- * 'version' command, to ensure the link comes from the server and not
- * from random grigoriy in [ooc].
- */
-DLString web_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt)
-{
-    ostringstream buf;
-
-    if (!ch->desc)
-        return seeFmt;
-
-    if (ch->desc->websock.state != WS_ESTABLISHED)
-        return seeFmt;
-
-    buf << "[cmd=" << cmd << ",see=" << seeFmt << ",nonce=" << ch->desc->websock.nonce << "]";
-    return buf.str();
-}
