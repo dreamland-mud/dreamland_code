@@ -11,11 +11,16 @@
 
 #include <dlstring.h>
 
+class PCharacter;
+
 class WebEditorSaveArguments {
 public:
-    WebEditorSaveArguments(const DLString &s) : text(s) {
+    WebEditorSaveArguments(PCharacter *ch, const DLString &s) 
+            : pch(ch), text(s) 
+    {
     }
 
+    PCharacter *pch;
     DLString text;
 };
 
