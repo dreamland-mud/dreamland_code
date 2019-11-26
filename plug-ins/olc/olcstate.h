@@ -72,7 +72,10 @@ public:
     static bool can_edit( Character *, int );
     static bool can_edit( Character *, area_data * );
     
-    /* returns corresponding area pointer for mob/room/obj vnum */
+    /** Find OLC input handler for descriptor. */
+    static OLCState::Pointer getOLCState(Descriptor *d);
+
+    /** returns corresponding area pointer for mob/room/obj vnum */
     static area_data *get_vnum_area( int );
 
 protected:
@@ -98,9 +101,10 @@ protected:
     bool editorCopy(const char *field);
     bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editorPaste(char *&field, editor_flags flags = ED_NO_FLAG);
+    bool editorWeb(const DLString &original);
     bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
-
+    
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;
     XML_VARIABLE OLCStringEditor strEditor;

@@ -21,6 +21,8 @@
 #include "logstream.h"
 #include "so.h"
 #include "plugin.h"
+#include "xmlattributeplugin.h"
+#include "mocregistrator.h"
 
 #include "mercdb.h"
 
@@ -34,7 +36,6 @@ extern "C"
         SO::PluginList ppl;
         
         OnlineCreation::registerPlugin(ppl);
-        Plugin::registerPlugin<XMLAttributeOLCPlugin>( ppl );
         Plugin::registerPlugin<OLCInterpretLayer>( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateRoom> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateArea> >( ppl );
@@ -42,6 +43,8 @@ extern "C"
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateMobile> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateObject> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateExtraExit> >( ppl );
+        Plugin::registerPlugin<MocRegistrator<XMLVnumRange> >( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeOLC> >( ppl );
 
         return ppl;
     }

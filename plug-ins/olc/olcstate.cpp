@@ -9,6 +9,7 @@
 #include "sedit.h"
 #include "pcharacter.h"
 #include "security.h"
+#include "interp.h"
 #include "arg_utils.h"
 #include "mercdb.h"
 
@@ -31,6 +32,7 @@ short OLCCommand::getLog( ) const
 
 bool OLCCommand::matches( const DLString &argument ) const
 {
+    // TODO match Russian names.
     return !argument.empty( ) && argument.strPrefix( name );
 }
 
@@ -69,21 +71,13 @@ OLCInterpretLayer::putInto( )
 bool 
 OLCInterpretLayer::process( InterpretArguments &iargs )
 {
-    OLCState::Pointer state;
-    Descriptor *d;
-    
     if (iargs.ch->is_npc( ))
         return true;
     
-    d = iargs.d;
-
-    if (!d || d->handle_input.empty( ))
+    OLCState::Pointer state = OLCState::getOLCState(iargs.d);
+    if (!state) {
         return true;
-    
-    state = d->handle_input.front( ).getDynamicPointer<OLCState>( );
-
-    if (!state)
-        return true;
+    }
     
     if(iargs.cmdName.empty())
         iargs.cmdName = "show";
@@ -93,7 +87,7 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 
     iargs.pCommand = state->findCommand( iargs.ch->getPC( ), iargs.cmdName );
 
-    if (iargs.pCommand)
+    if (iargs.pCommand) 
         iargs.advance( );
     
     return true;
@@ -104,6 +98,17 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
  *-------------------------------------------------------------------------*/
 OLCState::OLCState() : inSedit(false), strEditor(*this)
 {
+}
+
+OLCState::Pointer OLCState::getOLCState(Descriptor *d)
+{
+    OLCState::Pointer state;
+
+    if (!d || d->handle_input.empty( ))
+        return state;
+    
+    state = d->handle_input.front( ).getDynamicPointer<OLCState>( );
+    return state;
 }
 
 int 
@@ -585,6 +590,23 @@ bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
     return true;
 }
 
+/**
+ * Runs 'webedit' for the provided string, remembering invoked command ('desc', 'short' etc)
+ * inside an attribute. '<desc> paste' will be done from the attribute's event handler once 
+ * webedit has finished.
+ */
+bool OLCState::editorWeb(const DLString &original)
+{
+    PCharacter *ch = owner->character->getPC();
+
+    editorCopy(original);
+
+    XMLAttributeOLC::Pointer attr = ch->getAttributes().getAttr<XMLAttributeOLC>("olc");
+    attr->saveCommand.setValue(lastCmd + " paste");
+    interpret_raw(ch, "webedit");
+    return false;
+}
+
 bool OLCState::editor(const char *argument, DLString &original, editor_flags flags)
 {
     PCharacter *ch = owner->character->getPC();
@@ -607,9 +629,13 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     if (arg_oneof(command, "paste", "вставить"))  
         return editorPaste(original, flags);
 
+    if (arg_oneof(command, "web",  "веб"))
+        return editorWeb(original);
+
     if (arg_is_help(command)) {
         stc("Команды редактора:\n\r", ch);
         ptc(ch, "%s        : войти во встроенный редактор описаний\n\r", cmd);
+        ptc(ch, "%s web    : отредактировать описание в вебредакторе\n\r", cmd);
         ptc(ch, "%s copy   : скопировать описание в буфер\n\r", cmd);
         ptc(ch, "%s paste  : заменить описание на то, что в буфере\n\r", cmd);
         ptc(ch, "%s строка : заменить описание на строку\r\n", cmd);
@@ -715,3 +741,4 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
     findCommand(ch, cmd)->run(ch, "");
     return false;
 }
+

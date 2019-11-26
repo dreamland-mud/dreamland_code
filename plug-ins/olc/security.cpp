@@ -11,10 +11,12 @@
 #include "mercdb.h"
 #include "handler.h"
 #include "merc.h"
+#include "interp.h"
 
 #include "security.h"
 #include "olc.h"
 #include "onlinecreation.h"
+#include "olcstate.h"
 
 #include "def.h"
 
@@ -71,18 +73,27 @@ bool XMLAttributeOLC::isOverlapping( int a, int b )
     return false;
 }
 
-void XMLAttributeOLCPlugin::initialization( ) 
-{
-    Class::regMoc<XMLVnumRange>( );
-    Class::regMoc<XMLAttributeOLC>( );
-    XMLAttributePlugin::initialization( );
-}
 
-void XMLAttributeOLCPlugin::destruction( ) 
+bool XMLAttributeOLC::handle( const WebEditorSaveArguments &args )
 {
-    XMLAttributePlugin::destruction( );
-    Class::unregMoc<XMLVnumRange>( );
-    Class::unregMoc<XMLAttributeOLC>( );
+    if (saveCommand.empty())
+        return false;
+
+    OLCState::Pointer state = OLCState::getOLCState(args.pch->desc);
+    if (!state) {
+        // Got out of OLC while in webedit.
+        saveCommand.clear();
+        return false;
+    }
+
+    // Copy webedit result to the attribute that is used by all 'paste' commands.
+    args.pch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0].split(args.text);
+
+    // Run '<cmd> paste' whatever.
+    state->handle(args.pch->desc, const_cast<char *>(saveCommand.c_str()));
+
+    saveCommand.clear();
+    return true;
 }
 
 /*
