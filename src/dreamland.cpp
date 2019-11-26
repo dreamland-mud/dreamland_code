@@ -161,30 +161,26 @@ void DreamLand::run( )
 
 void DreamLand::pulseStart( )
 {
-    pulseStartTime = clock( );
+    gettimeofday(&pulseStartTime, NULL);
 }
 
 void DreamLand::pulseEnd( )
 {
-    // Synchronize to a clock.
-    // Sleep( last_time + 1/PULSE_PER_SCD - now ).
-    // Careful here of signed versus unsigned arithmetic.
-    clock_t nowTime, pulseEnd, sleepTime;
+    struct timeval pulseEnd, now, pulseWidth = { 0, 1000000/getPulsePerSecond( ) };
     
-    pulseEnd = pulseStartTime + CLOCKS_PER_SEC / getPulsePerSecond( );
+    timeradd(&pulseStartTime, &pulseWidth, &pulseEnd);
 
-    Scripting::Object::manager->sync( pulseEnd );
+    Scripting::Object::manager->sync(&pulseEnd);
     
-    nowTime = clock( );
+    gettimeofday(&now, NULL);
 
-    if(nowTime > pulseEnd) {
-        sleepTime = nowTime - pulseEnd;
-        LogStream::sendError() 
-            << "pulse overflow " 
-            << (1000 * sleepTime / CLOCKS_PER_SEC) << "msec" << endl;
+    timersub(&now, &pulseStartTime, &pulseWidth);
+    int sleepTime = pulseWidth.tv_sec*1000 + pulseWidth.tv_usec/1000;
+
+    if(sleepTime < 0) {
+        LogStream::sendError() << "pulse overflow " << -sleepTime << "msec" << endl;
         return;
     }
-    sleepTime = pulseEnd - nowTime;
     
 #ifndef __MINGW32__
     usleep(1000000*sleepTime/CLOCKS_PER_SEC);

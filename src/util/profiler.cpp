@@ -11,29 +11,22 @@
 void
 Profiler::start()
 {
-    started = clock( );
+    gettimeofday(&started, NULL);
 }
 
 void
 Profiler::stop()
 {
-    stopped = clock( );
-}
-
-long Profiler::getStart() const
-{
-    return started;
-}
-
-long Profiler::getStop() const
-{
-    return stopped;
+    gettimeofday(&stopped, NULL);
 }
 
 long
 Profiler::msec()
 {
-    return 1000*(stopped - started)/CLOCKS_PER_SEC;
+    struct timeval result;
+    timersub(&stopped, &started, &result);
+
+    return result.tv_sec*1000 + result.tv_usec/1000;
 }
 
 
