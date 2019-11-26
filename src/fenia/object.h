@@ -125,10 +125,10 @@ public:
 
     virtual void seq( id_t, Data & );
 
-    bool tlim(clock_t );
-    bool syncPut(clock_t );
-    bool syncDel(clock_t );
-    bool sync(clock_t );
+    bool tlim(struct timeval *);
+    bool syncPut(struct timeval *);
+    bool syncDel(struct timeval *);
+    bool sync(struct timeval *);
 
     void backup();
     void recover();

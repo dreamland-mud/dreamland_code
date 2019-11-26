@@ -31,6 +31,9 @@
 #include "dldirectory.h"
 #include "xmlconfigurable.h"
 
+#include <sys/time.h>
+
+
 class DbEnvContext;
 
 class DreamLand;
@@ -139,7 +142,7 @@ private:
         /** world booting time */
         time_t bootTime;
 
-        clock_t pulseStartTime;
+        struct timeval pulseStartTime;
 
         long long lastID;
         
