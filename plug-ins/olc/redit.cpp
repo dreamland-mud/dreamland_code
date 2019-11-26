@@ -30,6 +30,7 @@
 #include "handler.h"
 #include "act_move.h"
 #include "update_areas.h"
+#include "websocketrpc.h"
 
 #include "mercdb.h"
 
@@ -250,9 +251,12 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     int door;
     bool fcnt;
 
-    ptc(ch, "Description:\n\r%s", pRoom->description);
-    ptc(ch, "Name:       [{W%s{x]\n\rArea:       [{W%5d{x] %s\n\r",
-              pRoom->name, pRoom->area->vnum, pRoom->area->name);
+    ptc(ch, "Description: %s\n\r%s", 
+        web_edit_button(ch, "desc", "web").c_str(), pRoom->description);
+
+    ptc(ch, "Name:       [{W%s{x] %s\n\rArea:       [{W%5d{x] %s\n\r",
+              pRoom->name, web_edit_button(ch, "name", "web").c_str(),
+              pRoom->area->vnum, pRoom->area->name);
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
     ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
     ptc(ch, "Guilds: [{W%s{x]\n\r", pRoom->guilds.toString().c_str());
