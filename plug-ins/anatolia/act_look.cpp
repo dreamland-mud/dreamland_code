@@ -41,6 +41,7 @@
 
 #include "descriptor.h"
 #include "webmanip.h"
+#include "websocketrpc.h"
 #include "comm.h"
 #include "gsn_plugin.h"
 #include "directions.h"
@@ -1187,6 +1188,8 @@ rprog_descr( Room *room, Character *ch, const DLString &descr )
     if (ch->getConfig( )->holy) 
         buf << " {" << CLR_RVNUM(ch) << "[Room " << room->vnum
             << "][" << room->area->name << "]{x";
+
+    buf << " " << web_edit_button(ch, "redit|show", room->vnum);
     
     buf << endl;
 
