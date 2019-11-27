@@ -199,7 +199,7 @@ private:
         ::Pointer<HelpManager> helpManager;
         ::Pointer<SkillGroupManager> skillGroupManager;
         ::Pointer<BonusManager> bonusManager;
-        ::Pointer<SocketManager> bonusManager;
+        ::Pointer<SocketManager> socketManager;
 
         DbEnvContext *dbEnv;
 };

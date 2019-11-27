@@ -52,7 +52,7 @@ public:
 
     virtual void run( );
     virtual void after( );
-    virtual int getPriority( );
+    virtual int getPriority( ) const;
 
     RoundRobinElement running, stopped;
 private:

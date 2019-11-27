@@ -43,11 +43,16 @@ public:
         /** Текущий приоритет в обрабатываемом мэпе */
         int getPriority( ) const;
         long getCurrentTick( ) const;
-        
+
+        static Scheduler *getThis() { return instance; }
+       
 protected:
         SchedulerQueue queue;
         long time;
         ::Pointer<SchedulerPriorityMap> working;
+
+private:
+        static Scheduler *instance;
 };
 
 #endif

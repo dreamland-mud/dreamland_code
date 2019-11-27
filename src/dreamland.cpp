@@ -41,6 +41,7 @@
 #include "hometown.h"
 #include "wearlocation.h"
 #include "feniamanager.h"
+#include "socketmanager.h"
 #include "process.h"
 #include "religion.h"
 #include "liquid.h"
@@ -160,25 +161,36 @@ void DreamLand::pulseStart( )
     gettimeofday(&pulseStartTime, NULL);
 }
 
+static int 
+sleepTime(struct timeval *pulseEnd)
+{
+    struct timeval now, tmp;
+
+    gettimeofday(&now, NULL);
+    timersub(pulseEnd, &now, &tmp);
+    return tmp.tv_sec*1000 + tmp.tv_usec/1000;
+}
+
 void DreamLand::pulseEnd( )
 {
-    struct timeval pulseEnd, now, pulseWidth = { 0, 1000000/getPulsePerSecond( ) };
+    struct timeval pulseEnd, pulseWidth = { 0, 1000000/getPulsePerSecond( ) };
+    int ms;
     
     timeradd(&pulseStartTime, &pulseWidth, &pulseEnd);
 
     Scripting::Object::manager->sync(&pulseEnd);
-    
-    gettimeofday(&now, NULL);
 
-    timersub(&now, &pulseStartTime, &pulseWidth);
-    int sleepTime = pulseWidth.tv_sec*1000 + pulseWidth.tv_usec/1000;
+    ms = sleepTime(&pulseEnd);
 
-    if(sleepTime < 0) {
-        LogStream::sendError() << "pulse overflow " << -sleepTime << "msec" << endl;
+    if(ms < 0) {
+        LogStream::sendError() << "pulse overflow " << -ms << "msec" << endl;
         return;
     }
 
-    socketManager->run(sleepTime);
+    do {
+        socketManager->run(ms);
+        ms = sleepTime(&pulseEnd);
+    } while(ms > 0);
 }
 
 

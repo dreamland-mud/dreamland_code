@@ -8,6 +8,8 @@
 
 #include "oneallocate.h"
 
+struct timeval;
+
 class SocketTask : public virtual DLObject
 {
     friend class SocketManager;

@@ -26,6 +26,7 @@ class PluginManager : public map<DLString, XMLSharedObject>,
 {
 friend class XMLSharedObject;
 public:
+    typedef ::Pointer<PluginManager> Pointer;
 
     PluginManager( );
     virtual ~PluginManager( );
@@ -54,7 +55,7 @@ public:
 
     virtual void run( );
     virtual void after( );
-    virtual int getPriority( );
+    virtual int getPriority( ) const;
 
 private:
     ::Pointer<PluginReloadRequest> request;

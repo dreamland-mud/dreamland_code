@@ -51,37 +51,24 @@ SocketManager::run(int ms)
         fds[j].events = (*i)->flags;
     }
 
-    do {
-        int rc = poll(fds, size(), ms);
+    int rc = poll(fds, size(), ms);
 
-        if(rc == 0) {
-            return;
-        }
-
-        if(rc < 0) {
-            LogStream::sendError() << "poll: " << strerror(errno) << endl;
-            return;
-        }
-        
-        j = 0;
-        for(iterator i=clone.begin();i!=clone.end();i++, j++) {
-            if(fds[j].revents & POLLIN)
-                (*i)->handleRead();
-            
-            if(fds[j].revents & POLLOUT)
-                (*i)->handleWrite();
-        }
-
-    nowTime = clock( );
-
-    if(nowTime > pulseEnd) {
-        sleepTime = nowTime - pulseEnd;
-        LogStream::sendError() 
-            << "pulse overflow " 
-            << (1000 * sleepTime / CLOCKS_PER_SEC) << "msec" << endl;
+    if(rc == 0) {
         return;
     }
-    sleepTime = pulseEnd - nowTime;
-    } while(ms > 0);
+
+    if(rc < 0) {
+        LogStream::sendError() << "poll: " << strerror(errno) << endl;
+        return;
+    }
+    
+    j = 0;
+    for(iterator i=clone.begin();i!=clone.end();i++, j++) {
+        if(fds[j].revents & POLLIN)
+            (*i)->handleRead();
+        
+        if(fds[j].revents & POLLOUT)
+            (*i)->handleWrite();
+    }
 }
 

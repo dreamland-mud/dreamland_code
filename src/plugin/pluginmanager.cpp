@@ -7,8 +7,10 @@
 
 #include "xmllist.h"
 #include "logstream.h"
+#include "lastlogstream.h"
 #include "xmlfile.h"
 
+#include "scheduler.h"
 #include "pluginmanager.h"
 #include "plugin.h"
 
@@ -31,12 +33,12 @@ PluginManager::PluginManager( )
 {
     checkDuplicate( thisClass );
     thisClass = this;
-    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
+    Scheduler::getThis( )->putTaskInitiate(Pointer(this));
 }
 
 PluginManager::~PluginManager( )
 {
-    DLScheduler::getThis( )->slayInstance(Pointer(this));
+    Scheduler::getThis( )->slayInstance(Pointer(this));
     unloadAll( );
     thisClass = 0;
 }
@@ -207,11 +209,11 @@ PluginManager::run( )
 void 
 PluginManager::after( )
 {
-    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
+    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
 }
 
 int 
-PluginManager::getPriority( )
+PluginManager::getPriority( ) const
 {
     return SCDP_RELOAD_PLUGIN;
 }

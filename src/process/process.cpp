@@ -5,6 +5,9 @@
 
 #include "process.h"
 #include "logstream.h"
+#include "lastlogstream.h"
+
+#include "scheduler.h"
 
 //#define PDEBUG
 
@@ -102,12 +105,12 @@ ProcessManager::ProcessManager( )
 {
     running.mux.lock( );
     thisClass = this;
-    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
+    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
 }
 
 ProcessManager::~ProcessManager( )
 {
-    DLScheduler::getThis( )->slayInstance(Pointer(this));
+    Scheduler::getThis( )->slayInstance(Pointer(this));
 
     if(running.next != &running)
         LogStream::sendError( ) << "not all threads finished!" << endl;
@@ -133,11 +136,11 @@ ProcessManager::run( )
 void 
 ProcessManager::after( )
 {
-    DLScheduler::getThis( )->putTaskInitiate( Pointer(this) );
+    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
 }
 
 int 
-ProcessManager::getPriority( )
+ProcessManager::getPriority( ) const
 {
     return SCDP_PROCESS;
 }

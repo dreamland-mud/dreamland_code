@@ -13,12 +13,17 @@
 class SchedulerTask;
 typedef Pointer<SchedulerTask> SchedulerTaskPointer;
 
+Scheduler *Scheduler::instance = NULL;
+
+
 Scheduler::Scheduler( ) : time( 0 )
 {
+    instance = this;
 }
 
 Scheduler::~Scheduler( )
 {
+    instance = NULL;
 }
 
 void Scheduler::putTask( long offset, SchedulerTaskPointer task )
