@@ -9,15 +9,20 @@
  * 'version' command, to ensure the link comes from the server and not
  * from random grigoriy in [ooc].
  */
-DLString web_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt)
+DLString web_cmd(Descriptor *d, const DLString &cmd, const DLString &seeFmt)
 {
     ostringstream buf;
 
-    if (!is_websock(ch))
+    if (!is_websock(d))
         return seeFmt;
 
-    buf << "[cmd=" << cmd << ",see=" << seeFmt << ",nonce=" << ch->desc->websock.nonce << "]";
+    buf << "[cmd=" << cmd << ",see=" << seeFmt << ",nonce=" << d->websock.nonce << "]";
     return buf.str();
+}
+
+DLString web_cmd(Character *ch, const DLString &cmd, const DLString &seeFmt)
+{
+    return web_cmd(ch->desc, cmd, seeFmt);
 }
 
 DLString web_edit_button(Character *ch, const DLString &editor, const DLString &args)
@@ -35,5 +40,10 @@ DLString web_edit_button(Character *ch, const DLString &editor, const DLString &
 
 bool is_websock( Character *ch )
 {
-    return ch && ch->desc && ch->desc->websock.state == WS_ESTABLISHED;
+    return ch && is_websock(ch->desc);
+}
+
+bool is_websock( Descriptor *d )
+{
+    return d && d->websock.state == WS_ESTABLISHED;
 }

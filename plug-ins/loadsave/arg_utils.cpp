@@ -171,6 +171,21 @@ bool arg_is_gold( const DLString &arg )
     return arg_oneof_strict( arg, "gold", "золото", "золота", "золотых" );
 }
 
+bool arg_is_copy( const DLString &arg )
+{
+    return arg_oneof(arg, "copy", "копировать");
+}
+
+bool arg_is_paste( const DLString &arg )
+{
+    return arg_oneof(arg, "paste", "вставить");
+}
+
+bool arg_is_web( const DLString &arg )
+{
+    return arg_oneof(arg, "web", "веб");
+}
+
 bool arg_is_money( const DLString &arg )
 {
     return arg_oneof( arg, "coin", "coins", "silver" )

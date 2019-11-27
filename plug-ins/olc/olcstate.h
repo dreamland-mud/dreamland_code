@@ -101,7 +101,7 @@ protected:
     bool editorCopy(const char *field);
     bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editorPaste(char *&field, editor_flags flags = ED_NO_FLAG);
-    bool editorWeb(const DLString &original);
+    bool editorWeb(const DLString &original, const DLString &saveCommand);
     bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
     

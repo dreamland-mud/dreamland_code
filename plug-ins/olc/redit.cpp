@@ -55,7 +55,8 @@ OLCStateRoom::attach(PCharacter *ch, Room *pRoom)
 {
     originalRoom.setValue( ch->in_room->vnum );
     
-    transfer_char( ch, ch, pRoom );
+    if (ch->in_room != pRoom)
+        transfer_char( ch, ch, pRoom );
 
     OLCState::attach(ch);
 }
@@ -280,7 +281,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
 
         stc("Extra desc: ", ch);
         for (ed = pRoom->extra_descr; ed; ed = ed->next) {
-            ptc(ch, "[%s] ", ed->keyword);
+            ptc(ch, "[%s] %s ", ed->keyword, web_edit_button(ch, "ed web", ed->keyword).c_str());
         }
         stc("{D(ed help){x\n\r", ch);
     }
@@ -1175,6 +1176,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
         
+        // TODO pass a 'non-interactive' argument to hide web buttons
         OLCStateRoom::show(ch, pRoom2);
         return;
         
