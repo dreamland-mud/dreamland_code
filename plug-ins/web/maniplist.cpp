@@ -13,7 +13,8 @@ Manip::Manip( const DLString &cmdName, const DLString &args )
 
 DLString Manip::toString( ) const 
 {
-    return cmd->getRussianName( ) + " " + args;
+    const DLString &rname = cmd->getRussianName().empty() ? cmd->getName() : cmd->getRussianName();
+    return rname + " " + args;
 }
 
 const DLString ManipList::TAG = "m";

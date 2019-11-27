@@ -59,6 +59,10 @@ struct ItemManipList : public ManipList {
         locals.push_back( Manip( cmdName, THIS ) );
     }
 
+    void addLocal( const DLString &cmdName, const DLString &arg ) {
+        locals.push_back( Manip( cmdName, arg ) );
+    }
+
     // Add commands to the main list, with various arguments.
     void add( const DLString &cmdName ) {
         manips.push_back( Manip( cmdName, THIS ) );
@@ -337,7 +341,12 @@ WEBMANIP_RUN(decorateItem)
     ItemManipList manips( item, descr );
     bitstring_t wear = item->wear_flags;
     REMOVE_BIT(wear, ITEM_TAKE|ITEM_NO_SAC);
-    
+
+    if (ch->is_immortal())  {
+        manips.addLocal("stat", "obj $");
+        manips.addLocal("oedit", DLString(item->pIndexData->vnum));
+    }
+
     // My inventory or equipment:
     if (item->carried_by == ch) {
         // Item type-specific commands.

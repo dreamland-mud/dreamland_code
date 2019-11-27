@@ -851,7 +851,7 @@ CMDWIZP( stat )
         
         victim =  fChar ? get_player_world( ch->getPC( ), string ) : get_char_world( ch, string );
         if (!victim) {
-            ch->pecho("%s с таким именем не найден.", fMob ? "Персонаж" : "Игрок");
+            ch->pecho("%s с именем %s не найден.", fMob ? "Персонаж" : "Игрок", string);
             return;
         }
         
