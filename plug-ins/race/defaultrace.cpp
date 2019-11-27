@@ -96,8 +96,8 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "Раса {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " или {C" << race->getName( ) << "{x" 
-       << "%PAUSE% " << web_edit_button(ch, "hedit", getID()) << "%RESUME%" << endl;
+    in << " или {C" << race->getName( ) << "{x " 
+       << editButton(ch) << endl;
     
     in << endl << *this << endl;
 

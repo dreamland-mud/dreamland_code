@@ -33,6 +33,7 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->level = original->getLevel();
     this->text = original->c_str();
     this->keywords = original->getKeywordAttribute();
+    this->fullKeyword = original->getKeyword();
 }
 
 OLCStateHelp::~OLCStateHelp() 
@@ -110,9 +111,10 @@ void OLCStateHelp::changed( PCharacter *ch )
 
 void OLCStateHelp::show( PCharacter *ch ) const
 {
-    ptc(ch, "{WСтатья справки под номером {c%d{x:\r\n", id.getValue());
-    ptc(ch, "{WКлючевые слова{x:    [{C%s{x]\r\n", keywords.c_str());
-    ptc(ch, "{WУровень{x:           [{C%d{x]\r\n", level.getValue());
+    ptc(ch, "{WСтатья справки под номером {c%d{x:\r\n", id.getValue()); 
+    ptc(ch, "{DВсе ключевые слова: [%s]\r\n", fullKeyword.c_str());
+    ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());
+    ptc(ch, "{WУровень{x:            [{C%d{x]\r\n", level.getValue());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.c_str());

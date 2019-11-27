@@ -20,11 +20,22 @@ DLString MarkupHelpArticle::getText( Character *ch ) const
     return out.str( );
 }
 
+void MarkupHelpArticle::editButton(Character *ch, ostringstream &in) const
+{
+    in << "%PAUSE% " << web_edit_button(ch, "hedit", getID()) << "%RESUME%" << endl;
+}
+
+DLString MarkupHelpArticle::editButton(Character *ch) const
+{
+    ostringstream buf;
+    editButton(ch, buf);
+    return buf.str();
+}
 
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
     in << "Справка на тему {C" << getKeyword() << "{x: "
-       << "%PAUSE% " << web_edit_button(ch, "hedit", getID()) << "%RESUME%" << endl;
+       << editButton(ch) << endl;
 
     in << *this;
 }

@@ -18,6 +18,8 @@ public:
 protected:
     virtual void getRawText( Character *, ostringstream & ) const;
     virtual void applyFormatter( Character *, ostringstream &, ostringstream & ) const;
+    void editButton(Character *ch, ostringstream &in) const;
+    DLString editButton(Character *ch) const;
 };
 
 #endif

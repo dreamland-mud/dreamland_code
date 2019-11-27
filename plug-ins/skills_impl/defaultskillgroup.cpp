@@ -10,6 +10,7 @@
 #include "spell.h"
 #include "skillmanager.h"
 #include "pcharacter.h"
+#include "websocketrpc.h"
 #include "act.h"
 #include "loadsave.h"
 #include "merc.h"
@@ -75,7 +76,12 @@ void DefaultSkillGroup::show( PCharacter *ch, ostringstream &buf ) const
 {
     buf << "Группа "
         << "{Y" << getName( ) << "{w, "
-        << "{Y" << getRussianName( ) << "{w" << endl;
+        << "{Y" << getRussianName( ) << "{w ";
+        
+    if (help)
+        buf << web_edit_button(ch, "hedit", help->getID());
+        
+    buf << endl;
 
     if (help)
         buf << help->c_str( );

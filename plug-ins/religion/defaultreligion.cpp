@@ -73,7 +73,7 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
             in << ", недоступна тебе.";
     }
 
-    in << endl << endl
+    in << " " << editButton(ch) << endl << endl
        << *this;
 }
 
