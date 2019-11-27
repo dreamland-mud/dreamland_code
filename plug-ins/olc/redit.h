@@ -27,7 +27,7 @@ public:
 
     bool change_exit(PCharacter *, char *, int);
     static Room *redit_create(PCharacter *, char *);
-    static void show(PCharacter *ch, Room *);
+    static void show(PCharacter *ch, Room *, bool showWeb);
 
     XML_VARIABLE XMLInteger originalRoom;
 

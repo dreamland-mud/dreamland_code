@@ -11,6 +11,7 @@
 #include "security.h"
 #include "interp.h"
 #include "arg_utils.h"
+#include "websocketrpc.h"
 #include "mercdb.h"
 
 /*--------------------------------------------------------------------------
@@ -740,3 +741,10 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
     return false;
 }
 
+DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)
+{
+    if (showWeb)
+        return web_edit_button(ch, editor, args);
+    else
+        return DLString::emptyString;
+}

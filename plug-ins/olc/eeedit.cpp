@@ -23,7 +23,7 @@
 #include "eeedit.h"
 #include "merc.h"
 #include "interp.h"
-
+#include "websocketrpc.h"
 #include "mercdb.h"
 
 #include "olc.h"
@@ -174,43 +174,54 @@ extern const char * extra_move_ru [];
 extern const char * extra_move_rp [];
 extern const char * extra_move_rt [];
 
+
 EEEDIT(show)
+{
+    show(ch);
+    return false;
+}
+
+void OLCStateExtraExit::show(PCharacter *ch)
 {
     OBJ_INDEX_DATA *obj;
     Room *r;
 
-    ptc(ch, "{CDescription:{x\n%s\n", description.getValue( ).c_str( ));
-    ptc(ch, "{CRoom desc:{x\n%s\n", room_description.getValue( ).c_str( ));
-    ptc(ch, "Keyword:   [{W%s{x]\n", keyword.getValue( ).c_str( ));
-    ptc(ch, "Exit info: [{W%s{x]\n", 
+    ptc(ch, "{CDescription:{x %s {D(desc help){x\n%s\n", 
+        web_edit_button(ch, "desc", "web").c_str(), description.getValue( ).c_str( ));
+    ptc(ch, "{CRoom desc:{x %s {D(rdesc help){x\n%s\n", 
+        web_edit_button(ch, "rdesc", "web").c_str(), room_description.getValue( ).c_str( ));
+    ptc(ch, "Name:       [{W%s{x]\n", keyword.getValue( ).c_str( ));
+    ptc(ch, "Flags:      [{W%s{x] {D(? exit_flags){x\n", 
             exit_flags.names(info.getValue( )).c_str());
     
     if(key.getValue( ) > 0 && (obj = get_obj_index(key.getValue( ))))
-        ptc(ch, "Key:       [{W%d{x] ({G%s{x)\n", 
+        ptc(ch, "Key:        [{W%d{x] ({G%s{x)\n", 
                 key.getValue( ), 
                 russian_case(obj->short_descr, '1').c_str( ));
+    else
+        ptc(ch, "Key:        []\n");
 
     r = get_room_index(to_room.getValue( ));
     if (r)
-        ptc(ch, "To room:   [{W%d{x] ({G%s{x)\n", 
+        ptc(ch, "Target:     [{W%d{x] ({G%s{x)\n", 
                 r->vnum, r->name);
     
-    ptc(ch, "Max size:  [{W%s{x]\n", 
+    ptc(ch, "Size:       [{W%s{x] {D(? size){x\n", 
             size_table.name(max_size_pass.getValue( )).c_str());
 
-    ptc(ch, "Move from:  [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x)\n", 
+    ptc(ch, "From:       Type: [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x) {W%s{x\n", 
             moving_from.getValue( ), extra_move_ru[moving_from.getValue( )],
-            moving_mode_from.getValue( ), extra_move_rt[moving_mode_from.getValue( )]
+            moving_mode_from.getValue( ), extra_move_rt[moving_mode_from.getValue( )],
+            short_desc_from.c_str( )
             );
-    ptc(ch, "Short from: {W%s{x\n", short_desc_from.getValue( ).c_str( ));
+    ptc(ch, "{D            (from <0..11> <0..11> <short descr>)\n");
     
-    ptc(ch, "Move to:    [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x)\n", 
+    ptc(ch, "To:         Type: [{W%d{x] ({G%s{x) Mode: [{W%d{x] ({G%s{x) {W%s{x\n", 
             moving_to.getValue( ), extra_move_rp[moving_to.getValue( )],
-            moving_mode_to.getValue( ), extra_move_rt[moving_mode_to.getValue( )]
+            moving_mode_to.getValue( ), extra_move_rt[moving_mode_to.getValue( )],
+            short_desc_to.c_str()
             );
-    ptc(ch, "Short to:   {W%s{x\n", short_desc_to.getValue( ).c_str( ));
-
-    return false;
+    ptc(ch, "{D            (to <0..11> <0..11> <short descr>)\n");            
 }
 
 EEEDIT(desc)
@@ -265,7 +276,7 @@ EEEDIT(target)
 static bool
 eeedit_dir_usage(PCharacter *ch) 
 {
-    stc("Usage: from|to <#type> <#mode> <$short>", ch);
+    stc("Usage: from|to <#type> <#mode> <short>\n\r", ch);
     return false;
 }
 

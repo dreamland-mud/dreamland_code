@@ -15,6 +15,7 @@
 #include "room.h"
 #include "skillgroup.h"
 
+#include "websocketrpc.h"
 #include "comm.h"
 #include "merc.h"
 #include "interp.h"
@@ -307,10 +308,14 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 // Mobile Editor Functions.
 MEDIT(show)
 {
-    ptc(ch, "{GName: [{x%s{G]\n\r", mob.player_name);
+    bool showWeb = !arg_oneof_strict(argument, "noweb");
 
-    ptc(ch, "{GShort desc: {x%s\n\r{GLong descr:{x\n\r%s",
-        mob.short_descr, mob.long_descr);        
+    ptc(ch, "{GName: [{x%s{G] %s\n\r", 
+        mob.player_name, web_edit_button(showWeb, ch, "name", "web").c_str());
+
+    ptc(ch, "{GShort desc: {x%s %s\n\r{GLong descr: %s{x\n\r%s",
+        mob.short_descr, web_edit_button(showWeb, ch, "short", "web").c_str(),
+        web_edit_button(showWeb, ch, "long", "web").c_str(), mob.long_descr);        
     
     ptc(ch, "{CLevel {Y%3d  {CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
         mob.level, mob.vnum,
@@ -378,7 +383,7 @@ MEDIT(show)
             ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
 
-    ptc(ch, "Description:\n\r%s", mob.description);
+    ptc(ch, "Description: %s\n\r%s", web_edit_button(showWeb, ch, "desc", "web").c_str(), mob.description);
 
     if (mob.behavior) {
         try {
@@ -1248,6 +1253,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateMobile::Pointer me(NEW, pMob);
         me->attach(ch);
+        me->findCommand(ch, "show")->run(ch, "");
         return;
     }
     else if (!str_cmp(arg1, "create")) {
@@ -1297,7 +1303,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "");
+        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "noweb");
         return;
     } else if (!str_cmp(arg1, "load")) {
         if(!*argument || !is_number(argument)) {

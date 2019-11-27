@@ -245,7 +245,7 @@ REDIT(olist, "псписок", "список всех предметов в да
 }
 
 void
-OLCStateRoom::show(PCharacter *ch, Room *pRoom)
+OLCStateRoom::show(PCharacter *ch, Room *pRoom, bool showWeb)
 {
     Object *obj;
     Character *rch;
@@ -253,10 +253,10 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
     bool fcnt;
 
     ptc(ch, "Description: %s\n\r%s", 
-        web_edit_button(ch, "desc", "web").c_str(), pRoom->description);
+        web_edit_button(showWeb, ch, "desc", "web").c_str(), pRoom->description);
 
     ptc(ch, "Name:       [{W%s{x] %s\n\rArea:       [{W%5d{x] %s\n\r",
-              pRoom->name, web_edit_button(ch, "name", "web").c_str(),
+              pRoom->name, web_edit_button(showWeb, ch, "name", "web").c_str(),
               pRoom->area->vnum, pRoom->area->name);
     ptc(ch, "Vnum:       [{W%u{x]\n\r", pRoom->vnum);
     ptc(ch, "Clan:       [{W%s{x] ", pRoom->clan->getName( ).c_str( ));
@@ -281,7 +281,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
 
         stc("Extra desc: ", ch);
         for (ed = pRoom->extra_descr; ed; ed = ed->next) {
-            ptc(ch, "[%s] %s ", ed->keyword, web_edit_button(ch, "ed web", ed->keyword).c_str());
+            ptc(ch, "[%s] %s ", ed->keyword, web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
         }
         stc("{D(ed help){x\n\r", ch);
     }
@@ -291,7 +291,7 @@ OLCStateRoom::show(PCharacter *ch, Room *pRoom)
 
         stc("Extra exits: {D(eexit help){x\r\n            ", ch);
         for(eed = pRoom->extra_exit; eed; eed = eed->next) {
-            ptc(ch, "[%s] ", eed->keyword);
+            ptc(ch, "[%s] %s ", eed->keyword, web_edit_button(showWeb, ch, "eexit set", eed->keyword).c_str());
         }
         stc("{x\n\r", ch);
     }
@@ -375,7 +375,7 @@ REDIT(show, "показать", "показать все поля")
     Room *pRoom;
     EDIT_ROOM(ch, pRoom);
 
-    show(ch, pRoom);
+    show(ch, pRoom, true);
 
     return false;
 }
@@ -861,6 +861,7 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
     if (is_name(command, "set")) {
         OLCStateExtraExit::Pointer eedp(NEW, pRoom, argument);
         eedp->attach(ch);
+        eedp->show(ch);
         return false;
     }
 
@@ -1176,8 +1177,7 @@ CMD(redit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
         
-        // TODO pass a 'non-interactive' argument to hide web buttons
-        OLCStateRoom::show(ch, pRoom2);
+        OLCStateRoom::show(ch, pRoom2, false);
         return;
         
     } else if (!str_cmp(arg1, "reset")) {

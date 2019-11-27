@@ -31,6 +31,7 @@
 #include "merc.h"
 #include "interp.h"
 
+#include "websocketrpc.h"
 #include "act.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -268,11 +269,13 @@ OEDIT(show)
     char buf[MAX_STRING_LENGTH];
     Affect *paf;
     int cnt;
+    bool showWeb = !arg_oneof_strict(argument, "noweb");
 
     EDIT_OBJ(ch, pObj);
 
-    sprintf(buf, "Name:        [%s]\n\rArea:        [%5d] %s\n\r",
+    sprintf(buf, "Name:        [%s] %s\n\rArea:        [%5d] %s\n\r",
               pObj->name,
+              web_edit_button(showWeb, ch, "name", "web").c_str(),
               !pObj->area ? -1 : pObj->area->vnum,
               !pObj->area ? "No Area" : pObj->area->name);
     stc(buf, ch);
@@ -322,19 +325,18 @@ OEDIT(show)
     if (pObj->extra_descr) {
         EXTRA_DESCR_DATA *ed;
 
-        stc("Ex desc kwd: ", ch);
+        stc("Extra desc: ", ch);
 
         for (ed = pObj->extra_descr; ed; ed = ed->next) {
-            stc("[", ch);
-            stc(ed->keyword, ch);
-            stc("]", ch);
+            ptc(ch, "[%s] %s ", ed->keyword, web_edit_button(showWeb, ch, "ed web", ed->keyword).c_str());
         }
 
-        stc("\n\r", ch);
+        stc(" {D(ed help){x\n\r", ch);
     }
 
-    sprintf(buf, "Short desc:  %s\n\rLong desc:\n\r     %s\n\r",
-              pObj->short_descr, pObj->description);
+    sprintf(buf, "Short desc:  %s %s\n\rLong desc: %s\n\r     %s\n\r",
+              pObj->short_descr, web_edit_button(showWeb, ch, "short", "web").c_str(),
+              web_edit_button(showWeb, ch, "long", "web").c_str(), pObj->description);
     stc(buf, ch);
 
     for (cnt = 0, paf = pObj->affected; paf; paf = paf->next) {
@@ -1117,6 +1119,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateObject::Pointer oe(NEW, pObj);
         oe->attach(ch);
+        oe->findCommand(ch, "show")->run(ch, "");
         return;
     } else if (!str_cmp(arg1, "create")) {
         if (!str_cmp(argument, "next")) 
@@ -1196,7 +1199,7 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->run(ch, "");
+        OLCStateObject::Pointer(NEW, pObj)->findCommand(ch, "show")->run(ch, "noweb");
         return;
     } else if (!str_cmp(arg1, "load")) {
         if(!*argument || !is_number(argument)) {

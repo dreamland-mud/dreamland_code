@@ -13,6 +13,7 @@
 
 #include "merc.h"
 #include "update_areas.h"
+#include "websocketrpc.h"
 #include "interp.h"
 #include "mercdb.h"
 #include "def.h"
@@ -112,7 +113,9 @@ void OLCStateHelp::show( PCharacter *ch ) const
     ptc(ch, "{WСтатья справки под номером {c%d{x:\r\n", id.getValue());
     ptc(ch, "{WКлючевые слова{x:    [{C%s{x]\r\n", keywords.c_str());
     ptc(ch, "{WУровень{x:           [{C%d{x]\r\n", level.getValue());
-    ptc(ch, "{WТекст{x:\r\n%s\r\n", text.c_str());
+    ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
+        web_edit_button(ch, "text", "web").c_str(),
+        text.c_str());
     ptc(ch, "{WКоманды{x: keywords, level, text copy, text paste\r\n");
 }
 

@@ -177,6 +177,8 @@ public:
     }
 };    
 
+extern DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args);
+
 #define OLC_STATE(State) \
 template <> \
 OLCStateTemplate<State>::Chain *OLCStateTemplate<State>::Chain::first = 0
