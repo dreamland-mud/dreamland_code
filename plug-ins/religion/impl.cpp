@@ -9,8 +9,8 @@
 #include "objectbehaviorplugin.h"
 #include "mocregistrator.h"
 #include "dlxmlloader.h"
-#include "xmltableloaderplugin.h"
 #include "xmlattributeplugin.h"
+#include "xmltableloaderplugin.h"
 
 #include "templeman.h"
 #include "gods_impl.h"

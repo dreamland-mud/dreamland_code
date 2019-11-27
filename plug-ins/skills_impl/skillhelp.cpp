@@ -11,6 +11,7 @@
 #include "skill.h"
 #include "spell.h"
 #include "command.h"
+#include "xmltableelement.h"
 #include "skillcommand.h"
 #include "skillgroup.h"
 #include "character.h"
@@ -30,7 +31,7 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
     else
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
-    SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
+    SkillGroupReference &group = skill.getConstPointer<Skill>()->getGroup( );
     const DLString &gname = group->getNameFor(ch);
     in << ", входит в группу '{hg{c" << gname << "{x'" << endl << endl
        << *this;
@@ -109,6 +110,14 @@ bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     return false;
 }
 
+void SkillHelp::save() const
+{
+    if (skill) {
+        const XMLTableElement *element = skill.getDynamicPointer<XMLTableElement>();
+        if (element)
+            element->save();
+    }
+}
 
 void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream &out ) const
 {

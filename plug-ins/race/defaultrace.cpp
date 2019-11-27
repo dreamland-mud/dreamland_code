@@ -26,8 +26,6 @@
 
 using namespace std;
 
-TABLE_LOADER_IMPL(RaceLoader, "races", "Race");
-
 /*-------------------------------------------------------------------
  * RaceHelp 
  *------------------------------------------------------------------*/
@@ -35,7 +33,7 @@ static const DLString LABEL_RACE = "race";
 const DLString RaceHelp::TYPE = "RaceHelp";
 GROUP(ancient_languages);
 
-void RaceHelp::setRace( Race::Pointer race )
+void RaceHelp::setRace( DefaultRace::Pointer race )
 {
     this->race = race;
     
@@ -62,11 +60,8 @@ void RaceHelp::unsetRace( )
 
 void RaceHelp::save() const
 {
-    if (!race)
-        return;
-    
-    DefaultRace::Pointer element(dynamic_cast<const DefaultRace *>(*race));
-    theRaceLoader->saveElement(element);
+    if (race)
+        race->save();
 }
 
 DLString RaceHelp::getTitle(const DLString &label) const
@@ -106,7 +101,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     
     in << endl << *this << endl;
 
-    const PCRace *r = (const_cast<Race *>(race.getPointer( )))->getPC( );
+    const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
     if (r) {
         
         in << "{cХарактер{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;

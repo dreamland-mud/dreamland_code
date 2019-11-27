@@ -22,7 +22,13 @@ static const DLString LABEL_CLASS = "class";
  *------------------------------------------------------------------*/
 const DLString ProfessionHelp::TYPE = "ProfessionHelp";
 
-void ProfessionHelp::setProfession( Profession::Pointer prof )
+void ProfessionHelp::save() const
+{
+    if (prof)
+        prof->save();
+}
+
+void ProfessionHelp::setProfession( DefaultProfession::Pointer prof )
 {
     this->prof = prof;
     

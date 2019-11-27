@@ -6,11 +6,21 @@
 #include "skillmanager.h"
 #include "skillgrouphelp.h"
 #include "character.h"
+#include "xmltableelement.h"
 
 /*-------------------------------------------------------------------
  * SkillGroupHelp 
  *------------------------------------------------------------------*/
 const DLString SkillGroupHelp::TYPE = "SkillGroupHelp";
+
+void SkillGroupHelp::save() const
+{
+    if (group) {
+        const XMLTableElement *element = group.getDynamicPointer<XMLTableElement>();
+        if (element)
+            element->save();
+    }
+}
 
 void SkillGroupHelp::getRawText( Character *ch, ostringstream &buf ) const
 {

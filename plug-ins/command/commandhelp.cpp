@@ -21,6 +21,15 @@ bool CommandHelp::visible( Character *ch ) const
     return command->available( ch );
 }
 
+void CommandHelp::save() const
+{
+    if (command) {
+        const XMLCommand *cmd = command.getDynamicPointer<XMLCommand>();
+        if (cmd)
+            commandManager->save(cmd);
+    }
+}
+
 void CommandHelp::setCommand( Command::Pointer command )
 {
     StringSet::const_iterator r;

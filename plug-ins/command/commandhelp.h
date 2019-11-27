@@ -17,6 +17,7 @@ public:
     virtual bool visible( Character * ) const;
     virtual void setCommand( CommandPointer );
     virtual void unsetCommand( );
+    virtual void save() const;
     
     inline CommandPointer getCommand( ) const;
     inline virtual const DLString & getType( ) const;

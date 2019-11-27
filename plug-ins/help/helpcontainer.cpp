@@ -4,9 +4,6 @@
  */
 #include "helpcontainer.h"
 
-TABLE_LOADER_IMPL(HelpLoader, "helps", "Help");
-
-
 HelpContainer::~HelpContainer( )
 {
 }
@@ -46,5 +43,5 @@ void GenericHelp::setContainer(::Pointer<HelpContainer> container)
 void GenericHelp::save() const
 {
     if (container)
-        theHelpLoader->saveElement(container);
+        container->save();
 }

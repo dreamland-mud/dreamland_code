@@ -9,6 +9,9 @@
 #include "bugtracker.h"
 #include "helpcontainer.h"
 #include "markuphelparticle.h"
+#include "xmltableloaderplugin.h"
+
+TABLE_LOADER(HelpLoader, "helps", "Help");
 
 extern "C" {
     

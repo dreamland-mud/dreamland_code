@@ -46,7 +46,7 @@ static HelpArticle::Pointer help_find_by_id(int id)
 
     for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
         if ((*a)->getID() == id) {
-            original = const_cast<HelpArticle *>(a->getPointer());
+            original = a->getConstPointer<HelpArticle>();
             break;
         }
     }

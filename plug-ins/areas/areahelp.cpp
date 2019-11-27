@@ -11,6 +11,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "dl_strings.h"
+#include "def.h"
 
 /*-------------------------------------------------------------------
  * XMLAreaHelp
@@ -51,12 +52,18 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadTy
  *------------------------------------------------------------------*/
 const DLString AreaHelp::TYPE = "AreaHelp";
 
+void AreaHelp::save() const
+{
+    if (areafile)
+        SET_BIT(areafile->area->area_flag, AREA_CHANGED);
+}
+
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     AREA_DATA *area = areafile->area;
     
     if (!selfHelp) {
-        in << *this;
+        MarkupHelpArticle::getRawText(ch, in);
         return;
     }
 

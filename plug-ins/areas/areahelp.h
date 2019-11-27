@@ -31,6 +31,7 @@ public:
     typedef ::Pointer<AreaHelp> Pointer;
 
     virtual void getRawText( Character *, ostringstream & ) const;
+    virtual void save() const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
     

@@ -19,6 +19,7 @@
 
 class Skill;
 class Liquid;
+class DefaultReligion;
 
 /*
  * ReligionHelp
@@ -27,8 +28,9 @@ class ReligionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<ReligionHelp> Pointer;
 
-    virtual void setReligion( Religion::Pointer );
+    virtual void setReligion( ::Pointer<DefaultReligion> religion );
     virtual void unsetReligion( );
+    virtual void save() const;
 
     virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;
@@ -36,7 +38,7 @@ public:
     static const DLString TYPE;
 
 protected:
-    Religion::Pointer religion;
+    ::Pointer<DefaultReligion> religion;
 };
 
 inline const DLString & ReligionHelp::getType( ) const

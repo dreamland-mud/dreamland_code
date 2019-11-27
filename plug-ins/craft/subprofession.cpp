@@ -22,6 +22,12 @@ static const DLString LABEL_CRAFT = "craft";
  *------------------------------------------------------------------*/
 const DLString CraftProfessionHelp::TYPE = "CraftProfessionHelp";
 
+void CraftProfessionHelp::save() const
+{
+    if (prof)
+        prof->save();
+}
+
 DLString CraftProfessionHelp::getTitle(const DLString &label) const
 {
     if (prof)

@@ -9,9 +9,6 @@
 #include "xmltableelement.h"
 #include "xmlpointer.h"
 #include "markuphelparticle.h"
-#include "xmltableloaderplugin.h"
-
-TABLE_LOADER_DECL(HelpLoader);
 
 class HelpContainer;
 

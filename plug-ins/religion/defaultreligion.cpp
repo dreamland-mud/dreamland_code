@@ -25,7 +25,7 @@ static const DLString LABEL_RELIGION = "religion";
  *------------------------------------------------------------------*/
 const DLString ReligionHelp::TYPE = "ReligionHelp";
 
-void ReligionHelp::setReligion( Religion::Pointer religion )
+void ReligionHelp::setReligion( DefaultReligion::Pointer religion )
 {
     this->religion = religion;
     
@@ -48,6 +48,12 @@ void ReligionHelp::unsetReligion( )
     fullKeyword = "";
 }
 
+void ReligionHelp::save() const
+{
+    if (religion)
+        religion->save();
+
+}
 DLString ReligionHelp::getTitle(const DLString &label) const
 {
     if (religion)
