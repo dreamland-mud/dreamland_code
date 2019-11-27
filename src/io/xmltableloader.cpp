@@ -48,14 +48,18 @@ void XMLTableLoader::saveAll( bool fVerbose )
 
 void XMLTableLoader::loadAll( )
 {
-    for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) 
+    for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
         (*e)->loaded( );
+        (*e)->setLoader(this);
+    }
 }
 
 void XMLTableLoader::unloadAll( )
 {
-    for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++)
+    for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
         (*e)->unloaded( );
+        (*e)->setLoader(NULL);
+    }
 
     elements.clear( );
 }
