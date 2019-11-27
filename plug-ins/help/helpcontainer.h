@@ -9,10 +9,26 @@
 #include "xmltableelement.h"
 #include "xmlpointer.h"
 #include "markuphelparticle.h"
+#include "xmltableloaderplugin.h"
 
-typedef XMLPointer<MarkupHelpArticle> MarkupHelpArticlePointer;
+TABLE_LOADER_DECL(HelpLoader);
 
-class HelpContainer : public XMLListContainer<MarkupHelpArticlePointer>,
+class HelpContainer;
+
+class GenericHelp : public MarkupHelpArticle {
+public:
+    typedef XMLPointer<GenericHelp> Pointer;    
+    
+    virtual const DLString & getType( ) const;
+    virtual void save() const;
+    void setContainer(::Pointer<HelpContainer> container);
+
+    static const DLString TYPE;
+protected:
+    ::Pointer<HelpContainer> container;
+};
+ 
+class HelpContainer : public XMLListContainer<GenericHelp::Pointer>,
                       public XMLTableElement
 {
 XML_OBJECT

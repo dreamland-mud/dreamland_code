@@ -35,6 +35,8 @@ using namespace Grammar;
 
 DLString act_to_fmt(const char *s);
 
+const DLString SocialHelp::TYPE = "SocialHelp";
+
 SocialHelp::SocialHelp(Social::Pointer social)
 {
     this->social = social;

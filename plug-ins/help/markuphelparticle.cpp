@@ -4,8 +4,7 @@
  */
 #include "markuphelparticle.h"
 #include "helpformatter.h"
-
-const DLString MarkupHelpArticle::TYPE = "Help";
+#include "websocketrpc.h"
 
 MarkupHelpArticle::~MarkupHelpArticle( )
 {
@@ -24,6 +23,9 @@ DLString MarkupHelpArticle::getText( Character *ch ) const
 
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
+    in << "Справка на тему {C" << getKeyword() << "{x: "
+       << "%PAUSE% " << web_edit_button(ch, "hedit", getID()) << "%RESUME%" << endl;
+
     in << *this;
 }
 

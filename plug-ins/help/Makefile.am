@@ -4,10 +4,12 @@ libhelp.la
 include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
--I$(top_srcdir)/plug-ins/system 
+-I$(top_srcdir)/plug-ins/system \
+-I$(top_srcdir)/plug-ins/descriptor
 
 
 libhelp_la_LIBADD = \
+../descriptor/libdescriptor.la \
 ../system/libsystem.la 
 
 libhelp_la_SOURCES = \

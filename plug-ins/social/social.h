@@ -184,11 +184,18 @@ public:
     SocialHelp(Social::Pointer social);
     virtual ~SocialHelp();
     virtual DLString getTitle(const DLString &label) const;
+    inline virtual const DLString & getType( ) const;
+    static const DLString TYPE;
 
 protected:
     virtual void getRawText( Character *, ostringstream & ) const;
     Social::Pointer social;
 };
+
+inline const DLString & SocialHelp::getType( ) const
+{
+    return TYPE;
+}
 
 #endif
 
