@@ -146,6 +146,18 @@ void DreamLand::run( )
         LastLogStream::send( ) <<  "Scheduler run"  << endl;
         scheduler->tick( );
         
+        // If you are thinking of moving this to a ScheluerTask - think again.
+        // ScheldulerPriorityMap will contain tasks defined in plugins.
+        // When those plugins are going to be unloaded, Scheduler::slay() requests
+        // are going to be ignored for the currently running tick.
+        // After the scheduer tick has finished processing, it will attempt to destroy
+        // the ScheldulerPriorityMap which holds Pointers to stuff defined in plugins
+        // which are gone now. Thus, either Scheduler should support ::slay operation for
+        // the currently running tick, or plugin reload should be happening outside of
+        // the Scheduler.
+        LastLogStream::send( ) <<  "Plugins reload"  << endl;
+        pluginManager->checkReloadRequest( );
+
         LastLogStream::send( ) <<  "Time goes..."  << endl;
         pulseEnd( );
 

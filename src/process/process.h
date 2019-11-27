@@ -11,13 +11,11 @@
 #include "mutex.h"
 #include "monitor.h"
 #include "thread.h"
-#include "schedulertask.h"
 
 using namespace std;
 
 #define SCDP_PROCESS       11000
-
-class ProcessManager : public SchedulerTask
+class ProcessManager : public virtual DLObject
 {
 public:
     typedef ::Pointer<ProcessManager> Pointer;
@@ -49,10 +47,6 @@ public:
     static inline ProcessManager *getThis() {
         return thisClass;
     }
-
-    virtual void run( );
-    virtual void after( );
-    virtual int getPriority( ) const;
 
     RoundRobinElement running, stopped;
 private:

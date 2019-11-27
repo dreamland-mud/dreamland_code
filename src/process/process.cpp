@@ -8,12 +8,43 @@
 #include "lastlogstream.h"
 
 #include "scheduler.h"
+#include "schedulertask.h"
 
 //#define PDEBUG
 
 Mutex hm;
 
 ProcessManager *ProcessManager::thisClass = 0;
+
+class ProcessManagerTask : public SchedulerTask {
+public:
+    typedef ::Pointer<ProcessManagerTask> Pointer;
+
+    virtual void run( );
+    virtual void after( );
+    virtual int getPriority( ) const;
+};
+
+void 
+ProcessManagerTask::run( )
+{
+    LastLogStream::send( ) <<  "Processes pulse"  << endl;
+    if(ProcessManager::getThis())
+        ProcessManager::getThis()->yield( );
+}
+
+void 
+ProcessManagerTask::after( )
+{
+    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
+}
+
+int 
+ProcessManagerTask::getPriority( ) const
+{
+    return SCDP_PROCESS;
+}
+
 
 ProcessManager::RoundRobinElement::RoundRobinElement( ) : mux( ), sync( &mux ) 
 {
@@ -105,12 +136,15 @@ ProcessManager::ProcessManager( )
 {
     running.mux.lock( );
     thisClass = this;
-    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
+
+    if(Scheduler::getThis( ))
+        Scheduler::getThis( )->putTaskInitiate(ProcessManagerTask::Pointer(NEW));
 }
 
 ProcessManager::~ProcessManager( )
 {
-    Scheduler::getThis( )->slayInstance(Pointer(this));
+    if(Scheduler::getThis( ))
+        Scheduler::getThis( )->slay(ProcessManagerTask::Pointer(NEW));
 
     if(running.next != &running)
         LogStream::sendError( ) << "not all threads finished!" << endl;
@@ -124,24 +158,5 @@ ProcessManager::yield()
 {
     if(running.next != &running) 
         running.yield( );
-}
-
-void 
-ProcessManager::run( )
-{
-    LastLogStream::send( ) <<  "Processes pulse"  << endl;
-    thisClass->yield( );
-}
-
-void 
-ProcessManager::after( )
-{
-    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
-}
-
-int 
-ProcessManager::getPriority( ) const
-{
-    return SCDP_PROCESS;
 }
 

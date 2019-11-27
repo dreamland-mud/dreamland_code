@@ -9,7 +9,6 @@ src_INCLUDES = \
 -I$(srcdir)/../xml \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../alloc \
--I$(srcdir)/../scheduler \
 -I$(srcdir)/../io \
 -I$(srcdir)/../util 
 

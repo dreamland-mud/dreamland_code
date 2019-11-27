@@ -7,10 +7,8 @@
 
 #include "xmllist.h"
 #include "logstream.h"
-#include "lastlogstream.h"
 #include "xmlfile.h"
 
-#include "scheduler.h"
 #include "pluginmanager.h"
 #include "plugin.h"
 
@@ -33,12 +31,10 @@ PluginManager::PluginManager( )
 {
     checkDuplicate( thisClass );
     thisClass = this;
-    Scheduler::getThis( )->putTaskInitiate(Pointer(this));
 }
 
 PluginManager::~PluginManager( )
 {
-    Scheduler::getThis( )->slayInstance(Pointer(this));
     unloadAll( );
     thisClass = 0;
 }
@@ -197,24 +193,5 @@ DLString PluginManager::getTableName( ) const
 DLString PluginManager::getNodeName( ) const
 {
     return NODE_NAME;
-}
-
-void 
-PluginManager::run( )
-{
-    LastLogStream::send( ) <<  "Plugins reload"  << endl;
-    checkReloadRequest( );
-}
-
-void 
-PluginManager::after( )
-{
-    Scheduler::getThis( )->putTaskInitiate( Pointer(this) );
-}
-
-int 
-PluginManager::getPriority( ) const
-{
-    return SCDP_RELOAD_PLUGIN;
 }
 
