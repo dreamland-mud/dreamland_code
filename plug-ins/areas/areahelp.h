@@ -23,6 +23,7 @@ public:
     DLString keyword;
     int level;
     DLString labels;
+    int id;
 };
 
 class AreaHelp : public MarkupHelpArticle {

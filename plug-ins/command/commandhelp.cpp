@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "commandhelp.h"
 #include "command.h"
 #include "commandmanager.h"
@@ -27,6 +28,8 @@ void CommandHelp::save() const
         const XMLCommand *cmd = command.getDynamicPointer<XMLCommand>();
         if (cmd)
             commandManager->save(cmd);
+        else
+            LogStream::sendError() << "Failed to save command help on command " << command->getName() << endl;
     }
 }
 

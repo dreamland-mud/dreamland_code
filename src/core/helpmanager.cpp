@@ -19,7 +19,8 @@ long lastID = 0;
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
-                 level( -1 )
+                 level( -1 ),
+                 id(-1)
 {
 }
 
@@ -188,15 +189,14 @@ HelpManager::~HelpManager( )
 void HelpManager::registrate( HelpArticle::Pointer art )
 {
     articles.push_back( art );
-    // TODO remove after one-off converting.
-    if (art->getID() <= 0)
-        art->setID(++lastID);
-    
-    if (articlesById.count(art->getID()) > 0)
-        LogStream::sendError() << "Duplicate help ID " << art->getID() << " for "
-            << art->getKeyword() << " and " << articlesById[art->getID()]->getKeyword() << endl;
 
-    articlesById[art->getID()] = art;
+    if (art->getID() > 0) {
+        if (articlesById.count(art->getID()) > 0)
+            LogStream::sendError() << "Duplicate help ID " << art->getID() << " for "
+                << art->getKeyword() << " and " << articlesById[art->getID()]->getKeyword() << endl;
+
+        articlesById[art->getID()] = art;
+    }
 }
 
 void HelpManager::unregistrate( HelpArticle::Pointer art )

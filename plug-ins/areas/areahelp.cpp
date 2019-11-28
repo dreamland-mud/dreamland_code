@@ -13,11 +13,13 @@
 #include "dl_strings.h"
 #include "def.h"
 
+static const DLString ATTRIBUTE_ID = "id";
+
 /*-------------------------------------------------------------------
  * XMLAreaHelp
  *------------------------------------------------------------------*/
 XMLAreaHelp::XMLAreaHelp()
-                : level(-1)
+                : level(-1), id(-1)
 {
 }
 
@@ -34,6 +36,9 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
     if (!labels.empty())
         parent->insertAttribute(HelpArticle::ATTRIBUTE_LABELS, labels);
 
+    if (id > 0)
+        parent->insertAttribute(ATTRIBUTE_ID, DLString(id));
+
     return true;    
 }
 
@@ -45,6 +50,9 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadTy
 
     if (parent->hasAttribute( HelpArticle::ATTRIBUTE_LEVEL ))
         level = parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL ).toInt( );
+
+    if (parent->hasAttribute(ATTRIBUTE_ID))
+        id = parent->getAttribute(ATTRIBUTE_ID).toInt();
 }
 
 /*-------------------------------------------------------------------
@@ -105,7 +113,9 @@ public:
         for (area = area_first; area; area = area->next) {
             HelpArticles::iterator a;
             HelpArticles &articles = area->helps;
-
+            DLString aname(area->name);
+            aname.colourstrip();
+            
             for (a = articles.begin( ); a != articles.end( ); a++) {
                 a->recover();
                 AreaHelp *help = a->getDynamicPointer<AreaHelp>();
@@ -113,12 +123,12 @@ public:
                 if (help->getKeywordAttribute().empty()) {
                     help->persistent = false;
                     help->selfHelp = true;
-                    help->addKeyword(DLString(area->name).colourStrip().quote());
+                    help->addKeyword(aname.quote());
                     help->addKeyword(DLString(area->credits).colourStrip().quote());
                 }
                 else {
                     help->persistent = true;
-                    help->selfHelp = is_name(area->name, (*a)->getKeyword().c_str());
+                    help->selfHelp = is_name(aname.c_str(), (*a)->getKeyword().c_str());
                 }
                 if (help->selfHelp) 
                     help->addLabel("area");

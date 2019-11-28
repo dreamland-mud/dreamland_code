@@ -1146,8 +1146,18 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
 
     if (arg == "savehelp") {
         HelpArticles::const_iterator a;
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) 
-            (*a)->save();
+
+        int max_id = 0;
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++)
+            if ((*a)->getID() > max_id)
+                max_id = (*a)->getID();
+
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if ((*a)->getID() <= 0) {
+                const_cast<HelpArticle *>(**a)->setID(++max_id);
+                (*a)->save();
+            }
+        }
     }
 }
 
