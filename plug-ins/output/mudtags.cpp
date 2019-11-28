@@ -598,13 +598,28 @@ void VisibilityTags::run( ostringstream &out )
         }
     }
 }
-            
+
+// Read chars from 'p' while they are numbers.
+static DLString collect_number(const char *&p) {
+    DLString result;
+
+    while (isdigit(*++p)) {
+        result.append(*p);
+    }
+
+    --p;
+    return result;
+}
+
+
 // {h
 // close hyper link: x
-// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>),
-// g (<hg>skill group names</hg>)
+// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>
+// or <hh id='234'>article</hh>), g (<hg>skill group names</hg>)
 void VisibilityTags::hyper_tag_start( ostringstream &out )
 {
+    DLString id;
+
     switch (*++p) {
     case 'c': 
         my_hyper_tag = "hc";
@@ -616,6 +631,7 @@ void VisibilityTags::hyper_tag_start( ostringstream &out )
 
     case 'h': 
         my_hyper_tag = "hh";
+        id = collect_number(p);
         break;
 
     case 'g': 
@@ -629,8 +645,12 @@ void VisibilityTags::hyper_tag_start( ostringstream &out )
         return;
     }
 
-    if (IS_SET(my_invis, INVIS_WEB)) 
-        out << "\036" << "<" << my_hyper_tag << ">" << "\037";
+    if (IS_SET(my_invis, INVIS_WEB)) {
+        out << "\036" << "<" << my_hyper_tag;
+        if (!id.empty())
+            out << " id='" << id << "'";
+        out << ">" << "\037";
+    }
 }    
 
 void VisibilityTags::hyper_tag_end( ostringstream &out )
