@@ -302,7 +302,6 @@ CMDRUNP( oscore )
 {
     ostringstream buf;
     Room *room = 0;
-    int i;
     PCharacter *pch = ch->getPC( );
 
     buf << fmt( 0, "Ты %1$s%2$s{x, уровень %3$d",
@@ -2371,6 +2370,16 @@ struct HelpFinder {
     typedef vector<HelpArticle::Pointer> ArticleArray;
 
     HelpFinder(Character *ch, const char *argument) {
+        // Find help by ID.
+        Integer id;
+        if (Integer::tryParse(id, argument)) {
+            HelpArticle::Pointer exact = helpManager->getArticle(id);
+            if (exact)
+                articles.push_back(exact);
+            return;
+        }
+
+        // Find help by keyword.
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {

@@ -1143,6 +1143,12 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         page_to_char( buf.str( ).c_str( ), ch );
         return;
     }
+
+    if (arg == "savehelp") {
+        HelpArticles::const_iterator a;
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) 
+            (*a)->save();
+    }
 }
 
 

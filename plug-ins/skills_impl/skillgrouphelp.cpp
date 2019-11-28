@@ -24,6 +24,7 @@ void SkillGroupHelp::save() const
 
 void SkillGroupHelp::getRawText( Character *ch, ostringstream &buf ) const
 {
+    buf << "%PAUSE%";
     group->show( ch->getPC( ), buf );
 }
 

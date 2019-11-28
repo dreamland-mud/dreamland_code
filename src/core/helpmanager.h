@@ -6,6 +6,7 @@
 #define HELPMANAGER_H
 
 #include <list>
+#include <map>
 
 #include "oneallocate.h"
 #include "xmlstringlist.h"
@@ -85,6 +86,7 @@ protected:
 
 typedef list<XMLPersistent<HelpArticle> > HelpArticles;
 extern template class XMLStub<HelpArticle>;
+typedef map<int, HelpArticle::Pointer> ArticlesById;
 
 class HelpManager : public OneAllocate {
 public:
@@ -94,9 +96,11 @@ public:
     void registrate( HelpArticle::Pointer );
     void unregistrate( HelpArticle::Pointer );
     inline const HelpArticles & getArticles( ) const;
+    HelpArticle::Pointer getArticle(int id) const;
 
 protected:
     HelpArticles articles; 
+    ArticlesById articlesById;
 };
 
 extern HelpManager * helpManager;

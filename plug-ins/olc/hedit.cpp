@@ -40,20 +40,6 @@ OLCStateHelp::~OLCStateHelp()
 {
 }
 
-static HelpArticle::Pointer help_find_by_id(int id)
-{
-    HelpArticles::const_iterator a;
-    HelpArticle::Pointer original;
-
-    for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-        if ((*a)->getID() == id) {
-            original = a->getConstPointer<HelpArticle>();
-            break;
-        }
-    }
-    return original;
-}
-
 list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
 {
     HelpArticles::const_iterator a;
@@ -67,31 +53,9 @@ list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
     return originals;
 }
 
-HelpArticle::Pointer OLCStateHelp::getOriginal() const
-{
-    HelpArticle::Pointer original;
-
-    // First look up by unique ID, unless plugins have been reloaded while a builder was
-    // insider 'hedit'.
-    original = help_find_by_id(id);
-
-    // If IDs have been changed since hedit had started, try looking up by keyword.
-    if (!original) {
-        list<HelpArticle::Pointer> matches = help_find_by_keywords(keywords);
-        if (matches.size() > 1) 
-            throw Exception("Cannot find unique match for help keyword, help not saved");
-        original = matches.front();
-    }
-
-    if (!original)
-        throw Exception("Cannot locate original help article, help not saved");
-
-    return original;
-}
-
 void OLCStateHelp::commit() 
 {
-    HelpArticle::Pointer original = getOriginal();
+    HelpArticle::Pointer original = helpManager->getArticle(id);
 
     original->setKeywordAttribute(keywords);
     original->setLevel(level);
@@ -194,7 +158,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
     }
 
     if (args.isNumber() && Integer::tryParse(id, args)) {
-        help = help_find_by_id(id);
+        help = helpManager->getArticle(id);
         if (!help) {
             stc("Справка с таким ID не найдена.\r\n", ch);
             return;
@@ -209,9 +173,9 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         }
 
         if (matches.size() > 1) {
-            stc("Найдено несколько статей справки, пожалуйста, уточните поиск:\r\n", ch);
+            stc("Найдено несколько статей справки, используйте ID, чтобы прицелиться получше:\r\n", ch);
             for (list<HelpArticle::Pointer>::const_iterator m = matches.begin();  m != matches.end(); m++)
-                ptc(ch, "     %s\r\n", (*m)->getKeywordAttribute().c_str());
+                ptc(ch, "%4d     %s\r\n", (*m)->getID(), (*m)->getKeyword().c_str());
             return;
         }
 

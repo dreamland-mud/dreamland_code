@@ -599,16 +599,23 @@ void VisibilityTags::run( ostringstream &out )
     }
 }
 
-// Read chars from 'p' while they are numbers.
+// Read chars from 'p' while they are numbers. Rollback if number is followed by "."
+// (help 2.create vs help 2).
 static DLString collect_number(const char *&p) {
-    DLString result;
+    const char *p_backup = p;
+    DLString number;
 
     while (isdigit(*++p)) {
-        result.append(*p);
+        number.append(*p);
+    }
+
+    if (*p == '.') {
+        p = p_backup;
+        return DLString::emptyString;
     }
 
     --p;
-    return result;
+    return number;
 }
 
 

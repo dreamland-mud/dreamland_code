@@ -33,7 +33,6 @@ public:
     
 private:
     virtual void statePrompt( Descriptor * );
-    HelpArticle::Pointer getOriginal() const;
 
     XML_VARIABLE XMLBoolean isChanged;
 };

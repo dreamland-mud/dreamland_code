@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "helpmanager.h"
 #include "character.h"
 
@@ -12,6 +13,7 @@ const DLString HelpArticle::ATTRIBUTE_LEVEL = "level";
 const DLString HelpArticle::ATTRIBUTE_REF = "ref";
 const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
+static const DLString ATTRIBUTE_ID = "id";
 
 long lastID = 0;
 
@@ -138,6 +140,9 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!labelAttribute.empty())
         parent->insertAttribute(ATTRIBUTE_LABELS, labelAttribute);
 
+    if (id > 0)
+        parent->insertAttribute(ATTRIBUTE_ID, DLString(id));
+
     return true;
 }
 
@@ -158,6 +163,9 @@ void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadT
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
     labelAttribute = parent->getAttribute(ATTRIBUTE_LABELS);
     labels.fromString(labelAttribute);
+    
+    if (parent->hasAttribute(ATTRIBUTE_ID))
+        id = parent->getAttribute(ATTRIBUTE_ID).toInt();
 }
 
 /*-----------------------------------------------------------------------
@@ -180,13 +188,28 @@ HelpManager::~HelpManager( )
 void HelpManager::registrate( HelpArticle::Pointer art )
 {
     articles.push_back( art );
-    art->setID(++lastID);
+    // TODO remove after one-off converting.
+    if (art->getID() <= 0)
+        art->setID(++lastID);
+    
+    if (articlesById.count(art->getID()) > 0)
+        LogStream::sendError() << "Duplicate help ID " << art->getID() << " for "
+            << art->getKeyword() << " and " << articlesById[art->getID()]->getKeyword() << endl;
+
+    articlesById[art->getID()] = art;
 }
 
 void HelpManager::unregistrate( HelpArticle::Pointer art )
 {
     articles.remove( art );
-    art->setID(-1);
+    articlesById.erase(art->getID());
 }
 
-
+HelpArticle::Pointer HelpManager::getArticle(int id) const
+{
+    ArticlesById::const_iterator a = articlesById.find(id);
+    if (a == articlesById.end())
+        return HelpArticle::Pointer();
+    else
+        return a->second;
+}
