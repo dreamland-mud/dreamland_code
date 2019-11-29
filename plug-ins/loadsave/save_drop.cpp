@@ -77,6 +77,7 @@ void load_single_objects_folder( char * subdir, bool remove_after )
 
     for( dp = readdir( dirp ); dp; dp = readdir( dirp ) )
     {
+        try {
             if ( NAMLEN( dp ) > 0
                     && dp->d_name[0] != '.' )
             {
@@ -84,10 +85,13 @@ void load_single_objects_folder( char * subdir, bool remove_after )
                     
                     try {
                         load_room_objects( room, dirn, remove_after );
-                    } catch (FileFormatException e) {
+                    } catch (const FileFormatException &e) {
                         LogStream::sendError( ) << e.what( ) << endl;
                     }
             }
+        } catch (const Exception &ex) {
+            LogStream::sendError() << ex.what() << endl;
+        }
     }
 
     CLOSEDIR( dirp );
@@ -200,7 +204,7 @@ void load_dropped_mobs( )
 
                 try {
                     load_single_mobiles_folder( dirn, false );
-                } catch (FileFormatException e) {
+                } catch (const FileFormatException &e) {
                     LogStream::sendError( ) << e.what( ) << endl;
                 }
         }
@@ -227,6 +231,7 @@ void load_single_mobiles_folder( char * subdir, bool remove_after )
 
         for( dp = readdir( dirp ); dp; dp = readdir( dirp ) )
         {
+            try {
                 if ( NAMLEN( dp ) > 0
                         && dp->d_name[0] != '.' )
                 {
@@ -240,10 +245,13 @@ void load_single_mobiles_folder( char * subdir, bool remove_after )
                         
                         try {
                             load_room_mobiles( room, dirn, remove_after );
-                        } catch (FileFormatException e) {
+                        } catch (const FileFormatException &e) {
                             LogStream::sendError( ) << e.what( ) << endl;
                         }
                 }
+            } catch (const Exception &e) {
+                LogStream::sendError() << e.what() << endl;
+            }
         }
 
         CLOSEDIR( dirp );
