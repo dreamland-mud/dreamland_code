@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#include "logstream.h"
 #include "commandbase.h"
 #include "interprethandler.h"
 #include "staticlist.h"
@@ -21,6 +22,7 @@ using namespace std;
 
 class Descriptor;
 struct area_data;
+class GlobalBitvector;
 
 typedef enum {
     ED_NO_FLAG=0,
@@ -92,7 +94,11 @@ protected:
 
     bool mapEdit( Properties &map, DLString &args );
     bool flagBitsEdit(const FlagTable &table, int &field);
+    bool flagBitsEdit(const FlagTable &table, Flags &field);
     bool flagValueEdit(const FlagTable &table, int &field);
+    bool flagValueEdit(const FlagTable &table, Flags &field);
+    template<typename E> inline
+    bool globalBitvectorEdit(GlobalBitvector &field);
     bool numberEdit(int minValue, int maxValue, int &field);
     bool numberEdit(long minValue, long maxValue, long &field);
     bool diceEdit(int *field);
@@ -139,8 +145,14 @@ public:
             state->lastCmd.setValue( getName( ) );
             state->lastArgs.setValue( args );
 
-            if (((*state)->*method)( pch, args ))
-                state->changed( pch );
+            try {
+                if (((*state)->*method)( pch, args ))
+                    state->changed( pch );
+            } catch (const Exception &e) {
+                LogStream::sendError() << "OLC " << e.what() << endl;
+                pch->println(e.what());
+                state->detach(pch);
+            }
         }
         
         ::Pointer<T> state;
@@ -189,5 +201,36 @@ template <> bool State::cmd<olc::Cmd##_type>( PCharacter *ch, char *argument ); 
 OLCStateTemplate<State>::Chain olc_##State##_##Cmd##_registrator( #Cmd, OLCStateTemplate<State>::SubCommandInfo(&State::cmd<olc::Cmd##_type>, rname, help)); \
 template <> bool State::cmd<olc::Cmd##_type>( PCharacter *ch, char *argument )
 
+template<typename E> inline
+bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ch->printf("Использование:\r\n{W%s{x значение - установить или убрать значение\r\n"
+                   "{W? %s{x - показать таблицу значений\r\n", cmd, cmd);
+        return false;
+    }
+
+    GlobalRegistry<E> *registry = static_cast<GlobalRegistry<E>*>(field.getRegistry());
+    E *elem = registry->findUnstrict(args);
+    if (!elem) {
+        ch->printf("Значение '%s' не найдено.\r\n", args.c_str());
+        return false;
+    }
+
+    int ndx = elem->getIndex();
+    if (field.isSet(ndx)) {
+        field.remove(ndx);
+        ch->printf("Удаляем %s, новое значение: {g%s{x\r\n", elem->getName().c_str(), field.toString().c_str());
+        return true;
+    }
+
+    field.set(ndx);
+    ch->printf("Добавляем %s, новое значение: {g%s{x\r\n", elem->getName().c_str(), field.toString().c_str());
+    return true;    
+}
 
 #endif

@@ -1,0 +1,240 @@
+
+#include <character.h>
+#include <pcharacter.h>
+#include <commandmanager.h>
+#include <object.h>
+#include <affect.h>
+#include "room.h"
+#include "areahelp.h"
+
+#include "reledit.h"
+#include "olc.h"
+#include "security.h"
+
+#include "merc.h"
+#include "update_areas.h"
+#include "websocketrpc.h"
+#include "arg_utils.h"
+#include "interp.h"
+#include "act.h"
+#include "mercdb.h"
+#include "def.h"
+
+OLC_STATE(OLCStateReligion);
+RELIG(none);
+RELIG(chronos);
+
+OLCStateReligion::OLCStateReligion() : isChanged(false)
+{
+}
+
+OLCStateReligion::OLCStateReligion(Religion *religion) 
+    : isChanged(false)
+{
+    if (!original)
+        return;
+
+    original = religion->getIndex();
+}
+
+OLCStateReligion::~OLCStateReligion() 
+{
+}
+
+void OLCStateReligion::commit() 
+{
+    if (!isChanged)
+        return;
+
+    DefaultReligion *original = getOriginal();
+    if (!original)
+        return;
+    
+    original->save();
+    if (owner)
+        owner->character->println("Изменения сохранены на диск.");
+}
+
+DefaultReligion * OLCStateReligion::getOriginal()
+{
+    Religion *religion = religionManager->find(original->getIndex());
+    if (!religion)
+        throw Exception("Attached religion doesn't exist");
+
+    DefaultReligion *defaultReligion = dynamic_cast<DefaultReligion *>(religion);
+    if (!defaultReligion)
+        throw Exception("Attached religion was unloaded");
+    
+    return defaultReligion;
+}
+
+void OLCStateReligion::statePrompt(Descriptor *d) 
+{
+    d->send( "Religion> " );
+}
+
+void OLCStateReligion::changed( PCharacter *ch )
+{
+    isChanged = true;
+}
+
+void OLCStateReligion::show( PCharacter *ch )
+{
+    DefaultReligion *r = getOriginal();
+
+    ptc(ch, "Короткое описание: {C%s{x  %s {D(short help){x\r\n", 
+        r->getShortDescr().c_str(),
+        web_edit_button(ch, "short", "web").c_str());
+
+    ptc(ch, "Русское описание:  {C%s{x  %s {D(russian help){x\r\n",
+        r->getRussianName().c_str(),
+        web_edit_button(ch, "russian", "web").c_str());
+
+    ptc(ch, "Пол божества:      {C%s{x {D(? sex){x\r\n",
+        sex_table.name(r->getSex()).c_str());
+
+    ptc(ch, "Описание:          {C%s{x  %s {D(desc help){x\r\n",
+        r->getDescription().c_str(),
+        web_edit_button(ch, "desc", "web").c_str());        
+
+    ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
+        web_edit_button(ch, "hedit", r->help->getID()).c_str(),
+        r->help->getID());
+
+    ptc(ch, "Характер:          {Y%s{x {D(? align){x\r\n",
+        r->getAlign().names().c_str());
+
+    ptc(ch, "Этос:              {Y%s{x {D(? ethos){x\r\n",
+        r->getEthos().names().c_str());
+
+    ptc(ch, "Расы:              {Y%s{x {D(? races){x\r\n",
+        r->races.empty() ? "-": r->races.toString().c_str());
+
+    ptc(ch, "Классы:            {Y%s{x {D(? classes){x\r\n",
+        r->classes.empty() ? "-": r->classes.toString().c_str());
+}
+
+RELEDIT(show, "показать", "показать все поля")
+{
+    show(ch);
+    return false;
+}
+
+RELEDIT(short, "короткое", "установить английское имя с большой буквы")
+{
+    return editor(argument, getOriginal()->shortDescr, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+RELEDIT(russian, "русское", "установить русское имя с падежами")
+{
+    return editor(argument, getOriginal()->nameRus, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+RELEDIT(sex, "пол", "установить пол божества")
+{
+    return flagValueEdit(sex_table, getOriginal()->sex);
+}
+
+RELEDIT(desc, "описание", "установить описание божества")
+{
+    return editor(argument, getOriginal()->description, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+RELEDIT(align, "характер", "ограничить по характеру")
+{
+    return flagBitsEdit(align_table, getOriginal()->align);
+}
+
+RELEDIT(ethos, "этос", "ограничить по этосу")
+{
+    return flagBitsEdit(ethos_table, getOriginal()->ethos);
+}
+
+RELEDIT(races, "расы", "ограничить по расам")
+{
+    return globalBitvectorEdit<Race>(getOriginal()->races);
+}
+
+RELEDIT(classes, "классы", "ограничить по классам")
+{
+    return globalBitvectorEdit<Profession>(getOriginal()->classes);
+}
+
+
+RELEDIT(commands, "команды", "показать список встроенных команд edit")
+{
+    do_commands(ch);
+    return false;
+}
+
+RELEDIT(done, "готово", "выйти из редактора") 
+{
+    commit();
+    detach(ch);
+    return false;
+}
+
+RELEDIT(dump, "вывод", "(отладка) вывести внутреннее состояние редактора")
+{
+    ostringstream os;
+    XMLStreamable<OLCState> xs( "OLCState" );
+    
+    xs.setPointer( this);
+    xs.toStream(os);
+
+    stc(os.str() + "\r\n", ch);
+    return false;
+}
+
+CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
+{
+    Religion *religion;
+    DLString args = argument;
+    args.toLower().stripWhiteSpace();
+
+    if (args.empty()) {
+        stc("Формат:  reledit название_религии\r\n", ch);
+        stc("         reledit list\r\n", ch);
+        return;
+    }
+
+    if (arg_is_list(args)) {
+        ch->send_to(dlprintf("{C%-15s %-17s %3s  %-3s %-3s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH"));
+
+        const DLString lineFormat = web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s  %1s%1s%1s %1s%1s%1s{x\r\n";
+
+        for (int r = 0; r < religionManager->size(); r++) {
+            DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));
+            if (!rel)
+                continue;
+                        
+            if (rel->getIndex() == god_none)
+                continue;
+            if (rel->getIndex() == god_chronos)
+                continue;
+
+            ch->send_to(dlprintf(lineFormat.c_str(),
+                    rel->getShortDescr().c_str(),
+                    rel->getRussianName().ruscase('1').c_str(),
+                    rel->getSex() == SEX_MALE ? "M" : "F",
+                    rel->getAlign().isSetBitNumber(N_ALIGN_GOOD) ? "{YG{x" : " ",
+                    rel->getAlign().isSetBitNumber(N_ALIGN_NEUTRAL) ? "N" : " ",
+                    rel->getAlign().isSetBitNumber(N_ALIGN_EVIL) ? "{RE{x" : " ",
+                    rel->getEthos().isSetBitNumber(ETHOS_LAWFUL) ? "{WL{x" : " ",
+                    rel->getEthos().isSetBitNumber(ETHOS_NEUTRAL) ? "N" : " ",
+                    rel->getEthos().isSetBitNumber(ETHOS_CHAOTIC) ? "{MC{x" : " "));
+        }
+        return;
+    }
+
+    religion = religionManager->findUnstrict(args);
+    if (!religion || dynamic_cast<DefaultReligion *>(religion) == NULL) {
+        stc("Религия с таким названием не найдена, используйте reledit list для списка.\r\n", ch);
+        return;
+    }
+
+    OLCStateReligion::Pointer he(NEW, religion);
+    he->attach(ch);
+    he->show(ch);
+}
+

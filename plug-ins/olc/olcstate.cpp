@@ -378,6 +378,15 @@ bool OLCState::mapEdit( Properties &map, DLString &args )
     return false;
 }
 
+bool OLCState::flagBitsEdit(const FlagTable &table, Flags &field)
+{
+    int value = field.getValue();
+    bool rc = flagBitsEdit(table, value);
+    if (rc)
+        field.setValue(value);
+    return rc;
+}
+
 bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
 {
     PCharacter *ch = owner->character->getPC();
@@ -400,6 +409,15 @@ bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
     field ^= value;
     ptc(ch, "Новое значение поля {g%s{x:\r\n%s\r\n", cmd, table.names(field).c_str());
     return true;
+}
+
+bool OLCState::flagValueEdit(const FlagTable &table, Flags &field)
+{
+    int value = field.getValue();
+    bool rc = flagValueEdit(table, value);
+    if (rc)
+        field.setValue(value);
+    return rc;
 }
 
 bool OLCState::flagValueEdit(const FlagTable &table, int &field)

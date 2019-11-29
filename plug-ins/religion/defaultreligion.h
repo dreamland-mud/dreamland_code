@@ -90,7 +90,7 @@ public:
     virtual bool likesStolen(Object *) const;
     virtual bool ignoresItem(Object *) const;
 
-protected:
+// Fields are public to simplify online editing.
     XML_VARIABLE XMLString  shortDescr;
     XML_VARIABLE XMLString  nameRus;
     XML_VARIABLE XMLString  description;
