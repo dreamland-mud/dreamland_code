@@ -59,6 +59,7 @@ int liq_table;
 int mat_table;
 int group_table;
 int race_table;
+int class_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
@@ -86,8 +87,11 @@ const struct olc_help_type help_table[] =
     {"liquid", &liq_table, "Жидкости (поле value2 у емкостей и фонтанов)."},
     {"material", &mat_table, "Материалы предметов и мобов (поле material)." },
 
-    {"{YМобы{x", NULL, NULL},
+    {"{YМобы и персонажи{x", NULL, NULL},
     {"races", &race_table, "Список всех рас мобов."},
+    {"classes", &class_table, "Список всех классов персонажей."},
+    {"align_table", &align_table, "Характер персонажа."},
+    {"ethos_table", &ethos_table, "Этос персонажа."},
     {"sex_table", &sex_table, "Пол моба (поле sex)."},
     {"position_table", &position_table, "Позиции мобов (поля start_pos, default_pos, position)."},
     {"size_table", &size_table, "Размеры мобов (поле size)."},
@@ -111,6 +115,7 @@ const struct olc_help_type help_table[] =
     {"{YУмения и заклинания{x", NULL, NULL}, 
     {"spells", &skill_table, "Имена всех заклинаний."},
     {"groups", &group_table, "Все группы умений (для поля practicer)."},
+
     {NULL, NULL, NULL}
 };
 
@@ -297,6 +302,20 @@ bool show_help(Character * ch, const char *cargument)
                     buf << fmt( 0, "{g%-17s{x: %-25s",
                                 race->getName().c_str(),
                                 race->getMaleName().ruscase('1').c_str() );
+                    if (i % 2)
+                        buf << endl;
+                }
+                buf << endl;
+                ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &class_table) {
+                ostringstream buf;
+                for (int i = 0; i < professionManager->size( ); i++) {
+                    Profession *prof = professionManager->find(i);
+                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                                prof->getName().c_str(),
+                                prof->getRusName().ruscase('1').c_str() );
                     if (i % 2)
                         buf << endl;
                 }
