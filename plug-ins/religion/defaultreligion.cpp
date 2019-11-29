@@ -6,6 +6,7 @@
 #include "religionattribute.h"
 #include "logstream.h"
 
+#include "xmltableloaderplugin.h"
 #include "pcharacter.h"
 #include "race.h"
 #include "liquid.h"
@@ -14,11 +15,15 @@
 #include "skillmanager.h"
 #include "skillgroup.h"
 
+#include "religionflags.h"
 #include "liquidflags.h"
+#include "websocketrpc.h"
 #include "merc.h"
 #include "def.h"
 
 static const DLString LABEL_RELIGION = "religion";
+
+TABLE_LOADER_IMPL(ReligionLoader, "religions", "Religion");
 
 /*-------------------------------------------------------------------
  * ReligionHelp 
@@ -73,7 +78,7 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
             in << ", недоступна тебе.";
     }
 
-    in << " " << editButton(ch) << endl << endl
+    in << " " << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl << endl
        << *this;
 }
 
@@ -85,7 +90,8 @@ DefaultReligion::DefaultReligion( )
                   ethos( 0, &ethos_table ),
                   races( raceManager ),
                   classes( professionManager ),
-                  sex( SEX_MALE, &sex_table )
+                  sex( SEX_MALE, &sex_table ),
+                  flags( 0, &religion_flags )
 
 {
 }
@@ -108,6 +114,12 @@ bool DefaultReligion::isValid( ) const
 
 bool DefaultReligion::isAllowed( Character *ch ) const
 {
+    if (flags.isSet(RELIG_SYSTEM))
+        return false;
+
+    if (flags.isSet(RELIG_HIDDEN) && !ch->is_immortal())
+        return false;
+
     if (!ethos.isSetBitNumber( ch->ethos ))
         return false;
 

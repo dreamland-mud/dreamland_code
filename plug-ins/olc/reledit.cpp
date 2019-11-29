@@ -6,11 +6,13 @@
 #include <affect.h>
 #include "room.h"
 #include "areahelp.h"
+#include "regexp.h"
 
 #include "reledit.h"
 #include "olc.h"
 #include "security.h"
 
+#include "religionflags.h"
 #include "merc.h"
 #include "update_areas.h"
 #include "websocketrpc.h"
@@ -23,6 +25,7 @@
 OLC_STATE(OLCStateReligion);
 RELIG(none);
 RELIG(chronos);
+
 
 OLCStateReligion::OLCStateReligion() : isChanged(false)
 {
@@ -97,15 +100,19 @@ void OLCStateReligion::show( PCharacter *ch )
         r->getDescription().c_str(),
         web_edit_button(ch, "desc", "web").c_str());        
 
-    ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
-        web_edit_button(ch, "hedit", r->help->getID()).c_str(),
-        r->help->getID());
+    ptc(ch, "Флаги:             {C%s{x {D(? religion_flags){x\r\n",
+        r->flags.getValue() != 0 ? r->flags.names().c_str() : "-");
+
+    if (r->help)
+        ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
+            web_edit_button(ch, "hedit", r->help->getID()).c_str(),
+            r->help->getID());
 
     ptc(ch, "Характер:          {Y%s{x {D(? align){x\r\n",
-        r->getAlign().names().c_str());
+        r->align.getValue() != 0 ? r->align.names().c_str() : "-");
 
     ptc(ch, "Этос:              {Y%s{x {D(? ethos){x\r\n",
-        r->getEthos().names().c_str());
+        r->ethos.getValue() != 0 ? r->ethos.names().c_str() : "-");
 
     ptc(ch, "Расы:              {Y%s{x {D(? races){x\r\n",
         r->races.empty() ? "-": r->races.toString().c_str());
@@ -140,6 +147,11 @@ RELEDIT(sex, "пол", "установить пол божества")
 RELEDIT(desc, "описание", "установить описание божества")
 {
     return editor(argument, getOriginal()->description, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
+}
+
+RELEDIT(flags, "флаги", "выставить флаги религии")
+{
+    return flagBitsEdit(religion_flags, getOriginal()->flags);
 }
 
 RELEDIT(align, "характер", "ограничить по характеру")
@@ -188,31 +200,65 @@ RELEDIT(dump, "вывод", "(отладка) вывести внутренне�
     return false;
 }
 
+static bool religion_valid(Religion *rel)
+{
+    return rel 
+        && rel->isValid()
+        && rel->getIndex() != god_none
+        && rel->getIndex() != god_chronos;
+}
+
 CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
 {
-    Religion *religion;
     DLString args = argument;
-    args.toLower().stripWhiteSpace();
+    DLString cmd = args.getOneArgument();
 
-    if (args.empty()) {
-        stc("Формат:  reledit название_религии\r\n", ch);
+    if (cmd.empty()) {
+        stc("Формат:  reledit название\r\n", ch);
         stc("         reledit list\r\n", ch);
+        stc("         reledit create новое_ключевое_слово\r\n", ch);
         return;
     }
 
-    if (arg_is_list(args)) {
+    if (arg_oneof(cmd, "create", "создать")) {
+        static RegExp namePattern("^[a-z ]{2,}$", true);
+        if (args.empty() || !namePattern.match(args)) {
+            stc("Укажите английское название религии маленькими буквами.\r\n", ch);
+            return;
+        }
+
+        if (religionManager->findUnstrict(args)) {
+            stc("Религия с похожим ключевым словом уже существует.\r\n", ch);
+            return;
+        }
+
+        DefaultReligion::Pointer rel(NEW);
+        rel->setName(args);
+        rel->shortDescr = args.capitalize();
+        rel->help.construct();
+        rel->help->setID(
+            helpManager->getLastID() + 1
+        );
+        
+        ReligionLoader::getThis()->loadElement(rel);
+        ReligionLoader::getThis()->saveElement(rel);
+
+        ptc(ch, "Создана новая религия под именем %s.\r\n", rel->getName().c_str());
+
+        OLCStateReligion::Pointer he(NEW, *rel);
+        he->attach(ch);
+        he->show(ch);
+        return;
+    }
+
+    if (arg_is_list(cmd)) {
         ch->send_to(dlprintf("{C%-15s %-17s %3s %-3s   %-3s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH"));
 
         const DLString lineFormat = web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s %1s%1s%1s   %1s%1s%1s{x\r\n";
 
         for (int r = 0; r < religionManager->size(); r++) {
             DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));
-            if (!rel)
-                continue;
-                        
-            if (rel->getIndex() == god_none)
-                continue;
-            if (rel->getIndex() == god_chronos)
+            if (!religion_valid(rel))
                 continue;
 
             ch->send_to(dlprintf(lineFormat.c_str(),
@@ -229,7 +275,8 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    religion = religionManager->findUnstrict(args);
+    Religion *religion = religionManager->findUnstrict(
+        DLString(argument).toLower().stripWhiteSpace());
     if (!religion || dynamic_cast<DefaultReligion *>(religion) == NULL) {
         stc("Религия с таким названием не найдена, используйте reledit list для списка.\r\n", ch);
         return;

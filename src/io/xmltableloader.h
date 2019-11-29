@@ -27,6 +27,7 @@ public:
     void loadAll( );
     void unloadAll( );
     void saveElement(XMLTableElement::Pointer element);
+    void loadElement(XMLTableElement::Pointer element);
 
     inline const LoadedList & getElements( ) const
     {

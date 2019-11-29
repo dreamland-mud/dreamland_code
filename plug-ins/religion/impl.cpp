@@ -10,15 +10,12 @@
 #include "mocregistrator.h"
 #include "dlxmlloader.h"
 #include "xmlattributeplugin.h"
-#include "xmltableloaderplugin.h"
 
 #include "templeman.h"
 #include "gods_impl.h"
 #include "tattoo.h"
 #include "defaultreligion.h"
 #include "religionattribute.h"
-
-TABLE_LOADER(ReligionLoader, "religions", "Religion");
 
 extern "C"
 {

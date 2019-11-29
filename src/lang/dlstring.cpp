@@ -459,14 +459,16 @@ bool DLString::isRussian( ) const
     return true;
 }
 
-void DLString::stripLeftWhiteSpace( )
+DLString & DLString::stripLeftWhiteSpace( )
 {
         erase( 0, find_first_not_of( ' ' ) );
+        return *this;
 }
 
-void DLString::stripRightWhiteSpace( )
+DLString & DLString::stripRightWhiteSpace( )
 {
         erase( find_last_not_of( ' ' ) + 1 );
+        return *this;
 }
 
 DLString& DLString::toLower( )

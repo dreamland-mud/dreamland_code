@@ -308,16 +308,17 @@ public:
         bool isRussian( ) const;
         
         /** убирает пробелы в начале и конце строки */
-        inline void stripWhiteSpace( )
+        inline DLString& stripWhiteSpace( )
         {
                 stripRightWhiteSpace( );
                 stripLeftWhiteSpace( );
+                return *this;
         }
 
         /** убирает пробелы в начале строки */
-        void stripLeftWhiteSpace( );
+        DLString & stripLeftWhiteSpace( );
         /** убирает пробелы в конце строки */
-        void stripRightWhiteSpace( );
+        DLString & stripRightWhiteSpace( );
         
         DLString& toLower( );
         DLString toLower( ) const;

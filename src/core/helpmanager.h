@@ -97,6 +97,7 @@ public:
     void unregistrate( HelpArticle::Pointer );
     inline const HelpArticles & getArticles( ) const;
     HelpArticle::Pointer getArticle(int id) const;
+    int getLastID() const;
 
 protected:
     HelpArticles articles; 

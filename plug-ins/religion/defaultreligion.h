@@ -12,6 +12,7 @@
 #include "xmlvariablecontainer.h"
 #include "xmlenumeration.h"
 #include "xmlboolean.h"
+#include "xmltableloaderplugin.h"
 
 #include "religion.h"
 #include "helpmanager.h"
@@ -20,6 +21,8 @@
 class Skill;
 class Liquid;
 class DefaultReligion;
+
+TABLE_LOADER_DECL(ReligionLoader);
 
 /*
  * ReligionHelp
@@ -100,6 +103,7 @@ public:
     XML_VARIABLE XMLPointerNoEmpty<ReligionHelp> help;
     XML_VARIABLE XMLEnumeration sex;
     XML_VARIABLE GodLikes likes;
+    XML_VARIABLE XMLFlagsNoEmpty flags;
 };
 
 inline const Flags & DefaultReligion::getAlign() const

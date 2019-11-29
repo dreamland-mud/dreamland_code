@@ -118,3 +118,9 @@ void XMLTableLoader::saveElement(XMLTableElement::Pointer element)
     }
 }
 
+void XMLTableLoader::loadElement(XMLTableElement::Pointer element)
+{
+    elements.push_back(element);
+    element->loaded();
+    element->setLoader(this);
+}

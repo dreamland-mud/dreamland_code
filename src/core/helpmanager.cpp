@@ -15,7 +15,6 @@ const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
 static const DLString ATTRIBUTE_ID = "id";
 
-long lastID = 0;
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
@@ -212,4 +211,16 @@ HelpArticle::Pointer HelpManager::getArticle(int id) const
         return HelpArticle::Pointer();
     else
         return a->second;
+}
+
+int HelpManager::getLastID() const
+{
+    HelpArticles::const_iterator a;
+    int max_id = 0;
+
+    for (a = getArticles( ).begin( ); a != getArticles( ).end( ); a++)
+        if ((*a)->getID() > max_id)
+            max_id = (*a)->getID();
+
+    return max_id;
 }

@@ -38,6 +38,7 @@
 #include "loadsave.h"
 #include "damageflags.h"
 #include "recipeflags.h"
+#include "religionflags.h"
 #include "material.h"
 #include "def.h"
 
@@ -92,6 +93,7 @@ const struct olc_help_type help_table[] =
     {"classes", &class_table, "Список всех классов персонажей."},
     {"align_table", &align_table, "Характер персонажа."},
     {"ethos_table", &ethos_table, "Этос персонажа."},
+    {"religion_flags", &religion_flags, "Флаги религий."},
     {"sex_table", &sex_table, "Пол моба (поле sex)."},
     {"position_table", &position_table, "Позиции мобов (поля start_pos, default_pos, position)."},
     {"size_table", &size_table, "Размеры мобов (поле size)."},
