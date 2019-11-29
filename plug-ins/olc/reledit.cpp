@@ -201,9 +201,9 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
     }
 
     if (arg_is_list(args)) {
-        ch->send_to(dlprintf("{C%-15s %-17s %3s  %-3s %-3s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH"));
+        ch->send_to(dlprintf("{C%-15s %-17s %3s %-3s   %-3s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH"));
 
-        const DLString lineFormat = web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s  %1s%1s%1s %1s%1s%1s{x\r\n";
+        const DLString lineFormat = web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s %1s%1s%1s   %1s%1s%1s{x\r\n";
 
         for (int r = 0; r < religionManager->size(); r++) {
             DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));
@@ -219,12 +219,12 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
                     rel->getShortDescr().c_str(),
                     rel->getRussianName().ruscase('1').c_str(),
                     rel->getSex() == SEX_MALE ? "M" : "F",
-                    rel->getAlign().isSetBitNumber(N_ALIGN_GOOD) ? "{YG{x" : " ",
-                    rel->getAlign().isSetBitNumber(N_ALIGN_NEUTRAL) ? "N" : " ",
-                    rel->getAlign().isSetBitNumber(N_ALIGN_EVIL) ? "{RE{x" : " ",
-                    rel->getEthos().isSetBitNumber(ETHOS_LAWFUL) ? "{WL{x" : " ",
-                    rel->getEthos().isSetBitNumber(ETHOS_NEUTRAL) ? "N" : " ",
-                    rel->getEthos().isSetBitNumber(ETHOS_CHAOTIC) ? "{MC{x" : " "));
+                    rel->getAlign().isSetBitNumber(N_ALIGN_GOOD) ? "{YG{x" : "{D-{x",
+                    rel->getAlign().isSetBitNumber(N_ALIGN_NEUTRAL) ? "N" : "{D-{x",
+                    rel->getAlign().isSetBitNumber(N_ALIGN_EVIL) ? "{RE{x" : "{D-{x",
+                    rel->getEthos().isSetBitNumber(ETHOS_LAWFUL) ? "{WL{x" : "{D-{x",
+                    rel->getEthos().isSetBitNumber(ETHOS_NEUTRAL) ? "N" : "{D-{x",
+                    rel->getEthos().isSetBitNumber(ETHOS_CHAOTIC) ? "{MC{x" : "{D-{x"));
         }
         return;
     }
