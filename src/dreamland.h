@@ -125,8 +125,6 @@ public:
         inline void resetOption( int );
         void setCurrentTime( );
 
-        ::Pointer<SocketManager> getSocketManager();
-
 private:
         void setBootTime( );
         void pulseStart( );

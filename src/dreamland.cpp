@@ -63,80 +63,6 @@ const long DreamLand::DEFAULT_OPTIONS = DL_PK | DL_SAVE_OBJS | DL_SAVE_MOBS;
 #include <sys/types.h>
 #include <netinet/in.h>
 
-class TestClientSocket : public BufferedSocketTask {
-public:
-    TestClientSocket(int fd) : BufferedSocketTask(fd) { }
-
-protected:
-    void handleIn() {
-        string s(in.begin(), in.end());
-        LogStream::sendError() << "in: " << s << endl;
-
-        in.clear();
-
-        s = ">>> " + s;
-
-        out.insert(out.end(), s.begin(), s.end());
-    }
-
-    void handleError(int e) {
-        LogStream::sendError() << "Oops: " << e << endl;
-        dreamland->getSocketManager()->slay(fd);
-        close(fd);
-    }
-
-    void handleEOF() {
-        LogStream::sendError() << "EOF" << endl;
-        dreamland->getSocketManager()->slay(fd);
-        close(fd);
-    }
-};
-
-class TestServerSocket : public ServerSocketTask {
-public:
-    TestServerSocket(int fd) : ServerSocketTask(fd) { }
-
-protected:
-    void handleError(int e) {
-        LogStream::sendError() << "Oops: " << e << endl;
-        dreamland->getSocketManager()->slay(fd);
-        close(fd);
-    }
-
-    void handleConnection(int fd) {
-        LogStream::sendError() << "Connected! " << fd << endl;
-        dreamland->getSocketManager()->put((SocketTask *)new TestClientSocket(fd));
-    }
-};
-
-::Pointer<SocketManager>
-DreamLand::getSocketManager()
-{
-    return socketManager; 
-}
-
-void
-testServer()
-{
-    int sock = socket(AF_INET, SOCK_STREAM, 6);
-    struct sockaddr_in sin = { AF_INET };
-    sin.sin_addr.s_addr = INADDR_ANY;
-    sin.sin_port = htons(1234);
-
-    if(bind(sock, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
-        LogStream::sendError() << "Oops: " << errno << endl;
-        return;
-    }
-
-    if(listen(sock, 7) < 0) {
-        LogStream::sendError() << "Oops: " << errno << endl;
-        return;
-    }
-
-    SocketTask::Pointer p((SocketTask*)new TestServerSocket(sock));
-    dreamland->getSocketManager()->put(p);
-}
-
 DreamLand::DreamLand( )
         : currentTime( 0 ), 
           bootTime( 0 ), 
@@ -178,7 +104,7 @@ DreamLand::DreamLand( )
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
 
-        testServer();
+        new HttpServerSocket(1234);
 }
 
 DreamLand::~DreamLand( )
