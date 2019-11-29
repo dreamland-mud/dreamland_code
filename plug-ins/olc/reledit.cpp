@@ -112,6 +112,8 @@ void OLCStateReligion::show( PCharacter *ch )
 
     ptc(ch, "Классы:            {Y%s{x {D(? classes){x\r\n",
         r->classes.empty() ? "-": r->classes.toString().c_str());
+
+    ptc(ch, "{WКоманды{x: commands, show, done, ?\r\n");        
 }
 
 RELEDIT(show, "показать", "показать все поля")

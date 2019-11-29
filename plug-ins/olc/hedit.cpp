@@ -82,7 +82,7 @@ void OLCStateHelp::show( PCharacter *ch ) const
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.c_str());
-    ptc(ch, "{WКоманды{x: keywords, level, text copy, text paste\r\n");
+    ptc(ch, "{WКоманды{x: keywords, level, text copy, text paste, commands, show, done\r\n");
 }
 
 HEDIT(show, "показать", "показать все поля")
@@ -174,12 +174,18 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
 
         if (matches.size() > 1) {
             stc("Найдено несколько статей справки, используйте ID, чтобы прицелиться получше:\r\n", ch);
+            const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
             for (list<HelpArticle::Pointer>::const_iterator m = matches.begin();  m != matches.end(); m++)
-                ptc(ch, "%4d     %s\r\n", (*m)->getID(), (*m)->getKeyword().c_str());
+                ptc(ch, lineFormat.c_str(), (*m)->getID(), (*m)->getKeyword().c_str());
             return;
         }
 
         help = matches.front();
+    }
+
+    if (help->getID() <= 0) {
+        stc("Эту статью справки невозможно сохранить на диск.\r\n", ch);
+        return;
     }
 
     OLCStateHelp::Pointer he(NEW, help.getPointer());
