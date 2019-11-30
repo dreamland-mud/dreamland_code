@@ -29,13 +29,15 @@ CMDRUNP( webedit )
         return;
     }
 
+    std::vector<DLString> args(2);
+
+    // Pass editor buffer as the first argument.
     Editor::reg_t &reg = pch->getAttributes().getAttr<XMLAttributeEditorState>("edstate")->regs[0];
-
-    std::vector<DLString> args(1);
-
     for(Editor::reg_t::const_iterator j = reg.begin(); j != reg.end(); j++)
         args[0].append(*j).append("\n");
 
+    // Pass arg this comand was called with as the second argument, e.g. 'webedit help'.
+    args[1] = argument;
     ch->desc->writeWSCommand("editor_open", args);
 }
 

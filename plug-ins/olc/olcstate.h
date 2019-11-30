@@ -28,7 +28,8 @@ typedef enum {
     ED_NO_FLAG=0,
     ED_UPPER_FIRST_CHAR=1,
     ED_NO_NEWLINE=2,
-    ED_ADD_NEWLINE=4
+    ED_ADD_NEWLINE=4,
+    ED_HELP_HINTS=8
 } editor_flags;
 
 class OLCCommand : public CommandBase {
@@ -107,7 +108,7 @@ protected:
     bool editorCopy(const char *field);
     bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editorPaste(char *&field, editor_flags flags = ED_NO_FLAG);
-    bool editorWeb(const DLString &original, const DLString &saveCommand);
+    bool editorWeb(const DLString &original, const DLString &saveCommand, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
     

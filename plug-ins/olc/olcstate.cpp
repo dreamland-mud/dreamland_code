@@ -614,7 +614,7 @@ bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
  * inside an attribute. '<desc> paste' will be done from the attribute's event handler once 
  * webedit has finished.
  */
-bool OLCState::editorWeb(const DLString &original, const DLString &saveCommand)
+bool OLCState::editorWeb(const DLString &original, const DLString &saveCommand, editor_flags flags)
 {
     PCharacter *ch = owner->character->getPC();
 
@@ -622,7 +622,12 @@ bool OLCState::editorWeb(const DLString &original, const DLString &saveCommand)
 
     XMLAttributeOLC::Pointer attr = ch->getAttributes().getAttr<XMLAttributeOLC>("olc");
     attr->saveCommand.setValue(saveCommand);
-    interpret_raw(ch, "webedit");
+
+    if (IS_SET(flags, ED_HELP_HINTS))
+        interpret_raw(ch, "webedit", "help");
+    else
+        interpret_raw(ch, "webedit");
+        
     return false;
 }
 
@@ -649,7 +654,7 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
         return editorPaste(original, flags);
 
     if (arg_is_web(command))
-        return editorWeb(original, lastCmd + " paste");
+        return editorWeb(original, lastCmd + " paste", flags);
 
     if (arg_is_help(command)) {
         stc("Команды редактора:\n\r", ch);

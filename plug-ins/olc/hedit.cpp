@@ -111,7 +111,7 @@ HEDIT(level, "уровень", "установить уровень, с кото
 
 HEDIT(text, "текст", "редактировать текст справки")
 {
-    return editor(argument, text);
+    return editor(argument, text, ED_HELP_HINTS);
 }
 
 HEDIT(commands, "команды", "показать список встроенных команд edit")
