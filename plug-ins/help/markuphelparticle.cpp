@@ -5,6 +5,8 @@
 #include "markuphelparticle.h"
 #include "helpformatter.h"
 #include "websocketrpc.h"
+#include "character.h"
+#include "descriptor.h"
 
 MarkupHelpArticle::~MarkupHelpArticle( )
 {
@@ -34,8 +36,9 @@ DLString MarkupHelpArticle::editButton(Character *ch) const
 
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "Справка на тему {C" << getKeyword() << "{x: "
-       << editButton(ch) << endl;
+    if (ch)
+        in << "Справка на тему {C" << getKeyword() << "{x: "
+        << editButton(ch) << endl;
 
     in << *this;
 }
