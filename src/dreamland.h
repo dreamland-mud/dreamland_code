@@ -58,6 +58,7 @@ class HelpManager;
 class SkillGroupManager;
 class BonusManager;
 class SocketManager;
+class ServletManager;
 
 extern DreamLand * dreamland;
 
@@ -200,6 +201,7 @@ private:
         ::Pointer<SkillGroupManager> skillGroupManager;
         ::Pointer<BonusManager> bonusManager;
         ::Pointer<SocketManager> socketManager;
+        ::Pointer<ServletManager> servletManager;
 
         DbEnvContext *dbEnv;
 };

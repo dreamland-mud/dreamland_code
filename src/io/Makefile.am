@@ -9,6 +9,7 @@ src_INCLUDES = \
 -I$(srcdir)/../xml \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../alloc \
+-I$(srcdir)/../plugin \
 -I$(srcdir)/../util 
 
 AM_CPPFLAGS = -Wall
@@ -22,6 +23,9 @@ dlfileop.cpp \
 dlfilestream.cpp \
 exceptiondbio.cpp \
 socketmanager.cpp \
+servlet.cpp \
+http.cpp \
+httpsocket.cpp \
 xmlloader.cpp \
 xmltableelement.cpp \
 xmltableloader.cpp \

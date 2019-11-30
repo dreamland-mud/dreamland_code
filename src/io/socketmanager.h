@@ -25,7 +25,7 @@ public:
     virtual bool expectWrite() const = 0;
     virtual void handleRead() = 0;
     virtual void handleWrite() = 0;
-    virtual void handleError(string);
+    virtual void handleError(std::string);
     void close();
     void put();
 
@@ -38,7 +38,9 @@ protected:
 class ServerSocketTask : public SocketTask
 {
 public:
-    ServerSocketTask(int);
+    ServerSocketTask(unsigned short port);
+
+    int createSocket(unsigned short port);
 
     virtual bool expectRead() const;
     virtual bool expectWrite() const;
@@ -47,7 +49,7 @@ public:
     virtual void handleWrite();
 
 protected:
-    virtual void handleConnection(int fd) = 0;
+    virtual SocketTask::Pointer createNewTask(int fd) = 0;
 };
 
 class BufferedSocketTask : public SocketTask
@@ -67,55 +69,6 @@ protected:
     std::vector<unsigned char> in, out;
 };
 
-class HttpEntity
-{
-public:
-    std::map<std::string, std::string> headers;
-    std::string body;
-};
-
-class HttpRequest : public HttpEntity
-{
-public:
-    std::string method;
-    std::string uri;
-    std::string proto;
-};
-
-class HttpResponse : public HttpEntity
-{
-public:
-    std::string proto;
-    int status;
-    std::string message;
-};
-
-class HttpSocketTask : public BufferedSocketTask
-{
-public:
-    HttpSocketTask(int);
-
-protected:
-    virtual void handleIn();
-
-    virtual void handleRequest();
-
-    HttpRequest request;
-    HttpResponse response;
-
-private:
-    size_t getContentLength();
-    bool consumeLine(string &str);
-    void parseHeaderLine(const string &str);
-    void parse1stLine(const string &str);
-
-    enum {
-        INIT,
-        HEADER,
-        BODY
-    } state;
-};
-
 class SocketManager : std::list<SocketTask::Pointer>, public OneAllocate 
 {
 public:
@@ -131,18 +84,6 @@ public:
 private:
     static bool sameFd(SocketTask::Pointer task1, int fd);
     static SocketManager *instance;
-};
-
-ostream &operator << (ostream &os, const HttpResponse &resp);
-
-class HttpServerSocket : public ServerSocketTask {
-public:
-    HttpServerSocket(unsigned short port);
-
-    int createSocket(unsigned short port);
-
-protected:
-    void handleConnection(int fd);
 };
 
 #endif

@@ -42,6 +42,7 @@
 #include "wearlocation.h"
 #include "feniamanager.h"
 #include "socketmanager.h"
+#include "servlet.h"
 #include "process.h"
 #include "religion.h"
 #include "liquid.h"
@@ -100,11 +101,10 @@ DreamLand::DreamLand( )
         skillGroupManager.construct( );
         bonusManager.construct( );
         socketManager.construct( );
+        servletManager.construct( );
 
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
-
-        new HttpServerSocket(1234);
 }
 
 DreamLand::~DreamLand( )
@@ -131,6 +131,7 @@ DreamLand::~DreamLand( )
         helpManager.clear( );
         skillGroupManager.clear( );
         bonusManager.clear( );
+        servletManager.clear( );
         socketManager.clear( );
 
         getDbEnv( )->close( );
