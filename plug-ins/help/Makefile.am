@@ -5,12 +5,13 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/system \
--I$(top_srcdir)/plug-ins/descriptor
-
+-I$(top_srcdir)/plug-ins/descriptor \
+-I/usr/include/jsoncpp 
 
 libhelp_la_LIBADD = \
 ../descriptor/libdescriptor.la \
-../system/libsystem.la 
+../system/libsystem.la \
+-ljsoncpp
 
 libhelp_la_SOURCES = \
 helpformatter.cpp \

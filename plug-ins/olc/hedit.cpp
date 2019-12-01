@@ -15,6 +15,8 @@
 #include "mercdb.h"
 #include "def.h"
 
+extern void help_save_ids();
+
 OLC_STATE(OLCStateHelp);
 
 OLCStateHelp::OLCStateHelp() : id(-1), level(-1), isChanged(false)
@@ -57,6 +59,8 @@ void OLCStateHelp::commit()
     original->setLevel(level);
     original->setText(text);
     original->save();
+
+    help_save_ids();
 }
 
 void OLCStateHelp::statePrompt(Descriptor *d) 

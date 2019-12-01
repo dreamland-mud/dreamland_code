@@ -10,7 +10,6 @@
 #include "xmlattributeticker.h"
 #include "xmlattributeplugin.h"
 #include "json/json.h"
-#include "iconvmap.h"
 #include "descriptor.h"
 #include "descriptorstatelistener.h"
 #include "quest.h"
@@ -79,7 +78,7 @@ GSN(randomizer);
 GSN(ruler_aura);
 CLAN(none);
 
-static IconvMap koi2utf("koi8-r", "utf-8");
+extern void help_save_ids();
 
 static string json_to_string( const Json::Value &value )
 {
@@ -1114,7 +1113,7 @@ public:
      */
     virtual void run( )
     {
-        saveUniqueRefs();
+        help_save_ids();
 #if 0        
         PCharacter dummy;
 
@@ -1159,24 +1158,6 @@ public:
 
 
 protected:
-    /**
-     * Save a JSON file with all keywords and unique ID, to be used inside hedit.
-     */
-    void saveUniqueRefs() {
-        Json::Value typeahead;
-        HelpArticles::const_iterator a;
-
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            Json::Value b;
-            b["kw"] = koi2utf((*a)->getAllKeywordsString());
-            b["id"] = DLString((*a)->getID());
-            typeahead.append(b);
-        }
-
-        DLFileStream("/tmp", "hedit", ".json").fromString(
-            json_to_string(typeahead)
-        );
-    }
 #if 0
     /**
      * Save a JSON file that contains mapping of each help keyword to its unique ID
