@@ -73,7 +73,7 @@
 #include "playerattributes.h"
 
 #include "affect.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcrace.h"
@@ -2407,12 +2407,12 @@ struct HelpFinder {
 private:
     bool articleMatches(const HelpArticle::Pointer &a, const char *argument) const
     {
-        const DLString &fullKw = a->getKeyword();
+        const DLString &fullKw = a->getAllKeywordsString();
 
         if (is_name(argument, fullKw.c_str()))
             return true; 
 
-        for (StringSet::const_iterator k = (*a)->getKeywords().begin(); k != (*a)->getKeywords().end(); k++)
+        for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
             if (is_name(argument, (*k).c_str()))
                 return true; 
 
@@ -2470,7 +2470,7 @@ CMDRUNP( help )
     // Several matches, display them all with numbers.
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
     for (unsigned int a = 0; a < articles.size(); a++) 
-        buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getKeyword() << endl;
+        buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getAllKeywordsString() << endl;
     buf << endl
         << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." 
         << endl;

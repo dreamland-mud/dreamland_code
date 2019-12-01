@@ -15,8 +15,10 @@
 #include <FlexLexer.h>
 
 #include <algorithm>
+#include "logstream.h"
 #include "xmlnode.h"
 #include "xmlmatchpattern.h"
+#include "integer.h"
 
 const DLString XMLNode::ATTRIBUTE_TYPE = "type";
 const DLString XMLNode::ATTRIBUTE_NODE = "node";
@@ -113,6 +115,19 @@ XMLNode::Pointer XMLNode::selectSingleNode( const DLString& pattern ) const thro
         {
                 return *list->begin( );
         }
+}
+
+void XMLNode::getAttribute(const DLString &name, int &value) const
+{
+    if (hasAttribute(name)) {
+        try {
+            value = getAttribute(name).toInt();
+        } catch (const ExceptionBadType &e) {
+            LogStream::sendError() 
+                << "XML attribute: expected int for " 
+                << name << ", got " << getAttribute(name) << endl;
+        }
+    }
 }
 
 bool XMLNode::equal( const XMLNode &other ) const

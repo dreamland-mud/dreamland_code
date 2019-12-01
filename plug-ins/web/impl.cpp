@@ -1168,7 +1168,7 @@ protected:
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
             Json::Value b;
-            b["kw"] = koi2utf((*a)->getKeyword());
+            b["kw"] = koi2utf((*a)->getAllKeywordsString());
             b["id"] = DLString((*a)->getID());
             typeahead.append(b);
         }
@@ -1177,7 +1177,7 @@ protected:
             json_to_string(typeahead)
         );
     }
-
+#if 0
     /**
      * Save a JSON file that contains mapping of each help keyword to its unique ID
      * (and list of labels). This file is used to generate unique HTML links to the articles.
@@ -1258,7 +1258,7 @@ protected:
 
         DLFileStream(dir, label, ".html").fromString(buf.str());
     }
-
+#endif
 };    
 
 extern "C"

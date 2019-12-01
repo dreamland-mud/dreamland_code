@@ -13,7 +13,7 @@ const DLString HelpArticle::ATTRIBUTE_LEVEL = "level";
 const DLString HelpArticle::ATTRIBUTE_REF = "ref";
 const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
-static const DLString ATTRIBUTE_ID = "id";
+const DLString HelpArticle::ATTRIBUTE_ID = "id";
 
 
 HelpArticle::HelpArticle( ) 
@@ -26,16 +26,6 @@ HelpArticle::HelpArticle( )
 DLString HelpArticle::getText( Character * ) const
 {
     return *this;
-}
-
-const DLString & HelpArticle::getKeyword( ) const
-{
-    return fullKeyword;
-}
-
-const StringSet & HelpArticle::getKeywords() const
-{
-    return keywords;
 }
 
 int HelpArticle::getLevel( ) const
@@ -60,7 +50,7 @@ int HelpArticle::getID() const
 
 DLString HelpArticle::getTitle(const DLString &label) const 
 {
-    return getKeyword();
+    return getAllKeywordsString();
 }
 
 
@@ -75,23 +65,36 @@ void HelpArticle::save() const
 }
 
 
-void HelpArticle::addKeyword( const DLString &add )
-{
-    // 'add' can contain a list of keywords, parse them into keywords set.
-    keywords.fromString(add.toLower());
-    // Regenerate concatenated string.
-    fullKeyword = keywords.toString().toUpper();
-}
-
 const DLString &HelpArticle::getKeywordAttribute() const
 {
-    return keyword;
+    return keywordAttribute;
 }
 
-void HelpArticle::setKeywordAttribute(const DLString &keyword)
+void HelpArticle::setKeywordAttribute(const DLString &keywordAttribute)
 {
-    this->keyword = keyword;
-    addKeyword( keyword );
+    this->keywordAttribute = keywordAttribute;
+    refreshKeywords();
+}
+
+void HelpArticle::addAutoKeyword(const DLString &keyword)
+{
+    keywordsAuto.fromString(keyword.quote());
+    refreshKeywords();
+}
+
+void HelpArticle::addAutoKeyword(const StringSet &keywords)
+{
+    keywordsAuto.insert(keywords.begin(), keywords.end());
+    refreshKeywords();
+}
+
+void HelpArticle::refreshKeywords()
+{
+    keywordsAll.clear();
+    keywordsAll.insert(keywordsAuto.begin(), keywordsAuto.end());
+    keywordsAll.fromString(keywordAttribute);
+
+    keywordsAllString = keywordsAll.toString().toUpper();
 }
 
 const StringSet & HelpArticle::getLabels() const
@@ -122,11 +125,11 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     XMLStringNoEmpty xmlString( *this );
 
     if (!xmlString.toXML( parent ))
-        if (keyword.empty( ) && ref.empty( ) && refby.empty( ))
+        if (keywordAttribute.empty( ) && ref.empty( ) && refby.empty( ))
             return false;
     
-    if (!keyword.empty( ))
-        parent->insertAttribute( ATTRIBUTE_KEYWORD, keyword );
+    if (!keywordAttribute.empty( ))
+        parent->insertAttribute( ATTRIBUTE_KEYWORD, keywordAttribute );
 
     if (level >= -1)
         parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
@@ -146,26 +149,22 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     return true;
 }
 
-void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadType )
+void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw (ExceptionBadType)
 {
     XMLStringNoEmpty xmlString;
     
     xmlString.fromXML( parent );
     assign( xmlString );
 
-    keyword = parent->getAttribute( ATTRIBUTE_KEYWORD );
-    addKeyword( keyword );
+    setKeywordAttribute(
+        parent->getAttribute( ATTRIBUTE_KEYWORD ));
 
-    if (parent->hasAttribute( ATTRIBUTE_LEVEL ))
-        level = parent->getAttribute( ATTRIBUTE_LEVEL ).toInt( );
-
+    parent->getAttribute( ATTRIBUTE_LEVEL, level);
+    parent->getAttribute(ATTRIBUTE_ID, id);
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
     labelAttribute = parent->getAttribute(ATTRIBUTE_LABELS);
     labels.fromString(labelAttribute);
-    
-    if (parent->hasAttribute(ATTRIBUTE_ID))
-        id = parent->getAttribute(ATTRIBUTE_ID).toInt();
 }
 
 /*-----------------------------------------------------------------------
@@ -192,7 +191,7 @@ void HelpManager::registrate( HelpArticle::Pointer art )
     if (art->getID() > 0) {
         if (articlesById.count(art->getID()) > 0)
             LogStream::sendError() << "Duplicate help ID " << art->getID() << " for "
-                << art->getKeyword() << " and " << articlesById[art->getID()]->getKeyword() << endl;
+                << art->getAllKeywordsString() << " and " << articlesById[art->getID()]->getAllKeywordsString() << endl;
 
         articlesById[art->getID()] = art;
     }

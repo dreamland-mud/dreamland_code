@@ -271,7 +271,7 @@ void do_help( Descriptor *d, const char *topic, bool fColor )
     Character *ch = d->character;
 
     for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-        if (is_name( topic, (*a)->getKeyword( ).c_str( ) )) {
+        if (is_name( topic, (*a)->getAllKeywordsString( ).c_str( ) )) {
             ostringstream buf;
 
             if (!fColor)

@@ -1,9 +1,6 @@
 
-#include <character.h>
 #include <pcharacter.h>
 #include <commandmanager.h>
-#include <object.h>
-#include <affect.h>
 #include "room.h"
 #include "areahelp.h"
 
@@ -12,7 +9,7 @@
 #include "security.h"
 
 #include "merc.h"
-#include "update_areas.h"
+#include "arg_utils.h"
 #include "websocketrpc.h"
 #include "interp.h"
 #include "mercdb.h"
@@ -33,7 +30,6 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->level = original->getLevel();
     this->text = original->c_str();
     this->keywords = original->getKeywordAttribute();
-    this->fullKeyword = original->getKeyword();
 }
 
 OLCStateHelp::~OLCStateHelp() 
@@ -46,7 +42,7 @@ list<HelpArticle::Pointer> help_find_by_keywords(const DLString &keywords)
     list<HelpArticle::Pointer> originals;
 
     for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-        if (is_name(keywords.c_str(), (*a)->getKeyword().c_str()))
+        if (is_name(keywords.c_str(), (*a)->getAllKeywordsString().c_str()))
             originals.push_back(*a);
     }
 
@@ -65,7 +61,7 @@ void OLCStateHelp::commit()
 
 void OLCStateHelp::statePrompt(Descriptor *d) 
 {
-    d->send( "Editing help> " );
+    d->send( "Help> " );
 }
 
 void OLCStateHelp::changed( PCharacter *ch )
@@ -73,16 +69,32 @@ void OLCStateHelp::changed( PCharacter *ch )
     isChanged = true;
 }
 
+/**
+ * How all keywords for this article will look like after commit:
+ * a combination of automatic keywords and currently edited keyword attribute.
+ */
+StringSet OLCStateHelp::allKeywords() const
+{
+    StringSet kw;
+
+    HelpArticle::Pointer article = helpManager->getArticle(id);
+    const StringSet &autoKeywords = article->getAutoKeywords();
+    kw.insert(autoKeywords.begin(), autoKeywords.end());
+
+    kw.fromString(keywords);
+    return kw;
+}
+
 void OLCStateHelp::show( PCharacter *ch ) const
 {
     ptc(ch, "{WСтатья справки под номером {c%d{x:\r\n", id.getValue()); 
-    ptc(ch, "{DВсе ключевые слова: [%s]\r\n", fullKeyword.c_str());
+    ptc(ch, "{DВсе ключевые слова: [%s]\r\n", allKeywords().toString().c_str());
     ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());
     ptc(ch, "{WУровень{x:            [{C%d{x]\r\n", level.getValue());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.c_str());
-    ptc(ch, "{WКоманды{x: keywords, level, text copy, text paste, commands, show, done\r\n");
+    ptc(ch, "{WКоманды{x: commands, show, cancel, done\r\n");
 }
 
 HEDIT(show, "показать", "показать все поля")
@@ -91,11 +103,18 @@ HEDIT(show, "показать", "показать все поля")
     return false;
 }
 
-HEDIT(keywords, "ключевые", "установить слова, на которые откликается справка")
+HEDIT(keywords, "ключевые", "установить или очистить дополнительные ключевые слова")
 {
     if (!*argument) {
-        stc("Синтаксис:   keywords 'long keyword' shortkeyword etc\n\r", ch);
+        stc("Синтаксис:   keywords 'long keyword' shortkeyword\n\r", ch);
+        stc("             keywords clear\n\r", ch);
         return false;
+    }
+
+    if (arg_oneof_strict(argument, "clear", "очистить")) {
+        keywords.clear();
+        stc("Ключевые слова очищены.\r\n", ch);
+        return true;
     }
 
     keywords = argument;
@@ -133,18 +152,6 @@ HEDIT(cancel, "отменить", "отменить все изменения и
     return false;
 }
 
-HEDIT(dump, "вывод", "(отладка) вывести внутреннее состояние редактора")
-{
-    ostringstream os;
-    XMLStreamable<OLCState> xs( "OLCState" );
-    
-    xs.setPointer( this);
-    xs.toStream(os);
-
-    stc(os.str() + "\r\n", ch);
-    return false;
-}
-
 CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
 {
     DLString args = argument;
@@ -176,7 +183,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             stc("Найдено несколько статей справки, используйте ID, чтобы прицелиться получше:\r\n", ch);
             const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
             for (list<HelpArticle::Pointer>::const_iterator m = matches.begin();  m != matches.end(); m++)
-                ptc(ch, lineFormat.c_str(), (*m)->getID(), (*m)->getKeyword().c_str());
+                ptc(ch, lineFormat.c_str(), (*m)->getID(), (*m)->getAllKeywordsString().c_str());
             return;
         }
 

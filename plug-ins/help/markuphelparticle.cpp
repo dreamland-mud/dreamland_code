@@ -37,7 +37,7 @@ DLString MarkupHelpArticle::editButton(Character *ch) const
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
     if (ch)
-        in << "Справка на тему {C" << getKeyword() << "{x: "
+        in << "Справка на тему {C" << getAllKeywordsString() << "{x: "
         << editButton(ch) << endl;
 
     in << *this;

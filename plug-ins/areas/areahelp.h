@@ -18,9 +18,9 @@ public:
 
     XMLAreaHelp();
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& );
 
-    DLString keyword;
+    DLString keywordAttribute;
     int level;
     DLString labels;
     int id;

@@ -13,7 +13,7 @@
 #include "dl_strings.h"
 #include "def.h"
 
-static const DLString ATTRIBUTE_ID = "id";
+
 
 /*-------------------------------------------------------------------
  * XMLAreaHelp
@@ -27,8 +27,8 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
 {
     XMLString::toXML(parent);
 
-    if (!keyword.empty( ))
-        parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keyword );
+    if (!keywordAttribute.empty( ))
+        parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keywordAttribute );
 
     if (level >= -1)
         parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
@@ -37,22 +37,18 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
         parent->insertAttribute(HelpArticle::ATTRIBUTE_LABELS, labels);
 
     if (id > 0)
-        parent->insertAttribute(ATTRIBUTE_ID, DLString(id));
+        parent->insertAttribute(HelpArticle::ATTRIBUTE_ID, DLString(id));
 
     return true;    
 }
 
-void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadType )
+void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
 {
     XMLString::fromXML(parent);
-    keyword = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
+    keywordAttribute = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
     labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
-
-    if (parent->hasAttribute( HelpArticle::ATTRIBUTE_LEVEL ))
-        level = parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL ).toInt( );
-
-    if (parent->hasAttribute(ATTRIBUTE_ID))
-        id = parent->getAttribute(ATTRIBUTE_ID).toInt();
+    parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL, level );
+    parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
 }
 
 /*-------------------------------------------------------------------
@@ -123,12 +119,12 @@ public:
                 if (help->getKeywordAttribute().empty()) {
                     help->persistent = false;
                     help->selfHelp = true;
-                    help->addKeyword(aname.quote());
-                    help->addKeyword(DLString(area->credits).colourStrip().quote());
+                    help->addAutoKeyword(aname.quote());
+                    help->addAutoKeyword(DLString(area->credits).colourStrip().quote());
                 }
                 else {
                     help->persistent = true;
-                    help->selfHelp = is_name(aname.c_str(), (*a)->getKeyword().c_str());
+                    help->selfHelp = is_name(aname.c_str(), (*a)->getAllKeywordsString().c_str());
                 }
                 if (help->selfHelp) 
                     help->addLabel("area");

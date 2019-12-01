@@ -25,7 +25,6 @@ public:
 
     XML_VARIABLE XMLInteger id, level;
     XML_VARIABLE XMLString keywords;
-    XML_VARIABLE XMLString fullKeyword;
     XML_VARIABLE XMLString text;
 
     template <typename T>
@@ -33,6 +32,7 @@ public:
     
 private:
     virtual void statePrompt( Descriptor * );
+    StringSet allKeywords() const;
 
     XML_VARIABLE XMLBoolean isChanged;
 };

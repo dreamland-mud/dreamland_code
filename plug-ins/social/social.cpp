@@ -169,8 +169,8 @@ Social::~Social( )
 void Social::loaded()
 {
     help = SocialHelp::Pointer(NEW, Pointer(this));
-    help->addKeyword(getName());
-    help->addKeyword(getRussianName());
+    help->addAutoKeyword(getName());
+    help->addAutoKeyword(getRussianName());
     help->addLabel("social");
     
     helpManager->registrate(help);

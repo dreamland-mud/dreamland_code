@@ -34,12 +34,8 @@ void ReligionHelp::setReligion( DefaultReligion::Pointer religion )
 {
     this->religion = religion;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( religion->getName( ) );
-    keywords.insert( religion->getRussianName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
+    addAutoKeyword( religion->getName( ) );
+    addAutoKeyword( religion->getRussianName( ).ruscase( '1' ) );
     addLabel(LABEL_RELIGION);
 
     helpManager->registrate( Pointer( this ) );
@@ -49,8 +45,8 @@ void ReligionHelp::unsetReligion( )
 {
     helpManager->unregistrate( Pointer( this ) );
     religion.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
 }
 
 void ReligionHelp::save() const
@@ -91,7 +87,9 @@ DefaultReligion::DefaultReligion( )
                   races( raceManager ),
                   classes( professionManager ),
                   sex( SEX_MALE, &sex_table ),
-                  flags( 0, &religion_flags )
+                  flags( 0, &religion_flags ),
+                  minstat(&stat_table), maxstat(&stat_table),
+                  clans(clanManager)
 
 {
 }
@@ -109,6 +107,20 @@ void DefaultReligion::setName( const DLString &name )
 
 bool DefaultReligion::isValid( ) const
 {
+    return true;
+}
+
+bool DefaultReligion::isAllowedNew( Character *ch ) const
+{
+    if (flags.isSet(RELIG_SYSTEM))
+        return false;
+
+    if (ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
+        return false;
+
+    if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
+        return false;
+// TODO WIP
     return true;
 }
 

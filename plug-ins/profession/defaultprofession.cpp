@@ -32,13 +32,9 @@ void ProfessionHelp::setProfession( DefaultProfession::Pointer prof )
 {
     this->prof = prof;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( prof->getName( ) );
-    keywords.insert( prof->getRusName( ).ruscase( '1' ) );
-    keywords.insert( prof->getMltName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
+    addAutoKeyword( prof->getName( ) );
+    addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
+    addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
     addLabel(LABEL_CLASS);
 
     helpManager->registrate( Pointer( this ) );
@@ -48,8 +44,8 @@ void ProfessionHelp::unsetProfession( )
 {
     helpManager->unregistrate( Pointer( this ) );
     prof.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
 }
 
 DLString ProfessionHelp::getTitle(const DLString &label) const

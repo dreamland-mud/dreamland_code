@@ -321,10 +321,10 @@ void load_helps( FILE *fp )
         AreaHelp::Pointer help( NEW );
 
         help->setLevel( fread_number( fp ) );
-        help->addKeyword( fread_string( fp ) );
+        help->addAutoKeyword( fread_string( fp ) );
         help->areafile = area_file_list;
 
-        if (help->getKeyword( )[0] == '$') 
+        if (help->getAllKeywordsString( )[0] == '$') 
             break;
 
         help->setText( fread_string( fp ) );

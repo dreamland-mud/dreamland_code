@@ -32,13 +32,8 @@ void SkillGroupHelp::setSkillGroup( SkillGroup::Pointer group )
 {
     this->group = group;
     
-    keywords.insert( group->getName( ) );    
-    keywords.insert( group->getRussianName( ) );    
-    
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-    
-    fullKeyword = keywords.toString().toUpper();
+    addAutoKeyword( group->getName( ) );    
+    addAutoKeyword( group->getRussianName( ) );    
     helpManager->registrate( Pointer( this ) );
 }
 
@@ -46,7 +41,7 @@ void SkillGroupHelp::unsetSkillGroup( )
 {
     helpManager->unregistrate( Pointer( this ) );
     group.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
 }
 

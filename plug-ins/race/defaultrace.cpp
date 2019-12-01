@@ -37,14 +37,10 @@ void RaceHelp::setRace( DefaultRace::Pointer race )
 {
     this->race = race;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( race->getName( ) );
-    keywords.insert( race->getMaleName( ).ruscase( '1' ) );
-    keywords.insert( race->getFemaleName( ).ruscase( '1' ) );
-    keywords.insert( race->getMltName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
+    addAutoKeyword( race->getName( ) );
+    addAutoKeyword( race->getMaleName( ).ruscase( '1' ) );
+    addAutoKeyword( race->getFemaleName( ).ruscase( '1' ) );
+    addAutoKeyword( race->getMltName( ).ruscase( '1' ) );
     addLabel(LABEL_RACE);
 
     helpManager->registrate( Pointer( this ) );
@@ -54,8 +50,8 @@ void RaceHelp::unsetRace( )
 {
     helpManager->unregistrate( Pointer( this ) );
     race.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
 }
 
 void RaceHelp::save() const

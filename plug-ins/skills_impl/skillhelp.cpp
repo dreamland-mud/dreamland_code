@@ -147,19 +147,16 @@ void SkillHelp::setSkill( Skill::Pointer skill )
 {
     this->skill = skill;
     
-    keywords.insert( skill->getName( ) );    
-    keywords.insert( skill->getRussianName( ) );    
-    
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
+    addAutoKeyword( skill->getName( ) );    
+    addAutoKeyword( skill->getRussianName( ) );    
     
     if (skill->getCommand( )) {
         Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
         
         if (cmd) {
-            keywords.insert( cmd->getName( ) );
-            cmd->getAliases( ).toSet( keywords );
-            cmd->getRussianAliases( ).toSet( keywords );
+            addAutoKeyword( cmd->getName( ) );
+            addAutoKeyword(cmd->getAliases().toSet());
+            addAutoKeyword(cmd->getRussianAliases().toSet());
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
                 labels.fromString(
                     cmd->getCommandCategory().names());
@@ -177,7 +174,6 @@ void SkillHelp::setSkill( Skill::Pointer skill )
     if (skillWithType)
         addLabel(skillWithType->getType().toLower());
 
-    fullKeyword = keywords.toString().toUpper();
     helpManager->registrate( Pointer( this ) );
 }
 
@@ -185,8 +181,9 @@ void SkillHelp::unsetSkill( )
 {
     helpManager->unregistrate( Pointer( this ) );
     skill.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
 }
+
 
 

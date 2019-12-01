@@ -13,6 +13,7 @@
 #include "xmlenumeration.h"
 #include "xmlboolean.h"
 #include "xmltableloaderplugin.h"
+#include "xmlglobalarray.h"
 
 #include "religion.h"
 #include "helpmanager.h"
@@ -81,6 +82,7 @@ public:
     virtual const DLString &getShortDescr( ) const;
     virtual const DLString &getDescription( ) const;
     virtual bool isAllowed( Character * ) const;
+    virtual bool isAllowedNew(Character *) const;
     virtual const DLString& getNameFor( Character * ) const;
     
     inline const Flags & getAlign() const;
@@ -104,6 +106,8 @@ public:
     XML_VARIABLE XMLEnumeration sex;
     XML_VARIABLE GodLikes likes;
     XML_VARIABLE XMLFlagsNoEmpty flags;
+    XML_VARIABLE XMLEnumerationArray minstat, maxstat;
+    XML_VARIABLE XMLGlobalArray      clans;
 };
 
 inline const Flags & DefaultReligion::getAlign() const

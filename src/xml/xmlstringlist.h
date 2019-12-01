@@ -13,7 +13,7 @@ class XMLStringList : public XMLListBase<XMLString> {
 public:
 
     XMLStringList();
-    void toSet( StringSet & ) const;
+    StringSet toSet() const;
 };
 
 class XMLStringSet : public StringSet {

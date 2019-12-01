@@ -39,32 +39,30 @@ void CommandHelp::setCommand( Command::Pointer command )
 
     this->command = command;
     
-    keywords.insert( command->getName( ) );    
-    keywords.insert( command->getRussianName( ) );    
-    command->getAliases( ).toSet( keywords );
-    command->getRussianAliases( ).toSet( keywords );
+    addAutoKeyword(command->getName());
+    addAutoKeyword(command->getRussianName());    
+    addAutoKeyword(command->getAliases().toSet());
+    addAutoKeyword(command->getRussianAliases().toSet());
 
     labels.fromString(
         command->getCommandCategory().names());
     labels.insert(LABEL_COMMAND);
 
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
+    // TODO: get rid of ref/reby malarky, each command should have its own help.
     for (r = ref.begin( ); r != ref.end( ); r++) {
         Command::Pointer cmd = commandManager->findExact( *r );
 
-        if (cmd) 
-            keywords.fromString( cmd->getHelp()->getKeyword().toLower() );
+        if (cmd) {
+            addAutoKeyword(cmd->getName());
+            addAutoKeyword(cmd->getRussianName());
+        }
     }
-    
-    fullKeyword = keywords.toString( ).toUpper( );
 
     for (r = refby.begin( ); r != refby.end( ); r++) {
         Command::Pointer cmd = commandManager->findExact( *r );
 
         if (cmd && cmd->getHelp( ))
-            cmd->getHelp( )->addKeyword( fullKeyword );
+            cmd->getHelp( )->addAutoKeyword(getAllKeywords());
     }
    
     if (!empty( ))
@@ -76,11 +74,9 @@ void CommandHelp::unsetCommand( )
     if (!empty( ))
         helpManager->unregistrate( Pointer( this ) );
     
-    /* XXX remove refby keyword */
-
     command.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
 }
 
 

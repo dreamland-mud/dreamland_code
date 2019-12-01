@@ -139,6 +139,7 @@ public:
                         return DLString::emptyString;
                 }
         }
+        void getAttribute(const DLString &name, int &value) const;
 
         inline bool hasAttribute( const DLString &name ) const
         {
