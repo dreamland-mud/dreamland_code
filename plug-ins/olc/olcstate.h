@@ -98,10 +98,12 @@ protected:
     bool flagBitsEdit(const FlagTable &table, Flags &field);
     bool flagValueEdit(const FlagTable &table, int &field);
     bool flagValueEdit(const FlagTable &table, Flags &field);
+    bool enumerationArrayEdit(const FlagTable &table, EnumerationArray &field);
     template<typename E> inline
     bool globalBitvectorEdit(GlobalBitvector &field);
     bool numberEdit(int minValue, int maxValue, int &field);
     bool numberEdit(long minValue, long maxValue, long &field);
+    bool rangeEdit(int minValue, int maxValue, int &field1, int &field2);
     bool diceEdit(int *field);
     bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
     bool editorCopy(const DLString &original);

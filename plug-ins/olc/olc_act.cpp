@@ -61,6 +61,7 @@ int mat_table;
 int group_table;
 int race_table;
 int class_table;
+int clan_table;
 
 // This table contains help commands and a brief description of each.
 const struct olc_help_type help_table[] =
@@ -91,8 +92,10 @@ const struct olc_help_type help_table[] =
     {"{YМобы и персонажи{x", NULL, NULL},
     {"races", &race_table, "Список всех рас мобов."},
     {"classes", &class_table, "Список всех классов персонажей."},
+    {"clans", &clan_table, "Список всех кланов."},
     {"align_table", &align_table, "Характер персонажа."},
     {"ethos_table", &ethos_table, "Этос персонажа."},
+    {"stat_table", &stat_table, "Параметры персонажа."},
     {"religion_flags", &religion_flags, "Флаги религий."},
     {"sex_table", &sex_table, "Пол моба (поле sex)."},
     {"position_table", &position_table, "Позиции мобов (поля start_pos, default_pos, position)."},
@@ -318,6 +321,20 @@ bool show_help(Character * ch, const char *cargument)
                     buf << fmt( 0, "{g%-17s{x: %-25s",
                                 prof->getName().c_str(),
                                 prof->getRusName().ruscase('1').c_str() );
+                    if (i % 2)
+                        buf << endl;
+                }
+                buf << endl;
+                ch->send_to(buf);
+                return false;
+            }
+            else if (help_table[cnt].structure == &clan_table) {
+                ostringstream buf;
+                for (int i = 0; i < clanManager->size( ); i++) {
+                    Clan *clan = clanManager->find(i);
+                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                                clan->getName().c_str(),
+                                clan->getShortName().c_str());
                     if (i % 2)
                         buf << endl;
                 }

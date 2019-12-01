@@ -9,7 +9,7 @@
 #include "skill.h"
 #include "skillcommand.h"
 #include "profession.h"
-#include "religion.h"
+#include "defaultreligion.h"
 #include "subprofession.h"
 #include "room.h"
 #include "pcharacter.h"
@@ -834,12 +834,17 @@ Scripting::Register ReligionWrapper::wrap( const DLString &name )
     return Scripting::Register( sobj );
 }
 
-Religion * ReligionWrapper::getTarget() const
+DefaultReligion * ReligionWrapper::getTarget() const
 {
-    Religion::Pointer relig = religionManager->findExisting(name);
-    if (!relig)
+    Religion *rel = religionManager->findExisting(name);
+    if (!rel)
         throw Scripting::Exception("Religion not found");
-    return *relig;
+
+    DefaultReligion *religion = dynamic_cast<DefaultReligion *>(rel);
+    if (!religion)
+        throw Scripting::Exception("Religion not found");
+
+    return religion;
 }
 
 NMI_INVOKE( ReligionWrapper, api, "(): печатает этот api" )
@@ -879,6 +884,18 @@ NMI_INVOKE( ReligionWrapper, isAllowed, "(ch): доступна ли религ�
 {
     Character *ch = args2character(args);
     return getTarget()->isAllowed(ch);
+}
+
+NMI_INVOKE( ReligionWrapper, available, "(ch): НОВАЯ ЛОГИКА - доступна ли религия персонажу")
+{
+    Character *ch = args2character(args);
+    return getTarget()->available(ch);
+}
+
+NMI_INVOKE( ReligionWrapper, reasonWhy, "(ch): НОВАЯ ЛОГИКА - причина почему недоступна или пустая строка")
+{
+    Character *ch = args2character(args);
+    return getTarget()->reasonWhy(ch);
 }
 
 /*----------------------------------------------------------------------

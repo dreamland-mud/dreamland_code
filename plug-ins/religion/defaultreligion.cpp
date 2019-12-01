@@ -110,18 +110,48 @@ bool DefaultReligion::isValid( ) const
     return true;
 }
 
-bool DefaultReligion::isAllowedNew( Character *ch ) const
+bool DefaultReligion::available( Character *ch ) const
+{
+    return reasonWhy(ch).empty();
+}
+
+DLString DefaultReligion::reasonWhy(Character *ch) const
 {
     if (flags.isSet(RELIG_SYSTEM))
-        return false;
+        return "hidden";
+
+    if (!clans.empty() && !clans.isSet(ch->getClan()))
+        return "clan";
+
+    if (!minstat.empty()) 
+        for (int i = 0; i < stat_table.size; i++)
+            if (ch->getCurrStat(i) < minstat[i])
+                return "minstat";
+    
+    if (!maxstat.empty())
+        for (int i = 0; i < stat_table.size; i++)
+            if (maxstat[i] > 0 && ch->getCurrStat(i) > maxstat[i])
+                return "maxstat";
+
+    if (minage > 0 && !ch->is_npc() && ch->getPC()->age.getYears() < minage)
+        return "too_young";
+    
+    if (maxage > 0 && !ch->is_npc() && ch->getPC()->age.getYears() > maxage)
+        return "too_old";
 
     if (ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
-        return false;
+        return "ethos";
 
     if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
-        return false;
-// TODO WIP
-    return true;
+        return "align";
+
+    bool raceOK = races.empty() || races.isSet(ch->getRace());
+    bool classOK = classes.empty() || classes.isSet(ch->getProfession());
+
+    if (!raceOK && !classOK)
+        return "raceclass";
+
+    return DLString::emptyString;
 }
 
 bool DefaultReligion::isAllowed( Character *ch ) const

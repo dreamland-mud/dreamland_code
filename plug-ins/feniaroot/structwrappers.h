@@ -220,7 +220,7 @@ public:
 /*----------------------------------------------------------------------
  * Religion
  *----------------------------------------------------------------------*/
-class Religion;
+class DefaultReligion;
 
 class ReligionWrapper : public PluginNativeImpl<ReligionWrapper>, 
                     public NativeHandler,
@@ -241,7 +241,7 @@ public:
     XML_VARIABLE XMLString name;
 
 protected:
-    Religion * getTarget() const;
+    DefaultReligion * getTarget() const;
 };
 
 /*----------------------------------------------------------------------

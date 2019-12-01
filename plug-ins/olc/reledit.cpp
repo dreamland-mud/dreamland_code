@@ -120,6 +120,27 @@ void OLCStateReligion::show( PCharacter *ch )
     ptc(ch, "Классы:            {Y%s{x {D(? classes){x\r\n",
         r->classes.empty() ? "-": r->classes.toString().c_str());
 
+    ptc(ch, "Кланы:             {Y%s{x {D(? clans){x\r\n",
+        r->clans.empty() ? "-": r->clans.toString().c_str());
+
+    DLString params;
+    for (int i = 0; i < stat_table.size; i++)
+        if (r->minstat[i] > 0)
+            params << stat_table.fields[i].name << " " << r->minstat[i] << " ";
+    ptc(ch, "Мин. параметры:    {Y%s{x {D(minstat help){x\r\n", 
+        params.empty() ? "-" : params.c_str());
+
+    params.clear();
+    for (int i = 0; i < stat_table.size; i++)
+        if (r->maxstat[i] > 0)
+            params << stat_table.fields[i].name << " " << r->maxstat[i] << " ";
+    ptc(ch, "Макс. параметры:   {Y%s{x {D(maxstat help){x\r\n", 
+        params.empty() ? "-" : params.c_str());
+
+    ptc(ch, "Возраст:           {Y%s-%s{x {D(age help){x\r\n", 
+        r->minage > 0 ? DLString(r->minage).c_str() : "0",
+        r->maxage > 0 ? DLString(r->maxage).c_str() : "");
+                
     ptc(ch, "{WКоманды{x: commands, show, done, ?\r\n");        
 }
 
@@ -174,6 +195,26 @@ RELEDIT(classes, "классы", "ограничить по классам")
     return globalBitvectorEdit<Profession>(getOriginal()->classes);
 }
 
+RELEDIT(clans, "кланы", "ограничить по клановой принадлежности")
+{
+    return globalBitvectorEdit<Clan>(getOriginal()->clans);
+}
+
+RELEDIT(minstat, "минпарам", "ограничить по параметрам снизу")
+{
+    return enumerationArrayEdit(stat_table, getOriginal()->minstat);
+}
+
+RELEDIT(maxstat, "макспарам", "ограничить по параметрам сверху")
+{
+    return enumerationArrayEdit(stat_table, getOriginal()->maxstat);
+}
+
+RELEDIT(age, "возраст", "ограничить по возрасту")
+{
+    DefaultReligion *r = getOriginal();
+    return rangeEdit(0, 10000, r->minage, r->maxage);
+}
 
 RELEDIT(commands, "команды", "показать список встроенных команд edit")
 {
@@ -188,24 +229,11 @@ RELEDIT(done, "готово", "выйти из редактора")
     return false;
 }
 
-RELEDIT(dump, "вывод", "(отладка) вывести внутреннее состояние редактора")
-{
-    ostringstream os;
-    XMLStreamable<OLCState> xs( "OLCState" );
-    
-    xs.setPointer( this);
-    xs.toStream(os);
-
-    stc(os.str() + "\r\n", ch);
-    return false;
-}
-
-static bool religion_valid(Religion *rel)
+static bool religion_valid(DefaultReligion *rel)
 {
     return rel 
         && rel->isValid()
-        && rel->getIndex() != god_none
-        && rel->getIndex() != god_chronos;
+        && !rel->flags.isSet(RELIG_SYSTEM);
 }
 
 CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")

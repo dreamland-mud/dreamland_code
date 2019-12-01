@@ -378,6 +378,26 @@ bool OLCState::mapEdit( Properties &map, DLString &args )
     return false;
 }
 
+bool OLCState::enumerationArrayEdit(const FlagTable &table, EnumerationArray &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString valueName = args.getOneArgument();
+    int index = table.value(valueName);
+    Integer value;
+
+    if (index == NO_FLAG || !Integer::tryParse(value, args) || value < 0) {
+        ptc(ch, "Формат: %s <param name> <число>\r\n", cmd);
+        ptc(ch, "        %s <param name> 0\r\n", cmd);
+        return false;
+    }
+
+    field[index] = value;
+    ptc(ch, "Поле %s установлено в %d.\r\n", table.fields[index].name, value);
+    return true;
+}
+
 bool OLCState::flagBitsEdit(const FlagTable &table, Flags &field)
 {
     int value = field.getValue();
@@ -487,6 +507,37 @@ bool OLCState::numberEdit(long minValue, long maxValue, long &field)
 
     field = value;
     ptc(ch, "Новое значение поля {g%s{x: %ld\r\n", cmd, field);
+    return true;
+}
+
+bool OLCState::rangeEdit(int minValue, int maxValue, int &field1, int &field2)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString arg1 = args.getOneArgument();
+    DLString arg2 = args.getOneArgument();
+    Integer value1, value2;
+
+    if (!Integer::tryParse(value1, arg1) || !Integer::tryParse(value2, arg2)) {
+        ptc(ch, "Использование:\r\n{W%s{x число1 число2 - установить два значения. каждое в диапазоне от %d до %d\r\n",
+             cmd, minValue, maxValue);        
+        return false;
+    }
+
+    if (maxValue < field1 || maxValue < field2) {
+        ptc(ch, "Значения должны быть не больше %d.\r\n", maxValue);
+        return false;
+    }
+
+    if (minValue > field1 || minValue > field2) {
+        ptc(ch, "Значения должны быть не меньше %d.\r\n", minValue);
+        return false;
+    }
+
+    field1 = value1;
+    field2 = value2;
+    ptc(ch, "Новый диапазон %s: %d .. %d\r\n", cmd, field1, field2);
     return true;
 }
 
