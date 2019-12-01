@@ -880,6 +880,11 @@ NMI_GET( ReligionWrapper, sex, "пол божества (таблица .tables.
     return Register((int)getTarget()->getSex());
 }
 
+NMI_GET( ReligionWrapper, flags, "флаги религий (таблица .tables.religion_flags)" ) 
+{
+    return Register((int)getTarget()->flags.getValue());
+}
+
 NMI_INVOKE( ReligionWrapper, isAllowed, "(ch): доступна ли религия персонажу")
 {
     Character *ch = args2character(args);
