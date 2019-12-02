@@ -8,6 +8,7 @@
 #include "xmlattributequestreward.h"
 #include "xmlattributequestdata.h"
 #include "occupations.h"
+#include "defaultreligion.h"
 
 #include "affect.h"
 #include "object.h"
@@ -539,8 +540,17 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
 {
     Object *obj;
     const char *leader = client->getReligion( )->getShortDescr( ).c_str( );
-    
-    obj = create_object( get_obj_index( OBJ_VNUM_TATTOO ), 0 );
+
+    // Use tattoo vnum from religion profile if specified, otherwise use default one.
+    DefaultReligion *religion = dynamic_cast<DefaultReligion *>(client->getReligion().operator->());
+    int tattooVnum = 0;
+    if (religion)
+        tattooVnum = religion->tattooVnum;
+
+    if (tattooVnum == 0)
+        tattooVnum = OBJ_VNUM_TATTOO;
+
+    obj = create_object( get_obj_index( tattooVnum ), 0 );
     obj->fmtName( obj->getName( ), leader );
     obj->fmtShortDescr( obj->getShortDescr( ), leader );
 
@@ -563,6 +573,13 @@ bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) co
 
     if (wear_tattoo->find( client )) {
         say_act( client, tattoer, "Но у тебя уже есть татуировка, $c1!" );
+        return false;
+    }
+
+    DefaultReligion *religion = dynamic_cast<DefaultReligion *>(&client->getReligion());
+    if (religion && religion->tattooVnum != 0 && !get_obj_index(religion->tattooVnum)) {
+        say_act(client, tattoer, "Я не могу сейчас нанести тебе эту татуировку, приходи позже.");
+        LogStream::sendError() << "BUG: no tattoo index data for " << religion->getName() << endl;
         return false;
     }
 

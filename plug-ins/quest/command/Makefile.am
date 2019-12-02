@@ -7,6 +7,7 @@ plugin_INCLUDES = \
 -I$(srcdir)/../core \
 -I$(top_srcdir)/plug-ins/services/core \
 -I$(top_srcdir)/plug-ins/selfrate \
+-I$(top_srcdir)/plug-ins/religion \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/languages/core \
 $(INCLUDES_AI) \
@@ -17,6 +18,7 @@ libquest_command_la_LIBADD = \
 ../../services/core/libservices_core.la \
 ../../languages/core/liblanguages_core.la \
 ../../selfrate/libselfrate.la \
+../../religion/libreligion.la \
 ../core/libquest_core.la \
 $(LIBADD_AI)
 
