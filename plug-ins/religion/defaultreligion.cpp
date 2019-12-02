@@ -147,6 +147,9 @@ DLString DefaultReligion::reasonWhy(Character *ch) const
     if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
         return "align";
 
+    if (races.empty() && classes.empty())
+        return OK;
+        
     bool myRace = races.isSet(ch->getRace());
     bool myClass = classes.isSet(ch->getProfession());
 
