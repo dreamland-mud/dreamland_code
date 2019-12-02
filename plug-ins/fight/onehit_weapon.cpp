@@ -128,8 +128,8 @@ void WeaponOneHit::damApplyHoly( )
     if (wield && IS_WEAPON_STAT(wield,WEAPON_HOLY) && number_percent( ) < 30) 
     {
         msgWeaponVict( "{YСвященная аура %3$O2 поражает тебя.{x" );
-        msgWeaponRoom( "{YСвященная аура %3$O2 поражает %2$C2.{x" );
-        msgWeaponChar( "{YСвященная аура %3$O2 поражает %2$C2.{x" );
+        msgWeaponRoom( "{YСвященная аура %3$O2 поражает %2$C4.{x" );
+        msgWeaponChar( "{YСвященная аура %3$O2 поражает %2$C4.{x" );
         dam += dam * 120 / 100;
         return;
     }
