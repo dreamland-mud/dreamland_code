@@ -111,6 +111,7 @@ public:
     XML_VARIABLE XMLEnumerationArray minstat, maxstat;
     XML_VARIABLE XMLGlobalBitvector clans;
     XML_VARIABLE XMLIntegerNoEmpty minage, maxage;
+    XML_VARIABLE XMLIntegerNoEmpty tattooVnum;
 };
 
 inline const Flags & DefaultReligion::getAlign() const

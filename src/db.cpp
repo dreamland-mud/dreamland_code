@@ -174,7 +174,9 @@ area_data::area_data( ) : behavior( AreaBehavior::NODE_NAME )
 }
 
 mob_index_data::mob_index_data( ) 
-                     : practicer( skillGroupManager ), wrapper ( 0 )
+                     : practicer( skillGroupManager ), 
+                       religion( religionManager ),
+                       wrapper ( 0 )
 {
 }
 

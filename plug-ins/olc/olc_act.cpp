@@ -121,7 +121,7 @@ const struct olc_help_type help_table[] =
 
     {"{YУмения и заклинания{x", NULL, NULL}, 
     {"spells", &skill_table, "Имена всех заклинаний."},
-    {"groups", &group_table, "Все группы умений (для поля practicer)."},
+    {"practicer", &group_table, "Все группы умений (для поля practicer)."},
 
     {NULL, NULL, NULL}
 };

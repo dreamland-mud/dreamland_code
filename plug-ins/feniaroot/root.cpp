@@ -900,9 +900,10 @@ NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов �
 NMI_INVOKE( Root, Religion, "(name): конструктор для религии по имени" )
 {
     DLString name = args2string(args);
-    if (!religionManager->findExisting(name))
+    Religion *religion = religionManager->findExisting(name);
+    if (!religion)
         throw Scripting::Exception("Religion not found");
-    return ReligionWrapper::wrap( name );
+    return ReligionWrapper::wrap( religion->getName() );
 }
 
 NMI_GET( Root, races, "список всех рас") 
