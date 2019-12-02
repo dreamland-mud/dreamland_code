@@ -910,7 +910,17 @@ NMI_GET( ReligionWrapper, races, "разрешенные расы или пус�
     return Register(getTarget()->races.toString());
 }
 
+NMI_GET( ReligionWrapper, minstat, "по каким параметрам ограничено сверху" ) 
+{
+    Bitstring stats;
+    DefaultReligion *target = getTarget();
 
+    for (int i = 0; i < stat_table.size; i++)
+        if (target->minstat[i] != 0)
+            stats.setBitNumber(i);
+
+    return Register((int)stats); 
+}
 
 NMI_INVOKE( ReligionWrapper, isAllowed, "(ch): доступна ли религия персонажу")
 {
