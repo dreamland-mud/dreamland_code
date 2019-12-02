@@ -348,11 +348,11 @@ bool show_help(Character * ch, const char *cargument)
                 ostringstream buf;
                 for (int i = 0; i < religionManager->size( ); i++) {
                     Religion *rel = religionManager->find(i);
-                    buf << fmt( 0, "{g%-17s{x: %-25s",
+                    buf << fmt( 0, "{g%-15s{x: %-20s (%-15s)",
                                 rel->getShortDescr().c_str(),
-                                rel->getRussianName().ruscase('1').c_str());
-                    if (i % 2)
-                        buf << endl;
+                                rel->getRussianName().ruscase('1').c_str(),
+				rel->getName().c_str());
+		    buf << endl;
                 }
                 buf << endl;
                 ch->send_to(buf);
