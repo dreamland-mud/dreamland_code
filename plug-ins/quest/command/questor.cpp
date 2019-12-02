@@ -490,7 +490,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
         if (attr->getAllVictoriesCount() > 5) {
             tell_raw( client, ch, "Попроси у богов подтверждения своему персонажу, чтобы продолжить выполнять задания.");
-            tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {W{hc{lRсправка подтверждение{lEhelp confirm{x." );
+            tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {y{hc{lRсправка подтверждение{lEhelp confirm{x." );
             return;
         }
     } else if (descr.empty( )) {

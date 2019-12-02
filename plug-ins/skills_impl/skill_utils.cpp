@@ -134,7 +134,7 @@ void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf)
     // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
     buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x";
     if (group != group_none)
-       buf << " и команду {W{hc{lRгруппаум{lEglist{lx " << group->getNameFor(ch) << "{x";
+       buf << " и команду {y{hc{lRгруппаум{lEglist{lx " << group->getNameFor(ch) << "{x";
     buf << "." << endl;
 }
   
