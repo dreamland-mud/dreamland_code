@@ -1457,7 +1457,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
 	if (arg_oneof(arg, "ethos", "этос", "мировоззрение")) {
-        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos).c_str());
+        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
         return;
     } 
 	if (arg_oneof(arg, "hometown", "дом")) {
@@ -1661,7 +1661,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            fRus ?  ethos_table.message( ch->ethos ).cutSize( 12 ).c_str( )
+            fRus ?  ethos_table.message( ch->ethos, '1' ).cutSize( 12 ).c_str( )
                   : ethos_table.name( ch->ethos ).c_str( ),
             CLR_BAR,
             CLR_CAPT,

@@ -885,6 +885,33 @@ NMI_GET( ReligionWrapper, flags, "флаги религий (таблица .tab
     return Register((int)getTarget()->flags.getValue());
 }
 
+NMI_GET( ReligionWrapper, align, "разрешенные характеры или пустая строка (таблица .tables.align_table)" ) 
+{
+    return Register((int)getTarget()->align.getValue());
+}
+
+NMI_GET( ReligionWrapper, ethos, "разрешенные этосы или пустая строка (таблица .tables.ethos_table)" ) 
+{
+    return Register((int)getTarget()->ethos.getValue());
+}
+
+NMI_GET( ReligionWrapper, classes, "разрешенные профессии или пустая строка (olchelp class)" ) 
+{
+    return Register(getTarget()->classes.toString());
+}
+
+NMI_GET( ReligionWrapper, clans, "разрешенные кланы или пустая строка (olchelp clan)" ) 
+{
+    return Register(getTarget()->clans.toString());
+}
+
+NMI_GET( ReligionWrapper, races, "разрешенные расы или пустая строка (olchelp race)" ) 
+{
+    return Register(getTarget()->races.toString());
+}
+
+
+
 NMI_INVOKE( ReligionWrapper, isAllowed, "(ch): доступна ли религия персонажу")
 {
     Character *ch = args2character(args);

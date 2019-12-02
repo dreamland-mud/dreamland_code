@@ -108,7 +108,7 @@ DLString spell_utterance(Skill *skill)
 
 Skill * skillref_to_pointer(const XMLSkillReference &ref)
 {
-    Skill *skill = const_cast<Skill *>(const_cast<XMLSkillReference *>(&ref)->operator ->());
+    Skill *skill = const_cast<Skill *>(const_cast<XMLSkillReference *>(&ref)->getElement());
     return skill;
 }
 

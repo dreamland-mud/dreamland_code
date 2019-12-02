@@ -849,7 +849,7 @@ CMDWIZP( stat )
            return;
         }
         
-        victim =  fChar ? get_player_world( ch->getPC( ), string ) : get_char_world( ch, string );
+        victim =  fChar ? get_player_world( ch, string ) : get_char_world( ch, string );
         if (!victim) {
             ch->pecho("%s с именем %s не найден.", fMob ? "Персонаж" : "Игрок", string);
             return;
@@ -3601,7 +3601,7 @@ CMDWIZP( rename )
         return;
     }
     
-    PCharacter* victim = get_player_world( ch->getPC( ), oldName.c_str( ) );
+    PCharacter* victim = get_player_world( ch, oldName.c_str( ) );
     
     if (!victim) {
         ch->send_to("There is no such a person online.\n\r");

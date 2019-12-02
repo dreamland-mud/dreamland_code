@@ -117,6 +117,8 @@ bool DefaultReligion::available( Character *ch ) const
 
 DLString DefaultReligion::reasonWhy(Character *ch) const
 {
+    static const DLString OK = DLString::emptyString;
+
     if (flags.isSet(RELIG_SYSTEM))
         return "hidden";
 
@@ -145,13 +147,24 @@ DLString DefaultReligion::reasonWhy(Character *ch) const
     if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
         return "align";
 
-    bool raceOK = races.empty() || races.isSet(ch->getRace());
-    bool classOK = classes.empty() || classes.isSet(ch->getProfession());
+    bool myRace = races.isSet(ch->getRace());
+    bool myClass = classes.isSet(ch->getProfession());
 
-    if (!raceOK && !classOK)
-        return "raceclass";
+    // Allow "thief OR kender" restriction if both race and class are set in religion profile.
+    if (!races.empty() && !classes.empty()) {
+        if (myRace || myClass)
+            return OK;
+        else if (!myRace)
+            return "race";
+        else
+            return "class";
+    }
 
-    return DLString::emptyString;
+    // Allow "vampire only" restriction if race is not set.
+    if (races.empty())
+        return myClass ? OK : "class";
+    else
+        return myRace ? OK : "race";
 }
 
 bool DefaultReligion::isAllowed( Character *ch ) const

@@ -406,7 +406,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
               altar, rname, religion.getSex());
     ch->recho("%^C1 приносит содержимое %O2 в жертву своим богам.", ch, altar);
 
-    DefaultReligion *drelig = dynamic_cast<DefaultReligion *>(pch->getReligion().operator ->());
+    DefaultReligion *drelig = dynamic_cast<DefaultReligion *>(pch->getReligion().getElement());
     if (!drelig) {
         ch->pecho("Похоже, %N1 совершенно равнодуш%gно|ен|на к жертвоприношениям.", 
                    rname, religion.getSex());

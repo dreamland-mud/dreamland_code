@@ -115,7 +115,7 @@ CMD(security, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         ch->send_to("Usage: security <player> <#security level>\n\r");
         return;
     }
-    victim = get_player_world(ch->getPC(), buf);
+    victim = get_player_world(ch, buf);
 
     if(!victim) {
         ch->send_to("Char not found.\n\r");

@@ -542,7 +542,7 @@ void TattooQuestArticle::buy( PCharacter *client, NPCharacter *tattoer )
     const char *leader = client->getReligion( )->getShortDescr( ).c_str( );
 
     // Use tattoo vnum from religion profile if specified, otherwise use default one.
-    DefaultReligion *religion = dynamic_cast<DefaultReligion *>(client->getReligion().operator->());
+    DefaultReligion *religion = dynamic_cast<DefaultReligion *>(client->getReligion().getElement());
     int tattooVnum = 0;
     if (religion)
         tattooVnum = religion->tattooVnum;

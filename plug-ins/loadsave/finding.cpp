@@ -754,7 +754,7 @@ Character *get_char_world_doppel( Character *ch, const char *cArgument )
     return 0;
 }
 
-PCharacter * get_player_world( PCharacter *ch, const char *arg, bool fSeenOnly )
+PCharacter * get_player_world( Character *ch, const char *arg, bool fSeenOnly )
 {
     Descriptor *d;
 
