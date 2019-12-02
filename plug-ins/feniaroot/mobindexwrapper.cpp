@@ -148,6 +148,12 @@ NMI_GET( MobIndexWrapper, practicer, "какие группы умений мо�
     return target->practicer.toString( );
 }
 
+NMI_GET( MobIndexWrapper, religion, "какие религии исповедует (reledit list)") 
+{
+    checkTarget( );
+    return target->religion.toString( );
+}
+
 NMI_GET( MobIndexWrapper, area, "зона, в которой прописан моб (.Area)") 
 {
     checkTarget( );

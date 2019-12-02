@@ -525,13 +525,18 @@ bool OLCState::rangeEdit(int minValue, int maxValue, int &field1, int &field2)
         return false;
     }
 
-    if (maxValue < field1 || maxValue < field2) {
+    if (maxValue < value1 || maxValue < value2) {
         ptc(ch, "Значения должны быть не больше %d.\r\n", maxValue);
         return false;
     }
 
-    if (minValue > field1 || minValue > field2) {
+    if (minValue > value1 || minValue > value2) {
         ptc(ch, "Значения должны быть не меньше %d.\r\n", minValue);
+        return false;
+    }
+
+    if (value1 > value2) {
+        stc("Первое число должно быть меньше или равно второму.\r\n", ch);
         return false;
     }
 

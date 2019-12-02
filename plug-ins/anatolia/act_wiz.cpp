@@ -1585,6 +1585,9 @@ static bool has_nopost(Character *ch)
     if (npc && !npc->pIndexData->practicer.empty( ))
         buf << "Practicer: " << npc->pIndexData->practicer.toString( ) << endl;
 
+    if (npc && !npc->pIndexData->religion.empty())
+        buf << "Religious beliefs: " << npc->pIndexData->religion.toString( ) << endl;
+
     if (npc && npc->behavior) { 
         buf << "Behavior: [" << npc->behavior->getType( ) << "]" << endl;
         npc->behavior.toStream( buf );

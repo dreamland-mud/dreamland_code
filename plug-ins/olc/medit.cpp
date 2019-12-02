@@ -108,6 +108,8 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.size             = original->size;
     mob.practicer.clear( );
     mob.practicer.set( original->practicer );
+    mob.religion.clear();
+    mob.religion.set(original->religion);
 }
 
 OLCStateMobile::OLCStateMobile( int vnum )
@@ -285,6 +287,8 @@ void OLCStateMobile::commit()
     mob.behavior = 0;    
     original->practicer.clear( );
     original->practicer.set( mob.practicer );
+    original->religion.clear();
+    original->religion.set(mob.religion);
 
     for(wch = char_list; wch; wch = wch->next) {
         NPCharacter *victim = wch->getNPC();
@@ -374,7 +378,8 @@ MEDIT(show)
     if (!mob.spec_fun.name.empty())
         ptc(ch, "Spec fun: [%s] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
     ptc(ch, "Group:    [%d]\n\r", mob.group);
-    ptc(ch, "Practicer:[%s] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "Practicer:[{G%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "Religion: [{G%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
     ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
 
     if (!mob.properties.empty( )) {
@@ -970,30 +975,12 @@ MEDIT(group)
 
 MEDIT(practicer)
 {
-    SkillGroup *g;
+    return globalBitvectorEdit<SkillGroup>(mob.practicer);
+}
 
-    if (!*argument) {
-        stc("Syntax:  practicer <groupname>|clear\n\r", ch);
-        return false;
-    }
-
-    if (!str_cmp(argument, "clear")) {
-        mob.practicer.clear( );
-        stc("Practicer cleared\n\r", ch);
-        return true;
-    }
-    
-    g = skillGroupManager->findExisting( argument );
-
-    if (!g) {
-        stc("Группа не найдена. Используй {W? groups{x для полного списка.\r\n", ch);
-        return false;
-    }
-    
-    mob.practicer.set( *g );
-
-    stc("Practicer toggled.\n\r", ch);
-    return true;
+MEDIT(religion)
+{
+    return globalBitvectorEdit<Religion>(mob.religion);
 }
 
 MEDIT(hitroll)

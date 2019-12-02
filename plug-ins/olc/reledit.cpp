@@ -103,6 +103,11 @@ void OLCStateReligion::show( PCharacter *ch )
     ptc(ch, "Флаги:             {C%s{x {D(? religion_flags){x\r\n",
         r->flags.getValue() != 0 ? r->flags.names().c_str() : "-");
 
+    OBJ_INDEX_DATA *tattoo = r->tattooVnum == 0 ? 0 : get_obj_index(r->tattooVnum);
+    ptc(ch, "Татуировка:        {C%d{x [{W%s{x] {D(tattoo help){x\r\n",
+        r->tattooVnum.getValue(), 
+        tattoo ? russian_case(tattoo->short_descr, '1').c_str() : "none");
+
     if (r->help)
         ptc(ch, "Справка: %s {D(hedit %d){x\r\n",
             web_edit_button(ch, "hedit", r->help->getID()).c_str(),
@@ -140,7 +145,7 @@ void OLCStateReligion::show( PCharacter *ch )
     ptc(ch, "Возраст:           {Y%s-%s{x {D(age help){x\r\n", 
         r->minage > 0 ? DLString(r->minage).c_str() : "0",
         r->maxage > 0 ? DLString(r->maxage).c_str() : "");
-                
+
     ptc(ch, "{WКоманды{x: commands, show, done, ?\r\n");        
 }
 
@@ -173,6 +178,39 @@ RELEDIT(desc, "описание", "установить описание бож�
 RELEDIT(flags, "флаги", "выставить флаги религии")
 {
     return flagBitsEdit(religion_flags, getOriginal()->flags);
+}
+
+RELEDIT(tattoo, "татуировка", "установить vnum татуировки религии")
+{
+    Integer vnum;
+    if (!Integer::tryParse(vnum, argument)) {
+        stc("Укажи vnum предмета-татуировки или 0 для сброса.\r\n", ch);
+        return false;
+    }
+
+    if (vnum == 0) {
+        getOriginal()->tattooVnum = 0;
+        stc("Татуировка очищена.\r\n", ch);
+        return false;
+    }
+ 
+    OBJ_INDEX_DATA *tattoo = get_obj_index(vnum);
+    if (!tattoo) {
+        stc("Предмета с таким внумом не существует, сперва создайте его командой oedit create <vnum>.\r\n", ch);
+        return false;
+    }
+
+    getOriginal()->tattooVnum = vnum.getValue();
+    ptc(ch, "Татуировка этой религии теперь %d: %s.\r\n", 
+            vnum, russian_case(tattoo->short_descr, '1').c_str());
+
+    if (tattoo->item_type != ITEM_TATTOO) 
+        stc("Осторожно, этот предмет не имеет тип 'tattoo'!\r\n", ch);
+    
+    if (!IS_SET(tattoo->wear_flags, ITEM_WEAR_TATTOO)) 
+        stc("Осторожно, этот предмет не надевается на локацию tattoo!\r\n", ch);
+
+    return true;
 }
 
 RELEDIT(align, "характер", "ограничить по характеру")

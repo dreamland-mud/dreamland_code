@@ -99,6 +99,7 @@ XMLMobIndexData::XMLMobIndexData()
     new_format = true;
     behavior = 0;
     practicer.setRegistry( skillGroupManager );
+    religion.setRegistry(religionManager);
     wrapper = 0;
     group = 0;
 }
@@ -136,6 +137,7 @@ XMLMobIndexData::XMLMobIndexData(const MOB_INDEX_DATA &mob)
     parts            = mob.parts;
     player_name      = str_dup(mob.player_name);
     practicer        = mob.practicer;
+    religion         = mob.religion;
     race             = str_dup(mob.race);
     res_flags        = mob.res_flags;
     sex              = mob.sex;

@@ -107,6 +107,9 @@ int BasicMobileBehavior::getOccupation( )
     if (!ch->pIndexData->practicer.empty( ))
         SET_BIT(occupation, 1 << OCC_PRACTICER);
 
+    if (!ch->pIndexData->religion.empty())
+        SET_BIT(occupation, 1 << OCC_ADEPT);
+
     return occupation;
 }
 
