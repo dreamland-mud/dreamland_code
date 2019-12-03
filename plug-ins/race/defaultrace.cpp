@@ -345,6 +345,12 @@ Flags DefaultRace::getAttitude( const Race &race ) const
 {
     Flags att( 0, &race_flags );
 
+    if (hunts.isSet (race))
+        att.setBit( RACE_HUNTS );
+
+    if (donates.isSet (race))
+        att.setBit( RACE_DONATES );
+
     if (getForm( ).isSet( FORM_CANINE ) && race.getForm( ).isSet( FORM_FELINE ))
         att.setBit( RACE_HATES );
 

@@ -124,6 +124,7 @@ void UndefinedOneHit::calcDamage( )
     damApplyMasterSword( );
     damApplyPosition( );
     damApplyDamroll( );
+    damApplyAttitude( );
     damApplyDeathblow( );
     damApplyCounter( );
 

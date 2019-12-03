@@ -1129,17 +1129,37 @@ CMDRUNP( request )
             return;
         }
 
-        if ((!IS_GOOD(ch) && !victim->getRace( )->getAttitude( *ch->getRace( ) ).isSet( RACE_DONATES ))
-                || IS_EVIL(ch))
-        {
-                do_say(victim, "У тебя нечистая душа, я ничего тебе не дам!");
-                return;
-        }
-
         if (ch->move < (50 + ch->getRealLevel( )))
         {
                 do_say(victim, "Ты выглядишь устало, может, отдохнешь сначала?");
                 return;
+        }
+
+        Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
+
+        if (att.isSet( RACE_DONATES ))
+        {
+            if (IS_EVIL( victim )) {
+                interpret( victim, "grin" );
+                return;
+            }
+        } else
+        {
+            if (!IS_GOOD(ch) || !IS_GOOD(victim))
+            {
+                if (IS_EVIL(ch) && !IS_EVIL(victim))
+                {
+                    do_say(victim, "У тебя нечистая душа, я ничего тебе не дам!");
+                } else
+                {
+                    do_say(victim, "Я не дам тебе ничего!!");
+                }
+                if (ch->getModifyLevel( ) > 30 && number_percent() > 75) 
+                {
+                    interpret_raw( victim, "murder", ch->getNameP( ));
+                }
+                return;
+            }
         }
 
         ch->setWaitViolence( 1 );
@@ -1157,20 +1177,6 @@ CMDRUNP( request )
                 || IS_SET(obj->extra_flags, ITEM_INVENTORY))
         {
                 do_say(victim, "Извини, у меня нет этого.");
-                return;
-        }
-        
-        if (victim->getRace( )->getAttitude( *ch->getRace( ) ).isSet( RACE_DONATES ))
-        {
-            if (IS_EVIL( victim )) {
-                interpret( victim, "grin" );
-                return;
-            }
-
-        } else if (!IS_GOOD(victim))
-        {
-                do_say(victim, "Я не дам тебе ничего!!");
-                interpret_raw( victim, "murder", ch->getNameP( ));
                 return;
         }
 
@@ -1649,7 +1655,7 @@ CMDRUNP( score )
             CLR_CAPT,
             pch->getQuestPoints(),
             CLR_FRAME,
-    
+
             CLR_CAPT,
             align_name_short(ch, Grammar::MultiGender::FEMININE),
             CLR_BAR,
@@ -2638,12 +2644,12 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "стоит {W" << obj->cost << "{x серебра";
     else
         buf << "ничего не стоит";
-   
+
     // XXX 'изготовлено из' + падежи
     mat = obj->getMaterial( );
     if (mat && strcmp( mat, "none" ) && strcmp( mat, "oldstyle" ))
         buf << ", материал {W" << mat << "{x";
-    
+
     buf << endl;
 
     bitstring_t extra = obj->extra_flags;
@@ -2782,4 +2788,3 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     for (paf = obj->affected; paf != 0; paf = paf->next)
         lore_fmt_affect( paf, buf );
 }
-
