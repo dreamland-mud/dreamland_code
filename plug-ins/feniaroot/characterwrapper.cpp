@@ -32,6 +32,7 @@
 #include "save.h"
 #include "mercdb.h"
 #include "fight.h"
+#include "immunity.h"
 #include "magic.h"
 #include "movement.h"
 #include "act_move.h"
@@ -1671,6 +1672,14 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аф�
     return Register( );
 }
 
+
+NMI_INVOKE( CharacterWrapper, isImmune, "(damtype, damflag): есть ли иммунитет к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
+{
+    checkTarget();
+    int damtype = argnum2flag(args, 1, damage_table);
+    int damflag = argnum2flag(args, 2, damage_flags);
+    return immune_check(target, damtype, damflag) == RESIST_IMMUNE;
+}
 
 NMI_INVOKE( CharacterWrapper, stop_fighting, "(): прекратить битву" )
 {
