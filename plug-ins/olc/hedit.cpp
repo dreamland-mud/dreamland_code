@@ -32,6 +32,7 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->level = original->getLevel();
     this->text = original->c_str();
     this->keywords = original->getKeywordAttribute();
+    this->labels = original->getLabels().toString();
 }
 
 OLCStateHelp::~OLCStateHelp() 
@@ -91,7 +92,7 @@ StringSet OLCStateHelp::allKeywords() const
 
 void OLCStateHelp::show( PCharacter *ch ) const
 {
-    ptc(ch, "{WСтатья справки под номером {c%d{x:\r\n", id.getValue()); 
+    ptc(ch, "{WСтатья справки под номером {c%d{W, метки {c%s{x:\r\n", id.getValue(), labels.c_str());     
     ptc(ch, "{DВсе ключевые слова: [%s]\r\n", allKeywords().toString().c_str());
     ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());
     ptc(ch, "{WУровень{x:            [{C%d{x]\r\n", level.getValue());
