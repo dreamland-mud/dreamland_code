@@ -36,7 +36,7 @@ void ReligionHelp::setReligion( DefaultReligion::Pointer religion )
     
     addAutoKeyword( religion->getName( ) );
     addAutoKeyword( religion->getRussianName( ).ruscase( '1' ) );
-    addLabel(LABEL_RELIGION);
+    labels.addTransient(LABEL_RELIGION);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -47,6 +47,8 @@ void ReligionHelp::unsetReligion( )
     religion.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 void ReligionHelp::save() const

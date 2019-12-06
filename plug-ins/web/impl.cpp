@@ -1140,7 +1140,7 @@ public:
                 for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
                     h["kw"].append(k->toUpper());
 
-                for (StringSet::const_iterator l = (*a)->getLabels().begin(); l != (*a)->getLabels().end(); l++) {
+                for (StringSet::const_iterator l = (*a)->labels.all.begin(); l != (*a)->labels.all.end(); l++) {
                     h["labels"].append(*l);
                     h["titles"][*l] = (*a)->getTitle(*l).toUpper();
                 }

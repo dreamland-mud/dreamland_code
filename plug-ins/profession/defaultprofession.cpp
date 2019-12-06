@@ -35,7 +35,7 @@ void ProfessionHelp::setProfession( DefaultProfession::Pointer prof )
     addAutoKeyword( prof->getName( ) );
     addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
     addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
-    addLabel(LABEL_CLASS);
+    labels.addTransient(LABEL_CLASS);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -46,6 +46,8 @@ void ProfessionHelp::unsetProfession( )
     prof.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 DLString ProfessionHelp::getTitle(const DLString &label) const

@@ -127,7 +127,7 @@ public:
                     help->selfHelp = is_name(aname.c_str(), (*a)->getAllKeywordsString().c_str());
                 }
                 if (help->selfHelp) 
-                    help->addLabel("area");
+                    help->labels.addTransient("area");
                 
                 helpManager->registrate( *a );
             }

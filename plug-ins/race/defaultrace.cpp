@@ -41,7 +41,7 @@ void RaceHelp::setRace( DefaultRace::Pointer race )
     addAutoKeyword( race->getMaleName( ).ruscase( '1' ) );
     addAutoKeyword( race->getFemaleName( ).ruscase( '1' ) );
     addAutoKeyword( race->getMltName( ).ruscase( '1' ) );
-    addLabel(LABEL_RACE);
+    labels.addTransient(LABEL_RACE);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -52,6 +52,8 @@ void RaceHelp::unsetRace( )
     race.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 void RaceHelp::save() const

@@ -32,7 +32,8 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->level = original->getLevel();
     this->text = original->c_str();
     this->keywords = original->getKeywordAttribute();
-    this->labels = original->getLabels().toString();
+    this->labels = original->labels.persistent.toString();
+    this->labelsAuto = original->labels.transient.toString();
 }
 
 OLCStateHelp::~OLCStateHelp() 
@@ -59,6 +60,8 @@ void OLCStateHelp::commit()
     original->setKeywordAttribute(keywords);
     original->setLevel(level);
     original->setText(text);
+    original->labels.persistent.clear();
+    original->labels.addPersistent(labels);
     original->save();
 
     help_save_ids();
@@ -92,7 +95,10 @@ StringSet OLCStateHelp::allKeywords() const
 
 void OLCStateHelp::show( PCharacter *ch ) const
 {
-    ptc(ch, "{WСтатья справки под номером {c%d{W, метки {c%s{x:\r\n", id.getValue(), labels.c_str());     
+    ptc(ch, "{WСтатья справки под номером {c%d{W, метки в файле {c%s{W, автоматические метки {c%s{x:\r\n", 
+        id.getValue(), 
+        labels.empty() ? "-" : labels.c_str(), 
+        labelsAuto.empty() ? "-" : labelsAuto.c_str());     
     ptc(ch, "{DВсе ключевые слова: [%s]\r\n", allKeywords().toString().c_str());
     ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());
     ptc(ch, "{WУровень{x:            [{C%d{x]\r\n", level.getValue());
@@ -125,6 +131,19 @@ HEDIT(keywords, "ключевые", "установить или очистит�
     keywords = argument;
     keywords.toUpper();
     ptc(ch, "Новые ключевые слова: %s\n\r", keywords.c_str());
+    return true;
+}
+
+HEDIT(labels, "метки", "установить метки для экспорта на сайт")
+{
+    if (!*argument) {
+        stc("Синтаксис:   labels <new labels>\n\r", ch);
+        return false;
+    }
+
+    labels = argument;
+    labels.toLower();
+    ptc(ch, "Новые метки: %s\n\r", labels.c_str());
     return true;
 }
 

@@ -42,7 +42,7 @@ void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
     addAutoKeyword( prof->getName( ) );
     addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
     addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
-    addLabel(LABEL_CRAFT);
+    labels.addTransient(LABEL_CRAFT);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -53,6 +53,8 @@ void CraftProfessionHelp::unsetProfession( )
     prof.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 void CraftProfessionHelp::getRawText( Character *ch, ostringstream &in ) const

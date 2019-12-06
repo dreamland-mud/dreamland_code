@@ -158,21 +158,23 @@ void SkillHelp::setSkill( Skill::Pointer skill )
             addAutoKeyword(cmd->getAliases().toSet());
             addAutoKeyword(cmd->getRussianAliases().toSet());
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-                labels.fromString(
+/*                
+                labels.addTransient(
                     cmd->getCommandCategory().names());
-                labels.insert("cmd");
+*/                    
+                labels.addTransient("cmd");
             }
         }
     }
     
     if (skill->getSpell())
-        addLabel("spell");
+        labels.addTransient("spell");
     else
-        addLabel("skill");
+        labels.addTransient("skill");
         
     XMLVariableContainer *skillWithType = skill.getDynamicPointer<XMLVariableContainer>();
     if (skillWithType)
-        addLabel(skillWithType->getType().toLower());
+        labels.addTransient(skillWithType->getType().toLower());
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -183,6 +185,8 @@ void SkillHelp::unsetSkill( )
     skill.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 

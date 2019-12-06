@@ -171,7 +171,7 @@ void Social::loaded()
     help = SocialHelp::Pointer(NEW, Pointer(this));
     help->addAutoKeyword(getName());
     help->addAutoKeyword(getRussianName());
-    help->addLabel("social");
+    help->labels.addTransient("social");
     
     helpManager->registrate(help);
 }

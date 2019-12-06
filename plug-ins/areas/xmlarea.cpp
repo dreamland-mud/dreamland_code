@@ -148,6 +148,7 @@ XMLArea::init(area_file *af)
             help.keywordAttribute = ahelp->getKeywordAttribute();
             help.level = ahelp->getLevel();
             help.id = ahelp->getID();
+            help.labels = ahelp->labels.persistent.toString();
             helps.push_back(help); 
         }
     }
@@ -194,11 +195,11 @@ XMLArea::load_helps(AREA_DATA *a)
         help->setLevel(h->level);
         help->setID(h->id);
         help->setText(h->getValue());
-        help->setLabelAttribute(h->labels);
+        help->labels.addPersistent(h->labels);
         helpManager->registrate(help);
         if (help->selfHelp) {
             selfHelpExists = true;
-            help->addLabel("area");
+            help->labels.addTransient("area");
         }
         XMLPersistent<HelpArticle> phelp(help.getPointer());
         a->helps.push_back(phelp);
@@ -212,7 +213,7 @@ XMLArea::load_helps(AREA_DATA *a)
         help->addAutoKeyword(DLString(a->name).colourStrip().quote());
         help->addAutoKeyword(DLString(a->credits).colourStrip().quote());
         help->setText("     ");
-        help->addLabel("area");
+        help->labels.addTransient("area");
         helpManager->registrate(help);
 
         XMLPersistent<HelpArticle> phelp(help.getPointer());

@@ -26,5 +26,15 @@ public:
     StringSet toStringSet( ) const;
 };
 
+struct StringStorage {
+    void addTransient(const DLString &entry);
+    void addPersistent(const DLString &entry);
+    void refresh();
+
+    StringSet transient;
+    StringSet persistent;
+    StringSet all;
+    DLString allString;
+};
 #endif
 

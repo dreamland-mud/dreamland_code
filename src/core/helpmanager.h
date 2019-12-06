@@ -56,12 +56,11 @@ public:
     int getID() const;
     void setID(int);
 
-    const StringSet &getLabels() const;
-    void addLabel(const DLString &);
-    void setLabelAttribute(const DLString &);
     virtual DLString getTitle(const DLString &label) const;
 
     struct area_file * areafile;
+
+    StringStorage labels;
 
     static const DLString ATTRIBUTE_KEYWORD;
     static const DLString ATTRIBUTE_LEVEL;
@@ -98,9 +97,6 @@ protected:
     /** Level from which this article is visible. */
     int level;
 
-    StringSet labels;
-    DLString labelAttribute;
-
     /** Unique ID. */
     int id;
 
@@ -120,6 +116,7 @@ inline const StringSet & HelpArticle::getAutoKeywords() const
 {
     return keywordsAuto;
 }
+
 
 typedef list<XMLPersistent<HelpArticle> > HelpArticles;
 extern template class XMLStub<HelpArticle>;

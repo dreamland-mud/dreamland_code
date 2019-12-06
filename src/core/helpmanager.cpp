@@ -97,24 +97,6 @@ void HelpArticle::refreshKeywords()
     keywordsAllString = keywordsAll.toString().toUpper();
 }
 
-const StringSet & HelpArticle::getLabels() const
-{
-    return labels;
-}
-
-void HelpArticle::addLabel(const DLString &label) 
-{
-    labels.insert(label);
-}
-
-void HelpArticle::setLabelAttribute(const DLString &attribute)
-{
-    this->labelAttribute = attribute;
-    StringSet newLabels;
-    newLabels.fromString(labelAttribute);
-    labels.insert(newLabels.begin(), newLabels.end());
-}
-
 bool HelpArticle::visible( Character *ch ) const
 {
     return ch->get_trust( ) >= level;
@@ -140,8 +122,8 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!refby.empty( ))
         parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
-    if (!labelAttribute.empty())
-        parent->insertAttribute(ATTRIBUTE_LABELS, labelAttribute);
+    if (!labels.persistent.empty())
+        parent->insertAttribute(ATTRIBUTE_LABELS, labels.persistent.toString());
 
     if (id > 0)
         parent->insertAttribute(ATTRIBUTE_ID, DLString(id));
@@ -163,8 +145,8 @@ void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw (ExceptionBadT
     parent->getAttribute(ATTRIBUTE_ID, id);
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
-    labelAttribute = parent->getAttribute(ATTRIBUTE_LABELS);
-    labels.fromString(labelAttribute);
+    labels.persistent.clear();
+    labels.addPersistent(parent->getAttribute(ATTRIBUTE_LABELS));
 }
 
 /*-----------------------------------------------------------------------

@@ -44,9 +44,9 @@ void CommandHelp::setCommand( Command::Pointer command )
     addAutoKeyword(command->getAliases().toSet());
     addAutoKeyword(command->getRussianAliases().toSet());
 
-    labels.fromString(
+    labels.addTransient(
         command->getCommandCategory().names());
-    labels.insert(LABEL_COMMAND);
+    labels.addTransient(LABEL_COMMAND);
 
     // TODO: get rid of ref/reby malarky, each command should have its own help.
     for (r = ref.begin( ); r != ref.end( ); r++) {
@@ -77,6 +77,8 @@ void CommandHelp::unsetCommand( )
     command.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 

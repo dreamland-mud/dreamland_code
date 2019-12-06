@@ -43,5 +43,7 @@ void SkillGroupHelp::unsetSkillGroup( )
     group.clear( );
     keywordsAuto.clear();
     refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
