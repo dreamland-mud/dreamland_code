@@ -126,6 +126,7 @@ NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аф
     Affect af;
     toAffect(af);
     affect_modify(ch, &af, true);
+    return Register();	
 }
 
 #define GS(x, api) \

@@ -192,7 +192,22 @@ NMI_GET( CharacterWrapper, inventory, "список всех предметов 
     checkTarget( );
     
     for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
-        rc->push_back(wrap(obj));
+	if (obj->wear_loc == wear_none)
+	    rc->push_back(wrap(obj));
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(rc);
+    return Register( obj );
+}
+
+NMI_GET( CharacterWrapper, equipment, "список всех предметов в экипировке" )
+{
+    RegList::Pointer rc( NEW );
+    checkTarget( );
+    
+    for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
+	if (obj->wear_loc != wear_none)
+            rc->push_back(wrap(obj));
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -1527,6 +1542,20 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): спас-бросок против типа повреждения (.tables.damage_table) с флагом повреждения (.tables.damage_flags)")
+{
+    checkTarget();
+    Character *caster = argnum2character(args, 1);
+    int level = argnum2number(args, 2);
+    int dam_type = argnum2flag(args, 3, damage_table);
+    int dam_flag = DAMF_OTHER;
+    if (args.size() > 3)
+	dam_flag = argnum2flag(args, 4, damage_flags);
+
+    return Register(saves_spell(level, target, dam_type, caster, dam_flag));	
+}
+
+
 NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict или с аргументом")
 {
     checkTarget( );
@@ -1672,6 +1701,14 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аф�
     return Register( );
 }
 
+
+NMI_INVOKE( CharacterWrapper, isVulnerable, "(damtype, damflag): есть ли уязвимость к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
+{
+    checkTarget();
+    int damtype = argnum2flag(args, 1, damage_table);
+    int damflag = argnum2flag(args, 2, damage_flags);
+    return immune_check(target, damtype, damflag) == RESIST_VULNERABLE;
+}
 
 NMI_INVOKE( CharacterWrapper, isImmune, "(damtype, damflag): есть ли иммунитет к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
 {
