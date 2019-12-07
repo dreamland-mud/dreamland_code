@@ -880,6 +880,11 @@ NMI_GET( ReligionWrapper, sex, "пол божества (таблица .tables.
     return Register((int)getTarget()->getSex());
 }
 
+NMI_GET( ReligionWrapper, tattooVnum, "vnum объекта-татуировки" ) 
+{
+    return Register(getTarget()->tattooVnum);
+}
+
 NMI_GET( ReligionWrapper, flags, "флаги религий (таблица .tables.religion_flags)" ) 
 {
     return Register((int)getTarget()->flags.getValue());
