@@ -282,6 +282,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
     if (cmd.empty()) {
         stc("Формат:  reledit название\r\n", ch);
         stc("         reledit list\r\n", ch);
+        stc("         reledit tattoo\r\n", ch);
         stc("         reledit create новое_ключевое_слово\r\n", ch);
         return;
     }
@@ -317,10 +318,49 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    if (arg_is_list(cmd)) {
-        ch->send_to(dlprintf("{C%-15s %-17s %3s %-3s   %-3s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH"));
+    if (arg_oneof(cmd, "tattoo", "татуировка")) {
+        ch->send_to(dlprintf(
+            "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
 
-        const DLString lineFormat = web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s %1s%1s%1s   %1s%1s%1s{x\r\n";
+        const DLString lineFormat = 
+            web_cmd(ch, "reledit $1", "%-15s") 
+                + " %-17s {W"
+                + web_cmd(ch, "oedit $1", "%-6d")
+                + "{x %s"
+                + "{x\r\n";         
+        const DLString lineFormatNoTattoo = 
+            web_cmd(ch, "reledit $1", "%-15s") 
+                + " %-17s\r\n";
+
+        for (int r = 0; r < religionManager->size(); r++) {
+            DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));
+            if (!religion_valid(rel))
+                continue;
+
+            OBJ_INDEX_DATA *pObj = NULL;
+
+            if (rel->tattooVnum > 0 && rel->tattooVnum != 50)
+                pObj = get_obj_index(rel->tattooVnum);
+
+            if (pObj)
+                ch->send_to(dlprintf(lineFormat.c_str(),
+                        rel->getShortDescr().c_str(),
+                        rel->getRussianName().ruscase('1').c_str(),
+                        pObj->vnum,
+                        russian_case(pObj->short_descr, '1').c_str()));
+            else
+                ch->send_to(dlprintf(lineFormatNoTattoo.c_str(),
+                        rel->getShortDescr().c_str(),
+                        rel->getRussianName().ruscase('1').c_str()));
+        }
+        return;
+    }
+
+    if (arg_is_list(cmd)) {
+        ch->send_to(dlprintf("{C%-15s %-17s %-3s {Y%-3s   %-3s %1s %1s{x\r\n", "Название", "Русское имя", "SEX", "ALG", "ETH", "R", "C"));
+
+        const DLString lineFormat = 
+            web_cmd(ch, "reledit $1", "%-15s") + " %-17s %-3s %1s%1s%1s   %1s%1s%1s %1s %1s{x\r\n";
 
         for (int r = 0; r < religionManager->size(); r++) {
             DefaultReligion *rel = dynamic_cast<DefaultReligion *>(religionManager->find(r));
@@ -336,8 +376,11 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
                     rel->getAlign().isSetBitNumber(N_ALIGN_EVIL) ? "{RE{x" : "{D-{x",
                     rel->getEthos().isSetBitNumber(ETHOS_LAWFUL) ? "{WL{x" : "{D-{x",
                     rel->getEthos().isSetBitNumber(ETHOS_NEUTRAL) ? "N" : "{D-{x",
-                    rel->getEthos().isSetBitNumber(ETHOS_CHAOTIC) ? "{MC{x" : "{D-{x"));
+                    rel->getEthos().isSetBitNumber(ETHOS_CHAOTIC) ? "{MC{x" : "{D-{x",
+                    (!rel->classes.empty() || !rel->races.empty()) ? "{Y*{x" : "",
+                    !rel->clans.empty() ? "{Y*{x" : ""));
         }
+        ch->println("R - ограничено по классу и/или расе; C - ограничено по клану.");
         return;
     }
 
