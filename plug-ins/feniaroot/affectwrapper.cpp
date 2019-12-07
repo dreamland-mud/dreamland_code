@@ -10,15 +10,14 @@
 #include "skillmanager.h"
 #include "liquid.h"
 #include "wearlocation.h"
-
 #include "nativeext.h"
 #include "regcontainer.h"
 #include "reglist.h"
 #include "wrappermanager.h"
+#include "wrap_utils.h"
 #include "subr.h"
 #include "handler.h"
 #include "merc.h"
-
 #include "schedulerwrapper.h"
 #include "def.h"
 
@@ -120,6 +119,14 @@ NMI_SET( AffectWrapper, type, "название умения, которым э�
     }
 }
 
+NMI_INVOKE(AffectWrapper, apply, "(ch): применить действие аффекта на ch, не вешая его")
+{
+    Character *ch = args2character(args);
+
+    Affect af;
+    toAffect(af);
+    affect_modify(ch, &af, true);
+}
 
 #define GS(x, api) \
 NMI_GET( AffectWrapper, x, api ) \
