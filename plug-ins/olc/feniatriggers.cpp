@@ -77,11 +77,7 @@ DLString triggerType(const DLString &name)
 // Return true for strings like Aaaaa.
 bool stringIsCapitalized(const DLString &str)
 {
-    DLString n1 = str, n2 = str;
-    n1.capitalize();
-    if (n1.empty() || n1 != n2)
-        return false;
-    return true;
+    return !str.empty() && dl_isupper(str.at(0));
 }
 
 void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &indexType) const
