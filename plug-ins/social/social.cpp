@@ -37,13 +37,33 @@ DLString act_to_fmt(const char *s);
 
 const DLString SocialHelp::TYPE = "SocialHelp";
 
-SocialHelp::SocialHelp(Social::Pointer social)
+SocialHelp::SocialHelp()
 {
-    this->social = social;
 }
 
 SocialHelp::~SocialHelp()
 {
+}
+
+void SocialHelp::setSocial(Social::Pointer social)
+{
+    this->social = social;
+    addAutoKeyword(social->getName());
+    addAutoKeyword(social->getRussianName());
+    labels.addTransient("social");
+    helpManager->registrate( Pointer( this ) );
+}
+
+void SocialHelp::unsetSocial()
+{
+    helpManager->unregistrate( Pointer( this ) );
+    social.clear( );
+}
+
+void SocialHelp::save() const
+{
+    if (social)
+        social->save();
 }
 
 DLString SocialHelp::getTitle(const DLString &label) const
@@ -168,19 +188,20 @@ Social::~Social( )
 
 void Social::loaded()
 {
-    help = SocialHelp::Pointer(NEW, Pointer(this));
-    help->addAutoKeyword(getName());
-    help->addAutoKeyword(getRussianName());
-    help->labels.addTransient("social");
-    
-    helpManager->registrate(help);
+    if (!help) {
+        help.construct();
+        help->setID(
+            helpManager->getLastID() + 1
+        );
+    }
+   
+    help->setSocial(Pointer(this)); 
 }
 
 void Social::unloaded()
 {
     if (help) {
-        helpManager->unregistrate(help);
-        help.clear(); 
+        help->unsetSocial();
     }
 }
 

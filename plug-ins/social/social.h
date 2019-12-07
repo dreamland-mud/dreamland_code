@@ -15,10 +15,36 @@
 #include "xmlenumeration.h"
 #include "xmltableelement.h"
 #include "socialbase.h"
+#include "xmlpointer.h"
 #include "xmlloader.h"
 #include "markuphelparticle.h"
 
-class SocialHelp;
+class Social;
+
+class SocialHelp : public MarkupHelpArticle {
+public:
+    typedef ::Pointer<SocialHelp> Pointer;
+    
+    SocialHelp();
+    virtual ~SocialHelp();
+
+    void setSocial(::Pointer<Social> social);
+    void unsetSocial();
+    virtual void save() const;
+
+    virtual DLString getTitle(const DLString &label) const;
+    inline virtual const DLString & getType( ) const;
+    static const DLString TYPE;
+
+protected:
+    virtual void getRawText( Character *, ostringstream & ) const;
+    ::Pointer<Social> social;
+};
+
+inline const DLString & SocialHelp::getType( ) const
+{
+    return TYPE;
+}
 
 class Social : public SocialBase, public XMLVariableContainer, 
                public XMLTableElement 
@@ -88,7 +114,7 @@ private:
 
     XML_VARIABLE XMLEnumeration position;
 
-    ::Pointer<SocialHelp> help;
+    XML_VARIABLE XMLPointer<SocialHelp> help;
 };
 
 inline const DLString& Social::getName( ) const 
@@ -175,26 +201,6 @@ inline const DLString & Social::getObjNoVictimSelf() const
 inline const DLString & Social::getObjNoVictimOthers() const
 {
     return msgOthersObj.getValue();
-}
-
-class SocialHelp : public MarkupHelpArticle {
-public:
-    typedef ::Pointer<SocialHelp> Pointer;
-    
-    SocialHelp(Social::Pointer social);
-    virtual ~SocialHelp();
-    virtual DLString getTitle(const DLString &label) const;
-    inline virtual const DLString & getType( ) const;
-    static const DLString TYPE;
-
-protected:
-    virtual void getRawText( Character *, ostringstream & ) const;
-    Social::Pointer social;
-};
-
-inline const DLString & SocialHelp::getType( ) const
-{
-    return TYPE;
 }
 
 #endif

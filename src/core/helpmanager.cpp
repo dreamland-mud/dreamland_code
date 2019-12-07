@@ -72,19 +72,21 @@ const DLString &HelpArticle::getKeywordAttribute() const
 
 void HelpArticle::setKeywordAttribute(const DLString &keywordAttribute)
 {
-    this->keywordAttribute = keywordAttribute;
+    this->keywordAttribute = keywordAttribute.toUpper();
     refreshKeywords();
 }
 
 void HelpArticle::addAutoKeyword(const DLString &keyword)
 {
-    keywordsAuto.fromString(keyword.quote());
+    keywordsAuto.fromString(keyword.toUpper().quote());
     refreshKeywords();
 }
 
 void HelpArticle::addAutoKeyword(const StringSet &keywords)
 {
-    keywordsAuto.insert(keywords.begin(), keywords.end());
+    for (StringSet::const_iterator k = keywords.begin(); k != keywords.end(); k++)
+        keywordsAuto.insert(k->toUpper());
+
     refreshKeywords();
 }
 
@@ -107,7 +109,7 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     XMLStringNoEmpty xmlString( *this );
 
     if (!xmlString.toXML( parent ))
-        if (keywordAttribute.empty( ) && ref.empty( ) && refby.empty( ))
+        if (keywordAttribute.empty( ) && ref.empty( ) && refby.empty( ) && id <= 0)
             return false;
     
     if (!keywordAttribute.empty( ))
