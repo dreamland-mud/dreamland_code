@@ -1097,8 +1097,7 @@ public:
 };    
 
 /**
- * Help dumper task: save help HTML to disk each time this plugin is loaded.
- * It's prioritized to run after all area initialization has completed.
+ * Help dumper task: periodically save help JSON to disk.
  */
 class HelpDumpPlugin : public SchedulerTaskRoundPlugin {
 public:
@@ -1106,7 +1105,12 @@ public:
 
     virtual int getPriority( ) const
     {
-        return SCDP_BOOT + 25;
+        return SCDP_ROUND + 30;
+    }
+
+    virtual void after( )
+    {
+        DLScheduler::getThis( )->putTaskInSecond( 1 * Date::SECOND_IN_HOUR, Pointer( this ) );
     }
 
     /**
@@ -1137,7 +1141,7 @@ public:
 
                 h["id"] = (*a)->getID();
 
-	    	h["kw"] = (*a)->getAllKeywordsString();
+	    	    h["kw"] = (*a)->getAllKeywordsString();
 
                 for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
                     h["kwList"].append(*k);
@@ -1156,6 +1160,7 @@ public:
             }
         }
 
+        LogStream::sendNotice() << "Dumping all helps to disk." << endl;
         DLFileStream("/tmp", "helps", ".json").fromString(
             koi2utf(
                 json_to_string(helps))
