@@ -1137,8 +1137,10 @@ public:
 
                 h["id"] = (*a)->getID();
 
+	    	h["kw"] = (*a)->getAllKeywordsString();
+
                 for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
-                    h["kw"].append(k->toUpper());
+                    h["kwList"].append(*k);
 
                 for (StringSet::const_iterator l = (*a)->labels.all.begin(); l != (*a)->labels.all.end(); l++) {
                     h["labels"].append(*l);
