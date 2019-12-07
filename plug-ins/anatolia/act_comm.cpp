@@ -355,10 +355,13 @@ CMDRUNP( quit )
         DescriptorStateManager::getThis( )->handle( CON_PLAYING, CON_QUIT, pch->desc );
 
     act_p( "$c1 покину$gло|л|ла этот мир.", pch, 0, 0, TO_ROOM ,POS_DEAD);
-    wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
-    infonet("{CТихий голос из $o2: {W$C1 покину$Gло|л|ла Dream Land.{x", pch, 0);
-    send_discord_orb(fmt(0, "%1$^C1 покинул%1$Gо||а Dream Land.", pch));
 
+    if (!pch->getPC( )->getAttributes( ).isAvailable("quietLogin")) {
+        wiznet( WIZ_LOGINS, 0, pch->get_trust( ), "%1$^C1 покину%1$Gло|л|ла этот мир.", pch );
+        infonet("{CТихий голос из $o2: {W$C1 покину$Gло|л|ла Dream Land.{x", pch, 0);
+        send_discord_orb(fmt(0, "%1$^C1 покинул%1$Gо||а Dream Land.", pch));
+    }
+	
     dreamland->removeOption( DL_SAVE_OBJS );
 
     for( obj = pch->carrying; obj ; obj = obj_next)
