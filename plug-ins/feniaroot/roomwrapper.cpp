@@ -567,6 +567,19 @@ NMI_INVOKE( RoomWrapper, list_mob_vnum, "(vnum): поиск списка моб�
     return Register( sobj );
 }
 
+NMI_INVOKE( RoomWrapper, count_enemies, "(ch): кол-во персонажей, сражающихся с ch")
+{
+    checkTarget( );
+    Character *ch = args2character(args);
+    int count = 0;
+	
+    for (Character *rch = target->people; rch; rch = rch->next_in_room)
+	if (rch != ch && rch->fighting == ch)
+	    count++;
+
+    return Register(count);
+}
+
 /*---------------------------------------------------------
  * fenia traverse
  *--------------------------------------------------------*/
