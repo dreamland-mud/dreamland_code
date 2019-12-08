@@ -3,6 +3,9 @@
  * ruffina, 2019
  */
 #include "dlfilestream.h"
+#include "json/json.h"
+#include "iconvmap.h"
+
 #include "dlscheduler.h"
 #include "schedulertaskroundplugin.h"
 #include "plugininitializer.h"
@@ -24,6 +27,7 @@
 #include "mercdb.h"
 #include "def.h"
 
+static IconvMap koi2utf("koi8-r", "utf-8");
 
 GSN(none);
 
@@ -112,6 +116,7 @@ public:
     bool dumpPets() 
     {
         ostringstream buf;
+        Json::Value dump;
 
         buf << "vnum,name,level,act,aff,off,area" << endl;
         for (int i = 0; i < MAX_KEY_HASH; i++)
@@ -124,9 +129,19 @@ public:
             DLString type = pMob->behavior->getFirstNode()->getAttribute(XMLNode::ATTRIBUTE_TYPE);
             if (type.find("Pet") == DLString::npos && type != "Rat")
                 continue;
-
+            
             DLString aname = pMob->area->name;
             csv_escape(aname);
+
+            Json::Value pet;
+            pet["vnum"] = pMob->vnum;
+            pet["name"] = russian_case(pMob->short_descr, '1').colourStrip();
+            pet["level"] = (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level);
+            pet["act"] = act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_SAGE|ACT_NOWHERE));
+            pet["aff"] = affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED));
+            pet["off"] = off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
+            pet["area"] = aname;
+            dump.append(pet);
 
             buf << pMob->vnum << "," 
                 << russian_case(pMob->short_descr, '1').colourStrip() << "," 
@@ -144,12 +159,19 @@ public:
             return false;
         }
 
+        Json::FastWriter writer;
+        DLFileStream("/tmp", "db_pets", ".json").fromString(
+            koi2utf(
+                writer.write(dump))
+        );
+
         return true;
     }
 
     bool dumpArmor()
     {
         ostringstream buf;
+        Json::Value dump;
 
         buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,str,int,wis,dex,con,cha,align,affects,area,where,limit" << endl;
 
@@ -259,7 +281,31 @@ public:
             DLString area = pArea->name;
             csv_escape( area );
             csv_escape( where );
-                
+
+            Json::Value a;
+            a["vnum"] = pObj->vnum;
+            a["name"] = name;
+            a["level"] = pObj->level;
+            a["wearloc"] = wearloc;
+            a["itemtype"] = itemtype;
+            a["hr"] = hr;
+            a["dr"] = dr;
+            a["hp"] = hp;
+            a["mana"] = mana;
+            a["move"] = move;
+            a["saves"] = svs;
+            a["str"] = str;
+            a["int"] = inta;
+            a["wis"] = wis;
+            a["dex"] = dex;
+            a["con"] = con;
+            a["cha"] = cha;
+            a["align"] = align;
+            a["area"] = area;
+            a["where"] = where;
+            a["limit"] = pObj->limit;
+            dump.append(a);
+
             // TODO show affects
             buf << pObj->vnum << ","
                 << "\"" << name << "\","
@@ -276,6 +322,12 @@ public:
                 << pObj->limit << endl;
         }
 
+        Json::FastWriter writer;
+        DLFileStream("/tmp", "db_armor", ".json").fromString(
+            koi2utf(
+                writer.write(dump))
+        );
+
         try {
             DLFileStream( "/tmp/db_armor.csv" ).fromString( buf.str( ) );
         } catch (const ExceptionDBIO &ex) {
@@ -289,6 +341,7 @@ public:
     bool dumpWeapon()
     {
         ostringstream buf;
+        Json::Value dump;
 
         buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where,limit" << endl;
 
@@ -368,7 +421,32 @@ public:
             DLString area = pArea->name;
             csv_escape( area );
             csv_escape( where );
-                
+
+            Json::Value w;
+            w["vnum"] = pObj->vnum;
+            w["name"] = name;
+            w["level"] = pObj->level;
+            w["wclass"] = weaponClass;
+            w["special"] = special;
+            w["d1"] = d1;
+            w["d2"] = d2;
+            w["ave"] = ave;
+            w["hr"] = hr;
+            w["dr"] = dr;
+            w["hp"] = hp;
+            w["mana"] = mana;
+            w["saves"] = svs;
+            w["str"] = str;
+            w["int"] = inta;
+            w["wis"] = wis;
+            w["dex"] = dex;
+            w["con"] = con;
+            w["align"] = align;
+            w["area"] = area;
+            w["where"] = where;
+            w["limit"] = pObj->limit;
+            dump.append(w);
+
             // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where"
             buf << pObj->vnum << ","
                 << "\"" << name << "\","
@@ -388,6 +466,12 @@ public:
                 << pObj->limit << endl;
         }
 
+        Json::FastWriter writer;
+        DLFileStream("/tmp", "db_weapon", ".json").fromString(
+            koi2utf(
+                writer.write(dump))
+        );
+
         try {
             DLFileStream( "/tmp/db_weapon.csv" ).fromString( buf.str( ) );
         } catch (const ExceptionDBIO &ex) {
@@ -401,7 +485,7 @@ public:
     bool dumpMagic()
     {
         ostringstream buf;
-
+        Json::Value dump;
         buf << "vnum,name,level,itemtype,spellLevel,charges,spells,area,where,limit" << endl;
         // Collect distinct list of spells.
         std::set<DLString> allSpells;
@@ -490,6 +574,19 @@ public:
             csv_escape( area );
             csv_escape( where );
                 
+            Json::Value wand;
+            wand["vnum"] = pObj->vnum;
+            wand["name"] = name;
+            wand["level"] = pObj->level;
+            wand["type"] = itemtype;
+            wand["spellLevel"] = spellLevel;
+            wand["charges"] = charges;
+            wand["spells"] = spells;
+            wand["area"] = area;
+            wand["where"] = where;
+            wand["limit"] = pObj->limit;
+            dump.append(wand);
+
             // Header; "vnum,name,level,type,spellLevel,charges,spells,area,where" 
             buf << pObj->vnum << ","
                 << "\"" << name << "\","
@@ -501,6 +598,12 @@ public:
                 << "\"" << area << "\","  << "\"" << where << "\","
                 << pObj->limit << endl;
         }
+
+        Json::FastWriter writer;
+        DLFileStream("/tmp", "db_magic", ".json").fromString(
+            koi2utf(
+                writer.write(dump))
+        );
 
         try {
             DLFileStream( "/tmp/db_magic.csv" ).fromString( buf.str( ) );

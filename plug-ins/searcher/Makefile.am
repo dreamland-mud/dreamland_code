@@ -8,6 +8,7 @@ $(INCLUDES_FIGHT) \
 -I$(top_srcdir)/plug-ins/areas \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
+-I/usr/include/jsoncpp \
 $(INCLUDES_SRC) 
 
 AM_YFLAGS = -d
@@ -18,7 +19,8 @@ $(LIBADD_FIGHT) \
 ../ed/lib/libed.la \
 ../areas/libareas.la \
 ../skills_impl/libskills_impl.la \
-../updates/libupdates.la
+../updates/libupdates.la \
+-ljsoncpp
 
 libsearcher_la_SOURCES = \
 searcher.cpp \
