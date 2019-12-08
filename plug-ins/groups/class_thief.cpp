@@ -37,6 +37,7 @@
 #include "drink_utils.h"
 #include "act_move.h"
 #include "arg_utils.h"
+#include "chance.h"
 #include "exitsmovement.h"
 #include "act_lock.h"
 #include "mercdb.h"
@@ -1048,10 +1049,12 @@ SKILL_RUNP( backstab )
         fBonus = true;
     }
 
+    Chance bsChance(ch, gsn_backstab->getEffective(ch)-1, 100);
+
     try {
         if (!IS_AWAKE(victim)
                 || fBonus
-                || number_percent( ) < gsn_backstab->getEffective( ch ))
+                || bsChance.reroll())
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
@@ -1064,7 +1067,7 @@ SKILL_RUNP( backstab )
             else
                 dual_chance =  dual_percent * 8 / 10;
 
-            if (number_percent( ) < dual_chance) {
+            if (Chance(ch, dual_chance-1, 100).reroll()) {
                 gsn_dual_backstab->improve( ch, true, victim );
 
                 if (ch->fighting == victim)
@@ -1080,7 +1083,7 @@ SKILL_RUNP( backstab )
                     else
                         haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
 
-                    if (number_percent() < haste_chance) {
+                    if (Chance(ch, haste_chance-1, 100).reroll()) {
                         if (ch->fighting == victim)
                             BackstabOneHit( ch, victim ).hit( );
                     }
@@ -1269,7 +1272,7 @@ SKILL_RUNP( blackjack )
             fBonus = true;
         }
 
-        if (fBonus || number_percent() < chance * k / 100)
+        if (fBonus || Chance(ch, chance * k / 100, 100).reroll())
         {
                 act_p("Ты бьешь $C4 по голове мешочком со свинцом.",
                         ch,0,victim,TO_CHAR,POS_RESTING);

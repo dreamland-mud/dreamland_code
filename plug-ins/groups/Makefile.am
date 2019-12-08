@@ -18,6 +18,7 @@ $(INCLUDES_SRC)
 
 libgenericskill_la_SOURCES = \
 impl_genericskill.cpp \
+chance.cpp \
 dreamskill.cpp \
 genericskill.cpp 
 
@@ -31,6 +32,7 @@ libgenericskill_la_LIBADD = \
 ../system/libscheduler_task_round.la \
 ../loadsave/libloadsave.la \
 ../fight_core/libfight_core.la \
+../wearlocation/libwearlocation.la \
 ../skills_impl/libskills_impl.la 
 
 libgroup_skills_la_SOURCES = \
