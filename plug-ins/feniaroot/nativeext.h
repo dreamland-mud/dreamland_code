@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 
+#include "json/json.h"
 #include "logstream.h"
 #include "native.h"
 #include "dlfilestream.h"
@@ -73,51 +74,33 @@ void traitsAPI( ostringstream &buf )
     traitsAPIAux<typename Traits::Invoke>( buf );
 }
 
-/** 
- * Save API output for this wrapper to one or two files, in the form of HTML table rows.
- * TODO HTML-escaping
- */
-template <typename T>
-void traitsAPIDump(const DLString &prefix, bool showFieldStatus, bool methodsSeparately)
+template <typename TT>
+void traitsAPIJsonAux( Json::Value &jsonMap, bool readOnly ) 
 {
-    typedef NativeTraits<T> Traits;
-    ostringstream fbuf, mbuf;
-    DLDirectory dir(dreamland->getMiscDir(), "api");
-
-    {
-        API api;
-
-        traitsAPIAux<typename Traits::Get>( api, true );
-        traitsAPIAux<typename Traits::Set>( api, false );
-        for (API::const_iterator a = api.begin(); a != api.end(); a++) {
-            fbuf << "<tr><td>"; 
-            if (showFieldStatus)
-                fbuf << (a->second.readOnly ? "ro":"rw") << "</td><td>";
-            fbuf << a->first << "</td><td>" << a->second.help << "</td></tr>";
-        }
-    }
-    {
-        API api;
-
-        traitsAPIAux<typename Traits::Invoke>( api, false );
-        for (API::const_iterator a = api.begin(); a != api.end(); a++)
-            mbuf << "<tr><td>" << a->first << "</td><td>" << a->second.help << "</td></tr>";
-    }
+    typename TT::List *list = TT::List::begin();
     
-    try {
-        if (methodsSeparately) {
-            DLFileStream(dir, prefix + "_methods").fromString(mbuf.str());
-            DLFileStream(dir, prefix + "_fields").fromString(fbuf.str());
-        } else {
-            fbuf << mbuf.str();
-            DLFileStream(dir, prefix + "_fields").fromString(fbuf.str());
-        }
-
-    } catch (const ExceptionDBIO &ex) {
-        LogStream::sendError() << "Error writing API: " << ex.what() << endl;
-        return;
+    for ( ; list; list = list->getNext()) {
+        Json::Value details;
+        details["help"] = list->getVal().help;
+        details["readOnly"] = readOnly;
+        jsonMap[list->getKey().name] = details;
     }
 }
+
+template <typename T>
+void traitsAPIJson(const DLString &prefix, Json::Value &apiDump)
+{
+    typedef NativeTraits<T> Traits;
+    Json::Value fields, methods;
+
+    traitsAPIJsonAux<typename Traits::Get>( fields, true );
+    traitsAPIJsonAux<typename Traits::Set>( fields, false );
+    traitsAPIJsonAux<typename Traits::Invoke>( methods, false );
+
+    apiDump[prefix + "_fields"] = fields;
+    apiDump[prefix + "_methods"] = methods;
+}
+
 
 }
 
