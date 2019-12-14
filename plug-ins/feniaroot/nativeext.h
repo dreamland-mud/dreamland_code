@@ -75,30 +75,38 @@ void traitsAPI( ostringstream &buf )
 }
 
 template <typename TT>
-void traitsAPIJsonAux( Json::Value &jsonMap, bool readOnly ) 
+void traitsAPIJsonAux( Json::Value &jsonArray, bool readOnly ) 
 {
     typename TT::List *list = TT::List::begin();
     
     for ( ; list; list = list->getNext()) {
         Json::Value details;
         details["help"] = list->getVal().help;
-        details["readOnly"] = readOnly;
-        jsonMap[list->getKey().name] = details;
+        details["ro"] = readOnly;
+        details["name"] = list->getKey().name;
+        jsonArray.append(details);
     }
 }
 
 template <typename T>
-void traitsAPIJson(const DLString &prefix, Json::Value &apiDump)
+void traitsAPIJson(const DLString &prefix, Json::Value &apiDump, bool splitMethodsAndFields)
 {
     typedef NativeTraits<T> Traits;
-    Json::Value fields, methods;
+    Json::Value fields;
+    Json::Value methods;
+    Json::Value &fieldsOrMethods = splitMethodsAndFields ? fields : methods; 
 
-    traitsAPIJsonAux<typename Traits::Get>( fields, true );
-    traitsAPIJsonAux<typename Traits::Set>( fields, false );
+    traitsAPIJsonAux<typename Traits::Get>( fieldsOrMethods, true );
+    traitsAPIJsonAux<typename Traits::Set>( fieldsOrMethods, false );
     traitsAPIJsonAux<typename Traits::Invoke>( methods, false );
 
-    apiDump[prefix + "_fields"] = fields;
-    apiDump[prefix + "_methods"] = methods;
+    if (splitMethodsAndFields) {
+        apiDump[prefix + "_fields"] = fields;
+        apiDump[prefix + "_methods"] = methods;
+
+    } else {
+        apiDump[prefix + "_methods"] = methods;
+    }
 }
 
 

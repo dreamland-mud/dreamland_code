@@ -102,26 +102,26 @@ WrappersPlugin::initialization( )
     LogStream::sendNotice() << "Dumping Fenia API to disk." << endl;
 
     Json::Value apiDump;
-    traitsAPIJson<CharacterWrapper>("char", apiDump);     
-    traitsAPIJson<ObjectWrapper>("obj", apiDump);     
-    traitsAPIJson<RoomWrapper>("room", apiDump);     
-    traitsAPIJson<MobIndexWrapper>("mob_index", apiDump);     
-    traitsAPIJson<ObjIndexWrapper>("obj_index", apiDump);     
-    traitsAPIJson<Root>("root", apiDump);     
-    traitsAPIJson<AffectWrapper>("affect", apiDump);     
-    traitsAPIJson<CommandWrapper>("command", apiDump);     
-    traitsAPIJson<AreaWrapper>("area", apiDump);     
-    traitsAPIJson<HometownWrapper>("hometown", apiDump);     
-    traitsAPIJson<ProfessionWrapper>("profession", apiDump);     
-    traitsAPIJson<RaceWrapper>("race", apiDump);     
-    traitsAPIJson<ClanWrapper>("clan", apiDump);     
-    traitsAPIJson<CraftProfessionWrapper>("craftprofession", apiDump);     
-    traitsAPIJson<BonusWrapper>("bonus", apiDump);     
-    traitsAPIJson<ReligionWrapper>("religion", apiDump);     
-    traitsAPIJson<LiquidWrapper>("liquid", apiDump);     
-    traitsAPIJson<SkillWrapper>("skill", apiDump);     
-    traitsAPIJson<FeniaSkill>("feniaskill", apiDump);     
-    traitsAPIJson<FeniaString>("string", apiDump);
+    traitsAPIJson<CharacterWrapper>("char", apiDump, true);     
+    traitsAPIJson<ObjectWrapper>("obj", apiDump, true);     
+    traitsAPIJson<RoomWrapper>("room", apiDump, true);     
+    traitsAPIJson<MobIndexWrapper>("mob_index", apiDump, false);     
+    traitsAPIJson<ObjIndexWrapper>("obj_index", apiDump, false);     
+    traitsAPIJson<Root>("root", apiDump, true);     
+    traitsAPIJson<AffectWrapper>("affect", apiDump, false);     
+    traitsAPIJson<CommandWrapper>("command", apiDump, false);     
+    traitsAPIJson<AreaWrapper>("area", apiDump, false);     
+    traitsAPIJson<HometownWrapper>("hometown", apiDump, false);     
+    traitsAPIJson<ProfessionWrapper>("profession", apiDump, false);     
+    traitsAPIJson<RaceWrapper>("race", apiDump, false);     
+    traitsAPIJson<ClanWrapper>("clan", apiDump, false);     
+    traitsAPIJson<CraftProfessionWrapper>("craftprofession", apiDump, false);     
+    traitsAPIJson<BonusWrapper>("bonus", apiDump, false);     
+    traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
+    traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
+    traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
+    traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);     
+    traitsAPIJson<FeniaString>("string", apiDump, false);
 
     Json::FastWriter writer;
     DLFileStream("/tmp", "feniaapi", ".json").fromString(
