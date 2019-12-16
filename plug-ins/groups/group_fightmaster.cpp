@@ -170,6 +170,9 @@ SKILL_RUNP( bashdoor )
         if (room->isDark( ) && !IS_AFFECTED(ch, AFF_INFRARED ))
                 chance /= 2;
 
+        chance = max( 3, chance );
+        chance = min( 98, chance );
+
         /* now the attack */
         if (number_percent() < chance )
         {
