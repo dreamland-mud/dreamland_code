@@ -9,21 +9,23 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "room.h"
-
 #include "interprethandler.h"
 #include "descriptor.h"
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
 #include "commonattributes.h"
+#include "subprofession.h"
+#include "language.h"
+#include "languagemanager.h"
 #include "websocketrpc.h"
-
 #include "dreamland.h"
 #include "weather.h"
 #include "move_utils.h"
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
+#include "../anatolia/handler.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -844,7 +846,7 @@ NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск про
     if (!prof)
         throw Scripting::IllegalArgumentException( );
 
-    return ProfessionWrapper::wrap( prof->getName( ) );
+    return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
 NMI_GET( Root, professions, "список всех профессий, доступных игрокам") 
@@ -856,7 +858,7 @@ NMI_GET( Root, professions, "список всех профессий, дост�
         prof = professionManager->find( i );
 
         if (prof->isValid( ) && prof->isPlayed( )) 
-            list->push_back( ProfessionWrapper::wrap( prof->getName( ) ) );
+            list->push_back( Register::handler<ProfessionWrapper>(prof->getName()) );
     }
     
     Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
@@ -866,36 +868,30 @@ NMI_GET( Root, professions, "список всех профессий, дост�
 
 NMI_INVOKE( Root, Profession, "(name): конструктор для профессии (класса) по имени" )
 {
-    DLString name;
-
-    if (args.empty( ))
-        name = "none";
-    else
-        name = args.front( ).toString( );
-        
-    return ProfessionWrapper::wrap( name );
+    DLString name = args2string(args);
+    Profession *prof = professionManager->findExisting(name);
+    if (!prof)
+        throw Scripting::Exception("Profession not found");
+    return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
 NMI_INVOKE( Root, CraftProfession, "(name): конструктор для дополнительной профессии по имени" )
 {
-    DLString name;
-
-    if (args.empty( ))
-        name = "none";
-    else
-        name = args.front( ).toString( );
-        
-    return CraftProfessionWrapper::wrap( name );
+    DLString name = args2string(args);
+    CraftProfession::Pointer prof = craftProfessionManager->get(name);
+    if (!prof)
+        throw Scripting::Exception("Craft profession not found");
+    return Register::handler<CraftProfessionWrapper>(prof->getName());
 }
 
 NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов по имени" )
 {
     DLString name = args2string(args);
-    if (!bonusManager->findExisting(name))
+    Bonus *bonus = bonusManager->findExisting(name);
+    if (!bonus)
         throw Scripting::Exception("Bonus not found");
-    return BonusWrapper::wrap( name );
+    return Register::handler<BonusWrapper>(bonus->getName());
 }
-
 
 NMI_INVOKE( Root, Religion, "(name): конструктор для религии по имени" )
 {
@@ -903,7 +899,16 @@ NMI_INVOKE( Root, Religion, "(name): конструктор для религи�
     Religion *religion = religionManager->findExisting(name);
     if (!religion)
         throw Scripting::Exception("Religion not found");
-    return ReligionWrapper::wrap( religion->getName() );
+    return Register::handler<ReligionWrapper>(religion->getName());
+}
+
+NMI_INVOKE( Root, Language, "(name): конструктор для древнего языка по имени" )
+{
+    DLString name = args2string(args);
+    Language::Pointer lang = languageManager->findLanguage(name);
+    if (!lang)
+        throw Scripting::Exception("Language not found");
+    return Register::handler<LanguageWrapper>(lang->getName());
 }
 
 NMI_GET( Root, races, "список всех рас") 

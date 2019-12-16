@@ -10,6 +10,9 @@
 #include "skillcommand.h"
 #include "profession.h"
 #include "defaultreligion.h"
+#include "language.h"
+#include "languagemanager.h"
+#include "wordeffect.h"
 #include "subprofession.h"
 #include "room.h"
 #include "pcharacter.h"
@@ -200,16 +203,6 @@ NMI_INIT(ProfessionWrapper, "profession, класс персонажа");
 ProfessionWrapper::ProfessionWrapper( const DLString &n )
                   : name( n )
 {
-}
-
-Scripting::Register ProfessionWrapper::wrap( const DLString &name )
-{
-    ProfessionWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
 }
 
 NMI_INVOKE( ProfessionWrapper, api, "(): печатает этот api" )
@@ -648,16 +641,6 @@ CraftProfessionWrapper::CraftProfessionWrapper( const DLString &n )
 {
 }
 
-Scripting::Register CraftProfessionWrapper::wrap( const DLString &name )
-{
-    CraftProfessionWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
-}
-
 CraftProfession * CraftProfessionWrapper::getTarget() const
 {
     CraftProfession::Pointer prof = craftProfessionManager->get(name);
@@ -739,22 +722,12 @@ BonusWrapper::BonusWrapper( const DLString &n )
 {
 }
 
-Scripting::Register BonusWrapper::wrap( const DLString &name )
-{
-    BonusWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
-}
-
 Bonus * BonusWrapper::getTarget() const
 {
-    Bonus::Pointer prof = bonusManager->findExisting(name);
-    if (!prof)
+    Bonus::Pointer bonus = bonusManager->findExisting(name);
+    if (!bonus)
         throw Scripting::Exception("Bonus not found");
-    return *prof;
+    return *bonus;
 }
 
 NMI_INVOKE( BonusWrapper, api, "(): печатает этот api" )
@@ -822,16 +795,6 @@ NMI_INIT(ReligionWrapper, "reglion, религия");
 ReligionWrapper::ReligionWrapper( const DLString &n )
                   : name( n )
 {
-}
-
-Scripting::Register ReligionWrapper::wrap( const DLString &name )
-{
-    ReligionWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
 }
 
 DefaultReligion * ReligionWrapper::getTarget() const
@@ -944,6 +907,66 @@ NMI_INVOKE( ReligionWrapper, reasonWhy, "(ch): НОВАЯ ЛОГИКА - при�
     Character *ch = args2character(args);
     return getTarget()->reasonWhy(ch);
 }
+
+/*----------------------------------------------------------------------
+ * Language
+ *----------------------------------------------------------------------*/
+NMI_INIT(LanguageWrapper, "language, древний язык");
+
+LanguageWrapper::LanguageWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Language * LanguageWrapper::getTarget() const
+{
+    Language::Pointer lang = languageManager->findLanguage(name);
+    if (!lang)
+        throw Scripting::Exception("Language not found");
+    return lang.getPointer();
+}
+
+NMI_INVOKE( LanguageWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<LanguageWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( LanguageWrapper, name, "английское название" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( LanguageWrapper, nameRus, "русское название" ) 
+{
+    return getTarget()->getRussianName( );
+}
+
+NMI_INVOKE( LanguageWrapper, word, "(): создать одноразовое слово по правилам языка")
+{
+    return getTarget()->createDictum();
+}
+
+NMI_INVOKE( LanguageWrapper, runEffect, "(effect, ch, vict): выполнить эффект с данным именем (good, bad, bless etc) от имени ch и с целью vict")
+{
+    DLString effectName = argnum2string(args, 1);
+    PCharacter *ch = argnum2player(args, 2);
+    Character *vict = argnum2character(args, 3);
+    WordEffect::Pointer effect = getTarget()->findEffect(effectName);
+    if (!effect)
+        throw Scripting::Exception(effectName + " effect not found for language " + name);
+
+    return Register(effect->run(ch, vict));
+}
+
+NMI_INVOKE( LanguageWrapper, effective, "(ch): узнать процент раскачки языка у персонажа" )
+{
+    PCharacter *ch = args2player(args); 
+    return Register( getTarget()->getEffective(ch) );
+}
+
 
 /*----------------------------------------------------------------------
  * Skill

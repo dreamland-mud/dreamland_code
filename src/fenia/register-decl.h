@@ -38,6 +38,8 @@ public:
     inline Register(const Register &r);
     template <typename T> 
         static inline Register handler();
+    template <typename T> 
+        static inline Register handler(const DLString &argument);
     inline ~Register();
 
     inline const Register &operator = (int r);

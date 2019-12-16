@@ -811,7 +811,7 @@ NMI_GET( CharacterWrapper, profession, "класс (структура .Professi
 {
     checkTarget( );
     CHK_NPC
-    return ProfessionWrapper::wrap( target->getPC( )->getProfession( )->getName( ) );
+    return Register::handler<ProfessionWrapper>(target->getPC()->getProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, profession, "класс (структура .Profession)" )
@@ -828,7 +828,7 @@ NMI_GET( CharacterWrapper, religion, "религия (структура .Religi
 {
     checkTarget( );
     CHK_NPC
-    return ReligionWrapper::wrap( target->getPC( )->getReligion( )->getName( ) );
+    return Register::handler<ReligionWrapper>( target->getPC( )->getReligion( )->getName( ) );
 }
 
 NMI_SET( CharacterWrapper, religion, "религия (структура .Religion)" )
@@ -845,7 +845,7 @@ NMI_GET( CharacterWrapper, uniclass, "под-профессия универса
 {
     checkTarget( );
     CHK_NPC
-    return ProfessionWrapper::wrap( target->getPC( )->getSubProfession( )->getName( ) );
+    return Register::handler<ProfessionWrapper>(target->getPC()->getSubProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
