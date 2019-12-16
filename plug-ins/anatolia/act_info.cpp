@@ -1569,7 +1569,6 @@ CMDRUNP( score )
     XMLAttributeTimer::Pointer qd = pch->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );
     int age = pch->age.getYears( );
     Room *room = get_room_index( pch->getHometown( )->getAltar( ) );
-    bool fRus = ch->getConfig( )->rucommands;
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
     if (ch->getProfession( ) == prof_universal) 
@@ -1609,8 +1608,8 @@ CMDRUNP( score )
 "     | %sРаса :{x  %-12s %s| %s{lRУм  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
 "     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
 "     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-5d%s  |\n\r"
-"     | %s{lRНатура:{lEAlign: {lx{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %s{lRЭтос {lEEthos{lx:{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
+"     | %sНатура:{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
+"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
 "     | %sДом  :{x  %-30s %s| {Y%-22s %s|\n\r"                
 "     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
 
@@ -1667,8 +1666,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            fRus ?  ethos_table.message( ch->ethos, '1' ).cutSize( 12 ).c_str( )
-                  : ethos_table.name( ch->ethos ).c_str( ),
+            ethos_table.message( ch->ethos, '1' ).cutSize( 12 ).c_str( ),
             CLR_BAR,
             CLR_CAPT,
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA), pch->getMaxStat(STAT_CHA),
