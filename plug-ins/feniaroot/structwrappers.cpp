@@ -272,6 +272,14 @@ NMI_GET( ProfessionWrapper, nameMlt, "русское название во мн�
     return professionManager->find( name )->getMltName( );
 }
 
+NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги профессии для этого персонажа (таблица .tables.prof_flags)" ) 
+{
+    Character *ch = args2character(args);
+    Profession *prof = professionManager->find( name );
+    return Register((int)prof->getFlags(ch).getValue());
+}
+
+
 NMI_GET( ProfessionWrapper, ethos, "список подходящих мировоззрений" ) 
 {
     return professionManager->find( name )->getEthos( ).names( );

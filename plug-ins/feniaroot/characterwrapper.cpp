@@ -26,6 +26,7 @@
 #include "room.h"
 
 #include "subprofession.h"
+#include "profflags.h"
 #include "occupations.h"
 #include "interp.h"
 #include "comm.h"
@@ -810,8 +811,7 @@ NMI_GET( CharacterWrapper, lastAccessTime, "время последнего за
 NMI_GET( CharacterWrapper, profession, "класс (структура .Profession)" )
 {
     checkTarget( );
-    CHK_NPC
-    return Register::handler<ProfessionWrapper>(target->getPC()->getProfession()->getName());
+    return Register::handler<ProfessionWrapper>(target->getProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, profession, "класс (структура .Profession)" )
