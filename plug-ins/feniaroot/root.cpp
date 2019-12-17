@@ -25,6 +25,7 @@
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
+#include "damageflags.h"
 #include "../anatolia/handler.h"
 
 #include "root.h"
@@ -1100,4 +1101,27 @@ NMI_INVOKE(Root, webcmd, "(ch,cmd,label): создать линку для ве�
     DLString seeFmt = argnum2string(args, 3);
 
     return Register(web_cmd(ch, cmd, seeFmt));
+}
+
+NMI_INVOKE(Root, spells, "(targets): вернуть все заклинания, действующие на цели (.tables.target_table)")
+{
+    int targets = argnum2flag(args, 1, target_table);
+    RegList::Pointer spells(NEW);
+
+    for (int sn = 0; sn < skillManager->size( ); sn++) {
+        Skill *skill = skillManager->find(sn);
+        Spell::Pointer spell = skill->getSpell();
+
+        if (!spell || !spell->isCasted())
+            continue;
+
+        if (targets > 0 && !IS_SET(spell->getTarget(), targets))
+            continue;
+
+        spells->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(spells);
+    return Register(listObj);
 }

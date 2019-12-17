@@ -171,7 +171,7 @@ int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
 {
     Register a = argnum(args, num);
     if (a.type == Register::STRING)
-        return table.value( a.toString().c_str(), true );
+        return table.bitstring( a.toString().c_str(), true );
     return a.toNumber();
 }
 
