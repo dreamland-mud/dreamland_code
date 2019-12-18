@@ -15,6 +15,7 @@
 #include "infonet.h"
 #include "messengers.h"
 #include "commonattributes.h"
+#include "skillgroup.h"
 #include "subprofession.h"
 #include "language.h"
 #include "languagemanager.h"
@@ -1111,7 +1112,7 @@ NMI_INVOKE(Root, webcmd, "(ch,cmd,label): создать линку для ве�
     return Register(web_cmd(ch, cmd, seeFmt));
 }
 
-NMI_INVOKE(Root, spells, "(targets): вернуть все заклинания, действующие на цели (.tables.target_table)")
+NMI_INVOKE(Root, spells, "(targets): вернуть названия всех заклинаний, действующих на цели (.tables.target_table)")
 {
     int targets = argnum2flag(args, 1, target_table);
     RegList::Pointer spells(NEW);
@@ -1131,5 +1132,24 @@ NMI_INVOKE(Root, spells, "(targets): вернуть все заклинания,
 
     Scripting::Object *listObj = &Scripting::Object::manager->allocate();
     listObj->setHandler(spells);
+    return Register(listObj);
+}
+
+NMI_INVOKE(Root, skills, "(group): вернуть названия всех умений, принадлежащих этой группе (olchelp prac)")
+{
+    SkillGroup *group = skillGroupManager->findExisting(args2string(args));
+    if (!group)
+        throw Scripting::Exception("Skill group not found");
+
+    RegList::Pointer skills(NEW);
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        if (skill->getGroup() == group->getIndex())
+            skills->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(skills);
     return Register(listObj);
 }
