@@ -18,6 +18,10 @@
 #include "class_ranger.h"
 #include "objthrow.h"
 
+#include "wrapperbase.h"
+#include "register-impl.h"
+#include "lex.h"
+
 #include "skill.h"
 #include "spelltarget.h"
 #include "spelltemplate.h"
@@ -37,7 +41,6 @@
 #include "gsn_plugin.h"
 #include "act_move.h"
 #include "mercdb.h"
-
 #include "magic.h"
 #include "fight.h"
 #include "stats_apply.h"
@@ -65,6 +68,12 @@ static Object * find_arrow( Character *ch, Object *quiver );
 /*
  * 'track' skill command
  */
+static bool oprog_track( Object *obj, Character *ch, const char *target, int door )
+{
+    FENIA_CALL( obj, "Track", "Csi", ch, target, door );
+    FENIA_NDX_CALL( obj, "Track", "OCsi", obj, ch, target, door );
+    return false;
+}
 
 SKILL_RUNP( track )
 {
@@ -86,10 +95,16 @@ SKILL_RUNP( track )
     act_p("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM,POS_RESTING);
 
     if (number_percent() < gsn_track->getEffective( ch ))
-        if (( d = ch->in_room->history.went( arg, false ) ) != -1)
+        if (( d = ch->in_room->history.went( arg, false ) ) != -1) {
             if (( pexit = ch->in_room->exit[d] )) {
+
                 gsn_track->improve( ch, true );
-                ch->printf( "%s's tracks lead %s.\r\n", arg.c_str( ), dirs[d].name );
+
+                for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+                    if (oprog_track(obj, ch, arg.c_str(), d))
+                        return;
+
+                ch->pecho("Следы %s ведут %s.", arg.c_str(), dirs[d].leave);
                 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) 
                     open_door_extra( ch, d, pexit );
@@ -97,6 +112,7 @@ SKILL_RUNP( track )
                 move_char(ch, d );
                 return;
             }
+        }
     
     ch->send_to("Ты не видишь здесь следов.\n\r");
     gsn_track->improve( ch, false );
