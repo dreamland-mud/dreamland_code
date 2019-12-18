@@ -901,7 +901,7 @@ void show_char_to_char_1( Character *victim, Character *ch, bool fBrief )
     naked = show_char_equip( ch, victim, buf, false );
 
     if (ch != victim && victim->getReligion() == god_godiva && !ch->is_immortal()) {
-        ch->pecho("\r\n{DПризрачное покрывало{x окутывает %P2.", victim);
+        ch->pecho("\r\n{DПризрачное покрывало окутывает %1$C4, скрывая %1$P2 экипировку от твоего взора.{x", victim);
         return;
     }
 

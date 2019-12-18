@@ -19,6 +19,7 @@
 #include "npcharacter.h"
 #include "room.h"
 #include "clanreference.h"
+#include "wearlocation.h"
 
 #include "follow_utils.h"
 #include "loadsave.h"
@@ -27,6 +28,8 @@
 #include "merc.h"
 #include "def.h"
 
+RELIG(fili);
+WEARLOC(tattoo);
 CLAN(battlerager);
 Character * follower_find_nosee( Character *ch, const char *cargument );
 
@@ -355,6 +358,14 @@ CMDRUN( split )
     {
          ch->send_to( "Очень мудро.\n\r");
         return;
+    }
+
+    if (ch->getReligion() == god_fili) {
+        Object *tattoo = wearlocationManager->find(wear_tattoo)->find(ch);
+        if (tattoo) {
+            ch->pecho("%^O1 укоризненно вздрагивает, когда ты пытаешься поделиться прибылью с согруппниками.", tattoo);
+            return;
+        }
     }
 
     ch->silver        -= amount_silver;
