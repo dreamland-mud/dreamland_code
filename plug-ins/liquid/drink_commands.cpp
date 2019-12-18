@@ -18,7 +18,7 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "affect.h"
 #include "skillreference.h"
 
@@ -469,6 +469,7 @@ COMMAND( CPour, "pour" )
 /*
  * 'drink' command
  */
+/** Call prog for drinking character. */
 static bool mprog_drink( Character *ch, Object *obj, const char *liq, int amount )
 {
     FENIA_CALL(ch, "Drink", "Osi", obj, liq, amount);
@@ -476,10 +477,19 @@ static bool mprog_drink( Character *ch, Object *obj, const char *liq, int amount
     return false;
 }
 
+/** Call prog for drinking container */
 static bool oprog_drink( Object *obj, Character *ch, const char *liq, int amount )
 {
     FENIA_CALL( obj, "Drink", "Csi", ch, liq, amount );
     FENIA_NDX_CALL( obj, "Drink", "OCsi", obj, ch, liq, amount );
+    return false;
+}
+
+/** Call prog for a carried/worn item. */
+static bool oprog_drink_near( Object *obj, Object *drink, Character *ch, const char *liq, int amount )
+{
+    FENIA_CALL( obj, "DrinkNear", "OCsi", drink, ch, liq, amount );
+    FENIA_NDX_CALL( obj, "DrinkNear", "OOCsi", obj, drink, ch, liq, amount );
     return false;
 }
 
@@ -575,6 +585,10 @@ CMDRUN( drink )
 
     if (oprog_drink( obj, ch, liquid->getName( ).c_str( ), amount ))
         return;
+
+    for (Object *o = ch->carrying; o; o = o->next_content)
+        if (oprog_drink_near(o, obj, ch, liquid->getName().c_str(), amount))
+            return;
 }
 
 
