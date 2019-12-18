@@ -26,7 +26,7 @@
 #include "attract.h"
 #include "occupations.h"
 #include "webmanip.h"
-
+#include "wearloc_utils.h"
 #include "skillreference.h"
 #include "skill.h"
 #include "pcharacter.h"
@@ -45,6 +45,7 @@
     
 GSN(haggle);
 BONUS(black_friday);
+RELIG(fili);
 
 using std::min;
 using std::max;
@@ -223,8 +224,9 @@ CMDRUN( buy )
     }
 
     /* haggle */
-    roll = number_percent( );
-    if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && roll < gsn_haggle->getEffective( ch ) )
+    bool bonus = ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo) != 0;
+    roll = bonus ? 100 : number_percent( );
+    if ( !IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective(ch))) )
     {
         cost -= obj->cost / 2 * roll / 100;
         act_p( "Ты торгуешься с $C5.", ch, 0, keeper, TO_CHAR, POS_RESTING );
