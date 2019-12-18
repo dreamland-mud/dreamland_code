@@ -1080,7 +1080,11 @@ void UndefinedOneHit::damApplyMasterHand( )
 void UndefinedOneHit::damApplyReligion()
 {
     // Cradya followers get more damage from their pets, clan pets excluded.
-    if (ch->is_npc() && ch->leader && ch->leader->getReligion() == god_cradya) {
+    if (ch->is_npc() 
+            && ch->leader 
+            && ch->leader->getReligion() == god_cradya
+            && get_eq_char(ch->leader, wear_tattoo) != 0)
+    {
         if (!area_is_clan(ch->getNPC()->pIndexData->area)) {         
             dam = dam * 150 / 100;
         }
