@@ -14,11 +14,13 @@
 #include "skillcommand.h"
 #include "affect.h"
 #include "race.h"
+#include "religion.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "object.h"
 #include "room.h"
 #include "clanreference.h"
+#include "areabehaviormanager.h"
 
 #include "dreamland.h"
 #include "fight.h"
@@ -48,6 +50,8 @@ PROF(thief);
 
 WEARLOC(tat_wrist_l);
 WEARLOC(tat_wrist_r);
+
+RELIG(cradya);
 
 /*----------------------------------------------------------------------------
  * Hit by weapon or bare hands
@@ -127,6 +131,7 @@ void UndefinedOneHit::calcDamage( )
     damApplyAttitude( );
     damApplyDeathblow( );
     damApplyCounter( );
+    damApplyReligion();
 
     damNormalize( );
 
@@ -1072,6 +1077,15 @@ void UndefinedOneHit::damApplyMasterHand( )
     dam = dice( 3 + ch->getModifyLevel() / 10, 10 ) * skill / 100;        
 }
 
+void UndefinedOneHit::damApplyReligion()
+{
+    // Cradya followers get more damage from their pets, clan pets excluded.
+    if (ch->is_npc() && ch->leader && ch->leader->getReligion() == god_cradya) {
+        if (!area_is_clan(ch->getNPC()->pIndexData->area)) {         
+            dam = dam * 150 / 100;
+        }
+    }
+}
 
 /*----------------------------------------------------------------------------
  * Chop off a hand 
