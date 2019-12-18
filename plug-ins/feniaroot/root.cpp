@@ -220,6 +220,14 @@ NMI_INVOKE( Root, get_obj_world , "(name): ищет в мире предмет �
     return Register( );
 }
 
+NMI_INVOKE( Root, get_obj_world_unique , "(vnum, ch): ищет в мире предмет с этим внумом, принадлежащий ch")
+{
+    int vnum = argnum2number(args, 1);
+    Character *ch = argnum2character(args, 2);
+    ::Object *obj = get_obj_world_unique(vnum, ch);
+    return WrapperManager::getThis()->getWrapper(obj);
+}
+
 NMI_INVOKE( Root, get_char_world , "(name): ищет в мире чара с указанным именем")
 {
     Character *wch;
