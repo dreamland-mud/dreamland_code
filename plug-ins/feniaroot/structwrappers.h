@@ -276,13 +276,12 @@ public:
     typedef ::Pointer<SkillWrapper> Pointer;
 
     SkillWrapper() { }
-    SkillWrapper(const DLString &);
-            
+    SkillWrapper(const DLString &);            
     virtual void setSelf(Scripting::Object *) { }
     
-    static Scripting::Register wrap( const DLString & );
-
+protected:
     XML_VARIABLE XMLString name;
+    Skill * getTarget() const;
 };
 
 class FeniaSkill : public PluginNativeImpl<FeniaSkill>, 

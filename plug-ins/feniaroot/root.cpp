@@ -1003,7 +1003,7 @@ static bool normalize_skill_name(DLString &arg)
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {
     Skill *skill = argnum2skill(args, 1);
-    return SkillWrapper::wrap(skill->getName());    
+    return Register::handler<SkillWrapper>(skill->getName());    
 }
 
 NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для нового умения" )

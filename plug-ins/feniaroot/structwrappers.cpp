@@ -986,14 +986,12 @@ SkillWrapper::SkillWrapper( const DLString &n )
 {
 }
 
-Scripting::Register SkillWrapper::wrap( const DLString &name )
+Skill * SkillWrapper::getTarget() const
 {
-    SkillWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
+    Skill *skill = skillManager->find(name);
+    if (!skill)
+        throw Scripting::Exception(name + ": skill no longer exists");
+    return skill;
 }
 
 NMI_INVOKE( SkillWrapper, api, "(): печатает этот api" )
@@ -1004,39 +1002,49 @@ NMI_INVOKE( SkillWrapper, api, "(): печатает этот api" )
     return Scripting::Register( buf.str( ) );
 }
 
-
 NMI_GET( SkillWrapper, name, "английское название" ) 
 {
-    return skillManager->find( name )->getName( );
+    return getTarget()->getName( );
 }
 
 NMI_GET( SkillWrapper, nameRus, "русское название" ) 
 {
-    return skillManager->find( name )->getRussianName( );
+    return getTarget()->getRussianName( );
 }
 
 NMI_GET( SkillWrapper, index, "порядковый номер (для value у волшебных предметов)" ) 
 { 
-    return skillManager->find( name )->getIndex();
+    return getTarget()->getIndex();
 }
 
+NMI_GET(SkillWrapper, spellTarget, "флаги целей заклинания (.tables.target_table)")
+{
+    Spell::Pointer spell = getTarget()->getSpell();
+    return spell ? spell->getTarget() : 0;
+}
+
+NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_types)")
+{
+    Spell::Pointer spell = getTarget()->getSpell();
+    return spell ? spell->getSpellType() : 0;
+}
 
 NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение для использования прямо сейчас персонажу ch" )
 {
     Character *ch = args2character(args);
-    return skillManager->find( name )->usable( ch, false );
+    return getTarget()->usable( ch, false );
 }
 
 NMI_INVOKE( SkillWrapper, adept, "(ch): вернуть максимальное значение, до которого можно практиковаться" )
 {
     PCharacter *ch = args2player(args); 
-    return skillManager->find(name)->getAdept(ch);
+    return getTarget()->getAdept(ch);
 }
 
 NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разученность или установить ее в percent" )
 {
     PCharacter *ch = args2player(args); 
-    int sn = skillManager->find(name)->getIndex();
+    int sn = getTarget()->getIndex();
 
     if (args.size() > 1) {
         int value = args.back( ).toNumber( );
@@ -1054,7 +1062,7 @@ NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разуче�
 NMI_INVOKE( SkillWrapper, effective, "(ch): узнать процент раскачки у персонажа" )
 {
     PCharacter *ch = args2player(args); 
-    return Register( skillManager->find(name)->getEffective(ch) );
+    return Register( getTarget()->getEffective(ch) );
 }
 
 NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться улучшить знание умения на успехе/неудаче (true/false), применен на жертву" )
@@ -1063,7 +1071,7 @@ NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться 
     int success = argnum2number(args, 2);
     Character *victim = args.size() > 2 ? argnum2character(args, 3) : NULL;
      
-    skillManager->find( name )->improve( ch, success, victim );
+    getTarget()->improve( ch, success, victim );
     return Register( );
 }
 
@@ -1087,7 +1095,7 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
         throw Scripting::Exception("learned param cannot be negative");
 
     // Do nothing for already available permanent skills.
-    Skill *skill = skillManager->find(name);
+    Skill *skill = getTarget();
     if (skill->visible(ch))
         return Register(false);
     
@@ -1108,7 +1116,7 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
 NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить временное умение у персонажа. Вернет true, если было что очищать.")
 {
     PCharacter *ch = argnum2player(args, 1);
-    Skill *skill = skillManager->find(name);
+    Skill *skill = getTarget();
     PCSkillData &data = ch->getSkillData(skill->getIndex());
 
     if (!data.isTemporary())
@@ -1123,7 +1131,7 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить времен�
 
 NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): выполнить умение без проверок и сообщений")
 {
-    Skill *skill = skillManager->find(name);
+    Skill *skill = getTarget();
     Character *ch = argnum2character(args, 1);
     
     if (args.size() < 2)
