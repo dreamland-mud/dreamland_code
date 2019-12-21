@@ -88,6 +88,7 @@ public:
     WordEffectPointer findEffect( const DLString & ) const;
     DLString getEffectName( WordEffectPointer ) const;
     bool isNative( PCharacter * ) const;
+    virtual DLString createDictum( ) const = 0;
     
 protected:    
     void doUtter( PCharacter *, DLString &, DLString & ) const;
@@ -104,7 +105,6 @@ protected:
     Word createGlobalWord( ) const;
     Word createPersonalWord( ) const;
     DLString getRandomEffectName( bool ) const;
-    virtual DLString createDictum( ) const = 0;
     virtual void dream( const Word &, PCharacter * ) const = 0;
     const RaceLangInfo * getRaceInfo( PCharacter * ) const;
     const ClassLangInfo * getClassInfo( PCharacter * ) const;

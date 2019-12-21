@@ -10,6 +10,9 @@
 #include "skillcommand.h"
 #include "profession.h"
 #include "defaultreligion.h"
+#include "language.h"
+#include "languagemanager.h"
+#include "wordeffect.h"
 #include "subprofession.h"
 #include "room.h"
 #include "pcharacter.h"
@@ -202,16 +205,6 @@ ProfessionWrapper::ProfessionWrapper( const DLString &n )
 {
 }
 
-Scripting::Register ProfessionWrapper::wrap( const DLString &name )
-{
-    ProfessionWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
-}
-
 NMI_INVOKE( ProfessionWrapper, api, "(): печатает этот api" )
 {
     ostringstream buf;
@@ -278,6 +271,14 @@ NMI_GET( ProfessionWrapper, nameMlt, "русское название во мн�
 {
     return professionManager->find( name )->getMltName( );
 }
+
+NMI_INVOKE( ProfessionWrapper, flags, "(ch): флаги профессии для этого персонажа (таблица .tables.prof_flags)" ) 
+{
+    Character *ch = args2character(args);
+    Profession *prof = professionManager->find( name );
+    return Register((int)prof->getFlags(ch).getValue());
+}
+
 
 NMI_GET( ProfessionWrapper, ethos, "список подходящих мировоззрений" ) 
 {
@@ -648,16 +649,6 @@ CraftProfessionWrapper::CraftProfessionWrapper( const DLString &n )
 {
 }
 
-Scripting::Register CraftProfessionWrapper::wrap( const DLString &name )
-{
-    CraftProfessionWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
-}
-
 CraftProfession * CraftProfessionWrapper::getTarget() const
 {
     CraftProfession::Pointer prof = craftProfessionManager->get(name);
@@ -739,22 +730,12 @@ BonusWrapper::BonusWrapper( const DLString &n )
 {
 }
 
-Scripting::Register BonusWrapper::wrap( const DLString &name )
-{
-    BonusWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
-}
-
 Bonus * BonusWrapper::getTarget() const
 {
-    Bonus::Pointer prof = bonusManager->findExisting(name);
-    if (!prof)
+    Bonus::Pointer bonus = bonusManager->findExisting(name);
+    if (!bonus)
         throw Scripting::Exception("Bonus not found");
-    return *prof;
+    return *bonus;
 }
 
 NMI_INVOKE( BonusWrapper, api, "(): печатает этот api" )
@@ -822,16 +803,6 @@ NMI_INIT(ReligionWrapper, "reglion, религия");
 ReligionWrapper::ReligionWrapper( const DLString &n )
                   : name( n )
 {
-}
-
-Scripting::Register ReligionWrapper::wrap( const DLString &name )
-{
-    ReligionWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
 }
 
 DefaultReligion * ReligionWrapper::getTarget() const
@@ -946,6 +917,66 @@ NMI_INVOKE( ReligionWrapper, reasonWhy, "(ch): НОВАЯ ЛОГИКА - при�
 }
 
 /*----------------------------------------------------------------------
+ * Language
+ *----------------------------------------------------------------------*/
+NMI_INIT(LanguageWrapper, "language, древний язык");
+
+LanguageWrapper::LanguageWrapper( const DLString &n )
+                  : name( n )
+{
+}
+
+Language * LanguageWrapper::getTarget() const
+{
+    Language::Pointer lang = languageManager->findLanguage(name);
+    if (!lang)
+        throw Scripting::Exception("Language not found");
+    return lang.getPointer();
+}
+
+NMI_INVOKE( LanguageWrapper, api, "(): печатает этот api" )
+{
+    ostringstream buf;
+    
+    Scripting::traitsAPI<LanguageWrapper>( buf );
+    return Scripting::Register( buf.str( ) );
+}
+
+NMI_GET( LanguageWrapper, name, "английское название" ) 
+{
+    return getTarget()->getName( );
+}
+
+NMI_GET( LanguageWrapper, nameRus, "русское название" ) 
+{
+    return getTarget()->getRussianName( );
+}
+
+NMI_INVOKE( LanguageWrapper, word, "(): создать одноразовое слово по правилам языка")
+{
+    return getTarget()->createDictum();
+}
+
+NMI_INVOKE( LanguageWrapper, runEffect, "(effect, ch, vict): выполнить эффект с данным именем (good, bad, bless etc) от имени ch и с целью vict")
+{
+    DLString effectName = argnum2string(args, 1);
+    PCharacter *ch = argnum2player(args, 2);
+    Character *vict = argnum2character(args, 3);
+    WordEffect::Pointer effect = getTarget()->findEffect(effectName);
+    if (!effect)
+        throw Scripting::Exception(effectName + " effect not found for language " + name);
+
+    return Register(effect->run(ch, vict));
+}
+
+NMI_INVOKE( LanguageWrapper, effective, "(ch): узнать процент раскачки языка у персонажа" )
+{
+    PCharacter *ch = args2player(args); 
+    return Register( getTarget()->getEffective(ch) );
+}
+
+
+/*----------------------------------------------------------------------
  * Skill
  *----------------------------------------------------------------------*/
 NMI_INIT(SkillWrapper, "skill, умение или заклинание");
@@ -955,14 +986,12 @@ SkillWrapper::SkillWrapper( const DLString &n )
 {
 }
 
-Scripting::Register SkillWrapper::wrap( const DLString &name )
+Skill * SkillWrapper::getTarget() const
 {
-    SkillWrapper::Pointer hw( NEW, name );
-
-    Scripting::Object *sobj = &Scripting::Object::manager->allocate( );
-    sobj->setHandler( hw );
-
-    return Scripting::Register( sobj );
+    Skill *skill = skillManager->find(name);
+    if (!skill)
+        throw Scripting::Exception(name + ": skill no longer exists");
+    return skill;
 }
 
 NMI_INVOKE( SkillWrapper, api, "(): печатает этот api" )
@@ -973,39 +1002,49 @@ NMI_INVOKE( SkillWrapper, api, "(): печатает этот api" )
     return Scripting::Register( buf.str( ) );
 }
 
-
 NMI_GET( SkillWrapper, name, "английское название" ) 
 {
-    return skillManager->find( name )->getName( );
+    return getTarget()->getName( );
 }
 
 NMI_GET( SkillWrapper, nameRus, "русское название" ) 
 {
-    return skillManager->find( name )->getRussianName( );
+    return getTarget()->getRussianName( );
 }
 
 NMI_GET( SkillWrapper, index, "порядковый номер (для value у волшебных предметов)" ) 
 { 
-    return skillManager->find( name )->getIndex();
+    return getTarget()->getIndex();
 }
 
+NMI_GET(SkillWrapper, spellTarget, "флаги целей заклинания (.tables.target_table)")
+{
+    Spell::Pointer spell = getTarget()->getSpell();
+    return spell ? spell->getTarget() : 0;
+}
+
+NMI_GET(SkillWrapper, spellType, "вид заклинания (.tables.spell_types)")
+{
+    Spell::Pointer spell = getTarget()->getSpell();
+    return spell ? spell->getSpellType() : 0;
+}
 
 NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение для использования прямо сейчас персонажу ch" )
 {
     Character *ch = args2character(args);
-    return skillManager->find( name )->usable( ch, false );
+    return getTarget()->usable( ch, false );
 }
 
 NMI_INVOKE( SkillWrapper, adept, "(ch): вернуть максимальное значение, до которого можно практиковаться" )
 {
     PCharacter *ch = args2player(args); 
-    return skillManager->find(name)->getAdept(ch);
+    return getTarget()->getAdept(ch);
 }
 
 NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разученность или установить ее в percent" )
 {
     PCharacter *ch = args2player(args); 
-    int sn = skillManager->find(name)->getIndex();
+    int sn = getTarget()->getIndex();
 
     if (args.size() > 1) {
         int value = args.back( ).toNumber( );
@@ -1023,7 +1062,7 @@ NMI_INVOKE( SkillWrapper, learned, "(ch[,percent]): вернуть разуче�
 NMI_INVOKE( SkillWrapper, effective, "(ch): узнать процент раскачки у персонажа" )
 {
     PCharacter *ch = args2player(args); 
-    return Register( skillManager->find(name)->getEffective(ch) );
+    return Register( getTarget()->getEffective(ch) );
 }
 
 NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться улучшить знание умения на успехе/неудаче (true/false), применен на жертву" )
@@ -1032,7 +1071,7 @@ NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться 
     int success = argnum2number(args, 2);
     Character *victim = args.size() > 2 ? argnum2character(args, 3) : NULL;
      
-    skillManager->find( name )->improve( ch, success, victim );
+    getTarget()->improve( ch, success, victim );
     return Register( );
 }
 
@@ -1056,7 +1095,7 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
         throw Scripting::Exception("learned param cannot be negative");
 
     // Do nothing for already available permanent skills.
-    Skill *skill = skillManager->find(name);
+    Skill *skill = getTarget();
     if (skill->visible(ch))
         return Register(false);
     
@@ -1077,7 +1116,7 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
 NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить временное умение у персонажа. Вернет true, если было что очищать.")
 {
     PCharacter *ch = argnum2player(args, 1);
-    Skill *skill = skillManager->find(name);
+    Skill *skill = getTarget();
     PCSkillData &data = ch->getSkillData(skill->getIndex());
 
     if (!data.isTemporary())
@@ -1092,7 +1131,7 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить времен�
 
 NMI_INVOKE(SkillWrapper, run, "(ch[,victim or level]): выполнить умение без проверок и сообщений")
 {
-    Skill *skill = skillManager->find(name);
+    Skill *skill = getTarget();
     Character *ch = argnum2character(args, 1);
     
     if (args.size() < 2)

@@ -121,6 +121,19 @@ Register::handler()
     return Register(&o);
 }
 
+template <typename T>
+inline Register 
+Register::handler(const DLString &argument)
+{
+    Object &o = Object::manager->allocate();
+
+    o.setHandler(::Pointer<T>(NEW, argument));
+
+    return Register(&o);
+}
+
+
+
 inline
 Register::~Register() 
 {

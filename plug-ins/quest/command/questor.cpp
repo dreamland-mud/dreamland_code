@@ -35,6 +35,7 @@
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
 PROF(universal);
+RELIG(fili);
 
 /*--------------------------------------------------------------------------
  * Questor
@@ -103,6 +104,12 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     tell_fmt( msg.str( ).c_str( ), client, ch, 
               fExpReward ? r->exp : r->points,
               r->gold );
+
+    if (client->getReligion() == god_fili && get_eq_char(client, wear_tattoo)) {
+        int bonus = r->gold;
+        tell_fmt("{YФили{G просил передать тебе еще {Y%3$d{G золот%3$Iую|ые|ых моне%3$Iту|ты|т.", client, ch, bonus);
+        client->gold += bonus;
+    }
 
     client->gold += r->gold;
 

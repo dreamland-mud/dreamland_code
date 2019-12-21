@@ -284,7 +284,7 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
 
         if (is_safe_spell(ch,vch,true)
         ||  ( vch->is_npc() && ch->is_npc()
-        &&  (ch->fighting != vch /*|| vch->fighting != ch */)))
+        &&  (ch->fighting != vch && vch->fighting != ch )))
             continue;
         if ( is_safe(ch, vch) )
           continue;
@@ -346,7 +346,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
 
         if (is_safe_spell(ch,vch,true)
         ||  (vch->is_npc() && ch->is_npc()
-        &&   (ch->fighting != vch /*|| vch->fighting != ch*/)))
+        &&   (ch->fighting != vch && vch->fighting != ch)))
             continue;
         if ( is_safe(ch, vch) )
           continue;
@@ -409,7 +409,7 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 
         if (is_safe_spell(ch,vch,true)
         ||  (ch->is_npc() && vch->is_npc()
-        &&   (ch->fighting == vch || vch->fighting == ch)))
+        &&   (ch->fighting != vch && vch->fighting != ch)))
             continue;
         if ( is_safe(ch, vch) )
           continue;

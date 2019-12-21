@@ -25,6 +25,7 @@
 #include "interp.h"
 #include "itemflags.h"
 #include "loadsave.h"
+#include "wearloc_utils.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "save.h"
@@ -35,6 +36,7 @@
 #define OBJ_VNUM_ALTAR 88
 
 RELIG(none);
+RELIG(fili);
 GSN(sacrifice);
 BONUS(experience);
 BONUS(learning);
@@ -649,6 +651,12 @@ CMDRUNP( sacrifice )
         ch->send_to(buf);
 
         ch->silver += silver;
+
+        if (ch->getReligion() == god_fili && get_eq_char(ch, wear_tattoo)) {
+            int bonus = silver * 2;
+            ch->pecho("{YФили{x добавляет тебе еще %1$d монет%1$Iу|ы|.", bonus);
+            ch->silver += bonus;
+        }
 
         if (IS_SET(ch->act,PLR_AUTOSPLIT))
             if (silver > 1)

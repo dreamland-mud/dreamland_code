@@ -21,6 +21,7 @@
 #include "def.h"
 
 GSN(haggle);
+RELIG(fili);
 
 /*----------------------------------------------------------------------
  * Pet
@@ -86,9 +87,10 @@ int Pet::toSilver( Character *client ) const
 int Pet::haggle( Character *client ) const
 {
     int cost = toSilver( client );
-    int roll = number_percent( );
+    bool bonus = client->getReligion() == god_fili && get_eq_char(client, wear_tattoo) != 0;
+    int roll = bonus ? 100 : number_percent( );
 
-    if (roll < gsn_haggle->getEffective( client )) {
+    if (bonus || (roll < gsn_haggle->getEffective( client ))) {
         cost -= cost / 2 * roll / 100;
         client->printf( "Ты торгуешься и цена снижается до %d монет.\r\n", cost );
         gsn_haggle->improve( client, true );
