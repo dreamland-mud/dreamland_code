@@ -33,6 +33,7 @@
 #include "magic.h"
 #include "fight.h"
 #include "damage.h"
+#include "skill_utils.h"
 #include "clanreference.h"
 #include "vnum.h"
 #include "merc.h"
@@ -364,7 +365,7 @@ SKILL_RUNP( bash )
                 chance -= 20;
 
         /* level */
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        chance += (skill_level(*gsn_bash, ch) - skill_level(*gsn_bash, victim)) * 2;
 
         if ( is_flying( victim ) )
                 chance -= 10;
@@ -575,7 +576,7 @@ SKILL_RUNP( trip )
                 chance -= 20;
 
         /* level */
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        chance += (skill_level(*gsn_trip, ch) - skill_level(*gsn_trip, victim)) * 2;
 
         if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
             chance /= 2;
@@ -814,12 +815,13 @@ SKILL_RUNP( concentrate )
 BOOL_SKILL( concentrate )::run( Character *ch ) 
 {
     Affect af;
+    int level = skill_level(*gsn_concentrate, ch);
 
     af.where        = TO_AFFECTS;
     af.type         = gsn_concentrate;
-    af.level        = ch->getModifyLevel();
-    af.duration     = number_fuzzy( ch->getModifyLevel() / 8);
-    af.modifier     = max( 1, ch->getModifyLevel() / 8 );
+    af.level        = level;
+    af.duration     = number_fuzzy( level / 8);
+    af.modifier     = max( 1, level / 8 );
     af.bitvector    = 0;
 
     af.location        = APPLY_HITROLL;
@@ -828,7 +830,7 @@ BOOL_SKILL( concentrate )::run( Character *ch )
     af.location        = APPLY_DAMROLL;
     affect_to_char(ch,&af);
 
-    af.modifier        = max( 1, ch->getModifyLevel() / 10 );
+    af.modifier        = max( 1, level / 10 );
     af.location        = APPLY_AC;
     affect_to_char(ch,&af);
 
@@ -1020,17 +1022,18 @@ SKILL_RUNP( berserk )
 BOOL_SKILL( berserk )::run( Character *ch )
 {
     Affect af;
+    int level = skill_level(*gsn_berserk, ch);
 
     /* heal a little damage */
-    ch->hit += ch->getModifyLevel() * 2;
+    ch->hit += level * 2;
     ch->hit = min(ch->hit, ch->max_hit);
 
     af.where        = TO_AFFECTS;
     af.type         = gsn_berserk;
-    af.level        = ch->getModifyLevel();
-    af.duration     = number_fuzzy( ch->getModifyLevel() / 8);
+    af.level        = level;
+    af.duration     = number_fuzzy( level / 8);
 
-    af.modifier        = max( 1, ch->getModifyLevel() / 5 );
+    af.modifier        = max( 1, level / 5 );
     af.location        = APPLY_HITROLL;
     affect_to_char(ch,&af);
 
@@ -1038,7 +1041,7 @@ BOOL_SKILL( berserk )::run( Character *ch )
     af.bitvector       = AFF_BERSERK;
     affect_to_char(ch,&af);
 
-    af.modifier        = max( 10, 10 * ( ch->getModifyLevel() / 5 ) );
+    af.modifier        = max( 10, 10 * ( level / 5 ) );
     af.location        = APPLY_AC;
     af.bitvector         = 0;
     affect_to_char(ch,&af);
@@ -1155,7 +1158,7 @@ SKILL_RUNP( dirt )
                 chance -= 25;
 
         /* level */
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        chance += (skill_level(*gsn_dirt_kicking, ch) - skill_level(*gsn_dirt_kicking, victim)) * 2;
 
         if (chance % 5 == 0)
                 chance += 1;
@@ -1278,18 +1281,20 @@ SKILL_RUNP( warcry )
     }
 
     ch->mana -= gsn_warcry->getMana( );
+    
+    int level = skill_level(*gsn_warcry, ch);
 
     af.where        = TO_AFFECTS;
     af.type      = gsn_warcry;
-    af.level         = ch->getModifyLevel();
-    af.duration  = 6 + ch->getModifyLevel( ) / 2;
+    af.level         = level;
+    af.duration  = 6 + level / 2;
     af.location  = APPLY_HITROLL;
-    af.modifier  = ch->getModifyLevel() / 8;
+    af.modifier  = level / 8;
     af.bitvector = 0;
     affect_to_char( ch, &af );
 
     af.location  = APPLY_SAVING_SPELL;
-    af.modifier  = 0 - ch->getModifyLevel() / 8;
+    af.modifier  = 0 - level / 8;
     affect_to_char( ch, &af );
 
     if (!ch->is_npc( )) 
@@ -1424,7 +1429,7 @@ SKILL_RUNP( smash )
         chance -= 20;
 
     /* level */
-    chance += ch->getModifyLevel() - victim->getModifyLevel();
+    chance += skill_level(*gsn_smash, ch) - skill_level(*gsn_smash, victim);
 
     if (!ch->is_npc() && !victim->is_npc())
         LogStream::sendNotice() 
@@ -1510,11 +1515,13 @@ BOOL_SKILL( areaattack )::run( Character *ch, Character *victim )
     
     gsn_area_attack->improve( ch, true, victim );
 
-    if ( ch->getModifyLevel() < 70)
+    int level = skill_level(*gsn_area_attack, ch);
+
+    if (level < 70)
         max_count = 1;
-    else if ( ch->getModifyLevel() < 80)
+    else if (level < 80)
         max_count = 2;
-    else if ( ch->getModifyLevel() < 90)
+    else if (level < 90)
         max_count = 3;
     else
         max_count = 4;

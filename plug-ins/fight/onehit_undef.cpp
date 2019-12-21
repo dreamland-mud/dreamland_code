@@ -27,6 +27,7 @@
 #include "material.h"
 #include "immunity.h"
 #include "handler.h"
+#include "skill_utils.h"
 #include "move_utils.h"
 #include "gsn_plugin.h"
 #include "profflags.h"
@@ -1074,7 +1075,8 @@ void UndefinedOneHit::damApplyMasterHand( )
         return;
     
     gsn_mastering_pound->improve( ch, true, victim );
-    dam = dice( 3 + ch->getModifyLevel() / 10, 10 ) * skill / 100;        
+    int level = skill_level(*gsn_mastering_pound, ch);
+    dam += dice( 3 + level / 10, 10 ) * skill / 100;        
 }
 
 void UndefinedOneHit::damApplyReligion()
@@ -1135,7 +1137,7 @@ void UndefinedOneHit::damEffectSlice( )
     chance += ch->getCurrStat(STAT_DEX ) - victim->getCurrStat(STAT_DEX );
     chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_STR ));
 
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+    chance += (skill_level(*gsn_slice, ch) - skill_level(*gsn_slice, victim)) * 2;
 
     if (!IS_WEAPON_STAT( axe, WEAPON_SHARP ))
         chance -= chance / 10;
