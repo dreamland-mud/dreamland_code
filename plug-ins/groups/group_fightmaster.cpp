@@ -365,7 +365,7 @@ SKILL_RUNP( bash )
                 chance -= 20;
 
         /* level */
-        chance += (skill_level(*gsn_bash, ch) - skill_level(*gsn_bash, victim)) * 2;
+        chance += (skill_level(*gsn_bash, ch) - victim->getModifyLevel()) * 2;
 
         if ( is_flying( victim ) )
                 chance -= 10;
@@ -576,7 +576,7 @@ SKILL_RUNP( trip )
                 chance -= 20;
 
         /* level */
-        chance += (skill_level(*gsn_trip, ch) - skill_level(*gsn_trip, victim)) * 2;
+        chance += (skill_level(*gsn_trip, ch) - victim->getModifyLevel()) * 2;
 
         if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
             chance /= 2;
@@ -1158,7 +1158,7 @@ SKILL_RUNP( dirt )
                 chance -= 25;
 
         /* level */
-        chance += (skill_level(*gsn_dirt_kicking, ch) - skill_level(*gsn_dirt_kicking, victim)) * 2;
+        chance += (skill_level(*gsn_dirt_kicking, ch) - victim->getModifyLevel()) * 2;
 
         if (chance % 5 == 0)
                 chance += 1;
@@ -1429,7 +1429,7 @@ SKILL_RUNP( smash )
         chance -= 20;
 
     /* level */
-    chance += skill_level(*gsn_smash, ch) - skill_level(*gsn_smash, victim);
+    chance += skill_level(*gsn_smash, ch) - victim->getModifyLevel();
 
     if (!ch->is_npc() && !victim->is_npc())
         LogStream::sendNotice() 

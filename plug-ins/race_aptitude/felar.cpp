@@ -126,7 +126,7 @@ SKILL_RUNP( tail )
 
     /* level */
 
-    chance += (skill_level(*gsn_tail, ch) - skill_level(*gsn_tail, victim)) * 2;
+    chance += (skill_level(*gsn_tail, ch) - victim->getModifyLevel()) * 2;
 
     /* now the attack */
     if (number_percent() < chance / 2)

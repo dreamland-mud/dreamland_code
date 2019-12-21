@@ -1137,7 +1137,7 @@ void UndefinedOneHit::damEffectSlice( )
     chance += ch->getCurrStat(STAT_DEX ) - victim->getCurrStat(STAT_DEX );
     chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_STR ));
 
-    chance += (skill_level(*gsn_slice, ch) - skill_level(*gsn_slice, victim)) * 2;
+    chance += (skill_level(*gsn_slice, ch) - victim->getModifyLevel()) * 2;
 
     if (!IS_WEAPON_STAT( axe, WEAPON_SHARP ))
         chance -= chance / 10;
