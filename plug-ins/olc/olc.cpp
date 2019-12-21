@@ -1158,6 +1158,28 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
                 (*a)->save();
             }
         }
+        return;
+    }
+
+    if (arg == "readroom") {
+        Integer vnum;
+        Room *room;
+
+        if (args.empty() || !Integer::tryParse(vnum, args)) {
+            ch->println("abc readroom <vnum>");
+            return;
+        }
+
+        room = get_room_index(vnum);
+        if (!room) {
+            ch->printf("Room vnum [%d] not found.\r\n", vnum.getValue());
+            return;
+        }
+        
+        ch->printf("Loading room objects for '%s' [%d], check logs for details.\r\n", 
+                    room->name, room->vnum);
+        load_room_objects(room, "/tmp", false);
+        return;
     }
 }
 
