@@ -1119,6 +1119,9 @@ public:
      */
     virtual void run( )
     {
+        if (dreamland->hasOption(DL_BUILDPLOT))
+            return;
+
         help_save_ids();
 
         PCharacter dummy;

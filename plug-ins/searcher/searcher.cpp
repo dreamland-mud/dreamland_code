@@ -20,6 +20,7 @@
 #include "searcher_val.h"    
 #include "profiler.h"
 
+#include "dreamland.h"
 #include "merc.h"
 #include "act.h"
 #include "comm.h"
@@ -106,6 +107,9 @@ public:
 
     virtual void run( )
     {   
+        if (dreamland->hasOption(DL_BUILDPLOT))
+            return;
+
         LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
         dumpArmor();
         dumpWeapon();

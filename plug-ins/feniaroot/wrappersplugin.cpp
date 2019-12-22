@@ -3,6 +3,8 @@
  * ruffina, 2004
  */
 
+#include "json/json.h"
+#include "iconvmap.h"
 
 #include "wrappersplugin.h"
 #include "root.h"
@@ -33,6 +35,8 @@
 #include "subr.h"
 
 using namespace Scripting;
+
+static IconvMap koi2utf("koi8-r", "utf-8");
 
 void 
 WrappersPlugin::linkTargets()
@@ -96,28 +100,38 @@ WrappersPlugin::initialization( )
 
     linkTargets();
 
-    // Dump API to disk on every plugin load.
-    traitsAPIDump<CharacterWrapper>("char", true, true);     
-    traitsAPIDump<ObjectWrapper>("obj", true, true);     
-    traitsAPIDump<RoomWrapper>("room", true, true);     
-    traitsAPIDump<MobIndexWrapper>("mob_index", false, false);     
-    traitsAPIDump<ObjIndexWrapper>("obj_index", false, false);     
-    traitsAPIDump<Root>("root", true, true);     
-    traitsAPIDump<AffectWrapper>("affect", false, false);     
-    traitsAPIDump<CommandWrapper>("command", false, false);     
-    traitsAPIDump<AreaWrapper>("area", false, false);     
-    traitsAPIDump<HometownWrapper>("hometown", false, false);     
-    traitsAPIDump<ProfessionWrapper>("profession", false, false);     
-    traitsAPIDump<RaceWrapper>("race", false, false);     
-    traitsAPIDump<ClanWrapper>("clan", false, false);     
-    traitsAPIDump<CraftProfessionWrapper>("craftprofession", false, false);     
-    traitsAPIDump<BonusWrapper>("bonus", false, false);     
-    traitsAPIDump<ReligionWrapper>("religion", false, false);
-    traitsAPIDump<LanguageWrapper>("language", false, false);     
-    traitsAPIDump<LiquidWrapper>("liquid", false, false);     
-    traitsAPIDump<SkillWrapper>("skill", false, false);     
-    traitsAPIDump<FeniaSkill>("feniaskill", false, false);     
-    traitsAPIDump<FeniaString>("string", false, false);     
+    if (dreamland->hasOption(DL_BUILDPLOT))
+        return;
+
+    LogStream::sendNotice() << "Dumping Fenia API to disk." << endl;
+
+    Json::Value apiDump;
+    traitsAPIJson<CharacterWrapper>("char", apiDump, true);     
+    traitsAPIJson<ObjectWrapper>("obj", apiDump, true);     
+    traitsAPIJson<RoomWrapper>("room", apiDump, true);     
+    traitsAPIJson<MobIndexWrapper>("mob_index", apiDump, false);     
+    traitsAPIJson<ObjIndexWrapper>("obj_index", apiDump, false);     
+    traitsAPIJson<Root>("root", apiDump, true);     
+    traitsAPIJson<AffectWrapper>("affect", apiDump, false);     
+    traitsAPIJson<CommandWrapper>("command", apiDump, false);     
+    traitsAPIJson<AreaWrapper>("area", apiDump, false);     
+    traitsAPIJson<HometownWrapper>("hometown", apiDump, false);     
+    traitsAPIJson<ProfessionWrapper>("profession", apiDump, false);     
+    traitsAPIJson<RaceWrapper>("race", apiDump, false);     
+    traitsAPIJson<ClanWrapper>("clan", apiDump, false);     
+    traitsAPIJson<CraftProfessionWrapper>("craftprofession", apiDump, false);     
+    traitsAPIJson<BonusWrapper>("bonus", apiDump, false);     
+    traitsAPIJson<ReligionWrapper>("religion", apiDump, false);     
+    traitsAPIJson<LiquidWrapper>("liquid", apiDump, false);     
+    traitsAPIJson<SkillWrapper>("skill", apiDump, false);     
+    traitsAPIJson<FeniaSkill>("feniaskill", apiDump, false);     
+    traitsAPIJson<FeniaString>("string", apiDump, false);
+
+    Json::FastWriter writer;
+    DLFileStream("/tmp", "feniaapi", ".json").fromString(
+        koi2utf(
+            writer.write(apiDump))
+    );
 }
 
 void WrappersPlugin::destruction( ) {

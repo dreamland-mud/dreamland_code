@@ -18,8 +18,8 @@
 
 using std::max;
 
-/*
- * Stick a little fuzz on a number.
+/**
+ * Stick a little fuzz on a number: return number, or number -1, or number + 1
  */
 int number_fuzzy( int number )
 {
@@ -34,8 +34,8 @@ int number_fuzzy( int number )
 
 
 
-/*
- * Generate a random number.
+/**
+ * Generate a random number in the [from..to] interval.
  */
 int number_range( int from, int to )
 {
@@ -45,6 +45,9 @@ int number_range( int from, int to )
     return from + number_mm( ) % (to - from + 1);
 }
 
+/**
+ * A 'num out of 100' chance of success.
+ */
 bool chance(int num)
 {
     if (number_range(1,100) <= num) return true;
@@ -66,8 +69,8 @@ int number_disperse( int value, int disperse )
 }
 
 
-/*
- * Generate a percentile roll.
+/**
+ * Generate a percentile roll: a number from 1 to 100.
  */
 int number_percent( void )
 {
@@ -81,7 +84,7 @@ int number_percent( void )
 
 
 
-/*
+/**
  * Generate a random door.
  */
 int number_door( void )
@@ -94,6 +97,9 @@ int number_door( void )
     return door;
 }
 
+/**
+ * Generate a random number between 0 and 2^width - 1.
+ */
 int number_bits( int width )
 {
     return number_mm( ) & ( ( 1 << width ) - 1 );
