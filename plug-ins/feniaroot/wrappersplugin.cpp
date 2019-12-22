@@ -100,6 +100,9 @@ WrappersPlugin::initialization( )
 
     linkTargets();
 
+    if (dreamland->hasOption(DL_BUILDPLOT))
+        return;
+
     LogStream::sendNotice() << "Dumping Fenia API to disk." << endl;
 
     Json::Value apiDump;

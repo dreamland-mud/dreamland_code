@@ -14,6 +14,9 @@
 #include "iconvmap.h"
 #include "dlfilestream.h"
 #include "dldirectory.h"
+#include "dreamland.h"
+#include "autoflags.h"
+#include "def.h"
 
 TABLE_LOADER(HelpLoader, "helps", "Help");
 
@@ -25,6 +28,9 @@ static IconvMap koi2utf("koi8-r", "utf-8");
  */
 void help_save_ids() 
 {
+    if (dreamland->hasOption(DL_BUILDPLOT))
+        return;
+
     Json::Value typeahead;
     HelpArticles::const_iterator a;
 
