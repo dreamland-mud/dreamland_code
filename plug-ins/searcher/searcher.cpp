@@ -582,7 +582,7 @@ public:
             wand["vnum"] = pObj->vnum;
             wand["name"] = name;
             wand["level"] = pObj->level;
-            wand["type"] = itemtype;
+            wand["itemtype"] = itemtype;
             wand["spellLevel"] = spellLevel;
             wand["charges"] = charges;
             wand["spells"] = spells;
