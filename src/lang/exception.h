@@ -20,8 +20,8 @@ using namespace std;
 class Exception : public std::exception
 {
 public:
-    Exception( const std::string &  = "" ) ;
-    virtual ~Exception( ) ;
+    Exception( const std::string &  = "" ) throw ();
+    virtual ~Exception( ) throw ();
     
     virtual const char* what( ) const throw ();
     void setStr( const string& str );
