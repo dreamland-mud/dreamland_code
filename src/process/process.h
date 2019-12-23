@@ -14,7 +14,7 @@
 
 using namespace std;
 
-
+#define SCDP_PROCESS       11000
 class ProcessManager : public virtual DLObject
 {
 public:

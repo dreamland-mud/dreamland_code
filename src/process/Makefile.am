@@ -9,6 +9,7 @@ src_INCLUDES = \
 -I$(srcdir)/../lang \
 -I$(srcdir)/../util \
 -I$(srcdir)/../xml \
+-I$(srcdir)/../scheduler \
 -I$(srcdir)/../l10n
 
 AM_CPPFLAGS =  -Wall

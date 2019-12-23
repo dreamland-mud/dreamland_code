@@ -41,6 +41,8 @@
 #include "hometown.h"
 #include "wearlocation.h"
 #include "feniamanager.h"
+#include "socketmanager.h"
+#include "servlet.h"
 #include "process.h"
 #include "religion.h"
 #include "liquid.h"
@@ -57,6 +59,10 @@ using namespace std;
 
 DreamLand *dreamland = NULL;
 const long DreamLand::DEFAULT_OPTIONS = DL_PK | DL_SAVE_OBJS | DL_SAVE_MOBS; 
+
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
 
 DreamLand::DreamLand( )
         : currentTime( 0 ), 
@@ -94,6 +100,8 @@ DreamLand::DreamLand( )
         helpManager.construct( );
         skillGroupManager.construct( );
         bonusManager.construct( );
+        socketManager.construct( );
+        servletManager.construct( );
 
         basic_ostringstream<char> buf;
         buf << resetiosflags( ios::left );
@@ -123,6 +131,8 @@ DreamLand::~DreamLand( )
         helpManager.clear( );
         skillGroupManager.clear( );
         bonusManager.clear( );
+        servletManager.clear( );
+        socketManager.clear( );
 
         getDbEnv( )->close( );
         
@@ -143,9 +153,15 @@ void DreamLand::run( )
         LastLogStream::send( ) <<  "Scheduler run"  << endl;
         scheduler->tick( );
         
-        LastLogStream::send( ) <<  "Processes pulse"  << endl;
-        processManager->yield( );
-
+        // If you are thinking of moving this to a ScheluerTask - think again.
+        // ScheldulerPriorityMap will contain tasks defined in plugins.
+        // When those plugins are going to be unloaded, Scheduler::slay() requests
+        // are going to be ignored for the currently running tick.
+        // After the scheduer tick has finished processing, it will attempt to destroy
+        // the ScheldulerPriorityMap which holds Pointers to stuff defined in plugins
+        // which are gone now. Thus, either Scheduler should support ::slay operation for
+        // the currently running tick, or plugin reload should be happening outside of
+        // the Scheduler.
         LastLogStream::send( ) <<  "Plugins reload"  << endl;
         pluginManager->checkReloadRequest( );
 
@@ -161,36 +177,39 @@ void DreamLand::run( )
 
 void DreamLand::pulseStart( )
 {
-    pulseStartTime = clock( );
+    gettimeofday(&pulseStartTime, NULL);
+}
+
+static int 
+sleepTime(struct timeval *pulseEnd)
+{
+    struct timeval now, tmp;
+
+    gettimeofday(&now, NULL);
+    timersub(pulseEnd, &now, &tmp);
+    return tmp.tv_sec*1000 + tmp.tv_usec/1000;
 }
 
 void DreamLand::pulseEnd( )
 {
-    // Synchronize to a clock.
-    // Sleep( last_time + 1/PULSE_PER_SCD - now ).
-    // Careful here of signed versus unsigned arithmetic.
-    clock_t nowTime, pulseEnd, sleepTime;
+    struct timeval pulseEnd, pulseWidth = { 0, 1000000/getPulsePerSecond( ) };
+    int ms;
     
-    pulseEnd = pulseStartTime + CLOCKS_PER_SEC / getPulsePerSecond( );
+    timeradd(&pulseStartTime, &pulseWidth, &pulseEnd);
 
-    Scripting::Object::manager->sync( pulseEnd );
-    
-    nowTime = clock( );
+    Scripting::Object::manager->sync(&pulseEnd);
 
-    if(nowTime > pulseEnd) {
-        sleepTime = nowTime - pulseEnd;
-        LogStream::sendError() 
-            << "pulse overflow " 
-            << (1000 * sleepTime / CLOCKS_PER_SEC) << "msec" << endl;
+    ms = sleepTime(&pulseEnd);
+
+    if(ms < 0) {
+        LogStream::sendError() << "pulse overflow " << -ms << "msec" << endl;
         return;
     }
-    sleepTime = pulseEnd - nowTime;
-    
-#ifndef __MINGW32__
-    usleep(1000000*sleepTime/CLOCKS_PER_SEC);
-#else
-    Sleep(1000*sleepTime/CLOCKS_PER_SEC);
-#endif
+
+    do {
+        socketManager->run(ms);
+        ms = sleepTime(&pulseEnd);
+    } while(ms > 0);
 }
 
 

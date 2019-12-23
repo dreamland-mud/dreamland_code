@@ -9,6 +9,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <sys/time.h>
 
 #include <logstream.h>
 #include <integer.h>
@@ -221,16 +222,19 @@ Object::Manager::put( id_t id, const string &s )
 }
 
 bool
-Object::Manager::tlim(clock_t finishAt)
+Object::Manager::tlim(struct timeval * finishAt)
 {
     if(!finishAt)
         return true;
 
-    return clock( ) < finishAt;
+    struct timeval now;
+    gettimeofday(&now, NULL);
+
+    return timercmp(&now, finishAt, <);
 }
 
 bool
-Object::Manager::syncPut(clock_t finishAt)
+Object::Manager::syncPut(struct timeval * finishAt)
 {
     Profiler prof;
     int cnt;
@@ -265,7 +269,7 @@ Object::Manager::stats()
 
 
 bool
-Object::Manager::syncDel(clock_t finishAt)
+Object::Manager::syncDel(struct timeval * finishAt)
 {
     Profiler prof;
     int cnt;
@@ -289,10 +293,12 @@ Object::Manager::syncDel(clock_t finishAt)
 }
 
 bool
-Object::Manager::sync(clock_t tickEnd)
+Object::Manager::sync(struct timeval *tickEnd)
 {
+    struct timeval withGap, gap = { 0, 40*1000 };
     if(tickEnd) {
-        tickEnd -= 40*CLOCKS_PER_SEC/1000; // 40ms gap for sure
+        timersub(tickEnd, &gap, &withGap); // 40ms gap for sure
+        tickEnd = &withGap;
     }
 
     bool consistent = syncPut(tickEnd) && syncDel(tickEnd);
