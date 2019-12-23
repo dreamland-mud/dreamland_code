@@ -60,7 +60,7 @@ void Exception::printStackTrace( std::ostream &os ) const
     }
 }
 
-FileFormatException::FileFormatException( const char * fmt, ... ) 
+FileFormatException::FileFormatException( const char * fmt, ... ) throw()
 {
     va_list ap;
     char buf[1024];
@@ -72,11 +72,11 @@ FileFormatException::FileFormatException( const char * fmt, ... )
     setStr( string( buf ) );            
 }
 
-FileFormatException::~FileFormatException( ) 
+FileFormatException::~FileFormatException( ) throw()
 {
 }
 
-ExceptionBadType::~ExceptionBadType( ) 
+ExceptionBadType::~ExceptionBadType( ) throw()
 {
 }
 

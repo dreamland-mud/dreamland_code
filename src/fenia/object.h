@@ -41,9 +41,9 @@ public:
     class Manager;
 
     struct NotRecoveredException : public Exception {
-        NotRecoveredException() : Exception("Object not recovered") { }
+        NotRecoveredException() throw(): Exception("Object not recovered") { }
 
-        virtual ~NotRecoveredException( ) ;
+        virtual ~NotRecoveredException( ) throw();
     };
 
     Object();

@@ -24,7 +24,7 @@ FeniaProcess::FeniaProcess() : running(false)
 {
 }
 
-FeniaProcess::~FeniaProcess() 
+FeniaProcess::~FeniaProcess() throw()
 {
     if(current == this)
         current = FeniaManager::getThis( );

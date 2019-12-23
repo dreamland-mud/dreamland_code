@@ -4,7 +4,7 @@
  */
 #include "exceptionclassnotfound.h"
 
-ExceptionClassNotFound::~ExceptionClassNotFound( ) 
+ExceptionClassNotFound::~ExceptionClassNotFound( ) throw()
 {
 }
 

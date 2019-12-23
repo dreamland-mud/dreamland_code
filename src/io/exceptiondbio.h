@@ -15,9 +15,9 @@
 class ExceptionDBIO : public Exception
 {
 public:
-    ExceptionDBIO( const DLString &str ) ;
+    ExceptionDBIO( const DLString &str ) throw() ;
 
-    virtual ~ExceptionDBIO( ) ;
+    virtual ~ExceptionDBIO( )  throw();
 };
 
 

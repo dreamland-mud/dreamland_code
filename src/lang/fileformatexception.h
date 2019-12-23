@@ -13,8 +13,8 @@
 
 class FileFormatException : public Exception {
 public:
-    FileFormatException( const char * fmt, ... ) ;
-    virtual ~FileFormatException( ) ;
+    FileFormatException( const char * fmt, ... ) throw();
+    virtual ~FileFormatException( ) throw();
 };
                         
 

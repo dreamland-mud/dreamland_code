@@ -147,7 +147,7 @@ Object::finalize()
         toList( manager->deleted );
 }
 
-Object::NotRecoveredException::~NotRecoveredException( ) 
+Object::NotRecoveredException::~NotRecoveredException( ) throw()
 {
 }
 

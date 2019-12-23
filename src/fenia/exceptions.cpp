@@ -17,7 +17,7 @@ using namespace std;
 
 namespace Scripting {
     
-Exception::~Exception( ) 
+Exception::~Exception( ) throw() 
 {
 }
 
@@ -42,83 +42,83 @@ Exception::info(string s)
     return buf.str( );
 }
 
-CustomException::~CustomException() 
+CustomException::~CustomException() throw() 
 {
 }
 
-NullPointerException::~NullPointerException( ) 
+NullPointerException::~NullPointerException( ) throw() 
 {
 }
 
-NotImplementedException::~NotImplementedException( ) 
+NotImplementedException::~NotImplementedException( ) throw() 
 {
 }
 
-NotEnoughArgumentsException::~NotEnoughArgumentsException( ) 
+NotEnoughArgumentsException::~NotEnoughArgumentsException( ) throw() 
 {
 }
 
-TooManyArgumentsException::~TooManyArgumentsException( ) 
+TooManyArgumentsException::~TooManyArgumentsException( ) throw() 
 {
 }
 
-IllegalArgumentException::~IllegalArgumentException( ) 
+IllegalArgumentException::~IllegalArgumentException( ) throw() 
 {
 }
 
-MissplacedBreakException::~MissplacedBreakException( ) 
+MissplacedBreakException::~MissplacedBreakException( ) throw() 
 {
 }
 
-MissplacedContinueException::~MissplacedContinueException( ) 
+MissplacedContinueException::~MissplacedContinueException( ) throw() 
 {
 }
 
-InvalidIndexingModeException::~InvalidIndexingModeException( ) 
+InvalidIndexingModeException::~InvalidIndexingModeException( ) throw() 
 {
 }
 
-NotAReferenceException::~NotAReferenceException( ) 
+NotAReferenceException::~NotAReferenceException( ) throw() 
 {
 }
 
-WrongNativeThisException::~WrongNativeThisException( ) 
+WrongNativeThisException::~WrongNativeThisException( ) throw() 
 {
 }
 
-IdentifierComparitionException::~IdentifierComparitionException( ) 
+IdentifierComparitionException::~IdentifierComparitionException( ) throw() 
 {
 }
 
-UnknownNativeMethodException::~UnknownNativeMethodException( ) 
+UnknownNativeMethodException::~UnknownNativeMethodException( ) throw() 
 {
 }
 
-IdentifierExpectedException::~IdentifierExpectedException( ) 
+IdentifierExpectedException::~IdentifierExpectedException( ) throw() 
 {
 }
 
-FunctionNotDefinedException::~FunctionNotDefinedException( ) 
+FunctionNotDefinedException::~FunctionNotDefinedException( ) throw() 
 {
 }
 
-ObjectNotDefinedException::~ObjectNotDefinedException( ) 
+ObjectNotDefinedException::~ObjectNotDefinedException( ) throw() 
 {
 }
 
-InvalidCastException::~InvalidCastException( ) 
+InvalidCastException::~InvalidCastException( ) throw() 
 {
 }
 
-ParseError::~ParseError( ) 
+ParseError::~ParseError( ) throw() 
 {
 }
 
-IndexOutOfBoundsException::~IndexOutOfBoundsException( ) 
+IndexOutOfBoundsException::~IndexOutOfBoundsException( ) throw() 
 {
 }
 
-DivisionByZero::~DivisionByZero( ) 
+DivisionByZero::~DivisionByZero( ) throw() 
 {
 }
 
