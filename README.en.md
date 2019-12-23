@@ -13,7 +13,7 @@
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 
-Tested on clean Ubuntu 16.04, Ubuntu 14.04. You can either follow these instructions and create a local build environment,
+Tested on clean Ubuntu 18.04. You can either follow these instructions and create a local build environment,
 or build a ready-to-use Docker container, as described in [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker) README file.
 
 ## Install build and dev tools
@@ -24,7 +24,7 @@ sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet 
 
 ## Install dependency libraries
 ```bash
-sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
+sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev libfl-dev
 ```
 
 ## Download and build server code
