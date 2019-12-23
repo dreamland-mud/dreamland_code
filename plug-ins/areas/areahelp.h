@@ -18,11 +18,12 @@ public:
 
     XMLAreaHelp();
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& );
 
-    DLString keyword;
+    DLString keywordAttribute;
     int level;
     DLString labels;
+    int id;
 };
 
 class AreaHelp : public MarkupHelpArticle {
@@ -31,6 +32,7 @@ public:
     typedef ::Pointer<AreaHelp> Pointer;
 
     virtual void getRawText( Character *, ostringstream & ) const;
+    virtual void save() const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
     

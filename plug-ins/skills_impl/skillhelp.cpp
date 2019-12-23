@@ -11,6 +11,7 @@
 #include "skill.h"
 #include "spell.h"
 #include "command.h"
+#include "xmltableelement.h"
 #include "skillcommand.h"
 #include "skillgroup.h"
 #include "character.h"
@@ -30,16 +31,17 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
     else
         in << " '{c" << skill->getName( ) << "{x' или" << " '{c" << skill->getRussianName( ) << "{x'";
 
-    SkillGroupReference &group = (const_cast<Skill *>(skill.getPointer( )))->getGroup( );
+    SkillGroupReference &group = skill.getConstPointer<Skill>()->getGroup( );
     const DLString &gname = group->getNameFor(ch);
-    in << ", входит в группу '{hg{c" << gname << "{x'" << endl << endl
+    in << ", входит в группу '{hg{c" << gname << "{x' " 
+       << editButton(ch) << endl << endl
        << *this;
     
     // '... умение|slook herbs|травы'. - с гипер-ссылкой на команду
     // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
-    in << "См. также команду {W{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
+    in << "См. также команду {y{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
     if (group != group_none)
-       in << ", {W{hc{lRгруппаум{lEglist{lx " << gname << "{x";
+       in << ", {y{hc{lRгруппаум{lEglist{lx " << gname << "{x";
     in << "." << endl;
 }
 
@@ -109,6 +111,14 @@ bool SkillHelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
     return false;
 }
 
+void SkillHelp::save() const
+{
+    if (skill) {
+        const XMLTableElement *element = skill.getDynamicPointer<XMLTableElement>();
+        if (element)
+            element->save();
+    }
+}
 
 void SkillHelp::applyFormatter( Character *ch, ostringstream &in, ostringstream &out ) const
 {
@@ -137,37 +147,35 @@ void SkillHelp::setSkill( Skill::Pointer skill )
 {
     this->skill = skill;
     
-    keywords.insert( skill->getName( ) );    
-    keywords.insert( skill->getRussianName( ) );    
-    
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
+    addAutoKeyword( skill->getName( ) );    
+    addAutoKeyword( skill->getRussianName( ) );    
     
     if (skill->getCommand( )) {
         Command::Pointer cmd = skill->getCommand( ).getDynamicPointer<Command>( );
         
         if (cmd) {
-            keywords.insert( cmd->getName( ) );
-            cmd->getAliases( ).toSet( keywords );
-            cmd->getRussianAliases( ).toSet( keywords );
+            addAutoKeyword( cmd->getName( ) );
+            addAutoKeyword(cmd->getAliases().toSet());
+            addAutoKeyword(cmd->getRussianAliases().toSet());
             if (!cmd->getExtra().isSet(CMD_NO_INTERPRET)) {
-                labels.fromString(
+/*                
+                labels.addTransient(
                     cmd->getCommandCategory().names());
-                labels.insert("cmd");
+*/                    
+                labels.addTransient("cmd");
             }
         }
     }
     
     if (skill->getSpell())
-        addLabel("spell");
+        labels.addTransient("spell");
     else
-        addLabel("skill");
+        labels.addTransient("skill");
         
     XMLVariableContainer *skillWithType = skill.getDynamicPointer<XMLVariableContainer>();
     if (skillWithType)
-        addLabel(skillWithType->getType().toLower());
+        labels.addTransient(skillWithType->getType().toLower());
 
-    fullKeyword = keywords.toString().toUpper();
     helpManager->registrate( Pointer( this ) );
 }
 
@@ -175,8 +183,11 @@ void SkillHelp::unsetSkill( )
 {
     helpManager->unregistrate( Pointer( this ) );
     skill.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
+
 
 

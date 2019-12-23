@@ -320,7 +320,7 @@ void CommandLoader::loadCommand( XMLCommand::Pointer command )
 
 void CommandLoader::saveCommand( XMLCommand::Pointer command )
 {
-//    saveXML( *command, command->getName( ) );
+    saveXML( *command, command->getName( ) );
 }
 
 DLString CommandLoader::getNodeName( ) const

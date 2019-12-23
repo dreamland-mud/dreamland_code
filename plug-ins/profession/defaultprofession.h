@@ -17,6 +17,8 @@
 #include "markuphelparticle.h"
 #include "profession.h"
 
+class DefaultProfession;
+
 /*
  * ProfessionHelp
  */
@@ -24,16 +26,17 @@ class ProfessionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<ProfessionHelp> Pointer;
 
-    virtual void setProfession( Profession::Pointer );
+    virtual void setProfession( ::Pointer<DefaultProfession> prof );
     virtual void unsetProfession( );
 
     virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;
+    virtual void save() const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
 
 protected:
-    Profession::Pointer prof;
+    ::Pointer<DefaultProfession> prof;
 };
 
 inline const DLString & ProfessionHelp::getType( ) const

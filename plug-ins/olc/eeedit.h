@@ -23,6 +23,7 @@ public:
 
     virtual void commit( );
     virtual void changed( PCharacter * );
+    void show(PCharacter *ch);
 
     XML_VARIABLE XMLInteger room, to_room, info, key;
     XML_VARIABLE XMLInteger moving_from, moving_mode_from, moving_to;

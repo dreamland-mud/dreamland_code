@@ -50,7 +50,7 @@ XMLRegisterList::toXML( XMLNode::Pointer& parent ) const
 }
 
 void 
-XMLRegisterList::fromXML( const XMLNode::Pointer& parent ) throw ( ExceptionBadType )
+XMLRegisterList::fromXML( const XMLNode::Pointer& parent ) 
 {
     clear();
     XMLContainer::fromXML(parent);

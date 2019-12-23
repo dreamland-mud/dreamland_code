@@ -27,7 +27,7 @@ public:
 
     virtual void setSelf( Scripting::Object * );
     void setTarget( mob_index_data * );
-    void checkTarget( ) const throw( Scripting::Exception );
+    void checkTarget( ) const ;
     virtual void extract( bool );
     mob_index_data *getTarget( ) const;
 private:        

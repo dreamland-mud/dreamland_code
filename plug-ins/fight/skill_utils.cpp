@@ -11,6 +11,7 @@
 #include "mercdb.h"
 
 GROUP(none);
+GSN(turlok_fury);
 
 bool temporary_skill_active( const Skill *skill, Character *ch )
 {
@@ -108,7 +109,7 @@ DLString spell_utterance(Skill *skill)
 
 Skill * skillref_to_pointer(const XMLSkillReference &ref)
 {
-    Skill *skill = const_cast<Skill *>(const_cast<XMLSkillReference *>(&ref)->operator ->());
+    Skill *skill = const_cast<Skill *>(const_cast<XMLSkillReference *>(&ref)->getElement());
     return skill;
 }
 
@@ -134,7 +135,7 @@ void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf)
     // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
     buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x";
     if (group != group_none)
-       buf << " и команду {W{hc{lRгруппаум{lEglist{lx " << group->getNameFor(ch) << "{x";
+       buf << " и команду {y{hc{lRгруппаум{lEglist{lx " << group->getNameFor(ch) << "{x";
     buf << "." << endl;
 }
   
@@ -172,4 +173,25 @@ DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
     ostringstream buf;
     buf << ", работает на {C" << eff << "%{x";
     return buf.str();
+}
+
+int skill_level(Skill &skill, Character *ch)
+{
+    int slevel = ch->getModifyLevel();
+
+    if (!ch->is_npc()) {
+        slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
+        slevel += ch->getPC()->mod_level_skills[skill.getIndex()];
+        slevel += ch->getPC()->mod_level_all;
+    }
+
+    if (ch->isAffected(gsn_turlok_fury) && chance(50)) {
+        slevel += number_range(1, 5);
+    }
+    
+    if (ch->is_immortal() && slevel != ch->getModifyLevel()) 
+        ch->printf("Отладка: уровень умения %s %d -> %d.\r\n", 
+                    skill.getName().c_str(), ch->getModifyLevel(), slevel);
+
+    return slevel;
 }

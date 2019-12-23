@@ -5,7 +5,7 @@
 #include "xmlglobalreference.h"
 #include "xmlstring.h"
 
-void XMLGlobalReference::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLGlobalReference::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLString str;
 

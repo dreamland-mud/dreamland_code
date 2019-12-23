@@ -17,7 +17,7 @@ public:
     XMLFlags( bitstring_t, const FlagTable * );
     
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     inline XMLFlags & operator = ( bitstring_t bit ) { 
         setValue( bit );
@@ -49,7 +49,7 @@ public:
     XMLFlagsWithTable( );
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
     
 protected:
     static const DLString ATTRIBUTE_TABLE;

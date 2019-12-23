@@ -179,13 +179,12 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
         ptc(ch,
             "[v0] Вместимость:[%u кг]\n\r"
             "[v1] Флаги:      [%s] {D(? container_flags){x\n\r"
-            "[v2] Ключ:        %s [%u]\n\r"
+            "[v2] Ключ:        %s [%d]\n\r"
             "[v3] Макс. вес:  [%u]\n\r"
             "[v4] Коэф. снижения веса: [%u]\n\r",
             obj->value[0],
             container_flags.names(obj->value[1]).c_str(),
-            get_obj_index(obj->value[2])
-            ? get_obj_index(obj->value[2])->short_descr
+            (obj->value[2] > 0 && get_obj_index(obj->value[2])) ? get_obj_index(obj->value[2])->short_descr
             : "none",
             obj->value[2],
             obj->value[3],
@@ -600,7 +599,7 @@ bool set_obj_values(Character * ch, OBJ_INDEX_DATA * pObj, int value_num, const 
             stc("Container flags toggled.\n\r\n\r", ch);
             break;
         case 2:
-            if (atoi(argument) != 0) {
+            if (atoi(argument) > 0) {
                 if (!get_obj_index(atoi(argument))) {
                     stc("THERE IS NO SUCH ITEM.\n\r\n\r", ch);
                     return false;

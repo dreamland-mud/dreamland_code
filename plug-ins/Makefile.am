@@ -46,11 +46,11 @@ magic \
 mansion \
 mlove \
 note \
+religion \
 quest \
 misc_behaviors \
 race_aptitude \
 cards \
-religion \
 riding \
 web \
 gmcp \

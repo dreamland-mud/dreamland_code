@@ -904,7 +904,7 @@ bool HunterBeaconTrap::use( Character *ch, const char *cArgs )
         return true;
     }
 
-    victim = get_player_world( ch->getPC( ), args.c_str( ) );
+    victim = get_player_world( ch, args.c_str( ) );
     if (victim == NULL) {
         ch->println( "Жертва с таким именем не найдена." );
         return true;

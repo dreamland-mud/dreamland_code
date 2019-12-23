@@ -31,6 +31,7 @@
 #include "onehit.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
+#include "chance.h"
 #include "clan.h"
 #include "vnum.h"
 #include "merc.h"
@@ -287,7 +288,9 @@ void AssassinateOneHit::calcDamage( )
         chance = URANGE( 5, chance, 20 );
     }
 
-    if (number_percent( ) <= chance) {
+    Chance mychance(ch, chance, 100);
+
+    if (mychance.reroll()) {
         act_p("Ты {R+++ASSASSINATE+++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
         act_p("$c1 {R+++ASSASSINATES+++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
         act_p("$c1 {R+++ASSASSINATES+++{x тебя!",ch,0,victim,TO_VICT,POS_DEAD);
@@ -724,8 +727,10 @@ SKILL_RUNP( strangle )
 
         if (victim->isAffected(gsn_backguard)) 
             chance /= 2;
-        
-        if ( ch->is_npc() || number_percent() < chance * k / 100 )
+
+        Chance mychance(ch, chance*k/100, 100);
+
+        if ( ch->is_npc() || mychance.reroll())
         {
                 act_p("Ты смыкаешь руки на шее $C2 и $E погружается в сон.",
                         ch,0,victim,TO_CHAR,POS_RESTING);

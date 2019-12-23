@@ -14,6 +14,7 @@ $(LIBADD_AI)
 
 libreligion_la_SOURCES = \
 impl.cpp \
+religionflags.cpp \
 defaultreligion.cpp \
 templeman.cpp \
 tattoo.cpp \
@@ -29,4 +30,9 @@ tattoo.h \
 gods_impl.h \
 religionattribute.h
 
+religionflags.cpp: religionflags.conf religionflags.h
+religionflags.h: religionflags.conf
+libreligion_la_moc_xml.cpp: religionflags.h
+
+CLEANFILES = religionflags.cpp $(top_builddir)/src/religionflags.h 
 AM_CPPFLAGS += $(plugin_INCLUDES)

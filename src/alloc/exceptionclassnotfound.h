@@ -27,7 +27,7 @@ public:
     {
     }
 
-    virtual ~ExceptionClassNotFound( ) throw( );
+    virtual ~ExceptionClassNotFound( ) ;
 };
 
 #endif

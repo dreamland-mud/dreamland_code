@@ -101,26 +101,26 @@ public:
     virtual bool is_npc( ) const = 0;
     
     // set-get methods inherited from CharacterMemoryInterface
-    virtual const DLString& getName( ) const throw( );
-    virtual void setName( const DLString& ) throw( );
+    virtual const DLString& getName( ) const ;
+    virtual void setName( const DLString& ) ;
 
-    virtual short getLevel( ) const throw( );
-    virtual void setLevel( short ) throw( );
+    virtual short getLevel( ) const ;
+    virtual void setLevel( short ) ;
 
-    virtual ReligionReference & getReligion( ) throw( );
+    virtual ReligionReference & getReligion( ) ;
     virtual void setReligion( const ReligionReference & );
 
-    virtual short getSex( ) const throw( );
-    virtual void setSex( short ) throw( );
+    virtual short getSex( ) const ;
+    virtual void setSex( short ) ;
 
-    virtual RaceReference &getRace( ) throw( );
-    virtual void setRace( const RaceReference & ) throw( );
+    virtual RaceReference &getRace( ) ;
+    virtual void setRace( const RaceReference & ) ;
 
-    virtual ClanReference &getClan( ) throw( );
-    virtual void setClan( const ClanReference & ) throw( );
+    virtual ClanReference &getClan( ) ;
+    virtual void setClan( const ClanReference & ) ;
 
-    virtual ProfessionReference &getProfession( ) throw( );
-    virtual void setProfession( const ProfessionReference & ) throw( );
+    virtual ProfessionReference &getProfession( ) ;
+    virtual void setProfession( const ProfessionReference & ) ;
     virtual ProfessionReference & getTrueProfession( );
 
     // various set-get methods 

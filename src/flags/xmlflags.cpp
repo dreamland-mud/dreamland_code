@@ -19,7 +19,7 @@ XMLFlags::XMLFlags( bitstring_t v, const FlagTable *t )
 {
 }
 
-void XMLFlags::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLFlags::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
 
@@ -52,7 +52,7 @@ XMLFlagsWithTable::XMLFlagsWithTable( ) : XMLFlags( 0, NULL )
 {
 }
 
-void XMLFlagsWithTable::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLFlagsWithTable::fromXML( const XMLNode::Pointer& parent ) 
 {
     setTable( parent->getAttribute( ATTRIBUTE_TABLE ) );
 

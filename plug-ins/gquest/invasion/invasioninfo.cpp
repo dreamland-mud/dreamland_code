@@ -83,7 +83,7 @@ InvasionGQuestInfo::findScenario( const DLString& key )
     return i->second.getPointer( );
 }
 
-void InvasionGQuestInfo::fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+void InvasionGQuestInfo::fromXML( const XMLNode::Pointer& node ) 
 {
     scenarios.clear( );
     GlobalQuestInfo::fromXML( node );

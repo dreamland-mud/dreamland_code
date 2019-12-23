@@ -340,6 +340,7 @@ struct editor_table_entry {
     {"room",   "redit"},
     {"object", "oedit"},
     {"mobile", "medit"},
+    {"help",   "hmedit"},
     {NULL, 0,}
 };
 
@@ -1140,6 +1141,44 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
                     pObj->area->name, pObj->vnum, pObj->short_descr) << endl;
         }
         page_to_char( buf.str( ).c_str( ), ch );
+        return;
+    }
+
+    if (arg == "savehelp") {
+        HelpArticles::const_iterator a;
+
+        int max_id = 0;
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++)
+            if ((*a)->getID() > max_id)
+                max_id = (*a)->getID();
+
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if ((*a)->getID() <= 0) {
+                const_cast<HelpArticle *>(**a)->setID(++max_id);
+                (*a)->save();
+            }
+        }
+        return;
+    }
+
+    if (arg == "readroom") {
+        Integer vnum;
+        Room *room;
+
+        if (args.empty() || !Integer::tryParse(vnum, args)) {
+            ch->println("abc readroom <vnum>");
+            return;
+        }
+
+        room = get_room_index(vnum);
+        if (!room) {
+            ch->printf("Room vnum [%d] not found.\r\n", vnum.getValue());
+            return;
+        }
+        
+        ch->printf("Loading room objects for '%s' [%d], check logs for details.\r\n", 
+                    room->name, room->vnum);
+        load_room_objects(room, "/tmp", false);
         return;
     }
 }

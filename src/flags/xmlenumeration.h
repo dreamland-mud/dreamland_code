@@ -16,7 +16,7 @@ public:
     XMLEnumeration( int, const FlagTable * );
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     inline XMLEnumeration & operator = ( int value ) { 
         setValue( value );
@@ -32,7 +32,7 @@ public:
     XMLEnumerationArray( const FlagTable *, int = 0 );
     
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     void clear( );
 protected:

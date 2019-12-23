@@ -13,6 +13,8 @@ xmlindexdata.cpp \
 redit.cpp \
 sedit.cpp \
 aedit.cpp \
+hedit.cpp \
+reledit.cpp \
 medit.cpp \
 oedit.cpp \
 eeedit.cpp \
@@ -32,6 +34,8 @@ feniatriggers.cpp
 libolc_la_MOC = \
 redit.h \
 aedit.h \
+hedit.h \
+reledit.h \
 medit.h \
 sedit.h \
 oedit.h \
@@ -49,6 +53,7 @@ $(INCLUDES_FIGHT) \
 -I$(top_srcdir)/plug-ins/updates \
 -I$(top_srcdir)/plug-ins/areas \
 -I$(top_srcdir)/plug-ins/feniaroot \
+-I$(top_srcdir)/plug-ins/religion \
 -I$(top_srcdir)/plug-ins/ed \
 -I$(top_srcdir)/plug-ins/ed/lib \
 $(INCLUDES_SRC) 
@@ -60,6 +65,7 @@ $(LIBADD_FIGHT) \
 ../ed/lib/libed.la \
 ../areas/libareas.la \
 ../feniaroot/libfeniaroot.la \
+../religion/libreligion.la \
 ../skills_impl/libskills_impl.la \
 ../updates/libupdates.la
 

@@ -70,6 +70,22 @@ NMI_INVOKE(FeniaString, cutOneArgument, "(): возвращает строку �
     return str;
 }
 
+NMI_INVOKE(FeniaString, arguments, "(): разбивает строку на список аргументов (слова или фразы в кавычках)") 
+{
+    RegList::Pointer arguments(NEW);
+    DLString str = *this;
+
+    while (!str.empty()) {
+        arguments->push_back(
+            Register(str.getOneArgument()));
+    }
+
+    Scripting::Object *sobj = &Scripting::Object::manager->allocate();
+    sobj->setHandler(arguments);
+    return Register(sobj);
+}
+
+
 NMI_INVOKE(FeniaString, upperFirstChar, "(): возвращает ту же строку, но с большой буквы")
 {
     DLString str = *this;

@@ -18,7 +18,7 @@ public:
 
     bool match( DLObject * ) const;
 
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
     virtual bool toXML( XMLNode::Pointer& ) const;
 
     static const DLString TYPE;

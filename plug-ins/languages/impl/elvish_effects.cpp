@@ -70,8 +70,7 @@ bool BlessEquipWE::run( PCharacter *ch, Character *victim ) const
         af.modifier = -1 * number_range( 1, 3 );
         af.duration = number_range( 6 + af.level / 2, 200 );
         affect_to_obj( obj, &af);
-
-        ch->saving_throw += af.modifier;
+        affect_modify(ch, &af, true);
     }
 
     act( "{CОбмундирование на $c6 на мгновение загорается священным огнем.{x", victim, 0, 0, TO_ROOM );

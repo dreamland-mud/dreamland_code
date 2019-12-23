@@ -421,7 +421,7 @@ void save_helps(FILE *fp, AREA_DATA *pArea)
         if ((*a)->areafile == pArea->area_file)
             fprintf(fp, "%d %s~\n%s~\n", 
                     (*a)->getLevel( ), 
-                    (*a)->getKeyword( ).c_str( ), 
+                    (*a)->getAllKeywordsString( ).c_str( ), 
                     fix_string((*a)->c_str( )));
     
     fprintf(fp, "0 $~\n\n\n\n");

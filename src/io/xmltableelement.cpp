@@ -3,6 +3,7 @@
  * ruffina, Dream Land, 2005
  */
 #include "xmltableelement.h"
+#include "xmltableloader.h"
 
 /*-------------------------------------------------------------------------
  * XMLTableElement
@@ -16,3 +17,13 @@ void XMLTableElement::unloaded( )
 }
 
 
+void XMLTableElement::save() const
+{
+    if (loader)
+        loader->saveElement(this);
+}
+
+void XMLTableElement::setLoader(XMLTableLoader *loader)
+{
+    this->loader = loader;
+}

@@ -33,17 +33,17 @@ DBIO::~DBIO( )
 {
 }
 
-void DBIO::open( ) throw( ExceptionDBIO )
+void DBIO::open( ) 
 {
     table.open( );
 }
 
-void DBIO::open( const DLString &tableName ) throw( ExceptionDBIO )
+void DBIO::open( const DLString &tableName ) 
 {
     table.open( tableName );
 }
 
-DBIO::DBNode DBIO::nextXML( ) throw( ExceptionDBIO, ExceptionDBIOEOF )
+DBIO::DBNode DBIO::nextXML( ) 
 {
     DLFile entry = table.nextTypedEntry( EXT_XML );
     DLFileStream stream( table, entry );
@@ -54,23 +54,23 @@ DBIO::DBNode DBIO::nextXML( ) throw( ExceptionDBIO, ExceptionDBIOEOF )
     return DBNode( entry.getFileName( ), buf.str( ) );
 }
 
-void DBIO::insert( const DBIO::DBNode &dbNode ) throw( ExceptionDBIO )
+void DBIO::insert( const DBIO::DBNode &dbNode ) 
 {
     insert( dbNode.getKey( ), dbNode.getXML( ) );
 }
 
-void DBIO::safeInsert( const DBIO::DBNode &dbNode ) throw( ExceptionDBIO )
+void DBIO::safeInsert( const DBIO::DBNode &dbNode ) 
 {
     safeInsert( dbNode.getKey( ), dbNode.getXML( ) );
 }
 
-void DBIO::insert( const DLString& key, const DLString& xml ) throw( ExceptionDBIO )
+void DBIO::insert( const DLString& key, const DLString& xml ) 
 {
     DLFileStream stream( getEntryAsFile( key ) );
     stream.fromString( xml );
 }
 
-void DBIO::safeInsert( const DLString& key, const DLString& xml ) throw( ExceptionDBIO )
+void DBIO::safeInsert( const DLString& key, const DLString& xml ) 
 {
     DLFile tmpEntry = table.tempEntry( );
     DLFileStream tmpStream( tmpEntry );
@@ -80,7 +80,7 @@ void DBIO::safeInsert( const DLString& key, const DLString& xml ) throw( Excepti
     tmpEntry.rename( getEntryAsFile( key ) );
 }
         
-DBIO::DBNode DBIO::select( const DLString& key ) throw( ExceptionDBIO )
+DBIO::DBNode DBIO::select( const DLString& key ) 
 {
     DLFileStream stream( getEntryAsFile( key ) );
 
@@ -90,13 +90,13 @@ DBIO::DBNode DBIO::select( const DLString& key ) throw( ExceptionDBIO )
     return DBNode( key, buf.str( ) );
 }
 
-void DBIO::remove( const DLString& key ) throw( ExceptionDBIO )
+void DBIO::remove( const DLString& key ) 
 {
     if (!getEntryAsFile( key ).remove( ))
         throw ExceptionDBIO( "Unable to delete '" + key + "'" );
 }
 
-void DBIO::renameID( const DLString& oldKey, const DLString& newKey ) throw( ExceptionDBIO )
+void DBIO::renameID( const DLString& oldKey, const DLString& newKey ) 
 {
     DLFile oldEntry( table, oldKey, EXT_XML );
     DLFile backupTable( table, "backup" );

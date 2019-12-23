@@ -49,7 +49,7 @@ protected:
     XML_VARIABLE XMLBoolean          nopet;
     XML_VARIABLE XMLBoolean          hidden;
     XML_VARIABLE XMLBoolean          autoHelp;
-    XML_VARIABLE XMLPointerNoEmpty<SkillGroupHelp> help;
+    XML_VARIABLE XMLPointer<SkillGroupHelp> help;
     XML_VARIABLE XMLIntegerNoEmpty   practicer;
 };
 

@@ -10,7 +10,7 @@
 class XMLContainer : public virtual XMLVariable {
 public:
 
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
     virtual bool nodeFromXML( const XMLNode::Pointer & ) = 0;
 };
 

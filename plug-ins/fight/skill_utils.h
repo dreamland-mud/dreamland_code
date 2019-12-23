@@ -52,4 +52,9 @@ int skill_learned_from_affects(const Skill *skill, PCharacter *ch);
  */
 DLString skill_effective_bonus(const Skill *skill, PCharacter *ch);
 
+/**
+ *  Return skill level taking into account affects with APPLY_LEVEL and TO_SKILLS.
+ */
+int skill_level(Skill &skill, Character *ch);
+
 #endif

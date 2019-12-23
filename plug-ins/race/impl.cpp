@@ -12,7 +12,6 @@
 #include "defaultpcrace.h"
 #include "defaultracelanguage.h"
 
-
 TABLE_LOADER(RaceLoader, "races", "Race");
 TABLE_LOADER(RaceLanguageLoader, "race-languages", "RaceLanguage");
 

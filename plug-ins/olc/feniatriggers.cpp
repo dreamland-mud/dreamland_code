@@ -5,6 +5,7 @@
 #include "plugininitializer.h"
 #include "wrappermanager.h"
 #include "iconvmap.h"
+#include "websocketrpc.h"
 #include "dlfileloader.h"
 #include "pcharacter.h"
 #include "room.h"
@@ -76,11 +77,7 @@ DLString triggerType(const DLString &name)
 // Return true for strings like Aaaaa.
 bool stringIsCapitalized(const DLString &str)
 {
-    DLString n1 = str, n2 = str;
-    n1.capitalize();
-    if (n1.empty() || n1 != n2)
-        return false;
-    return true;
+    return !str.empty() && dl_isupper(str.at(0));
 }
 
 void FeniaTriggerLoader::showAvailableTriggers(PCharacter *ch, const DLString &indexType) const
@@ -116,7 +113,7 @@ static Register get_wrapper_for_index_data(int vnum, const DLString &type)
 
 bool FeniaTriggerLoader::openEditor(PCharacter *ch, XMLIndexData &indexData, const DLString &constArguments) const
 {
-    if (ch->desc->websock.state != WS_ESTABLISHED) {
+    if (!is_websock(ch)) {
         ch->println("Эта крутая фишка доступна только в веб-клиенте.");
         return false;
     }

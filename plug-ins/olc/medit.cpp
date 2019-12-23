@@ -15,6 +15,7 @@
 #include "room.h"
 #include "skillgroup.h"
 
+#include "websocketrpc.h"
 #include "comm.h"
 #include "merc.h"
 #include "interp.h"
@@ -107,6 +108,8 @@ void OLCStateMobile::copyParameters( MOB_INDEX_DATA *original )
     mob.size             = original->size;
     mob.practicer.clear( );
     mob.practicer.set( original->practicer );
+    mob.religion.clear();
+    mob.religion.set(original->religion);
 }
 
 OLCStateMobile::OLCStateMobile( int vnum )
@@ -284,6 +287,8 @@ void OLCStateMobile::commit()
     mob.behavior = 0;    
     original->practicer.clear( );
     original->practicer.set( mob.practicer );
+    original->religion.clear();
+    original->religion.set(mob.religion);
 
     for(wch = char_list; wch; wch = wch->next) {
         NPCharacter *victim = wch->getNPC();
@@ -307,10 +312,14 @@ void OLCStateMobile::statePrompt(Descriptor *d)
 // Mobile Editor Functions.
 MEDIT(show)
 {
-    ptc(ch, "{GName: [{x%s{G]\n\r", mob.player_name);
+    bool showWeb = !arg_oneof_strict(argument, "noweb");
 
-    ptc(ch, "{GShort desc: {x%s\n\r{GLong descr:{x\n\r%s",
-        mob.short_descr, mob.long_descr);        
+    ptc(ch, "{GName: [{x%s{G] %s\n\r", 
+        mob.player_name, web_edit_button(showWeb, ch, "name", "web").c_str());
+
+    ptc(ch, "{GShort desc: {x%s %s\n\r{GLong descr: %s{x\n\r%s",
+        mob.short_descr, web_edit_button(showWeb, ch, "short", "web").c_str(),
+        web_edit_button(showWeb, ch, "long", "web").c_str(), mob.long_descr);        
     
     ptc(ch, "{CLevel {Y%3d  {CVnum: [{Y%u{C]  Area: [{Y%5d{C] {G%s{x\n\r",
         mob.level, mob.vnum,
@@ -369,7 +378,8 @@ MEDIT(show)
     if (!mob.spec_fun.name.empty())
         ptc(ch, "Spec fun: [%s] {D(? spec){x\n\r", mob.spec_fun.name.c_str());
     ptc(ch, "Group:    [%d]\n\r", mob.group);
-    ptc(ch, "Practicer:[%s] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "Practicer:[{G%s{x] {D(? groups){x\n\r", mob.practicer.toString( ).c_str( ));
+    ptc(ch, "Religion: [{G%s{x] {D(reledit list){x\n\r", mob.religion.toString().c_str());
     ptc(ch, "Smell:     %s\n\r", mob.smell.c_str( ));
 
     if (!mob.properties.empty( )) {
@@ -378,7 +388,7 @@ MEDIT(show)
             ptc(ch, "%20s: %s\n\r", p->first.c_str( ), p->second.c_str( ));
     }
 
-    ptc(ch, "Description:\n\r%s", mob.description);
+    ptc(ch, "Description: %s\n\r%s", web_edit_button(showWeb, ch, "desc", "web").c_str(), mob.description);
 
     if (mob.behavior) {
         try {
@@ -672,12 +682,16 @@ MEDIT(behavior)
         static const DLString petType( "Pet" );
         type = petType;
     }
+    else if (!str_cmp( argument, "leveladaptivepet" )) {
+        static const DLString petType( "LevelAdaptivePet" );
+        type = petType;
+    }
     else if (!str_cmp( argument, "trainer" )) {
         static const DLString trainerType( "Trainer" );
         type = trainerType;
     }
     else { 
-        stc("Допустимые значения поведения: shopper, pet, trainer.\r\n", ch);
+        stc("Допустимые значения поведения: shopper, pet, leveladaptivepet, trainer.\r\n", ch);
         return false;
     }
 
@@ -965,30 +979,12 @@ MEDIT(group)
 
 MEDIT(practicer)
 {
-    SkillGroup *g;
+    return globalBitvectorEdit<SkillGroup>(mob.practicer);
+}
 
-    if (!*argument) {
-        stc("Syntax:  practicer <groupname>|clear\n\r", ch);
-        return false;
-    }
-
-    if (!str_cmp(argument, "clear")) {
-        mob.practicer.clear( );
-        stc("Practicer cleared\n\r", ch);
-        return true;
-    }
-    
-    g = skillGroupManager->findExisting( argument );
-
-    if (!g) {
-        stc("Группа не найдена. Используй {W? groups{x для полного списка.\r\n", ch);
-        return false;
-    }
-    
-    mob.practicer.set( *g );
-
-    stc("Practicer toggled.\n\r", ch);
-    return true;
+MEDIT(religion)
+{
+    return globalBitvectorEdit<Religion>(mob.religion);
 }
 
 MEDIT(hitroll)
@@ -1248,6 +1244,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
         OLCStateMobile::Pointer me(NEW, pMob);
         me->attach(ch);
+        me->findCommand(ch, "show")->run(ch, "");
         return;
     }
     else if (!str_cmp(arg1, "create")) {
@@ -1297,7 +1294,7 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             return;
         }
 
-        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "");
+        OLCStateMobile::Pointer(NEW, pMob)->findCommand(ch, "show")->run(ch, "noweb");
         return;
     } else if (!str_cmp(arg1, "load")) {
         if(!*argument || !is_number(argument)) {

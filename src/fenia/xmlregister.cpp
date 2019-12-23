@@ -93,7 +93,7 @@ XMLRegister::toXML( XMLNode::Pointer& parent) const
 }
 
 void 
-XMLRegister::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadType )
+XMLRegister::fromXML( const XMLNode::Pointer& parent) 
 {
     const DLString &regtype = parent->getAttribute(ATTRIBUTE_REGTYPE);
     if(regtype == REGTYPE_NONE) {

@@ -83,7 +83,7 @@ public:
                 return allowedIP.getValue( ).c_str( );
         }
 
-        void initialize( ) throw ( ExceptionServerSocket );
+        void initialize( ) ;
         void destroy( );
         
         virtual void loaded( );

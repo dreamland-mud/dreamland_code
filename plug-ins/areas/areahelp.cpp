@@ -11,12 +11,15 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "dl_strings.h"
+#include "def.h"
+
+
 
 /*-------------------------------------------------------------------
  * XMLAreaHelp
  *------------------------------------------------------------------*/
 XMLAreaHelp::XMLAreaHelp()
-                : level(-1)
+                : level(-1), id(-1)
 {
 }
 
@@ -24,8 +27,8 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
 {
     XMLString::toXML(parent);
 
-    if (!keyword.empty( ))
-        parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keyword );
+    if (!keywordAttribute.empty( ))
+        parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keywordAttribute );
 
     if (level >= -1)
         parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
@@ -33,17 +36,19 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
     if (!labels.empty())
         parent->insertAttribute(HelpArticle::ATTRIBUTE_LABELS, labels);
 
+    if (id > 0)
+        parent->insertAttribute(HelpArticle::ATTRIBUTE_ID, DLString(id));
+
     return true;    
 }
 
-void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadType )
+void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
 {
     XMLString::fromXML(parent);
-    keyword = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
+    keywordAttribute = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
     labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
-
-    if (parent->hasAttribute( HelpArticle::ATTRIBUTE_LEVEL ))
-        level = parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL ).toInt( );
+    parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL, level );
+    parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
 }
 
 /*-------------------------------------------------------------------
@@ -51,12 +56,18 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent ) throw( ExceptionBadTy
  *------------------------------------------------------------------*/
 const DLString AreaHelp::TYPE = "AreaHelp";
 
+void AreaHelp::save() const
+{
+    if (areafile)
+        SET_BIT(areafile->area->area_flag, AREA_CHANGED);
+}
+
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     AREA_DATA *area = areafile->area;
     
     if (!selfHelp) {
-        in << *this;
+        MarkupHelpArticle::getRawText(ch, in);
         return;
     }
 
@@ -98,7 +109,9 @@ public:
         for (area = area_first; area; area = area->next) {
             HelpArticles::iterator a;
             HelpArticles &articles = area->helps;
-
+            DLString aname(area->name);
+            aname.colourstrip();
+            
             for (a = articles.begin( ); a != articles.end( ); a++) {
                 a->recover();
                 AreaHelp *help = a->getDynamicPointer<AreaHelp>();
@@ -106,15 +119,15 @@ public:
                 if (help->getKeywordAttribute().empty()) {
                     help->persistent = false;
                     help->selfHelp = true;
-                    help->addKeyword(DLString(area->name).colourStrip().quote());
-                    help->addKeyword(DLString(area->credits).colourStrip().quote());
+                    help->addAutoKeyword(aname.quote());
+                    help->addAutoKeyword(DLString(area->credits).colourStrip().quote());
                 }
                 else {
                     help->persistent = true;
-                    help->selfHelp = is_name(area->name, (*a)->getKeyword().c_str());
+                    help->selfHelp = is_name(aname.c_str(), (*a)->getAllKeywordsString().c_str());
                 }
                 if (help->selfHelp) 
-                    help->addLabel("area");
+                    help->labels.addTransient("area");
                 
                 helpManager->registrate( *a );
             }

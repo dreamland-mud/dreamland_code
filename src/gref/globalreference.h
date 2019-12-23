@@ -61,15 +61,18 @@ public:
     
     inline Element * operator -> ( )
     {
-        resolve( );
-        return Registry::getThis( )->find( index );
+        return getElement();
     }
     inline Element & operator * ( )
     {
         resolve( );
         return *Registry::getThis( )->find( index );
     }
-
+    inline Element * getElement() 
+    {
+        resolve( );
+        return Registry::getThis( )->find( index );
+    }
     void assign( const Reference &ref )
     {
         setName( ref.name );

@@ -15,7 +15,7 @@
 #include "room.h"
 #include "affect.h"
 #include "character.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "damage_impl.h"
 #include "damageflags.h"

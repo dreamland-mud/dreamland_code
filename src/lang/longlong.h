@@ -32,14 +32,14 @@ public:
         {
         }
 
-        inline LongLong( const DLString& value ) throw( ExceptionBadType )
+        inline LongLong( const DLString& value ) 
         {
                 fromString( value );
         }
 
         
-        DLString toString( ) const throw( );
-        void fromString( const DLString& value ) throw( ExceptionBadType );
+        DLString toString( ) const ;
+        void fromString( const DLString& value ) ;
         
         inline long long getValue( ) const
         {

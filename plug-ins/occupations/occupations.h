@@ -20,6 +20,7 @@ enum {
     OCC_SMITHMAN,
     OCC_TRAINER,
     OCC_CLANGUARD,
+    OCC_ADEPT,
     OCC_MAX,
 };
 

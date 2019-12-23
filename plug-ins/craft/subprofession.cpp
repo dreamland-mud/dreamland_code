@@ -22,6 +22,12 @@ static const DLString LABEL_CRAFT = "craft";
  *------------------------------------------------------------------*/
 const DLString CraftProfessionHelp::TYPE = "CraftProfessionHelp";
 
+void CraftProfessionHelp::save() const
+{
+    if (prof)
+        prof->save();
+}
+
 DLString CraftProfessionHelp::getTitle(const DLString &label) const
 {
     if (prof)
@@ -33,14 +39,10 @@ void CraftProfessionHelp::setProfession( CraftProfession::Pointer prof )
 {
     this->prof = prof;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( prof->getName( ) );
-    keywords.insert( prof->getRusName( ).ruscase( '1' ) );
-    keywords.insert( prof->getMltName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
-    addLabel(LABEL_CRAFT);
+    addAutoKeyword( prof->getName( ) );
+    addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
+    addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
+    labels.addTransient(LABEL_CRAFT);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -49,8 +51,10 @@ void CraftProfessionHelp::unsetProfession( )
 {
     helpManager->unregistrate( Pointer( this ) );
     prof.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 void CraftProfessionHelp::getRawText( Character *ch, ostringstream &in ) const

@@ -6,6 +6,7 @@
 #include "religionattribute.h"
 #include "logstream.h"
 
+#include "xmltableloaderplugin.h"
 #include "pcharacter.h"
 #include "race.h"
 #include "liquid.h"
@@ -14,28 +15,28 @@
 #include "skillmanager.h"
 #include "skillgroup.h"
 
+#include "religionflags.h"
 #include "liquidflags.h"
+#include "websocketrpc.h"
 #include "merc.h"
 #include "def.h"
 
 static const DLString LABEL_RELIGION = "religion";
+
+TABLE_LOADER_IMPL(ReligionLoader, "religions", "Religion");
 
 /*-------------------------------------------------------------------
  * ReligionHelp 
  *------------------------------------------------------------------*/
 const DLString ReligionHelp::TYPE = "ReligionHelp";
 
-void ReligionHelp::setReligion( Religion::Pointer religion )
+void ReligionHelp::setReligion( DefaultReligion::Pointer religion )
 {
     this->religion = religion;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( religion->getName( ) );
-    keywords.insert( religion->getRussianName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
-    addLabel(LABEL_RELIGION);
+    addAutoKeyword( religion->getName( ) );
+    addAutoKeyword( religion->getRussianName( ).ruscase( '1' ) );
+    labels.addTransient(LABEL_RELIGION);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -44,10 +45,18 @@ void ReligionHelp::unsetReligion( )
 {
     helpManager->unregistrate( Pointer( this ) );
     religion.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
+void ReligionHelp::save() const
+{
+    if (religion)
+        religion->save();
+
+}
 DLString ReligionHelp::getTitle(const DLString &label) const
 {
     if (religion)
@@ -61,13 +70,13 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
        << religion->getShortDescr() << "{x)";
     
     if (ch && ch->desc) {
-        if (religion->isAllowed(ch))
+        if (religion->available(ch))
             in << ", доступна для тебя.";
         else
             in << ", недоступна тебе.";
     }
 
-    in << endl << endl
+    in << " " << "%PAUSE% " << web_edit_button(ch, "reledit", religion->getName()) << "%RESUME%" << endl << endl
        << *this;
 }
 
@@ -79,7 +88,10 @@ DefaultReligion::DefaultReligion( )
                   ethos( 0, &ethos_table ),
                   races( raceManager ),
                   classes( professionManager ),
-                  sex( SEX_MALE, &sex_table )
+                  sex( SEX_MALE, &sex_table ),
+                  flags( 0, &religion_flags ),
+                  minstat(&stat_table), maxstat(&stat_table),
+                  clans(clanManager)
 
 {
 }
@@ -100,8 +112,74 @@ bool DefaultReligion::isValid( ) const
     return true;
 }
 
+bool DefaultReligion::available( Character *ch ) const
+{
+    return reasonWhy(ch).empty();
+}
+
+DLString DefaultReligion::reasonWhy(Character *ch) const
+{
+    static const DLString OK = DLString::emptyString;
+
+    if (flags.isSet(RELIG_SYSTEM))
+        return "hidden";
+
+    if (!clans.empty() && !clans.isSet(ch->getClan()))
+        return "clan";
+
+    if (!minstat.empty()) 
+        for (int i = 0; i < stat_table.size; i++)
+            if (ch->getCurrStat(i) < minstat[i])
+                return "minstat";
+    
+    if (!maxstat.empty())
+        for (int i = 0; i < stat_table.size; i++)
+            if (maxstat[i] > 0 && ch->getCurrStat(i) > maxstat[i])
+                return "maxstat";
+
+    if (minage > 0 && !ch->is_npc() && ch->getPC()->age.getYears() < minage)
+        return "too_young";
+    
+    if (maxage > 0 && !ch->is_npc() && ch->getPC()->age.getYears() > maxage)
+        return "too_old";
+
+    if (ethos.getValue() > 0 && !ethos.isSetBitNumber(ch->ethos))
+        return "ethos";
+
+    if (align.getValue() > 0 && !align.isSetBitNumber(ALIGNMENT(ch)))
+        return "align";
+
+    if (races.empty() && classes.empty())
+        return OK;
+        
+    bool myRace = races.isSet(ch->getRace());
+    bool myClass = classes.isSet(ch->getProfession());
+
+    // Allow "thief OR kender" restriction if both race and class are set in religion profile.
+    if (!races.empty() && !classes.empty()) {
+        if (myRace || myClass)
+            return OK;
+        else if (!myRace)
+            return "race";
+        else
+            return "class";
+    }
+
+    // Allow "vampire only" restriction if race is not set.
+    if (races.empty())
+        return myClass ? OK : "class";
+    else
+        return myRace ? OK : "race";
+}
+
 bool DefaultReligion::isAllowed( Character *ch ) const
 {
+    if (flags.isSet(RELIG_SYSTEM))
+        return false;
+
+    if (flags.isSet(RELIG_HIDDEN) && !ch->is_immortal())
+        return false;
+
     if (!ethos.isSetBitNumber( ch->ethos ))
         return false;
 

@@ -27,7 +27,7 @@ public:
     virtual void setSelf( Scripting::Object * );
     virtual void extract( bool );
     void setTarget( ::Object * );
-    void checkTarget( ) const throw( Scripting::Exception );
+    void checkTarget( ) const ;
     ::Object * getTarget() const;
     
 private:

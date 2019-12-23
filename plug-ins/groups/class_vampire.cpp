@@ -24,6 +24,7 @@
 #include "save.h"
 #include "magic.h"
 #include "fight.h"
+#include "chance.h"
 #include "occupations.h"
 #include "onehit.h"
 #include "onehit_weapon.h"
@@ -37,6 +38,7 @@
 
 PROF(vampire);
 DESIRE(bloodlust);
+RELIG(karmina);
 
 
 #define ROOM_VNUM_GRAVE         5
@@ -584,8 +586,8 @@ SKILL_RUNP( bite )
     VampiricBiteOneHit vb( ch, victim );
     
     try {
-        if ( !IS_AWAKE(victim)
-            && (number_percent( ) < gsn_vampiric_bite->getEffective( ch )))
+        if (!IS_AWAKE(victim)
+            && Chance(ch, gsn_vampiric_bite->getEffective( ch )-1, 100).reroll())
         {
             af.type     = gsn_vampiric_bite;
             af.level    = ch->getModifyLevel();
@@ -704,7 +706,7 @@ SKILL_RUNP( touch )
     if (victim->isAffected(gsn_backguard)) 
         chance /= 2;
 
-    if (number_percent() < chance)
+    if (Chance(ch, chance, 100).reroll())
     {
         act_p("Ты прикасаешься к шее $C2 и $E забывается в ужасном кошмаре.",
                                 ch,0,victim,TO_CHAR,POS_RESTING);
@@ -820,6 +822,7 @@ public:
 
     virtual void calcTHAC0( );
     virtual void calcDamage( );
+    void damApplyReligion();
 };
 
 
@@ -827,12 +830,26 @@ BonedaggerOneHit::BonedaggerOneHit( Character *ch, Character *victim )
             : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_bonedagger )
 {
 }
+
+void BonedaggerOneHit::damApplyReligion()
+{
+    if (ch->getReligion() == god_karmina && chance(5)) {
+        Object *tattoo = get_eq_char(ch, wear_tattoo);
+        if (tattoo) {
+            ch->pecho("{rКармина{x придает твоему костяному ножу особую остроту.");
+            dam *= 2;
+        }
+    }
+}
+
 void BonedaggerOneHit::calcDamage( ) 
 {
     damBase( );
     gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
     damApplyPosition( );
     damApplyDamroll( );
+    damApplyReligion();
+
     dam *= 4;
 
     WeaponOneHit::calcDamage( );

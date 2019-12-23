@@ -10,6 +10,7 @@ using namespace std;
 #include "lex.h"
 #include "register-impl.h"
 #include "exceptions.h"
+#include "wrap_utils.h"
 #include "tableswrapper.h"
 #include "flagtable.h"
 #include "flagtableregistry.h"
@@ -21,6 +22,8 @@ static IdRef ID_VALUE("value");
 static IdRef ID_VALUES("values");
 static IdRef ID_NAME("name");
 static IdRef ID_NAMES("names");
+static IdRef ID_MESSAGE("message");
+static IdRef ID_MESSAGES("messages");
 
     
 TableWrapper::TableWrapper() : table(0)
@@ -93,34 +96,34 @@ TableWrapper::callMethod(const Register &key, const RegisterList &args)
 
         return Register( os.str() );
     }
-    else if (( key == ID_VALUE ).toBoolean( ) 
-              || ( key == ID_VALUES ).toBoolean( )) 
-    {
-        if (args.empty( ))
-            throw Scripting::NotEnoughArgumentsException( );
-            
-        if (table->enumerated)
-            return Register( table->value( args.front( ).toString( ) ) );
-        else
-            return Register( (int)table->bitstring( args.front( ).toString( ) ) );
+
+    if (( key == ID_VALUE ).toBoolean( ) )
+        return Register((int)table->value(args2string(args)));
+
+    if (( key == ID_VALUES ).toBoolean( )) 
+        return Register((int)table->bitstring(args2string(args)));
+
+    if (( key == ID_NAME ).toBoolean( ) )
+        return Register(table->name(args2number(args)));
+
+    if (( key == ID_NAMES ).toBoolean( ) )
+        return Register(table->names(args2number(args)));
+
+    if (( key == ID_MESSAGE ).toBoolean( ) ) {
+        int gcase = args.size() > 1 ? argnum2number(args, 2) : 1;
+        return Register(table->message(argnum2number(args, 1), gcase + '0'));
     }
-    else if (( key == ID_NAME ).toBoolean( )
-             || ( key == ID_NAMES ).toBoolean( ))
-    {
-        if (args.empty( ))
-            throw Scripting::NotEnoughArgumentsException( );
-        
-        if (table->enumerated)
-            return Register( table->name( args.front( ).toNumber( ) ) );
-        else
-            return Register( table->names( args.front( ).toNumber( ) ) );
+
+    if (( key == ID_MESSAGES ).toBoolean( ) ) {
+        int gcase = args.size() > 1 ? argnum2number(args, 2) : 1;
+        return Register(table->messages(argnum2number(args, 1), true, gcase + '0'));
     }
 
     throw Scripting::Exception("no such method in this object");
 }
 
 void 
-TableWrapper::setSelf(Object *)
+TableWrapper::setSelf(Scripting::Object *)
 {
 }
 
@@ -167,7 +170,7 @@ TablesWrapper::callMethod(const Register &key, const RegisterList &args)
 }
 
 void 
-TablesWrapper::setSelf(Object *)
+TablesWrapper::setSelf(Scripting::Object *)
 {
 }
 

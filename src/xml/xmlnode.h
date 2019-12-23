@@ -139,6 +139,7 @@ public:
                         return DLString::emptyString;
                 }
         }
+        void getAttribute(const DLString &name, int &value) const;
 
         inline bool hasAttribute( const DLString &name ) const
         {
@@ -152,8 +153,8 @@ public:
         }
         
         NodeList::Pointer getElementsByTagName( const DLString& name ) const;
-        NodeList::Pointer selectNodes( const DLString& pattern ) const throw( ExceptionXSL );
-        Pointer selectSingleNode( const DLString& pattern ) const throw( ExceptionXSL );
+        NodeList::Pointer selectNodes( const DLString& pattern ) const ;
+        Pointer selectSingleNode( const DLString& pattern ) const ;
         
         void erase( const Pointer& node );
         bool equal( const XMLNode & ) const;        

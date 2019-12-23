@@ -19,6 +19,7 @@
 
 WEARLOC(none);
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
+bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );
 bool char_has_name(Character *target, const char *arg);
 
 // Parse string argument as if it contains entity ID.
@@ -195,14 +196,14 @@ Character *get_char_world( Character *ch, const char *cArgument )
         Character *wch;
         int number;
         int count;
-        
+       
         strcpy( arg_buf, cArgument );
-
+        long long id = get_arg_id( argument );
         if ( ( wch = get_char_room( ch, argument ) ) != 0 )
                 return wch;
 
         number = number_argument( argument, arg ) - count_char_room( ch, argument );
-
+ 
         count  = 0;
         for ( wch = char_list; wch != 0 ; wch = wch->next )
         {
@@ -212,7 +213,9 @@ Character *get_char_world( Character *ch, const char *cArgument )
                     continue;
                 if (!ch->can_see( wch ))
                     continue;
-                if (!char_has_name(wch, arg))
+               if (id && wch->getID( ) != id)
+                     continue;
+                if (!id && !char_has_name(wch, arg))
                     continue;
 
                 if ( ++count >= number )
@@ -473,6 +476,7 @@ Object *get_obj_world( Character *ch, char *argument )
     Object *obj;
     int number;
     int count;
+    long long id = get_arg_id( argument );
 
     if ( ( obj = get_obj_here( ch, argument ) ) != 0 )
         return obj;
@@ -481,7 +485,7 @@ Object *get_obj_world( Character *ch, char *argument )
     count  = 0;
     for ( obj = object_list; obj != 0; obj = obj->next )
     {
-        if ( ch->can_see( obj ) && obj_has_name( obj, arg, ch ) )
+        if ( ch->can_see( obj ) && obj_has_name_or_id( obj, arg, ch, id ) )
         {
             if ( ++count == number )
                 return obj;
@@ -750,7 +754,7 @@ Character *get_char_world_doppel( Character *ch, const char *cArgument )
     return 0;
 }
 
-PCharacter * get_player_world( PCharacter *ch, const char *arg, bool fSeenOnly )
+PCharacter * get_player_world( Character *ch, const char *arg, bool fSeenOnly )
 {
     Descriptor *d;
 

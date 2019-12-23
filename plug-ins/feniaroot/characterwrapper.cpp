@@ -26,12 +26,14 @@
 #include "room.h"
 
 #include "subprofession.h"
+#include "profflags.h"
 #include "occupations.h"
 #include "interp.h"
 #include "comm.h"
 #include "save.h"
 #include "mercdb.h"
 #include "fight.h"
+#include "immunity.h"
 #include "magic.h"
 #include "movement.h"
 #include "act_move.h"
@@ -113,7 +115,7 @@ void CharacterWrapper::setTarget( ::Character *target )
     id = target->getID( );
 }
 
-void CharacterWrapper::checkTarget( ) const throw( Scripting::Exception )
+void CharacterWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "Character is dead" );
@@ -191,7 +193,22 @@ NMI_GET( CharacterWrapper, inventory, "список всех предметов 
     checkTarget( );
     
     for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
-        rc->push_back(wrap(obj));
+	if (obj->wear_loc == wear_none)
+	    rc->push_back(wrap(obj));
+
+    Scripting::Object *obj = &Scripting::Object::manager->allocate();
+    obj->setHandler(rc);
+    return Register( obj );
+}
+
+NMI_GET( CharacterWrapper, equipment, "список всех предметов в экипировке" )
+{
+    RegList::Pointer rc( NEW );
+    checkTarget( );
+    
+    for (::Object *obj = target->carrying; obj != 0; obj = obj->next_content)  
+	if (obj->wear_loc != wear_none)
+            rc->push_back(wrap(obj));
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);
@@ -794,8 +811,7 @@ NMI_GET( CharacterWrapper, lastAccessTime, "время последнего за
 NMI_GET( CharacterWrapper, profession, "класс (структура .Profession)" )
 {
     checkTarget( );
-    CHK_NPC
-    return ProfessionWrapper::wrap( target->getPC( )->getProfession( )->getName( ) );
+    return Register::handler<ProfessionWrapper>(target->getProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, profession, "класс (структура .Profession)" )
@@ -812,7 +828,7 @@ NMI_GET( CharacterWrapper, religion, "религия (структура .Religi
 {
     checkTarget( );
     CHK_NPC
-    return ReligionWrapper::wrap( target->getPC( )->getReligion( )->getName( ) );
+    return Register::handler<ReligionWrapper>( target->getPC( )->getReligion( )->getName( ) );
 }
 
 NMI_SET( CharacterWrapper, religion, "религия (структура .Religion)" )
@@ -829,7 +845,7 @@ NMI_GET( CharacterWrapper, uniclass, "под-профессия универса
 {
     checkTarget( );
     CHK_NPC
-    return ProfessionWrapper::wrap( target->getPC( )->getSubProfession( )->getName( ) );
+    return Register::handler<ProfessionWrapper>(target->getPC()->getSubProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
@@ -1526,6 +1542,20 @@ NMI_INVOKE( CharacterWrapper, one_hit, "(vict): нанести vict один у�
     return Register();
 }
 
+NMI_INVOKE( CharacterWrapper, saves_spell, "(caster,level,dam_type[,dam_flag]): спас-бросок против типа повреждения (.tables.damage_table) с флагом повреждения (.tables.damage_flags)")
+{
+    checkTarget();
+    Character *caster = argnum2character(args, 1);
+    int level = argnum2number(args, 2);
+    int dam_type = argnum2flag(args, 3, damage_table);
+    int dam_flag = DAMF_OTHER;
+    if (args.size() > 3)
+	dam_flag = argnum2flag(args, 4, damage_flags);
+
+    return Register(saves_spell(level, target, dam_type, caster, dam_flag));	
+}
+
+
 NMI_INVOKE( CharacterWrapper, spell, "(skillName,level[,vict|argument[,spellbane[,verbose]]]): скастовать заклинания на всю комнату, на vict или с аргументом")
 {
     checkTarget( );
@@ -1671,6 +1701,22 @@ NMI_INVOKE( CharacterWrapper, affectStrip, "(skillName): снять все аф�
     return Register( );
 }
 
+
+NMI_INVOKE( CharacterWrapper, isVulnerable, "(damtype, damflag): есть ли уязвимость к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
+{
+    checkTarget();
+    int damtype = argnum2flag(args, 1, damage_table);
+    int damflag = argnum2flag(args, 2, damage_flags);
+    return immune_check(target, damtype, damflag) == RESIST_VULNERABLE;
+}
+
+NMI_INVOKE( CharacterWrapper, isImmune, "(damtype, damflag): есть ли иммунитет к типу повреждений из .tables.damage_table с флагом повреждений из .tables.damage_flags" )
+{
+    checkTarget();
+    int damtype = argnum2flag(args, 1, damage_table);
+    int damflag = argnum2flag(args, 2, damage_flags);
+    return immune_check(target, damtype, damflag) == RESIST_IMMUNE;
+}
 
 NMI_INVOKE( CharacterWrapper, stop_fighting, "(): прекратить битву" )
 {
@@ -1972,7 +2018,7 @@ NMI_GET( CharacterWrapper, hasDestiny, "моб имеет предназначе
         return Register( false );
 }
 
-NMI_INVOKE( CharacterWrapper, hasOccupation, "(): моб имеет занятие (shopper,practicer,repairman,quest_trader,quest_master,healer,smithman,trainer,clanguard)" )
+NMI_INVOKE( CharacterWrapper, hasOccupation, "(): моб имеет занятие (shopper,practicer,repairman,quest_trader,quest_master,healer,smithman,trainer,clanguard,adept)" )
 {
     checkTarget( );
     CHK_PC

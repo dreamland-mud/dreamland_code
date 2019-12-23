@@ -40,7 +40,7 @@ ServerSocket::~ServerSocket( )
     destroy( );
 }
 
-void ServerSocket::initialize( ) throw( ExceptionServerSocket )
+void ServerSocket::initialize( ) 
 {
     sockaddr_in sa;
     int x = 1;

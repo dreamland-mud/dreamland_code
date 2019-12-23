@@ -17,7 +17,7 @@ public:
     XMLEmptyAttribute( );
     virtual ~XMLEmptyAttribute( );
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     virtual const DLString & getType( ) const

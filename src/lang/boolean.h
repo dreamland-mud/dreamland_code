@@ -34,13 +34,13 @@ public:
         {
         }
 
-        inline Boolean( const DLString& value ) throw( ExceptionBadType )
+        inline Boolean( const DLString& value ) 
         {
                 fromString( value );
         }
 
-        DLString toString( ) const throw( );
-        void fromString( const DLString& value ) throw( ExceptionBadType );
+        DLString toString( ) const ;
+        void fromString( const DLString& value ) ;
         
         inline bool getValue( ) const
         {

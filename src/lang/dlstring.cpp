@@ -173,7 +173,7 @@ DLString& DLString::append( long long value )
         return append( buf.str( ) );
 }
 
-int DLString::toInt() const throw( ExceptionBadType )
+int DLString::toInt() const 
 {
         basic_istringstream<char> s( this->c_str() );
         int i;
@@ -190,7 +190,7 @@ int DLString::toInt() const throw( ExceptionBadType )
         }
 }                                                                                                   
 
-long DLString::toLong() const throw( ExceptionBadType )
+long DLString::toLong() const 
 {
         basic_istringstream<char> s( this->c_str() );
         long i;
@@ -208,7 +208,7 @@ long DLString::toLong() const throw( ExceptionBadType )
 
 }
 
-long long DLString::toLongLong() const throw( ExceptionBadType )
+long long DLString::toLongLong() const 
 {
         basic_istringstream<char> s( this->c_str( ) );
         long long i;
@@ -225,7 +225,7 @@ long long DLString::toLongLong() const throw( ExceptionBadType )
 
 }
 
-long int DLString::toLongInt() const throw( ExceptionBadType )
+long int DLString::toLongInt() const 
 {
         basic_istringstream<char> s( this->c_str( ) );
         long int i;
@@ -242,7 +242,7 @@ long int DLString::toLongInt() const throw( ExceptionBadType )
 
 }
 
-bool DLString::toBoolean() const throw( ExceptionBadType )
+bool DLString::toBoolean() const 
 {
         if( *this == "true" )
         {
@@ -259,7 +259,7 @@ bool DLString::toBoolean() const throw( ExceptionBadType )
 
 }
 
-char DLString::toChar() const throw( ExceptionBadType )
+char DLString::toChar() const 
 {
         if( ( this->length( ) == 0 ) || ( this->length( ) > 1 ) )
         {
@@ -272,7 +272,7 @@ char DLString::toChar() const throw( ExceptionBadType )
 
 }
 
-unsigned char DLString::toByte() const throw( ExceptionBadType )
+unsigned char DLString::toByte() const 
 {
         basic_istringstream<char> s( this->c_str( ) );
         unsigned char i;
@@ -459,14 +459,16 @@ bool DLString::isRussian( ) const
     return true;
 }
 
-void DLString::stripLeftWhiteSpace( )
+DLString & DLString::stripLeftWhiteSpace( )
 {
         erase( 0, find_first_not_of( ' ' ) );
+        return *this;
 }
 
-void DLString::stripRightWhiteSpace( )
+DLString & DLString::stripRightWhiteSpace( )
 {
         erase( find_last_not_of( ' ' ) + 1 );
+        return *this;
 }
 
 DLString& DLString::toLower( )

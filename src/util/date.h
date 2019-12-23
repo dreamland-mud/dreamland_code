@@ -71,7 +71,7 @@ public:
          * В итоге: -86705
          * </pre>
          */
-        static int getSecondFromString( const DLString& date ) throw( ExceptionBadDateString );
+        static int getSecondFromString( const DLString& date ) ;
         
         static DLString getStringFromSecond( int time );
         

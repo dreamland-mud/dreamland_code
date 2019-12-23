@@ -28,7 +28,7 @@ public:
     {
     }
 
-    virtual ~ExceptionXMLClassAllocate( ) throw ( );
+    virtual ~ExceptionXMLClassAllocate( ) ;
 };
 
 class ExceptionXMLClassNotRegistered : public ExceptionXMLClassAllocate {
@@ -38,7 +38,7 @@ public:
     { 
     }
 
-    virtual ~ExceptionXMLClassNotRegistered( ) throw ( );
+    virtual ~ExceptionXMLClassNotRegistered( ) ;
 };
 
 class ExceptionXMLClassNotDerived : public ExceptionXMLClassAllocate {
@@ -48,7 +48,7 @@ public:
     { 
     }
 
-    virtual ~ExceptionXMLClassNotDerived( ) throw ( );
+    virtual ~ExceptionXMLClassNotDerived( ) ;
 };
 
 
@@ -77,7 +77,7 @@ public:
         return false;
     }
     
-    void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    void fromXML( const XMLNode::Pointer& parent ) 
     {
         if (parent->getType( ) == XMLNode::XML_LEAF) {
             clear( );

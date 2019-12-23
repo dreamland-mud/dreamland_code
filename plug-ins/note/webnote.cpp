@@ -20,12 +20,18 @@ WebNote::WebNote( const Note *note, bool fColor )
     date.setValue( note->getDate( ).getTimeAsString( "%d %b %Y") );
     id.setValue( note->getID( ) );
 
-    // Strip {hl and so on. Color strip on demand.
-    ostringstream txt;
-    vistags_convert(note->getText().c_str(), txt);
-    text.setValue(txt.str());
-    if (!fColor)
+    if (fColor) {
+        // Convert {hh and color tags to web <c/> nodes.
+        ostringstream textStream;
+        mudtags_convert_web(note->getText().c_str(), textStream, 0);
+        text.setValue(textStream.str());
+    } else {
+        // Strip all visibility and color tags.
+        ostringstream txt;
+        vistags_convert(note->getText().c_str(), txt, 0);
+        text.setValue(txt.str());
         text.colourstrip(); 
+    }
 }
 
 WebNote::~WebNote( )

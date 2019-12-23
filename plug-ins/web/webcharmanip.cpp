@@ -74,6 +74,10 @@ struct MobileManipList : public ManipList {
         locals.push_back( Manip( cmdName, args ) );
     }
 
+    void addLocal( const DLString &cmdName ) {
+        locals.push_back( Manip( cmdName, THIS ) );
+    }
+
     // Add commands to the main list, with various arguments.
     void add( const DLString &cmdName ) {
         manips.push_back( Manip( cmdName, THIS ) );
@@ -172,6 +176,11 @@ WEBMANIP_RUN(decorateMobile)
     NPCharacter *victim = myArgs.victim;
 
     MobileManipList manips( victim, myArgs.descr );
+
+    if (ch->is_immortal()) {
+        manips.addLocal("stat", "mob $");
+        manips.addLocal("medit", DLString(victim->getNPC()->pIndexData->vnum));
+    }
 
     if (ch->in_room == victim->in_room) {
         manips.add( "look" );

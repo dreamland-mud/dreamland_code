@@ -67,7 +67,7 @@ public:
     XMLIdentifier() : value(0) { }
     XMLIdentifier(Lex::id_t id) : value(id) { }
 
-    virtual void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& parent ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     Lex::id_t getValue() const {

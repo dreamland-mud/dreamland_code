@@ -53,7 +53,7 @@ RainbowGQuest::~RainbowGQuest( )
     thisClass = NULL;
 }
 
-void RainbowGQuest::create( const Config& config ) throw ( GQCannotStartException ) 
+void RainbowGQuest::create( const Config& config )  
 {
     Character *ch;
     NPCharacter *mob;

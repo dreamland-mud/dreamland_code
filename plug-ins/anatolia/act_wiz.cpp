@@ -849,9 +849,9 @@ CMDWIZP( stat )
            return;
         }
         
-        victim =  fChar ? get_player_world( ch->getPC( ), string ) : get_char_world( ch, string );
+        victim =  fChar ? get_player_world( ch, string ) : get_char_world( ch, string );
         if (!victim) {
-            ch->pecho("%s с таким именем не найден.", fMob ? "Персонаж" : "Игрок");
+            ch->pecho("%s с именем %s не найден.", fMob ? "Персонаж" : "Игрок", string);
             return;
         }
         
@@ -1584,6 +1584,9 @@ static bool has_nopost(Character *ch)
     
     if (npc && !npc->pIndexData->practicer.empty( ))
         buf << "Practicer: " << npc->pIndexData->practicer.toString( ) << endl;
+
+    if (npc && !npc->pIndexData->religion.empty())
+        buf << "Religious beliefs: " << npc->pIndexData->religion.toString( ) << endl;
 
     if (npc && npc->behavior) { 
         buf << "Behavior: [" << npc->behavior->getType( ) << "]" << endl;
@@ -3598,7 +3601,7 @@ CMDWIZP( rename )
         return;
     }
     
-    PCharacter* victim = get_player_world( ch->getPC( ), oldName.c_str( ) );
+    PCharacter* victim = get_player_world( ch, oldName.c_str( ) );
     
     if (!victim) {
         ch->send_to("There is no such a person online.\n\r");

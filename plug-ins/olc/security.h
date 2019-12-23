@@ -8,9 +8,8 @@
 #include "xmlvariablecontainer.h"
 #include "xmlinteger.h"
 #include "xmlvector.h"
-
 #include "xmlattribute.h"
-#include "xmlattributeplugin.h"
+#include "webeditor.h"
 
 class Character;
 struct area_data;
@@ -28,28 +27,25 @@ public:
     XML_VARIABLE XMLInteger security;
 };
 
-class XMLAttributeOLC : public XMLAttribute, public XMLVariableContainer {
+class XMLAttributeOLC : public EventHandler<WebEditorSaveArguments>, public XMLVariableContainer {
 XML_OBJECT
 public:
     typedef ::Pointer<XMLAttributeOLC> Pointer;
     typedef XMLVectorBase<XMLVnumRange> RangeList;
 
+    virtual bool handle( const WebEditorSaveArguments &args );
     void removeInterval( int, int );
     bool isOverlapping( int, int );
 
+    /**
+     * List of vnum ranges available to the builder and their security level.
+     */
     XML_VARIABLE RangeList vnums;
-};
 
-class XMLAttributeOLCPlugin : public XMLAttributePlugin {
-public:
-        typedef ::Pointer<XMLAttributeOLCPlugin> Pointer;
-
-        virtual void initialization( );
-        virtual void destruction( );
-
-        virtual const DLString& getName( ) const {
-            return XMLAttributeOLC::MOC_TYPE;
-        }
+    /**
+     * Command (e.g. 'desc paste') that needs to be run after webedit is done.
+     */
+    XML_VARIABLE XMLString saveCommand;
 };
 
 #endif

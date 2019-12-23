@@ -25,7 +25,7 @@
 #include "comm.h"
 #include "act.h"
 #include "mudtags.h"
-#include "webmanip.h"
+#include "websocketrpc.h"
 #include "dl_match.h"    
 #include "dl_ctype.h"
 #include "dl_strings.h"

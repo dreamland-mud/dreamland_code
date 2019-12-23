@@ -9,7 +9,9 @@
 #include "sedit.h"
 #include "pcharacter.h"
 #include "security.h"
+#include "interp.h"
 #include "arg_utils.h"
+#include "websocketrpc.h"
 #include "mercdb.h"
 
 /*--------------------------------------------------------------------------
@@ -31,6 +33,7 @@ short OLCCommand::getLog( ) const
 
 bool OLCCommand::matches( const DLString &argument ) const
 {
+    // TODO match Russian names.
     return !argument.empty( ) && argument.strPrefix( name );
 }
 
@@ -69,21 +72,13 @@ OLCInterpretLayer::putInto( )
 bool 
 OLCInterpretLayer::process( InterpretArguments &iargs )
 {
-    OLCState::Pointer state;
-    Descriptor *d;
-    
     if (iargs.ch->is_npc( ))
         return true;
     
-    d = iargs.d;
-
-    if (!d || d->handle_input.empty( ))
+    OLCState::Pointer state = OLCState::getOLCState(iargs.d);
+    if (!state) {
         return true;
-    
-    state = d->handle_input.front( ).getDynamicPointer<OLCState>( );
-
-    if (!state)
-        return true;
+    }
     
     if(iargs.cmdName.empty())
         iargs.cmdName = "show";
@@ -93,7 +88,7 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
 
     iargs.pCommand = state->findCommand( iargs.ch->getPC( ), iargs.cmdName );
 
-    if (iargs.pCommand)
+    if (iargs.pCommand) 
         iargs.advance( );
     
     return true;
@@ -104,6 +99,17 @@ OLCInterpretLayer::process( InterpretArguments &iargs )
  *-------------------------------------------------------------------------*/
 OLCState::OLCState() : inSedit(false), strEditor(*this)
 {
+}
+
+OLCState::Pointer OLCState::getOLCState(Descriptor *d)
+{
+    OLCState::Pointer state;
+
+    if (!d || d->handle_input.empty( ))
+        return state;
+    
+    state = d->handle_input.front( ).getDynamicPointer<OLCState>( );
+    return state;
 }
 
 int 
@@ -372,6 +378,35 @@ bool OLCState::mapEdit( Properties &map, DLString &args )
     return false;
 }
 
+bool OLCState::enumerationArrayEdit(const FlagTable &table, EnumerationArray &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString valueName = args.getOneArgument();
+    int index = table.value(valueName);
+    Integer value;
+
+    if (index == NO_FLAG || !Integer::tryParse(value, args) || value < 0) {
+        ptc(ch, "Формат: %s <param name> <число>\r\n", cmd);
+        ptc(ch, "        %s <param name> 0\r\n", cmd);
+        return false;
+    }
+
+    field[index] = value;
+    ptc(ch, "Поле %s установлено в %d.\r\n", table.fields[index].name, value);
+    return true;
+}
+
+bool OLCState::flagBitsEdit(const FlagTable &table, Flags &field)
+{
+    int value = field.getValue();
+    bool rc = flagBitsEdit(table, value);
+    if (rc)
+        field.setValue(value);
+    return rc;
+}
+
 bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
 {
     PCharacter *ch = owner->character->getPC();
@@ -394,6 +429,15 @@ bool OLCState::flagBitsEdit(const FlagTable &table, int &field)
     field ^= value;
     ptc(ch, "Новое значение поля {g%s{x:\r\n%s\r\n", cmd, table.names(field).c_str());
     return true;
+}
+
+bool OLCState::flagValueEdit(const FlagTable &table, Flags &field)
+{
+    int value = field.getValue();
+    bool rc = flagValueEdit(table, value);
+    if (rc)
+        field.setValue(value);
+    return rc;
 }
 
 bool OLCState::flagValueEdit(const FlagTable &table, int &field)
@@ -463,6 +507,42 @@ bool OLCState::numberEdit(long minValue, long maxValue, long &field)
 
     field = value;
     ptc(ch, "Новое значение поля {g%s{x: %ld\r\n", cmd, field);
+    return true;
+}
+
+bool OLCState::rangeEdit(int minValue, int maxValue, int &field1, int &field2)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+    DLString arg1 = args.getOneArgument();
+    DLString arg2 = args.getOneArgument();
+    Integer value1, value2;
+
+    if (!Integer::tryParse(value1, arg1) || !Integer::tryParse(value2, arg2)) {
+        ptc(ch, "Использование:\r\n{W%s{x число1 число2 - установить два значения. каждое в диапазоне от %d до %d\r\n",
+             cmd, minValue, maxValue);        
+        return false;
+    }
+
+    if (maxValue < value1 || maxValue < value2) {
+        ptc(ch, "Значения должны быть не больше %d.\r\n", maxValue);
+        return false;
+    }
+
+    if (minValue > value1 || minValue > value2) {
+        ptc(ch, "Значения должны быть не меньше %d.\r\n", minValue);
+        return false;
+    }
+
+    if (value1 > value2) {
+        stc("Первое число должно быть меньше или равно второму.\r\n", ch);
+        return false;
+    }
+
+    field1 = value1;
+    field2 = value2;
+    ptc(ch, "Новый диапазон %s: %d .. %d\r\n", cmd, field1, field2);
     return true;
 }
 
@@ -585,6 +665,28 @@ bool OLCState::editor(const char *argument, char *&field, editor_flags flags)
     return true;
 }
 
+/**
+ * Runs 'webedit' for the provided string, remembering invoked command ('desc', 'short' etc)
+ * inside an attribute. '<desc> paste' will be done from the attribute's event handler once 
+ * webedit has finished.
+ */
+bool OLCState::editorWeb(const DLString &original, const DLString &saveCommand, editor_flags flags)
+{
+    PCharacter *ch = owner->character->getPC();
+
+    editorCopy(original);
+
+    XMLAttributeOLC::Pointer attr = ch->getAttributes().getAttr<XMLAttributeOLC>("olc");
+    attr->saveCommand.setValue(saveCommand);
+
+    if (IS_SET(flags, ED_HELP_HINTS))
+        interpret_raw(ch, "webedit", "help");
+    else
+        interpret_raw(ch, "webedit");
+        
+    return false;
+}
+
 bool OLCState::editor(const char *argument, DLString &original, editor_flags flags)
 {
     PCharacter *ch = owner->character->getPC();
@@ -601,15 +703,19 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
         return true;
     }
 
-    if (arg_oneof(command, "copy", "копировать")) 
+    if (arg_is_copy(command)) 
         return editorCopy(original);
 
-    if (arg_oneof(command, "paste", "вставить"))  
+    if (arg_is_paste(command))
         return editorPaste(original, flags);
+
+    if (arg_is_web(command))
+        return editorWeb(original, lastCmd + " paste", flags);
 
     if (arg_is_help(command)) {
         stc("Команды редактора:\n\r", ch);
         ptc(ch, "%s        : войти во встроенный редактор описаний\n\r", cmd);
+        ptc(ch, "%s web    : отредактировать описание в вебредакторе\n\r", cmd);
         ptc(ch, "%s copy   : скопировать описание в буфер\n\r", cmd);
         ptc(ch, "%s paste  : заменить описание на то, что в буфере\n\r", cmd);
         ptc(ch, "%s строка : заменить описание на строку\r\n", cmd);
@@ -623,11 +729,29 @@ bool OLCState::editor(const char *argument, DLString &original, editor_flags fla
     return true;
 }
 
+static EXTRA_DESCR_DATA *safe_extra_descr(PCharacter *ch, const char *keyword, EXTRA_DESCR_DATA *&list)
+{
+    EXTRA_DESCR_DATA *ed;
+
+    for (ed = list; ed; ed = ed->next)
+        if (is_name(keyword, ed->keyword))
+            break;
+
+    if (!ed) {
+        ed = new_extra_descr();
+        ed->keyword = str_dup(keyword);
+        ed->description = str_empty;
+        ed->next = list;
+        list = ed;
+        ptc(ch, "Создано новое экстра-описание [%s].\r\n", keyword);
+    }
+
+    return ed;
+}
+
 bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
 {
     char buf[MAX_STRING_LENGTH];
-    EXTRA_DESCR_DATA *ed;
-    EXTRA_DESCR_DATA *ped = NULL;
     PCharacter *ch = owner->character->getPC();
     const char *cmd = lastCmd.c_str();
     char command[MAX_INPUT_LENGTH];
@@ -638,64 +762,44 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
 
     if (!*command || !*keyword) {
         ptc(ch, "Синтаксис:\r\n%s set [keyword]    - войти во встроенный редактор экстра-описания\n\r", cmd);
+        ptc(ch, "%s web [keyword]    - отредактировать экстра-описание в вебредакторе\n\r", cmd);        
         ptc(ch, "%s copy [keyword]   - скопировать экстра-описание в буфер\n\r", cmd);
         ptc(ch, "%s paste [keyword]  - установить экстра-описание из буфера\n\r", cmd);
         ptc(ch, "%s delete [keyword] - удалить экстра-описание\n\r", cmd);
         return false;
     }
 
-    for (ed = list; ed; ed = ed->next) {
-        if (is_name(keyword, ed->keyword))
-            break;
-        ped = ed;
-    }
-    
-    if (is_name(command, "copy")) {
-        if (!ed) {
-            ed = new_extra_descr();
-            ed->keyword = str_dup(keyword);
-            ed->description = str_empty;
-            ed->next = list;
-            list = ed;
-            ptc(ch, "Создано новое экстра-описание [%s].\r\n", keyword);
-        }
-
-        return editorCopy(ed->description);
+    if (arg_is_copy(command)) {
+        return editorCopy(
+                    safe_extra_descr(ch, keyword, list)->description);
     }
 
-    if (is_name(command, "paste")) {
-        if (!ed) {
-            ed = new_extra_descr();
-            ed->keyword = str_dup(keyword);
-            ed->description = str_empty;
-            ed->next = list;
-            list = ed;
-            ptc(ch, "Создано новое экстра-описание [%s].\r\n", keyword);
-        }
+    if (arg_is_paste(command)) {
+        return editorPaste(
+                    safe_extra_descr(ch, keyword, list)->description);
+    }
 
-        editorPaste(ed->description);
-        return true;
+    if (arg_is_web(command)) {
+        return editorWeb(
+                    safe_extra_descr(ch, keyword, list)->description,
+                    lastCmd + " paste " + keyword);
     }
 
     if (is_name(command, "set")) {
-        char *desc = ed ? ed->description : str_empty;
-        if(!sedit(desc))
-            return false;
-
-        if (!ed) {
-            ed = new_extra_descr();
-            ed->keyword = str_dup(keyword);
-            ed->next = list;
-            list = ed;
-        }
-        
-        ed->description = desc;
-        
-        stc("Экстра-описание установлено.\n\r", ch);
-        return true;
+        return sedit(
+                    safe_extra_descr(ch, keyword, list)->description);
     }
 
     if (is_name(command, "delete")) {
+        EXTRA_DESCR_DATA *ed;
+        EXTRA_DESCR_DATA *ped = NULL;
+
+        for (ed = list; ed; ed = ed->next) {
+            if (is_name(keyword, ed->keyword))
+                break;
+            ped = ed;
+        }
+    
         if (!ed) {
             stc("Экстра-описание с таким ключом не найдено.\n\r", ch);
             return false;
@@ -714,4 +818,12 @@ bool OLCState::extraDescrEdit(EXTRA_DESCR_DATA *&list)
 
     findCommand(ch, cmd)->run(ch, "");
     return false;
+}
+
+DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args)
+{
+    if (showWeb)
+        return web_edit_button(ch, editor, args);
+    else
+        return DLString::emptyString;
 }

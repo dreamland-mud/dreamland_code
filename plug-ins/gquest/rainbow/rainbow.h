@@ -33,7 +33,7 @@ public:
     RainbowGQuest( const DLString& );
     virtual ~RainbowGQuest( );
     
-    virtual void create( const Config& ) throw ( GQCannotStartException );
+    virtual void create( const Config& ) ;
     virtual void destroy( );
     
     virtual void after( );

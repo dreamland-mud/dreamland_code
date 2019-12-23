@@ -19,6 +19,8 @@
 #include "markuphelparticle.h"
 #include "race.h"
 
+class DefaultRace;
+
 /*
  * RaceHelp
  */
@@ -26,8 +28,9 @@ class RaceHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<RaceHelp> Pointer;
 
-    virtual void setRace( Race::Pointer );
+    virtual void setRace( ::Pointer<DefaultRace> race );
     virtual void unsetRace( );
+    virtual void save() const;
 
     virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;
@@ -35,7 +38,7 @@ public:
     static const DLString TYPE;
 
 protected:
-    Race::Pointer race;
+    ::Pointer<DefaultRace> race;
 };
 
 inline const DLString & RaceHelp::getType( ) const

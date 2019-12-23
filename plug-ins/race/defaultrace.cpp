@@ -18,12 +18,14 @@
 #include "wearlocation.h"
 #include "alignment.h"
 #include "logstream.h"
+#include "websocketrpc.h"
 
 #include "dreamland.h"
 #include "merc.h"
 #include "def.h"
 
 using namespace std;
+
 /*-------------------------------------------------------------------
  * RaceHelp 
  *------------------------------------------------------------------*/
@@ -31,19 +33,15 @@ static const DLString LABEL_RACE = "race";
 const DLString RaceHelp::TYPE = "RaceHelp";
 GROUP(ancient_languages);
 
-void RaceHelp::setRace( Race::Pointer race )
+void RaceHelp::setRace( DefaultRace::Pointer race )
 {
     this->race = race;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( race->getName( ) );
-    keywords.insert( race->getMaleName( ).ruscase( '1' ) );
-    keywords.insert( race->getFemaleName( ).ruscase( '1' ) );
-    keywords.insert( race->getMltName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
-    addLabel(LABEL_RACE);
+    addAutoKeyword( race->getName( ) );
+    addAutoKeyword( race->getMaleName( ).ruscase( '1' ) );
+    addAutoKeyword( race->getFemaleName( ).ruscase( '1' ) );
+    addAutoKeyword( race->getMltName( ).ruscase( '1' ) );
+    labels.addTransient(LABEL_RACE);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -52,8 +50,16 @@ void RaceHelp::unsetRace( )
 {
     helpManager->unregistrate( Pointer( this ) );
     race.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
+}
+
+void RaceHelp::save() const
+{
+    if (race)
+        race->save();
 }
 
 DLString RaceHelp::getTitle(const DLString &label) const
@@ -88,11 +94,12 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     in << "Раса {C" << (ch->getSex( ) == SEX_FEMALE ? nameF : nameM) << "{x";
     if (nameF != nameM)
         in << " ({C" << (ch->getSex( ) == SEX_FEMALE ? nameM : nameF) << "{x)";
-    in << " или {C" << race->getName( ) << "{x" << endl << endl;
+    in << " или {C" << race->getName( ) << "{x " 
+       << editButton(ch) << endl;
+    
+    in << endl << *this << endl;
 
-    in << *this << endl;
-
-    const PCRace *r = (const_cast<Race *>(race.getPointer( )))->getPC( );
+    const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
     if (r) {
         
         in << "{cХарактер{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
@@ -339,6 +346,12 @@ DLString DefaultRace::getNameFor( Character *looker, Character *me, const Gramma
 Flags DefaultRace::getAttitude( const Race &race ) const
 {
     Flags att( 0, &race_flags );
+
+    if (hunts.isSet (race))
+        att.setBit( RACE_HUNTS );
+
+    if (donates.isSet (race))
+        att.setBit( RACE_DONATES );
 
     if (getForm( ).isSet( FORM_CANINE ) && race.getForm( ).isSet( FORM_FELINE ))
         att.setBit( RACE_HATES );

@@ -108,7 +108,7 @@ void XMLDocument::emit( const XMLNode &node, ostream& ostr, int space, bool& cda
     }
 }
 
-void XMLDocument::save( ostream& ostr ) const throw( ExceptionXMLError ) 
+void XMLDocument::save( ostream& ostr ) const  
 {
     ostr << "<?xml version=\"" << version << "\" encoding=\"" << encoding << "\"?>";
     bool cdataPrev = false;
@@ -116,7 +116,7 @@ void XMLDocument::save( ostream& ostr ) const throw( ExceptionXMLError )
     ostr << endl;
 }
 
-void XMLDocument::load( istream& istr ) throw( ExceptionXMLError )
+void XMLDocument::load( istream& istr ) 
 {
     nodes.clear( );
     XMLDocument::Pointer document( this );

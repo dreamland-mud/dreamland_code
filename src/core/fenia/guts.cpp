@@ -25,7 +25,7 @@ Guts::toXML( XMLNode::Pointer& parent ) const
 }
 
 void 
-Guts::fromXML( const XMLNode::Pointer& parent ) throw ( ExceptionBadType )
+Guts::fromXML( const XMLNode::Pointer& parent ) 
 {
     clear();
     XMLContainer::fromXML(parent);

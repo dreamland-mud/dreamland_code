@@ -19,7 +19,7 @@ public:
     XMLOptionalString( );
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     void set(bool);
     bool set( ) const;
@@ -34,7 +34,7 @@ struct XMLArmor {
     void init(int, int, int, int);
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     int pierce, bash, slash, exotic;
 };
@@ -48,7 +48,7 @@ struct XMLFlagsDiff {
     bitstring_t get(bitstring_t base);
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     const FlagTable *table;
     bitstring_t add, del;
@@ -59,14 +59,14 @@ struct XMLDice {
     void set(int n, int t, int b);
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     int number, type, bonus;
 };
 
 struct XMLExtraDescr : public XMLStringNoEmpty {
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     DLString keyword;
 };
@@ -75,7 +75,7 @@ struct XMLApply : public XMLIntegerNoEmpty {
     XMLApply( );
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 
     bitstring_t where;
 };

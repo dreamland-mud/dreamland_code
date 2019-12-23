@@ -57,7 +57,7 @@ ObjIndexWrapper::setTarget( OBJ_INDEX_DATA * pIndex )
 }
 
 void 
-ObjIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
+ObjIndexWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "OBJ_INDEX_DATA is dead" );

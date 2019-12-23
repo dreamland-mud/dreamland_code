@@ -79,7 +79,7 @@ Character *        get_char_world        ( Character *ch, const char *argument )
 Character *        get_char_world        ( Character *ch, const DLString & );
 Character *        get_char_area        ( Character *ch, char *argument );
 Character *        get_char_world_doppel( Character *ch, const char *cArgument );
-PCharacter *        get_player_world( PCharacter *ch, const char *arg, bool fSeenOnly = true );
+PCharacter *        get_player_world( Character *ch, const char *arg, bool fSeenOnly = true );
 bool char_has_name(Character *target, const char *arg);
 Object *        get_obj_list        ( Character *ch, const DLString &cArg, Object *list, DLString pocket = "" );
 Object *        get_obj_carry        ( Character *ch, const DLString & );

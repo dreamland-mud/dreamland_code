@@ -26,6 +26,7 @@ protected:
     void damApplyMasterHand( );
     void damApplyMasterSword( );
     void damApplyDeathblow( );
+    void damApplyReligion();
     
     void damEffectMasterHand( );
     void damEffectMasterSword( );

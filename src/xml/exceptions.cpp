@@ -12,15 +12,15 @@
 
 using namespace std;
 
-ExceptionSkipVariable::~ExceptionSkipVariable( ) throw( )
+ExceptionSkipVariable::~ExceptionSkipVariable( ) 
 {
 }
 
-ExceptionVariableNotFound::~ExceptionVariableNotFound( ) throw( )
+ExceptionVariableNotFound::~ExceptionVariableNotFound( ) 
 {
 }
 
-ExceptionXMLError::~ExceptionXMLError( ) throw( )
+ExceptionXMLError::~ExceptionXMLError( ) 
 {
 }
 
@@ -48,7 +48,7 @@ ExceptionXSL::ExceptionXSL( const string type, const string symbol, int position
     setStr( ostr.str( ) );
 }
 
-ExceptionXSL::~ExceptionXSL( ) throw( )
+ExceptionXSL::~ExceptionXSL( ) 
 {
 }
 

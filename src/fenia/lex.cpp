@@ -63,7 +63,7 @@ IdRef::operator Register ()
 }
 
 void
-XMLIdentifier::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType ) 
+XMLIdentifier::fromXML( const XMLNode::Pointer& parent )  
 {
     XMLNode::Pointer node = parent->getFirstNode( );
 

@@ -28,7 +28,7 @@ public:
         {
         }
         
-        inline XMLBoolean( const DLString& value ) throw( ExceptionBadType )
+        inline XMLBoolean( const DLString& value ) 
                 : Boolean( value )
         {
         }
@@ -36,7 +36,7 @@ public:
         /** Возвращает xml представление переменной */
         bool toXML( XMLNode::Pointer& node ) const;
         /** Инициализация класса из xml данных */
-        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 class XMLBooleanNoFalse : public XMLBoolean {
@@ -49,7 +49,7 @@ public:
         {
         }
         
-        inline XMLBooleanNoFalse( const DLString& value ) throw( ExceptionBadType )
+        inline XMLBooleanNoFalse( const DLString& value ) 
                 : XMLBoolean( value )
         {
         }
@@ -67,7 +67,7 @@ public:
         {
         }
         
-        inline XMLBooleanNoTrue( const DLString& value ) throw( ExceptionBadType )
+        inline XMLBooleanNoTrue( const DLString& value ) 
                 : XMLBoolean( value )
         {
         }

@@ -10,8 +10,14 @@
 
 class StringSet : public std::set<DLString> {
 public:
+    /** 
+     * Return a space-separated string of entries,
+     * long entries surrounded by single quotes.
+     */
     DLString toString( ) const;
-    StringSet & fromString( const DLString & );
+
+    /** Split provided string into words and append to the current set. */
+    StringSet & fromString( const DLString &str );
 };
 
 class NumberSet : public std::set<int> {
@@ -20,5 +26,15 @@ public:
     StringSet toStringSet( ) const;
 };
 
+struct StringStorage {
+    void addTransient(const DLString &entry);
+    void addPersistent(const DLString &entry);
+    void refresh();
+
+    StringSet transient;
+    StringSet persistent;
+    StringSet all;
+    DLString allString;
+};
 #endif
 

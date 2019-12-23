@@ -7,15 +7,23 @@
 
 #include "xmlpolymorphvariable.h"
 
+class XMLTableLoader;
+
 class XMLTableElement : public virtual XMLPolymorphVariable {
+    friend class XMLTableLoader;
 public:
     typedef ::Pointer<XMLTableElement> Pointer;
 
     virtual void loaded( );
     virtual void unloaded( );
+    void save() const;
     
     virtual const DLString & getName( ) const = 0;
     virtual void setName( const DLString & ) = 0;
+    
+protected:
+    void setLoader(XMLTableLoader *loader);
+    XMLTableLoader *loader;
 };
 
 #endif

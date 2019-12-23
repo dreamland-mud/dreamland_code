@@ -14,7 +14,7 @@ QuestCannotStartException::QuestCannotStartException( )
 {
 }
 
-QuestCannotStartException::~QuestCannotStartException( ) throw( ) 
+QuestCannotStartException::~QuestCannotStartException( )  
 {
 }
 
@@ -24,7 +24,7 @@ QuestRuntimeException::QuestRuntimeException( const DLString & msg ) : Exception
     LogStream::sendError( ) << "Quest: " << msg << endl;
 }
 
-QuestRuntimeException::~QuestRuntimeException( ) throw( )
+QuestRuntimeException::~QuestRuntimeException( ) 
 {
 }
 

@@ -9,6 +9,7 @@
 #include "merc.h"
 #include "mercdb.h"
 #include "loadsave.h"
+#include "pet.h"
 
 #include "mobindexwrapper.h"
 #include "wrappermanager.h"
@@ -16,6 +17,7 @@
 #include "reglist.h"
 #include "nativeext.h"
 #include "register-impl.h"
+#include "wrap_utils.h"
 
 #include "def.h"
 
@@ -66,7 +68,7 @@ MobIndexWrapper::setTarget( mob_index_data * pIndex )
 }
 
 void 
-MobIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
+MobIndexWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "MOB_INDEX_DATA is dead" );
@@ -148,6 +150,12 @@ NMI_GET( MobIndexWrapper, practicer, "какие группы умений мо�
     return target->practicer.toString( );
 }
 
+NMI_GET( MobIndexWrapper, religion, "какие религии исповедует (reledit list)") 
+{
+    checkTarget( );
+    return target->religion.toString( );
+}
+
 NMI_GET( MobIndexWrapper, area, "зона, в которой прописан моб (.Area)") 
 {
     checkTarget( );
@@ -199,6 +207,24 @@ NMI_INVOKE(MobIndexWrapper, create, "(): создать экземпляр мо�
     return WrapperManager::getThis( )->getWrapper( mob ); 
 }
 
+NMI_INVOKE(MobIndexWrapper, createFor, "(ch): создать экземпляр пета по уровню игрока ch")
+{
+    NPCharacter *mob;
+    checkTarget();
+
+    if (target->behavior->getFirstNode( )->getAttribute(XMLNode::ATTRIBUTE_TYPE) != "LevelAdaptivePet")
+        throw Scripting::Exception("This mob is not a pet");
+
+    PCharacter *client = args2player(args);
+    mob = create_mobile( target );            
+    char_to_room( mob, get_room_index( ROOM_VNUM_FENIA_STORAGE ) );        
+
+    LevelAdaptivePet::Pointer pet = mob->behavior.getDynamicPointer<LevelAdaptivePet>();
+    if (pet)
+        pet->config(client, pet->getChar());
+        
+    return WrapperManager::getThis( )->getWrapper( mob ); 
+}
 
 NMI_INVOKE( MobIndexWrapper, api, "(): печатает этот API" )
 {

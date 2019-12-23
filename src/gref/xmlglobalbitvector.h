@@ -13,7 +13,7 @@ public:
     XMLGlobalBitvector( );
     XMLGlobalBitvector( GlobalRegistryBase * );
     
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
     bool toXML( XMLNode::Pointer& ) const;
 
 protected:

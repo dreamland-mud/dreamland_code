@@ -35,6 +35,7 @@
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
 PROF(universal);
+RELIG(fili);
 
 /*--------------------------------------------------------------------------
  * Questor
@@ -103,6 +104,12 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     tell_fmt( msg.str( ).c_str( ), client, ch, 
               fExpReward ? r->exp : r->points,
               r->gold );
+
+    if (client->getReligion() == god_fili && get_eq_char(client, wear_tattoo)) {
+        int bonus = r->gold;
+        tell_fmt("{YФили{G просил передать тебе еще {Y%3$d{G золот%3$Iую|ые|ых моне%3$Iту|ты|т.", client, ch, bonus);
+        client->gold += bonus;
+    }
 
     client->gold += r->gold;
 
@@ -490,7 +497,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     if (!IS_SET( client->act, PLR_CONFIRMED )) {
         if (attr->getAllVictoriesCount() > 5) {
             tell_raw( client, ch, "Попроси у богов подтверждения своему персонажу, чтобы продолжить выполнять задания.");
-            tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {W{hc{lRсправка подтверждение{lEhelp confirm{x." );
+            tell_raw( client, ch, "Если не знаешь, как это делается, прочитай {y{hc{lRсправка подтверждение{lEhelp confirm{x." );
             return;
         }
     } else if (descr.empty( )) {

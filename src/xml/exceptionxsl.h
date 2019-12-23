@@ -41,7 +41,7 @@ public:
      */
     ExceptionXSL( char symbol, int position  );
 
-    virtual ~ExceptionXSL( ) throw( );
+    virtual ~ExceptionXSL( ) ;
 };
 
 #endif

@@ -63,9 +63,10 @@ int ShopBuyPrice::getSingleCost( ) const
 int ShopBuyPrice::haggle( Character *client ) const
 {
     int cost = toSilver( client );
-    int roll = number_percent( );
+    bool bonus = client->getReligion() == god_fili && get_eq_char(ch, wear_tattoo) != 0;
+    int roll = bonus ? 100 : number_percent( );
 
-    if (!IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && roll < gsn_haggle->getEffective( client )) {
+    if (!IS_OBJ_STAT( obj, ITEM_SELL_EXTRACT ) && (bonus || (roll < gsn_haggle->getEffective( client )))) {
         cost -= obj->cost / 2 * roll / 100;
 
         act( "Ты торгуешься с $C5.", client, 0, article->trader->getKeeper( ), TO_CHAR );

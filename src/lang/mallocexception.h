@@ -11,7 +11,7 @@
 
 class MallocException : public Exception {
 public:
-        MallocException( const DLString &msg, int count ) throw( ) 
+        MallocException( const DLString &msg, int count )  
               : Exception( "Cannot allocate " + DLString(count) + " bytes for " + msg )
         {
         }

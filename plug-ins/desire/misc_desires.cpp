@@ -10,9 +10,12 @@
 
 #include "interp.h"
 #include "fight_safe.h"
+#include "wearloc_utils.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
+
+RELIG(karmina);
 
 /*
  * bloodlust
@@ -31,6 +34,16 @@ void BloodlustDesire::damage( PCharacter *ch )
 
         if (!IS_AWAKE(ch))
             interpret_raw( ch, "stand" );
+
+        if (ch->getReligion() == god_karmina && chance(50)) {
+            Object *tattoo = get_eq_char(ch, wear_tattoo);
+            if (tattoo) {
+                ch->pecho("{rКармина{x утоляет твою жажду, предотвращая безумие.");
+                ch->recho("%^O1 на челе %C2 вспыхивает {rбагряным{x.", tattoo, ch);
+                ch->desires[getIndex( )] = 40;
+                return;
+            }
+        }
 
         for (vch = ch->in_room->people; vch != 0 && ch->fighting == 0; vch = vch_next) {
             vch_next = vch->next_in_room;

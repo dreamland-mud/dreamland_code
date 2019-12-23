@@ -33,7 +33,7 @@ public:
     InvasionScenario * getScenario( const DLString& );
     InvasionScenario * findScenario( const DLString& );
     
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
     
 private:
     XML_VARIABLE Scenarios scenarios;

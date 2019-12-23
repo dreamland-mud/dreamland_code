@@ -2,6 +2,7 @@
  *
  * ruffina, 2004
  */
+#include "logstream.h"
 #include "helpmanager.h"
 #include "character.h"
 
@@ -12,28 +13,19 @@ const DLString HelpArticle::ATTRIBUTE_LEVEL = "level";
 const DLString HelpArticle::ATTRIBUTE_REF = "ref";
 const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
+const DLString HelpArticle::ATTRIBUTE_ID = "id";
 
-long lastID = 0;
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
-                 level( -1 )
+                 level( -1 ),
+                 id(-1)
 {
 }
 
 DLString HelpArticle::getText( Character * ) const
 {
     return *this;
-}
-
-const DLString & HelpArticle::getKeyword( ) const
-{
-    return fullKeyword;
-}
-
-const StringSet & HelpArticle::getKeywords() const
-{
-    return keywords;
 }
 
 int HelpArticle::getLevel( ) const
@@ -58,7 +50,7 @@ int HelpArticle::getID() const
 
 DLString HelpArticle::getTitle(const DLString &label) const 
 {
-    return getKeyword();
+    return getAllKeywordsString();
 }
 
 
@@ -67,41 +59,44 @@ void HelpArticle::setText( const DLString &text )
     assign( text );
 }
 
-void HelpArticle::addKeyword( const DLString &add )
+void HelpArticle::save() const
 {
-    // 'add' can contain a list of keywords, parse them into keywords set.
-    keywords.fromString(add.toLower());
-    // Regenerate concatenated string.
-    fullKeyword = keywords.toString().toUpper();
+    // Empty default impelemntation.
 }
+
 
 const DLString &HelpArticle::getKeywordAttribute() const
 {
-    return keyword;
+    return keywordAttribute;
 }
 
-void HelpArticle::setKeywordAttribute(const DLString &keyword)
+void HelpArticle::setKeywordAttribute(const DLString &keywordAttribute)
 {
-    this->keyword = keyword;
-    addKeyword( keyword );
+    this->keywordAttribute = keywordAttribute.toUpper();
+    refreshKeywords();
 }
 
-const StringSet & HelpArticle::getLabels() const
+void HelpArticle::addAutoKeyword(const DLString &keyword)
 {
-    return labels;
+    keywordsAuto.fromString(keyword.toUpper().quote());
+    refreshKeywords();
 }
 
-void HelpArticle::addLabel(const DLString &label) 
+void HelpArticle::addAutoKeyword(const StringSet &keywords)
 {
-    labels.insert(label);
+    for (StringSet::const_iterator k = keywords.begin(); k != keywords.end(); k++)
+        keywordsAuto.insert(k->toUpper());
+
+    refreshKeywords();
 }
 
-void HelpArticle::setLabelAttribute(const DLString &attribute)
+void HelpArticle::refreshKeywords()
 {
-    this->labelAttribute = attribute;
-    StringSet newLabels;
-    newLabels.fromString(labelAttribute);
-    labels.insert(newLabels.begin(), newLabels.end());
+    keywordsAll.clear();
+    keywordsAll.insert(keywordsAuto.begin(), keywordsAuto.end());
+    keywordsAll.fromString(keywordAttribute);
+
+    keywordsAllString = keywordsAll.toString().toUpper();
 }
 
 bool HelpArticle::visible( Character *ch ) const
@@ -114,11 +109,11 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     XMLStringNoEmpty xmlString( *this );
 
     if (!xmlString.toXML( parent ))
-        if (keyword.empty( ) && ref.empty( ) && refby.empty( ))
+        if (keywordAttribute.empty( ) && ref.empty( ) && refby.empty( ) && id <= 0)
             return false;
     
-    if (!keyword.empty( ))
-        parent->insertAttribute( ATTRIBUTE_KEYWORD, keyword );
+    if (!keywordAttribute.empty( ))
+        parent->insertAttribute( ATTRIBUTE_KEYWORD, keywordAttribute );
 
     if (level >= -1)
         parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
@@ -129,29 +124,31 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!refby.empty( ))
         parent->insertAttribute( ATTRIBUTE_REFBY, refby.toString( ) );
 
-    if (!labelAttribute.empty())
-        parent->insertAttribute(ATTRIBUTE_LABELS, labelAttribute);
+    if (!labels.persistent.empty())
+        parent->insertAttribute(ATTRIBUTE_LABELS, labels.persistent.toString());
+
+    if (id > 0)
+        parent->insertAttribute(ATTRIBUTE_ID, DLString(id));
 
     return true;
 }
 
-void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadType )
+void HelpArticle::fromXML( const XMLNode::Pointer &parent ) 
 {
     XMLStringNoEmpty xmlString;
     
     xmlString.fromXML( parent );
     assign( xmlString );
 
-    keyword = parent->getAttribute( ATTRIBUTE_KEYWORD );
-    addKeyword( keyword );
+    setKeywordAttribute(
+        parent->getAttribute( ATTRIBUTE_KEYWORD ));
 
-    if (parent->hasAttribute( ATTRIBUTE_LEVEL ))
-        level = parent->getAttribute( ATTRIBUTE_LEVEL ).toInt( );
-
+    parent->getAttribute( ATTRIBUTE_LEVEL, level);
+    parent->getAttribute(ATTRIBUTE_ID, id);
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );
     refby.fromString( parent->getAttribute( ATTRIBUTE_REFBY ) );
-    labelAttribute = parent->getAttribute(ATTRIBUTE_LABELS);
-    labels.fromString(labelAttribute);
+    labels.persistent.clear();
+    labels.addPersistent(parent->getAttribute(ATTRIBUTE_LABELS));
 }
 
 /*-----------------------------------------------------------------------
@@ -174,13 +171,39 @@ HelpManager::~HelpManager( )
 void HelpManager::registrate( HelpArticle::Pointer art )
 {
     articles.push_back( art );
-    art->setID(++lastID);
+
+    if (art->getID() > 0) {
+        if (articlesById.count(art->getID()) > 0)
+            LogStream::sendError() << "Duplicate help ID " << art->getID() << " for "
+                << art->getAllKeywordsString() << " and " << articlesById[art->getID()]->getAllKeywordsString() << endl;
+
+        articlesById[art->getID()] = art;
+    }
 }
 
 void HelpManager::unregistrate( HelpArticle::Pointer art )
 {
     articles.remove( art );
-    art->setID(-1);
+    articlesById.erase(art->getID());
 }
 
+HelpArticle::Pointer HelpManager::getArticle(int id) const
+{
+    ArticlesById::const_iterator a = articlesById.find(id);
+    if (a == articlesById.end())
+        return HelpArticle::Pointer();
+    else
+        return a->second;
+}
 
+int HelpManager::getLastID() const
+{
+    HelpArticles::const_iterator a;
+    int max_id = 0;
+
+    for (a = getArticles( ).begin( ); a != getArticles( ).end( ); a++)
+        if ((*a)->getID() > max_id)
+            max_id = (*a)->getID();
+
+    return max_id;
+}

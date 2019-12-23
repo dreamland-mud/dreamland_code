@@ -19,13 +19,13 @@ public:
     DLFileStream( const DLFile &dir, const DLString &filename, const DLString &fileext = DLString::emptyString );
     virtual ~DLFileStream( );
 
-    void toStream( std::ostream & ) throw( ExceptionDBIO );
-    void fromString( const DLString & ) throw( ExceptionDBIO );
-    vector<DLString> toVector() throw (ExceptionDBIO);
+    void toStream( std::ostream & ) ;
+    void fromString( const DLString & ) ;
+    vector<DLString> toVector() ;
 
 protected:
-    void openInputStream( ) throw( ExceptionDBIO );
-    void openOutputStream( ) throw( ExceptionDBIO );
+    void openInputStream( ) ;
+    void openOutputStream( ) ;
 
     std::ifstream istr;
     std::ofstream ostr;

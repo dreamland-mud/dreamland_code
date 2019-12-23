@@ -131,6 +131,14 @@ public:
         {
                 return dynamic_cast<T1*>( pointer );
         }
+
+        /** @return Получить обьект указателя и привести через dynamic_cast и const_cast к типу const T1*/
+        template<typename T1>
+        inline const T1* getDynamicPointer( ) const
+        {
+                return const_cast<T1*>(dynamic_cast<T1*>( pointer ));
+        }
+
         
         /** Установить указатель */
         inline void setPointer( T* pointer )

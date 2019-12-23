@@ -29,7 +29,7 @@ public:
     virtual ~XMLVariable( );
 
 public:
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) = 0;
+    virtual void fromXML( const XMLNode::Pointer& node )  = 0;
     /** @param - пустой xmlnode передается по ссылке */
     virtual bool toXML( XMLNode::Pointer& node ) const = 0;
 };

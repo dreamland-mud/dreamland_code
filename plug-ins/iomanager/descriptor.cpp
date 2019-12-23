@@ -338,7 +338,7 @@ RPCRUN(editor_save)
     PCharacter *pch = ch->getPC();
 
     if(pch) {
-        pch->getAttributes().handleEvent(WebEditorSaveArguments(text));
+        pch->getAttributes().handleEvent(WebEditorSaveArguments(pch, text));
         LogStream::sendError() << "editor_save: " << text << endl;
         mprog_editorsave(pch, text);
     }
@@ -494,7 +494,7 @@ sendVersion(Descriptor *d)
 {
     Json::Value val;
     val["command"] = "version";
-    val["args"][0] = "DreamLand Web Client/1.9";
+    val["args"][0] = "DreamLand Web Client/1.10";
     val["args"][1] = d->websock.nonce;
     LogStream::sendError( ) << "WebSock: sending server version" << endl;
     d->writeWSCommand(val);

@@ -41,6 +41,7 @@
 #include "interp.h"
 #include "def.h"
 
+RELIG(godiva);
 
 /*
  * 'second wield' skill command
@@ -210,6 +211,12 @@ SKILL_RUNP( disarm )
         {
                 ch->send_to("Сейчас ты не сражаешься.\n\r");
                 return;
+        }
+
+        if (victim->getReligion() == god_godiva && get_eq_char(victim, wear_tattoo)) {
+            ch->pecho("{DПризрачная аура{x вокруг %1$C2 мешает тебе обезоружить %1$P2.", victim);
+            victim->pecho("%^C1 пытается обезоружить тебя, но не может пробиться сквозь {Dпризрачную ауру{x.", ch);
+            return;
         }
 
         if ( ( obj = get_eq_char( victim, wear_wield ) ) == 0 )

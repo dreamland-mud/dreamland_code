@@ -13,7 +13,7 @@
 /*---------------------------------------------------------------------------
  * XMLStringPredicate
  *--------------------------------------------------------------------------*/
-void XMLStringPredicate::fromXML( const XMLNode::Pointer & parent ) throw (ExceptionBadType) 
+void XMLStringPredicate::fromXML( const XMLNode::Pointer & parent )  
 {
     XMLString::fromXML( parent );
     XMLPredicate::fromXML( parent );

@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#include "logstream.h"
 #include "commandbase.h"
 #include "interprethandler.h"
 #include "staticlist.h"
@@ -21,12 +22,14 @@ using namespace std;
 
 class Descriptor;
 struct area_data;
+class GlobalBitvector;
 
 typedef enum {
     ED_NO_FLAG=0,
     ED_UPPER_FIRST_CHAR=1,
     ED_NO_NEWLINE=2,
-    ED_ADD_NEWLINE=4
+    ED_ADD_NEWLINE=4,
+    ED_HELP_HINTS=8
 } editor_flags;
 
 class OLCCommand : public CommandBase {
@@ -72,7 +75,10 @@ public:
     static bool can_edit( Character *, int );
     static bool can_edit( Character *, area_data * );
     
-    /* returns corresponding area pointer for mob/room/obj vnum */
+    /** Find OLC input handler for descriptor. */
+    static OLCState::Pointer getOLCState(Descriptor *d);
+
+    /** returns corresponding area pointer for mob/room/obj vnum */
     static area_data *get_vnum_area( int );
 
 protected:
@@ -89,18 +95,25 @@ protected:
 
     bool mapEdit( Properties &map, DLString &args );
     bool flagBitsEdit(const FlagTable &table, int &field);
+    bool flagBitsEdit(const FlagTable &table, Flags &field);
     bool flagValueEdit(const FlagTable &table, int &field);
+    bool flagValueEdit(const FlagTable &table, Flags &field);
+    bool enumerationArrayEdit(const FlagTable &table, EnumerationArray &field);
+    template<typename E> inline
+    bool globalBitvectorEdit(GlobalBitvector &field);
     bool numberEdit(int minValue, int maxValue, int &field);
     bool numberEdit(long minValue, long maxValue, long &field);
+    bool rangeEdit(int minValue, int maxValue, int &field1, int &field2);
     bool diceEdit(int *field);
     bool extraDescrEdit(EXTRA_DESCR_DATA *&list);
     bool editorCopy(const DLString &original);
     bool editorCopy(const char *field);
     bool editorPaste(DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editorPaste(char *&field, editor_flags flags = ED_NO_FLAG);
+    bool editorWeb(const DLString &original, const DLString &saveCommand, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, DLString &original, editor_flags flags = ED_NO_FLAG);
     bool editor(const char *argument, char *&field, editor_flags flags = ED_NO_FLAG);
-
+    
     Descriptor *owner;
     XML_VARIABLE XMLBoolean inSedit;
     XML_VARIABLE OLCStringEditor strEditor;
@@ -135,8 +148,14 @@ public:
             state->lastCmd.setValue( getName( ) );
             state->lastArgs.setValue( args );
 
-            if (((*state)->*method)( pch, args ))
-                state->changed( pch );
+            try {
+                if (((*state)->*method)( pch, args ))
+                    state->changed( pch );
+            } catch (const Exception &e) {
+                LogStream::sendError() << "OLC " << e.what() << endl;
+                pch->println(e.what());
+                state->detach(pch);
+            }
         }
         
         ::Pointer<T> state;
@@ -173,6 +192,8 @@ public:
     }
 };    
 
+extern DLString web_edit_button(bool showWeb, Character *ch, const DLString &editor, const DLString &args);
+
 #define OLC_STATE(State) \
 template <> \
 OLCStateTemplate<State>::Chain *OLCStateTemplate<State>::Chain::first = 0
@@ -183,5 +204,36 @@ template <> bool State::cmd<olc::Cmd##_type>( PCharacter *ch, char *argument ); 
 OLCStateTemplate<State>::Chain olc_##State##_##Cmd##_registrator( #Cmd, OLCStateTemplate<State>::SubCommandInfo(&State::cmd<olc::Cmd##_type>, rname, help)); \
 template <> bool State::cmd<olc::Cmd##_type>( PCharacter *ch, char *argument )
 
+template<typename E> inline
+bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ch->printf("Использование:\r\n{W%s{x значение - установить или убрать значение\r\n"
+                   "{W? %s{x - показать таблицу значений\r\n", cmd, cmd);
+        return false;
+    }
+
+    GlobalRegistry<E> *registry = static_cast<GlobalRegistry<E>*>(field.getRegistry());
+    E *elem = registry->findUnstrict(args);
+    if (!elem) {
+        ch->printf("Значение '%s' не найдено.\r\n", args.c_str());
+        return false;
+    }
+
+    int ndx = elem->getIndex();
+    if (field.isSet(ndx)) {
+        field.remove(ndx);
+        ch->printf("Удаляем %s, новое значение: {g%s{x\r\n", elem->getName().c_str(), field.toString().c_str());
+        return true;
+    }
+
+    field.set(ndx);
+    ch->printf("Добавляем %s, новое значение: {g%s{x\r\n", elem->getName().c_str(), field.toString().c_str());
+    return true;    
+}
 
 #endif

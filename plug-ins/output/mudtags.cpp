@@ -6,6 +6,7 @@
 #include "dl_ctype.h"
 #include "logstream.h"
 #include "descriptor.h"
+#include "websocketrpc.h"
 #include "pcharacter.h"
 #include "race.h"
 #include "merc.h"
@@ -14,11 +15,6 @@
 LANG(common);   LANG(human);   LANG(dwarvish);
 LANG(elvish);   LANG(gnomish); LANG(giant);
 LANG(trollish); LANG(cat);
-
-static bool is_websock( Character *ch )
-{
-    return ch && ch->desc && ch->desc->websock.state == WS_ESTABLISHED;
-}
 
 /*------------------------------------------------------------------------------------
  * ColorTags
@@ -602,13 +598,35 @@ void VisibilityTags::run( ostringstream &out )
         }
     }
 }
-            
+
+// Read chars from 'p' while they are numbers. Rollback if number is followed by "."
+// (help 2.create vs help 2).
+static DLString collect_number(const char *&p) {
+    const char *p_backup = p;
+    DLString number;
+
+    while (isdigit(*++p)) {
+        number.append(*p);
+    }
+
+    if (*p == '.') {
+        p = p_backup;
+        return DLString::emptyString;
+    }
+
+    --p;
+    return number;
+}
+
+
 // {h
 // close hyper link: x
-// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>),
-// g (<hg>skill group names</hg>)
+// supported hyper link types: c (<hc>command</hc>), l (<hl>hyper link</hl>), h (<hh>help article</hh>
+// or <hh id='234'>article</hh>), g (<hg>skill group names</hg>)
 void VisibilityTags::hyper_tag_start( ostringstream &out )
 {
+    DLString id;
+
     switch (*++p) {
     case 'c': 
         my_hyper_tag = "hc";
@@ -620,6 +638,7 @@ void VisibilityTags::hyper_tag_start( ostringstream &out )
 
     case 'h': 
         my_hyper_tag = "hh";
+        id = collect_number(p);
         break;
 
     case 'g': 
@@ -633,8 +652,12 @@ void VisibilityTags::hyper_tag_start( ostringstream &out )
         return;
     }
 
-    if (IS_SET(my_invis, INVIS_WEB)) 
-        out << "\036" << "<" << my_hyper_tag << ">" << "\037";
+    if (IS_SET(my_invis, INVIS_WEB)) {
+        out << "\036" << "<" << my_hyper_tag;
+        if (!id.empty())
+            out << " id='" << id << "'";
+        out << ">" << "\037";
+    }
 }    
 
 void VisibilityTags::hyper_tag_end( ostringstream &out )

@@ -15,12 +15,12 @@
 
 const DLString Char::TYPE = "Char";
 
-void Char::fromString( const DLString & value ) throw( ExceptionBadType )
+void Char::fromString( const DLString & value ) 
 {
     this->value = value[0];
 }
 
-DLString Char::toString( ) const throw( )
+DLString Char::toString( ) const 
 {
     return DLString( value );
 }

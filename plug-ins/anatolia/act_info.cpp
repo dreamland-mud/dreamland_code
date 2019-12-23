@@ -73,7 +73,7 @@
 #include "playerattributes.h"
 
 #include "affect.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcrace.h"
@@ -302,7 +302,6 @@ CMDRUNP( oscore )
 {
     ostringstream buf;
     Room *room = 0;
-    int i;
     PCharacter *pch = ch->getPC( );
 
     buf << fmt( 0, "Ты %1$s%2$s{x, уровень %3$d",
@@ -1130,17 +1129,37 @@ CMDRUNP( request )
             return;
         }
 
-        if ((!IS_GOOD(ch) && !victim->getRace( )->getAttitude( *ch->getRace( ) ).isSet( RACE_DONATES ))
-                || IS_EVIL(ch))
-        {
-                do_say(victim, "У тебя нечистая душа, я ничего тебе не дам!");
-                return;
-        }
-
         if (ch->move < (50 + ch->getRealLevel( )))
         {
                 do_say(victim, "Ты выглядишь устало, может, отдохнешь сначала?");
                 return;
+        }
+
+        Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
+
+        if (att.isSet( RACE_DONATES ))
+        {
+            if (IS_EVIL( victim )) {
+                interpret( victim, "grin" );
+                return;
+            }
+        } else
+        {
+            if (!IS_GOOD(ch) || !IS_GOOD(victim))
+            {
+                if (IS_EVIL(ch) && !IS_EVIL(victim))
+                {
+                    do_say(victim, "У тебя нечистая душа, я ничего тебе не дам!");
+                } else
+                {
+                    do_say(victim, "Я не дам тебе ничего!!");
+                }
+                if (ch->getModifyLevel( ) > 30 && number_percent() > 75) 
+                {
+                    interpret_raw( victim, "murder", ch->getNameP( ));
+                }
+                return;
+            }
         }
 
         ch->setWaitViolence( 1 );
@@ -1158,20 +1177,6 @@ CMDRUNP( request )
                 || IS_SET(obj->extra_flags, ITEM_INVENTORY))
         {
                 do_say(victim, "Извини, у меня нет этого.");
-                return;
-        }
-        
-        if (victim->getRace( )->getAttitude( *ch->getRace( ) ).isSet( RACE_DONATES ))
-        {
-            if (IS_EVIL( victim )) {
-                interpret( victim, "grin" );
-                return;
-            }
-
-        } else if (!IS_GOOD(victim))
-        {
-                do_say(victim, "Я не дам тебе ничего!!");
-                interpret_raw( victim, "murder", ch->getNameP( ));
                 return;
         }
 
@@ -1458,7 +1463,7 @@ static void do_score_args(Character *ch, const DLString &arg)
         return;
     } 
 	if (arg_oneof(arg, "ethos", "этос", "мировоззрение")) {
-        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos).c_str());
+        ch->pecho("У тебя %s этос.", ethos_table.message(ch->ethos, '1').c_str());
         return;
     } 
 	if (arg_oneof(arg, "hometown", "дом")) {
@@ -1564,7 +1569,6 @@ CMDRUNP( score )
     XMLAttributeTimer::Pointer qd = pch->getAttributes( ).findAttr<XMLAttributeTimer>( "questdata" );
     int age = pch->age.getYears( );
     Room *room = get_room_index( pch->getHometown( )->getAltar( ) );
-    bool fRus = ch->getConfig( )->rucommands;
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
     if (ch->getProfession( ) == prof_universal) 
@@ -1604,8 +1608,8 @@ CMDRUNP( score )
 "     | %sРаса :{x  %-12s %s| %s{lRУм  :{lE Int:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sПрактик   :{x   %3d      %s|\n\r"
 "     | %sПол  :{x  %-11s  %s| %s{lRМудр:{lE Wis:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sТренировок:{x   %3d      %s|\n\r"
 "     | %sКласс:{x  %-13s%s| %s{lRЛовк:{lE Dex:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. единиц:{x  %-5d%s  |\n\r"
-"     | %s{lRНатура:{lEAlign: {lx{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
-"     | %s{lRЭтос {lEEthos{lx:{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
+"     | %sНатура:{x %-11s  %s| %s{lRСлож:{lE Con:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %sКвест. время:{x   %-3d %s   |\n\r"
+"     | %sЭтос :{x  %-12s %s| %s{lRОбая:{lE Cha:{lx{x %2d{c({x%2d{c){x {C%2d{x %s| %s%s :{x   %3d      %s|\n\r"
 "     | %sДом  :{x  %-30s %s| {Y%-22s %s|\n\r"                
 "     |%s+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+%s|\n\r",
 
@@ -1650,7 +1654,7 @@ CMDRUNP( score )
             CLR_CAPT,
             pch->getQuestPoints(),
             CLR_FRAME,
-    
+
             CLR_CAPT,
             align_name_short(ch, Grammar::MultiGender::FEMININE),
             CLR_BAR,
@@ -1662,8 +1666,7 @@ CMDRUNP( score )
             CLR_FRAME,
 
             CLR_CAPT,
-            fRus ?  ethos_table.message( ch->ethos ).cutSize( 12 ).c_str( )
-                  : ethos_table.name( ch->ethos ).c_str( ),
+            ethos_table.message( ch->ethos, '1' ).cutSize( 12 ).c_str( ),
             CLR_BAR,
             CLR_CAPT,
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA), pch->getMaxStat(STAT_CHA),
@@ -2371,6 +2374,16 @@ struct HelpFinder {
     typedef vector<HelpArticle::Pointer> ArticleArray;
 
     HelpFinder(Character *ch, const char *argument) {
+        // Find help by ID.
+        Integer id;
+        if (Integer::tryParse(id, argument)) {
+            HelpArticle::Pointer exact = helpManager->getArticle(id);
+            if (exact)
+                articles.push_back(exact);
+            return;
+        }
+
+        // Find help by keyword.
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
@@ -2398,12 +2411,12 @@ struct HelpFinder {
 private:
     bool articleMatches(const HelpArticle::Pointer &a, const char *argument) const
     {
-        const DLString &fullKw = a->getKeyword();
+        const DLString &fullKw = a->getAllKeywordsString();
 
         if (is_name(argument, fullKw.c_str()))
             return true; 
 
-        for (StringSet::const_iterator k = (*a)->getKeywords().begin(); k != (*a)->getKeywords().end(); k++)
+        for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
             if (is_name(argument, (*k).c_str()))
                 return true; 
 
@@ -2461,7 +2474,7 @@ CMDRUNP( help )
     // Several matches, display them all with numbers.
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
     for (unsigned int a = 0; a < articles.size(); a++) 
-        buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getKeyword() << endl;
+        buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getAllKeywordsString() << endl;
     buf << endl
         << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." 
         << endl;
@@ -2629,12 +2642,12 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "стоит {W" << obj->cost << "{x серебра";
     else
         buf << "ничего не стоит";
-   
+
     // XXX 'изготовлено из' + падежи
     mat = obj->getMaterial( );
     if (mat && strcmp( mat, "none" ) && strcmp( mat, "oldstyle" ))
         buf << ", материал {W" << mat << "{x";
-    
+
     buf << endl;
 
     bitstring_t extra = obj->extra_flags;
@@ -2773,4 +2786,3 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     for (paf = obj->affected; paf != 0; paf = paf->next)
         lore_fmt_affect( paf, buf );
 }
-

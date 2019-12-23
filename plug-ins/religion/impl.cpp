@@ -9,7 +9,6 @@
 #include "objectbehaviorplugin.h"
 #include "mocregistrator.h"
 #include "dlxmlloader.h"
-#include "xmltableloaderplugin.h"
 #include "xmlattributeplugin.h"
 
 #include "templeman.h"
@@ -17,8 +16,6 @@
 #include "tattoo.h"
 #include "defaultreligion.h"
 #include "religionattribute.h"
-
-TABLE_LOADER(ReligionLoader, "religions", "Religion");
 
 extern "C"
 {

@@ -16,7 +16,7 @@ XMLGlobalBitvector::XMLGlobalBitvector( GlobalRegistryBase *reg )
 {
 }
 
-void XMLGlobalBitvector::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLGlobalBitvector::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLString str;
     str.fromXML( parent );

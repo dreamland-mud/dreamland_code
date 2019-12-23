@@ -32,7 +32,7 @@ public:
         {
         }
         
-        inline XMLShort( const DLString& value ) throw( ExceptionBadType )
+        inline XMLShort( const DLString& value ) 
                 : Short( value )
         {
         }
@@ -40,7 +40,7 @@ public:
         /** Возвращает xml представление переменной */
         bool toXML( XMLNode::Pointer& node ) const;
         /** Инициализация класса из xml данных */
-        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 

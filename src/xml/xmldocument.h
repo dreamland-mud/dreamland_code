@@ -62,8 +62,8 @@ public:
                 else return *nodes.begin( );
         }
         
-        void save( ostream& ) const throw( ExceptionXMLError );
-        void load( istream& ) throw( ExceptionXMLError );
+        void save( ostream& ) const ;
+        void load( istream& ) ;
 private:
         DLString encode(const DLString &) const;
         void emit( const XMLNode &, ostream&, int, bool& ) const;

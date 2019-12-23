@@ -103,6 +103,7 @@ load_mobile(FILE *fp, MOB_INDEX_DATA *pMobIndex)
     pMobIndex->act              = fread_flag( fp ) | ACT_IS_NPC | race->getAct( );
     pMobIndex->affected_by      = fread_flag( fp ) | race->getAff( );
     pMobIndex->practicer.clear( );
+    pMobIndex->religion.clear( );
     pMobIndex->detection        = race->getDet( );
 
     pMobIndex->alignment        = fread_number( fp );
@@ -222,6 +223,7 @@ load_mobile(FILE *fp, MOB_INDEX_DATA *pMobIndex)
 
         } else if (letter == 'G') {
             pMobIndex->practicer.fromString( fread_dlstring( fp ) );
+            // Note: religion and any other new things won't be saved to the old format.
         } else if (letter == 'N') {
             pMobIndex->gram_number = Grammar::Number(fread_word(fp));
         } else if (letter == 'X') {

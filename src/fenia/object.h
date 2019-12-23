@@ -43,7 +43,7 @@ public:
     struct NotRecoveredException : public Exception {
         NotRecoveredException() : Exception("Object not recovered") { }
 
-        virtual ~NotRecoveredException( ) throw( );
+        virtual ~NotRecoveredException( ) ;
     };
 
     Object();
@@ -70,7 +70,7 @@ public:
         return id;
     }
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     void backup();

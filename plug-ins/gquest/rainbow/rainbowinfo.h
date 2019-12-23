@@ -28,7 +28,7 @@ public:
     virtual const DLString & getQuestID( ) const;
     virtual const DLString & getQuestName( ) const;  
 
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
 
     inline static RainbowGQuestInfo* getThis( ); 
 

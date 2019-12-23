@@ -270,13 +270,13 @@ public:
         * Набор функций для конвертации содержимого строк в другие типы
         * При при неудачном преобразовании генерится исключение()
         */
-        int toInt( ) const throw( ExceptionBadType );
-        long toLong( ) const throw( ExceptionBadType );
-        long long toLongLong( ) const throw( ExceptionBadType );
-        long int toLongInt( ) const throw( ExceptionBadType );
-        bool toBoolean( ) const throw( ExceptionBadType );
-        char toChar( ) const throw( ExceptionBadType );
-        unsigned char toByte( ) const throw( ExceptionBadType );
+        int toInt( ) const ;
+        long toLong( ) const ;
+        long long toLongLong( ) const ;
+        long int toLongInt( ) const ;
+        bool toBoolean( ) const ;
+        char toChar( ) const ;
+        unsigned char toByte( ) const ;
         
         /*
          * Compare strings, case insensitive, for prefix matching.
@@ -308,16 +308,17 @@ public:
         bool isRussian( ) const;
         
         /** убирает пробелы в начале и конце строки */
-        inline void stripWhiteSpace( )
+        inline DLString& stripWhiteSpace( )
         {
                 stripRightWhiteSpace( );
                 stripLeftWhiteSpace( );
+                return *this;
         }
 
         /** убирает пробелы в начале строки */
-        void stripLeftWhiteSpace( );
+        DLString & stripLeftWhiteSpace( );
         /** убирает пробелы в конце строки */
-        void stripRightWhiteSpace( );
+        DLString & stripRightWhiteSpace( );
         
         DLString& toLower( );
         DLString toLower( ) const;

@@ -40,7 +40,7 @@ XMLOptionalString::set( ) const
 }
 
 void 
-XMLOptionalString::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLOptionalString::fromXML(const XMLNode::Pointer &parent)
 {
     set(true);
     XMLString::fromXML(parent);
@@ -76,7 +76,7 @@ XMLArmor::init(int p, int b, int s, int e)
 }
 
 void 
-XMLArmor::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLArmor::fromXML(const XMLNode::Pointer &parent)
 {
     pierce = parent->getAttribute("pierce").toInt( );
     bash = parent->getAttribute("bash").toInt( );
@@ -125,7 +125,7 @@ XMLFlagsDiff::setAddDel(bitstring_t a, bitstring_t d)
 
 
 void
-XMLFlagsDiff::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLFlagsDiff::fromXML(const XMLNode::Pointer &parent) 
 {
     add = table->bitstring(parent->getAttribute("add"));
     del = table->bitstring(parent->getAttribute("del"));
@@ -166,7 +166,7 @@ XMLDice::set(int n = 0, int t = 0, int b = 0)
 }
 
 void 
-XMLDice::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLDice::fromXML(const XMLNode::Pointer &parent) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
 
@@ -207,7 +207,7 @@ XMLExtraDescr::toXML(XMLNode::Pointer &parent) const
 }
 
 void 
-XMLExtraDescr::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLExtraDescr::fromXML(const XMLNode::Pointer &parent) 
 {
     keyword = parent->getAttribute("keyword");
     XMLString::fromXML(parent);
@@ -234,7 +234,7 @@ XMLApply::toXML(XMLNode::Pointer &parent) const
 }
 
 void 
-XMLApply::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLApply::fromXML(const XMLNode::Pointer &parent) 
 {
     where = apply_flags.value(parent->getAttribute("to"));
     XMLIntegerNoEmpty::fromXML(parent);

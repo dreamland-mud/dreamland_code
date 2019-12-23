@@ -34,13 +34,13 @@ public:
         {
         }
 
-        inline Byte( const DLString& value ) throw( ExceptionBadType )
+        inline Byte( const DLString& value ) 
         {
                 fromString( value );
         }
         
-        DLString toString( ) const throw( );
-        void fromString( const DLString& value ) throw( ExceptionBadType );
+        DLString toString( ) const ;
+        void fromString( const DLString& value ) ;
         
         inline unsigned char getValue( ) const
         {

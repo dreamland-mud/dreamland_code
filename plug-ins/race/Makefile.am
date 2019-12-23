@@ -4,11 +4,13 @@ librace.la
 include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
+-I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/alignment \
 -I$(top_srcdir)/plug-ins/help
 
 librace_la_LIBADD = ../system/libsystem.la \
+../descriptor/libdescriptor.la \
 ../help/libhelp.la \
 ../alignment/libalignment.la
 

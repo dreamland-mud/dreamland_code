@@ -368,7 +368,7 @@ SKILL_RUNP( judge )
                 ch->pecho("У %1$#C2 %2$s этос и %3$s характер.\n\r"
                           "%1$#^P2 заслуги перед законом: %4$d.",
                           victim, 
-                          ethos_table.message( victim->ethos ).c_str( ),
+                          ethos_table.message( victim->ethos, '1' ).c_str( ),
                           align_name( victim ).ruscase( '1' ).c_str( ),
                           victim->getPC( )->loyalty.getValue( ));
 

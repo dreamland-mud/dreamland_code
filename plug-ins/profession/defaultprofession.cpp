@@ -22,18 +22,20 @@ static const DLString LABEL_CLASS = "class";
  *------------------------------------------------------------------*/
 const DLString ProfessionHelp::TYPE = "ProfessionHelp";
 
-void ProfessionHelp::setProfession( Profession::Pointer prof )
+void ProfessionHelp::save() const
+{
+    if (prof)
+        prof->save();
+}
+
+void ProfessionHelp::setProfession( DefaultProfession::Pointer prof )
 {
     this->prof = prof;
     
-    if (!keyword.empty( ))
-        keywords.fromString( keyword.toLower() );
-
-    keywords.insert( prof->getName( ) );
-    keywords.insert( prof->getRusName( ).ruscase( '1' ) );
-    keywords.insert( prof->getMltName( ).ruscase( '1' ) );
-    fullKeyword = keywords.toString( ).toUpper( );
-    addLabel(LABEL_CLASS);
+    addAutoKeyword( prof->getName( ) );
+    addAutoKeyword( prof->getRusName( ).ruscase( '1' ) );
+    addAutoKeyword( prof->getMltName( ).ruscase( '1' ) );
+    labels.addTransient(LABEL_CLASS);
 
     helpManager->registrate( Pointer( this ) );
 }
@@ -42,8 +44,10 @@ void ProfessionHelp::unsetProfession( )
 {
     helpManager->unregistrate( Pointer( this ) );
     prof.clear( );
-    keywords.clear();
-    fullKeyword = "";
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
 }
 
 DLString ProfessionHelp::getTitle(const DLString &label) const

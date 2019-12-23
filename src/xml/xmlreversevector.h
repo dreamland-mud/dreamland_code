@@ -18,7 +18,7 @@ public:
     using std::vector<T>::push_back;
     using std::vector<T>::erase;
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+    virtual void fromXML( const XMLNode::Pointer& node ) 
     {
         reverse.clear( );
         XMLVectorBase<T>::fromXML( node );

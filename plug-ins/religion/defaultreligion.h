@@ -12,6 +12,9 @@
 #include "xmlvariablecontainer.h"
 #include "xmlenumeration.h"
 #include "xmlboolean.h"
+#include "xmltableloaderplugin.h"
+#include "xmlglobalarray.h"
+#include "xmlinteger.h"
 
 #include "religion.h"
 #include "helpmanager.h"
@@ -19,6 +22,9 @@
 
 class Skill;
 class Liquid;
+class DefaultReligion;
+
+TABLE_LOADER_DECL(ReligionLoader);
 
 /*
  * ReligionHelp
@@ -27,8 +33,9 @@ class ReligionHelp : public MarkupHelpArticle {
 public:
     typedef ::Pointer<ReligionHelp> Pointer;
 
-    virtual void setReligion( Religion::Pointer );
+    virtual void setReligion( ::Pointer<DefaultReligion> religion );
     virtual void unsetReligion( );
+    virtual void save() const;
 
     virtual DLString getTitle(const DLString &label) const;
     virtual void getRawText( Character *, ostringstream & ) const;
@@ -36,7 +43,7 @@ public:
     static const DLString TYPE;
 
 protected:
-    Religion::Pointer religion;
+    ::Pointer<DefaultReligion> religion;
 };
 
 inline const DLString & ReligionHelp::getType( ) const
@@ -76,6 +83,8 @@ public:
     virtual const DLString &getShortDescr( ) const;
     virtual const DLString &getDescription( ) const;
     virtual bool isAllowed( Character * ) const;
+    virtual bool available(Character *) const;
+    DLString reasonWhy(Character *) const;
     virtual const DLString& getNameFor( Character * ) const;
     
     inline const Flags & getAlign() const;
@@ -88,7 +97,7 @@ public:
     virtual bool likesStolen(Object *) const;
     virtual bool ignoresItem(Object *) const;
 
-protected:
+// Fields are public to simplify online editing.
     XML_VARIABLE XMLString  shortDescr;
     XML_VARIABLE XMLString  nameRus;
     XML_VARIABLE XMLString  description;
@@ -98,6 +107,11 @@ protected:
     XML_VARIABLE XMLPointerNoEmpty<ReligionHelp> help;
     XML_VARIABLE XMLEnumeration sex;
     XML_VARIABLE GodLikes likes;
+    XML_VARIABLE XMLFlagsNoEmpty flags;
+    XML_VARIABLE XMLEnumerationArray minstat, maxstat;
+    XML_VARIABLE XMLGlobalBitvector clans;
+    XML_VARIABLE XMLIntegerNoEmpty minage, maxage;
+    XML_VARIABLE XMLIntegerNoEmpty tattooVnum;
 };
 
 inline const Flags & DefaultReligion::getAlign() const

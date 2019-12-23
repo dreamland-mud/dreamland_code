@@ -235,20 +235,20 @@ void Character::extract( )
  * set-get methods inherited from CharacterMemoryInterface
  * with some additional methods needed
  *****************************************************************************/
-const DLString& Character::getName( ) const throw( )
+const DLString& Character::getName( ) const 
 {
     return name.getValue( );
 }
-void Character::setName( const DLString& name ) throw( )
+void Character::setName( const DLString& name ) 
 {
     this->name.setValue( name );
     updateCachedNoun( );
 }
-short Character::getLevel( ) const throw( )
+short Character::getLevel( ) const 
 {
     return level.getValue( );
 }
-void Character::setLevel( short level ) throw( )
+void Character::setLevel( short level ) 
 {
     this->level.setValue( level );
 }
@@ -256,20 +256,20 @@ short Character::getRealLevel( ) const
 {
     return level.getValue( );
 }
-ClanReference & Character::getClan( ) throw( )
+ClanReference & Character::getClan( ) 
 {
     return clan;
 }
-void Character::setClan( const ClanReference & clan ) throw( )
+void Character::setClan( const ClanReference & clan ) 
 {
     this->clan.assign( clan );
 }
 
-ProfessionReference & Character::getProfession( ) throw( )
+ProfessionReference & Character::getProfession( ) 
 {
     return profession;
 }
-void Character::setProfession( const ProfessionReference & profession ) throw( )
+void Character::setProfession( const ProfessionReference & profession ) 
 {
     this->profession.assign( profession );
 }
@@ -278,7 +278,7 @@ ProfessionReference & Character::getTrueProfession( )
     return getProfession( );
 }
 
-ReligionReference & Character::getReligion( ) throw( )
+ReligionReference & Character::getReligion( ) 
 {
     return religion;
 }
@@ -286,19 +286,19 @@ void Character::setReligion( const ReligionReference &religion )
 {
     this->religion.assign( religion );
 }
-RaceReference &Character::getRace( ) throw( )
+RaceReference &Character::getRace( ) 
 {
     return race;
 }
-void Character::setRace( const RaceReference & race ) throw( )
+void Character::setRace( const RaceReference & race ) 
 {
     this->race.assign( race );
 }
-short Character::getSex( ) const throw( )
+short Character::getSex( ) const 
 {
     return sex.getValue( );
 }
-void Character::setSex( short sex ) throw( )
+void Character::setSex( short sex ) 
 {
     this->sex.setValue( sex );
     updateCachedNoun( );

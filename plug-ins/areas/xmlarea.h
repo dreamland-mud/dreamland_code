@@ -30,7 +30,7 @@ public:
     area_data *compat( );
         
     virtual bool toXML( XMLNode::Pointer& ) const;
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& );
     
     XML_VARIABLE XMLStringNoEmpty name, credits, authors, altname, translator, speedwalk;
     XML_VARIABLE XMLIntegerNoEmpty security;

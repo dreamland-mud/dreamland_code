@@ -50,3 +50,22 @@ StringSet NumberSet::toStringSet( ) const
     return str;
 }
 
+void StringStorage::addTransient(const DLString &entry)
+{
+    transient.fromString(entry);
+    refresh();
+}
+
+void StringStorage::addPersistent(const DLString &entry)
+{
+    persistent.fromString(entry);
+    refresh();
+}
+
+void StringStorage::refresh()
+{
+    all.clear();
+    all.insert(transient.begin(), transient.end());
+    all.insert(persistent.begin(), persistent.end());
+    allString = all.toString();
+}

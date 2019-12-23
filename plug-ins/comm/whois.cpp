@@ -43,7 +43,7 @@ COMMAND(Whois, "whois")
         return;
     }
         
-    pch = get_player_world(ch->getPC(), args.c_str(), false);
+    pch = get_player_world(ch, args.c_str(), false);
 
     if (!pch) {
         offline_pch = dallocate(PCharacter);

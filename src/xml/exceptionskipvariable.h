@@ -13,7 +13,7 @@ public:
     {
     }
 
-    virtual ~ExceptionSkipVariable( ) throw( );
+    virtual ~ExceptionSkipVariable( ) ;
 };
 
 

@@ -16,7 +16,7 @@ XMLEnumeration::XMLEnumeration( int v, const FlagTable *t )
 {
 }
 
-void XMLEnumeration::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLEnumeration::fromXML( const XMLNode::Pointer& parent ) 
 {
     int value;
     XMLNode::Pointer node = parent->getFirstNode( );
@@ -80,7 +80,7 @@ bool XMLEnumerationArray::toXML( XMLNode::Pointer& parent ) const
         return true;
 }
 
-void XMLEnumerationArray::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLEnumerationArray::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::NodeList::const_iterator n;
     

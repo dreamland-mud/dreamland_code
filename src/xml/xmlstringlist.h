@@ -13,19 +13,19 @@ class XMLStringList : public XMLListBase<XMLString> {
 public:
 
     XMLStringList();
-    void toSet( StringSet & ) const;
+    StringSet toSet() const;
 };
 
 class XMLStringSet : public StringSet {
 public:
     bool toXML( XMLNode::Pointer& node ) const;
-    void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 class XMLNumberSet : public NumberSet {
 public:
     bool toXML( XMLNode::Pointer& node ) const;
-    void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 #endif
