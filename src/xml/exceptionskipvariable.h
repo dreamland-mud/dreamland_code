@@ -9,11 +9,11 @@
 
 class ExceptionSkipVariable : public Exception {
 public:
-    inline ExceptionSkipVariable( ) : Exception( "XML variable skipped while saving" )
+    inline ExceptionSkipVariable( ) throw(): Exception( "XML variable skipped while saving" )
     {
     }
 
-    virtual ~ExceptionSkipVariable( ) ;
+    virtual ~ExceptionSkipVariable( ) throw();
 };
 
 

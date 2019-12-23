@@ -26,22 +26,22 @@ public:
      * @arg type - сообщение о ошибке
      * @arg position - в какой позиции
      */
-    ExceptionXSL( const string type, int position  );
+    ExceptionXSL( const string type, int position  ) throw();
     
     /**
      * @arg type - сообщение о ошибке
      * @arg symbol - неизвестная строка
      * @arg position - в какой позиции
      */
-    ExceptionXSL( const string type, const string  symbol, int position  );
+    ExceptionXSL( const string type, const string  symbol, int position  ) throw();
     
     /**
      * @arg symbol - неизвестный символ
      * @arg position - в какой позиции
      */
-    ExceptionXSL( char symbol, int position  );
+    ExceptionXSL( char symbol, int position  ) throw();
 
-    virtual ~ExceptionXSL( ) ;
+    virtual ~ExceptionXSL( ) throw();
 };
 
 #endif

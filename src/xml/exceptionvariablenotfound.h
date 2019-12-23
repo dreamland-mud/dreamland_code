@@ -13,12 +13,12 @@
 
 class ExceptionVariableNotFound : public Exception {
 public:
-    inline ExceptionVariableNotFound( string name, string className )
+    inline ExceptionVariableNotFound( string name, string className ) throw()
             : Exception( string( "Variable '" ) + name + "' not found in class '" + className + '\'' )
     {
     }
 
-    virtual ~ExceptionVariableNotFound( ) ;
+    virtual ~ExceptionVariableNotFound( ) throw();
 };
 
 
