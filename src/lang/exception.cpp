@@ -14,7 +14,7 @@
 #include "exceptionbadtype.h"
 #include "fileformatexception.h"
 
-Exception::Exception( const string &str )  : message( str )
+Exception::Exception( const string &str ) throw () : message( str )
 {
     fillStackFrames(NULL);
 }
@@ -25,7 +25,7 @@ Exception::what( ) const throw()
     return message.c_str( );
 }
 
-Exception::~Exception( ) 
+Exception::~Exception( ) throw () 
 {
 }
 
