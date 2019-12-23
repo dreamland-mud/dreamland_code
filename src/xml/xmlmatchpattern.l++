@@ -14,7 +14,7 @@
 
 #include "xmlmatchpattern.h"
 
-#define YY_DECL int XMLMatchPattern::yylex( ) throw( ExceptionXSL )
+#define YY_DECL int XMLMatchPattern::yylex( )
 
 %}
 

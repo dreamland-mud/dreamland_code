@@ -75,7 +75,7 @@ RainbowGQuestInfo::getScenario( const DLString& key )
     return i->second.getPointer( );
 }
 
-void RainbowGQuestInfo::fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+void RainbowGQuestInfo::fromXML( const XMLNode::Pointer& node ) 
 {
     scenarios.clear( );
     GlobalQuestInfo::fromXML( node );

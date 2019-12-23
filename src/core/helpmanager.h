@@ -23,7 +23,7 @@ public:
     HelpArticle( );
     
     virtual bool toXML( XMLNode::Pointer& ) const;
-    virtual void fromXML( const XMLNode::Pointer& ) throw (ExceptionBadType);
+    virtual void fromXML( const XMLNode::Pointer& ) ;
     /** Return help article formatted for this char. */
     virtual DLString getText( Character * = NULL ) const;
     /** Assign text for the article. */

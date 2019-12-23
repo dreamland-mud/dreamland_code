@@ -34,7 +34,7 @@ public:
     
     /** Возвращает xml представление переменной */
     bool toXML( XMLNode::Pointer& node ) const;
-    void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& node ) ;
     
     // compat
     inline const DLString& getValue( ) const
@@ -67,7 +67,7 @@ public:
 class XMLStringVariable : public virtual XMLVariable, public XMLString {
 public:
     virtual bool toXML( XMLNode::Pointer& ) const;
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
 };
 
 class XMLStringNode {
@@ -75,7 +75,7 @@ public:
     XMLStringNode( );
 
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
    
     inline bool empty( ) const
     {

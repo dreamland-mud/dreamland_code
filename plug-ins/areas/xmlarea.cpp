@@ -36,7 +36,7 @@ XMLAreaHeader::toXML(XMLNode::Pointer &parent) const
 }
 
 void 
-XMLAreaHeader::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLAreaHeader::fromXML(const XMLNode::Pointer &parent) 
 {
     XMLVariableContainer::fromXML(parent);
     loaded = true;

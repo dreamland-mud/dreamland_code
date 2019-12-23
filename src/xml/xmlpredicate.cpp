@@ -8,7 +8,7 @@
 
 const DLString XMLPredicate::ATTRIBUTE_INVERT = "invert";
 
-void XMLPredicate::fromXML( const XMLNode::Pointer& parent ) throw (ExceptionBadType)  
+void XMLPredicate::fromXML( const XMLNode::Pointer& parent )   
 {
     invert = Boolean(parent->getAttribute( ATTRIBUTE_INVERT ));
 }

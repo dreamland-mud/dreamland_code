@@ -68,7 +68,7 @@ MobIndexWrapper::setTarget( mob_index_data * pIndex )
 }
 
 void 
-MobIndexWrapper::checkTarget( ) const throw( Scripting::Exception )
+MobIndexWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "MOB_INDEX_DATA is dead" );

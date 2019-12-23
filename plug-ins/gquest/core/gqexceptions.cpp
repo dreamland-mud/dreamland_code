@@ -4,31 +4,31 @@
  */
 #include "gqexceptions.h"
 
-BadMobileBehaviorException::~BadMobileBehaviorException( ) throw( )
+BadMobileBehaviorException::~BadMobileBehaviorException( ) 
 {
 }
 
-BadObjectBehaviorException::~BadObjectBehaviorException( ) throw( )
+BadObjectBehaviorException::~BadObjectBehaviorException( ) 
 {
 }
 
-MobileNotFoundException::~MobileNotFoundException( ) throw( )
+MobileNotFoundException::~MobileNotFoundException( ) 
 {
 }
 
-ObjectNotFoundException::~ObjectNotFoundException( ) throw( )
+ObjectNotFoundException::~ObjectNotFoundException( ) 
 {
 }
 
-GQAlreadyRunningException::~GQAlreadyRunningException( ) throw( )
+GQAlreadyRunningException::~GQAlreadyRunningException( ) 
 {
 }
 
-GQRuntimeException::~GQRuntimeException( ) throw( )
+GQRuntimeException::~GQRuntimeException( ) 
 {
 }
 
-GQCannotStartException::~GQCannotStartException( ) throw( )
+GQCannotStartException::~GQCannotStartException( ) 
 {
 }
 

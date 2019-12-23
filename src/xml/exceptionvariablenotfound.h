@@ -18,7 +18,7 @@ public:
     {
     }
 
-    virtual ~ExceptionVariableNotFound( ) throw( );
+    virtual ~ExceptionVariableNotFound( ) ;
 };
 
 

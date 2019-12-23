@@ -74,7 +74,7 @@ ObjectWrapper::getTarget() const
     return target;
 }
 
-void ObjectWrapper::checkTarget( ) const throw( Scripting::Exception )
+void ObjectWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "Non existent object referenced" );

@@ -115,7 +115,7 @@ void CharacterWrapper::setTarget( ::Character *target )
     id = target->getID( );
 }
 
-void CharacterWrapper::checkTarget( ) const throw( Scripting::Exception )
+void CharacterWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "Character is dead" );

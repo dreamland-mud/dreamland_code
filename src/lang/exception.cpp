@@ -14,18 +14,18 @@
 #include "exceptionbadtype.h"
 #include "fileformatexception.h"
 
-Exception::Exception( const string &str ) throw( ) : message( str )
+Exception::Exception( const string &str )  : message( str )
 {
     fillStackFrames(NULL);
 }
 
 const char*
-Exception::what( ) const throw( )
+Exception::what( ) const throw()
 {
     return message.c_str( );
 }
 
-Exception::~Exception( ) throw( )
+Exception::~Exception( ) 
 {
 }
 
@@ -60,7 +60,7 @@ void Exception::printStackTrace( std::ostream &os ) const
     }
 }
 
-FileFormatException::FileFormatException( const char * fmt, ... ) throw( )
+FileFormatException::FileFormatException( const char * fmt, ... ) 
 {
     va_list ap;
     char buf[1024];
@@ -72,11 +72,11 @@ FileFormatException::FileFormatException( const char * fmt, ... ) throw( )
     setStr( string( buf ) );            
 }
 
-FileFormatException::~FileFormatException( ) throw( )
+FileFormatException::~FileFormatException( ) 
 {
 }
 
-ExceptionBadType::~ExceptionBadType( ) throw( )
+ExceptionBadType::~ExceptionBadType( ) 
 {
 }
 

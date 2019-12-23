@@ -12,7 +12,7 @@
 
 #include "xmllonglong.h"
 
-void XMLLongLong::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLLongLong::fromXML( const XMLNode::Pointer& parent ) 
 {
         XMLNode::Pointer node = parent->getFirstNode( );
         

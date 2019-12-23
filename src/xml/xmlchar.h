@@ -28,7 +28,7 @@ public:
         {
         }
         
-        inline XMLChar( const DLString& value ) throw( ExceptionBadType )
+        inline XMLChar( const DLString& value ) 
                 : Char( value )
         {
         }
@@ -36,7 +36,7 @@ public:
         /** Возвращает xml представление переменной */
         bool toXML( XMLNode::Pointer& node ) const;
         /** Инициализация класса из xml данных */
-        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 

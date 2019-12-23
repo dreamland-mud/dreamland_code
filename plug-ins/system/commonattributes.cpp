@@ -20,7 +20,7 @@ XMLEmptyAttribute::~XMLEmptyAttribute( )
 {
 }
 
-void XMLEmptyAttribute::fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+void XMLEmptyAttribute::fromXML( const XMLNode::Pointer& node ) 
 {
 }
 

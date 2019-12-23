@@ -20,7 +20,7 @@ namespace Scripting {
 class Exception : public ::Exception { 
 public:
     Exception(DLString s) : ::Exception(info(s)) { }
-    virtual ~Exception( ) throw( );
+    virtual ~Exception( ) ;
 
     static string info(string s);
 };
@@ -30,105 +30,105 @@ class NullPointerException : public Exception {
 public:
     NullPointerException() : Exception("Null pointer dereference") { }
 
-    virtual ~NullPointerException( ) throw( );
+    virtual ~NullPointerException( ) ;
 };
 
 class NotImplementedException : public Exception {
 public:
     NotImplementedException() : Exception("Operation not implemented") { }
 
-    virtual ~NotImplementedException( ) throw( );
+    virtual ~NotImplementedException( ) ;
 };
 
 class NotEnoughArgumentsException : public Exception {
 public:
     NotEnoughArgumentsException() : Exception("Not enough arguments") { }
 
-    virtual ~NotEnoughArgumentsException( ) throw( );
+    virtual ~NotEnoughArgumentsException( ) ;
 };
 
 class TooManyArgumentsException : public Exception { 
 public:
     TooManyArgumentsException() : Exception("Too many arguments") { }
 
-    virtual ~TooManyArgumentsException( ) throw( );
+    virtual ~TooManyArgumentsException( ) ;
 };
 
 class IllegalArgumentException : public Exception { 
 public:
     IllegalArgumentException() : Exception("Illegal argument") { }
 
-    virtual ~IllegalArgumentException( ) throw( );
+    virtual ~IllegalArgumentException( ) ;
 };
 
 class MissplacedBreakException : public Exception {
 public:
     MissplacedBreakException() : Exception("Break without loop or switch") { }
 
-    virtual ~MissplacedBreakException( ) throw( );
+    virtual ~MissplacedBreakException( ) ;
 };
 
 class MissplacedContinueException : public Exception {
 public:
     MissplacedContinueException() : Exception("Continue without loop") { }
 
-    virtual ~MissplacedContinueException( ) throw( );
+    virtual ~MissplacedContinueException( ) ;
 };
 
 class InvalidIndexingModeException : public Exception {
 public:
     InvalidIndexingModeException() : Exception("Invalid indexing mode") { }
 
-    virtual ~InvalidIndexingModeException( ) throw( );
+    virtual ~InvalidIndexingModeException( ) ;
 };
 
 class NotAReferenceException : public Exception { 
 public:
     NotAReferenceException() : Exception("Not a reference") { }
 
-    virtual ~NotAReferenceException( ) throw( );
+    virtual ~NotAReferenceException( ) ;
 };
 
 class WrongNativeThisException : public Exception { 
 public:
     WrongNativeThisException() : Exception("Wrong `this' for native method call") { }
 
-    virtual ~WrongNativeThisException( ) throw( );
+    virtual ~WrongNativeThisException( ) ;
 };
 
 class IdentifierComparitionException : public Exception {
 public:
     IdentifierComparitionException() : Exception("Identifier compared with something else") { }
 
-    virtual ~IdentifierComparitionException( ) throw( );
+    virtual ~IdentifierComparitionException( ) ;
 };
 
 class UnknownNativeMethodException : public Exception {
 public:
     UnknownNativeMethodException() : Exception("Method not found") { }
 
-    virtual ~UnknownNativeMethodException( ) throw( );
+    virtual ~UnknownNativeMethodException( ) ;
 };
 
 class IdentifierExpectedException : public Exception {
 public:
     IdentifierExpectedException() : Exception("Identifier expected") { }
 
-    virtual ~IdentifierExpectedException( ) throw( );
+    virtual ~IdentifierExpectedException( ) ;
 };
 
 class FunctionNotDefinedException : public Exception {
 public:
     FunctionNotDefinedException() : Exception("Function with requested id was not defined") { }
 
-    virtual ~FunctionNotDefinedException( ) throw( );
+    virtual ~FunctionNotDefinedException( ) ;
 };
 
 class ObjectNotDefinedException : public Exception {
 public:
     ObjectNotDefinedException() : Exception("Object with requested id was not defined") { }
 
-    virtual ~ObjectNotDefinedException( ) throw( );
+    virtual ~ObjectNotDefinedException( ) ;
 };
 
 class InvalidCastException : public Exception {
@@ -141,21 +141,21 @@ public:
     { 
     }
 
-    virtual ~InvalidCastException( ) throw( );
+    virtual ~InvalidCastException( ) ;
 };
 
 class ParseError : public Exception {
 public:
     ParseError( string msg ) : Exception("Parse error: " + msg) { }
 
-    virtual ~ParseError( ) throw( );
+    virtual ~ParseError( ) ;
 };
 
 class CustomException : public Exception {
 public:
     CustomException( string msg ) : Exception( msg ), message(msg) { 
     }
-    virtual ~CustomException() throw( );
+    virtual ~CustomException() ;
 
     string message;
 };
@@ -164,14 +164,14 @@ class IndexOutOfBoundsException : public Exception {
 public:
     IndexOutOfBoundsException( ) : Exception( "Index out of bounds" ) { }
 
-    virtual ~IndexOutOfBoundsException( ) throw( );
+    virtual ~IndexOutOfBoundsException( ) ;
 };
 
 class DivisionByZero : public Exception {
 public:
     DivisionByZero( ) : Exception( "division by zero" ) { }
 
-    virtual ~DivisionByZero( ) throw( );
+    virtual ~DivisionByZero( ) ;
 };
 
 }

@@ -117,7 +117,7 @@ bool XMLPlayerAge::toXML( XMLNode::Pointer &parent ) const
     return XMLInteger( getTrueTime( ) ).toXML( parent );
 }
 
-void XMLPlayerAge::fromXML( const XMLNode::Pointer &parent ) throw( ExceptionBadType )
+void XMLPlayerAge::fromXML( const XMLNode::Pointer &parent ) 
 {
     XMLInteger t;
 
@@ -440,31 +440,31 @@ PCharacter * PCharacter::getPlayer( )
     return this;
 }
 
-const DLString& PCharacter::getName( ) const throw( )
+const DLString& PCharacter::getName( ) const 
 {
     return Character::getName( );
 }
-const DLString& PCharacter::getPassword( ) const throw( )
+const DLString& PCharacter::getPassword( ) const 
 {
     return password.getValue( );
 }
-void PCharacter::setPassword( const DLString &passwd) throw( )
+void PCharacter::setPassword( const DLString &passwd) 
 {
     this->password.setValue( passwd );
 }
-const Date& PCharacter::getLastAccessTime( ) const throw( )
+const Date& PCharacter::getLastAccessTime( ) const 
 {
     return lastAccessTime;
 }
-void PCharacter::setLastAccessTime( const Date& lastAccessTime ) throw( )
+void PCharacter::setLastAccessTime( const Date& lastAccessTime ) 
 {
     this->lastAccessTime = lastAccessTime;
 }
-const DLString& PCharacter::getLastAccessHost( ) const throw( )
+const DLString& PCharacter::getLastAccessHost( ) const 
 {
     return lastAccessHost.getValue( );
 }
-void PCharacter::setLastAccessHost( const DLString& lastAccessHost ) throw( )
+void PCharacter::setLastAccessHost( const DLString& lastAccessHost ) 
 {
     this->lastAccessHost.setValue( lastAccessHost );
 }
@@ -472,31 +472,31 @@ void PCharacter::setLastAccessTime( )
 {
     lastAccessTime = Date::newInstance( );
 }
-short PCharacter::getLevel( ) const throw( )
+short PCharacter::getLevel( ) const 
 {
     return getRealLevel( );
 }
-int PCharacter::getTrust( ) const throw( )
+int PCharacter::getTrust( ) const 
 {
     return trust.getValue( );
 }
-void PCharacter::setTrust( int trust ) throw( )
+void PCharacter::setTrust( int trust ) 
 {
     this->trust = trust;
 }
-int PCharacter::getSecurity( ) const throw( )
+int PCharacter::getSecurity( ) const 
 {
     return security.getValue( );
 }
-void PCharacter::setSecurity( int security ) throw( )
+void PCharacter::setSecurity( int security ) 
 {
     this->security = security;
 }
-int PCharacter::getQuestPoints( ) const throw( )
+int PCharacter::getQuestPoints( ) const 
 {
         return questpoints;
 }
-void PCharacter::setQuestPoints( int questpoints ) throw( )
+void PCharacter::setQuestPoints( int questpoints ) 
 {
         this->questpoints = questpoints;
 }
@@ -505,27 +505,27 @@ int PCharacter::addQuestPoints(int delta)
     this->questpoints += delta;
     return this->questpoints;
 }
-ClanReference &PCharacter::getPetition( ) throw( )
+ClanReference &PCharacter::getPetition( ) 
 {
     return petition;
 }
-void PCharacter::setPetition( const ClanReference & petition ) throw( )
+void PCharacter::setPetition( const ClanReference & petition ) 
 {
     this->petition.assign( petition );
 }
-ClanReference & PCharacter::getClan( ) throw( )
+ClanReference & PCharacter::getClan( ) 
 {
     return Character::getClan( );
 }
-void PCharacter::setClan( const ClanReference & clan ) throw( )
+void PCharacter::setClan( const ClanReference & clan ) 
 {
     this->clan.assign( clan );
 }
-HometownReference &PCharacter::getHometown( ) throw( )
+HometownReference &PCharacter::getHometown( ) 
 {
     return hometown;
 }
-void PCharacter::setHometown( const HometownReference & hometown ) throw( )
+void PCharacter::setHometown( const HometownReference & hometown ) 
 {
     this->hometown.assign( hometown );
 }
@@ -545,65 +545,65 @@ ProfessionReference &PCharacter::getTrueProfession( )
     return getProfession( );
 }
 
-short PCharacter::getClanLevel( ) const throw( )
+short PCharacter::getClanLevel( ) const 
 {
     return clanLevel.getValue( );
 }
-void PCharacter::setClanLevel( short clanLevel ) throw( )
+void PCharacter::setClanLevel( short clanLevel ) 
 {
     this->clanLevel.setValue( clanLevel );
 }
-short PCharacter::getSex( ) const throw( )
+short PCharacter::getSex( ) const 
 {
     return Character::getSex( );
 }
-XMLAttributes& PCharacter::getAttributes( ) throw( )
+XMLAttributes& PCharacter::getAttributes( ) 
 {
     return attributes;
 }
-const XMLAttributes& PCharacter::getAttributes( ) const throw( )
+const XMLAttributes& PCharacter::getAttributes( ) const 
 {
     return attributes;
 }
-void PCharacter::setAttributes( const XMLAttributes& attributes ) throw( )
+void PCharacter::setAttributes( const XMLAttributes& attributes ) 
 {
     this->attributes = attributes;
 }
-const DLString& PCharacter::getPretitle( ) const throw( )
+const DLString& PCharacter::getPretitle( ) const 
 {
     return pretitle.getValue( );
 }
-void PCharacter::setPretitle( const DLString& pretitle ) throw( )
+void PCharacter::setPretitle( const DLString& pretitle ) 
 {
     this->pretitle.setValue( pretitle );
     updateCachedNoun( );
 }
-const DLString& PCharacter::getRussianPretitle( ) const throw( )
+const DLString& PCharacter::getRussianPretitle( ) const 
 {
     return russianPretitle.getValue( );
 }
-void PCharacter::setRussianPretitle( const DLString& pretitle ) throw( )
+void PCharacter::setRussianPretitle( const DLString& pretitle ) 
 {
     this->russianPretitle.setValue( pretitle );
     updateCachedNoun( );
 }
-Remorts& PCharacter::getRemorts( ) throw( )
+Remorts& PCharacter::getRemorts( ) 
 {
     return remorts;
 }
-const Remorts& PCharacter::getRemorts( ) const throw( )
+const Remorts& PCharacter::getRemorts( ) const 
 {
     return remorts;
 }
-void PCharacter::setRemorts( const Remorts& remorts ) throw( ) 
+void PCharacter::setRemorts( const Remorts& remorts )  
 {
     this->remorts = remorts;
 }
-const RussianString& PCharacter::getRussianName( ) const throw( )
+const RussianString& PCharacter::getRussianName( ) const 
 {
     return russianName;
 }
-void PCharacter::setRussianName( const DLString& name ) throw( )
+void PCharacter::setRussianName( const DLString& name ) 
 {
     russianName.setFullForm( name );
     updateCachedNoun( );

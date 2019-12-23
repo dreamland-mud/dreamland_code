@@ -31,7 +31,7 @@ public:
     {
     }
 
-    virtual ~ExceptionXMLError( ) throw( );
+    virtual ~ExceptionXMLError( ) ;
     
 private:
     int line;

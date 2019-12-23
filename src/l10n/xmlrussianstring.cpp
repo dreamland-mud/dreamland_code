@@ -10,7 +10,7 @@ using namespace Grammar;
 
 const DLString XMLRussianString::ATTRIBUTE_GRAMMAR = "mg";
 
-void XMLRussianString::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLRussianString::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
     

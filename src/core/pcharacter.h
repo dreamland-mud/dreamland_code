@@ -66,7 +66,7 @@ protected:
 class XMLPlayerAge : public PlayerAge {
 public:
     bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    void fromXML( const XMLNode::Pointer& ) ;
 };
 
 /*
@@ -124,64 +124,64 @@ public:
     virtual bool isOnline( ) const;
     virtual PCharacter * getPlayer( );
 
-    virtual const DLString& getName( ) const throw( );
+    virtual const DLString& getName( ) const ;
 
-    virtual const DLString& getPassword( ) const throw( );
-    virtual void setPassword( const DLString& ) throw( );
+    virtual const DLString& getPassword( ) const ;
+    virtual void setPassword( const DLString& ) ;
 
-    virtual ClanReference &getClan( ) throw( );
-    virtual void setClan( const ClanReference & ) throw( );
+    virtual ClanReference &getClan( ) ;
+    virtual void setClan( const ClanReference & ) ;
 
-    virtual ClanReference &getPetition( ) throw( );
-    virtual void setPetition( const ClanReference & ) throw( );
+    virtual ClanReference &getPetition( ) ;
+    virtual void setPetition( const ClanReference & ) ;
     
-    virtual short getClanLevel( ) const throw( );
-    virtual void setClanLevel( short clanLevel ) throw( );
+    virtual short getClanLevel( ) const ;
+    virtual void setClanLevel( short clanLevel ) ;
 
     virtual ProfessionReference & getTrueProfession( );
     ProfessionReference & getSubProfession( );
     void setSubProfession( const ProfessionReference & );
 
-    virtual HometownReference &getHometown( ) throw( );
-    virtual void setHometown( const HometownReference & ) throw( );
+    virtual HometownReference &getHometown( ) ;
+    virtual void setHometown( const HometownReference & ) ;
 
-    virtual const Date& getLastAccessTime( ) const throw( );
-    virtual void setLastAccessTime( const Date& ) throw( );
+    virtual const Date& getLastAccessTime( ) const ;
+    virtual void setLastAccessTime( const Date& ) ;
     void setLastAccessTime( );
 
-    virtual const DLString& getLastAccessHost( ) const throw( );
-    virtual void setLastAccessHost( const DLString& ) throw( );
+    virtual const DLString& getLastAccessHost( ) const ;
+    virtual void setLastAccessHost( const DLString& ) ;
 
-    virtual short getLevel( ) const throw( );
+    virtual short getLevel( ) const ;
 
-    virtual int getTrust( ) const throw( );
-    virtual void setTrust( int ) throw( );
+    virtual int getTrust( ) const ;
+    virtual void setTrust( int ) ;
 
-    virtual int getSecurity( ) const throw( );
-    virtual void setSecurity( int ) throw( );
+    virtual int getSecurity( ) const ;
+    virtual void setSecurity( int ) ;
 
-    virtual int getQuestPoints( ) const throw( );
-    virtual void setQuestPoints( int ) throw( );
+    virtual int getQuestPoints( ) const ;
+    virtual void setQuestPoints( int ) ;
     int addQuestPoints(int);
 
-    virtual short getSex( ) const throw( );
+    virtual short getSex( ) const ;
 
-    virtual XMLAttributes& getAttributes( ) throw( );
-    virtual void setAttributes( const XMLAttributes& attributes ) throw( );
-    virtual const XMLAttributes& getAttributes( ) const throw( );
+    virtual XMLAttributes& getAttributes( ) ;
+    virtual void setAttributes( const XMLAttributes& attributes ) ;
+    virtual const XMLAttributes& getAttributes( ) const ;
             
-    virtual const RussianString& getRussianName( ) const throw( );
-    virtual void setRussianName( const DLString& ) throw( );
+    virtual const RussianString& getRussianName( ) const ;
+    virtual void setRussianName( const DLString& ) ;
 
-    virtual Remorts& getRemorts( ) throw( );
-    virtual const Remorts& getRemorts( ) const throw( );
-    virtual void setRemorts( const Remorts& ) throw( ); 
+    virtual Remorts& getRemorts( ) ;
+    virtual const Remorts& getRemorts( ) const ;
+    virtual void setRemorts( const Remorts& ) ; 
 
-    virtual const DLString& getRussianPretitle( ) const throw( );
-    virtual void setRussianPretitle( const DLString& ) throw( );
+    virtual const DLString& getRussianPretitle( ) const ;
+    virtual void setRussianPretitle( const DLString& ) ;
     
-    virtual const DLString& getPretitle( ) const throw( );
-    virtual void setPretitle( const DLString& ) throw( );
+    virtual const DLString& getPretitle( ) const ;
+    virtual void setPretitle( const DLString& ) ;
 
     // set-get methods inherited from Character
     virtual const GlobalBitvector & getWearloc( );

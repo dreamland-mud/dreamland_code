@@ -62,18 +62,18 @@ public:
         DBIO( const DLDirectory &tableDir, const DLString & tableName );
         virtual ~DBIO( );
 
-        void open( ) throw( ExceptionDBIO );
-        void open( const DLString &tableName ) throw( ExceptionDBIO );
+        void open( ) ;
+        void open( const DLString &tableName ) ;
 
-        DBNode nextXML( ) throw( ExceptionDBIO, ExceptionDBIOEOF );
+        DBNode nextXML( ) ;
 
-        void insert( const DBNode & ) throw( ExceptionDBIO );
-        void insert( const DLString&, const DLString& ) throw( ExceptionDBIO );
-        void safeInsert( const DBNode & ) throw( ExceptionDBIO );
-        void safeInsert( const DLString&, const DLString& ) throw( ExceptionDBIO );
-        DBNode select( const DLString& ) throw( ExceptionDBIO );
-        void remove( const DLString& ) throw( ExceptionDBIO );
-        void renameID( const DLString& oldKey, const DLString& newKey ) throw( ExceptionDBIO );
+        void insert( const DBNode & ) ;
+        void insert( const DLString&, const DLString& ) ;
+        void safeInsert( const DBNode & ) ;
+        void safeInsert( const DLString&, const DLString& ) ;
+        DBNode select( const DLString& ) ;
+        void remove( const DLString& ) ;
+        void renameID( const DLString& oldKey, const DLString& newKey ) ;
         DLFile getEntryAsFile( const DLString &key );
 
 private:

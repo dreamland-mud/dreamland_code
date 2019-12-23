@@ -20,13 +20,13 @@ public:
     DLDirectory( const DLFile &dir, const DLString &filename, const DLString &fileext = DLString::emptyString );
     virtual ~DLDirectory( );
     
-    void open( const DLString &path ) throw( ExceptionDBIO );
-    void open( ) throw( ExceptionDBIO );
+    void open( const DLString &path ) ;
+    void open( ) ;
     void close( );
 
-    DLFile nextEntry( ) throw( ExceptionDBIOEOF );
-    DLFile nextTypedEntry( const DLString &fileExt ) throw( ExceptionDBIOEOF );
-    DLFile tempEntry( ) throw( ExceptionDBIO );
+    DLFile nextEntry( ) ;
+    DLFile nextTypedEntry( const DLString &fileExt ) ;
+    DLFile tempEntry( ) ;
 
 protected:
     DIR * dirp;

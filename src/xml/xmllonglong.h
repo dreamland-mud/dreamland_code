@@ -28,7 +28,7 @@ public:
         {
         }
         
-        inline XMLLongLong( const DLString& value ) throw( ExceptionBadType )
+        inline XMLLongLong( const DLString& value ) 
                 : LongLong( value )
         {
         }
@@ -36,7 +36,7 @@ public:
         /** Возвращает xml представление переменной */
         bool toXML( XMLNode::Pointer& node ) const;
         /** Инициализация класса из xml данных */
-        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 

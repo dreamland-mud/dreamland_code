@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "xmlboolean.h"
 
-void XMLBoolean::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLBoolean::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
     

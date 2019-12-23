@@ -16,7 +16,7 @@ const DLString Boolean::TYPE = "Boolean";
 const DLString Boolean::VAL_TRUE = "true";
 const DLString Boolean::VAL_FALSE = "false";
 
-void Boolean::fromString( const DLString & value ) throw( ExceptionBadType )
+void Boolean::fromString( const DLString & value ) 
 {
     if( value == VAL_TRUE )
         this->value = true;
@@ -26,7 +26,7 @@ void Boolean::fromString( const DLString & value ) throw( ExceptionBadType )
         throw ExceptionBadType( TYPE, value );
 }
 
-DLString Boolean::toString( ) const throw( )
+DLString Boolean::toString( ) const 
 {
     return value ? VAL_TRUE : VAL_FALSE;
 }

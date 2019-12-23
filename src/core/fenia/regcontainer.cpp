@@ -101,7 +101,7 @@ RegContainer::toXML( XMLNode::Pointer& parent ) const
 }
 
 void 
-RegContainer::fromXML( const XMLNode::Pointer& parent ) throw ( ExceptionBadType )
+RegContainer::fromXML( const XMLNode::Pointer& parent ) 
 {
     map.clear();
     XMLContainer::fromXML(parent);

@@ -210,7 +210,7 @@ XMLItemType::toXML(XMLNode::Pointer &parent) const
 }
 
 void
-XMLItemType::fromXML(const XMLNode::Pointer &parent) throw(ExceptionBadType)
+XMLItemType::fromXML(const XMLNode::Pointer &parent)
 {
     type = item_table.value(parent->getAttribute("name"));
 

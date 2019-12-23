@@ -62,7 +62,7 @@ Object::changed()
 }
 
 void 
-Object::fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) 
+Object::fromXML( const XMLNode::Pointer& node )  
 {
     backupNode = node;
 }
@@ -146,7 +146,7 @@ Object::finalize()
         toList( manager->deleted );
 }
 
-Object::NotRecoveredException::~NotRecoveredException( ) throw( )
+Object::NotRecoveredException::~NotRecoveredException( ) 
 {
 }
 

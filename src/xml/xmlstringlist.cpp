@@ -26,7 +26,7 @@ bool XMLStringSet::toXML( XMLNode::Pointer& node ) const
     return XMLStringNoEmpty( toString( ) ).toXML( node );
 }
 
-void XMLStringSet::fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+void XMLStringSet::fromXML( const XMLNode::Pointer& node ) 
 {
     XMLString str;
 
@@ -42,7 +42,7 @@ bool XMLNumberSet::toXML( XMLNode::Pointer& node ) const
                     .toXML( node );
 }
 
-void XMLNumberSet::fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+void XMLNumberSet::fromXML( const XMLNode::Pointer& node ) 
 {
     XMLStringSet str;
 

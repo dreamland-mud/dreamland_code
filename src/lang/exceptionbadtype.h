@@ -17,17 +17,17 @@
 class ExceptionBadType : public Exception
 {
 public:
-    inline ExceptionBadType( string str ) throw( )
+    inline ExceptionBadType( string str ) 
             : Exception( str )
     {
     }
     
-    inline ExceptionBadType( string parentType, string nodeType ) throw( )
+    inline ExceptionBadType( string parentType, string nodeType ) 
             : Exception( "Unparsed node <" + parentType + "> <" + nodeType +">" )
     {
     }
 
-    virtual ~ExceptionBadType( ) throw( );
+    virtual ~ExceptionBadType( ) ;
 };
 
 #endif

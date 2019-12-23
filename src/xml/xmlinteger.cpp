@@ -12,7 +12,7 @@
 #include "exceptionskipvariable.h"
 #include "xmlinteger.h"
 
-void XMLInteger::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLInteger::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
     
@@ -38,7 +38,7 @@ bool XMLIntegerNoEmpty::toXML( XMLNode::Pointer& parent ) const
         return XMLInteger::toXML( parent );
 }
 
-void XMLIntegerVariable::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLIntegerVariable::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLInteger::fromXML( parent );
 }

@@ -12,7 +12,7 @@
 
 #include "xmlbyte.h"
 
-void XMLByte::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType ) {
+void XMLByte::fromXML( const XMLNode::Pointer& parent )  {
         XMLNode::Pointer node = parent->getFirstNode( );
 
         if (!node.isEmpty( ))

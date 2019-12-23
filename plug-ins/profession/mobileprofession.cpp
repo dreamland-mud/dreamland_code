@@ -107,7 +107,7 @@ GlobalBitvector MobileProfession::toVector( Character *ch ) const
     return bv;
 }
 
-void MobileProfession::checkTarget( Character *ch ) const throw( Exception )
+void MobileProfession::checkTarget( Character *ch ) const 
 {
     if (!ch->is_npc( ))
         throw Exception( ch->getName( ) + " has mobile profession!" );

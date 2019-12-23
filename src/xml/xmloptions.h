@@ -25,7 +25,7 @@ public:
         setValue( value );
     }
     
-    inline void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) {
+    inline void fromXML( const XMLNode::Pointer& node )  {
         if (isOverriden)
             return;
 
@@ -55,7 +55,7 @@ public:
         assign( value );
     }
     
-    inline void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) {
+    inline void fromXML( const XMLNode::Pointer& node )  {
         if (isOverriden)
             return;
 

@@ -27,7 +27,7 @@ public:
     {
     }
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType )
+    virtual void fromXML( const XMLNode::Pointer& node ) 
     {
         clear( );
         XMLContainer::fromXML( node );

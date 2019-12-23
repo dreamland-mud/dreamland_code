@@ -15,7 +15,7 @@ bool XMLTimeStamp::toXML( XMLNode::Pointer& parent ) const
     return XMLLong( Date::getCurrentTime( ) ).toXML( parent );
 }
 
-void XMLTimeStamp::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLTimeStamp::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLLong::fromXML( parent );
 }

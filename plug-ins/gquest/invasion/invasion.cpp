@@ -45,7 +45,7 @@ InvasionGQuest::~InvasionGQuest( )
     thisClass = NULL;
 }
 
-void InvasionGQuest::create( const GlobalQuest::Config &config ) throw ( GQCannotStartException ) 
+void InvasionGQuest::create( const GlobalQuest::Config &config )  
 {
     int mobCnt, objCnt, helpCnt;
     std::vector<Room *> rooms;

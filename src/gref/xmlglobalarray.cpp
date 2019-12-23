@@ -10,7 +10,7 @@ XMLGlobalArray::XMLGlobalArray( GlobalRegistryBase *reg )
 {
 }
 
-void XMLGlobalArray::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLGlobalArray::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::NodeList::const_iterator n;
     

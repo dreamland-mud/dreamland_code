@@ -13,13 +13,13 @@ class QuestCannotStartException : public Exception {
 public:
         QuestCannotStartException( );
         QuestCannotStartException( const DLString & );
-        virtual ~QuestCannotStartException( ) throw( );
+        virtual ~QuestCannotStartException( ) ;
 };
 
 class QuestRuntimeException : public Exception {
 public:
         QuestRuntimeException( const DLString & );
-        virtual ~QuestRuntimeException( ) throw( );
+        virtual ~QuestRuntimeException( ) ;
 };
 
 #endif

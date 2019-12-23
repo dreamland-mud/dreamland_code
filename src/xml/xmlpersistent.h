@@ -23,7 +23,7 @@ public:
         parent = node;
         return true;
     }
-    virtual void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    virtual void fromXML( const XMLNode::Pointer& parent ) 
     {
         node = parent;
     }
@@ -54,7 +54,7 @@ public:
         setPointer(p);
     }
     
-    void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    void fromXML( const XMLNode::Pointer& parent ) 
     {
         try {
             Ptr::fromXML( parent );

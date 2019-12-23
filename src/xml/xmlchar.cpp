@@ -11,7 +11,7 @@
 
 #include "xmlchar.h"
 
-void XMLChar::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLChar::fromXML( const XMLNode::Pointer& parent ) 
 {
         XMLNode::Pointer node = parent->getFirstNode( );
 

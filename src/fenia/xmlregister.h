@@ -35,7 +35,7 @@ public:
     XMLRegister();
     XMLRegister(const Register &r);
         
-    void fromXML(const XMLNode::Pointer& parent) throw( ExceptionBadType );
+    void fromXML(const XMLNode::Pointer& parent) ;
     bool toXML(XMLNode::Pointer& parent) const;
 
 private:

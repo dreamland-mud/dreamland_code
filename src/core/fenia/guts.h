@@ -28,7 +28,7 @@ public:
     typedef ::Pointer<Guts> Pointer;
 
     virtual bool nodeFromXML( const XMLNode::Pointer& node );
-    virtual void fromXML( const XMLNode::Pointer& node ) throw ( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
 };
 

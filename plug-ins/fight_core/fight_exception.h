@@ -8,7 +8,7 @@
 #include "exception.h"
 
 struct VictimDeathException : public Exception {
-    virtual ~VictimDeathException( ) throw( );
+    virtual ~VictimDeathException( ) ;
 };
 
 
