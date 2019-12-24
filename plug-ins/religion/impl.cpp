@@ -38,6 +38,9 @@ public:
         if (oldState != CON_READ_MOTD || newState != CON_PLAYING) 
             return;
 
+        if (ch->getReligion() == god_none)
+            return;
+
         DefaultReligion *rel = dynamic_cast<DefaultReligion *>(ch->getReligion().getElement());
         if (!rel)
             return;
