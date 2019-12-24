@@ -15,6 +15,7 @@
 #include "descriptorstatelistener.h"
 #include "quest.h"
 #include "commandmanager.h"
+#include "jsonservlet.h"
 
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
@@ -121,7 +122,6 @@ public:
 
         virtual void run( Descriptor *, Character *, Json::Value &json );
 
-protected:
         static Json::Value jsonPlayer( Character *ch, PCharacter *wch );
         static Json::Value jsonWho( Character *ch );
 };
@@ -1170,6 +1170,51 @@ public:
         );
     }
 };    
+
+JSONSERVLET_HANDLE(cmd_who, "/who")
+{
+    PCharacter dummy;
+    dummy.config.setBit(CONFIG_RUCOMMANDS);
+    
+    for (Descriptor *d = descriptor_list; d; d = d->next) {
+        PCharacter *victim;
+        
+        if (d->connected != CON_PLAYING || !d->character)
+            continue;
+
+        victim = d->character->getPC( );
+
+        if (!can_see_god(NULL, victim)) 
+            continue;
+
+        XMLAttributes *attrs = &victim->getAttributes( );
+        if (attrs->isAvailable("nowho"))
+            continue;
+
+        Json::Value wch;
+
+        wch["name"]["en"] = victim->getName();
+        wch["name"]["ru"] = victim->getRussianName().decline('1');
+        wch["race"]["en"] = victim->getRace()->getName();
+        wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim);
+
+        if (victim->getClan() != clan_none)
+            wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
+
+        if (!victim->getPretitle().empty())
+            wch["pretitle"]["en"] = victim->getPretitle().colourStrip();
+
+        if (!victim->getRussianPretitle().empty())
+            wch["pretitle"]["ru"] = victim->getRussianPretitle().colourStrip();
+
+        wch["title"] = victim->getParsedTitle().colourStrip();
+        wch["remorts"] = DLString(victim->getRemorts().size());
+
+        body["people"].append(wch);
+    }
+
+    body["total"] = body["people"].size();
+}
 
 extern "C"
 {

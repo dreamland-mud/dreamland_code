@@ -32,6 +32,7 @@ badnames.cpp \
 base64.cpp \
 rpccommandmanager.cpp \
 webmanip.cpp \
+jsonservlet.cpp \
 impl.cpp
 
 libiomanager_la_MOC = \
