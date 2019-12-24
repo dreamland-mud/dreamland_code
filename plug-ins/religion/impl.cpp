@@ -10,12 +10,47 @@
 #include "mocregistrator.h"
 #include "dlxmlloader.h"
 #include "xmlattributeplugin.h"
+#include "descriptorstatelistener.h"
+#include "descriptor.h"
+#include "pcharacter.h"
+#include "wiznet.h"
+#include "def.h"
 
 #include "templeman.h"
 #include "gods_impl.h"
 #include "tattoo.h"
 #include "defaultreligion.h"
 #include "religionattribute.h"
+
+RELIG(none);
+
+class OldGodListener : public DescriptorStateListener {
+public:
+    typedef ::Pointer<OldGodListener> Pointer;
+    
+    virtual void run(int oldState, int newState, Descriptor *d)
+    {
+        PCharacter *ch;
+
+        if (!d->character || !( ch = d->character->getPC( ) ))
+            return;
+
+        if (oldState != CON_READ_MOTD || newState != CON_PLAYING) 
+            return;
+
+        DefaultReligion *rel = dynamic_cast<DefaultReligion *>(ch->getReligion().getElement());
+        if (!rel)
+            return;
+
+        if (rel->available(ch))
+            return;
+
+        ch->pecho("\r\n{RВнимание!{x Религия {C%N1{x больше не подходит тебе. Обратись к богам за помощью.",
+                  rel->getRussianName().c_str());
+        wiznet(WIZ_RELIGION, 0, 0, "%^C1 имеет неподходящую религию %N1.", 
+                  ch, rel->getRussianName().c_str());
+    }
+};
 
 extern "C"
 {
@@ -49,7 +84,7 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<BastGod> >( ppl );
         Plugin::registerPlugin<MocRegistrator<RavenQueenGod> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ErevanGod> >( ppl );
-        
+        Plugin::registerPlugin<OldGodListener>(ppl);
         Plugin::registerPlugin<ReligionLoader>( ppl );
 
         return ppl;
