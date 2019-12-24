@@ -190,7 +190,7 @@ ServerSocketTask::createSocket(unsigned short port)
 {
     int sock = socket(AF_INET, SOCK_STREAM, 6);
     struct sockaddr_in sin = { AF_INET };
-    sin.sin_addr.s_addr = INADDR_ANY;
+    sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     sin.sin_port = htons(port);
 
     if(bind(sock, (struct sockaddr*)&sin, sizeof(sin)) < 0) {
