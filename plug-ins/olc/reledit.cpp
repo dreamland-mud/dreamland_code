@@ -384,8 +384,12 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    Religion *religion = religionManager->findUnstrict(
-        DLString(argument).toLower().stripWhiteSpace());
+    DLString arg = DLString(argument).toLower().stripWhiteSpace();    
+
+    Religion *religion = religionManager->findExisting(arg);
+    if (!religion)
+        religion = religionManager->findUnstrict(arg);
+        
     if (!religion || dynamic_cast<DefaultReligion *>(religion) == NULL) {
         stc("Религия с таким названием не найдена, используйте reledit list для списка.\r\n", ch);
         return;
