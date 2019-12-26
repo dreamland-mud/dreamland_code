@@ -178,12 +178,12 @@ bool Note::findRecipient( PCMemoryInterface *pcm, DLString &arg, ostringstream &
     
     if (arg.toLower() == "telegram") {
         buf << "Telegram";
-        return true;
+        return false;
     }
 
     if (arg.toLower() == "discord") {
         buf << "Discord";
-        return true;
+        return false;
     }
 
     if (argIsImmortal( arg )) {
