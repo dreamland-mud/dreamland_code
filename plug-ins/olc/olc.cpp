@@ -2,21 +2,6 @@
  *
  * ruffina, 2004
  */
-
-#include <sys/types.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <stdarg.h>
-
-#include <fstream>
-#include <list>
-#include <set>
-
-#include <config.h>
-
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
 #include "regexp.h"
@@ -38,14 +23,15 @@
 #include <npcharacter.h>
 #include <commandmanager.h>
 #include "race.h"
-
 #include "room.h"
 
 #include "olc.h"
 #include "olcflags.h"
 #include "olcstate.h"
 #include "security.h"
+#include "areahelp.h"
 
+#include "websocketrpc.h"
 #include "interp.h"
 #include "merc.h"
 #include "handler.h"
@@ -54,7 +40,6 @@
 #include "act_move.h"
 #include "vnum.h"
 #include "mercdb.h"
-
 #include "comm.h"
 #include "def.h"
 
@@ -72,6 +57,19 @@ enum {
     NDX_OBJ,
     NDX_MOB,
 };
+
+/** Get self-help article for this area, either a real one or automatically created. */
+AreaHelp * get_area_help(AREA_DATA *area)
+{
+    for (auto &article: area->helps) {
+        AreaHelp *ahelp = article.getDynamicPointer<AreaHelp>();
+        if (ahelp && ahelp->selfHelp)
+            return ahelp;
+    }
+
+    return 0;
+}
+
 
 static int next_index_data( Character *ch, Room *r, int ndx_type )
 {
@@ -163,6 +161,7 @@ void show_fenia_triggers(Character *ch, Scripting::Object *wrapper)
     }
 }
 
+/** Find area with given vnum. */
 AREA_DATA *get_area_data(int vnum)
 {
     AREA_DATA *pArea;
@@ -553,14 +552,28 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 {
     AREA_DATA *pArea;
 
-    ptc(ch, "%3s Sec [%27s] (%5s-%5s) %15s [%-10s]\n\r",
-      "Num", "Area Name", "lvnum", "uvnum", "Filename", "Authors");
+    const DLString lineFormat = 
+            "[" + web_cmd(ch, "aedit $1", "%3d") 
+            + "] {W%-29s {x(%5u-%5u) %17s %s\n\r";
+
+    ptc(ch, "[%3s] %-29s   (%5s-%5s) %-17s %s\n\r",
+      "Num", "Area Name", "lvnum", "uvnum", "Filename", "Help");
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
-        ptc(ch, "%3d [%d] {W%-29s {x(%5u-%5u) %15s [%10s]\n\r",
-            pArea->vnum, pArea->security, pArea->name,
-            pArea->min_vnum, pArea->max_vnum,
-            pArea->area_file->file_name, pArea->authors);
+        DLString hedit = "";
+        AreaHelp *ahelp = get_area_help(pArea);
+        if (ahelp && ahelp->getID() > 0) {
+            DLString id(ahelp->getID());
+            hedit = web_cmd(ch, "hedit " + id, "hedit " + id);
+        }
+            
+        ch->send_to(
+            dlprintf(lineFormat.c_str(), 
+                pArea->vnum, 
+                DLString(pArea->name).colourStrip().cutSize(29).c_str(),
+                pArea->min_vnum, pArea->max_vnum,
+                pArea->area_file->file_name,
+                hedit.c_str()));
     }
 }
 
@@ -1178,7 +1191,7 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         
         ch->printf("Loading room objects for '%s' [%d], check logs for details.\r\n", 
                     room->name, room->vnum);
-        load_room_objects(room, "/tmp", false);
+        load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
 }

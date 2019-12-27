@@ -92,33 +92,9 @@ OLCStateArea::~OLCStateArea()
 {
 }
 
-/** Find area with given vnum. */
-static AREA_DATA * get_original(int vnum)
-{
-    AREA_DATA *area;
-    
-    for (area = area_first; area; area = area->next)
-        if(area->vnum == vnum)
-            return area;
-
-    return 0;
-}
-
-/** Get self-help article for this area, either a real one or automatically created. */
-static AreaHelp * get_area_help(AREA_DATA *area)
-{
-    for (auto &article: area->helps) {
-        AreaHelp *ahelp = article.getDynamicPointer<AreaHelp>();
-        if (ahelp && ahelp->selfHelp)
-            return ahelp;
-    }
-
-    return 0;
-}
-
 void OLCStateArea::commit() 
 {
-    AREA_DATA *original = get_original(vnum);
+    AREA_DATA *original = get_area_data(vnum);
     
     if(!original) {
         original = new AREA_DATA;
@@ -217,7 +193,7 @@ AEDIT(show, "показать", "показать все поля")
     if (!behavior.empty( ))
         ptc(ch, "Behavior:\r\n%s", behavior.c_str( ));
 
-    AREA_DATA *original = get_original(vnum);
+    AREA_DATA *original = get_area_data(vnum);
     if (original) {
         DLString buf;
 
@@ -241,7 +217,7 @@ AEDIT(show, "показать", "показать все поля")
 AEDIT(helps, "справка", "создать или посмотреть справку по зоне")
 {
     DLString arg = argument;
-    AREA_DATA *original = get_original(vnum);
+    AREA_DATA *original = get_area_data(vnum);
 
     if (!original) {
         stc("Сперва сохрани новую арию.", ch);
@@ -312,7 +288,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
 
 AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
-    AREA_DATA *original = get_original(vnum);
+    AREA_DATA *original = get_area_data(vnum);
 
     if (original) {
         reset_area(original);
