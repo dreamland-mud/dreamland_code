@@ -2,8 +2,11 @@
  *
  * ruffina, 2004
  */
+#include "json/json.h"
 #include "commonattributes.h"
-
+#include "pcmemoryinterface.h"
+#include "xmlattributes.h"
+#include "logstream.h"
 
 const DLString XMLEmptyAttribute::TYPE = "XMLEmptyAttribute";
 
@@ -53,3 +56,28 @@ XMLStringListAttribute::~XMLStringListAttribute( )
 {
 }
 
+const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName)
+{
+    XMLStringAttribute::Pointer attr = player->getAttributes().getAttr<XMLStringAttribute>(attrName);
+    return attr->getValue();
+}
+
+bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue)
+{
+    const DLString &attrString = get_string_attribute(player, attrName);
+    Json::Reader reader;
+    if (!reader.parse(attrString, attrValue)) {
+        LogStream::sendNotice() << "Error parsing JSON attribute " << attrString << " for " << player->getName() << endl;
+        return false;
+    }
+
+    return true;
+}
+
+void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue)
+{
+    XMLStringAttribute::Pointer attr = player->getAttributes().getAttr<XMLStringAttribute>(attrName);
+    Json::FastWriter writer;
+    attr->setValue(
+        writer.write(attrValue));
+}

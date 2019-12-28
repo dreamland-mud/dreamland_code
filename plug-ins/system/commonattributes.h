@@ -75,4 +75,13 @@ public:
     static const DLString TYPE;
 };
 
+class PCMemoryInterface;
+namespace Json {
+    class Value;
+}
+
+const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName);
+bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
+void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
+
 #endif

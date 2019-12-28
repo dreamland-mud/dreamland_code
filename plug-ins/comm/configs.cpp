@@ -5,14 +5,17 @@
  */
 
 #include "configs.h"
+#include "jsoncpp/json/json.h"
 
 #include "commandmanager.h"
 #include "commandtemplate.h"
-
+#include "commonattributes.h"
 #include "pcharacter.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "interp.h"
+#include "comm.h"
+#include "act.h"
 #include "arg_utils.h"
 #include "def.h"
 
@@ -25,6 +28,10 @@
 
 static void config_scroll(Character *ch, const DLString &constArguments);
 static void config_scroll_print(Character *ch);
+static void config_telegram(PCharacter *ch, const DLString &constArguments);
+static void config_telegram_print(PCharacter *ch);
+static void config_discord(PCharacter *ch, const DLString &constArguments);
+static void config_discord_print(PCharacter *ch);
 
 /*-------------------------------------------------------------------------
  * ConfigElement
@@ -110,19 +117,22 @@ void ConfigElement::printRow( PCharacter *ch ) const
                       yes ? "ВКЛ." : "ВЫКЛ." );
 }
 
+static const char * LINE_FORMAT = "  {%s%-12s {%s%5s {x%s\r\n";
+static const char * LINE_FORMAT_RU = "  {%s%-14s {%s%5s {x%s\r\n";
+
 void ConfigElement::printLine( PCharacter *ch ) const
 {
     bool yes = isSetBit( ch );
 
     if (ch->getConfig( )->rucommands)
-        ch->printf( "  {%s%-14s {%s%5s {x%s\n",
+        ch->printf( LINE_FORMAT_RU,
                         CLR_NAME(ch),
                         rname.getValue( ).c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
                         yes ? "ДА" : "НЕТ",
                         yes ? msgOn.c_str() : msgOff.c_str() );
     else
-        ch->printf( "  {%s%-12s {%s%5s {x%s\n",
+        ch->printf( LINE_FORMAT,
                         CLR_NAME(ch),
                         name.getValue( ).c_str( ),
                         yes ? CLR_YES(ch) : CLR_NO(ch),
@@ -250,13 +260,26 @@ COMMAND(ConfigCommand, "config")
                     (*c)->printLine( pch );
         }
 
-        config_scroll_print(ch);
+        config_scroll_print(pch);
+        config_telegram_print(pch);
+        config_discord_print(pch);
+        ch->println("\r\nПодробнее смотри по команде {lR{yрежим {Dнастройка{w{lE{yconfig {Dнастройка{x.");
         return;
     }
 
     if (arg_oneof(arg1, "scroll", "экран", "буфер")) {
         config_scroll(pch, arg2);
         return; 
+    }
+
+    if (arg_oneof(arg1, "telegram", "телеграм")) {
+        config_telegram(pch, arg2);
+        return;
+    }
+
+    if (arg_oneof(arg1, "discord", "дискорд")) {
+        config_discord(pch, arg2);
+        return;
     }
 
     for (g = groups.begin( ); g != groups.end( ); g++) 
@@ -288,16 +311,25 @@ CMDRUN( autolist )
  *------------------------------------------------------------------------*/
 CMDRUN( scroll )
 {
-    ch->println("Эта команда устарела, используй {hc{y{lRрежим экран{lEconfig scroll{x.");
+    ch->println("Эта команда устарела, используй {hc{y{lRрежим буфер{lEconfig scroll{x.");
 }
 
 static void config_scroll_print(Character *ch)
 {
+    DLString lines(ch->lines);
+    DLString msg;
     if (ch->lines == 0)
-        ch->send_to("Ты получаешь длинные сообщения без буферизации.\n\r");
+        msg = "Ты получаешь длинные сообщения без буферизации.";
     else
-        ch->printf( "Тебе непрерывно выводится %d лин%s текста.\n\r",
-                    ch->lines.getValue( ) + 2, GET_COUNT(ch->lines.getValue( ) + 2, "ия","ии","ий") );
+        msg = dlprintf("Тебе непрерывно выводится %d лин%s текста.",
+                    ch->lines.getValue( ), GET_COUNT(ch->lines.getValue( ), "ия","ии","ий") );
+
+    if (ch->getConfig()->rucommands)
+        ch->printf(LINE_FORMAT_RU,
+                   CLR_NAME(ch), "буфер", CLR_NO(ch), lines.c_str(), msg.c_str());
+    else
+        ch->printf(LINE_FORMAT,
+                   CLR_NAME(ch), "scroll", CLR_NO(ch), lines.c_str(), msg.c_str());
 }
 
 static void config_scroll(Character *ch, const DLString &constArguments)
@@ -341,7 +373,132 @@ static void config_scroll(Character *ch, const DLString &constArguments)
         return;
     }
 
-    ch->lines = lines - 2;
+    ch->lines = lines;
     ch->printf( "Вывод установлен на %d лин%s.\n\r", lines,
                 GET_COUNT(lines, "ию","ии","ий") );
+}
+
+/**
+ * Print Telegram handle.
+ */
+static void config_telegram_print(PCharacter *ch)
+{
+    const DLString &user = get_string_attribute(ch, "telegram");
+    bool yes = !user.empty();
+    DLString msg = yes ? dlprintf("Твой персонаж связан с пользователем Telegram {C%s{x.", user.c_str()) :
+                        "Твой персонаж не связан с пользователями Telegram, набери {y{hc{lEconfig telegram{lRрежим телеграм{x.";
+
+    if (ch->getConfig()->rucommands)
+        ch->printf(LINE_FORMAT_RU,
+                   CLR_NAME(ch), "телеграм", yes ? CLR_YES(ch) : CLR_NO(ch), 
+                   yes ? "ДА" : "НЕТ", msg.c_str());
+    else
+        ch->printf(LINE_FORMAT,
+                   CLR_NAME(ch), "telegram", yes ? CLR_YES(ch) : CLR_NO(ch), 
+                   yes ? "YES" : "NO", msg.c_str());
+}
+
+/**
+ * Link your character to a Telegram handle.
+ */
+static void config_telegram(PCharacter *ch, const DLString &constArguments)
+{
+    DLString arg = constArguments;
+    XMLStringAttribute::Pointer user = ch->getAttributes().getAttr<XMLStringAttribute>("telegram");
+
+    if (arg.empty()) {
+        if (!user->empty())
+            ch->printf("Твой персонаж связан с пользователем Telegram {C%s{x.\r\n"
+                       "Используй {hc{y{lRрежим телеграм очистить{lEconfig telegram clear{x для очистки.\r\n", 
+                       user->getValue().c_str());
+        else
+            ch->println("Твой персонаж не связан с пользователями Telegram.\r\n"
+                        "Используй {y{lRрежим телеграм @имя{lEconfig telegram @username{x для установки.");        
+        return;
+    }
+
+    if (arg_is_clear(arg)) {
+        if (user->empty()) 
+            ch->println("Нечего очищать.");
+        else {
+            ch->printf("Связь с пользователем {C%s{x очищена.\r\n", user->getValue().c_str());
+            user->clear();
+        }
+        return;
+    }
+
+    if (arg.at(0) != '@') {
+        ch->println("Задай имя пользователя начиная с @.");
+        return;
+    }
+
+    user->setValue(arg);
+    ch->printf("Теперь {C%s{x привязан к твоему персонажу.\r\n", arg.c_str());
+}
+
+static void config_discord_print(PCharacter *ch)
+{
+    ostringstream msg;
+
+    Json::Value discord;
+    get_json_attribute(ch, "discord", discord);
+    bool yes = !discord["id"].empty();
+    
+    if (yes)
+        msg << "Пользователь " << discord["username"] 
+            << " (" << discord["id"] << "), статус " << discord["status"] 
+            << ", секретное слово " << discord["token"];
+    else
+        msg << "Твой персонаж не связан с пользователем Discord, набери {y{hc{lRрежим дискорд{lEconfig discord{x";
+
+    if (ch->getConfig()->rucommands)
+        ch->printf(LINE_FORMAT_RU,
+                   CLR_NAME(ch), "дискорд", yes ? CLR_YES(ch) : CLR_NO(ch), 
+                   yes ? "ДА" : "НЕТ", msg.str().c_str());
+    else
+        ch->printf(LINE_FORMAT,
+                   CLR_NAME(ch), "discord", yes ? CLR_YES(ch) : CLR_NO(ch), 
+                   yes ? "YES" : "NO", msg.str().c_str());
+}
+
+static void config_discord(PCharacter *ch, const DLString &constArguments)
+{
+    DLString arg = constArguments;
+    ostringstream buf;
+    Json::Value discord;
+    get_json_attribute(ch, "discord", discord);
+
+    if (arg_is_clear(arg)) {
+        bool linked = !discord["id"].empty();
+        discord.clear();
+        discord["token"] = create_nonce(6);
+        set_json_attribute(ch, "discord", discord);
+
+        if (linked)
+            ch->send_to("Связь с пользователем Discord очищена. ");
+
+        ch->printf("Новое секретное слово: {W%s{x.\r\n",
+                   discord["token"].asString().c_str());
+        return;
+    }
+
+    if (discord["token"].empty()) {
+        discord["token"] = create_nonce(6);
+        set_json_attribute(ch, "discord", discord);
+    }
+
+    if (discord["id"].empty()) {
+        buf << "Для связи этого персонажа с пользователем Discord: " << endl
+            << "  {W*{x зайди на сервер {hlhttps://discord.gg/RPaz6ut{x" << endl
+            << "  {W*{x зайди на канал {W#dreamland{x или открой приват с ботом {WВалькирия{x" << endl
+            << "  {W*{x набери {W/link " << discord["token"].asString() << "{x" << endl
+            << "Для смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x." << endl;
+    } else {
+        buf << "Твой персонаж связан с пользователем " << discord["username"] << "(" 
+            << discord["id"] << "), статус " << discord["status"] << endl;
+        buf << "Для повторной линковки набери {W/link " << discord["token"] <<"{x в привате с ботом {WВалькирия{x" << endl
+            << "Для очистки и смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x.";
+    }
+
+    ch->send_to(buf);
 }
