@@ -14,9 +14,10 @@
 #include "descriptor.h"
 #include "descriptorstatelistener.h"
 #include "quest.h"
+#include "pcharactermanager.h"
 #include "commandmanager.h"
 #include "jsonservlet.h"
-
+#include "commonattributes.h"
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
 #include "dldirectory.h"
@@ -1215,6 +1216,7 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
 
     body["total"] = body["people"].size();
 }
+
 
 extern "C"
 {

@@ -7,6 +7,7 @@
 #include "configs.h"
 #include "jsoncpp/json/json.h"
 
+#include "servlet.h"
 #include "commandmanager.h"
 #include "commandtemplate.h"
 #include "commonattributes.h"
@@ -16,6 +17,7 @@
 #include "mercdb.h"
 #include "interp.h"
 #include "comm.h"
+#include "servlet_utils.h"
 #include "act.h"
 #include "arg_utils.h"
 #include "def.h"
@@ -380,7 +382,7 @@ static void config_telegram_print(PCharacter *ch)
 {
     const DLString &user = get_string_attribute(ch, "telegram");
     bool yes = !user.empty();
-    DLString msgYes = dlprintf("Твой персонаж связан с пользователем Telegram {C%s{x.", user.c_str());
+    DLString msgYes = dlprintf("Пользователь Telegram {C%s{x.", user.c_str());
     DLString msgNo = "Твой персонаж не связан с пользователями Telegram, набери {y{hc{lEconfig telegram{lRрежим телеграм{x.";
     print_line(ch, "telegram", "телеграм", yes, msgYes, msgNo);
 }
@@ -432,12 +434,11 @@ static void config_discord_print(PCharacter *ch)
 {
     Json::Value discord;
     get_json_attribute(ch, "discord", discord);
-    bool yes = !discord["id"].empty();
+    bool yes = !discord["id"].asString().empty();
 
     ostringstream msgYes;
-    msgYes << "Пользователь " << discord["username"] 
-            << " (" << discord["id"] << "), статус " << discord["status"] 
-            << ", секретное слово " << discord["token"];    
+    msgYes << "Пользователь Discord {C" << discord["username"].asString() 
+           << "{w ({C" << discord["id"].asString() << "{w), статус " << discord["status"];            
 
     DLString msgNo = "Твой персонаж не связан с пользователем Discord, набери {y{hc{lRрежим дискорд{lEconfig discord{x";
     print_line(ch, "discord", "дискорд", yes, msgYes.str(), msgNo);
@@ -455,7 +456,7 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
 
     if (arg_is_clear(arg)) {
         // Clear out all user data and regenerate token.
-        bool linked = !discord["id"].empty();
+        bool linked = !discord["id"].asString().empty();
         discord.clear();
         discord["token"] = create_nonce(6);
         set_json_attribute(ch, "discord", discord);
@@ -470,24 +471,82 @@ static void config_discord(PCharacter *ch, const DLString &constArguments)
     }
 
     // Generate secret token for the first time.
-    if (discord["token"].empty()) {
+    if (discord["token"].asString().empty()) {
         discord["token"] = create_nonce(6);
         set_json_attribute(ch, "discord", discord);
         PCharacterManager::save(ch);
     }
 
-    if (discord["id"].empty()) {
+    if (discord["id"].asString().empty()) {
         buf << "Для связи этого персонажа с пользователем Discord: " << endl
             << "  {W*{x зайди на сервер {hlhttps://discord.gg/RPaz6ut{x" << endl
             << "  {W*{x зайди на канал {W#dreamland{x или открой приват с ботом {WВалькирия{x" << endl
             << "  {W*{x набери {W/link " << discord["token"].asString() << "{x" << endl
             << "Для смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x." << endl;
     } else {
-        buf << "Твой персонаж связан с пользователем " << discord["username"] << "(" 
-            << discord["id"] << "), статус " << discord["status"] << endl;
-        buf << "Для повторной линковки набери {W/link " << discord["token"] <<"{x в привате с ботом {WВалькирия{x" << endl
-            << "Для очистки и смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x.";
+        buf << "Твой персонаж связан с пользователем {C" << discord["username"].asString() << "{w ({C" 
+            << discord["id"].asString() << "{w), статус " << discord["status"].asString() << endl;
+        buf << "Для повторной линковки набери {W/link " << discord["token"].asString() <<"{x в привате с ботом {WВалькирия{x" << endl
+            << "Для очистки и смены секретного слова набери {hc{y{lRрежим дискорд очистить{lEconfig discord clear{x."
+            << endl;
     }
 
     ch->send_to(buf);
 }
+
+
+/**
+ * Discord: /link <6-symbol-token>
+ * Auth: bottype=discord, token=<discord secret>
+ * Args: link, id, username, status
+ */
+SERVLET_HANDLE(cmd_link, "/link")
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+
+    if (!servlet_auth_bot(params, response)) 
+        return;
+
+    DLString linkToken, discordId, discordUsername, discordStatus;
+    if (!servlet_get_arg(params, response, "link", linkToken)
+        || !servlet_get_arg(params, response, "id", discordId)
+        || !servlet_get_arg(params, response, "username", discordUsername)
+        || !servlet_get_arg(params, response, "status", discordStatus))
+        return;
+
+    PCMemoryInterface *player = find_player_by_json_attribute("discord", "token", linkToken);
+    if (!player) {
+        servlet_response_404(response, "Player with this token not found");
+        return;
+    }
+
+    Json::Value discord;
+    get_json_attribute(player, "discord", discord);
+    DLString currentId = discord["id"].asString();
+    if (currentId == discordId) {
+        servlet_response_200(response, "Already linked");
+        return;
+    }
+
+    if (!currentId.empty()) {
+        notice("Change Discord id from %s(%s) to %s(%s) for player %s.",
+                currentId.c_str(), discord["username"].asString().c_str(),
+                discordId.c_str(), discordUsername.c_str(), player->getName().c_str());
+    } else {
+        notice("Set Discord id to %s(%s) for player %s.",
+                discordId.c_str(), discordUsername.c_str(), player->getName().c_str());
+    }
+
+    discord["id"] = discordId;
+    discord["username"] = discordUsername;
+    discord["status"] = discordStatus;
+    discord["token"] = DLString::emptyString;
+    set_json_attribute(player, "discord", discord);
+    PCharacterManager::saveMemory(player);
+
+    servlet_response_200(response, "Link successful");
+}
+
+

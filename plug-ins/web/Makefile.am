@@ -21,6 +21,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/traverse \
 -I$(top_srcdir)/plug-ins/ai \
 -I$(top_srcdir)/plug-ins/mlove \
+-I$(top_srcdir)/plug-ins/servlets \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/quest/core \
 -I$(top_srcdir)/plug-ins/services/core \
@@ -37,6 +38,7 @@ $(LIBADD_AI) \
 ../ed/libcoreed.la \
 ../updates/libupdates.la \
 ../mlove/libmlove.la \
+../servlets/libservlets.la \
 ../clan/core/libclan_core.la \
 ../quest/core/libquest_core.la \
 ../services/core/libservices_core.la \

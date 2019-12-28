@@ -5,6 +5,8 @@
 #include "json/json.h"
 #include "commonattributes.h"
 #include "pcmemoryinterface.h"
+#include "pcharactermemorylist.h"
+#include "pcharactermanager.h"
 #include "xmlattributes.h"
 #include "logstream.h"
 
@@ -62,6 +64,9 @@ const DLString & get_string_attribute(PCMemoryInterface *player, const DLString 
     return attr->getValue();
 }
 
+/**
+ * Generate Json from player attribute string.
+ */
 bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue)
 {
     const DLString &attrString = get_string_attribute(player, attrName);
@@ -74,10 +79,55 @@ bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Jso
     return true;
 }
 
+/**
+ * Create string from Json attribute and save as a player attribute.
+ */
 void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue)
 {
     XMLStringAttribute::Pointer attr = player->getAttributes().getAttr<XMLStringAttribute>(attrName);
     Json::FastWriter writer;
     attr->setValue(
         writer.write(attrValue));
+}
+
+/**
+ * Locate first player memory with an attribute of given value.
+ */
+PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLString &attrValue)
+{
+    const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
+
+    for (const auto &keyValue: pcm) {
+        PCMemoryInterface *player = keyValue.second;   
+        XMLStringAttribute::Pointer attr = player->getAttributes().findAttr<XMLStringAttribute>(attrName);
+        if (attr && attr->getValue() == attrValue)
+            return player;
+    }
+
+    return 0;
+}
+
+/**
+ * Locate first player memory with a JSON attribute with given name:value pair.
+ */
+PCMemoryInterface * find_player_by_json_attribute(const DLString &attrName, const DLString &name, const DLString &value)
+{
+    const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
+
+    for (const auto &keyValue: pcm) {
+        PCMemoryInterface *player = keyValue.second;   
+        XMLStringAttribute::Pointer attr = player->getAttributes().findAttr<XMLStringAttribute>(attrName);
+        if (!attr)
+            continue;
+
+        Json::Reader reader;
+        Json::Value attrValue;
+        if (!reader.parse(attr->getValue(), attrValue))
+            continue;
+
+        if (attrValue[name].asString() == value)
+            return player;
+    }
+
+    return 0;    
 }

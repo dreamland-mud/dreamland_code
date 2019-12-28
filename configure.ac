@@ -168,6 +168,7 @@ plug-ins/interpret/Makefile \
 plug-ins/descriptor/Makefile \
 plug-ins/ed/Makefile \
 plug-ins/ed/lib/Makefile \
+plug-ins/servlets/Makefile \
 plug-ins/iomanager/Makefile \
 plug-ins/admin/Makefile \
 plug-ins/comm/Makefile \

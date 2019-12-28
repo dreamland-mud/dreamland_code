@@ -83,5 +83,6 @@ namespace Json {
 const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName);
 bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
 void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
-
+PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLString &attrValue);
+PCMemoryInterface * find_player_by_json_attribute(const DLString &attrName, const DLString &name, const DLString &value);
 #endif
