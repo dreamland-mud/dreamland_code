@@ -70,6 +70,9 @@ const DLString & get_string_attribute(PCMemoryInterface *player, const DLString 
 bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue)
 {
     const DLString &attrString = get_string_attribute(player, attrName);
+    if (attrString.empty())
+        return false;
+        
     Json::Reader reader;
     if (!reader.parse(attrString, attrValue)) {
         LogStream::sendNotice() << "Error parsing JSON attribute " << attrString << " for " << player->getName() << endl;
@@ -110,9 +113,10 @@ PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLS
 /**
  * Locate first player memory with a JSON attribute with given name:value pair.
  */
-PCMemoryInterface * find_player_by_json_attribute(const DLString &attrName, const DLString &name, const DLString &value)
+list<PCMemoryInterface *> find_players_by_json_attribute(const DLString &attrName, const DLString &name, const DLString &value)
 {
     const PCharacterMemoryList &pcm = PCharacterManager::getPCM();
+    list<PCMemoryInterface *> result;
 
     for (const auto &keyValue: pcm) {
         PCMemoryInterface *player = keyValue.second;   
@@ -126,8 +130,8 @@ PCMemoryInterface * find_player_by_json_attribute(const DLString &attrName, cons
             continue;
 
         if (attrValue[name].asString() == value)
-            return player;
+            result.push_back(player);
     }
 
-    return 0;    
+    return result;    
 }

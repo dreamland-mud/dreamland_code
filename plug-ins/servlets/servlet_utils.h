@@ -15,5 +15,6 @@ PCMemoryInterface * servlet_find_player(Json::Value &params, HttpResponse &respo
 bool servlet_get_arg(Json::Value &params, HttpResponse &response, const DLString &argName, DLString &argValue);
 void servlet_response_200(HttpResponse &response, const DLString &text);
 void servlet_response_404(HttpResponse &response, const DLString &text);
+void servlet_response_200_json(HttpResponse &response, const Json::Value &payload);
 
 #endif

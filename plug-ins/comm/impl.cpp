@@ -22,7 +22,6 @@
 #include "pcdeleteidle.h"
 #include "run.h"
 #include "whois.h"
-#include "who.h"
 #include "writing.h"
 #include "eating.h"
 #include "so.h"
@@ -47,7 +46,6 @@ extern "C"
 
                 Plugin::registerPlugin<COrder>( ppl );
                 Plugin::registerPlugin<Whois>( ppl );
-                Plugin::registerPlugin<Who>( ppl );
                 Plugin::registerPlugin<CWrite>( ppl );
                 
 //                Plugin::registerPlugin<PCDeleteIdle>( ppl );

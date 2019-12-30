@@ -36,7 +36,6 @@ corder.h \
 pcdeleteidle.h \
 run.h \
 whois.h \
-who.h \
 writing.h \
 eating.h
 

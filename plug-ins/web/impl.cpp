@@ -3,7 +3,6 @@
  * ruffina, 2018
  */
 #include "webprompt.h"
-#include "webpromptattribute.h"
 #include "logstream.h"
 #include "schedulertaskroundplugin.h"
 #include "dlscheduler.h"
@@ -16,7 +15,6 @@
 #include "quest.h"
 #include "pcharactermanager.h"
 #include "commandmanager.h"
-#include "jsonservlet.h"
 #include "commonattributes.h"
 #include "grammar_entities_impl.h"
 #include "dlfilestream.h"
@@ -41,7 +39,6 @@
 #include "so.h"
 #include "def.h"
 
-static const DLString NONE = "none";
 static const DLString EXITS = "exits";
 static const DLString ROOM = "room";
 static const DLString ZONE = "zone";
@@ -55,7 +52,6 @@ static const DLString PROTECT = "pro";
 static const DLString TRAVEL = "trv";
 static const DLString MALAD = "mal";
 static const DLString CLAN = "cln";
-static const DLString WHO = "who";
 static const DLString PARAM1 = "p1";
 static const DLString PARAM2 = "p2";
 static const DLString PERM_STAT = "ps";
@@ -90,109 +86,6 @@ static string json_to_string( const Json::Value &value )
     return writer.write( value );
 }    
 
-static void json_update_if_new( const DLString &field, const Json::Value &newValue, WebPromptAttribute::Pointer &attr, Json::Value &prompt )
-{
-    // First time a value disappears, we need to send "none" to front-end to hide corresponding row.
-    // Subsequent calls can just omit the value from prompt, until it's back again.
-    if (newValue.empty( )) {
-        if (!attr->prompt.isAvailable( field ) || !attr->prompt[field].empty( )) {
-            prompt[field] = NONE;
-        }
-        attr->prompt[field] = DLString::emptyString;
-        return;
-    }
-
-    // Serialize new value to string and see if it differs from the stored value.
-    DLString value = json_to_string( newValue );
-    if (!attr->prompt.isAvailable( field ) || attr->prompt[field] != value) {
-        // First occurence or changed value, update it in the attribute and send to front-end.
-        attr->prompt[field] = value;
-        prompt[field] = newValue;
-        return;
-    }
-
-    // Nothing changed, send nothing in the prompt.
-}
-
-/*-------------------------------------------------------------------------
- * WhoWebPromptListener
- *------------------------------------------------------------------------*/
-class WhoWebPromptListener : public WebPromptListener {
-public:
-        typedef ::Pointer<WhoWebPromptListener> Pointer;
-
-        virtual void run( Descriptor *, Character *, Json::Value &json );
-
-        static Json::Value jsonPlayer( Character *ch, PCharacter *wch );
-        static Json::Value jsonWho( Character *ch );
-};
-
-void WhoWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
-{
-    WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
-    Json::Value &prompt = json["args"][0];
-
-    json_update_if_new( WHO, jsonWho( ch ), attr, prompt ); 
-}    
-
-Json::Value WhoWebPromptListener::jsonPlayer( Character *ch, PCharacter *wch )
-{
-    Json::Value player;
-    
-    // Player name and sex.
-    player["n"] = wch->toNoun(ch)->decline('1').cutSize(10);
-    player["s"] = wch->getSex( ) == SEX_MALE ? "m" : "f";
-
-    // First 2 letters of player race.
-    player["r"] = wch->getRace( )->getName( ).substr(0, 2);
-
-    // Clan name (first letter) and colour.
-    player["cn"] = wch->getClan( )->getName( ).substr(0, 1);
-    
-    DLString clr = wch->getClan( )->getColor( );
-    if (!clr.empty( )) {
-        player["cc"] = DLString(dl_isupper(clr.at(0)) ? "b" : "d") + dl_tolower(clr.at(0));
-    }
-
-    return player;
-}
-
-Json::Value WhoWebPromptListener::jsonWho( Character *ch )
-{
-    Json::Value who;
-    list<PCharacter *> players;
-    list<PCharacter *>::iterator p;
-
-    // Find all visible players.
-    for (Descriptor *d = descriptor_list; d; d = d->next) {
-        PCharacter *victim;
-        
-        if (d->connected != CON_PLAYING || !d->character)
-            continue;
-
-        victim = d->character->getPC( );
-
-        if (!can_see_god(ch, victim)) 
-            continue;
-
-        XMLAttributes *attrs = &victim->getAttributes( );
-        if (attrs->isAvailable("nowho"))
-            continue;
-        
-        players.push_back( victim );
-    }
-
-    // Populate player list.
-    int pc = 0;
-    for (p = players.begin( ); p != players.end( ); p++) {
-        who["p"][pc++] = jsonPlayer( ch, *p );
-    }
-
-    // Total player count.
-    who["t"] = DLString(players.size());
-    return who;
-}
-
 /*-------------------------------------------------------------------------
  * GroupWebPromptListener
  *------------------------------------------------------------------------*/
@@ -212,7 +105,7 @@ void GroupWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &jso
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
 
-    json_update_if_new( GROUP, jsonGroup( ch ), attr, prompt ); 
+    attr->updateIfNew( GROUP, jsonGroup( ch ), prompt ); 
 }    
 
 Json::Value GroupWebPromptListener::jsonGroupMember( Character *ch, Character *gch )
@@ -298,9 +191,9 @@ void LocationWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
 
-    json_update_if_new( ROOM, jsonRoom( d, ch ), attr, prompt ); 
-    json_update_if_new( ZONE, jsonZone( d, ch ), attr, prompt ); 
-    json_update_if_new( EXITS, jsonExits( d, ch ), attr, prompt ); 
+    attr->updateIfNew( ROOM, jsonRoom( d, ch ), prompt ); 
+    attr->updateIfNew( ZONE, jsonZone( d, ch ), prompt ); 
+    attr->updateIfNew( EXITS, jsonExits( d, ch ), prompt ); 
 }
 
 bool LocationWebPromptListener::canSeeLocation( Character *ch )
@@ -480,9 +373,9 @@ void CalendarWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
 
-    json_update_if_new( TIME, jsonTime( d, ch ), attr, prompt ); 
-    json_update_if_new( DATE, jsonDate( d, ch ), attr, prompt ); 
-    json_update_if_new( WEATHER, jsonWeather( d, ch ), attr, prompt ); 
+    attr->updateIfNew( TIME, jsonTime( d, ch ), prompt ); 
+    attr->updateIfNew( DATE, jsonDate( d, ch ), prompt ); 
+    attr->updateIfNew( WEATHER, jsonWeather( d, ch ), prompt ); 
 }    
 
 /*-------------------------------------------------------------------------
@@ -564,12 +457,12 @@ void AffectsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
 
-    json_update_if_new( DETECT, jsonDetect( d, ch ), attr, prompt ); 
-    json_update_if_new( ENHANCE, jsonEnhance( d, ch ), attr, prompt ); 
-    json_update_if_new( PROTECT, jsonProtect( d, ch ), attr, prompt ); 
-    json_update_if_new( TRAVEL, jsonTravel( d, ch ), attr, prompt ); 
-    json_update_if_new( MALAD, jsonMalad( d, ch ), attr, prompt ); 
-    json_update_if_new( CLAN, jsonClan( d, ch ), attr, prompt ); 
+    attr->updateIfNew( DETECT, jsonDetect( d, ch ), prompt ); 
+    attr->updateIfNew( ENHANCE, jsonEnhance( d, ch ), prompt ); 
+    attr->updateIfNew( PROTECT, jsonProtect( d, ch ), prompt ); 
+    attr->updateIfNew( TRAVEL, jsonTravel( d, ch ), prompt ); 
+    attr->updateIfNew( MALAD, jsonMalad( d, ch ), prompt ); 
+    attr->updateIfNew( CLAN, jsonClan( d, ch ), prompt ); 
 }
 
 static void mark_affect( Character *ch, DLString &output, bitstring_t bit, char marker )
@@ -947,8 +840,8 @@ void ParamsWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &js
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
 
-    json_update_if_new( PARAM1, jsonParam1( d, ch ), attr, prompt ); 
-    json_update_if_new( PARAM2, jsonParam2( d, ch ), attr, prompt ); 
+    attr->updateIfNew( PARAM1, jsonParam1( d, ch ), prompt ); 
+    attr->updateIfNew( PARAM2, jsonParam2( d, ch ), prompt ); 
 }
 
 Json::Value ParamsWebPromptListener::jsonParam1( Descriptor *d, Character *ch )
@@ -994,7 +887,7 @@ void QuestorWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &j
     WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
     Json::Value &prompt = json["args"][0];
 
-    json_update_if_new( QUESTOR, jsonQuestor( d, ch ), attr, prompt ); 
+    attr->updateIfNew( QUESTOR, jsonQuestor( d, ch ), prompt ); 
 }
 
 Json::Value QuestorWebPromptListener::jsonQuestor( Descriptor *d, Character *ch )
@@ -1172,52 +1065,6 @@ public:
     }
 };    
 
-JSONSERVLET_HANDLE(cmd_who, "/who")
-{
-    PCharacter dummy;
-    dummy.config.setBit(CONFIG_RUCOMMANDS);
-    
-    for (Descriptor *d = descriptor_list; d; d = d->next) {
-        PCharacter *victim;
-        
-        if (d->connected != CON_PLAYING || !d->character)
-            continue;
-
-        victim = d->character->getPC( );
-
-        if (!can_see_god(NULL, victim)) 
-            continue;
-
-        XMLAttributes *attrs = &victim->getAttributes( );
-        if (attrs->isAvailable("nowho"))
-            continue;
-
-        Json::Value wch;
-
-        wch["name"]["en"] = victim->getName();
-        wch["name"]["ru"] = victim->getRussianName().decline('1');
-        wch["race"]["en"] = victim->getRace()->getName();
-        wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim);
-
-        if (victim->getClan() != clan_none)
-            wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
-
-        if (!victim->getPretitle().empty())
-            wch["pretitle"]["en"] = victim->getPretitle().colourStrip();
-
-        if (!victim->getRussianPretitle().empty())
-            wch["pretitle"]["ru"] = victim->getRussianPretitle().colourStrip();
-
-        wch["title"] = victim->getParsedTitle().colourStrip();
-        wch["remorts"] = DLString(victim->getRemorts().size());
-
-        body["people"].append(wch);
-    }
-
-    body["total"] = body["people"].size();
-}
-
-
 extern "C"
 {
     SO::PluginList initialize_web( )
@@ -1225,7 +1072,6 @@ extern "C"
         SO::PluginList ppl;
         Plugin::registerPlugin<HelpDumpPlugin>( ppl );
         Plugin::registerPlugin<CommandDumpPlugin>( ppl );
-        Plugin::registerPlugin<WhoWebPromptListener>( ppl );
         Plugin::registerPlugin<GroupWebPromptListener>( ppl );
         Plugin::registerPlugin<CalendarWebPromptListener>( ppl );
         Plugin::registerPlugin<LocationWebPromptListener>( ppl );

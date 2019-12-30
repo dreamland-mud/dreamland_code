@@ -39,6 +39,7 @@ pagerhandler.h \
 interprethandler.h \
 nannyhandler.h \
 wrapperhandler.h \
+webprompt.h \
 defaultbufferhandler.h \
 serversocket.h \
 serversocketcontainer.h \

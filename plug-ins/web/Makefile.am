@@ -5,13 +5,12 @@ include $(top_srcdir)/src/Makefile.inc
 
 libweb_la_SOURCES = \
 impl.cpp \
-webpromptattribute.cpp \
 maniplist.cpp \
 webitemmanip.cpp \
 webcharmanip.cpp \
 webtextmanip.cpp
 
-libweb_la_MOC = webpromptattribute.h
+libweb_la_MOC = 
 
 
 plugin_INCLUDES = \

@@ -5,14 +5,21 @@
 
 #include <sstream>
 
-#include "who.h"
+#include "json/json.h"
 #include "class.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
+#include "pcharactermanager.h"
 #include "object.h"
 #include "pcrace.h"
 
+#include "commandtemplate.h"
+#include "plugininitializer.h"
+#include "jsonservlet.h"
+#include "commonattributes.h"
+#include "servlet_utils.h"
 #include "webmanip.h"
+#include "webprompt.h"
 #include "clanreference.h"
 #include "fight.h"
 #include "act.h"
@@ -23,229 +30,98 @@
 #include "descriptor.h"
 #include "def.h"
 
+static const DLString WHO = "who";
+
 GSN(manacles);
 GSN(jail);
+CLAN(none);
 
-COMMAND(Who, "who")
+/** Check if profession in 'who/whois' is visible when both belong to the same clan. */
+bool can_see_profession( PCharacter *ch, PCMemoryInterface *victim ) 
 {
-    std::basic_ostringstream<char> buf;
-    std::list<PCharacter *> victims;
-    std::map<DLString, bool> rsClan;
-    std::map<DLString, bool> rsRace;
-    std::map<DLString, bool> rsClass;
-    Clan *clan;
-    Profession *prof;
-    bool fPK = false, fImmortal = false; 
-    int count, tattoo = 0, nNumber = 0, minLevel = 0, maxLevel = MAX_LEVEL;
-    DLString arg, arguments = constArguments;
+    if (ch->is_immortal( ))
+        return true;
     
-    if (ch->getPC( ) == 0)
-        return;
-
-    for( ; ; ) {
-        arg = arguments.getOneArgument( );
-
-        if (arg.empty( ))
-            break;
-
-        if (arg_is_pk( arg )) {
-            fPK = true;
-            continue;
-        }
-
-        if (arg == "tattoo" || arg == "татуировка") {
-            if (!get_eq_char( ch, wear_tattoo )) {
-                ch->send_to( "У тебя нет татуировки!\n\r");
-                return;
-            } else {
-                tattoo = get_eq_char( ch, wear_tattoo )->pIndexData->vnum;
-                continue;
-            }
-        }
-
-        if (is_number( arg.c_str( ) )) {
-            if (!ch->is_immortal( )) {
-                ch->send_to( "Синтаксис 'who <minlevel> <maxlevel>' доступен только богам.\r\n" );
-                return;
-            }
-            
-            switch (++nNumber) {
-            case 1:        minLevel = atoi( arg.c_str( ) ); break;
-            case 2:        maxLevel = atoi( arg.c_str( ) ); break;
-            default:        ch->send_to( "Слишком много аргументов.\n\r"); return;
-            }
-
-            continue;  
-        }
+    if (ch == victim->getPlayer())
+        return true;
     
-        if (( clan = ClanManager::getThis( )->findUnstrict( arg ) )) {
-            rsClan[clan->getName( )] = true;
-            continue;
-        } 
+    if (ch->getClan( ) != clan_none 
+        && ch->getClan( ) == victim->getClan( )
+        && !ch->getClan( )->isDispersed( ))
+        return true;
 
-        if (arg.at( 0 ) == 'i') {
-            fImmortal = true;
-            continue;
-        }
+    return false;
+}
 
-        prof = professionManager->findUnstrict( arg );
+/** Check if level in 'who/whois' is visible because of low charisma or same clan. */
+bool can_see_level( PCharacter *ch, PCMemoryInterface *victim ) 
+{
+    if (victim->isOnline() && victim->getPlayer()->getCurrStat( STAT_CHA ) < 18)
+        return true;
 
-        if (!prof) {
-            Race * race = raceManager->findUnstrict( arg );
-            
-            if (!race) {
-                ch->send_to( "Неправильная раса.\n\r");
-                return;
-            }
-            
-            rsRace[race->getName( )] = true;
+    return can_see_profession( ch, victim );
+}
 
-        } else { 
-            if (!ch->is_immortal( )) {
-                ch->send_to( "Синтаксис 'who <имя класса>' доступен только богам.\r\n" );
-                return;
-            }
-            
-            rsClass[prof->getName( )] = true;
-        }
+/** Get a list of online players excluding gods in wizinvis. */
+list<PCharacter *> who_find_online(PCharacter *looker)
+{
+    list<PCharacter *> result;
 
-    }
-
-
-    count = 0;
     for (Descriptor *d = descriptor_list; d; d = d->next) {
-        Object *obj;
         PCharacter *victim;
         
         if (d->connected != CON_PLAYING || !d->character)
             continue;
-        
+
         victim = d->character->getPC( );
 
-        if (victim->getAttributes( ).isAvailable("nowho"))
+        if (!can_see_god(looker, victim)) 
             continue;
 
-        // Add here explicit checks for wizinvis and incognito,
-        // to avoid showing hidden immortals in total count.      
-        if (!can_see_god(ch, victim)) 
+        XMLAttributes *attrs = &victim->getAttributes( );
+        if (attrs->isAvailable("nowho"))
             continue;
 
-        count++;
-        
-        if (victim->getRealLevel( ) < minLevel || victim->getRealLevel( ) > maxLevel)
-            continue;
-        
-        if (fPK && is_safe_nomessage( ch, victim ))
-            continue;
-
-        if (fImmortal && victim->getRealLevel( ) <= LEVEL_HERO)
-            continue;
-
-        if (!rsClass.empty( ))
-            if (rsClass.find( victim->getProfession( )->getName( ).c_str( ) ) == rsClass.end( ))
-                continue;
-        
-        if (!rsRace.empty( ))
-            if (rsRace.find( victim->getRace( )->getName( ) ) == rsRace.end( ))
-                continue;
-
-        if (!rsClan.empty( ))
-            if (rsClan.find( victim->getClan( )->getName( ) ) == rsClan.end( ))
-                continue;
-
-        if (tattoo)
-            if (!(obj = get_eq_char( victim, wear_tattoo)) || tattoo != obj->pIndexData->vnum)
-                continue;
-
-        victims.push_back( victim );
+        result.push_back(victim);
     }
 
-    for (std::list<PCharacter *>::iterator i = victims.begin( ); i != victims.end( ); i++)
-        ch->send_to( formatChar( ch, *i ).c_str( ) );
-
-    buf << endl 
-        << "Всего игроков: " << count;
-    if (count != victims.size()) 
-        buf << ", найдено: " << victims.size( );
-    buf << ". "
-        << "Максимум на сегодня был: " << Descriptor::getMaxOnline( ) << "." << endl;
-    if (!IS_SET( ch->act, PLR_CONFIRMED ) && ch->getPC( )->getRemorts( ).size( ) == 0) 
-        buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl
-            << "Подробнее читай {W? подтверждение{x." << endl;
-    ch->send_to( buf );
+    return result;
 }
 
-DLString Who::formatChar( Character *ch, PCharacter *victim ) {
-    DLString result;
-    std::basic_ostringstream<char> buf, tmp;
-  
-    /* Level, Race, Class */
-    buf << "{x|" << leftColumn( ch, victim ) << "{x|";
-        
-    /* PK */
-    if (victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
-        tmp << "{x({rPK{x)";
-    
-    buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
-    tmp.str( "" );
+/** Get a list of offline players that are online/idle in Discord. */
+list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
+{
+    list<PCMemoryInterface *> result;
 
-    /* Clan, (R) (L) */
-    if (!victim->getClan( )->isHidden( ) && !victim->is_immortal( )) {
-        const Clan &clan = *victim->getClan( );
+    for (const auto &kv: PCharacterManager::getPCM()) {
+        PCMemoryInterface *pcm = kv.second;
+        Json::Value discord;
 
-        tmp << "{x[{" << clan.getColor( ) << clan.getShortName( ).at( 0 ) << "{x]";
-        
-        if (clan.isLeader( victim ))
-            tmp << "{R({CL{R){x";
-        else if (clan.isRecruiter( victim ))
-            tmp << "{R({CR{R){x";
-        else 
-            tmp << "   ";
-    } 
-    
-    buf << dlprintf( "%6s", tmp.str( ).c_str( ) );
-    tmp.str( "" );
-   
-    /* Remorts */
-    int remorts = victim->getRemorts( ).size( );
-    if (remorts) {
-        if (remorts < 10)
-                tmp << " {W({M" + DLString(remorts) + "{W)";
-        else
-                tmp << "{W({M" + DLString(remorts) + "{W)";
+        if (!pcm->isOnline() && get_json_attribute(pcm, "discord", discord)) {
+            DLString status = discord["status"].asString();
+            if (status != "offline") {
+                result.push_back(pcm);
+            }
+        }
     }
-    
-    buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
-    tmp.str( "" );
 
-    /* Flags */
-    buf << dlprintf( "%9s", flags( victim ).c_str( ) );
-        
-    /* Pretitle, Name, Title */
-    if (victim->getRealLevel( ) > LEVEL_HERO 
-            || (victim->isCoder( ) && ch->isCoder( ) && victim->getRealLevel( ) >= LEVEL_HERO))
-        buf << "{C";
-    else
-        buf << "{W";
-   
-    DLString descr = ch->seeName( victim );
-    webManipManager->decorateCharacter( buf, descr, victim, ch );
-
-    buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
-    return buf.str( );
+    return result;
 }
 
-DLString Who::leftColumn( Character *ch, PCharacter *victim ) {
+/** Format left column of the 'who' output, with race/class/clan. */
+static DLString who_cmd_left_column(PCharacter *ch, PCMemoryInterface *vict) 
+{
     std::basic_ostringstream<char> buf, tmp;
-    
-    if (victim->isCoder( ) && ch->isCoder( ) && victim->getRealLevel( ) >= LEVEL_HERO) {
+    bool coder = vict->getAttributes().isAvailable("coder");
+
+    if (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO) {
         /* visible only to each other, like vampires >8) */
         buf << "{C    CODER    {x";
         return buf.str( );
     }
     
-    switch (victim->getRealLevel( )) {
-    case MAX_LEVEL - 0: buf << GET_SEX( victim, "{W IMPLEMENTOR {x",
+    switch (vict->getLevel( )) {
+    case MAX_LEVEL - 0: buf << GET_SEX( vict, "{W IMPLEMENTOR {x",
                                                 "{W IMPLEMENTOR {x",
                                                 "{WIMPLEMENTRESS{x" );
                         break;
@@ -264,18 +140,18 @@ DLString Who::leftColumn( Character *ch, PCharacter *victim ) {
         return buf.str( );
 
     /* Level */
-    if (ch->getPC( )->canSeeLevel( victim )) {
-        if (!ch->getPC( )->canSeeProfession( victim ))
+    if (can_see_level(ch, vict)) {
+        if (!can_see_profession(ch, vict))
             tmp << "{c";
 
-        tmp << victim->getRealLevel( ) << "{x";
+        tmp << vict->getLevel() << "{x";
     }
 
     buf << dlprintf( "%3s", tmp.str( ).c_str( ) );
     tmp.str( "" );
     
     /* Race */
-    tmp << victim->getRace( )->getPC( )->getWhoNameFor( ch );
+    tmp << vict->getRace( )->getPC( )->getWhoNameFor( ch );
 
     if (tmp.str( ).size( ) < 4)
         buf << "  " << dlprintf( "%-4s", tmp.str( ).c_str( ) );
@@ -285,17 +161,29 @@ DLString Who::leftColumn( Character *ch, PCharacter *victim ) {
     tmp.str( "" );
 
     /* Class */
-    if (ch->getPC( )->canSeeProfession( victim ))
-        tmp << "{Y" << victim->getProfession( )->getWhoNameFor( ch );
+    if (can_see_profession(ch, vict))
+        tmp << "{Y" << vict->getProfession( )->getWhoNameFor( ch );
 
     buf << " " << dlprintf( "%3s", tmp.str( ).c_str( ) );
     return buf.str( );
 }
 
-DLString Who::flags( PCharacter *victim ) {
+/** Format flags near the player name in 'who' command. */
+static DLString who_cmd_flags(PCMemoryInterface *vict) 
+{
     std::basic_ostringstream<char> buf, result;
-    XMLAttributes *attrs = &victim->getAttributes( );
-    
+    XMLAttributes *attrs = &vict->getAttributes( );
+    PCharacter *victim = vict->getPlayer();
+
+    if (!vict->isOnline()) {
+        Json::Value discord;
+        get_json_attribute(vict, "discord", discord);
+        DLString status = discord["status"].asString(); 
+        DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
+        result << "{" << color << "*{x ";
+        return result.str();
+    }
+
     if (IS_SET( victim->comm, COMM_AFK ))  buf << "{CA";
     if (victim->incog_level >= LEVEL_HERO) buf << "{DI";
     if (victim->invis_level >= LEVEL_HERO) buf << "{DW";
@@ -308,12 +196,14 @@ DLString Who::flags( PCharacter *victim ) {
     if (victim->curse != 100)              buf << "{DC";
     if (victim->bless)                     buf << "{CB";
     if (IS_SET( victim->act, PLR_WANTED))  buf << "{RW";
+    if (victim->isAffected(gsn_manacles)) buf << "{mM";        
     if (victim->isAffected(gsn_manacles)) buf << "{mM";
+    if (victim->isAffected(gsn_manacles)) buf << "{mM";        
     if (victim->isAffected(gsn_jail ))   buf << "{mJ";
+    if (!IS_SET( victim->act, PLR_CONFIRMED )) buf << "{gU";
     if (attrs->isAvailable("nochannel"))   buf << "{mN";
     if (attrs->isAvailable( "nopost" ))    buf << "{mP";
     if (attrs->isAvailable( "teacher" ))   buf << "{gT";
-    if (!IS_SET( victim->act, PLR_CONFIRMED )) buf << "{gU";
 
     if (!buf.str( ).empty( )) 
         result << "{x(" << buf.str( ) << "{x)";
@@ -321,4 +211,213 @@ DLString Who::flags( PCharacter *victim ) {
     return result.str( );
 }
 
+/** Format one line of 'who' command. */
+static DLString who_cmd_format_char( PCharacter *ch, PCMemoryInterface *vict ) 
+{
+    DLString result;
+    std::basic_ostringstream<char> buf, tmp;
+    PCharacter *victim = vict->getPlayer();
+  
+    /* Level, Race, Class */
+    buf << "{x|" << who_cmd_left_column( ch, vict ) << "{x|";
+        
+    /* PK */
+    if (victim && victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
+        tmp << "{x({rPK{x)";
+    
+    buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
+    tmp.str( "" );
 
+    /* Clan, (R) (L) */
+    if (!vict->getClan( )->isHidden( ) && vict->get_trust() < LEVEL_IMMORTAL) {
+        const Clan &clan = *vict->getClan( );
+
+        tmp << "{x[{" << clan.getColor( ) << clan.getShortName( ).at( 0 ) << "{x]";
+        
+        if (clan.isLeader( vict ))
+            tmp << "{R({CL{R){x";
+        else if (clan.isRecruiter( vict ))
+            tmp << "{R({CR{R){x";
+        else 
+            tmp << "   ";
+    } 
+    
+    buf << dlprintf( "%6s", tmp.str( ).c_str( ) );
+    tmp.str( "" );
+   
+    /* Remorts */
+    int remorts = vict->getRemorts( ).size( );
+    if (remorts) {
+        if (remorts < 10)
+                tmp << " {W({M" + DLString(remorts) + "{W)";
+        else
+                tmp << "{W({M" + DLString(remorts) + "{W)";
+    }
+    
+    buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
+    tmp.str( "" );
+
+    /* Flags */
+    buf << dlprintf( "%9s", who_cmd_flags(vict).c_str( ) );
+
+    /* Pretitle, Name, Title */
+    bool coder = vict->getAttributes().isAvailable("coder");
+    if (vict->getLevel( ) > LEVEL_HERO 
+            || (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO))
+        buf << "{C";
+    else
+        buf << "{W";
+   
+    if (victim) {
+        DLString descr = ch->seeName( victim );
+        webManipManager->decorateCharacter( buf, descr, victim, ch );
+        buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
+    } else {
+        DLString name = ch->getConfig()->runames ? vict->getRussianName().decline('1') : vict->getName();
+        buf << "{w" << name << "  {D(Discord){x" << endl;        
+    }
+
+    return buf.str( );
+}
+
+
+/*-------------------------------------------------------------------------
+ * 'who' command.
+ *------------------------------------------------------------------------*/
+CMDRUN(who)
+{
+    ostringstream buf;
+    DLString arg, arguments = constArguments;
+    
+    if (ch->getPC( ) == 0)
+        return;
+
+    PCharacter *pch = ch->getPC();
+    list<PCharacter *> online = who_find_online(pch);
+    int online_count = online.size();
+    list<PCMemoryInterface *> offline = who_find_offline(pch);
+    int offline_count = offline.size();
+
+    if (online_count > 0)
+        buf << "Сейчас в мире:" << endl;
+    for (const auto &victim: online)
+        buf << who_cmd_format_char(pch, victim);
+
+    if (offline_count > 0)
+        buf << endl << "Слышат общие каналы:" << endl;
+    for (const auto &victim: offline)
+        buf << who_cmd_format_char(pch, victim);
+
+    buf << endl;
+
+    if (offline_count > 0) 
+        buf << "В мире: " << online_count << ", слышат каналы: " << offline_count 
+            << ", всего игроков: " << (online_count + offline_count) << "." << endl;
+    else
+        buf << "Всего игроков: " << online_count << ". ";
+
+    buf << "Максимум в мире за последнее время был: " << Descriptor::getMaxOnline( ) << "." << endl;
+
+    if (!IS_SET( ch->act, PLR_CONFIRMED ) && pch->getRemorts( ).size( ) == 0) 
+        buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl
+            << "Подробнее читай {W? подтверждение{x." << endl;
+    ch->send_to( buf );
+}
+
+/*-------------------------------------------------------------------------
+ * WhoWebPromptListener
+ *------------------------------------------------------------------------*/
+class WhoWebPromptListener : public WebPromptListener {
+public:
+        typedef ::Pointer<WhoWebPromptListener> Pointer;
+
+        virtual void run( Descriptor *, Character *, Json::Value &json );
+
+        static Json::Value jsonPlayer( PCharacter *ch, PCharacter *wch );
+        static Json::Value jsonWho( PCharacter *ch );
+};
+
+void WhoWebPromptListener::run( Descriptor *d, Character *ch, Json::Value &json )
+{
+    WebPromptAttribute::Pointer attr = ch->getPC( )->getAttributes( ).getAttr<WebPromptAttribute>( "webprompt" );
+    Json::Value &prompt = json["args"][0];
+
+    attr->updateIfNew( WHO, jsonWho( ch->getPC() ), prompt ); 
+}    
+
+Json::Value WhoWebPromptListener::jsonPlayer( PCharacter *ch, PCharacter *wch )
+{
+    Json::Value player;
+    
+    // Player name and sex.
+    player["n"] = wch->toNoun(ch)->decline('1').cutSize(10);
+    player["s"] = wch->getSex( ) == SEX_MALE ? "m" : "f";
+
+    // First 2 letters of player race.
+    player["r"] = wch->getRace( )->getName( ).substr(0, 2);
+
+    // Clan name (first letter) and colour.
+    player["cn"] = wch->getClan( )->getName( ).substr(0, 1);
+    
+    DLString clr = wch->getClan( )->getColor( );
+    if (!clr.empty( )) {
+        player["cc"] = DLString(dl_isupper(clr.at(0)) ? "b" : "d") + dl_tolower(clr.at(0));
+    }
+
+    return player;
+}
+
+Json::Value WhoWebPromptListener::jsonWho( PCharacter *ch )
+{
+    Json::Value who;
+    list<PCharacter *> players = who_find_online(ch);
+    list<PCharacter *>::iterator p;
+
+    // Populate player list.
+    int pc = 0;
+    for (p = players.begin( ); p != players.end( ); p++) {
+        who["p"][pc++] = jsonPlayer( ch, *p );
+    }
+
+    // Total player count.
+    who["t"] = DLString(players.size());
+    return who;
+}
+
+PluginInitializer<WhoWebPromptListener> initWhoWebPromptListener;
+
+/*-------------------------------------------------------------------------
+ * /who public servlet
+ *------------------------------------------------------------------------*/
+JSONSERVLET_HANDLE(cmd_who, "/who")
+{
+    PCharacter dummy;
+    dummy.config.setBit(CONFIG_RUCOMMANDS);
+    
+    list<PCharacter *> players = who_find_online(0);
+
+    for (const auto &victim: players) {
+        Json::Value wch;
+
+        wch["name"]["en"] = victim->getName();
+        wch["name"]["ru"] = victim->getRussianName().decline('1');
+        wch["race"]["en"] = victim->getRace()->getName();
+        wch["race"]["ru"] = victim->getRace()->getNameFor(&dummy, victim);
+
+        if (victim->getClan() != clan_none)
+            wch["clan"]["en"] = victim->getClan()->getShortName().toLower().upperFirstCharacter();
+
+        if (!victim->getPretitle().empty())
+            wch["pretitle"]["en"] = victim->getPretitle().colourStrip();
+
+        if (!victim->getRussianPretitle().empty())
+            wch["pretitle"]["ru"] = victim->getRussianPretitle().colourStrip();
+
+        wch["title"] = victim->getParsedTitle().colourStrip();
+        wch["remorts"] = DLString(victim->getRemorts().size());
+
+        body["people"].append(wch);
+    }
+
+    body["total"] = body["people"].size();
+}

@@ -60,3 +60,46 @@ void WebPromptListener::destruction( )
     WebPromptManager::getThis( )->unregistrate( Pointer( this ) );
 }
 
+static const DLString NONE = "none";
+
+WebPromptAttribute::~WebPromptAttribute( )
+{
+}    
+
+
+void WebPromptAttribute::init( )
+{
+    clear( );
+}
+
+void WebPromptAttribute::clear( )
+{
+    prompt.clear( );
+}   
+
+
+void WebPromptAttribute::updateIfNew( const DLString &field, const Json::Value &newValue, Json::Value &prompt )
+{
+    // First time a value disappears, we need to send "none" to front-end to hide corresponding row.
+    // Subsequent calls can just omit the value from prompt, until it's back again.
+    if (newValue.empty( )) {
+        if (!this->prompt.isAvailable( field ) || !this->prompt[field].empty( )) {
+            prompt[field] = NONE;
+        }
+        this->prompt[field] = DLString::emptyString;
+        return;
+    }
+
+    // Serialize new value to string and see if it differs from the stored value.
+    Json::FastWriter writer;
+    DLString value = writer.write( newValue );
+    if (!this->prompt.isAvailable( field ) || this->prompt[field] != value) {
+        // First occurence or changed value, update it in the attribute and send to front-end.
+        this->prompt[field] = value;
+        prompt[field] = newValue;
+        return;
+    }
+
+    // Nothing changed, send nothing in the prompt.
+}
+

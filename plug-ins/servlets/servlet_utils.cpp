@@ -9,6 +9,7 @@
 #include "commonattributes.h"
 
 static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap koi2utf("koi8-r", "utf-8");
 
 bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Value &params)
 {
@@ -31,13 +32,13 @@ bool servlet_parse_params(HttpRequest &request, HttpResponse &response, Json::Va
     }
 }
 
-static DLString read_token(const DLString &botType)
+static DLString read_token()
 {
     DLString token;
 
     try {
         ostringstream buf;
-        DLFileStream tokenFile(dreamland->getMiscDir(), botType + ".token");
+        DLFileStream tokenFile(dreamland->getMiscDir(), "dreamland_bot.token");
         tokenFile.toStream(buf);
         token = buf.str();
         token.replaces("\n", "");
@@ -62,7 +63,7 @@ bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
     }
 
     DLString myToken = params["token"].asString();
-    DLString token = read_token(myBotType);
+    DLString token = read_token();
 
     if (myToken.empty() || token.empty() || myToken != token) {
         LogStream::sendError() << "Servlet token " << myToken << ", expected " << token << endl;
@@ -77,23 +78,26 @@ bool servlet_auth_bot(Json::Value &params, HttpResponse &response)
 
 PCMemoryInterface * servlet_find_player(Json::Value &params, HttpResponse &response)
 {
-    DLString discordId = params["args"]["id"].asString();
-    if (discordId.empty()) {
+    DLString myId = params["args"]["id"].asString();
+    if (myId.empty()) {
         response.status = 400;
         response.message = "Bad request";
         response.body = "Required parameter args.id not found";
         return 0;
     }
 
-    PCMemoryInterface *player = find_player_by_json_attribute("discord", "id", discordId);
-    if (!player) {
+    DLString botType = params["bottype"].asString();
+    botType.toLower();
+
+    list<PCMemoryInterface *> players = find_players_by_json_attribute(botType, "id", myId);
+    if (players.empty()) {
         response.status = 404;
         response.message = "Not found";
-        response.body = "Player with this Discord ID not found";
+        response.body = "Player with this " + botType + " ID not found";
         return 0;
     }        
 
-    return player;
+    return players.front();
 }   
 
 bool servlet_get_arg(Json::Value &params, HttpResponse &response, const DLString &argName, DLString &argValue)
@@ -121,4 +125,13 @@ void servlet_response_404(HttpResponse &response, const DLString &text)
     response.status = 404;
     response.message = "Not found"; 
     response.body = text;
+}
+
+void servlet_response_200_json(HttpResponse &response, const Json::Value &payload)
+{
+    Json::FastWriter writer;
+    response.body = koi2utf(writer.write(payload));        
+    response.status = 200;
+    response.message = "OK";
+    response.headers["content-type"] = "application/json";
 }

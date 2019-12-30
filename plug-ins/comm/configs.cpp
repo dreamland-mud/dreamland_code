@@ -13,6 +13,7 @@
 #include "commonattributes.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
+#include "dreamland.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "interp.h"
@@ -516,12 +517,13 @@ SERVLET_HANDLE(cmd_link, "/link")
         || !servlet_get_arg(params, response, "status", discordStatus))
         return;
 
-    PCMemoryInterface *player = find_player_by_json_attribute("discord", "token", linkToken);
-    if (!player) {
+    list<PCMemoryInterface *> players = find_players_by_json_attribute("discord", "token", linkToken);
+    if (players.empty()) {
         servlet_response_404(response, "Player with this token not found");
         return;
     }
 
+    PCMemoryInterface *player = players.front();
     Json::Value discord;
     get_json_attribute(player, "discord", discord);
     DLString currentId = discord["id"].asString();
@@ -539,6 +541,12 @@ SERVLET_HANDLE(cmd_link, "/link")
                 discordId.c_str(), discordUsername.c_str(), player->getName().c_str());
     }
 
+    // Clean up alt players linked to the same id.
+    for (const auto &alt: find_players_by_json_attribute("discord", "id", discordId)) {
+        alt->getAttributes().eraseAttribute("discord");
+        notice("Clear Discord info from %s for id %s.", alt->getName().c_str(), discordId.c_str());
+    }
+
     discord["id"] = discordId;
     discord["username"] = discordUsername;
     discord["status"] = discordStatus;
@@ -550,3 +558,88 @@ SERVLET_HANDLE(cmd_link, "/link")
 }
 
 
+/**
+ * Update player Discord status on bot logon.
+ * Auth: bottype=discord, token=<discord secret>
+ * Args: array of {id, username, status}
+ */
+SERVLET_HANDLE(cmd_update_all, "/update/all")
+{
+    Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+
+    if (!servlet_auth_bot(params, response)) 
+        return;
+
+    DLString botType = params["bottype"].asString();
+    botType.toLower();
+
+    // Transform request payload into a map by id for quicker access.
+    map<DLString, Json::Value> statuses;
+    for (const auto &status: params["args"]) {
+        DLString id = status["id"].asString();
+        if (!id.empty()) 
+            statuses[id] = status;
+    }
+
+    // Update all players linked to Discord. If their status is not mentioned
+    // in the payload, assume they're offline.
+    for (const auto &pcm: PCharacterManager::getPCM()) {
+        Json::Value discord;
+
+        if (get_json_attribute(pcm.second, botType, discord)) {
+            DLString myDiscordId = discord["id"].asString();
+            const auto &d = statuses.find(myDiscordId);
+            if (d != statuses.end()) {
+                discord["username"] = d->second["username"];
+                discord["status"] = d->second["status"];
+            } else {
+                discord["status"] = "offline";
+            }
+
+            set_json_attribute(pcm.second, botType, discord);
+            PCharacterManager::saveMemory(pcm.second);
+            LogStream::sendNotice() << "Discord: update " << pcm.first << " status to " << discord["status"] << endl;
+        }
+    }
+
+    servlet_response_200(response, "Success");
+}
+
+/**
+ * Update player status when their presence in Discord changes.
+ * Auth: bottype=discord, token=<discord secret>
+ * Args: id, username, status
+ */
+SERVLET_HANDLE(cmd_update_one, "/update/one")
+{
+   Json::Value params;
+    if (!servlet_parse_params(request, response, params))
+        return;
+
+    if (!servlet_auth_bot(params, response)) 
+        return;
+
+    PCMemoryInterface *player = servlet_find_player(params, response);
+    if (!player)
+        return;
+
+    DLString discordUsername, discordStatus;
+    if (!servlet_get_arg(params, response, "username", discordUsername)
+        || !servlet_get_arg(params, response, "status", discordStatus))
+        return;
+
+    Json::Value discord;
+    DLString botType = DLString(params["bottype"].asString()).toLower();
+    get_json_attribute(player, botType, discord);
+
+    discord["username"] = discordUsername;
+    discord["status"] = discordStatus;
+
+    set_json_attribute(player, botType, discord);
+    PCharacterManager::saveMemory(player);
+    LogStream::sendNotice() << "Discord: update " << player->getName() << " status to " << discord["status"] << endl;    
+
+    servlet_response_200(response, "Success");
+}
