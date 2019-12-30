@@ -96,8 +96,12 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
     for (const auto &kv: PCharacterManager::getPCM()) {
         PCMemoryInterface *pcm = kv.second;
         Json::Value discord;
+        
+        // Consider link dead people as offline.
+        if (pcm->getPlayer() && pcm->getPlayer()->desc)
+            continue;
 
-        if (!pcm->isOnline() && get_json_attribute(pcm, "discord", discord)) {
+        if (get_json_attribute(pcm, "discord", discord)) {
             DLString status = discord["status"].asString();
             if (status != "offline") {
                 result.push_back(pcm);
@@ -109,7 +113,7 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
 }
 
 /** Format left column of the 'who' output, with race/class/clan. */
-static DLString who_cmd_left_column(PCharacter *ch, PCMemoryInterface *vict) 
+static DLString who_cmd_left_column(PCharacter *ch, PCharacter *vict) 
 {
     std::basic_ostringstream<char> buf, tmp;
     bool coder = vict->getAttributes().isAvailable("coder");
@@ -169,20 +173,10 @@ static DLString who_cmd_left_column(PCharacter *ch, PCMemoryInterface *vict)
 }
 
 /** Format flags near the player name in 'who' command. */
-static DLString who_cmd_flags(PCMemoryInterface *vict) 
+static DLString who_cmd_flags(PCharacter *victim) 
 {
     std::basic_ostringstream<char> buf, result;
-    XMLAttributes *attrs = &vict->getAttributes( );
-    PCharacter *victim = vict->getPlayer();
-
-    if (!vict->isOnline()) {
-        Json::Value discord;
-        get_json_attribute(vict, "discord", discord);
-        DLString status = discord["status"].asString(); 
-        DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
-        result << "{" << color << "*{x ";
-        return result.str();
-    }
+    XMLAttributes *attrs = &victim->getAttributes( );
 
     if (IS_SET( victim->comm, COMM_AFK ))  buf << "{CA";
     if (victim->incog_level >= LEVEL_HERO) buf << "{DI";
@@ -211,32 +205,49 @@ static DLString who_cmd_flags(PCMemoryInterface *vict)
     return result.str( );
 }
 
+/** Format offline players for the 'who' command. */
+static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victim ) 
+{
+    ostringstream buf;
+    Json::Value discord;
+
+    get_json_attribute(victim, "discord", discord);
+
+    DLString status = discord["status"].asString(); 
+    DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
+    buf << " {" << color << "*{x ";
+
+    DLString name = ch->getConfig()->runames ? victim->getRussianName().decline('1') : victim->getName();
+    buf << "{W" << name << "  {D(Discord){x" << endl;        
+    
+    return buf.str();
+}
+
 /** Format one line of 'who' command. */
-static DLString who_cmd_format_char( PCharacter *ch, PCMemoryInterface *vict ) 
+static DLString who_cmd_format_char( PCharacter *ch, PCharacter *victim ) 
 {
     DLString result;
     std::basic_ostringstream<char> buf, tmp;
-    PCharacter *victim = vict->getPlayer();
-  
+
     /* Level, Race, Class */
-    buf << "{x|" << who_cmd_left_column( ch, vict ) << "{x|";
+    buf << "{x|" << who_cmd_left_column( ch, victim ) << "{x|";
         
     /* PK */
-    if (victim && victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
+    if (victim->getModifyLevel( ) >= PK_MIN_LEVEL && !is_safe_nomessage( ch, victim ))
         tmp << "{x({rPK{x)";
     
     buf << dlprintf( "%4s", tmp.str( ).c_str( ) );
     tmp.str( "" );
 
     /* Clan, (R) (L) */
-    if (!vict->getClan( )->isHidden( ) && vict->get_trust() < LEVEL_IMMORTAL) {
-        const Clan &clan = *vict->getClan( );
+    if (!victim->getClan( )->isHidden( ) && victim->get_trust() < LEVEL_IMMORTAL) {
+        const Clan &clan = *victim->getClan( );
 
         tmp << "{x[{" << clan.getColor( ) << clan.getShortName( ).at( 0 ) << "{x]";
         
-        if (clan.isLeader( vict ))
+        if (clan.isLeader( victim ))
             tmp << "{R({CL{R){x";
-        else if (clan.isRecruiter( vict ))
+        else if (clan.isRecruiter( victim ))
             tmp << "{R({CR{R){x";
         else 
             tmp << "   ";
@@ -246,7 +257,7 @@ static DLString who_cmd_format_char( PCharacter *ch, PCMemoryInterface *vict )
     tmp.str( "" );
    
     /* Remorts */
-    int remorts = vict->getRemorts( ).size( );
+    int remorts = victim->getRemorts( ).size( );
     if (remorts) {
         if (remorts < 10)
                 tmp << " {W({M" + DLString(remorts) + "{W)";
@@ -258,24 +269,19 @@ static DLString who_cmd_format_char( PCharacter *ch, PCMemoryInterface *vict )
     tmp.str( "" );
 
     /* Flags */
-    buf << dlprintf( "%9s", who_cmd_flags(vict).c_str( ) );
+    buf << dlprintf( "%9s", who_cmd_flags(victim).c_str( ) );
 
     /* Pretitle, Name, Title */
-    bool coder = vict->getAttributes().isAvailable("coder");
-    if (vict->getLevel( ) > LEVEL_HERO 
-            || (coder && ch->isCoder( ) && vict->getLevel( ) >= LEVEL_HERO))
+    bool coder = victim->getAttributes().isAvailable("coder");
+    if (victim->getLevel( ) > LEVEL_HERO 
+            || (coder && ch->isCoder( ) && victim->getLevel( ) >= LEVEL_HERO))
         buf << "{C";
     else
         buf << "{W";
    
-    if (victim) {
-        DLString descr = ch->seeName( victim );
-        webManipManager->decorateCharacter( buf, descr, victim, ch );
-        buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
-    } else {
-        DLString name = ch->getConfig()->runames ? vict->getRussianName().decline('1') : vict->getName();
-        buf << "{w" << name << "  {D(Discord){x" << endl;        
-    }
+    DLString descr = ch->seeName( victim );
+    webManipManager->decorateCharacter( buf, descr, victim, ch );
+    buf << "{x " << victim->getParsedTitle( ) << "{x" << endl;
 
     return buf.str( );
 }
@@ -306,7 +312,7 @@ CMDRUN(who)
     if (offline_count > 0)
         buf << endl << "Слышат общие каналы:" << endl;
     for (const auto &victim: offline)
-        buf << who_cmd_format_char(pch, victim);
+        buf << who_cmd_format_offline(pch, victim);
 
     buf << endl;
 
