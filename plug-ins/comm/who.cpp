@@ -217,7 +217,8 @@ static DLString who_cmd_format_offline( PCharacter *ch, PCMemoryInterface *victi
     DLString color = status == "online" ? "G" : (status == "idle" ? "Y" : "R");
     buf << " {" << color << "*{x ";
 
-    DLString name = ch->getConfig()->runames ? victim->getRussianName().decline('1') : victim->getName();
+    DLString name = ch->getConfig()->runames && !victim->getRussianName().getFullForm().empty() 
+        ? victim->getRussianName().decline('1') : victim->getName();
     buf << "{W" << name << "  {D(Discord){x" << endl;        
     
     return buf.str();
