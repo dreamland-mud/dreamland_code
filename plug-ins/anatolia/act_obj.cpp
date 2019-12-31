@@ -1631,7 +1631,13 @@ CMDRUNP( use )
         return;
     }
 
-    if ( !( obj = get_obj_here( ch, arg ) ))
+    // First try to use items in your own inventory/eq,
+    // then items on the floor, as it often causes confusion.
+    obj = get_obj_wear_carry(ch, arg);
+    if (!obj)
+        obj = get_obj_here(ch, arg);
+
+    if (!obj)
     {
         act_p( "Ты не видишь здесь этого.", ch, 0, 0, TO_CHAR,POS_RESTING);
         return;
