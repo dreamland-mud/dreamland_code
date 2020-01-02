@@ -212,7 +212,7 @@ NMI_INVOKE(MobIndexWrapper, createFor, "(ch): создать экземпляр 
     NPCharacter *mob;
     checkTarget();
 
-    if (target->behavior->getFirstNode( )->getAttribute(XMLNode::ATTRIBUTE_TYPE) != "LevelAdaptivePet")
+    if (!target->behavior || target->behavior->getFirstNode( )->getAttribute(XMLNode::ATTRIBUTE_TYPE) != "LevelAdaptivePet")
         throw Scripting::Exception("This mob is not a pet");
 
     PCharacter *client = args2player(args);
