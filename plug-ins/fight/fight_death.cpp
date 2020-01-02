@@ -26,6 +26,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "object.h"
+#include "religion.h"
 #include "playerattributes.h"
 #include "room.h"
 
@@ -56,6 +57,8 @@ enum {
 };
 
 #define GHOST_MIN_LEVEL (PK_MIN_LEVEL + 10)
+
+RELIG(shamash);
 
 static void loot_transform( Object *obj, Character *ch )
 {
@@ -837,6 +840,9 @@ protected:
     bool penaltyConstitution( )
     {
         if (pch->getProfession( ) == prof_samurai)
+            return false;
+
+        if (pch->getReligion() == god_shamash)
             return false;
 
         if (pch->death % 5)
