@@ -1053,9 +1053,15 @@ void aggr_update( )
         if (ch->in_room == 0)
             continue;
         
-        if (ch->is_npc( ) || ch->desc == 0)
+        // Decrease wait and daze state for mobs and link-dead players.
+        // For connected players these are decresed in IOManager::ioRead.
+        if (ch->is_npc( ) || ch->desc == 0) {
             if (ch->wait > 0)
                 ch->wait--;
+
+            if (ch->daze > 0)
+                ch->daze--;
+        }
 
         check_bloodthirst( ch );
         gsn_ambush->getCommand( )->run( ch );
