@@ -29,4 +29,25 @@ int hour_of_day( );
 DLString sunlight( );
 DLString calendar_month( );
 
+enum{
+    SEASON_WINTER = 0,
+    SEASON_SPRING,
+    SEASON_SUMMER,
+    SEASON_AUTUMN
+};
+
+struct season_info {
+    int number;
+    const char *name;
+    const char *rname;
+    const char *short_descr;
+    const char *adjective;
+    char color;
+};
+
+extern const struct season_info season_table [];
+
+/** Return English name of the current season. */
+DLString season();
+
 #endif

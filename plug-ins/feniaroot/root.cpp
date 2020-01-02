@@ -747,6 +747,11 @@ NMI_GET( Root, month, "текущий месяц, 0..16" )
     return Register( time_info.month ); 
 }
 
+NMI_GET(Root, season, "время года (winter,autumn,summer,spring), зависит от текущего месяца")
+{
+    return Register(season());
+}
+
 NMI_SET( Root, sunlight , "время суток: 0=ночь, 1=рассвет, 2=день, 3=закат") 
 {
     weather_info.sunlight = check_range(arg, 0, 3);
