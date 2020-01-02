@@ -494,15 +494,15 @@ void ghost_gain( Character *victim )
     }
 }
 
-static bool oprog_death( Character *victim )
+static bool oprog_death( Character *victim, Character *killer )
 {
     Object *obj, *obj_next;
     
     for (obj = victim->carrying; obj != 0; obj = obj_next) {
         obj_next = obj->next_content;    
         
-        FENIA_CALL( obj, "Death", "C", victim )
-        FENIA_NDX_CALL( obj, "Death", "OC", obj, victim )
+        FENIA_CALL( obj, "Death", "CC", victim, killer )
+        FENIA_NDX_CALL( obj, "Death", "OCC", obj, victim, killer )
         BEHAVIOR_CALL( obj, death, victim )
     }
 
@@ -549,7 +549,7 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 
     stop_fighting( victim, true );
     
-    if (oprog_death( victim )) {
+    if (oprog_death( victim, ch )) {
         victim->position = POS_STANDING;
         return;
     }
