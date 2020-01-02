@@ -31,12 +31,12 @@
 #include "room.h"
 #include "affect.h"
 
+#include "skill_utils.h"
 #include "fight.h"
 #include "magic.h"
 #include "save.h"
 #include "material.h"
 #include "damage.h"
-
 #include "merc.h"
 #include "gsn_plugin.h"
 #include "comm.h"
@@ -452,7 +452,7 @@ void HunterWeapon::fight_axe( Character *ch )
     chance -= 2 * victim->getCurrStat(STAT_STR);
 
     /* level */
-    chance += ch->getRealLevel( ) - victim->getRealLevel( );
+    chance += ch->getRealLevel( ) - skill_level(*gsn_shield_block, victim);
     chance += obj->level - shield->level;
 
     /* and now the attack */

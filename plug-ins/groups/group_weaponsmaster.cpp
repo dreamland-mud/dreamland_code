@@ -29,6 +29,7 @@
 #include "mercdb.h"
 
 #include "magic.h"
+#include "skill_utils.h"
 #include "damage.h"
 #include "material.h"
 #include "fight.h"
@@ -339,7 +340,7 @@ SKILL_RUNP( shield )
     chance -= 2 * victim->getCurrStat(STAT_STR);
 
     /* level */
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+    chance += ( ch->getModifyLevel() - skill_level(*gsn_shield_block, victim) ) * 2;
 /*    chance += ch->getRealLevel( ) - victim->getRealLevel( );*/
     chance += axe->level - shield->level;
 

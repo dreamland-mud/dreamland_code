@@ -291,7 +291,7 @@ bool UndefinedOneHit::defenseParry( )
     }
 
 
-    if (number_percent( ) >= chance + victim->getModifyLevel() - ch->getModifyLevel())
+    if (number_percent( ) >= chance + skill_level(*gsn_parry, victim) - ch->getModifyLevel())
         return false;
 
     if(SHADOW(victim))
@@ -460,7 +460,7 @@ bool UndefinedOneHit::defenseShieldBlock( )
         gsn_forest_fighting->improve( victim, true, ch );
     }
     
-    if ( number_percent( ) >= chance + victim->getModifyLevel() - ch->getModifyLevel()
+    if ( number_percent( ) >= chance + skill_level(*gsn_shield_block, victim) - ch->getModifyLevel()
         || ( !victim->is_npc() && !victim->move ) )
         return false;
 
@@ -535,7 +535,7 @@ bool UndefinedOneHit::defenseDodge( )
     if (wield && (wield->value[0] == WEAPON_FLAIL || wield->value[0] == WEAPON_WHIP))
         chance = ( int )( chance * 1.2 );
         
-    if (number_percent( ) >= chance + ( victim->getModifyLevel() - ch->getModifyLevel() ) / 2
+    if (number_percent( ) >= chance + ( skill_level(*gsn_dodge, victim) - ch->getModifyLevel() ) / 2
         || ( !victim->is_npc() && !victim->move ) )
         return false;
 
@@ -647,7 +647,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         chance = ( int )( chance * 0.5 );
     }
 
-    if ( number_percent( ) >= chance + ( victim->getModifyLevel() - ch->getModifyLevel() ) )
+    if ( number_percent( ) >= chance + ( skill_level(*gsn_cross_block, victim) - ch->getModifyLevel() ) )
         return false;
 
     victim->move -= move_dec( victim );
@@ -766,7 +766,7 @@ bool UndefinedOneHit::defenseHandBlock( )
         chance = ( int )( chance * 0.5 );
     }
 
-    if ( number_percent( ) >= chance +( victim->getModifyLevel() - ch->getModifyLevel() ) ) 
+    if ( number_percent( ) >= chance +( skill_level(*gsn_hand_block, victim) - ch->getModifyLevel() ) ) 
         return false;
     
     victim->move -= move_dec( victim );

@@ -11,7 +11,10 @@
 #include "mercdb.h"
 
 GROUP(none);
+GROUP(fightmaster);
+GROUP(defensive);
 GSN(turlok_fury);
+GSN(athena_wisdom);
 
 bool temporary_skill_active( const Skill *skill, Character *ch )
 {
@@ -185,7 +188,11 @@ int skill_level(Skill &skill, Character *ch)
         slevel += ch->getPC()->mod_level_all;
     }
 
-    if (ch->isAffected(gsn_turlok_fury) && chance(50)) {
+    if (skill.getGroup() == group_fightmaster && ch->isAffected(gsn_turlok_fury) && chance(50)) {
+        slevel += number_range(1, 5);
+    }
+
+    if (skill.getGroup() == group_defensive && ch->isAffected(gsn_athena_wisdom) && chance(50)) {
         slevel += number_range(1, 5);
     }
     
