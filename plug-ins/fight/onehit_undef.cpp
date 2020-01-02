@@ -53,6 +53,8 @@ WEARLOC(tat_wrist_l);
 WEARLOC(tat_wrist_r);
 
 RELIG(cradya);
+RELIG(phobos);
+RELIG(deimos);
 
 /*----------------------------------------------------------------------------
  * Hit by weapon or bare hands
@@ -1089,6 +1091,26 @@ void UndefinedOneHit::damApplyReligion()
     {
         if (!area_is_clan(ch->getNPC()->pIndexData->area)) {         
             dam = dam * 150 / 100;
+        }
+        return;
+    }
+
+    // Phobos and Deimos followers work well together.
+    if (get_eq_char(ch, wear_tattoo) != 0) {
+        for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+            if (rch == ch)
+                continue;
+            if (!is_same_group(ch, rch))
+                continue;
+            if (get_eq_char(rch, wear_tattoo) == 0)
+                continue;
+            if (ch->getReligion() == god_deimos && rch->getReligion() != god_phobos)
+                continue;
+            if (ch->getReligion() == god_phobos && rch->getReligion() != god_deimos)
+                continue;
+            
+            dam = dam * 110 / 100;
+            return;
         }
     }
 }
