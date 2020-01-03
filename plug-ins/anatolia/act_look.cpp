@@ -441,8 +441,8 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
         if (paf->type->getAffect( ))
             paf->type->getAffect( )->toStream( buf, paf );
 
-	if (!buf.str().empty())
-		mainBuf << endl << buf.str();
+    if (!buf.str().empty())
+        mainBuf << endl << buf.str();
 }
 
 /*
@@ -1179,6 +1179,13 @@ rprog_descr( Room *room, Character *ch, const DLString &descr )
     return descr;
 }
 
+static DLString
+rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLString &descr )
+{   
+    FENIA_STR_CALL( room, "ExtraExitDescr", "sCs", peexit->keyword, ch, descr.c_str( ) )
+    return descr;
+}
+
 /* NOTCOMMAND */ void do_look_auto( Character *ch, Room *room, bool fBrief, bool fShowMount )
 {
     ostringstream buf;
@@ -1215,7 +1222,7 @@ rprog_descr( Room *room, Character *ch, const DLString &descr )
                                 peexit;
                                 peexit = peexit->next)
             if (ch->can_see( peexit ))
-                rbuf << peexit->room_description;
+                rbuf << rprog_eexit_descr(room, peexit, ch, peexit->room_description);
 
         buf << rprog_descr( room, ch, rbuf.str( ) );
     }
