@@ -13,6 +13,7 @@
 #include "wearloc_utils.h"
 #include "occupations.h"
 #include "mercdb.h"
+#include "grammar_entities_impl.h"
 
 #include "objectwrapper.h"
 #include "roomwrapper.h"
@@ -122,6 +123,29 @@ NMI_GET( ObjectWrapper, real_short_descr , "описание без учета r
 {
     checkTarget( );
     return Register( target->getRealShortDescr( ) );
+}
+
+NMI_GET( ObjectWrapper, gender , "грамматический род и число (n, m, f, p или null)")
+{
+    checkTarget();
+    if (target->gram_gender == MultiGender::UNDEF)
+        return Register();
+    return Register( target->gram_gender.toString() );
+}
+
+NMI_SET( ObjectWrapper, gender , "грамматический род и число (n, m, f, p или null)")
+{
+    checkTarget();
+    MultiGender mg(MultiGender::UNDEF);
+
+    if (arg.type != Register::NONE) {
+        mg.fromString(arg.toString().c_str());
+        if (mg == MultiGender::UNDEF)
+            throw Scripting::Exception("Invalid gender, must be one of: n m f p, or null");
+    }
+
+    target->gram_gender = mg;
+    target->updateCachedNoun();
 }
 
 NMI_GET( ObjectWrapper, enchanted, "висят ли на предмете аффекты, меняющие его свойства")

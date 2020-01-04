@@ -48,6 +48,7 @@ Object::Object( ) :
                 from( &str_empty[0] ),
                 extracted( 0 ), water_float( 0 ),
                 killer( &str_empty[0] ), count( 0 ),
+                gram_gender(MultiGender::UNDEF),
                 behavior( ObjectBehavior::NODE_NAME ),
                 reset_obj(0), reset_mob(0), reset_room(0)
 {
@@ -113,6 +114,7 @@ void Object::extract( )
         water_float = 0;
         killer = &str_empty[0];
         count = 0;
+        gram_gender = MultiGender::UNDEF;
         properties.clear();
 
         wrapper = 0;
@@ -457,14 +459,17 @@ Noun::Pointer Object::toNoun( const DLObject *forWhom, int flags ) const
 
 void Object::updateCachedNoun( )
 {
+    MultiGender g = gram_gender == MultiGender::UNDEF 
+        ? pIndexData->gram_gender : gram_gender;
+
     if (!cachedNoun) { 
         cachedNoun = RussianString::Pointer( NEW, 
                                              getShortDescr( ), 
-                                             pIndexData->gram_gender );
+                                             g );
     }
     else {
         cachedNoun->setFullForm( getShortDescr( ) );
-        cachedNoun->setGender( pIndexData->gram_gender );
+        cachedNoun->setGender( g );
     }
 }
 

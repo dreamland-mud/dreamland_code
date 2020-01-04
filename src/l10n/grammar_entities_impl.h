@@ -103,7 +103,7 @@ inline void Number::fromString(const char *t)
 
 inline MultiGender::MultiGender(int v) 
 {
-    value = (v >= NONE && v < MAX) ? v : NONE;
+    value = (v >= UNDEF && v < MAX) ? v : NONE;
 }
 
 inline MultiGender::MultiGender(const Gender &g, const Number &n) 

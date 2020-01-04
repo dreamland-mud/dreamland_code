@@ -68,7 +68,8 @@ struct Number : public Entity {
 
 struct MultiGender : public Entity {
     enum {
-        NONE,
+        UNDEF = -1,
+        NONE = 0,
         NEUTER = NONE,
         MASCULINE,
         FEMININE,

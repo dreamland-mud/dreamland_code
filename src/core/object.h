@@ -86,6 +86,7 @@ public:
 
     char              *  killer;  // for corpse
     int                  count;
+    Grammar::MultiGender gram_gender;
     Properties           properties;
     XMLPersistentStreamable<ObjectBehavior> behavior;
 
