@@ -1258,8 +1258,17 @@ NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отф�
 NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформатированную строку всем в комнате, кроме нас" )
 {
     checkTarget( );
-    target->recho( regfmt( target, args ).c_str( ) );
-    return Register( );
+
+    for (Character *to = target->in_room->people; to; to = to->next_in_room) {
+        if (to == target)
+            continue;
+        if (to->position < POS_RESTING)
+            continue;
+
+        to->println(regfmt(to, args));
+    }
+
+    return Register();
 }
 
 NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит отформатированную строку всем в комнате, кроме нас и vict" )
@@ -1270,7 +1279,15 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит от
     Character *vict = args2character(args);
     myArgs.pop_front();
 
-    target->recho( vict, regfmt( target, myArgs ).c_str( ) );
+    for (Character *to = target->in_room->people; to; to = to->next_in_room) {
+        if (to == target || to == vict)
+            continue;
+        if (to->position < POS_RESTING)
+            continue;
+
+        to->println(regfmt(to, myArgs));
+    }
+
     return Register( );
 }
 
