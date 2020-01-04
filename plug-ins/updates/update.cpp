@@ -75,7 +75,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "liquid.h"
 #include "desire.h"
 
@@ -92,7 +92,7 @@
 #include "fight.h"
 #include "damage_impl.h"
 #include "magic.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "save.h"
 #include "wiznet.h"
 #include "act.h"
@@ -590,13 +590,16 @@ static bool oprog_update_key( Object *obj )
         if (IS_SET(obj->getRoom( )->room_flags, ROOM_MANSION)) 
             return false;
 
-        // don't touch keys in the pits or corpses
+        // don't touch keys in the pits or corpses or keyrings.
         if (container && IS_PIT(container))
             return false;
         if (container 
                 && (container->item_type == ITEM_CORPSE_PC
                     || container->item_type == ITEM_CORPSE_NPC))
             return false;
+
+        if (obj->in_obj && obj->in_obj->item_type == ITEM_KEYRING)
+            return false;        
 
         if (reset_check_obj( obj )) { // object is in reset place
             obj->timer = 0;
