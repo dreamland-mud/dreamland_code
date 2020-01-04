@@ -906,6 +906,13 @@ static bool oprog_put_money(Object *container, Character *ch, int gold, int silv
     return false;
 }
 
+static bool oprog_put_money_msg(Object *container, Character *ch, int gold, int silver)
+{
+    FENIA_CALL( container, "PutMoneyMsg", "Cii", ch, gold, silver );
+    FENIA_NDX_CALL( container, "PutMoneyMsg", "OCii", container, ch, gold, silver );
+    return false;
+}
+
 static bool put_obj_container( Character *ch, Object *obj, Object *container, 
                                DLString &pocket )
 {
@@ -994,11 +1001,13 @@ void put_money_container(Character *ch, int amount, const char *currencyName, co
   
     oprog_put_money(container, ch, gold, silver); 
 
-    DLString moneyArg = describe_money(gold, silver, 4);
-    DLString preposition = IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
-    ch->pecho("Ты кладешь %s %s %O4.", moneyArg.c_str(), preposition.c_str(), container);
-    ch->recho("%^C1 кладет %s %O4 несколько монет.", ch, preposition.c_str(), container);
-
+    if (!oprog_put_money_msg(container, ch, gold, silver)) {
+        DLString moneyArg = describe_money(gold, silver, 4);
+        DLString preposition = IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
+        ch->pecho("Ты кладешь %s %s %O4.", moneyArg.c_str(), preposition.c_str(), container);
+        ch->recho("%^C1 кладет %s %O4 несколько монет.", ch, preposition.c_str(), container);
+    }
+    
     // Add money to the container or merge with existing coins.
     ch->silver -= silver;
     ch->gold -= gold;
