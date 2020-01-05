@@ -12,7 +12,10 @@
 #include "xmlattributeplugin.h"
 #include "descriptorstatelistener.h"
 #include "descriptor.h"
+#include "core/object.h"
 #include "pcharacter.h"
+#include "wearloc_utils.h"
+#include "loadsave.h"
 #include "wiznet.h"
 #include "def.h"
 
@@ -44,6 +47,25 @@ public:
         DefaultReligion *rel = dynamic_cast<DefaultReligion *>(ch->getReligion().getElement());
         if (!rel)
             return;
+
+        Object *tattoo = get_eq_char(ch, wear_tattoo);
+        if (tattoo && tattoo->pIndexData->vnum != rel->tattooVnum) {
+            static const DLString tattooDefaultName = "татуировк|а|и|е|у|ой|е с изображением ";
+            int qp = 200;
+
+            if (tattoo->getRealShortDescr() && !tattooDefaultName.strPrefix(tattoo->getRealShortDescr()))
+                qp += 200;
+
+            ch->pecho("\r\n%^O1 больше не может служить тебе и исчезает.", tattoo);
+            ch->pecho("На твой счет перечислено %d qp для покупки нового знака твоей религии.", qp);
+            wiznet(WIZ_RELIGION, 0, 0, "%^C1 лишается %O2.", ch, tattoo);
+            
+            ch->addQuestPoints(qp);
+
+            extract_obj(tattoo);
+
+            ch->save();
+        }
 
         if (rel->available(ch))
             return;
