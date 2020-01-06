@@ -591,7 +591,7 @@ NMI_INVOKE(Root, infonet, "(msg): выдать сообщение msg через
     return Register( );
 }
 
-NMI_INVOKE(Root, wiznet, "(msg): выдать сообщение msg по wiznet" )
+NMI_INVOKE(Root, wiznet, "(msg[, trust[, wiztype]]): выдать сообщение msg по wiznet" )
 {
     DLString msg;
     int trust = 0, wiztype = WIZ_QUEST, wiznum;
