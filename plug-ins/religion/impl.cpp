@@ -50,7 +50,7 @@ public:
 
         Object *tattoo = get_eq_char(ch, wear_tattoo);
         if (tattoo && tattoo->pIndexData->vnum != rel->tattooVnum) {
-            static const DLString tattooDefaultName = "татуировк|а|и|е|у|ой|е с изображением ";
+            const DLString tattooDefaultName = "татуировк|а|и|е|у|ой|е с изображением ";
             int qp = 200;
 
             if (tattoo->getRealShortDescr() && !tattooDefaultName.strPrefix(tattoo->getRealShortDescr()))

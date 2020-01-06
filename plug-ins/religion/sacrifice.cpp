@@ -1,6 +1,7 @@
 #include <map>
 #include "defaultreligion.h"
 #include "religionattribute.h"
+#include "religionflags.h"
 #include "logstream.h"
 #include "calendar_utils.h"
 
@@ -11,7 +12,7 @@
 #include "commandtemplate.h"
 #include "pcharacter.h"
 #include "race.h"
-#include "object.h"
+#include "core/object.h"
 #include "skill.h"
 #include "skillmanager.h"
 #include "liquid.h"
@@ -21,7 +22,7 @@
 #include "dreamland.h"
 #include "fight.h"
 #include "gsn_plugin.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "interp.h"
 #include "itemflags.h"
 #include "loadsave.h"
@@ -409,7 +410,7 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
     ch->recho("%^C1 приносит содержимое %O2 в жертву своим богам.", ch, altar);
 
     DefaultReligion *drelig = dynamic_cast<DefaultReligion *>(pch->getReligion().getElement());
-    if (!drelig) {
+    if (!drelig || !drelig->flags.isSet(RELIG_CULT)) {
         ch->pecho("Похоже, %N1 совершенно равнодуш%gно|ен|на к жертвоприношениям.", 
                    rname, religion.getSex());
         ch->recho("... но ничего не происходит.");

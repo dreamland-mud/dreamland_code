@@ -522,10 +522,10 @@ void ErevanGod::tattooFight( Object *obj, Character *ch ) const
     Character *victim = ch->fighting;
     if (!victim)
         return;
-   
+
     // Chance 1 in 8 of getting a heal. 
     if (ch->hit < ch->max_hit && chance(12)) {
-        ch->println("{CТатуировка на твоем плече загорается голубым светом.{x");
+        ch->pecho("{C%^O1 загорается голубым светом.{x", obj);
         spell(gsn_cure_critical, ch->getModifyLevel(), ch, ch, FSPELL_NOTRIGGER);
         return; 
     }
