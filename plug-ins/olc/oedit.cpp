@@ -664,7 +664,7 @@ OEDIT(short)
 
 OEDIT(long)
 {
-    return editor(argument, obj.description, ED_UPPER_FIRST_CHAR);
+    return editor(argument, obj.description, (editor_flags)(ED_UPPER_FIRST_CHAR|ED_NO_NEWLINE));
 }
 
 OEDIT(sound)
