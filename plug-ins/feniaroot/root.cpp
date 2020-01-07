@@ -917,6 +917,25 @@ NMI_INVOKE( Root, Religion, "(name): конструктор для религи�
     return Register::handler<ReligionWrapper>(religion->getName());
 }
 
+NMI_GET( Root, religions, "список всех религий") 
+{
+    RegList::Pointer list(NEW);
+    Religion *religion;
+    
+    for (int i = 0; i < religionManager->size( ); i++) {
+        religion = religionManager->find( i );
+
+        if (religion->isValid( )) 
+            list->push_back( 
+                 Register::handler<ReligionWrapper>(religion->getName()));
+    }
+    
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    return Register( listObj );
+}
+
+
 NMI_INVOKE( Root, Language, "(name): конструктор для древнего языка по имени" )
 {
     DLString name = args2string(args);
