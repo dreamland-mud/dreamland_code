@@ -892,7 +892,7 @@ NMI_INVOKE( Root, Profession, "(name): конструктор для профе�
 
 NMI_INVOKE( Root, CraftProfession, "(name): конструктор для дополнительной профессии по имени" )
 {
-    DLString name = args2string(args);
+    DLString name = args2word(args);
     CraftProfession::Pointer prof = craftProfessionManager->get(name);
     if (!prof)
         throw Scripting::Exception("Craft profession not found");
@@ -901,7 +901,7 @@ NMI_INVOKE( Root, CraftProfession, "(name): конструктор для доп
 
 NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов по имени" )
 {
-    DLString name = args2string(args);
+    DLString name = args2word(args);
     Bonus *bonus = bonusManager->findExisting(name);
     if (!bonus)
         throw Scripting::Exception("Bonus not found");
@@ -910,7 +910,7 @@ NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов �
 
 NMI_INVOKE( Root, Religion, "(name): конструктор для религии по имени" )
 {
-    DLString name = args2string(args);
+    DLString name = args2word(args);
     Religion *religion = religionManager->findExisting(name);
     if (!religion)
         throw Scripting::Exception("Religion not found");

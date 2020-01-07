@@ -66,6 +66,15 @@ DLString args2string( const RegisterList &args )
     return get_unique_arg( args ).toString( );
 }
 
+DLString args2word( const RegisterList &args )
+{
+    StringSet ss;
+    ss.fromString(get_unique_arg(args).toString());
+    if (ss.size() > 1 || ss.size() < 1)
+        throw Scripting::Exception("Expecting a single word or words in quotes");
+    return *(ss.begin());
+}
+
 Character * args2character( const RegisterList &args )
 {
     return wrapper_cast<CharacterWrapper>( get_unique_arg(args) )->getTarget( );
