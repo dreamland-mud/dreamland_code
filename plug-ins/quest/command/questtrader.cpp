@@ -567,18 +567,18 @@ bool TattooQuestArticle::available( Character *client, NPCharacter *tattoer ) co
         return false;
 
     if (client->getReligion( ) == god_none) {
-        say_act( client, tattoer, "$c1, ты не веришь в бога и не можешь получить татуировку." );
+        say_act( client, tattoer, "$c1, ты не веришь в бога и не можешь получить знак религии." );
         return false;
     }
 
     if (wear_tattoo->find( client )) {
-        say_act( client, tattoer, "Но у тебя уже есть татуировка, $c1!" );
+        say_act( client, tattoer, "Но у тебя уже есть знак религии, $c1!" );
         return false;
     }
 
     DefaultReligion *religion = dynamic_cast<DefaultReligion *>(&client->getReligion());
     if (religion && religion->tattooVnum != 0 && !get_obj_index(religion->tattooVnum)) {
-        say_act(client, tattoer, "Я не могу сейчас нанести тебе эту татуировку, приходи позже.");
+        say_act(client, tattoer, "Я не могу сейчас нанести тебе этот знак религии, приходи позже.");
         LogStream::sendError() << "BUG: no tattoo index data for " << religion->getName() << endl;
         return false;
     }

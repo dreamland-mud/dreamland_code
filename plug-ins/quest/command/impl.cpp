@@ -37,6 +37,7 @@ extern "C"
         Plugin::registerPlugin<MobileBehaviorRegistrator<Questor> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<QuestScrollBehavior> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<QuestMaster> >( ppl );
+        Plugin::registerPlugin<MobileBehaviorRegistrator<DefaultQuestMaster> >( ppl );
         
         return ppl;
     }

@@ -6,11 +6,49 @@
 #include "mobilebehavior.h"
 #include "xmldocument.h"
 #include "logstream.h"
+#include "plugininitializer.h"
+#include "dlxmlloader.h"
 
 #include "npcharacter.h"
 #include "fread_utils.h"
 #include "mercdb.h"
 #include "def.h"
+
+/**
+ * Class responsible for reading XML behavior description from a folder;
+ * useful for specifying big default behaviors such as healer or questor.
+ */
+class MobileBehaviorLoader : public DLXMLLoader, public Plugin {
+public:
+    
+    MobileBehaviorLoader() {
+        thisClass = this;
+    }
+    virtual ~MobileBehaviorLoader() {
+        thisClass = 0;
+    }
+
+    virtual void initialization( ) {}
+    virtual void destruction( ) {}
+
+    virtual DLString getTableName( ) const {
+        return "behaviors";
+    }
+    virtual DLString getNodeName( ) const {
+        return MobileBehavior::NODE_NAME;
+    }
+    
+    inline static MobileBehaviorLoader *getThis( ) {
+        return thisClass;
+    }
+
+private:
+    static MobileBehaviorLoader *thisClass;
+};
+
+MobileBehaviorLoader * MobileBehaviorLoader::thisClass = 0;
+
+PluginInitializer<MobileBehaviorLoader> initMobileBehaviorLoader(INITPRIO_NORMAL);
 
 void MobileBehaviorManager::assign( NPCharacter *mob ) {
     if (!mob->pIndexData->behavior)
@@ -21,8 +59,19 @@ void MobileBehaviorManager::assign( NPCharacter *mob ) {
             mob->behavior->unsetChar( );
             mob->behavior.clear( );
         }
-        
-        mob->behavior.fromXML( mob->pIndexData->behavior->getFirstNode( ) );
+
+        const XMLNode::Pointer &rootNode = mob->pIndexData->behavior->getFirstNode();                
+        const DLString & type = rootNode->getAttribute( XMLNode::ATTRIBUTE_TYPE );
+
+        // First load behavior from its XML definition in the area file.
+        mob->behavior.fromXML( rootNode );
+
+        // Try to override behavior definition from a file in 'share/DL/behaviors' folder.
+        // Careful here to pass the original pointer, so that fromXML on the underlying class is called,
+        // rather than the one on the XMLPolymorphPointer.
+        MobileBehaviorLoader::getThis()->loadXML(
+            mob->behavior.getPointer(), type, true);
+
         mob->behavior->setChar( mob );
 
     } catch (const Exception &e) {

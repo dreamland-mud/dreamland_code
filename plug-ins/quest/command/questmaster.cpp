@@ -71,3 +71,7 @@ void QuestMaster::tell( Character *victim, const char *msg )
     }
 }
 
+DefaultQuestMaster::~DefaultQuestMaster()
+{
+
+}
