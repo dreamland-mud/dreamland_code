@@ -19,6 +19,7 @@ using namespace std;
 #include "xmlboolean.h"
 #include "xmldocument.h"
 #include "pcharacter.h"
+#include "arg_utils.h"
 
 class Descriptor;
 struct area_data;
@@ -212,27 +213,39 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
     DLString args = lastArgs;
 
     if (args.empty()) {
-        ch->printf("Использование:\r\n{W%s{x значение - установить или убрать значение\r\n"
-                   "{W? %s{x - показать таблицу значений\r\n", cmd, cmd);
+        ch->pecho("Использование:\r\n{W%1$s{x значения - установить новые значения\r\n"
+                   "{W%1$s clear{x - очистить поле\r\n"
+                   "{W? %1$s{x - показать таблицу значений", cmd);
         return false;
     }
 
-    GlobalRegistry<E> *registry = static_cast<GlobalRegistry<E>*>(field.getRegistry());
-    E *elem = registry->findUnstrict(args);
-    if (!elem) {
-        ch->printf("Значение '%s' не найдено.\r\n", args.c_str());
-        return false;
-    }
-
-    int ndx = elem->getIndex();
-    if (field.isSet(ndx)) {
-        field.remove(ndx);
-        ch->printf("Удаляем %s, новое значение: {g%s{x\r\n", elem->getName().c_str(), field.toString().c_str());
+    if (arg_is_clear(args)) {
+        field.clear();
+        ch->println("Поле очищено.");
         return true;
     }
 
-    field.set(ndx);
-    ch->printf("Добавляем %s, новое значение: {g%s{x\r\n", elem->getName().c_str(), field.toString().c_str());
+    GlobalRegistry<E> *registry = static_cast<GlobalRegistry<E>*>(field.getRegistry());
+    
+    GlobalBitvector newField(registry);
+    StringSet values;
+    values.fromString(args);
+    for (auto &v: values) {
+        E *elem = registry->findExisting(v);
+        if (!elem)
+            elem = registry->findUnstrict(v);
+
+        if (!elem) {
+            ch->printf("Значение '%s' не найдено.\r\n", args.c_str());
+            return false;
+        }
+
+        newField.set(elem->getIndex());
+    }
+
+    field.clear();
+    field.set(newField);
+    ch->printf("Новое значение: {g%s{x\r\n", field.toString().c_str());
     return true;    
 }
 
