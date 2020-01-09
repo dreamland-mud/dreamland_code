@@ -29,10 +29,14 @@ SPELL_DECL(Link);
 VOID_SPELL(Link)::run( Character *ch, Character *victim, int sn, int level )
 {
     int random = number_percent( );
-    
+
     ch->endur /= 2;
     victim->mana = victim->mana + (ch->mana / 2 + random) / 2;
     ch->mana = 0;
+
+    ch->pecho("Арка магической энергии возникает между тобой и %C5.", victim);
+    victim->pecho("Арка магической энергии возникает между тобой и %C5.", ch);
+    ch->recho(victim, "Арка магической энергии возникает между %C5 и %C5.", ch, victim);
 }
 
 SPELL_DECL(MagicConcentrate);
