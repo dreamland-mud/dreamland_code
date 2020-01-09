@@ -1264,10 +1264,10 @@ NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформа
     for (Character *to = target->in_room->people; to; to = to->next_in_room) {
         if (to == target)
             continue;
-        if (to->position < POS_RESTING)
+        if (!to->can_sense(target))
             continue;
 
-        to->println(regfmt(to, args));
+        to->pecho(POS_RESTING, regfmt(to, args).c_str());
     }
 
     return Register();
@@ -1285,11 +1285,11 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит от
 
     for (Character *to = target->in_room->people; to; to = to->next_in_room) {
         if (to == target || to == vict)
-            continue;
-        if (to->position < POS_RESTING)
+            continue;            
+        if (!to->can_sense(target))
             continue;
 
-        to->println(regfmt(to, myArgs));
+        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
     }
 
     return Register( );
