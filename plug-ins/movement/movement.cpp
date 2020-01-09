@@ -85,6 +85,21 @@ bool Movement::canLeave( Character *wch )
     return true;
 }
 
+static int get_area_help_id(AREA_DATA *area)
+{
+    DLString aname(area->name);
+    aname.colourstrip();
+
+    for (auto &help: area->helps) {
+        if (is_name(aname.c_str(), help->getAllKeywordsString().c_str())) {
+            if (help->getID() > 0 && help->getLevel() < LEVEL_IMMORTAL)
+                return help->getID();
+        }
+    }
+
+    return -1;
+}
+
 void Movement::place( Character *wch )
 {
     Room *old_room = wch->in_room;
@@ -101,7 +116,11 @@ void Movement::place( Character *wch )
             && !eyes_blinded( wch )
             && !eyes_darkened( wch ))
     {
-        wch->printf("Ты попадаешь в местность '{c{hh%s{x'.\r\n\r\n", to_room->area->name);
+        int helpId = get_area_help_id(to_room->area);
+        if (helpId >= 0)
+            wch->printf("Ты попадаешь в местность '{c{hh%d%s{x'.\r\n\r\n", helpId, to_room->area->name);
+        else
+            wch->printf("Ты попадаешь в местность '{c{hh%s{x'.\r\n\r\n", to_room->area->name);
     }
  
     interpret_raw( wch, "look", "move" );
