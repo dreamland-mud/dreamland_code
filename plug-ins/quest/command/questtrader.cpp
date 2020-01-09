@@ -395,7 +395,7 @@ void KeyringQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     extract_obj( girth );
 
     act("$C1 прикрепляет огромный брелок к $o3.", client, keyring, questman, TO_CHAR);
-    act("$C1 прикрепляет огромный брелок к $o3 $c2.", client, keyring, questman, TO_ROOM);
+    act("$C1 прикрепляет огромный брелок к $o3.", client, keyring, questman, TO_ROOM);
 }
 
 bool KeyringQuestArticle::available( Character *client, NPCharacter *questman ) const 

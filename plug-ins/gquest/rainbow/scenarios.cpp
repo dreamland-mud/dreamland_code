@@ -204,7 +204,7 @@ void RainbowSinsScenario::printCount( int cnt, ostringstream& buf ) const
 
 void RainbowSinsScenario::printTime( ostringstream& buf ) const
 {
-    buf << "Вакансия закроется через ";
+    buf << "До закрытия вакансии остается ";
     RainbowGQuest::getThis( )->printRemainedTime( buf );
     buf << "." << endl;
 }

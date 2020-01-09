@@ -170,7 +170,7 @@ CMDRUNP( replay )
         ostringstream buf;
 
         if (replay_tells( buf, pch )) {
-            pch->println( "Сообщения, полученные за время твоего отсутствия:" );
+            pch->println( "Сообщения, полученные за время твоего отсутствия или боя:" );
             pch->send_to( buf );
         } else {
             pch->println( "Все сообщения, полученные за время отсутствия, уже прочитаны." );

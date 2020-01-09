@@ -425,7 +425,7 @@ void NoteThread::doList( PCharacter *ch, DLString &argument ) const
         }
     }
     catch (const Exception &e) {
-        ch->println( DLString( e.what( ) ) + "" );
+        ch->println("Неверный формат, смотри {y{hc{lRсправка письмо список{lEhelp note list{x." );
         return;
     }
     
