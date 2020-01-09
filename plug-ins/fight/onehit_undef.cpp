@@ -1104,19 +1104,19 @@ void UndefinedOneHit::damApplyReligion()
                 continue;
             if (get_eq_char(rch, wear_tattoo) == 0)
                 continue;
-            if (ch->getReligion() == god_deimos && rch->getReligion() != god_phobos)
-                continue;
-            if (ch->getReligion() == god_phobos && rch->getReligion() != god_deimos)
-                continue;
-            
-            if (chance(1)) {
-                ch->recho(rch, "%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch, rch);
-                ch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", rch);
-                rch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch);
-            }
 
-            dam = dam * 110 / 100;
-            return;
+            if ((ch->getReligion() == god_deimos && rch->getReligion() == god_phobos)
+                || (ch->getReligion() == god_phobos && rch->getReligion() == god_deimos))
+            {           
+                if (chance(1)) {
+                    ch->recho(rch, "%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch, rch);
+                    ch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", rch);
+                    rch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch);
+                }
+
+                dam = dam * 110 / 100;
+                return;
+            }
         }
     }
 }
