@@ -58,7 +58,7 @@
 #include "behavior_utils.h"
 #include "skill.h"
 #include "clanreference.h"
-#include "object.h"
+#include "core/object.h"
 #include "objectbehavior.h"
 #include "pcharacter.h"
 #include "pcharactermanager.h"
@@ -459,6 +459,17 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
         
         toChar << "Ты берешь $o4 " << prep << " $O2.";
         toRoom << "$c1 берет $o4 " << prep << " $O2.";
+        break;
+
+    case ITEM_CORPSE_NPC:
+    case ITEM_CORPSE_PC:
+        if (DLString::emptyString != obj->from) {
+            toChar << "Ты снимаешь $o4 с $O2.";
+            toRoom << "$c1 снимает $o4 с $O2.";
+        } else {
+            toChar << "Ты берешь $o4 с $O2.";
+            toRoom << "$c1 берет $o4 с $O2.";
+        }
         break;
 
     default:

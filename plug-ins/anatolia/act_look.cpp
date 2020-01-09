@@ -1687,7 +1687,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 
 static bool oprog_examine_corpse( Object *obj, Character *ch, const DLString & )
 {
-    act( "$o1 содержит:", ch, obj, 0, TO_CHAR );
+    act( "На $o6 ты видишь:", ch, obj, 0, TO_CHAR );
     show_list_to_char( obj->contains, ch, true, true );
     return true;
 }        

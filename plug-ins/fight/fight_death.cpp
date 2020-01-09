@@ -25,7 +25,7 @@
 #include "dlscheduler.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "religion.h"
 #include "playerattributes.h"
 #include "room.h"
@@ -38,7 +38,7 @@
 #include "mercdb.h"
 #include "desire.h"
 #include "act.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "merc.h"
 #include "fight.h"
 #include "vnum.h"
@@ -225,6 +225,7 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
 {
     Object *obj, *obj_next;
     Wearlocation *wearloc;
+    DLString worn;
 
     for (obj = ch->carrying; obj; obj = obj_next) {
         obj_next = obj->next_content;
@@ -240,11 +241,16 @@ static void corpse_fill( Object *corpse, Character *ch, int flags = 0 )
             break;
 
         case LOOT_KEEP:
+            // Remember where the item have been worn to correctly format 'get' command messages.
+            worn = obj->wear_loc != wear_none ? 
+                        obj->wear_loc->getName() : DLString::emptyString;
             obj_from_char( obj );
 
-            if (corpse)
+            if (corpse) {
+                free_string(obj->from);
+                obj->from = str_dup(worn.c_str());
                 obj_to_obj( obj, corpse );
-            else 
+            } else 
                 obj_to_room( obj, ch->in_room );
             break;
 
