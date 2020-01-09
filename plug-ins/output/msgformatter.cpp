@@ -344,8 +344,10 @@ again:
                 goto again;
             default:
                 switch (cvt) {
+                    int nounFlags;
                 case 'G':
-                    if (argNoun()->getMultiGender() == (state - 8)) 
+                    nounFlags = (alternative ? 0 : FMT_INVIS);
+                    if (argNoun(nounFlags)->getMultiGender() == (state - 8))
                         s += *f;
                     break;
                 case 'I':
@@ -357,7 +359,8 @@ again:
                         s += *f;
                     break;
                 case 'n':
-                    if (argNoun()->getNumber() == (state - 8))
+                    nounFlags = (alternative ? 0 : FMT_INVIS);
+                    if (argNoun(nounFlags)->getNumber() == (state - 8))
                         s += *f;
                     break;
                 }
