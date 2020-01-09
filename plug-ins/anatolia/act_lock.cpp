@@ -1010,17 +1010,6 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
     int door;
     Keyhole::Pointer null;
 
-    if (( obj = get_obj_here( ch, arg.c_str( ) ) )) {
-        if (obj->item_type == ITEM_PORTAL)
-            return PortalKeyhole::Pointer( NEW, ch, obj );
-
-        if (obj->item_type == ITEM_CONTAINER)
-            return ContainerKeyhole::Pointer( NEW, ch, obj );
-
-        act( "В $o6 нет замочной скважины.", ch, obj, 0, TO_CHAR );
-        return null;
-    }
-
     if (( peexit = get_extra_exit( arg.c_str( ), ch->in_room->extra_exit ) )
                 && ch->can_see( peexit ))
     {
@@ -1031,6 +1020,17 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
                             FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY) ) >= 0)
     {
         return DoorKeyhole::Pointer( NEW, ch, ch->in_room, door );
+    }
+
+    if (( obj = get_obj_here( ch, arg.c_str( ) ) )) {
+        if (obj->item_type == ITEM_PORTAL)
+            return PortalKeyhole::Pointer( NEW, ch, obj );
+
+        if (obj->item_type == ITEM_CONTAINER)
+            return ContainerKeyhole::Pointer( NEW, ch, obj );
+
+        act( "В $o6 нет замочной скважины.", ch, obj, 0, TO_CHAR );
+        return null;
     }
 
     return null;
