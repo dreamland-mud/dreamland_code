@@ -7,6 +7,7 @@
 
 #include "act.h"
 #include "msgformatter.h"
+#include "mudtags.h"
 
 #include "char.h"
 #include "logstream.h"
@@ -337,8 +338,11 @@ void player_fmt( const DLString &format, PCMemoryInterface *pc, ostringstream &b
             break;
 
         case 'p':
-            if (pch)
-                word = pch->getParsedTitle( );
+            if (pch) {
+                ostringstream titleBuf;
+                vistags_convert( pch->getParsedTitle().c_str(), titleBuf, to );             
+                word = titleBuf.str();
+            }
             break;
         
         case 'b':

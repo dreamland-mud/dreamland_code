@@ -61,7 +61,7 @@ COMMAND(Whois, "whois")
     }
     
     /* Pretitle Name Title */
-    player_fmt( "{W%N{w%p{w", pch, buf, ch );
+    player_fmt( "{W%N{w %p{w", pch, buf, ch );
     lines.add( buf );
 
     /* Race, Sex, Class, Level */
