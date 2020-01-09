@@ -43,7 +43,7 @@
 #include "interp.h"
 #include "def.h"
 
-
+GSN(shocking_trap);
 
 #define OBJ_VNUM_FIRE_SHIELD        92
 
@@ -266,8 +266,8 @@ struct ShockingTrapDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-        msgRoom( "Силовые волны, наполняющие местность,\6%C4", ch );
-        msgChar( "Силовые волны, наполняющие местность,\6тебя", ch );
+        msgRoom( "%1$^O1, наполняющие местность,\6%2$C4", gsn_shocking_trap->getDammsg(), ch );
+        msgChar( "%1$^O1, наполняющие местность,\6тебя", gsn_shocking_trap->getDammsg(), ch );
     }
 };
         

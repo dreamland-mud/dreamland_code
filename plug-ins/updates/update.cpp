@@ -56,6 +56,7 @@
 #include "lastlogstream.h"
 #include "logstream.h"
 #include "profiler.h"
+#include "grammar_entities_impl.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -1146,12 +1147,13 @@ struct LightVampireDamage : public Damage {
     
         act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
+        static RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
-            msgRoom( "Солнечный свет\6%C2", ch);
+            msgRoom( "%1$^O1\6%2$C2", sunlight, ch);
         else
-            msgRoom( "Солнечный свет\6%C4", ch);
+            msgRoom( "%1$^O1\6%2$C4", sunlight, ch);
             
-        msgChar( "Солнечный свет\6тебя" );
+        msgChar( "%1$^O1\6тебя", sunlight );
     }
 };
 

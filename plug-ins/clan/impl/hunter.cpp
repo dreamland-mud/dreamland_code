@@ -1001,12 +1001,12 @@ struct HunterSnareDamage : public Damage {
         
     virtual void message( ) {
         if (fMovement) {
-            msgChar( "%^O1\6твою ногу при ходьбе", snare->getObj( ) );
-            msgRoom( "%^C1 морщится от боли, наступив на зажатую в %O4 ногу", ch, snare->getObj( ) );
+            msgChar( "%1$^O1\6твою ногу при ходьбе", snare->getObj( ) );
+            msgRoom( "%2$^C1 морщится от боли, наступив на зажатую в %1$O4 ногу", snare->getObj( ), ch );
         }
         else {
-            msgRoom( "%^O1\6%C4", snare->getObj( ), ch );
-            msgChar( "%^O1\6тебя", snare->getObj( ) );
+            msgRoom( "%1$^O1\6%2$C4", snare->getObj( ), ch );
+            msgChar( "%1$^O1\6тебя", snare->getObj( ) );
         }
     }
 
@@ -1387,8 +1387,8 @@ struct HunterPitDamage : public Damage {
     }
     
     virtual void message( ) {
-        msgRoom( "%^O1 в %O6\6 %C4", pit->getSteaks( ), pit->getObj( ), ch );
-        msgChar( "%^O1 в %O6\6 тебя", pit->getSteaks( ), pit->getObj( ) );
+        msgRoom( "%1$^O1 в %2$O6\6 %3$C4", pit->getSteaks( ), pit->getObj( ), ch );
+        msgChar( "%1$^O1 в %2$O6\6 тебя", pit->getSteaks( ), pit->getObj( ) );
     }
     
     virtual void calcDamage( ) {

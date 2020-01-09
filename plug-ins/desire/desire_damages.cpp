@@ -16,7 +16,7 @@ HungerDamage::HungerDamage( Character *ch, int dam )
 
 void HungerDamage::message( )
 {
-    msgRoom( "От голода %C1\6себя", ch );
+    msgRoom( "От голода %1$C1\6себя", ch );
     msgChar( "От голода ты\5себя" );
 }
 
@@ -27,7 +27,7 @@ ThirstDamage::ThirstDamage( Character *ch, int dam )
 
 void ThirstDamage::message( )
 {
-    msgRoom( "От жажды %C1\6себя", ch );
+    msgRoom( "От жажды %1$C1\6себя", ch );
     msgChar( "От жажды ты\5себя" );
 }
 
