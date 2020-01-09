@@ -58,7 +58,7 @@ using namespace Scripting;
 
 template class EventHandler<WebEditorSaveArguments>;
 
-static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap utf2koi("utf-8", "koi8-r//IGNORE");
 
 static const char *MSG_FLUSH_BUF = "Buffer flushed.\r\n";
 const char *lid = "\n\r*** PUT A LID ON IT!!! ***\n\r";
