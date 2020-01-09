@@ -1147,7 +1147,7 @@ struct LightVampireDamage : public Damage {
     
         act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
-        static RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
+        RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
             msgRoom( "%1$^O1\6%2$C2", sunlight, ch);
         else
