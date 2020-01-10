@@ -129,7 +129,8 @@ cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
 
 if ! test -f "$prefix/var/db/fenia/fenia" 
 then
-    cat "$srcdir/admin/fenia/fenia.dump" | (cd "$prefix/var/db/fenia" && db5.3_load fenia)
+    echo "Loading Fenia DB from dump..."
+    cat "$srcdir/admin/fenia/fenia.dump" | (cd "$prefix/var/db/fenia" && db_load fenia)
 fi
 
 AC_CONFIG_COMMANDS([src/moc/moc], [

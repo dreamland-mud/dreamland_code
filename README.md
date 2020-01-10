@@ -46,7 +46,7 @@
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim libfl-dev bzip2
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
 ```
 
