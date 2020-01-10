@@ -93,7 +93,10 @@ AC_CREATE_DIR(var/db/clan-data)
 AC_CREATE_DIR(var/db/gquests)
 
 AC_CREATE_DIR(var/db/languages)
-cp "$srcdir/admin/scripts/ahenn.txt"    "$prefix/var/db/languages/ahenn.txt"
+if ! test -f "$prefix/var/db/languages/ahenn.txt"
+then
+    cp "$srcdir/admin/scripts/ahenn.txt"    "$prefix/var/db/languages/ahenn.txt"
+fi
 
 AC_CREATE_DIR(var/db/notes/change)
 AC_CREATE_DIR(var/db/notes/crime)
@@ -126,7 +129,7 @@ cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
 
 if ! test -f "$prefix/var/db/fenia/fenia" 
 then
-    cat "$srcdir/admin/fenia/fenia.tbz2" | (cd "$prefix/var/db" && tar xvjf -)
+    cat "$srcdir/admin/fenia/fenia.dump" | (cd "$prefix/var/db/fenia" && db5.3_load fenia)
 fi
 
 AC_CONFIG_COMMANDS([src/moc/moc], [
