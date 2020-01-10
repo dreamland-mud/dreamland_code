@@ -1,0 +1,1684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Player>
+  <ID>5390184008673</ID>
+  <act>autoexit autoloot autogold color confirmed nosummon nofollow</act>
+  <add_affected_by></add_affected_by>
+  <add_comm>autostore nocancel autolook</add_comm>
+  <affected_by></affected_by>
+  <age>11991</age>
+  <alignment>0</alignment>
+  <armor>
+    <pierce>100</pierce>
+    <bash>100</bash>
+    <slash>100</slash>
+    <exotic>100</exotic>
+  </armor>
+  <attributes>
+    <node name="coder" type="XMLEmptyAttribute">
+    </node>
+    <node name="dream" type="XMLAttributeDream">
+      <currentDreamID>0</currentDreamID>
+      <lastDreamID>0</lastDreamID>
+      <sleepTime>0</sleepTime>
+    </node>
+    <node name="lastread" type="XMLAttributeLastRead">
+      <stamps>
+        <node name="change">1528106002</node>
+        <node name="crime">1528106002</node>
+        <node name="idea">1528106002</node>
+        <node name="news">1528106002</node>
+        <node name="note">1528106002</node>
+        <node name="penalty">1528106002</node>
+        <node name="qnote">1528106002</node>
+        <node name="story">1528106002</node>
+      </stamps>
+    </node>
+  </attributes>
+  <batle_prompt>&lt;%n: %h/%Hhp %m/%Mm %v/%Vmv Opp:&lt;%o&gt;&gt; </batle_prompt>
+  <bless>0</bless>
+  <clanLevel>0</clanLevel>
+  <comm>prompt combine</comm>
+  <config>fightspam skillspam objname_hint newdamage</config>
+  <curse>100</curse>
+  <description>You see tanned dark-haired man with a tired look on his face.
+He's dressed in a dusty tunic, his calloused hands grip a shovel.
+There is a glimpse of infinity in his eyes.
+</description>
+  <desires>
+    <full>40</full>
+    <thirst>40</thirst>
+    <bloodlust>40</bloodlust>
+    <hunger>40</hunger>
+  </desires>
+  <detection></detection>
+  <ethos>lawful</ethos>
+  <exp>107000</exp>
+  <hit>1398</hit>
+  <hometown>midgaard_neutral</hometown>
+  <imm_flags></imm_flags>
+  <lastAccessHost></lastAccessHost>
+  <lastAccessTime>1533291993</lastAccessTime>
+  <last_death_time>0</last_death_time>
+  <last_level>0</last_level>
+  <last_logoff>1533291993</last_logoff>
+  <level>107</level>
+  <lines>40</lines>
+  <mana>1770</mana>
+  <max_hit>1398</max_hit>
+  <max_mana>1985</max_mana>
+  <max_move>736</max_move>
+  <max_skill_points>23260</max_skill_points>
+  <move>736</move>
+  <name>Cadmus</name>
+  <password>AC11D7FD549A4210979B52671ECE53FA8CBFFF319E20507431CCFD60FBF93DE5F80697FD54FCCE4D699F121C698CDCCBFBA414E7DD0719A0CB775E932362E499$EDF4D69A773205FC0D7D2285E4C854ACC2E44C13D77BA2487CE9F8AB42B235DBD50F8CDE96BF7BC7A34558C1F6383B964B5BFF7F78AC45F5016F35F0D45A3B4C</password>
+  <perm_hit>1398</perm_hit>
+  <perm_mana>1985</perm_mana>
+  <perm_move>736</perm_move>
+  <perm_stat>
+    <str>16</str>
+    <int>17</int>
+    <wis>17</wis>
+    <dex>17</dex>
+    <con>17</con>
+    <cha>17</cha>
+  </perm_stat>
+  <posFlags></posFlags>
+  <position>stand</position>
+  <practice>217</practice>
+  <profession>warlock</profession>
+  <prompt>&lt;%n: %h/%Hhp %m/%Mm %v/%Vmv %Xexp&gt; </prompt>
+  <race>human</race>
+  <remorts>
+    <stats>
+      <node>0</node>
+      <node>0</node>
+      <node>0</node>
+      <node>0</node>
+      <node>0</node>
+      <node>0</node>
+    </stats>
+  </remorts>
+  <res_flags></res_flags>
+  <russianName>Кадмус||а|у|а|ом|е</russianName>
+  <security>0</security>
+  <sex>1</sex>
+  <shadow>-1</shadow>
+  <skills>
+    <node name="acetum primus">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="acid arrow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="acid blast">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="acute vision">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="adamantite golem">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="ahenn">
+      <forgetting>false</forgetting>
+      <learned>100</learned>
+      <timer>0</timer>
+    </node>
+    <node name="aid">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="ambush">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="anathema">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="animate dead">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="arcadian">
+      <forgetting>false</forgetting>
+      <learned>100</learned>
+      <timer>0</timer>
+    </node>
+    <node name="area attack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="armor">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="assassinate">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="assist">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="astral walk">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="awakening">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="axe">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="backstab">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="banishment">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bark skin">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bash">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bash door">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bear call">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="benediction">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="berserk">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="black death">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="black feeble">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blackjack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blade barrier">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blade of darkness">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bless">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bless weapon">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blind fighting">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blindness">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blindness dust">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blink">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="blue arrow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bluefire">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="bow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="burning hands">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="butcher">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="call lightning">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="calm">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="caltraps">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="camouflage">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="camouflage move">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="camp">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cancellation">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cause critical">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cause light">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cause serious">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="caustic font">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="chain lightning">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="charm person">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="chill touch">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="circle">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cleave">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="colour spray">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="concentrate">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="continual light">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="control undead">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="control weather">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="corruption">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="counter">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="create food">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="create rose">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="create spring">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="create water">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="critical strike">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cross block">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="crusify">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cure blindness">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cure critical">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cure disease">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cure light">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cure poison">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cure serious">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="curse">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="cursed lands">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dagger">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dark shroud">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="deadly venom">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="deafen">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="demonfire">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="desert fist">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect evil">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect good">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect hide">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect invis">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect magic">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect poison">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="detect undead">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dirt kicking">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="disarm">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="disintegrate">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dispel affects">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dispel evil">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dispel good">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="disruption">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dodge">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dragon skin">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dragons breath">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="druidic">
+      <forgetting>false</forgetting>
+      <learned>100</learned>
+      <timer>0</timer>
+    </node>
+    <node name="dual backstab">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="earthquake">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="enchant armor">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="enchant sword">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="enchant weapon">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="endure">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="energy drain">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="enhanced armor">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="enhanced damage">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="entangle">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="envenom">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="escape">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="etheral fist">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="explode">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="faerie fire">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="faerie fog">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="farsight">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fast healing">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fear">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fifth attack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fireball">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fireproof">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="flail">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="flame of god">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="flamestrike">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="floating disc">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fly">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="forest fighting">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fortitude">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="fourth attack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="frenzy">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="galvanic whip">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="gate">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="giant strength">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="golden eye">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="green arrow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="grip">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="ground strike">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="group defense">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="group heal">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="haggle">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hand block">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hand of undead">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hand to hand">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hara kiri">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="harm">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="haste">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="heal">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="healing light">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="heat metal">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hellfire">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="herbs">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hide">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="holy word">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="holycross">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hurricane">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="hydroblast">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="iceball">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="identify">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="improved benediction">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="improved detect">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="improved invis">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="improved maladiction">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="infravision">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="insanity">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="inspire">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="invisibility">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="iron golem">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="katana">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="key forgery">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="khuzdul">
+      <forgetting>false</forgetting>
+      <learned>100</learned>
+      <timer>0</timer>
+    </node>
+    <node name="kick">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="knife">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="knock">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="know alignment">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lash">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lay hands">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="leadership">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="learning">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lesser golem">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lethargic mist">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lightning bolt">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lightning shield">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="link">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lion call">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="locate object">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="lore">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mace">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="magic concentrate">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="magic jar">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="magic missile">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="magnetic trust">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="make arrow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="make bow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="make shield">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mass healing">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mass invis">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mass sanctuary">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="master healing">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mastering bow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mastering pound">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mastering sword">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="meditation">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mend">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mental block">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mind wrack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mind wrench">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="mysterious dream">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="nerve">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="nexus">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="observation">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="parry">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="pass door">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="peek">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="perception">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="pick lock">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="plague">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="poison">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="poison smoke">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="polearm">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="portal">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="power word kill">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="power word stun">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="prayer">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="protection cold">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="protection evil">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="protection good">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="protection heat">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="protection negative">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="protective shield">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="push">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="quantum spike">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="quenia">
+      <forgetting>false</forgetting>
+      <learned>100</learned>
+      <timer>0</timer>
+    </node>
+    <node name="ray of truth">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="recall">
+      <forgetting>false</forgetting>
+      <learned>75</learned>
+      <timer>33</timer>
+    </node>
+    <node name="recall shadowblade">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="recharge">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="red arrow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="refresh">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="remove curse">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="remove fear">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="rescue">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="resilience">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="restoring light">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sanctify lands">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sanctuary">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sand storm">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="scream">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="scribing">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="scrolls">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="second attack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="second weapon">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="settraps">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="severity force">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shadowblade">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shield">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shield block">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shield cleave">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shielding">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shocking grasp">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="shocking trap">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sleep">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="slice">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="slow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="smash">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="smithing">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sneak">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="solar flight">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sonic resonance">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="spear">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="spectral furor">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="spell craft">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="spell resistance">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="stardust">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="staves">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="steal">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="stone golem">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="stone skin">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="strangle">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sulfurus spray">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="summon">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="summon shadow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="superior heal">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="sword">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="tame">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="target">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="teleport">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="third attack">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="throw">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="tiger power">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="track">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="trance">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="trip">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="turn">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="turn undead">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="unholy word">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="vanish">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="ventriloquate">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="wands">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="warcry">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="weaken">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="weapon cleave">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="weapon morph">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="web">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="whip">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="white arrow">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="winters touch">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="witch curse">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="word of recall">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+    <node name="wrath">
+      <forgetting>false</forgetting>
+      <learned>1</learned>
+      <timer>0</timer>
+    </node>
+  </skills>
+  <start_room>31000</start_room>
+  <security>999</security>
+  <title>creating chaos out of chaos</title>
+  <train>24</train>
+  <vuln_flags></vuln_flags>
+  <wearloc>finger_l second_wield neck_2 neck_1 finger_r wrist_r wrist_l body light shield head legs feet hands arms about waist wield hold float tattoo face </wearloc>
+</Player>

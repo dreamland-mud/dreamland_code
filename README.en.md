@@ -56,6 +56,8 @@ Logs are available under /path/to/runtime/var/log.
 ```bash
 telnet localhost 9127
 ```
-user: Kadm
+user: Cadmus 
 password: KadmKadm
+
+This player is configured to have Russian skills/names/commands turned off in output, and is placed in room 31001 with English descriptions.
 

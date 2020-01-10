@@ -121,6 +121,7 @@ AC_CREATE_DIR_16(var/db/saved/mobiles)
 AC_CREATE_FILE(etc/dreamland.xml)
 AC_CREATE_FILE(libexec/plugin.xml)
 AC_PLAYER_COPY(kadm)
+AC_PLAYER_COPY(cadmus)
 cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
 
 if ! test -f "$prefix/var/db/fenia/fenia" 
