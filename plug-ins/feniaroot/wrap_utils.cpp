@@ -179,8 +179,12 @@ PCharacter *argnum2player(const RegisterList &args, int num)
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
 {
     Register a = argnum(args, num);
-    if (a.type == Register::STRING)
-        return table.bitstring( a.toString().c_str(), true );
+    if (a.type == Register::STRING) {
+        if (table.enumerated)
+            return table.value( a.toString().c_str(), true );
+        else
+            return table.bitstring( a.toString().c_str(), true );
+    }
     return a.toNumber();
 }
 

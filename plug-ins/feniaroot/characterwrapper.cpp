@@ -1892,6 +1892,33 @@ NMI_INVOKE( CharacterWrapper, save, "(): сохранить профайл на 
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, skills, "([origin]): список названий доступных скилов, всех или с данным происхождением (.tables.skill_origin_table)" )
+{
+    checkTarget();
+    CHK_NPC
+
+    RegList::Pointer list(NEW);
+    int origin = args.empty() ? NO_FLAG : argnum2flag(args, 1, skill_origin_table);
+    
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        // Choose only permanent skills available at any level, or active temporary skills.
+        if (!skill->visible(target))
+            continue;
+
+        PCSkillData &data = target->getPC()->getSkillData(sn);
+        // Filter by requested origin (fenia, religion, etc) or return all.
+        if (origin != NO_FLAG && data.origin != origin)
+            continue;
+
+        list->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    return Register( listObj );
+}
+
 NMI_INVOKE( CharacterWrapper, updateSkills, "(): освежить разученность умений (при входе в мир)" )
 {
     checkTarget( );

@@ -1081,12 +1081,13 @@ NMI_INVOKE( SkillWrapper, improve, "(ch,success[,victim]): попытаться 
     return Register( );
 }
 
-NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвоить временное умение персонажу, разученное на learned % (или на 75%), работающее days дней (или вечно). Вернет true, если присвоено успешно.")
+NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): присвоить временное умение персонажу, разученное на learned % (или на 75%), работающее days дней (или вечно), помеченное как origin (или fenia). Вернет true, если присвоено успешно.")
 {
     PCharacter *ch = argnum2player(args, 1);
     int learned = args.size() > 1 ? argnum2number(args, 2) : ch->getProfession()->getSkillAdept();
     long today = day_of_epoch(time_info);
     long end;
+    int origin;
 
     if (args.size() <= 2)
         end = PCSkillData::END_NEVER;
@@ -1097,17 +1098,22 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
         end = today + end;
     }
 
+    if (args.size() >= 4)
+        origin = argnum2flag(args, 4, skill_origin_table);
+    else
+        origin = SKILL_FENIA;
+
     if (learned <= 0)
         throw Scripting::Exception("learned param cannot be negative");
 
-    // Do nothing for already available permanent skills.
+    // Do nothing for already available permanent or temporary skills.
     Skill *skill = getTarget();
     if (skill->visible(ch))
         return Register(false);
     
     // Create and save temporary skill data.
     PCSkillData &data = ch->getSkillData(skill->getIndex());
-    data.origin = SKILL_FENIA;
+    data.origin = origin;
     data.start = today;
     data.end = end;
     data.learned = learned;
