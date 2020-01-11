@@ -1133,10 +1133,9 @@ NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить вр
     else
         origin = SKILL_FENIA;
 
-
     if (!data.isTemporary())
         return Register(false);
-    if (data.origin != SKILL_FENIA)
+    if (data.origin != origin)
         return Register(false);
 
     data.clear();
