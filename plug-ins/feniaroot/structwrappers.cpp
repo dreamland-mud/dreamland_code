@@ -1121,11 +1121,18 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
     return Register(true);
 }
 
-NMI_INVOKE( SkillWrapper, removeTemporary, "(ch): очистить временное умение у персонажа. Вернет true, если было что очищать.")
+NMI_INVOKE( SkillWrapper, removeTemporary, "(ch[,origin]): очистить временное умение у персонажа, помеченное как origin (.tables.skill_origin_table). Вернет true, если было что очищать.")
 {
     PCharacter *ch = argnum2player(args, 1);
     Skill *skill = getTarget();
     PCSkillData &data = ch->getSkillData(skill->getIndex());
+    int origin;
+
+    if (args.size() >= 2)
+        origin = argnum2flag(args, 2, skill_origin_table);
+    else
+        origin = SKILL_FENIA;
+
 
     if (!data.isTemporary())
         return Register(false);
