@@ -60,4 +60,7 @@ void tell_dim( Character *, Character *, const char *, const void *arg = 0 );
 void tell_fmt( const char *, ... );
 void say_fmt( const char *, ... );
 
+/** Display newbie hint message. */
+void hint_fmt(Character *ch, const char *format, ...);
+
 #endif
