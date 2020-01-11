@@ -1035,6 +1035,12 @@ NMI_INVOKE( SkillWrapper, usable, "(ch): доступно ли умение дл
     return getTarget()->usable( ch, false );
 }
 
+NMI_INVOKE( SkillWrapper, visible, "(ch): видно ли это умение ch, независимо от уровня, включая временные скилы" )
+{
+    Character *ch = args2character(args);
+    return getTarget()->visible( ch );
+}
+
 NMI_INVOKE( SkillWrapper, adept, "(ch): вернуть максимальное значение, до которого можно практиковаться" )
 {
     PCharacter *ch = args2player(args); 
@@ -1099,12 +1105,8 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days]]): присвои�
     if (skill->visible(ch))
         return Register(false);
     
-    // Do nothing for already present temporary skills.
-    PCSkillData &data = ch->getSkillData(skill->getIndex());
-    if (temporary_skill_active(data))
-        return Register(false);
-
     // Create and save temporary skill data.
+    PCSkillData &data = ch->getSkillData(skill->getIndex());
     data.origin = SKILL_FENIA;
     data.start = today;
     data.end = end;
