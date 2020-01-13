@@ -29,7 +29,7 @@ public:
         {
         }
         
-        inline XMLInteger( const DLString& value ) throw( ExceptionBadType )
+        inline XMLInteger( const DLString& value ) 
                 : Integer( value )
         {
         }
@@ -37,7 +37,7 @@ public:
         /** Возвращает xml представление переменной */
         bool toXML( XMLNode::Pointer& node ) const;
         /** Инициализация класса из xml данных */
-        void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+        void fromXML( const XMLNode::Pointer& node ) ;
 };
 
 class XMLIntegerNoEmpty : public XMLInteger {
@@ -56,7 +56,7 @@ public:
 class XMLIntegerVariable : public virtual XMLVariable, public XMLInteger {
 public:
     virtual bool toXML( XMLNode::Pointer& ) const;
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
 };
 
 template <int def>

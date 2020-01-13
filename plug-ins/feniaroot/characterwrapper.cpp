@@ -26,6 +26,7 @@
 #include "room.h"
 
 #include "subprofession.h"
+#include "profflags.h"
 #include "occupations.h"
 #include "interp.h"
 #include "comm.h"
@@ -114,7 +115,7 @@ void CharacterWrapper::setTarget( ::Character *target )
     id = target->getID( );
 }
 
-void CharacterWrapper::checkTarget( ) const throw( Scripting::Exception )
+void CharacterWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "Character is dead" );
@@ -810,8 +811,7 @@ NMI_GET( CharacterWrapper, lastAccessTime, "время последнего за
 NMI_GET( CharacterWrapper, profession, "класс (структура .Profession)" )
 {
     checkTarget( );
-    CHK_NPC
-    return ProfessionWrapper::wrap( target->getPC( )->getProfession( )->getName( ) );
+    return Register::handler<ProfessionWrapper>(target->getProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, profession, "класс (структура .Profession)" )
@@ -828,7 +828,7 @@ NMI_GET( CharacterWrapper, religion, "религия (структура .Religi
 {
     checkTarget( );
     CHK_NPC
-    return ReligionWrapper::wrap( target->getPC( )->getReligion( )->getName( ) );
+    return Register::handler<ReligionWrapper>( target->getPC( )->getReligion( )->getName( ) );
 }
 
 NMI_SET( CharacterWrapper, religion, "религия (структура .Religion)" )
@@ -845,7 +845,7 @@ NMI_GET( CharacterWrapper, uniclass, "под-профессия универса
 {
     checkTarget( );
     CHK_NPC
-    return ProfessionWrapper::wrap( target->getPC( )->getSubProfession( )->getName( ) );
+    return Register::handler<ProfessionWrapper>(target->getPC()->getSubProfession()->getName());
 }
 
 NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
@@ -1257,20 +1257,41 @@ NMI_INVOKE( CharacterWrapper, act, "(fmt, args): печатает нам отф�
 
 NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформатированную строку всем в комнате, кроме нас" )
 {
-    checkTarget( );
-    target->recho( regfmt( target, args ).c_str( ) );
-    return Register( );
+    checkTarget();
+    if (!target->in_room)
+        return Register();
+
+    for (Character *to = target->in_room->people; to; to = to->next_in_room) {
+        if (to == target)
+            continue;
+        if (!to->can_sense(target))
+            continue;
+
+        to->pecho(POS_RESTING, regfmt(to, args).c_str());
+    }
+
+    return Register();
 }
 
 NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит отформатированную строку всем в комнате, кроме нас и vict" )
 {
-    checkTarget( );
+    checkTarget();
+    if (!target->in_room)
+        return Register();
+
     RegisterList myArgs(args);
-    
     Character *vict = args2character(args);
     myArgs.pop_front();
 
-    target->recho( vict, regfmt( target, myArgs ).c_str( ) );
+    for (Character *to = target->in_room->people; to; to = to->next_in_room) {
+        if (to == target || to == vict)
+            continue;            
+        if (!to->can_sense(target))
+            continue;
+
+        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
+    }
+
     return Register( );
 }
 
@@ -1869,6 +1890,33 @@ NMI_INVOKE( CharacterWrapper, save, "(): сохранить профайл на 
     CHK_NPC
     target->getPC( )->save( );
     return Register( );
+}
+
+NMI_INVOKE( CharacterWrapper, skills, "([origin]): список названий доступных скилов, всех или с данным происхождением (.tables.skill_origin_table)" )
+{
+    checkTarget();
+    CHK_NPC
+
+    RegList::Pointer list(NEW);
+    int origin = args.empty() ? NO_FLAG : argnum2flag(args, 1, skill_origin_table);
+    
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        // Choose only permanent skills available at any level, or active temporary skills.
+        if (!skill->visible(target))
+            continue;
+
+        PCSkillData &data = target->getPC()->getSkillData(sn);
+        // Filter by requested origin (fenia, religion, etc) or return all.
+        if (origin != NO_FLAG && data.origin != origin)
+            continue;
+
+        list->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    return Register( listObj );
 }
 
 NMI_INVOKE( CharacterWrapper, updateSkills, "(): освежить разученность умений (при входе в мир)" )

@@ -12,7 +12,7 @@
 
 #include "xmlshort.h"
 
-void XMLShort::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType ) {
+void XMLShort::fromXML( const XMLNode::Pointer& parent )  {
         XMLNode::Pointer node = parent->getFirstNode( );
 
         if (!node.isEmpty( ))

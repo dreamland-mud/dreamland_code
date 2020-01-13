@@ -38,7 +38,7 @@ public:
     GlobalQuest( );
     GlobalQuest( const DLString& );
 
-    virtual void create( const Config & ) throw ( GQCannotStartException ) = 0;
+    virtual void create( const Config & )  = 0;
     virtual void destroy( ) = 0;
     void scheduleDestroy( );
     

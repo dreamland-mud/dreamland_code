@@ -68,7 +68,7 @@ public:
                     getPointer( )->getReferenceId( ) );
         return true;
     }
-    void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    void fromXML( const XMLNode::Pointer& parent ) 
     {
         const DLString &sid = parent->getAttribute( ATTRIBUTE_REFID );
 
@@ -124,7 +124,7 @@ public:
             return false;
     }
     
-    void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    void fromXML( const XMLNode::Pointer& parent ) 
     {
         Ptr::fromXML(parent);
 

@@ -22,16 +22,16 @@
 class ExceptionXMLError : public Exception
 {
 public: 
-    inline ExceptionXMLError( string errmsg )
+    inline ExceptionXMLError( string errmsg ) throw()
             : Exception( errmsg ), line( 0 )
     {
     }
-    inline ExceptionXMLError( string errmsg, char ch, int line )
+    inline ExceptionXMLError( string errmsg, char ch, int line ) throw()
             : Exception( errmsg + "::" + ch + ": at line " + DLString(line) ), line( line )
     {
     }
 
-    virtual ~ExceptionXMLError( ) throw( );
+    virtual ~ExceptionXMLError( ) throw();
     
 private:
     int line;

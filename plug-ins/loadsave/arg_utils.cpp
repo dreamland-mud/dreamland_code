@@ -208,4 +208,7 @@ bool arg_is_all( const DLString &arg )
     return arg == "all" || arg == "все" || arg == "всё"; 
 }
 
-
+bool arg_is_clear( const DLString &arg )
+{
+    return arg_oneof(arg, "clear", "очистить");
+}

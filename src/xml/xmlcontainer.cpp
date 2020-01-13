@@ -7,7 +7,7 @@
 #include "logstream.h"
 
 void 
-XMLContainer::fromXML( const XMLNode::Pointer & parent ) throw( ExceptionBadType )
+XMLContainer::fromXML( const XMLNode::Pointer & parent ) 
 {
     XMLNode::NodeList::const_iterator ipos;
     const XMLNode::NodeList& children = parent->getNodeList( );

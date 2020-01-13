@@ -2143,7 +2143,7 @@ DLString AffectOutput::format_affect_global( Affect *paf )
         case TO_SKILL_GROUPS:
             if (paf->location == APPLY_LEVEL) {
                 buf << (paf->modifier >= 0 ? "повышает" : "понижает")
-                    << " уровень заклинаний "
+                    << " уровень умений "
                     << (paf->where == TO_SKILL_GROUPS ? "группы" : "") << " {m" 
                     << (russian ? paf->global.toRussianString() : paf->global.toString()).quote()
                     << "{y на {m" << (int)abs(paf->modifier) << "{y";
@@ -2516,7 +2516,7 @@ void lore_fmt_affect( Affect *paf, ostringstream &buf )
                         case TO_SKILLS:
                         case TO_SKILL_GROUPS:
                             buf << (paf->modifier >= 0 ? "Повышает" : "Понижает")
-                                << " уровень заклинания "
+                                << " уровень умения "
                                 << (paf->where == TO_SKILL_GROUPS ? "группы" : "")
                                 << " " << paf->global.toRussianString().quote() 
                                 << " на " << (int)abs(paf->modifier) << endl;

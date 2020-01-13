@@ -38,7 +38,7 @@
 
 ## <a name="local">Запуск локальной версии</a>
 
-Эта инструкция по сборке была проверена на Ubuntu 16.04 и Ubuntu 14.04. Дримленд собирается под версиями компилятора **gcc** начиная с **4.8** и заканчивая **8.2.0**.
+Эта инструкция по сборке была проверена на Ubuntu 18.04. Дримленд гарантированно собирается под **gcc 7.4** (или другой версией с поддержкой C++11).
 
 Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
 
@@ -46,7 +46,7 @@
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim bzip2
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
 ```
 

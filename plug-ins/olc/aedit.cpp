@@ -2,35 +2,22 @@
  *
  * ruffina, 2004
  */
-
-#include <sys/types.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <stdarg.h>
-
-#include <config.h>
-
-#include <character.h>
 #include <pcharacter.h>
-#include <commandmanager.h>
 #include <object.h>
-#include <affect.h>
 #include "room.h"
 
 #include "aedit.h"
-
+#include "hedit.h"
+#include "security.h"
 #include "olc.h"
+#include "areahelp.h"
 
+#include "websocketrpc.h"
 #include "merc.h"
+#include "arg_utils.h"
 #include "update_areas.h"
 #include "interp.h"
 #include "mercdb.h"
-
-#include "security.h"
-
 #include "def.h"
 
 OLC_STATE(OLCStateArea);
@@ -107,11 +94,7 @@ OLCStateArea::~OLCStateArea()
 
 void OLCStateArea::commit() 
 {
-    AREA_DATA *original;
-    
-    for (original = area_first; original; original = original->next)
-        if(original->vnum == vnum)
-            break;
+    AREA_DATA *original = get_area_data(vnum);
     
     if(!original) {
         original = new AREA_DATA;
@@ -205,24 +188,113 @@ AEDIT(show, "показать", "показать все поля")
     ptc(ch, "Translator: [%s]\n\r", translator.getValue( ).c_str( ));
     ptc(ch, "Speedwalk:  [%s]\n\r", speedwalk.getValue( ).c_str( ));
     ptc(ch, "Message:    [%s]\n\r", resetmsg.getValue( ).c_str( ));
-    ptc(ch, "Flags:      [%s] {D(? area_flags}{w\n\r", area_flags.names(area_flag).c_str());
-
+    ptc(ch, "Flags:      [%s] {D(? area_flags{w)\n\r", area_flags.names(area_flag).c_str());
+             
     if (!behavior.empty( ))
         ptc(ch, "Behavior:\r\n%s", behavior.c_str( ));
-    
+
+    AREA_DATA *original = get_area_data(vnum);
+    if (original) {
+        DLString buf;
+
+        for (auto &article: original->helps) 
+            if (article->getID() > 0)
+                buf += "    [{C" + article->getAllKeywordsString() + "{x] "
+                    +  web_edit_button(ch, "hedit", DLString(article->getID()))
+                    + " {D(hedit " + DLString(article->getID()) + "){x\r\n";
+
+        if (!buf.empty())
+            ch->println("Helps:\r\n" + buf);
+        else
+            ch->println("Helps:      (none) ({y{hchelp create{hx {Dto add area help{w)");
+    } else {
+        ptc(ch, "Helps:      {Dno helps for the new area, save and use {yhelp create{x\r\n");
+    }
+
+    return false;
+}
+
+AEDIT(helps, "справка", "создать или посмотреть справку по зоне")
+{
+    DLString arg = argument;
+    AREA_DATA *original = get_area_data(vnum);
+
+    if (!original) {
+        stc("Сперва сохрани новую арию.", ch);
+        return false;
+    }
+
+    if (arg.empty()) {
+        stc("Статьи справки, объявленные внутри этой зоны: \r\n", ch);
+        bool hasHelp = false;
+
+        for (auto &article: original->helps) {
+            if (article->getID() > 0) {
+                ch->println(
+                    "    [{C" + article->getAllKeywordsString() + "{x] "
+                    +  web_edit_button(ch, "hedit", DLString(article->getID()))
+                    + " {D(hedit " + DLString(article->getID()) + "){x");
+
+                hasHelp = true;
+            }
+        }
+
+        if (!hasHelp)
+            ch->println("    (нет)");
+
+        AreaHelp *ahelp = get_area_help(original);
+        if (!ahelp || !ahelp->persistent)
+            ch->println("Используй {y{hchelp create{x для создания справки по зоне.");
+
+        return false;
+    }
+
+    if (arg_oneof(arg, "create", "создать")) {
+        AreaHelp *ahelp = get_area_help(original);
+        if (!ahelp) {
+            ch->println("Не найдена автоматическая справка по этой зоне, что-то поломалось.");
+            return false;
+        }
+
+        if (ahelp->persistent) {
+            ch->println("Справка по этой зоне уже существет, запускаю редактор.");
+        } else {
+
+            ch->println("Превращаю автоматическую справку по зоне в постоянную.");
+            ahelp->persistent = true;
+
+            StringSet kwd;
+            kwd.fromString(DLString(original->name).colourStrip().quote());
+            kwd.fromString(DLString(original->credits).colourStrip().quote());
+            ahelp->setKeywordAttribute(kwd.toString());
+
+            ahelp->setID(
+                helpManager->getLastID() + 1
+            );
+            helpManager->unregistrate(AreaHelp::Pointer(ahelp));
+            helpManager->registrate(AreaHelp::Pointer(ahelp));
+        }
+
+        OLCStateHelp::Pointer hedit(NEW, ahelp);
+        hedit->attach(ch);
+        hedit->show(ch);
+
+        return true;
+    }
+
+    stc("Использование: helps, helps create\r\n", ch);
     return false;
 }
 
 AEDIT(reset, "сбросить", "сбросить арию, обновив всех мобов, предметы и двери")
 {
-    AREA_DATA *original;
+    AREA_DATA *original = get_area_data(vnum);
 
-    for (original = area_first; original; original = original->next)
-        if(original->vnum == vnum) {
-            reset_area(original);
-            stc("Ария сброшена.\n\r", ch);
-            return false;
-        }
+    if (original) {
+        reset_area(original);
+        stc("Ария сброшена.\n\r", ch);
+        return false;
+    }
 
     stc("Создание арии не завершено - нечего сбрасывать.\n\r", ch);
     return false;

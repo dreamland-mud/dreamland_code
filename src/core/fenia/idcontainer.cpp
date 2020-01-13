@@ -94,7 +94,7 @@ IdContainer::toXML( XMLNode::Pointer& parent ) const
 }
 
 void 
-IdContainer::fromXML( const XMLNode::Pointer& parent ) throw ( ExceptionBadType )
+IdContainer::fromXML( const XMLNode::Pointer& parent ) 
 {
     idmap.clear();
     XMLContainer::fromXML(parent);

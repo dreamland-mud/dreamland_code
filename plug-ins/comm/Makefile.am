@@ -36,7 +36,6 @@ corder.h \
 pcdeleteidle.h \
 run.h \
 whois.h \
-who.h \
 writing.h \
 eating.h
 
@@ -48,12 +47,16 @@ plugin_INCLUDES = \
 $(INCLUDES_FIGHT) \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/ed \
--I$(top_srcdir)/plug-ins/ed/lib
+-I$(top_srcdir)/plug-ins/servlets \
+-I$(top_srcdir)/plug-ins/ed/lib \
+-I/usr/include/jsoncpp
 
 libcomm_la_LIBADD = \
 $(LIBADD_FIGHT) \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \
-../communication/libcommunication.la 
+../servlets/libservlets.la \
+../communication/libcommunication.la \
+-ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

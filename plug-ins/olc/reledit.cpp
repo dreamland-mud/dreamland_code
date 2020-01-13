@@ -104,7 +104,7 @@ void OLCStateReligion::show( PCharacter *ch )
         r->flags.getValue() != 0 ? r->flags.names().c_str() : "-");
 
     OBJ_INDEX_DATA *tattoo = r->tattooVnum == 0 ? 0 : get_obj_index(r->tattooVnum);
-    ptc(ch, "Татуировка:        {C%d{x [{W%s{x] {D(tattoo help){x\r\n",
+    ptc(ch, "Знак:              {C%d{x [{W%s{x] {D(tattoo help){x\r\n",
         r->tattooVnum.getValue(), 
         tattoo ? russian_case(tattoo->short_descr, '1').c_str() : "none");
 
@@ -180,17 +180,17 @@ RELEDIT(flags, "флаги", "выставить флаги религии")
     return flagBitsEdit(religion_flags, getOriginal()->flags);
 }
 
-RELEDIT(tattoo, "татуировка", "установить vnum татуировки религии")
+RELEDIT(mark, "знак", "установить vnum знака религии")
 {
     Integer vnum;
     if (!Integer::tryParse(vnum, argument)) {
-        stc("Укажи vnum предмета-татуировки или 0 для сброса.\r\n", ch);
+        stc("Укажи vnum предмета-знака или 0 для сброса.\r\n", ch);
         return false;
     }
 
     if (vnum == 0) {
         getOriginal()->tattooVnum = 0;
-        stc("Татуировка очищена.\r\n", ch);
+        stc("Знак очищен.\r\n", ch);
         return false;
     }
  
@@ -201,14 +201,14 @@ RELEDIT(tattoo, "татуировка", "установить vnum татуир�
     }
 
     getOriginal()->tattooVnum = vnum.getValue();
-    ptc(ch, "Татуировка этой религии теперь %d: %s.\r\n", 
+    ptc(ch, "Знак этой религии теперь %d: %s.\r\n", 
             vnum, russian_case(tattoo->short_descr, '1').c_str());
 
     if (tattoo->item_type != ITEM_TATTOO) 
-        stc("Осторожно, этот предмет не имеет тип 'tattoo'!\r\n", ch);
+        stc("Осторожно, этот предмет не имеет тип 'mark'!\r\n", ch);
     
     if (!IS_SET(tattoo->wear_flags, ITEM_WEAR_TATTOO)) 
-        stc("Осторожно, этот предмет не надевается на локацию tattoo!\r\n", ch);
+        stc("Осторожно, этот предмет не надевается на лоб (wear_tattoo)!\r\n", ch);
 
     return true;
 }
@@ -318,7 +318,7 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    if (arg_oneof(cmd, "tattoo", "татуировка")) {
+    if (arg_oneof(cmd, "tattoo", "татуировка") || arg_oneof(cmd, "mark", "знак")) {
         ch->send_to(dlprintf(
             "{C%-15s %-17s %-6s %s{x\r\n", "Название", "Русское имя", "VNUM", "Описание"));        
 
@@ -384,8 +384,12 @@ CMD(reledit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online religion editor.")
         return;
     }
 
-    Religion *religion = religionManager->findUnstrict(
-        DLString(argument).toLower().stripWhiteSpace());
+    DLString arg = DLString(argument).toLower().stripWhiteSpace();    
+
+    Religion *religion = religionManager->findExisting(arg);
+    if (!religion)
+        religion = religionManager->findUnstrict(arg);
+        
     if (!religion || dynamic_cast<DefaultReligion *>(religion) == NULL) {
         stc("Религия с таким названием не найдена, используйте reledit list для списка.\r\n", ch);
         return;

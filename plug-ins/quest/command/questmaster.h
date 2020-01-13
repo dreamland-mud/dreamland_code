@@ -25,5 +25,13 @@ protected:
         virtual bool specIdle( );
 };
 
+class DefaultQuestMaster : public QuestMaster {
+XML_OBJECT
+public:
+        typedef ::Pointer<DefaultQuestMaster> Pointer;
+        
+        virtual ~DefaultQuestMaster();
+};
+
 #endif
 

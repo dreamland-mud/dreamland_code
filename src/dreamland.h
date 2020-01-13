@@ -31,6 +31,9 @@
 #include "dldirectory.h"
 #include "xmlconfigurable.h"
 
+#include <sys/time.h>
+
+
 class DbEnvContext;
 
 class DreamLand;
@@ -54,6 +57,8 @@ class DesireManager;
 class HelpManager;
 class SkillGroupManager;
 class BonusManager;
+class SocketManager;
+class ServletManager;
 
 extern DreamLand * dreamland;
 
@@ -119,10 +124,10 @@ public:
         inline void setOption( int );
         inline void removeOption( int );
         inline void resetOption( int );
+        void setCurrentTime( );
 
 private:
         void setBootTime( );
-        void setCurrentTime( );
         void pulseStart( );
         void pulseEnd( );
 
@@ -138,7 +143,7 @@ private:
         /** world booting time */
         time_t bootTime;
 
-        clock_t pulseStartTime;
+        struct timeval pulseStartTime;
 
         long long lastID;
         
@@ -195,6 +200,8 @@ private:
         ::Pointer<HelpManager> helpManager;
         ::Pointer<SkillGroupManager> skillGroupManager;
         ::Pointer<BonusManager> bonusManager;
+        ::Pointer<SocketManager> socketManager;
+        ::Pointer<ServletManager> servletManager;
 
         DbEnvContext *dbEnv;
 };

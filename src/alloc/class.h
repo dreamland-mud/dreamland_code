@@ -79,8 +79,8 @@ public:
     
     static void regClass( const DLString& name, ClassRegistrator::Pointer classPointer );
     static void unRegClass( const DLString& name );
-    static AllocateClass::Pointer allocateClass( const DLString& name ) throw( ExceptionClassNotFound );
-    static AllocateClass * allocateClassRaw( const DLString& name ) throw( ExceptionClassNotFound );
+    static AllocateClass::Pointer allocateClass( const DLString& name ) ;
+    static AllocateClass * allocateClassRaw( const DLString& name ) ;
 };
 
 

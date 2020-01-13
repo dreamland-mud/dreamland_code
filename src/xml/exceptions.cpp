@@ -12,19 +12,19 @@
 
 using namespace std;
 
-ExceptionSkipVariable::~ExceptionSkipVariable( ) throw( )
+ExceptionSkipVariable::~ExceptionSkipVariable( ) throw()
 {
 }
 
-ExceptionVariableNotFound::~ExceptionVariableNotFound( ) throw( )
+ExceptionVariableNotFound::~ExceptionVariableNotFound( ) throw()
 {
 }
 
-ExceptionXMLError::~ExceptionXMLError( ) throw( )
+ExceptionXMLError::~ExceptionXMLError( ) throw()
 {
 }
 
-ExceptionXSL::ExceptionXSL( const string type, int position  )
+ExceptionXSL::ExceptionXSL( const string type, int position  ) throw()
 {
     basic_ostringstream<char> ostr;
     
@@ -32,7 +32,7 @@ ExceptionXSL::ExceptionXSL( const string type, int position  )
     setStr( ostr.str( ) );
 }
 
-ExceptionXSL::ExceptionXSL( char symbol, int position  )
+ExceptionXSL::ExceptionXSL( char symbol, int position  ) throw()
 {
     basic_ostringstream<char> ostr;
     
@@ -40,7 +40,7 @@ ExceptionXSL::ExceptionXSL( char symbol, int position  )
     setStr( ostr.str( ) );
 }
 
-ExceptionXSL::ExceptionXSL( const string type, const string symbol, int position  )
+ExceptionXSL::ExceptionXSL( const string type, const string symbol, int position  ) throw()
 {
     basic_ostringstream<char> ostr;
     
@@ -48,7 +48,7 @@ ExceptionXSL::ExceptionXSL( const string type, const string symbol, int position
     setStr( ostr.str( ) );
 }
 
-ExceptionXSL::~ExceptionXSL( ) throw( )
+ExceptionXSL::~ExceptionXSL( )  throw()
 {
 }
 

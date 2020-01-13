@@ -28,7 +28,7 @@ public:
     virtual void setSelf( Scripting::Object * );
     virtual void extract( bool );
     void setTarget( Room *r );
-    void checkTarget( ) const throw( Scripting::Exception );
+    void checkTarget( ) const ;
     Room * getTarget( ) const;
 
 private:

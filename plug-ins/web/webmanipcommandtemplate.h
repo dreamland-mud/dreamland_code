@@ -31,7 +31,7 @@ public:
     virtual const DLString &getType( ) const {
         return ClassSelfRegistratorPlugin<tn>::getType( );
     }
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) {
+    virtual void fromXML( const XMLNode::Pointer& node )  {
     }
     virtual bool toXML( XMLNode::Pointer& node ) const {
         return false;

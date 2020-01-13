@@ -13,6 +13,7 @@ onehit.cpp \
 onehit_undef.cpp \
 onehit_weapon.cpp \
 onehit_missile.cpp \
+skill_utils.cpp \
 impl.cpp
 
 

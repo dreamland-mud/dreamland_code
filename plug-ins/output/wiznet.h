@@ -34,6 +34,7 @@
 #define WIZ_QUEST               (X)
 #define WIZ_LANGUAGE            (Y)
 #define WIZ_SKILLS              (Z)
+#define WIZ_RELIGION            (aa)
 
 struct wiznet_type {
     const char * name;

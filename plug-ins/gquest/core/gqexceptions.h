@@ -11,7 +11,7 @@
 
 class BadMobileBehaviorException : public Exception {
 public:
-    virtual ~BadMobileBehaviorException( ) throw( );
+    virtual ~BadMobileBehaviorException( ) ;
 
     BadMobileBehaviorException( int vnum )
                 : Exception( "Invalid behavior for mobile #" + DLString( vnum ) )
@@ -21,7 +21,7 @@ public:
 
 class BadObjectBehaviorException : public Exception {
 public:
-    virtual ~BadObjectBehaviorException( ) throw( );
+    virtual ~BadObjectBehaviorException( ) ;
 
     BadObjectBehaviorException( int vnum )
                 : Exception( "Invalid behavior for object #" + DLString( vnum ) )
@@ -31,7 +31,7 @@ public:
 
 class MobileNotFoundException : public Exception {
 public:
-        virtual ~MobileNotFoundException( ) throw( );
+        virtual ~MobileNotFoundException( ) ;
         MobileNotFoundException( int vnum ) 
                 : Exception( "Mob Vnum #" + DLString( vnum ) + " not found." )
         {        
@@ -41,7 +41,7 @@ public:
 
 class ObjectNotFoundException : public Exception {
 public:
-        virtual ~ObjectNotFoundException( ) throw( );
+        virtual ~ObjectNotFoundException( ) ;
         ObjectNotFoundException( int vnum ) 
                 : Exception( "Obj Vnum #" + DLString( vnum ) + " not found." )
         {        
@@ -51,7 +51,7 @@ public:
 
 class GQAlreadyRunningException : public Exception {
 public:
-        virtual ~GQAlreadyRunningException( ) throw( );
+        virtual ~GQAlreadyRunningException( ) ;
         GQAlreadyRunningException( DLString id ) 
                 : Exception( "Quest \"" + id + "\" is already running." )
         {        
@@ -60,7 +60,7 @@ public:
 
 class GQRuntimeException: public Exception {
 public:
-        virtual ~GQRuntimeException( ) throw( );
+        virtual ~GQRuntimeException( ) ;
         GQRuntimeException( DLString id ) 
                 : Exception( "GQ runtime exception: " + id )
         {        
@@ -69,7 +69,7 @@ public:
 
 class GQCannotStartException : public Exception {
 public:
-        virtual ~GQCannotStartException( ) throw( );
+        virtual ~GQCannotStartException( ) ;
         GQCannotStartException( int min, int max ) 
                 : Exception( "GQuest for levels " + DLString(min) + " - " 
                              + DLString(max) + " cannot be started." )

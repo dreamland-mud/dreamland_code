@@ -35,6 +35,7 @@
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
 PROF(universal);
+RELIG(fili);
 
 /*--------------------------------------------------------------------------
  * Questor
@@ -103,6 +104,12 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     tell_fmt( msg.str( ).c_str( ), client, ch, 
               fExpReward ? r->exp : r->points,
               r->gold );
+
+    if (client->getReligion() == god_fili && get_eq_char(client, wear_tattoo)) {
+        int bonus = r->gold;
+        tell_fmt("{YФили{G просил передать тебе еще {Y%3$d{G золот%3$Iую|ые|ых моне%3$Iту|ты|т.", client, ch, bonus);
+        client->gold += bonus;
+    }
 
     client->gold += r->gold;
 
@@ -478,7 +485,7 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
     
     if (attr->getTime( ) > 0) {
         tell_fmt( "Ты очень отваж%1$Gно|ен|на, %1$C1, но дай шанс кому-нибудь еще.", client, ch );
-        tell_raw( client, ch, "Приходи позже." );
+        tell_fmt( "Приходи через {Y%3$d{G мину%3$Iту|ты|т, когда истечет твое {y{hcквест время{x.", client, ch, attr->getTime() );
         return;
     }
     
@@ -504,8 +511,10 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         
         if (cha < 20 && number_percent( ) < (20 - cha) * 5) {
             tell_raw( client, ch, "Знаешь, что-то душа не лежит давать тебе задание." );
-            tell_raw( client, ch, "Приходи позже.");
             delay_noquest(attr, client);        
+            tell_fmt( "Приходи через {Y%3$d{G мину%3$Iту|ты|т.", client, ch, attr->getTime() );
+            hint_fmt(client, "Квестор может отказаться выдавать тебе задание, если у тебя слишком низкая {hhхаризма{x.");
+            hint_fmt(client, "Харизму, как и другие параметры, можно поднять вещами или {hh1353тренировками{x.");
             return;
         }
     }
@@ -514,8 +523,8 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
         QuestList quests = QuestManager::getThis()->list(client);
         if (quests.empty()) {
             tell_raw(client, ch, "Извини, но у меня не нашлось ни одного подходящего для тебя задания.");
-            tell_raw(client, ch, "Приходи позже.");
             delay_noquest(attr, client);        
+            tell_fmt( "Приходи через {Y%3$d{G мину%3$Iту|ты|т.", client, ch, attr->getTime() );            
             return;
         }
 
@@ -551,8 +560,8 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
 
         } catch (const QuestCannotStartException &e) {
             tell_raw(client, ch, "Извини, но я не могу сейчас выбрать для тебя задание.");
-            tell_raw(client, ch, "Приходи позже.");
             delay_noquest(attr, client);        
+            tell_fmt( "Приходи через {Y%3$d{G мину%3$Iту|ты|т.", client, ch, attr->getTime() );            
         }
         return;
     }

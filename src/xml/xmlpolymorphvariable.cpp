@@ -10,15 +10,15 @@ XMLPolymorphVariable::set( DLObject::Pointer arg1, DLObject::Pointer arg2 )
     return DLObject::Pointer( );
 }
 
-ExceptionXMLClassNotDerived::~ExceptionXMLClassNotDerived( ) throw ( )
+ExceptionXMLClassNotDerived::~ExceptionXMLClassNotDerived( ) throw() 
 {
 }
 
-ExceptionXMLClassNotRegistered::~ExceptionXMLClassNotRegistered( ) throw ( )
+ExceptionXMLClassNotRegistered::~ExceptionXMLClassNotRegistered( ) throw() 
 {
 }
 
-ExceptionXMLClassAllocate::~ExceptionXMLClassAllocate( ) throw ( )
+ExceptionXMLClassAllocate::~ExceptionXMLClassAllocate( ) throw() 
 {
 }
 

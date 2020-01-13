@@ -140,18 +140,7 @@ OLCStateExtraExit::statePrompt( Descriptor *d )
 
 EEEDIT(flags)
 {
-    int value;
-
-    value = exit_flags.value( argument);
-
-    if (value != NO_FLAG) {
-        info.setValue( info.getValue( ) ^ value );
-        stc("Extra exit flag toggled.\r\n", ch);
-        return true;
-    }
-
-    stc("unknow extra exit flag\r\n", ch);
-    return false;
+    return flagBitsEdit(exit_flags, info);
 }
 
 EEEDIT(size)

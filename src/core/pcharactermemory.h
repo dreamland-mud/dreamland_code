@@ -43,67 +43,67 @@ public:
     virtual ~PCharacterMemory( );
     
     // CharacterMemoryInterface
-    virtual const DLString& getName( ) const throw( );
-    virtual void setName( const DLString& name ) throw( );
+    virtual const DLString& getName( ) const ;
+    virtual void setName( const DLString& name ) ;
 
-    virtual short getLevel( ) const throw( );
-    virtual void setLevel( short level ) throw( );
+    virtual short getLevel( ) const ;
+    virtual void setLevel( short level ) ;
 
-    virtual ProfessionReference & getProfession( ) throw( );
+    virtual ProfessionReference & getProfession( ) ;
 
-    virtual ReligionReference & getReligion( ) throw( );
+    virtual ReligionReference & getReligion( ) ;
     virtual void setReligion( const ReligionReference & );
     
-    virtual short getSex( ) const throw( );
-    virtual void setSex( short sex ) throw( );
+    virtual short getSex( ) const ;
+    virtual void setSex( short sex ) ;
 
-    virtual RaceReference &getRace( ) throw( );
-    virtual void setRace( const RaceReference & ) throw( );
+    virtual RaceReference &getRace( ) ;
+    virtual void setRace( const RaceReference & ) ;
 
-    virtual ClanReference &getClan( ) throw( );
-    virtual void setClan( const ClanReference & clan ) throw( );
+    virtual ClanReference &getClan( ) ;
+    virtual void setClan( const ClanReference & clan ) ;
 
     virtual int get_trust( ) const;
 
     // PCMemoryInterface
-    virtual const DLString& getPassword( ) const throw( );
-    virtual void setPassword( const DLString &password ) throw( );
+    virtual const DLString& getPassword( ) const ;
+    virtual void setPassword( const DLString &password ) ;
 
-    virtual const Date& getLastAccessTime( ) const throw( );
-    virtual void setLastAccessTime( const Date& lastAccessTime ) throw( );
+    virtual const Date& getLastAccessTime( ) const ;
+    virtual void setLastAccessTime( const Date& lastAccessTime ) ;
 
-    virtual const DLString& getLastAccessHost( ) const throw( );
-    virtual void setLastAccessHost( const DLString& lastAccessHost ) throw( );
+    virtual const DLString& getLastAccessHost( ) const ;
+    virtual void setLastAccessHost( const DLString& lastAccessHost ) ;
 
-    virtual int getTrust( ) const throw( );
-    virtual void setTrust( int trust ) throw( );
+    virtual int getTrust( ) const ;
+    virtual void setTrust( int trust ) ;
 
-    virtual int getQuestPoints( ) const throw( );
-    virtual void setQuestPoints( int ) throw( );
+    virtual int getQuestPoints( ) const ;
+    virtual void setQuestPoints( int ) ;
 
-    virtual int getSecurity( ) const throw( );
-    virtual void setSecurity( int ) throw( );
+    virtual int getSecurity( ) const ;
+    virtual void setSecurity( int ) ;
 
-    virtual void setProfession( const ProfessionReference & ) throw( );
+    virtual void setProfession( const ProfessionReference & ) ;
 
-    virtual short getClanLevel( ) const throw( );
-    virtual void setClanLevel( short clanLevel ) throw( );
+    virtual short getClanLevel( ) const ;
+    virtual void setClanLevel( short clanLevel ) ;
 
-    virtual ClanReference &getPetition( ) throw( );
-    virtual void setPetition( const ClanReference & ) throw( );
+    virtual ClanReference &getPetition( ) ;
+    virtual void setPetition( const ClanReference & ) ;
 
-    virtual HometownReference &getHometown( ) throw( );
-    virtual void setHometown( const HometownReference & ) throw( );
+    virtual HometownReference &getHometown( ) ;
+    virtual void setHometown( const HometownReference & ) ;
 
-    virtual XMLAttributes& getAttributes( ) throw( );
-    virtual const XMLAttributes& getAttributes( ) const throw( );
-    virtual void setAttributes( const XMLAttributes& attributes ) throw( );
+    virtual XMLAttributes& getAttributes( ) ;
+    virtual const XMLAttributes& getAttributes( ) const ;
+    virtual void setAttributes( const XMLAttributes& attributes ) ;
 
-    virtual Remorts& getRemorts( ) throw( );
-    virtual void setRemorts( const Remorts& remorts ) throw( );
+    virtual Remorts& getRemorts( ) ;
+    virtual void setRemorts( const Remorts& remorts ) ;
 
-    virtual const RussianString& getRussianName( ) const throw( );
-    virtual void setRussianName( const DLString& name ) throw( );
+    virtual const RussianString& getRussianName( ) const ;
+    virtual void setRussianName( const DLString& name ) ;
 
     virtual bool isOnline( ) const;
     virtual PCharacter * getPlayer( );

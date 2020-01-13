@@ -97,7 +97,7 @@ void RainbowScenario::onQuestInit( ) const
  * Rainbow Default Scenario 
  *-------------------------------------------------------------------------*/
 
-void RainbowDefaultScenario::canStart( ) const throw ( GQCannotStartException )
+void RainbowDefaultScenario::canStart( ) const 
 {
     if (weather_info.sky != SKY_RAINING)
         throw GQCannotStartException( "wrong weather" );
@@ -178,7 +178,7 @@ void RainbowDefaultScenario::dressItem( Object *obj, int number ) const
  * Rainbow Sins Scenario 
  *-------------------------------------------------------------------------*/
 
-void RainbowSinsScenario::canStart( ) const throw ( GQCannotStartException )
+void RainbowSinsScenario::canStart( ) const 
 {
     GlobalQuestInfo::PlayerList players;
     RainbowGQuestInfo::getThis( )->findParticipants( players );
@@ -204,7 +204,7 @@ void RainbowSinsScenario::printCount( int cnt, ostringstream& buf ) const
 
 void RainbowSinsScenario::printTime( ostringstream& buf ) const
 {
-    buf << "Вакансия закроется через ";
+    buf << "До закрытия вакансии остается ";
     RainbowGQuest::getThis( )->printRemainedTime( buf );
     buf << "." << endl;
 }

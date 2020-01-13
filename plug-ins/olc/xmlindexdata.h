@@ -41,7 +41,7 @@ public:
 
     void clear();
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
     virtual int getVnum() const;
     virtual area_data * getArea() const;
@@ -56,7 +56,7 @@ public:
 
     void clear();
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
     virtual int getVnum() const;
     virtual area_data * getArea() const;

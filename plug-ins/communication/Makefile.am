@@ -10,7 +10,9 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/descriptor \
 -I$(top_srcdir)/plug-ins/output \
 -I$(top_srcdir)/plug-ins/help \
--I$(top_srcdir)/plug-ins/loadsave 
+-I$(top_srcdir)/plug-ins/loadsave \
+-I$(top_srcdir)/plug-ins/servlets \
+-I/usr/include/jsoncpp
 
 libcommunication_la_LIBADD = \
 ../system/libsystem.la \
@@ -20,7 +22,9 @@ libcommunication_la_LIBADD = \
 ../loadsave/libloadsave.la \
 ../ban/libban.la \
 ../help/libhelp.la \
-../command/libcommand.la 
+../command/libcommand.la \
+../servlets/libservlets.la \
+-ljsoncpp
 
 libcommunication_la_SOURCES = \
 languages.cpp \
@@ -34,7 +38,8 @@ personalchannel.cpp \
 racechannel.cpp \
 roomchannel.cpp \
 worldchannel.cpp \
-channels.cpp 
+channels.cpp \
+channelservlet.cpp
 
 libcommunication_la_MOC = \
 areachannel.h \

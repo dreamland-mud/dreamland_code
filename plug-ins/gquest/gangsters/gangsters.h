@@ -26,7 +26,7 @@ public:
     Gangsters( const DLString& );
     virtual ~Gangsters( );
     
-    virtual void create( const Config& ) throw ( GQCannotStartException );
+    virtual void create( const Config& ) ;
     virtual void destroy( );
 
     virtual void resume( );

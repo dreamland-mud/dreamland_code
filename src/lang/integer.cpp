@@ -17,7 +17,7 @@
 const DLString Integer::TYPE = "Integer";
 
 
-void Integer::fromString( const DLString & value ) throw( ExceptionBadType )
+void Integer::fromString( const DLString & value ) 
 {
         std::basic_istringstream<char> s( value.c_str( ) );
         int i;
@@ -32,7 +32,7 @@ void Integer::fromString( const DLString & value ) throw( ExceptionBadType )
         throw ExceptionBadType( TYPE, value );
 }
 
-DLString Integer::toString( ) const throw( )
+DLString Integer::toString( ) const 
 {
         std::basic_ostringstream<char>  buf;
 

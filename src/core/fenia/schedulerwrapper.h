@@ -29,7 +29,7 @@ struct PlugLock {
 };
 
 struct YieldException : public Scripting::Exception {
-    YieldException(const DLString &s) : 
+    YieldException(const DLString &s) throw(): 
         Scripting::Exception(s)
     {
     }

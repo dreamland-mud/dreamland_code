@@ -17,7 +17,7 @@
 const DLString LongLong::TYPE = "LongLong";
 
 
-void LongLong::fromString( const DLString & str ) throw( ExceptionBadType )
+void LongLong::fromString( const DLString & str ) 
 {
         std::basic_istringstream<char> s( str.c_str( ) );
         long long i;
@@ -32,7 +32,7 @@ void LongLong::fromString( const DLString & str ) throw( ExceptionBadType )
         throw ExceptionBadType( TYPE, str );
 }
 
-DLString LongLong::toString( ) const throw( )
+DLString LongLong::toString( ) const 
 {
         std::basic_ostringstream<char>  buf;
 

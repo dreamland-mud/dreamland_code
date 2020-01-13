@@ -140,7 +140,7 @@ public:
     virtual void setSkill( SkillPointer ) { }
     virtual void unsetSkill( ) { }
     virtual SkillPointer getSkill( ) const { return SkillPointer( ); }
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType ) { }
+    virtual void fromXML( const XMLNode::Pointer& node )  { }
     virtual bool toXML( XMLNode::Pointer& node ) const { return false; }
     virtual const DLString & getType( ) const { return DLString::emptyString; }
 };

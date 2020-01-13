@@ -56,6 +56,7 @@
 #include "lastlogstream.h"
 #include "logstream.h"
 #include "profiler.h"
+#include "grammar_entities_impl.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -75,7 +76,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "liquid.h"
 #include "desire.h"
 
@@ -92,7 +93,7 @@
 #include "fight.h"
 #include "damage_impl.h"
 #include "magic.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "save.h"
 #include "wiznet.h"
 #include "act.h"
@@ -590,13 +591,16 @@ static bool oprog_update_key( Object *obj )
         if (IS_SET(obj->getRoom( )->room_flags, ROOM_MANSION)) 
             return false;
 
-        // don't touch keys in the pits or corpses
+        // don't touch keys in the pits or corpses or keyrings.
         if (container && IS_PIT(container))
             return false;
         if (container 
                 && (container->item_type == ITEM_CORPSE_PC
                     || container->item_type == ITEM_CORPSE_NPC))
             return false;
+
+        if (obj->in_obj && obj->in_obj->item_type == ITEM_KEYRING)
+            return false;        
 
         if (reset_check_obj( obj )) { // object is in reset place
             obj->timer = 0;
@@ -1053,9 +1057,15 @@ void aggr_update( )
         if (ch->in_room == 0)
             continue;
         
-        if (ch->is_npc( ) || ch->desc == 0)
+        // Decrease wait and daze state for mobs and link-dead players.
+        // For connected players these are decresed in IOManager::ioRead.
+        if (ch->is_npc( ) || ch->desc == 0) {
             if (ch->wait > 0)
                 ch->wait--;
+
+            if (ch->daze > 0)
+                ch->daze--;
+        }
 
         check_bloodthirst( ch );
         gsn_ambush->getCommand( )->run( ch );
@@ -1137,12 +1147,13 @@ struct LightVampireDamage : public Damage {
     
         act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
+        RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
-            msgRoom( "Солнечный свет\6%C2", ch);
+            msgRoom( "%1$^O1\6%2$C2", sunlight, ch);
         else
-            msgRoom( "Солнечный свет\6%C4", ch);
+            msgRoom( "%1$^O1\6%2$C4", sunlight, ch);
             
-        msgChar( "Солнечный свет\6тебя" );
+        msgChar( "%1$^O1\6тебя", sunlight );
     }
 };
 

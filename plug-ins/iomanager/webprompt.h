@@ -9,6 +9,10 @@
 
 #include "oneallocate.h"
 #include "plugin.h"
+#include "xmlvariablecontainer.h"
+#include "xmlattribute.h"
+#include "xmlmap.h"
+#include "xmlstring.h"
 
 class WebPromptListener;
 class Descriptor;
@@ -16,6 +20,22 @@ class Character;
 namespace Json {
     class Value;
 }
+
+class WebPromptAttribute : public XMLAttribute, public XMLVariableContainer 
+{
+XML_OBJECT
+public:
+    typedef ::Pointer<WebPromptAttribute> Pointer;
+    
+    virtual ~WebPromptAttribute( );
+    virtual void init( );
+
+    void clear( );
+    void updateIfNew( const DLString &field, const Json::Value &newValue, Json::Value &prompt );
+
+protected:
+    XML_VARIABLE XMLMapBase<XMLString> prompt;
+};
 
 class WebPromptManager : public Plugin, public OneAllocate {
 public:        

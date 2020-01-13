@@ -7,6 +7,7 @@
 
 #include "act.h"
 #include "msgformatter.h"
+#include "mudtags.h"
 
 #include "char.h"
 #include "logstream.h"
@@ -337,8 +338,11 @@ void player_fmt( const DLString &format, PCMemoryInterface *pc, ostringstream &b
             break;
 
         case 'p':
-            if (pch)
-                word = pch->getParsedTitle( );
+            if (pch) {
+                ostringstream titleBuf;
+                vistags_convert( pch->getParsedTitle().c_str(), titleBuf, to );             
+                word = titleBuf.str();
+            }
             break;
         
         case 'b':
@@ -526,3 +530,24 @@ void tell_dim( Character *listener, Character *teller,
     act( buf.str( ).c_str( ), listener, arg, teller, TO_CHAR );
 }
 
+void hint_fmt(Character *ch, const char *format, ...)
+{
+    if (ch->is_npc())
+        return;
+    
+    // Everyone below level 50 and living first life is a newbie.
+    if (!ch->is_immortal()) {
+        if (ch->getPC()->getRemorts().size() > 0)
+            return;
+
+        if (ch->getLevel() >= 50)
+            return;
+    }
+
+    va_list av;
+    va_start(av, format);
+    DLString output = vfmt(ch, format, av);
+    va_end(av);
+
+    ch->println("[{cПодсказка{x] " + output);
+}

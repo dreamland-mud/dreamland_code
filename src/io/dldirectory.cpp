@@ -36,14 +36,14 @@ DLDirectory::~DLDirectory( )
     close( );
 }
 
-void DLDirectory::open( const DLString &path ) throw( ExceptionDBIO )
+void DLDirectory::open( const DLString &path ) 
 {
     close( );
     this->path = path;
     open( );
 }
 
-void DLDirectory::open( ) throw( ExceptionDBIO )
+void DLDirectory::open( ) 
 {
     dirp = opendir( path.c_str( ) );
     
@@ -59,7 +59,7 @@ void DLDirectory::close( )
     }
 }
 
-DLFile DLDirectory::nextEntry( ) throw( ExceptionDBIOEOF )
+DLFile DLDirectory::nextEntry( ) 
 {
     if (dirp == 0)
         throw ExceptionDBIO( "Directory '" + path + "' already closed" );
@@ -75,7 +75,7 @@ DLFile DLDirectory::nextEntry( ) throw( ExceptionDBIOEOF )
     return DLFile( dp->d_name );
 }
 
-DLFile DLDirectory::nextTypedEntry( const DLString &fileExt ) throw( ExceptionDBIOEOF )
+DLFile DLDirectory::nextTypedEntry( const DLString &fileExt ) 
 {
     DLFile local = nextEntry( );
     DLFile global( *this, local );
@@ -92,7 +92,7 @@ DLFile DLDirectory::nextTypedEntry( const DLString &fileExt ) throw( ExceptionDB
 }
 
 
-DLFile DLDirectory::tempEntry( ) throw( ExceptionDBIO )
+DLFile DLDirectory::tempEntry( ) 
 {
     char templateBuf[1000], *pTemplate;
 

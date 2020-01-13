@@ -9,6 +9,7 @@ loadsave \
 command \
 alignment \
 iomanager \
+servlets \
 ed \
 profession \
 race \

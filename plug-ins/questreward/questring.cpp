@@ -70,7 +70,7 @@ void QuestRing::addAffect( Character *ch, Affect *paf )
                 if (evil)
                     mod = level / 10 + 3;
                 else if (neutral)
-                    mod = level / 12 + 2;
+                    mod = level / 12 + 3;
                 else
                     mod = level / 14 + 1;
               
@@ -78,7 +78,7 @@ void QuestRing::addAffect( Character *ch, Affect *paf )
                 if (evil)
                     mod = level / 14 + 3;
                 else if (neutral)
-                    mod = level / 14 + 1;
+                    mod = level / 14 + 2;
                 else
                     mod = level / 14;            
             }
@@ -89,7 +89,7 @@ void QuestRing::addAffect( Character *ch, Affect *paf )
                 if (evil)
                     mod = level / 20 + 1;
                 else if (neutral)
-                    mod = level / 12 + 1;
+                    mod = level / 12 + 2;
                 else
                     mod = level / 10 + 3;
               
@@ -97,7 +97,7 @@ void QuestRing::addAffect( Character *ch, Affect *paf )
                 if (evil)
                     mod = level / 14;
                 else if (neutral)
-                    mod = level / 12;
+                    mod = level / 12 + 1;
                 else
                     mod = level / 10;            
             }
@@ -109,7 +109,7 @@ void QuestRing::addAffect( Character *ch, Affect *paf )
                 if (evil)
                     mod = level / 2;
                 else if (neutral)
-                    mod = 3 * level / 4;
+                    mod = (3 * level / 4) + (level / 3);
                 else
                     mod = level;
               

@@ -26,6 +26,7 @@
 #include "mercdb.h"
 
 #include "magic.h"
+#include "skill_utils.h"
 #include "handler.h"
 #include "fight.h"
 #include "vnum.h"
@@ -98,7 +99,7 @@ SKILL_RUNP( rescue )
         ch->setWait( gsn_rescue->getBeats( )  );
 
         if ( ( number_percent( ) > gsn_rescue->getEffective( ch ) )
-                || ( victim->getModifyLevel() > ( ch->getModifyLevel() + 30) )
+                || ( victim->getModifyLevel() > ( skill_level(*gsn_rescue, ch) + 30) )
                 || ( ( fch == 0  ) && victim->trap.isSet( TF_NO_RESCUE ) ) )
         {
                 ch->send_to("Твоя попытка спасти не удалась.\n\r");

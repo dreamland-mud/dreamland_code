@@ -31,7 +31,7 @@ public:
         XMLMatchPattern( const XMLNode::Pointer node, const DLString& pattern );
         virtual ~XMLMatchPattern( );
         
-        virtual int yylex( ) throw( ExceptionXSL );
+        virtual int yylex( ) ;
         
         inline NodeListPointer getList( )
         {

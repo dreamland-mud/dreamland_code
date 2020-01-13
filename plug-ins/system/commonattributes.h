@@ -17,7 +17,7 @@ public:
     XMLEmptyAttribute( );
     virtual ~XMLEmptyAttribute( );
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     virtual const DLString & getType( ) const
@@ -75,4 +75,14 @@ public:
     static const DLString TYPE;
 };
 
+class PCMemoryInterface;
+namespace Json {
+    class Value;
+}
+
+const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName);
+bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
+void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
+PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLString &attrValue);
+list<PCMemoryInterface *> find_players_by_json_attribute(const DLString &attrName, const DLString &name, const DLString &value);
 #endif

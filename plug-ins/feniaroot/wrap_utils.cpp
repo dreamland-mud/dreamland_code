@@ -66,6 +66,15 @@ DLString args2string( const RegisterList &args )
     return get_unique_arg( args ).toString( );
 }
 
+DLString args2word( const RegisterList &args )
+{
+    StringSet ss;
+    ss.fromString(get_unique_arg(args).toString());
+    if (ss.size() > 1 || ss.size() < 1)
+        throw Scripting::Exception("Expecting a single word or words in quotes");
+    return *(ss.begin());
+}
+
 Character * args2character( const RegisterList &args )
 {
     return wrapper_cast<CharacterWrapper>( get_unique_arg(args) )->getTarget( );
@@ -170,8 +179,12 @@ PCharacter *argnum2player(const RegisterList &args, int num)
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
 {
     Register a = argnum(args, num);
-    if (a.type == Register::STRING)
-        return table.value( a.toString().c_str(), true );
+    if (a.type == Register::STRING) {
+        if (table.enumerated)
+            return table.value( a.toString().c_str(), true );
+        else
+            return table.bitstring( a.toString().c_str(), true );
+    }
     return a.toNumber();
 }
 

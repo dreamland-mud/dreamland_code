@@ -60,7 +60,7 @@ private:
 
 class PluginException : public Exception {
 public:
-        inline PluginException( const DLString &pluginName, const DLString &error )
+        inline PluginException( const DLString &pluginName, const DLString &error ) throw()
                 : Exception( "Error while loading plugin " + pluginName + ": " + error )
         {
         }

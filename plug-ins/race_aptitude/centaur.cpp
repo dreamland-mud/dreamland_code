@@ -54,7 +54,7 @@ void RearKickOneHit::init( )
 
 void RearKickOneHit::damBase( )
 {
-    int ave, level = ch->getModifyLevel( );
+    int ave, level = ch->getModifyLevel();
     
          if (level >= 100) ave = level - 12;
     else if (level >= 40)  ave = level - 10;
@@ -68,12 +68,14 @@ void RearKickOneHit::damBase( )
 
 void RearKickOneHit::calcDamage( )
 {
+    int level = ch->getModifyLevel();
+
     damBase( ); 
     gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
     damApplyPosition( );
-    dam = ( ch->getModifyLevel( ) < 50)
-        ? ( ch->getModifyLevel( ) / 10 + 1) * dam + ch->getModifyLevel( )
-        : ( ch->getModifyLevel( ) / 10 ) * dam + ch->getModifyLevel( );
+    dam = (level < 50)
+        ? (level / 10 + 1) * dam + level
+        : (level / 10 ) * dam + level;
     damApplyDamroll( );
 
     OneHit::calcDamage( );

@@ -6,7 +6,7 @@
 #include <string.h>
 #include "exceptiondbio.h"
 
-ExceptionDBIO::ExceptionDBIO( const DLString &str ) throw( )
+ExceptionDBIO::ExceptionDBIO( const DLString &str ) throw() 
 {
     if (errno > 0) {
         setStr( str + " (" + strerror( errno ) + ")" );
@@ -16,6 +16,6 @@ ExceptionDBIO::ExceptionDBIO( const DLString &str ) throw( )
     }
 }
 
-ExceptionDBIO::~ExceptionDBIO( ) throw( )
+ExceptionDBIO::~ExceptionDBIO( ) throw() 
 {
 }

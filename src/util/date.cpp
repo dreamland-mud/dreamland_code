@@ -63,7 +63,7 @@ Date Date::newInstance( )
     return Date( ::time( 0 ) );
 }
 
-int Date::getSecondFromString( const DLString& date ) throw( ExceptionBadDateString )
+int Date::getSecondFromString( const DLString& date ) 
 {
         istringstream istr(date.c_str());
         DateParser parser( date, &istr );

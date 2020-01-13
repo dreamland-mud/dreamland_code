@@ -145,7 +145,7 @@ static void show_commands_by_categories( Character *ch, int flags )
             buf << setiosflags(ios::right) << setw(21) << msg << resetiosflags(ios::right)
                 << categories[name].join(" ") << endl;
     }
-    buf << "Также смотри {y{lRкоманды список{lEcommad list{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
+    buf << "Также смотри {y{lRкоманды список{lEcommand list{x, {y{lRкоманды синоним{lEcommand alias{x и {y{lRкоманды показ{lEcommand show{x." << endl;
     ch->send_to(buf);
 }
 

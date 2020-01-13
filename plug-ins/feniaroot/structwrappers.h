@@ -86,8 +86,6 @@ public:
             
     virtual void setSelf(Scripting::Object *) { }
     
-    static Scripting::Register wrap( const DLString & );
-
     XML_VARIABLE XMLString name;
 };
 
@@ -110,8 +108,6 @@ public:
             
     virtual void setSelf(Scripting::Object *) { }
     
-    static Scripting::Register wrap( const DLString & );
-
     XML_VARIABLE XMLString name;
 
 protected:
@@ -137,8 +133,6 @@ public:
             
     virtual void setSelf(Scripting::Object *) { }
     
-    static Scripting::Register wrap( const DLString & );
-
     XML_VARIABLE XMLString name;
 
 protected:
@@ -236,12 +230,35 @@ public:
             
     virtual void setSelf(Scripting::Object *) { }
     
-    static Scripting::Register wrap( const DLString & );
-
     XML_VARIABLE XMLString name;
 
 protected:
     DefaultReligion * getTarget() const;
+};
+
+/*----------------------------------------------------------------------
+ * Language
+ *----------------------------------------------------------------------*/
+class Language;
+
+class LanguageWrapper : public PluginNativeImpl<LanguageWrapper>, 
+                    public NativeHandler,
+                    public XMLVariableContainer 
+{
+XML_OBJECT
+NMI_OBJECT
+public:
+    typedef ::Pointer<LanguageWrapper> Pointer;
+
+    LanguageWrapper() { }
+    LanguageWrapper(const DLString &);
+            
+    virtual void setSelf(Scripting::Object *) { }
+    
+    XML_VARIABLE XMLString name;
+
+protected:
+    Language * getTarget() const;
 };
 
 /*----------------------------------------------------------------------
@@ -259,13 +276,12 @@ public:
     typedef ::Pointer<SkillWrapper> Pointer;
 
     SkillWrapper() { }
-    SkillWrapper(const DLString &);
-            
+    SkillWrapper(const DLString &);            
     virtual void setSelf(Scripting::Object *) { }
     
-    static Scripting::Register wrap( const DLString & );
-
+protected:
     XML_VARIABLE XMLString name;
+    Skill * getTarget() const;
 };
 
 class FeniaSkill : public PluginNativeImpl<FeniaSkill>, 

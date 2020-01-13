@@ -58,7 +58,7 @@ using namespace Scripting;
 
 template class EventHandler<WebEditorSaveArguments>;
 
-static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap utf2koi("utf-8", "koi8-r//IGNORE");
 
 static const char *MSG_FLUSH_BUF = "Buffer flushed.\r\n";
 const char *lid = "\n\r*** PUT A LID ON IT!!! ***\n\r";
@@ -474,21 +474,6 @@ Descriptor::wsHandleFrame(unsigned char *buf, int rc)
 
 }
 
-/** Generate random alnum string of given length. */
-static string createNonce(int len)
-{
-    ostringstream buf;
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-
-    for (int i = 0; i < len; ++i) {
-        buf << alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-    return buf.str();
-}
-
 static void
 sendVersion(Descriptor *d)
 {
@@ -565,7 +550,7 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     }
 
                     // Generate unique client ID, to be used when creating secure clickable action links.
-                    websock.nonce = createNonce(8);
+                    websock.nonce = create_nonce(8);
 
                     LogStream::sendError( ) << "WebSock: Success! ID " << websock.nonce << endl;
                     sendVersion(this);

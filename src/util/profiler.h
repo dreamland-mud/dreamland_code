@@ -6,17 +6,17 @@
 #ifndef __PROFLER_H__
 #define __PROFLER_H__
 
+#include <sys/time.h>
+
 class Profiler {
 public:
     void start();
     void stop();
-    long getStart() const;
-    long getStop() const;
 
     long msec();
 
 private:
-    long started, stopped;
+    struct timeval started, stopped;
 };
 
 class ProfilerBlock : public Profiler {

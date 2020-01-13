@@ -11,6 +11,10 @@
 #include "mercdb.h"
 
 GROUP(none);
+GROUP(fightmaster);
+GROUP(defensive);
+GSN(turlok_fury);
+GSN(athena_wisdom);
 
 bool temporary_skill_active( const Skill *skill, Character *ch )
 {
@@ -172,4 +176,29 @@ DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
     ostringstream buf;
     buf << ", работает на {C" << eff << "%{x";
     return buf.str();
+}
+
+int skill_level(Skill &skill, Character *ch)
+{
+    int slevel = ch->getModifyLevel();
+
+    if (!ch->is_npc()) {
+        slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
+        slevel += ch->getPC()->mod_level_skills[skill.getIndex()];
+        slevel += ch->getPC()->mod_level_all;
+    }
+
+    if (skill.getGroup() == group_fightmaster && ch->isAffected(gsn_turlok_fury) && chance(50)) {
+        slevel += number_range(1, 5);
+    }
+
+    if (skill.getGroup() == group_defensive && ch->isAffected(gsn_athena_wisdom) && chance(50)) {
+        slevel += number_range(1, 5);
+    }
+    
+    if (ch->is_immortal() && slevel != ch->getModifyLevel()) 
+        ch->printf("Отладка: уровень умения %s %d -> %d.\r\n", 
+                    skill.getName().c_str(), ch->getModifyLevel(), slevel);
+
+    return slevel;
 }

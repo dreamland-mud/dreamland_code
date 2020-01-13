@@ -31,6 +31,7 @@ const Register & get_unique_arg( const RegisterList & );
 
 int args2number( const RegisterList& );
 DLString args2string( const RegisterList& );
+DLString args2word( const RegisterList &args );
 void args2buf(const RegisterList &args, char *buf, size_t bufsize);
 
 Wearlocation * arg2wearloc( const Register & );

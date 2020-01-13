@@ -23,32 +23,32 @@ public:
 
 class ExceptionXMLClassAllocate : public ExceptionBadType {
 public:
-    ExceptionXMLClassAllocate( const DLString &msg )
+    ExceptionXMLClassAllocate( const DLString &msg ) throw() 
             : ExceptionBadType( "Polymorph pointer exception: " + msg )
     {
     }
 
-    virtual ~ExceptionXMLClassAllocate( ) throw ( );
+    virtual ~ExceptionXMLClassAllocate( ) throw() ;
 };
 
 class ExceptionXMLClassNotRegistered : public ExceptionXMLClassAllocate {
 public:
-    ExceptionXMLClassNotRegistered( const DLString &myType, const DLString &type ) 
+    ExceptionXMLClassNotRegistered( const DLString &myType, const DLString &type ) throw() 
             : ExceptionXMLClassAllocate( "while allocating " + myType + ": class " + type + " not registered" ) 
     { 
     }
 
-    virtual ~ExceptionXMLClassNotRegistered( ) throw ( );
+    virtual ~ExceptionXMLClassNotRegistered( ) throw() ;
 };
 
 class ExceptionXMLClassNotDerived : public ExceptionXMLClassAllocate {
 public:
-    ExceptionXMLClassNotDerived( const DLString &myType, const DLString &type ) 
+    ExceptionXMLClassNotDerived( const DLString &myType, const DLString &type ) throw() 
             : ExceptionXMLClassAllocate( "class " + type + " not derived from " + myType ) 
     { 
     }
 
-    virtual ~ExceptionXMLClassNotDerived( ) throw ( );
+    virtual ~ExceptionXMLClassNotDerived( ) throw() ;
 };
 
 
@@ -77,7 +77,7 @@ public:
         return false;
     }
     
-    void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    void fromXML( const XMLNode::Pointer& parent ) 
     {
         if (parent->getType( ) == XMLNode::XML_LEAF) {
             clear( );

@@ -29,7 +29,8 @@ reglistext.cpp \
 tableswrapper.cpp \
 affectwrapper.cpp \
 structwrappers.cpp \
-wrap_utils.cpp 
+wrap_utils.cpp \
+evalservlet.cpp
 
 libfeniaroot_la_MOC = \
 root.h \
@@ -57,6 +58,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/skills_impl  \
 -I$(top_srcdir)/plug-ins/clan/core \
 -I$(top_srcdir)/plug-ins/services/core \
+-I$(top_srcdir)/plug-ins/languages/core \
 -I$(top_srcdir)/plug-ins/services/petshop \
 -I/usr/include/jsoncpp \
 $(INCLUDES_AI) \
@@ -74,6 +76,7 @@ $(LIBADD_AI) \
 ../skills_impl/libskills_impl.la \
 ../services/core/libservices_core.la \
 ../services/petshop/libservices_petshop.la \
+../languages/core/liblanguages_core.la \
 -ljsoncpp
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

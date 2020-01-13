@@ -177,7 +177,7 @@ XMLMobIndexData::clear()
 
 
 void
-XMLMobIndexData::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadType )
+XMLMobIndexData::fromXML( const XMLNode::Pointer& parent) 
 {
     clear();
 #if 0
@@ -331,7 +331,7 @@ XMLObjIndexData::clear()
 }
 
 void
-XMLObjIndexData::fromXML( const XMLNode::Pointer& parent) throw( ExceptionBadType )
+XMLObjIndexData::fromXML( const XMLNode::Pointer& parent) 
 {
     clear();
 #if 0

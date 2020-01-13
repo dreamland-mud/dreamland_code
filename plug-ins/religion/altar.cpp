@@ -1,5 +1,6 @@
 #include "religionattribute.h"
 #include "defaultreligion.h"
+#include "religionflags.h"
 
 #include "commandtemplate.h"
 #include "commonattributes.h"
@@ -53,6 +54,13 @@ CMDRUN(altar)
 
     if (religion.getIndex() == god_none) {
         ch->pecho("Но ты же закоренел%1$Gое|ый|ая атеист%1$G||ка.", ch);
+        return;
+    }
+
+    DefaultReligion *drelig = dynamic_cast<DefaultReligion *>(pch->getReligion().getElement());
+    if (!drelig || !drelig->flags.isSet(RELIG_CULT)) {
+        ch->pecho("Похоже, %N1 совершенно равнодуш%gно|ен|на к жертвоприношениям.", 
+                   rname, religion.getSex());
         return;
     }
 

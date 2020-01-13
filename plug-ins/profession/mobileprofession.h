@@ -23,7 +23,7 @@ public:
     virtual Flags getFlags( Character * = NULL ) const;
 
 private:
-    void checkTarget( Character * ) const throw( Exception );
+    void checkTarget( Character * ) const ;
 };
 
 #endif

@@ -68,7 +68,7 @@ void RoomWrapper::setTarget( ::Room *r )
     id = ROOM_VNUM2ID(r->vnum);
 }
 
-void RoomWrapper::checkTarget( ) const throw( Scripting::Exception )
+void RoomWrapper::checkTarget( ) const 
 {
     if (zombie.getValue())
         throw Scripting::Exception( "Room is dead" );

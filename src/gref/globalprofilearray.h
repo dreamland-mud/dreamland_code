@@ -41,7 +41,7 @@ public:
         return map.toXML( parent );
     }
 
-    virtual void fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+    virtual void fromXML( const XMLNode::Pointer& parent ) 
     {
         XMLProfileDataMap map;
         typename XMLProfileDataMap::iterator i;

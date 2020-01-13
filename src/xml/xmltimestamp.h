@@ -13,7 +13,7 @@ public:
     XMLTimeStamp( );
 
     virtual bool toXML( XMLNode::Pointer& ) const;
-    virtual void fromXML( const XMLNode::Pointer& ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& ) ;
 };
 
 

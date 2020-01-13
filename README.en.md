@@ -13,18 +13,18 @@
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
 
-Tested on clean Ubuntu 16.04, Ubuntu 14.04. You can either follow these instructions and create a local build environment,
+Tested on clean Ubuntu 18.04. You can either follow these instructions and create a local build environment,
 or build a ready-to-use Docker container, as described in [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker) README file.
 
 ## Install build and dev tools
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util
 ```
 
 ## Install dependency libraries
 ```bash
-sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
+sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev libfl-dev
 ```
 
 ## Download and build server code
@@ -56,6 +56,8 @@ Logs are available under /path/to/runtime/var/log.
 ```bash
 telnet localhost 9127
 ```
-user: Kadm
+user: Cadmus 
 password: KadmKadm
+
+This player is configured to have Russian skills/names/commands turned off in output, and is placed in room 31001 with English descriptions.
 

@@ -464,8 +464,9 @@ VOID_SPELL(FlameOfGod)::run( Character *ch, Object *obj, int sn, int level )
     chance = level - obj->level + ch->getSkill( sn );
     chance -= number_percent( );
 
-    if (chance < -10 && !IS_OBJ_STAT(obj, ITEM_NOPURGE)) {
-        act_p("Ты прогнева$gло|л|ла своего Бога и он уничтожил оружие.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    if (ch->is_immortal() || chance < -10 && !IS_OBJ_STAT(obj, ITEM_NOPURGE)) {
+        ch->pecho("Ты прогневал%1$Gо||а сво%2$gего|его|ю Бог%2$gа|а|иню, и %2$p1 уничтожил%2$gо||а оружие.", 
+                  ch, ch->getReligion()->getSex());
         extract_obj( obj );
         return;
     }

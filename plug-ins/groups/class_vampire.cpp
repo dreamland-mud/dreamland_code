@@ -38,6 +38,7 @@
 
 PROF(vampire);
 DESIRE(bloodlust);
+RELIG(karmina);
 
 
 #define ROOM_VNUM_GRAVE         5
@@ -821,6 +822,7 @@ public:
 
     virtual void calcTHAC0( );
     virtual void calcDamage( );
+    void damApplyReligion();
 };
 
 
@@ -828,12 +830,26 @@ BonedaggerOneHit::BonedaggerOneHit( Character *ch, Character *victim )
             : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_bonedagger )
 {
 }
+
+void BonedaggerOneHit::damApplyReligion()
+{
+    if (ch->getReligion() == god_karmina && chance(5)) {
+        Object *tattoo = get_eq_char(ch, wear_tattoo);
+        if (tattoo) {
+            ch->pecho("{rКармина{x придает твоему костяному ножу особую остроту.");
+            dam *= 2;
+        }
+    }
+}
+
 void BonedaggerOneHit::calcDamage( ) 
 {
     damBase( );
     gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
     damApplyPosition( );
     damApplyDamroll( );
+    damApplyReligion();
+
     dam *= 4;
 
     WeaponOneHit::calcDamage( );

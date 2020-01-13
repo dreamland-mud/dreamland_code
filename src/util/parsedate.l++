@@ -20,7 +20,7 @@ using namespace std;
 
 #include "dateparser.h"
 
-#define YY_DECL int DateParser::dateLex( ) throw( ExceptionBadDateString )
+#define YY_DECL int DateParser::dateLex( ) 
 
 
 

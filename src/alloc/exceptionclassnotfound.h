@@ -22,12 +22,12 @@
 class ExceptionClassNotFound : public Exception
 {
 public: 
-    inline ExceptionClassNotFound( string name )
+    inline ExceptionClassNotFound( string name ) throw()
             : Exception( string( "Class '" ) + name + "' not found" )
     {
     }
 
-    virtual ~ExceptionClassNotFound( ) throw( );
+    virtual ~ExceptionClassNotFound( ) throw();
 };
 
 #endif

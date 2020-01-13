@@ -95,14 +95,14 @@ XMLNode::NodeList::Pointer XMLNode::getElementsByTagName( const DLString& name )
         return list;
 }
 
-XMLNode::NodeList::Pointer XMLNode::selectNodes( const DLString& pattern ) const throw( ExceptionXSL )
+XMLNode::NodeList::Pointer XMLNode::selectNodes( const DLString& pattern ) const 
 {
         XMLMatchPattern match( this, pattern );
         match.yylex( );
         return match.getList( );
 }
 
-XMLNode::Pointer XMLNode::selectSingleNode( const DLString& pattern ) const throw( ExceptionXSL )
+XMLNode::Pointer XMLNode::selectSingleNode( const DLString& pattern ) const 
 {
         XMLMatchPattern match( this, pattern );
         match.yylex( );

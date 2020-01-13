@@ -14,7 +14,7 @@
 #include "xmllong.h"
 #include "exceptionskipvariable.h"
 
-void XMLDate::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLDate::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
 

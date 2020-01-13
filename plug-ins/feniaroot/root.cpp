@@ -9,21 +9,25 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "room.h"
-
 #include "interprethandler.h"
 #include "descriptor.h"
 #include "wiznet.h"
 #include "infonet.h"
 #include "messengers.h"
 #include "commonattributes.h"
+#include "skillgroup.h"
+#include "subprofession.h"
+#include "language.h"
+#include "languagemanager.h"
 #include "websocketrpc.h"
-
 #include "dreamland.h"
 #include "weather.h"
 #include "move_utils.h"
 #include "act.h"
 #include "mercdb.h"
 #include "merc.h"
+#include "damageflags.h"
+#include "../anatolia/handler.h"
 
 #include "root.h"
 #include "nannyhandler.h"
@@ -215,6 +219,14 @@ NMI_INVOKE( Root, get_obj_world , "(name): ищет в мире предмет �
             return WrapperManager::getThis( )->getWrapper(obj); 
 
     return Register( );
+}
+
+NMI_INVOKE( Root, get_obj_world_unique , "(vnum, ch): ищет в мире предмет с этим внумом, принадлежащий ch")
+{
+    int vnum = argnum2number(args, 1);
+    Character *ch = argnum2character(args, 2);
+    ::Object *obj = get_obj_world_unique(vnum, ch);
+    return WrapperManager::getThis()->getWrapper(obj);
 }
 
 NMI_INVOKE( Root, get_char_world , "(name): ищет в мире чара с указанным именем")
@@ -579,7 +591,7 @@ NMI_INVOKE(Root, infonet, "(msg): выдать сообщение msg через
     return Register( );
 }
 
-NMI_INVOKE(Root, wiznet, "(msg): выдать сообщение msg по wiznet" )
+NMI_INVOKE(Root, wiznet, "(msg[, trust[, wiztype]]): выдать сообщение msg по wiznet" )
 {
     DLString msg;
     int trust = 0, wiztype = WIZ_QUEST, wiznum;
@@ -735,6 +747,11 @@ NMI_GET( Root, month, "текущий месяц, 0..16" )
     return Register( time_info.month ); 
 }
 
+NMI_GET(Root, season, "время года (winter,autumn,summer,spring), зависит от текущего месяца")
+{
+    return Register(season());
+}
+
 NMI_SET( Root, sunlight , "время суток: 0=ночь, 1=рассвет, 2=день, 3=закат") 
 {
     weather_info.sunlight = check_range(arg, 0, 3);
@@ -844,7 +861,7 @@ NMI_INVOKE( Root, find_profession, "(name): нестрогий поиск про
     if (!prof)
         throw Scripting::IllegalArgumentException( );
 
-    return ProfessionWrapper::wrap( prof->getName( ) );
+    return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
 NMI_GET( Root, professions, "список всех профессий, доступных игрокам") 
@@ -856,7 +873,7 @@ NMI_GET( Root, professions, "список всех профессий, дост�
         prof = professionManager->find( i );
 
         if (prof->isValid( ) && prof->isPlayed( )) 
-            list->push_back( ProfessionWrapper::wrap( prof->getName( ) ) );
+            list->push_back( Register::handler<ProfessionWrapper>(prof->getName()) );
     }
     
     Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
@@ -866,44 +883,66 @@ NMI_GET( Root, professions, "список всех профессий, дост�
 
 NMI_INVOKE( Root, Profession, "(name): конструктор для профессии (класса) по имени" )
 {
-    DLString name;
-
-    if (args.empty( ))
-        name = "none";
-    else
-        name = args.front( ).toString( );
-        
-    return ProfessionWrapper::wrap( name );
+    DLString name = args2string(args);
+    Profession *prof = professionManager->findExisting(name);
+    if (!prof)
+        throw Scripting::Exception("Profession not found");
+    return Register::handler<ProfessionWrapper>(prof->getName());
 }
 
 NMI_INVOKE( Root, CraftProfession, "(name): конструктор для дополнительной профессии по имени" )
 {
-    DLString name;
-
-    if (args.empty( ))
-        name = "none";
-    else
-        name = args.front( ).toString( );
-        
-    return CraftProfessionWrapper::wrap( name );
+    DLString name = args2word(args);
+    CraftProfession::Pointer prof = craftProfessionManager->get(name);
+    if (!prof)
+        throw Scripting::Exception("Craft profession not found");
+    return Register::handler<CraftProfessionWrapper>(prof->getName());
 }
 
 NMI_INVOKE( Root, Bonus, "(name): конструктор для бонусов по имени" )
 {
-    DLString name = args2string(args);
-    if (!bonusManager->findExisting(name))
+    DLString name = args2word(args);
+    Bonus *bonus = bonusManager->findExisting(name);
+    if (!bonus)
         throw Scripting::Exception("Bonus not found");
-    return BonusWrapper::wrap( name );
+    return Register::handler<BonusWrapper>(bonus->getName());
 }
-
 
 NMI_INVOKE( Root, Religion, "(name): конструктор для религии по имени" )
 {
-    DLString name = args2string(args);
+    DLString name = args2word(args);
     Religion *religion = religionManager->findExisting(name);
     if (!religion)
         throw Scripting::Exception("Religion not found");
-    return ReligionWrapper::wrap( religion->getName() );
+    return Register::handler<ReligionWrapper>(religion->getName());
+}
+
+NMI_GET( Root, religions, "список всех религий") 
+{
+    RegList::Pointer list(NEW);
+    Religion *religion;
+    
+    for (int i = 0; i < religionManager->size( ); i++) {
+        religion = religionManager->find( i );
+
+        if (religion->isValid( )) 
+            list->push_back( 
+                 Register::handler<ReligionWrapper>(religion->getName()));
+    }
+    
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    return Register( listObj );
+}
+
+
+NMI_INVOKE( Root, Language, "(name): конструктор для древнего языка по имени" )
+{
+    DLString name = args2string(args);
+    Language::Pointer lang = languageManager->findLanguage(name);
+    if (!lang)
+        throw Scripting::Exception("Language not found");
+    return Register::handler<LanguageWrapper>(lang->getName());
 }
 
 NMI_GET( Root, races, "список всех рас") 
@@ -997,7 +1036,7 @@ static bool normalize_skill_name(DLString &arg)
 NMI_INVOKE( Root, Skill, "(name): конструктор для умения по имени" )
 {
     Skill *skill = argnum2skill(args, 1);
-    return SkillWrapper::wrap(skill->getName());    
+    return Register::handler<SkillWrapper>(skill->getName());    
 }
 
 NMI_INVOKE( Root, FeniaSkill, "(name): конструктор для нового умения" )
@@ -1095,4 +1134,46 @@ NMI_INVOKE(Root, webcmd, "(ch,cmd,label): создать линку для ве�
     DLString seeFmt = argnum2string(args, 3);
 
     return Register(web_cmd(ch, cmd, seeFmt));
+}
+
+NMI_INVOKE(Root, spells, "(targets): вернуть названия всех заклинаний, действующих на цели (.tables.target_table)")
+{
+    int targets = argnum2flag(args, 1, target_table);
+    RegList::Pointer spells(NEW);
+
+    for (int sn = 0; sn < skillManager->size( ); sn++) {
+        Skill *skill = skillManager->find(sn);
+        Spell::Pointer spell = skill->getSpell();
+
+        if (!spell || !spell->isCasted())
+            continue;
+
+        if (targets > 0 && !IS_SET(spell->getTarget(), targets))
+            continue;
+
+        spells->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(spells);
+    return Register(listObj);
+}
+
+NMI_INVOKE(Root, skills, "(group): вернуть названия всех умений, принадлежащих этой группе (olchelp prac)")
+{
+    SkillGroup *group = skillGroupManager->findExisting(args2string(args));
+    if (!group)
+        throw Scripting::Exception("Skill group not found");
+
+    RegList::Pointer skills(NEW);
+
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        if (skill->getGroup() == group->getIndex())
+            skills->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate();
+    listObj->setHandler(skills);
+    return Register(listObj);
 }

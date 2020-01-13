@@ -28,6 +28,9 @@ void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
     // Notify via crystal orb for all types of messages.
     notifyOrb(thread, note);
 
+    if (dreamland->hasOption(DL_BUILDPLOT))
+        return;
+
     // Telegram: post full message if addressed to 'telegram'
     if (note.isNoteTo("telegram")) {
         hookTelegram(thread, note);

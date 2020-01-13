@@ -133,7 +133,7 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     return true;
 }
 
-void HelpArticle::fromXML( const XMLNode::Pointer &parent ) throw (ExceptionBadType)
+void HelpArticle::fromXML( const XMLNode::Pointer &parent ) 
 {
     XMLStringNoEmpty xmlString;
     

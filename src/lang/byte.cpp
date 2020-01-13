@@ -17,7 +17,7 @@
 const DLString Byte::TYPE = "Byte";
 
 
-void Byte::fromString( const DLString & value ) throw( ExceptionBadType )
+void Byte::fromString( const DLString & value ) 
 {
         std::basic_istringstream<char> s( value.c_str( ) );
         unsigned char i;
@@ -32,7 +32,7 @@ void Byte::fromString( const DLString & value ) throw( ExceptionBadType )
         throw ExceptionBadType( TYPE, value );
 }
 
-DLString Byte::toString( ) const throw( )
+DLString Byte::toString( ) const 
 {
         std::basic_ostringstream<char>  buf;
 

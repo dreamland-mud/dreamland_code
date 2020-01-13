@@ -23,7 +23,7 @@ bool XMLClause::match( DLObject * arg ) const
     return true;
 }
 
-void XMLClause::fromXML( const XMLNode::Pointer& parent ) throw (ExceptionBadType)  
+void XMLClause::fromXML( const XMLNode::Pointer& parent )   
 {
     allow = Boolean(parent->getAttribute( ATTRIBUTE_ALLOW ));
     XMLPredicatesList::fromXML( parent );

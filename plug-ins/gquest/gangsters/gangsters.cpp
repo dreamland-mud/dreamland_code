@@ -48,7 +48,7 @@ Gangsters::~Gangsters( )
     thisClass = NULL;
 }
 
-void Gangsters::create( const Config& ) throw ( GQCannotStartException ) 
+void Gangsters::create( const Config& )  
 {
     AREA_DATA *area;
     AreaList areaList;

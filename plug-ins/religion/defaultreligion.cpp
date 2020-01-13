@@ -70,7 +70,7 @@ void ReligionHelp::getRawText( Character *ch, ostringstream &in ) const
        << religion->getShortDescr() << "{x)";
     
     if (ch && ch->desc) {
-        if (religion->isAllowed(ch))
+        if (religion->available(ch))
             in << ", доступна для тебя.";
         else
             in << ", недоступна тебе.";

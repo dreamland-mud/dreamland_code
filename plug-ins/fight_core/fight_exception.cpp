@@ -4,7 +4,7 @@
  */
 #include "fight_exception.h"
 
-VictimDeathException::~VictimDeathException( ) throw( )
+VictimDeathException::~VictimDeathException( ) 
 {
 }
 

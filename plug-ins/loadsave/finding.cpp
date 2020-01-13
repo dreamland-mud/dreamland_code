@@ -877,6 +877,11 @@ Object * get_obj_wear_carry( Character *ch, const DLString &cArgument )
 // Return true if immortal's config allows them to be seen.
 bool can_see_god(Character *ch, Character *god)
 {
+    if (!ch) {
+        return god->invis_level <= LEVEL_MORTAL 
+                && god->incog_level <= LEVEL_MORTAL;
+    }
+    
     if (ch->get_trust() < god->invis_level)
         return false;
             

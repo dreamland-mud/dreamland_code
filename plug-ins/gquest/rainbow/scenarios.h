@@ -28,7 +28,7 @@ public:
     typedef ::Pointer<RainbowScenario> Pointer;
     typedef XMLVectorBase<XMLString> PieceDescriptions;
 
-    virtual void canStart( ) const throw ( GQCannotStartException ) = 0;
+    virtual void canStart( ) const  = 0;
     virtual bool checkArea( area_data * ) const;
     virtual bool checkMobile( NPCharacter * ) const;
     virtual bool checkRoom( Room * ) const;
@@ -131,7 +131,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<RainbowDefaultScenario> Pointer;
 
-    virtual void canStart( ) const throw ( GQCannotStartException );
+    virtual void canStart( ) const ;
     virtual bool checkRoom( Room * ) const;
 
     virtual void printCount( int, ostringstream& ) const;
@@ -152,7 +152,7 @@ XML_OBJECT
 public:
     typedef ::Pointer<RainbowSinsScenario> Pointer;
 
-    virtual void canStart( ) const throw ( GQCannotStartException );
+    virtual void canStart( ) const ;
     virtual bool checkMobile( NPCharacter * ) const;
 
     virtual void printCount( int, ostringstream& ) const;

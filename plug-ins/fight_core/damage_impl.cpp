@@ -47,21 +47,21 @@ RawDamage::RawDamage( Character *ch, Character *victim, int dam_type, int dam )
 void RawDamage::message( )
 {
     if( ch == victim ) {
-        msgRoom( "%^C1\6себя", ch );
+        msgRoom( "%1$^C1\6себя", ch );
         msgChar( "Ты\5себя" );
         return;
     } 
 
     if ( dam == 0 ) {
-       msgRoom( "%^C1\6%C2", ch, victim);
-       msgChar( "Ты\5%C2", victim);
+       msgRoom( "%1$^C1\6%2$C2", ch, victim);
+       msgChar( "Ты\5%2$C2", ch, victim);
     }
     else {
-       msgRoom( "%^C1\6%C4", ch, victim );
-       msgChar( "Ты\5%C4", victim );
+       msgRoom( "%1$^C1\6%2$C4", ch, victim );
+       msgChar( "Ты\5%2$C4", ch, victim );
     }
 
-    msgVict( "%^C1\6тебя", ch );
+    msgVict( "%1$^C1\6тебя", ch );
 }
 
 bool RawDamage::canDamage( )

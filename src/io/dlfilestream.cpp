@@ -26,7 +26,7 @@ DLFileStream::~DLFileStream( )
 {
 }
 
-void DLFileStream::openInputStream( ) throw( ExceptionDBIO )
+void DLFileStream::openInputStream( ) 
 {
     istr.open( path.c_str( ) );
     
@@ -34,7 +34,7 @@ void DLFileStream::openInputStream( ) throw( ExceptionDBIO )
         throw ExceptionDBIO( "Unable to open input stream for '" + path + "'" );
 }
 
-void DLFileStream::openOutputStream( ) throw( ExceptionDBIO )
+void DLFileStream::openOutputStream( ) 
 {
     ostr.open( path.c_str( ) );
     
@@ -42,7 +42,7 @@ void DLFileStream::openOutputStream( ) throw( ExceptionDBIO )
         throw ExceptionDBIO( "Unable to open output stream for '" + path + "'" );
 }
 
-void DLFileStream::toStream( std::ostream &buf ) throw( ExceptionDBIO )
+void DLFileStream::toStream( std::ostream &buf ) 
 {
     char c;
 
@@ -56,7 +56,7 @@ void DLFileStream::toStream( std::ostream &buf ) throw( ExceptionDBIO )
 }
 
 
-void DLFileStream::fromString( const DLString &source ) throw( ExceptionDBIO )
+void DLFileStream::fromString( const DLString &source ) 
 {
     openOutputStream( );
     ostr << source;
@@ -64,7 +64,7 @@ void DLFileStream::fromString( const DLString &source ) throw( ExceptionDBIO )
 }
 
 
-vector<DLString> DLFileStream::toVector() throw (ExceptionDBIO)
+vector<DLString> DLFileStream::toVector() 
 {
     vector<DLString> lines;
     ifstream file(path.c_str());

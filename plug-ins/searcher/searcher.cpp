@@ -20,6 +20,7 @@
 #include "searcher_val.h"    
 #include "profiler.h"
 
+#include "dreamland.h"
 #include "merc.h"
 #include "act.h"
 #include "comm.h"
@@ -106,6 +107,9 @@ public:
 
     virtual void run( )
     {   
+        if (dreamland->hasOption(DL_BUILDPLOT))
+            return;
+
         LogStream::sendNotice() << "Dumping searcher db to disk." << endl;
         dumpArmor();
         dumpWeapon();
@@ -294,12 +298,12 @@ public:
             a["mana"] = mana;
             a["move"] = move;
             a["saves"] = svs;
-            a["str"] = str;
-            a["int"] = inta;
-            a["wis"] = wis;
-            a["dex"] = dex;
-            a["con"] = con;
-            a["cha"] = cha;
+            a["stat_str"] = str;
+            a["stat_int"] = inta;
+            a["stat_wis"] = wis;
+            a["stat_dex"] = dex;
+            a["stat_con"] = con;
+            a["stat_cha"] = cha;
             a["align"] = align;
             a["area"] = area;
             a["where"] = where;
@@ -436,11 +440,11 @@ public:
             w["hp"] = hp;
             w["mana"] = mana;
             w["saves"] = svs;
-            w["str"] = str;
-            w["int"] = inta;
-            w["wis"] = wis;
-            w["dex"] = dex;
-            w["con"] = con;
+            w["stat_str"] = str;
+            w["stat_int"] = inta;
+            w["stat_wis"] = wis;
+            w["stat_dex"] = dex;
+            w["stat_con"] = con;
             w["align"] = align;
             w["area"] = area;
             w["where"] = where;
@@ -578,7 +582,7 @@ public:
             wand["vnum"] = pObj->vnum;
             wand["name"] = name;
             wand["level"] = pObj->level;
-            wand["type"] = itemtype;
+            wand["itemtype"] = itemtype;
             wand["spellLevel"] = spellLevel;
             wand["charges"] = charges;
             wand["spells"] = spells;

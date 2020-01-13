@@ -31,7 +31,7 @@ struct ClassMap : public map<DLString, Class::ClassRegistrator::Pointer>
             erase( pos );
     }
 
-    AllocateClass::Pointer allocate( const DLString& name ) throw( ExceptionClassNotFound )
+    AllocateClass::Pointer allocate( const DLString& name ) 
     {
         if (name.empty( ))
             throw Exception( "Attempt to allocate a class with empty name!" );
@@ -45,7 +45,7 @@ struct ClassMap : public map<DLString, Class::ClassRegistrator::Pointer>
         throw ExceptionClassNotFound( name );
     }
 
-    AllocateClass * allocateRaw( const DLString& name ) throw( ExceptionClassNotFound )
+    AllocateClass * allocateRaw( const DLString& name ) 
     {
         if (name.empty( ))
             throw Exception( "Attempt to allocate a class with empty name!" );
@@ -73,12 +73,12 @@ void Class::unRegClass( const DLString& name )
     classMap.unreg( name );
 }
 
-AllocateClass::Pointer Class::allocateClass( const DLString& name ) throw( ExceptionClassNotFound )
+AllocateClass::Pointer Class::allocateClass( const DLString& name ) 
 {
     return classMap.allocate( name );
 }
 
-AllocateClass * Class::allocateClassRaw( const DLString& name ) throw( ExceptionClassNotFound )
+AllocateClass * Class::allocateClassRaw( const DLString& name ) 
 {
     return classMap.allocateRaw( name );
 }

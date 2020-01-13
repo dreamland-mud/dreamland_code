@@ -3,7 +3,8 @@ lib_LTLIBRARIES = libscheduler_task_round.la libsystem.la
 include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
--I$(top_srcdir)/plug-ins/descriptor
+-I$(top_srcdir)/plug-ins/descriptor \
+-I/usr/include/jsoncpp
 
 libscheduler_task_round_la_SOURCES = \
 schedulertaskroundcharacter.cpp \
@@ -17,7 +18,8 @@ libscheduler_task_round_la_LIBADD = \
 
 libsystem_la_LIBADD = \
 libscheduler_task_round.la \
-../descriptor/libdescriptor.la
+../descriptor/libdescriptor.la \
+-ljsoncpp
 
 libsystem_la_SOURCES = \
 xmlattributeplugin.cpp \

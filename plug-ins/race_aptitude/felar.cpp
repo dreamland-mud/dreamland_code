@@ -22,6 +22,7 @@
 #include "dreamland.h"
 #include "fight.h"
 #include "move_utils.h"
+#include "skill_utils.h"
 #include "merc.h"
 #include "handler.h"
 #include "mercdb.h"
@@ -125,7 +126,7 @@ SKILL_RUNP( tail )
 
     /* level */
 
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+    chance += (skill_level(*gsn_tail, ch) - victim->getModifyLevel()) * 2;
 
     /* now the attack */
     if (number_percent() < chance / 2)

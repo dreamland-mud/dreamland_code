@@ -12,7 +12,7 @@
 #include "exceptionskipvariable.h"
 #include "xmlstring.h"
 
-void XMLString::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLString::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLNode::Pointer node = parent->getFirstNode( );
 
@@ -39,7 +39,7 @@ bool XMLStringNoEmpty::toXML( XMLNode::Pointer& parent ) const
         return XMLString::toXML( parent );
 }
 
-void XMLStringVariable::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLStringVariable::fromXML( const XMLNode::Pointer& parent ) 
 {
     XMLString::fromXML( parent );
 }
@@ -64,7 +64,7 @@ bool XMLStringNode::toXML( XMLNode::Pointer& parent ) const
     return true;
 }
 
-void XMLStringNode::fromXML( const XMLNode::Pointer& parent ) throw( ExceptionBadType )
+void XMLStringNode::fromXML( const XMLNode::Pointer& parent ) 
 {
     node = parent;
 }

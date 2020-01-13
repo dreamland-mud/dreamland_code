@@ -68,7 +68,7 @@ bool Class::mocToXML( XMLNode::Pointer &parent ) const \
 }
 
 #define MOC_VARIABLE(name)  \
-    static void var_ ## name ## _fromXML( ContainerType *container, const XMLNode::Pointer& parent ) throw( ExceptionBadType ) \
+    static void var_ ## name ## _fromXML( ContainerType *container, const XMLNode::Pointer& parent )  \
     { \
         container->name.fromXML( parent ); \
     } \

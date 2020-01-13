@@ -49,25 +49,11 @@ const char * sunlight_en [4] = {
     "sunset"
 };    
 
-enum{
-    SEASON_WINTER = 0,
-    SEASON_SPRING,
-    SEASON_SUMMER,
-    SEASON_AUTUMN
-};
-struct season_info {
-    int number;
-    const char *name;
-    const char *short_descr;
-    const char *adjective;
-    char color;
-};
-
 const struct season_info season_table [4] = {
-    { SEASON_WINTER, "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   'C' },
-    { SEASON_SPRING, "весна", "весн|а|ы|е|у|ой|е", "весеннего", 'g' },
-    { SEASON_SUMMER, "лето",  "лет|о|а|у|о|ом|е",  "летнего",   'Y' },
-    { SEASON_AUTUMN, "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  'y' },
+    { SEASON_WINTER, "winter", "зима",  "зим|а|ы|е|у|ой|е",  "зимнего",   'C' },
+    { SEASON_SPRING, "spring", "весна", "весн|а|ы|е|у|ой|е", "весеннего", 'g' },
+    { SEASON_SUMMER, "summer", "лето",  "лет|о|а|у|о|ом|е",  "летнего",   'Y' },
+    { SEASON_AUTUMN, "autumn", "осень", "осен|ь|и|и|ь|ью|и", "осеннего",  'y' },
 };
 
 struct month_info {
@@ -137,6 +123,12 @@ void mmhg_update()
 
     weather_info.mmhg += weather_info.change_ * 4/3;
     weather_info.mmhg = URANGE( 960, weather_info.mmhg, 1040 );
+}
+
+DLString season()
+{
+    int this_season = month_table[time_info.month].season;
+    return season_table[this_season].name;
 }
 
 /*

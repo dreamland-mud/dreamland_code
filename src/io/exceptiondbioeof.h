@@ -14,7 +14,7 @@
 class ExceptionDBIOEOF : public Exception  
 {
 public:
-        inline ExceptionDBIOEOF( )
+        inline ExceptionDBIOEOF( ) throw() 
                 : Exception( "EOF" )
         {
         }

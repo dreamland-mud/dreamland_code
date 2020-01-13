@@ -17,7 +17,7 @@
 const DLString Short::TYPE = "Short";
 
 
-void Short::fromString( const DLString & str ) throw( ExceptionBadType )
+void Short::fromString( const DLString & str ) 
 {
         std::basic_istringstream<char> s( str.c_str( ) );
         short i;
@@ -32,7 +32,7 @@ void Short::fromString( const DLString & str ) throw( ExceptionBadType )
         throw ExceptionBadType( TYPE, str );
 }
 
-DLString Short::toString( ) const throw( )
+DLString Short::toString( ) const 
 {
         std::basic_ostringstream<char>  buf;
 

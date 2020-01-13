@@ -41,9 +41,9 @@ public:
     class Manager;
 
     struct NotRecoveredException : public Exception {
-        NotRecoveredException() : Exception("Object not recovered") { }
+        NotRecoveredException() throw(): Exception("Object not recovered") { }
 
-        virtual ~NotRecoveredException( ) throw( );
+        virtual ~NotRecoveredException( ) throw();
     };
 
     Object();
@@ -70,7 +70,7 @@ public:
         return id;
     }
 
-    virtual void fromXML( const XMLNode::Pointer& node ) throw( ExceptionBadType );
+    virtual void fromXML( const XMLNode::Pointer& node ) ;
     virtual bool toXML( XMLNode::Pointer& node ) const;
 
     void backup();
@@ -125,10 +125,10 @@ public:
 
     virtual void seq( id_t, Data & );
 
-    bool tlim(clock_t );
-    bool syncPut(clock_t );
-    bool syncDel(clock_t );
-    bool sync(clock_t );
+    bool tlim(struct timeval *);
+    bool syncPut(struct timeval *);
+    bool syncDel(struct timeval *);
+    bool sync(struct timeval *);
 
     void backup();
     void recover();

@@ -14,17 +14,20 @@
 #include "skillcommand.h"
 #include "affect.h"
 #include "race.h"
+#include "religion.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
 #include "object.h"
 #include "room.h"
 #include "clanreference.h"
+#include "areabehaviormanager.h"
 
 #include "dreamland.h"
 #include "fight.h"
 #include "material.h"
 #include "immunity.h"
 #include "handler.h"
+#include "skill_utils.h"
 #include "move_utils.h"
 #include "gsn_plugin.h"
 #include "profflags.h"
@@ -48,6 +51,10 @@ PROF(thief);
 
 WEARLOC(tat_wrist_l);
 WEARLOC(tat_wrist_r);
+
+RELIG(cradya);
+RELIG(phobos);
+RELIG(deimos);
 
 /*----------------------------------------------------------------------------
  * Hit by weapon or bare hands
@@ -127,6 +134,7 @@ void UndefinedOneHit::calcDamage( )
     damApplyAttitude( );
     damApplyDeathblow( );
     damApplyCounter( );
+    damApplyReligion();
 
     damNormalize( );
 
@@ -283,7 +291,7 @@ bool UndefinedOneHit::defenseParry( )
     }
 
 
-    if (number_percent( ) >= chance + victim->getModifyLevel() - ch->getModifyLevel())
+    if (number_percent( ) >= chance + skill_level(*gsn_parry, victim) - ch->getModifyLevel())
         return false;
 
     if(SHADOW(victim))
@@ -452,7 +460,7 @@ bool UndefinedOneHit::defenseShieldBlock( )
         gsn_forest_fighting->improve( victim, true, ch );
     }
     
-    if ( number_percent( ) >= chance + victim->getModifyLevel() - ch->getModifyLevel()
+    if ( number_percent( ) >= chance + skill_level(*gsn_shield_block, victim) - ch->getModifyLevel()
         || ( !victim->is_npc() && !victim->move ) )
         return false;
 
@@ -527,7 +535,7 @@ bool UndefinedOneHit::defenseDodge( )
     if (wield && (wield->value[0] == WEAPON_FLAIL || wield->value[0] == WEAPON_WHIP))
         chance = ( int )( chance * 1.2 );
         
-    if (number_percent( ) >= chance + ( victim->getModifyLevel() - ch->getModifyLevel() ) / 2
+    if (number_percent( ) >= chance + ( skill_level(*gsn_dodge, victim) - ch->getModifyLevel() ) / 2
         || ( !victim->is_npc() && !victim->move ) )
         return false;
 
@@ -639,7 +647,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         chance = ( int )( chance * 0.5 );
     }
 
-    if ( number_percent( ) >= chance + ( victim->getModifyLevel() - ch->getModifyLevel() ) )
+    if ( number_percent( ) >= chance + ( skill_level(*gsn_cross_block, victim) - ch->getModifyLevel() ) )
         return false;
 
     victim->move -= move_dec( victim );
@@ -758,7 +766,7 @@ bool UndefinedOneHit::defenseHandBlock( )
         chance = ( int )( chance * 0.5 );
     }
 
-    if ( number_percent( ) >= chance +( victim->getModifyLevel() - ch->getModifyLevel() ) ) 
+    if ( number_percent( ) >= chance +( skill_level(*gsn_hand_block, victim) - ch->getModifyLevel() ) ) 
         return false;
     
     victim->move -= move_dec( victim );
@@ -1069,9 +1077,49 @@ void UndefinedOneHit::damApplyMasterHand( )
         return;
     
     gsn_mastering_pound->improve( ch, true, victim );
-    dam = dice( 3 + ch->getModifyLevel() / 10, 10 ) * skill / 100;        
+    int level = skill_level(*gsn_mastering_pound, ch);
+    dam += dice( 3 + level / 10, 10 ) * skill / 100;        
 }
 
+void UndefinedOneHit::damApplyReligion()
+{
+    // Cradya followers get more damage from their pets, clan pets excluded.
+    if (ch->is_npc() 
+            && ch->leader 
+            && ch->leader->getReligion() == god_cradya
+            && get_eq_char(ch->leader, wear_tattoo) != 0)
+    {
+        if (!area_is_clan(ch->getNPC()->pIndexData->area)) {         
+            dam = dam * 150 / 100;
+        }
+        return;
+    }
+
+    // Phobos and Deimos followers work well together.
+    if (get_eq_char(ch, wear_tattoo) != 0) {
+        for (Character *rch = ch->in_room->people; rch; rch = rch->next_in_room) {
+            if (rch == ch)
+                continue;
+            if (!is_same_group(ch, rch))
+                continue;
+            if (get_eq_char(rch, wear_tattoo) == 0)
+                continue;
+
+            if ((ch->getReligion() == god_deimos && rch->getReligion() == god_phobos)
+                || (ch->getReligion() == god_phobos && rch->getReligion() == god_deimos))
+            {           
+                if (chance(1)) {
+                    ch->recho(rch, "%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch, rch);
+                    ch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", rch);
+                    rch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch);
+                }
+
+                dam = dam * 110 / 100;
+                return;
+            }
+        }
+    }
+}
 
 /*----------------------------------------------------------------------------
  * Chop off a hand 
@@ -1117,7 +1165,7 @@ void UndefinedOneHit::damEffectSlice( )
     chance += ch->getCurrStat(STAT_DEX ) - victim->getCurrStat(STAT_DEX );
     chance += 2 * (ch->getCurrStat(STAT_STR ) - victim->getCurrStat(STAT_STR ));
 
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+    chance += (skill_level(*gsn_slice, ch) - victim->getModifyLevel()) * 2;
 
     if (!IS_WEAPON_STAT( axe, WEAPON_SHARP ))
         chance -= chance / 10;
