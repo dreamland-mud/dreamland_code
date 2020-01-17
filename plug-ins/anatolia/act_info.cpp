@@ -342,7 +342,7 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d килограмм.\n\r",
+   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
@@ -385,7 +385,7 @@ CMDRUNP( oscore )
         if (ch->getProfession( ) != prof_samurai)
             buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
         else 
-            buf << dlprintf( "Смертей: %d.  ", ch->getPC( )->death.getValue( ));
+            buf << fmt(0, "Тебя убили уже %1$d ра%1$Iз|за|з.", ch->getPC()->death.getValue());
 	    
         if (ch->getPC()->guarding != 0)
             buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
