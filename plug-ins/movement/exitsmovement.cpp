@@ -305,7 +305,7 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     wch->setWait( 4 );
     msgSelfRoom( wch,
                  "Твоя попытка просочиться сквозь %4$N4 закончилась неудачей.", 
-                 "%2$C1 стукается лбом о %4$N4." );
+                 "%2$^C1 стукается лбом о %4$N4." );
     return false;
 }
 

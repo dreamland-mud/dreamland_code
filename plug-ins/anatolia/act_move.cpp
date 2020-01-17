@@ -954,6 +954,8 @@ CMDRUNP( wake )
         return; 
     }
 
+    act("Ты будишь $C4.", ch, 0, victim, TO_CHAR);
+    act("$c1 будит $C4.", ch, 0, victim, TO_NOTVICT);
     act_p( "$c1 будит тебя.", ch, 0, victim, TO_VICT,POS_SLEEPING );
     do_stand(victim,"");
     mprog_wake( victim, ch );

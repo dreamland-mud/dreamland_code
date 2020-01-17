@@ -927,30 +927,32 @@ SKILL_RUNP( forest )
     int mana;
 
     if (ch->is_npc() || !gsn_forest_fighting->getEffective( ch )) {
-        ch->send_to("Что?\n");
+        ch->send_to("Какой такой лес?\n");
         return;
     }
     
     argument = one_argument( argument, arg );
 
     if (!*arg) {
-        ch->send_to("Использование: forest {{ attack|defence|normal }\n\r");
+        ch->send_to("Использование: {lRлес атака|защита|выкл{lEforest attack|defence|off{x\n\r");
         return;
     }
-    else if (!str_prefix(arg, "normal")) {
+
+    if (arg_is_switch_off(arg) || arg_oneof(arg, "normal")) {
         if (!ch->isAffected(gsn_forest_fighting)) {
             ch->send_to("Ты не используешь в бою твои знания о лесе.\n\r");
-            return;
         }
         else {
             ch->send_to("Ты прекращаешь использовать в бою твои знания о лесе.\n\r");
             affect_strip(ch, gsn_forest_fighting);
-            return;
         }
+
+        return;
     }
-    else if (!str_prefix(arg, "defence")) 
+
+    if (arg_oneof(arg, "защита", "defense", "defence")) 
         attack = false;
-    else if (!str_prefix(arg, "attack"))
+    else if (arg_oneof(arg, "атака", "attack"))
         attack = true;
     else {
         run(ch, str_empty);

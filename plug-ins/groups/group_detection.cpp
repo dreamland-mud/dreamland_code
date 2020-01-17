@@ -689,6 +689,11 @@ SKILL_RUNP( lore )
 
   argument = one_argument( argument, arg1 );
 
+    if (arg1[0] == '\0') {
+        ch->println("Использование: {lRлегенды{lElore{x предмет.");
+        return;
+    }
+
   if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
       ch->send_to("У тебя нет этого.\n\r");

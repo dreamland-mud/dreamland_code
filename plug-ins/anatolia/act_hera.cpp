@@ -232,8 +232,8 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                sprintf (buf, "Ставок не получено - %s{Y снят с аукциона{x.",auction->item->getShortDescr( '1' ).c_str( ));
-                talk_auction(buf);
+                DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а с аукциона{x.", auction->item);
+                talk_auction(msg.c_str());
 
                 act_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);

@@ -241,7 +241,7 @@ CMDRUNP( open )
     Object *obj;
     EXTRA_EXIT_DATA *peexit;
     int door;
-
+    
     one_argument( argument, arg );
 
     if ( arg[0] == '\0' )
@@ -250,13 +250,15 @@ CMDRUNP( open )
         return;
     }
 
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
     if (( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) >= 0)
     {
         open_door( ch, door );
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         bool changed = false;
         
@@ -348,13 +350,15 @@ CMDRUNP( close )
         return;
     }
 
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
     if (( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) >= 0)
     {
         close_door( ch, door );
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         if ( obj->item_type == ITEM_PORTAL )
         {
@@ -544,7 +548,9 @@ CMDRUNP( lock )
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         // portal stuff
         if (obj->item_type == ITEM_PORTAL)
@@ -771,7 +777,9 @@ CMDRUNP( unlock )
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         // portal stuff
         if ( obj->item_type == ITEM_PORTAL )
@@ -1008,6 +1016,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
     Object *obj;
     EXTRA_EXIT_DATA *peexit;
     int door;
+    bool canBeDoor = direction_lookup(arg.c_str()) >= 0;
     Keyhole::Pointer null;
 
     if (( peexit = get_extra_exit( arg.c_str( ), ch->in_room->extra_exit ) )
@@ -1022,7 +1031,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
         return DoorKeyhole::Pointer( NEW, ch, ch->in_room, door );
     }
 
-    if (( obj = get_obj_here( ch, arg.c_str( ) ) )) {
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg.c_str( ) ) )) {
         if (obj->item_type == ITEM_PORTAL)
             return PortalKeyhole::Pointer( NEW, ch, obj );
 

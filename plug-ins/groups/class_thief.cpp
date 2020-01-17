@@ -1142,8 +1142,6 @@ SKILL_RUNP( circle )
     if (is_safe(ch,victim))
             return;
 
-    ch->setWait( gsn_circle->getBeats( )  );
-
     for ( person = ch->in_room->people; person != 0; person = person->next_in_room )
     {
             if (person->fighting == ch)
@@ -1152,6 +1150,8 @@ SKILL_RUNP( circle )
                     return;
             }
     }
+ 
+    ch->setWait( gsn_circle->getBeats( )  );
 
     CircleOneHit circ( ch, victim );
     bool fBonus = false;

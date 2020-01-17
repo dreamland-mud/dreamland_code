@@ -82,6 +82,11 @@ SKILL_RUNP( searchstones )
     case SECT_FOREST:        chance = 30; break;
     case SECT_FIELD:        chance = 30; break;
     }
+
+    if (chance == 0) {
+        ch->println("В этой местности бесполезно искать камни.");
+        return;
+    }
     
     if (number_percent( ) > gsn_search_stones->getEffective( ch ) * chance / 100) {
         ch->println("Тебе не удалось отыскать ни одного камня.");

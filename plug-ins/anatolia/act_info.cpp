@@ -739,7 +739,7 @@ CMDRUNP( consider )
     diff = victim->getModifyLevel() - ch->getModifyLevel();
 
          if ( diff <= -10 ) msg = "Ты можешь убить $C4 даже без оружия.";
-    else if ( diff <=  -5 ) msg = "$C1 не соперник тебе.";
+    else if ( diff <=  -5 ) msg = "$C1 не соперн$Gик|ик|ица тебе.";
     else if ( diff <=  -2 ) msg = "Ты похоже легко убьешь $C4.";
     else if ( diff <=   1 ) msg = "Прекрасный поединок!";
     else if ( diff <=   4 ) msg = "$C1 говорит 'Чувствуешь удачу, шпана?'.";
