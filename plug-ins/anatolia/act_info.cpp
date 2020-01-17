@@ -342,7 +342,7 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
+   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d килограмм.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
@@ -384,9 +384,9 @@ CMDRUNP( oscore )
 
         if (ch->getProfession( ) != prof_samurai)
             buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
-        else
-            buf << dlprintf( "Тебя убили уже %d раз.  ", ch->getPC( )->death.getValue( ));
-
+        else 
+            buf << dlprintf( "Смертей: %d.  ", ch->getPC( )->death.getValue( ));
+	    
         if (ch->getPC()->guarding != 0)
             buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
 
@@ -1361,7 +1361,7 @@ CMDRUNP( demand )
   if ( !can_drop_obj( ch, obj ) )
     {
       do_say(victim,
-        "Эта вещь проклята, и я не могу избавиться от нее. Прости меня, повелитель.");
+        "Эта вещь проклята, и я не могу избавиться от нее.");
       return;
     }
 
