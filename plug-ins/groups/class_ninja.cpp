@@ -65,7 +65,7 @@ SKILL_RUNP( vanish )
     if ( ch->death_ground_delay > 0
             && ch->trap.isSet( TF_NO_MOVE ) )
     {
-            ch->send_to("Ты не можешь покинуть это место - без посторонней помощи!\n\r");
+            ch->send_to("Ты не можешь покинуть это место без посторонней помощи!\n\r");
             return;
     }
 
@@ -91,14 +91,14 @@ SKILL_RUNP( vanish )
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
     {
-        ch->send_to("Твоя попытка закончилась неудачей!\n\r");
+        ch->send_to("Боги покинули тебя.\n\r");
         return;
     }
 
     pRoomIndex = get_random_room_vanish( ch );
     
     if (!pRoomIndex) {
-        ch->send_to("Твоя попытка закончилась неудачей!\n\r");
+        ch->send_to("Тебе некуда скрыться.\n\r");
         return;
     }
     
@@ -155,7 +155,7 @@ SKILL_RUNP( nerve )
 
         if ( ch->isAffected(gsn_nerve) )
         {
-                ch->send_to("Ты не можешь сделать его еще слабее.\n\r");
+                ch->send_to("Ты не можешь сделать этого противника еще слабее.\n\r");
                 return;
         }
 
@@ -213,13 +213,13 @@ SKILL_RUNP( endure )
 {
   if (ch->is_npc())
     {
-      ch->send_to("Выносливость - не твой удел.\n\r");
+      ch->send_to("Выносливость -- не твой удел.\n\r");
       return;
     }
 
   if ( gsn_endure->getEffective( ch ) <= 1 )
   {
-      ch->send_to("Похоже ты не так вынослив, как о себе думаешь.\n\r");
+      ch->pecho( "Похоже ты не так выносли%Gво|в|ва, как о себе думаешь.", ch );
       return;
     }
 
@@ -291,9 +291,9 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, chance, 100);
 
     if (mychance.reroll()) {
-        act_p("Ты {R+++ASSASSINATE+++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 {R+++ASSASSINATES+++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-        act_p("$c1 {R+++ASSASSINATES+++{x тебя!",ch,0,victim,TO_VICT,POS_DEAD);
+        act_p("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
 
@@ -364,7 +364,7 @@ SKILL_RUNP( assassinate )
 
     if ( victim->is_immortal() && !victim->is_npc() )
     {
-            ch->send_to("Оопс.. руки не находят нужного им.\n\r");
+            ch->send_to("С богами такие штучки не пройдут.\n\r");
             return;
     }
 
@@ -394,7 +394,7 @@ SKILL_RUNP( assassinate )
             && victim->can_see(ch)
             && IS_AWAKE(victim) )
     {
-            act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается.. ты не можешь подкрасться.",
+            act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается... ты не можешь подкрасться.",
                     ch, 0, victim, TO_CHAR,POS_RESTING);
             return;
     }
