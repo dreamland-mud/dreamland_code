@@ -171,7 +171,7 @@ VOID_SPELL(Learning)::run( Character *ch, Character *victim, int sn, int level )
 
     if ( victim->is_npc() )
     {
-        ch->send_to("Ему это не поможет.\n\r");
+        ch->pecho("%1#GЕму|Ему|Ей это не поможет.", victim);
         return;
     }
 

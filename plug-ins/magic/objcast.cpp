@@ -88,8 +88,8 @@ CMDRUNP( quaff )
         return;
     }
 
-    if (ch->getRealLevel( ) < obj->level) {
-        ch->send_to("Эта смесь чересчур сильна, чтобы ты мог выпить ее.\n\r");
+    if (ch->getModifyLevel( ) < obj->level) {
+        ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить ее.", ch);
         return;
     }
 
@@ -141,7 +141,7 @@ CMDRUNP( recite )
         return;
     }
 
-    if (get_wear_level( ch, scroll ) > ch->getRealLevel( )) {
+    if (get_wear_level( ch, scroll ) > ch->getModifyLevel( )) {
         ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
         return;
     }
@@ -265,7 +265,7 @@ CMDRUNP( brandish )
         act( "$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
         act( "Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
 
-        if (ch->getRealLevel( ) + 3 < staff->level
+        if (ch->getModifyLevel( ) + 3 < staff->level
             || number_percent( ) >= gsn_staves->getEffective( ch ))
         {
             act_p("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR,POS_RESTING);
@@ -351,7 +351,7 @@ CMDRUNP( zap )
     DLString args = argument;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Ты должен уничтожать магию, а не использовать ее!\n\r");
+        ch->send_to("Ты должен уничтожать магию, а не использовать её!\n\r");
         return;
     }
 

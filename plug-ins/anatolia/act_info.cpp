@@ -13,14 +13,14 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *        
- *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
- *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *        
- *         Ibrahim Canpunar  {Asena}        canpunar@rorqual.cc.metu.edu.tr    *        
- *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
- *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
+ *     ANATOLIA has been brought to you by ANATOLIA consortium             *
+ *         Serdar BULUT {Chronos}             bulut@rorqual.cc.metu.edu.tr *
+ *         Ibrahim Canpunar  {Asena}       canpunar@rorqual.cc.metu.edu.tr *
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr *
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr    *
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *
  ***************************************************************************/
 
 /***************************************************************************
@@ -1242,12 +1242,17 @@ CMDRUNP( request )
 
 
 
-
 CMDRUNP( identify )
 {
     Object *obj;
     Character *rch;
+    int cost = 20;
 
+    if ( ch->is_npc( ) ) {
+        ch->send_to( "У тебя же лапки!!!\n\r");
+        return;
+    }
+    
     if ( ( obj = get_obj_carry( ch, argument ) ) == 0 )
     {
        ch->send_to( "У тебя нет этого.\n\r");
@@ -1261,6 +1266,15 @@ CMDRUNP( identify )
        ch->send_to("Тут никто ничего толкового не скажет об этой вещи.\n\r");
        return;
     }
+   
+    int remorts = ch->getPC()->getRemorts( ).size( );
+    //add guru checks?
+    if ( remorts == 0) {
+        cost = round ((ch->getRealLevel( ) - cost) * 0.66);
+        if (cost < 0) cost = 0;
+        if (cost > 20) cost = 20;
+    }
+
 
     if (ch->is_immortal( )) {
         act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
@@ -1473,7 +1487,7 @@ static void do_score_args(Character *ch, const DLString &arg)
     } 
 	if (arg_oneof(arg, "religion", "религия")) {
         if (ch->getReligion() == god_none)
-            ch->pecho("Ты атеист.");
+            ch->pecho("Ты атеист%1$G||ка.", ch);
         else
             ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
         return;
@@ -2205,7 +2219,7 @@ struct PermanentAffects {
     }
     
     void printAll() const {
-        print("У тебя иммунитет против", my_imm, imm_flags, '2');
+        print("У тебя иммунитет к", my_imm, imm_flags, '2');
         print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
         print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
         print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
