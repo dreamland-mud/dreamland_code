@@ -46,7 +46,7 @@ void PetShopStorage::msgListEmpty( Character *client )
 
 void PetShopStorage::msgListBefore( Character *client )
 {
-    client->println( "Животные для продажи:" );
+    client->println( "Существа на продажу:" );
 }
 
 void PetShopStorage::msgListAfter( Character *client )
@@ -104,7 +104,7 @@ void PetShopStorage::msgArticleNotFound( Character *client )
 
 void PetShopStorage::msgArticleTooFew( Character *client, Article::Pointer )
 {
-    client->println( "Ты можешь купить только одно животное." );
+    client->println( "Ты можешь купить только одного питомца." );
 }
 
 Article::Pointer PetShopStorage::findArticle( Character *client, DLString &arguments )

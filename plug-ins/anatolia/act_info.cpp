@@ -384,9 +384,9 @@ CMDRUNP( oscore )
 
         if (ch->getProfession( ) != prof_samurai)
             buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
-        else
-            buf << dlprintf( "Тебя убили уже %d раз.  ", ch->getPC( )->death.getValue( ));
-
+        else 
+            buf << fmt(0, "Тебя убили уже %1$d ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+	    
         if (ch->getPC()->guarding != 0)
             buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
 
@@ -1375,7 +1375,7 @@ CMDRUNP( demand )
   if ( !can_drop_obj( ch, obj ) )
     {
       do_say(victim,
-        "Эта вещь проклята, и я не могу избавиться от нее. Прости меня, повелитель.");
+        "Эта вещь проклята, и я не могу избавиться от нее.");
       return;
     }
 
