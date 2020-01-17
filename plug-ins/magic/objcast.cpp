@@ -197,7 +197,7 @@ CMDRUNP( recite )
             spell = SkillManager::getThis( )->find( scroll->value[i] )->getSpell( );
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
 
-            if (offensive && is_safe( ch, t->victim ))
+            if (offensive && t->victim && is_safe( ch, t->victim ))
                 continue;
             
             if (!spell->spellbane( ch, t->victim )) {

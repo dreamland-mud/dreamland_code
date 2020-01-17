@@ -648,6 +648,22 @@ NMI_INVOKE( ObjectWrapper, affectAdd, "(aff): повесить на предме
     return Register( );
 }
 
+NMI_INVOKE( ObjectWrapper, affectJoin, "(aff): усилить существующий аффект или повесить новый (.Affect)" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+    Affect af;
+    
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+    
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );
+    aw->toAffect( af );
+    affect_enhance( target, &af );
+
+    return Register( );
+}
+
 NMI_INVOKE( ObjectWrapper, affectStrip, "(skill): снять с предмета все аффекты от умения по имени skill" )
 {
     checkTarget( );

@@ -212,13 +212,25 @@ int GenericSkill::getLevel( Character *ch ) const
     }
 
     rb = getRaceBonus( ch );
+    // Race bonuses that are independent on profession are available immediately,
+    // e.g. rockseers get wands from level 1.
     if (rb && !rb->isProfessional( ))
         return rb->getLevel( );
 
+    // Return class level or non-zero race bonus level, whatever is lower,
+    // e.g. urukhai get spears from level 1.
     ci = getClassInfo( ch );
-    if (ci && ci->visible())
-       return ci->getLevel( );
+    if (ci && ci->visible()) {
+        int classLevel = ci->getLevel();
+        int raceLevel = rb ? rb->getLevel() : 0;
 
+        if (raceLevel == 0)
+            return classLevel;
+
+        return min(classLevel, raceLevel);
+    }
+
+    // Can't be here.
     return ch->getRealLevel();
 }
 
