@@ -37,6 +37,11 @@ NMI_INVOKE(FeniaString, trim, "(): обрезать лишние пробелы 
     return Register( str );
 }
 
+NMI_INVOKE(FeniaString, quote, "(): вернуть строку в кавычках, если в ней есть пробелы")
+{
+    return Register(quote());
+}
+
 NMI_INVOKE(FeniaString, strPrefix, "(str): true если эта строка - префикс str")
 {
     if (args.empty( ))
