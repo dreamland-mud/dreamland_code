@@ -373,6 +373,10 @@ bool Character::can_see( const Character *victim ) const
                     || ( CAN_DETECT( this, DETECT_INVIS )
                             && !IS_AFFECTED(this, AFF_BLIND) ) )
                     return true;
+
+            if (IS_GHOST(this) ||IS_DEATH_TIME(this))
+                return true;
+
             return false;
         }
 
