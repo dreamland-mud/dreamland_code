@@ -96,7 +96,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom );
 /*
  * "(english name)" for CONFIG_OBJNAME_HINT 
  */
-static void get_obj_name_hint( Object *obj, std::ostringstream &buf )
+void get_obj_name_hint( Object *obj, std::ostringstream &buf )
 {
     DLString name;
     unsigned int i;
@@ -1249,7 +1249,7 @@ static void do_look_move( Character *ch, bool fBrief )
         if (eyes_darkened( ch ))
             ch->println( "Здесь слишком темно ... " );
         else
-            ch->printf( "{W%s{x", ch->in_room->name );
+            ch->printf( "{W%s{x\r\n", ch->in_room->name );
         return;
     }
 

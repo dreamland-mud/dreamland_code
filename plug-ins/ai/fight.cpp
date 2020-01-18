@@ -93,9 +93,6 @@ void BasicMobileBehavior::fight( Character *victim )
 
     setLastFought( victim );
 
-    if (!victim->is_npc( )) 
-        victim->getPC( )->getAttributes( ).eraseAttribute( "speedwalk" );
-    
     one_hit( ch, victim );
 
     if (ch->fighting != victim)

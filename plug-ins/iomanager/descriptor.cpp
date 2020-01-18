@@ -93,10 +93,6 @@ bool Descriptor::checkStopSymbol( )
     if (!character)
         return false;
 
-    if (!character->is_npc() 
-        && character->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
-        return false;
-    
     if(inptr > 0)
         switch(inbuf[inptr-1]) {
             case '\r':
@@ -109,6 +105,10 @@ bool Descriptor::checkStopSymbol( )
     inptr = 0;
     *incomm = 0;
 
+    if (!character->is_npc() && character->getPC()->getAttributes().isAvailable("speedwalk")) {
+        character->getPC()->getAttributes().eraseAttribute("speedwalk");
+    }
+    
     writeRaw((const unsigned char *)MSG_FLUSH_BUF, strlen(MSG_FLUSH_BUF));
     return true;
 }
