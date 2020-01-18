@@ -113,6 +113,7 @@ void Movement::place( Character *wch )
 
     if (old_room->area != to_room->area 
             && IS_AWAKE( wch ) 
+            && !IS_SET(to_room->area->area_flag, AREA_HIDDEN)
             && !eyes_blinded( wch )
             && !eyes_darkened( wch ))
     {
