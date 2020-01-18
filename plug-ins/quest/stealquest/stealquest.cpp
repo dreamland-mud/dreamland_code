@@ -486,6 +486,9 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
         
         if (r == from)
             continue;
+
+        if (!r->isCommon() || IS_SET(r->room_flags, ROOM_MANSION))
+            continue;
         
         for (int i = 0; i < DIR_SOMEWHERE; i++)
             if (r->exit[i] && r->exit[i]->u1.to_room == room)
