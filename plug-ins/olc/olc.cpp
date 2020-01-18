@@ -747,13 +747,63 @@ static bool door_rename_as_russian(EXIT_DATA *pexit)
     return false;
 }
 
-CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
+static DLString find_word_mention(const DLString &text, const list<RussianString> &words)
 {
+    for (const auto &word: words)
+        for (int c = Grammar::Case::NONE; c < Grammar::Case::MAX; c++) {
+            DLString myword = word.decline(c);
+            if (text.isName(myword))
+                return myword;
+        }
+
+    return DLString::emptyString;
+}
+
+CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
+{
+    DLString args = argument;
+    DLString arg = args.getOneArgument();
+
+    if (arg == "water") {
+        ostringstream buf;
+        const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] {W%-29s{x ({C%s{x)";
+
+        list<RussianString> water;
+        water.push_back(RussianString("вод|а|ы|е|у|ой|е"));
+        water.push_back(RussianString("водоем||а|у||ом|е" ));
+        water.push_back(RussianString("водопад||а|у||ом|е" ));
+        water.push_back(RussianString("озер|о|а|у|о|ом|е"));
+        water.push_back(RussianString("мор|е|я|ю|е|ем|е" ));
+        water.push_back(RussianString("рек|а|и|е|у|ой|е" ));
+
+        buf << "Всех неводные комнаты с упоминанием воды, без флагов indoors и near_water:" << endl;
+
+        for (Room *room = room_list; room; room = room->rnext) {
+            if (IS_SET(room->room_flags, ROOM_INDOORS|ROOM_NEAR_WATER))
+                continue;
+
+            if (IS_WATER(room))
+                continue;
+
+            if (!room->isCommon())
+                continue;
+
+            DLString desc = room->description;
+            desc.colourStrip();
+            desc.toLower();
+
+            DLString myword = find_word_mention(desc, water);
+            if (!myword.empty())
+                buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
+        }
+
+        page_to_char( buf.str( ).c_str( ), ch );
+        return;
+    }
+
     if (!ch->isCoder( ))
         return;
 
-    DLString args = argument;
-    DLString arg = args.getOneArgument();
     ostringstream buf;
 
     if (arg == "magic") {
@@ -1194,6 +1244,7 @@ CMD(abc, 50, "", POS_DEAD, 110, LOG_ALWAYS, "")
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
+
 }
 
 
