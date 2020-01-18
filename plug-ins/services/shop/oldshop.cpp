@@ -53,6 +53,7 @@ using std::max;
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
 long long get_arg_id( const DLString &cArgument );
 short get_wear_level( Character *ch, Object *obj );
+void get_obj_name_hint( Object *obj, std::ostringstream &buf );
 
 /*
  * Local functions
@@ -477,6 +478,10 @@ CMDRUN( list )
                     i+1, si.obj->level, si.cost, si.count );
 
         webManipManager->decorateShopItem( buf, si.obj->getShortDescr( '1' ), si.obj, ch );
+
+        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
+            get_obj_name_hint(si.obj, buf);
+
         buf << endl;
     }
 
