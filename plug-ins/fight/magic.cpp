@@ -388,13 +388,12 @@ bool checkDispel( int dis_level, Character *victim, int sn)
         if (!savesDispel(dis_level,af->level,af->duration)) {
             AffectHandler::Pointer handler = skillManager->find( sn )->getAffect( );
             
-            affect_strip(victim,sn);
-            
             if (handler) {
                 handler->remove( victim );
                 handler->dispel( victim );
             }
 
+            affect_strip(victim,sn);            
             return true;
         }
         else

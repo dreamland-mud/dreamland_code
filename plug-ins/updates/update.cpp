@@ -735,10 +735,11 @@ void obj_update( void )
                 }
 
                 room_to_save( obj );
-                affect_remove_obj( obj, paf );
 
                 if (ah)
                     ah->remove( obj );
+
+                affect_remove_obj( obj, paf );
             }
         }
 

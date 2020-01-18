@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include "spelltemplate.h"
+#include "affecthandlertemplate.h"
 #include "transportspell.h"
 #include "recallmovement.h"
 #include "profflags.h"
@@ -114,6 +115,24 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
 
         return;
 
+}
+
+AFFECT_DECL(Fly);
+VOID_AFFECT(Fly)::remove( Character *victim ) 
+{
+    if (victim->posFlags.isSet( POS_FLY_DOWN )) 
+        victim->println("Ты теряешь способность к полетам.");
+    else
+        DefaultAffectHandler::remove( victim );                                     
+
+}
+
+VOID_AFFECT(Fly)::dispel( Character *victim ) 
+{
+    if (victim->posFlags.isSet( POS_FLY_DOWN )) 
+        victim->recho("%^C1 теряет способность к полетам.", victim);
+    else
+        DefaultAffectHandler::dispel( victim );                                     
 }
 
 /*
