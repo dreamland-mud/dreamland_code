@@ -1248,8 +1248,13 @@ CMD(medit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         return;
     }
     else if (!str_cmp(arg1, "create")) {
-        if (!str_cmp(argument, "next")) 
+        if (!str_cmp(argument, "next")) {
             value = next_mob_index(ch, ch->in_room);
+            if (value < 0) {
+                ch->println("Все внумы в этой зоне уже заняты!");
+                return;
+            }
+        }
         else
             value = atoi(argument);
 
