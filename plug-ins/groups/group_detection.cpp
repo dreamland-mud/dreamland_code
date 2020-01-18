@@ -1026,11 +1026,8 @@ SKILL_RUNP( lore )
         }
       else
         {
-          if (chance > 50) {
-            value1 = number_range(1, 2 * obj->value[1]);
-            if (chance > 75)
-              value2 = number_range(1, 2 * obj->value[2]);
-          }
+	  value1 = obj->value[1];
+	  value2 = obj->value[2];
         }
 
         ch->printf("%s (%s)\r\n",
