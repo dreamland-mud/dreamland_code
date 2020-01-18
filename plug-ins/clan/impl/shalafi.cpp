@@ -146,7 +146,7 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
 
     if (number_percent() < 50)
       {
-        ch->send_to("Твоя попытка закончилась неудачей, разбив сосуд.\n\r");
+        ch->send_to("Твоя попытка закончилась неудачей, уничтожив ингредиент.\n\r");
         extract_obj(obj);
         return;
       }

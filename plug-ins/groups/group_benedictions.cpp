@@ -194,6 +194,7 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
     short high_level = 0;
     int chance;
     Affect af;
+    bool found = false;
 
     /* get sum of all mobile levels in the room */
     for (vch = room->people; vch != 0; vch = vch->next_in_room)
@@ -248,10 +249,15 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
 
             af.location = APPLY_DAMROLL;
             affect_to_char(vch,&af);
+            
+            found = true;
         }
     }
 
+    if (!found)
+        ch->println("Тебе тут некого успокаивать.");
 }
+
 SPELL_DECL(Frenzy);
 VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -638,8 +644,11 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
       return;
     }
 
+    bool clean = true;
+
   if (IS_RAFFECTED(room,AFF_ROOM_CURSE))
         {
+         clean = false;
          room->affectStrip( gsn_cursed_lands);
          ch->send_to("Это место очищается от проклятья.\n\r");
          act_p("Это место очищается от проклятья.\n\r",
@@ -647,6 +656,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_POISON))
         {
+         clean = false;
          room->affectStrip( gsn_deadly_venom);
          ch->send_to("Ядовитые пары, окружавшие это место, рассеиваются.\n\r");
          act_p("Ядовитые пары, окружавшие это место, рассеиваются.\n\r",
@@ -654,6 +664,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_SLEEP))
         {
+         clean = false;
          ch->send_to("Это место пробуждается от таинственного сна.\n\r");
          act_p("Это место пробуждается от таинственного сна.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
@@ -661,6 +672,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_PLAGUE))
         {
+         clean = false;
          ch->send_to("Это место очищается от болезней.\n\r");
          act_p("Это место очищается от болезней.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
@@ -668,13 +680,15 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_SLOW))
         {
+         clean = false;
          ch->send_to("Летаргический туман, окружавший это место, рассеивается.\n\r");
          act_p("Летаргический туман, окружавший это место, рассеивается.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_lethargic_mist);
         }
-    return;
 
+    if (clean)
+        ch->println("Это место не нуждается в очищении.");
 }
 
 SPELL_DECL(Wrath);

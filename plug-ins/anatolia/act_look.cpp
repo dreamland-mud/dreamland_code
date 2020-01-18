@@ -1843,7 +1843,7 @@ CMDRUNP( exits )
                 found = true;
 
                 buf << fmt( ch, "%-6^s", ename ) 
-                    << " * (" << direction_doorname(pexit) << ")";
+                    << " * (" << russian_case(direction_doorname(pexit), '1') << ")";
 
                 if (ch->is_immortal())
                     buf << " (room " << room->vnum << ")";
