@@ -749,12 +749,16 @@ static bool door_rename_as_russian(EXIT_DATA *pexit)
     return false;
 }
 
-static DLString find_word_mention(const DLString &text, const list<RussianString> &words)
+static DLString find_word_mention(const char *text, const list<RussianString> &words)
 {
+    DLString t = text;
+    t.colourStrip();
+    t.toLower();
+
     for (const auto &word: words)
         for (int c = Grammar::Case::NONE; c < Grammar::Case::MAX; c++) {
             DLString myword = word.decline(c);
-            if (text.isName(myword))
+            if (t.isName(myword))
                 return myword;
         }
 
@@ -777,6 +781,11 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         water.push_back(RussianString("озер|о|а|у|о|ом|е"));
         water.push_back(RussianString("мор|е|я|ю|е|ем|е" ));
         water.push_back(RussianString("рек|а|и|е|у|ой|е" ));
+        water.push_back(RussianString("причал||а|у||ом|е" ));
+        water.push_back(RussianString("лодк|а|и|е|у|ой|е" ));
+        water.push_back(RussianString("верф|ь|и|и|ь|ью|и" ));
+        water.push_back(RussianString("набережн|ая|ой|ой|ую|ой|ой"));
+        water.push_back(RussianString("корабл|ь|я|ю|ь|ем|я"));
 
         buf << "Всех неводные комнаты с упоминанием воды, без флагов indoors и near_water:" << endl;
 
@@ -796,14 +805,18 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             if (room->sector_type == SECT_AIR)
                 continue;
 
-            DLString desc = room->description;
-            desc.colourStrip();
-            desc.toLower();
+            DLString myword = find_word_mention(room->description, water);
+            if (!myword.empty()) {
+                buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
+                continue;
+            }
 
-            DLString myword = find_word_mention(desc, water);
+            myword = find_word_mention(room->name, water);
             if (!myword.empty())
                 buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
         }
+
+        
 
         page_to_char( buf.str( ).c_str( ), ch );
         return;
