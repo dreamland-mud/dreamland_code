@@ -278,6 +278,8 @@ static bool can_take_obj( Character *ch, Object *obj )
         return false;
     if (obj->pIndexData->limit > 0)
         return false;
+    if (obj->item_type == ITEM_CORPSE_NPC && obj->contains)
+        return false;
     return true;
 }
 
