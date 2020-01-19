@@ -171,6 +171,9 @@ static bool has_water_around( Character *ch )
     if (IS_WATER(ch->in_room))
         return true;
 
+    if (ch->in_room->sector_type == SECT_UNDERWATER)
+        return true;
+
     if (!IS_OUTSIDE(ch))
         return false;
    

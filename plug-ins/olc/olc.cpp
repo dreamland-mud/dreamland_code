@@ -804,6 +804,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
             if (room->sector_type == SECT_AIR)
                 continue;
+            if (room->sector_type == SECT_UNDERWATER)
+                continue;
 
             DLString myword = find_word_mention(room->description, water);
             if (!myword.empty()) {
