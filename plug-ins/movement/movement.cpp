@@ -203,7 +203,7 @@ void Movement::callProgs( Character *wch )
                 oprog_greet( obj, wch );
 
         /* greet programs for people */
-	if (IS_AWAKE(fch))
+        if (IS_AWAKE(fch) && movetype != MOVETYPE_RUNNING)
             mprog_greet( fch, wch );
     }
 
