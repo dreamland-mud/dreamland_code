@@ -23,6 +23,7 @@
 #include <npcharacter.h>
 #include <commandmanager.h>
 #include "race.h"
+#include "clanreference.h"
 #include "room.h"
 
 #include "olc.h"
@@ -48,6 +49,7 @@ DLString format_longdescr_to_char(const char *descr, Character *ch);
 GSN(enchant_weapon);
 GSN(enchant_armor);
 GSN(none);
+CLAN(none);
 
 using namespace std;
 
@@ -779,7 +781,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         buf << "Всех неводные комнаты с упоминанием воды, без флагов indoors и near_water:" << endl;
 
         for (Room *room = room_list; room; room = room->rnext) {
-            if (IS_SET(room->room_flags, ROOM_INDOORS|ROOM_NEAR_WATER))
+            if (IS_SET(room->room_flags, ROOM_INDOORS|ROOM_NEAR_WATER|ROOM_MANSION))
                 continue;
 
             if (IS_WATER(room))
@@ -798,6 +800,33 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         }
 
         page_to_char( buf.str( ).c_str( ), ch );
+        return;
+    }
+
+    if (arg == "eexit") {
+        ostringstream abuf, cbuf, mbuf;
+        abuf << endl << "Экстравыходы везде:" << endl;
+        mbuf << endl << "Экстравыходы в особняках и пригородах:" << endl;
+        cbuf << endl << "Экстравыходы в кланах:" << endl;
+
+        const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] %-35s{x [{C%s{x]";
+        for (Room *room = room_list; room; room = room->rnext) {
+            ostringstream *buf;
+            if (IS_SET(room->room_flags, ROOM_MANSION) || !str_prefix("ht", room->area->area_file->file_name))
+                buf = &mbuf;
+            else if (room->clan != clan_none)
+                buf = &cbuf;
+            else
+                buf = &abuf;
+            for (EXTRA_EXIT_DATA *eexit = room->extra_exit; eexit; eexit = eexit->next) {
+                (*buf) << dlprintf(lineFormat.c_str(), room->vnum, room->name, eexit->keyword) << endl;
+            }
+        }
+        
+        page_to_char( mbuf.str( ).c_str( ), ch );
+        page_to_char( cbuf.str( ).c_str( ), ch );
+        page_to_char( abuf.str( ).c_str( ), ch );
+
         return;
     }
 
