@@ -20,7 +20,7 @@ CMDRUN( showskill )
         return;
     
     if (argument.empty( )) {
-        ch->send_to( "Использование: showskill|slook <умение или заклинание>\r\n" );
+        ch->send_to( "Использование: {y{lRумение{lEslook{x <умение или заклинание>\r\n" );
         return;
     }
 

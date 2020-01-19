@@ -28,25 +28,21 @@ SkillManager::~SkillManager( )
 int SkillManager::unstrictLookup( const DLString &constName, Character *ch ) const
 {
     unsigned int i;
-    Indexes::const_iterator iter;
     const Skill *skill;
-    DLString name = constName.quote().getOneArgument();
+    DLString name = constName.toLower().quote().getOneArgument();
 
     if (name.empty( ))
         return -1;
     
-    // strict lookup
-    iter = indexes.find( name );
-    
-    if (iter != indexes.end( )) {
-        i = iter->second;
+    // Strict lookup: always return an exact match.
+    for (i = 0; i < table.size(); i++) {
         skill = (Skill *)*table[i];
-
-        if (!ch || skill->available( ch ))
+        if (skill->getName() == name || skill->getRussianName() == name) {
             return i;
+        }
     }
-    
-    // unstrict lookup by partial name , e.g. 'cur po' for 'cure poison'
+
+    // Unstrict lookup by partial name , e.g. 'cur po' for 'cure poison'.
     StringList argList(name);
 
     for (i = 0; i < table.size( ); i++) {
