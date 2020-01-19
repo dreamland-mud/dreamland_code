@@ -790,6 +790,12 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
             if (!room->isCommon())
                 continue;
 
+            if (!str_cmp(room->area->area_file->file_name, "galeon.are"))
+                continue;
+
+            if (room->sector_type == SECT_AIR)
+                continue;
+
             DLString desc = room->description;
             desc.colourStrip();
             desc.toLower();
