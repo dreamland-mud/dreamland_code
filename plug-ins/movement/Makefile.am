@@ -22,6 +22,7 @@ movetypes.cpp \
 portalmovement.cpp \
 roomhistory.cpp \
 terrains.cpp \
+doors.cpp \
 walkment.cpp \
 transfermovement.cpp \
 recallmovement.cpp \

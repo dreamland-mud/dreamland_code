@@ -72,63 +72,6 @@ static bool oprog_open_msg(Object *obj, Character *ch)
     return false;
 }
 
-void open_door_extra ( Character *ch, int door, void *pexit )
-{
-    EXIT_DATA *pexit_rev = 0;
-    int exit_info;
-    bool eexit = door == DIR_SOMEWHERE;
-    Room *room = ch->in_room;
-
-    if ( !pexit )
-            return;
-
-    exit_info = eexit?
-                    ((EXTRA_EXIT_DATA *) pexit)->exit_info
-            : ((EXIT_DATA *) pexit)->exit_info;
-
-    if ( !IS_SET(exit_info, EX_CLOSED) )
-    {
-            ch->println( "Здесь уже открыто." );
-            return;
-    }
-
-    if ( IS_SET(exit_info, EX_LOCKED) )
-    {
-            ch->println( "Здесь заперто." );
-            return;
-    }
-
-    REMOVE_BIT( eexit?
-                    ((EXTRA_EXIT_DATA *) pexit)->exit_info
-            : ((EXIT_DATA *) pexit)->exit_info, EX_CLOSED);
-
-    if ( eexit ) {
-        act( "$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
-        act( "Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
-    }
-    else {
-        const char *doorname = direction_doorname((EXIT_DATA *) pexit);
-        act( "$c1 открывает $N4.", ch, 0, doorname, TO_ROOM );
-        act( "Ты открываешь $N4.", ch, 0, doorname, TO_CHAR );
-    }
-
-
-    /* open the other side */
-    if (!eexit && (pexit_rev = direction_reverse(room, door)))
-    {
-            REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 открывается.", direction_doorname(pexit_rev));
-    }
-}
-
-void open_door ( Character *ch, int door )
-{
-    if ( door < 0 || door > 5 )
-            return;
-
-    open_door_extra( ch, door, ch->in_room->exit[door] );
-}
-
 bool open_portal( Character *ch, Object *obj )
 {
     if ( !IS_SET(obj->value[1], EX_ISDOOR) )
