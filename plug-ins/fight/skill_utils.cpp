@@ -7,6 +7,8 @@
 #include "calendar_utils.h"
 #include "skill.h"
 #include "affectflags.h"
+#include "dreamland.h"
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 
@@ -128,6 +130,21 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
     if (percent > skill->getAdept( ch ))
         return 'c';
     return 'x';
+}
+
+void print_wait_and_mana(const Skill *skill, PCharacter *ch, ostream &buf)
+{
+    int beat = skill->getBeats() / dreamland->getPulsePerSecond();
+    if (beat > 0)
+        buf << fmt(0, "Задержка при выполнении {C%1$d{x секунд%1$Iу|ы|. ", beat);
+
+    Spell::Pointer spell = skill->getSpell();
+    int mana = (spell && spell->isCasted( )) ? spell->getManaCost(ch) : skill->getMana();
+    if (mana > 0)
+        buf << fmt(0, "Расход маны {C%d{x. ", mana);
+
+    if (mana > 0 || beat > 0)
+        buf << endl;
 }
 
 void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf) 

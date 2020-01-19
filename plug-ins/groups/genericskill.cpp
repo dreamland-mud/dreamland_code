@@ -573,8 +573,10 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         << "входит в группу '{hg{c" 
         << getGroup()->getNameFor(ch) 
         << "{x'."
-        << endl
         << endl;
+
+    print_wait_and_mana(this, ch, buf);            
+    buf << endl;
     
     if (!visible( ch )) {
         if (!classes.empty())
