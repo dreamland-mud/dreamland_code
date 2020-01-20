@@ -629,12 +629,14 @@ CMDRUNP( sacrifice )
                     return;
                 }
 
-                if ( (  obj->item_type == ITEM_CORPSE_NPC  )
-                        && number_percent() < gsn_crusify->getEffective( ch ) )
-                {
+                if (obj->item_type == ITEM_CORPSE_NPC) {
+                    if (number_percent() < gsn_crusify->getEffective( ch )) {
                         mana_gain = ch->getModifyLevel();
                         gsn_crusify->improve( ch, true );
-                }         
+                    } else {
+                        gsn_crusify->improve( ch, false );
+                    }
+                } 
 
                 if ( ( silver=sacrifice_obj(ch, obj, true) )<0 )
                         return;

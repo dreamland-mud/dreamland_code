@@ -96,7 +96,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom );
 /*
  * "(english name)" for CONFIG_OBJNAME_HINT 
  */
-static void get_obj_name_hint( Object *obj, std::ostringstream &buf )
+void get_obj_name_hint( Object *obj, std::ostringstream &buf )
 {
     DLString name;
     unsigned int i;
@@ -755,11 +755,11 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
         return;
 
     if (IS_AFFECTED( victim, AFF_BLIND ))
-        str << "Похоже ничего не видит." << endl;
+        str << "Похоже, ничего не видит." << endl;
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
-        str << "Покрыт чумными язвочками." << endl;
+        str << "Покрыт%1$Gо||а чумными язвочками." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
-        str << "Отравлен." << endl;
+        str << "Отравлен%1$Gо||а." << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
         str << "Передвигается М Е Д Л Е Н  Н   О." << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
@@ -771,15 +771,16 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
     if (CAN_DETECT( victim, ADET_FEAR ))
         str << "Дрожит от страха." << endl;
     if (IS_AFFECTED( victim, AFF_CURSE ))
-        str << "Проклят." << endl;
+        str << "Проклят%1$Gо||а." << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_EVIL ))
-        str << "Защищен от зла" << endl;
+        str << "Защищен%1$Gо||а от зла" << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_GOOD ))
-        str << "Защищен от добра." << endl;
+        str << "Защищен%1$Gо||а от добра." << endl;
 
-    if (!str.str( ).empty( )) 
+    DLString details = str.str();
+    if (!details.empty()) 
         buf << endl << "Ты замечаешь важные детали:" << endl
-            << str.str( ) << endl;
+            << fmt(0, details.c_str(), victim) << endl;
 }
 
 /*
@@ -1248,7 +1249,7 @@ static void do_look_move( Character *ch, bool fBrief )
         if (eyes_darkened( ch ))
             ch->println( "Здесь слишком темно ... " );
         else
-            ch->printf( "{W%s{x", ch->in_room->name );
+            ch->printf( "{W%s{x\r\n", ch->in_room->name );
         return;
     }
 
@@ -1842,7 +1843,7 @@ CMDRUNP( exits )
                 found = true;
 
                 buf << fmt( ch, "%-6^s", ename ) 
-                    << " * (" << direction_doorname(pexit) << ")";
+                    << " * (" << russian_case(direction_doorname(pexit), '1') << ")";
 
                 if (ch->is_immortal())
                     buf << " (room " << room->vnum << ")";

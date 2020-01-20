@@ -1717,7 +1717,7 @@ CMDRUNP( search )
         }
     }
 
-    ch->println("Ты можешь искать только камни(stones).");
+    ch->println("Ты можешь искать только камни (stones).");
 }
 
 CMDRUNP( throw )

@@ -7,6 +7,7 @@
 #include "directions.h"
 #include "movetypes.h"
 #include "move_utils.h"
+#include "doors.h"
 
 #include "feniamanager.h"
 #include "wrapperbase.h"
@@ -184,17 +185,24 @@ bool ExitsMovement::checkClosedDoor( Character *wch )
         msgSelfRoom( wch,
                      "Через %4$N4 невозможно пройти насквозь.",
                      "%2$^C1 стукается лбом о %4$N4." );
+        return false;
     }
-    else {
-        if (IS_SET(exit_info, EX_LOCKED))
-            rc = RC_MOVE_PASS_NEEDED;
-        else
-            rc = RC_MOVE_CLOSED;
-            
-        msgSelfParty( wch,
-                      "%4$^N1: тут закрыто.",
-                      "%4$^N1: тут закрыто." );
+
+    if (IS_SET(exit_info, EX_LOCKED)) {
+        rc = RC_MOVE_PASS_NEEDED;
+    } else if (movetype == MOVETYPE_RUNNING) {
+        // Attempt to open closed door when running.
+        rc = RC_MOVE_CLOSED;
+        open_door(ch, door);
+        if (!IS_SET(pexit->exit_info, EX_CLOSED))
+            return true;
+    } else {
+        rc = RC_MOVE_CLOSED;
     }
+        
+    msgSelfParty( wch,
+                    "%4$^N1: тут закрыто.",
+                    "%4$^N1: тут закрыто." );
     
     return false;
 }
@@ -305,7 +313,7 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     wch->setWait( 4 );
     msgSelfRoom( wch,
                  "Твоя попытка просочиться сквозь %4$N4 закончилась неудачей.", 
-                 "%2$C1 стукается лбом о %4$N4." );
+                 "%2$^C1 стукается лбом о %4$N4." );
     return false;
 }
 

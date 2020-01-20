@@ -84,7 +84,10 @@ static const RussianString & object_name()
 static RussianString russian_string(PCMemoryInterface *pc)
 {
     MultiGender mg = MultiGender(pc->getSex(), Number::SINGULAR);
-    return RussianString(pc->getRussianName().getFullForm(), mg);
+    if (pc->getRussianName().getFullForm().empty())
+        return RussianString(pc->getName(), mg);
+    else
+        return RussianString(pc->getRussianName().getFullForm(), mg);
 }
 
 // Finds random registered player and returns its name+gender.

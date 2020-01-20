@@ -246,6 +246,11 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
     }
 
+    if (!skill->available(ch)) {
+        ch->printf("Умение '%s' тебе не доступно.\r\n", skill->getNameFor(ch).c_str());
+        return;
+    }
+
     sname = skill->getNameFor(ch).c_str();
 
     if (!skill->canPractice( ch, buf )) {

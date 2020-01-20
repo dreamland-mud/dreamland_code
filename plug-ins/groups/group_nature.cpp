@@ -170,10 +170,16 @@ static bool has_water_around( Character *ch )
 {
     if (IS_WATER(ch->in_room))
         return true;
-    
+
+    if (ch->in_room->sector_type == SECT_UNDERWATER)
+        return true;
+
     if (!IS_OUTSIDE(ch))
         return false;
-    
+   
+    if (IS_SET(ch->in_room->room_flags, ROOM_NEAR_WATER))
+        return true;
+ 
     if (weather_info.sky >= SKY_RAINING)
         return true;
 
@@ -197,7 +203,7 @@ VOID_SPELL(Hydroblast)::run( Character *ch, Character *victim, int sn, int level
     act("Молекулы воды вокруг $c2 собираются вместе, образуя кулак.", ch, 0, 0, TO_ROOM);
     act("Молекулы воды вокруг тебя собираются вместе, образуя кулак.", ch, 0, 0, TO_CHAR);
     dam = dice( level , 14 );
-    damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL);
+    damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL|DAMF_WATER);
 }
 
 /*

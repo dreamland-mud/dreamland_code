@@ -19,9 +19,8 @@
 #include "directions.h"
 #include "terrains.h"
 #include "move_utils.h"
+#include "doors.h"
 
-void open_door_extra ( Character *ch, int door, void *pexit );
 bool open_portal( Character *, Object * );
-void open_door( Character *, int );
 
 #endif

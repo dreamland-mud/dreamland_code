@@ -24,6 +24,9 @@ WEARLOC(hold_leg);
 /* visibility on a room -- for entering and exits */
 bool Character::can_see( Room *pRoomIndex ) const
 {
+	if (!pRoomIndex)
+		return false;
+
         if ( IS_SET(pRoomIndex->room_flags, ROOM_IMP_ONLY)
                 && get_trust() < MAX_LEVEL )
                 return false;

@@ -739,7 +739,7 @@ CMDRUNP( consider )
     diff = victim->getModifyLevel() - ch->getModifyLevel();
 
          if ( diff <= -10 ) msg = "Ты можешь убить $C4 даже без оружия.";
-    else if ( diff <=  -5 ) msg = "$C1 не соперник тебе.";
+    else if ( diff <=  -5 ) msg = "$C1 не соперн$Gик|ик|ица тебе.";
     else if ( diff <=  -2 ) msg = "Ты похоже легко убьешь $C4.";
     else if ( diff <=   1 ) msg = "Прекрасный поединок!";
     else if ( diff <=   4 ) msg = "$C1 говорит 'Чувствуешь удачу, шпана?'.";
@@ -2747,11 +2747,18 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
             if (obj->value[1] > 0) sips +=1;
         }
 
-        buf << "Содержит " 
-            << liquid->getShortDescr( ).ruscase( '4' ) << " "
-            << liquid->getColor( ).ruscase( '2' ) 
-            << " цвета. Осталось " << sips 
-            << " из "  << sipsf << " глотков." << endl;
+        if (obj->value[1] > 0)
+            buf << "Содержит " 
+                << liquid->getShortDescr( ).ruscase( '4' ) << " "
+                << liquid->getColor( ).ruscase( '2' ) 
+                << " цвета. Осталось " << sips 
+                << " из "  << sipsf << " глотков." << endl;
+        else
+            buf << "Видны следы "
+                << liquid->getShortDescr( ).ruscase( '2' ) << " "
+                << liquid->getColor( ).ruscase( '2' ) << " цвета. " 
+                << fmt(0, "Объем емкости %1$d глот%1$Iок|ка|ков.", sipsf) << endl;
+
         break;
 
     case ITEM_CONTAINER:

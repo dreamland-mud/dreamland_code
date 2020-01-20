@@ -643,7 +643,10 @@ void Katana::wear( Character *ch )
         && obj->extra_descr->description
         && strstr( obj->extra_descr->description, ch->getNameP( ) ) != 0)
   {
-   ch->send_to("Ты ощущаешь СВОЮ катану, как часть себя!\n\r");
+    if (obj->getRealShortDescr())
+        ch->pecho("Ты ощущаешь %O4 как часть себя!", obj);
+    else
+        ch->send_to("Ты ощущаешь СВОЮ катану, как часть себя!\n\r");
   }
 }
 

@@ -219,7 +219,7 @@ SKILL_RUNP( endure )
 
   if ( gsn_endure->getEffective( ch ) <= 1 )
   {
-      ch->pecho( "Похоже ты не так выносли%Gво|в|ва, как о себе думаешь.", ch );
+      ch->pecho("Похоже, ты не так вынослив%Gо||а, как о себе думаешь.", ch);
       return;
     }
 

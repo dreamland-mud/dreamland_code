@@ -31,6 +31,7 @@ protected:
 
     void resolveAll( );
     void unresolveAll( );
+    void dumpCSV();
 };
 
 #endif

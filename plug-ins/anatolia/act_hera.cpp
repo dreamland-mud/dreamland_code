@@ -232,8 +232,8 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                sprintf (buf, "Ставок не получено - %s{Y снят с аукциона{x.",auction->item->getShortDescr( '1' ).c_str( ));
-                talk_auction(buf);
+                DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а с аукциона{x.", auction->item);
+                talk_auction(msg.c_str());
 
                 act_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
@@ -336,10 +336,10 @@ CMDRUNP( auction )
                         }
 
                         if  (obj->item_type == ITEM_WEAPON) {
-                                ch->printf("Тип оружия: %s (%s)\r\n",
+                                ch->printf("Тип оружия: %s (%s), среднее повреждение %d.\r\n",
                                            weapon_class.message(obj->value[0] ).c_str( ),
-                                           weapon_class.name( obj->value[0] ).c_str( )
-                                          );
+                                           weapon_class.name( obj->value[0] ).c_str( ),
+                                          (1 + obj->value[2]) * obj->value[1] / 2);
                         }
 
                         return;

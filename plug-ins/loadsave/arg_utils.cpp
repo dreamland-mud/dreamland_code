@@ -195,17 +195,18 @@ bool arg_is_money( const DLString &arg )
 
 bool arg_is_alldot( const DLString &arg )
 {
-    return arg == "all" 
-           || arg == "все" 
-           || arg == "всё" 
-           || !str_prefix( "all.", arg.c_str( ) )
-           || !str_prefix( "все.", arg.c_str( ) )
-           || !str_prefix( "всё.", arg.c_str( ) );
+    DLString larg = arg.toLower();
+    return arg ^ "all" 
+           || arg ^ "все" 
+           || arg ^ "всё" 
+           || !str_prefix( "all.", larg.c_str( ) )
+           || !str_prefix( "все.", larg.c_str( ) )
+           || !str_prefix( "всё.", larg.c_str( ) );
 }
 
 bool arg_is_all( const DLString &arg )
 {
-    return arg == "all" || arg == "все" || arg == "всё"; 
+    return arg ^ "all" || arg ^ "все" || arg ^ "всё"; 
 }
 
 bool arg_is_clear( const DLString &arg )

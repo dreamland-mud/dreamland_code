@@ -52,6 +52,9 @@ Character * BasicMobileBehavior::findCastVictim( )
         
         if (ch->fighting == rch && chHpPercent < 25)
             return rch;
+
+        if (ch->fighting == rch && IS_AFFECTED(ch, AFF_BLIND))
+            return rch;
         
         if (!victim)
             switch_chance = 100;

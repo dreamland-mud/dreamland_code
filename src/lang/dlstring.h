@@ -330,7 +330,7 @@ public:
         DLString& capitalize( );
 
         /** case-insensitive, full-word-match search of subword */
-        bool isName( const DLString & msg);
+        bool isName( const DLString & msg) const;
         DLString &substitute( char, char );
 
         DLString substitute( char, const char *) const;

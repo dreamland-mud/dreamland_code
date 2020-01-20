@@ -20,7 +20,7 @@ static const char * consume_keyword(const char *desc, DLString &keyword)
 {
     const char *d;
     for (d = desc; *d && *d != ')'; ++d) {
-        if (!isspace(*d) && !isalpha(*d)) {
+        if (!isspace(*d) && !isalpha(*d) && *d != '-') {
             // Doesn't look like part of a keyword anymore, interrupt.
             break;
         }

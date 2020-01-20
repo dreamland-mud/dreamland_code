@@ -156,7 +156,12 @@ bool RecallMovement::applyMovepoints( )
 
 bool RecallMovement::checkSameRoom( )
 {
-    return from_room != to_room;
+    if (from_room == to_room) {
+        ch->pecho("Но ты уже здесь!");
+        return false;
+    }
+
+    return true;
 }
 
 void RecallMovement::moveFollowers( Character *wch ) 

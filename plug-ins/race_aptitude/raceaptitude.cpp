@@ -123,6 +123,8 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     default: buf << "рас "; break;
     }
     buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
+
+    print_wait_and_mana(this, ch, buf);    
     
     if (!visible( ch )) {
         print_see_also(this, ch, buf);

@@ -11,6 +11,7 @@
 #include "loadsave.h"
 #include "infonet.h"
 #include "messengers.h"
+#include "arg_utils.h"
 #include "act.h"
 #include "merc.h"
 #include "def.h"
@@ -55,14 +56,15 @@ CMDRUN( selfrate )
         return;
     }
 
-    if (arg == "newbie" ) 
+
+    if (arg_oneof_strict(arg, "newbie", "ньюби"))
         rate = 0;
-    else if (arg == "expert" || arg == "experienced" )
+    else if (arg_oneof_strict(arg, "expert", "эксперт"))
         rate = 1;
-    else if (arg == "guru" )
+    else if (arg_oneof_strict(arg, "guru", "гуру"))
         rate = 2;
     else {
-        pch->printf( "Выбери, кто ты: newbie, expert или guru.\r\n" );
+        pch->printf( "Выбери, кто ты: {lRньюби, эксперт или гуру{lEnewbie, expert или guru{x.\r\n" );
         return;
     }
 

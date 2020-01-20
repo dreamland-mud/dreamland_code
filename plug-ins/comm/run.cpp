@@ -221,15 +221,18 @@ void SpeedWalkUpdateTask::run( PCharacter *ch )
     }
 
     if (ch->fighting || ch->position < POS_STANDING) {
-        attributes.eraseAttribute( "speedwalk" );
+        walk->show(ch);
+        attributes.eraseAttribute( "speedwalk" );        
         return;
     }
     
     if (ch->wait > 0)
         return;
 
-    if (RunMovement( ch, walk ).move( ) != RC_MOVE_OK || walk->isEmpty( )) 
-        attributes.eraseAttribute( "speedwalk" );
+    if (RunMovement( ch, walk ).move( ) != RC_MOVE_OK || walk->isEmpty( )) {
+        walk->show(ch);
+        attributes.eraseAttribute( "speedwalk" );        
+    }
 }
 
 void SpeedWalkUpdateTask::after( )
@@ -240,6 +243,42 @@ void SpeedWalkUpdateTask::after( )
 /*-----------------------------------------------------------------------------
  * XMLAttributeSpeedWalk 
  *----------------------------------------------------------------------------*/
+
+/** Display remaining path to the player, if any. */
+void XMLAttributeSpeedWalk::show(PCharacter *ch) const
+{
+    if (path.empty())
+        return;
+
+    // Speedwalk is kept in enhanced mode: replace nnn with 3n.
+    DLString collated;
+    char last_letter = path.at(0);
+    int cnt = 0;
+
+    for (size_t i = 0; i < path.size(); i++) {
+        if (path.at(i) == last_letter && isSmallLetter(last_letter)) {
+            cnt++;
+        } else {
+            if (cnt > 1) // Don't show '1n', just 'n'.
+                collated << cnt;
+            collated << last_letter;
+            last_letter = path.at(i);
+            cnt = 1;
+        }
+    }
+
+    // Add last remaining letter from the path.
+    if (cnt > 1)
+        collated << cnt;
+    collated << last_letter;
+    
+    if (ch->isCoder())
+        ch->printf("Развернутый маршрут: %s\r\n", path.c_str());
+
+    if (!collated.empty())
+        ch->printf("Тебе оставалось бежать: {c%s{x.\r\n", collated.c_str());
+}
+
 char XMLAttributeSpeedWalk::getFirstCommand( ) const
 {
     if (path.getValue( ).empty( ))

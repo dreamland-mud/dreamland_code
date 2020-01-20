@@ -13,6 +13,7 @@
 #include "object.h"
 #include "npcharacter.h"
 #include "dreamland.h"
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -208,6 +209,8 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
     }
 
     buf << "." << endl; 
+
+    print_wait_and_mana(this, ch, buf);
 
     if (!visible( ch )) {
         print_see_also(this, ch, buf);

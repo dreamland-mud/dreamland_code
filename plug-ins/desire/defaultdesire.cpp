@@ -110,6 +110,9 @@ void DefaultDesire::gain( PCharacter *ch, int value )
     if (IS_GHOST( ch ))
         return;
 
+    if (!ch->desc)
+        return;
+
     wasActive = isActive( ch );
     oldDesire = ch->desires[getIndex( )];
     desire = URANGE( (int)minValue, oldDesire + value, (int)maxValue );
