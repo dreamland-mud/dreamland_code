@@ -5,11 +5,12 @@
 #include "defaultprofession.h"
 #include "profflags.h"
 
+#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
 #include "alignment.h"
 #include "room.h"
-#include "race.h"
+#include "pcrace.h"
 #include "merc.h"
 #include "def.h"
 
@@ -91,8 +92,29 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     in << endl;
 
     in << "{cДоп. опыт{x : " << prof->getPoints( ) << endl;
-        
-    in << endl << "{cБонус к уровню вещей{x: ";
+
+    StringList noraces, races;
+    for (int i = 0; i < raceManager->size(); i++) {
+        Race *race = raceManager->find(i);
+        if (race->isPC()) {
+            if (race->getPC()->getClasses()[prof->getIndex()] <= 0)
+                noraces.push_back(race->getMltName().ruscase('2'));
+            else
+                races.push_back(race->getMltName().ruscase('1'));
+        }
+    }
+    in << "{cРасы      {x: ";
+    if (noraces.empty())
+        in << "все";
+    else if (races.size() < noraces.size() || noraces.size() > 5)
+        in << "только " << races.join(", ");
+    else if (!races.empty())
+        in << "все, кроме " << noraces.join(", ");
+    else
+        in << "никто";
+    in << endl;
+    
+    in << "{cБонус к уровню вещей{x: ";
     if (prof->getIndex( ) == prof_universal) {
         in << " (зависит от выбранной профессии)";
     } else {
