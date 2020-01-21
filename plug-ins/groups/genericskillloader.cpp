@@ -60,7 +60,7 @@ void GenericSkillLoader::dumpCSV()
             profs.push_back(prof->getName());
         }
     }
-    buf << "name," << profs.join(",") << endl;
+    buf << "name,group," << profs.join(",") << endl;
 
     // Body: armor,,1,1,...
     for (LoadedList::iterator e = elements.begin( ); e != elements.end( ); e++) {
@@ -84,7 +84,7 @@ void GenericSkillLoader::dumpCSV()
         }
 
         if (found)
-            buf << skill->getName() << levels.str() << endl;
+            buf << skill->getName() << "," << skill->getGroup()->getName() << levels.str() << endl;
     }
 
     try {
