@@ -12,6 +12,7 @@
 
 class HelpContainer;
 
+/** A simple help article defined in one of the files in /help folder. */
 class GenericHelp : public MarkupHelpArticle {
 public:
     typedef XMLPointer<GenericHelp> Pointer;    
@@ -24,7 +25,8 @@ public:
 protected:
     ::Pointer<HelpContainer> container;
 };
- 
+
+ /** A collection of articles from the /help folder. */
 class HelpContainer : public XMLListContainer<GenericHelp::Pointer>,
                       public XMLTableElement
 {

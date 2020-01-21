@@ -35,6 +35,7 @@ using namespace Scripting;
 using namespace std;
 
 bool has_fenia_security( PCharacter *pch );
+bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
 
 static bool cs_by_subj(PCharacter *ch, const DLString &arg, id_t &csid)
 {
@@ -164,28 +165,20 @@ CMDADM( codesource )
             return;
         }
 
+        DLString lineFormat = "[" + web_cmd(ch, "cs web $1", "%5d") + "] {g%8s{x: %-36s {D(%d функц.){x\r\n";
+
         buf << "Сценарии, содержащие '" << args << "':" << endl;
         
         for(i = CodeSource::manager->begin( );i != CodeSource::manager->end( ); i++) {
             ostringstream matchBuf;
-            stringstream lines(i->content);
-            DLString line;            
-            int num = 0;
-
-            while (std::getline(lines, line, '\n')) {
-                num++;
-                if (line.find(args) != string::npos) {
-                    line.replaces(args, highlight + args + "{x");
-                    matchBuf << dlprintf("{D%3d{x ", num) << line << "\r\n";
-                }
-            }
-
-            DLString match = matchBuf.str();
-            if (!match.empty()) {
-                buf << dlprintf("[%5u] {g%8s{x: {G%-36s {D(%d функц.){x",
-                                i->getId(), i->author.c_str(), i->name.c_str(), i->functions.size())
-                    << endl
-                    << match
+            
+            if (text_match_with_highlight(i->content, args, matchBuf)) {
+                buf << fmt( 0, lineFormat.c_str(), 
+                        i->getId(),
+                        i->author.c_str( ), 
+                        i->name.c_str( ),
+                        i->functions.size( ))
+                    << matchBuf.str()
                     << endl;
             }
         }
