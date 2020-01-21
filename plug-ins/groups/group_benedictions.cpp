@@ -330,31 +330,30 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
         if (spellbane( ch, gch ))
             continue;
 
-        if( gch->isAffected(gsn_armor ) ) {
+        if( !gch->isAffected(gsn_armor ) ) {
+            af.where     = TO_AFFECTS;
+            af.type      = gsn_armor;
+            af.level     = level;
+            af.duration  = level;
+            af.location  = APPLY_AC;
+            af.modifier  = -20;
+            affect_to_char( gch, &af );
+
+            act("Священная броня окружает тебя.", gch, 0, 0, TO_CHAR);
+            if( ch != gch )
+                act("Священная броня окружает $C4.", ch, 0, gch, TO_CHAR);
+        } else {
             if( gch == ch)
-                act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
+               act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
             else
                 act("$C1 уже защище$Gно|н|на заклинанием брони.", ch, 0, gch, TO_CHAR);
-            continue;
         }
 
-        af.where     = TO_AFFECTS;
-        af.type      = gsn_armor;
-        af.level     = level;
-        af.duration  = level;
-        af.location  = APPLY_AC;
-        af.modifier  = -20;
-        affect_to_char( gch, &af );
-
-        act("Священная броня окружает тебя.", gch, 0, 0, TO_CHAR);
-        if( ch != gch )
-            act("Священная броня окружает $C4.", ch, 0, gch, TO_CHAR);
-        
         if( gch->isAffected(gsn_shield ) )
-        {
-          if (gch == ch)
+            {
+            if (gch == ch)
               act("Ты уже защище$gно|н|на заклинанием щита.", ch, 0, 0, TO_CHAR);
-          else
+            else
               act("$C1 уже защище$Gно|н|на заклинанием щита.", ch, 0, gch, TO_CHAR);
           continue;
         }
