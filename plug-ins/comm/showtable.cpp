@@ -84,27 +84,27 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         DLString cat = cmd->getCommandCategory().messages().toLower();
         if (cat.empty())
             cat = "(нет)";
-        buf << "Категория {c" << cat << "{x";
+        buf << "Категория {W" << cat << "{x";
 
         bitstring_t extra = cmd->getExtra();
         REMOVE_BIT(extra, CMD_HIDDEN|CMD_IMPORTANT|CMD_NO_INTERPRET);
-        buf << ", можно выполнить {c";
+        buf << ", можно выполнить {W";
         switch (cmd->getPosition().getValue()) {
             default: buf << "всегда"; break;
-            case POS_STANDING: buf << "стоя"; break;
+            case POS_STANDING: buf << "только стоя и вне боя"; break;
             case POS_FIGHTING: buf << "сражаясь"; break;
             case POS_SITTING: buf << "сидя"; break;
             case POS_RESTING: buf << "на отдыхе"; break;
             case POS_SLEEPING: buf << "во сне"; break;
         }
         
-        buf << "{x" << endl;
+        buf << ".{x" << endl;
 
         buf << "Эта команда {W" << (extra > 0 ? command_flags.messages(extra, true) : "без особенностей") << "{x";
         if (cmd->getOrder().getValue() != 0)
             buf << ", приказы примут {W" << cmd->getOrder().messages(true) << "{x";
 
-        buf << endl << endl;             
+        buf << "." << endl << endl;             
     }
 
     if (found)
