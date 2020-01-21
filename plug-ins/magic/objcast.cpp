@@ -350,7 +350,7 @@ CMDRUNP( zap )
     DLString args = argument;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->pecho("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!\n\r");
+        ch->pecho("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!", ch);
         return;
     }
 
