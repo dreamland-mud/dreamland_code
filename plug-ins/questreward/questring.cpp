@@ -59,7 +59,6 @@ void QuestRing::addAffect( Character *ch, Affect *paf )
     bool caster = ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER);
     bool fighter = !caster;
     bool evil = IS_EVIL(ch);
-    bool good = IS_GOOD(ch);
     bool neutral = IS_NEUTRAL(ch);
 
     int mod = 0;

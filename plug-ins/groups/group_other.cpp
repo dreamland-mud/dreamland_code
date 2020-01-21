@@ -131,7 +131,7 @@ VOID_SPELL(Kassandra)::run( Character *ch, Character *, int sn, int level )
 { 
     if ( ch->isAffected(sn ) )
       {
-        ch->send_to("Ты совсем недавно пользовался этим заклинанием.\n\r");
+        ch->pecho("Ты совсем недавно пользовал%1$Gось|ся|ась этим заклинанием.", ch );
         return;
       }
 
