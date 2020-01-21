@@ -84,7 +84,7 @@ VOID_SPELL(ImprovedInvis)::run( Character *ch, Character *victim, int sn, int le
     }
 
     if (IS_AFFECTED(ch, AFF_FAERIE_FIRE)) {
-        ch->send_to("Ты не можешь стать совсем невидимым, когда светишься.\r\n");
+        ch->pecho("Ты не можешь стать совсем невидим%1$Gым|ым|ой, когда светишься.", ch);
         return;
     }
 
