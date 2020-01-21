@@ -28,7 +28,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "dreamland.h"
 #include "act_move.h"
@@ -40,7 +40,7 @@
 #include "clanreference.h"
 #include "vnum.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
 #include "def.h"
@@ -88,8 +88,8 @@ CMDRUNP( quaff )
         return;
     }
 
-    if (ch->getModifyLevel( ) < obj->level) {
-        ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить ее.", ch);
+      if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+        ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
         return;
     }
 
@@ -141,7 +141,7 @@ CMDRUNP( recite )
         return;
     }
 
-    if (get_wear_level( ch, scroll ) > ch->getModifyLevel( )) {
+    if (get_wear_level( ch, scroll ) > ch->getRealLevel( )) {
         ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
         return;
     }
@@ -265,8 +265,7 @@ CMDRUNP( brandish )
         act( "$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
         act( "Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
 
-        if (ch->getModifyLevel( ) + 3 < staff->level
-            || number_percent( ) >= gsn_staves->getEffective( ch ))
+        if ( number_percent( ) >= gsn_staves->getEffective( ch ))
         {
             act_p("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR,POS_RESTING);
             act_p("...и ничего не происходит.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -351,7 +350,7 @@ CMDRUNP( zap )
     DLString args = argument;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Ты должен уничтожать магию, а не использовать её!\n\r");
+        ch->pecho("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!\n\r");
         return;
     }
 

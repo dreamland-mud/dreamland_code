@@ -1271,21 +1271,20 @@ CMDRUNP( identify )
     //add guru checks?
     if ( remorts == 0) {
         cost = round ((ch->getRealLevel( ) - cost) * 0.66);
-        if (cost < 0) cost = 0;
-        if (cost > 20) cost = 20;
+        cost = URANGE (0, cost, 20);
     }
 
 
     if (ch->is_immortal( )) {
         act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
     }
-    else if (ch->gold < 20) {
-        tell_dim( ch, rch, "У тебя даже 20 золотых нету, чтобы мне заплатить!" );
+    else if (ch->gold < cost) {
+        tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );
         return;
     }
     else {
-       ch->gold -= 20;
-       ch->send_to("Твой кошелек становится значительно легче.\n\r");
+       ch->gold -= cost;
+       if ( cost > 0 ) ch->send_to("Твой кошелек становится значительно легче.\n\r");
     }
 
     act_p( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
