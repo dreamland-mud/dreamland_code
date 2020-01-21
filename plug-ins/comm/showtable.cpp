@@ -61,7 +61,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         return;
     }
 
-    buf << "Найдены такие команды:" << endl;
+    buf << "Найдены такие команды:" << endl << endl;
 
     for (c = commands.getCommands( ).begin( ); c != commands.getCommands( ).end( ); c++) {
         ostringstream aliases;
@@ -75,13 +75,36 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         
         found = true;
         show_aliases( cmd, aliases );
+        buf << "Команда {c" << cmd->getName() << "{x, {c" << cmd->getRussianName() << "{x: "
+            << cmd->getHint() << endl;
 
-        buf << fmt( 0, "{c%-12s {x: {c%s %s{x\r\n%-12s   %s\r\n",
-                       cmd->getName( ).c_str( ),
-                       cmd->getRussianName( ).c_str( ),
-                       aliases.str( ).c_str( ),
-                       " ",
-                       cmd->getHint( ).c_str( ) );
+        if (!aliases.str().empty())
+            buf << "Синонимы: {D" << aliases.str() << "{x" << endl;
+
+        DLString cat = cmd->getCommandCategory().messages().toLower();
+        if (cat.empty())
+            cat = "(нет)";
+        buf << "Категория {c" << cat << "{x";
+
+        bitstring_t extra = cmd->getExtra();
+        REMOVE_BIT(extra, CMD_HIDDEN|CMD_IMPORTANT|CMD_NO_INTERPRET);
+        buf << ", можно выполнить {c";
+        switch (cmd->getPosition().getValue()) {
+            default: buf << "всегда"; break;
+            case POS_STANDING: buf << "стоя"; break;
+            case POS_FIGHTING: buf << "сражаясь"; break;
+            case POS_SITTING: buf << "сидя"; break;
+            case POS_RESTING: buf << "на отдыхе"; break;
+            case POS_SLEEPING: buf << "во сне"; break;
+        }
+        
+        buf << "{x" << endl;
+
+        buf << "Эта команда {W" << (extra > 0 ? command_flags.messages(extra, true) : "без особенностей") << "{x";
+        if (cmd->getOrder().getValue() != 0)
+            buf << ", приказы примут {W" << cmd->getOrder().messages(true) << "{x";
+
+        buf << endl << endl;             
     }
 
     if (found)
