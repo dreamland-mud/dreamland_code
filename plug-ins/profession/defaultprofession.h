@@ -43,6 +43,30 @@ inline const DLString & ProfessionHelp::getType( ) const
 {
     return TYPE;
 }
+
+/** An article that automatically displays all skills of a certain class. */
+class ClassSkillHelp : public MarkupHelpArticle {
+public:
+    typedef ::Pointer<ClassSkillHelp> Pointer;    
+
+    virtual void setProfession( ::Pointer<DefaultProfession> prof );
+    virtual void unsetProfession( );
+
+    virtual const DLString & getType( ) const;
+    static const DLString TYPE;
+    virtual DLString getTitle(const DLString &label) const;
+    virtual void getRawText( Character *, ostringstream & ) const;
+    virtual void save() const;
+
+protected:
+    ::Pointer<DefaultProfession> prof;
+};
+ 
+inline const DLString & ClassSkillHelp::getType( ) const
+{
+    return TYPE;
+}
+
 /*
  * ProfessionTitles
  */
@@ -109,6 +133,7 @@ class DefaultProfession : public Profession,
                           public XMLVariableContainer 
 {
 XML_OBJECT
+friend class ProfessionHelp;
 public:
     typedef ::Pointer<DefaultProfession> Pointer;
     
@@ -166,6 +191,7 @@ protected:
     XML_VARIABLE XMLFlags ethos;
     XML_VARIABLE XMLFlags sex;
     XML_VARIABLE XMLPointerNoEmpty<ProfessionHelp> help;
+    XML_VARIABLE XMLPointerNoEmpty<ClassSkillHelp> skillHelp;
 };
 
 inline const DLString & DefaultProfession::getName( ) const

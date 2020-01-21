@@ -8,6 +8,9 @@
 #include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
+#include "skillmanager.h"
+#include "skill.h"
+#include "skillgroup.h"
 #include "alignment.h"
 #include "room.h"
 #include "pcrace.h"
@@ -15,8 +18,84 @@
 #include "def.h"
 
 PROF(universal);
+GROUP(ancient_languages);
+GROUP(card_pack);
+GROUP(tattoo_master);
 
 static const DLString LABEL_CLASS = "class";
+
+const DLString ClassSkillHelp::TYPE = "ClassSkillHelp";
+
+DLString ClassSkillHelp::getTitle(const DLString &label) const
+{
+    if (prof)
+        return "умения " + prof->getRusName().ruscase('2');
+
+    return HelpArticle::getTitle(label);
+}
+
+void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
+{
+    in << "Умения и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
+       << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
+        
+    in << *this;
+
+    PCharacter dummy;
+    dummy.setLevel(100);
+    dummy.setProfession(prof->getName());
+
+    // Group all skills by the level they become available to this class.
+    map<int, StringList> myskills;
+    for (int i = 0; i < skillManager->size(); i++) {
+        Skill *skill = skillManager->find(i);
+        int mylevel = skill->getLevel(&dummy);
+
+        if (mylevel > LEVEL_MORTAL)
+            continue;
+        
+        if (skill->getGroup() == group_ancient_languages 
+            || skill->getGroup() == group_card_pack
+            || skill->getGroup() == group_tattoo_master)
+            continue;
+
+        DLString color = skill->visible(ch) ? "{g" : "{w";
+        myskills[mylevel].push_back(color + skill->getNameFor(ch) + "{x");
+    }
+
+    // Output skills highlighting those available to this player in green.
+    for (auto &pair: myskills) {
+        in << "Уровень {C" << pair.first << "{x: " << pair.second.join(", ") << endl;
+    }
+}
+
+void ClassSkillHelp::save() const
+{
+    if (prof)
+        prof->save();
+}
+
+void ClassSkillHelp::setProfession( DefaultProfession::Pointer prof )
+{
+    this->prof = prof;
+    
+    addAutoKeyword(prof->getName( ) + " skills");
+    addAutoKeyword("умения " + prof->getRusName().ruscase('2'));
+    addAutoKeyword("умения " + prof->getMltName().ruscase('2'));
+    labels.addTransient(LABEL_CLASS);
+
+    helpManager->registrate( Pointer( this ) );
+}
+
+void ClassSkillHelp::unsetProfession( )
+{
+    helpManager->unregistrate( Pointer( this ) );
+    prof.clear( );
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
+}
 
 /*-------------------------------------------------------------------
  * ProfessionHelp 
@@ -61,7 +140,8 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << "Профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
-       << prof->getName( ) << "{x" << endl << endl;
+       << prof->getName( ) << "{x" 
+       << editButton(ch) << endl << endl;
         
     in << *this << endl;
 
@@ -131,7 +211,11 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 
     in << endl;
-    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,профессия характеристики)]" << endl;
+    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,профессия характеристики)]. ";
+    if (prof->skillHelp && prof->skillHelp->getID() > 0)
+        in << "%SA% %H% [(" << prof->getName() << " skills,умения " 
+           << prof->getRusName().ruscase('2') << ")].";
+    in << endl;
 }
 
 /*-------------------------------------------------------------------
@@ -177,12 +261,18 @@ void DefaultProfession::loaded( )
 
     if (help)
         help->setProfession( Pointer( this ) );
+
+    if (skillHelp)
+        skillHelp->setProfession(Pointer(this));
 }
 
 void DefaultProfession::unloaded( )
 {
     if (help)
         help->unsetProfession( );
+
+    if (skillHelp)
+        skillHelp->unsetProfession();
 
     professionManager->unregistrate( Pointer( this ) );
 }
