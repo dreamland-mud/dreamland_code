@@ -59,7 +59,7 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
             || skill->getGroup() == group_tattoo_master)
             continue;
 
-        DLString color = skill->visible(ch) ? "{g" : "{w";
+        DLString color = ch && skill->visible(ch) ? "{g" : "{w";
         myskills[mylevel].push_back(color + skill->getNameFor(ch) + "{x");
     }
 

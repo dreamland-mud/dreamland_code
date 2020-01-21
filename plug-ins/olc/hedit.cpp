@@ -10,12 +10,15 @@
 
 #include "merc.h"
 #include "arg_utils.h"
+#include "act.h"
+#include "comm.h"
 #include "websocketrpc.h"
 #include "interp.h"
 #include "mercdb.h"
 #include "def.h"
 
 extern void help_save_ids();
+bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf);
 
 OLC_STATE(OLCStateHelp);
 
@@ -185,6 +188,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
     if (args.empty()) {
         stc("Формат:  hedit ключевые слова\r\n", ch);
         stc("         hedit <id>\r\n", ch);
+        stc("         hedit search <text>\r\n", ch);
         return;
     }
 
@@ -194,8 +198,27 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             stc("Справка с таким ID не найдена.\r\n", ch);
             return;
         }
-    }
-    else {
+    } else if (DLString("search").strPrefix(args)) {
+        ostringstream buf;
+        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
+
+        args.getOneArgument();
+
+        buf << "Статьи справки, содержащие '" << args << "{x': " << endl;
+        for (auto &a: helpManager->getArticles()) {
+            ostringstream matchBuf;
+
+            if (text_match_with_highlight(a->c_str(), args, matchBuf)) {
+                buf << fmt( 0, lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str())
+                    << matchBuf.str()
+                    << endl;
+            }
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+
+    } else {
         list<HelpArticle::Pointer> matches = help_find_by_keywords(args);
 
         if (matches.size() == 0) {

@@ -13,6 +13,7 @@
 #include "room.h"
 
 #include "descriptor.h"
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -978,3 +979,22 @@ Profession * find_prof_unstrict( const DLString &className)
     return NULL;
 }
 
+bool text_match_with_highlight(const DLString &text, const DLString &args, ostringstream &matchBuf)
+{
+    static DLString highlight("{R");    
+    stringstream lines(text);
+    DLString line;            
+    int num = 0;
+    bool found = false;
+
+    while (std::getline(lines, line, '\n')) {
+        num++;
+        if (line.find(args) != string::npos) {
+            line.replaces(args, highlight + args + "{w");
+            matchBuf << dlprintf("{D%3d{x ", num) << line << "\r\n";
+            found = true;
+        }
+    }
+
+    return found;
+}

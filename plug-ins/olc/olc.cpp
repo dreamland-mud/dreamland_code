@@ -1257,20 +1257,8 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "savehelp") {
-        HelpArticles::const_iterator a;
-
-        int max_id = 0;
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++)
-            if ((*a)->getID() > max_id)
-                max_id = (*a)->getID();
-
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if ((*a)->getID() <= 0) {
-                const_cast<HelpArticle *>(**a)->setID(++max_id);
-                (*a)->save();
-            }
-        }
+    if (arg == "maxhelp") {
+        ch->printf("Max help ID is %d.\r\n", helpManager->getLastID());
         return;
     }
 
