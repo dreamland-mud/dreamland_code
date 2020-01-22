@@ -3,6 +3,7 @@
 #include <commandmanager.h>
 #include "room.h"
 #include "areahelp.h"
+#include "helpcontainer.h"
 
 #include "hedit.h"
 #include "olc.h"
@@ -188,7 +189,8 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
     if (args.empty()) {
         stc("Формат:  hedit ключевые слова\r\n", ch);
         stc("         hedit <id>\r\n", ch);
-        stc("         hedit search <text>\r\n", ch);
+        stc("         hedit create         - создать новую пустую статью справки\r\n", ch);
+        stc("         hedit search <text>  - поиск в тексте статей, включая ссылки (hh123)\r\n", ch);
         return;
     }
 
@@ -216,6 +218,27 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         }
 
         page_to_char(buf.str().c_str(), ch);
+        return;
+
+    } else if (arg_oneof_strict(args, "create", "создать")) {
+        for (auto &container: HelpLoader::getThis()->getElements()) {
+            // Create a new empty node inside help.xml and properly register it.
+            if (container->getName() == "help" && container.getDynamicPointer<HelpContainer>()) {
+                HelpContainer *hc = container.getConstPointer<HelpContainer>();
+                GenericHelp::Pointer help(NEW);
+                help->setContainer(hc);
+                hc->push_back(help);
+                help->setID(helpManager->getLastID() + 1);
+                helpManager->registrate(help);
+
+                OLCStateHelp::Pointer hedit(NEW, help.getPointer());
+                hedit->attach(ch);
+                hedit->show(ch);
+                return;
+            }
+        }
+
+        ch->println("Не могу найти файл для сохранения справки.");
         return;
 
     } else {

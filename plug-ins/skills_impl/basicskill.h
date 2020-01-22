@@ -47,7 +47,6 @@ public:
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual int getMaximum( Character * ) const;
     
-protected:
     XML_VARIABLE XMLStringNoEmpty nameRus;
     XML_VARIABLE XMLRussianString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;

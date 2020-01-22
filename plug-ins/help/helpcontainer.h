@@ -9,6 +9,7 @@
 #include "xmltableelement.h"
 #include "xmlpointer.h"
 #include "markuphelparticle.h"
+#include "xmltableloaderplugin.h"
 
 class HelpContainer;
 
@@ -55,5 +56,7 @@ void HelpContainer::setName( const DLString &name )
 {
     this->name = name;
 }
+
+TABLE_LOADER_DECL(HelpLoader);
 
 #endif

@@ -18,7 +18,7 @@
 #include "autoflags.h"
 #include "def.h"
 
-TABLE_LOADER(HelpLoader, "helps", "Help");
+TABLE_LOADER_IMPL(HelpLoader, "helps", "Help");
 
 static IconvMap koi2utf("koi8-r", "utf-8");
 
