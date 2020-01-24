@@ -342,20 +342,37 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
+    buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
-    buf << dlprintf( 
-            "Твои параметры:   Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
-            "              Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
-            "              Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
+    if (ch->is_npc( )) {
+        buf << dlprintf( 
+            "Твои параметры: родные(текущие)\n\r"
+            "      Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
+            "  Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
+            "  Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS),
             ch->perm_stat[STAT_DEX], ch->getCurrStat(STAT_DEX),
             ch->perm_stat[STAT_CON], ch->getCurrStat(STAT_CON),
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA) );
+
+    } else {
+        buf << dlprintf( 
+            "Твои параметры: родные(текущие) [максимальные]\n\r"
+            "      Сила(Str): %d(%d) [%d] Интеллект(Int): %d(%d) [%d]\n\r"
+            "  Мудрость(Wis): %d(%d) [%d]  Ловкость(Dex): %d(%d) [%d]\n\r"
+            "  Сложение(Con): %d(%d) [%d]   Обаяние(Cha): %d(%d) [%d]\n\r",
+            ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
+            ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT), pch->getMaxStat(STAT_INT),
+            ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
+            ch->perm_stat[STAT_DEX], ch->getCurrStat(STAT_DEX), pch->getMaxStat(STAT_DEX),
+            ch->perm_stat[STAT_CON], ch->getCurrStat(STAT_CON), pch->getMaxStat(STAT_CON),
+            ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA), pch->getMaxStat(STAT_CHA) );
+
+    }
 
     buf << dlprintf( "У тебя %d очков опыта, и %s\n\r",
                   ch->exp.getValue( ),
