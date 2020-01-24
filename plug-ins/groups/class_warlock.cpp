@@ -126,7 +126,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
         victim->send_to("Тебя {RУБИЛИ{x!\n\r");
 
         act_p("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR,POS_RESTING);
-        act_p("$c1 больше не существует!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
 
         victim->send_to("{YБожественные Силы возвращают тебя к жизни!{x\n\r");
         
