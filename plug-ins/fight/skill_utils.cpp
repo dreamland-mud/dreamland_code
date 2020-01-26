@@ -150,11 +150,7 @@ void print_wait_and_mana(const Skill *skill, Character *ch, ostream &buf)
     }
 
     if (spell && spell->isCasted()) { 
-        buf << "Тип заклинания";
-        if (spell->getSpellType() == SPELL_NONE) 
-            buf << ": (не определен).";
-        else
-            buf << " {W" << spell_types.message(spell->getSpellType()) << "{x.";
+        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << "{x.";
         empty = false;
     }
 

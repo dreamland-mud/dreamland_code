@@ -38,6 +38,8 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->keywords = original->getKeywordAttribute();
     this->labels = original->labels.persistent.toString();
     this->labelsAuto = original->labels.transient.toString();
+    this->title = original->getTitleAttribute();
+    this->autotitle = original->getTitle(DLString::emptyString);
 }
 
 OLCStateHelp::~OLCStateHelp() 
@@ -64,6 +66,7 @@ void OLCStateHelp::commit()
     original->setKeywordAttribute(keywords);
     original->setLevel(level);
     original->setText(text);
+    original->setTitleAttribute(title);
     original->labels.persistent.clear();
     original->labels.addPersistent(labels);
     original->save();
@@ -104,8 +107,10 @@ void OLCStateHelp::show( PCharacter *ch ) const
         labels.empty() ? "-" : labels.c_str(), 
         labelsAuto.empty() ? "-" : labelsAuto.c_str());     
     ptc(ch, "{DВсе ключевые слова: [%s]\r\n", allKeywords().toString().c_str());
-    ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());
+    ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());    
     ptc(ch, "{WУровень{x:            [{C%d{x]\r\n", level.getValue());
+    ptc(ch, "{WЗаголовок{x:          [{C%s{x]\r\n", title.c_str());
+    ptc(ch, "{DАвтозаголовок:      [%s]\r\n", autotitle.c_str());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.c_str());
@@ -137,6 +142,26 @@ HEDIT(keywords, "ключевые", "установить или очистит�
     ptc(ch, "Новые ключевые слова: %s\n\r", keywords.c_str());
     return true;
 }
+
+HEDIT(title, "заголовок", "установить или очистить заголовок вместо автоматического")
+{
+    if (!*argument) {
+        stc("Синтаксис:   title <new value>\n\r", ch);
+        stc("             title clear\n\r", ch);
+        return false;
+    }
+
+    if (arg_oneof_strict(argument, "clear", "очистить")) {
+        title.clear();
+        stc("Заголовок очищен.\r\n", ch);
+        return true;
+    }
+
+    title = argument;
+    ptc(ch, "Новый заголовок: %s\n\r", title.c_str());
+    return true;
+}
+
 
 HEDIT(labels, "метки", "установить метки для экспорта на сайт")
 {

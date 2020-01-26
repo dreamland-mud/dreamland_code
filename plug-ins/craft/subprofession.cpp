@@ -30,8 +30,14 @@ void CraftProfessionHelp::save() const
 
 DLString CraftProfessionHelp::getTitle(const DLString &label) const
 {
-    if (prof)
+    // For help json dump.
+    if (!label.empty() && prof)
         return prof->getRusName().ruscase('1') + ", " + prof->getName();
+
+    // Default title if not set explicitly.
+    if (label.empty() && titleAttribute.empty() && prof)
+        return "Профессия {c" + prof->getRusName().ruscase('1') + "{x, {c" + prof->getName() + "{x";    
+    
     return HelpArticle::getTitle(label);
 }
     

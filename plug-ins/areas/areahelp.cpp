@@ -62,6 +62,24 @@ void AreaHelp::save() const
         SET_BIT(areafile->area->area_flag, AREA_CHANGED);
 }
 
+DLString AreaHelp::getTitle(const DLString &label) const
+{
+    ostringstream buf;
+    AREA_DATA *area = areafile->area;
+
+    if (!label.empty() || !titleAttribute.empty() || !selfHelp)
+        return MarkupHelpArticle::getTitle(label);
+
+    buf << "Зона {c" << area->name << "{x";
+
+    if (strlen(area->credits) > 0 
+            && str_str(area->credits, area->name) == 0
+            && str_str(area->name, area->credits) == 0)
+        buf << " ({c" << area->credits << "{x)";
+
+    return buf.str();
+}
+
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     AREA_DATA *area = areafile->area;

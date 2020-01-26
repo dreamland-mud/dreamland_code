@@ -68,8 +68,14 @@ void SocialHelp::save() const
 
 DLString SocialHelp::getTitle(const DLString &label) const
 {
-    if (social)
+    // For help json dump.
+    if (!label.empty() && social)
         return social->getName() + ", " + social->getRussianName();
+
+    // Default title if not set explicitly.
+    if (label.empty() && titleAttribute.empty() && social)
+        return "Социал {c" + social->getRussianName() + "{x, {c" + social->getName() + "{x";
+        
     return HelpArticle::getTitle(label);
 }
 

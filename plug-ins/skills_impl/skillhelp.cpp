@@ -140,11 +140,29 @@ DLString SkillHelp::getTitle(const DLString &label) const
     if (!skill)
         return HelpArticle::getTitle(label);
 
-    if (label != "cmd" || !skill->getCommand()) 
+    // For help json dump.
+    if (!label.empty()) {
+        if (label == "cmd" && skill->getCommand()) 
+            return skill->getCommand()->getName() + ", "
+                    + skill->getCommand()->getRussianName();
+
         return skill->getName() + ", " + skill->getRussianName();
-    
-    return skill->getCommand()->getName() + ", "
-            + skill->getCommand()->getRussianName();
+    }
+
+    // Default title if not set explicitly.
+    if (titleAttribute.empty()) {
+        DLString title = (skill_is_spell(*skill) ? "Заклинание {c" : "Умение {c")
+            + skill->getRussianName() + "{x, {c" + skill->getName() + "{x";
+
+        if (skill->getCommand() && !skill->getCommand()->getRussianName().empty())
+            title += " и команда {c" 
+                + skill->getCommand()->getRussianName() + "{x, {c" 
+                + skill->getCommand()->getName() + "{x";
+
+        return title;
+    }
+
+    return titleAttribute;
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )

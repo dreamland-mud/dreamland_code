@@ -56,7 +56,12 @@ public:
     int getID() const;
     void setID(int);
 
+    /** Construct article title depending on implementation. */
     virtual DLString getTitle(const DLString &label) const;
+    /** Return title configured as XML attribute. */
+    const DLString &getTitleAttribute() const;
+    /** Set title attribute that overrides auto-generated title. */
+    void setTitleAttribute(const DLString &);
 
     struct area_file * areafile;
 
@@ -68,6 +73,7 @@ public:
     static const DLString ATTRIBUTE_REFBY;
     static const DLString ATTRIBUTE_LABELS;
     static const DLString ATTRIBUTE_ID;
+    static const DLString ATTRIBUTE_TITLE;
    
 protected:
     /** (Extra) keywords specified as an XML attribute for this help article. 
@@ -87,6 +93,9 @@ protected:
     /** Strings containing a concatenation of all keywords, with multi-word keywords
         inside single quotes. */
     DLString keywordsAllString;
+
+    /** Overridden article title. */
+    DLString titleAttribute;
 
     /** List of help articles this one refers to, specified as an XML attribute. */
     StringSet ref;
