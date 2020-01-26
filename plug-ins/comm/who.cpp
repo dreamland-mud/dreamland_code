@@ -101,7 +101,7 @@ list<PCMemoryInterface *> who_find_offline(PCharacter *looker)
         if (pcm->getPlayer() && pcm->getPlayer()->desc)
             continue;
 
-        if (get_json_attribute(pcm, "discord", discord)) {
+        if (get_json_attribute(pcm, "discord", discord) && !discord["id"].asString().empty()) {
             DLString status = discord["status"].asString();
             if (status != "offline") {
                 result.push_back(pcm);
