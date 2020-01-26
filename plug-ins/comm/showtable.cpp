@@ -67,7 +67,7 @@ static void show_matched_commands( Character *ch, const DLString &arg )
         ostringstream aliases;
         Command::Pointer cmd = *c;
 
-        if (!cmd->visible( ch ))
+        if (cmd->getLevel( ) >= LEVEL_HERO && !ch->is_immortal())
             continue;
         
         if (!cmd->matches( arg ) && !cmd->matchesAlias( arg ))
