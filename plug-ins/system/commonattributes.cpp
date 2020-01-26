@@ -18,6 +18,8 @@ const DLString XMLIntegerAttribute::TYPE = "XMLIntegerAttribute";
 
 const DLString XMLStringListAttribute::TYPE = "XMLStringListAttribute";
 
+const DLString XMLStringMapAttribute::TYPE = "XMLStringMapAttribute";
+
 XMLEmptyAttribute::XMLEmptyAttribute( )
 {
 }
@@ -58,10 +60,49 @@ XMLStringListAttribute::~XMLStringListAttribute( )
 {
 }
 
+XMLStringMapAttribute::XMLStringMapAttribute( )
+{
+}
+
+XMLStringMapAttribute::~XMLStringMapAttribute( )
+{
+}
+
 const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName)
 {
     XMLStringAttribute::Pointer attr = player->getAttributes().getAttr<XMLStringAttribute>(attrName);
     return attr->getValue();
+}
+
+/**
+ * Find an entry in a map attribute with given name, or return empty string.
+ */
+const DLString & get_map_attribute_value(PCMemoryInterface *player, const DLString &attrName, const DLString &key)
+{
+    XMLStringMapAttribute::Pointer map = player->getAttributes().findAttr<XMLStringMapAttribute>(attrName);
+    if (!map)
+        return DLString::emptyString;
+
+    XMLStringMapAttribute::const_iterator entry = map->find(key);
+    if (entry == map->end())
+        return DLString::emptyString;
+
+    return entry->second;
+}
+
+/**
+ * Set a key-value pair inside a map attribute with a given name.
+ */
+void set_map_attribute_value(PCMemoryInterface *player, const DLString &attrName, const DLString &key, const DLString &value)
+{
+    XMLStringMapAttribute::Pointer map = player->getAttributes().getAttr<XMLStringMapAttribute>(attrName);
+    (**map)[key] = value;
+}
+
+XMLStringMapAttribute & get_map_attribute(PCMemoryInterface *player, const DLString &attrName)
+{
+    XMLStringMapAttribute::Pointer map = player->getAttributes().getAttr<XMLStringMapAttribute>(attrName);
+    return **map;
 }
 
 /**

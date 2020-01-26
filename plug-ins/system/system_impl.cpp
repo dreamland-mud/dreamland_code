@@ -33,6 +33,7 @@ extern "C"
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLStringAttribute> >( ppl );
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLIntegerAttribute> >( ppl );
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLStringListAttribute> >( ppl );
+                Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLStringMapAttribute> >( ppl );
                 
                 Plugin::registerPlugin<XMLVariableRegistrator<XMLPCClassPredicate> >( ppl );
                 Plugin::registerPlugin<XMLVariableRegistrator<XMLPCRacePredicate> >( ppl );
