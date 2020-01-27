@@ -5,11 +5,15 @@
 #include "room.h"
 #include "affecthandler.h"
 #include "affect.h"
+#include "character.h"
+#include "core/object.h"
 
 #include "loadsave.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "def.h"
+
+WEARLOC(none);
 
 /*
  * Apply or remove an affect to a room.
@@ -237,4 +241,40 @@ bool Room::isAffected( int sn ) const
     }
 
     return false;
+}
+
+/** Whether an item can contribute to the light in the room. */
+static bool is_lantern(Object *obj)
+{
+    if (obj->item_type != ITEM_LIGHT)
+        return false;
+        
+    // Expired lanterns don't count.
+    if (obj->value[2] == 0)
+        return false;
+
+    // Worn item is ok.
+    if (obj->carried_by)
+        return obj->wear_loc != wear_none;
+
+    // Item on the floor ok if it's a permanent fixture.
+    if (obj->in_room)
+        return !IS_SET(obj->wear_flags, ITEM_TAKE);
+
+    return false;
+}
+
+/** Recalculate light in the room when an object is worn or destroyed. */
+void Room::updateLight()
+{
+    light = 0;
+
+    for (Character *rch = people; rch; rch = rch->next_in_room)
+        for (Object *obj = rch->carrying; obj; obj = obj->next_content)
+            if (is_lantern(obj))
+                light++;
+
+    for (Object *obj = contents; obj; obj = obj->next_content)
+        if (is_lantern(obj))
+            light++;
 }

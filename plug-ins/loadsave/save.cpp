@@ -2238,10 +2238,5 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
         extract_obj( obj );
         throw e;
     }
-    
-    if (obj->wear_loc != wear_none
-            && obj->item_type == ITEM_LIGHT
-            && obj->value[2] != 0)
-            ++ch->in_room->light;
 }
 

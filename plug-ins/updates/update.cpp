@@ -1383,7 +1383,6 @@ void lantern_update( Character *ch )
     {
         if ( --obj->value[2] == 0 && ch->in_room != 0 )
         {
-//  (decreased in unequip)    --ch->in_room->light; 
             ch->pecho("%1$^O1 мигну%1$Gло|л|ла|ли и поту%1$Gхло|х|хла|хли.", obj );
             ch->recho("%1$^O1 поту%1$Gхло|х|хла|хли.", obj );
             extract_obj( obj );

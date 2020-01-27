@@ -231,8 +231,8 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 
     switch (obj->item_type) {
     case ITEM_LIGHT:
-        if (obj->value[2] != 0 && ch->in_room != 0)
-            ++ch->in_room->light;
+        if (ch->in_room != 0)
+            ch->in_room->updateLight();
         break;
 
     case ITEM_ARMOR:
@@ -280,8 +280,8 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
 
     switch (obj->item_type) {
     case ITEM_LIGHT:
-        if (obj->value[2] != 0 && ch->in_room != 0 && ch->in_room->light > 0)
-            --ch->in_room->light;
+        if (ch->in_room != 0)
+            ch->in_room->updateLight();
         break;
 
     case ITEM_ARMOR:

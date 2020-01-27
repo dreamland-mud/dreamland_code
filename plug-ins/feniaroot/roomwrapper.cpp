@@ -189,12 +189,6 @@ NMI_GET( RoomWrapper, description, "описание комнаты" )
     return Register( target->description );
 }
 
-NMI_SET( RoomWrapper, light, "количество источников света в комнате" )
-{
-    checkTarget( );
-    target->light = arg.toNumber();
-}
-
 NMI_GET( RoomWrapper, clan, "имя клана, которому принадлежит комната" )
 {
     checkTarget();
