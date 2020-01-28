@@ -25,6 +25,19 @@ class PCharacter;
 class XMLNoteData;
 class XMLAttributeNoteData;
 
+class NoteHelp : public CommandHelp {
+public:
+    typedef ::Pointer<NoteHelp> Pointer;
+
+    virtual void save() const;
+    inline virtual const DLString & getType( ) const;
+    static const DLString TYPE;
+};
+
+inline const DLString & NoteHelp::getType( ) const
+{
+    return TYPE;
+}
 
 /*
  * NoteThread
@@ -133,7 +146,7 @@ protected:
     XML_VARIABLE XMLString rusCommand;
     XML_VARIABLE XMLString hint;
     XML_VARIABLE XMLFlagsNoEmpty extra;
-    XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
+    XML_VARIABLE XMLPointerNoEmpty<NoteHelp> help;
     XML_VARIABLE XMLFlags cat;
     XML_VARIABLE XMLEnumeration gender;
     XML_VARIABLE XMLInteger keepDays;
