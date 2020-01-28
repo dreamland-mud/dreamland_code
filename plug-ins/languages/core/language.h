@@ -115,7 +115,7 @@ protected:
     XML_VARIABLE XMLString  nameRus;
     XML_VARIABLE XMLStringNoEmpty nameRusNoCase;
     XML_VARIABLE XMLString  hint;
-    XML_VARIABLE XMLPointerNoEmpty<CommandHelp> description;
+    XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
     XML_VARIABLE XMLInteger beats;
     XML_VARIABLE XMLInteger minAlign, maxAlign;
     XML_VARIABLE Races    races;

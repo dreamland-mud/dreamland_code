@@ -58,7 +58,7 @@ void Language::destruction( )
 CommandHelp::Pointer Language::getHelp( ) const
 {
 
-    return description;
+    return help;
 }
 
 const RaceLangInfo * Language::getRaceInfo( PCharacter *ch ) const
