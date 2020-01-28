@@ -34,6 +34,20 @@ public:
     LanguageException( const Language &, const DLString & );
 };
 
+class LanguageHelp : public CommandHelp {
+public:
+    typedef ::Pointer<LanguageHelp> Pointer;
+
+    virtual void save() const;
+    virtual DLString getTitle(const DLString &label) const;
+    inline virtual const DLString & getType( ) const;
+    static const DLString TYPE;
+};
+
+inline const DLString & LanguageHelp::getType( ) const
+{
+    return TYPE;
+}
 
 class Language : public Skill, public Command, public virtual Plugin, public XMLVariableContainer {
 XML_OBJECT
@@ -115,7 +129,7 @@ protected:
     XML_VARIABLE XMLString  nameRus;
     XML_VARIABLE XMLStringNoEmpty nameRusNoCase;
     XML_VARIABLE XMLString  hint;
-    XML_VARIABLE XMLPointerNoEmpty<CommandHelp> help;
+    XML_VARIABLE XMLPointerNoEmpty<LanguageHelp> help;
     XML_VARIABLE XMLInteger beats;
     XML_VARIABLE XMLInteger minAlign, maxAlign;
     XML_VARIABLE Races    races;

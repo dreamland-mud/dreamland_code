@@ -6,7 +6,9 @@
 #include "so.h"
 #include "xmlattributeplugin.h"
 #include "mobilebehaviorplugin.h"
+#include "xmlvariableregistrator.h"
 
+#include "language.h"
 #include "languagemanager.h"
 #include "xmlattributelanguage.h"
 #include "poliglot.h"
@@ -21,6 +23,7 @@ extern "C"
         Plugin::registerPlugin<LanguageManager>( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguage> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLanguageHints> >( ppl );
+        Plugin::registerPlugin<XMLVariableRegistrator<LanguageHelp> >( ppl );
         
         Plugin::registerPlugin<MobileBehaviorRegistrator<Poliglot> >( ppl );
 

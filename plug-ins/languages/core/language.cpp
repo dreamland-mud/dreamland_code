@@ -20,6 +20,36 @@
 #include "def.h"
 
 /*--------------------------------------------------------------------
+ * LanguageHelp
+ *-------------------------------------------------------------------*/
+const DLString LanguageHelp::TYPE = "LanguageHelp";
+
+void LanguageHelp::save() const
+{
+   if (command) {
+        const Language *lang = command.getDynamicPointer<Language>();
+        if (lang)
+            languageManager->saveXML(lang, lang->getName());
+        else
+            LogStream::sendNotice() << "Failed to save language " << command->getName() << endl;
+   }
+}
+
+DLString LanguageHelp::getTitle(const DLString &label) const
+{
+    ostringstream buf;
+
+    if (!label.empty() || !titleAttribute.empty() || !command)
+        return MarkupHelpArticle::getTitle(label);
+
+    buf << "Древний язык {c";
+    if (!command->getRussianName().empty())
+        buf << command->getRussianName() << "{x, {c";
+    buf << command->getName() << "{x";
+    return buf.str();
+}
+
+/*--------------------------------------------------------------------
  * Language
  *-------------------------------------------------------------------*/
 const int Language::MAX_POWER_WORLD = 200;
