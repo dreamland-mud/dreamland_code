@@ -93,8 +93,13 @@ CMDRUNP( wear )
         for (obj = ch->carrying; obj != 0; obj = obj_next) {
             obj_next = obj->next_content;
             
-            if (obj->wear_loc == wear_none && ch->can_see( obj ))
-                wear_obj( ch, obj, F_WEAR_VERBOSE );
+            if (obj->wear_loc == wear_none && ch->can_see( obj )) {
+                if (RIDDEN(ch) && obj->can_wear( ITEM_WEAR_HORSE ) ) {
+                    ch->send_to("Ты не цирковая лошадь! Попроси всадника спешиться.\r\n");
+                    continue;
+                } 
+                else wear_obj( ch, obj, F_WEAR_VERBOSE );
+            }
         }
 
         return;
@@ -102,6 +107,11 @@ CMDRUNP( wear )
     
     if (( obj = get_obj_carry( ch, argObj ) ) == 0) {
         ch->println("У тебя нет этого.");
+        return;
+    }
+
+    if (RIDDEN(ch) && obj->can_wear( ITEM_WEAR_HORSE ) ) {
+        ch->send_to("Ты не цирковая лошадь! Попроси всадника спешиться.\r\n");
         return;
     }
 
@@ -205,6 +215,11 @@ CMDRUNP( remove )
         for (obj = ch->carrying; obj != 0; obj = obj_next) {
             obj_next = obj->next_content;
 
+            if (RIDDEN(ch) && obj->wear_loc != wear_none &&  obj->can_wear( ITEM_WEAR_HORSE ) ) {
+                ch->send_to("Ты не цирковая лошадь! Попроси всадника спешиться.\r\n");
+                continue;
+            }
+
             if (ch->can_see( obj ))
                 obj->wear_loc->remove( obj, F_WEAR_VERBOSE );
         }
@@ -215,6 +230,11 @@ CMDRUNP( remove )
     if (ch == victim) {
         if (( obj = get_obj_wear( ch, argObj ) ) == 0) {
             ch->println("У тебя нет этого.");
+            return;
+        }
+
+        if (RIDDEN(ch) && obj->can_wear( ITEM_WEAR_HORSE ) ) {
+            ch->send_to("Ты не цирковая лошадь! Попроси всадника спешиться.\r\n");
             return;
         }
 
