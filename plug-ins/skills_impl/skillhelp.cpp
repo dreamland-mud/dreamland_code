@@ -43,10 +43,12 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
     
     // '... умение|slook herbs|травы'. - с гипер-ссылкой на команду
     // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
-    in << "См. также команду {y{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
-    if (group != group_none)
-       in << ", {y{hc{lRгруппаум{lEglist{lx " << gname << "{x";
-    in << "." << endl;
+    if (skill->visible(ch)) {
+        in << "См. также команду {y{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
+        if (group != group_none)
+        in << ", {y{hc{lRгруппаум{lEglist{lx " << gname << "{x";
+        in << "." << endl;
+    }
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )
