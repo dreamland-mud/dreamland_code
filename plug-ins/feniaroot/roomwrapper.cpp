@@ -445,18 +445,13 @@ NMI_INVOKE( RoomWrapper, echoAround, "(fmt, args): выводит отформа
 NMI_INVOKE(RoomWrapper, zecho, "(msg): выведет сообщение msg для всех в этой арии" )
 {
     Character *wch;
-    const char *msg;
+    DLString msg = args2string(args);
     
     checkTarget( );
-
-    if (args.size( ) != 1)
-        throw Scripting::NotEnoughArgumentsException( );
-
-    msg = args.front( ).toString( ).c_str( );
     
     for (wch = char_list; wch; wch = wch->next) 
         if (wch->in_room->area == target->area) 
-            wch->println( msg );
+            wch->println(msg);
 
     return Register( );
 }

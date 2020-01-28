@@ -752,14 +752,14 @@ NMI_SET( CharacterWrapper, x, help) \
 }
 INT_FIELD(off_flags, "флаги поведения моба (таблица .tables.off_flags)")
 
-NMI_SET( CharacterWrapper, wearloc, "список слотов экипировки")
+NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
     CHK_NPC
     target->getPC( )->wearloc.fromString( arg.toString( ) );
 }
 
-NMI_GET( CharacterWrapper, wearloc, "список слотов экипировки")
+NMI_GET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
     CHK_NPC
