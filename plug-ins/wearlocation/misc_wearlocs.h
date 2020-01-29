@@ -24,6 +24,15 @@ public:
     virtual int canWear( Character *ch, Object *obj, int flags );
 };
 
+class HorseWearloc : public DefaultWearlocation {
+XML_OBJECT    
+public:
+    typedef ::Pointer<HorseWearloc> Pointer;
+
+    virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual bool canRemove( Character *ch, Object *obj, int flags );
+};
+
 class HairWearloc : public DefaultWearlocation {
 XML_OBJECT    
 public:
