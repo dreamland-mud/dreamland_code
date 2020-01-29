@@ -7,7 +7,6 @@
 #include "commandtemplate.h"
 
 #include "cmlt.h"
-#include "fixremort.h"
 #include "remortnanny.h"
 #include "lifeprice.h"
 #include "remortbonuses_impl.h"
@@ -28,14 +27,11 @@ extern "C"
         Plugin::registerPlugin<MocRegistrator<PretitleRemortBonus> >( ppl );
         Plugin::registerPlugin<MocRegistrator<HealthRemortBonus> >( ppl );
         Plugin::registerPlugin<MocRegistrator<ManaRemortBonus> >( ppl );
-        Plugin::registerPlugin<MocRegistrator<SkillPointRemortBonus> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<RemortWitch> >( ppl );
 
         Plugin::registerPlugin<MocRegistrator<VictoryPrice> >( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<Koschey> >( ppl );
         
-        Plugin::registerPlugin<FixRemortListener>( ppl );
-
         return ppl;
     }
 }

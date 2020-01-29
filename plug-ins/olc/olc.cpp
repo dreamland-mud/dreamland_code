@@ -579,48 +579,6 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     }
 }
 
-static int get_obj_reset_level( AREA_DATA *pArea, int keyVnum )
-{
-    int mobVnum = -1;
-    int level = 200;
-    
-    if (keyVnum <= 0 || !get_obj_index( keyVnum ))
-        return pArea->low_range;
-        
-    for (Room *room = room_list; room; room = room->rnext) 
-        for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next)
-            switch(pReset->command) {
-                case 'M':
-                    mobVnum = pReset->arg1;
-                    break;
-                case 'G':
-                case 'E':
-                    if (pReset->arg1 == keyVnum && mobVnum > 0)
-                        level = min( get_mob_index(mobVnum)->level, level );
-                    break;
-                case 'O':
-                    if (pReset->arg1 == keyVnum) 
-                        level = min( pArea->low_range, level );
-                    break; 
-                case 'P':
-                    if (pReset->arg1 == keyVnum) {
-                        OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
-
-                        if (in->item_type == ITEM_CONTAINER
-                            && IS_SET(in->value[1], CONT_LOCKED))
-                        {
-                            level = min( get_obj_reset_level( room->area, in->value[2] ), 
-                                         level );
-                        }
-                        else
-                            level = min( pArea->low_range, level );
-                    }
-                    break;
-            }
-    
-    return (level == 200 ? pArea->low_range : level);
-}            
-
 static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
 {
     DLString line = str;
@@ -629,125 +587,6 @@ static DLString trim(const DLString& str, const string& chars = "\t\n\v\f\r ")
     return line;
 }
 
-static void door_rename(EXIT_DATA *pexit, const char *keyword, const char *short_descr, const char *extra_keyword = NULL)
-{
-    DLString newKeyword = keyword;
-    if (extra_keyword && extra_keyword[0] && !is_name(extra_keyword, keyword))
-            newKeyword << " " << extra_keyword;
-
-    LogStream::sendNotice() << "door [" << pexit->keyword << "] -> [" << newKeyword << "], [" << short_descr << endl;
-    free_string(pexit->keyword);
-    pexit->keyword = str_dup(newKeyword.c_str());
-    free_string(pexit->short_descr);
-    pexit->short_descr = str_dup(short_descr);
-}
-
-struct door_rename_info {
-    const char *orig_keyword;
-    const char *keyword;
-    const char *short_descr;
-};
-static const struct door_rename_info renames [] = {
-    { "doors", "двери", "двер|и|ей|ям|и|ьми|ях" },
-    { "door", "дверь", "двер|ь|и|и|ь|ью|и" },
-    { "celldoor", "door дверь", "двер|ь|и|и|ь|ью|и" },
-    { "marble square", "мраморная клетка", "мраморн|ая|ой|ой|ую|ой|ой клетк|а|и|е|у|ой|е" },
-    { "steel", "steel door дверь", "двер|ь|и|и|ь|ью|и" },
-    { "дверь", "door", "двер|ь|и|и|ь|ью|и" },
-    { "ldthm", "door дверь", "двер|ь|и|и|ь|ью|и" },
-    { "двустворчатая", "door дверь", "двустворчат|ая|ой|ой|ую|ой|ой двер|ь|и|и|ь|ью|и" },
-    { "opening", "отверстие", "отверсти|е|я|ю|е|ем|и" },
-    { "калитка", "wicket", "калитк|а|у|е|у|ой|е" },
-    { "cell", "door дверь", "двер|ь|и|и|ь|ью|и" },
-    { "дверь домика", "door house дверь домика", "двер|ь|и|и|ь|ью|и домика" },
-    { "дверь клетки", "door cage дверь клетки", "двер|ь|и|и|ь|ью|и клетки" },
-    { "door cage дверь клетки", "door cage дверь клетки", "двер|ь|и|и|ь|ью|и клетки" },
-    { "могильный камень tomb stone", "могильный камень tomb stone", "могильн|ый|ого|ому|ый|ым|ом кам|ень|ня|ню|ень|нем|не" },
-    { "hatch", "люк", "люк||а|у||ом|е" },
-    { "gates", "ворота", "ворот|а||ам|а|ами|ах" },
-    { "stones", "камни", "камн|и|ей|ям|и|ями|ях" },
-    { "воротца", "gates", "ворот|ца|ец|цам|ца|цами|цах" },
-    { "gate", "ворота", "ворот|а||ам|а|ами|ах" },
-    { "gateway", "ворота", "ворот|а||ам|а|ами|ах" },
-    { "trapdoor", "люк", "люк||а|у||ом|е" },
-    { "тайник", "secret", "тайник||а|у||ом|е" },
-    { "люк", "trapdoor", "люк||а|у||ом|е" },
-    { "tapestry", "гобелен", "гобелен||а|у||ом|е" },
-    { "manhole", "проход", "проход||а|у||ом|е" },
-    { "wall", "стена", "стен|а|у|е|у|ой|е" },
-    { "floorboard", "половица", "половиц|а|у|е|у|ей|е" },
-    { "floorboards", "половица", "половиц|а|у|е|у|ей|е" },
-    { "curtain", "штора", "штор|а|у|е|у|ой|е" },
-    { "cage", "клетка", "клетк|а|у|е|у|ой|е" },
-    { "hole", "дыра", "дыр|а|у|е|у|ой|е" },
-    { "tree", "дерево", "дерев|о|а|у|о|ом|е" },
-    { "bookcase", "шкаф книжный", "шкаф||а|у||ом|е" },
-    { "skeleton", "скелет", "скелет||а|у||ом|е" },
-    { "painting", "картина", "картин|а|у|е|у|ой|е" },
-    { "panel", "панель", "панел|ь|и||ь|ью|и" },
-    { "statue", "статуя", "стату|я|ю|е|ю|ей|е" },
-    { "stone", "камень", "кам|ень|ня|ню|ень|нем|не" },
-    { "grate", "решетка", "решетк|а|и|е|у|ой|е" },
-    { "bookshelf", "полка", "полк|а|и|е|у|ой|е" },
-    { "tomb", "могила", "могил|а|ы|е|у|ой|е" },
-    { "crack", "трещина", "трещин|а|ы|е|у|ой|е" },
-    { "sculpture", "скульптура", "скульптур|а|ы|е|у|ой|е" },
-    { "throne", "трон", "трон||а|у||ом|е" },
-    { "bars", "решетка", "решетк|а|и|е|у|ой|е" },
-    { "bushes", "кусты", "куст|ы|ов|ам|ы|ами|ах" },
-    { "thicket", "заросли", "заросл|и|ей|ям|и|ями|ях" },
-    { "drapes", "портьеры", "портьер|ы||ам|ы|ами|ах" },
-    { "underbrush", "подлесок", "подлес|ок|ка|ку|ок|ком|ке" },
-    { "forcefield", "поле силовое", "силов|ое|ого|ому|ое|ым|ом пол|е|я|ю|е|ем|е" },
-    { "enterance", "entrance вход", "вход||а|у||ом|е" },
-    { "lid", "крышка", "крышк|а|и|е|у|ой|е" },
-    { "floor", "пол", "пол||а|у||ом|е" },
-    { "boulder", "валун", "валун||а|у||ом|е" },
-    { "sesame", "сезам", "сезам||а|у||ом|е" },
-    { "exit", "выход", "выход||а|у||ом|е" },
-    { "ranks", "ряды", "ряд|ы|ом|ам|ы|ами|ах" },
-    { "tank", "аквариум", "аквариум||а|у||ом|е" },
-    { "ceiling", "потолок", "потол|ок|ка|ку|ок|ком|ке" },
-    { "hope", "надежда", "надежд|а|у|е|у|ой|е" },
-    { "secret", "секретная потайная дверь", "потайн|ая|ой|ой|ую|ой|ой двер|ь|и|и|ь|ью|и" },
-    { 0 },
-};
-
-static bool door_match_and_rename_exact(EXIT_DATA *pexit) 
-{
-    const char *k = pexit->keyword;
-    for (int r = 0; renames[r].orig_keyword; r++) {
-        if (!str_cmp(renames[r].orig_keyword, k)) {
-            door_rename(pexit, k, renames[r].short_descr, renames[r].keyword);
-            return true;
-        }
-    }
-    return false;
-}
-    
-static bool door_match_and_rename_substring(EXIT_DATA *pexit) 
-{
-    const char *k = pexit->keyword;
-    DLString kStr(k);
-
-    for (int r = 0; renames[r].orig_keyword; r++) {
-        if (kStr.isName(renames[r].orig_keyword)) {
-            door_rename(pexit, k, renames[r].short_descr, renames[r].keyword);
-            return true;
-        }
-    }
-    return false;
-}
-
-static bool door_rename_as_russian(EXIT_DATA *pexit)
-{
-    const char *k = pexit->keyword;
-    if (DLString(k).isRussian()) {
-        door_rename(pexit, k, k, "door дверь");
-        return true;
-    }
-    return false;
-}
 
 static DLString find_word_mention(const char *text, const list<RussianString> &words)
 {
@@ -774,7 +613,7 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         ostringstream buf;
         const DLString lineFormat = "[" + web_cmd(ch, "goto $1", "%5d") + "] {W%-29s{x ({C%s{x)";
 
-        list<RussianString> water;
+        list<RussianString> water, air;
         water.push_back(RussianString("вод|а|ы|е|у|ой|е"));
         water.push_back(RussianString("водоем||а|у||ом|е" ));
         water.push_back(RussianString("водопад||а|у||ом|е" ));
@@ -787,33 +626,44 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         water.push_back(RussianString("набережн|ая|ой|ой|ую|ой|ой"));
         water.push_back(RussianString("корабл|ь|я|ю|ь|ем|я"));
 
+        air.push_back(RussianString("облак|о|а|у|о|ом|е"));
+        air.push_back(RussianString("облак|а|ов|ам|а|ами|ов"));
+        air.push_back(RussianString("туч|а|и|е|у|ей|е" ));
+        air.push_back(RussianString("туч|и||ам|и|ами|ах" ));
+
         buf << "Всех неводные комнаты с упоминанием воды, без флагов indoors и near_water:" << endl;
 
         for (Room *room = room_list; room; room = room->rnext) {
             if (IS_SET(room->room_flags, ROOM_INDOORS|ROOM_NEAR_WATER|ROOM_MANSION))
                 continue;
-
+            if (room->sector_type == SECT_UNDERWATER)
+                continue;
             if (IS_WATER(room))
                 continue;
 
-            if (!room->isCommon())
+            if (!room->isCommon() && room->clan == clan_none)
                 continue;
 
             if (!str_cmp(room->area->area_file->file_name, "galeon.are"))
                 continue;
 
-            if (room->sector_type == SECT_AIR)
-                continue;
-            if (room->sector_type == SECT_UNDERWATER)
-                continue;
+            DLString myword;
 
-            DLString myword = find_word_mention(room->description, water);
+            if (room->sector_type == SECT_AIR)
+                myword = find_word_mention(room->description, air);
+            else
+                myword = find_word_mention(room->description, water);
+
             if (!myword.empty()) {
                 buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
                 continue;
             }
 
-            myword = find_word_mention(room->name, water);
+            if (room->sector_type == SECT_AIR)
+                myword = find_word_mention(room->name, air);
+            else
+                myword = find_word_mention(room->name, water);
+
             if (!myword.empty())
                 buf << dlprintf(lineFormat.c_str(), room->vnum, room->name, myword.c_str()) << endl;
         }
@@ -853,172 +703,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
 
     if (!ch->isCoder( ))
         return;
-
-    ostringstream buf;
-
-    if (arg == "magic") {
-        for (AREA_DATA *area = area_first; area; area = area->next) {
-            buf << "{C       ******   {C" << area->name << "      ********{x" << endl;
-            for (int i = area->min_vnum; i <= area->max_vnum; i++) {
-                OBJ_INDEX_DATA *pObj = get_obj_index( i );
-                if (!pObj)
-                    continue;
-                if (!IS_SET(pObj->extra_flags, ITEM_MAGIC))
-                    continue;
-                if (pObj->item_type == ITEM_PORTAL)
-                    continue;
-                
-                REMOVE_BIT(pObj->extra_flags, ITEM_MAGIC);
-                SET_BIT(pObj->area->area_flag, AREA_CHANGED);
-
-                buf << dlprintf("[%5d] %s\n", 
-                        pObj->vnum, russian_case(pObj->short_descr, '1').c_str( ));
-            }
-        }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-    
-    if (arg == "nomagic") {
-        for (Object *obj = object_list; obj; obj = obj->next) {
-            if (!IS_SET(obj->extra_flags, ITEM_MAGIC))
-                continue;
-            
-            if (IS_SET(obj->pIndexData->extra_flags, ITEM_MAGIC))
-                continue;
-            
-            if (obj->enchanted) {
-                if (obj->affected 
-                    && (obj->affected->affect_find( gsn_enchant_armor )
-                       || obj->affected->affect_find( gsn_enchant_weapon )))
-                    continue;
-            }
-
-            Room *r = obj->getRoom( );
-
-            REMOVE_BIT( obj->extra_flags, ITEM_MAGIC );
-            buf << "nomagic [" << obj->pIndexData->vnum << "] " 
-                << "[" << obj->getID( ) << "] "
-                << obj->getShortDescr( '1' ) << " "
-                << (obj->getRealShortDescr( ) ? "*" : "")
-                << " " << (obj->getOwner( ) ? obj->getOwner( ) : "")
-                << " " << "[" << r->vnum << "] " 
-                << r->name 
-                << endl;
-            save_items( r );
-        }
-
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
-
-    if (arg == "gender") {
-        DLString prefix = args.getOneArgument();
-        DLString mg = args.getOneArgument();
-
-        ch->printf("Prefix=[%s] mg=[%s]\n", prefix.c_str(), mg.c_str());
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-            for(OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
-                DLString oname = russian_case(pObj->short_descr, '1').colourStrip().toLower();
-                
-                if (oname.isName(prefix)) {
-                    buf << dlprintf("[%5d] %s\n", pObj->vnum, oname.c_str());
-
-                    if (!mg.empty()) {
-                        pObj->gram_gender = Grammar::MultiGender(mg.c_str());
-                        SET_BIT(pObj->area->area_flag, AREA_CHANGED);
-                    }
-                }
-            }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-    
-    if (arg == "swim") {
-        for (Character *wch = char_list; wch; wch = wch->next) {
-            if (!wch->is_npc())
-                continue;
-            if (!IS_WATER(wch->in_room))
-                continue;
-            if (IS_AFFECTED(wch, AFF_FLYING) || IS_AFFECTED(wch, AFF_SWIM))
-                continue;
-            if (boat_get_type(wch) != BOAT_NONE)
-                continue;
-
-            buf << dlprintf("[%5d] (%14s) %s\n", 
-                            wch->getNPC()->pIndexData->vnum, 
-                            wch->getRace()->getName().c_str(),
-                            wch->getNameP('1').c_str());
-        }
-
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
-
-    if (arg == "linkwrapper") {
-        DLString vnumStr = args.getOneArgument();
-        if (vnumStr.isNumber()) {
-            Room *r = get_room_index(vnumStr.toInt());
-            if (r) {
-                if (FeniaManager::wrapperManager)
-                    FeniaManager::wrapperManager->linkWrapper(r);
-                ch->println("Room wrapped.");
-            }
-            else 
-                ch->println("Room not found.");
-        }
-        else
-            ch->println("Usage: abc linkwrapper <room vnum>");
-
-    }
-
-    if (arg == "objdup") {
-        typedef list<Object *> ObjectList;
-        ObjectList::iterator o;
-        map<long long, ObjectList> ids;
-        map<long long, ObjectList>::iterator i;
-
-        for (Object *obj = object_list; obj; obj = obj->next) {
-            ids[obj->getID( )].push_back( obj );
-        }
-
-        for (i = ids.begin( ); i != ids.end( ); i++)
-            if (i->second.size( ) > 1)
-                for (o = i->second.begin( ); o != i->second.end( ); o++)
-                    buf << "[" << i->first << "] " 
-                        << (*o)->getShortDescr( '1' ) 
-                        << " [" << (*o)->getRoom( )->vnum << "]" << endl;
-            
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
-
-
-    if (arg == "mobdup") {
-        typedef list<NPCharacter *> MobileList;
-        MobileList::iterator m;
-        map<long long, MobileList> ids;
-        map<long long, MobileList>::iterator i;
-
-        for (Character *wch = char_list; wch; wch = wch->next) {
-            if (wch->is_npc( ))
-                ids[wch->getID( )].push_back( wch->getNPC( ) );
-        }
-
-        for (i = ids.begin( ); i != ids.end( ); i++)
-            if (i->second.size( ) > 1)
-                for (m = i->second.begin( ); m != i->second.end( ); m++)
-                    buf << "[" << i->first << "] " 
-                        << (*m)->getNameP( '1' ) 
-                        << " [" << (*m)->in_room->vnum << "]" << endl;
-            
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
 
     if (arg == "objname") {
         int cnt = 0, hcnt = 0, rcnt = 0;
@@ -1126,27 +810,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "screenreader") {
-        ostringstream buf;
-
-        SET_BIT(ch->config, CONFIG_SCREENREADER);
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
-            buf << format_longdescr_to_char(pObj->description, ch) << "{x" << endl;
-        }
-
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
-            buf << pMob->long_descr << format_longdescr_to_char(pMob->long_descr, ch) << "{x" << endl;            
-        }
-
-        REMOVE_BIT(ch->config, CONFIG_SCREENREADER);
-        page_to_char(buf.str().c_str(), ch);
-        return;
-    }
-
-
     if (arg == "mobname") {
         int cnt = 0, hcnt = 0, rcnt = 0;
         ostringstream buf, hbuf, rbuf;
@@ -1195,68 +858,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "doors") {
-        ostringstream buf;
-        int cnt = 0, total = 0, unprocessed = 0;
-
-        for (Room *room = room_list; room; room = room->rnext) {
-            for (int door = 0; door < DIR_SOMEWHERE; door++) {
-                EXIT_DATA *pexit;
-
-                if (!(pexit = room->exit[door]))
-                    continue;
-                if (!IS_SET(pexit->exit_info_default, EX_ISDOOR))
-                    continue;
-                if (!pexit->keyword || !pexit->keyword[0]) 
-                    continue;
-
-                total++;
-
-                unprocessed++;
-
-                if (door_match_and_rename_exact(pexit)
-                    || door_match_and_rename_substring(pexit)
-                    || door_rename_as_russian(pexit))
-                    continue;
-
-                cnt++;
-                buf << dlprintf("[{G%5d{x] %30s %20s: {g%s{x\r\n",
-                        room->vnum, room->name, room->area->name,
-                        pexit->keyword && pexit->keyword[0] ? pexit->keyword : "");
-                door_rename(pexit, pexit->keyword, "двер|ь|и|и|ь|ью|и");
-            }
-        }
-
-        buf << "Всего " << cnt << "/" << unprocessed << "/" << total << "." << endl;           
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
-
-    if (arg == "relig") {
-        for (int i = 0; i < religionManager->size( ); i++) {
-            Religion *r = religionManager->find(i);
-            if (r)
-                buf << dlprintf("{c%-14s {w%-14s{x : %s",
-                    r->getRussianName().ruscase('1').c_str(), 
-                    r->getShortDescr().c_str(), 
-                    r->getDescription().c_str())
-                    << endl;
-        }
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
-
-    if (arg == "rot") {
-        for (int i = 0; i < MAX_KEY_HASH; i++)
-        for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
-           if (IS_SET(pObj->extra_flags, ITEM_ROT_DEATH))
-                buf << dlprintf("[%20s] [%6d] %s",
-                    pObj->area->name, pObj->vnum, pObj->short_descr) << endl;
-        }
-        page_to_char( buf.str( ).c_str( ), ch );
-        return;
-    }
-
     if (arg == "maxhelp") {
         ch->printf("Max help ID is %d.\r\n", helpManager->getLastID());
         return;
@@ -1282,7 +883,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
-
 }
 
 

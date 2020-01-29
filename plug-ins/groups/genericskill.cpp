@@ -25,7 +25,6 @@
 
 PROF(none);
 PROF(vampire);
-PROF(universal);
 HOMETOWN(frigate);
 
 const DLString GenericSkill::CATEGORY = "Профессиональные умения";
@@ -53,30 +52,12 @@ bool GenericSkill::isProfessional() const
     return !classes.empty();
 }
 
-/*
- * заполняет массивы с детьми, на основании массива с предками.
- * Вызывается из GenericSkillLoader после загрузки всех generic-skills.
- */
 void GenericSkill::resolve( ) 
 {
-    Classes::iterator c;
-    
-    for (c = classes.begin( ); c != classes.end( ); c++) 
-        try {
-            c->second.parentNames.resolve( c->first, Pointer( this ) );
-        } catch (const Exception &e) {
-            LogStream::sendError( ) << e.what( ) << endl;
-        }
 }
 
 void GenericSkill::unresolve( )
 {
-    Classes::iterator c;
-    
-    for (c = classes.begin( ); c != classes.end( ); c++) {
-        c->second.parents.clear( );
-        c->second.children.clear( );
-    }
 }
 
 /*
@@ -150,29 +131,6 @@ bool GenericSkill::usable( Character *ch, bool message = false ) const
         }
         else
             return true;
-    }
-    else if (ch->getProfession( ) == prof_universal) {
-        if (availableForAll( ))
-            return true;
-        
-        if (classes.size( ) == 1)
-            return true;
-
-        const SkillClassInfo *info = getClassInfo( ch );
-        if (info && info->isAlwaysAvailable( ))
-            return true;
-
-        if (ch->getPC( )->getSubProfession( ) != prof_none) {
-            fUsable = classes.isAvailable( 
-                        ch->getPC( )->getSubProfession( )->getName( ) );
-        }
-        else
-            fUsable = false;
-        
-        if (!fUsable && message && spell && spell->isCasted( ))
-            ch->send_to( "Это заклинание в данный момент недоступно тебе.\r\n" );
-
-        return fUsable;
     }
     else
         return true;
@@ -257,8 +215,7 @@ int GenericSkill::getLearned( Character *ch ) const
     if (temporary_skill_active(this, ch))
         return pch->getSkillData( getIndex( ) ).learned;
    
-    adept = pch->getProfession( )->getSkillAdept( ) 
-            + pch->getProfession( )->getParentAdept( );
+    adept = pch->getProfession( )->getSkillAdept( );
             
     return learnedAux( pch, adept );
 }
@@ -282,20 +239,6 @@ int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
     info = getClassInfo( pch );
     min = 100;
     
-    if (info) {
-        GenericSkillVector::const_iterator i;
-        const GenericSkillVector &v = info->parents.getConstVector( pch );
-
-        for (i = v.begin( ); i != v.end( ); i++) {
-            int lrn;
-            
-            lrn = (*i)->learnedAux( pch, adept );
-
-            if (lrn < adept)
-                min = std::min( lrn, min );
-        }
-    }
-
     percent = pch->getSkillData( getIndex( ) ).learned;
     
     rb = getRaceBonus( pch );
@@ -307,25 +250,6 @@ int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
         return min;
     else
         return URANGE( 1, percent, min );
-}
-
-/*
- * pure weight of this skill; race bonuses cost nothing 
- */
-int GenericSkill::getWeight( Character *ch ) const
-{
-    const SkillRaceBonus *rb;
-    const SkillClassInfo *ci;
-
-    rb = getRaceBonus( ch );
-    if (rb)
-        return 0;
-    
-    ci = getClassInfo( ch );
-    if (ci)
-        return ci->getWeight( );
-
-    return 0;
 }
 
 int GenericSkill::getMaximum( Character *ch ) const
@@ -340,86 +264,6 @@ int GenericSkill::getMaximum( Character *ch ) const
     return BasicSkill::getMaximum( ch );
 }
 
-/*
- * Суммарная цена скила в skill points-ах, с учетом стоимости
- * всех разученных предков.
- */
-int GenericSkill::getTotalWeight( PCharacter *ch ) 
-{
-    int result;
-    
-    unmark( ch );
-    result = totalWeightAux( ch ) / 10;
-    unmark( ch );
-    return result;
-}
-
-int GenericSkill::totalWeightAux( PCharacter *ch ) 
-{
-    GenericSkillVector::iterator i;
-    SkillClassInfo *ci = getClassInfo( ch );
-    int total = ch->skill_points( getIndex( ) ); 
-    
-    if (!ci)
-        return 0;
-
-    if (ci->isMarked( ))
-        return 0;
-
-    ci->mark( );
-
-    GenericSkillVector &v = ci->parents.getVector( ch );
-
-    for (i = v.begin( ); i != v.end( ); i++)
-        total += (*i)->totalWeightAux( ch );
-
-    return total;
-}
-
-/*
- * Сколько будет стоит знание этого скила на 100%
- * (скилы-предки должны быть разучены минимум на 75%)
- */
-int GenericSkill::getMaxWeight( PCharacter *ch ) 
-{
-    int result;
-    ProfessionReference &prof = ch->getProfession( );
-    int adept = prof->getSkillAdept( ) + prof->getParentAdept( );
-    
-    unmark( ch );
-    result = maxWeightAux( ch, adept );
-    unmark( ch );
-    
-    if (!isRaceAffect( ch ))
-        result += (100 - adept) * getWeight( ch );
-    
-    return result / 10;
-}
-
-int GenericSkill::maxWeightAux( PCharacter *ch, int adept ) 
-{
-    GenericSkillVector::iterator i;
-    SkillClassInfo *ci = getClassInfo( ch );
-    int max = 0;
-    
-    if (!ci)
-        return 0;
-
-    if (ci->isMarked( ))
-        return 0;
-    
-    ci->mark( );
-    
-    GenericSkillVector &v = ci->parents.getVector( ch );
-
-    for (i = v.begin( ); i != v.end( ); i++)
-        max += (*i)->maxWeightAux( ch, adept );
-    
-    if (isRaceAffect( ch ))
-        return max;
-    else
-        return max + adept * getWeight( ch );
-}
 
 /*
  * skill rating for player's class (how hard is it to learn)
@@ -437,49 +281,6 @@ int GenericSkill::getRating( PCharacter *ch ) const
 }
 
 /*
- * может ли чар забыть скилл (автоматически либо с пом. команды 'forget')
- * Нельзя забывать расовые бонусы и те скилы, у которых есть разученные
- * потомки. Если потомок - расовый бонус, то он не учитывается.
- */
-bool GenericSkill::canForget( PCharacter *ch ) const
-{
-    if (!available( ch ))
-        return false;
-
-    if (ch->getSkillData( getIndex( ) ).learned <= 1)
-        return false;
-    
-    if (getRaceBonus( ch ))
-        return false;
-
-    if (temporary_skill_active(this, ch))
-        return false;
-
-    return forgetAux( ch );
-}
-
-bool GenericSkill::forgetAux( PCharacter *ch ) const
-{
-    GenericSkillVector::const_iterator i;
-    const SkillClassInfo *info; 
-
-    if (getRaceBonus( ch ))
-        return true;
-
-    info = getClassInfo( ch );
-    
-    const GenericSkillVector &v = info->children.getConstVector( ch );
-
-    for (i = v.begin( ); i != v.end( ); i++)
-        if (ch->getSkillData( (*i)->getIndex( ) ).learned > 1)
-            return false;
-        else if (!(*i)->forgetAux( ch ))
-            return false; 
-
-    return true;
-}
-
-/*
  * может ли чар практиковать этот скилл
  */
 bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
@@ -487,57 +288,11 @@ bool GenericSkill::canPractice( PCharacter *ch, std::ostream & buf ) const
     if (!available( ch ))
         return false;
     
-    if (ch->getProfession( ) == prof_universal && !usable( ch )) {
-        buf << "Умение '" << getNameFor( ch ) << "' сейчас недоступно тебе." << endl;
-        return false;
-    }
-
-    if (ch->skill_points( ) > ch->max_skill_points) {
-        buf << "Тебе уже есть, что {RЗАБЫВАТЬ{x!" << endl;
-        return false;
-    }
-
     if (ch->getSkillData(getIndex()).isTemporary()) {
         buf << "Ты уже знаешь '" << getNameFor(ch) << "' так хорошо, как только можешь." << endl;
         return false;
     }
     
-    return practiceAux( ch, buf );
-}
-
-bool GenericSkill::practiceAux( PCharacter *ch, std::ostream & buf ) const
-{
-    GenericSkillVector::const_iterator i;
-    const SkillClassInfo *info; 
-    int adept;
-    
-    if (getRaceBonus( ch ))
-        return true;
-
-    info  = getClassInfo( ch );
-    adept = getAdept( ch ) /*+ ch->getProfession( )->getParentAdept( )*/;
-    
-    const GenericSkillVector &v = info->parents.getConstVector( ch );
-
-    for (i = v.begin( ); i != v.end( ); i++) {
-        PCSkillData &data = ch->getSkillData( (*i)->getIndex( ) );
-        const char *sname = (*i)->getNameFor( ch ).c_str( );
-
-        if (data.forgetting) {
-            buf << "Ты не можешь изучить это умение, ведь ты сейчас "
-                << "пытаешься забыть исскуство '" << sname << "'." << endl;
-            return false;
-        }
-        
-        if (!isRaceAffect( ch ) && data.learned.getValue( ) < adept) {
-            buf << "Ты недостаточно владеешь искусством '" << sname << "'." << endl;
-            return false;
-        }
-
-        if (!(*i)->practiceAux( ch, buf ))
-            return false;
-    }
-
     return true;
 }
 
@@ -610,54 +365,6 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         buf << skill_effective_bonus(this, ch) << "." << endl;
     }
     
-    if (ch->getProfession( ) == prof_universal) {
-        StringList cnames; 
-        
-        for (Classes::iterator i = classes.begin( ); i != classes.end( ); i++) 
-            if (i->first != prof_universal->getName( )) {
-                Profession *prof = professionManager->find( i->first );
-                cnames.push_back(prof->getNameFor(ch));
-            }
-        
-        if (!cnames.empty()) {
-            buf << "Доступно професси" << (cnames.size() == 1 ? "и" : "ям") << " "
-                << cnames.wrap("{W", "{x").join(", ") << endl;
-        }
-    }
-    
-    
-#if 0    
-    float sp = (float) getWeight( ch ) / 10;
-    int total = getTotalWeight( ch );
-    int max = getMaxWeight( ch );
-    if (sp || total || max) 
-        buf << "Цена {W" << sp << "{x sp, "
-            << "на всю ветку потрачено {W" << total << "{x sp, "
-            << "мастерское владение стоит {W" << max << "{x sp" 
-            << endl;
-#endif    
-    SkillClassInfo *ci = getClassInfo( ch );
-    
-    if (ci) {
-        StringList cnames;
-        GenericSkillVector::const_iterator i;
-        const GenericSkillVector &v = ci->children.getConstVector( ch );
-        
-        for (i = v.begin( ); i != v.end( ); i++) 
-            cnames.push_back((*i)->getNameFor(ch));
-        
-        if (!cnames.empty()) 
-            buf << "Позволяет выучить: " << cnames.wrap("{W", "{x").join(", ") << endl;
-    }
-    
-    unmark( ch );
-    if (ch->getProfession( ) == prof_universal) {
-        buf << endl;
-        showParents( ch, buf, "|" );
-        buf << endl;
-    }
-    unmark( ch );
-
     if (getGroup()->getPracticer() == 0) {
         // '...в твоей гильдии (справка|help гильдии|guilds)' - с гипер-ссылкой на справку.
         buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка {hhгильдии{hx{lEhelp {hhguilds{x)." << endl;
@@ -676,58 +383,6 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         buf << "Ты все еще можешь учиться у {gадепта{x ({g{hhMUD Школа{x)." << endl;
 
     print_see_also(this, ch, buf);
-}
-
-/* 
- * Печатает дерево предков для скила
- */
-void 
-GenericSkill::showParents( PCharacter *ch, std::ostream & buf, DLString pad ) 
-{
-    SkillClassInfo *ci = getClassInfo( ch );
-    PCSkillData &data = ch->getSkillData( getIndex( ) );
-    int percent = data.learned;
-    
-    if (!data.isTemporary() && !ci)
-        return;
-
-    if (ci && ci->isMarked( ))
-        buf << "{D";
-    else if (!usable( ch ))
-        buf << "{R";
-    else if (data.forgetting) 
-        buf << "{Y";
-    else if (getEffective( ch ) >= getMaximum( ch ))
-        buf << "{G";
-    else 
-        buf << "{g";
-
-    buf << getNameFor( ch ) << "{x ({" << skill_learned_colour(this, ch) << data.learned << "%{x";
-    
-#if 0    
-    float sp = (float) getWeight( ch ) / 10;
-    if (sp > 0)
-        buf << "*" << sp;
-#endif        
-    buf << ", уровень {W" << getLevel( ch ) << "{x)" << endl;
-    
-    if (data.isTemporary())
-        return;
- 
-    ci->mark( );
-
-    GenericSkillVector &v = ci->parents.getVector( ch );
-
-    for (unsigned int i = 0; i < v.size( ); i++) {
-        DLString pa = pad.substr( 0, pad.length( ) - 1 );
-
-        buf << "{y" << pad << endl << pa << "+-->" << "{x";
-        
-        if (i + 1 == v.size( ))
-            v[i]->showParents( ch, buf, pa + "    |" );        
-        else
-            v[i]->showParents( ch, buf, pad + "   |" );        
-    }
 }
 
 /*
@@ -800,26 +455,6 @@ bool GenericSkill::isRaceAffect( Character *ch ) const
     return ch->getRace( )->getAff( ).isSet( raceAffect.getValue( ) );
 }
 
-/*
- * установка/снятие/проверка меток на дереве предков
- * (используется при обходе в глубину)
- */
-void GenericSkill::unmark( PCharacter *ch )
-{
-    Classes::iterator c;
-    
-    for (c = classes.begin( ); c != classes.end( ); c++) {
-        GenericSkillVector::iterator i;
-        SkillClassInfo *info = &c->second;
-        GenericSkillVector &v = info->parents.getVector( ch );
-
-        info->unmark( );
-        
-        for (i = v.begin( ); i != v.end( ); i++)
-            (*i)->unmark( ch );
-    }
-}
-
 /*--------------------------------------------------------------------------
  * SkillRaceBonus
  *--------------------------------------------------------------------------*/
@@ -855,153 +490,5 @@ bool SkillClassInfo::visible( ) const
 {
     return getLevel( ) < LEVEL_IMMORTAL 
             && getRating( ) > 0;
-}
-
-/*--------------------------------------------------------------------------
- * SkillRelatives
- *--------------------------------------------------------------------------*/
-
-void SkillRelatives::clear( )
-{
-    evil.clear( );
-    good.clear( );
-    neutral.clear( );
-}
-
-GenericSkillVector & SkillRelatives::getVector( PCharacter *ch ) 
-{
-    return const_cast<GenericSkillVector &>( getConstVector( ch ) );
-}
-
-const GenericSkillVector & SkillRelatives::getConstVector( PCharacter *ch ) const
-{
-    if (IS_GOOD(ch))
-        return good;
-    else if (IS_EVIL(ch))
-        return evil;
-    else
-        return neutral;
-}
-
-/*--------------------------------------------------------------------------
- * XMLSkillParents 
- *--------------------------------------------------------------------------*/
-
-bool XMLSkillParents::nodeFromXML( const XMLNode::Pointer& child )
-{
-    XMLNode::Pointer node;
-    DLString align, name;
-    
-    if (child->getName( ) != XMLNode::ATTRIBUTE_NODE) 
-        return false;
-    
-    node = child->getFirstNode( );
-
-    if (!node || node->getName( ).empty( ))
-        return false;
-    
-    name = node->getName( );
-    align = child->getAttribute( "align" );
-
-    if (align.empty( ) || align == "any" || align == "all") {
-        evil.push_back( name );
-        good.push_back( name );
-        neutral.push_back( name );
-    }
-    else if (align == "evil")
-        evil.push_back( name );
-    else if (align == "good") 
-        good.push_back( name );
-    else if (align == "neutral")
-        neutral.push_back( name );
-    else
-        return false;
-        
-    return true;
-}
-
-bool XMLSkillParents::toXML( XMLNode::Pointer& parent ) const
-{
-    Names::const_iterator i;
-    
-    if (evil.empty( ) && good.empty( ) && neutral.empty( ))
-        return false;
-
-    parent->setType( XMLNode::XML_NODE );
-    
-    if (evil == good && good == neutral) {
-        for (i = evil.begin( ); i != evil.end( ); i++) 
-            appendChild( *i, parent, "" );
-    }
-    else {
-        for (i = evil.begin( ); i != evil.end( ); i++) 
-            appendChild( *i, parent, "evil" );
-
-        for (i = neutral.begin( ); i != neutral.end( ); i++) 
-            appendChild( *i, parent, "neutral" );
-
-        for (i = good.begin( ); i != good.end( ); i++) 
-            appendChild( *i, parent, "good" );
-    }
-
-    return true;
-}
-
-void XMLSkillParents::appendChild( const DLString& name, XMLNode::Pointer& parent, const DLString& align ) const
-{
-    XMLNode::Pointer child( NEW ), text( NEW );
-    
-    text->setCData( name );
-    text->setType( XMLNode::XML_TEXT );
-    child->appendChild( text );
-
-    child->setName( XMLNode::ATTRIBUTE_NODE );
-    child->setType( XMLNode::XML_NODE );
-
-    if (!align.empty( ))
-        child->insertAttribute( "align", align );
-
-    parent->appendChild( child );
-}
-
-void XMLSkillParents::resolve( const DLString &className, GenericSkill::Pointer mySkill )
-{
-    Names::iterator i;
-    GenericSkill::Pointer parent;
-
-    for (i = evil.begin( ); i != evil.end( ); i++) {
-        parent = getParentSkill( *i, mySkill );
-        mySkill->getClassInfo( className )->parents.evil.push_back( parent );
-        parent->getClassInfo( className )->children.evil.push_back( mySkill );
-    }
-    for (i = good.begin( ); i != good.end( ); i++) {
-        parent = getParentSkill( *i, mySkill );
-        mySkill->getClassInfo( className )->parents.good.push_back( parent );
-        parent->getClassInfo( className )->children.good.push_back( mySkill );
-    }
-    for (i = neutral.begin( ); i != neutral.end( ); i++) {
-        parent = getParentSkill( *i, mySkill );
-        mySkill->getClassInfo( className )->parents.neutral.push_back( parent );
-        parent->getClassInfo( className )->children.neutral.push_back( mySkill );
-    }
-}
-
-GenericSkill::Pointer XMLSkillParents::getParentSkill( 
-            const DLString& skillName, GenericSkill::Pointer mySkill ) 
-{
-    Skill::Pointer skill;
-    GenericSkill::Pointer gskill;
-    
-    skill = SkillManager::getThis( )->find( skillName );
-
-    if (!skill)
-        throw Exception( "Unknown parent " + skillName + " for skill " + mySkill->getName( ) );
-        
-    gskill = skill.getDynamicPointer<GenericSkill>( );
-
-    if (!gskill)
-        throw Exception( "Skill " + mySkill->getName( ) + " depends on non-generic skill " + skill->getName( ) );
-
-    return gskill;
 }
 

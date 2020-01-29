@@ -111,7 +111,6 @@ using std::min;
 using std::max;
 
 PROF(none);
-PROF(universal);
 PROF(samurai);
 PROF(anti_paladin);
 RELIG(none);
@@ -324,10 +323,6 @@ CMDRUNP( oscore )
         << "  Класс: " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
-        if (pch->getSubProfession( ) != prof_none)
-            buf << "(" << pch->getSubProfession( )->getNameFor( ch ) << ")";
-    
-    if (!ch->is_npc( ))
         room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
     else
         room = get_room_index( ROOM_VNUM_TEMPLE );
@@ -483,12 +478,7 @@ CMDRUNP( oscore )
             buf << dlprintf( "Благословение богов улучшает все твои умения на %d%%.\n\r",
                         ch->getPC( )->bless.getValue( ));
     }
-#if 0
-    if (ch->getProfession( ) == prof_universal)
-        buf << dlprintf( "У тебя %d/%d {lRочков умений{lEskill points{lx.\n\r",
-                    ch->getPC()->skill_points(),
-                    ch->getPC()->max_skill_points.getValue( ));
-#endif
+    
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
         buf << dlprintf( "Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня.",
@@ -1602,11 +1592,6 @@ CMDRUNP( score )
     Room *room = get_room_index( pch->getHometown( )->getAltar( ) );
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
-    if (ch->getProfession( ) == prof_universal) 
-        profName << "+"
-                 << (pch->getSubProfession( ) != prof_none ? 
-                        pch->getSubProfession( )->getWhoNameFor( ch ) : "   ");
-        
     ostringstream name;
     DLString title = pch->getParsedTitle( );
     name << ch->seeName( ch, '1' ) << "{x ";

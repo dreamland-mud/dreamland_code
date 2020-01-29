@@ -44,7 +44,6 @@ public:
     int countBonusLifes( ) const;
     int getHitPerLevel( int );
     int getManaPerLevel( int );
-    int getSkillPointsPerLevel( int );
     static int bonusPerLevel( int, int );
     
     XML_VARIABLE XMLIntegerNoEmpty points;
@@ -54,7 +53,6 @@ public:
     XML_VARIABLE XMLIntegerNoEmpty hp;
     XML_VARIABLE XMLIntegerNoEmpty mana;
     XML_VARIABLE XMLIntegerNoEmpty level;
-    XML_VARIABLE XMLIntegerNoEmpty skillPoints;
 
     XML_VARIABLE XMLIntegerNoEmpty owners;
 

@@ -67,16 +67,6 @@ int RaceAptitude::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned.getValue( );
 }
 
-int RaceAptitude::getWeight( Character * ) const
-{
-    return 0;
-}
-
-bool RaceAptitude::canForget( PCharacter * ) const
-{
-    return false;
-}
-
 bool RaceAptitude::canPractice( PCharacter * ch, std::ostream & ) const
 {
     return available( ch );

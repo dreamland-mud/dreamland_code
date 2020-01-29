@@ -90,16 +90,6 @@ int CraftSkill::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
 
-int CraftSkill::getWeight( Character *ch ) const
-{
-    return weight;
-}
-
-bool CraftSkill::canForget( PCharacter *ch ) const
-{
-    return false;
-}
-
 bool CraftSkill::canPractice( PCharacter *ch, std::ostream &buf ) const
 {
     return available(ch);
@@ -177,9 +167,6 @@ void CraftSkill::improve( Character *ch, bool success, Character *victim, int da
         return;
     
     rprog_skill( ch->in_room, ch, getName( ).c_str( ), success, victim );
-
-    if (data.forgetting)
-        return;
 
     data.timer = 0;
 

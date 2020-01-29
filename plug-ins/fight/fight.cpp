@@ -106,7 +106,6 @@ PROF(anti_paladin);
 PROF(ninja);
 PROF(ranger);
 PROF(samurai);
-PROF(universal);
 
 static bool mprog_fight( Character *ch, Character *victim )
 {
@@ -195,7 +194,6 @@ const struct second_weapon_t second_weapon_table [] = {
 { prof_ninja,       { 90, 45,  45, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } }, 
 { prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 18, 18,  18, 18, 18 } },
 { prof_samurai,     { 60, 45,  90, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
-{ prof_universal,   { 45, 45,  30, 45, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
 { prof_none,        { 0,                                                    } },
 };
 

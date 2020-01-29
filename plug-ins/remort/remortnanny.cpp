@@ -19,8 +19,6 @@
 #include "vnum.h"
 #include "def.h"
 
-PROF(universal);
-
 
 /*-----------------------------------------------------------------------------
  * descriptor state listener for remorting players 

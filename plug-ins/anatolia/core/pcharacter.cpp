@@ -20,7 +20,6 @@
 
 CLAN(none);
 PROF(samurai);
-PROF(universal);
 
 /*
  *  Experience
@@ -130,17 +129,6 @@ void PCharacter::advanceLevel( )
 
     if (add_train > 0)
         buf << ", {Y" << add_train << "{C/" << train << " {lRтренировку{lEtrain{lx";
-
-    if (getProfession( ) == prof_universal) {
-        int sp_gain;
-
-        sp_gain = 200 + getRace( )->getPC( )->getSpBonus( ) + remorts.getSkillPointsPerLevel( level );
-        max_skill_points += sp_gain;         
-#if 0        
-        buf << "," << endl << "              "
-            << "{Y" << sp_gain << "{C/" << max_skill_points << " {lRочков умений{lEskill points{lx"; 
-#endif        
-    }
     
     buf << ".{x";
     println( buf.str( ).c_str( ) );

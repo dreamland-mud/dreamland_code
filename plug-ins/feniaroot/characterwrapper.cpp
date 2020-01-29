@@ -723,7 +723,6 @@ INT_FIELD(has_killed, "сколько жертв убито всего")
 INT_FIELD(perm_hit, "max hp без шмота")
 INT_FIELD(perm_mana, "max mana без шмота")
 INT_FIELD(perm_move, "max move без шмота")
-INT_FIELD(max_skill_points, "кол-во скилпоинтов у чара")
 INT_FIELD(practice, "сколько практик")
 INT_FIELD(train, "сколько тренировок")
 INT_FIELD(loyalty, "лояльность по отношению к закону (рулеровскому)")
@@ -839,23 +838,6 @@ NMI_SET( CharacterWrapper, religion, "религия (структура .Religi
         target->getPC( )->setReligion( "none" );
     else
         target->getPC( )->setReligion( wrapper_cast<ReligionWrapper>(arg)->name );
-}
-
-NMI_GET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
-{
-    checkTarget( );
-    CHK_NPC
-    return Register::handler<ProfessionWrapper>(target->getPC()->getSubProfession()->getName());
-}
-
-NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
-{
-    checkTarget( );
-    CHK_NPC
-    if (arg.type == Register::NONE)
-        target->getPC( )->setSubProfession( "none" );
-    else
-        target->getPC( )->setSubProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
 NMI_GET( CharacterWrapper, hometown, "родной город (структура .Hometown)" )

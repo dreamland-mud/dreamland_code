@@ -96,7 +96,7 @@ VOID_SPELL(CausticFont)::run( Character *ch, Character *victim, int sn, int leve
     int dam;
 
     dam = dice( level, 9 );
-    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
+    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL|DAMF_WATER ) )
         dam /= 2;
         
     act("Фонтан едкой жидкости образуется у ног $C2.\n\r"

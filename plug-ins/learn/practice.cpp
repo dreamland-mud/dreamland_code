@@ -50,19 +50,13 @@ COMMAND(CPractice, "practice")
 
 struct PracInfo {
     int percent;
-    int weight;
-    bool forgetting;
     int adept;
-    int parentAdept;
     int maximum;
     DLString name;
 
     inline const char * getNameColor( ) const
     {
-        if (forgetting)
-            return "{r";
-        else
-            return "{x";
+        return "{x";
     }
     inline const char * getPercentColor( ) const
     {
@@ -70,10 +64,8 @@ struct PracInfo {
             return "{R";
         else if (percent >= maximum)
             return "{C";
-        else if (percent >= adept + parentAdept)
+        else if (percent >= adept)
             return "{c";
-        else if (percent > adept)
-            return "{m";
         else
             return "{x";
     }
@@ -113,11 +105,8 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
             continue;
         
         info.percent = data.learned;
-        info.weight = skill->getWeight( ch );
-        info.forgetting = data.forgetting;
         info.name = skill->getNameFor( ch );
         info.adept = skill->getAdept( ch );
-        info.parentAdept = ch->getProfession( )->getParentAdept( );
         info.maximum = skill->getMaximum( ch );
 
         cm_iter = cmap.find( category );
@@ -150,11 +139,6 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
                               info.name.c_str( ),
                               info.getPercentColor( ),
                               info.percent );                                
-#if 0            
-            if (info.weight > 0)
-                buf << "*{c" << info.weight / 10 << "." << info.weight % 10 << "{x ";
-            else
-#endif                
                 buf << "     ";
             
             if ((i + 1) % columns == 0)
@@ -169,11 +153,6 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
     
     buf << dlprintf( "У тебя %d сесси%s практики (practice).\n\r",
                  ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
-#if 0    
-    int sp;
-    if ((sp = ch->skill_points( )) > 0)
-        buf << "{cУ тебя " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
-#endif
 
     page_to_char( buf.str( ).c_str( ), ch );
 }

@@ -46,7 +46,6 @@ PROF(anti_paladin);
 PROF(ninja);
 PROF(ranger);
 PROF(samurai);
-PROF(universal);
 PROF(thief);
 
 WEARLOC(tat_wrist_l);

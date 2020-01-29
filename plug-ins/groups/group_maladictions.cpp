@@ -455,7 +455,7 @@ VOID_AFFECT(LethargicMist)::update( Room *room, Affect *paf )
     af.bitvector= AFF_SLOW;
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
-        if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_SPELL)
+        if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_SPELL|DAMF_WATER)
                 && !is_safe_rspell(paf->level,vch)
                 && !IS_AFFECTED(vch,AFF_SLOW) && number_bits(3) == 0 )
         {

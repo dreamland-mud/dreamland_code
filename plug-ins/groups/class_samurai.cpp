@@ -680,17 +680,3 @@ bool OwnedKatana::isLevelAdaptive( )
 {
    return true; 
 }
-
-/*
- * SamuraiUniclassAdept
- */
-SamuraiUniclassAdept::SamuraiUniclassAdept( )
-{
-    myclass.setValue( prof_samurai->getName( ) );
-}
-
-void SamuraiUniclassAdept::tell( Character *victim, const char *speech )
-{
-    UniclassAdept::tell( victim, speech );
-}
-

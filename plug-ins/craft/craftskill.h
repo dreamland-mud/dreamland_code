@@ -25,9 +25,7 @@ public:
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
-    virtual int getWeight( Character * ) const;
     
-    virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
@@ -42,7 +40,6 @@ public:
 protected:
     static const DLString CATEGORY;
 
-    XML_VARIABLE XMLInteger weight;    
     XML_VARIABLE XMLSkillGroupReference group;
     XML_VARIABLE CraftProfessions subprofessions;
 };

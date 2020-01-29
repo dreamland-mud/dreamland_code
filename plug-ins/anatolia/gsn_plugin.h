@@ -248,7 +248,6 @@ _GSN_( restoring_light );
 _GSN_( sanctuary );
 _GSN_( sand_storm );
 _GSN_( scream );
-_GSN_( scribing );
 _GSN_( scrolls );
 _GSN_( sebat );
 _GSN_( second_attack );

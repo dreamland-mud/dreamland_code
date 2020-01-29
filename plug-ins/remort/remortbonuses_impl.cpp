@@ -7,8 +7,6 @@
 #include "merc.h"
 #include "def.h"
 
-PROF(universal);
-
 /*
  * StatRemortBonus
  */
@@ -127,31 +125,6 @@ int ManaRemortBonus::bonusMaximum( PCharacter *ch ) const
 int & ManaRemortBonus::bonusField( PCharacter *ch ) const
 {
     return ch->getRemorts( ).mana;
-}
-
-/*
- * SkillPointRemortBonus 
- */
-void SkillPointRemortBonus::bonusApply( PCharacter *ch ) const
-{
-    for (int i = 1; i <= ch->getRealLevel( ); i++) 
-        ch->max_skill_points += ch->getRemorts( ).getSkillPointsPerLevel( i );
-}
-
-void SkillPointRemortBonus::bonusRemove( PCharacter *ch ) const
-{
-    for (int i = 1; i <= ch->getRealLevel( ); i++) 
-        ch->max_skill_points -= ch->getRemorts( ).getSkillPointsPerLevel( i );
-}
-
-int SkillPointRemortBonus::bonusMaximum( PCharacter *ch ) const 
-{
-    return (ch->getProfession( ) == prof_universal ? 0xffff : 0);
-}
-
-int & SkillPointRemortBonus::bonusField( PCharacter *ch ) const
-{
-    return ch->getRemorts( ).skillPoints;
 }
 
 /*

@@ -77,10 +77,6 @@ int Profession::getSkillAdept( ) const
 {
     return 0;
 }
-int Profession::getParentAdept( ) const
-{
-    return 0;
-}
 int Profession::getThac00( Character * ) const
 {
     return 0;

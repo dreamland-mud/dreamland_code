@@ -23,7 +23,6 @@ struct SkillInfo
     int adept;
     int maximum;
     bool spell;
-    bool forgetting;
     bool available;
 
     static bool cmp_by_name( SkillInfo a, SkillInfo b )

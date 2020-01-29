@@ -59,16 +59,6 @@ int CardSkill::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
 
-int CardSkill::getWeight( Character * ) const
-{
-    return 0;
-}
-
-bool CardSkill::canForget( PCharacter * ) const
-{
-    return false;
-}
-
 bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
 {
     return available( ch );

@@ -3459,7 +3459,6 @@ CMDWIZP( advance )
         victim->max_move = 100;
         victim->practice = 0;
         victim->train    = 0;
-        victim->max_skill_points = 1000;
         victim->hit      = victim->max_hit;
         victim->mana     = victim->max_mana;
         victim->move     = victim->max_move;

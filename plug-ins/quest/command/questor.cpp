@@ -34,7 +34,6 @@
 
 #define OBJ_VNUM_QUEST_SCROLL 28109
 
-PROF(universal);
 RELIG(fili);
 
 /*--------------------------------------------------------------------------
@@ -141,8 +140,6 @@ void Questor::doComplete( PCharacter *client, DLString &args )
     if (chance( r->wordChance ))
         rewardWord( client );
    
-    if (client->getProfession( ) == prof_universal) 
-        r->scrollChance *= 2;
     fScrollGiven = chance( r->scrollChance );
     if (fScrollGiven)
         rewardScroll( client );

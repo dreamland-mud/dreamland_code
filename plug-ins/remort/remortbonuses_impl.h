@@ -60,16 +60,5 @@ protected:
     virtual int & bonusField( PCharacter * ) const;
 };
 
-class SkillPointRemortBonus : public AppliedRemortBonus {
-XML_OBJECT
-public:
-    typedef ::Pointer<SkillPointRemortBonus> Pointer;
-protected:
-    virtual void bonusApply( PCharacter * ) const;
-    virtual void bonusRemove( PCharacter * ) const;
-    virtual int bonusMaximum( PCharacter * ) const;
-    virtual int & bonusField( PCharacter * ) const;
-};
-
 
 #endif

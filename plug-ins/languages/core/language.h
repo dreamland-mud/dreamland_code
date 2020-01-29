@@ -85,10 +85,8 @@ public:
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
-    virtual int getWeight( Character * ) const;
     virtual int getMaximum( Character * ) const;
     virtual int getAdept( PCharacter * ) const;
-    virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void practice( PCharacter * ) const;

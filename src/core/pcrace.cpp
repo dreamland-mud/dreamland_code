@@ -74,10 +74,6 @@ int PCRace::getPracBonus( ) const
 {
     return 0;
 }
-int PCRace::getSpBonus( ) const
-{
-    return 0;
-}
 
 DLString PCRace::getWhoNameFor( Character *, Character * ) const
 {
