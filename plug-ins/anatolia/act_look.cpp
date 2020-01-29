@@ -1278,15 +1278,15 @@ static void do_look_into( Character *ch, char *arg2 )
     oprog_examine( obj, ch, pocket );
 }
 
-static void afprog_look( Character *ch, Character *victim )
+static void afprog_look( Character *looker, Character *victim )
 {
     Affect *paf, *paf_next;
     
-    for (paf = ch->affected; paf; paf = paf_next) {
+    for (paf = victim->affected; paf; paf = paf_next) {
         paf_next = paf->next;
 
         if (paf->type->getAffect( ))
-            paf->type->getAffect( )->look( ch, victim, paf );
+            paf->type->getAffect( )->look( looker, victim, paf );
     }
 }
 

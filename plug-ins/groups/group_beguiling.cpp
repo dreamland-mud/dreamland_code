@@ -156,46 +156,57 @@ VOID_SPELL(ControlUndead)::run( Character *ch, Character *victim, int sn, int le
 SPELL_DECL(LovePotion);
 VOID_SPELL(LovePotion)::run( Character *ch, Character *, int sn, int level ) 
 { 
-  Affect af;
+    if (ch->isAffected(sn)) {
+        ch->pecho("Ты уже настолько неотразим%Gо||а, насколько это возможно!", ch);
+        return;
+    }
 
-  af.where                = TO_AFFECTS;
-  af.type               = sn;
-  af.level              = level;
-  af.duration           = 50;
-  affect_join(ch, &af);
+    Affect af;
 
-  ch->send_to("Тебя так и тянет взглянуть на кого-нибудь.\n\r");
+    af.where              = TO_AFFECTS;
+    af.type               = sn;
+    af.level              = level;
+    af.duration           = level / 5;
+    affect_join(ch, &af);
 
+    ch->pecho("Ты чувствуешь себя неотразимо прекрасн%Gым|ым|ой.", ch);
 }
 
 AFFECT_DECL(LovePotion);
-VOID_AFFECT(LovePotion)::look( Character *ch, Character *victim, Affect *paf ) 
+VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf ) 
 {
     Affect af;
 
-    DefaultAffectHandler::look( ch, victim, paf );
+    DefaultAffectHandler::look( ch, witch, paf );
     
-    if (ch == victim || ch->is_immortal( ))
+    if (ch == witch || ch->is_immortal())
         return;
 
-    affect_strip( ch, paf->type );
+    if (is_safe(witch, ch) || overcharmed(witch))
+        return;
+
+    if (saves_spell( paf->level, ch, DAM_CHARM, witch, DAMF_SPELL )) {
+        act("При взгляде на $c4 твое сердце на мгновение замирает.", witch, 0, ch, TO_VICT);
+        act("Во взгляде $C2 на мгновение мелькает полный восторг.", witch, 0, ch, TO_CHAR);
+        return;
+    }
+
+    act("Неужели $c1 выглядит так очаровательно?", witch, 0, ch, TO_VICT);
+    act("$C1 смотрит на тебя с покорностью.", witch, 0, ch, TO_CHAR);
+    act("$C1 смотрит на $c4 с покорностью.", witch, 0, ch, TO_NOTVICT);
 
     if (ch->master)
         ch->stop_follower( );
 
-    ch->add_follower( victim );
-    ch->leader = victim;
+    ch->add_follower( witch );
+    ch->leader = witch;
 
     af.where     = TO_AFFECTS;
     af.type      = gsn_charm_person;
     af.level     = ch->getModifyLevel( );
-    af.duration  = number_fuzzy( victim->getModifyLevel( ) / 4);
+    af.duration  = number_fuzzy( witch->getModifyLevel( ) / 4);
     af.bitvector = AFF_CHARM;
     affect_to_char(ch, &af);
-
-    act("Неужели $c1 выглядит так очаровательно?", victim, 0, ch, TO_VICT);
-    act("$C1 смотрит на тебя с покорностью.", victim, 0, ch, TO_CHAR);
-    act("$C1 смотрит на $c4 с покорностью.", victim, 0, ch, TO_NOTVICT);
 }
 
 /*
