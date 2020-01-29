@@ -218,7 +218,7 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     int chance_modifier = 18;
  
     for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
-        if (ch->getTrueProfession( ) == second_weapon_table[i].prof) {
+        if (ch->getProfession( ) == second_weapon_table[i].prof) {
             chance_modifier = second_weapon_table[i].percents[index];
             break;
         }

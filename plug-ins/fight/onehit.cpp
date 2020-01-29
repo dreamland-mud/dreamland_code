@@ -195,8 +195,8 @@ void OneHit::thacBase( )
 {
     int thac0_00, thac0_32;
 
-    thac0_00 = ch->getTrueProfession( )->getThac00( ch );
-    thac0_32 = ch->getTrueProfession( )->getThac32( ch );
+    thac0_00 = ch->getProfession( )->getThac00( ch );
+    thac0_32 = ch->getProfession( )->getThac32( ch );
 
     thac0  = interpolate( ch->getModifyLevel(), thac0_00, thac0_32 );
 

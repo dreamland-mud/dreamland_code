@@ -70,7 +70,7 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
         chance  = min( static_cast<short>( 30 ), victim->getModifyLevel() );
     else
     {
-        int prof = victim->getTrueProfession( );
+        int prof = victim->getProfession( );
 
         chance  = gsn_dodge->getEffective( victim ) / 2;
         chance += victim->getCurrStat(STAT_DEX) - 20;

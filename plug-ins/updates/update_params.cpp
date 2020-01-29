@@ -98,7 +98,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
         return;
 
     gain = std::max(3, 2 * ch->getCurrStat(STAT_CON) + (7 * ch->getRealLevel( )) / 4);
-    rate = ch->getTrueProfession( )->getHpRate( );
+    rate = ch->getProfession( )->getHpRate( );
     gain = (gain * rate) / 100;
     number = number_percent();
 
@@ -188,7 +188,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
         return;
 
     gain = ch->getCurrStat(STAT_WIS) + (2 * ch->getCurrStat(STAT_INT)) + ch->getRealLevel( );
-    rate = ch->getTrueProfession( )->getManaRate( );
+    rate = ch->getProfession( )->getManaRate( );
     gain = ( gain * rate ) / 100;
 
     number = number_percent();

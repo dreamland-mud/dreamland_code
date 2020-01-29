@@ -139,7 +139,7 @@ void QuestWeapon::addAffect( Character *ch, Affect *paf ) {
     case APPLY_MANA:
       paf->level = level;
       paf->modifier = level * 2;
-      if (ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER)) 
+      if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER)) 
           paf->modifier += paf->modifier*3/2;
 
       return;

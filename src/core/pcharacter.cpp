@@ -527,10 +527,6 @@ void PCharacter::setHometown( const HometownReference & hometown )
 {
     this->hometown.assign( hometown );
 }
-ProfessionReference &PCharacter::getTrueProfession( )
-{
-    return getProfession( );
-}
 
 short PCharacter::getClanLevel( ) const 
 {

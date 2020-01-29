@@ -1509,7 +1509,7 @@ bool RangerStaff::death( Character *ch )
 
 bool RangerStaff::canEquip( Character *ch )
 {
-  if (ch->getTrueProfession( ) != prof_ranger) {
+  if (ch->getProfession( ) != prof_ranger) {
         ch->println("Ты не знаешь как использовать эту вещь.");
         act( "Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
         act( "Посох рейнджера выскальзывает из рук $c2.", ch, 0, 0, TO_ROOM );

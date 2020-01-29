@@ -208,7 +208,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
         add_ac = -2;
     }
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
         SET_BIT(obj->extra_flags,ITEM_MAGIC);
                 
     /* now add the enchantments */
@@ -390,7 +390,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
         added = 2;
     }
                 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
         SET_BIT(obj->extra_flags,ITEM_MAGIC);
 
     /* now add the enchantments */

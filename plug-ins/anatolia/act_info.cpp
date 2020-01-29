@@ -1317,7 +1317,7 @@ CMDRUNP( demand )
   if (ch->is_npc())
         return;
 
-  if (ch->getTrueProfession( ) != prof_anti_paladin)
+  if (ch->getProfession( ) != prof_anti_paladin)
     {
         ch->println( "Ты никого не запугаешь своим видом." );
       return;

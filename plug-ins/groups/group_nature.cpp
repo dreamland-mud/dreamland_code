@@ -78,7 +78,7 @@ SKILL_RUNP( tame )
     /*
      * druidic tame: control animal attracted by magic bite
      */
-    if (ch->getTrueProfession( ) == prof_druid) {
+    if (ch->getProfession( ) == prof_druid) {
 #if 0        
         DruidSummonedAnimal::Pointer animal;
         int chance;
@@ -132,7 +132,7 @@ SKILL_RUNP( tame )
     /* 
      * ranger tame: remove aggression
      */
-    if (ch->getTrueProfession( ) == prof_ranger) {
+    if (ch->getProfession( ) == prof_ranger) {
         if (!IS_SET(victim->act,ACT_AGGRESSIVE))
         {
             ch->pecho("%1$^C1 обычно не аггресив%1$Gно|ен|на|ны.", victim);

@@ -273,10 +273,6 @@ void Character::setProfession( const ProfessionReference & profession )
 {
     this->profession.assign( profession );
 }
-ProfessionReference & Character::getTrueProfession( )
-{
-    return getProfession( );
-}
 
 ReligionReference & Character::getReligion( ) 
 {

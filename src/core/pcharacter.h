@@ -138,8 +138,6 @@ public:
     virtual short getClanLevel( ) const ;
     virtual void setClanLevel( short clanLevel ) ;
 
-    virtual ProfessionReference & getTrueProfession( );
-
     virtual HometownReference &getHometown( ) ;
     virtual void setHometown( const HometownReference & ) ;
 

@@ -194,7 +194,7 @@ short get_wear_level( Character *ch, Object *obj )
 {
     int wear_mod, level_diff;
     
-    wear_mod = ch->getTrueProfession( )->getWearModifier( obj->item_type );
+    wear_mod = ch->getProfession( )->getWearModifier( obj->item_type );
     level_diff = ch->getModifyLevel( ) - ch->getRealLevel( );
             
     return std::max( 1, obj->level - wear_mod - level_diff );

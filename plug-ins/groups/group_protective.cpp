@@ -90,7 +90,7 @@ VOID_SPELL(Armor)::run( Character *ch, Character *victim, int sn, int level )
     af.location  = APPLY_AC;
     affect_to_char( victim, &af );
     
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
         act("Священная броня окружает тебя.", victim, 0, 0, TO_CHAR);
         if (ch != victim)
             act("Священная броня окружает $C4.", ch, 0, victim, TO_CHAR);
@@ -710,7 +710,7 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
     af.bitvector = 0;
     affect_to_char( victim, &af );
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
         act("Божественная энергия окружает тебя щитом.", victim, 0, 0, TO_CHAR);
         act("Божественная энергия окружает $c4 щитом.", victim, 0, 0, TO_ROOM);
     } else {
