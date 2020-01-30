@@ -34,7 +34,6 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 GSN(bat_sworm);
 GSN(bat_swarm);
-PROF(universal);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -44,25 +43,6 @@ static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReferen
     if (learn1 > 1 && !skill1->visible( ch ) && skill2->visible( ch )) {
         learn2 = learn1;
         learn1 = 1;
-    }
-}
-
-static void update_skill_points( PCharacter *ch )
-{
-    if (ch->getProfession( ) == prof_universal) {
-        int deserves_sp = 1000;
-
-        for (int l = 1; l <= ch->getLevel( ); l++)
-            deserves_sp += 200 
-                + ch->getRace( )->getPC( )->getSpBonus( )
-                + ch->getRemorts( ).getSkillPointsPerLevel( l );
-
-        if (ch->max_skill_points < deserves_sp) {
-            notice("Fixing skill points for %s: from %d to %d.",
-                ch->getName( ).c_str( ), ch->max_skill_points, deserves_sp);
-
-            ch->max_skill_points = deserves_sp;         
-        }
     }
 }
 
@@ -197,7 +177,6 @@ bool PCharacter::load( )
     updateStats( );
     updateSkills( );
     update_exp( this );
-    update_skill_points( this );
 
     /* fix renamed skills */
     skill_exchange( this, gsn_sanctuary, gsn_stardust );

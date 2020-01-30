@@ -151,7 +151,6 @@ public:
     virtual DLString getWhoNameFor( Character * ) const;
     virtual int  getWeapon( ) const;
     virtual int  getSkillAdept( ) const;
-    virtual int  getParentAdept( ) const;
     virtual int  getThac00( Character * = NULL ) const;
     virtual int  getThac32( Character * = NULL ) const;
     virtual int  getHpRate( ) const;

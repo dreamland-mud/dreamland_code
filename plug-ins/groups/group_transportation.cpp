@@ -176,7 +176,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     Room *to_room = 0, *from_room;
     int vnum;
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         vnum = OBJ_VNUM_HOLY_PORTAL;
     else
         vnum = OBJ_VNUM_PORTAL;
@@ -247,7 +247,7 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
     Object *portal, *stone;
     int vnum;
     
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
         vnum = OBJ_VNUM_HOLY_PORTAL;
     else
         vnum = OBJ_VNUM_PORTAL;

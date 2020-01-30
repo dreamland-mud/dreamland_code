@@ -117,11 +117,6 @@ int ClanSkill::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
 
-int ClanSkill::getWeight( Character * ) const
-{
-    return 0;
-}
-
 int ClanSkill::getMaximum( Character *ch ) const
 {
     const SkillClanInfo *ci;
@@ -130,11 +125,6 @@ int ClanSkill::getMaximum( Character *ch ) const
         return ci->maximum;
 
     return BasicSkill::getMaximum( ch );
-}
-
-bool ClanSkill::canForget( PCharacter * ) const
-{
-    return false;
 }
 
 bool ClanSkill::canPractice( PCharacter * ch, std::ostream & ) const

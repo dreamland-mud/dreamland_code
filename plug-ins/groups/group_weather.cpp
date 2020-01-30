@@ -138,7 +138,7 @@ VOID_SPELL(FaerieFog)::run( Character *ch, Room *room, int sn, int level )
         if (ich->invis_level > 0)
             continue;
 
-        if ( ich == ch || saves_spell( level, ich,DAM_OTHER,ch, DAMF_SPELL) )
+        if ( ich == ch || saves_spell( level, ich,DAM_OTHER,ch, DAMF_SPELL|DAMF_WATER) )
             continue;
 
         affect_strip ( ich, gsn_invisibility                );

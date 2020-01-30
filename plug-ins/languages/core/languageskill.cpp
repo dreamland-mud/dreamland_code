@@ -92,16 +92,6 @@ int Language::getLearned( Character *ch ) const
     return min( learned, maximum );
 }
 
-int Language::getWeight( Character * ) const
-{
-    return 0;
-}
-
-bool Language::canForget( PCharacter * ) const
-{
-    return false;
-}
-
 bool Language::canPractice( PCharacter * ch, std::ostream & ) const
 {
     return available( ch );

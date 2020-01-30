@@ -92,7 +92,7 @@ bool DruidStaff::death( Character *ch )
 
 bool DruidStaff::canEquip( Character *ch )
 {
-  if (ch->getTrueProfession( ) != prof_druid) {
+  if (ch->getProfession( ) != prof_druid) {
         ch->println("Ты не знаешь как использовать эту вещь.");
         act( "$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
         act( "$o1 выскальзывает из рук $c2.", ch, obj, 0, TO_ROOM );

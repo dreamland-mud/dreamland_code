@@ -46,7 +46,6 @@ PROF(anti_paladin);
 PROF(ninja);
 PROF(ranger);
 PROF(samurai);
-PROF(universal);
 PROF(thief);
 
 WEARLOC(tat_wrist_l);
@@ -257,7 +256,7 @@ bool UndefinedOneHit::defenseParry( )
         return false;
 
     chance    = gsn_parry->getEffective( victim ) / 2;
-    prof = victim->getTrueProfession( );
+    prof = victim->getProfession( );
 
     if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
         chance += chance / 5;
@@ -425,7 +424,7 @@ bool UndefinedOneHit::defenseShieldBlock( )
         return false;
 
     chance = chance / 2 - 10;
-    prof = victim->getTrueProfession( );
+    prof = victim->getProfession( );
 
     if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
         chance += 10;
@@ -500,7 +499,7 @@ bool UndefinedOneHit::defenseDodge( )
 
     /* chance for high dex. */
     chance += 2 * (victim->getCurrStat(STAT_DEX) - 20);
-    prof = victim->getTrueProfession( );
+    prof = victim->getProfession( );
 
     if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
         chance += chance / 5;
@@ -621,7 +620,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         if ( gsn_cross_block->getEffective( victim ) <= 1 )
             return false;
         chance    = gsn_cross_block->getEffective( victim ) / 3;
-        prof = victim->getTrueProfession( );
+        prof = victim->getProfession( );
 
         if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
             chance += chance / 2;
@@ -744,7 +743,7 @@ bool UndefinedOneHit::defenseHandBlock( )
     if ((chance = gsn_hand_block->getEffective( victim )) <= 1)
         return false;
 
-    if ( victim->getTrueProfession( ) == prof_ninja) {
+    if ( victim->getProfession( ) == prof_ninja) {
         chance /= 2;
     }
     else
@@ -1018,7 +1017,7 @@ void UndefinedOneHit::damApplyDeathblow( )
     chance = gsn_deathblow->getEffective( ch );
 
     if (victim->is_npc( ) && victim->getNPC( )->behavior && !victim->getNPC( )->behavior->isAfterCharm( )) {
-        if (victim->getTrueProfession( )->getFlags( victim ).isSet(PROF_MAGIC))
+        if (victim->getProfession( )->getFlags( victim ).isSet(PROF_MAGIC))
             chance /= 8;
         else
             chance /= 10;

@@ -180,9 +180,9 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
       dam = max((int)victim->hit, dice(level,4));
     if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL ) )
         dam /= 2;
-    if( ch->getTrueProfession( ) == prof_cleric ||
-        ch->getTrueProfession( ) == prof_paladin ||
-        ch->getTrueProfession( ) == prof_anti_paladin )
+    if( ch->getProfession( ) == prof_cleric ||
+        ch->getProfession( ) == prof_paladin ||
+        ch->getProfession( ) == prof_anti_paladin )
       dam *= 2;
 
     damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
@@ -217,9 +217,9 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
       dam = max((int)victim->hit, dice(level,4));
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
         dam /= 2;
-    if( ch->getTrueProfession( ) == prof_cleric ||
-        ch->getTrueProfession( ) == prof_paladin ||
-        ch->getTrueProfession( ) == prof_anti_paladin )
+    if( ch->getProfession( ) == prof_cleric ||
+        ch->getProfession( ) == prof_paladin ||
+        ch->getProfession( ) == prof_anti_paladin )
       dam *= 2;
 
     damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
@@ -489,7 +489,7 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     PCMemoryInterface *pcm;
     PCharacter *victim;
 
-    if ((ch->getTrueProfession( ) != prof_cleric && ch->getTrueProfession( ) != prof_paladin)
+    if ((ch->getProfession( ) != prof_cleric && ch->getProfession( ) != prof_paladin)
         || IS_EVIL(ch)) 
     {
         ch->send_to("Ты не владеешь этой силой.\r\n");

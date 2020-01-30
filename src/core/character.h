@@ -121,7 +121,6 @@ public:
 
     virtual ProfessionReference &getProfession( ) ;
     virtual void setProfession( const ProfessionReference & ) ;
-    virtual ProfessionReference & getTrueProfession( );
 
     // various set-get methods 
     inline long long getID( ) const;

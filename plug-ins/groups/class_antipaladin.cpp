@@ -369,7 +369,7 @@ bool ShadowBlade::area( )
     if (!( ch = obj->getCarrier( ) ))
         return false;
 
-    if (ch->getTrueProfession( ) == prof_anti_paladin)
+    if (ch->getProfession( ) == prof_anti_paladin)
         return false;
 
     if (obj->wear_loc != wear_wield && obj->wear_loc != wear_second_wield)
@@ -389,7 +389,7 @@ bool ShadowBlade::area( )
 
 bool ShadowBlade::canEquip( Character *ch )
 {
-    if (ch->getTrueProfession( ) != prof_anti_paladin) {
+    if (ch->getProfession( ) != prof_anti_paladin) {
         act( "$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
         unequip_char( ch, obj );
         obj_from_char( obj );

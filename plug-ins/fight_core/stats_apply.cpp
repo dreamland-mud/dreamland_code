@@ -188,7 +188,7 @@ static int get_curr_stat_extra( Character *ch, int stat )
 
     if (value == MAX_STAT 
         && !ch->is_npc( )
-        && ch->getTrueProfession( )->getStat( stat ) > 0
+        && ch->getProfession( )->getStat( stat ) > 0
         && ch->getRace( )->getPC( )->getStats( )[stat] >= MAX_STAT - BASE_STAT)
         value++;
 

@@ -568,8 +568,8 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
 
     dam = dice( level, 10 );
 
-        if( ch->getTrueProfession( ) == prof_paladin ||
-        ch->getTrueProfession( ) == prof_anti_paladin )
+        if( ch->getProfession( ) == prof_paladin ||
+        ch->getProfession( ) == prof_anti_paladin )
                 dam = dam + dam / 2;
 
     if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL) )

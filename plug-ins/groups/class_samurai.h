@@ -8,7 +8,6 @@
 
 #include "basicmobilebehavior.h"
 #include "objectbehavior.h"
-#include "class_universal.h"
 
 class Katana : public ObjectBehavior {
 XML_OBJECT
@@ -41,16 +40,6 @@ protected:
         void doFirstEnchant( Character *, Object * );
         void doOwner( Character *, Object * );
         bool checkPrice( Character *, int );
-};
-
-class SamuraiUniclassAdept : public SamuraiGuildmaster, UniclassAdept {
-XML_OBJECT
-public:
-        typedef ::Pointer<SamuraiUniclassAdept> Pointer;
-
-        SamuraiUniclassAdept( );
-
-        virtual void tell( Character *, const char * );
 };
 
 #endif

@@ -76,9 +76,6 @@ COMMAND(Whois, "whois")
     
     if (ch->getPC( )->canSeeProfession( pch )) {
         buf << ", профессия {W" << pch->getProfession( )->getNameFor( ch ) << "{w";
-        
-        if (pch->getSubProfession( ) != prof_none)
-            buf << " ({W" << pch->getSubProfession( )->getWhoNameFor( ch ) << "{w)";
     }
     
     if (ch->getPC( )->canSeeLevel( pch ))

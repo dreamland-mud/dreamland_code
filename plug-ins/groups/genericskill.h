@@ -48,11 +48,9 @@ public:
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
-    virtual int getWeight( Character * ) const;
     virtual int getRating( PCharacter * ) const;
     virtual int getMaximum( Character * ) const;
 
-    virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, ostream & buf ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
@@ -69,21 +67,12 @@ protected:
     static const DLString CATEGORY;                                             
     
     bool availableForAll( ) const;
-    int getMaxWeight( PCharacter * );
-    int maxWeightAux( PCharacter *, int );
-    int getTotalWeight( PCharacter * );
-    int totalWeightAux( PCharacter * );
     int learnedAux( PCharacter *, int ) const;
-    bool forgetAux( PCharacter * ) const;
-    bool practiceAux( PCharacter *, ostream & ) const;
-    void showParents( PCharacter *, ostream &, DLString );
     const SkillClassInfo * getClassInfo( Character * ) const;
     SkillClassInfo * getClassInfo( PCharacter * );
     SkillClassInfo * getClassInfo( const DLString & );
     const SkillRaceBonus *getRaceBonus( Character * ) const;
     bool isRaceAffect( Character * ) const;
-
-    void unmark( PCharacter * );
 
     XML_VARIABLE XMLSkillGroupReference group;
     XML_VARIABLE XMLFlagsNoEmpty   raceAffect;
@@ -95,35 +84,6 @@ protected:
     XML_VARIABLE XMLBooleanNoFalse hidden;
 };
 
-
-typedef vector<GenericSkill::Pointer> GenericSkillVector;
-
-class SkillRelatives : public virtual DLObject {
-public:
-    
-    void clear( );
-    GenericSkillVector &getVector( PCharacter * );
-    const GenericSkillVector &getConstVector( PCharacter * ) const;
-
-    GenericSkillVector evil, good, neutral;
-};
-
-class XMLSkillParents : public XMLVariableContainer {
-XML_OBJECT    
-public:
-    typedef vector<DLString> Names;
-    
-    virtual bool nodeFromXML( const XMLNode::Pointer& );
-    virtual bool toXML( XMLNode::Pointer& ) const;
-    
-    void resolve( const DLString& , GenericSkill::Pointer );
-    
-protected:
-    void appendChild( const DLString &, XMLNode::Pointer&, const DLString& ) const;
-    GenericSkill::Pointer getParentSkill( const DLString &, GenericSkill::Pointer );
-
-    Names evil, good, neutral;
-};
 
 class SkillClassInfo : public XMLVariableContainer {
 XML_OBJECT
@@ -147,23 +107,8 @@ public:
     inline int getMaximum( ) const {
         return maximum.getValue( );
     }
-    inline int getWeight( ) const {
-        return weight.getValue( );
-    }
-    inline void mark( ) {
-        marked = true;
-    }
-    inline void unmark( ) {
-        marked = false; 
-    }
-    inline bool isMarked( ) const {
-        return marked;
-    }
     bool visible( ) const;
      
-    SkillRelatives parents, children;
-
-    XML_VARIABLE XMLSkillParents parentNames;
 protected:
     XML_VARIABLE XMLInteger level;
     XML_VARIABLE XMLInteger rating;
@@ -171,8 +116,6 @@ protected:
     XML_VARIABLE XMLIntegerNoEmpty weight;
     XML_VARIABLE XMLBooleanNoFalse always;
     XML_VARIABLE ClanAntiBonuses clanAntiBonuses;
-
-    bool marked;
 };
 
 class SkillRaceBonus : public XMLVariableContainer {

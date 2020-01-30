@@ -87,9 +87,9 @@ void CMlt::doShowOther( Character *ch, PCMemoryInterface *pcm )
     for (int i = 0; i < stat_table.size; i++)
         ch->printf("%d %s ", r.stats[i].getValue( ), stat_table.name( i ).c_str( ) );
 
-    ch->printf("\n%d lvl, %d hp, %d mana, %d sp %s, %d owners\n",
+    ch->printf("\n%d lvl, %d hp, %d mana, %s, %d owners\n",
                 r.level.getValue( ),
-                r.hp.getValue( ), r.mana.getValue( ), r.skillPoints.getValue( ),
+                r.hp.getValue( ), r.mana.getValue( ),
                 (r.pretitle ? "pretitle" : ""),
                 r.owners.getValue( ));
 }
@@ -165,7 +165,6 @@ void CMlt::doShowSelf( PCharacter *ch )
 
         str << (r.hp > 0          ? fmt( ch, "     %d здоровья\n", r.hp.getValue( ) ) : "")
             << (r.mana > 0        ? fmt( ch, "     %d маны\n", r.mana.getValue( ) ) : "")
-            << (r.skillPoints > 0 ? fmt( ch, "     %d skill points\n", r.skillPoints.getValue( ) ) : "")
             << (r.level > 0       ? fmt( ch, "     %1$d уров%1$Iень|ня|ней \n", r.level.getValue( ) ) : "")
             << (r.pretitle        ?          "     цветной претитул\n" : "");
 
@@ -192,11 +191,6 @@ void CMlt::doCount( Character* ch, int n )
         
         if (pcm->getRemorts( ).size( ) == (unsigned)n) {
             buf << pcm->getName( );
-            
-            if (pcm->getAttributes( ).isAvailable( "fixremort1" ))
-                buf << " *";
-            if (pcm->getAttributes( ).isAvailable( "fixremort2" ))
-                buf << " **";
             
             buf << endl;
             cnt++;

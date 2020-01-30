@@ -519,7 +519,7 @@ void SamuraiGuildmaster::give( Character *victim, Object *obj )
         return;
     }
     
-    if (victim->getTrueProfession( ) != prof_samurai) {
+    if (victim->getProfession( ) != prof_samurai) {
         say_act( victim, ch, "Ты не принадлежишь к классу самураев, ты недосто$gйно|ин|йна даже находиться здесь!" );
         giveBack( victim, obj );
         return;
@@ -680,17 +680,3 @@ bool OwnedKatana::isLevelAdaptive( )
 {
    return true; 
 }
-
-/*
- * SamuraiUniclassAdept
- */
-SamuraiUniclassAdept::SamuraiUniclassAdept( )
-{
-    myclass.setValue( prof_samurai->getName( ) );
-}
-
-void SamuraiUniclassAdept::tell( Character *victim, const char *speech )
-{
-    UniclassAdept::tell( victim, speech );
-}
-

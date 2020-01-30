@@ -55,7 +55,7 @@ void GenericSkillLoader::dumpCSV()
     for (int i = 0; i < professionManager->size( ); i++) {
         Profession *prof = professionManager->find( i );
         if (prof->isValid( ) && prof->isPlayed( ) 
-            && prof->getName() != "druid" && prof->getName() != "universal")
+            && prof->getName() != "druid")
         {
             profs.push_back(prof->getName());
         }

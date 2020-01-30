@@ -90,7 +90,6 @@ class_vampire.cpp \
 class_warlock.cpp \
 class_warrior.cpp \
 class_necromancer.cpp \
-class_universal.cpp \
 class_cleric.cpp 
 
 libclass_skills_la_MOC = \
@@ -98,7 +97,6 @@ class_antipaladin.h \
 class_samurai.h \
 class_vampire.h \
 class_ranger.h \
-class_universal.h \
 class_warlock.h 
 
 libclass_skills_la_LIBADD = \

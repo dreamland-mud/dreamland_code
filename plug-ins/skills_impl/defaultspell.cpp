@@ -183,7 +183,7 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     if (ch->is_npc( ))
         return mlevel;
     
-    if (ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER))
+    if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
         slevel = mlevel - max(0, mlevel / 20);
     else
         slevel = mlevel - max(5, mlevel / 10);
@@ -543,7 +543,7 @@ bool DefaultSpell::isPrayer( Character *caster ) const
     if (getSkill( )->getGroup( ) == -1)
         return false;
     
-    return caster->getTrueProfession( )->getFlags( caster ).isSet(PROF_DIVINE);
+    return caster->getProfession( )->getFlags( caster ).isSet(PROF_DIVINE);
 }
 
 /*

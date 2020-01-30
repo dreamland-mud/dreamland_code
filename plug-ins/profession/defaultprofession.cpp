@@ -17,7 +17,6 @@
 #include "merc.h"
 #include "def.h"
 
-PROF(universal);
 GROUP(ancient_languages);
 GROUP(card_pack);
 GROUP(tattoo_master);
@@ -206,18 +205,14 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     in << endl;
     
     in << "{cБонус к уровню вещей{x: ";
-    if (prof->getIndex( ) == prof_universal) {
-        in << " (зависит от выбранной профессии)";
-    } else {
-        found = false;
-        for (int i = 0; i < item_table.size; i++) {
-            int m = prof->getWearModifier( i );
-            if (m != 0) {
-                if (found)
-                    in << ", ";
-                in << (m > 0 ? "+" : "") << m << " к " << item_table.message( i, '3' );
-                found = true;
-            }
+    found = false;
+    for (int i = 0; i < item_table.size; i++) {
+        int m = prof->getWearModifier( i );
+        if (m != 0) {
+            if (found)
+                in << ", ";
+            in << (m > 0 ? "+" : "") << m << " к " << item_table.message( i, '3' );
+            found = true;
         }
     }
 
@@ -303,10 +298,6 @@ int DefaultProfession::getWeapon( ) const
 int DefaultProfession::getSkillAdept( ) const
 {
     return skillAdept.getValue( );
-}
-int DefaultProfession::getParentAdept( ) const
-{
-    return parentAdept.getValue( );
 }
 int DefaultProfession::getThac00( Character * ) const
 {

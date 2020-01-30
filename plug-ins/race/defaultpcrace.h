@@ -29,7 +29,6 @@ public:
     virtual int getHpBonus( ) const;
     virtual int getManaBonus( ) const;
     virtual int getPracBonus( ) const;
-    virtual int getSpBonus( ) const;
     
     virtual DLString getWhoNameFor( Character *, Character * ) const;
     virtual DLString getScoreNameFor( Character *looker, Character *owner = NULL ) const;
@@ -43,7 +42,6 @@ protected:
     XML_VARIABLE XMLIntegerNoEmpty pracBonus;
     XML_VARIABLE XMLFlagsNoEmpty   align;
     XML_VARIABLE XMLInteger        minAlign, maxAlign;
-    XML_VARIABLE XMLIntegerNoEmpty skillPointsBonus;
 
     XML_VARIABLE XMLStringNoEmpty  nameWho; 
     XML_VARIABLE XMLStringNoEmpty  nameWhoRus; 

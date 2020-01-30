@@ -158,7 +158,7 @@ bool MissileOneHit::defenseDodge( )
         chance  = min( 30, (int)victim->getModifyLevel( ) );
     else
     {
-        int prof = victim->getTrueProfession( );
+        int prof = victim->getProfession( );
 
         chance  = gsn_dodge->getEffective( victim ) / 4;
         chance += victim->getCurrStat(STAT_DEX) - 20;

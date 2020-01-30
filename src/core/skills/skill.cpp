@@ -94,10 +94,6 @@ int Skill::getEffective( Character *ch ) const
 {
     return getLearned( ch );
 }
-int Skill::getWeight( Character * ) const
-{
-    return 0;
-}
 int Skill::getMaximum( Character * ) const
 {
     return 0;
@@ -113,10 +109,6 @@ const DLString & Skill::getCategory( ) const
 {
     static DLString category = "under construction";
     return category;
-}
-bool Skill::canForget( PCharacter * ) const
-{
-    return false;
 }
 bool Skill::canPractice( PCharacter *, std::ostream & ) const
 {

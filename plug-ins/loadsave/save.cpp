@@ -444,7 +444,6 @@ void fwrite_char( PCharacter *ch, FILE *fp )
         fprintf( fp, "QuestPnts %d\n", ch->getQuestPoints() );
         fprintf( fp ,"Haskilled %d\n",        ch->has_killed.getValue( )        );
         fprintf( fp ,"Antkilled %d\n",        ch->anti_killed.getValue( )        );
-        fprintf( fp ,"MaxSkillPoints %d\n",        ch->max_skill_points.getValue( ) );
 #endif        
 }
 
@@ -916,6 +915,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
     bool fMatch = true;
     int version;
     int trust;
+    int dummy;
 
     LogStream::sendNotice( ) << "Loading " << ch->getName( ) << '.' << endl;
 
@@ -1096,7 +1096,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             KEYSKIP( "LastTime" );
             break;
         case 'M':
-                KEY( "MaxSkillPoints",        ch->max_skill_points,fread_number( fp ) );
+                KEY( "MaxSkillPoints",        dummy, fread_number( fp ) );
                 break;
         case 'N':
             if ( !str_cmp( word, "Name" ) )
@@ -1196,7 +1196,6 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
                         
                         sk.learned = value;
                         sk.timer = timer;
-                        sk.forgetting = forget;
                     }
                     fMatch = true;
                     break;

@@ -47,7 +47,7 @@ void Remorts::clearBonuses( )
     stats.resize( stat_table.size, 0 );
     
     level = 0;
-    hp = mana = skillPoints = 0;
+    hp = mana = 0;
     points = 0;
     pretitle = false;
 }
@@ -65,10 +65,6 @@ int Remorts::getHitPerLevel( int level )
 int Remorts::getManaPerLevel( int level )
 {
     return bonusPerLevel( mana, level );
-}
-int Remorts::getSkillPointsPerLevel( int level )
-{
-    return bonusPerLevel( skillPoints, level );
 }
 
 int Remorts::bonusPerLevel( int bonus, int level )

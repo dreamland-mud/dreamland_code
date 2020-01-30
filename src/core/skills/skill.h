@@ -52,12 +52,10 @@ public:
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
     virtual int getEffective( Character * ) const;
-    virtual int getWeight( Character * ) const;
     virtual int getAdept( PCharacter * ) const;
     virtual int getMaximum( Character * ) const;
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     
-    virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool verbose = true );
     virtual void practice( PCharacter * ) const;

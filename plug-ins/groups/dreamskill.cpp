@@ -16,7 +16,6 @@
 #include "def.h"
 
 CLAN(battlerager);
-PROF(universal);
 GROUP(fightmaster);
 GROUP(weaponsmaster);
 GROUP(defensive);
@@ -202,14 +201,11 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
 
 void DreamSkillManager::run( PCharacter *ch ) 
 {
-    // Exclude awake players, universals, newbies and player in mansions.
+    // Exclude awake players, newbies and player in mansions.
 
     if (ch->position != POS_SLEEPING)
         return;
     
-    if (ch->getProfession() == prof_universal)
-        return;
-
     if (ch->getRealLevel() < 20 && ch->getRemorts().size() == 0)
         return;
 

@@ -35,7 +35,6 @@ public:
     virtual int getHpBonus( ) const;
     virtual int getManaBonus( ) const;
     virtual int getPracBonus( ) const;
-    virtual int getSpBonus( ) const;
     
     virtual DLString getWhoNameFor( Character *looker, Character *owner = NULL ) const;
     virtual DLString getScoreNameFor( Character *looker, Character *owner = NULL ) const;

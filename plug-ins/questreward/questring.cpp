@@ -56,7 +56,7 @@ void QuestRing::equip( Character *ch )
 void QuestRing::addAffect( Character *ch, Affect *paf ) 
 {
     short level = ch->getModifyLevel();
-    bool caster = ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER);
+    bool caster = ch->getProfession( )->getFlags( ).isSet(PROF_CASTER);
     bool fighter = !caster;
     bool evil = IS_EVIL(ch);
     bool neutral = IS_NEUTRAL(ch);

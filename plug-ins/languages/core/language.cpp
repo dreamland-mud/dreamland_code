@@ -110,7 +110,7 @@ const RaceLangInfo * Language::getRaceInfo( PCharacter *ch ) const
 const ClassLangInfo * Language::getClassInfo( PCharacter *ch ) const
 {
     static const DLString otherName( "other" );
-    Classes::const_iterator i = classes.find( ch->getTrueProfession( )->getName( ) );
+    Classes::const_iterator i = classes.find( ch->getProfession( )->getName( ) );
     
     if (i == classes.end( ))
         i = classes.find( otherName );
