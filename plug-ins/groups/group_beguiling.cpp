@@ -193,7 +193,7 @@ VOID_AFFECT(LovePotion)::look( Character *ch, Character *witch, Affect *paf )
 
     act("Неужели $c1 выглядит так очаровательно?", witch, 0, ch, TO_VICT);
     act("$C1 смотрит на тебя с покорностью.", witch, 0, ch, TO_CHAR);
-    act("$C1 смотрит на $c4 с покорностью.", witch, 0, ch, TO_NOTVICT);
+    act("$C1 зачарованно смотрит на $c4 и жаждет выполнить любые поручения.", witch, 0, ch, TO_NOTVICT);
 
     if (ch->master)
         ch->stop_follower( );
