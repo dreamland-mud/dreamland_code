@@ -273,13 +273,9 @@ bool Walkment::canControlHorse( )
         act( "Ты не можешь управлять $C5.", ch, 0, horse, TO_CHAR );
         return false;
     }
-    
-    /* horrible XXX until riding skills are available for all */
-    if (horse->is_npc( ) 
-            && (   (horse->getNPC( )->pIndexData->vnum >= 50000
-                   && horse->getNPC( )->pIndexData->vnum <= 51000)
-                || (horse->getNPC( )->pIndexData->vnum >= 550
-                   && horse->getNPC( )->pIndexData->vnum <= 560)))
+   
+    // Knight horses aren't pets, thus 'riding' skill will matter. 
+    if (horse->is_npc( ) && !ch->is_npc() && ch->getPC()->pet == horse)
         return true;
 
     if (number_percent( ) > gsn_riding->getEffective( ch ) && !ch->isCoder( )) {
@@ -288,7 +284,6 @@ bool Walkment::canControlHorse( )
         return false; 
     }
 
-    /* XXX more checks */
     gsn_riding->improve( ch, true );
     return true;
 }

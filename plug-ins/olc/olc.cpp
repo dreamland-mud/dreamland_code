@@ -618,10 +618,12 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         water.push_back(RussianString("водоем||а|у||ом|е" ));
         water.push_back(RussianString("водопад||а|у||ом|е" ));
         water.push_back(RussianString("озер|о|а|у|о|ом|е"));
+        water.push_back(RussianString("болот|о|а|у|о|ом|е"));
         water.push_back(RussianString("мор|е|я|ю|е|ем|е" ));
         water.push_back(RussianString("рек|а|и|е|у|ой|е" ));
         water.push_back(RussianString("причал||а|у||ом|е" ));
         water.push_back(RussianString("лодк|а|и|е|у|ой|е" ));
+        water.push_back(RussianString("трясин|а|ы|е|у|ой|е" ));
         water.push_back(RussianString("верф|ь|и|и|ь|ью|и" ));
         water.push_back(RussianString("набережн|ая|ой|ой|ую|ой|ой"));
         water.push_back(RussianString("корабл|ь|я|ю|ь|ем|я"));

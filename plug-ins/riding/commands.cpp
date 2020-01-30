@@ -120,7 +120,8 @@ CMDRUN( mount )
         ch->println("У тебя не хватает сил даже задрать ногу.");
         return;
     }
-    
+   
+#if 0    
     /* horrible XXX unless riding skills are available for all */
     if (horse->is_npc( ) 
             && ((horse->getNPC( )->pIndexData->vnum >= 50000
@@ -141,6 +142,7 @@ CMDRUN( mount )
         gsn_riding->improve( ch, false );
         return;
     }
+#endif
 
     ch->mount = horse;
     ch->riding = true;
