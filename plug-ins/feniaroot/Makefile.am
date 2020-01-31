@@ -52,6 +52,7 @@ plugin_INCLUDES = \
 -I$(top_srcdir)/plug-ins/ed/lib \
 -I$(top_srcdir)/plug-ins/updates \
 -I$(top_srcdir)/plug-ins/traverse \
+-I$(top_srcdir)/plug-ins/questreward \
 -I$(top_srcdir)/plug-ins/ai \
 -I$(top_srcdir)/plug-ins/craft \
 -I$(top_srcdir)/plug-ins/religion \
@@ -72,6 +73,7 @@ $(LIBADD_AI) \
 ../updates/libupdates.la \
 ../craft/libcraft.la \
 ../religion/libreligion.la \
+../questreward/libquestreward.la \
 ../clan/core/libclan_core.la \
 ../skills_impl/libskills_impl.la \
 ../services/core/libservices_core.la \

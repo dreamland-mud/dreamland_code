@@ -14,7 +14,7 @@
 #include "occupations.h"
 #include "mercdb.h"
 #include "grammar_entities_impl.h"
-
+#include "personalquestreward.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -310,7 +310,15 @@ NMI_SET( ObjectWrapper, owner , "имя персонажа-владельца (�
     target->setOwner( d.c_str() );
 }
 
-NMI_SET( ObjectWrapper, personal, "сделать вещь личной для персонажа по англ имени или null")
+NMI_GET( ObjectWrapper, personal, "установить или вернуть англ. имя собственника для личной вещи (или null)")
+{
+    checkTarget();
+    if (target->getOwner() && target->behavior && target->behavior.getDynamicPointer<PersonalQuestReward>())
+        return Register(target->getOwner());
+    return Register();
+}
+
+NMI_SET( ObjectWrapper, personal, "установить или вернуть англ. имя собственника для личной вещи (или null)")
 {
     checkTarget();
 
