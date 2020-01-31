@@ -10,6 +10,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/fight_core \
 -I$(top_srcdir)/plug-ins/follow/core \
+-I$(top_srcdir)/plug-ins/occupations \
 -I$(top_srcdir)/plug-ins/interpret
 
 libmovement_la_SOURCES = \
@@ -36,6 +37,7 @@ libmovement_la_LIBADD = \
 ../system/libsystem.la \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \
+../occupations/liboccupations.la \
 ../follow/core/libfollow_core.la \
 ../fight_core/libfight_core.la
 

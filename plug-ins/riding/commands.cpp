@@ -12,6 +12,7 @@
 
 #include "loadsave.h"
 #include "move_utils.h"
+#include "occupations.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -89,7 +90,7 @@ CMDRUN( mount )
             return;
         }
     }
-    else if (!ch->isCoder( )) { /* other rideable beasts */
+    else { /* other rideable beasts */
         if (!IS_SET(horse->act, ACT_RIDEABLE)) {
             act("$c1 пытается запрыгнуть верхом на $C4, но соскальзывает.", ch, 0, horse, TO_NOTVICT);
             ch->println("Этот вид живых существ не предназначен для верховой езды.");
@@ -120,20 +121,13 @@ CMDRUN( mount )
         ch->println("У тебя не хватает сил даже задрать ногу.");
         return;
     }
+
+    // Knight horses are the only ones requiring special handling skill ('riding'). 
+    bool needsRidingSkill = horse->is_npc() 
+            && horse->getNPC()->behavior 
+            && IS_SET(horse->getNPC()->behavior->getOccupation(), (1<<OCC_BATTLEHORSE));
    
-#if 0    
-    /* horrible XXX unless riding skills are available for all */
-    if (horse->is_npc( ) 
-            && ((horse->getNPC( )->pIndexData->vnum >= 50000
-                   && horse->getNPC( )->pIndexData->vnum <= 51000)
-                || (horse->getNPC( )->pIndexData->vnum >= 550
-                   && horse->getNPC( )->pIndexData->vnum <= 560)))
-    {
-    }
-    else if (horse->is_npc( ) 
-             && number_percent( ) > gsn_riding->getEffective( ch ) 
-             && !ch->isCoder( )) 
-    {
+    if (needsRidingSkill && number_percent( ) > gsn_riding->getEffective( ch )) {
         act( "Тебе не хватило мастерства оседлать $C4.", ch, 0, horse, TO_CHAR );
         act( "$c1 пытается оседлать тебя, но мастерства явно не хватает.", ch, 0, horse, TO_VICT );
         act( "$c1 пытается оседлать $C4, но мастерства явно не хватает.", ch, 0, horse, TO_NOTVICT );
@@ -142,7 +136,6 @@ CMDRUN( mount )
         gsn_riding->improve( ch, false );
         return;
     }
-#endif
 
     ch->mount = horse;
     ch->riding = true;

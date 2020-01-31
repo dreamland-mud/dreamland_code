@@ -31,6 +31,7 @@ static const char * occ_names [] =
     "trainer",
     "clanguard",
     "adept",
+    "battlehorse",
     0
 };
 

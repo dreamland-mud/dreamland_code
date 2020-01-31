@@ -19,6 +19,7 @@
 #include "object.h"
 
 #include "stats_apply.h"
+#include "occupations.h"
 #include "act.h"
 #include "loadsave.h"
 #include "interp.h"
@@ -274,11 +275,15 @@ bool Walkment::canControlHorse( )
         return false;
     }
    
-    // Knight horses aren't pets, thus 'riding' skill will matter. 
-    if (horse->is_npc( ) && !ch->is_npc() && ch->getPC()->pet == horse)
+    // Knight horses are the only ones requiring special handling skill ('riding'). 
+    bool needsRidingSkill = horse->is_npc() 
+            && horse->getNPC()->behavior 
+            && IS_SET(horse->getNPC()->behavior->getOccupation(), (1<<OCC_BATTLEHORSE));
+
+    if (!needsRidingSkill)
         return true;
 
-    if (number_percent( ) > gsn_riding->getEffective( ch ) && !ch->isCoder( )) {
+    if (number_percent( ) > gsn_riding->getEffective( ch )) {
         act( "Тебе не хватает мастерства управлять $C5.", ch, 0, horse, TO_CHAR );
         gsn_riding->improve( ch, false );
         return false; 

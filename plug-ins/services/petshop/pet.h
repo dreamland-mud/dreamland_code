@@ -49,6 +49,7 @@ public:
     
     virtual int haggle( Character * ) const;
     virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual int getOccupation( );
 
     virtual void config( PCharacter *, NPCharacter * ) const;
 protected:
