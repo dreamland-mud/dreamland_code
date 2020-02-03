@@ -773,7 +773,7 @@ void obj_update( void )
         {
             if (carrier) {
                 if (!carrier->is_npc( ) && chance( 20 )) {
-                    carrier->pecho( "%1$^O1 разбива%1$nется|ются.", obj );
+                    carrier->pecho( "%1$^O1 лопа%1$nется|ются от жары.", obj );
                     extract_obj( obj );
                     continue;
                 }

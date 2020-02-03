@@ -57,19 +57,13 @@ SKILL_RUNP( rescue )
 
         if ( ( victim = get_char_room( ch, arg ) ) == 0 )
         {
-                ch->send_to("Этого нет здесь.\n\r");
+                ch->send_to("Таких нет здесь.\n\r");
                 return;
         }
 
         if ( victim == ch )
         {
                 ch->send_to("Себя?\n\r");
-                return;
-        }
-
-        if ( !ch->is_npc() && victim->is_npc() )
-        {
-                ch->send_to("Твоя помощь не нужна!\n\r");
                 return;
         }
 
@@ -86,15 +80,15 @@ SKILL_RUNP( rescue )
                 return;
         }
 
-        if ( ch->is_npc() && ch->master != 0 && victim->is_npc() )
+        if (fch && is_safe_nomessage(ch, fch) ) {
+                ch->pecho( "Ты не можешь вступить в бой против %C2. Вы вне ПК.", fch);
                 return;
-        
-        if ((fch && is_safe(ch, fch)) || is_safe( ch, victim ))
-            return;
+        }
 
-        if (ch->is_npc( ) && ch->master != 0)
-            if ((fch && is_safe(ch->master, fch)) || is_safe( ch->master, victim ))
+        if ((!victim->is_npc( ) || (victim->is_npc( ) && victim->master != 0 ) ) && !is_same_group(ch, victim) && fch) {
+                ch->pecho("Вы не в одной группе!");
                 return;
+        }
 
         ch->setWait( gsn_rescue->getBeats( )  );
 

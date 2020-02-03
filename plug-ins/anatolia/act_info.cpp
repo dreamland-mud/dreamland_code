@@ -2825,7 +2825,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "Класс брони: ";
 
         for (int i = 0; i <= 3; i++)
-            buf << obj->value[i] << " " << ac_type.message(i )
+            buf << -obj->value[i] << " " << ac_type.message(i )
                 << (i == 3 ? "" : ", ");
 
         buf << endl;
