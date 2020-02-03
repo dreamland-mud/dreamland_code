@@ -108,7 +108,7 @@ void talk_auction(const char *argument)
             continue;
     
         bool fRussian = ch->getConfig()->rucommands;
-        ch->pecho(POS_RESTING, fRussian ? msg_ru.c_str() : msg_en.c_str());
+        ch->pecho(POS_SLEEPING, fRussian ? msg_ru.c_str() : msg_en.c_str());
     }
 }
 
@@ -361,7 +361,7 @@ CMDRUNP( auction )
         if (arg_oneof_strict( arg1, "talk", "реклама", "говорить" ))
         {
             if ( ch != auction->seller ) {
-                ch->send_to("Ты ничего не выставлял на аукцион - рекламировать тебе нечего.\r\n");
+                ch->pecho("Ты ничего не выставлял%Gо||а на аукцион - рекламировать тебе нечего.", ch);
                 return;
             }
             if (argument[0] == '\0') {

@@ -204,12 +204,12 @@ static bool can_influence_exp( PCharacter *gch, Character *leader )
     if (IS_GHOST( gch ))
         return false;
 
-    if (gch->getModifyLevel( ) - leader->getModifyLevel( ) > 8 ) {
+    if (gch->getModifyLevel( ) - leader->getModifyLevel( ) > GROUP_RANGE ) {
         gch->send_to("Ты слишком высокого уровня для этой группы.\n\r");
         return false;
     }
 
-    if (gch->getModifyLevel( ) - leader->getModifyLevel( ) < -8 ) {
+    if (gch->getModifyLevel( ) - leader->getModifyLevel( ) < -GROUP_RANGE ) {
         gch->send_to("Ты слишком низкого уровня для этой группы.\n\r");
         return false;
     }

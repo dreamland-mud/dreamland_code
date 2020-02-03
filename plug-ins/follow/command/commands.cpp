@@ -196,7 +196,7 @@ CMDRUN( group )
         return;
     }
 
-    if ( abs(ch->getModifyLevel() - victim->getModifyLevel()) > 8)
+    if ( abs(ch->getModifyLevel() - victim->getModifyLevel()) > GROUP_RANGE)
     {
         act_p( "$C1 не может присоединиться к группе $c2.",
                 ch,0,victim,TO_NOTVICT,POS_RESTING );
