@@ -1079,8 +1079,8 @@ SKILL_RUNP( lore )
         }
 
       sprintf( buf,
-              "Класс защиты: -%d укол  -%d удар  -%d разрезание  -%d vs. магия.\n\r",
-              value0, value1, value2, value3 );
+              "Класс защиты: %d укол  %d удар  %d разрезание  %d vs. магия.\n\r",
+              -value0, -value1, -value2, -value3 );
       ch->send_to(buf);
       break;
     }
