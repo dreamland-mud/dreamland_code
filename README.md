@@ -12,11 +12,11 @@
 [![Build Status](https://travis-ci.org/dreamland-mud/dreamland_code.svg?branch=master)](https://travis-ci.org/dreamland-mud/dreamland_code)
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
-Есть несколько способов познакомиться с кодом проекта и начать под него разработку:
-* Собрать у себя локально, например, на виртуальной машине с Ubuntu, пользуясь инструкцией ниже.
-* Собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
-* Воспользоваться Goorm Online IDE согласно [инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE), что даст возможность изучать и изменять код, запускать свой сервер и играть на нем, не покидая окна браузера.
-
+Как собирать и запускать:
+* Из-под Ubuntu 18.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
+* Из-под Windows 10: следуя [этой инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0-%D0%B8-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D0%B2-Windows-(WSL)) для Windows Subsystem for Linux и редактора VS Code
+* Из-под окружения Docker: собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
+* Из-под онлайн сред разработки в браузере: [Goorm Online IDE](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE) или же https://gitpod.io.
 
 **Содержание**
 * [Запуск локальной версии](#local)
