@@ -14,6 +14,7 @@
 #include "comm.h"
 #include "badnames.h"
 #include "xmlattributecoder.h"
+#include "serversocketcontainer.h"
 
 #include "pcharacter.h"
 #include "npcharacter.h"
@@ -42,7 +43,6 @@ HOMETOWN(frigate);
 
 using namespace Scripting;
 NMI_INIT(NannyHandler, "няня");
-Register NannyHandler::tmpNanny;
 bool password_check( PCMemoryInterface *pci, const DLString &input );
 
 using namespace std;
@@ -148,7 +148,7 @@ void NannyHandler::doPlace( Descriptor *d )
     d->connected = CON_NANNY;
     char_to_list( d->character, &newbie_list );
     
-    if (!invoke( ID_CONNECT, d->character, Scripting::RegisterList( ) )) {
+    if (!invoke( ID_CONNECT, d, Scripting::RegisterList( ) )) {
         d->send("Front door is closed, please use backdoor.\n");
         d->close( );
     }
@@ -161,7 +161,7 @@ void NannyHandler::doInterpret( Descriptor *d, char *arg )
     Scripting::RegisterList regList;
 
     regList.push_back( arg );
-    invoke( ID_INPUT, d->character, regList ); 
+    invoke( ID_INPUT, d, regList ); 
 }
 
 
@@ -199,31 +199,36 @@ void NannyHandler::setSelf( Scripting::Object * )
 {
 }
 
-bool NannyHandler::resolve( )
+Scripting::Register NannyHandler::resolve(Descriptor *d)
 {
-    static Scripting::IdRef ID_TMP( "tmp" ), ID_NANNY( "nanny" );
+    static Scripting::IdRef ID_TMP( "tmp" ), ID_NANNY( "nanny" ), ID_INTRO("intro");
 
     try {
-        tmpNanny = *(*Scripting::Context::root[ID_TMP])[ID_NANNY];
+        if (ServerSocketContainer::isNewNanny(d->control)) {
+            return *(*Scripting::Context::root[ID_TMP])[ID_INTRO];
+        }
+        else {
+            return *(*Scripting::Context::root[ID_TMP])[ID_NANNY];
+        }
     }
     catch (const Scripting::Exception &e) {
         LogStream::sendWarning( ) << "nanny: " << e.what( ) << endl;
-        return false;
     }
 
-    return true;
+    return Scripting::Register();
 }
 
-bool NannyHandler::invoke( Scripting::IdRef &id, Character *ch, Scripting::RegisterList regList )
+bool NannyHandler::invoke( Scripting::IdRef &id, Descriptor *d, Scripting::RegisterList regList )
 {
     if (!FeniaManager::wrapperManager)
         return false;
         
-    if (!resolve( ))
+    Scripting::Register tmpNanny = resolve(d);
+    if (tmpNanny.type == Register::NONE)
         return false;
 
     try {
-        regList.push_front( FeniaManager::wrapperManager->getWrapper( ch ) );
+        regList.push_front( FeniaManager::wrapperManager->getWrapper( d->character ) );
         tmpNanny[id]( regList );
     }
     catch (const Scripting::Exception &e) {

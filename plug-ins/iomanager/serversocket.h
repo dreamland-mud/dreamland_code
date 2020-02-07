@@ -78,6 +78,11 @@ public:
             return fd != -1;
         }
 
+        inline bool isNewNanny() const
+        {
+            return newnanny.getValue();
+        }
+
         inline const char * getAllowedIP( ) const
         {
                 return allowedIP.getValue( ).c_str( );
@@ -99,6 +104,7 @@ private:
         XML_VARIABLE XMLString  allowedIP;
         XML_VARIABLE XMLBoolean backdoor;
         XML_VARIABLE XMLBoolean websock;
+        XML_VARIABLE XMLBoolean newnanny;
             
         int fd;
 };
