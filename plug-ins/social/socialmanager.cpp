@@ -9,6 +9,7 @@
 #include "socialmanager.h"
 #include "social.h"
 #include "commandinterpreter.h"
+#include "descriptor.h"
 
 #include "class.h"
 
@@ -69,6 +70,9 @@ bool SocialManager::process( InterpretArguments &iargs )
     LoadedList::iterator e;
     DLString cmd = iargs.cmdName;
     
+    if (iargs.d && iargs.d->connected != CON_PLAYING)
+        return true;
+
     if (!cmd.empty( ) && cmd.at( 0 ) == '*')
         cmd.erase( 0, 1 );
         
