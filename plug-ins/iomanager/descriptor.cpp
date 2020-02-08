@@ -33,6 +33,7 @@
 #include "codepage.h"
 #include "comm.h"
 #include "outofband.h"
+#include "backdoorhandler.h"
 
 #include "char.h"
 #include "dreamland.h"
@@ -555,7 +556,10 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     LogStream::sendError( ) << "WebSock: Success! ID " << websock.nonce << endl;
                     sendVersion(this);
 
-                    NannyHandler::init(this);
+                    if (ServerSocketContainer::isBackdoor( control ))
+                        BackdoorHandler::init( this );
+                    else
+                        NannyHandler::init( this );
                 }
 
                 std::vector<unsigned char>(i+1, websock.frame.end()).swap(websock.frame);
