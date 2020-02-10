@@ -410,7 +410,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
         for (sd = shortDescriptions.begin( ), item = items.begin( ), iShow = 0; 
              sd != shortDescriptions.end( ); 
              sd++, item++, iShow++) {
-            if (iShow >= 100) {
+            if (iShow >= 200) {
                 output << "{" << CLR_OBJ(ch)
                         << "     ... И много чего еще ...{x" << endl;
                 break;
