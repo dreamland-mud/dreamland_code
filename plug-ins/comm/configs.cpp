@@ -365,9 +365,9 @@ static void config_scroll(PCharacter *ch, const DLString &constArguments)
         return;
     }
 
-    if (lines < 10 || lines > 100)
+    if (lines < 10 || lines > 200)
     {
-        ch->send_to("Введи значение между 10 и 100.\n\r");
+        ch->send_to("Введи значение между 10 и 200.\n\r");
         return;
     }
 
