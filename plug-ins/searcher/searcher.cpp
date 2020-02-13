@@ -701,7 +701,7 @@ CMDRUNP(searcher)
         try {
             Profiler prof;
             int cnt = 0;
-            vector<list<DLString> > output(101);
+            vector<list<DLString> > output(MAX_LEVEL+1);
 
             prof.start();
 
@@ -709,7 +709,7 @@ CMDRUNP(searcher)
             for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
                 if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
                     continue;
-                if (pObj->level > 100)
+                if (pObj->level > MAX_LEVEL)
                     continue;
 
                 if (searcher_parse(pObj, args.c_str())) {
