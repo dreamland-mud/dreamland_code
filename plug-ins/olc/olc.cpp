@@ -556,7 +556,7 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     const DLString lineFormat = 
             "[" + web_cmd(ch, "aedit $1", "%3d") 
-            + "] {W%-29s {x(%5u-%5u) %17s %s\n\r";
+            + "] {W%-29s {x(%5u-%5u) %17s %s{w\n\r";
 
     ptc(ch, "[%3s] %-29s   (%5s-%5s) %-17s %s\n\r",
       "Num", "Area Name", "lvnum", "uvnum", "Filename", "Help");
@@ -566,7 +566,8 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         AreaHelp *ahelp = get_area_help(pArea);
         if (ahelp && ahelp->getID() > 0) {
             DLString id(ahelp->getID());
-            hedit = web_cmd(ch, "hedit " + id, "hedit " + id);
+	    DLString color = (ahelp->find_first_not_of(' ') != DLString::npos) ? "": " {R*{x";
+            hedit = web_cmd(ch, "hedit " + id, "hedit " + id) + color;
         }
             
         ch->send_to(
@@ -885,6 +886,15 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         load_room_objects(room, const_cast<char *>("/tmp"), false);
         return;
     }
+
+    if (arg == "nohelp") {
+	ostringstream buf;
+	for (auto help: helpManager->getArticles())
+		if (help->getID() < 1)
+			buf << help->getAllKeywordsString() << endl;
+	page_to_char(buf.str().c_str(), ch);
+	return;
+    }	    	
 }
 
 
