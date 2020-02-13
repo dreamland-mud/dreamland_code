@@ -24,6 +24,7 @@ public:
     int level;
     DLString labels;
     int id;
+    DLString titleAttribute;
 };
 
 class AreaHelp : public MarkupHelpArticle {

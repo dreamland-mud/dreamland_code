@@ -30,6 +30,9 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
     if (!keywordAttribute.empty( ))
         parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keywordAttribute );
 
+    if (!titleAttribute.empty())
+        parent->insertAttribute(HelpArticle::ATTRIBUTE_TITLE, titleAttribute);
+
     if (level >= -1)
         parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
 
@@ -46,6 +49,7 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
 {
     XMLString::fromXML(parent);
     keywordAttribute = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
+    titleAttribute = parent->getAttribute(HelpArticle::ATTRIBUTE_TITLE);
     labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
     parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL, level );
     parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
