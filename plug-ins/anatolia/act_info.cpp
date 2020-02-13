@@ -122,6 +122,7 @@ bool omprog_give( Object *obj, Character *ch, Character *victim );
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
+DLString help_article_disambig(const HelpArticle *help);
 
 NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
 {    
@@ -2492,40 +2493,23 @@ CMDRUNP( help )
 
     // Several matches, display them all with numbers.
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
-    if (ch->getPC()->getAttributes().isAvailable("newhelp"))  {
-        DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
-        for (unsigned int a = 0; a < articles.size(); a++) {
-            DLString title = articles[a]->getTitle(DLString::emptyString);
-            DLString ltitle(title);
-            ltitle.toLower();
+    DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
+    for (unsigned int a = 0; a < articles.size(); a++) {
+	auto help = articles[a];
+        DLString title = help->getTitle(DLString::emptyString);
+	DLString disambig = help_article_disambig(*help);
 
-            // Get a list of additional keywords not mentioned in the title.
-            const StringSet &keywords = articles[a]->getAllKeywords();
-            StringSet disambig;            
-            for (auto &kw: keywords) {
-                DLString kwLower = kw.toLower();
-                if (ltitle.find(kwLower) == DLString::npos)
-                    disambig.insert(kwLower);
-            }
+        // Create a line with help ID, title and disambiguation keywords.
+        DLString line = title;
+        if (!disambig.empty())
+            line += " ({D" + disambig + "{x)"; 
 
-            // Create a line with help ID, title and disambiguation keywords.
-            DLString line = title;
-            if (!disambig.empty())
-                line += " ({D" + disambig.toString() + "{x)"; 
-
-            buf << fmt(0, lineFormat.c_str(), articles[a]->getID(), line.c_str());
-        }
-
-        buf << endl
-            << "Для уточнения поиска введи {yсправка {Wномер{x{Iw или нажми на ссылку{x." << endl;
-    
-    } else {
-        for (unsigned int a = 0; a < articles.size(); a++) 
-            buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getAllKeywordsString() << endl;
-        buf << endl
-            << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." 
-            << endl;
+        buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
     }
+
+    buf << endl
+        << "Для уточнения поиска введи {yсправка {Wномер{x{Iw или нажми на ссылку{x." << endl;
+    
 
     ch->send_to(buf.str().c_str());
 }                  

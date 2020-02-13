@@ -8,6 +8,23 @@
 #include "character.h"
 #include "descriptor.h"
 
+// Get a list of additional keywords not mentioned in the title.
+DLString help_article_disambig(const HelpArticle *help)
+{
+	DLString ltitle = help->getTitle(DLString::emptyString);
+	ltitle.toLower();
+
+	const StringSet &keywords = help->getAllKeywords();
+	StringSet disambig;
+	for (auto &kw: keywords) {
+		DLString kwLower = kw.toLower();
+		if (ltitle.find(kwLower) == DLString::npos)
+			disambig.insert(kwLower);
+	}
+
+	return disambig.toString();
+}
+
 MarkupHelpArticle::~MarkupHelpArticle( )
 {
 }
@@ -36,9 +53,14 @@ DLString MarkupHelpArticle::editButton(Character *ch) const
 
 void MarkupHelpArticle::getRawText( Character *ch, ostringstream &in ) const
 {
-    if (ch && ch->desc && ch->desc->connected == CON_PLAYING)
-        in << "Справка на тему {C" << getAllKeywordsString() << "{x: "
-        << editButton(ch) << endl;
+    if (ch && ch->desc && ch->desc->connected == CON_PLAYING) {
+        DLString title = getTitle(DLString::emptyString);
+        DLString disambig = help_article_disambig(this);
+
+        in << "{WСправка на тему {C" << title << "{x " << editButton(ch) << endl;
+	if (!disambig.empty())
+	    in << "{DКлючевые слова: " << disambig << "{x" << endl << endl;	
+    }
 
     in << *this;
 }
