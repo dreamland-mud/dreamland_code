@@ -686,6 +686,9 @@ CMDRUNP( get )
                 return;
             }
             
+            if (!oprog_can_fetch( ch, container, obj, pocket ))
+                return;
+
             if (can_get_obj( ch, obj ))
                 get_obj_container( ch, obj, container );
         }
