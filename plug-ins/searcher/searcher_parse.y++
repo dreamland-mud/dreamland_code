@@ -35,7 +35,7 @@ bool match( const DLString &str, const DLString &pattern )
 %token T_LEQ T_GEQ T_NEQ 
 %token T_HR T_DR T_HP T_MANA T_MOVE T_SAVES T_ARMOR T_STR T_INT T_WIS T_DEX T_CON T_CHA T_SIZE T_AGE
 %token T_AFF T_RES T_IMM T_VULN T_DET T_LIMIT T_HGAIN T_MGAIN T_SLEVEL
-%token T_WCLASS T_WFLAGS T_AVE T_FENIA T_LEARNED
+%token T_WCLASS T_WFLAGS T_D1 T_D2 T_AVE T_DAMAGE T_FENIA T_LEARNED
 
 %type <result> cond
 %type <str> str_expr
@@ -88,7 +88,9 @@ num_expr:
     |	T_HGAIN             { $$ = p.heal_gain;   }
     |	T_MGAIN             { $$ = p.mana_gain;   }
     |	T_AVE               { $$ = p.ave;   }
-    |   T_SLEVEL            { $$ = p.slevel; }
+    |   T_D1                { $$ = p.d1; }
+    |   T_D2                { $$ = p.d2; }
+    |   T_SLEVEL            { $$ = p.slevel; }    
     |	num_expr '+' num_expr	    { $$ = $1 + $3;		}
     |	num_expr '-' num_expr	    { $$ = $1 - $3;		}
     ;
@@ -106,6 +108,7 @@ str_expr:
     |	T_DET               { $$ = p.det;}
     |	T_WCLASS            { $$ = p.wclass;}
     |	T_WFLAGS            { $$ = p.wflags;}
+    |	T_DAMAGE            { $$ = p.damage;}
     |   T_FENIA             { $$ = p.fenia;}
     |   T_LEARNED           { $$ = p.learned; }
     ;

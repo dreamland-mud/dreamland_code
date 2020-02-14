@@ -12,7 +12,7 @@
 #include "areabehaviormanager.h"
 #include "commandtemplate.h"
 #include "affect.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "race.h"
@@ -20,6 +20,7 @@
 #include "searcher_val.h"    
 #include "profiler.h"
 
+#include "websocketrpc.h"
 #include "dreamland.h"
 #include "merc.h"
 #include "act.h"
@@ -91,6 +92,35 @@ static bool get_obj_resets( int vnum, AREA_DATA *&pArea, DLString &where )
     return false;
 }            
 
+
+static StringList searcher_param_anti(OBJ_INDEX_DATA *pObj)
+{
+    StringList anti;
+    if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
+        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) anti.push_back("{YG{x");
+        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) anti.push_back("{RE{x");
+        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) anti.push_back("N");
+    }
+    return anti;                    
+}
+
+static DLString searcher_param_asterix(OBJ_INDEX_DATA *pObj)
+{
+    bool clr_aff = !p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty();
+    bool clr_fenia = !p.fenia.empty();
+    bool clr_skills = !p.learned.empty();
+
+    DLString aff = " ";
+    if (clr_skills) {
+        aff = (clr_aff || clr_fenia) ? "{M*{x" : "{m*{x";
+    } else if (clr_fenia) {
+        aff = clr_aff ? "{G*{x" : "{g*{x";
+    } else if (clr_aff) {
+        aff = "{C*{x";
+    }
+    return aff;
+}
+
 class SearcherDumpTask : public SchedulerTaskRoundPlugin {
 public:
     typedef ::Pointer<SearcherDumpTask> Pointer;
@@ -122,7 +152,6 @@ public:
         ostringstream buf;
         Json::Value dump;
 
-        buf << "vnum,name,level,act,aff,off,area" << endl;
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[i]; pMob; pMob = pMob->next) {
             if (!pMob->behavior)
@@ -146,38 +175,24 @@ public:
             pet["off"] = off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE));
             pet["area"] = aname;
             dump.append(pet);
-
-            buf << pMob->vnum << "," 
-                << russian_case(pMob->short_descr, '1').colourStrip() << "," 
-                << (type == "LevelAdaptivePet" || type == "Rat" ? -1 : pMob->level) << ","
-                << act_flags.names(REMOVE_BIT(pMob->act, ACT_IS_NPC|ACT_NOALIGN|ACT_OUTDOORS|ACT_INDOORS|ACT_SENTINEL|ACT_SCAVENGER|ACT_NOPURGE|ACT_STAY_AREA|ACT_NOTRACK|ACT_SAGE|ACT_NOWHERE)) << ","
-                << affect_flags.names(REMOVE_BIT(pMob->affected_by, AFF_INFRARED)) << ","
-                << off_flags.names(REMOVE_BIT(pMob->off_flags, ASSIST_ALIGN|ASSIST_VNUM|ASSIST_RACE|OFF_FADE)) << ","
-                << aname << endl;
         }
 
         try {
-            DLFileStream( "/tmp/db_pets.csv" ).fromString( buf.str( ) );
+            Json::FastWriter writer;
+            DLFileStream("/tmp", "db_pets", ".json").fromString(
+                koi2utf(writer.write(dump))
+            );
         } catch (const ExceptionDBIO &ex) {
             LogStream::sendError() << ex.what() << endl;
             return false;
         }
-
-        Json::FastWriter writer;
-        DLFileStream("/tmp", "db_pets", ".json").fromString(
-            koi2utf(
-                writer.write(dump))
-        );
 
         return true;
     }
 
     bool dumpArmor()
     {
-        ostringstream buf;
         Json::Value dump;
-
-        buf << "vnum,name,level,wearloc,itemtype,hr,dr,hp,mana,move,saves,str,int,wis,dex,con,cha,align,affects,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
@@ -309,31 +324,13 @@ public:
             a["where"] = where;
             a["limit"] = pObj->limit;
             dump.append(a);
-
-            // TODO show affects
-            buf << pObj->vnum << ","
-                << "\"" << name << "\","
-                << pObj->level << ","
-                << "\"" << wearloc << "\","
-                << "\"" << itemtype << "\","
-                << hr << "," << dr << "," << hp << "," 
-                << mana << "," << move << "," 
-                << svs << "," 
-                << str << "," << inta << "," << wis << ","
-                << dex << "," << con << "," << cha << ","
-                << "\"" << align << "\","<< "\"\","
-                << "\"" << area << "\","  << "\"" << where << "\","  
-                << pObj->limit << endl;
         }
 
-        Json::FastWriter writer;
-        DLFileStream("/tmp", "db_armor", ".json").fromString(
-            koi2utf(
-                writer.write(dump))
-        );
-
         try {
-            DLFileStream( "/tmp/db_armor.csv" ).fromString( buf.str( ) );
+            Json::FastWriter writer;
+            DLFileStream("/tmp", "db_armor", ".json").fromString(
+                koi2utf(writer.write(dump))
+            );
         } catch (const ExceptionDBIO &ex) {
             LogStream::sendError() << ex.what() << endl;
             return false;
@@ -344,10 +341,7 @@ public:
 
     bool dumpWeapon()
     {
-        ostringstream buf;
         Json::Value dump;
-
-        buf << "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where,limit" << endl;
 
         for (int i = 0; i < MAX_KEY_HASH; i++)
         for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
@@ -450,34 +444,13 @@ public:
             w["where"] = where;
             w["limit"] = pObj->limit;
             dump.append(w);
-
-            // Header: "vnum,name,level,wclass,special,d1,d2,ave,hr,dr,hp,mana,saves,str,int,wis,dex,con,align,area,where"
-            buf << pObj->vnum << ","
-                << "\"" << name << "\","
-                << pObj->level << ","
-                << "\"" << weaponClass << "\","
-                << "\"" << special << "\","
-                << d1 << "," 
-                << d2 << "," 
-                << ave << "," 
-                << hr << "," << dr << "," 
-                << hp << "," << mana << "," 
-                << svs << ","
-                << str << "," << inta << "," << wis << ","
-                << dex << "," << con << "," 
-                << "\"" << align << "\","
-                << "\"" << area << "\","  << "\"" << where << "\","
-                << pObj->limit << endl;
         }
 
-        Json::FastWriter writer;
-        DLFileStream("/tmp", "db_weapon", ".json").fromString(
-            koi2utf(
-                writer.write(dump))
-        );
-
         try {
-            DLFileStream( "/tmp/db_weapon.csv" ).fromString( buf.str( ) );
+            Json::FastWriter writer;
+            DLFileStream("/tmp", "db_weapon", ".json").fromString(
+                koi2utf(writer.write(dump))
+            );
         } catch (const ExceptionDBIO &ex) {
             LogStream::sendError() << ex.what() << endl;
             return false;
@@ -488,9 +461,7 @@ public:
 
     bool dumpMagic()
     {
-        ostringstream buf;
         Json::Value dump;
-        buf << "vnum,name,level,itemtype,spellLevel,charges,spells,area,where,limit" << endl;
         // Collect distinct list of spells.
         std::set<DLString> allSpells;
 
@@ -590,27 +561,14 @@ public:
             wand["where"] = where;
             wand["limit"] = pObj->limit;
             dump.append(wand);
-
-            // Header; "vnum,name,level,type,spellLevel,charges,spells,area,where" 
-            buf << pObj->vnum << ","
-                << "\"" << name << "\","
-                << pObj->level << ","
-                << "\"" << itemtype << "\","
-                << spellLevel << "," 
-                << charges << "," 
-                << "\"" << spells << "\","
-                << "\"" << area << "\","  << "\"" << where << "\","
-                << pObj->limit << endl;
         }
 
-        Json::FastWriter writer;
-        DLFileStream("/tmp", "db_magic", ".json").fromString(
-            koi2utf(
-                writer.write(dump))
-        );
-
         try {
-            DLFileStream( "/tmp/db_magic.csv" ).fromString( buf.str( ) );
+            Json::FastWriter writer;
+            DLFileStream("/tmp", "db_magic", ".json").fromString(
+                koi2utf(
+                    writer.write(dump))
+            );
         } catch (const ExceptionDBIO &ex) {
             LogStream::sendError() << ex.what() << endl;
             return false;
@@ -642,7 +600,6 @@ PluginInitializer<SearcherDumpTask> initSearcherDumpTask;
  *      in like contains
  */
 CMDRUNP(searcher)
-//CMD(searcher, 50, "", POS_DEAD, 110, LOG_ALWAYS, "Commands to generate searcher CSV files")
 {
     DLString args = argument;
     DLString arg = args.getOneArgument();
@@ -650,13 +607,13 @@ CMDRUNP(searcher)
 
     if (arg_is_all(arg)) {
         task.run();
-        ch->println("Created 4 CSV files in /tmp, check logs for any errors.");
+        ch->println("Created 4 JSON files in /tmp, check logs for any errors.");
         return;
     }
 
     if (arg_oneof(arg, "pets")) {
         if (task.dumpPets())
-            ch->println("Created /tmp/db_pets.csv file.");
+            ch->println("Created /tmp/db_pets.json file.");
         else
             ch->println("Error occurred, please check the logs.");
         
@@ -665,7 +622,7 @@ CMDRUNP(searcher)
 
     if (arg_oneof(arg, "armor")) {
         if (task.dumpArmor()) 
-            ch->println("Created /tmp/db_armor.csv file.");
+            ch->println("Created /tmp/db_armor.json file.");
         else
             ch->println("Error occurred, please check the logs.");
 
@@ -674,7 +631,7 @@ CMDRUNP(searcher)
 
     if (arg_oneof(arg, "magic")) {
         if (task.dumpMagic()) 
-            ch->println("Created /tmp/db_magic.csv file.");
+            ch->println("Created /tmp/db_magic.json file.");
         else
             ch->println("Error occurred, please check the logs.");
 
@@ -683,7 +640,7 @@ CMDRUNP(searcher)
     
     if (arg_oneof(arg, "weapon")) {
         if (task.dumpWeapon()) 
-            ch->println("Created /tmp/db_weapon.csv file.");
+            ch->println("Created /tmp/db_weapon.json file.");
         else
             ch->println("Error occurred, please check the logs.");
 
@@ -696,12 +653,13 @@ CMDRUNP(searcher)
             ch->println("Usage: searcher q <query string>\nSee 'help searcher' for details.");
             return;
         }
-
     
         try {
             Profiler prof;
             int cnt = 0;
             vector<list<DLString> > output(MAX_LEVEL+1);
+            DLString lineFormat = 
+                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-10s{x {y%-10s{x %-20.20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n";
 
             prof.start();
 
@@ -713,32 +671,16 @@ CMDRUNP(searcher)
                     continue;
 
                 if (searcher_parse(pObj, args.c_str())) {
-                    StringList anti;
-                    if (IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD|ITEM_ANTI_EVIL|ITEM_ANTI_NEUTRAL)) {
-                        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_GOOD)) anti.push_back("{YG{x");
-                        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_EVIL)) anti.push_back("{RE{x");
-                        if (!IS_SET(pObj->extra_flags, ITEM_ANTI_NEUTRAL)) anti.push_back("N");
-                    }
+                    StringList anti = searcher_param_anti(pObj);
+                    DLString aff = searcher_param_asterix(pObj);
 
-                    bool clr_aff = !p.aff.empty() || !p.det.empty() || !p.vuln.empty() || !p.res.empty() || !p.imm.empty();
-                    bool clr_fenia = !p.fenia.empty();
-                    bool clr_skills = !p.learned.empty();
-
-                    DLString aff = " ";
-                    if (clr_skills) {
-                        aff = (clr_aff || clr_fenia) ? "{M*{x" : "{m*{x";
-                    } else if (clr_fenia) {
-                        aff = clr_aff ? "{G*{x" : "{g*{x";
-                    } else if (clr_aff) {
-                        aff = "{C*{x";
-                    }
-
-                    DLString line = fmt(NULL, "%5d {C%3d{x {y%-10s{x {y%-10s{x %-20.20s %-3s %1s {%s%3d {%s%3d {%s%3d {%s%3d {%s%3d {D%s{x\n", 
+                    DLString line = 
+                        fmt(NULL, lineFormat.c_str(), 
                                     pObj->vnum,
                                     pObj->level, 
                                     p.itemtype.c_str(),
                                     p.wear.substr(0, 10).c_str(),
-                                    russian_case(pObj->short_descr, '1')./*colourStrip().substr(0, 20).*/c_str(),
+                                    russian_case(pObj->short_descr, '1').c_str(),
                                     anti.join("").c_str(),
                                     aff.c_str(),
                                     (p.hr != 0 ? "C": "w"), p.hr, 
@@ -780,5 +722,80 @@ CMDRUNP(searcher)
         return;
     }
 
-    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\nsearcher q <query string\nSee 'help searcher' for details.");
+    if (arg_oneof(arg, "wquery")) {
+
+        if (args.empty()) {
+            ch->println("Usage: searcher wq <query string>\nSee 'help searcher' for details.");
+            return;
+        }
+    
+        try {
+            Profiler prof;
+            int cnt = 0;
+            vector<list<DLString> > output(MAX_LEVEL+1);
+            DLString lineFormat = 
+                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s %s{x\r\n";
+
+            prof.start();
+
+            for (int i = 0; i < MAX_KEY_HASH; i++)
+            for (OBJ_INDEX_DATA *pObj = obj_index_hash[i]; pObj; pObj = pObj->next) {
+                if (!IS_SET(pObj->wear_flags, ITEM_TAKE))
+                    continue;
+                if (pObj->level > MAX_LEVEL)
+                    continue;
+                if (pObj->item_type != ITEM_WEAPON)
+                    continue;
+
+                if (searcher_parse(pObj, args.c_str())) {
+                    StringList anti = searcher_param_anti(pObj);
+                    DLString aff = searcher_param_asterix(pObj);
+                    DLString line = 
+                        fmt(NULL, lineFormat.c_str(), 
+                                    pObj->vnum,
+                                    pObj->level, 
+                                    p.wclass.c_str(),
+                                    russian_case(pObj->short_descr, '1').c_str(),
+                                    p.d1, p.d2, p.ave, 
+                                    p.damage.c_str(),
+                                    (p.hr != 0 ? "C": "w"), p.hr, 
+                                    (p.dr != 0 ? "C": "w"), p.dr, 
+                                    (p.hp != 0 ? "C": "w"), p.hp, 
+                                    anti.join("").c_str(),
+                                    aff.c_str(),
+                                    p.wflags.c_str());
+
+                    DLString where;
+                    AREA_DATA *pArea;
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj->vnum, pArea, where)) {
+                        line.colourstrip();
+                        line = "{D" + line + "{x";
+                    }
+
+                    output[pObj->level].push_back(line);
+                    cnt++;
+                }
+            } 
+    
+            ostringstream buf;
+            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %s{x\r\n",
+                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "WFLAGS");
+            for (size_t lvl = 0; lvl < output.size(); lvl++) {
+                const list<DLString> &lines = output[lvl];
+                for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
+                    buf << *l;
+            }
+
+            prof.stop();
+            buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+     
+            page_to_char(buf.str().c_str(), ch);
+        } catch (const Exception &ex) {
+            ch->println(ex.what());
+        }
+
+        return;
+    }
+
+    ch->println("Usage:\nsearcher all\nsearcher armor|weapon|magic|pets\nsearcher q <item query>\nsearcher wq <weapon query>\n");
 }

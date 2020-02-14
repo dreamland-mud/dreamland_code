@@ -31,10 +31,16 @@ struct SearcherParam {
     int heal_gain, mana_gain;
     int slevel;
     DLString aff, vuln, res, imm, det;
-    DLString wclass, wflags;
-    int ave;
     DLString fenia;
     DLString learned;
+
+    // Weapon class (dagger) and flags (vampiric).    
+    DLString wclass, wflags;
+    // Weapon dices and average damage.
+    int d1, d2, ave;
+    // Weapon damage noun (DAMW_BITE, weapon_flags enum).
+    DLString damage;
+
     bool result;
 };
 extern SearcherParam p;
