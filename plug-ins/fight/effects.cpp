@@ -260,7 +260,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.level     = level;
             af.duration  = 6;
             af.location  = APPLY_STR;
-            af.modifier  = -1;
+            af.modifier = - (level / 12);
             af.bitvector = 0;
             affect_join( victim, &af );
         }
