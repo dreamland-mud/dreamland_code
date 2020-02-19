@@ -65,16 +65,16 @@ struct attack_type        attack_table        []                =
     { "slash",                "рубящий удар",                DAM_SLASH,        MultiGender::MASCULINE },
     { "whip",                "хлесткий удар",        DAM_SLASH,        MultiGender::MASCULINE },
     { "claw",                "удар когтями",                DAM_SLASH,        MultiGender::MASCULINE },  /*  5 */
-    { "blast",                "порыв",                DAM_BASH,        MultiGender::MASCULINE },
+    { "blast",                "залп",                DAM_BASH,        MultiGender::MASCULINE },
     { "pound",                "тяжелый удар",                DAM_BASH,        MultiGender::MASCULINE },
     { "crush",                "дробящий удар",        DAM_BASH,        MultiGender::MASCULINE },
     { "grep",                "захват",                 DAM_SLASH,        MultiGender::MASCULINE },
     { "bite",                "укус",                        DAM_PIERCE,        MultiGender::MASCULINE },  /* 10 */
     { "pierce",                "глубокий выпад",        DAM_PIERCE,        MultiGender::MASCULINE },
-    { "suction",        "засасывающий удар",    DAM_BASH,        MultiGender::MASCULINE },
-    { "beating",        "прямой удар",                DAM_BASH,        MultiGender::MASCULINE },
-    { "digestion",        "переваривание",        DAM_ACID,        MultiGender::MASCULINE },
-    { "charge",                "атака",                DAM_BASH,        MultiGender::FEMININE},  /* 15 */
+    { "suction",        "засасывание",    DAM_DROWNING,        MultiGender::MASCULINE },
+    { "beating",        "серия ударов",                DAM_BASH,        MultiGender::FEMININE },
+    { "digestion",        "кислотная слизь",        DAM_ACID,        MultiGender::FEMININE },
+    { "charge",                "удар с разбегу",                DAM_BASH,        MultiGender::MASCULINE},  /* 15 */
     { "slap",                "шлепок",                DAM_BASH,        MultiGender::MASCULINE },
     { "punch",                "удар кулаком",                DAM_BASH,        MultiGender::MASCULINE },
     { "wrath",                "гнев",                  DAM_ENERGY,        MultiGender::MASCULINE },
@@ -83,7 +83,7 @@ struct attack_type        attack_table        []                =
     { "cleave",                "раскалывающий удар",        DAM_SLASH,        MultiGender::MASCULINE },
     { "scratch",        "царапающий удар",        DAM_PIERCE,        MultiGender::MASCULINE },
     { "peck",                "удар клювом",                DAM_PIERCE,        MultiGender::MASCULINE },
-    { "peckb",                "удар клювом",                DAM_BASH,        MultiGender::MASCULINE },
+    { "peckb",                "клюющий удар",                DAM_PIERCE,        MultiGender::MASCULINE },
     { "chop",                "рубящий удар",                DAM_SLASH,        MultiGender::MASCULINE },  /* 25 */
     { "sting",                "жалящий удар",                DAM_PIERCE,        MultiGender::MASCULINE },
     { "smash",                "разбивающий удар",        DAM_BASH,        MultiGender::MASCULINE },
@@ -91,21 +91,25 @@ struct attack_type        attack_table        []                =
     { "flbite",                "обжигающий укус",        DAM_FIRE,        MultiGender::MASCULINE },
     { "frbite",                "леденящий укус",       DAM_COLD,        MultiGender::MASCULINE },  /* 30 */
     { "acbite",                "окисляющий укус",      DAM_ACID,        MultiGender::MASCULINE },
-    { "chomp",                "мощный удар",                DAM_PIERCE,        MultiGender::MASCULINE },
-    { "drain",                "отбирающий жизнь удар",DAM_NEGATIVE,        MultiGender::MASCULINE },
+    { "chomp",                "грызущий удар",                DAM_PIERCE,        MultiGender::MASCULINE },
+    { "drain",                "темная энергия",DAM_NEGATIVE,        MultiGender::FEMININE },
     { "thrust",                "выпад",                DAM_PIERCE,        MultiGender::MASCULINE },
-    { "slime",                "плевок слизью",        DAM_ACID,        MultiGender::MASCULINE },
-    { "shock",                "толчок",                DAM_LIGHTNING,        MultiGender::MASCULINE },
+    { "slime",                "жижа",        DAM_DROWNING,        MultiGender::FEMININE },
+    { "shock",                "разряд",                DAM_LIGHTNING,        MultiGender::MASCULINE },
     { "thwack",                "удар с размаху",        DAM_BASH,        MultiGender::MASCULINE },
-    { "flame",                "пламя",                DAM_FIRE,        MultiGender::NEUTER},
+    { "flame",                "вспышка",                DAM_LIGHT,        MultiGender::FEMININE},
     { "chill",                "холод",                DAM_COLD,        MultiGender::MASCULINE },
     { "cuff",                "подзатыльник",                DAM_BASH,        MultiGender::MASCULINE },
     { "hooves",                "удар копытами",        DAM_BASH,        MultiGender::MASCULINE },
     { "horns",                "удар рогами",                DAM_BASH,        MultiGender::MASCULINE },
     { "spines",         "удар иголками",              DAM_PIERCE,         MultiGender::MASCULINE }, 
     { "cacophony",      "какофония",              DAM_SOUND,      MultiGender::FEMININE}, 
-    { "poisonbite",      "отравляющий укус",              DAM_PIERCE,      MultiGender::MASCULINE}, 
-    { "tearbite",      "разрывающий укус",              DAM_SLASH,      MultiGender::MASCULINE}, 
+    { "poisonbite",      "отравляющий укус",              DAM_POISON,      MultiGender::MASCULINE}, 
+    { "tearbite",      "разрывающий укус",              DAM_SLASH,      MultiGender::MASCULINE},
+    { "mental",      "ментальный удар",              DAM_MENTAL,      MultiGender::MASCULINE},
+    { "disease",      "чумные миазмы",              DAM_DISEASE,      MultiGender::PLURAL},
+    { "charm",      "неотразимость",              DAM_CHARM,      MultiGender::FEMININE},
+    { "sound",      "звуковая волна",              DAM_SOUND,      MultiGender::FEMININE},    
     { 0,                0,                        0                }
 };
 
