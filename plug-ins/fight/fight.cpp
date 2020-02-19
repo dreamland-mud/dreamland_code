@@ -189,10 +189,10 @@ struct second_weapon_t {
 const struct second_weapon_t second_weapon_table [] = {
 /*                  HAND EXOT SWRD DAG STF MACE AXE FLA WHI POLE BOW ARR LAN */
 { prof_warrior,     { 60, 45,  45, 90, 18, 18,  90, 18, 18, 18,  18, 18, 18 } },
-{ prof_paladin,     { 60, 45,  45, 90, 18, 45,  18, 18, 18, 90,  18, 18, 18 } },
-{ prof_anti_paladin,{ 45, 45,  45, 45, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
-{ prof_ninja,       { 90, 45,  45, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } }, 
-{ prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 18, 18,  18, 18, 18 } },
+{ prof_paladin,     { 60, 45,  45, 90, 18, 60,  18, 90, 18, 60,  18, 18, 18 } },
+{ prof_anti_paladin,{ 45, 45,  60, 60, 18, 18,  18, 45, 18, 18,  18, 18, 18 } },
+{ prof_ninja,       { 90, 45,  45, 90, 60, 18,  18, 18, 18, 18,  18, 18, 18 } }, 
+{ prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 60, 18,  18, 60, 18 } },
 { prof_samurai,     { 60, 45,  90, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
 { prof_none,        { 0,                                                    } },
 };
