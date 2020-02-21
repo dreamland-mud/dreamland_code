@@ -1035,7 +1035,6 @@ public:
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            // TODO: this won't dump empty auto-generated area helps
             if ((*a)->visible(&dummy) && (*a)->getID() > 0) {
                 Json::Value h;
 

@@ -216,6 +216,8 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         stc("         hedit <id>\r\n", ch);
         stc("         hedit create         - создать новую пустую статью справки\r\n", ch);
         stc("         hedit search <text>  - поиск в тексте статей, включая ссылки (hh123)\r\n", ch);
+        stc("         hedit label          - список всех меток\r\n", ch);
+        stc("         hedit label <name>   - список всех статей у этой метки\r\n", ch);
         return;
     }
 
@@ -243,6 +245,44 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         }
 
         page_to_char(buf.str().c_str(), ch);
+        return;
+
+    } else if (DLString("label").strPrefix(args))  {
+        args.getOneArgument();
+
+        // 'hedit label' - just show total counts
+        if (args.empty()) {
+            map<DLString, int> activeLabelCount;
+            const DLString lineFormat = "[{c" + web_cmd(ch, "hedit label $1", "%12s") + "{x], статей {W%d{x";
+
+            for (auto &a: helpManager->getArticles()) {
+                for (auto &l: (*a)->labels.all) 
+                    activeLabelCount[l]++;
+            }
+
+            for (auto &kv: activeLabelCount) {
+                ch->println(fmt(0, lineFormat.c_str(), kv.first.c_str(), kv.second));
+            }
+            return;
+        }
+
+        // 'hedit label <arg>' - show articles under this label
+        list<int> labeledIds;
+        for (auto &a: helpManager->getArticles())
+            if ((*a)->labels.all.count(args) != 0)
+                labeledIds.push_back(a->getID());
+
+        if (labeledIds.empty()) {
+            ch->println("Не найдено ни одной статьи с этой меткой, укажите название полностью.");
+            return;
+        }
+
+        ch->printf("Cписок всех статей с меткой {c%s{x:\r\n", args.c_str());
+        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
+        for (auto &id: labeledIds) {
+            HelpArticle::Pointer a = helpManager->getArticle(id);
+            ch->printf(lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
+        }
         return;
 
     } else if (arg_oneof_strict(args, "create", "создать")) {
