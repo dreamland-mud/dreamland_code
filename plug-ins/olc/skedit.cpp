@@ -1,24 +1,17 @@
 
-#include <character.h>
 #include <pcharacter.h>
-#include <commandmanager.h>
-#include <object.h>
-#include <affect.h>
-#include "room.h"
-#include "regexp.h"
 #include "skillhelp.h"
+#include "skillgroup.h"
+#include "skillmanager.h"
 
 #include "skedit.h"
 #include "hedit.h"
 #include "olc.h"
 #include "security.h"
 
-#include "religionflags.h"
 #include "merc.h"
-#include "update_areas.h"
 #include "websocketrpc.h"
 #include "arg_utils.h"
-#include "interp.h"
 #include "act.h"
 #include "mercdb.h"
 #include "def.h"
@@ -85,6 +78,7 @@ void OLCStateSkill::show( PCharacter *ch )
 
     ptc(ch, "Умение {C%s{x, {C%s{x\r\n", r->getName().c_str(), r->getRussianName().c_str());
     ptc(ch, "Задержка:   {C%d{w пульсов {D(beats){x\r\n", r->getBeats());
+    ptc(ch, "Группа:     {C%s{x {D(group){x\r\n", r->getGroup()->getName().c_str());
     if (r->help)
         ptc(ch, "Справка: %s {D(help или hedit %d){x\r\n",
             web_edit_button(ch, "hedit", r->help->getID()).c_str(),
@@ -147,6 +141,12 @@ SKEDIT(beats, "задержка", "wait state в пульсах (секунды 
     return numberEdit(0, 60, r->beats);
 }
 
+SKEDIT(group, "группа", "группа умений (? practicer)")
+{
+    BasicSkill *r = getOriginal();
+    return globalReferenceEdit<SkillGroupManager, SkillGroup>(r->getGroup());
+}
+
 SKEDIT(commands, "команды", "показать список встроенных команд")
 {
     do_commands(ch);
@@ -173,15 +173,18 @@ CMD(skedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online skill editor.")
 
     DLString arg = DLString(argument).toLower().stripWhiteSpace();    
 
-    Skill *skill = skillManager->findExisting(arg);
-    if (!skill)
-        skill = skillManager->findUnstrict(arg);
-        
-    if (!skill || dynamic_cast<BasicSkill *>(skill) == NULL) {
-        stc("Умение с таким названием не найдено.\r\n", ch);
+    int sn = skillManager->unstrictLookup(arg, 0);        
+    if (sn < 0) {
+        ch->printf("Умение '%s' не найдено.\r\n", arg.c_str());
         return;
     }
 
+    Skill *skill = skillManager->find(sn);
+    if (!dynamic_cast<BasicSkill *>(skill)) {
+        ch->printf("Умение '%s' невозможно отредактировать.\r\n", skill->getName().c_str());
+        return;
+    }
+    
     OLCStateSkill::Pointer ske(NEW, skill);
     ske->attach(ch);
     ske->show(ch);

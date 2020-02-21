@@ -102,6 +102,8 @@ protected:
     bool enumerationArrayEdit(const FlagTable &table, EnumerationArray &field);
     template<typename E> inline
     bool globalBitvectorEdit(GlobalBitvector &field);
+    template<typename R, typename E> inline
+    bool globalReferenceEdit(GlobalReference<R, E> &field);
     bool numberEdit(int minValue, int maxValue, int &field);
     bool numberEdit(long minValue, long maxValue, long &field);
     bool rangeEdit(int minValue, int maxValue, int &field1, int &field2);
@@ -246,6 +248,32 @@ bool OLCState::globalBitvectorEdit(GlobalBitvector &field)
     field.clear();
     field.set(newField);
     ch->printf("Новое значение: {g%s{x\r\n", field.toString().c_str());
+    return true;    
+}
+
+template<typename R, typename E> inline
+bool OLCState::globalReferenceEdit(GlobalReference<R, E> &field)
+{
+    PCharacter *ch = owner->character->getPC();
+    const char *cmd = lastCmd.c_str();
+    DLString args = lastArgs;
+
+    if (args.empty()) {
+        ch->pecho("Использование:\r\n{W%1$s{x значение - установить новое значение\r\n", cmd);
+        return false;
+    }
+
+    E *elem = R::getThis()->findExisting(args);
+    if (!elem)
+        elem = R::getThis()->findUnstrict(args);
+
+    if (!elem) {
+        ch->printf("Значение '%s' не найдено.\r\n", args.c_str());
+        return false;
+    }
+
+    field.assign(elem->getIndex());
+    ch->printf("Новое значение: {g%s{x\r\n", field.getName().c_str());
     return true;    
 }
 
