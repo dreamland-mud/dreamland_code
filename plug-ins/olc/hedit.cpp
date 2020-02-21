@@ -218,6 +218,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         stc("         hedit search <text>  - поиск в тексте статей, включая ссылки (hh123)\r\n", ch);
         stc("         hedit label          - список всех меток\r\n", ch);
         stc("         hedit label <name>   - список всех статей у этой метки\r\n", ch);
+        stc("         hedit label none     - список всех статей без единой метки\r\n", ch);
         return;
     }
 
@@ -258,6 +259,8 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             for (auto &a: helpManager->getArticles()) {
                 for (auto &l: (*a)->labels.all) 
                     activeLabelCount[l]++;
+                if ((*a)->labels.all.empty())
+                    activeLabelCount["none"]++;
             }
 
             for (auto &kv: activeLabelCount) {
@@ -269,7 +272,10 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         // 'hedit label <arg>' - show articles under this label
         list<int> labeledIds;
         for (auto &a: helpManager->getArticles())
-            if ((*a)->labels.all.count(args) != 0)
+            if (args == "none") {
+                if ((*a)->labels.all.empty())
+                    labeledIds.push_back(a->getID());
+            } else if ((*a)->labels.all.count(args) != 0)
                 labeledIds.push_back(a->getID());
 
         if (labeledIds.empty()) {
