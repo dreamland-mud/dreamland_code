@@ -267,7 +267,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 
         dam = number_range(1, wield->level / 5 + 1);
         damage_nocatch(ch,victim,dam,0,DAM_NEGATIVE,false);
-        ch->hit += dam/2;
+        ch->hit += dam*2;
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
     {
