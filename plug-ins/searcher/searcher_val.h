@@ -33,6 +33,7 @@ struct SearcherParam {
     DLString aff, vuln, res, imm, det;
     DLString fenia;
     DLString learned;
+    bool ed;
 
     // Weapon class (dagger) and flags (vampiric).    
     DLString wclass, wflags;

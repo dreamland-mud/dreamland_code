@@ -713,6 +713,8 @@ CMDRUNP(searcher)
 
             prof.stop();
             buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+            buf << "{WA{x field: {C*{x imm/res/vuln/det, {g*{x Fenia trigger, {m*{x skill bonus, "
+                << "{G*{x Fenia trigger plus imm/res, {M*{x skill bonus plus anything else." << endl;
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {
@@ -750,6 +752,7 @@ CMDRUNP(searcher)
                 if (searcher_parse(pObj, args.c_str())) {
                     StringList anti = searcher_param_anti(pObj);
                     DLString aff = searcher_param_asterix(pObj);
+
                     DLString line = 
                         fmt(NULL, lineFormat.c_str(), 
                                     pObj->vnum,
@@ -788,6 +791,8 @@ CMDRUNP(searcher)
 
             prof.stop();
             buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+            buf << "{WA{x field: {C*{x imm/res/vuln/det, {g*{x Fenia trigger, {m*{x skill bonus, "
+                << "{G*{x Fenia trigger plus imm/res, {M*{x skill bonus plus anything else." << endl;
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {

@@ -31,7 +31,7 @@ bool match( const DLString &str, const DLString &pattern )
 %token <str> T_STRING
 %token <num> T_INTEGER
 %token T_OR T_AND 
-%token T_VNUM T_NAME T_LVL T_EXTRA T_WEAR T_ITEMTYPE
+%token T_VNUM T_NAME T_ED T_LVL T_EXTRA T_WEAR T_ITEMTYPE
 %token T_LEQ T_GEQ T_NEQ 
 %token T_HR T_DR T_HP T_MANA T_MOVE T_SAVES T_ARMOR T_STR T_INT T_WIS T_DEX T_CON T_CHA T_SIZE T_AGE
 %token T_AFF T_RES T_IMM T_VULN T_DET T_LIMIT T_HGAIN T_MGAIN T_SLEVEL
@@ -63,6 +63,7 @@ cond:	cond T_OR cond		    { $$ = $1 || $3;	    }
     |	num_expr T_GEQ num_expr	    { $$ = $1 >= $3;	    }
     |	num_expr '<' num_expr	    { $$ = $1 <  $3;	    }
     |	num_expr '>' num_expr	    { $$ = $1 >  $3;	    }
+    |   T_ED                        { $$ = p.ed; }
     ;
 
 num_expr:   
