@@ -207,9 +207,11 @@ HEDIT(cancel, "отменить", "отменить все изменения и
 
 CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
 {
-    DLString args = argument;
+    DLString args = argument, tmpArgs(argument);
     HelpArticle::Pointer help;
     Integer id;
+    DLString arg1 = tmpArgs.getOneArgument();
+    DLString arg2 = tmpArgs;
 
     if (args.empty()) {
         stc("Формат:  hedit ключевые слова\r\n", ch);
@@ -228,17 +230,20 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             stc("Справка с таким ID не найдена.\r\n", ch);
             return;
         }
-    } else if (DLString("search").strPrefix(args)) {
+    } else if (arg_oneof_strict(arg1, "search")) {
         ostringstream buf;
         const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
 
-        args.getOneArgument();
+        if (arg2.empty()) {
+            stc("Формат: hedit search <строка>\r\n", ch);
+            return;
+        }
 
-        buf << "Статьи справки, содержащие '" << args << "{x': " << endl;
+        buf << "Статьи справки, содержащие '" << arg2 << "{x': " << endl;
         for (auto &a: helpManager->getArticles()) {
             ostringstream matchBuf;
 
-            if (text_match_with_highlight(a->c_str(), args, matchBuf)) {
+            if (text_match_with_highlight(a->c_str(), arg2, matchBuf)) {
                 buf << fmt( 0, lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str())
                     << matchBuf.str()
                     << endl;
@@ -248,11 +253,9 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         page_to_char(buf.str().c_str(), ch);
         return;
 
-    } else if (DLString("label").strPrefix(args))  {
-        args.getOneArgument();
-
+    } else if (arg_oneof_strict(arg1, "label"))  {
         // 'hedit label' - just show total counts
-        if (args.empty()) {
+        if (arg2.empty()) {
             map<DLString, int> activeLabelCount;
             const DLString lineFormat = "[{c" + web_cmd(ch, "hedit label $1", "%12s") + "{x], статей {W%d{x";
 
@@ -272,10 +275,10 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         // 'hedit label <arg>' - show articles under this label
         list<int> labeledIds;
         for (auto &a: helpManager->getArticles())
-            if (args == "none") {
+            if (arg2 == "none") {
                 if ((*a)->labels.all.empty())
                     labeledIds.push_back(a->getID());
-            } else if ((*a)->labels.all.count(args) != 0)
+            } else if ((*a)->labels.all.count(arg2) != 0)
                 labeledIds.push_back(a->getID());
 
         if (labeledIds.empty()) {
@@ -283,7 +286,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             return;
         }
 
-        ch->printf("Cписок всех статей с меткой {c%s{x:\r\n", args.c_str());
+        ch->printf("Cписок всех статей с меткой {c%s{x:\r\n", arg2.c_str());
         const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + "     %s\r\n";
         for (auto &id: labeledIds) {
             HelpArticle::Pointer a = helpManager->getArticle(id);

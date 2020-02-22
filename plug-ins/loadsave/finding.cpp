@@ -987,6 +987,9 @@ bool text_match_with_highlight(const DLString &text, const DLString &args, ostri
     int num = 0;
     bool found = false;
 
+    if (args.empty())
+        return found;
+
     while (std::getline(lines, line, '\n')) {
         num++;
         if (line.find(args) != string::npos) {
