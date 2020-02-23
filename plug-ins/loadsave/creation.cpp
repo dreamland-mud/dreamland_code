@@ -396,6 +396,8 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
         obj->enchanted        = false;
         obj->updateCachedNoun( );
 
+        pObjIndex->instances.push_back(obj);
+
         if ( ( obj->pIndexData->limit != -1 )
                 && ( obj->pIndexData->count >  obj->pIndexData->limit ) )
                 if ( pObjIndex->new_format == 1 )

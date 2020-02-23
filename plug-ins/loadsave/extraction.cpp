@@ -12,7 +12,7 @@
 #include "behavior_utils.h"
 #include "npcharacter.h"
 #include "npcharactermanager.h"
-#include "object.h"
+#include "core/object.h"
 #include "objectmanager.h"
 #include "room.h"
 
@@ -93,6 +93,7 @@ void extract_obj_1( Object *obj, bool count )
                 --obj->pIndexData->count;
 
         oprog_extract( obj, count );
+        obj->pIndexData->instances.remove(obj);
         ObjectManager::extract( obj );
 
         return;

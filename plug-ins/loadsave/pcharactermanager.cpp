@@ -103,10 +103,6 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
     
     if( !strcmp( word, "Vnum" ) ) {
       vnum = fread_number( pfile );
-//      pObjIndex =  get_obj_index( vnum );
-//      if (pObjIndex) {
-//        pObjIndex->count++;
-//      }
       bVnum = true;
     }
     
@@ -158,10 +154,6 @@ static void load_OBJECT( FILE *pfile, const DLString &playerName )
       case 'V':
         if( !strcmp( word, "Vnum" ) && !bVnum ) {
           vnum = fread_number( pfile );
-//          pObjIndex =  get_obj_index( vnum );
-//          if (pObjIndex) {
-//            pObjIndex->count++;
-//          }
           break;
         }
         break;

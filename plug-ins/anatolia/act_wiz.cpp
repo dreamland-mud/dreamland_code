@@ -89,8 +89,8 @@
 #include "worldknowledge.h"
 #include "gsn_plugin.h"
 #include "npcharacter.h"
-#include "object.h"
-#include "handler.h"
+#include "core/object.h"
+#include "../anatolia/handler.h"
 #include "fread_utils.h"
 #include "stats_apply.h"
 #include "act_wiz.h"
@@ -330,12 +330,12 @@ CMDWIZP( limited )
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
-                        ch->send_to("Not found.\n\r");
+                        ch->send_to("Usage: limited <vnum>.\n\r");
                         return;
                 }
                 if ( obj_index->limit == -1 )
                 {
-                        ch->send_to("Thats not a limited item.\n\r");
+                        ch->send_to("That's not a limited item.\n\r");
                         return;
                 }
                 nMatch = 0;
@@ -363,8 +363,8 @@ CMDWIZP( limited )
                                                 obj->in_obj->pIndexData->vnum);
                                         ch->send_to(buf);
                         }
-                sprintf(buf, "  %d found in game. %d should be in pFiles.\n\r",
-                        ingameCount, obj_index->count-ingameCount);
+                sprintf(buf, "  %d/%d found in game. %d should be in pFiles.\n\r",
+                        ingameCount, obj_index->instances.size(), obj_index->count-ingameCount);
                 ch->send_to(buf);
                 return;
         }
@@ -376,18 +376,13 @@ CMDWIZP( limited )
                 nMatch++;
                 if (obj_index->limit > 0 && obj_index->limit < 100)
                 {
-                    int inGame = 0;
-                    for (Object* obj=object_list; obj != 0; obj=obj->next )
-                            if ( obj->pIndexData->vnum == obj_index->vnum )
-                                inGame++;
-
                     struct limit_info info;
                     info.description = obj_index->short_descr;
                     info.level = obj_index->level;
                     info.vnum = obj_index->vnum;
                     info.limit = obj_index->limit;
                     info.count = obj_index->count;
-                    info.inGame = inGame;
+                    info.inGame = obj_index->instances.size();
                     limits.push_back(info);
                 }
         }

@@ -160,9 +160,8 @@ NMI_GET( ObjIndexWrapper, instances, "список (List) всех предме�
     checkTarget();
     RegList::Pointer rc(NEW);
 
-    for (Object *o = object_list; o; o = o->next)
-        if (o->pIndexData == target)
-            rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
+    for (auto *o: target->instances)
+        rc->push_back( WrapperManager::getThis( )->getWrapper( o ) );
 
     Scripting::Object *obj = &Scripting::Object::manager->allocate();
     obj->setHandler(rc);

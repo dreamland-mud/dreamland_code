@@ -371,6 +371,8 @@ struct        extra_descr_data
 };
 
 
+typedef list<Object *> ObjectList;
+
 /*
  * Prototype for an object.  *OID*
  */
@@ -404,6 +406,7 @@ struct        obj_index_data
     DLString smell;
     DLString sound;
     Properties properties;
+    ObjectList instances;
 };
 
 
