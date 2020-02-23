@@ -95,6 +95,7 @@ L	    ([A-Za-z_]|{RL})
 "DAMAGE"    return T_DAMAGE;
 "FENIA"     return T_FENIA;
 "LEARNED"   return T_LEARNED;
+"MATERIAL"  return T_MATERIAL;
 
 
 "<="	    return T_LEQ;

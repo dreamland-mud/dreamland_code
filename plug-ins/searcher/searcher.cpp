@@ -793,7 +793,7 @@ CMDRUNP(searcher)
             }
 
             prof.stop();
-            buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
+            buf << endl << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
             buf << "{WA{x field: {C*{x imm/res/vuln/det, {g*{x Fenia trigger, {m*{x skill bonus, "
                 << "{G*{x Fenia trigger plus imm/res, {M*{x skill bonus plus anything else." << endl
                 << "{WCNT{x field: in-game count {W/{x profile count." << endl;
