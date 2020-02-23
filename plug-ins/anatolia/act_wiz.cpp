@@ -346,11 +346,10 @@ CMDWIZP( limited )
                         obj_index->count );
                 buf[0] = Char::upper( buf[0] );
                 ch->send_to(buf);
-                ingameCount = 0;
+                ingameCount = obj_index->instances.size();
                 for (Object* obj=object_list; obj != 0; obj=obj->next )
                         if ( obj->pIndexData->vnum == obj_index->vnum )
                         {
-                                ingameCount++;
                                 if ( obj->carried_by != 0 && ch->can_see( obj->carried_by ) )
                                         sprintf(buf, "Carried by %-30s\n\r",
                                                 obj->carried_by->getNameP( ));
@@ -363,8 +362,8 @@ CMDWIZP( limited )
                                                 obj->in_obj->pIndexData->vnum);
                                         ch->send_to(buf);
                         }
-                sprintf(buf, "  %d/%d found in game. %d should be in pFiles.\n\r",
-                        ingameCount, obj_index->instances.size(), obj_index->count-ingameCount);
+                sprintf(buf, "  %d found in game. %d should be in pFiles.\n\r",
+                        ingameCount, obj_index->count-ingameCount);
                 ch->send_to(buf);
                 return;
         }

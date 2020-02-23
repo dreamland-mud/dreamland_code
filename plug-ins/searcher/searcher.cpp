@@ -736,7 +736,7 @@ CMDRUNP(searcher)
             int cnt = 0;
             vector<list<DLString> > output(MAX_LEVEL+1);
             DLString lineFormat = 
-                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s %s{x\r\n";
+                web_cmd(ch, "oedit $1", "%5d") + " {C%3d{x {y%-7s{x %-20.20s{x {W%2d %2d %3d{x %-10s {%s%3d {%s%3d {%s%3d{x %-3s %1s {D%2d{w/{D%-2d{w %s{x\r\n";
 
             prof.start();
 
@@ -752,6 +752,8 @@ CMDRUNP(searcher)
                 if (searcher_parse(pObj, args.c_str())) {
                     StringList anti = searcher_param_anti(pObj);
                     DLString aff = searcher_param_asterix(pObj);
+                    int countInGame = pObj->instances.size();
+                    int countProfiles = pObj->count - countInGame;
 
                     DLString line = 
                         fmt(NULL, lineFormat.c_str(), 
@@ -766,6 +768,7 @@ CMDRUNP(searcher)
                                     (p.hp != 0 ? "C": "w"), p.hp, 
                                     anti.join("").c_str(),
                                     aff.c_str(),
+                                    countInGame, countProfiles,
                                     p.wflags.c_str());
 
                     DLString where;
@@ -781,8 +784,8 @@ CMDRUNP(searcher)
             } 
     
             ostringstream buf;
-            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %s{x\r\n",
-                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "WFLAGS");
+            buf << fmt(0, "{W%5s %3s %-7s %-20.20s %-2s %-2s %3s %-10s %3s %3s %3s %-3s %1s %-5s %s{x\r\n",
+                            "VNUM", "LVL", "WCLASS", "NAME", "D1", "D2", "AVE", "DAMAGE", "HR", "DR", "HP", "ALG", "A", "CNT", "WFLAGS");
             for (size_t lvl = 0; lvl < output.size(); lvl++) {
                 const list<DLString> &lines = output[lvl];
                 for (list<DLString>::const_iterator l = lines.begin(); l != lines.end(); l++)
@@ -792,7 +795,8 @@ CMDRUNP(searcher)
             prof.stop();
             buf << "Found " << cnt << " entries, search took " << prof.msec() << " ms." << endl;
             buf << "{WA{x field: {C*{x imm/res/vuln/det, {g*{x Fenia trigger, {m*{x skill bonus, "
-                << "{G*{x Fenia trigger plus imm/res, {M*{x skill bonus plus anything else." << endl;
+                << "{G*{x Fenia trigger plus imm/res, {M*{x skill bonus plus anything else." << endl
+                << "{WCNT{x field: in-game count {W/{x profile count." << endl;
      
             page_to_char(buf.str().c_str(), ch);
         } catch (const Exception &ex) {
