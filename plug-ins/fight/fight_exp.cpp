@@ -20,6 +20,7 @@
 #include "object.h"
 #include "bonus.h"
 #include "gsn_plugin.h"
+#include "wiznet.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "handler.h"
@@ -34,16 +35,31 @@ BONUS(pet_day);
 
 int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, Character *leader, int base_exp_bonus );
 
+/** Report mob's parameter gain to wiznet 'levels'. */
+static void wiznet(NPCharacter *pet, Character *victim, const char *what, int oldPetParam, int petParam, int victParam)
+{
+    Character *master = pet->master;
+
+    wiznet( WIZ_LEVELS, 0, 0, 
+                  "Питомец %C2 %C1 (ур. %d) повышает %s, убив %C4 (ур. %d). Параметр пета %d -> %d, моба %d.", 
+                  master, pet, pet->getLevel(), 
+                  what, victim, victim->getRealLevel(), oldPetParam, petParam, victParam);
+}
+
 #ifndef FIGHT_STUB
+/**
+ * Charmed mobs level up and improve their parameters when killing a stronger opponent.
+ * Every parameter is capped by mob's level * N, and no improvement occurs if victim's level
+ * is below mob's level by 5. During the 1st day of Summer there are more chances to improve.
+ */
 void gain_exp_mob( NPCharacter *ch, Character *victim )
 {
-    int modifier = 100;
-    int diff = victim->getRealLevel() - ch->getRealLevel();
+    int modifier;
+    int mylevel = ch->getRealLevel();
+    int diff = victim->getRealLevel() - mylevel;
     bool fBonus = bonus_pet_day->isActive(NULL, time_info);
    
-    if (fBonus)
-        modifier = 150;
-    else if (diff > 15)
+    if (diff > 15)
         modifier = 150;
     else if ( diff > 5 )
         modifier = 125;
@@ -51,13 +67,20 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         modifier = 110;
     else if ( diff > -5 )
         modifier = 105;
-     
+    else
+        return;
+    
+    if (fBonus)
+        modifier = number_range(modifier, 150);
+
     if ( number_percent() * modifier / 100 > 110 )
     {
-        if (victim->getRealLevel() > ch->getRealLevel()) {
+        if (victim->getRealLevel() > mylevel && mylevel < 103) {
+            int oldParam = ch->getRealLevel();
             ch->setLevel( ch->getRealLevel() + 1 );
             ch->send_to("Ты получаешь уровень!\n\r");
             act_p("$c1 выглядит более опытн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, "уровень", oldParam, ch->getRealLevel(), victim->getRealLevel());
 
             // Restore act bits that are removed for low-level adaptive pets.
             if (ch->getRealLevel( ) > 20) {
@@ -68,66 +91,81 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
             }
         }
     }
-    if ( number_percent() * modifier / 100 > 90 )
+    if ( number_percent() * modifier / 100 > 100 )
     {
-        if (fBonus || victim->hitroll > ch->hitroll) {
+        if (victim->hitroll > ch->hitroll && ch->hitroll < mylevel * 3) {
+            int oldParam = ch->hitroll;
             ch->hitroll++;
             ch->send_to("Теперь ты будешь попадать более метко!\n\r");
             act_p("$c1 становится более метк$gим|им|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, "точность", oldParam, ch->hitroll, victim->hitroll);
         }
     }
     if ( number_percent() * modifier / 100 > 110 )
     {
-        if (fBonus || victim->damroll > ch->damroll) {
+        if (victim->damroll > ch->damroll && ch->damroll < mylevel * 3) {
+            int oldParam = ch->damroll;
             ch->damroll++;
             ch->send_to("Теперь ты будешь больнее бить!\n\r");
             act_p("$c1 теперь будет больнее бить!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, "урон", oldParam, ch->damroll, victim->damroll);
         }
     }
     if ( number_percent() * modifier / 100 > 100 )
     {
+        const int max_hp = mylevel * 300;
         int gain;
         
         gain = max( 0, victim->max_hit - ch->max_hit );
-        gain = gain * number_percent() * 20 / 10000;
-
-        if (fBonus || gain > 0) {
-            ch->max_hit += gain;
+        gain = gain * number_percent() * 20 / 10000; // 20% max
+        
+        if (gain > 0 && ch->max_hit < max_hp) {
+            int oldParam = ch->max_hit;
+            ch->max_hit = min(ch->max_hit + gain, max_hp);
             ch->send_to("Ты здоровеешь!\n\r");
             act_p("Здоровье $c2 растет!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, "здоровье", oldParam, ch->max_hit, victim->max_hit);
         }
     }
     if ( number_percent() * modifier / 100 > 100 )
     {
         int gain;
+        const int max_mana = mylevel * 150;
         
         gain = max( 0, victim->max_mana - ch->max_mana );
-        gain = gain * number_percent() * 20 / 10000;
+        gain = gain * number_percent() * 20 / 10000; // 20% max
 
-        if (fBonus || gain > 0) {
-            ch->max_mana += gain;
+        if (gain > 0 && ch->max_mana < max_mana) {
+            int oldParam = ch->max_mana;            
+            ch->max_mana = min(ch->max_mana + gain, max_mana);
             ch->send_to("Ты чувствуешь прилив энергии!\n\r");
             act_p("$c1 наполняется энергией!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, "ману", oldParam, ch->max_mana, victim->max_mana);
         }
     }
 
     if (victim->is_npc( )) {
         NPCharacter *vch = victim->getNPC( );
+        const int max_dice = max(5, mylevel / 5);
 
         if ( number_percent() * modifier / 100 > 110 )
         {
-            if (fBonus || vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER]) {
+            if (vch->damage[DICE_NUMBER] > ch->damage[DICE_NUMBER] && ch->damage[DICE_NUMBER] < max_dice) {
+                int oldParam = ch->damage[DICE_NUMBER];
                 ch->damage[DICE_NUMBER]++;
                 ch->send_to("Теперь ты будешь наносить больше повреждений!\n\r");
                 act_p("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+                wiznet(ch, victim, "dice_number", oldParam, ch->damage[DICE_NUMBER], vch->damage[DICE_NUMBER]);
             }
         }
         if ( number_percent() * modifier / 100 > 110 )
         {
-            if (fBonus || vch->damage[DICE_TYPE] > vch->damage[DICE_TYPE]) {
+            if (vch->damage[DICE_TYPE] > ch->damage[DICE_TYPE] && ch->damage[DICE_TYPE] < max_dice) {
+                int oldParam = ch->damage[DICE_TYPE];
                 ch->damage[DICE_TYPE]++;
                 ch->send_to("Теперь ты будешь наносить больше повреждений!\n\r");
                 act_p("$c1 становится более опасн$gым|ым|ой!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+                wiznet(ch, victim, "dice_type", oldParam, ch->damage[DICE_TYPE], vch->damage[DICE_TYPE]);
             }
         }
     }
@@ -158,21 +196,27 @@ void gain_exp_mob( NPCharacter *ch, Character *victim )
         gain = min( 0, victim->armor[dam_type] - ch->armor[dam_type]);
         gain = gain * number_percent() * 5 / 10000;
         
-        if (fBonus || gain < 0) {
+        if (gain < 0 && ch->armor[dam_type] > -10 * mylevel) {
+            int oldParam = ch->armor[dam_type];
             ch->armor[dam_type] += gain;
             ch->send_to("Твоя защита улучшается!\n\r");
             act_p("Защита $c2 улучшается!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, "броню", oldParam, ch->armor[dam_type], victim->armor[dam_type]);
         }
     }
     
     for (int i = 0; i < stat_table.size; i ++)
     {
         if ( number_bits(4) == 0
+            && ch->perm_stat[i] < victim->perm_stat[i]
+            && ch->perm_stat[i] < 25
             && number_percent() * modifier / 100 > 110 )
         {
-            ch->perm_stat[i] = min(25,ch->perm_stat[i] + 1);
+            int oldParam = ch->perm_stat[i];
+            ch->perm_stat[i] += 1;
             ch->send_to("Твои параметры улучшаются!\n\r");
             act_p("$c1 улучшает свои параметры!\n\r",ch,0,0,TO_ROOM,POS_RESTING);
+            wiznet(ch, victim, stat_table.fields[i].name, oldParam, ch->perm_stat[i], victim->perm_stat[i]);
         }
     }
 }
