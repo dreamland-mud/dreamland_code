@@ -40,9 +40,15 @@ static void wiznet(NPCharacter *pet, Character *victim, const char *what, int ol
 {
     Character *master = pet->master;
 
-    wiznet( WIZ_LEVELS, 0, 0, 
-                  "Питомец %C2 %C1 (ур. %d) повышает %s, убив %C4 (ур. %d). Параметр пета %d -> %d, моба %d.", 
+    if (master)
+        wiznet( WIZ_LEVELS, 0, 0, 
+                  "Питомец %C2 %C1 (ур. %d) повышает %s, убив %C4 (ур. %d). Параметр убийцы %d -> %d, жертвы %d.", 
                   master, pet, pet->getLevel(), 
+                  what, victim, victim->getRealLevel(), oldPetParam, petParam, victParam);
+    else 
+        wiznet( WIZ_LEVELS, 0, 0, 
+                  "Моб %C1 (ур. %d) повышает %s, убив %C4 (ур. %d). Параметр убийцы %d -> %d, жертвы %d.", 
+                  pet, pet->getLevel(), 
                   what, victim, victim->getRealLevel(), oldPetParam, petParam, victParam);
 }
 
