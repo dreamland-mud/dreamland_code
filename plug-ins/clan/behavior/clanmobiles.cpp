@@ -23,6 +23,7 @@
 #include "gsn_plugin.h"
 #include "interp.h"
 #include "act.h"
+#include "arg_utils.h"
 #include "act_move.h"
 #include "mercdb.h"
 #include "def.h"
@@ -387,7 +388,7 @@ void ClanGuard::speech( Character *wch, const char *speech )
             act( "Ты снимаешь с шеи $o4.", ch, obj, 0, TO_CHAR );
         }
     }
-    else if (!str_cmp( speech, "I need invitation" )) {
+    else if (!str_cmp( speech, "I need invitation" ) || !str_cmp(speech, "Мне нужно приглашение")) {
         if (clanArea->invitationVnum > 0) {
             if (wch->getClan( ) != ch->getClan( )) {
                 do_say(ch, "Я не обязан приглашать тебя в свой клан!");
