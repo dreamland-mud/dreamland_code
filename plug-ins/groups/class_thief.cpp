@@ -373,9 +373,9 @@ SKILL_RUNP( envenom )
         {
             act_p("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM,POS_RESTING);
             act_p("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR,POS_RESTING);
-            if (!IS_SET(obj->value[3], DRINK_POISONED))
+            if (!IS_SET(obj->value3(), DRINK_POISONED))
             {
-                SET_BIT(obj->value[3], DRINK_POISONED);
+                obj->value3(obj->value3() | DRINK_POISONED);
                 gsn_envenom->improve( ch, true );
             }
             ch->setWait( gsn_envenom->getBeats( ) );
@@ -383,7 +383,7 @@ SKILL_RUNP( envenom )
         }
 
         act_p("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR,POS_RESTING);
-        if (!IS_SET(obj->value[3], DRINK_POISONED))
+        if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
         ch->setWait( gsn_envenom->getBeats( ) );
         return;
@@ -404,8 +404,8 @@ SKILL_RUNP( envenom )
             return;
         }
 
-        if (obj->value[3] < 0
-        ||  attack_table[obj->value[3]].damage == DAM_BASH)
+        if (obj->value3() < 0
+        ||  attack_table[obj->value3()].damage == DAM_BASH)
         {
             ch->send_to("Ты можешь отравить только оружие, имеющее острое лезвие.\n\r");
             return;
@@ -1001,7 +1001,7 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    if ( attack_table[obj->value[3]].damage != DAM_PIERCE )
+    if ( attack_table[obj->value3()].damage != DAM_PIERCE )
     {
             ch->send_to("Чтоб ударить сзади, нужно вооружится колющим оружием.\n\r");
             return;
@@ -1133,7 +1133,7 @@ SKILL_RUNP( circle )
     }
 
     if ( get_eq_char(ch,wear_wield) == 0
-            || attack_table[get_eq_char(ch,wear_wield)->value[3]].damage != DAM_PIERCE)
+            || attack_table[get_eq_char(ch,wear_wield)->value3()].damage != DAM_PIERCE)
     {
             ch->send_to("Вооружись для этого колющим оружием.\n\r");
             return;
@@ -1335,7 +1335,7 @@ SKILL_RUNP( knife )
         return;
     }
 
-    if (knife->value[0] != WEAPON_DAGGER) {
+    if (knife->value0() != WEAPON_DAGGER) {
         ch->send_to("Для этого тебе нужен кинжал.\r\n");
         return;
     }
@@ -1402,7 +1402,7 @@ SKILL_RUNP( forge )
     }
 
     for (blank = get_obj_carry_type( ch, ITEM_LOCKPICK );
-         blank && blank->value[0] != Keyhole::LOCK_VALUE_BLANK;
+         blank && blank->value0() != Keyhole::LOCK_VALUE_BLANK;
          blank = get_obj_list_type( ch, ITEM_LOCKPICK, blank->next_content ))
         ;
 
@@ -1458,8 +1458,8 @@ SKILL_RUNP( forge )
         dup->extra_flags = blank->extra_flags;
         dup->condition   = blank->condition;
         dup->weight      = blank->weight;
-        dup->value[0] = 1;
-        dup->value[1] = 1;
+        dup->value0(1);
+        dup->value1(1);
         obj_to_char( dup, ch );
 
         act( "Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
@@ -1508,8 +1508,8 @@ SKILL_RUNP( forge )
         blank->addExtraDescr( blank->getName( ), fmt( 0, LOCK_EXTRA, ch ) );
         keyhole->record( blank );
 
-        blank->value[0] = keyhole->getLockType( );
-        blank->value[1] = 50 + gsn_key_forgery->getEffective( ch ) / 2;
+        blank->value0(keyhole->getLockType( ));
+        blank->value1(50 + gsn_key_forgery->getEffective( ch ) / 2);
 
         gsn_key_forgery->improve( ch, true );
         return;

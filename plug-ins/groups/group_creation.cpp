@@ -93,8 +93,8 @@ VOID_SPELL(CreateFood)::run( Character *ch, char *target_name, int sn, int level
         vnum = OBJ_VNUM_MUSHROOM;
         
     mushroom = create_object( get_obj_index( vnum ), 0 );
-    mushroom->value[0] = std::min( level / 2, 35 );
-    mushroom->value[1] = level;
+    mushroom->value0(std::min( level / 2, 35 ));
+    mushroom->value1(level);
     dress_created_item( sn, mushroom, ch, target_name );
     obj_to_char( mushroom, ch );
 
@@ -178,7 +178,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
     if (drink_is_closed( obj, ch ))
         return;
 
-    if (obj->value[2] != liq_water && obj->value[1] != 0 )
+    if (obj->value2() != liq_water && obj->value1() != 0 )
     {
         ch->send_to("Контейнер содержит другую жидкость.\n\r");
         return;
@@ -186,13 +186,13 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
     water = min(
                 level * (weather_info.sky >= SKY_RAINING ? 4 : 2),
-                obj->value[0] - obj->value[1]
+                obj->value0() - obj->value1()
                 );
 
     if ( water > 0 )
     {
-        obj->value[2] = liq_water;
-        obj->value[1] += water;
+        obj->value2(liq_water);
+        obj->value1(obj->value1() + water);
         if ( !is_name( "water", obj->getName( )) )
             obj->fmtName( "%s water", obj->getName( ) );
 
@@ -218,8 +218,8 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     }
 
     disc = create_object(get_obj_index(OBJ_VNUM_DISC), 0);
-    disc->value[0]        = ch->getModifyLevel() * 10; /* 10 pounds per level capacity */
-    disc->value[3]        = ch->getModifyLevel() * 5; /* 5 pounds per level max per item */
+    disc->value0(ch->getModifyLevel() * 10); /* 10 pounds per level capacity */
+    disc->value3(ch->getModifyLevel() * 5); /* 5 pounds per level max per item */
     disc->timer                = ch->getModifyLevel() * 2 - number_range(0,level / 2);
 
     if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 

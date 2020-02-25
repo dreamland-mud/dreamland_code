@@ -473,3 +473,107 @@ void Object::updateCachedNoun( )
     }
 }
 
+int Object::getWeightMultiplier( ) const
+{
+    return item_type == ITEM_CONTAINER ? value4() : 100;
+}
+
+static bool get_value0_from_proto(const Object *obj)
+{
+    switch (obj->item_type) {
+        case ITEM_WEAPON: 
+            // Always grab weapon's class from the proto, unless it's a restring (e.g. cleric's mace).
+            return !obj->getRealShortDescr();
+        default:
+            return false;
+    }
+}
+
+static bool get_value1_from_proto(const Object *obj)
+{
+    switch (obj->item_type) {
+        case ITEM_WEAPON: 
+            // Bypass object dices and return those from proto if the weapon is not enchanted, not
+            // dynamically created (ranger staff, bow, arrow, stone) and not restringed (cleric's mace).
+            return !obj->getRealShortDescr() && !obj->enchanted && obj->level == obj->pIndexData->level;
+        default:
+            return false;
+    }
+}
+
+static bool get_value2_from_proto(const Object *obj)
+{
+    return get_value1_from_proto(obj);
+}
+
+static bool get_value3_from_proto(const Object *obj)
+{
+    switch (obj->item_type) {
+        case ITEM_WEAPON: 
+            // Grab weapon damage type (pierce, slash) from proto unless it's a restring (e.g. cleric's mace).
+            return !obj->getRealShortDescr();
+        default:
+            return false;
+    }
+}
+
+static bool get_value4_from_proto(const Object *obj)
+{
+    return false;
+}
+
+static bool get_value_from_proto(const Object *obj, int index)
+{
+    switch (index) {
+        case 0: return get_value0_from_proto(obj);
+        case 1: return get_value1_from_proto(obj);
+        case 2: return get_value2_from_proto(obj);
+        case 3: return get_value3_from_proto(obj);
+        case 4: return get_value4_from_proto(obj);
+        default:
+            return false;        
+    }
+}
+
+int Object::itemOrProtoValue(int index) const
+{
+    return get_value_from_proto(this, index) ? pIndexData->value[index] : value[index];
+}
+
+void Object::itemOrProtoValue(int index, int v)
+{
+    if (get_value_from_proto(this, index))
+        warn("Object::value%d set value will be ignored for [%d], value [%d]", 
+              index, pIndexData->vnum, v);
+
+    value[index] = v;
+}
+
+
+int Object::valueByIndex(int index) const
+{
+    switch (index) {
+        case 0: return value0();
+        case 1: return value1();
+        case 2: return value2();
+        case 3: return value3();
+        case 4: return value4();
+        default:
+            bug("Object::valueByIndex invalid index [%d] for [%d]", index, pIndexData->vnum);
+            break;
+    }
+}
+
+void Object::valueByIndex(int index, int value)
+{
+    switch (index) {
+        case 0: value0(value); break;
+        case 1: value1(value); break;
+        case 2: value2(value); break;
+        case 3: value3(value); break;
+        case 4: value4(value); break;
+        default:
+            bug("Object::valueByIndex invalid index [%d] for [%d] and value [%d]", index, pIndexData->vnum, value);
+            break;
+    }
+}

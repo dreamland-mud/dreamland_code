@@ -181,26 +181,26 @@ char arg[MAX_STRING_LENGTH];
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-        fprintf( fp, "Level %d spells of:", obj->value[0] );
+        fprintf( fp, "Level %d spells of:", obj->value0() );
 
-        if ( obj->value[1] >= 0 && obj->value[1] < SkillManager::getThis( )->size() )
+        if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[1])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value1())->getName().c_str());
         }
 
-        if ( obj->value[2] >= 0 && obj->value[2] < SkillManager::getThis( )->size() )
+        if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[2])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value2())->getName().c_str());
         }
 
-        if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
         }
 
-        if (obj->value[4] >= 0 && obj->value[4] < SkillManager::getThis( )->size())
+        if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[4])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value4())->getName().c_str());
         }
 
         fprintf( fp,".\n");
@@ -208,18 +208,18 @@ char arg[MAX_STRING_LENGTH];
 
     case ITEM_WAND:
     case ITEM_STAFF:
-        fprintf(fp, "Has %d charges of level %d", obj->value[2], obj->value[0]);
+        fprintf(fp, "Has %d charges of level %d", obj->value2(), obj->value0());
 
-        if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
         }
 
         fprintf( fp,".\n");
         break;
 
     case ITEM_DRINK_CON:
-        liquid = liquidManager->find( obj->value[2] );
+        liquid = liquidManager->find( obj->value2() );
         fprintf(fp,"It holds %s-colored %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
@@ -227,36 +227,36 @@ char arg[MAX_STRING_LENGTH];
 
     case ITEM_CONTAINER:
         fprintf(fp,"Capacity: %d#  Maximum weight: %d#  flags: %s\n",
-            obj->value[0], obj->value[3], container_flags.messages(obj->value[1]).c_str( ));
-        if (obj->value[4] != 100)
+            obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
+        if (obj->value4() != 100)
         {
             fprintf(fp,"Weight multiplier: %d%%\n",
-                obj->value[4]);
+                obj->value4());
         }
         break;
                 
     case ITEM_WEAPON:
          fprintf(fp,"Weapon type is %s\n", 
-                    weapon_class.name(obj->value[0]).c_str( ));
+                    weapon_class.name(obj->value0()).c_str( ));
                 
         if (obj->pIndexData->new_format)
             fprintf(fp,"Damage is %dd%d (average %d).\n",
-                obj->value[1],obj->value[2],
-                (1 + obj->value[2]) * obj->value[1] / 2);
+                obj->value1(),obj->value2(),
+                (1 + obj->value2()) * obj->value1() / 2);
         else
             fprintf( fp, "Damage is %d to %d (average %d).\n",
-                    obj->value[1], obj->value[2],
-                    ( obj->value[1] + obj->value[2] ) / 2 );
-        if (obj->value[4])  /* weapon flags */
+                    obj->value1(), obj->value2(),
+                    ( obj->value1() + obj->value2() ) / 2 );
+        if (obj->value4())  /* weapon flags */
         {
-            fprintf(fp,"Weapons flags: %s\n",weapon_type2.messages(obj->value[4]).c_str( ));
+            fprintf(fp,"Weapons flags: %s\n",weapon_type2.messages(obj->value4()).c_str( ));
         }
         break;
 
     case ITEM_ARMOR:
         fprintf( fp,
         "Armor class is %d pierce, %d bash, %d slash, and %d vs. magic.\n",
-            obj->value[0], obj->value[1], obj->value[2], obj->value[3] );
+            obj->value0(), obj->value1(), obj->value2(), obj->value3() );
         break;
     }
        for( paf=obj->pIndexData->affected; paf != 0; paf = paf->next )
@@ -1076,7 +1076,7 @@ CMDWIZP( stat )
         ch->send_to(buf);
 
         sprintf( buf, "Values: %d %d %d %d %d\n\r",
-                obj->value[0], obj->value[1], obj->value[2], obj->value[3],        obj->value[4] );
+                obj->value0(), obj->value1(), obj->value2(), obj->value3(),        obj->value4() );
         ch->send_to(buf);
 
         // now give out vital statistics as per identify
@@ -1086,34 +1086,34 @@ CMDWIZP( stat )
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
-                sprintf( buf, "Level %d spells of:", obj->value[0] );
+                sprintf( buf, "Level %d spells of:", obj->value0() );
                 ch->send_to(buf);
 
-                if ( obj->value[1] >= 0 && obj->value[1] < SkillManager::getThis( )->size() )
+                if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[1])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value1())->getName().c_str());
                         ch->send_to("'");
                 }
 
-                if ( obj->value[2] >= 0 && obj->value[2] < SkillManager::getThis( )->size() )
+                if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[2])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value2())->getName().c_str());
                         ch->send_to("'");
                 }
 
-                if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+                if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value3())->getName().c_str());
                         ch->send_to("'");
                 }
 
-                if (obj->value[4] >= 0 && obj->value[4] < SkillManager::getThis( )->size())
+                if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[4])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value4())->getName().c_str());
                         ch->send_to("'");
                 }
 
@@ -1123,13 +1123,13 @@ CMDWIZP( stat )
         case ITEM_WAND:
         case ITEM_STAFF:
                 sprintf( buf, "Has %d(%d) charges of level %d",
-                        obj->value[1], obj->value[2], obj->value[0] );
+                        obj->value1(), obj->value2(), obj->value0() );
                 ch->send_to(buf);
 
-                if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+                if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value3())->getName().c_str());
                         ch->send_to("'");
                 }
 
@@ -1137,7 +1137,7 @@ CMDWIZP( stat )
                 break;
 
         case ITEM_DRINK_CON:
-                liquid = liquidManager->find( obj->value[2] );
+                liquid = liquidManager->find( obj->value2() );
                 sprintf(buf,"It holds %s-colored %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
@@ -1146,40 +1146,40 @@ CMDWIZP( stat )
                 
         case ITEM_WEAPON:
                 ch->send_to("Weapon type is ");
-                ch->send_to(weapon_class.name(obj->value[0]).c_str( ));
+                ch->send_to(weapon_class.name(obj->value0()).c_str( ));
                 ch->send_to("\n");
                 
                 if (obj->pIndexData->new_format)
                         sprintf(buf,"Damage is %dd%d (average %d)\n\r",
-                                obj->value[1],obj->value[2],(1 + obj->value[2]) * obj->value[1] / 2);
+                                obj->value1(),obj->value2(),(1 + obj->value2()) * obj->value1() / 2);
                 else
                         sprintf( buf, "Damage is %d to %d (average %d)\n\r",
-                                obj->value[1], obj->value[2],( obj->value[1] + obj->value[2] ) / 2 );
+                                obj->value1(), obj->value2(),( obj->value1() + obj->value2() ) / 2 );
                         ch->send_to(buf);
 
-                sprintf(buf,"Damage noun is %s.\n\r", weapon_flags.name(obj->value[3]).c_str( ));
+                sprintf(buf,"Damage noun is %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
                 ch->send_to(buf);
         
-                if (obj->value[4])  /* weapon flags */
+                if (obj->value4())  /* weapon flags */
                 {
-                        sprintf(buf,"Weapons flags: %s\n\r",weapon_type2.messages(obj->value[4]).c_str( ));
+                        sprintf(buf,"Weapons flags: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
                         ch->send_to(buf);
                 }
                 break;
 
         case ITEM_ARMOR:
                 sprintf( buf,"Armor class is %d pierce, %d bash, %d slash, and %d vs. magic\n\r",
-                        obj->value[0], obj->value[1], obj->value[2], obj->value[3] );
+                        obj->value0(), obj->value1(), obj->value2(), obj->value3() );
                 ch->send_to(buf);
                 break;
 
         case ITEM_CONTAINER:
                 sprintf(buf,"Capacity: %d#  Maximum weight: %d#  flags: %s\n\r",
-                        obj->value[0], obj->value[3], container_flags.messages(obj->value[1]).c_str( ));
+                        obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
                 ch->send_to(buf);
-                if (obj->value[4] != 100)
+                if (obj->value4() != 100)
                 {
-                        sprintf(buf,"Weight multiplier: %d%%\n\r",obj->value[4]);
+                        sprintf(buf,"Weight multiplier: %d%%\n\r",obj->value4());
                         ch->send_to(buf);
                 }
                 break;
@@ -1187,8 +1187,8 @@ CMDWIZP( stat )
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
                 ch->printf( "Steaks: %d, Level: %d, Parts: '%s', Vnum: %d\n\r",
-                            obj->value[0], obj->value[1], 
-                            part_flags.messages( obj->value[2] ).c_str( ), obj->value[3] );
+                            obj->value0(), obj->value1(), 
+                            part_flags.messages( obj->value2() ).c_str( ), obj->value3() );
                 break;
         }
 

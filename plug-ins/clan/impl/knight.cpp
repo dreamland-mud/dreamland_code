@@ -401,13 +401,13 @@ VOID_SPELL(Dragonsword)::run( Character *ch, char *target_name, int sn, int leve
   sword = create_object( get_obj_index(sword_vnum), level);
   sword->timer = level * 2;
   sword->cost  = 0;
-    if( level <= 30)                          sword->value[2] = 4;
-    else if( level > 30 && level <= 40)   sword->value[2] = 5;
-    else if( level > 40 && level <= 50)   sword->value[2] = 6;
-    else if( level > 50 && level <= 60)   sword->value[2] = 7;
-    else if( level > 60 && level <= 70)   sword->value[2] = 9;
-    else if( level > 70 && level <= 80)   sword->value[2] = 10;
-    else sword->value[2] = 11;
+    if( level <= 30)                          sword->value2(4);
+    else if( level > 30 && level <= 40)   sword->value2(5);
+    else if( level > 40 && level <= 50)   sword->value2(6);
+    else if( level > 50 && level <= 60)   sword->value2(7);
+    else if( level > 60 && level <= 70)   sword->value2(9);
+    else if( level > 70 && level <= 80)   sword->value2(10);
+    else sword->value2(11);
   sword->level = ch->getRealLevel( );
 
   af.where        = TO_OBJECT;

@@ -48,12 +48,12 @@ bool LiquidWEBase::checkItemType( PCharacter *ch, Object *obj ) const
     
 bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 {
-    if (obj->value[1] == 0) {
+    if (obj->value1() == 0) {
         act("Слово эхом отозвалось в пустоте $o2.", ch, obj, 0, TO_CHAR);
         return false;
     }
     
-    if (obj->value[1] > gsn_arcadian->getEffective( ch ) * 10) {
+    if (obj->value1() > gsn_arcadian->getEffective( ch ) * 10) {
         act("В $o6 налито слишком много жидкости.", ch, obj, 0, TO_CHAR);
         return false;
     }
@@ -63,7 +63,7 @@ bool LiquidWEBase::checkVolume( PCharacter *ch, Object *obj ) const
 
 bool LiquidWEBase::checkWater( PCharacter *ch, Object *obj ) const
 {
-    if (obj->value[2] != liq_water) {
+    if (obj->value2() != liq_water) {
         act("Это слово действует только на воду.", ch, 0, 0, TO_CHAR);
         return false;
     }
@@ -85,7 +85,7 @@ bool WaterToWineWE::run( PCharacter *ch, Object *obj ) const
         return false;
 
     wine = liquidManager->random( LIQF_WINE );
-    obj->value[2] = wine->getIndex( );
+    obj->value2(wine->getIndex( ));
     ch->pecho( "Вода в %O6 начинает шипеть и искриться, постепенно окрашиваясь {1%N5{2 цветом.{x", 
                 obj, wine->getColor( ).c_str( ) );
     return true;
@@ -104,7 +104,7 @@ bool WaterToBeerWE::run( PCharacter *ch, Object *obj ) const
         return false;
 
     beer = liquidManager->random( LIQF_BEER );
-    obj->value[2] = beer->getIndex( );
+    obj->value2(beer->getIndex( ));
     ch->pecho( "Вода в %O6 начинает бурлить и пениться, постепенно окрашиваясь {1%N5{2 цветом.{x", 
                 obj, beer->getColor( ).c_str( ) );
     return true;
@@ -171,7 +171,7 @@ bool WineContainerWEBase::run( PCharacter *ch, Object *obj ) const
             && checkContainer( ch, obj )))
         return false;
     
-    liq = liquidManager->find( obj->value[2] );
+    liq = liquidManager->find( obj->value2() );
     if (!liq->getFlags( ).isSet( LIQF_WINE )) {
         act("То, что налито в $o4, мало похоже на вино.", ch, obj, 0, TO_CHAR);
         return false;
@@ -195,7 +195,7 @@ bool BeerContainerWEBase::run( PCharacter *ch, Object *obj ) const
             && checkContainer( ch, obj )))
         return false;
     
-    liq = liquidManager->find( obj->value[2] );
+    liq = liquidManager->find( obj->value2() );
     if (!liq->getFlags( ).isSet( LIQF_BEER )) {
         act("То, что налито в $o4, мало похоже на пиво.", ch, obj, 0, TO_CHAR);
         return false;

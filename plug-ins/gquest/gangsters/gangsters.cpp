@@ -678,8 +678,8 @@ Object * Gangsters::createPortal( RoomList &portalRooms )
     if (!portal->behavior)
         throw BadObjectBehaviorException( portal->pIndexData->vnum );
 
-    SET_BIT( portal->value[1], EX_ISDOOR|EX_CLOSED|EX_LOCKED|EX_NOPASS|EX_PICKPROOF );
-    portal->value[4] = GangstersInfo::getThis( )->vnumKey;
+    portal->value1(portal->value1() | EX_ISDOOR|EX_CLOSED|EX_LOCKED|EX_NOPASS|EX_PICKPROOF);
+    portal->value4(GangstersInfo::getThis( )->vnumKey);
 
     obj_to_room( portal, room );
     portalRoomVnums.push_back( room->vnum );

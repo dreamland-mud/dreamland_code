@@ -41,10 +41,10 @@ int ShopBuyPrice::calculate( )
     cost *= article->trader->profitBuy  / 100;
 
     if (obj->item_type == ITEM_STAFF || obj->item_type == ITEM_WAND) {
-        if( !obj->value[1] ) 
+        if( !obj->value1() ) 
             cost /= 4;
         else 
-            cost = cost * obj->value[2] / obj->value[1];
+            cost = cost * obj->value2() / obj->value1();
     }
 
     return cost;
@@ -108,10 +108,10 @@ int ShopSellPrice::calculate( )
         cost >>= article->trader->countSameObjects( obj );
 
     if (obj->item_type == ITEM_STAFF || obj->item_type == ITEM_WAND) {
-        if (!obj->value[1]) 
+        if (!obj->value1()) 
             cost /= 4;
         else 
-            cost = cost * obj->value[2] / obj->value[1];
+            cost = cost * obj->value2() / obj->value1();
     }
 
     return cost;

@@ -215,7 +215,7 @@ void MissileOneHit::init( )
     missile_sn = get_weapon_sn( missile );
     missileSkill = skillManager->find( missile_sn );
     skill = missileSkill->getEffective( ch ) + 20;
-    dam_type = attack_table[missile->value[3]].damage;
+    dam_type = attack_table[missile->value3()].damage;
 }
 
 void ThrowerOneHit::init( )
@@ -248,14 +248,14 @@ void MissileOneHit::calcDamage( )
 void MissileOneHit::damBase( )
 {
     missileSkill->improve( ch, true, victim, dam_type, dam_flag );
-    dam = dice( missile->value[1], missile->value[2] ) * skill / 100;
+    dam = dice( missile->value1(), missile->value2() ) * skill / 100;
 }
 
 void ThrowerOneHit::damBase( )
 {
     throwerSkill->improve( ch, true, victim, dam_type, dam_flag );
     MissileOneHit::damBase( );
-    dam += dice( thrower->value[1], thrower->value[2] ) * skill_thrower / 100;
+    dam += dice( thrower->value1(), thrower->value2() ) * skill_thrower / 100;
 }
 
 void MissileOneHit::damApplySharp( )

@@ -263,7 +263,7 @@ bool UndefinedOneHit::defenseParry( )
     else if (prof == prof_anti_paladin && victim->getClan( ) == clan_shalafi) 
             chance /= 2;
 
-    if (wield && (wield->value[0] == WEAPON_FLAIL || wield->value[0] == WEAPON_WHIP ))
+    if (wield && (wield->value0() == WEAPON_FLAIL || wield->value0() == WEAPON_WHIP ))
         return false;
 
     if ( !victim->can_see( ch ) )
@@ -430,9 +430,9 @@ bool UndefinedOneHit::defenseShieldBlock( )
         chance += 10;
 
     if (wield) { 
-        if (wield->value[0] == WEAPON_FLAIL)
+        if (wield->value0() == WEAPON_FLAIL)
             chance /= 2;
-        if (wield->value[0] == WEAPON_WHIP)
+        if (wield->value0() == WEAPON_WHIP)
             return false;
     }
 
@@ -531,7 +531,7 @@ bool UndefinedOneHit::defenseDodge( )
         gsn_forest_fighting->improve( victim, true, ch );
     }
 
-    if (wield && (wield->value[0] == WEAPON_FLAIL || wield->value[0] == WEAPON_WHIP))
+    if (wield && (wield->value0() == WEAPON_FLAIL || wield->value0() == WEAPON_WHIP))
         chance = ( int )( chance * 1.2 );
         
     if (number_percent( ) >= chance + ( skill_level(*gsn_dodge, victim) - ch->getModifyLevel() ) / 2
@@ -1139,7 +1139,7 @@ void UndefinedOneHit::damEffectSlice( )
     if ((chance = gsn_slice->getEffective( ch )) <= 1)
         return;
     
-    if (axe->value[3] != DAMW_SLASH && axe->value[3] != DAMW_CHOP && axe->value[3] != DAMW_SLICE)
+    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE)
         return;
     
     if (number_bits(1)) {
@@ -1199,7 +1199,7 @@ void UndefinedOneHit::damEffectSlice( )
 
     if (arm->item_type == ITEM_FOOD) {
         if (IS_SET(victim->form,FORM_POISON))
-            arm->value[3] = 1;
+            arm->value3(1);
         else if (!IS_SET(victim->form,FORM_EDIBLE))
             arm->item_type = ITEM_TRASH;
     }

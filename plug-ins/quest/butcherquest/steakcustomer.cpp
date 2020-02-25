@@ -34,7 +34,7 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
         return false;
     }
 
-    if (!( orig = get_mob_index( obj->value[2] ) )) {
+    if (!( orig = get_mob_index( obj->value2() ) )) {
         tell_fmt( "Ужас, с кого ты это среза%1$Gло|л|ла?!", hero, ch );
         return false;
     }

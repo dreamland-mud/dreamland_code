@@ -572,20 +572,20 @@ CMDRUNP( compare )
             break;
 
         case ITEM_ARMOR:
-            value1 = obj1->value[0] + obj1->value[1] + obj1->value[2];
-            value2 = obj2->value[0] + obj2->value[1] + obj2->value[2];
+            value1 = obj1->value0() + obj1->value1() + obj1->value2();
+            value2 = obj2->value0() + obj2->value1() + obj2->value2();
             break;
 
-        case ITEM_WEAPON:
+        case  ITEM_WEAPON:
             if (obj1->pIndexData->new_format)
-                value1 = (1 + obj1->value[2]) * obj1->value[1];
+                value1 = (1 + obj1->value2()) * obj1->value1();
             else
-                    value1 = obj1->value[1] + obj1->value[2];
+                    value1 = obj1->value1() + obj1->value2();
 
             if (obj2->pIndexData->new_format)
-                value2 = (1 + obj2->value[2]) * obj2->value[1];
+                value2 = (1 + obj2->value2()) * obj2->value1();
             else
-                    value2 = obj2->value[1] + obj2->value[2];
+                    value2 = obj2->value1() + obj2->value2();
             break;
         }
     }
@@ -2697,45 +2697,45 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
             keyhole->doLore( buf );
         break;
     case ITEM_KEYRING:
-        buf << "Нанизано " << obj->value[1] << " ключей из возможных " << obj->value[0] << "." << endl;
+        buf << "Нанизано " << obj->value1() << " ключей из возможных " << obj->value0() << "." << endl;
         break;
     case ITEM_LOCKPICK:
-        if (obj->value[0] == Keyhole::LOCK_VALUE_BLANK) {
+        if (obj->value0() == Keyhole::LOCK_VALUE_BLANK) {
             buf << "Это заготовка для ключа или отмычки." << endl;
         }
         else {
-            if (obj->value[0] == Keyhole::LOCK_VALUE_MULTI)
+            if (obj->value0() == Keyhole::LOCK_VALUE_MULTI)
                 buf << "Открывает любой замок. ";
             else
                 buf << "Открывает один из видов замков. ";
             
             buf << "Отмычка " 
-                << quality_percent( obj->value[1] ).colourStrip( ).ruscase( '2' ) 
+                << quality_percent( obj->value1() ).colourStrip( ).ruscase( '2' ) 
                 << " качества." << endl;
         }
         break;
     case ITEM_SPELLBOOK:
-        buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
-            << "Максимальное качество заклинаний в книге: " << obj->value[2] << "." << endl;
+        buf << "Всего страниц: " << obj->value0() << ", из них использовано: " << obj->value1() << "." << endl
+            << "Максимальное качество заклинаний в книге: " << obj->value2() << "." << endl;
         break;
 
     case ITEM_TEXTBOOK:
-        buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
-            << "Максимальное качество записей в учебнике: " << obj->value[2] << "." << endl;
+        buf << "Всего страниц: " << obj->value0() << ", из них использовано: " << obj->value1() << "." << endl
+            << "Максимальное качество записей в учебнике: " << obj->value2() << "." << endl;
         break;
 
     case ITEM_RECIPE:
-        buf << "Сложность рецепта: " << obj->value[2] << ". " 
-            << "Применяется для создания " << recipe_flags.messages(obj->value[0], true) << "." << endl;
+        buf << "Сложность рецепта: " << obj->value2() << ". " 
+            << "Применяется для создания " << recipe_flags.messages(obj->value0(), true) << "." << endl;
         break;
 
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-        buf << "Заклинания " << obj->value[0] << " уровня:";
+        buf << "Заклинания " << obj->value0() << " уровня:";
 
         for (int i = 1; i <= 4; i++) 
-            if (( skill = SkillManager::getThis( )->find( obj->value[i] ) ))
+            if (( skill = SkillManager::getThis( )->find( obj->valueByIndex(i) ) ))
                 if (skill->getIndex( ) != gsn_none)
                     buf << " '" << skill->getNameFor( ch ) << "'";
         
@@ -2744,10 +2744,10 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     case ITEM_WAND:
     case ITEM_STAFF:
-        buf << "Имеет " << obj->value[2] << " заклинани" << GET_COUNT(obj->value[2], "е", "я", "й") << " " 
-            << obj->value[0] << " уровня:";
+        buf << "Имеет " << obj->value2() << " заклинани" << GET_COUNT(obj->value2(), "е", "я", "й") << " " 
+            << obj->value0() << " уровня:";
         
-        if (( skill = SkillManager::getThis( )->find( obj->value[3] ) ))
+        if (( skill = SkillManager::getThis( )->find( obj->value3() ) ))
             if (skill->getIndex( ) != gsn_none)
                 buf << " '" << skill->getNameFor( ch ) << "'";
 
@@ -2755,17 +2755,17 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         break;
 
     case ITEM_DRINK_CON:
-        liquid = liquidManager->find( obj->value[2] );
+        liquid = liquidManager->find( obj->value2() );
         int sips, sipsf;
-        sips = max( 0, obj->value[1] / liquid->getSipSize( ) );
-        sipsf = max( 0, obj->value[0] / liquid->getSipSize( ) );
+        sips = max( 0, obj->value1() / liquid->getSipSize( ) );
+        sipsf = max( 0, obj->value0() / liquid->getSipSize( ) );
 
-        if (sipsf * liquid->getSipSize( ) < obj->value[0]) {
+        if (sipsf * liquid->getSipSize( ) < obj->value0()) {
             sipsf +=1;
-            if (obj->value[1] > 0) sips +=1;
+            if (obj->value1() > 0) sips +=1;
         }
 
-        if (obj->value[1] > 0)
+        if (obj->value1() > 0)
             buf << "Содержит " 
                 << liquid->getShortDescr( ).ruscase( '4' ) << " "
                 << liquid->getColor( ).ruscase( '2' ) 
@@ -2780,28 +2780,28 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         break;
 
     case ITEM_CONTAINER:
-        buf << "Вместительность: " << obj->value[0] << "  "
-            << "Максим. вес: " << obj->value[3] << " фун" << GET_COUNT(obj->value[3], "т", "та", "тов") << " ";
+        buf << "Вместительность: " << obj->value0() << "  "
+            << "Максим. вес: " << obj->value3() << " фун" << GET_COUNT(obj->value3(), "т", "та", "тов") << " ";
         
-        if (obj->value[4] != 100)
-            buf << " Коэф. снижения веса: " << obj->value[4] << "%";
+        if (obj->value4() != 100)
+            buf << " Коэф. снижения веса: " << obj->value4() << "%";
             
-        if (obj->value[1])
-            buf << endl << "Особенности: " << container_flags.messages(obj->value[1], true );
+        if (obj->value1())
+            buf << endl << "Особенности: " << container_flags.messages(obj->value1(), true );
         
         buf << endl;
         break;
 
     case ITEM_WEAPON:
         buf << "Тип оружия: " 
-            << weapon_class.message(obj->value[0] ) << " "
-            << "(" << weapon_class.name( obj->value[0] ) << "), ";
+            << weapon_class.message(obj->value0() ) << " "
+            << "(" << weapon_class.name( obj->value0() ) << "), ";
         
-        buf << "повреждения " << obj->value[1] << "d" << obj->value[2] << " "
-            << "(среднее " << (1 + obj->value[2]) * obj->value[1] / 2 << ")" << endl;
+        buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
+            << "(среднее " << (1 + obj->value2()) * obj->value1() / 2 << ")" << endl;
     
-        if (obj->value[4])  /* weapon flags */
-            buf << "Особенности оружия: " << weapon_type2.messages(obj->value[4], true ) << endl;
+        if (obj->value4())  /* weapon flags */
+            buf << "Особенности оружия: " << weapon_type2.messages(obj->value4(), true ) << endl;
 
         break;
 
@@ -2809,7 +2809,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "Класс брони: ";
 
         for (int i = 0; i <= 3; i++)
-            buf << -obj->value[i] << " " << ac_type.message(i )
+            buf << -obj->valueByIndex(i) << " " << ac_type.message(i )
                 << (i == 3 ? "" : ", ");
 
         buf << endl;

@@ -60,11 +60,11 @@ bool MagicItemUsage::check( Object *obj, int spellSN, Character *user, Character
         if (wearlocationManager->find( wearloc )->canWear( user, obj, F_WEAR_REPLACE ) != RC_WEAR_OK) 
             return false;
     
-    if (chargesValue >= 0 && obj->value[chargesValue] <= 0) 
+    if (chargesValue >= 0 && obj->valueByIndex(chargesValue) <= 0) 
         return false;
 
     for (int i = minValue; i <= maxValue; i++)
-        if (obj->value[i] == spellSN)
+        if (obj->valueByIndex(i) == spellSN)
             return true;
 
     return false;

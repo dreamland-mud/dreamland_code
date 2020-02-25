@@ -115,7 +115,7 @@ COMMAND(CEat, "eat")
     switch ( obj->item_type )
     {
     case ITEM_FOOD:
-            eatFood( ch, obj->value[0]*2, obj->value[1]*2, obj->value[3] );
+            eatFood( ch, obj->value0()*2, obj->value1()*2, obj->value3() );
             break;
 
     case ITEM_PILL:

@@ -61,7 +61,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         else {
             chest = createItem<HiddenChest>( reg->chests.randomVnum( ) );
             fillChest( pch, chest );
-            key = createItem<LockPick>( chest->value[2] );
+            key = createItem<LockPick>( chest->value2() );
             hideaway = findHideaway( pch, thief );
         }
         

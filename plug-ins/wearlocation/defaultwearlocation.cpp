@@ -237,7 +237,7 @@ void DefaultWearlocation::triggersOnEquip( Character *ch, Object *obj )
 
     case ITEM_ARMOR:
         for (int i = 0; i < 4; i++)
-            ch->armor[i] -= armorCoef * obj->value[i];
+            ch->armor[i] -= armorCoef * obj->valueByIndex(i);
         break;
     }
 }
@@ -286,7 +286,7 @@ void DefaultWearlocation::triggersOnUnequip( Character *ch, Object *obj )
 
     case ITEM_ARMOR:
         for (int i = 0; i < 4; i++)
-            ch->armor[i] += armorCoef * obj->value[i];
+            ch->armor[i] += armorCoef * obj->valueByIndex(i);
         break;
     }
 }

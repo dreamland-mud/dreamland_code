@@ -160,7 +160,7 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
 
     spell = 0;
 
-    potion->value[0] = level;
+    potion->value0(level);
 
     if (obj->item_type == ITEM_TRASH)
       {
@@ -217,7 +217,7 @@ VOID_SPELL(Brew)::run( Character *ch, Object *obj, int sn, int level )
           spell = gsn_acute_vision;
       }
 
-    potion->value[1] = spell;
+    potion->value1(spell);
     extract_obj(obj);
     act_p("Используя магические силы, ты изготавливаешь $o4!",
            ch, potion, 0, TO_CHAR,POS_RESTING);

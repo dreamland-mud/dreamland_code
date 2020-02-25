@@ -271,11 +271,11 @@ struct PortalFunc {
 
     bool operator () ( Room *const room, Object *portal ) const
     {
-        if (IS_SET(portal->value[1], EX_LOCKED )) {
+        if (IS_SET(portal->value1(), EX_LOCKED )) {
             return false;
         }
 
-        return model->checkRoomForTraverse(pch, get_room_index( portal->value[3] ));
+        return model->checkRoomForTraverse(pch, get_room_index( portal->value3() ));
     }
 
     PCharacter *pch;

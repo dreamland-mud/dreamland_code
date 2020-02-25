@@ -253,7 +253,7 @@ void GlobalQuest::wipeRoom( Room *room ) const
         }
 
         if (v == OBJ_VNUM_CORPSE_PC) {
-            Room *pitRoom = get_room_index( obj->value[3] );
+            Room *pitRoom = get_room_index( obj->value3() );
 
             if (pitRoom) 
                 obj_to_room( obj, pitRoom );

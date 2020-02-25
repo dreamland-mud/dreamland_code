@@ -337,9 +337,9 @@ CMDRUNP( auction )
 
                         if  (obj->item_type == ITEM_WEAPON) {
                                 ch->printf("Тип оружия: %s (%s), среднее повреждение %d.\r\n",
-                                           weapon_class.message(obj->value[0] ).c_str( ),
-                                           weapon_class.name( obj->value[0] ).c_str( ),
-                                          (1 + obj->value[2]) * obj->value[1] / 2);
+                                           weapon_class.message(obj->value0() ).c_str( ),
+                                           weapon_class.name( obj->value0() ).c_str( ),
+                                          (1 + obj->value2()) * obj->value1() / 2);
                         }
 
                         return;

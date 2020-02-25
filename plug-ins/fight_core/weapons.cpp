@@ -22,7 +22,7 @@ GSN(lance); GSN(throw_stone); GSN(hand_to_hand);
 
 Skill * get_weapon_skill( Object *wield )
 {
-    switch (wield->value[0])
+    switch (wield->value0())
     {
         default :               return &*gsn_none;
         case(WEAPON_EXOTIC):    return &*gsn_exotic;

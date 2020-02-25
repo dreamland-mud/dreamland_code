@@ -152,17 +152,17 @@ static Object * corpse_create( Character *ch )
     corpse->fmtDescription( corpse->getDescription( ), name.c_str( ) ); 
 
     if (IS_SET(ch->form, FORM_EDIBLE))
-        corpse->value[0] = (1 << ch->size) - 1;
+        corpse->value0((1 << ch->size) - 1);
 
-    corpse->value[1] = ch->getModifyLevel( );
-    corpse->value[2] = ch->parts;
+    corpse->value1(ch->getModifyLevel( ));
+    corpse->value2(ch->parts);
 
     if (ch->is_npc( ))
-        corpse->value[3] = ch->getNPC( )->pIndexData->vnum;
+        corpse->value3(ch->getNPC( )->pIndexData->vnum);
     else
-        corpse->value[3] = ch->getPC( )->getHometown( )->getPit( );
+        corpse->value3(ch->getPC( )->getHometown( )->getPit( ));
     
-    corpse->value[4] = ch->alignment;
+    corpse->value4(ch->alignment);
     return corpse;
 }
 
@@ -340,15 +340,15 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
         if (body_name.size( ) == corpse->getShortDescr( '1' ).size( ))
             body_name = "";
         
-        if (corpse->value[3]) {
+        if (corpse->value3()) {
             MOB_INDEX_DATA *pBodyOwner;
-            if (( pBodyOwner = get_mob_index( corpse->value[3] ) ))
+            if (( pBodyOwner = get_mob_index( corpse->value3() ) ))
                 body_form = pBodyOwner->form;
         }
 
-        body_level = corpse->value[1];
+        body_level = corpse->value1();
         body_room = corpse->getRoom( );
-        body_vnum = corpse->value[3];
+        body_vnum = corpse->value3();
     }
     else {
         body_room = get_room_index( ROOM_VNUM_LIMBO );
@@ -364,12 +364,12 @@ Object * bodypart_create( int vnum, Character *ch, Object *corpse )
 
     if (obj->item_type == ITEM_FOOD) {
         if (IS_SET(body_form, FORM_POISON))
-            obj->value[3] = 1;
+            obj->value3(1);
         else if (!IS_SET(body_form, FORM_EDIBLE))
             obj->item_type = ITEM_TRASH;
     }
     
-    obj->value[4] = body_vnum;
+    obj->value4(body_vnum);
     obj_to_room( obj, body_room );
 
     return obj;
@@ -679,7 +679,7 @@ protected:
     {
         for (Object *obj = killer->in_room->contents; obj; obj = obj->next_content)
             if (obj->item_type == ITEM_CORPSE_NPC 
-                && obj->value[3] == ch->getNPC( )->pIndexData->vnum) 
+                && obj->value3() == ch->getNPC( )->pIndexData->vnum) 
             {
                 corpse = obj;
                 break;

@@ -145,7 +145,7 @@ VOID_SPELL(ChaosBlade)::run( Character *ch, char *, int sn, int level )
          ch,0,0,TO_ROOM,POS_RESTING);
 
   blade->timer = level * 2;
-  blade->value[2] = ch->applyCurse( ( ch->getModifyLevel() / 10 ) + 3 );
+  blade->value2(ch->applyCurse( ( ch->getModifyLevel() / 10 ) + 3 ));
   blade->level = ch->getRealLevel( );
 
   af.where        = TO_OBJECT;

@@ -329,7 +329,7 @@ CMDRUN( dismount )
     chance += (ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX)) * 2;
 
     if (( wield = wear_wield->find( ch ) ))
-        switch (wield->value[0]) {
+        switch (wield->value0()) {
         case WEAPON_POLEARM: 
             chance += 20;
             break;

@@ -615,10 +615,10 @@ int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer t
     }
 
     if( obj->item_type == ITEM_STAFF || obj->item_type == ITEM_WAND ) {
-        if( !obj->value[1] ) 
+        if( !obj->value1() ) 
             cost /= 4;
         else 
-            cost = cost * obj->value[2] / obj->value[1];
+            cost = cost * obj->value2() / obj->value1();
     }
 
     return cost;

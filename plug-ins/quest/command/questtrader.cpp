@@ -321,7 +321,7 @@ Object * PocketsQuestArticle::findBag( PCharacter *client ) const
 
     for (obj = client->carrying; obj; obj = obj->next_content) 
         if (obj->pIndexData->vnum == OBJ_VNUM_QUESTBAG 
-            && !IS_SET(obj->value[1], CONT_WITH_POCKETS)) 
+            && !IS_SET(obj->value1(), CONT_WITH_POCKETS)) 
             break;
     
     return obj;
@@ -332,7 +332,7 @@ void PocketsQuestArticle::buy( PCharacter *client, NPCharacter *questman )
     Object *obj = findBag( client );
     
     if (obj) {
-        SET_BIT(obj->value[1], CONT_WITH_POCKETS);
+        obj->value1(obj->value1() | CONT_WITH_POCKETS);
         act("$C1 пришивает карманы на $o4.", client, obj, questman, TO_CHAR);
         act("$C1 пришивает $c5 карманы на $o4.", client, obj, questman, TO_ROOM);
     }

@@ -423,7 +423,7 @@ void reset_room(Room *pRoom)
             }
 
             /* fix object lock state! */
-            obj_to->value[1] = obj_to->pIndexData->value[1];
+            obj_to->value1(obj_to->pIndexData->value[1]);
             last = true;
             
             break;
