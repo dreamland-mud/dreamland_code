@@ -121,6 +121,12 @@ NMI_GET( ObjIndexWrapper, count, "кол-во экземпляров предм�
     return target->count;
 }
 
+NMI_SET( ObjIndexWrapper, count, "кол-во экземпляров предметов этого прототипа") 
+{ 
+    checkTarget( ); 
+    target->count = arg.toNumber();
+}
+
 NMI_GET( ObjIndexWrapper, cost , "цена в серебре") 
 { 
     checkTarget( ); 
