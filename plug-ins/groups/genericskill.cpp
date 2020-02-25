@@ -26,6 +26,7 @@
 PROF(none);
 PROF(vampire);
 HOMETOWN(frigate);
+GROUP(none);
 
 const DLString GenericSkill::CATEGORY = "Профессиональные умения";
 
@@ -324,11 +325,10 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
 
     buf << what.upperFirstCharacter()
         << " '{c" << getName( ) << "{x' или"
-        << " '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c" 
-        << getGroup()->getNameFor(ch) 
-        << "{x'."
-        << endl;
+        << " '{c" << getRussianName( ) << "{x'";
+    if (getGroup() != group_none)
+        buf << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'";
+    buf << "." << endl;
 
     print_wait_and_mana(this, ch, buf);            
     buf << endl;

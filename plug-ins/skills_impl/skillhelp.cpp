@@ -33,8 +33,9 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 
     SkillGroupReference &group = skill.getConstPointer<Skill>()->getGroup( );
     const DLString &gname = group->getNameFor(ch);
-    in << ", входит в группу '{hg{c" << gname << "{x' " 
-       << editButton(ch) << endl;
+    if (group != group_none)
+        in << ", входит в группу '{hg{c" << gname << "{x'";
+    in << " " << editButton(ch) << endl;
 
     print_wait_and_mana(*skill, ch, in);
 
