@@ -207,7 +207,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
     {
         Affect *paf;
 
-        paf = obj->affected->affect_find(gsn_bless);
+        paf = obj->affected ? obj->affected->affect_find(gsn_bless) : 0;
         if (!savesDispel(level,paf != 0 ? paf->level : obj->level,0))
         {
             if (paf != 0)

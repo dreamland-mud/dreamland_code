@@ -481,7 +481,7 @@ SKILL_RUNP( manacles )
                 if ( victim->isAffected(gsn_manacles) )
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected->affect_find (gsn_manacles);
+                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_manacles) : 0;
 
                         if ( paf->duration >= 0 )
                         {
@@ -1077,7 +1077,7 @@ SKILL_RUNP( suspect )
         if ( arg == 0
                 || arg[0] == '\0' )
         {
-                Affect *paf = victim->affected->affect_find (gsn_suspect);
+                Affect *paf = victim->affected ? victim->affected->affect_find (gsn_suspect) : 0;
 
                 if ( paf != 0 )   
                 {
@@ -1239,7 +1239,7 @@ SKILL_RUNP( jail )
                 if ( victim->isAffected(gsn_jail) )
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected->affect_find (gsn_jail);
+                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_jail) : 0;
 
                         if ( paf->duration >= 0 )
                         {
@@ -1424,7 +1424,7 @@ SKILL_RUNP( dismiss )
                 if ( victim->isAffected(gsn_dismiss) )
                 {
                         char buf[MAX_STRING_LENGTH];
-                        Affect *paf = victim->affected->affect_find (gsn_dismiss);
+                        Affect *paf = victim->affected ? victim->affected->affect_find (gsn_dismiss) : 0;
 
                         if ( paf->duration >= 0 )
                         {

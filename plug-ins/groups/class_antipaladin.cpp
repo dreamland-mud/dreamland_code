@@ -310,7 +310,7 @@ void ShadowBlade::fight( Character *ch )
             if (++castChance > 80)
                 castChance = 80;
             
-            if (( paf = obj->affected->affect_find( gsn_shadowblade ) )) {
+            if (obj->affected && ( paf = obj->affected->affect_find( gsn_shadowblade ) )) {
                 oldMod = paf->modifier;
                 paf->modifier = URANGE( p->min_hr, oldMod + 1, p->max_hr );
                 ch->hitroll += paf->modifier - oldMod;

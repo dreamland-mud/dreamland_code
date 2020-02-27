@@ -372,7 +372,7 @@ void MissileOneHit::damEffectFunkyWeapon( )
         short level;
         Affect *poison, af;
 
-        if ((poison = missile->affected->affect_find(gsn_poison)) == 0)
+        if (!missile->affected || (poison = missile->affected->affect_find(gsn_poison)) == 0)
             level = missile->level;
         else
             level = poison->level;

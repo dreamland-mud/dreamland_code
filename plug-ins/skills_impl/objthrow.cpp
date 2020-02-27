@@ -218,7 +218,7 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
         short level;
         Affect *poison, af;
 
-        if ((poison = arrow->affected->affect_find(gsn_poison)) == 0)
+        if (!arrow->affected || (poison = arrow->affected->affect_find(gsn_poison)) == 0)
             level = arrow->level;
         else
             level = poison->level;
