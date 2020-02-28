@@ -40,6 +40,9 @@ DLString ClassSkillHelp::getTitle(const DLString &label) const
 
 void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
+    // True if it's a help json dump and not a player requesting the article.
+    bool autodump = ch->desc == 0;
+
     in << "Умения и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
        << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
         
@@ -63,11 +66,24 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
             || skill->getGroup() == group_tattoo_master)
             continue;
 
-        DLString color = ch && skill->visible(ch) ? "{g" : "{w";
-        myskills[mylevel].push_back(color + skill->getNameFor(ch) + "{x");
+        DLString skillName;
+
+        // Show hyper-links to skills but only for json dump.
+        if (autodump) {
+            skillName << "{hh";
+            if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+                skillName << skill->getSkillHelp()->getID();
+            skillName << skill->getRussianName() << "{hx";
+
+        } else {
+            // For player interactive help, highlight available skills in green.
+            DLString color = ch && skill->visible(ch) ? "{g" : "{w";
+            skillName = color + skill->getNameFor(ch) + "{x";
+        }
+
+        myskills[mylevel].push_back(skillName);
     }
 
-    // Output skills highlighting those available to this player in green.
     for (auto &pair: myskills) {
         in << "Уровень {C" << pair.first << "{x: " << pair.second.join(", ") << endl;
     }

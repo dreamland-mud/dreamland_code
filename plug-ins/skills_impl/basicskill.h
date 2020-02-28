@@ -36,6 +36,7 @@ public:
     virtual SpellPointer getSpell( ) const;
     virtual AffectHandlerPointer getAffect( ) const;
     virtual SkillCommandPointer getCommand( ) const;
+    virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual const RussianString &getDammsg( ) const;

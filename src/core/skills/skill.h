@@ -17,12 +17,14 @@ class AffectHandler;
 class SkillGroupReference;
 class SkillCommand;
 class SkillEventHandler;
+class HelpArticle;
 class RussianString;
 
 typedef ::Pointer<Spell> SpellPointer;
 typedef ::Pointer<SkillCommand> SkillCommandPointer;
 typedef ::Pointer<AffectHandler> AffectHandlerPointer;
 typedef ::Pointer<SkillEventHandler> SkillEventHandlerPointer;
+typedef ::Pointer<HelpArticle> HelpArticlePointer;
 
 class Skill : public GlobalRegistryElement {
 public:
@@ -41,6 +43,7 @@ public:
     virtual SpellPointer getSpell( ) const;
     virtual AffectHandlerPointer getAffect( ) const;
     virtual SkillCommandPointer getCommand( ) const;
+    virtual HelpArticlePointer getSkillHelp() const;
     virtual SkillEventHandlerPointer getEventHandler( ) const;
     virtual int getBeats( ) const;
     virtual int getMana( ) const;

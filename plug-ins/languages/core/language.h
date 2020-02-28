@@ -77,6 +77,7 @@ public:
     virtual AffectHandler::Pointer getAffect( );
     virtual Spell::Pointer getSpell( ) const;
     virtual CommandHelp::Pointer getHelp( ) const;
+    virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual SkillGroupReference & getGroup( );

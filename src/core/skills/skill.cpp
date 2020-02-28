@@ -10,6 +10,7 @@
 #include "skilleventhandler.h"
 #include "skillgroup.h"
 #include "character.h"
+#include "helpmanager.h"
 
 GROUP(none);
 
@@ -56,6 +57,10 @@ AffectHandler::Pointer Skill::getAffect( ) const
 SkillEventHandlerPointer Skill::getEventHandler( ) const
 {
     return SkillEventHandler::Pointer( );
+}
+HelpArticlePointer Skill::getSkillHelp() const
+{
+    return HelpArticle::Pointer();
 }
 int Skill::getBeats( ) const
 {

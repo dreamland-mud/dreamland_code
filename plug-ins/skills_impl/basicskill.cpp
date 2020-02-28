@@ -307,6 +307,11 @@ SkillCommandPointer BasicSkill::getCommand( ) const
     else
         return command;
 }
+HelpArticlePointer BasicSkill::getSkillHelp( ) const
+{
+    return help;
+}
+
 int BasicSkill::getBeats( ) const
 {
     return beats.getValue( );

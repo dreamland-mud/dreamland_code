@@ -28,6 +28,12 @@ SkillGroupReference & Language::getGroup( )
     return group_ancient_languages;
 }
 
+HelpArticlePointer Language::getSkillHelp( ) const
+{
+    return help;
+}
+
+
 bool Language::visible( Character * ch ) const
 {
     if (!Command::available( ch ))
