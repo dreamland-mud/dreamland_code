@@ -41,57 +41,72 @@ static void csv_escape( DLString &name ) {
 //    name.replaces( "\'", "\\\'");
 }
 
-static bool get_obj_resets( int vnum, AREA_DATA *&pArea, DLString &where )
+static bool get_obj_resets_in_room(Room *room, int vnum, AREA_DATA *&pArea, DLString &where )
 {
-    // Scan resets for each room.
-    for (Room *room = room_list; room; room = room->rnext) {
-        int mobVnum = -1;
-        for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next)
-            switch(pReset->command) {
-                case 'M':
-                    // Remember potential carrier in the room.
-                    mobVnum = pReset->arg1;
-                    break;
-                case 'G':
-                case 'E':
-                    // Found who carries the object.
-                    if (pReset->arg1 == vnum && mobVnum > 0) {
-                        MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
-                        if (pMob) {
-                            // Return success
-                            pArea = room->area;
-                            where = russian_case(pMob->short_descr, '1');
-                            return true;
-                        }
+    int mobVnum = -1;
+    for(RESET_DATA *pReset = room->reset_first;pReset;pReset = pReset->next) {
+        switch(pReset->command) {
+            case 'M':
+                // Remember potential carrier in the room.
+                mobVnum = pReset->arg1;
+                break;
+            case 'G':
+            case 'E':
+                // Found who carries the object.
+                if (pReset->arg1 == vnum && mobVnum > 0) {
+                    MOB_INDEX_DATA *pMob = get_mob_index( mobVnum );
+                    if (pMob) {
+                        // Return success
+                        pArea = room->area;
+                        where = russian_case(pMob->short_descr, '1');
+                        return true;
                     }
-                    break;
-                case 'O':
-                    if (pReset->arg1 == vnum) { 
-                        // Object is on the floor, return success.
+                }
+                break;
+            case 'O':
+                if (pReset->arg1 == vnum) { 
+                    // Object is on the floor, return success.
+                    pArea = room->area;
+                    where = room->name;
+                    return true;
+                }
+                break; 
+            case 'P':
+                // Found where the object is placed.
+                if (pReset->arg1 == vnum) {
+                    OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
+                    if (in) {
+                        // Return success.
                         pArea = room->area;
                         where = room->name;
                         return true;
                     }
-                    break; 
-                case 'P':
-                    // Found where the object is placed.
-                    if (pReset->arg1 == vnum) {
-                        OBJ_INDEX_DATA *in = get_obj_index( pReset->arg3 );
-                        if (in) {
-                            // Return success.
-                            pArea = room->area;
-                            where = room->name;
-                            return true;
-                        }
-                    }
-                    break;
-            }
-     }
+                }
+                break;
+        }
+    }
 
     // No candidates have been found, return a failure.
     return false;
 }            
 
+static bool get_obj_resets( OBJ_INDEX_DATA *pObj, AREA_DATA *&pArea, DLString &where )
+{
+    // First look for obj resets in the same area it's from.
+    for (auto &pair: pObj->area->rooms) {
+        Room *room = pair.second;
+        if (get_obj_resets_in_room(room, pObj->vnum, pArea, where))
+            return true;
+    }
+
+    // Scan resets for each room.
+    for (Room *room = room_list; room; room = room->rnext) {
+        if (room->area != pObj->area && get_obj_resets_in_room(room, pObj->vnum, pArea, where))
+            return true;
+    }
+
+    return false;
+}
 
 static StringList searcher_param_anti(OBJ_INDEX_DATA *pObj)
 {
@@ -290,7 +305,7 @@ public:
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AREA_DATA *pArea;
-            useless = !get_obj_resets( pObj->vnum, pArea, where );
+            useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
             if (area_is_clan(pArea))
@@ -409,7 +424,7 @@ public:
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AREA_DATA *pArea;
-            bool useless = !get_obj_resets( pObj->vnum, pArea, where );
+            bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
             if (area_is_clan(pArea))
@@ -538,7 +553,7 @@ public:
             // Find item resets and ignore items without resets and from clan areas.
             DLString where;
             AREA_DATA *pArea;
-            bool useless = !get_obj_resets( pObj->vnum, pArea, where );
+            bool useless = !get_obj_resets( pObj, pArea, where );
             if (useless)
                 continue;
             if (area_is_clan(pArea))
@@ -692,7 +707,7 @@ CMDRUNP(searcher)
 
                     DLString where;
                     AREA_DATA *pArea;
-                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj->vnum, pArea, where)) {
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
                     }
@@ -773,7 +788,7 @@ CMDRUNP(searcher)
 
                     DLString where;
                     AREA_DATA *pArea;
-                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj->vnum, pArea, where)) {
+                    if (IS_SET(pObj->area->area_flag, AREA_HIDDEN) || !get_obj_resets(pObj, pArea, where)) {
                         line.colourstrip();
                         line = "{D" + line + "{x";
                     }
