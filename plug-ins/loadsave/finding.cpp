@@ -19,9 +19,6 @@
 #include "def.h"
 
 WEARLOC(none);
-bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
-bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );
-bool char_has_name(Character *target, const char *arg);
 
 // Parse string argument as if it contains entity ID.
 long long get_arg_id( const DLString &cArgument )
@@ -892,55 +889,19 @@ bool can_see_god(Character *ch, Character *god)
     return true;
 }
 
-// return true if character is allowed to see object name hint in brackets
-bool can_see_objname_hint( Character *ch, Object *obj )
-{
-    if (ch->is_immortal( ))
-       return true;
-    
-    // See it in your eq and inv.
-    if (obj->getCarrier( ) == ch)
-       return true;
-
-    // Can't see in other's inventory or eq.
-    // Items on the floor should have a hint in long descr.
-    if (!obj->in_obj)
-       return false;
-
-    // Take only from your own corpse.
-    if (obj->in_obj->item_type == ITEM_CORPSE_PC)
-       return obj->in_obj->hasOwner( ch );    
-
-    // Other containers without owners - OK
-    if (!obj->in_obj->getOwner( ))
-        return true;
-
-    // Hero bags and hunter armor - only for the owner.
-    if (obj->in_obj->behavior && obj->in_obj->behavior->canLock( ch ))
-        return true;
-
-    return false;
-}
-
-// return true if character can access object by the name
+/** Return true if character can access object by the name. */
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch )
 {
-    // If object is carried by or in a non-personal container:
-    if (can_see_objname_hint( ch, obj )) {
-        // First try matching by obj names.
-        if (is_name( arg.c_str( ), obj->getName( ) ))
-            return true;
+    // First try matching by obj names.
+    if (is_name( arg.c_str( ), obj->getName( ) ))
+        return true;
 
-        // Then try to match by short descr, all grammatical cases, no colours.
-        if (is_name( arg.c_str( ), obj->getShortDescr( '7' ).colourStrip( ).c_str( ) ))
-            return true;
+    // Then try to match by short descr, all grammatical cases, no colours.
+    if (is_name( arg.c_str( ), obj->getShortDescr( '7' ).colourStrip( ).c_str( ) ))
+        return true;
         
-        // No match.
-        return false;
-    }
-
-    // For items inside PC corpses and the like: match only by names.
-    return is_name( arg.c_str( ), obj->getName( ) );
+    // No match.
+    return false;
 }
 
 // Return true if arg matches one of the character names or short descriptions.

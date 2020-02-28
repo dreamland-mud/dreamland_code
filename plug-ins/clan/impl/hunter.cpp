@@ -679,6 +679,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
     Object *in_obj;
     bool found;
     int number = 0, max_found;
+    DLString args = arg_unquote(target_name);
     
     found = false;
     number = 0;
@@ -686,7 +687,8 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
 
     for ( obj = object_list; obj != 0; obj = obj->next )
     {
-        if ( !ch->can_see( obj ) || !is_name( target_name, obj->getName( ))
+        if ( !ch->can_see( obj ) 
+                || !obj_has_name(obj, args, ch)
                 || number_percent() > 2 * level
                 || ch->getModifyLevel() < obj->level
                 || IS_OBJ_STAT(obj, ITEM_NOFIND) )

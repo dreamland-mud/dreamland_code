@@ -109,6 +109,9 @@ int                count_obj_in_obj( Object *container );
 int                count_obj_in_obj( Object *container, int itype );
 Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument );
 bool can_see_god(Character *ch, Character *god);
+bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
+long long get_arg_id( const DLString &cArgument );
+bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );
 
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );

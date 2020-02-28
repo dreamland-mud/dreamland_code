@@ -25,14 +25,14 @@
 #include "so.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "affect.h"
 #include "liquid.h"
 #include "magic.h"
 #include "fight.h"
 #include "interp.h"
 #include "gsn_plugin.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "comm.h"
 #include "recipeflags.h"
 #include "act_move.h"
@@ -414,7 +414,8 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
     Object *obj;
     Object *in_obj;
     bool found;
-    int number = 0, max_found;
+    int number = 0, max_found;    
+    DLString args = arg_unquote(target_name);
 
     found = false;
     number = 0;
@@ -422,9 +423,13 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
 
     for ( obj = object_list; obj != 0; obj = obj->next )
     {
-        if ( !ch->can_see( obj ) || !is_name( target_name, obj->getName( ) )
-        ||   IS_OBJ_STAT(obj,ITEM_NOLOCATE) || number_percent() > 2 * level
-        ||   ch->getModifyLevel() < obj->level)
+        if ( !ch->can_see( obj ) 
+            || IS_OBJ_STAT(obj, ITEM_NOLOCATE) 
+            || number_percent() > 2 * level
+            || ch->getModifyLevel() < obj->level)
+            continue;
+
+        if (!obj_has_name(obj, args, ch))
             continue;
 
         found = true;

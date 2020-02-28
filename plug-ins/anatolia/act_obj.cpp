@@ -91,11 +91,6 @@ DESIRE(thirst);
 DESIRE(bloodlust);
 GSN(smell);
 
-
-bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
-long long get_arg_id( const DLString &cArgument );
-
-
 /*
  * find ':pocket' part of container name
  */

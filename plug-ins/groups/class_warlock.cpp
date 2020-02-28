@@ -437,13 +437,13 @@ bool EnergyShield::isColdShield( ) const
 {
   return (obj->extra_descr
                 && obj->extra_descr->description
-                && strstr( obj->extra_descr->description, "cold" ) != 0 );
+                && strstr( obj->extra_descr->description, "холод" ) != 0 );
 }
 bool EnergyShield::isFireShield( ) const
 {
   return (obj->extra_descr
                 && obj->extra_descr->description
-                && strstr( obj->extra_descr->description, "fire" ) != 0 );
+                && strstr( obj->extra_descr->description, "огня" ) != 0 );
 }
 void EnergyShield::wear( Character *ch )
 {
@@ -501,8 +501,13 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     Object *fire;
 
     target_name = one_argument( target_name, arg );
+    DLString from;
 
-    if (!(!str_cmp(arg,"cold") || !str_cmp(arg,"fire"))) {
+    if (arg_oneof(arg, "cold", "холода"))
+        from = "холода";
+    else if (arg_oneof(arg, "fire", "огонь", "огня"))
+        from = "огня";
+    else {
         ch->send_to("Выбери: от огня или холода он будет тебя защищать.\n\r");
         return;
     }
@@ -511,10 +516,8 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     fire->setOwner(ch->getNameP( ));
     fire->from = str_dup(ch->getNameP( ));
     fire->level = ch->getRealLevel( );
-    fire->fmtShortDescr( fire->getShortDescr( ), arg );
-    fire->fmtDescription( fire->getDescription( ), arg );
 
-    sprintf( buf, fire->pIndexData->extra_descr->description, arg );
+    sprintf( buf, fire->pIndexData->extra_descr->description, from.c_str() );
     fire->extra_descr = new_extra_descr();
     fire->extra_descr->keyword =
               str_dup( fire->pIndexData->extra_descr->keyword );
@@ -533,6 +536,6 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
          SET_BIT(fire->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_GOOD));        
          
     obj_to_char( fire, ch);
-    ch->send_to("Ты создаешь энергетический щит.\n\r");
+    ch->printf("Ты создаешь энергетический щит для защиты от %s.\n\r", from.c_str());
 }
 

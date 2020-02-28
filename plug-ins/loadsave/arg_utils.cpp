@@ -213,3 +213,9 @@ bool arg_is_clear( const DLString &arg )
 {
     return arg_oneof(arg, "clear", "очистить");
 }
+
+/** Remove surrounding quotes from an argument. */
+DLString arg_unquote(const DLString &arg)
+{
+    return DLString(arg).substitute('\'', ' ').stripWhiteSpace();
+}

@@ -31,7 +31,7 @@
 #include "affecthandler.h"
 
 #include "affect.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcrace.h"
@@ -49,7 +49,7 @@
 #include "occupations.h"
 #include "move_utils.h"
 #include "act_lock.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -76,8 +76,6 @@ RELIG(godiva);
  * Extern functions needed
  */
 DLString get_pocket_argument( char *arg );
-bool can_see_objname_hint( Character *ch, Object *obj );
-long long get_arg_id( const DLString &cArgument );
 void lore_fmt_wear( int type, int wear, ostringstream &buf );
 /*
  * Local functions.
@@ -242,8 +240,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( ) << "]";
 
-        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT)
-            && can_see_objname_hint( ch, obj ))
+        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
         {
             get_obj_name_hint( obj, buf );
         }

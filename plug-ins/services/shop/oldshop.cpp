@@ -50,8 +50,6 @@ RELIG(fili);
 using std::min;
 using std::max;
 
-bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
-long long get_arg_id( const DLString &cArgument );
 short get_wear_level( Character *ch, Object *obj );
 void get_obj_name_hint( Object *obj, std::ostringstream &buf );
 
