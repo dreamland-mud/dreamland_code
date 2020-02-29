@@ -261,12 +261,12 @@ SKILL_RUNP( dig )
         return;
     }
 
-    if (room->sector_type == SECT_CITY || room->sector_type == SECT_INSIDE) {
+    if (room->sector_type == SECT_CITY) {
         ch->send_to("Здесь слишком твердая почва.\r\n");
         return;
     }
     
-    if (IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
+    if (room->sector_type == SECT_INSIDE || IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
     {
         ch->send_to("Здесь неподходящее место для копания могилы.\r\n");
         return;
