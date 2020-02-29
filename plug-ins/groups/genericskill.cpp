@@ -43,6 +43,17 @@ GenericSkill::~GenericSkill( )
 {
 }
 
+void GenericSkill::loaded( )
+{
+    BasicSkill::loaded();
+
+    // Assign additional per-class labels to help articles.
+    if (help) {
+        for (auto &pair: classes)
+            help->labels.addTransient(pair.first + "-skills");
+    }
+}
+
 SkillGroupReference & GenericSkill::getGroup( )
 {
     return group;

@@ -42,6 +42,7 @@ public:
     void resolve( );
     void unresolve( );
 
+    virtual void loaded( );
     virtual SkillGroupReference & getGroup( );
     virtual bool visible( Character * ) const;
     virtual bool available( Character * ) const;

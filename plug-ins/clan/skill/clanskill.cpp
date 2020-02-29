@@ -25,6 +25,17 @@ ClanSkill::ClanSkill( )
 {
 }
 
+void ClanSkill::loaded( )
+{
+    BasicSkill::loaded();
+
+    // Assign additional per-clan labels to help articles.
+    if (help) {
+        for (auto &pair: clans)
+            help->labels.addTransient(pair.first + "-skills");
+    }    
+}
+
 SkillGroupReference & ClanSkill::getGroup( ) 
 {
     return group_clan;

@@ -26,6 +26,7 @@ public:
     
     ClanSkill( );
 
+    virtual void loaded( );
     virtual SkillGroupReference & getGroup( );
     virtual bool visible( Character * ) const;
     virtual bool available( Character * ) const;
