@@ -198,10 +198,8 @@ Social::~Social( )
 void Social::loaded()
 {
     if (!help) {
-        help.construct();
-        help->setID(
-            helpManager->getLastID() + 1
-        );
+        LogStream::sendWarning() << "Social " << getName() << " with empty help article." << endl;
+        return;
     }
    
     help->setSocial(Pointer(this)); 
