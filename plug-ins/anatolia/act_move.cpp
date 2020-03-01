@@ -65,11 +65,11 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "gsn_plugin.h"
 #include "act.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -1028,45 +1028,33 @@ CMDRUNP( fly )
 
 
 /*
- * Разработка Тирна.
+ * Экстра-выходы - разработка Тирна.
  */
-CMDRUNP( walk )
-{
-    EXTRA_EXIT_DATA *peexit;
-
-    // Must be entered extra exit name
-    if (argument[0] == '\0') {
-        ch->println( "И куда мы собрались идти, все таки?" );
-        return;
-    }
-
-    peexit = get_extra_exit( argument, ch->in_room->extra_exit );
-
-    if (peexit == 0) {
-        ch->println( "Ты не находишь этого здесь." );
-        return;
-    }
-
-    move_char( ch, peexit );
-}
-
-
 CMDRUNP( enter )
 {
-    Object *portal;
+    Object *portal = 0;
+    EXTRA_EXIT_DATA *peexit = 0;
     
+    // Syntax: enter, enter <portal>, enter <eexit>.
     if (!argument[0])
         portal = get_obj_room_type( ch, ITEM_PORTAL );
-    else
+    else {
         portal = get_obj_list( ch, argument, ch->in_room->contents );
+        peexit = get_extra_exit( argument, ch->in_room->extra_exit );
+    }
 
-    if (portal == 0) {
-        ch->println( "Ты не видишь этого тут." );
+    if (portal == 0 && peexit == 0) {
+        ch->println( "Ты не видишь здесь такого портала или дополнительного выхода.");
         return;
     }
     
+    if (peexit) {
+        move_char( ch, peexit );
+        return;            
+    }
+
     if (portal->item_type != ITEM_PORTAL) {
-        ch->println( "Ты не находишь пути внутрь." );
+        ch->pecho( "Ты не находишь пути внутрь %O2, это не портал.", portal );
         return;
     }
 
