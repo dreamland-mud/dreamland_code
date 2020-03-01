@@ -438,6 +438,9 @@ void undig( Character *ch )
         ch->ambushing = &str_empty[0]; 
     }
 
+    if (ch->position < POS_RESTING)
+        ch->position = POS_RESTING;
+        
     act_p("Ты выкапываешься из земли.", ch, 0, 0, TO_CHAR, POS_DEAD); 
     act_p("Земля шевелится, и $c1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM, POS_RESTING ); 
     extract_grave( ch );
