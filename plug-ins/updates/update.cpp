@@ -400,7 +400,7 @@ void char_update( )
             }
         }
 
-        if (!frozen)
+        if (!frozen && !ch->isDead())
             char_update_affects( ch );
 
         if (!ch->is_npc( )
