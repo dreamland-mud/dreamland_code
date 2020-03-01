@@ -149,8 +149,8 @@ DefaultBufferHandler::read( Descriptor *d )
     }
 
     if(line_length >= MAX_INPUT_LENGTH - 2) {
-        static const char * msg = "Line too long.\n\r";
-        d->writeRaw((const unsigned char*)msg, strlen(msg));
+        static const char * msg = "Слишком длинная строка.\n\r";
+        d->writeConverted(msg);
         koi8[MAX_INPUT_LENGTH-2] = 0;
         line_length = MAX_INPUT_LENGTH - 2;
     }
@@ -197,7 +197,7 @@ DefaultBufferHandler::read( Descriptor *d )
 
                     d->repeat = 0;
 
-                    d->writeRaw((const unsigned char*)lid, strlen(lid));
+                    d->writeConverted(lid);
                     d->close( );
                     return false;
                 }
@@ -395,7 +395,7 @@ DLString DefaultBufferHandler::convert(const char *txt)
         }
         txt++;
         if(c == IAC) {
-            result << IAC;
+            result << (unsigned char)IAC;
         }
     }
 
