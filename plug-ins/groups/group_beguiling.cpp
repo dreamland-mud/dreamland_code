@@ -370,7 +370,7 @@ VOID_SPELL(MysteriousDream)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(MysteriousDream);
 VOID_AFFECT(MysteriousDream)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act_p("{yВ воздухе клубится какой-то туман.{x",ch, 0, 0, TO_CHAR, POS_SLEEPING);
+     act("{yВ воздухе клубится сонный туман.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(MysteriousDream)::toStream( ostringstream &buf, Affect *paf ) 

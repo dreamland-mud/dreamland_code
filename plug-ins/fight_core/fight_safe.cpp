@@ -95,7 +95,6 @@ bool is_safe_nomessage(Character *ch, Character *victim )
     // recurent victim pet to master
     if ( victim->is_npc()
         && IS_CHARMED(victim)
-        && victim->master != 0
         && !victim->master->is_npc() )
     {
         return is_safe_nomessage(ch,victim->master);
@@ -202,8 +201,11 @@ bool is_safe_rspell_nom( short level, Character *victim )
     if (is_safe_rspell( victim ))
         return true;
     
-    if (!is_in_pk_range( level, victim->getModifyLevel( ), 1 ))
+    if (!victim->is_npc() && !is_in_pk_range( level, victim->getModifyLevel( ), 1 ))
         return true;
+
+    if (victim->is_npc() && IS_CHARMED(victim) && !victim->master->is_npc())
+        return !is_in_pk_range( level, victim->master->getModifyLevel( ), 1 );
 
     return false;
 }

@@ -126,6 +126,18 @@ VOID_SPELL(BlackDeath)::run( Character *ch, Room *room, int sn, int level )
 }
 
 AFFECT_DECL(BlackDeath);
+VOID_AFFECT(BlackDeath)::entry( Room *room, Character *ch, Affect *paf )
+{
+     act("{yВоздух отравлен чумными миазмами.{x",ch, 0, 0, TO_CHAR);
+}
+
+VOID_AFFECT(BlackDeath)::toStream( ostringstream &buf, Affect *paf ) 
+{
+    buf << fmt( 0, "Чумные миазмы будут отравлять воздух еще {W%1$d{x ча%1$Iс|са|сов.",
+                   paf->duration )
+        << endl;
+}
+
 VOID_AFFECT(BlackDeath)::update( Room *room, Affect *paf )
 {
     Affect plague;
@@ -337,6 +349,18 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
 }
 
 AFFECT_DECL(DeadlyVenom);
+VOID_AFFECT(DeadlyVenom)::entry( Room *room, Character *ch, Affect *paf )
+{
+     act("{yВ воздухе ощущаются ядовитые испарения.{x",ch, 0, 0, TO_CHAR);
+}
+
+VOID_AFFECT(DeadlyVenom)::toStream( ostringstream &buf, Affect *paf ) 
+{
+    buf << fmt( 0, "Ядовитые испарения исчезнут через {W%1$d{x ча%1$Iс|са|сов.",
+                   paf->duration )
+        << endl;
+}
+
 VOID_AFFECT(DeadlyVenom)::update( Room *room, Affect *paf )
 {
     Affect af;
@@ -431,7 +455,7 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(LethargicMist);
 VOID_AFFECT(LethargicMist)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act_p("{yВ воздухе клубится какой-то туман.{x",ch, 0, 0, TO_CHAR, POS_SLEEPING);
+     act("{yВ воздухе клубится летаргический туман.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(LethargicMist)::toStream( ostringstream &buf, Affect *paf ) 
