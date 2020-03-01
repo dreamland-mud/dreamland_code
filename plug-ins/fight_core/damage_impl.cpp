@@ -101,7 +101,7 @@ void SkillDamage::message( )
     }
     else {
         if (ch == victim) {
-            msgRoom( "%1$^O1 %2$C2\6себя", &attack, ch );
+            msgRoom( "%1$^O1 %2$C2\6%2$P2", &attack, ch );
             msgChar( "%1$^T1 %1$O1\6тебя", &attack );
         }
         else {
