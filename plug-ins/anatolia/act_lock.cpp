@@ -8,11 +8,10 @@
 
 #include "commandtemplate.h"
 #include "objectbehavior.h"
-#include "object.h"
+#include "core/object.h"
 #include "affect.h"
 #include "room.h"
 #include "pcharacter.h"
-#include "character.h"
 
 #include "save.h"
 #include "act.h"

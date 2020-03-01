@@ -66,7 +66,7 @@
 #include "char.h"
 #include "fileformatexception.h"
 #include "logstream.h"
-
+#include "grammar_entities_impl.h"
 #include "skill.h"
 #include "skillgroup.h"
 #include "skillreference.h"
@@ -844,6 +844,9 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
 
                 for (Properties::const_iterator p = obj->properties.begin(); p != obj->properties.end(); p++)
                     fprintf(fp, "X %s %s~\n", p->first.c_str(), p->second.c_str());
+
+                if (obj->gram_gender != Grammar::MultiGender::UNDEF)
+                        fprintf(fp, "Gender %s\n", obj->gram_gender.toString());
 
                 fprintf( fp, "End\n" );
                 ObjectBehaviorManager::save( obj, fp );
@@ -2022,6 +2025,16 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             return;
                         }
                     }
+                    break;
+
+            case 'G':
+                    if (!str_cmp( word, "Gender" )) {
+                        obj->gram_gender.fromString(fread_word( fp ));
+                        obj->updateCachedNoun();
+                        fMatch = true;
+                        break;
+                    }
+
                     break;
 
             case 'I':

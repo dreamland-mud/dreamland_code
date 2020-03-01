@@ -29,7 +29,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "bonus.h"
 #include "dreamland.h"
 
@@ -51,7 +51,7 @@
 #include "vnum.h"
 #include "occupations.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
 #include "def.h"
@@ -1450,6 +1450,7 @@ SKILL_RUNP( forge )
         }
 
         dup = create_object( key->pIndexData, 0 );
+        dup->gram_gender = Grammar::MultiGender::MASCULINE;
         dup->fmtName( DUP_NAMES, key->getName( ) );
         dup->fmtShortDescr( DUP_SHORT, key->getShortDescr( '2' ).c_str( ) );
         dup->fmtDescription( DUP_LONG, key->getShortDescr( '2' ).c_str( ) );
@@ -1502,6 +1503,7 @@ SKILL_RUNP( forge )
         act( "$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
 
         blank->setOwner( ch->getName( ).c_str( ) );
+        blank->gram_gender = Grammar::MultiGender::FEMININE;
         blank->setName( LOCK_NAMES );
         blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ).c_str( ) );
         blank->setDescription( fmt( 0, LOCK_LONG, ch ).c_str( ) );
