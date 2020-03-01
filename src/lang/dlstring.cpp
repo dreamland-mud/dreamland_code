@@ -383,7 +383,7 @@ DLString DLString::getOneArgument( )
 
     cEnd = ' ';
 
-    if (*i == '\'' || *i == '"')
+    if (*i == '\'' || *i == '"' || *i == '!')
         cEnd = *i++;
     
     while (i != end( )) {
@@ -392,7 +392,6 @@ DLString DLString::getOneArgument( )
             break;
         }
 
-//        ret += dl_tolower( *i );
         ret += *i;
         i++;
     }
