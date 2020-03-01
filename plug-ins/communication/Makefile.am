@@ -49,6 +49,7 @@ personalchannel.h \
 racechannel.h \
 roomchannel.h \
 worldchannel.h \
+replay.h \
 channels.h 
 
 

@@ -5,13 +5,13 @@
 #include "replay.h"
 #include "commonattributes.h"
 #include "pcharacter.h"
+#include "dreamland.h"
 #include "arg_utils.h"
 
 static const DLString ATTR_PRIVATE = "history_private";
 static const DLString ATTR_NEAR = "history_near";
 static const DLString ATTR_PUBLIC = "history_public";
 static const DLString ATTR_ALL = "history_all";
-static const DLString ATTR_TELLS = "tells";
 
 const int MAX_HISTORY_SIZE = 50;
 const int DEFAULT_REPLAY_SIZE = 10;
@@ -101,3 +101,62 @@ void remember_history_near( PCharacter *ch, const DLString &msg )
 }
 
 
+/** 
+ * Called from stop_fighting. 
+ * Notify about missed messages, but not too often - remember last time. 
+ */
+bool ReplayAttribute::handle( const StopFightArguments &args )
+{                
+    if (tells.empty())
+        return true;
+
+    long long now = dreamland->getCurrentTime();
+
+    if (now - lastNotified > Date::SECOND_IN_MINUTE) {
+        notify(args.pch);
+        lastNotified = now;
+    }
+
+    return true;
+}
+
+/** Called from 'afk' command. Notify about missed messages. */
+bool ReplayAttribute::handle( const AfkArguments &args )
+{
+    if (args.on)
+        return true;
+
+    notify(args.pch);
+    return true;
+}
+
+void ReplayAttribute::notify(PCharacter *ch) const
+{
+    if (tells.size() > 0)
+        ch->pecho(
+            "Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий, используй команду {hc{y{lRпрослушать{lEreplay{x для просмотра.",
+            tells.size());    
+}
+
+void ReplayAttribute::addMessage(const DLString &msg)
+{
+    tells.push_back(msg);
+    lastNotified = 0;
+}
+
+/** Replay stored messages and wipe out the attribute. */
+bool ReplayAttribute::playAndErase(ostringstream &buf, PCharacter *ch)
+{
+    ReplayAttribute::Pointer replay
+                = ch->getAttributes().findAttr<ReplayAttribute>( "replay" );
+    
+    if (!replay)
+        return false;
+
+    for (auto &t: replay->tells)
+        buf << " ** " << t << endl;
+    
+    bool rc = replay->tells.size() > 0;
+    ch->getAttributes( ).eraseAttribute( "replay" );
+    return rc;
+}

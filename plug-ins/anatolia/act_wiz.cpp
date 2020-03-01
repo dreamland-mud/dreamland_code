@@ -2168,14 +2168,14 @@ CMDWIZP( return )
         return;
     
     if ( !mob->switchedFrom ) {
-        ch->send_to("You aren't switched.\n\r");
+        ch->send_to("Ты и так в своем теле.\n\r");
         return;
     }
 
     if (mprog_return( mob ))
         return;
 
-    mob->send_to("You return to your original body. Type replay to see any missed tells.\n\r");
+    mob->send_to("Ты возвращаешься в своё привычное тело. Используй команду {y{hc{lRпрослушать{lEreplay{x для просмотра пропущенных сообщений.\n\r");
     ch->prompt.clear( );
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust( ), 
@@ -2187,21 +2187,6 @@ CMDWIZP( return )
     mob->desc = 0;
 }
 
-/* trust levels for load and clone */
-bool obj_check (Character *ch, Object *obj)
-{
-/*    if (IS_TRUSTED(ch,GOD)
-        || (IS_TRUSTED(ch,IMMORTAL) && obj->level <= 20 && obj->cost <= 1000)
-        || (IS_TRUSTED(ch,DEMI)            && obj->level <= 10 && obj->cost <= 500)
-        || (IS_TRUSTED(ch,ANGEL)    && obj->level <=  5 && obj->cost <= 250)
-        || (IS_TRUSTED(ch,AVATAR)   && obj->level ==  0 && obj->cost <= 100))
-        return true;
-    else
-        return false;*/
-    //by razer - nonense check        
-    return true;        
-}
-
 /* for clone, to insure that cloning goes many levels deep */
 void recursive_clone(Character *ch, Object *obj, Object *clone)
 {
@@ -2209,13 +2194,10 @@ void recursive_clone(Character *ch, Object *obj, Object *clone)
 
         for (c_obj = obj->contains; c_obj != 0; c_obj = c_obj->next_content)
         {
-                if (obj_check(ch,c_obj))
-                {
-                        t_obj = create_object(c_obj->pIndexData,0);
-                        clone_object(c_obj,t_obj);
-                        obj_to_obj(t_obj,clone);
-                        recursive_clone(ch,c_obj,t_obj);
-                }
+            t_obj = create_object(c_obj->pIndexData,0);
+            clone_object(c_obj,t_obj);
+            obj_to_obj(t_obj,clone);
+            recursive_clone(ch,c_obj,t_obj);
         }
 }
 
@@ -2271,12 +2253,6 @@ CMDWIZP( clone )
         {
                 Object *clone;
 
-                if (!obj_check(ch,obj))
-                {
-                        ch->send_to("Your powers are not great enough for such a task.\n\r");
-                        return;
-                }
-
                 clone = create_object(obj->pIndexData,0);
                 clone_object(obj,clone);
 
@@ -2319,14 +2295,11 @@ CMDWIZP( clone )
         
                 for (obj = mob->carrying; obj != 0; obj = obj->next_content)
                 {
-                        if (obj_check(ch,obj))
-                        {
-                                new_obj = create_object(obj->pIndexData,0);
-                                clone_object(obj,new_obj);
-                                recursive_clone(ch,obj,new_obj);
-                                obj_to_char(new_obj,clone);
-                                new_obj->wear_loc = obj->wear_loc;
-                        }
+                    new_obj = create_object(obj->pIndexData,0);
+                    clone_object(obj,new_obj);
+                    recursive_clone(ch,obj,new_obj);
+                    obj_to_char(new_obj,clone);
+                    new_obj->wear_loc = obj->wear_loc;
                 }
 
                 char_to_room(clone,ch->in_room);
