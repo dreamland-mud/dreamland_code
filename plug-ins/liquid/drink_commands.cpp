@@ -595,14 +595,8 @@ CMDRUN( drink )
 /*---------------------------------------------------------------------------
  * smell affects
  *--------------------------------------------------------------------------*/
-AFFECT_DECL(PouredLiquid);
-TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *victim, Affect *paf ) 
+bool oprog_smell_liquid(Liquid *liq, Character *ch)
 {
-    bool rc = false;
-    vector<int> bits = paf->global.toArray( );
-
-    for (unsigned int i = 0; i < bits.size( ); i++) {
-        Liquid *liq = liquidManager->find( bits[i] );
         DLString msg;
 
         if (liq->getFlags( ).isSet( LIQF_LIQUOR ))
@@ -611,11 +605,25 @@ TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *victim, Affect
             msg = "Ты улавливаешь аромат %1$N2.";
         else if (liq->getFlags( ).isSet( LIQF_BEER ))
             msg = "Пахнет %1$N5.";
-        else
+        else if (liq->getIndex() != liq_water)
             msg = "Ты чувствуешь запах %1$N2.";
+        else
+            return false;        
         
-        victim->pecho( msg.c_str( ), liq->getShortDescr( ).c_str( ) );
-        rc = true;
+        ch->pecho( msg.c_str( ), liq->getShortDescr( ).c_str( ) );
+        return true;
+}        
+
+AFFECT_DECL(PouredLiquid);
+TYPE_AFFECT(bool, PouredLiquid)::smell( Character *ch, Character *victim, Affect *paf ) 
+{
+    bool rc = false;
+    vector<int> bits = paf->global.toArray( );
+
+    for (unsigned int i = 0; i < bits.size( ); i++) {
+        Liquid *liq = liquidManager->find( bits[i] );
+        if (oprog_smell_liquid(liq, victim))
+            rc = true;
     }
     
     return rc;

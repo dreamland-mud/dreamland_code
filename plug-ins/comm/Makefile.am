@@ -56,6 +56,7 @@ $(LIBADD_FIGHT) \
 ../ed/lib/libed.la \
 ../ed/libcoreed.la \
 ../servlets/libservlets.la \
+../liquid/libliquid.la \
 ../communication/libcommunication.la \
 -ljsoncpp
 

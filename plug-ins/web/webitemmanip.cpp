@@ -280,6 +280,10 @@ static bool has_trigger_smell( Object *obj )
     // See if wrappers for this item or its index data has a onSmell function defined.
     FENIA_HAS_TRIGGER(obj, "Smell");
     FENIA_NDX_HAS_TRIGGER(obj, "Smell");
+
+    if (obj->item_type == ITEM_DRINK_CON && obj->value[1] > 0)
+        return true;
+
     return false;
 }
 
