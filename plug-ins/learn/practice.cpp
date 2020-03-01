@@ -39,9 +39,7 @@ COMMAND(CPractice, "practice")
         return;
         
     if (argument.empty( ) || arg_is_all( argument ))
-        pracShow( ch->getPC( ), true, false );
-    else if (arg_oneof_strict( argument, "now", "сейчас" ))
-        pracShow( ch->getPC( ), true, true );
+        pracShow( ch->getPC( ) );
     else if (arg_oneof_strict( argument, "here", "здесь" ))
         pracHere( ch->getPC( ) );
     else
@@ -75,7 +73,7 @@ typedef std::vector<PracInfo> PracInfoList;
 typedef std::map<DLString, PracInfoList> PracCategoryMap;
 
 
-void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
+void CPractice::pracShow( PCharacter *ch )
 {
     std::basic_ostringstream<char> buf;
     PracCategoryMap cmap;
@@ -91,18 +89,12 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
         if (!skill->available( ch ))
             continue;
         
-        if (!skill->usable( ch, false ) && fUsableOnly)
-            continue;
-
         if (skill->getSpell( ) 
                 && skill->getSpell( )->isCasted( ) 
                 && ch->getClan( ) == clan_battlerager)
             continue;
 
         PCSkillData &data = ch->getSkillData( sn );
-        
-        if (data.learned <= 1 && !fAll)
-            continue;
         
         info.percent = data.learned;
         info.name = skill->getNameFor( ch );

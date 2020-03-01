@@ -736,28 +736,6 @@ PCSkillData & PCharacter::getSkillData( int sn )
     return skills.get( sn );
 }
 
-void PCharacter::updateSkills( )
-{
-    for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-        Skill *skill = SkillManager::getThis( )->find( sn );
-        PCSkillData &data = getSkillData(sn);
-
-        // Ensure skill learned percentage is always within limits.
-        if (skill->visible( this )) {
-            int &percent = data.learned;
-
-            percent = std::max( 1, percent );
-            percent = std::max( skill->getLearned( this ), percent );
-        }
-
-        // For historical 'temporary' skills, set up proper skill origin value.
-        if (data.temporary) {
-            data.temporary = false;
-            data.origin.setValue(SKILL_DREAM);
-        }
-    }
-}                        
-
 int PCharacter::applyCurse( int def )
 {
     return (def * curse) / 100;

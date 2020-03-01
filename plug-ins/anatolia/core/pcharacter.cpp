@@ -8,6 +8,7 @@
 #include "pcharactermanager.h"
 #include "pcrace.h"
 #include "room.h"
+#include "commonattributes.h"
 
 #include "wiznet.h"
 #include "infonet.h"
@@ -133,7 +134,16 @@ void PCharacter::advanceLevel( )
     buf << ".{x";
     println( buf.str( ).c_str( ) );
 
+    // Display how many new skills became available after level up.
+    XMLIntegerAttribute::Pointer skillCount 
+        =  getAttributes().getAttr<XMLIntegerAttribute>("skillCount");
+    int skillsLastLevel = skillCount->getValue();
+
     updateSkills( );
+
+    int skillsDiff = skillCount->getValue() - skillsLastLevel;
+    if (skillsDiff > 0)
+        pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
 }
 
 #else

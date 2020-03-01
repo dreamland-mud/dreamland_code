@@ -19,6 +19,7 @@ impl.cpp
 libanatoliacore_la_LIBADD = \
 ../../descriptor/libdescriptor.la \
 ../../output/liboutput.la \
+../../system/libsystem.la \
 ../../loadsave/libloadsave.la \
 ../../interpret/libinterpret.la \
 ../../system/libscheduler_task_round.la \

@@ -24,7 +24,7 @@ public:
 private:
         static const DLString COMMAND_NAME;
                 
-        void pracShow( PCharacter *, bool, bool );
+        void pracShow( PCharacter * );
         void pracLearn( PCharacter *, DLString & );
         void pracHere( PCharacter * );
         PCharacter * findTeacher( PCharacter *, Skill * = NULL );
