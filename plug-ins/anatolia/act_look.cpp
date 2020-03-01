@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 #include <sstream>
+#include <iomanip>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -90,42 +91,65 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount = true
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty );
 static void show_exits_to_char( Character *ch, Room *targetRoom );
 
+/** Split string into a list of arguments. */
+static StringList name_list(const DLString &cArgs)
+{
+    DLString args(cArgs);
+    StringList result;
+
+    while (!args.empty())
+        result.push_back(args.getOneArgument());
+
+    return result;
+}
+
+/** Return true if string doesn't contain any RU characters. */
+static bool name_is_en(const DLString &name)
+{
+    for (unsigned int i = 0; i < name.size(); i++)
+        if (dl_isrusalpha(name.at(i)))
+            return false;
+    return true;
+}
+
+/** Return first entry in the list w/o RU characters. */
+static bool find_first_en_name(const StringList &list, DLString &result)
+{
+    for (const auto &name: list) {
+        if (name_is_en(name)) {
+            result = name;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/** Return first entry in the list containing only RU characters and spaces. */
+static bool find_first_ru_name(const StringList &list, DLString &result)
+{
+    for (const auto &name: list)
+        if (name.isRussian()) {
+            result = name;
+            return true;
+        }
+
+    return false;
+}
 
 /*
  * "(english name)" for CONFIG_OBJNAME_HINT 
  */
 void get_obj_name_hint( Object *obj, std::ostringstream &buf )
 {
-    DLString name;
-    unsigned int i;
-    
-    name = obj->getShortDescr( );
+    DLString name = obj->getName( );
     name.colourstrip( );
-
-    for (i = 0; i < name.size( ); i++)
-        if (isalpha( name.at( i ) ))
-            return;
     
-    name = obj->getName( );
-    name.colourstrip( );
-
-    while (!name.empty( )) {
-        bool good = true;
-        DLString hint = name.getOneArgument( );
-
-        for (i = 0; i < hint.size( ); i++)
-            if (dl_isrusalpha( hint.at( i ) )) {
-                good = false;
-                break;
-            }
-        
-        if (good) {
-            buf << " {x(" << hint << "{x)";
-            return;
-        }
-    }
-
-    warn( "(objhint) no hint found for [%d]", obj->pIndexData->vnum);
+    DLString hint;
+    if (find_first_en_name(name_list(name), hint))
+        buf << " {x(" << hint << "{x)";
+    else
+        warn( "(objhint) no hint found for [%d]", obj->pIndexData->vnum);
 }
 
 static bool is_empty_descr( const char *arg )
@@ -1822,7 +1846,7 @@ CMDRUNP( exits )
         {
             found = true;
 
-            buf << fmt( ch, "%-6^s", ename ) << " - ";
+            buf << fmt(0, "    {C%-6s{x", ename) << " - ";
 
             if (room->isDark( ) && !cfg->holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
@@ -1839,7 +1863,7 @@ CMDRUNP( exits )
                 gsn_perception->improve( ch, true );
                 found = true;
 
-                buf << fmt( ch, "%-6^s", ename ) 
+                buf << fmt( ch, "    {C%-6s{x", ename ) 
                     << " * (" << russian_case(direction_doorname(pexit), '1') << ")";
 
                 if (ch->is_immortal())
@@ -1849,10 +1873,33 @@ CMDRUNP( exits )
             }
         }
     }
-    
+
     if (!found)
-        buf << (cfg->ruexits ? "Нет." : "None.") << endl;
-            
+        buf << "    нет" << endl;
+
     ch->send_to( buf );
+
+    found = false;
+    buf.str("");
+
+    for (EXTRA_EXIT_DATA *eexit = ch->in_room->extra_exit; eexit; eexit = eexit->next) {
+        if (ch->can_see(eexit)) {
+            StringList names = name_list(eexit->keyword);
+            DLString name, nameRus;
+
+            buf <<  "    ";
+            if (find_first_ru_name(names, nameRus))
+                buf << "{C" << nameRus << "{x ";
+            if (find_first_en_name(names, name))
+                buf << "(" << name << ")";
+            buf << endl;
+            found = true;
+        }
+    }
+
+    if (found) {
+        ch->println("\r\nДополнительные выходы:");
+        ch->send_to(buf);
+    }
 }
 
