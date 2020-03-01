@@ -31,15 +31,16 @@
 #include "skill.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "bonus.h"
 
 #include "dreamland.h"
+#include "arg_utils.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
-#include "handler.h"
+#include "../../anatolia/handler.h"
 #include "interp.h"
 #include "def.h"
     
@@ -119,10 +120,6 @@ ShopStock get_stock_keeper( ShopTrader::Pointer trader, Character *client, const
     }
 
     return stock;
-}
-
-void describe_goods( NPCharacter *keeper, Character *client, const DLString &arg, bool fStrict )
-{
 }
 
 /*----------------------------------------------------------------------------
@@ -493,6 +490,33 @@ CMDRUN( list )
 /*----------------------------------------------------------------------------
  * 'value' command
  *---------------------------------------------------------------------------*/
+static void value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Pointer trader, Object *obj)
+{
+    if (!keeper->can_see(obj)) {
+        ch->pecho("%^C1 не видит %O4.", keeper, obj);
+        return;
+    }
+
+    if (!can_drop_obj( ch, obj )) {
+        ch->pecho("Ты не сможешь избавиться от %O2.", obj);
+        return;
+    }
+
+    int cost = get_cost( keeper, obj, false, trader );
+    if (cost <= 0) {
+        ch->pecho("%^C1 не интересуется %O5.", keeper, obj);
+        return;
+    }
+
+    int gold = cost/100;
+    int silver = cost - gold * 100;
+
+    if ( dreamland->getBalanceMerchantBank() < (gold + 1) )
+        tell_fmt("Я дал%2$Gо||а бы тебе %3$d серебра и %4$d золота за %5$O4, но у меня нет денег.", ch, keeper, silver, gold, obj);
+    else
+        tell_fmt("Я дам тебе %3$d серебра и %4$d золота за %5$O4.", ch, keeper, silver, gold, obj);
+}
+
 CMDRUN( value )
 {
     char buf[MAX_STRING_LENGTH];
@@ -513,47 +537,24 @@ CMDRUN( value )
     
     keeper = trader->getChar( );
 
-    if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 )
-    {
-        act_p( "$c1 говорит тебе '{gУ тебя нет этого.{x'",
-                keeper, 0, ch, TO_VICT,POS_RESTING );
-        ch->reply = keeper;
+    if (arg_is_all(arg)) {
+        if (!ch->carrying) {
+            tell_fmt("Но у тебя же ничего нет!", ch, keeper);
+            return;
+        }
+
+        for (obj = ch->carrying; obj; obj = obj->next_content) {
+            value_one_item(ch, keeper, trader, obj);
+        }
         return;
     }
 
-    if (!keeper->can_see(obj))
-    {
-        act_p("$c1 не видит этого.",keeper,0,ch,TO_VICT,POS_RESTING);
+    if ( ( obj = get_obj_carry( ch, arg.c_str( ) ) ) == 0 ) {
+        tell_fmt("У тебя нет этого.", ch, keeper);
         return;
     }
 
-    if ( !can_drop_obj( ch, obj ) )
-    {
-        ch->send_to("Ты не можешь избавиться от этого.\n\r");
-        return;
-    }
-
-    if ( ( cost = get_cost( keeper, obj, false, trader ) ) <= 0 )
-    {
-        act_p("$c1 не интересуется $o5.", keeper, obj, ch, TO_VICT,POS_RESTING );
-        return;
-    }
-
-    if ( dreamland->getBalanceMerchantBank() < (cost / 100 + 1) )
-    {
-        sprintf( buf,
-                "$c1 говорит тебе '{gЯ дал бы тебе %d серебра и %d золота за $o4, но у меня нет денег.{x'",
-                cost - (cost/100) * 100, cost/100 );
-    }
-    else
-    {        
-        sprintf( buf,
-                "$c1 говорит тебе '{gЯ дам тебе %d серебра и %d золота за $o4.{x'",
-                cost - (cost/100) * 100, cost/100 );
-    }
-
-    act_p( buf, keeper, obj, ch, TO_VICT,POS_RESTING );
-    ch->reply = keeper;
+    value_one_item(ch, keeper, trader, obj);
 }
 
 /*----------------------------------------------------------------------------
