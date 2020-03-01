@@ -606,10 +606,10 @@ SKILL_RUNP( throwspear )
 {
         Character *victim;
         Object *spear;
-        char arg1[512],arg2[512];
         bool success;
         int chance,direction;
         int range = ( ch->getModifyLevel() / 10) + 1;
+        DLString argDoor, argVict;
 
         if ( ch->is_npc() )
                 return; /* Mobs can't shoot spears */
@@ -620,38 +620,26 @@ SKILL_RUNP( throwspear )
                 return;
         }
 
-        argument=one_argument( argument, arg1 );
-        one_argument( argument, arg2 );
-
-        if ( arg1[0] == '\0' || arg2[0] == '\0')
-        {
-                ch->send_to("Метнуть копье куда и в кого?\n\r");
-                return;
-        }
-
         if ( ch->fighting )
         {
                 ch->send_to("Ты не можешь сконцентрироваться для метания копья.\n\r");
                 return;
         }
 
-        direction = direction_lookup( arg1 );
-
-        if (direction < 0)
-        {
+        if (!direction_range_argument(argument, argDoor, argVict, direction)) {
                 ch->send_to("Метнуть копье куда и в кого?\n\r");
                 return;
         }
 
-        if ( ( victim = find_char( ch, arg2, direction, &range) ) == 0 )
+        if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
                 return;
-/*
+
         if ( !victim->is_npc() && victim->desc == 0 )
         {
                 ch->send_to("Ты не можешь сделать этого.\n\r");
                 return;
         }
-*/
+
         if ( victim == ch )
         {
                 ch->send_to("Это бессмысленно.\n\r");

@@ -35,7 +35,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "dreamland.h"
 #include "gsn_plugin.h"
@@ -44,12 +44,13 @@
 #include "magic.h"
 #include "fight.h"
 #include "stats_apply.h"
+#include "directions.h"
 #include "onehit.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
 #include "vnum.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "save.h"
 #include "act.h"
 #include "interp.h"
@@ -155,26 +156,16 @@ SKILL_RUNP( shoot )
     Object *wield;
     Object *arrow;
     Object *quiver;
-
-    char arg1[512],arg2[512];
     bool success;
     int chance,direction;
     int range, range0 = ( ch->getModifyLevel() / 10) + 1;
     int master_shoots = 2;
+    DLString argDoor, argVict;
 
     if (!gsn_bow->usable( ch ))
     {
           ch->send_to("Ты не умеешь стрелять из лука.\n\r");
           return;
-    }
-
-    argument=one_argument( argument, arg1 );
-    one_argument( argument, arg2 );
-
-    if ( arg1[0] == '\0' || arg2[0] == '\0' )
-    {
-            ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
-            return;
     }
 
     if ( ch->fighting )
@@ -183,16 +174,13 @@ SKILL_RUNP( shoot )
             return;
     }
 
-    direction = direction_lookup( arg1 );
-
-    if (direction < 0)
-    {
-            ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
-            return;
+    if (!direction_range_argument(argument, argDoor, argVict, direction)) {
+        ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
+        return;
     }
-    
+
     range = range0;
-    if ( ( victim = find_char( ch, arg2, direction, &range) ) == 0 )
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
     {
             ch->send_to("Там таких нет.\n\r");
             return;
@@ -306,7 +294,7 @@ SKILL_RUNP( shoot )
     
     for (int i = 0; i < master_shoots; i++) {
         range = range0;
-        if (find_char( ch, arg2, direction, &range) != victim)
+        if (find_char( ch, argVict.c_str(), direction, &range) != victim)
             return; 
         
         if (!( arrow = find_arrow( ch, quiver ) ))

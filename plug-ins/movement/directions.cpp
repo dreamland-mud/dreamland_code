@@ -192,3 +192,32 @@ Room * direction_target(Room *room, int door)
         return NULL;
     return room->exit[door]->u1.to_room;
 }
+
+
+/** 
+ * Split into arguments 'n.victim', 'north victim', 'n victim', 'north.victim'.
+ * Return true if first word is a valid direction name.
+ */
+bool direction_range_argument(const DLString &cargs, DLString &argDoor, DLString &argVict, int &door)
+{
+    unsigned int i;
+
+    argDoor = "";
+    argVict = cargs;
+    door = -1;
+
+    for (i = 0; i < cargs.size() && cargs.at(i) != '.' && cargs.at(i) != ' '; i++)
+        ;
+
+    if (i == 0 || i == cargs.size() || i == cargs.size() - 1)
+        return false;
+
+    argDoor = cargs.substr(0, i);
+    if ((door = direction_lookup(argDoor.c_str())) < 0) {
+        argDoor = "";
+        return false;
+    }
+
+    argVict = cargs.substr(i+1);
+    return true;
+}

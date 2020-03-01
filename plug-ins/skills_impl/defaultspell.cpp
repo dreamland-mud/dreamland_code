@@ -126,26 +126,18 @@ int DefaultSpell::getMaxRange( Character *ch ) const
 }
 
 /*
- * Find a char for spell usage.
+ * Find a char for spell usage. Allowed syntax: vict, dir.vict, dir vict
  */
 Character * 
 DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, int *range )
 {
-    char buf[MAX_INPUT_LENGTH];
-    unsigned int i, j;
+    DLString argDoor, argVict;
 
-    for (i = 0; argument[i] != '\0' && argument[i] != '.'; i++)
-        buf[i] = argument[i];
-    buf[i] = '\0';
-
-    if (i == 0 || (*door = direction_lookup(buf)) < 0)
-        return get_char_room( ch, argument.c_str( ) );
+    if (direction_range_argument(argument, argDoor, argVict, *door)) {
+        return find_char(ch, argVict.c_str(), *door, range, false);
+    }
     
-    for (i++, j = 0; i < argument.size( ); j++, i++)
-        buf[j] = argument[i];
-    buf[j] = '\0';
-    
-    return find_char( ch, buf, *door, range, false );
+    return get_char_room(ch, argVict.c_str());
 }
 
 /*
