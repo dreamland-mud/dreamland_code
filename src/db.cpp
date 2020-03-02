@@ -202,6 +202,32 @@ void free_extra_descr(EXTRA_DESCR_DATA *ed)
     delete ed;
 }
 
+EXTRA_EXIT_DATA * new_extra_exit()
+{
+    static EXTRA_EXIT_DATA eexit_zero;
+    EXTRA_EXIT_DATA *eexit;
+    
+    eexit = new EXTRA_EXIT_DATA;
+    *eexit = eexit_zero;
+    eexit->keyword = eexit->description = eexit->room_description = eexit->short_desc_to = eexit->short_desc_from = str_empty;
+    
+    return eexit;
+}
+
+void free_extra_exit(EXTRA_EXIT_DATA *eexit)
+{
+    free_string(eexit->keyword);
+    free_string(eexit->short_desc_from);
+    free_string(eexit->short_desc_to);
+    free_string(eexit->description);
+    free_string(eexit->room_description);
+
+    delete eexit;
+}
+
+
+
+
 /*
  * Get an extra description from a list.
  */
