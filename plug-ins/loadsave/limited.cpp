@@ -64,14 +64,16 @@ bool limit_check_on_load( Object *obj )
 
     bool fCount = true;
 
+    if (obj->getRoom( ))
+        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
+
     if (obj->carried_by) {
+        // If this item was already expired during boot time, its count was not increased.
         fCount = obj->timestamp > dreamland->getBootTime( );
         LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
             << " (" << obj->getID( ) << ") extracted for " << obj->carried_by->getName( )
             << ", " << (fCount ? "count":"nocount") << endl;
     } else {
-        if (obj->getRoom( ))
-            obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
         LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
             << " (" << obj->getID( ) << ") extracted in " << (obj->getRoom( ) ? obj->getRoom( )->vnum : -1)
             << ", " << (fCount ? "count":"nocount") << endl;
@@ -167,20 +169,12 @@ void limit_ground_decay(Object *obj)
     save_items_at_holder(obj);
 }
 
-// Destroy expired limited objects when room or player is saved.
-bool limit_check_on_save( Object *obj )
+// Periodically destroy expired limited items.
+bool limit_purge( Object *obj )
 {
     // Not a limited item.
     if (obj->pIndexData->limit < 0)
         return false;
-
-    DLString where;
-    if (obj->carried_by)
-        where = obj->carried_by->getName( );
-    else if (obj->in_room)
-        where =  "room #" + DLString(obj->in_room->vnum);
-    else
-        where = "none";
 
     // Limited item but not marked (yet).
     if (obj->timestamp <= 0) 
@@ -197,9 +191,16 @@ bool limit_check_on_save( Object *obj )
     if (obj->getRoom( ))
         obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
 
-    // If item was already expired during boot time,
-    // its counter hasn't been increased, thus we shouldn't decrease.
-    bool fCount = obj->timestamp > dreamland->getBootTime( );
+    DLString where;
+    if (obj->carried_by)
+        where = obj->carried_by->getName( );
+    else if (obj->in_room)
+        where =  "room #" + DLString(obj->in_room->vnum);
+    else
+        where = "none";
+
+    // Always decrease counters for periodic limits extract.
+    bool fCount = true;
     LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
         << " (" << obj->getID( ) << ") extracted for " << where 
         << ", " << (fCount ? "count":"nocount") << endl;
@@ -215,7 +216,7 @@ void limit_purge( )
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
         limit_ground_decay(obj);
-        limit_check_on_save(obj);
+        limit_purge(obj);
     }
 }
 
