@@ -412,11 +412,11 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
         obj->item_type        = pObjIndex->item_type;
         obj->extra_flags= pObjIndex->extra_flags;
         obj->wear_flags        = pObjIndex->wear_flags;
-        obj->value[0]        = pObjIndex->value[0];
-        obj->value[1]        = pObjIndex->value[1];
-        obj->value[2]        = pObjIndex->value[2];
-        obj->value[3]        = pObjIndex->value[3];
-        obj->value[4]        = pObjIndex->value[4];
+        obj->value0(pObjIndex->value[0]);
+        obj->value1(pObjIndex->value[1]);
+        obj->value2(pObjIndex->value[2]);
+        obj->value3(pObjIndex->value[3]);
+        obj->value4(pObjIndex->value[4]);
         obj->weight        = pObjIndex->weight;
         obj->extracted        = false;
         obj->from       = str_dup(""); /* used with body parts */
@@ -434,112 +434,14 @@ Object *create_object_org( OBJ_INDEX_DATA *pObjIndex, short level, bool Count )
         /*
          * Mess with object properties.
          */
-        switch ( obj->item_type )
-        {
-        default:
-                bug( "Read_object: vnum %d bad type.", pObjIndex->vnum );
-                break;
-
+        switch ( obj->item_type ) {
         case ITEM_LIGHT:
-                if ( obj->value[2] == 999 )
-                        obj->value[2] = -1;
+                if ( obj->value2() == 999 )
+                        obj->value2(-1);
                 break;
 
         case ITEM_CORPSE_PC:
-                obj->value[3] = ROOM_VNUM_ALTAR;
-
-        case ITEM_CORPSE_NPC:
-        case ITEM_KEY:
-        case ITEM_FURNITURE:
-        case ITEM_TRASH:
-        case ITEM_CONTAINER:
-        case ITEM_DRINK_CON:
-        case ITEM_FOOD:
-        case ITEM_BOAT:
-        case ITEM_FOUNTAIN:
-        case ITEM_MAP:
-        case ITEM_CLOTHING:
-        case ITEM_PORTAL:
-                if (!pObjIndex->new_format)
-                        obj->cost /= 5;
-                break;
-
-        case ITEM_TREASURE:
-        case ITEM_KEYRING:
-        case ITEM_LOCKPICK:
-        case ITEM_WARP_STONE:
-        case ITEM_GEM:
-        case ITEM_JEWELRY:
-        case ITEM_TATTOO:
-        case ITEM_SPELLBOOK:
-        case ITEM_RECIPE:
-        case ITEM_TEXTBOOK:
-        case ITEM_PARCHMENT:
-                break;
-
-        case ITEM_SCROLL:
-                if (level != -1 && !pObjIndex->new_format)
-                        obj->value[0]        = number_fuzzy( obj->value[0] );
-                break;
-
-        case ITEM_WAND:
-        case ITEM_STAFF:
-                if (level != -1 && !pObjIndex->new_format)
-                {
-                        obj->value[0]        = number_fuzzy( obj->value[0] );
-                        obj->value[1]        = number_fuzzy( obj->value[1] );
-                        obj->value[2]        = obj->value[1];
-                }
-                if (!pObjIndex->new_format)
-                        obj->cost *= 2;
-                break;
-
-        case ITEM_WEAPON:
-                if (level != -1 && !pObjIndex->new_format)
-                {
-                        obj->value[1] = number_fuzzy( number_fuzzy( 1 * level / 4 + 2 ) );
-                        obj->value[2] = number_fuzzy( number_fuzzy( 3 * level / 4 + 6 ) );
-                }
-                if ( pObjIndex->new_format )
-                {
-                //Randomizing value2
-                    if ( obj->value[2] < 6)
-                            obj->value[2] = number_disperse( obj->value[2], 30 );
-                    else
-                    if ( obj->value[2] < 10)
-                            obj->value[2] = number_disperse( obj->value[2], 20 );
-                    else
-                            obj->value[2] = number_disperse( obj->value[2], 15 );
-                }
-                break;
-
-        case ITEM_ARMOR:
-                if (level != -1 && !pObjIndex->new_format)
-                {
-                        obj->value[0]        = number_fuzzy( level / 5 + 3 );
-                        obj->value[1]        = number_fuzzy( level / 5 + 3 );
-                        obj->value[2]        = number_fuzzy( level / 5 + 3 );
-                }
-                if ( pObjIndex->new_format )
-                {
-                        //Randomizing 
-                    obj->value[0] = number_disperse( obj->value[0], 35 );
-                    obj->value[1] = number_disperse( obj->value[1], 35 );
-                    obj->value[2] = number_disperse( obj->value[2], 35 );
-                    obj->value[3] = number_disperse( obj->value[3], 15 );
-                }
-                                                                                                    
-                break;
-
-        case ITEM_POTION:
-        case ITEM_PILL:
-                if (level != -1 && !pObjIndex->new_format)
-                        obj->value[0] = number_fuzzy( number_fuzzy( obj->value[0] ) );
-                break;
-
-        case ITEM_MONEY:
-                if (!pObjIndex->new_format)
-                        obj->value[0]        = obj->cost;
+                obj->value3(ROOM_VNUM_ALTAR);
                 break;
         }
         
@@ -606,7 +508,7 @@ void clone_object(Object *parent, Object *clone)
     clone->extracted    = parent->extracted;
 
     for (i = 0;  i < 5; i ++)
-        clone->value[i]        = parent->value[i];
+        clone->valueByIndex(i, parent->valueByIndex(i));
 
     /* affects */
     clone->enchanted        = parent->enchanted;

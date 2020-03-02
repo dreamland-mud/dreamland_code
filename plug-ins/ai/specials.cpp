@@ -122,13 +122,13 @@ static int potion_cure_level( Object *potion )
     cl = 0;
     for (i=1;i<5;i++)
     {
-        if ( gsn_cure_critical == potion->value[i] )
+        if ( gsn_cure_critical == potion->valueByIndex(i) )
             cl += 3;
-        if ( gsn_cure_light == potion->value[i])
+        if ( gsn_cure_light == potion->valueByIndex(i))
             cl += 1;
-        if ( gsn_cure_serious == potion->value[i] )
+        if ( gsn_cure_serious == potion->valueByIndex(i) )
             cl += 2;
-        if ( gsn_heal == potion->value[i])
+        if ( gsn_heal == potion->valueByIndex(i))
             cl += 4;
     }
     return(cl);
@@ -140,15 +140,15 @@ static int potion_arm_level( Object *potion )
     al = 0;
     for (i=1;i<5;i++)
     {
-        if ( gsn_armor == potion->value[i] )
+        if ( gsn_armor == potion->valueByIndex(i) )
             al += 1;
-        if ( gsn_shield == potion->value[i])
+        if ( gsn_shield == potion->valueByIndex(i))
             al += 1;
-        if ( gsn_stone_skin == potion->value[i] )
+        if ( gsn_stone_skin == potion->valueByIndex(i) )
             al += 2;
-        if ( gsn_sanctuary == potion->value[i])
+        if ( gsn_sanctuary == potion->valueByIndex(i))
             al += 4;
-        if ( gsn_protection_evil == potion->value[i] || gsn_protection_good == potion->value[i])
+        if ( gsn_protection_evil == potion->valueByIndex(i) || gsn_protection_good == potion->valueByIndex(i))
             al += 3;
     }
     return(al);
@@ -159,7 +159,7 @@ static bool potion_cure_blind( Object *potion )
     int i;
     for (i=0;i<5;i++)
     {
-        if (gsn_cure_blindness == potion->value[i])
+        if (gsn_cure_blindness == potion->valueByIndex(i))
             return(true);
     }
     return(false);
@@ -169,7 +169,7 @@ static bool potion_cure_poison( Object *potion )
     int i;
     for (i=0;i<5;i++)
     {
-        if (gsn_cure_poison == potion->value[i] )
+        if (gsn_cure_poison == potion->valueByIndex(i) )
             return(true);
     }
     return(false);
@@ -179,7 +179,7 @@ static bool potion_cure_disease( Object *potion )
     int i;
     for (i=0;i<5;i++)
     {
-        if (gsn_cure_disease == potion->value[i] )
+        if (gsn_cure_disease == potion->valueByIndex(i) )
             return(true);
     }
     return(false);
@@ -400,15 +400,15 @@ bool BasicMobileBehavior::doPickWeapon( )
         }
         else { // while tracking, wield dagger to stab or bow to shoot
             if (gsn_bow->usable( ch )
-                && (!wield || wield->value[0] != WEAPON_BOW)
-                && obj->value[0] == WEAPON_BOW)
+                && (!wield || wield->value0() != WEAPON_BOW)
+                && obj->value0() == WEAPON_BOW)
             {
                 isGood = true;
             }
 
             if (gsn_backstab->usable( ch )
-                && (!wield || attack_table[wield->value[3]].damage != DAM_PIERCE) 
-                && attack_table[obj->value[3]].damage == DAM_PIERCE)
+                && (!wield || attack_table[wield->value3()].damage != DAM_PIERCE) 
+                && attack_table[obj->value3()].damage == DAM_PIERCE)
             {
                 isGood = true;
             }

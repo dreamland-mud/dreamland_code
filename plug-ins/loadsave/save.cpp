@@ -160,8 +160,8 @@ static void convert_obj_values( Object *obj )
     switch (obj->item_type) {
     case ITEM_FOUNTAIN:
     case ITEM_DRINK_CON:
-        if (obj->value[2] >= 0 && obj->value[2] < liquid_count) 
-            obj->value[2] = liquidManager->lookup( liquid_names[obj->value[2]] );
+        if (obj->value2() >= 0 && obj->value2() < liquid_count) 
+            obj->value2(liquidManager->lookup( liquid_names[obj->value2()] ));
 
         break;
 
@@ -797,40 +797,40 @@ void fwrite_obj_0( Character *ch, Object *obj, FILE *fp, int iNest )
                 if (obj->timer != 0)
                         fprintf( fp, "Time %d\n",        obj->timer             );
                 fprintf( fp, "Cost %d\n",        obj->cost                     );
-                if ( obj->value[0] != obj->pIndexData->value[0]
-                        || obj->value[1] != obj->pIndexData->value[1]
-                        || obj->value[2] != obj->pIndexData->value[2]
-                        || obj->value[3] != obj->pIndexData->value[3]
-                        || obj->value[4] != obj->pIndexData->value[4] )
+                if ( obj->value0() != obj->pIndexData->value[0]
+                        || obj->value1() != obj->pIndexData->value[1]
+                        || obj->value2() != obj->pIndexData->value[2]
+                        || obj->value3() != obj->pIndexData->value[3]
+                        || obj->value4() != obj->pIndexData->value[4] )
                         fprintf( fp, "Val  %d %d %d %d %d\n",
-                                obj->value[0], obj->value[1], obj->value[2], obj->value[3],
-                                obj->value[4] );
+                                obj->value0(), obj->value1(), obj->value2(), obj->value3(),
+                                obj->value4() );
 
                 switch ( obj->item_type )
                 {
                 case ITEM_POTION:
                 case ITEM_SCROLL:
-                        if ( obj->value[1] > 0 )
-                                fprintf( fp, "Spell 1 '%s'\n", skillname(obj->value[1]).c_str() );
-                        if ( obj->value[2] > 0 )
-                                fprintf( fp, "Spell 2 '%s'\n", skillname(obj->value[2]).c_str() );
-                        if ( obj->value[3] > 0 )
-                                fprintf( fp, "Spell 3 '%s'\n", skillname(obj->value[3]).c_str() );
-                        if ( obj->value[4] > 0 )
-                                fprintf( fp, "Spell 4 '%s'\n", skillname(obj->value[4]).c_str() );
+                        if ( obj->value1() > 0 )
+                                fprintf( fp, "Spell 1 '%s'\n", skillname(obj->value1()).c_str() );
+                        if ( obj->value2() > 0 )
+                                fprintf( fp, "Spell 2 '%s'\n", skillname(obj->value2()).c_str() );
+                        if ( obj->value3() > 0 )
+                                fprintf( fp, "Spell 3 '%s'\n", skillname(obj->value3()).c_str() );
+                        if ( obj->value4() > 0 )
+                                fprintf( fp, "Spell 4 '%s'\n", skillname(obj->value4()).c_str() );
                         break;
 
                 case ITEM_PILL:
                 case ITEM_STAFF:
                 case ITEM_WAND:
-                        if ( obj->value[3] > 0 )
-                                fprintf( fp, "Spell 3 '%s'\n", skillname(obj->value[3]).c_str() );
+                        if ( obj->value3() > 0 )
+                                fprintf( fp, "Spell 3 '%s'\n", skillname(obj->value3()).c_str() );
                         break;
 
                 case ITEM_FOUNTAIN:
                 case ITEM_DRINK_CON:
                         fprintf( fp, "Liquid '%s'\n",  
-                                     liquidManager->find( obj->value[2] )->getName( ).c_str( ) );
+                                     liquidManager->find( obj->value2() )->getName( ).c_str( ) );
                         break;
                 }
 
@@ -2053,7 +2053,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     KEY( "Level",        obj->level,                fread_number( fp ) );
                     KEY( "Lev",                obj->level,                fread_number( fp ) );
                     if (!str_cmp( word, "Liquid" )) {
-                        obj->value[2] = liquidManager->lookup(fread_word(fp));
+                        obj->value2(liquidManager->lookup(fread_word(fp)));
                         fMatch = true;
                         break;
                     }
@@ -2160,7 +2160,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                             }
                             else
                             {
-                                    obj->value[iValue] = sn;
+                                    obj->valueByIndex(iValue, sn);
                             }
                             fMatch = true;
                             break;
@@ -2177,12 +2177,12 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
             case 'V':
                     if ( !str_cmp( word, "Values" ) || !str_cmp(word,"Vals"))
                     {
-                            obj->value[0]        = fread_number( fp );
-                            obj->value[1]        = fread_number( fp );
-                            obj->value[2]        = fread_number( fp );
-                            obj->value[3]        = fread_number( fp );
-                            if (obj->item_type == ITEM_WEAPON && obj->value[0] == 0)
-                                    obj->value[0] = obj->pIndexData->value[0];
+                            obj->value0(fread_number( fp ));
+                            obj->value1(fread_number( fp ));
+                            obj->value2(fread_number( fp ));
+                            obj->value3(fread_number( fp ));
+                            if (obj->item_type == ITEM_WEAPON && obj->value0() == 0)
+                                    obj->value0(obj->pIndexData->value[0]);
                             convert_obj_values( obj );
                             fMatch                = true;
                             break;
@@ -2190,11 +2190,11 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
                     if ( !str_cmp( word, "Val" ) )
                     {
-                            obj->value[0]         = fread_number( fp );
-                            obj->value[1]        = fread_number( fp );
-                            obj->value[2]         = fread_number( fp );
-                            obj->value[3]        = fread_number( fp );
-                            obj->value[4]        = fread_number( fp );
+                            obj->value0(fread_number( fp ));
+                            obj->value1(fread_number( fp ));
+                            obj->value2(fread_number( fp ));
+                            obj->value3(fread_number( fp ));
+                            obj->value4(fread_number( fp ));
                             convert_obj_values( obj );
                             fMatch = true;
                             break;

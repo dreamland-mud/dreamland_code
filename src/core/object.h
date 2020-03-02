@@ -53,6 +53,7 @@ protected:
     char              *  description;
     char              *  material;
     RussianString::Pointer cachedNoun;
+    int                  value  [5];
 
 public:
     Object            *  next;
@@ -79,7 +80,6 @@ public:
     int              condition;
     int              timer;
     time_t           timestamp;
-    int                  value  [5];
     char              *  from;
     bool                extracted;
     int                  water_float;
@@ -110,10 +110,7 @@ public:
         return IS_SET(wear_flags,part);
     }
 
-    inline int getWeightMultiplier( ) const
-    {
-        return item_type == ITEM_CONTAINER ? value[4] : 100;
-    }
+    int getWeightMultiplier( ) const;
 
     const char *get_cond_alias(void);
     int floating_time(void);
@@ -164,6 +161,35 @@ public:
     bool hasOwner( const Character * ) const;
 
     virtual NounPointer toNoun( const DLObject *forWhom = NULL, int flags = 0 ) const;
+
+    /** Return instance or index data value[0], depending on item type. */
+    inline int value0() const;
+
+    /** Return instance or index data value[1], depending on item type. */
+    inline int value1() const;
+
+    /** Return instance or index data value[2], depending on item type. */
+    inline int value2() const;
+
+    /** Return instance or index data value[3], depending on item type. */
+    inline int value3() const;
+
+    /** Return instance or index data value[4], depending on item type. */
+    inline int value4() const;
+
+    inline void value0(int);
+    inline void value1(int);
+    inline void value2(int);
+    inline void value3(int);
+    inline void value4(int);
+
+    int valueByIndex(int index) const;
+    void valueByIndex(int index, int value);
+    bool getsValueFromProto(int index) const;
+
+protected:
+    int itemOrProtoValue(int index) const;
+    void itemOrProtoValue(int index, int value);
 };
 
 
@@ -212,6 +238,56 @@ inline const char * Object::getDescription( ) const
 inline const char * Object::getMaterial( ) const
 {
     return material ? material : pIndexData->material;
+}
+
+inline void Object::value0(int v)
+{
+    itemOrProtoValue(0, v);
+}
+
+inline void Object::value1(int v)
+{
+    itemOrProtoValue(1, v);
+}
+
+inline void Object::value2(int v)
+{
+    itemOrProtoValue(2, v);
+}
+
+inline void Object::value3(int v)
+{
+    itemOrProtoValue(3, v);
+}
+
+inline void Object::value4(int v)
+{
+    itemOrProtoValue(4, v);
+}
+
+inline int Object::value0() const
+{
+    return itemOrProtoValue(0);
+}
+
+inline int Object::value1() const
+{
+    return itemOrProtoValue(1);
+}
+
+inline int Object::value2() const
+{
+    return itemOrProtoValue(2);
+}
+
+inline int Object::value3() const
+{
+    return itemOrProtoValue(3);
+}
+
+inline int Object::value4() const
+{
+    return itemOrProtoValue(4);
 }
 
 

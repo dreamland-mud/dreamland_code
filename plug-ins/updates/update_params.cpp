@@ -144,7 +144,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     gain = gain * ch->in_room->heal_rate / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
-        gain = gain * ch->on->value[3] / 100;
+        gain = gain * ch->on->value3() / 100;
 
     if ( IS_AFFECTED(ch, AFF_POISON) )
         gain /= 4;
@@ -233,7 +233,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     gain = gain * min(400, ch->in_room->mana_rate) / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
-        gain = gain * min(400, ch->on->value[4]) / 100;
+        gain = gain * min(400, ch->on->value4()) / 100;
 
     if ( IS_AFFECTED( ch, AFF_POISON ) )
         gain /= 4;
@@ -300,7 +300,7 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
     gain = gain * ch->in_room->heal_rate/100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
-        gain = gain * ch->on->value[3] / 100;
+        gain = gain * ch->on->value3() / 100;
 
     if ( IS_AFFECTED(ch, AFF_POISON) )
         gain /= 4;

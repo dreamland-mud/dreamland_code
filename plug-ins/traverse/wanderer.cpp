@@ -57,7 +57,7 @@ bool Wanderer::canWander( Room *const room, Object *portal )
     if (!ch->can_see( portal ))
         return false;
         
-    if (IS_SET(portal->value[1], EX_LOCKED ))
+    if (IS_SET(portal->value1(), EX_LOCKED ))
         return false;
 
     return true;

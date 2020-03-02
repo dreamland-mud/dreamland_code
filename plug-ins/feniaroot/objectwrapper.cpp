@@ -375,18 +375,18 @@ NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия
 {
     checkTarget( );
     if (target->item_type == ITEM_WEAPON)
-        return Register((1 + target->value[2]) * target->value[1] / 2);
+        return Register((1 + target->value2()) * target->value1() / 2);
     return Register(0);
 }
 
 #define SETGETVALUE(x) \
     NMI_GET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
         checkTarget( ); \
-        return Register( target->value[x]); \
+        return Register( target->value##x() ); \
     } \
     NMI_SET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
         checkTarget( ); \
-        target->value[x] = arg.toNumber(); \
+        target->value##x(arg.toNumber()); \
     }
         
 SETGETVALUE(0)

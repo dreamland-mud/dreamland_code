@@ -163,10 +163,10 @@ bool Object::mustDisappear( Character *ch )
     if (ch->is_immortal( ))
         return false;
 
-    if (item_type == ITEM_KEY && value[0] == 0)
+    if (item_type == ITEM_KEY && value0() == 0)
         return true;
         
-    if (item_type == ITEM_MAP && !value[0])
+    if (item_type == ITEM_MAP && !value0())
         return true;
     
     if (wear_loc == wear_stuck_in || wear_loc == wear_hold_leg)

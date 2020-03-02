@@ -477,10 +477,10 @@ SKILL_RUNP( katana )
                 affect_to_obj( katana, &af );
 
                 if (ch->getModifyLevel() < 70 )
-                        katana->value[2] = 10;
+                        katana->value2(10);
                 else
                 {
-                        katana->value[2] = 10 + (ch->getModifyLevel()-70)/7;
+                        katana->value2(10 + (ch->getModifyLevel()-70)/7);
                 }
                 sprintf( buf,katana->pIndexData->extra_descr->description,ch->getNameP( ) );
                 katana->extra_descr = new_extra_descr();

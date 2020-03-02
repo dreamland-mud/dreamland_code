@@ -90,25 +90,25 @@ CMDRUN( fill )
     if (drink_is_closed( obj, ch ))
         return;
 
-    if (obj->value[1] != 0 && obj->value[2] != fountain->value[2]) {
+    if (obj->value1() != 0 && obj->value2() != fountain->value2()) {
         ch->pecho("В %O4 налита другая жидкость.", obj);
         return;
     }
 
-    if (obj->value[1] >= obj->value[0]) {
+    if (obj->value1() >= obj->value0()) {
         ch->pecho("%1$^O1 уже наполн%1$Gено|ен|на|ны до краев.", obj);
         return;
     }
     
-    liq = liquidManager->find( fountain->value[2] );
+    liq = liquidManager->find( fountain->value2() );
     ch->pecho( "Ты наполняешь %O4 %N5 из %O2.",
                obj, liq->getShortDescr( ).c_str( ), fountain );
     ch->recho( "%^C1 наполняет %O4 %N5 из %O2.",
                ch, obj, liq->getShortDescr( ).c_str( ), fountain );
 
-    amount = obj->value[0] - obj->value[1];
-    obj->value[2] = fountain->value[2];
-    obj->value[1] = obj->value[0];
+    amount = obj->value0() - obj->value1();
+    obj->value2(fountain->value2());
+    obj->value1(obj->value0());
 
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
         drink->fill( ch, fountain, amount );
@@ -136,7 +136,7 @@ void CPour::createPool( Character *ch, Object *out, int amount )
     if (time == 0) 
         return;
 
-    liqShort = liquidManager->find( out->value[2] )->getShortDescr( );
+    liqShort = liquidManager->find( out->value2() )->getShortDescr( );
     time = std::max( 2, time );
     pool = get_obj_room_vnum( room, OBJ_VNUM_POOL ); 
     
@@ -147,7 +147,7 @@ void CPour::createPool( Character *ch, Object *out, int amount )
         } 
         else { /* same liquid */ 
             pool->timer += time;
-            pool->value[0] = max( 1, pool->timer / 10 );
+            pool->value0(max( 1, pool->timer / 10 ));
             act( "Лужа $n2 растекается еще шире.", ch, liqShort.c_str( ), 0, TO_ALL );
             save_items(room);
             return;
@@ -164,7 +164,7 @@ void CPour::createPool( Character *ch, Object *out, int amount )
     pool->setMaterial( liqShort.ruscase( '1' ).c_str( ) );        
         
     pool->timer += time;
-    pool->value[0] = max( 1, pool->timer / 10 );
+    pool->value0(max( 1, pool->timer / 10 ));
 
     if (!pool->in_room)
         obj_to_room(pool, room);
@@ -177,17 +177,17 @@ void CPour::pourOut( Character *ch, Object * out )
     int amount;
     Room *room = ch->in_room;
 
-    if (out->value[1] == 0) {
+    if (out->value1() == 0) {
         act( "Ты переворачиваешь $o4, однако оттуда не выливается ни капли.", ch, out, 0, TO_CHAR );
         act( "Приговаривая 'ну котеночек, ну еще капельку', $c1 переворачивает и трясет $o5.", ch, out, 0, TO_ROOM );
         return;
     }
     
-    amount = out->value[1];
-    out->value[1] = 0;
-    out->value[3] = 0;
+    amount = out->value1();
+    out->value1(0);
+    out->value3(0);
    
-    Liquid *liq =  liquidManager->find( out->value[2] );
+    Liquid *liq =  liquidManager->find( out->value2() );
     const char *liqname = liq->getName( ).c_str( );
     DLString liqShort = liq->getShortDescr( );
 
@@ -236,11 +236,11 @@ void CPour::pourOut( Character *ch, Object * out, Character *victim )
     DLString msgRoom, msgVict, msgChar;
     DLString msgOther, msgSelf;
 
-    liquid = liquidManager->find( out->value[2] );
-    amount = out->value[1];
+    liquid = liquidManager->find( out->value2() );
+    amount = out->value1();
     sips = max( 1, amount / liquid->getSipSize( ) );
 
-    if (out->value[1] == 0) {
+    if (out->value1() == 0) {
         msgChar = "Ты опрокидываешь на %2$C4 %3$O4, однако оттуда не выливается ни капли.";
         msgVict = "%1$C1 переворачивает над тобой %3$O4, однако оттуда не выливается ни капли.";
         msgRoom = "%1$C1 переворачивает над %2$C5 %3$O4, однако оттуда не выливается ни капли.";
@@ -293,11 +293,11 @@ void CPour::pourOut( Character *ch, Object * out, Character *victim )
         }
     }
     
-    if (out->value[1] == 0)
+    if (out->value1() == 0)
         return;
 
-    out->value[1] = 0;
-    out->value[3] = 0;
+    out->value1(0);
+    out->value3(0);
     
     if (sips >= 5) {
         if (liq_water == liquid) {
@@ -374,7 +374,7 @@ COMMAND( CPour, "pour" )
     if (drink_is_closed( out, ch ))
         return;
     
-    liq = liquidManager->find( out->value[2] );
+    liq = liquidManager->find( out->value2() );
     
     if (arg2 == "out" || arg2.empty( )) {
         if (!arg3.empty( )) {
@@ -420,26 +420,26 @@ COMMAND( CPour, "pour" )
         return;
     }
 
-    if (in->value[1] != 0 && in->value[2] != out->value[2]) {
+    if (in->value1() != 0 && in->value2() != out->value2()) {
         ch->pecho("В %O4 налита другая жидкость.", in);
         return;
     }
 
-    if (out->value[1] == 0) {
+    if (out->value1() == 0) {
         act_p("В $o6 нет ничего, что можно вылить.",ch,out,0,TO_CHAR,POS_RESTING);
         return;
     }
 
-    if (in->value[1] >= in->value[0]) {
+    if (in->value1() >= in->value0()) {
         ch->pecho( "%1$^O1 уже полностью заполне%1$Gно|н|на|ны.", in );
         return;
     }
 
-    amount = min(out->value[1],in->value[0] - in->value[1]);
+    amount = min(out->value1(),in->value0() - in->value1());
 
-    in->value[1] += amount;
-    out->value[1] -= amount;
-    in->value[2] = out->value[2];
+    in->value1(in->value1() + amount);
+    out->value1(out->value1() - amount);
+    in->value2(out->value2());
 
     const char *liqShort = liq->getShortDescr( ).c_str( );
 
@@ -523,7 +523,7 @@ CMDRUN( drink )
         return;
 
     case ITEM_FOUNTAIN:
-        liquid = liquidManager->find( obj->value[2] );
+        liquid = liquidManager->find( obj->value2() );
         amount = liquid->getSipSize( ) * 3;
         break;
 
@@ -531,14 +531,14 @@ CMDRUN( drink )
         if (drink_is_closed( obj, ch ))
             return;
 
-        if (obj->value[1] <= 0) {
+        if (obj->value1() <= 0) {
             ch->send_to("Здесь пусто.\n\r");
             return;
         }
 
-        liquid = liquidManager->find( obj->value[2] );
+        liquid = liquidManager->find( obj->value2() );
         amount = liquid->getSipSize( );
-        amount = min(amount, obj->value[1]);
+        amount = min(amount, obj->value1());
         break;
     }
     
@@ -559,7 +559,7 @@ CMDRUN( drink )
         for (int i = 0; i < desireManager->size( ); i++)
             desireManager->find( i )->drink( ch->getPC( ), amount, liquid );
     
-    if (IS_SET( obj->value[3], DRINK_POISONED ) || obj->isAffected(gsn_poison))
+    if (IS_SET( obj->value3(), DRINK_POISONED ) || obj->isAffected(gsn_poison))
     {
         /* The drink was poisoned ! */
         Affect af;
@@ -574,8 +574,8 @@ CMDRUN( drink )
         affect_join( ch, &af );
     }
     
-    if (obj->value[0] > 0)
-        obj->value[1] -= amount;
+    if (obj->value0() > 0)
+        obj->value1(obj->value1() - amount);
 
     if (obj->behavior && ( drink = obj->behavior.getDynamicPointer<DrinkContainer>( ) ))
         drink->drink( ch, amount );

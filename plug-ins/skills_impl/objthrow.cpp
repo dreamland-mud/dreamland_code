@@ -52,7 +52,7 @@ static bool check_rock_catching( Character *victim, Object *obj )
 {
     if (obj->item_type != ITEM_WEAPON)
         return false;
-    if (obj->value[0] != WEAPON_STONE)
+    if (obj->value0() != WEAPON_STONE)
         return false;
     if (victim->size < SIZE_HUGE) 
         return false;
@@ -200,12 +200,12 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     int dam, sn, dam_type;
 
     if (arrow->item_type == ITEM_WEAPON)
-        dam_type = attack_table[arrow->value[3]].damage;
+        dam_type = attack_table[arrow->value3()].damage;
     else
         dam_type = DAM_BASH;
 
     sn = get_weapon_skill( arrow )->getIndex( );
-    dam = dice( arrow->value[1], arrow->value[2] );
+    dam = dice( arrow->value1(), arrow->value2() );
 
     if (ch->isAffected( gsn_accuracy ))
         dam *= 2;

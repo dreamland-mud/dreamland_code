@@ -51,15 +51,15 @@ bool PortalMovement::findTargetRoom( )
     if (targetVnum != 0) {
         to_room = get_room_index( targetVnum );
     }
-    else if (IS_SET(portal->value[2],GATE_RANDOM) || portal->value[3] == -1) {
+    else if (IS_SET(portal->value2(),GATE_RANDOM) || portal->value3() == -1) {
         to_room = get_random_room( ch );
-        portal->value[3] = to_room->vnum; /* keeps record */
+        portal->value3(to_room->vnum); /* keeps record */
     }
-    else if (IS_SET(portal->value[2], GATE_BUGGY) && (number_percent( ) < 5)) {
+    else if (IS_SET(portal->value2(), GATE_BUGGY) && (number_percent( ) < 5)) {
         to_room = get_random_room( ch );
     }
     else {
-        to_room = get_room_index( portal->value[3] );
+        to_room = get_room_index( portal->value3() );
     }
 
     if (to_room == 0) {
@@ -74,7 +74,7 @@ bool PortalMovement::findTargetRoom( )
 
 bool PortalMovement::isNormalExit( )
 {
-    return IS_SET(portal->value[2], GATE_NORMAL_EXIT);
+    return IS_SET(portal->value2(), GATE_NORMAL_EXIT);
 }
 
 bool PortalMovement::canLeaveMaster( Character *wch )
@@ -97,7 +97,7 @@ bool PortalMovement::tryMove( Character *wch )
 
 bool PortalMovement::checkCharges( )
 {
-    return portal->value[0] >= 0;
+    return portal->value0() >= 0;
 }
 
 int PortalMovement::move( )
@@ -105,12 +105,12 @@ int PortalMovement::move( )
     if (!moveRecursive( )) 
         return RC_MOVE_FAIL;
 
-    if (IS_SET(portal->value[2], GATE_GOWITH)) { 
+    if (IS_SET(portal->value2(), GATE_GOWITH)) { 
         obj_from_room( portal );
         obj_to_room( portal, to_room );
     }
 
-    if (portal->value[0] == -1) {
+    if (portal->value0() == -1) {
         portal->getRoom( )->echo( POS_RESTING, 
                                   "%^O1 медленно исчезает в дымке.", 
                                   portal );
@@ -131,16 +131,18 @@ bool PortalMovement::moveAtomic( )
     if (!Walkment::moveAtomic( ))
         return false;
 
-    if (portal->value[0] > 0) 
-        if (--portal->value[0] == 0)
-            portal->value[0] = -1;
+    if (portal->value0() > 0) {
+        portal->value0(portal->value0() - 1);
+        if (portal->value0() == 0)
+            portal->value0(-1);
+    }
 
     return true;
 }
 
 bool PortalMovement::checkClosedDoor( Character *wch )
 {
-    if (!IS_SET(portal->value[1], EX_CLOSED))
+    if (!IS_SET(portal->value1(), EX_CLOSED))
         return true;
         
     if (wch->get_trust( ) >= ANGEL)
@@ -176,7 +178,7 @@ bool PortalMovement::checkCurse( Character *wch )
     if (wch->get_trust( ) >= ANGEL)
         return true;
     
-    if (IS_SET(portal->value[2], GATE_NOCURSE))
+    if (IS_SET(portal->value2(), GATE_NOCURSE))
         return true;
     
     if (IS_AFFECTED(wch, AFF_CURSE)) {

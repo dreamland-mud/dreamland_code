@@ -307,10 +307,10 @@ void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf 
     Object *obj;
     
     if (container->item_type != ITEM_CONTAINER
-        || !IS_SET(container->value[1], CONT_WITH_POCKETS))
+        || !IS_SET(container->value1(), CONT_WITH_POCKETS))
         return;
 
-    if (IS_SET(container->value[1], CONT_PUT_ON|CONT_PUT_ON2))
+    if (IS_SET(container->value1(), CONT_PUT_ON|CONT_PUT_ON2))
         buf << "Отделения: " << endl;
     else if (!container->can_wear( ITEM_TAKE ))
         buf << "Полки: " << endl;
@@ -522,9 +522,9 @@ void show_char_position( Character *ch, Character *victim,
 
             if (!rc.empty( ))
                 buf << rc;
-            else if (IS_SET(victim->on->value[2], atFlag))
+            else if (IS_SET(victim->on->value2(), atFlag))
                 buf << "возле " << victim->on->getShortDescr( '2' );
-            else if (IS_SET(victim->on->value[2], onFlag))
+            else if (IS_SET(victim->on->value2(), onFlag))
                 buf << "на " << victim->on->getShortDescr( '6' );
             else
                 buf << "в " << victim->on->getShortDescr( '6' );
@@ -1614,50 +1614,50 @@ CMDRUNP( examine )
  *--------------------------------------------------------------------------*/
 static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
 {
-    if (obj->value[0] == 0)
+    if (obj->value0() == 0)
     {
-        if (obj->value[1] == 0)
+        if (obj->value1() == 0)
                 ch->printf("Жаль... но здесь нет золота.\n\r");
-        else if (obj->value[1] == 1)
+        else if (obj->value1() == 1)
                 ch->printf("Ух-ты. Одна золотая монетка!\n\r");
         else
                 ch->printf("Здесь %d золот%s.\n\r",
-                        obj->value[1],GET_COUNT(obj->value[1], "ая монета","ые монеты","ых монет"));
+                        obj->value1(),GET_COUNT(obj->value1(), "ая монета","ые монеты","ых монет"));
     }
-    else if (obj->value[1] == 0)
+    else if (obj->value1() == 0)
     {
-        if (obj->value[0] == 1)
+        if (obj->value0() == 1)
                 ch->printf("Ух-ты. Одна серебряная монетка.\n\r");
         else
                 ch->printf("Здесь %d серебрян%s.\n\r",
-                        obj->value[0],GET_COUNT(obj->value[0], "ая монета","ые монеты","ых монет"));
+                        obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
     }
     else
         ch->printf("Здесь %d золот%s и %d серебрян%s.\n\r",
-                obj->value[1],GET_COUNT(obj->value[1], "ая","ые","ых"),
-                obj->value[0],GET_COUNT(obj->value[0], "ая монета","ые монеты","ых монет"));
+                obj->value1(),GET_COUNT(obj->value1(), "ая","ые","ых"),
+                obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
     return true;
 }
 
 static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLString& )
 {
-    if (IS_SET(obj->value[3], DRINK_CLOSED)) {
+    if (IS_SET(obj->value3(), DRINK_CLOSED)) {
         ch->println("Эта емкость закрыта.");
         return true;
     }
 
-    if (obj->value[1] <= 0) {
+    if (obj->value1() <= 0) {
         ch->println( "Тут пусто." );
         return true;
     }
 
     ch->printf( "%s наполнен жидкостью %s цвета.\n\r",
-                obj->value[1] < obj->value[0] / 4 ? 
+                obj->value1() < obj->value0() / 4 ? 
                     "Меньше, чем до половины" :
-                    obj->value[1] < 3 * obj->value[0] / 4 ? 
+                    obj->value1() < 3 * obj->value0() / 4 ? 
                         "До половины"  : 
                         "Больше, чем до половины",
-                liquidManager->find( obj->value[2] )->getColor( ).ruscase( '2' ).c_str( )
+                liquidManager->find( obj->value2() )->getColor( ).ruscase( '2' ).c_str( )
               );
     return true;
 }
@@ -1671,13 +1671,13 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 {
     ContainerKeyhole( ch, obj ).doExamine( );
 
-    if (IS_SET(obj->value[1], CONT_CLOSED)) {
+    if (IS_SET(obj->value1(), CONT_CLOSED)) {
         ch->println( "Тут закрыто." );
         return true;
     }
     
     if (!pocket.empty( )) {
-        if (!IS_SET(obj->value[1], CONT_WITH_POCKETS)) {
+        if (!IS_SET(obj->value1(), CONT_WITH_POCKETS)) {
             ch->println( "Ты не видишь здесь ни одного кармана." );
             return true;
         }
@@ -1685,7 +1685,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     
     const char *p = pocket.c_str( );
 
-    if (IS_SET(obj->value[1],CONT_PUT_ON|CONT_PUT_ON2)) {
+    if (IS_SET(obj->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
         if (!pocket.empty( ))
             ch->pecho( "Отделение '%2$s' %1$O2 содержит:", obj, p );
         else

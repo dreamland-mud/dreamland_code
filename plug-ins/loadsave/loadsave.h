@@ -116,10 +116,10 @@ bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long l
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );
 
-#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value[4],(stat)))
+#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value4(),(stat)))
 
 #define IS_PIT(obj)        (obj->item_type == ITEM_CONTAINER \
-                            && IS_SET(obj->value[1], CONT_PIT))
+                            && IS_SET(obj->value1(), CONT_PIT))
 
 #define IS_CHARMED(ch)  (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL)
 #endif

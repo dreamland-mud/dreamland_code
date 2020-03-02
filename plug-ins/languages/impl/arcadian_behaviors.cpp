@@ -86,7 +86,7 @@ void ArcadianDrinkBehavior::pourOut( Character *ch, int amount )
 
 void ArcadianDrinkBehavior::pour( Character *ch, Object *destination, int amount )
 {
-    if (obj->value[1] == 0)
+    if (obj->value1() == 0)
         cleanup( );
 }
 
@@ -116,7 +116,7 @@ void ArcadianDrinkBehavior::drink( Character *ch, int amount )
     
     drinkEffect->onDrink( this, ch, amount );
 
-    if (obj->value[1] == 0)
+    if (obj->value1() == 0)
         cleanup( );
 }
 

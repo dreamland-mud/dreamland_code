@@ -57,13 +57,13 @@ void Excalibur::equip( Character *ch )
 {
   short level = ch->getModifyLevel();
 
-  if ( level > 20 && level <= 30)        obj->value[2] = 4;
-  else if ( level > 30 && level <= 40)   obj->value[2] = 5;
-  else if ( level > 40 && level <= 50)   obj->value[2] = 6;
-  else if ( level > 50 && level <= 60)   obj->value[2] = 8;
-  else if ( level > 60 && level <= 70)   obj->value[2] = 10;
-  else if ( level > 70 && level <= 80)   obj->value[2] = 11;
-  else obj->value[2] = 12;
+  if ( level > 20 && level <= 30)        obj->value2(4);
+  else if ( level > 30 && level <= 40)   obj->value2(5);
+  else if ( level > 40 && level <= 50)   obj->value2(6);
+  else if ( level > 50 && level <= 60)   obj->value2(8);
+  else if ( level > 60 && level <= 70)   obj->value2(10);
+  else if ( level > 70 && level <= 80)   obj->value2(11);
+  else obj->value2(12);
 }
 
 void Excalibur::remove( Character *ch )
@@ -177,15 +177,15 @@ void TwoSnakeWhip::equip( Character *ch )
 {
   short level = ch->getModifyLevel();
 
-  if (  level <= 10)                        obj->value[2] = 3;
-  else if ( level > 10 && level <= 20)   obj->value[2] = 4;
-  else if ( level > 20 && level <= 30)   obj->value[2] = 5;
-  else if ( level > 30 && level <= 40)   obj->value[2] = 6;
-  else if ( level > 40 && level <= 50)   obj->value[2] = 7;
-  else if ( level > 50 && level <= 60)   obj->value[2] = 8;
-  else if ( level > 60 && level <= 70)   obj->value[2] = 9;
-  else if ( level > 70 && level <= 80)   obj->value[2] = 10;
-  else obj->value[2] = 11;
+  if (  level <= 10)                        obj->value2(3);
+  else if ( level > 10 && level <= 20)   obj->value2(4);
+  else if ( level > 20 && level <= 30)   obj->value2(5);
+  else if ( level > 30 && level <= 40)   obj->value2(6);
+  else if ( level > 40 && level <= 50)   obj->value2(7);
+  else if ( level > 50 && level <= 60)   obj->value2(8);
+  else if ( level > 60 && level <= 70)   obj->value2(9);
+  else if ( level > 70 && level <= 80)   obj->value2(10);
+  else obj->value2(11);
   return;
 }
 
@@ -388,13 +388,13 @@ void SwordOfSun::equip( Character *ch )
 {
   short level = ch->getModifyLevel();
 
-  if ( level > 20 && level <= 30)        obj->value[2] = 4;
-  else if ( level > 30 && level <= 40)   obj->value[2] = 5;
-  else if ( level > 40 && level <= 50)   obj->value[2] = 6;
-  else if ( level > 50 && level <= 60)   obj->value[2] = 8;
-  else if ( level > 60 && level <= 70)   obj->value[2] = 10;
-  else if ( level > 70 && level <= 80)   obj->value[2] = 11;
-  else obj->value[2] = 12;
+  if ( level > 20 && level <= 30)        obj->value2(4);
+  else if ( level > 30 && level <= 40)   obj->value2(5);
+  else if ( level > 40 && level <= 50)   obj->value2(6);
+  else if ( level > 50 && level <= 60)   obj->value2(8);
+  else if ( level > 60 && level <= 70)   obj->value2(10);
+  else if ( level > 70 && level <= 80)   obj->value2(11);
+  else obj->value2(12);
 }
 
 void SwordOfSun::fight( Character *ch )

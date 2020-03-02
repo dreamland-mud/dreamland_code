@@ -271,7 +271,7 @@ Object * CWrite::findNail( Character *ch )
         return nail;
         
     if (nail->item_type == ITEM_WEAPON)
-        switch (attack_table[nail->value[3]].damage) {
+        switch (attack_table[nail->value3()].damage) {
         case DAM_PIERCE:
         case DAM_SLASH:
             return nail;

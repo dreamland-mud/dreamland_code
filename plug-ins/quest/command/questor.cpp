@@ -256,7 +256,13 @@ void Questor::doFind( PCharacter *client )
 
 bool Questor::canWander( Room *const room, EXIT_DATA *exit )
 {
-    return exit->u1.to_room->isCommon( );
+    if (!exit->u1.to_room->isCommon())
+        return false;
+        
+    if (IS_SET(exit->u1.to_room->room_flags, ROOM_NO_QUEST))
+        return false;
+
+    return true;
 }
 
 bool Questor::canWander( Room *const room, EXTRA_EXIT_DATA *eexit )

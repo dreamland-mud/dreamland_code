@@ -360,8 +360,8 @@ void HunterWeapon::wear( Character *ch )
 
     for (i = 0; i < size; i++) 
         if (obj->level <= params[i].level) {
-            obj->value[1] = params[i].value1;
-            obj->value[2] = params[i].value2;
+            obj->value1(params[i].value1);
+            obj->value2(params[i].value2);
             break;
         }
 
@@ -413,7 +413,7 @@ void HunterWeapon::fight( Character *ch )
     if (number_percent( ) >= 25)
         return;
 
-    switch (obj->value[0]) {
+    switch (obj->value0()) {
     case WEAPON_SWORD:        fight_sword( ch );  return;
     case WEAPON_MACE:        fight_mace( ch );   return;
     case WEAPON_AXE:        fight_axe( ch );    return;

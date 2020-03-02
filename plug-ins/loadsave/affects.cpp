@@ -46,7 +46,7 @@ void affect_remove_obj( Object *obj, Affect *paf )
             break;
         case TO_WEAPON:
             if (obj->item_type == ITEM_WEAPON)
-                REMOVE_BIT(obj->value[4],paf->bitvector);
+                obj->value4(obj->value4() & ~paf->bitvector);
             break;
         }
 
@@ -97,7 +97,7 @@ void affect_to_obj( Object *obj, Affect *paf )
             break;
         case TO_WEAPON:
             if (obj->item_type == ITEM_WEAPON)
-                SET_BIT(obj->value[4],paf->bitvector);
+                obj->value4(obj->value4() | paf->bitvector);
             break;
         }
 }

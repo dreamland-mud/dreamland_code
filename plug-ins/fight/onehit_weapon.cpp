@@ -55,7 +55,7 @@ void WeaponOneHit::init( )
     skill = 20 + weaponSkill->getEffective( ch );
     
     if (wield) 
-        attack = wield->value[3];
+        attack = wield->value3();
     else 
         attack = ch->dam_type;
 
@@ -82,7 +82,7 @@ void WeaponOneHit::damBase( )
         weaponSkill->improve( ch, true, victim, dam_type, dam_flag );
 
     if (wield) {
-        dam = dice(wield->value[1], wield->value[2]) * skill / 100;
+        dam = dice(wield->value1(), wield->value2()) * skill / 100;
 
         damApplyShield( );
         damApplySharp( );

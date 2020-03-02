@@ -1044,7 +1044,7 @@ NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(liqname): вернет емк�
 
     list< ::Object *> drinks = ::get_objs_list_type(target, ITEM_DRINK_CON, target->carrying);
     for (list< ::Object *>::iterator o = drinks.begin(); o != drinks.end(); o++)
-        if (liquidManager->find((*o)->value[2]) == liquid)
+        if (liquidManager->find((*o)->value2()) == liquid)
             return wrap(*o);
 
     return Register();
@@ -1057,7 +1057,7 @@ NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(flag): вернет рецеп
     bitstring_t flag = args2number(args);
     list< ::Object *> recipes = ::get_objs_list_type(target, ITEM_RECIPE, target->carrying);
     for (list< ::Object *>::iterator o = recipes.begin(); o != recipes.end(); o++)
-        if (IS_SET((*o)->value[0], flag))
+        if (IS_SET((*o)->value0(), flag))
             return wrap(*o);
 
     return Register();
@@ -2160,8 +2160,8 @@ NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок та
     ::Object *obj = arg2item( args.front( ) );
 
     if (obj->item_type == ITEM_FOOD) {
-        desire_hunger->eat( target->getPC( ), obj->value[0] * 2 );
-        desire_full->eat( target->getPC( ), obj->value[1] * 2 );
+        desire_hunger->eat( target->getPC( ), obj->value0() * 2 );
+        desire_full->eat( target->getPC( ), obj->value1() * 2 );
     }
 
     return Register( );
@@ -2180,7 +2180,7 @@ NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желу�
     amount = args.back( ).toNumber( );
 
     if (obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOUNTAIN) {
-        Liquid *liq = liquidManager->find( obj->value[2] );
+        Liquid *liq = liquidManager->find( obj->value2() );
 
         desire_full->drink( target->getPC( ), amount, liq );
         desire_thirst->drink( target->getPC( ), amount, liq );

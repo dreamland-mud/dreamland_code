@@ -412,13 +412,13 @@ void ExitsMovement::msgOnMove( Character *wch, bool fLeaving )
             int ncase = 0;
             DLString part, prep;
                     
-            switch (boat->value[1]) {
+            switch (boat->value1()) {
             case POS_RESTING:  part = "лежа"; break;
             case POS_SITTING:  part = "сидя"; break;
             case POS_STANDING: part = "стоя"; break;
             }
             
-            switch (boat->value[2]) {
+            switch (boat->value2()) {
             case PUT_IN:     prep = "в";      ncase = 6; break;
             case PUT_ON:     prep = "на";     ncase = 6; break;
             case PUT_AT:     prep = "у";      ncase = 2; break;
@@ -451,7 +451,7 @@ int ExitsMovement::adjustMovetype( Character *wch )
         switch (boat_type) {
         case BOAT_INV:
         case BOAT_EQ:
-            return boat->value[0];
+            return boat->value0();
 
         case BOAT_FLY:
             return MOVETYPE_FLYING;

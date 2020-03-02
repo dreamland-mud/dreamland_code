@@ -1157,57 +1157,57 @@ void oset( Character* ch, char* argument )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[0], value_add );
-                                REMOVE_BIT( obj->value[0], value_sub );
+                                obj->value0(obj->value0() | value_add );
+                                obj->value0(obj->value0() & ~value_sub );
                         }
                         else
-                                obj->value[0] = value;
+                                obj->value0(value);
 
-                        obj->value[0] = min(101,obj->value[0]);
+                        obj->value0(min(101,obj->value0()));
                 }
                 else
                 if ( !str_cmp( arg2, "value1" ) || !str_cmp( arg2, "v1" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[1], value_add );
-                                REMOVE_BIT( obj->value[1], value_sub );
+                                obj->value1(obj->value1() | value_add );
+                                obj->value1(obj->value1() & ~value_sub );
                         }
                         else
-                                obj->value[1] = value;
+                                obj->value1(value);
                 }
                 else
                 if ( !str_cmp( arg2, "value2" ) || !str_cmp( arg2, "v2" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[2], value_add );
-                                REMOVE_BIT( obj->value[2], value_sub );
+                                obj->value2(obj->value2() | value_add );
+                                obj->value2(obj->value2() & ~value_sub );
                         }
                         else
-                                obj->value[2] = value;
+                                obj->value2(value);
                 }
                 else
                 if ( !str_cmp( arg2, "value3" ) || !str_cmp( arg2, "v3" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[3], value_add );
-                                REMOVE_BIT( obj->value[3], value_sub );
+                                obj->value3(obj->value3() | value_add );
+                                obj->value3(obj->value3() & ~value_sub );
                         }
                         else
-                                obj->value[3] = value;
+                                obj->value3(value);
                 }
                 else
                 if ( !str_cmp( arg2, "value4" ) || !str_cmp( arg2, "v4" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[4], value_add );
-                                REMOVE_BIT( obj->value[4], value_sub );
+                                obj->value4(obj->value4() | value_add );
+                                obj->value4(obj->value4() & ~value_sub );
                         }
                         else
-                                obj->value[4] = value;
+                                obj->value4(value);
                 }
                 else
                 if ( !str_prefix( arg2, "extra" ) )

@@ -210,7 +210,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     /* portal one */
     portal = create_object(get_obj_index(vnum),0);
     portal->timer = 1 + level / 5;
-    portal->value[3] = to_room->vnum;
+    portal->value3(to_room->vnum);
 
     obj_to_room(portal,from_room);
 
@@ -224,7 +224,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     /* portal two */
     portal = create_object(get_obj_index(vnum),0);
     portal->timer = 1 + level / 5;
-    portal->value[3] = from_room->vnum;
+    portal->value3(from_room->vnum);
 
     obj_to_room(portal,to_room);
 
@@ -279,7 +279,7 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     portal = create_object(get_obj_index(vnum),0);
     portal->timer = 2 + level / 8;
-    portal->value[3] = victim->in_room->vnum;
+    portal->value3(victim->in_room->vnum);
 
     obj_to_room(portal,ch->in_room);
 

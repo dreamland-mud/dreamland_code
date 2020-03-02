@@ -250,7 +250,7 @@ static bool is_lantern(Object *obj)
         return false;
         
     // Expired lanterns don't count.
-    if (obj->value[2] == 0)
+    if (obj->value2() == 0)
         return false;
 
     // Worn item is ok.

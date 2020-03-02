@@ -35,7 +35,7 @@ bool BasicMobileBehavior::canAggressDistanceRanger( )
     if (gsn_bow->usable( ch )
         && ( wield = get_eq_char( ch, wear_wield ) )
         && wield->item_type == ITEM_WEAPON
-        && wield->value[0] == WEAPON_BOW)
+        && wield->value0() == WEAPON_BOW)
     {
         return true;
     }

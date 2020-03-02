@@ -615,7 +615,7 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
                         return;
                 }
                 
-                SET_BIT(obj->value[3], DRINK_POISONED);
+                obj->value3(obj->value3() | DRINK_POISONED);
                 act_p("Пары яда проникают в $o4.",ch,obj,0,TO_ALL,POS_RESTING);
                 return;
         }

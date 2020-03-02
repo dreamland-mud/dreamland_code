@@ -34,8 +34,8 @@ bool MidgaardFountain::area( ) {
     wch = obj->in_room->people; 
 
     if (count < 3) {
-        if (obj->value[2] != obj->pIndexData->value[2] && obj->value[2] == liq_blood) {
-            obj->value[2] = obj->pIndexData->value[2];
+        if (obj->value2() != obj->pIndexData->value[2] && obj->value2() == liq_blood) {
+            obj->value2(obj->pIndexData->value[2]);
 
             if (wch)
                 act_p("Кровь в $o6 снова превращается в воду..", wch, obj, 0, TO_ALL, POS_RESTING);
@@ -43,8 +43,8 @@ bool MidgaardFountain::area( ) {
         return false;
     }
 
-    if (obj->value[2] == obj->pIndexData->value[2]) {
-        obj->value[2] = liq_blood;
+    if (obj->value2() == obj->pIndexData->value[2]) {
+        obj->value2(liq_blood);
         
         if (wch) 
             act_p("Вода в $o6 медленно окрашивается {rкрасным{x.", wch, obj, 0, TO_ALL, POS_RESTING);

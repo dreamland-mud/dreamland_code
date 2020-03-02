@@ -140,7 +140,7 @@ COMMAND(CChop, "chop")
         return;
     }
 
-    if (!IS_SET(corpse->value[2], part)) {
+    if (!IS_SET(corpse->value2(), part)) {
         ch->pecho( "У этого трупа нету %s.", 
                    part_flags.messages( part, true, '2' ).c_str( ) );
         return;
@@ -151,12 +151,12 @@ COMMAND(CChop, "chop")
         return;
     }
 
-    if (axe->value[3] != DAMW_SLASH && axe->value[3] != DAMW_CHOP && axe->value[3] != DAMW_SLICE) {
+    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE) {
         ch->println( "Твоим оружием неудобно это делать." );
         return;
     }
 
-    REMOVE_BIT(corpse->value[2], part);
+    corpse->value2(corpse->value2() & ~part);
     ch->setWait( gsn_trophy->getBeats( ) / 2 );
 
     DLString what = part_flags.messages( part, true, '4' );
@@ -311,10 +311,10 @@ SKILL_RUNP( trophy )
             af.modifier        = level > 20 ? 2 : 1;
             affect_to_obj( trophy, &af );
 
-            trophy->value[0] = ch->getModifyLevel();
-            trophy->value[1] = ch->getModifyLevel();
-            trophy->value[2] = ch->getModifyLevel();
-            trophy->value[3] = ch->getModifyLevel();
+            trophy->value0(ch->getModifyLevel());
+            trophy->value1(ch->getModifyLevel());
+            trophy->value2(ch->getModifyLevel());
+            trophy->value3(ch->getModifyLevel());
 
 
             obj_to_char(trophy, ch);

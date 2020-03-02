@@ -197,7 +197,7 @@ SKILL_RUNP( cleave )
         return;
     }
 
-    if (attack_table[obj->value[3]].damage != DAM_SLASH) {
+    if (attack_table[obj->value3()].damage != DAM_SLASH) {
         ch->send_to("Чтобы рассечь кого-то, нужно вооружится режущим оружием.\n\r");
         return;
     }
@@ -322,8 +322,8 @@ void ShadowBlade::fight( Character *ch )
                 }
             }
             
-            obj->value[1] = std::max( obj->value[1], p->value1 );
-            obj->value[2] = std::max( obj->value[2], p->value2 );
+            obj->value1(std::max( obj->value1(), p->value1 ));
+            obj->value2(std::max( obj->value2(), p->value2 ));
             obj->level = ch->getModifyLevel( );
             act("{cСлабое {Cсияние{c окутывает $o4.{x", ch, obj, 0, TO_CHAR);
         }
@@ -550,8 +550,8 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     bhv->owner = ch->getName( );
     
     param = find_blade_param( ch->getModifyLevel( ) );
-    blade->value[1] = param->value1;
-    blade->value[2] = param->value2;
+    blade->value1(param->value1);
+    blade->value2(param->value2);
 
     af.where = TO_OBJECT;
     af.type = sn;

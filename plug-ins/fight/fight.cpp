@@ -213,7 +213,7 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     
     weapon = get_eq_char(ch, wear_second_wield);
     if (weapon && weapon->item_type == ITEM_WEAPON)
-        index = weapon->value[0] + 1;
+        index = weapon->value0() + 1;
   
     int chance_modifier = 18;
  

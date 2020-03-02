@@ -69,18 +69,18 @@ void get_money_here( Object *list, int &gold, int &silver )
             break;
 
         case OBJ_VNUM_SILVER_SOME:
-            silver += obj->value[0];
+            silver += obj->value0();
             extract_obj(obj);
             break;
 
         case OBJ_VNUM_GOLD_SOME:
-            gold += obj->value[1];
+            gold += obj->value1();
             extract_obj( obj );
             break;
 
         case OBJ_VNUM_COINS:
-            silver += obj->value[0];
-            gold += obj->value[1];
+            silver += obj->value0();
+            gold += obj->value1();
             extract_obj(obj);
             break;
         }
@@ -113,7 +113,7 @@ Object *create_money( int gold, int silver )
     {
         obj = create_object( get_obj_index( OBJ_VNUM_GOLD_SOME ), 0 );
         obj->fmtShortDescr( obj->getShortDescr( ), gold );
-        obj->value[1]           = gold;
+        obj->value1(gold);
         obj->cost               = gold;
         obj->weight                = gold/5;
     }
@@ -121,7 +121,7 @@ Object *create_money( int gold, int silver )
     {
         obj = create_object( get_obj_index( OBJ_VNUM_SILVER_SOME ), 0 );
         obj->fmtShortDescr( obj->getShortDescr( ), silver );
-        obj->value[0]           = silver;
+        obj->value0(silver);
         obj->cost               = silver;
         obj->weight                = silver/20;
     }
@@ -130,8 +130,8 @@ Object *create_money( int gold, int silver )
     {
         obj = create_object( get_obj_index( OBJ_VNUM_COINS ), 0 );
         obj->fmtShortDescr( obj->getShortDescr( ), silver, gold );
-        obj->value[0]                = silver;
-        obj->value[1]                = gold;
+        obj->value0(silver);
+        obj->value1(gold);
         obj->cost                = 100 * gold + silver;
         obj->weight                = gold / 5 + silver / 20;
     }
