@@ -105,7 +105,8 @@ static bool item_is_home(Object *obj)
             return true;
 
         // Deal with the timer once the corpse is decayed or item removed.
-        if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+        if (obj->in_obj->item_type == ITEM_CORPSE_PC 
+                || obj->in_obj->item_type == ITEM_CORPSE_NPC)
             return true;
 
         return false;
@@ -142,13 +143,14 @@ void limit_ground_decay(Object *obj)
     if (obj->pIndexData->limit < 0)
         return;
 
+    // Don't touch items in their reset places or inside corpses.
+    if (item_is_home(obj))
+        return;
+
     // Check limited items  without a timer.
     // Example: spec_fido mob destroys a coprse, limited item falls on the ground.
     // Example: object becomes a limit after OLC changes.
     if (obj->timestamp <= 0) {
-        if (item_is_home(obj))
-            return;
-
         limit_timestamp(obj, 0);
         save_items_at_holder(obj);
         return;
