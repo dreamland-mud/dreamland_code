@@ -522,14 +522,14 @@ static bool get_value4_from_proto(const Object *obj)
     return false;
 }
 
-static bool get_value_from_proto(const Object *obj, int index)
+bool Object::getsValueFromProto(int index) const
 {
     switch (index) {
-        case 0: return get_value0_from_proto(obj);
-        case 1: return get_value1_from_proto(obj);
-        case 2: return get_value2_from_proto(obj);
-        case 3: return get_value3_from_proto(obj);
-        case 4: return get_value4_from_proto(obj);
+        case 0: return get_value0_from_proto(this);
+        case 1: return get_value1_from_proto(this);
+        case 2: return get_value2_from_proto(this);
+        case 3: return get_value3_from_proto(this);
+        case 4: return get_value4_from_proto(this);
         default:
             return false;        
     }
@@ -537,15 +537,11 @@ static bool get_value_from_proto(const Object *obj, int index)
 
 int Object::itemOrProtoValue(int index) const
 {
-    return get_value_from_proto(this, index) ? pIndexData->value[index] : value[index];
+    return getsValueFromProto(index) ? pIndexData->value[index] : value[index];
 }
 
 void Object::itemOrProtoValue(int index, int v)
 {
-    if (get_value_from_proto(this, index))
-        warn("Object::value%d set value will be ignored for [%d], value [%d]", 
-              index, pIndexData->vnum, v);
-
     value[index] = v;
 }
 
@@ -562,6 +558,7 @@ int Object::valueByIndex(int index) const
             bug("Object::valueByIndex invalid index [%d] for [%d]", index, pIndexData->vnum);
             break;
     }
+    return -1;
 }
 
 void Object::valueByIndex(int index, int value)

@@ -212,7 +212,7 @@ void OLCStateObject::commit()
                 o->cost = obj.cost;
            
             for (int i = 0; i < 5; i++)
-                if (o->valueByIndex(i) == original->value[i])
+                if (o->getsValueFromProto(i) && o->valueByIndex(i) == original->value[i])
                     o->valueByIndex(i, obj.value[i]);
         }
     

@@ -185,6 +185,8 @@ public:
 
     int valueByIndex(int index) const;
     void valueByIndex(int index, int value);
+    bool getsValueFromProto(int index) const;
+
 protected:
     int itemOrProtoValue(int index) const;
     void itemOrProtoValue(int index, int value);
