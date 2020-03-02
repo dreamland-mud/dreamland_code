@@ -188,8 +188,8 @@ CMDRUNP( smell )
             return;
         }
 
-        if (obj->item_type == ITEM_DRINK_CON && obj->value[1] > 0) {
-            Liquid *liq = liquidManager->find(obj->value[2]);
+        if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0) {
+            Liquid *liq = liquidManager->find(obj->value2());
             if (oprog_smell_liquid(liq, ch))
                 return;
         }
