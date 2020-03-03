@@ -254,7 +254,6 @@ plug-ins/output/Makefile \
 plug-ins/follow/Makefile \
 plug-ins/follow/core/Makefile \
 plug-ins/follow/command/Makefile \
-plug-ins/debug/Makefile \
 plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \
