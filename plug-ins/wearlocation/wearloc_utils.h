@@ -14,6 +14,9 @@
 #define unequip_char(ch, obj)            obj->wear_loc->unequip( obj )
 #define wear_obj(ch, obj, flags )   wearlocationManager->wear( obj, flags )
 
+// True if an item is worn in a non-decorative wearlocation. Can be improved by adding new method to Wearloc class.
+bool obj_is_worn(Object *obj);
+
 // most commonly used wearlocs 
 #ifndef _WEARLOC_
 #   define _WEARLOC_( name ) extern WearlocationReference wear_##name;

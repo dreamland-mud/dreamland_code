@@ -58,6 +58,7 @@ protected:
     virtual void affectsOnEquip( Character *ch, Object *obj );
     bool canEquip( Character *ch, Object *obj );
     void triggersOnEquip( Character *ch, Object *obj );
+    virtual void triggersOnWear( Character *ch, Object *obj );
 
     virtual void affectsOnUnequip( Character *ch, Object *obj );
     void triggersOnUnequip( Character *ch, Object *obj );

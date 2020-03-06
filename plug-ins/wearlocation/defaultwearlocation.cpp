@@ -379,6 +379,11 @@ int DefaultWearlocation::wear( Object *obj, int flags )
     return RC_WEAR_NOREPLACE;
 }
 
+void DefaultWearlocation::triggersOnWear( Character *ch, Object *obj )
+{
+    oprog_wear( obj, ch );
+}
+
 bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     if (canWear( ch, flags )) {
@@ -387,7 +392,7 @@ bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
             ch->recho( msgRoomWear.c_str( ), ch, obj );
         }
 
-        oprog_wear( obj, ch );
+        triggersOnWear(ch, obj);
         equip( obj );
         return true;
     }

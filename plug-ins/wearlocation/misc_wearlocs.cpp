@@ -22,6 +22,10 @@
 GSN(second_weapon);
 GSN(hand_to_hand);
 
+WEARLOC(tail);
+WEARLOC(hair);
+
+
 /*
  * stuck-in
  */
@@ -302,7 +306,7 @@ bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 }
 
 /*
- * tair 
+ * tail 
  */
 bool TailWearloc::equip( Character *ch, Object *obj )
 {
@@ -332,4 +336,15 @@ int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );
+}
+
+/*
+ * utils
+ */
+
+bool obj_is_worn(Object *obj)
+{
+    return obj->wear_loc != wear_none 
+            && obj->wear_loc != wear_tail
+            && obj->wear_loc != wear_hair;
 }

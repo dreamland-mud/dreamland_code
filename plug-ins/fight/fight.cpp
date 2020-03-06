@@ -80,13 +80,14 @@
 #include "gsn_plugin.h"
 #include "race.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "effects.h"
 #include "wiznet.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act_move.h"
 #include "magic.h"
 #include "vnum.h"
+#include "wearloc_utils.h"
 
 #include "onehit_undef.h"
 #include "damage_impl.h"
@@ -170,7 +171,7 @@ void violence_update( )
         {
             obj_next = obj->next_content;
 
-            if( ch->fighting )
+            if( ch->fighting && obj_is_worn(obj))
                 oprog_fight( obj, ch );
         }
 

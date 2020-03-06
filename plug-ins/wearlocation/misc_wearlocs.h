@@ -45,6 +45,7 @@ public:
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
+    virtual void triggersOnWear( Character *ch, Object *obj ) { }
 };
 
 class WieldWearloc : public DefaultWearlocation {
@@ -90,5 +91,6 @@ public:
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
+    virtual void triggersOnWear( Character *ch, Object *obj ) { }
 };
 #endif
