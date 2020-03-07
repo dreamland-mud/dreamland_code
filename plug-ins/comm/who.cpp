@@ -401,9 +401,10 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
     PCharacter dummy;
     dummy.config.setBit(CONFIG_RUCOMMANDS);
     
-    list<PCharacter *> players = who_find_online(0);
+    list<PCharacter *> online = who_find_online(0);
+    list<PCMemoryInterface *> offline = who_find_offline(0);
 
-    for (const auto &victim: players) {
+    for (const auto &victim: online) {
         Json::Value wch;
 
         wch["name"]["en"] = victim->getName();
@@ -426,5 +427,13 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         body["people"].append(wch);
     }
 
-    body["total"] = body["people"].size();
+    for (const auto &victim: offline) {
+        Json::Value wch;
+
+        wch["name"]["en"] = victim->getName();
+        wch["name"]["ru"] = victim->getRussianName().decline('1');
+        body["discord"].append(wch);
+    }
+
+    body["total"] = (int)(online.size() + offline.size());
 }
