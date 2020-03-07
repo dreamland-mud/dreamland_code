@@ -408,6 +408,7 @@ const char * Descriptor::getRealHost( ) const
 Descriptor *descriptor_list;
 
 int Descriptor::max_online = 0;
+int Descriptor::max_offline = 0;
 
 void Descriptor::updateMaxOnline( )
 {
@@ -423,8 +424,19 @@ void Descriptor::updateMaxOnline( )
 
 int Descriptor::getMaxOnline( )
 {
-    return max( 5, max_online );
+    return max_online;
 }
+
+void Descriptor::updateMaxOffline(int newValue)
+{
+    max_offline = max(max_offline, newValue);
+}
+
+int Descriptor::getMaxOffline()
+{
+    return max_offline;
+}
+
 
 void Descriptor::echoOff( )
 {

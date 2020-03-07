@@ -172,9 +172,12 @@ public:
 
 private:
     static int max_online;
+    static int max_offline;
 public:
     static void updateMaxOnline( );
     static int getMaxOnline( );
+    static void updateMaxOffline(int newValue);
+    static int getMaxOffline();
 };
 
 extern Descriptor *descriptor_list;
