@@ -1070,9 +1070,7 @@ SKILL_RUNP( backstab )
                         if (ch->fighting == victim)
                             BackstabOneHit( ch, victim ).hit( );
                     }
-            }
-
-		else {
+					else {
 
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
@@ -1092,6 +1090,30 @@ SKILL_RUNP( backstab )
                 gsn_dual_backstab->improve( ch, false, victim );
 				}
 			}
+            }
+			
+			else {
+
+            int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
+            if (ch->is_npc())
+                dual_chance = 0;
+            else if (fBonus && dual_percent > 50)
+                dual_chance = 100;
+            else
+                dual_chance =  dual_percent * 8 / 10;
+
+            if (Chance(ch, dual_chance-1, 100).reroll()) {
+                gsn_dual_backstab->improve( ch, true, victim );
+
+                if (ch->fighting == victim)
+                    DualBackstabOneHit( ch, victim ).hit( );
+            }
+            else {
+                gsn_dual_backstab->improve( ch, false, victim );
+				}
+			}
+
+
 		}
         else
         {
