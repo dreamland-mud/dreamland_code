@@ -884,10 +884,11 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     if (dam == 0)
         return;
 
-    if ( get_eq_char(ch,wear_wield) != 0
+      //remove lower crit chance for everyone but ninjas
+  /*  if ( get_eq_char(ch,wear_wield) != 0
             && get_eq_char(ch,wear_second_wield) != 0
             && number_percent() > HEALTH(ch))
-        return;
+        return;*/
 
     if(SHADOW(ch))
         return;
