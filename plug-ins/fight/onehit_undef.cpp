@@ -994,13 +994,18 @@ void UndefinedOneHit::damEffectMasterSword( )
     if (paf->level == 120)
         return;
 
-    old_mod = paf->modifier;            
+    old_mod = paf->modifier;               
     paf->modifier = min(paf->modifier+1, ch->getModifyLevel() / 3);
+    //do not dull an already sharp katana
+    if(paf->modifier > old_mod){
     ch->hitroll += paf->modifier - old_mod;
+    }
     
     if (paf->next != 0) {
         paf->next->modifier = paf->modifier;
+        if(paf->modifier > old_mod){
         ch->damroll += paf->modifier - old_mod;
+        }
     }
     
     act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana,0, TO_ROOM);
