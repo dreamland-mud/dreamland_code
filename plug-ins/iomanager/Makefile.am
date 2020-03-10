@@ -32,6 +32,7 @@ badnames.cpp \
 base64.cpp \
 rpccommandmanager.cpp \
 webmanip.cpp \
+lasthost.cpp \
 impl.cpp
 
 libiomanager_la_MOC = \
@@ -44,6 +45,7 @@ defaultbufferhandler.h \
 serversocket.h \
 serversocketcontainer.h \
 backdoorhandler.h \
+lasthost.h \
 badnames.h
 
 if WITH_MINGW

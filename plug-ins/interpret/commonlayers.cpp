@@ -7,11 +7,14 @@
 #include "commandinterpreter.h"
 #include "commandbase.h"
 #include "translit.h"
-
+#include "json/json.h"
+#include "lasthost.h"
+#include "websocketrpc.h"
 #include "lastlogstream.h"
 #include "logstream.h"
 #include "so.h"
 #include "dlfileop.h"
+#include "profiler.h"
 
 #include "pcharacter.h"
 #include "room.h"
@@ -20,6 +23,8 @@
 #include "wiznet.h"
 #include "merc.h"
 #include "def.h"
+
+const char *ttype_name( int ttype );
 
 class GrabWordInterpretLayer : public InterpretLayer {
 public:
@@ -44,24 +49,91 @@ public:
     }
 
     virtual bool process( InterpretArguments &iargs )
-    {
+    {        
         LastLogStream::send( ) 
             << iargs.ch->getNameP( ) << ": " << iargs.line << endl;
-
-        if (dreamland->hasOption( DL_LOG_IMM ) && iargs.ch->is_immortal( )) {
-            DLFileAppend( dreamland->getBasePath( ), dreamland->getImmLogFile( ) )
-                 .printf(
-                        "[%s]:[%s] [%d] %s\n",
-                         Date::getTimeAsString( dreamland->getCurrentTime( ) ).c_str( ),
-                         iargs.ch->getNameP( ),
-                         iargs.ch->in_room->vnum,
-                         iargs.line.c_str( ) );
-        }
-
         return true;
     }
 };
 
+/** Return true if logging is enabled for this character and command. */
+static bool can_log_input(InterpretArguments &iargs) 
+{
+    // Hide personal commands from logging.
+    if (iargs.pCommand && iargs.pCommand->getLog() == LOG_NEVER)        
+        return false;
+
+    if (iargs.ch->is_npc())
+        return false;
+
+    // Individual logging.
+    if (IS_SET( iargs.ch->act, PLR_LOG ))
+        return true;
+
+    // Commands that always need to be logged, such as 'clan'.
+    if (iargs.pCommand && iargs.pCommand->getLog() == LOG_ALWAYS)
+        return true;
+
+    // Exclude immortals from common log unless explicitly turned on.
+    if (iargs.ch->is_immortal() && !dreamland->hasOption(DL_LOG_IMM))
+        return false;
+
+    // Log everyone to a separate file.
+    if (dreamland->hasOption( DL_LOG_ALL ))
+        return true;
+
+    return false;
+}
+
+/** Append one entry to the common log file, for matched or missing command. */
+static bool create_log_entry(InterpretArguments &iargs)
+{
+    Json::Value log;
+    log["time"] = Date::getTimeAsString(dreamland->getCurrentTime());
+
+    log["ch"]["id"] = iargs.ch->getID();
+    log["ch"]["lvl"] = iargs.ch->getLevel();
+    log["ch"]["remort"] = (int)iargs.ch->getPC()->getRemorts().size();
+    log["ch"]["room"] = iargs.ch->in_room->vnum;
+
+    DLString defaultPrompt = "<{r%h{x/{R%H{xзд {c%m{x/{C%M{xман %v/%Vшг {W%X{xоп Вых:{g%d{x>%c";
+    if (!IS_SET(iargs.ch->comm, COMM_PROMPT))
+        log["cfg"]["prompt"] = "off";
+    else if (iargs.ch->prompt != defaultPrompt)
+        log["cfg"]["prompt"] = "custom";
+    else
+        log["cfg"]["prompt"] = "default";
+
+    log["cfg"]["web"] = is_websock(iargs.ch);
+    log["cfg"]["blind"] = (bool)(IS_SET(iargs.ch->getPC()->config, CONFIG_SCREENREADER));
+    log["cfg"]["mudlet"] = iargs.ch->desc && iargs.ch->desc->telnet.ttype != 0;
+    log["cfg"]["nanny"] = (iargs.ch->desc && iargs.ch->desc->connected != CON_PLAYING);
+    log["cfg"]["brief"] = (bool)(IS_SET(iargs.ch->comm, COMM_BRIEF));
+
+    log["i"]["raw"] = iargs.line;
+    log["i"]["name"] = iargs.cmdName;    
+    log["i"]["args"] = iargs.cmdArgs;
+    if (iargs.pCommand) {
+        log["i"]["cmd"] = iargs.pCommand->getName();
+    } else {
+        log["i"]["cmd"] = "none";
+    }
+
+    DLString ip = iargs.ch->getPC()->getLastAccessHost();
+    bool unique = XMLAttributeLastHost::isUnique(iargs.ch->getName(), ip);
+    log["ip"] = unique ? "new" : "old";
+
+    try {
+        Json::FastWriter serializer;
+        DLFileAppend(dreamland->getBasePath(), dreamland->getImmLogFile())
+            .write(serializer.write(log));
+    } catch (const ExceptionDBIO &ex) {
+        LogStream::sendError() << ex.what() << endl;
+        return false;
+    }
+
+    return true;
+}
 
 class LogCommandInterpretLayer : public InterpretLayer {
 public:
@@ -72,27 +144,12 @@ public:
 
     virtual bool process( InterpretArguments &iargs )
     {
-        if (!iargs.line.empty( )) {
-            DLString line = iargs.cmdName + " " + iargs.cmdArgs;
-            logCommand( iargs.ch, iargs.pCommand->getLog( ), line );
-        }
-        
+//        ProfilerBlock p("log command");
+
+        if (can_log_input(iargs))
+            create_log_entry(iargs);
+
         return true;
-    }
-
-private:
-    void logCommand( Character *ch, int log, const DLString &line )
-    {
-        if (log == LOG_NEVER) 
-            return;
-
-        if ((!ch->is_npc( ) && IS_SET( ch->act, PLR_LOG ))
-              || dreamland->hasOption( DL_LOG_ALL ) 
-              || log == LOG_ALWAYS)
-        {
-            wiznet( WIZ_SECURE, 0, ch->get_trust(), "Log %C1: %s [%d]",
-                    ch, line.c_str( ), ch->in_room->vnum );
-        }
     }
 };
 
@@ -130,6 +187,9 @@ public:
 
         if (iargs.cmdName.empty( ))
             return false;
+
+        if (can_log_input(iargs))
+            create_log_entry(iargs);
 
         if (!iargs.ch->desc || iargs.ch->desc->connected != CON_PLAYING)
             return false;

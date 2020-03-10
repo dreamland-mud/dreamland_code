@@ -1,5 +1,6 @@
 #include "lasthost.h"
 #include "logstream.h"
+#include "pcharactermanager.h"
 #include "pcharacter.h"
 #include "descriptor.h"
 #include "act.h"
@@ -22,6 +23,19 @@ const DLString &XMLAttributeLastHost::getMatchingHost(const DLString &hostPrefix
             return h->first;
 
     return DLString::emptyString;
+}
+
+bool XMLAttributeLastHost::isUnique(const DLString &playerName, const DLString &host)
+{
+    for (auto &p: PCharacterManager::getPCM()) {
+        if (playerName != p.first) {
+            XMLAttributeLastHost::Pointer attr = p.second->getAttributes().findAttr<XMLAttributeLastHost>("lasthost");
+            if (attr && attr->hasHost(host))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 /**

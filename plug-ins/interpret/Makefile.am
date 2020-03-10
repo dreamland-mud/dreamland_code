@@ -4,7 +4,10 @@ include $(top_srcdir)/src/Makefile.inc
 plugin_INCLUDES = \
 $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/output \
--I$(top_srcdir)/plug-ins/descriptor 
+-I$(top_srcdir)/plug-ins/descriptor \
+-I$(top_srcdir)/plug-ins/iomanager \
+-I$(top_srcdir)/plug-ins/system \
+-I/usr/include/jsoncpp
 
 libinterpret_la_SOURCES = \
 interpretlayer.cpp \
@@ -19,8 +22,11 @@ libinterpret_la_LIBADD = \
 
 libcommonlayers_la_LIBADD = \
 libinterpret.la \
+../system/libsystem.la \
 ../output/liboutput.la \
-../descriptor/libdescriptor.la
+../iomanager/libiomanager.la \
+../descriptor/libdescriptor.la \
+-ljsoncpp
 
 libcommonlayers_la_SOURCES = commonlayers.cpp
 
