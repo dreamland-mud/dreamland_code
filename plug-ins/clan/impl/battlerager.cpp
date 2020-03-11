@@ -397,7 +397,7 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
             ch->getNameP('1').c_str(), ch->getModifyLevel(),
             victim->getNameP('1').c_str(), victim->getModifyLevel(),
             dam, victim->hit, victim->max_hit);
-    damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value[3]].damage, true);
+    damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;
 }
