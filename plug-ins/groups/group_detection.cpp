@@ -37,6 +37,7 @@
 #include "recipeflags.h"
 #include "act_move.h"
 #include "act_lock.h"
+#include "attacks.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -1044,12 +1045,18 @@ SKILL_RUNP( lore )
                 value1,value2,
                 (1 + value2) * value1 / 2);
       ch->send_to(buf);
-      if (learned > 85)
+      if (learned > 85){
+	if(obj->value3()) // damage type
+	{
+	  sprintf(buf,"Тип повреждений: %s.\n\r", attack_table[obj->value3()].noun);
+          ch->send_to(buf);
+	}
         if (obj->value4())  /* weapon flags */
         {
-          sprintf(buf,"Флаги оружия:%s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
+          sprintf(buf,"Флаги оружия: %s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
           ch->send_to(buf);
         }
+      }
 
       break;
 
