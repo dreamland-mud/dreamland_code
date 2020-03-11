@@ -11,7 +11,6 @@
 #include "room.h"
 #include "clanreference.h"
 #include "skillreference.h"
-#include "interp.h"
 
 #include "follow_utils.h"
 #include "loadsave.h"
@@ -51,18 +50,9 @@ COMMAND(COrder, "order")
     victim = findVictim( ch, argTarget );
     
     if (!victim) {
-        Character * follower = follower_find( ch, argTarget.c_str() );
-            if(follower && is_same_group ( ch, follower )){
-               ch->println( "Твой последователь должен быть рядом с тобой." );
-                    if(ch->getPC( )->pet && follower->getNPC() && ch->getPC( )->pet == follower->getNPC()){
-                       interpret_raw( ch, "gt where are you" );
-                    }
-               }
-            else{
-                ch->println( "Среди твоих последователей такого нет." );
-                }
-  return;
-}       
+        ch->println( "Среди твоих последователей такого нет." );
+        return;
+    }
 
     interpretOrder( victim, iargs, argOrder );
     
