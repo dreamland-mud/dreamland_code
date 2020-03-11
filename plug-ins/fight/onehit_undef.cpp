@@ -1000,8 +1000,9 @@ void UndefinedOneHit::damEffectMasterSword( )
     new_mod = min(paf->modifier+1, ch->getModifyLevel() / 3);
             
     //do not dull an already sharp katana            
-    if(new_mod > old_mod){             
-             
+    if(new_mod > old_mod){  
+                
+    paf->modifier = new_mod;         
     ch->hitroll += new_mod - old_mod;
        
     if (paf->next != 0) {
