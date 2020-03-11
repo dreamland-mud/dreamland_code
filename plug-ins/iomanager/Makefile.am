@@ -23,6 +23,7 @@ descriptorstatelistener.cpp \
 descriptorstatemanager.cpp \
 pagerhandler.cpp \
 interprethandler.cpp \
+commonlayers.cpp \
 nannyhandler.cpp \
 wrapperhandler.cpp \
 defaultbufferhandler.cpp \
