@@ -80,6 +80,7 @@
 #include "room.h"
 #include "desire.h"
 #include "helpmanager.h"
+#include "attacks.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -2799,6 +2800,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         
         buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
             << "(среднее " << (1 + obj->value2()) * obj->value1() / 2 << ")" << endl;
+		    
+        if (obj->value3())  /* weapon damtype */
+            buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;		    
     
         if (obj->value4())  /* weapon flags */
             buf << "Особенности оружия: " << weapon_type2.messages(obj->value4(), true ) << endl;
