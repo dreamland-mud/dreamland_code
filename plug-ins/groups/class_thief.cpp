@@ -1058,6 +1058,19 @@ SKILL_RUNP( backstab )
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
+			
+            if (IS_AFFECTED(ch, AFF_HASTE)) {
+                    int haste_chance;
+                    if (fBonus)
+                        haste_chance = 100;
+                    else
+                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
+
+                    if (Chance(ch, haste_chance-1, 100).reroll()) {
+                        if (ch->fighting == victim)
+                            BackstabOneHit( ch, victim ).hit( );
+                    }
+					else {
 
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
@@ -1075,21 +1088,33 @@ SKILL_RUNP( backstab )
             }
             else {
                 gsn_dual_backstab->improve( ch, false, victim );
-
-                if (IS_AFFECTED(ch, AFF_HASTE)) {
-                    int haste_chance;
-                    if (fBonus)
-                        haste_chance = 100;
-                    else
-                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
-
-                    if (Chance(ch, haste_chance-1, 100).reroll()) {
-                        if (ch->fighting == victim)
-                            BackstabOneHit( ch, victim ).hit( );
-                    }
-                }
+				}
+			}
             }
-        }
+			
+			else {
+
+            int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
+            if (ch->is_npc())
+                dual_chance = 0;
+            else if (fBonus && dual_percent > 50)
+                dual_chance = 100;
+            else
+                dual_chance =  dual_percent * 8 / 10;
+
+            if (Chance(ch, dual_chance-1, 100).reroll()) {
+                gsn_dual_backstab->improve( ch, true, victim );
+
+                if (ch->fighting == victim)
+                    DualBackstabOneHit( ch, victim ).hit( );
+            }
+            else {
+                gsn_dual_backstab->improve( ch, false, victim );
+				}
+			}
+
+
+		}
         else
         {
             gsn_backstab->improve( ch, false, victim );
@@ -1103,7 +1128,6 @@ SKILL_RUNP( backstab )
     catch (const VictimDeathException& e) {
     }
 }
-
 
 /*
  * 'circle' skill command

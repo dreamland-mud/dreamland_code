@@ -884,10 +884,11 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     if (dam == 0)
         return;
 
-    if ( get_eq_char(ch,wear_wield) != 0
+      //remove lower crit chance for everyone but ninjas
+  /*  if ( get_eq_char(ch,wear_wield) != 0
             && get_eq_char(ch,wear_second_wield) != 0
             && number_percent() > HEALTH(ch))
-        return;
+        return;*/
 
     if(SHADOW(ch))
         return;
@@ -956,6 +957,7 @@ void UndefinedOneHit::damEffectMasterSword( )
 {
     Affect *paf;
     int old_mod;
+    int new_mod;
     Object *katana = wield;
 
     if (weapon_sn != gsn_sword)
@@ -992,16 +994,23 @@ void UndefinedOneHit::damEffectMasterSword( )
     
     if (paf->level == 120)
         return;
-
-    old_mod = paf->modifier;            
-    paf->modifier = min(paf->modifier+1, ch->getModifyLevel() / 3);
-    ch->hitroll += paf->modifier - old_mod;
-    
+            
+            
+    old_mod = paf->modifier;
+    new_mod = min(paf->modifier+1, ch->getModifyLevel() / 3);
+            
+    //do not dull an already sharp katana            
+    if(new_mod > old_mod){  
+                
+    paf->modifier = new_mod;         
+    ch->hitroll += new_mod - old_mod;
+       
     if (paf->next != 0) {
-        paf->next->modifier = paf->modifier;
-        ch->damroll += paf->modifier - old_mod;
+        paf->next->modifier = new_mod;
+        ch->damroll += new_mod - old_mod;
+        }
     }
-    
+            
     act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana,0, TO_ROOM);
     act("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
             ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);

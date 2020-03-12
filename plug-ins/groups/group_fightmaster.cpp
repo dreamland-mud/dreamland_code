@@ -707,6 +707,7 @@ SKILL_RUNP( kick )
                 kick_dam = number_range( 1, ch->getModifyLevel() );
                 
                 if ( (ch->getProfession( ) == prof_samurai)
+                        && IS_SET ( ch->parts, PART_FEET)
                         && ((on_feet=get_eq_char(ch,wear_feet)) == 0
                         || (on_feet!=0 && !material_is_typed( on_feet, MAT_METAL ) ) ) )
                 {
