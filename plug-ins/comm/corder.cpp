@@ -53,7 +53,7 @@ COMMAND(COrder, "order")
     
     if (!victim) {
         Character * follower = follower_find_nosee( ch, argTarget.c_str() );
-            if(follower && is_same_group ( ch, follower )){
+            if(follower){
                ch->println( "Твой последователь должен быть рядом с тобой." );
                     if(ch->getPC( )->pet && follower->getNPC() && ch->getPC( )->pet == follower->getNPC()){
                        interpret_raw( ch, "gt where are you" );
