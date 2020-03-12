@@ -15,6 +15,7 @@
 #include "so.h"
 #include "dlfileop.h"
 #include "profiler.h"
+#include "plugininitializer.h"
 
 #include "pcharacter.h"
 #include "room.h"
@@ -249,18 +250,8 @@ private:
 };
 
 
-extern "C"
-{
-    SO::PluginList initialize_commonlayers( )
-    {
-        SO::PluginList ppl;
-        
-        Plugin::registerPlugin<GrabWordInterpretLayer>( ppl );
-        Plugin::registerPlugin<FixStringInterpretLayer>( ppl );
-        Plugin::registerPlugin<LogInputInterpretLayer>( ppl );
-        Plugin::registerPlugin<LogCommandInterpretLayer>( ppl );
-        Plugin::registerPlugin<SayWhatInterpretLayer>( ppl );
-
-        return ppl;
-    }
-}
+PluginInitializer<GrabWordInterpretLayer> initGrabWord;
+PluginInitializer<FixStringInterpretLayer> initFixString;
+PluginInitializer<LogInputInterpretLayer> initLogInput;
+PluginInitializer<LogCommandInterpretLayer> initLogCommand;
+PluginInitializer<SayWhatInterpretLayer> initSayWhat;
