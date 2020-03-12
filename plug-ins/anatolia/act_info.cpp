@@ -80,7 +80,7 @@
 #include "room.h"
 #include "desire.h"
 #include "helpmanager.h"
-#include "attacks.h"
+#include "../fight/attacks.h"
 
 #include "dreamland.h"
 #include "merc.h"
