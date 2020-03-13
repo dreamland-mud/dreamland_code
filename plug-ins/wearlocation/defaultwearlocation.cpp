@@ -419,8 +419,8 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
 
     if(obj->pIndexData->limit >= 0 && ch->getModifyLevel( ) > obj->level + 20){
          if (IS_SET(flags, F_WEAR_VERBOSE)) {
-            ch->pecho( "Твой уровень слишком велик, чтобы использовать %1$^O1.", obj );
-            ch->recho( "Уровень %1$^C3 слишком велик, чтобы использовать %2$O4.", ch, obj );
+            ch->pecho( "Твой уровень слишком велик, чтобы использовать %1$O4.", obj );
+            ch->recho( "Уровень %1$^C2 слишком велик, чтобы использовать %2$O3.", ch, obj );
          }
         return RC_WEAR_YOUNG;
     }
