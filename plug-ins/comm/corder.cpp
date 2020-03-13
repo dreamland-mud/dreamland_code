@@ -56,7 +56,7 @@ COMMAND(COrder, "order")
             if(follower){
                ch->println( "Твой последователь должен быть рядом с тобой." );
                     if(ch->getPC( )->pet && follower->getNPC() && ch->getPC( )->pet == follower->getNPC()){
-                       interpret_raw( ch, "gt where are you" );
+                       interpret_raw( ch, "gtell", "where are you" );
                     }
                }
             else{
