@@ -1,7 +1,6 @@
 lib_LTLIBRARIES = libfight.la
 
 libfight_la_SOURCES = \
-attacks.cpp \
 effects.cpp \
 fight.cpp \
 fight_cmds.cpp \
