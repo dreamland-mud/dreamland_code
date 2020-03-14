@@ -201,14 +201,16 @@ void UndefinedOneHit::damEffectVorpal()
     if (victim->is_immortal())
         return;
 
+    victim->recho("Раз-два, раз-два! Горит трава, взы-взы -- стрижает %O1!", wield);            
+    victim->pecho("Раз-два, раз-два! Горит трава, взы-взы -- стрижает %O1!", wield);
+            
     // Chances are 1% for goods and 0.5% for others.
     int chance = IS_GOOD(ch) ? 10 : 5; 
     if (number_range(1, 1000) > chance)
         return;
-
-    ch->pecho("Твое оружие неконтролируемо тянется к шее твоего противника!");
-    victim->recho("Описав гигантскую дугу, %O1 отрубает голову %C3!", wield, victim);
-    victim->pecho("Оружие %C2 со свистом отрубает тебе голову!", ch);
+            
+    victim->recho("Ува! Ува! И голова %C2 барабардает с плеч!", victim);
+    victim->pecho("Ува! И твоя голова барабардает с плеч!", victim);
     victim->recho("%^C1 уже ТРУП!", victim);
 
     group_gain( ch, victim );
