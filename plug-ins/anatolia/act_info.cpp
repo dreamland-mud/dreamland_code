@@ -2500,10 +2500,15 @@ CMDRUNP( help )
         DLString title = help->getTitle(DLString::emptyString);
 	DLString disambig = help_article_disambig(*help);
 
-        // Create a line with help ID, title and disambiguation keywords.
+        // Create a line with help ID, title and disambiguation keywords (unless turned off).
         DLString line = title;
-        if (!disambig.empty())
-            line += " ({D" + disambig + "{x)"; 
+        if (!disambig.empty()) {
+            if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER) 
+                && !ch->getPC()->getAttributes().isAvailable("newhelp"))
+            {
+                line += " ({D" + disambig + "{x)"; 
+            }
+        }
 
         buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
     }
