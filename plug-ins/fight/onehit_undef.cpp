@@ -17,7 +17,7 @@
 #include "religion.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "clanreference.h"
 #include "areabehaviormanager.h"
@@ -26,7 +26,7 @@
 #include "fight.h"
 #include "material.h"
 #include "immunity.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "skill_utils.h"
 #include "move_utils.h"
 #include "gsn_plugin.h"
@@ -171,6 +171,51 @@ void UndefinedOneHit::postDamageEffects( )
     damEffectFeeble( );
     damEffectFunkyWeapon( );
     damEffectSlice( );
+    damEffectVorpal();
+}
+
+/**
+ * One, two! One, two! and through and through
+ * The vorpal blade went snicker-snack!
+ * He left it dead, and with its head
+ * He went galumphing back.
+ * 
+ * Раз-два, раз-два! Горит трава,
+ * Взы-взы — стрижает меч,
+ * Ува! Ува! И голова
+ * Барабардает с плеч!
+ */ 
+void UndefinedOneHit::damEffectVorpal()
+{
+    // Will work for both first and second wield, if worn.
+    if (!wield || ch->fighting != victim)
+        return;
+
+    if (!IS_WEAPON_STAT(wield, WEAPON_VORPAL))
+        return;
+
+    // No vorpal from mobs: repeats sun sword logic, can be easily changed if needed.
+    if (ch->is_npc())
+        return;
+
+    if (victim->is_immortal())
+        return;
+
+    // Chances are 1% for goods and 0.5% for others.
+    int chance = IS_GOOD(ch) ? 10 : 5; 
+    if (number_range(1, 1000) > chance)
+        return;
+
+    ch->pecho("Твое оружие неконтролируемо тянется к шее твоего противника!");
+    victim->recho("Описав гигантскую дугу, %O1 отрубает голову %C3!", wield, victim);
+    victim->pecho("Оружие %C2 со свистом отрубает тебе голову!", ch);
+    victim->recho("%^C1 уже ТРУП!", victim);
+
+    group_gain( ch, victim );
+    raw_kill( victim, 3, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+    pk_gain( ch, victim );
+    victim->pecho("Тебя УБИЛИ!");
+    throw VictimDeathException( );
 }
 
 void UndefinedOneHit::message( )

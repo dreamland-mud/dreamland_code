@@ -34,6 +34,7 @@ protected:
     void damEffectGroundStrike( );
     void damEffectCriticalStrike( );
     void damEffectSlice( );
+    void damEffectVorpal();
 
     bool defenseParry( );
     bool defenseHandBlock( ); 
