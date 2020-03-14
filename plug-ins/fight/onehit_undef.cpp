@@ -353,7 +353,7 @@ bool UndefinedOneHit::defenseParry( )
         && (!defending_weapon 
             || !IS_WEAPON_STAT(defending_weapon, WEAPON_HOLY))) 
     {
-        msgFightVict( "%3$^O1 passes straight through your attempt to parry!" );
+        msgFightVict( "%3$^O1 проходит насквозь через твою попытку спарировать!" );
         
         if (defending_weapon) {
             msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
