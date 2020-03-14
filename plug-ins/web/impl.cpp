@@ -244,7 +244,7 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
             visible << dirs[door].name[0];
-        } else if (number_percent() < gsn_perception->getEffective( ch )) {
+        } else {
             hidden << dirs[door].name[0];
         }
     }
