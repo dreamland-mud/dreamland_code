@@ -105,7 +105,6 @@ extern "C"
         Plugin::registerPlugin<ObjectBehaviorRegistrator<FireGauntlets> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<VolcanoeArmbands> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<DemonfireShield> >( ppl );
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<SwordOfSun> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<FlyingBoots> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<GiantStrengthArmor> >( ppl );
         Plugin::registerPlugin<ObjectBehaviorRegistrator<RoseShield> >( ppl );
