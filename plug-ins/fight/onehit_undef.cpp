@@ -201,14 +201,47 @@ void UndefinedOneHit::damEffectVorpal()
     if (victim->is_immortal())
         return;
 
-    // Chances are 1% for goods and 0.5% for others.
-    int chance = IS_GOOD(ch) ? 10 : 5; 
-    if (number_range(1, 1000) > chance)
+    // Chances are 1% for goods and 0.5% for others. Generic 'vorpal' warning is shown more often.
+    if (!chance(5)) 
         return;
 
-    ch->pecho("Твое оружие неконтролируемо тянется к шее твоего противника!");
-    victim->recho("Описав гигантскую дугу, %O1 отрубает голову %C3!", wield, victim);
-    victim->pecho("Оружие %C2 со свистом отрубает тебе голову!", ch);
+    const char *msgAll;
+    if (wield->value0() == WEAPON_AXE)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит топор!{x";
+    else if (wield->value0() == WEAPON_POLEARM)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит бердыш!{x";
+    else if (wield->value0() == WEAPON_WHIP)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы стрижает плеть!{x";
+    else if (wield->value0() == WEAPON_DAGGER)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы стрижает нож!{x";
+    else
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит клинок!{x";
+
+    ch->in_room->echo(POS_RESTING, msgAll);
+
+    if (!chance(IS_GOOD(ch) ? 20 : 10))
+        return;
+
+    const char *msgVict, *msgOther;
+    if (wield->value0() == WEAPON_AXE) {
+        msgOther = "{mУва! %1$^C1 без головы остал%1$Gось|ся|ась с этих пор!{x";
+        msgVict = "{mУва! И ты без головы остал%1$Gось|ся|ась с этих пор!{x";    
+    } else if (wield->value0() == WEAPON_POLEARM) {
+        msgOther = "{mУва! %1$C2 котелок скосило как камыш!{x";
+        msgVict = "{mУва! Ува! Твой котелок скосило как камыш!{x";
+    } else if (wield->value0() == WEAPON_WHIP) {
+        msgOther = "{mУва! %1$C3 с головой не подружиться впредь!{x";
+        msgVict = "{mУва! И тебе с головой не подружиться впредь!{x";
+    } else if (wield->value0() == WEAPON_DAGGER) {
+        msgOther = "{mУва! Ты голову %1$C2 у ног своих найдешь!{x";
+        msgVict = "{mУва! Ты голову свою у ног своих найдешь!{x";
+    } else {
+        msgOther = "{mУва! %1$C2 голова лежит у твоих ног!{x";
+        msgVict = "{mУва! И твоя голова лежит у твоих ног!{x";
+    }
+
+    victim->pecho(msgVict, victim);
+    victim->recho(msgOther, victim);
     victim->recho("%^C1 уже ТРУП!", victim);
 
     group_gain( ch, victim );
@@ -351,7 +384,7 @@ bool UndefinedOneHit::defenseParry( )
         && (!defending_weapon 
             || !IS_WEAPON_STAT(defending_weapon, WEAPON_HOLY))) 
     {
-        msgFightVict( "%3$^O1 passes straight through your attempt to parry!" );
+        msgFightVict( "%3$^O1 проходит насквозь через твою попытку спарировать!" );
         
         if (defending_weapon) {
             msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
@@ -709,7 +742,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         && !IS_WEAPON_STAT(def1, WEAPON_HOLY) 
         && !IS_WEAPON_STAT(def2, WEAPON_HOLY)) 
     {
-        msgFightVict( "%3$^O1 passes straight through your attempt to cross block!" );
+        msgFightVict( "%3$^O1 проходит насквозь через твою попытку кросс-блокировать!" );
         msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
         msgFightRoom( "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!" );
 
@@ -928,12 +961,6 @@ void UndefinedOneHit::damEffectCriticalStrike( )
 
     if (dam == 0)
         return;
-
-      //remove lower crit chance for everyone but ninjas
-  /*  if ( get_eq_char(ch,wear_wield) != 0
-            && get_eq_char(ch,wear_second_wield) != 0
-            && number_percent() > HEALTH(ch))
-        return;*/
 
     if(SHADOW(ch))
         return;
