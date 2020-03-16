@@ -335,27 +335,27 @@ void ShadowBlade::fight( Character *ch )
     switch (number_range( 1, 4 )) {
     case 1:
         if (!IS_SET(victim->imm_flags, IMM_POISON)) {
-            act("Капли {Gяда{x стекают по лезвию твоего $o2.", ch, obj, 0, TO_CHAR);
+            act("Капли {Gяда{x стекают по лезвию $o2.", ch, obj, 0, TO_CHAR);
             act("Капли {Gяда{x стекают по лезвию $o2 в руках $c2.", ch, obj, 0, TO_ROOM);
             spell( gsn_poison, level + 1, ch, victim, FSPELL_BANE );
         }
         break;
     case 2:
         if (!IS_SET(victim->imm_flags, IMM_DISEASE)) {
-            ch->pecho("{cТлетворная аура{x окружает тво%1$Gе|й|ю|и %1$O4.", obj );
+            ch->pecho("{cТлетворная аура{x окружает %1$O4.", obj );
             act("{cТлетворная аура{x окружает $o4 $c2.", ch, obj, 0, TO_ROOM);
             spell( gsn_plague, level + 1, ch, victim, FSPELL_BANE );
         }
         break;
     case 3:
         if (!IS_AFFECTED( victim, AFF_CURSE )) {
-            ch->pecho("{DЗловещая аура{x окутывает тво%1$Gе|й|ю|и %1$O4.", obj );
+            ch->pecho("{DЗловещая аура{x окутывает %1$O4.", obj );
             ch->recho("%1$^O1 %2$C2 окутыва%1$nется|ются {Dзловещей аурой{x.", obj, ch );
             spell( gsn_curse, level + 1, ch, victim, FSPELL_BANE );
         }
         break;
     case 4:
-        ch->pecho("{DТво%1$Gе|й|ю|и %1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
+        ch->pecho("{D%1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
         ch->recho("%1$^O1 %2$C2 вспыхива%1$nет|ют мертвенно-бледным светом.", obj, ch );
         spell( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );        
         break;
