@@ -300,8 +300,8 @@ void Damage::protectResistance( )
 
 void Damage::protectAlign( )
 {
-    if (   (IS_AFFECTED(victim, AFF_PROTECT_EVIL) && IS_EVIL(ch))
-        || (IS_AFFECTED(victim, AFF_PROTECT_GOOD) && IS_GOOD(ch))) 
+    if (   (IS_AFFECTED(victim, AFF_PROTECT_EVIL) && IS_EVIL(ch) && IS_GOOD(victim))
+        || (IS_AFFECTED(victim, AFF_PROTECT_GOOD) && IS_GOOD(ch) && IS_EVIL(victim))) 
     {
         dam -= dam / 4;
     }
