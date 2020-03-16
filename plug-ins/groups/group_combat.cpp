@@ -651,26 +651,15 @@ VOID_SPELL(ShockingGrasp)::run( Character *ch, Character *victim, int sn, int le
 SPELL_DECL(SonicResonance);
 VOID_SPELL(SonicResonance)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-
+    
     int dam;
 
     dam = dice( level, 7 );
     if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
-    {
         dam /= 2;
     act_p("Цилиндр вибрирующей энергии окружает $C4, заставляя $S резонировать.",
                 ch,0,victim,TO_NOTVICT,POS_RESTING);
-    }
-
-    else{
-        act_p("Цилиндр вибрирующей энергии, созданный $c5, обездвиживает $C4!",
-           ch,0,victim,TO_NOTVICT,POS_RESTING);
-        act_p("Созданный тобой цилиндр вибрирующей энергии обездвиживает $C4!",
-           ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("Цилиндр вибрирующей энергии, созданный $c5, обездвиживает тебя!",
-           ch,0,victim,TO_VICT,POS_RESTING);
-        victim->setWait( skill->getBeats( )  );
-    }
+    victim->setWait( skill->getBeats( )  );
     damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
 
