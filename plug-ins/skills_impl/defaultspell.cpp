@@ -326,7 +326,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     if (target.isSet( TAR_CREATE_MOB )) {
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
-                buf << "Кого именно ты хочешь позвать?" << endl;
+                buf << "Кого именно ты хочешь призвать?" << endl;
                 return null;
             }
 
@@ -381,7 +381,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         
         buf.str( "" );
-        buf << "В Dream Land нет никого с таким именем." << endl;
+        buf << "Ты не находишь никого с таким именем." << endl;
         return null;
     }
     
@@ -450,7 +450,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
             
         buf.str( "" );
-        buf << "Произнести заклинание.. на кого?" << endl;
+        buf << "Произнести заклинание... на кого?" << endl;
         return null;
     }
 
@@ -507,7 +507,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         else if (target.isSet( TAR_OBJ_ROOM ))
             buf << "Ты не видишь здесь такого предмета." << endl;
         else if (target.isSet( TAR_OBJ_WORLD ))
-            buf << "В Dream Land нет ничего похожего на это." << endl;
+            buf << "Ты не можешь обнаружить ничего с таким именем." << endl;
     }
 
     return null;
@@ -516,7 +516,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
-        ch->println("Ты не можешь сконцентрироваться.");
+        ch->println("Ты не можешь использовать это заклинание, когда сражаешься.");
         return false;
     }
     
@@ -558,9 +558,9 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-        act("Твои боги неблагосклонны к $C3.", ch, 0, vch, TO_CHAR);
-        act("Боги $c2 неблагосклонны к тебе.", ch, 0, vch, TO_VICT);
-        act("Боги $c2 неблагосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
+        act("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
+        act("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
+        act("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
         act("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
