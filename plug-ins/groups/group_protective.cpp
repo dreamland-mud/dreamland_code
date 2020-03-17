@@ -476,11 +476,11 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-    if(IS_GOOD(victim) || IS_NEUTRAL(victim)){
+    if(!IS_GOOD(victim)){
         if (victim == ch)
-          act("Тёмные силы не будут защищать тебя!", ch,0, 0,TO_CHAR);
+          act("Светлые силы не будут защищать тебя!", ch,0, 0,TO_CHAR);
         else
-          act("Тёмные силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
+          act("Светлые силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
         return;
     }
     af.where     = TO_AFFECTS;
@@ -514,11 +514,11 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
           act("$C1 уже защище$Gно|н|на.", ch,0,victim,TO_CHAR);
         return;
     }
-    if(IS_EVIL(victim) || IS_NEUTRAL(victim)){
+    if(!IS_EVIL(victim)){
         if (victim == ch)
-          act("Светлые силы не будут защищать тебя!", ch,0, 0,TO_CHAR);
+          act("Темные силы не будут защищать тебя!", ch,0, 0,TO_CHAR);
         else
-          act("Светлые силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
+          act("Темные силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
         return;
     }
 
