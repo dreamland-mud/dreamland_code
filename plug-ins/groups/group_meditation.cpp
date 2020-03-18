@@ -30,6 +30,12 @@ VOID_SPELL(Link)::run( Character *ch, Character *victim, int sn, int level )
 {
     int random = number_percent( );
 
+    if (victim == ch)
+    {
+        ch->send_to("Это заклинание имеет смысл применять только на других.\n\r");
+        return;
+    }
+    
     ch->endur /= 2;
     victim->mana = victim->mana + (ch->mana / 2 + random) / 2;
     ch->mana = 0;
