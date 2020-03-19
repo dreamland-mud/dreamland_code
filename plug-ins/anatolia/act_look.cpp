@@ -1768,7 +1768,8 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
 {
     ostringstream buf;
     EXIT_DATA *pexit;
-    const char *ename;
+    DLString ename;
+    DLString cmd;
     PlayerConfig::Pointer cfg;
     Room *room;
     bool found;
@@ -1789,15 +1790,17 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
 
         ename = (cfg->ruexits ? dirs[door].rname : dirs[door].name);
+        found = true;
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
-            found = true;
-            buf << " {hc" << ename << "{hx";
-        }
-        else if (number_percent() < gsn_perception->getEffective( ch )) {
-            found = true;
-            gsn_perception->improve( ch, true );
-            buf << " {x" << ename << "*{" << CLR_AEXIT(ch);
+            cmd = ename;
+            buf << " " << web_cmd(ch, cmd, ename);
+        } else if (!IS_SET(pexit->exit_info, EX_LOCKED)) {
+            cmd = "{lRоткрыть{lEopen{lx " + ename;
+            buf << " *" << web_cmd(ch, cmd, ename) << "*";
+        } else {
+            cmd = "{lRотпереть{lEunlock{lx " + ename;
+            buf << " *" << web_cmd(ch, cmd, ename) << "*";
         }
     }
     
@@ -1812,7 +1815,7 @@ CMDRUNP( exits )
 {
     ostringstream buf;
     EXIT_DATA *pexit;
-    const char *ename;
+    DLString ename;
     Room *room;
     PlayerConfig::Pointer cfg;
     bool found;
@@ -1840,13 +1843,12 @@ CMDRUNP( exits )
         if (!ch->can_see( room ))
             continue;
 
+        found = true;   
         ename = (cfg->ruexits ? dirs[door].rname : dirs[door].name);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED))
         {
-            found = true;
-
-            buf << fmt(0, "    {C%-6s{x", ename) << " - ";
+            buf << fmt(0, "    {C%-8s{x", ename.c_str()) << " - ";
 
             if (room->isDark( ) && !cfg->holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
@@ -1859,18 +1861,14 @@ CMDRUNP( exits )
             buf << endl;
         }
         else {
-            if (number_percent() < gsn_perception->getEffective( ch )) {
-                gsn_perception->improve( ch, true );
-                found = true;
+            ename = "*" + ename + "*";
+            buf << fmt( ch, "    {C%-8s{x", ename.c_str() ) 
+                << " - " << russian_case(direction_doorname(pexit), '1') << " (закрыто)";
 
-                buf << fmt( ch, "    {C%-6s{x", ename ) 
-                    << " * (" << russian_case(direction_doorname(pexit), '1') << ")";
-
-                if (ch->is_immortal())
-                    buf << " (room " << room->vnum << ")";
-                
-                buf << endl;
-            }
+            if (ch->is_immortal())
+                buf << " (room " << room->vnum << ")";
+            
+            buf << endl;
         }
     }
 

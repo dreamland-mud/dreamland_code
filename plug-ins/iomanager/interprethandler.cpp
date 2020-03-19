@@ -31,7 +31,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-GSN(perception);
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
 const char *dir_name[] = {"N","E","S","W","U","D"};
@@ -248,8 +247,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                     continue;
 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-                    if (number_percent( ) < gsn_perception->getEffective( ch ))
-                        doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
+                    doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
                 } else {
                     doors << (ruexits ? ru_dir_name[door] : dir_name[door]);
                 }
