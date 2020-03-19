@@ -266,6 +266,12 @@ void Damage::protectMaterial( Object *obj )
 }
 void Damage::protectSanctuary( ) 
 {
+    switch (dam_type) {
+    case DAM_POISON:
+    case DAM_DISEASE:
+    case DAM_DROWNING:
+        return;
+    }
 
     if (IS_AFFECTED(victim, AFF_SANCTUARY)) {
         dam /= 2;
