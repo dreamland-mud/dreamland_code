@@ -481,7 +481,7 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
         if (victim == ch)
           act("Светлые силы не будут тебя защищать!", ch,0, 0,TO_CHAR);
         else
-          act("Светлые силы не будут защищать $C2.", ch,0,victim,TO_CHAR);
+          act("Светлые силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -522,7 +522,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
         if (victim == ch)
           act("Темные силы не будут тебя защищать!", ch,0, 0,TO_CHAR);
         else
-          act("Темные силы не будут защищать $C2.", ch,0,victim,TO_CHAR);
+          act("Темные силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
         return;
     }
 
