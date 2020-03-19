@@ -517,7 +517,7 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-  if (!IS_EVIL(victim))
+    if (!IS_EVIL(victim))
     {
         if (victim == ch)
           act("Темные силы не будут тебя защищать!", ch,0, 0,TO_CHAR);
