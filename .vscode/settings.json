@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.tcc": "cpp",
+        "chrono": "cpp",
+        "string_view": "cpp",
+        "algorithm": "cpp",
+        "istream": "cpp",
+        "limits": "cpp"
+    }
+}

@@ -563,10 +563,13 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     dam = min( ch->getModifyLevel(), static_cast<short>( paf->level/5+1 ) );
     ch->mana -= dam;
     ch->move -= dam;
-    damage_nocatch( ch, ch, dam, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+
+    float modifier = linear_interpolation(ch->getModifyLevel(), 1, 103, 0.5, 2);
+
+    damage_nocatch( ch, ch, (int) dam * modifier, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
 
     if (number_range(1, 100) < 70 )
-        damage_nocatch( ch, ch, max(ch->max_hit/20, 50), gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
+        damage_nocatch( ch, ch, (int) (max(ch->max_hit/20, 50) * modifier), gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
 }
     
 VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf ) 
@@ -705,7 +708,10 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
         poison_damage = paf->level * number_range(1,4);
     
     poison_damage = max( 1, poison_damage );
-    damage_nocatch(ch, ch, poison_damage, gsn_poison, DAM_POISON, true, DAMF_SPELL);
+
+    float modifier = linear_interpolation(ch->getModifyLevel(), 1, 103, 0.5, 2);
+    
+    damage_nocatch(ch, ch, (int) (poison_damage*modifier), gsn_poison, DAM_POISON, true, DAMF_SPELL);
 }
 
 SPELL_DECL(Slow);
