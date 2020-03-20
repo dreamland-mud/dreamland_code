@@ -564,12 +564,16 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     ch->mana -= dam;
     ch->move -= dam;
 
-    float modifier = linear_interpolation(ch->getModifyLevel(), 1, min(ch->getModifyLevel(),(short)103), 0.5, 2);
-    dam = (int) (dam * modifier);
-    damage_nocatch( ch, ch, max(1, dam), gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+    float modifier = linear_interpolation(min(ch->getModifyLevel(),(short)103), 1, 103, 0.5, 2);
+    
+    int plague_damage = max(3,(int) (dam * modifier));
+
+    damage_nocatch( ch, ch, plague_damage, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+    
+    int plague_hp_damage = (max(ch->max_hit/20, 50) * modifier);
 
     if (number_range(1, 100) < 70 )
-        damage_nocatch( ch, ch, (int) (max(ch->max_hit/20, 50) * modifier), gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
+        damage_nocatch( ch, ch, plague_hp_damage, gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
 }
     
 VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf ) 
@@ -707,9 +711,9 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
     else if (ch->getRealLevel( ) < 40)
         poison_damage = paf->level * number_range(1,4);
     
-    float modifier = linear_interpolation(ch->getModifyLevel(), 1, min(ch->getModifyLevel(),(short)103), 0.5, 2);
+    float modifier = linear_interpolation(min(ch->getModifyLevel(),(short)103), 1, 103, 0.5, 2);
 
-    poison_damage = max( 1, (int) (poison_damage*modifier) );
+    poison_damage = max( 3, (int) (poison_damage*modifier) );
     
     damage_nocatch(ch, ch, poison_damage, gsn_poison, DAM_POISON, true, DAMF_SPELL);
 }
