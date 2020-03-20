@@ -564,7 +564,7 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     ch->mana -= dam;
     ch->move -= dam;
 
-    float modifier = linear_interpolation(ch->getModifyLevel(), 1, 103, 0.5, 2);
+    float modifier = linear_interpolation(ch->getModifyLevel(), 1, min(ch->getModifyLevel(),(short)103), 0.5, 2);
 
     damage_nocatch( ch, ch, (int) dam * modifier, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
 
@@ -709,7 +709,7 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
     
     poison_damage = max( 1, poison_damage );
 
-    float modifier = linear_interpolation(ch->getModifyLevel(), 1, 103, 0.5, 2);
+    float modifier = linear_interpolation(ch->getModifyLevel(), 1, min(ch->getModifyLevel(),(short)103), 0.5, 2);
     
     damage_nocatch(ch, ch, (int) (poison_damage*modifier), gsn_poison, DAM_POISON, true, DAMF_SPELL);
 }
