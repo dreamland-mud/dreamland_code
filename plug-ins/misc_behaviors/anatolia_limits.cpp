@@ -48,8 +48,8 @@
  */
 void Excalibur::wear( Character *ch )
 {
-  act_p("$o1 загорается ослепительно белым светом.", ch,obj,0,TO_CHAR,POS_RESTING);
-  act_p("$o1 загорается ослепительно белым светом.", ch,obj,0,TO_ROOM,POS_RESTING);
+  act_p("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_CHAR,POS_RESTING);
+  act_p("$o1 загорается ослепительно-белым светом.", ch,obj,0,TO_ROOM,POS_RESTING);
   
 }
 
@@ -116,8 +116,8 @@ bool Excalibur::sac( Character *ch )
 void HasteBracers::wear( Character *ch ) 
 {
   if( !( ch->isAffected(gsn_haste ) || ch->isAffected(gsn_transform ) ) ) {
-      ch->send_to("Наручи принимают форму твоих рук, плотно прилегая к коже.\n\r");
-      ch->send_to("Твои руки наполняются удивительной легкостью.\n\r");
+//      ch->send_to("Предмет принимает форму твоих рук, плотно прилегая к коже.\n\r");
+      ch->send_to("Твое тело наполняется удивительной легкостью.\n\r");
     }
 }
 void HasteBracers::equip( Character *ch ) 
@@ -142,7 +142,7 @@ void HasteBracers::remove( Character *ch )
   if (ch->isAffected(gsn_haste))
     {
       affect_strip(ch, gsn_haste);
-      ch->send_to("Ты снова ощущаешь тяжесть в руках.\n\r");
+      ch->send_to("Твое тело теряет легкость, и твои движения замедляются.\n\r");
     }
 }
 
@@ -191,9 +191,9 @@ void TwoSnakeWhip::equip( Character *ch )
 
 void TwoSnakeWhip::remove( Character *ch )
 {
-  act_p("{rЗмеи на хлысте повисают безжизненным куском кожи.{x",
+  act_p("{rЗмеи на хлысте безжизненно обвисают.{x",
                 ch,obj,0,TO_CHAR,POS_DEAD);
-  act_p("{rЗмеи на хлысте повисают безжизненным куском кожи.{x",
+  act_p("{rЗмеи на хлысте безжизненно обвисают.{x",
                 ch,obj,0,TO_ROOM,POS_DEAD);
 }
 
@@ -244,9 +244,9 @@ void Thunderbolt::fight( Character *ch )
 
         switch(number_bits(6)) {
         case 0:
-            act("Разряд молнии вылетает из твоего меча и поражает $C4!", ch, 0, victim, TO_CHAR);
-            act("Разряд молнии потрескивает вдоль лезвия меча $c2 и изгибается в твою сторону!", ch, 0, victim, TO_VICT);
-            act("Разряд молнии вылетает из меча $c2, изгибаясь в сторону $C2!", ch, 0, victim, TO_NOTVICT);
+            act("Разряд молнии выстреливает из твоего оружия и поражает $C4!", ch, 0, victim, TO_CHAR);
+            act("Разряд молнии конденсируется на оружии $c2 и выстреливает в твою сторону!", ch, 0, victim, TO_VICT);
+            act("Разряд молнии конденсируется на оружии $c2, и выстреливает в сторону $C2!", ch, 0, victim, TO_NOTVICT);
 
             dam = dice(level,4) + 12;
             if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
@@ -367,7 +367,7 @@ int dam;
 
 void DemonfireShield::wear( Character *ch )
 {
-    ch->send_to("Твои руки чувствуют жар {RОгненного Щита{x.\n\r");
+    ch->send_to("Твои руки чувствуют жар {RОгня Демонов{x.\n\r");
 }
 
 void DemonfireShield::remove( Character *ch )
@@ -487,8 +487,8 @@ void LionClaw::fight( Character *ch )
   if ( ( obj == get_eq_char(ch,wear_wield)) ||
         (secondary = (obj == get_eq_char(ch,wear_second_wield))) )
    {
-     ch->send_to("{WКогти на мгновение показались из львиной лапы.{x\n\r");
-     act_p("{WКогти на мгновение показались из львиной лапы $c2.{x",
+     ch->send_to("{WКогти на мгновение показались из Львиной Лапы.{x\n\r");
+     act_p("{WКогти на мгновение показались из Львиной Лапы $c2.{x",
                 ch,0,0,TO_ROOM,POS_DEAD);
      
      one_hit(ch, ch->fighting, secondary);
