@@ -566,7 +566,7 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
 
     float modifier = linear_interpolation(ch->getModifyLevel(), 1, min(ch->getModifyLevel(),(short)103), 0.5, 2);
 
-    damage_nocatch( ch, ch, (int) dam * modifier, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+    damage_nocatch( ch, ch, (int) (dam * modifier), gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
 
     if (number_range(1, 100) < 70 )
         damage_nocatch( ch, ch, (int) (max(ch->max_hit/20, 50) * modifier), gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
