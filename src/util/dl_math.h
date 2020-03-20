@@ -16,7 +16,6 @@ long    number_mm       ( );
 int        dice                ( int number, int size );
 int        interpolate        ( short level, int value_00, int value_32 );
 void    init_mm( );
-float linear_interpolation (float x, float x1, float x2, float y1, float y2);
 
 #endif
 

@@ -28,6 +28,7 @@
 #include "act_move.h"
 #include "gsn_plugin.h"
 #include "drink_utils.h"
+#include "math_utils.h"
 
 #include "merc.h"
 #include "mercdb.h"

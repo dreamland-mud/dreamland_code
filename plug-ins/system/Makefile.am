@@ -40,6 +40,7 @@ objectbehaviorplugin.cpp \
 areabehaviorplugin.cpp \
 roombehaviorplugin.cpp \
 fenia_utils.cpp \
+math_utils.cpp \
 calendar_utils.cpp
 
 libsystem_la_MOC = \
