@@ -1221,6 +1221,21 @@ CMDRUNP( request )
                 ch->send_to( "Ты не видишь этого.\n\r");
                 return;
         }
+          if ( !victim->can_see( ch ) )
+         {
+                  do_say(victim,
+                 "Извини, я не вижу тебя.");
+                 return;
+        }
+
+        if ( !victim->can_see( obj ) )
+            {
+                do_say(victim,
+                "Извини, я не вижу этой вещи.");
+            return;
+            }
+
+
 
         if ( obj->pIndexData->vnum == 520 ) // Knight's key
         {
@@ -1442,7 +1457,7 @@ CMDRUNP( demand )
   if ( !victim->can_see( obj ) )
     {
         do_say(victim,
-        "Извини, я не вижу это.");
+        "Извини, я не вижу этой вещи.");
       return;
     }
 
