@@ -40,7 +40,7 @@ bool SteakCustomer::givenCheck( PCharacter *hero, Object *obj )
     }
 
     if (quest->raceName != orig->race) {
-        tell_fmt( "Хороший кусок, но я заказывал%2$Gло|л|ла мясо %3$s.",
+        tell_fmt( "Хороший кусок, но я заказыва%2$Gло|л|ла мясо %3$s.",
                   hero, ch, quest->raceRusName.c_str( ) );
         return false;        
         
