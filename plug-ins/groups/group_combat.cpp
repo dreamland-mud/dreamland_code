@@ -28,6 +28,7 @@
 #include "act_move.h"
 #include "gsn_plugin.h"
 
+#include "dreamland.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "act.h"
@@ -659,10 +660,10 @@ VOID_SPELL(SonicResonance)::run( Character *ch, Character *victim, int sn, int l
         dam /= 2;
     act_p("Цилиндр вибрирующей энергии окружает $C4, заставляя $S резонировать.",
                 ch,0,victim,TO_NOTVICT,POS_RESTING);
-    victim->setWait( skill->getBeats( )  );
+
+    victim->setWait(dreamland->getPulsePerSecond() * number_range(0, 3));
     damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
-
 
 SPELL_DECL(SpectralFuror);
 VOID_SPELL(SpectralFuror)::run( Character *ch, Character *victim, int sn, int level ) 
