@@ -228,6 +228,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     }
 
     if (is_safe_nomessage( pch, victim ) 
+            || !victim->in_room->isCommon()
             || !pch->can_see( victim->in_room )) 
     {
         act("$o1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
