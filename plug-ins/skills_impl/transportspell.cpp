@@ -351,13 +351,13 @@ bool SummonMovement::checkVictim( )
     if (ch->isAffected( gsn_spellbane ))
         return false;
 
+    if (IS_SET(ch->imm_flags, IMM_SUMMON))
+        return false;
+        
     if (ch->is_npc( )) {
         if (IS_SET(ch->act,ACT_AGGRESSIVE))
             return false;
             
-        if (IS_SET(ch->imm_flags,IMM_SUMMON))
-            return false;
-        
         if (ch->getNPC( )->behavior
             && IS_SET(ch->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
             return false;
