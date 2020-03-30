@@ -1140,11 +1140,6 @@ CMDRUNP( request )
                 return;
         }
 
-        if (!IS_AWAKE(victim)) {
-            interpret_raw( victim, "snore" );
-            return;
-        }
-
         if (ch->move < (50 + ch->getRealLevel( )))
         {
                 do_say(victim, "Ты выглядишь устало, может, отдохнешь сначала?");
@@ -1255,9 +1250,6 @@ CMDRUNP( request )
                           IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
       return;
     }
-
-            if ( obj->wear_loc != wear_none )
-                unequip_char(victim, obj);
 
 
         obj_from_char( obj );
@@ -1473,9 +1465,6 @@ CMDRUNP( demand )
                           IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
       return;
     }
-
-      if ( obj->wear_loc != wear_none )
-    unequip_char(victim, obj);
 
     act( "$c1 требует $o4 у $C2.", ch, obj, victim, TO_NOTVICT);
     act( "Ты требуешь $o4 у $C2.",   ch, obj, victim, TO_CHAR);
