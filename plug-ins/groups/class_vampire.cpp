@@ -215,7 +215,7 @@ SKILL_RUNP( control )
                 
   victim->master = victim->leader = ch;
 
-  act_p( "Ну разве $c1 не прелесть?", ch, 0, victim, TO_VICT,POS_RESTING );
+  act_p( "Ну разве $c1 -- не прелесть?", ch, 0, victim, TO_VICT,POS_RESTING );
   if ( ch != victim )
         act_p("$C1 смотрит на тебя влюбленными глазами.",ch,0,victim,TO_CHAR,POS_RESTING);
 
@@ -261,19 +261,19 @@ SKILL_RUNP( dig )
         return;
     }
 
-    if (room->sector_type == SECT_CITY || room->sector_type == SECT_INSIDE) {
-        ch->send_to("Здесь слишком твердая почва..\r\n");
+    if (room->sector_type == SECT_CITY) {
+        ch->send_to("Здесь слишком твердая почва.\r\n");
         return;
     }
     
-    if (IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
+    if (room->sector_type == SECT_INSIDE || IS_SET(room->room_flags, ROOM_PRIVATE|ROOM_SOLITARY|ROOM_LAW|ROOM_SAFE))
     {
         ch->send_to("Здесь неподходящее место для копания могилы.\r\n");
         return;
     }
     
     if (get_obj_room_vnum( room, OBJ_VNUM_GRAVE )) {
-        ch->send_to("Опс.. похоже, этот участок уже занял твой коллега.\r\n");
+        ch->send_to("Упс, похоже, этот участок уже занял твой коллега.\r\n");
         return;
     }
 
@@ -330,7 +330,7 @@ SKILL_RUNP( vampire )
 
         if ( ch->isAffected(gsn_vampire ) )
         {
-                ch->send_to("Ты не можешь стать еще более вампиром!\n\r");
+		ch->pecho( "Ты не можешь стать еще более вампир%Gом|ом|шей!", ch );
                 return;
         }
 
@@ -342,14 +342,14 @@ SKILL_RUNP( vampire )
 
         if (gsn_vampire->getLearned( ch ) < 100)
         {
-                ch->send_to("Попроси гильдмастера помочь тебе.\n\r");
+                ch->send_to("Поклонись Гильдмастеру -- и он поможет тебе.\n\r");
                 return;
         }
 
         if ( weather_info.sunlight == SUN_LIGHT
                 || weather_info.sunlight == SUN_RISE )
         {
-                ch->send_to("Тебе нужно дождаться вечера, чтобы превратиться в вампира.\n\r");
+		ch->pecho( "Тебе нужно дождаться вечера, чтобы превратиться в вампир%Gа|а|шу!", ch );
         }
 
         level = ch->getModifyLevel();
@@ -408,7 +408,7 @@ SKILL_RUNP( vampire )
         af.bitvector = PLR_VAMPIRE;
         affect_to_char( ch, &af );
 
-        ch->send_to("Превращаясь в кровожадного вампира, ты чувствуешь прилив силы.\r\n");
+	ch->pecho( "Превращаясь в кровожадн%1$Gого|ого|ую вампир%1$Gа|а|шу, ты чувствуешь прилив силы.", ch );
         act_p("$c1 неуловимо меняется, превращаясь в нечто ужасное!",ch,0,0,TO_ROOM,POS_RESTING);
 }
 
@@ -489,7 +489,7 @@ SKILL_RUNP( suck )
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-         ch->send_to("Высасывать кровь можно, только превратившись в вампира.\n\r");
+	 ch->pecho( "Высасывать кровь можно, только превратившись в вампир%Gа|а|шу!", ch );
          return;
     }
 
@@ -525,7 +525,7 @@ SKILL_RUNP( bite )
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-        ch->send_to("Чтоб укусить ты должен сначала превратиться в вампира.\n\r");
+  	    ch->pecho( "Чтобы укусить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch );    
         return;
     }
 
@@ -549,7 +549,7 @@ SKILL_RUNP( bite )
 
     if ( victim->position != POS_SLEEPING )
     {
-        ch->send_to("Сначала он должен уснуть.\n\r");
+        ch->send_to("Сначала усыпи жертву.\n\r");
         return;
     }
 
@@ -757,7 +757,7 @@ SKILL_RUNP( human )
 
     if ( !IS_VAMPIRE(ch) )
     {
-     ch->send_to("Ты и есть человек.\n\r");
+     ch->send_to("Ты уже в человеческом облике.\n\r");
      return;
     }
 
@@ -1051,12 +1051,12 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-        ch->send_to("Для этого тебе необходимо превратиться в вампира.\r\n");
+	ch->pecho( "Для этого тебе необходимо превратиться в вампир%Gа|а|шу!", ch );    
         return;
     }
 
     if (ch->isAffected(sn)) {
-        ch->send_to("Две стаи летучих мышей - это слишком.\r\n");
+        ch->send_to("Две стаи летучих мышей -- это слишком.\r\n");
         return;
     }
 
@@ -1102,7 +1102,7 @@ bool VampireGuildmaster::social( Character *actor, Character *victim, const DLSt
     }
     
     if (pActor->getQuestPoints() < 50) {
-        say_act( actor, ch, "Я потребую с тебя 50 qp, но я вижу, что ты не можешь заплатить такую цену." );
+        say_act( actor, ch, "Тебе потребуется 50 квестовых очков для обряда инициации." );
         return true;
     }
 

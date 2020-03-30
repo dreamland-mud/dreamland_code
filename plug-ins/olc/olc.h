@@ -59,6 +59,7 @@ OBJ_INDEX_DATA *new_obj_index();
 void free_obj_index(OBJ_INDEX_DATA * pObj);
 MOB_INDEX_DATA *new_mob_index();
 void free_mob_index(MOB_INDEX_DATA * pMob);
+// Defined in db.cpp
 EXTRA_EXIT_DATA *new_extra_exit();
 void free_extra_exit(EXTRA_EXIT_DATA *eeit);
 

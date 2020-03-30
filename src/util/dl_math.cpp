@@ -209,6 +209,3 @@ int interpolate( short level, int value_00, int value_32 )
     return value_00 + level * (value_32 - value_00) / 32;
 }
 
-
-
-

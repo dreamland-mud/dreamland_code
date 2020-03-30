@@ -15,14 +15,12 @@ allskillslist.cpp \
 cskills.cpp \
 train.cpp \
 glist.cpp \
-forget.cpp \
 practice.cpp \
 showskill.cpp \
 teach.cpp \
 impl.cpp
 
 liblearn_la_MOC = \
-forget.h \
 teach.h \
 train.h
 

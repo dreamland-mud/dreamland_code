@@ -31,13 +31,13 @@
 #include "mercdb.h"
 #include "def.h"
 
-GSN(perception);
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
 const char *dir_name[] = {"N","E","S","W","U","D"};
 const char *dir_name_small[] = {"n","e","s","w","u","d"};
 const char *ru_dir_name[] = {"С","В","Ю","З","П","О"};
 const char *ru_dir_name_small[] = {"с","в","ю","з","п","о"};
+const char * sunlight_ru [4] = { "темно", "светает", "светло", "сумерки" };    
 
 static bool rprog_command( Room *room, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
@@ -78,6 +78,52 @@ static bool omprog_command( Character *actor, const DLString &cmdName, const DLS
     }
 
     return false;
+}
+
+static bool can_see_room_details(Character *ch)
+{
+    if (ch->getConfig( )->holy
+        || ch->is_vampire( )
+        || IS_GHOST(ch) || IS_DEATH_TIME(ch)
+        || (ch->in_room->isDark( ) && IS_AFFECTED(ch, AFF_INFRARED))
+        || (!ch->in_room->isDark( ) && !IS_AFFECTED(ch, AFF_BLIND)))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+static bool can_see_sunlight(Character *ch)
+{
+    return !IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
+}
+
+static char sector_type_color(int type)
+{
+    switch (type) {
+        case SECT_CITY:
+        case SECT_INSIDE:
+            return 'W';
+        case SECT_AIR: 
+            return 'C';
+        case SECT_FOREST: 
+            return 'g';
+        case SECT_FIELD:
+        case SECT_HILLS: 
+            return 'G';
+        case SECT_MOUNTAIN: 
+            return 'y';
+        case SECT_WATER_SWIM: 
+            return 'B';
+        case SECT_WATER_NOSWIM:
+        case SECT_UNDERWATER: 
+            return 'b';            
+        case SECT_DESERT: 
+            return 'Y';
+        default: 
+            return 'D';
+    }
 }
 
 int
@@ -201,8 +247,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                     continue;
 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-                    if (number_percent( ) < gsn_perception->getEffective( ch ))
-                        doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
+                    doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
                 } else {
                     doors << (ruexits ? ru_dir_name[door] : dir_name[door]);
                 }
@@ -219,10 +264,6 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'n' :
             out << ch->seeName( ch );
-            break;
-
-        case 'S' :
-            out << (ch->getSex( ) == SEX_MALE ? "Male":(!ch->getSex( ) ? "None":"Female"));
             break;
 
         case 'y' :
@@ -283,6 +324,14 @@ void InterpretHandler::normalPrompt( Character *ch )
             out << ch->getRealLevel( );
             break;
 
+        case 'L':
+            if (ch->in_room && can_see_sunlight(ch)) {
+                out << sunlight_ru[weather_info.sunlight];
+            } else {
+                out << "-";
+            }
+            break;
+
         case 'g' :
             out << ch->gold;
             break;
@@ -291,24 +340,28 @@ void InterpretHandler::normalPrompt( Character *ch )
             out << ch->silver;
             break;
 
-        case 'a' :
-            out << align_table.name( ALIGNMENT(ch) );
+        case 'S':
+            if (ch->in_room && can_see_room_details(ch)) {
+                int sector = ch->in_room->sector_type;
+                bool indoors = IS_SET(ch->in_room->room_flags, ROOM_INDOORS);
+                out << (indoors ? "(" : "")
+                    << "{" << sector_type_color(sector) <<  sector_table.message(sector) << "{w"
+                    << (indoors ? ")" : "");
+            } else {
+                out << "";
+            }
             break;
 
         case 'r' :
-            if (ch->in_room != 0)
-                if (ch->getConfig( )->holy
-                    || ch->is_vampire( )
-                    || IS_GHOST(ch) || IS_DEATH_TIME(ch)
-                    || (ch->in_room->isDark( ) && IS_AFFECTED(ch, AFF_INFRARED))
-                    || (!ch->in_room->isDark( ) && !IS_AFFECTED(ch, AFF_BLIND)))
-                {
+            if (ch->in_room != 0) {
+                if (can_see_room_details(ch)) {
                     out << ch->in_room->name;
-                }
-                else
+                } else {
                     out << "темнота";
-            else
+                }
+            } else {
                 out << " ";
+            }
             break;
 
         case 'W' :
@@ -382,7 +435,7 @@ InterpretHandler::prompt(Descriptor *d)
 
     battlePrompt( ch );
 
-    webPrompt(d, ch);
+    webPrompt(d, d->character);
 
     if (!IS_SET( ch->comm, COMM_COMPACT ))
         d->send("\n\r");
@@ -456,4 +509,5 @@ void InterpretHandler::init( Descriptor *d )
     d->inbuf[0] = '\0';
     Descriptor::updateMaxOnline( );
 }
+
 

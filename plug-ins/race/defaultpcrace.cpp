@@ -43,11 +43,6 @@ int DefaultPCRace::getPracBonus( ) const
 {
     return pracBonus.getValue( );
 }
-int DefaultPCRace::getSpBonus( ) const
-{
-    return skillPointsBonus.getValue( );
-}
-
 const Flags & DefaultPCRace::getAlign( ) const
 {
     return align;

@@ -318,9 +318,9 @@ SKILL_RUNP( shield )
     if (material_is_flagged( shield, MAT_INDESTR ) || shield->pIndexData->limit != -1)
         return;
 
-    if (axe->value[0] == WEAPON_AXE )
+    if (axe->value0() == WEAPON_AXE )
         chance = ( int )( chance * 1.2 );
-    else if (axe->value[0] != WEAPON_SWORD)
+    else if (axe->value0() != WEAPON_SWORD)
         {
          ch->send_to("Для этого ты должен вооружиться топором или мечом.\n\r");
          return;
@@ -411,9 +411,9 @@ SKILL_RUNP( weapon )
         return;
 
 
-    if (axe->value[0] == WEAPON_AXE )
+    if (axe->value0() == WEAPON_AXE )
         chance = ( int )( chance * 1.2 );
-    else if (axe->value[0] != WEAPON_SWORD)
+    else if (axe->value0() != WEAPON_SWORD)
         {
          ch->send_to("Для этого тебе нужно вооружиться топором или мечом.\n\r");
          return;
@@ -487,9 +487,9 @@ SKILL_RUNP( lash )
     one_argument(argument, arg);
     
     whip = get_eq_char(ch, wear_wield);
-    if (!whip || whip->item_type != ITEM_WEAPON || whip->value[0] != WEAPON_WHIP)
+    if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP)
         whip = get_eq_char(ch, wear_second_wield);
-    if (!whip || whip->item_type != ITEM_WEAPON || whip->value[0] != WEAPON_WHIP) 
+    if (!whip || whip->item_type != ITEM_WEAPON || whip->value0() != WEAPON_WHIP) 
     {
         ch->send_to( "Возьми в руки хлыст.\n\r" );
         return;
@@ -606,10 +606,10 @@ SKILL_RUNP( throwspear )
 {
         Character *victim;
         Object *spear;
-        char arg1[512],arg2[512];
         bool success;
         int chance,direction;
         int range = ( ch->getModifyLevel() / 10) + 1;
+        DLString argDoor, argVict;
 
         if ( ch->is_npc() )
                 return; /* Mobs can't shoot spears */
@@ -620,38 +620,26 @@ SKILL_RUNP( throwspear )
                 return;
         }
 
-        argument=one_argument( argument, arg1 );
-        one_argument( argument, arg2 );
-
-        if ( arg1[0] == '\0' || arg2[0] == '\0')
-        {
-                ch->send_to("Метнуть копье куда и в кого?\n\r");
-                return;
-        }
-
         if ( ch->fighting )
         {
                 ch->send_to("Ты не можешь сконцентрироваться для метания копья.\n\r");
                 return;
         }
 
-        direction = direction_lookup( arg1 );
-
-        if (direction < 0)
-        {
+        if (!direction_range_argument(argument, argDoor, argVict, direction)) {
                 ch->send_to("Метнуть копье куда и в кого?\n\r");
                 return;
         }
 
-        if ( ( victim = find_char( ch, arg2, direction, &range) ) == 0 )
+        if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
                 return;
-/*
+
         if ( !victim->is_npc() && victim->desc == 0 )
         {
                 ch->send_to("Ты не можешь сделать этого.\n\r");
                 return;
         }
-*/
+
         if ( victim == ch )
         {
                 ch->send_to("Это бессмысленно.\n\r");
@@ -674,7 +662,7 @@ SKILL_RUNP( throwspear )
 
         if ( !spear
                 || spear->item_type != ITEM_WEAPON
-                || spear->value[0] != WEAPON_SPEAR )
+                || spear->value0() != WEAPON_SPEAR )
         {
                 ch->send_to("Для метания тебе необходимо копье!\n\r");
                 return;            
@@ -707,7 +695,7 @@ SKILL_RUNP( throwspear )
         obj_from_char(spear);
         int dam;
         
-        dam = dice(spear->value[1],spear->value[2]);
+        dam = dice(spear->value1(),spear->value2());
         dam += ch->damroll + get_str_app(ch).missile;
         dam /= 2;
 

@@ -47,64 +47,53 @@ DLString ServerSocketContainer::getNodeName( ) const
     return NODE_NAME;
 }
 
-bool ServerSocketContainer::isWrapped( int d )
+ServerSocket * ServerSocketContainer::findSocket(int desc)
 {
-    iterator pos;
-
-    for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
-
-        if (sock->getFD( ) == d)
-            return (sock->getWrapped( ) > 0);
+    for (auto elem: elements) {
+        ServerSocket *sock = elem.getStaticPointer<ServerSocket>();
+        if (sock && sock->getFD() == desc)
+            return sock;
     }
 
-    return false;
+    return 0;
+}
+
+bool ServerSocketContainer::isWrapped( int d )
+{
+    ServerSocket *sock = thisClass->findSocket(d);
+    return sock && (sock->getWrapped( ) > 0);
 }
 
 bool ServerSocketContainer::isBackdoor( int d )
 {
-    iterator pos;
-
-    for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
-
-        if (sock->getFD( ) == d)
-            return sock->isBackdoor( );
-    }
-
-    return false;
+    ServerSocket *sock = thisClass->findSocket(d);
+    return sock && sock->isBackdoor();
 }
 
 bool ServerSocketContainer::isWebSock( int d )
 {
-    iterator pos;
+    ServerSocket *sock = thisClass->findSocket(d);
+    return sock && sock->isWebSock();
+}
 
-    for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
-
-        if (sock->getFD( ) == d)
-            return sock->isWebSock( );
-    }
-
-    return false;
+bool ServerSocketContainer::isNewNanny(int desc)
+{
+    ServerSocket *sock = thisClass->findSocket(desc);
+    return sock && sock->isNewNanny();
 }
 
 bool ServerSocketContainer::isAllowed( int d, struct sockaddr_in &other_sock )
 {
-    iterator pos;
+    ServerSocket *sock = thisClass->findSocket(d);
 
-    for (pos = thisClass->elements.begin( ); pos != thisClass->elements.end( ); pos++) {
-        ServerSocket *sock = pos->getStaticPointer<ServerSocket>( );
-        
-        if (sock->getFD( ) == d) {
-           if (!sock->isLocal( ))
-               return true;
+    if (sock) {
+        if (!sock->isLocal( ))
+            return true;
 
-           if (other_sock.sin_addr.s_addr == inet_addr(sock->getAllowedIP( )))
-               return true;
+        if (other_sock.sin_addr.s_addr == inet_addr(sock->getAllowedIP( )))
+            return true;
 
-           return false;
-        }
+        return false;
     }
 
     return false;

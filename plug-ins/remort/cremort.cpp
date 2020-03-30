@@ -66,7 +66,7 @@ CMDRUN( remort )
     }
     
     if (argument.empty( )) {
-        pch->println("Если хочешь начать новую жизнь, набери remort <password>");
+        pch->println("Если хочешь начать новую жизнь, набери {y{lRпереродиться{lEremort{x пароль.");
         return;
     }
     

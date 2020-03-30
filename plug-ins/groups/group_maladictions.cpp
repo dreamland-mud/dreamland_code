@@ -28,6 +28,7 @@
 #include "act_move.h"
 #include "gsn_plugin.h"
 #include "drink_utils.h"
+#include "math_utils.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -126,6 +127,18 @@ VOID_SPELL(BlackDeath)::run( Character *ch, Room *room, int sn, int level )
 }
 
 AFFECT_DECL(BlackDeath);
+VOID_AFFECT(BlackDeath)::entry( Room *room, Character *ch, Affect *paf )
+{
+     act("{yВоздух отравлен чумными миазмами.{x",ch, 0, 0, TO_CHAR);
+}
+
+VOID_AFFECT(BlackDeath)::toStream( ostringstream &buf, Affect *paf ) 
+{
+    buf << fmt( 0, "Чумные миазмы будут отравлять воздух еще {W%1$d{x ча%1$Iс|са|сов.",
+                   paf->duration )
+        << endl;
+}
+
 VOID_AFFECT(BlackDeath)::update( Room *room, Affect *paf )
 {
     Affect plague;
@@ -207,7 +220,7 @@ VOID_SPELL(Curse)::run( Character *ch, Object *obj, int sn, int level )
     {
         Affect *paf;
 
-        paf = obj->affected->affect_find(gsn_bless);
+        paf = obj->affected ? obj->affected->affect_find(gsn_bless) : 0;
         if (!savesDispel(level,paf != 0 ? paf->level : obj->level,0))
         {
             if (paf != 0)
@@ -337,6 +350,18 @@ VOID_SPELL(DeadlyVenom)::run( Character *ch, Room *room, int sn, int level )
 }
 
 AFFECT_DECL(DeadlyVenom);
+VOID_AFFECT(DeadlyVenom)::entry( Room *room, Character *ch, Affect *paf )
+{
+     act("{yВ воздухе ощущаются ядовитые испарения.{x",ch, 0, 0, TO_CHAR);
+}
+
+VOID_AFFECT(DeadlyVenom)::toStream( ostringstream &buf, Affect *paf ) 
+{
+    buf << fmt( 0, "Ядовитые испарения исчезнут через {W%1$d{x ча%1$Iс|са|сов.",
+                   paf->duration )
+        << endl;
+}
+
 VOID_AFFECT(DeadlyVenom)::update( Room *room, Affect *paf )
 {
     Affect af;
@@ -431,7 +456,7 @@ VOID_SPELL(LethargicMist)::run( Character *ch, Room *room, int sn, int level )
 AFFECT_DECL(LethargicMist);
 VOID_AFFECT(LethargicMist)::entry( Room *room, Character *ch, Affect *paf )
 {
-     act_p("{yВ воздухе клубится какой-то туман.{x",ch, 0, 0, TO_CHAR, POS_SLEEPING);
+     act("{yВ воздухе клубится летаргический туман.{x",ch, 0, 0, TO_CHAR);
 }
 
 VOID_AFFECT(LethargicMist)::toStream( ostringstream &buf, Affect *paf ) 
@@ -455,7 +480,7 @@ VOID_AFFECT(LethargicMist)::update( Room *room, Affect *paf )
     af.bitvector= AFF_SLOW;
 
     for (vch = room->people; vch != 0; vch = vch->next_in_room) {
-        if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_SPELL)
+        if ( !saves_spell(af.level ,vch,DAM_OTHER, 0, DAMF_SPELL|DAMF_WATER)
                 && !is_safe_rspell(paf->level,vch)
                 && !IS_AFFECTED(vch,AFF_SLOW) && number_bits(3) == 0 )
         {
@@ -539,10 +564,17 @@ VOID_AFFECT(Plague)::update( Character *ch, Affect *paf )
     dam = min( ch->getModifyLevel(), static_cast<short>( paf->level/5+1 ) );
     ch->mana -= dam;
     ch->move -= dam;
-    damage_nocatch( ch, ch, dam, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+
+    float modifier = linear_interpolation(min(ch->getModifyLevel(),(short)103), 1, 103, 0.5, 2);
+    
+    int plague_damage = max(3,(int) (dam * modifier));
+
+    damage_nocatch( ch, ch, plague_damage, gsn_plague,DAM_DISEASE,false, DAMF_SPELL);
+    
+    int plague_hp_damage = (max(ch->max_hit/20, 50) * modifier);
 
     if (number_range(1, 100) < 70 )
-        damage_nocatch( ch, ch, max(ch->max_hit/20, 50), gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
+        damage_nocatch( ch, ch, plague_hp_damage, gsn_plague,DAM_DISEASE,true, DAMF_SPELL);
 }
     
 VOID_AFFECT(Plague)::entry( Character *ch, Affect *paf ) 
@@ -591,7 +623,7 @@ VOID_SPELL(Poison)::run( Character *ch, Object *obj, int sn, int level )
                         return;
                 }
                 
-                SET_BIT(obj->value[3], DRINK_POISONED);
+                obj->value3(obj->value3() | DRINK_POISONED);
                 act_p("Пары яда проникают в $o4.",ch,obj,0,TO_ALL,POS_RESTING);
                 return;
         }
@@ -680,7 +712,10 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
     else if (ch->getRealLevel( ) < 40)
         poison_damage = paf->level * number_range(1,4);
     
-    poison_damage = max( 1, poison_damage );
+    float modifier = linear_interpolation(min(ch->getModifyLevel(),(short)103), 1, 103, 0.5, 2);
+
+    poison_damage = max( 3, (int) (poison_damage*modifier) );
+    
     damage_nocatch(ch, ch, poison_damage, gsn_poison, DAM_POISON, true, DAMF_SPELL);
 }
 

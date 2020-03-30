@@ -138,10 +138,6 @@ public:
     virtual short getClanLevel( ) const ;
     virtual void setClanLevel( short clanLevel ) ;
 
-    virtual ProfessionReference & getTrueProfession( );
-    ProfessionReference & getSubProfession( );
-    void setSubProfession( const ProfessionReference & );
-
     virtual HometownReference &getHometown( ) ;
     virtual void setHometown( const HometownReference & ) ;
 
@@ -204,8 +200,6 @@ public:
     bool canSeeProfession( PCharacter * );
     
     // pc skills
-    int skill_points( );
-    int skill_points( int );
     virtual int applyCurse( int );
     PCSkillData & getSkillData( int );
     inline PCSkills & getSkills( );
@@ -249,7 +243,6 @@ private:
     XML_VARIABLE XMLClanReference petition;
     XML_VARIABLE XMLShort clanLevel;
     XML_VARIABLE XMLHometownReference   hometown;
-    XML_VARIABLE XMLProfessionReference subprofession;
 
     XML_VARIABLE XMLAttributes attributes;
     XML_VARIABLE Remorts remorts;
@@ -297,7 +290,6 @@ public:
     XML_VARIABLE XMLInteger                perm_hit;
     XML_VARIABLE XMLInteger                perm_mana;
     XML_VARIABLE XMLInteger                perm_move;
-    XML_VARIABLE XMLInteger                max_skill_points;
     XML_VARIABLE XMLIntegerNoEmpty        practice;
     XML_VARIABLE XMLIntegerNoEmpty        train;
     XML_VARIABLE XMLIntegerNoEmpty        loyalty;          // real ethos - dynamic

@@ -210,9 +210,10 @@ void OLCStateObject::commit()
 
             if(o->cost == original->cost)
                 o->cost = obj.cost;
-            
-            if(!memcmp(o->value, original->value, sizeof(o->value)))
-                memcpy(o->value, obj.value, sizeof(o->value));
+           
+            for (int i = 0; i < 5; i++)
+                if (o->getsValueFromProto(i) && o->valueByIndex(i) == original->value[i])
+                    o->valueByIndex(i, obj.value[i]);
         }
     
     original->new_format   = obj.new_format;
@@ -1122,8 +1123,13 @@ CMD(oedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
         oe->findCommand(ch, "show")->run(ch, "");
         return;
     } else if (!str_cmp(arg1, "create")) {
-        if (!str_cmp(argument, "next")) 
+        if (!str_cmp(argument, "next")) {
             value = next_obj_index(ch, ch->in_room);
+            if (value < 0) {
+                ch->println("Все внумы в этой зоне уже заняты!");
+                return;
+            }
+        }
         else
             value = atoi(argument);
 

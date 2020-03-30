@@ -12,11 +12,11 @@
 [![Build Status](https://travis-ci.org/dreamland-mud/dreamland_code.svg?branch=master)](https://travis-ci.org/dreamland-mud/dreamland_code)
 [![Discord chat](https://img.shields.io/discord/464761427710705664.svg?label=Discord%20chat&style=flat)](https://discord.gg/RPaz6ut)
 
-Есть несколько способов познакомиться с кодом проекта и начать под него разработку:
-* Собрать у себя локально, например, на виртуальной машине с Ubuntu, пользуясь инструкцией ниже.
-* Собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
-* Воспользоваться Goorm Online IDE согласно [инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE), что даст возможность изучать и изменять код, запускать свой сервер и играть на нем, не покидая окна браузера.
-
+Как собирать и запускать:
+* Из-под Ubuntu 18.04 (реальная или виртуальная машина): пользуйтесь инструкцией ниже.
+* Из-под Windows 10: следуя [этой инструкции](https://github.com/dreamland-mud/dreamland_code/wiki/WSL-and-VS-Code) для Windows Subsystem for Linux и редактора VS Code
+* Из-под окружения Docker: собрать готовый к использованию Docker контейнер, как описано в Readme к проекту [dreamland_docker](https://github.com/dreamland-mud/dreamland_docker).
+* Из-под онлайн сред разработки в браузере: [Goorm Online IDE](https://github.com/dreamland-mud/dreamland_code/wiki/Goorm-IDE) или же https://gitpod.io.
 
 **Содержание**
 * [Запуск локальной версии](#local)
@@ -46,7 +46,7 @@
 Установите компилятор и сопутствующие программы, а также библиотеки, от которых зависит код дримленд:
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim libfl-dev bzip2
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
 ```
 

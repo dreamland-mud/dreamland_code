@@ -46,10 +46,8 @@ private:
     static PCharacter * getPlayer( const Scripting::RegisterList & );
     static PCharacter * getPlayer( const Scripting::Register & );
     static Character * getCharacter( const Scripting::RegisterList & );
-    static bool resolve( );
-    static bool invoke( Scripting::IdRef &, Character *, Scripting::RegisterList );
-    
-    static Scripting::Register tmpNanny;
+    static Scripting::Register resolve(Descriptor *d);
+    static bool invoke( Scripting::IdRef &, Descriptor *, Scripting::RegisterList );
 };
 
 #endif

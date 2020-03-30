@@ -16,7 +16,7 @@ public:
     virtual void unsetSkillGroup( );
     inline virtual SkillGroupPointer getSkillGroup( ) const;
     virtual void save() const;
-
+    virtual DLString getTitle(const DLString &label) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;
 

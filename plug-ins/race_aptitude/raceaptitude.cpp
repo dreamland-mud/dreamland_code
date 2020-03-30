@@ -67,16 +67,6 @@ int RaceAptitude::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned.getValue( );
 }
 
-int RaceAptitude::getWeight( Character * ) const
-{
-    return 0;
-}
-
-bool RaceAptitude::canForget( PCharacter * ) const
-{
-    return false;
-}
-
 bool RaceAptitude::canPractice( PCharacter * ch, std::ostream & ) const
 {
     return available( ch );
@@ -123,6 +113,8 @@ void RaceAptitude::show( PCharacter *ch, std::ostream &buf )
     default: buf << "рас "; break;
     }
     buf << rnames.wrap("{W", "{x").join(", ") << "." << endl;
+
+    print_wait_and_mana(this, ch, buf);    
     
     if (!visible( ch )) {
         print_see_also(this, ch, buf);

@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include "spelltemplate.h"
+#include "affecthandlertemplate.h"
 #include "transportspell.h"
 #include "recallmovement.h"
 #include "profflags.h"
@@ -116,6 +117,24 @@ VOID_SPELL(Fly)::run( Character *ch, Character *victim, int sn, int level )
 
 }
 
+AFFECT_DECL(Fly);
+VOID_AFFECT(Fly)::remove( Character *victim ) 
+{
+    if (victim->posFlags.isSet( POS_FLY_DOWN )) 
+        victim->println("Ты теряешь способность к полетам.");
+    else
+        DefaultAffectHandler::remove( victim );                                     
+
+}
+
+VOID_AFFECT(Fly)::dispel( Character *victim ) 
+{
+    if (victim->posFlags.isSet( POS_FLY_DOWN )) 
+        victim->recho("%^C1 теряет способность к полетам.", victim);
+    else
+        DefaultAffectHandler::dispel( victim );                                     
+}
+
 /*
  * 'pass door' spell
  */
@@ -157,7 +176,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     Room *to_room = 0, *from_room;
     int vnum;
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         vnum = OBJ_VNUM_HOLY_PORTAL;
     else
         vnum = OBJ_VNUM_PORTAL;
@@ -191,7 +210,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     /* portal one */
     portal = create_object(get_obj_index(vnum),0);
     portal->timer = 1 + level / 5;
-    portal->value[3] = to_room->vnum;
+    portal->value3(to_room->vnum);
 
     obj_to_room(portal,from_room);
 
@@ -205,7 +224,7 @@ VOID_SPELL(Nexus)::run( Character *ch, Character *victim, int sn, int level )
     /* portal two */
     portal = create_object(get_obj_index(vnum),0);
     portal->timer = 1 + level / 5;
-    portal->value[3] = from_room->vnum;
+    portal->value3(from_room->vnum);
 
     obj_to_room(portal,to_room);
 
@@ -228,7 +247,7 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
     Object *portal, *stone;
     int vnum;
     
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
         vnum = OBJ_VNUM_HOLY_PORTAL;
     else
         vnum = OBJ_VNUM_PORTAL;
@@ -260,7 +279,7 @@ VOID_SPELL(Portal)::run( Character *ch, Character *victim, int sn, int level )
 
     portal = create_object(get_obj_index(vnum),0);
     portal->timer = 2 + level / 8;
-    portal->value[3] = victim->in_room->vnum;
+    portal->value3(victim->in_room->vnum);
 
     obj_to_room(portal,ch->in_room);
 

@@ -51,21 +51,12 @@ void QuestWeapon::equip( Character *ch )
     Affect af;
     for (int i = 0; weapon_params[i].level; i++) {
         if (level <= weapon_params[i].level) {
-            obj->value[1] = weapon_params[i].value1;
-            obj->value[2] = weapon_params[i].value2;
+            obj->value1(weapon_params[i].value1);
+            obj->value2(weapon_params[i].value2);
             break;
         }
    }
         
-/*
-    if ( level > 17 && level <= 30)           obj->value[2] = 4;
-    else if ( level > 30 && level <= 40)   obj->value[2] = 5;
-    else if ( level > 40 && level <= 50)   obj->value[2] = 6;
-    else if ( level > 50 && level <= 60)   obj->value[2] = 8;
-    else if ( level > 60 && level <= 70)   obj->value[2] = 10;
-    else if ( level > 70 && level <= 80)   obj->value[2] = 11;
-    else obj->value[2] = 12;
-*/    
     obj->level = ch->getRealLevel( );
 
     if( obj->affected )
@@ -139,7 +130,7 @@ void QuestWeapon::addAffect( Character *ch, Affect *paf ) {
     case APPLY_MANA:
       paf->level = level;
       paf->modifier = level * 2;
-      if (ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER)) 
+      if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER)) 
           paf->modifier += paf->modifier*3/2;
 
       return;

@@ -22,6 +22,14 @@ void SkillGroupHelp::save() const
     }
 }
 
+DLString SkillGroupHelp::getTitle(const DLString &label) const
+{
+    if (!label.empty() || !group || !titleAttribute.empty())
+        return MarkupHelpArticle::getTitle(label);
+
+    return "Группа умений {c" + group->getRussianName() + "{x, {c" + group->getName() + "{x";
+}
+
 void SkillGroupHelp::getRawText( Character *ch, ostringstream &buf ) const
 {
     buf << "%PAUSE%";

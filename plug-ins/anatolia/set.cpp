@@ -43,7 +43,6 @@
 CLAN(none);
 CLAN(outsider);
 PROF(none);
-PROF(universal);
 
 typedef void                ( *FUNC_SET )( Character*, char* );
 
@@ -107,7 +106,6 @@ void chg_mob_gold( Character*, char* );
 void chg_mob_killer( Character*, char* );
 void chg_mob_violent( Character*, char* );
 void chg_mob_slain( Character*, char* );
-void chg_mob_skillpoints( Character*, char* );
 void chg_mob_help( Character*, char* );
 void chg_mob_act( Character*, char* );
 void chg_mob_off( Character*, char* );
@@ -115,7 +113,6 @@ void chg_mob_imm( Character*, char* );
 void chg_mob_res( Character*, char* );
 void chg_mob_vuln( Character*, char* );
 void chg_mob_class( Character*, char* );
-void chg_mob_uniclass( Character*, char* );
 void chg_mob_attr( Character*, char* );
 void chg_mob_qp( Character*, char* );
 
@@ -141,14 +138,11 @@ T_SET_MOB tab_set_mob[] = {
   { "killer",        chg_mob_killer,        false, S_S,                "Флаг {RKILLER{x"                },
   { "violent",        chg_mob_violent,false, S_S,                "Флаг {BVIOLENT{x"                },
   { "slain",        chg_mob_slain,        false, S_S,                "Флаг {DSLAIN{x"                },
-        { "skillpoints", chg_mob_skillpoints, true, S_V, "максимум skillpoints" },
         { "act",                chg_mob_act, false, S_NONE, "Флаги поведения NPC (help actflags)" },
         { "off",                chg_mob_off, false, S_NONE, "Умения NPC (help offflags)" },
         { "imm",                chg_mob_imm, false, S_NONE, "Иммуны NPC (help immflags)" },
         { "res",                chg_mob_res, false, S_NONE, "Резисты NPC (help immflags)" },
         { "vuln",                chg_mob_vuln, false, S_NONE, "Вульны NPC (help immflags)" },
-        { "class",                chg_mob_class, false, S_NONE, "Смена класса (только для Universal)" },
-        { "uniclass",                chg_mob_uniclass, false, S_NONE, "Смена подкласса для Universal" },
         { "attr",                chg_mob_attr, false, S_NONE, "Установка аттрибута" },
   { "help",        chg_mob_help,        false, S_NONE,                "Это то что на экране"                },
   { NULL,        NULL,                false, S_NONE,                NULL                                }
@@ -983,207 +977,6 @@ void chg_mob_slain( Character* ch, char* argument ) {
 }
 
 
-void chg_mob_skillpoints( Character* ch, char* argument )
-{
-  Character* victim;
-  char buf[MAX_INPUT_LENGTH];
-  int value;
-  int adv_value;
-
-  if( ( victim = get_CHAR( ch, &argument ) ) )
-        {
-                if( victim->is_npc() )
-                {
-      ch->send_to("Данный параметр можно изменить только игрокам.\n\r");
-      return;
-    }
-
-    if( is_number( argument ) )
-                {
-      value = atoi( argument );
-
-                        if( argument[0] == '-' || argument[0] == '+' )
-                        {
-                                adv_value = victim->getPC()->max_skill_points + value;
-                        }
-                        else
-                        {
-                                adv_value = value;
-                        }
-                        if( adv_value < 0 || adv_value > 100000 )
-                        {
-                                sprintf( buf, "Значение должно лежать в пределах %d...%d.\n\r", 0, 100000 );
-                                ch->send_to(buf);
-                                return;
-                        }
-                        victim->getPC()->max_skill_points = adv_value;
-                        sprintf( buf, "%s %d.\n\r", "Текущее значение:",adv_value );
-                        ch->send_to(buf);
-                        return;
-                }
-                else
-                {
-                        ch->send_to("Ошибочные данные.\n\r");
-                }
-        }
-}
-
-/*
- * UNIVERSAL PROFESSIONS
- */
-void chg_mob_class( Character* ch, char* argument )
-{
-  Character* vict;
-  char arg[MAX_STRING_LENGTH];
-  int sn;
-
-  if( ( vict = get_CHAR( ch, &argument ) ) )        {
-        PCharacter *victim;
-        Profession *prof;
-
-        if( vict->is_npc() )        {
-            ch->send_to("Данный параметр можно изменить только игрокам.\n\r");
-            return;
-        }
-        
-        victim = vict->getPC();
-
-        if (victim->getProfession() != prof_universal) {
-            ch->send_to("Новый класс устанавливается только для Universals.\n\r");
-            return;
-        }
-    
-        argument = one_argument(argument, arg );
-        prof = professionManager->findUnstrict( arg ); 
-        
-        if (!prof || prof_universal == prof) {
-            ch->send_to("Неверное имя класса.\n\r");
-            return;
-        }
-        
-        if (victim->getRace( )->getPC( )->getClasses( )[prof->getIndex( )] <= 0) {
-            ch->send_to("Новый класс недоступен для такой рассы.\n\r");
-            return;
-        }
-        
-        if (!prof->getSex( ).isSetBitNumber( victim->getSex( ) )) {
-            ch->send_to("Для этого придется сделать операцию по смене пола.\n\r");
-            return;
-        }
-        
-        if (!prof->getAlign( ).isSetBitNumber( ALIGNMENT(victim) )) {
-            ch->send_to("Неподходящий характер.\n\r");
-            return;
-        }
-
-        if (!prof->getEthos( ).isSetBitNumber( victim->ethos )) {
-            ch->send_to( "Неподходящий ethos.\r\n" );
-            return;
-        }
-
-        if (PCharacterManager::pfBackup(victim->getName()))
-            ch->send_to("Profile backuped. Use 'recover' command for roll back.\n\r");
-        else {
-            ch->send_to("Unable to backup the profile.\n\r");
-            return;
-        }
-        
-        victim->setProfession( prof->getName( ) );
-        victim->setSubProfession( prof_none );
-
-        for (sn = 0; sn < skillManager->size( ); sn++) {
-            PCSkillData &pcskill = victim->getSkillData( sn );
-            
-            if (!skillManager->find( sn )->visible( victim )) {
-                if (pcskill.learned > 1)
-                    victim->practice++;
-                    
-                pcskill.learned = 0;
-            }
-            else if (pcskill.learned < 75 && pcskill.learned >= 50) {
-                pcskill.learned = 75;
-            }
-
-            pcskill.forgetting = false;
-            pcskill.timer = 0;
-        }
-
-        victim->max_skill_points = 1000;
-        victim->exp = victim->getExpPerLevel( victim->getLevel( ) );
-        
-        if (victim->getClan( ) != clan_none && !victim->getClan( )->canInduct( victim )) {
-            victim->setClan( clan_outsider );
-            victim->setClanLevel( 0 );
-            
-            victim->printf("You have been inducted into %s.", victim->getClan( )->getLongName( ).c_str( ));
-            ch->send_to("Forced induct into Outsiders.\n\r");
-        }
-
-        victim->updateSkills( );        
-        victim->save( );
-
-        ch->printf( "%s теперь %s!", victim->getNameP( '1' ).c_str( ), prof->getName( ).c_str( ) );
-        victim->printf( "Теперь ты %s!", prof->getName( ).c_str( ) );        
-
-  }
-
-}
-
-void chg_mob_uniclass( Character* ch, char* argument )
-{
-    char arg[MAX_INPUT_LENGTH];
-    Character* vict;
-
-  if( ( vict = get_CHAR( ch, &argument ) ) )        {
-        Profession *prof;
-        PCharacter *victim;
-
-        if( vict->is_npc() )        {
-            ch->send_to("Данный параметр можно изменить только игрокам.\n\r");
-            return;
-        }
-        
-        victim = vict->getPC();
-
-        if (victim->getProfession( ) != prof_universal) {
-            ch->send_to("Подклассы устанавливаются только для Universals.\n\r");
-            return;
-        }
-    
-        argument = one_argument(argument, arg);
-        prof = professionManager->findUnstrict( arg );
-                
-        if (!prof || prof_universal == prof) {
-            ch->send_to("Неверное имя класса.\n\r");
-            return;
-        }
-        
-        if (!prof->getSex( ).isSetBitNumber( victim->getSex( ) )) {
-            ch->send_to("Для этого придется сделать операцию по смене пола.\n\r");
-            return;
-        }
-        
-        if (!prof->getAlign( ).isSetBitNumber( ALIGNMENT(victim) )) {
-            ch->send_to("Неподходящий характер.\n\r");
-            return;
-        }
-
-        if (!prof->getEthos( ).isSetBitNumber( victim->ethos )) {
-            ch->send_to( "Неподходящий ethos.\r\n" );
-            return;
-        }
-        
-        victim->setSubProfession( prof->getName( ) );
-        victim->updateSkills( );
-        victim->save( );
-
-        ch->send_to("Ok.\n\r");
-        ch->printf( "Теперь ты будешь изображать из себя %s.\r\n", prof->getName( ).c_str( ) );
-  }
-
-
-}
-
 
 void chg_mob_qp( Character* ch, char* argument ) 
 {
@@ -1364,57 +1157,57 @@ void oset( Character* ch, char* argument )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[0], value_add );
-                                REMOVE_BIT( obj->value[0], value_sub );
+                                obj->value0(obj->value0() | value_add );
+                                obj->value0(obj->value0() & ~value_sub );
                         }
                         else
-                                obj->value[0] = value;
+                                obj->value0(value);
 
-                        obj->value[0] = min(101,obj->value[0]);
+                        obj->value0(min(101,obj->value0()));
                 }
                 else
                 if ( !str_cmp( arg2, "value1" ) || !str_cmp( arg2, "v1" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[1], value_add );
-                                REMOVE_BIT( obj->value[1], value_sub );
+                                obj->value1(obj->value1() | value_add );
+                                obj->value1(obj->value1() & ~value_sub );
                         }
                         else
-                                obj->value[1] = value;
+                                obj->value1(value);
                 }
                 else
                 if ( !str_cmp( arg2, "value2" ) || !str_cmp( arg2, "v2" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[2], value_add );
-                                REMOVE_BIT( obj->value[2], value_sub );
+                                obj->value2(obj->value2() | value_add );
+                                obj->value2(obj->value2() & ~value_sub );
                         }
                         else
-                                obj->value[2] = value;
+                                obj->value2(value);
                 }
                 else
                 if ( !str_cmp( arg2, "value3" ) || !str_cmp( arg2, "v3" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[3], value_add );
-                                REMOVE_BIT( obj->value[3], value_sub );
+                                obj->value3(obj->value3() | value_add );
+                                obj->value3(obj->value3() & ~value_sub );
                         }
                         else
-                                obj->value[3] = value;
+                                obj->value3(value);
                 }
                 else
                 if ( !str_cmp( arg2, "value4" ) || !str_cmp( arg2, "v4" ) )
                 {
                         if ( value == 0 && ( value_add || value_sub ) )
                         {
-                                SET_BIT( obj->value[4], value_add );
-                                REMOVE_BIT( obj->value[4], value_sub );
+                                obj->value4(obj->value4() | value_add );
+                                obj->value4(obj->value4() & ~value_sub );
                         }
                         else
-                                obj->value[4] = value;
+                                obj->value4(value);
                 }
                 else
                 if ( !str_prefix( arg2, "extra" ) )

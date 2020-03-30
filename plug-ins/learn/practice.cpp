@@ -39,9 +39,7 @@ COMMAND(CPractice, "practice")
         return;
         
     if (argument.empty( ) || arg_is_all( argument ))
-        pracShow( ch->getPC( ), true, false );
-    else if (arg_oneof_strict( argument, "now", "сейчас" ))
-        pracShow( ch->getPC( ), true, true );
+        pracShow( ch->getPC( ) );
     else if (arg_oneof_strict( argument, "here", "здесь" ))
         pracHere( ch->getPC( ) );
     else
@@ -50,19 +48,13 @@ COMMAND(CPractice, "practice")
 
 struct PracInfo {
     int percent;
-    int weight;
-    bool forgetting;
     int adept;
-    int parentAdept;
     int maximum;
     DLString name;
 
     inline const char * getNameColor( ) const
     {
-        if (forgetting)
-            return "{r";
-        else
-            return "{x";
+        return "{x";
     }
     inline const char * getPercentColor( ) const
     {
@@ -70,10 +62,8 @@ struct PracInfo {
             return "{R";
         else if (percent >= maximum)
             return "{C";
-        else if (percent >= adept + parentAdept)
+        else if (percent >= adept)
             return "{c";
-        else if (percent > adept)
-            return "{m";
         else
             return "{x";
     }
@@ -83,7 +73,7 @@ typedef std::vector<PracInfo> PracInfoList;
 typedef std::map<DLString, PracInfoList> PracCategoryMap;
 
 
-void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
+void CPractice::pracShow( PCharacter *ch )
 {
     std::basic_ostringstream<char> buf;
     PracCategoryMap cmap;
@@ -99,9 +89,6 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
         if (!skill->available( ch ))
             continue;
         
-        if (!skill->usable( ch, false ) && fUsableOnly)
-            continue;
-
         if (skill->getSpell( ) 
                 && skill->getSpell( )->isCasted( ) 
                 && ch->getClan( ) == clan_battlerager)
@@ -109,15 +96,9 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
 
         PCSkillData &data = ch->getSkillData( sn );
         
-        if (data.learned <= 1 && !fAll)
-            continue;
-        
         info.percent = data.learned;
-        info.weight = skill->getWeight( ch );
-        info.forgetting = data.forgetting;
         info.name = skill->getNameFor( ch );
         info.adept = skill->getAdept( ch );
-        info.parentAdept = ch->getProfession( )->getParentAdept( );
         info.maximum = skill->getMaximum( ch );
 
         cm_iter = cmap.find( category );
@@ -150,11 +131,6 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
                               info.name.c_str( ),
                               info.getPercentColor( ),
                               info.percent );                                
-#if 0            
-            if (info.weight > 0)
-                buf << "*{c" << info.weight / 10 << "." << info.weight % 10 << "{x ";
-            else
-#endif                
                 buf << "     ";
             
             if ((i + 1) % columns == 0)
@@ -169,11 +145,6 @@ void CPractice::pracShow( PCharacter *ch, bool fAll, bool fUsableOnly )
     
     buf << dlprintf( "У тебя %d сесси%s практики (practice).\n\r",
                  ch->practice.getValue( ), GET_COUNT(ch->practice, "я","и","й") );
-#if 0    
-    int sp;
-    if ((sp = ch->skill_points( )) > 0)
-        buf << "{cУ тебя " << sp << "/" << ch->max_skill_points << " skill points.{x" << endl;
-#endif
 
     page_to_char( buf.str( ).c_str( ), ch );
 }
@@ -243,6 +214,11 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 
     if (!skill) {
         ch->printf("Умение %s не существует или еще тебе не доступно.\r\n", arg.c_str());
+        return;
+    }
+
+    if (!skill->available(ch)) {
+        ch->printf("Умение '%s' тебе не доступно.\r\n", skill->getNameFor(ch).c_str());
         return;
     }
 

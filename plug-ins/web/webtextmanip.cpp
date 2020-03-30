@@ -20,7 +20,7 @@ static const char * consume_keyword(const char *desc, DLString &keyword)
 {
     const char *d;
     for (d = desc; *d && *d != ')'; ++d) {
-        if (!isspace(*d) && !isalpha(*d)) {
+        if (!isspace(*d) && !isalpha(*d) && *d != '-') {
             // Doesn't look like part of a keyword anymore, interrupt.
             break;
         }
@@ -65,7 +65,7 @@ WEBMANIP_RUN(decorateExtraDescr)
     const char *desc = myArgs.desc;
     extra_descr_data *ed = myArgs.ed;
     const char *d;
-    
+
     for (d = desc; *d; ++d) {
         // Normal part of the description, copy as is.
         if (*d != '(') {
@@ -90,7 +90,7 @@ WEBMANIP_RUN(decorateExtraDescr)
             buf << "(" << keyword << ")";
         } else {
             // Decorate with pseudo-tags, hide normal output from web.
-            buf << "{Iw[read=" << unique << ",see=" << keyword << "]{Ix";
+            buf << "{Iw[read=" << unique << ",see=" << keyword << "]";
             buf << "{IW(" << keyword << "){Ix";
         }
 

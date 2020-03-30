@@ -26,16 +26,15 @@ public:
     
     ClanSkill( );
 
+    virtual void loaded( );
     virtual SkillGroupReference & getGroup( );
     virtual bool visible( Character * ) const;
     virtual bool available( Character * ) const;
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
-    virtual int getWeight( Character * ) const;
     virtual int getMaximum( Character * ) const;
     
-    virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 

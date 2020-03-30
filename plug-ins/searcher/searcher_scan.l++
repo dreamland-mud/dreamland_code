@@ -50,6 +50,7 @@ L	    ([A-Za-z_]|{RL})
 "AND"       return T_AND;
 "VNUM"      return T_VNUM;
 "NAME"      return T_NAME;
+"ED"        return T_ED;
 "LEVEL"     return T_LVL;
 "LVL"       return T_LVL;
 "EXTRA"     return T_EXTRA;
@@ -88,9 +89,13 @@ L	    ([A-Za-z_]|{RL})
 "SLEVEL"    return T_SLEVEL;
 "WCLASS"    return T_WCLASS;
 "WFLAGS"    return T_WFLAGS;
+"D1"        return T_D1;
+"D2"        return T_D2;
 "AVE"       return T_AVE;
+"DAMAGE"    return T_DAMAGE;
 "FENIA"     return T_FENIA;
 "LEARNED"   return T_LEARNED;
+"MATERIAL"  return T_MATERIAL;
 
 
 "<="	    return T_LEQ;
@@ -115,7 +120,7 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.pObj = pObj;
     
     p.name = russian_case(pObj->short_descr, '7').colourStrip() + " " + pObj->name;
-
+    p.ed = (pObj->extra_descr != NULL);
     p.extra = extra_flags.names(pObj->extra_flags);
 
     bitstring_t wear = pObj->wear_flags;
@@ -129,7 +134,8 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     p.heal_gain = p.mana_gain = 0;
     p.det = p.aff = p.imm = p.res = p.vuln = "";
     p.wclass = p.wflags = "";
-    p.ave = 0;
+    p.ave = 0; p.d1 = 0; p.d2 = 0;
+    p.damage = "";
     p.learned = "";
     p.slevel = 0;
 
@@ -188,7 +194,10 @@ bool searcher_parse(struct obj_index_data *pObj, const char *args)
     if (pObj->item_type == ITEM_WEAPON) {
         p.wclass = weapon_class.name( pObj->value[0] );
         p.wflags = weapon_type2.names( pObj->value[4] );
-        p.ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
+        p.d1 = pObj->value[1];
+        p.d2 = pObj->value[2];
+        p.ave = (1 + p.d2) * p.d1 / 2; 
+        p.damage = weapon_flags.name(pObj->value[3]).c_str();        
     }
 
     WrapperBase *base = get_wrapper(pObj->wrapper);

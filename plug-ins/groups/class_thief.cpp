@@ -29,7 +29,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "bonus.h"
 #include "dreamland.h"
 
@@ -51,7 +51,7 @@
 #include "vnum.h"
 #include "occupations.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
 #include "def.h"
@@ -297,8 +297,8 @@ struct SettrapsDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-        msgRoom( "Ловушка \6%C4.", ch );
-        msgChar( "Ловушка \6тебя!", ch );
+        msgRoom( "%1$^O1\6%2$C4.", gsn_settraps->getDammsg(), ch );
+        msgChar( "%1$^O1\6тебя!", gsn_settraps->getDammsg(), ch );
     }
 };
 
@@ -373,9 +373,9 @@ SKILL_RUNP( envenom )
         {
             act_p("$c1 отравляет $o4 смертельным ядом.",ch,obj,0,TO_ROOM,POS_RESTING);
             act_p("Ты отравляешь $o4 смертельным ядом.",ch,obj,0,TO_CHAR,POS_RESTING);
-            if (!IS_SET(obj->value[3], DRINK_POISONED))
+            if (!IS_SET(obj->value3(), DRINK_POISONED))
             {
-                SET_BIT(obj->value[3], DRINK_POISONED);
+                obj->value3(obj->value3() | DRINK_POISONED);
                 gsn_envenom->improve( ch, true );
             }
             ch->setWait( gsn_envenom->getBeats( ) );
@@ -383,7 +383,7 @@ SKILL_RUNP( envenom )
         }
 
         act_p("Твоя попытка отравить $o4 закончилась неудачей.",ch,obj,0,TO_CHAR,POS_RESTING);
-        if (!IS_SET(obj->value[3], DRINK_POISONED))
+        if (!IS_SET(obj->value3(), DRINK_POISONED))
             gsn_envenom->improve( ch, false );
         ch->setWait( gsn_envenom->getBeats( ) );
         return;
@@ -404,8 +404,8 @@ SKILL_RUNP( envenom )
             return;
         }
 
-        if (obj->value[3] < 0
-        ||  attack_table[obj->value[3]].damage == DAM_BASH)
+        if (obj->value3() < 0
+        ||  attack_table[obj->value3()].damage == DAM_BASH)
         {
             ch->send_to("Ты можешь отравить только оружие, имеющее острое лезвие.\n\r");
             return;
@@ -1001,7 +1001,7 @@ SKILL_RUNP( backstab )
             return;
     }
 
-    if ( attack_table[obj->value[3]].damage != DAM_PIERCE )
+    if ( attack_table[obj->value3()].damage != DAM_PIERCE )
     {
             ch->send_to("Чтоб ударить сзади, нужно вооружится колющим оружием.\n\r");
             return;
@@ -1058,6 +1058,19 @@ SKILL_RUNP( backstab )
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
+			
+            if (IS_AFFECTED(ch, AFF_HASTE)) {
+                    int haste_chance;
+                    if (fBonus)
+                        haste_chance = 100;
+                    else
+                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
+
+                    if (Chance(ch, haste_chance-1, 100).reroll()) {
+                        if (ch->fighting == victim)
+                            BackstabOneHit( ch, victim ).hit( );
+                    }
+					else {
 
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
@@ -1075,21 +1088,33 @@ SKILL_RUNP( backstab )
             }
             else {
                 gsn_dual_backstab->improve( ch, false, victim );
-
-                if (IS_AFFECTED(ch, AFF_HASTE)) {
-                    int haste_chance;
-                    if (fBonus)
-                        haste_chance = 100;
-                    else
-                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
-
-                    if (Chance(ch, haste_chance-1, 100).reroll()) {
-                        if (ch->fighting == victim)
-                            BackstabOneHit( ch, victim ).hit( );
-                    }
-                }
+				}
+			}
             }
-        }
+			
+			else {
+
+            int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
+            if (ch->is_npc())
+                dual_chance = 0;
+            else if (fBonus && dual_percent > 50)
+                dual_chance = 100;
+            else
+                dual_chance =  dual_percent * 8 / 10;
+
+            if (Chance(ch, dual_chance-1, 100).reroll()) {
+                gsn_dual_backstab->improve( ch, true, victim );
+
+                if (ch->fighting == victim)
+                    DualBackstabOneHit( ch, victim ).hit( );
+            }
+            else {
+                gsn_dual_backstab->improve( ch, false, victim );
+				}
+			}
+
+
+		}
         else
         {
             gsn_backstab->improve( ch, false, victim );
@@ -1103,7 +1128,6 @@ SKILL_RUNP( backstab )
     catch (const VictimDeathException& e) {
     }
 }
-
 
 /*
  * 'circle' skill command
@@ -1133,7 +1157,7 @@ SKILL_RUNP( circle )
     }
 
     if ( get_eq_char(ch,wear_wield) == 0
-            || attack_table[get_eq_char(ch,wear_wield)->value[3]].damage != DAM_PIERCE)
+            || attack_table[get_eq_char(ch,wear_wield)->value3()].damage != DAM_PIERCE)
     {
             ch->send_to("Вооружись для этого колющим оружием.\n\r");
             return;
@@ -1141,8 +1165,6 @@ SKILL_RUNP( circle )
 
     if (is_safe(ch,victim))
             return;
-
-    ch->setWait( gsn_circle->getBeats( )  );
 
     for ( person = ch->in_room->people; person != 0; person = person->next_in_room )
     {
@@ -1152,6 +1174,8 @@ SKILL_RUNP( circle )
                     return;
             }
     }
+ 
+    ch->setWait( gsn_circle->getBeats( )  );
 
     CircleOneHit circ( ch, victim );
     bool fBonus = false;
@@ -1335,7 +1359,7 @@ SKILL_RUNP( knife )
         return;
     }
 
-    if (knife->value[0] != WEAPON_DAGGER) {
+    if (knife->value0() != WEAPON_DAGGER) {
         ch->send_to("Для этого тебе нужен кинжал.\r\n");
         return;
     }
@@ -1402,7 +1426,7 @@ SKILL_RUNP( forge )
     }
 
     for (blank = get_obj_carry_type( ch, ITEM_LOCKPICK );
-         blank && blank->value[0] != Keyhole::LOCK_VALUE_BLANK;
+         blank && blank->value0() != Keyhole::LOCK_VALUE_BLANK;
          blank = get_obj_list_type( ch, ITEM_LOCKPICK, blank->next_content ))
         ;
 
@@ -1450,6 +1474,7 @@ SKILL_RUNP( forge )
         }
 
         dup = create_object( key->pIndexData, 0 );
+        dup->gram_gender = Grammar::MultiGender::MASCULINE;
         dup->fmtName( DUP_NAMES, key->getName( ) );
         dup->fmtShortDescr( DUP_SHORT, key->getShortDescr( '2' ).c_str( ) );
         dup->fmtDescription( DUP_LONG, key->getShortDescr( '2' ).c_str( ) );
@@ -1458,8 +1483,8 @@ SKILL_RUNP( forge )
         dup->extra_flags = blank->extra_flags;
         dup->condition   = blank->condition;
         dup->weight      = blank->weight;
-        dup->value[0] = 1;
-        dup->value[1] = 1;
+        dup->value0(1);
+        dup->value1(1);
         obj_to_char( dup, ch );
 
         act( "Ты изготавливаешь $o4 из $O2.", ch, dup, blank, TO_CHAR );
@@ -1502,14 +1527,15 @@ SKILL_RUNP( forge )
         act( "$c1 проделывает манипуляции с $o5.", ch, blank, 0, TO_ROOM );
 
         blank->setOwner( ch->getName( ).c_str( ) );
+        blank->gram_gender = Grammar::MultiGender::FEMININE;
         blank->setName( LOCK_NAMES );
         blank->setShortDescr( fmt( 0, LOCK_SHORT, ch ).c_str( ) );
         blank->setDescription( fmt( 0, LOCK_LONG, ch ).c_str( ) );
         blank->addExtraDescr( blank->getName( ), fmt( 0, LOCK_EXTRA, ch ) );
         keyhole->record( blank );
 
-        blank->value[0] = keyhole->getLockType( );
-        blank->value[1] = 50 + gsn_key_forgery->getEffective( ch ) / 2;
+        blank->value0(keyhole->getLockType( ));
+        blank->value1(50 + gsn_key_forgery->getEffective( ch ) / 2);
 
         gsn_key_forgery->improve( ch, true );
         return;

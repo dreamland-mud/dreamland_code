@@ -25,18 +25,19 @@
 #include "so.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "affect.h"
 #include "liquid.h"
 #include "magic.h"
 #include "fight.h"
 #include "interp.h"
 #include "gsn_plugin.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "comm.h"
 #include "recipeflags.h"
 #include "act_move.h"
 #include "act_lock.h"
+#include "attacks.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -244,7 +245,7 @@ VOID_SPELL(DetectPoison)::run( Character *ch, Object *obj, int sn, int level )
 { 
     if ( obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOOD )
     {
-        if (IS_SET(obj->value[3], DRINK_POISONED))
+        if (IS_SET(obj->value3(), DRINK_POISONED))
             ch->send_to("Ты чувствуешь запах яда.\n\r");
         else
             ch->send_to("Это выглядит вполне нормально.\n\r");
@@ -414,7 +415,8 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
     Object *obj;
     Object *in_obj;
     bool found;
-    int number = 0, max_found;
+    int number = 0, max_found;    
+    DLString args = arg_unquote(target_name);
 
     found = false;
     number = 0;
@@ -422,9 +424,13 @@ VOID_SPELL(LocateObject)::run( Character *ch, char *target_name, int sn, int lev
 
     for ( obj = object_list; obj != 0; obj = obj->next )
     {
-        if ( !ch->can_see( obj ) || !is_name( target_name, obj->getName( ) )
-        ||   IS_OBJ_STAT(obj,ITEM_NOLOCATE) || number_percent() > 2 * level
-        ||   ch->getModifyLevel() < obj->level)
+        if ( !ch->can_see( obj ) 
+            || IS_OBJ_STAT(obj, ITEM_NOLOCATE) 
+            || number_percent() > 2 * level
+            || ch->getModifyLevel() < obj->level)
+            continue;
+
+        if (!obj_has_name(obj, args, ch))
             continue;
 
         found = true;
@@ -689,6 +695,11 @@ SKILL_RUNP( lore )
 
   argument = one_argument( argument, arg1 );
 
+    if (arg1[0] == '\0') {
+        ch->println("Использование: {lRлегенды{lElore{x предмет.");
+        return;
+    }
+
   if ( ( obj = get_obj_carry( ch, arg1 ) ) == 0 )
     {
       ch->send_to("У тебя нет этого.\n\r");
@@ -823,10 +834,10 @@ SKILL_RUNP( lore )
 
   ch->mana -= mana;
 
-  value0 = obj->value[0];
-  value1 = obj->value[1];
-  value2 = obj->value[2];
-  value3 = obj->value[3];
+  value0 = obj->value0();
+  value1 = obj->value1();
+  value2 = obj->value2();
+  value3 = obj->value3();
 
   switch ( obj->item_type )
     {
@@ -840,20 +851,20 @@ SKILL_RUNP( lore )
         break;
     case ITEM_KEYRING:
         if (learned < 85) 
-            value0 = number_fuzzy( obj->value[0] );
+            value0 = number_fuzzy( obj->value0() );
         else 
-            value0 = obj->value[0];
+            value0 = obj->value0();
         
         ch->pecho( "Можно нанизать %1$d клю%1$Iч|ча|чей.", value0 );
         break;
     case ITEM_LOCKPICK:
         if (learned < 85) {
-            value0 = number_fuzzy( obj->value[0] );   
-            value1 = number_fuzzy( obj->value[1] );
+            value0 = number_fuzzy( obj->value0() );   
+            value1 = number_fuzzy( obj->value1() );
         }
         else {
-            value0 = obj->value[0];
-            value1 = obj->value[1];
+            value0 = obj->value0();
+            value1 = obj->value1();
         }
         
         if (value0 == Keyhole::LOCK_VALUE_BLANK) {
@@ -872,14 +883,14 @@ SKILL_RUNP( lore )
         
     case ITEM_SPELLBOOK:
         if (learned < 85) {
-            value0 = number_fuzzy( obj->value[0] );
-            value1 = number_fuzzy( obj->value[1] );
+            value0 = number_fuzzy( obj->value0() );
+            value1 = number_fuzzy( obj->value1() );
             value2 = number_range( 1, 100 );
         }
         else {
-            value0 = obj->value[0];
-            value1 = obj->value[1];
-            value2 = number_fuzzy( obj->value[2] );
+            value0 = obj->value0();
+            value1 = obj->value1();
+            value2 = number_fuzzy( obj->value2() );
         }
         
         ch->printf( "Страниц: %d из %d. Максимальное качество формул %d%%.\r\n",
@@ -888,14 +899,14 @@ SKILL_RUNP( lore )
 
     case ITEM_TEXTBOOK:
         if (learned < 85) {
-            value0 = number_fuzzy( obj->value[0] );
-            value1 = number_fuzzy( obj->value[1] );
+            value0 = number_fuzzy( obj->value0() );
+            value1 = number_fuzzy( obj->value1() );
             value2 = number_range( 1, 100 );
         }
         else {
-            value0 = obj->value[0];
-            value1 = obj->value[1];
-            value2 = number_fuzzy( obj->value[2] );
+            value0 = obj->value0();
+            value1 = obj->value1();
+            value2 = number_fuzzy( obj->value2() );
         }
         ch->printf( "Страниц: %d из %d. Максимальное качество записей %d%%.\r\n",
                      value1, value0, value2 ); 
@@ -903,12 +914,12 @@ SKILL_RUNP( lore )
     
     case ITEM_RECIPE:
         if (learned < 85) {
-            value0 = obj->value[0];
-            value2 = number_fuzzy( obj->value[2] );
+            value0 = obj->value0();
+            value2 = number_fuzzy( obj->value2() );
         }
         else {
-            value0 = obj->value[0];
-            value2 = obj->value[2];
+            value0 = obj->value0();
+            value2 = obj->value2();
         }
         ch->printf( "Сложность рецепта: %d. Применяется для создания %s.\r\n",
                      value2, recipe_flags.messages(value0, true).c_str());
@@ -941,7 +952,7 @@ SKILL_RUNP( lore )
           }
         }
 
-      sprintf( buf, "Уровень %d заклинания:", obj->value[0] );
+      sprintf( buf, "Уровень %d заклинания:", obj->value0() );
       ch->send_to(buf);
 
       if (value1 >= 0 && value1 < SkillManager::getThis( )->size() && value1 != gsn_none)
@@ -976,7 +987,7 @@ SKILL_RUNP( lore )
           if (chance > 40) {
             value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
             if (chance > 60) {
-              value2 = number_range(0, 2 * obj->value[2]);
+              value2 = number_range(0, 2 * obj->value2());
               if (chance > 80)
                 value1 = number_range(0, value2);
             }
@@ -987,7 +998,7 @@ SKILL_RUNP( lore )
           if (chance > 60) {
             value3 = number_range(1, (SkillManager::getThis( )->size() - 1));
             if (chance > 80) {
-              value2 = number_range(0, 2 * obj->value[2]);
+              value2 = number_range(0, 2 * obj->value2());
               if (chance > 95)
                 value1 = number_range(0, value2);
             }
@@ -1014,18 +1025,15 @@ SKILL_RUNP( lore )
         {
           value0 = number_range(0, 8);
           if (chance > 33) {
-            value1 = number_range(1, 2 * obj->value[1]);
+            value1 = number_range(1, 2 * obj->value1());
             if (chance > 66)
-              value2 = number_range(1, 2 * obj->value[2]);
+              value2 = number_range(1, 2 * obj->value2());
           }
         }
       else
         {
-          if (chance > 50) {
-            value1 = number_range(1, 2 * obj->value[1]);
-            if (chance > 75)
-              value2 = number_range(1, 2 * obj->value[2]);
-          }
+	  value1 = obj->value1();
+	  value2 = obj->value2();
         }
 
         ch->printf("%s (%s)\r\n",
@@ -1037,12 +1045,18 @@ SKILL_RUNP( lore )
                 value1,value2,
                 (1 + value2) * value1 / 2);
       ch->send_to(buf);
-      if (learned > 85)
-        if (obj->value[4])  /* weapon flags */
+      if (learned > 85){
+	if(obj->value3()) // damage type
+	{
+	  sprintf(buf,"Тип повреждений: %s.\n\r", attack_table[obj->value3()].noun);
+          ch->send_to(buf);
+	}
+        if (obj->value4())  /* weapon flags */
         {
-          sprintf(buf,"Флаги оружия:%s.\n\r",weapon_type2.messages(obj->value[4]).c_str( ));
+          sprintf(buf,"Флаги оружия: %s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
           ch->send_to(buf);
         }
+      }
 
       break;
 
@@ -1050,13 +1064,13 @@ SKILL_RUNP( lore )
       if (learned < 85)
         {
           if (chance > 25) {
-            value2 = number_range(0, 2 * obj->value[2]);
+            value2 = number_range(0, 2 * obj->value2());
               if (chance > 45) {
-                value0 = number_range(0, 2 * obj->value[0]);
+                value0 = number_range(0, 2 * obj->value0());
                   if (chance > 65) {
-                    value3 = number_range(0, 2 * obj->value[3]);
+                    value3 = number_range(0, 2 * obj->value3());
                       if (chance > 85)
-                        value1 = number_range(0, 2 * obj->value[1]);
+                        value1 = number_range(0, 2 * obj->value1());
                   }
               }
           }
@@ -1064,13 +1078,13 @@ SKILL_RUNP( lore )
       else
         {
           if (chance > 45) {
-            value2 = number_range(0, 2 * obj->value[2]);
+            value2 = number_range(0, 2 * obj->value2());
               if (chance > 65) {
-                value0 = number_range(0, 2 * obj->value[0]);
+                value0 = number_range(0, 2 * obj->value0());
                   if (chance > 85) {
-                    value3 = number_range(0, 2 * obj->value[3]);
+                    value3 = number_range(0, 2 * obj->value3());
                       if (chance > 95)
-                        value1 = number_range(0, 2 * obj->value[1]);
+                        value1 = number_range(0, 2 * obj->value1());
                   }
               }
           }
@@ -1078,7 +1092,7 @@ SKILL_RUNP( lore )
 
       sprintf( buf,
               "Класс защиты: %d укол  %d удар  %d разрезание  %d vs. магия.\n\r",
-              value0, value1, value2, value3 );
+              -value0, -value1, -value2, -value3 );
       ch->send_to(buf);
       break;
     }

@@ -32,7 +32,7 @@ protected:
     XML_VARIABLE XMLString msgStillAffected;
     XML_VARIABLE XMLString msgTooManyMobiles;
     XML_VARIABLE XMLString msgCreateAttemptSelf, msgCreateAttemptRoom, msgCreateAttemptArea;
-    XML_VARIABLE XMLString msgCreateSelf, msgCreateRoom;
+    XML_VARIABLE XMLString msgCreateSelf, msgCreateRoom, msgCreateSelfOne, msgCreateRoomOne;
     XML_VARIABLE XMLString msgNotRecognizeRoom, msgNotRecognizeSelf;
     XML_VARIABLE XMLString msgReattachAttemptRoom, msgReattachAttemptSelf;
     XML_VARIABLE XMLString msgReattachRoom, msgReattachSelf;

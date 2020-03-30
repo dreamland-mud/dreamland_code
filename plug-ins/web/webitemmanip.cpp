@@ -135,16 +135,16 @@ static bool has_trigger_close( Object *obj )
 
     switch (obj->item_type) {
          case ITEM_PORTAL:
-             return IS_SET(obj->value[1], EX_ISDOOR)
-                    && !IS_SET(obj->value[1], EX_NOCLOSE|EX_CLOSED);
+             return IS_SET(obj->value1(), EX_ISDOOR)
+                    && !IS_SET(obj->value1(), EX_NOCLOSE|EX_CLOSED);
 
          case ITEM_DRINK_CON:
-             return IS_SET(obj->value[3], DRINK_CLOSE_CORK|DRINK_CLOSE_NAIL|DRINK_CLOSE_KEY)
-                    && !IS_SET(obj->value[3],  DRINK_CLOSED);
+             return IS_SET(obj->value3(), DRINK_CLOSE_CORK|DRINK_CLOSE_NAIL|DRINK_CLOSE_KEY)
+                    && !IS_SET(obj->value3(),  DRINK_CLOSED);
 
          case ITEM_CONTAINER:
-             return IS_SET(obj->value[1], CONT_CLOSEABLE) 
-                    && !IS_SET(obj->value[1], CONT_CLOSED);
+             return IS_SET(obj->value1(), CONT_CLOSEABLE) 
+                    && !IS_SET(obj->value1(), CONT_CLOSED);
 
          default:
              return false;
@@ -156,16 +156,16 @@ static bool has_trigger_lock( Object *obj, Character *ch )
 
     switch (obj->item_type) {
          case ITEM_PORTAL:
-             return IS_SET(obj->value[1], EX_ISDOOR)
-                    && IS_SET(obj->value[1], EX_CLOSED)
-                    && !IS_SET(obj->value[1], EX_NOCLOSE|EX_NOLOCK|EX_LOCKED)
-                    && obj->value[4] > 0;
+             return IS_SET(obj->value1(), EX_ISDOOR)
+                    && IS_SET(obj->value1(), EX_CLOSED)
+                    && !IS_SET(obj->value1(), EX_NOCLOSE|EX_NOLOCK|EX_LOCKED)
+                    && obj->value4() > 0;
 
          case ITEM_CONTAINER:
-             return IS_SET(obj->value[1], CONT_CLOSED)
-                    && IS_SET(obj->value[1], CONT_CLOSEABLE)
-                    && !IS_SET(obj->value[1], CONT_LOCKED)
-                    && (obj->value[2] > 0
+             return IS_SET(obj->value1(), CONT_CLOSED)
+                    && IS_SET(obj->value1(), CONT_CLOSEABLE)
+                    && !IS_SET(obj->value1(), CONT_LOCKED)
+                    && (obj->value2() > 0
                             || (obj->behavior && obj->behavior->canLock( ch )));
 
          default:
@@ -178,19 +178,19 @@ static bool has_trigger_unlock( Object *obj, Character *ch )
 
     switch (obj->item_type) {
          case ITEM_PORTAL:
-             return IS_SET(obj->value[1], EX_ISDOOR)
-                    && IS_SET(obj->value[1], EX_CLOSED)
-                    && IS_SET(obj->value[1], EX_LOCKED)
-                    && obj->value[4] > 0;
+             return IS_SET(obj->value1(), EX_ISDOOR)
+                    && IS_SET(obj->value1(), EX_CLOSED)
+                    && IS_SET(obj->value1(), EX_LOCKED)
+                    && obj->value4() > 0;
 
          case ITEM_DRINK_CON:
-             return IS_SET(obj->value[3], DRINK_CLOSED)
-                    && IS_SET(obj->value[3],  DRINK_LOCKED);
+             return IS_SET(obj->value3(), DRINK_CLOSED)
+                    && IS_SET(obj->value3(),  DRINK_LOCKED);
 
          case ITEM_CONTAINER:
-             return IS_SET(obj->value[1], CONT_CLOSED)
-                    && IS_SET(obj->value[1], CONT_LOCKED) 
-                    && (obj->value[2] > 0
+             return IS_SET(obj->value1(), CONT_CLOSED)
+                    && IS_SET(obj->value1(), CONT_LOCKED) 
+                    && (obj->value2() > 0
                             || (obj->behavior && obj->behavior->canLock( ch )));
 
          default:
@@ -203,18 +203,18 @@ static bool has_trigger_open( Object *obj )
 
     switch (obj->item_type) {
          case ITEM_PORTAL:
-             return IS_SET(obj->value[1], EX_ISDOOR)
-                    && IS_SET(obj->value[1], EX_CLOSED)
-                    && !IS_SET(obj->value[1], EX_LOCKED);
+             return IS_SET(obj->value1(), EX_ISDOOR)
+                    && IS_SET(obj->value1(), EX_CLOSED)
+                    && !IS_SET(obj->value1(), EX_LOCKED);
 
          case ITEM_DRINK_CON:
-             return IS_SET(obj->value[3], DRINK_CLOSED)
-                    && !IS_SET(obj->value[3],  DRINK_LOCKED);
+             return IS_SET(obj->value3(), DRINK_CLOSED)
+                    && !IS_SET(obj->value3(),  DRINK_LOCKED);
 
          case ITEM_CONTAINER:
-             return IS_SET(obj->value[1], CONT_CLOSED)
-                    && IS_SET(obj->value[1], CONT_CLOSEABLE) 
-                    && !IS_SET(obj->value[1], CONT_LOCKED);
+             return IS_SET(obj->value1(), CONT_CLOSED)
+                    && IS_SET(obj->value1(), CONT_CLOSEABLE) 
+                    && !IS_SET(obj->value1(), CONT_LOCKED);
 
          default:
              return false;
@@ -280,6 +280,10 @@ static bool has_trigger_smell( Object *obj )
     // See if wrappers for this item or its index data has a onSmell function defined.
     FENIA_HAS_TRIGGER(obj, "Smell");
     FENIA_NDX_HAS_TRIGGER(obj, "Smell");
+
+    if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0)
+        return true;
+
     return false;
 }
 
@@ -501,11 +505,11 @@ WEBMANIP_RUN(decorateItem)
                 break;
 
             case ITEM_FURNITURE:
-                if (IS_SET(item->value[2],SIT_IN|SIT_ON|SIT_AT))
+                if (IS_SET(item->value2(),SIT_IN|SIT_ON|SIT_AT))
                     manips.add( "sit" );
-                if (IS_SET(item->value[2],REST_IN|REST_ON|REST_AT))
+                if (IS_SET(item->value2(),REST_IN|REST_ON|REST_AT))
                     manips.add( "rest" );
-                if (IS_SET(item->value[2],SLEEP_IN|SLEEP_ON|SLEEP_AT))
+                if (IS_SET(item->value2(),SLEEP_IN|SLEEP_ON|SLEEP_AT))
                     manips.add( "sleep" );
 
                 break;

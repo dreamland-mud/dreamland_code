@@ -15,11 +15,9 @@ $(LIBADD_FIGHT)
 libmagic_la_SOURCES = \
 ccast.cpp \
 objcast.cpp \
-scribing.cpp \
 impl.cpp
 
-libmagic_la_MOC = \
-scribing.h 
+libmagic_la_MOC = 
 
 
 AM_CPPFLAGS += $(plugin_INCLUDES)

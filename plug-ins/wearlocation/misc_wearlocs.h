@@ -24,6 +24,15 @@ public:
     virtual int canWear( Character *ch, Object *obj, int flags );
 };
 
+class HorseWearloc : public DefaultWearlocation {
+XML_OBJECT    
+public:
+    typedef ::Pointer<HorseWearloc> Pointer;
+
+    virtual int canWear( Character *ch, Object *obj, int flags );
+    virtual bool canRemove( Character *ch, Object *obj, int flags );
+};
+
 class HairWearloc : public DefaultWearlocation {
 XML_OBJECT    
 public:
@@ -36,6 +45,7 @@ public:
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
+    virtual void triggersOnWear( Character *ch, Object *obj ) { }
 };
 
 class WieldWearloc : public DefaultWearlocation {
@@ -81,5 +91,6 @@ public:
 protected:    
     virtual void affectsOnEquip( Character *ch, Object *obj );
     virtual void affectsOnUnequip( Character *ch, Object *obj );
+    virtual void triggersOnWear( Character *ch, Object *obj ) { }
 };
 #endif

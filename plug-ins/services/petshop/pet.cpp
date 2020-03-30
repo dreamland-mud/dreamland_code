@@ -13,6 +13,7 @@
 #include "room.h"
 
 #include "dreamland.h"
+#include "occupations.h"
 #include "interp.h"
 #include "act.h"
 #include "handler.h"
@@ -255,3 +256,7 @@ void RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
     act( "$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
 }
 
+int RideablePet::getOccupation( )
+{
+    return Pet::getOccupation( ) | (1 << OCC_BATTLEHORSE);
+}

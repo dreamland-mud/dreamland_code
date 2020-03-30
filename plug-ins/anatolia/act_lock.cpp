@@ -8,11 +8,10 @@
 
 #include "commandtemplate.h"
 #include "objectbehavior.h"
-#include "object.h"
+#include "core/object.h"
 #include "affect.h"
 #include "room.h"
 #include "pcharacter.h"
-#include "character.h"
 
 #include "save.h"
 #include "act.h"
@@ -72,84 +71,27 @@ static bool oprog_open_msg(Object *obj, Character *ch)
     return false;
 }
 
-void open_door_extra ( Character *ch, int door, void *pexit )
-{
-    EXIT_DATA *pexit_rev = 0;
-    int exit_info;
-    bool eexit = door == DIR_SOMEWHERE;
-    Room *room = ch->in_room;
-
-    if ( !pexit )
-            return;
-
-    exit_info = eexit?
-                    ((EXTRA_EXIT_DATA *) pexit)->exit_info
-            : ((EXIT_DATA *) pexit)->exit_info;
-
-    if ( !IS_SET(exit_info, EX_CLOSED) )
-    {
-            ch->println( "Здесь уже открыто." );
-            return;
-    }
-
-    if ( IS_SET(exit_info, EX_LOCKED) )
-    {
-            ch->println( "Здесь заперто." );
-            return;
-    }
-
-    REMOVE_BIT( eexit?
-                    ((EXTRA_EXIT_DATA *) pexit)->exit_info
-            : ((EXIT_DATA *) pexit)->exit_info, EX_CLOSED);
-
-    if ( eexit ) {
-        act( "$c1 открывает $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_ROOM );
-        act( "Ты открываешь $n4.", ch, ((EXTRA_EXIT_DATA *) pexit)->short_desc_from, 0, TO_CHAR );
-    }
-    else {
-        const char *doorname = direction_doorname((EXIT_DATA *) pexit);
-        act( "$c1 открывает $N4.", ch, 0, doorname, TO_ROOM );
-        act( "Ты открываешь $N4.", ch, 0, doorname, TO_CHAR );
-    }
-
-
-    /* open the other side */
-    if (!eexit && (pexit_rev = direction_reverse(room, door)))
-    {
-            REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
-            direction_target(room, door)->echo(POS_RESTING, "%^N1 открывается.", direction_doorname(pexit_rev));
-    }
-}
-
-void open_door ( Character *ch, int door )
-{
-    if ( door < 0 || door > 5 )
-            return;
-
-    open_door_extra( ch, door, ch->in_room->exit[door] );
-}
-
 bool open_portal( Character *ch, Object *obj )
 {
-    if ( !IS_SET(obj->value[1], EX_ISDOOR) )
+    if ( !IS_SET(obj->value1(), EX_ISDOOR) )
     {
             ch->println( "Ты не можешь сделать этого." );
             return false;
     }
 
-    if ( !IS_SET(obj->value[1], EX_CLOSED) )
+    if ( !IS_SET(obj->value1(), EX_CLOSED) )
     {
             ch->println( "Это уже открыто." );
             return false;
     }
 
-    if ( IS_SET(obj->value[1], EX_LOCKED) )
+    if ( IS_SET(obj->value1(), EX_LOCKED) )
     {
             ch->println( "Здесь заперто." );
             return false;
     }
 
-    REMOVE_BIT(obj->value[1], EX_CLOSED);
+    obj->value1(obj->value1() & ~EX_CLOSED);
     act_p("Ты открываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
     act_p("$c1 открывает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
 
@@ -158,17 +100,17 @@ bool open_portal( Character *ch, Object *obj )
 
 bool open_drink_container( Character *ch, Object *obj )
 {
-    if (!IS_SET(obj->value[3], DRINK_CLOSED)) {
+    if (!IS_SET(obj->value3(), DRINK_CLOSED)) {
         ch->pecho( "%1$^O1 и так не запер%1$Gто|т|та.", obj );
         return false;
     }
     
-    if (IS_SET(obj->value[3], DRINK_LOCKED)) {
-        if (IS_SET(obj->value[3], DRINK_CLOSE_CORK))
+    if (IS_SET(obj->value3(), DRINK_LOCKED)) {
+        if (IS_SET(obj->value3(), DRINK_CLOSE_CORK))
             ch->pecho( "%1$^O1 плотно закупоре%1$Gно|н|на пробкой, поищи штопор.", obj );
-        else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL))
+        else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
             ch->pecho( "%1$^O1 закры%1$Gто|т|та крышкой и заколоче%1$Gн|но|на.", obj );
-        else if (IS_SET(obj->value[3], DRINK_CLOSE_KEY))
+        else if (IS_SET(obj->value3(), DRINK_CLOSE_KEY))
             ch->pecho( "%1$^O1 крепко запер%1$Gто|т|та.", obj );
         else
             ch->pecho( "%1$^O1 запер%1$Gто|т|та.", obj );
@@ -176,9 +118,9 @@ bool open_drink_container( Character *ch, Object *obj )
         return false;
     }
     
-    REMOVE_BIT(obj->value[3], DRINK_CLOSED);
+    obj->value3(obj->value3() & ~DRINK_CLOSED);
 
-    if (IS_SET(obj->value[3], DRINK_CLOSE_CORK)) {
+    if (IS_SET(obj->value3(), DRINK_CLOSE_CORK)) {
         Object *cork;
 
         cork = create_object( get_obj_index( OBJ_VNUM_CORK ), 0 );
@@ -187,7 +129,7 @@ bool open_drink_container( Character *ch, Object *obj )
         act( "Ты вынимаешь пробку из $O2.", ch, 0, obj, TO_CHAR );
         act( "$c1 вынимает пробку из $O2.", ch, 0, obj, TO_ROOM );
     }
-    else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL)) {
+    else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
         act( "Ты открываешь крышку $O2.", ch, 0, obj, TO_CHAR );
         act( "$c1 открывает крышку $O2.", ch, 0, obj, TO_ROOM );
     }
@@ -201,19 +143,19 @@ bool open_drink_container( Character *ch, Object *obj )
 
 bool open_container( Character *ch, Object *obj )
 {
-    if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+    if ( !IS_SET(obj->value1(), CONT_CLOSED) )
     {
             ch->println( "Это уже открыто." );
             return false;
     }
 
-    if ( !IS_SET(obj->value[1], CONT_CLOSEABLE) )
+    if ( !IS_SET(obj->value1(), CONT_CLOSEABLE) )
     {
             ch->println( "Ты не можешь сделать этого." );
             return false;
     }
 
-    if ( IS_SET(obj->value[1], CONT_LOCKED) )
+    if ( IS_SET(obj->value1(), CONT_LOCKED) )
     {
             ch->println( "Здесь заперто." );
             return false;
@@ -222,7 +164,7 @@ bool open_container( Character *ch, Object *obj )
     if (oprog_cant_open( obj, ch ))
         return false;
 
-    REMOVE_BIT(obj->value[1], CONT_CLOSED);
+    obj->value1(obj->value1() & ~CONT_CLOSED);
 
     if (!oprog_open_msg( obj, ch )) {
         act_p("Ты открываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
@@ -241,7 +183,7 @@ CMDRUNP( open )
     Object *obj;
     EXTRA_EXIT_DATA *peexit;
     int door;
-
+    
     one_argument( argument, arg );
 
     if ( arg[0] == '\0' )
@@ -250,13 +192,15 @@ CMDRUNP( open )
         return;
     }
 
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
     if (( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) >= 0)
     {
         open_door( ch, door );
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         bool changed = false;
         
@@ -348,50 +292,52 @@ CMDRUNP( close )
         return;
     }
 
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
     if (( door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY ) ) >= 0)
     {
         close_door( ch, door );
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         if ( obj->item_type == ITEM_PORTAL )
         {
             // portal stuff
-            if ( !IS_SET(obj->value[1],EX_ISDOOR)
-                    || IS_SET(obj->value[1],EX_NOCLOSE) )
+            if ( !IS_SET(obj->value1(),EX_ISDOOR)
+                    || IS_SET(obj->value1(),EX_NOCLOSE) )
             {
                 ch->println( "Ты не можешь сделать этого." );
                 return;
             }
 
-            if ( IS_SET(obj->value[1],EX_CLOSED) )
+            if ( IS_SET(obj->value1(),EX_CLOSED) )
             {
                 ch->println( "Здесь уже закрыто." );
                 return;
             }
 
-            SET_BIT(obj->value[1],EX_CLOSED);
+            obj->value1(obj->value1() | EX_CLOSED);
             act_p("Ты закрываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
             act_p("$c1 закрывает $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
             // 'close object'
-            if ( IS_SET(obj->value[1], CONT_CLOSED) )
+            if ( IS_SET(obj->value1(), CONT_CLOSED) )
             {
                 ch->println( "Здесь уже закрыто." );
                 return;
             }
 
-            if ( !IS_SET(obj->value[1], CONT_CLOSEABLE) )
+            if ( !IS_SET(obj->value1(), CONT_CLOSEABLE) )
             {
                 ch->println( "Ты не можешь сделать этого." );
                 return;
             }
 
-            SET_BIT(obj->value[1], CONT_CLOSED);
+            obj->value1(obj->value1() | CONT_CLOSED);
             act_p("Ты закрываешь $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
             act_p( "$c1 закрывает $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
             oprog_close( obj, ch );
@@ -399,17 +345,17 @@ CMDRUNP( close )
         else if (obj->item_type == ITEM_DRINK_CON) {
             // cork a bottle 
             
-            if (!IS_SET(obj->value[3], DRINK_CLOSE_CORK|DRINK_CLOSE_NAIL|DRINK_CLOSE_KEY)) {
+            if (!IS_SET(obj->value3(), DRINK_CLOSE_CORK|DRINK_CLOSE_NAIL|DRINK_CLOSE_KEY)) {
                 act( "$O4 невозможно закрыть или закупорить.", ch, 0, obj, TO_CHAR );
                 return;
             }
 
-            if (IS_SET(obj->value[3], DRINK_CLOSED)) {
+            if (IS_SET(obj->value3(), DRINK_CLOSED)) {
                 act( "$O4 уже закрыли.", ch, 0, obj, TO_CHAR );
                 return;
             }
             
-            if (IS_SET(obj->value[3], DRINK_CLOSE_CORK)) {
+            if (IS_SET(obj->value3(), DRINK_CLOSE_CORK)) {
                 Object *cork = get_obj_carry_vnum( ch, OBJ_VNUM_CORK );
 
                 if (!cork) {
@@ -422,7 +368,7 @@ CMDRUNP( close )
                 act( "Ты закупориваешь $O4 пробкой.", ch, 0, obj, TO_CHAR );
                 act( "$c1 закупоривает $O4 пробкой.", ch, 0, obj, TO_ROOM );
             }
-            else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL)) {
+            else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
                 act( "Ты закрываешь $O4 крышкой.", ch, 0, obj, TO_CHAR );
                 act( "$c1 закрывает $O4 крышкой.", ch, 0, obj, TO_ROOM );
             }
@@ -431,7 +377,7 @@ CMDRUNP( close )
                 act( "$c1 закрывает $O4.", ch, 0, obj, TO_ROOM );
             }
             
-            SET_BIT(obj->value[3], DRINK_CLOSED);
+            obj->value3(obj->value3() | DRINK_CLOSED);
         }
         else {
             ch->println( "Это не контейнер." );
@@ -544,77 +490,79 @@ CMDRUNP( lock )
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         // portal stuff
         if (obj->item_type == ITEM_PORTAL)
         {
-                if ( !IS_SET(obj->value[1],EX_ISDOOR)
-                        || IS_SET(obj->value[1],EX_NOCLOSE) )
+                if ( !IS_SET(obj->value1(),EX_ISDOOR)
+                        || IS_SET(obj->value1(),EX_NOCLOSE) )
                 {
                         ch->println( "Ты не можешь сделать этого." );
                         return;
                 }
 
-                if (!IS_SET(obj->value[1],EX_CLOSED))
+                if (!IS_SET(obj->value1(),EX_CLOSED))
                 {
                         ch->println( "Здесь не закрыто." );
                         return;
                 }
 
-                    if (IS_SET(obj->value[1],EX_NOLOCK))
+                    if (IS_SET(obj->value1(),EX_NOLOCK))
                 {
                         ch->println( "Это невозможно запереть." );
                         return;
                 }
 
-                if (obj->value[4] <= 0) 
+                if (obj->value4() <= 0) 
                 {
                     ch->println( "Здесь нет замочной скважины -- просто закрой." );
                     return;
                 }
 
-                if (!get_key_carry(ch,obj->value[4]))
+                if (!get_key_carry(ch,obj->value4()))
                 {
                         ch->println( "У тебя нет ключа." );
                         return;
                 }
 
-                if (IS_SET(obj->value[1],EX_LOCKED))
+                if (IS_SET(obj->value1(),EX_LOCKED))
                 {
                         ch->println( "Здесь уже заперто." );
                         return;
                 }
 
-                SET_BIT(obj->value[1],EX_LOCKED);
+                obj->value1(obj->value1() | EX_LOCKED);
                 act_p("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR,POS_RESTING);
                 act_p("$c1 закрывает $o4 на ключ.",ch,obj,0,TO_ROOM,POS_RESTING);
         }
         else if ( obj->item_type == ITEM_CONTAINER )
         {
             // 'lock object'
-            if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+            if ( !IS_SET(obj->value1(), CONT_CLOSED) )
             {
                     ch->println( "Это не закрыто." );
                     return;
             }
 
-            if ( obj->value[2] < 0 )
+            if ( obj->value2() < 0 )
             {
                     ch->println( "Здесь нет замочной скважины -- просто закрой." );
                     return;
             }
             
-            if ( IS_SET(obj->value[1], CONT_LOCKED) )
+            if ( IS_SET(obj->value1(), CONT_LOCKED) )
             {
                     ch->println( "Это уже заперто." );
                     return;
             }
 
             if ((obj->behavior && obj->behavior->canLock( ch ))
-                || get_key_carry( ch, obj->value[2])) 
+                || get_key_carry( ch, obj->value2())) 
             {
-                SET_BIT(obj->value[1], CONT_LOCKED);
+                obj->value1(obj->value1() | CONT_LOCKED);
                 act("Ты закрываешь $o4 на ключ.",ch,obj,0,TO_CHAR);
                 act("$c1 закрывает $o4 на ключ.", ch, obj, 0, TO_ROOM);
                 
@@ -626,10 +574,10 @@ CMDRUNP( lock )
         else if (obj->item_type == ITEM_DRINK_CON) {
             // lock drink containers
 
-            if (IS_SET(obj->value[3], DRINK_LOCKED)) {
-                if (IS_SET(obj->value[3], DRINK_CLOSE_CORK))
+            if (IS_SET(obj->value3(), DRINK_LOCKED)) {
+                if (IS_SET(obj->value3(), DRINK_CLOSE_CORK))
                     ch->pecho( "%1$^O1 и так плотно закупоре%1$Gно|н|но пробкой.", obj );
-                else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL))
+                else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
                     ch->pecho( "%1$^O1 и так закры%1$Gто|т|то крышкой и заколоче%1$Gно|н|но.", obj );
                 else
                     ch->pecho( "%1$^O1 и так крепко запер%1$Gто|т|то.", obj );
@@ -771,42 +719,44 @@ CMDRUNP( unlock )
         return;
     }
 
-    if ( ( obj = get_obj_here( ch, arg ) ) != 0 )
+    bool canBeDoor = direction_lookup(arg) >= 0;
+
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg ) ) != 0 )
     {
         // portal stuff
         if ( obj->item_type == ITEM_PORTAL )
         {
-            if (!IS_SET(obj->value[1],EX_ISDOOR))
+            if (!IS_SET(obj->value1(),EX_ISDOOR))
             {
                     ch->println( "Ты не можешь этого сделать." );
                     return;
             }
 
-            if (!IS_SET(obj->value[1],EX_CLOSED))
+            if (!IS_SET(obj->value1(),EX_CLOSED))
             {
                     ch->println( "Здесь не закрыто." );
                     return;
             }
 
-            if (obj->value[4] <= 0)
+            if (obj->value4() <= 0)
             {
                 ch->println( "Здесь нет замочной скважины -- просто открой." );
                 return;
             }
 
-            if (!get_key_carry(ch,obj->value[4]))
+            if (!get_key_carry(ch,obj->value4()))
             {
                     ch->println( "У тебя нет ключа." );
                     return;
             }
 
-            if (!IS_SET(obj->value[1],EX_LOCKED))
+            if (!IS_SET(obj->value1(),EX_LOCKED))
             {
                     ch->println( "Здесь уже не заперто." );
                     return;
             }
 
-            REMOVE_BIT(obj->value[1],EX_LOCKED);
+            obj->value1(obj->value1() & ~EX_LOCKED);
             act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
             act_p("$c1 открывает ключом $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
         }
@@ -814,28 +764,28 @@ CMDRUNP( unlock )
         {
             // 'unlock object'
 
-            if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+            if ( !IS_SET(obj->value1(), CONT_CLOSED) )
             {
                     ch->println( "Здесь не закрыто." );
                     return;
             }
 
-            if ( obj->value[2] < 0 )
+            if ( obj->value2() < 0 )
             {
                     ch->println( "Здесь нет замочной скважины -- просто открой." );
                     return;
             }
 
-            if ( !IS_SET(obj->value[1], CONT_LOCKED) )
+            if ( !IS_SET(obj->value1(), CONT_LOCKED) )
             {
                     ch->println( "Здесь уже не заперто." );
                     return;
             }
 
             if ((obj->behavior && obj->behavior->canLock( ch ))
-                || get_key_carry( ch, obj->value[2])) 
+                || get_key_carry( ch, obj->value2())) 
             {
-                REMOVE_BIT(obj->value[1], CONT_LOCKED);
+                obj->value1(obj->value1() & ~CONT_LOCKED);
                 act_p("Ты открываешь ключом $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
                 act_p("$c1 открывает ключом $o4.", ch, obj, 0, TO_ROOM,POS_RESTING );
                 
@@ -848,17 +798,17 @@ CMDRUNP( unlock )
             Object *key;
             
             // uncork a bottle
-            if (!IS_SET(obj->value[3], DRINK_LOCKED)) {
+            if (!IS_SET(obj->value3(), DRINK_LOCKED)) {
                 ch->println( "Тут не заперто и не закупорено." );
                 return;
             }
 
-            key = get_key_carry( ch, obj->value[4] );
+            key = get_key_carry( ch, obj->value4() );
 
             if (!key) {
-                if (IS_SET(obj->value[3], DRINK_CLOSE_CORK)) 
+                if (IS_SET(obj->value3(), DRINK_CLOSE_CORK)) 
                     ch->println( "У тебя нечем вытащить пробку." );
-                else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL))
+                else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL))
                     ch->println( "У тебя нечем оторвать крышку." );
                 else
                     ch->println( "У тебя нечем открыть эту емкость." );
@@ -866,11 +816,11 @@ CMDRUNP( unlock )
                 return;
             }
 
-            if (IS_SET(obj->value[3], DRINK_CLOSE_CORK)) {
+            if (IS_SET(obj->value3(), DRINK_CLOSE_CORK)) {
                 act( "Ты расшатываешь пробку в $O6 с помощью $o4.", ch, key, obj, TO_CHAR );
                 act( "$c1 расшатывает пробку в $O6 с помощью $o4.", ch, key, obj, TO_ROOM );
             }
-            else if (IS_SET(obj->value[3], DRINK_CLOSE_NAIL)) {
+            else if (IS_SET(obj->value3(), DRINK_CLOSE_NAIL)) {
                 act( "Ты выдергиваешь гвозди из крышки $O2 с помощью $o4.", ch, key, obj, TO_CHAR );
                 act( "$c1 выдергивает гвозди из крышки $O2 с помощью $o4.", ch, key, obj, TO_ROOM );
             }
@@ -879,7 +829,7 @@ CMDRUNP( unlock )
                 act( "$c1 открывает $o5 $O2.", ch, key, obj, TO_ROOM );
             }
 
-            REMOVE_BIT(obj->value[3], DRINK_LOCKED);
+            obj->value3(obj->value3() & ~DRINK_LOCKED);
                 
         }
         else
@@ -993,10 +943,10 @@ Keyhole::Pointer Keyhole::locate( Character *ch, Object *key )
             || (obj->getCarrier( ) && !ch->can_see( obj->getCarrier( ) )))
             continue;
 
-        if (obj->item_type == ITEM_PORTAL && obj->value[4] == keyVnum)
+        if (obj->item_type == ITEM_PORTAL && obj->value4() == keyVnum)
             return PortalKeyhole::Pointer( NEW, ch, obj, key );
 
-        if (obj->item_type == ITEM_CONTAINER && obj->value[2] == keyVnum)
+        if (obj->item_type == ITEM_CONTAINER && obj->value2() == keyVnum)
             return ContainerKeyhole::Pointer( NEW, ch, obj, key );
     }
 
@@ -1008,6 +958,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
     Object *obj;
     EXTRA_EXIT_DATA *peexit;
     int door;
+    bool canBeDoor = direction_lookup(arg.c_str()) >= 0;
     Keyhole::Pointer null;
 
     if (( peexit = get_extra_exit( arg.c_str( ), ch->in_room->extra_exit ) )
@@ -1022,7 +973,7 @@ Keyhole::Pointer Keyhole::create( Character *ch, const DLString &arg )
         return DoorKeyhole::Pointer( NEW, ch, ch->in_room, door );
     }
 
-    if (( obj = get_obj_here( ch, arg.c_str( ) ) )) {
+    if (!canBeDoor && ( obj = get_obj_here( ch, arg.c_str( ) ) )) {
         if (obj->item_type == ITEM_PORTAL)
             return PortalKeyhole::Pointer( NEW, ch, obj );
 
@@ -1125,7 +1076,7 @@ bool Keyhole::doPick( const DLString &arg )
 
     if (number_percent( ) >= gsn_pick_lock->getEffective( ch )) {
         if (number_percent( ) >= gsn_pick_lock->getEffective( ch )
-            && number_percent( ) > lockpick->value[1]) 
+            && number_percent( ) > lockpick->value1()) 
         {
             ch->pecho( "  ... но, слишком резко надавив, ломаешь %1$P2!", lockpick );
             extract_obj( lockpick );
@@ -1148,7 +1099,7 @@ bool Keyhole::doPick( const DLString &arg )
 
 void Keyhole::unlock( )
 {
-    REMOVE_BIT(getLockFlags( ), bitLocked( ));
+    setLockFlags(getLockFlags() & ~bitLocked());
     ch->in_room->echo( POS_RESTING, "*Щелк*" );
 }
 
@@ -1160,10 +1111,10 @@ bool Keyhole::checkLockPick( Object *o )
     if (!ch->can_see( o ) && !ch->can_hear( o ))
         return false;
         
-    if (o->value[0] == LOCK_VALUE_MULTI)
+    if (o->value0() == LOCK_VALUE_MULTI)
         return true;
         
-    return o->value[0] == getLockType( );
+    return o->value0() == getLockType( );
 }
 
 bool Keyhole::checkGuards( )
@@ -1236,10 +1187,10 @@ bool Keyhole::doLore( ostringstream &buf )
         buf << "Открывает замок на "
             << getDescription( ).ruscase( '6' ) << "." << endl;
     
-    if (key->value[0] == 0)
+    if (key->value0() == 0)
         buf << "Рассыпается, лежа в кармане." << endl;
 
-    if (key->value[1] > 0)
+    if (key->value1() > 0)
         buf << "Рассыпается, лежа на земле." << endl;
 
     gsn_golden_eye->improve( ch, true );
@@ -1294,9 +1245,13 @@ ItemKeyhole::ItemKeyhole( Character *ch, Object *obj, Object *key )
     this->obj = obj;
     this->key = key;
 }
-int & ItemKeyhole::getLockFlags( )
+int ItemKeyhole::getLockFlags( )
 {
-    return obj->value[1];
+    return obj->value1();
+}
+void ItemKeyhole::setLockFlags(int flags)
+{
+    obj->value1(flags);
 }
 bool ItemKeyhole::checkGuards( )
 {
@@ -1356,7 +1311,7 @@ bitstring_t ContainerKeyhole::bitUnlockable( )
 }
 int ContainerKeyhole::getKey( )
 {
-    return obj->value[2];
+    return obj->value2();
 }
 /*------------------------------------------------------------------------
  * ExitKeyhole 
@@ -1390,7 +1345,7 @@ PortalKeyhole::PortalKeyhole( Character *ch, Object *obj, Object *key )
 }
 int PortalKeyhole::getKey( )
 {
-    return obj->value[4];
+    return obj->value4();
 }
 /*------------------------------------------------------------------------
  * DoorKeyhole 
@@ -1416,9 +1371,13 @@ DoorKeyhole::DoorKeyhole( Character *ch, Room *room, int door, Object *key )
     pexit_rev = (to_room ? to_room->exit[dirs[door].rev] : 0);
 }
 
-int & DoorKeyhole::getLockFlags( )
+int DoorKeyhole::getLockFlags( )
 {
     return pexit->exit_info;
+}
+void DoorKeyhole::setLockFlags(int flags)
+{
+    pexit->exit_info = flags;
 }
 void DoorKeyhole::unlock( )
 {
@@ -1469,9 +1428,14 @@ ExtraExitKeyhole::ExtraExitKeyhole( Character *ch, Room *room, EXTRA_EXIT_DATA *
     this->key = key;
 }
 
-int & ExtraExitKeyhole::getLockFlags( )
+int ExtraExitKeyhole::getLockFlags( )
 {
     return peexit->exit_info;
+}
+
+void ExtraExitKeyhole::setLockFlags(int flags)
+{
+    peexit->exit_info = flags;
 }
 
 void ExtraExitKeyhole::msgTryPickSelf( )

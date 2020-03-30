@@ -47,11 +47,7 @@ void char_from_room( Character *ch )
                 ch->trap.clear( );
         }
 
-        if ( ( obj = wear_light->find( ch ) ) != 0
-                && obj->item_type == ITEM_LIGHT
-                && obj->value[2] != 0
-                && ch->in_room->light > 0 )
-                --ch->in_room->light;
+        ch->in_room->updateLight();
 
         if ( ch == ch->in_room->people )
         {
@@ -145,11 +141,7 @@ void char_to_room( Character *ch, Room *pRoomIndex )
                 ++ch->in_room->area->nplayer;
         }
 
-        if ( ( obj = wear_light->find( ch ) ) != 0
-                && obj->item_type == ITEM_LIGHT
-                && obj->value[2] != 0 )
-                ++ch->in_room->light;
-        
+        ch->in_room->updateLight();
 
         if ( ch->is_npc( )
                 && !IS_CHARMED(ch)  )
@@ -286,6 +278,9 @@ void obj_from_room( Object *obj )
         obj->in_room      = 0;
         obj->next_content = 0;
 
+        if (obj->item_type == ITEM_LIGHT)
+            pRoomIndex->updateLight();
+
         save_items( pRoomIndex );
 
         return;
@@ -303,6 +298,9 @@ void obj_to_room( Object *obj, Room *pRoomIndex )
         obj->in_obj = 0;
         obj->wear_loc = wear_none;
         obj->water_float = -2;
+
+        if (obj->item_type == ITEM_LIGHT)
+            pRoomIndex->updateLight();
 
         save_items( pRoomIndex );
 }
@@ -440,6 +438,9 @@ void undig( Character *ch )
         ch->ambushing = &str_empty[0]; 
     }
 
+    if (ch->position < POS_RESTING)
+        ch->position = POS_RESTING;
+        
     act_p("Ты выкапываешься из земли.", ch, 0, 0, TO_CHAR, POS_DEAD); 
     act_p("Земля шевелится, и $c1 выкапывается из своей могилы.", ch, 0, 0, TO_ROOM, POS_RESTING ); 
     extract_grave( ch );

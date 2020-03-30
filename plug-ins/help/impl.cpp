@@ -18,7 +18,7 @@
 #include "autoflags.h"
 #include "def.h"
 
-TABLE_LOADER(HelpLoader, "helps", "Help");
+TABLE_LOADER_IMPL(HelpLoader, "helps", "Help");
 
 static IconvMap koi2utf("koi8-r", "utf-8");
 
@@ -32,9 +32,11 @@ void help_save_ids()
         return;
 
     Json::Value typeahead;
-    HelpArticles::const_iterator a;
 
-    for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+    for (auto &a: helpManager->getArticles()) {
+        if (a->labels.all.count("social") > 0)
+            continue;
+            
         Json::Value b;
         b["kw"] = koi2utf((*a)->getAllKeywordsString());
         b["id"] = DLString((*a)->getID());

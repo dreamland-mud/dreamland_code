@@ -67,6 +67,8 @@ public:
     bool isAffected( int sn ) const;
     
     bool isDark( ) const;
+    /** Recalculate 'light' field for current room content. */
+    void updateLight();
 
     void vecho( int, const char *, va_list ) const;
     void echo( int, const char *, ... ) const;

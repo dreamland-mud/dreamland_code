@@ -65,11 +65,11 @@
 #include "room.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "gsn_plugin.h"
 #include "act.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "interp.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -344,15 +344,15 @@ CMDRUNP( stand )
                 }
 
                 if ( obj->item_type != ITEM_FURNITURE
-                        || ( !IS_SET(obj->value[2],STAND_AT)
-                                && !IS_SET(obj->value[2],STAND_ON)
-                                && !IS_SET(obj->value[2],STAND_IN) ) )
+                        || ( !IS_SET(obj->value2(),STAND_AT)
+                                && !IS_SET(obj->value2(),STAND_ON)
+                                && !IS_SET(obj->value2(),STAND_IN) ) )
                 {
                         ch->println( "Ты не можешь стоять на этом." );
                         return;
                 }
 
-                if (ch->on != obj && count_users(obj) >= obj->value[0])
+                if (ch->on != obj && count_users(obj) >= obj->value0())
                 {
                         act_p("На $o6 нет свободного места.",
                                 ch,obj,0,TO_ROOM,POS_DEAD);
@@ -376,12 +376,12 @@ CMDRUNP( stand )
                         ch->on = 0;
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeStandRoom", "msgWakeStandChar" )) {
-                    if (IS_SET(obj->value[2],STAND_AT))
+                    if (IS_SET(obj->value2(),STAND_AT))
                     {
                             act_p("Ты просыпаешься и становишься возле $o2.",ch,obj,0,TO_CHAR,POS_DEAD);
                             act_p("$c1 просыпается и становится возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],STAND_ON))
+                    else if (IS_SET(obj->value2(),STAND_ON))
                     {
                             act_p("Ты просыпаешься и становишься на $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
                             act_p("$c1 просыпается и становится на $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -412,12 +412,12 @@ CMDRUNP( stand )
                         ch->on = 0;
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgStandRoom", "msgStandChar" )) {
-                    if (IS_SET(obj->value[2],STAND_AT))
+                    if (IS_SET(obj->value2(),STAND_AT))
                     {
                             act_p("Ты становишься возле $o2.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 становится возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],STAND_ON))
+                    else if (IS_SET(obj->value2(),STAND_ON))
                     {
                             act_p("Ты становишься на $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 становится на $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -498,15 +498,15 @@ CMDRUNP( rest )
         if (obj != 0)
         {
                 if ( ( obj->item_type != ITEM_FURNITURE )
-                        || ( !IS_SET(obj->value[2],REST_ON)
-                                && !IS_SET(obj->value[2],REST_IN)
-                                && !IS_SET(obj->value[2],REST_AT) ) )
+                        || ( !IS_SET(obj->value2(),REST_ON)
+                                && !IS_SET(obj->value2(),REST_IN)
+                                && !IS_SET(obj->value2(),REST_AT) ) )
                 {
                         ch->println( "Ты не можешь отдыхать на этом." );
                         return;
                 }
 
-                if (obj != 0 && ch->on != obj && count_users(obj) >= obj->value[0])
+                if (obj != 0 && ch->on != obj && count_users(obj) >= obj->value0())
                 {
                         act_p("На $o6 нет свободного места.",ch,obj,0,TO_CHAR,POS_DEAD);
                         return;
@@ -527,13 +527,13 @@ CMDRUNP( rest )
                         act_p("$c1 просыпается и садится отдыхать.",ch,0,0,TO_ROOM,POS_RESTING);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeRestRoom", "msgWakeRestChar" )) {
-                    if (IS_SET(obj->value[2],REST_AT))
+                    if (IS_SET(obj->value2(),REST_AT))
                     {
                             act_p("Ты просыпаешься и садишься отдыхать возле $o2.",
                                     ch,obj,0,TO_CHAR,POS_SLEEPING);
                             act_p("$c1 просыпается и садится отдыхать возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],REST_ON))
+                    else if (IS_SET(obj->value2(),REST_ON))
                     {
                             act_p("Ты просыпаешься и садишься отдыхать на $o4.",
                                     ch,obj,0,TO_CHAR,POS_SLEEPING);
@@ -560,12 +560,12 @@ CMDRUNP( rest )
                         act_p( "$c1 садится отдыхать.", ch, 0, 0, TO_ROOM,POS_RESTING );
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRestRoom", "msgSitRestChar" )) {
-                    if (IS_SET(obj->value[2],REST_AT))
+                    if (IS_SET(obj->value2(),REST_AT))
                     {
                             act_p("Ты садишься возле $o2 и отдыхаешь.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 садится возле $o2 и отдыхает.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],REST_ON))
+                    else if (IS_SET(obj->value2(),REST_ON))
                     {
                             act_p("Ты садишься на $o4 и отдыхаешь..",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 садится на $o4 и отдыхает.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -586,12 +586,12 @@ CMDRUNP( rest )
                         act_p("$c1 отдыхает.",ch,0,0,TO_ROOM,POS_RESTING);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgRestRoom", "msgRestChar" )) {
-                    if (IS_SET(obj->value[2],REST_AT))
+                    if (IS_SET(obj->value2(),REST_AT))
                     {
                             act_p("Ты отдыхаешь возле $o2.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 отдыхает возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],REST_ON))
+                    else if (IS_SET(obj->value2(),REST_ON))
                     {
                             act_p("Ты отдыхаешь на $o6.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 отдыхает на $o6.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -675,15 +675,15 @@ CMDRUNP( sit )
         if (obj != 0)
         {
                 if ( ( obj->item_type != ITEM_FURNITURE )
-                        || ( !IS_SET(obj->value[2],SIT_ON)
-                                && !IS_SET(obj->value[2],SIT_IN)
-                                && !IS_SET(obj->value[2],SIT_AT) ) )
+                        || ( !IS_SET(obj->value2(),SIT_ON)
+                                && !IS_SET(obj->value2(),SIT_IN)
+                                && !IS_SET(obj->value2(),SIT_AT) ) )
                 {
                         ch->println( "Ты не можешь сесть на это." );
                         return;
                 }
 
-                if (obj != 0 && ch->on != obj && count_users(obj) >= obj->value[0])
+                if (obj != 0 && ch->on != obj && count_users(obj) >= obj->value0())
                 {
                         act_p("На $o6 нет больше свободного места.",ch,obj,0,TO_CHAR,POS_DEAD);
                         return;
@@ -701,12 +701,12 @@ CMDRUNP( sit )
                         act_p( "$c1 просыпается и садится.", ch, 0, 0, TO_ROOM,POS_RESTING );
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgWakeSitRoom", "msgWakeSitChar" )) {
-                    if (IS_SET(obj->value[2],SIT_AT))
+                    if (IS_SET(obj->value2(),SIT_AT))
                     {
                             act_p("Ты просыпаешься и садишься возле $o2.",ch,obj,0,TO_CHAR,POS_DEAD);
                             act_p("$c1 просыпается и садится возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],SIT_ON))
+                    else if (IS_SET(obj->value2(),SIT_ON))
                     {
                             act_p("Ты просыпаешься и садишься на $o4.",ch,obj,0,TO_CHAR,POS_DEAD);
                             act_p("$c1 просыпается и садится на $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -725,13 +725,13 @@ CMDRUNP( sit )
                 if (obj == 0)
                         ch->println( "Ты прекращаешь отдых." );
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
-                    if (IS_SET(obj->value[2],SIT_AT))
+                    if (IS_SET(obj->value2(),SIT_AT))
                     {
                             act_p("Ты садишься возле $o2.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 садится возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
 
-                    else if (IS_SET(obj->value[2],SIT_ON))
+                    else if (IS_SET(obj->value2(),SIT_ON))
                     {
                             act_p("Ты садишься на $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 садится на $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -757,12 +757,12 @@ CMDRUNP( sit )
                         act_p("$c1 садится на землю.",ch,0,0,TO_ROOM,POS_RESTING);
                 }
                 else if (!oprog_msg_furniture( obj, ch, "msgSitRoom", "msgSitChar" )) {
-                    if (IS_SET(obj->value[2],SIT_AT))
+                    if (IS_SET(obj->value2(),SIT_AT))
                     {
                             act_p("Ты садишься возле $o2.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 садится возле $o2.",ch,obj,0,TO_ROOM,POS_RESTING);
                     }
-                    else if (IS_SET(obj->value[2],SIT_ON))
+                    else if (IS_SET(obj->value2(),SIT_ON))
                     {
                             act_p("Ты садишься на $o4.",ch,obj,0,TO_CHAR,POS_RESTING);
                             act_p("$c1 садится на $o4.",ch,obj,0,TO_ROOM,POS_RESTING);
@@ -849,15 +849,15 @@ CMDRUNP( sleep )
             }
 
             if ( obj->item_type != ITEM_FURNITURE
-                    || ( !IS_SET(obj->value[2],SLEEP_ON)
-                            && !IS_SET(obj->value[2],SLEEP_IN)
-                            && !IS_SET(obj->value[2],SLEEP_AT)))
+                    || ( !IS_SET(obj->value2(),SLEEP_ON)
+                            && !IS_SET(obj->value2(),SLEEP_IN)
+                            && !IS_SET(obj->value2(),SLEEP_AT)))
             {
                     ch->println( "Ты не можешь спать на этом!" );
                     return;
             }
 
-            if (ch->on != obj && count_users(obj) >= obj->value[0])
+            if (ch->on != obj && count_users(obj) >= obj->value0())
             {
                     act_p("На $o6 не осталось свободного места для тебя.",
                             ch,obj,0,TO_CHAR,POS_DEAD);
@@ -873,12 +873,12 @@ CMDRUNP( sleep )
             toMe << "Ты ложишься спать ";
             toRoom << "%1$^C1 ложится спать ";
 
-            if (IS_SET(obj->value[2],SLEEP_AT))
+            if (IS_SET(obj->value2(),SLEEP_AT))
             {
                 toMe << "возле %2$O2";
                 toRoom << "возле %2$O2";
             }
-            else if (IS_SET(obj->value[2],SLEEP_ON))
+            else if (IS_SET(obj->value2(),SLEEP_ON))
             {
                 toMe << "на %2$O4";
                 toRoom << "на %2$O4";
@@ -954,6 +954,8 @@ CMDRUNP( wake )
         return; 
     }
 
+    act("Ты будишь $C4.", ch, 0, victim, TO_CHAR);
+    act("$c1 будит $C4.", ch, 0, victim, TO_NOTVICT);
     act_p( "$c1 будит тебя.", ch, 0, victim, TO_VICT,POS_SLEEPING );
     do_stand(victim,"");
     mprog_wake( victim, ch );
@@ -1026,45 +1028,33 @@ CMDRUNP( fly )
 
 
 /*
- * Разработка Тирна.
+ * Экстра-выходы - разработка Тирна.
  */
-CMDRUNP( walk )
-{
-    EXTRA_EXIT_DATA *peexit;
-
-    // Must be entered extra exit name
-    if (argument[0] == '\0') {
-        ch->println( "И куда мы собрались идти, все таки?" );
-        return;
-    }
-
-    peexit = get_extra_exit( argument, ch->in_room->extra_exit );
-
-    if (peexit == 0) {
-        ch->println( "Ты не находишь этого здесь." );
-        return;
-    }
-
-    move_char( ch, peexit );
-}
-
-
 CMDRUNP( enter )
 {
-    Object *portal;
+    Object *portal = 0;
+    EXTRA_EXIT_DATA *peexit = 0;
     
+    // Syntax: enter, enter <portal>, enter <eexit>.
     if (!argument[0])
         portal = get_obj_room_type( ch, ITEM_PORTAL );
-    else
+    else {
         portal = get_obj_list( ch, argument, ch->in_room->contents );
+        peexit = get_extra_exit( argument, ch->in_room->extra_exit );
+    }
 
-    if (portal == 0) {
-        ch->println( "Ты не видишь этого тут." );
+    if (portal == 0 && peexit == 0) {
+        ch->println( "Ты не видишь здесь такого портала или дополнительного выхода.");
         return;
     }
     
+    if (peexit) {
+        move_char( ch, peexit );
+        return;            
+    }
+
     if (portal->item_type != ITEM_PORTAL) {
-        ch->println( "Ты не находишь пути внутрь." );
+        ch->pecho( "Ты не находишь пути внутрь %O2, это не портал.", portal );
         return;
     }
 

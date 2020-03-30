@@ -68,8 +68,14 @@ void SocialHelp::save() const
 
 DLString SocialHelp::getTitle(const DLString &label) const
 {
-    if (social)
+    // For help json dump.
+    if (!label.empty() && social)
         return social->getName() + ", " + social->getRussianName();
+
+    // Default title if not set explicitly.
+    if (label.empty() && titleAttribute.empty() && social)
+        return "Социал {c" + social->getRussianName() + "{x, {c" + social->getName() + "{x";
+        
     return HelpArticle::getTitle(label);
 }
 
@@ -84,7 +90,10 @@ static const RussianString & object_name()
 static RussianString russian_string(PCMemoryInterface *pc)
 {
     MultiGender mg = MultiGender(pc->getSex(), Number::SINGULAR);
-    return RussianString(pc->getRussianName().getFullForm(), mg);
+    if (pc->getRussianName().getFullForm().empty())
+        return RussianString(pc->getName(), mg);
+    else
+        return RussianString(pc->getRussianName().getFullForm(), mg);
 }
 
 // Finds random registered player and returns its name+gender.
@@ -189,10 +198,8 @@ Social::~Social( )
 void Social::loaded()
 {
     if (!help) {
-        help.construct();
-        help->setID(
-            helpManager->getLastID() + 1
-        );
+        LogStream::sendWarning() << "Social " << getName() << " with empty help article." << endl;
+        return;
     }
    
     help->setSocial(Pointer(this)); 

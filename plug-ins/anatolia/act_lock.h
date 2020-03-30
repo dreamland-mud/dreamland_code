@@ -48,7 +48,8 @@ public:
     static const int ERROR_KEY_TYPE;
 
 protected:
-    virtual int & getLockFlags( ) = 0;
+    virtual int getLockFlags( ) = 0;
+    virtual void setLockFlags(int flags) = 0;
     virtual bitstring_t bitCloseable( ) = 0;
     virtual bitstring_t bitLocked( ) = 0;
     virtual bitstring_t bitPickProof( ) = 0;
@@ -81,7 +82,8 @@ public:
     virtual DLString getDescription( );
 
 protected:
-    virtual int & getLockFlags( );
+    virtual int getLockFlags( );
+    virtual void setLockFlags(int flags);
     virtual bool checkGuards( );
     virtual void unlock( );
 
@@ -137,7 +139,8 @@ public:
     virtual DLString getDescription( );
 
 protected:
-    virtual int & getLockFlags( );
+    virtual int getLockFlags( );
+    virtual void setLockFlags(int flags);
     virtual void unlock( );
     
     virtual void msgTryPickSelf( );
@@ -159,7 +162,8 @@ public:
     virtual DLString getDescription( );
 
 protected:
-    virtual int & getLockFlags( );
+    virtual int getLockFlags( );
+    virtual void setLockFlags(int flags);
     
     virtual void msgTryPickSelf( );
     virtual void msgTryPickOther( );

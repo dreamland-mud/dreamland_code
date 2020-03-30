@@ -20,6 +20,36 @@
 #include "def.h"
 
 /*--------------------------------------------------------------------
+ * LanguageHelp
+ *-------------------------------------------------------------------*/
+const DLString LanguageHelp::TYPE = "LanguageHelp";
+
+void LanguageHelp::save() const
+{
+   if (command) {
+        const Language *lang = command.getDynamicPointer<Language>();
+        if (lang)
+            languageManager->saveXML(lang, lang->getName());
+        else
+            LogStream::sendNotice() << "Failed to save language " << command->getName() << endl;
+   }
+}
+
+DLString LanguageHelp::getTitle(const DLString &label) const
+{
+    ostringstream buf;
+
+    if (!label.empty() || !titleAttribute.empty() || !command)
+        return MarkupHelpArticle::getTitle(label);
+
+    buf << "Древний язык {c";
+    if (!command->getRussianName().empty())
+        buf << command->getRussianName() << "{x, {c";
+    buf << command->getName() << "{x";
+    return buf.str();
+}
+
+/*--------------------------------------------------------------------
  * Language
  *-------------------------------------------------------------------*/
 const int Language::MAX_POWER_WORLD = 200;
@@ -58,7 +88,7 @@ void Language::destruction( )
 CommandHelp::Pointer Language::getHelp( ) const
 {
 
-    return description;
+    return help;
 }
 
 const RaceLangInfo * Language::getRaceInfo( PCharacter *ch ) const
@@ -80,7 +110,7 @@ const RaceLangInfo * Language::getRaceInfo( PCharacter *ch ) const
 const ClassLangInfo * Language::getClassInfo( PCharacter *ch ) const
 {
     static const DLString otherName( "other" );
-    Classes::const_iterator i = classes.find( ch->getTrueProfession( )->getName( ) );
+    Classes::const_iterator i = classes.find( ch->getProfession( )->getName( ) );
     
     if (i == classes.end( ))
         i = classes.find( otherName );

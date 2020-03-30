@@ -142,36 +142,6 @@ void free_exit(EXIT_DATA * pExit)
     return;
 }
 
-EXTRA_EXIT_DATA *
-new_extra_exit()
-{
-    static EXTRA_EXIT_DATA z_eexit;
-    EXTRA_EXIT_DATA *rc = (EXTRA_EXIT_DATA *)alloc_mem(sizeof(EXTRA_EXIT_DATA));
-    
-    *rc = z_eexit;
-    rc->keyword = rc->description = rc->room_description = rc->short_desc_to = rc->short_desc_from = str_empty;
-    
-    return rc;
-}
-
-void
-free_extra_exit(EXTRA_EXIT_DATA *eexit)
-{
-    if(eexit->keyword)
-        free_string(eexit->keyword);
-    if(eexit->short_desc_from)
-        free_string(eexit->short_desc_from);
-    if(eexit->short_desc_to)
-        free_string(eexit->short_desc_to);
-    if(eexit->description)
-        free_string(eexit->description);
-    if(eexit->room_description)
-        free_string(eexit->room_description);
-
-    free_mem(eexit, sizeof(*eexit));
-}
-
-
 Room *new_room_index(void)
 {
     Room *pRoom;
@@ -205,41 +175,6 @@ Room *new_room_index(void)
     pRoom->mana_rate_default = 100;
     return pRoom;
 }
-
-void free_room_index(Room * pRoom)
-{
-    int door;
-    EXTRA_DESCR_DATA *pExtra, *pExtra_next;
-    EXTRA_EXIT_DATA *pEExit, *pEExit_next;
-    RESET_DATA *pReset, *pReset_next;
-
-    free_string(pRoom->name);
-    free_string(pRoom->description);
-    free_string(pRoom->owner);
-
-    for (door = 0; door < DIR_SOMEWHERE; door++) {
-        if (pRoom->exit[door])
-            free_exit(pRoom->exit[door]);
-    }
-
-    for (pExtra = pRoom->extra_descr; pExtra; pExtra = pExtra_next) {
-        pExtra_next = pExtra->next;
-        free_extra_descr(pExtra);
-    }
-
-    for (pEExit = pRoom->extra_exit; pEExit; pEExit = pEExit_next) {
-        pEExit_next = pEExit->next;
-        free_extra_exit(pEExit); 
-    }
-
-    for (pReset = pRoom->reset_first; pReset; pReset = pReset_next) {
-        pReset_next = pReset->next;
-        free_reset_data(pReset);
-    }
-
-    delete pRoom;
-}
-
 
 OBJ_INDEX_DATA *new_obj_index(void)
 {

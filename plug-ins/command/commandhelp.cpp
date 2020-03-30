@@ -33,6 +33,20 @@ void CommandHelp::save() const
     }
 }
 
+DLString CommandHelp::getTitle(const DLString &label) const
+{
+    ostringstream buf;
+
+    if (!label.empty() || !titleAttribute.empty() || !command)
+        return MarkupHelpArticle::getTitle(label);
+
+    buf << "Команда {c";
+    if (!command->getRussianName().empty())
+        buf << command->getRussianName() << "{x, {c";
+    buf << command->getName() << "{x";
+    return buf.str();
+}
+
 void CommandHelp::setCommand( Command::Pointer command )
 {
     StringSet::const_iterator r;

@@ -500,9 +500,9 @@ bool VisibilityTags::need_escape( )
         return true;
     }
 
-    // Only allow > if it's followed by {Ix.
+    // Only allow > if it's followed by {Ix, {IW.
     if (c == '>') {
-        if (is_followed_by(p, "{Ix"))
+        if (is_followed_by(p, "{Ix") || is_followed_by(p, "{IW"))
             return false;
 
         return true;

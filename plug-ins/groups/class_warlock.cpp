@@ -43,7 +43,7 @@
 #include "interp.h"
 #include "def.h"
 
-
+GSN(shocking_trap);
 
 #define OBJ_VNUM_FIRE_SHIELD        92
 
@@ -126,7 +126,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
         victim->send_to("Тебя {RУБИЛИ{x!\n\r");
 
         act_p("Тебя больше не существует!\n\r", victim, 0, 0, TO_CHAR,POS_RESTING);
-        act_p("$c1 больше не существует!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p("$c2 больше не существует!\n\r", victim, 0, 0, TO_ROOM,POS_RESTING);
 
         victim->send_to("{YБожественные Силы возвращают тебя к жизни!{x\n\r");
         
@@ -266,8 +266,8 @@ struct ShockingTrapDamage : public SelfDamage {
     {
     }
     virtual void message( ) {
-        msgRoom( "Силовые волны, наполняющие местность,\6%C4", ch );
-        msgChar( "Силовые волны, наполняющие местность,\6тебя", ch );
+        msgRoom( "%1$^O1, наполняющие местность,\6%2$C4", gsn_shocking_trap->getDammsg(), ch );
+        msgChar( "%1$^O1, наполняющие местность,\6тебя", gsn_shocking_trap->getDammsg(), ch );
     }
 };
         
@@ -437,13 +437,13 @@ bool EnergyShield::isColdShield( ) const
 {
   return (obj->extra_descr
                 && obj->extra_descr->description
-                && strstr( obj->extra_descr->description, "cold" ) != 0 );
+                && strstr( obj->extra_descr->description, "холод" ) != 0 );
 }
 bool EnergyShield::isFireShield( ) const
 {
   return (obj->extra_descr
                 && obj->extra_descr->description
-                && strstr( obj->extra_descr->description, "fire" ) != 0 );
+                && strstr( obj->extra_descr->description, "огня" ) != 0 );
 }
 void EnergyShield::wear( Character *ch )
 {
@@ -501,8 +501,13 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     Object *fire;
 
     target_name = one_argument( target_name, arg );
+    DLString from;
 
-    if (!(!str_cmp(arg,"cold") || !str_cmp(arg,"fire"))) {
+    if (arg_oneof(arg, "cold", "холода"))
+        from = "холода";
+    else if (arg_oneof(arg, "fire", "огонь", "огня"))
+        from = "огня";
+    else {
         ch->send_to("Выбери: от огня или холода он будет тебя защищать.\n\r");
         return;
     }
@@ -511,10 +516,8 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
     fire->setOwner(ch->getNameP( ));
     fire->from = str_dup(ch->getNameP( ));
     fire->level = ch->getRealLevel( );
-    fire->fmtShortDescr( fire->getShortDescr( ), arg );
-    fire->fmtDescription( fire->getDescription( ), arg );
 
-    sprintf( buf, fire->pIndexData->extra_descr->description, arg );
+    sprintf( buf, fire->pIndexData->extra_descr->description, from.c_str() );
     fire->extra_descr = new_extra_descr();
     fire->extra_descr->keyword =
               str_dup( fire->pIndexData->extra_descr->keyword );
@@ -533,6 +536,6 @@ VOID_SPELL(MakeShield)::run( Character *ch, char *target_name, int sn, int level
          SET_BIT(fire->extra_flags,(ITEM_ANTI_NEUTRAL | ITEM_ANTI_GOOD));        
          
     obj_to_char( fire, ch);
-    ch->send_to("Ты создаешь энергетический щит.\n\r");
+    ch->printf("Ты создаешь энергетический щит для защиты от %s.\n\r", from.c_str());
 }
 

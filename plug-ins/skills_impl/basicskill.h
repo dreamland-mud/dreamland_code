@@ -36,6 +36,7 @@ public:
     virtual SpellPointer getSpell( ) const;
     virtual AffectHandlerPointer getAffect( ) const;
     virtual SkillCommandPointer getCommand( ) const;
+    virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual const RussianString &getDammsg( ) const;
@@ -47,7 +48,6 @@ public:
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual int getMaximum( Character * ) const;
     
-protected:
     XML_VARIABLE XMLStringNoEmpty nameRus;
     XML_VARIABLE XMLRussianString dammsg;
     XML_VARIABLE XMLIntegerNoEmpty beats;

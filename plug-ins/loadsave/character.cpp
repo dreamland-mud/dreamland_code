@@ -24,6 +24,9 @@ WEARLOC(hold_leg);
 /* visibility on a room -- for entering and exits */
 bool Character::can_see( Room *pRoomIndex ) const
 {
+	if (!pRoomIndex)
+		return false;
+
         if ( IS_SET(pRoomIndex->room_flags, ROOM_IMP_ONLY)
                 && get_trust() < MAX_LEVEL )
                 return false;
@@ -160,10 +163,10 @@ bool Object::mustDisappear( Character *ch )
     if (ch->is_immortal( ))
         return false;
 
-    if (item_type == ITEM_KEY && value[0] == 0)
+    if (item_type == ITEM_KEY && value0() == 0)
         return true;
         
-    if (item_type == ITEM_MAP && !value[0])
+    if (item_type == ITEM_MAP && !value0())
         return true;
     
     if (wear_loc == wear_stuck_in || wear_loc == wear_hold_leg)
@@ -191,7 +194,7 @@ short get_wear_level( Character *ch, Object *obj )
 {
     int wear_mod, level_diff;
     
-    wear_mod = ch->getTrueProfession( )->getWearModifier( obj->item_type );
+    wear_mod = ch->getProfession( )->getWearModifier( obj->item_type );
     level_diff = ch->getModifyLevel( ) - ch->getRealLevel( );
             
     return std::max( 1, obj->level - wear_mod - level_diff );

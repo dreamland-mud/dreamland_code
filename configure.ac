@@ -93,7 +93,10 @@ AC_CREATE_DIR(var/db/clan-data)
 AC_CREATE_DIR(var/db/gquests)
 
 AC_CREATE_DIR(var/db/languages)
-cp "$srcdir/admin/scripts/ahenn.txt"    "$prefix/var/db/languages/ahenn.txt"
+if ! test -f "$prefix/var/db/languages/ahenn.txt"
+then
+    cp "$srcdir/admin/scripts/ahenn.txt"    "$prefix/var/db/languages/ahenn.txt"
+fi
 
 AC_CREATE_DIR(var/db/notes/change)
 AC_CREATE_DIR(var/db/notes/crime)
@@ -121,11 +124,13 @@ AC_CREATE_DIR_16(var/db/saved/mobiles)
 AC_CREATE_FILE(etc/dreamland.xml)
 AC_CREATE_FILE(libexec/plugin.xml)
 AC_PLAYER_COPY(kadm)
+AC_PLAYER_COPY(cadmus)
 cp "$srcdir/admin/startup-local"    "$prefix/bin/startup-local"
 
 if ! test -f "$prefix/var/db/fenia/fenia" 
 then
-    cat "$srcdir/admin/fenia/fenia.tbz2" | (cd "$prefix/var/db" && tar xvjf -)
+    echo "Loading Fenia DB from dump..."
+    cat "$srcdir/admin/fenia/fenia.dump" | (cd "$prefix/var/db/fenia" && db_load fenia)
 fi
 
 AC_CONFIG_COMMANDS([src/moc/moc], [
@@ -249,7 +254,6 @@ plug-ins/output/Makefile \
 plug-ins/follow/Makefile \
 plug-ins/follow/core/Makefile \
 plug-ins/follow/command/Makefile \
-plug-ins/debug/Makefile \
 plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \

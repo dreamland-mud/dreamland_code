@@ -31,6 +31,7 @@ ServerSocket::ServerSocket( )
                 local( false ),
                 backdoor( false ),
                 websock( false ),
+                newnanny(false),
                 fd( -1 )
 {
 }

@@ -262,7 +262,6 @@ void PCharacter::init( )
     clanLevel = 0;
     hometown.assign( home_none );
     profession.assign( prof_none );
-    subprofession.assign( prof_none );
 
     attributes.clear( );
     remorts.clear( );
@@ -304,7 +303,6 @@ void PCharacter::init( )
     perm_mana = max_mana;
     perm_move = max_move;
 
-    max_skill_points = 1000;
     practice = 0;
     train = 0;
     loyalty = 0;
@@ -529,21 +527,6 @@ void PCharacter::setHometown( const HometownReference & hometown )
 {
     this->hometown.assign( hometown );
 }
-ProfessionReference & PCharacter::getSubProfession( )
-{
-    return subprofession;
-}
-void PCharacter::setSubProfession( const ProfessionReference &sub )
-{
-    subprofession.assign( sub );
-}
-ProfessionReference &PCharacter::getTrueProfession( )
-{
-    if (subprofession != prof_none)
-        return subprofession;
-
-    return getProfession( );
-}
 
 short PCharacter::getClanLevel( ) const 
 {
@@ -748,60 +731,10 @@ DLString PCharacter::getNameP( char gram_case ) const
 /**************************************************************************
  *  pc skills 
  **************************************************************************/
-/*
- * сколько всего skill points потрачено на все разученные скилы
- */
-int PCharacter::skill_points( ) 
-{
-        int sn;
-        int points = 0;
-        
-        for (sn = 0; sn < SkillManager::getThis( )->size( ); sn++) 
-            points += skill_points( sn );
-        
-        return points / 10;
-}
-
-/* 
- * сколько skill points потрачено на данный скил 
- */
-int PCharacter::skill_points( int sn )
-{
-    int learned = getSkillData( sn ).learned;
-    Skill *skill = SkillManager::getThis( )->find( sn );
-    
-    if (learned <= 1 || !skill->available( this ))
-        return 0;
-
-    return learned * SkillManager::getThis( )->find(sn)->getWeight( this );
-}
-
 PCSkillData & PCharacter::getSkillData( int sn )
 {
     return skills.get( sn );
 }
-
-void PCharacter::updateSkills( )
-{
-    for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
-        Skill *skill = SkillManager::getThis( )->find( sn );
-        PCSkillData &data = getSkillData(sn);
-
-        // Ensure skill learned percentage is always within limits.
-        if (skill->visible( this )) {
-            int &percent = data.learned;
-
-            percent = std::max( 1, percent );
-            percent = std::max( skill->getLearned( this ), percent );
-        }
-
-        // For historical 'temporary' skills, set up proper skill origin value.
-        if (data.temporary) {
-            data.temporary = false;
-            data.origin.setValue(SKILL_DREAM);
-        }
-    }
-}                        
 
 int PCharacter::applyCurse( int def )
 {
@@ -908,9 +841,6 @@ int PCharacter::getMaxStat( int i )
         return MAX_STAT;
 
     int maxStat = getMaxTrain( i ) + remorts.stats[i].getValue( );
-
-    if (subprofession != prof_none)
-        maxStat += subprofession->getStat( i );
 
     return URANGE( MIN_STAT, maxStat, MAX_STAT );
 }

@@ -8,6 +8,7 @@
 #include "pcharactermanager.h"
 #include "pcrace.h"
 #include "room.h"
+#include "commonattributes.h"
 
 #include "wiznet.h"
 #include "infonet.h"
@@ -20,7 +21,6 @@
 
 CLAN(none);
 PROF(samurai);
-PROF(universal);
 
 /*
  *  Experience
@@ -130,22 +130,20 @@ void PCharacter::advanceLevel( )
 
     if (add_train > 0)
         buf << ", {Y" << add_train << "{C/" << train << " {lRтренировку{lEtrain{lx";
-
-    if (getProfession( ) == prof_universal) {
-        int sp_gain;
-
-        sp_gain = 200 + getRace( )->getPC( )->getSpBonus( ) + remorts.getSkillPointsPerLevel( level );
-        max_skill_points += sp_gain;         
-#if 0        
-        buf << "," << endl << "              "
-            << "{Y" << sp_gain << "{C/" << max_skill_points << " {lRочков умений{lEskill points{lx"; 
-#endif        
-    }
     
     buf << ".{x";
     println( buf.str( ).c_str( ) );
 
+    // Display how many new skills became available after level up.
+    XMLIntegerAttribute::Pointer skillCount 
+        =  getAttributes().getAttr<XMLIntegerAttribute>("skillCount");
+    int skillsLastLevel = skillCount->getValue();
+
     updateSkills( );
+
+    int skillsDiff = skillCount->getValue() - skillsLastLevel;
+    if (skillsDiff > 0)
+        pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
 }
 
 #else

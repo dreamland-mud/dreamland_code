@@ -9,6 +9,7 @@
 #include "xmlstring.h"
 #include "xmlinteger.h"
 #include "xmlattribute.h"
+#include "xmlmap.h"
 
 class XMLEmptyAttribute: public virtual XMLAttribute {
 public:
@@ -75,12 +76,33 @@ public:
     static const DLString TYPE;
 };
 
+class XMLStringMapAttribute : public virtual XMLAttribute,
+                              public XMLMapBase<XMLString> 
+{
+public:        
+        typedef ::Pointer<XMLStringMapAttribute> Pointer;
+
+        XMLStringMapAttribute( );
+        virtual ~XMLStringMapAttribute( );
+
+        static const DLString TYPE;
+
+        virtual const DLString & getType( ) const
+        {
+            return TYPE;
+        }
+};
+
 class PCMemoryInterface;
 namespace Json {
     class Value;
 }
 
 const DLString & get_string_attribute(PCMemoryInterface *player, const DLString &attrName);
+XMLStringMapAttribute & get_map_attribute(PCMemoryInterface *player, const DLString &attrName);
+const DLString & get_map_attribute_value(PCMemoryInterface *player, const DLString &attrName, const DLString &key);
+void set_map_attribute_value(PCMemoryInterface *player, const DLString &attrName, const DLString &key, const DLString &value);
+
 bool get_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
 void set_json_attribute(PCMemoryInterface *player, const DLString &attrName, Json::Value &attrValue);
 PCMemoryInterface * find_player_by_attribute(const DLString &attrName, const DLString &attrValue);

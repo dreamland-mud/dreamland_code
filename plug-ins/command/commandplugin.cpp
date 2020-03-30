@@ -14,7 +14,7 @@ void CommandPlugin::initialization( )
 
 void CommandPlugin::destruction( )
 {
-    commandManager->save( Pointer( this ) );
+//    commandManager->save( Pointer( this ) );
     commandManager->unregistrate( Pointer( this ) );
 }
 

@@ -14,7 +14,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "liquid.h"
 #include "affect.h"
 
@@ -24,7 +24,7 @@
 #include "mercdb.h"
 #include "def.h"
 
-LIQ(water);
+bool oprog_smell_liquid(Liquid *liq, Character *ch);
 
 /*---------------------------------------------------------------------------
  * listen
@@ -186,6 +186,12 @@ CMDRUNP( smell )
         if (!obj->pIndexData->smell.empty( )) {
             ch->println( obj->pIndexData->smell );
             return;
+        }
+
+        if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0) {
+            Liquid *liq = liquidManager->find(obj->value2());
+            if (oprog_smell_liquid(liq, ch))
+                return;
         }
 
         ch->println("Пахнет вполне обычно.");

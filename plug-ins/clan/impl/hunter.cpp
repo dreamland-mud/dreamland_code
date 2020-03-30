@@ -360,8 +360,8 @@ void HunterWeapon::wear( Character *ch )
 
     for (i = 0; i < size; i++) 
         if (obj->level <= params[i].level) {
-            obj->value[1] = params[i].value1;
-            obj->value[2] = params[i].value2;
+            obj->value1(params[i].value1);
+            obj->value2(params[i].value2);
             break;
         }
 
@@ -413,7 +413,7 @@ void HunterWeapon::fight( Character *ch )
     if (number_percent( ) >= 25)
         return;
 
-    switch (obj->value[0]) {
+    switch (obj->value0()) {
     case WEAPON_SWORD:        fight_sword( ch );  return;
     case WEAPON_MACE:        fight_mace( ch );   return;
     case WEAPON_AXE:        fight_axe( ch );    return;
@@ -679,6 +679,7 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
     Object *in_obj;
     bool found;
     int number = 0, max_found;
+    DLString args = arg_unquote(target_name);
     
     found = false;
     number = 0;
@@ -686,7 +687,8 @@ VOID_SPELL(FindObject)::run( Character *ch, char *target_name, int sn, int level
 
     for ( obj = object_list; obj != 0; obj = obj->next )
     {
-        if ( !ch->can_see( obj ) || !is_name( target_name, obj->getName( ))
+        if ( !ch->can_see( obj ) 
+                || !obj_has_name(obj, args, ch)
                 || number_percent() > 2 * level
                 || ch->getModifyLevel() < obj->level
                 || IS_OBJ_STAT(obj, ITEM_NOFIND) )
@@ -1001,12 +1003,12 @@ struct HunterSnareDamage : public Damage {
         
     virtual void message( ) {
         if (fMovement) {
-            msgChar( "%^O1\6твою ногу при ходьбе", snare->getObj( ) );
-            msgRoom( "%^C1 морщится от боли, наступив на зажатую в %O4 ногу", ch, snare->getObj( ) );
+            msgChar( "%1$^O1\6твою ногу при ходьбе", snare->getObj( ) );
+            msgRoom( "%2$^C1 морщится от боли, наступив на зажатую в %1$O4 ногу", snare->getObj( ), ch );
         }
         else {
-            msgRoom( "%^O1\6%C4", snare->getObj( ), ch );
-            msgChar( "%^O1\6тебя", snare->getObj( ) );
+            msgRoom( "%1$^O1\6%2$C4", snare->getObj( ), ch );
+            msgChar( "%1$^O1\6тебя", snare->getObj( ) );
         }
     }
 
@@ -1387,8 +1389,8 @@ struct HunterPitDamage : public Damage {
     }
     
     virtual void message( ) {
-        msgRoom( "%^O1 в %O6\6 %C4", pit->getSteaks( ), pit->getObj( ), ch );
-        msgChar( "%^O1 в %O6\6 тебя", pit->getSteaks( ), pit->getObj( ) );
+        msgRoom( "%1$^O1 в %2$O6\6 %3$C4", pit->getSteaks( ), pit->getObj( ), ch );
+        msgChar( "%1$^O1 в %2$O6\6 тебя", pit->getSteaks( ), pit->getObj( ) );
     }
     
     virtual void calcDamage( ) {

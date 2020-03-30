@@ -34,6 +34,20 @@ public:
     LanguageException( const Language &, const DLString & );
 };
 
+class LanguageHelp : public CommandHelp {
+public:
+    typedef ::Pointer<LanguageHelp> Pointer;
+
+    virtual void save() const;
+    virtual DLString getTitle(const DLString &label) const;
+    inline virtual const DLString & getType( ) const;
+    static const DLString TYPE;
+};
+
+inline const DLString & LanguageHelp::getType( ) const
+{
+    return TYPE;
+}
 
 class Language : public Skill, public Command, public virtual Plugin, public XMLVariableContainer {
 XML_OBJECT
@@ -63,6 +77,7 @@ public:
     virtual AffectHandler::Pointer getAffect( );
     virtual Spell::Pointer getSpell( ) const;
     virtual CommandHelp::Pointer getHelp( ) const;
+    virtual HelpArticlePointer getSkillHelp( ) const;
     virtual int getBeats( ) const;
     virtual int getMana( ) const;
     virtual SkillGroupReference & getGroup( );
@@ -71,10 +86,8 @@ public:
     virtual bool usable( Character *, bool ) const; 
     virtual int getLevel( Character * ) const;
     virtual int getLearned( Character * ) const;
-    virtual int getWeight( Character * ) const;
     virtual int getMaximum( Character * ) const;
     virtual int getAdept( PCharacter * ) const;
-    virtual bool canForget( PCharacter * ) const;
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void practice( PCharacter * ) const;
@@ -115,7 +128,7 @@ protected:
     XML_VARIABLE XMLString  nameRus;
     XML_VARIABLE XMLStringNoEmpty nameRusNoCase;
     XML_VARIABLE XMLString  hint;
-    XML_VARIABLE XMLPointerNoEmpty<CommandHelp> description;
+    XML_VARIABLE XMLPointerNoEmpty<LanguageHelp> help;
     XML_VARIABLE XMLInteger beats;
     XML_VARIABLE XMLInteger minAlign, maxAlign;
     XML_VARIABLE Races    races;

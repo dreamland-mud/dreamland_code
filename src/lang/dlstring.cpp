@@ -383,7 +383,7 @@ DLString DLString::getOneArgument( )
 
     cEnd = ' ';
 
-    if (*i == '\'' || *i == '"')
+    if (*i == '\'' || *i == '"' || *i == '!')
         cEnd = *i++;
     
     while (i != end( )) {
@@ -392,7 +392,6 @@ DLString DLString::getOneArgument( )
             break;
         }
 
-//        ret += dl_tolower( *i );
         ret += *i;
         i++;
     }
@@ -513,7 +512,7 @@ DLString DLString::toUpper( ) const
     return rc;
 }
 
-bool DLString::isName( const DLString &msg ) {
+bool DLString::isName( const DLString &msg ) const {
     size_type pos; 
     DLString m( msg ), s( *this );
     

@@ -112,6 +112,7 @@ typedef map<DLString, DLString> Properties;
 #define LEVEL_IMMORTAL                   (MAX_LEVEL - 8)
 #define LEVEL_MORTAL               100
 
+#define GROUP_RANGE                8
 
 #define IMPLEMENTOR                MAX_LEVEL
 #define        CREATOR                        (MAX_LEVEL - 1)
@@ -370,6 +371,8 @@ struct        extra_descr_data
 };
 
 
+typedef list<Object *> ObjectList;
+
 /*
  * Prototype for an object.  *OID*
  */
@@ -403,6 +406,7 @@ struct        obj_index_data
     DLString smell;
     DLString sound;
     Properties properties;
+    ObjectList instances;
 };
 
 

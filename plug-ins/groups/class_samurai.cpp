@@ -477,10 +477,10 @@ SKILL_RUNP( katana )
                 affect_to_obj( katana, &af );
 
                 if (ch->getModifyLevel() < 70 )
-                        katana->value[2] = 10;
+                        katana->value2(10);
                 else
                 {
-                        katana->value[2] = 10 + (ch->getModifyLevel()-70)/7;
+                        katana->value2(10 + (ch->getModifyLevel()-70)/7);
                 }
                 sprintf( buf,katana->pIndexData->extra_descr->description,ch->getNameP( ) );
                 katana->extra_descr = new_extra_descr();
@@ -519,7 +519,7 @@ void SamuraiGuildmaster::give( Character *victim, Object *obj )
         return;
     }
     
-    if (victim->getTrueProfession( ) != prof_samurai) {
+    if (victim->getProfession( ) != prof_samurai) {
         say_act( victim, ch, "Ты не принадлежишь к классу самураев, ты недосто$gйно|ин|йна даже находиться здесь!" );
         giveBack( victim, obj );
         return;
@@ -643,7 +643,10 @@ void Katana::wear( Character *ch )
         && obj->extra_descr->description
         && strstr( obj->extra_descr->description, ch->getNameP( ) ) != 0)
   {
-   ch->send_to("Ты ощущаешь СВОЮ катану, как часть себя!\n\r");
+    if (obj->getRealShortDescr())
+        ch->pecho("Ты ощущаешь %O4 как часть себя!", obj);
+    else
+        ch->send_to("Ты ощущаешь СВОЮ катану, как часть себя!\n\r");
   }
 }
 
@@ -677,17 +680,3 @@ bool OwnedKatana::isLevelAdaptive( )
 {
    return true; 
 }
-
-/*
- * SamuraiUniclassAdept
- */
-SamuraiUniclassAdept::SamuraiUniclassAdept( )
-{
-    myclass.setValue( prof_samurai->getName( ) );
-}
-
-void SamuraiUniclassAdept::tell( Character *victim, const char *speech )
-{
-    UniclassAdept::tell( victim, speech );
-}
-

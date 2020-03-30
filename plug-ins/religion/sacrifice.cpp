@@ -160,7 +160,7 @@ protected:
 
     void money(Object *obj) {
         quantity["money"] = 1;
-        int item_cost =  obj->value[0] / 100 + obj->value[1];
+        int item_cost =  obj->value0() / 100 + obj->value1();
         cost["money"] = min(200, item_cost);
     }
     
@@ -190,7 +190,7 @@ protected:
 
         // Favour spells present in tattoos or closely related.
         for (int i = 1; i <= 4; i++)
-            if ((skill = SkillManager::getThis( )->find( obj->value[i] ) )) {
+            if ((skill = SkillManager::getThis( )->find( obj->valueByIndex(i) ) )) {
                 if (religion->likesSpell(skill)) {
                     quantity["magic"]++;
                     cost["magic"] = min(500, cost["magic"] + 200);
@@ -203,7 +203,7 @@ protected:
         Skill *skill;
 
         // Favour spells present in tattoos or closely related.
-        if ((skill = SkillManager::getThis( )->find( obj->value[3] ) ))
+        if ((skill = SkillManager::getThis( )->find( obj->value3() ) ))
             if (religion->likesSpell(skill)) {
                 quantity["magic"]++;
                 cost["magic"] = min(500, cost["magic"] + 200);
@@ -227,29 +227,29 @@ protected:
 
     void food(Object *obj) {
         // Smite for offering poisonous food.
-        if (obj->value[3]) {
+        if (obj->value3()) {
             smite = true;
             smiteMessage = "ядовитую еду";
             return;
         }
         // Use double food's "full" value as its cost.
         quantity["food"]++;
-        cost["food"] = min(200, cost["food"] + obj->value[0] * 2);
+        cost["food"] = min(200, cost["food"] + obj->value0() * 2);
     }
 
     void drink(Object *obj) {
         // Smite for poisonous or empty drinks.
-        if (IS_SET( obj->value[3], DRINK_POISONED )) {
+        if (IS_SET( obj->value3(), DRINK_POISONED )) {
             smite = true;
             smiteMessage = "отравленную жидкость";
             return;
         }
-        if (obj->value[1] <= 0 || obj->value[0] <= 0) {
+        if (obj->value1() <= 0 || obj->value0() <= 0) {
             smite = true;
             smiteMessage = "пустую тару";
             return;
         }
-        if (obj->value[1] < obj->value[0] / 4) {
+        if (obj->value1() < obj->value0() / 4) {
             smite = true;
             smiteMessage = "полупустую тару";
             return;
@@ -257,11 +257,11 @@ protected:
         // Favourite drinks (wine, milk) give more points.
         quantity["drink"]++;
         int item_cost;
-        if (religion->likesDrink(liquidManager->find(obj->value[2]))) {
+        if (religion->likesDrink(liquidManager->find(obj->value2()))) {
             // Penalize for non-full containers.
-            item_cost = 500 * obj->value[1] / obj->value[0];
+            item_cost = 500 * obj->value1() / obj->value0();
         } else {
-            item_cost = min(100, obj->value[1]);
+            item_cost = min(100, obj->value1());
         }
         cost["drink"] = min(500, cost["drink"] + item_cost);
     }
@@ -272,8 +272,8 @@ protected:
     }
 
     void corpse_npc(Object *obj) {
-        bitnumber_t align = ALIGN_NUMBER(obj->value[4]);
-        MOB_INDEX_DATA *pMob = get_mob_index(obj->value[3]);
+        bitnumber_t align = ALIGN_NUMBER(obj->value4());
+        MOB_INDEX_DATA *pMob = get_mob_index(obj->value3());
         if (!pMob)
             return;
 
@@ -629,12 +629,14 @@ CMDRUNP( sacrifice )
                     return;
                 }
 
-                if ( (  obj->item_type == ITEM_CORPSE_NPC  )
-                        && number_percent() < gsn_crusify->getEffective( ch ) )
-                {
+                if (obj->item_type == ITEM_CORPSE_NPC) {
+                    if (number_percent() < gsn_crusify->getEffective( ch )) {
                         mana_gain = ch->getModifyLevel();
                         gsn_crusify->improve( ch, true );
-                }         
+                    } else {
+                        gsn_crusify->improve( ch, false );
+                    }
+                } 
 
                 if ( ( silver=sacrifice_obj(ch, obj, true) )<0 )
                         return;

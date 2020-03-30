@@ -260,7 +260,7 @@ void cold_effect(void *vo, short level, int dam, int target, bitstring_t dam_fla
             af.level     = level;
             af.duration  = 6;
             af.location  = APPLY_STR;
-            af.modifier  = -1;
+            af.modifier = min(-1, -level / 12);
             af.bitvector = 0;
             affect_join( victim, &af );
         }
@@ -569,7 +569,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
             case ITEM_FOOD:
                 break;
             case ITEM_DRINK_CON:
-                if (obj->value[0] == obj->value[1])
+                if (obj->value0() == obj->value1())
                     return;
                 break;
         }
@@ -579,7 +579,7 @@ void poison_effect(void *vo,short level, int dam, int target, bitstring_t dam_fl
         if (number_percent() > chance)
             return;
 
-        SET_BIT( obj->value[3], DRINK_POISONED );
+        obj->value3(obj->value3() | DRINK_POISONED);
         return;
     }
 }

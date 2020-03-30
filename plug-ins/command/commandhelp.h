@@ -19,6 +19,7 @@ public:
     virtual void unsetCommand( );
     virtual void save() const;
     
+    virtual DLString getTitle(const DLString &label) const;
     inline CommandPointer getCommand( ) const;
     inline virtual const DLString & getType( ) const;
     static const DLString TYPE;

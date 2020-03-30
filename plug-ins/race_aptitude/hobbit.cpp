@@ -41,8 +41,8 @@ static Object * create_stone( int level )
 
     stone = create_object( get_obj_index( OBJ_VNUM_THROWING_STONE ), 0 );
     stone->level = level;
-    stone->value[1] = 4 + level / 15;
-    stone->value[2] = 4 + level / 30;
+    stone->value1(4 + level / 15);
+    stone->value2(4 + level / 30);
 
     af.where                  = TO_OBJECT;
     af.type               = gsn_search_stones;
@@ -81,6 +81,11 @@ SKILL_RUNP( searchstones )
                         break;                        
     case SECT_FOREST:        chance = 30; break;
     case SECT_FIELD:        chance = 30; break;
+    }
+
+    if (chance == 0) {
+        ch->println("В этой местности бесполезно искать камни.");
+        return;
     }
     
     if (number_percent( ) > gsn_search_stones->getEffective( ch ) * chance / 100) {
@@ -183,17 +188,12 @@ SKILL_RUNP( throwstone )
 
     if (!( stone = get_eq_char( ch, wear_hold ) )
         || stone->item_type != ITEM_WEAPON
-        || stone->value[0] != WEAPON_STONE)
+        || stone->value0() != WEAPON_STONE)
     {
         ch->println("Возьми в руку камень!");
         return;
     }
-/*
-    if (get_eq_char(ch, wear_wield)) {
-        ch->println("Твоя вторая рука дожна быть свободна!");
-        return;            
-    }
-*/
+
     ch->setWait( gsn_throw_stone->getBeats( ) );
     set_violent( ch, victim, false );
     act( "Ты швыряешь $o4 $T.", ch, stone, dirs[ direction ].leave, TO_CHAR );
@@ -207,7 +207,7 @@ SKILL_RUNP( throwstone )
         chance -= 40;
 
     chance += ch->hitroll - ch->getRealLevel( );
-    dam = dice(stone->value[1], stone->value[2]);
+    dam = dice(stone->value1(), stone->value2());
     dam += ch->damroll + get_str_app(ch).missile;
 
     if (ch->size < SIZE_HUGE)

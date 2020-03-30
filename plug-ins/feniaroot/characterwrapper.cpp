@@ -723,7 +723,6 @@ INT_FIELD(has_killed, "сколько жертв убито всего")
 INT_FIELD(perm_hit, "max hp без шмота")
 INT_FIELD(perm_mana, "max mana без шмота")
 INT_FIELD(perm_move, "max move без шмота")
-INT_FIELD(max_skill_points, "кол-во скилпоинтов у чара")
 INT_FIELD(practice, "сколько практик")
 INT_FIELD(train, "сколько тренировок")
 INT_FIELD(loyalty, "лояльность по отношению к закону (рулеровскому)")
@@ -752,14 +751,14 @@ NMI_SET( CharacterWrapper, x, help) \
 }
 INT_FIELD(off_flags, "флаги поведения моба (таблица .tables.off_flags)")
 
-NMI_SET( CharacterWrapper, wearloc, "список слотов экипировки")
+NMI_SET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
     CHK_NPC
     target->getPC( )->wearloc.fromString( arg.toString( ) );
 }
 
-NMI_GET( CharacterWrapper, wearloc, "список слотов экипировки")
+NMI_GET( CharacterWrapper, wearloc, "названия всех слотов экипировки через пробел")
 {
     checkTarget( );
     CHK_NPC
@@ -839,23 +838,6 @@ NMI_SET( CharacterWrapper, religion, "религия (структура .Religi
         target->getPC( )->setReligion( "none" );
     else
         target->getPC( )->setReligion( wrapper_cast<ReligionWrapper>(arg)->name );
-}
-
-NMI_GET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
-{
-    checkTarget( );
-    CHK_NPC
-    return Register::handler<ProfessionWrapper>(target->getPC()->getSubProfession()->getName());
-}
-
-NMI_SET( CharacterWrapper, uniclass, "под-профессия универсала (.Profession)" )
-{
-    checkTarget( );
-    CHK_NPC
-    if (arg.type == Register::NONE)
-        target->getPC( )->setSubProfession( "none" );
-    else
-        target->getPC( )->setSubProfession( wrapper_cast<ProfessionWrapper>(arg)->name );
 }
 
 NMI_GET( CharacterWrapper, hometown, "родной город (структура .Hometown)" )
@@ -1062,7 +1044,7 @@ NMI_INVOKE( CharacterWrapper, get_liquid_carry, "(liqname): вернет емк�
 
     list< ::Object *> drinks = ::get_objs_list_type(target, ITEM_DRINK_CON, target->carrying);
     for (list< ::Object *>::iterator o = drinks.begin(); o != drinks.end(); o++)
-        if (liquidManager->find((*o)->value[2]) == liquid)
+        if (liquidManager->find((*o)->value2()) == liquid)
             return wrap(*o);
 
     return Register();
@@ -1075,7 +1057,7 @@ NMI_INVOKE( CharacterWrapper, get_recipe_carry, "(flag): вернет рецеп
     bitstring_t flag = args2number(args);
     list< ::Object *> recipes = ::get_objs_list_type(target, ITEM_RECIPE, target->carrying);
     for (list< ::Object *>::iterator o = recipes.begin(); o != recipes.end(); o++)
-        if (IS_SET((*o)->value[0], flag))
+        if (IS_SET((*o)->value0(), flag))
             return wrap(*o);
 
     return Register();
@@ -1264,10 +1246,10 @@ NMI_INVOKE( CharacterWrapper, recho, "(fmt, args): выводит отформа
     for (Character *to = target->in_room->people; to; to = to->next_in_room) {
         if (to == target)
             continue;
-        if (to->position < POS_RESTING)
+        if (!to->can_sense(target))
             continue;
 
-        to->println(regfmt(to, args));
+        to->pecho(POS_RESTING, regfmt(to, args).c_str());
     }
 
     return Register();
@@ -1285,11 +1267,11 @@ NMI_INVOKE( CharacterWrapper, rvecho, "(vict, fmt, args...): выводит от
 
     for (Character *to = target->in_room->people; to; to = to->next_in_room) {
         if (to == target || to == vict)
-            continue;
-        if (to->position < POS_RESTING)
+            continue;            
+        if (!to->can_sense(target))
             continue;
 
-        to->println(regfmt(to, myArgs));
+        to->pecho(POS_RESTING, regfmt(to, myArgs).c_str());
     }
 
     return Register( );
@@ -1892,6 +1874,33 @@ NMI_INVOKE( CharacterWrapper, save, "(): сохранить профайл на 
     return Register( );
 }
 
+NMI_INVOKE( CharacterWrapper, skills, "([origin]): список названий доступных скилов, всех или с данным происхождением (.tables.skill_origin_table)" )
+{
+    checkTarget();
+    CHK_NPC
+
+    RegList::Pointer list(NEW);
+    int origin = args.empty() ? NO_FLAG : argnum2flag(args, 1, skill_origin_table);
+    
+    for (int sn = 0; sn < skillManager->size(); sn++) {
+        Skill *skill = skillManager->find(sn);
+        // Choose only permanent skills available at any level, or active temporary skills.
+        if (!skill->visible(target))
+            continue;
+
+        PCSkillData &data = target->getPC()->getSkillData(sn);
+        // Filter by requested origin (fenia, religion, etc) or return all.
+        if (origin != NO_FLAG && data.origin != origin)
+            continue;
+
+        list->push_back(Register(skill->getName()));
+    }
+
+    Scripting::Object *listObj = &Scripting::Object::manager->allocate( );
+    listObj->setHandler( list );
+    return Register( listObj );
+}
+
 NMI_INVOKE( CharacterWrapper, updateSkills, "(): освежить разученность умений (при входе в мир)" )
 {
     checkTarget( );
@@ -2151,8 +2160,8 @@ NMI_INVOKE( CharacterWrapper, eat, "(ob): заполнить желудок та
     ::Object *obj = arg2item( args.front( ) );
 
     if (obj->item_type == ITEM_FOOD) {
-        desire_hunger->eat( target->getPC( ), obj->value[0] * 2 );
-        desire_full->eat( target->getPC( ), obj->value[1] * 2 );
+        desire_hunger->eat( target->getPC( ), obj->value0() * 2 );
+        desire_full->eat( target->getPC( ), obj->value1() * 2 );
     }
 
     return Register( );
@@ -2171,7 +2180,7 @@ NMI_INVOKE( CharacterWrapper, drink, "(obj,amount): заполнить желу�
     amount = args.back( ).toNumber( );
 
     if (obj->item_type == ITEM_DRINK_CON || obj->item_type == ITEM_FOUNTAIN) {
-        Liquid *liq = liquidManager->find( obj->value[2] );
+        Liquid *liq = liquidManager->find( obj->value2() );
 
         desire_full->drink( target->getPC( ), amount, liq );
         desire_thirst->drink( target->getPC( ), amount, liq );

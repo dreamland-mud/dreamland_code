@@ -28,7 +28,6 @@ fight \
 updates \
 areas \
 desire \
-comm \
 social \
 ai \
 services \
@@ -36,6 +35,7 @@ remort \
 questreward \
 skills_impl \
 liquid \
+comm \
 clan \
 selfrate \
 gquest \

@@ -108,9 +108,6 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     
     rprog_skill( ch->in_room, ch, getName( ).c_str( ), success, victim );
 
-    if (data.forgetting)
-        return;
-
     if (data.isTemporary())
         return;
 
@@ -145,10 +142,9 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
             chance += 20 * (diff + 10);
     }
 
-    bool fEnlight = pch->getAttributes( ).isAvailable( "enlight" );
     bool fBonus = bonus_learning->isActive(pch, time_info);
 
-    if (fEnlight || fBonus)
+    if (fBonus)
         chance *= 2;
     if (number_range(1, 1000) > chance)
         return;
@@ -156,7 +152,7 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     /* now that the character has a CHANCE to learn, see if they really have */        
     if (success) {
         int learned = data.learned;
-        if (fEnlight || fBonus)
+        if (fBonus)
             learned = min(learned, 60);
         chance = URANGE(5, 100 - learned, 95);
         
@@ -237,7 +233,6 @@ void BasicSkill::practice( PCharacter *ch ) const
     learned = URANGE( 1, learned + delta, getAdept( ch ) );
 
     data.timer = 0;
-    data.forgetting = false;
 }
 
 int BasicSkill::getEffective( Character *ch ) const
@@ -312,6 +307,11 @@ SkillCommandPointer BasicSkill::getCommand( ) const
     else
         return command;
 }
+HelpArticlePointer BasicSkill::getSkillHelp( ) const
+{
+    return help;
+}
+
 int BasicSkill::getBeats( ) const
 {
     return beats.getValue( );

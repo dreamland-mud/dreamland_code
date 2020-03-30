@@ -165,10 +165,10 @@ void init_descriptor( int control )
 
     if (ServerSocketContainer::isWrapped( control )) 
         WrapperHandler::init( dnew );
-    else if (ServerSocketContainer::isBackdoor( control ))
-        BackdoorHandler::init( dnew );
     else if (ServerSocketContainer::isWebSock( control ))
         dnew->websock.state = WS_NEGOTIATING;
+    else if (ServerSocketContainer::isBackdoor( control ))
+        BackdoorHandler::init( dnew );
     else
         NannyHandler::init( dnew );
 

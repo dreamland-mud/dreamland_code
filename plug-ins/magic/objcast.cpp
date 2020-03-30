@@ -28,7 +28,7 @@
 #include "affect.h"
 #include "pcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "dreamland.h"
 #include "act_move.h"
@@ -40,7 +40,7 @@
 #include "clanreference.h"
 #include "vnum.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "interp.h"
 #include "def.h"
@@ -88,8 +88,8 @@ CMDRUNP( quaff )
         return;
     }
 
-    if (ch->getRealLevel( ) < obj->level) {
-        ch->send_to("Эта смесь чересчур сильна, чтобы ты мог выпить ее.\n\r");
+      if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+        ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
         return;
     }
 
@@ -149,7 +149,7 @@ CMDRUNP( recite )
     found = false;
 
     for (int i = 1; i <= 4; i++) {
-        int sn = scroll->value[i];
+        int sn = scroll->valueByIndex(i);
         
         if (sn > 0) {
             spell = SkillManager::getThis( )->find( sn )->getSpell( );
@@ -194,15 +194,15 @@ CMDRUNP( recite )
             if (!t)
                 continue;
             
-            spell = SkillManager::getThis( )->find( scroll->value[i] )->getSpell( );
+            spell = SkillManager::getThis( )->find( scroll->valueByIndex(i) )->getSpell( );
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
 
-            if (offensive && is_safe( ch, t->victim ))
+            if (offensive && t->victim && is_safe( ch, t->victim ))
                 continue;
             
             if (!spell->spellbane( ch, t->victim )) {
                 try {
-                    spell->run( ch, t, scroll->value[0] );
+                    spell->run( ch, t, scroll->value0() );
 
                     if (offensive)
                         attack_caster( ch, t->victim );
@@ -249,7 +249,7 @@ CMDRUNP( brandish )
         return;
     }
     
-    sn = staff->value[3];
+    sn = staff->value3();
     skill = SkillManager::getThis( )->find( sn );
     
     if (!skill || !( spell = skill->getSpell( ) )) { 
@@ -259,14 +259,13 @@ CMDRUNP( brandish )
 
      ch->setWaitViolence( 2 );
 
-    if (staff->value[2] > 0) {
+    if (staff->value2() > 0) {
         const char *terrain = terrains[ch->in_room->sector_type].hit;
         
         act( "$c1 ударяет $o5 $T.", ch, staff, terrain, TO_ROOM );
         act( "Ты ударяешь $o5 $T.", ch, staff, terrain, TO_CHAR );
 
-        if (ch->getRealLevel( ) + 3 < staff->level
-            || number_percent( ) >= gsn_staves->getEffective( ch ))
+        if ( number_percent( ) >= gsn_staves->getEffective( ch ))
         {
             act_p("Ты не смо$gгло|г|гла активировать $o4.",ch,staff,0,TO_CHAR,POS_RESTING);
             act_p("...и ничего не происходит.",ch,0,0,TO_ROOM,POS_RESTING);
@@ -277,7 +276,7 @@ CMDRUNP( brandish )
             bool offensive;
             int level, t;
             
-            level = staff->value[0];
+            level = staff->value0();
             offensive = spell->getSpellType( ) == SPELL_OFFENSIVE;
             t = spell->getTarget( );
 
@@ -328,7 +327,8 @@ CMDRUNP( brandish )
         }
     }
 
-    if (--staff->value[2] <= 0) {
+    staff->value2(staff->value2() - 1);
+    if (staff->value2() <= 0) {
         ch->recho( "%1$O1 %2$C2 темне%1$nет|ют и исчеза%1$nет|ют.", staff, ch );
         ch->pecho( "Тво%1$Gе|й|я|и %1$O1 темне%1$nет|ют и исчеза%1$nет|ют.", staff );
         extract_obj( staff );
@@ -351,7 +351,7 @@ CMDRUNP( zap )
     DLString args = argument;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Ты должен уничтожать магию, а не использовать ее!\n\r");
+        ch->pecho("Ты долж%1$Gно|ен|на уничтожать магию, а не использовать её!", ch);
         return;
     }
 
@@ -365,7 +365,7 @@ CMDRUNP( zap )
         return;
     }
     
-    sn = wand->value[3];
+    sn = wand->value3();
     skill = SkillManager::getThis( )->find( sn );
 
     if (!skill || !( spell = skill->getSpell( ) )) {
@@ -387,7 +387,7 @@ CMDRUNP( zap )
         return;
     }
     
-    if (wand->value[2] > 0) {
+    if (wand->value2() > 0) {
         Character *victim = target->victim;
 
         if (victim && victim->in_room == ch->in_room) {
@@ -425,7 +425,7 @@ CMDRUNP( zap )
 
             try {
                 if (!spell->spellbane( ch, victim )) {
-                    spell->run( ch, target, wand->value[0] );
+                    spell->run( ch, target, wand->value0() );
 
                     if (offensive)
                         attack_caster( ch, victim );
@@ -443,7 +443,8 @@ CMDRUNP( zap )
         }
     }
 
-    if (--wand->value[2] <= 0) {
+    wand->value2(wand->value2() - 1);
+    if (wand->value2() <= 0) {
         ch->recho( "%1$O1 %2$C2 развалива%1$nется|ются на куски.", wand, ch );
         ch->pecho( "Тво%1$Gе|й|я|и %1$O1 развалива%1$nется|ются на куски.", wand );
         extract_obj( wand );

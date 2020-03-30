@@ -273,10 +273,6 @@ void Character::setProfession( const ProfessionReference & profession )
 {
     this->profession.assign( profession );
 }
-ProfessionReference & Character::getTrueProfession( )
-{
-    return getProfession( );
-}
 
 ReligionReference & Character::getReligion( ) 
 {
@@ -373,6 +369,10 @@ bool Character::can_see( const Character *victim ) const
                     || ( CAN_DETECT( this, DETECT_INVIS )
                             && !IS_AFFECTED(this, AFF_BLIND) ) )
                     return true;
+
+            if (IS_GHOST(this) ||IS_DEATH_TIME(this))
+                return true;
+
             return false;
         }
 
@@ -453,7 +453,7 @@ bool Character::can_see( const Object *obj ) const
     if ( IS_AFFECTED( this, AFF_BLIND ) && obj->item_type != ITEM_POTION)
         return false;
 
-    if ( obj->item_type == ITEM_LIGHT && obj->value[2] != 0 )
+    if ( obj->item_type == ITEM_LIGHT && obj->value2() != 0 )
         return true;
 
     if ( IS_SET(obj->extra_flags, ITEM_INVIS)

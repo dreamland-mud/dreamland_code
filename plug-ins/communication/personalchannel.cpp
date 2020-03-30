@@ -39,9 +39,8 @@ Character * PersonalChannel::findListener( Character *ch, const DLString &arg ) 
 
 void PersonalChannel::tellToBuffer( Character *ch, Character *victim, const DLString &messageChar, const DLString &messageVict ) const
 {
-    if (!victim->is_npc( ))
-        victim->getPC( )->getAttributes( ).getAttr<XMLStringListAttribute>( 
-                                    "tells" )->push_back( messageVict );
+    if (!victim->is_npc())
+        victim->getPC()->getAttributes().getAttr<ReplayAttribute>("replay")->addMessage(messageVict);
 
     postOutput(victim, messageVict);
     postOutput(ch, messageChar);

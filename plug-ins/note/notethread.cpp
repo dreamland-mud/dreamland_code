@@ -16,6 +16,19 @@
 #include "merc.h"
 #include "def.h"
 
+const DLString NoteHelp::TYPE = "NoteHelp";
+
+void NoteHelp::save() const
+{
+   if (command) {
+        const NoteThread *note = command.getDynamicPointer<NoteThread>();
+        if (note)
+            NoteManager::getThis()->saveXML(note, note->getName());
+        else
+            LogStream::sendNotice() << "Failed to save command " << command->getName() << endl;
+   }
+}
+
 NoteThread::NoteBucket::NoteBucket( )
                           : NoteThread::NoteBucket::Base( true )
 {

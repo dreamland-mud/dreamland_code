@@ -580,7 +580,7 @@ NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Di
     return Register( );
 }
 
-NMI_INVOKE(Root, infonet, "(msg): выдать сообщение msg через хрустальный шар" )
+NMI_INVOKE(Root, infonet, "(msg, ch): выдать сообщение msg через хрустальный шар с участием ch" )
 {
     if (args.size() != 2)
         throw Scripting::NotEnoughArgumentsException( );

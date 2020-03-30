@@ -155,7 +155,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
             af.bitvector = 0;
             affect_to_char(ch, &af);
             ch->send_to("Ты чувствуешь, как сила уходит из тебя.\n\r");
-            act_p("$c1 выглядит слабым и уставшим.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
+            act_p("$c1 выглядит слаб$gым|ым|ой и уставш$gим|им|ой.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
         }
         else if (!IS_AFFECTED(ch, AFF_CURSE) && !IS_SET(ch->imm_flags, IMM_NEGATIVE)) {
             af.where = TO_AFFECTS;
@@ -197,7 +197,7 @@ VOID_SPELL(Prayer)::run( Character *ch, char *, int sn, int level )
         return;
     }
 
-    if (number_percent() > ch->getRealLevel( ) * 3 * ch->getSkill( sn ) / 100) {
+    if (number_percent() > ch->getSkill( sn ) - 5 ) {
         // nothing 
         ch->send_to("Боги слишком заняты, чтобы снизойти до твоих молитв...\n\r");
         return;

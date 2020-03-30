@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include "commandtemplate.h"
-#include "scribing.h"
 #include "so.h"
 
 extern "C"
@@ -12,8 +11,6 @@ extern "C"
     {
         SO::PluginList ppl;
 
-        Plugin::registerPlugin<ObjectBehaviorRegistrator<SpellBook> >( ppl );
-        
         return ppl;
     }
 }

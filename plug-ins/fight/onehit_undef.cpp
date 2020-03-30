@@ -17,7 +17,7 @@
 #include "religion.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "clanreference.h"
 #include "areabehaviormanager.h"
@@ -26,7 +26,7 @@
 #include "fight.h"
 #include "material.h"
 #include "immunity.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "skill_utils.h"
 #include "move_utils.h"
 #include "gsn_plugin.h"
@@ -46,7 +46,6 @@ PROF(anti_paladin);
 PROF(ninja);
 PROF(ranger);
 PROF(samurai);
-PROF(universal);
 PROF(thief);
 
 WEARLOC(tat_wrist_l);
@@ -172,6 +171,90 @@ void UndefinedOneHit::postDamageEffects( )
     damEffectFeeble( );
     damEffectFunkyWeapon( );
     damEffectSlice( );
+    damEffectVorpal();
+}
+
+/**
+ * One, two! One, two! and through and through
+ * The vorpal blade went snicker-snack!
+ * He left it dead, and with its head
+ * He went galumphing back.
+ * 
+ * Раз-два, раз-два! Горит трава,
+ * Взы-взы — стрижает меч,
+ * Ува! Ува! И голова
+ * Барабардает с плеч!
+ */ 
+void UndefinedOneHit::damEffectVorpal()
+{
+    // Will work for both first and second wield, if worn.
+    if (!wield || ch->fighting != victim)
+        return;
+
+    if (!IS_WEAPON_STAT(wield, WEAPON_VORPAL))
+        return;
+
+    // No vorpal from mobs: repeats sun sword logic, can be easily changed if needed.
+    if (ch->is_npc())
+        return;
+
+    if (victim->is_immortal())
+        return;
+
+    // Chances are 1% for goods and 0.5% for others. Generic 'vorpal' warning is shown more often.
+    if (!chance(5)) 
+        return;
+
+    const char *msgAll;
+    
+    if (wield->value0() == WEAPON_SWORD)
+        msgAll = "{mРаз-два, раз-два! Горит трава, взы-взы -- стрижает меч!";
+    else if (wield->value0() == WEAPON_AXE)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит топор!{x";
+    else if (wield->value0() == WEAPON_POLEARM)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит бердыш!{x";
+    else if (wield->value0() == WEAPON_WHIP)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы стрижает плеть!{x";
+    else if (wield->value0() == WEAPON_DAGGER)
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы стрижает нож!{x";
+    else
+        msgAll = "{mРаз-два! Раз-два! Горит трава, взы-взы свирчит клинок!{x";
+
+    ch->in_room->echo(POS_RESTING, msgAll);
+
+    if (!chance(IS_GOOD(ch) ? 20 : 10))
+        return;
+
+    const char *msgVict, *msgOther;
+    if (wield->value0() == WEAPON_SWORD) {
+        msgOther = "{mУва! Ува! И %1$C2 голова барабардает с плеч!{x";
+        msgVict = "{mУва! И твоя голова барабардает с плеч!{x";
+    } else if (wield->value0() == WEAPON_AXE) {
+        msgOther = "{mУва! %1$^C1 без головы остал%1$Gось|ся|ась с этих пор!{x";
+        msgVict = "{mУва! И ты без головы остал%1$Gось|ся|ась с этих пор!{x";    
+    } else if (wield->value0() == WEAPON_POLEARM) {
+        msgOther = "{mУва! %1$C2 котелок скосило как камыш!{x";
+        msgVict = "{mУва! Ува! Твой котелок скосило как камыш!{x";
+    } else if (wield->value0() == WEAPON_WHIP) {
+        msgOther = "{mУва! %1$C3 с головой не подружиться впредь!{x";
+        msgVict = "{mУва! И тебе с головой не подружиться впредь!{x";
+    } else if (wield->value0() == WEAPON_DAGGER) {
+        msgOther = "{mУва! Ты голову %1$C2 у ног своих найдешь!{x";
+        msgVict = "{mУва! Ты голову свою у ног своих найдешь!{x";
+    } else {
+        msgOther = "{mУва! %1$C2 голова лежит у твоих ног!{x";
+        msgVict = "{mУва! И твоя голова лежит у твоих ног!{x";
+    }
+
+    victim->pecho(msgVict, victim);
+    victim->recho(msgOther, victim);
+    victim->recho("%^C1 уже ТРУП!", victim);
+
+    group_gain( ch, victim );
+    raw_kill( victim, 3, ch, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
+    pk_gain( ch, victim );
+    victim->pecho("Тебя УБИЛИ!");
+    throw VictimDeathException( );
 }
 
 void UndefinedOneHit::message( )
@@ -257,14 +340,14 @@ bool UndefinedOneHit::defenseParry( )
         return false;
 
     chance    = gsn_parry->getEffective( victim ) / 2;
-    prof = victim->getTrueProfession( );
+    prof = victim->getProfession( );
 
     if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
         chance += chance / 5;
     else if (prof == prof_anti_paladin && victim->getClan( ) == clan_shalafi) 
             chance /= 2;
 
-    if (wield && (wield->value[0] == WEAPON_FLAIL || wield->value[0] == WEAPON_WHIP ))
+    if (wield && (wield->value0() == WEAPON_FLAIL || wield->value0() == WEAPON_WHIP ))
         return false;
 
     if ( !victim->can_see( ch ) )
@@ -307,7 +390,7 @@ bool UndefinedOneHit::defenseParry( )
         && (!defending_weapon 
             || !IS_WEAPON_STAT(defending_weapon, WEAPON_HOLY))) 
     {
-        msgFightVict( "%3$^O1 passes straight through your attempt to parry!" );
+        msgFightVict( "%3$^O1 проходит насквозь через твою попытку спарировать!" );
         
         if (defending_weapon) {
             msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
@@ -425,15 +508,15 @@ bool UndefinedOneHit::defenseShieldBlock( )
         return false;
 
     chance = chance / 2 - 10;
-    prof = victim->getTrueProfession( );
+    prof = victim->getProfession( );
 
     if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
         chance += 10;
 
     if (wield) { 
-        if (wield->value[0] == WEAPON_FLAIL)
+        if (wield->value0() == WEAPON_FLAIL)
             chance /= 2;
-        if (wield->value[0] == WEAPON_WHIP)
+        if (wield->value0() == WEAPON_WHIP)
             return false;
     }
 
@@ -500,7 +583,7 @@ bool UndefinedOneHit::defenseDodge( )
 
     /* chance for high dex. */
     chance += 2 * (victim->getCurrStat(STAT_DEX) - 20);
-    prof = victim->getTrueProfession( );
+    prof = victim->getProfession( );
 
     if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
         chance += chance / 5;
@@ -532,7 +615,7 @@ bool UndefinedOneHit::defenseDodge( )
         gsn_forest_fighting->improve( victim, true, ch );
     }
 
-    if (wield && (wield->value[0] == WEAPON_FLAIL || wield->value[0] == WEAPON_WHIP))
+    if (wield && (wield->value0() == WEAPON_FLAIL || wield->value0() == WEAPON_WHIP))
         chance = ( int )( chance * 1.2 );
         
     if (number_percent( ) >= chance + ( skill_level(*gsn_dodge, victim) - ch->getModifyLevel() ) / 2
@@ -621,7 +704,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         if ( gsn_cross_block->getEffective( victim ) <= 1 )
             return false;
         chance    = gsn_cross_block->getEffective( victim ) / 3;
-        prof = victim->getTrueProfession( );
+        prof = victim->getProfession( );
 
         if (prof == prof_warrior || prof == prof_samurai || prof == prof_paladin)
             chance += chance / 2;
@@ -665,7 +748,7 @@ bool UndefinedOneHit::defenseCrossBlock( )
         && !IS_WEAPON_STAT(def1, WEAPON_HOLY) 
         && !IS_WEAPON_STAT(def2, WEAPON_HOLY)) 
     {
-        msgFightVict( "%3$^O1 passes straight through your attempt to cross block!" );
+        msgFightVict( "%3$^O1 проходит насквозь через твою попытку кросс-блокировать!" );
         msgFightChar( "%3$^O1 проходит сквозь оружие %2$C2!" );
         msgFightRoom( "%3$^O1 %1$C2 проходит сквозь оружие %2$C2!" );
 
@@ -744,7 +827,7 @@ bool UndefinedOneHit::defenseHandBlock( )
     if ((chance = gsn_hand_block->getEffective( victim )) <= 1)
         return false;
 
-    if ( victim->getTrueProfession( ) == prof_ninja) {
+    if ( victim->getProfession( ) == prof_ninja) {
         chance /= 2;
     }
     else
@@ -885,11 +968,6 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     if (dam == 0)
         return;
 
-    if ( get_eq_char(ch,wear_wield) != 0
-            && get_eq_char(ch,wear_second_wield) != 0
-            && number_percent() > HEALTH(ch))
-        return;
-
     if(SHADOW(ch))
         return;
 
@@ -957,6 +1035,7 @@ void UndefinedOneHit::damEffectMasterSword( )
 {
     Affect *paf;
     int old_mod;
+    int new_mod;
     Object *katana = wield;
 
     if (weapon_sn != gsn_sword)
@@ -993,16 +1072,23 @@ void UndefinedOneHit::damEffectMasterSword( )
     
     if (paf->level == 120)
         return;
-
-    old_mod = paf->modifier;            
-    paf->modifier = min(paf->modifier+1, ch->getModifyLevel() / 3);
-    ch->hitroll += paf->modifier - old_mod;
-    
+            
+            
+    old_mod = paf->modifier;
+    new_mod = min(paf->modifier+1, ch->getModifyLevel() / 3);
+            
+    //do not dull an already sharp katana            
+    if(new_mod > old_mod){  
+                
+    paf->modifier = new_mod;         
+    ch->hitroll += new_mod - old_mod;
+       
     if (paf->next != 0) {
-        paf->next->modifier = paf->modifier;
-        ch->damroll += paf->modifier - old_mod;
+        paf->next->modifier = new_mod;
+        ch->damroll += new_mod - old_mod;
+        }
     }
-    
+            
     act("$o1 $c2 загорается {Cголубым светом{x.", ch, katana,0, TO_ROOM);
     act("$o1 в твоей $T руке загорается {Cголубым светом{x.", 
             ch, katana, (secondary ? "левой" : "правой"), TO_CHAR);
@@ -1018,7 +1104,7 @@ void UndefinedOneHit::damApplyDeathblow( )
     chance = gsn_deathblow->getEffective( ch );
 
     if (victim->is_npc( ) && victim->getNPC( )->behavior && !victim->getNPC( )->behavior->isAfterCharm( )) {
-        if (victim->getTrueProfession( )->getFlags( victim ).isSet(PROF_MAGIC))
+        if (victim->getProfession( )->getFlags( victim ).isSet(PROF_MAGIC))
             chance /= 8;
         else
             chance /= 10;
@@ -1104,19 +1190,19 @@ void UndefinedOneHit::damApplyReligion()
                 continue;
             if (get_eq_char(rch, wear_tattoo) == 0)
                 continue;
-            if (ch->getReligion() == god_deimos && rch->getReligion() != god_phobos)
-                continue;
-            if (ch->getReligion() == god_phobos && rch->getReligion() != god_deimos)
-                continue;
-            
-            if (chance(1)) {
-                ch->recho(rch, "%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch, rch);
-                ch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", rch);
-                rch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch);
-            }
 
-            dam = dam * 110 / 100;
-            return;
+            if ((ch->getReligion() == god_deimos && rch->getReligion() == god_phobos)
+                || (ch->getReligion() == god_phobos && rch->getReligion() == god_deimos))
+            {           
+                if (chance(1)) {
+                    ch->recho(rch, "%^C1 и %C1 наводят {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch, rch);
+                    ch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", rch);
+                    rch->pecho("Ты и %C1 наводите {Rстрах и ужас{x на противников, нанося дополнительный урон!", ch);
+                }
+
+                dam = dam * 110 / 100;
+                return;
+            }
         }
     }
 }
@@ -1140,7 +1226,7 @@ void UndefinedOneHit::damEffectSlice( )
     if ((chance = gsn_slice->getEffective( ch )) <= 1)
         return;
     
-    if (axe->value[3] != DAMW_SLASH && axe->value[3] != DAMW_CHOP && axe->value[3] != DAMW_SLICE)
+    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE)
         return;
     
     if (number_bits(1)) {
@@ -1200,7 +1286,7 @@ void UndefinedOneHit::damEffectSlice( )
 
     if (arm->item_type == ITEM_FOOD) {
         if (IS_SET(victim->form,FORM_POISON))
-            arm->value[3] = 1;
+            arm->value3(1);
         else if (!IS_SET(victim->form,FORM_EDIBLE))
             arm->item_type = ITEM_TRASH;
     }

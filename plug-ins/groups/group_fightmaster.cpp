@@ -370,7 +370,7 @@ SKILL_RUNP( bash )
         if ( is_flying( victim ) )
                 chance -= 10;
         
-        if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
+        if (ch->getProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
             chance /= 2;
 
         /* now the attack */
@@ -578,7 +578,7 @@ SKILL_RUNP( trip )
         /* level */
         chance += (skill_level(*gsn_trip, ch) - victim->getModifyLevel()) * 2;
 
-        if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
+        if (ch->getProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
             chance /= 2;
 
         /* now the attack */
@@ -706,7 +706,8 @@ SKILL_RUNP( kick )
         {
                 kick_dam = number_range( 1, ch->getModifyLevel() );
                 
-                if ( (ch->getTrueProfession( ) == prof_samurai)
+                if ( (ch->getProfession( ) == prof_samurai)
+                        && IS_SET ( ch->parts, PART_FEET)
                         && ((on_feet=get_eq_char(ch,wear_feet)) == 0
                         || (on_feet!=0 && !material_is_typed( on_feet, MAT_METAL ) ) ) )
                 {
@@ -1185,7 +1186,7 @@ SKILL_RUNP( dirt )
                 return;
         }
 
-        if (ch->getTrueProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
+        if (ch->getProfession( ) == prof_anti_paladin && ch->getClan( ) == clan_shalafi)
             chance /= 2;
 
         /* now the attack */
@@ -1560,9 +1561,9 @@ VOID_SKILL( enhanceddamage )::run( Character *ch, Character *victim, int &dam )
         
         gsn_enhanced_damage->improve( ch, true, victim );
         
-        if (ch->getTrueProfession( ) == prof_warrior || ch->getTrueProfession( ) == prof_samurai)
+        if (ch->getProfession( ) == prof_warrior || ch->getProfession( ) == prof_samurai)
             div = 100;
-        else if (ch->getTrueProfession( ) == prof_cleric)
+        else if (ch->getProfession( ) == prof_cleric)
             div = 130;
         else
             div = 114;

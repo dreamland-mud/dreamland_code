@@ -126,26 +126,18 @@ int DefaultSpell::getMaxRange( Character *ch ) const
 }
 
 /*
- * Find a char for spell usage.
+ * Find a char for spell usage. Allowed syntax: vict, dir.vict, dir vict
  */
 Character * 
 DefaultSpell::getCharSpell( Character *ch, const DLString &argument, int *door, int *range )
 {
-    char buf[MAX_INPUT_LENGTH];
-    unsigned int i, j;
+    DLString argDoor, argVict;
 
-    for (i = 0; argument[i] != '\0' && argument[i] != '.'; i++)
-        buf[i] = argument[i];
-    buf[i] = '\0';
-
-    if (i == 0 || (*door = direction_lookup(buf)) < 0)
-        return get_char_room( ch, argument.c_str( ) );
+    if (direction_range_argument(argument, argDoor, argVict, *door)) {
+        return find_char(ch, argVict.c_str(), *door, range, false);
+    }
     
-    for (i++, j = 0; i < argument.size( ); j++, i++)
-        buf[j] = argument[i];
-    buf[j] = '\0';
-    
-    return find_char( ch, buf, *door, range, false );
+    return get_char_room(ch, argVict.c_str());
 }
 
 /*
@@ -178,12 +170,11 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
     int slevel;
     int chance;
     int mlevel = ch->getModifyLevel( );
-    bool groupBonus = false;
     
     if (ch->is_npc( ))
         return mlevel;
     
-    if (ch->getTrueProfession( )->getFlags( ).isSet(PROF_CASTER))
+    if (ch->getProfession( )->getFlags( ).isSet(PROF_CASTER))
         slevel = mlevel - max(0, mlevel / 20);
     else
         slevel = mlevel - max(5, mlevel / 10);
@@ -204,7 +195,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             gsn_improved_maladiction->improve( ch, true );
-            groupBonus = true;
         }
         else
             gsn_improved_maladiction->improve( ch, false );
@@ -217,7 +207,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             slevel = mlevel;
             slevel += chance / 20;
             gsn_improved_benediction->improve( ch, true );
-            groupBonus = true;
         }
         else
             gsn_improved_benediction->improve( ch, false );
@@ -234,7 +223,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
             act( "Свет на мгновение пронизывает твои ладони.", ch, 0, 0, TO_CHAR );
             act( "Свет на мгновение пронизывает ладони $c2.", ch, 0, 0, TO_ROOM );
             gsn_holy_remedy->improve( ch, true );
-            groupBonus = true;
         }
     }
     
@@ -261,7 +249,6 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
         f  = A0 / (1 + x / B0);
 
         slevel = (int) (f * slevel);
-        groupBonus = true;
     }
 
     if (gsn_mastering_spell->usable( ch, false )) {
@@ -275,14 +262,18 @@ DefaultSpell::getSpellLevel( Character *ch, int range )
 
     slevel = max( 1, slevel + get_int_app(ch).slevel );
 
-    if (!groupBonus) {
-        int old_level = slevel;
-        slevel += ch->getPC()->mod_level_groups[skill->getGroup()];
-        slevel += ch->getPC()->mod_level_skills[skill->getIndex()];
-        slevel += ch->getPC()->mod_level_all;
-        if (old_level != slevel && ch->isCoder()) 
-            ch->printf(">>> changing spell level from %d to %d.\n", old_level, slevel);
-    }
+    int old_level = slevel;
+    slevel += ch->getPC()->mod_level_groups[skill->getGroup()];
+    slevel += ch->getPC()->mod_level_skills[skill->getIndex()];
+    slevel += ch->getPC()->mod_level_all;
+    if (old_level != slevel && ch->isCoder()) 
+        ch->printf(">>> changing spell level from %d to %d.\n", old_level, slevel);
+
+    if (slevel > mlevel+5)
+        notice("DefaultSpell::getSpellLevel %s class %s clan %s: mlevel=%d slevel=%d old_level=%d range=%d",
+               ch->getName().c_str(), ch->getProfession()->getName().c_str(), ch->getClan()->getName().c_str(),
+               mlevel, slevel, old_level, range);
+
 
     return slevel;
 }
@@ -335,7 +326,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     if (target.isSet( TAR_CREATE_MOB )) {
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
-                buf << "Кого именно ты хочешь позвать?" << endl;
+                buf << "Кого именно ты хочешь призвать?" << endl;
                 return null;
             }
 
@@ -390,7 +381,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         
         buf.str( "" );
-        buf << "В Dream Land нет никого с таким именем." << endl;
+        buf << "Ты не находишь никого с таким именем." << endl;
         return null;
     }
     
@@ -459,7 +450,7 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
             
         buf.str( "" );
-        buf << "Произнести заклинание.. на кого?" << endl;
+        buf << "Произнести заклинание... на кого?" << endl;
         return null;
     }
 
@@ -516,7 +507,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         else if (target.isSet( TAR_OBJ_ROOM ))
             buf << "Ты не видишь здесь такого предмета." << endl;
         else if (target.isSet( TAR_OBJ_WORLD ))
-            buf << "В Dream Land нет ничего похожего на это." << endl;
+            buf << "Ты не можешь обнаружить ничего с таким именем." << endl;
     }
 
     return null;
@@ -525,7 +516,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
-        ch->println("Ты не можешь сконцентрироваться.");
+        ch->println("Ты не можешь использовать это заклинание, когда сражаешься.");
         return false;
     }
     
@@ -543,7 +534,7 @@ bool DefaultSpell::isPrayer( Character *caster ) const
     if (getSkill( )->getGroup( ) == -1)
         return false;
     
-    return caster->getTrueProfession( )->getFlags( caster ).isSet(PROF_DIVINE);
+    return caster->getProfession( )->getFlags( caster ).isSet(PROF_DIVINE);
 }
 
 /*
@@ -567,9 +558,9 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-        act("Твои боги неблагосклонны к $C3.", ch, 0, vch, TO_CHAR);
-        act("Боги $c2 неблагосклонны к тебе.", ch, 0, vch, TO_VICT);
-        act("Боги $c2 неблагосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
+        act("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
+        act("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
+        act("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
         act("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);

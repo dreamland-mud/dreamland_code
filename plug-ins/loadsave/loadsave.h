@@ -109,14 +109,17 @@ int                count_obj_in_obj( Object *container );
 int                count_obj_in_obj( Object *container, int itype );
 Object *        get_obj_wear_carry( Character *ch, const DLString &cArgument );
 bool can_see_god(Character *ch, Character *god);
+bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
+long long get_arg_id( const DLString &cArgument );
+bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );
 
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );
 
-#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value[4],(stat)))
+#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value4(),(stat)))
 
 #define IS_PIT(obj)        (obj->item_type == ITEM_CONTAINER \
-                            && IS_SET(obj->value[1], CONT_PIT))
+                            && IS_SET(obj->value1(), CONT_PIT))
 
 #define IS_CHARMED(ch)  (IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL)
 #endif

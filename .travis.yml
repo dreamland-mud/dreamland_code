@@ -1,5 +1,5 @@
 language: generic
-dist: beaver 
+dist: bionic
 script: bash ./admin/travis/verify_build.sh
 branches:
   only:

@@ -244,7 +244,7 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
             visible << dirs[door].name[0];
-        } else if (number_percent() < gsn_perception->getEffective( ch )) {
+        } else {
             hidden << dirs[door].name[0];
         }
     }
@@ -867,6 +867,9 @@ Json::Value ParamsWebPromptListener::jsonParam2( Descriptor *d, Character *ch )
     // Armor class (pierce only) and saves.
     p2["a"] = DLString(GET_AC(ch,AC_PIERCE));
     p2["s"] = DLString(ch->saving_throw);
+    // Position and flying status.
+    p2["pos"] = position_table.name(ch->position);
+    p2["posf"] = position_flags.names(ch->posFlags);
     return p2;
 }
 
@@ -1032,7 +1035,6 @@ public:
         HelpArticles::const_iterator a;
 
         for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            // TODO: this won't dump empty auto-generated area helps
             if ((*a)->visible(&dummy) && (*a)->getID() > 0) {
                 Json::Value h;
 

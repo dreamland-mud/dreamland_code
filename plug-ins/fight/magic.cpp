@@ -301,7 +301,7 @@ void spell_by_item( Character *ch, Object *obj )
         SpellTarget::Pointer result( NEW );
         int target;
 
-        skill = SkillManager::getThis( )->find( obj->value[i] );
+        skill = SkillManager::getThis( )->find( obj->valueByIndex(i) );
 
         if (!skill)
             continue;
@@ -351,7 +351,7 @@ void spell_by_item( Character *ch, Object *obj )
                 mprog_cast( ch, result, skill, true );
 
                 if (!fForbidCasting)
-                    spell->run( ch, result, obj->value[0] );
+                    spell->run( ch, result, obj->value0() );
 
                 if (result->type == SpellTarget::CHAR && result->victim)
                     mprog_spell( result->victim, ch, skill, false );
@@ -388,13 +388,12 @@ bool checkDispel( int dis_level, Character *victim, int sn)
         if (!savesDispel(dis_level,af->level,af->duration)) {
             AffectHandler::Pointer handler = skillManager->find( sn )->getAffect( );
             
-            affect_strip(victim,sn);
-            
             if (handler) {
                 handler->remove( victim );
                 handler->dispel( victim );
             }
 
+            affect_strip(victim,sn);            
             return true;
         }
         else

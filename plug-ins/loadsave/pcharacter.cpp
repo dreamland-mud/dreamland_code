@@ -8,6 +8,7 @@
 #include "loadsave.h"
 #include "dlfile.h"
 #include "dlfileop.h"
+#include "commonattributes.h"
 
 #include "logstream.h"
 #include "profiler.h"
@@ -34,7 +35,6 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 GSN(bat_sworm);
 GSN(bat_swarm);
-PROF(universal);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -44,25 +44,6 @@ static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReferen
     if (learn1 > 1 && !skill1->visible( ch ) && skill2->visible( ch )) {
         learn2 = learn1;
         learn1 = 1;
-    }
-}
-
-static void update_skill_points( PCharacter *ch )
-{
-    if (ch->getProfession( ) == prof_universal) {
-        int deserves_sp = 1000;
-
-        for (int l = 1; l <= ch->getLevel( ); l++)
-            deserves_sp += 200 
-                + ch->getRace( )->getPC( )->getSpBonus( )
-                + ch->getRemorts( ).getSkillPointsPerLevel( l );
-
-        if (ch->max_skill_points < deserves_sp) {
-            notice("Fixing skill points for %s: from %d to %d.",
-                ch->getName( ).c_str( ), ch->max_skill_points, deserves_sp);
-
-            ch->max_skill_points = deserves_sp;         
-        }
     }
 }
 
@@ -87,6 +68,36 @@ static void clear_fenia_skills( PCharacter *ch )
         if (s->origin == SKILL_FENIA)
             s->clear();
 }
+
+void PCharacter::updateSkills( )
+{
+    int availCounter = 0;
+
+    for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
+        Skill *skill = SkillManager::getThis( )->find( sn );
+        PCSkillData &data = getSkillData(sn);
+
+        // Ensure skill learned percentage is always within limits.
+        if (skill->visible( this )) {
+            int &percent = data.learned;
+
+            percent = std::max( 1, percent );
+            percent = std::max( skill->getLearned( this ), percent );
+        }
+
+        // For historical 'temporary' skills, set up proper skill origin value.
+        if (data.temporary) {
+            data.temporary = false;
+            data.origin.setValue(SKILL_DREAM);
+        }
+
+        // Count and store total number of skills available at this level.
+        if (skill->available(this))
+            availCounter++;
+    }
+
+    getAttributes().getAttr<XMLIntegerAttribute>("skillCount")->setValue(availCounter);
+}                        
 
 /*-------------------------------------------------------------------------
  *  work with profiles 
@@ -197,7 +208,6 @@ bool PCharacter::load( )
     updateStats( );
     updateSkills( );
     update_exp( this );
-    update_skill_points( this );
 
     /* fix renamed skills */
     skill_exchange( this, gsn_sanctuary, gsn_stardust );

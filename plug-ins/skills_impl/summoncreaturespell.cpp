@@ -95,9 +95,6 @@ void SummonCreatureSpell::run( Character *ch, char *, int sn, int level )
     if (!canSummonHere( ch )) 
         return;
 
-    ch->pecho( msgCreateSelf.getValue( ).c_str( ) );
-    ch->recho( POS_RESTING, msgCreateRoom.getValue( ).c_str( ), ch );
-
     postaffect_to_char( ch, sn, postaffectDuration );
 
     for (int i = 0; i < cnt; i++) { 
@@ -114,6 +111,15 @@ void SummonCreatureSpell::run( Character *ch, char *, int sn, int level )
         char_to_room( mob, ch->in_room );
         bhv->save( );
         bhv->conjure( );
+    }
+
+    // Show different message when only one lion/panther/guard out of 2 appears.
+    if (cnt == 1 && cnt != castMobCount) {
+        ch->pecho( msgCreateSelfOne.getValue( ).c_str( ) );
+        ch->recho( POS_RESTING, msgCreateRoomOne.getValue( ).c_str( ), ch );
+    } else {
+        ch->pecho( msgCreateSelf.getValue( ).c_str( ) );
+        ch->recho( POS_RESTING, msgCreateRoom.getValue( ).c_str( ), ch );
     }
 }
 

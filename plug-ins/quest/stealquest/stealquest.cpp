@@ -61,7 +61,7 @@ void StealQuest::create( PCharacter *pch, NPCharacter *questman )
         else {
             chest = createItem<HiddenChest>( reg->chests.randomVnum( ) );
             fillChest( pch, chest );
-            key = createItem<LockPick>( chest->value[2] );
+            key = createItem<LockPick>( chest->value2() );
             hideaway = findHideaway( pch, thief );
         }
         
@@ -485,6 +485,9 @@ DLString StealQuest::getRoomHint( Room * room, Room *from, int depth )
             continue;
         
         if (r == from)
+            continue;
+
+        if (!r->isCommon() || IS_SET(r->room_flags, ROOM_MANSION))
             continue;
         
         for (int i = 0; i < DIR_SOMEWHERE; i++)

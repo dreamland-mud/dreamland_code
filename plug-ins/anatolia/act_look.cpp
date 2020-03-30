@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 #include <sstream>
+#include <iomanip>
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -31,7 +32,7 @@
 #include "affecthandler.h"
 
 #include "affect.h"
-#include "object.h"
+#include "core/object.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "pcrace.h"
@@ -49,7 +50,7 @@
 #include "occupations.h"
 #include "move_utils.h"
 #include "act_lock.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act.h"
 #include "merc.h"
 #include "mercdb.h"
@@ -76,8 +77,6 @@ RELIG(godiva);
  * Extern functions needed
  */
 DLString get_pocket_argument( char *arg );
-bool can_see_objname_hint( Character *ch, Object *obj );
-long long get_arg_id( const DLString &cArgument );
 void lore_fmt_wear( int type, int wear, ostringstream &buf );
 /*
  * Local functions.
@@ -92,42 +91,65 @@ void show_people_to_char( Character *list, Character *ch, bool fShowMount = true
 bool show_char_equip( Character *ch, Character *victim, ostringstream &buf, bool fShowEmpty );
 static void show_exits_to_char( Character *ch, Room *targetRoom );
 
+/** Split string into a list of arguments. */
+static StringList name_list(const DLString &cArgs)
+{
+    DLString args(cArgs);
+    StringList result;
+
+    while (!args.empty())
+        result.push_back(args.getOneArgument());
+
+    return result;
+}
+
+/** Return true if string doesn't contain any RU characters. */
+static bool name_is_en(const DLString &name)
+{
+    for (unsigned int i = 0; i < name.size(); i++)
+        if (dl_isrusalpha(name.at(i)))
+            return false;
+    return true;
+}
+
+/** Return first entry in the list w/o RU characters. */
+static bool find_first_en_name(const StringList &list, DLString &result)
+{
+    for (const auto &name: list) {
+        if (name_is_en(name)) {
+            result = name;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/** Return first entry in the list containing only RU characters and spaces. */
+static bool find_first_ru_name(const StringList &list, DLString &result)
+{
+    for (const auto &name: list)
+        if (name.isRussian()) {
+            result = name;
+            return true;
+        }
+
+    return false;
+}
 
 /*
  * "(english name)" for CONFIG_OBJNAME_HINT 
  */
-static void get_obj_name_hint( Object *obj, std::ostringstream &buf )
+void get_obj_name_hint( Object *obj, std::ostringstream &buf )
 {
-    DLString name;
-    unsigned int i;
-    
-    name = obj->getShortDescr( );
+    DLString name = obj->getName( );
     name.colourstrip( );
-
-    for (i = 0; i < name.size( ); i++)
-        if (isalpha( name.at( i ) ))
-            return;
     
-    name = obj->getName( );
-    name.colourstrip( );
-
-    while (!name.empty( )) {
-        bool good = true;
-        DLString hint = name.getOneArgument( );
-
-        for (i = 0; i < hint.size( ); i++)
-            if (dl_isrusalpha( hint.at( i ) )) {
-                good = false;
-                break;
-            }
-        
-        if (good) {
-            buf << " {x(" << hint << "{x)";
-            return;
-        }
-    }
-
-    warn( "(objhint) no hint found for [%d]", obj->pIndexData->vnum);
+    DLString hint;
+    if (find_first_en_name(name_list(name), hint))
+        buf << " {x(" << hint << "{x)";
+    else
+        warn( "(objhint) no hint found for [%d]", obj->pIndexData->vnum);
 }
 
 static bool is_empty_descr( const char *arg )
@@ -242,8 +264,7 @@ DLString format_obj_to_char( Object *obj, Character *ch, bool fShort )
             if (obj->condition <= 99 )
                 buf << " [" << obj->get_cond_alias( ) << "]";
 
-        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT)
-            && can_see_objname_hint( ch, obj ))
+        if (!ch->is_npc() && IS_SET(ch->getPC()->config, CONFIG_OBJNAME_HINT))
         {
             get_obj_name_hint( obj, buf );
         }
@@ -286,10 +307,10 @@ void show_pockets_to_char( Object *container, Character *ch, ostringstream &buf 
     Object *obj;
     
     if (container->item_type != ITEM_CONTAINER
-        || !IS_SET(container->value[1], CONT_WITH_POCKETS))
+        || !IS_SET(container->value1(), CONT_WITH_POCKETS))
         return;
 
-    if (IS_SET(container->value[1], CONT_PUT_ON|CONT_PUT_ON2))
+    if (IS_SET(container->value1(), CONT_PUT_ON|CONT_PUT_ON2))
         buf << "Отделения: " << endl;
     else if (!container->can_wear( ITEM_TAKE ))
         buf << "Полки: " << endl;
@@ -410,7 +431,7 @@ void show_list_to_char( Object *list, Character *ch, bool fShort, bool fShowNoth
         for (sd = shortDescriptions.begin( ), item = items.begin( ), iShow = 0; 
              sd != shortDescriptions.end( ); 
              sd++, item++, iShow++) {
-            if (iShow >= 100) {
+            if (iShow >= 200) {
                 output << "{" << CLR_OBJ(ch)
                         << "     ... И много чего еще ...{x" << endl;
                 break;
@@ -501,9 +522,9 @@ void show_char_position( Character *ch, Character *victim,
 
             if (!rc.empty( ))
                 buf << rc;
-            else if (IS_SET(victim->on->value[2], atFlag))
+            else if (IS_SET(victim->on->value2(), atFlag))
                 buf << "возле " << victim->on->getShortDescr( '2' );
-            else if (IS_SET(victim->on->value[2], onFlag))
+            else if (IS_SET(victim->on->value2(), onFlag))
                 buf << "на " << victim->on->getShortDescr( '6' );
             else
                 buf << "в " << victim->on->getShortDescr( '6' );
@@ -755,11 +776,11 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
         return;
 
     if (IS_AFFECTED( victim, AFF_BLIND ))
-        str << "Похоже ничего не видит." << endl;
+        str << "Похоже, ничего не видит." << endl;
     if (IS_AFFECTED( victim,  AFF_PLAGUE ))
-        str << "Покрыт чумными язвочками." << endl;
+        str << "Покрыт%1$Gо||а чумными язвочками." << endl;
     if (IS_AFFECTED( victim, AFF_POISON ))
-        str << "Отравлен." << endl;
+        str << "Отравлен%1$Gо||а." << endl;
     if (IS_AFFECTED( victim, AFF_SLOW ))
         str << "Передвигается М Е Д Л Е Н  Н   О." << endl;
     if (IS_AFFECTED( victim, AFF_HASTE ))
@@ -771,15 +792,16 @@ void show_char_diagnose( Character *ch, Character *victim, ostringstream &buf )
     if (CAN_DETECT( victim, ADET_FEAR ))
         str << "Дрожит от страха." << endl;
     if (IS_AFFECTED( victim, AFF_CURSE ))
-        str << "Проклят." << endl;
+        str << "Проклят%1$Gо||а." << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_EVIL ))
-        str << "Защищен от зла" << endl;
+        str << "Защищен%1$Gо||а от зла" << endl;
     if (IS_AFFECTED( victim, AFF_PROTECT_GOOD ))
-        str << "Защищен от добра." << endl;
+        str << "Защищен%1$Gо||а от добра." << endl;
 
-    if (!str.str( ).empty( )) 
+    DLString details = str.str();
+    if (!details.empty()) 
         buf << endl << "Ты замечаешь важные детали:" << endl
-            << str.str( ) << endl;
+            << fmt(0, details.c_str(), victim) << endl;
 }
 
 /*
@@ -1248,7 +1270,7 @@ static void do_look_move( Character *ch, bool fBrief )
         if (eyes_darkened( ch ))
             ch->println( "Здесь слишком темно ... " );
         else
-            ch->printf( "{W%s{x", ch->in_room->name );
+            ch->printf( "{W%s{x\r\n", ch->in_room->name );
         return;
     }
 
@@ -1277,15 +1299,15 @@ static void do_look_into( Character *ch, char *arg2 )
     oprog_examine( obj, ch, pocket );
 }
 
-static void afprog_look( Character *ch, Character *victim )
+static void afprog_look( Character *looker, Character *victim )
 {
     Affect *paf, *paf_next;
     
-    for (paf = ch->affected; paf; paf = paf_next) {
+    for (paf = victim->affected; paf; paf = paf_next) {
         paf_next = paf->next;
 
         if (paf->type->getAffect( ))
-            paf->type->getAffect( )->look( ch, victim, paf );
+            paf->type->getAffect( )->look( looker, victim, paf );
     }
 }
 
@@ -1592,50 +1614,50 @@ CMDRUNP( examine )
  *--------------------------------------------------------------------------*/
 static bool oprog_examine_money( Object *obj, Character *ch, const DLString& )
 {
-    if (obj->value[0] == 0)
+    if (obj->value0() == 0)
     {
-        if (obj->value[1] == 0)
+        if (obj->value1() == 0)
                 ch->printf("Жаль... но здесь нет золота.\n\r");
-        else if (obj->value[1] == 1)
+        else if (obj->value1() == 1)
                 ch->printf("Ух-ты. Одна золотая монетка!\n\r");
         else
                 ch->printf("Здесь %d золот%s.\n\r",
-                        obj->value[1],GET_COUNT(obj->value[1], "ая монета","ые монеты","ых монет"));
+                        obj->value1(),GET_COUNT(obj->value1(), "ая монета","ые монеты","ых монет"));
     }
-    else if (obj->value[1] == 0)
+    else if (obj->value1() == 0)
     {
-        if (obj->value[0] == 1)
+        if (obj->value0() == 1)
                 ch->printf("Ух-ты. Одна серебряная монетка.\n\r");
         else
                 ch->printf("Здесь %d серебрян%s.\n\r",
-                        obj->value[0],GET_COUNT(obj->value[0], "ая монета","ые монеты","ых монет"));
+                        obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
     }
     else
         ch->printf("Здесь %d золот%s и %d серебрян%s.\n\r",
-                obj->value[1],GET_COUNT(obj->value[1], "ая","ые","ых"),
-                obj->value[0],GET_COUNT(obj->value[0], "ая монета","ые монеты","ых монет"));
+                obj->value1(),GET_COUNT(obj->value1(), "ая","ые","ых"),
+                obj->value0(),GET_COUNT(obj->value0(), "ая монета","ые монеты","ых монет"));
     return true;
 }
 
 static bool oprog_examine_drink_container( Object *obj, Character *ch, const DLString& )
 {
-    if (IS_SET(obj->value[3], DRINK_CLOSED)) {
+    if (IS_SET(obj->value3(), DRINK_CLOSED)) {
         ch->println("Эта емкость закрыта.");
         return true;
     }
 
-    if (obj->value[1] <= 0) {
+    if (obj->value1() <= 0) {
         ch->println( "Тут пусто." );
         return true;
     }
 
     ch->printf( "%s наполнен жидкостью %s цвета.\n\r",
-                obj->value[1] < obj->value[0] / 4 ? 
+                obj->value1() < obj->value0() / 4 ? 
                     "Меньше, чем до половины" :
-                    obj->value[1] < 3 * obj->value[0] / 4 ? 
+                    obj->value1() < 3 * obj->value0() / 4 ? 
                         "До половины"  : 
                         "Больше, чем до половины",
-                liquidManager->find( obj->value[2] )->getColor( ).ruscase( '2' ).c_str( )
+                liquidManager->find( obj->value2() )->getColor( ).ruscase( '2' ).c_str( )
               );
     return true;
 }
@@ -1649,13 +1671,13 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
 {
     ContainerKeyhole( ch, obj ).doExamine( );
 
-    if (IS_SET(obj->value[1], CONT_CLOSED)) {
+    if (IS_SET(obj->value1(), CONT_CLOSED)) {
         ch->println( "Тут закрыто." );
         return true;
     }
     
     if (!pocket.empty( )) {
-        if (!IS_SET(obj->value[1], CONT_WITH_POCKETS)) {
+        if (!IS_SET(obj->value1(), CONT_WITH_POCKETS)) {
             ch->println( "Ты не видишь здесь ни одного кармана." );
             return true;
         }
@@ -1663,7 +1685,7 @@ static bool oprog_examine_container( Object *obj, Character *ch, const DLString 
     
     const char *p = pocket.c_str( );
 
-    if (IS_SET(obj->value[1],CONT_PUT_ON|CONT_PUT_ON2)) {
+    if (IS_SET(obj->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
         if (!pocket.empty( ))
             ch->pecho( "Отделение '%2$s' %1$O2 содержит:", obj, p );
         else
@@ -1746,7 +1768,8 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
 {
     ostringstream buf;
     EXIT_DATA *pexit;
-    const char *ename;
+    DLString ename;
+    DLString cmd;
     PlayerConfig::Pointer cfg;
     Room *room;
     bool found;
@@ -1767,15 +1790,17 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
             continue;
 
         ename = (cfg->ruexits ? dirs[door].rname : dirs[door].name);
+        found = true;
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
-            found = true;
-            buf << " {hc" << ename << "{hx";
-        }
-        else if (number_percent() < gsn_perception->getEffective( ch )) {
-            found = true;
-            gsn_perception->improve( ch, true );
-            buf << " {x" << ename << "*{" << CLR_AEXIT(ch);
+            cmd = ename;
+            buf << " " << web_cmd(ch, cmd, ename);
+        } else if (!IS_SET(pexit->exit_info, EX_LOCKED)) {
+            cmd = "{lRоткрыть{lEopen{lx " + ename;
+            buf << " *" << web_cmd(ch, cmd, ename) << "*";
+        } else {
+            cmd = "{lRотпереть{lEunlock{lx " + ename;
+            buf << " *" << web_cmd(ch, cmd, ename) << "*";
         }
     }
     
@@ -1790,7 +1815,7 @@ CMDRUNP( exits )
 {
     ostringstream buf;
     EXIT_DATA *pexit;
-    const char *ename;
+    DLString ename;
     Room *room;
     PlayerConfig::Pointer cfg;
     bool found;
@@ -1818,13 +1843,12 @@ CMDRUNP( exits )
         if (!ch->can_see( room ))
             continue;
 
+        found = true;   
         ename = (cfg->ruexits ? dirs[door].rname : dirs[door].name);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED))
         {
-            found = true;
-
-            buf << fmt( ch, "%-6^s", ename ) << " - ";
+            buf << fmt(0, "    {C%-8s{x", ename.c_str()) << " - ";
 
             if (room->isDark( ) && !cfg->holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
@@ -1837,24 +1861,43 @@ CMDRUNP( exits )
             buf << endl;
         }
         else {
-            if (number_percent() < gsn_perception->getEffective( ch )) {
-                gsn_perception->improve( ch, true );
-                found = true;
+            ename = "*" + ename + "*";
+            buf << fmt( ch, "    {C%-8s{x", ename.c_str() ) 
+                << " - " << russian_case(direction_doorname(pexit), '1') << " (закрыто)";
 
-                buf << fmt( ch, "%-6^s", ename ) 
-                    << " * (" << direction_doorname(pexit) << ")";
-
-                if (ch->is_immortal())
-                    buf << " (room " << room->vnum << ")";
-                
-                buf << endl;
-            }
+            if (ch->is_immortal())
+                buf << " (room " << room->vnum << ")";
+            
+            buf << endl;
         }
     }
-    
+
     if (!found)
-        buf << (cfg->ruexits ? "Нет." : "None.") << endl;
-            
+        buf << "    нет" << endl;
+
     ch->send_to( buf );
+
+    found = false;
+    buf.str("");
+
+    for (EXTRA_EXIT_DATA *eexit = ch->in_room->extra_exit; eexit; eexit = eexit->next) {
+        if (ch->can_see(eexit)) {
+            StringList names = name_list(eexit->keyword);
+            DLString name, nameRus;
+
+            buf <<  "    ";
+            if (find_first_ru_name(names, nameRus))
+                buf << "{C" << nameRus << "{x ";
+            if (find_first_en_name(names, name))
+                buf << "(" << name << ")";
+            buf << endl;
+            found = true;
+        }
+    }
+
+    if (found) {
+        ch->println("\r\nДополнительные выходы:");
+        ch->send_to(buf);
+    }
 }
 

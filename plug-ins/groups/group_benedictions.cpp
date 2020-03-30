@@ -109,7 +109,7 @@ VOID_SPELL(Bless)::run( Character *ch, Object *obj, int sn, int level )
     {
         Affect *paf;
 
-        paf = obj->affected->affect_find(gsn_curse);
+        paf = obj->affected ? obj->affected->affect_find(gsn_curse) : 0;
         if (!savesDispel(level,paf != 0 ? paf->level : obj->level,0))
         {
             if (paf != 0)
@@ -194,6 +194,7 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
     short high_level = 0;
     int chance;
     Affect af;
+    bool found = false;
 
     /* get sum of all mobile levels in the room */
     for (vch = room->people; vch != 0; vch = vch->next_in_room)
@@ -248,10 +249,15 @@ VOID_SPELL(Calm)::run( Character *ch, Room *room, int sn, int level )
 
             af.location = APPLY_DAMROLL;
             affect_to_char(vch,&af);
+            
+            found = true;
         }
     }
 
+    if (!found)
+        ch->println("Тебе тут некого успокаивать.");
 }
+
 SPELL_DECL(Frenzy);
 VOID_SPELL(Frenzy)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -324,31 +330,30 @@ VOID_SPELL(GroupDefense)::run( Character *ch, Room *room, int sn, int level )
         if (spellbane( ch, gch ))
             continue;
 
-        if( gch->isAffected(gsn_armor ) ) {
+        if( !gch->isAffected(gsn_armor ) ) {
+            af.where     = TO_AFFECTS;
+            af.type      = gsn_armor;
+            af.level     = level;
+            af.duration  = level;
+            af.location  = APPLY_AC;
+            af.modifier  = -20;
+            affect_to_char( gch, &af );
+
+            act("Священная броня окружает тебя.", gch, 0, 0, TO_CHAR);
+            if( ch != gch )
+                act("Священная броня окружает $C4.", ch, 0, gch, TO_CHAR);
+        } else {
             if( gch == ch)
-                act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
+               act("Ты уже защище$gно|н|на заклинанием брони.", ch, 0, 0, TO_CHAR);
             else
                 act("$C1 уже защище$Gно|н|на заклинанием брони.", ch, 0, gch, TO_CHAR);
-            continue;
         }
 
-        af.where     = TO_AFFECTS;
-        af.type      = gsn_armor;
-        af.level     = level;
-        af.duration  = level;
-        af.location  = APPLY_AC;
-        af.modifier  = -20;
-        affect_to_char( gch, &af );
-
-        act("Священная броня окружает тебя.", gch, 0, 0, TO_CHAR);
-        if( ch != gch )
-            act("Священная броня окружает $C4.", ch, 0, gch, TO_CHAR);
-        
         if( gch->isAffected(gsn_shield ) )
-        {
-          if (gch == ch)
+            {
+            if (gch == ch)
               act("Ты уже защище$gно|н|на заклинанием щита.", ch, 0, 0, TO_CHAR);
-          else
+            else
               act("$C1 уже защище$Gно|н|на заклинанием щита.", ch, 0, gch, TO_CHAR);
           continue;
         }
@@ -563,8 +568,8 @@ VOID_SPELL(RayOfTruth)::run( Character *ch, Character *victim, int sn, int level
 
     dam = dice( level, 10 );
 
-        if( ch->getTrueProfession( ) == prof_paladin ||
-        ch->getTrueProfession( ) == prof_anti_paladin )
+        if( ch->getProfession( ) == prof_paladin ||
+        ch->getProfession( ) == prof_anti_paladin )
                 dam = dam + dam / 2;
 
     if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL) )
@@ -638,8 +643,11 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
       return;
     }
 
+    bool clean = true;
+
   if (IS_RAFFECTED(room,AFF_ROOM_CURSE))
         {
+         clean = false;
          room->affectStrip( gsn_cursed_lands);
          ch->send_to("Это место очищается от проклятья.\n\r");
          act_p("Это место очищается от проклятья.\n\r",
@@ -647,6 +655,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_POISON))
         {
+         clean = false;
          room->affectStrip( gsn_deadly_venom);
          ch->send_to("Ядовитые пары, окружавшие это место, рассеиваются.\n\r");
          act_p("Ядовитые пары, окружавшие это место, рассеиваются.\n\r",
@@ -654,6 +663,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_SLEEP))
         {
+         clean = false;
          ch->send_to("Это место пробуждается от таинственного сна.\n\r");
          act_p("Это место пробуждается от таинственного сна.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
@@ -661,6 +671,7 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_PLAGUE))
         {
+         clean = false;
          ch->send_to("Это место очищается от болезней.\n\r");
          act_p("Это место очищается от болезней.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
@@ -668,13 +679,15 @@ VOID_SPELL(SanctifyLands)::run( Character *ch, Room *room, int sn, int level )
         }
   if (IS_RAFFECTED(room,AFF_ROOM_SLOW))
         {
+         clean = false;
          ch->send_to("Летаргический туман, окружавший это место, рассеивается.\n\r");
          act_p("Летаргический туман, окружавший это место, рассеивается.\n\r",
                 ch,0,0,TO_ROOM,POS_RESTING);
          room->affectStrip( gsn_lethargic_mist);
         }
-    return;
 
+    if (clean)
+        ch->println("Это место не нуждается в очищении.");
 }
 
 SPELL_DECL(Wrath);

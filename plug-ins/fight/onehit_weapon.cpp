@@ -14,12 +14,12 @@
 #include "race.h"
 #include "npcharacter.h"
 #include "pcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "room.h"
 #include "clanreference.h"
 
 #include "fight.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "gsn_plugin.h"
 #include "effects.h"
 #include "damageflags.h"
@@ -55,7 +55,7 @@ void WeaponOneHit::init( )
     skill = 20 + weaponSkill->getEffective( ch );
     
     if (wield) 
-        attack = wield->value[3];
+        attack = wield->value3();
     else 
         attack = ch->dam_type;
 
@@ -82,7 +82,7 @@ void WeaponOneHit::damBase( )
         weaponSkill->improve( ch, true, victim, dam_type, dam_flag );
 
     if (wield) {
-        dam = dice(wield->value[1], wield->value[2]) * skill / 100;
+        dam = dice(wield->value1(), wield->value2()) * skill / 100;
 
         damApplyShield( );
         damApplySharp( );
@@ -267,7 +267,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
 
         dam = number_range(1, wield->level / 5 + 1);
         damage_nocatch(ch,victim,dam,0,DAM_NEGATIVE,false);
-        ch->hit += dam/2;
+        ch->hit += dam*2;
     }
     if (IS_WEAPON_STAT(wield,WEAPON_FLAMING) )
     {

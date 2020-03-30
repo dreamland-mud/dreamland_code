@@ -108,6 +108,8 @@ public:
     int writeWSCommand(const DLString &name, const std::vector<DLString> &args);
     int writeSock(const unsigned char *buf, int len);
     int writeRaw(const unsigned char *txt, int len);
+    /** Write text directly to descriptor but after codepage conversion. */
+    int writeConverted(const char *txt);
 #ifdef MCCP
     int writeMccp(const unsigned char *buf, int len);
     int processMccp( );
@@ -170,9 +172,12 @@ public:
 
 private:
     static int max_online;
+    static int max_offline;
 public:
     static void updateMaxOnline( );
     static int getMaxOnline( );
+    static void updateMaxOffline(int newValue);
+    static int getMaxOffline();
 };
 
 extern Descriptor *descriptor_list;

@@ -38,6 +38,9 @@ char skill_learned_colour(const Skill *, PCharacter *ch);
  */
 void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf);
 
+/** Print wait state and mana cost for a skill. */
+void print_wait_and_mana(const Skill *skill, Character *ch, ostream &buf);
+
 bool skill_is_spell(const Skill *skill);
 DLString skill_what(const Skill *skill);
 DLString skill_what_plural(const Skill *skill);

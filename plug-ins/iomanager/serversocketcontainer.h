@@ -52,6 +52,7 @@ public:
     static bool isBackdoor( int );
     static bool isWebSock( int );
     static bool isAllowed( int, struct sockaddr_in & );
+    static bool isNewNanny(int desc);
 
     // temporary methods
     static void FD_SETBeforeSelect( fd_set* );
@@ -60,6 +61,9 @@ public:
     static inline ServerSocketContainer* getThis( ) {
         return thisClass;
     }
+
+    /** Find socket description matching this descriptor number. */
+    ServerSocket * findSocket(int desc);
 
 private:
     static ServerSocketContainer* thisClass;

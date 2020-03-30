@@ -33,16 +33,23 @@ void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 
     SkillGroupReference &group = skill.getConstPointer<Skill>()->getGroup( );
     const DLString &gname = group->getNameFor(ch);
-    in << ", входит в группу '{hg{c" << gname << "{x' " 
-       << editButton(ch) << endl << endl
+    if (group != group_none)
+        in << ", входит в группу '{hg{c" << gname << "{x'";
+    in << " " << editButton(ch) << endl;
+
+    print_wait_and_mana(*skill, ch, in);
+
+    in << endl
        << *this;
     
     // '... умение|slook herbs|травы'. - с гипер-ссылкой на команду
     // '... группаум|glist maladiction|проклятия' - с гипер-ссылкой на команду
-    in << "См. также команду {y{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
-    if (group != group_none)
-       in << ", {y{hc{lRгруппаум{lEglist{lx " << gname << "{x";
-    in << "." << endl;
+    if (skill->visible(ch)) {
+        in << "См. также команду {y{hc{lRумение{lEslook{lx " << skill->getNameFor(ch) << "{x";
+        if (group != group_none)
+        in << ", {y{hc{lRгруппаум{lEglist{lx " << gname << "{x";
+        in << "." << endl;
+    }
 }
 
 SkillHelpFormatter::SkillHelpFormatter( const char *text, Skill::Pointer skill )
@@ -136,11 +143,29 @@ DLString SkillHelp::getTitle(const DLString &label) const
     if (!skill)
         return HelpArticle::getTitle(label);
 
-    if (label != "cmd" || !skill->getCommand()) 
+    // For help json dump.
+    if (!label.empty()) {
+        if (label == "cmd" && skill->getCommand()) 
+            return skill->getCommand()->getName() + ", "
+                    + skill->getCommand()->getRussianName();
+
         return skill->getName() + ", " + skill->getRussianName();
-    
-    return skill->getCommand()->getName() + ", "
-            + skill->getCommand()->getRussianName();
+    }
+
+    // Default title if not set explicitly.
+    if (titleAttribute.empty()) {
+        DLString title = (skill_is_spell(*skill) ? "Заклинание {c" : "Умение {c")
+            + skill->getRussianName() + "{x, {c" + skill->getName() + "{x";
+
+        if (skill->getCommand() && !skill->getCommand()->getRussianName().empty())
+            title += " и команда {c" 
+                + skill->getCommand()->getRussianName() + "{x, {c" 
+                + skill->getCommand()->getName() + "{x";
+
+        return title;
+    }
+
+    return titleAttribute;
 }
 
 void SkillHelp::setSkill( Skill::Pointer skill )

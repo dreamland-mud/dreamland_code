@@ -59,16 +59,6 @@ int CardSkill::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
 
-int CardSkill::getWeight( Character * ) const
-{
-    return 0;
-}
-
-bool CardSkill::canForget( PCharacter * ) const
-{
-    return false;
-}
-
 bool CardSkill::canPractice( PCharacter * ch, std::ostream & ) const
 {
     return available( ch );
@@ -94,7 +84,10 @@ void CardSkill::show( PCharacter *ch, std::ostream & buf )
     buf << skill_what(this).ruscase('1').upperFirstCharacter() 
         << " Колоды '{c" << getName( ) << "{x' или '{c" << getRussianName( ) << "{x', "
         << "входит в группу '{hg{c"  << getGroup()->getNameFor(ch) << "{x'" 
-        << endl << endl;
+        << endl;
+    
+    print_wait_and_mana(this, ch, buf);     
+    buf << endl;
     
     buf << "Появляется у карт, начиная с {C" 
         << russian_case( XMLAttributeCards::levelFaces[cardLevel].name, '2' ) 

@@ -62,7 +62,7 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
         }
 
         SET_BIT(light->extra_flags,ITEM_GLOW);
-        if (!ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
+        if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
             SET_BIT(light->extra_flags, ITEM_MAGIC);
         
         light->getRoom( )->echo( POS_RESTING, "%1$^O1 вспыхива%1$nет|ют белым светом.", light );
@@ -70,7 +70,7 @@ VOID_SPELL(ContinualLight)::run( Character *ch, char *target_name, int sn, int l
     }
 
     light = create_object( get_obj_index( OBJ_VNUM_LIGHT_BALL ), 0 );
-    if (!ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
+    if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
         SET_BIT(light->extra_flags, ITEM_MAGIC);
 
     dress_created_item( sn, light, ch, target_name );
@@ -87,18 +87,18 @@ VOID_SPELL(CreateFood)::run( Character *ch, char *target_name, int sn, int level
     Object *mushroom;
     int vnum;
     
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE))
         vnum = OBJ_VNUM_MANNA;
     else
         vnum = OBJ_VNUM_MUSHROOM;
         
     mushroom = create_object( get_obj_index( vnum ), 0 );
-    mushroom->value[0] = std::min( level / 2, 35 );
-    mushroom->value[1] = level;
+    mushroom->value0(std::min( level / 2, 35 ));
+    mushroom->value1(level);
     dress_created_item( sn, mushroom, ch, target_name );
     obj_to_char( mushroom, ch );
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) {
         act( "$c1 взмахивает руками, и с неба падает $o1.", ch, mushroom, 0, TO_ROOM );
         act( "Ты взмахиваешь руками, и с неба падает $o1.", ch, mushroom, 0, TO_CHAR );
     }
@@ -135,9 +135,9 @@ VOID_SPELL(CreateSpring)::run( Character *ch, char *target_name, int sn, int lev
     Object *spring;
     int vnum;
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         vnum = OBJ_VNUM_HOLY_SPRING;
-    else if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_NATURE)) {
+    else if (ch->getProfession( )->getFlags( ch ).isSet(PROF_NATURE)) {
          if (ch->in_room->sector_type != SECT_FIELD
              && ch->in_room->sector_type != SECT_FOREST
              && ch->in_room->sector_type != SECT_HILLS
@@ -178,7 +178,7 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
     if (drink_is_closed( obj, ch ))
         return;
 
-    if (obj->value[2] != liq_water && obj->value[1] != 0 )
+    if (obj->value2() != liq_water && obj->value1() != 0 )
     {
         ch->send_to("Контейнер содержит другую жидкость.\n\r");
         return;
@@ -186,13 +186,13 @@ VOID_SPELL(CreateWater)::run( Character *ch, Object *obj, int sn, int level )
 
     water = min(
                 level * (weather_info.sky >= SKY_RAINING ? 4 : 2),
-                obj->value[0] - obj->value[1]
+                obj->value0() - obj->value1()
                 );
 
     if ( water > 0 )
     {
-        obj->value[2] = liq_water;
-        obj->value[1] += water;
+        obj->value2(liq_water);
+        obj->value1(obj->value1() + water);
         if ( !is_name( "water", obj->getName( )) )
             obj->fmtName( "%s water", obj->getName( ) );
 
@@ -218,11 +218,11 @@ VOID_SPELL(FloatingDisc)::run( Character *ch, char *target_name, int sn, int lev
     }
 
     disc = create_object(get_obj_index(OBJ_VNUM_DISC), 0);
-    disc->value[0]        = ch->getModifyLevel() * 10; /* 10 pounds per level capacity */
-    disc->value[3]        = ch->getModifyLevel() * 5; /* 5 pounds per level max per item */
+    disc->value0(ch->getModifyLevel() * 10); /* 10 pounds per level capacity */
+    disc->value3(ch->getModifyLevel() * 5); /* 5 pounds per level max per item */
     disc->timer                = ch->getModifyLevel() * 2 - number_range(0,level / 2);
 
-    if (!ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
+    if (!ch->getProfession( )->getFlags( ch ).isSet(PROF_DIVINE)) 
         SET_BIT(disc->extra_flags, ITEM_MAGIC);
 
     dress_created_item( sn, disc, ch, target_name );

@@ -7,6 +7,9 @@
 #include "calendar_utils.h"
 #include "skill.h"
 #include "affectflags.h"
+#include "damageflags.h"
+#include "dreamland.h"
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 
@@ -128,6 +131,43 @@ char skill_learned_colour(const Skill *skill, PCharacter *ch)
     if (percent > skill->getAdept( ch ))
         return 'c';
     return 'x';
+}
+
+void print_wait_and_mana(const Skill *skill, Character *ch, ostream &buf)
+{
+    bool empty = true;
+    int beat = skill->getBeats() / dreamland->getPulsePerSecond();
+    if (beat > 0) {
+        buf << fmt(0, "Задержка при выполнении {W%1$d{x секунд%1$Iу|ы|. ", beat);
+        empty = false;
+    }
+
+    Spell::Pointer spell = skill->getSpell();
+    int mana = (ch && spell && spell->isCasted( )) ? spell->getManaCost(ch) : skill->getMana();
+    if (mana > 0) {
+        buf << fmt(0, "Расход маны {W%d{x. ", mana);
+        empty = false;
+    }
+
+    if (spell && spell->isCasted()) { 
+        buf << "Тип заклинания" << " {W" << spell_types.message(spell->getSpellType()) << "{x.";
+        empty = false;
+    }
+
+    if (!empty)
+        buf << endl;
+    
+    empty = true;
+
+    if (spell && spell->isCasted() && spell->getTarget() != 0) {
+        buf << "Целью служит {W" << target_table.messages(spell->getTarget(), true) << "{x. ";
+        empty = false;
+    }
+
+    // TODO: expose spell position and show it here.
+    // TODO: show if it's ranged or not.
+    if (!empty)
+        buf << endl;
 }
 
 void print_see_also(const Skill *skill, PCharacter *ch, ostream &buf) 

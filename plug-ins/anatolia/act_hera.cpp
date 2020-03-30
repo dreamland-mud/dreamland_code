@@ -108,7 +108,7 @@ void talk_auction(const char *argument)
             continue;
     
         bool fRussian = ch->getConfig()->rucommands;
-        ch->pecho(POS_RESTING, fRussian ? msg_ru.c_str() : msg_en.c_str());
+        ch->pecho(POS_SLEEPING, fRussian ? msg_ru.c_str() : msg_en.c_str());
     }
 }
 
@@ -232,8 +232,8 @@ void auction_update (void)
             }
             else /* not sold */
             {
-                sprintf (buf, "Ставок не получено - %s{Y снят с аукциона{x.",auction->item->getShortDescr( '1' ).c_str( ));
-                talk_auction(buf);
+                DLString msg = fmt(0, "Ставок не получено - %1$#O1{Y снят%1$Gо||а с аукциона{x.", auction->item);
+                talk_auction(msg.c_str());
 
                 act_p("Из дымки перед тобой появляется аукционер и возвращает тебе {W$o4{w.",
                       auction->seller,auction->item,0,TO_CHAR,POS_DEAD);
@@ -336,10 +336,10 @@ CMDRUNP( auction )
                         }
 
                         if  (obj->item_type == ITEM_WEAPON) {
-                                ch->printf("Тип оружия: %s (%s)\r\n",
-                                           weapon_class.message(obj->value[0] ).c_str( ),
-                                           weapon_class.name( obj->value[0] ).c_str( )
-                                          );
+                                ch->printf("Тип оружия: %s (%s), среднее повреждение %d.\r\n",
+                                           weapon_class.message(obj->value0() ).c_str( ),
+                                           weapon_class.name( obj->value0() ).c_str( ),
+                                          (1 + obj->value2()) * obj->value1() / 2);
                         }
 
                         return;
@@ -361,7 +361,7 @@ CMDRUNP( auction )
         if (arg_oneof_strict( arg1, "talk", "реклама", "говорить" ))
         {
             if ( ch != auction->seller ) {
-                ch->send_to("Ты ничего не выставлял на аукцион - рекламировать тебе нечего.\r\n");
+                ch->pecho("Ты ничего не выставлял%Gо||а на аукцион - рекламировать тебе нечего.", ch);
                 return;
             }
             if (argument[0] == '\0') {

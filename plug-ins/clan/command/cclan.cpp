@@ -141,12 +141,12 @@ void CClan::usage( PCharacter *pc )
         << "{W{lRклан состав{lEclan member{lx{x     показывает лидеру список членов клана (см. {W{lRклан состав помощь{lEclan member help{lx{x)" << endl
         << "{W{lRклан петиция {lEclan petition{lx{x   написать/принять/отклонить петицию на вступление в клан" << endl
         << "                (см. {W{lRклан петиция помощь{lEclan petition help{lx{x)" << endl           
-        << "{W{lRклан дипломатия{lEclan diplomacy {lx{x посмотреть/установить клановую дипломатию (см. {W{lRклан дипломатия помощь{lEclan dipl help{lx{x)" << endl;        
+        << "{W{lRклан дипломатия{lEclan diplomacy {lx{x посмотреть/установить клановую дипломатию (см. {W{lRклан дипломатия помощь{lEclan dipl help{lx{x)" << endl;
 
     if (pc->is_immortal( ))
         buf << "{W{lRклан принять{lEclan induct {lx{x    принять кого-то в клан" << endl
-            << "{W{lRклан статус{lEclan status{lx{x     показать статистику побед/поражений по уровням" << endl
-            << "{W{lRклан рейтинг{lEclan rating {lx{x    рейтинг клана согласно статистике побед/поражений" << endl;
+            << "{W{lRклан рейтинг{lEclan rating {lx{x    рейтинг клана согласно статистике побед/поражений" << endl
+            << "{W{lRклан статус{lEclan status{lx{x     показать статистику побед/поражений по уровням" << endl;        
     
     pc->send_to( buf );
 }
@@ -1033,11 +1033,6 @@ void CClan::clanMember( PCharacter *pc, DLString& argument )
         return;
     }
 
-    if (!pc->getClan( )->isRecruiter( pc ) && !pc->is_immortal( )) {
-        pc->send_to( "У тебя недостаточно полномочий для этого.\r\n" );
-        return;
-    }        
-
     const PCharacterMemoryList& list = PCharacterManager::getPCM( );
 
     for (pos = list.begin( ); pos != list.end( ); pos++) {
@@ -1079,8 +1074,7 @@ void CClan::clanMemberHelp( PCharacter *pc )
 {
     basic_ostringstream<char> buf;
     
-    buf   << "Для лидеров:" << endl
-          << "{W{lRклан состав{lEclan member{lx{x           - показывает список всех членов клана, в алфавитном порядке" << endl
+    buf   << "{W{lRклан состав{lEclan member{lx{x           - показывает список всех членов клана, в алфавитном порядке" << endl
           << "{W{lRклан состав дата{lEclan member date{lx{x      - сортирует список по дате последнего захода в мир" << endl
           << "{W{lRклан состав уровень{lEclan member level{lx{x     - сортирует список по уровню" << endl
           << "{W{lRклан состав клануровень{lEclan member clanlevel{lx{x - сортирует список по клановому уровню" << endl;

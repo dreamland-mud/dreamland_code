@@ -9,9 +9,11 @@
 #include "xmltableelement.h"
 #include "xmlpointer.h"
 #include "markuphelparticle.h"
+#include "xmltableloaderplugin.h"
 
 class HelpContainer;
 
+/** A simple help article defined in one of the files in /help folder. */
 class GenericHelp : public MarkupHelpArticle {
 public:
     typedef XMLPointer<GenericHelp> Pointer;    
@@ -24,7 +26,8 @@ public:
 protected:
     ::Pointer<HelpContainer> container;
 };
- 
+
+ /** A collection of articles from the /help folder. */
 class HelpContainer : public XMLListContainer<GenericHelp::Pointer>,
                       public XMLTableElement
 {
@@ -53,5 +56,7 @@ void HelpContainer::setName( const DLString &name )
 {
     this->name = name;
 }
+
+TABLE_LOADER_DECL(HelpLoader);
 
 #endif

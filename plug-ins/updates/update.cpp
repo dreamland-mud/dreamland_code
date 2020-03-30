@@ -56,6 +56,7 @@
 #include "lastlogstream.h"
 #include "logstream.h"
 #include "profiler.h"
+#include "grammar_entities_impl.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -399,7 +400,7 @@ void char_update( )
             }
         }
 
-        if (!frozen)
+        if (!frozen && !ch->isDead())
             char_update_affects( ch );
 
         if (!ch->is_npc( )
@@ -490,12 +491,12 @@ void water_float_update( )
                 obj->water_float = obj->floating_time( );
         }
         
-        if (obj->item_type == ITEM_DRINK_CON && !IS_SET(obj->value[4], DRINK_CLOSED)) {
+        if (obj->item_type == ITEM_DRINK_CON && !IS_SET(obj->value4(), DRINK_CLOSED)) {
             obj->in_room->echo( POS_RESTING, "%1$^O1 дела%1$nет|ют пузыри на поверхности %2$N2.", obj, obj->in_room->liquid->getShortDescr( ).c_str( ) );
 
-            obj->value[1] = URANGE( 1, obj->value[1] + 8, obj->value[0] );
-            obj->water_float = obj->value[0] - obj->value[1];
-            obj->value[2] = obj->in_room->liquid;
+            obj->value1(URANGE( 1, obj->value1() + 8, obj->value0() ));
+            obj->water_float = obj->value0() - obj->value1();
+            obj->value2(obj->in_room->liquid);
             room_to_save( obj );
         }
 
@@ -581,7 +582,7 @@ static bool oprog_update_key( Object *obj )
     
     /* ground */
     if (carrier == 0) {
-        if (obj->value[1] == 0) { // 0: never rot
+        if (obj->value1() == 0) { // 0: never rot
             obj->timer = 0;
             return true;
         }
@@ -615,19 +616,19 @@ static bool oprog_update_key( Object *obj )
     }
 
     /* inventory or bags */
-    if (obj->value[0] == 1) { // 1: never rot        
+    if (obj->value0() == 1) { // 1: never rot        
         obj->timer = 0;
         return true;
     }
     
-    if (obj->value[0] > 1) {// > 1: means TTL
+    if (obj->value0() > 1) {// > 1: means TTL
         if (reset_check_obj( obj )) {
             obj->timer = 0;
             return true;
         }
         
         if (!obj->timer) {
-            obj->timer = obj->value[0];
+            obj->timer = obj->value0();
             return true;
         }
             
@@ -734,10 +735,11 @@ void obj_update( void )
                 }
 
                 room_to_save( obj );
-                affect_remove_obj( obj, paf );
 
                 if (ah)
                     ah->remove( obj );
+
+                affect_remove_obj( obj, paf );
             }
         }
 
@@ -771,7 +773,7 @@ void obj_update( void )
         {
             if (carrier) {
                 if (!carrier->is_npc( ) && chance( 20 )) {
-                    carrier->pecho( "%1$^O1 разбива%1$nется|ются.", obj );
+                    carrier->pecho( "%1$^O1 лопа%1$nется|ются от жары.", obj );
                     extract_obj( obj );
                     continue;
                 }
@@ -876,7 +878,7 @@ void obj_update( void )
                         Object *pit = 0;
 
                         if(obj->item_type == ITEM_CORPSE_PC) {
-                            Room *pitRoom = get_room_index( obj->value[3] );
+                            Room *pitRoom = get_room_index( obj->value3() );
 
                             if (pitRoom)
                                 for (pit = pitRoom->contents;
@@ -1146,12 +1148,13 @@ struct LightVampireDamage : public Damage {
     
         act( msg.c_str( ), ch, 0, 0, TO_CHAR );
 
+        RussianString sunlight("солнечный свет", MultiGender::MASCULINE);
         if (dam == 0)
-            msgRoom( "Солнечный свет\6%C2", ch);
+            msgRoom( "%1$^O1\6%2$C2", sunlight, ch);
         else
-            msgRoom( "Солнечный свет\6%C4", ch);
+            msgRoom( "%1$^O1\6%2$C4", sunlight, ch);
             
-        msgChar( "Солнечный свет\6тебя" );
+        msgChar( "%1$^O1\6тебя", sunlight );
     }
 };
 
@@ -1376,16 +1379,16 @@ void lantern_update( Character *ch )
 
     if ( ( obj = get_eq_char( ch, wear_light ) ) != 0
             && obj->item_type == ITEM_LIGHT
-            && obj->value[2] > 0 )
+            && obj->value2() > 0 )
     {
-        if ( --obj->value[2] == 0 && ch->in_room != 0 )
+        obj->value2(obj->value2() - 1);
+        if ( obj->value2() == 0 && ch->in_room != 0 )
         {
-//  (decreased in unequip)    --ch->in_room->light; 
             ch->pecho("%1$^O1 мигну%1$Gло|л|ла|ли и поту%1$Gхло|х|хла|хли.", obj );
             ch->recho("%1$^O1 поту%1$Gхло|х|хла|хли.", obj );
             extract_obj( obj );
         }
-        else if ( obj->value[2] <= 5 && ch->in_room != 0)
+        else if ( obj->value2() <= 5 && ch->in_room != 0)
             ch->pecho("%1$^O1 мига%1$nет|ют.", obj );
     }
 }

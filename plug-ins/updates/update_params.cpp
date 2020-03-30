@@ -98,7 +98,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
         return;
 
     gain = std::max(3, 2 * ch->getCurrStat(STAT_CON) + (7 * ch->getRealLevel( )) / 4);
-    rate = ch->getTrueProfession( )->getHpRate( );
+    rate = ch->getProfession( )->getHpRate( );
     gain = (gain * rate) / 100;
     number = number_percent();
 
@@ -144,7 +144,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     gain = gain * ch->in_room->heal_rate / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
-        gain = gain * ch->on->value[3] / 100;
+        gain = gain * ch->on->value3() / 100;
 
     if ( IS_AFFECTED(ch, AFF_POISON) )
         gain /= 4;
@@ -188,7 +188,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
         return;
 
     gain = ch->getCurrStat(STAT_WIS) + (2 * ch->getCurrStat(STAT_INT)) + ch->getRealLevel( );
-    rate = ch->getTrueProfession( )->getManaRate( );
+    rate = ch->getProfession( )->getManaRate( );
     gain = ( gain * rate ) / 100;
 
     number = number_percent();
@@ -233,7 +233,7 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     gain = gain * min(400, ch->in_room->mana_rate) / 100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
-        gain = gain * min(400, ch->on->value[4]) / 100;
+        gain = gain * min(400, ch->on->value4()) / 100;
 
     if ( IS_AFFECTED( ch, AFF_POISON ) )
         gain /= 4;
@@ -300,7 +300,7 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
     gain = gain * ch->in_room->heal_rate/100;
 
     if ( ch->on != 0 && ch->on->item_type == ITEM_FURNITURE )
-        gain = gain * ch->on->value[3] / 100;
+        gain = gain * ch->on->value3() / 100;
 
     if ( IS_AFFECTED(ch, AFF_POISON) )
         gain /= 4;

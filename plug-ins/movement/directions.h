@@ -5,6 +5,7 @@
 #ifndef __DIRECTIONS_H__
 #define __DIRECTIONS_H__
 
+class DLString;
 class Character;
 class Room;
 struct extra_exit_data;
@@ -38,6 +39,9 @@ const char * direction_doorname(exit_data *);
 exit_data *direction_reverse(Room *room, int door);
 /** Return room this door leads to. */
 Room * direction_target(Room *room, int door);
+
+/** Split direction.victim arguments. */
+bool direction_range_argument(const DLString &cargs, DLString &argDoor, DLString &argVict, int &door);
 
 #define FEX_NONE     (0)
 #define FEX_NO_INVIS (A)

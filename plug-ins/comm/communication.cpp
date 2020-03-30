@@ -56,7 +56,7 @@ CMDRUNP( quiet )
  * replay near          рядом        -- последние X сообщений и эмоций рядом или в той же арии, групповой канал
  * replay public        публичные    -- последние X сообщений в общих каналах, хрустальном шаре, клановом канале
  * replay all           все          -- все сохраненные сообщения в хронологическом порядке
- * replay <keyword> -N               -- последние N сообщений в данной категории TODO
+ * replay <keyword> -N               -- последние N сообщений в данной категории
  *
  * X = 10, MAX for all = 100
  *
@@ -95,25 +95,7 @@ CMDRUNP( quiet )
  *
  * TODO:
  * timestamps like in notes
- * replay -N
- *
  */
-
-static bool replay_tells( ostringstream &buf, PCharacter *ch )
-{
-    XMLStringListAttribute::iterator i;
-    XMLStringListAttribute::Pointer tells
-                = ch->getAttributes( ).findAttr<XMLStringListAttribute>( "tells" );
-    
-    if (!tells || tells->size( ) == 0)
-        return false;
-
-    for (i = tells->begin( ); i != tells->end( ); i++)
-        buf << " ** " << *i << endl;
-    
-    ch->getAttributes( ).eraseAttribute( "tells" );
-    return true;
-}
 
 static void replay_summary( PCharacter *ch )
 {
@@ -131,7 +113,7 @@ static void replay_summary( PCharacter *ch )
 
 static void replay_hint( PCharacter *ch )
 {
-    ch->println( "Также смотри {y{lRпрослушать ?{lEreplay help{lx{x." );
+    ch->println( "Также смотри {hc{y{lRпрослушать ?{lEreplay help{lx{x." );
 }
 
 static void replay_help( PCharacter *ch )
@@ -169,7 +151,7 @@ CMDRUNP( replay )
     if (arg.empty( )) {
         ostringstream buf;
 
-        if (replay_tells( buf, pch )) {
+        if (ReplayAttribute::playAndErase( buf, pch )) {
             pch->println( "Сообщения, полученные за время твоего отсутствия или боя:" );
             pch->send_to( buf );
         } else {
@@ -274,20 +256,8 @@ CMDRUNP( afk )
     
     if (IS_SET(pch->comm,COMM_AFK))
     {
-        XMLStringListAttribute::Pointer tells
-                    = pch->getAttributes( ).findAttr<XMLStringListAttribute>( "tells" );
-
-        if(tells && tells->size( ) > 0)
-        {
-            pch->pecho( "Режим AFK выключен. Тебя ожидает {R%1$d{x сообщен%1$Iие|ия|ий.\r\n"
-                         "Используй команду {y{lRпрослушать{lEreplay{x, чтобы %1$Iего|их|их прочитать.", tells->size( ) );
-        }
-        else
-        {
-            pch->pecho( "Режим AFK выключен. Сообщений не было.\r\n"
-                        "Используй {y{lRпрослушать ?{lEreplay help{x для справки о том, как просмотреть все недавние сообщения." );
-        }
-
+        pch->pecho("Режим AFK выключен.");
+        pch->getAttributes().handleEvent(AfkArguments(pch, false));
         REMOVE_BIT(pch->comm,COMM_AFK);
         pch->getAttributes( ).eraseAttribute( "afk" );        
     }
@@ -301,6 +271,8 @@ CMDRUNP( afk )
         }
         else
             pch->send_to("Режим AFK включен.\n\r");
+
+        pch->getAttributes().handleEvent(AfkArguments(pch, true));
     }
 }
 

@@ -9,6 +9,8 @@
 #include "descriptorstatelistener.h"
 #include "playerattributes.h"
 
+class PCMemoryInterface;
+
 /**
  * Keep track of IP addresses this player uses.
  */
@@ -22,6 +24,9 @@ public:
         bool hasHost(const DLString &host) const;
         void showHosts(ostringstream &buf) const;
         const DLString &getMatchingHost(const DLString &hostPrefix) const;
+
+        /** Check if this player has a unique ip address */
+        static bool isUnique(const DLString &playerName, const DLString &host);
 
 private:
         /** Map between IP address and how many times it was used. */

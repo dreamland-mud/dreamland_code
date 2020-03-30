@@ -125,11 +125,13 @@ void DefaultSkillGroup::listPracticers( PCharacter *ch, ostringstream &buf ) con
 
 void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
 {
-    PlayerConfig::Pointer cfg = ch ? ch->getConfig( ) : PlayerConfig::Pointer( );
-    bool fRus = cfg && cfg->ruskills;
+    // True if it's a help json dump and not a player requesting the article.
+    bool autodump = ch->desc == 0;
+    bool fRus = ch->getConfig()->ruskills;
     int columns = 3;
     const char *pattern = fRus ? "{%c%-26s{x" : "{%c%-20s{x";
-    
+    const char *autopattern = "%-26s";
+
     buf << endl << "Навыки этой группы:" << endl;
 
     for (int col = 0, sn = 0; sn < skillManager->size( ); sn++) {
@@ -138,10 +140,17 @@ void DefaultSkillGroup::listSkills( PCharacter *ch, ostringstream &buf ) const
         if (skill->getGroup( ) != this)
             continue;
 
-        const DLString &skillName = fRus ? skill->getRussianName( ) : skill->getName( );
-        buf << fmt( 0, pattern, 
-                       getSkillColor( skill, ch ),
-                       skillName.c_str( ) );
+        if (autodump) {
+            DLString id;
+            if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+                id = DLString(skill->getSkillHelp()->getID());
+
+            DLString skillName = skill->getNameFor(ch) + "{hx";
+            buf << "{hh" << id << dlprintf(autopattern, skillName.c_str());
+
+        } else {
+            buf << fmt(0, pattern, getSkillColor(skill, ch), skill->getNameFor(ch).c_str());
+        }
         
         if (++col % columns == 0)
             buf << endl;

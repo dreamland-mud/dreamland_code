@@ -140,7 +140,7 @@ COMMAND(CChop, "chop")
         return;
     }
 
-    if (!IS_SET(corpse->value[2], part)) {
+    if (!IS_SET(corpse->value2(), part)) {
         ch->pecho( "У этого трупа нету %s.", 
                    part_flags.messages( part, true, '2' ).c_str( ) );
         return;
@@ -151,12 +151,12 @@ COMMAND(CChop, "chop")
         return;
     }
 
-    if (axe->value[3] != DAMW_SLASH && axe->value[3] != DAMW_CHOP && axe->value[3] != DAMW_SLICE) {
+    if (axe->value3() != DAMW_SLASH && axe->value3() != DAMW_CHOP && axe->value3() != DAMW_SLICE) {
         ch->println( "Твоим оружием неудобно это делать." );
         return;
     }
 
-    REMOVE_BIT(corpse->value[2], part);
+    corpse->value2(corpse->value2() & ~part);
     ch->setWait( gsn_trophy->getBeats( ) / 2 );
 
     DLString what = part_flags.messages( part, true, '4' );
@@ -311,10 +311,10 @@ SKILL_RUNP( trophy )
             af.modifier        = level > 20 ? 2 : 1;
             affect_to_obj( trophy, &af );
 
-            trophy->value[0] = ch->getModifyLevel();
-            trophy->value[1] = ch->getModifyLevel();
-            trophy->value[2] = ch->getModifyLevel();
-            trophy->value[3] = ch->getModifyLevel();
+            trophy->value0(ch->getModifyLevel());
+            trophy->value1(ch->getModifyLevel());
+            trophy->value2(ch->getModifyLevel());
+            trophy->value3(ch->getModifyLevel());
 
 
             obj_to_char(trophy, ch);
@@ -367,12 +367,9 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
         return false;
     }
 
-    // Calculate real chance to strike (original Anatolia code, plus clan level bonus).
-    // For hero PK, chances are ranging from 1+clanLevel to 8+clanLevel, i.e. from 1 to 16.
-    // For players of the same level, chances are ranging from 2 to 12.
+    // Calculate real chance to strike (original Anatolia code).
     chance = 1 + learned / 30; 
     chance += (ch->getModifyLevel() - victim->getModifyLevel()) / 2;
-    chance += ch->is_npc() ? 0 : ch->getPC()->getClanLevel();
     chance = max(1, chance);
     notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), learned %d, chance %d, level diff %d.",
             ch->getNameP('1').c_str(), ch->getModifyLevel(),
@@ -397,7 +394,7 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
             ch->getNameP('1').c_str(), ch->getModifyLevel(),
             victim->getNameP('1').c_str(), victim->getModifyLevel(),
             dam, victim->hit, victim->max_hit);
-    damage(ch, victim, dam, gsn_mortal_strike, DAM_NONE, true);
+    damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;
 }

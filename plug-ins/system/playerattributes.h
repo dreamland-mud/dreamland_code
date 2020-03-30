@@ -74,20 +74,31 @@ struct WhoisArguments {
     PCharacter *looker;
     list<DLString> &lines;
 };
-#if 0
-struct TimeArguments {
-    TimeArguments(PCharacter *ch, ostringstream &b)
-           : pch(ch), buf(b)
-    {
+
+struct StopFightArguments {
+    StopFightArguments(PCharacter *ch) : pch(ch)
+    {        
     }
 
     PCharacter *pch;
-    ostringstream &buf;
 };
-#endif
+
+struct AfkArguments {
+    AfkArguments(PCharacter *_pch, bool _on) : pch(_pch), on(_on)
+    {        
+    }
+
+    PCharacter *pch;
+    bool on;
+};
+
+
+extern template class EventHandler<ScoreArguments>;
 extern template class EventHandler<RemortArguments>;
 extern template class EventHandler<DeathArguments>;
 extern template class EventHandler<PromptArguments>;
 extern template class EventHandler<WhoisArguments>;
+extern template class EventHandler<StopFightArguments>;
+extern template class EventHandler<AfkArguments>;
 
 #endif

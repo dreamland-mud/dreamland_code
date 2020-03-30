@@ -64,14 +64,16 @@ bool limit_check_on_load( Object *obj )
 
     bool fCount = true;
 
+    if (obj->getRoom( ))
+        obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
+
     if (obj->carried_by) {
+        // If this item was already expired during boot time, its count was not increased.
         fCount = obj->timestamp > dreamland->getBootTime( );
         LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
             << " (" << obj->getID( ) << ") extracted for " << obj->carried_by->getName( )
             << ", " << (fCount ? "count":"nocount") << endl;
     } else {
-        if (obj->getRoom( ))
-            obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
         LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
             << " (" << obj->getID( ) << ") extracted in " << (obj->getRoom( ) ? obj->getRoom( )->vnum : -1)
             << ", " << (fCount ? "count":"nocount") << endl;
@@ -89,6 +91,10 @@ static bool item_is_home(Object *obj)
     if (!IS_SET(obj->wear_flags, ITEM_TAKE))
         return true;
 
+    // Don't decay auction items.
+    if (obj == auction->item)
+	return true;
+
     if (obj->in_room) {
         if (obj->reset_room == obj->in_room->vnum)
             return true;
@@ -101,7 +107,8 @@ static bool item_is_home(Object *obj)
             return true;
 
         // Deal with the timer once the corpse is decayed or item removed.
-        if (obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC)
+        if (obj->in_obj->item_type == ITEM_CORPSE_PC 
+                || obj->in_obj->item_type == ITEM_CORPSE_NPC)
             return true;
 
         return false;
@@ -138,13 +145,14 @@ void limit_ground_decay(Object *obj)
     if (obj->pIndexData->limit < 0)
         return;
 
+    // Don't touch items in their reset places or inside corpses.
+    if (item_is_home(obj))
+        return;
+
     // Check limited items  without a timer.
     // Example: spec_fido mob destroys a coprse, limited item falls on the ground.
     // Example: object becomes a limit after OLC changes.
     if (obj->timestamp <= 0) {
-        if (item_is_home(obj))
-            return;
-
         limit_timestamp(obj, 0);
         save_items_at_holder(obj);
         return;
@@ -161,20 +169,12 @@ void limit_ground_decay(Object *obj)
     save_items_at_holder(obj);
 }
 
-// Destroy expired limited objects when room or player is saved.
-bool limit_check_on_save( Object *obj )
+// Periodically destroy expired limited items.
+bool limit_purge( Object *obj )
 {
     // Not a limited item.
     if (obj->pIndexData->limit < 0)
         return false;
-
-    DLString where;
-    if (obj->carried_by)
-        where = obj->carried_by->getName( );
-    else if (obj->in_room)
-        where =  "room #" + DLString(obj->in_room->vnum);
-    else
-        where = "none";
 
     // Limited item but not marked (yet).
     if (obj->timestamp <= 0) 
@@ -184,12 +184,23 @@ bool limit_check_on_save( Object *obj )
     if (obj->timestamp > dreamland->getCurrentTime( ))
         return false;
 
+    // Don't destory item while on auction.	
+    if (obj == auction->item)
+        return false;
+
     if (obj->getRoom( ))
         obj->getRoom( )->echo( POS_RESTING, "%1$^O1 рассыпается трухой!", obj );
 
-    // If item was already expired during boot time,
-    // its counter hasn't been increased, thus we shouldn't decrease.
-    bool fCount = obj->timestamp > dreamland->getBootTime( );
+    DLString where;
+    if (obj->carried_by)
+        where = obj->carried_by->getName( );
+    else if (obj->in_room)
+        where =  "room #" + DLString(obj->in_room->vnum);
+    else
+        where = "none";
+
+    // Always decrease counters for periodic limits extract.
+    bool fCount = true;
     LogStream::sendNotice( ) << "Limited item " << obj->pIndexData->vnum 
         << " (" << obj->getID( ) << ") extracted for " << where 
         << ", " << (fCount ? "count":"nocount") << endl;
@@ -205,7 +216,7 @@ void limit_purge( )
     for (obj = object_list; obj != 0; obj = obj_next) {
         obj_next = obj->next;
         limit_ground_decay(obj);
-        limit_check_on_save(obj);
+        limit_purge(obj);
     }
 }
 

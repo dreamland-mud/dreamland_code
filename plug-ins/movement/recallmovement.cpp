@@ -40,8 +40,10 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
 {
     int chance;
     
-    if (!wch->fighting)
+    if (!wch->fighting) {
+        skill->improve(wch, true);
         return true;
+    }
 
     if (wch != ch) {
         msgSelf( ch, "Но %2$C1 сражается!" );
@@ -52,14 +54,14 @@ bool RecallMovement::applyFightingSkill( Character *wch, SkillReference &skill )
     chance = skill->getEffective( wch );
     chance = 80 * chance / 100;
     
-    if (number_percent( ) < chance) { /* historical bug here */
+    if (number_percent( ) > chance) {
         skill->improve( wch, false );
         wch->setWaitViolence( 1 );
         wch->pecho( "Твоя попытка закончилась неудачей!" );
         return false;
     }
 
-    skill->improve( wch, false );
+    skill->improve( wch, true );
     msgSelfParty( wch, "Ты убегаешь с поля битвы!", "%2$^C1 убегает с поля битвы!" );
     return true;
 }
@@ -156,7 +158,12 @@ bool RecallMovement::applyMovepoints( )
 
 bool RecallMovement::checkSameRoom( )
 {
-    return from_room != to_room;
+    if (from_room == to_room) {
+        ch->pecho("Но ты уже здесь!");
+        return false;
+    }
+
+    return true;
 }
 
 void RecallMovement::moveFollowers( Character *wch ) 

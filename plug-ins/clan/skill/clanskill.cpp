@@ -13,6 +13,7 @@
 #include "object.h"
 #include "npcharacter.h"
 #include "dreamland.h"
+#include "act.h"
 #include "merc.h"
 #include "mercdb.h"
 #include "def.h"
@@ -22,6 +23,17 @@ GROUP(clan);
 
 ClanSkill::ClanSkill( )
 {
+}
+
+void ClanSkill::loaded( )
+{
+    BasicSkill::loaded();
+
+    // Assign additional per-clan labels to help articles.
+    if (help) {
+        for (auto &pair: clans)
+            help->labels.addTransient(pair.first + "-skills");
+    }    
 }
 
 SkillGroupReference & ClanSkill::getGroup( ) 
@@ -116,11 +128,6 @@ int ClanSkill::getLearned( Character *ch ) const
     return ch->getPC( )->getSkillData( getIndex( ) ).learned;
 }
 
-int ClanSkill::getWeight( Character * ) const
-{
-    return 0;
-}
-
 int ClanSkill::getMaximum( Character *ch ) const
 {
     const SkillClanInfo *ci;
@@ -129,11 +136,6 @@ int ClanSkill::getMaximum( Character *ch ) const
         return ci->maximum;
 
     return BasicSkill::getMaximum( ch );
-}
-
-bool ClanSkill::canForget( PCharacter * ) const
-{
-    return false;
 }
 
 bool ClanSkill::canPractice( PCharacter * ch, std::ostream & ) const
@@ -208,6 +210,8 @@ void ClanSkill::show( PCharacter *ch, std::ostream & buf )
     }
 
     buf << "." << endl; 
+
+    print_wait_and_mana(this, ch, buf);
 
     if (!visible( ch )) {
         print_see_also(this, ch, buf);

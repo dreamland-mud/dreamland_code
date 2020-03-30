@@ -16,6 +16,7 @@ public:
     virtual void initialization( )
     {
         Class::regXMLVar<ProfessionHelp>( );
+        Class::regXMLVar<ClassSkillHelp>( );
         Class::regXMLVar<ProfessionTitlesByLevel>( );
         Class::regMoc<ProfessionTitlesByConstant>( );
         Class::regMoc<DefaultProfession>( );
@@ -25,6 +26,7 @@ public:
     virtual void destruction( )
     {
         Class::unregXMLVar<ProfessionHelp>( );
+        Class::unregXMLVar<ClassSkillHelp>( );
         Class::unregXMLVar<ProfessionTitlesByLevel>( );
         Class::unregMoc<ProfessionTitlesByConstant>( );
         Class::unregMoc<DefaultProfession>( );

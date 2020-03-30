@@ -28,6 +28,12 @@ SkillGroupReference & Language::getGroup( )
     return group_ancient_languages;
 }
 
+HelpArticlePointer Language::getSkillHelp( ) const
+{
+    return help;
+}
+
+
 bool Language::visible( Character * ch ) const
 {
     if (!Command::available( ch ))
@@ -90,16 +96,6 @@ int Language::getLearned( Character *ch ) const
     maximum = getMaximum( ch );
     
     return min( learned, maximum );
-}
-
-int Language::getWeight( Character * ) const
-{
-    return 0;
-}
-
-bool Language::canForget( PCharacter * ) const
-{
-    return false;
 }
 
 bool Language::canPractice( PCharacter * ch, std::ostream & ) const

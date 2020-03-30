@@ -22,6 +22,10 @@
 GSN(second_weapon);
 GSN(hand_to_hand);
 
+WEARLOC(tail);
+WEARLOC(hair);
+
+
 /*
  * stuck-in
  */
@@ -36,6 +40,41 @@ void StuckInWearloc::unequip( Character *ch, Object *obj )
 {
     obj->wear_loc.assign( wear_none );
     saveDrops( ch );
+}
+
+/*
+ * horse part of centaurs
+ */
+
+int HorseWearloc::canWear( Character *ch, Object *obj, int flags )
+{
+    int rc = DefaultWearlocation::canWear( ch, obj, flags );
+    
+    if (rc != RC_WEAR_OK)
+        return rc;
+
+    if (RIDDEN(ch)) {
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->pecho("Ты не цирков%1$Gой|ой|ая %1$Gконь|конь|лошадь! Попроси всадника спешиться.", ch);
+        return RC_WEAR_CONFLICT;
+    }
+
+    return RC_WEAR_OK;
+}
+
+bool HorseWearloc::canRemove( Character *ch, Object *obj, int flags )
+{
+    int rc = DefaultWearlocation::canRemove( ch, obj, flags );
+    if (!rc)
+        return rc;
+
+    if (RIDDEN(ch)) {
+        if (IS_SET(flags, F_WEAR_VERBOSE))
+            ch->pecho("Ты не цирков%1$Gой|ой|ая %1$Gконь|конь|лошадь! Попроси всадника спешиться.", ch);
+        return false;
+    }
+
+    return true;
 }
 
 /*
@@ -267,7 +306,7 @@ bool TattooWearloc::canRemove( Character *ch, Object *obj, int flags )
 }
 
 /*
- * tair 
+ * tail 
  */
 bool TailWearloc::equip( Character *ch, Object *obj )
 {
@@ -297,4 +336,15 @@ int TailWearloc::canWear( Character *ch, Object *obj, int flags ) {
         return RC_WEAR_CONFLICT;
     }
     return DefaultWearlocation::canWear( ch, obj, flags );
+}
+
+/*
+ * utils
+ */
+
+bool obj_is_worn(Object *obj)
+{
+    return obj->wear_loc != wear_none 
+            && obj->wear_loc != wear_tail
+            && obj->wear_loc != wear_hair;
 }

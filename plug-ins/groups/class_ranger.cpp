@@ -35,7 +35,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 
 #include "dreamland.h"
 #include "gsn_plugin.h"
@@ -44,12 +44,13 @@
 #include "magic.h"
 #include "fight.h"
 #include "stats_apply.h"
+#include "directions.h"
 #include "onehit.h"
 #include "onehit_weapon.h"
 #include "damage_impl.h"
 #include "vnum.h"
 #include "merc.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "save.h"
 #include "act.h"
 #include "interp.h"
@@ -126,7 +127,7 @@ static Object * find_arrow( Character *ch, Object *quiver )
     Object *arrow = NULL;
 
     for (Object *obj = quiver->contains; obj != 0; obj = obj->next_content)
-        if (obj->item_type == ITEM_WEAPON && obj->value[0] == WEAPON_ARROW) {
+        if (obj->item_type == ITEM_WEAPON && obj->value0() == WEAPON_ARROW) {
             arrow = obj;
             break; 
         }
@@ -155,26 +156,16 @@ SKILL_RUNP( shoot )
     Object *wield;
     Object *arrow;
     Object *quiver;
-
-    char arg1[512],arg2[512];
     bool success;
     int chance,direction;
     int range, range0 = ( ch->getModifyLevel() / 10) + 1;
     int master_shoots = 2;
+    DLString argDoor, argVict;
 
     if (!gsn_bow->usable( ch ))
     {
           ch->send_to("Ты не умеешь стрелять из лука.\n\r");
           return;
-    }
-
-    argument=one_argument( argument, arg1 );
-    one_argument( argument, arg2 );
-
-    if ( arg1[0] == '\0' || arg2[0] == '\0' )
-    {
-            ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
-            return;
     }
 
     if ( ch->fighting )
@@ -183,16 +174,13 @@ SKILL_RUNP( shoot )
             return;
     }
 
-    direction = direction_lookup( arg1 );
-
-    if (direction < 0)
-    {
-            ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
-            return;
+    if (!direction_range_argument(argument, argDoor, argVict, direction)) {
+        ch->send_to("Выстрелить в каком направлении и в кого?\n\r");
+        return;
     }
-    
+
     range = range0;
-    if ( ( victim = find_char( ch, arg2, direction, &range) ) == 0 )
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
     {
             ch->send_to("Там таких нет.\n\r");
             return;
@@ -222,7 +210,7 @@ SKILL_RUNP( shoot )
 
     if ( !wield
             || wield->item_type != ITEM_WEAPON
-            || wield->value[0] != WEAPON_BOW )
+            || wield->value0() != WEAPON_BOW )
     {
             ch->send_to("Для того, чтобы стрелять тебе нужен лук!\n\r");
             return;            
@@ -243,7 +231,7 @@ SKILL_RUNP( shoot )
     }        
     
     if (!ch->is_npc( ) && 
-        (quiver->item_type != ITEM_CONTAINER || !IS_SET(quiver->value[1], CONT_FOR_ARROW)))
+        (quiver->item_type != ITEM_CONTAINER || !IS_SET(quiver->value1(), CONT_FOR_ARROW)))
     {
             ch->send_to("Возьми в руки колчан.\n\r");
             return;
@@ -284,7 +272,7 @@ SKILL_RUNP( shoot )
     try {
         success = send_arrow( ch, victim, arrow,
                               direction, chance,
-                              dice( wield->value[1], wield->value[2] ) );
+                              dice( wield->value1(), wield->value2() ) );
     } catch (const VictimDeathException &e) {
         return;
     }
@@ -306,7 +294,7 @@ SKILL_RUNP( shoot )
     
     for (int i = 0; i < master_shoots; i++) {
         range = range0;
-        if (find_char( ch, arg2, direction, &range) != victim)
+        if (find_char( ch, argVict.c_str(), direction, &range) != victim)
             return; 
         
         if (!( arrow = find_arrow( ch, quiver ) ))
@@ -315,7 +303,7 @@ SKILL_RUNP( shoot )
         try {
             success = send_arrow( ch, victim, arrow,
                                   direction, chance,
-                                  dice( wield->value[1], wield->value[2] ) );
+                                  dice( wield->value1(), wield->value2() ) );
         } catch (const VictimDeathException &e) {
             return;
         }
@@ -696,8 +684,8 @@ static Object * create_arrow( int color, int level )
             str_name = "green зеленая";
             str_long = "{GЗеленая";
             str_short = "{Gзелен|ая|ой|ой|ую|ой|ой";
-            arrow->value[1] = 4 + level / 12;
-            arrow->value[2] = 4 + level / 10;
+            arrow->value1(4 + level / 12);
+            arrow->value2(4 + level / 10);
         }
         else if (color == gsn_red_arrow)
         {
@@ -705,8 +693,8 @@ static Object * create_arrow( int color, int level )
             str_name = "red красная";
             str_long = "{RКрасная";
             str_short = "{Rкрасн|ая|ой|ой|ую|ой|ой";
-            arrow->value[1] = 4 + level / 15;
-            arrow->value[2] = 4 + level / 30;
+            arrow->value1(4 + level / 15);
+            arrow->value2(4 + level / 30);
         }
         else if (color == gsn_white_arrow)
         {
@@ -714,8 +702,8 @@ static Object * create_arrow( int color, int level )
             str_name = "white белая";
             str_long = "{WБелая";
             str_short = "{Wбел|ая|ой|ой|ую|ой|ой";
-            arrow->value[1] = 4 + level / 15;
-            arrow->value[2] = 4 + level / 30;
+            arrow->value1(4 + level / 15);
+            arrow->value2(4 + level / 30);
         }
         else
         {
@@ -723,8 +711,8 @@ static Object * create_arrow( int color, int level )
             str_name = "blue голубая";
             str_long = "{CГолубая";
             str_short = "{Cголуб|ая|ой|ой|ую|ой|ой";
-            arrow->value[1] = 4 + level / 15;
-            arrow->value[2] = 4 + level / 30;
+            arrow->value1(4 + level / 15);
+            arrow->value2(4 + level / 30);
         }
 
         affect_to_obj( arrow, &saf);
@@ -734,8 +722,8 @@ static Object * create_arrow( int color, int level )
         str_name = "wooden деревянная";
         str_long = "{yДеревянная";
         str_short = "{yдеревянн|ая|ой|ой|ую|ой|ой";
-        arrow->value[1] = 4 + level / 12;
-        arrow->value[2] = 4 + level / 10;
+        arrow->value1(4 + level / 12);
+        arrow->value2(4 + level / 10);
     }
 
     arrow->fmtName( arrow->getName( ), str_name );
@@ -886,8 +874,8 @@ SKILL_RUNP( makebow )
 
   bow = create_object(get_obj_index(OBJ_VNUM_RANGER_BOW), ch->getModifyLevel() );
   bow->level = ch->getRealLevel( );
-  bow->value[1] = 4 + ch->getModifyLevel() / 15;
-  bow->value[2] = 4 + ch->getModifyLevel() / 15;
+  bow->value1(4 + ch->getModifyLevel() / 15);
+  bow->value2(4 + ch->getModifyLevel() / 15);
 
   tohit.where                    = TO_OBJECT;
   tohit.type               = gsn_make_arrow;
@@ -927,30 +915,32 @@ SKILL_RUNP( forest )
     int mana;
 
     if (ch->is_npc() || !gsn_forest_fighting->getEffective( ch )) {
-        ch->send_to("Что?\n");
+        ch->send_to("Какой такой лес?\n");
         return;
     }
     
     argument = one_argument( argument, arg );
 
     if (!*arg) {
-        ch->send_to("Использование: forest {{ attack|defence|normal }\n\r");
+        ch->send_to("Использование: {lRлес атака|защита|выкл{lEforest attack|defence|off{x\n\r");
         return;
     }
-    else if (!str_prefix(arg, "normal")) {
+
+    if (arg_is_switch_off(arg) || arg_oneof(arg, "normal")) {
         if (!ch->isAffected(gsn_forest_fighting)) {
             ch->send_to("Ты не используешь в бою твои знания о лесе.\n\r");
-            return;
         }
         else {
             ch->send_to("Ты прекращаешь использовать в бою твои знания о лесе.\n\r");
             affect_strip(ch, gsn_forest_fighting);
-            return;
         }
+
+        return;
     }
-    else if (!str_prefix(arg, "defence")) 
+
+    if (arg_oneof(arg, "защита", "defense", "defence")) 
         attack = false;
-    else if (!str_prefix(arg, "attack"))
+    else if (arg_oneof(arg, "атака", "attack"))
         attack = true;
     else {
         run(ch, str_empty);
@@ -1059,7 +1049,7 @@ SKILL_RUNP( butcher )
                 return;
         }
 
-        if ( obj->value[0] <= 0 )
+        if ( obj->value0() <= 0 )
         {
                 ch->send_to("Ты разве видишь мясо в этом трупе?!\n\r");
                 return;
@@ -1072,10 +1062,10 @@ SKILL_RUNP( butcher )
 
         numsteaks = number_bits(2) + 1;
 
-        if ( numsteaks > obj->value[0] )
-                numsteaks = obj->value[0];
+        if ( numsteaks > obj->value0() )
+                numsteaks = obj->value0();
 
-        obj->value[0] -= numsteaks;
+        obj->value0(obj->value0() - numsteaks);
 
         if ( number_percent() < gsn_butcher->getEffective( ch ) )
         {
@@ -1098,7 +1088,7 @@ SKILL_RUNP( butcher )
                         steak->fmtDescription( steak->getDescription( ), obj->getShortDescr( '2' ).c_str( ));
                         
                         /* save originating mob vnum */
-                        steak->value[2] = obj->value[3];
+                        steak->value2(obj->value3());
                                                 
                         obj_to_room(steak,ch->in_room);
                 }
@@ -1451,8 +1441,8 @@ VOID_SPELL(RangerStaff)::run( Character *ch, char *, int sn, int level )
   ch->send_to("Ты создаешь посох рейнджера!\n\r");
   act_p("$c1 создает посох рейнджера!",ch,0,0,TO_ROOM,POS_RESTING);
 
-  staff->value[1] = 4 + level / 15;
-  staff->value[2] = 4 + level / 15;
+  staff->value1(4 + level / 15);
+  staff->value2(4 + level / 15);
 
   tohit.where                   = TO_OBJECT;
   tohit.type               = sn;
@@ -1507,7 +1497,7 @@ bool RangerStaff::death( Character *ch )
 
 bool RangerStaff::canEquip( Character *ch )
 {
-  if (ch->getTrueProfession( ) != prof_ranger) {
+  if (ch->getProfession( ) != prof_ranger) {
         ch->println("Ты не знаешь как использовать эту вещь.");
         act( "Посох рейнджера выскальзывает из твоих рук.", ch, 0, 0, TO_CHAR );
         act( "Посох рейнджера выскальзывает из рук $c2.", ch, 0, 0, TO_ROOM );

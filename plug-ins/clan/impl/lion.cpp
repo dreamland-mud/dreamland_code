@@ -273,15 +273,15 @@ void LionEyedSword::equip( Character *ch )
 {
     short level = ch->getModifyLevel();
 
-    if (  level <= 10)                           obj->value[2] = 3;
-    else if ( level > 10 && level <= 20)   obj->value[2] = 4;
-    else if ( level > 20 && level <= 30)   obj->value[2] = 5;
-    else if ( level > 30 && level <= 40)   obj->value[2] = 6;
-    else if ( level > 40 && level <= 50)   obj->value[2] = 7;
-    else if ( level > 50 && level <= 60)   obj->value[2] = 8;
-    else if ( level > 60 && level <= 70)   obj->value[2] = 9;
-    else if ( level > 70 && level <= 80)   obj->value[2] = 10;
-    else                                   obj->value[2] = 11;
+    if (  level <= 10)                           obj->value2(3);
+    else if ( level > 10 && level <= 20)   obj->value2(4);
+    else if ( level > 20 && level <= 30)   obj->value2(5);
+    else if ( level > 30 && level <= 40)   obj->value2(6);
+    else if ( level > 40 && level <= 50)   obj->value2(7);
+    else if ( level > 50 && level <= 60)   obj->value2(8);
+    else if ( level > 60 && level <= 70)   obj->value2(9);
+    else if ( level > 70 && level <= 80)   obj->value2(10);
+    else                                   obj->value2(11);
 
     obj->level = ch->getRealLevel( );
 }
@@ -304,7 +304,7 @@ VOID_SPELL(EyedSword)::run( Character *ch, char *target_name, int sn, int level 
     sprintf( buf, eyed->pIndexData->extra_descr->description, ch->getNameP( ) );
     eyed->addExtraDescr( eyed->pIndexData->extra_descr->keyword, buf );
 
-    eyed->value[2] = ( ch->getModifyLevel() / 10) + 3;
+    eyed->value2(( ch->getModifyLevel() / 10) + 3);
     eyed->level = ch->getRealLevel( );
     eyed->cost = 0;
     obj_to_char( eyed, ch);

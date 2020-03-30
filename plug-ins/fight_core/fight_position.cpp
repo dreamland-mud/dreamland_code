@@ -5,6 +5,7 @@
 #include "fight_position.h"
 
 #include "commonattributes.h"
+#include "playerattributes.h"
 #include "skill.h"
 #include "skillreference.h"
 #include "clanreference.h"
@@ -49,15 +50,8 @@ void stop_fighting( Character *ch, bool fBoth )
 
             update_pos( fch );
             
-            if (!fch->is_npc( )) {
-                static const DLString aname="tells";
-                XMLStringListAttribute::Pointer tells 
-                        = fch->getPC( )->getAttributes( ).findAttr<XMLStringListAttribute>( aname );
-                
-                if (tells && tells->size( ) > 0) {
-                    fch->pecho( "Тебе было послано {R%1$d{x сообщен%1$Iие|ия|ий. Используй команду {y{lEreplay{lRпрослушать{lx для просмотра.",
-                                 tells->size( ) );
-                }
+            if (!fch->is_npc()) {
+                fch->getPC()->getAttributes().handleEvent(StopFightArguments(fch->getPC()));
             }
         }
   }

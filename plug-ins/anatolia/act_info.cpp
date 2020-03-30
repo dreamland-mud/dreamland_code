@@ -13,14 +13,14 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 /***************************************************************************
- *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *        
- *     ANATOLIA has been brought to you by ANATOLIA consortium                   *
- *         Serdar BULUT {Chronos}                bulut@rorqual.cc.metu.edu.tr       *        
- *         Ibrahim Canpunar  {Asena}        canpunar@rorqual.cc.metu.edu.tr    *        
- *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr           *        
- *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr           *        
+ *     ANATOLIA 2.1 is copyright 1996-1997 Serdar BULUT, Ibrahim CANPUNAR  *
+ *     ANATOLIA has been brought to you by ANATOLIA consortium             *
+ *         Serdar BULUT {Chronos}             bulut@rorqual.cc.metu.edu.tr *
+ *         Ibrahim Canpunar  {Asena}       canpunar@rorqual.cc.metu.edu.tr *
+ *         Murat BICER  {KIO}                mbicer@rorqual.cc.metu.edu.tr *
+ *         D.Baris ACAR {Powerman}        dbacar@rorqual.cc.metu.edu.tr    *
  *     By using this code, you have agreed to follow the terms of the      *
- *     ANATOLIA license, in the file Anatolia/anatolia.licence             *        
+ *     ANATOLIA license, in the file Anatolia/anatolia.licence             *
  ***************************************************************************/
 
 /***************************************************************************
@@ -80,6 +80,7 @@
 #include "room.h"
 #include "desire.h"
 #include "helpmanager.h"
+#include "attacks.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -87,6 +88,7 @@
 #include "comm.h"
 #include "colour.h"
 #include "mudtags.h"
+#include "websocketrpc.h"
 #include "bugtracker.h"
 #include "act.h"
 #include "alignment.h"
@@ -110,7 +112,6 @@ using std::min;
 using std::max;
 
 PROF(none);
-PROF(universal);
 PROF(samurai);
 PROF(anti_paladin);
 RELIG(none);
@@ -122,6 +123,7 @@ bool omprog_give( Object *obj, Character *ch, Character *victim );
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 bool password_check( PCMemoryInterface *pci, const DLString &plainText );
 DLString quality_percent( int ); /* XXX */
+DLString help_article_disambig(const HelpArticle *help);
 
 NPCharacter * find_mob_with_act( Room *room, bitstring_t act )
 {    
@@ -323,10 +325,6 @@ CMDRUNP( oscore )
         << "  Класс: " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
-        if (pch->getSubProfession( ) != prof_none)
-            buf << "(" << pch->getSubProfession( )->getNameFor( ch ) << ")";
-    
-    if (!ch->is_npc( ))
         room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
     else
         room = get_room_index( ROOM_VNUM_TEMPLE );
@@ -342,20 +340,37 @@ CMDRUNP( oscore )
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
-   buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
+    buf << dlprintf( "Ты несешь %d/%d вещей с весом %d/%d фунтов.\n\r",
                 ch->carry_number, ch->canCarryNumber( ),
                 ch->getCarryWeight( )/10, ch->canCarryWeight( )/10 );
 
-    buf << dlprintf( 
-            "Твои параметры:   Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
-            "              Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
-            "              Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
+    if (ch->is_npc( )) {
+        buf << dlprintf( 
+            "Твои параметры: родные(текущие)\n\r"
+            "      Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
+            "  Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
+            "  Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS),
             ch->perm_stat[STAT_DEX], ch->getCurrStat(STAT_DEX),
             ch->perm_stat[STAT_CON], ch->getCurrStat(STAT_CON),
             ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA) );
+
+    } else {
+        buf << dlprintf( 
+            "Твои параметры: родные(текущие) [максимальные]\n\r"
+            "      Сила(Str): %d(%d) [%d] Интеллект(Int): %d(%d) [%d]\n\r"
+            "  Мудрость(Wis): %d(%d) [%d]  Ловкость(Dex): %d(%d) [%d]\n\r"
+            "  Сложение(Con): %d(%d) [%d]   Обаяние(Cha): %d(%d) [%d]\n\r",
+            ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
+            ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT), pch->getMaxStat(STAT_INT),
+            ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
+            ch->perm_stat[STAT_DEX], ch->getCurrStat(STAT_DEX), pch->getMaxStat(STAT_DEX),
+            ch->perm_stat[STAT_CON], ch->getCurrStat(STAT_CON), pch->getMaxStat(STAT_CON),
+            ch->perm_stat[STAT_CHA], ch->getCurrStat(STAT_CHA), pch->getMaxStat(STAT_CHA) );
+
+    }
 
     buf << dlprintf( "У тебя %d очков опыта, и %s\n\r",
                   ch->exp.getValue( ),
@@ -384,9 +399,9 @@ CMDRUNP( oscore )
 
         if (ch->getProfession( ) != prof_samurai)
             buf << dlprintf( "Ты попытаешься убежать при %d жизни.  ", ch->wimpy.getValue( ) );
-        else
-            buf << dlprintf( "Тебя убили уже %d раз.  ", ch->getPC( )->death.getValue( ));
-
+        else 
+            buf << fmt(0, "Тебя убили уже %1$d ра%1$Iз|за|з.", ch->getPC()->death.getValue());
+	    
         if (ch->getPC()->guarding != 0)
             buf << dlprintf( "Ты охраняешь: %s. ", ch->seeName( ch->getPC()->guarding, '4' ).c_str( ) );
 
@@ -465,12 +480,7 @@ CMDRUNP( oscore )
             buf << dlprintf( "Благословение богов улучшает все твои умения на %d%%.\n\r",
                         ch->getPC( )->bless.getValue( ));
     }
-#if 0
-    if (ch->getProfession( ) == prof_universal)
-        buf << dlprintf( "У тебя %d/%d {lRочков умений{lEskill points{lx.\n\r",
-                    ch->getPC()->skill_points(),
-                    ch->getPC()->max_skill_points.getValue( ));
-#endif
+    
     /* RT wizinvis and holy light */
     if (ch->is_immortal( )) 
         buf << dlprintf( "Божественный взор %s. Невидимость %d уровня, инкогнито %d уровня.",
@@ -563,20 +573,20 @@ CMDRUNP( compare )
             break;
 
         case ITEM_ARMOR:
-            value1 = obj1->value[0] + obj1->value[1] + obj1->value[2];
-            value2 = obj2->value[0] + obj2->value[1] + obj2->value[2];
+            value1 = obj1->value0() + obj1->value1() + obj1->value2();
+            value2 = obj2->value0() + obj2->value1() + obj2->value2();
             break;
 
-        case ITEM_WEAPON:
+        case  ITEM_WEAPON:
             if (obj1->pIndexData->new_format)
-                value1 = (1 + obj1->value[2]) * obj1->value[1];
+                value1 = (1 + obj1->value2()) * obj1->value1();
             else
-                    value1 = obj1->value[1] + obj1->value[2];
+                    value1 = obj1->value1() + obj1->value2();
 
             if (obj2->pIndexData->new_format)
-                value2 = (1 + obj2->value[2]) * obj2->value[1];
+                value2 = (1 + obj2->value2()) * obj2->value1();
             else
-                    value2 = obj2->value[1] + obj2->value[2];
+                    value2 = obj2->value1() + obj2->value2();
             break;
         }
     }
@@ -739,7 +749,7 @@ CMDRUNP( consider )
     diff = victim->getModifyLevel() - ch->getModifyLevel();
 
          if ( diff <= -10 ) msg = "Ты можешь убить $C4 даже без оружия.";
-    else if ( diff <=  -5 ) msg = "$C1 не соперник тебе.";
+    else if ( diff <=  -5 ) msg = "$C1 не соперн$Gик|ик|ица тебе.";
     else if ( diff <=  -2 ) msg = "Ты похоже легко убьешь $C4.";
     else if ( diff <=   1 ) msg = "Прекрасный поединок!";
     else if ( diff <=   4 ) msg = "$C1 говорит 'Чувствуешь удачу, шпана?'.";
@@ -1242,12 +1252,17 @@ CMDRUNP( request )
 
 
 
-
 CMDRUNP( identify )
 {
     Object *obj;
     Character *rch;
+    int cost = 20;
 
+    if ( ch->is_npc( ) ) {
+        ch->send_to( "У тебя же лапки!!!\n\r");
+        return;
+    }
+    
     if ( ( obj = get_obj_carry( ch, argument ) ) == 0 )
     {
        ch->send_to( "У тебя нет этого.\n\r");
@@ -1261,17 +1276,25 @@ CMDRUNP( identify )
        ch->send_to("Тут никто ничего толкового не скажет об этой вещи.\n\r");
        return;
     }
+   
+    int remorts = ch->getPC()->getRemorts( ).size( );
+    //add guru checks?
+    if ( remorts == 0) {
+        cost = round ((ch->getRealLevel( ) - cost) * 0.66);
+        cost = URANGE (0, cost, 20);
+    }
+
 
     if (ch->is_immortal( )) {
         act_p( "$c1 смотрит на тебя!\n\r", rch, obj, ch, TO_VICT,POS_RESTING );
     }
-    else if (ch->gold < 20) {
-        tell_dim( ch, rch, "У тебя даже 20 золотых нету, чтобы мне заплатить!" );
+    else if (ch->gold < cost) {
+        tell_fmt("У тебя даже %3$d золот%3$Iого|ых|ых нету, чтобы мне заплатить!", ch, rch, cost );
         return;
     }
     else {
-       ch->gold -= 20;
-       ch->send_to("Твой кошелек становится значительно легче.\n\r");
+       ch->gold -= cost;
+       if ( cost > 0 ) ch->send_to("Твой кошелек становится значительно легче.\n\r");
     }
 
     act_p( "$c1 изучающе смотрит на $o4.", rch, obj, 0, TO_ROOM,POS_RESTING );
@@ -1296,7 +1319,7 @@ CMDRUNP( demand )
   if (ch->is_npc())
         return;
 
-  if (ch->getTrueProfession( ) != prof_anti_paladin)
+  if (ch->getProfession( ) != prof_anti_paladin)
     {
         ch->println( "Ты никого не запугаешь своим видом." );
       return;
@@ -1361,7 +1384,7 @@ CMDRUNP( demand )
   if ( !can_drop_obj( ch, obj ) )
     {
       do_say(victim,
-        "Эта вещь проклята, и я не могу избавиться от нее. Прости меня, повелитель.");
+        "Эта вещь проклята, и я не могу избавиться от нее.");
       return;
     }
 
@@ -1473,7 +1496,7 @@ static void do_score_args(Character *ch, const DLString &arg)
     } 
 	if (arg_oneof(arg, "religion", "религия")) {
         if (ch->getReligion() == god_none)
-            ch->pecho("Ты атеист.");
+            ch->pecho("Ты атеист%1$G||ка.", ch);
         else
             ch->pecho("Религия %s.", ch->getReligion()->getRussianName().ruscase('1').c_str());
         return;
@@ -1571,11 +1594,6 @@ CMDRUNP( score )
     Room *room = get_room_index( pch->getHometown( )->getAltar( ) );
     DLString profName = ch->getProfession( )->getNameFor( ch );
 
-    if (ch->getProfession( ) == prof_universal) 
-        profName << "+"
-                 << (pch->getSubProfession( ) != prof_none ? 
-                        pch->getSubProfession( )->getWhoNameFor( ch ) : "   ");
-        
     ostringstream name;
     DLString title = pch->getParsedTitle( );
     name << ch->seeName( ch, '1' ) << "{x ";
@@ -2205,7 +2223,7 @@ struct PermanentAffects {
     }
     
     void printAll() const {
-        print("У тебя иммунитет против", my_imm, imm_flags, '2');
+        print("У тебя иммунитет к", my_imm, imm_flags, '2');
         print("Ты обладаешь сопротивляемостью к", my_res, imm_flags, '3');
         print("Ты уязвим%1$Gо||а к", my_vuln, imm_flags, '3');
         print("Ты способ%1$Gно|ен|на обнаружить", my_det, detect_flags, '4');
@@ -2431,6 +2449,9 @@ CMDRUNP( help )
     std::basic_ostringstream<char> buf;
     DLString origArgument( argument );
 
+    if (!ch->getPC())
+        return;
+
     if (argument[0] == '\0') {
         if (ch->getConfig( )->rucommands)
             strcpy(argument, "summary_ru");
@@ -2472,12 +2493,29 @@ CMDRUNP( help )
     }
 
     // Several matches, display them all with numbers.
-    buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки:" << endl << endl;
-    for (unsigned int a = 0; a < articles.size(); a++) 
-        buf << "    {C{hh" << (a+1) << "." << origArgument << "{x : " << articles[a]->getAllKeywordsString() << endl;
+    buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
+    DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
+    for (unsigned int a = 0; a < articles.size(); a++) {
+	auto help = articles[a];
+        DLString title = help->getTitle(DLString::emptyString);
+	DLString disambig = help_article_disambig(*help);
+
+        // Create a line with help ID, title and disambiguation keywords (unless turned off).
+        DLString line = title;
+        if (!disambig.empty()) {
+            if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER) 
+                && !ch->getPC()->getAttributes().isAvailable("newhelp"))
+            {
+                line += " ({D" + disambig + "{x)"; 
+            }
+        }
+
+        buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
+    }
+
     buf << endl
-        << "Для выбора необходимого раздела используй {C? 1." << origArgument << "{x, {C? 2." << origArgument << "{x и так далее." 
-        << endl;
+        << "Для уточнения поиска введи {yсправка {Wномер{x{Iw или нажми на ссылку{x." << endl;
+    
 
     ch->send_to(buf.str().c_str());
 }                  
@@ -2665,45 +2703,45 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
             keyhole->doLore( buf );
         break;
     case ITEM_KEYRING:
-        buf << "Нанизано " << obj->value[1] << " ключей из возможных " << obj->value[0] << "." << endl;
+        buf << "Нанизано " << obj->value1() << " ключей из возможных " << obj->value0() << "." << endl;
         break;
     case ITEM_LOCKPICK:
-        if (obj->value[0] == Keyhole::LOCK_VALUE_BLANK) {
+        if (obj->value0() == Keyhole::LOCK_VALUE_BLANK) {
             buf << "Это заготовка для ключа или отмычки." << endl;
         }
         else {
-            if (obj->value[0] == Keyhole::LOCK_VALUE_MULTI)
+            if (obj->value0() == Keyhole::LOCK_VALUE_MULTI)
                 buf << "Открывает любой замок. ";
             else
                 buf << "Открывает один из видов замков. ";
             
             buf << "Отмычка " 
-                << quality_percent( obj->value[1] ).colourStrip( ).ruscase( '2' ) 
+                << quality_percent( obj->value1() ).colourStrip( ).ruscase( '2' ) 
                 << " качества." << endl;
         }
         break;
     case ITEM_SPELLBOOK:
-        buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
-            << "Максимальное качество заклинаний в книге: " << obj->value[2] << "." << endl;
+        buf << "Всего страниц: " << obj->value0() << ", из них использовано: " << obj->value1() << "." << endl
+            << "Максимальное качество заклинаний в книге: " << obj->value2() << "." << endl;
         break;
 
     case ITEM_TEXTBOOK:
-        buf << "Всего страниц: " << obj->value[0] << ", из них использовано: " << obj->value[1] << "." << endl
-            << "Максимальное качество записей в учебнике: " << obj->value[2] << "." << endl;
+        buf << "Всего страниц: " << obj->value0() << ", из них использовано: " << obj->value1() << "." << endl
+            << "Максимальное качество записей в учебнике: " << obj->value2() << "." << endl;
         break;
 
     case ITEM_RECIPE:
-        buf << "Сложность рецепта: " << obj->value[2] << ". " 
-            << "Применяется для создания " << recipe_flags.messages(obj->value[0], true) << "." << endl;
+        buf << "Сложность рецепта: " << obj->value2() << ". " 
+            << "Применяется для создания " << recipe_flags.messages(obj->value0(), true) << "." << endl;
         break;
 
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-        buf << "Заклинания " << obj->value[0] << " уровня:";
+        buf << "Заклинания " << obj->value0() << " уровня:";
 
         for (int i = 1; i <= 4; i++) 
-            if (( skill = SkillManager::getThis( )->find( obj->value[i] ) ))
+            if (( skill = SkillManager::getThis( )->find( obj->valueByIndex(i) ) ))
                 if (skill->getIndex( ) != gsn_none)
                     buf << " '" << skill->getNameFor( ch ) << "'";
         
@@ -2712,10 +2750,10 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     case ITEM_WAND:
     case ITEM_STAFF:
-        buf << "Имеет " << obj->value[2] << " заклинани" << GET_COUNT(obj->value[2], "е", "я", "й") << " " 
-            << obj->value[0] << " уровня:";
+        buf << "Имеет " << obj->value2() << " заклинани" << GET_COUNT(obj->value2(), "е", "я", "й") << " " 
+            << obj->value0() << " уровня:";
         
-        if (( skill = SkillManager::getThis( )->find( obj->value[3] ) ))
+        if (( skill = SkillManager::getThis( )->find( obj->value3() ) ))
             if (skill->getIndex( ) != gsn_none)
                 buf << " '" << skill->getNameFor( ch ) << "'";
 
@@ -2723,46 +2761,56 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         break;
 
     case ITEM_DRINK_CON:
-        liquid = liquidManager->find( obj->value[2] );
+        liquid = liquidManager->find( obj->value2() );
         int sips, sipsf;
-        sips = max( 0, obj->value[1] / liquid->getSipSize( ) );
-        sipsf = max( 0, obj->value[0] / liquid->getSipSize( ) );
+        sips = max( 0, obj->value1() / liquid->getSipSize( ) );
+        sipsf = max( 0, obj->value0() / liquid->getSipSize( ) );
 
-        if (sipsf * liquid->getSipSize( ) < obj->value[0]) {
+        if (sipsf * liquid->getSipSize( ) < obj->value0()) {
             sipsf +=1;
-            if (obj->value[1] > 0) sips +=1;
+            if (obj->value1() > 0) sips +=1;
         }
 
-        buf << "Содержит " 
-            << liquid->getShortDescr( ).ruscase( '4' ) << " "
-            << liquid->getColor( ).ruscase( '2' ) 
-            << " цвета. Осталось " << sips 
-            << " из "  << sipsf << " глотков." << endl;
+        if (obj->value1() > 0)
+            buf << "Содержит " 
+                << liquid->getShortDescr( ).ruscase( '4' ) << " "
+                << liquid->getColor( ).ruscase( '2' ) 
+                << " цвета. Осталось " << sips 
+                << " из "  << sipsf << " глотков." << endl;
+        else
+            buf << "Видны следы "
+                << liquid->getShortDescr( ).ruscase( '2' ) << " "
+                << liquid->getColor( ).ruscase( '2' ) << " цвета. " 
+                << fmt(0, "Объем емкости %1$d глот%1$Iок|ка|ков.", sipsf) << endl;
+
         break;
 
     case ITEM_CONTAINER:
-        buf << "Вместительность: " << obj->value[0] << "  "
-            << "Максим. вес: " << obj->value[3] << " фун" << GET_COUNT(obj->value[3], "т", "та", "тов") << " ";
+        buf << "Вместительность: " << obj->value0() << "  "
+            << "Максим. вес: " << obj->value3() << " фун" << GET_COUNT(obj->value3(), "т", "та", "тов") << " ";
         
-        if (obj->value[4] != 100)
-            buf << " Коэф. снижения веса: " << obj->value[4] << "%";
+        if (obj->value4() != 100)
+            buf << " Коэф. снижения веса: " << obj->value4() << "%";
             
-        if (obj->value[1])
-            buf << endl << "Особенности: " << container_flags.messages(obj->value[1], true );
+        if (obj->value1())
+            buf << endl << "Особенности: " << container_flags.messages(obj->value1(), true );
         
         buf << endl;
         break;
 
     case ITEM_WEAPON:
         buf << "Тип оружия: " 
-            << weapon_class.message(obj->value[0] ) << " "
-            << "(" << weapon_class.name( obj->value[0] ) << "), ";
+            << weapon_class.message(obj->value0() ) << " "
+            << "(" << weapon_class.name( obj->value0() ) << "), ";
         
-        buf << "повреждения " << obj->value[1] << "d" << obj->value[2] << " "
-            << "(среднее " << (1 + obj->value[2]) * obj->value[1] / 2 << ")" << endl;
+        buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
+            << "(среднее " << (1 + obj->value2()) * obj->value1() / 2 << ")" << endl;
+		    
+        if (obj->value3())  /* weapon damtype */
+            buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;		    
     
-        if (obj->value[4])  /* weapon flags */
-            buf << "Особенности оружия: " << weapon_type2.messages(obj->value[4], true ) << endl;
+        if (obj->value4())  /* weapon flags */
+            buf << "Особенности оружия: " << weapon_type2.messages(obj->value4(), true ) << endl;
 
         break;
 
@@ -2770,7 +2818,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         buf << "Класс брони: ";
 
         for (int i = 0; i <= 3; i++)
-            buf << obj->value[i] << " " << ac_type.message(i )
+            buf << -obj->valueByIndex(i) << " " << ac_type.message(i )
                 << (i == 3 ? "" : ", ");
 
         buf << endl;

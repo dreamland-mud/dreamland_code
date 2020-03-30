@@ -21,6 +21,7 @@ enum {
     OCC_TRAINER,
     OCC_CLANGUARD,
     OCC_ADEPT,
+    OCC_BATTLEHORSE,
     OCC_MAX,
 };
 

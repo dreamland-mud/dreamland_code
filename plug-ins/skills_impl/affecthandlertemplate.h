@@ -22,6 +22,10 @@ struct AffectHandlerTemplate : public DefaultAffectHandler, public ClassSelfRegi
     { 
         DefaultAffectHandler::remove( ch );
     } 
+    virtual void dispel( Character * ch ) 
+    { 
+        DefaultAffectHandler::dispel( ch );
+    } 
     virtual void remove( Object * obj) 
     { 
         DefaultAffectHandler::remove( obj );

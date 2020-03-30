@@ -687,6 +687,10 @@ OLCStateRoom::redit_create(PCharacter *ch, char *argument)
 
     if(!str_cmp(argument, "next")) {
         value = next_room(ch, pRoom);
+        if (value < 0) {
+            ch->println("Все внумы в этой зоне уже заняты!");
+            return 0;
+        }
     } else
         value = atoi(argument);
 
@@ -879,14 +883,11 @@ REDIT(eexit, "экстравыход", "редактор экстра-выход
             return false;
         }
 
-        LogStream::sendNotice() << "found eexit " << eed->keyword << endl;
-
         if (!pee)
             pRoom->extra_exit = eed->next;
         else
             pee->next = eed->next;
 
-        LogStream::sendNotice() << "pee " << pee << endl;
         free_extra_exit(eed);
 
         stc("Extra exit deleted.\n\r", ch);

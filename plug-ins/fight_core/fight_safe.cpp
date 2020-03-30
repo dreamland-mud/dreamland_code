@@ -36,16 +36,18 @@ CLAN(flowers);
 
 bool is_safe(Character *ch, Character *victim)
 {
-  if (is_safe_nomessage(ch,victim))
-    {
-      act_p("$C1 находится под защитой богов.",ch,0,victim,TO_CHAR,POS_RESTING);
-      act_p("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM,POS_RESTING);
+    if (!is_safe_nomessage(ch, victim))
+        return false;
 
-    if ( victim->fighting == ch ) stop_fighting (victim, false);
-    
-      return true;
+    if (ch && victim) {
+        act_p("$C1 находится под защитой богов.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("Боги защитили $C4 от $c2.",ch,0,victim,TO_ROOM,POS_RESTING);
+
+        if (victim->fighting == ch) 
+            stop_fighting (victim, false);
     }
-  else return false;
+
+    return true;
 }
 
 static bool mprog_safe( Character *ch, Character *victim ) 
@@ -93,7 +95,6 @@ bool is_safe_nomessage(Character *ch, Character *victim )
     // recurent victim pet to master
     if ( victim->is_npc()
         && IS_CHARMED(victim)
-        && victim->master != 0
         && !victim->master->is_npc() )
     {
         return is_safe_nomessage(ch,victim->master);
@@ -200,8 +201,11 @@ bool is_safe_rspell_nom( short level, Character *victim )
     if (is_safe_rspell( victim ))
         return true;
     
-    if (!is_in_pk_range( level, victim->getModifyLevel( ), 1 ))
+    if (!victim->is_npc() && !is_in_pk_range( level, victim->getModifyLevel( ), 1 ))
         return true;
+
+    if (victim->is_npc() && IS_CHARMED(victim) && !victim->master->is_npc())
+        return !is_in_pk_range( level, victim->master->getModifyLevel( ), 1 );
 
     return false;
 }

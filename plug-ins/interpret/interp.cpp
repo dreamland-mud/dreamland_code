@@ -25,6 +25,7 @@ bool interpret( Character *ch, const char *line )
         0
     };
 
+    iargs.d = ch->desc;
     iargs.ch = ch;
     iargs.line = line;
     iargs.phases = phases;
@@ -66,6 +67,7 @@ bool interpret_cmd( Character *ch, const char *cmd, const char *argsFormat, ... 
     vsprintf( args, argsFormat, ap );
     va_end( ap );
 
+    iargs.d = ch->desc;
     iargs.ch = ch;
     iargs.cmdName = cmd;
     iargs.cmdArgs = args;
@@ -96,6 +98,7 @@ void interpret_raw( Character *ch, const char *cmd, const char *format, ... )
     vsprintf( buf, format, ap );
     va_end( ap );
     
+    iargs.d = ch->desc;
     iargs.ch = ch;
     iargs.cmdName = cmd;
     iargs.cmdArgs = buf;

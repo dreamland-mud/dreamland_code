@@ -16,8 +16,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-PROF(universal);
-
 const char * SkillInfo::colorLearned( )
 {
     return color( learned );
@@ -28,9 +26,7 @@ const char * SkillInfo::colorReal( )
 }
 const char * SkillInfo::color( int x )
 {
-    if (forgetting)
-        return "{r";
-    else if (x == 1)
+    if (x <= 1)
         return "{R";
     else if (x >= maximum)
         return "{C";
@@ -62,18 +58,10 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
 
     if (arg_oneof( arg1, "help", "?", "помощь", "справка" )) {
         DLString what = fSpells ? "заклинания" : "умения";
-        if (ch->getProfession( ) == prof_universal) 
-            buf 
-            << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: все доступные сейчас у выбранной профессии "  << what << endl;
-        else            
-            buf 
-            << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: все доступные на этом уровне "  << what << endl;
+        buf 
+        << "        {y{lR" << rcmd << "{lE" << cmd << "{lx{w: все доступные на этом уровне "  << what << endl;
 
         buf << "        {y{lR" << rcmd << " все{lE" << cmd << " all{lx{w: доступные на всех уровнях "  << what << endl;
-
-        if (ch->getProfession( ) == prof_universal) 
-            buf 
-            << "        {y{lR" << rcmd << " текущ{lE" << cmd << " curr{lx{w: доступные на всех уровнях у выбранной профессии" << endl;
 
         buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <уровень>{w: " << what << ", которые появятся на этом уровне" << endl;
         buf << "        {y{lR" << rcmd << "{lE" << cmd << "{lx <уровень1> <уровень2>{w: " << what << ", которые появятся на этом диапазоне уровней" << endl;
@@ -179,13 +167,11 @@ void AllSkillsList::make( Character *ch )
 
         if (ch->is_npc( )) {
             info.learned = skill->getLearned( ch );
-            info.forgetting = false;
             info.adept = info.learned;
         }
         else {
             PCSkillData &data = ch->getPC( )->getSkillData( sn );
             info.learned = data.learned;
-            info.forgetting = data.forgetting;
             info.adept = skill->getAdept( ch->getPC( ) );
         }
         

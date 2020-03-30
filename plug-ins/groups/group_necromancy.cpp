@@ -58,7 +58,7 @@ void AdamantiteGolem::fight( Character *victim )
     if (!master
         || !master->fighting
         || master->is_npc( )
-        || master->getTrueProfession( ) != prof_necromancer)
+        || master->getProfession( ) != prof_necromancer)
         return;
     
     if (master->fighting->fighting != master)
@@ -245,8 +245,8 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         undead->master = ch;
         undead->leader = ch;
         
-        if (obj->value[3]) 
-            pCorpseOwner = get_mob_index( obj->value[3] );
+        if (obj->value3()) 
+            pCorpseOwner = get_mob_index( obj->value3() );
         
         if (pCorpseOwner && pCorpseOwner->sex != SEX_EITHER) 
             undead->setSex( pCorpseOwner->sex );

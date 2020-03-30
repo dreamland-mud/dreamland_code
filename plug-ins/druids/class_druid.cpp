@@ -38,8 +38,8 @@ VOID_SPELL(DruidStaff)::run( Character *ch, char *, int sn, int level )
     ch->println("Ты создаешь посох друида!");
     act("$c1 создает посох друида!",ch,0,0,TO_ROOM);
 
-    staff->value[1] = 4 + level / 15;
-    staff->value[2] = 4 + level / 15;
+    staff->value1(4 + level / 15);
+    staff->value2(4 + level / 15);
 
     tohit.where                   = TO_OBJECT;
     tohit.type               = sn;
@@ -92,7 +92,7 @@ bool DruidStaff::death( Character *ch )
 
 bool DruidStaff::canEquip( Character *ch )
 {
-  if (ch->getTrueProfession( ) != prof_druid) {
+  if (ch->getProfession( ) != prof_druid) {
         ch->println("Ты не знаешь как использовать эту вещь.");
         act( "$o1 выскальзывает из твоих рук.", ch, obj, 0, TO_CHAR );
         act( "$o1 выскальзывает из рук $c2.", ch, obj, 0, TO_ROOM );

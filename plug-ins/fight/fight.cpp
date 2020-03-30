@@ -80,13 +80,14 @@
 #include "gsn_plugin.h"
 #include "race.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "effects.h"
 #include "wiznet.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act_move.h"
 #include "magic.h"
 #include "vnum.h"
+#include "wearloc_utils.h"
 
 #include "onehit_undef.h"
 #include "damage_impl.h"
@@ -106,7 +107,6 @@ PROF(anti_paladin);
 PROF(ninja);
 PROF(ranger);
 PROF(samurai);
-PROF(universal);
 
 static bool mprog_fight( Character *ch, Character *victim )
 {
@@ -171,7 +171,7 @@ void violence_update( )
         {
             obj_next = obj->next_content;
 
-            if( ch->fighting )
+            if( ch->fighting && obj_is_worn(obj))
                 oprog_fight( obj, ch );
         }
 
@@ -190,12 +190,11 @@ struct second_weapon_t {
 const struct second_weapon_t second_weapon_table [] = {
 /*                  HAND EXOT SWRD DAG STF MACE AXE FLA WHI POLE BOW ARR LAN */
 { prof_warrior,     { 60, 45,  45, 90, 18, 18,  90, 18, 18, 18,  18, 18, 18 } },
-{ prof_paladin,     { 60, 45,  45, 90, 18, 45,  18, 18, 18, 90,  18, 18, 18 } },
-{ prof_anti_paladin,{ 45, 45,  45, 45, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
-{ prof_ninja,       { 90, 45,  45, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } }, 
-{ prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 18, 18,  18, 18, 18 } },
+{ prof_paladin,     { 60, 45,  45, 90, 18, 60,  18, 90, 18, 60,  18, 18, 18 } },
+{ prof_anti_paladin,{ 45, 45,  60, 60, 18, 18,  18, 45, 18, 18,  18, 18, 18 } },
+{ prof_ninja,       { 90, 45,  45, 90, 60, 18,  18, 18, 18, 18,  18, 18, 18 } }, 
+{ prof_ranger,      { 60, 45,  40, 90, 90, 18,  18, 18, 60, 18,  18, 60, 18 } },
 { prof_samurai,     { 60, 45,  90, 90, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
-{ prof_universal,   { 45, 45,  30, 45, 18, 18,  18, 18, 18, 18,  18, 18, 18 } },
 { prof_none,        { 0,                                                    } },
 };
 
@@ -215,12 +214,12 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     
     weapon = get_eq_char(ch, wear_second_wield);
     if (weapon && weapon->item_type == ITEM_WEAPON)
-        index = weapon->value[0] + 1;
+        index = weapon->value0() + 1;
   
     int chance_modifier = 18;
  
     for (int i = 0; second_weapon_table[i].prof != prof_none; i++) {
-        if (ch->getTrueProfession( ) == second_weapon_table[i].prof) {
+        if (ch->getProfession( ) == second_weapon_table[i].prof) {
             chance_modifier = second_weapon_table[i].percents[index];
             break;
         }

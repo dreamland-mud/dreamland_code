@@ -5,17 +5,117 @@
 #include "defaultprofession.h"
 #include "profflags.h"
 
+#include "stringlist.h"
 #include "grammar_entities_impl.h"
 #include "pcharacter.h"
+#include "skillmanager.h"
+#include "skill.h"
+#include "skillgroup.h"
 #include "alignment.h"
 #include "room.h"
-#include "race.h"
+#include "pcrace.h"
 #include "merc.h"
 #include "def.h"
 
-PROF(universal);
+GROUP(ancient_languages);
+GROUP(card_pack);
+GROUP(tattoo_master);
 
 static const DLString LABEL_CLASS = "class";
+
+const DLString ClassSkillHelp::TYPE = "ClassSkillHelp";
+
+DLString ClassSkillHelp::getTitle(const DLString &label) const
+{
+    // For help json dump.
+    if (!label.empty() && prof)
+        return "Умения " + prof->getRusName().ruscase('2');
+
+    // Default title if not set explicitly.
+    if (label.empty() && titleAttribute.empty() && prof)
+        return "Умения " + prof->getRusName().ruscase('2');
+
+    return HelpArticle::getTitle(label);
+}
+
+void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
+{
+    // True if it's a help json dump and not a player requesting the article.
+    bool autodump = ch->desc == 0;
+
+    in << "Умения и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
+       << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
+        
+    in << *this;
+
+    PCharacter dummy;
+    dummy.setLevel(100);
+    dummy.setProfession(prof->getName());
+
+    // Group all skills by the level they become available to this class.
+    map<int, StringList> myskills;
+    for (int i = 0; i < skillManager->size(); i++) {
+        Skill *skill = skillManager->find(i);
+        int mylevel = skill->getLevel(&dummy);
+
+        if (mylevel > LEVEL_MORTAL)
+            continue;
+        
+        if (skill->getGroup() == group_ancient_languages 
+            || skill->getGroup() == group_card_pack
+            || skill->getGroup() == group_tattoo_master)
+            continue;
+
+        DLString skillName;
+
+        // Show hyper-links to skills but only for json dump.
+        if (autodump) {
+            skillName << "{hh";
+            if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+                skillName << skill->getSkillHelp()->getID();
+            skillName << skill->getRussianName() << "{hx";
+
+        } else {
+            // For player interactive help, highlight available skills in green.
+            DLString color = ch && skill->visible(ch) ? "{g" : "{w";
+            skillName = color + skill->getNameFor(ch) + "{x";
+        }
+
+        myskills[mylevel].push_back(skillName);
+    }
+
+    for (auto &pair: myskills) {
+        in << "Уровень {C" << pair.first << "{x: " << pair.second.join(", ") << endl;
+    }
+}
+
+void ClassSkillHelp::save() const
+{
+    if (prof)
+        prof->save();
+}
+
+void ClassSkillHelp::setProfession( DefaultProfession::Pointer prof )
+{
+    this->prof = prof;
+    
+    addAutoKeyword(prof->getName( ) + " skills");
+    addAutoKeyword("умения " + prof->getRusName().ruscase('2'));
+    addAutoKeyword("умения " + prof->getMltName().ruscase('2'));
+    labels.addTransient(LABEL_CLASS);
+
+    helpManager->registrate( Pointer( this ) );
+}
+
+void ClassSkillHelp::unsetProfession( )
+{
+    helpManager->unregistrate( Pointer( this ) );
+    prof.clear( );
+    keywordsAuto.clear();
+    refreshKeywords();
+    labels.transient.clear();
+    labels.refresh();
+}
 
 /*-------------------------------------------------------------------
  * ProfessionHelp 
@@ -52,15 +152,22 @@ void ProfessionHelp::unsetProfession( )
 
 DLString ProfessionHelp::getTitle(const DLString &label) const
 {
-    if (prof)
+    // For help json dump.
+    if (!label.empty() && prof)
         return prof->getRusName().ruscase('1') + ", " + prof->getName();
+
+    // Default title if not set explicitly.
+    if (label.empty() && titleAttribute.empty() && prof)
+        return "Класс {c" + prof->getRusName().ruscase('1') + "{x, {c" + prof->getName() + "{x";
+
     return HelpArticle::getTitle(label);
 }
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
     in << "Профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
-       << prof->getName( ) << "{x" << endl << endl;
+       << prof->getName( ) << "{x" 
+       << editButton(ch) << endl << endl;
         
     in << *this << endl;
 
@@ -91,25 +198,46 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     in << endl;
 
     in << "{cДоп. опыт{x : " << prof->getPoints( ) << endl;
-        
-    in << endl << "{cБонус к уровню вещей{x: ";
-    if (prof->getIndex( ) == prof_universal) {
-        in << " (зависит от выбранной профессии)";
-    } else {
-        found = false;
-        for (int i = 0; i < item_table.size; i++) {
-            int m = prof->getWearModifier( i );
-            if (m != 0) {
-                if (found)
-                    in << ", ";
-                in << (m > 0 ? "+" : "") << m << " к " << item_table.message( i, '3' );
-                found = true;
-            }
+
+    StringList noraces, races;
+    for (int i = 0; i < raceManager->size(); i++) {
+        Race *race = raceManager->find(i);
+        if (race->isPC()) {
+            if (race->getPC()->getClasses()[prof->getIndex()] <= 0)
+                noraces.push_back(race->getMltName().ruscase('2'));
+            else
+                races.push_back(race->getMltName().ruscase('1'));
+        }
+    }
+    in << "{cРасы      {x: ";
+    if (noraces.empty())
+        in << "все";
+    else if (races.size() < noraces.size() || noraces.size() > 5)
+        in << "только " << races.join(", ");
+    else if (!races.empty())
+        in << "все, кроме " << noraces.join(", ");
+    else
+        in << "никто";
+    in << endl;
+    
+    in << "{cБонус к уровню вещей{x: ";
+    found = false;
+    for (int i = 0; i < item_table.size; i++) {
+        int m = prof->getWearModifier( i );
+        if (m != 0) {
+            if (found)
+                in << ", ";
+            in << (m > 0 ? "+" : "") << m << " к " << item_table.message( i, '3' );
+            found = true;
         }
     }
 
     in << endl;
-    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,профессия характеристики)]" << endl;
+    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,профессия характеристики)]. ";
+    if (prof->skillHelp && prof->skillHelp->getID() > 0)
+        in << "%SA% %H% [(" << prof->getName() << " skills,умения " 
+           << prof->getRusName().ruscase('2') << ")].";
+    in << endl;
 }
 
 /*-------------------------------------------------------------------
@@ -155,12 +283,18 @@ void DefaultProfession::loaded( )
 
     if (help)
         help->setProfession( Pointer( this ) );
+
+    if (skillHelp)
+        skillHelp->setProfession(Pointer(this));
 }
 
 void DefaultProfession::unloaded( )
 {
     if (help)
         help->unsetProfession( );
+
+    if (skillHelp)
+        skillHelp->unsetProfession();
 
     professionManager->unregistrate( Pointer( this ) );
 }
@@ -180,10 +314,6 @@ int DefaultProfession::getWeapon( ) const
 int DefaultProfession::getSkillAdept( ) const
 {
     return skillAdept.getValue( );
-}
-int DefaultProfession::getParentAdept( ) const
-{
-    return parentAdept.getValue( );
 }
 int DefaultProfession::getThac00( Character * ) const
 {

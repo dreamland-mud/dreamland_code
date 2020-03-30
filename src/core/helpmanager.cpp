@@ -14,7 +14,7 @@ const DLString HelpArticle::ATTRIBUTE_REF = "ref";
 const DLString HelpArticle::ATTRIBUTE_REFBY = "refby";
 const DLString HelpArticle::ATTRIBUTE_LABELS = "labels";
 const DLString HelpArticle::ATTRIBUTE_ID = "id";
-
+const DLString HelpArticle::ATTRIBUTE_TITLE = "title";
 
 HelpArticle::HelpArticle( ) 
                : areafile( NULL ),
@@ -50,7 +50,10 @@ int HelpArticle::getID() const
 
 DLString HelpArticle::getTitle(const DLString &label) const 
 {
-    return getAllKeywordsString();
+    if (!titleAttribute.empty())
+        return titleAttribute;
+    else
+        return getAllKeywordsString();
 }
 
 
@@ -64,6 +67,15 @@ void HelpArticle::save() const
     // Empty default impelemntation.
 }
 
+const DLString &HelpArticle::getTitleAttribute() const
+{
+    return titleAttribute;
+}
+
+void HelpArticle::setTitleAttribute(const DLString &title)
+{
+    this->titleAttribute = title;
+}
 
 const DLString &HelpArticle::getKeywordAttribute() const
 {
@@ -115,6 +127,9 @@ bool HelpArticle::toXML( XMLNode::Pointer &parent ) const
     if (!keywordAttribute.empty( ))
         parent->insertAttribute( ATTRIBUTE_KEYWORD, keywordAttribute );
 
+    if (!titleAttribute.empty())
+        parent->insertAttribute(ATTRIBUTE_TITLE, titleAttribute);
+
     if (level >= -1)
         parent->insertAttribute( ATTRIBUTE_LEVEL, DLString( level ) );
     
@@ -143,6 +158,7 @@ void HelpArticle::fromXML( const XMLNode::Pointer &parent )
     setKeywordAttribute(
         parent->getAttribute( ATTRIBUTE_KEYWORD ));
 
+    titleAttribute = parent->getAttribute(ATTRIBUTE_TITLE);
     parent->getAttribute( ATTRIBUTE_LEVEL, level);
     parent->getAttribute(ATTRIBUTE_ID, id);
     ref.fromString( parent->getAttribute( ATTRIBUTE_REF ) );

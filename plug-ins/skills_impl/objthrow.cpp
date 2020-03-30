@@ -52,7 +52,7 @@ static bool check_rock_catching( Character *victim, Object *obj )
 {
     if (obj->item_type != ITEM_WEAPON)
         return false;
-    if (obj->value[0] != WEAPON_STONE)
+    if (obj->value0() != WEAPON_STONE)
         return false;
     if (victim->size < SIZE_HUGE) 
         return false;
@@ -70,7 +70,7 @@ bool check_obj_dodge( Character *ch, Character *victim, Object *obj, int bonus )
         chance  = min( static_cast<short>( 30 ), victim->getModifyLevel() );
     else
     {
-        int prof = victim->getTrueProfession( );
+        int prof = victim->getProfession( );
 
         chance  = gsn_dodge->getEffective( victim ) / 2;
         chance += victim->getCurrStat(STAT_DEX) - 20;
@@ -200,12 +200,12 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
     int dam, sn, dam_type;
 
     if (arrow->item_type == ITEM_WEAPON)
-        dam_type = attack_table[arrow->value[3]].damage;
+        dam_type = attack_table[arrow->value3()].damage;
     else
         dam_type = DAM_BASH;
 
     sn = get_weapon_skill( arrow )->getIndex( );
-    dam = dice( arrow->value[1], arrow->value[2] );
+    dam = dice( arrow->value1(), arrow->value2() );
 
     if (ch->isAffected( gsn_accuracy ))
         dam *= 2;
@@ -218,7 +218,7 @@ static void arrow_damage( Object *arrow, Character *ch, Character *victim,
         short level;
         Affect *poison, af;
 
-        if ((poison = arrow->affected->affect_find(gsn_poison)) == 0)
+        if (!arrow->affected || (poison = arrow->affected->affect_find(gsn_poison)) == 0)
             level = arrow->level;
         else
             level = poison->level;

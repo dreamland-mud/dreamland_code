@@ -156,13 +156,9 @@ XMLRoom::init(Room *room)
 
     EXTRA_DESCR_DATA *pEd;
     for (pEd = room->extra_descr; pEd; pEd = pEd->next) {
-#if 0
-        extraDescr[pEd->keyword].setValue(pEd->description);
-#else
         extraDescr.push_back(XMLExtraDescr( ));
         extraDescr.back( ).keyword = pEd->keyword;
         extraDescr.back( ).setValue(pEd->description);
-#endif
     }
 
     manaRate.setValue(room->mana_rate_default);
@@ -229,16 +225,6 @@ XMLRoom::compat(int vnum)
         room->extra_exit = peexit;
     }
 
-#if 0
-    XMLMapBase<XMLString>::reverse_iterator edit;
-    for(edit = extraDescr.rbegin( ); edit != extraDescr.rend( ); edit++) {
-        EXTRA_DESCR_DATA *pEd = new_extra_descr( );
-        pEd->keyword = str_dup(edit->first.c_str( ));
-        pEd->description = str_dup(edit->second.getValue( ).c_str( ));
-        pEd->next = room->extra_descr;
-        room->extra_descr = pEd;
-    }
-#else
     XMLListBase<XMLExtraDescr>::reverse_iterator edit;
     for(edit = extraDescr.rbegin( ); edit != extraDescr.rend( ); edit++) {
         EXTRA_DESCR_DATA *pEd = new_extra_descr( );
@@ -247,7 +233,6 @@ XMLRoom::compat(int vnum)
         pEd->next = room->extra_descr;
         room->extra_descr = pEd;
     }
-#endif
 
     room->mana_rate_default = room->mana_rate = manaRate.getValue( );
     room->heal_rate_default = room->heal_rate = healRate.getValue( );

@@ -64,8 +64,14 @@ void RaceHelp::save() const
 
 DLString RaceHelp::getTitle(const DLString &label) const
 {
-    if (race)
+    // For help json dump.
+    if (!label.empty() && race)
         return race->getMltName().ruscase('1') + ", " + race->getName();
+
+    // Default title if not set explicitly.
+    if (label.empty() && titleAttribute.empty() && race)
+        return "Раса {c" + race->getMltName().ruscase('1') + "{x, {c" + race->getName() + "{x";
+
     return HelpArticle::getTitle(label);
 }
 
@@ -159,7 +165,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     // Pretend we have a dummy character of this race. Find out
     // all available race aptitude, professional and
     // non-professioal bonuses.
-    CommaSet prof100, noprof100, raceApt;
+    CommaSet prof100, noprof100, raceApt, lang;
 
     for (int sn = 0; sn < skillManager->size( ); sn++) {
         Skill *skill = skillManager->find( sn );
@@ -173,9 +179,18 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         if (skill->visible( &dummy )) {
             if (skill->getLearned( &dummy ) >= 100)
                 noprof100.insert( sname );
-            else if (skill->getGroup( ) != group_ancient_languages)
+            else if (skill->getGroup( ) == group_ancient_languages) {
+                int max = skill->getMaximum(&dummy);
+                int adept = skill->getAdept(&dummy);
+                if (max > adept) {
+                    DLString langName;
+                    langName << sname << " до " << max << "%";
+                    lang.insert(langName);
+                }
+            }
+            else
                 raceApt.insert( sname );
-        }            
+        }
 
         // Pretend we're every profession in a row and check
         // for professional 100% learned bonus.
@@ -201,8 +216,11 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     if (!noprof100.empty( )) {
         in << "{WБонусы независимо от профессии{x: " << noprof100 << endl;
     }
-
-    in << endl << "Подробнее обо всех параметрах читай в %H% [(race stats,раса характеристики)]" << endl;
+    if (!lang.empty()) {
+        in << "{WЗнание древних языков{x: " << lang << endl;
+    }
+    
+    in << endl << "Подробнее о значении каждого параметра расскажет %H% [расовые особенности]." << endl;
 }
 
 /* ------------------------------------------------------------------

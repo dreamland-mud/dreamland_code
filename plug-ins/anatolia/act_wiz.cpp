@@ -89,8 +89,8 @@
 #include "worldknowledge.h"
 #include "gsn_plugin.h"
 #include "npcharacter.h"
-#include "object.h"
-#include "handler.h"
+#include "core/object.h"
+#include "../anatolia/handler.h"
 #include "fread_utils.h"
 #include "stats_apply.h"
 #include "act_wiz.h"
@@ -181,26 +181,26 @@ char arg[MAX_STRING_LENGTH];
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-        fprintf( fp, "Level %d spells of:", obj->value[0] );
+        fprintf( fp, "Level %d spells of:", obj->value0() );
 
-        if ( obj->value[1] >= 0 && obj->value[1] < SkillManager::getThis( )->size() )
+        if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[1])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value1())->getName().c_str());
         }
 
-        if ( obj->value[2] >= 0 && obj->value[2] < SkillManager::getThis( )->size() )
+        if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[2])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value2())->getName().c_str());
         }
 
-        if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
         }
 
-        if (obj->value[4] >= 0 && obj->value[4] < SkillManager::getThis( )->size())
+        if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[4])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value4())->getName().c_str());
         }
 
         fprintf( fp,".\n");
@@ -208,18 +208,18 @@ char arg[MAX_STRING_LENGTH];
 
     case ITEM_WAND:
     case ITEM_STAFF:
-        fprintf(fp, "Has %d charges of level %d", obj->value[2], obj->value[0]);
+        fprintf(fp, "Has %d charges of level %d", obj->value2(), obj->value0());
 
-        if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+        if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
         {
-            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+            fprintf(fp, " '%s'", SkillManager::getThis( )->find(obj->value3())->getName().c_str());
         }
 
         fprintf( fp,".\n");
         break;
 
     case ITEM_DRINK_CON:
-        liquid = liquidManager->find( obj->value[2] );
+        liquid = liquidManager->find( obj->value2() );
         fprintf(fp,"It holds %s-colored %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
@@ -227,36 +227,36 @@ char arg[MAX_STRING_LENGTH];
 
     case ITEM_CONTAINER:
         fprintf(fp,"Capacity: %d#  Maximum weight: %d#  flags: %s\n",
-            obj->value[0], obj->value[3], container_flags.messages(obj->value[1]).c_str( ));
-        if (obj->value[4] != 100)
+            obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
+        if (obj->value4() != 100)
         {
             fprintf(fp,"Weight multiplier: %d%%\n",
-                obj->value[4]);
+                obj->value4());
         }
         break;
                 
     case ITEM_WEAPON:
          fprintf(fp,"Weapon type is %s\n", 
-                    weapon_class.name(obj->value[0]).c_str( ));
+                    weapon_class.name(obj->value0()).c_str( ));
                 
         if (obj->pIndexData->new_format)
             fprintf(fp,"Damage is %dd%d (average %d).\n",
-                obj->value[1],obj->value[2],
-                (1 + obj->value[2]) * obj->value[1] / 2);
+                obj->value1(),obj->value2(),
+                (1 + obj->value2()) * obj->value1() / 2);
         else
             fprintf( fp, "Damage is %d to %d (average %d).\n",
-                    obj->value[1], obj->value[2],
-                    ( obj->value[1] + obj->value[2] ) / 2 );
-        if (obj->value[4])  /* weapon flags */
+                    obj->value1(), obj->value2(),
+                    ( obj->value1() + obj->value2() ) / 2 );
+        if (obj->value4())  /* weapon flags */
         {
-            fprintf(fp,"Weapons flags: %s\n",weapon_type2.messages(obj->value[4]).c_str( ));
+            fprintf(fp,"Weapons flags: %s\n",weapon_type2.messages(obj->value4()).c_str( ));
         }
         break;
 
     case ITEM_ARMOR:
         fprintf( fp,
         "Armor class is %d pierce, %d bash, %d slash, and %d vs. magic.\n",
-            obj->value[0], obj->value[1], obj->value[2], obj->value[3] );
+            obj->value0(), obj->value1(), obj->value2(), obj->value3() );
         break;
     }
        for( paf=obj->pIndexData->affected; paf != 0; paf = paf->next )
@@ -330,12 +330,12 @@ CMDWIZP( limited )
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
-                        ch->send_to("Not found.\n\r");
+                        ch->send_to("Usage: limited <vnum>.\n\r");
                         return;
                 }
                 if ( obj_index->limit == -1 )
                 {
-                        ch->send_to("Thats not a limited item.\n\r");
+                        ch->send_to("That's not a limited item.\n\r");
                         return;
                 }
                 nMatch = 0;
@@ -346,11 +346,10 @@ CMDWIZP( limited )
                         obj_index->count );
                 buf[0] = Char::upper( buf[0] );
                 ch->send_to(buf);
-                ingameCount = 0;
+                ingameCount = obj_index->instances.size();
                 for (Object* obj=object_list; obj != 0; obj=obj->next )
                         if ( obj->pIndexData->vnum == obj_index->vnum )
                         {
-                                ingameCount++;
                                 if ( obj->carried_by != 0 && ch->can_see( obj->carried_by ) )
                                         sprintf(buf, "Carried by %-30s\n\r",
                                                 obj->carried_by->getNameP( ));
@@ -376,18 +375,13 @@ CMDWIZP( limited )
                 nMatch++;
                 if (obj_index->limit > 0 && obj_index->limit < 100)
                 {
-                    int inGame = 0;
-                    for (Object* obj=object_list; obj != 0; obj=obj->next )
-                            if ( obj->pIndexData->vnum == obj_index->vnum )
-                                inGame++;
-
                     struct limit_info info;
                     info.description = obj_index->short_descr;
                     info.level = obj_index->level;
                     info.vnum = obj_index->vnum;
                     info.limit = obj_index->limit;
                     info.count = obj_index->count;
-                    info.inGame = inGame;
+                    info.inGame = obj_index->instances.size();
                     limits.push_back(info);
                 }
         }
@@ -1082,7 +1076,7 @@ CMDWIZP( stat )
         ch->send_to(buf);
 
         sprintf( buf, "Values: %d %d %d %d %d\n\r",
-                obj->value[0], obj->value[1], obj->value[2], obj->value[3],        obj->value[4] );
+                obj->value0(), obj->value1(), obj->value2(), obj->value3(),        obj->value4() );
         ch->send_to(buf);
 
         // now give out vital statistics as per identify
@@ -1092,34 +1086,34 @@ CMDWIZP( stat )
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
-                sprintf( buf, "Level %d spells of:", obj->value[0] );
+                sprintf( buf, "Level %d spells of:", obj->value0() );
                 ch->send_to(buf);
 
-                if ( obj->value[1] >= 0 && obj->value[1] < SkillManager::getThis( )->size() )
+                if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[1])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value1())->getName().c_str());
                         ch->send_to("'");
                 }
 
-                if ( obj->value[2] >= 0 && obj->value[2] < SkillManager::getThis( )->size() )
+                if ( obj->value2() >= 0 && obj->value2() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[2])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value2())->getName().c_str());
                         ch->send_to("'");
                 }
 
-                if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+                if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value3())->getName().c_str());
                         ch->send_to("'");
                 }
 
-                if (obj->value[4] >= 0 && obj->value[4] < SkillManager::getThis( )->size())
+                if (obj->value4() >= 0 && obj->value4() < SkillManager::getThis( )->size())
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[4])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value4())->getName().c_str());
                         ch->send_to("'");
                 }
 
@@ -1129,13 +1123,13 @@ CMDWIZP( stat )
         case ITEM_WAND:
         case ITEM_STAFF:
                 sprintf( buf, "Has %d(%d) charges of level %d",
-                        obj->value[1], obj->value[2], obj->value[0] );
+                        obj->value1(), obj->value2(), obj->value0() );
                 ch->send_to(buf);
 
-                if ( obj->value[3] >= 0 && obj->value[3] < SkillManager::getThis( )->size() )
+                if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
                 {
                         ch->send_to(" '");
-                        ch->send_to(SkillManager::getThis( )->find(obj->value[3])->getName().c_str());
+                        ch->send_to(SkillManager::getThis( )->find(obj->value3())->getName().c_str());
                         ch->send_to("'");
                 }
 
@@ -1143,7 +1137,7 @@ CMDWIZP( stat )
                 break;
 
         case ITEM_DRINK_CON:
-                liquid = liquidManager->find( obj->value[2] );
+                liquid = liquidManager->find( obj->value2() );
                 sprintf(buf,"It holds %s-colored %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
@@ -1152,40 +1146,40 @@ CMDWIZP( stat )
                 
         case ITEM_WEAPON:
                 ch->send_to("Weapon type is ");
-                ch->send_to(weapon_class.name(obj->value[0]).c_str( ));
+                ch->send_to(weapon_class.name(obj->value0()).c_str( ));
                 ch->send_to("\n");
                 
                 if (obj->pIndexData->new_format)
                         sprintf(buf,"Damage is %dd%d (average %d)\n\r",
-                                obj->value[1],obj->value[2],(1 + obj->value[2]) * obj->value[1] / 2);
+                                obj->value1(),obj->value2(),(1 + obj->value2()) * obj->value1() / 2);
                 else
                         sprintf( buf, "Damage is %d to %d (average %d)\n\r",
-                                obj->value[1], obj->value[2],( obj->value[1] + obj->value[2] ) / 2 );
+                                obj->value1(), obj->value2(),( obj->value1() + obj->value2() ) / 2 );
                         ch->send_to(buf);
 
-                sprintf(buf,"Damage noun is %s.\n\r", weapon_flags.name(obj->value[3]).c_str( ));
+                sprintf(buf,"Damage noun is %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
                 ch->send_to(buf);
         
-                if (obj->value[4])  /* weapon flags */
+                if (obj->value4())  /* weapon flags */
                 {
-                        sprintf(buf,"Weapons flags: %s\n\r",weapon_type2.messages(obj->value[4]).c_str( ));
+                        sprintf(buf,"Weapons flags: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
                         ch->send_to(buf);
                 }
                 break;
 
         case ITEM_ARMOR:
                 sprintf( buf,"Armor class is %d pierce, %d bash, %d slash, and %d vs. magic\n\r",
-                        obj->value[0], obj->value[1], obj->value[2], obj->value[3] );
+                        obj->value0(), obj->value1(), obj->value2(), obj->value3() );
                 ch->send_to(buf);
                 break;
 
         case ITEM_CONTAINER:
                 sprintf(buf,"Capacity: %d#  Maximum weight: %d#  flags: %s\n\r",
-                        obj->value[0], obj->value[3], container_flags.messages(obj->value[1]).c_str( ));
+                        obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
                 ch->send_to(buf);
-                if (obj->value[4] != 100)
+                if (obj->value4() != 100)
                 {
-                        sprintf(buf,"Weight multiplier: %d%%\n\r",obj->value[4]);
+                        sprintf(buf,"Weight multiplier: %d%%\n\r",obj->value4());
                         ch->send_to(buf);
                 }
                 break;
@@ -1193,8 +1187,8 @@ CMDWIZP( stat )
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
                 ch->printf( "Steaks: %d, Level: %d, Parts: '%s', Vnum: %d\n\r",
-                            obj->value[0], obj->value[1], 
-                            part_flags.messages( obj->value[2] ).c_str( ), obj->value[3] );
+                            obj->value0(), obj->value1(), 
+                            part_flags.messages( obj->value2() ).c_str( ), obj->value3() );
                 break;
         }
 
@@ -1553,11 +1547,11 @@ static bool has_nopost(Character *ch)
             case TO_LOCATIONS: buf << "no rib "   << paf->global.toString( ) << ", "; break;
             case TO_SKILLS:    
                 buf << "skill " << (paf->location == APPLY_LEVEL ? "level" : "learned")
-                    << paf->global.toString() << " by " << paf->modifier << ", "; 
+                    << " " << paf->global.toString() << " by " << paf->modifier << ", "; 
                 break;
             case TO_SKILL_GROUPS:    
                 buf << "skill group " << (paf->location == APPLY_LEVEL ? "level" : "learned")
-                    << paf->global.toString() << " by " << paf->modifier << ", "; 
+                    << " " << paf->global.toString() << " by " << paf->modifier << ", "; 
                 break;
             }
         }
@@ -2174,14 +2168,14 @@ CMDWIZP( return )
         return;
     
     if ( !mob->switchedFrom ) {
-        ch->send_to("You aren't switched.\n\r");
+        ch->send_to("Ты и так в своем теле.\n\r");
         return;
     }
 
     if (mprog_return( mob ))
         return;
 
-    mob->send_to("You return to your original body. Type replay to see any missed tells.\n\r");
+    mob->send_to("Ты возвращаешься в своё привычное тело. Используй команду {y{hc{lRпрослушать{lEreplay{x для просмотра пропущенных сообщений.\n\r");
     ch->prompt.clear( );
 
     wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust( ), 
@@ -2193,21 +2187,6 @@ CMDWIZP( return )
     mob->desc = 0;
 }
 
-/* trust levels for load and clone */
-bool obj_check (Character *ch, Object *obj)
-{
-/*    if (IS_TRUSTED(ch,GOD)
-        || (IS_TRUSTED(ch,IMMORTAL) && obj->level <= 20 && obj->cost <= 1000)
-        || (IS_TRUSTED(ch,DEMI)            && obj->level <= 10 && obj->cost <= 500)
-        || (IS_TRUSTED(ch,ANGEL)    && obj->level <=  5 && obj->cost <= 250)
-        || (IS_TRUSTED(ch,AVATAR)   && obj->level ==  0 && obj->cost <= 100))
-        return true;
-    else
-        return false;*/
-    //by razer - nonense check        
-    return true;        
-}
-
 /* for clone, to insure that cloning goes many levels deep */
 void recursive_clone(Character *ch, Object *obj, Object *clone)
 {
@@ -2215,13 +2194,10 @@ void recursive_clone(Character *ch, Object *obj, Object *clone)
 
         for (c_obj = obj->contains; c_obj != 0; c_obj = c_obj->next_content)
         {
-                if (obj_check(ch,c_obj))
-                {
-                        t_obj = create_object(c_obj->pIndexData,0);
-                        clone_object(c_obj,t_obj);
-                        obj_to_obj(t_obj,clone);
-                        recursive_clone(ch,c_obj,t_obj);
-                }
+            t_obj = create_object(c_obj->pIndexData,0);
+            clone_object(c_obj,t_obj);
+            obj_to_obj(t_obj,clone);
+            recursive_clone(ch,c_obj,t_obj);
         }
 }
 
@@ -2277,12 +2253,6 @@ CMDWIZP( clone )
         {
                 Object *clone;
 
-                if (!obj_check(ch,obj))
-                {
-                        ch->send_to("Your powers are not great enough for such a task.\n\r");
-                        return;
-                }
-
                 clone = create_object(obj->pIndexData,0);
                 clone_object(obj,clone);
 
@@ -2325,14 +2295,11 @@ CMDWIZP( clone )
         
                 for (obj = mob->carrying; obj != 0; obj = obj->next_content)
                 {
-                        if (obj_check(ch,obj))
-                        {
-                                new_obj = create_object(obj->pIndexData,0);
-                                clone_object(obj,new_obj);
-                                recursive_clone(ch,obj,new_obj);
-                                obj_to_char(new_obj,clone);
-                                new_obj->wear_loc = obj->wear_loc;
-                        }
+                    new_obj = create_object(obj->pIndexData,0);
+                    clone_object(obj,new_obj);
+                    recursive_clone(ch,obj,new_obj);
+                    obj_to_char(new_obj,clone);
+                    new_obj->wear_loc = obj->wear_loc;
                 }
 
                 char_to_room(clone,ch->in_room);
@@ -3459,7 +3426,6 @@ CMDWIZP( advance )
         victim->max_move = 100;
         victim->practice = 0;
         victim->train    = 0;
-        victim->max_skill_points = 1000;
         victim->hit      = victim->max_hit;
         victim->mana     = victim->max_mana;
         victim->move     = victim->max_move;

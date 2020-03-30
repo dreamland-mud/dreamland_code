@@ -30,6 +30,9 @@ bool XMLAreaHelp::toXML( XMLNode::Pointer& parent ) const
     if (!keywordAttribute.empty( ))
         parent->insertAttribute( HelpArticle::ATTRIBUTE_KEYWORD, keywordAttribute );
 
+    if (!titleAttribute.empty())
+        parent->insertAttribute(HelpArticle::ATTRIBUTE_TITLE, titleAttribute);
+
     if (level >= -1)
         parent->insertAttribute( HelpArticle::ATTRIBUTE_LEVEL, DLString( level ) );
 
@@ -46,6 +49,7 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
 {
     XMLString::fromXML(parent);
     keywordAttribute = parent->getAttribute( HelpArticle::ATTRIBUTE_KEYWORD );
+    titleAttribute = parent->getAttribute(HelpArticle::ATTRIBUTE_TITLE);
     labels = parent->getAttribute(HelpArticle::ATTRIBUTE_LABELS);
     parent->getAttribute( HelpArticle::ATTRIBUTE_LEVEL, level );
     parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
@@ -60,6 +64,24 @@ void AreaHelp::save() const
 {
     if (areafile)
         SET_BIT(areafile->area->area_flag, AREA_CHANGED);
+}
+
+DLString AreaHelp::getTitle(const DLString &label) const
+{
+    ostringstream buf;
+    AREA_DATA *area = areafile->area;
+
+    if (!label.empty() || !titleAttribute.empty() || !selfHelp)
+        return MarkupHelpArticle::getTitle(label);
+
+    buf << "Зона {c" << area->name << "{x";
+
+    if (strlen(area->credits) > 0 
+            && str_str(area->credits, area->name) == 0
+            && str_str(area->name, area->credits) == 0)
+        buf << " ({c" << area->credits << "{x)";
+
+    return buf.str();
 }
 
 void AreaHelp::getRawText( Character *ch, ostringstream &in ) const

@@ -53,6 +53,9 @@ int immune_check(Character *ch, int dam_type, bitstring_t dam_flag)
     if (IS_SET(dam_flag, DAMF_MAGIC))
         immune_from_flags( ch, IMM_MAGIC, res );
 
+    if (IS_SET(dam_flag, DAMF_WATER))
+        immune_from_flags( ch, IMM_DROWNING, res );
+
     /* set bits to check -- VULN etc. must ALL be the same or this will fail */
     switch (dam_type)
     {

@@ -208,7 +208,7 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
         add_ac = -2;
     }
 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
         SET_BIT(obj->extra_flags,ITEM_MAGIC);
                 
     /* now add the enchantments */
@@ -390,7 +390,7 @@ VOID_SPELL(EnchantWeapon)::run( Character *ch, Object *obj, int sn, int level )
         added = 2;
     }
                 
-    if (ch->getTrueProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
+    if (ch->getProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
         SET_BIT(obj->extra_flags,ITEM_MAGIC);
 
     /* now add the enchantments */
@@ -619,13 +619,13 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    if (obj->value[0] >= 3 * level / 2)
+    if (obj->value0() >= 3 * level / 2)
     {
         ch->send_to("Тебе не хватает могущества для восстановления этих заклинаний.\n\r");
         return;
     }
 
-    if (obj->value[1] == 0)
+    if (obj->value1() == 0)
     {
         ch->send_to("Эти заклинания больше не могут быть восстановлены.\n\r");
         return;
@@ -633,9 +633,9 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     chance = 40 + 2 * level;
 
-    chance -= obj->value[0]; /* harder to do high-level spells */
-    chance -= (obj->value[1] - obj->value[2]) *
-              (obj->value[1] - obj->value[2]);
+    chance -= obj->value0(); /* harder to do high-level spells */
+    chance -= (obj->value1() - obj->value2()) *
+              (obj->value1() - obj->value2());
 
     chance = max(level/2,chance);
 
@@ -645,8 +645,8 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
     {
         act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_CHAR,POS_RESTING);
         act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_ROOM,POS_RESTING);
-        obj->value[2] = max(obj->value[1],obj->value[2]);
-        obj->value[1] = 0;
+        obj->value2(max(obj->value1(),obj->value2()));
+        obj->value1(0);
         return;
     }
 
@@ -657,23 +657,23 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
         act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_CHAR,POS_RESTING);
         act_p("$o1 слабо вспыхивает.",ch,obj,0,TO_CHAR,POS_RESTING);
 
-        chargemax = obj->value[1] - obj->value[2];
+        chargemax = obj->value1() - obj->value2();
 
         if (chargemax > 0)
             chargeback = max(1,chargemax * percent / 100);
         else
             chargeback = 0;
 
-        obj->value[2] += chargeback;
-        obj->value[1] = 0;
+        obj->value2(obj->value2() + chargeback);
+        obj->value1(0);
         return;
     }
 
     else if (percent <= min(95, 3 * chance / 2))
     {
         ch->send_to("Ничего не произошло.\n\r");
-        if (obj->value[1] > 1)
-            obj->value[1]--;
+        if (obj->value1() > 1)
+            obj->value1(obj->value1() - 1);
         return;
     }
 
@@ -707,8 +707,8 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
         return;
     }
 
-    if (obj->value[0] == WEAPON_MACE
-            || obj->value[0] == WEAPON_ARROW
+    if (obj->value0() == WEAPON_MACE
+            || obj->value0() == WEAPON_ARROW
             || IS_WEAPON_STAT(obj,WEAPON_TWO_HANDS))
     {
         ch->println("Ты не можешь создать булаву из этого оружия.");
@@ -739,8 +739,8 @@ VOID_SPELL(WeaponMorph)::run( Character *ch, char *target_name, int sn, int leve
         return;
     }
 
-    obj->value[0] = WEAPON_MACE;
-    obj->value[3] = DAMW_POUND;
+    obj->value0(WEAPON_MACE);
+    obj->value3(DAMW_POUND);
     obj->getRoom( )->echo( POS_RESTING, 
         "{W%1$^O1 окружа%1$nется|ются {Rярко-красной аурой{W и приобрета%1$nет|ют новую форму.{x", obj );
 

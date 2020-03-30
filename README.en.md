@@ -19,7 +19,7 @@ or build a ready-to-use Docker container, as described in [dreamland_docker](htt
 ## Install build and dev tools
 ```bash
 sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet vim
+sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util
 ```
 
 ## Install dependency libraries
@@ -56,6 +56,8 @@ Logs are available under /path/to/runtime/var/log.
 ```bash
 telnet localhost 9127
 ```
-user: Kadm
+user: Cadmus 
 password: KadmKadm
+
+This player is configured to have Russian skills/names/commands turned off in output, and is placed in room 31001 with English descriptions.
 

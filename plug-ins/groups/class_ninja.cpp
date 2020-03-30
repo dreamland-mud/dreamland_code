@@ -213,7 +213,7 @@ SKILL_RUNP( endure )
 {
   if (ch->is_npc())
     {
-      ch->send_to("Выносливость - не твой удел.\n\r");
+      ch->send_to("Выносливость -- не твой удел.\n\r");
       return;
     }
 
@@ -291,9 +291,9 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, chance, 100);
 
     if (mychance.reroll()) {
-        act_p("Ты {R+++СВОРАЧИВАШЬ ШЕЮ+++{x $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 {R+++СВОРАЧИВАЕТ ШЕЮ+++{x $C3!",ch,0,victim,TO_NOTVICT,POS_RESTING);
-        act_p("$c1 {R+++СВОРАЧИВАЕТ ШЕЮ+++{x тебе!",ch,0,victim,TO_VICT,POS_DEAD);
+        act_p("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
 

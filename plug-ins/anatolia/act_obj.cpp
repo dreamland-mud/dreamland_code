@@ -91,11 +91,6 @@ DESIRE(thirst);
 DESIRE(bloodlust);
 GSN(smell);
 
-
-bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
-long long get_arg_id( const DLString &cArgument );
-
-
 /*
  * find ':pocket' part of container name
  */
@@ -205,13 +200,13 @@ static void get_obj_on_victim( Character *ch, Character *victim, const char *arg
 /* RT part of the corpse looting code */
 static bool oprog_get_money( Character *ch, Object *obj )
 {
-    ch->silver += obj->value[0];
-    ch->gold += obj->value[1];
+    ch->silver += obj->value0();
+    ch->gold += obj->value1();
 
     if (IS_SET(ch->act,PLR_AUTOSPLIT))
-        if (obj->value[0] > 1 || obj->value[1])
+        if (obj->value0() > 1 || obj->value1())
             if (party_members_room( ch ).size( ) > 1)
-                interpret_raw( ch, "split", "%d %d", obj->value[0], obj->value[1] );
+                interpret_raw( ch, "split", "%d %d", obj->value0(), obj->value1() );
     
     extract_obj( obj );
     return true;
@@ -350,12 +345,12 @@ static bool oprog_can_fetch( Character *ch, Object *container, Object *obj, cons
         return oprog_can_fetch_corpse_pc( ch, container );
         
     case ITEM_CONTAINER:
-        if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
+        if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
             act("Тебе не удалось нашарить ни одного кармана у $o2.",ch,container,0,TO_CHAR);
             return false;
         }
         
-        if (IS_SET( container->value[1], CONT_CLOSED )) {
+        if (IS_SET( container->value1(), CONT_CLOSED )) {
             ch->pecho("%1$^O4 нужно сперва открыть.", container );
             return false;
         }
@@ -450,9 +445,9 @@ static bool get_obj_container( Character *ch, Object *obj, Object *container )
         break;
 
     case ITEM_CONTAINER:
-        if (IS_SET(container->value[1], CONT_PUT_ON)) 
+        if (IS_SET(container->value1(), CONT_PUT_ON)) 
             prep = "со";
-        else if (IS_SET(container->value[1], CONT_PUT_ON2)) 
+        else if (IS_SET(container->value1(), CONT_PUT_ON2)) 
             prep = "с";
         else
             prep = "из";
@@ -686,6 +681,9 @@ CMDRUNP( get )
                 return;
             }
             
+            if (!oprog_can_fetch( ch, container, obj, pocket ))
+                return;
+
             if (can_get_obj( ch, obj ))
                 get_obj_container( ch, obj, container );
         }
@@ -760,12 +758,12 @@ static bool can_put_into( Character *ch, Object *container, const DLString &pock
 {
     switch (container->item_type) {
     case ITEM_CONTAINER:
-        if (IS_SET(container->value[1], CONT_CLOSED)) {
+        if (IS_SET(container->value1(), CONT_CLOSED)) {
             ch->println( "Тут закрыто." );
             return false;
         }
 
-        if (!pocket.empty( ) && !IS_SET(container->value[1], CONT_WITH_POCKETS)) {
+        if (!pocket.empty( ) && !IS_SET(container->value1(), CONT_WITH_POCKETS)) {
             ch->println( "Тебе не удалось нашарить ни одного кармана." );
             return false;
         }
@@ -795,7 +793,7 @@ static bool can_put_money_into( Character *ch, Object *container )
         return false;
     }
 
-    if (IS_SET(container->value[1], CONT_CLOSED)) {
+    if (IS_SET(container->value1(), CONT_CLOSED)) {
         ch->pecho("%1$^O1 закрыт%1$Gо||а.", container);
         return false;
     }
@@ -824,7 +822,7 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
     pcount = count_obj_in_obj( container );
 
     if (container->item_type == ITEM_KEYRING) {
-        if (pcount >= container->value[0]) {
+        if (pcount >= container->value0()) {
             act( "На $o6 не осталось свободного места.", ch, container, 0, TO_CHAR );
             return PUT_OBJ_STOP;
         }
@@ -838,12 +836,12 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         return PUT_OBJ_OK;
     }
 
-    if (pcount > container->value[0]) {
+    if (pcount > container->value0()) {
         act_p("Опасно запихивать столько вещей в $o4!", ch,container,0, TO_CHAR,POS_RESTING);
         return PUT_OBJ_STOP;
     }
 
-    if (obj->getWeightMultiplier() != 100 && !IS_SET(container->value[1], CONT_NESTED)) {
+    if (obj->getWeightMultiplier() != 100 && !IS_SET(container->value1(), CONT_NESTED)) {
         if (verbose)
             ch->send_to("Наверное это была плохая идея.\n\r");
         return PUT_OBJ_ERR;
@@ -854,17 +852,17 @@ static int can_put_obj_into( Character *ch, Object *obj, Object *container, cons
         return PUT_OBJ_ERR;
     }
 
-    if (IS_SET(container->value[1],CONT_FOR_ARROW)
+    if (IS_SET(container->value1(),CONT_FOR_ARROW)
             && (obj->item_type != ITEM_WEAPON
-            || obj->value[0]  != WEAPON_ARROW ))
+            || obj->value0()  != WEAPON_ARROW ))
     {
         if (verbose)
             act_p("Ты можешь положить только стрелы в $o4.",ch,container,0,TO_CHAR,POS_RESTING);
         return PUT_OBJ_ERR;
     }
 
-    if (obj->getWeight( ) + container->getTrueWeight( ) > (container->value[0] * 10)
-        ||  obj->getWeight( ) > (container->value[3] * 10))
+    if (obj->getWeight( ) + container->getTrueWeight( ) > (container->value0() * 10)
+        ||  obj->getWeight( ) > (container->value3() * 10))
     {
         if (verbose)
             ch->pecho("%1$^O1 не сможет вместить в себя %2$O4.", container, obj);
@@ -942,19 +940,19 @@ static bool put_obj_container( Character *ch, Object *obj, Object *container,
             obj->pocket = pocket;
 
         toRoom << "$c1 кладет $o4 "
-               << (IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ?
+               << (IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ?
                              "на" : "в")
                << " $O4.";
         
         if (pocket.empty( ))
             toChar << "Ты кладешь $o4 "
-                   << (IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ?
+                   << (IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ?
                              "на" : "в")
                    << " $O4.";
         else {
             toChar << "Ты кладешь $o4 ";
 
-            if (IS_SET(container->value[1],CONT_PUT_ON|CONT_PUT_ON2)) {
+            if (IS_SET(container->value1(),CONT_PUT_ON|CONT_PUT_ON2)) {
                 toChar << "на $O4 в отделение '" << pocket << "'.";
             }
             else if (!container->can_wear(ITEM_TAKE)) {
@@ -1014,7 +1012,7 @@ void put_money_container(Character *ch, int amount, const char *currencyName, co
 
     if (!oprog_put_money_msg(container, ch, gold, silver)) {
         DLString moneyArg = describe_money(gold, silver, 4);
-        DLString preposition = IS_SET( container->value[1], CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
+        DLString preposition = IS_SET( container->value1(), CONT_PUT_ON|CONT_PUT_ON2 ) ? "на" : "в";
         ch->pecho("Ты кладешь %s %s %O4.", moneyArg.c_str(), preposition.c_str(), container);
         ch->recho("%^C1 кладет %s %O4 несколько монет.", ch, preposition.c_str(), container);
     }
@@ -1249,9 +1247,17 @@ CMDRUNP( drop )
             obj_to_room( obj, ch->in_room );
 
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )
-                act_p( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM,POS_RESTING);
-
-            ch->println( "Ты бросаешь несколько монет." );
+            {
+                if (obj->value0() == 1 || obj->value1() == 1)
+                 act_p( "$c1 бросает монетку.", ch, 0, 0, TO_ROOM,POS_RESTING);
+                else
+                 act_p( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM,POS_RESTING);
+            }
+         
+            if (obj->value0() == 1 || obj->value1() == 1)
+             ch->println( "Ты бросаешь монетку." );
+            else
+             ch->println( "Ты бросаешь несколько монет." );
         }
 
         return;
@@ -1717,7 +1723,7 @@ CMDRUNP( search )
         }
     }
 
-    ch->println("Ты можешь искать только камни(stones).");
+    ch->println("Ты можешь искать только камни (stones).");
 }
 
 CMDRUNP( throw )

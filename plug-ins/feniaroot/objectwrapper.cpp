@@ -14,7 +14,7 @@
 #include "occupations.h"
 #include "mercdb.h"
 #include "grammar_entities_impl.h"
-
+#include "personalquestreward.h"
 #include "objectwrapper.h"
 #include "roomwrapper.h"
 #include "characterwrapper.h"
@@ -310,7 +310,15 @@ NMI_SET( ObjectWrapper, owner , "имя персонажа-владельца (�
     target->setOwner( d.c_str() );
 }
 
-NMI_SET( ObjectWrapper, personal, "сделать вещь личной для персонажа по англ имени или null")
+NMI_GET( ObjectWrapper, personal, "установить или вернуть англ. имя собственника для личной вещи (или null)")
+{
+    checkTarget();
+    if (target->getOwner() && target->behavior && target->behavior.getDynamicPointer<PersonalQuestReward>())
+        return Register(target->getOwner());
+    return Register();
+}
+
+NMI_SET( ObjectWrapper, personal, "установить или вернуть англ. имя собственника для личной вещи (или null)")
 {
     checkTarget();
 
@@ -351,6 +359,11 @@ NMI_GET( ObjectWrapper, wear_loc, "имя локации, куда надет с
     return Register( target->wear_loc->getName( ) );
 }
 
+NMI_GET(ObjectWrapper, worn, "true если надето, но не на хвост и не в волосы")
+{
+    checkTarget();
+    return Register(obj_is_worn(target));
+}
 NMI_GET( ObjectWrapper, weightTotal, "вес предмета с учетом содержимого")
 {
     checkTarget( );
@@ -367,18 +380,18 @@ NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия
 {
     checkTarget( );
     if (target->item_type == ITEM_WEAPON)
-        return Register((1 + target->value[2]) * target->value[1] / 2);
+        return Register((1 + target->value2()) * target->value1() / 2);
     return Register(0);
 }
 
 #define SETGETVALUE(x) \
     NMI_GET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
         checkTarget( ); \
-        return Register( target->value[x]); \
+        return Register( target->value##x() ); \
     } \
     NMI_SET( ObjectWrapper, value##x, "поле value"#x", смысл зависит от типа предмета") { \
         checkTarget( ); \
-        target->value[x] = arg.toNumber(); \
+        target->value##x(arg.toNumber()); \
     }
         
 SETGETVALUE(0)
@@ -644,6 +657,22 @@ NMI_INVOKE( ObjectWrapper, affectAdd, "(aff): повесить на предме
     aw = wrapper_cast<AffectWrapper>( args.front( ) );
     aw->toAffect( af );
     affect_to_obj( target, &af );
+
+    return Register( );
+}
+
+NMI_INVOKE( ObjectWrapper, affectJoin, "(aff): усилить существующий аффект или повесить новый (.Affect)" )
+{
+    checkTarget( );
+    AffectWrapper *aw;
+    Affect af;
+    
+    if (args.empty( ))
+        throw Scripting::NotEnoughArgumentsException( );
+    
+    aw = wrapper_cast<AffectWrapper>( args.front( ) );
+    aw->toAffect( af );
+    affect_enhance( target, &af );
 
     return Register( );
 }

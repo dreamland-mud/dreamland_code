@@ -12,6 +12,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/follow/core \
 -I$(top_srcdir)/plug-ins/interpret \
 -I$(top_srcdir)/plug-ins/movement \
+-I$(top_srcdir)/plug-ins/occupations \
 -I$(top_srcdir)/plug-ins/help \
 -I$(top_srcdir)/plug-ins/command
 
@@ -27,6 +28,7 @@ libriding_la_LIBADD = \
 ../system/libscheduler_task_round.la \
 ../interpret/libinterpret.la \
 ../fight_core/libfight_core.la \
+../occupations/liboccupations.la \
 ../follow/core/libfollow_core.la \
 ../movement/libmovement.la \
 ../help/libhelp.la \

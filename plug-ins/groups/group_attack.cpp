@@ -180,9 +180,9 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
       dam = max((int)victim->hit, dice(level,4));
     if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL ) )
         dam /= 2;
-    if( ch->getTrueProfession( ) == prof_cleric ||
-        ch->getTrueProfession( ) == prof_paladin ||
-        ch->getTrueProfession( ) == prof_anti_paladin )
+    if( ch->getProfession( ) == prof_cleric ||
+        ch->getProfession( ) == prof_paladin ||
+        ch->getProfession( ) == prof_anti_paladin )
       dam *= 2;
 
     damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
@@ -217,9 +217,9 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
       dam = max((int)victim->hit, dice(level,4));
     if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
         dam /= 2;
-    if( ch->getTrueProfession( ) == prof_cleric ||
-        ch->getTrueProfession( ) == prof_paladin ||
-        ch->getTrueProfession( ) == prof_anti_paladin )
+    if( ch->getProfession( ) == prof_cleric ||
+        ch->getProfession( ) == prof_paladin ||
+        ch->getProfession( ) == prof_anti_paladin )
       dam *= 2;
 
     damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
@@ -358,7 +358,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
     int dam = 0;
     bool fail = true;
 
-   if (!saves_spell(level + 2,victim,DAM_FIRE,ch, DAMF_SPELL))
+   if (!saves_spell(level-2,victim,DAM_FIRE,ch, DAMF_PRAYER))
    {
         for ( obj_lose = victim->carrying;
               obj_lose != 0;
@@ -366,7 +366,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
         {
             obj_next = obj_lose->next_content;
             if ( number_range(1,2 * level) > obj_lose->level
-            &&   !saves_spell(level,victim,DAM_FIRE,ch, DAMF_SPELL)
+            &&   !saves_spell(level,victim,DAM_FIRE,ch, DAMF_PRAYER)
             &&   material_is_typed( obj_lose, MAT_METAL )
             &&   !IS_OBJ_STAT(obj_lose,ITEM_BURN_PROOF))
             {
@@ -376,7 +376,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                 if (obj_lose->wear_loc != wear_none) /* remove the item */
                 {
                     if (can_drop_obj(victim,obj_lose)
-                    &&  (obj_lose->weight / 10) <
+                    &&  (obj_lose->weight / 10) >
                         number_range(1,2 * victim->getCurrStat(STAT_DEX))
                     && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
@@ -384,7 +384,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                                 victim,obj_lose,0,TO_ROOM,POS_RESTING);
                         act_p("Ты кричишь от боли и бросаешь $o4 на землю!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
-                        dam += (number_range(1,obj_lose->level) / 3);
+                        dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
                         fail = false;
@@ -406,7 +406,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                                victim,obj_lose,0,TO_ROOM,POS_RESTING);
                         act_p("Ты кричишь от боли и бросаешь $o4 на землю!",
                                victim,obj_lose,0,TO_CHAR,POS_RESTING);
-                        dam += (number_range(1,obj_lose->level) / 6);
+                        dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
                         fail = false;
@@ -429,9 +429,9 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     if (can_drop_obj(victim,obj_lose)
                         && obj_lose->wear_loc->remove( obj_lose, 0 ))
                     {
-                        act_p("$o1 выпадает из обоженных рук $c2.",
+                        act_p("$o1 выпадает из обожженных рук $c2.",
                                victim,obj_lose,0,TO_ROOM,POS_RESTING);
-                        victim->send_to("Оружие выпадает из твоих обоженных рук!\n\r");
+                        victim->send_to("Оружие выпадает из твоих обожженных рук!\n\r");
                         dam += 1;
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose,victim->in_room);
@@ -450,7 +450,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     {
                         victim->pecho( "%1$^O1 раскаляется, и ты бросаешь %1$P2 на землю.", obj_lose );
                         victim->recho( "%1$^O1 раскаляется, и %2$C1 бросает %1$P2 на землю.", obj_lose, victim );
-                        dam += (number_range(1,obj_lose->level) / 6);
+                        dam += (number_range(1,obj_lose->level) / 2);
                         obj_from_char(obj_lose);
                         obj_to_room(obj_lose, victim->in_room);
                         fail = false;
@@ -470,14 +470,13 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
     }
     if (fail)
     {
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->send_to("Твоя попытка нагревания закончилась неудачей.\n\r");
         victim->send_to("Ты чувствуешь легкое прикосновение тепла.\n\r");
     }
     else /* damage! */
     {
-        if (saves_spell(level,victim,DAM_FIRE,ch, DAMF_SPELL))
-            dam = 2 * dam / 3;
-        damage_nocatch(ch,victim,dam,sn,DAM_FIRE,true, DAMF_SPELL);
+        dam = 2 * dam / 3;
+        damage_nocatch(ch,victim,dam,sn,DAM_FIRE,true, DAMF_PRAYER);
     }
 
 }
@@ -489,7 +488,7 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     PCMemoryInterface *pcm;
     PCharacter *victim;
 
-    if ((ch->getTrueProfession( ) != prof_cleric && ch->getTrueProfession( ) != prof_paladin)
+    if ((ch->getProfession( ) != prof_cleric && ch->getProfession( ) != prof_paladin)
         || IS_EVIL(ch)) 
     {
         ch->send_to("Ты не владеешь этой силой.\r\n");

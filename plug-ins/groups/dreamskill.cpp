@@ -16,7 +16,6 @@
 #include "def.h"
 
 CLAN(battlerager);
-PROF(universal);
 GROUP(fightmaster);
 GROUP(weaponsmaster);
 GROUP(defensive);
@@ -29,7 +28,6 @@ GROUP(maladictions);
 GROUP(protective);
 GROUP(benedictions);
 GROUP(curative);
-GROUP(harmful);
 GROUP(beguiling);
 GROUP(transportation);
 GROUP(creation);
@@ -161,9 +159,13 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
             << "Ты вряд ли вспомнишь детали, когда проснешься, за исключением одной молитвы:" << endl
             << "                   {c" << sname << "{x." << endl; 
     }
-    else if (skill->getGroup() == group_harmful) {
-        DLString relig = ch->getReligion() == god_none ? "неизвестное божество" : ch->getReligion()->getRussianName().ruscase('1');
-        buf << "Во сне " << relig << " как будто направляет твою руку, и ты повергаешь врагов молитвой {c" << sname << "{x." << endl;
+    else if (skill->getGroup() == group_attack) {
+        if (chance(50)) {	    
+            DLString relig = ch->getReligion() == god_none ? "неизвестное божество" : ch->getReligion()->getRussianName().ruscase('1');
+            buf << "Во сне " << relig << " как будто направляет твою руку, и ты повергаешь врагов молитвой {c" << sname << "{x." << endl;
+	} else {
+            buf << "Сила твоей веры во сне так сильна, что позволяет тебе сражать противников молитвой {c" << sname << "{x." << endl;
+	}
     }
     else if (skill->getGroup() == group_protective) {
         buf << "Прошептав во сне заклинание {c" << sname << "{x, ты отправляешься на битву с Лагом и, конечно же, побеждаешь его." << endl;
@@ -174,7 +176,6 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
             << "                    {c" << spell_utterance(skill) << "{x." << endl;
     }
     else if (skill->getGroup() == group_attack) {
-        buf << "Сила твоей веры во сне так сильна, что позволяет тебе сражать противников молитвой {c" << sname << "{x." << endl;
     }
     else if (skill->getGroup() == group_transportation) {
         buf << "И уносят тебя, и уносят тебя... три белых кентавра!" << endl
@@ -202,14 +203,11 @@ void DreamSkillManager::describeDream(PCharacter *ch, Skill *skill) const
 
 void DreamSkillManager::run( PCharacter *ch ) 
 {
-    // Exclude awake players, universals, newbies and player in mansions.
+    // Exclude awake players, newbies and player in mansions.
 
     if (ch->position != POS_SLEEPING)
         return;
     
-    if (ch->getProfession() == prof_universal)
-        return;
-
     if (ch->getRealLevel() < 20 && ch->getRemorts().size() == 0)
         return;
 

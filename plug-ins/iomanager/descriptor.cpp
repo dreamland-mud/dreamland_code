@@ -33,6 +33,7 @@
 #include "codepage.h"
 #include "comm.h"
 #include "outofband.h"
+#include "backdoorhandler.h"
 
 #include "char.h"
 #include "dreamland.h"
@@ -58,10 +59,10 @@ using namespace Scripting;
 
 template class EventHandler<WebEditorSaveArguments>;
 
-static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap utf2koi("utf-8", "koi8-r//IGNORE");
 
-static const char *MSG_FLUSH_BUF = "Buffer flushed.\r\n";
-const char *lid = "\n\r*** PUT A LID ON IT!!! ***\n\r";
+static const char *MSG_FLUSH_BUF = "Входящие команды очищены.\r\n";
+const char *lid = "\n\r*** ХВАТЫТ!!! ***\n\r";
 
 /*
  * Negotiated client terminal type.
@@ -93,10 +94,6 @@ bool Descriptor::checkStopSymbol( )
     if (!character)
         return false;
 
-    if (!character->is_npc() 
-        && character->getPC( )->getAttributes( ).isAvailable( "speedwalk" ))
-        return false;
-    
     if(inptr > 0)
         switch(inbuf[inptr-1]) {
             case '\r':
@@ -109,8 +106,24 @@ bool Descriptor::checkStopSymbol( )
     inptr = 0;
     *incomm = 0;
 
-    writeRaw((const unsigned char *)MSG_FLUSH_BUF, strlen(MSG_FLUSH_BUF));
+    if (!character->is_npc() && character->getPC()->getAttributes().isAvailable("speedwalk")) {
+        character->getPC()->getAttributes().eraseAttribute("speedwalk");
+    }
+
+    writeConverted(MSG_FLUSH_BUF);
     return true;
+}
+
+int Descriptor::writeConverted(const char *txt)
+{
+    DLString converted;
+
+    if (buffer_handler)
+        converted = buffer_handler->convert(txt);
+    else
+        converted = txt;
+
+    return writeRaw((const unsigned char *)converted.c_str(), converted.size());
 }
 
 int Descriptor::inputChar( unsigned char i )
@@ -125,7 +138,7 @@ int Descriptor::inputChar( unsigned char i )
 
     inbuf[sizeof(inbuf) - 1] = 0;
     LogStream::sendWarning( ) << host << " input overflow: " << inbuf << endl;
-    writeRaw((const unsigned char*)lid, strlen(lid));
+    writeConverted(lid);
     return -1;
 }
 
@@ -555,7 +568,10 @@ Descriptor::wsHandleNeg(unsigned char *buf, int rc)
                     LogStream::sendError( ) << "WebSock: Success! ID " << websock.nonce << endl;
                     sendVersion(this);
 
-                    NannyHandler::init(this);
+                    if (ServerSocketContainer::isBackdoor( control ))
+                        BackdoorHandler::init( this );
+                    else
+                        NannyHandler::init( this );
                 }
 
                 std::vector<unsigned char>(i+1, websock.frame.end()).swap(websock.frame);

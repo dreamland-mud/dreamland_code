@@ -177,11 +177,11 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     shoe->level = level;
 
     for (int j = 0; j < 4; j++)
-        if (level < 25)                shoe->value[j] = min( level , 15 );
-        else if (level < 60)        shoe->value[j] = max( 20, number_fuzzy( 20 ) );
-        else if (level < 80)        shoe->value[j] = max( 23, number_fuzzy( 23 ) );
-        else if (level < 90)        shoe->value[j] = max( 26, number_fuzzy( 26 ) );
-        else                        shoe->value[j] = max( 30, number_fuzzy( 30 ) );
+        if (level < 25)                shoe->valueByIndex(j, min( level , 15 ));
+        else if (level < 60)        shoe->valueByIndex(j,  max( 20, number_fuzzy( 20 ) ));
+        else if (level < 80)        shoe->valueByIndex(j, max( 23, number_fuzzy( 23 ) ));
+        else if (level < 90)        shoe->valueByIndex(j, max( 26, number_fuzzy( 26 ) ));
+        else                        shoe->valueByIndex(j, max( 30, number_fuzzy( 30 ) ));
 
     
     if (level < 10)                { hr = 1; dr = 1; }
@@ -398,8 +398,7 @@ void SharpSmithService::smith( Character *client, NPCharacter *smithman, Object 
 
     myprice->deduct( client );
     obj->level += 1;
-
-    SET_BIT( obj->value[4], WEAPON_SHARP );
+    obj->value4(obj->value4() | WEAPON_SHARP);
 
     act( "$C1 точит $o4 и возвращает тебе.", client, obj, smithman, TO_CHAR );
     act( "$C1 точит $o4 и возвращает $c3.", client, obj, smithman, TO_ROOM );
