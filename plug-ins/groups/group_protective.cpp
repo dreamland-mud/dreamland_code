@@ -476,12 +476,12 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-        if (IS_NEUTRAL(victim))
+    if (IS_NEUTRAL(victim))
     {
         if (victim == ch)
           act("Ты не можешь получить защиту от злых существ.", ch,0, 0,TO_CHAR);
         else
-          act("$C1 получает защиту от злых существ.", ch,0,victim,TO_CHAR);
+          act("$C1 не может получить защиту от злых существ.", ch,0,victim,TO_CHAR);
         return;
     }
 
