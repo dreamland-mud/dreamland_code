@@ -91,32 +91,32 @@ SKILL_RUNP( vanish )
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
     {
-        ch->send_to("Боги покинули тебя.\n\r");
+        ch->send_to("Из этого места нельзя исчезать.\n\r");
         return;
     }
 
     pRoomIndex = get_random_room_vanish( ch );
     
     if (!pRoomIndex) {
-        ch->send_to("Тебе некуда скрыться.\n\r");
+        ch->send_to("В этой зоне тебе некуда исчезать.\n\r");
         return;
     }
     
-  act_p( "$c1 бросает на землю небольшой шар.", ch, 0, 0, TO_ROOM,POS_RESTING);
-  ch->send_to("Ты бросаешь на землю небольшой шар.\r\n");
+  act_p( "$c1 бросает на землю небольшой шар. Яркая вспышка на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM,POS_RESTING);
+  ch->send_to("Ты бросаешь на землю небольшой шар. Яркая вспышка на мгновение ослепляет всех вокруг!\r\n");
 
   gsn_vanish->improve( ch, true );
 
   if (!ch->is_npc() && ch->fighting != 0 && number_bits(1) == 1)
   {
-    ch->send_to("Твоя попытка закончилась неудачей!\n\r");
+    ch->send_to("Противник бдительно следит за твоими движениями, тебе не удается исчезнуть!\n\r");
     return;
   }
     
     transfer_char( ch, ch, pRoomIndex,
-            "%1^C1 исчезает!",
-            "Ты исчезаешь!",
-            "%1^C1 появляется из ничего." );
+            "%1^C1 внезапно исчезает!",
+            "Пользуясь всеобщим замешательством, ты исчезаешь!",
+            "%1^C1 внезапно появляется у тебя за спиной." );
 }
 
 /*
@@ -155,7 +155,7 @@ SKILL_RUNP( nerve )
 
         if ( ch->isAffected(gsn_nerve) )
         {
-                ch->send_to("Ты не можешь сделать этого противника еще слабее.\n\r");
+                ch->send_to("Ты не можешь сделать противника еще слабее.\n\r");
                 return;
         }
 
@@ -166,17 +166,17 @@ SKILL_RUNP( nerve )
                                         + ch->getCurrStat(STAT_DEX))/2 )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
-                act_p("Ты ослабляешь $C4, пережимая нервные точки.",ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 ослабляет тебя, пережимая твои нервные точки.",ch,0,victim,TO_VICT,POS_RESTING);
+                act_p("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR,POS_RESTING);
+                act_p("$c1 ослабляет тебя, пережимая твои нервные окончания.",ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_nerve->improve( ch, true, victim );
         }
   else
         {
                 ch->send_to("Ты нажимаешь не туда, куда надо.\n\r");
-                act_p("$c1 нажимает пальцами на твое тело, но ничего не происходит.",
+                act_p("$c1 нажимает пальцами на твои нервные окончания, но ничего не происходит.",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 нажимает пальцами на тело $C2, но ничего не происходит.",
+                act_p("$c1 нажимает пальцами на нервные окончания $C2, но ничего не происходит.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_nerve->improve( ch, false, victim );
         }
@@ -219,7 +219,7 @@ SKILL_RUNP( endure )
 
   if ( gsn_endure->getEffective( ch ) <= 1 )
   {
-      ch->pecho("Похоже, ты не так вынослив%Gо||а, как о себе думаешь.", ch);
+      ch->send_to("Тебе недоступна техника выносливости.\n\r");
       return;
     }
 
@@ -291,8 +291,8 @@ void AssassinateOneHit::calcDamage( )
     Chance mychance(ch, chance, 100);
 
     if (mychance.reroll()) {
-        act_p("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C4!",ch,0,victim,TO_CHAR,POS_RESTING);
-        act_p("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C4!",ch,0,victim,TO_NOTVICT,POS_RESTING);
+        act_p("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$c1 {R+++ ЛОМАЕТ ШЕЮ +++{x $C3!",ch,0,victim,TO_NOTVICT,POS_RESTING);
         act_p("$c1 {R+++ ЛОМАЕТ ТЕБЕ ШЕЮ +++{x!",ch,0,victim,TO_VICT,POS_DEAD);
 
         gsn_assassinate->improve( ch, true, victim );
@@ -364,7 +364,7 @@ SKILL_RUNP( assassinate )
 
     if ( victim->is_immortal() && !victim->is_npc() )
     {
-            ch->send_to("С богами такие штучки не пройдут.\n\r");
+            ch->send_to("На Бессмертных это не подействует.\n\r");
             return;
     }
 
@@ -455,9 +455,9 @@ SKILL_RUNP( caltraps )
   if (is_safe(ch,victim))
     return;
 
-  act_p("Ты кидаешь пригорошню острых шипов под ноги $C3.",
+  act_p("Ты кидаешь пригоршню острых шипов под ноги $C3.",
          ch,0,victim,TO_CHAR,POS_RESTING);
-  act_p("$c1 кидает пригорошню острых шипов тебе под ноги!",
+  act_p("$c1 кидает пригоршню острых шипов тебе под ноги!",
          ch,0,victim,TO_VICT,POS_RESTING);
 
   ch->setWait( gsn_caltraps->getBeats( ) );
@@ -529,7 +529,7 @@ SKILL_RUNP( throwdown )
 
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Нельзя никого бросить, сидя в седле!\n\r");
+                ch->send_to("Эта техника броска не работает в седле.\n\r");
                 return;
         }
 
@@ -550,7 +550,7 @@ SKILL_RUNP( throwdown )
         if ( ( victim = ch->fighting ) == 0 )
         {
                 ch->send_to("Сейчас ты не сражаешься.\n\r");
-                return;
+                return; 
         }
 
         if (IS_CHARMED(ch) && ch->master == victim)
