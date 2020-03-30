@@ -441,7 +441,7 @@ static void lock_door( Character *ch, int door )
 
     if ( pexit->key <= 0 )
     {
-            ch->println( "Здесь нет замочной скважины." );
+            ch->println( "Здесь нет замочной скважины -- просто закрой дверь." );
             return;
     }
 
@@ -518,7 +518,7 @@ CMDRUNP( lock )
 
                 if (obj->value4() <= 0) 
                 {
-                    ch->println( "Здесь нет замочной скважины." );
+                    ch->println( "Здесь нет замочной скважины -- просто закрой." );
                     return;
                 }
 
@@ -549,7 +549,7 @@ CMDRUNP( lock )
 
             if ( obj->value2() < 0 )
             {
-                    ch->println( "Здесь нет замочной скважины." );
+                    ch->println( "Здесь нет замочной скважины -- просто закрой." );
                     return;
             }
             
@@ -622,7 +622,7 @@ CMDRUNP( lock )
 
         if ( peexit->key <= 0 )
         {
-                ch->println( "Здесь нет замочной скважины." );
+                ch->println( "Здесь нет замочной скважины -- просто закрой." );
                 return;
         }
 
@@ -670,7 +670,7 @@ static void unlock_door( Character *ch, int door )
 
     if ( pexit->key <= 0 )
     {
-            ch->println( "Здесь нет замочной скважины." );
+            ch->println( "Здесь нет замочной скважины -- просто открой." );
             return;
     }
 
@@ -740,7 +740,7 @@ CMDRUNP( unlock )
 
             if (obj->value4() <= 0)
             {
-                ch->println( "Здесь нет замочной скважины." );
+                ch->println( "Здесь нет замочной скважины -- просто открой." );
                 return;
             }
 
@@ -772,7 +772,7 @@ CMDRUNP( unlock )
 
             if ( obj->value2() < 0 )
             {
-                    ch->println( "Здесь нет замочной скважины." );
+                    ch->println( "Здесь нет замочной скважины -- просто открой." );
                     return;
             }
 
@@ -861,7 +861,7 @@ CMDRUNP( unlock )
 
         if ( peexit->key <= 0 )
         {
-                ch->println( "Здесь нет замочной скважины." );
+                ch->println( "Здесь нет замочной скважины -- просто открой." );
                 return;
         }
 
@@ -1078,7 +1078,7 @@ bool Keyhole::doPick( const DLString &arg )
         if (number_percent( ) >= gsn_pick_lock->getEffective( ch )
             && number_percent( ) > lockpick->value1()) 
         {
-            ch->pecho( "  ... но слишком резко надавив, ломаешь %1$P2!", lockpick );
+            ch->pecho( "  ... но, слишком резко надавив, ломаешь %1$P2!", lockpick );
             extract_obj( lockpick );
         }
         else
