@@ -476,12 +476,12 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-        if (!IS_GOOD(victim))
+        if (IS_NEUTRAL(victim))
     {
         if (victim == ch)
-          act("Светлые силы не будут тебя защищать!", ch,0, 0,TO_CHAR);
+          act("Ты не можешь получить защиту от злых существ.", ch,0, 0,TO_CHAR);
         else
-          act("Светлые силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
+          act("$C1 получает защиту от злых существ.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -493,9 +493,9 @@ VOID_SPELL(ProtectionEvil)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector = AFF_PROTECT_EVIL;
     affect_to_char( victim, &af );
-    victim->send_to("Ты чувствуешь защиту светлых сил.\n\r");
+    victim->send_to("Ты получаешь защиту от злых существ.\n\r");
     if ( ch != victim )
-        act_p("$C1 обретает защиту светлых сил.",
+        act_p("$C1 получает защиту от злых существ.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
@@ -517,12 +517,12 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
         return;
     }
 
-    if (!IS_EVIL(victim))
+    if (IS_NEUTRAL(victim))
     {
         if (victim == ch)
-          act("Темные силы не будут тебя защищать!", ch,0, 0,TO_CHAR);
+          act("Ты не можешь получить защиту от добрых существ.", ch,0, 0,TO_CHAR);
         else
-          act("Темные силы не будут защищать $C4.", ch,0,victim,TO_CHAR);
+          act("$C1 не может получить защиту от добрых существ.", ch,0,victim,TO_CHAR);
         return;
     }
 
@@ -534,9 +534,9 @@ VOID_SPELL(ProtectionGood)::run( Character *ch, Character *victim, int sn, int l
     af.modifier  = -1;
     af.bitvector = AFF_PROTECT_GOOD;
     affect_to_char( victim, &af );
-    victim->send_to("Ты чувствуешь защиту темных сил.\n\r");
+    victim->send_to("Ты получаешь защиту от добрых существ.\n\r");
     if ( ch != victim )
-        act_p("$C1 обретает защиту темных сил.",
+        act_p("$C1 получает защиту от добрых существ.",
                ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
