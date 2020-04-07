@@ -293,6 +293,11 @@ bool ExitsMovement::applyPassDoor( Character *wch )
     if (!IS_SET(exit_info, EX_CLOSED))
         return true;
 
+    if(movetype == MOVETYPE_RUNNING && !IS_SET(exit_info, EX_LOCKED)){
+        msgSelf( wch, "Ты просачиваешься сквозь %4$N4." );
+        return true;
+    }
+
     doorLevel = (peexit ? peexit->level : pexit->level);
 
     delta = 10;
