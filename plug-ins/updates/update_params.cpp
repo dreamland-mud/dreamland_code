@@ -32,10 +32,7 @@
 #include "merc.h"
 #include "def.h"
 
-GSN(trance);
-GSN(meditation);
 GSN(bandage);
-GSN(fast_healing);
 GSN(magic_concentrate);
 GSN(curl);
 
@@ -90,7 +87,8 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
             if (ch->hit < 1)
                 RawDamage( ch, ch, DAM_NONE, 1 ).hit( false );
         }
-
+        //trolls do not care much about corruption
+        if(ch->getRace()->getName() != "troll")
         return;
     }
 
@@ -101,12 +99,7 @@ void CharacterParamsUpdateTask::gainHitPoint( Character *ch )
     rate = ch->getProfession( )->getHpRate( );
     gain = (gain * rate) / 100;
     number = number_percent();
-
-    if ( number < gsn_fast_healing->getEffective( ch ) ) {
-        gain += number * gain / 100;
-        if ( ch->hit < ch->max_hit )
-            gsn_fast_healing->improve( ch, true );
-    }
+    gain += number * gain / 100;
 
     int k = std::max(1, ch->getCurrStat(STAT_CON) - 10);
 
@@ -192,18 +185,11 @@ void CharacterParamsUpdateTask::gainMana( Character *ch )
     gain = ( gain * rate ) / 100;
 
     number = number_percent();
+    gain += number * gain / 100;
 
-    if ( number < gsn_meditation->getEffective( ch ) ) {
+    if ( ch->getProfession()->getManaRate() > 70 )
         gain += number * gain / 100;
-        if ( ch->mana < ch->max_mana )
-            gsn_meditation->improve(ch, true);
-    }
 
-    if ( number < gsn_trance->getEffective( ch ) ) {
-        gain += number * gain / 100;
-        if ( ch->mana < ch->max_mana )
-            gsn_trance->improve(ch, true);
-    }
 
     if (rate < 70)
         gain /= 2;
@@ -316,6 +302,10 @@ void CharacterParamsUpdateTask::gainMove( Character *ch )
 
     if ( IS_HARA_KIRI(ch) )
         gain *= 3;
+
+    if(ch->getRace()->getName() == "troll"){
+        gain *= 2;
+    }
 
     if( ch->isAffected(gsn_bandage ) )
         gain += ch->getRealLevel( ) / 20;
