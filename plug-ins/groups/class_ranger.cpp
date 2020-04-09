@@ -1220,7 +1220,7 @@ AmbushOneHit::AmbushOneHit( Character *ch, Character *victim )
 void AmbushOneHit::calcDamage( ) 
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     damApplyDamroll( );
     dam *= 3;

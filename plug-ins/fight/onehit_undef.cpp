@@ -126,7 +126,7 @@ void UndefinedOneHit::calcDamage( )
 {
     damBase( );
     damApplyMasterHand( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyMasterSword( );
     damApplyPosition( );
     damApplyDamroll( );

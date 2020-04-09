@@ -25,7 +25,6 @@
 #include "def.h"
 
 GSN(rear_kick);
-GSN(enhanced_damage);
 
 /*----------------------------------------------------------------------------
  * Rear kick 
@@ -71,7 +70,7 @@ void RearKickOneHit::calcDamage( )
     int level = ch->getModifyLevel();
 
     damBase( ); 
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = (level < 50)
         ? (level / 10 + 1) * dam + level

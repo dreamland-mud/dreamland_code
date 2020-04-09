@@ -104,7 +104,7 @@ void VampiricBiteOneHit::damBase( )
 void VampiricBiteOneHit::calcDamage( )
 {
     damBase( ); 
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = ( ch->getModifyLevel( ) / 15 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
@@ -845,7 +845,7 @@ void BonedaggerOneHit::damApplyReligion()
 void BonedaggerOneHit::calcDamage( ) 
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     damApplyDamroll( );
     damApplyReligion();
