@@ -41,6 +41,7 @@ protected:
     virtual bool checkVisibility( Character * );
     virtual bool checkLawzone( Character * );
     virtual bool checkClosedDoor( Character * ) = 0;
+    virtual int getDoorStatus(Character *) = 0;
     virtual bool checkRoomCapacity( Character * );
     virtual bool checkGuild( Character * );
     virtual bool checkSafe( Character * );

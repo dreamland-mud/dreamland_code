@@ -19,7 +19,7 @@
 #include "pcharacter.h"
 #include "npcharacter.h"
 #include "room.h"
-#include "object.h"
+#include "core/object.h"
 #include "wearlocation.h"
 
 #include "affectflags.h"
@@ -160,50 +160,64 @@ bool ExitsMovement::canMove( Character *wch )
            && checkExtraExit( wch );
 }
 
-    
-bool ExitsMovement::checkClosedDoor( Character *wch )
+int ExitsMovement::getDoorStatus(Character *wch)
 {
     if (!IS_SET(exit_info, EX_CLOSED))
-        return true;
+        return RC_MOVE_OK;
         
     if (wch->get_trust( ) >= ANGEL)
-        return true;
-
-    if (IS_AFFECTED(wch, AFF_PASS_DOOR) && !IS_SET(exit_info, EX_NOPASS))
-        return true;
+        return RC_MOVE_PASS_ALWAYS;
 
     if (wch->is_mirror( ))
-        return true;
+        return RC_MOVE_PASS_ALWAYS;
             
     if (IS_GHOST( wch )) 
         if (!IS_SET(to_room->room_flags, ROOM_MANSION) 
             || IS_SET(from_room->room_flags, ROOM_MANSION))
-            return true;
+        return RC_MOVE_PASS_ALWAYS;
 
-    if (IS_AFFECTED(wch, AFF_PASS_DOOR) && IS_SET( exit_info, EX_NOPASS)) {
-        rc = RC_MOVE_PASS_NEVER;
+    if (IS_AFFECTED(wch, AFF_PASS_DOOR)) {
+        if (IS_SET(exit_info, EX_NOPASS))
+            return RC_MOVE_PASS_NEVER;
+        else
+            return RC_MOVE_PASS_POSSIBLE;
+    }
+
+    if (IS_SET(exit_info, EX_LOCKED))
+        return RC_MOVE_PASS_NEEDED;
+    else
+        return RC_MOVE_CLOSED;
+}
+
+bool ExitsMovement::checkClosedDoor( Character *wch )
+{
+    rc = getDoorStatus(wch);
+
+    if (rc == RC_MOVE_OK || rc == RC_MOVE_PASS_ALWAYS)
+        return true;
+
+    if (rc == RC_MOVE_PASS_NEVER) {
         msgSelfRoom( wch,
                      "Через %4$N4 невозможно пройти насквозь.",
                      "%2$^C1 стукается лбом о %4$N4." );
         return false;
     }
 
-    if (IS_SET(exit_info, EX_LOCKED)) {
-        rc = RC_MOVE_PASS_NEEDED;
-    } else if (movetype == MOVETYPE_RUNNING) {
-        // Attempt to open closed door when running.
-        rc = RC_MOVE_CLOSED;
+    // Attempt to open closed door when running.
+    if (movetype == MOVETYPE_RUNNING && pexit && !IS_SET(pexit->exit_info, EX_LOCKED)) 
+    {
         open_door(ch, door);
-        if (!IS_SET(pexit->exit_info, EX_CLOSED))
-            return true;
-    } else {
-        rc = RC_MOVE_CLOSED;
-    }
-        
+        rc = RC_MOVE_OK;
+        exit_info = pexit->exit_info;
+        return true;
+    } 
+
+    if (rc == RC_MOVE_PASS_POSSIBLE)
+        return true;
+
     msgSelfParty( wch,
                     "%4$^N1: тут закрыто.",
-                    "%4$^N1: тут закрыто." );
-    
+                    "%4$^N1: тут закрыто." );    
     return false;
 }
 

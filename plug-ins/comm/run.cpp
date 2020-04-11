@@ -188,15 +188,17 @@ protected:
 
     bool checkContinuousWay( )
     {
-        bool fOpenWay;
-        
         if (!pexit || !to_room)
             return false;
             
-        silence = true;
-        fOpenWay = checkVisibility( ch ) && checkClosedDoor( ch );
-        silence = false;
-        return fOpenWay;
+        if (!checkVisibility( ch ))
+            return false;
+            
+        rc = getDoorStatus( ch );
+        if (rc == RC_MOVE_OK || rc == RC_MOVE_CLOSED || rc == RC_MOVE_PASS_ALWAYS || rc == RC_MOVE_PASS_POSSIBLE)
+            return true;
+
+        return false;
     }
     
     XMLAttributeSpeedWalk::Pointer walk;

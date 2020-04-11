@@ -140,18 +140,27 @@ bool PortalMovement::moveAtomic( )
     return true;
 }
 
-bool PortalMovement::checkClosedDoor( Character *wch )
+int PortalMovement::getDoorStatus(Character *wch)
 {
     if (!IS_SET(portal->value1(), EX_CLOSED))
-        return true;
+        return RC_MOVE_OK;
         
     if (wch->get_trust( ) >= ANGEL)
-        return true;
+        return RC_MOVE_OK;
 
     if (IS_GHOST( wch ))
-        return true;
+        return RC_MOVE_OK;
     
-    rc = RC_MOVE_CLOSED;
+    return RC_MOVE_CLOSED;
+}
+
+bool PortalMovement::checkClosedDoor( Character *wch )
+{
+    rc = getDoorStatus(wch);
+    
+    if (rc == RC_MOVE_OK)
+        return true;
+
     msgSelfParty( wch, 
                   "%4$^O1: тут закрыто.",
                   "%4$^O1: тут закрыто." );
