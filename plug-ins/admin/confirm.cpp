@@ -338,7 +338,7 @@ void Confirm::doShow( Character *ch, DLString& argument )
             buf << "Reason: " << attr->reason.getValue( ) << endl;
     }
 
-    buf << endl << attr->description.getValue( ) << endl;
+    buf << endl << pci->getDescription() << endl;
     ch->send_to( buf );
 }
 
@@ -423,9 +423,6 @@ void XMLAttributeConfirm::run( Character *ch )
 
 void XMLAttributeConfirm::update( Character *ch ) 
 {
-    if (ch->getDescription( ))
-        description.setValue( ch->getDescription( ) );
-
     date.setTime( Date::getCurrentTime( ) );
     responsible.setValue( "" );
     reason.setValue( "" );
