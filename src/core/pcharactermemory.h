@@ -75,6 +75,9 @@ public:
     virtual const DLString& getLastAccessHost( ) const ;
     virtual void setLastAccessHost( const DLString& lastAccessHost ) ;
 
+    virtual const char * getDescription( ) const;
+    virtual void setDescription( const DLString& ); 
+
     virtual int getTrust( ) const ;
     virtual void setTrust( int trust ) ;
 
@@ -113,6 +116,7 @@ private:
     XML_VARIABLE XMLString password;
     XML_VARIABLE XMLDate lastAccessTime;
     XML_VARIABLE XMLString lastAccessHost;
+    XML_VARIABLE XMLString description;
     XML_VARIABLE XMLShort level;
     XML_VARIABLE XMLClanReference petition;
     XML_VARIABLE XMLClanReference clan;
