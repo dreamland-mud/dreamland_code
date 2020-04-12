@@ -78,17 +78,14 @@ wiznet( long flag, long flag_skip, int min_level, const char *fmt, ... )
 {
     Descriptor *d;
     PCharacter *pch;
-    va_list args;
-    DLString msg;
 
-    va_start( args, fmt );
-    msg = vfmt( NULL, fmt, args ).colourStrip( );
-    va_end( args );
-
-    if (flag != WIZ_RESETS)
+    if (flag != WIZ_RESETS) {
+        va_list args;
+        va_start( args, fmt );
+        DLString msg = vfmt( NULL, fmt, args ).colourStrip( );
+        va_end( args );
         LogStream::sendNotice( ) << "[wiznet:" << wiznet_name( flag ) << "] " << msg << endl;
-
-    msg << "\n\r";
+    }
 
     for ( d = descriptor_list; d != 0; d = d->next ) {
         if (d->connected != CON_PLAYING)
@@ -115,9 +112,14 @@ wiznet( long flag, long flag_skip, int min_level, const char *fmt, ... )
             continue;
 
         if (IS_SET(pch->wiznet, WIZ_PREFIX))
-            d->send( "--> " );
-        
-        d->send( msg.c_str( ) );
+            pch->send_to( "--> " );
+
+        va_list av;
+
+        va_start(av, fmt);
+        pch->vpecho(fmt, av);
+        pch->println("");
+        va_end(av);
     }
 }
 
