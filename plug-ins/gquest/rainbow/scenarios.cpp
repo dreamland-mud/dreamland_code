@@ -151,7 +151,7 @@ void RainbowDefaultScenario::onQuestFinish( PCharacter *ch ) const
     af.bitvector = RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
                    |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
                    |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
-                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON;
+                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON|RES_MITHRIL;
     af.location = 0;
     af.modifier = 0;
     affect_join(ch, &af);
@@ -231,7 +231,7 @@ void RainbowSinsScenario::onQuestFinish( PCharacter *ch ) const
     af.bitvector = RES_SUMMON|RES_CHARM|RES_SPELL|RES_WEAPON|RES_BASH
                    |RES_PIERCE|RES_SLASH|RES_FIRE|RES_COLD|RES_LIGHTNING
                    |RES_ACID|RES_NEGATIVE|RES_HOLY|RES_ENERGY|RES_MENTAL
-                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON;
+                   |RES_LIGHT|RES_WOOD|RES_SILVER|RES_IRON|RES_MITHRIL;
     af.location = 0;
     af.modifier = 0;
     affect_join(ch, &af);
