@@ -418,19 +418,22 @@ public:
         if (!iargs.cmdArgs.empty() || !Integer::tryParse(choice, iargs.cmdName)) {
             return true;
         }
-    
+
+        if (!ch->getPC()->getAttributes().isAvailable("menu"))
+            return true;
+
         // This choice is not from the latest menu.
         DLString menuAction = get_map_attribute_value(ch->getPC(), "menu", choice.toString());
         if (menuAction.empty()) {
-            ch->println("Такого выбора не было в меню.");
+            ch->println("Такого выбора не было в меню.");            
             return false;
         }
 
         // Substitute input command with remembered menu option, re-parse arguments.
-        iargs.line =menuAction;
+        iargs.line = menuAction;
         iargs.splitLine();
 
-        if (ch->isCoder()) 
+        if (ch->isCoder())
             ch->printf("Отладка: результат замены %s (%s).\r\n", iargs.cmdName.c_str(), iargs.cmdArgs.c_str());
         
         return true;
