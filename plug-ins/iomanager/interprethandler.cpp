@@ -54,6 +54,13 @@ static bool mprog_command( Character *ch, Character *actor, const DLString &cmdN
     return false;
 }
 
+static bool mprog_input( Character *ch, const DLString &line )
+{
+    FENIA_CALL(ch, "Input", "s", line.c_str());
+    FENIA_NDX_CALL(ch->getNPC( ), "Input", "Cs", ch, line.c_str());
+    return false;
+}
+
 static bool oprog_command( Object *obj, Character *actor, const DLString &cmdName, const DLString &cmdArgs )
 {
     FENIA_CALL(obj, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
@@ -144,6 +151,9 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     iargs.ch = d->character;
     iargs.line = arg;
     iargs.phases = phases;
+
+    if (mprog_input(iargs.ch, iargs.line))
+        return 0;
 
     CommandInterpreter::getThis( )->run( iargs );
 
