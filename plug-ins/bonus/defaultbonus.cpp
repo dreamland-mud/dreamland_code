@@ -59,6 +59,9 @@ bool DefaultBonus::available(PCharacter *ch) const
 
     if (!professions.empty( ) && !professions.isSet( ch->getProfession( ) ))
         return false;
+
+    if(ch->getRace()->getName() == "human" && getName() == "learning")
+        return false;
    
     return true; 
 }
