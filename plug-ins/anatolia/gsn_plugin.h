@@ -119,7 +119,6 @@ _GSN_( enchant_weapon );
 _GSN_( endure );
 _GSN_( energy_drain );
 _GSN_( enhanced_armor );
-_GSN_( enhanced_damage );
 _GSN_( entangle );
 _GSN_( envenom );
 _GSN_( escape );

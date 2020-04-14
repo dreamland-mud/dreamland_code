@@ -1641,11 +1641,6 @@ SKILL_RUNP( smash )
                     "Помогите! %1$^C1 сбивает меня с ног!" );
 }
 
-//delete this!!!
-SKILL_DECL( enhanceddamage );
-VOID_SKILL( enhanceddamage )::run( Character *ch, Character *victim, int &dam ) 
-{
-}
 /*
  * 'area attack' skill command
  */
