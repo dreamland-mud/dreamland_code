@@ -128,7 +128,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         }
         in << "{cРазмер{x    : " << size_table.message( r->getSize( ) ) << endl; 
         
-        in << "{cПрофессии{x : ";
+        in << "{cКлассы{x : ";
         bool found = false;
         for (int i = 0; i < professionManager->size( ); i++) {
             Profession *prof = professionManager->find( i );
@@ -141,9 +141,9 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
         }
         in << endl;
 
-        if (r->getPoints( ) > 0) {
+/*        if (r->getPoints( ) > 0) {
             in << "{cДоп. опыт{x : " << r->getPoints( ) << endl;
-        }
+        } */
 
         DLString res = imm_flags.messages( r->getRes( ), true, '1' );
         if (!res.empty( )) {
@@ -156,7 +156,7 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
 
         DLString aff = r->getAff( ).messages( true, '1' );
         if (!aff.empty( )) {
-            in << "{cАффекты{x   : " << aff << endl;
+            in << "{cВоздействия{x   : " << aff << endl;
         }
     }
 
@@ -208,19 +208,19 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     }
     
     if (!raceApt.empty( )) {
-        in << "{WРасовые cпособности{x: " << raceApt << endl;
+        in << "{WУникальные cпособности{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
         in << "{WБонусы на профессиональные умения{x: " << prof100 << endl;
     }
     if (!noprof100.empty( )) {
-        in << "{WБонусы независимо от профессии{x: " << noprof100 << endl;
+        in << "{WБонусные умения{x: " << noprof100 << endl;
     }
     if (!lang.empty()) {
         in << "{WЗнание древних языков{x: " << lang << endl;
     }
     
-    in << endl << "Подробнее о значении каждого параметра расскажет %H% [расовые особенности]." << endl;
+    in << endl << "Подробнее о значении каждого параметра читай %H% [расовые особенности]." << endl;
 }
 
 /* ------------------------------------------------------------------
