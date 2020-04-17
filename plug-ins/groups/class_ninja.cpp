@@ -126,44 +126,142 @@ SKILL_RUNP( vanish )
 SKILL_RUNP( nerve )
 {
         Character *victim;
+        int chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+        bool FightingCheck;
         char arg[MAX_INPUT_LENGTH];
+        
+        //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+        skill_mod   = 0.3;
+        stat_mod    = 0.05;
+        level_mod   = 0.01;
+        quick_mod   = 0.1;
+        size_mod    = -0.1; // HARDER to affect smaller victims, easier to affect larger
+        sleep_mod   = 0.1;
+        vis_mod     = 0.1;    
+    
+        //////////////// ELIGIBILITY CHECKS ////////////////
 
+        ///// Standard checks: TODO: turn this into a function
+    
         if ( MOUNTED(ch) )
         {
                 ch->send_to("Только не верхом!\n\r");
                 return;
         }
 
-        one_argument(argument,arg);
-
         if (!gsn_nerve->usable( ch ) )
         {
-                ch->send_to("Ты не владеешь этой техникой.\n\r");
+                ch->send_to("Ты не владеешь этим навыком.\n\r");
                 return;
         }
 
-        if (ch->fighting == 0)
+        // Needs at least one hand
+        const GlobalBitvector &loc = ch->getWearloc( );
+        if (!loc.isSet( wear_hands )
+        || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) )
         {
-                ch->send_to("Сейчас ты не сражаешься.\n\r");
+                ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+                return;
+        }
+    
+        if (ch->fighting != 0) {
+                FightingCheck = true;
+                victim = ch->fighting;
+        }
+        else
+                FightingCheck = false;
+
+        argument = one_argument(argument,arg);
+
+        if (arg[0] == '\0')
+        {               
+                if (!FightingCheck)
+                {
+                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        return;
+                }
+        }
+        else if ((victim = get_char_room(ch,arg)) == 0)
+        {
+                ch->send_to("Этого нет здесь.\n\r");
                 return;
         }
 
-        victim = ch->fighting;
-
-        if ( is_safe(ch,victim) )
+        if (is_safe(ch,victim))
+        {
+                act_p("Боги защитили $C4 от твоей атаки.",ch,0,victim,TO_CHAR,POS_RESTING);            
                 return;
+        }
 
-        if ( ch->isAffected(gsn_nerve) )
+        if (IS_CHARMED(ch) && ch->master == victim)
+        {
+                act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
+
+        if( !ch->is_npc() && !ch->move )
+        {
+                ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+                return;
+        }
+        else
+                ch->move -= move_dec( ch );
+
+        ///// Custom messages: TODO: move these to XML as well
+            
+        if (victim == ch)
+        {
+                ch->send_to("Ты трогаешь себя в нескольких неожиданных местах и довольно улыбаешься.\n\r");
+                return;
+        }
+            
+        if(SHADOW(ch))
+        {
+                ch->send_to("Твои пальцы проходят сквозь тень!\n\r");
+                act_p("$c1 пытается потрогать свою тень.",
+                                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }    
+
+        if ( victim->isAffected(gsn_nerve) )
         {
                 ch->send_to("Ты не можешь сделать противника еще слабее.\n\r");
                 return;
         }
 
+        if (IS_SET(victim->imm_flags, IMM_DISEASE))
+        {
+                act_p("$C1 обладает иммунитетом к этой технике.", ch, 0,
+                    victim, TO_CHAR,POS_RESTING);
+                return;
+        }            
+            
+        //////////////// PROBABILITY CHECKS ////////////////
+            
+        chance = 0;
+        
+        chance += gsn_nerve->getEffective( ch ) * skill_mod;
+        chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += (ch->size - victim->size) * size_mod * 100;
+        chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+        chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
+        if (IS_QUICK(ch))
+                chance += quick_mod * 100;
+        if (IS_QUICK(victim))
+                chance -= quick_mod * 100;            
+
+        if (IS_SET(victim->res_flags, RES_DISEASE))
+                chance = ( int )( chance * 0.5 );
+            
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+                chance = ( int )( chance * 0.5 );    
+
+        //////////////// THE ROLL ////////////////
+            
         ch->setWait( gsn_nerve->getBeats( )  );
 
-        if ( ch->is_npc()
-                || number_percent() < (gsn_nerve->getEffective( ch ) + ch->getModifyLevel()
-                                        + ch->getCurrStat(STAT_DEX))/2 )
+        if ( ch->is_npc() || number_percent() < chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
                 act_p("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR,POS_RESTING);
@@ -171,7 +269,7 @@ SKILL_RUNP( nerve )
                 act_p("$c1 ослабляет $C4",ch,0,victim,TO_NOTVICT,POS_RESTING);
                 gsn_nerve->improve( ch, true, victim );
         }
-  else
+        else
         {
                 ch->send_to("Ты нажимаешь не туда, куда надо.\n\r");
                 act_p("$c1 нажимает пальцами на твои нервные окончания, но ничего не происходит.",
@@ -181,7 +279,7 @@ SKILL_RUNP( nerve )
                 gsn_nerve->improve( ch, false, victim );
         }
 
-        if (!victim->fighting) {
+        if (!FightingCheck) {
             yell_panic( ch, victim,
                         "Помогите! Меня кто-то трогает!",
                         "Убери свои руки, %1$C1!" );
@@ -192,13 +290,23 @@ SKILL_RUNP( nerve )
 
 BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
 {
+    int level, skill, mod;
+    level = ch->getModifyLevel();
+    
+    if (gsn_nerve->usable( ch ) )
+        skill = gsn_nerve->getEffective( ch );
+    else
+        skill = 0;
+    
+    mod = -1 * (level/20 + skill/20 + 1);
+    
     Affect af;
     af.where    = TO_AFFECTS;
     af.type     = gsn_nerve;
-    af.level    = ch->getModifyLevel();
-    af.duration = ch->getModifyLevel() / 20;
+    af.level    = level;
+    af.duration = level / 20;
     af.location = APPLY_STR;
-    af.modifier = -3;
+    af.modifier = mod;
     af.bitvector = 0;
 
     affect_to_char(victim,&af);
