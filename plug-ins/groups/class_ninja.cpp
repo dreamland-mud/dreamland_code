@@ -398,21 +398,59 @@ AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
 
 void AssassinateOneHit::calcDamage( )
 {
-    int chance;
+    int chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
 
-    damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
-    damApplyPosition( );
+    //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+    skill_mod   = 0.08;
+    stat_mod    = 0.01;
+    level_mod   = 0.01;
+    quick_mod   = 0.1;
+    size_mod    = 0.03;
+    sleep_mod   = 0.05;
+    vis_mod     = 0.05;
+    time_mod    = 0.05;
     
+    //////////////// PROBABILITY CHECKS ////////////////
+            
+    chance = 0;
+        
+    chance += gsn_assassinate->getEffective( ch ) * skill_mod;
+    chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+    chance += (ch->size - victim->size) * size_mod * 100;
+    chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+    chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
+    if (IS_QUICK(ch))
+        chance += quick_mod * 100;
+    if (IS_QUICK(victim))
+        chance -= quick_mod * 100;            
+
+    if (IS_SET(victim->res_flags, RES_WEAPON))
+        chance = ( int )( chance * 0.5 );
+            
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        chance = ( int )( chance * 0.5 ); 
+    
+    // neckguard can't protect if you're asleep
+    if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
+        chance = ( int )( chance * 0.5 );    
+
+    // only check for assassinate spam without strangle
+    int k = ch->getLastFightDelay( );
+    if (k >= 0 && k < FIGHT_DELAY_TIME && IS_AWAKE( victim ))
+        chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
+        
+    UNSET_DEATH_TIME(ch);
+    victim->setLastFightTime( );
+    ch->setLastFightTime( );    
+    
+    chance = MAX( 1, chance ); // there's always a chance
+
     if (victim->is_immortal( ))
         chance = 0;
-    else if (IS_AWAKE( victim ))
-        chance = 10;
-    else { /* XXX */
-        chance = 5 + (ch->getModifyLevel( ) - victim->getModifyLevel( )) * 2;
-        chance = URANGE( 5, chance, 20 );
-    }
 
+    //////////////// THE ROLL ////////////////
+    
     Chance mychance(ch, chance, 100);
 
     if (mychance.reroll()) {
@@ -431,8 +469,10 @@ void AssassinateOneHit::calcDamage( )
         dam *= 2;
     }
 
+    damBase( );
+    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyPosition( );    
     damApplyDamroll( );
-
     WeaponOneHit::calcDamage( );
 }
 
@@ -444,6 +484,10 @@ SKILL_RUNP( assassinate )
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
 
+    //////////////// ELIGIBILITY CHECKS ////////////////
+
+    ///// Standard checks: TODO: turn this into a function    
+    
     if ( MOUNTED(ch) )
     {
             ch->send_to("Только не верхом!\n\r");
@@ -456,7 +500,7 @@ SKILL_RUNP( assassinate )
 
     if ( !ch->is_npc() && !gsn_assassinate->usable( ch ) )
     {
-            ch->send_to("Ты не имеешь понятия, как это делается.\n\r");
+            ch->send_to("Ты не имеешь понятия, как ломать шеи.\n\r");
             return;
     }
 
@@ -534,21 +578,19 @@ SKILL_RUNP( assassinate )
     if (gsn_rear_kick->getCommand( )->run( ch, victim ))
         return;
 
+    if(SHADOW(ch))
+    {
+            ch->send_to("Твои пальцы проходят сквозь тень!\n\r");
+            act_p("$c1 пытается сломать шею своей тени.",
+                    ch, 0, 0, TO_ROOM,POS_RESTING);
+            return;
+    }   
+    
     ch->setWait( gsn_assassinate->getBeats( )  );
-    AssassinateOneHit ass( ch, victim );
+    AssassinateOneHit ass( ch, victim );    
     
     try {
-        if ( ch->is_npc()
-                || number_percent( ) < (gsn_assassinate->getEffective( ch ) * 0.7) )
-        {
-                ass.hit( );
-        }
-        else
-        {
-                gsn_assassinate->improve( ch, false, victim );
-                ass.miss( );
-        }
-        
+        ass.hit( );       
         yell_panic( ch, victim,
                     "Помогите! Кто-то пытается УБИТЬ меня!",
                     "Помогите! %1$^C1 пытается УБИТЬ меня!" );
