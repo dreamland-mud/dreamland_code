@@ -188,8 +188,7 @@ SKILL_RUNP( nerve )
         }
 
         if (is_safe(ch,victim))
-        {
-                act_p("Боги защитили $C4 от твоей атаки.",ch,0,victim,TO_CHAR,POS_RESTING);            
+        {            
                 return;
         }
 
@@ -319,33 +318,51 @@ BOOL_SKILL(nerve)::run(Character *ch, Character *victim)
 
 SKILL_RUNP( endure )
 {
+    int level, skill, mod;    
+    
+  ///// Standard checks: TODO: turn this into a function
+    
+  if ( MOUNTED(ch) )
+  {
+        ch->send_to("Только не верхом!\n\r");
+        return;
+  }
+    
   if (ch->is_npc())
-    {
-      ch->send_to("Выносливость -- не твой удел.\n\r");
-      return;
-    }
+  {
+        ch->send_to("Выносливость -- не твой удел.\n\r");
+        return;
+  }
 
   if ( gsn_endure->getEffective( ch ) <= 1 )
   {
-      ch->send_to("Тебе недоступна техника выносливости.\n\r");
-      return;
-    }
+        ch->send_to("Тебе недоступна техника выносливости.\n\r");
+        return;
+  }
 
   if (ch->isAffected(gsn_endure))
     {
       ch->send_to("Ты не можешь стать еще выносливее.\n\r");
       return;
     }
-
-
+    
+    level = ch->getModifyLevel();
+    
+    if (gsn_endure->usable( ch ) )
+        skill = gsn_endure->getEffective( ch );
+    else
+        skill = 0;
+    
+    mod = -1 * (level/20 + skill/20 + 1); 
+    
     ch->setWait( gsn_endure->getBeats( )  );
-    gsn_endure->getCommand()->run(ch, -1 * (gsn_endure->getEffective( ch ) / 10));
+    gsn_endure->getCommand()->run(ch, mod);
     gsn_endure->improve( ch, true );
 }
 
 
 BOOL_SKILL(endure)::run(Character *ch, int modifier)
-{
+{      
     Affect af;
 
     af.where         = TO_AFFECTS;
@@ -358,8 +375,8 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 
     affect_to_char(ch,&af);
 
-    act("Ты готовишься к столкновению с магией.", ch, 0, 0, TO_CHAR);
-    act("$c1 мгновенно концентрируется.", ch,0,0,TO_ROOM);
+    act("Ты мгновенно концентрируешься, готовясь к столкновению с магией.", ch, 0, 0, TO_CHAR);
+    act("$c1 мгновенно концентрируется, готовясь к столкновению с магией.", ch,0,0,TO_ROOM);
     return true;
 }
 
