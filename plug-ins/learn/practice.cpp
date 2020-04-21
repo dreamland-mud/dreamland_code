@@ -161,7 +161,7 @@ void CPractice::pracHere( PCharacter *ch )
             return;
         }
 
-    buf << fmt( ch, "%1$^C1 может научить тебя таким навыкам:", teacher ) << endl;
+    buf << fmt( ch, "%1$^C1 может помочь тебе практиковаться в таких умениях:", teacher ) << endl;
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         ostringstream errbuf;
         Skill *skill = SkillManager::getThis( )->find( sn );
@@ -213,12 +213,12 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     skill = skillManager->find( sn );
 
     if (!skill) {
-        ch->printf("Умение %s не существует или еще тебе не доступно.\r\n", arg.c_str());
+        ch->printf("Умение {W%s{x не существует или еще тебе не доступно.\r\n", arg.c_str());
         return;
     }
 
     if (!skill->available(ch)) {
-        ch->printf("Умение '%s' тебе не доступно.\r\n", skill->getNameFor(ch).c_str());
+        ch->printf("Умение {W%s{x тебе не доступно.\r\n", skill->getNameFor(ch).c_str());
         return;
     }
 
@@ -226,7 +226,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
 
     if (!skill->canPractice( ch, buf )) {
         if (buf.str().empty())
-            ch->pecho("Ты не можешь выучить умение '%s'.", sname);
+            ch->pecho("Ты не можешь выучить умение {W%s{x.", sname);
         else
             ch->send_to(buf);
         return;
@@ -240,7 +240,7 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
         return;
 
     if (ch->practice <= 0) {
-        ch->send_to( "У тебя нет сессий практики (practice).\n\r");
+        ch->send_to( "У тебя сейчас нет сессий практики (practice).\n\r");
         return;
     }
 
@@ -249,7 +249,8 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     adept = skill->getAdept( ch );
 
     if (learned >= adept) {
-        ch->printf( "Ты уже знаешь искусство '%s'.\r\n", sname );
+        ch->printf( "Ты уже слишком хорошо владеешь умением {W%s{x, практиковаться бессмысленно.", sname );
+        ch->printf( "Чтобы овладеть умением еще лучше, просто применяй его почаще.\r\n", sname );        
         return;
     }
 
@@ -257,15 +258,16 @@ void CPractice::pracLearn( PCharacter *ch, DLString &arg )
     
     skill->practice( ch );
 
-    act("$c1 обучает тебя искусству '$t'.", teacher, sname, ch, TO_VICT);
-    act("Ты обучаешь $C4 искусству '$t'.", teacher, sname, ch, TO_CHAR);
-    act("$c1 обучает $C4 искусству '$t'.", teacher, sname, ch, TO_NOTVICT);
+    act("$c1 обучает тебя умению {W$t{x.", teacher, sname, ch, TO_VICT);
+    act("Ты обучаешь $C4 умению {W$t{x.", teacher, sname, ch, TO_CHAR);
+    act("$c1 обучает $C4 умению {W$t{x.", teacher, sname, ch, TO_NOTVICT);
     
     if (learned < adept)
-        ch->printf( "Ты теперь знаешь '%s' на %d процентов.\n\r", sname, learned );
+        ch->printf( "Ты теперь знаешь умение {W%s{x на %d процентов.\n\r", sname, learned );
     else {
-        act_p("Ты теперь знаешь '$t'.",ch, sname, 0, TO_CHAR, POS_RESTING);
-        act_p("$c1 теперь знает '$t'.",ch, sname, 0, TO_ROOM, POS_RESTING);
+        act_p("Теперь ты хорошо владеешь умением {W$t{x.",ch, sname, 0, TO_CHAR, POS_RESTING);
+        act_p("$c1 теперь хорошо владеет умением {W$t{x.",ch, sname, 0, TO_ROOM, POS_RESTING);
+        ch->printf( "Дальше практиковать не получится, просто начни применять его почаще.\r\n", sname );        
     }
 }
 
