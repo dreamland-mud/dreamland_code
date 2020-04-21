@@ -575,7 +575,8 @@ SKILL_RUNP( assassinate )
             return;
     }
 
-    if (gsn_rear_kick->getCommand( )->run( ch, victim ))
+    // strangled centaurs can't rearkick
+    if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
         return;
 
     if(SHADOW(ch))
@@ -589,6 +590,7 @@ SKILL_RUNP( assassinate )
     ch->setWait( gsn_assassinate->getBeats( )  );
     AssassinateOneHit ass( ch, victim );    
     
+    // assassination attempt can't "miss"
     try {
         ass.hit( );       
         yell_panic( ch, victim,
@@ -605,23 +607,136 @@ SKILL_RUNP( assassinate )
 
 SKILL_RUNP( caltraps )
 {
-  Character *victim = ch->fighting;
+  Character *victim;
+  int chance, skill_mod, stat_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+  bool FightingCheck;
+  char arg[MAX_INPUT_LENGTH];
+    
+  //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+  skill_mod   = 0.3;
+  stat_mod    = 0.05;
+  quick_mod   = 0.1;
+  size_mod    = -0.1; // HARDER to affect smaller victims, easier to affect larger
+  sleep_mod   = 0.1;
+  vis_mod     = 0.1;    
+    
+  //////////////// ELIGIBILITY CHECKS ////////////////
 
+  ///// Standard checks: TODO: turn this into a function
+    
   if (ch->is_npc() || !gsn_caltraps->usable( ch ))
-    {
-      ch->send_to("Шипами кидаться? Не выросли еще.\n\r");
-      return;
-    }
+  {
+        ch->send_to("Ты не владеешь этим навыком.\n\r");
+        return;
+  }
 
-  if (victim == 0)
-    {
-      ch->pecho("Для этого ты долж%Gно|ен|на с кем-то сражаться.", ch);
-      return;
-    }
+  // Needs at least one hand
+  const GlobalBitvector &loc = ch->getWearloc( );
+  if (!loc.isSet( wear_hands )
+  || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) )
+  {
+        ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+        return;
+  }
+    
+  if (ch->fighting != 0) {
+        FightingCheck = true;
+        victim = ch->fighting;
+   }
+    else
+        FightingCheck = false;
 
-  if (is_safe(ch,victim))
-    return;
+   argument = one_argument(argument,arg);
 
+   if (arg[0] == '\0')
+   {               
+        if (!FightingCheck)
+        {
+                ch->send_to("Сейчас ты не сражаешься!\n\r");
+                return;
+        }
+   }
+   else if ((victim = get_char_room(ch,arg)) == 0)
+   {
+        ch->send_to("Этого нет здесь.\n\r");
+        return;
+   }
+
+   if (is_safe(ch,victim))
+   {            
+        return;
+   }
+
+   if (IS_CHARMED(ch) && ch->master == victim)
+   {
+        act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
+   }
+
+   if( !ch->is_npc() && !ch->move )
+   {
+        ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
+        return;
+   }
+   else
+        ch->move -= move_dec( ch );
+
+   ///// Custom messages: TODO: move these to XML as well
+      
+   if (is_flying( victim ))
+   {
+        ch->send_to("Твои шипы не смогут навредить летучему противнику.\n\r");
+        return;
+   }      
+
+   if (victim == ch)
+   {
+        ch->send_to("Ты задумчиво колешь себя острым шипом в пятку. Ай!\n\r");
+        return;
+   }
+            
+   if(SHADOW(ch))
+   {
+        ch->send_to("Твои шипы проходят сквозь тень!\n\r");
+        act_p("$c1 бросает шипы под ноги собственной тени.",
+                ch, 0, 0, TO_ROOM,POS_RESTING);
+        return;
+   }    
+
+   if ( victim->isAffected(gsn_caltraps) )
+   {
+        ch->send_to("Противник уже хромает.\n\r");
+        return;
+   }
+
+   if (IS_SET(victim->imm_flags, IMM_PIERCE))
+   {
+        act_p("$C1 обладает иммунитетом к острым шипам.", ch, 0,
+                victim, TO_CHAR,POS_RESTING);
+        return;
+   }       
+
+   //////////////// PROBABILITY CHECKS ////////////////
+            
+   chance = 0;
+        
+   chance += gsn_caltraps->getEffective( ch ) * skill_mod;
+   chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
+   // chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100; // no level check for caltraps
+   chance += (ch->size - victim->size) * size_mod * 100;
+   chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+   chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
+   if (IS_QUICK(ch))
+        chance += quick_mod * 100;
+   if (IS_QUICK(victim))
+        chance -= quick_mod * 100;            
+
+   if (IS_SET(victim->res_flags, RES_PIERCE))
+        chance = ( int )( chance * 0.5 );
+          
+
+  //////////////// THE ROLL ////////////////      
+      
   act_p("Ты кидаешь пригоршню острых шипов под ноги $C3.",
          ch,0,victim,TO_CHAR,POS_RESTING);
   act_p("$c1 кидает пригоршню острых шипов тебе под ноги!",
@@ -629,19 +744,36 @@ SKILL_RUNP( caltraps )
 
   ch->setWait( gsn_caltraps->getBeats( ) );
 
-  if (!ch->is_npc() && number_percent() >= gsn_caltraps->getEffective( ch ))
-    {
-      damage(ch,victim,0,gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
-      gsn_caltraps->improve( ch, false, victim );
-      return;
-    }
-
-    gsn_caltraps->getCommand()->run(ch, victim);    
-    gsn_caltraps->improve( ch, true, victim );
+  if ( (!FightingCheck) && (IS_AWAKE( victim )) ) {
+       yell_panic( ch, victim,
+            "Помогите! Ай! Колется!!!",
+            "Убери свои чертовы шипы, %1$C1!" );
+        
+       multi_hit(victim,ch);
+  }
+      
+  if ( ch->is_npc() || number_percent() > chance )
+  {
+        damage(ch,victim,0,gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
+        gsn_caltraps->improve( ch, false, victim );
+        return;
+  }
+  gsn_caltraps->getCommand()->run(ch, victim);    
+  gsn_caltraps->improve( ch, true, victim );
 }
 
 BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 {
+    int level, skill, mod;
+    level = ch->getModifyLevel();
+    
+    if (gsn_caltraps->usable( ch ) )
+        skill = gsn_caltraps->getEffective( ch );
+    else
+        skill = 0;
+    
+    mod = -1 * (level/10 + skill/10 + 1);
+    
     try {
         damage_nocatch(ch,victim, ch->getModifyLevel(),gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
 
@@ -650,19 +782,19 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 
             tohit.where     = TO_AFFECTS;
             tohit.type      = gsn_caltraps;
-            tohit.level     = ch->getModifyLevel();
+            tohit.level     = level;
             tohit.duration  = -1;
             tohit.location  = APPLY_HITROLL;
-            tohit.modifier  = -5;
+            tohit.modifier  = mod;
             tohit.bitvector = 0;
             affect_to_char( victim, &tohit );
 
             todam.where = TO_AFFECTS;
             todam.type = gsn_caltraps;
-            todam.level = ch->getModifyLevel();
+            todam.level = level;
             todam.duration = -1;
             todam.location = APPLY_DAMROLL;
-            todam.modifier = -5;
+            todam.modifier = mod;
             todam.bitvector = 0;
             affect_to_char( victim, &todam);
 
@@ -670,12 +802,12 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
             todex.level = ch->getModifyLevel();
             todex.duration = -1;
             todex.location = APPLY_DEX;
-            todex.modifier = -5;
+            todex.modifier = mod/2;
             todex.bitvector = 0;
             affect_to_char( victim, &todex);
 
-            act_p("$C1 начинает хромать.",ch,0,victim,TO_CHAR,POS_RESTING);
-            act_p("Ты начинаешь хромать.",ch,0,victim,TO_VICT,POS_RESTING);
+            act_p("Острые шипы вонзаются в ступни $C2, стесняя движения и вызывая хромоту.",ch,0,victim,TO_CHAR,POS_RESTING);
+            act_p("Острые шипы вонзаются в твои ступни, стесняя движения и вызывая хромоту.",ch,0,victim,TO_VICT,POS_RESTING);
         }
     } catch (const VictimDeathException &) {
     }
