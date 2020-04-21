@@ -400,6 +400,12 @@ void sacrifice_at_altar(Character *ch, Object *altar, const char *arg)
         return;
     }
 
+    if(ch->getRace()->getName() == "human" && bonus->getName() == "learning") {
+        ch->pecho("Ты и так учишься быстрее других. Попроси божество об иной милости.");
+        return;
+    }
+
+
     if (attr->prevBonus == bonus->getIndex()) {
         ch->pecho("Не стоит просить %N4 об одном и том же два раза подряд - попроси %p2 о чем-то еще.", rname, religion.getSex());
         return;
