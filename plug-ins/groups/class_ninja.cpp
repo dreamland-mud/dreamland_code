@@ -126,7 +126,7 @@ SKILL_RUNP( vanish )
 SKILL_RUNP( nerve )
 {
         Character *victim;
-        int chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+        float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
         bool FightingCheck;
         char arg[MAX_INPUT_LENGTH];
         
@@ -158,7 +158,7 @@ SKILL_RUNP( nerve )
         // Needs at least one hand
         const GlobalBitvector &loc = ch->getWearloc( );
         if (!loc.isSet( wear_hands )
-        || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) )
+        || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
         {
                 ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
                 return;
@@ -238,13 +238,14 @@ SKILL_RUNP( nerve )
         //////////////// PROBABILITY CHECKS ////////////////
             
         chance = 0;
-        
+  
         chance += gsn_nerve->getEffective( ch ) * skill_mod;
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         chance += (ch->size - victim->size) * size_mod * 100;
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
-        chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
+        chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
+   
         if (IS_QUICK(ch))
                 chance += quick_mod * 100;
         if (IS_QUICK(victim))
@@ -259,7 +260,6 @@ SKILL_RUNP( nerve )
         //////////////// THE ROLL ////////////////
             
         ch->setWait( gsn_nerve->getBeats( )  );
-
         if ( ch->is_npc() || number_percent() < chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
@@ -398,7 +398,7 @@ AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
 
 void AssassinateOneHit::calcDamage( )
 {
-    int chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
+    float chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
     skill_mod   = 0.08;
@@ -444,7 +444,7 @@ void AssassinateOneHit::calcDamage( )
     victim->setLastFightTime( );
     ch->setLastFightTime( );    
     
-    chance = MAX( 1, chance ); // there's always a chance
+    chance = max( 1, chance ); // there's always a chance
 
     if (victim->is_immortal( ))
         chance = 0;
@@ -608,7 +608,7 @@ SKILL_RUNP( assassinate )
 SKILL_RUNP( caltraps )
 {
   Character *victim;
-  int chance, skill_mod, stat_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+  float chance, skill_mod, stat_mod, quick_mod, size_mod, sleep_mod, vis_mod;
   bool FightingCheck;
   char arg[MAX_INPUT_LENGTH];
     
@@ -633,7 +633,7 @@ SKILL_RUNP( caltraps )
   // Needs at least one hand
   const GlobalBitvector &loc = ch->getWearloc( );
   if (!loc.isSet( wear_hands )
-  || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) )
+  || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
   {
         ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
         return;
@@ -1198,4 +1198,3 @@ BOOL_SKILL( blindness )::run( Character *ch )
     }
     return true;
 }
-
