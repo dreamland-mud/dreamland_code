@@ -823,43 +823,77 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 SKILL_RUNP( throwdown )
 {
         Character *victim;
+        float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+        bool FightingCheck;
         char arg[MAX_INPUT_LENGTH];
-        int chance, dam;
 
+        //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+        skill_mod   = 0.6;
+        stat_mod    = 0.03;
+        level_mod   = 0.01;    
+        quick_mod   = 0.1;
+        size_mod    = 0.25; // much easier to throw smaller victims, much harder on larger
+        sleep_mod   = 0.05;
+        vis_mod     = 0.05; 
+
+        //////////////// ELIGIBILITY CHECKS ////////////////
+
+        ///// Standard checks: TODO: turn this into a function
+    
         if ( MOUNTED(ch) )
         {
-                ch->send_to("Эта техника броска не работает в седле.\n\r");
+                ch->send_to("Только не верхом!\n\r");
                 return;
         }
-
-        argument = one_argument(argument,arg);
 
         if ( ch->is_npc() || !gsn_throw->usable( ch ) )
         {
-                ch->send_to("Ты не умеешь бросать через плечо!\n\r");
+                ch->send_to("Ты не владеешь этим навыком.\n\r");
                 return;
         }
 
-        if (is_flying( ch ))
+        // Needs at least one hand
+        const GlobalBitvector &loc = ch->getWearloc( );
+        if (!loc.isSet( wear_hands )
+        || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
         {
-                ch->send_to("Твои ноги должны стоять на земле для упора.\n\r");
+                ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
                 return;
         }
-
-        if ( ( victim = ch->fighting ) == 0 )
-        {
-                ch->send_to("Сейчас ты не сражаешься.\n\r");
-                return; 
+    
+        if (ch->fighting != 0) {
+                FightingCheck = true;
+                victim = ch->fighting;
         }
+        else
+                FightingCheck = false;
 
-        if (IS_CHARMED(ch) && ch->master == victim)
+        argument = one_argument(argument,arg);
+
+        if (arg[0] == '\0')
+        {               
+                if (!FightingCheck)
+                {
+                        ch->send_to("Сейчас ты не сражаешься!\n\r");
+                        return;
+                }
+        }
+        else if ((victim = get_char_room(ch,arg)) == 0)
         {
-                act_p("Но $C1 твой друг!",ch,0,victim,TO_CHAR,POS_RESTING);
+                ch->send_to("Этого нет здесь.\n\r");
                 return;
         }
 
         if (is_safe(ch,victim))
+        {            
                 return;
+        }
+
+        if (IS_CHARMED(ch) && ch->master == victim)
+        {
+                act_p("Но $C1 твой друг!!!",ch,0,victim,TO_CHAR,POS_RESTING);
+                return;
+        }
 
         if( !ch->is_npc() && !ch->move )
         {
@@ -869,11 +903,67 @@ SKILL_RUNP( throwdown )
         else
                 ch->move -= move_dec( ch );
 
+        ///// Custom messages: TODO: move these to XML as well
+
+        if (is_flying( ch ))
+        {
+                ch->send_to("Твои ноги должны стоять на земле для упора.\n\r");
+                return;
+        }
+
+        if (victim == ch)
+        {
+                ch->send_to("Ты крепко обнимаешь себя и в экстазе падаешь на землю!\n\r");
+                return;
+        }
+            
+        if(SHADOW(ch))
+        {
+                ch->send_to("Твой захват проходит сквозь тень!\n\r");
+                act_p("$c1 пытается бросить через плечо свою тень.",
+                                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        } 
+
+        if (IS_SET(victim->imm_flags, IMM_BASH))
+        {
+                act_p("$C1 обладает иммунитетом к этой технике.", ch, 0,
+                    victim, TO_CHAR,POS_RESTING);
+                return;
+        }
+
+        //////////////// PROBABILITY CHECKS ////////////////
+            
+        chance = 0;
+  
+        chance += gsn_throw->getEffective( ch ) * skill_mod;
+        chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += (ch->size - victim->size) * size_mod * 100;
+        chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+        chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
+   
+        if (IS_QUICK(ch))
+                chance += quick_mod * 100;
+        if (IS_QUICK(victim))
+                chance -= quick_mod * 100;            
+
+        if (IS_SET(victim->res_flags, RES_BASH))
+                chance = ( int )( chance * 0.5 );
+            
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+                chance = ( int )( chance * 0.5 ); 
+        
+        if (is_flying( victim ))
+                chance -= 10;
+
+        //////////////// THE ROLL ////////////////
+    
         ch->setWait( gsn_throw->getBeats( )  );
 
         if (victim->isAffected(gsn_protective_shield))
         {
-                act_p("{YУ тебя не получилось добраться до $X.{x",
+                act_p("{YТвоя попытка броска наталкивается на защитный щит!{x",
                                         ch,0,victim, TO_CHAR,POS_FIGHTING);
                 act_p("{Y$c1 не смо$gгло|г|гла бросить тебя, натолкнувшись на защитный щит.{x",
                                         ch, 0, victim, TO_VICT,POS_FIGHTING);
@@ -882,28 +972,6 @@ SKILL_RUNP( throwdown )
                 return;
         }
 
-        chance = gsn_throw->getEffective( ch ) * 4 / 5;
-
-        if (ch->size < victim->size)
-                chance += (ch->size - victim->size) * 25;
-        else
-                chance += (ch->size - victim->size) * 10;
-
-        /* stats */
-        chance += ch->getCurrStat(STAT_STR);
-        chance -= victim->getCurrStat(STAT_DEX) * 4/3;
-
-        if (is_flying( victim ) )
-                chance -= 10;
-
-        /* speed */
-        if (IS_QUICK(ch))
-                chance += 10;
-        if (IS_QUICK(victim))
-                chance -= 20;
-
-        /* level */
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
 
         if ( ch->is_npc() || number_percent() < chance )
         {
@@ -914,14 +982,20 @@ SKILL_RUNP( throwdown )
                         ch,0,victim,TO_VICT,POS_RESTING);
                 act_p("$c1 бросает $C4 с ошеломляющей силой.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
-                victim->setWaitViolence( 2 );
+                victim->setWaitViolence( 2 + max(2, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR)) );
 
                 victim->position = POS_RESTING;
+                if (is_flying( victim )) {
+                    victim->posFlags.setBit( POS_FLY_DOWN );
+                    victim->println( "Ты перестаешь летать." );
+                    victim->recho( "%^C1 перестает летать.", victim ); 
+                }    
             }
             else {
                 act("Ты бросаешь $C4 через плечо.", ch,0,victim,TO_CHAR);
                 act("$c1 бросает тебя через плечо.", ch,0,victim,TO_VICT);
                 act("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
+                victim->position = POS_RESTING;
             }        
 
             dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
@@ -934,9 +1008,17 @@ SKILL_RUNP( throwdown )
         {
             act( "Твой бросок не удался.", ch, 0, 0, TO_CHAR);
             act( "$C1 пытается бросить тебя, но терпит неудачу.", victim, 0, ch,TO_CHAR);
-            act( "$c1 пытается ухватиться за $C4 поудобнее. Но безуспешно.", ch, 0, victim, TO_NOTVICT);
+            act( "$c1 пытается ухватиться за $C4 поудобнее, но терпит неудачу.", ch, 0, victim, TO_NOTVICT);
             gsn_throw->improve( ch, false, victim );
         }
+
+        if (!FightingCheck) {
+            yell_panic( ch, victim,
+                        "Помогите! Меня кто-то хватает!",
+                        "Убери свои руки, %1$C1!" );
+        
+            multi_hit(victim,ch);
+        }    
 }
 
 /*
