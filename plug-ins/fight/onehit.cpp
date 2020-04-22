@@ -33,6 +33,7 @@
 
 GSN(shadow_shroud);
 GSN(soul_lust);
+RACE(hobbit);
 
 /*-----------------------------------------------------------------------------
  * One Hit (hit one guy once)
@@ -133,8 +134,12 @@ bool OneHit::diceroll()
     dice = number_range( 0, 19 );
 
     // critical miss
-    if(dice == 0)
-        return false;
+    // lucky little hobbits do not miss critically. for them, critical miss is treated as a critical hit instead
+    if(dice == 0){
+        if(ch->getRace() == race_hobbit)
+        return true;
+        else return false;
+    }
     
     // critical hit
     if(dice == 19)
