@@ -48,22 +48,25 @@
 SKILL_RUNP( vanish )
 {
     Character *victim;
+    float chance, kidnap_chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+    bool FightingCheck;    
     Room *pRoomIndex;
     Affect af;
     char arg[MAX_INPUT_LENGTH];
 
-    if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
-    {
-            ch->send_to("Что?\n\r");
-            return;
-    }
-    
-    if (ch->mana < gsn_vanish->getMana( ))
-    {
-            ch->send_to("У тебя недостаточно энергии для этого.\n\r" );
-            return;
-    }
+    //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+    skill_mod   = 0.3;
+    stat_mod    = 0.05;
+    level_mod   = 0.01;
+    quick_mod   = 0.1;
+    size_mod    = 0.1;
+    sleep_mod   = 0.1;
+    vis_mod     = 0.1; 
 
+    //////////////// ELIGIBILITY CHECKS ////////////////
+
+    ///// Specific transportation checks
+    
     if ( ch->death_ground_delay > 0
             && ch->trap.isSet( TF_NO_MOVE ) )
     {
@@ -74,21 +77,6 @@ SKILL_RUNP( vanish )
     if (ch->mount) {
         ch->pecho( "Ты не можешь исчезнуть, пока ты верхом или оседла%Gно|н|на!", ch );
         return;
-    }
-
-    ch->mana -= gsn_vanish->getMana( );
-    ch->setWait( gsn_vanish->getBeats( )  );
-    
-    if (ch->isAffected(gsn_vanish)) {
-        ch->send_to("Тебе пока нечего бросить.\r\n");
-        return;
-    }
-    
-    if (number_percent() > gsn_vanish->getEffective( ch ) )
-    {
-            ch->send_to("Твоя попытка закончилась неудачей!\n\r");
-            gsn_vanish->improve( ch, false );
-            return;
     }
 
     if (IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL))
@@ -103,109 +91,228 @@ SKILL_RUNP( vanish )
         ch->send_to("В этой зоне тебе некуда исчезать.\n\r");
         return;
     }
-
-       one_argument( argument, arg );
-
-    if (arg[0] == '\0') {
-        victim = 0;
+    
+    ///// Standard checks: TODO: turn this into a function
+    
+    if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
+    {
+            ch->send_to("Ты не владеешь этим навыком.\n\r");
+            return;
+    }
+    
+    if (ch->mana < gsn_vanish->getMana( ))
+    {
+            ch->send_to("У тебя недостаточно энергии для этого.\n\r" );
+            return;
     }
 
-    else{
+    if (ch->isAffected(gsn_vanish)) {
+        ch->send_to("Тебе пока нечего бросить.\r\n");
+        return;
+    }
+    
+    // Needs at least one hand
+    const GlobalBitvector &loc = ch->getWearloc( );
+    if (!loc.isSet( wear_hands )
+    || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
+    {
+            ch->send_to("Тебе нужна хотя бы одна рука для этой техники.\r\n");
+            return;
+    }
+    
+    if (ch->fighting != 0) {
+            FightingCheck = true;
+    }
+    else
+            FightingCheck = false;
 
-        if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+    argument = one_argument(argument,arg);
+
+    if (arg[0] == '\0')
+    {               
+            victim = 0;
+    }
+    else {
+        if ((victim = get_char_room(ch,arg)) == 0)
         {
                 ch->send_to("Этого нет здесь.\n\r");
                 return;
         }
 
-        if ( victim == ch )
+        if ( ( victim->fighting != 0 ) && ( victim != ch ) )
         {
-            ch->send_to("Хочешь похитить себя? Смешно.\n\r");
+            ch->send_to("Подожди, пока закончится сражение.\n\r");
             return;
         }
 
-         if ( is_safe( ch, victim ) )
-                return;
-
-        if ( victim->is_immortal() && !victim->is_npc() )
-        {
-            ch->send_to("На Бессмертных это не подействует.\n\r");
-            return;
-        }
-
-        if (IS_SET(victim->imm_flags,IMM_SUMMON)){
+        if ( IS_SET(victim->imm_flags,IMM_SUMMON) ) {
             ch->send_to(fmt(ch, "%^C4 нельзя переместить.\n\r", victim));
             return;
         }
 
-        if ( victim->fighting != 0 )
+        if (is_safe(ch,victim))
+        {            
+                return;
+        }
+
+        // strangled centaurs can't rearkick
+        if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+                return;
+        
+        if(SHADOW(ch))
         {
-            ch->send_to("Подожди, пока закончится сражение.\n\r");
+                ch->send_to("Ты пытаешься схватить в охапку свою тень!\n\r");
+                act_p("$c1 пытается схватить в охапку свою тень.",
+                                        ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }
+        
+        if ( victim == ch )
+        {
+            victim = 0; // can use your own name as an excessive arg to simply vanish
+        }
+        
+        // CAN vanish charmed targets (e.g. your own pets)        
+        // CAN vanish immortals :)
+    }
+
+    if( !ch->is_npc() && !ch->move )
+    {
+            ch->pecho("Ты слишком уста%Gло|л|ла для этого.", ch);
             return;
-        } 
+    }
+    else
+            ch->move -= move_dec( ch );
+   
+    ch->mana -= gsn_vanish->getMana( );
+    ch->setWait( gsn_vanish->getBeats( )  );
+        
+    if (number_percent() > gsn_vanish->getEffective( ch ) )
+    {
+            ch->send_to("Тебе не удается активировать световую гранату.\n\r");
+            gsn_vanish->improve( ch, false );
+            return;
+    }    
+    
+    act_p( "$c1 бросает на землю небольшой шар. {WЯркая вспышка{x на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM,POS_RESTING);
+    ch->send_to("Ты бросаешь на землю световую гранату. {WЯркая вспышка{x на мгновение ослепляет всех вокруг!\r\n");
+    gsn_vanish->improve( ch, true );
+
+    //////////////// PROBABILITY CHECKS: SELF ////////////////
+
+    chance = 0;
+    chance += gsn_vanish->getEffective( ch );
+
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        chance = ( int )( chance * 0.5 );    
+    
+    if (FightingCheck) {
+        
+        chance = ( int )( chance * 0.5 ); 
+        
+        chance += ch->fighting->can_see(ch) ? 0 : (vis_mod * 100);
+        
+        if ( IS_SET(ch->fighting->imm_flags,IMM_LIGHT) ) {
+            ch->send_to(fmt(ch, "{W%^C1 не поддается воздействию вспышки!{x\n\r", ch->fighting));
+            chance = 0;
+        }
+        if ( IS_SET(ch->fighting->res_flags,RES_LIGHT) ) {
+            ch->send_to(fmt(ch, "{W%^C1 сопротивляется воздействию вспышки!{x\n\r", ch->fighting));
+            chance = ( int )( chance * 0.5 ); 
+        }         
+    }    
+
+    //////////////// PROBABILITY CHECKS: KIDNAP ////////////////
+    
+    if (victim != 0) {
+        kidnap_chance = 0;
+        kidnap_chance += gsn_vanish->getEffective( ch ) * skill_mod;
+        kidnap_chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_STR) ) * stat_mod * 100;
+        kidnap_chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        kidnap_chance += (ch->size - victim->size) * size_mod * 100;
+        kidnap_chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+        kidnap_chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
+   
+        if (IS_QUICK(ch))
+                kidnap_chance += quick_mod * 100;
+        if (IS_QUICK(victim))
+                kidnap_chance -= quick_mod * 100;            
+
+        if (IS_SET(victim->res_flags, RES_LIGHT))
+                kidnap_chance = ( int )( kidnap_chance * 0.5 );
+            
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+                kidnap_chance = ( int )( kidnap_chance * 0.5 ); 
+        
+        // neckguard can't protect if you're asleep
+        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
+                kidnap_chance = ( int )( kidnap_chance * 0.5 );
+        
+        kidnap_chance = max( 1, (int) kidnap_chance ); // there's always a chance        
+    }
+
+    //////////////// THE ROLL ////////////////
+    
+    if ( number_percent() > chance ) {
+            if (FightingCheck) {
+                act_p( "$c1 пытается скрыться, но противник бдит, и бой продолжается!", ch, 0, 0, TO_ROOM,POS_RESTING);
+                ch->send_to("Ты пытаешься скрыться, но противник бдит, и бой продолжается!\r\n");
+                return;
+            }
+            else {
+                // weak stun is a bitch
+                act_p( "$c1 пытается скрыться, но спотыкается и падает!", ch, 0, 0, TO_ROOM,POS_RESTING);                
+                ch->send_to("Ты пытаешься скрыться, но спотыкаешься и падаешь!\r\n");
+                return;                
+            }    
     }
     
-    
-  act_p( "$c1 бросает на землю небольшой шар. Яркая вспышка на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM,POS_RESTING);
-  ch->send_to("Ты бросаешь на землю небольшой шар. Яркая вспышка на мгновение ослепляет всех вокруг!\r\n");
-
-  gsn_vanish->improve( ch, true );
-
-  if (!ch->is_npc() && ch->fighting != 0 && number_bits(1) == 1)
-  {
-    ch->send_to("Противник бдительно следит за твоими движениями, тебе не удается исчезнуть!\n\r");
-    return;
-  }
-
-        if(victim == 0){
-
-    transfer_char( ch, ch, pRoomIndex,
+    if (victim = 0)
+        transfer_char( ch, ch, pRoomIndex,
             "%1^C1 внезапно исчезает!",
             "Пользуясь всеобщим замешательством, ты исчезаешь!",
             "%1^C1 внезапно появляется у тебя за спиной." );
-        }       
+        return;
+    }    
+    else {   
+            // trying to kidnap
+            act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
+            act_p( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR,POS_RESTING    );
+            act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
 
-        else{
-                //messages tries to kidnap
-                act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
-                act_p( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR,POS_RESTING    );
-                act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
-
-                int kidnapChance = 1; 
-
-                //chance calculations...
-
-                if(number_percent() < kidnapChance){
-
-                        //kidnapping success
-
-                            transfer_char( ch, ch, pRoomIndex,
-            "%1^C1 внезапно исчезает!",
-            "Пользуясь всеобщим замешательством, ты исчезаешь!",
-            "%1^C1 внезапно появляется у тебя за спиной." );
+            if ( number_percent() < kidnap_chance ) {
+                    // kidnapping success
+                    transfer_char( ch, ch, pRoomIndex,
+                        "%1^C1 внезапно исчезает!",
+                        "Пользуясь всеобщим замешательством, ты исчезаешь!",
+                        "%1^C1 внезапно появляется у тебя за спиной." );
             
-                        //kidnapping success
-                            transfer_char( victim, ch, pRoomIndex,
-            "%1^C1 исчезает вместе с %2^C5!",
-            "С собой ты забираешь %1^C4!",
-            "%1^C1 внезапно появляется в комнате, в охапке у %2^C2." ); 
+                    transfer_char( victim, ch, pRoomIndex,
+                        "%1^C1 исчезает вместе с %2^C5!",
+                        "Ты хватаешь и утаскиваешь с собой %1^C4!",
+                        "%2^C1 внезапно появляется, волоча за собой %1^C4." );
+                    
+                    if (!FightingCheck) {
+                        yell_panic( ch, victim,
+                            "Помогите! Меня кто-то похищает!",
+                            "Убери свои лапы, %1$C1!" );
+        
+                        multi_hit(victim,ch);
+                    }
+            }
+            else {
+                    // kidnap failed, victim escaped               
+                    act_p( "$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
+                    act_p( "$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR,POS_RESTING    );
+                    act_p( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT,POS_RESTING    );
 
-                }
-
-                else{
-
-                        //kindap failed, victim escaped
-
-                act_p( "$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
-                act_p( "$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR,POS_RESTING    );
-                act_p( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT,POS_RESTING    );
-                
-                //does char still vanish in this case?
-
-
-                }
+                    transfer_char( ch, ch, pRoomIndex,
+                        "%1^C1 внезапно исчезает!",
+                        "Пользуясь всеобщим замешательством, ты исчезаешь!",
+                        "%1^C1 внезапно появляется у тебя за спиной." );
+            }
       
-        }
+     }
 }
 
 /*
