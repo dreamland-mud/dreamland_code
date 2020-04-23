@@ -105,11 +105,12 @@ SKILL_RUNP( vanish )
             ch->send_to("У тебя недостаточно энергии для этого.\n\r" );
             return;
     }
-
+    
+    /* TODO: Not sure if it needs the effect: wait_state is enough
     if (ch->isAffected(gsn_vanish)) {
         ch->send_to("Тебе пока нечего бросить.\r\n");
         return;
-    }
+    } */
     
     // Needs at least one hand
     const GlobalBitvector &loc = ch->getWearloc( );
@@ -186,6 +187,7 @@ SKILL_RUNP( vanish )
    
     ch->mana -= gsn_vanish->getMana( );
     ch->setWait( gsn_vanish->getBeats( )  );
+    UNSET_DEATH_TIME(ch);
         
     if (number_percent() > gsn_vanish->getEffective( ch ) )
     {
@@ -456,6 +458,8 @@ SKILL_RUNP( nerve )
         //////////////// THE ROLL ////////////////
             
         ch->setWait( gsn_nerve->getBeats( )  );
+        UNSET_DEATH_TIME(ch);
+    
         if ( ch->is_npc() || number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
@@ -938,6 +942,7 @@ SKILL_RUNP( caltraps )
          ch,0,victim,TO_VICT,POS_RESTING);
 
   ch->setWait( gsn_caltraps->getBeats( ) );
+  UNSET_DEATH_TIME(ch);  
 
   if ( (!FightingCheck) && (IS_AWAKE( victim )) ) {
        yell_panic( ch, victim,
@@ -1155,6 +1160,7 @@ SKILL_RUNP( throwdown )
         //////////////// THE ROLL ////////////////
     
         ch->setWait( gsn_throw->getBeats( )  );
+        UNSET_DEATH_TIME(ch);
 
         if (victim->isAffected(gsn_protective_shield))
         {
@@ -1365,6 +1371,7 @@ SKILL_RUNP( strangle )
         //////////////// THE ROLL ////////////////
     
         ch->setWait( gsn_strangle->getBeats( ) );
+        UNSET_DEATH_TIME(ch);
 
         Chance mychance(ch, (int) chance, 100);
 
@@ -1418,8 +1425,8 @@ SKILL_RUNP( poison )
 
         if (!gsn_poison_smoke->usable( ch ))
         {
-            ch->send_to("Ась?\n\r");
-            return;
+                ch->send_to("Ты не владеешь этим навыком.\n\r");
+                return;
         }
 
         if ( ch->mana < gsn_poison_smoke->getMana( ) )
@@ -1436,12 +1443,6 @@ SKILL_RUNP( poison )
         {
                 ch->send_to("Твоя попытка закончилась неудачей.\n\r");
                 gsn_poison_smoke->improve( ch, false );
-                return;
-        }
-
-        if (SHADOW(ch))
-        {
-                ch->send_to("Облако поглощается твоей тенью.\n\r");
                 return;
         }
 
@@ -1480,8 +1481,8 @@ SKILL_RUNP( blindness )
         
         if (!gsn_blindness_dust->usable(ch))
         {
-            ch->send_to("Ась?\n\r");
-            return;
+                ch->send_to("Ты не владеешь этим навыком.\n\r");
+                return;
         }
 
         if (ch->mana < gsn_blindness_dust->getMana( ))
@@ -1501,14 +1502,8 @@ SKILL_RUNP( blindness )
                 return;
         }
 
-        if(SHADOW(ch))
-        {
-                ch->send_to("Облако поглощается твоей тенью.\n\r");
-                return;
-        }
-
-        ch->send_to("Облако пыли наполнило комнату.\n\r");
-        act_p("Облако пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Облако магической пыли наполнило комнату.\n\r");
+        act_p("Облако магической пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
 
         gsn_blindness_dust->improve( ch, true );
     
