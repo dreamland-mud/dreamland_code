@@ -1224,9 +1224,24 @@ SKILL_RUNP( throwdown )
 SKILL_RUNP( strangle )
 {
         Character *victim;
-        Affect af;
-        int chance;
+        Affect af;    
+        float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+        char arg[MAX_INPUT_LENGTH];
+        
+        //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+        skill_mod   = 0.2;
+        stat_mod    = 0.04;
+        level_mod   = 0.01;
+        quick_mod   = 0.1;
+        size_mod    = -0.03; // HARDER to affect smaller victims, easier to affect larger
+        sleep_mod   = 0.1;
+        vis_mod     = 0.1;
+        time_mod    = 0.05;
 
+        //////////////// ELIGIBILITY CHECKS ////////////////
+
+        ///// Standard checks: TODO: turn this into a function 
+    
         if ( MOUNTED(ch) )
         {
                 ch->send_to("Только не верхом!\n\r");
@@ -1269,43 +1284,89 @@ SKILL_RUNP( strangle )
 
         if ( ch == victim )
         {
-                ch->send_to("У тебя боязнь себя?\n\r");
+                ch->send_to("Ты смыкаешь руки на собственной шее и удовлетворенно хрипишь.\n\r");
                 return;
         }
 
         if ( victim->isAffected(gsn_strangle) )
+        {
+                ch->send_to("Твоя жертва уже в отключке.\n\r");                
                 return;
+        }
 
+        if ( victim->fighting != 0 )
+        {
+                ch->send_to("Подожди, пока закончится сражение.\n\r");
+                return;
+        }
+    
         if ( is_safe(ch,victim) )
         {
-                ch->send_to("Боги защищают твою жертву.\n\r");
                 return;
         }
         
-        if (gsn_rear_kick->getCommand( )->run( ch, victim ))
+        if (IS_SET(victim->imm_flags, IMM_WEAPON))
+        {
+                act_p("$C1 имеет иммунитет к физическим воздействиям.", ch, 0,
+                        victim, TO_CHAR,POS_RESTING);
+                return;
+        }
+
+        // sleepy centaurs can't rearkick
+        if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
             return;
 
-        int k = victim->getLastFightDelay( );
+        if(SHADOW(ch))
+        {
+                ch->send_to("Твои пальцы проходят сквозь тень!\n\r");
+                act_p("$c1 пытается придушить собственную тень.",
+                    ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }
 
+        //////////////// PROBABILITY CHECKS ////////////////
+            
+        chance = 0;
+    
+        chance += gsn_strangle->getEffective( ch ) * skill_mod;
+        chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += (ch->size - victim->size) * size_mod * 100;
+        chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+        chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
+        if (IS_QUICK(ch))
+            chance += quick_mod * 100;
+        if (IS_QUICK(victim))
+            chance -= quick_mod * 100;            
+
+        if (IS_SET(victim->res_flags, RES_WEAPON))
+            chance = ( int )( chance * 0.5 );
+            
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+            chance = ( int )( chance * 0.5 ); 
+    
+        // neckguard can't protect if you're asleep
+        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
+            chance = ( int )( chance * 0.5 );    
+
+        int k = ch->getLastFightDelay( );
         if (k >= 0 && k < FIGHT_DELAY_TIME)
-            k = k * 100 / FIGHT_DELAY_TIME;
-        else
-            k = 100;
+            chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
         
         UNSET_DEATH_TIME(ch);
         victim->setLastFightTime( );
-        ch->setLastFightTime( );
+        ch->setLastFightTime( );    
+    
+        chance = max( 1, (int) chance ); // there's always a chance
 
+        if (victim->is_immortal( ))
+            chance = 0;
+
+        //////////////// THE ROLL ////////////////
+    
         ch->setWait( gsn_strangle->getBeats( ) );
 
-        chance = ( int ) ( 0.6 * gsn_strangle->getEffective( ch ) );
-        chance += URANGE(0, (ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
-        chance += victim->can_see(ch) ? 0 : 5;
-
-        if (victim->isAffected(gsn_backguard)) 
-            chance /= 2;
-
-        Chance mychance(ch, chance*k/100, 100);
+        Chance mychance(ch, (int) chance, 100);
 
         if ( ch->is_npc() || mychance.reroll())
         {
