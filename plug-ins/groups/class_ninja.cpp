@@ -47,8 +47,10 @@
 
 SKILL_RUNP( vanish )
 {
+    Character *victim;
     Room *pRoomIndex;
     Affect af;
+    char arg[MAX_INPUT_LENGTH];
 
     if ( !ch->is_npc() && !gsn_vanish->usable( ch ) )
     {
@@ -101,6 +103,48 @@ SKILL_RUNP( vanish )
         ch->send_to("В этой зоне тебе некуда исчезать.\n\r");
         return;
     }
+
+       one_argument( argument, arg );
+
+    if (arg[0] == '\0') {
+        victim = 0;
+    }
+
+    else{
+
+        if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+        {
+                ch->send_to("Этого нет здесь.\n\r");
+                return;
+        }
+
+        if ( victim == ch )
+        {
+            ch->send_to("Хочешь похитить себя? Смешно.\n\r");
+            return;
+        }
+
+         if ( is_safe( ch, victim ) )
+                return;
+
+        if ( victim->is_immortal() && !victim->is_npc() )
+        {
+            ch->send_to("На Бессмертных это не подействует.\n\r");
+            return;
+        }
+
+        if (IS_SET(victim->imm_flags,IMM_SUMMON)){
+            ch->send_to(fmt(ch, "%^C4 нельзя переместить.\n\r", victim));
+            return;
+        }
+
+        if ( victim->fighting != 0 )
+        {
+            ch->send_to("Подожди, пока закончится сражение.\n\r");
+            return;
+        } 
+    }
+    
     
   act_p( "$c1 бросает на землю небольшой шар. Яркая вспышка на мгновение ослепляет тебя!", ch, 0, 0, TO_ROOM,POS_RESTING);
   ch->send_to("Ты бросаешь на землю небольшой шар. Яркая вспышка на мгновение ослепляет всех вокруг!\r\n");
@@ -112,11 +156,56 @@ SKILL_RUNP( vanish )
     ch->send_to("Противник бдительно следит за твоими движениями, тебе не удается исчезнуть!\n\r");
     return;
   }
-    
+
+        if(victim == 0){
+
     transfer_char( ch, ch, pRoomIndex,
             "%1^C1 внезапно исчезает!",
             "Пользуясь всеобщим замешательством, ты исчезаешь!",
             "%1^C1 внезапно появляется у тебя за спиной." );
+        }       
+
+        else{
+                //messages tries to kidnap
+                act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
+                act_p( "Ты пытаешься взять $C4 в охапку.",   ch, 0, victim, TO_CHAR,POS_RESTING    );
+                act_p( "$c1 пытается взять $C4 в охапку!", ch, 0, victim, TO_VICT,POS_RESTING    );
+
+                int kidnapChance = 1; 
+
+                //chance calculations...
+
+                if(number_percent() < kidnapChance){
+
+                        //kidnapping success
+
+                            transfer_char( ch, ch, pRoomIndex,
+            "%1^C1 внезапно исчезает!",
+            "Пользуясь всеобщим замешательством, ты исчезаешь!",
+            "%1^C1 внезапно появляется у тебя за спиной." );
+            
+                        //kidnapping success
+                            transfer_char( victim, ch, pRoomIndex,
+            "%1^C1 исчезает вместе с %2^C5!",
+            "С собой ты забираешь %1^C4!",
+            "%1^C1 внезапно появляется в комнате, в охапке у %2^C2." ); 
+
+                }
+
+                else{
+
+                        //kindap failed, victim escaped
+
+                act_p( "$C1 успевает вырваться из объятий $c2!", ch, 0, victim, TO_NOTVICT,POS_RESTING );
+                act_p( "$C1 успевает вырваться из твоих объятий!",   ch, 0, victim, TO_CHAR,POS_RESTING    );
+                act_p( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT,POS_RESTING    );
+                
+                //does char still vanish in this case?
+
+
+                }
+      
+        }
 }
 
 /*
@@ -260,7 +349,7 @@ SKILL_RUNP( nerve )
         //////////////// THE ROLL ////////////////
             
         ch->setWait( gsn_nerve->getBeats( )  );
-        if ( ch->is_npc() || number_percent() < chance )
+        if ( ch->is_npc() || number_percent() < (int) chance )
         {
                 gsn_nerve->getCommand()->run(ch, victim);
                 act_p("Ты ослабляешь $C4, пережимая нервные окончания.",ch,0,victim,TO_CHAR,POS_RESTING);
@@ -444,14 +533,14 @@ void AssassinateOneHit::calcDamage( )
     victim->setLastFightTime( );
     ch->setLastFightTime( );    
     
-    chance = max( 1, chance ); // there's always a chance
+    chance = max( 1, (int) chance ); // there's always a chance
 
     if (victim->is_immortal( ))
         chance = 0;
 
     //////////////// THE ROLL ////////////////
     
-    Chance mychance(ch, chance, 100);
+    Chance mychance(ch, (int) chance, 100);
 
     if (mychance.reroll()) {
         act_p("Ты {R+++ ЛОМАЕШЬ ШЕЮ +++{x $C3!",ch,0,victim,TO_CHAR,POS_RESTING);
@@ -466,14 +555,13 @@ void AssassinateOneHit::calcDamage( )
     else
     {
         gsn_assassinate->improve( ch, false, victim );
+        damBase( );
+        gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );
+        damApplyPosition( );  
         dam *= 2;
+        damApplyDamroll( );
+        WeaponOneHit::calcDamage( );        
     }
-
-    damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
-    damApplyPosition( );    
-    damApplyDamroll( );
-    WeaponOneHit::calcDamage( );
 }
 
 /*
@@ -752,7 +840,7 @@ SKILL_RUNP( caltraps )
        multi_hit(victim,ch);
   }
       
-  if ( ch->is_npc() || number_percent() > chance )
+  if ( ch->is_npc() || number_percent() > (int) chance )
   {
         damage(ch,victim,0,gsn_caltraps,DAM_PIERCE, true, DAMF_WEAPON);
         gsn_caltraps->improve( ch, false, victim );
@@ -973,7 +1061,7 @@ SKILL_RUNP( throwdown )
         }
 
 
-        if ( ch->is_npc() || number_percent() < chance )
+        if ( ch->is_npc() || number_percent() < (int) chance )
         {
             if ( number_percent() < 70 ) {
                 act_p("Ты бросаешь $C4 с ошеломляющей силой.",
@@ -998,7 +1086,8 @@ SKILL_RUNP( throwdown )
                 victim->position = POS_RESTING;
             }        
 
-            dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
+                //dam is a member of Damage class. this will work without declaring dam after enhanceddamage changes are merged
+            int dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
             gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
 
             damage( ch, victim, dam, gsn_throw, DAM_BASH, true, DAMF_WEAPON );
