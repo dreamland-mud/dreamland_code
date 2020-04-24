@@ -33,6 +33,9 @@
 
 GSN(shadow_shroud);
 GSN(soul_lust);
+PROF(cleric);
+PROF(samurai);
+PROF(warrior);
 RACE(hobbit);
 
 /*-----------------------------------------------------------------------------
@@ -323,6 +326,24 @@ void OneHit::damApplyAttitude( )
 
     if (att.isSet( RACE_HATES ))
         dam = dam * 120 / 100;
+}
+
+void OneHit::damApplyEnhancedDamage( )
+{
+
+    if (ch->getProfession()->getHpRate() < 70 || ch->is_npc())
+        return;
+
+        int div;        
+       
+        if (ch->getProfession( ) == prof_warrior || ch->getProfession( ) == prof_samurai)
+            div = 100;
+        else if (ch->getProfession( ) == prof_cleric)
+            div = 130;
+        else
+            div = 114;
+
+        dam += dam * number_percent()/div;
 }
 
 /*----------------------------------------------------------------------------

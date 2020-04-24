@@ -508,7 +508,7 @@ TricksterGodOneHit::TricksterGodOneHit( Character *ch, Character *victim )
 void TricksterGodOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = (ch->getModifyLevel( ) / 30 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );

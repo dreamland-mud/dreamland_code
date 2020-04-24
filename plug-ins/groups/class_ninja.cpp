@@ -276,7 +276,7 @@ void AssassinateOneHit::calcDamage( )
     int chance;
 
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     
     if (victim->is_immortal( ))
@@ -517,6 +517,29 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 }
 
 
+/*----------------------------------------------------------------------------
+ * throwdown 
+ *---------------------------------------------------------------------------*/
+class ThrowDownOneHit: public SkillWeaponOneHit {
+public:
+    ThrowDownOneHit( Character *ch, Character *victim );
+
+    virtual void calcDamage( );
+};
+
+ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
+            : Damage(ch, victim, 0, DAM_BASH, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_throw )
+{
+}
+
+void ThrowDownOneHit::calcDamage( )
+{
+        dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
+        damApplyEnhancedDamage( );
+
+        WeaponOneHit::calcDamage( );
+}
+
 /*
  * 'throw' skill command
  */
@@ -625,10 +648,14 @@ SKILL_RUNP( throwdown )
                 act("$c1 бросает $C4 через плечо.", ch,0,victim,TO_NOTVICT);
             }        
 
-            dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
-            gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
-
-            damage( ch, victim, dam, gsn_throw, DAM_BASH, true, DAMF_WEAPON );
+            ThrowDownOneHit throwdown( ch, victim );
+            try
+            {
+            throwdown.hit();
+            }
+            catch (const VictimDeathException &e){   
+            }                     
+          
             gsn_throw->improve( ch, true, victim );
         }
         else

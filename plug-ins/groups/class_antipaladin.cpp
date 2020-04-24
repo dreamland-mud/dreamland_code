@@ -67,7 +67,7 @@ void CleaveOneHit::calcDamage( )
     int chance;
     
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
 
     if (victim->is_immortal( ))

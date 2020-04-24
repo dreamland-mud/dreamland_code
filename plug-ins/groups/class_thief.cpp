@@ -99,7 +99,7 @@ BackstabOneHit::BackstabOneHit( Character *ch, Character *victim )
 void BackstabOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
 
     if (wield != 0)
@@ -139,7 +139,7 @@ DualBackstabOneHit::DualBackstabOneHit( Character *ch, Character *victim )
 void DualBackstabOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
 
     if (wield != 0)
@@ -177,7 +177,7 @@ CircleOneHit::CircleOneHit( Character *ch, Character *victim )
 void CircleOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = ( ch->getModifyLevel( ) / 40 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
@@ -205,7 +205,7 @@ KnifeOneHit::KnifeOneHit( Character *ch, Character *victim )
 void KnifeOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = (ch->getModifyLevel( ) / 30 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
