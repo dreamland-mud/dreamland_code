@@ -18,7 +18,7 @@
 #include "merc.h"
 #include "def.h"
 
-const DLString RaceAptitude::CATEGORY = "Расовые способности";
+const DLString RaceAptitude::CATEGORY = "Уникальные способности";
 
 RaceAptitude::RaceAptitude( ) 
 {
