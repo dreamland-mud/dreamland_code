@@ -269,7 +269,7 @@ SKILL_RUNP( vanish )
             }    
     }
     
-    if (victim = 0)
+    if (victim = 0) {
         transfer_char( ch, ch, pRoomIndex,
             "%1^C1 внезапно исчезает!",
             "Пользуясь всеобщим замешательством, ты исчезаешь!",
