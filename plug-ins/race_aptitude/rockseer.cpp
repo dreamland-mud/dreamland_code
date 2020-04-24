@@ -46,13 +46,15 @@ VOID_SPELL(MeldIntoStone)::run( Character *ch, Character *victim, int sn, int le
   af.location  = APPLY_AC;
   af.modifier  = -100;
   af.where     = TO_RESIST;
-  af.bitvector = RES_PIERCE;
+  af.bitvector = RES_PIERCE | RES_SLASH;
   affect_to_char( victim, &af );
-  af.where     = TO_VULN;
-  af.bitvector = VULN_ACID;
-  af.modifier = 0;
-  af.location = APPLY_NONE;
-  affect_to_char( victim, &af );
+
+  af.where     = TO_AFFECTS;
+  af.location  = APPLY_DEX;
+  af.modifier  = -(1 + level / 20);
+  af.bitvector = AFF_SLOW;
+  affect_to_char( ch, &af );
+
 
   act_p( "Кожа $c2 затвердевает, становясь подобной камню.",
           victim,0,0,TO_ROOM,POS_RESTING);
