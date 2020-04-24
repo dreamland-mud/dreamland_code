@@ -209,6 +209,21 @@ NMI_INVOKE( Root, player_attribute, "(playerName, attrName): значение д
         return DLString::emptyString;
 }
 
+NMI_INVOKE(Root, player_description, "(playerName[, descr]): вернуть или установить описание персонажа в оффлайне")
+{
+    PCMemoryInterface *pci = argnum2memory(args, 1);
+
+    if (args.size() > 1) {
+        DLString newDescription = argnum2string(args, 2);
+        DLString oldDescription = pci->getDescription();
+        pci->setDescription(newDescription);
+        PCharacterManager::saveMemory(pci);
+        LogStream::sendNotice() << "Changing description for " << pci->getName() << ": old " << oldDescription << " new " << newDescription << endl;
+    }
+
+    return Register(pci->getDescription());
+}
+
 NMI_INVOKE( Root, get_obj_world , "(name): ищет в мире предмет с указанным именем")
 {
     ::Object *obj;

@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#undef HTTP_DEBUG
+
 HttpSocketTask::HttpSocketTask(int fd) : BufferedSocketTask(fd), state(INIT)
 {
 }
@@ -124,13 +126,14 @@ HttpSocketTask::handleIn()
 void
 HttpSocketTask::handleRequest()
 {
+#ifdef HTTP_DEBUG        
     LogStream::sendError() << "method=" << request.method << ", uri=" << request.uri << ", proto=" << request.proto << endl;
 
     for(map<string, string>::iterator it=request.headers.begin();it!=request.headers.end();it++)
         LogStream::sendError() << "  " << it->first << ": " << it->second << endl;
 
     LogStream::sendError() << "body='" << request.body << "'" << endl;
-
+#endif
     ServletManager::getThis()->handle(request, response);
 }
 
@@ -141,7 +144,9 @@ HttpServerSocket::HttpServerSocket(unsigned short port) : ServerSocketTask(port)
 SocketTask::Pointer 
 HttpServerSocket::createNewTask(int fd)
 {
+#ifdef HTTP_DEBUG    
     LogStream::sendError() << "HttpServerSocket: Connected! fd=" << fd << endl;
+#endif    
     return (SocketTask*)new HttpSocketTask(fd);
 }
 

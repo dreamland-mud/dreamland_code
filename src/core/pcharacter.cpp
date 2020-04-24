@@ -386,6 +386,7 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setRemorts( getRemorts( ) );
         mem->setRussianName( getRussianName( ).getFullForm( ) );
         mem->setReligion( getReligion( ) );
+        mem->setDescription(getDescription());
 
         return mem;
 }
@@ -411,6 +412,7 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setRemorts( pcm->getRemorts( ) );
         setRussianName( pcm->getRussianName( ).getFullForm( ) );
         setReligion( pcm->getReligion( ) );
+        setDescription(pcm->getDescription());
 }
 
 /**************************************************************************

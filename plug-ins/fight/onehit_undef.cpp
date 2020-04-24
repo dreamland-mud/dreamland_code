@@ -989,15 +989,54 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     gsn_critical_strike->improve( ch, true, victim );
 
     if (diceroll < 75) {
-        act_p( "{R$c1 бросает тебя умелым движением!{x", ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( "{RТы бросаешь $C4 умелым движением!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
+
+        const char *msgVict = "{R$c1 бросает тебя умелым движением!{x"; //bare hands messages
+        const char *msgChar = "{RТы бросаешь $C4 умелым движением!{x";
+
+        if(wield){
+
+            if(wield->value0() == WEAPON_SWORD){
+            msgVict = "{R$c1 бросает тебя умелым движением!{x"; //sword messages
+            msgChar = "{RТы бросаешь $C4 умелым движением!{x";
+            }
+            else if(wield->value0() == WEAPON_DAGGER){
+            msgVict = "{R$c1 бросает тебя умелым движением!{x"; //dagger messages
+            msgChar = "{RТы бросаешь $C4 умелым движением!{x";         
+            }
+            else{
+            msgVict = "{R$c1 бросает тебя умелым движением!{x"; //everything else
+            msgChar = "{RТы бросаешь $C4 умелым движением!{x";
+            }
+        }
+
+        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
 
         victim->setWaitViolence( 2 );
         dam += (dam * number_range( 2, 5 )) / 5;            
     }
     else if (diceroll < 95) {
-        act_p( "{y$c1 ослепляет тебя своей атакой!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
-        act_p( "{yТы ослепляешь $C4 своей атакой!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
+        const char *msgVict = "{y$c1 ослепляет тебя своей атакой!{x"; //bare hands messages
+        const char *msgChar = "{yТы ослепляешь $C4 своей атакой!{x";
+
+        if(wield){
+
+            if(wield->value0() == WEAPON_SWORD){
+            msgVict = "{y$c1 ослепляет тебя своей атакой!{x"; //sword messages
+            msgChar = "{yТы ослепляешь $C4 своей атакой!{x";
+            }
+            else if(wield->value0() == WEAPON_DAGGER){
+            msgVict = "{y$c1 ослепляет тебя своей атакой!{x"; //dagger messages
+            msgChar = "{yТы ослепляешь $C4 своей атакой!{x";         
+            }
+            else{
+            msgVict = "{y$c1 ослепляет тебя своей атакой!{x"; //everything else
+            msgChar = "{yТы ослепляешь $C4 своей атакой!{x";
+            }
+        }
+
+        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
 
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
@@ -1013,8 +1052,28 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         dam += dam * number_range( 1, 2 );            
     }
     else {
-        act_p( "{r$c1 подрезает тебя больно! ОЙ!!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
-        act_p( "{rТы подрезаешь $C4 больно!  Это действительно больно!{x", ch, 0, victim, TO_CHAR ,POS_RESTING);
+        const char *msgVict = "{r$c1 подрезает тебя больно! ОЙ!!{x"; //bare hands messages
+        const char *msgChar = "{rТы подрезаешь $C4 больно!  Это действительно больно!{x";
+
+        if(wield){
+
+            if(wield->value0() == WEAPON_SWORD){
+            msgVict = "{r$c1 подрезает тебя больно! ОЙ!!{x"; //sword messages
+            msgChar = "{rТы подрезаешь $C4 больно!  Это действительно больно!{x";
+            }
+            else if(wield->value0() == WEAPON_DAGGER){
+            msgVict = "{r$c1 подрезает тебя больно! ОЙ!!{x"; //dagger messages
+            msgChar = "{rТы подрезаешь $C4 больно!  Это действительно больно!{x";         
+            }
+            else{
+            msgVict = "{r$c1 подрезает тебя больно! ОЙ!!{x"; //everything else
+            msgChar = "{rТы подрезаешь $C4 больно!  Это действительно больно!{x";
+            }
+        }
+
+        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
+
         dam += dam * number_range( 2, 5 );            
     }
 }
