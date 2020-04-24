@@ -699,7 +699,7 @@ VOID_AFFECT(Poison)::update( Character *ch, Affect *paf )
 
     DefaultAffectHandler::update( ch, paf );
 
-    if (!IS_AFFECTED(ch, AFF_POISON) || IS_AFFECTED(ch, AFF_SLOW))
+    if (!IS_AFFECTED(ch, AFF_POISON) || IS_SLOW(ch))
         return;
 
     act_p("$c1 дрожит и испытывает боль.", ch, 0, 0, TO_ROOM, POS_RESTING);
@@ -725,7 +725,7 @@ VOID_SPELL(Slow)::run( Character *ch, Character *victim, int sn, int level )
     
     Affect af;
 
-    if ( victim->isAffected(sn ) || IS_AFFECTED(victim,AFF_SLOW))
+    if ( victim->isAffected(sn ) || IS_SLOW(victim))
     {
         if (victim == ch)
           ch->send_to("Ты не можешь двигаться медленнее, чем сейчас!\n\r");
