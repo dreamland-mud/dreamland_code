@@ -88,6 +88,7 @@
 #include "magic.h"
 #include "vnum.h"
 #include "wearloc_utils.h"
+#include "skill_utils.h"
 
 #include "onehit_undef.h"
 #include "damage_impl.h"
@@ -226,6 +227,7 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     }
     
     chance = chance * chance_modifier / 100;
+    chance+= (skill_level(*gsn_second_weapon, ch) - ch->getModifyLevel());
 
     if (number_percent( ) < gsn_second_weapon->getEffective( ch ) * chance / 100) {
         one_hit_nocatch( ch, victim, true );
@@ -240,6 +242,8 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
     if (IS_AFFECTED(ch, AFF_SLOW))
         chance = chance * 3 / 4;
     
+    chance+= (skill_level(skill, ch) - ch->getModifyLevel());
+
     if (number_percent( ) < chance) {
         one_hit_nocatch( ch, victim );
         skill.improve( ch, true, victim );

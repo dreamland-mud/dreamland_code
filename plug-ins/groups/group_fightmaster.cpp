@@ -682,6 +682,9 @@ void KickOneHit::calcDamage( )
                 dam += ch->damroll / 2;
                 damApplyEnhancedDamage( );
 
+                //10% extra damage for every skill level
+                dam*= (skill_level(*gsn_kick, ch) - ch->getModifyLevel())/10;
+
                 if (IS_SET( ch->parts, PART_TWO_HOOVES ))
                     dam = 3 * dam / 2;
                 else if (IS_SET( ch->parts, PART_FOUR_HOOVES ))
@@ -721,6 +724,9 @@ void DoubleKickOneHit::calcDamage( )
                 
                 dam += ch->damroll / 2;
                 damApplyEnhancedDamage( );
+
+                //10% extra damage for every skill level
+                dam*= (skill_level(*gsn_double_kick, ch) - ch->getModifyLevel())/10;
 
                 if (IS_SET( ch->parts, PART_TWO_HOOVES ))
                     dam = 3 * dam / 2;
