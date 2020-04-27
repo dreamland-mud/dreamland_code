@@ -1030,7 +1030,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";         
             }
             else{
-            msgVict = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x; //everything else
+            msgVict = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //everything else
             msgChar = "{yТы ослепляешь $C4 быстрым ударом в голову!{x";
             }
         }
@@ -1044,7 +1044,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             baf.type     = gsn_critical_strike;
             baf.level    = ch->getModifyLevel();
             baf.location     = APPLY_HITROLL;
-            baf.modifier     = ch->getModifyLevel() / 10;
+            baf.modifier     = -1 * ch->getModifyLevel() / 10;
             baf.duration     = number_range(1,5);
             baf.bitvector    = AFF_BLIND;
             affect_to_char( victim, &baf );
