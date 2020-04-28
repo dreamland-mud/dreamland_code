@@ -227,7 +227,6 @@ void second_weapon_hit( Character *ch, Character *victim, int chance )
     }
     
     chance = chance * chance_modifier / 100;
-    chance+= (skill_level(*gsn_second_weapon, ch) - ch->getModifyLevel());
 
     if (number_percent( ) < gsn_second_weapon->getEffective( ch ) * chance / 100) {
         one_hit_nocatch( ch, victim, true );

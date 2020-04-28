@@ -24,6 +24,7 @@
 #include "gsn_plugin.h"
 #include "act_move.h"
 #include "mercdb.h"
+#include "skill_utils.h"
 
 #include "magic.h"
 #include "occupations.h"
@@ -628,6 +629,7 @@ SKILL_RUNP( throwdown )
 
         /* level */
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
+        chance += skill_level(*gsn_throw, ch) - victim->getModifyLevel();
 
         if ( ch->is_npc() || number_percent() < chance )
         {
