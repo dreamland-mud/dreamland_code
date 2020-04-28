@@ -1292,7 +1292,13 @@ SKILL_RUNP( ambush )
             return;
     }
 
-    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) || victim->can_see(ch) )
+    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
+    {
+            ch->send_to("Сначала тебе стоит замаскироваться.\n\r");
+            return;
+    }   
+
+    if ( victim->can_see(ch) )
     {
             ch->send_to("Твоя жертва тебя видит.\n\r");
             return;
