@@ -229,7 +229,7 @@ SKILL_RUNP( vanish )
     if (victim != 0) {
         kidnap_chance = 0;
         kidnap_chance += gsn_vanish->getEffective( ch ) * skill_mod;
-        kidnap_chance += ( get_dex_app(ch) - get_str_app(victim) ) * stat_mod * 100;
+        kidnap_chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_STR) ) * stat_mod * 100;
         kidnap_chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         kidnap_chance += (ch->size - victim->size) * size_mod * 100;
         kidnap_chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
@@ -438,7 +438,7 @@ SKILL_RUNP( nerve )
         chance = 0;
   
         chance += gsn_nerve->getEffective( ch ) * skill_mod;
-        chance += ( get_dex_app(ch) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         chance += (ch->size - victim->size) * size_mod * 100;
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
@@ -615,7 +615,7 @@ void AssassinateOneHit::calcDamage( )
     chance = 0;
         
     chance += gsn_assassinate->getEffective( ch ) * skill_mod;
-    chance += ( get_str_app(ch) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+    chance += ( get_curr_stat_extra(ch, STAT_STR) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
     chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
     chance += (ch->size - victim->size) * size_mod * 100;
     chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
@@ -917,7 +917,7 @@ SKILL_RUNP( caltraps )
    chance = 0;
         
    chance += gsn_caltraps->getEffective( ch ) * skill_mod;
-   chance += ( get_dex_app(ch) - get_dex_app(victim) ) * stat_mod * 100;
+   chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_DEX) ) * stat_mod * 100;
    // chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100; // no level check for caltraps
    chance += (ch->size - victim->size) * size_mod * 100;
    chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
@@ -1134,7 +1134,7 @@ SKILL_RUNP( throwdown )
         chance = 0;
   
         chance += gsn_throw->getEffective( ch ) * skill_mod;
-        chance += ( get_dex_app(ch) - get_dex_app(victim) ) * stat_mod * 100;
+        chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_DEX) ) * stat_mod * 100;
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         chance += (ch->size - victim->size) * size_mod * 100;
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
@@ -1196,8 +1196,8 @@ SKILL_RUNP( throwdown )
                 victim->position = POS_RESTING;
             }        
 
-                //dam is a member of Damage class. this will work without declaring dam after enhanceddamage changes are merged
-            int dam = ch->getModifyLevel() + get_str_app(ch) + ch->damroll / 2;
+            //dam is a member of Damage class. this will work without declaring dam after enhanceddamage changes are merged
+            int dam = ch->getModifyLevel() + get_curr_stat_extra(ch, STAT_STR) + ch->damroll / 2;
             gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
 
             damage( ch, victim, dam, gsn_throw, DAM_BASH, true, DAMF_WEAPON );
@@ -1332,7 +1332,7 @@ SKILL_RUNP( strangle )
         chance = 0;
     
         chance += gsn_strangle->getEffective( ch ) * skill_mod;
-        chance += ( get_dex_app(ch) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         chance += (ch->size - victim->size) * size_mod * 100;
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
