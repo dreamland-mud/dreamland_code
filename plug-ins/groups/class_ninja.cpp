@@ -206,11 +206,11 @@ SKILL_RUNP( vanish )
     chance += gsn_vanish->getEffective( ch );
 
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-        chance = ( int )( chance * 0.5 );    
+        chance = chance / 2;    
     
     if (FightingCheck) {
         
-        chance = ( int )( chance * 0.5 ); 
+        chance = chance / 2; 
         
         chance += ch->fighting->can_see(ch) ? 0 : (vis_mod * 100);
         
@@ -220,7 +220,7 @@ SKILL_RUNP( vanish )
         }
         if ( IS_SET(ch->fighting->res_flags,RES_LIGHT) ) {
             ch->send_to(fmt(ch, "{W%^C1 сопротивляется воздействию вспышки!{x\n\r", ch->fighting));
-            chance = ( int )( chance * 0.5 ); 
+            chance = chance / 2; 
         }         
     }    
 
@@ -241,16 +241,16 @@ SKILL_RUNP( vanish )
                 kidnap_chance -= quick_mod * 100;            
 
         if (IS_SET(victim->res_flags, RES_LIGHT))
-                kidnap_chance = ( int )( kidnap_chance * 0.5 );
+                kidnap_chance = kidnap_chance / 2;
             
         if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-                kidnap_chance = ( int )( kidnap_chance * 0.5 ); 
+                kidnap_chance = kidnap_chance / 2;
         
         // neckguard can't protect if you're asleep
         if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
-                kidnap_chance = ( int )( kidnap_chance * 0.5 );
+                kidnap_chance = kidnap_chance / 2;
         
-        kidnap_chance = max( 1, (int) kidnap_chance ); // there's always a chance        
+        kidnap_chance = max( 1, kidnap_chance ); // there's always a chance        
     }
 
     //////////////// THE ROLL ////////////////
@@ -450,10 +450,10 @@ SKILL_RUNP( nerve )
                 chance -= quick_mod * 100;            
 
         if (IS_SET(victim->res_flags, RES_DISEASE))
-                chance = ( int )( chance * 0.5 );
+                chance = chance / 2;
             
         if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-                chance = ( int )( chance * 0.5 );    
+                chance = chance / 2;    
 
         //////////////// THE ROLL ////////////////
             
@@ -626,14 +626,14 @@ void AssassinateOneHit::calcDamage( )
         chance -= quick_mod * 100;            
 
     if (IS_SET(victim->res_flags, RES_WEAPON))
-        chance = ( int )( chance * 0.5 );
+        chance = chance / 2;
             
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-        chance = ( int )( chance * 0.5 ); 
+        chance = chance / 2; 
     
     // neckguard can't protect if you're asleep
     if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
-        chance = ( int )( chance * 0.5 );    
+        chance = chance / 2;    
 
     // only check for assassinate spam without strangle
     int k = ch->getLastFightDelay( );
@@ -644,10 +644,7 @@ void AssassinateOneHit::calcDamage( )
     victim->setLastFightTime( );
     ch->setLastFightTime( );    
     
-    chance = max( 1, (int) chance ); // there's always a chance
-
-    if (victim->is_immortal( ))
-        chance = 0;
+    chance = max( 1, chance ); // there's always a chance
 
     //////////////// THE ROLL ////////////////
     
@@ -931,7 +928,7 @@ SKILL_RUNP( caltraps )
         chance -= quick_mod * 100;            
 
    if (IS_SET(victim->res_flags, RES_PIERCE))
-        chance = ( int )( chance * 0.5 );
+        chance = chance / 2;
           
 
   //////////////// THE ROLL ////////////////      
@@ -1149,10 +1146,10 @@ SKILL_RUNP( throwdown )
                 chance -= quick_mod * 100;            
 
         if (IS_SET(victim->res_flags, RES_BASH))
-                chance = ( int )( chance * 0.5 );
+                chance = chance / 2;
             
         if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-                chance = ( int )( chance * 0.5 ); 
+                chance = chance / 2; 
         
         if (is_flying( victim ))
                 chance -= 10;
@@ -1174,7 +1171,7 @@ SKILL_RUNP( throwdown )
         }
 
 
-        if ( ch->is_npc() || number_percent() < (int) chance )
+        if ( ch->is_npc() || number_percent() < chance )
         {
             if ( number_percent() < 70 ) {
                 act_p("Ты бросаешь $C4 с ошеломляющей силой.",
@@ -1346,14 +1343,14 @@ SKILL_RUNP( strangle )
             chance -= quick_mod * 100;            
 
         if (IS_SET(victim->res_flags, RES_WEAPON))
-            chance = ( int )( chance * 0.5 );
+            chance = chance / 2;
             
         if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-            chance = ( int )( chance * 0.5 ); 
+            chance = chance / 2; 
     
         // neckguard can't protect if you're asleep
         if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
-            chance = ( int )( chance * 0.5 );    
+            chance = chance / 2;   
 
         int k = ch->getLastFightDelay( );
         if (k >= 0 && k < FIGHT_DELAY_TIME)
@@ -1363,10 +1360,7 @@ SKILL_RUNP( strangle )
         victim->setLastFightTime( );
         ch->setLastFightTime( );    
     
-        chance = max( 1, (int) chance ); // there's always a chance
-
-        if (victim->is_immortal( ))
-            chance = 0;
+        chance = max( 1, chance ); // there's always a chance
 
         //////////////// THE ROLL ////////////////
     
@@ -1502,8 +1496,8 @@ SKILL_RUNP( blindness )
                 return;
         }
 
-        ch->send_to("Облако магической пыли наполнило комнату.\n\r");
-        act_p("Облако магической пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Облако загадочной пыли наполнило комнату.\n\r");
+        act_p("Облако загадочной пыли наполнило комнату.",ch,0,0,TO_ROOM,POS_RESTING);
 
         gsn_blindness_dust->improve( ch, true );
     
