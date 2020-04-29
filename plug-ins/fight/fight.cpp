@@ -238,7 +238,7 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
 {
     int chance = skill.getEffective( ch ) / coef;
 
-    if (IS_AFFECTED(ch, AFF_SLOW))
+    if (IS_SLOW(ch))
         chance = chance * 3 / 4;
     
     chance+= skill_level_bonus(skill, ch);
@@ -321,7 +321,7 @@ void multi_hit_nocatch( Character *ch, Character *victim )
     
     gsn_area_attack->getCommand( )->run( ch, victim );
 
-    if (IS_AFFECTED(ch,AFF_HASTE))
+    if (IS_QUICK(ch))
         one_hit_nocatch( ch, victim );
 
     if (ch->fighting != victim )
