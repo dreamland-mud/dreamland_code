@@ -60,4 +60,9 @@ DLString skill_effective_bonus(const Skill *skill, PCharacter *ch);
  */
 int skill_level(Skill &skill, Character *ch);
 
+/**
+ *  Return skill level bonus from affects with APPLY_LEVEL and TO_SKILLS.
+ */
+int skill_level_bonus(Skill &skill, Character *ch);
+
 #endif
