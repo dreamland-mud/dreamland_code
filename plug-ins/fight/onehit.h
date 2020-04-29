@@ -39,7 +39,6 @@ public:
     void damApplyPosition( );
     void damApplyDamroll( );
     void damApplyAttitude( );
-    void damApplyEnhancedDamage( );
     
     void protectShadowShroud( );
     virtual void priorDamageEffects( );

@@ -223,7 +223,7 @@ SKILL_RUNP( bashdoor )
 /*----------------------------------------------------------------------------
  * bash
  *---------------------------------------------------------------------------*/
-class BashOneHit: public SkillWeaponOneHit {
+class BashOneHit: public SkillDamage {
 public:
     BashOneHit( Character *ch, Character *victim );
 
@@ -233,16 +233,19 @@ public:
 };
 
 BashOneHit::BashOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, DAM_BASH, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_bash )
+            : Damage( ch, victim, DAM_BASH, 0 ), 
+              SkillDamage( ch, victim, gsn_bash, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
+
+
 
 void BashOneHit::calcDamage( )
 {
         dam = (ch->damroll / 2) + number_range(4,4 + 4* ch->size + chance/10);
-        damApplyEnhancedDamage();
         if ( is_flying( victim ) ) dam += dam/3;
-        WeaponOneHit::calcDamage( );
+        damApplyEnhancedDamage();
+        Damage::calcDamage( );
 }
 
 int BashOneHit::calcChance( )
@@ -449,7 +452,7 @@ SKILL_RUNP( bash )
                 gsn_bash->improve( ch, true, victim );
                 ch->setWait( gsn_bash->getBeats( ) );
                 try{
-                bash.hit();
+                bash.hit(true);
                 }
                 catch (const VictimDeathException &e){                        
                 }
@@ -654,17 +657,20 @@ SKILL_RUNP( trip )
 /*----------------------------------------------------------------------------
  * kick
  *---------------------------------------------------------------------------*/
-class KickOneHit: public SkillWeaponOneHit {
+class KickOneHit: public SkillDamage {
 public:
     KickOneHit( Character *ch, Character *victim );
 
     virtual void calcDamage( );
+
 };
 
 KickOneHit::KickOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, DAM_BASH, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_kick )
+            : Damage( ch, victim, DAM_BASH, 0 ),
+              SkillDamage( ch, victim, gsn_kick, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
+
 
 void KickOneHit::calcDamage( )
 {
@@ -688,13 +694,13 @@ void KickOneHit::calcDamage( )
                     dam *= 2;
 
                
-        WeaponOneHit::calcDamage( );
+        Damage::calcDamage( );
 }
 
 /*----------------------------------------------------------------------------
  * doublekick
  *---------------------------------------------------------------------------*/
-class DoubleKickOneHit: public SkillWeaponOneHit {
+class DoubleKickOneHit: public SkillDamage {
 public:
     DoubleKickOneHit( Character *ch, Character *victim );
 
@@ -702,7 +708,8 @@ public:
 };
 
 DoubleKickOneHit::DoubleKickOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, DAM_BASH, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_double_kick )
+            : Damage( ch, victim, DAM_BASH, 0 ),
+              SkillDamage( ch, victim, gsn_double_kick, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
 
@@ -728,7 +735,7 @@ void DoubleKickOneHit::calcDamage( )
                     dam *= 2;
 
                
-        WeaponOneHit::calcDamage( );
+        Damage::calcDamage( );
 }
 
 /*
@@ -821,7 +828,7 @@ SKILL_RUNP( kick )
                 gsn_kick->improve( ch, true, victim );
                 KickOneHit kick (ch , victim);
                 try{
-                        kick.hit();
+                        kick.hit(true);
                 }
                 catch (const VictimDeathException &) {
                 }         
@@ -832,7 +839,7 @@ SKILL_RUNP( kick )
                         gsn_double_kick->improve( ch, true, victim );
                         DoubleKickOneHit doublekick (ch , victim);
                         try{
-                                doublekick.hit();
+                                doublekick.hit(true);
                         }
                         catch (const VictimDeathException &) {
                         } 
@@ -1422,7 +1429,7 @@ SKILL_RUNP( warcry )
 /*----------------------------------------------------------------------------
  * smash
  *---------------------------------------------------------------------------*/
-class SmashOneHit: public SkillWeaponOneHit {
+class SmashOneHit: public SkillDamage {
 public:
     SmashOneHit( Character *ch, Character *victim );
 
@@ -1432,15 +1439,16 @@ public:
 };
 
 SmashOneHit::SmashOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, DAM_BASH, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_smash )
+            : Damage( ch, victim, DAM_BASH, 0 ),
+              SkillDamage( ch, victim, gsn_smash, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
 
 void SmashOneHit::calcDamage( )
 {
         dam = (ch->damroll / 2) + number_range(4, 4 + 5 * ch->size + chance/10);
-        damApplyEnhancedDamage( );
-        WeaponOneHit::calcDamage( );
+        damApplyEnhancedDamage();
+        Damage::calcDamage( );
 }
 
 int SmashOneHit::calcChance( )
@@ -1604,7 +1612,7 @@ SKILL_RUNP( smash )
         
 
         try {
-           smash.hit();
+           smash.hit(true);
             
             if (number_percent() < gsn_smash->getEffective( ch ) - 40)
             {

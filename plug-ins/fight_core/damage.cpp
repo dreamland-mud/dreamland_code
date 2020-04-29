@@ -41,6 +41,9 @@ GSN(protection_heat);
 GSN(protection_cold);
 GSN(prayer);
 GSN(stardust);
+PROF(cleric);
+PROF(samurai);
+PROF(warrior);
 
 void do_visible( Character * );
 
@@ -364,6 +367,23 @@ void Damage::calcDamage( )
     protectPrayer( );
     protectImmune( );
     protectRazer( ); // >8)
+}
+
+void Damage::damApplyEnhancedDamage( )
+{
+    if (ch->getProfession()->getHpRate() < 70 || ch->is_npc())
+        return;
+
+        int div;        
+       
+        if (ch->getProfession( ) == prof_warrior || ch->getProfession( ) == prof_samurai)
+            div = 100;
+        else if (ch->getProfession( ) == prof_cleric)
+            div = 130;
+        else
+            div = 114;
+
+        dam += dam * number_percent()/div;
 }
 
 /*-----------------------------------------------------------------------------
