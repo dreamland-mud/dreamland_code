@@ -39,6 +39,7 @@
 #include "act.h"
 #include "interp.h"
 #include "def.h"
+#include "stats_apply.h"
 
 
 /*
@@ -48,12 +49,11 @@
 SKILL_RUNP( vanish )
 {
     Character *victim;
-    float chance, kidnap_chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+    float chance, kidnap_chance = 0, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
     bool FightingCheck;    
     Room *pRoomIndex;
     Affect af;
     char arg[MAX_INPUT_LENGTH];
-
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
     skill_mod   = 0.3;
     stat_mod    = 0.05;
@@ -86,7 +86,7 @@ SKILL_RUNP( vanish )
     }
 
     pRoomIndex = get_random_room_vanish( ch );
-    
+
     if (!pRoomIndex) {
         ch->send_to("В этой зоне тебе некуда исчезать.\n\r");
         return;
@@ -111,7 +111,7 @@ SKILL_RUNP( vanish )
         ch->send_to("Тебе пока нечего бросить.\r\n");
         return;
     } */
-    
+
     // Needs at least one hand
     const GlobalBitvector &loc = ch->getWearloc( );
     if (!loc.isSet( wear_hands )
@@ -227,7 +227,6 @@ SKILL_RUNP( vanish )
     //////////////// PROBABILITY CHECKS: KIDNAP ////////////////
     
     if (victim != 0) {
-        kidnap_chance = 0;
         kidnap_chance += gsn_vanish->getEffective( ch ) * skill_mod;
         kidnap_chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_STR) ) * stat_mod * 100;
         kidnap_chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
@@ -250,7 +249,7 @@ SKILL_RUNP( vanish )
         if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
                 kidnap_chance = kidnap_chance / 2;
         
-        kidnap_chance = max( 1, kidnap_chance ); // there's always a chance        
+        kidnap_chance = max( (float)1, kidnap_chance ); // there's always a chance        
     }
 
     //////////////// THE ROLL ////////////////
@@ -269,7 +268,7 @@ SKILL_RUNP( vanish )
             }    
     }
     
-    if (victim = 0) {
+    if (victim == 0 || victim == ch) {
         transfer_char( ch, ch, pRoomIndex,
             "%1^C1 внезапно исчезает!",
             "Пользуясь всеобщим замешательством, ты исчезаешь!",
@@ -288,11 +287,11 @@ SKILL_RUNP( vanish )
                         "%1^C1 внезапно исчезает!",
                         "Пользуясь всеобщим замешательством, ты исчезаешь!",
                         "%1^C1 внезапно появляется у тебя за спиной." );
-            
+
                     transfer_char( victim, ch, pRoomIndex,
                         "%1^C1 исчезает вместе с %2^C5!",
                         "Ты хватаешь и утаскиваешь с собой %1^C4!",
-                        "%2^C1 внезапно появляется, волоча за собой %1^C4." );
+                        "%2^C1 внезапно появляется, приволоченный %1^C5." );
                     
                     if (!FightingCheck) {
                         yell_panic( ch, victim,
@@ -644,7 +643,7 @@ void AssassinateOneHit::calcDamage( )
     victim->setLastFightTime( );
     ch->setLastFightTime( );    
     
-    chance = max( 1, chance ); // there's always a chance
+    chance = max( (float)1, chance ); // there's always a chance
 
     //////////////// THE ROLL ////////////////
     
@@ -1228,7 +1227,7 @@ SKILL_RUNP( strangle )
 {
         Character *victim;
         Affect af;    
-        float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
+        float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod, time_mod;
         char arg[MAX_INPUT_LENGTH];
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
@@ -1279,6 +1278,14 @@ SKILL_RUNP( strangle )
                 return;
         }
 
+        argument = one_argument(argument,arg);
+
+        if ( arg[0] == '\0' )
+        {
+            ch->send_to("И кого ты хочешь придушить?\n\r");
+            return;
+        }
+        
         if ( (victim = get_char_room(ch,argument)) == 0 )
         {
                 ch->send_to("Здесь таких нет.\n\r");
@@ -1330,7 +1337,6 @@ SKILL_RUNP( strangle )
         //////////////// PROBABILITY CHECKS ////////////////
             
         chance = 0;
-    
         chance += gsn_strangle->getEffective( ch ) * skill_mod;
         chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
@@ -1360,7 +1366,7 @@ SKILL_RUNP( strangle )
         victim->setLastFightTime( );
         ch->setLastFightTime( );    
     
-        chance = max( 1, chance ); // there's always a chance
+        chance = max( (float)1, chance ); // there's always a chance
 
         //////////////// THE ROLL ////////////////
     
