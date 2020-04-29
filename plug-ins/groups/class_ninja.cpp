@@ -628,8 +628,7 @@ SKILL_RUNP( throwdown )
                 chance -= 20;
 
         /* level */
-        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 2;
-        chance += skill_level(*gsn_throw, ch) - victim->getModifyLevel();
+        chance += (skill_level(*gsn_throw, ch) - victim->getModifyLevel()) * 2;
 
         if ( ch->is_npc() || number_percent() < chance )
         {
