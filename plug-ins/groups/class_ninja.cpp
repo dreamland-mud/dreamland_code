@@ -1286,7 +1286,7 @@ SKILL_RUNP( strangle )
             return;
         }
         
-        if ( (victim = get_char_room(ch,argument)) == 0 )
+        if ( (victim = get_char_room(ch,arg)) == 0 )
         {
                 ch->send_to("Здесь таких нет.\n\r");
                 return;
