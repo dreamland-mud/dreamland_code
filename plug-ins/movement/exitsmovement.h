@@ -14,6 +14,8 @@ enum {
     RC_MOVE_PASS_NEVER = 100,
     RC_MOVE_PASS_FAILED,
     RC_MOVE_PASS_NEEDED,
+    RC_MOVE_PASS_POSSIBLE,
+    RC_MOVE_PASS_ALWAYS
 };
 
 class ExitsMovement : public Walkment {
@@ -36,6 +38,7 @@ protected:
 
     virtual bool checkVisibility( Character * );
     virtual bool checkClosedDoor( Character * );
+    virtual int getDoorStatus(Character *);
             bool checkExtraExit( Character * );
 
     virtual bool tryMove( Character * );

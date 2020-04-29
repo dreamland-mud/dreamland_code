@@ -1108,7 +1108,7 @@ NMI_INVOKE( SkillWrapper, giveTemporary, "(ch[,learned[,days[,origin]]]): при
 
     // Do nothing for already available permanent or temporary skills.
     Skill *skill = getTarget();
-    if (skill->visible(ch))
+    if (skill->available(ch))
         return Register(false);
     
     // Create and save temporary skill data.

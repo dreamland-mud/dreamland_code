@@ -181,6 +181,10 @@ int GenericSkill::getLevel( Character *ch ) const
             return 1;
     }
 
+    // Skills acquired from worn items become available immediately.
+    if (temporary_skill_active(this, ch))
+        return ch->getRealLevel();
+ 
     rb = getRaceBonus( ch );
     // Race bonuses that are independent on profession are available immediately,
     // e.g. rockseers get wands from level 1.

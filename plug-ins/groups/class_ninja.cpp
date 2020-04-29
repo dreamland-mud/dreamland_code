@@ -24,6 +24,7 @@
 #include "gsn_plugin.h"
 #include "act_move.h"
 #include "mercdb.h"
+#include "skill_utils.h"
 
 #include "magic.h"
 #include "occupations.h"
@@ -663,7 +664,7 @@ void AssassinateOneHit::calcDamage( )
     {
         gsn_assassinate->improve( ch, false, victim );
         damBase( );
-        gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );
+        damApplyEnhancedDamage( );
         damApplyPosition( );  
         dam *= 2;
         damApplyDamroll( );
@@ -1012,6 +1013,30 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 }
 
 
+/*----------------------------------------------------------------------------
+ * throwdown 
+ *---------------------------------------------------------------------------*/
+class ThrowDownOneHit: public SkillDamage {
+public:
+    ThrowDownOneHit( Character *ch, Character *victim );
+
+    virtual void calcDamage( );
+};
+
+ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
+            : Damage( ch, victim, DAM_BASH, 0 ),
+              SkillDamage( ch, victim, gsn_throw, DAM_BASH, 0, DAMF_WEAPON )
+{
+}
+
+void ThrowDownOneHit::calcDamage( )
+{
+        dam = ch->getModifyLevel() + get_curr_stat_extra(ch, STAT_STR) + ch->damroll / 2;
+        damApplyEnhancedDamage( );
+
+        Damage::calcDamage( );
+}
+
 /*
  * 'throw' skill command
  */
@@ -1195,11 +1220,14 @@ SKILL_RUNP( throwdown )
                 victim->position = POS_RESTING;
             }        
 
-            //dam is a member of Damage class. this will work without declaring dam after enhanceddamage changes are merged
-            int dam = ch->getModifyLevel() + get_curr_stat_extra(ch, STAT_STR) + ch->damroll / 2;
-            gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
-
-            damage( ch, victim, dam, gsn_throw, DAM_BASH, true, DAMF_WEAPON );
+            ThrowDownOneHit throwdown( ch, victim );
+            try
+            {
+                throwdown.hit(true);
+            }
+            catch (const VictimDeathException &e){   
+            }                     
+          
             gsn_throw->improve( ch, true, victim );
         }
         else

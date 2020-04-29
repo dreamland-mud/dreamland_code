@@ -49,9 +49,19 @@ VOID_SPELL(BlessWeapon)::run( Character *ch, Object *obj, int sn, int level )
         return;
     }
 
-    if ( IS_WEAPON_STAT(obj,WEAPON_VAMPIRIC)
-        ||  IS_OBJ_STAT(obj,ITEM_DARK)
-        ||  IS_OBJ_STAT(obj,ITEM_EVIL) )
+    if ( IS_WEAPON_STAT(obj,WEAPON_VAMPIRIC) )
+    {
+        ch->pecho("Вампиризм %1$O2 препятствует твоему благословению.", obj);
+        return;
+    }
+    
+    if ( IS_OBJ_STAT(obj,ITEM_DARK) )
+    {
+        ch->pecho("Темная сущность %1$O2 отвергает твое благословение.", obj);
+        return;
+    }
+    
+    if ( IS_OBJ_STAT(obj,ITEM_EVIL) )
     {
         ch->pecho("Дьявольская сущность %1$O2 отвергает твое благословение.", obj);
         return;
@@ -199,13 +209,13 @@ VOID_SPELL(EnchantArmor)::run( Character *ch, Object *obj, int sn, int level )
     else if (result <= (90 - level/5))  /* success! */
     {
         act("Золотая аура окружает $o4.",ch,obj,0,TO_ALL);
-        add_ac = -1;
+        add_ac = -1 * (level / 5);
     }
     else  /* exceptional enchant */
     {
         act("$o1 вспыхивает бриллиантово-золотым светом!", ch,obj,0,TO_ALL);
         SET_BIT(obj->extra_flags,ITEM_GLOW);
-        add_ac = -2;
+        add_ac = -2 * (level / 5);
     }
 
     if (ch->getProfession( )->getFlags( ch ).isSet(PROF_MAGIC))
@@ -513,7 +523,8 @@ VOID_SPELL(HungerWeapon)::run( Character *ch, Object *obj, int sn, int level )
         ||  IS_OBJ_STAT(obj, ITEM_BLESS)
         ||  IS_OBJ_STAT(obj, ITEM_ANTI_EVIL)) 
     {
-            act_p("Боги в гневе!", ch, 0, 0, TO_ALL, POS_RESTING);
+            act("Боги Света наказывают тебя за попытку осквернения священного оружия!", ch, 0, 0, TO_CHAR);
+            act("Боги Света наказывают $c4 за попытку осквернения священного оружия!", ch, 0, 0, TO_ROOM);
             rawdamage(ch, ch, DAM_HOLY, 
                     (ch->hit - 1) > 1000 ? 1000 : (ch->hit - 1), true );
             return;
@@ -615,7 +626,7 @@ VOID_SPELL(Recharge)::run( Character *ch, Object *obj, int sn, int level )
 
     if (obj->item_type != ITEM_WAND && obj->item_type != ITEM_STAFF)
     {
-        ch->println("Ты можешь восстановить заклинания только у волшебных палочек и посохов.");
+        ch->println("Ты можешь восстановить заряды только у волшебных палочек и посохов.");
         return;
     }
 

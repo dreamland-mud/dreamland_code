@@ -33,9 +33,8 @@ private:
         void doAccept( Character *, DLString& );
         void doReject( Character *, DLString& );
         void doDelete( Character *, DLString& );
-        void doList( Character * );
+        void doList( Character *, DLString & );
         void doShow( Character *, DLString& );
-        void doUnread( Character * );
         void usage( Character * );
         
         static const DLString COMMAND_NAME;

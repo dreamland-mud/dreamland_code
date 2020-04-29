@@ -142,7 +142,8 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
             chance += 20 * (diff + 10);
     }
 
-    bool fBonus = bonus_learning->isActive(pch, time_info);
+    //humans always have bonus learning. does not stack with other bonuses
+    bool fBonus = (bonus_learning->isActive(pch, time_info) || ch->getRace()->getName() == "human");
 
     if (fBonus)
         chance *= 2;

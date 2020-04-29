@@ -1220,7 +1220,7 @@ AmbushOneHit::AmbushOneHit( Character *ch, Character *victim )
 void AmbushOneHit::calcDamage( ) 
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     damApplyDamroll( );
     dam *= 3;
@@ -1292,7 +1292,13 @@ SKILL_RUNP( ambush )
             return;
     }
 
-    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) || victim->can_see(ch) )
+    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
+    {
+            ch->send_to("Сначала тебе стоит замаскироваться.\n\r");
+            return;
+    }   
+
+    if ( victim->can_see(ch) )
     {
             ch->send_to("Твоя жертва тебя видит.\n\r");
             return;

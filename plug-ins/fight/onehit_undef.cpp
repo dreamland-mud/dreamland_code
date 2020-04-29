@@ -126,7 +126,7 @@ void UndefinedOneHit::calcDamage( )
 {
     damBase( );
     damApplyMasterHand( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyMasterSword( );
     damApplyPosition( );
     damApplyDamroll( );
@@ -901,8 +901,9 @@ void UndefinedOneHit::damEffectGroundStrike( )
         return;
 
     diceroll = number_range( 0, 100 );
+    diceroll-= skill_level_bonus(*gsn_ground_strike, ch);
     levelDiff = victim->getModifyLevel( ) - ch->getModifyLevel( );
-
+    
     if (levelDiff > 0)
         diceroll += levelDiff * 2;
     else 
@@ -972,6 +973,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         return;
 
     diceroll = number_range( 0, 100 );
+    diceroll-= skill_level_bonus(*gsn_critical_strike, ch);
+
     if ( victim->getRealLevel( ) > ch->getRealLevel( ) )
         diceroll += ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
     if ( victim->getRealLevel( ) < ch->getRealLevel( ) )
@@ -989,15 +992,54 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     gsn_critical_strike->improve( ch, true, victim );
 
     if (diceroll < 75) {
-        act_p( "{R$c1 бросает тебя умелым движением!{x", ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( "{RТы бросаешь $C4 умелым движением!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
+
+        const char *msgVict = "{W$c1 обездвиживает тебя предательским ударом по печени!{x"; //bare hands messages
+        const char *msgChar = "{WТы обездвиживаешь $C4 предательским ударом по печени!{x";
+
+        if(wield){
+
+            if(wield->value0() == WEAPON_SWORD){
+            msgVict = "{W$c1 обездвиживает тебя внезапным ударом меча в печень!{x"; //sword messages
+            msgChar = "{WТы обездвиживаешь $C4 внезапным ударом меча в печень!{x";
+            }
+            else if(wield->value0() == WEAPON_DAGGER){
+            msgVict = "{W$c1 обездвиживает тебя, внезапно всаживая кинжал в печень!{x"; //dagger messages
+            msgChar = "{WТы обездвиживаешь $C4, внезапно всаживая кинжал в печень!{x{x";         
+            }
+            else{
+            msgVict = "{W$c1 обездвиживает тебя внезапным ударом в печень!{x"; //everything else
+            msgChar = "{WТы обездвиживаешь $C4 внезапным ударом в печень!{x";
+            }
+        }
+
+        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
 
         victim->setWaitViolence( 2 );
-        dam += (dam * number_range( 2, 5 )) / 5;            
+        dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
     }
     else if (diceroll < 95) {
-        act_p( "{y$c1 ослепляет тебя своей атакой!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
-        act_p( "{yТы ослепляешь $C4 своей атакой!{x", ch, 0, victim, TO_CHAR,POS_RESTING);
+        const char *msgVict = "{y$c1 внезапно ослепляет тебя, ткнув пальцем прямо в глаз!{x"; //bare hands messages
+        const char *msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";
+
+        if(wield){
+
+            if(wield->value0() == WEAPON_SWORD){
+            msgVict = "{y$c1 наносит тебе удар мечом в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //sword messages
+            msgChar = "{yТы ослепляешь $C4, нанеся удар мечом в голову!{x";
+            }
+            else if(wield->value0() == WEAPON_DAGGER){
+            msgVict = "{y$c1 внезапно ослепляет тебя, ткнув кинжалом прямо в глаз!{x"; //dagger messages
+            msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";         
+            }
+            else{
+            msgVict = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //everything else
+            msgChar = "{yТы ослепляешь $C4 быстрым ударом в голову!{x";
+            }
+        }
+
+        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
 
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
@@ -1005,17 +1047,37 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             baf.type     = gsn_critical_strike;
             baf.level    = ch->getModifyLevel();
             baf.location     = APPLY_HITROLL;
-            baf.modifier     = -4;
+            baf.modifier     = -1 * ch->getModifyLevel() / 10;
             baf.duration     = number_range(1,5);
             baf.bitvector    = AFF_BLIND;
             affect_to_char( victim, &baf );
         }
-        dam += dam * number_range( 1, 2 );            
+        dam += dam * number_range( 1, 2 );  // +100-200% damage          
     }
     else {
-        act_p( "{r$c1 подрезает тебя больно! ОЙ!!{x", ch, 0, victim, TO_VICT ,POS_RESTING);
-        act_p( "{rТы подрезаешь $C4 больно!  Это действительно больно!{x", ch, 0, victim, TO_CHAR ,POS_RESTING);
-        dam += dam * number_range( 2, 5 );            
+        const char *msgVict = "{RНеожиданно изловчившись, $c1 наносит мощнейшую серию ударов тебе ПРЯМО В СЕРДЦЕ!!!{x"; //bare hands messages
+        const char *msgChar = "{RНеожиданно изловчившись, ты наносишь мощнейшую серию ударов $C3 ПРЯМО В СЕРДЦЕ!!!{x";
+
+        if(wield){
+
+            if(wield->value0() == WEAPON_SWORD){
+            msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе меч ПРЯМО В СЕРДЦЕ!!!{x"; //sword messages
+            msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 меч ПРЯМО В СЕРДЦЕ!!!{x";
+            }
+            else if(wield->value0() == WEAPON_DAGGER){
+            msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе кинжал ПРЯМО В СЕРДЦЕ!!!{x"; //dagger messages
+            msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 кинжал ПРЯМО В СЕРДЦЕ!!!{x";         
+            }
+            else{
+            msgVict = "{RНеожиданно изловчившись, $c1 наносит тебе удар ПРЯМО В СЕРДЦЕ!!!{x"; //everything else
+            msgChar = "{RНеожиданно изловчившись, ты наносишь $C3 удар ПРЯМО В СЕРДЦЕ!!!{x";
+            }
+        }
+
+        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
+
+        dam += dam * number_range( 2, 5 ); // +200-500% damage            
     }
 }
 

@@ -1127,16 +1127,17 @@ CMDRUNP( request )
                 return;
         }
 
+          if ( victim->position <= POS_SLEEPING )
+        {
+                act( "$C1 не в состоянии выполнить твою просьбу.", ch, 0, victim, TO_CHAR);
+                return;
+        }
+
         if (victim->getNPC()->behavior 
             && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER)))
         {
                 ch->send_to("Хочешь -- купи!\n\r");
                 return;
-        }
-
-        if (!IS_AWAKE(victim)) {
-            interpret_raw( victim, "snore" );
-            return;
         }
 
         if (ch->move < (50 + ch->getRealLevel( )))
@@ -1190,14 +1191,13 @@ CMDRUNP( request )
                 return;
         }
 
-        if ( obj->wear_loc != wear_none )
-                unequip_char(victim, obj);
-
-        if ( !can_drop_obj( ch, obj ) )
-        {
-                do_say(victim, "Извини, но эта вешь проклята, я не могу избавиться от нее.");
-                return;
-        }
+    if ( !can_drop_obj( ch, obj )
+    || ( obj_is_worn(obj) && IS_OBJ_STAT(obj, ITEM_NOREMOVE)  ))
+    {
+      do_say(victim,
+        "Извини, но эта вещь проклята, и я не могу избавиться от нее.");
+      return;
+    }
 
         if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
         {
@@ -1216,12 +1216,41 @@ CMDRUNP( request )
                 ch->send_to( "Ты не видишь этого.\n\r");
                 return;
         }
+          if ( !victim->can_see( ch ) )
+         {
+                  do_say(victim,
+                 "Извини, я не вижу тебя.");
+                 return;
+        }
+
+        if ( !victim->can_see( obj ) )
+            {
+                do_say(victim,
+                "Извини, я не вижу этой вещи.");
+            return;
+            }
+
+
 
         if ( obj->pIndexData->vnum == 520 ) // Knight's key
         {
                 ch->send_to("Извини, он не отдаст тебе это.\n\r");
                 return;
         }
+
+  if ( is_safe(ch, victim) )
+    {
+      return;
+    }
+
+    if ( obj->pIndexData->limit >= 0 && obj->isAntiAligned( ch ) )
+    {
+        ch->pecho("%2$^s не позволяют тебе завладеть %1$O5.",
+                          obj,
+                          IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
+      return;
+    }
+
 
         obj_from_char( obj );
         obj_to_char( obj, ch );
@@ -1346,6 +1375,12 @@ CMDRUNP( demand )
         act( "$C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
         return;
     }
+
+  if ( victim->position <= POS_SLEEPING )
+    {
+       act( "$C1 не в состоянии исполнить твой приказ.", ch, 0, victim, TO_CHAR);
+      return;
+    }
   
     if (victim->getNPC()->behavior 
         && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER))) 
@@ -1377,16 +1412,14 @@ CMDRUNP( demand )
       return;
     }
 
-
-  if ( obj->wear_loc != wear_none )
-    unequip_char(victim, obj);
-
-  if ( !can_drop_obj( ch, obj ) )
+    if ( !can_drop_obj( ch, obj )
+    || ( obj_is_worn(obj) && IS_OBJ_STAT(obj, ITEM_NOREMOVE)  ))
     {
       do_say(victim,
         "Эта вещь проклята, и я не могу избавиться от нее.");
       return;
     }
+
 
   if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
     {
@@ -1403,6 +1436,33 @@ CMDRUNP( demand )
   if ( !ch->can_see( obj ) )
     {
       act_p( "Ты не видишь этого.", ch, 0, victim, TO_CHAR,POS_RESTING );
+      return;
+    }
+
+  if ( !victim->can_see( ch ) )
+    {
+        do_say(victim,
+        "Извини, я не вижу тебя.");
+      return;
+    }
+
+  if ( !victim->can_see( obj ) )
+    {
+        do_say(victim,
+        "Извини, я не вижу этой вещи.");
+      return;
+    }
+
+  if ( is_safe(ch, victim) )
+    {
+      return;
+    }
+
+      if ( obj->pIndexData->limit >= 0 && obj->isAntiAligned( ch ) )
+    {
+        ch->pecho("%2$^s не позволяют тебе завладеть %1$O5.",
+                          obj,
+                          IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
       return;
     }
 

@@ -52,6 +52,10 @@ public:
     virtual void setClan( const ClanReference & )  = 0;
 
     virtual int get_trust( ) const = 0;
+
+    virtual const char * getDescription( ) const  = 0;
+    virtual void setDescription( const DLString& )  = 0; 
+
 };
 
 /**

@@ -79,8 +79,8 @@ SKILL_RUNP( searchstones )
     case SECT_HILLS:    chance = 80; break;
     case SECT_CITY:        chance = IS_SET(ch->in_room->room_flags, ROOM_INDOORS) ? 0 : 40; 
                         break;                        
-    case SECT_FOREST:        chance = 30; break;
-    case SECT_FIELD:        chance = 30; break;
+    case SECT_FOREST:        chance = 60; break;
+    case SECT_FIELD:        chance = 60; break;
     }
 
     if (chance == 0) {
@@ -106,7 +106,7 @@ SKILL_RUNP( searchstones )
     ch->setWait( gsn_search_stones->getBeats( ) );
     
     mlevel = ch->getModifyLevel( );
-    count = number_range( 1, mlevel / 20 );
+    count = number_range( 5, 5 + mlevel / 30 );
 
     act( "Ты подбираешь с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_CHAR );
     act( "$c1 подбирает с земли $t.", ch, (count == 1 ? "камень" : "несколько камней"), 0, TO_ROOM );
@@ -129,47 +129,42 @@ SKILL_RUNP( searchstones )
 /*
  * 'throw stone' skill command
  */
+static Object * find_stone(Character *ch)
+{
+    for (Object *obj = ch->carrying; obj; obj = obj->next_content )
+        if (obj->item_type == ITEM_WEAPON
+            && obj->value0() == WEAPON_STONE
+            && (ch->can_see( obj ) || ch->can_hear( obj )))
+        {
+            return obj;
+        }
+
+    return 0;
+}
 
 SKILL_RUNP( throwstone )
 {
     Character *victim;
     Object *stone;
     bool success;
-    int direction, dam, scanRange, scanRange0, throwRange;
+    int direction, dam;
     int chance = gsn_throw_stone->getEffective( ch );
-    DLString args = argument, arg1, arg2;
+    int range = ( ch->getModifyLevel() / 10) + 1;
+    DLString args = argument;
+    DLString argDoor, argVict;
 
     if (chance <= 1) {
         ch->println("Ты не умеешь швыряться камнями.");
         return;
     }
     
-    arg1 = args.getOneArgument( );
-    arg2 = args.getOneArgument( );
-
-    if (arg1.empty( ) || arg2.empty( )) {
+    if (!direction_range_argument(argument, argDoor, argVict, direction)) {
         ch->println("Швырнуть камень куда и в кого?");
         return;
     }
 
-    direction = direction_lookup( arg1.c_str( ) );
-
-    if (direction < 0) {
-        ch->println("Швырнуть в каком направлении?");
+    if ( ( victim = find_char( ch, argVict.c_str(), direction, &range) ) == 0 )
         return;
-    }
-
-    scanRange = scanRange0 = max( 1, ch->getModifyLevel( ) / 10 );
-    throwRange = 1 + ch->getModifyLevel( ) / 30;
-    victim = find_char( ch, arg2.c_str( ), direction, &scanRange);
-
-    if (!victim)
-        return;
-
-    if (scanRange0 - scanRange > throwRange) {
-        ch->println("Жертва стоит слишком далеко.");
-        return;
-    }
 
     if (victim == ch) {
         ch->println("Просто ударь себя этим камнем по лбу.");
@@ -186,11 +181,9 @@ SKILL_RUNP( throwstone )
         return;
     }
 
-    if (!( stone = get_eq_char( ch, wear_hold ) )
-        || stone->item_type != ITEM_WEAPON
-        || stone->value0() != WEAPON_STONE)
-    {
-        ch->println("Возьми в руку камень!");
+    stone = find_stone(ch);
+    if (!stone) {
+        ch->println("У тебя в инвентаре нет ни одного камня.");
         return;
     }
 
