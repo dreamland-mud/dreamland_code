@@ -220,7 +220,12 @@ DLString skill_effective_bonus(const Skill *skill, PCharacter *ch)
 
 int skill_level(Skill &skill, Character *ch)
 {
-    int slevel = ch->getModifyLevel();
+    return skill_level_bonus(skill, ch) + ch->getModifyLevel();
+}
+
+int skill_level_bonus(Skill &skill, Character *ch)
+{
+    int slevel = 0;
 
     if (!ch->is_npc()) {
         slevel += ch->getPC()->mod_level_groups[skill.getGroup()];
@@ -236,9 +241,9 @@ int skill_level(Skill &skill, Character *ch)
         slevel += number_range(1, 5);
     }
     
-    if (ch->is_immortal() && slevel != ch->getModifyLevel()) 
+    if (ch->is_immortal() && slevel > 0) 
         ch->printf("Отладка: уровень умения %s %d -> %d.\r\n", 
-                    skill.getName().c_str(), ch->getModifyLevel(), slevel);
+                    skill.getName().c_str(), ch->getModifyLevel(), slevel+ch->getModifyLevel());
 
     return slevel;
 }

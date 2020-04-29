@@ -901,7 +901,7 @@ void UndefinedOneHit::damEffectGroundStrike( )
         return;
 
     diceroll = number_range( 0, 100 );
-    diceroll-= (skill_level(*gsn_ground_strike, ch) - ch->getModifyLevel());
+    diceroll-= skill_level_bonus(*gsn_ground_strike, ch);
     levelDiff = victim->getModifyLevel( ) - ch->getModifyLevel( );
     
     if (levelDiff > 0)
@@ -973,7 +973,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         return;
 
     diceroll = number_range( 0, 100 );
-    diceroll-= (skill_level(*gsn_critical_strike, ch) - ch->getModifyLevel());
+    diceroll-= skill_level_bonus(*gsn_critical_strike, ch);
 
     if ( victim->getRealLevel( ) > ch->getRealLevel( ) )
         diceroll += ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
