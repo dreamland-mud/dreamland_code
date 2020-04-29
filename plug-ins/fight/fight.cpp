@@ -241,7 +241,7 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
     if (IS_AFFECTED(ch, AFF_SLOW))
         chance = chance * 3 / 4;
     
-    chance+= (skill_level(skill, ch) - ch->getModifyLevel());
+    chance+= skill_level_bonus(skill, ch);
 
     if (number_percent( ) < chance) {
         one_hit_nocatch( ch, victim );
