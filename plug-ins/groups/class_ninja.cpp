@@ -520,7 +520,7 @@ BOOL_SKILL(caltraps)::run(Character *ch, Character *victim)
 /*----------------------------------------------------------------------------
  * throwdown 
  *---------------------------------------------------------------------------*/
-class ThrowDownOneHit: public SkillWeaponOneHit {
+class ThrowDownOneHit: public SkillDamage {
 public:
     ThrowDownOneHit( Character *ch, Character *victim );
 
@@ -528,7 +528,8 @@ public:
 };
 
 ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, DAM_BASH, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_throw )
+            : Damage( ch, victim, DAM_BASH, 0 ),
+              SkillDamage( ch, victim, gsn_throw, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
 
@@ -537,7 +538,7 @@ void ThrowDownOneHit::calcDamage( )
         dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
         damApplyEnhancedDamage( );
 
-        WeaponOneHit::calcDamage( );
+        Damage::calcDamage( );
 }
 
 /*
@@ -651,7 +652,7 @@ SKILL_RUNP( throwdown )
             ThrowDownOneHit throwdown( ch, victim );
             try
             {
-            throwdown.hit();
+            throwdown.hit(true);
             }
             catch (const VictimDeathException &e){   
             }                     
