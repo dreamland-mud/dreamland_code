@@ -372,7 +372,7 @@ static bool can_get_obj( Character *ch, Object *obj )
     if (!oprog_can_get( ch, obj ))
         return false;
 
-    if (!obj->can_wear( ITEM_TAKE ))
+    if ( (!obj->can_wear( ITEM_TAKE )) && (!ch->is_immortal()) )
     {
         ch->pecho("Ты не можешь взять %1$O4.", obj );
         return false;
