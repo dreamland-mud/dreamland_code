@@ -912,7 +912,7 @@ CMDWIZP( stat )
         ch->send_to(buf);
     }
 
-    sprintf( buf, "Имя: '%s'\n\Зона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
+    sprintf( buf, "Имя: '%s'\n\rЗона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
         location->name,
         location->area->name ,
         location->owner,
@@ -957,7 +957,7 @@ CMDWIZP( stat )
         }
     }
 
-    ch->send_to(".\n\Объекты:   ");
+    ch->send_to(".\n\rОбъекты:   ");
     for ( obj = location->contents; obj; obj = obj->next_content )
     {
         ch->printf( " %s", obj->getFirstName( ).c_str( ) );
