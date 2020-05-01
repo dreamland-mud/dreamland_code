@@ -128,8 +128,10 @@ bool RoamingPortal::area( )
     if (!room)
         return false;
 
+    obj->getRoom( )->echo( POS_RESTING, "%1$^O1 {Cярко вспыхивает,{x схлопывается и исчезает!", obj );    
     obj_from_room( obj );
     obj_to_room( obj, room );
+    obj->getRoom( )->echo( POS_RESTING, "%1$^O1 {Wпоявляется из ниоткуда,{x приветливо гудя и потрескивая.", obj );    
 
     current = frequency;
     return false;
@@ -159,16 +161,16 @@ bool CatsEye::drop( Character *victim ) {
             || IS_SET(victim->act, PLR_WANTED)
             || victim->isAffected(gsn_manacles ) 
             || victim->isAffected(gsn_jail)
-            || victim->in_room->vnum == 4)) 
+            || victim->in_room->vnum == 10)) 
     {
-        act("Кошачий глаз ярко вспыхивает зеленым и исчезает.", victim, 0, 0, TO_ALL);
-        act("Кошачий Бог не хочет тебя сейчас видеть.", victim, 0, 0, TO_CHAR);
+        act("Кошачий глаз {Gярко вспыхивает зеленым{x и исчезает.", victim, 0, 0, TO_ALL);
+        act("{RКошачья Богиня не хочет тебя сейчас видеть.{x", victim, 0, 0, TO_CHAR);
     } else {
-        act("Кошачий глаз ярко вспыхивает зеленым и исчезает.", victim, 0, 0, TO_CHAR);
+        act("Кошачий глаз {Gярко вспыхивает зеленым{x и исчезает.", victim, 0, 0, TO_CHAR);
 
         transfer_char( victim, victim, room,
-                       "Кошачий глаз ярко вспыхивает и исчезает, увлекая %1$^C4 за собой в зеленом вихре.",
-                       "Могущество Кошачего Бога переносит тебя к его Алтарю.", 
+                       "Кошачий глаз {Gярко вспыхивает{x и исчезает, увлекая %1$^C4 за собой в зеленом вихре.",
+                       "Могущество Кошачьей Богини переносит тебя подальше от опасности.", 
                        "%1$^C1 появил%1$Gось|ся|ась в комнате." );
     }
    
