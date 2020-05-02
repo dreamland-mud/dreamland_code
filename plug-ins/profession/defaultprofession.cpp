@@ -43,7 +43,7 @@ void ClassSkillHelp::getRawText( Character *ch, ostringstream &in ) const
     // True if it's a help json dump and not a player requesting the article.
     bool autodump = ch->desc == 0;
 
-    in << "Умения и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
+    in << "Навыки и заклинания класса {C" << prof->getRusName( ).ruscase('1') << "{x, {C"
        << prof->getName( ) << "{x: " << editButton(ch) << endl << endl;
         
     in << *this;
@@ -100,8 +100,13 @@ void ClassSkillHelp::setProfession( DefaultProfession::Pointer prof )
     this->prof = prof;
     
     addAutoKeyword(prof->getName( ) + " skills");
+    addAutoKeyword(prof->getName( ) + " spells");
+    addAutoKeyword("заклинания " + prof->getRusName().ruscase('2'));
+    addAutoKeyword("заклинания " + prof->getMltName().ruscase('2'));    
     addAutoKeyword("умения " + prof->getRusName().ruscase('2'));
     addAutoKeyword("умения " + prof->getMltName().ruscase('2'));
+    addAutoKeyword("навыки " + prof->getRusName().ruscase('2'));
+    addAutoKeyword("навыки " + prof->getMltName().ruscase('2'));    
     labels.addTransient(LABEL_CLASS);
 
     helpManager->registrate( Pointer( this ) );
@@ -165,7 +170,7 @@ DLString ProfessionHelp::getTitle(const DLString &label) const
 
 void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    in << "Профессия {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
+    in << "Класс {C" << prof->getRusName( ).ruscase( '1' ) << "{x или {C"
        << prof->getName( ) << "{x" 
        << editButton(ch) << endl << endl;
         
@@ -233,7 +238,7 @@ void ProfessionHelp::getRawText( Character *ch, ostringstream &in ) const
     }
 
     in << endl;
-    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,профессия характеристики)]. ";
+    in << endl << "Подробнее обо всех параметрах читай в %H% [(class stats,таблица классов)]. ";
     if (prof->skillHelp && prof->skillHelp->getID() > 0)
         in << "%SA% %H% [(" << prof->getName() << " skills,умения " 
            << prof->getRusName().ruscase('2') << ")].";
