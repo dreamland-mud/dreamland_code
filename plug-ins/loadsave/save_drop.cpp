@@ -353,7 +353,7 @@ void save_room_objects( Room *room )
 {
     char        fname[MAX_INPUT_LENGTH];
     FILE        *fp;
-    Object *obj, *obj_nc;
+    Object *obj;
 
     if ( !room )
     {

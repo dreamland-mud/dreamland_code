@@ -206,9 +206,7 @@ void Room::affectStrip( int sn )
 void Room::affectJoin( Affect *paf )
 {
     Affect *paf_old;
-    bool found;
 
-    found = false;
     for ( paf_old = affected; paf_old != 0; paf_old = paf_old->next )
     {
         if ( paf_old->type == paf->type )
@@ -224,7 +222,6 @@ void Room::affectJoin( Affect *paf )
     affectTo( paf );
     return;
 }
-
 
 
 /*

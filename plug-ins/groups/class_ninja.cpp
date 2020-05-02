@@ -550,7 +550,7 @@ SKILL_RUNP( throwdown )
 {
         Character *victim;
         char arg[MAX_INPUT_LENGTH];
-        int chance, dam;
+        int chance;
 
         if ( MOUNTED(ch) )
         {
