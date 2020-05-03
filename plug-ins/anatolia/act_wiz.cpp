@@ -2524,7 +2524,7 @@ CMDWIZP( restore )
             vch->mana        = vch->max_mana;
             vch->move        = vch->max_move;
             update_pos( vch);
-            act_p("$c1 {Gвосстановил{x твои силы!",ch,0,vch,TO_VICT,POS_DEAD);
+            act_p("$c1 {Gвосстановил$gо||а{x твои силы!",ch,0,vch,TO_VICT,POS_DEAD);
         }
 
         wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust(), 
@@ -2560,7 +2560,7 @@ CMDWIZP( restore )
             victim->move        = victim->max_move;
             update_pos( victim);
             if (victim->in_room != 0)
-                act_p("$c1 {Gвосстановил{x твои силы!",ch,0,victim,TO_VICT,POS_DEAD);
+                act_p("$c1 {Gвосстановил$gо||а{x твои силы!",ch,0,victim,TO_VICT,POS_DEAD);
         }
         ch->send_to("Все активные игроки восстановлены!\n\r");
         return;
@@ -2582,7 +2582,7 @@ CMDWIZP( restore )
     victim->move = victim->max_move;
     update_pos( victim );
 
-    act_p( "$c1 {Gвосстановил{x твои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
+    act_p( "$c1 {Gвосстановил$gо||а{x твои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
     wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust( ), "%C1 restored %C4.", ch, victim );
     ch->send_to("Готово.\n\r");
 }
