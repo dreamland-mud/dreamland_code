@@ -11,6 +11,7 @@
 #include "lex.h"
 
 #include "commandtemplate.h"
+#include "hometown.h"
 #include "attract.h"
 #include "occupations.h"
 #include "behavior_utils.h"
@@ -24,6 +25,7 @@
 #include "def.h"
 
 static const int conPriceQP = 150;
+HOMETOWN(frigate);
 
 static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
 {
@@ -75,16 +77,6 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 
         client->practice -= 10;
         client->train +=1 ;
-        return;
-    }
-
-    if (arg.empty( )) {
-        if (client->practice >= 10)
-            tell_act( client, ch, "Можно обменять {Y10{G практик на {Y1{G тренировочную сессию: {hc{lRтренировки купить{lEgain convert{lx{x." );    
-        if (client->train >= 1)
-            tell_act( client, ch, "Можно обменять {Y1{G тренировку на {Y10{G практик: {hc{lRтренировки продать{lEgain revert{lx{x" );  
-        if ( (client->train < 1) && (client->practice < 10) )
-            tell_act( client, ch, "У тебя не хватает ни тренировок, ни практик для этого." );
         return;
     }
 }
@@ -192,8 +184,13 @@ void Trainer::showTrain(PCharacter *client)
                   "Ты можешь тренировать:%s%s", 
                   (cnt > 3 ? "\r\n" : " " ),
                   buf.str( ).c_str( ) );
-        if ( (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON )) && (client->getPC( )->getQuestPoints() >= conPriceQP) )
-            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hc{lEtrain con qp{lRтренировать сложение кп{lx{x.", conPriceQP );
+        
+        bool hideQpPrice = client->getHometown() == home_frigate 
+                            && client->getRemorts().size() == 0
+                            && client->getQuestPoints() < conPriceQP;
+        
+        if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ) && !hideQpPrice)
+            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hc{lEtrain con qp{lRтренировать сложение кп{x.", conPriceQP );
     }            
     else {
         /*
