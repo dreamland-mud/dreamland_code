@@ -176,16 +176,6 @@ bool Note::findRecipient( PCMemoryInterface *pcm, DLString &arg, ostringstream &
         return true;
     }
     
-    if (arg.toLower() == "telegram") {
-        buf << "Telegram";
-        return false;
-    }
-
-    if (arg.toLower() == "discord") {
-        buf << "Discord";
-        return false;
-    }
-
     if (argIsImmortal( arg )) {
         buf << "Боги";
         return (pcm->get_trust( ) >= LEVEL_IMMORTAL);

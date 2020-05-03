@@ -85,6 +85,8 @@ AC_CREATE_DIR(var/misc/bugs)
 AC_CREATE_DIR(var/misc/ideas)
 AC_CREATE_DIR(var/misc/nohelp)
 AC_CREATE_DIR(var/misc/discord)
+AC_CREATE_DIR(var/misc/discord-stream)
+AC_CREATE_DIR(var/misc/telegram)
 AC_CREATE_DIR(var/misc/api)
 AC_CREATE_DIR(var/misc/help)
 
