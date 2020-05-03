@@ -40,7 +40,6 @@ CMDADM( nopost )
         XMLAttributes* attributes;
         XMLAttributeNoPost::Pointer attr;
         PCMemoryInterface* pci;
-        int level;
         DLString arguments = constArguments;
         DLString name = arguments.getOneArgument( );
 
@@ -57,7 +56,6 @@ CMDADM( nopost )
         }
 
         name = pci->getName( );
-        level = pci->get_trust( );
         attributes = &pci->getAttributes( );
                     
         arguments.stripWhiteSpace( );

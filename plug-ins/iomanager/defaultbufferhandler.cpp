@@ -337,7 +337,6 @@ DefaultBufferHandler::write( Descriptor *d, const char *txt )
 // Temporary here before descriptor read/write overhaul.
 DLString DefaultBufferHandler::convert(const char *txt) 
 {
-    int size;
     int length = strlen(txt);
 
     const unsigned char *to = russian_codepages[codepage].to;

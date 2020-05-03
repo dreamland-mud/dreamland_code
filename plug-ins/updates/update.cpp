@@ -191,6 +191,22 @@ void room_saving( void )
     saving_position = i_max;
 }
 
+bool is_bright_for_vampire( Character *ch )
+{
+    if (weather_info.sunlight == SUN_DARK)
+        return false;
+        
+    if (IS_SET(ch->in_room->room_flags, ROOM_DARK))
+        return false;
+
+    if (!IS_OUTSIDE(ch))
+        return false;
+        
+    if (ch->isAffected(gsn_dark_shroud)) 
+        return false;
+    return true;
+}
+
 bool is_room_saving( Room * room )
 {
     if ( room == 0 )
@@ -323,9 +339,7 @@ void char_update( )
         }
         
         if (ch->is_vampire( ) && !frozen) {
-            if (weather_info.sunlight != SUN_DARK
-                && !IS_SET(ch->in_room->room_flags, ROOM_DARK)
-                && IS_OUTSIDE(ch))
+            if (is_bright_for_vampire( ch ))
             {
                 interpret( ch, "human" );
             }
@@ -1121,18 +1135,9 @@ struct LightVampireDamage : public Damage {
         if (!ch->is_vampire( ))
             return false;
         
-        if (weather_info.sunlight == SUN_DARK)
+        if (!is_bright_for_vampire( ch ))
             return false;
-        
-        if (IS_SET(ch->in_room->room_flags, ROOM_DARK))
-            return false;
-
-        if (!IS_OUTSIDE(ch))
-            return false;
-        
-        if (ch->isAffected(gsn_dark_shroud)) 
-            return false;
-
+            
         return Damage::canDamage( );
     }
         

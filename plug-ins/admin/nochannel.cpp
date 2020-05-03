@@ -35,7 +35,6 @@ CMDADM( nochannel )
         XMLAttributes* attributes;
         XMLAttributeNoChannel::Pointer attr;
         PCMemoryInterface* pci;
-        int level;
         DLString arguments = constArguments;
         DLString name = arguments.getOneArgument( );
 
@@ -52,7 +51,6 @@ CMDADM( nochannel )
         }
 
         name = pci->getName( );
-        level = pci->get_trust( );
         attributes = &pci->getAttributes( );
                     
         arguments.stripWhiteSpace( );

@@ -523,7 +523,6 @@ CMDRUN( value )
     NPCharacter *keeper;
     ShopTrader::Pointer trader;
     Object *obj;
-    int cost;
     DLString arg = constArguments;
 
     if (arg.empty( ))

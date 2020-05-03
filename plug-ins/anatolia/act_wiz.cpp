@@ -360,7 +360,7 @@ CMDWIZP( limited )
                                         sprintf(buf, "Внутри %-20s [%d] \n\r",
                                                 obj->in_obj->getShortDescr( '1' ).c_str( ),
                                                 obj->in_obj->pIndexData->vnum);
-                                        ch->send_to(buf);
+                                ch->send_to(buf);
                         }
                 sprintf(buf, "  %d сейчас в игре, а еще %d в профилях игроков.\n\r",
                         ingameCount, obj_index->count-ingameCount);

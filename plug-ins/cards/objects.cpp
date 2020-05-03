@@ -492,7 +492,7 @@ DLString CardBehavior::extraDescription( Character *ch, const DLString &args )
     
     if (ch->is_npc( ) 
             || !is_name( args.c_str( ), obj->getName( ) )
-            || !gsn_card_vision->getLearned( ch ) > 1)
+            || gsn_card_vision->getLearned( ch ) <= 1)
         return DLString::emptyString;
 
     victPlayer = PCharacterManager::findPlayer( getPlayerName( ) );
