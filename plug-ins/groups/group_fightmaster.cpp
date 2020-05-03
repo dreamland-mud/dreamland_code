@@ -74,13 +74,13 @@ SKILL_RUNP( bashdoor )
 
         if (MOUNTED(ch))
         {
-                ch->send_to("Ты не можешь выбить дверь, когда ты в седле.\n\r");
+                ch->send_to("Только не верхом!\n\r");
                 return;
         }
 
         if (RIDDEN(ch))
         {
-                ch->send_to("Ты не можешь выбить дверь, когда оседлан.\n\r");
+                ch->send_to("Ты не можешь выбить дверь, когда оседлан{Sfа{Sx.\n\r");
                 return;
         }
 
@@ -136,7 +136,7 @@ SKILL_RUNP( bashdoor )
 
         if ( !IS_SET(exit_info, EX_LOCKED) )
         {
-                ch->send_to("Просто поробуй открыть.\n\r");
+                ch->send_to("Просто попробуй открыть.\n\r");
                 return;
         }
 
@@ -297,11 +297,12 @@ SKILL_RUNP( bash )
         int wait;
         bool FightingCheck;
 
+        /*
         if ( MOUNTED(ch) )
         {
                 ch->send_to("Ты не можешь сбить с ног, если ты верхом!\n\r");
                 return;
-        }
+        }*/
 
         if ( ch->fighting != 0 )
                 FightingCheck = true;
@@ -337,7 +338,7 @@ SKILL_RUNP( bash )
                 return;
         }
 
-        if ( victim->position < POS_FIGHTING )
+        if ( ( victim->position < POS_FIGHTING ) && ( FightingCheck ) )
         {
                 act_p("Подожди пока $E встанет.",ch,0,victim,TO_CHAR,POS_RESTING);
                 return;
@@ -355,11 +356,12 @@ SKILL_RUNP( bash )
                 return;
         }
         
+        /*
         if ( is_flying( ch ) )
         {
                 ch->send_to("В полете? И как ты себе это представляешь?\n\r");
                 return;
-        }
+        }*/
 
         if ( is_safe(ch,victim) )
                 return;
@@ -372,7 +374,7 @@ SKILL_RUNP( bash )
 
         if (SHADOW(ch))
         {
-                ch->send_to("Ты безуспешно пытаешься бороться со своей тенью.\n\r");
+                ch->send_to("Ты безуспешно пытаешься сбить с ног свою тень.\n\r");
                 act_p("$c1 бьет щитом свою тень.",ch,0,0,TO_ROOM,POS_RESTING);
                 return;
         }
@@ -905,7 +907,7 @@ SKILL_RUNP( concentrate )
     /* fighting */
     if (ch->fighting)
     {
-        ch->send_to("Концентрируется для сражения!\n\r");
+        ch->send_to("Поздно концентрироваться, бой уже в самом разгаре!\n\r");
         return;
     }
 
