@@ -297,12 +297,11 @@ SKILL_RUNP( bash )
         int wait;
         bool FightingCheck;
 
-        /*
-        if ( MOUNTED(ch) )
+        if ( (MOUNTED(ch)) && (!gsn_riding->available(ch)) )
         {
-                ch->send_to("Ты не можешь сбить с ног, если ты верхом!\n\r");
+                ch->send_to("Ты не знаешь, как применять такие навыки верхом.\n\r");
                 return;
-        }*/
+        }
 
         if ( ch->fighting != 0 )
                 FightingCheck = true;
