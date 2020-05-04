@@ -180,7 +180,7 @@ const struct        con_app_type        con_app                []               
 /*
  * Attribute helper functions
  */
-static int get_curr_stat_extra( Character *ch, int stat )
+int get_curr_stat_extra( Character *ch, int stat )
 {
     int value;
 
