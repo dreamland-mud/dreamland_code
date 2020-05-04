@@ -16,13 +16,29 @@
 
 static IconvMap koi2utf("koi8-r", "utf-8");
 
+/** Strip mud-tags from the string. Escape characters that are part of Markdown syntax. */
+static DLString telegram_string(const DLString &source)
+{
+    ostringstream outBuf;
+
+    vistags_convert(source.c_str(), outBuf, 0);
+    DLString dest = outBuf.str();
+    dest.colourstrip();
+    
+    dest.replaces("_", "\\_");
+    dest.replaces("*", "\\*");
+    dest.replaces("`", "\\`");
+    dest.replaces("[", "\\[");
+    return koi2utf(dest);
+}
+
 void send_telegram(const DLString &content)
 {
     try {
         Json::Value body;
         body["chat_id"] = "@dreamland_rocks";
         body["parse_mode"] = "Markdown";
-        body["text"] = koi2utf(content.colourStrip());
+        body["text"] = telegram_string(content);
         
         Json::FastWriter writer;
         DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
