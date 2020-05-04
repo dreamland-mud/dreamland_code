@@ -957,39 +957,67 @@ void UndefinedOneHit::damEffectGroundStrike( )
  */
 void UndefinedOneHit::damEffectCriticalStrike( )
 {
-    int diceroll, chance;
+    int diceroll, chance, skill;
     Affect baf;
+    Object *weapon;        
+              
+    weapon = get_eq_char(ch,wear_wield);
+    skill = gsn_critical_strike->getEffective( ch );        
+            
+    //////////////// ELIGIBILITY CHECKS ////////////////
+            
+    if ( ch == victim )
+        return;
+
+    if ( skill <= 1)
+        return;
+
+    if ( dam == 0 )
+        return;
+
+    if ( SHADOW(ch) )
+        return;
+
+    if ( ( ch->getProfession( ) == prof_ranger ) &&
+         ( ch->in_room->sector_type != SECT_HILLS ) &&
+         ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
+         ( ch->in_room->sector_type != SECT_FOREST ) &&
+         ( ch->in_room->sector_type != SECT_FIELD )
+        return;
     
-    if (ch == victim)
+    if ( ( ch->getProfession( ) == prof_thief ) &&    
+         ( weapon != WEAPON_DAGGER ) )
         return;
 
-    if (( chance = gsn_critical_strike->getEffective( ch ) ) <= 1)
-        return;
-
-    if (dam == 0)
-        return;
-
-    if(SHADOW(ch))
-        return;
-
-    diceroll = number_range( 0, 100 );
-    diceroll-= skill_level_bonus(*gsn_critical_strike, ch);
-
+    //////////////// PROBABILITY CHECKS ////////////////
+    
+    chance = 0;
+        
+    chance += skill / 2;
+    chance += skill_level_bonus(*gsn_critical_strike, ch);    
     if ( victim->getRealLevel( ) > ch->getRealLevel( ) )
-        diceroll += ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
+        chance -= ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
     if ( victim->getRealLevel( ) < ch->getRealLevel( ) )
-        diceroll -= ( ch->getModifyLevel() - victim->getModifyLevel() );
-
-    if (diceroll <= (chance/2)) {
-        gsn_critical_strike->improve( ch, true, victim );
-        dam += dam * diceroll/200;
-    }
-
-    if (diceroll > (chance/13))
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() );
+    if (IS_QUICK(ch))
+        chance += 10;
+    if (IS_QUICK(victim))
+        chance -= 10;
+        
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        chance = chance / 2;
+   
+    if ( number_percent() > chance ) {
+        gsn_critical_strike->improve( ch, false, victim );        
         return;
+    }
+        
+    //////////////// SUCCESS: CALCULATING EFFECT ////////////////
+        
+    gsn_critical_strike->improve( ch, true, victim );
+    dam += dam * chance/200;
    
     diceroll = number_percent( );
-    gsn_critical_strike->improve( ch, true, victim );
 
     if (diceroll < 75) {
 
