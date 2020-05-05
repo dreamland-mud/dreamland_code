@@ -957,11 +957,9 @@ void UndefinedOneHit::damEffectGroundStrike( )
  */
 void UndefinedOneHit::damEffectCriticalStrike( )
 {
-    int diceroll, chance, skill;
+    int diceroll, chance, skill, stun_chance, blind_chance;
     Affect baf;
-    Object *weapon;        
-              
-    weapon = get_eq_char(ch,wear_wield);
+
     skill = gsn_critical_strike->getEffective( ch );        
             
     //////////////// ELIGIBILITY CHECKS ////////////////
@@ -986,14 +984,14 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         return;
     
     if ( ( ch->getProfession( ) == prof_thief ) &&    
-         ( weapon != WEAPON_DAGGER ) )
+         ( !wield || wield->value0 != WEAPON_DAGGER ) )
         return;
 
     //////////////// PROBABILITY CHECKS ////////////////
     
     chance = 0;
         
-    chance += skill / 2;
+    chance += skill / 3;
     chance += skill_level_bonus(*gsn_critical_strike, ch);    
     if ( victim->getRealLevel( ) > ch->getRealLevel( ) )
         chance -= ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
@@ -1006,8 +1004,14 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;
-   
-    if ( number_percent() > chance ) {
+
+    if ( ( ch->getProfession( ) != prof_ranger ) && 
+         ( ch->getProfession( ) != prof_ninja ) &&
+         ( ch->getProfession( ) != prof_samurai ) &&
+         ( ch->getProfession( ) != prof_ranger ) )
+        chance = chance * 3 / 4;        
+    
+    if ( number_percent() > chance ) {               
         gsn_critical_strike->improve( ch, false, victim );        
         return;
     }
@@ -1016,10 +1020,25 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         
     gsn_critical_strike->improve( ch, true, victim );
     dam += dam * chance/200;
-   
+        
+    // thieves have +10% to blind:              65 / 95 / 100  
+    // ninjas and rangers have +10% to stun:    85 / 95 / 100
+    // samurai have +10% to strike heart:       75 / 85 / 100
+    // everyone else:                           75 / 95 / 100 
+        
+    stun_chance = 75;
+    blind_chance = 95;    
+    if ( ( ch->getProfession( ) == prof_ranger ) &&
+         ( ch->getProfession( ) == prof_ninja ) )
+        stun_chance = 85; 
+    if ( ch->getProfession( ) == prof_thief )
+        stun_chance = 65;
+    if ( ch->getProfession( ) == prof_samurai )
+        blind_chance = 85;
+        
     diceroll = number_percent( );
 
-    if (diceroll < 75) {
+    if (diceroll < stun_chance) {
 
         const char *msgVict = "{W$c1 обездвиживает тебя предательским ударом по печени!{x"; //bare hands messages
         const char *msgChar = "{WТы обездвиживаешь $C4 предательским ударом по печени!{x";
@@ -1046,7 +1065,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         victim->setWaitViolence( 2 );
         dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
     }
-    else if (diceroll < 95) {
+    else if (diceroll < blind_chance) {
         const char *msgVict = "{y$c1 внезапно ослепляет тебя, ткнув пальцем прямо в глаз!{x"; //bare hands messages
         const char *msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";
 
@@ -1088,9 +1107,13 @@ void UndefinedOneHit::damEffectCriticalStrike( )
 
         if(wield){
 
-            if(wield->value0() == WEAPON_SWORD){
+            if(wield->value0() == WEAPON_SWORD) {
             msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе меч ПРЯМО В СЕРДЦЕ!!!{x"; //sword messages
             msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 меч ПРЯМО В СЕРДЦЕ!!!{x";
+                if ( ch->getProfession( ) == prof_samurai ) {
+                    msgVict = "{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x"; //sword messages
+                    msgChar = "{RИспользуя технику кацуги-вадза, ты внезапно наносишь $C3 удар особой силы!!!{x";                                    
+                }            
             }
             else if(wield->value0() == WEAPON_DAGGER){
             msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе кинжал ПРЯМО В СЕРДЦЕ!!!{x"; //dagger messages
