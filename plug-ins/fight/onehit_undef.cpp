@@ -877,79 +877,12 @@ bool UndefinedOneHit::defenseHandBlock( )
 /*  
  *  from Anatolia 3.0
  */
+
+
 void UndefinedOneHit::damEffectGroundStrike( ) 
 {
-    int diceroll, levelDiff, chance;
-    Affect baf;
-
-    if (ch == victim)
+        // TODO: delete this function
         return;
-
-    if (!dam)
-        return;
-
-    if (( chance = gsn_ground_strike->getEffective( ch ) ) <= 1)
-        return;
-    
-    if ( ch->in_room->sector_type != SECT_HILLS
-                && ch->in_room->sector_type != SECT_MOUNTAIN
-                && ch->in_room->sector_type != SECT_FOREST
-                && ch->in_room->sector_type != SECT_FIELD )
-        return;
-
-    if(SHADOW(ch))
-        return;
-
-    diceroll = number_range( 0, 100 );
-    diceroll-= skill_level_bonus(*gsn_ground_strike, ch);
-    levelDiff = victim->getModifyLevel( ) - ch->getModifyLevel( );
-    
-    if (levelDiff > 0)
-        diceroll += levelDiff * 2;
-    else 
-        diceroll += levelDiff;
-
-    if ( diceroll <= (chance/3) ) {  
-        gsn_ground_strike->improve( ch, true, victim );
-        dam += dam * diceroll/200;
-    }  
-
-    if ( diceroll > (chance/15) ) 
-        return;
-
-    diceroll = number_percent( );
-    gsn_ground_strike->improve( ch, true, victim );
-  
-    if( diceroll < 75 ) {  
-        act_p( "{RЗемля трясется под твоими ногами!{x", ch, 0, victim, TO_VICT,POS_RESTING );
-        act_p( "{RЗемля под ногами $C2 начинает трястись, повинуясь твоему приказу!{x", ch, NULL, victim, TO_CHAR,POS_RESTING );
-        
-        victim->setWaitViolence( 2 );
-        dam += (dam * number_range( 2, 5 )) / 5;                        
-    } 
-    else if (diceroll < 95) {   
-        act_p( "{yТы ослепле$Gно|н|на атакой $c2!{x", ch, NULL, victim, TO_VICT, POS_RESTING );
-        act_p( "{yТы ослепляешь $C4 своей атакой!{x", ch, NULL, victim, TO_CHAR, POS_RESTING );
-
-        if (!IS_AFFECTED(victim,AFF_BLIND)) {
-              baf.where    = TO_AFFECTS;
-              baf.type = gsn_ground_strike;
-              baf.level = ch->getModifyLevel( ); 
-              baf.location = APPLY_HITROLL; 
-              baf.modifier = -4;
-              baf.duration = number_range(1,5); 
-              baf.bitvector = AFF_BLIND;
-              affect_to_char( victim, &baf );
-        }  
-
-        dam += dam * number_range( 1, 2 );                        
-    } 
-    else {
-        act_p( "{R$c1 вырывает твое сердце! OUCH!!{x", ch, NULL, victim, TO_VICT ,POS_RESTING ); 
-        act_p( "{RТы вырываешь сердце $C2!{x", ch, NULL, victim, TO_CHAR ,POS_RESTING );
-
-        dam += dam * number_range( 2, 5 );                        
-    }
 }
 
 /*
