@@ -913,7 +913,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
          ( ch->in_room->sector_type != SECT_HILLS ) &&
          ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
          ( ch->in_room->sector_type != SECT_FOREST ) &&
-         ( ch->in_room->sector_type != SECT_FIELD )
+         ( ch->in_room->sector_type != SECT_FIELD ) )
         return;
     
     if ( ( ch->getProfession( ) == prof_thief ) &&    
