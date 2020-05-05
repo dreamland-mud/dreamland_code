@@ -917,7 +917,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         return;
     
     if ( ( ch->getProfession( ) == prof_thief ) &&    
-         ( (!wield) || (wield->value0 != WEAPON_DAGGER) ) )
+         ( (!wield) || (wield->value0() != WEAPON_DAGGER) ) )
         return;
 
     //////////////// PROBABILITY CHECKS ////////////////
