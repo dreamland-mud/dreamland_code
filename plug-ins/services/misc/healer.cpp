@@ -196,6 +196,10 @@ bool SpellHealService::available( Character *client, NPCharacter *healer ) const
         say_fmt("Ты не нуждаешься этой услуге, %2$C1: твое зрение в порядке!", healer, client);
         return false;
     }
+    else if(sn == gsn_cure_blindness && !client->isAffected( gsn_blindness )){
+        say_fmt("Я не могу помочь тебе с этим типом слепоты, %2$C1.", healer, client);
+        return false;      
+    }
     else if (sn == gsn_bless && client->isAffected(sn)) {
         say_fmt("Я не могу благословить тебя еще больше, %2$C1.", healer, client);
         return false;
