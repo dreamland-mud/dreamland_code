@@ -893,7 +893,9 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     int diceroll, chance, skill, stun_chance, blind_chance;
     Affect baf;
 
-    skill = gsn_critical_strike->getEffective( ch );        
+    skill = gsn_critical_strike->getEffective( ch );
+    stun_chance = 75; // base thresholds
+    blind_chance = 95;            
             
     //////////////// ELIGIBILITY CHECKS ////////////////
             
@@ -908,119 +910,123 @@ void UndefinedOneHit::damEffectCriticalStrike( )
 
     if ( SHADOW(ch) )
         return;
+            
+    // bare hands messages
+    const char *msgVictStun = "{W$c1 обездвиживает тебя предательским ударом по печени!{x"; 
+    const char *msgCharStun = "{WТы обездвиживаешь $C4 предательским ударом по печени!{x";
+    const char *msgVictBlind = "{y$c1 внезапно ослепляет тебя, ткнув пальцем прямо в глаз!{x";
+    const char *msgCharBlind = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";
+    const char *msgVictHeart = "{RНеожиданно изловчившись, $c1 наносит мощнейшую серию ударов тебе ПРЯМО В СЕРДЦЕ!!!{x";
+    const char *msgCharHeart = "{RНеожиданно изловчившись, ты наносишь мощнейшую серию ударов $C3 ПРЯМО В СЕРДЦЕ!!!{x";
 
-    if ( ( ch->getProfession( ) == prof_ranger ) &&
-         ( ch->in_room->sector_type != SECT_HILLS ) &&
-         ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
-         ( ch->in_room->sector_type != SECT_FOREST ) &&
-         ( ch->in_room->sector_type != SECT_FIELD ) )
-        return;
-    
-    if ( ( ch->getProfession( ) == prof_thief ) &&    
-         ( (!wield) || (wield->value0() != WEAPON_DAGGER) ) )
-        return;
-
+    if (wield) {        
+            switch( wield->value0() ) {
+            case WEAPON_SWORD:
+                        msgVictStun = "{W$c1 обездвиживает тебя внезапным ударом меча в печень!{x"; 
+                        msgCharStun = "{WТы обездвиживаешь $C4 внезапным ударом меча в печень!{x";
+                        msgVictBlind = "{y$c1 наносит тебе удар мечом в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
+                        msgCharBlind = "{yТы ослепляешь $C4, нанеся удар мечом в голову!{x";
+                        msgVictHeart = "{RНеожиданно изловчившись, $c1 вонзает тебе меч ПРЯМО В СЕРДЦЕ!!!{x";
+                        msgCharHeart = "{RНеожиданно изловчившись, ты вонзаешь $C3 меч ПРЯМО В СЕРДЦЕ!!!{x";
+                        break;
+            case WEAPON_DAGGER:
+                        msgVictStun = "{W$c1 обездвиживает тебя, внезапно всаживая кинжал в печень!{x"; 
+                        msgCharStun = "{WТы обездвиживаешь $C4, внезапно всаживая кинжал в печень!{x{x";
+                        msgVictBlind = "{y$c1 внезапно ослепляет тебя, ткнув кинжалом прямо в глаз!{x";
+                        msgCharBlind = "{yТы внезапно ослепляешь $C4, ткнув кинжалом прямо в глаз!{x"; 
+                        msgVictHeart = "{RНеожиданно изловчившись, $c1 вонзает тебе кинжал ПРЯМО В СЕРДЦЕ!!!{x";
+                        msgCharHeart = "{RНеожиданно изловчившись, ты вонзаешь $C3 кинжал ПРЯМО В СЕРДЦЕ!!!{x";
+                        break;
+            default:
+                        msgVictBlind = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
+                        msgCharBlind = "{yТы ослепляешь $C4 быстрым ударом в голову!{x"; 
+                        msgVictHeart = "{RНеожиданно изловчившись, $c1 наносит тебе удар ПРЯМО В СЕРДЦЕ!!!{x";
+                        msgCharHeart = "{RНеожиданно изловчившись, ты наносишь $C3 удар ПРЯМО В СЕРДЦЕ!!!{x";
+                        break;
+            }
+    }            
+    // thieves have +10% to blind:              65 / 95 / 100  
+    // ninjas and rangers have +10% to stun:    85 / 95 / 100
+    // samurai have +10% to strike heart:       75 / 85 / 100
+    // everyone else:                           75 / 95 / 100 
+            
+    switch( ch->getProfession( ) ) {
+    case prof_ranger:                    
+            if ( ( ch->in_room->sector_type != SECT_HILLS ) &&
+                 ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
+                 ( ch->in_room->sector_type != SECT_FOREST ) &&
+                 ( ch->in_room->sector_type != SECT_FIELD ) )
+                        return;
+            msgVictStun = "{W$c1 сотрясает землю мощным ударом, обездвиживая тебя!{x";
+            msgCharStun = "{WТы сотрясаешь землю мощным ударом, обездвиживая $C4!{x";
+            msgVictBlind = "{y$c1 внезапной серией ударов поднимает вихрь листьев, ослепляя тебя!{x";
+            msgCharBlind = "{yТы внезапной серией ударов поднимаешь вихрь листьев, ослепляя $C4!{x";
+            msgVictHeart = "{R$c1 призывает силу Природы, нанося тебе мощнейший удар прямо в сердце!{x";
+            msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";                            
+            chance = 10;
+            stun_chance = 85;
+            break;            
+    case prof_thief:
+            if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
+                        return;                
+            chance = 10;
+            stun_chance = 65;        
+            break;
+    case prof_ninja:
+            chance = 10;
+            stun_chance = 85;
+            break;   
+    case prof_samurai:
+            if ( (wield) && (wield->value0() == WEAPON_SWORD) ) {
+                    msgVictBlind = "{yИспользуя технику кирикаэси, $c1 наносит серию ударов в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
+                    msgCharBlind = "{yИспользуя технику кирикаэси, ты ослепляешь $C4. Мэн!{x";                        
+                    msgVictHeart = "{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x";
+                    msgCharHeart = "{RИспользуя технику кацуги-вадза, ты внезапно наносишь $C3 удар особой силы!!!{x";
+            }
+            chance = 10;
+            blind_chance = 85;
+            break;
+    default:
+            chance = 0;
+            break;
+                            
     //////////////// PROBABILITY CHECKS ////////////////
-    
-    chance = 0;
         
-    chance += skill / 3;
+    chance += skill / 4;
     chance += skill_level_bonus(*gsn_critical_strike, ch);    
-    if ( victim->getRealLevel( ) > ch->getRealLevel( ) )
+    if ( victim->getModifyLevel() > ch->getModifyLevel() )
         chance -= ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
-    if ( victim->getRealLevel( ) < ch->getRealLevel( ) )
+    if ( victim->getModifyLevel() < getModifyLevel() )
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() );
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        chance = chance / 2;
     if (IS_QUICK(ch))
         chance += 10;
     if (IS_QUICK(victim))
-        chance -= 10;
-        
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-        chance = chance / 2;
-
-    if ( ( ch->getProfession( ) != prof_ranger ) && 
-         ( ch->getProfession( ) != prof_ninja ) &&
-         ( ch->getProfession( ) != prof_samurai ) &&
-         ( ch->getProfession( ) != prof_ranger ) )
-        chance = chance * 3 / 4;        
+        chance -= 10;              
     
-    if ( number_percent() > chance ) {               
-        gsn_critical_strike->improve( ch, false, victim );        
+    if ( number_percent() > chance ) {
+        if ( number_percent() > 50 )
+            gsn_critical_strike->improve( ch, false, victim );        
         return;
     }
         
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
         
     gsn_critical_strike->improve( ch, true, victim );
-    dam += dam * chance/200;
-        
-    // thieves have +10% to blind:              65 / 95 / 100  
-    // ninjas and rangers have +10% to stun:    85 / 95 / 100
-    // samurai have +10% to strike heart:       75 / 85 / 100
-    // everyone else:                           75 / 95 / 100 
-        
-    stun_chance = 75;
-    blind_chance = 95;    
-    if ( ( ch->getProfession( ) == prof_ranger ) &&
-         ( ch->getProfession( ) == prof_ninja ) )
-        stun_chance = 85; 
-    if ( ch->getProfession( ) == prof_thief )
-        stun_chance = 65;
-    if ( ch->getProfession( ) == prof_samurai )
-        blind_chance = 85;
+    dam += dam * chance/200; 
         
     diceroll = number_percent( );
 
     if (diceroll < stun_chance) {
-
-        const char *msgVict = "{W$c1 обездвиживает тебя предательским ударом по печени!{x"; //bare hands messages
-        const char *msgChar = "{WТы обездвиживаешь $C4 предательским ударом по печени!{x";
-
-        if(wield){
-
-            if(wield->value0() == WEAPON_SWORD){
-            msgVict = "{W$c1 обездвиживает тебя внезапным ударом меча в печень!{x"; //sword messages
-            msgChar = "{WТы обездвиживаешь $C4 внезапным ударом меча в печень!{x";
-            }
-            else if(wield->value0() == WEAPON_DAGGER){
-            msgVict = "{W$c1 обездвиживает тебя, внезапно всаживая кинжал в печень!{x"; //dagger messages
-            msgChar = "{WТы обездвиживаешь $C4, внезапно всаживая кинжал в печень!{x{x";         
-            }
-            else{
-            msgVict = "{W$c1 обездвиживает тебя внезапным ударом в печень!{x"; //everything else
-            msgChar = "{WТы обездвиживаешь $C4 внезапным ударом в печень!{x";
-            }
-        }
-
-        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
-
+        act_p( msgVictStun, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgCharStun, ch, 0, victim, TO_CHAR,POS_RESTING);
         victim->setWaitViolence( 2 );
         dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
     }
     else if (diceroll < blind_chance) {
-        const char *msgVict = "{y$c1 внезапно ослепляет тебя, ткнув пальцем прямо в глаз!{x"; //bare hands messages
-        const char *msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";
-
-        if(wield){
-
-            if(wield->value0() == WEAPON_SWORD){
-            msgVict = "{y$c1 наносит тебе удар мечом в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //sword messages
-            msgChar = "{yТы ослепляешь $C4, нанеся удар мечом в голову!{x";
-            }
-            else if(wield->value0() == WEAPON_DAGGER){
-            msgVict = "{y$c1 внезапно ослепляет тебя, ткнув кинжалом прямо в глаз!{x"; //dagger messages
-            msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";         
-            }
-            else{
-            msgVict = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //everything else
-            msgChar = "{yТы ослепляешь $C4 быстрым ударом в голову!{x";
-            }
-        }
-
-        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
-
+        act_p( msgVictBlind, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgCharBlind, ch, 0, victim, TO_CHAR,POS_RESTING);
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
             baf.where    = TO_AFFECTS;
@@ -1035,32 +1041,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         dam += dam * number_range( 1, 2 );  // +100-200% damage          
     }
     else {
-        const char *msgVict = "{RНеожиданно изловчившись, $c1 наносит мощнейшую серию ударов тебе ПРЯМО В СЕРДЦЕ!!!{x"; //bare hands messages
-        const char *msgChar = "{RНеожиданно изловчившись, ты наносишь мощнейшую серию ударов $C3 ПРЯМО В СЕРДЦЕ!!!{x";
-
-        if(wield){
-
-            if(wield->value0() == WEAPON_SWORD) {
-            msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе меч ПРЯМО В СЕРДЦЕ!!!{x"; //sword messages
-            msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 меч ПРЯМО В СЕРДЦЕ!!!{x";
-                if ( ch->getProfession( ) == prof_samurai ) {
-                    msgVict = "{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x"; //sword messages
-                    msgChar = "{RИспользуя технику кацуги-вадза, ты внезапно наносишь $C3 удар особой силы!!!{x";                                    
-                }            
-            }
-            else if(wield->value0() == WEAPON_DAGGER){
-            msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе кинжал ПРЯМО В СЕРДЦЕ!!!{x"; //dagger messages
-            msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 кинжал ПРЯМО В СЕРДЦЕ!!!{x";         
-            }
-            else{
-            msgVict = "{RНеожиданно изловчившись, $c1 наносит тебе удар ПРЯМО В СЕРДЦЕ!!!{x"; //everything else
-            msgChar = "{RНеожиданно изловчившись, ты наносишь $C3 удар ПРЯМО В СЕРДЦЕ!!!{x";
-            }
-        }
-
-        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
-
+        act_p( msgVictHeart, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgCharHeart, ch, 0, victim, TO_CHAR,POS_RESTING);
         dam += dam * number_range( 2, 5 ); // +200-500% damage            
     }
 }
