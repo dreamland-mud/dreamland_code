@@ -41,8 +41,10 @@ const struct        str_app_type        str_app                []               
     {   5,   60,   350,   45,  25,    6     },
     {   6,   70,   400,   50,  28,   10     },
     {   6,   80,   450,   55,  32,   13     },
-    {   7,   90,   500,   60,  36,   15     }, /* 25   */
-    {   8,   95,   550,   65,  37,   20     }  /* 25+ */
+    {   7,   90,   500,   60,  34,   15     }, /* 25 */
+    {   7,   95,   550,   65,  36,   17     }, /* 26 */
+    {   8,   100,   600,   70,  38,   19     }, /* 27 */
+    {   9,   105,   650,   75,  40,   21     }  /* 28 */
 };           
 
 
@@ -75,7 +77,9 @@ const struct        int_app_type        int_app                []               
     { 70,    2 },
     { 80,    3 },
     { 85,    4 },        /* 25  */
-    { 90,    5 }        /* 25+ */
+    { 90,    5 },        /* 26  */
+    { 95,    6 },        /* 27  */
+    { 100,    7 }        /* 28 */
 };
 
 
@@ -109,7 +113,9 @@ const struct        wis_app_type        wis_app                []               
     { 4, 3, },
     { 4, 3, },
     { 5, 4, }, /* 25 */
-    { 5, 5, }  /* 25+ */
+    { 5, 4, }, /* 26 */
+    { 5, 5, }, /* 27 */
+    { 6, 6, }  /* 28 */
 };
 
 
@@ -142,7 +148,9 @@ const struct        dex_app_type        dex_app                []               
     { - 90 },
     { -105 },
     { -120 },   /* 25 */
-    { -145 }    /* 25+ */
+    { -135 },   /* 26 */
+    { -150 },   /* 27 */
+    { -165 }    /* 28 */
 };
 
 
@@ -174,50 +182,29 @@ const struct        con_app_type        con_app                []               
     { 99 },
     { 99 },
     { 99 },   /* 25 */
-    { 99 }    /* 25+ */
+    { 99 },   /* 26 */
+    { 99 },   /* 27 */
+    { 99 }    /* 28 */
 };    
-
-/*
- * Attribute helper functions
- */
-int get_curr_stat_extra( Character *ch, int stat )
-{
-    int value;
-
-    value = ch->getCurrStat( stat );
-
-  /*  if (value == MAX_STAT 
-        && !ch->is_npc( )
-        && ch->getProfession( )->getStat( stat ) > 0
-        && ch->getRace( )->getPC( )->getStats( )[stat] >= MAX_STAT - BASE_STAT)
-        value++;*/
-        if(value > 26){
-            value = 26;
-        }
-
-        
-
-    return value;
-}
 
 const struct str_app_type & get_str_app( Character *ch )
 {
-    return str_app[get_curr_stat_extra( ch, STAT_STR )];
+    return str_app[ch->getCurrStat( STAT_STR )];
 }
 
 const struct int_app_type & get_int_app( Character *ch )
 {
-    return int_app[get_curr_stat_extra( ch, STAT_INT )];
+    return int_app[ch->getCurrStat( STAT_INT )];
 }
 
 const struct wis_app_type & get_wis_app( Character *ch )
 {
-    return wis_app[get_curr_stat_extra( ch, STAT_WIS )];
+    return wis_app[ch->getCurrStat( STAT_WIS )];
 }
 
 const struct dex_app_type & get_dex_app( Character *ch )
 {
-    return dex_app[get_curr_stat_extra( ch, STAT_DEX )];
+    return dex_app[ch->getCurrStat( STAT_DEX )];
 }
 
 #else
