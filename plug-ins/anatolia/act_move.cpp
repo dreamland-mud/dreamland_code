@@ -985,9 +985,6 @@ CMDRUNP( fly )
 {
     char arg[MAX_INPUT_LENGTH];
 
-    if (ch->is_npc())
-        return;
-
     argument = one_argument(argument,arg);
 
     if (!str_cmp(arg,"up") || !str_cmp(arg,"вверх"))
