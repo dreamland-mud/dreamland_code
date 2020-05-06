@@ -895,7 +895,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
 
     skill = gsn_critical_strike->getEffective( ch );
     stun_chance = 75; // base thresholds
-    blind_chance = 95;            
+    blind_chance = 95;
+    chance = 0;        
             
     //////////////// ELIGIBILITY CHECKS ////////////////
             
@@ -950,18 +951,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     // samurai have +10% to strike heart:       75 / 85 / 100
     // everyone else:                           75 / 95 / 100 
     
-    const char *prof = "";
-    if ( ch->getProfession( ) == prof_ranger )
-            prof = "ranger";
-    if ( ch->getProfession( ) == prof_thief )
-            prof = "thief";
-    if ( ch->getProfession( ) == prof_samurai )
-            prof = "samurai";
-    if ( ch->getProfession( ) == prof_ninja )
-            prof = "ninja";
-                
-    switch( prof ) {
-    case 'ranger':                    
+    if ( ch->getProfession( ) == prof_ranger ) {                    
             if ( ( ch->in_room->sector_type != SECT_HILLS ) &&
                  ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
                  ( ch->in_room->sector_type != SECT_FOREST ) &&
@@ -975,18 +965,18 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";                            
             chance = 10;
             stun_chance = 85;
-            break;            
-    case 'thief':
+    }       
+    if ( ch->getProfession( ) == prof_thief ) {
             if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
                         return;                
             chance = 10;
             stun_chance = 65;        
-            break;
-    case 'ninja':
+    }
+    if ( ch->getProfession( ) == prof_ninja ) {
             chance = 10;
             stun_chance = 85;
-            break;   
-    case 'samurai':
+    }   
+    if ( ch->getProfession( ) == prof_samurai ) {
             if ( (wield) && (wield->value0() == WEAPON_SWORD) ) {
                     msgVictBlind = "{yИспользуя технику кирикаэси, $c1 наносит серию ударов в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
                     msgCharBlind = "{yИспользуя технику кирикаэси, ты ослепляешь $C4. Мэн!{x";                        
@@ -995,10 +985,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             }
             chance = 10;
             blind_chance = 85;
-            break;
-    default:
-            chance = 0;
-            break;
+    }
                             
     //////////////// PROBABILITY CHECKS ////////////////
         
@@ -1006,7 +993,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     chance += skill_level_bonus(*gsn_critical_strike, ch);    
     if ( victim->getModifyLevel() > ch->getModifyLevel() )
         chance -= ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
-    if ( victim->getModifyLevel() < getModifyLevel() )
+    if ( victim->getModifyLevel() < ch->getModifyLevel() )
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() );
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;
