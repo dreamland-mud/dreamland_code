@@ -103,11 +103,6 @@ void PCharacter::advanceLevel( )
     add_move = max( 6, add_move );
     add_train = getRealLevel( ) % 5 == 0 ? 1 : 0;
 
-    if (getSex( ) == SEX_FEMALE) {
-        add_hp   -= 1;
-        add_mana += 2;
-    }
-
     add_hp += remorts.getHitPerLevel( level );
     add_mana += remorts.getManaPerLevel( level ); 
 
