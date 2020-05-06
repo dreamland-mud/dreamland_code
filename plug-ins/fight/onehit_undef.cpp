@@ -949,9 +949,19 @@ void UndefinedOneHit::damEffectCriticalStrike( )
     // ninjas and rangers have +10% to stun:    85 / 95 / 100
     // samurai have +10% to strike heart:       75 / 85 / 100
     // everyone else:                           75 / 95 / 100 
-            
-    switch( ch->getProfession( ) ) {
-    case prof_ranger:                    
+    
+    const char *prof = "";
+    if ( ch->getProfession( ) == prof_ranger )
+            prof = "ranger";
+    if ( ch->getProfession( ) == prof_thief )
+            prof = "thief";
+    if ( ch->getProfession( ) == prof_samurai )
+            prof = "samurai";
+    if ( ch->getProfession( ) == prof_ninja )
+            prof = "ninja";
+                
+    switch( prof ) {
+    case 'ranger':                    
             if ( ( ch->in_room->sector_type != SECT_HILLS ) &&
                  ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
                  ( ch->in_room->sector_type != SECT_FOREST ) &&
@@ -966,17 +976,17 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             chance = 10;
             stun_chance = 85;
             break;            
-    case prof_thief:
+    case 'thief':
             if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
                         return;                
             chance = 10;
             stun_chance = 65;        
             break;
-    case prof_ninja:
+    case 'ninja':
             chance = 10;
             stun_chance = 85;
             break;   
-    case prof_samurai:
+    case 'samurai':
             if ( (wield) && (wield->value0() == WEAPON_SWORD) ) {
                     msgVictBlind = "{yИспользуя технику кирикаэси, $c1 наносит серию ударов в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
                     msgCharBlind = "{yИспользуя технику кирикаэси, ты ослепляешь $C4. Мэн!{x";                        
