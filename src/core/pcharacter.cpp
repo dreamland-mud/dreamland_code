@@ -842,7 +842,12 @@ int PCharacter::getMaxStat( int i )
     if (getRealLevel( ) > LEVEL_IMMORTAL)
         return MAX_STAT;
 
-    int maxStat = getMaxTrain( i ) + remorts.stats[i].getValue( );
+    int maxTrain = getMaxTrain( i );
+    int remortBonus = remorts.stats[i].getValue( );
+
+    int maxStat = maxTrain > MAX_STAT_REMORT ? maxTrain //greater than 25 without remorts? then take it
+    : maxTrain+remortBonus > MAX_STAT_REMORT ? MAX_STAT_REMORT //remort bonus can't give more than 25
+    : maxTrain+remortBonus; //if less than or equal to 25 - take train+remorts
 
     return URANGE( MIN_STAT, maxStat, MAX_STAT );
 }

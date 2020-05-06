@@ -186,11 +186,16 @@ int get_curr_stat_extra( Character *ch, int stat )
 
     value = ch->getCurrStat( stat );
 
-    if (value == MAX_STAT 
+  /*  if (value == MAX_STAT 
         && !ch->is_npc( )
         && ch->getProfession( )->getStat( stat ) > 0
         && ch->getRace( )->getPC( )->getStats( )[stat] >= MAX_STAT - BASE_STAT)
-        value++;
+        value++;*/
+        if(value > 26){
+            value = 26;
+        }
+
+        
 
     return value;
 }
