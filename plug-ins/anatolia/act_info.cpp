@@ -2452,25 +2452,26 @@ struct HelpFinder {
     typedef vector<HelpArticle::Pointer> ArticleArray;
 
     HelpFinder(Character *ch, const char *argument) {
+
+        parseArgs(argument);
+
         // Find help by ID.
         Integer id;
-        if (Integer::tryParse(id, argument)) {
+        if (Integer::tryParse(id, args)) {
             HelpArticle::Pointer exact = helpManager->getArticle(id);
+            
             if (exact)
                 articles.push_back(exact);
             return;
         }
 
         // Find help by keyword.
-        HelpArticles::const_iterator a;
+        findMatchingArticles(ch);
 
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if (!(*a)->visible( ch ))
-                continue;
-            if (!articleMatches(*a, argument))
-                continue;
-            
-            articles.push_back(*a); 
+        // Our smartassery yielded nothing, just search for the whole argument.
+        if (articles.empty() && !preferredLabel.empty()) {
+            preferredLabel = "";
+            findMatchingArticles(ch);
         }
     }
     
@@ -2487,21 +2488,67 @@ struct HelpFinder {
 	}
     
 private:
-    bool articleMatches(const HelpArticle::Pointer &a, const char *argument) const
+    void findMatchingArticles(Character *ch) 
     {
-        const DLString &fullKw = a->getAllKeywordsString();
+        HelpArticles::const_iterator a;
 
-        if (is_name(argument, fullKw.c_str()))
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if (!(*a)->visible( ch ))
+                continue;
+
+            if (!articleMatches(*a))
+                continue;
+            
+            articles.push_back(*a); 
+        }
+    }
+
+    bool articleMatches(const HelpArticle::Pointer &a) const
+    {
+        // If first keyword was something like "skill", look for remaining keywords within a certain label.
+        if (!preferredLabel.empty() && a->labels.all.count(preferredLabel) == 0)
+            return false;
+
+        const DLString &fullKw = a->getAllKeywordsString();
+        const char *lookup = preferredLabel.empty() ? args.c_str() : argRest.c_str();
+
+        if (is_name(lookup, fullKw.c_str()))
             return true; 
 
         for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
-            if (is_name(argument, (*k).c_str()))
+            if (is_name(lookup, (*k).c_str()))
                 return true; 
 
         return false;
     }
+
+    void parseArgs(const char *argument) {
+        args = argument;
+        argRest = args;
+        arg1 = argRest.getOneArgument();
+
+        // Reduce "help skill bash" to just "help bash".
+        if (!argRest.empty()) {
+            if (arg_oneof_strict(arg1, "умение", "навык", "skill"))
+                preferredLabel = "skill";
+            else if (arg_oneof_strict(arg1, "заклинание", "spell"))
+                preferredLabel = "spell";
+            else if (arg_oneof_strict(arg1, "класс", "class"))
+                preferredLabel = "class";
+            else if (arg_oneof_strict(arg1, "команда", "command"))
+                preferredLabel = "cmd";
+            else if (arg_oneof_strict(arg1, "зона", "area", "zone"))
+                preferredLabel = "area";
+            else if (arg_oneof_strict(arg1, "религия", "religion"))
+                preferredLabel = "religion";
+            else if (arg_oneof_strict(arg1, "клан", "clan"))
+                preferredLabel = "clan";
+        }
+    }
 	
 	ArticleArray articles;
+    DLString args, arg1, argRest;
+    DLString preferredLabel;
 };
 
 CMDRUNP( help )
@@ -2556,9 +2603,9 @@ CMDRUNP( help )
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
     DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
     for (unsigned int a = 0; a < articles.size(); a++) {
-	auto help = articles[a];
+	    auto help = articles[a];
         DLString title = help->getTitle(DLString::emptyString);
-	DLString disambig = help_article_disambig(*help);
+	    DLString disambig = help_article_disambig(*help);
 
         // Create a line with help ID, title and disambiguation keywords (unless turned off).
         DLString line = title;
