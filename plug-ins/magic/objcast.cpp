@@ -69,7 +69,7 @@ CMDRUNP( quaff )
     one_argument( argument, arg );
 
     if(!ch->is_npc( ) && ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->send_to("Ты же BattleRager, а не презренный МАГ!\n\r");
+        ch->send_to("Ты же воин клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
@@ -84,11 +84,11 @@ CMDRUNP( quaff )
     }
 
     if (obj->item_type != ITEM_POTION) {
-        ch->send_to("Ты можешь осушить только снадобья.\n\r");
+        ch->send_to("Осушать можно только снадобья.\n\r");
         return;
     }
 
-      if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+      if (get_wear_level( ch, obj ) > ch->getModifyLevel( )) {
         ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
         return;
     }
@@ -125,7 +125,7 @@ CMDRUNP( recite )
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("RECITE?!  Ты же BattleRager, а не презренный МАГ!\n\r");
+        ch->send_to("Какие еще свитки-шмитки?! Ты же воин клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
@@ -141,7 +141,7 @@ CMDRUNP( recite )
         return;
     }
 
-    if (get_wear_level( ch, scroll ) > ch->getRealLevel( )) {
+    if (get_wear_level( ch, scroll ) > ch->getModifyLevel( )) {
         ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
         return;
     }
@@ -235,12 +235,12 @@ CMDRUNP( brandish )
     Spell::Pointer spell;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Ты же BattleRager, а не презренный МАГ!\n\r");
+        ch->send_to("Ты же воин клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
     if (( staff = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->send_to("Ты не держишь ничего в руке.\n\r");
+        ch->send_to("Чтобы пользоваться посохами, их надо взять в руки.\n\r");
         return;
     }
 
