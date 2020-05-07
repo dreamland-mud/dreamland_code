@@ -29,16 +29,17 @@ static DLString telegram_string(const DLString &source)
     dest.replaces("*", "\\*");
     dest.replaces("`", "\\`");
     dest.replaces("[", "\\[");
-    return koi2utf(dest);
+    return dest;
 }
 
-void send_telegram(const DLString &content)
+/** Save one file with Telegram JSON markup to disk. Assume all strings are already escaped and converted to UTF-8. */
+static void send_to_telegram(const DLString &content)
 {
     try {
         Json::Value body;
         body["chat_id"] = "@dreamland_rocks";
         body["parse_mode"] = "Markdown";
-        body["text"] = telegram_string(content);
+        body["text"] = content;
         
         Json::FastWriter writer;
         DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
@@ -51,6 +52,28 @@ void send_telegram(const DLString &content)
     }
 }
 
+/** Paste news or note to Telegram. */
+void send_telegram_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
+{
+    ostringstream content;
+
+    content 
+        << "*Автор*: " << telegram_string(author) << endl
+        << "*Тема*: " << telegram_string(title) << endl
+        << endl
+        << telegram_string(description);
+
+    return send_to_telegram(koi2utf(content.str()));
+}
+
+/** Send arbitrary string as Telegram message. */
+void send_telegram(const DLString &content)
+{
+    DLString escaped = telegram_string(content);
+    send_to_telegram(koi2utf(escaped));
+}
+
+/** Prepare string to use inside Discord JSON field. Strip tags and colors and trim to size. */
 static DLString discord_string(const DLString &source)
 {
     ostringstream outBuf;
@@ -68,6 +91,7 @@ static DLString discord_string(const DLString &source)
     return koi2utf(dest);
 }
 
+/** Save one file with Discord JSON markup to disk. Assume all strings are already trimmed and converted to UTF-8. */
 static void send_to_discord(Json::Value &body, const DLString &dirName)
 {
     try {
