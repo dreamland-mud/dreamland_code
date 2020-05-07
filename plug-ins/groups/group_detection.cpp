@@ -1110,16 +1110,17 @@ SKILL_RUNP( lore )
     return;
   }
 
-  if (!obj->enchanted)
+  if (!obj->enchanted){
+    ostr.str(std::string());
     for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
       {
         if ( paf->location != APPLY_NONE && paf->modifier != 0 )
-          {
-            sprintf( buf, "Изменяет: %s на %d.\n\r",
-                    apply_flags.message( paf->location ).c_str( ), paf->modifier );
-            ch->send_to(buf);
+          {           
+            lore_fmt_affect(paf,ostr);            
           }
       }
+      ch->send_to(ostr);
+  }
 
   for ( paf = obj->affected; paf != 0; paf = paf->next )
     {
