@@ -2530,7 +2530,7 @@ private:
         // Reduce "help skill bash" to just "help bash".
         if (!argRest.empty()) {
             if (arg_oneof_strict(arg1, "умение", "навык", "skill"))
-                preferredLabel = "skill";
+                preferredLabel = "genericskill"; // справка умение Х выдает и навыки, и заклинания
             else if (arg_oneof_strict(arg1, "заклинание", "spell"))
                 preferredLabel = "spell";
             else if (arg_oneof_strict(arg1, "класс", "class"))
