@@ -963,17 +963,17 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             msgCharBlind = "{yТы внезапной серией ударов поднимаешь вихрь листьев, ослепляя $C4!{x";
             msgVictHeart = "{R$c1 призывает силу Природы, нанося тебе мощнейший удар прямо в сердце!{x";
             msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";                            
-            chance = 10;
+            chance = 5;
             stun_chance = 85;
     }       
     if ( ch->getProfession( ) == prof_thief ) {
             if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
                         return;                
-            chance = 10;
+            chance = 5;
             stun_chance = 65;        
     }
     if ( ch->getProfession( ) == prof_ninja ) {
-            chance = 10;
+            chance = 5;
             stun_chance = 85;
     }   
     if ( ch->getProfession( ) == prof_samurai ) {
@@ -983,36 +983,33 @@ void UndefinedOneHit::damEffectCriticalStrike( )
                     msgVictHeart = "{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x";
                     msgCharHeart = "{RИспользуя технику кацуги-вадза, ты внезапно наносишь $C3 удар особой силы!!!{x";
             }
-            chance = 10;
+            chance = 5;
             blind_chance = 85;
     }
                             
     //////////////// PROBABILITY CHECKS ////////////////
         
-    chance += skill / 4;
+    chance += skill / 10;
     chance += skill_level_bonus(*gsn_critical_strike, ch);    
     if ( victim->getModifyLevel() > ch->getModifyLevel() )
-        chance -= ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
+        chance -= ( victim->getModifyLevel() - ch->getModifyLevel() );
     if ( victim->getModifyLevel() < ch->getModifyLevel() )
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() );
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
         chance = chance / 2;
     if (IS_QUICK(ch))
-        chance += 10;
+        chance += 5;
     if (IS_QUICK(victim))
-        chance -= 10;              
+        chance -= 5;              
     
     if ( number_percent() > chance ) {
-        if ( number_percent() > 50 )
-            gsn_critical_strike->improve( ch, false, victim );        
+        gsn_critical_strike->improve( ch, false, victim );        
         return;
     }
         
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
         
-    gsn_critical_strike->improve( ch, true, victim );
-    dam += dam * chance/200; 
-        
+    gsn_critical_strike->improve( ch, true, victim );        
     diceroll = number_percent( );
 
     if (diceroll < stun_chance) {
