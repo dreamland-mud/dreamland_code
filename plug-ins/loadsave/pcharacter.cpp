@@ -59,6 +59,24 @@ static void update_exp( PCharacter *ch )
     }
 }    
 
+static void update_stats( PCharacter *ch )
+{
+    int i, max_stat;
+
+    for (i = 0; i < stat_table.size; i++) {        
+        max_stat = ch->getMaxTrain( i );
+
+        if (ch->perm_stat[i] > max_stat) {
+            int diff = ch->perm_stat[i] - max_stat;
+            notice("Fixing stats for %s: %s %d -> %d",
+                ch->getName().c_str(), stat_table.name(i).c_str(), ch->perm_stat[i], max_stat);
+
+            ch->train += diff;
+            ch->perm_stat[i] = max_stat;
+        }
+    }
+}
+
 static void clear_fenia_skills( PCharacter *ch )
 {
     PCSkills skills = ch->getSkills();
@@ -188,8 +206,10 @@ bool PCharacter::load( )
     parts       = getRace( )->getParts( );
     wearloc.set(getRace()->getWearloc());
 
-    clear_fenia_skills( this );
+    LogStream::sendNotice( ) << getName( ) << " has race " << getRace( )->getName( ) << " and level " << getLevel( ) << endl;
 
+    clear_fenia_skills( this );
+    
     // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
     char_to_room(this, get_room_index(ROOM_VNUM_LIMBO));
 
@@ -200,12 +220,10 @@ bool PCharacter::load( )
     /* now add back spell effects */
     for (Affect *af = affected; af != 0; af = af->next)
         affect_modify( this, af, true );
-
-    LogStream::sendNotice( ) << getName( ) << " has race " << getRace( )->getName( ) << " and level " << getLevel( ) << endl;
     
     position = (position == POS_FIGHTING ? POS_STANDING: position);
     REMOVE_BIT(act, PLR_NO_EXP|PLR_DIGGED); 
-    updateStats( );
+    update_stats(this);
     updateSkills( );
     update_exp( this );
 
