@@ -35,6 +35,8 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 GSN(bat_sworm);
 GSN(bat_swarm);
+GSN(ground_strike);
+GSN(critical_strike);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -232,6 +234,7 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_magic_resistance, gsn_spell_resistance );
     skill_exchange( this, gsn_dispel_magic, gsn_dispel_affects );
     skill_exchange( this, gsn_bat_sworm, gsn_bat_swarm );
+    skill_exchange( this, gsn_ground_strike, gsn_critical_strike );
 
     // Move player out of the room, to be placed to the start room correctly further down the way.
     char_from_room(this);
