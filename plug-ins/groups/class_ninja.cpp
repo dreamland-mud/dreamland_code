@@ -42,37 +42,7 @@
 #include "interp.h"
 #include "def.h"
 #include "stats_apply.h"
-
-
-struct Debug {
-    Debug(Character *_ch, const char *_attr, const char *_label)
-        : ch(_ch), attr(_attr), label(_label)
-    {
-    }
-
-    ~Debug() 
-    {
-        DLString result = buf.str();
-        if (!result.empty() 
-                && !ch->is_npc() 
-                && ch->getPC()->getAttributes().isAvailable(attr)) 
-        {
-            ch->printf("%s chances: %s\r\n", label, result.c_str());
-        }
-    }        
-
-    Debug & log(float chance, const char *msg)
-    {
-        buf << msg << "={C" << chance << "{x, ";
-        return *this;
-    }
-
-    ostringstream buf;
-    Character *ch;
-    const char *attr;
-    const char *label;
-};
-
+#include "debug_utils.h"
 
 /*
  * 'vanish' skill command

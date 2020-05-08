@@ -31,7 +31,6 @@ protected:
     void damEffectMasterHand( );
     void damEffectMasterSword( );
     void damEffectDestroyEquipment( );
-    void damEffectGroundStrike( );
     void damEffectCriticalStrike( );
     void damEffectSlice( );
     void damEffectVorpal();

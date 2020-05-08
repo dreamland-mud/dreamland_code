@@ -23,6 +23,7 @@
 #include "areabehaviormanager.h"
 
 #include "dreamland.h"
+#include "debug_utils.h"
 #include "fight.h"
 #include "material.h"
 #include "immunity.h"
@@ -153,7 +154,6 @@ void UndefinedOneHit::priorDamageEffects( )
     damEffectMasterHand( );
     damEffectMasterSword( );
     damEffectCriticalStrike( );
-    damEffectGroundStrike( );
 }
 
 bool UndefinedOneHit::mprog_hit()
@@ -870,26 +870,16 @@ bool UndefinedOneHit::defenseHandBlock( )
     return true;
 }
 
-
 /*----------------------------------------------------------------------------
  * Damage increasing skills
  *---------------------------------------------------------------------------*/
-/*  
- *  from Anatolia 3.0
- */
-
-
-void UndefinedOneHit::damEffectGroundStrike( ) 
-{
-        // TODO: delete this function
-        return;
-}
 
 /*
  * critical strike
  */
 void UndefinedOneHit::damEffectCriticalStrike( )
 {
+    Debug d(ch, "critical", "critical");
     int diceroll, chance, skill, stun_chance, blind_chance;
     Affect baf;
 
@@ -987,21 +977,44 @@ void UndefinedOneHit::damEffectCriticalStrike( )
             blind_chance = 85;
     }
                             
+    d.log(stun_chance, "stun_chance");
+    d.log(blind_chance, "blind_chance");
+    d.log(chance, "chance");
+
     //////////////// PROBABILITY CHECKS ////////////////
         
     chance += skill / 10;
+    d.log(chance, "skill");
     chance += skill_level_bonus(*gsn_critical_strike, ch);    
-    if ( victim->getModifyLevel() > ch->getModifyLevel() )
+    d.log(chance, "bonus");
+
+    if ( victim->getModifyLevel() > ch->getModifyLevel() ) {
         chance -= ( victim->getModifyLevel() - ch->getModifyLevel() );
-    if ( victim->getModifyLevel() < ch->getModifyLevel() )
+        d.log(chance, "lvl");
+    }
+
+    if ( victim->getModifyLevel() < ch->getModifyLevel() ) {
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() );
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        d.log(chance, "lvl");
+    }
+
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
         chance = chance / 2;
-    if (IS_QUICK(ch))
+        d.log(chance, "stun");
+    }
+
+    if (IS_QUICK(ch)) {
         chance += 5;
-    if (IS_QUICK(victim))
-        chance -= 5;              
+        d.log(chance, "quick");
+    }
+
+    if (IS_QUICK(victim)) {
+        chance -= 5;
+        d.log(chance, "quick");
+    }
     
+    d.log(chance, "final chance");
+
     if ( number_percent() > chance ) {
         gsn_critical_strike->improve( ch, false, victim );        
         return;
@@ -1011,6 +1024,7 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         
     gsn_critical_strike->improve( ch, true, victim );        
     diceroll = number_percent( );
+    d.log(diceroll, "diceroll");
 
     if (diceroll < stun_chance) {
         act_p( msgVictStun, ch, 0, victim, TO_VICT,POS_RESTING);

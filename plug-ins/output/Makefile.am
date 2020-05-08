@@ -12,6 +12,7 @@ character.cpp \
 room.cpp \
 mudtags.cpp \
 messengers.cpp \
+debug_utils.cpp \
 impl.cpp
 
 include $(top_srcdir)/plug-ins/Makefile.inc
