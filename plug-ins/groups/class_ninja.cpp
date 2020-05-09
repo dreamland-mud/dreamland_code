@@ -356,7 +356,7 @@ SKILL_RUNP( nerve )
         char arg[MAX_INPUT_LENGTH];
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-        skill_mod   = 0.3;
+        skill_mod   = 0.5;
         stat_mod    = 0.05;
         level_mod   = 0.01;
         quick_mod   = 0.1;
@@ -872,7 +872,7 @@ SKILL_RUNP( caltraps )
   char arg[MAX_INPUT_LENGTH];
     
   //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-  skill_mod   = 0.3;
+  skill_mod   = 0.5;
   stat_mod    = 0.05;
   quick_mod   = 0.1;
   size_mod    = -0.1; // HARDER to affect smaller victims, easier to affect larger
@@ -1503,10 +1503,7 @@ SKILL_RUNP( strangle )
             chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
             d.log(chance, "adrenaline");
         }
-        
-        UNSET_DEATH_TIME(ch);
-        victim->setLastFightTime( );
-        ch->setLastFightTime( );    
+           
     
         chance = max( (float)1, chance ); // there's always a chance
         d.log(chance, "final");
@@ -1515,6 +1512,8 @@ SKILL_RUNP( strangle )
     
         ch->setWait( gsn_strangle->getBeats( ) );
         UNSET_DEATH_TIME(ch);
+        victim->setLastFightTime( );
+        ch->setLastFightTime( );  
 
         Chance mychance(ch, (int) chance, 100);
 
