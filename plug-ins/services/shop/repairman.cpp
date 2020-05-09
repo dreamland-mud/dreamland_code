@@ -60,7 +60,7 @@ bool Repairman::specIdle( )
         return false;
 
     if (chance( 1 )) {
-        interpret_raw(ch, "say", "Настало время для ремонта ваших доспехов.");
+        interpret_raw(ch, "say", "Я буду рад отремонтировать тебе что-нибудь!");
         return true;
     }
 
@@ -77,8 +77,8 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     
     if (arg.empty( )) {
         say_act( client, ch, "Я отремонтирую тебе что-нибудь за деньги.");
-        client->println("Используй repair <item>, чтоб восстановить поврежденный предмет.");
-        client->println("Используй estimate <item>, чтобы узнать, сколько будет стоить починка.");
+        client->println("Напиши {y{lrчинить{lerepair{x <название предмета>, чтоб восстановить его.");
+        client->println("Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
         return;
     }
 
@@ -93,7 +93,7 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     cost = getRepairCost( obj );
 
     if (cost > client->gold) {
-        say_act( client, ch, "У тебя не хватает денег, чтоб оплатить мои услуги.");
+        say_act( client, ch, "У тебя не хватит денег, чтоб оплатить ремонт этой вещи.");
         return;
     }
 
@@ -122,7 +122,7 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
     arg = args.getOneArgument( );
     
     if (arg.empty( )) {
-        say_act( client, ch, "Попробуй использовать estimate <item>.");
+        say_act( client, ch, "Напиши {y{lrоценить{leestimate{x <название предмета>, чтобы узнать, сколько будет стоить починка.");
            return;
     }
 
@@ -134,7 +134,7 @@ void Repairman::doEstimate( Character *client, const DLString &cArgs )
     if (!canRepair( obj, client ))
         return;
     
-    tell_fmt( "Восстановление будет стоить %3$d.", 
+    tell_fmt( "Восстановление этой вещи будет стоить %3$d.", 
                client, ch, getRepairCost( obj ) );
 }
 
@@ -167,7 +167,8 @@ bool Repairman::canRepair( Object *obj, Character *client )
     }
 
     if (obj->cost == 0) {
-        say_fmt( "%2$^O1 не подлеж%2$nит|ат ремонту.", ch, obj );
+        say_fmt( "%2$^O1 ничего не стоит, а значит я не смогу оценить починку.", ch, obj );
+        say_act( client, ch, "Ты случайно не из ямы для пожертвований ее вытащил{Sfа{Sx?");        
            return false;
     }
 
