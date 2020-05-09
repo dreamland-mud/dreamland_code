@@ -164,7 +164,7 @@ void CClan::clanList( PCharacter* pc )
         
         if (!clan->isHidden( )) {
             basic_ostringstream<char> buf;                                          
-            buf << setw( 33 ) << clan->getLongName( ) << " [{"
+            buf << setw( 40 ) << clan->getLongName( ) << " [{"
                 << clan->getColor( ) << clan->getPaddedName( ) 
                 << "{x]" << endl;
             pc->send_to( buf );
