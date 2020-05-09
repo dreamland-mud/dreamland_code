@@ -2469,8 +2469,8 @@ struct HelpFinder {
         findMatchingArticles(ch);
 
         // Our smartassery yielded nothing, just search for the whole argument.
-        if (articles.empty() && !preferredLabel.empty()) {
-            preferredLabel = "";
+        if (articles.empty() && !preferredLabels.empty()) {
+            preferredLabels.clear();
             findMatchingArticles(ch);
         }
     }
@@ -2506,11 +2506,11 @@ private:
     bool articleMatches(const HelpArticle::Pointer &a) const
     {
         // If first keyword was something like "skill", look for remaining keywords within a certain label.
-        if (!preferredLabel.empty() && a->labels.all.count(preferredLabel) == 0)
+        if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
             return false;
 
         const DLString &fullKw = a->getAllKeywordsString();
-        const char *lookup = preferredLabel.empty() ? args.c_str() : argRest.c_str();
+        const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
 
         if (is_name(lookup, fullKw.c_str()))
             return true; 
@@ -2529,26 +2529,30 @@ private:
 
         // Reduce "help skill bash" to just "help bash".
         if (!argRest.empty()) {
-            if (arg_oneof_strict(arg1, "умение", "навык", "skill"))
-                preferredLabel = "genericskill"; // справка умение Х выдает и навыки, и заклинания
+            if (arg_oneof_strict(arg1, "умение", "навык", "skill")) {
+                preferredLabels.insert("skill");
+                preferredLabels.insert("spell");
+            }
             else if (arg_oneof_strict(arg1, "заклинание", "spell"))
-                preferredLabel = "spell";
+                preferredLabels.insert("spell");
             else if (arg_oneof_strict(arg1, "класс", "class"))
-                preferredLabel = "class";
+                preferredLabels.insert("class");
+            else if (arg_oneof_strict(arg1, "раса", "race"))
+                preferredLabels.insert("race");
             else if (arg_oneof_strict(arg1, "команда", "command"))
-                preferredLabel = "cmd";
+                preferredLabels.insert("cmd");
             else if (arg_oneof_strict(arg1, "зона", "area", "zone"))
-                preferredLabel = "area";
+                preferredLabels.insert("area");
             else if (arg_oneof_strict(arg1, "религия", "religion"))
-                preferredLabel = "religion";
+                preferredLabels.insert("religion");
             else if (arg_oneof_strict(arg1, "клан", "clan"))
-                preferredLabel = "clan";
+                preferredLabels.insert("clan");
         }
     }
 	
 	ArticleArray articles;
     DLString args, arg1, argRest;
-    DLString preferredLabel;
+    StringSet preferredLabels;
 };
 
 CMDRUNP( help )
