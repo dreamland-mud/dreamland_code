@@ -80,7 +80,7 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
         if ( ((peexit = get_extra_exit( arg, room->extra_exit )) && ch->can_see(peexit)) ||
              (door = find_exit( ch, arg, FEX_NO_INVIS|FEX_DOOR|FEX_NO_EMPTY)) >= 0) 
         {
-                EXIT_DATA *pexit;
+                EXIT_DATA *pexit = 0;
                 EXIT_DATA *pexit_rev = 0;
                 int exit_info;
 
