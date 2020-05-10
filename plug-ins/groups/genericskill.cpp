@@ -479,7 +479,7 @@ bool SkillRaceBonus::visible( ) const
  * SkillClassInfo
  *--------------------------------------------------------------------------*/
 SkillClassInfo::SkillClassInfo( )
-                 : maximum( 100 ), clanAntiBonuses( false ), always( false )
+                 : maximum( 100 ), always( false ), clanAntiBonuses( false )
 {
 }
 
