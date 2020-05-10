@@ -22,11 +22,11 @@ void WrapperHandler::init( Descriptor *d )
 int
 WrapperHandler::handle(Descriptor *d, char *arg) 
 {
-    char *ip, *host, *key;
+    char *ip, *key;
 
     key  = strtok(arg," "); 
     ip   = strtok(NULL," ");
-    host = strtok(NULL," ");
+    /* host */ strtok(NULL," ");
     
     if (!key || strcmp(key,"amaltea")) {
         LogStream::sendWarning() << "Wrong keyword from " << d->realip << ": " << key << endl;
