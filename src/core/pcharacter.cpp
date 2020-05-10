@@ -857,20 +857,6 @@ int PCharacter::getMaxTrain( int i )
                                 + getProfession( )->getStat( i ));
 }
 
-void PCharacter::updateStats( )
-{
-    int i, max_stat;
-
-    for (i = 0; i < stat_table.size; i++) {        
-        max_stat = getMaxTrain( i );
-
-        if (perm_stat[i] > max_stat) {
-            train += perm_stat[i] - max_stat;
-            perm_stat[i] = max_stat;
-        }
-    }
-}
-
 /**************************************************************************
  * misc 
  **************************************************************************/
