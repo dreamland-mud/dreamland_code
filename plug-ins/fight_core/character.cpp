@@ -78,7 +78,6 @@ bool Character::is_adrenalined( ) const
 void PCharacter::check_hit_newbie( Character *victim )
 {
         // памятка: "как попасть в аутсайдеры"
-#warning надо б добавить код дуэлей к Character::check_hit_newbie()
 
         if ( getClan() != clan_none ) // клановые не считаются
                 return;
