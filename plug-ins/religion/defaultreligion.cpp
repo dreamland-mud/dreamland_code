@@ -61,7 +61,7 @@ DLString ReligionHelp::getTitle(const DLString &label) const
 {
     // For help json dump.
     if (!label.empty() && religion)
-        return religion->getRussianName().ruscase('1') + ", " + religion->getName();
+        return religion->getRussianName().ruscase('1') + ", " + religion->getName().upperFirstCharacter();
 
     // Default title if not set explicitly.
     if (label.empty() && titleAttribute.empty() && religion)
