@@ -580,7 +580,8 @@ void affect_join( Character *ch, Affect *paf )
                 if (!paf->global.isSet( paf_old->global ))
                     continue;
 
-            paf->level = (paf->level += paf_old->level) / 2;
+            paf->level += paf_old->level;
+            paf->level /= 2;
             paf->duration += paf_old->duration;
             paf->modifier += paf_old->modifier;
 
