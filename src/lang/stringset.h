@@ -18,6 +18,9 @@ public:
 
     /** Split provided string into words and append to the current set. */
     StringSet & fromString( const DLString &str );
+
+    /** Check if this set contains any element of the other set. */
+    bool containsAny(const StringSet &other) const;
 };
 
 class NumberSet : public std::set<int> {

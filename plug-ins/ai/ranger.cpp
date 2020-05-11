@@ -21,7 +21,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 /*----------------------------------------------------------------------------
  *                         RANGER BRAIN
  *----------------------------------------------------------------------------*/
@@ -80,5 +79,3 @@ bool BasicMobileBehavior::healRanger( Character *patient )
 
     return false;
 }
-
-#endif

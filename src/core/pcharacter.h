@@ -223,7 +223,6 @@ public:
     virtual int getCurrStat( int );
     int getMaxStat( int );
     int getMaxTrain( int );
-    void updateStats( );
     
     // player pk counter (implemented in anatolia_core)
     void check_hit_newbie( Character *victim );

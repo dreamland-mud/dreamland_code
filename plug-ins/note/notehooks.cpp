@@ -110,26 +110,21 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
 }
 
 void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
-{
-    ostringstream content;
-
-    content 
-        << "*Автор*: " << note.getFrom() << endl
-        << "*Тема*: " << note.getSubject() << endl
-        << endl
-        << note.getText();
-        
-    send_telegram(content.str());
+{        
+    const DLString threadName = thread.getRussianName().ruscase('1');        
+    send_telegram_note(threadName, note.getFrom(), note.getSubject(), note.getText());
 }
 
 void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
 {
+    const DLString threadName = thread.getRussianName().ruscase('1');
+
     if (thread.getName() == "news" || thread.getName() == "change")
-        send_discord_news(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject(), note.getText());
+        send_discord_news(threadName, note.getFrom(), note.getSubject(), note.getText());
     else
-        send_discord_note(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject(), note.getText());
+        send_discord_note(threadName, note.getFrom(), note.getSubject(), note.getText());
       
-    send_discord_note_notify(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject());
+    send_discord_note_notify(threadName, note.getFrom(), note.getSubject());
 }
 
 // Timestamp/ID of the first story written after 2018 DL rebirth.

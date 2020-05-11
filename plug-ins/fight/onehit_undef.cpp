@@ -23,6 +23,7 @@
 #include "areabehaviormanager.h"
 
 #include "dreamland.h"
+#include "debug_utils.h"
 #include "fight.h"
 #include "material.h"
 #include "immunity.h"
@@ -153,7 +154,6 @@ void UndefinedOneHit::priorDamageEffects( )
     damEffectMasterHand( );
     damEffectMasterSword( );
     damEffectCriticalStrike( );
-    damEffectGroundStrike( );
 }
 
 bool UndefinedOneHit::mprog_hit()
@@ -870,177 +870,171 @@ bool UndefinedOneHit::defenseHandBlock( )
     return true;
 }
 
-
 /*----------------------------------------------------------------------------
  * Damage increasing skills
  *---------------------------------------------------------------------------*/
-/*  
- *  from Anatolia 3.0
- */
-void UndefinedOneHit::damEffectGroundStrike( ) 
-{
-    int diceroll, levelDiff, chance;
-    Affect baf;
-
-    if (ch == victim)
-        return;
-
-    if (!dam)
-        return;
-
-    if (( chance = gsn_ground_strike->getEffective( ch ) ) <= 1)
-        return;
-    
-    if ( ch->in_room->sector_type != SECT_HILLS
-                && ch->in_room->sector_type != SECT_MOUNTAIN
-                && ch->in_room->sector_type != SECT_FOREST
-                && ch->in_room->sector_type != SECT_FIELD )
-        return;
-
-    if(SHADOW(ch))
-        return;
-
-    diceroll = number_range( 0, 100 );
-    diceroll-= skill_level_bonus(*gsn_ground_strike, ch);
-    levelDiff = victim->getModifyLevel( ) - ch->getModifyLevel( );
-    
-    if (levelDiff > 0)
-        diceroll += levelDiff * 2;
-    else 
-        diceroll += levelDiff;
-
-    if ( diceroll <= (chance/3) ) {  
-        gsn_ground_strike->improve( ch, true, victim );
-        dam += dam * diceroll/200;
-    }  
-
-    if ( diceroll > (chance/15) ) 
-        return;
-
-    diceroll = number_percent( );
-    gsn_ground_strike->improve( ch, true, victim );
-  
-    if( diceroll < 75 ) {  
-        act_p( "{RЗемля трясется под твоими ногами!{x", ch, 0, victim, TO_VICT,POS_RESTING );
-        act_p( "{RЗемля под ногами $C2 начинает трястись, повинуясь твоему приказу!{x", ch, NULL, victim, TO_CHAR,POS_RESTING );
-        
-        victim->setWaitViolence( 2 );
-        dam += (dam * number_range( 2, 5 )) / 5;                        
-    } 
-    else if (diceroll < 95) {   
-        act_p( "{yТы ослепле$Gно|н|на атакой $c2!{x", ch, NULL, victim, TO_VICT, POS_RESTING );
-        act_p( "{yТы ослепляешь $C4 своей атакой!{x", ch, NULL, victim, TO_CHAR, POS_RESTING );
-
-        if (!IS_AFFECTED(victim,AFF_BLIND)) {
-              baf.where    = TO_AFFECTS;
-              baf.type = gsn_ground_strike;
-              baf.level = ch->getModifyLevel( ); 
-              baf.location = APPLY_HITROLL; 
-              baf.modifier = -4;
-              baf.duration = number_range(1,5); 
-              baf.bitvector = AFF_BLIND;
-              affect_to_char( victim, &baf );
-        }  
-
-        dam += dam * number_range( 1, 2 );                        
-    } 
-    else {
-        act_p( "{R$c1 вырывает твое сердце! OUCH!!{x", ch, NULL, victim, TO_VICT ,POS_RESTING ); 
-        act_p( "{RТы вырываешь сердце $C2!{x", ch, NULL, victim, TO_CHAR ,POS_RESTING );
-
-        dam += dam * number_range( 2, 5 );                        
-    }
-}
 
 /*
  * critical strike
  */
 void UndefinedOneHit::damEffectCriticalStrike( )
 {
-    int diceroll, chance;
+    Debug d(ch, "critical", "critical");
+    int diceroll, chance, skill, stun_chance, blind_chance;
     Affect baf;
+
+    skill = gsn_critical_strike->getEffective( ch );
+    stun_chance = 75; // base thresholds
+    blind_chance = 95;
+    chance = 0;        
+            
+    //////////////// ELIGIBILITY CHECKS ////////////////
+            
+    if ( ch == victim )
+        return;
+
+    if ( skill <= 1)
+        return;
+
+    if ( dam == 0 )
+        return;
+
+    if ( SHADOW(ch) )
+        return;
+            
+    // bare hands messages
+    const char *msgVictStun = "{W$c1 обездвиживает тебя предательским ударом по печени!{x"; 
+    const char *msgCharStun = "{WТы обездвиживаешь $C4 предательским ударом по печени!{x";
+    const char *msgVictBlind = "{y$c1 внезапно ослепляет тебя, ткнув пальцем прямо в глаз!{x";
+    const char *msgCharBlind = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";
+    const char *msgVictHeart = "{RНеожиданно изловчившись, $c1 наносит мощнейшую серию ударов тебе ПРЯМО В СЕРДЦЕ!!!{x";
+    const char *msgCharHeart = "{RНеожиданно изловчившись, ты наносишь мощнейшую серию ударов $C3 ПРЯМО В СЕРДЦЕ!!!{x";
+
+    if (wield) {        
+            switch( wield->value0() ) {
+            case WEAPON_SWORD:
+                        msgVictStun = "{W$c1 обездвиживает тебя внезапным ударом меча в печень!{x"; 
+                        msgCharStun = "{WТы обездвиживаешь $C4 внезапным ударом меча в печень!{x";
+                        msgVictBlind = "{y$c1 наносит тебе удар мечом в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
+                        msgCharBlind = "{yТы ослепляешь $C4, нанеся удар мечом в голову!{x";
+                        msgVictHeart = "{RНеожиданно изловчившись, $c1 вонзает тебе меч ПРЯМО В СЕРДЦЕ!!!{x";
+                        msgCharHeart = "{RНеожиданно изловчившись, ты вонзаешь $C3 меч ПРЯМО В СЕРДЦЕ!!!{x";
+                        break;
+            case WEAPON_DAGGER:
+                        msgVictStun = "{W$c1 обездвиживает тебя, внезапно всаживая кинжал в печень!{x"; 
+                        msgCharStun = "{WТы обездвиживаешь $C4, внезапно всаживая кинжал в печень!{x{x";
+                        msgVictBlind = "{y$c1 внезапно ослепляет тебя, ткнув кинжалом прямо в глаз!{x";
+                        msgCharBlind = "{yТы внезапно ослепляешь $C4, ткнув кинжалом прямо в глаз!{x"; 
+                        msgVictHeart = "{RНеожиданно изловчившись, $c1 вонзает тебе кинжал ПРЯМО В СЕРДЦЕ!!!{x";
+                        msgCharHeart = "{RНеожиданно изловчившись, ты вонзаешь $C3 кинжал ПРЯМО В СЕРДЦЕ!!!{x";
+                        break;
+            default:
+                        msgVictBlind = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
+                        msgCharBlind = "{yТы ослепляешь $C4 быстрым ударом в голову!{x"; 
+                        msgVictHeart = "{RНеожиданно изловчившись, $c1 наносит тебе удар ПРЯМО В СЕРДЦЕ!!!{x";
+                        msgCharHeart = "{RНеожиданно изловчившись, ты наносишь $C3 удар ПРЯМО В СЕРДЦЕ!!!{x";
+                        break;
+            }
+    }            
+    // thieves have +10% to blind:              65 / 95 / 100  
+    // ninjas and rangers have +10% to stun:    85 / 95 / 100
+    // samurai have +10% to strike heart:       75 / 85 / 100
+    // everyone else:                           75 / 95 / 100 
     
-    if (ch == victim)
-        return;
+    if ( ch->getProfession( ) == prof_ranger ) {                    
+            if ( ( ch->in_room->sector_type != SECT_HILLS ) &&
+                 ( ch->in_room->sector_type != SECT_MOUNTAIN ) &&
+                 ( ch->in_room->sector_type != SECT_FOREST ) &&
+                 ( ch->in_room->sector_type != SECT_FIELD ) )
+                        return;
+            msgVictStun = "{W$c1 сотрясает землю мощным ударом, обездвиживая тебя!{x";
+            msgCharStun = "{WТы сотрясаешь землю мощным ударом, обездвиживая $C4!{x";
+            msgVictBlind = "{y$c1 внезапной серией ударов поднимает вихрь листьев, ослепляя тебя!{x";
+            msgCharBlind = "{yТы внезапной серией ударов поднимаешь вихрь листьев, ослепляя $C4!{x";
+            msgVictHeart = "{R$c1 призывает силу Природы, нанося тебе мощнейший удар прямо в сердце!{x";
+            msgCharHeart = "{RТы призываешь силу Природы, нанося $C3 мощнейший удар прямо в сердце!{x";                            
+            chance = 5;
+            stun_chance = 85;
+    }       
+    if ( ch->getProfession( ) == prof_thief ) {
+            if ( (!wield) || (wield->value0() != WEAPON_DAGGER) )
+                        return;                
+            chance = 5;
+            stun_chance = 65;        
+    }
+    if ( ch->getProfession( ) == prof_ninja ) {
+            chance = 5;
+            stun_chance = 85;
+    }   
+    if ( ch->getProfession( ) == prof_samurai ) {
+            if ( (wield) && (wield->value0() == WEAPON_SWORD) ) {
+                    msgVictBlind = "{yИспользуя технику кирикаэси, $c1 наносит серию ударов в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x";
+                    msgCharBlind = "{yИспользуя технику кирикаэси, ты ослепляешь $C4. Мэн!{x";                        
+                    msgVictHeart = "{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x";
+                    msgCharHeart = "{RИспользуя технику кацуги-вадза, ты внезапно наносишь $C3 удар особой силы!!!{x";
+            }
+            chance = 5;
+            blind_chance = 85;
+    }
+                            
+    d.log(stun_chance, "stun_chance");
+    d.log(blind_chance, "blind_chance");
+    d.log(chance, "chance");
 
-    if (( chance = gsn_critical_strike->getEffective( ch ) ) <= 1)
-        return;
+    //////////////// PROBABILITY CHECKS ////////////////
+        
+    chance += skill / 10;
+    d.log(chance, "skill");
+    chance += skill_level_bonus(*gsn_critical_strike, ch);    
+    d.log(chance, "bonus");
 
-    if (dam == 0)
-        return;
-
-    if(SHADOW(ch))
-        return;
-
-    diceroll = number_range( 0, 100 );
-    diceroll-= skill_level_bonus(*gsn_critical_strike, ch);
-
-    if ( victim->getRealLevel( ) > ch->getRealLevel( ) )
-        diceroll += ( victim->getModifyLevel() - ch->getModifyLevel() ) * 2;
-    if ( victim->getRealLevel( ) < ch->getRealLevel( ) )
-        diceroll -= ( ch->getModifyLevel() - victim->getModifyLevel() );
-
-    if (diceroll <= (chance/2)) {
-        gsn_critical_strike->improve( ch, true, victim );
-        dam += dam * diceroll/200;
+    if ( victim->getModifyLevel() > ch->getModifyLevel() ) {
+        chance -= ( victim->getModifyLevel() - ch->getModifyLevel() );
+        d.log(chance, "lvl");
     }
 
-    if (diceroll > (chance/13))
+    if ( victim->getModifyLevel() < ch->getModifyLevel() ) {
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() );
+        d.log(chance, "lvl");
+    }
+
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
+        chance = chance / 2;
+        d.log(chance, "stun");
+    }
+
+    if (IS_QUICK(ch)) {
+        chance += 5;
+        d.log(chance, "quick");
+    }
+
+    if (IS_QUICK(victim)) {
+        chance -= 5;
+        d.log(chance, "quick");
+    }
+    
+    d.log(chance, "final chance");
+
+    if ( number_percent() > chance ) {
+        gsn_critical_strike->improve( ch, false, victim );        
         return;
-   
+    }
+        
+    //////////////// SUCCESS: CALCULATING EFFECT ////////////////
+        
+    gsn_critical_strike->improve( ch, true, victim );        
     diceroll = number_percent( );
-    gsn_critical_strike->improve( ch, true, victim );
+    d.log(diceroll, "diceroll");
 
-    if (diceroll < 75) {
-
-        const char *msgVict = "{W$c1 обездвиживает тебя предательским ударом по печени!{x"; //bare hands messages
-        const char *msgChar = "{WТы обездвиживаешь $C4 предательским ударом по печени!{x";
-
-        if(wield){
-
-            if(wield->value0() == WEAPON_SWORD){
-            msgVict = "{W$c1 обездвиживает тебя внезапным ударом меча в печень!{x"; //sword messages
-            msgChar = "{WТы обездвиживаешь $C4 внезапным ударом меча в печень!{x";
-            }
-            else if(wield->value0() == WEAPON_DAGGER){
-            msgVict = "{W$c1 обездвиживает тебя, внезапно всаживая кинжал в печень!{x"; //dagger messages
-            msgChar = "{WТы обездвиживаешь $C4, внезапно всаживая кинжал в печень!{x{x";         
-            }
-            else{
-            msgVict = "{W$c1 обездвиживает тебя внезапным ударом в печень!{x"; //everything else
-            msgChar = "{WТы обездвиживаешь $C4 внезапным ударом в печень!{x";
-            }
-        }
-
-        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
-
+    if (diceroll < stun_chance) {
+        act_p( msgVictStun, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgCharStun, ch, 0, victim, TO_CHAR,POS_RESTING);
         victim->setWaitViolence( 2 );
         dam += (dam * number_range( 2, 5 )) / 5;  // +40-100% damage          
     }
-    else if (diceroll < 95) {
-        const char *msgVict = "{y$c1 внезапно ослепляет тебя, ткнув пальцем прямо в глаз!{x"; //bare hands messages
-        const char *msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";
-
-        if(wield){
-
-            if(wield->value0() == WEAPON_SWORD){
-            msgVict = "{y$c1 наносит тебе удар мечом в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //sword messages
-            msgChar = "{yТы ослепляешь $C4, нанеся удар мечом в голову!{x";
-            }
-            else if(wield->value0() == WEAPON_DAGGER){
-            msgVict = "{y$c1 внезапно ослепляет тебя, ткнув кинжалом прямо в глаз!{x"; //dagger messages
-            msgChar = "{yТы внезапно ослепляешь $C4, ткнув пальцем прямо в глаз!{x";         
-            }
-            else{
-            msgVict = "{y$c1 наносит тебе удар в голову!{/Кровь заливает тебе глаза, ты ничего не видишь!{x"; //everything else
-            msgChar = "{yТы ослепляешь $C4 быстрым ударом в голову!{x";
-            }
-        }
-
-        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
-
+    else if (diceroll < blind_chance) {
+        act_p( msgVictBlind, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgCharBlind, ch, 0, victim, TO_CHAR,POS_RESTING);
         if ( !IS_AFFECTED(victim,AFF_BLIND) )
         {
             baf.where    = TO_AFFECTS;
@@ -1055,28 +1049,8 @@ void UndefinedOneHit::damEffectCriticalStrike( )
         dam += dam * number_range( 1, 2 );  // +100-200% damage          
     }
     else {
-        const char *msgVict = "{RНеожиданно изловчившись, $c1 наносит мощнейшую серию ударов тебе ПРЯМО В СЕРДЦЕ!!!{x"; //bare hands messages
-        const char *msgChar = "{RНеожиданно изловчившись, ты наносишь мощнейшую серию ударов $C3 ПРЯМО В СЕРДЦЕ!!!{x";
-
-        if(wield){
-
-            if(wield->value0() == WEAPON_SWORD){
-            msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе меч ПРЯМО В СЕРДЦЕ!!!{x"; //sword messages
-            msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 меч ПРЯМО В СЕРДЦЕ!!!{x";
-            }
-            else if(wield->value0() == WEAPON_DAGGER){
-            msgVict = "{RНеожиданно изловчившись, $c1 вонзает тебе кинжал ПРЯМО В СЕРДЦЕ!!!{x"; //dagger messages
-            msgChar = "{RНеожиданно изловчившись, ты вонзаешь $C3 кинжал ПРЯМО В СЕРДЦЕ!!!{x";         
-            }
-            else{
-            msgVict = "{RНеожиданно изловчившись, $c1 наносит тебе удар ПРЯМО В СЕРДЦЕ!!!{x"; //everything else
-            msgChar = "{RНеожиданно изловчившись, ты наносишь $C3 удар ПРЯМО В СЕРДЦЕ!!!{x";
-            }
-        }
-
-        act_p( msgVict, ch, 0, victim, TO_VICT,POS_RESTING);
-        act_p( msgChar, ch, 0, victim, TO_CHAR,POS_RESTING);
-
+        act_p( msgVictHeart, ch, 0, victim, TO_VICT,POS_RESTING);
+        act_p( msgCharHeart, ch, 0, victim, TO_CHAR,POS_RESTING);
         dam += dam * number_range( 2, 5 ); // +200-500% damage            
     }
 }

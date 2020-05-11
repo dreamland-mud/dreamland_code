@@ -61,7 +61,7 @@ DLString ReligionHelp::getTitle(const DLString &label) const
 {
     // For help json dump.
     if (!label.empty() && religion)
-        return religion->getRussianName().ruscase('1') + ", " + religion->getName();
+        return religion->getRussianName().ruscase('1') + ", " + religion->getName().upperFirstCharacter();
 
     // Default title if not set explicitly.
     if (label.empty() && titleAttribute.empty() && religion)
@@ -260,7 +260,7 @@ bool DefaultReligion::likesDrink(const Liquid *liq) const
         return true;
     if (liq->getFlags().isSet(likes.liquidFlags.getValue()))
         return true;
-	return false;
+    return false;
 }
 
 bool DefaultReligion::likesItem(Object *obj) const

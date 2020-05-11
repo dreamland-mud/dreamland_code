@@ -100,10 +100,10 @@ Character::Character( )
 Character::~Character(void)
 {
     if (carrying)
-        throw Exception( "~Character: inventory not empty" );
+        LogStream::sendFatal() << "~Character: inventory not empty" << endl;
 
     if (affected)
-        throw Exception( "~Character: affected not empty" );
+        LogStream::sendFatal() << "~Character: affected not empty" << endl;
 
     free_string(prefix);
     free_string(material);

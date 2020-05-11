@@ -19,7 +19,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(none);
 GSN(dispel_affects);
 GSN(dragons_breath);
@@ -104,5 +103,3 @@ bool BasicMobileBehavior::specFightMage( )
     
     return SpellChanceTable( spellTable, ch, victim ).castSpell( );
 }
-
-#endif

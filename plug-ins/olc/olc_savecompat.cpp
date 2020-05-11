@@ -143,7 +143,7 @@ void save_mobile(FILE * fp, const MOB_INDEX_DATA * pMobIndex)
     fprintf(fp, "%s\n", pflag(pMobIndex->vuln_flags & ~race->getVuln( )));
     fprintf(fp, "%s ", position_table.name(pMobIndex->start_pos).c_str());
     fprintf(fp, "%s ", position_table.name(pMobIndex->default_pos).c_str());
-    fprintf(fp, "%s %ld\n", sex_table.name(pMobIndex->sex ).c_str( ), pMobIndex->wealth);
+    fprintf(fp, "%s %d\n", sex_table.name(pMobIndex->sex ).c_str( ), pMobIndex->wealth);
     fprintf(fp, "%s ", pflag(pMobIndex->form & ~race->getForm( )));
     fprintf(fp, "%s ", pflag(pMobIndex->parts & ~race->getParts( )));
 

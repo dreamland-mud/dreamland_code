@@ -19,7 +19,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 PROF(vampire);
 
 /*
@@ -287,5 +286,3 @@ Character * BasicMobileBehavior::findRangeVictim( int maxRange, int &victDoor, i
 
     return victim;
 }
-
-#endif

@@ -35,6 +35,8 @@ GSN(dispel_affects);
 GSN(dispel_magic);
 GSN(bat_sworm);
 GSN(bat_swarm);
+GSN(ground_strike);
+GSN(critical_strike);
 
 static void skill_exchange( PCharacter *ch, SkillReference &skill1, SkillReference &skill2 )
 {
@@ -58,6 +60,24 @@ static void update_exp( PCharacter *ch )
         ch->exp = exp_perlvl;
     }
 }    
+
+static void update_stats( PCharacter *ch )
+{
+    int i, max_stat;
+
+    for (i = 0; i < stat_table.size; i++) {        
+        max_stat = ch->getMaxTrain( i );
+
+        if (ch->perm_stat[i] > max_stat) {
+            int diff = ch->perm_stat[i] - max_stat;
+            notice("Fixing stats for %s: %s %d -> %d",
+                ch->getName().c_str(), stat_table.name(i).c_str(), ch->perm_stat[i], max_stat);
+
+            ch->train += diff;
+            ch->perm_stat[i] = max_stat;
+        }
+    }
+}
 
 static void clear_fenia_skills( PCharacter *ch )
 {
@@ -188,8 +208,10 @@ bool PCharacter::load( )
     parts       = getRace( )->getParts( );
     wearloc.set(getRace()->getWearloc());
 
-    clear_fenia_skills( this );
+    LogStream::sendNotice( ) << getName( ) << " has race " << getRace( )->getName( ) << " and level " << getLevel( ) << endl;
 
+    clear_fenia_skills( this );
+    
     // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
     char_to_room(this, get_room_index(ROOM_VNUM_LIMBO));
 
@@ -200,12 +222,10 @@ bool PCharacter::load( )
     /* now add back spell effects */
     for (Affect *af = affected; af != 0; af = af->next)
         affect_modify( this, af, true );
-
-    LogStream::sendNotice( ) << getName( ) << " has race " << getRace( )->getName( ) << " and level " << getLevel( ) << endl;
     
     position = (position == POS_FIGHTING ? POS_STANDING: position);
     REMOVE_BIT(act, PLR_NO_EXP|PLR_DIGGED); 
-    updateStats( );
+    update_stats(this);
     updateSkills( );
     update_exp( this );
 
@@ -214,6 +234,7 @@ bool PCharacter::load( )
     skill_exchange( this, gsn_magic_resistance, gsn_spell_resistance );
     skill_exchange( this, gsn_dispel_magic, gsn_dispel_affects );
     skill_exchange( this, gsn_bat_sworm, gsn_bat_swarm );
+    skill_exchange( this, gsn_ground_strike, gsn_critical_strike );
 
     // Move player out of the room, to be placed to the start room correctly further down the way.
     char_from_room(this);

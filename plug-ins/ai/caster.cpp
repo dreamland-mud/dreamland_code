@@ -20,7 +20,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(summon);
 GSN(none);
 GSN(stardust);
@@ -359,5 +358,3 @@ bool BasicMobileBehavior::SpellChanceTable::canCastSpell( int sn )
     return true;
 }
 
-
-#endif

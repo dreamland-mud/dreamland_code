@@ -19,7 +19,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(dispel_affects);
 PROF(vampire);
 
@@ -361,4 +360,3 @@ bool BasicMobileBehavior::aggressVampire( )
     
     return true;
 }
-#endif

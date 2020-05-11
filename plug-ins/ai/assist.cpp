@@ -32,7 +32,6 @@
 #include "def.h"
 
 
-#ifndef AI_STUB
 /*
  * Auto-assist a fighting char against certain victim
  */
@@ -462,6 +461,3 @@ bool BasicMobileBehavior::assistSpell( NPCharacter *whoNeeds, SkillReference &sn
 
     return false;
 }
-
-
-#endif

@@ -30,7 +30,6 @@ struct MobileMemory : public XMLMapBase<XMLLongLong> {
     void poll( int );
 };
 
-#ifndef AI_STUB
 class BasicMobileBehavior : public virtual MobileBehavior {
 XML_OBJECT
 public:
@@ -266,29 +265,6 @@ protected:
  */
     bool useItemWithSpell( int, Character * );
 };
-
-#else
-// MOC_SKIP_BEGIN
-class BasicMobileBehavior : public virtual MobileBehavior {
-XML_OBJECT
-public:
-    BasicMobileBehavior( );
-    virtual ~BasicMobileBehavior( );
-protected:    
-    virtual bool specFight( );
-    virtual bool specAdrenaline( );
-    virtual bool specIdle( );
-    XML_VARIABLE XMLLongLongNoEmpty lastCharmTime;
-    XML_VARIABLE XMLStringNoEmpty lastFought;
-    XML_VARIABLE MobileMemory memoryFought;
-    XML_VARIABLE MobileMemory memoryAttacked;
-    XML_VARIABLE XMLIntegerNoEmpty homeVnum;
-    XML_VARIABLE XMLBooleanNoFalse lostTrack;
-};
-// MOC_SKIP_END
-#endif
-
-
 
 class BasicMobileDestiny : public BasicMobileBehavior {
 XML_OBJECT

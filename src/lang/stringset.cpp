@@ -29,6 +29,14 @@ StringSet & StringSet::fromString( const DLString &constStr )
     return *this;
 }
 
+bool StringSet::containsAny(const StringSet &other) const
+{
+    for (auto &s: other)
+        if (this->find(s) != this->end())
+            return true;
+            
+    return false;
+}
 
 void NumberSet::fromStringSet( const StringSet &str )
 {

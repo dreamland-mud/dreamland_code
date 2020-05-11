@@ -9,7 +9,6 @@
 #include "pcrace.h"
 #include "merc.h"
 
-#ifndef FIGHT_STUB
 /*
  * Attribute bonus tables.
  */
@@ -207,13 +206,3 @@ const struct dex_app_type & get_dex_app( Character *ch )
     return dex_app[ch->getCurrStat( STAT_DEX )];
 }
 
-#else
-static const struct str_app_type zero_str_app = { 4, 50, 250, 35,  20,    0     }; /* 20  */
-static const struct int_app_type zero_int_app = { 49, 0 };        /* 20 */
-static const struct wis_app_type zero_wis_app = { 3, 2, };        /* 20 */
-static const struct dex_app_type zero_dex_app = { - 50 };   /* 20 */
-const struct str_app_type & get_str_app( Character * ) { return zero_str_app; }
-const struct int_app_type & get_int_app( Character * ) { return zero_int_app; }
-const struct wis_app_type & get_wis_app( Character * ) { return zero_wis_app; }
-const struct dex_app_type & get_dex_app( Character * ) { return zero_dex_app; }
-#endif

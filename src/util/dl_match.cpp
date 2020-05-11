@@ -74,11 +74,10 @@ rangematch(const char *pattern, char test, bool casefold, char **newp)
 bool
 dl_match(const char *pattern, const char *string, bool casefold)
 {
-    const char *stringstart;
     char *newp;
     char c, pc, sc;
 
-    for (stringstart = string;;) {
+    for (;;) {
         pc = *pattern++;
         sc = *string;
 

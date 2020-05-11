@@ -20,10 +20,34 @@
 #include "def.h"
 
 
+/** 
+ * Reset remort bonuses if they are no longer useful. If point imbalance is detected on login,
+ * player will automatically get transferred to Jaga room.
+ */
+static void update_remort_bonuses(PCharacter *ch)
+{
+    for (int i = 0; i < stat_table.size; i++) {        
+        int max_stat = ch->getMaxTrain(i);
+        int bonus_stat = ch->getRemorts().stats[i];
+        int diff = max_stat + bonus_stat - MAX_STAT;
+
+        if (diff > 0) {            
+            notice("Fixing remort bonus for %s: %s bonus was %d, current max is %d, diff %d",
+                    ch->getName().c_str(), stat_table.name(i).c_str(), bonus_stat, max_stat, diff);
+            ch->pecho("{cУ твоей расы теперь выше параметр '%s', тебе нет нужды покупать его дополнительно за реморты.{x",
+                       stat_table.message(i).c_str());
+            ch->getRemorts().stats[i] -= diff;
+            ch->getRemorts().points += 10 * diff;
+        }
+    }
+
+    if (ch->getRemorts().points != 0)
+        ch->pecho("{cТы попадаешь в избушку к Бабе Яге, чтобы снова выбрать плюшки за реморты.{x");
+}
+
 /*-----------------------------------------------------------------------------
  * descriptor state listener for remorting players 
  *----------------------------------------------------------------------------*/
-
 void RemortNanny::run( int oldState, int newState, Descriptor *d )
 {
     PCharacter *ch;
@@ -37,7 +61,9 @@ void RemortNanny::run( int oldState, int newState, Descriptor *d )
     
     if (ch->getRemorts( ).size( ) == 0)
         return;
-    
+
+    update_remort_bonuses(ch);
+
     if (ch->getRemorts( ).points == 0)
         return;
 
@@ -50,8 +76,8 @@ void RemortNanny::run( int oldState, int newState, Descriptor *d )
 
     if (ch->in_room != izba)
         transfer_char( ch, 0, izba,
-                        "Ветер перемен подхватывает %1$C4 и уносит куда-то.. ", 
-                        "Ветер перемен переносит тебя в другое место..", 
+                        "Ветер перемен подхватывает %1$C4 и уносит куда-то...", 
+                        "Ветер перемен переносит тебя в другое место...", 
                         "%1$C1 влетает в избу через окошко.",
                         "Влетев в избу через окошко, ты шлепаешься на пол." );
     
@@ -60,6 +86,8 @@ void RemortNanny::run( int oldState, int newState, Descriptor *d )
         transfer_char( ch->pet, 0, izba,
                         NULL, NULL, "%1$C1 влетает в избу через окошко." );
     }
+
+    ch->save();
 }
 
 /*-----------------------------------------------------------------------------

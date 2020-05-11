@@ -86,7 +86,6 @@ static void rprog_skill( Room *room, Character *actor, const char *skill, bool s
         mprog_skill( rch, actor, skill, success, victim );
 }
 
-#ifndef FIGHT_STUB
 void 
 BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_type, int dam_flags ) const 
 {
@@ -198,13 +197,6 @@ BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_typ
     
     pch->gainExp( xp );
 }
-#else 
-void 
-BasicSkill::improve( Character *ch, bool success, Character *victim, int dam_type, int dam_flags ) const 
-{
-    mprog_skill( ch, getName( ).c_str( ), success, victim );
-}
-#endif
 
 int BasicSkill::getAdept( PCharacter *ch ) const
 {

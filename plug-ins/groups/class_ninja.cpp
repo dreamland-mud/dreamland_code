@@ -12,6 +12,7 @@
  *    Andreyanov Aleksandr {Manwe}                                         *
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
+#include <sstream>
 #include "skill.h"
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"
@@ -41,7 +42,7 @@
 #include "interp.h"
 #include "def.h"
 #include "stats_apply.h"
-
+#include "debug_utils.h"
 
 /*
  * 'vanish' skill command
@@ -49,6 +50,7 @@
 
 SKILL_RUNP( vanish )
 {
+    Debug d(ch, "ninja", "vanish");
     Character *victim;
     float chance, kidnap_chance = 0, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
     bool FightingCheck;    
@@ -205,52 +207,76 @@ SKILL_RUNP( vanish )
 
     chance = 0;
     chance += gsn_vanish->getEffective( ch );
+    d.log(chance, "skill");
 
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-        chance = chance / 2;    
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
+        chance = chance / 2;
+        d.log(chance, "stun");
+    }
     
     if (FightingCheck) {
         
         chance = chance / 2; 
-        
+        d.log(chance, "fight");
         chance += ch->fighting->can_see(ch) ? 0 : (vis_mod * 100);
-        
+        d.log(chance, "vis");
+
         if ( IS_SET(ch->fighting->imm_flags,IMM_LIGHT) ) {
             ch->send_to(fmt(ch, "{W%^C1 не поддается воздействию вспышки!{x\n\r", ch->fighting));
             chance = 0;
+            d.log(chance, "imm");
         }
         if ( IS_SET(ch->fighting->res_flags,RES_LIGHT) ) {
             ch->send_to(fmt(ch, "{W%^C1 сопротивляется воздействию вспышки!{x\n\r", ch->fighting));
             chance = chance / 2; 
+            d.log(chance, "res");
         }         
     }    
+
+    d.log(chance, "chance final");
 
     //////////////// PROBABILITY CHECKS: KIDNAP ////////////////
     
     if (victim != 0) {
         kidnap_chance += gsn_vanish->getEffective( ch ) * skill_mod;
+        d.log(kidnap_chance, "kidnap skill");
         kidnap_chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_STR) ) * stat_mod * 100;
+        d.log(kidnap_chance, "stats");
         kidnap_chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        d.log(kidnap_chance, "lvl");
         kidnap_chance += (ch->size - victim->size) * size_mod * 100;
+        d.log(kidnap_chance, "size");
         kidnap_chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         kidnap_chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
-   
-        if (IS_QUICK(ch))
-                kidnap_chance += quick_mod * 100;
-        if (IS_QUICK(victim))
-                kidnap_chance -= quick_mod * 100;            
+        d.log(kidnap_chance, "vis");
 
-        if (IS_SET(victim->res_flags, RES_LIGHT))
+        if (IS_QUICK(ch)) {
+                kidnap_chance += quick_mod * 100;
+                d.log(kidnap_chance, "quick");
+        }
+        if (IS_QUICK(victim)) {
+                kidnap_chance -= quick_mod * 100;            
+                d.log(kidnap_chance, "quick");
+        }
+
+        if (IS_SET(victim->res_flags, RES_LIGHT)) {
                 kidnap_chance = kidnap_chance / 2;
+                d.log(kidnap_chance, "res");
+        }
             
-        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
                 kidnap_chance = kidnap_chance / 2;
+                d.log(kidnap_chance, "stun");
+        }
         
         // neckguard can't protect if you're asleep
-        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
+        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) {
                 kidnap_chance = kidnap_chance / 2;
+                d.log(kidnap_chance, "backguard");
+        }
         
         kidnap_chance = max( (float)1, kidnap_chance ); // there's always a chance        
+        d.log(kidnap_chance, "kidnap final");
     }
 
     //////////////// THE ROLL ////////////////
@@ -323,13 +349,14 @@ SKILL_RUNP( vanish )
 
 SKILL_RUNP( nerve )
 {
+        Debug d(ch, "ninja", "nerve");
         Character *victim;
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
         bool FightingCheck;
         char arg[MAX_INPUT_LENGTH];
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-        skill_mod   = 0.3;
+        skill_mod   = 0.5;
         stat_mod    = 0.05;
         level_mod   = 0.01;
         quick_mod   = 0.1;
@@ -438,23 +465,37 @@ SKILL_RUNP( nerve )
         chance = 0;
   
         chance += gsn_nerve->getEffective( ch ) * skill_mod;
+        d.log(chance, "skill"); 
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        d.log(chance, "stats");
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
+        d.log(chance, "size");
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
+        d.log(chance, "vis");
    
-        if (IS_QUICK(ch))
+        if (IS_QUICK(ch)) {
                 chance += quick_mod * 100;
-        if (IS_QUICK(victim))
+                d.log(chance, "quick");
+        }
+        if (IS_QUICK(victim)) {
                 chance -= quick_mod * 100;            
+                d.log(chance, "quick");
+        }
 
-        if (IS_SET(victim->res_flags, RES_DISEASE))
+        if (IS_SET(victim->res_flags, RES_DISEASE)) {
                 chance = chance / 2;
+                d.log(chance, "res");
+        }
             
-        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-                chance = chance / 2;    
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
+                chance = chance / 2; 
+                d.log(chance, "stun");
+        }
 
+        d.log((int)chance, "final");
         //////////////// THE ROLL ////////////////
             
         ch->setWait( gsn_nerve->getBeats( )  );
@@ -598,6 +639,7 @@ AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
 
 void AssassinateOneHit::calcDamage( )
 {
+    Debug d(ch, "ninja", "assa");
     float chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
@@ -615,36 +657,56 @@ void AssassinateOneHit::calcDamage( )
     chance = 0;
         
     chance += gsn_assassinate->getEffective( ch ) * skill_mod;
+    d.log(chance, "skill");
     chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+    d.log(chance, "stats");
     chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+    d.log(chance, "lvl");
     chance += (ch->size - victim->size) * size_mod * 100;
-    chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+    d.log(chance, "size");
+    chance += victim->can_see(ch) ? 0 : (vis_mod * 100);    
     chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
-    if (IS_QUICK(ch))
-        chance += quick_mod * 100;
-    if (IS_QUICK(victim))
-        chance -= quick_mod * 100;            
+    d.log(chance, "vis");
 
-    if (IS_SET(victim->res_flags, RES_WEAPON))
+    if (IS_QUICK(ch)) {
+        chance += quick_mod * 100;
+        d.log(chance, "quick");
+    }        
+
+    if (IS_QUICK(victim)) {
+        chance -= quick_mod * 100;            
+        d.log(chance, "quick");
+    }
+
+    if (IS_SET(victim->res_flags, RES_WEAPON)) {
         chance = chance / 2;
+        d.log(chance, "res");
+    }
             
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-        chance = chance / 2; 
+    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
+        chance = chance / 2;
+        d.log(chance, "stun");
+    }
     
     // neckguard can't protect if you're asleep
-    if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
-        chance = chance / 2;    
+    if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) {
+        chance = chance / 2;
+        d.log(chance, "backguard");
+    }
 
     // only check for assassinate spam without strangle
     int k = ch->getLastFightDelay( );
-    if (k >= 0 && k < FIGHT_DELAY_TIME && IS_AWAKE( victim ))
+    if (k >= 0 && k < FIGHT_DELAY_TIME && IS_AWAKE( victim )) {
         chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
+        d.log(chance, "adrenaline");
+    }
         
     UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
     ch->setLastFightTime( );    
     
     chance = max( (float)1, chance ); // there's always a chance
+    d.log((int)chance, "final");
 
     //////////////// THE ROLL ////////////////
     
@@ -803,13 +865,14 @@ SKILL_RUNP( assassinate )
 
 SKILL_RUNP( caltraps )
 {
+  Debug d(ch, "ninja", "caltraps");
   Character *victim;
   float chance, skill_mod, stat_mod, quick_mod, size_mod, sleep_mod, vis_mod;
   bool FightingCheck;
   char arg[MAX_INPUT_LENGTH];
     
   //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-  skill_mod   = 0.3;
+  skill_mod   = 0.5;
   stat_mod    = 0.05;
   quick_mod   = 0.1;
   size_mod    = -0.1; // HARDER to affect smaller victims, easier to affect larger
@@ -917,19 +980,31 @@ SKILL_RUNP( caltraps )
    chance = 0;
         
    chance += gsn_caltraps->getEffective( ch ) * skill_mod;
+   d.log(chance, "skill");
    chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
+   d.log(chance, "stats");
    // chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100; // no level check for caltraps
    chance += (ch->size - victim->size) * size_mod * 100;
-   chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+   d.log(chance, "size");
+   chance += victim->can_see(ch) ? 0 : (vis_mod * 100);   
    chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
-   if (IS_QUICK(ch))
-        chance += quick_mod * 100;
-   if (IS_QUICK(victim))
-        chance -= quick_mod * 100;            
+   d.log(chance, "vis");
 
-   if (IS_SET(victim->res_flags, RES_PIERCE))
+   if (IS_QUICK(ch)) {
+        chance += quick_mod * 100;
+        d.log(chance, "quick");
+   }
+   if (IS_QUICK(victim)) {
+        chance -= quick_mod * 100;            
+        d.log(chance, "quick");
+   }
+
+   if (IS_SET(victim->res_flags, RES_PIERCE)) {
         chance = chance / 2;
+        d.log(chance, "res");
+   }        
           
+   d.log((int)chance, "final");
 
   //////////////// THE ROLL ////////////////      
       
@@ -1043,6 +1118,7 @@ void ThrowDownOneHit::calcDamage( )
 
 SKILL_RUNP( throwdown )
 {
+        Debug d(ch, "ninja", "throw");
         Character *victim;
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
         bool FightingCheck;
@@ -1158,25 +1234,43 @@ SKILL_RUNP( throwdown )
         chance = 0;
   
         chance += gsn_throw->getEffective( ch ) * skill_mod;
+        d.log(chance, "skill");
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
+        d.log(chance, "stats");
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
+        d.log(chance, "size");
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);    
+        d.log(chance, "vis");
    
-        if (IS_QUICK(ch))
+        if (IS_QUICK(ch)) {
                 chance += quick_mod * 100;
-        if (IS_QUICK(victim))
-                chance -= quick_mod * 100;            
+                d.log(chance, "quick");
+        }
 
-        if (IS_SET(victim->res_flags, RES_BASH))
+        if (IS_QUICK(victim)) {
+                chance -= quick_mod * 100;            
+                d.log(chance, "quick");
+        }
+
+        if (IS_SET(victim->res_flags, RES_BASH)) {
                 chance = chance / 2;
+                d.log(chance, "res");
+        }
             
-        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
                 chance = chance / 2; 
+                d.log(chance, "stun");
+        }
         
-        if (is_flying( victim ))
+        if (is_flying( victim )) {
                 chance -= 10;
+                d.log(chance, "fly");
+        }
+
+        d.log(chance, "final");
 
         //////////////// THE ROLL ////////////////
     
@@ -1253,6 +1347,7 @@ SKILL_RUNP( throwdown )
 
 SKILL_RUNP( strangle )
 {
+        Debug d(ch, "ninja", "strangle");
         Character *victim;
         Affect af;    
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod, time_mod;
@@ -1366,40 +1461,59 @@ SKILL_RUNP( strangle )
             
         chance = 0;
         chance += gsn_strangle->getEffective( ch ) * skill_mod;
+        d.log(chance, "skill");
         chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        d.log(chance, "stats");
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        d.log(chance, "lvl");
         chance += (ch->size - victim->size) * size_mod * 100;
+        d.log(chance, "size");
         chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
         chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
-        if (IS_QUICK(ch))
-            chance += quick_mod * 100;
-        if (IS_QUICK(victim))
-            chance -= quick_mod * 100;            
+        d.log(chance, "vis");
 
-        if (IS_SET(victim->res_flags, RES_WEAPON))
+        if (IS_QUICK(ch)) {
+            chance += quick_mod * 100;
+            d.log(chance, "quick");
+        }
+
+        if (IS_QUICK(victim)) {
+            chance -= quick_mod * 100;            
+            d.log(chance, "quick");
+        }
+
+        if (IS_SET(victim->res_flags, RES_WEAPON)) {
             chance = chance / 2;
+            d.log(chance, "res");
+        }
             
-        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
-            chance = chance / 2; 
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
+            chance = chance / 2;
+            d.log(chance, "stun");
+        }
     
         // neckguard can't protect if you're asleep
-        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) 
-            chance = chance / 2;   
+        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) {
+            chance = chance / 2;
+            d.log(chance, "backguard");
+        }
 
         int k = ch->getLastFightDelay( );
-        if (k >= 0 && k < FIGHT_DELAY_TIME)
+        if (k >= 0 && k < FIGHT_DELAY_TIME) {
             chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
-        
-        UNSET_DEATH_TIME(ch);
-        victim->setLastFightTime( );
-        ch->setLastFightTime( );    
+            d.log(chance, "adrenaline");
+        }
+           
     
         chance = max( (float)1, chance ); // there's always a chance
+        d.log(chance, "final");
 
         //////////////// THE ROLL ////////////////
     
         ch->setWait( gsn_strangle->getBeats( ) );
         UNSET_DEATH_TIME(ch);
+        victim->setLastFightTime( );
+        ch->setLastFightTime( );  
 
         Chance mychance(ch, (int) chance, 100);
 

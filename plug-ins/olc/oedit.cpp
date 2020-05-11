@@ -878,6 +878,7 @@ OEDIT(type)
     return false;
 }
 
+// TODO: check against hard-coded list of materials.
 OEDIT(material)
 {
     OBJ_INDEX_DATA *pObj;
@@ -891,7 +892,6 @@ OEDIT(material)
 
     free_string(pObj->material);
     pObj->material = str_dup(argument);
-#warning нет material_lookup
 
     stc("Material set.\n\r", ch);
     return true;

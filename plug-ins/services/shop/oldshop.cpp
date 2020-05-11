@@ -461,7 +461,7 @@ CMDRUN( list )
 
     buf << "[ Ном.| Ур.  Цена Кол-во] Товар" << endl;
 
-    for (int i = 0; i < stock.size( ); i++) {
+    for (unsigned int i = 0; i < stock.size( ); i++) {
         const StockInfo &si = stock.at( i );
         
         if (IS_OBJ_STAT( si.obj, ITEM_INVENTORY ))
@@ -519,7 +519,6 @@ static void value_one_item(Character *ch, NPCharacter *keeper, ShopTrader::Point
 
 CMDRUN( value )
 {
-    char buf[MAX_STRING_LENGTH];
     NPCharacter *keeper;
     ShopTrader::Pointer trader;
     Object *obj;

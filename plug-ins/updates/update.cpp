@@ -688,8 +688,8 @@ void obj_update( void )
     {
         const char *message;
 
-#warning XXX
         if(!obj->pIndexData) {
+            // TODO: does it need additional debugging output, as it happens fairly regularly in prod.
             LogStream::sendError() << "obj_update aborted" << endl;
             return;
         }
