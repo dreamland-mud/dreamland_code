@@ -725,8 +725,6 @@ SKILL_RUNP( touch )
         af.bitvector = AFF_SLEEP;
         affect_join ( victim,&af );
 
-        set_backguard( victim );
-
         if (IS_AWAKE(victim))
                 victim->position = POS_SLEEPING;
         

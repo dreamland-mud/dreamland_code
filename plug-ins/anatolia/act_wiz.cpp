@@ -86,7 +86,6 @@
 #include "clan.h"
 #include "liquid.h"
 
-#include "worldknowledge.h"
 #include "gsn_plugin.h"
 #include "npcharacter.h"
 #include "core/object.h"

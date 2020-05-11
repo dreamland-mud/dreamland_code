@@ -380,23 +380,6 @@ void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool sh
     }
 }
 
-void set_backguard( Character *wch )
-{
-#if 0    
-    Affect af;
-
-    af.type         = gsn_backguard;
-    af.where        = TO_AFFECTS;
-    af.level        = wch->getRealLevel( );
-    af.duration     = 2;
-    af.location     = APPLY_NONE;
-    af.modifier     = 0;
-    af.bitvector    = 0;
-    
-    affect_join(wch, &af);
-#endif
-}
-
 static inline bool must_not_yell( Character *ch, Character *victim, int flags )
 {
     /* sanity checks */

@@ -10,7 +10,6 @@
 #include "pcharactermanager.h"
 
 #include "savedcreature.h"
-#include "worldknowledge.h"
 
 #include "save.h"
 #include "merc.h"
@@ -81,7 +80,6 @@ extern "C" {
         Plugin::registerPlugin<PlayerLoadTask>( ppl );
         Plugin::registerPlugin<DropsLoadTask>( ppl );
         Plugin::registerPlugin<MobileBehaviorRegistrator<SavedCreature> >( ppl );
-//        Plugin::registerPlugin<WorldKnowledge>( ppl );
         Plugin::registerPlugin<LimitedItemsPurgeTask>( ppl );
 
         return ppl;

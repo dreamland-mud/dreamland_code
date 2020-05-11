@@ -319,55 +319,6 @@ DLString::size_type DLString::colorLength( ) const
         
         return length( ) - len_colour * 2 - len_s;
 }
-#if 0
-DLString DLString::getOneArgument( )
-{
-        char terminate_char = ' ';
-
-        if ( empty( ) )
-        {
-                DLString ret = "";
-                return ret;
-        }
-
-        size_type no_space = find_first_not_of( ' ', 0 );
-
-        if ( at(no_space) == '\'' || at(no_space) == '"' )
-        {
-                terminate_char = at(no_space);
-                no_space++;
-        }
-
-        size_type pos = find( terminate_char, no_space );
-
-        if( pos != npos )
-        {
-                DLString ret = substr( no_space, pos - no_space );
-
-                if ( terminate_char != ' ' )
-                        pos++;
-
-                size_type pos2 = find_first_not_of( ' ', pos );
-
-                if( pos2 != npos )
-                        pos = pos2;
-                else
-                        pos++;
-                
-                erase( 0, pos );
-
-                return ret;
-        }
-        else
-        {
-                DLString ret = substr( no_space ); 
-
-                erase( );
-
-                return ret;
-        }
-}
-#endif
 
 DLString DLString::getOneArgument( )
 {

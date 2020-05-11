@@ -21,23 +21,6 @@ public:
     virtual void speech( Character *victim, const char *speech );
     virtual void tell ( Character *victim, const char *speech );
     
-#if 0
-    virtual void doSell( PCharacter *, const DLString & );
-    virtual void doValue( PCharacter *, const DLString & );
-    
-protected:
-    virtual bool canServeClient( PCharacter * );
-    virtual Article::Pointer findArticle( PCharacter *, DLString & );
-    virtual void toStream( PCharacter *, ostringstream & );
-
-    virtual void msgListEmpty( PCharacter * );
-    virtual void msgListBefore( PCharacter * );
-    virtual void msgListAfter( PCharacter * );
-    virtual void msgListRequest( PCharacter * );
-    virtual void msgBuyRequest( PCharacter * );
-    virtual void msgArticleNotFound( PCharacter * );
-    virtual void msgArticleTooFew( PCharacter *, Article::Pointer );
-#endif
     XML_VARIABLE XMLInteger closeHour, openHour;
     XML_VARIABLE XMLInteger profitBuy, profitSell;
     XML_VARIABLE XMLFlagsNoEmpty buys;

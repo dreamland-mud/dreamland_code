@@ -1,10 +1,4 @@
-lib_LTLIBRARIES = libolc.la libolc_skills.la
-
-libolc_skills_la_SOURCES = olcstubskill.cpp
-libolc_skills_la_MOC = olcstubskill.h
-libolc_skills_la_LIBADD = \
-../skills_impl/libskills_impl.la \
-../system/libsystem.la
+lib_LTLIBRARIES = libolc.la
 
 libolc_la_SOURCES = \
 olcflags.cpp \

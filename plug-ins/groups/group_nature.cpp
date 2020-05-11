@@ -2,9 +2,6 @@
  *
  * ruffina, 2004
  */
-#if 0
-#include "class_druid.h"
-#endif
 
 #include "skill.h"
 #include "spelltarget.h"

@@ -18,7 +18,6 @@ banking.cpp \
 configs.cpp \
 corder.cpp \
 impl.cpp \
-pcdeleteidle.cpp \
 run.cpp \
 showtable.cpp \
 whois.cpp \
@@ -33,7 +32,6 @@ libcomm_la_MOC = \
 banking.h \
 configs.h \
 corder.h \
-pcdeleteidle.h \
 run.h \
 whois.h \
 writing.h \

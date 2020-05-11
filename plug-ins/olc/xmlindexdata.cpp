@@ -31,23 +31,6 @@ void save_area_header(FILE *, const AREA_DATA *);
 
 using namespace std;
 
-#if 0
-int
-isreadfn(void *cookie, char *buf, int len)
-{
-    return ((std::istream *)cookie)->read(buf, len).gcount();
-}
-
-int
-oswritefn(void *cookie, const char *buf, int len)
-{
-    if(((ostream *)cookie)->write(buf, len))
-        return len;
-    else
-        return -1;
-}
-#endif 
-
 /*------------------------------------
  * MOB_INDEX_DATA
  *-----------------------------------*/
@@ -180,29 +163,9 @@ void
 XMLMobIndexData::fromXML( const XMLNode::Pointer& parent) 
 {
     clear();
-#if 0
-    XMLNode::Pointer node = parent->getFirstNode( );
-    
-    if (!node)
-        return;
-
-    if(node->getType( ) != XMLNode::XML_CDATA && node->getType( ) != XMLNode::XML_TEXT )
-        throw ExceptionBadType( "XMLMobIndexData", node->getCData( ) );
- 
-    istringstream is(node->getCData( ));
-
-    FILE *fd = fropen((istream *)&is, isreadfn);
-
-    if(!fd)
-        throw ExceptionBadType( "XMLMobIndexData", strerror(errno) );
-
-    load_mobile(fd, this);
-    fclose(fd);
-#else
     XMLMobileFactory f;
     f.fromXML(parent);
     f.compat(this);
-#endif
 
     vnum = parent->getAttribute( "vnum" ).toInt( );
     area = OLCState::get_vnum_area(vnum);
@@ -211,29 +174,10 @@ XMLMobIndexData::fromXML( const XMLNode::Pointer& parent)
 bool
 XMLMobIndexData::toXML( XMLNode::Pointer& parent ) const
 {
-#if 0
-    XMLNode::Pointer node( NEW );
-
-    node->setType( XMLNode::XML_TEXT );
-
-    ostringstream os;
-
-    FILE *fd = fwopen((ostream *)&os, oswritefn);
-
-    if(!fd)
-        throw ExceptionBadType( "XMLMobIndexData", strerror(errno) );
-
-    save_mobile(fd, this);
-    fclose(fd);
-
-    node->setCData( DLString( os.str( ) ) );
-
-    parent->appendChild( node );
-#else
     XMLMobileFactory f;
     f.init(this);
     f.toXML(parent);
-#endif
+
     parent->insertAttribute("vnum", vnum);
     return true;
 }
@@ -334,29 +278,10 @@ void
 XMLObjIndexData::fromXML( const XMLNode::Pointer& parent) 
 {
     clear();
-#if 0
-    XMLNode::Pointer node = parent->getFirstNode( );
-    
-    if (!node)
-        return;
 
-    if(node->getType( ) != XMLNode::XML_CDATA && node->getType( ) != XMLNode::XML_TEXT )
-        throw ExceptionBadType( "XMLObjIndexData", node->getCData( ) );
- 
-    istringstream is(node->getCData( ));
-
-    FILE *fd = fropen((istream *)&is, isreadfn);
-
-    if(!fd)
-        throw ExceptionBadType( "XMLObjIndexData", strerror(errno) );
-
-    load_object(fd, this);
-    fclose(fd);
-#else
     XMLObjectFactory f;
     f.fromXML(parent);
     f.compat(this);
-#endif
     
     vnum = parent->getAttribute( "vnum" ).toInt( );
     area = OLCState::get_vnum_area(vnum);
@@ -365,28 +290,10 @@ XMLObjIndexData::fromXML( const XMLNode::Pointer& parent)
 bool
 XMLObjIndexData::toXML( XMLNode::Pointer& parent ) const
 {
-#if 0
-    XMLNode::Pointer node( NEW );
-    
-    node->setType( XMLNode::XML_TEXT );
-
-    ostringstream os;
-    FILE *fd = fwopen((ostream *)&os, oswritefn);
-
-    if(!fd)
-        throw ExceptionBadType( "XMLObjIndexData", strerror(errno) );
-
-    save_object(fd, this);
-    fclose(fd);
-
-    node->setCData( DLString( os.str( ) ) );
-
-    parent->appendChild( node );
-#else
     XMLObjectFactory f;
     f.init(this);
     f.toXML(parent);
-#endif
+
     parent->insertAttribute("vnum", vnum);
     return true;
 }
