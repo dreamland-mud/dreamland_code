@@ -12,18 +12,6 @@
 #include "playerattributes.h"
 #include "bonus.h"
 
-class Flags;
-struct time_info_data;
-
-class XMLTimeInfo : public XMLVariableContainer
-{
-XML_OBJECT
-public:
-    XML_VARIABLE XMLInteger year;
-    XML_VARIABLE XMLInteger month;
-    XML_VARIABLE XMLInteger day;
-};
-
 class XMLAttributeReligion: public XMLVariableContainer, 
                             public virtual EventHandler<ScoreArguments>
 {
