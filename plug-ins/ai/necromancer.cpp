@@ -19,7 +19,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(assist);
 GSN(none);
 GSN(dispel_affects);
@@ -114,5 +113,3 @@ bool BasicMobileBehavior::healNecro( Character *patient )
     return SpellChanceTable( necroSnHealing, ch, patient ).castSpell( ~FSPELL_OBSTACLES );
 }
 
-
-#endif

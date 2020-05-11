@@ -89,7 +89,6 @@ void MobileMemory::poll( int diff )
 /*
  * BasicMobileBehavior 
  */
-#ifndef AI_STUB
 bool BasicMobileBehavior::isSaved( ) const
 {
     return false;
@@ -507,12 +506,6 @@ int BasicMobileBehavior::getExpBonus( Character *killer )
 
     return max( 0, bonus );
 }
-
-#else
-bool BasicMobileBehavior::specFight( ) { return false; }
-bool BasicMobileBehavior::specAdrenaline( ) { return false; }
-bool BasicMobileBehavior::specIdle( ) { return false; }
-#endif
 
 BasicMobileBehavior::BasicMobileBehavior( ) 
                         : lostTrack( false )
