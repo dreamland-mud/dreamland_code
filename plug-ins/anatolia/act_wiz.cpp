@@ -1155,7 +1155,7 @@ CMDWIZP( stat )
                 else
                         sprintf( buf, "Урон от %d до %d (среднее %d)\n\r",
                                 obj->value1(), obj->value2(),( obj->value1() + obj->value2() ) / 2 );
-                        ch->send_to(buf);
+                ch->send_to(buf);
 
                 sprintf(buf,"Тип удара: %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
                 ch->send_to(buf);

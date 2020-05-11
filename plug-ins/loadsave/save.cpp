@@ -916,9 +916,6 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
 {
     const char *word="End";
     bool fMatch = true;
-    int version;
-    int trust;
-    int dummy;
 
     LogStream::sendNotice( ) << "Loading " << ch->getName( ) << '.' << endl;
 
@@ -1099,7 +1096,7 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             KEYSKIP( "LastTime" );
             break;
         case 'M':
-                KEY( "MaxSkillPoints",        dummy, fread_number( fp ) );
+                KEYSKIP( "MaxSkillPoints" );
                 break;
         case 'N':
             if ( !str_cmp( word, "Name" ) )
@@ -1179,13 +1176,12 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
                     int sn;
                     int value;
                     int timer;
-                    int forget;
                     char *temp;
 
                     value = fread_number( fp );
                     timer = fread_number( fp );
                     temp = fread_word( fp ) ;
-                    forget = fread_number( fp );
+                    /* forget */ fread_number( fp );
                     sn = SkillManager::getThis( )->lookup(temp);
                     convert_skill( sn );
 
@@ -1208,8 +1204,8 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
 
         case 'T':
             KEY( "Trai",        ch->train,        fread_number( fp ) );
-            KEY( "Trust",        trust,                fread_number( fp ) );
-            KEY( "Tru",                trust,                fread_number( fp ) );
+            KEYSKIP( "Trust" );
+            KEYSKIP( "Tru" );
 
             if ( !str_cmp( word, "Title" )  || !str_cmp( word, "Titl"))
             {
@@ -1227,8 +1223,8 @@ void fread_char_raw( PCharacter *ch, FILE *fp )
             break;
 
         case 'V':
-            KEY( "Version",     version,                fread_number ( fp ) );
-            KEY( "Vers",        version,                fread_number ( fp ) );
+            KEYSKIP( "Version" );
+            KEYSKIP( "Vers" );
             break;
 
         case 'W':
@@ -1805,7 +1801,7 @@ NPCharacter * fread_mob( FILE *fp )
 void fread_mlt( PCharacter *ch, FILE *fp ) {
   bool fMatch;
   const char *word;
-  int i, dummy;
+  int i;
 
   word   = feof( fp ) ? "End" : fread_word( fp );
   if( str_cmp( word, "MLTLv" ) ) {
@@ -1830,7 +1826,7 @@ void fread_mlt( PCharacter *ch, FILE *fp ) {
         fread_to_eol( fp );
         break;
       case 'C':
-        KEY( "Class",  dummy,      fread_number( fp ) );
+        KEYSKIP( "Class" );
         break;
       case 'E':
         if( !str_cmp( word, "End" ) ) {
@@ -1838,10 +1834,10 @@ void fread_mlt( PCharacter *ch, FILE *fp ) {
         }
         break;
       case 'R':
-        KEY( "Race",   dummy,       fread_number( fp ) );
+        KEYSKIP( "Race" );
         break;
       case 'T':
-        KEY( "Time",   dummy,  fread_number( fp ) );
+        KEYSKIP( "Time" );
         break;
       if( !fMatch ) {
           bug( "fread_mlt: no match.", 0 );
@@ -1881,7 +1877,6 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
     bool first;
     bool fPersonal;
     int wear_loc = -1;
-    int tmp;
 
     fVnum = false;
     obj = 0;
@@ -1939,7 +1934,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
                     break;
 
             case 'A':
-                    KEY( "Altar", tmp, fread_number( fp ) );
+                    KEYSKIP( "Altar" );
                     if (!str_cmp(word,"Affc"))
                     {
                             Affect *paf = fread_Affc( fp );
@@ -2119,7 +2114,7 @@ void fread_obj( Character *ch, Room *room, FILE *fp )
 
             case 'P':
                     KEY( "Pocket", obj->pocket, fread_string( fp ) );
-                    KEY( "Pit", tmp, fread_number( fp ) );
+                    KEYSKIP( "Pit" );
                     break;
             
             case 'Q':

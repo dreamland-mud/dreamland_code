@@ -211,7 +211,8 @@ void Room::affectJoin( Affect *paf )
     {
         if ( paf_old->type == paf->type )
         {
-            paf->level = (paf->level += paf_old->level) / 2;
+            paf->level += paf_old->level;
+            paf->level /= 2;
             paf->duration += paf_old->duration;
             paf->modifier += paf_old->modifier;
             affectRemove( paf_old );

@@ -260,7 +260,7 @@ bool DefaultReligion::likesDrink(const Liquid *liq) const
         return true;
     if (liq->getFlags().isSet(likes.liquidFlags.getValue()))
         return true;
-	return false;
+    return false;
 }
 
 bool DefaultReligion::likesItem(Object *obj) const

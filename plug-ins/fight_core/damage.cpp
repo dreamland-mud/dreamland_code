@@ -374,16 +374,16 @@ void Damage::damApplyEnhancedDamage( )
     if (ch->getProfession()->getHpRate() < 70 || ch->is_npc())
         return;
 
-        int div;        
-       
-        if (ch->getProfession( ) == prof_warrior || ch->getProfession( ) == prof_samurai)
-            div = 100;
-        else if (ch->getProfession( ) == prof_cleric)
-            div = 130;
-        else
-            div = 114;
+    int div;        
+   
+    if (ch->getProfession( ) == prof_warrior || ch->getProfession( ) == prof_samurai)
+        div = 100;
+    else if (ch->getProfession( ) == prof_cleric)
+        div = 130;
+    else
+        div = 114;
 
-        dam += dam * number_percent()/div;
+    dam += dam * number_percent()/div;
 }
 
 /*-----------------------------------------------------------------------------
