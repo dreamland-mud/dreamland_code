@@ -48,7 +48,7 @@ bool StatRemortBonus::matches( const DLString &arg ) const
 
 int StatRemortBonus::bonusMaximum( PCharacter *ch ) const 
 {
-    return MAX_STAT - ch->getMaxStat( stat );
+    return MAX_STAT_REMORT - ch->getMaxStat( stat );
 }
 
 int & StatRemortBonus::bonusField( PCharacter *ch ) const

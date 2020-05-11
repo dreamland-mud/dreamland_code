@@ -46,7 +46,6 @@ struct        con_app_type
 /*
  * Character parameters macros and utils
  */
-int get_curr_stat_extra( Character *ch, int stat );
 const struct str_app_type & get_str_app( Character * );
 const struct int_app_type & get_int_app( Character * );
 const struct wis_app_type & get_wis_app( Character * );
