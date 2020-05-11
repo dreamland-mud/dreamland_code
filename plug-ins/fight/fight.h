@@ -36,8 +36,6 @@ void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, i
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
 int        move_dec( Character *ch );
 
-void        set_backguard( Character * );
-
 
 #define FYP_SLEEP    (A)
 #define FYP_VICT_ANY (B)

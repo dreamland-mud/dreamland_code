@@ -17,6 +17,11 @@
 #include "mercdb.h"
 #include "def.h"
 
+/*
+ * Note: shops were never fully refactored to use the Service classes. Unfinished attempt to do so can be found in
+ * Git history for this plugin.
+ */
+
 void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showName );
 void deduct_cost(Character *ch, int cost);
 int get_cost( NPCharacter *keeper, Object *obj, bool fBuy, ShopTrader::Pointer trader );
@@ -128,144 +133,3 @@ void ShopTrader::describeGoods( Character *client, const DLString &args, bool ve
 
 
 
-#if 0
-
-
-
-
-
-
-
-
-
-
-/*
- * TODO
- */
-bool ShopTrader::canServeClient( PCharacter *client )
-{
-    if (!IS_AWAKE(ch)) {
-        interpret_raw( ch, "snore" );
-        return false;
-    }
-    
-    if (IS_SET(ch->in_room->area->area_flag, AREA_HOMETOWN)
-         && !client->is_npc( ) 
-         && IS_SET(client->act, PLR_WANTED))
-    {
-        do_say( ch, "Criminals are not welcome!" );
-        interpret_raw( ch, "yell", "%s the CRIMINAL is over here!", client->getNameP( ) );
-        return false;
-    }
-
-    if (time_info.hour > closeHour) {
-        do_say( ch, "Извини, магазин уже закрыт. Приходи завтра." );
-        return false;
-    }
-
-    if (time_info.hour < openHour) {
-        do_say( ch, "Извини, магазин еще не открылся. Подожди немного." );
-        return false;
-    }
-
-    if (!ch->can_see( client ) && !client->is_immortal( )) {
-        do_say( ch, "Я не торгую с тем, кого не вижу." );
-        return false;
-    }
-
-    if (ch->fighting) {
-        do_say( ch, "Подожди немного, мне сейчас не до тебя." );
-        return false;
-    }
-
-    return true;
-}
-
-Article::Pointer ShopTrader::findArticle( PCharacter *client, DLString &arguments )
-{
-}
-
-int ShopTrader::getBuyCost( Object *obj )
-{
-}
-
-int ShopTrader::getSellCost( Object *obj )
-{
-}
-
-bool ShopTrader::canSell( Object *obj, PCharacter *client )
-{
-}
-
-bool ShopTrader::canBuy( Object *obj, PCharacter *client )
-{
-    if (obj->wear_loc != wear_none)
-        return false;
-        
-    if (!ch->can_see( obj ) || !client->can_see( obj ))
-        return false;
-
-    return true;
-}
-
-void ShopTrader::toStream( PCharacter *client, ostringstream &buf )
-{
-    Object *obj;
-    int number, cost, count;
-
-    for (obj = ch->carrying, number = 1; obj; obj = obj->next_content) 
-        if (( cost = getBuyCost( obj ) ) > 0) {
-            if (IS_OBJ_STAT( obj, ITEM_INVENTORY ))
-                count = 0;
-            else {
-                count = 1;
-
-                while (obj->next_content
-                        && obj->pIndexData == obj->next_content->pIndexData
-                        && !str_cmp(obj->getShortDescr( ), obj->next_content->getShortDescr( ) ))
-                {
-                    obj = obj->next_content;
-                    count++;
-                }
-            }
-
-            buf << dlprintf( "[ {Y%3d{x |%3d %5d %6d ] %s\n\r",
-                             number++, 
-                             obj->level, 
-                             cost,
-                             count == 0 ? "  --  " : DLString( count ).c_str( ),
-                             obj->getShortDescr( '1' ).c_str( ) );
-        }
-}
-
-void ShopTrader::msgListEmpty( PCharacter *client )
-{
-    tell_dim( client, ch, "Мне сегодня нечего тебе предложить.");
-}
-
-void ShopTrader::msgListBefore( PCharacter *client )
-{
-    client->send_to("[ Ном.| Ур.  Цена Кол-во] Объект\n\r");
-}
-
-void ShopTrader::msgListAfter( PCharacter *client )
-{
-}
-
-void ShopTrader::msgListRequest( PCharacter *client )
-{
-}
-
-void ShopTrader::msgBuyRequest( PCharacter * )
-{
-}
-
-void ShopTrader::msgArticleNotFound( PCharacter *client )
-{
-}
-
-void ShopTrader::msgArticleTooFew( PCharacter *client, Article::Pointer )
-{
-}
-
-#endif

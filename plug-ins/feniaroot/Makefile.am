@@ -29,8 +29,7 @@ reglistext.cpp \
 tableswrapper.cpp \
 affectwrapper.cpp \
 structwrappers.cpp \
-wrap_utils.cpp \
-evalservlet.cpp
+wrap_utils.cpp 
 
 libfeniaroot_la_MOC = \
 root.h \

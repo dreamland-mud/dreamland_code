@@ -1315,7 +1315,6 @@ SKILL_RUNP( blackjack )
                 af.bitvector = AFF_SLEEP;
                 affect_join ( victim,&af );
 
-                set_backguard( victim );
                 set_violent( ch, victim, true );
                 if ( IS_AWAKE(victim) )
                         victim->position = POS_SLEEPING;

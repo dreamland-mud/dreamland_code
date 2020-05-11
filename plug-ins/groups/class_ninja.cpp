@@ -1537,7 +1537,6 @@ SKILL_RUNP( strangle )
                 affect_join ( victim,&af );
                 
                 set_violent( ch, victim, true );
-                set_backguard( victim );
 
                 if (IS_AWAKE(victim))
                         victim->position = POS_SLEEPING;

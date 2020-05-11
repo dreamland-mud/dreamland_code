@@ -404,12 +404,6 @@ CMDRUN( time )
 
     if (ch->getProfession( ) == prof_vampire && weather_info.sunlight == SUN_DARK)
         buf <<  "Время {rубивать{x, {Dсоздание ночи{x!" << endl;
-
-#if 0   
-    if (!ch->is_npc()) {
-        ch->getPC()->getBonuses().handleEvent(TimeArguments(ch->getPC(), buf));
-    }
-#endif 
   
     for (int bn = 0; bn < bonusManager->size(); bn++) {
         Bonus *bonus = bonusManager->find(bn);

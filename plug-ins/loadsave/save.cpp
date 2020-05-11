@@ -299,152 +299,10 @@ void fwrite_char( PCharacter *ch, FILE *fp )
 {
 
         fprintf( fp, "#%s\n",  "PLAYER"        );
-#if 0
-        int room;
-
-        fprintf( fp, "Name %s~\n", ch->getName( ).c_str( ) );
-
-        ostringstream os;
-        os << ch->getID( );
-
-        fprintf( fp, "Id   %s\n", os.str( ).c_str( ) );
-        fprintf( fp, "LogO "TIME_T_PRINTF"\n",        dreamland->getCurrentTime( ) );
-        fprintf( fp, "LastTime "TIME_T_PRINTF"\n", ch->logon );
-        fprintf( fp, "Plyd %d\n",
-                ch->true_played + (int) ( dreamland->getCurrentTime( ) - ch->logon)        );
-
-        if (!ch->in_room || IS_SET(ch->in_room->room_flags, ROOM_NOQUIT)) 
-            room = ROOM_VNUM_TEMPLE;
-        else
-            room = ch->in_room->vnum;
-
-        fprintf( fp, "Room %d\n", room );
-#endif        
         for (Affect* paf = ch->affected; paf != 0; paf = paf->next )
             fwrite_affect( fp, paf );
 
         fprintf( fp, "End\n\n" );
-#if 0
-        fprintf( fp, "Etho %d\n",   ch->ethos.getValue( )                );
-        fprintf( fp, "Dead %d\n",   ch->death.getValue( )        );
-        
-        if (ch->getDescription( ))
-            fprintf( fp, "Desc %s~\n",        ch->getDescription( ));
-
-        fprintf( fp, "Prom %s~\n",      ch->prompt.c_str( )          );
-        fprintf( fp, "BatleProm %s~\n", ch->batle_prompt.c_str( ));
-        fprintf( fp, "Shadow %d\n",        ch->shadow.getValue( )                );
-        fprintf( fp, "GHOST %d\n",        ch->ghost_time.getValue( )                );
-        fprintf( fp, "PKTimeV %d\n",        ch->PK_time_v.getValue( )                );
-        fprintf( fp, "PKTimeSK %d\n",        ch->PK_time_sk.getValue( )                );
-        fprintf( fp, "PKTimeT %d\n",        ch->PK_time_t.getValue( )                );
-        fprintf( fp, "PKFlag %d\n",        ch->PK_flag.getValue( )                );
-        fprintf( fp, "PCethos %d\n",ch->loyalty.getValue( )               );
-        fprintf( fp, "DeathT %d\n",        ch->last_death_time.getValue( ) );
-        fprintf( fp, "Curse %d\n",        ch->curse.getValue( )                );
-        fprintf( fp, "Bless %d\n",        ch->bless.getValue( )                );
-        fprintf( fp, "Config %Ld\n", ch->config.getValue( ) );
-
-        fprintf( fp, "Scro %d\n",         ch->lines.getValue( )        );
-
-        fprintf( fp, "HMV  %d %d %d %d %d %d\n",
-                ch->hit.getValue( ), ch->max_hit.getValue( ), ch->mana.getValue( ), ch->max_mana.getValue( ), ch->move.getValue( ), ch->max_move.getValue( ) );
-
-        if (ch->gold > 0)
-                fprintf( fp, "Gold %d\n",        ch->gold.getValue( )                );
-
-        if (ch->silver > 0)
-                fprintf( fp, "Silv %d\n",ch->silver.getValue( )                );
-
-        if (ch->bank_s > 0)
-                fprintf( fp, "Banks %ld\n", ch->bank_s.getValue( ) );
-
-        if (ch->bank_g > 0)
-                fprintf( fp, "Bankg %ld\n", ch->bank_g.getValue( ) );
-
-        fprintf( fp, "Exp  %d\n",        ch->exp.getValue( )                        );
-
-        if (ch->act != 0)
-                fprintf( fp, "Act  %s\n",   print_flags(ch->act));
-
-        if (ch->affected_by != 0)
-        {
-                        fprintf( fp, "AfBy %s\n", print_flags((ch->affected_by & (~AFF_CHARM))) );
-        }
-
-        if (ch->detection != 0)
-                fprintf( fp, "Detect %s\n",   print_flags(ch->detection));
-
-        fprintf( fp, "AfBy_Add %s\n", print_flags(ch->add_affected_by) );
-        fprintf( fp, "Comm %s\n",       print_flags(ch->comm));
-        fprintf( fp, "Comm_Add %s\n",   print_flags(ch->add_comm));
-
-        if (ch->wiznet)
-                fprintf( fp, "Wizn %s\n",   print_flags(ch->wiznet));
-
-        if (ch->invis_level)
-                fprintf( fp, "Invi %d\n",         ch->invis_level.getValue( )        );
-
-        if (ch->incog_level)
-                fprintf(fp,"Inco %d\n",ch->incog_level.getValue( ));
-
-        fprintf( fp, "Pos  %d\n",        
-                ch->position == POS_FIGHTING ? POS_STANDING : ch->position.getValue( ) );
-
-        if (ch->practice != 0)
-                fprintf( fp, "Prac %d\n",        ch->practice.getValue( )        );
-
-        if (ch->train != 0)
-                fprintf( fp, "Trai %d\n",        ch->train.getValue( )        );
-
-        if (ch->saving_throw != 0)
-                fprintf( fp, "Save  %d\n",        ch->saving_throw.getValue( ));
-
-        fprintf( fp, "Alig  %d\n",        ch->alignment.getValue( )                );
-
-        if (ch->hitroll != 0)
-                fprintf( fp, "Hit   %d\n",        ch->hitroll.getValue( )        );
-
-        if (ch->damroll != 0)
-                fprintf( fp, "Dam   %d\n",        ch->damroll.getValue( )        );
-
-        fprintf( fp, "ACs %d %d %d %d\n",        
-                ch->armor[0],ch->armor[1],ch->armor[2],ch->armor[3]);
-
-        if (ch->wimpy !=0 )
-                fprintf( fp, "Wimp  %d\n",        ch->wimpy.getValue( ));
-
-        fprintf( fp, "Attr %d %d %d %d %d %d\n",
-                ch->perm_stat[STAT_STR],
-                ch->perm_stat[STAT_INT],
-                ch->perm_stat[STAT_WIS],
-                ch->perm_stat[STAT_DEX],
-                ch->perm_stat[STAT_CON],
-                ch->perm_stat[STAT_CHA] );
-
-        fprintf (fp, "AMod %d %d %d %d %d %d\n",
-                ch->mod_stat[STAT_STR],
-                ch->mod_stat[STAT_INT],
-                ch->mod_stat[STAT_WIS],
-                ch->mod_stat[STAT_DEX],
-                ch->mod_stat[STAT_CON],
-                ch->mod_stat[STAT_CHA] );
-
-        if (ch->bamfin[0] != '\0')
-                fprintf( fp, "Bin  %s~\n",        ch->bamfin.c_str( ));
-
-        if (ch->bamfout[0] != '\0')
-                fprintf( fp, "Bout %s~\n",        ch->bamfout.c_str( ));
-
-        fprintf( fp, "LLev %d\n",        ch->last_level.getValue( ) );
-        fprintf( fp, "HMVP %d %d %d\n", 
-                ch->perm_hit.getValue( ),
-                ch->perm_mana.getValue( ),
-                ch->perm_move.getValue( ));
-        fprintf( fp, "QuestPnts %d\n", ch->getQuestPoints() );
-        fprintf( fp ,"Haskilled %d\n",        ch->has_killed.getValue( )        );
-        fprintf( fp ,"Antkilled %d\n",        ch->anti_killed.getValue( )        );
-#endif        
 }
 
 /* write a pet */
@@ -462,9 +320,6 @@ void fwrite_pet( NPCharacter *pet, FILE *fp)
             fprintf(fp,"Room %d\n", pet->in_room->vnum);
             
         fprintf( fp, "Id   %s\n", id_to_string(pet->getID()).c_str() );
-#if 0        
-        fprintf(fp,"LogO "TIME_T_PRINTF"\n", dreamland->getCurrentTime( ) );
-#endif        
         if (pet->getRealShortDescr( ))
                 fprintf(fp,"ShD  %s~\n", pet->getShortDescr( ));
         if (pet->getRealLongDescr( ))

@@ -19,7 +19,6 @@
 #include "banking.h"
 #include "corder.h"
 #include "configs.h"
-#include "pcdeleteidle.h"
 #include "run.h"
 #include "whois.h"
 #include "writing.h"
@@ -48,8 +47,6 @@ extern "C"
                 Plugin::registerPlugin<Whois>( ppl );
                 Plugin::registerPlugin<CWrite>( ppl );
                 
-//                Plugin::registerPlugin<PCDeleteIdle>( ppl );
-
                 Plugin::registerPlugin<CEat>( ppl );
 
                 return ppl;

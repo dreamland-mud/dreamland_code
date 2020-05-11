@@ -27,7 +27,6 @@ SCDP_AUTO    = 5000
   
 SCDP_ROUND   = 6500
    +10 SchedulerTaskRoundPCMemory
-   +15 WorldKnowledge
    +20 SchedulerTaskRoundPCharacter
    +30 SchedulerTaskRoundCharacter
    +40 SchedulerTaskRoundObject

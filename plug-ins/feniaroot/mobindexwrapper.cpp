@@ -45,13 +45,6 @@ MobIndexWrapper::extract( bool count )
 
 void MobIndexWrapper::setSelf( Scripting::Object *s )
 {
-#if 0
-    if(s)
-        LogStream::sendNotice() << "set self" << endl;
-    else
-        LogStream::sendNotice() << "unset self" << endl;
-#endif
-
     WrapperBase::setSelf( s );
 
     if (!self && target) {

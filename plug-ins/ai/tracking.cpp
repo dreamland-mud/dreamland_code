@@ -212,28 +212,3 @@ void BasicMobileBehavior::shooted( Character *attacker, int door )
     }
 }
 
-#if 0
-{
-    if (ch->in_room->history.traverse( ch->in_room, victim )) {
-        int d;
-        EXIT_DATA *pexit;
-    
-        act("$c1 всматривается в землю в поисках следов.",ch,0,0,TO_ROOM);
-        d = ch->in_room->history.went( victim );
-        pexit = ch->in_room->exit[d];
-
-        if (IS_SET(pexit->exit_info, EX_CLOSED)) 
-            open_door_extra( ch, d, pexit );
-
-        return move_char(ch, d, false, "normal");
-    }
-    
-    if (ch->in_room->area != ch->zone) 
-        return chance( 10 ) && backHome( false );
-
-    if (ch->in_room->area == victim->in_room->area) 
-        return chance( 10 ) && trackTraverseSameZone( victim->in_room );
-
-    return trackCaster( victim );
-}
-#endif
