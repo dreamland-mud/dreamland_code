@@ -44,7 +44,6 @@
 #include "vnum.h"
 #include "def.h"
 
-#ifndef FIGHT_STUB
 enum {
     LOOT_DESTROY,
     LOOT_DROP,
@@ -928,15 +927,4 @@ extern "C"
         return ppl;
     }
 }
-
-#else
-void        raw_kill( Character* victim, int part, Character* ch, int flags ) { }
-void        death_cry( Character *ch, int part ) { }
-
-extern "C"
-{
-    SO::PluginList initialize_fight( ) { return SO::PluginList(); }
-}
-#endif
-
 

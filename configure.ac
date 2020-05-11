@@ -63,11 +63,6 @@ AC_CHECK_THREADS
 AC_CHECK_MCCP
 AC_CHECK_GC
 AC_CONVERT_CHARSET
-#AM_ICONV_LINK
-
-dnl Additional options
-AC_CHECK_FIGHT_STUB
-AC_CHECK_AI_STUB
 
 dnl Creating installation tree
 test "x$prefix" = xNONE && prefix=$ac_default_prefix

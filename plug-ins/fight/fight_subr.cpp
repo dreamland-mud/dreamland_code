@@ -33,7 +33,6 @@
 #include "fight.h"
 #include "def.h"
 
-#ifndef FIGHT_STUB
 bool check_stun( Character *ch, Character *victim ) 
 {
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) )
@@ -157,11 +156,4 @@ void check_bloodthirst( Character *ch )
         }
     }
 }
-
-#else
-void        check_assist(Character *ch,Character *victim) { }
-bool        check_stun( Character *ch, Character *victim ) { return false; } 
-bool        check_bare_hands( Character *ch ) { return false; }
-void        check_bloodthirst( Character *ch ) { }
-#endif
 

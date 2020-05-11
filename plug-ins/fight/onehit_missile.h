@@ -7,7 +7,6 @@
 
 #include "onehit.h"
 
-#ifndef FIGHT_STUB
 class MissileOneHit : public OneHit {
 public:
     MissileOneHit( Character *ch, Character *victim, Object *missile, int range );
@@ -63,14 +62,5 @@ protected:
     int skill_thrower;
 };
 
-#else
-struct MissileOneHit : public OneHit { 
-    MissileOneHit( ) { }
-    virtual void init( ) { }
-};
-struct ThrowerOneHit : public MissileOneHit { 
-    ThrowerOneHit( ) { }
-};
-#endif
 
 #endif

@@ -20,7 +20,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(none);
 GSN(dispel_affects);
 
@@ -233,5 +232,3 @@ bool BasicMobileBehavior::doWimpy( )
 
     return true;
 }
-
-#endif

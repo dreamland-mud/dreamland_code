@@ -16,7 +16,6 @@
 #include "merc.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(none);
 GSN(scrolls);
 GSN(wands);
@@ -175,4 +174,3 @@ bool BasicMobileBehavior::useItemWithSpell( int sn, Character *target )
     return MagicItemTable::use( obj, ch, target );
 }
 
-#endif

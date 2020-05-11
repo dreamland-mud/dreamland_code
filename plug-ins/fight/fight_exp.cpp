@@ -52,7 +52,6 @@ static void wiznet(NPCharacter *pet, Character *victim, const char *what, int ol
                   what, victim, victim->getRealLevel(), oldPetParam, petParam, victParam);
 }
 
-#ifndef FIGHT_STUB
 /**
  * Charmed mobs level up and improve their parameters when killing a stronger opponent.
  * Every parameter is capped by mob's level * N, and no improvement occurs if victim's level
@@ -529,6 +528,3 @@ int xp_compute( PCharacter *gch, Character *victim, int npccount, int pccount, C
     return xp;
 }
 
-#else
-void        group_gain( Character *ch, Character *victim ) { }
-#endif

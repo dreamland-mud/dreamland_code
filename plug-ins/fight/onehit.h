@@ -9,7 +9,6 @@
 
 class Skill;
 
-#ifndef FIGHT_STUB
 class OneHit: public virtual Damage {
 public:
     OneHit( Character *ch, Character *victim );
@@ -62,12 +61,5 @@ protected:
     int victim_ac;
     int orig_dam;
 };
-
-#else
-struct OneHit: public virtual Damage {
-    OneHit( ) { }
-    virtual void message( ) { }
-};
-#endif
 
 #endif

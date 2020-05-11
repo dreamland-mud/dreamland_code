@@ -74,7 +74,6 @@ using std::max;
 DESIRE(thirst);
 DESIRE(hunger);
 
-#ifndef FIGHT_STUB
 void acid_effect(void *vo, short level, int dam, int target, bitstring_t dam_flag )
 {
         if ( target == TARGET_ROOM ) /* nail objects on the floor */
@@ -1016,13 +1015,3 @@ void scream_effect(void *vo, short level, int dam, int target, bitstring_t dam_f
                 return;
         }
 }
-
-#else
-void    acid_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-void    cold_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-void    fire_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-void    poison_effect   (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-void    shock_effect    (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-void    sand_effect     (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-void    scream_effect   (void *vo, short level, int dam, int target, bitstring_t dam_flag ) { }
-#endif

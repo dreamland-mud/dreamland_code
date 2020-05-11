@@ -21,7 +21,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(pass_door);
 GSN(track);
 GSN(giant_strength);
@@ -237,5 +236,4 @@ void BasicMobileBehavior::shooted( Character *attacker, int door )
 
     return trackCaster( victim );
 }
-#endif
 #endif
