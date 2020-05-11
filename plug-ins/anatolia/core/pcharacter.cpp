@@ -72,7 +72,6 @@ void PCharacter::gainExp( int gain )
     }
 }
 
-#ifndef FIGHT_STUB
 /*
  * Advancement stuff.
  */
@@ -140,8 +139,4 @@ void PCharacter::advanceLevel( )
     if (skillsDiff > 0)
         pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
 }
-
-#else
-void PCharacter::advanceLevel( ) { }
-#endif
 

@@ -125,9 +125,6 @@ static bool oprog_fight( Object *obj, Character *ch )
     return false;
 }
 
-
-
-#ifndef FIGHT_STUB
 /*
  * Control the fights going on.
  * Called periodically by update_handler.
@@ -467,19 +464,3 @@ int move_dec( Character *ch )
 
     return min( max( ch->getModifyLevel( ) / 20, 1 ), (int)ch->move );
 }
-
-#else
-void        violence_update( ) { }
-void        multi_hit( Character *ch, Character *victim ) { }
-void        multi_hit_nocatch( Character *ch, Character *victim ) { }
-void        one_hit( Character *ch, Character* victim, bool secondary ) { }
-void        one_hit_nocatch( Character *ch, Character* victim, bool secondary ) { }
-bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
-bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
-void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
-void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
-void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage) { }
-int        move_dec( Character *ch ) { return 0; }
-void        set_backguard( Character * ) { }
-void        yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags ) { }
-#endif

@@ -87,8 +87,6 @@
 
 CLAN(none);
 
-
-#ifndef FIGHT_STUB
 /*
  * Compute a saving throw.
  * Negative apply's make saving throw better.
@@ -446,19 +444,3 @@ bool overcharmed( Character *ch )
 
     return false;
 }
-
-#else
-bool saves_spell( short level, Character *victim, int dam_type, Character *ch, bitstring_t dam_flag ) { return false; }
-void attack_caster( Character *caster, Character *victim ) { }
-void area_message( Character *ch, const DLString &msg, bool everywhere ) { }
-bool spell( int sn, int level, Character *ch, ::Pointer<SpellTarget>, int flags ) { return false; }
-bool spell( int sn, int level, Character *ch, Character *victim, int flags ) { return false; }
-bool spell( int sn, int level, Character *ch, Object *obj ) { return false; }
-bool spell( int sn, int level, Character *ch, Room *room ) { return false; }
-bool spell( int sn, int level, Character *ch, char *arg ) { return false; }
-void spell_by_item( Character *ch, Object *obj ) { }
-bool savesDispel( int dis_level, int spell_level, int duration) { return false; }
-bool checkDispel( int dis_level, Character *victim, int sn) { return false; }
-bool is_safe_spell( Character *ch, Character *victim, bool area ) { return false; }
-bool overcharmed( Character *ch ) { return false; }
-#endif
