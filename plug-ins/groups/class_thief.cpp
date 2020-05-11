@@ -1059,7 +1059,7 @@ SKILL_RUNP( backstab )
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
 			
-            if (IS_AFFECTED(ch, AFF_HASTE)) {
+            if (IS_QUICK(ch)) {
                     int haste_chance;
                     if (fBonus)
                         haste_chance = 100;
