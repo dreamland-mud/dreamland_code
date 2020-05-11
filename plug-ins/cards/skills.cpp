@@ -118,7 +118,7 @@ SKILL_RUNP( sconce )
     ch->setWait( gsn_sconce->getBeats( ) );
 
     chance = ( int ) ( 0.5 * gsn_sconce->getEffective( ch ) );
-    chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
+    chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
     chance += victim->can_see(ch) ? 0 : 5;
     if (victim->is_npc( ) 
         && victim->getNPC( )->behavior

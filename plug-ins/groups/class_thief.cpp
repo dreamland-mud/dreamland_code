@@ -1059,7 +1059,7 @@ SKILL_RUNP( backstab )
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
 			
-            if (IS_AFFECTED(ch, AFF_HASTE)) {
+            if (IS_QUICK(ch)) {
                     int haste_chance;
                     if (fBonus)
                         haste_chance = 100;
@@ -1277,7 +1277,7 @@ SKILL_RUNP( blackjack )
         ch->setWait( gsn_blackjack->getBeats( ) );
 
         chance = ( int ) ( 0.5 * gsn_blackjack->getEffective( ch ) );
-        chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
+        chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
         chance += victim->can_see(ch) ? 0 : 5;
         if (victim->is_npc( )
             && victim->getNPC( )->behavior
