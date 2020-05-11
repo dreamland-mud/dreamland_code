@@ -50,7 +50,7 @@ bool ExoticSkill::usable( Character *, bool ) const
 }
 int ExoticSkill::getLearned( Character *ch ) const
 {
-    return min( 100, ch->getRealLevel( ) * (3 + (ch->getCurrStat(STAT_INT) - 20)) );
+    return min( 100, ch->getRealLevel( ) * max(1, (3 + (ch->getCurrStat(STAT_INT) - 20))) );
 }
 
 
