@@ -21,6 +21,7 @@
 
 GSN(second_weapon);
 GSN(hand_to_hand);
+GSN(exotic);
 
 WEARLOC(tail);
 WEARLOC(hair);
@@ -175,7 +176,7 @@ int WieldWearloc::canWear( Character *ch, Object *obj, int flags )
             || (ch->getRace( )->getSize( ) < SIZE_HUGE && wear_second_wield->find( ch ))))
     {
         if (IS_SET(flags, F_WEAR_VERBOSE))
-            ch->println("Чтобы вооружиться этим, у тебя должно быть две свободные руки.");
+            ch->println("Чтобы вооружиться этим, у тебя должны быть свободны обе руки.");
         return RC_WEAR_LARGE;
     }
 
@@ -218,11 +219,17 @@ void WieldWearloc::reportWeaponSkill( Character *ch, Object *obj )
         msg = "Ты хорошо владеешь $o5.";
     else if (skill > 50)
         msg = "Ты довольно посредственно владеешь $o5.";
-    else if (skill > 25)
-        msg = "Ты чувствуешь себя неуклюже, вооружившись $o5.";
-    else
-        msg = "Ты неумело крутишь в руках $o4, боясь уронить.";
-    
+    else if (skill > 25) {
+        if (sn != gsn_exotic)
+            msg = "Ты чувствуешь себя неуклюже, вооружившись $o5.{/Попрактикуйся еще в умении владеть этим типом оружия.";
+        else
+            msg = "Ты все еще не готов{Sfа{Sx как следует владеть $o5.{/Владение экзотическим оружием зависит от твоего опыта и интеллекта.";    
+    } else {
+        if (sn != gsn_exotic)
+            msg = "Ты понятия не имеешь, как орудовать $o5.{/Возможно, стоит попрактироваться в умении владеть этим типом оружия.";
+        else
+            msg = "Ты пока не готов{Sfа{Sx как следует владеть $o5.{/Владение экзотическим оружием зависит от твоего опыта и интеллекта.";
+    }
     act( msg, ch, obj, 0, TO_CHAR );
 }
 
