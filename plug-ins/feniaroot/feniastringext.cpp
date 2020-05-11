@@ -215,7 +215,7 @@ NMI_INVOKE(FeniaString, substr, "(offset[,length]): возвращает под�
         
     try {
         RegisterList::const_iterator iter;
-        int i1, i2 = std::string::npos;
+        size_type i1, i2 = std::string::npos;
 
         iter = args.begin();
         i1 = iter->toNumber();
