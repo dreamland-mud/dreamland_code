@@ -240,7 +240,7 @@ SKILL_RUNP( vanish )
     if (victim != 0) {
         kidnap_chance += gsn_vanish->getEffective( ch ) * skill_mod;
         d.log(kidnap_chance, "kidnap skill");
-        kidnap_chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_STR) ) * stat_mod * 100;
+        kidnap_chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_STR) ) * stat_mod * 100;
         d.log(kidnap_chance, "stats");
         kidnap_chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         d.log(kidnap_chance, "lvl");
@@ -465,8 +465,8 @@ SKILL_RUNP( nerve )
         chance = 0;
   
         chance += gsn_nerve->getEffective( ch ) * skill_mod;
-        d.log(chance, "skill");
-        chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
+        d.log(chance, "skill"); 
+        chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
         d.log(chance, "stats");
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
@@ -658,7 +658,7 @@ void AssassinateOneHit::calcDamage( )
         
     chance += gsn_assassinate->getEffective( ch ) * skill_mod;
     d.log(chance, "skill");
-    chance += ( get_curr_stat_extra(ch, STAT_STR) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
+    chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
     d.log(chance, "stats");
     chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
     d.log(chance, "lvl");
@@ -981,7 +981,7 @@ SKILL_RUNP( caltraps )
         
    chance += gsn_caltraps->getEffective( ch ) * skill_mod;
    d.log(chance, "skill");
-   chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_DEX) ) * stat_mod * 100;
+   chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
    d.log(chance, "stats");
    // chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100; // no level check for caltraps
    chance += (ch->size - victim->size) * size_mod * 100;
@@ -1106,7 +1106,7 @@ ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
 
 void ThrowDownOneHit::calcDamage( )
 {
-        dam = ch->getModifyLevel() + get_curr_stat_extra(ch, STAT_STR) + ch->damroll / 2;
+        dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
         damApplyEnhancedDamage( );
 
         Damage::calcDamage( );
@@ -1235,7 +1235,7 @@ SKILL_RUNP( throwdown )
   
         chance += gsn_throw->getEffective( ch ) * skill_mod;
         d.log(chance, "skill");
-        chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_DEX) ) * stat_mod * 100;
+        chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_DEX) ) * stat_mod * 100;
         d.log(chance, "stats");
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");
@@ -1462,7 +1462,7 @@ SKILL_RUNP( strangle )
         chance = 0;
         chance += gsn_strangle->getEffective( ch ) * skill_mod;
         d.log(chance, "skill");
-        chance += ( get_curr_stat_extra(ch, STAT_DEX) - get_curr_stat_extra(victim, STAT_CON) ) * stat_mod * 100;
+        chance += ( ch->getCurrStat(STAT_DEX) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
         d.log(chance, "stats");
         chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
         d.log(chance, "lvl");

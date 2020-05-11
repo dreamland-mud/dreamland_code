@@ -100,7 +100,8 @@ typedef map<DLString, DLString> Properties;
 /*
  * Per-class stuff.
  */
-#define MAX_STAT 25
+#define MAX_STAT 28
+#define MAX_STAT_REMORT 25
 #define MIN_STAT 3        
 #define BASE_STAT 20        
 
