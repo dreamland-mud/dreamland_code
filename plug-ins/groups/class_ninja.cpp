@@ -625,7 +625,7 @@ BOOL_SKILL(endure)::run(Character *ch, int modifier)
 /*----------------------------------------------------------------------------
  * Assassinate 
  *---------------------------------------------------------------------------*/
-class AssassinateOneHit: public SkillWeaponOneHit {
+class AssassinateOneHit: public SkillDamage {
 public:
     AssassinateOneHit( Character *ch, Character *victim );
 
@@ -633,7 +633,8 @@ public:
 };
 
 AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
-            : Damage(ch, victim, 0, 0, DAMF_WEAPON), SkillWeaponOneHit( ch, victim, gsn_assassinate )
+            : Damage( ch, victim, DAM_BASH, 0 ),
+              SkillDamage( ch, victim, gsn_assassinate, DAM_BASH, 0, DAMF_WEAPON )
 {
 }
 
@@ -725,12 +726,15 @@ void AssassinateOneHit::calcDamage( )
     else
     {
         gsn_assassinate->improve( ch, false, victim );
-        damBase( );
+
+        dam = ch->getModifyLevel() + ch->damroll;
+        dam += dam * get_str_app(ch).damage / 100;
         damApplyEnhancedDamage( );
-        damApplyPosition( );  
+        if ( !IS_AWAKE(victim) )
         dam *= 2;
-        damApplyDamroll( );
-        WeaponOneHit::calcDamage( );        
+
+        Damage::calcDamage( );
+
     }
 }
 
@@ -850,7 +854,7 @@ SKILL_RUNP( assassinate )
     
     // assassination attempt can't "miss"
     try {
-        ass.hit( );       
+        ass.hit( true );       
         yell_panic( ch, victim,
                     "Помогите! Кто-то пытается УБИТЬ меня!",
                     "Помогите! %1$^C1 пытается УБИТЬ меня!" );
@@ -1106,7 +1110,8 @@ ThrowDownOneHit::ThrowDownOneHit( Character *ch, Character *victim )
 
 void ThrowDownOneHit::calcDamage( )
 {
-        dam = ch->getModifyLevel() + ch->getCurrStat(STAT_STR) + ch->damroll / 2;
+        dam = ch->getModifyLevel() + ch->damroll / 2;
+        dam += dam * get_str_app(ch).damage / 100;
         damApplyEnhancedDamage( );
 
         Damage::calcDamage( );
