@@ -142,7 +142,7 @@ void CachedNoun::clear( )
 void CachedNoun::update( PCharacter *ch )
 {
     static const DLString vampireName = "{DСоздани|е|я|ю|е|ем|и ночи{x";
-    static const DLString immortalName = "Immortal";
+    static const DLString immortalName = "{CБессмертный{x";
     MultiGender mg( ch->getSex( ), Number::SINGULAR );
     
     /* plain english name */
