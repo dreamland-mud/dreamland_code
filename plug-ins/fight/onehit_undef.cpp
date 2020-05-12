@@ -1167,11 +1167,13 @@ void UndefinedOneHit::damApplyDeathblow( )
 
 void UndefinedOneHit::damEffectMasterHand( )
 {
-    int diceroll, skill;
+    int diceroll, skill, level;
     float chance, skill_mod, stat_mod, level_mod, quick_mod;        
     Affect af;
             
     skill = gsn_mastering_pound->getEffective( ch );
+    level = skill_level(*gsn_mastering_pound, ch);
+            
     chance = 0;
     diceroll = number_percent( );            
 
@@ -1202,9 +1204,9 @@ void UndefinedOneHit::damEffectMasterHand( )
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
         
     chance += skill * skill_mod;
-    chance += skill_level_bonus(*gsn_mastering pound, ch);
+    chance += skill_level_bonus(*gsn_mastering_pound, ch);
     chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
-    chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;            
+    chance += ( level - victim->getModifyLevel() ) * level_mod * 100;            
 
     if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
             chance = chance / 2;
@@ -1278,7 +1280,7 @@ void UndefinedOneHit::damApplyMasterHand( )
         
     dam_bonus += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;       
     dam_bonus += ( skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel() ) * level_mod * 100;
-    dam_bonus += ( skill_level(*gsn_mastering_pound, ch) / 10;        
+    dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;        
     dam_bonus = (int) URANGE(1, (int) dam_bonus, 20);
             
     dam += dice( dam_bonus, 10 ) * skill / 100;        
