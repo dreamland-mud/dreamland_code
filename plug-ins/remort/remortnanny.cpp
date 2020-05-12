@@ -26,6 +26,8 @@
  */
 static void update_remort_bonuses(PCharacter *ch)
 {
+    int oldPoints = ch->getRemorts().points;
+
     for (int i = 0; i < stat_table.size; i++) {        
         int max_stat = ch->getMaxTrain(i);
         int bonus_stat = ch->getRemorts().stats[i];
@@ -41,7 +43,7 @@ static void update_remort_bonuses(PCharacter *ch)
         }
     }
 
-    if (ch->getRemorts().points != 0)
+    if (oldPoints == 0 && ch->getRemorts().points != 0)
         ch->pecho("{cТы попадаешь в избушку к Бабе Яге, чтобы снова выбрать плюшки за реморты.{x");
 }
 
