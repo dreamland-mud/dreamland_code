@@ -90,9 +90,6 @@ bool RoomQuestModel::checkRoomVictim( PCharacter *pch, Room *room, NPCharacter *
     if (IS_SET( room->room_flags, ROOM_SAFE|ROOM_NO_DAMAGE ))
         return false;
 
-    if (IS_SET( room->area->area_flag, AREA_HOMETOWN ))
-        return false;
-
     if (!checkRoom( pch, room ))
         return false;
 
@@ -190,7 +187,7 @@ AreaList RoomQuestModel::findAreas(PCharacter *pch)
     for (AREA_DATA *area = area_first; area; area = area->next) {
         if (area->low_range > pch->getRealLevel())
             continue;
-        if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HOMETOWN|AREA_HIDDEN|AREA_NOQUEST) )
+        if (IS_SET(area->area_flag, AREA_WIZLOCK|AREA_HIDDEN|AREA_NOQUEST) )
             continue;
 
         result.push_back(area);
