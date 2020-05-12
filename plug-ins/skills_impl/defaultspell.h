@@ -15,6 +15,17 @@
 #include "xmlenumeration.h"
 #include "xmlboolean.h"
 
+enum {
+    TARGET_ERR_SUMMON_WHO = 1,
+    TARGET_ERR_NOT_ON_OTHERS,
+    TARGET_ERR_NO_TARGET_NEEDED,
+    TARGET_ERR_CAST_ON_WHOM,
+    TARGET_ERR_CAST_ON_WHAT,
+    TARGET_ERR_CHAR_NOT_FOUND,
+    TARGET_ERR_OBJ_NOT_FOUND,
+    TARGET_ERR_TOO_FAR
+};
+
 class DefaultSpell : public Spell, public XMLVariableContainer
 {
 XML_OBJECT

@@ -481,7 +481,7 @@ VOID_AFFECT(Camp)::toStream( ostringstream &buf, Affect *paf )
 
 SKILL_RUNP( bearcall )
 {
-    SpellTarget::Pointer target( NEW );
+    SpellTarget::Pointer target;
     ostringstream errbuf;
 
   if (!gsn_bear_call->usable( ch ) )
@@ -496,7 +496,8 @@ SKILL_RUNP( bearcall )
      return;
   }
 
-  if (!( target = gsn_bear_call->getSpell( )->locateTargets( ch, argument, errbuf ) )) {
+  target = gsn_bear_call->getSpell( )->locateTargets( ch, argument, errbuf );
+  if (target->error) {
       ch->send_to( errbuf );
       return;
   }
@@ -562,7 +563,7 @@ TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const
 
 SKILL_RUNP( lioncall )
 {
-    SpellTarget::Pointer target( NEW );
+    SpellTarget::Pointer target;
     ostringstream errbuf;
 
   if (!gsn_lion_call->usable( ch ) )
@@ -577,10 +578,11 @@ SKILL_RUNP( lioncall )
        return;
     }
 
-  if (!( target = gsn_lion_call->getSpell( )->locateTargets( ch, argument, errbuf ) )) {
+  target = gsn_lion_call->getSpell( )->locateTargets( ch, argument, errbuf );
+  if (target->error) {
         ch->send_to( errbuf );
         return;
-    }
+  }
 
   if ( number_percent( ) > gsn_lion_call->getEffective( ch ) )
   {

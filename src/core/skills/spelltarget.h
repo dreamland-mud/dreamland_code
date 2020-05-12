@@ -41,6 +41,7 @@ struct SpellTarget : public virtual DLObject {
 
     bool castFar;
     int door, range;
+    int error;
 };
 
 inline bool SpellTarget::isValid( ) const

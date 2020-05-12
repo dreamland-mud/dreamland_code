@@ -20,6 +20,7 @@
 #include "spelltarget.h"
 #include "skillmanager.h"
 #include "commandtemplate.h"
+#include "defaultspell.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -116,7 +117,6 @@ CMDRUNP( quaff )
 
 CMDRUNP( recite )
 {
-    std::basic_ostringstream<char> buf;
     std::vector<SpellTarget::Pointer> targets;
     SpellTarget::Pointer t;
     Spell::Pointer spell;
@@ -149,6 +149,7 @@ CMDRUNP( recite )
     found = false;
 
     for (int i = 1; i <= 4; i++) {
+        std::basic_ostringstream<char> buf;
         int sn = scroll->valueByIndex(i);
         
         if (sn > 0) {
@@ -157,16 +158,29 @@ CMDRUNP( recite )
             if (spell) { 
                 t = spell->locateTargets( ch, args, buf );
 
-                if (t) {
-                    if (t->castFar && t->door != -1) {
-                        ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
-                        return;
-                    }
-
-                    targets.push_back( t );
-                    found = true;
-                    continue;
+                if (t->castFar && t->door != -1) {
+                    ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
+                    return;
                 }
+
+                if (t->error != 0) {
+                    switch (t->error) {
+                    case TARGET_ERR_CAST_ON_WHOM:
+                        ch->println("Зачитать свиток на кого?");
+                        break;
+                    case TARGET_ERR_CAST_ON_WHAT:
+                        ch->println("Зачитать свиток на что?");
+                        break;
+                    default:
+                        ch->send_to(buf);
+                        break;
+                    }
+                    return;
+                }
+
+                targets.push_back( t );
+                found = true;
+                continue;
             }
         }
 
@@ -375,8 +389,19 @@ CMDRUNP( zap )
 
     target = spell->locateTargets( ch, args, buf );
 
-    if (!target) {
-        ch->send_to("Кого или что ты хочешь поразить?\n\r");
+    if (target->error != 0) {
+        switch (target->error) {
+        case TARGET_ERR_CAST_ON_WHAT:
+            ch->println("Взмахнуть жезлом на что?");
+            break;
+        case TARGET_ERR_CAST_ON_WHOM:
+            ch->println("Взмахнуть жезлом на кого именно?");
+            break;
+        default:
+            ch->send_to(buf);
+            break;
+        }
+
         return;
     }
     
