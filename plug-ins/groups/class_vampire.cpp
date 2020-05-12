@@ -83,16 +83,17 @@ void VampiricBiteOneHit::damBase( )
 {
     int ave, level = ch->getModifyLevel( );
     
-         if (level >= 100) ave = level - 12;
-    else if (level >= 40)  ave = level - 10;
-    else if (level >= 37)  ave = level -  9;
-    else if (level >= 35)  ave = level -  8;
-    else if (level >= 33)  ave = level -  7;
-    else if (level >= 30)  ave = level -  6;
-    else if (level >= 25)  ave = level -  3;
-    else if (level >= 23)  ave = level -  2;
-    else if (level >= 20)  ave = level -  1; 
-    else                   ave = level;
+         if (level >= 100) ave = level - 27; // as Tier 1 weapons, sigma distribution TODO: refactor
+    else if (level >= 90)  ave = level - 18;	
+    else if (level >= 80)  ave = level - 12;
+    else if (level >= 70)  ave = level - 5;	
+    else if (level >= 60)  ave = level - 1;	
+    else if (level >= 50)  ave = level + 3;
+    else if (level >= 45)  ave = level + 4;	
+    else if (level >= 40)  ave = level + 9;
+    else if (level >= 30)  ave = level + 10;
+    else if (level >= 20)  ave = level + 11;
+    else                   ave = level + 9;;
     
     dam = ave * skill / 100;                   // as weapon with skill bonus
 
@@ -121,14 +122,37 @@ void VampiricBiteOneHit::calcTHAC0( )
 }
 
 void VampiricBiteOneHit::postDamageEffects( )
-{
-    // vampiric bite gives hp to ch from victim
-    int hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
-
-    ch->hit += hit_ga;
-    ch->hit  = min( ch->hit , ch->max_hit);
+{	
+    // vampiric bite gives hp/mana to ch from victim
+    int hit_ga  = min( (orig_dam / 2 ), (int)victim->max_hit );
+    int mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
+	
+    ch->hit   += hit_ga;
+    ch->hit   =  min( ch->hit , ch->max_hit);
+    ch->mana  += mana_ga;
+    ch->mana  =  min( ch->mana , ch->max_mana);	
     update_pos( ch );
-    ch->send_to("Твое самочувствие улучшается, когда ты высасываешь кровь из противника.\n\r");
+    ch->send_to("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника.\n\r");
+
+    // corrupt victim	
+    Affect af;
+    int level = ch->getModifyLevel();
+    if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
+    	af.where     = TO_AFFECTS;
+    	af.type      = gsn_corruption;
+   	af.level     = level;
+    	af.duration  = level / 10;
+    	af.location  = APPLY_HITROLL;
+    	af.modifier  = - (level / 10);
+    	if (victim->is_npc())
+    		af.bitvector = 0;
+    	else
+    		af.bitvector = AFF_CORRUPTION;
+        affect_join( victim, &af );	
+	    
+    	act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
+    	act_p("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
+    }
 }
 
 /*
@@ -139,86 +163,135 @@ SKILL_RUNP( control )
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
-  int chance;
+  int clevel = ch->getModifyLevel();
+  int vlevel = victim->getModifyLevel(); 	
+  float chance, skill_mod, stat_mod, level_mod;
+        
+  //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+  skill_mod   = 0.5;
+  stat_mod    = 0.02;
+  level_mod   = 0.05;
 
+  //////////////// ELIGIBILITY CHECKS ////////////////
+
+  ///// Standard checks: TODO: turn this into a function 
+	
   argument = one_argument( argument, arg );
 
   if (ch->is_npc() || !gsn_control_animal->usable( ch ) )
-    {
-      ch->send_to( "Чего?\n\r");
-      return;
-    }
+  {
+  	ch->send_to( "Это умение тебе недоступно.\n\r");
+	return;
+  }
 
   if ( arg[0] == '\0' )
-    {
-      ch->send_to( "Кого очаровать?\n\r");
-      return;
-    }
+  {
+	ch->send_to( "Доминировать над кем?\n\r");
+	return;
+  }
 
   if ( ( victim = get_char_room( ch, arg ) ) == 0 )
-    {
-      ch->send_to( "Нет этого тут.\n\r");
-      return;
-    }
-
-  if (victim->getRace( )->isPC( ))
-    {
-      ch->send_to("Стоит попробовать на животных?\n\r");
-      return;
-    }
-
-  if (IS_SET( victim->form, FORM_NONADOPTABLE )) {
-    ch->send_to("Эта форма жизни не поддается контролю.\n\r");
-    return;        
+  {
+	ch->send_to( "Тут таких нет.\n\r");
+	return;
   }
+
+  if ( victim == ch )
+  {
+	ch->send_to("Ты ДОМИНИРУЕШЬ над собой!\n\r");
+	return;
+  }
+	
+  if (!victim->is_npc( ))
+  {
+	ch->send_to("Доминировать над игроками нельзя -- используй вместо этого очарование.\n\r");
+	return;
+  }
+
+  if ( IS_SET( victim->form, FORM_NONADOPTABLE ) ||
+       IS_SET( victim->form, FORM_UNDEAD ) || 
+       IS_SET( victim->form, FORM_CONSTRUCT ) ) {
+	ch->send_to("Это существо не поддается доминации.\n\r");
+	return;        
+  }	
     
-  if (is_safe(ch,victim)) return;
+  if ( (is_safe(ch,victim)) || (overcharmed(ch)) )
+	return;
 
-  if (overcharmed(ch))  
-      return;
+  if ( IS_CHARMED(victim) ) {
+	ch->send_to("Это существо уже под чьим-то контролем.\n\r");
+	return;
+  }
+  
+  if ( IS_CHARMED(ch) )
+  {
+  	ch->pecho("Спроси разрешения у сво%1$Gего|его|й хозя%1$Gина|ина|йки.", ch->master);
+        return;
+  }
 
+  if ( IS_SET(victim->imm_flags,IMM_CHARM )
+  {
+	ch->send_to("У этого существа иммунитет к очарованию.\n\r");
+        return;
+  }
+  
+  if ( victim->fighting != 0 )
+  {
+	ch->send_to("Подожди, пока закончится сражение.\n\r");
+	return;
+  }
+  
+  if ( !IS_AWAKE(victim) || !victim->can_see(ch) )
+  {
+	ch->send_to("Твоя жертва не видит тебя.\n\r");
+	return;                
+  }  
+  
+  //////////////// PROBABILITY CHECKS //////////////// 
+      
   ch->setWaitViolence( 1 );
 
-  chance = gsn_control_animal->getEffective( ch );
+  chance = gsn_control_animal->getEffective( ch ) * skill_mod;
+  chance += ( ch->getCurrStat(STAT_CHA) - 20 ) * stat_mod * 100;
+  chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT) ) * stat_mod * 100;
+  chance += ( clevel - vlevel ) * level_mod * 100;
+  chance = URANGE(1, (int)chance, 100)    
+  
+  // can't dominate shoppers or +5 level mobs    
+  if ( (clevel < (vlevel + 5) ||
+       (victim->is_npc( ) && victim->getNPC( )->behavior &&
+	IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))
+	  chance = 0;
 
-  chance += (ch->getCurrStat(STAT_CHA) - 20) * 5;
-  chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * 3;
-  chance +=
-   (ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT)) * 5;
-
- if ( IS_CHARMED(victim)
-    ||   IS_CHARMED(ch)
-    ||         number_percent() > chance
-    ||   ch->getModifyLevel() < ( victim->getModifyLevel() + 2 )
-    ||   IS_SET(victim->imm_flags,IMM_CHARM)
-    ||         (victim->is_npc( ) 
-            && victim->getNPC( )->behavior
-            && IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))))
-        {
-         gsn_control_animal->improve( ch, false, victim );
-         do_say(victim,"Я не собираюсь следовать за тобой!");
-         interpret_raw(victim, "murder", ch->getNameP( ));
-         return;
-        }
+  //////////////// THE ROLL ////////////////
+	
+  if ( number_percent() > (int)chance )
+  {
+	gsn_control_animal->improve( ch, false, victim );
+	do_say(victim,"Я не собираюсь следовать за тобой!");
+	multi_hit(victim,ch);
+	return;
+  }
 
   gsn_control_animal->improve( ch, true, victim );
 
   if ( victim->master )
         victim->stop_follower( );
+	
   SET_BIT(victim->affected_by,AFF_CHARM);
 
-        if ( victim->is_npc( )
-                && victim->in_room )
-        {
-                save_mobs( victim->in_room );
-        }
+  if ( victim->is_npc( ) && victim->in_room )
+  {
+	save_mobs( victim->in_room );
+  }
                 
   victim->master = victim->leader = ch;
 
-  act_p( "Ну разве $c1 -- не прелесть?", ch, 0, victim, TO_VICT,POS_RESTING );
-  if ( ch != victim )
-        act_p("$C1 смотрит на тебя влюбленными глазами.",ch,0,victim,TO_CHAR,POS_RESTING);
-
+  if ( ch != victim ) {
+        act_p("$C1 смотрит на тебя с покорностью.",ch,0,victim,TO_CHAR,POS_RESTING);
+  	act_p( "$c1 подчиняет тебя своей воле.", ch, 0, victim, TO_VICT,POS_RESTING );
+  }
+	
   return;
 }
 
@@ -336,20 +409,20 @@ SKILL_RUNP( vampire )
 
         if ( !ch->is_npc() && !gsn_vampire->usable( ch ) )
         {
-                ch->send_to("Ты пытаешься выглядеть более уродливо.\n\r");
+                ch->send_to("Ты ощериваешь клыки, пытаясь превратиться в упыря, но ничего не выходит.\n\r");
                 return;
         }
 
         if (gsn_vampire->getLearned( ch ) < 100)
         {
-                ch->send_to("Поклонись Гильдмастеру -- и он поможет тебе.\n\r");
+                ch->send_to("Поклонись своему Гильдмастеру для вампирьей Инициации ({hc{yсправка инициация{x).\n\r");
                 return;
         }
 
         if ( weather_info.sunlight == SUN_LIGHT
                 || weather_info.sunlight == SUN_RISE )
         {
-		ch->pecho( "Тебе нужно дождаться вечера, чтобы превратиться в вампир%Gа|а|шу!", ch );
+		ch->pecho( "Помни, тебе нужно остерегаться солнечных лучей!", ch );
         }
 
         level = ch->getModifyLevel();
@@ -442,7 +515,17 @@ void sucking( Character *ch, Character *victim )
     act_p("$c1 высасывает {rкровь{x из шеи $C2.", ch, 0, victim, TO_NOTVICT, POS_RESTING);
     
     if (!ch->is_npc( )) {
-        desire_bloodlust->gain( ch->getPC( ), 20 );
+	Object *tattoo = get_eq_char(ch, wear_tattoo);
+	    
+        if ( (ch->getReligion() == god_karmina) &&
+	      (tattoo) && (chance(10) ) {
+                ch->pecho("{rКармина{x позволяет тебе насладиться кровью ради чистого удовольствия!");
+                ch->recho("%^O1 на челе %C2 вспыхивает {Rярко-красным{x.", tattoo, ch);
+		desire_bloodlust->gain( ch->getPC( ), 0 );		      
+            }
+        } else {	    
+        	desire_bloodlust->gain( ch->getPC( ), 20 );
+	}	
         cond = ch->getPC( )->desires[desire_bloodlust];
     } 
     else 
@@ -463,7 +546,7 @@ void sucking( Character *ch, Character *victim )
         if (number_percent( ) < cond) {
             set_fighting( victim, ch );
             act_p("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM, POS_RESTING);
-            act_p("Твой кошмар проходит - ты просыпаешься.", victim, 0, ch, TO_CHAR, POS_DEAD);
+            act_p("Ты просыпаешься от невыносимой боли в шее!", victim, 0, ch, TO_CHAR, POS_DEAD);
             multi_hit( victim, ch );
         }
     } 
@@ -484,7 +567,7 @@ SKILL_RUNP( suck )
 
     if (!gsn_vampiric_bite->usable( ch )) 
     {
-        ch->send_to("Хрум, хрум!\n\r");
+        ch->send_to("Ты с надеждой ощупываешь свои клыки, но они не оправдывают ожиданий.\n\r");
         return;
     }
 
@@ -499,7 +582,7 @@ SKILL_RUNP( suck )
     }
 
     if ((victim = get_char_room( ch, arg )) == 0) {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->send_to("Таких здесь нет.\n\r");
         return;
     }
 
@@ -537,13 +620,13 @@ SKILL_RUNP( bite )
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->send_to("Этого нет здесь.\n\r");
+        ch->send_to("Таких здесь нет.\n\r");
         return;
     }
 
     if ( victim == ch )
     {
-        ch->send_to("Поцелуй себя в локоть.\n\r");
+        ch->send_to("От безделья ты пытаешься грызануть себя за локоть, но ничего не выходит.\n\r");
         return;
     }
 
@@ -604,14 +687,6 @@ SKILL_RUNP( bite )
                 cond = number_range( -10, 80 );
                     
             if (cond < 0 && number_percent( ) > 50) {
-                
-                af.duration = ch->getModifyLevel( ) / 50;
-                af.location = APPLY_NONE;
-                af.modifier = 0;
-                af.where = TO_AFFECTS;
-                af.bitvector = AFF_CORRUPTION;
-                affect_join( victim, &af );
-
                 vb.hit( );
             }
             else 
