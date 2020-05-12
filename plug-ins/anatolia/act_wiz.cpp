@@ -1823,7 +1823,7 @@ CMDWIZP( owhere )
                 sprintf( buf, "%3d) %s в руках у %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
-                        ch->sees(in_obj->carried_by, '5').c_str(),
+                        ch->sees(in_obj->carried_by, '2').c_str(),
                         in_obj->carried_by->in_room->vnum );
         else if ( in_obj->in_room != 0 && ch->can_see(in_obj->in_room) )
                 sprintf( buf, "%3d) %s на полу в %s [Комната %d]\n\r",
