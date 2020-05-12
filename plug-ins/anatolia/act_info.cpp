@@ -1123,7 +1123,7 @@ CMDRUNP( request )
 
         if (!victim->is_npc())
         {
-                ch->send_to("Проси другой командой: say <Подари мне ЭТО>!\n\r");
+                ch->send_to("На игроков такие штучки не пройдут. Просто поговори с ними!\n\r");
                 return;
         }
 
@@ -1148,12 +1148,26 @@ CMDRUNP( request )
 
         Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
 
+	// donating races (e.g., centaurs, only donate to their own alignment
+	
         if (att.isSet( RACE_DONATES ))
         {
-            if (IS_EVIL( victim )) {
-                interpret( victim, "grin" );
-                return;
-            }
+	    if ( !((IS_GOOD(ch) && IS_GOOD(victim))) &&
+		 !((IS_EVIL(ch) && IS_GOOD(victim))) &&
+		 !((IS_NEUTRAL(ch) && IS_NEUTRAL(victim))) ) {
+		    
+            	if (IS_GOOD( victim )) {
+                	do_say(victim, "Я помогаю только тем, кто служит добру!");
+			return;
+            	} else if (IS_NEUTRAL( victim )) {
+                	do_say(victim, "Я помогу только тем, кто сохраняет нейтралитет в борьбе Добра со Злом.");
+			return;
+            	} else {
+                	do_say(victim, "Лишь служащие Тьме удостоятся моего внимания.");
+			return;			
+		}
+	    }	    
+			
         } else
         {
             if (!IS_GOOD(ch) || !IS_GOOD(victim))
@@ -1179,7 +1193,7 @@ CMDRUNP( request )
 
         if (victim->getModifyLevel( ) >= ch->getModifyLevel( ) + 10 || victim->getModifyLevel( ) >= ch->getModifyLevel( ) * 2)
         {
-                do_say(victim, "Всему свое время, малыш.");
+                do_say(victim, "Всему свое время, малыш{Sfка{Sx.");
                 return;
         }
 
