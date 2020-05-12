@@ -984,32 +984,17 @@ SKILL_RUNP( lore )
     return;
   }
 
-  if (!obj->enchanted){
-    ostr.str(std::string());
-    for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
-      {
-        if ( paf->location != APPLY_NONE && paf->modifier != 0 )
-          {           
-            lore_fmt_affect(paf,ostr);            
-          }
-      }
-      ch->send_to(ostr);
-  }
+  ostr.str(std::string());
 
-  for ( paf = obj->affected; paf != 0; paf = paf->next )
-    {
-      if ( paf->location != APPLY_NONE && paf->modifier != 0 )
-        {
-          sprintf( buf, "Изменяет: %s на %d",
-                  apply_flags.message( paf->location ).c_str( ), paf->modifier );
-          ch->send_to(buf);
-          if ( paf->duration > -1)
-              sprintf(buf,", в течении %d часов.\n\r",paf->duration);
-          else
-              sprintf(buf,".\n\r");
-          ch->send_to(buf);
-        }
-    }
+  if (!obj->enchanted)
+      for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
+          lore_fmt_affect( paf, ostr );
+
+  for (paf = obj->affected; paf != 0; paf = paf->next)
+          lore_fmt_affect( paf, ostr );
+
+      ch->send_to(ostr);
+
   // check for limited
     if ( obj->pIndexData->limit != -1 )
     {
