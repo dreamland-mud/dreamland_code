@@ -231,8 +231,6 @@ CDATA						"![CDATA["
 	BEGIN( NS_VE );
 }
 
-<NS_VE>[ \t]	;
-
 <NS_VE>"?>"	{
 	BEGIN( NS_XMLDocument );
 }
