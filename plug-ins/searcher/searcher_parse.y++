@@ -1,4 +1,4 @@
-%pure_parser
+%pure-parser
 %define api.prefix searcher_yy
 
 %{

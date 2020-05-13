@@ -1,4 +1,4 @@
-%pure_parser
+%pure-parser
 %define api.prefix listfilter_yy
 
 %{
