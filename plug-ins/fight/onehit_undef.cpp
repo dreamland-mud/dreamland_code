@@ -1235,18 +1235,11 @@ void UndefinedOneHit::damEffectMasterHand( )
                         act("{r$c1 слегка оглушает СЕБЯ ударом в голову!{x", ch,0,victim,TO_NOTVICT);
             }
     } else {
-        if ( (!IS_AFFECTED(victim,AFF_STUN)) && (diceroll < (chance / 2)) ) {
+        if ( diceroll < (chance / 2) ) {
             if (ch == victim)
                         return;
                     
-            af.where     = TO_AFFECTS;
-            af.type      = gsn_mastering_pound;
-            af.level     = level;
-            af.duration  = 1;
-            af.location  = APPLY_DEX;
-            af.modifier  = -level / 25;
-            af.bitvector = AFF_STUN;
-            affect_to_char( victim, &af );
+            SET_BIT(victim->affected_by,AFF_STUN);
 
             act("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch,0,victim,TO_CHAR);
             act("{r$c1 сильно оглушает тебя мощной серией ударов в голову!{x", ch,0,victim,TO_VICT);
@@ -1278,7 +1271,7 @@ void UndefinedOneHit::damApplyMasterHand( )
             
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
         
-    dam_bonus += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;       
+    dam_bonus += ( ch->getCurrStat(STAT_STR) - 20 ) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead      
     dam_bonus += ( skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel() ) * level_mod * 100;
     dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;        
     dam_bonus = (int) URANGE(1, (int) dam_bonus, 20);
