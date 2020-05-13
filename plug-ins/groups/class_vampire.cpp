@@ -541,6 +541,25 @@ void sucking( Character *ch, Character *victim )
     try {
         RawDamage( ch, victim, DAM_OTHER, hp_gain ).hit( true );
 
+    	// corrupt victim	
+   	Affect af;
+    	int level = ch->getModifyLevel();
+    	if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
+    		af.where     = TO_AFFECTS;
+    		af.type      = gsn_corruption;
+   		af.level     = level;
+    		af.duration  = level / 10;
+    		af.location  = APPLY_HITROLL;
+    		af.modifier  = - (level / 10);
+    		if (victim->is_npc())
+    			af.bitvector = 0;
+    		else
+    			af.bitvector = AFF_CORRUPTION;
+        	affect_join( victim, &af );	
+	    
+    		act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
+    		act_p("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
+    	}	    
         victim->position = POS_SLEEPING;
                                
         if (number_percent( ) < cond) {
@@ -600,11 +619,31 @@ SKILL_RUNP( bite )
     int cond;
     Affect af;
 
+    //////////////// ELIGIBILITY CHECKS ////////////////
+
+    ///// Standard checks: TODO: turn this into a function    
+    
+    if ( MOUNTED(ch) )
+    {
+            ch->send_to("Только не верхом!\n\r");
+            return;
+    }
+	
     one_argument( argument, arg );
 
-    if (!gsn_vampiric_bite->usable( ch )) {
-        ch->send_to("Ты не умеешь кусаться.\n\r");
-        return;
+    if ( ch->master != 0 && ch->is_npc() )
+            return;
+
+    if ( !ch->is_npc() && !gsn_vampiric_bite->usable( ch ) )
+    {
+            ch->send_to("Ты не умеешь кусаться.\n\r");
+            return;
+    }
+	
+    if ( IS_CHARMED(ch) )
+    {
+            ch->pecho( "Ты же не хочешь укусить сво%1$Gего|его|ю любим%1$Gого|ого|ю хозя%1$Gина|ина|йку.", ch->master);
+            return;
     }
 
     if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
@@ -630,14 +669,14 @@ SKILL_RUNP( bite )
         return;
     }
 
-    if ( victim->position != POS_SLEEPING )
+    if ( !IS_AWAKE(victim) )
     {
         ch->send_to("Сначала усыпи жертву.\n\r");
         return;
     }
 
     if (victim->isAffected(gsn_vampiric_bite )) {
-        ch->send_to("Отсюда уже можно пить.\r\n");
+        ch->send_to("Из шеи жертвы уже можно пить.\r\n");
         return;
     }
     
@@ -649,22 +688,45 @@ SKILL_RUNP( bite )
         ch->send_to("Ты не можешь укусить того, кто сражается.\n\r");
         return;
     }
+	
+    if ( victim->hit < victim->max_hit
+            && victim->can_see(ch)
+            && IS_AWAKE(victim) )
+    {
+            act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается... ты не можешь подкрасться.",
+                    ch, 0, victim, TO_CHAR,POS_RESTING);
+            return;
+    }
+	
+    if (IS_SET(victim->imm_flags, IMM_WEAPON))
+    {
+            act_p("$C1 имеет слишком крепкую шею, чтобы ее можно было прокусить.", ch, 0,
+                    victim, TO_CHAR,POS_RESTING);
+            return;
+    }
+	
+    if(SHADOW(ch))
+    {
+            ch->send_to("Твои клыки проходят сквозь тень!\n\r");
+            act_p("$c1 пытается прогрызть шею своей тени.",
+                    ch, 0, 0, TO_ROOM,POS_RESTING);
+            return;
+    }	
+	
+    // strangled centaurs can't rearkick
+    if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+        return;
 
+    if (victim->getLastFightDelay( ) < FIGHT_DELAY_TIME && IS_AWAKE(victim) )
+    {
+        act_p( "$C1 настороже после боя, надо немного выждать.",ch, 0, victim, TO_CHAR,POS_RESTING);
+        return;
+    }
+	
     UNSET_DEATH_TIME(ch);
+    victim->setLastFightTime( );
+    ch->setLastFightTime( );	
     ch->setWait( gsn_vampiric_bite->getBeats( )  );
-
-    if ( victim->hit < (0.8 * victim->max_hit) &&
-         (IS_AWAKE(victim) ) )
-    {
-        act_p( "$C1 ран%Gно|ен|на и подозрител%Gьно|ен|ьна... не стоит даже пытаться.", ch, 0, victim, TO_CHAR,POS_RESTING);
-        return;
-    }
-
-    if (victim->getLastFightDelay( ) < 300 && IS_AWAKE(victim) )
-    {
-        act_p( "$C1 настороже, не стоит даже пробовать.",ch, 0, victim, TO_CHAR,POS_RESTING);
-        return;
-    }
     
     VampiricBiteOneHit vb( ch, victim );
     
@@ -713,73 +775,157 @@ SKILL_RUNP( bite )
 
 SKILL_RUNP( touch )
 {
-    int chance;
-    Character *victim;
-    Affect af;
+	Character *victim;
+        Affect af;    
+        float chance, skill_mod, stat_mod, level_mod, quick_mod, sleep_mod, vis_mod, time_mod;
+        char arg[MAX_INPUT_LENGTH];
+        
+        //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+        skill_mod   = 0.2;
+        stat_mod    = 0.04;
+        level_mod   = 0.01;
+        quick_mod   = 0.1;
+        sleep_mod   = 0.1;
+        vis_mod     = 0.1;
+        time_mod    = 0.05;
 
-    if (!gsn_vampiric_touch->usable( ch ))
-    {
-        ch->send_to("Ты не владеешь этим!\n\r");
-        return;
-    }
+        //////////////// ELIGIBILITY CHECKS ////////////////
 
-    if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
-    {
-        ch->send_to("Ок, ок.\n\r");
-        return;
-    }
-
-    if ( IS_CHARMED(ch) )
-    {
-        ch->pecho("Ты же не хочешь высосать сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
-        return;
-    }
-
-    if ( (victim = get_char_room(ch,argument)) == 0 )
-    {
-        ch->send_to("Здесь таких нет.\n\r");
-        return;
-    }
-
-    if ( ch == victim )
-    {
-        ch->send_to("Что-что ты хочешь сотворить с собой?\n\r");
-        return;
-    }
-
-    if ( victim->isAffected(gsn_vampiric_touch) )
-    {
-        ch->send_to("Твоя жертва еще не отошла от прикосновения.\n\r");
-        return;
-    }
-
-    if ( is_safe(ch,victim) )
-    {
-        ch->send_to("Боги защищают твою жертву.\n\r");
-        return;
-    }
-
-    if (gsn_rear_kick->getCommand( )->run( ch, victim ))
-        return;
-
-    int k = victim->getLastFightDelay( );
-
-    if ( k >= 0 && k < FIGHT_DELAY_TIME )
-            k = k * 100 /        FIGHT_DELAY_TIME;
-    else
-            k = 100;
-
-    UNSET_DEATH_TIME(ch);
-    victim->setLastFightTime( );
-    ch->setLastFightTime( );
-
-    ch->setWait( gsn_vampiric_touch->getBeats( ) );
-
-    chance = 17 * gsn_vampiric_touch->getEffective( ch ) / 20;
-    chance = chance * k / 100;
+        ///// Standard checks: TODO: turn this into a function 
     
-    if (victim->isAffected(gsn_backguard)) 
-        chance /= 2;
+        if ( MOUNTED(ch) )
+        {
+                ch->send_to("Только не верхом!\n\r");
+                return;
+        }
+	
+        if ( !gsn_vampiric_touch->usable( ch ) )
+        {
+                ch->send_to("Это умение тебе недоступно.\n\r");
+                return;
+        }	
+
+    	if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
+    	{
+        	ch->send_to("Это умение доступно только вампирам.\n\r");
+        	return;
+    	}
+
+    	if ( IS_CHARMED(ch) )
+    	{
+        	ch->pecho("Ты же не хочешь усыпить сво%1$Gего|его|ю хозя%1$Gина|ина|йку?", ch->master);
+        	return;
+    	}
+	
+        // Needs at least one hand
+        const GlobalBitvector &loc = ch->getWearloc( );
+        if (!loc.isSet( wear_hands )
+        || (!loc.isSet( wear_wrist_l ) && (!loc.isSet( wear_wrist_r )) ))
+        {
+                ch->send_to("Тебе нужна хотя бы одна рука для прикосновения.\r\n");
+                return;
+        }
+	
+        argument = one_argument(argument,arg);
+	
+        if ( arg[0] == '\0' )
+        {
+            ch->send_to("И кого ты хочешь усыпить?\n\r");
+            return;
+        }
+	
+    	if ( (victim = get_char_room(ch,argument)) == 0 )
+    	{
+        	ch->send_to("Здесь таких нет.\n\r");
+        	return;
+    	}
+
+    	if ( ch == victim )
+    	{
+        	ch->send_to("Может стоит просто заснуть?\n\r");
+        	return;
+    	}
+
+    	if ( victim->isAffected(gsn_vampiric_touch) )
+    	{
+        	ch->send_to("Твоя жертва еще не отошла от прикосновения.\n\r");
+        	return;
+    	}
+	
+        if ( victim->fighting != 0 )
+        {
+                ch->send_to("Подожди, пока закончится сражение.\n\r");
+                return;
+        }
+	
+        if ( is_safe(ch,victim) )
+        {
+                return;
+        }
+	
+        if (IS_SET(victim->imm_flags, IMM_NEGATIVE))
+        {
+                act_p("$C1 имеет иммунитет к темной магии.", ch, 0,
+                        victim, TO_CHAR,POS_RESTING);
+                return;
+        }
+	
+        // sleepy centaurs can't rearkick
+        if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
+            return;
+	
+        if(SHADOW(ch))
+        {
+                ch->send_to("Твое прикосновение проходит сквозь тень!\n\r");
+                act_p("$c1 пытается усыпить собственную тень.",
+                    ch, 0, 0, TO_ROOM,POS_RESTING);
+                return;
+        }
+	
+        //////////////// PROBABILITY CHECKS ////////////////
+            
+        chance = 0;
+        chance += gsn_vampiric_touch->getEffective( ch ) * skill_mod;
+        chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
+        chance += ( ch->getModifyLevel() - victim->getModifyLevel() ) * level_mod * 100;
+        chance += victim->can_see(ch) ? 0 : (vis_mod * 100);
+        chance += IS_AWAKE( victim ) ? 0 : (sleep_mod * 100);            
+
+        if (IS_QUICK(ch)) {
+            chance += quick_mod * 100;
+        }
+
+        if (IS_QUICK(victim)) {
+            chance -= quick_mod * 100;            
+        }
+
+        if (IS_SET(victim->res_flags, RES_NEGATIVE)) {
+            chance = chance / 2;
+        }
+            
+        if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
+            chance = chance / 2;
+        }
+    
+        // neckguard can't protect if you're asleep
+        if ( (victim->isAffected(gsn_backguard)) && IS_AWAKE( victim ) ) {
+            chance = chance / 2;
+        }
+
+        int k = ch->getLastFightDelay( );
+        if (k >= 0 && k < FIGHT_DELAY_TIME) {
+            chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
+        }
+           
+        chance = max( (float)1, chance ); // there's always a chance
+
+        //////////////// THE ROLL ////////////////
+
+        UNSET_DEATH_TIME(ch);
+        victim->setLastFightTime( );
+        ch->setLastFightTime( ); 
+
+    	ch->setWait( gsn_vampiric_touch->getBeats( ) );
 
     if (Chance(ch, chance, 100).reroll())
     {
@@ -817,26 +963,26 @@ SKILL_RUNP( touch )
 }
 
 /*
- * 'human' command
+ * 'human' command TODO: rename this to unmorph/детрансформироваться
  */
 
 SKILL_RUNP( human )
 {
     if (ch->getProfession( ) != prof_vampire)
     {
-     ch->send_to("Что?\n\r");
+     ch->send_to("Ты не владеешь вампирьей трансформацией\n\r");
      return;
     }
 
     if ( !IS_VAMPIRE(ch) )
     {
-     ch->send_to("Ты уже в человеческом облике.\n\r");
+     ch->send_to("Ты уже выш{Smел{Sfшла{Sx из вампирьей трансформации.\n\r");
      return;
     }
 
    affect_strip(ch, gsn_vampire);
    REMOVE_BIT(ch->act,PLR_VAMPIRE);
-   ch->send_to("Ты принимаешь человеческий облик.\n\r");
+   ch->send_to("Ты выходишь из вампирьей трансформации и принимаешь свой обычный облик.\n\r");
 }
 
 /*
@@ -860,7 +1006,7 @@ SKILL_RUNP( bloodlet )
     }
     
     if (IS_VAMPIRE( ch )) {
-        ch->send_to("Тебя возбудит только вид человеческой крови.\r\n");
+        ch->send_to("Сначала детрансформируйся. Кровь упыря тебя не возбудит.\r\n");
         return;
     }
 
