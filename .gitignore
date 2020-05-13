@@ -20,7 +20,7 @@ aclocal.m4
 /lib
 /share
 /var
-/core.2*
+/core.*
 /*.f++
 /db_*.csv
 /db_*.txt
