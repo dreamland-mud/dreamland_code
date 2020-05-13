@@ -47,5 +47,6 @@ void SpellTarget::init( )
     castFar = false;
     door = -1;
     range = -1;
+    error = 0;
 }
 

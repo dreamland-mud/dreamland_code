@@ -313,7 +313,6 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     char carg[MAX_STRING_LENGTH];
     Character *victim;
     SpellTarget::Pointer result( NEW );
-    SpellTarget::Pointer null;
 
     strcpy( carg, arg.c_str( ) );
     
@@ -327,7 +326,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
                 buf << "Кого именно ты хочешь призвать?" << endl;
-                return null;
+                result->error = TARGET_ERR_SUMMON_WHO; 
+                return result;
             }
 
             result->type = SpellTarget::CHAR;
@@ -351,7 +351,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         if (target.isSet( TAR_CHAR_SELF )) {
             if (!is_self_name( arg, ch )) {
                 buf << "Ты не можешь использовать это заклинание на других." << endl;
-                return null;
+                result->error = TARGET_ERR_NOT_ON_OTHERS;
+                return result;
             }
 
             result->type = SpellTarget::CHAR;
@@ -360,13 +361,15 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         }
 
         buf << "Этому заклинанию не нужно указывать цель." << endl;
-        return null;
+        result->error = TARGET_ERR_NO_TARGET_NEEDED;
+        return result;
     }
 
     if (target.isSet( TAR_CHAR_WORLD )) {
         if (arg.empty( )) {
             buf << "Колдовать на кого?" << endl;
-            return null;
+            result->error = TARGET_ERR_CAST_ON_WHOM;
+            return result;
         }
 
         victim = get_char_world_doppel( ch, carg );
@@ -377,22 +380,26 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         }
         
-        if (( result = locateTargetObject( ch, arg, buf ) ))
-            return result;
+        SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+        if (objresult)
+            return objresult;
         
         buf.str( "" );
         buf << "Ты не находишь никого с таким именем." << endl;
-        return null;
+        result->error = TARGET_ERR_CHAR_NOT_FOUND;
+        return result;
     }
     
     if (target.isSet( TAR_CHAR_SELF )) {
         if (!arg.empty( ) && !is_self_name( arg, ch )) {
-            if (( result = locateTargetObject( ch, arg, buf ) ))
-                return result;
+            SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+            if (objresult)
+                return objresult;
 
             buf.str( "" );
             buf << "Ты не можешь использовать это заклинание на других." << endl;
-            return null;
+            result->error = TARGET_ERR_NOT_ON_OTHERS;
+            return result;
         }
 
         result->type = SpellTarget::CHAR;
@@ -427,7 +434,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     {
                         buf << "Твое заклинание не действует на "
                             << victim->getNameP( '4' ) << " на таком расстоянии." << endl;
-                        return null;
+                        result->error = TARGET_ERR_TOO_FAR;
+                        return result;
                     }
                     
                     result->range = std::max( 0, getMaxRange( ch ) - maxrange );
@@ -446,21 +454,25 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         
         result->range = -1;
 
-        if (( result = locateTargetObject( ch, arg, buf ) ))
-            return result;
+        SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+        if (objresult)
+            return objresult;
             
         buf.str( "" );
         buf << "Произнести заклинание... на кого?" << endl;
-        return null;
+        result->error = TARGET_ERR_CAST_ON_WHOM;
+        return result;
     }
 
-    if (( result = locateTargetObject( ch, arg, buf ) ))
-        return result;
+    SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+    if (objresult)
+        return objresult;
     
     if (buf.str( ).empty( ))
         buf << "Произнести заклинание... на кого?" << endl;
 
-    return null;
+    result->error = TARGET_ERR_CAST_ON_WHOM;
+    return result;
 }
 
 SpellTarget::Pointer
@@ -469,6 +481,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
     char carg[MAX_STRING_LENGTH];
     Object *obj;
     SpellTarget::Pointer null;
+    SpellTarget::Pointer result( NEW );
     
     strcpy( carg, arg.c_str( ) );
     
@@ -480,7 +493,8 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 
         if (arg.empty( )) {
             buf << "Произнести заклинание на что?" << endl;
-            return null;
+            result->error = TARGET_ERR_CAST_ON_WHAT;
+            return result;
         }
         
         if (target.isSet( TAR_OBJ_EQUIP ) && target.isSet( TAR_OBJ_INV ))
@@ -495,8 +509,6 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
             obj = get_obj_world( ch, carg );
         
         if (obj) {
-            SpellTarget::Pointer result( NEW );
-
             result->type = SpellTarget::OBJECT;
             result->obj = obj;
             return result;
@@ -508,6 +520,9 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
             buf << "Ты не видишь здесь такого предмета." << endl;
         else if (target.isSet( TAR_OBJ_WORLD ))
             buf << "Ты не можешь обнаружить ничего с таким именем." << endl;
+
+        result->error = TARGET_ERR_OBJ_NOT_FOUND;
+        return result;
     }
 
     return null;
