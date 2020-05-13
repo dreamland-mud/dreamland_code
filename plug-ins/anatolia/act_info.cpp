@@ -321,7 +321,7 @@ CMDRUNP( oscore )
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
     buf << "{WРаса:{x " << ch->getRace( )->getNameFor( ch, ch )
-	<< "{WРазмер:{x " << size_table.message( ch->size( ) )    
+	<< "{WРазмер:{x " << size_table.message( ch->size )    
         << "  {WПол:{x " << sex_table.message( ch->getSex( ) )
         << "  {WКласс:{x " << ch->getProfession( )->getNameFor( ch );
     
