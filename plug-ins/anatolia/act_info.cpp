@@ -1153,7 +1153,7 @@ CMDRUNP( request )
         if (att.isSet( RACE_DONATES ))
         {
 	    if ( !((IS_GOOD(ch) && IS_GOOD(victim))) &&
-		 !((IS_EVIL(ch) && IS_GOOD(victim))) &&
+		 !((IS_EVIL(ch) && IS_EVIL(victim))) &&
 		 !((IS_NEUTRAL(ch) && IS_NEUTRAL(victim))) ) {
 		    
             	if (IS_GOOD( victim )) {
