@@ -1,5 +1,5 @@
 %pure-parser
-%define api.prefix listfilter_yy
+%define api.prefix {listfilter_yy}
 
 %{
 /* $Id: listfilter_parse.y++,v 1.1.2.3.18.4 2010-09-01 21:20:45 rufina Exp $
