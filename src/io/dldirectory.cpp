@@ -103,6 +103,7 @@ DLFile DLDirectory::tempEntry( )
     if (fd < 0) 
         throw ExceptionDBIO( "Unable to create tmp file in '" + path + "'" );
 
+    ::close(fd);
     return DLFile( pTemplate );
 }
 
