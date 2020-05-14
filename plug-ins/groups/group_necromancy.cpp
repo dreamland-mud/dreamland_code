@@ -183,23 +183,24 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         char arg[MAX_STRING_LENGTH];
         char *argument;
         int i;
+        bool is_capital;
 
         if ( !(obj->item_type == ITEM_CORPSE_NPC
                         || obj->item_type == ITEM_CORPSE_PC))
         {
-                ch->send_to("Ты можешь воскресить только труп!!!\n\r");
+                ch->send_to("Это заклинание работает только на трупы.\n\r");
                 return;
         }
 
         if ( !ch->is_immortal() && obj->item_type == ITEM_CORPSE_PC )
         {
-                ch->send_to("Запрещено богами!\n\r");
+                ch->send_to("Некромантия с трупами игроков запрещена Богами.\n\r");
                 return;
         }
 
         if ( ch->isAffected(sn ) )
         {
-                ch->send_to("Нужно восстановить энергию после предыдущего воскрешения.\n\r");
+                ch->send_to("Нужно восстановить энергию после предыдущего оживления.\n\r");
                 return;
         }
 
@@ -208,7 +209,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
         if ( ch->in_room && IS_SET( ch->in_room->room_flags, ROOM_NO_MOB ) )
         {
-                ch->send_to("Здесь невозможно оживить труп.\n\r");
+                ch->send_to("В этом месте могут находиться только игроки.\n\r");
                 return;
         }
 
@@ -261,16 +262,25 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         buf3[0] = '\0';
         while (argument[0] != '\0' )
         {
+                is_capital = false;
+            
+                if ( dl_isupper(arg[0]) )
+                        is_capital = true;
+            
+                // one_argument strips capitalization, gotta preserve original mob's name
+            
                 argument = one_argument(argument, arg);
                 if (!( !str_cmp(arg,"Оживленный")
                                 || !str_cmp(arg,"(corpse)")
                                 || !str_cmp(arg,"труп") ))
                 {
                         if (buf3[0] == '\0')
+                                if (is_capital) arg.capitalize();
                                 strcat(buf3,arg);
                         else
                         {
                                 strcat(buf3," ");
+                                if (is_capital) arg.capitalize();
                                 strcat(buf3,arg);
                         }
                 }
@@ -292,12 +302,12 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
 
         postaffect_to_char( ch, sn, ch->getModifyLevel() / 10 );
 
-        ch->send_to("Используя Мистическую Силу ты воскрешаешь труп!\n\r");
+        ch->send_to("С помощью сил Тьмы и Хаоса ты оживляешь труп!\n\r");
 
-        sprintf(buf,"Используя Мистическую Силу $c1 воскрешает %s!",obj->getShortDescr( '4' ).c_str( ));
+        sprintf(buf,"С помощью сил Тьмы и Хаоса $c1 оживляет %s!",obj->getShortDescr( '4' ).c_str( ));
         act_p(buf,ch,0,0,TO_ROOM,POS_RESTING);
 
-        act_p("$C1 смотрит на тебя бессмысленным взглядом,\n\rповинуясь твоим приказам!",ch,0,undead,TO_CHAR,POS_RESTING);
+        act_p("$C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,0,undead,TO_CHAR,POS_RESTING);
         extract_obj (obj);
 }
 
