@@ -275,14 +275,16 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
                                 || !str_cmp(arg,"труп") ))
                 {
                         if (buf3[0] == '\0')
-                                if (is_capital)
-                                    arg.capitalize();
+                                if (is_capital) {
+                                    DLString(arg).capitalize().c_str;
+                                }
                                 strcat(buf3,arg);
                         else
                         {
                                 strcat(buf3," ");
-                                if (is_capital)
-                                    arg.capitalize();
+                                if (is_capital) {
+                                    DLString(arg).capitalize().c_str;
+                                }
                                 strcat(buf3,arg);
                         }
                 }
