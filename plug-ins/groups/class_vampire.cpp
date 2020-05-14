@@ -238,7 +238,7 @@ SKILL_RUNP( control )
         return;
   }
 
-  if ( IS_SET(victim->imm_flags,IMM_CHARM )
+  if ( IS_SET(victim->imm_flags,IMM_CHARM ) )
   {
 	ch->send_to("У этого существа иммунитет к очарованию.\n\r");
         return;
@@ -267,9 +267,9 @@ SKILL_RUNP( control )
   chance = URANGE(1, (int)chance, 100)    
   
   // can't dominate shoppers or +5 level mobs    
-  if ( (clevel < (vlevel + 5) ||
+  if ( (clevel < (vlevel + 5)) ||
        (victim->is_npc( ) && victim->getNPC( )->behavior &&
-	IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))
+	IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)) )
 	  chance = 0;
 
   //////////////// THE ROLL ////////////////
@@ -534,7 +534,7 @@ void sucking( Character *ch, Character *victim )
 	Object *tattoo = get_eq_char(ch, wear_tattoo);
 	    
         if ( (ch->getReligion() == god_karmina) &&
-	      (tattoo) && (chance(10) ) {
+	      (tattoo) && (chance(10)) ) {
                 ch->pecho("{rКармина{x позволяет тебе насладиться кровью ради чистого удовольствия!");
                 ch->recho("%^O1 на челе %C2 вспыхивает {Rярко-красным{x.", tattoo, ch);
 		desire_bloodlust->gain( ch->getPC( ), 0 );		      
