@@ -449,7 +449,7 @@ void Damage::handlePosition( )
     /*
      * Sleep spells and extremely wounded folks.
      */
-    if (!IS_AWAKE(victim)) 
+    if (!IS_AWAKE(victim) && ch != victim) 
         stop_fighting( victim, false );
 }
 
