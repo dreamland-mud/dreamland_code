@@ -497,7 +497,7 @@ SKILL_RUNP( vampire )
 
 void sucking( Character *ch, Character *victim ) 
 {
-    int cond;
+    int cond, hp_gain, mana_gain;
 
     if (victim == ch) {
         ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
@@ -549,13 +549,13 @@ void sucking( Character *ch, Character *victim )
         cond = number_range( -10, 60 );
 
     if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {    
-	int hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
-	int mana_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+	hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+	mana_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
     }	    
     else {
 	act_p("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
-	int hp_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit ); 
-	int mana_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit );	    
+	hp_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit ); 
+	mana_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit );	    
     }
 	    
     ch->hit += hp_gain;
