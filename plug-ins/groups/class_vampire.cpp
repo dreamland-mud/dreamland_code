@@ -124,15 +124,24 @@ void VampiricBiteOneHit::calcTHAC0( )
 void VampiricBiteOneHit::postDamageEffects( )
 {	
     // vampiric bite gives hp/mana to ch from victim
-    int hit_ga  = min( (orig_dam / 2 ), (int)victim->max_hit );
-    int mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
+    int hit_ga, mana_ga;
+	
+    if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {
+    	hit_ga = min( (orig_dam / 2 ), (int)victim->max_hit );
+    	mana_ga = min( (orig_dam / 2 ), (int)victim->max_mana );
+	ch->send_to("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника.\n\r");
+    }
+    else {
+    	hit_ga = min( (orig_dam / 10 ), (int)victim->max_hit );
+    	mana_ga = min( (orig_dam / 10 ), (int)victim->max_mana );
+	ch->send_to("Ты с отвращением высасываешь кровь, {cхолодную{x как сердца разработчиков.\n\r");	    
+    }
 	
     ch->hit   += hit_ga;
     ch->hit   =  min( ch->hit , ch->max_hit);
     ch->mana  += mana_ga;
     ch->mana  =  min( ch->mana , ch->max_mana);	
     update_pos( ch );
-    ch->send_to("Твое здоровье и энергия восполняются, когда ты высасываешь кровь из противника.\n\r");
 
     // corrupt victim	
     Affect af;
@@ -487,7 +496,7 @@ SKILL_RUNP( vampire )
 
 void sucking( Character *ch, Character *victim ) 
 {
-    int cond, hp_gain;
+    int cond, hp_gain, mana_gain;
 
     if (victim == ch) {
         ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
@@ -506,7 +515,14 @@ void sucking( Character *ch, Character *victim )
         ch->send_to("В жертве нет необходимой дырочки.\n\r");
         return;
     }
-    
+
+    if ( IS_SET( victim->form, FORM_NONADOPTABLE ) ||
+         IS_SET( victim->form, FORM_UNDEAD ) || 
+         IS_SET( victim->form, FORM_CONSTRUCT ) ) {
+	ch->send_to("Ты не ощущаешь ни капли крови в этом существе. Брррр...\n\r");
+	return;        
+    }
+	
     UNSET_DEATH_TIME(ch);
     ch->setWait( gsn_vampiric_bite->getBeats( )  );
                      
@@ -531,9 +547,19 @@ void sucking( Character *ch, Character *victim )
     else 
         cond = number_range( -10, 60 );
 
-    hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+    if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) 	    
+	hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+	mana_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );	    
+    else {
+	act_p("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
+	hp_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit ); 
+	mana_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit );	    
+    }
+	    
     ch->hit += hp_gain;
     ch->hit = std::min( ch->hit , ch->max_hit );
+    ch->mana += mana_gain;
+    ch->mana = std::min( ch->mana , ch->max_mana );	    
     update_pos( ch );
     
     victim->position = POS_STANDING;
@@ -1108,7 +1134,7 @@ SKILL_RUNP( bonedagger )
             return;
         }
         else  {
-            ch->printf("Ты ждешь, пока некто '%s' отбросит тень на твою могилу.\n\r", ch->ambushing);
+            ch->printf("Ты ждешь, когда некто '{R%s{x' отбросит тень на твою могилу.\n\r", ch->ambushing);
             return;
         }
     }
@@ -1223,11 +1249,6 @@ SKILL_RUNP( sense )
 
   ch->setWait( gsn_sense_life->getBeats( )  );
 
-    if(SHADOW(ch)) {
-      ch->send_to("Кроме своей тени тебе не удается ничего почувствовать.\n\r");
-      return;
-    }
-
   if (!ch->is_npc() && number_percent() < gsn_sense_life->getEffective( ch ))
     {
       Affect af;
@@ -1278,7 +1299,7 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
         ch->send_to("Две стаи летучих мышей -- это слишком.\r\n");
         return;
     }
-
+	
     act_p("В воздухе внезапно раздается шелест крыльев и едва различимый писк.", ch, 0, 0, TO_ALL, POS_RESTING);
     act_p("На зов $c2 слетается стая летучих мышей и окружает $s живым облаком.", ch, 0, 0, TO_ROOM, POS_RESTING);
     act_p("Стая летучих мышей прибывает по твоему зову и окружает тебя живым облаком.", ch, 0, 0, TO_CHAR, POS_RESTING);
@@ -1300,12 +1321,20 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
 
 bool VampireGuildmaster::social( Character *actor, Character *victim, const DLString &socialName )
 {
-    if (victim != ch || actor == ch)
+    if (socialName != "bow") {
+        act( "$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
+        act( "$c1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
+        say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
         return false;
-
-    if (socialName != "bow")
+    }
+	
+    if (victim != ch || actor == ch) {
+        act( "$c1 смотрит на $C4 как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_NOTVICT );
+        act( "$c1 смотрит на тебя как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_VICT );
+        say_act( actor, ch, "Кому ты кланяешься? Стенке?" );	    
         return false;
-
+    }	
+	
     if (actor->is_npc( ) || actor->getProfession( ) != prof_vampire) {
         act( "$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
         act( "$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
