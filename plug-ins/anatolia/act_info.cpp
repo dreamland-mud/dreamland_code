@@ -320,23 +320,24 @@ CMDRUNP( oscore )
     if (ch->getRealLevel( ) != ch->get_trust( ))
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
-    buf << "Раса " << ch->getRace( )->getNameFor( ch, ch )
-        << "  Пол: " << sex_table.message( ch->getSex( ) )
-        << "  Класс: " << ch->getProfession( )->getNameFor( ch );
+    buf << "{WРаса:{x " << ch->getRace( )->getNameFor( ch, ch )
+	<< " {WРазмер:{x " << size_table.message( ch->size )    
+        << "  {WПол:{x " << sex_table.message( ch->getSex( ) )
+        << "  {WКласс:{x " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
         room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
     else
         room = get_room_index( ROOM_VNUM_TEMPLE );
     
-    buf << "  Дом: " << (room ? room->area->name : "Потерян" ) << endl
-        << dlprintf( "У тебя %d/%d жизни, %d/%d энергии и %d/%d движения.\n\r",
+    buf << "  {WДом:{x " << (room ? room->area->name : "Потерян" ) << endl
+        << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
                     ch->move.getValue( ), ch->max_move.getValue( ));
     
     if (!ch->is_npc( )) 
-        buf << fmt( 0, "У тебя %1$d практи%1$Iка|ки|к и %2$d тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й.",
+        buf << fmt( 0, "У тебя {Y%1$d{x практи%1$Iка|ки|к и {Y%2$d{x тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й.",
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
@@ -346,7 +347,7 @@ CMDRUNP( oscore )
 
     if (ch->is_npc( )) {
         buf << dlprintf( 
-            "Твои параметры: родные(текущие)\n\r"
+            "Твои параметры: исходные, (текущие)\n\r"
             "      Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
             "  Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
             "  Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
@@ -359,10 +360,10 @@ CMDRUNP( oscore )
 
     } else {
         buf << dlprintf( 
-            "Твои параметры: родные(текущие) [максимальные]\n\r"
-            "      Сила(Str): %d(%d) [%d] Интеллект(Int): %d(%d) [%d]\n\r"
-            "  Мудрость(Wis): %d(%d) [%d]  Ловкость(Dex): %d(%d) [%d]\n\r"
-            "  Сложение(Con): %d(%d) [%d]   Обаяние(Cha): %d(%d) [%d]\n\r",
+            "Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
+            "      Сила(Str): %d{c({W%d{c){x [{C%d{x] Интеллект(Int): %d{c({W%d{c){x [{C%d{x]\n\r"
+            "  Мудрость(Wis): %d{c({W%d{c){x [{C%d{x]  Ловкость(Dex): %d{c({W%d{c){x [{C%d{x]\n\r"
+            "  Сложение(Con): %d{c({W%d{c){x [{C%d{x]   Обаяние(Cha): %d{c({W%d{c){x [{C%d{x]\n\r",
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT), pch->getMaxStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
@@ -378,7 +379,7 @@ CMDRUNP( oscore )
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
-        buf << dlprintf( "Тебе нужно набрать %d очков опыта до следующего уровня.\n\r",
+        buf << dlprintf( "Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r",
                     ch->getPC()->getExpToLevel( ) );
 
     if (!ch->is_npc( )) {
@@ -386,12 +387,12 @@ CMDRUNP( oscore )
         int qtime = qd ? qd->getTime( ) : 0;
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
-        buf << fmt( 0, "У тебя %1$d квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
+        buf << fmt( 0, "У тебя {W%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
                        pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
         else
-            buf << fmt( 0, "До %1$s квеста осталось %2$d ти%2$Iк|ка|ков.",
+            buf << fmt( 0, "До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков.",
                        hasQuest ? "конца" : "следующего",
                        qtime );
 
@@ -467,7 +468,7 @@ CMDRUNP( oscore )
         if (ch->getReligion( ) == god_none)
             buf << "Ты не веришь в бога.  ";
         else
-            buf << dlprintf( "Твоя религия: %s.  ",
+            buf << dlprintf( "Твоя религия: {C%s{x.  ",
                         ch->getReligion( )->getShortDescr( ).c_str( ) );
         
         buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
