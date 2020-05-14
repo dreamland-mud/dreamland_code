@@ -172,14 +172,15 @@ SKILL_RUNP( control )
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
-  int clevel = ch->getModifyLevel();
-  int vlevel = victim->getModifyLevel(); 	
+  int clevel, vlevel; 
   float chance, skill_mod, stat_mod, level_mod;
         
   //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
   skill_mod   = 0.5;
   stat_mod    = 0.02;
   level_mod   = 0.05;
+  clevel      = ch->getModifyLevel();
+  vlevel      = victim->getModifyLevel(); 
 
   //////////////// ELIGIBILITY CHECKS ////////////////
 
@@ -268,8 +269,8 @@ SKILL_RUNP( control )
   
   // can't dominate shoppers or +5 level mobs    
   if ( (clevel < (vlevel + 5)) ||
-       (victim->is_npc( ) && victim->getNPC( )->behavior &&
-	IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER)) )
+       ( (victim->is_npc( )) && (victim->getNPC( )->behavior) &&
+	 (IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))) ) )
 	  chance = 0;
 
   //////////////// THE ROLL ////////////////
