@@ -264,7 +264,7 @@ SKILL_RUNP( control )
   chance += ( ch->getCurrStat(STAT_CHA) - 20 ) * stat_mod * 100;
   chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT) ) * stat_mod * 100;
   chance += ( clevel - vlevel ) * level_mod * 100;
-  chance = URANGE(1, (int)chance, 100)    
+  chance = URANGE(1, (int)chance, 100) ;   
   
   // can't dominate shoppers or +5 level mobs    
   if ( (clevel < (vlevel + 5)) ||
@@ -496,7 +496,7 @@ SKILL_RUNP( vampire )
 
 void sucking( Character *ch, Character *victim ) 
 {
-    int cond, hp_gain, mana_gain;
+    int cond;
 
     if (victim == ch) {
         ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
@@ -538,8 +538,8 @@ void sucking( Character *ch, Character *victim )
                 ch->pecho("{rКармина{x позволяет тебе насладиться кровью ради чистого удовольствия!");
                 ch->recho("%^O1 на челе %C2 вспыхивает {Rярко-красным{x.", tattoo, ch);
 		desire_bloodlust->gain( ch->getPC( ), 0 );		      
-            }
-        } else {	    
+        }
+	else {	    
         	desire_bloodlust->gain( ch->getPC( ), 20 );
 	}	
         cond = ch->getPC( )->desires[desire_bloodlust];
@@ -547,13 +547,14 @@ void sucking( Character *ch, Character *victim )
     else 
         cond = number_range( -10, 60 );
 
-    if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) 	    
-	hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
-	mana_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );	    
+    if ( !IS_SET( victim->form, FORM_COLD_BLOOD ) ) {    
+	int hp_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+	int mana_gain = std::min( ch->getModifyLevel( ) * 5, (int)victim->max_hit );
+    }	    
     else {
 	act_p("Ты с отвращением глотаешь кровь $C2, {cхолодную{x как сердца разработчиков.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
-	hp_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit ); 
-	mana_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit );	    
+	int hp_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit ); 
+	int mana_gain = std::min( ch->getModifyLevel( ) * 1, (int)victim->max_hit );	    
     }
 	    
     ch->hit += hp_gain;
