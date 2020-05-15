@@ -26,6 +26,10 @@ enum {
     TARGET_ERR_TOO_FAR
 };
 
+/**
+ * Base implementation for all types of spells. Individual spells mostly override one of the
+ * 'run' methods.
+ */
 class DefaultSpell : public Spell, public XMLVariableContainer
 {
 XML_OBJECT
@@ -78,6 +82,10 @@ protected:
     SkillPointer skill;
 };
 
+/**
+ * Describes a typical spell from attack or combat group that checks saves roll, inflicts damage
+ * and shows some messages.
+ */
 class AnatoliaCombatSpell : public virtual DefaultSpell {
 XML_OBJECT
 public:
@@ -87,12 +95,12 @@ public:
 
     virtual void run( Character *, Character *, int, int );
 
-    XML_VARIABLE XMLEnumeration damtype;
-    XML_VARIABLE XMLFlags damflags;
-    XML_VARIABLE XMLInteger dice, diceBonus;
-    XML_VARIABLE XMLStringNoEmpty msgNotVict, msgVict, msgChar;
-    XML_VARIABLE XMLIntegerNoEmpty waitMin, waitMax;
-    XML_VARIABLE XMLBooleanNoTrue savesCheck;
+    XML_VARIABLE XMLEnumeration damtype; // damage type from damage_table
+    XML_VARIABLE XMLFlags damflags; // additional flags other than DAMF_SPELL
+    XML_VARIABLE XMLInteger dice, diceBonus; // damage calculation: <level> d <dice> + <diceBonus>
+    XML_VARIABLE XMLStringNoEmpty msgNotVict, msgVict, msgChar; // optional messages 
+    XML_VARIABLE XMLIntegerNoEmpty waitMin, waitMax; // optional range of waitstate on victim
+    XML_VARIABLE XMLBooleanNoTrue savesCheck; // whether to check for saves and reduce damage, true by default
 };
 
 #endif
