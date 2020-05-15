@@ -11,6 +11,9 @@ addons:
        - libdb5.3++ 
        - libdb5.3++-dev  
 
+cache:
+  apt: true
+
 matrix:
   include:
     - os: linux
@@ -20,12 +23,7 @@ matrix:
 #install:
 #  - travis_retry bash ./admin/travis/verify_build.sh travis_install
     
-before_script:
-  - bash ./admin/travis/verify_build.sh travis_before_script
-
 script: 
   - bash ./admin/travis/verify_build.sh travis_script
 
-after_success:
-  - bash ./admin/travis/verify_build.sh travis_after_success
 
