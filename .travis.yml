@@ -1,6 +1,31 @@
-language: generic
+language: cpp
 dist: bionic
-script: bash ./admin/travis/verify_build.sh
-branches:
-  only:
-  - master
+addons:
+  apt:
+     update: true
+     packages:
+       - libfl-dev
+       - libcrypto++-dev 
+       - libjsoncpp-dev 
+       - libdb5.3-dev 
+       - libdb5.3++ 
+       - libdb5.3++-dev  
+
+matrix:
+  include:
+    - os: linux
+      compiler: "gcc"
+      env: PPSSPP_BUILD_TYPE=Linux PVS_ANALYZE=Yes
+
+#install:
+#  - travis_retry bash ./admin/travis/verify_build.sh travis_install
+    
+before_script:
+  - bash ./admin/travis/verify_build.sh travis_before_script
+
+script: 
+  - bash ./admin/travis/verify_build.sh travis_script
+
+after_success:
+  - bash ./admin/travis/verify_build.sh travis_after_success
+
