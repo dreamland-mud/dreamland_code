@@ -3,10 +3,10 @@
 ROOT=`pwd` # normally /home/travis/build/dreamland-mud/dreamland_code
 
 run_build() {
-    mkdir -p objs && \
+    mkdir -p $HOME/objs && \
     make -f Makefile.git && \
-    cd objs && \
-    ../configure --prefix=$ROOT && \
+    cd $HOME/objs && \
+    $ROOT/configure --prefix=$ROOT && \
     make -j 2 && make install 
 }
 
@@ -21,6 +21,11 @@ run_smoke_test() {
 
 travis_script() {
     run_build && run_smoke_test
+}
+
+travis_before_cache() {
+    find . -name "lib*.so*" | xargs rm
+    find . -name "lib*.cpp" | xargs rm
 }
 
 set -e # stop on a non-zero exit code

@@ -12,8 +12,12 @@ addons:
        - libdb5.3++-dev  
 
 cache:
-  apt: true
+  directories:
+      - $HOME/objs
+before_cache:
+  - bash ./admin/travis/verify_build.sh travis_before_cache
 
+ 
 #install:
 #  - travis_retry bash ./admin/travis/verify_build.sh travis_install
     
