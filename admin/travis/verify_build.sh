@@ -6,7 +6,7 @@ run_build() {
     mkdir -p objs && \
     make -f Makefile.git && \
     cd objs && \
-    $ROOT/configure --prefix=$ROOT && \
+    ../configure --prefix=$ROOT && \
     make -j 2 && make install 
 }
 
