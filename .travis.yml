@@ -13,7 +13,7 @@ addons:
 
 cache:
   directories:
-      - $HOME/objs
+      - $TRAVIS_BUILD_DIR/objs
 before_cache:
   - bash ./admin/travis/verify_build.sh travis_before_cache
 
@@ -24,4 +24,12 @@ before_cache:
 script: 
   - bash ./admin/travis/verify_build.sh travis_script
 
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
 
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL

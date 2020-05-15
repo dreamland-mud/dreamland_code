@@ -1,11 +1,11 @@
 #!/bin/bash
 
-ROOT=`pwd` # normally /home/travis/build/dreamland-mud/dreamland_code
+ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
-    mkdir -p $HOME/objs && \
+    mkdir -p objs && \
     make -f Makefile.git && \
-    cd $HOME/objs && \
+    cd objs && \
     $ROOT/configure --prefix=$ROOT && \
     make -j 2 && make install 
 }
