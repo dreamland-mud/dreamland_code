@@ -11,6 +11,7 @@ run_build() {
 }
 
 run_smoke_test() {
+    cd $ROOT && \
     mkdir -p share && \
     cd share && \
     git clone https://github.com/dreamland-mud/dreamland_world.git DL && \
