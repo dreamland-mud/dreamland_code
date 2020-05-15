@@ -270,41 +270,6 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
 }
 
 
-
-SPELL_DECL(Hellfire);
-VOID_SPELL(Hellfire)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-  
-  int dam;
-
-  dam = dice(level, 7);
-
-  damage_nocatch(ch,victim,dam,sn,DAM_FIRE, true, DAMF_SPELL);
-
-
-}
-
-
-SPELL_DECL(SeverityForce);
-VOID_SPELL(SeverityForce)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    act_p("Ты призываешь подземные силы, раскалывающие землю у ног $C2.",
-           ch,0,victim,TO_CHAR,POS_RESTING);
-    act_p( "$c1 призывает подземные силы, раскалывающие землю у твоих ног!.",
-            ch, 0, victim, TO_VICT,POS_RESTING);
-
-    dam = dice( level , 18 );
-    damage_nocatch(ch,victim,dam,sn,DAM_NONE,true);
-}
-
-TYPE_SPELL(int, SeverityForce)::getMaxRange( Character * ) const
-{
-    return 0;
-}
-
 SPELL_DECL(Web);
 VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -523,5 +488,3 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     damage_nocatch(ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL); 
 
 }
-
-

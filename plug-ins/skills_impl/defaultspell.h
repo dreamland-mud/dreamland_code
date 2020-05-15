@@ -72,9 +72,27 @@ protected:
     XML_VARIABLE XMLFlags   target;
     XML_VARIABLE XMLEnumeration   position;
     XML_VARIABLE XMLEnumeration   type;
-    XML_VARIABLE XMLBoolean casted;
+    XML_VARIABLE XMLBooleanNoTrue casted;
+    XML_VARIABLE XMLBooleanNoTrue ranged;
 
     SkillPointer skill;
+};
+
+class AnatoliaCombatSpell : public virtual DefaultSpell {
+XML_OBJECT
+public:
+    typedef ::Pointer<AnatoliaCombatSpell> Pointer;
+    
+    AnatoliaCombatSpell();
+
+    virtual void run( Character *, Character *, int, int );
+
+    XML_VARIABLE XMLEnumeration damtype;
+    XML_VARIABLE XMLFlags damflags;
+    XML_VARIABLE XMLInteger dice, diceBonus;
+    XML_VARIABLE XMLStringNoEmpty msgNotVict, msgVict, msgChar;
+    XML_VARIABLE XMLIntegerNoEmpty waitMin, waitMax;
+    XML_VARIABLE XMLBooleanNoTrue savesCheck;
 };
 
 #endif
