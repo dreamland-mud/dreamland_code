@@ -701,9 +701,9 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
     int dam;
 
     dam = dice( level, 12);
-    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
+    if ( saves_spell( level, victim, DAM_NEGATIVE,ch, DAMF_SPELL ) )
         dam /= 2;
-    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
+    damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_SPELL);
 }
 
 SPELL_DECL(MagicArrow);
