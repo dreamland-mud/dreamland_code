@@ -3,11 +3,6 @@
 ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
-    which gcc
-    which g++
-    which ccache
-    echo $PATH
-
     mkdir -p objs && \
     make -f Makefile.git && \
     cd objs && \
