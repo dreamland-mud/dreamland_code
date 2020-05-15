@@ -701,14 +701,14 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
     int dam, chance;    
     Affect af;
 
-    chance = ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT);
+    chance = 50 + ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT);
  
     dam = dice( level, 12);
     if ( saves_spell( level, victim, DAM_NEGATIVE,ch, DAMF_SPELL ) ) {
         dam /= 2;
     }
     else {
-        if ( (chance(50 + chance)) && (!victim->isAffected(gsn_weaken)) ) {
+        if ( (number_percent() < chance) && (!victim->isAffected(gsn_weaken)) ) {
             af.where     = TO_AFFECTS;
             af.type      = gsn_weaken;
             af.level     = level;
