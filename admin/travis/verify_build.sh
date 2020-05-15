@@ -3,6 +3,7 @@
 ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
+    find $TRAVIS_BUILD_DIR
     mkdir -p objs && \
     make -f Makefile.git && \
     cd objs && \
