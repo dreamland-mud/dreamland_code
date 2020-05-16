@@ -297,9 +297,9 @@ SKILL_RUNP( vanish )
     
     if (victim == 0 || victim == ch) {
         transfer_char( ch, ch, pRoomIndex,
-            "%1^C1 внезапно исчезает!",
+            "%1$^C1 внезапно исчезает!",
             "Пользуясь всеобщим замешательством, ты исчезаешь!",
-            "%1^C1 внезапно появляется у тебя за спиной." );
+            "%1$^C1 внезапно появляется у тебя за спиной." );
         return;
     }    
     else {   
@@ -311,14 +311,14 @@ SKILL_RUNP( vanish )
             if ( number_percent() < kidnap_chance ) {
                     // kidnapping success
                     transfer_char( ch, ch, pRoomIndex,
-                        "%1^C1 внезапно исчезает!",
+                        "%1$^C1 внезапно исчезает!",
                         "Пользуясь всеобщим замешательством, ты исчезаешь!",
-                        "%1^C1 внезапно появляется у тебя за спиной." );
+                        "%1$^C1 внезапно появляется у тебя за спиной." );
 
                     transfer_char( victim, ch, pRoomIndex,
-                        "%1^C1 исчезает вместе с %2^C5!",
-                        "Ты хватаешь и утаскиваешь с собой %1^C4!",
-                        "%2^C1 внезапно появляется, приволоченный %1^C5." );
+                        "%1$^C1 исчезает вместе с %2^C5!",
+                        "Ты хватаешь и утаскиваешь с собой %1$^C4!",
+                        "%2$^C1 внезапно появляется, похищенн%2$Gое|ый|ая %1$^C5." );
                     
                     if (!FightingCheck) {
                         yell_panic( ch, victim,
@@ -335,9 +335,9 @@ SKILL_RUNP( vanish )
                     act_p( "Ты умудряешься вырваться из объятий $c2", ch, 0, victim, TO_VICT,POS_RESTING    );
 
                     transfer_char( ch, ch, pRoomIndex,
-                        "%1^C1 внезапно исчезает!",
+                        "%1$^C1 внезапно исчезает!",
                         "Пользуясь всеобщим замешательством, ты исчезаешь!",
-                        "%1^C1 внезапно появляется у тебя за спиной." );
+                        "%1$^C1 внезапно появляется у тебя за спиной." );
             }
       
      }
@@ -1297,11 +1297,11 @@ SKILL_RUNP( throwdown )
         if ( ch->is_npc() || number_percent() < chance )
         {
             if ( number_percent() < 70 ) {
-                act_p("Ты бросаешь $C4 с ошеломляющей силой.",
+                act_p("Ты бросаешь $C4 с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_CHAR,POS_RESTING);
-                act_p("$c1 бросает тебя с ошеломляющей силой.",
+                act_p("$c1 бросает тебя с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_VICT,POS_RESTING);
-                act_p("$c1 бросает $C4 с ошеломляющей силой.",
+                act_p("$c1 бросает $C4 с {Wошеломляющей силой{x.",
                         ch,0,victim,TO_NOTVICT,POS_RESTING);
                 victim->setWaitViolence( 2 + max(2, ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_STR)) );
 
