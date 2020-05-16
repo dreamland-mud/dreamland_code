@@ -1165,118 +1165,117 @@ void UndefinedOneHit::damApplyDeathblow( )
         gsn_deathblow->improve( ch, false, victim );
 }
 
-void UndefinedOneHit::damEffectMasterHand( )
+void UndefinedOneHit::damEffectMasterHand()
 {
     int diceroll, skill, level;
-    float chance, skill_mod, stat_mod, level_mod, quick_mod;        
+    float chance, skill_mod, stat_mod, level_mod, quick_mod;
     Affect af;
-            
-    skill = gsn_mastering_pound->getEffective( ch );
+
+    skill = gsn_mastering_pound->getEffective(ch);
     level = skill_level(*gsn_mastering_pound, ch);
-            
+
     chance = 0;
-    diceroll = number_percent( );            
+    diceroll = number_percent();
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-    skill_mod   = 0.2;
-    stat_mod    = 0.01;
-    level_mod   = 0.01;
-    quick_mod   = 0.05;
-            
+    skill_mod = 0.2;
+    stat_mod = 0.01;
+    level_mod = 0.01;
+    quick_mod = 0.05;
+
     //////////////// ELIGIBILITY CHECKS ////////////////
-    
 
-    if ( skill <= 1)
+    if (skill <= 1)
         return;
 
-    if ( dam == 0 )
+    if (dam == 0)
         return;
 
-    if ( SHADOW(ch) )
-        return;   
-            
+    if (SHADOW(ch))
+        return;
+
     if (wield)
         return;
-        
+
     if (diceroll > skill)
         return;
 
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
-        
+
     chance += skill * skill_mod;
     chance += skill_level_bonus(*gsn_mastering_pound, ch);
-    chance += ( ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON) ) * stat_mod * 100;
-    chance += ( level - victim->getModifyLevel() ) * level_mod * 100;            
+    chance += (ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON)) * stat_mod * 100;
+    chance += (level - victim->getModifyLevel()) * level_mod * 100;
 
-    if ( IS_AFFECTED(ch,AFF_WEAK_STUN) ) {
-            chance = chance / 2;
+    if (IS_AFFECTED(ch, AFF_WEAK_STUN)) {
+        chance = chance / 2;
     }
-            
+
     if (IS_QUICK(ch)) {
-            chance += quick_mod * 100;
+        chance += quick_mod * 100;
     }
     if (IS_QUICK(victim)) {
-            chance -= quick_mod * 100;            
-    }    
-    
-    chance = max(1, (int) chance); // there's always a chance;
-            
+        chance -= quick_mod * 100;
+    }
+
+    chance = max(1, (int)chance); // there's always a chance;
+
     if (diceroll > chance)
         return;
-            
-    if ( !IS_AFFECTED(victim,AFF_WEAK_STUN) ) {       
-            SET_BIT(victim->affected_by,AFF_WEAK_STUN);           
-            if (ch != victim) {
-                        act("{rТвой удар в голову слегка оглушает $C4!{x", ch,0,victim,TO_CHAR);
-                        act("{r$c1 слегка оглушает тебя ударом в голову!{x", ch,0,victim,TO_VICT);
-                        act("{r$c1 слегка оглушает $C4 ударом в голову!{x", ch,0,victim,TO_NOTVICT);
-            } else {
-                        act("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch,0,victim,TO_CHAR);
-                        act("{r$c1 слегка оглушает СЕБЯ ударом в голову!{x", ch,0,victim,TO_NOTVICT);
-            }
-    } else {
-        if ( diceroll < (chance / 2) ) {
-            if (ch == victim)
-                        return;
-                    
-            SET_BIT(victim->affected_by,AFF_STUN);
 
-            act("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch,0,victim,TO_CHAR);
-            act("{r$c1 сильно оглушает тебя мощной серией ударов в голову!{x", ch,0,victim,TO_VICT);
-            act("{r$c1 оглушает $C4 мощной серией ударов в голову!{x", ch,0,victim,TO_NOTVICT);
+    if (!IS_AFFECTED(victim, AFF_WEAK_STUN)) {
+        SET_BIT(victim->affected_by, AFF_WEAK_STUN);
+        if (ch != victim) {
+            act("{rТвой удар в голову слегка оглушает $C4!{x", ch, 0, victim, TO_CHAR);
+            act("{r$c1 слегка оглушает тебя ударом в голову!{x", ch, 0, victim, TO_VICT);
+            act("{r$c1 слегка оглушает $C4 ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
+        } else {
+            act("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch, 0, victim, TO_CHAR);
+            act("{r$c1 слегка оглушает СЕБЯ ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
         }
-    }            
-    gsn_mastering_pound->improve( ch, true, victim );
+    } else {
+        if (diceroll < (chance / 2)) {
+            if (ch == victim)
+                return;
+
+            SET_BIT(victim->affected_by, AFF_STUN);
+
+            act("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch, 0, victim, TO_CHAR);
+            act("{r$c1 сильно оглушает тебя мощной серией ударов в голову!{x", ch, 0, victim, TO_VICT);
+            act("{r$c1 оглушает $C4 мощной серией ударов в голову!{x", ch, 0, victim, TO_NOTVICT);
+        }
+    }
+    gsn_mastering_pound->improve(ch, true, victim);
 }
 
-void UndefinedOneHit::damApplyMasterHand( )
+void UndefinedOneHit::damApplyMasterHand()
 {
     int diceroll, skill;
-    float dam_bonus, stat_mod, level_mod;        
+    float dam_bonus, stat_mod, level_mod;
     Affect af;
-            
-    skill = gsn_mastering_pound->getEffective( ch );
+
+    skill = gsn_mastering_pound->getEffective(ch);
     dam_bonus = 0;
-    diceroll = number_percent( );            
+    diceroll = number_percent();
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-    stat_mod    = 0.01;
-    level_mod   = 0.01;
-            
+    stat_mod = 0.01;
+    level_mod = 0.01;
+
     if (wield)
         return;
-        
+
     if (diceroll > skill)
         return;
-            
+
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
-        
-    dam_bonus += ( ch->getCurrStat(STAT_STR) - 20 ) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead      
-    dam_bonus += ( skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel() ) * level_mod * 100;
-    dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;        
-    dam_bonus = (int) URANGE(1, (int) dam_bonus, 20);
-            
-    dam += dice( dam_bonus, 10 ) * skill / 100;        
+
+    dam_bonus += (ch->getCurrStat(STAT_STR) - 20) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead
+    dam_bonus += (skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel()) * level_mod * 100;
+    dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;
+    dam_bonus = (int)URANGE(1, (int)dam_bonus, 20);
+
+    dam += dice(dam_bonus, 10) * skill / 100;
 }
 
 void UndefinedOneHit::damApplyReligion()
