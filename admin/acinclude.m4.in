@@ -161,6 +161,12 @@ EOF
     fi
     rm -fr conftest*
   fi
+
+dnl Set flags explicitly so that AC_PROG_CC doesn't set them to default "-g -O2".
+  if test "$ac_use_optimization_code" = "no"; then
+      CXXFLAGS="$CXXFLAGS -g -Og"
+      CFLAGS="$CFLAGS -g -Og"
+  fi
 ])
 
 
