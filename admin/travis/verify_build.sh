@@ -8,8 +8,8 @@ run_build() {
     make -f Makefile.git && \
     cd objs && \
     ../configure --prefix=$ROOT && \
-    grep ccache * && \
-    make -j 2 && make install 
+    cat config.log
+#    make -j 2 && make install 
 }
 
 run_smoke_test() {
