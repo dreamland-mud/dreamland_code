@@ -3,16 +3,18 @@
 ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
-    du -s $HOME/.ccache
-    mkdir -p objs
-    make -f Makefile.git
-    cd objs
-    which gcc 
-    export PATH=/usr/lib/ccache:$PATH
-    which gcc
-    ../configure --prefix=$ROOT 
-    cat config.log
-#    make -j 2 && make install 
+    ccache -s
+
+    mkdir -p objs && \
+    make -f Makefile.git && \
+    cd objs && \
+    ../configure --prefix=$ROOT && \
+    cd src && \
+    time (make -j 2 && make install) && \
+    cd ../plug-ins && \
+    time (make -j 2 && make install)
+
+    ccache -s
 }
 
 run_smoke_test() {
@@ -22,9 +24,7 @@ run_smoke_test() {
 }
 
 travis_script() {
-#    run_build && run_smoke_test
-    run_build
-    du -s $HOME/.ccache
+    run_build && run_smoke_test
 }
 
 set -e # stop on a non-zero exit code
