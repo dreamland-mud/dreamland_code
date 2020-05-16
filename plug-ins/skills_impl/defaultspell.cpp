@@ -50,7 +50,8 @@ DefaultSpell::DefaultSpell( )
         : target( TAR_IGNORE, &target_table ), 
           position( POS_STANDING, &position_table ), 
           type( SPELL_NONE, &spell_types ),
-          casted( true )
+          casted( true ),
+          ranged(true)
           
 {
 }
@@ -111,13 +112,16 @@ int DefaultSpell::getManaCost( Character *ch )
  */
 int DefaultSpell::getMaxRange( Character *ch ) const
 {
-    int level = skill->getLevel( ch );
-    
+    if (!ranged)
+        return 0;
+
     if (type == SPELL_NONE || type == SPELL_DEFENSIVE)
         return 0;
 
     if (position.getValue( ) == POS_STANDING)
         return 0;
+
+    int level = skill->getLevel( ch );
         
     if (level < 26)
         return 0;
@@ -815,3 +819,40 @@ bool DefaultSpell::isCasted( ) const
     return casted.getValue( );
 }
 
+AnatoliaCombatSpell::AnatoliaCombatSpell()
+                : damtype(0, &damage_table),
+                  damflags(0, &damage_flags),
+                  savesCheck(true)
+{
+
+}
+
+void AnatoliaCombatSpell::run( Character *ch, Character *victim, int sn, int level )
+{
+    // Calculate spell flags.
+    bitstring_t flags = DAMF_SPELL | damflags;
+
+    // Calculate damage.
+    int dam = ::dice(level, dice) + diceBonus;
+    
+    // Do a saves check if required.
+    if (savesCheck && saves_spell(level, victim, damtype, ch, flags))
+        dam /= 2;
+
+    // Display messages.
+    if (!msgNotVict.empty())
+        act(msgNotVict.c_str(), ch, 0, victim, TO_NOTVICT);
+
+    if (!msgChar.empty())
+        act(msgChar.c_str(), ch, 0, victim, TO_CHAR);
+
+    if (!msgVict.empty())
+        act(msgVict.c_str(), ch, 0, victim, TO_VICT);
+
+    // Apply waitstate to the victim.
+    if (waitMax != 0)
+        victim->setWait(number_range(waitMin, waitMax));
+
+    // Inflict the damage.
+    damage_nocatch(ch, victim, dam, sn, damtype, true, flags);
+}

@@ -36,6 +36,7 @@ extern "C"
                 Plugin::registerPlugin<MocRegistrator<DefaultSpell> >( ppl );                
                 Plugin::registerPlugin<MocRegistrator<GateSpell> >( ppl );                
                 Plugin::registerPlugin<MocRegistrator<SummonSpell> >( ppl );                
+                Plugin::registerPlugin<MocRegistrator<AnatoliaCombatSpell> >( ppl );
                 Plugin::registerPlugin<MocRegistrator<SleepAffectHandler> >( ppl );                
                 Plugin::registerPlugin<XMLVariableRegistrator<SkillHelp> >( ppl );
                 Plugin::registerPlugin<XMLAttributeVarRegistrator<XMLAttributeRestring> >( ppl );

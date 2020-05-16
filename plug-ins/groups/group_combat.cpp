@@ -37,76 +37,6 @@
 
 
 
-SPELL_DECL(AcetumPrimus);
-VOID_SPELL(AcetumPrimus)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 8 );
-    if (saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ))
-        dam /= 2;
-    
-    act("Плащ первобытной кислоты обволакивает $C4 и, искрясь, поглощает все, к чему прикасается.", ch, 0, victim, TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
-}
-
-SPELL_DECL(AcidArrow);
-VOID_SPELL(AcidArrow)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice( level, 12 );
-    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
-        dam /= 2;
-    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
-}
-
-
-SPELL_DECL(AcidBlast);
-VOID_SPELL(AcidBlast)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice( level, 18 );
-    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
-        dam /= 2;
-    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
-}
-
-
-
-SPELL_DECL(BurningHands);
-VOID_SPELL(BurningHands)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice(level , 2) + 7;
-    if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
-        dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_FIRE,true, DAMF_SPELL);
-}
-
-
-SPELL_DECL(CausticFont);
-VOID_SPELL(CausticFont)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice( level, 9 );
-    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL|DAMF_WATER ) )
-        dam /= 2;
-        
-    act("Фонтан едкой жидкости образуется у ног $C2.\n\r"
-        "Запах $S разлагающихся тканей просто отвратителен!",
-        ch, 0, victim, TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
-}
-
-
 SPELL_DECL(ChainLightning);
 VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -202,12 +132,6 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 
 }
 
-TYPE_SPELL(int, ChainLightning)::getMaxRange( Character * ) const
-{
-    return 0;
-}
-
-
 SPELL_DECL(ChillTouch);
 VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -277,23 +201,6 @@ VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level
         sand_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
 }
 
-
-
-SPELL_DECL(Disruption);
-VOID_SPELL(Disruption)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 9 );
-    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
-        dam /= 2;
-
-    act("Загадочная сила охватывает $C4, заставляя усомниться в $S дальнейшем существовании.", ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
-}
-
-
-
 SPELL_DECL(EtheralFist);
 VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -310,52 +217,6 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
            ch,0,victim,TO_NOTVICT);
     damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
-
-
-
-SPELL_DECL(Fireball);
-VOID_SPELL(Fireball)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 15);
-    if ( saves_spell( level, victim, DAM_FIRE,ch, DAMF_SPELL) )
-        dam /= 2;
-
-    damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);
-}
-
-
-
-SPELL_DECL(Flamestrike);
-VOID_SPELL(Flamestrike)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice(level, 10);
-    if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
-        dam /= 2;
-
-    damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);
-}
-
-
-
-SPELL_DECL(GalvanicWhip);
-VOID_SPELL(GalvanicWhip)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 7 );
-    if ( saves_spell( level, victim, DAM_LIGHTNING,ch, DAMF_SPELL ) )
-        dam /= 2;
-    
-    act("$c1 заклинает хлыст ионизированных частиц, который яростно хлещет $C4.",
-           ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_LIGHTNING,true, DAMF_SPELL);
-}
-
-
 
 SPELL_DECL(HandOfUndead);
 VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int level ) 
@@ -433,19 +294,6 @@ VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level )
 }
 
 
-SPELL_DECL(LightningBolt);
-VOID_SPELL(LightningBolt)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice(level,4) + 12;
-    if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
-        dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_LIGHTNING ,true, DAMF_SPELL);
-}
-
-
 SPELL_DECL(MagicMissile);
 VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -509,59 +357,6 @@ VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int lev
           dam /= 2;
       damage_nocatch( ch, victim, dam, sn, DAM_ENERGY ,true, DAMF_SPELL);
     }
-}
-
-SPELL_DECL(MagneticTrust);
-VOID_SPELL(MagneticTrust)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 8 );
-    if ( saves_spell( level, victim, DAM_LIGHTNING,ch, DAMF_SPELL ) )
-        dam /= 2;
-
-    act("Твои волосы встают дыбом от ощущения невидимых потоков энергии рядом с тобой.", ch, 0, victim, TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_LIGHTNING,true, DAMF_SPELL);
-}
-
-SPELL_DECL(MindWrack);
-VOID_SPELL(MindWrack)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 7 );
-    if ( saves_spell( level, victim, DAM_MENTAL,ch, DAMF_SPELL ) )
-        dam /= 2;
-    act("$c1 пристально смотрит на $C4, повергая $S в сонливость.",
-           ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_MENTAL,true, DAMF_SPELL);
-}
-
-
-SPELL_DECL(MindWrench);
-VOID_SPELL(MindWrench)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 9 );
-    if ( saves_spell( level, victim, DAM_MENTAL,ch, DAMF_SPELL ) )
-        dam /= 2;
-    act("$c1 пристально смотрит на $C4, вызывая в $Z ненормальное оживление.", ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_MENTAL,true, DAMF_SPELL);
-}
-
-
-SPELL_DECL(QuantumSpike);
-VOID_SPELL(QuantumSpike)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 9 );
-    if ( saves_spell( level, victim, DAM_LIGHTNING,ch, DAMF_SPELL ) )
-        dam /= 2;
-    act("Кажется, будто $C1 распадается на мельчайшие несвязанные частицы и вновь мучительно собирается воедино.",
-           ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_LIGHTNING,true, DAMF_SPELL);
 }
 
 
@@ -648,53 +443,6 @@ VOID_SPELL(ShockingGrasp)::run( Character *ch, Character *victim, int sn, int le
     damage_nocatch( ch, victim, dam, sn, DAM_LIGHTNING ,true, DAMF_SPELL);
 }
 
-
-SPELL_DECL(SonicResonance);
-VOID_SPELL(SonicResonance)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice( level, 7 );
-    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
-        dam /= 2;
-    act_p("Цилиндр вибрирующей энергии окружает $C4, заставляя $S резонировать.",
-                ch,0,victim,TO_NOTVICT,POS_RESTING);
-
-    victim->setWait(dreamland->getPulsePerSecond() * number_range(0, 3));
-    damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
-}
-
-SPELL_DECL(SpectralFuror);
-VOID_SPELL(SpectralFuror)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    int dam;
-
-    dam = dice( level, 8 );
-    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
-        dam /= 2;
-
-    act("Космическая материя яростно искажается вокруг $C2!", ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
-}
-
-
-
-SPELL_DECL(SulfurusSpray);
-VOID_SPELL(SulfurusSpray)::run( Character *ch, Character *victim, int sn, int level ) 
-{ 
-    
-    int dam;
-
-    dam = dice( level, 7 );
-    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
-        dam /= 2;
-    act("Вонючая струя серной жидкости низвергается дождем на $C4.",
-           ch,0,victim,TO_NOTVICT);
-    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
-}
-
-
 SPELL_DECL(VampiricBlast);
 VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
@@ -705,18 +453,6 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
         dam /= 2;
     damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
 }
-
-SPELL_DECL(MagicArrow);
-VOID_SPELL(MagicArrow)::run( Character *ch, Character *victim, int sn, int level )
-{
-    int dam;
-
-    dam = dice( level, 1 );
-    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
-            dam /= 2;
-    damage_nocatch( ch, victim, dam, sn, DAM_ENERGY, true, DAMF_SPELL);
-}
-
 
 SPELL_DECL(Hurricane);
 VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level ) 
