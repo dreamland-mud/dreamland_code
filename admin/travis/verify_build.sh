@@ -3,7 +3,7 @@
 ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
-    ccache -s
+    ccache -s # display ccache usage stats
 
     mkdir -p objs && \
     make -f Makefile.git && \

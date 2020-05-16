@@ -13,15 +13,11 @@ addons:
 
 cache: ccache
 
-script: 
-  - ccache -M 2G
-  - bash ./admin/travis/verify_build.sh travis_script
-  - echo travis:$sshpassword | sudo chpasswd
-  - sudo sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
-  - sudo service ssh restart
-  - sudo apt-get install sshpass
-  - sshpass -p $sshpassword ssh -R 9999:localhost:22 -o StrictHostKeyChecking=no travis@$bouncehostip
+before_script:
+  - ccache -M 2G # default ccache limit of 500Mb is not enough for our cache of 800Mb
 
+script: 
+  - bash ./admin/travis/verify_build.sh travis_script
 
 after_success:
   - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
