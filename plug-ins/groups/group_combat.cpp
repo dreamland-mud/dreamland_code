@@ -443,6 +443,17 @@ VOID_SPELL(ShockingGrasp)::run( Character *ch, Character *victim, int sn, int le
     damage_nocatch( ch, victim, dam, sn, DAM_LIGHTNING ,true, DAMF_SPELL);
 }
 
+SPELL_DECL(VampiricBlast);
+VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int level ) 
+{ 
+    int dam;
+
+    dam = dice( level, 12);
+    if ( saves_spell( level, victim, DAM_ACID,ch, DAMF_SPELL ) )
+        dam /= 2;
+    damage_nocatch( ch, victim, dam, sn,DAM_ACID,true, DAMF_SPELL);
+}
+
 SPELL_DECL(Hurricane);
 VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level ) 
 { 
