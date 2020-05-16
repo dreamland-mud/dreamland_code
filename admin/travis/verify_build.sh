@@ -3,12 +3,12 @@
 ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
-    ls -laR $HOME/.ccache
     du -s $HOME/.ccache
     mkdir -p objs && \
     make -f Makefile.git && \
     cd objs && \
     ../configure --prefix=$ROOT && \
+    grep ccache * && \
     make -j 2 && make install 
 }
 
@@ -20,7 +20,6 @@ run_smoke_test() {
 
 travis_script() {
     run_build && run_smoke_test
-    ls -laR $HOME/.ccache
     du -s $HOME/.ccache
 }
 
