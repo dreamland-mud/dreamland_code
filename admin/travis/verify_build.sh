@@ -3,6 +3,8 @@
 ROOT=$TRAVIS_BUILD_DIR
 
 run_build() {
+    ls -laR $HOME/.ccache
+    du -s $HOME/.ccache
     mkdir -p objs && \
     make -f Makefile.git && \
     cd objs && \
@@ -18,6 +20,8 @@ run_smoke_test() {
 
 travis_script() {
     run_build && run_smoke_test
+    ls -laR $HOME/.ccache
+    du -s $HOME/.ccache
 }
 
 set -e # stop on a non-zero exit code
