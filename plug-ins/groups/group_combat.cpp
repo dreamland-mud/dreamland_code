@@ -271,31 +271,31 @@ VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level )
 
         movedam     = number_range( ch->getModifyLevel(), 2 * ch->getModifyLevel() );
 
-        vector<Character*> to_damage;
+        list<Character*> to_damage;        
 
         for (tmp_vict = room->people; tmp_vict != 0; tmp_vict = tmp_next)
         {
                 to_damage.push_back(tmp_vict);
                 tmp_next = tmp_vict->next_in_room;
         }
-
-        for(vector<Character*>::iterator it = to_damage.begin(); it != to_damage.end(); ++it)
+        
+        for(auto& it : to_damage)
         {
-            if((*it) && !(*it)->isDead() && (*it)->in_room == ch->in_room){
+            if(!it->isDead() && it->in_room == ch->in_room){
 
-                if ( (*it)->is_mirror()
+                if ( it->is_mirror()
                     && ( number_percent() < 50 ) ) continue;
 
-                if ( !is_safe_spell(ch,(*it),true))
+                if ( !is_safe_spell(ch,it,true))
                 {
-                        if (ch->fighting != (*it) && (*it)->fighting != ch)
-                            yell_panic( ch, (*it) );
+                        if (ch->fighting != it && it->fighting != ch)
+                            yell_panic( ch, it );
 
-                        if (saves_spell(level,(*it), DAM_COLD,ch, DAMF_SPELL))
+                        if (saves_spell(level,it, DAM_COLD,ch, DAMF_SPELL))
                                 dam /= 2;
                     try{
-                        damage_nocatch( ch, (*it), dam, sn, DAM_COLD, true, DAMF_SPELL );
-                        (*it)->move -= min((int)(*it)->move,movedam);
+                        damage_nocatch( ch, it, dam, sn, DAM_COLD, true, DAMF_SPELL );
+                        it->move -= min((int)it->move,movedam);
                      }
                          catch (const VictimDeathException &) {
                              continue;
