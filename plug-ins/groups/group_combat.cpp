@@ -397,6 +397,10 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                         continue;
                 if ( is_safe(ch, vch) )
                         continue;
+
+                if (ch->fighting != vch && vch->fighting != ch)
+                yell_panic( ch, vch );
+                
             try{
                 if ( saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL) )
                 {

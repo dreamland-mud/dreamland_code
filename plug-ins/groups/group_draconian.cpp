@@ -232,9 +232,9 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 break;
 
         case 4:
-                poison_effect(ch->in_room,level,dam,TARGET_ROOM, DAMF_SPELL);
+                poison_effect(victim->in_room,level,dam,TARGET_ROOM, DAMF_SPELL);
 
-                for ( auto &vch : ch->in_room->getPeople())
+                for ( auto &vch : victim->in_room->getPeople())
                 {
        
                         if ( vch->is_mirror()
@@ -271,6 +271,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 break;
 
         case 5:
+        ch->send_to("light");
                 if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL))
                 {
                         shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
