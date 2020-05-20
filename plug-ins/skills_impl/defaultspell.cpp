@@ -123,7 +123,7 @@ int DefaultSpell::getMaxRange( Character *ch ) const
 
     int level = skill->getLevel( ch ); 
         
-    return level / 10;
+    return max(1,level / 10);
 }
 
 /*
