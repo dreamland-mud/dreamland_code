@@ -879,7 +879,7 @@ bool UndefinedOneHit::defenseHandBlock( )
  */
 void UndefinedOneHit::damEffectCriticalStrike( )
 {
-    Debug d(ch, "critical", "critical");
+    Debug d(ch, "debug_critical", "critical");
     int diceroll, chance, skill, stun_chance, blind_chance;
     Affect baf;
 
@@ -1167,6 +1167,7 @@ void UndefinedOneHit::damApplyDeathblow( )
 
 void UndefinedOneHit::damEffectMasterHand()
 {
+    Debug d(ch, "debug_ninja", "stun");
     int diceroll, skill, level;
     float chance, skill_mod, stat_mod, level_mod, quick_mod;
     Affect af;
@@ -1204,21 +1205,28 @@ void UndefinedOneHit::damEffectMasterHand()
 
     chance += skill * skill_mod;
     chance += skill_level_bonus(*gsn_mastering_pound, ch);
+    d.log(chance, "skill");
     chance += (ch->getCurrStat(STAT_STR) - victim->getCurrStat(STAT_CON)) * stat_mod * 100;
+    d.log(chance, "stats");
     chance += (level - victim->getModifyLevel()) * level_mod * 100;
+    d.log(chance, "lvl");
 
     if (IS_AFFECTED(ch, AFF_WEAK_STUN)) {
         chance = chance / 2;
+        d.log(chance, "stun");        
     }
 
     if (IS_QUICK(ch)) {
         chance += quick_mod * 100;
+        d.log(chance, "quick");
     }
     if (IS_QUICK(victim)) {
         chance -= quick_mod * 100;
+        d.log(chance, "quick");
     }
 
     chance = max(1, (int)chance); // there's always a chance;
+    d.log(chance, "final");
 
     if (diceroll > chance)
         return;
@@ -1233,11 +1241,8 @@ void UndefinedOneHit::damEffectMasterHand()
             act("{rТвой удар отклонен тебе ж в голову! Ты слегка оглушаешь СЕБЯ!{x", ch, 0, victim, TO_CHAR);
             act("{r$c1 слегка оглушает СЕБЯ ударом в голову!{x", ch, 0, victim, TO_NOTVICT);
         }
-    } else {
-        if (diceroll < (chance / 2)) {
-            if (ch == victim)
-                return;
-
+    } else if (diceroll < (chance / 2) && !IS_AFFECTED(victim, AFF_STUN)) {
+        if (ch != victim) {
             SET_BIT(victim->affected_by, AFF_STUN);
 
             act("{rМощной серией ударов в голову ты сильно оглушаешь $C4!{x", ch, 0, victim, TO_CHAR);
@@ -1245,14 +1250,18 @@ void UndefinedOneHit::damEffectMasterHand()
             act("{r$c1 оглушает $C4 мощной серией ударов в голову!{x", ch, 0, victim, TO_NOTVICT);
         }
     }
+
     gsn_mastering_pound->improve(ch, true, victim);
 }
 
 void UndefinedOneHit::damApplyMasterHand()
 {
+    Debug d(ch, "debug_mpound", "mpound");
     int diceroll, skill;
     float dam_bonus, stat_mod, level_mod;
     Affect af;
+
+    d.log(dam, "orig damage");
 
     skill = gsn_mastering_pound->getEffective(ch);
     dam_bonus = 0;
@@ -1271,11 +1280,19 @@ void UndefinedOneHit::damApplyMasterHand()
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
 
     dam_bonus += (ch->getCurrStat(STAT_STR) - 20) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead
+    d.log(dam_bonus, "stats");
     dam_bonus += (skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel()) * level_mod * 100;
     dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;
+    d.log(dam_bonus, "lvl");
     dam_bonus = (int)URANGE(1, (int)dam_bonus, 20);
+    d.log(dam_bonus, "final");
 
-    dam += dice(dam_bonus, 10) * skill / 100;
+    int bonus_dice = dice(dam_bonus, 10) * skill / 100;
+    d.log(bonus_dice, "damage bonus");
+    dam += bonus_dice;
+
+    int old_bonus_dice = dice( 3 + ch->getModifyLevel() / 10, 10 ) * skill / 100;
+    d.log(old_bonus_dice, "{yold damage bonus{x");
 }
 
 void UndefinedOneHit::damApplyReligion()

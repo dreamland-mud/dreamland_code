@@ -14,13 +14,13 @@ Debug::~Debug()
             && !ch->is_npc() 
             && ch->getPC()->getAttributes().isAvailable(attr)) 
     {
-        ch->printf("%s chances: %s\r\n", label, result.c_str());
+        ch->printf("{C[{cDebug{C]{W %s: {C%s\r\n", label, result.c_str());
     }
 }        
 
 Debug & Debug::log(float chance, const char *msg)
 {
-    buf << msg << "={C" << chance << "{x, ";
+    buf << msg << "{W={c" << chance << "{C, ";
     return *this;
 }
 

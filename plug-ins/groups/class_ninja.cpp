@@ -13,7 +13,6 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include <sstream>
-#include "skill.h"
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"
 
@@ -30,16 +29,11 @@
 #include "magic.h"
 #include "occupations.h"
 #include "fight.h"
-#include "onehit.h"
 #include "onehit_weapon.h"
-#include "damage_impl.h"
 #include "chance.h"
-#include "clan.h"
-#include "vnum.h"
 #include "merc.h"
 #include "handler.h"
 #include "act.h"
-#include "interp.h"
 #include "def.h"
 #include "stats_apply.h"
 #include "debug_utils.h"
@@ -50,7 +44,7 @@
 
 SKILL_RUNP( vanish )
 {
-    Debug d(ch, "ninja", "vanish");
+    Debug d(ch, "debug_ninja", "vanish");
     Character *victim;
     float chance, kidnap_chance = 0, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
     bool FightingCheck;    
@@ -349,7 +343,7 @@ SKILL_RUNP( vanish )
 
 SKILL_RUNP( nerve )
 {
-        Debug d(ch, "ninja", "nerve");
+        Debug d(ch, "debug_ninja", "nerve");
         Character *victim;
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
         bool FightingCheck;
@@ -640,7 +634,7 @@ AssassinateOneHit::AssassinateOneHit( Character *ch, Character *victim )
 
 void AssassinateOneHit::calcDamage( )
 {
-    Debug d(ch, "ninja", "assa");
+    Debug d(ch, "debug_ninja", "assa");
     float chance, skill_mod, stat_mod, level_mod, size_mod, vis_mod, sleep_mod, quick_mod, time_mod;
 
     //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
@@ -869,7 +863,7 @@ SKILL_RUNP( assassinate )
 
 SKILL_RUNP( caltraps )
 {
-  Debug d(ch, "ninja", "caltraps");
+  Debug d(ch, "debug_ninja", "caltraps");
   Character *victim;
   float chance, skill_mod, stat_mod, quick_mod, size_mod, sleep_mod, vis_mod;
   bool FightingCheck;
@@ -1123,7 +1117,7 @@ void ThrowDownOneHit::calcDamage( )
 
 SKILL_RUNP( throwdown )
 {
-        Debug d(ch, "ninja", "throw");
+        Debug d(ch, "debug_ninja", "throw");
         Character *victim;
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod;
         bool FightingCheck;
@@ -1352,7 +1346,7 @@ SKILL_RUNP( throwdown )
 
 SKILL_RUNP( strangle )
 {
-        Debug d(ch, "ninja", "strangle");
+        Debug d(ch, "debug_ninja", "strangle");
         Character *victim;
         Affect af;    
         float chance, skill_mod, stat_mod, level_mod, quick_mod, size_mod, sleep_mod, vis_mod, time_mod;
