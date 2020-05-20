@@ -26,6 +26,7 @@
 #include "room.h"
 #include "object.h"
 #include "desire.h"
+#include "damage.h"
 
 #include "gsn_plugin.h"
 #include "act_move.h"
@@ -124,7 +125,7 @@ static void yell_explode( Character *ch, Character *victim )
 
 SKILL_RUNP( explode )
 {
-    Character *vch, *vch_next, *victim;
+    Character *victim;
     int dam, hp_dam, dice_dam, mana;
     int hpch, level;
     char arg[MAX_INPUT_LENGTH];
@@ -185,8 +186,9 @@ SKILL_RUNP( explode )
         fire_effect(victim->in_room,level,dam/2,TARGET_ROOM);
     }
 
-    for (vch = victim->in_room->people; vch != 0; vch = vch_next) {
-        vch_next = vch->next_in_room;
+    for ( auto &vch : victim->in_room->getPeople()){
+       
+       if(!vch->isDead() && vch->in_room == victim->in_room){
 
         if ( vch->is_mirror() && ( number_percent() < 50 ) ) 
             continue;
@@ -201,11 +203,21 @@ SKILL_RUNP( explode )
 
         if (vch == victim) /* full damage */ {
             fire_effect(vch,level,dam,TARGET_CHAR);
-            damage(ch,vch,dam,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+            try{
+            damage_nocatch(ch,vch,dam,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+            }
+            catch (const VictimDeathException &){
+                continue;
+            }
         }
         else /* partial damage */ {
+            try{
             fire_effect(vch,level/2,dam/4,TARGET_CHAR);
-            damage(ch,vch,dam/2,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+            damage_nocatch(ch,vch,dam/2,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+            }
+            catch (const VictimDeathException &){
+                continue;
+            }
         }
         
         yell_explode( ch, vch);
@@ -213,7 +225,8 @@ SKILL_RUNP( explode )
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch )) {        
         fire_effect(ch,level/4,dam/10,TARGET_CHAR);
-        damage(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+        damage_nocatch(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+    }
     }
 }
 
