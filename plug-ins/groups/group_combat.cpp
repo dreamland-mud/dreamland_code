@@ -68,6 +68,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
         found = false;
         for (auto &tmp_vict : ch->in_room->getPeople())
         {
+          
           if (!is_safe_spell(ch,tmp_vict,true) && tmp_vict != last_vict)
           {
 
@@ -400,7 +401,7 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
 
                 if (ch->fighting != vch && vch->fighting != ch)
                 yell_panic( ch, vch );
-                
+
             try{
                 if ( saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL) )
                 {
