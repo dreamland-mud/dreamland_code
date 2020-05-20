@@ -222,11 +222,12 @@ SKILL_RUNP( explode )
         
         yell_explode( ch, vch);
     }
+    }
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch )) {        
         fire_effect(ch,level/4,dam/10,TARGET_CHAR);
         damage_nocatch(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
-    }
+    
     }
 }
 
