@@ -271,27 +271,39 @@ VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level )
 
         movedam     = number_range( ch->getModifyLevel(), 2 * ch->getModifyLevel() );
 
+        vector<Character*> to_damage;
+
         for (tmp_vict = room->people; tmp_vict != 0; tmp_vict = tmp_next)
         {
+                to_damage.push_back(tmp_vict);
                 tmp_next = tmp_vict->next_in_room;
-
-                if ( tmp_vict->is_mirror()
-                    && ( number_percent() < 50 ) ) continue;
-
-                if ( !is_safe_spell(ch,tmp_vict,true))
-                {
-                        if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                            yell_panic( ch, tmp_vict );
-
-                        if (saves_spell(level,tmp_vict, DAM_COLD,ch, DAMF_SPELL))
-                                dam /= 2;
-
-                        damage_nocatch( ch, tmp_vict, dam, sn, DAM_COLD, true, DAMF_SPELL );
-                        tmp_vict->move -= min((int)tmp_vict->move,movedam);
-                }
         }
 
-}
+        for(vector<Character*>::iterator it = to_damage.begin(); it != to_damage.end(); ++it)
+        {
+            if((*it) && !(*it)->isDead() && (*it)->in_room == ch->in_room){
+
+                if ( (*it)->is_mirror()
+                    && ( number_percent() < 50 ) ) continue;
+
+                if ( !is_safe_spell(ch,(*it),true))
+                {
+                        if (ch->fighting != (*it) && (*it)->fighting != ch)
+                            yell_panic( ch, (*it) );
+
+                        if (saves_spell(level,(*it), DAM_COLD,ch, DAMF_SPELL))
+                                dam /= 2;
+                    try{
+                        damage_nocatch( ch, (*it), dam, sn, DAM_COLD, true, DAMF_SPELL );
+                        (*it)->move -= min((int)(*it)->move,movedam);
+                     }
+                         catch (const VictimDeathException &) {
+                             continue;
+                    }
+                }                       
+             }
+        }
+ }
 
 
 SPELL_DECL(MagicMissile);
