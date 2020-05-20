@@ -228,8 +228,7 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
 SPELL_DECL(Earthquake);
 VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     int dam;
 
     ch->send_to("Земля дрожит под твоими ногами!\n\r");
@@ -237,9 +236,8 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
 
     area_message( ch, "Земля слегка дрожит под твоими ногами.", true );
 
-    for (vch = room->people; vch != 0; vch = vch_next )
+    for ( auto &vch : room->getPeople() )
     {
-        vch_next        = vch->next_in_room;
 
         if (DIGGED(vch) && vch->was_in_room->area == room->area)
             if (!is_safe_nomessage( ch, vch ) && number_percent( ) < ch->getSkill( sn ) / 2)
@@ -265,7 +263,12 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
         case SECT_INSIDE:   dam *= 2; break;
         }
 
+        try{
         damage_nocatch( ch, vch, dam, sn, DAM_BASH, true, DAMF_SPELL );
+        }
+        catch (const VictimDeathException &){
+            continue;
+        }
     }
 }
 

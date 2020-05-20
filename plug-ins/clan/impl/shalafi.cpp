@@ -337,8 +337,7 @@ TYPE_SPELL(bool, MentalKnife)::spellbane( Character *, Character * ) const
 SPELL_DECL(Scourge);
 VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-  Character *tmp_vict;
-  Character *tmp_next;
+
   int dam;
 
   if( ch->getModifyLevel() < 40 )
@@ -347,40 +346,44 @@ VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level )
         dam = dice(level,9);
   else dam = dice(level,12);
 
-  for (tmp_vict = room->people;tmp_vict != 0;
-       tmp_vict = tmp_next)
-    {
-      tmp_next = tmp_vict->next_in_room;
 
-        if ( tmp_vict->is_mirror()
+        for(auto &it : ch->in_room->getPeople())
+        {
+            if(!it->isDead() && it->in_room == ch->in_room){
+
+        if ( it->is_mirror()
             && ( number_percent() < 50 ) ) continue;
                         
 
-      if ( !is_safe_spell(ch,tmp_vict,true))
+      if ( !is_safe_spell(ch,it,true))
         {
-            if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                yell_panic( ch, tmp_vict );
+            if (ch->fighting != it && it->fighting != ch)
+                yell_panic( ch, it );
         
-          if (!tmp_vict->isAffected(sn)) {
+          if (!it->isAffected(sn)) {
         
+          try{
+            if (number_percent() < level)
+              spell(gsn_poison, level, ch, it);
 
             if (number_percent() < level)
-              spell(gsn_poison, level, ch, tmp_vict);
+              spell(gsn_blindness,level,ch,it);
 
             if (number_percent() < level)
-              spell(gsn_blindness,level,ch,tmp_vict);
+              spell(gsn_weaken, level, ch, it);
 
-            if (number_percent() < level)
-              spell(gsn_weaken, level, ch, tmp_vict);
-
-            if (saves_spell(level,tmp_vict, DAM_FIRE, ch, DAMF_SPELL))
+            if (saves_spell(level,it, DAM_FIRE, ch, DAMF_SPELL))
               dam /= 2;
-            damage( ch, tmp_vict, ch->applyCurse( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
+            damage( ch, it, ch->applyCurse( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
           }
-
+            catch (const VictimDeathException &) {
+                   continue;
+            }
+          }
         }
-    }
 
+      }
+    }
 }
 
 

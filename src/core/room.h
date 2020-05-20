@@ -73,6 +73,7 @@ public:
     void vecho( int, const char *, va_list ) const;
     void echo( int, const char *, ... ) const;
     void echoAround( int, const char *, ... ) const;
+    list<Character*> getPeople( );
 
 public:
     Room *        next;
