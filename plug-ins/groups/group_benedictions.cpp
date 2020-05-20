@@ -434,6 +434,8 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
 
     for ( auto &vch : room->getPeople() )
     {
+
+        if(!vch->isDead() && vch->in_room == room){
         
         if (vch->is_mirror() && number_percent() < 50) 
             continue;
@@ -495,6 +497,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
             ch->hit /= (4/3);
             throw ex;
         }
+    }
     }
 
     ch->send_to("Ты чувствуешь себя опустошенно.\n\r");

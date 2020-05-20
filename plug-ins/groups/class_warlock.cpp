@@ -169,6 +169,8 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
 
         for ( auto &vch : room->getPeople())
         {
+            if(!vch->isDead() && vch->in_room == room){
+
                 if (is_safe_spell(ch,vch,true))
                         continue;
 
@@ -182,7 +184,8 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
                         scream_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
                 else
                         scream_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-        }
+            }
+       }
 
 }
 

@@ -391,6 +391,11 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
 
         for ( auto &vch : room->getPeople() )
         {
+            if(!vch->isDead() && vch->in_room == room){
+
+                if (vch->is_mirror() && number_percent() < 50) 
+                continue;
+
                if ( is_safe_spell(ch,vch,true )
                         || ( vch->is_npc()
                                 && ch->is_npc()
@@ -418,7 +423,7 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                 continue;
             }
         }
-
+        }
 }
 
 SPELL_DECL(ShockingGrasp);
@@ -496,7 +501,13 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
 
     for ( auto &vch : room->getPeople())
-    {
+    {            
+        if(!vch->isDead() && vch->in_room == room){
+
+        if (vch->is_mirror() && number_percent() < 50) 
+        continue;
+        
+
         if (is_safe_spell(ch,vch,true))
             continue;
 
@@ -527,6 +538,7 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
     catch (const VictimDeathException &){
         continue;
     }
+        }
 
     }
 

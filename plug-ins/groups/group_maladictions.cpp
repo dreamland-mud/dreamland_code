@@ -824,6 +824,7 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
 
         for(auto &it : ch->in_room->getPeople())
         {
+            
         if(!it->isDead() && it->in_room == ch->in_room){
             
             try{

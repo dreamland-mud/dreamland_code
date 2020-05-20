@@ -62,6 +62,8 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
 
     for ( auto &vch : room->getPeople()) {
 
+        if(!vch->isDead() && vch->in_room == room){
+
         if (vch->is_mirror() && number_percent() < 50) 
             continue;
 
@@ -77,6 +79,7 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
         }
         catch (const VictimDeathException &){
             continue;
+        }
         }
     }
 }

@@ -239,6 +239,8 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
     for ( auto &vch : room->getPeople() )
     {
 
+         if(!vch->isDead() && vch->in_room == room){   
+
         if (DIGGED(vch) && vch->was_in_room->area == room->area)
             if (!is_safe_nomessage( ch, vch ) && number_percent( ) < ch->getSkill( sn ) / 2)
                 undig_earthquake( vch );
@@ -269,6 +271,7 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
         catch (const VictimDeathException &){
             continue;
         }
+    }
     }
 }
 

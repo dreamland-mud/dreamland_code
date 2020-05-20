@@ -112,6 +112,8 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {
+                        if(!vch->isDead() && vch->in_room == victim->in_room){
+
                         if ( vch->is_mirror()
                         && ( number_percent() < 50 ) ) continue;
 
@@ -160,6 +162,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                         continue;
                                 }
                         }
+                        }
                 }
     break;
 
@@ -180,7 +183,9 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 cold_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
                 for ( auto &vch : victim->in_room->getPeople())
-                {
+                {                        
+                        if(!vch->isDead() && vch->in_room == victim->in_room){
+
                         if ( vch->is_mirror()
                         && ( number_percent() < 50 ) ) continue;
 
@@ -228,6 +233,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                         continue;
                                 }
                         }
+                        }
                 }
                 break;
 
@@ -236,6 +242,8 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {
+
+                        if(!vch->isDead() && vch->in_room == victim->in_room){
        
                         if ( vch->is_mirror()
                         && ( number_percent() < 50 ) ) continue;
@@ -266,6 +274,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         }
                         catch (const VictimDeathException &){
                                 continue;
+                        }
                         }
                 }
                 break;
@@ -306,7 +315,8 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
 
     for ( auto &vch : victim->in_room->getPeople())
     {
-       
+       if(!vch->isDead() && vch->in_room == victim->in_room){
+
         if ( vch->is_mirror()
             && ( number_percent() < 50 ) ) continue;
 
@@ -354,6 +364,7 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
                         continue;
                 }
         }
+       }
     }
 
 }
@@ -377,6 +388,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
 
     for ( auto &vch : victim->in_room->getPeople())
     {
+        if(!vch->isDead() && vch->in_room == victim->in_room){
 
         if ( vch->is_mirror()
             && ( number_percent() < 50 ) ) continue;
@@ -425,6 +437,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
                         continue;
                 }
         }
+        }
     }
 
 }
@@ -448,6 +461,8 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 
     for ( auto &vch : room->getPeople())
     {
+        if(!vch->isDead() && vch->in_room == room){
+
         if ( vch->is_mirror()
             && ( number_percent() < 50 ) ) continue;
 
@@ -478,6 +493,7 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
 
         catch (const VictimDeathException &){
                 continue;
+        }
         }
     }
 
