@@ -202,8 +202,8 @@ SKILL_RUNP( explode )
             continue;
 
         if (vch == victim) /* full damage */ {
-            fire_effect(vch,level,dam,TARGET_CHAR);
             try{
+            fire_effect(vch,level,dam,TARGET_CHAR);            
             damage_nocatch(ch,vch,dam,gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
             }
             catch (const VictimDeathException &){
@@ -226,7 +226,7 @@ SKILL_RUNP( explode )
 
     if (!ch->is_npc() && number_percent() >= gsn_explode->getEffective( ch )) {        
         fire_effect(ch,level/4,dam/10,TARGET_CHAR);
-        damage_nocatch(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
+        damage(ch,ch,(ch->hit / 10),gsn_explode,DAM_FIRE,true, DAMF_WEAPON);
     
     }
 }
