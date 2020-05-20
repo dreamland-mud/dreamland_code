@@ -1167,7 +1167,7 @@ void UndefinedOneHit::damApplyDeathblow( )
 
 void UndefinedOneHit::damEffectMasterHand()
 {
-    Debug d(ch, "debug_ninja", "mpound");
+    Debug d(ch, "debug_ninja", "stun");
     int diceroll, skill, level;
     float chance, skill_mod, stat_mod, level_mod, quick_mod;
     Affect af;
@@ -1256,10 +1256,12 @@ void UndefinedOneHit::damEffectMasterHand()
 
 void UndefinedOneHit::damApplyMasterHand()
 {
-    Debug d(ch, "debug_ninja", "mpound");
+    Debug d(ch, "debug_mpound", "mpound");
     int diceroll, skill;
     float dam_bonus, stat_mod, level_mod;
     Affect af;
+
+    d.log(dam, "orig damage");
 
     skill = gsn_mastering_pound->getEffective(ch);
     dam_bonus = 0;
@@ -1278,15 +1280,19 @@ void UndefinedOneHit::damApplyMasterHand()
     //////////////// SUCCESS: CALCULATING EFFECT ////////////////
 
     dam_bonus += (ch->getCurrStat(STAT_STR) - 20) * stat_mod * 100; // TODO: this should roll vs. victim's CON instead
+    d.log(dam_bonus, "stats");
     dam_bonus += (skill_level(*gsn_mastering_pound, ch) - victim->getModifyLevel()) * level_mod * 100;
     dam_bonus += skill_level(*gsn_mastering_pound, ch) / 10;
+    d.log(dam_bonus, "lvl");
     dam_bonus = (int)URANGE(1, (int)dam_bonus, 20);
-    d.log(dam, "dam");
-    d.log(dam_bonus, "dam_bonus");
-    d.log(3 + ch->getModifyLevel() / 10, "old_dam_bonus");
+    d.log(dam_bonus, "final");
 
-    dam += dice(dam_bonus, 10) * skill / 100;
-    d.log(dam, "dam");
+    int bonus_dice = dice(dam_bonus, 10) * skill / 100;
+    d.log(bonus_dice, "damage bonus");
+    dam += bonus_dice;
+
+    int old_bonus_dice = dice( 3 + ch->getModifyLevel() / 10, 10 ) * skill / 100;
+    d.log(old_bonus_dice, "{yold damage bonus{x");
 }
 
 void UndefinedOneHit::damApplyReligion()

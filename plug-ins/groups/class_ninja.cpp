@@ -13,7 +13,6 @@
  *    и все остальные, кто советовал и играл в этот MUD                    *
  ***************************************************************************/
 #include <sstream>
-#include "skill.h"
 #include "skillcommandtemplate.h"
 #include "skillmanager.h"
 
@@ -30,16 +29,11 @@
 #include "magic.h"
 #include "occupations.h"
 #include "fight.h"
-#include "onehit.h"
 #include "onehit_weapon.h"
-#include "damage_impl.h"
 #include "chance.h"
-#include "clan.h"
-#include "vnum.h"
 #include "merc.h"
 #include "handler.h"
 #include "act.h"
-#include "interp.h"
 #include "def.h"
 #include "stats_apply.h"
 #include "debug_utils.h"
