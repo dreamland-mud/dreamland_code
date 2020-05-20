@@ -271,7 +271,6 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 break;
 
         case 5:
-        ch->send_to("light");
                 if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL))
                 {
                         shock_effect(victim,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
