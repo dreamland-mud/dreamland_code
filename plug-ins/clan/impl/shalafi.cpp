@@ -347,34 +347,34 @@ VOID_SPELL(Scourge)::run( Character *ch, Room *room, int sn, int level )
   else dam = dice(level,12);
 
 
-        for(auto &it : ch->in_room->getPeople())
+        for(auto &tmp_vict : ch->in_room->getPeople())
         {
-            if(!it->isDead() && it->in_room == ch->in_room){
+            if(!tmp_vict->isDead() && tmp_vict->in_room == ch->in_room){
 
-        if ( it->is_mirror()
+        if ( tmp_vict->is_mirror()
             && ( number_percent() < 50 ) ) continue;
                         
 
-      if ( !is_safe_spell(ch,it,true))
+      if ( !is_safe_spell(ch,tmp_vict,true))
         {
-            if (ch->fighting != it && it->fighting != ch)
-                yell_panic( ch, it );
+            if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
+                yell_panic( ch, tmp_vict );
         
-          if (!it->isAffected(sn)) {
+          if (!tmp_vict->isAffected(sn)) {
         
           try{
             if (number_percent() < level)
-              spell(gsn_poison, level, ch, it);
+              spell(gsn_poison, level, ch, tmp_vict);
 
             if (number_percent() < level)
-              spell(gsn_blindness,level,ch,it);
+              spell(gsn_blindness,level,ch,tmp_vict);
 
             if (number_percent() < level)
-              spell(gsn_weaken, level, ch, it);
+              spell(gsn_weaken, level, ch, tmp_vict);
 
-            if (saves_spell(level,it, DAM_FIRE, ch, DAMF_SPELL))
+            if (saves_spell(level,tmp_vict, DAM_FIRE, ch, DAMF_SPELL))
               dam /= 2;
-            damage( ch, it, ch->applyCurse( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
+            damage_nocatch( ch, tmp_vict, ch->applyCurse( dam ), sn, DAM_FIRE, true, DAMF_SPELL );
           }
             catch (const VictimDeathException &) {
                    continue;

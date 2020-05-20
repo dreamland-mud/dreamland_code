@@ -490,7 +490,7 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
 
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
 
-    for ( auto &vch : ch->in_room->getPeople())
+    for ( auto &vch : room->getPeople())
     {
         if (is_safe_spell(ch,vch,true))
             continue;

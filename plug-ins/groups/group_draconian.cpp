@@ -112,6 +112,9 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {
+                        if ( vch->is_mirror()
+                        && ( number_percent() < 50 ) ) continue;
+
 
                         if ( is_safe_spell(ch,vch,true)
                                 || ( vch->is_npc() && ch->is_npc()
@@ -178,6 +181,9 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                 for ( auto &vch : victim->in_room->getPeople())
                 {
+                        if ( vch->is_mirror()
+                        && ( number_percent() < 50 ) ) continue;
+
                         if ( is_safe_spell(ch,vch,true)
                                 || ( vch->is_npc() && ch->is_npc()
                                         && (ch->fighting != vch && vch->fighting != ch)))
@@ -231,6 +237,9 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                 for ( auto &vch : ch->in_room->getPeople())
                 {
        
+                        if ( vch->is_mirror()
+                        && ( number_percent() < 50 ) ) continue;
+
                         if ( is_safe_spell(ch,vch,true)
                                 || ( ch->is_npc() && vch->is_npc()
                                         && (ch->fighting != vch && vch->fighting != ch)))
