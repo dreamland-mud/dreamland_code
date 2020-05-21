@@ -221,7 +221,7 @@ SKILL_RUNP( control )
   if ( IS_SET( victim->form, FORM_NONADOPTABLE ) ||
        IS_SET( victim->form, FORM_UNDEAD ) || 
        IS_SET( victim->form, FORM_CONSTRUCT ) ) {
-	ch->send_to("Это существо не поддается доминации.\n\r");
+	ch->send_to("Это существо не поддается доминированию.\n\r");
 	return;        
   }	
     
@@ -268,9 +268,11 @@ SKILL_RUNP( control )
   chance = URANGE(1, (int)chance, 100) ;   
   
   // can't dominate shoppers or +5 level mobs    
-  if ( (clevel < (vlevel + 5)) ||
-       ( (victim->is_npc( )) && (victim->getNPC( )->behavior) &&
-	 (IS_SET(victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER))) ) )
+  if ( (vlevel - clevel) > 5 )
+	  chance = 0;	  
+  
+  if ( (victim->is_npc( )) && (victim->getNPC( )->behavior) &&
+       (IS_SET( victim->getNPC( )->behavior->getOccupation( ), (1 << OCC_SHOPPER) )) )
 	  chance = 0;
 
   //////////////// THE ROLL ////////////////
@@ -579,14 +581,16 @@ void sucking( Character *ch, Character *victim )
     		af.duration  = level / 10;
     		af.location  = APPLY_HITROLL;
     		af.modifier  = - (level / 10);
-    		if (victim->is_npc())
-    			af.bitvector = 0;
-    		else
-    			af.bitvector = AFF_CORRUPTION;
+    		af.bitvector = AFF_CORRUPTION;
         	affect_join( victim, &af );	
-	    
-    		act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
-    		act_p("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
+	    	
+		if (!IS_AWAKE( victim )) {
+    			act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
+		}
+		else {
+    			act_p("Ты стонешь во сне, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);			
+		}
+		act_p("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
     	}	    
         victim->position = POS_SLEEPING;
                                
@@ -697,7 +701,7 @@ SKILL_RUNP( bite )
         return;
     }
 
-    if ( !IS_AWAKE(victim) )
+    if ( IS_AWAKE(victim) )
     {
         ch->send_to("Сначала усыпи жертву.\n\r");
         return;
@@ -710,21 +714,6 @@ SKILL_RUNP( bite )
     
     if ( is_safe( ch, victim ) )
       return;
-
-    if ( victim->fighting != 0 )
-    {
-        ch->send_to("Ты не можешь укусить того, кто сражается.\n\r");
-        return;
-    }
-	
-    if ( victim->hit < victim->max_hit
-            && victim->can_see(ch)
-            && IS_AWAKE(victim) )
-    {
-            act_p( "$C1 ран$Gено|ен|ена и настороженно оглядывается... ты не можешь подкрасться.",
-                    ch, 0, victim, TO_CHAR,POS_RESTING);
-            return;
-    }
 	
     if (IS_SET(victim->imm_flags, IMM_WEAPON))
     {
@@ -740,16 +729,6 @@ SKILL_RUNP( bite )
                     ch, 0, 0, TO_ROOM,POS_RESTING);
             return;
     }	
-	
-    // strangled centaurs can't rearkick
-    if ( IS_AWAKE(victim) && (gsn_rear_kick->getCommand( )->run( ch, victim )) )
-        return;
-
-    if (victim->getLastFightDelay( ) < FIGHT_DELAY_TIME && IS_AWAKE(victim) )
-    {
-        act_p( "$C1 настороже после боя, надо немного выждать.",ch, 0, victim, TO_CHAR,POS_RESTING);
-        return;
-    }
 	
     UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
@@ -1323,37 +1302,46 @@ VOID_SPELL(BatSwarm)::run( Character *ch, Character *, int sn, int level )
 
 bool VampireGuildmaster::social( Character *actor, Character *victim, const DLString &socialName )
 {
-    if (socialName != "bow") {
-        act( "$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
-        act( "$c1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
-        say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
-        return false;
-    }
-	
-    if (victim != ch || actor == ch) {
-        act( "$c1 смотрит на $C4 как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_NOTVICT );
-        act( "$c1 смотрит на тебя как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_VICT );
-        say_act( actor, ch, "Кому ты кланяешься? Стенке?" );	    
-        return false;
-    }	
-	
-    if (actor->is_npc( ) || actor->getProfession( ) != prof_vampire) {
+    if (actor->is_npc( ))
+	    return false;
+
+    if ( (actor->getProfession( ) != prof_vampire) && (number_percent() < 20) ) {
         act( "$c1 одаривает $C4 равнодушным холодным взглядом.", ch, 0, actor, TO_NOTVICT );
         act( "$c1 одаривает тебя равнодушным холодным взглядом.", ch, 0, actor, TO_VICT );
-        return true;
+        return false;
     }
-    
+	    
+    if ( socialName != "bow" ) {
+	if ( victim != ch ) {
+		return false;
+	}
+	else  {
+        	act( "$c1 с отвращением смотрит на ужимки $C2.", ch, 0, actor, TO_NOTVICT );
+        	act( "$c1 с отвращением смотрит на твои ужимки.", ch, 0, actor, TO_VICT );
+        	say_act( actor, ch, "Тебе нужно {hc{yпоклониться{x своему мастеру, $c1." );	    
+        	return false;		
+	}
+    }
+    else {
+    	if (!victim || victim != ch) {
+        	act( "$c1 смотрит на $C4 как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_NOTVICT );
+        	act( "$c1 смотрит на тебя как на полн{Smого{Sfую{Sx идиот{Smа{Sfку{Sx.", ch, 0, actor, TO_VICT );
+        	say_act( actor, ch, "Кому ты кланяешься? Стенке?" );	    
+        	return false;
+	}
+    }	
+	
     PCharacter *pActor = actor->getPC( );
     PCSkillData &data = pActor->getSkillData( gsn_vampire );
 
     if (data.learned == 100) {
         say_act( actor, ch, "Ты уже ста$gло|л|ла одн$gим|им|ой из нас, $c1." );
-        return true;
+        return false;
     }
-    
+	
     if (pActor->getQuestPoints() < 50) {
         say_act( actor, ch, "Тебе потребуется 50 квестовых очков для обряда инициации." );
-        return true;
+        return false;
     }
 
     pActor->addQuestPoints(-50);
