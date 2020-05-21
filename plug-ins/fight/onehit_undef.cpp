@@ -973,6 +973,10 @@ void UndefinedOneHit::damEffectCriticalStrike( )
                     msgVictHeart = "{RИспользуя технику кацуги-вадза, $c1 внезапно наносит удар особой силы!!!{x";
                     msgCharHeart = "{RИспользуя технику кацуги-вадза, ты внезапно наносишь $C3 удар особой силы!!!{x";
             }
+            if (!wield) {
+                    msgVictStun = "{W$c1 обездвиживает тебя внезапным ударом пяткой в печень!{x"; 
+                    msgCharStun = "{WТы обездвиживаешь $C4 внезапным ударом пяткой в печень!{x";                        
+            }            
             chance = 5;
             blind_chance = 85;
     }
