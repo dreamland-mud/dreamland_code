@@ -1010,6 +1010,7 @@ CMDRUNP( password )
      * Can't use one_argument here because it smashes case.
      * So we just steal all its code.  Bleagh.
      */
+    /* TODO: rework with DLString */
     pArg = arg1;
     while ( dl_isspace(*argument) )
         argument++;
@@ -1069,6 +1070,7 @@ CMDRUNP( password )
 
     /*
      * No tilde allowed because of player file format.
+     * TODO: obsolete restriction, remove.
      */
     pwdnew = arg2;
     for ( p = pwdnew; *p != '\0'; p++ )
@@ -1085,9 +1087,6 @@ CMDRUNP( password )
     ch->send_to( "Ok.\n\r");
     return;
 }
-
-/* RT configure command */
-
 
 CMDRUNP( request )
 {
@@ -1148,27 +1147,10 @@ CMDRUNP( request )
 
         Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
 
-	// donating races (e.g., centaurs, only donate to their own alignment
-	
-        if (att.isSet( RACE_DONATES ))
-        {
-	    if ( !((IS_GOOD(ch) && IS_GOOD(victim))) &&
-		 !((IS_EVIL(ch) && IS_EVIL(victim))) &&
-		 !((IS_NEUTRAL(ch) && IS_NEUTRAL(victim))) ) {
-		    
-            	if (IS_GOOD( victim )) {
-                	do_say(victim, "Я помогаю только тем, кто служит добру!");
-			return;
-            	} else if (IS_NEUTRAL( victim )) {
-                	do_say(victim, "Я помогу только тем, кто сохраняет нейтралитет в борьбе Добра со Злом.");
-			return;
-            	} else {
-                	do_say(victim, "Лишь служащие Тьме удостоятся моего внимания.");
-			return;			
-		}
-	    }	    
-			
-        } else
+	/* Donating races (e.g. centaurs) donate regardless of alignment. 
+	 * Otherwise good mobs would donate to good players.
+	 */	 
+        if (!att.isSet( RACE_DONATES ))
         {
             if (!IS_GOOD(ch) || !IS_GOOD(victim))
             {
