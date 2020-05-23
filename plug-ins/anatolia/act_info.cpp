@@ -1011,6 +1011,7 @@ CMDRUNP( password )
      * Can't use one_argument here because it smashes case.
      * So we just steal all its code.  Bleagh.
      */
+    /* TODO: rework with DLString */
     pArg = arg1;
     while ( dl_isspace(*argument) )
         argument++;
@@ -1070,6 +1071,7 @@ CMDRUNP( password )
 
     /*
      * No tilde allowed because of player file format.
+     * TODO: obsolete restriction, remove.
      */
     pwdnew = arg2;
     for ( p = pwdnew; *p != '\0'; p++ )
@@ -1086,9 +1088,6 @@ CMDRUNP( password )
     ch->send_to( "Ok.\n\r");
     return;
 }
-
-/* RT configure command */
-
 
 CMDRUNP( request )
 {
@@ -1124,7 +1123,7 @@ CMDRUNP( request )
 
         if (!victim->is_npc())
         {
-                ch->send_to("Проси другой командой: say <Подари мне ЭТО>!\n\r");
+                ch->send_to("На игроков такие штучки не пройдут. Просто поговори с ними!\n\r");
                 return;
         }
 
@@ -1149,13 +1148,10 @@ CMDRUNP( request )
 
         Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
 
-        if (att.isSet( RACE_DONATES ))
-        {
-            if (IS_EVIL( victim )) {
-                interpret( victim, "grin" );
-                return;
-            }
-        } else
+	/* Donating races (e.g. centaurs) donate regardless of alignment. 
+	 * Otherwise good mobs would donate to good players.
+	 */	 
+        if (!att.isSet( RACE_DONATES ))
         {
             if (!IS_GOOD(ch) || !IS_GOOD(victim))
             {
@@ -1180,7 +1176,7 @@ CMDRUNP( request )
 
         if (victim->getModifyLevel( ) >= ch->getModifyLevel( ) + 10 || victim->getModifyLevel( ) >= ch->getModifyLevel( ) * 2)
         {
-                do_say(victim, "Всему свое время, малыш.");
+                do_say(victim, "Всему свое время, малыш{Sfка{Sx.");
                 return;
         }
 
