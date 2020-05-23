@@ -665,7 +665,7 @@ SKILL_RUNP( hunt )
                     true, false, false );
     
     if (road.type == Road::DOOR)
-        act( "$C1 на $t отсюда.", ch, dirs[road.value.door].name, victim, TO_CHAR );
+        act( "$C1 $t отсюда.", ch, dirs[road.value.door].leave, victim, TO_CHAR );
     else
         act( "Тебе не удается понять, как пройти к $C3.", ch, 0, victim, TO_CHAR );
 }
