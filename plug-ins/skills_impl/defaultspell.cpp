@@ -121,12 +121,9 @@ int DefaultSpell::getMaxRange( Character *ch ) const
     if (position.getValue( ) == POS_STANDING)
         return 0;
 
-    int level = skill->getLevel( ch );
+    int level = skill->getLevel( ch ); 
         
-    if (level < 26)
-        return 0;
-        
-    return level / 10;
+    return max(1,level / 10);
 }
 
 /*
