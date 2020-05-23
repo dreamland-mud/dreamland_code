@@ -178,12 +178,6 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         NPCharacter *undead;
         Object *obj2,*next;
         MOB_INDEX_DATA *pCorpseOwner = 0;
-        char buf[MAX_STRING_LENGTH];
-        char buf3[MAX_STRING_LENGTH];
-        char arg[MAX_STRING_LENGTH];
-        char *argument;
-        int i;
-        bool is_capital;
 
         if ( !(obj->item_type == ITEM_CORPSE_NPC
                         || obj->item_type == ITEM_CORPSE_PC))
@@ -220,9 +214,18 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
                 ch->send_to("Святость этого места не позволяет тебе сделать этого.\n\r");
                 return;
         }
+
+        if (obj->value3()) 
+            pCorpseOwner = get_mob_index( obj->value3() );
+
+        if (!pCorpseOwner) {
+            ch->println("Этот труп не поддается восстановлению.");
+            return;
+        }
+
         undead = create_mobile( get_mob_index(MOB_VNUM_UNDEAD) );
 
-        for ( i=0; i < stat_table.size; i++ )
+        for (int i=0; i < stat_table.size; i++ )
         {
                 undead->perm_stat[i] = min(25,2 * ch->perm_stat[i]);
         }
@@ -234,7 +237,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         undead->alignment = ch->alignment;
         undead->setLevel( min(100, ( ch->getModifyLevel() - 2 ) ) );
 
-        for ( i=0; i < 3; i++ )
+        for (int i=0; i < 3; i++ )
                 undead->armor[i] = interpolate(undead->getRealLevel( ),100,-100);
         undead->armor[3] = interpolate(undead->getRealLevel( ),50,-200);
         undead->gold = 0;
@@ -246,53 +249,16 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         undead->master = ch;
         undead->leader = ch;
         
-        if (obj->value3()) 
-            pCorpseOwner = get_mob_index( obj->value3() );
-        
-        if (pCorpseOwner && pCorpseOwner->sex != SEX_EITHER) 
+        if (pCorpseOwner->sex != SEX_EITHER) 
             undead->setSex( pCorpseOwner->sex );
         else
             undead->setSex( ch->getSex( ) );
 
-        sprintf(buf, undead->getName().c_str(), obj->getName( ));
-        undead->setName( buf );
-        
-        strcpy(buf, obj->getShortDescr( '1' ).c_str( ));
-        argument = buf;
-        buf3[0] = '\0';
-        while (argument[0] != '\0' )
-        {
-                is_capital = false;
-            
-                if ( dl_isupper(arg[0]) )
-                        is_capital = true;
-            
-                // one_argument strips capitalization, gotta preserve original mob's name
-            
-                argument = one_argument(argument, arg);
-                if (!( !str_cmp(arg,"Оживленный")
-                                || !str_cmp(arg,"(corpse)")
-                                || !str_cmp(arg,"труп") ))
-                {
-                        if (buf3[0] == '\0')
-                                if (is_capital) {
-                                    DLString(arg).capitalize().c_str;
-                                }
-                                strcat(buf3,arg);
-                        else
-                        {
-                                strcat(buf3," ");
-                                if (is_capital) {
-                                    DLString(arg).capitalize().c_str;
-                                }
-                                strcat(buf3,arg);
-                        }
-                }
-        }
-        sprintf(buf, undead->getShortDescr( ), buf3);
-        undead->setShortDescr( buf );
-        sprintf(buf, undead->getLongDescr( ), buf3);
-        undead->setLongDescr( buf );
+        // Replace "%s" in the short and long descrs of the undead with original mob name.
+        DLString whose = russian_case(pCorpseOwner->short_descr, '2');
+        undead->fmtName(undead->getName().c_str(), pCorpseOwner->player_name);
+        undead->fmtShortDescr(undead->getShortDescr(), whose.c_str());
+        undead->fmtLongDescr(undead->getLongDescr(), whose.c_str());
 
         char_to_room(undead,ch->in_room);
 
@@ -307,11 +273,9 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         postaffect_to_char( ch, sn, ch->getModifyLevel() / 10 );
 
         ch->send_to("С помощью сил Тьмы и Хаоса ты оживляешь труп!\n\r");
+        ch->recho("С помощью сил Тьмы и Хаоса %C1 оживляет %O4!", ch, obj);
+        act("$C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,0,undead,TO_CHAR);
 
-        sprintf(buf,"С помощью сил Тьмы и Хаоса $c1 оживляет %s!",obj->getShortDescr( '4' ).c_str( ));
-        act_p(buf,ch,0,0,TO_ROOM,POS_RESTING);
-
-        act_p("$C1 смотрит на тебя бессмысленным взглядом, повинуясь твоим приказам!",ch,0,undead,TO_CHAR,POS_RESTING);
         extract_obj (obj);
 }
 
