@@ -59,7 +59,7 @@ VOID_SPELL(Knock)::run( Character *ch, char *target_name, int sn, int level )
 { 
         char arg[MAX_INPUT_LENGTH];
         int chance=0;
-        int door;
+        int door = DIR_SOMEWHERE;
         Room *room = ch->in_room;
         EXTRA_EXIT_DATA *peexit = 0;
 
