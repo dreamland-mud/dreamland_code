@@ -63,11 +63,6 @@ AC_CHECK_THREADS
 AC_CHECK_MCCP
 AC_CHECK_GC
 AC_CONVERT_CHARSET
-#AM_ICONV_LINK
-
-dnl Additional options
-AC_CHECK_FIGHT_STUB
-AC_CHECK_AI_STUB
 
 dnl Creating installation tree
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -85,6 +80,8 @@ AC_CREATE_DIR(var/misc/bugs)
 AC_CREATE_DIR(var/misc/ideas)
 AC_CREATE_DIR(var/misc/nohelp)
 AC_CREATE_DIR(var/misc/discord)
+AC_CREATE_DIR(var/misc/discord-stream)
+AC_CREATE_DIR(var/misc/telegram)
 AC_CREATE_DIR(var/misc/api)
 AC_CREATE_DIR(var/misc/help)
 
@@ -254,7 +251,6 @@ plug-ins/output/Makefile \
 plug-ins/follow/Makefile \
 plug-ins/follow/core/Makefile \
 plug-ins/follow/command/Makefile \
-plug-ins/debug/Makefile \
 plug-ins/help/Makefile \
 plug-ins/druids/Makefile \
 plug-ins/craft/Makefile \

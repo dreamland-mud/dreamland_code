@@ -37,6 +37,7 @@
 #include "recipeflags.h"
 #include "act_move.h"
 #include "act_lock.h"
+#include "attacks.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -544,132 +545,6 @@ VOID_SPELL(Identify)::run( Character *ch, Object *obj, int sn, int level )
     ch->send_to( buf );
 }
 
-#if 0
-void lore_fmt_obj( Object *obj, ostringstream &buf, 
-                   int weight,
-                   int cost,
-                   const char *material,
-                   int level,
-                   int type,
-                   int extra,
-                   int limit )
-{
-    DLString itype;
-
-    buf << "Похоже, что эта вещь откликается на имена {W" << obj->getName( ) << "{x." << endl;
-
-    if (weight != -1) {
-        weight /= 10;
-
-        if (weight == 0)
-            buf << "Похоже, совсем ничего не весит." << endl;
-        else
-            buf << "На вес она около {W" << weight << "{x фунт" << GET_COUNT(weight, "а", "ов", "ов") << "." << endl;
-    }
-
-    if (cost != -1)
-        if (cost == 0)
-            buf << "Кажется, эта вещь ничего не стоит." << endl;
-        else
-            buf << "Примерная стоимость - {W" << cost << "{x серебра." << endl;
-
-    if (material && strcmp( material, "none" ) && strcmp( material, "oldstyle" ))
-        buf << "Материал напоминает {W" << material << "{x." << endl;
-
-    if (level != -1)
-        buf << "Приблизительный уровень - {W" << level << "{x." << endl;
-    
-    itype = item_table.message(type );
-    if (!itype.empty( ))
-        buf << "По некоторым признакам ты узнаешь, что это {W" << itype << "{x." << endl;
-
-    if (extra > 0)
-        buf << "Наметанный взгляд подмечает особенные свойства: {W" << extra_flags.messages(extra, true ) << "{x." << endl;
-
-    if (limit != -1 && limit < 100)
-        buf << "Ходят слухи, что это очень редкая вещь - количество ей подобных в мире не превышает {W" << limit << "{x!" << endl;
-}
-
-int lore_rnd_value( int x, int learned )
-{
-    learned = 100 - learned;
-    x = number_range( x - x * learned / 100, x + x * learned / 100 );
-    return x;
-}
-
-/*
- * 'lore' skill command
- */
-
-SKILL_RUNP( lore )
-{
-    Object *obj;
-    ostringstream buf;
-    int learned;
-    int weight, cost, level, type, extra, wear, limit;
-    const char *material;
-    int value[5], i;
-    
-    if (( obj = get_obj_carry( ch, argument ) ) == 0) {
-        ch->send_to("У тебя нет этого.\n\r");
-        return;
-    }
-
-    learned = gsn_lore->getEffective( ch );
-    weight = cost = level = type = extra = wear = limit = -1;
-    material = NULL;
-    
-    for (i = 0; i < 5; i++)
-        value[i] = -1;
-
-    if (learned < 10) {
-        act("Ты недостаточно внимательно слуша$gл|ло|ла бабушкины сказки, "
-            "и врядли сможешь что-то узнать о $o6.", ch, obj, 0, TO_CHAR);
-        return;
-    }
-
-    if (learned > 20) {
-        weight   = lore_rnd_value( obj->weight, learned );
-        cost     = lore_rnd_value( obj->cost, learned );
-        material = obj->getMaterial( );
-    }
-
-    if (learned > 40) {
-        weight   = obj->weight;
-        level    = lore_rnd_value( obj->level, learned );
-    } 
-
-    if (learned > 60) {
-        type     = lore_rnd_value( obj->item_type, learned );
-    }
-    
-    if (learned > 80) {
-        type     = obj->item_type;
-        extra    = lore_rnd_value( obj->extra_flags, learned );
-        wear     = lore_rnd_value( obj->wear_flags, learned );
-    }
-
-    if (learned > 90) {
-        extra    = obj->extra_flags;
-        wear     = obj->wear_flags;
-        limit    = obj->pIndexData->limit;
-    }
-
-    if (learned >= 100) {
-        cost     = obj->cost;
-        level    = obj->level;
-    }
-    
-    act( "Ты внимательно рассматриваешь $o4, припоминая все, что когда-либо "
-         "слыша$gло|л|ла о подобных вещах.", ch, obj, 0, TO_CHAR );
-
-    lore_fmt_obj( obj, buf, weight, cost, material, level, type, extra, limit );
-    lore_fmt_wear( type, wear, buf );
-
-    ch->send_to( buf );
-}
-#endif
-
 
 /** onLore can display more info for 'lore' command. */
 static void oprog_lore(Object *obj, Character *ch)
@@ -1044,12 +919,18 @@ SKILL_RUNP( lore )
                 value1,value2,
                 (1 + value2) * value1 / 2);
       ch->send_to(buf);
-      if (learned > 85)
+      if (learned > 85){
+	if(obj->value3()) // damage type
+	{
+	  sprintf(buf,"Тип повреждений: %s.\n\r", attack_table[obj->value3()].noun);
+          ch->send_to(buf);
+	}
         if (obj->value4())  /* weapon flags */
         {
-          sprintf(buf,"Флаги оружия:%s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
+          sprintf(buf,"Флаги оружия: %s.\n\r",weapon_type2.messages(obj->value4()).c_str( ));
           ch->send_to(buf);
         }
+      }
 
       break;
 
@@ -1103,31 +984,17 @@ SKILL_RUNP( lore )
     return;
   }
 
-  if (!obj->enchanted)
-    for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
-      {
-        if ( paf->location != APPLY_NONE && paf->modifier != 0 )
-          {
-            sprintf( buf, "Изменяет: %s на %d.\n\r",
-                    apply_flags.message( paf->location ).c_str( ), paf->modifier );
-            ch->send_to(buf);
-          }
-      }
+  ostr.str(std::string());
 
-  for ( paf = obj->affected; paf != 0; paf = paf->next )
-    {
-      if ( paf->location != APPLY_NONE && paf->modifier != 0 )
-        {
-          sprintf( buf, "Изменяет: %s на %d",
-                  apply_flags.message( paf->location ).c_str( ), paf->modifier );
-          ch->send_to(buf);
-          if ( paf->duration > -1)
-              sprintf(buf,", в течении %d часов.\n\r",paf->duration);
-          else
-              sprintf(buf,".\n\r");
-          ch->send_to(buf);
-        }
-    }
+  if (!obj->enchanted)
+      for (paf = obj->pIndexData->affected; paf != 0; paf = paf->next)
+          lore_fmt_affect( paf, ostr );
+
+  for (paf = obj->affected; paf != 0; paf = paf->next)
+          lore_fmt_affect( paf, ostr );
+
+      ch->send_to(ostr);
+
   // check for limited
     if ( obj->pIndexData->limit != -1 )
     {

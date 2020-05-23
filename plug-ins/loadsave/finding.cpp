@@ -505,7 +505,6 @@ int count_char_room( Character *ch, char *argument )
         int count;
         int ugly;
 
-        int number = number_argument( argument, arg );
         count  = 0;
         ugly   = 0;
 

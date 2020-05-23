@@ -16,13 +16,30 @@
 
 static IconvMap koi2utf("koi8-r", "utf-8");
 
-void send_telegram(const DLString &content)
+/** Strip mud-tags from the string. Escape characters that are part of Markdown syntax. */
+static DLString telegram_string(const DLString &source)
+{
+    ostringstream outBuf;
+
+    vistags_convert(source.c_str(), outBuf, 0);
+    DLString dest = outBuf.str();
+    dest.colourstrip();
+    
+    dest.replaces("_", "\\_");
+    dest.replaces("*", "\\*");
+    dest.replaces("`", "\\`");
+    dest.replaces("[", "\\[");
+    return dest;
+}
+
+/** Save one file with Telegram JSON markup to disk. Assume all strings are already escaped and converted to UTF-8. */
+static void send_to_telegram(const DLString &content)
 {
     try {
         Json::Value body;
         body["chat_id"] = "@dreamland_rocks";
         body["parse_mode"] = "Markdown";
-        body["text"] = koi2utf(content.colourStrip());
+        body["text"] = content;
         
         Json::FastWriter writer;
         DLDirectory dir( dreamland->getMiscDir( ), "telegram" );
@@ -35,26 +52,50 @@ void send_telegram(const DLString &content)
     }
 }
 
+/** Paste news or note to Telegram. */
+void send_telegram_note(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
+{
+    ostringstream content;
+
+    content 
+        << "*Автор*: " << telegram_string(author) << endl
+        << "*Тема*: " << telegram_string(title) << endl
+        << endl
+        << telegram_string(description);
+
+    return send_to_telegram(koi2utf(content.str()));
+}
+
+/** Send arbitrary string as Telegram message. */
+void send_telegram(const DLString &content)
+{
+    DLString escaped = telegram_string(content);
+    send_to_telegram(koi2utf(escaped));
+}
+
+/** Prepare string to use inside Discord JSON field. Strip tags and colors and trim to size. */
 static DLString discord_string(const DLString &source)
 {
     ostringstream outBuf;
 
     vistags_convert(source.c_str(), outBuf, 0);
-    DLString colored = outBuf.str();
-    DLString utf = koi2utf(colored.colourStrip());
+    DLString dest = outBuf.str();
+    dest.colourstrip();
 
-    if (utf.length() > 2000) {
-        utf.cutSize(1995);
-        utf << "\n...";
+    // Discord 'description' field has a limit of 2000 characters (in UTF encoding).
+    if (dest.size() > 1000) {
+        dest.cutSize(995);
+        dest << "\n...";
     }
-    return utf;
+
+    return koi2utf(dest);
 }
 
-static void send_discord(Json::Value &body)
+/** Save one file with Discord JSON markup to disk. Assume all strings are already trimmed and converted to UTF-8. */
+static void send_to_discord(Json::Value &body, const DLString &dirName)
 {
     try {
-
-        DLDirectory dir( dreamland->getMiscDir( ), "discord" );
+        DLDirectory dir( dreamland->getMiscDir( ), dirName );
 
         Json::FastWriter writer;
         DLFileStream( dir.tempEntry( ) ).fromString( 
@@ -66,11 +107,18 @@ static void send_discord(Json::Value &body)
     }
 }
 
-void send_discord(const DLString &content)
+/** Send one message to the main discussion channel. */
+static void send_to_discord_chat(Json::Value &body)
+{
+    send_to_discord(body, "discord");
+}
+
+/** Send one message to the stream channel. */
+static void send_to_discord_stream(const DLString &content)
 {
     Json::Value body;
     body["content"] = discord_string(content);
-    send_discord(body);
+    send_to_discord(body, "discord-stream");
 }
 
 /**
@@ -79,7 +127,7 @@ void send_discord(const DLString &content)
 void send_discord_ooc(Character *ch, const DLString &format, const DLString &msg)
 {
     DLString description = fmt(0, format.c_str(), ch, msg.c_str(), 0);
-    send_discord(":speech_left: `" + description + "`");
+    send_to_discord_stream(":speech_left: `" + description + "`");
 }
 
 /** 
@@ -94,27 +142,27 @@ void send_discord_ic(Character *ch, const DLString &format, const DLString &msg)
     vict.config.setBit(CONFIG_RUNAMES);
 
     DLString description = fmt(&vict, format.c_str(), ch, msg.c_str(), 0);
-    send_discord(":speech_left: `" + description + "`");
+    send_to_discord_stream(":speech_left: `" + description + "`");
 }
 
 void send_discord_note_notify(const DLString &thread, const DLString &from, const DLString &subj)
 {
-    send_discord(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
+    send_to_discord_stream(":envelope: " + thread.upperFirstCharacter() + " от " + from + " на тему: " + subj);
 }
 
 void send_discord_orb(const DLString &msg)
 {
-    send_discord(":arrow_right: " + msg);
+    send_to_discord_stream(":arrow_right: " + msg);
 }
 
 void send_discord_clan(const DLString &msg)
 {
-    send_discord(":crossed_swords: " + msg);
+    send_to_discord_stream(":crossed_swords: " + msg);
 }
 
 void send_discord_gquest(const DLString &gqName, const DLString &msg)
 {
-    send_discord(":gem: **" + gqName + "** " + msg);
+    send_to_discord_stream(":gem: **" + gqName + "** " + msg);
 }
 
 // TODO use it for sub-prof
@@ -127,12 +175,12 @@ void send_discord_level(PCharacter *ch)
     else
         msg = fmt(0, "%1$^C1 достиг%1$Gло||ла следующей ступени мастерства.", ch);
 
-    send_discord(":zap: " + msg);
+    send_to_discord_stream(":zap: " + msg);
 }
 
 void send_discord_bonus(const DLString &msg)
 {
-    send_discord(":calendar_spiral: " + msg);
+    send_to_discord_stream(":calendar_spiral: " + msg);
 }
 
 void send_discord_death(PCharacter *ch, Character *killer)
@@ -143,7 +191,7 @@ void send_discord_death(PCharacter *ch, Character *killer)
     else
         msg = fmt(0, "%1$C1 па%1$Gло|л|ла от руки %2$C2.", ch, killer);
 
-    send_discord(":skull_crossbones: " + msg);
+    send_to_discord_stream(":skull_crossbones: " + msg);
 }
 
 static const DLString COLOR_PINK = "14132165";
@@ -162,7 +210,7 @@ void send_discord_note(const DLString &thread, const DLString &author, const DLS
     body["embeds"][0]["color"] = COLOR_GREEN;
     body["embeds"][0]["author"]["name"] = discord_string(author);
 
-    send_discord(body);
+    send_to_discord_chat(body);
 }
 
 void send_discord_news(const DLString &thread, const DLString &author, const DLString &title, const DLString &description)
@@ -175,6 +223,6 @@ void send_discord_news(const DLString &thread, const DLString &author, const DLS
     body["embeds"][0]["color"] = COLOR_BLUE;
     body["embeds"][0]["author"]["name"] = discord_string(author);
 
-    send_discord(body);
+    send_to_discord_chat(body);
 }
 

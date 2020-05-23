@@ -537,13 +537,13 @@ SKILL_RUNP( lash )
     chance += ch->getCurrStat(STAT_STR);
     chance -= victim->getCurrStat(STAT_STR);
 
-    if (IS_AFFECTED(ch, AFF_HASTE))
+    if (IS_QUICK(ch))
         chance += 20;
-    if (IS_AFFECTED(victim, AFF_HASTE))
+    if (IS_QUICK(victim))
         chance -= 20;
-    if (IS_AFFECTED(ch, AFF_SLOW))
+    if (IS_SLOW(ch))
         chance -= 10;
-    if (IS_AFFECTED(victim, AFF_SLOW))
+    if (IS_SLOW(victim))
         chance += 10;
 
     chance += (ch->getModifyLevel( ) - victim->getModifyLevel( )) * 2;

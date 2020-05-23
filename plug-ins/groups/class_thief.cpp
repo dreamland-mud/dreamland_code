@@ -99,7 +99,7 @@ BackstabOneHit::BackstabOneHit( Character *ch, Character *victim )
 void BackstabOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
 
     if (wield != 0)
@@ -139,7 +139,7 @@ DualBackstabOneHit::DualBackstabOneHit( Character *ch, Character *victim )
 void DualBackstabOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
 
     if (wield != 0)
@@ -177,7 +177,7 @@ CircleOneHit::CircleOneHit( Character *ch, Character *victim )
 void CircleOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = ( ch->getModifyLevel( ) / 40 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
@@ -205,7 +205,7 @@ KnifeOneHit::KnifeOneHit( Character *ch, Character *victim )
 void KnifeOneHit::calcDamage( )
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = (ch->getModifyLevel( ) / 30 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
@@ -1058,6 +1058,19 @@ SKILL_RUNP( backstab )
         {
             gsn_backstab->improve( ch, true, victim );
             bs.hit( );
+			
+            if (IS_QUICK(ch)) {
+                    int haste_chance;
+                    if (fBonus)
+                        haste_chance = 100;
+                    else
+                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
+
+                    if (Chance(ch, haste_chance-1, 100).reroll()) {
+                        if (ch->fighting == victim)
+                            BackstabOneHit( ch, victim ).hit( );
+                    }
+					else {
 
             int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
             if (ch->is_npc())
@@ -1075,21 +1088,33 @@ SKILL_RUNP( backstab )
             }
             else {
                 gsn_dual_backstab->improve( ch, false, victim );
-
-                if (IS_AFFECTED(ch, AFF_HASTE)) {
-                    int haste_chance;
-                    if (fBonus)
-                        haste_chance = 100;
-                    else
-                        haste_chance = gsn_backstab->getEffective( ch ) * 4 / 10;
-
-                    if (Chance(ch, haste_chance-1, 100).reroll()) {
-                        if (ch->fighting == victim)
-                            BackstabOneHit( ch, victim ).hit( );
-                    }
-                }
+				}
+			}
             }
-        }
+			
+			else {
+
+            int dual_chance, dual_percent = gsn_dual_backstab->getEffective(ch);
+            if (ch->is_npc())
+                dual_chance = 0;
+            else if (fBonus && dual_percent > 50)
+                dual_chance = 100;
+            else
+                dual_chance =  dual_percent * 8 / 10;
+
+            if (Chance(ch, dual_chance-1, 100).reroll()) {
+                gsn_dual_backstab->improve( ch, true, victim );
+
+                if (ch->fighting == victim)
+                    DualBackstabOneHit( ch, victim ).hit( );
+            }
+            else {
+                gsn_dual_backstab->improve( ch, false, victim );
+				}
+			}
+
+
+		}
         else
         {
             gsn_backstab->improve( ch, false, victim );
@@ -1103,7 +1128,6 @@ SKILL_RUNP( backstab )
     catch (const VictimDeathException& e) {
     }
 }
-
 
 /*
  * 'circle' skill command
@@ -1253,7 +1277,7 @@ SKILL_RUNP( blackjack )
         ch->setWait( gsn_blackjack->getBeats( ) );
 
         chance = ( int ) ( 0.5 * gsn_blackjack->getEffective( ch ) );
-        chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - 20) * 2, 10);
+        chance += URANGE( 0, ( ch->getCurrStat(STAT_DEX) - BASE_STAT) * 2, (MAX_STAT-BASE_STAT) * 2);
         chance += victim->can_see(ch) ? 0 : 5;
         if (victim->is_npc( )
             && victim->getNPC( )->behavior
@@ -1291,7 +1315,6 @@ SKILL_RUNP( blackjack )
                 af.bitvector = AFF_SLEEP;
                 affect_join ( victim,&af );
 
-                set_backguard( victim );
                 set_violent( ch, victim, true );
                 if ( IS_AWAKE(victim) )
                         victim->position = POS_SLEEPING;

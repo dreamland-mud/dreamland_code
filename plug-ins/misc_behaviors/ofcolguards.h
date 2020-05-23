@@ -14,7 +14,8 @@ friend class OfcolMarshal;
 public:
     typedef ::Pointer<OfcolGuard> Pointer;
 
-    virtual void fight( Character * );
+protected:
+    virtual bool specFight();
 };
 
 class OfcolMarshal: public BasicMobileDestiny {
@@ -22,7 +23,8 @@ XML_OBJECT
 public:
     typedef ::Pointer<OfcolMarshal> Pointer;
 
-    virtual void fight( Character * );
+protected:
+    virtual bool specFight();
 };
 
 #endif

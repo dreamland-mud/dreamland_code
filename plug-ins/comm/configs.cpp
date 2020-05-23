@@ -18,6 +18,7 @@
 #include "mercdb.h"
 #include "interp.h"
 #include "comm.h"
+#include "descriptor.h"
 #include "servlet_utils.h"
 #include "act.h"
 #include "arg_utils.h"
@@ -36,6 +37,7 @@ static void config_telegram(PCharacter *ch, const DLString &constArguments);
 static void config_telegram_print(PCharacter *ch);
 static void config_discord(PCharacter *ch, const DLString &constArguments);
 static void config_discord_print(PCharacter *ch);
+list<PCMemoryInterface *> who_find_offline(PCharacter *looker);
 
 /*-------------------------------------------------------------------------
  * ConfigElement
@@ -605,6 +607,8 @@ SERVLET_HANDLE(cmd_update_all, "/update/all")
     }
 
     servlet_response_200(response, "Success");
+
+    Descriptor::updateMaxOffline(who_find_offline(0).size());
 }
 
 /**
@@ -642,4 +646,6 @@ SERVLET_HANDLE(cmd_update_one, "/update/one")
     LogStream::sendNotice() << "Discord: update " << player->getName() << " status to " << discord["status"] << endl;    
 
     servlet_response_200(response, "Success");
+
+    Descriptor::updateMaxOffline(who_find_offline(0).size());
 }

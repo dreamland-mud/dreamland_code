@@ -74,6 +74,15 @@ struct parse {
 extern "C" {
 #endif
 
+/* === dl_ctype.h === */
+int dl_isspace( char );
+int dl_isalpha( char );
+int dl_isrusalpha( char );
+int dl_isupper( char );
+int dl_islower( char );
+int dl_isdelim( char );
+int dl_isalnum( char c );
+
 /* === regcomp.c === */
 static void p_ere(struct parse *p, int stop);
 static void p_ere_exp(struct parse *p);

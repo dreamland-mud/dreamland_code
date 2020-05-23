@@ -22,45 +22,18 @@
 
 void NoteHooks::processNoteMessage( const NoteThread &thread, const Note &note )
 {
-    bool telegramNotified = false;
-    bool discordNotified = false;
-
     // Notify via crystal orb for all types of messages.
     notifyOrb(thread, note);
 
     if (dreamland->hasOption(DL_BUILDPLOT))
         return;
 
-    // Telegram: post full message if addressed to 'telegram'
-    if (note.isNoteTo("telegram")) {
-        hookTelegram(thread, note);
-        telegramNotified = true;
-    }
-
-    // Post news and quest notes to Discord channel if they're addressed to all or to discord.
-    // Post all other messages if addressed to 'discord'.
-    if (thread.getName() == "news" || thread.getName() == "change" || thread.getName() == "qnote")
-    {
-        if (note.isNoteToAll() || note.isNoteTo("discord")) {
-            send_discord_news(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject(), note.getText());
-            discordNotified = true;
-        }
-    }
-    else if (note.isNoteTo("discord")) {
-        send_discord_note(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject(), note.getText());
-        discordNotified = true;
-    }
-    
     if (!note.isNoteToAll( ))
         return;
   
-    // Telegram: notify about public messages unless already posted a full message 
-    if (!telegramNotified) 
-        hookTelegramUnread(thread, note);
-
-    // Discord: notify about public messages unless already posted a full message
-    if (!discordNotified) 
-        send_discord_note_notify(thread.getRussianName().ruscase('1'), note.getFrom(), note.getSubject());
+    // Notify Discord and Telegram about all types of public messages.
+    hookTelegram(thread, note);
+    hookDiscord(thread, note);
 
     // Publish news and changes to the website.
     if (thread.getName() == "news" || thread.getName() == "change")
@@ -137,27 +110,21 @@ void NoteHooks::notifyOrb( const NoteThread &thread, const Note &note )
 }
 
 void NoteHooks::hookTelegram(const NoteThread &thread, const Note &note)
-{
-    ostringstream content;
-
-    content 
-        << "*Автор*: " << note.getFrom() << endl
-        << "*Тема*: " << note.getSubject() << endl
-        << endl
-        << note.getText();
-        
-    send_telegram(content.str());
+{        
+    const DLString threadName = thread.getRussianName().ruscase('1');        
+    send_telegram_note(threadName, note.getFrom(), note.getSubject(), note.getText());
 }
 
-void NoteHooks::hookTelegramUnread(const NoteThread &thread, const Note &note)
+void NoteHooks::hookDiscord(const NoteThread &thread, const Note &note)
 {
-    ostringstream content;
+    const DLString threadName = thread.getRussianName().ruscase('1');
 
-    content << thread.getRussianName().ruscase('1').upperFirstCharacter() 
-            << " от *" << note.getFrom() << "*, на тему *" << note.getSubject() << "*" 
-            << endl;
-    
-    send_telegram(content.str());
+    if (thread.getName() == "news" || thread.getName() == "change")
+        send_discord_news(threadName, note.getFrom(), note.getSubject(), note.getText());
+    else
+        send_discord_note(threadName, note.getFrom(), note.getSubject(), note.getText());
+      
+    send_discord_note_notify(threadName, note.getFrom(), note.getSubject());
 }
 
 // Timestamp/ID of the first story written after 2018 DL rebirth.

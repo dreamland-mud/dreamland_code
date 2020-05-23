@@ -67,7 +67,7 @@ void CleaveOneHit::calcDamage( )
     int chance;
     
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
 
     if (victim->is_immortal( ))
@@ -145,7 +145,7 @@ VOID_SPELL(Deafen)::run( Character *ch, Character *victim, int sn, int level )
   affect_to_char(victim,&af);
 
   act_p("$C1 теперь ничего не слышит!",ch,0,victim,TO_CHAR,POS_RESTING);
-  victim->send_to("Пронзительный звон оглушает тебя...ты ничего не слышишь!\n\r");
+  victim->send_to("Пронзительный звон оглушает тебя... ты ничего не слышишь!\n\r");
 
 }
 
@@ -175,7 +175,7 @@ SKILL_RUNP( cleave )
     }
 
     if (arg[0] == '\0') {
-        ch->send_to("Расколоть что?\n\r");
+        ch->send_to("Рассечь кого?\n\r");
         return;
     }
 
@@ -193,17 +193,17 @@ SKILL_RUNP( cleave )
         return;
 
     if ( ( obj = get_eq_char( ch, wear_wield ) ) == 0) {
-        ch->send_to("Вооружись для начала.\n\r");
+        ch->send_to("Вооружись для начала режущим или рубящим оружием.\n\r");
         return;
     }
 
     if (attack_table[obj->value3()].damage != DAM_SLASH) {
-        ch->send_to("Чтобы рассечь кого-то, нужно вооружится режущим оружием.\n\r");
+        ch->send_to("Чтобы рассечь кого-то, нужно вооружится режущим или рубящим оружием.\n\r");
         return;
     }
 
     if (victim->fighting != 0) {
-        ch->send_to("Подожди, пока закончится сражение.\n\r");
+        ch->send_to("Дождись окончания боя.\n\r");
         return;
     }
 
@@ -335,27 +335,27 @@ void ShadowBlade::fight( Character *ch )
     switch (number_range( 1, 4 )) {
     case 1:
         if (!IS_SET(victim->imm_flags, IMM_POISON)) {
-            act("Капли {Gяда{x стекают по лезвию твоего $o2.", ch, obj, 0, TO_CHAR);
+            act("Капли {Gяда{x стекают по лезвию $o2.", ch, obj, 0, TO_CHAR);
             act("Капли {Gяда{x стекают по лезвию $o2 в руках $c2.", ch, obj, 0, TO_ROOM);
             spell( gsn_poison, level + 1, ch, victim, FSPELL_BANE );
         }
         break;
     case 2:
         if (!IS_SET(victim->imm_flags, IMM_DISEASE)) {
-            ch->pecho("{cТлетворная аура{x окружает тво%1$Gе|й|ю|и %1$O4.", obj );
-            act("{cТлетворная аура{x окружает $o4 $c2.", ch, obj, 0, TO_ROOM);
+            ch->pecho("{rТлетворная аура{x окружает %1$O4.", obj );
+            act("{rТлетворная аура{x окружает $o4 $c2.", ch, obj, 0, TO_ROOM);
             spell( gsn_plague, level + 1, ch, victim, FSPELL_BANE );
         }
         break;
     case 3:
         if (!IS_AFFECTED( victim, AFF_CURSE )) {
-            ch->pecho("{DЗловещая аура{x окутывает тво%1$Gе|й|ю|и %1$O4.", obj );
-            ch->recho("%1$^O1 %2$C2 окутыва%1$nется|ются {Dзловещей аурой{x.", obj, ch );
+            ch->pecho("{RЗловещая аура{x окутывает %1$O4.", obj );
+            ch->recho("%1$^O1 %2$C2 окутыва%1$nется|ются {Rзловещей аурой{x.", obj, ch );
             spell( gsn_curse, level + 1, ch, victim, FSPELL_BANE );
         }
         break;
     case 4:
-        ch->pecho("{DТво%1$Gе|й|ю|и %1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
+        ch->pecho("{D%1$O1 вспыхива%1$nет|ют {xмертвенно-бледным{D светом.{x", obj );
         ch->recho("%1$^O1 %2$C2 вспыхива%1$nет|ют мертвенно-бледным светом.", obj, ch );
         spell( gsn_energy_drain, level + 2, ch, victim, FSPELL_BANE );        
         break;
@@ -435,7 +435,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     }
     
     if (ch->getName( ) != behavior->owner.getValue( )) {
-        ch->send_to( "Ты можешь направить это заклинание только на твой собственный клинок.\n\r" );
+        ch->send_to( "Ты можешь направить это заклинание только на свой собственный клинок.\n\r" );
         return;
     }
     
@@ -445,7 +445,7 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     ||   IS_WEAPON_STAT(blade, WEAPON_POISON)
     ||   IS_WEAPON_STAT(blade, WEAPON_SHOCKING) )
     {
-        ch->send_to( "Ничего не произошло..\r\n" );
+        ch->send_to( "Твое оружие и так обладает мощными свойствами!\r\n" );
         return;
     }
 
@@ -463,8 +463,8 @@ VOID_SPELL(BladeOfDarkness)::run( Character *ch, Object *blade, int sn, int leve
     af.bitvector        = WEAPON_FADING;
     affect_to_obj( blade, &af );
 
-    act( "Ты окутываешь $o4 темнотой.", ch, blade, 0, TO_CHAR );
-    act( "$c1 окутывает $o4 темнотой.", ch, blade, 0, TO_ROOM );
+    act( "Ты посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_CHAR );
+    act( "$c1 посвящаешь $o4 {DВеликой Тьме{x, наделяя оружие призрачной аурой.", ch, blade, 0, TO_ROOM );
 }
 
 /*
@@ -488,7 +488,7 @@ VOID_SPELL(RecallShadowBlade)::run( Character *ch, char *, int sn, int level )
         }
         
     if (!blade) {
-        ch->send_to( "Ничего не произошло..\n\r" );
+        ch->send_to( "Ты не можешь найти свой клинок.\n\r" );
         return;
     }
 
@@ -539,7 +539,7 @@ VOID_SPELL(ShadowBlade)::run( Character *ch, char *, int sn, int level )
     
     pObjIndex = find_obj_unique_index<ShadowBlade>( );
     if (!pObjIndex) {
-        ch->send_to( "В Мире что-то нарушилось.. Ты не можешь сейчас создать свой клинок.\r\n" );
+        ch->send_to( "В Мире что-то нарушилось... Ты не можешь сейчас создать свой клинок.\r\n" );
         LogStream::sendError( ) << "ShadowBlade: NULL obj index" << endl;
         return;
     }
@@ -617,7 +617,7 @@ VOID_SPELL(PowerWordStun)::run( Character *ch, Character *victim, int sn, int le
 
         if ( saves_spell( level, victim, DAM_OTHER, ch, DAMF_SPELL) )
         {
-                ch->send_to("Не получилось..\n\r");
+                ch->send_to("Оглушить противника не удается!\n\r");
                 return;
         }
 

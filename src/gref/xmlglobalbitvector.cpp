@@ -12,7 +12,7 @@ XMLGlobalBitvector::XMLGlobalBitvector( )
 }
 
 XMLGlobalBitvector::XMLGlobalBitvector( GlobalRegistryBase *reg )                    
-                      : registryFromAttribute(false), GlobalBitvector( reg )
+                      :  GlobalBitvector( reg ), registryFromAttribute(false)
 {
 }
 

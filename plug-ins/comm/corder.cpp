@@ -11,6 +11,7 @@
 #include "room.h"
 #include "clanreference.h"
 #include "skillreference.h"
+#include "interp.h"
 
 #include "follow_utils.h"
 #include "loadsave.h"
@@ -21,6 +22,7 @@
 
 CLAN(ruler);
 GSN(manacles);
+Character * follower_find_nosee( Character *ch, const char *cargument );
 
 COMMAND(COrder, "order")
 {
@@ -50,9 +52,18 @@ COMMAND(COrder, "order")
     victim = findVictim( ch, argTarget );
     
     if (!victim) {
-        ch->println( "Среди твоих последователей такого нет." );
+        Character * follower = follower_find_nosee( ch, argTarget.c_str() );
+            if(follower){
+               ch->println( "Твой последователь должен быть рядом с тобой." );
+                    if(ch->getPC( )->pet && follower->getNPC() && ch->getPC( )->pet == follower->getNPC()){
+                       interpret_raw( ch, "gtell", "where are you" );
+                    }
+               }
+            else{
+                ch->println( "Среди твоих последователей такого нет." );
+                }
         return;
-    }
+        }      
 
     interpretOrder( victim, iargs, argOrder );
     

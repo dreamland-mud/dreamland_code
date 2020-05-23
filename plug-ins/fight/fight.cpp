@@ -80,13 +80,15 @@
 #include "gsn_plugin.h"
 #include "race.h"
 #include "npcharacter.h"
-#include "object.h"
+#include "core/object.h"
 #include "effects.h"
 #include "wiznet.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "act_move.h"
 #include "magic.h"
 #include "vnum.h"
+#include "wearloc_utils.h"
+#include "skill_utils.h"
 
 #include "onehit_undef.h"
 #include "damage_impl.h"
@@ -123,9 +125,6 @@ static bool oprog_fight( Object *obj, Character *ch )
     return false;
 }
 
-
-
-#ifndef FIGHT_STUB
 /*
  * Control the fights going on.
  * Called periodically by update_handler.
@@ -170,7 +169,7 @@ void violence_update( )
         {
             obj_next = obj->next_content;
 
-            if( ch->fighting )
+            if( ch->fighting && obj_is_worn(obj))
                 oprog_fight( obj, ch );
         }
 
@@ -236,9 +235,11 @@ bool next_attack( Character *ch, Character *victim, Skill &skill, int coef )
 {
     int chance = skill.getEffective( ch ) / coef;
 
-    if (IS_AFFECTED(ch, AFF_SLOW))
+    if (IS_SLOW(ch))
         chance = chance * 3 / 4;
     
+    chance+= skill_level_bonus(skill, ch);
+
     if (number_percent( ) < chance) {
         one_hit_nocatch( ch, victim );
         skill.improve( ch, true, victim );
@@ -317,7 +318,7 @@ void multi_hit_nocatch( Character *ch, Character *victim )
     
     gsn_area_attack->getCommand( )->run( ch, victim );
 
-    if (IS_AFFECTED(ch,AFF_HASTE))
+    if (IS_QUICK(ch))
         one_hit_nocatch( ch, victim );
 
     if (ch->fighting != victim )
@@ -377,23 +378,6 @@ void rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool sh
         rawdamage_nocatch( ch, victim, dam_type, dam, show );
     } catch (const VictimDeathException &) {
     }
-}
-
-void set_backguard( Character *wch )
-{
-#if 0    
-    Affect af;
-
-    af.type         = gsn_backguard;
-    af.where        = TO_AFFECTS;
-    af.level        = wch->getRealLevel( );
-    af.duration     = 2;
-    af.location     = APPLY_NONE;
-    af.modifier     = 0;
-    af.bitvector    = 0;
-    
-    affect_join(wch, &af);
-#endif
 }
 
 static inline bool must_not_yell( Character *ch, Character *victim, int flags )
@@ -463,19 +447,3 @@ int move_dec( Character *ch )
 
     return min( max( ch->getModifyLevel( ) / 20, 1 ), (int)ch->move );
 }
-
-#else
-void        violence_update( ) { }
-void        multi_hit( Character *ch, Character *victim ) { }
-void        multi_hit_nocatch( Character *ch, Character *victim ) { }
-void        one_hit( Character *ch, Character* victim, bool secondary ) { }
-void        one_hit_nocatch( Character *ch, Character* victim, bool secondary ) { }
-bool        damage( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
-bool        damage_nocatch( Character *ch, Character *victim, int dam, int sn, int dam_type, bool show, bitstring_t dam_flag ) { return false; }
-void        rawdamage( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
-void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, int dam, bool show ) { }
-void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage) { }
-int        move_dec( Character *ch ) { return 0; }
-void        set_backguard( Character * ) { }
-void        yell_panic( Character *ch, Character *victim, const char *msgBlind, const char *msg, int flags ) { }
-#endif

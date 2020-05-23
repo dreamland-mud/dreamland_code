@@ -80,6 +80,7 @@
 #include "room.h"
 #include "desire.h"
 #include "helpmanager.h"
+#include "attacks.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -319,23 +320,24 @@ CMDRUNP( oscore )
     if (ch->getRealLevel( ) != ch->get_trust( ))
         buf << "Уровень доверия к тебе составляет " << ch->get_trust( ) << "." << endl;
 
-    buf << "Раса " << ch->getRace( )->getNameFor( ch, ch )
-        << "  Пол: " << sex_table.message( ch->getSex( ) )
-        << "  Класс: " << ch->getProfession( )->getNameFor( ch );
+    buf << "{WРаса:{x " << ch->getRace( )->getNameFor( ch, ch )
+	<< " {WРазмер:{x " << size_table.message( ch->size )    
+        << "  {WПол:{x " << sex_table.message( ch->getSex( ) )
+        << "  {WКласс:{x " << ch->getProfession( )->getNameFor( ch );
     
     if (!ch->is_npc( ))
         room = get_room_index( ch->getPC()->getHometown( )->getAltar() );
     else
         room = get_room_index( ROOM_VNUM_TEMPLE );
     
-    buf << "  Дом: " << (room ? room->area->name : "Потерян" ) << endl
-        << dlprintf( "У тебя %d/%d жизни, %d/%d энергии и %d/%d движения.\n\r",
+    buf << "  {WДом:{x " << (room ? room->area->name : "Потерян" ) << endl
+        << dlprintf( "У тебя {R%d{x/{r%d{x жизни, {C%d{x/{c%d{x энергии и %d/%d движения.\n\r",
                     ch->hit.getValue( ), ch->max_hit.getValue( ), 
                     ch->mana.getValue( ), ch->max_mana.getValue( ), 
                     ch->move.getValue( ), ch->max_move.getValue( ));
     
     if (!ch->is_npc( )) 
-        buf << fmt( 0, "У тебя %1$d практи%1$Iка|ки|к и %2$d тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й.",
+        buf << fmt( 0, "У тебя {Y%1$d{x практи%1$Iка|ки|к и {Y%2$d{x тренировочн%2$Iая|ые|ых сесси%2$Iя|и|й.",
                        pch->practice.getValue( ), pch->train.getValue( ) )
             << endl;
     
@@ -345,7 +347,7 @@ CMDRUNP( oscore )
 
     if (ch->is_npc( )) {
         buf << dlprintf( 
-            "Твои параметры: родные(текущие)\n\r"
+            "Твои параметры: исходные, (текущие)\n\r"
             "      Сила(Str): %d(%d) Интеллект(Int): %d(%d)\n\r"
             "  Мудрость(Wis): %d(%d)  Ловкость(Dex): %d(%d)\n\r"
             "  Сложение(Con): %d(%d)   Обаяние(Cha): %d(%d)\n\r",
@@ -358,10 +360,10 @@ CMDRUNP( oscore )
 
     } else {
         buf << dlprintf( 
-            "Твои параметры: родные(текущие) [максимальные]\n\r"
-            "      Сила(Str): %d(%d) [%d] Интеллект(Int): %d(%d) [%d]\n\r"
-            "  Мудрость(Wis): %d(%d) [%d]  Ловкость(Dex): %d(%d) [%d]\n\r"
-            "  Сложение(Con): %d(%d) [%d]   Обаяние(Cha): %d(%d) [%d]\n\r",
+            "Твои параметры: исходные, {c({Wтекущие{c){x, [{Cмаксимальные{x]\n\r"
+            "      Сила(Str): %d{c({W%d{c){x [{C%d{x] Интеллект(Int): %d{c({W%d{c){x [{C%d{x]\n\r"
+            "  Мудрость(Wis): %d{c({W%d{c){x [{C%d{x]  Ловкость(Dex): %d{c({W%d{c){x [{C%d{x]\n\r"
+            "  Сложение(Con): %d{c({W%d{c){x [{C%d{x]   Обаяние(Cha): %d{c({W%d{c){x [{C%d{x]\n\r",
             ch->perm_stat[STAT_STR], ch->getCurrStat(STAT_STR), pch->getMaxStat(STAT_STR),
             ch->perm_stat[STAT_INT], ch->getCurrStat(STAT_INT), pch->getMaxStat(STAT_INT),
             ch->perm_stat[STAT_WIS], ch->getCurrStat(STAT_WIS), pch->getMaxStat(STAT_WIS),
@@ -377,7 +379,7 @@ CMDRUNP( oscore )
 
     /* KIO shows exp to level */
     if (!ch->is_npc() && ch->getRealLevel( ) < LEVEL_HERO - 1)
-        buf << dlprintf( "Тебе нужно набрать %d очков опыта до следующего уровня.\n\r",
+        buf << dlprintf( "Тебе нужно набрать {W%d{x очков опыта до следующего уровня.\n\r",
                     ch->getPC()->getExpToLevel( ) );
 
     if (!ch->is_npc( )) {
@@ -385,12 +387,12 @@ CMDRUNP( oscore )
         int qtime = qd ? qd->getTime( ) : 0;
         bool hasQuest = pch->getAttributes( ).isAvailable( "quest" );
         
-        buf << fmt( 0, "У тебя %1$d квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
+        buf << fmt( 0, "У тебя {W%1$d{x квестов%1$Iая|ые|ых едини%1$Iца|цы|ц. ",
                        pch->getQuestPoints() );
         if (qtime == 0)
             buf << "У тебя сейчас нет задания.";
         else
-            buf << fmt( 0, "До %1$s квеста осталось %2$d ти%2$Iк|ка|ков.",
+            buf << fmt( 0, "До %1$s квеста осталось {Y%2$d{x ти%2$Iк|ка|ков.",
                        hasQuest ? "конца" : "следующего",
                        qtime );
 
@@ -466,7 +468,7 @@ CMDRUNP( oscore )
         if (ch->getReligion( ) == god_none)
             buf << "Ты не веришь в бога.  ";
         else
-            buf << dlprintf( "Твоя религия: %s.  ",
+            buf << dlprintf( "Твоя религия: {C%s{x.  ",
                         ch->getReligion( )->getShortDescr( ).c_str( ) );
         
         buf << dlprintf("Твои заслуги перед законом:  %d.\n\r", ch->getPC( )->loyalty.getValue( ));
@@ -1009,6 +1011,7 @@ CMDRUNP( password )
      * Can't use one_argument here because it smashes case.
      * So we just steal all its code.  Bleagh.
      */
+    /* TODO: rework with DLString */
     pArg = arg1;
     while ( dl_isspace(*argument) )
         argument++;
@@ -1068,6 +1071,7 @@ CMDRUNP( password )
 
     /*
      * No tilde allowed because of player file format.
+     * TODO: obsolete restriction, remove.
      */
     pwdnew = arg2;
     for ( p = pwdnew; *p != '\0'; p++ )
@@ -1084,9 +1088,6 @@ CMDRUNP( password )
     ch->send_to( "Ok.\n\r");
     return;
 }
-
-/* RT configure command */
-
 
 CMDRUNP( request )
 {
@@ -1122,7 +1123,13 @@ CMDRUNP( request )
 
         if (!victim->is_npc())
         {
-                ch->send_to("Проси другой командой: say <Подари мне ЭТО>!\n\r");
+                ch->send_to("На игроков такие штучки не пройдут. Просто поговори с ними!\n\r");
+                return;
+        }
+
+          if ( victim->position <= POS_SLEEPING )
+        {
+                act( "$C1 не в состоянии выполнить твою просьбу.", ch, 0, victim, TO_CHAR);
                 return;
         }
 
@@ -1133,11 +1140,6 @@ CMDRUNP( request )
                 return;
         }
 
-        if (!IS_AWAKE(victim)) {
-            interpret_raw( victim, "snore" );
-            return;
-        }
-
         if (ch->move < (50 + ch->getRealLevel( )))
         {
                 do_say(victim, "Ты выглядишь устало, может, отдохнешь сначала?");
@@ -1146,13 +1148,10 @@ CMDRUNP( request )
 
         Flags att = victim->getRace( )->getAttitude( *ch->getRace( ) );
 
-        if (att.isSet( RACE_DONATES ))
-        {
-            if (IS_EVIL( victim )) {
-                interpret( victim, "grin" );
-                return;
-            }
-        } else
+	/* Donating races (e.g. centaurs) donate regardless of alignment. 
+	 * Otherwise good mobs would donate to good players.
+	 */	 
+        if (!att.isSet( RACE_DONATES ))
         {
             if (!IS_GOOD(ch) || !IS_GOOD(victim))
             {
@@ -1177,7 +1176,7 @@ CMDRUNP( request )
 
         if (victim->getModifyLevel( ) >= ch->getModifyLevel( ) + 10 || victim->getModifyLevel( ) >= ch->getModifyLevel( ) * 2)
         {
-                do_say(victim, "Всему свое время, малыш.");
+                do_say(victim, "Всему свое время, малыш{Sfка{Sx.");
                 return;
         }
 
@@ -1189,14 +1188,13 @@ CMDRUNP( request )
                 return;
         }
 
-        if ( obj->wear_loc != wear_none )
-                unequip_char(victim, obj);
-
-        if ( !can_drop_obj( ch, obj ) )
-        {
-                do_say(victim, "Извини, но эта вешь проклята, я не могу избавиться от нее.");
-                return;
-        }
+    if ( !can_drop_obj( ch, obj )
+    || ( obj_is_worn(obj) && IS_OBJ_STAT(obj, ITEM_NOREMOVE)  ))
+    {
+      do_say(victim,
+        "Извини, но эта вещь проклята, и я не могу избавиться от нее.");
+      return;
+    }
 
         if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
         {
@@ -1215,12 +1213,41 @@ CMDRUNP( request )
                 ch->send_to( "Ты не видишь этого.\n\r");
                 return;
         }
+          if ( !victim->can_see( ch ) )
+         {
+                  do_say(victim,
+                 "Извини, я не вижу тебя.");
+                 return;
+        }
+
+        if ( !victim->can_see( obj ) )
+            {
+                do_say(victim,
+                "Извини, я не вижу этой вещи.");
+            return;
+            }
+
+
 
         if ( obj->pIndexData->vnum == 520 ) // Knight's key
         {
                 ch->send_to("Извини, он не отдаст тебе это.\n\r");
                 return;
         }
+
+  if ( is_safe(ch, victim) )
+    {
+      return;
+    }
+
+    if ( obj->pIndexData->limit >= 0 && obj->isAntiAligned( ch ) )
+    {
+        ch->pecho("%2$^s не позволяют тебе завладеть %1$O5.",
+                          obj,
+                          IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
+      return;
+    }
+
 
         obj_from_char( obj );
         obj_to_char( obj, ch );
@@ -1345,6 +1372,12 @@ CMDRUNP( demand )
         act( "$C1 не подчинится твоему требованию.", ch, 0, victim, TO_CHAR);
         return;
     }
+
+  if ( victim->position <= POS_SLEEPING )
+    {
+       act( "$C1 не в состоянии исполнить твой приказ.", ch, 0, victim, TO_CHAR);
+      return;
+    }
   
     if (victim->getNPC()->behavior 
         && IS_SET(victim->getNPC()->behavior->getOccupation( ), (1 << OCC_SHOPPER))) 
@@ -1376,16 +1409,14 @@ CMDRUNP( demand )
       return;
     }
 
-
-  if ( obj->wear_loc != wear_none )
-    unequip_char(victim, obj);
-
-  if ( !can_drop_obj( ch, obj ) )
+    if ( !can_drop_obj( ch, obj )
+    || ( obj_is_worn(obj) && IS_OBJ_STAT(obj, ITEM_NOREMOVE)  ))
     {
       do_say(victim,
         "Эта вещь проклята, и я не могу избавиться от нее.");
       return;
     }
+
 
   if ( ch->carry_number + obj->getNumber( ) > ch->canCarryNumber( ) )
     {
@@ -1402,6 +1433,33 @@ CMDRUNP( demand )
   if ( !ch->can_see( obj ) )
     {
       act_p( "Ты не видишь этого.", ch, 0, victim, TO_CHAR,POS_RESTING );
+      return;
+    }
+
+  if ( !victim->can_see( ch ) )
+    {
+        do_say(victim,
+        "Извини, я не вижу тебя.");
+      return;
+    }
+
+  if ( !victim->can_see( obj ) )
+    {
+        do_say(victim,
+        "Извини, я не вижу этой вещи.");
+      return;
+    }
+
+  if ( is_safe(ch, victim) )
+    {
+      return;
+    }
+
+      if ( obj->pIndexData->limit >= 0 && obj->isAntiAligned( ch ) )
+    {
+        ch->pecho("%2$^s не позволяют тебе завладеть %1$O5.",
+                          obj,
+                          IS_NEUTRAL(ch) ? "силы равновесия" : IS_GOOD(ch) ? "священные силы" : "твои демоны");
       return;
     }
 
@@ -2391,25 +2449,26 @@ struct HelpFinder {
     typedef vector<HelpArticle::Pointer> ArticleArray;
 
     HelpFinder(Character *ch, const char *argument) {
+
+        parseArgs(argument);
+
         // Find help by ID.
         Integer id;
-        if (Integer::tryParse(id, argument)) {
+        if (Integer::tryParse(id, args)) {
             HelpArticle::Pointer exact = helpManager->getArticle(id);
+            
             if (exact)
                 articles.push_back(exact);
             return;
         }
 
         // Find help by keyword.
-        HelpArticles::const_iterator a;
+        findMatchingArticles(ch);
 
-        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
-            if (!(*a)->visible( ch ))
-                continue;
-            if (!articleMatches(*a, argument))
-                continue;
-            
-            articles.push_back(*a); 
+        // Our smartassery yielded nothing, just search for the whole argument.
+        if (articles.empty() && !preferredLabels.empty()) {
+            preferredLabels.clear();
+            findMatchingArticles(ch);
         }
     }
     
@@ -2426,21 +2485,71 @@ struct HelpFinder {
 	}
     
 private:
-    bool articleMatches(const HelpArticle::Pointer &a, const char *argument) const
+    void findMatchingArticles(Character *ch) 
     {
-        const DLString &fullKw = a->getAllKeywordsString();
+        HelpArticles::const_iterator a;
 
-        if (is_name(argument, fullKw.c_str()))
+        for (a = helpManager->getArticles( ).begin( ); a != helpManager->getArticles( ).end( ); a++) {
+            if (!(*a)->visible( ch ))
+                continue;
+
+            if (!articleMatches(*a))
+                continue;
+            
+            articles.push_back(*a); 
+        }
+    }
+
+    bool articleMatches(const HelpArticle::Pointer &a) const
+    {
+        // If first keyword was something like "skill", look for remaining keywords within a certain label.
+        if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
+            return false;
+
+        const DLString &fullKw = a->getAllKeywordsString();
+        const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
+
+        if (is_name(lookup, fullKw.c_str()))
             return true; 
 
         for (StringSet::const_iterator k = (*a)->getAllKeywords().begin(); k != (*a)->getAllKeywords().end(); k++)
-            if (is_name(argument, (*k).c_str()))
+            if (is_name(lookup, (*k).c_str()))
                 return true; 
 
         return false;
     }
+
+    void parseArgs(const char *argument) {
+        args = argument;
+        argRest = args;
+        arg1 = argRest.getOneArgument();
+
+        // Reduce "help skill bash" to just "help bash".
+        if (!argRest.empty()) {
+            if (arg_oneof_strict(arg1, "умение", "навык", "skill")) {
+                preferredLabels.insert("skill");
+                preferredLabels.insert("spell");
+            }
+            else if (arg_oneof_strict(arg1, "заклинание", "spell"))
+                preferredLabels.insert("spell");
+            else if (arg_oneof_strict(arg1, "класс", "class"))
+                preferredLabels.insert("class");
+            else if (arg_oneof_strict(arg1, "раса", "race"))
+                preferredLabels.insert("race");
+            else if (arg_oneof_strict(arg1, "команда", "command"))
+                preferredLabels.insert("cmd");
+            else if (arg_oneof_strict(arg1, "зона", "area", "zone"))
+                preferredLabels.insert("area");
+            else if (arg_oneof_strict(arg1, "религия", "religion"))
+                preferredLabels.insert("religion");
+            else if (arg_oneof_strict(arg1, "клан", "clan"))
+                preferredLabels.insert("clan");
+        }
+    }
 	
 	ArticleArray articles;
+    DLString args, arg1, argRest;
+    StringSet preferredLabels;
 };
 
 CMDRUNP( help )
@@ -2495,14 +2604,19 @@ CMDRUNP( help )
     buf << "По запросу '{C" << origArgument << "{x' найдено несколько разделов справки с такими номерами:" << endl << endl;
     DLString lineFormat = "[{C" + web_cmd(ch, "help $1", "%5d") + "{x] %s\r\n";
     for (unsigned int a = 0; a < articles.size(); a++) {
-	auto help = articles[a];
+	    auto help = articles[a];
         DLString title = help->getTitle(DLString::emptyString);
-	DLString disambig = help_article_disambig(*help);
+	    DLString disambig = help_article_disambig(*help);
 
-        // Create a line with help ID, title and disambiguation keywords.
+        // Create a line with help ID, title and disambiguation keywords (unless turned off).
         DLString line = title;
-        if (!disambig.empty())
-            line += " ({D" + disambig + "{x)"; 
+        if (!disambig.empty()) {
+            if (!IS_SET(ch->getPC()->config, CONFIG_SCREENREADER) 
+                && !ch->getPC()->getAttributes().isAvailable("newhelp"))
+            {
+                line += " ({D" + disambig + "{x)"; 
+            }
+        }
 
         buf << fmt(0, lineFormat.c_str(), help->getID(), line.c_str());
     }
@@ -2799,6 +2913,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
         
         buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
             << "(среднее " << (1 + obj->value2()) * obj->value1() / 2 << ")" << endl;
+		    
+        if (obj->value3())  /* weapon damtype */
+            buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;		    
     
         if (obj->value4())  /* weapon flags */
             buf << "Особенности оружия: " << weapon_type2.messages(obj->value4(), true ) << endl;

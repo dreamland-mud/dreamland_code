@@ -121,7 +121,6 @@ bool GenericSkill::available( Character *ch ) const
  */
 bool GenericSkill::usable( Character *ch, bool message = false ) const
 {
-    bool fUsable;
     const SkillRaceBonus *rb; 
 
     if (!available( ch ))
@@ -181,6 +180,10 @@ int GenericSkill::getLevel( Character *ch ) const
             return 1;
     }
 
+    // Skills acquired from worn items become available immediately.
+    if (temporary_skill_active(this, ch))
+        return ch->getRealLevel();
+ 
     rb = getRaceBonus( ch );
     // Race bonuses that are independent on profession are available immediately,
     // e.g. rockseers get wands from level 1.
@@ -239,7 +242,6 @@ int GenericSkill::getLearned( Character *ch ) const
  */
 int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
 {
-    const SkillClassInfo *info; 
     const SkillRaceBonus *rb;
     int percent, min;
     
@@ -248,9 +250,7 @@ int GenericSkill::learnedAux( PCharacter *pch, int adept ) const
         return 0;
     }
         
-    info = getClassInfo( pch );
-    min = 100;
-    
+    min = 100;    
     percent = pch->getSkillData( getIndex( ) ).learned;
     
     rb = getRaceBonus( pch );
@@ -479,7 +479,7 @@ bool SkillRaceBonus::visible( ) const
  * SkillClassInfo
  *--------------------------------------------------------------------------*/
 SkillClassInfo::SkillClassInfo( )
-                 : maximum( 100 ), clanAntiBonuses( false ), always( false )
+                 : maximum( 100 ), always( false ), clanAntiBonuses( false )
 {
 }
 

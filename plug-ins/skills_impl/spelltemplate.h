@@ -23,9 +23,6 @@ struct SpellTemplate<tn, DefaultSpell> : public DefaultSpell, public ClassSelfRe
     virtual void run( Character *, char *, int, int ) { }
     virtual void run( Character *, Room *, int, int ) { }
     
-    virtual int getMaxRange( Character *ch ) const {
-        return DefaultSpell::getMaxRange( ch );
-    }
     virtual bool spellbane( Character *ch, Character *victim ) const { 
         return DefaultSpell::spellbane( ch, victim );
     }

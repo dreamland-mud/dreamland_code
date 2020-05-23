@@ -237,28 +237,6 @@ static bool has_trade_triggers( Object *obj, Character *ch )
     return get_cost( keeper, obj, false, trader ) > 0;
 }
 
-static bool has_trigger_auction( Object *obj )
-{
-    switch (obj->item_type) {
-        case ITEM_MONEY:
-        case ITEM_CORPSE_PC:
-        case ITEM_CORPSE_NPC:
-        case ITEM_TATTOO:
-            return false;
-    }
-
-    if (obj->timer != 0)
-        return false;
-
-    if (IS_OBJ_STAT(obj, ITEM_NOSELL))
-        return false;
-
-    if (auction->item)
-        return false;
-
-    return true;
-}
-
 static bool has_trigger_listen( Object *obj )
 {
     // See if it has a sound defined in the area file.
@@ -281,7 +259,7 @@ static bool has_trigger_smell( Object *obj )
     FENIA_HAS_TRIGGER(obj, "Smell");
     FENIA_NDX_HAS_TRIGGER(obj, "Smell");
 
-    if (obj->item_type == ITEM_DRINK_CON && obj->value[1] > 0)
+    if (obj->item_type == ITEM_DRINK_CON && obj->value1() > 0)
         return true;
 
     return false;

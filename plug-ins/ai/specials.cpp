@@ -27,7 +27,6 @@
 
 short get_wear_level( Character *ch, Object *obj );
 
-#ifndef AI_STUB
 /*
  * Specials. Called from mobile_update every 4 seconds.
  */
@@ -537,5 +536,3 @@ bool BasicMobileBehavior::doHeal( )
 
     return false;
 }
-
-#endif

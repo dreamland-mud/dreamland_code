@@ -4,6 +4,7 @@
  */
 #include "so.h"
 #include "mocregistrator.h"
+#include "xmlattributeplugin.h"
 
 #include "wrapperhandler.h"
 #include "nannyhandler.h"
@@ -18,6 +19,7 @@
 #include "webmanip.h"
 #include "backdoorhandler.h"
 #include "badnames.h"
+#include "lasthost.h"
 
 extern "C" {
     
@@ -43,6 +45,8 @@ extern "C" {
         Plugin::registerPlugin<WebPromptManager>( ppl );
         Plugin::registerPlugin<WebManipManager>( ppl );
         Plugin::registerPlugin<BadNames>( ppl );
+        Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeLastHost> >(ppl);
+        Plugin::registerPlugin<XMLAttributeLastHostListenerPlugin>( ppl );
         
         return ppl;
     }

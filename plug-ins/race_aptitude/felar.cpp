@@ -37,7 +37,7 @@ GSN(protective_shield);
 SKILL_RUNP( tail )
 {
     Character *victim;
-    int chance, wait;
+    int chance;
     bool fightingCheck;
     int damage_tail;
     char arg[MAX_STRING_LENGTH];
@@ -135,9 +135,7 @@ SKILL_RUNP( tail )
         act_p("Ты наносишь $C3 удар хвостом!",ch,0,victim,TO_CHAR,POS_RESTING);
         act_p("$c1 наносит $C3 удар хвостом.",ch,0,victim,TO_NOTVICT,POS_RESTING);
         gsn_tail->improve( ch, true, victim );
-
-        wait = number_bits( 2 ) + 1;
-        
+    
         victim->setWaitViolence( number_bits( 2 ) + 1 );
         ch->setWait( gsn_tail->getBeats( ) );
 

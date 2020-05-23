@@ -1,33 +1,34 @@
 #!/bin/bash
 
-set -e
+ROOT=$TRAVIS_BUILD_DIR
 
-# Normally /home/travis/build/dreamland-mud/dreamland_code
-ROOT=`pwd`
+run_build() {
+    ccache -s # display ccache usage stats
 
-echo ">>> Building DreamLand in $ROOT"
+    mkdir -p objs && \
+    make -f Makefile.git && \
+    cd objs && \
+    ../configure --prefix=$ROOT && \
+    cd src && \
+    time (make -j 2 && make install) && \
+    cd ../plug-ins && \
+    time (make -j 2 && make install)
 
-echo ">>> Installing dependency packages..."
-sudo apt-get update
-sudo apt-get install -y git g++ gcc make automake libtool bison flex libfl-dev bzip2
-sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev db-util
+    ccache -s
+}
 
-echo ">>> Cloning dreamland_world..."
-mkdir -p share && \
-cd share && \
-git clone https://github.com/dreamland-mud/dreamland_world.git DL
+run_smoke_test() {
+    cd $ROOT && \
+    git clone https://github.com/dreamland-mud/dreamland_world.git share/DL && \
+    ./bin/dreamland admin/travis/dreamland.xml 
+}
 
-echo ">>> Configure and build the sources..."
-cd $ROOT && \
-mkdir -p objs && \
-make -f Makefile.git && \
-cd objs && \
-../configure --prefix=$ROOT && \
-make -j 2 && make install && \
-echo ">>> Installation complete."
+travis_script() {
+    run_build && run_smoke_test
+}
 
-echo ">>> Starting and shutting down DreamLand..."
-cd $ROOT && \
-./bin/dreamland admin/travis/dreamland.xml
-echo ">>> All done."
+set -e # stop on a non-zero exit code
+set -x # display expanded commands
+
+$1;
 

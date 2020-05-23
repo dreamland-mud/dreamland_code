@@ -20,6 +20,7 @@
 #include "spelltarget.h"
 #include "skillmanager.h"
 #include "commandtemplate.h"
+#include "defaultspell.h"
 
 #include "wrapperbase.h"
 #include "register-impl.h"
@@ -69,7 +70,7 @@ CMDRUNP( quaff )
     one_argument( argument, arg );
 
     if(!ch->is_npc( ) && ch->getClan( ) == clan_battlerager && !ch->is_immortal( )) {
-        ch->send_to("Ты же BattleRager, а не презренный МАГ!\n\r");
+        ch->send_to("Ты же воин клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
@@ -84,11 +85,11 @@ CMDRUNP( quaff )
     }
 
     if (obj->item_type != ITEM_POTION) {
-        ch->send_to("Ты можешь осушить только снадобья.\n\r");
+        ch->send_to("Осушать можно только снадобья.\n\r");
         return;
     }
 
-      if (get_wear_level( ch, obj ) > ch->getRealLevel( )) {
+      if (get_wear_level( ch, obj ) > ch->getModifyLevel( )) {
         ch->pecho("Эта смесь чересчур сильна, чтобы ты мог%1$Gло||ла выпить её.", ch);
         return;
     }
@@ -116,7 +117,6 @@ CMDRUNP( quaff )
 
 CMDRUNP( recite )
 {
-    std::basic_ostringstream<char> buf;
     std::vector<SpellTarget::Pointer> targets;
     SpellTarget::Pointer t;
     Spell::Pointer spell;
@@ -125,7 +125,7 @@ CMDRUNP( recite )
     DLString args = argument, arg1;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("RECITE?!  Ты же BattleRager, а не презренный МАГ!\n\r");
+        ch->send_to("Какие еще свитки-шмитки?! Ты же воин клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
@@ -141,7 +141,7 @@ CMDRUNP( recite )
         return;
     }
 
-    if (get_wear_level( ch, scroll ) > ch->getRealLevel( )) {
+    if (get_wear_level( ch, scroll ) > ch->getModifyLevel( )) {
         ch->send_to("Этот свиток чересчур сложен для твоего понимания.\n\r");
         return;
     }
@@ -149,6 +149,7 @@ CMDRUNP( recite )
     found = false;
 
     for (int i = 1; i <= 4; i++) {
+        std::basic_ostringstream<char> buf;
         int sn = scroll->valueByIndex(i);
         
         if (sn > 0) {
@@ -157,16 +158,29 @@ CMDRUNP( recite )
             if (spell) { 
                 t = spell->locateTargets( ch, args, buf );
 
-                if (t) {
-                    if (t->castFar && t->door != -1) {
-                        ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
-                        return;
-                    }
-
-                    targets.push_back( t );
-                    found = true;
-                    continue;
+                if (t->castFar && t->door != -1) {
+                    ch->send_to( "На таком расстоянии жертва ничего не почувствует.\r\n" );
+                    return;
                 }
+
+                if (t->error != 0) {
+                    switch (t->error) {
+                    case TARGET_ERR_CAST_ON_WHOM:
+                        ch->println("Зачитать свиток на кого?");
+                        break;
+                    case TARGET_ERR_CAST_ON_WHAT:
+                        ch->println("Зачитать свиток на что?");
+                        break;
+                    default:
+                        ch->send_to(buf);
+                        break;
+                    }
+                    return;
+                }
+
+                targets.push_back( t );
+                found = true;
+                continue;
             }
         }
 
@@ -235,12 +249,12 @@ CMDRUNP( brandish )
     Spell::Pointer spell;
 
     if (!ch->is_npc( ) && ch->getClan( ) == clan_battlerager) {
-        ch->send_to("Ты же BattleRager, а не презренный МАГ!\n\r");
+        ch->send_to("Ты же воин клана Ярости, а не презренный МАГ!\n\r");
         return;
     }
 
     if (( staff = get_eq_char( ch, wear_hold ) ) == 0) {
-        ch->send_to("Ты не держишь ничего в руке.\n\r");
+        ch->send_to("Чтобы пользоваться посохами, их надо взять в руки.\n\r");
         return;
     }
 
@@ -375,8 +389,19 @@ CMDRUNP( zap )
 
     target = spell->locateTargets( ch, args, buf );
 
-    if (!target) {
-        ch->send_to("Кого или что ты хочешь поразить?\n\r");
+    if (target->error != 0) {
+        switch (target->error) {
+        case TARGET_ERR_CAST_ON_WHAT:
+            ch->println("Взмахнуть жезлом на что?");
+            break;
+        case TARGET_ERR_CAST_ON_WHOM:
+            ch->println("Взмахнуть жезлом на кого именно?");
+            break;
+        default:
+            ch->send_to(buf);
+            break;
+        }
+
         return;
     }
     

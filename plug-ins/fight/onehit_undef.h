@@ -7,7 +7,6 @@
 
 #include "onehit_weapon.h"
 
-#ifndef FIGHT_STUB
 class UndefinedOneHit: public WeaponOneHit {
 public:
     UndefinedOneHit( Character *ch, Character *victim, bool secondary );
@@ -31,9 +30,9 @@ protected:
     void damEffectMasterHand( );
     void damEffectMasterSword( );
     void damEffectDestroyEquipment( );
-    void damEffectGroundStrike( );
     void damEffectCriticalStrike( );
     void damEffectSlice( );
+    void damEffectVorpal();
 
     bool defenseParry( );
     bool defenseHandBlock( ); 
@@ -50,11 +49,5 @@ protected:
 
     virtual bool mprog_hit();
 };
-
-#else
-struct UndefinedOneHit: public WeaponOneHit { 
-    UndefinedOneHit( ) { }
-};
-#endif
 
 #endif

@@ -30,7 +30,6 @@ PROF(none);
 COMMAND(Whois, "whois")
 {
     std::basic_ostringstream<char> buf;
-    Descriptor *d;
     LinesList lines;
     PCharacter *pch, *offline_pch = NULL;
     DLString args = constArguments;

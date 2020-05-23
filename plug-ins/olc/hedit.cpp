@@ -221,6 +221,7 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
         stc("         hedit label          - список всех меток\r\n", ch);
         stc("         hedit label <name>   - список всех статей у этой метки\r\n", ch);
         stc("         hedit label none     - список всех статей без единой метки\r\n", ch);
+        stc("         hedit id <id>        - список всех статей, чье ID на 10 меньше или больше указаного\r\n", ch);
         return;
     }
 
@@ -230,6 +231,25 @@ CMD(hedit, 50, "", POS_DEAD, 103, LOG_ALWAYS, "Online help editor.")
             stc("Справка с таким ID не найдена.\r\n", ch);
             return;
         }
+    } else if (arg_oneof_strict(arg1, "id", "ид")) {
+        ostringstream buf;
+        if (!Integer::tryParse(id, arg2)) {
+            stc("Формат: hedit id <номер>\r\n", ch);
+            return;
+        }
+
+        int minId = id - 10, maxId = id + 10;
+        const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";
+
+        buf << "Статьи справки с номерами между " << minId << " и " << maxId << ":" << endl;
+        for (auto &a: helpManager->getArticles()) {
+            if (a->getID() >= minId && a->getID() <= maxId)
+                buf << fmt(0, lineFormat.c_str(), a->getID(), a->getAllKeywordsString().c_str());
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+
     } else if (arg_oneof_strict(arg1, "search")) {
         ostringstream buf;
         const DLString lineFormat = web_cmd(ch, "hedit $1", "%4d") + " {C%s{x\r\n";

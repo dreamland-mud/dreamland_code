@@ -22,7 +22,6 @@ public:
         
 private:
         void doCount( Character *, int );
-        void doLimit( Character * );
         void doShowOther( Character *, PCMemoryInterface * );
         void doShowSelf( PCharacter * );
 

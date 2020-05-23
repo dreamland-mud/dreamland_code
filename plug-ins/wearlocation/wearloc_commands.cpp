@@ -149,7 +149,7 @@ CMDRUNP( wear )
         act("$c1 пытается надеть на $C4 $o4, но не может.", ch, obj, victim, TO_NOTVICT);
         return;
     }
-
+    
     act("Ты надеваешь $o4 на $C4.", ch, obj, victim, TO_CHAR);
     act("$c1 надевает на тебя $o4.", ch, obj, victim, TO_VICT);
     act("$c1 надевает на $C4 $o4.", ch, obj, victim, TO_NOTVICT);

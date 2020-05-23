@@ -304,30 +304,29 @@ CMDRUN(who)
     int online_count = online.size();
     list<PCMemoryInterface *> offline = who_find_offline(pch);
     int offline_count = offline.size();
+    int total = online_count + offline_count;
+
+    // Refresh offline player count, just in case.
+    Descriptor::updateMaxOffline(offline_count);
+    int max_total = Descriptor::getMaxOnline() + Descriptor::getMaxOffline();
 
     if (online_count > 0)
-        buf << "Сейчас в мире:" << endl;
+        buf << fmt(0, "Сейчас в мире {W%1$d{w игрок%1$I|а|ов:", online_count) << endl;
     for (const auto &victim: online)
         buf << who_cmd_format_char(pch, victim);
 
     if (offline_count > 0)
-        buf << endl << "Слышат общие каналы:" << endl;
+        buf << endl << fmt(0, "Еще {W%1$d{w игрок%1$I|а|ов слыш%1$Iит|ат|ат общие каналы:", offline_count) << endl;
     for (const auto &victim: offline)
         buf << who_cmd_format_offline(pch, victim);
 
     buf << endl;
 
-    if (offline_count > 0) 
-        buf << "В мире: " << online_count << ", слышат каналы: " << offline_count 
-            << ", всего игроков: " << (online_count + offline_count) << "." << endl;
-    else
-        buf << "Всего игроков: " << online_count << ". ";
-
-    buf << "Максимум в мире за последнее время был: " << Descriptor::getMaxOnline( ) << "." << endl;
+    buf << "Всего {W" << total << "{w, максимум за последнее время был {W" << max_total << "{w." << endl;
 
     if (!IS_SET( ch->act, PLR_CONFIRMED ) && pch->getRemorts( ).size( ) == 0) 
         buf << "Буква (U) рядом с твоим именем означает, что твое описание еще не одобрено богами." << endl
-            << "Подробнее читай {W? подтверждение{x." << endl;
+            << "Подробнее читай {Wсправка подтверждение{x." << endl;
     ch->send_to( buf );
 }
 
@@ -401,9 +400,10 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
     PCharacter dummy;
     dummy.config.setBit(CONFIG_RUCOMMANDS);
     
-    list<PCharacter *> players = who_find_online(0);
+    list<PCharacter *> online = who_find_online(0);
+    list<PCMemoryInterface *> offline = who_find_offline(0);
 
-    for (const auto &victim: players) {
+    for (const auto &victim: online) {
         Json::Value wch;
 
         wch["name"]["en"] = victim->getName();
@@ -426,5 +426,13 @@ JSONSERVLET_HANDLE(cmd_who, "/who")
         body["people"].append(wch);
     }
 
-    body["total"] = body["people"].size();
+    for (const auto &victim: offline) {
+        Json::Value wch;
+
+        wch["name"]["en"] = victim->getName();
+        wch["name"]["ru"] = victim->getRussianName().decline('1');
+        body["discord"].append(wch);
+    }
+
+    body["total"] = (int)(online.size() + offline.size());
 }

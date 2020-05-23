@@ -176,6 +176,15 @@ PCharacter *argnum2player(const RegisterList &args, int num)
     return ch->getPC();
 }
 
+PCMemoryInterface * argnum2memory(const RegisterList &args, int num)
+{
+    DLString playerName = argnum2string(args, num);
+    PCMemoryInterface *pci = PCharacterManager::find(playerName);
+    if (!pci)
+        throw Scripting::Exception("Player not found.");
+    return pci;
+}
+
 int argnum2flag(const RegisterList &args, int num, const FlagTable &table)
 {
     Register a = argnum(args, num);

@@ -26,6 +26,8 @@
 
 using namespace std;
 
+PROF(druid);
+
 /*-------------------------------------------------------------------
  * RaceHelp 
  *------------------------------------------------------------------*/
@@ -106,58 +108,61 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     in << endl << *this << endl;
 
     const PCRace *r = race.getConstPointer<DefaultRace>()->getPC( );
-    if (r) {
+    if (!r || !r->isValid())
+        return;
         
-        in << "{cХарактер{x  : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
-        if (!r->getStats( ).empty( )) {
-            bool found = false;
-
-            in << "{cПараметры{x : ";
-            for (int i = 0; i < stat_table.size; i++) {
-                int stat = r->getStats( )[i];
-                if (stat != 0) {
-                    if (found) 
-                        in << ", ";
-                    in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3' );
-                    found = true;
-                }
-            }
-            if (!found)
-                in << "без изменений";
-            in << endl;
-        }
-        in << "{cРазмер{x    : " << size_table.message( r->getSize( ) ) << endl; 
-        
-        in << "{cПрофессии{x : ";
+    in << "{cХарактер{x    : " << align_name_for_range( r->getMinAlign( ), r->getMaxAlign( ) ) << endl;
+    if (!r->getStats( ).empty( )) {
         bool found = false;
-        for (int i = 0; i < professionManager->size( ); i++) {
-            Profession *prof = professionManager->find( i );
-            if (const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] > 0) {
-                if (found)
-                  in << ", ";  
-                in << prof->getRusName( ).ruscase( '1' );
+
+        in << "{cПараметры{x   : ";
+        for (int i = 0; i < stat_table.size; i++) {
+            int stat = r->getStats( )[i];
+            if (stat != 0) {
+                if (found) 
+                    in << ", ";
+                in << (stat > 0 ? "+" : "") << stat << " к " << stat_table.message( i, '3' );
                 found = true;
             }
         }
+        if (!found)
+            in << "без изменений";
         in << endl;
+    }
+    in << "{cРазмер{x      : " << size_table.message( r->getSize( ) ) << endl; 
+    
+    in << "{cКлассы{x      : любой";
+    bool found = false;
+    for (int i = 0; i < professionManager->size( ); i++) {
+        Profession *prof = professionManager->find( i );
 
-        if (r->getPoints( ) > 0) {
-            in << "{cДоп. опыт{x : " << r->getPoints( ) << endl;
+        if (prof->isValid() 
+            && prof->isPlayed()
+            && prof->getIndex() != prof_druid
+            && const_cast<PCRace *>(r)->getClasses( )[prof->getIndex( )] <= 0) 
+        {
+            if (!found)
+                in << ", кроме ";
+            else
+                in << ", ";
+            in << prof->getRusName( ).ruscase( '2' );
+            found = true;
         }
+    }
+    in << endl;
 
-        DLString res = imm_flags.messages( r->getRes( ), true, '1' );
-        if (!res.empty( )) {
-            in << "{cУстойчивы{x : к " << res << endl;
-        }
-        DLString vuln = imm_flags.messages( r->getVuln( ), true, '1' );
-        if (!vuln.empty( )) {
-            in << "{cУязвимы{x   : к " << vuln << endl;
-        }
+    DLString res = imm_flags.messages( r->getRes( ), true, '1' );
+    if (!res.empty( )) {
+        in << "{cУстойчивы{x   : к " << res << endl;
+    }
+    DLString vuln = imm_flags.messages( r->getVuln( ), true, '1' );
+    if (!vuln.empty( )) {
+        in << "{cУязвимы{x     : к " << vuln << endl;
+    }
 
-        DLString aff = r->getAff( ).messages( true, '1' );
-        if (!aff.empty( )) {
-            in << "{cАффекты{x   : " << aff << endl;
-        }
+    DLString aff = r->getAff( ).messages( true, '1' );
+    if (!aff.empty( )) {
+        in << "{cВоздействия{x : " << aff << endl;
     }
 
     in << endl;
@@ -208,20 +213,19 @@ void RaceHelp::getRawText( Character *ch, ostringstream &in ) const
     }
     
     if (!raceApt.empty( )) {
-        in << "{WРасовые cпособности{x: " << raceApt << endl;
+        in << "{WУникальные cпособности{x: " << raceApt << endl;
     }
     if (!prof100.empty( )) {
         in << "{WБонусы на профессиональные умения{x: " << prof100 << endl;
     }
     if (!noprof100.empty( )) {
-        in << "{WБонусы независимо от профессии{x: " << noprof100 << endl;
+        in << "{WБонусные умения{x: " << noprof100 << endl;
     }
     if (!lang.empty()) {
         in << "{WЗнание древних языков{x: " << lang << endl;
     }
     
-
-    in << endl << "Подробнее обо всех параметрах читай в %H% [(race stats,раса характеристики)]" << endl;
+    in << endl << "Подробнее о значении каждого параметра читай %H% [расовые особенности]." << endl;
 }
 
 /* ------------------------------------------------------------------

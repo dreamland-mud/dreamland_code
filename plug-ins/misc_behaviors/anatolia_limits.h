@@ -105,16 +105,6 @@ public:
         virtual void fight( Character *ch );
 };
 
-class SwordOfSun : public ObjectBehavior {
-XML_OBJECT
-public:
-        typedef ::Pointer<SwordOfSun> Pointer;
-    
-        virtual void wear( Character *victim );                           
-        virtual void equip( Character *victim );                           
-        virtual void fight( Character *ch );
-};
-
 
 class Thunderbolt : public ObjectBehavior {
 XML_OBJECT

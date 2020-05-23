@@ -28,6 +28,7 @@ protected:
     virtual bool canMove( Character * );
     virtual bool checkSafe( Character * );
     virtual bool checkClosedDoor( Character * );
+    virtual int getDoorStatus(Character *);    
     virtual bool checkWater( Character * );
     virtual bool checkAir( Character * );
             bool checkCurse( Character * );

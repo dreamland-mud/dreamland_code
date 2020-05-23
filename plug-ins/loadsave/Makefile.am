@@ -30,7 +30,6 @@ pcharactermanager.cpp \
 room.cpp \
 savedcreature.cpp \
 save_charmed.cpp \
-worldknowledge.cpp \
 mobilebehaviormanager.cpp \
 objectbehaviormanager.cpp \
 areabehaviormanager.cpp \

@@ -8,7 +8,6 @@
 	<node>olc</node>
 	<node>feniaroot</node>
 	<node>communication</node>
-	<node>commonlayers</node>
 	<node>plugin_command</node>
 	<node>remort</node>
 	<node>admin</node>

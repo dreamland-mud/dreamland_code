@@ -60,6 +60,16 @@ void PCharacterMemory::setLastAccessHost( const DLString& lastAccessHost )
         this->lastAccessHost.setValue( lastAccessHost );
 }
 
+const char * PCharacterMemory::getDescription( ) const
+{
+    return description.c_str();
+}
+
+void PCharacterMemory::setDescription( const DLString &description )
+{
+    this->description = description; 
+}
+
 short PCharacterMemory::getLevel( ) const 
 {
         return level.getValue( );

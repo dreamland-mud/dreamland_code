@@ -131,10 +131,6 @@ public:
 
     virtual const GlobalBitvector & getWearloc( ) = 0;
     
-    // set-get methods for string fields
-    virtual void setDescription( const DLString& ) = 0;
-    virtual const char * getDescription( ) const = 0;
-
     // level
     short getRealLevel( ) const;
     virtual short getModifyLevel( ) const = 0;

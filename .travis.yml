@@ -1,6 +1,36 @@
-language: generic
-dist: beaver 
-script: bash ./admin/travis/verify_build.sh
-branches:
-  only:
-  - master
+language: cpp
+dist: bionic
+addons:
+  apt:
+     update: true
+     packages:
+       - libfl-dev
+       - libcrypto++-dev 
+       - libjsoncpp-dev 
+       - libdb5.3-dev 
+       - libdb5.3++ 
+       - libdb5.3++-dev  
+
+cache: ccache
+
+before_script:
+  - ccache -M 2G # default ccache limit of 500Mb is not enough for our cache of 800Mb
+
+script: 
+  - bash ./admin/travis/verify_build.sh travis_script
+
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
+
+notifications:
+  email:
+    recipients:
+      - dreamland.mud@gmail.com
+

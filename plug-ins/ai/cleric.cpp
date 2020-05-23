@@ -19,7 +19,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(none);
 GSN(dispel_affects);
 
@@ -134,12 +133,3 @@ bool BasicMobileBehavior::healCleric( Character *patient )
     
     return SpellChanceTable( spellTable, ch, patient ).castSpell( ~FSPELL_OBSTACLES);
 }
-
-
-/*
-    if (gsn_flamestrike->usable( ch ))
-        if (check_immune( victim, DAM_FIRE ) == IS_VULNERABLE)
-            return gsn_flamestrike;
-*/
-
-#endif

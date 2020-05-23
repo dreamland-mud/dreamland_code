@@ -22,7 +22,6 @@
 #include "affect.h"
 
 #include "interp.h"
-#include "worldknowledge.h"
 #include "fight_position.h"
 #include "fight_exception.h"
 #include "loadsave.h"
@@ -127,10 +126,6 @@ void Movement::place( Character *wch )
     interpret_raw( wch, "look", "move" );
 
     msgOnMove( wch, false );
-#if 0
-    if (!wch->is_npc( ))
-        worldKnowledge->visit( wch->getPC( ) );
-#endif    
 }
 
 static void rafprog_leave( Room *room, Character *ch )

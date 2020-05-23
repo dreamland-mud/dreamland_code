@@ -379,6 +379,11 @@ int DefaultWearlocation::wear( Object *obj, int flags )
     return RC_WEAR_NOREPLACE;
 }
 
+void DefaultWearlocation::triggersOnWear( Character *ch, Object *obj )
+{
+    oprog_wear( obj, ch );
+}
+
 bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
 {
     if (canWear( ch, flags )) {
@@ -387,7 +392,7 @@ bool DefaultWearlocation::wearAtomic( Character *ch, Object *obj, int flags )
             ch->recho( msgRoomWear.c_str( ), ch, obj );
         }
 
-        oprog_wear( obj, ch );
+        triggersOnWear(ch, obj);
         equip( obj );
         return true;
     }
@@ -409,6 +414,14 @@ int DefaultWearlocation::canWear( Character *ch, Object *obj, int flags )
             ch->pecho( "Тебе необходимо достичь %d уровня, чтобы использовать %O4.", wear_level, obj );
             ch->recho( "%1$^C3 не хватает опыта, чтобы использовать %2$O4.", ch, obj );
         }
+        return RC_WEAR_YOUNG;
+    }
+
+    if(obj->pIndexData->limit >= 0 && ch->getModifyLevel( ) > obj->level + 20){
+         if (IS_SET(flags, F_WEAR_VERBOSE)) {
+            ch->pecho( "Твой уровень слишком велик, чтобы использовать %1$O4.", obj );
+            ch->recho( "Уровень %1$^C2 слишком велик, чтобы использовать %2$O4.", ch, obj );
+         }
         return RC_WEAR_YOUNG;
     }
 

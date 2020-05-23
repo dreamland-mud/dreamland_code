@@ -28,8 +28,6 @@ void limit_timestamp( Object *obj, Character *ch );
  */
 void char_from_room( Character *ch )
 {
-        Object *obj;
-
         if ( ch->in_room == 0 )
         {
                 bug( "Char_from_room: 0.", 0 );
@@ -90,7 +88,6 @@ void char_from_room( Character *ch )
  */
 void char_to_room( Character *ch, Room *pRoomIndex )
 {
-        Object *obj;
         Character *pop;
         int cnt = 0;
 

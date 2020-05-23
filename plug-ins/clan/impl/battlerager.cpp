@@ -367,12 +367,9 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
         return false;
     }
 
-    // Calculate real chance to strike (original Anatolia code, plus clan level bonus).
-    // For hero PK, chances are ranging from 1+clanLevel to 8+clanLevel, i.e. from 1 to 16.
-    // For players of the same level, chances are ranging from 2 to 12.
+    // Calculate real chance to strike (original Anatolia code).
     chance = 1 + learned / 30; 
     chance += (ch->getModifyLevel() - victim->getModifyLevel()) / 2;
-    chance += ch->is_npc() ? 0 : ch->getPC()->getClanLevel();
     chance = max(1, chance);
     notice("[mortal strike] %s (%dlvl) vs %s (%dlvl), learned %d, chance %d, level diff %d.",
             ch->getNameP('1').c_str(), ch->getModifyLevel(),
@@ -397,7 +394,7 @@ BOOL_SKILL( mortalstrike )::run( Character *ch, Character *victim )
             ch->getNameP('1').c_str(), ch->getModifyLevel(),
             victim->getNameP('1').c_str(), victim->getModifyLevel(),
             dam, victim->hit, victim->max_hit);
-    damage(ch, victim, dam, gsn_mortal_strike, DAM_NONE, true);
+    damage(ch, victim, dam, gsn_mortal_strike, attack_table[wield->value3()].damage, true, DAMF_WEAPON);
     gsn_mortal_strike->improve( ch, true, victim );
     return true;
 }

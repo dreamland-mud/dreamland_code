@@ -372,7 +372,7 @@ static bool can_get_obj( Character *ch, Object *obj )
     if (!oprog_can_get( ch, obj ))
         return false;
 
-    if (!obj->can_wear( ITEM_TAKE ))
+    if ( (!obj->can_wear( ITEM_TAKE )) && (!ch->is_immortal()) )
     {
         ch->pecho("Ты не можешь взять %1$O4.", obj );
         return false;
@@ -1247,9 +1247,17 @@ CMDRUNP( drop )
             obj_to_room( obj, ch->in_room );
 
             if ( !IS_AFFECTED(ch, AFF_SNEAK) )
-                act_p( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM,POS_RESTING);
-
-            ch->println( "Ты бросаешь несколько монет." );
+            {
+                if (obj->value0() == 1 || obj->value1() == 1)
+                 act_p( "$c1 бросает монетку.", ch, 0, 0, TO_ROOM,POS_RESTING);
+                else
+                 act_p( "$c1 бросает несколько монет.", ch, 0, 0, TO_ROOM,POS_RESTING);
+            }
+         
+            if (obj->value0() == 1 || obj->value1() == 1)
+             ch->println( "Ты бросаешь монетку." );
+            else
+             ch->println( "Ты бросаешь несколько монет." );
         }
 
         return;

@@ -97,11 +97,13 @@ DLFile DLDirectory::tempEntry( )
     char templateBuf[1000], *pTemplate;
 
     sprintf( templateBuf, "%s%cXXXXXXX", path.c_str( ), PATH_SEP );
-    pTemplate = mktemp( templateBuf );
+    pTemplate = templateBuf;
+    int fd = mkstemp( pTemplate );
     
-    if (!pTemplate) 
+    if (fd < 0) 
         throw ExceptionDBIO( "Unable to create tmp file in '" + path + "'" );
 
+    ::close(fd);
     return DLFile( pTemplate );
 }
 

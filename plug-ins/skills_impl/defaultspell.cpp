@@ -50,7 +50,8 @@ DefaultSpell::DefaultSpell( )
         : target( TAR_IGNORE, &target_table ), 
           position( POS_STANDING, &position_table ), 
           type( SPELL_NONE, &spell_types ),
-          casted( true )
+          casted( true ),
+          ranged(true)
           
 {
 }
@@ -111,13 +112,16 @@ int DefaultSpell::getManaCost( Character *ch )
  */
 int DefaultSpell::getMaxRange( Character *ch ) const
 {
-    int level = skill->getLevel( ch );
-    
+    if (!ranged)
+        return 0;
+
     if (type == SPELL_NONE || type == SPELL_DEFENSIVE)
         return 0;
 
     if (position.getValue( ) == POS_STANDING)
         return 0;
+
+    int level = skill->getLevel( ch );
         
     if (level < 26)
         return 0;
@@ -313,7 +317,6 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     char carg[MAX_STRING_LENGTH];
     Character *victim;
     SpellTarget::Pointer result( NEW );
-    SpellTarget::Pointer null;
 
     strcpy( carg, arg.c_str( ) );
     
@@ -326,8 +329,9 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
     if (target.isSet( TAR_CREATE_MOB )) {
         if (!arg.empty( )) {
             if (!( victim = get_char_room( ch, arg.c_str( ) ) )) {
-                buf << "Кого именно ты хочешь позвать?" << endl;
-                return null;
+                buf << "Кого именно ты хочешь призвать?" << endl;
+                result->error = TARGET_ERR_SUMMON_WHO; 
+                return result;
             }
 
             result->type = SpellTarget::CHAR;
@@ -351,7 +355,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         if (target.isSet( TAR_CHAR_SELF )) {
             if (!is_self_name( arg, ch )) {
                 buf << "Ты не можешь использовать это заклинание на других." << endl;
-                return null;
+                result->error = TARGET_ERR_NOT_ON_OTHERS;
+                return result;
             }
 
             result->type = SpellTarget::CHAR;
@@ -360,13 +365,15 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         }
 
         buf << "Этому заклинанию не нужно указывать цель." << endl;
-        return null;
+        result->error = TARGET_ERR_NO_TARGET_NEEDED;
+        return result;
     }
 
     if (target.isSet( TAR_CHAR_WORLD )) {
         if (arg.empty( )) {
             buf << "Колдовать на кого?" << endl;
-            return null;
+            result->error = TARGET_ERR_CAST_ON_WHOM;
+            return result;
         }
 
         victim = get_char_world_doppel( ch, carg );
@@ -377,22 +384,26 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
             return result;
         }
         
-        if (( result = locateTargetObject( ch, arg, buf ) ))
-            return result;
+        SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+        if (objresult)
+            return objresult;
         
         buf.str( "" );
-        buf << "В Dream Land нет никого с таким именем." << endl;
-        return null;
+        buf << "Ты не находишь никого с таким именем." << endl;
+        result->error = TARGET_ERR_CHAR_NOT_FOUND;
+        return result;
     }
     
     if (target.isSet( TAR_CHAR_SELF )) {
         if (!arg.empty( ) && !is_self_name( arg, ch )) {
-            if (( result = locateTargetObject( ch, arg, buf ) ))
-                return result;
+            SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+            if (objresult)
+                return objresult;
 
             buf.str( "" );
             buf << "Ты не можешь использовать это заклинание на других." << endl;
-            return null;
+            result->error = TARGET_ERR_NOT_ON_OTHERS;
+            return result;
         }
 
         result->type = SpellTarget::CHAR;
@@ -427,7 +438,8 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
                     {
                         buf << "Твое заклинание не действует на "
                             << victim->getNameP( '4' ) << " на таком расстоянии." << endl;
-                        return null;
+                        result->error = TARGET_ERR_TOO_FAR;
+                        return result;
                     }
                     
                     result->range = std::max( 0, getMaxRange( ch ) - maxrange );
@@ -446,21 +458,25 @@ DefaultSpell::locateTargets( Character *ch, const DLString &arg, std::ostringstr
         
         result->range = -1;
 
-        if (( result = locateTargetObject( ch, arg, buf ) ))
-            return result;
+        SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+        if (objresult)
+            return objresult;
             
         buf.str( "" );
-        buf << "Произнести заклинание.. на кого?" << endl;
-        return null;
+        buf << "Произнести заклинание... на кого?" << endl;
+        result->error = TARGET_ERR_CAST_ON_WHOM;
+        return result;
     }
 
-    if (( result = locateTargetObject( ch, arg, buf ) ))
-        return result;
+    SpellTarget::Pointer objresult = locateTargetObject( ch, arg, buf );
+    if (objresult)
+        return objresult;
     
     if (buf.str( ).empty( ))
         buf << "Произнести заклинание... на кого?" << endl;
 
-    return null;
+    result->error = TARGET_ERR_CAST_ON_WHOM;
+    return result;
 }
 
 SpellTarget::Pointer
@@ -469,6 +485,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
     char carg[MAX_STRING_LENGTH];
     Object *obj;
     SpellTarget::Pointer null;
+    SpellTarget::Pointer result( NEW );
     
     strcpy( carg, arg.c_str( ) );
     
@@ -480,7 +497,8 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 
         if (arg.empty( )) {
             buf << "Произнести заклинание на что?" << endl;
-            return null;
+            result->error = TARGET_ERR_CAST_ON_WHAT;
+            return result;
         }
         
         if (target.isSet( TAR_OBJ_EQUIP ) && target.isSet( TAR_OBJ_INV ))
@@ -495,8 +513,6 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
             obj = get_obj_world( ch, carg );
         
         if (obj) {
-            SpellTarget::Pointer result( NEW );
-
             result->type = SpellTarget::OBJECT;
             result->obj = obj;
             return result;
@@ -507,7 +523,10 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
         else if (target.isSet( TAR_OBJ_ROOM ))
             buf << "Ты не видишь здесь такого предмета." << endl;
         else if (target.isSet( TAR_OBJ_WORLD ))
-            buf << "В Dream Land нет ничего похожего на это." << endl;
+            buf << "Ты не можешь обнаружить ничего с таким именем." << endl;
+
+        result->error = TARGET_ERR_OBJ_NOT_FOUND;
+        return result;
     }
 
     return null;
@@ -516,7 +535,7 @@ DefaultSpell::locateTargetObject( Character *ch, const DLString &arg, std::ostri
 bool DefaultSpell::checkPosition( Character *ch ) const
 {
     if (ch->position < position.getValue( )) {
-        ch->println("Ты не можешь сконцентрироваться.");
+        ch->println("Ты не можешь использовать это заклинание, когда сражаешься.");
         return false;
     }
     
@@ -558,9 +577,9 @@ bool DefaultSpell::isPrayer( Character *caster ) const
 void DefaultSpell::baneMessage( Character *ch, Character *vch ) const
 {
     if (isPrayer( ch )) {
-        act("Твои боги неблагосклонны к $C3.", ch, 0, vch, TO_CHAR);
-        act("Боги $c2 неблагосклонны к тебе.", ch, 0, vch, TO_VICT);
-        act("Боги $c2 неблагосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
+        act("Твои боги не благосклонны к $C3.", ch, 0, vch, TO_CHAR);
+        act("Боги $c2 не благосклонны к тебе.", ch, 0, vch, TO_VICT);
+        act("Боги $c2 не благосклонны к $C3.", ch, 0, vch, TO_NOTVICT);
     }
     else if (ch != vch) {
         act("$C1 отклоняет твое заклинание!", ch, 0, vch, TO_CHAR);
@@ -800,3 +819,40 @@ bool DefaultSpell::isCasted( ) const
     return casted.getValue( );
 }
 
+AnatoliaCombatSpell::AnatoliaCombatSpell()
+                : damtype(0, &damage_table),
+                  damflags(0, &damage_flags),
+                  savesCheck(true)
+{
+
+}
+
+void AnatoliaCombatSpell::run( Character *ch, Character *victim, int sn, int level )
+{
+    // Calculate spell flags.
+    bitstring_t flags = DAMF_SPELL | damflags;
+
+    // Calculate damage.
+    int dam = ::dice(level, dice) + diceBonus;
+    
+    // Do a saves check if required.
+    if (savesCheck && saves_spell(level, victim, damtype, ch, flags))
+        dam /= 2;
+
+    // Display messages.
+    if (!msgNotVict.empty())
+        act(msgNotVict.c_str(), ch, 0, victim, TO_NOTVICT);
+
+    if (!msgChar.empty())
+        act(msgChar.c_str(), ch, 0, victim, TO_CHAR);
+
+    if (!msgVict.empty())
+        act(msgVict.c_str(), ch, 0, victim, TO_VICT);
+
+    // Apply waitstate to the victim.
+    if (waitMax != 0)
+        victim->setWait(number_range(waitMin, waitMax));
+
+    // Inflict the damage.
+    damage_nocatch(ch, victim, dam, sn, damtype, true, flags);
+}

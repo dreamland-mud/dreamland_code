@@ -492,7 +492,7 @@ DLString quality_percent( int c )
     if (c >= 60) return "{Yнормальн|ое{x|ого{x|ому{x|ое{x|ым{x|ом{x";
     if (c >= 40) return "{yсредн|ее{x|его{x|ему{x|ее{x|им{x|ем{x";
     if (c >= 20) return "{Rплох|ое{x|ого{x|ому{x|ое{x|им{x|ом{x";
-                 return "{rужасн|ое{x|ого{x|ому{x|ое{x|ым{x|ом{x";
+    return "{rужасн|ое{x|ого{x|ому{x|ое{x|ым{x|ом{x";
 }
 
 

@@ -481,7 +481,7 @@ VOID_AFFECT(Camp)::toStream( ostringstream &buf, Affect *paf )
 
 SKILL_RUNP( bearcall )
 {
-    SpellTarget::Pointer target( NEW );
+    SpellTarget::Pointer target;
     ostringstream errbuf;
 
   if (!gsn_bear_call->usable( ch ) )
@@ -496,7 +496,8 @@ SKILL_RUNP( bearcall )
      return;
   }
 
-  if (!( target = gsn_bear_call->getSpell( )->locateTargets( ch, argument, errbuf ) )) {
+  target = gsn_bear_call->getSpell( )->locateTargets( ch, argument, errbuf );
+  if (target->error) {
       ch->send_to( errbuf );
       return;
   }
@@ -562,7 +563,7 @@ TYPE_SPELL(bool, BearCall)::canSummonHere( Character *ch ) const
 
 SKILL_RUNP( lioncall )
 {
-    SpellTarget::Pointer target( NEW );
+    SpellTarget::Pointer target;
     ostringstream errbuf;
 
   if (!gsn_lion_call->usable( ch ) )
@@ -577,10 +578,11 @@ SKILL_RUNP( lioncall )
        return;
     }
 
-  if (!( target = gsn_lion_call->getSpell( )->locateTargets( ch, argument, errbuf ) )) {
+  target = gsn_lion_call->getSpell( )->locateTargets( ch, argument, errbuf );
+  if (target->error) {
         ch->send_to( errbuf );
         return;
-    }
+  }
 
   if ( number_percent( ) > gsn_lion_call->getEffective( ch ) )
   {
@@ -1220,7 +1222,7 @@ AmbushOneHit::AmbushOneHit( Character *ch, Character *victim )
 void AmbushOneHit::calcDamage( ) 
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     damApplyDamroll( );
     dam *= 3;
@@ -1292,7 +1294,13 @@ SKILL_RUNP( ambush )
             return;
     }
 
-    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) || victim->can_see(ch) )
+    if ( !IS_AFFECTED(ch,AFF_CAMOUFLAGE) )
+    {
+            ch->send_to("Сначала тебе стоит замаскироваться.\n\r");
+            return;
+    }   
+
+    if ( victim->can_see(ch) )
     {
             ch->send_to("Твоя жертва тебя видит.\n\r");
             return;

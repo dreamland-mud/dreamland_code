@@ -244,7 +244,7 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
             visible << dirs[door].name[0];
-        } else if (number_percent() < gsn_perception->getEffective( ch )) {
+        } else {
             hidden << dirs[door].name[0];
         }
     }
@@ -1026,6 +1026,7 @@ public:
         dummy.setName("Kadm");
         dummy.setRussianName("Кадм||а|у|а|ом|е");
         dummy.setLevel(1);
+        dummy.setSex(SEX_MALE);
         dummy.config.setBit(CONFIG_RUSKILLS);
         dummy.config.setBit(CONFIG_RUCOMMANDS);
         dummy.config.setBit(CONFIG_RUOTHER);
@@ -1047,7 +1048,7 @@ public:
 
                 for (StringSet::const_iterator l = (*a)->labels.all.begin(); l != (*a)->labels.all.end(); l++) {
                     h["labels"].append(*l);
-                    h["titles"][*l] = (*a)->getTitle(*l).toUpper();
+                    h["titles"][*l] = (*a)->getTitle(*l).colourStrip();
                 }
 
                 ostringstream textStream;

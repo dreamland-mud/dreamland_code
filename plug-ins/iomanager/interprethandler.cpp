@@ -31,7 +31,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-GSN(perception);
 const        char         go_ahead_str        [] = { (char)IAC, (char)GA, '\0' };
 
 const char *dir_name[] = {"N","E","S","W","U","D"};
@@ -52,6 +51,13 @@ static bool mprog_command( Character *ch, Character *actor, const DLString &cmdN
     FENIA_CALL(ch, "Command", "Css", actor, cmdName.c_str( ), cmdArgs.c_str( ));
     FENIA_NDX_CALL(ch->getNPC( ), "Command", "CCss", ch, actor, cmdName.c_str( ), cmdArgs.c_str( ));
     BEHAVIOR_CALL(ch->getNPC( ), command, actor, cmdName, cmdArgs);
+    return false;
+}
+
+static bool mprog_input( Character *ch, const DLString &line )
+{
+    FENIA_CALL(ch, "Input", "s", line.c_str());
+    FENIA_NDX_CALL(ch->getNPC( ), "Input", "Cs", ch, line.c_str());
     return false;
 }
 
@@ -145,6 +151,9 @@ InterpretHandler::handle(Descriptor *d, char *arg)
     iargs.ch = d->character;
     iargs.line = arg;
     iargs.phases = phases;
+
+    if (mprog_input(iargs.ch, iargs.line))
+        return 0;
 
     CommandInterpreter::getThis( )->run( iargs );
 
@@ -248,8 +257,7 @@ void InterpretHandler::normalPrompt( Character *ch )
                     continue;
 
                 if (IS_SET(pexit->exit_info, EX_CLOSED)) {
-                    if (number_percent( ) < gsn_perception->getEffective( ch ))
-                        doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
+                    doors << (ruexits ? ru_dir_name_small[door] : dir_name_small[door]);
                 } else {
                     doors << (ruexits ? ru_dir_name[door] : dir_name[door]);
                 }

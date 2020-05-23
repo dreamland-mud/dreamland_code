@@ -72,7 +72,6 @@ void PCharacter::gainExp( int gain )
     }
 }
 
-#ifndef FIGHT_STUB
 /*
  * Advancement stuff.
  */
@@ -102,11 +101,6 @@ void PCharacter::advanceLevel( )
     add_mana = max( 3, add_mana );
     add_move = max( 6, add_move );
     add_train = getRealLevel( ) % 5 == 0 ? 1 : 0;
-
-    if (getSex( ) == SEX_FEMALE) {
-        add_hp   -= 1;
-        add_mana += 2;
-    }
 
     add_hp += remorts.getHitPerLevel( level );
     add_mana += remorts.getManaPerLevel( level ); 
@@ -145,8 +139,4 @@ void PCharacter::advanceLevel( )
     if (skillsDiff > 0)
         pecho("{CТебе открыл%1$Iось|ись|ись {Y%1$d{C нов%1$Iое|ых|ых умени%1$Iе|я|й.{x", skillsDiff);
 }
-
-#else
-void PCharacter::advanceLevel( ) { }
-#endif
 

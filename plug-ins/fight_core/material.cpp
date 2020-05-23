@@ -134,7 +134,7 @@ const material_t material_table [] = {
  { "iron",      0, -1, MAT_METAL, 0, VULN_IRON, "железо" },
  { "lead",      0, -1, MAT_METAL, 0, 0, "свинец" },
  { "metal",     0, -1, MAT_METAL, 0, 0, "металл" },
- { "mithril",   0, -1, MAT_METAL, 0, 0, "мифрил" }, // "reflective, light and pure" (c) adnd
+ { "mithril",   0, -1, MAT_METAL, 0, VULN_MITHRIL, "мифрил" }, // "reflective, light and pure" (c) adnd
  { "platinum",  0, -1, MAT_METAL, MAT_INDESTR, 0, "платина" }, 
  { "silver",    0, -1, MAT_METAL, 0, VULN_SILVER, "серебро" },
  { "steel",     0, -1, MAT_METAL, 0, VULN_IRON, "сталь" },

@@ -8,7 +8,6 @@
 #include "onehit.h"
 #include "damage_impl.h"
 
-#ifndef FIGHT_STUB
 class WeaponOneHit : public OneHit {
 public:
     WeaponOneHit( Character *ch, Character *victim, bool secondary );
@@ -48,12 +47,5 @@ public:
 protected:
     virtual bool mprog_immune();
 };
-
-#else
-struct WeaponOneHit : public OneHit {
-    WeaponOneHit( ) { }
-    virtual void init( ) { }
-};
-#endif
 
 #endif

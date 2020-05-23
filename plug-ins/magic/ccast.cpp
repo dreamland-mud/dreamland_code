@@ -139,14 +139,15 @@ CMDRUN( cast )
 
     if (ch->mana < mana) {
         if (ch->is_npc( ) && ch->master != 0) 
-            say_fmt("Хозя%2$Gин|ин|йка. У меня мана кончилась!", ch, ch->master);
+            say_fmt("Хозя%2$Gин|ин|йка, у меня мана кончилась!", ch, ch->master);
         else 
             ch->send_to("У тебя не хватает энергии (mana).\n\r");
 
         return;
     }
 
-    if (!( target = spell->locateTargets( ch, arguments, buf ) )) {
+    target = spell->locateTargets( ch, arguments, buf );
+    if (target->error != 0) {
         ch->send_to( buf );
         return;
     }

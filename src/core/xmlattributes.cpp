@@ -33,7 +33,6 @@ bool XMLAttributes::isAvailable( const DLString& name ) const
 
 bool XMLAttributes::nodeFromXML( const XMLNode::Pointer & child )
 {
-#warning XXX    
     try {
         if (!XMLMapBase<XPAttribute>::nodeFromXML( child ))
             if (!XMLVariableContainer::nodeFromXML( child ))

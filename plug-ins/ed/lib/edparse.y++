@@ -1,4 +1,4 @@
-%pure_parser
+%pure-parser
 %{
 
 /* $Id: edparse.y++,v 1.1.2.2 2006/01/03 09:50:53 rufina Exp $

@@ -36,8 +36,6 @@ void        rawdamage_nocatch( Character *ch, Character *victim, int dam_type, i
 void        damage_to_obj(Character *ch,Object *wield, Object *worn, int damage);
 int        move_dec( Character *ch );
 
-void        set_backguard( Character * );
-
 
 #define FYP_SLEEP    (A)
 #define FYP_VICT_ANY (B)
@@ -68,6 +66,8 @@ void        check_bloodthirst( Character *ch );
 
 
 #define IS_QUICK(ch) (((ch)->is_npc() && IS_SET((ch)->getNPC()->off_flags,OFF_FAST)) \
-                      || IS_AFFECTED((ch),AFF_HASTE))
+                      || (IS_AFFECTED((ch),AFF_HASTE) && !IS_AFFECTED((ch),AFF_SLOW)))
+
+#define IS_SLOW(ch) ((IS_AFFECTED((ch),AFF_SLOW) && !IS_AFFECTED((ch),AFF_HASTE)))
 
 #endif

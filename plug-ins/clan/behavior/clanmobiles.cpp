@@ -106,7 +106,7 @@ bool ClanHealer::specIdle( )
     sn = -1;        
     if (victim->isAffected(gsn_plague ))
         sn = gsn_cure_disease;
-    else if (IS_AFFECTED( victim, AFF_BLIND ))
+    else if (victim->isAffected(gsn_blindness ))
         sn = gsn_cure_blindness;
     else if (victim->isAffected(gsn_poison ))
         sn = gsn_cure_poison;

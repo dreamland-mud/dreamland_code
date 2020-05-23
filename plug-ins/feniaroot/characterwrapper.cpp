@@ -43,6 +43,7 @@
 #include "wiznet.h"
 #include "xmlattributecoder.h"
 #include "xmlattributerestring.h"
+#include "commonattributes.h"
 #include "pet.h"
 #include "recipeflags.h"
 
@@ -2222,6 +2223,22 @@ NMI_INVOKE(CharacterWrapper, restring, "(skill,key,names,short,long): устан
 
     target->getPC( )->save( );
     return Register( );
+}
+
+NMI_INVOKE(CharacterWrapper, menu, "([number, action]): очистить меню или установить пункт number с действием action")
+{
+    checkTarget( );
+    CHK_NPC
+
+    if (args.empty()) {
+        target->getPC()->getAttributes().eraseAttribute("menu");
+        return Register();
+    }
+
+    DLString number = argnum2string(args, 1);
+    DLString action = argnum2string(args, 2);
+    set_map_attribute_value(target->getPC(), "menu", number, action);
+    return Register();
 }
  
 NMI_INVOKE( CharacterWrapper, api, "(): печатает этот api" )

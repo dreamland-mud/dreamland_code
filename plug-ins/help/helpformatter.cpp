@@ -157,7 +157,7 @@ void HelpFormatter::run( Character *ch, ostringstream &out )
 bool HelpFormatter::handleKeyword( const DLString &kw, ostringstream &out )
 {
     if (kw == "H" || kw == "HELP") {
-        out << "{W{lEhelp{lR?{lx{w";
+        out << "{W{lEhelp{lRсправка{lx{w";
         return true;
     }
 

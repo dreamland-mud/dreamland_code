@@ -228,6 +228,7 @@ bool CardBehavior::use( Character *user, const char *cArgs )
     }
 
     if (is_safe_nomessage( pch, victim ) 
+            || !victim->in_room->isCommon()
             || !pch->can_see( victim->in_room )) 
     {
         act("$o1 выглядит живой, но тебе не удается понять, как сквозь нее пройти.", pch, obj, 0, TO_CHAR);
@@ -491,7 +492,7 @@ DLString CardBehavior::extraDescription( Character *ch, const DLString &args )
     
     if (ch->is_npc( ) 
             || !is_name( args.c_str( ), obj->getName( ) )
-            || !gsn_card_vision->getLearned( ch ) > 1)
+            || gsn_card_vision->getLearned( ch ) <= 1)
         return DLString::emptyString;
 
     victPlayer = PCharacterManager::findPlayer( getPlayerName( ) );

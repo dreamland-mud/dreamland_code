@@ -41,7 +41,7 @@ Character * TellChannel::findListener( Character *ch, const DLString &name ) con
     if (!victim) 
         victim = get_player_world(ch, name.c_str(), false);
 
-    if (!victim || victim->is_npc() && victim->in_room != ch->in_room) {
+    if (!victim || (victim->is_npc() && victim->in_room != ch->in_room)) {
         ch->println( "Ты не находишь этого персонажа.");
         return NULL;
     }

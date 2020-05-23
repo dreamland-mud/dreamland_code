@@ -19,7 +19,6 @@
 #include "mercdb.h"
 #include "def.h"
 
-#ifndef AI_STUB
 GSN(dispel_affects);
 PROF(vampire);
 
@@ -45,6 +44,10 @@ struct BasicMobileBehavior::VampVictims : public vector<Character *> {
             return true;
         
         if (!vamp->canAggressVampire( wch ))
+            return false;
+
+        // Don't get distracted on a hunt.
+        if (ch->zone && ch->in_room->area != ch->zone && vamp->hasLastFought())
             return false;
 
         return true;
@@ -357,4 +360,3 @@ bool BasicMobileBehavior::aggressVampire( )
     
     return true;
 }
-#endif

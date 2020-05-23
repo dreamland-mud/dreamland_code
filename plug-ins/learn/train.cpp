@@ -11,6 +11,7 @@
 #include "lex.h"
 
 #include "commandtemplate.h"
+#include "hometown.h"
 #include "attract.h"
 #include "occupations.h"
 #include "behavior_utils.h"
@@ -24,6 +25,7 @@
 #include "def.h"
 
 static const int conPriceQP = 150;
+HOMETOWN(frigate);
 
 static bool mprog_cant_train( PCharacter *client, NPCharacter *trainer )
 {
@@ -66,7 +68,7 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 
     if (arg_oneof(arg, "convert", "buy", "купить")) {
         if (client->practice < 10) {
-            tell_act( client, ch, "У тебя нет необходимого количества практик." );
+            tell_act( client, ch, "У тебя недостаточно практик -- надо 10." );
             return;
         }
 
@@ -75,13 +77,6 @@ void Trainer::doGain( PCharacter *client, DLString & argument )
 
         client->practice -= 10;
         client->train +=1 ;
-        return;
-    }
-
-    if (arg.empty( )) {
-        tell_act( client, ch, "Ты можешь обменять {Y10{G практик на {Y1{G тренировочную сессию." );
-        tell_act( client, ch, "Ты можешь обменять {Y1{G тренировочную сессию на {Y10{G практик." );
-        tell_act( client, ch, "Используй для этого '{lRтренировки купить{lEgain convert{lx' или '{lRтренировки продать{lEgain revert{lx'." );
         return;
     }
 }
@@ -104,7 +99,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     if (!argQP.empty( )) {
         if (argQP != "qp" && argQP != "кп") {
-            tell_raw( client, ch, "Если хочешь тренироваться за квестовые единицы, используй '{lRтренировать <параметр> кп{lEtrain <stat> qp{lx'." );
+            tell_raw( client, ch, "Чтобы тренироваться за квестовые единицы, напиши {hc{lRтренировать тело кп{lEtrain con qp{lx{x." );
             return;
         }
         else
@@ -138,7 +133,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     
     if (fQP) {
         if (stat != STAT_CON) {
-            tell_raw( client, ch, "Ты можешь тренировать за qp только телосложение." );
+            tell_raw( client, ch, "За квестовые очки можно тренировать только телосложение." );
             return;
         }
 
@@ -147,7 +142,7 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
             return;
         }
     } else if (cost > client->train) {
-        tell_raw( client, ch, "У тебя нет достаточного количества тренировочных сессий." );
+        tell_raw( client, ch, "У тебя недостаточно тренировочных сессий." );
         return;
     }
     
@@ -158,8 +153,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
 
     client->perm_stat[stat_table.fields[stat].value] += 1;
 
-    act( "Ты повышаешь $N4!", client, 0, stat_table.fields[stat].message, TO_CHAR );
-    act( "$c1 повышает $N4!", client, 0, stat_table.fields[stat].message, TO_ROOM );
+    act( "Ты повышаешь {W$N4{x!", client, 0, stat_table.fields[stat].message, TO_CHAR );
+    act( "$c1 повышает {W$N4!{x", client, 0, stat_table.fields[stat].message, TO_ROOM );
 }
 
 
@@ -189,8 +184,13 @@ void Trainer::showTrain(PCharacter *client)
                   "Ты можешь тренировать:%s%s", 
                   (cnt > 3 ? "\r\n" : " " ),
                   buf.str( ).c_str( ) );
-        if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ))
-            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {lEtrain con qp{lRтренировать сложение кп{lx.", conPriceQP );
+        
+        bool hideQpPrice = client->getHometown() == home_frigate 
+                            && client->getRemorts().size() == 0
+                            && client->getQuestPoints() < conPriceQP;
+        
+        if (client->perm_stat[STAT_CON] < client->getMaxTrain( STAT_CON ) && !hideQpPrice)
+            tell_raw( client, ch, "Ты можешь повысить телосложение за {Y%d{G квестовых единиц: {hc{lEtrain con qp{lRтренировать сложение кп{x.", conPriceQP );
     }            
     else {
         /*
@@ -203,8 +203,11 @@ void Trainer::showTrain(PCharacter *client)
 
 void Trainer::showGain(PCharacter *client)
 {
-    tell_act( client, ch, "Ты можешь обменять {Y10{G практик на {Y1{G тренировочную сессию и наоборот." );
-    tell_act( client, ch, "Используй для этого '{lRтренировки купить{lEgain convert{lx' или '{lRтренировки продать{lEgain revert{lx'." );
+    if (client->practice >= 10)
+        tell_act( client, ch, "Можно обменять {Y10{G практик на {Y1{G тренировочную сессию: {hc{lRтренировки купить{lEgain convert{lx{x." );
+    
+    if (client->train >= 1)
+        tell_act( client, ch, "Можно обменять {Y1{G тренировку на {Y10{G практик: {hc{lRтренировки продать{lEgain revert{lx{x" );  
 }
 
 CMDRUN( train )

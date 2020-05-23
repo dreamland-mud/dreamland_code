@@ -18,27 +18,30 @@
 
 GSN(garble);
 
-void OfcolMarshal::fight( Character *victim )
+bool OfcolMarshal::specFight( )
 {
     Character *ach, *ach_next;
     
-    BasicMobileDestiny::fight( victim );
+    BasicMobileDestiny::specFight();
 
     if (ch->in_room->area != ch->zone) 
-        return;
+        return BasicMobileDestiny::specFight();
 
     if (number_percent() < 25) 
-        return;
+        return BasicMobileDestiny::specFight();
    
     do_yell( ch, "Охрана! На помощь!" );
 
     if (ch->isAffected( gsn_garble ))
-        return;
+        return true;
 
     for( ach = char_list; ach != 0; ach = ach_next )
     {
         NPCharacter *mob;
         OfcolGuard::Pointer guard;
+
+        if (!ch->fighting || ch->fighting->isDead())
+            break;
 
         ach_next = ach->next;
 
@@ -79,7 +82,7 @@ void OfcolMarshal::fight( Character *victim )
                 mob->perm_stat[i] = 23;
 
             do_say(mob, "Диана, я иду на помощь...");
-            multi_hit( mob, victim );
+            multi_hit( mob, ch->fighting );
         }
         else {
             guard->pathToTarget( mob->in_room, ch->in_room, 2000 );
@@ -94,28 +97,36 @@ void OfcolMarshal::fight( Character *victim )
             }
         }
     }
+
+    return true;
 }
 
-void OfcolGuard::fight( Character *victim )
+bool OfcolGuard::specFight()
 {
-   Character *ach, *ach_next;
-
-    BasicMobileDestiny::fight( victim );
-
+    Character *ach, *ach_next;
+    
+    interpret_raw(ch, "say", "Сражаюсь");
+    
     if (ch->in_room->area != ch->zone) 
-        return;
+        return BasicMobileDestiny::specFight();
 
     if (number_percent( ) < 25) 
-        return;
+        return BasicMobileDestiny::specFight();
+
+    if (!ch->fighting || ch->fighting->isDead())
+        return BasicMobileDestiny::specFight();
 
     interpret_raw( ch, "yell", "Стража на помощь! %s убивает меня.", 
-                  victim->getNameP( '1' ).c_str( ) );
+                  ch->fighting->getNameP( '1' ).c_str( ) );
    
     for (ach = char_list; ach != 0; ach = ach_next)
     {
         NPCharacter *mob;
         OfcolGuard::Pointer guard;
 
+        if (!ch->fighting || ch->fighting->isDead())
+            break;
+            
         ach_next = ach->next;
 
         if (!ach->in_room
@@ -139,8 +150,8 @@ void OfcolGuard::fight( Character *victim )
 
         if (ch->in_room == mob->in_room) {
             interpret_raw( mob, "say", "Теперь, %s, ты поплатишься за нападение на стражника.",
-                           victim->getNameP( '1' ).c_str( ) );
-            multi_hit( mob, victim );
+                           ch->fighting->getNameP( '1' ).c_str( ) );
+            multi_hit( mob, ch->fighting );
         }
         else {
             guard->pathToTarget( mob->in_room, ch->in_room, 2000 );
@@ -155,6 +166,8 @@ void OfcolGuard::fight( Character *victim )
             }
         }
     }
+
+    return true;
 }
 
 

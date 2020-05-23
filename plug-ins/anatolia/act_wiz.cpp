@@ -86,7 +86,6 @@
 #include "clan.h"
 #include "liquid.h"
 
-#include "worldknowledge.h"
 #include "gsn_plugin.h"
 #include "npcharacter.h"
 #include "core/object.h"
@@ -149,7 +148,7 @@ char arg[MAX_STRING_LENGTH];
 
    if ( (fp=fopen( "objlist.txt", "w+" ) ) == 0 )
    {
-        ch->send_to("File error.\n\r");
+        ch->send_to("Ошибка: не могу открыть файл objlist.txt.\n\r");
         return;
    }
 
@@ -158,15 +157,15 @@ char arg[MAX_STRING_LENGTH];
      SetL = 110;
 
   for(currLevel=SetL; currLevel>=0; currLevel-- ) {
-   fprintf( fp, "\n======= LEVEL %d ========\n", currLevel );
+   fprintf( fp, "\n======= УРОВЕНЬ %d ========\n", currLevel );
    for( obj=object_list; obj!=0; obj = obj->next )
    {
 /*     if ( obj->pIndexData->affected != 0 )                */
        if ( obj->level==currLevel )        
      {
-       fprintf( fp, "\n#Obj: %s (Vnum : %d) \n", obj->getShortDescr( ) ,obj->pIndexData->vnum);
+       fprintf( fp, "\n#Объект: %s (Vnum : %d) \n", obj->getShortDescr( ) ,obj->pIndexData->vnum);
     fprintf( fp,
-        "Object '%s' is type %s, extra flags %s.\nWeight is %d, value is %d, level is %d.\n",
+        "Объект: '%s', тип: %s, флаги: %s.\nВес: %d, цена: %d, уровень: %d.\n",
 
         obj->getName( ),
         item_table.message(obj->item_type).c_str( ),
@@ -181,7 +180,7 @@ char arg[MAX_STRING_LENGTH];
     case ITEM_SCROLL:
     case ITEM_POTION:
     case ITEM_PILL:
-        fprintf( fp, "Level %d spells of:", obj->value0() );
+        fprintf( fp, "Заклинания %d уровня:", obj->value0() );
 
         if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
         {
@@ -208,7 +207,7 @@ char arg[MAX_STRING_LENGTH];
 
     case ITEM_WAND:
     case ITEM_STAFF:
-        fprintf(fp, "Has %d charges of level %d", obj->value2(), obj->value0());
+        fprintf(fp, "%d зарядов уровня %d", obj->value2(), obj->value0());
 
         if ( obj->value3() >= 0 && obj->value3() < SkillManager::getThis( )->size() )
         {
@@ -220,72 +219,72 @@ char arg[MAX_STRING_LENGTH];
 
     case ITEM_DRINK_CON:
         liquid = liquidManager->find( obj->value2() );
-        fprintf(fp,"It holds %s-colored %s.\n",
+        fprintf(fp,"Содержит жидкость цвета %s, это %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
         break;
 
     case ITEM_CONTAINER:
-        fprintf(fp,"Capacity: %d#  Maximum weight: %d#  flags: %s\n",
+        fprintf(fp,"Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n",
             obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
         if (obj->value4() != 100)
         {
-            fprintf(fp,"Weight multiplier: %d%%\n",
+            fprintf(fp,"Уменьшение веса: %d%%\n",
                 obj->value4());
         }
         break;
                 
     case ITEM_WEAPON:
-         fprintf(fp,"Weapon type is %s\n", 
+         fprintf(fp,"Тип оружия: %s\n", 
                     weapon_class.name(obj->value0()).c_str( ));
                 
         if (obj->pIndexData->new_format)
-            fprintf(fp,"Damage is %dd%d (average %d).\n",
+            fprintf(fp,"Урон %dd%d (среднее %d).\n",
                 obj->value1(),obj->value2(),
                 (1 + obj->value2()) * obj->value1() / 2);
         else
-            fprintf( fp, "Damage is %d to %d (average %d).\n",
+            fprintf( fp, "Урон от %d до %d (среднее %d).\n",
                     obj->value1(), obj->value2(),
                     ( obj->value1() + obj->value2() ) / 2 );
         if (obj->value4())  /* weapon flags */
         {
-            fprintf(fp,"Weapons flags: %s\n",weapon_type2.messages(obj->value4()).c_str( ));
+            fprintf(fp,"Флаги оружия: %s\n",weapon_type2.messages(obj->value4()).c_str( ));
         }
         break;
 
     case ITEM_ARMOR:
         fprintf( fp,
-        "Armor class is %d pierce, %d bash, %d slash, and %d vs. magic.\n",
+        "Класс брони: %d колющее, %d удары, %d режущее, %d экзотика.\n",
             obj->value0(), obj->value1(), obj->value2(), obj->value3() );
         break;
     }
        for( paf=obj->pIndexData->affected; paf != 0; paf = paf->next )
        {
             if ( paf == 0 ) continue;
-            fprintf( fp, "  Affects %s by %d.\n",
+            fprintf( fp, "  Изменяет %s на %d.\n",
                 apply_flags.message( paf->location ).c_str( ), paf->modifier );
             if (paf->bitvector)
             {
                 switch(paf->where)
                 {
                     case TO_AFFECTS:
-                        fprintf(fp,"   Adds %s affect.\n",
+                        fprintf(fp,"   Дает аффект %s.\n",
                             affect_flags.messages(paf->bitvector).c_str( ));
                         break;
                     case TO_OBJECT:
-                        fprintf(fp,"   Adds %s object flag.\n",
+                        fprintf(fp,"   Добавляет флаг %s.\n",
                             extra_flags.messages(paf->bitvector).c_str( ));
                         break;
                     case TO_IMMUNE:
-                        fprintf(fp,"   Adds immunity to %s.\n",
+                        fprintf(fp,"   Дает иммунитет к %s.\n",
                             imm_flags.messages(paf->bitvector).c_str( ));
                         break;
                     case TO_RESIST:
-                        fprintf(fp,"   Adds resistance to %s.\n\r",
+                        fprintf(fp,"   Дает сопротивляемость к %s.\n\r",
                             res_flags.messages(paf->bitvector).c_str( ));
                         break;
                     case TO_VULN:
-                        fprintf(fp,"   Adds vulnerability to %s.\n\r",
+                        fprintf(fp,"   Дает уязвимость к %s.\n\r",
                             vuln_flags.messages(paf->bitvector).c_str( ));
                         break;
                     case TO_DETECTS:
@@ -293,7 +292,7 @@ char arg[MAX_STRING_LENGTH];
                             detect_flags.messages(paf->bitvector).c_str( ));
                         break;
                     default:
-                        fprintf(fp,"   Unknown bit %d: %d\n\r",
+                        fprintf(fp,"   Неизвестный битовый флаг %d: %d\n\r",
                             paf->where,paf->bitvector);
                         break;
                 }
@@ -330,16 +329,16 @@ CMDWIZP( limited )
                 OBJ_INDEX_DATA *obj_index = get_obj_index( atoi(argument) );
                 if ( obj_index == 0 )
                 {
-                        ch->send_to("Usage: limited <vnum>.\n\r");
+                        ch->send_to("Формат: limited <vnum>.\n\r");
                         return;
                 }
                 if ( obj_index->limit == -1 )
                 {
-                        ch->send_to("That's not a limited item.\n\r");
+                        ch->send_to("Это не лимит.\n\r");
                         return;
                 }
                 nMatch = 0;
-                sprintf( buf, "%-35s [%5d]  Limit: %3d  Current: %3d\n\r",
+                sprintf( buf, "%-35s [%5d]  Лимит: %3d  Собрано: %3d\n\r",
                         obj_index->short_descr,
                         obj_index->vnum,
                         obj_index->limit,
@@ -351,18 +350,18 @@ CMDWIZP( limited )
                         if ( obj->pIndexData->vnum == obj_index->vnum )
                         {
                                 if ( obj->carried_by != 0 && ch->can_see( obj->carried_by ) )
-                                        sprintf(buf, "Carried by %-30s\n\r",
+                                        sprintf(buf, "У %-30s\n\r",
                                                 obj->carried_by->getNameP( ));
                                 if ( obj->in_room != 0 )
-                                        sprintf(buf, "At %-20s [%d]\n\r",
+                                        sprintf(buf, "В комнате %-20s [%d]\n\r",
                                                 obj->in_room->name, obj->in_room->vnum);
                                 if ( obj->in_obj != 0 )
-                                        sprintf(buf, "In %-20s [%d] \n\r",
+                                        sprintf(buf, "Внутри %-20s [%d] \n\r",
                                                 obj->in_obj->getShortDescr( '1' ).c_str( ),
                                                 obj->in_obj->pIndexData->vnum);
-                                        ch->send_to(buf);
+                                ch->send_to(buf);
                         }
-                sprintf(buf, "  %d found in game. %d should be in pFiles.\n\r",
+                sprintf(buf, "  %d сейчас в игре, а еще %d в профилях игроков.\n\r",
                         ingameCount, obj_index->count-ingameCount);
                 ch->send_to(buf);
                 return;
@@ -388,7 +387,7 @@ CMDWIZP( limited )
 
         limits.sort(limit_compare);
         for (list<limit_info>::const_iterator l = limits.begin(); l != limits.end(); l++)
-            ch->pecho( "[%3d] %-33^N1 [%5d]  Limit: %3d  Current: %3d In Game: %3d",
+            ch->pecho( "[%3d] %-33^N1 [%5d]  Лимит: %3d  Собрано: %3d В игре : %3d",
                     l->level,
                     l->description.c_str(),
                     l->vnum,
@@ -396,7 +395,7 @@ CMDWIZP( limited )
                     l->count,
                     l->inGame );
         
-        ch->printf( "\n\r%d of %d objects are limited.\n\r", limits.size(), nMatch );
+        ch->printf( "\n\rВсего лимитов: %d из %d.\n\r", limits.size(), nMatch );
 }
 
 CMDWIZP( wiznet )
@@ -411,12 +410,12 @@ CMDWIZP( wiznet )
         {
                 if (IS_SET(ch->getPC( )->wiznet,WIZ_ON))
                 {
-                        ch->send_to("Signing off of Wiznet.\n\r");
+                        ch->send_to("Визнет отключен. Уф.\n\r");
                         REMOVE_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 }
                 else
                 {
-                        ch->send_to("Welcome to Wiznet!\n\r");
+                        ch->send_to("Визнет включен, добро пожаловать в мир спама!\n\r");
                         SET_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 }
 
@@ -425,14 +424,14 @@ CMDWIZP( wiznet )
 
         if (!str_prefix(argument,"on"))
         {
-                ch->send_to("Welcome to Wiznet!\n\r");
+                ch->send_to("Визнет включен, добро пожаловать в мир спама!\n\r");
                 SET_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 return;
         }
 
         if (!str_prefix(argument,"off"))
         {
-                ch->send_to("Signing off of Wiznet.\n\r");
+                ch->send_to("Визнет отключен. Уф.\n\r");
                 REMOVE_BIT(ch->getPC( )->wiznet,WIZ_ON);
                 return;
         }
@@ -454,7 +453,7 @@ CMDWIZP( wiznet )
 
                 strcat(buf,"\n\r");
 
-                ch->send_to("Wiznet status:\n\r");
+                ch->send_to("Статус Визнета:\n\r");
                 ch->send_to(buf);
                 return;
         }
@@ -475,7 +474,7 @@ CMDWIZP( wiznet )
 
                 strcat(buf,"\n\r");
 
-                ch->send_to("Wiznet options available to you are:\n\r");
+                ch->send_to("Доступные тебе опции Визнета:\n\r");
                 ch->send_to(buf);
 
                 return;
@@ -485,20 +484,20 @@ CMDWIZP( wiznet )
 
         if ( flag == -1 || ch->get_trust() < wiznet_table[flag].level )
         {
-                ch->send_to("No such option.\n\r");
+                ch->send_to("Такой опции Визнета нет, или тебе она пока недоступна.\n\r");
                 return;
         }
 
         if ( IS_SET(ch->getPC( )->wiznet,wiznet_table[flag].flag) )
         {
-                ch->printf("You will no longer see %s on wiznet.\n\r",
+                ch->printf("Ты больше не следишь за %s через Визнет.\n\r",
                            wiznet_table[flag].name);
                 REMOVE_BIT(ch->getPC( )->wiznet,wiznet_table[flag].flag);
                 return;
         }
         else
         {
-                ch->printf("You will now see %s on wiznet.\n\r",
+                ch->printf("Ты теперь отслеживаешь %s через Визнет.\n\r",
                            wiznet_table[flag].name);
                 SET_BIT(ch->getPC( )->wiznet,wiznet_table[flag].flag);
                 return;
@@ -514,7 +513,7 @@ CMDWIZP( poofin )
 
     if (argument[0] == '\0')
     {
-            ch->printf("Your poofin is %s\n\r",ch->getPC( )->bamfin.c_str( ));
+            ch->printf("Твое сообщение poofin: %s\n\r",ch->getPC( )->bamfin.c_str( ));
             return;
     }
 
@@ -526,12 +525,12 @@ CMDWIZP( poofin )
             && strstr(argument,ch->getNameP( '5' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '6' ).c_str()) == 0 )
     {
-            ch->send_to("You must include your name.\n\r");
+            ch->send_to("Неплохо бы включить в poofin свое имя.\n\r");
             return;
     }
 
     ch->getPC( )->bamfin = argument;
-    ch->printf("Your poofin is now %s\n\r",ch->getPC( )->bamfin.c_str( ));
+    ch->printf("Твое сообщение poofin теперь: %s\n\r",ch->getPC( )->bamfin.c_str( ));
 }
 
 
@@ -543,7 +542,7 @@ CMDWIZP( poofout )
 
     if (argument[0] == '\0')
     {
-            ch->printf("Your poofout is %s\n\r",ch->getPC( )->bamfout.c_str( ));
+            ch->printf("Твое сообщение poofout: %s\n\r",ch->getPC( )->bamfout.c_str( ));
             return;
     }
 
@@ -555,13 +554,13 @@ CMDWIZP( poofout )
             && strstr(argument,ch->getNameP( '5' ).c_str()) == 0 
             && strstr(argument,ch->getNameP( '6' ).c_str()) == 0 )
     {
-            ch->send_to("You must include your name.\n\r");
+            ch->send_to("Неплохо бы включить в poofout свое имя.\n\r");
             return;
     }
 
     ch->getPC( )->bamfout = argument;
 
-    ch->printf("Your poofout is now %s\n\r",ch->getPC( )->bamfout.c_str( ));
+    ch->printf("Твое сообщение poofout теперь %s\n\r",ch->getPC( )->bamfout.c_str( ));
 }
 
 CMDWIZP( disconnect )
@@ -573,7 +572,7 @@ CMDWIZP( disconnect )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Disconnect whom?\n\r");
+        ch->send_to("Отключить кого?\n\r");
         return;
     }
 
@@ -587,7 +586,7 @@ CMDWIZP( disconnect )
             if ( d->descriptor == desc )
             {
                     d->close( );
-                    ch->send_to("Ok.\n\r");
+                    ch->send_to("Игрок отключен. Бай-бай!\n\r");
                     return;
             }
         }
@@ -595,13 +594,13 @@ CMDWIZP( disconnect )
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Таких сейчас в мире нет.\n\r");
         return;
     }
 
     if ( victim->desc == 0 )
     {
-        act_p( "$C1 doesn't have a descriptor.", ch, 0, victim, TO_CHAR,POS_DEAD );
+        act_p( "У $C2 нет дескриптора.", ch, 0, victim, TO_CHAR,POS_DEAD );
         return;
     }
 
@@ -610,13 +609,13 @@ CMDWIZP( disconnect )
         if ( d == victim->desc )
         {
             d->close( );
-            ch->send_to("Ok.\n\r");
+            ch->send_to("Готово.\n\r");
             return;
         }
     }
 
     bug( "Do_disconnect: desc not found.", 0 );
-    ch->send_to("Descriptor not found!\n\r");
+    ch->send_to("Дескриптор не найден!\n\r");
     return;
 }
 
@@ -634,7 +633,7 @@ CMDWIZP( transfer )
 
     if ( arg1[0] == '\0' )
     {
-        ch->send_to("Transfer whom (and where)?\n\r");
+        ch->send_to("Перенести кого и куда?\n\r");
         return;
     }
 
@@ -658,7 +657,7 @@ CMDWIZP( transfer )
 
     if ( ( victim = get_char_world( ch, arg1 ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Таких сейчас в мире нет.\n\r");
         return;
     }
     /*
@@ -672,7 +671,7 @@ CMDWIZP( transfer )
     {
         if ( ( location = find_location( ch, arg2 ) ) == 0 )
         {
-            ch->send_to("No such location.\n\r");
+            ch->send_to("Цель не найдена.\n\r");
             return;
         }
         
@@ -681,20 +680,20 @@ CMDWIZP( transfer )
         if ( location ->isPrivate( )
         &&  ch->get_trust() < MAX_LEVEL)
         {
-            ch->send_to("That room is private right now.\n\r");
+            ch->send_to("Комната приватная и сейчас занята.\n\r");
             return;
         }
     }
     
     if (victim->desc && victim->desc->connected != CON_PLAYING) {
-        ch->println("It's a bad idea.");
+        ch->println("Плохая идея.");
         return;
     }
 
     transfer_char( victim, ch, location,
-                  "%1$^C1 disappears in a mushroom cloud.",
-                  (ch != victim ? "%2$^C1 has transferred you." : NULL),
-                  "%1$^C1 arrives from a puff of smoke." );
+                  "%1$^C1 внезапно исчезает в столбе {Cбожественной энергии!{x",
+                  (ch != victim ? "%2$^C1 переносит тебя в столбе {Cбожественной энергии!{x" : NULL),
+                  "%1$^C1 внезапно прибывает в столбе {Cбожественной энергии!{x" );
 
     ch->send_to("Ok.\n\r");
 }
@@ -713,19 +712,19 @@ CMDWIZP( at )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-        ch->send_to("At where what?\n\r");
+        ch->send_to("Рядом с кем? Сделать что?\n\r");
         return;
     }
 
     if ( ( location = find_location( ch, arg ) ) == 0 )
     {
-        ch->send_to("No such location.\n\r");
+        ch->send_to("Цель не найдена.\n\r");
         return;
     }
 
     if ( location ->isPrivate( ) &&  ch->get_trust() < MAX_LEVEL)
     {
-        ch->send_to("That room is private right now.\n\r");
+        ch->send_to("Комната приватная и сейчас занята.\n\r");
         return;
     }
 
@@ -765,13 +764,13 @@ CMDWIZP( goto )
 
     if ( argument[0] == '\0' )
     {
-        ch->send_to("Goto where?\n\r");
+        ch->send_to("Переместиться куда?\n\r");
         return;
     }
 
     if ( ( location = find_location( ch, argument ) ) == 0 )
     {
-        ch->printf("No such location: %s.\n\r", argument );
+        ch->printf("Цель не найдена: %s.\n\r", argument );
         return;
     }
 
@@ -783,7 +782,7 @@ CMDWIZP( goto )
                 if (!pch->bamfout.empty( ))
                     act( "$t", ch, pch->bamfout.c_str( ), rch, TO_VICT );
                 else
-                    act( "$c1 leaves in a swirling mist.", ch, 0, rch, TO_VICT );
+                    act( "$c1 исчезает в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
             }
     }
     
@@ -795,7 +794,7 @@ CMDWIZP( goto )
                 if (!pch->bamfin.empty( ))
                     act( "$t", ch, pch->bamfin.c_str( ), rch, TO_VICT );
                 else
-                    act( "$c1 appears in a swirling mist.", ch, 0, rch, TO_VICT );
+                    act( "$c1 внезапно появляется в столбе {Cбожественной энергии.{x", ch, 0, rch, TO_VICT );
             }
     }
 }
@@ -814,11 +813,11 @@ CMDWIZP( stat )
    string = one_argument(argument, arg);
    if ( arg[0] == '\0')
    {
-        ch->send_to("Syntax:\n\r");
+        ch->send_to("Формат:\n\r");
         ch->send_to("  stat <name>\n\r");
         ch->send_to("  stat obj <name>\n\r");
         ch->send_to("  stat mob <name>\n\r");
-         ch->send_to("  stat room <number>\n\r");
+        ch->send_to("  stat room <number>\n\r");
         return;
    }
 
@@ -876,7 +875,7 @@ CMDWIZP( stat )
     return;
   }
 
-  ch->send_to("Nothing by that name found anywhere.\n\r");
+  ch->send_to("С таким именем ничего не найдено.\n\r");
 }
 
 
@@ -893,7 +892,7 @@ CMDWIZP( stat )
     location = ( arg[0] == '\0' ) ? ch->in_room : find_location( ch, arg );
     if ( location == 0 )
     {
-        ch->send_to("No such location.\n\r");
+        ch->send_to("Цель не найдена.\n\r");
         return;
     }
 
@@ -901,18 +900,18 @@ CMDWIZP( stat )
     if ( ch->in_room != location
     &&  location ->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->send_to("That room is private right now.\n\r");
+        ch->send_to("Комната приватная и сейчас занята.\n\r");
         return;
     }
 
     if (ch->in_room->affected_by)
     {
-        sprintf(buf, "Affected by %s\n\r",
+        sprintf(buf, "Под воздействием: %s\n\r",
             raffect_flags.messages(ch->in_room->affected_by).c_str( ));
         ch->send_to(buf);
     }
 
-    sprintf( buf, "Name: '%s'\n\rArea: '%s'\n\rOwner: '%s' Clan: '%s'\n\r",
+    sprintf( buf, "Имя: '%s'\n\rЗона: '%s'\n\rВладелец: '%s' Клан: '%s'\n\r",
         location->name,
         location->area->name ,
         location->owner,
@@ -920,7 +919,7 @@ CMDWIZP( stat )
     ch->send_to(buf);
 
     sprintf( buf,
-        "Vnum: %d  Sector: %d  Light: %d  Healing: %d  Mana: %d\n\r",
+        "Vnum: %d  Сектор: %d  Свет: %d  Лечение: %d  Мана: %d\n\r",
         location->vnum,
         location->sector_type,
         location->light,
@@ -929,7 +928,7 @@ CMDWIZP( stat )
     ch->send_to(buf);
 
     sprintf( buf,
-        "Room flags: %s.\n\rDescription:\n\r%s",
+        "Флаги: %s.\n\rОписание:\n\r%s",
         room_flags.names(location->room_flags).c_str( ),
         location->description );
     ch->send_to(buf);
@@ -938,7 +937,7 @@ CMDWIZP( stat )
     {
         EXTRA_DESCR_DATA *ed;
 
-        ch->send_to("Extra description keywords: '");
+        ch->send_to("Ключевые слова экстра-описания: '");
         for ( ed = location->extra_descr; ed; ed = ed->next )
         {
             ch->send_to(ed->keyword);
@@ -948,7 +947,7 @@ CMDWIZP( stat )
         ch->send_to("'.\n\r");
     }
 
-    ch->send_to("Characters:");
+    ch->send_to("Персонажи:");
     for ( rch = location->people; rch; rch = rch->next_in_room )
     {
         if (ch->can_see(rch))
@@ -957,7 +956,7 @@ CMDWIZP( stat )
         }
     }
 
-    ch->send_to(".\n\rObjects:   ");
+    ch->send_to(".\n\rОбъекты:   ");
     for ( obj = location->contents; obj; obj = obj->next_content )
     {
         ch->printf( " %s", obj->getFirstName( ).c_str( ) );
@@ -971,7 +970,7 @@ CMDWIZP( stat )
         if ( ( pexit = location->exit[door] ) != 0 )
         {
             sprintf( buf,
-                "Door: %d.  To: %d.  Key: %d. Level: %d.  Exit flags: %s.\n\rKeyword: '%s'.  Short: '%s'. Description: %s",
+                "Дверь: %d.  В: %d.  Ключ: %d. Уровень: %d.  Флаги выхода: %s.\n\rКейворд: '%s'.  Шорт: '%s'. Описание: %s",
 
                 door,
                 ( pexit->u1.to_room == 0 ? -1 : pexit->u1.to_room->vnum),
@@ -985,19 +984,19 @@ CMDWIZP( stat )
             ch->send_to(buf);
         }
     }
-    ch->send_to("Tracks:\n\r");
+    ch->send_to("Следы:\n\r");
 
     for (RoomHistory::iterator h = location->history.begin( );
          h != location->history.end( );
          h++)
     {
-        ch->printf( "%s took door %d.\r\n", h->name.c_str( ), h->went );
+        ch->printf( "%s проходит через дверь %d.\r\n", h->name.c_str( ), h->went );
     }
 
     if (location->behavior) {
         ostringstream ostr;
         
-        sprintf(buf, "Behavior: [%s]\r\n", location->behavior->getType( ).c_str( ));
+        sprintf(buf, "Поведение: [%s]\r\n", location->behavior->getType( ).c_str( ));
         ch->send_to(buf);
 
         location->behavior.toStream( ostr );
@@ -1020,20 +1019,20 @@ CMDWIZP( stat )
 
         if ( arg[0] == '\0' )
         {
-                ch->send_to("Stat what?\n\r");
+                ch->send_to("Stat чему?\n\r");
                 return;
         }
 
         if ( ( obj = get_obj_world( ch, argument ) ) == 0 )
         {
-                ch->send_to("Nothing like that in hell, earth, or heaven.\n\r");
+                ch->send_to("Ни на земле, ни в небесах не найдено. Увы и ах.\n\r");
                 return;
         }
 
         sprintf( buf, "Name(s): %s\n\r", obj->getName( ) );
         ch->send_to(buf);
 
-        sprintf( buf, "Vnum: %d  Limit: %d  Type: %s  Resets: %d\n\r",
+        sprintf( buf, "Vnum: %d  Лимит: %d  Тип: %s  Ресеты: %d\n\r",
                 obj->pIndexData->vnum, obj->pIndexData->limit,
                 item_table.message(obj->item_type).c_str( ),
                 obj->pIndexData->reset_num );
@@ -1044,30 +1043,30 @@ CMDWIZP( stat )
             ch->printf("Лимит исчезнет в %s.\r\n", d.c_str( ) );
         }
 
-        sprintf( buf, "Short description: %s\n\rLong description: %s\n\r",
+        sprintf( buf, "Шорт: %s\n\rДлинное описание: %s\n\r",
                 obj->getShortDescr( ), obj->getDescription( ) );
         ch->send_to(buf);
 
-        sprintf(buf,"Owner: %s\n\r", obj->getOwner( ) == 0 ? "nobody" : obj->getOwner( ));
+        sprintf(buf,"Владелец: %s\n\r", obj->getOwner( ) == 0 ? "nobody" : obj->getOwner( ));
         ch->send_to(buf);
 
-        sprintf( buf, "Material: %s\n\r", obj->getMaterial( ));
+        sprintf( buf, "Материал: %s\n\r", obj->getMaterial( ));
         ch->send_to(buf);
 
-        sprintf( buf, "Wear bits: %s\n\rExtra bits: %s\n\r",
+        sprintf( buf, "Берется в: %s\n\rЭкстра флаги: %s\n\r",
                 wear_flags.messages(obj->wear_flags, true).c_str( ), 
                 extra_flags.messages(obj->extra_flags, true).c_str( ) );
         ch->send_to(buf);
 
-        sprintf( buf, "Number: %d/%d  Weight: %d/%d/%d (10th pounds)\n\r",1,
+        sprintf( buf, "Число: %d/%d  Вес: %d/%d/%d (десятые доли фунта)\n\r",1,
                 obj->getNumber( ), obj->weight, obj->getWeight( ), obj->getTrueWeight( ) );
         ch->send_to(buf);
 
-        sprintf( buf, "Level: %d  Cost: %d  Condition: %d  Timer: %d Count: %d\n\r",
+        sprintf( buf, "Уровень: %d  Цена: %d  Состояние: %d  Таймер: %d По счету: %d\n\r",
                 obj->level, obj->cost, obj->condition, obj->timer, obj->pIndexData->count );
         ch->send_to(buf);
 
-        sprintf( buf,        "In room: %d  In object: %s  Carried by: %s  Wear_loc: %s\n\r",
+        sprintf( buf,        "В комнате: %d  Внутри: %s  В руках у: %s  Надето на: %s\n\r",
                 obj->in_room == 0 ? 0 : obj->in_room->vnum,
                 obj->in_obj  == 0 ? "(none)" : obj->in_obj->getShortDescr( '1' ).c_str( ),
                 obj->carried_by == 0 ? "(none)" :
@@ -1075,7 +1074,7 @@ CMDWIZP( stat )
                 obj->wear_loc->getName( ).c_str( ) );
         ch->send_to(buf);
 
-        sprintf( buf, "Values: %d %d %d %d %d\n\r",
+        sprintf( buf, "Значения: %d %d %d %d %d\n\r",
                 obj->value0(), obj->value1(), obj->value2(), obj->value3(),        obj->value4() );
         ch->send_to(buf);
 
@@ -1086,7 +1085,7 @@ CMDWIZP( stat )
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
-                sprintf( buf, "Level %d spells of:", obj->value0() );
+                sprintf( buf, "Заклинания %d уровня:", obj->value0() );
                 ch->send_to(buf);
 
                 if ( obj->value1() >= 0 && obj->value1() < SkillManager::getThis( )->size() )
@@ -1122,7 +1121,7 @@ CMDWIZP( stat )
 
         case ITEM_WAND:
         case ITEM_STAFF:
-                sprintf( buf, "Has %d(%d) charges of level %d",
+                sprintf( buf, "Имеет %d(%d) зарядов уровня %d",
                         obj->value1(), obj->value2(), obj->value0() );
                 ch->send_to(buf);
 
@@ -1138,55 +1137,55 @@ CMDWIZP( stat )
 
         case ITEM_DRINK_CON:
                 liquid = liquidManager->find( obj->value2() );
-                sprintf(buf,"It holds %s-colored %s.\n",
+                sprintf(buf,"Содержит жидкость %s цвета, %s.\n",
                     liquid->getColor( ).ruscase( '2' ).c_str( ),
                     liquid->getShortDescr( ).ruscase( '4' ).c_str( ) );
                 ch->send_to(buf);
                 break;
                 
         case ITEM_WEAPON:
-                ch->send_to("Weapon type is ");
+                ch->send_to("Тип оружия: ");
                 ch->send_to(weapon_class.name(obj->value0()).c_str( ));
                 ch->send_to("\n");
                 
                 if (obj->pIndexData->new_format)
-                        sprintf(buf,"Damage is %dd%d (average %d)\n\r",
+                        sprintf(buf,"Урон %dd%d (среднее %d)\n\r",
                                 obj->value1(),obj->value2(),(1 + obj->value2()) * obj->value1() / 2);
                 else
-                        sprintf( buf, "Damage is %d to %d (average %d)\n\r",
+                        sprintf( buf, "Урон от %d до %d (среднее %d)\n\r",
                                 obj->value1(), obj->value2(),( obj->value1() + obj->value2() ) / 2 );
-                        ch->send_to(buf);
+                ch->send_to(buf);
 
-                sprintf(buf,"Damage noun is %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
+                sprintf(buf,"Тип удара: %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));
                 ch->send_to(buf);
         
                 if (obj->value4())  /* weapon flags */
                 {
-                        sprintf(buf,"Weapons flags: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
+                        sprintf(buf,"Флаги оружия: %s\n\r",weapon_type2.messages(obj->value4()).c_str( ));
                         ch->send_to(buf);
                 }
                 break;
 
         case ITEM_ARMOR:
-                sprintf( buf,"Armor class is %d pierce, %d bash, %d slash, and %d vs. magic\n\r",
+                sprintf( buf,"Класс брони: %d колющее, %d удар, %d режущее, %d экзотика\n\r",
                         obj->value0(), obj->value1(), obj->value2(), obj->value3() );
                 ch->send_to(buf);
                 break;
 
         case ITEM_CONTAINER:
-                sprintf(buf,"Capacity: %d#  Maximum weight: %d#  flags: %s\n\r",
+                sprintf(buf,"Вместимость: %d#  Максимальный вес: %d#  Флаги: %s\n\r",
                         obj->value0(), obj->value3(), container_flags.messages(obj->value1()).c_str( ));
                 ch->send_to(buf);
                 if (obj->value4() != 100)
                 {
-                        sprintf(buf,"Weight multiplier: %d%%\n\r",obj->value4());
+                        sprintf(buf,"Уменьшение веса: %d%%\n\r",obj->value4());
                         ch->send_to(buf);
                 }
                 break;
         
         case ITEM_CORPSE_PC:
         case ITEM_CORPSE_NPC:
-                ch->printf( "Steaks: %d, Level: %d, Parts: '%s', Vnum: %d\n\r",
+                ch->printf( "Стейков: %d, Уровень: %d, Части тела: '%s', Vnum: %d\n\r",
                             obj->value0(), obj->value1(), 
                             part_flags.messages( obj->value2() ).c_str( ), obj->value3() );
                 break;
@@ -1196,7 +1195,7 @@ CMDWIZP( stat )
         {
                 EXTRA_DESCR_DATA *ed;
 
-                ch->send_to("Extra description keywords: '");
+                ch->send_to("Ключевые слова экстра-описаний: '");
 
                 for ( ed = obj->extra_descr; ed != 0; ed = ed->next )
                 {
@@ -1212,7 +1211,7 @@ CMDWIZP( stat )
         {
                 EXTRA_DESCR_DATA *ed;
 
-                ch->send_to("Extra description original: '");
+                ch->send_to("Оригинал экстра-описания: '");
 
                 for ( ed = obj->pIndexData->extra_descr; ed != 0; ed = ed->next )
                 {
@@ -1226,11 +1225,11 @@ CMDWIZP( stat )
 
     for ( paf = obj->affected; paf != 0; paf = paf->next )
     {
-        sprintf( buf, "Affects %s by %d, level %d",
+        sprintf( buf, "Изменяет %s на %d, уровень %d",
             apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
         ch->send_to(buf);
         if ( paf->duration > -1)
-            sprintf(buf,", %d hours.\n\r",paf->duration);
+            sprintf(buf,", %d часов.\n\r",paf->duration);
         else
             sprintf(buf,".\n\r");
         ch->send_to(buf);
@@ -1239,35 +1238,35 @@ CMDWIZP( stat )
             switch(paf->where)
             {
                 case TO_AFFECTS:
-                    sprintf(buf,"Adds %s affect.\n",
+                    sprintf(buf,"Дает аффект %s.\n",
                         affect_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_WEAPON:
-                    sprintf(buf,"Adds %s weapon flags.\n",
+                    sprintf(buf,"Добавляет флаги оружия %s.\n",
                         weapon_type2.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_OBJECT:
-                    sprintf(buf,"Adds %s object flag.\n",
+                    sprintf(buf,"Добавляет флаги объекта %s.\n",
                         extra_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_IMMUNE:
-                    sprintf(buf,"Adds immunity to %s.\n",
+                    sprintf(buf,"Дает иммунитет к %s.\n",
                         imm_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_RESIST:
-                    sprintf(buf,"Adds resistance to %s.\n\r",
+                    sprintf(buf,"Дает сопротивляемость к %s.\n\r",
                         res_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_VULN:
-                    sprintf(buf,"Adds vulnerability to %s.\n\r",
+                    sprintf(buf,"Дает уязвимость к %s.\n\r",
                         vuln_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_DETECTS:
-                    sprintf(buf,"Adds %s detection.\n\r",
+                    sprintf(buf,"Дает обнаружение %s.\n\r",
                         detect_flags.messages(paf->bitvector).c_str( ));
                     break;
                 default:
-                    sprintf(buf,"Unknown bit %d: %d\n\r",
+                    sprintf(buf,"Неизвестный битовый флаг %d: %d\n\r",
                         paf->where,paf->bitvector);
                     break;
             }
@@ -1278,7 +1277,7 @@ CMDWIZP( stat )
     if (!obj->enchanted)
     for ( paf = obj->pIndexData->affected; paf != 0; paf = paf->next )
     {
-        sprintf( buf, "Affects %s by %d, level %d.\n\r",
+        sprintf( buf, "Изменяет %s на %d, уровень %d.\n\r",
             apply_flags.message( paf->location ).c_str( ), paf->modifier,paf->level );
         ch->send_to(buf);
         if (paf->bitvector)
@@ -1286,31 +1285,31 @@ CMDWIZP( stat )
             switch(paf->where)
             {
                 case TO_AFFECTS:
-                    sprintf(buf,"Adds %s affect.\n",
+                    sprintf(buf,"Дает аффект %s.\n",
                         affect_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_OBJECT:
-                    sprintf(buf,"Adds %s object flag.\n",
+                    sprintf(buf,"Добавляет флаги объекта %s.\n",
                         extra_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_IMMUNE:
-                    sprintf(buf,"Adds immunity to %s.\n",
+                    sprintf(buf,"Дает иммунитет к %s.\n",
                         imm_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_RESIST:
-                    sprintf(buf,"Adds resistance to %s.\n\r",
+                    sprintf(buf,"Дает сопротивляемость к %s.\n\r",
                         res_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_VULN:
-                    sprintf(buf,"Adds vulnerability to %s.\n\r",
+                    sprintf(buf,"Дает уязвимость к %s.\n\r",
                         vuln_flags.messages(paf->bitvector).c_str( ));
                     break;
                 case TO_DETECTS:
-                    sprintf(buf,"Adds %s detection.\n\r",
+                    sprintf(buf,"Дает обнаружение %s.\n\r",
                         detect_flags.messages(paf->bitvector).c_str( ));
                     break;
                 default:
-                    sprintf(buf,"Unknown bit %d: %d\n\r",
+                    sprintf(buf,"Неизвестный битовый флаг %d: %d\n\r",
                         paf->where,paf->bitvector);
                     break;
             }
@@ -1318,14 +1317,14 @@ CMDWIZP( stat )
         }
     }
 
-        sprintf(buf,"Damage condition : %d (%s) ", obj->condition,
+        sprintf(buf,"Состояние : %d (%s) ", obj->condition,
         obj->get_cond_alias() );        
         ch->send_to(buf);
         
         if (obj->behavior) {
             ostringstream ostr;
             
-            sprintf(buf, "Behavior: [%s]\r\n", obj->behavior->getType( ).c_str( ));
+            sprintf(buf, "Поведение: [%s]\r\n", obj->behavior->getType( ).c_str( ));
             ch->send_to(buf);
 
             obj->behavior.toStream( ostr );
@@ -1360,23 +1359,23 @@ static bool has_nopost(Character *ch)
     PCharacter *pc = victim->is_npc( ) ? 0 : victim->getPC( ); // no switched data
     NPCharacter *npc = victim->getNPC( );
     
-    buf << "Name: [" << victim->getNameP( ) << "] ";
+    buf << "Имя: [" << victim->getNameP( ) << "] ";
     if (pc)
-        buf << "RName: [" << pc->getRussianName( ).normal( ) << "] ";
+        buf << "Шорт: [" << pc->getRussianName( ).normal( ) << "] ";
     if (npc)
-        buf << "Reset Zone: " << (npc->zone ? npc->zone->name : "?");
+        buf << "Родная зона: " << (npc->zone ? npc->zone->name : "?");
     buf << endl;
     
     if (npc)
         buf << "Vnum: "   << npc->pIndexData->vnum << "  "
-            << "Group: "  << npc->group << "  "
-            << "Count: "  << npc->pIndexData->count << "  "
-            << "Killed: " << npc->pIndexData->killed
+            << "Группа: "  << npc->group << "  "
+            << "По счету: "  << npc->pIndexData->count << "  "
+            << "Убито: " << npc->pIndexData->killed
             << endl;
 
-    buf << "Race: " << victim->getRace( )->getName( ) << "  "
-        << "Sex: "  << sex_table.name(victim->getSex( )) << "  "
-        << "Room: " << victim->in_room->vnum
+    buf << "Раса: " << victim->getRace( )->getName( ) << "  "
+        << "Пол: "  << sex_table.name(victim->getSex( )) << "  "
+        << "Комната: " << victim->in_room->vnum
         << endl;
     
     for (int s = 0; s < stat_table.size; s++)
@@ -1386,66 +1385,66 @@ static bool has_nopost(Character *ch)
             << "  ";
     buf << endl;
     
-    buf << "Hp: "   << victim->hit << "/" << victim->max_hit << " "
-        << "Mana: " << victim->mana << "/" << victim->max_mana << " "
-        << "Move: " << victim->move << "/" << victim->max_move << " ";
+    buf << "Хиты: "   << victim->hit << "/" << victim->max_hit << " "
+        << "Мана: " << victim->mana << "/" << victim->max_mana << " "
+        << "Мувы: " << victim->move << "/" << victim->max_move << " ";
     if (pc)
-        buf << "Prac: "  << pc->practice << " "
-            << "Train: " << pc->train << " ";
+        buf << "Практик: "  << pc->practice << " "
+            << "Тренировок: " << pc->train << " ";
     buf << endl;
     if (victim->heal_gain != 0 || victim->mana_gain != 0)
-        buf << "Extra heal gain: " << victim->heal_gain << "%   Extra mana gain: " << victim->mana_gain << "%" << endl;
+        buf << "Бонус восстановления жизни: " << victim->heal_gain << "%   Маны: " << victim->mana_gain << "%" << endl;
     
     if (victim->getReligion( ) == god_none)
         buf << "Не верит в богов." << endl;
     else
-        buf << "Believes the religion of " << victim->getReligion( )->getShortDescr( ) << endl;
+        buf << "Верит в " << victim->getReligion( )->getShortDescr( ) << endl;
     
-    buf << "Lev: " << victim->getRealLevel( ) << "(" << victim->getModifyLevel( ) << ")  "
-        << "Class: " << victim->getProfession( )->getName( ) << "  "
-        << "Align: " << align_table.name(ALIGNMENT(victim)) << " (" << victim->alignment << ")  "
-        << "Ethos: " << ethos_table.name( victim->ethos ) << "  "
+    buf << "Уровень: " << victim->getRealLevel( ) << "(" << victim->getModifyLevel( ) << ")  "
+        << "Класс: " << victim->getProfession( )->getName( ) << "  "
+        << "Натура: " << align_table.name(ALIGNMENT(victim)) << " (" << victim->alignment << ")  "
+        << "Этос: " << ethos_table.name( victim->ethos ) << "  "
         << endl;
 
-    buf << "Gold: " << victim->gold << "  "
-        << "Silver: " << victim->silver << "  ";
+    buf << "Золото: " << victim->gold << "  "
+        << "Серебро: " << victim->silver << "  ";
     if (pc)
-        buf << "Bank Gold: " << pc->bank_g << "  "
-            << "Bank Silver: " << pc->bank_s << "  "
-            << "QuestPoints: " << pc->getQuestPoints() 
+        buf << "Золота в банке: " << pc->bank_g << "  "
+            << "Серебра в банке: " << pc->bank_s << "  "
+            << "QP: " << pc->getQuestPoints() 
             << endl
-            << "Exp: " << pc->exp << "  "
-            << "Exp to level: " << pc->getExpToLevel( ) << "  "
-            << "Exp per level: " << pc->getExpPerLevel( pc->getLevel( ) + 1 ) - pc->getExpPerLevel( );
+            << "Опыт: " << pc->exp << "  "
+            << "До уровня: " << pc->getExpToLevel( ) << "  "
+            << "На уровень: " << pc->getExpPerLevel( pc->getLevel( ) + 1 ) - pc->getExpPerLevel( );
     buf << endl;
         
-    buf << "Armor: ";
+    buf << "Броня: ";
     for (int a = 0; a < ac_type.size; a++)
         buf << ac_type.name(a) << ": " << GET_AC(victim, a) << "  ";
     buf << endl;
     
-    buf << "Hit: "   << victim->hitroll << "  "
-        << "Dam: "   << victim->damroll << "  "
-        << "Saves: " << victim->saving_throw << "  "
-        << "Size: "  << size_table.name(victim->size) << " (" << victim->size << ")  "
-        << "Pos: "   << position_table.name(victim->position) << "  ";
+    buf << "Хитролл: "   << victim->hitroll << "  "
+        << "Дамролл: "   << victim->damroll << "  "
+        << "Савесы: " << victim->saving_throw << "  "
+        << "Размер: "  << size_table.name(victim->size) << " (" << victim->size << ")  "
+        << "Позиция: "   << position_table.name(victim->position) << "  ";
     if (pc)
-        buf << "Wimpy: " << victim->wimpy;
+        buf << "Трусость: " << victim->wimpy;
     buf << endl;
 
     if (npc)
-        buf << "Damage: " 
+        buf << "Урон: " 
             << npc->damage[DICE_NUMBER] << "d" 
             << npc->damage[DICE_TYPE] << "+"
             << npc->damage[DICE_BONUS] << "  "
-            << "Message: " << weapon_flags.name(npc->dam_type)
+            << "Тип урона: " << weapon_flags.name(npc->dam_type)
             << endl;
     
-    buf << "Fighting: " << (victim->fighting ? victim->fighting->getNameP( ) : "(none)") << "  ";
+    buf << "Сражается с: " << (victim->fighting ? victim->fighting->getNameP( ) : "(none)") << "  ";
     if (pc)
-        buf << "Death: " << pc->death << "  ";
-    buf << "Carry number: " << victim->carry_number << "  "
-        << "Carry weight: " << victim->getCarryWeight( ) / 10
+        buf << "Смертей: " << pc->death << "  ";
+    buf << "Несет вещей: " << victim->carry_number << "  "
+        << "Общим весом: " << victim->getCarryWeight( ) / 10
         << endl;
     
         
@@ -1455,24 +1454,24 @@ static bool has_nopost(Character *ch)
                 << ": " << pc->desires[i] << "  ";
         
         buf << endl
-            << "Age: "        << pc->age.getYears( ) << "  "
-            << "Played: "     << pc->age.getHours( ) << "(" << pc->age.getTrueHours( ) << ")  "
-            << "Last Level: " << pc->last_level << "  "
-            << "Timer: "      << pc->timer
+            << "Возраст: "        << pc->age.getYears( ) << "  "
+            << "Отыграно: "     << pc->age.getHours( ) << "(" << pc->age.getTrueHours( ) << ")  "
+            << "Последний уровень: " << pc->last_level << "  "
+            << "Таймер: "      << pc->timer
             << endl;
     }
     
     if (npc)
-        buf << "Act: " << act_flags.names(victim->act) << endl;
+        buf << "Поведение: " << act_flags.names(victim->act) << endl;
         
     if (pc) {
-        buf << "Act: " << plr_flags.names(victim->act) << " ";
+        buf << "Поведение: " << plr_flags.names(victim->act) << " ";
         show_char_pk_flags( pc, buf );
         buf << endl;
     }
     
     if (pc || victim->comm) {
-        buf << "Comm: " 
+        buf << "Связь: " 
             << comm_flags.names(victim->comm) << " "
             << add_comm_flags.names(victim->add_comm) << " ";
         
@@ -1484,47 +1483,47 @@ static bool has_nopost(Character *ch)
     }
     
     if (npc && npc->off_flags)
-        buf << "Offense: " << off_flags.names(npc->off_flags) << endl;
+        buf << "Атаки: " << off_flags.names(npc->off_flags) << endl;
 
     if (victim->imm_flags)
-        buf << "Immune: " << imm_flags.names(victim->imm_flags) << endl;
+        buf << "Иммунитеты: " << imm_flags.names(victim->imm_flags) << endl;
 
     if (victim->res_flags)
-        buf << "Resist: " <<  res_flags.names(victim->res_flags) << endl;
+        buf << "Сопротивляемости: " <<  res_flags.names(victim->res_flags) << endl;
 
     if (victim->vuln_flags)
-        buf << "Vulnerable: " << vuln_flags.names(victim->vuln_flags) << endl;
+        buf << "Уязвимости: " << vuln_flags.names(victim->vuln_flags) << endl;
 
     if (victim->detection)
-        buf << "Detection: " <<  detect_flags.names(victim->detection) << endl;
+        buf << "Видит: " <<  detect_flags.names(victim->detection) << endl;
     
-    buf << "Form:  " << form_flags.names(victim->form) << "  " << endl
-        << "Parts: " << part_flags.names(victim->parts) << endl;
+    buf << "Форма:  " << form_flags.names(victim->form) << "  " << endl
+        << "Части тела: " << part_flags.names(victim->parts) << endl;
     
     if (victim->affected_by)
-        buf << "Affected by " << affect_flags.names(victim->affected_by) << endl;
+        buf << "Под воздействием " << affect_flags.names(victim->affected_by) << endl;
     
-    buf << "Master " <<  (victim->master ? victim->master->getNameP( ) : "(none)") << "  "
-        << "Leader " <<  (victim->leader ? victim->leader->getNameP( ) : "(none)") << "  ";
+    buf << "Хозяин " <<  (victim->master ? victim->master->getNameP( ) : "(none)") << "  "
+        << "Лидер " <<  (victim->leader ? victim->leader->getNameP( ) : "(none)") << "  ";
     if (pc)
-        buf << "Pet: " << (pc->pet ? pc->pet->getNameP( ) : "(none)");
+        buf << "Пет: " << (pc->pet ? pc->pet->getNameP( ) : "(none)");
     buf << endl;
     
     if (npc) {
-        buf << "Short description: " << npc->getShortDescr( ) << endl
-            << "Long description: "  << npc->getLongDescr( );
+        buf << "Шорт: " << npc->getShortDescr( ) << endl
+            << "Длинное описание: "  << npc->getLongDescr( );
 
         const char *spec_fun_name = spec_name(*npc->spec_fun);
         if (spec_fun_name != 0)
-            buf << "Mobile has special procedure " << spec_fun_name << "." << endl;
+            buf << "Спец-процедура " << spec_fun_name << "." << endl;
     }
     
     for (Affect *paf = victim->affected; paf; paf = paf->next) {
-        buf << "Affect: '" << paf->type->getName( ) << "', ";
+        buf << "Аффект: '" << paf->type->getName( ) << "', ";
 
         if (paf->location != APPLY_NONE)
-            buf << "modifies " << apply_flags.name( paf->location ) << " "
-                << "by " << paf->modifier << ", ";
+            buf << "изменяет " << apply_flags.name( paf->location ) << " "
+                << "на " << paf->modifier << ", ";
                 
         if (paf->bitvector != 0) {
             const FlagTable *table = 0;
@@ -1563,27 +1562,27 @@ static bool has_nopost(Character *ch)
         
     if (pc) {
         if (pc->getLastAccessTime( ).getTime( ) != 0)
-            buf << "Last played time: " << pc->getLastAccessTime( ).getTimeAsString( ) << endl;
+            buf << "Последний раз в мире: " << pc->getLastAccessTime( ).getTimeAsString( ) << endl;
         
         if (!pc->getLastAccessHost( ).empty( ))
-            buf << "Last played host: " << pc->getLastAccessHost( ) << endl;
+            buf << "Последний хост: " << pc->getLastAccessHost( ) << endl;
     }
 
-    buf << "Last fought: " << (victim->last_fought ? victim->last_fought->getNameP( ) :"none") << "  "
-        << "Last fight time: " << Date::getTimeAsString( victim->getLastFightTime( ) ) 
+    buf << "Прошлый бой: " << (victim->last_fought ? victim->last_fought->getNameP( ) :"none") << "  "
+        << "Когда: " << Date::getTimeAsString( victim->getLastFightTime( ) ) 
         << endl;
     
     if (victim->ambushing[0])
-        buf << "Ambushing: [" << victim->ambushing << "]" << endl;
+        buf << "В засаде на: [" << victim->ambushing << "]" << endl;
     
     if (npc && !npc->pIndexData->practicer.empty( ))
-        buf << "Practicer: " << npc->pIndexData->practicer.toString( ) << endl;
+        buf << "Обучает: " << npc->pIndexData->practicer.toString( ) << endl;
 
     if (npc && !npc->pIndexData->religion.empty())
-        buf << "Religious beliefs: " << npc->pIndexData->religion.toString( ) << endl;
+        buf << "Верит в: " << npc->pIndexData->religion.toString( ) << endl;
 
     if (npc && npc->behavior) { 
-        buf << "Behavior: [" << npc->behavior->getType( ) << "]" << endl;
+        buf << "Поведение: [" << npc->behavior->getType( ) << "]" << endl;
         npc->behavior.toStream( buf );
     }
     
@@ -1599,7 +1598,7 @@ CMDWIZP( vnum )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Syntax:\n\r");
+        ch->send_to("Формат:\n\r");
         ch->send_to("  vnum obj <name>\n\r");
         ch->send_to("  vnum mob <name>\n\r");
         ch->send_to("  vnum type <item_type>\n\r");
@@ -1643,7 +1642,7 @@ CMDWIZP( vnum )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Find whom?\n\r");
+        ch->send_to("Найти кого?\n\r");
         return;
     }
 
@@ -1674,7 +1673,7 @@ CMDWIZP( vnum )
     }
 
     if ( !found )
-        ch->send_to("No mobiles by that name.\n\r");
+        ch->send_to("Мобы с таким именем не найдены.\n\r");
 
     return;
 }
@@ -1695,7 +1694,7 @@ CMDWIZP( vnum )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Find what?\n\r");
+        ch->send_to("Найти что?\n\r");
         return;
     }
 
@@ -1726,7 +1725,7 @@ CMDWIZP( vnum )
     }
 
     if ( !found )
-        ch->send_to("No objects by that name.\n\r");
+        ch->send_to("Объекты с таким именем не найдены.\n\r");
 
     return;
 }
@@ -1737,7 +1736,7 @@ CMDWIZP( vnum )
     ostringstream buf;
     
     if ((type = item_table.value( argument )) == NO_FLAG) {
-        ch->println( "No such item type exists." );
+        ch->println( "Такого типа предмета не существует." );
         return;
     }
     
@@ -1750,7 +1749,7 @@ CMDWIZP( vnum )
             }
 
     if (buf.str( ).empty( ))
-        ch->println( "No object has such item type." );
+        ch->println( "Такого типа нет ни у одного объекта." );
     else
         page_to_char( buf.str( ).c_str( ), ch ); 
 }
@@ -1761,7 +1760,7 @@ CMDWIZP( rwhere )
     bool found = false;
 
     if (argument[0] == '\0') {
-        ch->send_to("Find what room?\n\r");
+        ch->send_to("Найти какую комнату?\n\r");
         return;
     }
 
@@ -1772,7 +1771,7 @@ CMDWIZP( rwhere )
         }
 
     if (!found)
-        ch->println("Room with matching name not found.");
+        ch->println("Комната с таким именем не найдена.");
     else
         ch->send_to(buf);
 }
@@ -1789,7 +1788,7 @@ CMDWIZP( owhere )
 
     if ( argument[0] == '\0' )
     {
-            ch->send_to("Find what?\n\r");
+            ch->send_to("Найти что?\n\r");
             return;
     }
 
@@ -1821,19 +1820,19 @@ CMDWIZP( owhere )
 
         if ( in_obj->carried_by != 0 && ch->can_see(in_obj->carried_by)
                 && in_obj->carried_by->in_room != 0 )
-                sprintf( buf, "%3d) %s is carried by %s [Room %d]\n\r",
+                sprintf( buf, "%3d) %s в руках у %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
-                        ch->sees(in_obj->carried_by, '5').c_str(),
+                        ch->sees(in_obj->carried_by, '2').c_str(),
                         in_obj->carried_by->in_room->vnum );
         else if ( in_obj->in_room != 0 && ch->can_see(in_obj->in_room) )
-                sprintf( buf, "%3d) %s is in %s [Room %d]\n\r",
+                sprintf( buf, "%3d) %s на полу в %s [Комната %d]\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ),
                         in_obj->in_room->name,
                         in_obj->in_room->vnum );
         else
-                sprintf( buf, "%3d) %s is somewhere\n\r",
+                sprintf( buf, "%3d) %s черт его знает где.\n\r",
                         number,
                         obj->getShortDescr( '1' ).c_str( ) );
 
@@ -1845,7 +1844,7 @@ CMDWIZP( owhere )
     }
 
     if (!found)
-        ch->send_to("Nothing like that in heaven or earth.\n\r");
+        ch->send_to("Ни на земле, ни в небесах не найдено. Увы и ах.\n\r");
     else
         page_to_char( buffer.str( ).c_str( ), ch );
 }
@@ -1887,13 +1886,13 @@ CMDWIZP( mwhere )
                 count++;
 
                 if (victim->is_npc( ))
-                    sprintf(buf,"%3d) %s (in the body of %s) is in %s [%d]\n\r",
+                    sprintf(buf,"%3d) %s (в теле %s) находится в %s [%d]\n\r",
                             count, 
                             victim->getPC( )->getNameP( ),
                             victim->getNameP('1').c_str( ),
                             victim->in_room->name, victim->in_room->vnum);
                 else
-                    sprintf(buf,"%3d) %s is in %s [%d]\n\r",
+                    sprintf(buf,"%3d) %s находится в %s [%d]\n\r",
                             count, 
                             victim->getNameP( ),
                             victim->in_room->name, victim->in_room->vnum);
@@ -1934,7 +1933,7 @@ CMDWIZP( mwhere )
     }
 
     if (!found)
-        act_p( "You didn't find any $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
+        act_p( "Тебе не удалось найти $T.", ch, 0, argument, TO_CHAR,POS_DEAD );
     else
         page_to_char(buffer.str( ).c_str( ),ch);
 
@@ -2007,26 +2006,26 @@ CMDWIZP( snoop )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Snoop whom?\n\r");
+        ch->send_to("Следить за кем?\n\r");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Таких сейчас в мире нет\n\r");
         return;
     }
 
     if ( victim->desc == 0 )
     {
-        ch->send_to("No descriptor to snoop.\n\r");
+        ch->send_to("Дескриптор не найден!\n\r");
         return;
     }
 
     if ( victim == ch )
     {
-        ch->send_to("Cancelling all snoops.\n\r");
-        wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 stops being such a snoop.", ch );
+        ch->send_to("Отменяем всю слежку.\n\r");
+        wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 прекращает отслеживание.", ch );
         for ( d = descriptor_list; d != 0; d = d->next )
         {
             if ( d->snoop_by == ch->desc )
@@ -2037,36 +2036,36 @@ CMDWIZP( snoop )
 
     if ( victim->desc->snoop_by != 0 )
     {
-        ch->send_to("Busy already.\n\r");
+        ch->send_to("Кто-то уже следит за этим игроком.\n\r");
         return;
     }
 
     if (!victim->in_room->isOwner(ch) && ch->in_room != victim->in_room
     &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->send_to("That character is in a private room.\n\r");
+        ch->send_to("Этот игрок сейчас в приватной комнате.\n\r");
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust()
     ||   IS_SET(victim->comm,COMM_SNOOP_PROOF))
     {
-        ch->send_to("You failed.\n\r");
+        ch->send_to("У тебя пока не хватает прав на слежку за игроками.\n\r");
         return;
     }
 
     if ( ch->desc != 0 ) {
         for ( d = ch->desc->snoop_by; d != 0; d = d->snoop_by ) {
             if ( d->character == victim || d->character->getPC( ) == victim ) {
-                ch->send_to("Snoop loop detected.\n\r");
+                ch->send_to("Упс, круговая слежка!\n\r");
                 return;
             }
         }
     }
 
     victim->desc->snoop_by = ch->desc;
-    wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 starts snooping on %C1.", ch, victim );
-    ch->send_to("Ok.\n\r");
+    wiznet( WIZ_SNOOPS, WIZ_SECURE, ch->get_trust(), "%C1 начинает следить за %C1.", ch, victim );
+    ch->send_to("Начинаем слежку.\n\r");
 }
 
 
@@ -2077,7 +2076,7 @@ CMDWIZP( switch )
     Character *victim;
 
     if(ch->is_npc( )) {
-        ch->send_to("Mobs can't switch.\n\r");
+        ch->send_to("Мобы этого не умеют.\n\r");
         return;
     }
     
@@ -2087,7 +2086,7 @@ CMDWIZP( switch )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Switch into whom?\n\r");
+        ch->send_to("Вселиться в чье тело?\n\r");
         return;
     }
 
@@ -2096,24 +2095,24 @@ CMDWIZP( switch )
 
     if ( pch->switchedTo )
     {
-        ch->send_to("You are already switched.\n\r");
+        ch->send_to("Ты уже в чужом теле.\n\r");
         return;
     }
     
     victim = get_char_world( ch, arg );
     if ( !victim )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Таких сейчас в мире нет.\n\r");
         return;
     }
 
     if ( victim == ch ) {
-        ch->send_to("Ok.\n\r");
+        ch->send_to("Ты в своем теле.\n\r");
         return;
     }
 
     if (!victim->is_npc()) {
-        ch->send_to("You can only switch into mobiles.\n\r");
+        ch->send_to("Вселиться можно только в тело мобов.\n\r");
         return;
     }
 
@@ -2122,16 +2121,16 @@ CMDWIZP( switch )
     if (ch->in_room != victim->in_room &&  victim->in_room->isPrivate( ) &&
             !IS_TRUSTED(ch,IMPLEMENTOR))
     {
-        ch->send_to("That character is in a private room.\n\r");
+        ch->send_to("Этот персонаж сейчас в приватной комнате.\n\r");
         return;
     }
 
     if ( victim->desc != 0 ) {
-        ch->send_to("Character in use.\n\r");
+        ch->send_to("В это тело уже кто-то вселился!\n\r");
         return;
     }
 
-    wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust(), "%C1 switches into %C4.", pch, mob );
+    wiznet( WIZ_SWITCHES, WIZ_SECURE, ch->get_trust(), "%C1 вселяется в тело %C4.", pch, mob );
 
     mob->switchedFrom = pch;
     pch->switchedTo = mob;
@@ -2143,7 +2142,7 @@ CMDWIZP( switch )
     victim->prompt = ch->prompt;
     victim->comm = ch->comm;
     victim->lines = ch->lines;
-    victim->send_to("Ok.\n\r");
+    victim->send_to("Ты вселяешься в чужое тело.\n\r");
     return;
 }
 
@@ -2213,7 +2212,7 @@ CMDWIZP( clone )
 
         if (arg[0] == '\0')
         {
-                ch->send_to("Clone what?\n\r");
+                ch->send_to("Клонировать кого или что?\n\r");
                 return;
         }
 
@@ -2223,7 +2222,7 @@ CMDWIZP( clone )
                 obj = get_obj_here(ch,rest);
                 if (obj == 0)
                 {
-                        ch->send_to("You don't see that here.\n\r");
+                        ch->send_to("Этого здесь нет.\n\r");
                         return;
                 }
         }
@@ -2233,7 +2232,7 @@ CMDWIZP( clone )
                 mob = get_char_room(ch,rest);
                 if (mob == 0)
                 {
-                        ch->send_to("You don't see that here.\n\r");
+                        ch->send_to("Таких здесь нет.\n\r");
                         return;
                 }
         }
@@ -2243,7 +2242,7 @@ CMDWIZP( clone )
                 obj = get_obj_here(ch,argument);
                 if (mob == 0 && obj == 0)
                 {
-                        ch->send_to("You don't see that here.\n\r");
+                        ch->send_to("Этого здесь нет.\n\r");
                         return;
                 }
         }
@@ -2276,7 +2275,7 @@ CMDWIZP( clone )
 
                 if (!mob->is_npc())
                 {
-                        ch->send_to("You can only clone mobiles.\n\r");
+                        ch->send_to("Клонировать игроков запрещено Женевской конвенцией.\n\r");
                         return;
                 }
 
@@ -2286,7 +2285,7 @@ CMDWIZP( clone )
                         || (mob->getRealLevel( ) >  0 && !IS_TRUSTED(ch,ANGEL))
                         || !IS_TRUSTED(ch,AVATAR) )
                 {
-                        ch->send_to("Your powers are not great enough for such a task.\n\r");
+                        ch->send_to("У тебя пока не хватает прав для клонирования.\n\r");
                         return;
                 }
 
@@ -2322,7 +2321,7 @@ CMDWIZP( load )
 
     if (arg[0] == '\0')
     {
-        ch->send_to("Syntax:\n\r");
+        ch->send_to("Формат:\n\r");
         ch->send_to("  load mob <vnum>\n\r");
         ch->send_to("  load obj <vnum> <level>\n\r");
         return;
@@ -2354,13 +2353,13 @@ CMDWIZP( load )
 
         if ( arg[0] == '\0' || !is_number(arg) )
         {
-                ch->send_to("Syntax: load mob <vnum>.\n\r");
+                ch->send_to("Формат: load mob <vnum>.\n\r");
                 return;
         }
 
         if ( ( pMobIndex = get_mob_index( atoi( arg ) ) ) == 0 )
         {
-                ch->send_to("No mob has that vnum.\n\r");
+                ch->send_to("Моба с таким внумом не найдено.\n\r");
                 return;
         }
 
@@ -2375,7 +2374,7 @@ CMDWIZP( load )
 
         wiznet( WIZ_LOAD, WIZ_SECURE, ch->get_trust(), 
                 "%C1 создает %C4.", ch, victim );
-        ch->send_to("Ok.\n\r");
+        ch->send_to("Готово.\n\r");
         return;
 }
 
@@ -2393,7 +2392,7 @@ CMDWIZP( load )
 
     if ( arg1[0] == '\0' || !is_number(arg1))
     {
-        ch->send_to("Syntax: load obj <vnum> <level>.\n\r");
+        ch->send_to("Формат: load obj <vnum> <level>.\n\r");
         return;
     }
 
@@ -2403,20 +2402,20 @@ CMDWIZP( load )
     {
         if (!is_number(arg2))
         {
-          ch->send_to("Syntax: oload <vnum> <level>.\n\r");
+          ch->send_to("Формат: oload <vnum> <level>.\n\r");
           return;
         }
         level = atoi(arg2);
         if (level < 0 || level > ch->get_trust())
         {
-          ch->send_to("Level must be be between 0 and your level.\n\r");
+          ch->send_to("Уровень не может быть ниже нуля или выше твоего.\n\r");
             return;
         }
     }
 
     if ( ( pObjIndex = get_obj_index( atoi( arg1 ) ) ) == 0 )
     {
-        ch->send_to("No object has that vnum.\n\r");
+        ch->send_to("Объект с таким внумом не найден.\n\r");
         return;
     }
 
@@ -2471,8 +2470,8 @@ CMDWIZP( purge )
               extract_obj( obj );
         }
 
-        act_p( "$c1 purges the room!", ch, 0, 0, TO_ROOM,POS_RESTING);
-        ch->send_to("Ok.\n\r");
+        act_p( "$c1 изничтожает все в комнате!", ch, 0, 0, TO_ROOM,POS_RESTING);
+        ch->send_to("Готово.\n\r");
         dreamland->resetOption( DL_SAVE_MOBS );
         dreamland->resetOption( DL_SAVE_OBJS );
         save_items( ch->in_room );
@@ -2482,17 +2481,17 @@ CMDWIZP( purge )
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Таких в мире сейчас нет.\n\r");
         return;
     }
 
     if ( !victim->is_npc() )
     {
-          ch->send_to("Maybe that wasn't a good idea...\n\r");
+          ch->send_to("Сначала научись рисовать и отрасти усики.\n\r");
           return;
     }
 
-    act_p( "$c1 purges $C4.", ch, 0, victim, TO_NOTVICT,POS_RESTING );
+    act_p( "$c1 изничтожает $C4.", ch, 0, victim, TO_NOTVICT,POS_RESTING );
     extract_char( victim );
 }
 
@@ -2524,18 +2523,18 @@ CMDWIZP( restore )
             vch->mana        = vch->max_mana;
             vch->move        = vch->max_move;
             update_pos( vch);
-            act_p("$c1 has restored you.",ch,0,vch,TO_VICT,POS_DEAD);
+            act_p("$c1 {Gвосстановил$gо||а{x твои силы!",ch,0,vch,TO_VICT,POS_DEAD);
         }
 
         wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust(), 
                 "%C1 restored room %d.", ch, ch->in_room->vnum );
 
-        ch->send_to("Room restored.\n\r");
+        ch->send_to("Комната восстановлена.\n\r");
         return;
 
     }
 
-    if ( ch->get_trust() >=  MAX_LEVEL - 1 && !str_cmp(arg,"all"))
+    if ( ch->get_trust() >=  MAX_LEVEL - 5 && !str_cmp(arg,"all"))
     {
     /* cure all */
             
@@ -2560,15 +2559,15 @@ CMDWIZP( restore )
             victim->move        = victim->max_move;
             update_pos( victim);
             if (victim->in_room != 0)
-                act_p("$c1 has restored you.",ch,0,victim,TO_VICT,POS_DEAD);
+                act_p("$c1 {Gвосстановил$gо||а{x твои силы!",ch,0,victim,TO_VICT,POS_DEAD);
         }
-        ch->send_to("All active players restored.\n\r");
+        ch->send_to("Все активные игроки восстановлены!\n\r");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Таких здесь нет.\n\r");
         return;
     }
 
@@ -2582,9 +2581,9 @@ CMDWIZP( restore )
     victim->move = victim->max_move;
     update_pos( victim );
 
-    act_p( "$c1 has restored you.", ch, 0, victim, TO_VICT,POS_DEAD );
+    act_p( "$c1 {Gвосстановил$gо||а{x твои силы!", ch, 0, victim, TO_VICT,POS_DEAD );
     wiznet( WIZ_RESTORE, WIZ_SECURE, ch->get_trust( ), "%C1 restored %C4.", ch, victim );
-    ch->send_to("Ok.\n\r");
+    ch->send_to("Готово.\n\r");
 }
 
          
@@ -2597,40 +2596,40 @@ CMDWIZP( freeze )
 
     if ( arg[0] == '\0' )
     {
-        ch->send_to("Freeze whom?\n\r");
+        ch->send_to("Заморозить кого?\n\r");
         return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == 0 )
     {
-        ch->send_to("They aren't here.\n\r");
+        ch->send_to("Тут таких нет.\n\r");
         return;
     }
 
     if ( victim->is_npc() )
     {
-        ch->send_to("Not on NPC's.\n\r");
+        ch->send_to("Мобов замораживать бесполезно.\n\r");
         return;
     }
 
     if ( victim->get_trust() >= ch->get_trust() )
     {
-        ch->send_to("You failed.\n\r");
+        ch->send_to("У тебя пока не хватает прав для этого.\n\r");
         return;
     }
 
     if ( IS_SET(victim->act, PLR_FREEZE) )
     {
         victim->act.removeBit( PLR_FREEZE);
-        victim->send_to("You can play again.\n\r");
-        ch->send_to("FREEZE removed.\n\r");
+        victim->send_to("{CТебя разморозили!{x Ты чувствуешь как способность двигаться возвращается.\n\r");
+        ch->send_to("Цель разморожена.\n\r");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 thaws %C4.", ch, victim );
     }
     else
     {
         victim->act.setBit( PLR_FREEZE);
-        victim->send_to("You can't do ANYthing!\n\r");
-        ch->send_to("FREEZE set.\n\r");
+        victim->send_to("{CТЕБЯ ЗАМОРОЗИЛИ!{x Ты теряешь способность двигаться и говорить.\n\r");
+        ch->send_to("Цель заморожена.\n\r");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, 
                 "%C1 puts %C4 in the deep freeze.", ch, victim );
     }
@@ -2741,14 +2740,14 @@ CMDWIZP( noemote )
     if ( IS_SET(victim->comm, COMM_NOEMOTE) )
     {
         victim->comm.removeBit( COMM_NOEMOTE);
-        victim->send_to("You can emote again.\n\r");
+        victim->send_to("{MЧувства возвращаются к тебе!{x Ты снова можешь использовать эмоции.\n\r");
         ch->send_to("NOEMOTE removed.\n\r");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 restores emotes to %C1.", ch, victim );
     }
     else
     {
         victim->comm.setBit( COMM_NOEMOTE);
-        victim->send_to("You can't emote!\n\r");
+        victim->send_to("{MТЫ ТЕРЯЕШЬ ЧУВСТВА!{x Ты больше не можешь использовать эмоции.\n\r");
         ch->send_to("NOEMOTE set.\n\r");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 revokes %C2 emotes.", ch, victim );
     }
@@ -2783,14 +2782,14 @@ CMDWIZP( notell )
     if ( IS_SET(victim->comm, COMM_NOTELL) )
     {
         victim->comm.removeBit( COMM_NOTELL);
-        victim->send_to("You can tell again.\n\r");
+        victim->send_to("{GПечать на твоих устах пропадает.{x Ты снова можешь говорить.\n\r");
         ch->send_to("NOTELL removed.\n\r");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 restores tells to %C2.", ch, victim );
     }
     else
     {
         victim->comm.setBit( COMM_NOTELL);
-        victim->send_to("You can't tell!\n\r");
+        victim->send_to("{GБессмертный запечатывает твои уста!{x Ты не можешь говорить!\n\r");
         ch->send_to("NOTELL set.\n\r");
         wiznet( WIZ_PENALTIES, WIZ_SECURE, 0, "%C1 revokes %C1 tells.", ch, victim );
     }
@@ -2810,7 +2809,7 @@ CMDWIZP( peace )
             rch->act.removeBit(ACT_AGGRESSIVE);
     }
 
-    ch->send_to("Ok.\n\r");
+    ch->send_to("Мир, дружба, жвачка.\n\r");
     return;
 }
 
@@ -2875,11 +2874,11 @@ CMDWIZP( string )
                 || arg2[0] == '\0'
                 || arg3[0] == '\0' )
         {
-                ch->send_to("Syntax:\n\r");
+                ch->send_to("Формат:\n\r");
                 ch->send_to("  string mob <name> <field> <string>\n\r");
-                ch->send_to("    fields: name short long desc title spec\n\r");
+                ch->send_to("    поля: name short long desc title spec\n\r");
                 ch->send_to("  string obj  <name> <field> <string>\n\r");
-                ch->send_to("    fields: name short long\n\r");
+                ch->send_to("    поля: name short long\n\r");
                 ch->send_to("  string obj  <name> ed <add|remove|clear> <keyword> <string>\n\r");
                 return;
         }
@@ -2983,7 +2982,7 @@ CMDWIZP( string )
 
                 if ( obj->pIndexData->limit != -1 )
                 {
-                        ch->send_to("Хмм.. Мохам будет возмущен, не надо.\n\r");
+                        ch->send_to("Хмм... Тайфоэн будет возмущена, не надо.\n\r");
                         return;
                 }
             
@@ -3137,7 +3136,7 @@ CMDWIZP( force )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-        ch->send_to("Force whom to do what?\n\r");
+        ch->send_to("Принудить кого к чему?\n\r");
         return;
     }
 
@@ -3145,20 +3144,20 @@ CMDWIZP( force )
 
     if (!str_cmp(arg2,"delete"))
     {
-        ch->send_to("That will NOT be done.\n\r");
+        ch->send_to("ЭТО ЗАПРЕЩЕНО.\n\r");
         return;
     }
 
-    sprintf( buf, "$c1 forces you to '%s'.", argument );
+    sprintf( buf, "$c1 вежливо принуждает тебя выполнить команду '%s'.", argument );
 
     if ( !str_cmp( arg, "all" ) )
     {
         Character *vch;
         Character *vch_next;
 
-        if (ch->get_trust() < MAX_LEVEL - 3)
+        if (ch->get_trust() < MAX_LEVEL - 5)
         {
-            ch->send_to("Not at your level!\n\r");
+            ch->send_to("У тебя пока не хватает прав на принуждение.\n\r");
             return;
         }
 
@@ -3180,7 +3179,7 @@ CMDWIZP( force )
 
         if (ch->get_trust() < MAX_LEVEL - 2)
         {
-            ch->send_to("Not at your level!\n\r");
+            ch->send_to("У тебя пока не хватает прав на такое принуждение.\n\r");
             return;
         }
 
@@ -3203,7 +3202,7 @@ CMDWIZP( force )
 
         if (ch->get_trust() < MAX_LEVEL - 2)
         {
-            ch->send_to("Not at your level!\n\r");
+            ch->send_to("У тебя пока не хватает прав на такое принуждение.\n\r");
             return;
         }
 
@@ -3225,13 +3224,13 @@ CMDWIZP( force )
 
         if ( ( victim = get_char_world( ch, arg ) ) == 0 )
         {
-            ch->send_to("They aren't here.\n\r");
+            ch->send_to("Тут таких нет.\n\r");
             return;
         }
 
         if ( victim == ch )
         {
-            ch->send_to("Aye aye, right away!\n\r");
+            ch->send_to("Сила воли, бессердечная ты сука.\n\r");
             return;
         }
 
@@ -3239,19 +3238,19 @@ CMDWIZP( force )
         &&  ch->in_room != victim->in_room
         &&  victim->in_room->isPrivate( ) && !IS_TRUSTED(ch,IMPLEMENTOR))
             {
-            ch->send_to("That character is in a private room.\n\r");
+            ch->send_to("Этот персонаж сейчас в приватной комнате.\n\r");
             return;
         }
 
         if ( victim->get_trust() >= ch->get_trust() )
         {
-            ch->send_to("Do it yourself!\n\r");
+            ch->send_to("Эту цель ты пока не можешь принудить!\n\r");
             return;
         }
 
-        if ( !victim->is_npc() && ch->get_trust() < MAX_LEVEL -3)
+        if ( !victim->is_npc() && ch->get_trust() < MAX_LEVEL - 4)
         {
-            ch->send_to("Not at your level!\n\r");
+            ch->send_to("У тебя пока не хватает прав на такое принуждение.\n\r");
             return;
         }
 
@@ -3259,7 +3258,7 @@ CMDWIZP( force )
         interpret( victim, argument );
     }
 
-    ch->send_to("Ok.\n\r");
+    ch->send_to("Готово.\n\r");
     return;
 }
 
@@ -3282,14 +3281,14 @@ CMDWIZP( wizinvis )
       if ( ch->invis_level)
       {
           ch->invis_level = 0;
-          act_p( "$c1 slowly fades into existence.", ch, 0, 0, TO_ROOM,POS_RESTING );
-          ch->send_to("You slowly fade back into existence.\n\r");
+          act_p( "$c1 внезапно проявляется в реальности.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          ch->send_to("Ты снова проявляешься в реальности.\n\r");
       }
       else
       {
           ch->invis_level = 102;
-          act_p( "$c1 slowly fades into thin air.", ch, 0, 0, TO_ROOM,POS_RESTING );
-          ch->send_to("You slowly vanish into thin air.\n\r");
+          act_p( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          ch->send_to("Ты растворяешься за подкладкой реальности.\n\r");
       }
     else
     /* do the level thing */
@@ -3304,8 +3303,8 @@ CMDWIZP( wizinvis )
       {
           ch->reply = 0;
           ch->invis_level = level;
-          act_p( "$c1 slowly fades into thin air.", ch, 0, 0, TO_ROOM,POS_RESTING );
-          ch->send_to("You slowly vanish into thin air.\n\r");
+          act_p( "$c1 подмигивает и растворяется за подкладкой реальности.", ch, 0, 0, TO_ROOM,POS_RESTING );
+          ch->send_to("Ты растворяешься за подкладкой реальности.\n\r");
       }
     }
 
@@ -3374,13 +3373,13 @@ CMDWIZP( advance )
 
     if ( arg1[0] == '\0' || arg2[0] == '\0' || !is_number( arg2 ) )
     {
-        ch->send_to("Syntax: advance <char> <level>.\n\r");
+        ch->send_to("Формат: advance <char> <level>.\n\r");
         return;
     }
 
     if ( ( vict = get_char_room( ch, arg1 ) ) == 0 )
     {
-        ch->send_to("That player is not here.\n\r");
+        ch->send_to("Этого игрока тут нет.\n\r");
         return;
     }
 
@@ -3416,7 +3415,7 @@ CMDWIZP( advance )
         int temp_prac, temp_train;
 
         ch->send_to("Lowering a player's level!\n\r");
-        victim->send_to("**** OOOOHHHHHHHHHH  NNNNOOOO ****\n\r");
+        victim->send_to("**** ОООООО НЕЕЕЕЕЕЕЕЕТ!!! ****\n\r");
         temp_prac = victim->practice;
         temp_train = victim->train;
         victim->setLevel( 1 );
@@ -3436,13 +3435,13 @@ CMDWIZP( advance )
     else
     {
         ch->send_to("Raising a player's level!\n\r");
-        victim->send_to("**** OOOOHHHHHHHHHH  YYYYEEEESSS ****\n\r");
+        victim->send_to("**** ООООО ДАААААААААА ****\n\r");
     }
 
     for ( iLevel = victim->getRealLevel( ) ; iLevel < level; iLevel++ )
     {
         if( victim->get_trust() != 0xFFFF )
-            victim->send_to("You raise a level!!  ");
+            victim->send_to("Ты повышаешь уровень!  ");
         victim->exp += victim->getExpToLevel( );;
         victim->setLevel( victim->getRealLevel( ) + 1 );
         victim->getPC( )->advanceLevel( );
@@ -3652,13 +3651,13 @@ CMDWIZP( notitle )
    if (IS_SET(victim->act, PLR_NO_TITLE) )
         {
    victim->act.removeBit(PLR_NO_TITLE);
-   victim->send_to("You can change your title again.\n\r");
+   victim->send_to("Теперь ты снова можешь поменять титул.\n\r");
    ch->send_to("Ok.\n\r");
         }
    else
         {                
    victim->act.setBit(PLR_NO_TITLE);
-   victim->send_to("You won't be able to change your title anymore.\n\r");
+   victim->send_to("Бессмертный запрещает тебе менять титулы!\n\r");
    ch->send_to("Ok.\n\r");
         }
    return;
@@ -3737,7 +3736,7 @@ CMDWIZP( reboot )
     if (is_number(arg))
     {
      dreamland->setRebootCounter( atoi(arg) );
-     sprintf(buf,"Dream Land will reboot in %i ticks.\n\r",dreamland->getRebootCounter( ));
+     sprintf(buf,"Мир Мечты будет ПЕРЕЗАГРУЖЕН через %i тиков!\n\r",dreamland->getRebootCounter( ));
      ch->send_to(buf);
      return;
     }
@@ -3892,7 +3891,7 @@ CMDWIZP( curse )
         }
         if ( victim->is_npc() )
         {
-                ch->send_to("Это не есть игрок.\n\r");
+                ch->send_to("Это не игрок.\n\r");
                 return;
         }
 
@@ -3911,7 +3910,7 @@ CMDWIZP( curse )
                 modif = 1;
         else
         {
-                ch->send_to("Используйте:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
+                ch->send_to("Используй:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
                 return;
         }
 
@@ -3919,14 +3918,14 @@ CMDWIZP( curse )
 
         if ( !argument[0] )
         {
-                ch->send_to("Используйте:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
+                ch->send_to("Используй:\n\r   curse <игрок> <+/-количество> <причина>\n\r");
                 return;
         }
 
         if ( victim->getPC( )->curse + modif < 0
                 || victim->getPC( )->curse + modif > 100 )
         {
-                ch->send_to("Проклятие должно лежать в пределах 0..100\n\r");
+                ch->send_to("Проклятие должно лежать в пределах от 0 до 100\n\r");
                 return;
         }
 
@@ -3939,7 +3938,7 @@ CMDWIZP( curse )
         victim->getPC( )->curse += modif;
         interpret_raw( ch, "noaffect", victim->getNameP() );
         if ( modif > 0 )
-                sprintf( buf, "Боги становятся более блакосклонны к тебе.\n\rПричина: %s\n\r",
+                sprintf( buf, "Боги становятся более благосклонны к тебе.\n\rПричина: %s\n\r",
                         argument );
         else
                 sprintf( buf, "Боги проклинают тебя.\n\rПричина: %s", argument );
@@ -3955,7 +3954,7 @@ CMDWIZP( bless )
 
         if( !argument[0] )
         {
-                ch->send_to("Используйте:\n\r   bless <игрок> <+/-количество> <причина>\n\r");
+                ch->send_to("Используй:\n\r   bless <игрок> <+/-количество> <причина>\n\r");
                 return;
         }
 

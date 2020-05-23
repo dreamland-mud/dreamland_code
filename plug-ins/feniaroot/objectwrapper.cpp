@@ -359,6 +359,11 @@ NMI_GET( ObjectWrapper, wear_loc, "имя локации, куда надет с
     return Register( target->wear_loc->getName( ) );
 }
 
+NMI_GET(ObjectWrapper, worn, "true если надето, но не на хвост и не в волосы")
+{
+    checkTarget();
+    return Register(obj_is_worn(target));
+}
 NMI_GET( ObjectWrapper, weightTotal, "вес предмета с учетом содержимого")
 {
     checkTarget( );

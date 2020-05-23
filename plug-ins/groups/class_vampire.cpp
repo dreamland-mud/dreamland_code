@@ -104,7 +104,7 @@ void VampiricBiteOneHit::damBase( )
 void VampiricBiteOneHit::calcDamage( )
 {
     damBase( ); 
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     dam = ( ch->getModifyLevel( ) / 15 + 1) * dam + ch->getModifyLevel( );
     damApplyDamroll( );
@@ -725,8 +725,6 @@ SKILL_RUNP( touch )
         af.bitvector = AFF_SLEEP;
         affect_join ( victim,&af );
 
-        set_backguard( victim );
-
         if (IS_AWAKE(victim))
                 victim->position = POS_SLEEPING;
         
@@ -845,7 +843,7 @@ void BonedaggerOneHit::damApplyReligion()
 void BonedaggerOneHit::calcDamage( ) 
 {
     damBase( );
-    gsn_enhanced_damage->getCommand( )->run( ch, victim, dam );;
+    damApplyEnhancedDamage( );
     damApplyPosition( );
     damApplyDamroll( );
     damApplyReligion();

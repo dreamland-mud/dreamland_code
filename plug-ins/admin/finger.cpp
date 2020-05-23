@@ -81,6 +81,9 @@ CMDADM(finger)
             << "{gLast host:{x " << pci->getLastAccessHost() << endl
             << "{gAll hosts:{x Use 'finger " << playerName << " ip'" << endl;
 
+        str << "{gDescription:{x" << endl
+            << pci->getDescription();
+
         ch->send_to(str);
         return;
     }

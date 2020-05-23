@@ -309,6 +309,13 @@ bool StealQuest::checkItem( PCharacter *pch, Object *obj )
     if (!victim->can_see( obj ))
         return false;
 
+    // Hands almost full: may not be possible to give the item back.
+    if (victim->carry_number >= victim->canCarryNumber( ))
+        return false;
+
+    if (victim->getCarryWeight( ) >= victim->canCarryWeight( ))
+        return false;
+
     return ItemQuestModel::checkItem( pch, obj );
 }
 

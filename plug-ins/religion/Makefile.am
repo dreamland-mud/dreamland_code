@@ -16,7 +16,6 @@ libreligion_la_SOURCES = \
 impl.cpp \
 religionflags.cpp \
 defaultreligion.cpp \
-templeman.cpp \
 tattoo.cpp \
 gods_impl.cpp \
 religionattribute.cpp \
@@ -25,7 +24,6 @@ sacrifice.cpp
 
 libreligion_la_MOC = \
 defaultreligion.h \
-templeman.h \
 tattoo.h \
 gods_impl.h \
 religionattribute.h

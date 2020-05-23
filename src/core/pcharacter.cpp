@@ -142,7 +142,7 @@ void CachedNoun::clear( )
 void CachedNoun::update( PCharacter *ch )
 {
     static const DLString vampireName = "{DСоздани|е|я|ю|е|ем|и ночи{x";
-    static const DLString immortalName = "Immortal";
+    static const DLString immortalName = "{CБожеств|о{x|а{x|у{x|о{x|ом{x|е{x";
     MultiGender mg( ch->getSex( ), Number::SINGULAR );
     
     /* plain english name */
@@ -386,6 +386,7 @@ PCharacterMemory* PCharacter::getMemory( )
         mem->setRemorts( getRemorts( ) );
         mem->setRussianName( getRussianName( ).getFullForm( ) );
         mem->setReligion( getReligion( ) );
+        mem->setDescription(getDescription());
 
         return mem;
 }
@@ -411,6 +412,7 @@ void PCharacter::setMemory( PCharacterMemory* pcm )
         setRemorts( pcm->getRemorts( ) );
         setRussianName( pcm->getRussianName( ).getFullForm( ) );
         setReligion( pcm->getReligion( ) );
+        setDescription(pcm->getDescription());
 }
 
 /**************************************************************************
@@ -840,7 +842,12 @@ int PCharacter::getMaxStat( int i )
     if (getRealLevel( ) > LEVEL_IMMORTAL)
         return MAX_STAT;
 
-    int maxStat = getMaxTrain( i ) + remorts.stats[i].getValue( );
+    int maxTrain = getMaxTrain( i );
+    int remortBonus = remorts.stats[i].getValue( );
+
+    int maxStat = maxTrain > MAX_STAT_REMORT ? maxTrain //greater than 25 without remorts? then take it
+    : maxTrain+remortBonus > MAX_STAT_REMORT ? MAX_STAT_REMORT //remort bonus can't give more than 25
+    : maxTrain+remortBonus; //if less than or equal to 25 - take train+remorts
 
     return URANGE( MIN_STAT, maxStat, MAX_STAT );
 }
@@ -853,20 +860,6 @@ int PCharacter::getMaxTrain( int i )
         return min(MAX_STAT, BASE_STAT
                                 + getRace( )->getPC( )->getStats( )[i]
                                 + getProfession( )->getStat( i ));
-}
-
-void PCharacter::updateStats( )
-{
-    int i, max_stat;
-
-    for (i = 0; i < stat_table.size; i++) {        
-        max_stat = getMaxTrain( i );
-
-        if (perm_stat[i] > max_stat) {
-            train += perm_stat[i] - max_stat;
-            perm_stat[i] = max_stat;
-        }
-    }
 }
 
 /**************************************************************************
