@@ -26,6 +26,7 @@
 #include "fight.h"
 #include "act_move.h"
 #include "gsn_plugin.h"
+#include "damage.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -37,8 +38,7 @@
 SPELL_DECL(CallLightning);
 VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     int dam, vdam;
 
     if ( !IS_OUTSIDE(ch) )
@@ -60,8 +60,9 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
     
     area_message( ch, "Молнии сверкают на небе.", false );
 
-    for (vch = room->people; vch; vch = vch_next) {
-        vch_next = vch->next_in_room;
+    for ( auto &vch : room->getPeople()) {
+
+        if(!vch->isDead() && vch->in_room == room){
 
         if (vch->is_mirror() && number_percent() < 50) 
             continue;
@@ -73,7 +74,13 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
             continue;
         
         vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_SPELL ) ? dam / 2 : dam;
+        try{
         damage_nocatch( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
+        }
+        catch (const VictimDeathException &){
+            continue;
+        }
+        }
     }
 }
 

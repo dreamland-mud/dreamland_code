@@ -420,8 +420,7 @@ VOID_AFFECT(HealingLight)::toStream( ostringstream &buf, Affect *paf )
 SPELL_DECL(HolyWord);
 VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     int dam;
     int bless_num, curse_num, frenzy_num;
 
@@ -433,10 +432,11 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
            ch,0,0,TO_ROOM,POS_RESTING);
     ch->send_to("Ты произносишь заклинание {WБожественной Силы{x!\n\r");
 
-    for ( vch = room->people; vch != 0; vch = vch_next )
+    for ( auto &vch : room->getPeople() )
     {
-        vch_next = vch->next_in_room;
-         
+
+        if(!vch->isDead() && vch->in_room == room){
+        
         if (vch->is_mirror() && number_percent() < 50) 
             continue;
 
@@ -464,7 +464,12 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                 spell(curse_num,level,ch, vch);
                 vch->send_to("Божественная сила повергает тебя!\n\r");
                 dam = dice(level,6);
+                try{
                 damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
+                }
+                catch (const VictimDeathException &){
+                    continue;
+                }
               }
             }
 
@@ -478,7 +483,12 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
                 spell(curse_num,level/2,ch, vch);
                 vch->send_to("Божественная сила повергает тебя!\n\r");
                 dam = dice(level,4);
+                try{
                 damage_nocatch(ch,vch,dam,sn,DAM_HOLY, true, DAMF_SPELL);
+                }
+                catch (const VictimDeathException &){
+                    continue;
+                }
               }
             }
         } catch (const VictimDeathException &ex) {
@@ -487,6 +497,7 @@ VOID_SPELL(HolyWord)::run( Character *ch, Room *room, int sn, int level )
             ch->hit /= (4/3);
             throw ex;
         }
+    }
     }
 
     ch->send_to("Ты чувствуешь себя опустошенно.\n\r");

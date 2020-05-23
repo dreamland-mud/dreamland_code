@@ -41,7 +41,7 @@ SPELL_DECL(ChainLightning);
 VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     
-    Character *tmp_vict,*last_vict,*next_vict;
+    Character *last_vict;
     bool found;
     int dam;
 
@@ -66,11 +66,9 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
     while (level > 0)
     {
         found = false;
-        for (tmp_vict = ch->in_room->people;
-             tmp_vict != 0;
-             tmp_vict = next_vict)
+        for (auto &tmp_vict : ch->in_room->getPeople())
         {
-          next_vict = tmp_vict->next_in_room;
+          
           if (!is_safe_spell(ch,tmp_vict,true) && tmp_vict != last_vict)
           {
 
@@ -260,8 +258,6 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(Iceball);
 VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-        Character *tmp_vict;
-        Character *tmp_next;
         int dam;
         int movedam;
 
@@ -270,28 +266,32 @@ VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level )
         else                    dam = dice( level, 18 );
 
         movedam     = number_range( ch->getModifyLevel(), 2 * ch->getModifyLevel() );
-
-        for (tmp_vict = room->people; tmp_vict != 0; tmp_vict = tmp_next)
+     
+        for(auto &it : ch->in_room->getPeople())
         {
-                tmp_next = tmp_vict->next_in_room;
+            if(!it->isDead() && it->in_room == ch->in_room){
 
-                if ( tmp_vict->is_mirror()
+                if ( it->is_mirror()
                     && ( number_percent() < 50 ) ) continue;
 
-                if ( !is_safe_spell(ch,tmp_vict,true))
+                if ( !is_safe_spell(ch,it,true))
                 {
-                        if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
-                            yell_panic( ch, tmp_vict );
+                        if (ch->fighting != it && it->fighting != ch)
+                            yell_panic( ch, it );
 
-                        if (saves_spell(level,tmp_vict, DAM_COLD,ch, DAMF_SPELL))
+                        if (saves_spell(level,it, DAM_COLD,ch, DAMF_SPELL))
                                 dam /= 2;
-
-                        damage_nocatch( ch, tmp_vict, dam, sn, DAM_COLD, true, DAMF_SPELL );
-                        tmp_vict->move -= min((int)tmp_vict->move,movedam);
-                }
+                    try{
+                        damage_nocatch( ch, it, dam, sn, DAM_COLD, true, DAMF_SPELL );
+                        it->move -= min((int)it->move,movedam);
+                     }
+                         catch (const VictimDeathException &) {
+                             continue;
+                    }
+                }                       
+             }
         }
-
-}
+ }
 
 
 SPELL_DECL(MagicMissile);
@@ -363,7 +363,7 @@ VOID_SPELL(MagicMissile)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(SandStorm);
 VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-        Character *vch, *vch_next;
+
         int dam,hp_dam,dice_dam;
         int hpch;
 
@@ -389,11 +389,14 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
         dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
         sand_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
-        for ( vch = room->people; vch != 0; vch = vch_next )
+        for ( auto &vch : room->getPeople() )
         {
-                vch_next = vch->next_in_room;
+            if(!vch->isDead() && vch->in_room == room){
 
-                if ( is_safe_spell(ch,vch,true )
+                if (vch->is_mirror() && number_percent() < 50) 
+                continue;
+
+               if ( is_safe_spell(ch,vch,true )
                         || ( vch->is_npc()
                                 && ch->is_npc()
                                 && ( ch->fighting != vch && vch->fighting != ch)))
@@ -401,6 +404,10 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                 if ( is_safe(ch, vch) )
                         continue;
 
+                if (ch->fighting != vch && vch->fighting != ch)
+                yell_panic( ch, vch );
+
+            try{
                 if ( saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL) )
                 {
                         sand_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -411,8 +418,12 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                         sand_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
                         damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
                 }
+            }
+            catch (const VictimDeathException &){
+                continue;
+            }
         }
-
+        }
 }
 
 SPELL_DECL(ShockingGrasp);
@@ -475,8 +486,7 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
 SPELL_DECL(Hurricane);
 VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     int dam,hp_dam,dice_dam,hpch;
 
     act_p("$c1 призывает повелителя ураганов на помощь.",
@@ -490,9 +500,13 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
 
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
 
-    for (vch = room->people; vch != 0; vch = vch_next)
-    {
-        vch_next = vch->next_in_room;
+    for ( auto &vch : room->getPeople())
+    {            
+        if(!vch->isDead() && vch->in_room == room){
+
+        if (vch->is_mirror() && number_percent() < 50) 
+        continue;
+        
 
         if (is_safe_spell(ch,vch,true))
             continue;
@@ -515,11 +529,17 @@ VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level )
         else if (vch->size == SIZE_LARGE)  dam = ( int )( dam * 0.9 );
         else if (vch->size == SIZE_HUGE)  dam = ( int )( dam * 0.7 );
         else dam = ( int )( dam * 0.5 );
-
+    try{
         if (saves_spell(level,vch,DAM_OTHER, ch, DAMF_SPELL))
             damage_nocatch(ch,vch,dam/2,sn,DAM_OTHER,true, DAMF_SPELL);
         else
             damage_nocatch(ch,vch,dam,sn,DAM_OTHER,true, DAMF_SPELL);
+        }
+    catch (const VictimDeathException &){
+        continue;
+    }
+        }
+
     }
 
 }

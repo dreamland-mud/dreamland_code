@@ -1558,7 +1558,6 @@ SKILL_RUNP( strangle )
 
 SKILL_RUNP( poison )
 {
-        Character *tmp_vict;
 
         if (ch->is_npc())
                 return;
@@ -1591,7 +1590,7 @@ SKILL_RUNP( poison )
 
         gsn_poison_smoke->improve( ch, true );
 
-        for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
+        for ( auto &tmp_vict : ch->in_room->getPeople() )
         {
                 if ( !is_safe_spell(ch,tmp_vict,true) )
                 {
@@ -1652,9 +1651,9 @@ SKILL_RUNP( blindness )
 
 BOOL_SKILL( blindness )::run( Character *ch ) 
 {
-    Character *tmp_vict;
+ 
 
-    for ( tmp_vict=ch->in_room->people; tmp_vict!=0; tmp_vict=tmp_vict->next_in_room )
+    for ( auto &tmp_vict : ch->in_room->getPeople() )
     {
         if (!is_safe_spell(ch,tmp_vict,true))
         {

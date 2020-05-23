@@ -142,7 +142,7 @@ VOID_SPELL(Disintegrate)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(Scream);
 VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-        Character *vch, *vch_next;
+
         int dam=0,hp_dam,dice_dam;
         int hpch;
 
@@ -167,9 +167,9 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
 
         scream_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
-        for (vch = room->people; vch != 0; vch = vch_next)
+        for ( auto &vch : room->getPeople())
         {
-                vch_next = vch->next_in_room;
+            if(!vch->isDead() && vch->in_room == room){
 
                 if (is_safe_spell(ch,vch,true))
                         continue;
@@ -184,7 +184,8 @@ VOID_SPELL(Scream)::run( Character *ch, Room *room, int sn, int level )
                         scream_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
                 else
                         scream_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-        }
+            }
+       }
 
 }
 

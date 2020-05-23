@@ -29,6 +29,7 @@
 #include "gsn_plugin.h"
 #include "drink_utils.h"
 #include "math_utils.h"
+#include "damage.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -810,8 +811,7 @@ VOID_SPELL(Weaken)::run( Character *ch, Character *victim, int sn, int level )
 SPELL_DECL(UnholyWord);
 VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     int dam;
     
     if (!IS_EVIL(ch)) {
@@ -822,29 +822,33 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
     act_p("$c1 произносит нечистые слова!", ch,0,0,TO_ROOM,POS_RESTING);
     ch->send_to("Ты произносишь нечистые слова!\n\r");
 
-    for (vch = room->people; vch != 0; vch = vch_next) {
-        vch_next = vch->next_in_room;
-        
-        if (is_safe_spell(ch, vch, true ))
+        for(auto &it : ch->in_room->getPeople())
+        {
+            
+        if(!it->isDead() && it->in_room == ch->in_room){
+            
+            try{
+
+        if (is_safe_spell(ch, it, true ))
             continue;
 
-        if (vch->is_mirror( ) && (number_percent( ) < 50)) 
+        if (it->is_mirror( ) && (number_percent( ) < 50)) 
             continue;
         
-        if (is_safe( ch, vch ))
+        if (is_safe( ch, it ))
             continue;
         
-        if (IS_EVIL(vch))
+        if (IS_EVIL(it))
             continue;
-        else if (IS_GOOD(vch))
+        else if (IS_GOOD(it))
             dam = dice( level, 20 );
         else 
             dam = dice( level, 15 );
     
-        if (saves_spell( level, vch, DAM_NEGATIVE,ch, DAMF_SPELL )) {
+        if (saves_spell( level, it, DAM_NEGATIVE,ch, DAMF_SPELL )) {
             dam /= 2;
         }
-        else if (!IS_AFFECTED( vch, AFF_CURSE )) {
+        else if (!IS_AFFECTED( it, AFF_CURSE )) {
             Affect af;
             
             af.where = TO_AFFECTS;
@@ -854,20 +858,29 @@ VOID_SPELL(UnholyWord)::run( Character *ch, Room *room, int sn, int level )
             af.location = APPLY_HITROLL;
             af.modifier = -1 * (level / 5);
             af.bitvector = AFF_CURSE;
-            affect_to_char( vch, &af );
+            affect_to_char( it, &af );
             
             af.location  = APPLY_SAVING_SPELL;
             af.modifier  = level / 8;
-            affect_to_char( vch, &af );
+            affect_to_char( it, &af );
 
-            vch->send_to("Ты чувствуешь себя отвратительно.\n\r");
+            it->send_to("Ты чувствуешь себя отвратительно.\n\r");
             
-            if (ch != vch)
-                act("$C1 выглядит отвратительно.",ch,0,vch,TO_CHAR);
+            if (ch != it)
+                act("$C1 выглядит отвратительно.",ch,0,it,TO_CHAR);
         }
 
-        vch->send_to("Дьявольская сила повергает тебя!\n\r");
-        damage_nocatch( ch, vch, dam, sn, DAM_NEGATIVE, true, DAMF_SPELL );
+        it->send_to("Дьявольская сила повергает тебя!\n\r");
+
+            if (ch->fighting != it && it->fighting != ch)
+            yell_panic( ch, it );
+
+        damage_nocatch( ch, it, dam, sn, DAM_NEGATIVE, true, DAMF_SPELL );
+            }
+                         catch (const VictimDeathException &) {
+                             continue;
+                    }
+        }
     }
 }
 

@@ -27,6 +27,7 @@
 #include "act_move.h"
 #include "gsn_plugin.h"
 #include "effects.h"
+#include "damage.h"
 
 #include "merc.h"
 #include "mercdb.h"
@@ -87,7 +88,6 @@ SPELL_DECL(DragonsBreath);
 VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         
-        Character *vch, *vch_next;
         int dam,hp_dam,dice_dam;
         int hpch;
 
@@ -110,9 +110,13 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
         case 1:
                 fire_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
-                for (vch = victim->in_room->people; vch != 0; vch = vch_next)
+                for ( auto &vch : victim->in_room->getPeople())
                 {
-                        vch_next = vch->next_in_room;
+                        if(!vch->isDead() && vch->in_room == victim->in_room){
+
+                        if ( vch->is_mirror()
+                        && ( number_percent() < 50 ) ) continue;
+
 
                         if ( is_safe_spell(ch,vch,true)
                                 || ( vch->is_npc() && ch->is_npc()
@@ -124,6 +128,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                         if (vch == victim) /* full damage */
                         {
+                                try{
                                 if (saves_spell(level,vch,DAM_FIRE,ch, DAMF_SPELL))
                                 {
                                         fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -134,9 +139,14 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                         fire_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
                                         damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
                                 }
+                                }
+                                catch (const VictimDeathException &){
+                                        continue;
+                                }
                         }
                         else /* partial damage */
                         {
+                                try{
                                 if (saves_spell(level - 2,vch,DAM_FIRE,ch, DAMF_SPELL))
                                 {
                                         fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
@@ -147,6 +157,11 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                         fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
                                         damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
                                 }
+                                }
+                                catch (const VictimDeathException &){
+                                        continue;
+                                }
+                        }
                         }
                 }
     break;
@@ -167,9 +182,12 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
         case 3:
                 cold_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
-                for (vch = victim->in_room->people; vch != 0; vch = vch_next)
-                {
-                        vch_next = vch->next_in_room;
+                for ( auto &vch : victim->in_room->getPeople())
+                {                        
+                        if(!vch->isDead() && vch->in_room == victim->in_room){
+
+                        if ( vch->is_mirror()
+                        && ( number_percent() < 50 ) ) continue;
 
                         if ( is_safe_spell(ch,vch,true)
                                 || ( vch->is_npc() && ch->is_npc()
@@ -181,6 +199,7 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
 
                         if (vch == victim) /* full damage */
                         {
+                                try{
                                 if (saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL))
                                 {
                                         cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -191,9 +210,14 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                         cold_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
                                         damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
                                 }
+                                }
+                                catch (const VictimDeathException &){
+                                        continue;
+                                }
                         }
                         else
                         {
+                                try{
                                 if (saves_spell(level - 2,vch,DAM_COLD,ch, DAMF_SPELL))
                                 {
                                         cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
@@ -204,16 +228,25 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                                         cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
                                         damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
                                 }
+                                }
+                                catch (const VictimDeathException &){
+                                        continue;
+                                }
+                        }
                         }
                 }
                 break;
 
         case 4:
-                poison_effect(ch->in_room,level,dam,TARGET_ROOM, DAMF_SPELL);
+                poison_effect(victim->in_room,level,dam,TARGET_ROOM, DAMF_SPELL);
 
-                for (vch = ch->in_room->people; vch != 0; vch = vch_next)
+                for ( auto &vch : victim->in_room->getPeople())
                 {
-                        vch_next = vch->next_in_room;
+
+                        if(!vch->isDead() && vch->in_room == victim->in_room){
+       
+                        if ( vch->is_mirror()
+                        && ( number_percent() < 50 ) ) continue;
 
                         if ( is_safe_spell(ch,vch,true)
                                 || ( ch->is_npc() && vch->is_npc()
@@ -226,6 +259,8 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         if (ch->fighting != vch && vch->fighting != ch)
                             yell_panic( ch, vch );
 
+                        try{
+                                                    
                         if (saves_spell(level,vch,DAM_POISON,ch, DAMF_SPELL))
                         {
                                 poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -235,6 +270,11 @@ VOID_SPELL(DragonsBreath)::run( Character *ch, Character *victim, int sn, int le
                         {
                                 poison_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
                                 damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
+                        }
+                        }
+                        catch (const VictimDeathException &){
+                                continue;
+                        }
                         }
                 }
                 break;
@@ -259,7 +299,6 @@ SPELL_DECL(FireBreath);
 VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     
-    Character *vch, *vch_next;
     int dam,hp_dam,dice_dam;
     int hpch;
     
@@ -274,9 +313,9 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
     dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
     fire_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
-    for (vch = victim->in_room->people; vch != 0; vch = vch_next)
+    for ( auto &vch : victim->in_room->getPeople())
     {
-        vch_next = vch->next_in_room;
+       if(!vch->isDead() && vch->in_room == victim->in_room){
 
         if ( vch->is_mirror()
             && ( number_percent() < 50 ) ) continue;
@@ -291,6 +330,7 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
 
         if (vch == victim) /* full damage */
         {
+                try{
             if (saves_spell(level,vch,DAM_FIRE, ch, DAMF_SPELL))
             {
                 fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -301,9 +341,14 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
                 fire_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
                 damage_nocatch(ch,vch,dam,sn,DAM_FIRE,true, DAMF_SPELL);
             }
+                }
+                catch (VictimDeathException &){
+                        continue;
+                }
         }
         else /* partial damage */
         {
+                try{
             if (saves_spell(level - 2,vch,DAM_FIRE, ch, DAMF_SPELL))
             {
                 fire_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
@@ -314,7 +359,12 @@ VOID_SPELL(FireBreath)::run( Character *ch, Character *victim, int sn, int level
                 fire_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
                 damage_nocatch(ch,vch,dam/2,sn,DAM_FIRE,true, DAMF_SPELL);
             }
+                }
+                catch (const VictimDeathException &){
+                        continue;
+                }
         }
+       }
     }
 
 }
@@ -323,7 +373,6 @@ SPELL_DECL(FrostBreath);
 VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     
-    Character *vch, *vch_next;
     int dam,hp_dam,dice_dam, hpch;
     
     act("$c1 выдыхает леденящую воронку инея!", ch, 0, victim, TO_NOTVICT);
@@ -337,9 +386,9 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
     cold_effect(victim->in_room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
-    for (vch = victim->in_room->people; vch != 0; vch = vch_next)
+    for ( auto &vch : victim->in_room->getPeople())
     {
-        vch_next = vch->next_in_room;
+        if(!vch->isDead() && vch->in_room == victim->in_room){
 
         if ( vch->is_mirror()
             && ( number_percent() < 50 ) ) continue;
@@ -354,6 +403,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
 
         if (vch == victim) /* full damage */
         {
+                try{
             if (saves_spell(level,vch,DAM_COLD, ch, DAMF_SPELL))
             {
                 cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -364,9 +414,14 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
                 cold_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
                 damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
             }
+                }
+                catch (const VictimDeathException &){
+                        continue;
+                }
         }
         else
         {
+                try{
             if (saves_spell(level - 2,vch,DAM_COLD, ch, DAMF_SPELL))
             {
                 cold_effect(vch,level/4,dam/8,TARGET_CHAR, DAMF_SPELL);
@@ -377,6 +432,11 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
                 cold_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
                 damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
             }
+                }
+                catch (const VictimDeathException &){
+                        continue;
+                }
+        }
         }
     }
 
@@ -386,8 +446,7 @@ VOID_SPELL(FrostBreath)::run( Character *ch, Character *victim, int sn, int leve
 SPELL_DECL(GasBreath);
 VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     int dam,hp_dam,dice_dam,hpch;
 
     act("$c1 выдыхает воронку ядовитого газа!", ch, 0, 0, TO_ROOM);
@@ -400,9 +459,9 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
     dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
     poison_effect(room,level,dam,TARGET_ROOM, DAMF_SPELL);
 
-    for (vch = room->people; vch != 0; vch = vch_next)
+    for ( auto &vch : room->getPeople())
     {
-        vch_next = vch->next_in_room;
+        if(!vch->isDead() && vch->in_room == room){
 
         if ( vch->is_mirror()
             && ( number_percent() < 50 ) ) continue;
@@ -417,6 +476,8 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
         if (ch->fighting != vch && vch->fighting != ch)
             yell_panic( ch, vch );
 
+        try{
+
         if (saves_spell(level,vch,DAM_POISON, ch, DAMF_SPELL))
         {
             poison_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
@@ -426,6 +487,13 @@ VOID_SPELL(GasBreath)::run( Character *ch, Room *room, int sn, int level )
         {
             poison_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
             damage_nocatch(ch,vch,dam,sn,DAM_POISON,true, DAMF_SPELL);
+        }
+
+        }
+
+        catch (const VictimDeathException &){
+                continue;
+        }
         }
     }
 

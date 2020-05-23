@@ -261,8 +261,7 @@ VOID_SPELL(Disgrace)::run( Character *ch, Character *victim, int sn, int level )
 SPELL_DECL(Disperse);
 VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-    Character *vch;
-    Character *vch_next;
+
     Room *pRoomIndex;
     int cnt = 0;
 
@@ -277,9 +276,8 @@ VOID_SPELL(Disperse)::run( Character *ch, Room *room, int sn, int level )
         return;
     }
 
-    for ( vch = room->people; vch != 0; vch = vch_next )
+    for ( auto &vch : room->getPeople() )
     {
-        vch_next = vch->next_in_room;
         
         if (vch == ch)
             continue;
