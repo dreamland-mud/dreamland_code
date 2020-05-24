@@ -705,92 +705,6 @@ bool DefaultSpell::spellbane( Character *ch, Character *vch ) const
     }
 }
 
-
-/*
-bool 
-DefaultSpell::spellbane( Character *ch, Character *victim ) const
-{    
-    bool fAttack = false;
-    bool fPrayer = false;
-
-    if (target.isSet( TAR_CHAR_WORLD ))
-        return false;
-
-    if (victim == 0) 
-        return false;
-    
-    if (!victim->isAffected( gsn_spellbane ))
-        return false;
-    
-    if (!ch->is_npc( )) {
-        if (ch->getProfession( ) == prof_cleric || ch->getProfession( ) == prof_paladin) 
-            if (getSkill( )->getGroup( ) != GROUP_CLAN 
-                && getSkill( )->getGroup( ) != -1)
-            {
-                fPrayer = true;
-            }
-    }
-    else {
-        if (IS_SET(ch->act, ACT_CLERIC))
-            fPrayer = true;
-    }
-
-    
-    if (type == SPELL_OFFENSIVE) {
-        int chance;
-        
-        if (fPrayer)
-            return false;
-
-        chance = gsn_spellbane->getEffective( victim ); 
-
-        if (!victim->is_npc( )) {
-            chance = 2 * chance / 3;
-
-            if (ch->is_npc( ))
-                chance = chance / 2;
-        }
-        
-        if (number_percent( ) > chance) {
-            gsn_spellbane->improve( victim, false, ch );
-            return false;
-        }
-        else 
-            gsn_spellbane->improve( victim, true, ch );
-
-        fAttack = true;
-    }
-
-    if (ch == victim) {
-        act("Твоя магическая защита (spellbane) отклоняет заклинание!", ch,0,0,TO_CHAR);
-        act("Магическая защита (spellbane) $c2 отклоняет заклинание!", ch,0,0,TO_ROOM);
-        damage( victim, ch, 3 * victim->getModifyLevel(), gsn_spellbane,DAM_NEGATIVE, true, DAMF_SPELL);
-    }
-    else {
-        if (fPrayer) {
-            act("Твои боги неблагосклонны к $C3.", ch, 0, victim, TO_CHAR);
-            act("Боги $c2 неблагосклонны к тебе.", ch, 0, victim, TO_VICT);
-            act("Боги $c2 неблагосклонны к $C3.", ch, 0, victim, TO_NOTVICT);
-        }
-        else {
-            act("$C1 отклоняет твое заклинание!",ch,0,victim,TO_CHAR);
-            act("Ты отклоняешь заклинание $c2!",ch,0,victim,TO_VICT);
-            act("$C1 отклоняет заклинание $c2!",ch,0,victim,TO_NOTVICT);
-        }
-        
-        if (fAttack) {
-            if (!IS_SLAIN( victim )) 
-                damage( victim, ch, 3 * victim->getModifyLevel( ), gsn_spellbane, DAM_NEGATIVE, true, DAMF_SPELL );
-
-            if (!is_safe_nomessage( victim, ch )) 
-                multi_hit( victim, ch );
-        }
-    }
-
-    return true;
-}
-*/
-
 int DefaultSpell::getBeats( ) const
 {
     return skill->getBeats( ); 
@@ -807,6 +721,11 @@ int DefaultSpell::getSpellType( ) const
 {
     return type.getValue( );
 }
+int DefaultSpell::getPosition() const
+{
+    return position;
+}
+
 SkillPointer DefaultSpell::getSkill( ) const
 {
     return skill;

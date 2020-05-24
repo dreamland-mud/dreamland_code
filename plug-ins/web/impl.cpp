@@ -9,6 +9,7 @@
 #include "xmlattributeticker.h"
 #include "xmlattributeplugin.h"
 #include "json/json.h"
+#include "commandflags.h"
 #include "iconvmap.h"
 #include "descriptor.h"
 #include "descriptorstatelistener.h"
@@ -17,10 +18,15 @@
 #include "commandmanager.h"
 #include "commonattributes.h"
 #include "grammar_entities_impl.h"
+#include "damageflags.h"
+#include "skillgroup.h"
 #include "dlfilestream.h"
 #include "dldirectory.h"
 #include "dreamland.h"
 #include "bitstring.h"
+#include "affecthandler.h"
+#include "skillcommand.h"
+#include "spell.h"
 #include "clanreference.h"
 #include "affect.h"
 #include "room.h"
@@ -955,7 +961,72 @@ public:
     {
         return SCDP_BOOT + 25;
     }
-    virtual void run( )
+
+    virtual void run()
+    {
+        dumpSkills();
+        dumpCommands();
+    }
+
+    void dumpSkills() 
+    {
+        ostringstream buf;
+
+        buf << "name,rname,group,what,cmd,rcmd,position,target" << endl;
+
+        for (int sn = 0; sn < skillManager->size(); sn++) {
+            Skill *s = skillManager->find(sn);
+            Command *command = 0;            
+            SpellPointer spell;
+
+            if (s->getCommand()) {
+                command = s->getCommand().getDynamicPointer<Command>();
+                if (command && command->getExtra().isSet(CMD_NO_INTERPRET))
+                    command = 0;
+            }
+
+            if (s->getSpell() && s->getSpell()->isCasted())
+                spell = s->getSpell();
+
+            buf << s->getName() << "," << s->getRussianName() << ","
+                << s->getGroup().getName() << ",";
+
+            DLString what = "none";
+            if (spell)
+                what = "spell";
+            else if (command)
+                what = "command";
+            else if (s->getAffect())
+                what = "affect";
+            buf << what << ",";
+
+            DLString cmd, rcmd;
+            int position = NO_FLAG;
+            int target = NO_FLAG;
+            if (command) {
+                cmd = command->getName();
+                rcmd = command->getRussianName();
+                position = command->getPosition();
+            } else if (spell) {
+                position = spell->getPosition();
+                target = spell->getTarget();
+            }
+
+            buf << cmd << "," << rcmd << "," 
+                << position_table.name(position) << ","
+                << target_table.names(target) << endl;                       
+        }
+
+        try {
+            DLFileStream( "/tmp/skills.csv" ).fromString( 
+                koi2utf(buf.str())
+            );
+        } catch (const ExceptionDBIO &ex) {
+            LogStream::sendError() << ex.what() << endl;
+        }
+    }
+
+    void dumpCommands()
     {
         Json::Value json;
         list<Command::Pointer>::const_iterator c;
@@ -988,7 +1059,7 @@ public:
         }
 
         DLFileStream(dreamland->getMiscDir(), "commands", ".json").fromString(
-            json_to_string(json)
+            koi2utf(json_to_string(json))
         );
     }
 };    
