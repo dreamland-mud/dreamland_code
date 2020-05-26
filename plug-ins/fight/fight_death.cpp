@@ -617,12 +617,21 @@ void raw_kill( Character* victim, int part, Character* ch, int flags )
 
 void pk_gain( Character *killer, Character *victim )
 {
-    if ( !killer->is_npc() && !victim->is_npc() && killer != victim )
+    if ( !victim->is_npc() && killer != victim )
     {
+        if(!killer->is_npc()){
         set_killer( killer );
         set_slain( victim );
         killer->getClan( )->handleVictory( killer->getPC( ), victim->getPC( ) );
         victim->getClan( )->handleDefeat( victim->getPC( ), killer->getPC( ) );
+        }
+
+        else if(killer->master && !killer->master->is_npc()){
+        set_killer( killer->master );
+        set_slain( victim );
+        killer->master->getClan( )->handleVictory( killer->master->getPC( ), victim->getPC( ) );
+        victim->getClan( )->handleDefeat( victim->getPC( ), killer->master->getPC( ) );
+        }
     }
 }
 
