@@ -153,10 +153,7 @@ void VampiricBiteOneHit::postDamageEffects( )
     	af.duration  = level / 10;
     	af.location  = APPLY_HITROLL;
     	af.modifier  = - (level / 10);
-    	if (victim->is_npc())
-    		af.bitvector = 0;
-    	else
-    		af.bitvector = AFF_CORRUPTION;
+    	af.bitvector = AFF_CORRUPTION;
         affect_join( victim, &af );	
 	    
     	act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
@@ -170,11 +167,11 @@ void VampiricBiteOneHit::postDamageEffects( )
 
 SKILL_RUNP( control )
 {
-  char arg[MAX_INPUT_LENGTH];
   Character *victim;
   int clevel, vlevel; 
   float chance, skill_mod, stat_mod, level_mod;
-        
+  DLString arg, args = constArguments;
+       
   //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
   skill_mod   = 0.5;
   stat_mod    = 0.02;
@@ -186,25 +183,25 @@ SKILL_RUNP( control )
 
   ///// Standard checks: TODO: turn this into a function 
 	
-  argument = one_argument( argument, arg );
-
   if (ch->is_npc() || !gsn_control_animal->usable( ch ) )
   {
   	ch->send_to( "Это умение тебе недоступно.\n\r");
 	return;
   }
+	
+  arg = args.getOneArgument( );
 
-  if ( arg[0] == '\0' )
+  if (arg.empty( ))
   {
-	ch->send_to( "Доминировать над кем?\n\r");
-	return;
+        ch->send_to("Доминировать над кем?\n\r");
+        return;
   }
 
   if ( ( victim = get_char_room( ch, arg ) ) == 0 )
   {
-	ch->send_to( "Тут таких нет.\n\r");
-	return;
-  }
+        ch->send_to("Тут таких нет.\n\r");
+        return;
+  } 
 
   if ( victim == ch )
   {
@@ -611,33 +608,41 @@ void sucking( Character *ch, Character *victim )
 
 SKILL_RUNP( suck )
 {
-    char arg[MAX_INPUT_LENGTH];
-    Character *victim;
 
-    one_argument( argument, arg );
+  Character *victim;
+  DLString arg, args = constArguments;
+       
 
-    if (!gsn_vampiric_bite->usable( ch )) 
-    {
+  //////////////// ELIGIBILITY CHECKS ////////////////
+
+  ///// Standard checks: TODO: turn this into a function 
+	
+  if (!gsn_vampiric_bite->usable( ch )) 
+  {
         ch->send_to("Ты с надеждой ощупываешь свои клыки, но они не оправдывают ожиданий.\n\r");
         return;
-    }
+  }
+	
+  arg = args.getOneArgument( );
 
-    if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-	 ch->pecho( "Высасывать кровь можно, только превратившись в вампир%Gа|а|шу!", ch );
-         return;
-    }
-
-    if (arg[0] == '\0') {
+  if (arg.empty( ))
+  {
         ch->send_to("Пить кровь из кого?\n\r");
         return;
-    }
+  }
 
-    if ((victim = get_char_room( ch, arg )) == 0) {
-        ch->send_to("Таких здесь нет.\n\r");
+  if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+  {
+        ch->send_to("Тут таких нет.\n\r");
         return;
-    }
+  }
+	
+  if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
+	 ch->pecho( "Высасывать кровь можно, только превратившись в вампир%Gа|а|шу!", ch );
+         return;
+  }
 
-    sucking( ch, victim );
+  sucking( ch, victim );
 }
 
 /*
@@ -646,52 +651,52 @@ SKILL_RUNP( suck )
 
 SKILL_RUNP( bite )
 {
-    char arg[MAX_INPUT_LENGTH];
     Character *victim;
     int cond;
     Affect af;
+    DLString arg, args = constArguments;     
 
     //////////////// ELIGIBILITY CHECKS ////////////////
 
-    ///// Standard checks: TODO: turn this into a function    
-    
-    if ( MOUNTED(ch) )
-    {
-            ch->send_to("Только не верхом!\n\r");
-            return;
-    }
-	
-    one_argument( argument, arg );
-
-    if ( ch->master != 0 && ch->is_npc() )
-            return;
+    ///// Standard checks: TODO: turn this into a function 
 
     if ( !ch->is_npc() && !gsn_vampiric_bite->usable( ch ) )
     {
-            ch->send_to("Ты не умеешь кусаться.\n\r");
-            return;
-    }
-	
-    if ( IS_CHARMED(ch) )
-    {
-            ch->pecho( "Ты же не хочешь укусить сво%1$Gего|его|ю любим%1$Gого|ого|ю хозя%1$Gина|ина|йку.", ch->master);
-            return;
+	ch->send_to("Ты не умеешь кусаться.\n\r");
+	return;
     }
 
-    if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
-  	    ch->pecho( "Чтобы укусить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch );    
-        return;
-    }
-
-    if ( arg[0] == '\0' )
+    if ( MOUNTED(ch) )
     {
-        ch->send_to("Укусить кого?\n\r");
+	ch->send_to("Только не верхом!\n\r");
+	return;
+    }
+		
+    arg = args.getOneArgument( );
+
+    if (arg.empty( ))
+    {
+	ch->send_to("Укусить кого?\n\r");
         return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == 0 )
     {
-        ch->send_to("Таких здесь нет.\n\r");
+	ch->send_to("Тут таких нет.\n\r");
+        return;
+    }
+
+    if ( ch->master != 0 && ch->is_npc() )
+            return;
+	
+    if ( IS_CHARMED(ch) )
+    {
+	ch->pecho( "Ты же не хочешь укусить сво%1$Gего|его|ю любим%1$Gого|ого|ю хозя%1$Gина|ина|йку.", ch->master);
+	return;
+    }
+
+    if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch)) {
+	ch->pecho( "Чтобы укусить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch );    
         return;
     }
 
@@ -783,9 +788,9 @@ SKILL_RUNP( bite )
 SKILL_RUNP( touch )
 {
 	Character *victim;
-        Affect af;    
-        float chance, skill_mod, stat_mod, level_mod, quick_mod, sleep_mod, vis_mod, time_mod;
-        char arg[MAX_INPUT_LENGTH];
+	Affect af;    
+	float chance, skill_mod, stat_mod, level_mod, quick_mod, sleep_mod, vis_mod, time_mod;
+	DLString arg, args = constArguments;     
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
         skill_mod   = 0.2;
@@ -800,17 +805,31 @@ SKILL_RUNP( touch )
 
         ///// Standard checks: TODO: turn this into a function 
     
-        if ( MOUNTED(ch) )
-        {
-                ch->send_to("Только не верхом!\n\r");
-                return;
-        }
-	
-        if ( !gsn_vampiric_touch->usable( ch ) )
-        {
-                ch->send_to("Это умение тебе недоступно.\n\r");
-                return;
-        }	
+	if ( !ch->is_npc() && !gsn_vampiric_touch->usable( ch ) )
+	{
+		ch->send_to("Это умение тебе недоступно.\n\r");
+		return;
+	}
+
+	if ( MOUNTED(ch) )
+	{
+		ch->send_to("Только не верхом!\n\r");
+		return;
+	}
+		
+	arg = args.getOneArgument( );
+
+	if (arg.empty( ))
+	{
+		ch->send_to("Усыпить кого?\n\r");
+		return;
+	}
+
+	if ( ( victim = get_char_room( ch, arg ) ) == 0 )
+	{
+		ch->send_to("Тут таких нет.\n\r");
+		return;
+	}	
 
     	if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
     	{
@@ -831,21 +850,7 @@ SKILL_RUNP( touch )
         {
                 ch->send_to("Тебе нужна хотя бы одна рука для прикосновения.\r\n");
                 return;
-        }
-	
-        argument = one_argument(argument,arg);
-	
-        if ( arg[0] == '\0' )
-        {
-            ch->send_to("И кого ты хочешь усыпить?\n\r");
-            return;
-        }
-	
-    	if ( (victim = get_char_room(ch,argument)) == 0 )
-    	{
-        	ch->send_to("Здесь таких нет.\n\r");
-        	return;
-    	}
+        }	
 
     	if ( ch == victim )
     	{
@@ -1094,7 +1099,7 @@ void BonedaggerOneHit::calcTHAC0( )
  */
 SKILL_RUNP( bonedagger )
 {
-    char arg[MAX_INPUT_LENGTH];
+    DLString arg, args = constArguments; 
     int chance = gsn_bonedagger->getEffective( ch );
 
     if (chance < 2) {
@@ -1107,9 +1112,9 @@ SKILL_RUNP( bonedagger )
         return;
     }
     
-    one_argument( argument, arg );
+    arg = args.getOneArgument( );
     
-    if (arg[0] == '\0') {
+    if (arg.empty( )) {
         if (ch->ambushing[0] == '\0') {
             ch->send_to("Чью тень ты хочешь подкараулить?\n\r");
             return;
@@ -1210,13 +1215,13 @@ SKILL_RUNP( sense )
     
   if (ch->is_npc() || !gsn_sense_life->usable( ch ) )
     {
-      ch->send_to("Что?\n\r");
+      ch->send_to("Ты не умеешь чуять присутствие живых организмов.\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_sense_life))
     {
-      ch->send_to("Ты уже можешь чувствовать присутствие живых организмов.\n\r");
+      ch->send_to("Ты уже можешь почуять присутствие живых организмов.\n\r");
       return;
     }
 
