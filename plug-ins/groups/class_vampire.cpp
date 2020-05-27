@@ -982,13 +982,13 @@ SKILL_RUNP( human )
 {
     if (ch->getProfession( ) != prof_vampire)
     {
-     ch->send_to("Ты не владеешь вампирьей трансформацией\n\r");
+     ch->send_to("Ты не владеешь вампирьей трансформацией.\n\r");
      return;
     }
 
     if ( !IS_VAMPIRE(ch) )
     {
-     ch->send_to("Ты уже выш{Smел{Sfшла{Sx из вампирьей трансформации.\n\r");
+     ch->send_to("Ты уже выш{Smел{Sfла{Sx из вампирьей трансформации.\n\r");
      return;
     }
 
