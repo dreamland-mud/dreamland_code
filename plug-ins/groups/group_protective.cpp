@@ -187,7 +187,7 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
     case CANCEL_ALWAYS:
             break;
     case CANCEL_NEVER:
-            ch->println("Твоя попытка закончилась неудачей, попробуй dispel affects.");
+            ch->println("Отмена здесь бессильна, используй вместо этого снятие чар.");
             return;
     case CANCEL_DISPEL:
             if (!is_safe_spell( ch, victim, false ))        
@@ -208,9 +208,9 @@ VOID_SPELL(Cancellation)::run( Character *ch, Character *victim, int sn, int lev
     }
 
     if (found)
-        ch->send_to("Ok.\n\r");
+        ch->send_to("Получилось!\n\r");
     else
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->send_to("Твоя попытка отменить воздействия закончилась неудачей.\n\r");
 }
 
 
@@ -252,7 +252,7 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
 
     if (saves_spell(level, victim,DAM_OTHER, ch, DAMF_SPELL)) {
         victim->send_to("Ты чувствуешь легкий звон в ушах.\n\r");
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->send_to("Твоя попытка развеять чары закончилась неудачей.\n\r");
         return;
     }
 
@@ -265,9 +265,9 @@ VOID_SPELL(DispelAffects)::run( Character *ch, Character *victim, int sn, int le
     }
 
     if (found)
-        ch->send_to("Ok.\n\r");
+        ch->send_to("Получилось!\n\r");
     else
-        ch->send_to("Твоя попытка закончилась неудачей.\n\r");
+        ch->send_to("Твоя попытка развеять чары закончилась неудачей.\n\r");
 }
 
 
@@ -323,9 +323,9 @@ VOID_SPELL(EnhancedArmor)::run( Character *ch, Character *victim, int sn, int le
     af.location  = APPLY_AC;
     af.bitvector = 0;
     affect_to_char( victim, &af );
-    victim->send_to("Силовая защита окружает тебя.\n\r");
+    victim->send_to("Силовое поле окружает тебя.\n\r");
     if ( ch != victim )
-        act_p("Силовая защита окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("Силовое поле окружает $C4.",ch,0,victim,TO_CHAR,POS_RESTING);
     return;
 
 }
@@ -336,7 +336,7 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     Affect af;
 
     if (ch->isAffected(sn )) {
-        act_p("Ты уже гото$gво|в|ва к схватке со злом.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act_p("Ты уже гото$gво|в|ва противостоять холоду и темным чарам.", ch, 0, 0, TO_CHAR, POS_RESTING);
         return;
     }
 
@@ -349,7 +349,7 @@ VOID_SPELL(Fortitude)::run( Character *ch, Character *victim, int sn, int level 
     af.modifier = 0;
     affect_to_char(ch, &af);
     
-    act_p("Боги даруют тебе сопротивляемость к злу.", ch, 0, 0, TO_CHAR, POS_RESTING);
+    act_p("Свет дарует тебе сопротивляемость к могильному холоду и темным чарам!", ch, 0, 0, TO_CHAR, POS_RESTING);
 
 }
 
@@ -362,7 +362,7 @@ VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int 
 
         if (!ch->isAffected(sn))
         {
-                ch->send_to("Теперь заклинания причиняют тебе меньший вред.\n\r");
+                ch->send_to("Ты обретаешь сопротивляемость к магии!\n\r");
 
                 af.where = TO_RESIST;
                 af.type = sn;
@@ -374,7 +374,7 @@ VOID_SPELL(SpellResistance)::run( Character *ch, Character *victim, int sn, int 
                 affect_to_char(ch, &af);
         }
         else
-                ch->send_to("Ты уже имеешь эту защиту.\n\r");
+                ch->send_to("Ты уже имеешь сопротивляемость к магии.\n\r");
         return;
 
 }
@@ -598,19 +598,19 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("Ты приобретаешь иммунитет к негативным атакам.\n\r");
+      ch->send_to("Ты приобретаешь сопротивляемость к темной магии.\n\r");
 
-      af.where = TO_IMMUNE;
+      af.where = TO_RESIST;
       af.type = sn;
       af.duration = level / 4;
       af.level = ch->getModifyLevel();
-      af.bitvector = IMM_NEGATIVE;
+      af.bitvector = RES_NEGATIVE;
       af.location = 0;
       af.modifier = 0;
       affect_to_char(ch, &af);
     }
   else
-      ch->send_to("У тебя уже есть иммунитет к негативным атакам.\n\r");
+      ch->send_to("У тебя уже есть сопротивляемость к темной магии.\n\r");
  return;
 
 }
@@ -713,9 +713,9 @@ VOID_SPELL(Shield)::run( Character *ch, Character *victim, int sn, int level )
     if ( victim->isAffected(sn ) )
     {
         if (victim == ch)
-            act("Ты уже защище$gно|н|на заклинанием щита.", ch, 0, 0, TO_CHAR);
+            act("Ты уже под воздействием щита.", ch, 0, 0, TO_CHAR);
         else
-            act("$C1 уже защище$Gно|н|на заклинанием щита.", ch, 0, victim, TO_CHAR);
+            act("$C1 уже под воздействием щита.", ch, 0, victim, TO_CHAR);
         return;
     }
 
