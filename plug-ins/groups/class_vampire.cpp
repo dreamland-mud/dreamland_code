@@ -165,7 +165,7 @@ void VampiricBiteOneHit::postDamageEffects( )
  * 'control animal' skill command
  */
 
-SKILL_RUNP( control )
+SKILL_RUN( control )
 {
   Character *victim;
   int clevel, vlevel; 
@@ -606,7 +606,7 @@ void sucking( Character *ch, Character *victim )
  * 'suck' command
  */
 
-SKILL_RUNP( suck )
+SKILL_RUN( suck )
 {
 
   Character *victim;
@@ -649,7 +649,7 @@ SKILL_RUNP( suck )
  * 'vampiric bite' skill command
  */
 
-SKILL_RUNP( bite )
+SKILL_RUN( bite )
 {
     Character *victim;
     int cond;
@@ -785,7 +785,7 @@ SKILL_RUNP( bite )
  * 'vampiric touch' skill command
  */
 
-SKILL_RUNP( touch )
+SKILL_RUN( touch )
 {
 	Character *victim;
 	Affect af;    
@@ -1097,7 +1097,7 @@ void BonedaggerOneHit::calcTHAC0( )
 /*
  * 'bonedagger' skill command
  */
-SKILL_RUNP( bonedagger )
+SKILL_RUN( bonedagger )
 {
     DLString arg, args = constArguments; 
     int chance = gsn_bonedagger->getEffective( ch );
