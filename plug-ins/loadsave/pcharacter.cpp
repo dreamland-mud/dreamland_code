@@ -214,15 +214,17 @@ bool PCharacter::load( )
     
     // Put player to a room, so that onEquip mobprog that send messages or spellbane won't crash
     char_to_room(this, get_room_index(ROOM_VNUM_LIMBO));
-
-    /* now start adding back the effects */
-    for (Object *obj = carrying; obj != 0; obj = obj->next_content) 
-        obj->wear_loc->reset( obj );
-
-    /* now add back spell effects */
+   
+    /* Now add back spell effects. */
     for (Affect *af = affected; af != 0; af = af->next)
         affect_modify( this, af, true );
     
+    /* Now start adding back the effects from items. Some of the items may add their own affects via onEquip progs,
+     * so it's important to execute these two loops in this particular order, to avoid calling affect_modify twice.
+     */
+    for (Object *obj = carrying; obj != 0; obj = obj->next_content) 
+        obj->wear_loc->reset( obj );
+
     position = (position == POS_FIGHTING ? POS_STANDING: position);
     REMOVE_BIT(act, PLR_NO_EXP|PLR_DIGGED); 
     update_stats(this);
