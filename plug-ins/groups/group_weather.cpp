@@ -74,12 +74,9 @@ VOID_SPELL(CallLightning)::run( Character *ch, Room *room, int sn, int level )
             continue;
         
         vdam = saves_spell( level, vch, DAM_LIGHTNING, ch, DAMF_SPELL ) ? dam / 2 : dam;
-        try{
-        damage_nocatch( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
-        }
-        catch (const VictimDeathException &){
-            continue;
-        }
+
+        damage( ch, vch, vdam, sn, DAM_LIGHTNING, true, DAMF_SPELL );
+
         }
     }
 }
