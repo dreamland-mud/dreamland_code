@@ -40,6 +40,7 @@ public:
     virtual int getMana( ) const = 0;
     virtual int getTarget( ) const = 0;
     virtual int getSpellType( ) const = 0;
+    virtual int getPosition() const = 0;
     virtual bool isCasted( ) const = 0;
     virtual bool isPrayer( Character * ) const = 0;
     virtual bool checkPosition( Character * ) const = 0;

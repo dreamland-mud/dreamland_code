@@ -59,6 +59,9 @@ bitstring_t FlagTable::bitstring( const DLString &arg, bool strict ) const
 
 DLString FlagTable::names( bitstring_t bits ) const
 {
+    if (bits == NO_FLAG)
+        return DLString::emptyString;
+
     DLString buf;
     Bitstring b( bits );
     
@@ -75,6 +78,9 @@ DLString FlagTable::names( bitstring_t bits ) const
 
 DLString FlagTable::messages( bitstring_t bits, bool comma, char gcase ) const
 {
+    if (bits == NO_FLAG)
+        return DLString::emptyString;
+
     DLString buf;
     Bitstring b( bits );
     
