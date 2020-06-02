@@ -63,7 +63,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
         try{
         damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
         }
-        catch (VictimDeathException &){
+        catch (const VictimDeathException &){
             people.remove(victim);
         }
     
@@ -109,7 +109,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
                 try{
               damage_nocatch(ch,tmp_vict,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
                 }
-                catch (VictimDeathException &){
+                catch (const VictimDeathException &){
                     level -= 4;
                     people.remove(tmp_vict);
                     break;
