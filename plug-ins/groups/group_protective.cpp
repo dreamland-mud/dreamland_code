@@ -598,7 +598,7 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
 
     if (!ch->isAffected(sn))
     {
-      ch->send_to("Ты приобретаешь сопротивляемость к темной магии.\n\r");
+      ch->send_to("Ты приобретаешь сопротивляемость к темной магии и молитвам.\n\r");
 
       af.where = TO_RESIST;
       af.type = sn;
@@ -610,7 +610,7 @@ VOID_SPELL(ProtectionNegative)::run( Character *ch, Character *victim, int sn, i
       affect_to_char(ch, &af);
     }
   else
-      ch->send_to("У тебя уже есть сопротивляемость к темной магии.\n\r");
+      ch->send_to("У тебя уже есть сопротивляемость к темной магии и молитвам.\n\r");
  return;
 
 }
