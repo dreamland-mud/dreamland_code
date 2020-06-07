@@ -44,6 +44,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
     Character *last_vict;
     bool found;
     int dam;
+    list<Character*> people = ch->in_room->getPeople();
 
     /* first strike */
 
@@ -55,9 +56,16 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
            ch,0,victim,TO_VICT,POS_RESTING);
 
     dam = dice(level,6);
-    if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL))
+    if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL)){
         dam /= 3;
-    damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+    }
+
+        try{
+        damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+        }
+        catch (const VictimDeathException &){
+            people.remove(victim);
+        }
     
     last_vict = victim;
     level -= 4;   /* decrement damage */
@@ -65,8 +73,9 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
     /* new targets */
     while (level > 0)
     {
-        found = false;
-        for (auto &tmp_vict : ch->in_room->getPeople())
+        found = false;        
+
+        for (auto &tmp_vict : people)
         {
           
           if (!is_safe_spell(ch,tmp_vict,true) && tmp_vict != last_vict)
@@ -93,9 +102,18 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
                 if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
                     yell_panic( ch, tmp_vict );
 
-              if (saves_spell(level,tmp_vict,DAM_LIGHTNING,ch, DAMF_SPELL))
+              if (saves_spell(level,tmp_vict,DAM_LIGHTNING,ch, DAMF_SPELL)){
                 dam /= 3;
+              }
+
+                try{
               damage_nocatch(ch,tmp_vict,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+                }
+                catch (const VictimDeathException &){
+                    level -= 4;
+                    people.remove(tmp_vict);
+                    break;
+                }
               level -= 4;  /* decrement damage */
             }
           }
@@ -120,7 +138,7 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
           dam = dice(level,6);
           if (saves_spell(level,ch,DAM_LIGHTNING,ch, DAMF_SPELL))
            dam /= 3;
-          damage_nocatch(ch,ch,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+          damage(ch,ch,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
           level -= 4;  /* decrement damage */
           if (ch == 0)
             return;

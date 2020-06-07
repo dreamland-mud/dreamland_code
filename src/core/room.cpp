@@ -123,14 +123,13 @@ bool Room::isDark( ) const
 list<Character*> Room::getPeople ( )
 {
         Character *tmp_vict;
-        Character *tmp_next;
 
         list<Character*> people;        
 
-        for (tmp_vict = this->people; tmp_vict != 0; tmp_vict = tmp_next)
+        for (tmp_vict = this->people; tmp_vict != 0; tmp_vict)
         {
                 people.push_back(tmp_vict);
-                tmp_next = tmp_vict->next_in_room;
+                tmp_vict = tmp_vict->next_in_room;
         }
 
         return people;
