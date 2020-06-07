@@ -57,8 +57,7 @@ void AdamantiteGolem::fight( Character *victim )
 
     if (!master
         || !master->fighting
-        || master->is_npc( )
-        || master->getProfession( ) != prof_necromancer)
+        || master->is_npc( ) )
         return;
     
     if (master->fighting->fighting != master)
