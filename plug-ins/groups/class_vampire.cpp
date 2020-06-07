@@ -834,13 +834,13 @@ SKILL_RUNP( touch )
 	
         if ( arg[0] == '\0' )
         {
-            ch->send_to("И кого ты хочешь усыпить?\n\r");
+            ch->send_to("Усыпить кого?\n\r");
             return;
         }
 	
-    	if ( (victim = get_char_room(ch,argument)) == 0 )
+    	if ( (victim = get_char_room(ch,arg)) == 0 )
     	{
-        	ch->send_to("Здесь таких нет.\n\r");
+        	ch->send_to("Тут таких нет.\n\r");
         	return;
     	}
 
@@ -974,7 +974,7 @@ SKILL_RUNP( human )
 {
     if (ch->getProfession( ) != prof_vampire)
     {
-     ch->send_to("Ты не владеешь вампирьей трансформацией\n\r");
+     ch->send_to("Ты не владеешь вампирьей трансформацией.\n\r");
      return;
     }
 
@@ -1207,13 +1207,13 @@ SKILL_RUNP( sense )
     
   if (ch->is_npc() || !gsn_sense_life->usable( ch ) )
     {
-      ch->send_to("Что?\n\r");
+      ch->send_to("Ты не умеешь чуять присутствие живых организмов.\n\r");
       return;
     }
 
   if (ch->isAffected(gsn_sense_life))
     {
-      ch->send_to("Ты уже можешь чувствовать присутствие живых организмов.\n\r");
+      ch->send_to("Ты уже можешь почуять присутствие живых организмов.\n\r");
       return;
     }
 
