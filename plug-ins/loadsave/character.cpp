@@ -173,14 +173,20 @@ bool Object::mustDisappear( Character *ch )
         return false;
 
     if (pIndexData->limit > 0) {
-        if (ch->getModifyLevel( ) > level + 20)
+        if (ch->getModifyLevel( ) > level + 20) {
+	    ch->send_to("Ты уже слишком опыт{Smен{Sfна{Sx для этого лимита.\n\r");		
             return true;
+	}	
             
-        if (ch->getModifyLevel( ) < level - 3)
+        if (ch->getModifyLevel( ) < level - 3) {
+	    ch->send_to("Ты еще слишком неопыт{Smен{Sfна{Sx для этого лимита.\n\r");		
             return true;
+	}
 
-        if (!IS_SET(ch->act, PLR_CONFIRMED))
+        if (!IS_SET(ch->act, PLR_CONFIRMED)) {
+	    ch->send_to("Чтобы пользоваться лимитами, надо сначала {hhподтвердить{x описание.\n\r");		
             return true;
+	}
     }
     
     if (ch->getModifyLevel( ) < level - 3 && level > ANGEL)
