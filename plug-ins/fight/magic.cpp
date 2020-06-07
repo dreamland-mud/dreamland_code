@@ -425,7 +425,6 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
 bool overcharmed( Character *ch )        
 {
     Character *gch;
-    char buf[MAX_INPUT_LENGTH];    
     int count, max_charm;
 
     max_charm  = ch->getCurrStat( STAT_INT ) / 4 + ch->getRealLevel( ) / 30;
@@ -439,9 +438,8 @@ bool overcharmed( Character *ch )
     }
 
     if (count >= max_charm) {
-        sprintf( buf, "Ты уже контролируешь {C%d{x последователей из {c%d{x возможных.\n\r", 
+        ch->printf( "Ты уже контролируешь {C%d{x последователей из {c%d{x возможных.\n\r", 
                     count, max_charm );        
-        ch->send_to(buf);
         return true;
     }
 
