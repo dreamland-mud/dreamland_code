@@ -623,6 +623,7 @@ void pk_gain( Character *killer, Character *victim )
         set_slain( victim );
         killer->getClan( )->handleVictory( killer->getPC( ), victim->getPC( ) );
         victim->getClan( )->handleDefeat( victim->getPC( ), killer->getPC( ) );
+
     }
 }
 
@@ -635,6 +636,10 @@ public:
 
     virtual bool handleDeath( Character *killer, Character *victim ) const
     {
+        //transfer the killer flag to master if killer is a charmed npc and victim is a player
+        if(killer->is_npc() && !victim->is_npc() && killer->master && !killer->master->is_npc())
+        killer = killer->master;
+
         group_gain( killer, victim );
         raw_kill( victim, -1, killer, FKILL_CRY|FKILL_GHOST|FKILL_CORPSE );
         pk_gain( killer, victim );
