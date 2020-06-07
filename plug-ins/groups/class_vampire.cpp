@@ -149,14 +149,11 @@ void VampiricBiteOneHit::postDamageEffects( )
     if ( (level > number_percent()) && (!IS_AFFECTED(victim,AFF_CORRUPTION)) ) {	
     	af.where     = TO_AFFECTS;
     	af.type      = gsn_corruption;
-   	af.level     = level;
+   	    af.level     = level;
     	af.duration  = level / 10;
     	af.location  = APPLY_HITROLL;
     	af.modifier  = - (level / 10);
-    	if (victim->is_npc())
-    		af.bitvector = 0;
-    	else
-    		af.bitvector = AFF_CORRUPTION;
+    	af.bitvector = AFF_CORRUPTION;
         affect_join( victim, &af );	
 	    
     	act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
