@@ -281,7 +281,7 @@ bool ClanGuard::checkPush( PCharacter* wch )
     Room * location;
 
     if (!IS_SET(wch->act, PLR_CONFIRMED)
-        || (wch->getClan( ) == clan_none && wch->getRealLevel( ) <= 30)
+        || (wch->getClan( ) == clan_none && wch->getRealLevel( ) <= 80)
         || (wch->getClan( ) != clan_none && wch->getClan( ) != ch->getClan( ) && wch->getRealLevel( ) <= 15)
         || (wch->getClan( ) != ch->getClan( ) && !dreamland->hasOption( DL_PK )))
     {
