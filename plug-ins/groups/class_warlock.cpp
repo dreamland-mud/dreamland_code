@@ -408,7 +408,7 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
 
         if (!is_safe_rspell(paf->level,ch)) {
             int level = paf->level;
-            int sn = paf->sn;
+            int sn = paf->type;
 
             free_string(room->owner);
             room->owner = str_dup("");        
