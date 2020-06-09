@@ -126,10 +126,9 @@ list<Character*> Room::getPeople ( )
 
         list<Character*> people;        
 
-        for (tmp_vict = this->people; tmp_vict != 0; tmp_vict)
+        for (tmp_vict = this->people; tmp_vict != 0; tmp_vict = tmp_vict->next_in_room)
         {
                 people.push_back(tmp_vict);
-                tmp_vict = tmp_vict->next_in_room;
         }
 
         return people;

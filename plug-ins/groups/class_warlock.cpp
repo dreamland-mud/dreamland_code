@@ -407,10 +407,14 @@ VOID_AFFECT(LightningShield)::entry( Room *room, Character *ch, Affect *paf )
         interpret_raw( vch, "wake" );
 
         if (!is_safe_rspell(paf->level,ch)) {
+            int level = paf->level;
+            int sn = paf->sn;
+
             free_string(room->owner);
             room->owner = str_dup("");        
             room->affectRemove(paf);
-            damage_nocatch( vch,ch,dice(paf->level,4)+12, paf->type,DAM_LIGHTNING, true, DAMF_SPELL);
+
+            damage_nocatch(vch, ch, dice(level, 4) + 12, sn, DAM_LIGHTNING, true, DAMF_SPELL);
         }
     }
 }
