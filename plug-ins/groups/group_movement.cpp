@@ -223,8 +223,6 @@ SKILL_RUNP( hide )
         int forest = ch->in_room->sector_type == SECT_FOREST ? 60 : 0;
         forest += ch->in_room->sector_type == SECT_FIELD ? 60 : 0;
 
-        ch->send_to("Ты пытаешься скрыться.\n\r");
-
         int k = ch->getLastFightDelay( );
 
         if ( k >= 0 && k < FIGHT_DELAY_TIME )
@@ -234,11 +232,14 @@ SKILL_RUNP( hide )
                 
         if ( number_percent( ) < (gsn_hide->getEffective( ch ) - forest) * k / 100 )
         {
+                // TODO: add sector-specific messaging
+                ch->send_to("Ты скрываешь свое присутствие, используя особенности местности.\n\r");                
                 SET_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, true );
         }
         else
         {
+                ch->send_to("Ты пытаешься скрыться, но терпишь неудачу.\n\r");                
                 if ( IS_AFFECTED(ch, AFF_HIDE) )
                         REMOVE_BIT(ch->affected_by, AFF_HIDE);
                 gsn_hide->improve( ch, false );
@@ -322,7 +323,7 @@ protected:
             return checkPumped( );
         
         if (rated_as_guru( ch->getPC( ) )) {
-            ch->pecho( "Ты ведь не ищешь легких путей, не так ли?" );
+            ch->pecho( "Гуру не ищут легких путей." );
             return false;
         }
 
@@ -467,7 +468,7 @@ SKILL_RUNP( escape )
     argument = one_argument( argument, arg );
 
     if (!gsn_escape->usable( ch )) {
-        ch->println( "Попробуй flee. Может, это тебя спасет?" );
+        ch->println( "Этот навык тебе недоступен, просто напиши {hc{y{leflee{lrсбежать{x." );
         return;
     }
 
