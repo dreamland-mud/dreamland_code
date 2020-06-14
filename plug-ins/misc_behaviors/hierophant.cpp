@@ -120,6 +120,9 @@ void Hierophant::tell( Character *victim, const char *speech )
         SkillGroup *group = skillGroupManager->find( i->first );
         DLString g = group->getShortDescr( );
 
+        if (g.empty())
+            continue;
+
         buf << "{G" << g.at( 0 ) << "{g" << g.substr( 1 ) << "{g:{x" << endl;
 
         for (vector<DLString>::iterator j = i->second.begin( ); j != i->second.end( ); ) {
