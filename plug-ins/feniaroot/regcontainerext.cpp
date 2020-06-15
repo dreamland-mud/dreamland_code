@@ -70,7 +70,7 @@ NMI_INVOKE( RegContainer, api, "(): печатает этот api" )
 }
 
 
-NMI_INVOKE( RegContainer, clear, "(): очистка всех runtime полей" )
+NMI_INVOKE( RegContainer, clear, "(): очистка массива" )
 {
     map.clear( );
     self->changed();

@@ -32,6 +32,13 @@ NMI_INVOKE(IdContainer, size, "(): размер структуры")
     return Register( (int)idmap.size( ) );
 }
 
+NMI_INVOKE(IdContainer, clear, "(): очистка структуры")
+{
+    idmap.clear();
+    self->changed();
+    return Register();
+}
+
 NMI_INVOKE(IdContainer, api, "(): печатает этот api") 
 {
     Idmap::const_iterator i;

@@ -12,6 +12,7 @@
 #include "commonattributes.h"
 #include "comm.h"
 #include "merc.h"
+#include "arg_utils.h"
 
 #include "characterwrapper.h"
 #include "wrappersplugin.h"
@@ -77,7 +78,7 @@ CMDADM(findrefs)
     }
 
     if (constArguments.empty( )) {
-        ch->println("Синтаксис: {Wfindrefs {x<cs id>");
+        ch->println("Синтаксис: {Wfindrefs {x<cs id> - список ссылок на этот сценарий");
         return;
     }
 
@@ -96,16 +97,17 @@ CMDADM(findrefs)
         os << "Deps tree was built in " << prof.msec() << " ms." << endl;
 
         CodeSource::Manager::iterator it;
-
         try {
             DLString args = constArguments;
-            it = CodeSource::manager->find( args.toInt( ) );
+            DLString argCodesource = args.getOneArgument();
+            it = CodeSource::manager->find( argCodesource.toInt( ) );
         } catch( ... ) {
+            ch->println("Укажи номер сценария.");
             return;
         }
 
         if(it == CodeSource::manager->end( ) ) {
-            ch->send_to("no such CodeSource\r\n");
+            ch->println("Сценарий с таким номером не найден.");
             return;
         }
 
