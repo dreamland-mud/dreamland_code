@@ -162,22 +162,15 @@ void VampiricBiteOneHit::postDamageEffects( )
 }
 
 /*
- * 'control animal' skill command
+ * 'dominate' (former 'control animal') skill command
  */
-
-SKILL_RUNP( control )
+SKILL_RUNP( dominate )
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
   int clevel, vlevel; 
   float chance, skill_mod, stat_mod, level_mod;
         
-  //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-  skill_mod   = 0.5;
-  stat_mod    = 0.02;
-  level_mod   = 0.05;
-  clevel      = ch->getModifyLevel();
-  vlevel      = victim->getModifyLevel(); 
 
   //////////////// ELIGIBILITY CHECKS ////////////////
 
@@ -185,7 +178,7 @@ SKILL_RUNP( control )
 	
   argument = one_argument( argument, arg );
 
-  if (ch->is_npc() || !gsn_control_animal->usable( ch ) )
+  if (ch->is_npc() || !gsn_dominate->usable( ch ) )
   {
   	ch->send_to( "Это умение тебе недоступно.\n\r");
 	return;
@@ -222,7 +215,7 @@ SKILL_RUNP( control )
 	return;        
   }	
     
-  if ( (is_safe(ch,victim)) || (overcharmed(ch)) )
+  if (is_safe(ch,victim) || overcharmed(ch))
 	return;
 
   if ( IS_CHARMED(victim) ) {
@@ -253,12 +246,19 @@ SKILL_RUNP( control )
 	ch->send_to("Твоя жертва не видит тебя.\n\r");
 	return;                
   }  
-  
+
+  //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
+  skill_mod   = 0.5;
+  stat_mod    = 0.02;
+  level_mod   = 0.05;
+  clevel      = ch->getModifyLevel();
+  vlevel      = victim->getModifyLevel(); 
+
   //////////////// PROBABILITY CHECKS //////////////// 
       
   ch->setWaitViolence( 1 );
 
-  chance = gsn_control_animal->getEffective( ch ) * skill_mod;
+  chance = gsn_dominate->getEffective( ch ) * skill_mod;
   chance += ( ch->getCurrStat(STAT_CHA) - 20 ) * stat_mod * 100;
   chance += ( ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT) ) * stat_mod * 100;
   chance += ( clevel - vlevel ) * level_mod * 100;
@@ -276,13 +276,13 @@ SKILL_RUNP( control )
 	
   if ( number_percent() > (int)chance )
   {
-	gsn_control_animal->improve( ch, false, victim );
+	gsn_dominate->improve( ch, false, victim );
 	do_say(victim,"Я не собираюсь следовать за тобой!");
 	multi_hit(victim,ch);
 	return;
   }
 
-  gsn_control_animal->improve( ch, true, victim );
+  gsn_dominate->improve( ch, true, victim );
 
   if ( victim->master )
         victim->stop_follower( );
