@@ -76,7 +76,7 @@
 #include "clanreference.h"
 #include "gsn_plugin.h"
 #include "act_move.h"
-#include "handler.h"
+#include "../anatolia/handler.h"
 #include "interp.h"
 #include "vnum.h"
 #include "fight_exception.h"
@@ -424,21 +424,30 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
 
 bool overcharmed( Character *ch )        
 {
-    Character *gch;
-    int count, max_charm;
+    int max_charm;
 
     max_charm  = ch->getCurrStat( STAT_INT ) / 4 + ch->getRealLevel( ) / 30;
     max_charm -= 28 - min( 28, ch->getCurrStat( STAT_CHA ) );
 
-    count = 0;
+    if (max_charm <= 0) {
+        ch->println("Ты не в состоянии контролировать никого, кроме себя!");
+        return true;
+    }
 
-    for (gch = char_list; gch != 0; gch = gch->next) {
+    int count = 0;
+    for (Character *gch = char_list; gch != 0; gch = gch->next) {
         if (IS_CHARMED(gch) && gch->master == ch)
             count++;
     }
 
-    if (count >= max_charm) {
-        ch->printf( "Ты уже контролируешь {C%d{x последователей из {c%d{x возможных.\n\r", 
+    if (count == max_charm) {
+        ch->pecho("Ты уже контролируешь максимально допустимое число последователей ({c%d{x).",
+                    count);        
+        return true;
+    }
+
+    if (count > max_charm) {
+        ch->pecho("Ты уже контролируешь {C%1$d{x последовател%1$Iя|ей|ей из {c%2$d{x возможн%2$Iого|ых|ых.",
                     count, max_charm );        
         return true;
     }

@@ -227,7 +227,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
     if (IS_WEAPON_STAT(wield,WEAPON_POISON))
     {
         short level;
-        Affect *poison, af;
+        Affect *poison = 0, af;
 
         if (!wield->affected || (poison = wield->affected->affect_find(gsn_poison)) == 0)
             level = wield->level;
