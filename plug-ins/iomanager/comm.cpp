@@ -196,7 +196,7 @@ void page_to_char( const char *txt, Character *ch )
     if (!txt || !*txt)
         return;
     
-    mudtags_convert( txt, out, ch );
+    mudtags_convert( txt, out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR, ch );
     
     d->handle_input.push_front(new PagerHandler(out.str( ).c_str( )));
     d->handle_input.front()->handle(d, str_empty);
@@ -275,9 +275,9 @@ void do_help( Descriptor *d, const char *topic, bool fColor )
             ostringstream buf;
 
             if (!fColor)
-                mudtags_convert_nocolor( (*a)->getText( ch ).c_str( ), buf, ch );
+                mudtags_convert( (*a)->getText( ch ).c_str( ), buf, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, ch );
             else
-                mudtags_convert( (*a)->getText( ch ).c_str( ), buf, ch );
+                mudtags_convert( (*a)->getText( ch ).c_str( ), buf, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR, ch );
 
             d->send( buf.str( ).c_str( ));
             return;

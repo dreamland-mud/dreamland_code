@@ -141,7 +141,7 @@ COMMAND(CClanTalk, "cb")
 
             if (ch->isAffected(gsn_garble)) {
                 ostringstream out;
-                mudtags_convert_nocolor( argument.c_str( ), out, d->character );
+                mudtags_convert( argument.c_str( ), out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, d->character );
                 garble( out.str( ).c_str( ), msg_str );
             }
             else

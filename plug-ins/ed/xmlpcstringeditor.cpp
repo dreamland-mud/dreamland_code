@@ -11,6 +11,7 @@
 
 #include "xmlpcstringeditor.h"
 #include "format.h"
+#include "def.h"
 
 void 
 XMLPCStringEditor::print(const std::string &s)
@@ -77,7 +78,7 @@ XMLPCStringEditor::shell(const string &acmd, const string &text)
         
     } else if(cmd.strPrefix("show") || cmd.strPrefix("print")) {
         ostringstream os;
-        mudtags_convert( text.c_str( ), os );
+        mudtags_convert( text.c_str( ), os, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR );
         getOwner( )->send(os.str( ).c_str( ));
     } else {
         interpret(ch, cmd.c_str( ));

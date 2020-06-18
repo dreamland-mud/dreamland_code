@@ -340,7 +340,7 @@ void player_fmt( const DLString &format, PCMemoryInterface *pc, ostringstream &b
         case 'p':
             if (pch) {
                 ostringstream titleBuf;
-                vistags_convert( pch->getParsedTitle().c_str(), titleBuf, to );             
+                mudtags_convert( pch->getParsedTitle().c_str(), titleBuf, TAGS_CONVERT_VIS, to );             
                 word = titleBuf.str();
             }
             break;

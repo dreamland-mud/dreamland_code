@@ -55,7 +55,7 @@ void Character::send_to( const char *txt )
     if (!txt || !desc)
         return;
 
-    mudtags_convert( txt, out, this );
+    mudtags_convert( txt, out, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR, this );
     desc->send( out.str( ).c_str( ) );
 }
 
