@@ -114,7 +114,7 @@ void PCharacter::updateSkills( )
         }
 
         // Count and store total number of skills available at this level.
-        if (skill->available(this))
+        if (data.origin == SKILL_PRACTICE && skill->available(this))
             availCounter++;
     }
 
