@@ -2,6 +2,8 @@
  *
  * ruffina, 2004
  */
+#include <sstream>
+#include "mudtags.h"
 #include "colour.h"
 #include "dl_ctype.h"
 #include "logstream.h"
@@ -863,47 +865,40 @@ void VisibilityTags::invis_tag_parse( ostringstream &out )
 /*------------------------------------------------------------------------------------
  * utils 
  *------------------------------------------------------------------------------------*/
-void mudtags_convert( const char *text, ostringstream &out, Character *ch )
+void mudtags_convert( const char *text, ostringstream &out, int flags, Character *ch )
 {
-     ostringstream vbuf;
-     VisibilityTags( text, ch ).run( vbuf );
+    DLString result = text;
 
-     DLString vbufStr = vbuf.str( );
-     ColorTags( vbufStr.c_str( ), ch ).run( out );
-}
+    // Convert tags like {I, {L if requested.
+    if (IS_SET(flags, TAGS_CONVERT_VIS)) {
+        ostringstream vbuf;
+        VisibilityTags vtags(text, ch);
 
-void mudtags_convert_nocolor( const char *text, ostringstream &out, Character *ch )
-{
-     ostringstream vbuf;
-     VisibilityTags( text, ch ).run( vbuf );
+        if (IS_SET(flags, TAGS_ENFORCE_WEB)) 
+            vtags.setWeb(true);
+        if (IS_SET(flags, TAGS_ENFORCE_NOWEB)) 
+            vtags.setWeb(false);
 
-     DLString vbufStr = vbuf.str( );    
-     ColorTags ct( vbufStr.c_str( ), ch );
-     ct.setColor( false );
-     ct.run( out );
-}
+        vtags.run(vbuf);
+        result = vbuf.str();
+    }
 
-void mudtags_raw( const char *text, ostringstream &out )
-{
-      ColorTags ct( text );
-      ct.setColor( false );
-      ct.run( out );
-}
+    // Convert colors, either stripping them (NOCOLOR) or replacing with ANSI or HTML tags.
+    if (IS_SET(flags, TAGS_CONVERT_COLOR)) {
+        ColorTags ctags(result.c_str(), ch);
 
-void vistags_convert( const char *text, ostringstream &out, Character *ch )
-{
-    VisibilityTags( text, ch ).run( out );
-}
+        if (IS_SET(flags, TAGS_ENFORCE_WEB)) 
+            ctags.setWeb(true);
+        if (IS_SET(flags, TAGS_ENFORCE_NOWEB)) 
+            ctags.setWeb(false);
+        if (IS_SET(flags, TAGS_ENFORCE_NOCOLOR)) 
+            ctags.setColor(false);
+        if (IS_SET(flags, TAGS_ENFORCE_RAW))
+            ctags.setRaw(true);
 
-void mudtags_convert_web( const char *text, ostringstream &out, Character *ch )
-{
-     ostringstream vbuf;
-     VisibilityTags vtags( text, ch );
-     vtags.setWeb(true);
-     vtags.run( vbuf );
+        ctags.run(out);
 
-     DLString vbufStr = vbuf.str( );
-     ColorTags ctags( vbufStr.c_str( ), ch );
-     ctags.setWeb(true);
-     ctags.run( out );
+    } else {
+        out << result;
+    }
 }

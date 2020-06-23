@@ -21,7 +21,7 @@ static DLString telegram_string(const DLString &source)
 {
     ostringstream outBuf;
 
-    vistags_convert(source.c_str(), outBuf, 0);
+    mudtags_convert(source.c_str(), outBuf, TAGS_CONVERT_VIS);
     DLString dest = outBuf.str();
     dest.colourstrip();
     
@@ -78,7 +78,7 @@ static DLString discord_string(const DLString &source)
 {
     ostringstream outBuf;
 
-    vistags_convert(source.c_str(), outBuf, 0);
+    mudtags_convert(source.c_str(), outBuf, TAGS_CONVERT_VIS);
     DLString dest = outBuf.str();
     dest.colourstrip();
 

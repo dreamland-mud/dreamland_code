@@ -1124,7 +1124,7 @@ public:
 
                 ostringstream textStream;
                 DLString text = (*a)->getText(&dummy);
-                mudtags_convert_web(text.c_str(), textStream, &dummy);
+                mudtags_convert(text.c_str(), textStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_WEB, &dummy);
                 h["text"] = textStream.str();
 
                 helps.append(h);
