@@ -18,7 +18,7 @@ public:
 
     virtual void stopfol( Character * );
 
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
     virtual bool available( Character *, NPCharacter * ) const;
     virtual int getQuantity( ) const;
     
@@ -48,7 +48,7 @@ public:
     typedef ::Pointer<RideablePet> Pointer;
     
     virtual int haggle( Character * ) const;
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
     virtual int getOccupation( );
 
     virtual void config( PCharacter *, NPCharacter * ) const;

@@ -38,14 +38,14 @@ bool RemortBonus::available( Character *client, NPCharacter *keeper ) const
     return true;
 }
 
-void RemortBonus::purchase( Character *client, NPCharacter *keeper, const DLString &, int quantity )
+bool RemortBonus::purchase( Character *client, NPCharacter *keeper, const DLString &, int quantity )
 {
     if (client->is_npc( ))
-        return;
+        return false;
 
     if (!price->canAfford( client )) { /* xxx quantity */
         tell_raw( client, keeper, "Это тебе не по карману." );
-        return;
+        return false;
     }
     
     bonusBuy( client->getPC( ) );
@@ -54,6 +54,7 @@ void RemortBonus::purchase( Character *client, NPCharacter *keeper, const DLStri
     client->pecho( "%^C1 вручает тебе %N4 в обмен на %N4.",
                    keeper, getShortDescr( ).c_str( ), price->toString( client ).c_str( ) );
     client->recho( "%^C1 выменивает что-то у %C2.", client, keeper );
+    return true;
 }
 
 bool RemortBonus::sellable( Character *client )
@@ -61,16 +62,17 @@ bool RemortBonus::sellable( Character *client )
     return !client->is_npc( ) && bonusBought( client->getPC( ) );    
 }
 
-void RemortBonus::sell( Character *client, NPCharacter *keeper )
+bool RemortBonus::sell( Character *client, NPCharacter *keeper )
 {
     if (client->is_npc( ))
-        return;
+        return false;
 
     bonusSell( client->getPC( ) );
     price->induct( client );
 
     client->pecho( "Ты возвращаешь %C3 %N4.", keeper, getShortDescr( ).c_str( ) );
     client->recho( "%^C1 возвращает %C3 %N4.", client, keeper, getShortDescr( ).c_str( ) );
+    return true;
 }
 
 const DLString & RemortBonus::getGender( ) const

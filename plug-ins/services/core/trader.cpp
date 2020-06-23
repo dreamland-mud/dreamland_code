@@ -59,7 +59,9 @@ void Trader::doBuy( Character *client, const DLString &constArguments )
         return;
     }
     
-    article->purchase( client, getKeeper( ), arguments, quantity );
+    bool rc = article->purchase( client, getKeeper( ), arguments, quantity );
+    if (rc && client->getPC())
+        client->getPC()->save();
 }
 
 
@@ -91,7 +93,9 @@ void Seller::doSell( Character *client, const DLString &constArguments )
         return;
     }
 
-    article->sell( client, getKeeper( ) );
+    bool rc = article->sell( client, getKeeper( ) );
+    if (rc && client->getPC())
+        client->getPC()->save();
 }
 
 Article::Pointer Seller::findProposal( Character *client, DLString &arg )
