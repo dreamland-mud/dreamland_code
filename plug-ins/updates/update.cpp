@@ -863,9 +863,12 @@ void obj_update( void )
 
         /* Save the contents of the decaying obj. Always preserve everything inside
          * PC corpses and carried containers. In other cases, only save undestructible items.
+         * TODO: this code, unlike 'sacrifice' command, is not recursive, so items 
+         * within containers within containers are not rescued.
          */
         if (obj->contains) {
             Object *t_obj, *next_obj;
+            Object *pit = find_pit_for_obj(obj);
             bool saveAll;
 
             if (obj->item_type == ITEM_CORPSE_PC)
@@ -878,7 +881,7 @@ void obj_update( void )
             for (t_obj = obj->contains; t_obj != 0; t_obj = next_obj) {
                 next_obj = t_obj->next_content;
 
-                if (!saveAll && !IS_OBJ_STAT(t_obj, ITEM_NOPURGE))
+                if (!saveAll && !IS_OBJ_STAT(t_obj, ITEM_NOPURGE) && !IS_OBJ_STAT(t_obj, ITEM_NOSAC))
                     continue;
 
                 obj_from_obj(t_obj);
@@ -898,8 +901,6 @@ void obj_update( void )
                 } else if (obj->in_room == 0) { /* destroy it */
                     extract_obj(t_obj);
                 } else { /* to the pit */
-                    Object *pit = find_pit_for_obj(obj);
-
                     if (pit == 0)
                         obj_to_room(t_obj, obj->in_room);
                     else
