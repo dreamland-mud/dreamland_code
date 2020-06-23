@@ -861,55 +861,54 @@ void obj_update( void )
                 obj->in_room->echo( POS_RESTING, message, obj );
         }
 
-
-        if ((obj->item_type == ITEM_CORPSE_PC 
-                || (obj->item_type == ITEM_CONTAINER && obj->getCarrier( )))
-            && obj->contains)
-
-        {   /* save the contents */
+        /* Save the contents of the decaying obj. Always preserve everything inside
+         * PC corpses and carried containers. In other cases, only save undestructible items.
+         */
+        if (obj->contains) {
             Object *t_obj, *next_obj;
+            bool saveAll;
 
-            for ( t_obj = obj->contains; t_obj != 0; t_obj = next_obj )
-            {
+            if (obj->item_type == ITEM_CORPSE_PC)
+                saveAll = true;
+            else if (obj->item_type == ITEM_CONTAINER && obj->getCarrier())
+                saveAll = true;
+            else
+                saveAll = false;
+
+            for (t_obj = obj->contains; t_obj != 0; t_obj = next_obj) {
                 next_obj = t_obj->next_content;
+
+                if (!saveAll && !IS_OBJ_STAT(t_obj, ITEM_NOPURGE))
+                    continue;
+
                 obj_from_obj(t_obj);
 
-                if ( obj->in_obj ) /* in another object */
-                    obj_to_obj(t_obj,obj->in_obj);
-                else
-                    if (obj->carried_by)  /* carried */
-                        if ( obj->wear_loc == wear_float )
-                            if ( obj->carried_by->in_room == 0 )
-                                extract_obj(t_obj);
-                            else
-                                obj_to_room(t_obj,obj->carried_by->in_room);
+                if (obj->in_obj) { /* in another object */
+                    obj_to_obj(t_obj, obj->in_obj);
+                } else if (obj->carried_by) { /* carried */
+                    if (obj->wear_loc == wear_float) {
+                        if (obj->carried_by->in_room == 0)
+                            extract_obj(t_obj);
                         else
-                            obj_to_char(t_obj,obj->carried_by);
-                    else if (obj->in_room == 0)  /* destroy it */
-                        extract_obj(t_obj);
-                    else /* to the pit */
-                    {
-                        Object *pit = 0;
-
-                        if(obj->item_type == ITEM_CORPSE_PC) {
-                            Room *pitRoom = get_room_index( obj->value3() );
-
-                            if (pitRoom)
-                                for (pit = pitRoom->contents;
-                                        pit && !IS_PIT(pit);
-                                        pit = pit->next_content)
-                                    ;
-                        }
-
-                        if (pit == 0)
-                            obj_to_room(t_obj,obj->in_room);
-                        else
-                            obj_to_obj(t_obj,pit);
+                            obj_to_room(t_obj, obj->carried_by->in_room);
+                    } else {
+                        obj_to_char(t_obj, obj->carried_by);
                     }
+
+                } else if (obj->in_room == 0) { /* destroy it */
+                    extract_obj(t_obj);
+                } else { /* to the pit */
+                    Object *pit = find_pit_for_obj(obj);
+
+                    if (pit == 0)
+                        obj_to_room(t_obj, obj->in_room);
+                    else
+                        obj_to_obj(t_obj, pit);
+                }
             }
         }
 
-        extract_obj( obj );
+        extract_obj(obj);
     }
 }
 

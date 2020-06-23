@@ -816,6 +816,27 @@ Object * get_obj_room_unique( Room *room, int itype, Character *ch )
     return NULL;
 }
 
+Object *find_pit_in_room(int roomVnum)
+{
+    Object *pit = 0;
+    Room *pitRoom = get_room_index(roomVnum);
+    if (pitRoom)
+        for (pit = pitRoom->contents;
+             pit && !IS_PIT(pit);
+             pit = pit->next_content)
+            ;
+
+    return pit;
+}
+
+Object *find_pit_for_obj(Object *obj)
+{
+    if (obj->item_type == ITEM_CORPSE_PC)
+        return find_pit_in_room(obj->value3());
+    
+    return 0;
+}
+
 int count_obj_in_obj( Object *container )
 {
     Object *objc;

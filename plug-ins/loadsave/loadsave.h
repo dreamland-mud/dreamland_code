@@ -112,6 +112,8 @@ bool can_see_god(Character *ch, Character *god);
 bool obj_has_name( Object *obj, const DLString &arg, Character *ch );
 long long get_arg_id( const DLString &cArgument );
 bool obj_has_name_or_id( Object *obj, const DLString &arg, Character *ch, long long id );
+Object *find_pit_for_obj(Object *obj);
+Object *find_pit_in_room(int roomVnum);
 
 bool eyes_blinded( Character *ch );
 bool eyes_darkened( Character *ch );
