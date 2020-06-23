@@ -49,7 +49,7 @@ public:
     virtual bool available( Character *, NPCharacter * ) const;
     virtual bool matches( const DLString & ) const;
     virtual int getQuantity( ) const;
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
 
 protected:
     XML_VARIABLE XMLString name;

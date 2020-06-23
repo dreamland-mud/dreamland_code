@@ -19,11 +19,11 @@ public:
     
     virtual ~Article( );
 
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 ) = 0;
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 ) = 0;
     virtual bool available( Character *, NPCharacter * ) const = 0;
     virtual int getQuantity( ) const = 0;
 
-    virtual void sell( Character *, NPCharacter * ); 
+    virtual bool sell( Character *, NPCharacter * ); 
     virtual bool sellable( Character * );
 };
 

@@ -161,7 +161,7 @@ bool HorseshoeSmithService::available( Character *client, NPCharacter *smithman 
     return false;
 }
 
-void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, const DLString &, int )
+bool HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, const DLString &, int )
 {
     Affect af;
     Object *old_shoe, *shoe;
@@ -169,7 +169,7 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
 
     if (!price->canAfford( client )) {
         say_act( client, smithman, "У тебя не хватает $n2, чтобы оплатить мою работу.", price->toCurrency( ).c_str( ) );
-        return;
+        return false;
     }
 
     level = client->getModifyLevel( );
@@ -209,8 +209,6 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
     price->deduct( client );
     act( "$C1 забирает у тебя $n4.", client, price->toString( client ).c_str( ), smithman, TO_CHAR );
     
-//    act( "$c1 изготавливает две пары подков.", smithman, 0, 0, TO_ROOM );
-
     if ((old_shoe = get_eq_char( client, wear_hooves ))) {
         unequip_char( client, old_shoe );
         act( "$c1 снимает с тебя старые подковы.", smithman, 0, client, TO_VICT );
@@ -226,6 +224,8 @@ void HorseshoeSmithService::purchase( Character *client, NPCharacter *smithman, 
         act( "$c1 хлопает тебя по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_VICT );
         act( "$c1 хлопает $C4 по крупу, приговаривая '{gХороша, голубушка!{x'", smithman, 0, client, TO_NOTVICT );
     }
+
+    return true;
 }
 
 
@@ -242,7 +242,7 @@ bool ItemSmithService::available( Character *, NPCharacter * ) const
     return true;
 }
 
-void ItemSmithService::purchase( Character *client, NPCharacter *smithman, const DLString &constArguments, int )
+bool ItemSmithService::purchase( Character *client, NPCharacter *smithman, const DLString &constArguments, int )
 {
     Object *obj;
     DLString argument( constArguments );
@@ -252,14 +252,14 @@ void ItemSmithService::purchase( Character *client, NPCharacter *smithman, const
 
     if (arg.empty( )) {
         say_act( client, smithman, "Не томи, скажи что $t будем?", verb.getValue( ).c_str( ) );
-        return;
+        return false;
     }
 
     obj = get_obj_carry( client, arg.c_str( ) );
 
     if (!obj) {
         say_act( client, smithman, "Издеваешься? У тебя нет этого." );
-        return;
+        return false;
     }
 
     act( "Ты протягиваешь $C3 $o4.", client, obj, smithman, TO_CHAR );
@@ -267,13 +267,14 @@ void ItemSmithService::purchase( Character *client, NPCharacter *smithman, const
 
     if (obj->pIndexData->limit != -1) {
         say_act( client, smithman, "Эта вещь - уникальна. Я ничего не могу тут поделать." );
-        return;
+        return false;
     }
     
     if (!checkPrice( client, smithman, price ))
-        return;
+        return false;
 
     smith( client, smithman, obj );
+    return true;
 }   
 
 bool ItemSmithService::checkPrice( Character *client, NPCharacter *smithman, Price::Pointer price ) const

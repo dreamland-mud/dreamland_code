@@ -4,7 +4,7 @@
  */
 
 #include <sys/time.h>
-
+#include <string>
 #include "profiler.h"
 #include "logstream.h"
 
@@ -30,7 +30,7 @@ Profiler::msec()
 }
 
 
-ProfilerBlock::ProfilerBlock(const char *i) : id(i)
+ProfilerBlock::ProfilerBlock(const string &i, long t) : id(i), threshold(t)
 {
     start();
 }
@@ -38,6 +38,9 @@ ProfilerBlock::ProfilerBlock(const char *i) : id(i)
 ProfilerBlock::~ProfilerBlock()
 {
     stop();
-    LogStream::sendNotice( ) << "Prof: " << id << " takes " << msec() << " msecs" << endl;
+
+    long total = msec();
+    if (total >= threshold)
+        LogStream::sendNotice( ) << "Prof: " << id << " takes " << msec() << " msecs" << endl;
 }
 

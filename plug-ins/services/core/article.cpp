@@ -9,8 +9,9 @@ Article::~Article( )
 {
 }
 
-void Article::sell( Character *, NPCharacter * )
+bool Article::sell( Character *, NPCharacter * )
 {
+    return false;
 }
 
 bool Article::sellable( Character * )

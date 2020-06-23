@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string>
 
 #include "profiler.h"
 #include "mallocexception.h"

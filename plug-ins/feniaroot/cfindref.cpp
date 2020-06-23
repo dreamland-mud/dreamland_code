@@ -2,7 +2,7 @@
  *
  * ruffina, 2004
  */
-
+#include <string>
 #include "profiler.h"
 #include "phase.h"
 #include "function.h"

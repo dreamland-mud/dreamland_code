@@ -164,15 +164,19 @@ int QuestTradeArticle::getQuantity( ) const
     return 1;
 }
 
-void QuestTradeArticle::purchase( Character *client, NPCharacter *questman, const DLString &, int )
+bool QuestTradeArticle::purchase( Character *client, NPCharacter *questman, const DLString &, int )
 {
-    if (!price->canAfford( client ))
+    if (!price->canAfford( client )) {
         say_act( client, questman, "Извини, $c1, но у тебя недостаточно $n2 для этого.",
                  price->toCurrency( ).c_str( ) );
-    else if (!client->is_npc( )) {
+        return false;
+    } else if (!client->is_npc( )) {
         price->deduct( client );
         buy( client->getPC( ), questman );
+        return true;
     }
+
+    return false;
 }
 
 /*----------------------------------------------------------------------------

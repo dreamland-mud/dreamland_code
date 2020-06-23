@@ -145,7 +145,7 @@ int HealService::getQuantity( ) const
     return 1;
 }
 
-void HealService::purchase( Character *client, NPCharacter *healer, const DLString &, int )
+bool HealService::purchase( Character *client, NPCharacter *healer, const DLString &, int )
 {
     Character *payer;
 
@@ -156,12 +156,13 @@ void HealService::purchase( Character *client, NPCharacter *healer, const DLStri
             say_act( client, healer, "У тебя не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
         else
             say_act( client, healer, "У твоего хозяина не хватает $n2 оплатить мои услуги.", price->toCurrency( ).c_str( ) );
-        return;
+        return false;
     }
     
     price->deduct( payer );
     payer->setWaitViolence( 1 );
     heal( client, healer );
+    return true;
 }
 
 /*------------------------------------------------------------------------

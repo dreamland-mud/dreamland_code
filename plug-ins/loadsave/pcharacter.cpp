@@ -248,13 +248,13 @@ bool PCharacter::load( )
 
 void PCharacter::save( )
 {
-    static const char * METHOD = "PCharacter::save( )";
-//    ProfilerBlock be(METHOD);
+    static const char * METHOD = " PCharacter::save()";
+    ProfilerBlock profiler(getName() + METHOD, 100);
 
     DLFileWrite tmpfile( dreamland->getBasePath( ), dreamland->getTempFile( ) );
 
     if (!tmpfile.open( )) {
-        LogStream::sendError( ) << METHOD << " bad tmp for " << getName( ) << endl;
+        LogStream::sendError( ) << METHOD << " bad tmp file" << endl;
         return;
     }
 

@@ -7,6 +7,7 @@
 #define __PROFLER_H__
 
 #include <sys/time.h>
+using std::string;
 
 class Profiler {
 public:
@@ -19,13 +20,18 @@ private:
     struct timeval started, stopped;
 };
 
+/**
+ * Report to the logs how many milliseconds elapsed between creation and destruction. 
+ * Takes optional threshold argument, to only report blocks that take more than certain amount of time.
+ */
 class ProfilerBlock : public Profiler {
 public:
-    ProfilerBlock(const char *id);
+    ProfilerBlock(const string &id, long threshold = 0);
     ~ProfilerBlock();
     
 private:
-    const char *id;
+    const string id;
+    long threshold;
 };
 
 #endif
