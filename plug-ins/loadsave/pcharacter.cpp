@@ -254,7 +254,7 @@ void PCharacter::save( )
     DLFileWrite tmpfile( dreamland->getBasePath( ), dreamland->getTempFile( ) );
 
     if (!tmpfile.open( )) {
-        LogStream::sendError( ) << METHOD << " bad tmp file" << endl;
+        LogStream::sendError( ) << getName() << METHOD << " bad tmp file" << endl;
         return;
     }
 

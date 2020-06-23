@@ -7,6 +7,8 @@
 #define __PROFLER_H__
 
 #include <sys/time.h>
+#include <string>
+
 using std::string;
 
 class Profiler {

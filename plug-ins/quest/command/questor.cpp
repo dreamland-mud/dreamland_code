@@ -2,7 +2,6 @@
  *
  * ruffina, 2005
  */
-#include <string>
 #include "profiler.h"
 #include "pcharacter.h"
 #include "npcharacter.h"
