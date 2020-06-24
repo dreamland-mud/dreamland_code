@@ -77,7 +77,7 @@ void CommandList::gatherHints(InterpretArguments &iargs) const
     DLString kuzdn = translit(cmd);
 
     for (c = commands.begin(); c != commands.end(); c++) {
-        if ((*c)->available(iargs.ch)) {
+        if ((*c)->visible(iargs.ch)) {
             record_distance(cmd, kuzdn, (*c)->getName(), iargs);
 
             for (a = (*c)->getAliases().begin(); a != (*c)->getAliases().end(); a++) 
