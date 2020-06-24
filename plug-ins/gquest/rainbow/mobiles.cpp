@@ -104,7 +104,7 @@ bool RainbowMob::death( Character *killer )
         
         if (!wch->is_npc( )) {
             wch->getPC( )->getAttributes( ).getAttr<XMLEmptyAttribute>( gq->getQuestID( ) );
-            act("", ch, 0, wch, TO_VICT);
+            wch->pecho("{RТы не сможешь больше принимать участие в задании, т.к. осквернил%Gо||а свои руки убийством.{x", wch);
         }
     } 
 
