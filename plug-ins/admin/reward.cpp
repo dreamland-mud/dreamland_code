@@ -9,6 +9,7 @@
 #include "descriptor.h"
 #include "act.h"
 #include "arg_utils.h"
+#include "replay.h"
 
 static const DLString ATTRNAME = "godreward";
 
@@ -46,7 +47,8 @@ void XMLAttributeGodReward::reward( PCharacter *ch )
     buf << "{CВ благодарность от богов ты получаешь:{x" << endl;
     listRewards(buf);
     ch->send_to(buf);
-
+    remember_history_private(ch, buf.str());
+    
     for (r = rewards.begin( ); r!= rewards.end( ); r++) {
         ch->addQuestPoints(r->qp);
     }
