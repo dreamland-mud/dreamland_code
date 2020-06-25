@@ -230,11 +230,7 @@ void GlobalQuest::wipeRoom( Room *room ) const
         exorcism( ch );
     }
     
-    for (pit = get_room_index( ROOM_VNUM_ALTAR )->contents;
-         pit && !IS_PIT(pit);
-         pit = pit->next_content)
-         ;
-
+    pit = find_pit_in_room(ROOM_VNUM_ALTAR);
     office = get_room_index( ROOM_VNUM_LOST_PROPERTY_OFFICE );
     
     for (Object *obj = room->contents; obj; obj = obj_next) {
