@@ -125,8 +125,8 @@ void Trainer::doTrain( PCharacter *client, DLString & argument )
     if (client->perm_stat[stat_table.fields[stat].value] 
         >= client->getMaxTrain( stat_table.fields[stat].value )) 
     {
-        tell_raw( client, ch, "Твой параметр %s (%s) уже на максимуме.", 
-                  russian_case( stat_table.fields[stat].message, '1' ).c_str( ), 
+        tell_raw( client, ch, "Ты не можешь дальше тренировать %s (%s).", 
+                  russian_case( stat_table.fields[stat].message, '4' ).c_str( ), 
                   stat_table.fields[stat].name );
         return;
     }
