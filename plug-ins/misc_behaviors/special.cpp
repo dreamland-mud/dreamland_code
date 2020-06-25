@@ -411,17 +411,17 @@ bool spec_cast_adept( NPCharacter *ch )
         
         sn = -1;
         
-        if ( victim->isAffected(gsn_plague))    
+        if (victim->isAffected(gsn_plague))    
                 sn = gsn_cure_disease;
-        else if ( IS_AFFECTED( victim, AFF_BLIND))
+        else if (victim->isAffected(gsn_blindness))
                 sn = gsn_cure_blindness;
-        else if ( victim->isAffected(gsn_poison))
+        else if (victim->isAffected(gsn_poison))
                 sn = gsn_cure_poison;
-        else if ( IS_AFFECTED( victim, AFF_CURSE))
+        else if (victim->isAffected(gsn_curse))
                 sn = gsn_remove_curse;
-        else if ( !victim->isAffected(gsn_armor))
+        else if (!victim->isAffected(gsn_armor))
                 sn = gsn_armor;
-        else if ( !victim->isAffected(gsn_bless) && !victim->isAffected(gsn_warcry) )
+        else if (!victim->isAffected(gsn_bless) && !victim->isAffected(gsn_warcry))
                 sn = gsn_bless;
         else if ( (victim->hit < victim->max_hit) && (victim->move < victim->max_move))
         {

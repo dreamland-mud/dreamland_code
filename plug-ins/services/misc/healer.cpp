@@ -189,9 +189,17 @@ bool SpellHealService::available( Character *client, NPCharacter *healer ) const
         say_fmt("Ты не нуждаешься этой услуге, %2$C1: ты не отравлен%2$G|о|а!", healer, client);
         return false;
     }
+    else if (sn == gsn_cure_poison && !client->isAffected(gsn_poison)) {
+        say_fmt("Я не смогу вылечить такой яд, %2$C1.", healer, client);
+        return false;      
+    }
     else if (sn == gsn_cure_disease && !IS_AFFECTED(client, AFF_PLAGUE)) {
         say_fmt("Ты не нуждаешься этой услуге, %2$C1: ты не заражен%2$G|о|а чумой!", healer, client);
         return false;
+    }
+    else if (sn == gsn_cure_disease && !client->isAffected(gsn_plague)) {
+        say_fmt("Я не смогу вылечить твою болезнь, %2$C1.", healer, client);
+        return false;      
     }
     else if (sn == gsn_cure_blindness && !IS_AFFECTED(client, AFF_BLIND)) {
         say_fmt("Ты не нуждаешься этой услуге, %2$C1: твое зрение в порядке!", healer, client);
