@@ -967,10 +967,9 @@ SKILL_RUNP( touch )
 }
 
 /*
- * 'human' command TODO: rename this to unmorph/детрансформироваться
+ * 'unmorph' command
  */
-
-SKILL_RUNP( human )
+SKILL_RUNP( unmorph )
 {
     if (ch->getProfession( ) != prof_vampire)
     {
@@ -980,7 +979,7 @@ SKILL_RUNP( human )
 
     if ( !IS_VAMPIRE(ch) )
     {
-     ch->send_to("Ты уже выш{Smел{Sfшла{Sx из вампирьей трансформации.\n\r");
+     ch->send_to("Ты уже выш{Smел{Sfла{Sx из вампирьей трансформации.\n\r");
      return;
     }
 
