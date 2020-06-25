@@ -289,10 +289,14 @@ OLCState::xmledit(XMLDocument::Pointer &xml)
         XMLDocument::Pointer doc(NEW);
         istringstream is( buf );
         doc->load( is );
+
+        if (!doc->getFirstNode())
+            throw Exception("empty root node. Use 'behavior clear' instead.");
+
         xml = doc;
         return true;
-    } catch(const exception &e ) {
-        owner->send((DLString("xml parse error: ") + e.what( ) + "\r\n").c_str( ));
+    } catch (const exception &e) {
+        owner->send((DLString("XML parse error: ") + e.what( ) + "\r\n").c_str( ));
     }
     return false;
 }
