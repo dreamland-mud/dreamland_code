@@ -127,14 +127,14 @@ bool parse_money_arguments( Character *ch, const char *arg, int amount, int &gol
 {
     if ((!arg_is_silver( arg ) && !arg_is_gold( arg ) )) {
         if (!str_prefix( arg, "серебр" ) || !str_prefix( arg, "silver" )) {
-            ch->println( "Укажи название монеты полностью: серебро или silver." );
+            ch->println( "Укажи название монеты полностью: {lrсеребро{lesilver{x." );
             return false;
         }
         if (!str_prefix( arg, "золот" ) || !str_prefix( arg, "gold" )) {
-            ch->println( "Укажи название монеты полностью: золото или gold." );
+            ch->println( "Укажи название монеты полностью: {lrзолото{legold{x." );
             return false;
         }
-        ch->println( "Ты можешь указать количество денег в серебре (silver) или золоте (gold)." );
+        ch->println( "Ты можешь указать количество денег в серебре {le(silver) {xили золоте {le(gold){x." );
         return false;
     }
     if (amount < 0) {
@@ -321,7 +321,7 @@ static bool oprog_can_fetch_corpse_pc( Character *ch, Object *container )
     }
     
     if (container->count == 0) {
-        ch->send_to("Более тебе ничего нельзя взять.\n\r");
+        ch->send_to("Больше взять ничего не получится.\n\r");
         return false;
     }
 
@@ -696,7 +696,8 @@ CMDRUNP( get )
 
             if (IS_PIT(container) && !ch->is_immortal() )
             {
-                ch->send_to("Не будь столь жаден!\n\r");
+                ch->send_to("Не жадничай, пожертвования могут понадобиться кому-то еще.\n\r");
+                ch->send_to("И, кстати, не забудь, что продать вещи из ямы для пожертвований все равно не получится.\n\r");             
                 return;
             }
                 
@@ -1709,7 +1710,7 @@ CMDRUNP( make )
         }
     }
 
-    ch->println("Ты можешь изготовить только лук(bow) или стрелы(arrow).");
+    ch->println("Ты можешь изготовить только лук {le(bow) {xили стрелы{le (arrow){x.");
 }
 
 CMDRUNP( search )
@@ -1723,7 +1724,7 @@ CMDRUNP( search )
         }
     }
 
-    ch->println("Ты можешь искать только камни (stones).");
+    ch->println("Ты можешь искать только камни{le (stones){x.");
 }
 
 CMDRUNP( throw )
