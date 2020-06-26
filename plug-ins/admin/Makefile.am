@@ -13,6 +13,7 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/ban \
 -I$(top_srcdir)/plug-ins/system \
 -I$(top_srcdir)/plug-ins/help \
+-I$(top_srcdir)/plug-ins/communication \
 -I$(top_srcdir)/plug-ins/iomanager
 
 if WITH_MINGW
@@ -30,6 +31,7 @@ libadmin_la_LIBADD = \
 ../system/libsystem.la \
 ../anatolia/core/libanatoliacore.la \
 ../ban/libban.la \
+../communication/libcommunication.la \
 $(WSOCK)
 
 libadmin_la_SOURCES = \
