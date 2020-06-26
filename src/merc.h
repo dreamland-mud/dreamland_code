@@ -150,7 +150,6 @@ typedef struct  auction_data            AUCTION_DATA;
  */
 #define MAX_STRING_LENGTH         4608
 #define MAX_INPUT_LENGTH          256
-#define PAGELEN                           22
 
 
 /*
