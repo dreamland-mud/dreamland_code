@@ -94,8 +94,11 @@ CMDRUN( remort )
     new_ch->setSex( pch->getSex( ) );
     new_ch->prompt = pch->prompt;
     new_ch->batle_prompt = pch->batle_prompt;
-    new_ch->add_comm = COMM_NOTELNET | COMM_NOIAC; /* XXX save some options from last remort */
-    new_ch->act = PLR_COLOR;
+    new_ch->add_comm = pch->add_comm;
+    new_ch->config = pch->config;
+    new_ch->act = pch->act;
+    new_ch->comm = pch->comm;
+    new_ch->lines = pch->lines;
 
     if (pch->getClan( ) != clan_flowers) {
         new_ch->setQuestPoints(pch->getQuestPoints() +

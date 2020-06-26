@@ -163,7 +163,7 @@ void Character::init( )
     batle_prompt.clear( );
     free_string(prefix);
     prefix = &str_empty[0];
-    lines = PAGELEN;
+    lines = 0;
 
     act = 0;
     comm = 0;
