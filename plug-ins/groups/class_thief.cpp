@@ -489,7 +489,7 @@ SKILL_RUNP( steal )
 
         if( !victim->is_npc() && IS_GHOST( victim ) )
         {
-                ch->send_to("Эта загадочная субстанция не имеет ничего.");
+                ch->send_to("Твои руки проходят насквозь через карманы призрака.");
                 return;
         }
 
@@ -507,22 +507,17 @@ SKILL_RUNP( steal )
 
         if ( victim == ch || victim->is_immortal() )
         {
-                ch->send_to("Это не разумно.\n\r");
+                ch->send_to("Это неразумно.\n\r");
                 return;
         }
 
-        if ( victim->is_immortal() )
-        {
-                ch->send_to("Подумай, стоит ли это делать.\n\r");
-                return;
-        }
 
         if (is_safe(ch,victim))
                 return;
 
         if ( victim->position == POS_FIGHTING )
         {
-                ch->send_to("Не стоит - еще ударят больно в пылу битвы.\n\r");
+                ch->send_to("Не стоит -- еще ударят больно в пылу битвы.\n\r");
                 return;
         }
 
@@ -531,8 +526,7 @@ SKILL_RUNP( steal )
         ch->getPC( )->check_hit_newbie( victim );
         ch->setWait( gsn_steal->getBeats( )  );
 
-/*        percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -50 );
-        percent += victim->can_see( ch ) ? -10 : 0;*/
+
         percent  = number_percent( ) + ( IS_AWAKE(victim) ? 10 : -30 );
         percent += victim->can_see( ch ) ? 20 : 0;
 
@@ -562,7 +556,7 @@ SKILL_RUNP( steal )
                 }
                 act_p( "$c1 пытается обокрасть $C4.\n\r",  ch, 0, victim,TO_NOTVICT,POS_RESTING);
 
-                if( !victim->is_npc() )
+                if( ( !victim->is_npc() ) || ( number_percent() < 25 ) )
                         set_thief( ch );
 
                 if (mprog_steal_fail( victim, ch ))
@@ -571,7 +565,7 @@ SKILL_RUNP( steal )
                 switch(number_range(0,3))
                 {
                 case 0 :
-                        sprintf( buf, "%s - подлый воришка!", tmp_ch->getNameP( ) );
+                        sprintf( buf, "%s -- подлая ворюга!", tmp_ch->getNameP( ) );
                         break;
                 case 1 :
                         sprintf( buf, "Да %s и конфетку у ребенка украсть не сможет, неумеха!",
@@ -618,7 +612,7 @@ SKILL_RUNP( steal )
                 ch->silver     += amount_s;
                 victim->silver -= amount_s;
 
-                ch->pecho("Bingo! Тебе удалось стащить %s.", describe_money( amount_g, amount_s, 4 ).c_str( ));
+                ch->pecho("Бинго! Тебе удалось стащить %s.", describe_money( amount_g, amount_s, 4 ).c_str( ));
                 gsn_steal->improve( ch, true, victim );
 
                 if (mprog_steal_money( victim, ch, amount_g, amount_s ))
