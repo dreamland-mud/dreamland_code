@@ -149,7 +149,7 @@ typedef struct  auction_data            AUCTION_DATA;
  * String and memory management parameters.
  */
 #define MAX_STRING_LENGTH         4608
-#define MAX_INPUT_LENGTH          256
+#define MAX_INPUT_LENGTH          1024
 
 
 /*
