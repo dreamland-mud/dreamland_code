@@ -52,6 +52,8 @@ bool RainbowScenario::checkMobile( NPCharacter *ch ) const
         return false;
     if (IS_SET(ch->act, ACT_AGGRESSIVE))
         return false;
+    if (IS_AFFECTED(ch, AFF_BLIND))
+        return false;
 
     return true;
 }
@@ -212,7 +214,7 @@ void RainbowSinsScenario::printTime( ostringstream& buf ) const
 void RainbowSinsScenario::printWinnerMsgOther( const DLString &name, ostringstream& buf ) const 
 {
     buf << GQChannel::BOLD << name << GQChannel::NORMAL
-        << "  приняли на адскую должность!";
+        << " приняли на адскую должность!";
 }
 
 bool RainbowSinsScenario::canHearInitMsg( PCharacter *ch ) const
