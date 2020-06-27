@@ -32,6 +32,7 @@ public:
     bool nameRussian( const DLString &name ) const;
     bool nameMobiles( const DLString &name ) const;
     bool nameReserved( const DLString &name ) const;
+    bool nameReligion( const DLString &name, bool fRussian ) const;
 
 protected:
     virtual void initialization( );

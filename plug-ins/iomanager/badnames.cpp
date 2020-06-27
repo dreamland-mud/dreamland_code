@@ -3,10 +3,12 @@
  * ruffina, 2004
  */
 #include "badnames.h"
+#include "logstream.h"
 #include "dl_ctype.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "loadsave.h"
+#include "religion.h"
 
 BadNames *badNames = NULL;
 
@@ -35,7 +37,8 @@ bool BadNames::checkName( const DLString &name ) const
     return nameLength( name )
            && nameEnglish( name )
            && nameMobiles( name )
-           && nameReserved( name );
+           && nameReserved( name )
+           && nameReligion(name, false);
 }
 
 bool BadNames::checkRussianName( const DLString &name ) const
@@ -43,7 +46,21 @@ bool BadNames::checkRussianName( const DLString &name ) const
     return nameLength( name )
            && nameRussian( name )
            && nameMobiles( name )
-           && nameReserved( name );
+           && nameReserved( name )
+           && nameReligion(name, true);
+}
+
+bool BadNames::nameReligion(const DLString &name, bool fRussian) const
+{
+    for (int i = 0; i < religionManager->size(); i++) {
+        Religion *rel = religionManager->find(i);
+        DLString godName = fRussian ? rel->getRussianName() : rel->getName();
+
+        if (name.equalLess(godName))
+            return false;
+    }
+
+    return true;
 }
 
 bool BadNames::nameLength( const DLString &name ) const
