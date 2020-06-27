@@ -261,3 +261,10 @@ NMI_INVOKE( RegList, filter, "(func[,args]): возвращает новый с�
     return Register( obj );
 }
 
+NMI_INVOKE( RegList, clear, "(): очистка списка" )
+{
+    clear();
+    self->changed();
+    return Register();
+}
+
