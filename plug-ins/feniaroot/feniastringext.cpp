@@ -11,6 +11,8 @@
 #include "format.h"
 #include "regexp.h"
 #include "nativeext.h"
+#include "fenia/exceptions.h"
+#include "wrap_utils.h"
 #include "feniastring.h"
 #include "idcontainer.h"
 #include "regcontainer.h"
@@ -306,6 +308,17 @@ NMI_INVOKE(FeniaString, split, "(sep): возвращает List из подст
     return Register(obj);
 }
 
+NMI_INVOKE(FeniaString, at, "(i): возвращает символ в позиции i")
+{
+    int i = args2number(args);
+    if (i < 0 || (unsigned) i >= this->size())
+        throw Scripting::IndexOutOfBoundsException();
+
+    DLString result;
+    result.assign(this->at(i));
+    return result;
+}
+
 NMI_INVOKE(FeniaString, api, "(): печатает этот api")
 {
     ostringstream buf;
@@ -359,6 +372,7 @@ NMI_INVOKE(FeniaString, isRussian, "(): возвращает true если ст�
 
     return true;
 }
+
 NMI_INVOKE(FeniaString, toLower, "(): переводит всю строку в нижний регистр")
 {
     DLString s = *this;
@@ -369,5 +383,17 @@ NMI_INVOKE(FeniaString, toLower, "(): переводит всю строку в 
     }
     return s;
 }
+
+NMI_INVOKE(FeniaString, toUpper, "(): переводит всю строку в верхний регистр")
+{
+    DLString s = *this;
+    for( DLString::size_type pos = 0; pos < s.length( ); pos++ )
+    {
+            char& ch = s.at( pos );
+            ch = Char::upper( ch );
+    }
+    return s;
+}
+
 }
 

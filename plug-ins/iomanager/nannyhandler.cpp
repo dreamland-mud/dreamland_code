@@ -446,6 +446,17 @@ NMI_INVOKE( NannyHandler, checkName, "" )
     return true;
 }
 
+NMI_INVOKE( NannyHandler, checkRussianName, "" )
+{
+    DLString name;
+    
+    if (args.empty( ))
+       throw Scripting::NotEnoughArgumentsException( );
+    
+    name = args.front( ).toString( );
+    return badNames->checkRussianName( name );
+}
+
 NMI_INVOKE( NannyHandler, setupStats, "initial, non-random stat setup" )
 {
     static const int STAT_DELTAS [] = {
