@@ -24,10 +24,10 @@ public:
     BadNames( );
     virtual ~BadNames( );
     
-    bool checkName( const DLString &name ) const;
-    bool checkRussianName( const DLString &name ) const;
+    DLString checkName( const DLString &name ) const;
+    DLString checkRussianName( const DLString &name ) const;
 
-    bool nameLength( const DLString &name ) const;
+    DLString nameLength( const DLString &name ) const;
     bool nameEnglish( const DLString &name ) const;
     bool nameRussian( const DLString &name ) const;
     bool nameMobiles( const DLString &name ) const;
