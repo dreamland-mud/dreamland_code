@@ -2774,6 +2774,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
     if (obj_is_special(obj))
         buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
 
+    if (obj->timer != 0)
+        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
+
     if (obj->weight > 10)
         buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 
     else
