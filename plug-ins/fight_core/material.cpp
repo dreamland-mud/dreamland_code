@@ -191,10 +191,10 @@ const material_t material_table [] = {
  { "wind",      0,  1, MAT_ELEMENT,   0, 0, "ветер" },
  { "fire",      0,  1, MAT_ELEMENT,   0, VULN_FIRE, "огонь" },
  { "flame",     0,  1, MAT_ELEMENT,   0, VULN_FIRE, "пламя" },
- { "ice",      -1,  1, MAT_ELEMENT,   MAT_MELTING, 0, "лед" },
+ { "ice",      -1,  1, MAT_ELEMENT,   MAT_MELTING, VULN_COLD, "лед" },
  { "light",     0,  1, MAT_ELEMENT,   0, VULN_LIGHT, "свет" },
- { "water",    -1,  1, MAT_ELEMENT,   0, 0, "вода" },
- { "snow",     -1,  1, MAT_ELEMENT,   0, 0, "снег" },
+ { "water",    -1,  1, MAT_ELEMENT,   0, VULN_DROWNING, "вода" },
+ { "snow",     -1,  1, MAT_ELEMENT,   MAT_MELTING, VULN_COLD|VULN_DROWNING, "снег" },
                    
  // minerals       
  { "brick",     0, -1, MAT_MINERAL,   0, 0, "кирпич" },
@@ -279,7 +279,7 @@ const material_t material_table [] = {
  { "ethereal",   0, 1, MAT_ABSTRACT,   0, 0,   },
  { "etherealness",0,1, MAT_ABSTRACT,   0, 0,   },
  { "evil",       0, 1, MAT_ABSTRACT,   0, 0, "зло" },
- { "magic",      0, 1, MAT_ABSTRACT,   0, 0, "магия" },
+ { "magic",      0, 1, MAT_ABSTRACT,   0, VULN_MAGIC, "магия" },
  { "nothingness",0, 1, MAT_ABSTRACT,   0, 0, "ничего" },
  { "shadow",     0, 1, MAT_ABSTRACT,   0, 0, "тень" },
  { "vacuum",     0, 1, MAT_ABSTRACT,   0, 0, "вакуум" },
