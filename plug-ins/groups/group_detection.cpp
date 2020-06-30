@@ -603,6 +603,17 @@ SKILL_RUNP( lore )
                         obj->weight / 10,
                         obj->level);
                 ch->send_to(buf);
+            
+                if (obj->timer != 0){
+                  if(learned < 85){
+                    sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+                    ch->send_to(buf);
+                  }
+                  else{
+                    ch->send_to(fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer));
+                  }
+                }
+
                 ch->send_to("\n\rБолее про эту вещь невозможно ничего сказать.\n\r");
                 return;
         }
