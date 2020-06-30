@@ -51,8 +51,7 @@ Object * boat_object_find( Character *ch )
                 
     for (obj = ch->carrying; obj; obj = obj->next_content)
         if (obj->wear_loc == wear_none && obj->item_type == ITEM_BOAT)
-            if (!obj_is_wearable( obj ))
-                return obj;
+            return obj;
 
     return NULL;
 }
