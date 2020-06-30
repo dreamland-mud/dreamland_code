@@ -737,7 +737,12 @@ protected:
 
     void autoBlood( )
     {
-        if (desire_bloodlust->applicable( killer->getPC( ) )) {
+        if (desire_bloodlust->applicable( killer->getPC( ) )
+        && 
+        !((IS_SET( ch->form, FORM_NONADOPTABLE ) ||
+         IS_SET( ch->form, FORM_UNDEAD ) || 
+         IS_SET( ch->form, FORM_CONSTRUCT )))        
+        ) {
             act( "{R$c1 выпивает последние капли жизни из $C2!{x", killer, 0,ch,TO_ROOM);
             act( "{RТы выпиваешь последние капли жизни из $C2!{x", killer, 0,ch,TO_CHAR);
             desire_bloodlust->gain( killer->getPC( ), 3 );

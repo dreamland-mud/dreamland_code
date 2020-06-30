@@ -704,6 +704,13 @@ SKILL_RUNP( bite )
         return;
     }
 
+    if ( IS_SET( victim->form, FORM_NONADOPTABLE ) ||
+         IS_SET( victim->form, FORM_UNDEAD ) || 
+         IS_SET( victim->form, FORM_CONSTRUCT ) ) {
+	ch->send_to("Ты не ощущаешь ни капли крови в этом существе. Брррр...\n\r");
+	return;        
+    }	
+
     if (victim->isAffected(gsn_vampiric_bite )) {
         ch->send_to("Из шеи жертвы уже можно пить.\r\n");
         return;
@@ -725,8 +732,9 @@ SKILL_RUNP( bite )
             act_p("$c1 пытается прогрызть шею своей тени.",
                     ch, 0, 0, TO_ROOM,POS_RESTING);
             return;
-    }	
-	
+    }
+    
+
     UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
     ch->setLastFightTime( );	
