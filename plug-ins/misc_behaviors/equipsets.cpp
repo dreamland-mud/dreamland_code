@@ -38,8 +38,6 @@ EquipSet::EquipSet(int size, bool noDoubleNeck_, bool noDoubleWrist_)
  
 void EquipSet::equip( Character *victim )
 {
-    if (victim->is_npc())
-        return;
 
     if (hasAffect(victim)) 
         return;
@@ -52,8 +50,6 @@ void EquipSet::equip( Character *victim )
 
 void EquipSet::remove( Character *victim )
 {
-    if (victim->is_npc())
-        return;
 
     if (!hasAffect(victim))
         return;
@@ -69,8 +65,6 @@ bool EquipSet::isComplete(Character *ch) const
     GlobalArray slots(wearlocationManager);
     int wornSetSize = 0;
 
-    if (ch->is_npc())
-        return false;
     
     if (totalSetSize <= 0)
         return false;
@@ -103,8 +97,7 @@ bool EquipSet::isComplete(Character *ch) const
             wornSetSize--;
     }
     
-    if (ch->is_immortal())
-        ch->pecho("Окончательный результат %d предмета из %d.", wornSetSize, totalSetSize);
+    ch->pecho("Надето предметов из {hh67комплекта{x: {C%d{x из {c%d{x.", wornSetSize, totalSetSize);
 
     return wornSetSize >= totalSetSize;
 }
@@ -126,6 +119,7 @@ void SidheArmorSet::addAffect(Character *ch) const
 {
     if (IS_NEUTRAL(ch)) {
         ch->pecho("Набор сидхийской брони на мгновение загорается тусклым светом и тут же гаснет.");
+        ch->pecho("Лишь те, кто следуют по пути Добра или Зла, смогут завершить комплект.");       
         return;
     }
 
@@ -247,6 +241,7 @@ void NorivaMyrvaleSet::addAffect(Character *ch) const
 {
     if (ch->getProfession() != prof_cleric) {
         ch->pecho("Твое обмундирование на мгновение вспыхивает, но тут же гаснет.");
+        ch->pecho("Этот комплект предназначен только для клериков.");       
         return;
     }
 
@@ -286,7 +281,8 @@ bool ReykarisShevaleSet::hasAffect(Character *ch) const
 void ReykarisShevaleSet::addAffect(Character *ch) const
 {
     if (ch->getProfession() != prof_necromancer) {
-        ch->pecho("Зловещая аура на мгновение окружает твое обмундирование.");
+        ch->pecho("Зловещая аура на мгновение окружает твое обмундирование, но тут же гаснет.");
+        ch->pecho("Этот комплект предназначен только для некромантов.");       
         return;
     }
 
@@ -419,5 +415,8 @@ void MorrisDancerSet::fight( Character *ch )
     case 3:
         do_yell(ch, "Time on the ground is time wasted!");
         break;
+    case 4:
+        do_yell(ch, "С птицей и полотенцем потанцуй у стекла!");
+        break;                  
     }
 }
