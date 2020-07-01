@@ -431,19 +431,19 @@ NMI_INVOKE( NannyHandler, checkBan, "" )
  *-------------------------------------------------------------------------*/
 NMI_INVOKE( NannyHandler, checkName, "" )
 {
-    DLString name;
+    DLString name, rc;
     
     if (args.empty( ))
        throw Scripting::NotEnoughArgumentsException( );
     
     name = args.front( ).toString( );
-    if (!badNames->checkName( name )) 
-        return false;
+    if (!(rc = badNames->checkName(name)).empty())
+        return rc;
 
     if (descriptor_find_named( NULL, name ))
-        return false;
+        return "already_connected";
 
-    return true;
+    return DLString::emptyString;
 }
 
 NMI_INVOKE( NannyHandler, checkRussianName, "" )

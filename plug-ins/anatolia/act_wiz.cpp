@@ -3595,8 +3595,9 @@ CMDWIZP( rename )
         return;
     }
     
-    if (!badNames->checkName( newName )) {
-        ch->send_to( "The new name is illegal.\n\r" );
+    DLString rc;
+    if (!(rc = badNames->checkName(newName)).empty()) {
+        ch->printf( "New name failed sanity checks, reason: %s.\n\r", rc.c_str() );
         return;
     }
     
