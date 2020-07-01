@@ -345,7 +345,7 @@ VOID_SPELL(LionShield)::run( Character *ch, char *target_name, int sn, int level
   Affect af;
 
   shield = create_object( get_obj_index(OBJ_VNUM_LION_SHIELD), level );
-  shield->timer = level / 4;
+  shield->timer = level;
   shield->cost  = 0;
   obj_to_char(shield, ch);
   
