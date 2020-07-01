@@ -54,18 +54,23 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
            ch,0,victim,TO_CHAR,POS_RESTING);
     act_p("Разряд молнии, созданный $c5, поражает тебя!",
            ch,0,victim,TO_VICT,POS_RESTING);
-
-    dam = dice(level,6);
+  
+    // special damage table   
+         if (level <= 20)   dam = dice( level, 4 );    
+    else if (level <= 40)   dam = dice( level, 5 );
+    else if (level <= 70)   dam = dice( level, 6 );
+    else                    dam = dice( level, 7 );
+    
     if (saves_spell(level,victim,DAM_LIGHTNING,ch, DAMF_SPELL)){
-        dam /= 3;
+        dam /= 2;
     }
 
-        try{
+    try {
         damage_nocatch(ch,victim,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
-        }
-        catch (const VictimDeathException &){
-            people.remove(victim);
-        }
+    }
+    catch (const VictimDeathException &){
+        people.remove(victim);
+    }
     
     last_vict = victim;
     level -= 4;   /* decrement damage */
@@ -97,17 +102,23 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
                      tmp_vict,0,0,TO_ROOM,POS_RESTING);
               act_p("Разряд молнии поражает тебя!",
                      tmp_vict,0,0,TO_CHAR,POS_RESTING);
-              dam = dice(level,6);
+                
+                // special damage table   
+                     if (level <= 20)   dam = dice( level, 4 );    
+                else if (level <= 40)   dam = dice( level, 5 );
+                else if (level <= 70)   dam = dice( level, 6 );
+                else                    dam = dice( level, 7 );
                 
                 if (ch->fighting != tmp_vict && tmp_vict->fighting != ch)
                     yell_panic( ch, tmp_vict );
 
               if (saves_spell(level,tmp_vict,DAM_LIGHTNING,ch, DAMF_SPELL)){
-                dam /= 3;
+                dam /= 2;
               }
 
                 try{
               damage_nocatch(ch,tmp_vict,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
+              shock_effect(tmp_vict,level,dam,TARGET_CHAR, DAMF_SPELL);                    
                 }
                 catch (const VictimDeathException &){
                     level -= 4;
@@ -135,9 +146,15 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
           last_vict = ch;
           act_p("Разряд молнии поражает $c4..!",ch,0,0,TO_ROOM,POS_RESTING);
           ch->send_to("Созданная тобой молния поражает тебя же!\n\r");
-          dam = dice(level,6);
+
+            // special damage table   
+            if (level <= 20)   dam = dice( level, 4 );    
+            else if (level <= 40)   dam = dice( level, 5 );
+            else if (level <= 70)   dam = dice( level, 6 );
+            else                    dam = dice( level, 7 );  
+            
           if (saves_spell(level,ch,DAM_LIGHTNING,ch, DAMF_SPELL))
-           dam /= 3;
+           dam /= 2;
           damage(ch,ch,dam,sn,DAM_LIGHTNING,true, DAMF_SPELL);
           level -= 4;  /* decrement damage */
           if (ch == 0)
@@ -151,30 +168,26 @@ VOID_SPELL(ChainLightning)::run( Character *ch, Character *victim, int sn, int l
 SPELL_DECL(ChillTouch);
 VOID_SPELL(ChillTouch)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    
-    Affect af;
     int dam;
+    
+    act_p("Прикосновение ледяной длани $c2 замораживает $C4!",
+           ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("Прикосновение твоей ледяной длани замораживает $C4!",
+           ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("Прикосновение ледяной длани $c2 замораживает тебя!",
+           ch,0,victim,TO_VICT,POS_RESTING);
 
-    dam = number_range(1,level);
-    if ( !saves_spell( level, victim,DAM_COLD,ch, DAMF_SPELL ) )
-    {
-        act_p("$c1 замерзает от ледяного прикосновения.",
-               victim,0,0,TO_ROOM,POS_RESTING);
-        af.where     = TO_AFFECTS;
-        af.type      = sn;
-        af.level     = level;
-        af.duration  = 6;
-        af.location  = APPLY_STR;
-        af.modifier  = -1;
-        af.bitvector = 0;
-        affect_join( victim, &af );
-    }
-    else
-    {
+    // Tier 2 damage (spell has regular effects)
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 );
+    
+    if ( saves_spell( level, victim,DAM_COLD,ch, DAMF_SPELL ) )
         dam /= 2;
-    }
 
     damage_nocatch( ch, victim, dam, sn, DAM_COLD,true, DAMF_SPELL );
+    cold_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);    
 }
 
 
@@ -184,11 +197,23 @@ VOID_SPELL(ColourSpray)::run( Character *ch, Character *victim, int sn, int leve
     
     int dam;
 
-    dam = dice(level,5) + 13;
+    act_p("Созданная $c5 {Rр{Yа{Gд{Cу{Bг{Mа{x внезапно выстреливает в сторону $C4 разноцветными лучами!",
+           ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("Созданная тобой {Rр{Yа{Gд{Cу{Bг{Mа{x внезапно выстреливает в сторону $C4 разноцветными лучами!",
+           ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("Созданная $c5 {Rр{Yа{Gд{Cу{Bг{Mа{x внезапно выстреливает в тебя разноцветными лучами!",
+           ch,0,victim,TO_VICT,POS_RESTING);
+
+    // Tier 3 damage: spells with powerful effects
+         if (level <= 20)   dam = dice( level, 7  );    
+    else if (level <= 40)   dam = dice( level, 10 );
+    else if (level <= 70)   dam = dice( level, 13 );
+    else                    dam = dice( level, 16 );
+    
     if ( saves_spell( level, victim,DAM_LIGHT,ch, DAMF_SPELL) )
         dam /= 2;
     else
-        spell(gsn_blindness, level / 3 * 2, ch,  victim );
+        spell(gsn_blindness, level, ch, victim );
 
     damage_nocatch( ch, victim, dam, sn, DAM_LIGHT,true, DAMF_SPELL );
 }
@@ -198,23 +223,32 @@ SPELL_DECL(DesertFist);
 VOID_SPELL(DesertFist)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         
-        int dam;
+    int dam;
 
-        if ( (ch->in_room->sector_type != SECT_HILLS)
-                && (ch->in_room->sector_type != SECT_MOUNTAIN)
-                && (ch->in_room->sector_type != SECT_DESERT) )
-        {
-                ch->println("Здесь недостаточно песка, чтобы сформировать кулак.");
-                ch->wait = 0;
-                return;
-        }
-        
-        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет $c4.", victim, 0, 0, TO_ROOM);
-        act("Вихрь песка поднимается с земли, образуя огромный кулак, и ударяет тебя.", victim, 0, 0, TO_CHAR);
-        dam = dice( level , 14 );
+    if (   (ch->in_room->sector_type != SECT_HILLS)
+        && (ch->in_room->sector_type != SECT_MOUNTAIN)
+        && (ch->in_room->sector_type != SECT_DESERT) )
+    {
+        ch->println("Здесь недостаточно песка, чтобы сформировать кулак.");
+        ch->wait = 0;
+        return;
+    }
 
-        damage_nocatch(ch,victim,dam,sn,DAM_OTHER,true, DAMF_SPELL);
-        sand_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
+    act_p("{yВихрь песка,{x созданный $c5, образует огромный кулак и ударяет $c4.",
+        ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("{yВихрь песка,{x созданный тобой, образует огромный кулак и ударяет $c4.",
+        ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("{yВихрь песка,{x созданный $c5, образует огромный кулак и ударяет тебя!",
+        ch,0,victim,TO_VICT,POS_RESTING);
+
+    // Tier 1 damage: only spells with severe limitations
+         if (level <= 20)   dam = dice( level, 10 );    
+    else if (level <= 40)   dam = dice( level, 13 );
+    else if (level <= 70)   dam = dice( level, 16 );
+    else                    dam = dice( level, 20 );
+
+    damage_nocatch(ch,victim,dam,sn,DAM_BASH,true, DAMF_SPELL);
+    sand_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
 }
 
 SPELL_DECL(EtheralFist);
@@ -222,15 +256,27 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
 { 
     
     int dam;
+
+    act_p("Призванный $C5 кулак из иномирового эфира сокрушает $C4, повергая $S в ошеломление!",
+           ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("Призванный тобой кулак из иномирового эфира сокрушает $C4, повергая $S в ошеломление!",
+           ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("Призванный $C5 кулак из иномирового эфира сокрушает тебя, повергая тебя в ошеломление!",
+           ch,0,victim,TO_VICT,POS_RESTING);
     
-    if (level <= 50)        dam = dice( level, 12 );
-    else if (level <= 75)   dam = dice( level, 15 );
-    else                    dam = dice( level, 18 );
+    // Tier 3 damage: spells with powerful effects
+         if (level <= 20)   dam = dice( level, 7  );    
+    else if (level <= 40)   dam = dice( level, 10 );
+    else if (level <= 70)   dam = dice( level, 13 );
+    else                    dam = dice( level, 16 );
         
-    if ( saves_spell( level, victim, DAM_ENERGY,ch, DAMF_SPELL ) )
+    if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
         dam /= 2;
-    act("Кулак из темного эфира иных миров сокрушает $C4, повергая $S в ошеломление!",
-           ch,0,victim,TO_NOTVICT);
+    else {
+        if ( number_percent() > 50 )
+            victim->setWaitViolence( 2 );
+    }    
+
     damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
 }
 
@@ -240,34 +286,46 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     
     int dam;
 
-    if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
-    {
-        if (ch != victim)
-            act("Рука умертвия пытается схватить $C4, но безуспешно.", ch, 0, victim, TO_CHAR);
-        act("Ты на мгновение почувствова$gло|л|ла озноб.", victim, 0, 0, TO_CHAR);
-        return;
-    }
-
-    if ( (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD))
-        || IS_VAMPIRE(victim) )
+    if ( (victim->is_npc() && IS_SET(victim->act,ACT_UNDEAD)) ||
+         IS_VAMPIRE(victim) )
         {
             ch->println("Рука умертвия не властна над твоей жертвой.");
-             return;
-        }
-    if( victim->getModifyLevel() <= 2 )
+            return;
+        }    
+
+    act_p("Выпущенная $C5 рука умертвия пытается схватить $C4!",
+           ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("Выпущенная тобой рука умертвия пытается схватить $C4!",
+           ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("Выпущенная $C5 рука умертвия пытается схватить тебя!",
+           ch,0,victim,TO_VICT,POS_RESTING);
+   
+    // Tier 2 damage: spells with regular or no special effects   
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 );
+
+    // instakills small mobs
+    if ( victim->getModifyLevel() < ( level/10 ) )
     {
-        dam                 = ch->hit + 1;
-    }
-    else
-    {
-     dam = dice( level, 10 );
-     victim->mana        /= 2;
-     victim->move        /= 2;
-     ch->hit                += dam / 2;
+                            dam = victim->hit + 1;
     }
     
+    if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
+    {         
+        act("Ты на мгновение почувствова$gло|л|ла озноб.", victim, 0, 0, TO_CHAR);            
+        return;  
+    }
+
+    victim->mana        /= 2;
+    victim->move        /= 2;
+    ch->hit             += dam / 2;
+
+    act("Призрачные когти смыкаются вокруг $C4!", ch,0,victim,TO_NOTVICT);    
     victim->println("Ты чувствуешь, как жизнь ускользает от тебя!");
-    act("Непостижимая Рука Умертвия хватает $C4!", ch,0,victim,TO_NOTVICT);
+    ch->println("Ты чувствуешь прилив жизненной энергии!");    
+
     damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_SPELL);
 }
 
@@ -276,14 +334,16 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(Iceball);
 VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level ) 
 { 
-        int dam;
-        int movedam;
+    int dam;
+    int movedam;
 
-        if (level <= 60)        dam = dice( level, 12 );
-        else if (level <= 80)   dam = dice( level, 15 );
-        else                    dam = dice( level, 18 );
+    // Tier 1 damage: only spells with severe limitations
+         if (level <= 20)   dam = dice( level, 10 );    
+    else if (level <= 40)   dam = dice( level, 13 );
+    else if (level <= 70)   dam = dice( level, 16 );
+    else                    dam = dice( level, 20 );
 
-        movedam     = number_range( ch->getModifyLevel(), 2 * ch->getModifyLevel() );
+    movedam     = number_range( ch->getModifyLevel(), 2 * ch->getModifyLevel() );
      
         for(auto &it : ch->in_room->getPeople())
         {
@@ -301,6 +361,7 @@ VOID_SPELL(Iceball)::run( Character *ch, Room *room, int sn, int level )
                                 dam /= 2;
                     try{
                         damage_nocatch( ch, it, dam, sn, DAM_COLD, true, DAMF_SPELL );
+                        cold_effect(it,level,dam,TARGET_CHAR, DAMF_SPELL);                        
                         it->move -= min((int)it->move,movedam);
                      }
                          catch (const VictimDeathException &) {
@@ -382,30 +443,28 @@ SPELL_DECL(SandStorm);
 VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level ) 
 { 
 
-        int dam,hp_dam,dice_dam;
-        int hpch;
+    int dam;
 
-        if ( ch->in_room->sector_type == SECT_AIR
-                || ch->in_room->sector_type == SECT_INSIDE
-                || ch->in_room->sector_type == SECT_WATER_SWIM
-                || ch->in_room->sector_type == SECT_WATER_NOSWIM )
-        {
-                ch->send_to("Здесь нет ни крупицы песка!\n\r");
-                ch->wait = 0;
-                return;
-        }
+    if ( ch->in_room->sector_type == SECT_AIR || 
+         ch->in_room->sector_type == SECT_INSIDE || 
+         ch->in_room->sector_type == SECT_WATER_SWIM || 
+         ch->in_room->sector_type == SECT_WATER_NOSWIM )
+    {
+        ch->send_to("Здесь нет ни крупицы песка!\n\r");
+        ch->wait = 0;
+        return;
+    }
 
-        act_p("$c1 создает песчаную бурю вокруг себя.",ch,0,0,TO_ROOM,POS_RESTING);
-        ch->send_to("Ты создаешь песчаную бурю вокруг себя.\n\r");
+    // Tier 1 damage: only spells with severe limitations
+         if (level <= 20)   dam = dice( level, 10 );    
+    else if (level <= 40)   dam = dice( level, 13 );
+    else if (level <= 70)   dam = dice( level, 16 );
+    else                    dam = dice( level, 20 );
 
-        hpch = max( 10, (int)ch->hit );
-        hp_dam = number_range( hpch / 9 + 1, hpch / 5 );
-        if ( ch->is_npc() )
-                hp_dam /= 8;
-        dice_dam = dice(level,18);
+    act_p("$c1 создает песчаную бурю вокруг себя.",ch,0,0,TO_ROOM,POS_RESTING);
+    ch->send_to("Ты создаешь песчаную бурю вокруг себя.\n\r");
 
-        dam = max(hp_dam + dice_dam /10, dice_dam + hp_dam / 10);
-        sand_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
+    sand_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
         for ( auto &vch : room->getPeople() )
         {
@@ -429,12 +488,12 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
                 if ( saves_spell(level,vch,DAM_COLD,ch, DAMF_SPELL) )
                 {
                         sand_effect(vch,level/2,dam/4,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,vch,dam/2,sn,DAM_COLD,true, DAMF_SPELL);
+                        damage_nocatch(ch,vch,dam/2,sn,DAM_OTHER,true, DAMF_SPELL);
                 }
                 else
                 {
                         sand_effect(vch,level,dam,TARGET_CHAR, DAMF_SPELL);
-                        damage_nocatch(ch,vch,dam,sn,DAM_COLD,true, DAMF_SPELL);
+                        damage_nocatch(ch,vch,dam,sn,DAM_OTHER,true, DAMF_SPELL);
                 }
             }
             catch (const VictimDeathException &){
@@ -447,29 +506,20 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
 SPELL_DECL(ShockingGrasp);
 VOID_SPELL(ShockingGrasp)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    
-
-    static const int dam_each[] =
-    {
-         6,
-         8,  10,  12,  14,  16,         18, 20, 25, 29, 33,
-        36, 39, 39, 39, 40,        40, 41, 41, 42, 42,
-        43, 43, 44, 44, 45,        45, 46, 46, 47, 47,
-        48, 48, 49, 49, 50,        50, 51, 51, 52, 52,
-        53, 53, 54, 54, 55,        55, 56, 56, 57, 57
-    };
 
     int dam;
-
-    level        = min(level, ( int )( sizeof(dam_each)/sizeof(dam_each[0]) - 1 ) );
-    level        = max( 0 , level);
-        if( ch->getModifyLevel() > 50)
-    dam         = level / 2 ;
-        else
-    dam                = number_range( dam_each[level] / 2, dam_each[level] * 2 );
+    
+    // Tier 2 damage: spells with regular or no special effects   
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 );
+    
     if ( saves_spell( level, victim,DAM_LIGHTNING,ch, DAMF_SPELL) )
         dam /= 2;
+    
     damage_nocatch( ch, victim, dam, sn, DAM_LIGHTNING ,true, DAMF_SPELL);
+    shock_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);    
 }
 
 SPELL_DECL(VampiricBlast);
@@ -480,7 +530,12 @@ VOID_SPELL(VampiricBlast)::run( Character *ch, Character *victim, int sn, int le
 
     chance = 50 + ch->getCurrStat(STAT_INT) - victim->getCurrStat(STAT_INT);
  
-    dam = dice( level, 12);
+    // Tier 2 damage: spells with regular or no special effects   
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 );
+    
     if ( saves_spell( level, victim, DAM_NEGATIVE,ch, DAMF_SPELL ) ) {
         dam /= 2;
     }
@@ -505,18 +560,18 @@ SPELL_DECL(Hurricane);
 VOID_SPELL(Hurricane)::run( Character *ch, Room *room, int sn, int level ) 
 { 
 
-    int dam,hp_dam,dice_dam,hpch;
+    int dam;
 
     act_p("$c1 призывает повелителя ураганов на помощь.",
            ch,0,0,TO_NOTVICT,POS_RESTING);
     act_p("Ты призываешь повелителя ураганов на помощь.",
            ch,0,0,TO_CHAR,POS_RESTING);
 
-    hpch = max(16,(int)ch->hit);
-    hp_dam = number_range(hpch/15+1,8);
-    dice_dam = dice(level,12);
-
-    dam = max(hp_dam + dice_dam/10,dice_dam + hp_dam/10);
+    // Tier 2 damage: spells with regular or no special effects   
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 );
 
     for ( auto &vch : room->getPeople())
     {            
