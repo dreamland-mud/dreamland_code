@@ -66,7 +66,7 @@ void CommunicationChannel::applyGarble( Character *ch, DLString &msg, Character 
     if (!ch->isAffected( gsn_garble ))
         return;
     
-    mudtags_convert_nocolor( msg.c_str( ), srcStream, victim );
+    mudtags_convert( msg.c_str( ), srcStream, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, victim );
     DLString srcString = srcStream.str( );
     src = srcString.c_str( );
     dst = result;

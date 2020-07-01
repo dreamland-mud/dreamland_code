@@ -25,8 +25,8 @@ public:
     RemortBonus( );
 
     virtual bool matches( const DLString & ) const;
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
-    virtual void sell( Character *, NPCharacter * );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool sell( Character *, NPCharacter * );
     virtual bool sellable( Character * );
     virtual bool available( Character *, NPCharacter * ) const;
     virtual bool visible( Character * ) const;

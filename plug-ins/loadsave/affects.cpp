@@ -322,8 +322,6 @@ void affect_check(Character *ch,int where,int vector)
                                 case TO_RACE:
                                         break;
                         }
-
-                        return;
                 }
 
         for (obj = ch->carrying; obj != 0; obj = obj->next_content)
@@ -361,8 +359,6 @@ void affect_check(Character *ch,int where,int vector)
                                         case TO_RACE:
                                                 break;
                                 }
-
-                                return;
                         }
 
                 if (obj->enchanted)
@@ -399,8 +395,6 @@ void affect_check(Character *ch,int where,int vector)
                                                 break;
 
                                 }
-
-                                return;
                         }
         }
     

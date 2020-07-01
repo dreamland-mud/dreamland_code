@@ -851,12 +851,14 @@ CMDRUNP( title )
 static bool fix_pretitle( PCharacter *ch, DLString &title )
 {
     ostringstream buf;
-    mudtags_raw( title.c_str( ), buf );
+    mudtags_convert( 
+        title.c_str( ), buf, 
+        TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOWEB|TAGS_ENFORCE_NOCOLOR|TAGS_ENFORCE_RAW );
 
     DLString stripped = buf.str( );
     DLString nospace = stripped;
     nospace.stripWhiteSpace( );
-    
+   
     if (stripped.size( ) > 25) {
         ch->println( "Слишком длинный претитул!" );
         return false;
@@ -1654,7 +1656,7 @@ CMDRUNP( score )
     ostringstream name;
     DLString title = pch->getParsedTitle( );
     name << ch->seeName( ch, '1' ) << "{x ";
-    vistags_convert( title.c_str( ), name, ch );
+    mudtags_convert(title.c_str( ), name, TAGS_CONVERT_VIS, ch);
 
     // Output one piece of the score if there is an argument provided.
     DLString arg = argument;
@@ -2382,7 +2384,7 @@ CMDRUNP( affects )
 
         if (!IS_SET(flags, FSHOW_COLOR)) {
             ostringstream showbuf;
-            mudtags_convert_nocolor( buf.str( ).c_str( ), showbuf, ch );        
+            mudtags_convert( buf.str( ).c_str( ), showbuf, TAGS_CONVERT_VIS|TAGS_CONVERT_COLOR|TAGS_ENFORCE_NOCOLOR, ch );        
             ch->send_to( showbuf );
         }
         else
@@ -2771,6 +2773,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     if (obj_is_special(obj))
         buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
+
+    if (obj->timer != 0)
+        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
 
     if (obj->weight > 10)
         buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 

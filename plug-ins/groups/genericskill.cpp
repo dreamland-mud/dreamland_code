@@ -17,7 +17,7 @@
 #include "room.h"
 #include "npcharacter.h"
 #include "hometown.h"
-
+#include "profflags.h"
 #include "mercdb.h"
 #include "clan.h"
 #include "merc.h"
@@ -59,9 +59,19 @@ SkillGroupReference & GenericSkill::getGroup( )
     return group;
 }
 
+/** Return true if this skill belongs to at least one visible class/profession. */
 bool GenericSkill::isProfessional() const
 {
-    return !classes.empty();
+    if (classes.empty())
+        return false;
+
+    for (auto &pair: classes) {
+        Profession *prof = professionManager->findExisting(pair.first);
+        if (prof && !prof->getFlags().isSet(PROF_NEWLOCK))
+            return true;
+    }
+
+    return false;
 }
 
 void GenericSkill::resolve( ) 

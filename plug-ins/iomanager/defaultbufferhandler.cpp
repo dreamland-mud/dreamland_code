@@ -14,9 +14,13 @@
 #include "telnet.h"
 #include "codepage.h"
 #include "mercdb.h"
+#include "colour.h"
 #include "def.h"
 
 extern const char *lid;
+
+const char *MSG_LINE_TOO_LONG = C_YELLOW "Слишком длинная строка была обрезана. Эта часть не влезла:\n\r" C_WHITE;
+const char *MSG_EOL = "\r\n";
 
 void
 DefaultBufferHandlerPlugin::initialization()
@@ -138,9 +142,7 @@ DefaultBufferHandler::read( Descriptor *d )
     if(line_length < 0)
         return true;
 
-
     char koi8[line_length+2];
-
     line_length = convertCodepage(line, line_length, koi8, line_length);
 
     if(line_length < 0) {
@@ -148,11 +150,17 @@ DefaultBufferHandler::read( Descriptor *d )
         return false;
     }
 
+    // Cut off too long lines and notify the user.
     if(line_length >= MAX_INPUT_LENGTH - 2) {
-        static const char * msg = "Слишком длинная строка.\n\r";
-        d->writeConverted(msg);
-        koi8[MAX_INPUT_LENGTH-2] = 0;
+        d->writeConverted(MSG_LINE_TOO_LONG);
+
+        char remainder[MAX_STRING_LENGTH];
         line_length = MAX_INPUT_LENGTH - 2;
+        strncpy(remainder, koi8 + line_length, MAX_STRING_LENGTH);
+        koi8[line_length] = 0;
+
+        d->writeRaw((const unsigned char *)remainder, sizeof(remainder));
+        d->writeConverted(MSG_EOL);
     }
 
     /*

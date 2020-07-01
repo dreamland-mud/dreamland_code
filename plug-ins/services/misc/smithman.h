@@ -62,7 +62,7 @@ public:
     
     virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
 };
 
 class ItemSmithService : public SmithService {
@@ -72,7 +72,7 @@ public:
     
     virtual bool visible( Character * ) const;
     virtual bool available( Character *, NPCharacter * ) const;
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
 
 protected:
     bool checkPrice( Character *, NPCharacter *, Price::Pointer ) const;

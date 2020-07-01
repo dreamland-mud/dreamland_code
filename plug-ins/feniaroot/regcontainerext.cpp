@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "regcontainer.h"
+#include "wrap_utils.h"
 #include "nativeext.h"
 #include "fenia/object.h"
 #include "register-impl.h"
@@ -77,3 +78,33 @@ NMI_INVOKE( RegContainer, clear, "(): очистка массива" )
     return Register( );
 }
 
+NMI_INVOKE( RegContainer, add , "(args...): попарно добавляет в массив все элементы, перечисленные в параметрах")
+{
+    if (args.size() % 2 != 0) 
+        throw Scripting::Exception("add() method takes even number of arguments");
+
+    RegisterList::const_iterator a;
+    for (a = args.begin(); a != args.end(); a++) {
+        Register key = *a;
+        Register value = *(++a);
+        map[key] = value;
+    }
+
+    self->changed();
+    return Register( self );
+}
+
+NMI_INVOKE( RegContainer, addAll , "(array): добавляет в этот массив все элементы из массива array")
+{
+    Scripting::Object *otherObj = get_unique_arg(args).toObject();
+    if (otherObj && otherObj->hasHandler()) {
+        RegContainer *otherArray = otherObj->getHandler().getDynamicPointer<RegContainer>();
+        if (otherArray) {
+            map.insert(otherArray->map.begin(), otherArray->map.end());
+            self->changed();
+            return Register(self);
+        }
+    }
+
+    throw Scripting::Exception("Invalid array passed to addAll() method");
+}

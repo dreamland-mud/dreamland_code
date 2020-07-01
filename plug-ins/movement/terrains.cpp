@@ -32,28 +32,14 @@ const struct terrain_t terrains [SECT_MAX] = {
 /*-----------------------------------------------------------------------------
  * boats
  *----------------------------------------------------------------------------*/
-static bool obj_is_wearable( Object *obj )
-{
-    int wear = obj->wear_flags;
-
-    REMOVE_BIT(wear, ITEM_TAKE);
-    REMOVE_BIT(wear, ITEM_NO_SAC);
-    return wear;
-}
-
 Object * boat_object_find( Character *ch )
 {
     Object *obj;
 
     for (obj = ch->carrying; obj; obj = obj->next_content)
-        if (obj->wear_loc != wear_none && obj->item_type == ITEM_BOAT)
+        if (obj->item_type == ITEM_BOAT)
             return obj;
-                
-    for (obj = ch->carrying; obj; obj = obj->next_content)
-        if (obj->wear_loc == wear_none && obj->item_type == ITEM_BOAT)
-            if (!obj_is_wearable( obj ))
-                return obj;
-
+               
     return NULL;
 }
 

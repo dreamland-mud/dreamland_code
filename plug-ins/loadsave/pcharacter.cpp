@@ -114,7 +114,7 @@ void PCharacter::updateSkills( )
         }
 
         // Count and store total number of skills available at this level.
-        if (skill->available(this))
+        if (data.origin == SKILL_PRACTICE && skill->available(this))
             availCounter++;
     }
 
@@ -248,13 +248,13 @@ bool PCharacter::load( )
 
 void PCharacter::save( )
 {
-    static const char * METHOD = "PCharacter::save( )";
-//    ProfilerBlock be(METHOD);
+    static const char * METHOD = " PCharacter::save()";
+    ProfilerBlock profiler(getName() + METHOD, 100);
 
     DLFileWrite tmpfile( dreamland->getBasePath( ), dreamland->getTempFile( ) );
 
     if (!tmpfile.open( )) {
-        LogStream::sendError( ) << METHOD << " bad tmp for " << getName( ) << endl;
+        LogStream::sendError( ) << getName() << METHOD << " bad tmp file" << endl;
         return;
     }
 

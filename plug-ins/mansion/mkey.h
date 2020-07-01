@@ -68,7 +68,7 @@ class MansionKeyArticle : public Article {
 public:
     typedef ::Pointer<MansionKeyArticle> Pointer;
 
-    virtual void purchase( Character *, NPCharacter *, const DLString &, int = 1 );
+    virtual bool purchase( Character *, NPCharacter *, const DLString &, int = 1 );
     virtual bool available( Character *, NPCharacter * ) const;
     virtual int getQuantity( ) const;
 

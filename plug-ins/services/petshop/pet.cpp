@@ -36,23 +36,23 @@ void Pet::stopfol( Character *master )
     lastCharmTime = dreamland->getCurrentTime( );
 }
 
-void Pet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
+bool Pet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
 {
     NPCharacter *pet;
     
     if (client->is_npc( ) || client->getPC( )->pet) {
         client->println( "У тебя уже есть одно домашнее животное." );
-        return;
+        return false;
     }
 
     if (!canAfford( client )) {
         client->pecho( "У тебя не хватает %N2, чтобы заплатить за это.", toCurrency( ).c_str( ) );
-        return;
+        return false;
     }
 
     if (getLevel( client ) > client->getModifyLevel( )) {
         client->println( "У тебя недостаточно опыта, чтобы справиться с этим животным." );
-        return;
+        return false;
     }
 
     deduct( client );
@@ -61,6 +61,7 @@ void Pet::purchase( Character *client, NPCharacter *keeper, const DLString &argu
     
     act( "В трудную минуту $E поможет тебе!", client, 0, pet, TO_CHAR );
     act( "$c1 приобретает $C4.", client, 0, pet, TO_ROOM );
+    return true;
 }
 
 bool Pet::available( Character *client, NPCharacter *keeper ) const
@@ -224,26 +225,26 @@ NPCharacter * RideablePet::create( PCharacter *client ) const
     return horse;
 }
 
-void RideablePet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
+bool RideablePet::purchase( Character *client, NPCharacter *keeper, const DLString &arguments, int )
 {
     NPCharacter *horse;
     
     if (client->is_npc( ))
-        return;
+        return false;
 
     if (MOUNTED(client)) {
         client->println( "У тебя уже есть скакун." );
-        return;
+        return false;
     }
 
     if (!canAfford( client )) {
         client->pecho( "У тебя не хватает %N2, чтобы заплатить за это.", toCurrency( ).c_str( ) );
-        return;
+        return false;
     }
 
     if (getLevel( client ) - 5 > client->getModifyLevel( )) {
         ch->println("Тебе не хватит опыта справиться с этим скакуном.");
-        return;
+        return false;
     }
 
     deduct( client );
@@ -254,6 +255,7 @@ void RideablePet::purchase( Character *client, NPCharacter *keeper, const DLStri
 
     client->println("Наслаждайся своей лошадью.");
     act( "$c1 приобретает для верховой езды $C4.", client, 0, horse, TO_ROOM );
+    return true;
 }
 
 int RideablePet::getOccupation( )

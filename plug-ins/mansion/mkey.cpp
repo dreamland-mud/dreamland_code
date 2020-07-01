@@ -335,7 +335,7 @@ int MansionKeyMaker::findKeyVnum( PCharacter *client, const DLString& arg )
 /*-------------------------------------------------------------------------
  * MansionKeyArticle
  *------------------------------------------------------------------------*/
-void MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const DLString &, int ) 
+bool MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const DLString &, int ) 
 {
     Object *key;
     
@@ -343,7 +343,7 @@ void MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
         tell_act( client, maker, 
                   "У тебя недостаточно $n2, чтобы оплатить мою работу, $c1.", 
                   price->toCurrency( ).c_str( ) );
-        return;
+        return false;
     }
     
     price->deduct( client );
@@ -352,6 +352,7 @@ void MansionKeyArticle::purchase( Character *client, NPCharacter *maker, const D
 
     act( "$C1 вручает тебе $o4.", client, key, maker, TO_CHAR );
     act( "$C1 вручает $c3 $o4." , client, key, maker, TO_ROOM );
+    return true;
 }
 
 bool MansionKeyArticle::available( Character *client, NPCharacter *maker ) const

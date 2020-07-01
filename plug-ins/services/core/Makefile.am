@@ -9,6 +9,7 @@ $(INCLUDES_SRC) \
 
 libservices_core_la_LIBADD = \
 ../../output/liboutput.la \
+../../loadsave/libloadsave.la \
 ../../descriptor/libdescriptor.la
 
 libservices_core_la_SOURCES = \
