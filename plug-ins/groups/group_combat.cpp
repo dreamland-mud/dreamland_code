@@ -257,11 +257,11 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
     
     int dam;
 
-    act_p("Призванный $C5 кулак из иномирового эфира сокрушает $C4, повергая $S в ошеломление!",
+    act_p("Призванный $C5 кулак из иномирового эфира сокрушает $C4!",
            ch,0,victim,TO_NOTVICT,POS_RESTING);
-    act_p("Призванный тобой кулак из иномирового эфира сокрушает $C4, повергая $S в ошеломление!",
+    act_p("Призванный тобой кулак из иномирового эфира сокрушает $C4!",
            ch,0,victim,TO_CHAR,POS_RESTING);
-    act_p("Призванный $C5 кулак из иномирового эфира сокрушает тебя, повергая тебя в ошеломление!",
+    act_p("Призванный $C5 кулак из иномирового эфира сокрушает тебя!",
            ch,0,victim,TO_VICT,POS_RESTING);
     
     // Tier 3 damage: spells with powerful effects
@@ -273,8 +273,12 @@ VOID_SPELL(EtheralFist)::run( Character *ch, Character *victim, int sn, int leve
     if ( saves_spell( level, victim,DAM_ENERGY,ch, DAMF_SPELL) )
         dam /= 2;
     else {
-        if ( number_percent() > 50 )
+        if ( number_percent() > 50 ) {
+            act_p("$C4 ошеломленно трясет головой!", 0,0,victim,TO_CHAR,POS_RESTING);
+            act_p("$C4 ошеломленно трясет головой!", 0,0,victim,TO_NONVICT,POS_RESTING);
+            victim->println("Ты ошеломленно трясешь головой и не можешь пошевелиться!");            
             victim->setWaitViolence( 2 );
+        }    
     }    
 
     damage_nocatch( ch, victim, dam, sn,DAM_ENERGY,true, DAMF_SPELL);
@@ -322,13 +326,12 @@ VOID_SPELL(HandOfUndead)::run( Character *ch, Character *victim, int sn, int lev
     victim->move        /= 2;
     ch->hit             += dam / 2;
 
-    act("Призрачные когти смыкаются вокруг $C4!", ch,0,victim,TO_NOTVICT);    
+    act("Призрачные когти смыкаются вокруг $C4!", 0,0,victim,TO_NOTVICT);    
     victim->println("Ты чувствуешь, как жизнь ускользает от тебя!");
     ch->println("Ты чувствуешь прилив жизненной энергии!");    
 
     damage_nocatch( ch, victim, dam, sn,DAM_NEGATIVE,true, DAMF_SPELL);
 }
-
 
 
 SPELL_DECL(Iceball);
@@ -461,9 +464,15 @@ VOID_SPELL(SandStorm)::run( Character *ch, Room *room, int sn, int level )
     else if (level <= 70)   dam = dice( level, 16 );
     else                    dam = dice( level, 20 );
 
-    act_p("$c1 создает песчаную бурю вокруг себя.",ch,0,0,TO_ROOM,POS_RESTING);
-    ch->send_to("Ты создаешь песчаную бурю вокруг себя.\n\r");
-
+    if ( ch->in_room->sector_type == SECT_DESERT) {
+        act_p("$c1 создает мощную пустынную бурю вокруг себя!",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Ты создаешь мощную пустынную бурю вокруг себя.\n\r");        
+        dam = dice( level, 24 );        
+    }
+    else {
+        act_p("$c1 создает пылевой вихрь вокруг себя.",ch,0,0,TO_ROOM,POS_RESTING);
+        ch->send_to("Ты создаешь пылевой вихрь вокруг себя.\n\r");
+    }
     sand_effect(room,level,dam/2,TARGET_ROOM, DAMF_SPELL);
 
         for ( auto &vch : room->getPeople() )
