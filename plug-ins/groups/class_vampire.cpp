@@ -75,7 +75,7 @@ bool VampiricBiteOneHit::mprog_immune()
 
 void VampiricBiteOneHit::init( )
 {
-    dam_type = DAM_NEGATIVE;
+    dam_type = IS_BLOODLESS( victim ) ? DAM_PIERCE : DAM_NEGATIVE;
     skill = 20 + ch->getSkill( sn );
 }
 
@@ -99,6 +99,10 @@ void VampiricBiteOneHit::damBase( )
 
     if (number_percent( ) <= skill / 8)        // as sharpness
         dam = 2 * dam + (dam * 2 * number_percent( ) / 100); 
+
+        if(IS_BLOODLESS(victim)){
+            dam = dam/2;
+        }
 }
 
 
@@ -123,6 +127,9 @@ void VampiricBiteOneHit::calcTHAC0( )
 
 void VampiricBiteOneHit::postDamageEffects( )
 {	
+
+    if(!IS_BLOODLESS (victim)){
+
     // vampiric bite gives hp/mana to ch from victim
     int hit_ga, mana_ga;
 	
@@ -158,6 +165,11 @@ void VampiricBiteOneHit::postDamageEffects( )
 	    
     	act_p("Ты вскрикиваешь от боли, когда рана от клыков $c2 начинает гнить!", ch, 0, victim, TO_VICT, POS_DEAD);
     	act_p("Рана от твоих клыков на шее $C2 начинает гноиться.", ch, 0, victim, TO_CHAR, POS_RESTING);	    
+    }
+    }
+
+    else{
+       ch->send_to("Ты не ощущаешь ни капли крови в этом существе. Брррр...\n\r"); 
     }
 }
 
@@ -208,9 +220,7 @@ SKILL_RUNP( dominate )
 	return;
   }
 
-  if ( IS_SET( victim->form, FORM_NONADOPTABLE ) ||
-       IS_SET( victim->form, FORM_UNDEAD ) || 
-       IS_SET( victim->form, FORM_CONSTRUCT ) ) {
+  if ( IS_BLOODLESS(victim) ) {
 	ch->send_to("Это существо не поддается доминированию.\n\r");
 	return;        
   }	
@@ -516,9 +526,7 @@ void sucking( Character *ch, Character *victim )
         return;
     }
 
-    if ( IS_SET( victim->form, FORM_NONADOPTABLE ) ||
-         IS_SET( victim->form, FORM_UNDEAD ) || 
-         IS_SET( victim->form, FORM_CONSTRUCT ) ) {
+    if ( IS_BLOODLESS( victim ) ) {
 	ch->send_to("Ты не ощущаешь ни капли крови в этом существе. Брррр...\n\r");
 	return;        
     }
@@ -704,7 +712,7 @@ SKILL_RUNP( bite )
         return;
     }
 
-    if (victim->isAffected(gsn_vampiric_bite )) {
+    if (victim->isAffected(gsn_vampiric_bite ) && !IS_BLOODLESS ( victim )) {
         ch->send_to("Из шеи жертвы уже можно пить.\r\n");
         return;
     }
@@ -725,8 +733,9 @@ SKILL_RUNP( bite )
             act_p("$c1 пытается прогрызть шею своей тени.",
                     ch, 0, 0, TO_ROOM,POS_RESTING);
             return;
-    }	
-	
+    }
+    
+
     UNSET_DEATH_TIME(ch);
     victim->setLastFightTime( );
     ch->setLastFightTime( );	
@@ -752,7 +761,7 @@ SKILL_RUNP( bite )
             else
                 cond = number_range( -10, 80 );
                     
-            if (cond < 0 && number_percent( ) > 50) {
+            if ((cond < 0 && number_percent( ) > 50) || IS_BLOODLESS (victim)) {
                 vb.hit( );
             }
             else 
@@ -811,7 +820,7 @@ SKILL_RUNP( touch )
 
     	if (!IS_VAMPIRE(ch) && !IS_MOB_VAMPIRE(ch))
     	{
-        	ch->send_to("Это умение доступно только вампирам.\n\r");
+        	ch->pecho( "Чтобы усыпить, сначала необходимо превратиться в вампир%Gа|а|шу!", ch ); 
         	return;
     	}
 
