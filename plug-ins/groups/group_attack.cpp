@@ -44,6 +44,7 @@ PROF(anti_paladin);
 SPELL_DECL(BladeBarrier);
 VOID_SPELL(BladeBarrier)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
+    // TO-DO: refactor this with unified damcalc function with multiple projectiles
     int dam;
 
     act("Множество острых клинков возникает вокруг $c2, поражая $C4.", ch,0,victim,TO_NOTVICT);
@@ -91,30 +92,44 @@ SPELL_DECL(Bluefire);
 VOID_SPELL(Bluefire)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         
-        int dam;
+    int dam;
 
-        if ( !ch->is_npc() && !IS_NEUTRAL(ch) )
-        {
-                victim = ch;
-                ch->send_to("Твой {CГолубой огонь{x оборачивается против тебя!\n\r");
-        }
+    if ( !ch->is_npc() && !IS_NEUTRAL(ch) )
+    {
+        victim = ch;
+        ch->send_to("Твой {CГолубой огонь{x оборачивается против тебя!\n\r");
+    }
 
+    // Tier 2 damage: spells with regular or no special effects   
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 );
+
+    if (number_percent() > 50) {     
+        if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
+            dam /= 2;
         if (victim != ch)
         {
-                act_p("$c1 посылает {CГолубой огонь земли{x против $C2!",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
-                act_p("$c1 посылает {CГолубой огонь земли{x против тебя!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
-                ch->send_to("Ты призываешь на помощь {CГолубой огонь земли{x!\n\r");
-        }
-
-        dam = dice( level, 14 );
-
-        if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
-                dam /= 2;
-
-        damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);
-
+            act_p("Голубой огонь $c2 {Rобжигает{x $C2!", ch,0,victim,TO_NOTVICT,POS_RESTING);
+            act_p("Голубой огонь $c2 {Rобжигает{x тебя!", ch,0,0,TO_VICT,POS_RESTING);
+            act_p("Твой Голубой огонь {Rобжигает{x $C2!", 0,0,victim,TO_CHAR,POS_RESTING);            
+        }         
+        damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);        
+        fire_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
+    }
+    else {
+        if ( saves_spell( level, victim,DAM_COLD,ch, DAMF_SPELL) )
+            dam /= 2;
+        if (victim != ch)
+        {
+            act_p("Голубой огонь $c2 {Cобмораживает{x $C2!", ch,0,victim,TO_NOTVICT,POS_RESTING);
+            act_p("Голубой огонь $c2 {Cобмораживает{x тебя!", ch,0,0,TO_VICT,POS_RESTING);
+            act_p("Твой Голубой огонь {Cобмораживает{x $C2!", 0,0,victim,TO_CHAR,POS_RESTING);            
+        }         
+        damage_nocatch( ch, victim, dam, sn, DAM_COLD,true, DAMF_SPELL);       
+        cold_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);        
+    }
 }
 
 
@@ -122,33 +137,45 @@ SPELL_DECL(Demonfire);
 VOID_SPELL(Demonfire)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         
-        int dam;
+    int dam;
 
-        if ( !ch->is_npc() && !IS_EVIL(ch) )
-        {
-                victim = ch;
-                ch->send_to("Силы {RДемонов Ада{x оборачиваются против тебя!\n\r");
-        }
+    if ( !ch->is_npc() && !IS_EVIL(ch) )
+    {
+        victim = ch;
+        ch->send_to("Силы {RДемонов Ада{x оборачиваются против тебя!\n\r");
+    }
+    
+    // Tier 2 damage: spells with regular or no special effects   
+         if (level <= 20)   dam = dice( level, 8  );    
+    else if (level <= 40)   dam = dice( level, 12 );
+    else if (level <= 70)   dam = dice( level, 15 );
+    else                    dam = dice( level, 18 ); 
 
+    if (number_percent() > 50) {     
+        if ( saves_spell( level, victim,DAM_FIRE,ch, DAMF_SPELL) )
+            dam /= 2;
         if (victim != ch)
         {
-                act_p("$c1 посылает силы {RДемонов Ада{x против $C2!",
-                        ch,0,victim,TO_NOTVICT,POS_RESTING);
-                act_p("$c1 посылает силы {RДемонов Ада{x против тебя!",
-                        ch,0,victim,TO_VICT,POS_RESTING);
-                ch->send_to("Ты призываешь на помощь {RДемонов Ада{x!\n\r");
-        }
-
-        dam = dice( level, 14 );
-
+            act_p("Демонический огонь $c2 {Rобжигает{x $C2!", ch,0,victim,TO_NOTVICT,POS_RESTING);
+            act_p("Демонический огонь $c2 {Rобжигает{x тебя!", ch,0,0,TO_VICT,POS_RESTING);
+            act_p("Твой Демонический огонь {Rобжигает{x $C2!", 0,0,victim,TO_CHAR,POS_RESTING);            
+        }         
+        damage_nocatch( ch, victim, dam, sn, DAM_FIRE ,true, DAMF_SPELL);        
+        fire_effect(victim,level,dam,TARGET_CHAR, DAMF_SPELL);
+    }
+    else {
         if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
-                dam /= 2;
-        
-        damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
-    
+            dam /= 2;
+        if (victim != ch)
+        {
+            act_p("Демоны Ада, призванные $c5, {rтерзают{x $C2!", ch,0,victim,TO_NOTVICT,POS_RESTING);
+            act_p("Демоны Ада, призванные $c5, {rтерзают{x тебя!", ch,0,0,TO_VICT,POS_RESTING);
+            act_p("Демоны Ада, призванные тобой, {rтерзают{x $C2!", 0,0,victim,TO_CHAR,POS_RESTING);            
+        }         
+        damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE,true, DAMF_SPELL);
         if (!IS_AFFECTED(victim, AFF_CURSE))
-            spell(gsn_curse, 3 * level / 4, ch,  victim);
-
+            spell(gsn_curse, level, ch, victim);        
+    }
 }
 
 
@@ -156,15 +183,18 @@ SPELL_DECL(DispelEvil);
 VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
     
+    // TO-DO: combine with Dispel Good into Dispel Align
     int dam;
 
-    if ( !ch->is_npc() && IS_EVIL(ch) )
+    if ( !ch->is_npc() && IS_EVIL(ch) ) {
         victim = ch;
+        ch->send_to("Сила Добра оборачивается против тебя!\n\r");        
+    }
 
     if ( IS_GOOD(victim) )
     {
-        act_p( "Боги защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Боги защищают тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
+        act_p( "Силы Добра защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p( "Силы Добра тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
         return;
     }
 
@@ -174,34 +204,49 @@ VOID_SPELL(DispelEvil)::run( Character *ch, Character *victim, int sn, int level
         return;
     }
 
-    if (victim->hit > ( ch->getModifyLevel() * 4))
-      dam = dice( level, 4 );
-    else
-      dam = max((int)victim->hit, dice(level,4));
-    if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_SPELL ) )
-        dam /= 2;
     if( ch->getProfession( ) == prof_cleric ||
         ch->getProfession( ) == prof_paladin ||
-        ch->getProfession( ) == prof_anti_paladin )
-      dam *= 2;
+        ch->getProfession( ) == prof_anti_paladin ) {
+        // Tier 1 damage: only spells with severe limitations
+             if (level <= 20)   dam = dice( level, 10 );    
+        else if (level <= 40)   dam = dice( level, 13 );
+        else if (level <= 70)   dam = dice( level, 16 );
+        else                    dam = dice( level, 20 );        
+    }
+    else {
+        // Tier 3 damage: spells with powerful effects
+             if (level <= 20)   dam = dice( level, 7  );    
+        else if (level <= 40)   dam = dice( level, 10 );
+        else if (level <= 70)   dam = dice( level, 13 );
+        else                    dam = dice( level, 16 );        
+    }
+    
+    // works better on healthier victims
+    if ( (int)(victim->hit / victim->max_hit)*100 < (int)(level / 2) )
+        dam /= 2;
 
-    damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_SPELL);
+    if ( saves_spell( level, victim,DAM_HOLY, ch, DAMF_PRAYER ) )
+        dam /= 2;
+
+    damage_nocatch( ch, victim, dam, sn, DAM_HOLY ,true, DAMF_PRAYER);
 }
 
 
 SPELL_DECL(DispelGood);
 VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    
+    // TO-DO: combine with Dispel Good into Dispel Align
     int dam;
 
-    if ( !ch->is_npc() && IS_GOOD(ch) )
+    if ( !ch->is_npc() && IS_GOOD(ch) ) {
         victim = ch;
+        ch->send_to("Сила Зла оборачивается против тебя!\n\r");        
+    }
 
     if ( IS_EVIL(victim) )
     {
-        act_p( "$c4 защищают $s демоны.", victim, 0, 0, TO_ROOM,POS_RESTING);
-        act_p( "Тебя защищают твои демоны.", victim, 0, 0, TO_CHAR,POS_RESTING);
+        act_p( "Силы Зла защищают $c4.", victim, 0, 0, TO_ROOM,POS_RESTING);
+        act_p( "Силы Зла тебя.", victim, 0, 0, TO_CHAR,POS_RESTING);
         return;
     }
 
@@ -211,18 +256,31 @@ VOID_SPELL(DispelGood)::run( Character *ch, Character *victim, int sn, int level
         return;
     }
 
-    if (victim->hit > ( ch->getModifyLevel() * 4))
-      dam = dice( level, 4 );
-    else
-      dam = max((int)victim->hit, dice(level,4));
-    if ( saves_spell( level, victim,DAM_NEGATIVE,ch, DAMF_SPELL) )
-        dam /= 2;
     if( ch->getProfession( ) == prof_cleric ||
         ch->getProfession( ) == prof_paladin ||
-        ch->getProfession( ) == prof_anti_paladin )
-      dam *= 2;
+        ch->getProfession( ) == prof_anti_paladin ) {
+        // Tier 1 damage: only spells with severe limitations
+             if (level <= 20)   dam = dice( level, 10 );    
+        else if (level <= 40)   dam = dice( level, 13 );
+        else if (level <= 70)   dam = dice( level, 16 );
+        else                    dam = dice( level, 20 );        
+    }
+    else {
+        // Tier 3 damage: spells with powerful effects
+             if (level <= 20)   dam = dice( level, 7  );    
+        else if (level <= 40)   dam = dice( level, 10 );
+        else if (level <= 70)   dam = dice( level, 13 );
+        else                    dam = dice( level, 16 );        
+    }
+    
+    // works better on healthier victims
+    if ( (int)(victim->hit / victim->max_hit)*100 < (int)(level / 2) )
+        dam /= 2;
 
-    damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE ,true, DAMF_SPELL);
+    if ( saves_spell( level, victim,DAM_NEGATIVE, ch, DAMF_PRAYER ) )
+        dam /= 2;
+
+    damage_nocatch( ch, victim, dam, sn, DAM_NEGATIVE, true, DAMF_PRAYER);
 }
 
 SPELL_DECL(Earthquake);
@@ -238,40 +296,47 @@ VOID_SPELL(Earthquake)::run( Character *ch, Room *room, int sn, int level )
 
     for ( auto &vch : room->getPeople() )
     {
+         if ( !vch->isDead() && vch->in_room == room ) {   
+            
+            if (DIGGED(vch) && vch->was_in_room->area == room->area)
+                if (!is_safe_nomessage( ch, vch ) && number_percent( ) < ch->getSkill( sn ) / 2)
+                    undig_earthquake( vch );
+            
+            if (ch == vch)
+                continue;
 
-         if(!vch->isDead() && vch->in_room == room){   
+            if (is_safe_spell(ch,vch,true))
+                continue;
 
-        if (DIGGED(vch) && vch->was_in_room->area == room->area)
-            if (!is_safe_nomessage( ch, vch ) && number_percent( ) < ch->getSkill( sn ) / 2)
-                undig_earthquake( vch );
-        
-        if (ch == vch)
-            continue;
+            if (vch->is_mirror() && number_percent() < 50) 
+                continue;
 
-        if (is_safe_spell(ch,vch,true))
-            continue;
+            if (is_flying( vch ))
+                continue;
+            
+            // Tier 3 damage: spells with powerful effects
+                 if (level <= 20)   dam = dice( level, 7  );    
+            else if (level <= 40)   dam = dice( level, 10 );
+            else if (level <= 70)   dam = dice( level, 13 );
+            else                    dam = dice( level, 16 );
 
-        if (vch->is_mirror() && number_percent() < 50) 
-            continue;
+            switch (room->sector_type) {
+                case SECT_MOUNTAIN: dam *= 4; break;
+                case SECT_CITY:            dam *= 3; break;
+                case SECT_INSIDE:   dam *= 2; break;
+            }
 
-        if (is_flying( vch ))
-            continue;
-
-        dam = level + dice(3, 8);
-
-        switch (room->sector_type) {
-        case SECT_MOUNTAIN: dam *= 4; break;
-        case SECT_CITY:            dam *= 3; break;
-        case SECT_INSIDE:   dam *= 2; break;
+            try {
+                damage_nocatch( ch, vch, dam, sn, DAM_BASH, true, DAMF_SPELL );
+                if ( number_percent( ) < ch->getSkill( sn ) / 2 ) {
+                    vch->setWaitViolence( 2 );
+                    vch->position = POS_RESTING;                   
+                }    
+            }
+            catch (const VictimDeathException &) {
+                continue;
+            }
         }
-
-        try{
-        damage_nocatch( ch, vch, dam, sn, DAM_BASH, true, DAMF_SPELL );
-        }
-        catch (const VictimDeathException &){
-            continue;
-        }
-    }
     }
 }
 
@@ -280,45 +345,52 @@ SPELL_DECL(Web);
 VOID_SPELL(Web)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
         
-        Affect af;
+    Affect af;
 
-        if (saves_spell (level, victim,DAM_OTHER, ch, DAMF_SPELL) )
-        {
-                ch->send_to("Не получилось..\n\r");
-                return;
-        }
+    if ( victim->isAffected(sn ) )
+    {
+        if (victim == ch)
+            ch->send_to("Ты и так в паутине.\n\r");
+        else 
+            act_p("Густая паутина уже сковала движения $C2.", ch,0,victim,TO_CHAR,POS_RESTING);
+        return;
+    }
+    
+    act_p("$c1 пытается опутать $C4 энергетической паутиной!",
+           ch,0,victim,TO_NOTVICT,POS_RESTING);
+    act_p("Ты пытаешься опутать $C4 энергетической паутиной!",
+           ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("$c1 пытается опутать тебя энергетической паутиной!",
+           ch,0,victim,TO_VICT,POS_RESTING);
+    
+    if (saves_spell (level, victim,DAM_ENERGY, ch, DAMF_SPELL) )
+    {
+        act_p("$C1 с легкостью уворачивается от сетей.", ch,0,victim,TO_CHAR,POS_RESTING);
+        act_p("$C1 с легкостью уворачивается от сетей.", ch,0,victim,TO_NONVICT,POS_RESTING);
+        victim->send_to("Ты с легкостью уворачиваешься от сетей.\n\r");
+        return;
+    }
 
-        if ( victim->isAffected(sn ) )
-        {
-                if (victim == ch)
-                        ch->send_to("Ты и так в паутине.\n\r");
-                else
-                        act_p("Густая паутина уже сковала движения $C2.",
-                                ch,0,victim,TO_CHAR,POS_RESTING);
-                return;
-        }
+    af.type      = sn;
+    af.level     = level;
+    af.duration  = 1 + level / 30;
+    af.location  = APPLY_HITROLL;
+    af.modifier  = -1 * ( level / 6);
+    affect_to_char( victim, &af );
 
-        af.type      = sn;
-        af.level     = level;
-        af.duration  = 1 + level / 30;
-        af.location  = APPLY_HITROLL;
-        af.modifier  = -1 * ( level / 6);
-        affect_to_char( victim, &af );
+    af.location  = APPLY_DAMROLL;
+    af.modifier  = -1 * ( level / 6);
+    affect_to_char( victim, &af );
 
-        af.location  = APPLY_DAMROLL;
-        af.modifier  = -1 * ( level / 6);
-        affect_to_char( victim, &af );
-
-        af.location  = APPLY_DEX;
-        af.modifier  = -1 - level / 40;
-        af.where     = TO_DETECTS;
-        af.bitvector = ADET_WEB;
-        affect_to_char( victim, &af );
-
-        victim->send_to("Густая паутина опутывает тебя!\n\r");
-        if ( ch != victim )
-                act_p("Ты опутываешь $C4 густой паутиной!",
-                        ch,0,victim,TO_CHAR,POS_RESTING);
+    af.location  = APPLY_DEX;
+    af.modifier  = -1 - level / 40;
+    af.where     = TO_DETECTS;
+    af.bitvector = ADET_WEB;
+    affect_to_char( victim, &af );
+    
+    act_p("Ты сковываешь движения $C4 густой сетью!", ch,0,victim,TO_CHAR,POS_RESTING);
+    act_p("$C1 сковывает движения $C4 густой сетью!", ch,0,victim,TO_NONVICT,POS_RESTING);
+    victim->send_to("Густая сеть сковывает твои движения!\n\r");
 }
 
 SPELL_DECL(HeatMetal);
@@ -363,7 +435,7 @@ VOID_SPELL(HeatMetal)::run( Character *ch, Character *victim, int sn, int level 
                     else /* stuck on the body! ouch! */
                     {
                         act_p("$o1 обжигает твою кожу!",
-                               victim,obj_lose,0,TO_CHAR,POS_RESTING);
+                               victim,obj_lose,0,TO_CHAR,POS_RESTING);                        
                         dam += (number_range(1,obj_lose->level));
                         fail = false;
                     }
@@ -474,14 +546,14 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     pcm = PCharacterManager::find( DLString( grave->getOwner( )));
 
     if (!pcm || (victim = dynamic_cast<PCharacter *>( pcm )) == 0 || !DIGGED(victim)) {
-        ch->send_to("Опс.. а могила-то ничейная..\r\n");
+        ch->send_to("В этой могиле никого нет.\r\n");
         LogStream::sendError( ) << "Unexistent grave owner: " << grave->getOwner( )<< endl;
         return;
     }
 
     if (number_percent( ) > ch->getSkill( sn )) {
-        act_p("$c1 втыкает в могилу крест, но он падает на бок.", ch, 0, 0, TO_ROOM, POS_RESTING);
-        act_p("Ты втыкаешь в могилу крест, но он падает на бок.", ch, 0, 0, TO_CHAR, POS_RESTING);
+        act_p("$c1 втыкает в могилу крест, но он падает набок.", ch, 0, 0, TO_ROOM, POS_RESTING);
+        act_p("Ты втыкаешь в могилу крест, но он падает набок.", ch, 0, 0, TO_CHAR, POS_RESTING);
         return;
     }
     
@@ -490,7 +562,12 @@ VOID_SPELL(Holycross)::run( Character *ch, Object *grave, int sn, int level )
     act_p("Из-под земли раздается раздирающий душу вопль!", ch, 0, 0, TO_ALL, POS_RESTING);
     
     undig( victim );
-    dam = dice(level, 20);
-    damage_nocatch(ch, victim, dam, sn, DAM_HOLY, true, DAMF_SPELL); 
-
+    
+    // Tier 1 damage: only spells with severe limitations
+         if (level <= 20)   dam = dice( level, 10 );    
+    else if (level <= 40)   dam = dice( level, 13 );
+    else if (level <= 70)   dam = dice( level, 16 );
+    else                    dam = dice( level, 20 );
+    
+    damage_nocatch(ch, victim, dam, sn, DAM_HOLY, true, DAMF_PRAYER); 
 }
