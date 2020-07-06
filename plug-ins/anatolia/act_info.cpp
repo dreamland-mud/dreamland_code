@@ -499,6 +499,13 @@ CMDRUNP( oscore )
                         }
     }
 
+    if (IS_GHOST(ch)) {
+        buf << dlprintf( "Ты призрак и обретёшь плоть через {Y%3d {x%7s.",
+                 pch->ghost_time*dreamland->getPulsePerSecond(),
+                 GET_COUNT(pch->ghost_time*dreamland->getPulsePerSecond(),"секунду","секунды","секунд"))
+        << endl;
+    }
+
     ch->send_to( buf );
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
@@ -1800,6 +1807,16 @@ CMDRUNP( score )
         ch->printf( 
 "     %s| {yАдреналин кипит в твоих венах!                                  %s|\n\r",
                  CLR_FRAME,
+                 CLR_FRAME );
+    }
+
+    if (IS_GHOST(ch)) {
+        ekle = 1;
+        ch->printf( 
+"     %s| {xТы призрак и обретёшь плоть через {Y%3d {x%7s.                  %s|\n\r",
+                 CLR_FRAME,
+                 pch->ghost_time*dreamland->getPulsePerSecond(),
+                 GET_COUNT(pch->ghost_time*dreamland->getPulsePerSecond(),"секунду","секунды","секунд"),
                  CLR_FRAME );
     }
 
