@@ -794,13 +794,13 @@ SKILL_RUNP( touch )
         char arg[MAX_INPUT_LENGTH];
         
         //////////////// BASE MODIFIERS //////////////// TODO: add this to XML
-        skill_mod   = 0.2;
+        skill_mod   = 0.5;
         stat_mod    = 0.04;
         level_mod   = 0.01;
         quick_mod   = 0.1;
         sleep_mod   = 0.1;
         vis_mod     = 0.1;
-        time_mod    = 0.05;
+        time_mod    = 0.1;
 
         //////////////// ELIGIBILITY CHECKS ////////////////
 
@@ -925,7 +925,7 @@ SKILL_RUNP( touch )
             chance = chance / 2;
         }
 
-        int k = ch->getLastFightDelay( );
+        int k = victim->getLastFightDelay( );
         if (k >= 0 && k < FIGHT_DELAY_TIME) {
             chance -= (FIGHT_DELAY_TIME - k) * time_mod * 100;
         }
@@ -953,7 +953,7 @@ SKILL_RUNP( touch )
         af.type = gsn_vampiric_touch;
         af.where = TO_AFFECTS;
         af.level = ch->getModifyLevel();
-        af.duration = ch->getModifyLevel() / 20 + 1;
+        af.duration = ch->getModifyLevel() / 50 + 1;
         af.location = APPLY_NONE;
         af.modifier = 0;
         af.bitvector = AFF_SLEEP;
