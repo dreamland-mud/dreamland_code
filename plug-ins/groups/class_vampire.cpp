@@ -507,6 +507,7 @@ SKILL_RUNP( vampire )
 void sucking( Character *ch, Character *victim ) 
 {
     int cond, hp_gain, mana_gain;
+    bool karminaBonus = false;
 
     if (victim == ch) {
         ch->send_to("У тебя недостаточно гибкий позвоночник.\n\r");
@@ -545,7 +546,8 @@ void sucking( Character *ch, Character *victim )
 	      (tattoo) && (chance(10)) ) {
                 ch->pecho("{rКармина{x позволяет тебе насладиться кровью ради чистого удовольствия!");
                 ch->recho("%^O1 на челе %C2 вспыхивает {Rярко-красным{x.", tattoo, ch);
-		desire_bloodlust->gain( ch->getPC( ), 0 );		      
+		desire_bloodlust->gain( ch->getPC( ), 0 );	
+        karminaBonus = true;	      
         }
 	else {	    
         	desire_bloodlust->gain( ch->getPC( ), 20 );
@@ -599,7 +601,7 @@ void sucking( Character *ch, Character *victim )
     	}	    
         victim->position = POS_SLEEPING;
                                
-        if (number_percent( ) < cond) {
+        if (number_percent( ) < cond && !karminaBonus) {
             set_fighting( victim, ch );
             act_p("$c1 очнул$gось|ся|ась от терзавшего $s кошмара.", victim, 0, ch, TO_ROOM, POS_RESTING);
             act_p("Ты просыпаешься от невыносимой боли в шее!", victim, 0, ch, TO_CHAR, POS_DEAD);
