@@ -500,9 +500,8 @@ CMDRUNP( oscore )
     }
 
     if (IS_GHOST(ch)) {
-        buf << dlprintf( "Ты призрак и обретёшь плоть через {Y%3d {x%7s.",
-                 pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),
-                 GET_COUNT(pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),"секунду","секунды","секунд"))
+        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$3d {xсекунд%1$-1Iу|ы|.",
+                 pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
         << endl;
     }
 
@@ -1812,11 +1811,10 @@ CMDRUNP( score )
 
     if (IS_GHOST(ch)) {
         ekle = 1;
-        ch->printf( 
-"     %s| {xТы призрак и обретёшь плоть через {Y%3d {x%7s.                  %s|\n\r",
+        ch->pecho( 
+"     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$-1Iу|ы|.                  %1$s|",
                  CLR_FRAME,
                  pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),
-                 GET_COUNT(pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),"секунду","секунды","секунд"),
                  CLR_FRAME );
     }
 
