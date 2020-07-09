@@ -388,7 +388,7 @@ VOID_AFFECT(MysteriousDream)::update( Room *room, Affect *paf )
     af.where        = TO_AFFECTS;
     af.type         = gsn_sleep;
     af.level         = paf->level - 1;
-    af.duration        = number_range(1,((af.level/50)+1));
+    af.duration        = number_range(1,((af.level/10)+1));
     af.location        = APPLY_NONE;
     af.modifier        = -5;
     af.bitvector= AFF_SLEEP;
@@ -429,7 +429,7 @@ VOID_SPELL(Sleep)::run( Character *ch, Character *victim, int sn, int level )
     af.where     = TO_AFFECTS;
     af.type      = sn;
     af.level     = level;
-    af.duration  = 1 + level/50;
+    af.duration  = 1 + level/10;
     af.location  = APPLY_NONE;
     af.modifier  = 0;
     af.bitvector = AFF_SLEEP;
