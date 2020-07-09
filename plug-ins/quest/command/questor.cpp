@@ -561,7 +561,9 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
 
             if(!rated_as_guru(client)){
                tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            if(client->getRemorts().size()==0 && rated_as_newbie(client)){
                tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+            }
             }
             
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
@@ -607,7 +609,9 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
 
             if(!rated_as_guru(client)){
                tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            if(client->getRemorts().size()==0 && rated_as_newbie(client)){
                tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+            }
             }
 
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
