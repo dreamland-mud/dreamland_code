@@ -94,7 +94,7 @@ Quest::Reward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questma
     
     r->points = number_range( 18, 25 );
     r->points += ambushes * 25;
-    if(!(ch->getRemorts().size()==0 && rated_as_newbie(ch))){
+    if(!IS_TOTAL_NEWBIE(ch)){
     r->points -= hint * 10;
     }
     r->points = std::max( 10, r->points );
@@ -199,7 +199,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         return true;
     }
 
-    if (hint.getValue( ) > 5 && !(ch->getRemorts().size()==0 && rated_as_newbie(ch))) {
+    if (hint.getValue( ) > 5 && !IS_TOTAL_NEWBIE(ch)) {
         if (number_percent( ) < 30)
             tell_fmt( "%1$^C1, тебе необходимо следовать по такому пути: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
         else
@@ -208,7 +208,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         wiznet( "find", "failure" );
         return true;
     }
-    if(!(ch->getRemorts().size()==0 && rated_as_newbie(ch)))
+    if(!IS_TOTAL_NEWBIE(ch))
     tell_raw( ch, questman,  "Я помогу тебе, но награда будет не так велика.");
 
     if (rated_as_guru( ch ))
