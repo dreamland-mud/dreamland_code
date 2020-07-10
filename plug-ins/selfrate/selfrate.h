@@ -12,6 +12,8 @@
 #include "xmlshort.h"
 #include "xmlvariablecontainer.h"
 
+#define IS_TOTAL_NEWBIE(ch)     (ch->getRemorts().size()==0 && rated_as_newbie(ch))
+
 class PCMemoryInterface;
 class PCharacter;
 

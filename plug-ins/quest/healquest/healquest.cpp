@@ -120,7 +120,7 @@ Quest::Reward::Pointer HealQuest::reward( PCharacter *ch, NPCharacter *questman 
 {
     Reward::Pointer r( NEW );
     
-    if (hint > 0) {
+    if (hint > 0 && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
 
