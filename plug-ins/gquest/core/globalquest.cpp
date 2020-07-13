@@ -10,6 +10,8 @@
 
 #include "class.h"
 
+#include "summoncreaturespell.h"
+
 
 #include "dlscheduler.h"
 #include "object.h"
@@ -17,6 +19,7 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "clan.h"
+#include "npcharacter.h"
 
 #include "act.h"
 #include "move_utils.h"
@@ -192,23 +195,37 @@ void GlobalQuest::exorcism( Character *ch ) const
     act_p( "$c1 улетучивается.", ch, 0, 0, TO_ROOM, POS_RESTING);
     act_p( "Ты исчезаешь отсюда.", ch, 0, 0, TO_CHAR, POS_RESTING);
     
-    if (ch->is_npc( ) && ch == actor) {
-        extract_char(ch);
-        return;
-    } 
+    //lonely npc with no current master
+    if (ch->is_npc( ) && (ch == actor || actor->is_npc())){
 
-    if (ch->is_npc( ) && actor->is_npc( )) {
-        extract_char(ch);
+        //check if it's a summoned creature like a golem or something
+        if(!(ch->getNPC( )->behavior && actor->getNPC()->behavior.getDynamicPointer<SummonedCreature>())){
+        
+        //if it's not - extract it
+        extract_char(ch, true);
         return;
+        }  
+
+        //else try to find the player this creature belongs to. if found - set this player as the actor, else extract the creature
+        else{
+        PCharacter *player = PCharacterManager::findPlayer(actor->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName)->getPlayer();
+        if(player){
+            actor = player;
+        }
+        else{
+            extract_char(ch, true);
+            return;
+        }
+        }
     }
-    
+
     recall_vnum = actor->getClan( )->getRecallVnum( );
 
     if (recall_vnum <= 0)
         recall = get_room_index( actor->getPC( )->getHometown( )->getRecall( ) );
     else 
         recall = get_room_index( recall_vnum );
-    
+   
     if (!recall)
         recall = get_room_index( ROOM_VNUM_TEMPLE );
 
