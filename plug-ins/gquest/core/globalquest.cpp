@@ -199,17 +199,12 @@ void GlobalQuest::exorcism( Character *ch ) const
     if (ch->is_npc( ) && (ch == actor || actor->is_npc())){
 
         //check if it's a summoned creature like a golem or something
-        if(!(ch->getNPC( )->behavior && actor->getNPC()->behavior.getDynamicPointer<SummonedCreature>())){
+        if(ch->getNPC( )->behavior && ch->getNPC()->behavior.getDynamicPointer<SummonedCreature>()){
         
-        //if it's not - extract it
-        extract_char(ch, true);
-        return;
-        }  
+        //it's summoned creature - try to find the player it belongs to
+        PCMemoryInterface *player = PCharacterManager::find(ch->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName);
 
-        //else try to find the player this creature belongs to. if found - set this player as the actor, else extract the creature
-        else{
-        PCMemoryInterface *player = PCharacterManager::find(actor->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName);
-
+        //player found - check player's clan or hometown recall spot and transfer the creature there
         if(player){
             
         recall_vnum = player->getClan( )->getRecallVnum( );
@@ -227,12 +222,19 @@ void GlobalQuest::exorcism( Character *ch ) const
         return;
         }
 
+        //player not found - extract summoned creature
         else{
             extract_char(ch, true);
             return;
         }
         }
-    }
+        
+    //not a summoned creature - extract it
+    else {
+    extract_char(ch, true);
+    return;
+    }  
+    }  
 
     recall_vnum = actor->getClan( )->getRecallVnum( );
 
