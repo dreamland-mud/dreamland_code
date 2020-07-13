@@ -208,10 +208,25 @@ void GlobalQuest::exorcism( Character *ch ) const
 
         //else try to find the player this creature belongs to. if found - set this player as the actor, else extract the creature
         else{
-        PCharacter *player = PCharacterManager::findPlayer(actor->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName)->getPlayer();
+        PCMemoryInterface *player = PCharacterManager::find(actor->getNPC()->behavior.getDynamicPointer<SummonedCreature>()->creatorName);
+
         if(player){
-            actor = player;
+            
+        recall_vnum = player->getClan( )->getRecallVnum( );
+
+        if (recall_vnum <= 0)
+        recall = get_room_index( player->getHometown( )->getRecall( ) );
+        else 
+        recall = get_room_index( recall_vnum );
+   
+        if (!recall)
+        recall = get_room_index( ROOM_VNUM_TEMPLE );
+
+        transfer_char( ch, ch, recall,
+                   NULL, NULL, "%1$^C1 появил%1$Gось|ся|ась в комнате." );
+        return;
         }
+
         else{
             extract_char(ch, true);
             return;
