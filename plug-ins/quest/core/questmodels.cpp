@@ -314,11 +314,8 @@ bool RoomQuestModel::targetRoomAccessible(PCharacter *pch, Room *target)
         return true;
 
     std::vector<Room *> rooms;
-    MyHookIterator hookIterator(
-        DoorFunc(pch, this), 
-        ExtraExitFunc(pch, this), 
-        PortalFunc(pch, this), 
-        5);
+    DoorFunc goDoor(pch, this); ExtraExitFunc goEExit(pch, this); PortalFunc goPortal(pch, this);
+    MyHookIterator hookIterator(goDoor, goEExit, goPortal, 5);
     FindPathComplete fpComplete( target, rooms );
     room_traverse<MyHookIterator, FindPathComplete>( 
             pch->in_room, hookIterator, fpComplete, 10000 );

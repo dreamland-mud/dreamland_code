@@ -93,9 +93,9 @@ struct RoomTraverseTraits {
 template <typename DoorCondFunc, typename EExitCondFunc, typename PortalCondFunc>
 struct RoomRoadsIterator 
 {
-    RoomRoadsIterator( DoorCondFunc d = DoorCondFunc( ), 
-                       EExitCondFunc e = EExitCondFunc( ), 
-                       PortalCondFunc p = PortalCondFunc( ), 
+    RoomRoadsIterator( DoorCondFunc &d,
+                       EExitCondFunc &e,
+                       PortalCondFunc &p,
                        int s = 0 )
             : canGoDoor( d ), canGoEExit( e ), canGoPortal( p ), seed( s )
     {

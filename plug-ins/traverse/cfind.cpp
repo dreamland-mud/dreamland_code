@@ -73,7 +73,8 @@ CMDRUN( find )
     int target;
     Room *toRoom;
     RoomTraverseResult elements;
-    MyHookIterator iter;
+    GoDoor goDoor; GoEExit goEExit; GoPortal goPortal;    
+    MyHookIterator iter(goDoor, goEExit, goPortal);
     int radius = 10000;
     Room *msm = ch->in_room;
 
@@ -81,7 +82,7 @@ CMDRUN( find )
         target = constArguments.toInt( );
         if (target <= 0)
             return;
-    } catch (ExceptionBadType e) {
+    } catch (const ExceptionBadType &e) {
         ch->send_to( "Usage: find <room vnum>\r\n" );
         return;
     }
