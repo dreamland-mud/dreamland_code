@@ -499,6 +499,12 @@ CMDRUNP( oscore )
                         }
     }
 
+    if (IS_GHOST(ch)) {
+        buf << fmt(0, "{xТы призрак и обретёшь плоть через {Y%1$3d {xсекунд%1$-1Iу|ы|.",
+                 pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()))
+        << endl;
+    }
+
     ch->send_to( buf );
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
@@ -1803,6 +1809,15 @@ CMDRUNP( score )
                  CLR_FRAME );
     }
 
+    if (IS_GHOST(ch)) {
+        ekle = 1;
+        ch->pecho( 
+"     %1$s| {xТы призрак и обретёшь плоть через {Y%2$3d {xсекунд%2$-1Iу|ы|.                  %1$s|",
+                 CLR_FRAME,
+                 pch->ghost_time*(PULSE_MOBILE/dreamland->getPulsePerSecond()),
+                 CLR_FRAME );
+    }
+
     if (ch->is_immortal()) {
         ekle = 1;
         ch->printf( 
@@ -2773,6 +2788,9 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
 
     if (obj_is_special(obj))
         buf << "{WЭтот предмет обладает неведомыми, но мощными свойствами.{x" << endl;    
+
+    if (obj->timer != 0)
+        buf << fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer);
 
     if (obj->weight > 10)
         buf << "весит {W" << obj->weight / 10 << "{x фун" << GET_COUNT(obj->weight/10, "т", "та", "тов"); 

@@ -88,6 +88,7 @@
  ***************************************************************************/
 
 #define PULSE_AUCTION             (45 * dreamland->getPulsePerSecond( )) /* 60 seconds */
+#define AUC_TIMER_CUTOFF          24
 
 void talk_auction(const char *argument)
 {
@@ -342,6 +343,10 @@ CMDRUNP( auction )
                                           (1 + obj->value2()) * obj->value1() / 2);
                         }
 
+                        if (obj->timer != 0) {
+                            ch->pecho("{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т после продажи.{x", obj->timer);
+                        }
+
                         return;
                 }
                 else
@@ -479,10 +484,9 @@ CMDRUNP( auction )
                 return;
         }
 
-        if (obj->timer != 0)
+        if (obj->timer != 0 && obj->timer < AUC_TIMER_CUTOFF)
         {
-                sprintf( buf, "Этот предмет не может быть выставлен на аукцион, т.к. исчезнет через %d часов.\n\r", obj->timer );
-                ch->send_to( buf);
+                ch->pecho("Этот предмет не может быть выставлен на аукцион, т.к. он исчезнет всего через %1$d минут%1$Iу|ы|.", obj->timer);
                 return;
         }
 

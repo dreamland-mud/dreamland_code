@@ -3,10 +3,12 @@
  * ruffina, 2004
  */
 #include "badnames.h"
+#include "logstream.h"
 #include "dl_ctype.h"
 #include "mercdb.h"
 #include "merc.h"
 #include "loadsave.h"
+#include "religion.h"
 
 BadNames *badNames = NULL;
 
@@ -30,29 +32,77 @@ void BadNames::initialization( )
         regexps.push_back( RegExp( n->c_str( ) ) );
 }
 
-bool BadNames::checkName( const DLString &name ) const
+/**
+ * Check English name against criteria and return string error code.
+ */
+DLString BadNames::checkName( const DLString &name ) const
 {
-    return nameLength( name )
-           && nameEnglish( name )
-           && nameMobiles( name )
-           && nameReserved( name );
+    DLString rc;
+
+    if (!(rc = nameLength(name)).empty())
+        return rc;
+
+    if (!nameEnglish(name))
+        return "bad_en_letter";
+
+    if (!nameMobiles(name))
+        return "mob";
+
+    if (!nameReserved(name))
+        return "reserved";
+
+    if (!nameReligion(name, false))
+        return "god";
+
+    return DLString::emptyString;
 }
 
-bool BadNames::checkRussianName( const DLString &name ) const
+/**
+ * Check English name against criteria and return string error code.
+ */
+DLString BadNames::checkRussianName( const DLString &name ) const
 {
-    return nameLength( name )
-           && nameRussian( name )
-           && nameMobiles( name )
-           && nameReserved( name );
+    DLString rc;
+
+    if (!(rc = nameLength(name)).empty())
+        return rc;
+
+    if (!nameRussian(name))
+        return "bad_ru_letter";
+
+    if (!nameMobiles(name))
+        return "mob";
+
+    if (!nameReserved(name))
+        return "reserved";
+
+    if (!nameReligion(name, true))
+        return "god";
+
+    return DLString::emptyString;
 }
 
-bool BadNames::nameLength( const DLString &name ) const
+bool BadNames::nameReligion(const DLString &name, bool fRussian) const
+{
+    for (int i = 0; i < religionManager->size(); i++) {
+        Religion *rel = religionManager->find(i);
+        DLString godName = fRussian ? rel->getRussianName() : rel->getName();
+
+        if (name.equalLess(godName))
+            return false;
+    }
+
+    return true;
+}
+
+DLString BadNames::nameLength( const DLString &name ) const
 {
     if (name.length( ) < 2)
-        return false;
-    if (name.length( ) > 12)
-        return false;
-    return true;
+        return "too_short";
+    if (name.length( ) > 15)
+        return "too_long";
+
+    return DLString::emptyString;
 }
 
 bool BadNames::nameEnglish( const DLString &name ) const

@@ -603,6 +603,17 @@ SKILL_RUNP( lore )
                         obj->weight / 10,
                         obj->level);
                 ch->send_to(buf);
+            
+                if (obj->timer != 0){
+                  if(learned < 85){
+                    sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+                    ch->send_to(buf);
+                  }
+                  else{
+                    ch->send_to(fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer));
+                  }
+                }
+
                 ch->send_to("\n\rБолее про эту вещь невозможно ничего сказать.\n\r");
                 return;
         }
@@ -617,6 +628,11 @@ SKILL_RUNP( lore )
     {
       sprintf( buf, "Объект: '%s'.\n\r", obj->getName( ));
       ch->send_to(buf);
+
+      if (obj->timer != 0){
+      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+      ch->send_to(buf);
+      }
       ch->mana -= mana;
       gsn_lore->improve( ch, true );
       return;
@@ -635,6 +651,12 @@ SKILL_RUNP( lore )
         sprintf( buf, "Материал: %s.\n\r", obj->getMaterial( ));
         ch->send_to(buf);
       }
+
+      if (obj->timer != 0){
+      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+      ch->send_to(buf);
+      }
+
       ch->mana -= mana;
       gsn_lore->improve( ch, true );
       return;
@@ -651,6 +673,12 @@ SKILL_RUNP( lore )
           str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
+
+      if (obj->timer != 0){
+      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+      ch->send_to(buf);
+      }
+
       oprog_lore(obj, ch);
       ch->mana -= mana;
       gsn_lore->improve( ch, true );
@@ -670,6 +698,12 @@ SKILL_RUNP( lore )
           str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
+
+      if (obj->timer != 0){
+      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+      ch->send_to(buf);
+      }
+
       oprog_lore(obj, ch);
       
       ch->mana -= mana;
@@ -690,6 +724,12 @@ SKILL_RUNP( lore )
           str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
+
+      if (obj->timer != 0){
+      sprintf(buf, "{WЭтот предмет скоро исчезнет.{x\r\n");
+      ch->send_to(buf);
+      }
+
     }
   else
     {
@@ -704,6 +744,11 @@ SKILL_RUNP( lore )
           str_cmp(obj->getMaterial( ),"oldstyle")?obj->getMaterial( ):"unknown"
               );
       ch->send_to(buf);
+
+      if (obj->timer != 0){
+      ch->send_to(fmt(0, "{WЭтот предмет исчезнет через %1$d мину%1$Iту|ты|т.{x\r\n", obj->timer));
+      }
+
     }
 
   ch->mana -= mana;

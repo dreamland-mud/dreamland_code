@@ -1303,7 +1303,7 @@ SKILL_RUNP( blackjack )
                 af.type = gsn_blackjack;
                 af.where = TO_AFFECTS;
                 af.level = ch->getModifyLevel();
-                af.duration = ch->getModifyLevel() / 15 + 1;
+                af.duration = ch->getModifyLevel() / 50 + 1;
                 af.location = APPLY_NONE;
                 af.modifier = 0;
                 af.bitvector = AFF_SLEEP;

@@ -98,7 +98,7 @@ Quest::Reward::Pointer StaffQuest::reward( PCharacter *ch, NPCharacter *questman
 {
     Reward::Pointer r( NEW );
 
-    if (hint.getValue( )) {
+    if (hint.getValue( ) && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range( 1, 2 );
         r->points = number_range( 1, 4 );
     }

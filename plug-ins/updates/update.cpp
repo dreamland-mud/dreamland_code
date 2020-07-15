@@ -801,6 +801,10 @@ void obj_update( void )
             }
         }
 
+        // Time stops for auctioned items.
+        if (auction->item == obj)
+            continue;
+            
         if ( obj->condition > -1
                 && ( obj->timer <= 0
                      || --obj->timer > 0 ) )

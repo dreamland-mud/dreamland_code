@@ -94,7 +94,9 @@ Quest::Reward::Pointer KidnapQuest::reward( PCharacter *ch, NPCharacter *questma
     
     r->points = number_range( 18, 25 );
     r->points += ambushes * 25;
+    if(!IS_TOTAL_NEWBIE(ch)){
     r->points -= hint * 10;
+    }
     r->points = std::max( 10, r->points );
 
     r->gold = number_fuzzy( r->points );
@@ -187,13 +189,17 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
 {
     Room *room = helpLocation( );
 
-    if (state == QSTAT_INIT || !room) {
-        tell_fmt( "Извини, но тебе придется искать путь само%1$Gму|му|ой.", ch, questman );
+    if (state == QSTAT_INIT) {
+        tell_fmt( "Извини, но на этом этапе задания тебе придется искать путь само%1$Gму|му|ой.", ch, questman );
+        return true;
+    }
+    else if(!room){
+        tell_fmt( "Извини, я сейчас не могу тебе помочь - придется искать путь само%1$Gму|му|ой.", ch, questman );
         wiznet( "find", "failure" );
         return true;
     }
 
-    if (hint.getValue( ) > 5) {
+    if (hint.getValue( ) > 5 && !IS_TOTAL_NEWBIE(ch)) {
         if (number_percent( ) < 30)
             tell_fmt( "%1$^C1, тебе необходимо следовать по такому пути: eeeennnwwnewseesennnnnnnnwwnnn.", ch, questman ); 
         else
@@ -202,7 +208,7 @@ bool KidnapQuest::help( PCharacter *ch, NPCharacter *questman )
         wiznet( "find", "failure" );
         return true;
     }
-
+    if(!IS_TOTAL_NEWBIE(ch))
     tell_raw( ch, questman,  "Я помогу тебе, но награда будет не так велика.");
 
     if (rated_as_guru( ch ))

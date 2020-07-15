@@ -95,7 +95,7 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
     Reward::Pointer r( NEW );
     
     if (mobsKilled != mobsTotal) {
-        if (hint > 0)
+        if (hint > 0 && !IS_TOTAL_NEWBIE(ch))
             tell_fmt("К тому же, ты уничтожил%1$Gо||а только %3$d преступник%3$Iа|ов|ов из %4$d.", 
                      ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
         else     
@@ -103,7 +103,7 @@ Quest::Reward::Pointer BigQuest::reward( PCharacter *ch, NPCharacter *questman )
                      ch, questman, mobsKilled.getValue(), mobsTotal.getValue());
     }
 
-    if (hint > 0) {
+    if (hint > 0 && !IS_TOTAL_NEWBIE(ch)) {
         r->gold = number_range(1, 3);
         r->points = mobsKilled; 
     }

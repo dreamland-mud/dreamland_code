@@ -85,7 +85,7 @@ void Questor::doComplete( PCharacter *client, DLString &args )
 
     tell_raw( client, ch,  "Поздравляю с выполнением задания!" );
 
-    if (quest->hint.getValue( ) > 0) {
+    if (quest->hint.getValue( ) > 0 && !IS_TOTAL_NEWBIE(client)) {
         tell_raw( client, ch,  "Я припоминаю, что мне пришлось подсказать тебе путь.");
         msg << "Но за настойчивость я даю тебе";
     }
@@ -229,7 +229,7 @@ void Questor::doFind( PCharacter *client )
         return;
     }
 
-    if (quest->hint >= 3) {
+    if (quest->hint >= 3 && !IS_TOTAL_NEWBIE(client)) {
         tell_fmt( "Извини, %1$C1, но теперь тебе придется искать путь самостоятельно.", client, ch );
         quest->wiznet( "find", "failure, too many hints" );
         return;
@@ -244,6 +244,7 @@ void Questor::doFind( PCharacter *client )
         return;
     }
 
+    if(!IS_TOTAL_NEWBIE(client))
     tell_raw( client, ch, "Я помогу тебе, но награда будет не так велика.");
     tell_raw( client, ch, buf.str( ).c_str( ) );
     tell_raw( client, ch,  "Но помни! Все дороги в этом мире изменчивы и опасны.");
@@ -557,6 +558,13 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             attr->rememberLastQuest("");
             attr->setStartTime();
             PCharacterManager::save( client );
+
+            if(!rated_as_guru(client)){
+               tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            if(IS_TOTAL_NEWBIE(client)){
+               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+            }
+            }
             
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
 
@@ -598,7 +606,16 @@ void Questor::doRequest(PCharacter *client, const DLString &arg)
             attr->rememberLastQuest((*q)->getName());
             attr->setStartTime();
             PCharacterManager::save( client );
+
+            if(!rated_as_guru(client)){
+               tell_raw(client, ch, "Если не сможешь справиться - попроси у меня подсказку командой {y{hc{lRзадание найти{lEquest find{x.");
+            if(IS_TOTAL_NEWBIE(client)){
+               tell_raw(client, ch, "Для новичков {x({y{hc{lRсправка яесть{lEhelp selfrate{x){G, живущих первую жизнь {x({y{hc{lRсправка Перерождение{lEhelp remort{x){G, это бесплатно!");
+            }
+            }
+
             tell_raw(client, ch,  "Пусть удача сопутствует тебе!");
+
             return;
         } 
         catch (const QuestCannotStartException &e) {
