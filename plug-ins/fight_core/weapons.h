@@ -14,4 +14,9 @@ int         get_weapon_sn( Character *ch, bool secondary );
 int          get_weapon_sn( Object *wield );
 Skill *  get_weapon_skill( Object *wield );
 
+/**
+ * Weapon generator: calculate best value1 for a weapon of given class, level and tier.
+ */
+int weapon_value1(int level, int tier, bitnumber_t wclass);
+
 #endif
