@@ -161,9 +161,8 @@ struct PathWithDepthComplete {
 
 void Wanderer::pathToTarget( Room *const start_room, Room *const target_room, int limit )
 {
-    MyHookIterator iter( DoorFunc( this ), 
-                         ExtraExitFunc( this ), 
-                         PortalFunc( this ) );
+    DoorFunc goDoor(this); ExtraExitFunc goEExit(this); PortalFunc goPortal(this);
+    MyHookIterator iter(goDoor, goEExit, goPortal); 
 
     PathToTargetComplete complete( target_room, path );
     
@@ -173,9 +172,8 @@ void Wanderer::pathToTarget( Room *const start_room, Room *const target_room, in
 
 void Wanderer::pathWithDepth( Room *const start_room, int depth, int limit )
 {
-    MyHookIterator iter( DoorFunc( this ), 
-                         ExtraExitFunc( this ), 
-                         PortalFunc( this ), 10 );
+    DoorFunc goDoor(this); ExtraExitFunc goEExit(this); PortalFunc goPortal(this);
+    MyHookIterator iter(goDoor, goEExit, goPortal, 10);
     
     PathWithDepthComplete complete( depth, path );
 
