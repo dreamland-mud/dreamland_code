@@ -164,8 +164,8 @@ EOF
 
 dnl Set flags explicitly so that AC_PROG_CC doesn't set them to default "-g -O2".
   if test "$ac_use_optimization_code" = "no"; then
-      CXXFLAGS="$CXXFLAGS -g -Og"
-      CFLAGS="$CFLAGS -g -Og"
+      CXXFLAGS="$CXXFLAGS -g -Og -std=c++17"
+      CFLAGS="$CFLAGS -g -Og -std=c++17"
   fi
 ])
 
