@@ -3,6 +3,7 @@ dist: bionic
 addons:
   apt:
      update: true
+     sources: [ ubuntu-toolchain-r-test ]
      packages:
        - libfl-dev
        - libcrypto++-dev 
@@ -10,8 +11,13 @@ addons:
        - libdb5.3-dev 
        - libdb5.3++ 
        - libdb5.3++-dev  
+       - g++-9
+
+env:
+  - CXX=g++-9
 
 cache: ccache
+
 
 before_script:
   - ccache -M 2G # default ccache limit of 500Mb is not enough for our cache of 800Mb
