@@ -24,7 +24,9 @@ onlinecreation.cpp \
 ovalues.cpp \
 security.cpp \
 webedit.cpp \
-feniatriggers.cpp
+orandom.cpp \
+argparser.cpp \
+feniatriggers.cpp 
 
 libolc_la_MOC = \
 redit.h \

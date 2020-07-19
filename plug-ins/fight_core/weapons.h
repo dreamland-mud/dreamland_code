@@ -19,4 +19,14 @@ Skill *  get_weapon_skill( Object *wield );
  */
 int weapon_value1(int level, int tier, bitnumber_t wclass);
 
+/**
+ * Weapon generator: return fixed value2 based on weapon class.
+ */
+int weapon_value2(bitnumber_t wclass);
+
+/**
+ * Weapon generator: return fixed average damaged for a level and a tier.
+ */
+int weapon_ave(int level, int tier);
+
 #endif
