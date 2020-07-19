@@ -12,7 +12,7 @@
 
 using namespace CryptoPP;
 
-DLString digestWithBinarySalt( const DLString &password, byte *salt, size_t salt_len )
+DLString digestWithBinarySalt( const DLString &password, ::byte *salt, size_t salt_len )
 {
    unsigned int iterations = 1000;
    
@@ -26,7 +26,7 @@ DLString digestWithBinarySalt( const DLString &password, byte *salt, size_t salt
    pbkdf.DeriveKey(
       derivedkey, derivedkey.size(),
       0x00,
-      (byte *) password.data(), password.size(),
+      (::byte *) password.data(), password.size(),
       salt, salt_len,
       iterations
    );
@@ -47,7 +47,7 @@ DLString digestWithHexSalt( const DLString &password, const DLString &hexSalt )
   DLString salt;
   StringSource ss( hexSalt, true /*pumpAll*/, new HexDecoder( new StringSink(salt) ) );
   // Call digest to return salt and hash combination.
-  return digestWithBinarySalt( password, (byte *)salt.data( ), salt.size( ) );
+  return digestWithBinarySalt( password, (::byte *)salt.data( ), salt.size( ) );
 }
 
 DLString digestWithRandomSalt( const DLString &password )
