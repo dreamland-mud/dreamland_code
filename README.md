@@ -38,7 +38,7 @@
 
 ## <a name="local">Запуск локальной версии</a>
 
-Эта инструкция по сборке была проверена на Ubuntu 18.04. Дримленд гарантированно собирается под **gcc 7.4** (или другой версией с поддержкой C++11).
+Эта инструкция по сборке была проверена на Ubuntu 18.04. Дримленд гарантированно собирается под **gcc 9.3** (или другой версией с поддержкой C++17).
 
 Если вам удалось собрать под чем-то еще, пожалуйста, обновите это руководство. 
 
@@ -48,6 +48,15 @@
 sudo apt-get update
 sudo apt-get install -y git g++ gcc make automake libtool bison flex gdb telnet db-util libfl-dev bzip2
 sudo apt-get install -y libcrypto++-dev libjsoncpp-dev libdb5.3 libdb5.3-dev libdb5.3++ libdb5.3++-dev zlib1g zlib1g-dev libssl-dev
+```
+
+На Ubuntu 18.04, возможно, понадобится установить более свежую версию компилятора и сделать ее версией по умолчанию:
+```bash
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc-9 g++-9
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9
 ```
 
 ### <a name="build">Сборка из исходников</a>
