@@ -21,6 +21,4 @@ void do_help( Character *ch, const char *topic );
 
 Descriptor * descriptor_find_named( Descriptor *myD, const DLString &myName, int state = -1 );
 
-string create_nonce(int len);
-
 #endif

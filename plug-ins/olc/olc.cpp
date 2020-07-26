@@ -887,14 +887,6 @@ CMD(abc, 50, "", POS_DEAD, 106, LOG_ALWAYS, "")
         return;
     }
 
-    if (arg == "nohelp") {
-	ostringstream buf;
-	for (auto help: helpManager->getArticles())
-		if (help->getID() < 1)
-			buf << help->getAllKeywordsString() << endl;
-	page_to_char(buf.str().c_str(), ch);
-	return;
-    }	    	
 }
 
 
