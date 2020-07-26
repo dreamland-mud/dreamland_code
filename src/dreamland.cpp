@@ -288,3 +288,19 @@ void DreamLand::signalHandler( int signo )
     dreamland->shutdown( );
 }
 
+
+/*
+ * Enforce generation of references to weakly-defined symbols in src, so that if the same symbol is defined by two
+ * different plugins, the reference would always resolve in favour of libdreamland.so. This prevents a situation
+ * when both plugins have a reference to, say, std::_Sp_make_shared_tag::_S_ti()::__tag, and one of them always 
+ * fails to unload because some other plugin has a reference to its symbol.
+
+ * Encountered this situation with tao/pegtl library and libolc.so.
+ */
+#include <memory>
+void dummy() 
+{
+    struct dummy {} d;
+    std::make_shared<dummy>(d);
+}
+

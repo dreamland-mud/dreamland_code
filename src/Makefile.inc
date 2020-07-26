@@ -2,6 +2,7 @@ INCLUDES_SRC = \
 -I$(srcdir) \
 -I$(top_builddir)/src \
 -I$(top_builddir) \
+-I$(top_srcdir)/include \
 -I$(top_srcdir)/src \
 -I$(top_srcdir)/src/regex \
 -I$(top_srcdir)/src/lang \

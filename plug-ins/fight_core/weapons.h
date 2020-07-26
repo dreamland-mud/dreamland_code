@@ -14,4 +14,19 @@ int         get_weapon_sn( Character *ch, bool secondary );
 int          get_weapon_sn( Object *wield );
 Skill *  get_weapon_skill( Object *wield );
 
+/**
+ * Weapon generator: calculate best value1 for a weapon of given class, level and tier.
+ */
+int weapon_value1(int level, int tier, bitnumber_t wclass);
+
+/**
+ * Weapon generator: return fixed value2 based on weapon class.
+ */
+int weapon_value2(bitnumber_t wclass);
+
+/**
+ * Weapon generator: return fixed average damaged for a level and a tier.
+ */
+int weapon_ave(int level, int tier);
+
 #endif
