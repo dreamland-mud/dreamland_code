@@ -94,7 +94,30 @@ int get_weapon_sn( Character *ch, bool secondary )
 const int tier_step = 5;
 const int tier_size = LEVEL_MORTAL / 5 + 1;
 const int tier_count = 5;
-typedef int damage_tier_t [tier_size] ;
+typedef int damage_tier_t [tier_size];
+
+damage_tier_t damroll_tiers [tier_count] = {
+// tier 1
+{
+    1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 15, 16, 18, 21, 23, 25, 27, 30,
+},
+// tier 2
+{
+    0, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 16, 18, 21, 23, 25, 27,
+},
+// tier 3
+{
+    0, 0, 0, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 15, 16, 18, 21, 23,
+},
+// tier 4
+{
+    0, 0, 0, 0, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 15, 16, 18, 21,
+},
+// tier 5
+{
+    0, 0, 0, 0, 0, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 15, 16, 18,
+}
+};
 
 damage_tier_t damage_tiers [tier_count] = {
 // tier 1
@@ -210,3 +233,19 @@ int weapon_value1(int level, int tier, bitnumber_t wclass)
     return ceil(value1);
 }
 
+int weapon_damroll(int level, int tier)
+{
+    if (tier <= 0 || tier > tier_size) {
+        bug("weapon_damroll: invalid tier %d for level %d", tier, level);
+        return 0;
+    }
+
+    if (level <= 0 || level > MAX_LEVEL) {
+        bug("weapon_damroll: invalid level %d for tier %d", level, tier);
+        return 0;
+    }
+
+    damage_tier_t &damroll = damroll_tiers[tier - 1];
+    int index = min(level / 5, tier_size - 1);
+    return damroll[index];
+}

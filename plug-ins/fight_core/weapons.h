@@ -25,8 +25,13 @@ int weapon_value1(int level, int tier, bitnumber_t wclass);
 int weapon_value2(bitnumber_t wclass);
 
 /**
- * Weapon generator: return fixed average damaged for a level and a tier.
+ * Weapon generator: return fixed average damage for a level and a tier.
  */
 int weapon_ave(int level, int tier);
+
+/**
+ * Weapon generator: return fixed damroll bonus for a level and a tier.
+ */
+int weapon_damroll(int level, int tier);
 
 #endif
