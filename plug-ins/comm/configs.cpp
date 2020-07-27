@@ -20,6 +20,7 @@
 #include "comm.h"
 #include "descriptor.h"
 #include "servlet_utils.h"
+#include "math_utils.h"
 #include "act.h"
 #include "arg_utils.h"
 #include "def.h"

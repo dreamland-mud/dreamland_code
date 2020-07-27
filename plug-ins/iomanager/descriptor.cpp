@@ -20,7 +20,7 @@
 #endif
 
 #include "json/json.h"
-
+#include "math_utils.h"
 #include "rpccommandmanager.h"
 #include "iconvmap.h"
 #include "logstream.h"
