@@ -18,7 +18,7 @@ libareas_la_SOURCES = \
 db2.cpp \
 load_compat.cpp \
 load_xml.cpp \
-areahelp.cpp \
+xmlareahelp.cpp \
 xmlitemtype.cpp \
 xmlmisc.cpp \
 xmlarea.cpp \
@@ -42,7 +42,7 @@ xmlarea.h \
 xmlroom.h \
 xmlobjectfactory.h \
 xmlmobilefactory.h \
-areahelp.h
+xmlareahelp.h
 
 include $(top_srcdir)/plug-ins/Makefile.inc
 AM_CPPFLAGS += $(plugin_INCLUDES)

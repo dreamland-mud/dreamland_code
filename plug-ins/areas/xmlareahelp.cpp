@@ -3,14 +3,12 @@
  * ruffina, 2004
  */
 #include "logstream.h"
+#include "xmlareahelp.h"
 #include "areahelp.h"
 #include "so.h"
 #include "plugininitializer.h"
-#include "mocregistrator.h"
-#include "regexp.h"
 #include "merc.h"
 #include "mercdb.h"
-#include "dl_strings.h"
 #include "def.h"
 
 
@@ -55,70 +53,6 @@ void XMLAreaHelp::fromXML( const XMLNode::Pointer&parent )
     parent->getAttribute(HelpArticle::ATTRIBUTE_ID, id);
 }
 
-/*-------------------------------------------------------------------
- * AreaHelp 
- *------------------------------------------------------------------*/
-const DLString AreaHelp::TYPE = "AreaHelp";
-
-void AreaHelp::save() const
-{
-    if (areafile)
-        SET_BIT(areafile->area->area_flag, AREA_CHANGED);
-}
-
-DLString AreaHelp::getTitle(const DLString &label) const
-{
-    ostringstream buf;
-    AREA_DATA *area = areafile->area;
-
-    if (!label.empty() || !titleAttribute.empty() || !selfHelp)
-        return MarkupHelpArticle::getTitle(label);
-
-    buf << "Зона {c" << area->name << "{x";
-
-    if (strlen(area->credits) > 0 
-            && str_str(area->credits, area->name) == 0
-            && str_str(area->name, area->credits) == 0)
-        buf << " ({c" << area->credits << "{x)";
-
-    return buf.str();
-}
-
-void AreaHelp::getRawText( Character *ch, ostringstream &in ) const
-{
-    AREA_DATA *area = areafile->area;
-    
-    if (!selfHelp) {
-        MarkupHelpArticle::getRawText(ch, in);
-        return;
-    }
-
-    in << "Зона {Y" << area->name << "{x, " 
-       << "уровни {Y" << area->low_range << "-" << area->high_range << "{x, "
-       << "автор {y" << area->authors << "{x";
-    if (str_cmp(area->translator, ""))
-        in << ", перевод {y" << area->translator << "{x";
-
-    // This bit is going to be replaced with a link to the map by the webclient.
-    in << "%PAUSE% {Iw[map=" << areafile->file_name << "]{Ix%RESUME%";
-
-    in << endl
-       << endl;
-
-    if (!empty())
-       in << *this << endl;
-    
-    if (str_cmp(area->speedwalk, "")) {
-        in << "{yКак добраться{x: " << area->speedwalk << endl;
-
-        // If 'speedwalk' field contains something resembling a run path,
-        // and not just text, explain the starting point.
-        RegExp speedwalkRE("[0-9]?[nsewud]+");
-        if (speedwalkRE.match(area->speedwalk))
-           in << "{D(все пути ведут от Рыночной Площади Мидгаарда, если не указано иначе){x" << endl;
-    }
-
-}
 
 class AreaHelpLifetimePlugin : public Plugin {
 public:
@@ -192,7 +126,6 @@ extern "C" {
     {
         SO::PluginList ppl;
         
-        Plugin::registerPlugin<MocRegistrator<AreaHelp> >( ppl );
         Plugin::registerPlugin<AreaHelpLifetimePlugin>( ppl );
         return ppl;
     }

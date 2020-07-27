@@ -65,7 +65,6 @@
 #include "skillmanager.h"
 #include "spell.h"
 #include "affecthandler.h"
-#include "areabehaviormanager.h"
 #include "mobilebehavior.h"
 #include "xmlattributeticker.h"
 #include "commonattributes.h"
@@ -81,6 +80,7 @@
 #include "desire.h"
 #include "helpmanager.h"
 #include "attacks.h"
+#include "areahelp.h"
 
 #include "dreamland.h"
 #include "merc.h"
@@ -1922,113 +1922,6 @@ CMDRUNP( score )
 
     if (IS_SET(ch->comm, COMM_SHOW_AFFECTS))
         interpret_raw( ch, "affects", "noempty");
-}
-
-CMDRUNP( areas )
-{
-    ostringstream buf, areaBuf, clanBuf, mansionBuf;
-    int acnt = 0, ccnt = 0, mcnt = 0;
-    AREA_DATA *pArea;
-    int minLevel, maxLevel, level;
-    DLString arguments( argument ), args, arg1, arg2;
-    
-    arguments.stripWhiteSpace( );
-    level = minLevel = maxLevel = -1;
-    args = arguments;
-    arg1 = arguments.getOneArgument( );
-    arg2 = arguments.getOneArgument( );
-    
-    if (!arg1.empty( ) && !arg2.empty( ) && arg1.isNumber( ) != arg2.isNumber( )) {
-        ch->println( "Использование: \r\n"
-                     "{lEareas [<level> | <min level> <max level> | <string>]"
-                     "{lRзоны [<уровень> | <мин.уровень> <макс.уровень> | <название>]{lx" );
-        return;
-    }
-    
-    try {
-        if (arg1.isNumber( )) {
-            level = minLevel = arg1.toInt( );
-            args.clear( );
-        }
-
-        if (arg2.isNumber( )) {
-            level = -1;
-            maxLevel = arg2.toInt( );
-            args.clear( );
-        }
-    } catch (const ExceptionBadType & ) {
-        ch->send_to( "Уровень зоны указан неверно.\r\n" );
-        return;
-    }
-    
-    if (level != -1) 
-        buf << "{YАрии мира Dream Land для уровня " << level << ":{x" << endl;
-    else if (!args.empty( ))
-        buf << "{YНайдены арии: {x" << endl;
-    else if (minLevel != -1 && maxLevel != -1)
-        buf << "{YАрии мира Dream Land, для уровней " 
-            << minLevel << " - " << maxLevel << ":{x" << endl;
-    else
-        buf << "{YВсе арии мира Dream Land: {x" << endl;
-    
-    buf << "{wУровни    Название                       Уровни    Название{x" << endl
-        << "------------------------------------------------------------------------" << endl;
-
-    for (pArea = area_first; pArea; pArea = pArea->next) {
-        if (IS_SET(pArea->area_flag, AREA_HIDDEN)) 
-            continue;
-        
-        if (level != -1) {
-            if (pArea->low_range > level || pArea->high_range < level)
-                continue;
-        }
-        else if (minLevel != -1 && maxLevel != -1) {
-            if (pArea->low_range < minLevel || pArea->high_range > maxLevel)
-                continue;
-        }
-
-        if (!args.empty( )) {
-            DLString aname = DLString( pArea->name ).colourStrip( );
-            DLString altname = DLString( pArea->altname ).colourStrip( );
-            DLString acredits = DLString( pArea->credits ).colourStrip( );
-            if (!is_name( args.c_str( ), aname.c_str( ) ) 
-                    && !is_name( args.c_str( ), acredits.c_str( ) )
-                    && !is_name( args.c_str( ), altname.c_str( ) ))
-                continue;
-        }
-        
-        bool isMansion = area_is_mansion(pArea);
-        bool isClan = area_is_clan(pArea);    
-        ostringstream &str =  isMansion ? mansionBuf : isClan ? clanBuf : areaBuf;
-        int &cnt = isMansion ? mcnt : isClan ? ccnt : acnt;
-
-        str << fmt( ch, "[{w%3d{x {w%3d{x] %-30.30s ",
-                        pArea->low_range, pArea->high_range, 
-                        pArea->name);
-
-        if (++cnt % 2 == 0)
-            str << endl;
-    }
-  
-    if (!areaBuf.str().empty()) { 
-        buf << areaBuf.str();
-        if (acnt % 2)
-            buf << endl;
-    }
-
-    if (!clanBuf.str().empty()) {
-        buf << "{yКлановые территории:{x" << endl << clanBuf.str();
-        if (ccnt % 2)
-            buf << endl;
-    }
-
-    if (!mansionBuf.str().empty()) {
-        buf << "{yПригороды под застройку:{x" << endl << mansionBuf.str();
-        if (mcnt % 2)
-            buf << endl;
-    }
-    buf << endl << "Подробнее о каждой зоне смотри в {Wсправка название_зоны{x." << endl;
-    page_to_char( buf.str( ).c_str( ), ch );        
 }
 
 /*-----------------------------------------------------------------

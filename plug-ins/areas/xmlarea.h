@@ -17,7 +17,7 @@
 #include "xmlmobilefactory.h"
 #include "xmlobjectfactory.h"
 #include "xmlroom.h"
-#include "areahelp.h"
+#include "xmlareahelp.h"
 
 struct area_data;
 

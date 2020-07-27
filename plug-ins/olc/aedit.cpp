@@ -242,7 +242,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
         if (!hasHelp)
             ch->println("    (нет)");
 
-        AreaHelp *ahelp = get_area_help(original);
+        AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp || !ahelp->persistent)
             ch->println("Используй {y{hchelp create{x для создания справки по зоне.");
 
@@ -250,7 +250,7 @@ AEDIT(helps, "справка", "создать или посмотреть сп�
     }
 
     if (arg_oneof(arg, "create", "создать")) {
-        AreaHelp *ahelp = get_area_help(original);
+        AreaHelp *ahelp = area_selfhelp(original);
         if (!ahelp) {
             ch->println("Не найдена автоматическая справка по этой зоне, что-то поломалось.");
             return false;
@@ -304,6 +304,7 @@ AEDIT(create, "создать", "создать новую арию")
 {
     OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
     ae->attach(ch);
+    ae->findCommand(ch, "show")->run(ch, "");
 
     stc("Aрия создана.\n\r", ch);
     return false;
@@ -729,6 +730,7 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             }
             OLCStateArea::Pointer ae(NEW, (AREA_DATA *)NULL);
             ae->attach(ch);
+            ae->findCommand(ch, "show")->run(ch, "");
             stc("Ария создана.\r\n", ch);
             return;
         }
@@ -741,5 +743,6 @@ CMD(aedit, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     OLCStateArea::Pointer ae(NEW, pArea);
     ae->attach(ch);
+    ae->findCommand(ch, "show")->run(ch, "");
 }
 

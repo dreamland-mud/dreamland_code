@@ -769,10 +769,6 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     if (!ch) {
         save_area_list();
         for (pArea = area_first; pArea; pArea = pArea->next) {
-            if (IS_SET(pArea->area_flag, AREA_SAVELOCK)) {
-                ptc(ch, "Area %s was not saved! (Locked from saving)\n\r", ch);
-                continue;
-            }
             REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
             save_area(pArea);
         }
@@ -804,10 +800,6 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             stc("You are not a builder for this area.\n\r", ch);
             return;
         }
-        if (IS_SET(pArea->area_flag, AREA_SAVELOCK)) {
-            ptc(ch, "Area %s was not saved! (Locked from saving)\n\r", ch);
-            return;
-        }
         save_area_list();
         save_area(pArea);
         return;
@@ -817,10 +809,6 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     if (!str_cmp("world", arg1)) {
         save_area_list();
         for (pArea = area_first; pArea; pArea = pArea->next) {
-            if (IS_SET(pArea->area_flag, AREA_SAVELOCK)) {
-                ptc(ch, "Area %s was not saved! (Locked from saving)\n\r", ch);
-                continue;
-            }
             if (!OLCState::can_edit(ch, pArea))
                 continue;
 
@@ -847,10 +835,6 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
             if (!OLCState::can_edit(ch, pArea))
                 continue;
 
-            if (IS_SET(pArea->area_flag, AREA_SAVELOCK)) {
-                ptc(ch, "Area %s was not saved! (Locked from saving)\n\r", ch);
-                continue;
-            }
             /* Save changed areas. */
             if (IS_SET(pArea->area_flag, AREA_CHANGED)) {
                 REMOVE_BIT(pArea->area_flag, AREA_CHANGED);
@@ -873,10 +857,6 @@ CMD(asavecompat, 50, "", POS_DEAD, 103, LOG_ALWAYS,
     if (!str_cmp(arg1, "area")) {
         pArea = ch->in_room->area;
 
-        if (IS_SET(pArea->area_flag, AREA_SAVELOCK)) {
-            ptc(ch, "Area %s was not saved! (Locked from saving)\n\r", ch);
-            return;
-        }
         if (!pArea || !OLCState::can_edit(ch, pArea)) {
             stc("У вас нет прав изменять эту арию\n\r", ch);
             return;

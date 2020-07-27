@@ -6,6 +6,7 @@
 #include "logstream.h"
 #include "dlfileop.h"
 #include "xmlarea.h"
+#include "areahelp.h"
 #include "feniamanager.h"
 #include "fileformatexception.h"
 #include "room.h"

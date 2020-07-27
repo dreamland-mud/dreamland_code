@@ -60,19 +60,6 @@ enum {
     NDX_MOB,
 };
 
-/** Get self-help article for this area, either a real one or automatically created. */
-AreaHelp * get_area_help(AREA_DATA *area)
-{
-    for (auto &article: area->helps) {
-        AreaHelp *ahelp = article.getDynamicPointer<AreaHelp>();
-        if (ahelp && ahelp->selfHelp)
-            return ahelp;
-    }
-
-    return 0;
-}
-
-
 static int next_index_data( Character *ch, Room *r, int ndx_type )
 {
     AREA_DATA *pArea;
@@ -556,24 +543,31 @@ CMD(alist, 50, "", POS_DEAD, 103, LOG_ALWAYS,
 
     const DLString lineFormat = 
             "[" + web_cmd(ch, "aedit $1", "%3d") 
-            + "] {W%-29s {x(%5u-%5u) %17s %s{w\n\r";
+            + "] {%s%-29s {%s(%5u-%5u) %17s %s{w\n\r";
 
     ptc(ch, "[%3s] %-29s   (%5s-%5s) %-17s %s\n\r",
       "Num", "Area Name", "lvnum", "uvnum", "Filename", "Help");
 
     for (pArea = area_first; pArea; pArea = pArea->next) {
         DLString hedit = "";
-        AreaHelp *ahelp = get_area_help(pArea);
+        AreaHelp *ahelp = area_selfhelp(pArea);
         if (ahelp && ahelp->getID() > 0) {
             DLString id(ahelp->getID());
-	    DLString color = (ahelp->find_first_not_of(' ') != DLString::npos) ? "": " {R*{x";
+            // Mark zones without meaningful help articles with red asterix.
+            DLString color = help_is_empty(*ahelp) ? " {R*{x": "";
             hedit = web_cmd(ch, "hedit " + id, "hedit " + id) + color;
         }
-            
+
+        // System areas are shown in grey colors.           
+        const char *colorAreaName = IS_SET(pArea->area_flag, AREA_SYSTEM) ? "D" : "W";
+        const char *colorAreaVnums = IS_SET(pArea->area_flag, AREA_SYSTEM) ? "D" : "w";
+
         ch->send_to(
             dlprintf(lineFormat.c_str(), 
                 pArea->vnum, 
+                colorAreaName,
                 DLString(pArea->name).colourStrip().cutSize(29).c_str(),
+                colorAreaVnums,
                 pArea->min_vnum, pArea->max_vnum,
                 pArea->area_file->file_name,
                 hedit.c_str()));

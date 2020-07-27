@@ -20,7 +20,7 @@
 #include "core/object.h"
 #include "room.h"
 #include "clanreference.h"
-#include "areabehaviormanager.h"
+#include "areabehaviorplugin.h"
 
 #include "dreamland.h"
 #include "debug_utils.h"
