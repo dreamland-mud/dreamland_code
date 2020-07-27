@@ -14,6 +14,7 @@ libalias_la_LIBADD = \
 libalias_la_SOURCES = alias.cpp
 
 libcomm_la_SOURCES = \
+areas.cpp \
 banking.cpp \
 configs.cpp \
 corder.cpp \

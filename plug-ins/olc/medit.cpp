@@ -1139,7 +1139,7 @@ MEDIT(average)
 
     for (int iHash = 0; iHash < MAX_KEY_HASH; iHash++)
         for (MOB_INDEX_DATA *pMob = mob_index_hash[iHash]; pMob; pMob = pMob->next) {
-            if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN))
+            if (IS_SET(pMob->area->area_flag, AREA_NOQUEST|AREA_HIDDEN|AREA_SYSTEM))
                 continue;
             if (pMob->vnum == 3174) // old jew
                 continue;

@@ -5,27 +5,7 @@
 #ifndef AREAHELP_H
 #define AREAHELP_H
 
-#include "oneallocate.h"
-#include "plugin.h"
-#include "xmllist.h"
-#include "xmlpersistent.h"
 #include "markuphelparticle.h"
-
-class XMLAreaHelp : public XMLString {
-XML_OBJECT
-public:
-    typedef ::Pointer<XMLAreaHelp> Pointer;
-
-    XMLAreaHelp();
-    bool toXML( XMLNode::Pointer& ) const;
-    void fromXML( const XMLNode::Pointer& );
-
-    DLString keywordAttribute;
-    int level;
-    DLString labels;
-    int id;
-    DLString titleAttribute;
-};
 
 class AreaHelp : public MarkupHelpArticle {
 XML_OBJECT
@@ -46,5 +26,13 @@ inline const DLString & AreaHelp::getType( ) const
 {
     return TYPE;
 }
+
+struct area_data;
+
+/** Get self-help article for this area, either a real one or automatically created. */
+AreaHelp * area_selfhelp(struct area_data *area);
+
+/** Return true if this article is empty or consists only of spaces. */
+bool help_is_empty(const HelpArticle &help);
 
 #endif

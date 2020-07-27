@@ -9,7 +9,7 @@
 #include "dlscheduler.h"
 #include "schedulertaskroundplugin.h"
 #include "plugininitializer.h"
-#include "areabehaviormanager.h"
+#include "areabehaviorplugin.h"
 #include "commandtemplate.h"
 #include "affect.h"
 #include "core/object.h"

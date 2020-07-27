@@ -7,6 +7,7 @@
 #include "character.h"
 #include "dreamland.h"
 #include "merc.h"
+#include "mercdb.h"
 #include "def.h"
 
 void AreaBehaviorPlugin::initialization( ) {
@@ -39,4 +40,71 @@ void AreaBehaviorPlugin::destruction( ) {
             area->behavior.backup( );
         }
     }
+}
+
+bool area_is_mansion(area_data *area)
+{
+    // TODO remove obsolete check after flag is set everywhere.
+    if (!str_prefix("ht", area->area_file->file_name))
+        return true;
+
+    return IS_SET(area->area_flag, AREA_MANSION);
+}
+
+bool area_is_clan(area_data *area)
+{
+    // TODO remove obsolete check after flag is set everywhere.
+    static const DLString CLAN_AREA_TYPE = DLString("ClanArea");
+    if (area->behavior && CLAN_AREA_TYPE.strPrefix(area->behavior->getType()))
+        return true;
+
+    return IS_SET(area->area_flag, AREA_CLAN);
+}
+
+bool area_is_hometown(area_data *area)
+{
+    return IS_SET(area->area_flag, AREA_HOMETOWN);
+}
+
+bool area_has_levels(area_data *area)
+{
+    return area->high_range > 0 || area->low_range > 0;
+}
+
+DLString area_danger_long(area_data *area)
+{
+    bitstring_t flags = area->area_flag;
+
+    if (IS_SET(flags, AREA_SAFE))
+        return "{Cбезопасно{x";
+    
+    if (IS_SET(flags, AREA_EASY))
+        return "{Gлёгкие противники{x";
+
+    if (IS_SET(flags, AREA_HARD))
+        return "{Yсложные противники{x";
+
+    if (IS_SET(flags, AREA_DEADLY))
+        return "{Rсмертельно опасно{x";
+
+    return DLString::emptyString;
+}
+
+DLString area_danger_short(area_data *area)
+{
+    bitstring_t flags = area->area_flag;
+
+    if (IS_SET(flags, AREA_SAFE))
+        return "{Cмирная{x";
+    
+    if (IS_SET(flags, AREA_EASY))
+        return "{Gлегко{x";
+
+    if (IS_SET(flags, AREA_HARD))
+        return "{Yсложно{x";
+
+    if (IS_SET(flags, AREA_DEADLY))
+        return "{Rопасно{x";
+
+    return DLString::emptyString;
 }
