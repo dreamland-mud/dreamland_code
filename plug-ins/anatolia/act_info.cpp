@@ -2416,7 +2416,7 @@ private:
         if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
             return false;
 
-        const DLString &fullKw = a->getAllKeywordsString();
+        const DLString &fullKw = a->getAllKeywordsString() + " " + a->aka.toString();
         const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
 
         if (is_name(lookup, fullKw.c_str()))
@@ -2426,6 +2426,10 @@ private:
             if (is_name(lookup, (*k).c_str()))
                 return true; 
 
+        for (auto &aka: (*a)->aka) {
+            if (is_name(lookup, aka.c_str()))
+                return true;
+        }
         return false;
     }
 

@@ -67,6 +67,10 @@ public:
 
     StringStorage labels;
 
+    /** XML attribute value for a list of normally hidden keywords, A.K.A., for odd spelling choices.
+     * Can be edited in OLC. */
+    StringSet aka;
+
     static const DLString ATTRIBUTE_KEYWORD;
     static const DLString ATTRIBUTE_LEVEL;
     static const DLString ATTRIBUTE_REF;
@@ -74,6 +78,7 @@ public:
     static const DLString ATTRIBUTE_LABELS;
     static const DLString ATTRIBUTE_ID;
     static const DLString ATTRIBUTE_TITLE;
+    static const DLString ATTRIBUTE_AKA;
    
 protected:
     /** (Extra) keywords specified as an XML attribute for this help article. 
