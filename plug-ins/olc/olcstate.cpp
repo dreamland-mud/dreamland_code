@@ -623,6 +623,9 @@ static void apply_flags(DLString &original, editor_flags flags)
         original.upperFirstCharacter();
     }
 
+    if (IS_SET(flags, ED_UPPERCASE))
+        original.toUpper();
+
     if (IS_SET(flags, ED_NO_NEWLINE)) {
         original.erase( 
             original.find_last_not_of('\r') + 1);
