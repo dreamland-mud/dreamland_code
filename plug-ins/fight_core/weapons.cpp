@@ -3,12 +3,13 @@
  * ruffina, 2004
  */
 #include <math.h>
-
+#include "jsoncpp/json/json.h"
 #include "skill.h"
 #include "skillreference.h"
 #include "logstream.h"
 #include "object.h"
 #include "character.h"
+#include "configurable.h"
 
 #include "itemflags.h"
 #include "merc.h"
@@ -91,77 +92,28 @@ int get_weapon_sn( Character *ch, bool secondary )
     return get_weapon_sn( get_wield( ch, secondary ) );
 }
 
-const int tier_step = 5;
-const int tier_size = LEVEL_MORTAL / 5 + 1;
-const int tier_count = 5;
-typedef int damage_tier_t [tier_size] ;
 
-damage_tier_t damage_tiers [tier_count] = {
-// tier 1
-{ 9,  15, 19, 22, 26,
- 31, 35, 40, 45, 49,
- 53, 57, 60, 63, 65,
- 67, 68, 70, 71, 72,
- 73 },
+Json::Value weapon_value2_by_class;
+CONFIGURABLE_LOADED(fight, weapon_value2)
+{
+    weapon_value2_by_class = value;
+}
 
-// tier 2
-{ 8,  10, 15, 19, 22,
- 26, 31, 35, 40, 45,
- 49, 53, 57, 60, 63,
- 65, 67, 68, 70, 71,
- 72 },
+Json::Value ave_bonus_by_class;
+CONFIGURABLE_LOADED(fight, ave_bonus)
+{
+    ave_bonus_by_class = value;
+}
 
-// tier 3
-{ 7,  8, 10, 12, 15,
- 19, 22, 26, 31, 35,
- 40, 45, 49, 53, 57,
- 60, 63, 65, 67, 68,
- 70 },
-
-// tier 4
-{ 6,  7,  8, 10, 12,
- 15, 19, 22, 26, 31,
- 35, 40, 45, 49, 53,
- 57, 60, 63, 65, 67,
- 68 },
-
-// tier 5
-{ 5,  6,  7,  8, 10,
- 12, 15, 19, 22, 26,
- 31, 35, 40, 45, 49,
- 53, 57, 60, 63, 65,
- 67 }
-};
-
-int weapon_value2_by_class[WEAPON_MAX] = {
-   12, // exotic
-    6, // sword
-    3, // dagger
-    8, // spear
-    5, // mace
-    6, // axe
-    5, // flail
-    8, // whip
-   12, // polearm
-    0, 0, 0, 0
-};
-
-float ave_bonus_by_class[WEAPON_MAX] = {
-    1.2,
-    1,
-    1,
-    1,
-    1,
-    1.2,
-    0.8,
-    0.8,
-    1.2,
-    0, 0, 0, 0
-};
+Json::Value weapon_ave_tiers;
+CONFIGURABLE_LOADED(fight, weapon_ave_tiers)
+{
+    weapon_ave_tiers = value;
+}
 
 int weapon_ave(int level, int tier)
 {
-    if (tier <= 0 || tier > tier_size) {
+    if (tier <= 0 || tier > (int)weapon_ave_tiers.size()) {
         bug("weapon_ave: invalid tier %d for level %d", tier, level);
         return 0;
     }
@@ -171,29 +123,34 @@ int weapon_ave(int level, int tier)
         return 0;
     }
 
-    damage_tier_t &damages = damage_tiers[tier - 1];
-    int index = min(level / 5, tier_size - 1);
-    return damages[index];
+    Json::Value &one_tier = weapon_ave_tiers[tier-1];
+    int index = level / 5;
+    if (index >= (int)one_tier.size()) {
+        bug("weapon_ave: tier %d of size %d doesn't have enough values for level %d", tier, one_tier.size(), level);
+        return 0;
+    }
+
+    return one_tier[index].asInt();
 }
 
 int weapon_value2(bitnumber_t wclass)
 {
-    if (wclass < 0 || wclass >= WEAPON_MAX) {
+    if (wclass < 0 || wclass >= (int)weapon_value2_by_class.size()) {
         bug("weapon_value2: invalid weapon class %d", wclass);
         return 0;
     }
 
-    return weapon_value2_by_class[wclass];
+    return weapon_value2_by_class[wclass].asInt();
 }
 
 float weapon_ave_bonus(bitnumber_t wclass) 
 {
-    if (wclass < 0 || wclass >= WEAPON_MAX) {
+    if (wclass < 0 || wclass >= (int)ave_bonus_by_class.size()) {
         bug("weapon_ave_bonus: invalid weapon class %d", wclass);
         return 0;
     }
 
-    return ave_bonus_by_class[wclass];
+    return ave_bonus_by_class[wclass].asFloat();
 }
 
 int weapon_value1(int level, int tier, bitnumber_t wclass)
