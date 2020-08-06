@@ -623,6 +623,9 @@ static void apply_flags(DLString &original, editor_flags flags)
         original.upperFirstCharacter();
     }
 
+    if (IS_SET(flags, ED_UPPERCASE))
+        original.toUpper();
+
     if (IS_SET(flags, ED_NO_NEWLINE)) {
         original.erase( 
             original.find_last_not_of('\r') + 1);
@@ -685,6 +688,8 @@ bool OLCState::editorWeb(const DLString &original, const DLString &saveCommand, 
 
     if (IS_SET(flags, ED_HELP_HINTS))
         interpret_raw(ch, "webedit", "help");
+    else if (IS_SET(flags, ED_JSON))
+        interpret_raw(ch, "webedit", "json");
     else
         interpret_raw(ch, "webedit");
         

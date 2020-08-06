@@ -36,6 +36,7 @@ OLCStateHelp::OLCStateHelp(HelpArticle *original) : id(-1), level(-1), isChanged
     this->level = original->getLevel();
     this->text = original->c_str();
     this->keywords = original->getKeywordAttribute();
+    this->aka = original->aka.toString();
     this->labels = original->labels.persistent.toString();
     this->labelsAuto = original->labels.transient.toString();
     this->title = original->getTitleAttribute();
@@ -69,6 +70,7 @@ void OLCStateHelp::commit()
     original->setTitleAttribute(title);
     original->labels.persistent.clear();
     original->labels.addPersistent(labels);
+    original->aka.fromString(aka);
     original->save();
 
     help_save_ids();
@@ -106,11 +108,12 @@ void OLCStateHelp::show( PCharacter *ch ) const
         id.getValue(), 
         labels.empty() ? "-" : labels.c_str(), 
         labelsAuto.empty() ? "-" : labelsAuto.c_str());     
-    ptc(ch, "{DВсе ключевые слова: [%s]\r\n", allKeywords().toString().c_str());
-    ptc(ch, "{WКлючевые слова{x:     [{C%s{x]\r\n", keywords.c_str());    
-    ptc(ch, "{WУровень{x:            [{C%d{x]\r\n", level.getValue());
-    ptc(ch, "{WЗаголовок{x:          [{C%s{x]\r\n", title.c_str());
-    ptc(ch, "{DАвтозаголовок:      [%s]\r\n", autotitle.c_str());
+    ptc(ch, "{DВсе ключевые слова:   [%s]\r\n", allKeywords().toString().c_str());
+    ptc(ch, "{WКлючевые слова{x:       [{C%s{x] %s\r\n", keywords.c_str(), web_edit_button(ch, "keywords", "web").c_str());
+    ptc(ch, "{WСкрытые алиасы (aka){x: [{C%s{x] %s\r\n", aka.c_str(), web_edit_button(ch, "aka", "web").c_str());
+    ptc(ch, "{WУровень{x:              [{C%d{x]\r\n", level.getValue());
+    ptc(ch, "{WЗаголовок{x:            [{C%s{x]\r\n", title.c_str());
+    ptc(ch, "{DАвтозаголовок:        [%s]\r\n", autotitle.c_str());
     ptc(ch, "{WТекст{x: %s\r\n%s\r\n", 
         web_edit_button(ch, "text", "web").c_str(),
         text.c_str());
@@ -125,22 +128,12 @@ HEDIT(show, "показать", "показать все поля")
 
 HEDIT(keywords, "ключевые", "установить или очистить дополнительные ключевые слова")
 {
-    if (!*argument) {
-        stc("Синтаксис:   keywords 'long keyword' shortkeyword\n\r", ch);
-        stc("             keywords clear\n\r", ch);
-        return false;
-    }
+    return editor(argument, keywords, (editor_flags)(ED_HELP_HINTS|ED_UPPERCASE|ED_NO_NEWLINE));
+}
 
-    if (arg_oneof_strict(argument, "clear", "очистить")) {
-        keywords.clear();
-        stc("Ключевые слова очищены.\r\n", ch);
-        return true;
-    }
-
-    keywords = argument;
-    keywords.toUpper();
-    ptc(ch, "Новые ключевые слова: %s\n\r", keywords.c_str());
-    return true;
+HEDIT(aka, "скрытые", "установить или очистить скрытые алиасы")
+{
+    return editor(argument, aka, (editor_flags)(ED_HELP_HINTS|ED_UPPERCASE|ED_NO_NEWLINE));
 }
 
 HEDIT(title, "заголовок", "установить или очистить заголовок вместо автоматического")

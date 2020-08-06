@@ -6,7 +6,10 @@
 #include "pcharacter.h"
 #include "pcharactermanager.h"
 #include "regexp.h"
+#include "dreamland.h"
+#include "comm.h"
 
+HOMETOWN(frigate);
 void password_set( PCMemoryInterface *pci, const DLString &plainText );
 
 CMDADM( idelete )
@@ -18,6 +21,47 @@ CMDADM( idelete )
         ch->println( "Удалить чей профайл?" );
         return;
     }
+
+    if (name == "idle" && ch->isCoder()) {
+        ostringstream buf;
+        list<PCMemoryInterface *> victims;
+
+        buf << "Удаляю персонажей 1го уровня на Фрегате, не заходивших год:" << endl;
+        
+        for (auto &pair: PCharacterManager::getPCM()) {
+            PCMemoryInterface *pc = pair.second;
+            if (pc->getRemorts().size() > 0)
+                continue;
+
+            if (pc->getLevel() != 1)
+                continue;
+
+            if (pc->getHometown() != home_frigate)
+                continue;
+            
+            const time_t lastAccessDate = pc->getLastAccessTime( ).getTime( );
+            const time_t currentDate = dreamland->getCurrentTime( );
+            const time_t diff = Date::SECOND_IN_YEAR;
+            if (currentDate <= lastAccessDate + diff)
+                continue;
+
+            if (pc->isOnline())    
+                continue;
+
+            victims.push_back(pc);
+        }
+
+        for (auto &pc: victims) {
+            if (PCharacterManager::pfDelete(pc->getName()))
+                buf << "УДАЛЕН " << pc->getName() << ": " << pc->getLastAccessTime().getTimeAsString() << endl;
+            else
+                buf << "{RОШИБКА{x " << pc->getName() << ": " << pc->getLastAccessTime().getTimeAsString() << endl;
+        }
+
+        page_to_char(buf.str().c_str(), ch);
+        return;
+    }	    	
+
 
     if (!( pci = PCharacterManager::find( name ) )) {
         ch->println( "Персонаж с таким именем не найден." );

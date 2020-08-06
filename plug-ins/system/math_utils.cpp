@@ -1,3 +1,7 @@
+#include <string>
+#include <sstream>
+
+using namespace std;
 
 float linear_interpolation(float x, float x1, float x2, float y1, float y2 )
 {
@@ -8,5 +12,17 @@ float linear_interpolation(float x, float x1, float x2, float y1, float y2 )
 }
 
 
+/** Generate random alnum string of given length. */
+string create_nonce(int len)
+{
+    ostringstream buf;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
 
-
+    for (int i = 0; i < len; ++i) {
+        buf << alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return buf.str();
+}

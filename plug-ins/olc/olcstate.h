@@ -30,7 +30,9 @@ typedef enum {
     ED_UPPER_FIRST_CHAR=1,
     ED_NO_NEWLINE=2,
     ED_ADD_NEWLINE=4,
-    ED_HELP_HINTS=8
+    ED_HELP_HINTS=8,
+    ED_UPPERCASE=16,
+    ED_JSON=32
 } editor_flags;
 
 class OLCCommand : public CommandBase {

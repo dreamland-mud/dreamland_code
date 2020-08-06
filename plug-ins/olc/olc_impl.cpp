@@ -12,6 +12,7 @@
 #include "redit.h"
 #include "medit.h"
 #include "oedit.h"
+#include "fedit.h"
 #include "sedit.h"
 #include "eeedit.h"
 #include "reledit.h"
@@ -47,6 +48,7 @@ extern "C"
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateMobile> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateObject> >( ppl );
         Plugin::registerPlugin<InputHandlerRegistrator<OLCStateExtraExit> >( ppl );
+        Plugin::registerPlugin<InputHandlerRegistrator<OLCStateFile> >( ppl );
         Plugin::registerPlugin<MocRegistrator<XMLVnumRange> >( ppl );
         Plugin::registerPlugin<XMLAttributeRegistrator<XMLAttributeOLC> >( ppl );
 

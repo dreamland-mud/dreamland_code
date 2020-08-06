@@ -10,7 +10,8 @@ $(INCLUDES_SRC) \
 -I$(top_srcdir)/plug-ins/loadsave \
 -I$(top_srcdir)/plug-ins/occupations \
 -I$(top_srcdir)/plug-ins/follow/core \
--I$(top_srcdir)/plug-ins/interpret
+-I$(top_srcdir)/plug-ins/interpret \
+-I/usr/include/jsoncpp
 
 libfight_core_la_SOURCES = \
 damageflags.cpp \
@@ -37,7 +38,8 @@ libfight_core_la_LIBADD = \
 ../system/libsystem.la \
 ../occupations/liboccupations.la \
 ../system/libscheduler_task_round.la \
-../interpret/libinterpret.la
+../interpret/libinterpret.la \
+-ljsoncpp
 
 damageflags.cpp: damageflags.conf damageflags.h
 damageflags.h: damageflags.conf

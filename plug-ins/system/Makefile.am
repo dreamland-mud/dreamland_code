@@ -41,7 +41,8 @@ areabehaviorplugin.cpp \
 roombehaviorplugin.cpp \
 fenia_utils.cpp \
 math_utils.cpp \
-calendar_utils.cpp
+calendar_utils.cpp \
+configurable.cpp
 
 libsystem_la_MOC = \
 schedulertaskattributemanager.h \
