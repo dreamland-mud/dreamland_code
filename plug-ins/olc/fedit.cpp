@@ -38,7 +38,7 @@ OLCStateFile::~OLCStateFile()
 void OLCStateFile::commit() 
 {
     Configurable::Pointer original = configReg->get(path);
-    original->setText(text);
+    original->refresh(text);
 
     if (owner)
         owner->character->println("Изменения сохранены на диск.");
@@ -66,9 +66,8 @@ void OLCStateFile::show( PCharacter *ch ) const
 bool OLCStateFile::validate(PCharacter *ch) const
 {
     ostringstream errbuf;
-    Configurable::Pointer original = configReg->get(path);
 
-    if (!original->validate(text, errbuf)) {
+    if (!json_validate_text(text, errbuf)) {
         ch->println("Ошибка парсинга JSON:");
         ch->println(errbuf.str());
         ch->println("Отредактируйте текст еще раз ({y{hctext web{x) или отмените изменения ({y{hccancel{x).");

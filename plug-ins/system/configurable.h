@@ -13,18 +13,27 @@
 
 namespace Json { class Value; }
 
+/** Attempt to parse JSON contained within a string, recording error messages in the buffer.
+ *  Return true if parsing is successful.
+ */
+bool json_validate_text(const DLString &text, ostringstream &errbuf);
+
 class Configurable: public virtual Plugin {
 public:
     typedef ::Pointer<Configurable> Pointer;
 
     virtual void initialization();
     virtual void destruction();
-    virtual const DLString & getPath() const = 0;
     virtual void loaded(Json::Value) { }
     virtual void unloaded() { }
+
+    void refresh(const DLString &text);
     DLString getText() const;
-    void setText(const DLString &text);
-    bool validate(const DLString &text, ostringstream &errbuf) const;
+    DLString getAbsolutePath() const;
+    const DLString & getPath() const { return path; }
+
+protected:
+    DLString path;
 };
 
 class ConfigurableRegistry: public OneAllocate, public Plugin {
@@ -53,18 +62,10 @@ public:
     typedef ::Pointer<ConfigurableTemplate> Pointer;
     
     ConfigurableTemplate( ) {
-        _path = DLFile(folder,file).getPath();
+        path = DLFile(folder,file).getPath();
     }
 
-    virtual const DLString & getPath() const {
-        return _path;
-    }
-
-    virtual void loaded(Json::Value) {         
-    }
-
-    virtual void unloaded() { 
-    }
+    virtual void loaded(Json::Value) {  }
 
 protected:
     virtual void initialization( ) 
@@ -77,16 +78,12 @@ protected:
         Configurable::destruction( );
         ClassSelfRegistratorPlugin<tn>::destruction( );
     }
-    virtual void fromXML( const XMLNode::Pointer& node )  {
-    }
-    virtual bool toXML( XMLNode::Pointer& node ) const {
-        return false;
-    }
+    virtual void fromXML( const XMLNode::Pointer& node )  { }
+    virtual bool toXML( XMLNode::Pointer& node ) const { return false; }
     
 private:
     static const char *file;
     static const char *folder;
-    DLString _path;
 };
 
 #define CONFIGURABLE_DUMMY(x)         config_ ##x## _TypeName

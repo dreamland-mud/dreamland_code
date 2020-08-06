@@ -6,83 +6,61 @@
 #include "dreamland.h"
 #include "dlfilestream.h"
 
-void Configurable::initialization()
+DLString Configurable::getAbsolutePath() const
 {
     DLFile file(dreamland->getTableDir(), getPath(), ".json");
-    if (!file.exist()) {
-        LogStream::sendError() << "Configurable file not found: " << file.getAbsolutePath() << endl;
-        return;
-    }
+    return file.getAbsolutePath();
+}
 
-    Json::Value value;
+void Configurable::initialization()
+{
     try {
-        ifstream ifs(file.getAbsolutePath());
+        Json::Value value;
+
+        ifstream ifs(getAbsolutePath());
         ifs >> value;
+
+        loaded(value);
+        LogStream::sendNotice() << "Configurable " << getPath() << " loaded with " << value.size() << " entries." << endl;
+
+        configReg->add(Pointer(this));
+
     } catch (const std::exception &ex) {
-        LogStream::sendError() << "Configurable " << getPath() << " error: " << ex.what() << endl;
-        return;
+        LogStream::sendError() << ex.what() << endl;
     }
+}
 
-    loaded(value);
+void Configurable::refresh(const DLString &text)
+{
+    try {
+        ofstream ofs(getAbsolutePath());
+        ofs << text;
+        
+        Json::Value value;
+        Json::Reader reader;
+        reader.parse(text, value);
 
-    LogStream::sendNotice() << "Loaded " << getPath() << ".json with " << value.size() << " values" << endl;
+        loaded(value);
 
-    configReg->add(Pointer(this));
+        LogStream::sendNotice() << "Configurable " << getPath() << " updated with " << value.size() << " entries." << endl;
+
+    } catch (const std::exception &ex) {
+        LogStream::sendError() << getPath() << ":" << ex.what() << endl;
+    }
 }
 
 DLString Configurable::getText() const
 {
-    ostringstream text;
-
     try {
-        DLFileStream fs(dreamland->getTableDir(), getPath(), ".json");
-        fs.toStream(text);
+        ifstream ifs(getAbsolutePath());
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        return buffer.str();
 
     } catch (const std::exception &ex) {
-        LogStream::sendError() << "Configurable " << getPath() << " error: " << ex.what() << endl;
-        text << "ERROR: " << ex.what() << endl;
+        LogStream::sendError() << getPath() << ":" << ex.what() << endl;
+        return "ERROR";
     }
-
-    return text.str();
-}
-
-bool Configurable::validate(const DLString &text, ostringstream &errbuf) const
-{
-    try {
-        Json::Value value;
-        Json::Reader reader;
-
-        if (reader.parse(text, value))
-            return true;
-
-        errbuf << reader.getFormattedErrorMessages();
-
-    } catch (const std::exception &ex) {
-        errbuf << ex.what();
-    }
-
-    return false;
-}
-
-void Configurable::setText(const DLString &text)
-{
-    Json::Value value;
-
-    try {
-        DLFileStream fs(dreamland->getTableDir(), getPath(), ".json");
-        fs.fromString(text);
-
-        Json::Reader reader;
-        reader.parse(text, value);
-
-    } catch (const std::exception &ex) {
-        LogStream::sendError() << "Configurable " << getPath() << " error: " << ex.what() << endl;
-        return;
-    }
-
-    loaded(value);
-
-    LogStream::sendNotice() << "Configurable " << getPath() << " updated with new data." << endl;
 }
 
 void Configurable::destruction()
@@ -160,3 +138,21 @@ void ConfigurableRegistry::destruction()
 
 PluginInitializer<ConfigurableRegistry> initConfigurableRegistry;
 
+
+bool json_validate_text(const DLString &text, ostringstream &errbuf)
+{
+    try {
+        Json::Value value;
+        Json::Reader reader;
+
+        if (reader.parse(text, value))
+            return true;
+
+        errbuf << reader.getFormattedErrorMessages();
+
+    } catch (const std::exception &ex) {
+        errbuf << ex.what();
+    }
+
+    return false;  
+}
