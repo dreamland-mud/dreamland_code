@@ -27,6 +27,7 @@
 #include "subr.h"
 
 #include "material.h"
+#include "damageflags.h"
 #include "def.h"
 
 using namespace std;
