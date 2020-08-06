@@ -26,7 +26,8 @@ security.cpp \
 webedit.cpp \
 orandom.cpp \
 argparser.cpp \
-feniatriggers.cpp 
+feniatriggers.cpp \
+fedit.cpp
 
 libolc_la_MOC = \
 redit.h \
@@ -39,7 +40,8 @@ sedit.h \
 oedit.h \
 eeedit.h \
 security.h \
-olcstate.h 
+olcstate.h \
+fedit.h
 
 
 include $(top_srcdir)/plug-ins/Makefile.inc

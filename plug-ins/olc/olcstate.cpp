@@ -688,6 +688,8 @@ bool OLCState::editorWeb(const DLString &original, const DLString &saveCommand, 
 
     if (IS_SET(flags, ED_HELP_HINTS))
         interpret_raw(ch, "webedit", "help");
+    else if (IS_SET(flags, ED_JSON))
+        interpret_raw(ch, "webedit", "json");
     else
         interpret_raw(ch, "webedit");
         

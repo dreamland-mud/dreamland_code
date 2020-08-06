@@ -37,7 +37,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
     bitnumber_t minFlag  = myargs.wclass == -1 ? 0 : myargs.wclass;
     bitnumber_t maxFlag  = myargs.wclass == -1 ? WEAPON_MAX-1 : myargs.wclass;
 
-    buf << dlprintf("{C%15s{x {WLVL  V1  V2  AVE  REAL{x\r\n", "");
+    buf << dlprintf("{C%15s{x {WLVL  V1  V2  AVE  REAL  DR{x\r\n", "");
 
     for (bitnumber_t f = minFlag; f <= maxFlag; f++) {
         for (int t = minTier; t <= maxTier; t++) {
@@ -47,10 +47,11 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
                 int v2 = weapon_value2(f);
                 int ave = weapon_ave(l, t);
                 int real_ave = (v2 + 1) * v1 / 2;
+                int dr = weapon_damroll(l, t);
 
                 if (l != minLevel)
                     buf << dlprintf("%15s ", "");
-                buf << dlprintf("{C%3d{w  %2d  %2d  %3d   %3d\r\n", l, v1, v2, ave, real_ave);
+                buf << dlprintf("{C%3d{w  %2d  %2d  %3d   %3d  %2d\r\n", l, v1, v2, ave, real_ave, dr);
             }
         }
     }
