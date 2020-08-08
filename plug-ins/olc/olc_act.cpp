@@ -39,7 +39,6 @@
 #include "damageflags.h"
 #include "recipeflags.h"
 #include "religionflags.h"
-#include "material.h"
 #include "def.h"
 
 GROUP(defensive);
@@ -57,7 +56,6 @@ struct olc_help_type {
 int skill_table;
 int wearloc_table;
 int liq_table;
-int mat_table;
 int group_table;
 int race_table;
 int class_table;
@@ -88,7 +86,6 @@ const struct olc_help_type help_table[] =
     {"drink_flags", &drink_flags, "Флаги емкости для жидкостей (поле value3)."},
     {"recipe_flags", &recipe_flags, "Флаги рецептов (поле value0 у рецепта)"},
     {"liquid", &liq_table, "Жидкости (поле value2 у емкостей и фонтанов)."},
-    {"material", &mat_table, "Материалы предметов и мобов (поле material)." },
 
     {"{YМобы и персонажи{x", NULL, NULL},
     {"races", &race_table, "Список всех рас мобов."},
@@ -198,21 +195,6 @@ void show_spec_cmds(Character * ch)
     stc(buf1, ch);
 }
 
-void show_mat_cmds( Character *ch )
-{
-    ostringstream buf;
-    const material_t *mat;
-    
-    buf << "{gНазвание        Описание               Горючесть{x" << endl;
-    for (mat = &material_table[0]; mat->name; mat++)
-        buf << fmt( 0, "%-15s %-22N1 %-3d\n\r", 
-                       mat->name, 
-                       mat->rname ? mat->rname : "",
-                       mat->burns );
-
-    page_to_char( buf.str( ).c_str( ), ch );
-}
-
 void show_liq_cmds(Character * ch)
 {
     std::basic_ostringstream<char> buf;
@@ -274,10 +256,6 @@ bool show_help(Character * ch, const char *cargument)
             }
             else if (help_table[cnt].structure == &liq_table) {
                 show_liq_cmds(ch);
-                return false;
-            }
-            else if (help_table[cnt].structure == &mat_table) {
-                show_mat_cmds(ch);
                 return false;
             }
             else if (help_table[cnt].structure == &wearloc_table) {

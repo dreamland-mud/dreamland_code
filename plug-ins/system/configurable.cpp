@@ -5,6 +5,10 @@
 #include "configurable.h"
 #include "dreamland.h"
 #include "dlfilestream.h"
+#include "iconvmap.h"
+
+static IconvMap utf2koi("utf-8", "koi8-r");
+static IconvMap koi2utf("koi8-r", "utf-8");
 
 DLString Configurable::getAbsolutePath() const
 {
@@ -15,10 +19,11 @@ DLString Configurable::getAbsolutePath() const
 void Configurable::initialization()
 {
     try {
+        DLString text = getText();
+        
         Json::Value value;
-
-        ifstream ifs(getAbsolutePath());
-        ifs >> value;
+        Json::Reader reader;
+        reader.parse(text, value);
 
         loaded(value);
         LogStream::sendNotice() << "Configurable " << getPath() << " loaded with " << value.size() << " entries." << endl;
@@ -26,7 +31,7 @@ void Configurable::initialization()
         configReg->add(Pointer(this));
 
     } catch (const std::exception &ex) {
-        LogStream::sendError() << ex.what() << endl;
+        LogStream::sendError() << getPath() << ex.what() << endl;
     }
 }
 
@@ -34,7 +39,7 @@ void Configurable::refresh(const DLString &text)
 {
     try {
         ofstream ofs(getAbsolutePath());
-        ofs << text;
+        ofs << koi2utf(text);
         
         Json::Value value;
         Json::Reader reader;
@@ -55,7 +60,7 @@ DLString Configurable::getText() const
         ifstream ifs(getAbsolutePath());
         std::stringstream buffer;
         buffer << ifs.rdbuf();
-        return buffer.str();
+        return utf2koi(buffer.str());
 
     } catch (const std::exception &ex) {
         LogStream::sendError() << getPath() << ":" << ex.what() << endl;

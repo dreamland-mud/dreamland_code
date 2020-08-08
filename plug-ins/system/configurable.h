@@ -9,6 +9,7 @@
 #include "class.h"
 #include "classselfregistratorplugin.h"
 #include "plugininitializer.h"
+#include "flags.h"
 #include "dlfile.h"
 
 namespace Json { class Value; }
@@ -99,7 +100,43 @@ PluginInitializer<CONFIGURABLE(x)> config_ ##x## _init(INITPRIO_NORMAL);
 CONFIGURABLE_DECL(collection,x) \
 template <> void CONFIGURABLE(x)::loaded( Json::Value value )
 
+template <typename S>
+struct json_vector : public vector<S> {
+    void fromJson(const Json::Value &value) 
+    {
+        this->clear();
+        this->resize(value.size());
+        for (unsigned int i = 0; i < value.size(); i++) {
+            this->emplace(this->begin() + i);
+            this->at(i).fromJson(value[i]);
+        }
+    }
+};
 
+class Flags;
+template <const FlagTable *_table>
+struct json_flag : public Flags {
+    json_flag() 
+        : Flags(0, _table)
+    {
+    }
+
+    void fromJson(const Json::Value &value) 
+    {
+        bitstring_t b;
+        DLString valueString = value.asString();
+
+        if (valueString.empty())
+            return;
+            
+        if (table->enumerated)
+            b = table->value(value.asString());
+        else
+            b = table->bitstring(value.asString());
+
+        this->setValue(b);
+    }
+};
 
 
 #endif
