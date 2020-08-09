@@ -25,6 +25,7 @@
 #include "merc.h"
 #include "act.h"
 #include "comm.h"
+#include "weapons.h"
 #include "handler.h"
 #include "mercdb.h"
 #include "def.h"
@@ -380,7 +381,7 @@ public:
             DLString special = weapon_type2.messages( pObj->value[4] );
             int d1 = pObj->value[1];
             int d2 = pObj->value[2];
-            int ave = (1 + pObj->value[2]) * pObj->value[1] / 2; 
+            int ave = weapon_ave(pObj);
             
             // Format object name.
             DLString name = russian_case(pObj->short_descr, '1').toLower( );

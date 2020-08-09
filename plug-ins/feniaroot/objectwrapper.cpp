@@ -11,6 +11,7 @@
 #include "merc.h"
 #include "loadsave.h"
 #include "wearloc_utils.h"
+#include "weapons.h"
 #include "occupations.h"
 #include "mercdb.h"
 #include "grammar_entities_impl.h"
@@ -380,9 +381,7 @@ NMI_GET( ObjectWrapper, weight, "вес предмета")
 NMI_GET( ObjectWrapper, ave, "среднее повреждение оружия или 0")
 {
     checkTarget( );
-    if (target->item_type == ITEM_WEAPON)
-        return Register((1 + target->value2()) * target->value1() / 2);
-    return Register(0);
+    return weapon_ave(target);
 }
 
 #define SETGETVALUE(x) \

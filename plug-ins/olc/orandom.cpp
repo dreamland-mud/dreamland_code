@@ -4,6 +4,7 @@
 #include "security.h"
 #include "argparser.h"
 #include "weapons.h"
+#include "math_utils.h"
 #include "comm.h"
 #include "act.h"
 #include "def.h"
@@ -46,7 +47,7 @@ CMD(orandom, 50, "орандом", POS_DEAD, 103, LOG_ALWAYS,
                 int v1 = weapon_value1(l, t, f);
                 int v2 = weapon_value2(f);
                 int ave = weapon_ave(l, t);
-                int real_ave = (v2 + 1) * v1 / 2;
+                int real_ave = dice_ave(v1, v2);
                 int dr = weapon_damroll(l, t);
 
                 if (l != minLevel)

@@ -34,6 +34,7 @@
 #include "gsn_plugin.h"
 #include "../anatolia/handler.h"
 #include "comm.h"
+#include "math_utils.h"
 #include "recipeflags.h"
 #include "act_move.h"
 #include "act_lock.h"
@@ -961,8 +962,7 @@ SKILL_RUNP( lore )
                   );
 
         sprintf(buf,"Повреждения %dd%d (среднее %d).\n\r",
-                value1,value2,
-                (1 + value2) * value1 / 2);
+                value1,value2, dice_ave(value1, value2));
       ch->send_to(buf);
       if (learned > 85){
 	if(obj->value3()) // damage type

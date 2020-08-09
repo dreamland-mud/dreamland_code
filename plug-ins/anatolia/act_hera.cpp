@@ -80,6 +80,7 @@
 #include "wiznet.h"
 #include "def.h"
 #include "handler.h"
+#include "weapons.h"
 #include "act_move.h"
 #include "vnum.h"
 
@@ -340,7 +341,7 @@ CMDRUNP( auction )
                                 ch->printf("Тип оружия: %s (%s), среднее повреждение %d.\r\n",
                                            weapon_class.message(obj->value0() ).c_str( ),
                                            weapon_class.name( obj->value0() ).c_str( ),
-                                          (1 + obj->value2()) * obj->value1() / 2);
+                                           weapon_ave(obj));
                         }
 
                         if (obj->timer != 0) {
