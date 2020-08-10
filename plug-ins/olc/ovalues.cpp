@@ -14,6 +14,7 @@
 #include "loadsave.h"
 #include "recipeflags.h"
 #include "act_lock.h"
+#include "weapons.h"
 #include "liquid.h"
 #include "def.h"
 
@@ -31,7 +32,6 @@ static int skill_lookup( const DLString &name )
 void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
 {
     char buf[MAX_STRING_LENGTH];
-    int ave;
 
     switch (obj->item_type) {
     default:
@@ -163,10 +163,9 @@ void show_obj_values(Character * ch, OBJ_INDEX_DATA * obj)
     case ITEM_WEAPON:
         ptc(ch, "[v0] Вид оружия:   %s {D(? weapon_class){x\n\r",
             weapon_class.name(obj->value[0]).c_str());
-        ave = (obj->value[2] + 1) * obj->value[1] / 2;
         ptc(ch, "[v1] Число бросков кубика: [%u]\n\r", obj->value[1]);
         ptc(ch, "[v2] Число граней кубика : [%u] {D(повреждения %ud%u, среднее %u = (v2+1)*v1/2){x\r\n", 
-                       obj->value[2], obj->value[1], obj->value[2], ave);
+                       obj->value[2], obj->value[1], obj->value[2], weapon_ave(obj));
         ptc(ch, "[v3] Тип удара:    %s {D(? weapon_flags){x\n\r",
             weapon_flags.name(obj->value[3]).c_str());
         ptc(ch, "[v4] Флаги оружия: %s {D(? weapon_type2){x\n\r",

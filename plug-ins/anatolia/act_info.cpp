@@ -86,6 +86,7 @@
 #include "merc.h"
 #include "descriptor.h"
 #include "comm.h"
+#include "weapons.h"
 #include "colour.h"
 #include "mudtags.h"
 #include "websocketrpc.h"
@@ -585,15 +586,8 @@ CMDRUNP( compare )
             break;
 
         case  ITEM_WEAPON:
-            if (obj1->pIndexData->new_format)
-                value1 = (1 + obj1->value2()) * obj1->value1();
-            else
-                    value1 = obj1->value1() + obj1->value2();
-
-            if (obj2->pIndexData->new_format)
-                value2 = (1 + obj2->value2()) * obj2->value1();
-            else
-                    value2 = obj2->value1() + obj2->value2();
+            value1 = weapon_ave(obj1);
+            value2 = weapon_ave(obj2);
             break;
         }
     }
@@ -2829,7 +2823,7 @@ void lore_fmt_item( Character *ch, Object *obj, ostringstream &buf, bool showNam
             << "(" << weapon_class.name( obj->value0() ) << "), ";
         
         buf << "повреждения " << obj->value1() << "d" << obj->value2() << " "
-            << "(среднее " << (1 + obj->value2()) * obj->value1() / 2 << ")" << endl;
+            << "(среднее " << weapon_ave(obj) << ")" << endl;
 		    
         if (obj->value3())  /* weapon damtype */
             buf << "Тип повреждений: " << attack_table[obj->value3()].noun << endl;		    

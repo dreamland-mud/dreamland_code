@@ -79,6 +79,7 @@
 #include "desire.h"
 #include "helpmanager.h"
 #include "comm.h"
+#include "weapons.h"
 #include "badnames.h"
 #include "wiznet.h"
 #include "mercdb.h"
@@ -240,8 +241,7 @@ char arg[MAX_STRING_LENGTH];
                 
         if (obj->pIndexData->new_format)
             fprintf(fp,"Урон %dd%d (среднее %d).\n",
-                obj->value1(),obj->value2(),
-                (1 + obj->value2()) * obj->value1() / 2);
+                obj->value1(),obj->value2(), weapon_ave(obj));
         else
             fprintf( fp, "Урон от %d до %d (среднее %d).\n",
                     obj->value1(), obj->value2(),
@@ -1148,12 +1148,8 @@ CMDWIZP( stat )
                 ch->send_to(weapon_class.name(obj->value0()).c_str( ));
                 ch->send_to("\n");
                 
-                if (obj->pIndexData->new_format)
-                        sprintf(buf,"Урон %dd%d (среднее %d)\n\r",
-                                obj->value1(),obj->value2(),(1 + obj->value2()) * obj->value1() / 2);
-                else
-                        sprintf( buf, "Урон от %d до %d (среднее %d)\n\r",
-                                obj->value1(), obj->value2(),( obj->value1() + obj->value2() ) / 2 );
+                sprintf(buf,"Урон %dd%d (среднее %d)\n\r",
+                        obj->value1(),obj->value2(),weapon_ave(obj));
                 ch->send_to(buf);
 
                 sprintf(buf,"Тип удара: %s.\n\r", weapon_flags.name(obj->value3()).c_str( ));

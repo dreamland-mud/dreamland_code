@@ -26,3 +26,9 @@ string create_nonce(int len)
     }
     return buf.str();
 }
+
+int dice_ave(int d1, int d2)
+{
+    return (d2 + 1) * d1 / 2;
+}
+

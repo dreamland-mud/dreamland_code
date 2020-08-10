@@ -11,6 +11,7 @@
 #include "character.h"
 #include "configurable.h"
 
+#include "math_utils.h"
 #include "itemflags.h"
 #include "merc.h"
 #include "def.h"
@@ -116,6 +117,22 @@ CONFIGURABLE_LOADED(fight, weapon_damroll_tiers)
     weapon_damroll_tiers = value;
 }
 
+int weapon_ave(Object *wield)
+{
+    if (wield->item_type == ITEM_WEAPON)
+        return dice_ave(wield->value1(), wield->value2());
+    else
+        return 0;
+}
+
+int weapon_ave(struct obj_index_data *pWield)
+{
+    if (pWield->item_type == ITEM_WEAPON)
+        return dice_ave(pWield->value[1], pWield->value[2]);
+    else
+        return 0;
+}
+
 int weapon_ave(int level, int tier)
 {
     if (tier <= 0 || tier > (int)weapon_ave_tiers.size()) {
@@ -168,8 +185,15 @@ int weapon_value1(int level, int tier, bitnumber_t wclass)
     if (value2 <= 0)
         return 0;
 
-    float value1 = 2 * ave / (value2 + 1);
-    return ceil(value1);
+    // Calculate value1 based on desired average damage and fixed value2.
+    float value1_float = 2 * ave / (value2 + 1);
+    int value1 = ceil(value1_float);
+    // Calculate resulting average for a weapon with these values.
+    int real_ave = dice_ave(value1, value2);
+    // If resulting average differs from a desired one by more than 1, increase value1.
+    int value1_adjustment = real_ave + 1 < ave ? 1 : 0;
+
+    return value1 + value1_adjustment;
 }
 
 int weapon_damroll(int level, int tier)
