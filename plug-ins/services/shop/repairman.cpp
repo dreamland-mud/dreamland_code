@@ -16,6 +16,8 @@
 #include "npcharacter.h"
 #include "object.h"
 
+#include "skillreference.h"
+
 #include "act.h"
 #include "interp.h"
 #include "handler.h"
@@ -23,6 +25,9 @@
 #include "mercdb.h"
 #include "vnum.h"
 #include "def.h"
+
+GSN(haggle);
+RELIG(fili);
 
 static void mprog_repair( Character *mob, Character *client, Object *obj, int cost )
 {
@@ -70,7 +75,7 @@ bool Repairman::specIdle( )
 void Repairman::doRepair( Character *client, const DLString &cArgs )
 {
     Object *obj;
-    int cost;
+    int cost, roll;
     DLString args = cArgs, arg;
     
     arg = args.getOneArgument( );
@@ -95,6 +100,18 @@ void Repairman::doRepair( Character *client, const DLString &cArgs )
     if (cost > client->gold) {
         say_act( client, ch, "У тебя не хватит денег, чтоб оплатить ремонт этой вещи.");
         return;
+    }
+
+    /* haggle */
+    if(cost > 1){
+        bool bonus = client->getReligion() == god_fili && get_eq_char(client, wear_tattoo) != 0;
+        roll = bonus ? 100 : number_percent( );
+        if ( bonus || (roll < gsn_haggle->getEffective(client)) )
+        {
+            cost -= cost / 2 * roll / 100;
+            act_p( "Ты торгуешься с $C5.", client, 0, this->getChar(), TO_CHAR, POS_RESTING );
+            gsn_haggle->improve( client, true );
+        }
     }
 
     client->setWaitViolence( 1 );
