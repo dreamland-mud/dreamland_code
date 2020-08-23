@@ -294,7 +294,7 @@ COMMAND(ChannelsCommand, "channels")
 {
     ostringstream buf;
     Channels::iterator c;
-    bool rus = ch->getConfig( )->rucommands;
+    bool rus = ch->getConfig( ).rucommands;
     
     buf << "   канал     статус  " << endl
         << "---------------------" << endl;

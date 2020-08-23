@@ -100,7 +100,7 @@ DLString XMLAttributeSelfRate::getRateAlias( PCharacter *looker ) const
     ostringstream buf;
 
     if (looker) {
-        buf << (looker->getConfig()->rucommands ? rate_alias_ru[r] : rate_alias[r]);
+        buf << (looker->getConfig().rucommands ? rate_alias_ru[r] : rate_alias[r]);
     } else {
         buf << "{lE" << rate_alias[r] << "{lR" << rate_alias_ru[r] << "{lx";
     }

@@ -126,7 +126,7 @@ static void scan_people( Room *room, Character *ch, int depth, int door,
 {
     Character *rch, *orig;
     bool found;
-    bool fRus = ch->getConfig( )->ruexits;
+    bool fRus = ch->getConfig( ).ruexits;
 
     found = false;
     
@@ -170,7 +170,7 @@ static Room * scan_room( Room *start_room, Character *ch, int depth, int door,
 {
     EXIT_DATA *pExit;
     Room *room;
-    bool fRus = ch->getConfig( )->ruexits;
+    bool fRus = ch->getConfig( ).ruexits;
 
     pExit = start_room->exit[door];
     

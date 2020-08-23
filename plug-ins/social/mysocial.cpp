@@ -186,7 +186,7 @@ void MySocial::doList( Character *ch, XMLAttributeCustomSocials::Pointer attr )
         return;
     }
     
-    bool fRus = ch->getConfig( )->rucommands;
+    bool fRus = ch->getConfig( ).rucommands;
 
     buf << "{W----------------+--------------------------------------------------------------{x" << endl;
       

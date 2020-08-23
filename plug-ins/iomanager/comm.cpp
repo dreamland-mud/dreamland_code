@@ -262,7 +262,7 @@ Descriptor * descriptor_find_named( Descriptor *myD, const DLString &myName, int
  */
 void do_help( Character *ch, const char *topic )
 {
-    do_help( ch->desc, topic, ch->getConfig( )->color );
+    do_help( ch->desc, topic, ch->getConfig( ).color );
 }
 
 void do_help( Descriptor *d, const char *topic, bool fColor )

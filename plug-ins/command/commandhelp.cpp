@@ -123,7 +123,7 @@ void CommandHelpFormatter::reset( )
 void CommandHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-        fRusCmd = ch->getConfig( )->rucommands;
+        fRusCmd = ch->getConfig( ).rucommands;
     }
     
     HelpFormatter::setup( ch );

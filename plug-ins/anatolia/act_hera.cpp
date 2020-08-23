@@ -108,7 +108,7 @@ void talk_auction(const char *argument)
         if (IS_SET(ch->getPC( )->comm, COMM_NOAUCTION))
             continue;
     
-        bool fRussian = ch->getConfig()->rucommands;
+        bool fRussian = ch->getConfig().rucommands;
         ch->pecho(POS_SLEEPING, fRussian ? msg_ru.c_str() : msg_en.c_str());
     }
 }

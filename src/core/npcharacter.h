@@ -77,7 +77,7 @@ public:
     virtual bool is_mirror( ) const;
 
     // configuration
-    virtual PlayerConfig::Pointer getConfig( ) const;
+    virtual PlayerConfig getConfig( ) const;
 
 public:
     MOB_INDEX_DATA *        pIndexData;

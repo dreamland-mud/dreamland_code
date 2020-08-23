@@ -354,7 +354,7 @@ const DLString & DefaultRace::getMltName( ) const
 }
 DLString DefaultRace::getNameFor( Character *looker, Character *me, const Grammar::Case &c ) const
 {
-    if (looker && me && looker->getConfig( )->rucommands) {
+    if (looker && me && looker->getConfig( ).rucommands) {
         if (me->getSex( ) == SEX_MALE)
             return getMaleName( ).ruscase( c );
         if (me->getSex( ) == SEX_FEMALE)

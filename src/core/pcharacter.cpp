@@ -679,7 +679,7 @@ using namespace Grammar;
 Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
 {
     const Character *wch = dynamic_cast<const Character *>(forWhom);
-    PlayerConfig::Pointer cfg = wch ? wch->getConfig( ) : PlayerConfig::Pointer( );
+    PlayerConfig cfg = wch ? wch->getConfig( ) : PlayerConfig();
     
     if (IS_SET(flags, FMT_DOPPEL))
         return getDoppel( wch )->toNoun( wch, REMOVE_BIT(flags, FMT_DOPPEL) );
@@ -693,7 +693,7 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
         }
                 
         if (is_vampire( ) && !wch->is_vampire( )) {
-            if (cfg->holy) 
+            if (cfg.holy) 
                 return cachedNoun.vampire2;
             else
                 return cachedNoun.vampire;
@@ -701,13 +701,13 @@ Noun::Pointer PCharacter::toNoun( const DLObject *forWhom, int flags ) const
     }
     
     if (IS_SET(flags, FMT_PRETITLE)) {
-        if (wch && !cfg->runames)
+        if (wch && !cfg.runames)
             return cachedNoun.pretitle;
         else
             return cachedNoun.pretitleRussian;
     }
     
-    if (wch && !cfg->runames)
+    if (wch && !cfg.runames)
         return cachedNoun.name;
     else
         return cachedNoun.russian;
@@ -881,7 +881,7 @@ short PCharacter::getModifyLevel( ) const
 /**************************************************************************
  * configuration 
  **************************************************************************/
-PlayerConfig::Pointer PCharacter::getConfig( ) const
+PlayerConfig PCharacter::getConfig( ) const
 {
-    return PlayerConfig::Pointer( NEW, this );
+    return PlayerConfig( this );
 }

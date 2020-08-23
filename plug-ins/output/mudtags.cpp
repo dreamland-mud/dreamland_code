@@ -50,12 +50,12 @@ protected:
 
 ColorTags::ColorTags( const char *text, Character *ch )
 {
-    PlayerConfig::Pointer cfg = ch ? ch->getConfig( ) : PlayerConfig::Pointer( );
+    PlayerConfig cfg = ch ? ch->getConfig( ) : PlayerConfig( );
     this->text = text;
     this->ch = ch;
 
     // Is colour enabled for this player?
-    my_color = ch ? cfg->color : true;
+    my_color = ch ? cfg.color : true;
     // Are we using ANSI escape sequences or HTML tags?
     my_ansi = !is_websock(ch);
     raw = false;
@@ -377,15 +377,15 @@ protected:
 
 VisibilityTags::VisibilityTags( const char *text, Character *ch )
 {
-    PlayerConfig::Pointer cfg = ch ? ch->getConfig( ) : PlayerConfig::Pointer( );
+    PlayerConfig cfg = ch ? ch->getConfig( ) : PlayerConfig( );
     this->text = text;
     this->ch = ch;
 
-    my_clang = (cfg && cfg->rucommands) ? LANG_RUSSIAN : LANG_ENGLISH;
+    my_clang = (cfg.rucommands) ? LANG_RUSSIAN : LANG_ENGLISH;
 
-    my_slang = (cfg && cfg->ruskills) ? LANG_RUSSIAN : LANG_ENGLISH;
+    my_slang = (cfg.ruskills) ? LANG_RUSSIAN : LANG_ENGLISH;
 
-    my_nlang = (cfg && cfg->runames) ? LANG_RUSSIAN : LANG_ENGLISH;
+    my_nlang = (cfg.runames) ? LANG_RUSSIAN : LANG_ENGLISH;
 
     my_sex = ch ? ch->getSex( ) : SEX_MALE;
 

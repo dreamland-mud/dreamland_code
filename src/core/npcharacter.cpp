@@ -298,11 +298,11 @@ bool NPCharacter::is_mirror( ) const
 /****************************************************************************
  * switched player configuration 
  ****************************************************************************/
-PlayerConfig::Pointer NPCharacter::getConfig( ) const
+PlayerConfig NPCharacter::getConfig( ) const
 {
     if (switchedFrom)
         return switchedFrom->getConfig( );
     else
-        return PlayerConfig::Pointer( NEW );
+        return PlayerConfig();
 }
 
