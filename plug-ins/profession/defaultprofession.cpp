@@ -394,7 +394,7 @@ GlobalBitvector DefaultProfession::toVector( Character * ) const
 
 DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
-    if (ch && ch->getConfig( )->rucommands)
+    if (ch && ch->getConfig( ).rucommands)
         return getRusName( ).ruscase( c );
     else
         return getName( );
@@ -402,7 +402,7 @@ DLString DefaultProfession::getNameFor( Character *ch, const Grammar::Case &c ) 
 
 DLString DefaultProfession::getWhoNameFor( Character *ch ) const
 {
-    if (ch && ch->getConfig( )->rucommands)
+    if (ch && ch->getConfig( ).rucommands)
         return whoNameRus;
     else
         return whoName;

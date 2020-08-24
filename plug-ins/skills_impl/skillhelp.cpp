@@ -23,7 +23,7 @@ const DLString SkillHelp::TYPE = "SkillHelp";
 
 void SkillHelp::getRawText( Character *ch, ostringstream &in ) const
 {
-    bool rus = ch->getConfig( )->ruskills;
+    bool rus = ch->getConfig( ).ruskills;
 
     in << skill_what(*skill).ruscase('1').upperFirstCharacter();
     if (rus)
@@ -75,10 +75,10 @@ void SkillHelpFormatter::reset( )
 void SkillHelpFormatter::setup( Character *ch )
 {
     if (ch) {
-        PlayerConfig::Pointer cfg = ch->getConfig( );
+        PlayerConfig cfg = ch->getConfig( );
 
-        fRusCmd = cfg->rucommands;
-        fRusSkill = cfg->ruskills;
+        fRusCmd = cfg.rucommands;
+        fRusSkill = cfg.ruskills;
     }
     
     HelpFormatter::setup( ch );

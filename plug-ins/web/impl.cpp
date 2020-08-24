@@ -258,7 +258,7 @@ Json::Value LocationWebPromptListener::jsonExits( Descriptor *d, Character *ch )
     Json::Value exits;
     exits["h"] = hidden.str( );
     exits["e"] = visible.str( );
-    exits["l"] = ch->getConfig( )->ruexits ? "r" : "e";
+    exits["l"] = ch->getConfig( ).ruexits ? "r" : "e";
     return exits;
 }    
 

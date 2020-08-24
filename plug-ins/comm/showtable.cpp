@@ -120,7 +120,7 @@ static Categories group_by_categories(Character *ch, int flags)
     Categories categories;
     list<Command::Pointer>::const_iterator c;
     const CommandList &commands = commandManager->getCommands( );
-    bool fRus = ch->getConfig( )->rucommands;
+    bool fRus = ch->getConfig( ).rucommands;
 
     categories["info"].push_back("?");
 

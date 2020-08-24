@@ -211,7 +211,7 @@ bool eyes_blinded( Character *ch )
     if (!IS_AFFECTED(ch, AFF_BLIND))
         return false;
         
-    if (ch->getConfig( )->holy)
+    if (ch->getConfig( ).holy)
         return false;
 
     return true;
@@ -222,7 +222,7 @@ bool eyes_darkened( Character *ch )
     if (!ch->in_room->isDark( ))
         return false;
 
-    if (ch->getConfig( )->holy)
+    if (ch->getConfig( ).holy)
         return false;
 
     if (ch->is_vampire() || IS_AFFECTED(ch, AFF_INFRARED))

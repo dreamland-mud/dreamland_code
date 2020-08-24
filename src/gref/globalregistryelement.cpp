@@ -46,3 +46,17 @@ bool GlobalRegistryElement::matchesUnstrict( const DLString &str ) const
     
     return false;
 }
+
+bool GlobalRegistryElement::matchesSubstring( const DLString &str ) const
+{
+    if (str.empty() || getName().empty())
+        return false;
+
+    if (getName().find(str) != DLString::npos)
+        return true;
+
+    if (getRussianName().find(str) != DLString::npos)
+        return true;
+
+    return false;
+}

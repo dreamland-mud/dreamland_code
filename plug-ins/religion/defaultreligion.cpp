@@ -208,7 +208,7 @@ const DLString& DefaultReligion::getNameFor( Character *looker ) const
     if (looker && looker->getSex() == SEX_FEMALE && !nameRusFemale.empty())
         return nameRusFemale;
         
-    if (looker && looker->getConfig( )->ruskills) 
+    if (looker && looker->getConfig( ).ruskills) 
         return nameRus;
 
     return shortDescr;

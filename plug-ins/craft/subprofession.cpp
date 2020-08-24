@@ -100,7 +100,7 @@ void CraftProfession::unloaded( )
 
 DLString CraftProfession::getNameFor( Character *ch, const Grammar::Case &c ) const
 {
-    if (ch && ch->getConfig( )->rucommands)
+    if (ch && ch->getConfig( ).rucommands)
         return getRusName( ).ruscase( c );
     else
         return getName( );

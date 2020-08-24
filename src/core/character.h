@@ -57,9 +57,7 @@ enum {
     FMT_PRETITLE = 4,
 };
 
-struct PlayerConfig : public virtual DLObject {
-    typedef ::Pointer<PlayerConfig> Pointer;
-
+struct PlayerConfig {
     PlayerConfig( );
     PlayerConfig( const PCharacter * );
 
@@ -214,7 +212,7 @@ public:
     void dismount( );
     
     // configuration
-    virtual PlayerConfig::Pointer getConfig( ) const = 0;
+    virtual PlayerConfig getConfig( ) const = 0;
 
 protected:
     XML_VARIABLE XMLLongLong ID;

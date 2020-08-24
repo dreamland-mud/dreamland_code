@@ -80,7 +80,7 @@ void CPractice::pracShow( PCharacter *ch )
     PracCategoryMap::iterator cm_iter;
     PracInfo info;
     DLString category;
-    bool fRussian = ch->getConfig( )->ruskills;
+    bool fRussian = ch->getConfig( ).ruskills;
     
     for (int sn = 0; sn < SkillManager::getThis( )->size( ); sn++) {
         Skill *skill = SkillManager::getThis( )->find( sn );

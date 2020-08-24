@@ -5,7 +5,7 @@
 #include "globalarray.h"
 #include "globalbitvector.h"
 #include "logstream.h"
-
+#include "stringlist.h"
 
 static int zeroValue;
 
@@ -34,6 +34,14 @@ void GlobalArray::clear( )
         resize( registry->size( ) );
 }
 
+bool GlobalArray::isEmpty() const
+{
+    for (unsigned int sn = 0; sn < size(); sn++)
+        if (at(sn) != 0)
+            return false;
+    return true;
+}
+
 int & GlobalArray::operator [] (size_type ndx)
 {
     if (!registry)
@@ -60,3 +68,24 @@ void GlobalArray::applyBitvector(const GlobalBitvector &bv, int modifier)
     }
 }
 
+
+StringList GlobalArray::toStringList(bool fRussian) const
+{
+    StringList lines;
+
+    if (!registry)
+        return lines;
+
+    for (unsigned int sn = 0; sn < size(); sn++) {
+        int mod = at(sn);
+        if (mod == 0)
+            continue;
+
+        GlobalRegistryElement *e = registry->find(sn);
+        DLString line = fRussian ? e->getRussianName() : e->getName();
+        line << " на " << mod;
+        lines.push_back(line);
+    }
+
+    return lines;
+}

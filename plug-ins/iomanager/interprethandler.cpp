@@ -89,7 +89,7 @@ static bool omprog_command( Character *actor, const DLString &cmdName, const DLS
 
 static bool can_see_room_details(Character *ch)
 {
-    if (ch->getConfig( )->holy
+    if (ch->getConfig( ).holy
         || ch->is_vampire( )
         || IS_GHOST(ch) || IS_DEATH_TIME(ch)
         || (ch->in_room->isDark( ) && IS_AFFECTED(ch, AFF_INFRARED))
@@ -248,7 +248,7 @@ void InterpretHandler::normalPrompt( Character *ch )
 
         case 'd':
         case 'e':
-            ruexits = ch->getPC( ) && ch->getPC( )->getConfig( )->ruexits;
+            ruexits = ch->getPC( ) && ch->getPC( )->getConfig( ).ruexits;
 
             for (int door = 0; door < DIR_SOMEWHERE; door++) {
                 EXIT_DATA *pexit = ch->in_room->exit[door];

@@ -535,7 +535,7 @@ int Character::getSkill( int sn )
  ****************************************************************************/
 const Character * Character::getDoppel( const Character *looker ) const
 {
-    if (looker && looker->getConfig( )->holy)
+    if (looker && looker->getConfig( ).holy)
         return this;
     else if (doppel && isAffected(gsn_doppelganger))
         return doppel->getDoppel( looker );
@@ -545,7 +545,7 @@ const Character * Character::getDoppel( const Character *looker ) const
 
 Character * Character::getDoppel( const Character *looker )
 {
-    if (looker && looker->getConfig( )->holy)
+    if (looker && looker->getConfig( ).holy)
         return this;
     else if (doppel && isAffected(gsn_doppelganger))
         return doppel->getDoppel( looker );

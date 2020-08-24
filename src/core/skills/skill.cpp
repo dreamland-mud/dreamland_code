@@ -33,7 +33,7 @@ bool Skill::isValid( ) const
 }
 const DLString& Skill::getNameFor( Character *ch ) const
 {
-    if (ch->getConfig( )->ruskills)
+    if (ch->getConfig( ).ruskills)
         return getRussianName( );
     else
         return getName( );

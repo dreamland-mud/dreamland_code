@@ -233,7 +233,7 @@ public:
     virtual short getModifyLevel( ) const;
 
     // configuration
-    virtual PlayerConfig::Pointer getConfig( ) const;
+    virtual PlayerConfig getConfig( ) const;
 
 private:
     XML_VARIABLE XMLString password; 

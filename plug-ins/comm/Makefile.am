@@ -27,7 +27,8 @@ writing.cpp \
 eating.cpp \
 communication.cpp \
 info.cpp \
-senses.cpp
+senses.cpp \
+affects.cpp
 
 libcomm_la_MOC = \
 banking.h \

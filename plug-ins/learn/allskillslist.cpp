@@ -123,7 +123,7 @@ bool AllSkillsList::parse( DLString &argument, std::ostream &buf, Character *ch 
         return false;
     }
 
-    fRussian = ch->getConfig( )->ruskills;
+    fRussian = ch->getConfig( ).ruskills;
     return true;
 }
 

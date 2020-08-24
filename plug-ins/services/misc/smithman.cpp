@@ -127,7 +127,7 @@ void SmithService::printLine( Character *client,
 
 void SmithService::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    DLString myname = client->getConfig().rucommands && !rname.empty() ? rname : name;
     printLine( client, price, myname, descr, buf );
 }
 
@@ -361,7 +361,7 @@ void AlignSmithService::smith( Character *client, NPCharacter *smithman, Object 
  *------------------------------------------------------------------------*/
 void SharpSmithService::toStream( Character *client, ostringstream &buf ) const
 {
-    DLString myname = client->getConfig()->rucommands && !rname.empty() ? rname : name;
+    DLString myname = client->getConfig().rucommands && !rname.empty() ? rname : name;
     printLine( client, price, myname, descr, buf );
     printLine( client, extraPrice, myname, extraDescr, buf );
 }

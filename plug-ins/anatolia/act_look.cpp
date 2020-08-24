@@ -676,7 +676,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
         webManipManager->decorateCharacter(buf, ch->sees( victim, '1' ), victim, ch);
     }
     else {
-        if (ch->getConfig( )->holy && origVict != victim)
+        if (ch->getConfig( ).holy && origVict != victim)
             buf << "{" << CLR_PLAYER(ch) << ch->sees( origVict, '1' ) << "{x "
                 << "(под личиной " << ch->sees( victim, '2' ) << ") ";
         else {
@@ -870,7 +870,7 @@ static void show_char_sexrace( Character *ch, Character *vict, ostringstream &bu
 {
     buf << "(";
 
-    if (ch->getConfig( )->rucommands)
+    if (ch->getConfig( ).rucommands)
         buf << vict->getRace( )->getNameFor( ch, vict );
     else
         buf << GET_SEX(vict, "male", "sexless", "female")
@@ -1220,7 +1220,7 @@ rprog_eexit_descr( Room *room, EXTRA_EXIT_DATA *peexit, Character *ch, const DLS
     
     buf << "{" << CLR_RNAME(ch) << room->name << "{x";
 
-    if (ch->getConfig( )->holy) 
+    if (ch->getConfig( ).holy) 
         buf << " {" << CLR_RVNUM(ch) << "[Room " << room->vnum
             << "][" << room->area->name << "]{x";
 
@@ -1770,7 +1770,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
     EXIT_DATA *pexit;
     DLString ename;
     DLString cmd;
-    PlayerConfig::Pointer cfg;
+    PlayerConfig cfg;
     Room *room;
     bool found;
 
@@ -1789,7 +1789,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
         if (!ch->can_see( room ))
             continue;
 
-        ename = (cfg->ruexits ? dirs[door].rname : dirs[door].name);
+        ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
         found = true;
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED)) {
@@ -1805,7 +1805,7 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
     }
     
     if (!found)
-        buf << (cfg->ruexits ? " нет" : " none");
+        buf << (cfg.ruexits ? " нет" : " none");
             
     buf << "]{x" << endl;
     ch->send_to( buf );
@@ -1817,7 +1817,7 @@ CMDRUNP( exits )
     EXIT_DATA *pexit;
     DLString ename;
     Room *room;
-    PlayerConfig::Pointer cfg;
+    PlayerConfig cfg;
     bool found;
     int door;
 
@@ -1844,13 +1844,13 @@ CMDRUNP( exits )
             continue;
 
         found = true;   
-        ename = (cfg->ruexits ? dirs[door].rname : dirs[door].name);
+        ename = (cfg.ruexits ? dirs[door].rname : dirs[door].name);
 
         if (!IS_SET(pexit->exit_info, EX_CLOSED))
         {
             buf << fmt(0, "    {C%-8s{x", ename.c_str()) << " - ";
 
-            if (room->isDark( ) && !cfg->holy && !IS_AFFECTED(ch, AFF_INFRARED ))
+            if (room->isDark( ) && !cfg.holy && !IS_AFFECTED(ch, AFF_INFRARED ))
                 buf << "Дорога ведет в темноту и неизвестность...";
             else
                 buf << room->name;
