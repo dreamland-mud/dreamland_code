@@ -551,7 +551,7 @@ struct        area_data
 
 #define HEALTH(ch) ((ch)->hit * 100 / max(1, (ch)->max_hit.getValue( )))
 
-#define IS_BLOODLESS(ch) ( IS_SET( ch->form, FORM_NONADOPTABLE ) || IS_SET( ch->form, FORM_UNDEAD ) || IS_SET( ch->form, FORM_CONSTRUCT ) ) 
+#define IS_BLOODLESS(ch) (IS_SET( ch->form, FORM_UNDEAD ) || IS_SET( ch->form, FORM_CONSTRUCT ) ) 
 
 /*
  * Object macros.
