@@ -21,6 +21,7 @@
 #include "arg_utils.h"
 #include "act.h"
 #include "merc.h"
+#include "messengers.h"
 #include "websocketrpc.h"
 #include "descriptor.h"
 #include "def.h"
@@ -108,8 +109,9 @@ void Confirm::doRequest( Character *ch )
     
     ch->println( "Твое описание отправлено Бессмертным на рассмотрение." );
     wiznet( WIZ_CONFIRM, 0, 0,
-            "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );
-    
+            "%^C1 просит подтверждения своему персонажу ({y{hcconfirm list new{x).", ch );    
+    send_telegram("Внимание богам: кто-то попросил подтверждения своему персонажу.");
+
     attr->update( ch ); 
     PCharacterManager::saveMemory( ch->getPC( ) );
 }
