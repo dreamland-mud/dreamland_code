@@ -827,7 +827,7 @@ void show_char_wounds( Character *ch, Character *victim, ostringstream &buf )
     else if (percent >=  30)
         buf << "{Y имеет несколько больших, опасных ран и царапин";
     else if (percent >= 15)
-        buf << "{M выглядит сильно поврежденным";
+        buf << fmt(ch, "{M выглядит сильно поврежденн%1$Gым|ым|ой", victim);
     else if (percent >= 0 )
         buf << "{R в ужасном состоянии";
     else

@@ -346,7 +346,7 @@ again:
                 switch (cvt) {
                     int nounFlags;
                 case 'G':
-                    nounFlags = (alternative ? 0 : FMT_INVIS);
+                    nounFlags = (alternative ? 0 : FMT_INVIS|FMT_DOPPEL);
                     if (argNoun(nounFlags)->getMultiGender() == (state - 8))
                         s += *f;
                     break;
