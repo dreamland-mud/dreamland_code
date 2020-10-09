@@ -588,10 +588,17 @@ NMI_INVOKE(Root, gecho, "(msg): выдать сообщение msg всем и�
     return Register( );
 }
 
-NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord от имени бота Хрустальный Шар")
+NMI_INVOKE(Root, discord, "(msg): послать сообщение в чат Discord")
 {
     DLString msg = args2string(args);
     send_discord_orb(msg);
+    return Register( );
+}
+
+NMI_INVOKE(Root, telegram, "(msg): послать сообщение в Telegram")
+{
+    DLString msg = args2string(args);
+    send_telegram(msg);
     return Register( );
 }
 
@@ -1192,3 +1199,4 @@ NMI_INVOKE(Root, skills, "(group): вернуть названия всех ум
     listObj->setHandler(skills);
     return Register(listObj);
 }
+
