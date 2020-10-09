@@ -350,7 +350,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     if (getGroup() != group_none)
         buf << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'";
     buf << "." << endl;
-
+    
     print_wait_and_mana(this, ch, buf);            
     buf << endl;
     
@@ -388,7 +388,7 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
     
     if (getGroup()->getPracticer() == 0) {
         // '...в твоей гильдии (справка|help гильдии|guilds)' - с гипер-ссылкой на справку.
-        buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка {hhгильдии{hx{lEhelp {hhguilds{x)." << endl;
+        buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка гильдии{lEhelp guilds{x)." << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
         MOB_INDEX_DATA *pMob = get_mob_index(getGroup()->getPracticer());
