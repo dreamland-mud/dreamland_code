@@ -3,7 +3,6 @@
  * ruffina, 2004
  */
 #include "drink_utils.h"
-#include "drink_commands.h"
 #include "drinkcontainer.h"
 #include "liquidflags.h"
 
@@ -124,7 +123,7 @@ static bool oprog_empty( Object *obj, Character *ch, const char *liqname, int am
     return false;
 }
 
-void CPour::createPool( Character *ch, Object *out, int amount ) 
+static void create_pool( Character *ch, Object *out, int amount ) 
 {
     Object *pool;
     int time;
@@ -172,7 +171,7 @@ void CPour::createPool( Character *ch, Object *out, int amount )
         save_items(room);
 }
 
-void CPour::pourOut( Character *ch, Object * out )
+static void pour_out( Character *ch, Object * out )
 {
     int amount;
     Room *room = ch->in_room;
@@ -210,7 +209,7 @@ void CPour::pourOut( Character *ch, Object * out )
     else {
         act( "Ты переворачиваешь $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_CHAR );
         act( "$c1 переворачивает $o4, выливая $N4 на землю.", ch, out, liqShort.c_str( ), TO_ROOM );
-        createPool( ch, out, amount );
+        create_pool( ch, out, amount );
     }
 
     if (out->behavior && out->behavior.getDynamicPointer<DrinkContainer>( ))
@@ -229,7 +228,7 @@ static void mprog_pour_out( Character *victim, Character *ch, Object *out, const
     FENIA_NDX_VOID_CALL( victim->getNPC( ), "PourOut", "CCOsi", victim, ch, out, liqname, amount );
 }
 
-void CPour::pourOut( Character *ch, Object * out, Character *victim )
+static void pour_out( Character *ch, Object * out, Character *victim )
 {
     Liquid *liquid;
     int sips, amount;
@@ -342,73 +341,15 @@ void CPour::pourOut( Character *ch, Object * out, Character *victim )
         oprog_pour_out( obj, ch, out, liqname, amount );
 }
 
-COMMAND( CPour, "pour" )
+static void pour_in( Character *ch, Object *out, Object *in, Character *vch )
 {
-    DLString arg1, arg2, arg3;
-    DLString arguments = constArguments;
-    Object *out, *in;
-    Character *vch = 0;
-    int amount;
     DrinkContainer::Pointer drink;
-    Liquid *liq;
-    
-    arg1 = arguments.getOneArgument( ); // drink1
-    arg2 = arguments.getOneArgument( ); // drink2 or victim or out or empty
-    arg3 = arguments.getOneArgument( ); // victim or empty
-
-    if (arg1.empty( )) {
-        ch->send_to("Вылить что и куда?\n\r");
-        return;
-    }
-
-    if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
-        ch->send_to("У тебя нет этого.\n\r");
-        return;
-    }
-
-    if (out->item_type != ITEM_DRINK_CON) {
-        ch->pecho("%^O1 - не емкость для жидкости.", out);
-        return;
-    }
-
-    if (drink_is_closed( out, ch ))
-        return;
-    
-    liq = liquidManager->find( out->value2() );
-    
-    if (arg2 == "out" || arg2.empty( )) {
-        if (!arg3.empty( )) {
-            if (( vch = get_char_room(ch, arg3.c_str( ) ) ) == 0) {
-                ch->println( "Вылить на кого?" );
-                return;
-            }
-
-            pourOut( ch, out, vch );
-        }
-        else
-            pourOut( ch, out );
-
-        return;
-    }
-
-    if ((in = get_obj_here(ch,arg2.c_str( ))) == 0) {
-        vch = get_char_room(ch,arg2.c_str( ));
-
-        if (vch == 0) {
-            ch->send_to("Вылить во что?\n\r");
-            return;
-        }
-
-        in = wear_hold->find( vch );
-
-        if (in == 0) {
-            ch->println("Во что?");
-            return;
-        }
-    }
 
     if (in->item_type != ITEM_DRINK_CON) {
-        ch->send_to("Ты можешь вылить только в другую емкость для жидкости.\n\r");
+        if (!vch || vch == ch)
+            ch->pecho("Ты пытаешься налить что-то в %O4, а это не емкость для жидкости.", in);
+        else
+            ch->pecho("В руках у %C2 зажата совсем не емкость для жидкости.", vch);
         return;
     }
 
@@ -416,12 +357,15 @@ COMMAND( CPour, "pour" )
         return;
 
     if (in == out) {
-        ch->send_to("Ты не можешь изменить законы физики!\n\r");
+        ch->pecho("Ты не можешь перелить из %1$O2 в сам%1$Gое|ого|у|их себя!", in);
         return;
     }
 
     if (in->value1() != 0 && in->value2() != out->value2()) {
-        ch->pecho("В %O4 налита другая жидкость.", in);
+        if (!vch || vch == ch)
+            ch->pecho("В %O4 налита другая жидкость.", in);
+        else
+            ch->pecho("В %O4 в руках у %C2 налита другая жидкость.", in, vch);
         return;
     }
 
@@ -431,16 +375,20 @@ COMMAND( CPour, "pour" )
     }
 
     if (in->value1() >= in->value0()) {
-        ch->pecho( "%1$^O1 уже полностью заполне%1$Gно|н|на|ны.", in );
+        if (!vch || vch == ch)
+            ch->pecho( "%1$^O1 уже полностью заполне%1$Gно|н|на|ны.", in );
+        else
+            ch->pecho( "%1$^O1 в руках у %2$C2 уже полностью заполне%1$Gно|н|на|ны.", in, vch );
         return;
     }
 
-    amount = min(out->value1(),in->value0() - in->value1());
+    int amount = min(out->value1(),in->value0() - in->value1());
 
     in->value1(in->value1() + amount);
     out->value1(out->value1() - amount);
     in->value2(out->value2());
 
+    Liquid *liq = liquidManager->find( out->value2() );
     const char *liqShort = liq->getShortDescr( ).c_str( );
 
     if (vch == 0) {
@@ -464,6 +412,122 @@ COMMAND( CPour, "pour" )
 
     if (out->behavior && ( drink = out->behavior.getDynamicPointer<DrinkContainer>( ) ))
         drink->pour( ch, in, amount );
+}
+
+/**
+ * Syntax:
+ * pourout|вылить <drink1>
+ * pourout|вылить <drink1> <victim>
+ */
+CMDRUN( pourout )
+{
+    DLString arg1, arg2;
+    DLString arguments = constArguments;
+    Object *out;
+    Character *vch = 0;
+    
+    arg1 = arguments.getOneArgument( ); // drink1
+    arg2 = arguments.getOneArgument( ); // victim or empty
+
+    if (arg1.empty( )) {
+        ch->send_to("Вылить что и куда?\n\r");
+        return;
+    }
+
+    if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
+        ch->println("У тебя в инвентаре нет такой емкости для жидкости.");
+        return;
+    }
+
+    if (out->item_type != ITEM_DRINK_CON) {
+        ch->pecho("%^O1 - не емкость для жидкости.", out);
+        return;
+    }
+
+    if (drink_is_closed( out, ch ))
+        return;
+    
+    if (arg2.empty( )) {
+        pour_out( ch, out );
+        return;
+    }
+
+    if (( vch = get_char_room(ch, arg2.c_str( ) ) ) == 0) {
+        ch->println( "Вылить на кого?" );
+        return;
+    }
+
+    pour_out( ch, out, vch );
+}
+
+/**
+ * Syntax:
+ * pour <drink1> <drink2>
+ * pour <drink1> <victim>
+ * pour <drink1> out
+ * pour <drink1> out <victim>
+ */
+CMDRUN( pour )
+{
+    DLString arg1, arg2, arg3;
+    DLString arguments = constArguments;
+    Object *out, *in;
+    Character *vch = 0;
+    
+    arg1 = arguments.getOneArgument( ); // drink1
+    arg2 = arguments.getOneArgument( ); // drink2 or victim or out or empty
+    arg3 = arguments.getOneArgument( ); // victim or empty
+
+    if (arg1.empty( )) {
+        ch->send_to("Вылить что и куда?\n\r");
+        return;
+    }
+
+    if ((out = get_obj_carry(ch,arg1.c_str( ))) == 0) {
+        ch->println("У тебя в инвентаре нет такой емкости для жидкости.");
+        return;
+    }
+
+    if (out->item_type != ITEM_DRINK_CON) {
+        ch->pecho("%^O1 - не емкость для жидкости.", out);
+        return;
+    }
+
+    if (drink_is_closed( out, ch ))
+        return;
+    
+    if (arg2 == "out" || arg2.empty( )) {
+        if (!arg3.empty( )) {
+            if (( vch = get_char_room(ch, arg3.c_str( ) ) ) == 0) {
+                ch->println( "Вылить на кого?" );
+                return;
+            }
+
+            pour_out( ch, out, vch );
+        }
+        else
+            pour_out( ch, out );
+
+        return;
+    }
+
+    if ((in = get_obj_here(ch,arg2.c_str( ))) == 0) {
+        vch = get_char_room(ch,arg2.c_str( ));
+
+        if (vch == 0) {
+            ch->send_to("Вылить во что?\n\r");
+            return;
+        }
+
+        in = wear_hold->find( vch );
+
+        if (in == 0) {
+            ch->pecho("У %C2 в руках нет бокала или другой емкости.", vch);
+            return;
+        }
+    }
+
+    pour_in(ch, out, in, vch);
 }
 
 /*
