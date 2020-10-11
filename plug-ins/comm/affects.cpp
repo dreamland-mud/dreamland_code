@@ -373,21 +373,22 @@ CMDRUNP( affects )
     if (!ch->is_npc()) {
         PCharacter *pch = ch->getPC();
         bool rus = IS_SET(flags, FSHOW_RUSSIAN);
-        StringList learnedSkills = pch->mod_skills.toStringList(rus);
-        StringList learnedGroups = pch->mod_skill_groups.toStringList(rus);
-        StringList levelSkills = pch->mod_level_skills.toStringList(rus);
-        StringList levelGroups = pch->mod_level_groups.toStringList(rus);
+        const DLString joiner = " {yна{m ";
+        StringList learnedSkills = pch->mod_skills.toStringList(rus, joiner);
+        StringList learnedGroups = pch->mod_skill_groups.toStringList(rus, joiner);
+        StringList levelSkills = pch->mod_level_skills.toStringList(rus, joiner);
+        StringList levelGroups = pch->mod_level_groups.toStringList(rus, joiner);
 
         if (!learnedSkills.empty())
-            buf << "Изменено знание навыков: " << learnedSkills.wrap("", "%").join(", ") << "." << endl;
+            buf << "{yИзменено знание навыков: " << learnedSkills.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!learnedGroups.empty())
-            buf << "Изменено знание групп навыков: " << learnedGroups.wrap("", "%").join(", ") << "." << endl;
+            buf << "{yИзменено знание групп навыков: " << learnedGroups.wrap("{m", "%{y").join(", ") << "." << endl;
         if (!levelSkills.empty())
-            buf << "Изменен уровень навыков: " << levelSkills.join(", ") << "." << endl;
+            buf << "{yИзменен уровень навыков: " << levelSkills.wrap("{m", "{y").join(", ") << "." << endl;
         if (!levelGroups.empty())
-            buf << "Изменен уровень групп навыков: " << levelGroups.join(", ") << "." << endl;
+            buf << "{yИзменен уровень групп навыков: " << levelGroups.wrap("{m", "{y").join(", ") << "." << endl;
         if (pch->mod_level_all != 0)
-            buf << "Уровень всех навыков изменен на " << pch->mod_level_all << "." << endl;
+            buf << "{yУровень всех навыков изменен на {m" << pch->mod_level_all << "{y.{x" << endl;
     }
 
     if (IS_CHARMED(ch)) {
