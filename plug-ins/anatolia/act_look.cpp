@@ -1796,10 +1796,10 @@ static void show_exits_to_char( Character *ch, Room *targetRoom )
             cmd = ename;
             buf << " " << web_cmd(ch, cmd, ename);
         } else if (!IS_SET(pexit->exit_info, EX_LOCKED)) {
-            cmd = "{lRоткрыть{lEopen{lx " + ename;
+            cmd = (cfg.rucommands ? "открыть " : "open ") + ename;
             buf << " *" << web_cmd(ch, cmd, ename) << "*";
         } else {
-            cmd = "{lRотпереть{lEunlock{lx " + ename;
+            cmd = (cfg.rucommands? "отпереть " : "unlock ") + ename;
             buf << " *" << web_cmd(ch, cmd, ename) << "*";
         }
     }
