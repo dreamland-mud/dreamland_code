@@ -450,8 +450,12 @@ void Damage::handlePosition( )
      * Sleep spells and extremely wounded folks.
      * Don't call stop_fighting and wake up from selfdamage when you are not able to wake up
      */
-    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)) 
+    if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)){ 
+        if(victim->position == POS_SLEEPING){
+            victim->println("Ты просыпаешься от полученного урона.");
+        }
         stop_fighting( victim, false );
+    }
 }
 
 /*-----------------------------------------------------------------------------
