@@ -255,7 +255,7 @@ void WeaponOneHit::damEffectFunkyWeapon( )
             poison->level = max(0,poison->level - 2);
             poison->duration = max(0,poison->duration - 1);
             if ( poison->level == 0 || poison->duration == 0 )
-                act_p("Яд с $o2 проходит.",ch,wield,0,TO_CHAR,POS_RESTING);
+                act_p("Яд с $o2 скоро исчезнет.",ch,wield,0,TO_CHAR,POS_RESTING);
         }
     }
 
