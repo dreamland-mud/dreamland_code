@@ -51,7 +51,7 @@ bool XMLAttributeCraft::handle( const ScoreArguments &args )
             ExperienceCalculator::Pointer calc = prof->getCalculator(args.pch);
 
             buf << "Профессия: " << prof->getNameFor(args.pch) << " уровня " << p->second.level
-                << ", опыт " << calc->expToLevel() << "/" << calc->expThisLevel();
+                << ", опыта до уровня " << calc->expToLevel() << "/" << calc->expThisLevel();
             args.lines.push_back( buf.str() );
         }
     }
