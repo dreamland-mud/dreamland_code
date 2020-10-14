@@ -217,7 +217,7 @@ VOID_SPELL(AnimateDead)::run( Character *ch, Object *obj, int sn, int level )
         if (obj->value3()) 
             pCorpseOwner = get_mob_index( obj->value3() );
 
-        if (!pCorpseOwner) {
+        if (!pCorpseOwner || DLString(pCorpseOwner->short_descr).empty()) {
             ch->println("Этот труп не поддается восстановлению.");
             return;
         }
