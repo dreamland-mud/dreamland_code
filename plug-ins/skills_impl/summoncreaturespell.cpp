@@ -6,6 +6,7 @@
 
 #include "pcharacter.h"
 #include "npcharacter.h"
+#include "affect.h"
 
 #include "interp.h"
 #include "save.h"
@@ -61,6 +62,12 @@ NPCharacter * SummonCreatureSpell::createMobileAux(
     mob->damage[DICE_NUMBER] = dice_number;
     mob->damage[DICE_TYPE] = dice_type;
     mob->damage[DICE_BONUS] = dice_bonus;
+
+    // Make sure all permanent affect on the mob have non-zero level.
+    for (Affect *paf = mob->affected; paf; paf = paf->next) {
+        if (paf->duration == -1)
+            paf->level = mob->getRealLevel();
+    }
 
     return mob;
 }
