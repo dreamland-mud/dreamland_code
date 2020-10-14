@@ -42,7 +42,7 @@ VOID_SPELL(Aid)::run( Character *ch, Character *victim, int sn, int level )
         return;
     }
 
-    victim->hit += level * 5;
+    victim->hit += level * 5; // Historically allowed to go above max_hit.
     update_pos( victim );
     victim->send_to("Волна тепла согревает твое тело.\n\r");
     act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
@@ -61,7 +61,7 @@ VOID_SPELL(Assist)::run( Character *ch, Character *victim, int sn, int level )
                 return;
         }
 
-        victim->hit += 100 + level * 5;
+        victim->hit += 100 + level * 5;  // Historically allowed to go above max_hit.
         update_pos( victim );
         victim->send_to("Волна тепла согревает твое тело.\n\r");
         act_p("$c1 выглядит лучше.", victim, 0, 0, TO_ROOM,POS_RESTING);
@@ -87,16 +87,20 @@ VOID_SPELL(Refresh)::run( Character *ch, Character *victim, int sn, int level )
 }
 
 
-
+/** Ensure that hit points value is no bigger than max HP. 
+ *  If max HP is negative don't make situation even worse.
+ */
+static void adjust_hit_points(Character *victim)
+{
+    int hit_upper_limit = max(0, (int)victim->max_hit);
+    victim->hit = min((int)victim->hit, hit_upper_limit);
+}
 
 SPELL_DECL(CureLight);
 VOID_SPELL(CureLight)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    int heal;
-
-    heal = dice(1, 8) + level / 4 + 5;
-    
-    victim->hit = min( victim->hit + heal, (int)victim->max_hit );
+    victim->hit += dice(1, 8) + level / 4 + 5;
+    adjust_hit_points(victim);
     update_pos( victim );
     victim->send_to("Ты чувствуешь себя слегка лучше!\n\r");
 
@@ -107,12 +111,8 @@ VOID_SPELL(CureLight)::run( Character *ch, Character *victim, int sn, int level 
 SPELL_DECL(CureSerious);
 VOID_SPELL(CureSerious)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    int heal;
-
-    heal = dice(2, 8) + level / 3 + 10;
-
-    victim->hit = min( victim->hit + heal, (int)victim->max_hit );
-    update_pos( victim );
+    victim->hit += dice(2, 8) + level / 3 + 10;
+    adjust_hit_points(victim);
     victim->send_to("Ты чувствуешь себя лучше!\n\r");
 
     if ( ch != victim )
@@ -122,11 +122,8 @@ VOID_SPELL(CureSerious)::run( Character *ch, Character *victim, int sn, int leve
 SPELL_DECL(CureCritical);
 VOID_SPELL(CureCritical)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-    int heal;
-    
-    heal = dice(3, 8) + level / 2 + 20;
-    
-    victim->hit = min( victim->hit + heal, (int)victim->max_hit );
+    victim->hit += dice(3, 8) + level / 2 + 20;
+    adjust_hit_points(victim);
     update_pos( victim );
     victim->send_to("Ты чувствуешь себя намного лучше!\n\r");
 
@@ -138,11 +135,8 @@ VOID_SPELL(CureCritical)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(Heal);
 VOID_SPELL(Heal)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-//    victim->hit = min( victim->hit + 100 + level / 10, victim->max_hit );
-
     victim->hit += level * 2 + number_range( 40, 45 ); 
-    victim->hit = min( victim->hit, victim->max_hit );
-    
+    adjust_hit_points(victim);    
     update_pos( victim );
     victim->send_to("Волна тепла согревает твое тело.\n\r");
 
@@ -153,11 +147,8 @@ VOID_SPELL(Heal)::run( Character *ch, Character *victim, int sn, int level )
 SPELL_DECL(SuperiorHeal);
 VOID_SPELL(SuperiorHeal)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-//    victim->hit += 170 + level + dice(1,20);
-
     victim->hit += level * 3 + number_range( 100, 120 ); 
-    victim->hit = min( victim->hit, victim->max_hit );
-
+    adjust_hit_points(victim);    
     update_pos( victim );
     victim->send_to("Волна тепла окутывает тебя.\n\r");
 
@@ -169,11 +160,8 @@ VOID_SPELL(SuperiorHeal)::run( Character *ch, Character *victim, int sn, int lev
 SPELL_DECL(MasterHealing);
 VOID_SPELL(MasterHealing)::run( Character *ch, Character *victim, int sn, int level ) 
 { 
-//  victim->hit += 300 + level + dice(1, 40);
-  
     victim->hit += level * 5 + number_range( 60, 100 ); 
-    victim->hit = min( victim->hit, victim->max_hit );
-
+    adjust_hit_points(victim);    
     update_pos( victim );
     victim->send_to("Волна тепла согревает твое тело.\n\r");
 
