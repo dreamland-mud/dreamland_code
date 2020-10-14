@@ -458,7 +458,7 @@ void show_room_affects_to_char(Room *room, Character *ch, ostringstream &mainBuf
 {
 	ostringstream buf;
 		
-    for (Affect *paf = ch->in_room->affected; paf != 0; paf = paf->next)
+    for (Affect *paf = room->affected; paf != 0; paf = paf->next)
         if (paf->type->getAffect( ))
             paf->type->getAffect( )->toStream( buf, paf );
 
