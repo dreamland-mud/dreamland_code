@@ -452,7 +452,7 @@ void Damage::handlePosition( )
      */
     if (!IS_AWAKE(victim) && !(IS_AFFECTED(victim, AFF_SLEEP) && ch == victim)){ 
         if(victim->position == POS_SLEEPING){
-            victim->println("Ты просыпаешься от полученного урона.");
+            victim->println("Ты просыпаешься от внезапной боли.");
         }
         stop_fighting( victim, false );
     }
