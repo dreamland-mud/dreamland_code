@@ -572,18 +572,18 @@ NMI_INVOKE(Root, api, "(): печатает этот API" )
     return Register( buf.str( ) );
 }
 
-NMI_INVOKE(Root, gecho, "(msg): выдать сообщение msg всем играющим" )
+NMI_INVOKE(Root, gecho, "(fmt, args): выдать отформатированное сообщение msg всем играющим" )
 {
     Descriptor *d;
 
     if (args.empty())
         throw Scripting::NotEnoughArgumentsException( );
     
-    DLString txt = args.front().toString() + "\r\n";
-    
-    for (d = descriptor_list; d != 0; d = d->next)
-        if (d->connected == CON_PLAYING && d->character)
-            d->character->send_to( txt.c_str( ) );
+    for (d = descriptor_list; d != 0; d = d->next) {
+        Character *wch = d->character;
+        if (d->connected == CON_PLAYING && wch && wch->in_room)
+            wch->pecho(POS_RESTING, regfmt(wch, args).c_str());
+    }
     
     return Register( );
 }
