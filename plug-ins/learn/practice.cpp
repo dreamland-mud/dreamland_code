@@ -50,6 +50,7 @@ struct PracInfo {
     int percent;
     int adept;
     int maximum;
+    int help_id;
     DLString name;
 
     inline const char * getNameColor( ) const
@@ -101,6 +102,11 @@ void CPractice::pracShow( PCharacter *ch )
         info.adept = skill->getAdept( ch );
         info.maximum = skill->getMaximum( ch );
 
+        if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+            info.help_id = skill->getSkillHelp()->getID();
+        else
+            info.help_id = 0;
+
         cm_iter = cmap.find( category );
 
         if (cm_iter == cmap.end( )) {
@@ -113,7 +119,8 @@ void CPractice::pracShow( PCharacter *ch )
             cm_iter->second.push_back( info );
     }
 
-    const char *pattern = (fRussian ? "%s%-27s %s%3d%%{x" : "%s%-16s%s%3d%%{x");
+    const char *patternNoHelp = (fRussian ? "%s%-27s %s%3d%%{x" : "%s%-16s%s%3d%%{x");
+    const char *patternHelp = (fRussian ? "%s{hh%d%-27s{hx %s%3d%%{x" : "%s{hh%d%-16s{hx%s%3d%%{x");
     const int columns = (fRussian ? 2 : 3);
 
     for (cm_iter = cmap.begin( ); cm_iter != cmap.end( ); cm_iter++) {
@@ -121,17 +128,26 @@ void CPractice::pracShow( PCharacter *ch )
         
         category = cm_iter->first;
         category.upperFirstCharacter( );
-        buf << category << ":" << endl;
+        buf << "{Y" << category << ":{x" << endl;
         
         for (i = 0; i < cm_iter->second.size( ); i++) {
             info = cm_iter->second[i];
-             
-            buf << dlprintf( pattern,
-                              info.getNameColor( ), 
-                              info.name.c_str( ),
-                              info.getPercentColor( ),
-                              info.percent );                                
-                buf << "     ";
+            
+            if (info.help_id > 0)
+                buf << dlprintf( patternHelp,
+                                info.getNameColor( ), 
+                                info.help_id,
+                                info.name.c_str( ),
+                                info.getPercentColor( ),
+                                info.percent );
+            else
+                buf << dlprintf( patternNoHelp,
+                                info.getNameColor( ), 
+                                info.name.c_str( ),
+                                info.getPercentColor( ),
+                                info.percent );
+
+            buf << "     ";
             
             if ((i + 1) % columns == 0)
                 buf << endl;

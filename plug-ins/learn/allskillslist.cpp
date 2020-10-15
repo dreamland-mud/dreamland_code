@@ -180,6 +180,11 @@ void AllSkillsList::make( Character *ch )
         else
             info.mana = skill->getMana( );
 
+        if (skill->getSkillHelp() && skill->getSkillHelp()->getID() > 0)
+            info.help_id = skill->getSkillHelp()->getID();
+        else
+            info.help_id = 0;
+
         push_back( info );
     }
 
@@ -239,10 +244,15 @@ void AllSkillsList::display( std::ostream & buf )
         else if (firstColumn)
             buf << "       |";
 
-        if (bool_long_name)
-            buf << dlprintf( " {c%-30s{x|", info.name.c_str( ) );
+        if (info.help_id > 0)
+            buf << "{hh" << info.help_id << " ";
         else
-            buf << dlprintf( " {c%-18s{x|", info.name.c_str( ) );
+            buf << " ";
+            
+        if (bool_long_name)
+            buf << dlprintf( "{c%-30s{x|", info.name.c_str( ) );
+        else
+            buf << dlprintf( "{c%-18s{x|", info.name.c_str( ) );
 
         if (info.available)
             buf << dlprintf( " %s%3d{x(%s%3d{x)|", 

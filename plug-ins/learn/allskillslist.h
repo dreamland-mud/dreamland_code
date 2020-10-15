@@ -22,6 +22,7 @@ struct SkillInfo
     int mana;
     int adept;
     int maximum;
+    int help_id;
     bool spell;
     bool available;
 
