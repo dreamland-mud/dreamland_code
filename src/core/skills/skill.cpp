@@ -126,7 +126,7 @@ bool Skill::canTeach( NPCharacter *, PCharacter *, bool )
 void Skill::practice( PCharacter * ) const
 {
 }
-void Skill::show( PCharacter *, std::ostream & ) 
+void Skill::show( PCharacter *, std::ostream & ) const
 { 
 }
 

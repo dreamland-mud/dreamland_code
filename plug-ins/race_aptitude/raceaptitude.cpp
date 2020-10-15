@@ -88,14 +88,15 @@ bool RaceAptitude::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) 
+void RaceAptitude::show( PCharacter *ch, std::ostream &buf ) const
 {
-    Races::iterator i;
+    Races::const_iterator i;
+    SkillGroupReference &group = const_cast<RaceAptitude *>(this)->getGroup();
 
     buf << skill_what(this).ruscase('1').upperFirstCharacter() 
         << " '{c" << getName( ) << "{x' или" 
         << " '{c" << getRussianName( ) << "{x'"
-        << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'."
+        << ", входит в группу '{hg{c" << group->getNameFor(ch) << "{x'."
         << endl << endl;
 
 

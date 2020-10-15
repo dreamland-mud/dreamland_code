@@ -55,7 +55,7 @@ public:
     virtual bool canPractice( PCharacter *, ostream & buf ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
 
-    virtual void show( PCharacter *, ostream & buf );
+    virtual void show( PCharacter *, ostream & buf ) const;
 
     virtual const DLString & getCategory( ) const
     {

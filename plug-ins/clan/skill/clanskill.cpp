@@ -176,10 +176,10 @@ bool ClanSkill::canTeach( NPCharacter *mob, PCharacter * ch, bool verbose )
     return false;
 }
 
-void ClanSkill::show( PCharacter *ch, std::ostream & buf ) 
+void ClanSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
     StringList clanNames;
-    Clans::iterator i;
+    Clans::const_iterator i;
     PCSkillData &data = ch->getSkillData( getIndex( ) );
     
     buf << skill_what(this).ruscase('1').upperFirstCharacter() << " "

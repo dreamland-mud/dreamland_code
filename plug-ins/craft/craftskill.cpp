@@ -113,12 +113,14 @@ bool CraftSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-void CraftSkill::show( PCharacter *ch, std::ostream &buf )
+void CraftSkill::show( PCharacter *ch, std::ostream &buf ) const
 {
+    SkillGroupReference &group = const_cast<CraftSkill *>(this)->getGroup();
+
     buf << skill_what(this).ruscase('1').upperFirstCharacter() 
         << " '{c" << getName( ) << "{x' или"
         << " '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'." 
+        << "входит в группу '{hg{c" << group->getNameFor(ch) << "{x'." 
         << endl << endl;
 
     StringList pnames; 

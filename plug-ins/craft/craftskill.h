@@ -30,7 +30,7 @@ public:
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
 
-    virtual void show( PCharacter *, std::ostream & ); 
+    virtual void show( PCharacter *, std::ostream & ) const; 
 
     virtual const DLString & getCategory( ) const
     {

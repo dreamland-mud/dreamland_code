@@ -340,15 +340,16 @@ bool GenericSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
  * Печатает разную инфу: группу, цену в s.p., дерево предков, список потомков etc
  * Используется в showskill.
  */
-void GenericSkill::show( PCharacter *ch, std::ostream & buf ) 
+void GenericSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
-    const DLString what = skill_what(this).ruscase('1'); 
+    const DLString what = skill_what(this).ruscase('1');
+    SkillGroupReference &group = const_cast<GenericSkill *>(this)->getGroup();
 
     buf << what.upperFirstCharacter()
         << " '{c" << getName( ) << "{x' или"
         << " '{c" << getRussianName( ) << "{x'";
-    if (getGroup() != group_none)
-        buf << ", входит в группу '{hg{c" << getGroup()->getNameFor(ch) << "{x'";
+    if (group != group_none)
+        buf << ", входит в группу '{hg{c" << group->getNameFor(ch) << "{x'";
     buf << "." << endl;
     
     print_wait_and_mana(this, ch, buf);            
@@ -386,12 +387,12 @@ void GenericSkill::show( PCharacter *ch, std::ostream & buf )
         buf << skill_effective_bonus(this, ch) << "." << endl;
     }
     
-    if (getGroup()->getPracticer() == 0) {
-        // '...в твоей гильдии (справка|help гильдии|guilds)' - с гипер-ссылкой на справку.
-        buf << "Это " << what << " можно выучить в твоей {gгильдии{x ({W{lRсправка гильдии{lEhelp guilds{x)." << endl;
+    if (group->getPracticer() == 0) {
+        // '...в твоей гильдии' - с гипер-ссылкой на справку.
+        buf << "Это " << what << " можно выучить в твоей {g{hh44гильдии{x." << endl;
     } else {
         // 'Это заклинание можно выучить у Маршала Дианы (зона Новый Офкол)' - с гипер-ссылкой на зону
-        MOB_INDEX_DATA *pMob = get_mob_index(getGroup()->getPracticer());
+        MOB_INDEX_DATA *pMob = get_mob_index(group->getPracticer());
         if (pMob)
             buf << "Это " << what << " можно выучить у "
                 << "{g" << russian_case( pMob->short_descr, '2' ) << "{x "

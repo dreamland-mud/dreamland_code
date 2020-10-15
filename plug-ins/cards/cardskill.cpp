@@ -79,11 +79,13 @@ bool CardSkill::canTeach( NPCharacter *mob, PCharacter *ch, bool verbose )
     return false;
 }
 
-void CardSkill::show( PCharacter *ch, std::ostream & buf ) 
+void CardSkill::show( PCharacter *ch, std::ostream & buf ) const
 {
+    SkillGroupReference &group = const_cast<CardSkill *>(this)->getGroup();
+
     buf << skill_what(this).ruscase('1').upperFirstCharacter() 
         << " Колоды '{c" << getName( ) << "{x' или '{c" << getRussianName( ) << "{x', "
-        << "входит в группу '{hg{c"  << getGroup()->getNameFor(ch) << "{x'" 
+        << "входит в группу '{hg{c"  << group->getNameFor(ch) << "{x'" 
         << endl;
     
     print_wait_and_mana(this, ch, buf);     
