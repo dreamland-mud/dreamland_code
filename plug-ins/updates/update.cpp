@@ -497,6 +497,10 @@ void water_float_update( )
 
         if (IS_SET( obj->extra_flags, ITEM_NOPURGE ))
             continue;
+
+        // Don't drown items that reset in this location.
+        if (obj->reset_room == obj->in_room->vnum)
+            continue;
         
         if (obj->water_float == -2) {
             if (obj->may_float( ) || material_swims( obj ) == SWIM_ALWAYS)
