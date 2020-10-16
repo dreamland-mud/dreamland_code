@@ -133,18 +133,19 @@ void Language::practice( PCharacter *ch ) const
     learned = max( learned, SKILL_ADEPT );
 }
 
-void Language::show( PCharacter *ch, std::ostream & buf ) 
+void Language::show( PCharacter *ch, std::ostream & buf ) const
 {
-    Races::iterator r;
-    Classes::iterator c;
+    SkillGroupReference &group = const_cast<Language *>(this)->getGroup();
+    Races::const_iterator r;
+    Classes::const_iterator c;
     WordList perfect, unperfect;
-    WordList::iterator n;
+    WordList::const_iterator n;
     DLString userName;
 
     buf << "Язык '{W" << getName( ) << "{x'"
         << " '{W" << getRussianName( ) << "{x', "
         << "входит в группу '{hg{W" 
-        << getGroup()->getNameFor(ch) 
+        << group->getNameFor(ch) 
         << "{x'"
         << endl;
     

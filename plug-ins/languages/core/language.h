@@ -91,7 +91,7 @@ public:
     virtual bool canPractice( PCharacter *, std::ostream & ) const;
     virtual bool canTeach( NPCharacter *, PCharacter *, bool );
     virtual void practice( PCharacter * ) const;
-    virtual void show( PCharacter *, std::ostream & ); 
+    virtual void show( PCharacter *, std::ostream & ) const; 
     virtual void improve( Character *, bool, Character *victim = NULL, int dam_type = -1, int dam_flags = 0 ) const;
     virtual const DLString & getCategory( ) const
     {
