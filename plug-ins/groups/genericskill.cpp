@@ -28,7 +28,7 @@ PROF(vampire);
 HOMETOWN(frigate);
 GROUP(none);
 
-const DLString GenericSkill::CATEGORY = "Профессиональные умения";
+const DLString GenericSkill::CATEGORY = "Классовые умения";
 
 GenericSkill::GenericSkill( ) 
                 : raceAffect( 0, &affect_flags ),

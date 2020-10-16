@@ -11,10 +11,8 @@
 
 GROUP(none);
 
-void print_see_also(Skill *skill, PCharacter *ch, ostream &buf) 
+static void print_see_also(Skill *skill, PCharacter *ch, ostream &buf) 
 {
-    SkillGroupReference &group = skill->getGroup( );
-
     // 'См. также справка|help травы|herbs' - с гипер-ссылкой на справку.
     buf << endl << "См. также {W{lRсправка{lEhelp{lx {hh" << skill->getNameFor(ch) << "{x." << endl;
 }
