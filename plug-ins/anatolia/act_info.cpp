@@ -94,6 +94,7 @@
 #include "act.h"
 #include "alignment.h"
 #include "interp.h"
+#include "levenshtein.h"
 
 #include "occupations.h"
 #include "raceflags.h"
@@ -1974,6 +1975,122 @@ CMDRUNP( iidea )
 /*---------------------------------------------------------------------------*
  * Help
  *---------------------------------------------------------------------------*/
+
+/**
+ * An attempt to implement fuzzy search, matching input against keywords using
+ * Levenshtein algorithm.
+ */
+struct FuzzySearch {
+    FuzzySearch(Character *ch, const char *argument) 
+    {
+        arg = argument;
+        arg.toLower();
+
+        // For short user input, only look for very exact matches (distance 1).
+        min_distance = arg.length() > 5 ? 3 : arg.length() > 2 ? 2 : 1;
+
+        candidates.resize(min_distance + 1);
+
+        empty = true;
+
+        // Collect all matching articles.
+        for (auto &a : helpManager->getArticles()) {
+            if ((*a)->visible(ch))
+                searchArticle(a);
+        }
+    }
+
+    bool hasResults() 
+    {
+        return !empty;
+    }
+
+    void printResults(Character *ch) 
+    {
+        ostringstream buf;
+        int max_output = 5;    
+
+        buf << "Справка не найдена. Возможно, имелось в виду:" << endl;
+
+        // Output matches starting with best distance ones, but no more than max_output.
+        for (int i = 1; i <= min_distance && max_output > 0; i++) {
+            auto & matches = candidates[i];
+
+            for (auto &pair: matches) {
+                buf << "    ";
+                if (pair.second->getID() > 0)
+                    buf << "{hh" << pair.second->getID();
+
+                buf << pair.first << "{x "
+                    << "(" << pair.second->getTitle(DLString::emptyString).colourStrip() << ")" 
+                    << endl;
+
+                if ((--max_output) <= 0)
+                    break;
+            }
+        }
+
+        ch->send_to(buf);
+    }
+
+private:
+
+    void searchArticle(const HelpArticle::Pointer &a) 
+    {
+        int d;
+
+        // See if any of the article's keywords matches the input.
+        for (auto &keyword: a->getAllKeywords()) {
+            DLString kw = keyword;
+            kw.replaces("'", "");
+            kw.toLower(); 
+       
+            // First try to match full keyword (with spaces but without quotes). 
+            if ((d = getDistance(kw)) <= min_distance) { 
+                candidates[d].push_back(make_pair(kw, a));
+                empty = false;
+                return;
+            }
+
+            // If keyword contains spaces, split it into words and try again.
+            if (kw != keyword) {
+                DLString word;
+                while (!(word = kw.getOneArgument()).empty()) {
+                    if ((d = getDistance(word)) <= min_distance) { 
+                        candidates[d].push_back(make_pair(word, a));
+                        empty = false;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    int getDistance(const DLString &keyword)
+    {
+        // Return Levenshtein distance between user input and the keyword. 
+        // The keyword is cut to match the input size (unless input is too short already),
+        // this allows for prefix matches.
+        DLString kw = keyword;
+
+        if (arg.length() > 3 && arg.length() < kw.length())
+            kw.cutSize(arg.length());
+
+        return levenshtein(arg.c_str(), kw.c_str(), 1, 1, 1, 1);
+    }
+
+    DLString arg;
+
+    // Keep a list of matches for each distance. A match (pair) contains the exact keyword and the article.
+    vector<
+        list<pair<DLString, HelpArticle::Pointer> > > candidates;
+
+    // Cut-off distance.
+    int min_distance;
+
+    bool empty;
+};
+
 struct HelpFinder {
     typedef vector<HelpArticle::Pointer> ArticleArray;
 
@@ -2035,7 +2152,7 @@ private:
         if (!preferredLabels.empty() && !a->labels.all.containsAny(preferredLabels))
             return false;
 
-        const DLString &fullKw = a->getAllKeywordsString() + " " + a->aka.toString();
+        DLString fullKw = a->getAllKeywordsString() + " " + a->aka.toString();
         const char *lookup = preferredLabels.empty() ? args.c_str() : argRest.c_str();
 
         if (is_name(lookup, fullKw.c_str()))
@@ -2120,10 +2237,17 @@ CMDRUNP( help )
     
     // Поиск по строке без чисел.
     HelpFinder::ArticleArray articles = HelpFinder(ch, argument).getArticles();
-    // No match.
+    // No match, try fuzzy matching.
     if (articles.empty()) {
-        ch->send_to( "Нет подсказки по данному слову.\n\r");
-        bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+        FuzzySearch fs(ch, argument);
+
+        if (!fs.hasResults()) {
+            ch->send_to( "Нет подсказки по данному слову.\n\r");
+            bugTracker->reportNohelp( ch, origArgument.c_str( ) );
+        } else {
+            fs.printResults(ch);
+        }
+
         return;
     }
 
